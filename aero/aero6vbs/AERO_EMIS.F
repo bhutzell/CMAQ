@@ -19,7 +19,7 @@
 
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero6/AERO_EMIS.F,v 1.11 2012/01/19 13:20:08 yoj Exp $
+C $Header: /models/CMAQ/src/CMAQv5.0.1/models/CCTM/src/aero/vbs/AERO_EMIS.F,v 1.1.1.1 2012/04/19 19:45:04 sjr Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
@@ -64,8 +64,7 @@ C   25 Mar 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 C   11 May 11 D.Wong: incorporated twoway model implementation
 C   18 Aug 11 David Wong: In the merge inline point source PM species calculation,
 C                         arrays EMBUFF and PMEMIS_PT have incorrect index values
-C   17 Apr 13 J.Young: replace "SPFC ASO4" (found by Havala Pye) with "SPFC_ASO4"
-
+C   08 Sep 12 Bonyoung Koo: revised for VBS
 C-----------------------------------------------------------------------
 
       USE AERO_DATA, ONLY: N_MODE
@@ -122,7 +121,7 @@ C Factor for converting aerosol emissions from input units ...
 
 C *** PVB: temporary hack to speciate PMC
       REAL,    SAVE :: SPFC_ACORS
-      REAL,    SAVE :: SPFC_ASO4
+      REAL,    SAVE :: SPFC ASO4
       REAL,    SAVE :: SPFC_ANO3
       REAL,    SAVE :: SPFC_ACL
       REAL,    SAVE :: SPFC_AH2O
@@ -441,7 +440,7 @@ C *** Map aerosol surface emission species and set across-the-board adjustment f
 
 C *** PVB: temporary hack to speciate PMC
          SPFC_ACORS = ( 1.0 - 0.00325 ) * AEROSPC( ACORS_IDX )%EMIS_SPLIT( N_MODE )
-         SPFC_ASO4  = 0.00100 * AEROSPC( ASO4_IDX )%EMIS_SPLIT( N_MODE )
+         SPFC ASO4  = 0.00100 * AEROSPC( ASO4_IDX )%EMIS_SPLIT( N_MODE )
          SPFC_ANO3  = 0.00048 * AEROSPC( ANO3_IDX )%EMIS_SPLIT( N_MODE )
          SPFC_ACL   = 0.00145 * AEROSPC( ACL_IDX )%EMIS_SPLIT( N_MODE )
          SPFC_AH2O  = 0.00032 * AEROSPC( AH2O_IDX )%EMIS_SPLIT( N_MODE )
@@ -606,6 +605,13 @@ C Geometric Constants
          REAL, PARAMETER :: F6DPI = 6.0 / PI
          REAL, PARAMETER :: F6DPIM9 = 1.0E-9 * F6DPI   ! 1.0E-9 = Kg/ug
 
+C Local variables for VBS emissions
+         REAL EM_POA_OP( NCOLS,NROWS,NLAYS )  ! temporary array for POA_OP
+         REAL EM_POA_GV( NCOLS,NROWS,NLAYS )  ! temporary array for POA_GV
+         REAL EM_POA_DV( NCOLS,NROWS,NLAYS )  ! temporary array for POA_DV
+         INTEGER IDX_POA_OP( N_VBS_BIN ), IDX_POA_BB( N_VBS_BIN )
+         INTEGER NIDX_POA_OP, NIDX_POA_BB
+
 C Local variables for sea salt emission rates (grid cell value)
          REAL :: CR_SSM( N_AEROSPC,N_MODE )   ! mass
          REAL :: CR_SSN( N_MODE )             ! number
@@ -652,40 +658,206 @@ C     time.  Store result in EMBUFF array.
 
             EMBUFF = 0.0   ! array assignment
 
+            NIDX_POA_OP = 0
+            NIDX_POA_BB = 0
+
             DO S = 1, N_EMIS_PM   ! read 2d file
                IDX = PMEM_MAP( S )
-               IF ( .NOT. INTERPX( EMIS_1, AEROSPC( IDX )%EMIS, PNAME,
-     &                             STARTCOL,ENDCOL, STARTROW,ENDROW, 1,1,
-     &                             JDATE, JTIME, EMBUFF( 1,1,1,S ) ) ) THEN
-                  XMSG = 'Could not read '
-     &                 // TRIM( AEROSPC( IDX )%EMIS ) // ' from ' // EMIS_1
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
-               END IF
+cvbs=> special case for VBS emissions
+               if ( AEROSPC( IDX )%EMIS .EQ. 'POA_OP' ) then
+                  NIDX_POA_OP = NIDX_POA_OP + 1
+                  IDX_POA_OP(NIDX_POA_OP) = S
+                  if ( VBS_READY_FLAG ) then
+                     EM_POA_OP = 0.0
+                     if ( .NOT. INTERPX( EMIS_1, 'POA_OP', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,1,
+     &                                   JDATE, JTIME, EM_POA_OP ) ) then
+                        XMSG = 'Could not read POA_OP from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
+                     EM_POA_GV = 0.0
+                     if ( .NOT. INTERPX( EMIS_1, 'POA_GV', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,1,
+     &                                   JDATE, JTIME, EM_POA_GV ) ) then
+                        XMSG = 'Could not read POA_GV from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
+                     EM_POA_DV = 0.0
+                     if ( .NOT. INTERPX( EMIS_1, 'POA_DV', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,1,
+     &                                   JDATE, JTIME, EM_POA_DV ) ) then
+                        XMSG = 'Could not read POA_DV from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
+                     do R = 1, MY_NROWS
+                     do C = 1, MY_NCOLS
+                        EMBUFF( C,R,1,S ) = EM_POA_OP( C,R,1 ) * POA_OP_EF( AEROSPC( IDX )%VBS_BIN )
+     &                                    + EM_POA_GV( C,R,1 ) * POA_GV_EF( AEROSPC( IDX )%VBS_BIN )
+     &                                    + EM_POA_DV( C,R,1 ) * POA_DV_EF( AEROSPC( IDX )%VBS_BIN )
+                     end do
+                     end do
+                  else
+                     if ( .NOT. INTERPX( EMIS_1, 'POA', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,1,
+     &                                   JDATE, JTIME, EMBUFF( 1,1,1,S ) ) ) then
+                        XMSG = 'Could not read POA from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
+                     do R = 1, MY_NROWS
+                     do C = 1, MY_NCOLS
+                        EMBUFF( C,R,1,S ) = EMBUFF( C,R,1,S ) * POA_OP_EF( AEROSPC( IDX )%VBS_BIN )
+                     end do
+                     end do
+                  end if
+               else if ( AEROSPC( IDX )%EMIS .EQ. 'POA_BB' ) then
+                  NIDX_POA_BB = NIDX_POA_BB + 1
+                  IDX_POA_BB(NIDX_POA_BB) = S
+                  if ( VBS_READY_FLAG ) then
+                     if ( .NOT. INTERPX( EMIS_1, 'POA_BB', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,1,
+     &                                   JDATE, JTIME, EMBUFF( 1,1,1,S ) ) ) then
+                        XMSG = 'Could not read POA_BB from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
+                     do R = 1, MY_NROWS
+                     do C = 1, MY_NCOLS
+                        EMBUFF( C,R,1,S ) = EMBUFF( C,R,1,S ) * POA_BB_EF( AEROSPC( IDX )%VBS_BIN )
+                     end do
+                     end do
+                  end if
+               else
+                  IF ( .NOT. INTERPX( EMIS_1, AEROSPC( IDX )%EMIS, PNAME,
+     &                                STARTCOL,ENDCOL, STARTROW,ENDROW, 1,1,
+     &                                JDATE, JTIME, EMBUFF( 1,1,1,S ) ) ) THEN
+                     XMSG = 'Could not read '
+     &                    // TRIM( AEROSPC( IDX )%EMIS ) // ' from ' // EMIS_1
+                     CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                  END IF
+               end if
+cvbs<= special case for VBS emissions
             END DO
 
             DO S = 1, N_SPC_PTPM   ! merge inline point src PM species
                V = PTPM_MAP( S )   ! set in PT3D_DEFN
-               DO L = 1, PM_EMLYRS
-                  DO R = 1, MY_NROWS
-                     DO C = 1, MY_NCOLS
-!                       EMBUFF( C,R,L,S ) = EMBUFF( C,R,L,S ) + PMEMIS_PT( C,R,L,V )
-                        EMBUFF( C,R,L,V ) = EMBUFF( C,R,L,V ) + PMEMIS_PT( C,R,L,S )
+cvbs=> special case for VBS emissions
+cvbs   PTMAP_INIT skips emission species used multiple times, thus have to allocate
+cvbs   emissions of POA_OP and/or POA_BB here
+               IDX = PMEM_MAP( V )
+               if ( AEROSPC( IDX )%EMIS .EQ. 'POA_OP' ) then
+                  DO N = 1, NIDX_POA_OP
+                     DO L = 1, PM_EMLYRS
+                        DO R = 1, MY_NROWS
+                           DO C = 1, MY_NCOLS
+                              EMBUFF( C,R,L,IDX_POA_OP(N) ) = EMBUFF( C,R,L,IDX_POA_OP(N) )
+     &                                                               + PMEMIS_PT( C,R,L,S )
+     &                          * POA_OP_EF( AEROSPC( PMEM_MAP( IDX_POA_OP(N) ) )%VBS_BIN )
+                           END DO
+                        END DO
                      END DO
                   END DO
-               END DO
+               else if ( AEROSPC( IDX )%EMIS .EQ. 'POA_BB' ) then
+                  DO N = 1, NIDX_POA_BB
+                     DO L = 1, PM_EMLYRS
+                        DO R = 1, MY_NROWS
+                           DO C = 1, MY_NCOLS
+                              EMBUFF( C,R,L,IDX_POA_BB(N) ) = EMBUFF( C,R,L,IDX_POA_BB(N) )
+     &                                                               + PMEMIS_PT( C,R,L,S )
+     &                          * POA_BB_EF( AEROSPC( PMEM_MAP( IDX_POA_BB(N) ) )%VBS_BIN )
+                           END DO
+                        END DO
+                     END DO
+                  END DO
+               else
+                  DO L = 1, PM_EMLYRS
+                     DO R = 1, MY_NROWS
+                        DO C = 1, MY_NCOLS
+!                          EMBUFF( C,R,L,S ) = EMBUFF( C,R,L,S ) + PMEMIS_PT( C,R,L,V )
+                           EMBUFF( C,R,L,V ) = EMBUFF( C,R,L,V ) + PMEMIS_PT( C,R,L,S )
+                        END DO
+                     END DO
+                  END DO
+               end if
+cvbs<= special case for VBS emissions
             END DO
 
          ELSE   ! read 3d file
 
             DO S = 1, N_EMIS_PM
                IDX = PMEM_MAP( S )
-               IF ( .NOT. INTERPX( EMIS_1, AEROSPC( IDX )%EMIS, PNAME,
-     &                             STARTCOL,ENDCOL, STARTROW,ENDROW, 1,PM_EMLYRS,
-     &                             JDATE, JTIME, EMBUFF( 1,1,1,S ) ) ) THEN
-                  XMSG = 'Could not read '
-     &                 // TRIM( AEROSPC( IDX )%EMIS ) // ' from ' // EMIS_1
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
-               END IF
+cvbs=> special case for VBS emissions
+               if ( AEROSPC( IDX )%EMIS .EQ. 'POA_OP' ) then
+                  if ( VBS_READY_FLAG ) then
+                     EM_POA_OP = 0.0
+                     if ( .NOT. INTERPX( EMIS_1, 'POA_OP', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,PM_EMLYRS,
+     &                                   JDATE, JTIME, EM_POA_OP ) ) then
+                        XMSG = 'Could not read POA_OP from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
+                     EM_POA_GV = 0.0
+                     if ( .NOT. INTERPX( EMIS_1, 'POA_GV', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,PM_EMLYRS,
+     &                                   JDATE, JTIME, EM_POA_GV ) ) then
+                        XMSG = 'Could not read POA_GV from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
+                     EM_POA_DV = 0.0
+                     if ( .NOT. INTERPX( EMIS_1, 'POA_DV', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,PM_EMLYRS,
+     &                                   JDATE, JTIME, EM_POA_DV ) ) then
+                        XMSG = 'Could not read POA_DV from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
+                     do L = 1, PM_EMLYRS
+                     do R = 1, MY_NROWS
+                     do C = 1, MY_NCOLS
+                        EMBUFF( C,R,L,S ) = EM_POA_OP( C,R,L ) * POA_OP_EF( AEROSPC( IDX )%VBS_BIN )
+     &                                    + EM_POA_GV( C,R,L ) * POA_GV_EF( AEROSPC( IDX )%VBS_BIN )
+     &                                    + EM_POA_DV( C,R,L ) * POA_DV_EF( AEROSPC( IDX )%VBS_BIN )
+                     end do
+                     end do
+                     end do
+                  else
+                     if ( .NOT. INTERPX( EMIS_1, 'POA', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,PM_EMLYRS,
+     &                                   JDATE, JTIME, EMBUFF( 1,1,1,S ) ) ) then
+                        XMSG = 'Could not read POA from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
+                     do L = 1, PM_EMLYRS
+                     do R = 1, MY_NROWS
+                     do C = 1, MY_NCOLS
+                        EMBUFF( C,R,L,S ) = EMBUFF( C,R,L,S ) * POA_OP_EF( AEROSPC( IDX )%VBS_BIN )
+                     end do
+                     end do
+                     end do
+                  end if
+               else if ( AEROSPC( IDX )%EMIS .EQ. 'POA_BB' ) then
+                  if ( VBS_READY_FLAG ) then
+                     if ( .NOT. INTERPX( EMIS_1, 'POA_BB', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,PM_EMLYRS,
+     &                                   JDATE, JTIME, EMBUFF( 1,1,1,S ) ) ) then
+                        XMSG = 'Could not read POA_BB from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
+                     do L = 1, PM_EMLYRS
+                     do R = 1, MY_NROWS
+                     do C = 1, MY_NCOLS
+                        EMBUFF( C,R,L,S ) = EMBUFF( C,R,L,S ) * POA_BB_EF( AEROSPC( IDX )%VBS_BIN )
+                     end do
+                     end do
+                     end do
+                  end if
+               else
+                  IF ( .NOT. INTERPX( EMIS_1, AEROSPC( IDX )%EMIS, PNAME,
+     &                                STARTCOL,ENDCOL, STARTROW,ENDROW, 1,PM_EMLYRS,
+     &                                JDATE, JTIME, EMBUFF( 1,1,1,S ) ) ) THEN
+                     XMSG = 'Could not read '
+     &                    // TRIM( AEROSPC( IDX )%EMIS ) // ' from ' // EMIS_1
+                     CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                  END IF
+               end if
+cvbs<= special case for VBS emissions
             END DO
 
          END IF
@@ -790,7 +962,7 @@ C     Binkowski & Roselle (2003).
                   END DO
                   N = N_MODE
                   IF ( IDX .EQ. ASO4_IDX ) THEN
-                     EM_PART( IDX,N ) = SPFC_ASO4 * EM_RATE( S )
+                     EM_PART( IDX,N ) = SPFC ASO4 * EM_RATE( S )
                   ELSE IF ( IDX .EQ. ANO3_IDX ) THEN
                      EM_PART( IDX,N ) = SPFC_ANO3 * EM_RATE( S )
                   ELSE IF ( IDX .EQ. ACL_IDX ) THEN
@@ -919,7 +1091,7 @@ C     (excluding sea salt), as in Equation 7a of Binkowski & Roselle (2003).
                      END DO
                      N = N_MODE
                      IF ( IDX .EQ. ASO4_IDX ) THEN
-                        EM_PART( IDX,N ) = SPFC_ASO4 * EM_RATE( S )
+                        EM_PART( IDX,N ) = SPFC ASO4 * EM_RATE( S )
                      ELSE IF ( IDX .EQ. ANO3_IDX ) THEN
                         EM_PART( IDX,N ) = SPFC_ANO3 * EM_RATE( S )
                      ELSE IF ( IDX .EQ. ACL_IDX ) THEN

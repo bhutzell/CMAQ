@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero5/SOA_DEFN.F,v 1.9 2012/01/19 13:10:56 yoj Exp $
+C $Header: /models/CMAQ/src/CMAQv5.0.1/models/CCTM/src/aero/vbs/SOA_DEFN.F,v 1.1.1.1 2012/04/19 19:45:04 sjr Exp $
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       Module soa_defn
@@ -39,12 +39,12 @@ C
 C HP  03/11/11 Updated monoterpene SOA alphas and Cstars to Carlton et al. 2010 values
 C HP  07/24/11 Changed aromatic SOA alphas for consistency with updated reaction counters
 C               BNZ, TOL, XYL numbers now match Ng et al. 2007 Atmos. Chem. Phys.
-C 08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
+C BK  11/08/12 Revised for VBS
 C-----------------------------------------------------------------------
       Implicit None
 
-      Integer, Parameter :: n_vapor = 12    ! # of partitioning SVOCs
-      Integer, Parameter :: n_orgprod = 10  ! # of ROG rxn counter species
+      Integer, Parameter :: n_vapor = 16    ! # of partitioning SVOCs
+      Integer, Parameter :: n_orgprod = 5   ! # of ROG rxn counter species
 
       Type vapor_type
          Character( 16 ) :: name
@@ -58,40 +58,29 @@ C-----------------------------------------------------------------------
       End Type vapor_type
 
       Type( vapor_type ), Parameter :: vaporspc( n_vapor ) = (/
-C                   Name       Alpha    CStar     Enth     SOA           Decay  Drog
-C                                                          Name   Origin        Name
-C                  -------    -------  --------  -------  ------    --  ----   -------
-     & vapor_type('SV_ALK ',  0.0718,   0.0200,  40.0E3, 'AALKJ ', 'A',  8.0, 'ALK5RXN'),
-     & vapor_type('SV_XYL1',  0.0310,   1.3140,  32.0E3, 'AXYL1J', 'A',  8.0, 'XYLNRXN'),
-     & vapor_type('SV_XYL2',  0.0900,  34.4830,  32.0E3, 'AXYL2J', 'A',  8.0, 'XYLNRXN'),
-     & vapor_type('SV_TOL1',  0.0580,   2.3260,  18.0E3, 'ATOL1J', 'A',  7.0, 'TOLNRXN'),
-     & vapor_type('SV_TOL2',  0.1130,  21.2770,  18.0E3, 'ATOL2J', 'A',  7.0, 'TOLNRXN'),
-     & vapor_type('SV_BNZ1',  0.0720,   0.3020,  18.0E3, 'ABNZ1J', 'A',  6.0, 'BNZNRXN'),
-     & vapor_type('SV_BNZ2',  0.8880, 111.1100,  18.0E3, 'ABNZ2J', 'A',  6.0, 'BNZNRXN'),
-     & vapor_type('SV_TRP1',  0.1393,  14.7920,  40.0E3, 'ATRP1J', 'B', 10.0, 'TRPRXN '),
-     & vapor_type('SV_TRP2',  0.4542, 133.7297,  40.0E3, 'ATRP2J', 'B', 10.0, 'TRPRXN '),
-     & vapor_type('SV_ISO1',  0.2320, 116.0100,  40.0E3, 'AISO1J', 'B',  5.0, 'ISOPRXN'),
-     & vapor_type('SV_ISO2',  0.0288,   0.6170,  40.0E3, 'AISO2J', 'B',  5.0, 'ISOPRXN'),
-     & vapor_type('SV_SQT ',  1.5370,  24.9840,  40.0E3, 'ASQTJ ', 'B', 15.0, 'SESQRXN')/)
+C                        Name           Alpha    CStar     Enth       SOA Name    Origin  Decay     Drog Name
+C                  ----------------    -------  --------  -------  ----------------   --   ----   ----------------
+     & vapor_type('SV_AVB1         ',  0.0,      1.0,     35.0E3, 'A_AVB1J         ', 'A',  0.0, 'DUMMY           '),
+     & vapor_type('SV_AVB2         ',  0.0,     10.0,     35.0E3, 'A_AVB2J         ', 'A',  0.0, 'DUMMY           '),
+     & vapor_type('SV_AVB3         ',  0.0,    100.0,     35.0E3, 'A_AVB3J         ', 'A',  0.0, 'DUMMY           '),
+     & vapor_type('SV_AVB4         ',  0.0,   1000.0,     35.0E3, 'A_AVB4J         ', 'A',  0.0, 'DUMMY           '),
+     & vapor_type('SV_BVB1         ',  0.0,      1.0,     35.0E3, 'A_BVB1J         ', 'B',  0.0, 'DUMMY           '),
+     & vapor_type('SV_BVB2         ',  0.0,     10.0,     35.0E3, 'A_BVB2J         ', 'B',  0.0, 'DUMMY           '),
+     & vapor_type('SV_BVB3         ',  0.0,    100.0,     35.0E3, 'A_BVB3J         ', 'B',  0.0, 'DUMMY           '),
+     & vapor_type('SV_BVB4         ',  0.0,   1000.0,     35.0E3, 'A_BVB4J         ', 'B',  0.0, 'DUMMY           '),
+     & vapor_type('SV_PVB1         ',  0.0,      1.0,     85.0E3, 'A_PVB1J         ', 'A',  0.0, 'DUMMY           '),
+     & vapor_type('SV_PVB2         ',  0.0,     10.0,     74.0E3, 'A_PVB2J         ', 'A',  0.0, 'DUMMY           '),
+     & vapor_type('SV_PVB3         ',  0.0,    100.0,     63.0E3, 'A_PVB3J         ', 'A',  0.0, 'DUMMY           '),
+     & vapor_type('SV_PVB4         ',  0.0,   1000.0,     52.0E3, 'A_PVB4J         ', 'A',  0.0, 'DUMMY           '),
+     & vapor_type('SV_FVB1         ',  0.0,      1.0,     85.0E3, 'A_FVB1J         ', 'F',  0.0, 'DUMMY           '),
+     & vapor_type('SV_FVB2         ',  0.0,     10.0,     74.0E3, 'A_FVB2J         ', 'F',  0.0, 'DUMMY           '),
+     & vapor_type('SV_FVB3         ',  0.0,    100.0,     63.0E3, 'A_FVB3J         ', 'F',  0.0, 'DUMMY           '),
+     & vapor_type('SV_FVB4         ',  0.0,   1000.0,     52.0E3, 'A_FVB4J         ', 'F',  0.0, 'DUMMY           ')/)
 
 C Required species
-      Character( 16 ), Private, Parameter :: req_sviso1  = 'SV_ISO1'
-      Character( 16 ), Private, Parameter :: req_sviso2  = 'SV_ISO2'
-      Character( 16 ), Private, Parameter :: req_aeiso1  = 'AISO1'
-      Character( 16 ), Private, Parameter :: req_aeiso2  = 'AISO2'
-      Character( 16 ), Private, Parameter :: req_aeiso3  = 'AISO3'
-      Character( 16 ), Private, Parameter :: req_aeolga  = 'AOLGA'
-      Character( 16 ), Private, Parameter :: req_aeolgb  = 'AOLGB'
-      Character( 16 ), Private, Parameter :: req_aeorgc  = 'AORGC'
+      Character( 16 ), Private, Parameter :: req_aeorgc  = 'AORGC           '
 
 C Indices of required species
-      Integer :: iso1_idx
-      Integer :: iso2_idx
-      Integer :: aiso1_idx
-      Integer :: aiso2_idx
-      Integer :: aiso3_idx
-      Integer :: aolga_idx
-      Integer :: aolgb_idx
       Integer :: aorgc_idx
 
       Real    :: vapor_mw  ( n_vapor )   ! Molecular weights
@@ -111,18 +100,13 @@ C   This default orgprod table is for CB05, parent names are changed in subrouti
 C   extract_soa for the SAPRC99 and SAPRC07T mechanisms
 C
       Type( orgprod_type ), Save      :: orgprod( n_orgprod ) = (/
-C                      Name      Parent     Aerospc  AlphaH
-C                     -------    -------    ------   ------ 
-     & orgprod_type( 'ALK5RXN', 'ALK5RXN', '      ', 0.000 ),
-     & orgprod_type( 'XYLNRXN', 'XYL    ', '      ', 0.000 ),
-     & orgprod_type( 'XYLHRXN', 'XYL    ', 'AXYL3J', 0.300 ),
-     & orgprod_type( 'TOLNRXN', 'TOL    ', '      ', 0.000 ),
-     & orgprod_type( 'TOLHRXN', 'TOL    ', 'ATOL3J', 0.360 ),
-     & orgprod_type( 'BNZNRXN', 'BENZENE', '      ', 0.000 ),
-     & orgprod_type( 'BNZHRXN', 'BENZENE', 'ABNZ3J', 0.370 ),
-     & orgprod_type( 'TRPRXN ', 'TRPRXN ', '      ', 0.000 ),
-     & orgprod_type( 'ISOPRXN', 'ISOPRXN', '      ', 0.000 ),
-     & orgprod_type( 'SESQRXN', 'SESQRXN', '      ', 0.000 ) /)
+C                          Name                Parent             Aerospc        AlphaH
+C                     ----------------    ----------------    ----------------   ------ 
+     & orgprod_type( 'DUMMY           ', 'DUMMY           ', '                ', 0.000 ),
+     & orgprod_type( 'SV_AVB0         ', 'SV_AVB0         ', 'A_AVB0J         ', 1.000 ),
+     & orgprod_type( 'SV_BVB0         ', 'SV_BVB0         ', 'A_BVB0J         ', 1.000 ),
+     & orgprod_type( 'SV_PVB0         ', 'SV_PVB0         ', 'A_PVB0J         ', 1.000 ),
+     & orgprod_type( 'SV_FVB0         ', 'SV_FVB0         ', 'A_FVB0J         ', 1.000 ) /)
 
 
       Real    :: orgprod_mw     ( n_orgprod )  ! Mol weight of reactive organic gases
@@ -181,13 +165,13 @@ C Local Variables:
 
 C Build mapping to CGRID for each vapor species
          Do spc = 1, n_vapor
-            n = index1( vaporspc( spc )%name, n_nr_n2ae, nr_n2ae )
+            n = index1( vaporspc( spc )%name, n_gc_g2ae, gc_g2ae )
             If ( n .Ne. 0 ) Then
-               vapor_map( spc ) = nr_strt - 1 + nr_n2ae_map( n )
-               vapor_mw( spc ) = nr_molwt( nr_n2ae_map( n ) )
+               vapor_map( spc ) = gc_strt - 1 + gc_g2ae_map( n )
+               vapor_mw( spc ) = gc_molwt( gc_g2ae_map( n ) )
             Else
                xmsg = 'Species ' // Trim( vaporspc( spc )%name )
-     &              // ' in vapor name is not in non-reactives table'
+     &              // ' in vapor name is not in gas species table'
                Call m3exit( pname, 0, 0, xmsg, xstat3 )
             End If
          End Do
@@ -195,29 +179,30 @@ C Build mapping to CGRID for each vapor species
 C define orgprod parent names based on mechanism dependence
          If ( INDEX( MECHNAME, 'CB05' ) .EQ. 0 ) then
 
-            If ( INDEX( MECHNAME, 'SAPRC99' ) .GT. 0 ) then
-               alk_factor = 0.57    ! fraction of ALK5 that can produce SOA
-               orgprod( 2 )%parent = 'ARO2'
-               orgprod( 3 )%parent = 'ARO2'
-               orgprod( 4 )%parent = 'ARO1'
-               orgprod( 5 )%parent = 'ARO1'
-            Else If ( INDEX( MECHNAME, 'SAPRC07T' ) .GT. 0 ) then
-               alk_factor = 0.57    ! fraction of ALK5 that can produce SOA
-               orgprod( 2 )%parent = 'MXYL'
-               orgprod( 3 )%parent = 'MXYL'
-               orgprod( 4 )%parent = 'TOLUENE'
-               orgprod( 5 )%parent = 'TOLUENE'
-            Else
+cvbs            If ( INDEX( MECHNAME, 'SAPRC99' ) .GT. 0 ) then
+cvbs               alk_factor = 0.57    ! fraction of ALK5 that can produce SOA
+cvbs               orgprod( 2 )%parent = 'ARO2            '
+cvbs               orgprod( 3 )%parent = 'ARO2            '
+cvbs               orgprod( 4 )%parent = 'ARO1            '
+cvbs               orgprod( 5 )%parent = 'ARO1            '
+cvbs            Else If ( INDEX( MECHNAME, 'SAPRC07T' ) .GT. 0 ) then
+cvbs               alk_factor = 0.57    ! fraction of ALK5 that can produce SOA
+cvbs               orgprod( 2 )%parent = 'MXYL            '
+cvbs               orgprod( 3 )%parent = 'MXYL            '
+cvbs               orgprod( 4 )%parent = 'TOLUENE         '
+cvbs               orgprod( 5 )%parent = 'TOLUENE         '
+cvbs            Else
                xmsg =  'Mechanism ' // MECHNAME
      &              // ' is not supported in this version of the model'
                Call m3exit( pname, 0, 0, xmsg, xstat3 )
-            End If
+cvbs            End If
 
          End If  ! non CB05 condition
 
 
 C Build mapping to CGRID for each ORGPROD species and find MW of parent
 
+         orgprod_mw = 0.0
          orgprod_map = 0
          Do spc = 1, n_orgprod
             n = index1( orgprod( spc )%name, n_gc_g2ae, gc_g2ae )
@@ -235,13 +220,6 @@ C Build mapping to CGRID for each ORGPROD species and find MW of parent
          End Do
 
 C Find indices of required species
-         iso1_idx   = findVapor( req_sviso1 )
-         iso2_idx   = findVapor( req_sviso2 )
-         aiso1_idx  = findAero( req_aeiso1, .True. )
-         aiso2_idx  = findAero( req_aeiso2, .True. )
-         aiso3_idx  = findAero( req_aeiso3, .True. )
-         aolga_idx  = findAero( req_aeolga, .True. )
-         aolgb_idx  = findAero( req_aeolgb, .True. )
          aorgc_idx  = findAero( req_aeorgc, .True. )
 
 C Build mapping array to aero species
@@ -295,7 +273,7 @@ C Copy grid cell concentrations of ORGPROD species
       End Do
 
 C Adjust ALK orgprod for fraction that produces SOA
-      orgprod_conc( 1 ) = alk_factor * orgprod_conc( 1 )
+cvbs      orgprod_conc( 1 ) = alk_factor * orgprod_conc( 1 )
 
       Return
       End Subroutine extract_soa
@@ -763,6 +741,15 @@ C Variables used in equilibrium partitioning calculations
       Logical check          ! flag to indicate if NEWT subroutine
                              ! converged to a spurious root
 
+C Subset variables for the solver
+      Integer n_vap_sub
+      Integer idx_sub(n_vapor)
+      Real, Parameter :: thresh_sub = 1.0E-06
+      Real invmw_sub(n_vapor)
+      Real caer_sub(n_vapor)
+      Real ctot_sub(n_vapor)
+      Real c0_sub(n_vapor)
+
 C Variables for updating 2nd and 3rd moments
       Real old_m3  ! initial 3rd moment minus nonvol SOA [ mom/m3 ]
       Real old_m2  ! initial 2nd moment minus nonvol SOA [ mom/m3 ]
@@ -784,8 +771,6 @@ C Set unit conversion and inverse mw constants
          Do i = 1, n_vapor
             mw_vap_m1( i ) = 1.0 / vapor_mw( i )
          End Do
-
-         mwpoa = aerospc_mw( apoc_idx )
 
       End If ! first_time
 
@@ -830,36 +815,36 @@ C Oligomerization
 C Convert semi-volatile SOA to non-volatile oligomers by an exponential decay
 C process that conserves carbon mass.
 
-      nsvpa = 0.0
-      nsvpb = 0.0
+cvbs      nsvpa = 0.0
+cvbs      nsvpb = 0.0
 
-      Do i = 1, n_vapor
-         If ( vaporspc( i )%soa_origin .Eq. 'A' )
-     &      nsvpa = nsvpa + aerospc_conc( soa_aeroMap( i ),2 )
-     &            * mw_vap_m1( i ) * vaporspc( i )%soa_decay
-         If ( vaporspc( i )%soa_origin .Eq. 'B' )
-     &      nsvpb = nsvpb + aerospc_conc( soa_aeroMap( i ),2 )
-     &            * mw_vap_m1( i ) * vaporspc( i )%soa_decay
-      End Do
+cvbs      Do i = 1, n_vapor
+cvbs         If ( vaporspc( i )%soa_origin .Eq. 'A' )
+cvbs     &      nsvpa = nsvpa + aerospc_conc( soa_aeroMap( i ),2 )
+cvbs     &            * mw_vap_m1( i ) * vaporspc( i )%soa_decay
+cvbs         If ( vaporspc( i )%soa_origin .Eq. 'B' )
+cvbs     &      nsvpb = nsvpb + aerospc_conc( soa_aeroMap( i ),2 )
+cvbs     &            * mw_vap_m1( i ) * vaporspc( i )%soa_decay
+cvbs      End Do
 
-      expdt = exp( - kolig * dt )
+cvbs      expdt = exp( - kolig * dt )
 
-      Do i = 1, n_vapor
-         aerospc_conc( soa_aeroMap( i ),2 ) =
-     &   aerospc_conc( soa_aeroMap( i ),2 ) * expdt
-      End Do
+cvbs      Do i = 1, n_vapor
+cvbs         aerospc_conc( soa_aeroMap( i ),2 ) =
+cvbs     &   aerospc_conc( soa_aeroMap( i ),2 ) * expdt
+cvbs      End Do
 
-      aerospc_conc( aolga_idx,2 ) = aerospc_conc( aolga_idx,2 )
-     &                            + 12.0 * nsvpa * ( 1.0 - expdt ) * olgrat
-      aerospc_conc( aolgb_idx,2 ) = aerospc_conc( aolgb_idx,2 )
-     &                            + 12.0 * nsvpb * ( 1.0 - expdt ) * olgrat
+cvbs      aerospc_conc( aolga_idx,2 ) = aerospc_conc( aolga_idx,2 )
+cvbs     &                            + 12.0 * nsvpa * ( 1.0 - expdt ) * olgrat
+cvbs      aerospc_conc( aolgb_idx,2 ) = aerospc_conc( aolgb_idx,2 )
+cvbs     &                            + 12.0 * nsvpb * ( 1.0 - expdt ) * olgrat
 
 C Compute molar concentrations of non-volatile organic material and total
 C organic material; in future code updates, molecular weights of non-volatile
 C SOA species should be inherited from the include files or namelists to avoid
 C hard-coded values.
 
-      totorgsw = ( aerospc_conc( apoc_idx,1 ) + aerospc_conc( apoc_idx,2 ) ) / mwpoa
+      totorgsw = 0.0
       Do i = 1, n_aerospc
          If ( aerospc( i )%nonVol_soa ) Then
             totorgsw = totorgsw + aerospc_conc( i,2 ) / aerospc_mw( i )
@@ -900,21 +885,37 @@ C    caer = ctotf / ( 1 + c0/MW / totorg )
 C Check If gas/particle equilibrium can be established
       If ( ( threshold .Gt. 1.0 ) .Or. ( totorgsw .Gt. threshmin ) ) Then
 
+C Determine subset for the solver
+         n_vap_sub = 0
+         idx_sub = 0
+         Do i = 1, n_vapor
+            If ( ctotf(i) .Lt. thresh_sub ) Then
+               caer(i) = 0.0
+            Else
+               n_vap_sub = n_vap_sub + 1
+               idx_sub(n_vap_sub) = i
+               invmw_sub(n_vap_sub) = mw_vap_m1(i)
+               caer_sub(n_vap_sub) = caer(i)
+               ctot_sub(n_vap_sub) = ctotf(i)
+               c0_sub(n_vap_sub) = c0(i)
+            End If
+         End Do
+
 C Calculate new SOA by partitioning. This method uses a globally convergent
 C Newton-Raphson method coded by Dr Benedikt Schell to solve the nonlinear
 C quadratic system shown in eqn 8 of Schell et al:
 C    A(i)  * caer(i) ** 2 + B * caer(i) + C(i) = 0.0,
 C    where B(i) contains the sum of all caer(j), for j not equal to i.
 
-         Call newt( layer, caer, n_vapor, check,
-     &              ctotf, c0, mw_vap_m1, totorgsw )
+         Call newt( layer, caer_sub, n_vap_sub, check,
+     &              ctot_sub, c0_sub, invmw_sub, totorgsw )
          If ( check ) Then
 C Try again with initial guess of 50/50 gas/aerosol split.
-            Do i = 1, n_vapor
-               caer( i ) = 0.5 * ctotf( i )
+            Do i = 1, n_vap_sub
+               caer_sub( i ) = 0.5 * ctot_sub( i )
             End Do
-            Call newt( layer, caer, n_vapor, check,
-     &                 ctotf, c0, mw_vap_m1, totorgsw )
+            Call newt( layer, caer_sub, n_vap_sub, check,
+     &                 ctot_sub, c0_sub, invmw_sub, totorgsw )
             If ( check ) Then
                Write( xmsg,'( A,I4 )' ) ' *** Problem in NEWT at Layer = ', layer
                Call m3exit( pname, 0, 0, xmsg, xstat3 )
@@ -922,22 +923,24 @@ C Try again with initial guess of 50/50 gas/aerosol split.
          End If
 
 C Constrain caer to values between conmin and ctotf
-         Do i = 1, n_vapor
+         Do i = 1, n_vap_sub
 
-            If ( caer( i ) .Lt. conmin ) Then
-               If ( caer( i ) .Lt. 0.0 ) Then
-                  Write( logdev,* ) 'caer negative at i: ', i, caer( i ),
+            If ( caer_sub( i ) .Lt. conmin ) Then
+               If ( caer_sub( i ) .Lt. 0.0 ) Then
+                  Write( logdev,* ) 'caer negative at i: ', idx_sub(i), caer_sub( i ),
      &                              ' reset to conmin'
                End If
-               caer( i ) = conmin
+               caer_sub( i ) = conmin
             End If
 
-            If ( caer( i ) - ctotf( i ) .Gt. ctolmin ) Then
-               Write( logdev,* ) 'caer-ctotf exceeds ctolmin at i = ', i
-               Write( logdev,* ) 'caer: ', caer( i ), ' ctotf: ', ctotf( i )
+            If ( caer_sub( i ) - ctot_sub( i ) .Gt. ctolmin ) Then
+               Write( logdev,* ) 'caer-ctotf exceeds ctolmin at i = ', idx_sub(i)
+               Write( logdev,* ) 'caer: ', caer_sub( i ), ' ctotf: ', ctot_sub( i )
                Write( logdev,* ) 'caer reset to ctotf'
-               caer( i ) = ctotf( i )
+               caer_sub( i ) = ctot_sub( i )
             End If
+
+            caer( idx_sub(i) ) = caer_sub( i ) ! Transfer the solutions to the full-set
 
          End Do
 
@@ -962,18 +965,18 @@ C range of experimental conditions (530 nmol/m3) tested by Surratt et al.
 C (2007).  In future code updates, molecular weights of inorganic ions should
 C be inherited from include or namelist files to avoid hard-coded values.
 
-      hplus = 0.0
-      Do i = 1, n_aerospc
-         hplus = hplus - 1000.0 * aerospc( i )%charge * aerospc_conc( i,2 )
-     &         / aerospc_mw( i )
-      End Do
-      hplus = Min( 530.0, Max ( 0.0, hplus ) ) ! restrict extrapolation
+cvbs      hplus = 0.0
+cvbs      Do i = 1, n_aerospc
+cvbs         hplus = hplus - 1000.0 * aerospc( i )%charge * aerospc_conc( i,2 )
+cvbs     &         / aerospc_mw( i )
+cvbs      End Do
+cvbs      hplus = Min( 530.0, Max ( 0.0, hplus ) ) ! restrict extrapolation
 
 C Compute amount of acid-enhanced isoprene SOA that is produced during the current
 C time step (xiso3) using the normalized expression derived from Surratt et al. (2007)
 
-      aiso12 = aerospc_conc( aiso1_idx, 2 ) + aerospc_conc( aiso2_idx, 2 )
-      xiso3  = kacid * hplus * aiso12 - aerospc_conc( aiso3_idx,2 )
+cvbs      aiso12 = aerospc_conc( aiso1_idx, 2 ) + aerospc_conc( aiso2_idx, 2 )
+cvbs      xiso3  = kacid * hplus * aiso12 - aerospc_conc( aiso3_idx,2 )
 
 C Update CBLK(VISO3J) while conserving the total concentration of low-volatility
 C isoprene-derived products.  Since the acid-enhanced product is assumed to be
@@ -984,14 +987,14 @@ C proportional to their equilibrium concentrations.  The factor of 2.7/1.6 accou
 C for the enhancement in the OM/OC ratio when isoprene SOA is formed in the presence
 C of SO2, based on the lab experiments of Kleindienst et al. (2007)
 
-      If ( xiso3 .Gt. 0.0 ) Then
-         vviso = vapor_conc( iso1_idx ) + vapor_conc( iso2_idx )
-         xiso3  = Min( xiso3, vviso )
-         aerospc_conc( aiso3_idx,2 ) = aerospc_conc( aiso3_idx,2 ) + xiso3 * ( 2.7 / 1.6 )
-         isofrac = vapor_conc( iso1_idx ) / vviso
-         vapor_conc( iso1_idx ) = vapor_conc( iso1_idx ) - isofrac * xiso3
-         vapor_conc( iso2_idx ) = vapor_conc( iso2_idx ) - ( 1.0 - isofrac ) * xiso3
-      End If
+cvbs      If ( xiso3 .Gt. 0.0 ) Then
+cvbs         vviso = vapor_conc( iso1_idx ) + vapor_conc( iso2_idx )
+cvbs         xiso3  = Min( xiso3, vviso )
+cvbs         aerospc_conc( aiso3_idx,2 ) = aerospc_conc( aiso3_idx,2 ) + xiso3 * ( 2.7 / 1.6 )
+cvbs         isofrac = vapor_conc( iso1_idx ) / vviso
+cvbs         vapor_conc( iso1_idx ) = vapor_conc( iso1_idx ) - isofrac * xiso3
+cvbs         vapor_conc( iso2_idx ) = vapor_conc( iso2_idx ) - ( 1.0 - isofrac ) * xiso3
+cvbs      End If
 
 C Update 3rd moment, 2nd moment, and Dg in CBLK array by assuming that SOA
 C condensation/evaporation does not affect the geometric standard deviation.
@@ -1103,7 +1106,9 @@ C  Local variables
 
       INTEGER I, ITS, J, INDX( N_VAPOR )
       REAL D, DEN, F, FOLD, STPMAX, SUM, TEMP, TEST
-      REAL FJAC( N_VAPOR,N_VAPOR )
+      REAL FJAC( N,N ) ! bkoo: N_VAPOR -> N
+                       !       Multi-dimensional array must have consistent dimensions
+                       !       with those in the subroutine FDJAC, LUDCMP and LUBKSB.
       REAL G( N_VAPOR), P( N_VAPOR ), XOLD( N_VAPOR )
 !     EXTERNAL FDJAC
 
@@ -1194,7 +1199,7 @@ C    Get the Jacobian of the function
 C          ( a1 * X1^2 + b1 * X1 + c1 )
 C          ( a2 * X2^2 + b2 * X2 + c2 )
 C          ( a3 * X3^2 + b3 * X3 + c3 )
-C   F(X) = ( a4 * X4^2 + b4 * X4 + c4 ) = 0.0
+C   F(X) = ( a4 * X4^2 + b4 * X4 + c4 ) = 0.
 C          ( ........................ )
 C          ( aN * XN^2 + bN * XN + cN )
 C
@@ -1215,7 +1220,7 @@ C   SH  02/10/10 renamed NCVAP to n_vapor. Value is inherited from SOA_DEFN.
       IMPLICIT NONE
 
       INTEGER N                 ! dimension of problem
-      REAL X( N )               ! initial guess of CAER
+      REAL X( N )                 ! initial guess of CAER
 
       REAL CT
       REAL CS

@@ -19,7 +19,7 @@
 
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero5/aero_driver.F,v 1.11 2012/01/19 13:12:57 yoj Exp $
+C $Header: /models/CMAQ/src/CMAQv5.0.1/models/CCTM/src/aero/vbs/aero_driver.F,v 1.1.1.1 2012/04/19 19:45:04 sjr Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
@@ -91,6 +91,7 @@ C   S.Roselle- Mar 11 - replaced I/O API include files with UTILIO_DEFN
 C   David Wong - Aug 11 - put in twoway model implementation
 C   David Wong - Oct 11 - extended the twoway implementation to handle finer
 C                         time resolution
+C   Bonyoung Koo - Jul 12 - revised for VBS
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE AERO ( CGRID, JDATE, JTIME, TSTEP )
 
@@ -492,7 +493,7 @@ C     accumulation mode
      &                * AEROSPC_CONC( AH2O_IDX,2 )
                DO SPC = 1, N_VAPOR
                   M3SUBT = M3SUBT
-     &                   + ( 1.0E-9 * F6PI / AEROSPC( APOC_IDX )%DENSITY )
+     &                   + ( 1.0E-9 * F6PI / AEROSPC( aavb1_idx )%DENSITY )
      &                   * AEROSPC_CONC( SOA_AEROMAP( SPC ),2 )
                END DO
 

@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero6/aero_subs.F,v 1.8 2012/01/19 13:21:28 yoj Exp $
+C $Header: /models/CMAQ/src/CMAQv5.0.1/models/CCTM/src/aero/vbs/aero_subs.F,v 1.1.1.1 2012/04/19 19:45:04 sjr Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
@@ -175,6 +175,8 @@ C HS  03/10/11 Added call to POAAGE between ORGAER and HETCHEM
 
 C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
 
+C BK  07/04/11 revised for VBS
+
 C  REFERENCES:
 C   1. Binkowski, F.S. and U. Shankar, The regional particulate matter
 C      model 1. Model description and preliminary results, J. Geophys.
@@ -328,7 +330,7 @@ C     SOA resides in the accumulation mode.
 
 C *** POA Aging
 C     Increase primary NCOM concentration due to oxidative aging of POA.
-      CALL POAAGE ( DT )
+cvbs      CALL POAAGE ( DT )
 
 C *** Heterogeneous Chemistry
 C     Update the N2O5 and HNO3 concentrations to account for

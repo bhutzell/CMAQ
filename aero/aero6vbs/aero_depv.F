@@ -19,7 +19,7 @@
 
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero5/aero_depv.F,v 1.12 2012/01/19 13:12:14 yoj Exp $
+C $Header: /models/CMAQ/src/CMAQv5.0.1/models/CCTM/src/aero/vbs/aero_depv.F,v 1.1.1.1 2012/04/19 19:45:04 sjr Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C @(#)aero_depv.F       1.3 /project/mod3/CMAQ/src/ae_depv/aero_depv/SCCS/s.aero_depv.F 18 Jun 1997 12:55:48
@@ -75,7 +75,7 @@ C 20 May 11 D.Schwede: Modified for mosaic
 C 31 Aug 11 J.Bash: Moved shared mosaic variables to MOSAIC_MOD
 C 27 Sep 11 David Wong: replaced all run time dynamic arrays with allocatable
 C                       arrays to avoid run time memory issue  
-C 08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
+C 04 Jul 12 Bonyoung Koo: revised for VBS
 C-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -126,15 +126,15 @@ C set up species dimension and indices for deposition velocity internal array VD
 C Local variables:
 
       CHARACTER( 16 ) :: VDAE_NAME( N_AE_DEP_SPC )! dep vel surrogate name table
-      DATA         VDAE_NAME( 1 ) / 'VNUMATKN' /
-      DATA         VDAE_NAME( 2 ) / 'VNUMACC ' /
-      DATA         VDAE_NAME( 3 ) / 'VNUMCOR ' /
-      DATA         VDAE_NAME( 4 ) / 'VMASSI  ' /
-      DATA         VDAE_NAME( 5 ) / 'VMASSJ  ' /
-      DATA         VDAE_NAME( 6 ) / 'VMASSC  ' /
-      DATA         VDAE_NAME( 7 ) / 'VSRFATKN' /
-      DATA         VDAE_NAME( 8 ) / 'VSRFACC ' /
-      DATA         VDAE_NAME( 9 ) / 'VSRFCOR ' /
+      DATA         VDAE_NAME( 1 ) / 'VNUMATKN        ' /
+      DATA         VDAE_NAME( 2 ) / 'VNUMACC         ' /
+      DATA         VDAE_NAME( 3 ) / 'VNUMCOR         ' /
+      DATA         VDAE_NAME( 4 ) / 'VMASSI          ' /
+      DATA         VDAE_NAME( 5 ) / 'VMASSJ          ' /
+      DATA         VDAE_NAME( 6 ) / 'VMASSC          ' /
+      DATA         VDAE_NAME( 7 ) / 'VSRFATKN        ' /
+      DATA         VDAE_NAME( 8 ) / 'VSRFACC         ' /
+      DATA         VDAE_NAME( 9 ) / 'VSRFCOR         ' /
 
       INTEGER, ALLOCATABLE, SAVE :: DEPV_SUR( : )   ! pointer to surrogate
 
@@ -475,7 +475,7 @@ C        accumulation mode.
          M3SUBT = ( 1.0E-9 * F6PI / AEROSPC( AH2O_IDX )%DENSITY )
      &          * AEROSPC_CONC( AH2O_IDX,2 )
          DO SPC = 1, N_VAPOR
-            M3SUBT = M3SUBT + ( 1.0E-9 * F6PI / AEROSPC( APOC_IDX )%DENSITY )
+            M3SUBT = M3SUBT + ( 1.0E-9 * F6PI / AEROSPC( aavb1_idx )%DENSITY )
      &             * AEROSPC_CONC( SOA_AEROMAP( SPC ),2 )
          END DO
 
