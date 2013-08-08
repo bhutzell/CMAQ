@@ -44,7 +44,8 @@ C      5 Jun 2012 J.Bash: Added support for NH3 bidirectional exchange. Fertiliz
 C                         sector emissions are subtracted from the total NH3 emissions
 C                         if the CTM_ABFLUX flag is set
 C     18 Oct 2012 B.Koo: revised for VBS (IVOC emission factor set here)
-
+C      8 Aug 2013 H.Pye: Revision to prevent array out of bounds error in IVOC treatment
+C                        Fix confirmed by B. Koo 7/2/2013
 C-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -510,16 +511,37 @@ C plume rise
 
          IF ( PT3DEMIS ) THEN
 cvbs=> special case for VBS emissions
-            if ( ( IVOC_P_IDX .ge. 1 .and. SPC_PTEM_MAP( IVOC_P_IDX ) .lt. 1 ) .or. 
-     &           ( IVOC_P_IDX .lt. 1 .and. SPC_PTEM_MAP(-IVOC_P_IDX ) .ge. 1 ) ) then
-               XMSG = 'IVOC_P should be in both EMIS_1 and STK_EMIS or neither of them'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            end if
-            if ( ( IVOC_F_IDX .ge. 1 .and. SPC_PTEM_MAP( IVOC_F_IDX ) .lt. 1 ) .or. 
-     &           ( IVOC_F_IDX .lt. 1 .and. SPC_PTEM_MAP(-IVOC_F_IDX ) .ge. 1 ) ) then
-               XMSG = 'IVOC_F should be in both EMIS_1 and STK_EMIS or neither of them'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            end if
+c            if ( ( IVOC_P_IDX .ge. 1 .and. SPC_PTEM_MAP( IVOC_P_IDX ) .lt. 1 ) .or. 
+c     &           ( IVOC_P_IDX .lt. 1 .and. SPC_PTEM_MAP(-IVOC_P_IDX ) .ge. 1 ) ) then
+c               XMSG = 'IVOC_P should be in both EMIS_1 and STK_EMIS or neither of them'
+c               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+c            end if
+c            if ( ( IVOC_F_IDX .ge. 1 .and. SPC_PTEM_MAP( IVOC_F_IDX ) .lt. 1 ) .or. 
+c     &           ( IVOC_F_IDX .lt. 1 .and. SPC_PTEM_MAP(-IVOC_F_IDX ) .ge. 1 ) ) then
+c               XMSG = 'IVOC_F should be in both EMIS_1 and STK_EMIS or neither of them'
+c               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+c            end if
+           if ( IVOC_P_IDX .ge. 1 ) then
+              spcptem_idx = IVOC_P_IDX
+           elseif ( IVOC_P_IDX .lt. 1 ) then
+              spcptem_idx = -1*IVOC_P_IDX
+           endif
+           if ( ( IVOC_P_IDX .ge. 1 .and. SPC_PTEM_MAP( spcptem_idx ) .lt. 1 ) .or.
+     &          ( IVOC_P_IDX .lt. 1 .and. SPC_PTEM_MAP( spcptem_idx ) .ge. 1 ) ) then
+              XMSG = 'IVOC_P should be in both EMIS_1 and STK_EMIS or neither of them'
+              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+           end if
+           if ( IVOC_F_IDX .ge. 1 ) then
+              spcptem_idx = IVOC_F_IDX
+           elseif ( IVOC_F_IDX .lt. 1 ) then
+              spcptem_idx = -1*IVOC_F_IDX
+           endif
+           if ( ( IVOC_F_IDX .ge. 1 .and. SPC_PTEM_MAP( spcptem_idx ) .lt. 1 ) .or. 
+     &          ( IVOC_F_IDX .lt. 1 .and. SPC_PTEM_MAP( spcptem_idx ) .ge. 1 ) ) then
+              XMSG = 'IVOC_F should be in both EMIS_1 and STK_EMIS or neither of them'
+              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+           end if
+
 cvbs<= special case for VBS emissions
             CALL GET_PT3D_EMIS ( JDATE, JTIME, TSTEP )
 
