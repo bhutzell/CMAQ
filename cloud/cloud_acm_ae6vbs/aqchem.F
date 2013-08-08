@@ -111,6 +111,7 @@ C                       value for FE and MN was set. Also the washout rate was
 C                       removed from the calculation of the estimate for doubling
 C                       the time step based on sulfur oxidized < 5%.
 C    4 Jul 12 B.Koo:    revised for VBS
+C   28 Nov 12 G.Sarwar: Sulfate inhibition effect is implemented in the metal catalysis pathway
 C
 C  References:
 C     Walcek & Taylor, 1986, A theoretical Method for computing
@@ -1130,10 +1131,12 @@ C...Calculate sulfur iv oxidation rate due to O3 (Jacobson, 1997)
 
 C...Calculate sulfur iv oxidation rate due to 02 catalyzed by Mn++ and Fe+++
 C...(Martin and Goodman, 1991)
+C...Implement sulfate inhibition based on Martin and Good, 1991
 
         DSIVDT( 3 ) = - ( 750.0D0  * MN_OX * SIV +                 ! GS 4May2011
      &                    2600.0D0 * FE_OX * SIV +                 ! GS 4May2011
      &                    1.0D10   * MN_OX * FE_OX * SIV )         ! GS 4May2011
+     &                / ( 1.0D0 + 75.0D0 *( TS6**0.67D0 ))         ! GS 28Nov2012     
 
         IF ( ( DSIVDT( 3 ) .EQ. 0.0D0 ) .OR. ( TSIV .LE. CONMIN ) ) THEN
           DTW( 3 ) = DTRMV

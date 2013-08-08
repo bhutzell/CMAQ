@@ -33,6 +33,7 @@ C     Feb 2011: Steve Howard, Shawn Roselle, Prakash Bhave, Bill Hutzell -
 C     Mar 2011: Sergey Napelenok - AE6 update for Ca/Mg/K/Fe/Mn 
 C               indexing, density, variable names
 C     Mar 2011: Shawn Roselle, replaced I/O API include files with UTILIO_DEFN
+C     Jun 2012: J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
 C     Jul 2012: Bonyoung Koo, revised for VBS
 C
 C-----------------------------------------------------------------------
@@ -130,15 +131,15 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 C... Additional Aerosol surrogate species to add to aerosol list
       Type ( sur_aer_type ), private :: addsrgaer( naddaer ) = (/
-C                         Aitken             Accum              Coarse         Background MolWt Density
-C                      -------------      -------------      -------------     --------- ------ --------
-!    & sur_aer_type((/'                ','                ','CACO3           '/),   0.0, 100.1, 2200.0),
-!    & sur_aer_type((/'                ','                ','MGCO3           '/),   0.0,  84.3, 2200.0),
-!    & sur_aer_type((/'                ','                ','A3FE            '/),   0.0,  55.8, 2000.0),
-!    & sur_aer_type((/'                ','                ','B2MN            '/),   0.0,  54.9, 2000.0),
-!    & sur_aer_type((/'                ','                ','K               '/),   0.0,  39.1, 2200.0),
-     & sur_aer_type((/'NUM_AITKEN      ','NUM_ACCUM       ','NUM_COARSE      '/),   0.0,   0.0,    1.0),
-     & sur_aer_type((/'SRF_AITKEN      ','SRF_ACCUM       ','SRF_COARSE      '/),   0.0,   0.0,    1.0)/)
+C                        Aitken        Accum        Coarse      Background   MolWt  Density
+C                      ----------    ----------   ----------    ----------  ------  -------
+!    & sur_aer_type((/'          ', '          ', 'CACO3     '/),   0.0,     100.1,  2200.0),
+!    & sur_aer_type((/'          ', '          ', 'MGCO3     '/),   0.0,      84.3,  2200.0),
+!    & sur_aer_type((/'          ', '          ', 'A3FE      '/),   0.0,      55.8,  2000.0),
+!    & sur_aer_type((/'          ', '          ', 'B2MN      '/),   0.0,      54.9,  2000.0),
+!    & sur_aer_type((/'          ', '          ', 'K         '/),   0.0,      39.1,  2200.0),
+     & sur_aer_type((/'NUM_AITKEN', 'NUM_ACCUM ', 'NUM_COARSE'/),   0.0,       0.0,     1.0),
+     & sur_aer_type((/'SRF_AITKEN', 'SRF_ACCUM ', 'SRF_COARSE'/),   0.0,       0.0,     1.0)/)
 
 C...Required aerosol species
       Character( 16 ), Parameter, Private :: req_aso4   = 'SO4_ACCUM       '
@@ -160,14 +161,14 @@ cvbs      Character( 16 ), Parameter, Private :: req_apoa   = 'POA_ACCUM       '
       Character( 16 ), Parameter, Private :: req_num    = 'NUM_ACCUM       '
       Character( 16 ), Parameter, Private :: req_srf    = 'SRF_ACCUM       '
 
-      Character( 16 ), Parameter, Private :: req_caacc  = 'CA_ACCUM        ' ! SLN 16March2011
-      Character( 16 ), Parameter, Private :: req_mgacc  = 'MG_ACCUM        ' ! SLN 16March2011
-      Character( 16 ), Parameter, Private :: req_kacc   = 'K_ACCUM         ' ! SLN 16March2011
-      Character( 16 ), Parameter, Private :: req_feacc  = 'FE_ACCUM        ' ! SLN 22March2011
-      Character( 16 ), Parameter, Private :: req_mnacc  = 'MN_ACCUM        ' ! SLN 22March2011
-      Character( 16 ), Parameter, Private :: req_soilc  = 'SOIL_COARSE     ' ! SLN 16March2011
-      Character( 16 ), Parameter, Private :: req_anthc  = 'ANTH_COARSE     ' ! SLN 16March2011
-      Character( 16 ), Parameter, Private :: req_seasc  = 'SEAS_COARSE     ' ! SLN 16March2011
+      Character( 16 ), Parameter, Private :: req_caacc  = 'CA_ACCUM'    ! SLN 16March2011
+      Character( 16 ), Parameter, Private :: req_mgacc  = 'MG_ACCUM'    ! SLN 16March2011
+      Character( 16 ), Parameter, Private :: req_kacc   = 'K_ACCUM'     ! SLN 16March2011
+      Character( 16 ), Parameter, Private :: req_feacc  = 'FE_ACCUM'    ! SLN 22March2011
+      Character( 16 ), Parameter, Private :: req_mnacc  = 'MN_ACCUM'    ! SLN 22March2011
+      Character( 16 ), Parameter, Private :: req_soilc  = 'SOIL_COARSE' ! SLN 16March2011
+      Character( 16 ), Parameter, Private :: req_anthc  = 'ANTH_COARSE' ! SLN 16March2011
+      Character( 16 ), Parameter, Private :: req_seasc  = 'SEAS_COARSE' ! SLN 16March2011
 
 
 C...Pointers for the AQCHEM array AEROSOL
@@ -347,8 +348,7 @@ C...Map aero species
       Call map_aero()
 
       Do spc = 1, n_aerospc
-         srgaer( spc ) = sur_aer_type( (/'                ','                ','                '/),
-     &                                0.0, 0.0, 0.0 )
+         srgaer( spc ) = sur_aer_type( (/' ',' ',' '/), 0.0, 0.0, 0.0 )
 
          ! Skip H2O and SOIL species
          If ( spc .Eq. ah2o_idx ) Cycle
@@ -682,7 +682,7 @@ C..Local Variables:
       ! compute minimums for aerosol species
       Do m = 1, n_mode
          Do n = 1, n_aerospc
-            If ( aerospc( n )%name( m ) .Ne. '                ' ) Then
+            If ( aerospc( n )%name( m ) .Ne. ' ' ) Then
                spc = index1( aerospc( n )%name( m ), n_ae_spc, ae_spc )
                If ( spc .Ne. 0 ) Then
                   aeconcmin( spc ) = aerospc( n )%min_conc( m ) * mwair * 1.0E-9 / ae_molwt( spc )
