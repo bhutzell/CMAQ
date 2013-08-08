@@ -46,6 +46,8 @@ C                         if the CTM_ABFLUX flag is set
 C     18 Oct 2012 B.Koo: revised for VBS (IVOC emission factor set here)
 C      8 Aug 2013 H.Pye: Revision to prevent array out of bounds error in IVOC treatment
 C                        Fix confirmed by B. Koo 7/2/2013
+C      8 Aug 2013 H.Pye: Updated EF_IVOC2POA from 4.5 to 1.5 for high emission scenario
+C                        per B. Koo. Low emission value of 2.0 removed.
 C-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -367,10 +369,8 @@ C Local Variables:
      &                    A_PVB0J_IDX, A_PVB1J_IDX, A_PVB2J_IDX, A_PVB3J_IDX, A_PVB4J_IDX, 
      &                    A_FVB0J_IDX, A_FVB1J_IDX, A_FVB2J_IDX, A_FVB3J_IDX, A_FVB4J_IDX
 C Emission factor of IVOC relative to POA
-         ! Low IVOC Case
-         !REAL, PARAMETER :: EF_IVOC2POA = 2.0
          ! High IVOC/SVOC Case
-         REAL, PARAMETER :: EF_IVOC2POA = 4.5
+         REAL, PARAMETER :: EF_IVOC2POA = 1.5
 
 C-----------------------------------------------------------------------
 
