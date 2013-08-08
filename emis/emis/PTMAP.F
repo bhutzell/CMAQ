@@ -551,7 +551,7 @@ C Check that the PM species names match EMIS_1
                   K = PMEM_MAP( I )
                   IDX = INDEX1( AEROSPC( K )%EMIS, STKPM_VAR( N )%LEN, STKPM_VAR( N )%ARRY )
                   IF ( IDX .LE. 0 ) THEN
-                     WRITE( LOGDEV,'(5X, A, I3)' ) TRIM( AEROSPC( I )%EMIS )
+                     WRITE( LOGDEV,'(5X, A, I3)' ) TRIM( AEROSPC( K )%EMIS )
      &                                        // ' Not in Stack Emissions file', N
 !                    QUIT = .TRUE.
                   END IF
