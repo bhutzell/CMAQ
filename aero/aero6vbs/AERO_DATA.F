@@ -48,6 +48,7 @@ C GS  04/09/11 Updated sea-salt speciation; replaced ANAK with ASEACAT;
 C              made MG, K, CA, SEACAT required species;
 C JY  04/21/11 Added optional log messages (verbose)
 C JY  05/02/11 Added Reshape to aerospc_ssf initialization for pgf90 compiler
+C JY  06/08/12 remove full character blank padding put in for GNU Fortran (GCC) 4.1.2
 C BK  10/18/12 Revised for VBS (POA emission split factors set here)
 C----------------------------------------------------------------------
 
@@ -334,9 +335,9 @@ C-------------------------------------------------------------------------------
 C                   number     surface   minimum minimum minimum
 C                    name       name     numconc  m2conc  m3conc
 C                  ----------  -------  -------- -------  ------
-     &   mode_type('NUMATKN         ', 'SRFATKN         ', conmin,  conmin, conmin),
-     &   mode_type('NUMACC          ', 'SRFACC          ', conmin,  conmin, conmin),
-     &   mode_type('NUMCOR          ', 'SRFCOR          ', conmin,  conmin, conmin)/)
+     &   mode_type('NUMATKN', 'SRFATKN', conmin,  conmin, conmin),
+     &   mode_type('NUMACC ', 'SRFACC ', conmin,  conmin, conmin),
+     &   mode_type('NUMCOR ', 'SRFCOR ', conmin,  conmin, conmin)/)
 
       Real, Parameter :: min_sigma_g = 1.05
       Real, Parameter :: max_sigma_g = 2.50

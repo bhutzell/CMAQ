@@ -43,7 +43,7 @@ C    -added req_OH and OH_idx variables
 C    -changed precursor_conc to Real(8)
 
 C H.Pye 05/22/11: added ALK5RXN to precursor list for SAPRC mechanisms
-
+C 08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
 C B.Koo 07/04/12: revised for VBS
 C
 C-----------------------------------------------------------------------

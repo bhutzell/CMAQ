@@ -39,6 +39,7 @@ C
 C HP  03/11/11 Updated monoterpene SOA alphas and Cstars to Carlton et al. 2010 values
 C HP  07/24/11 Changed aromatic SOA alphas for consistency with updated reaction counters
 C               BNZ, TOL, XYL numbers now match Ng et al. 2007 Atmos. Chem. Phys.
+C 08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
 C BK  11/08/12 Revised for VBS
 C-----------------------------------------------------------------------
       Implicit None
@@ -1199,7 +1200,7 @@ C    Get the Jacobian of the function
 C          ( a1 * X1^2 + b1 * X1 + c1 )
 C          ( a2 * X2^2 + b2 * X2 + c2 )
 C          ( a3 * X3^2 + b3 * X3 + c3 )
-C   F(X) = ( a4 * X4^2 + b4 * X4 + c4 ) = 0.
+C   F(X) = ( a4 * X4^2 + b4 * X4 + c4 ) = 0.0
 C          ( ........................ )
 C          ( aN * XN^2 + bN * XN + cN )
 C
@@ -1220,7 +1221,7 @@ C   SH  02/10/10 renamed NCVAP to n_vapor. Value is inherited from SOA_DEFN.
       IMPLICIT NONE
 
       INTEGER N                 ! dimension of problem
-      REAL X( N )                 ! initial guess of CAER
+      REAL X( N )               ! initial guess of CAER
 
       REAL CT
       REAL CS
