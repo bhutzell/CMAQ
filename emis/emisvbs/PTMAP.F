@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/emis/emis/PTMAP.F,v 1.8 2011/10/21 16:10:46 yoj Exp $
+C $Header: /models/CMAQ/src/CMAQv5.0.1/models/CCTM/src/emis/emis/PTMAP.F,v 1.1.1.1 2012/04/19 19:45:06 sjr Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
@@ -36,6 +36,7 @@ C   31 Mar 09 J.Young: replace include files with mechanism namelists
 C   17 Sep 09 B.Hutzell: extended mapping algorithm to allow multiple usage
 C                        of an emission species from an individual source  
 C    6 Apr 11 S.Howard: replace Module PMEM_DEFN with AERO_DATA
+C    8 Sep 12 B.Koo: revised for VBS
 C-----------------------------------------------------------------------
 
       USE UDTYPES, ONLY: IARRY1, CARRY1 ! implementation for multiple
@@ -484,6 +485,18 @@ C point source emissions to PM species map
                K = PMEM_MAP( J )
                VNAME = AEROSPC( K )%EMIS
                IDX = INDEX1( VNAME, NVARS_EMIS( N ), STKSPC( N )%ARRY )
+cvbs=> special case for VBS emissions
+c              if not VBS-ready, look for POA instead of POA_OP and ignore POA_BB
+c              no need to look for POA_GV and POA_DV as point source files won't have them
+               if ( .not. VBS_READY_FLAG ) then
+                  if ( VNAME .eq. 'POA_OP' ) then
+                     VNAME = 'POA'
+                     IDX = INDEX1( VNAME, NVARS_EMIS( N ), STKSPC( N )%ARRY )
+                  else if ( VNAME .eq. 'POA_BB' ) then
+                     IDX = 0
+                  end if
+               end if
+cvbs=> special case for VBS emissions
                IF ( IDX .GT. 0 ) THEN
 !WTH skip if emission species used multiple times for current point group
                   DO I2 = NM+1, L
@@ -550,8 +563,19 @@ C Check that the PM species names match EMIS_1
                DO I = 1, N_EMIS_PM
                   K = PMEM_MAP( I )
                   IDX = INDEX1( AEROSPC( K )%EMIS, STKPM_VAR( N )%LEN, STKPM_VAR( N )%ARRY )
+cvbs=> special case for VBS emissions
+c                 if not VBS-ready, look for POA instead of POA_OP and ignore POA_BB
+c                 no need to look for POA_GV and POA_DV as point source files won't have them
+                  if ( .not. VBS_READY_FLAG ) then
+                     if ( AEROSPC( K )%EMIS .eq. 'POA_OP' ) then
+                        IDX = INDEX1( 'POA', STKPM_VAR( N )%LEN, STKPM_VAR( N )%ARRY )
+                     else if ( AEROSPC( K )%EMIS .eq. 'POA_BB' ) then
+                        IDX = 0
+                     end if
+                  end if
+cvbs=> special case for VBS emissions
                   IF ( IDX .LE. 0 ) THEN
-                     WRITE( LOGDEV,'(5X, A, I3)' ) TRIM( AEROSPC( I )%EMIS )
+                     WRITE( LOGDEV,'(5X, A, I3)' ) TRIM( AEROSPC( K )%EMIS )
      &                                        // ' Not in Stack Emissions file', N
 !                    QUIT = .TRUE.
                   END IF

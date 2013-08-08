@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/emis/emis/EMIS_DEFN.F,v 1.10 2011/10/21 16:10:46 yoj Exp $
+C $Header: /models/CMAQ/src/CMAQv5.0.1/models/CCTM/src/emis/emis/EMIS_DEFN.F,v 1.1.1.1 2012/04/19 19:45:06 sjr Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
@@ -40,13 +40,11 @@ C     16 Feb 2011 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                            removed deprecated TRIMLEN
 C      6 Apr 2011 J.Young, R.Pinder: add lightning NO emissions capability
 C     11 May 2011 D.Wong: incorporated twoway model implementation
-C      5 Jun 2012 J.Bash: Added support for NH3 bidirectional exchange. Fertilizer
-C                         sector emissions are subtracted from the total NH3 emissions
-C                         if the CTM_ABFLUX flag is set
+C     18 Oct 2012 B.Koo: revised for VBS (IVOC emission factor set here)
 
 C-----------------------------------------------------------------------
 
-      USE GRID_CONF           ! horizontal & vertical domain specifications      
+      USE GRID_CONF           ! horizontal & vertical domain specifications
 
       IMPLICIT NONE
 
@@ -73,7 +71,6 @@ C-----------------------------------------------------------------------
       REAL,    SAVE :: DT         ! TSTEP (output) in sec
 
       REAL,    ALLOCATABLE, SAVE :: BUFF( :,:,: )        ! read buffer
-      REAL,    ALLOCATABLE, SAVE :: FERT( :,:,: )        ! read buffer
 
       INTEGER, SAVE :: STRT_GC, FINI_GC, STRT_AE, FINI_AE,
      &                 STRT_NR, FINI_NR, STRT_TR, FINI_TR
@@ -98,7 +95,6 @@ C-----------------------------------------------------------------------
          USE UTILIO_DEFN         ! I/O API
          USE AERO_EMIS           ! inherits GRID_CONF
          USE AERO_DATA, ONLY: MAP_PMEMIS  ! access subroutine map_pmemis
-         USE DEPV_DEFN, ONLY: ABFLUX ! ammonia bidi flag
 
          IMPLICIT NONE
 
@@ -283,15 +279,6 @@ C 3D point source emissions (N_SPC_EMIS+1 serves as the null map for PTEM_MAP)
          END IF
          BUFF = 0.0   ! array assignment
 
-         IF ( ABFLUX ) THEN
-            ALLOCATE ( FERT( NCOLS,NROWS,EMLYRS ), STAT = STATUS )
-            IF ( STATUS .NE. 0 ) THEN
-               XMSG = 'FERT memory allocation failed'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
-               SUCCESS = .FALSE.; RETURN
-            END IF
-            FERT = 0.0   ! array assignment
-         END IF
 C combined gas emssions conversion factor
 
          CNVTE = CMLMR * CONVEM * MWAIR / ( DX1 * DX2 )
@@ -326,7 +313,6 @@ C GET_AERO_EMIS has to apply factors - don`t do it at this level.
          USE PTMAP               ! defines emissions file(s) PM mapping
          USE LTNG_DEFN           ! lightning NO emissions
          USE UTILIO_DEFN
-         USE DEPV_DEFN, ONLY: ABFLUX ! ammonia bidi flag
 
          IMPLICIT NONE
 
@@ -350,6 +336,7 @@ C Local Variables:
          REAL,    SAVE :: CNVTP         ! intermediate combined conv. factor
          REAL             DELT          ! interpolation factor
          INTEGER          C, R, L, N, S, V ! loop induction variables
+         INTEGER          S2
 
          CHARACTER( 16 ) :: PNAME = 'GET_EMIS'
          CHARACTER( 120 ) :: XMSG = ' '
@@ -360,6 +347,14 @@ C Local Variables:
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
          INTEGER          GXOFF, GYOFF         ! global origin offset from file
          INTEGER, SAVE :: STARTCOL, ENDCOL, STARTROW, ENDROW
+         INTEGER, SAVE :: IVOC_P_IDX, IVOC_F_IDX, 
+     &                    A_PVB0J_IDX, A_PVB1J_IDX, A_PVB2J_IDX, A_PVB3J_IDX, A_PVB4J_IDX, 
+     &                    A_FVB0J_IDX, A_FVB1J_IDX, A_FVB2J_IDX, A_FVB3J_IDX, A_FVB4J_IDX
+C Emission factor of IVOC relative to POA
+         ! Low IVOC Case
+         !REAL, PARAMETER :: EF_IVOC2POA = 2.0
+         ! High IVOC/SVOC Case
+         REAL, PARAMETER :: EF_IVOC2POA = 4.5
 
 C-----------------------------------------------------------------------
 
@@ -380,6 +375,10 @@ C read & interpolate emissions (create VDEMIS in the species class order)
          DO V = STRT_GC, FINI_GC
             S = V + 1 - STRT_GC
             BUFF = 0.0   ! array assignment
+cvbs=> special case for VBS emissions
+            if ( GC_EMIS( S ) .eq. 'IVOC_P' ) IVOC_P_IDX = S
+            if ( GC_EMIS( S ) .eq. 'IVOC_F' ) IVOC_F_IDX = S
+cvbs<= special case for VBS emissions
 C                                       vvvvvvv - emis surrogate names
             IF ( .NOT. INTERPX( EMIS_1, GC_EMIS( S ), PNAME,
      &                          STARTCOL,ENDCOL, STARTROW,ENDROW, 1,EMLYRS,
@@ -388,6 +387,33 @@ C                                       vvvvvvv - emis surrogate names
      &              // TRIM( GC_EMIS( S ) ) // ' from ' // EMIS_1
 !              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+cvbs=> special case for VBS emissions
+c              if missing, IVOC_P and IVOC_F will be set to EF_IVOC2POA x POA
+               if ( GC_EMIS( S ) .eq. 'IVOC_P' ) then
+                  IVOC_P_IDX = -IVOC_P_IDX
+                  XMSG = 'Will internally estimate IVOC_P'
+                  CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+                  do S2 = 1, NEMIS_AE
+                     if ( AE_EMIS( S2 ) .eq. 'A_PVB0J' ) A_PVB0J_IDX = S2
+                     if ( AE_EMIS( S2 ) .eq. 'A_PVB1J' ) A_PVB1J_IDX = S2
+                     if ( AE_EMIS( S2 ) .eq. 'A_PVB2J' ) A_PVB2J_IDX = S2
+                     if ( AE_EMIS( S2 ) .eq. 'A_PVB3J' ) A_PVB3J_IDX = S2
+                     if ( AE_EMIS( S2 ) .eq. 'A_PVB4J' ) A_PVB4J_IDX = S2
+                  end do
+               end if
+               if ( GC_EMIS( S ) .eq. 'IVOC_F' ) then
+                  IVOC_F_IDX = -IVOC_F_IDX
+                  XMSG = 'Will internally estimate IVOC_F'
+                  CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+                  do S2 = 1, NEMIS_AE
+                     if ( AE_EMIS( S2 ) .eq. 'A_FVB0J' ) A_FVB0J_IDX = S2
+                     if ( AE_EMIS( S2 ) .eq. 'A_FVB1J' ) A_FVB1J_IDX = S2
+                     if ( AE_EMIS( S2 ) .eq. 'A_FVB2J' ) A_FVB2J_IDX = S2
+                     if ( AE_EMIS( S2 ) .eq. 'A_FVB3J' ) A_FVB3J_IDX = S2
+                     if ( AE_EMIS( S2 ) .eq. 'A_FVB4J' ) A_FVB4J_IDX = S2
+                  end do
+               end if
+cvbs<= special case for VBS emissions
             END IF
             CNVTI = CNVTP * GC_EMIS_FAC( S )
 
@@ -468,6 +494,18 @@ C lightning NO
 C plume rise
 
          IF ( PT3DEMIS ) THEN
+cvbs=> special case for VBS emissions
+            if ( ( IVOC_P_IDX .ge. 1 .and. SPC_PTEM_MAP( IVOC_P_IDX ) .lt. 1 ) .or. 
+     &           ( IVOC_P_IDX .lt. 1 .and. SPC_PTEM_MAP(-IVOC_P_IDX ) .ge. 1 ) ) then
+               XMSG = 'IVOC_P should be in both EMIS_1 and STK_EMIS or neither of them'
+               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            end if
+            if ( ( IVOC_F_IDX .ge. 1 .and. SPC_PTEM_MAP( IVOC_F_IDX ) .lt. 1 ) .or. 
+     &           ( IVOC_F_IDX .lt. 1 .and. SPC_PTEM_MAP(-IVOC_F_IDX ) .ge. 1 ) ) then
+               XMSG = 'IVOC_F should be in both EMIS_1 and STK_EMIS or neither of them'
+               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            end if
+cvbs<= special case for VBS emissions
             CALL GET_PT3D_EMIS ( JDATE, JTIME, TSTEP )
 
 C merge: VDEMIS_PT in mol/sec. Convert to ppm/sec
@@ -509,6 +547,40 @@ C GET_AERO_EMIS in f90 module AERO_EMIS
                END DO
             END DO
 
+cvbs=> special case for VBS emissions
+c           IVOC_P and IVOC_F are set to EF_IVOC2POA x POA
+            if ( IVOC_P_IDX .lt. 1 ) then
+               do R = 1, MY_NROWS
+               do C = 1, MY_NCOLS
+               do L = 1, EMLAYS
+                  VDEMIS( STRT_GC - 1 - IVOC_P_IDX,L,C,R ) = EF_IVOC2POA * (
+     &                VDEMIS_AE( A_PVB0J_IDX,L,C,R ) * AE_MOLWT(AE_EMIS_MAP(A_PVB0J_IDX))
+     &              + VDEMIS_AE( A_PVB1J_IDX,L,C,R ) * AE_MOLWT(AE_EMIS_MAP(A_PVB1J_IDX))
+     &              + VDEMIS_AE( A_PVB2J_IDX,L,C,R ) * AE_MOLWT(AE_EMIS_MAP(A_PVB2J_IDX))
+     &              + VDEMIS_AE( A_PVB3J_IDX,L,C,R ) * AE_MOLWT(AE_EMIS_MAP(A_PVB3J_IDX))
+     &              + VDEMIS_AE( A_PVB4J_IDX,L,C,R ) * AE_MOLWT(AE_EMIS_MAP(A_PVB4J_IDX))
+     &                                             ) / GC_MOLWT(GC_EMIS_MAP(-IVOC_P_IDX))
+               end do
+               end do
+               end do
+            end if
+            if ( IVOC_F_IDX .lt. 1 ) then
+               do R = 1, MY_NROWS
+               do C = 1, MY_NCOLS
+               do L = 1, EMLAYS
+                  VDEMIS( STRT_GC - 1 - IVOC_F_IDX,L,C,R ) = EF_IVOC2POA * (
+     &                VDEMIS_AE( A_FVB0J_IDX,L,C,R ) * AE_MOLWT(AE_EMIS_MAP(A_FVB0J_IDX))
+     &              + VDEMIS_AE( A_FVB1J_IDX,L,C,R ) * AE_MOLWT(AE_EMIS_MAP(A_FVB1J_IDX))
+     &              + VDEMIS_AE( A_FVB2J_IDX,L,C,R ) * AE_MOLWT(AE_EMIS_MAP(A_FVB2J_IDX))
+     &              + VDEMIS_AE( A_FVB3J_IDX,L,C,R ) * AE_MOLWT(AE_EMIS_MAP(A_FVB3J_IDX))
+     &              + VDEMIS_AE( A_FVB4J_IDX,L,C,R ) * AE_MOLWT(AE_EMIS_MAP(A_FVB4J_IDX))
+     &                                             ) / GC_MOLWT(GC_EMIS_MAP(-IVOC_F_IDX))
+               end do
+               end do
+               end do
+            end if
+cvbs<= special case for VBS emissions
+
          END IF
 
 C non-reactive gases (conversion to ppmv/s) VDEMIS in this order from RDEMIS
@@ -524,29 +596,6 @@ C                                       vvvvvvv - emis surrogate names
      &              // TRIM( NR_EMIS( S ) ) // ' from ' // EMIS_1
                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
-! subtract the fertilizer emissions from the NEI for use in the NH3 bidirectional
-! exchange model JOB
-            IF ( ABFLUX .AND. TRIM( NR_EMIS( S ) ) .EQ. 'NH3' ) THEN
-               FERT = 0.0   ! array assignment
-               IF ( .NOT. INTERPX( EMIS_1, 'NH3_FERT', PNAME,
-     &                          STARTCOL,ENDCOL, STARTROW,ENDROW, 1,EMLYRS,
-     &                          JDATE, JTIME, FERT ) ) THEN
-                  XMSG = 'Could not read NH3_FERT from'
-     &                   // EMIS_1
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-               DO R = 1, MY_NROWS
-                  DO C = 1, MY_NCOLS
-                     BUFF( C,R,1 ) = BUFF( C,R,1 ) - FERT( C,R,1 )
-                     IF(BUFF( C,R,1 ) .LT. 0.0 ) THEN
-                        XMSG = 'Negative values in NH3 emissions' 
-     &                       //'Error in NH3 Bidi emissions'                          
-                        CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                     END IF
-                  END DO
-               END DO    
-            END IF ! ABFLUX
-
             CNVTI = CNVTP * NR_EMIS_FAC( S )
 
             DO R = 1, MY_NROWS
