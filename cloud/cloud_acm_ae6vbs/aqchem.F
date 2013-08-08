@@ -19,7 +19,7 @@
 
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/cloud/cloud_acm_ae6/aqchem.F,v 1.6 2012/03/19 15:43:49 yoj Exp $
+C $Header: /models/CMAQ/src/CMAQv5.0.1/models/CCTM/src/cloud/cloud_acm_vbs/aqchem.F,v 1.1.1.1 2012/04/19 19:45:05 sjr Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
@@ -110,7 +110,7 @@ C                       estimate FE_OX and MN_OX was moved to be after a floor
 C                       value for FE and MN was set. Also the washout rate was
 C                       removed from the calculation of the estimate for doubling
 C                       the time step based on sulfur oxidized < 5%.
-C   28 Nov 12 G.Sarwar: Sulfate inhibition effect is implemented in the metal catalysis pathway
+C    4 Jul 12 B.Koo:    revised for VBS
 C
 C  References:
 C     Walcek & Taylor, 1986, A theoretical Method for computing
@@ -312,7 +312,7 @@ C...........Local Variables (scalars):
       REAL( 8 ) :: OHL             ! OH radical conc in cloudwater (mol/liter)
       REAL( 8 ) :: SOA             ! secondary organic aerosol in cloudwater (mol/liter)
       REAL( 8 ) :: ORGC            ! cloud-produced SOA in cloudwater (treated as primary)
-      REAL( 8 ) :: POA             ! primary organic aerosol in cloudwater (mol/liter)
+cvbs      REAL( 8 ) :: POA             ! primary organic aerosol in cloudwater (mol/liter)
       REAL( 8 ) :: PAAH            ! Henry's Law Constant for PAA
       REAL( 8 ) :: PAAL            ! PAA conc in cloudwater (mol/liter)
       REAL( 8 ) :: PCO2F           ! gas only CO2 partial pressure (atm)
@@ -441,10 +441,10 @@ C...Initialization
 
         LOGDEV = SETUP_LOGDEV()
 
-C...Make sure an AE6 version of the mechanism is being used
+C...Make sure an VBS version of the mechanism is being used
 
-        IF ( INDEX ( MECHNAME, 'AE6' ) .LE. 0 ) THEN
-          XMSG = 'This version of AQCHEM requires an AE6 chemical mechanism'
+        IF ( INDEX ( MECHNAME, 'VBS' ) .LE. 0 ) THEN
+          XMSG = 'This version of AQCHEM requires an VBS chemical mechanism'
           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
         END IF
 
@@ -738,7 +738,7 @@ C...   = Initial amount - amount deposited  (mol/liter)
         MN      = LOADING( LMNACC, ACC) - WETDEP( LMNACCL ) * XC1 + MNCOR
         SOA     = LOADING( LSOA,  ACC ) - WETDEP( LSOAL  ) * XC1
         ORGC    = LOADING( LORGC, ACC ) + DORGC - WETDEP( LORGCL ) * XC1             ! new in-cloud organic
-        POA     = LOADING( LPOA,  ACC ) + LOADING( LPOA, AKN ) - WETDEP( LPOAL ) * XC1
+cvbs        POA     = LOADING( LPOA,  ACC ) + LOADING( LPOA, AKN ) - WETDEP( LPOAL ) * XC1
         EC      = LOADING( LEC,   ACC ) + LOADING( LEC,   AKN ) - WETDEP( LECL   ) * XC1
         PRIM    = LOADING( LPRI,  ACC ) + LOADING( LPRI,  AKN ) - WETDEP( LPRIML ) * XC1
 !       PRIMCOR = LOADING( LPRICOR, COR ) - WETDEP( LPRIMCORL ) * XC1
@@ -760,7 +760,7 @@ C...don't allow aerosol concentrations to go below zero
         MN      = MAX( MN,      0.0D0 )
         SOA     = MAX( SOA,     0.0D0 )
         ORGC    = MAX( ORGC,    0.0D0 )
-        POA     = MAX( POA,     0.0D0 )
+cvbs        POA     = MAX( POA,     0.0D0 )
         EC      = MAX( EC,      0.0D0 )
         PRIM    = MAX( PRIM,    0.0D0 )
 !       PRIMCOR = MAX( PRIMCOR, 0.0D0 )
@@ -1069,7 +1069,7 @@ C...load the liquid concentration array with current values
         LIQUID( LCLCORL   ) = CLCOR
         LIQUID( LNO3CORL  ) = NO3COR
         LIQUID( LNH4CORL  ) = NH4COR
-        LIQUID( LPOAL     ) = POA
+cvbs        LIQUID( LPOAL     ) = POA
         LIQUID( LECL      ) = EC
         LIQUID( LSOAL     ) = SOA
         LIQUID( LORGCL    ) = ORGC  
@@ -1130,12 +1130,10 @@ C...Calculate sulfur iv oxidation rate due to O3 (Jacobson, 1997)
 
 C...Calculate sulfur iv oxidation rate due to 02 catalyzed by Mn++ and Fe+++
 C...(Martin and Goodman, 1991)
-C...Implement sulfate inhibition based on Martin and Good, 1991
 
         DSIVDT( 3 ) = - ( 750.0D0  * MN_OX * SIV +                 ! GS 4May2011
      &                    2600.0D0 * FE_OX * SIV +                 ! GS 4May2011
      &                    1.0D10   * MN_OX * FE_OX * SIV )         ! GS 4May2011
-     &                / ( 1.0D0 + 75.0D0 *( TS6**0.67D0 ))         ! GS 28Nov2012     
 
         IF ( ( DSIVDT( 3 ) .EQ. 0.0D0 ) .OR. ( TSIV .LE. CONMIN ) ) THEN
           DTW( 3 ) = DTRMV
@@ -1397,7 +1395,7 @@ C...  to the accumulation mode particles
       AERWDEP( LEC,  AKN ) = 0.0D0
       AERWDEP( LPRI, AKN ) = 0.0D0
 
-      AERWDEP( LPOA, AKN ) = 0.0D0
+cvbs      AERWDEP( LPOA, AKN ) = 0.0D0
 
       AERWDEP( LSO4, ACC ) = WETDEP( LSO4ACCL ) + WETDEP( LHSO4ACCL )
       AERWDEP( LNH4, ACC ) = WETDEP( LNH4ACCL )
@@ -1407,7 +1405,7 @@ C...  to the accumulation mode particles
 
       AERWDEP( LSOA,  ACC ) = WETDEP( LSOAL  )
       AERWDEP( LORGC, ACC ) = WETDEP( LORGCL )
-      AERWDEP( LPOA,  ACC ) = WETDEP( LPOAL )
+cvbs      AERWDEP( LPOA,  ACC ) = WETDEP( LPOAL )
 
       AERWDEP( LSO4, COR ) = WETDEP( LTS6CORL  )
       AERWDEP( LNO3, COR ) = WETDEP( LNO3CORL  )
@@ -1451,7 +1449,7 @@ C...aerosol concentrations (mol/molV)
       AEROSOL( LEC,  AKN ) = AEROSOL( LEC,  AKN ) * EALFA3T
       AEROSOL( LPRI, AKN ) = AEROSOL( LPRI, AKN ) * EALFA3T
 
-      AEROSOL( LPOA, AKN ) = AEROSOL( LPOA, AKN ) * EALFA3T
+cvbs      AEROSOL( LPOA, AKN ) = AEROSOL( LPOA, AKN ) * EALFA3T
 
       AEROSOL( LSO4, ACC ) = TS6ACC * XL * RECIPAP1
       AEROSOL( LEC,  ACC ) = EC     * XL * RECIPAP1
@@ -1459,7 +1457,7 @@ C...aerosol concentrations (mol/molV)
 
       AEROSOL( LSOA,  ACC ) = SOA  * XL * RECIPAP1
       AEROSOL( LORGC, ACC ) = ORGC * XL * RECIPAP1
-      AEROSOL( LPOA,  ACC ) = POA  * XL * RECIPAP1
+cvbs      AEROSOL( LPOA,  ACC ) = POA  * XL * RECIPAP1
 
       AEROSOL( LNH4, ACC ) = FNH4ACC * TOTAMM
       AEROSOL( LNO3, ACC ) = FNO3ACC * TOTNIT
