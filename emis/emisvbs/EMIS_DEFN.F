@@ -369,6 +369,8 @@ C Local Variables:
      &                    A_PVB0J_IDX, A_PVB1J_IDX, A_PVB2J_IDX, A_PVB3J_IDX, A_PVB4J_IDX, 
      &                    A_FVB0J_IDX, A_FVB1J_IDX, A_FVB2J_IDX, A_FVB3J_IDX, A_FVB4J_IDX
 C Emission factor of IVOC relative to POA
+         ! No IVOC Case
+         !REAL, PARAMETER :: EF_IVOC2POA = 0.0
          ! High IVOC/SVOC Case
          REAL, PARAMETER :: EF_IVOC2POA = 1.5
 
