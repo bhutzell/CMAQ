@@ -355,6 +355,7 @@ C Local Variables:
          REAL             DELT          ! interpolation factor
          INTEGER          C, R, L, N, S, V ! loop induction variables
          INTEGER          S2
+         INTEGER          spcptem_idx 
 
          CHARACTER( 16 ) :: PNAME = 'GET_EMIS'
          CHARACTER( 120 ) :: XMSG = ' '
