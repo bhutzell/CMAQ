@@ -373,9 +373,7 @@ C Emission factor of IVOC relative to POA
          ! No IVOC Case
          !REAL, PARAMETER :: EF_IVOC2POA = 0.0
          ! High IVOC/SVOC Case
-         !REAL, PARAMETER :: EF_IVOC2POA = 1.5
-         ! incorrect value for testing
-         REAL, PARAMETER :: EF_IVOC2POA = 4.5
+         REAL, PARAMETER :: EF_IVOC2POA = 1.5
 
 C-----------------------------------------------------------------------
 
