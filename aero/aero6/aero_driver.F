@@ -211,8 +211,14 @@ C *** variables aerosol diagnostic file flag
 C *** environment variable for AERDIAG file
       CHARACTER( 16 ), SAVE :: CTM_AERDIAG = 'CTM_AERDIAG'
 
+C *** environment variable for STM species adjustment
+      CHARACTER( 16 ), SAVE :: STM_ADJSPC = 'STM_ADJSO4'
+
 C *** flag for AERDIAG file [F], default
       LOGICAL, SAVE :: AERDIAG
+
+C *** flag for STM species adjustment [T], default
+      LOGICAL, SAVE :: ADJ_STMSPC
 
 C *** first pass flag
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
@@ -327,6 +333,21 @@ C *** Get domain decomp info from the MET_CRO_3D file
          END IF
 #endif
 
+         ADJ_STMSPC = .TRUE.         ! default
+         VARDESC = 'Flag to override sulfur tracking species adjustment'
+         ADJ_STMSPC = ENVYN( STM_ADJSPC, VARDESC, ADJ_STMSPC, STATUS )
+         IF ( STATUS .NE. 0 ) WRITE( LOGDEV, '(5X, A)' ) VARDESC
+         IF ( STATUS .EQ. 1 ) THEN
+            XMSG = 'Environment variable improperly formatted'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+         ELSE IF ( STATUS .EQ. -1 ) THEN
+            XMSG = 'Environment variable set, but empty ... Using default:'
+            WRITE( LOGDEV, '(5X, A, I9)' ) XMSG, JTIME
+         ELSE IF ( STATUS .EQ. -2 ) THEN
+            XMSG = 'Environment variable not set ... Using default:'
+            WRITE( LOGDEV, '(5X, A, I9)' ) XMSG, JTIME
+         END IF
+
       END IF    ! FIRSTIME
 
       MDATE  = JDATE
@@ -422,6 +443,9 @@ C *** Extract soa concentrations from CGRID
 
 C *** Aerosol process routines
                CALL AEROPROC( DT, C, R, L, GAMMA_N2O5 )
+
+C *** Adjust sulfur tracking species
+               IF ( ADJ_STMSPC ) CALL ADJ_SULFTRK
 
 C *** Update aerosol variables conc back into CGRID (set minimum)
                CALL UPDATE_AERO( CGRID( C,R,L,: ), .TRUE. )
