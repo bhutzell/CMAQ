@@ -44,12 +44,13 @@ C    -changed precursor_conc to Real(8)
 
 C H.Pye 05/22/11: added ALK5RXN to precursor list for SAPRC mechanisms
 C 08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
+C S.Roselle 02/6/13: added SULF_ICBC to precursor list for sulfur tracking
  
 C-----------------------------------------------------------------------
 
       Implicit None
 
-      Integer, Parameter :: n_precursor = 19   ! # of precursors
+      Integer, Parameter :: n_precursor = 20   ! # of precursors
 
       Type precursor_type
          Character( 16 ) :: name               ! species name
@@ -68,6 +69,7 @@ C                       -------   ----------  ------
      & precursor_type( 'ISOPRXN', .True.  , .True.  ),
      & precursor_type( 'TRPRXN ', .True.  , .True.  ),
      & precursor_type( 'SULF   ', .False. , .True.  ),
+     & precursor_type( 'SULF_ICBC',.False., .True.  ),
      & precursor_type( 'SULPRD ', .True.  , .True.  ),
      & precursor_type( 'HCL    ', .False. , .True.  ),
      & precursor_type( 'ALK5RXN', .True.  , .True.  ),
@@ -88,6 +90,7 @@ C Required species
       Character( 16 ), Private, Parameter :: req_HNO3   = 'HNO3'
       Character( 16 ), Private, Parameter :: req_HONO   = 'HONO'
       Character( 16 ), Private, Parameter :: req_SULF   = 'SULF'
+      Character( 16 ), Private, Parameter :: req_SULFI  = 'SULF_ICBC'
       Character( 16 ), Private, Parameter :: req_SULPRD = 'SULPRD'
       Character( 16 ), Private, Parameter :: req_HCL    = 'HCL'
       Character( 16 ), Private, Parameter :: req_NH3    = 'NH3'
@@ -99,6 +102,7 @@ C Indices of required species
       Integer :: HNO3_idx
       Integer :: HONO_idx
       Integer :: SULF_idx
+      Integer :: SULFI_idx
       Integer :: SULPRD_idx
       Integer :: HCL_idx
       Integer :: NH3_idx
@@ -109,6 +113,7 @@ C Indices of required species
       Real( 8 ) :: precursor_conc( n_precursor ) ! precursor concentration [ug/m^3]
 
       Real    :: so4rate                       ! sulfate gas-phase production rate [ug/m^3*s]
+      Real    :: so4ratei                      ! ic/bc sulfate rate [ug/m^3*s]
 
 C Private variables for loading and unloading to CGRID array
       Integer          :: precursor_map( n_precursor )  ! pointers to CGRID
@@ -174,6 +179,7 @@ C Find indices of required species
       HNO3_idx   = findPrecursor( req_HNO3 )
       HONO_idx   = findPrecursor( req_HONO )
       SULF_idx   = findPrecursor( req_SULF )
+      SULFI_idx  = findPrecursor( req_SULFI )
       SULPRD_idx = findPrecursor( req_SULPRD )
       HCL_idx    = findPrecursor( req_HCL )
       NH3_idx    = findPrecursor( req_NH3 )
@@ -186,6 +192,7 @@ C Find indices of required species
       Write( logdev,'( 5x, a, i4 )' ) 'HNO3_idx:   ', HNO3_idx
       Write( logdev,'( 5x, a, i4 )' ) 'HONO_idx:   ', HONO_idx
       Write( logdev,'( 5x, a, i4 )' ) 'SULF_idx:   ', SULF_idx
+      Write( logdev,'( 5x, a, i4 )' ) 'SULFI_idx:  ', SULFI_idx
       Write( logdev,'( 5x, a, i4 )' ) 'SULPRD_idx: ', SULPRD_idx
       Write( logdev,'( 5x, a, i4 )' ) 'HCL_idx:    ', HCL_idx
       Write( logdev,'( 5x, a, i4 )' ) 'NH3_idx:    ', NH3_idx
