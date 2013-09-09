@@ -130,6 +130,8 @@ C     are in thermodynamic equilibrium at the end of each time step.
 C PVB 05/02/05 Modified ERF statement function for negative arguments such
 C     that erf(-x) = -erf(x).  Previous version had erf(-x) = erf(x).
 
+C SJR 01/31/06 Added capability for sulfate tracking
+
 C PVB 04/06/06 Added GAMMA_N2O5 to the AEROPROC and EQL3 call vectors,
 C     so it can be written to the aerosol diagnostic file.
 
@@ -955,6 +957,7 @@ C *** Determine if Hybrid
       hybrid = .false.
 #else
       DO I = 1, N_AEROSPC
+         IF(  AEROSPC( I )%tracer )CYCLE
          IF ( AEROSPC( I )%CHARGE .NE. 0 ) TMP = TMP + AEROSPC_CONC( I,N_MODE )
       END DO
       HYBRID = ( TMP .GE. CUTOFF ) .AND. ( AIRRH .GE. 0.18 )
@@ -974,6 +977,7 @@ C     H+ concentration
       HPLUS = 0.0
       DO I = 1, N_MODE
          DO N = 1, N_AEROSPC
+            IF(  AEROSPC( N )%tracer )CYCLE
             HPLUS( I ) = HPLUS( I )
      &                 - AEROSPC( N )%CHARGE * AEROSPC_CONC( N,I ) / AEROSPC_MW( N )
          END DO
@@ -1045,6 +1049,7 @@ C     on Equations A21 and A23 of Binkowski & Shankar (1995).
          XH2SO4 = SO4RATE / TMP
          XH2SO4 = MAX( XH2SO4, CONMIN )
          PRECURSOR_CONC( SULF_IDX ) = XH2SO4
+         PRECURSOR_CONC( SULFI_IDX ) = 0.0D0
 
 C *** Calculate new particle production rate for 0th, 2nd, & 3rd moments
          CALL NEWPART3 ( AIRRH, AIRTEMP, XH2SO4, SO4RATE,
@@ -1349,6 +1354,7 @@ C *** Add water and SOA to 2nd moment while preserving standard deviation
             AEROSPC_CONC( ANO3_IDX,IMODE ) = CFINAL( KNO3,IMODE )
             AEROSPC_CONC( ACL_IDX,IMODE )  = CFINAL( KCL, IMODE )
             AEROSPC_CONC( ASO4_IDX,IMODE ) = SO4
+            AEROSPC_CONC( ASO4GAS_IDX,IMODE ) = AEROSPC_CONC( ASO4GAS_IDX,IMODE ) + RATE * TSTEP * H2SO4RATM1
             AEROSPC_CONC( AH2O_IDX,IMODE ) = H2O
             MOMENT2_CONC( IMODE ) = WETM2
 
@@ -1496,6 +1502,8 @@ C *** Initialize excess evaporated mass array
          M3SOA = 0.0
          DO I = 1, N_AEROSPC
 
+            IF(  AEROSPC( I )%tracer )CYCLE
+
             ! Skip thermodynamically-active inorganic species
             IF ( I .EQ. ASO4_IDX .OR. I .EQ. ANO3_IDX .OR. I .EQ. ACL_IDX  .OR. 
      &           I .EQ. ANH4_IDX .OR. I .EQ. ANA_IDX  .OR. I .EQ. AMG_IDX  .OR. 
@@ -1620,12 +1628,14 @@ C *** Add water and SOA to 2nd moment while preserving standard deviation
          AEROSPC_CONC( ANO3_IDX, IMODE ) = CFINAL( KNO3,IMODE )
          AEROSPC_CONC( ACL_IDX, IMODE )  = CFINAL( KCL ,IMODE )
          AEROSPC_CONC( ASO4_IDX, IMODE ) = SO4
+         AEROSPC_CONC( ASO4GAS_IDX, IMODE ) = AEROSPC_CONC( ASO4GAS_IDX, IMODE ) + RATE * CONVFAC
          AEROSPC_CONC( AH2O_IDX, IMODE ) = H2O
          IF ( IMODE .EQ. 1 ) MOMENT0_CONC( IMODE ) = AM0(IMODE) + DNDT * DELT
          MOMENT2_CONC( IMODE ) = WETM2
 
          HPLUS( IMODE ) = 0.0
          DO I = 1, N_AEROSPC
+           IF(  AEROSPC( I )%tracer )CYCLE
            HPLUS( IMODE ) = HPLUS( IMODE )
      &                    - AEROSPC( I )%CHARGE * AEROSPC_CONC( I,IMODE ) / AEROSPC_MW( I )
          END DO
@@ -2916,6 +2926,7 @@ C     treated as though it were fine mass soil.
       
       !  sum from aerospc species
       DO N = 1, N_AEROSPC
+         IF(  AEROSPC( N )%tracer )CYCLE
          IF ( N .EQ. ASO4_IDX .OR. N .EQ. ANO3_IDX .OR. N .EQ. ANH4_IDX ) THEN
             IF ( AEROSPC( N )%NAME( 1 ) .NE. ' ' ) THEN
                EXT2 = EXT2 + FRH * AEROSPC( N )%VISUAL_IDX * AEROSPC_CONC( N,1 )
