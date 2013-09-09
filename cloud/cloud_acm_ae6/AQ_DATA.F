@@ -40,11 +40,11 @@ C-----------------------------------------------------------------------
 
       Implicit None
 
-      Integer, Parameter :: ngas = 15   ! number of gas-phase species for AQCHEM
+      Integer, Parameter :: ngas = 17   ! number of gas-phase species for AQCHEM
 !     Integer, Parameter :: naddaer = 7 ! number of additional aerosol surrogate species for AQCHEM
       Integer, Parameter :: naddaer = 2 ! number of additional aerosol surrogate species for AQCHEM
       Integer, Parameter :: naer = n_aerospc + naddaer  ! number of aerosol surrogate species for AQCHEM
-      Integer, Parameter :: nliqs = 51  ! number of liquid-phase species in AQCHEM
+      Integer, Parameter :: nliqs = 70  ! number of liquid-phase species in AQCHEM
       Integer, Parameter :: nmodes = 3  ! number of aerosol modes
       Integer, Parameter :: mxsrg = 20  ! maximum number of species for surrogate
 
@@ -74,11 +74,13 @@ C                       ----------    ----------
      & sur_gas_type( 'FOA       ',        0.0 ),
      & sur_gas_type( 'MHP       ',        0.0 ),
      & sur_gas_type( 'PAA       ',        0.0 ),
-     & sur_gas_type( 'H2SO4     ',        0.0 ),
+     & sur_gas_type( 'H2SO4_TOT ',        0.0 ),
      & sur_gas_type( 'HCL       ',        0.0 ),
      & sur_gas_type( 'GLY       ',        0.0 ),
      & sur_gas_type( 'MGLY      ',        0.0 ),
-     & sur_gas_type( 'HO        ',        0.0 ) / )
+     & sur_gas_type( 'HO        ',        0.0 ),
+     & sur_gas_type( 'H2SO4_PROD',        0.0 ),
+     & sur_gas_type( 'H2SO4_ICBC',        0.0 ) / )
 
 C...Required gas species
       Character( 16 ), Parameter, Private :: req_so2   = 'SO2'
@@ -91,11 +93,13 @@ C...Required gas species
       Character( 16 ), Parameter, Private :: req_foa   = 'FOA'
       Character( 16 ), Parameter, Private :: req_mhp   = 'MHP'
       Character( 16 ), Parameter, Private :: req_paa   = 'PAA'
-      Character( 16 ), Parameter, Private :: req_h2so4 = 'H2SO4'
+      Character( 16 ), Parameter, Private :: req_h2so4 = 'H2SO4_TOT'
       Character( 16 ), Parameter, Private :: req_hcl   = 'HCL'
       Character( 16 ), Parameter, Private :: req_gly   = 'GLY'
       Character( 16 ), Parameter, Private :: req_mgly  = 'MGLY'
       Character( 16 ), Parameter, Private :: req_ho    = 'HO'
+      Character( 16 ), Parameter, Private :: req_h2so4p = 'H2SO4_PROD'
+      Character( 16 ), Parameter, Private :: req_h2so4i = 'H2SO4_ICBC'
 
 C...Pointers for the AQCHEM array GAS
 
@@ -109,11 +113,13 @@ C...Pointers for the AQCHEM array GAS
       Integer :: lfoa     ! Formic Acid
       Integer :: lmhp     ! Methyl Hydrogen Peroxide
       Integer :: lpaa     ! Peroxyacidic Acid
-      Integer :: lh2so4   ! Sulfuric Acid
+      Integer :: lh2so4   ! Sulfuric Acid (total)
       Integer :: lhcl     ! Hydrogen Chloride
       Integer :: lgly     ! Glyoxal
       Integer :: lmgly    ! Methylglyoxal
       Integer :: lho      ! OH, hydroxyl radical
+      Integer :: lh2so4p  ! Sulfuric Acid (from gas-phase production)
+      Integer :: lh2so4i  ! Sulfuric Acid (from IC/BC)
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C...Aerosol surrogates species 
@@ -142,6 +148,14 @@ C                      ----------    ----------   ----------    ----------  ----
 
 C...Required aerosol species
       Character( 16 ), Parameter, Private :: req_aso4   = 'SO4_ACCUM'
+      Character( 16 ), Parameter, Private :: req_aso4aqh2o2 = 'SO4_AQH2O2_ACCUM'
+      Character( 16 ), Parameter, Private :: req_aso4aqo3   = 'SO4_AQO3_ACCUM'
+      Character( 16 ), Parameter, Private :: req_aso4aqfemn = 'SO4_AQFEMN_ACCUM'
+      Character( 16 ), Parameter, Private :: req_aso4aqmhp  = 'SO4_AQMHP_ACCUM'
+      Character( 16 ), Parameter, Private :: req_aso4aqpaa  = 'SO4_AQPAA_ACCUM'
+      Character( 16 ), Parameter, Private :: req_aso4gas    = 'SO4_GAS_ACCUM'
+      Character( 16 ), Parameter, Private :: req_aso4emis   = 'SO4_EMIS_ACCUM'
+      Character( 16 ), Parameter, Private :: req_aso4icbc   = 'SO4_ICBC_ACCUM'
       Character( 16 ), Parameter, Private :: req_anh4   = 'NH4_ACCUM'
       Character( 16 ), Parameter, Private :: req_ano3   = 'NO3_ACCUM'
       Character( 16 ), Parameter, Private :: req_asoa   = 'SOA_ACCUM'
@@ -172,6 +186,14 @@ C...Required aerosol species
 
 C...Pointers for the AQCHEM array AEROSOL
       Integer :: lso4     !  Sulfate
+      Integer :: lso4aqh2o2 ! Sulfate from aq H2O2 rxn
+      Integer :: lso4aqo3   ! Sulfate from aq O3 rxn
+      Integer :: lso4aqfemn ! Sulfate from aq rxn catalyzed by FE&MN
+      Integer :: lso4aqmhp  ! Sulfate from aq MHP rxn
+      Integer :: lso4aqpaa  ! Sulfate from aq PAA rxn
+      Integer :: lso4gas    ! Sulfate from gas phase rxn
+      Integer :: lso4emis   ! Sulfate from direct emissions
+      Integer :: lso4icbc   ! Sulfate from IC/BCs
       Integer :: lnh4     !  Ammonium
       Integer :: lno3     !  Nitrate
       Integer :: lsoa     !  SOA
@@ -252,6 +274,25 @@ C...Pointers for the AQCHEM arrays LIQUID and WETDEP
       Integer, Parameter :: lseascl   = 49  ! coarse mode SEAS (AE6) SLN 16March2011
       Integer, Parameter :: lfeaccl   = 50  ! accumulation mode Iron (AE6)      SLN 22March2011
       Integer, Parameter :: lmnaccl   = 51  ! accumulation mode Manganese (AE6) SLN 22March2011
+      Integer, Parameter :: lso4aqh2o2l   = 52 ! Sulfate from aq H2O2 rxn
+      Integer, Parameter :: lhso4aqh2o2l  = 53 ! bisulfate from aq H2O2 rxn
+      Integer, Parameter :: lso4aqo3l     = 54 ! Sulfate from aq O3 rxn
+      Integer, Parameter :: lhso4aqo3l    = 55 ! bisulfate from aq O3 rxn
+      Integer, Parameter :: lso4aqfemnl   = 56 ! Sulfate from aq rxn catalyzed by FE&MN
+      Integer, Parameter :: lhso4aqfemnl  = 57 ! bisulfate from aq rxn catalyzed by FE&MN
+      Integer, Parameter :: lso4aqmhpl    = 58 ! Sulfate from aq MHP rxn
+      Integer, Parameter :: lhso4aqmhpl   = 59 ! bisulfate from aq MHP rxn
+      Integer, Parameter :: lso4aqpaal    = 60 ! Sulfate from aq PAA rxn  
+      Integer, Parameter :: lhso4aqpaal   = 61 ! bisulfate from aq PAA rxn
+      Integer, Parameter :: lso4gasaccl   = 62 ! Sulfate from gas phase rxn (accumulation mode)
+      Integer, Parameter :: lhso4gasaccl  = 63 ! bisulfate from gas phase rxn (accumulation mode)
+      Integer, Parameter :: lso4emisaccl  = 64 ! Sulfate from direct emissions (accumulation mode)
+      Integer, Parameter :: lhso4emisaccl = 65 ! bisulfate from direct emissions (accumulation mode)
+      Integer, Parameter :: lso4icbcaccl  = 66 ! Sulfate from from ic/bcs (accumulation mode)
+      Integer, Parameter :: lhso4icbcaccl = 67 ! bisulfate from from ic/bcs (accumulation mode)
+      Integer, Parameter :: lts6gascorl   = 68 ! Coarse-mode sulfate from gas phase rxn
+      Integer, Parameter :: lts6emiscorl  = 69 ! Coarse-mode sulfate from direct emissions
+      Integer, Parameter :: lts6icbccorl  = 70 ! Coarse-mode sulfate from ic/bcs
 
       Integer    :: nsrggas( ngas )           ! # surrogates in CGRID for each gas
       Integer    :: lsrggas( ngas,mxsrg )
@@ -474,9 +515,19 @@ C...Create the pointers for required gas surrogate species needed by AQCHEM
       lgly   = findSgrGas( req_gly )    ! Glyoxal
       lmgly  = findSgrGas( req_mgly )   ! Methylglyoxal
       lho    = findSgrGas( req_ho )     ! OH, hydroxyl radical
+      lh2so4p= findSgrGas( req_h2so4p ) ! Sulfuric Acid from gas phase production
+      lh2so4i= findSgrGas( req_h2so4i ) ! Sulfuric Acid from IC/BCs
 
 C...Create the pointers for required aerosol surrogate species needed by AQCHEM
       lso4   = findSgrAer( req_aso4 )    !  Sulfate
+      lso4aqh2o2 = findSgrAer( req_aso4aqh2o2 ) ! Sulfate from aq H2O2 rxn
+      lso4aqo3   = findSgrAer( req_aso4aqo3 )   ! Sulfate from aq O3 rxn
+      lso4aqfemn = findSgrAer( req_aso4aqfemn ) ! Sulfate from aq rxn catalyzed by FE&MN
+      lso4aqmhp  = findSgrAer( req_aso4aqmhp )  ! Sulfate from aq MHP rxn
+      lso4aqpaa  = findSgrAer( req_aso4aqpaa )  ! Sulfate from aq PAA rxn
+      lso4gas    = findSgrAer( req_aso4gas )    ! Sulfate from gas phase rxn
+      lso4emis   = findSgrAer( req_aso4emis )   ! Sulfate from direct emissions
+      lso4icbc   = findSgrAer( req_aso4icbc )   ! Sulfate from IC/BCs
       lnh4   = findSgrAer( req_anh4 )    !  Ammonium
       lno3   = findSgrAer( req_ano3 )    !  Nitrate
       lsoa   = findSgrAer( req_asoa )    !  SOA
@@ -522,9 +573,19 @@ C...Create the pointers for required aerosol surrogate species needed by AQCHEM
       Write( logdev,'( 5x, a, i4 )' ) 'lgly:   ', lgly
       Write( logdev,'( 5x, a, i4 )' ) 'lmgly:  ', lmgly
       Write( logdev,'( 5x, a, i4 )' ) 'lho:    ', lho
+      Write( logdev,'( 5x, a, i4 )' ) 'lh2so4p:', lh2so4p
+      Write( logdev,'( 5x, a, i4 )' ) 'lh2so4i:', lh2so4i
 
       Write( logdev,'( /5x, a )' ) 'AQCHEM aerosol surrogate species'
       Write( logdev,'( 5x, a, i4 )' ) 'lso4:   ', lso4
+      Write( logdev,'( 5x, a, i4 )' ) 'lso4aqh2o2:', lso4aqh2o2
+      Write( logdev,'( 5x, a, i4 )' ) 'lso4aqo3:  ', lso4aqo3
+      Write( logdev,'( 5x, a, i4 )' ) 'lso4aqfemn:', lso4aqfemn
+      Write( logdev,'( 5x, a, i4 )' ) 'lso4aqmhp: ', lso4aqmhp
+      Write( logdev,'( 5x, a, i4 )' ) 'lso4aqpaa: ', lso4aqpaa
+      Write( logdev,'( 5x, a, i4 )' ) 'lso4gas:   ', lso4gas
+      Write( logdev,'( 5x, a, i4 )' ) 'lso4emis:  ', lso4emis
+      Write( logdev,'( 5x, a, i4 )' ) 'lso4icbc:  ', lso4icbc
       Write( logdev,'( 5x, a, i4 )' ) 'lnh4:   ', lnh4
       Write( logdev,'( 5x, a, i4 )' ) 'lno3:   ', lno3
       Write( logdev,'( 5x, a, i4 )' ) 'lsoa:   ', lsoa
