@@ -49,13 +49,14 @@ C              made MG, K, CA, SEACAT required species;
 C JY  04/21/11 Added optional log messages (verbose)
 C JY  05/02/11 Added Reshape to aerospc_ssf initialization for pgf90 compiler
 C JY  06/08/12 remove full character blank padding put in for GNU Fortran (GCC) 4.1.2
+C SR  02/06/13 Added capability for sulfur tracking
 C----------------------------------------------------------------------
 
       Implicit None
 
 C Number of aerosol species and modes
 
-      Integer, Parameter :: n_aerospc = 40      ! number of aero species
+      Integer, Parameter :: n_aerospc = 48      ! number of aero species
       Integer, Parameter :: n_mode = 3          ! number of modes:
                                                 ! 1 = Aitken 
                                                 ! 2 = accumulation 
@@ -101,6 +102,17 @@ C                  -----------Name--------------                   NoM2Wet |Trac
 C                   Aitken    Accum     Coarse     Min_Concs   Density  |  |  |   | Visidx OptSurr  Emis_1   Aitken Accum Coarse
 C                  --------- --------- ---------   ---------- -------   +  +  +   + ----- -------- -------- ------ ------ ------
      & spcs_type((/'ASO4I  ','ASO4J  ','ASO4K  '/), conmin_so4, 1800.0, F, F, F, -2,  3.0,'SOLUTE','PSO4  ',(/0.000,1.000,0.000/)),
+     & spcs_type((/'       ','ASO4AQH2O2J','   '/), conmin_set, 1800.0, F, F, T,  0,  0.0,'SOLUTE','      ',(/0.000,0.000,0.000/)),
+     & spcs_type((/'       ','ASO4AQO3J  ','   '/), conmin_set, 1800.0, F, F, T,  0,  0.0,'SOLUTE','      ',(/0.000,0.000,0.000/)),
+     & spcs_type((/'       ','ASO4AQFEMNJ','   '/), conmin_set, 1800.0, F, F, T,  0,  0.0,'SOLUTE','      ',(/0.000,0.000,0.000/)),
+     & spcs_type((/'       ','ASO4AQMHPJ ','   '/), conmin_set, 1800.0, F, F, T,  0,  0.0,'SOLUTE','      ',(/0.000,0.000,0.000/)),
+     & spcs_type((/'       ','ASO4AQPAAJ ','   '/), conmin_set, 1800.0, F, F, T,  0,  0.0,'SOLUTE','      ',(/0.000,0.000,0.000/)),
+     & spcs_type((/'ASO4GASI','ASO4GASJ','ASO4GASK'/),
+     &                                              conmin_set, 1800.0, F, F, T,  0,  0.0,'SOLUTE','      ',(/0.000,0.000,0.000/)),
+     & spcs_type((/'ASO4EMISI','ASO4EMISJ','ASO4EMISK'/),
+     &                                              conmin_set, 1800.0, F, F, T,  0,  0.0,'SOLUTE','      ',(/0.000,0.000,0.000/)),
+     & spcs_type((/'ASO4ICBCI','ASO4ICBCJ','ASO4ICBCK'/),
+     &                                              conmin_so4, 1800.0, F, F, T,  0,  0.0,'SOLUTE','      ',(/0.000,0.000,0.000/)),
      & spcs_type((/'ANO3I  ','ANO3J  ','ANO3K  '/), conmin_set, 1800.0, F, F, F, -1,  3.0,'SOLUTE','PNO3  ',(/0.000,1.000,0.000/)),
      & spcs_type((/'ACLI   ','ACLJ   ','ACLK   '/), conmin_set, 2200.0, F, F, F, -1,  0.0,'SOLUTE','PCL   ',(/0.000,1.000,0.000/)),
      & spcs_type((/'ANH4I  ','ANH4J  ','ANH4K  '/), conmin_set, 1800.0, F, F, F,  1,  3.0,'SOLUTE','PNH4  ',(/0.000,1.000,0.000/)),
@@ -146,6 +158,14 @@ C Sea-Salt Speciation factors
 C            Aitken    Accum   Coarse
 C           -------  -------  -------
      &   (/  0.0,     0.0776,  0.0776,      ! ASO4
+     &       0.0,     0.0,     0.0,         ! ASO4AQH2O2
+     &       0.0,     0.0,     0.0,         ! ASO4AQO3
+     &       0.0,     0.0,     0.0,         ! ASO4AQFEMN
+     &       0.0,     0.0,     0.0,         ! ASO4AQMHP
+     &       0.0,     0.0,     0.0,         ! ASO4AQPAA
+     &       0.0,     0.0,     0.0,         ! ASO4GAS
+     &       0.0,     0.0,     0.0,         ! ASO4EMIS
+     &       0.0,     0.0,     0.0,         ! ASO4ICBC
      &       0.0,     0.0,     0.0,         ! ANO3
      &       0.0,     0.5538,  0.5538,      ! ACL
      &       0.0,     0.0,     0.0,         ! ANH4
@@ -189,6 +209,14 @@ C           -------  -------  -------
 
 C Required species
       Character( 16 ), Private, Parameter :: req_so4    = 'ASO4'  
+      Character( 16 ), Private, Parameter :: req_so4aqh2o2 = 'ASO4AQH2O2'
+      Character( 16 ), Private, Parameter :: req_so4aqo3   = 'ASO4AQO3'
+      Character( 16 ), Private, Parameter :: req_so4aqfemn = 'ASO4AQFEMN'
+      Character( 16 ), Private, Parameter :: req_so4aqmhp  = 'ASO4AQMHP'
+      Character( 16 ), Private, Parameter :: req_so4aqpaa  = 'ASO4AQPAA'
+      Character( 16 ), Private, Parameter :: req_so4gas    = 'ASO4GAS'
+      Character( 16 ), Private, Parameter :: req_so4emis   = 'ASO4EMIS'
+      Character( 16 ), Private, Parameter :: req_so4icbc   = 'ASO4ICBC'
       Character( 16 ), Private, Parameter :: req_no3    = 'ANO3'  
       Character( 16 ), Private, Parameter :: req_cl     = 'ACL'   
       Character( 16 ), Private, Parameter :: req_nh4    = 'ANH4'  
@@ -205,6 +233,14 @@ C Required species
      
 C Indices of required species
       Integer :: aso4_idx
+      Integer :: aso4aqh2o2_idx
+      Integer :: aso4aqo3_idx
+      Integer :: aso4aqfemn_idx
+      Integer :: aso4aqmhp_idx
+      Integer :: aso4aqpaa_idx
+      Integer :: aso4gas_idx
+      Integer :: aso4emis_idx
+      Integer :: aso4icbc_idx
       Integer :: ano3_idx
       Integer :: acl_idx
       Integer :: anh4_idx
@@ -372,6 +408,14 @@ C Build mapping to CGRID for aero # and surf area variables
 
 C Find indices of required species
       aso4_idx    = findAero( req_so4,    .True. )
+      aso4aqh2o2_idx = findAero( req_so4aqh2o2, .True. )
+      aso4aqo3_idx   = findAero( req_so4aqo3,   .True. )
+      aso4aqfemn_idx = findAero( req_so4aqfemn, .True. )
+      aso4aqmhp_idx  = findAero( req_so4aqmhp,  .True. )
+      aso4aqpaa_idx  = findAero( req_so4aqpaa,  .True. )
+      aso4gas_idx    = findAero( req_so4gas,    .True. )
+      aso4emis_idx   = findAero( req_so4emis,   .True. )
+      aso4icbc_idx   = findAero( req_so4icbc,   .True. )
       ano3_idx    = findAero( req_no3,    .True. )
       acl_idx     = findAero( req_cl,     .True. )
       anh4_idx    = findAero( req_nh4,    .True. )
@@ -389,6 +433,14 @@ C Find indices of required species
 #ifdef verbose
       Write( logdev,'( /5x, a )' ) 'map_aero required species' 
       Write( logdev,'( 5x, a, i4 )' ) 'aso4_idx:   ', aso4_idx
+      Write( logdev,'( 5x, a, i4 )' ) 'aso4aqh2o2_idx: ', aso4aqh2o2_idx 
+      Write( logdev,'( 5x, a, i4 )' ) 'aso4aqo3_idx:   ', aso4aqo3_idx   
+      Write( logdev,'( 5x, a, i4 )' ) 'aso4aqfemn_idx: ', aso4aqfemn_idx 
+      Write( logdev,'( 5x, a, i4 )' ) 'aso4aqmhp_idx:  ', aso4aqmhp_idx  
+      Write( logdev,'( 5x, a, i4 )' ) 'aso4aqpaa_idx:  ', aso4aqpaa_idx  
+      Write( logdev,'( 5x, a, i4 )' ) 'aso4gas_idx:    ', aso4gas_idx    
+      Write( logdev,'( 5x, a, i4 )' ) 'aso4emis_idx:   ', aso4emis_idx   
+      Write( logdev,'( 5x, a, i4 )' ) 'aso4icbc_idx:   ', aso4icbc_idx   
       Write( logdev,'( 5x, a, i4 )' ) 'ano3_idx:   ', ano3_idx
       Write( logdev,'( 5x, a, i4 )' ) 'acl_idx:    ', acl_idx
       Write( logdev,'( 5x, a, i4 )' ) 'anh4_idx:   ', anh4_idx
@@ -727,6 +779,75 @@ C Find the substring vname in aerospc( spc )%name( n )
 
       Return
       End Function findAero
+
+C-----------------------------------------------------------------------
+      Subroutine adj_sulftrk()
+
+C  Adjust sulfur tracking species to total sulfur prediction
+ 
+C  Revision History:
+C     First version coded in July 2013 by Shawn Roselle
+C     
+C-----------------------------------------------------------------------
+
+!      Use utilio_defn
+
+      Implicit None
+
+C Local variables:
+      Integer m
+      Real aso4trk( n_mode ), mscor( n_mode )
+
+C Normalize tracked sulfate species to total modeled sulfate
+
+      m = 1
+      aso4trk( m ) = aerospc_conc( aso4gas_idx,m )
+     &             + aerospc_conc( aso4emis_idx,m )
+     &             + aerospc_conc( aso4icbc_idx,m )
+
+      If ( aso4trk( m ) .Gt. 0.0 ) Then
+         mscor( m ) = aerospc_conc( aso4_idx,m ) / aso4trk( m )
+         aerospc_conc( aso4gas_idx,m  ) = aerospc_conc( aso4gas_idx,m  ) * mscor( m )
+         aerospc_conc( aso4emis_idx,m ) = aerospc_conc( aso4emis_idx,m ) * mscor( m )
+         aerospc_conc( aso4icbc_idx,m ) = aerospc_conc( aso4icbc_idx,m ) * mscor( m )
+      End If
+
+      m = 2
+      aso4trk( m ) = aerospc_conc( aso4aqh2o2_idx,m )
+     &             + aerospc_conc( aso4aqo3_idx,m )
+     &             + aerospc_conc( aso4aqfemn_idx,m ) 
+     &             + aerospc_conc( aso4aqmhp_idx,m )
+     &             + aerospc_conc( aso4aqpaa_idx,m )
+     &             + aerospc_conc( aso4gas_idx,m )
+     &             + aerospc_conc( aso4emis_idx,m )
+     &             + aerospc_conc( aso4icbc_idx,m )
+
+      If ( aso4trk( m ) .Gt. 0.0 ) Then
+         mscor( m ) = aerospc_conc( aso4_idx,m ) / aso4trk( m )
+         aerospc_conc( aso4aqh2o2_idx,m ) = aerospc_conc( aso4aqh2o2_idx,m ) * mscor( m )
+         aerospc_conc( aso4aqo3_idx,m   ) = aerospc_conc( aso4aqo3_idx,m   ) * mscor( m )
+         aerospc_conc( aso4aqfemn_idx,m ) = aerospc_conc( aso4aqfemn_idx,m ) * mscor( m )
+         aerospc_conc( aso4aqmhp_idx,m  ) = aerospc_conc( aso4aqmhp_idx,m  ) * mscor( m )
+         aerospc_conc( aso4aqpaa_idx,m  ) = aerospc_conc( aso4aqpaa_idx,m  ) * mscor( m )
+         aerospc_conc( aso4gas_idx,m    ) = aerospc_conc( aso4gas_idx,m    ) * mscor( m )
+         aerospc_conc( aso4emis_idx,m   ) = aerospc_conc( aso4emis_idx,m   ) * mscor( m )
+         aerospc_conc( aso4icbc_idx,m   ) = aerospc_conc( aso4icbc_idx,m   ) * mscor( m )
+      End If
+
+      m = 3
+      aso4trk( m ) = aerospc_conc( aso4gas_idx,m )
+     &             + aerospc_conc( aso4emis_idx,m )
+     &             + aerospc_conc( aso4icbc_idx,m )
+
+      If ( aso4trk( m ) .GT. 0.0 ) Then
+         mscor( m ) = aerospc_conc( aso4_idx,m ) / aso4trk( m )
+         aerospc_conc( aso4gas_idx,m  ) = aerospc_conc( aso4gas_idx,m  ) * mscor( m )
+         aerospc_conc( aso4emis_idx,m ) = aerospc_conc( aso4emis_idx,m ) * mscor( m )
+         aerospc_conc( aso4icbc_idx,m ) = aerospc_conc( aso4icbc_idx,m ) * mscor( m )
+      End If
+
+      Return
+      End Subroutine adj_sulftrk
 
       End Module aero_data
 
