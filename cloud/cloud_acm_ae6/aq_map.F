@@ -48,6 +48,8 @@ C                       Jeff Young, Sergey Napelenok, and Shawn Roselle
 C       6 03/01/11 sjr  replaced I/O API include files with UTILIO_DEFN;
 C       7 07/01/01 gs   calculate zenith angle to determine daytime and nightime 
 C                       needed for sulfur oxidation via metal catalysis
+C       8 03/19/13 sjr  adapted following mp version w/tracer species for 
+C                       sulfur tracking
 C  Called by:  RADMCLD and RESCLD
  
 C  Calls the following subroutines:  AQCHEM
@@ -164,9 +166,11 @@ C...  specified, otherwise there is no need to perform aqueous chemistry
 
 C...load gas-phase concentrations
 
-      DO IGAS = 1, NGAS
+      GAS     = 0.0D0
+      WSRGGAS = 0.0D0
+      GASWDEP = 0.0D0
 
-        GAS( IGAS ) = 0.0D0
+      DO IGAS = 1, NGAS
 
         DO ISRG = 1, NSRGGAS( IGAS )
           PNTR = CGRID2AQ_MAP( LSRGGAS( IGAS, ISRG ) )
@@ -193,6 +197,10 @@ C...set background values for gases if no surrogates were specified
       END DO
 
 C...load aerosol concentrations
+
+      AEROSOL = 0.0D0
+      WSRGAER = 0.0D0
+      AERWDEP = 0.0D0
 
       DO IAER = 1, NAER
         DO IMODE = 1, NMODES
@@ -242,6 +250,7 @@ C *** Calculate pseudo aerosol 3rd moment (ignore factors that cancel in the div
       DO IMODE = 2, N_MODE
 
         DO SPC = 1, N_AEROSPC
+          IF (  AEROSPC( SPC )%TRACER ) CYCLE 
           IF ( ( AEROSPC( SPC )%NAME( IMODE ) .NE. ' ' ) .AND.
      &         ( .NOT. AEROSPC( SPC )%NO_M2WET ) ) THEN
              M3OLD( IMODE ) = M3OLD( IMODE )
@@ -297,6 +306,7 @@ C *** Calculate pseudo aerosol 3rd moment (ignore factors that cancel in the div
       DO IMODE = 2, N_MODE
 
         DO SPC = 1, N_AEROSPC
+          IF (  AEROSPC( SPC )%TRACER ) CYCLE 
           IF ( ( AEROSPC( SPC )%NAME( IMODE ) .NE. ' ' ) .AND.
      &         ( .NOT. AEROSPC( SPC )%NO_M2WET ) ) THEN
              M3NEW( IMODE ) = M3NEW( IMODE )
@@ -309,8 +319,8 @@ C *** Calculate pseudo aerosol 3rd moment (ignore factors that cancel in the div
 C...check for minimums
 
       DO IMODE = 2, N_MODE
-        M3OLD( IMODE ) = MAX( M3OLD( IMODE ), CONMIN )
-        M3NEW( IMODE ) = MAX( M3NEW( IMODE ), CONMIN )
+        M3OLD( IMODE ) = MAX( M3OLD( IMODE ), REAL( CONMIN, 8 ) )
+        M3NEW( IMODE ) = MAX( M3NEW( IMODE ), REAL( CONMIN, 8 ) )
       END DO
 
 C...Update surface area
