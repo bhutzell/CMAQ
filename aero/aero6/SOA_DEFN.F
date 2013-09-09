@@ -43,6 +43,7 @@ C 08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4
 C 13 Aug 13 H. Pye: Xylene and toluene low-NOx yields switched. Values now
 C               follow experimental data of Ng et al. 2007 ACP as shown in Table 3.
 C               Values in Table 6 of Ng et al. (previously used) are incorrect.
+C  4 Sep 13 S. Roselle: adapted aero6_mp module for use in sulfur tracking
 C-----------------------------------------------------------------------
       Implicit None
 
@@ -796,6 +797,7 @@ C Compute 3rd moment, 2nd moment, and Dg without nonvolatile SOA. Cloud-produced
 C SOA (i.e., orgcj) is not subtracted here because it is unchanged in this subroutine
       old_m3 = moment3_conc( 2 )
       Do i = 1, n_aerospc
+         If(  aerospc( i )%tracer )cycle
          If ( aerospc( i )%nonVol_soa .And. i .Ne. aorgc_idx ) Then
             old_m3 = old_m3 - orgfac * aerospc_conc( i,2 )
          End If
@@ -864,6 +866,7 @@ C hard-coded values.
 
       totorgsw = ( aerospc_conc( apoc_idx,1 ) + aerospc_conc( apoc_idx,2 ) ) / mwpoa
       Do i = 1, n_aerospc
+         If(  aerospc( i )%tracer )cycle
          If ( aerospc( i )%nonVol_soa ) Then
             totorgsw = totorgsw + aerospc_conc( i,2 ) / aerospc_mw( i )
          End If
@@ -967,6 +970,7 @@ C be inherited from include or namelist files to avoid hard-coded values.
 
       hplus = 0.0
       Do i = 1, n_aerospc
+         if(  aerospc( i )%tracer )cycle
          hplus = hplus - 1000.0 * aerospc( i )%charge * aerospc_conc( i,2 )
      &         / aerospc_mw( i )
       End Do
@@ -1002,6 +1006,7 @@ C condensation/evaporation does not affect the geometric standard deviation.
       new_m3 = old_m3
 
       Do i = 1, n_aerospc
+         If(  aerospc( i )%tracer )cycle
          If ( aerospc( i )%nonVol_soa .And. i .Ne. aorgc_idx ) Then
             new_m3 = new_m3 + orgfac * aerospc_conc( i,2 )
          End If
