@@ -101,6 +101,8 @@ C Emission rate of all aerosol species interpolated to current time
       REAL,    ALLOCATABLE, SAVE :: NUM_FAC ( : )       !
       INTEGER, ALLOCATABLE, SAVE :: SRF_MAP ( : )       !
       REAL,    ALLOCATABLE, SAVE :: SRF_FAC ( : )       !
+      INTEGER, ALLOCATABLE, SAVE :: SO4_MAP ( : )       !
+      INTEGER, ALLOCATABLE, SAVE :: SO4EMIS_MAP( : )    !
       INTEGER, ALLOCATABLE, SAVE :: SS_MAP  ( :,: )     !
       INTEGER, ALLOCATABLE, SAVE :: DUST_MAP( :,: )     !
 
@@ -114,6 +116,8 @@ C NUM_MAP                number emission rate index in VDEMIS_AE (CGRID)
 C NUM_FAC
 C SRF_MAP                sfc area emission rate index in VDEMIS_AE (CGRID)
 C SRF_FAC
+C SO4_MAP    so4 emission rate index in VDEMIS_AE (CGRID)
+C SO4EMIS_MAP so4 tracer emission rate index in VDEMIS_AE (CGRID)
 C SS_MAP     sea salt emission rate index in SSOUTM
 C DUST_MAP   windblown dust emission rate index in DUSTOUTM
 
@@ -123,6 +127,7 @@ C Factor for converting aerosol emissions from input units ...
 C *** PVB: temporary hack to speciate PMC
       REAL,    SAVE :: SPFC_ACORS
       REAL,    SAVE :: SPFC_ASO4
+!      REAL,    SAVE :: SPFC_ASO4EMIS
       REAL,    SAVE :: SPFC_ANO3
       REAL,    SAVE :: SPFC_ACL
       REAL,    SAVE :: SPFC_AH2O
@@ -138,6 +143,7 @@ C Domain decomposition info from emission and meteorology files
 C For handling vapor-phase sulfuric acid emissions
       INTEGER, SAVE :: VSULF               ! index to H2SO4 in VDEMIS array
       INTEGER, SAVE :: VPSO4               ! index to PSO4 in EM_RATE array
+      INTEGER, SAVE :: VPSO4EMIS           ! index to PSO4EMIS tracer in EM_RATE array
 
 C Miscellaneous variables
       LOGICAL, SAVE :: WB_DUST   ! flag for windblown dust option
@@ -334,7 +340,7 @@ C *** Allocate memory for PM_EM, EMBUFF, CELLHGT, CELLVOL, and CONVEM_PM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
          
-C *** Allocate memory for EM_RATE, EM_PART, EM_MAP, EM_FAC, NUM_MAP, NUM_FAC, SRF_MAP, SRF_FAC, SS_MAP and DUST_MAP
+C *** Allocate memory for EM_RATE, EM_PART, EM_MAP, EM_FAC, NUM_MAP, NUM_FAC, SRF_MAP, SRF_FAC, SO4_MAP, SO4EMIS_MAP, SS_MAP and DUST_MAP
          ALLOCATE ( EM_RATE( N_EMIS_PM ), STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = '*** EM_RATE memory allocation failed'
@@ -348,11 +354,13 @@ C *** Allocate memory for EM_RATE, EM_PART, EM_MAP, EM_FAC, NUM_MAP, NUM_FAC, SR
      &              NUM_FAC (            N_MODE ),
      &              SRF_MAP (            N_MODE ),
      &              SRF_FAC (            N_MODE ),
+     &              SO4_MAP (            N_MODE ),
+     &              SO4EMIS_MAP (        N_MODE ),
      &              SS_MAP  ( N_AEROSPC, N_MODE ),
      &              DUST_MAP( N_AEROSPC, N_MODE ), STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = '*** memory allocation failed for '
-     &           // 'EM_PART, EM_MAP, EM_FAC, NUM_MAP, NUM_FAC, SRF_MAP, SRF_FAC, SS_MAP or DUST_MAP'
+     &           // 'EM_PART, EM_MAP, EM_FAC, NUM_MAP, NUM_FAC, SRF_MAP, SRF_FAC, SO4_MAP, SO4EMIS_MAP, SS_MAP or DUST_MAP'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
@@ -439,9 +447,31 @@ C *** Map aerosol surface emission species and set across-the-board adjustment f
             END IF
          END DO
 
+C *** Map aerosol number emission species and set across-the-board adjustment factors
+         SO4_MAP = 0   ! array assignment
+         SO4EMIS_MAP = 0   ! array assignment
+         DO N = 1, N_MODE
+            SO4_MAP( N ) = INDEX1( AEROSPC( ASO4_IDX )%NAME( N ), N_AE_EMIS, AE_EMIS )
+            SO4EMIS_MAP( N ) = INDEX1( AEROSPC( ASO4EMIS_IDX )%NAME( N ), N_AE_EMIS, AE_EMIS )
+#ifdef Verbose1
+            write( logdev,* ) 'so4emis_map: ', n, so4emis_map( n ), aerospc( aso4_idx )%name( n )
+#endif
+            IF ( SO4_MAP( N ) .EQ. 0 ) THEN
+               XMSG = 'Could not find ' // TRIM( AEROSPC( ASO4_IDX )%NAME( N ) )
+     &              // ' in AE_EMIS table'
+               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
+            END IF
+            IF ( SO4EMIS_MAP( N ) .EQ. 0 ) THEN
+               XMSG = 'Could not find ' // TRIM( AEROSPC( ASO4EMIS_IDX )%NAME( N ) )
+     &              // ' in AE_EMIS table'
+               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
+            END IF
+         END DO
+
 C *** PVB: temporary hack to speciate PMC
          SPFC_ACORS = ( 1.0 - 0.00325 ) * AEROSPC( ACORS_IDX )%EMIS_SPLIT( N_MODE )
          SPFC_ASO4  = 0.00100 * AEROSPC( ASO4_IDX )%EMIS_SPLIT( N_MODE )
+!         SPFC_ASO4EMIS  = 0.00100 * AEROSPC( ASO4EMIS_IDX )%EMIS_SPLIT( N_MODE )
          SPFC_ANO3  = 0.00048 * AEROSPC( ANO3_IDX )%EMIS_SPLIT( N_MODE )
          SPFC_ACL   = 0.00145 * AEROSPC( ACL_IDX )%EMIS_SPLIT( N_MODE )
          SPFC_AH2O  = 0.00032 * AEROSPC( AH2O_IDX )%EMIS_SPLIT( N_MODE )
@@ -495,10 +525,13 @@ C *** Map windblown dust emission species
 
 C *** find index of SO4 emissions
          VPSO4 = 0
+         VPSO4EMIS = 0
          DO S = 1, N_EMIS_PM
             IF ( PMEM_MAP( S ) .EQ. ASO4_IDX ) VPSO4 = S
+!            IF ( PMEM_MAP( S ) .EQ. ASO4EMIS_IDX ) VPSO4EMIS = S
 #ifdef Verbose1
                write( logdev,* ) 'vpso4: ', s, pmem_map( s ), aso4_idx, vpso4
+!               write( logdev,* ) 'vpso4emis: ', s, pmem_map( s ), aso4emis_idx, vpso4emis
 #endif
          END DO
 
@@ -507,6 +540,11 @@ C *** find index of SO4 emissions
      &           // 'aerospc%emis='' '' in AERO_DATA.F'
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
          END IF
+!         IF ( VPSO4EMIS .EQ. 0 ) THEN
+!            XMSG = 'Cannot define index for SO4EMIS tracer emissions: '
+!     &           // 'aerospc%emis='' '' in AERO_DATA.F'
+!            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
+!         END IF
 
 C *** Get length and width of each grid cell
 C     note: crude estimate is made for LAT/LONG coordinate systems
@@ -765,6 +803,7 @@ C *** Extract H2SO4 vapor emission rate from the VDEMIS array, add it to
 C     the fine-PM sulfate emissions, and remove it from the gas emissions
                EM_RATE( VPSO4 ) = EM_RATE( VPSO4 ) + VDEMIS( VSULF,L,C,R )
      &                          * PRECURSOR_MW( SULF_IDX ) / CONVM
+!               EM_RATE( VPSO4EMIS ) = EM_RATE( VPSO4 )
                VDEMIS( VSULF,L,C,R ) = 0.0
 
 C *** Assign fine-particle emission rates to the fine modes.
@@ -791,6 +830,8 @@ C     Binkowski & Roselle (2003).
                   N = N_MODE
                   IF ( IDX .EQ. ASO4_IDX ) THEN
                      EM_PART( IDX,N ) = SPFC_ASO4 * EM_RATE( S )
+!                  ELSE IF ( IDX .EQ. ASO4EMIS_IDX ) THEN
+!                     EM_PART( IDX,N ) = SPFC_ASO4EMIS * EM_RATE( S )
                   ELSE IF ( IDX .EQ. ANO3_IDX ) THEN
                      EM_PART( IDX,N ) = SPFC_ANO3 * EM_RATE( S )
                   ELSE IF ( IDX .EQ. ACL_IDX ) THEN
@@ -868,6 +909,7 @@ C     Save results in the VDEMIS_AE array.
      &                                                   * ( CONVM / AEROSPC_MW( S ) )
                      END IF
                   END DO
+                  VDEMIS_AE( SO4EMIS_MAP( N ),L,C,R ) = VDEMIS_AE( SO4_MAP( N ),L,C,R )
                   VDEMIS_AE( NUM_MAP( N ),L,C,R ) = EM_NUM( N ) * NUM_FAC( N ) * CONVN
                   VDEMIS_AE( SRF_MAP( N ),L,C,R ) = EM_SRF( N ) * SRF_FAC( N ) * CONVS
                END DO
@@ -901,6 +943,7 @@ C *** Extract H2SO4 vapor emission rate from the VDEMIS array, add it to
 C     the fine-PM sulfate emissions, and remove it from the gas emissions
                   EM_RATE( VPSO4 ) = EM_RATE( VPSO4 ) + VDEMIS( VSULF,L,C,R )
      &                             * PRECURSOR_MW( SULF_IDX ) / CONVM
+!                  EM_RATE( VPSO4EMIS ) = EM_RATE( VPSO4 )
                   VDEMIS( VSULF,L,C,R ) = 0.0
 
 C *** Calculate emissions rate for third moments [m3/m3/s] of each mode 
@@ -920,6 +963,8 @@ C     (excluding sea salt), as in Equation 7a of Binkowski & Roselle (2003).
                      N = N_MODE
                      IF ( IDX .EQ. ASO4_IDX ) THEN
                         EM_PART( IDX,N ) = SPFC_ASO4 * EM_RATE( S )
+!                     ELSE IF ( IDX .EQ. ASO4EMIS_IDX ) THEN
+!                        EM_PART( IDX,N ) = SPFC_ASO4EMIS * EM_RATE( S )
                      ELSE IF ( IDX .EQ. ANO3_IDX ) THEN
                         EM_PART( IDX,N ) = SPFC_ANO3 * EM_RATE( S )
                      ELSE IF ( IDX .EQ. ACL_IDX ) THEN
@@ -961,6 +1006,7 @@ C     [m2/mol/s].  Save results in the VDEMIS_AE array.
      &                                                      * CONVM / AEROSPC_MW( S )
                         END IF
                      END DO
+                     VDEMIS_AE( SO4EMIS_MAP( N ),L,C,R ) = VDEMIS_AE( SO4_MAP( N ),L,C,R )
                      VDEMIS_AE( NUM_MAP( N ),L,C,R ) = EM_NUM( N ) * NUM_FAC( N ) * CONVN
                      VDEMIS_AE( SRF_MAP( N ),L,C,R ) = EM_SRF( N ) * SRF_FAC( N ) * CONVS
                   END DO
