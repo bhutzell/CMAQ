@@ -65,7 +65,7 @@ C...Local variables
       CHARACTER( 16 )       :: LAMBDA
       CHARACTER( 96 )       :: XMSG = ' '
 
-      INTEGER N, L, JWL       ! loop variables
+      INTEGER N, L, JWL, INCR     ! loop variables
 C-----------------------------------------------------------------------
 
 C...Try to open existing file for update
@@ -133,6 +133,7 @@ C...CSA Variables, Units and Descriptions for RJ_FILE
          VDESC3D( N ) = 'J-value for O3O1D'
          VTYPE3D( N ) = M3REAL
 
+        
          DO JWL = 1, NWL
 
 C...assumes that lamba in nanometers is on order of 100 or less
@@ -150,6 +151,13 @@ C...assumes that lamba in nanometers is on order of 100 or less
             VNAME3D( N ) = 'TAU_AERO_W' // TRIM( LAMBDA )
             UNITS3D( N ) = 'NONE'
             VDESC3D( N ) = 'Aerosol Optical Depth, '
+     &                   // TRIM( LAMBDA ) // ' nm'
+            VTYPE3D( N ) = M3REAL
+
+            N = N + 1
+            VNAME3D( N ) = 'TAU_CLOUD_W' // TRIM( LAMBDA )
+            UNITS3D( N ) = 'NONE'
+            VDESC3D( N ) = 'Cloud Optical Depth, '
      &                   // TRIM( LAMBDA ) // ' nm'
             VTYPE3D( N ) = M3REAL
 
@@ -208,7 +216,6 @@ C...  the photolysis diagnostic file
          STIME3D = JTIME
          TSTEP3D = TSTEP
 
-         NVARS3D = NPHOTAB
          NCOLS3D = GL_NCOLS
          NROWS3D = GL_NROWS
          NLAYS3D = NLAYS
@@ -245,6 +252,53 @@ C...load data from photolysis reaction list
             UNITS3D( N ) = '1/min'
             VDESC3D( N ) = 'Photolysis rates for ' // VNAME3D(N)
          END DO
+
+C...set pointers for diagnostic wavelengths for vertical profiles
+C...of optical depth and aerosol optics 
+
+         
+         N = NPHOTAB
+
+         DO L = 1, N_DIAG_WVL
+
+C...assumes that lamba in nanometers is on order of 100 or less
+
+            JWL = DIAG_WVL( L )
+            
+            WRITE( LAMBDA,'(I3.3)' ) INT( WAVELENGTH( JWL ) )
+
+            N = N + 1
+            VNAME3D( N ) = 'AERO_SSA_W' // TRIM( LAMBDA )
+            UNITS3D( N ) = 'NONE'
+            VDESC3D( N ) = 'Aerosol Single Scattering Albedo at '
+     &                   // TRIM( LAMBDA ) // ' nm'
+            VTYPE3D( N ) = M3REAL
+
+            N = N + 1
+            VNAME3D( N ) = 'AERO_ASYM_W' // TRIM( LAMBDA )
+            UNITS3D( N ) = 'NONE'
+            VDESC3D( N ) = 'Aerosol Asymetry Factor at '
+     &                   // TRIM( LAMBDA ) // ' nm'
+            VTYPE3D( N ) = M3REAL
+
+            N = N + 1
+            VNAME3D( N ) = 'TAU_W' // TRIM( LAMBDA )
+            UNITS3D( N ) = 'NONE'
+            VDESC3D( N ) = 'Optical Depth at bottom of layer for '
+     &                   // TRIM( LAMBDA ) // ' nm'
+            VTYPE3D( N ) = M3REAL
+
+ 
+            N = N + 1
+            VNAME3D( N ) = 'TAU_AERO_W' // TRIM( LAMBDA )
+            UNITS3D( N ) = 'NONE'
+            VDESC3D( N ) = 'Aerosol Optical Depth at bottom of layer for '
+     &                   // TRIM( LAMBDA ) // ' nm'
+            VTYPE3D( N ) = M3REAL
+            
+        END DO
+
+        NVARS3D = N
 
 C...Open the 2nd photolysis diagnostic file
 

@@ -57,6 +57,9 @@ C  GAM2 equal to zero in the Toon et al. (1989) solution to the two stream
 C  of the radiative transfer equation based on how the NCAR TUV model 
 C  implements the approximation
 C
+C  Bill Hutzell(May 2013) modified optical depth agruments to give vetical
+C  profile rather than surface values. Note that TAU_TOT now includes 
+C  stratospheric values.
 C-----------------------------------------------------------------------
 
       USE CSQY_DATA
@@ -79,6 +82,9 @@ C***Fundamental Constants: ( Source: CRC76, pp 1-1 to 1-6)
 C***LOGDEV for NEW_OPTICS and supporting routines
       
       INTEGER, SAVE :: NEW_OPTICS_LOG
+
+      INTEGER, PARAMETER :: N_DIAG_WVL = 2          ! number of dianostic wavelengths
+      INTEGER, SAVE      :: DIAG_WVL( N_DIAG_WVL )  ! pointers to diagnostic wavelengths
       
 C***Information for photolysis
 
@@ -116,7 +122,15 @@ C***Cloud albedo values from JPROC
       REAL, ALLOCATABLE, SAVE :: XO3CS( :,: )       !
       REAL, ALLOCATABLE, SAVE :: TEMP_O3_STRAT( : ) ! temperature for XO3CS, K
 
+C***arrays for reference data for needed photolysis rates
+
+      REAL, ALLOCATABLE, SAVE :: XXCS( :,:,: )  ! absorption cross sections
+      REAL, ALLOCATABLE, SAVE :: XXQY( :,:,: )  ! quantum yield
+
+      REAL, ALLOCATABLE, SAVE :: RTEMP_S( :,: )
+
       CHARACTER(16), ALLOCATABLE, SAVE  :: PHOTOLYSIS_RATE( : ) ! subset of photolysis rates from CSQY DATA
+
 
 C***Indices for special case photolysis cross sections
 
@@ -165,8 +179,9 @@ C***Indices for special case photolysis cross sections
       CHARACTER(60), ALLOCATABLE, SAVE :: LANDUSE_MODIS( : )
       INTEGER,       ALLOCATABLE, SAVE :: ALBMAP_REF2MODIS( : )
       REAL,          ALLOCATABLE, SAVE :: ALBFAC_REF2MODIS( : )
-      
+
       LOGICAL, SAVE      :: NO_NLCD40
+      LOGICAL, SAVE      :: WRITE_CELL
 
 C***special information for acetone
 C***  Reference:
@@ -199,14 +214,12 @@ C***     pp 283-297, 2000.
 
 C///////////////////////////////////////////////////////////////////////
       SUBROUTINE NEW_OPTICS ( NLAYS, NMODE,
-     &                        BLK_AE_NR, BLK_AE_NI, BLK_AE_VOL,
-     &                        BLK_AE_DGN, BLK_AE_LSG,
      &                        BLKTA, BLKPRS, BLKDENS, BLKZH, BLKZF,
      &                        BLKO3, BLKNO2,
      &                        ZSFC, COSZEN, SINZEN, RSQD,
      &                        LATCR, LONGCR, JDATE, LWC, CLDFRC,
      &                        BLKRJ, ETOT_SFC,
-     &                        TAU_AERO, TAU_TOT, TAUO3_TOP,
+     &                        TAUC_AERO, TAU_TOT, TAUO3_TOP,
      &                        TAU_RAY, SSA, TAU_CLOUD, STOZONE )
 C-----------------------------------------------------------------------
 C
@@ -225,16 +238,20 @@ C  Mar 2011 Bill Hutzell
 C      -revised arguement to account for aerosol redesign in 
 C       CMAQ version 5.0
 C      -change array declaration to allow flexible number of
-C       wavelength bins
+C       wavelength bins 
 C  Apr 2012 Bill Hutzell
 C      -revised error checking to needed photolysis data 
 C      -modified case statement for RACM2 photolysis rates
+C      -moved aerosol optics to its own module
 C   
 C-----------------------------------------------------------------------
 
 
       USE UTILIO_DEFN
+      USE AEROMET_DATA                   ! parameters for aerosol calculations
 
+      USE AERO_PHOTDATA
+      
       IMPLICIT NONE
 
       INCLUDE SUBST_RXCMMN      ! provides photolysis reaction list
@@ -244,12 +261,6 @@ C***arguments
       INTEGER, INTENT(IN) :: NLAYS   ! # of vertical layers
       INTEGER, INTENT(IN) :: NMODE   ! # of aerosol modes
       INTEGER, INTENT(IN) :: JDATE   ! julian date YYYYDDD
-
-      REAL, INTENT(IN) :: BLK_AE_NR ( NLAYS, NMODE ) ! aerosol real part of refractive index
-      REAL, INTENT(IN) :: BLK_AE_NI ( NLAYS, NMODE ) ! aerosol imaginary part of refractive index
-      REAL, INTENT(IN) :: BLK_AE_VOL( NLAYS, NMODE ) ! aerosol modal volumes
-      REAL, INTENT(IN) :: BLK_AE_LSG( NLAYS, NMODE ) ! aerosol modal log of geo. stand. dev
-      REAL, INTENT(IN) :: BLK_AE_DGN( NLAYS, NMODE ) ! aerosol modal mean geometeric diam. [ m ]
 
       REAL, INTENT(IN) :: BLKPRS ( NLAYS )    ! Air pressure in [ atm ]
       REAL, INTENT(IN) :: BLKTA  ( NLAYS )    ! Air temperature [ K ]
@@ -269,12 +280,14 @@ C***arguments
       REAL, INTENT(OUT) :: BLKRJ ( NLAYS, NPHOTAB ) ! photolysis rates [ 1 / sec ]
       REAL, INTENT(OUT) :: ETOT_SFC ( : )   ! total downward irradiance at sfc
                                               ! [ Watts / m**2  ]
-      REAL, INTENT(OUT) :: TAU_AERO ( : )   ! aerosol optical depth
-      REAL, INTENT(OUT) :: TAU_TOT  ( : )   ! total optical depth
+
+      REAL, INTENT(OUT) :: TAUC_AERO( :, : )  ! aerosol optical depth, bottom of layer
+      REAL, INTENT(OUT) :: TAU_TOT  ( :, : )  ! total optical depth, bottom of layer
+      REAL, INTENT(OUT) :: TAU_CLOUD( :, : )  ! cloud optical depth, bottom of layer
+
       REAL, INTENT(OUT) :: TAUO3_TOP( : )   ! optical depth of ozone above model domain
       REAL, INTENT(OUT) :: TAU_RAY  ( : )   ! Rayleigh optical depth above model domain
       REAL, INTENT(OUT) :: SSA      ( : )   ! single scatering albedo for aerosol column
-      REAL, INTENT(OUT) :: TAU_CLOUD( : )   ! cloud optical depth
       REAL, INTENT(OUT) :: STOZONE          ! total ozone above the top of the model
                                             ! ignoring tropospheric ozone [ DU ]
 
@@ -283,9 +296,8 @@ C***internal
       REAL, PARAMETER :: STRAT_TEMP = 225.0  ! stratospheric temperature
       REAL, PARAMETER :: ZTOA = 50.0E3  ! top of the atmosphere [ m ]
 
-      INTEGER L, I, IWL , II, ILEV, IPHOT ! loop indices
+      INTEGER L, I, IWL , II, ILEV, IPHOT, MODE ! loop indices
       INTEGER NPHOT
-      INTEGER IP_MAP, IP_REF    ! photolysis reaction indicies
 
       INTEGER NLEVEL
       REAL BLKDZ( NLAYS )       ! layer thicknesses [ m ]
@@ -299,6 +311,8 @@ C***internal
       REAL DENSTOM              ! estimated air density at top of model
                                 ! [ molecules / cm**3 ]
       REAL LAMDA                ! wavelength  [ nm ]
+      REAL INV_LAMBDA           ! reciprocal of wavelength [ 1/nm ]
+      REAL LAMDA_UM             ! wavelength  [ um ]
 
 C***working absorption cross sections [ cm**2 ]. These have been corrected
 C***  for ambient ( pressure and temperature ) conditions.
@@ -306,22 +320,32 @@ C***  for ambient ( pressure and temperature ) conditions.
       REAL AO3
       REAL ANO2
 
-      REAL DGN  ( NMODE )  ! geometric mean diameters
-      REAL XXLSG( NMODE )  ! geometric standard deviation
-      REAL VOL  ( NMODE )  ! Modal aerosol volume
+      REAL DGN_CORE   ! geometric mean diameters of aerosol core
+      REAL VOL        ! Total Modal aerosol volume
+      REAL VOL_CORE   ! Modal aerosol volume of aerosol core
+      REAL DGN_SHELL  ! geometric mean diameters of aerosol core
+      REAL VOL_SHELL  ! Modal aerosol volume of aerosol core
+      REAL XXLSG      ! geometric standard deviation
 
 C***indices
 C***  refractive indices for layer and each mode
 
       REAL NREAL( NMODE, NLAYS )
       REAL NIMAG( NMODE, NLAYS )
-      REAL NR_MODE( NMODE )
-      REAL NI_MODE( NMODE )
 
-      REAL BETA_M ! molecular scattering coefficient [ 1/m ]
-      REAL BEXT   ! total aerosol extinction coefficient [ 1/m ]
-      REAL BSCAT  ! total aerosol scattering coefficient [ 1/m ]
-      REAL G_BAR  ! total aerosol asymmetry factor
+      COMPLEX NR_SHELL
+      COMPLEX NI_SHELL
+      COMPLEX NR_CORE
+      COMPLEX NI_CORE
+
+      REAL BETA_M    ! molecular scattering coefficient [ 1/m ]
+      REAL BEXT_MODE  ! total aerosol extinction coefficient [ 1/m ]
+      REAL BSCAT_MODE ! total aerosol scattering coefficient [ 1/m ]
+      REAL GBAR_MODE  ! total aerosol asymmetry factor
+      REAL BEXT       ! total aerosol extinction coefficient [ 1/m ]
+      REAL VFAC, BSC  ! unit correction factors
+      REAL BSCAT      ! total aerosol scattering coefficient [ 1/m ]
+      REAL G_BAR      ! total aerosol asymmetry factor
 
 C***FSB The following variable is aq switch that allows a fast version of
 C***  aerosol optics to be used when set to .TRUE.
@@ -337,7 +361,9 @@ C***scratch variables
 
 C***Increment of optical depth
 
-      REAL DTAU( NLAYS+1 )
+      REAL DTAU    ( NLAYS+1 )    ! total depeth at level
+      REAL DT_AERO ( NLAYS+1 )    ! aerosol contribution at level
+      REAL DT_CLOUD( NLAYS+1 )    ! cloud contribution  at level
 
 C***single scattering albedo for layer
 
@@ -346,7 +372,6 @@ C***single scattering albedo for layer
 C***asymmetry factor
 
       REAL G( NLAYS+1 )
-      REAL DT_AERO( NLAYS+1 )     ! default optical depth from JPROC
 
 C***arrays for fluxes and irradiances used in
 
@@ -391,15 +416,13 @@ C***  Note: Hu &Stamnes give beta in [ 1 / km/ for LWC in [ g / m**3 ]
 C***  the values for beta/ LWC also give beta in [1/m] with LWC in [g/m **3]
 
 
-      REAL DT_CLOUD             ! contributionto cloud optical depth
       REAL DTSCAT_CLOUD         ! cloud scattering coefficient [1/m]
       REAL G_CLOUD              ! local cloud asymmetry factor
       REAL OM_CLOUD             ! local cloud single scattering albedo
 
       LOGICAL, SAVE :: FIRST      = .TRUE.  ! Flag for first call
-      LOGICAL       :: ERROR_FLAG = .FALSE.
+      LOGICAL       :: SUCCESS
 
-      CHARACTER( 80 ) XMSG
 
 C***arrays for fluxes and irradiances used in
       REAL, ALLOCATABLE, SAVE :: SRAYL( : )     ! Molecular scattering cross sections [ cm ** 2]
@@ -418,21 +441,12 @@ C***(layer, wavelength species)
       REAL, ALLOCATABLE, SAVE  :: CSZ( :,:,: )
       REAL, ALLOCATABLE, SAVE  :: QYZ( :,:,: )
 
-C***arrays for new values
-
-      REAL, ALLOCATABLE, SAVE :: XXCS( :,:,: )  ! absorption cross sections
-      REAL, ALLOCATABLE, SAVE :: XXQY( :,:,: )  ! quantum yield
-
-      REAL, ALLOCATABLE, SAVE :: RTEMP_S( :,: )
 
       IF ( FIRST ) THEN
 
          NEW_OPTICS_LOG = INIT3()
          
          NPHOT = NPHOTAB
-         ALLOCATE( PHOTOLYSIS_RATE ( NPHOTAB ) )
-         ALLOCATE( XXCS( NPHOTAB, IREFTEMPS, NWL ) )
-         ALLOCATE( XXQY( NPHOTAB, IREFTEMPS, NWL ) )
          ALLOCATE( CONV_WM2( NWL ) )
          ALLOCATE( SRAYL   ( NWL ) )
          ALLOCATE( TAU_SCAT( NWL ) )
@@ -440,7 +454,7 @@ C***arrays for new values
          ALLOCATE( XQY( IREFTEMPS, NWL, NPHOTAB ) )
          ALLOCATE( CSZ( NLAYS, NWL, NPHOTAB ) )
          ALLOCATE( QYZ( NLAYS, NWL, NPHOTAB ) )
-         ALLOCATE( RTEMP_S( IREFTEMPS, NPHOTAB ) )
+
 
 C***FSB Set up conversion factor for
 C***  [photons / ( cm**2 s) ] to [Watts / m**2 ]
@@ -450,7 +464,8 @@ C***  The 1.0e4 is for the area [ cm **2 ] -> [ m**2 ]
 
          DO IWL = 1, NWL
             LAMDA = WAVELENGTH( IWL )
-            CONV_WM2( IWL ) = 1.0E13 * ( PLANCK_C * LIGHT_SPEED ) / LAMDA
+            CONV_WM2( IWL ) = 1.0E13 * ( PLANCK_C * LIGHT_SPEED )
+     &                      / LAMDA
          END DO
 
          COS85 = COS( 85.0 * PI180 )
@@ -458,118 +473,6 @@ C***  The 1.0e4 is for the area [ cm **2 ] -> [ m**2 ]
 C***get molecular scattering cross sections
 
          CALL GETSRAY ( NWL, WAVELENGTH, SRAYL )
-
-C***initialize pointers
-
-         LNO2      = 0
-         LO3O1D    = 0
-         LO3O3P    = 0
-         LACETONE  = 0
-         LKETONE   = 0
-         LMGLY_ADJ = 0
-         LMGLY_ABS = 0
-
-C***get the photolysis data for the model chemical from the
-C***  reference data in module CSQY_DATA
-
-         DO IPHOT = 1, NPHOT
-            IP_MAP = INDEXR( PHOTAB( IPHOT ), NPHOT_MAP, PNAME_MAP )
-            IF ( IP_MAP .LE. 0 ) THEN
-               XMSG = 'FATAL ERROR: photolysis reaction ' // TRIM( PHOTAB( IPHOT ) )
-     &             // ' not found in ' //
-     &                'the reference data! '
-               ERROR_FLAG = .TRUE.
-               CALL M3WARN ( 'NEW_OPTICS', 0, 0, XMSG )
-            END IF
-            IP_REF = PHOT_MAP( IP_MAP )
-            PHOTOLYSIS_RATE( IPHOT ) = PNAME_MAP( IP_MAP )
-
-C***check to see if this photolysis reaction is a special case that
-C***  is referenced in other sections of the code.  if so, then set
-C***  the appropriate pointers for later processing
-
-            SELECT CASE ( TRIM( PHOTOLYSIS_RATE( IPHOT ) ) )
-               CASE( 'O3O3P', 'O3O3P_SAPRC99', 'O3O3P_06', 'O3_O3P_IUPAC04', 'O3O3P_NASA06' )
-                     LO3O3P = IPHOT
-               CASE( 'NO2', 'NO2_SAPRC99', 'NO2_06', 'NO2_RACM2' )
-                     LNO2 = IPHOT
-               CASE( 'O3O1D',  'O3O1D_SAPRC99' , 'O3O1D_06', 'O3_O1D_IUPAC04', 'O3O1D_NASA06' )
-                     LO3O1D = IPHOT
-               CASE( 'KETONE', 'KET_RACM2' )
-                     LKETONE   = IPHOT
-               CASE( 'MGLY_ADJ' )
-                     LMGLY_ADJ = IPHOT
-               CASE(  'MGLY_ABS' )
-                     LMGLY_ABS = IPHOT
-               CASE( 'ACETONE', 'CH3COCH3_RACM2' )
-                     LACETONE  = IPHOT
-               CASE( 'HCHOR_06', 'HCHO_RAD_RACM2')
-                     LHCHOR_06 = IPHOT
-            END SELECT
-
-!           IF  ( ( PNAME_MAP( IP_MAP ) .EQ. 'NO2' ) .OR.
-!    &            ( PNAME_MAP( IP_MAP ) .EQ. 'NO2_SAPRC99' ) .OR.
-!    &            ( PNAME_MAP( IP_MAP ) .EQ. 'NO2_06'      ) .OR.
-!    &            ( PNAME_MAP( IP_MAP ) .EQ. 'NO2_RACM2' ) ) LNO2 = IPHOT
-
-!           IF ( ( PNAME_MAP( IP_MAP ) .EQ. 'O3O1D' ) .OR.
-!    &           ( PNAME_MAP( IP_MAP ) .EQ. 'O3O1D_SAPRC99' )  .OR.
-!    &           ( PNAME_MAP( IP_MAP ) .EQ. 'O3O1D_06'      )  .OR.
-!    &           ( PNAME_MAP( IP_MAP ) .EQ. 'O3_O1D_IUPAC04' )  .OR.
-!    &           ( PNAME_MAP( IP_MAP ) .EQ. 'O3O1D_NASA06'  ) ) LO3O1D = IPHOT
-
-
-!           IF ( ( PNAME_MAP( IP_MAP ) .EQ. 'O3O3P' ) .OR.
-!    &           ( PNAME_MAP( IP_MAP ) .EQ. 'O3O3P_SAPRC99' )   .OR.
-!    &           ( PNAME_MAP( IP_MAP ) .EQ. 'O3O3P_06'      )   .OR.
-!    &           ( PNAME_MAP( IP_MAP ) .EQ. 'O3_O3P_IUPAC04' )  .OR.
-!    &           ( PNAME_MAP( IP_MAP ) .EQ. 'O3O3P_NASA06'  ) ) LO3O3P = IPHOT
-
-
-!           IF ( PNAME_REF( IPHOT ) .EQ. 'KETONE'   .OR.
-!    &           PNAME_REF( IPHOT ) .EQ. 'KET_RACM2' )      LKETONE   = IPHOT
-     
-!           IF ( PNAME_REF( IPHOT ) .EQ. 'MGLY_ADJ' )       LMGLY_ADJ = IPHOT
-!           IF ( PNAME_REF( IPHOT ) .EQ. 'MGLY_ABS' )       LMGLY_ABS = IPHOT
-            
-!           IF ( PNAME_REF( IPHOT ) .EQ. 'ACETONE'  .OR. 
-!    &           PNAME_REF( IPHOT ) .EQ. 'CH3COCH3_RACM2' ) LACETONE  = IPHOT
-            
-!           IF ( PNAME_REF( IPHOT ) .EQ. 'HCHOR_06' .OR.
-!    &           PNAME_REF( IPHOT ) .EQ. 'HCHO_RAD_RACM2' ) LHCHOR_06 = IPHOT
-
-C***load the local cross section & quantum yield data from the reference
-C***  dataset for this photolysis reaction
-
-            DO ITT = 1, IREFTEMPS
-               DO IWL = 1, NWL
-                  XXCS( IPHOT, ITT, IWL ) = CS_REF( IP_REF, ITT, IWL )
-                  XXQY( IPHOT, ITT, IWL ) = QY_REF( IP_REF, ITT, IWL )
-                  RTEMP_S( ITT, IPHOT ) = TEMP_REF( ITT, IP_REF )
-               END DO   ! iwl
-            END DO   ! itt
-
-         END DO   ! iphot
-
-         IF ( LNO2   .EQ. 0 ) THEN
-            XMSG = 'NO2 cross-section not found in the CSQY data! '
-            ERROR_FLAG = .TRUE.
-            CALL M3WARN ( 'NEW_OPTICS', 0, 0, XMSG )
-         END IF
-         IF ( LO3O1D .EQ. 0 ) THEN
-            XMSG = 'O3(1D) production not found in the CSQY data! '
-            CALL M3WARN ( 'NEW_OPTICS', 0, 0, XMSG )
-         END IF
-         IF ( LO3O3P .EQ. 0 ) THEN
-            XMSG = 'O3 cross-section not found in the CSQY data! '
-            ERROR_FLAG = .TRUE.
-            CALL M3WARN ( 'NEW_OPTICS', 0, 0, XMSG )
-         END IF
-
-         IF( ERROR_FLAG )THEN
-           XMSG = 'The above fatal error(s) found in CSQY data! '
-           CALL M3EXIT( 'NEW_OPTICS', 0, 0, XMSG, 1 )
-         END IF
 
          FIRST = .FALSE.
 
@@ -580,10 +483,11 @@ C***initialize BLKRJ
       NPHOT = NPHOTAB
       BLKRJ = 0.0
 
-C***Initialize ETOT_SFC, TAU_AERO, TAU_TOT, TAUO3_TOP, TAU_RAY, SSA
+
+C***Initialize ETOT_SFC, TAUC_AERO, TAU_TOT, TAUO3_TOP, TAU_RAY, SSA
 
       ETOT_SFC  = 0.0
-      TAU_AERO  = 0.0
+      TAUC_AERO  = 0.0
       TAU_TOT   = 0.0
       TAUO3_TOP = 0.0
       TAU_RAY   = 0.0
@@ -608,8 +512,7 @@ C***  equalt to 85 degrees. cos( 85 degrees ) equals 8.715574e-02.
 C***Adjust Absorption cross sections and quantum yields for
 C***  ambient conditions
 
-      CALL GETCSQY ( NLAYS, NWL, IREFTEMPS, BLKTA, BLKDENS, NPHOT,
-     &               RTEMP_S, XXCS, XXQY, CSZ, QYZ )
+      CALL GETCSQY ( NLAYS, NWL, IREFTEMPS, BLKTA, BLKDENS, NPHOT, CSZ, QYZ )
 
 C***calculate scale height from top of model domain
 
@@ -630,7 +533,7 @@ C***get total ozone column
 
 !     DAY = JDATE - ( JDATE / 1000 ) * 1000
 !     CALL O3AMT ( LATCR, LONGCR, DAY, STOZONE )
-      CALL O3TOTCOL ( LATCR, LONGCR, JDATE, STOZONE )
+      Call O3TOTCOL ( LATCR, LONGCR, JDATE, STOZONE )
 
 C***set top of modeling domain
 
@@ -645,20 +548,22 @@ C***get slantpath from ZTOM to ZTOA
 
       CALL SLANTPATHTOP ( ZTOM, ZTOA, ZSFC, REARTH, SINZEN, DSDH_TOP )
 
+C***FSB zero out summation variables
+
+      TAUC_AERO  = 0.0
+      TAU_TOT   = 0.0
+      TAU_CLOUD = 0.0
+      TAU_SCAT  = 0.0
+      SSA       = 1.0
+
 C***loop over wavelength
 
       DO IWL = 1, NWL           ! outermost loop
 
-C***FSB zero out summation variables
-
-         TAU_AERO ( IWL ) = 0.0
-         TAU_TOT  ( IWL ) = 0.0
-         TAU_SCAT ( IWL ) = 0.0
-         TAU_CLOUD( IWL ) = 0.0
-         SSA      ( IWL ) = 0.0
-
-         LAMDA = WAVELENGTH( IWL ) ! working wavelength [ nm ]
-         RSFC  = ALB( IWL )        ! surface albedo
+         LAMDA      = WAVELENGTH( IWL ) ! working wavelength [ nm ]
+         LAMDA_UM   = 1.0E-3 * LAMDA ! convert to micro-meters
+         INV_LAMBDA = 1.0 / LAMDA
+         RSFC       = ALB( IWL )        ! surface albedo
 
 C***stratosphere is assumed to exist above the model domain
 C***  top layer. THe assumption here is that this layer is at about 100
@@ -679,7 +584,11 @@ C***  pseudospherical correction for the stratosphere.
 
          FLXSCALE = 1.0 / RSQD
 
-C***loop over layers
+C*** initialize delta tau's and loop over layers
+
+         DTAU      = 0.0
+         DT_AERO   = 0.0
+         DT_CLOUD  = 0.0
 
          DO L = 2, NLAYS + 1
             II = NLAYS + 2 - L  ! from top to bottom
@@ -691,36 +600,13 @@ C***  converts [ 1 / cm ] to [ 1 / m ]
             AO3    = CSZ( II, IWL, LO3O3P ) * BLKO3  ( II ) * 100.0
             ANO2   = CSZ( II, IWL, LNO2   ) * BLKNO2 ( II ) * 100.0
 
-C***set up modal parameters
 
-C***modal properties
+C***set up aerosol optical properties
 
-            VOL( 1 ) = BLK_AE_VOL( II, 1 )
-            VOL( 2 ) = BLK_AE_VOL( II, 2 )
-            VOL( 3 ) = BLK_AE_VOL( II, 3 )
-            DGN( 1 ) = BLK_AE_DGN( II, 1 )
-            DGN( 2 ) = BLK_AE_DGN( II, 2 )
-            DGN( 3 ) = BLK_AE_DGN( II, 3 )
+            G_BAR = AERO_ASYM_FAC ( II, IWL )
+            BEXT  = AERO_EXTI_COEF( II, IWL )
+            BSCAT = AERO_SCAT_COEF( II, IWL )
 
-            XXLSG( 1 ) = BLK_AE_LSG( II, 1 )
-            XXLSG( 2 ) = BLK_AE_LSG( II, 2 )
-            XXLSG( 3 ) = BLK_AE_LSG( II, 3 )
-
-            NR_MODE( 1 ) = BLK_AE_NR( II, 1 )
-            NR_MODE( 2 ) = BLK_AE_NR( II, 2 )
-            NR_MODE( 3 ) = BLK_AE_NR( II, 3 )
-            NI_MODE( 1 ) = BLK_AE_NI( II, 1 )
-            NI_MODE( 2 ) = BLK_AE_NI( II, 2 )
-            NI_MODE( 3 ) = BLK_AE_NI( II, 3 )
-
-C***calculate the extinction and scattering coefficients
-C***  in [ 1 / m ] and the asymmetry factor for the  aerosol
-C***  particles.
-
-            CALL AERO_OPTICAL ( LAMDA, BETA_M,
-     &                          NMODE, NR_MODE, NI_MODE,
-     &                          VOL, DGN, XXLSG,
-     &                          BEXT, BSCAT, G_BAR )
 
 C***calculate total absorption and scattering contributions
 C***to optical depth
@@ -743,24 +629,24 @@ C***  as measured by satellites.
             DTABS_M  = MAX( DTABS_M, SMALL )
             DTABS_A  = MAX( DTABS_A, SMALL )
 
-            DT_CLOUD = CLOUD_BETA_LWC( IWL ) * LWC( II ) * BLKDZ( II )
+            DT_CLOUD( L ) = CLOUD_BETA_LWC( IWL ) * LWC( II ) * BLKDZ( II )
 
 C***FSB adjust DT_CLOUD for cloud fraction.
 
-            DT_CLOUD = DT_CLOUD * CLDFRC( II ) * SQRT( CLDFRC( II ) )
+            DT_CLOUD( L ) = DT_CLOUD( L ) * CLDFRC( II ) * SQRT( CLDFRC( II ) )
 
 C***FSB The 3/2 power of CLDFRC is an approximation from the NCAR CCM2
 C***  model that parameterizes cloud overlap.
 
             OM_CLOUD = 1.0 - CLOUD_COALBEDO( IWL )
-            DTSCAT_CLOUD = OM_CLOUD * DT_CLOUD
+            DTSCAT_CLOUD = OM_CLOUD * DT_CLOUD( L )
             G_CLOUD      = CLOUD_G( IWL )
 
 C***calculate total absorption and scattering contributions
 C***to optical depth
 
             DTSCAT = DTSCAT_M + DTSCAT_A + DTSCAT_CLOUD
-            DTABS  = DTABS_M  + DTABS_A + ( 1.0 - OM_CLOUD ) * DT_CLOUD
+            DTABS  = DTABS_M  + DTABS_A + ( 1.0 - OM_CLOUD ) * DT_CLOUD( L )
 
 C***set aerosol optical depth for later use
 
@@ -777,13 +663,22 @@ C***  and DSDH starting at the top.
 
             DSDH_TD( L ) = DSDH( L - 1 )
 
+C***initialize optical depth profiles to the layer increment
+
+            TAUC_AERO( II, IWL ) = DT_AERO( L )  ! aerosol optical depth
+            TAU_TOT  ( II, IWL ) = DTAU( L )     ! total optical depth
+            TAU_CLOUD( II, IWL ) = DT_CLOUD( L ) ! cloud optical depth
+
 C***FSB get sums of unscaled optical depths
 
-            TAU_AERO ( IWL ) = TAU_AERO ( IWL ) + DT_AERO( L )  ! aerosol optical depth
-            TAU_TOT  ( IWL ) = TAU_TOT  ( IWL ) + DTAU( L )  ! total optical depth
-            TAU_SCAT ( IWL ) = TAU_SCAT ( IWL ) + DTSCAT_A
-            TAU_CLOUD( IWL ) = TAU_CLOUD( IWL ) + DT_CLOUD
-            TAUO3_TOP( IWL ) = TAUO3_TOP( IWL ) - ( AO3 * BLKDZ( II ) )  ! remove tropospheric O3 from stratospheric value
+            TAU_SCAT ( IWL )     = TAU_SCAT ( IWL ) + DTSCAT_A
+            TAUO3_TOP( IWL )     = TAUO3_TOP( IWL ) - ( AO3 * BLKDZ( II ) )  ! remove tropospheric O3 from stratospheric value
+
+C***initialize optical depth profiles to the layer increment
+
+            TAUC_AERO( II, IWL ) = DT_AERO( L )  ! aerosol optical depth
+            TAU_TOT  ( II, IWL ) = DTAU( L )     ! total optical depth
+            TAU_CLOUD( II, IWL ) = DT_CLOUD( L ) ! cloud optical depth
 
          END DO                 ! loop over layers
 
@@ -795,6 +690,19 @@ C***set values for the stratosphere
          DTAU   ( 1 ) = TAUO3_TOP( IWL ) + TAU_RAY( IWL )
          DSDH_TD( 1 ) = DSDH_TOP
 
+         NLEVEL = NLAYS + 1
+
+C***calculate optical depth profiles
+         TAU_TOT  ( NLAYS, IWL ) = TAU_TOT  ( NLAYS, IWL ) + DTAU( 1 )
+         TAUC_AERO( NLAYS, IWL ) = TAUC_AERO( NLAYS, IWL ) + DT_AERO( 1 )  
+         TAU_CLOUD( NLAYS, IWL ) = TAU_CLOUD( NLAYS, IWL ) + DT_CLOUD( 1 ) 
+
+         DO L =  NLAYS-1, 1, -1
+            TAU_TOT  ( L, IWL ) = TAU_TOT  ( L, IWL ) + TAU_TOT  ( L+1, IWL )
+            TAUC_AERO( L, IWL ) = TAUC_AERO( L, IWL ) + TAUC_AERO( L+1, IWL ) 
+            TAU_CLOUD( L, IWL ) = TAU_CLOUD( L, IWL ) + TAU_CLOUD( L+1, IWL )
+         END DO
+         
 C***Set fluxes to zero
 
          FDIR = 0.0
@@ -804,13 +712,9 @@ C***Set fluxes to zero
          EUP  = 0.0
          EDN  = 0.0
 
-C***FSB Calculate total single scattering albedo
-
-         SSA( IWL ) = TAU_SCAT( IWL ) / TAU_AERO( IWL )
 
 C***calculate fluxes and irradiances
 
-         NLEVEL = NLAYS + 1
 
          CALL TWOSTREAM_S ( NLEVEL, COSZEN, RSFC, DTAU, OM, G, DSDH_TD,
      &                      FDIR, FUP, FDN, EDIR, EUP, EDN )
@@ -820,8 +724,15 @@ C***calculate fluxes and irradiances
             FX = FDIR( II ) + FDN( II ) + FUP( II ) ! actinic flux
             FSUM( L ) = FX
             ESUM( L ) = EDIR( II ) + EDN( II ) ! downward irradiance
+                        
          END DO                 ! loop over layers
 
+C***FSB Calculate column averaged scattering albedo
+
+         IF( TAUC_AERO( 1, IWL ) .GT. 1.0E-30 )THEN
+             SSA( IWL ) = TAU_SCAT( IWL ) / TAUC_AERO( 1, IWL )
+         END IF
+         
 C***FSB capture the total downward irradiance at the surface [ W / m**2]
 
          ETOT_SFC( IWL ) = CONV_WM2( IWL ) * FLXSCALE * FEXT( IWL )
@@ -849,6 +760,14 @@ C***compute rate of photolysis (j-values) for each reaction
 
       END DO    ! loop over wavelengths
 
+9503   FORMAT('LAYER = ',I3,' MODE = ',I3,' LAMBDA(nm)  = ',ES12.4,' DGN_CORE(m) = ',ES12.4,
+     &        ' DGN_SHELL(m) = ', ES12.4 / ' REFRACT_IDX_SHELL(NR,NI) = ', 2(ES12.4,1X),
+     &        ' REFRACT_IDX_CORE(NR,NI) = ', 2(ES12.4,1X) / ' LN(GEO.STD.DEV.) = ',
+     &        ES12.4)
+9504   FORMAT('LAYER = ',I3,' MODE = ',I3,' LAMBDA(nm)  = ',ES12.4,' DGN(m) = ',ES12.4,
+     &        ' REFRACT_IDX(NR,NI) = ', 2(ES12.4,1X) / ' VOL.DENS. = ', ES12.4,
+     &        ' LN(GEO.STD.DEV.) = ', ES12.4)
+
       RETURN
       END SUBROUTINE NEW_OPTICS
 
@@ -866,6 +785,7 @@ C   29 Mar 11 S.Roselle: Replaced I/O API include files with UTILIO_DEFN
 C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
+      USE AERO_DATA, ONLY: N_MODE
 
       IMPLICIT NONE
 
@@ -884,7 +804,9 @@ C***local
       CHARACTER(  16 ) :: PHOT_EXPECT
       CHARACTER(  30 ) :: LAND_EXPECT
       CHARACTER( 120 ) :: MSG                     ! buffer for messages to output
-      CHARACTER( 120 ) :: FILE_LINE
+      CHARACTER( 240 ) :: FILE_LINE
+
+      CHARACTER(  16 ),  ALLOCATABLE :: AE_RERACT_REF( : )
 
 !     INTEGER, INTENT(OUT) :: NWL_PHOT    ! # of wavelengths used in PHOT_MOD.F
       INTEGER :: NWL_PHOT    ! # of wavelengths used in PHOT_MOD.F
@@ -892,10 +814,18 @@ C***local
       INTEGER :: JDATE = 0
       INTEGER :: LOG_UNIT
       INTEGER :: PHOTAB_UNIT
-      INTEGER :: IPHOT_LOAD
-      INTEGER :: ITT_LOAD
+      INTEGER :: IPHOT, IPHOT_LOAD ! loop indices
+      INTEGER :: ITT, ITT_LOAD     ! loop indices 
+      INTEGER :: IP_MAP, IP_REF    ! photolysis reaction indicies
       INTEGER :: IWL_LOAD
-      
+      INTEGER :: STRT, FINI
+
+      INTEGER :: NAE_REFRACT_REF 
+
+      REAL,       ALLOCATABLE :: AE_IMAG_REFRACT( :, : )
+      REAL,       ALLOCATABLE :: AE_REAL_REFRACT( :, : )
+
+      LOGICAL                  :: ERROR_FLAG = .FALSE.
 
 C***external functions: none
 
@@ -975,11 +905,71 @@ C...begin read
 
       ALLOCATE( TEMP_REF( NTEMP_REF, NPHOT_MAP) )
 
-      DO ITT_LOAD = 1, 7 ! skip next 7 lines
+      DO ITT_LOAD = 1, 14 ! skip next 13 lines
          READ( PHOTAB_UNIT,'(A)' ) FILE_LINE
+#ifdef verbose_phot
+         write( log_unit, '(I2,1X,A)' )ITT_LOAD,TRIM(FILE_LINE)
+#endif
       END DO
 
-      READ( PHOTAB_UNIT,'(17X,I3)' ) NWL_REF
+      READ( PHOTAB_UNIT,'(A)' ) FILE_LINE
+#ifdef verbose_phot
+         write( log_unit, '(I2,1X,A)' )ITT_LOAD,TRIM(FILE_LINE)
+#endif
+
+!      READ( PHOTAB_UNIT,'(17X,I3)' ) NWL_REF
+!     READ( FILE_LINE,'(17X,I3,2X,17X,I3)' ) NWL_REF, NAE_REFRACT_REF
+      READ( FILE_LINE, 4999) NWL_REF
+
+      READ( PHOTAB_UNIT,'(A)' ) FILE_LINE
+      
+#ifdef verbose_phot
+      write( log_unit, * )TRIM(FILE_LINE)
+#endif
+
+      READ( FILE_LINE, 4999)NAE_REFRACT_REF
+
+4999  FORMAT(17X,I3,2X,17X,I3)
+
+      IF( NAE_REFRACT_REF .NE. NUM_REFRACTIVE )THEN
+         WRITE( LOG_UNIT,* ) 'NAE_REFRACT_REF  = ', NAE_REFRACT_REF
+         MSG = 'NAERO_REFRACT used in ' // CSQY_FILE
+     &       // ' does equal NWL in PHOT_MOD.F file. '
+         CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
+      END IF
+      
+      READ( PHOTAB_UNIT,'(A)' ) FILE_LINE
+#ifdef verbose_phot
+      write( log_unit, '(a3, 1x, a16)')'IDX', 'REFRACTIVE_IDX'
+#endif
+
+      ALLOCATE( AE_RERACT_REF   ( NAE_REFRACT_REF ) )
+          
+#ifdef verbose_phot
+      write( log_unit, '(a3, 1x, a16)')'IDX', 'REFRACTIVE_IDX'
+#endif
+
+      STRT = SCAN(FILE_LINE, '=', BACK = .TRUE.) + 1
+      FINI =  LEN(FILE_LINE)
+
+      READ( FILE_LINE( STRT:FINI ), * )( AE_RERACT_REF( ITT_LOAD ), 
+     &                                   ITT_LOAD = 1, NAE_REFRACT_REF )
+
+      DO ITT_LOAD = 1, NAE_REFRACT_REF 
+! set up refractive indices used by aero_photdata routine
+
+          REFRACTIVE_INDEX( ITT_LOAD )%NAME = AE_RERACT_REF( ITT_LOAD )
+          ALLOCATE( REFRACTIVE_INDEX( ITT_LOAD )%REAL_PART( N_MODE, NWL_REF ) )         
+          ALLOCATE( REFRACTIVE_INDEX( ITT_LOAD )%IMAG_PART( N_MODE, NWL_REF )  ) 
+           
+#ifdef verbose_phot
+          write( log_unit, '(i3, 1x, a16)')itt_load, refractive_index( itt_load )%name
+#endif
+
+      END DO
+
+      
+      
       NWL       = NWL_REF
       NWL_PHOT  = NWL
 
@@ -996,6 +986,9 @@ C...begin read
       END IF
 
       READ( PHOTAB_UNIT,'(A)' ) FILE_LINE
+#ifdef verbose_phot
+      write( log_unit, * )FILE_LINE
+#endif
 
       ALLOCATE( STWL_REF        ( NWL_REF ) )
       ALLOCATE( EFFWL_REF       ( NWL_REF ) )
@@ -1004,23 +997,38 @@ C...begin read
       ALLOCATE( CLD_BETA_REF    ( NWL_REF ) )
       ALLOCATE( CLD_COALBEDO_REF( NWL_REF ) )
       ALLOCATE( CLD_G_REF       ( NWL_REF ) )
+      ALLOCATE( AE_REAL_REFRACT ( NAE_REFRACT_REF, NWL_REF ) )
+      ALLOCATE( AE_IMAG_REFRACT ( NAE_REFRACT_REF, NWL_REF ) )
 
       DO IWL_LOAD = 1, NWL_REF
-         READ( PHOTAB_UNIT,'(4X,3(F8.3,2X),2X,ES12.4,2X,2(F8.3,2X),ES12.4,2X)' )
+!         READ( PHOTAB_UNIT,'(4X,3(F8.3,2X),2X,ES12.4,2X,2(F8.3,2X),ES12.4,2X)' )
+         READ( PHOTAB_UNIT, * )iphot_load,
      &         STWL_REF( IWL_LOAD ), EFFWL_REF( IWL_LOAD ),
      &         ENDWL_REF( IWL_LOAD ), FSOLAR_REF( IWL_LOAD ),
      &         CLD_BETA_REF( IWL_LOAD ), CLD_G_REF( IWL_LOAD ),
-     &         CLD_COALBEDO_REF( IWL_LOAD )
+     &         CLD_COALBEDO_REF( IWL_LOAD ),
+     &         ( AE_REAL_REFRACT( ITT_LOAD, IWL_LOAD ), 
+     &           AE_IMAG_REFRACT( ITT_LOAD, IWL_LOAD ),
+     &           ITT_LOAD = 1, NAE_REFRACT_REF )
 
+               DO ITT_LOAD = 1, NAE_REFRACT_REF
+                  REFRACTIVE_INDEX( ITT_LOAD )%REAL_PART( 1:N_MODE, IWL_LOAD ) 
+     &                                      = AE_REAL_REFRACT( ITT_LOAD, IWL_LOAD )
+                  REFRACTIVE_INDEX( ITT_LOAD )%IMAG_PART( 1:N_MODE, IWL_LOAD ) 
+     &                                      = AE_IMAG_REFRACT( ITT_LOAD, IWL_LOAD )
+               END DO
 #ifdef verbose_phot
-         write( log_unit,'(4x,3(f8.3,2x),2x,es12.4,2x,2(f8.3,2x),es12.4,2x)' )
+         write( log_unit,'(4x,3(f8.3,2x),2x,2(es12.4,2x),f8.3,2x,12(es12.4,2x))' )
      &          stwl_ref( iwl_load ), effwl_ref( iwl_load ),
      &          endwl_ref( iwl_load ),fsolar_ref( iwl_load ),
      &          cld_beta_ref( iwl_load ), cld_g_ref( iwl_load ),
-     &          cld_coalbedo_ref( iwl_load )
+     &          cld_coalbedo_ref( iwl_load ),
+     &          ( ae_real_refract( itt_load, iwl_load ),
+     &            ae_imag_refract( itt_load, iwl_load ), itt_load = 1, nae_refract_ref )
 #endif
 
       END DO
+
 
       READ( PHOTAB_UNIT,'(A)' ) FILE_LINE
       READ( PHOTAB_UNIT,'(A)' ) FILE_LINE
@@ -1280,10 +1288,11 @@ C...begin read
      &       // ' corresponds to CMAQ version 5.01.'
           CALL M3MESG( MSG )
       END IF
-          
+
       ALLOCATE( WAVELENGTH( NWL_PHOT ) )
       ALLOCATE( FEXT      ( NWL_PHOT ) )
       ALLOCATE( ALB       ( NWL_PHOT ) )
+
 
       ALLOCATE( CLOUD_BETA_LWC( NWL_PHOT ) )  ! cloud extinction coef divided by LWC
       ALLOCATE( CLOUD_COALBEDO( NWL_PHOT ) )  ! cloud coalbedo
@@ -1315,6 +1324,93 @@ C...begin read
             XO3CS( ITT_LOAD, IWL_LOAD ) = O3_CS_STRAT_REF( ITT_LOAD, IWL_LOAD )
          END DO
       END DO
+
+C***initialize pointers for mandatory photolysis rates
+
+      LNO2      = 0
+      LO3O1D    = 0
+      LO3O3P    = 0
+      LACETONE  = 0
+      LKETONE   = 0
+      LMGLY_ADJ = 0
+      LMGLY_ABS = 0
+
+C***get needed photolysis data for the model chemistry from the
+C***CSQY_DATA
+
+       ALLOCATE( PHOTOLYSIS_RATE ( NPHOTAB ) )
+       ALLOCATE( XXCS( NPHOTAB, IREFTEMPS, NWL ) )
+       ALLOCATE( XXQY( NPHOTAB, IREFTEMPS, NWL ) )
+       ALLOCATE( RTEMP_S( IREFTEMPS, NPHOTAB ) )
+
+       DO IPHOT = 1, NPHOTAB
+          IP_MAP = INDEXR( PHOTAB( IPHOT ), NPHOT_MAP, PNAME_MAP )
+          IF ( IP_MAP .LE. 0 ) THEN
+             MSG = 'FATAL ERROR: photolysis reaction ' // TRIM( PHOTAB( IPHOT ) )
+     &          // ' not found in ' //
+     &             'the reference data! '
+             ERROR_FLAG = .TRUE.
+             CALL M3WARN ( PNAME, 0, 0, MSG )
+          END IF
+          IP_REF = PHOT_MAP( IP_MAP )
+          PHOTOLYSIS_RATE( IPHOT ) = PNAME_MAP( IP_MAP )
+
+C***check to see if this photolysis reaction is a special case that
+C***  is referenced in other sections of the code.  if so, then set
+C***  the appropriate pointers for later processing
+
+           SELECT CASE ( TRIM( PHOTOLYSIS_RATE( IPHOT ) ) )
+              CASE( 'O3O3P', 'O3O3P_SAPRC99', 'O3O3P_06', 'O3_O3P_IUPAC04', 'O3O3P_NASA06' )
+                    LO3O3P = IPHOT
+              CASE( 'NO2', 'NO2_SAPRC99', 'NO2_06', 'NO2_RACM2' )
+                    LNO2 = IPHOT
+              CASE( 'O3O1D',  'O3O1D_SAPRC99' , 'O3O1D_06', 'O3_O1D_IUPAC04', 'O3O1D_NASA06' )
+                    LO3O1D = IPHOT
+              CASE( 'KETONE', 'KET_RACM2' )
+                    LKETONE   = IPHOT
+              CASE( 'MGLY_ADJ' )
+                    LMGLY_ADJ = IPHOT
+              CASE(  'MGLY_ABS' )
+                    LMGLY_ABS = IPHOT
+              CASE( 'ACETONE', 'CH3COCH3_RACM2' )
+                    LACETONE  = IPHOT
+              CASE( 'HCHOR_06', 'HCHO_RAD_RACM2')
+                    LHCHOR_06 = IPHOT
+           END SELECT
+
+
+C***load the local cross section & quantum yield data from the reference
+C***  dataset for this photolysis reaction
+
+            DO ITT = 1, IREFTEMPS
+               DO IWL = 1, NWL
+                  XXCS( IPHOT, ITT, IWL ) = CS_REF( IP_REF, ITT, IWL )
+                  XXQY( IPHOT, ITT, IWL ) = QY_REF( IP_REF, ITT, IWL )
+                  RTEMP_S( ITT, IPHOT ) = TEMP_REF( ITT, IP_REF )
+               END DO   ! iwl
+            END DO   ! itt
+
+       END DO   ! iphot
+
+       IF ( LNO2   .EQ. 0 ) THEN
+          MSG = 'NO2 cross-section not found in the CSQY data! '
+          ERROR_FLAG = .TRUE.
+          CALL M3WARN ( PNAME, 0, 0, MSG )
+       END IF
+       IF ( LO3O1D .EQ. 0 ) THEN
+          MSG = 'O3(1D) production not found in the CSQY data! '
+          CALL M3WARN ( 'NEW_OPTICS', 0, 0, MSG )
+       END IF
+       IF ( LO3O3P .EQ. 0 ) THEN
+          MSG = 'O3 cross-section not found in the CSQY data! '
+          ERROR_FLAG = .TRUE.
+          CALL M3WARN ( PNAME, 0, 0, MSG )
+       END IF
+
+       IF( ERROR_FLAG )THEN
+         MSG = 'The above fatal error(s) found in CSQY data! '
+         CALL M3EXIT( PNAME, 0, 0, MSG, 1 )
+       END IF
 
       WRITE( LOG_UNIT,* ) 'Sucessfully Loaded JTABLE'
 
@@ -1387,33 +1483,30 @@ C***  function of wavelength.
 
 C///////////////////////////////////////////////////////////////////////
 
-      SUBROUTINE GETCSQY ( NLAYS, NWL, IREFTEMPS, TEMP, DENS, NPHOT,
-     &                     RTEMP_S, XXCS, XXQY, CSZ, QYZ )
+      SUBROUTINE GETCSQY ( NLAYS, NWL, IREFTEMPS, TEMP, DENS, NPHOT, CSZ, QYZ )
 C-----------------------------------------------------------------------
 C  Purpose: Calculate values of absorption cross
 C     section and quantum yield, given, temperature and air
 C     pressure and density.
- 
+C
 C     FSB This version uses different reference temperatures for
 C     different species.
- 
+C
 C  coded 10/14/2004 by Dr. Francis S. Binkowski
 C     Carolina Environmental Program
 C     University of North Carolina at Chapel Hill
 C     email: frank_binkowski@unc.edu
- 
+C
 C  reference for acetone:
 C     Cameron-Smith, Philip J., Incorporating non_linear computation
 C     code (Fast-J), Journal of Atmospheric Chemistry, Vol. 37,
 C     pp 283-297, 2000)
- 
+C
 C  Mar 2011: Bill Hutzell
 C     - revised interpolation method for a general number of
 C     interpolation points
 C     - revised density corrections for specific photolysis reactions
- 
-C  Apr 2013: Jeff Young
-C     - added QDUM initialization in CASE starting with 'MGLY-06'
+C
 C-----------------------------------------------------------------------
 
       IMPLICIT NONE
@@ -1427,9 +1520,6 @@ C***Arguments
 
       REAL, INTENT(IN)  :: TEMP( NLAYS )    ! air temperature [K]
       REAL, INTENT(IN)  :: DENS( NLAYS )    ! air density [molecules/cm**2]
-      REAL, INTENT(IN)  :: RTEMP_S( IREFTEMPS, NPHOT )   ! Ref temperatures
-      REAL, INTENT(IN)  :: XXCS( NPHOT, IREFTEMPS, NWL ) ! abs cross sections
-      REAL, INTENT(IN)  :: XXQY( NPHOT, IREFTEMPS, NWL ) ! quantum yields
       REAL, INTENT(OUT) :: CSZ( NLAYS, NWL, NPHOT ) ! abs cross sections
       REAL, INTENT(OUT) :: QYZ( NLAYS, NWL, NPHOT ) ! quantum yields
 
@@ -1539,11 +1629,9 @@ C***Make density corrections using values from Fast-JX V. 5.0
                   CASE ( 'CCHO_R', 'ALD2', 'CH3CHO_RACM2' )      ! 'CH3CHO -> CH3 + HCO'
 
                      IF ( QYZ( LAYS, IWL, IPHOT ) .GT. 1.0E-5 ) THEN
-                        QDUM = 0.0
-                     ELSE
-                        QDUM = QYZ( LAYS, IWL, IPHOT )
-                        QYZ( LAYS, IWL, IPHOT ) = 1.0
-     &                                         / ( 1.0 + ( 1.0 / QDUM - 1.0 ) * DENS( LAYS ) / 2.465E19 )
+                              QDUM = QYZ( LAYS, IWL, IPHOT )
+                              QYZ( LAYS, IWL, IPHOT ) = 1.0
+     &                           / ( 1.0 + ( 1.0 / QDUM - 1.0 ) * DENS( LAYS ) / 2.465E19 )
                         QYZ( LAYS, IWL, IPHOT ) = MIN( 1.0, QYZ( LAYS, IWL, IPHOT ) )
                         QYZ( LAYS, IWL, IPHOT ) = MAX( 0.0, QYZ( LAYS, IWL, IPHOT ) )
                      END IF
@@ -1665,7 +1753,7 @@ C***remove wavelength dependence
                            QDUM = QDUM
      &                          / ( QDUM + 1.36E8 * PRESSURE )
                         ELSE
-                           QDUM = 0.0
+                           QDUM = QYZ( LAYS, IWL, IPHOT )
                         END IF
 
                      ELSE IF ( WAVELENGTH( IWL ) .LE. 240.0 ) THEN
@@ -1827,83 +1915,91 @@ C///////////////////////////////////////////////////////////////////////
 
       REAL FUNCTION QY_ACETONE( TEMP, DENS_NUMB, LAMBDA )
 
-C-----------------------------------------------------------------------
-C Computes acetone quantum yields according to:
-C IUPAC (2005) recommendation based on
-C Blitz, M. A., D. E. Heard, M. J. Pilling, S. R. Arnold, and M. P. Chipperfield
-C       (2004), Pressure and temperature-dependent quantum yields for the
-C       photodissociation of acetone between 279 and 327.5 nm, Geophys.
-C       Res. Lett., 31, L06111, doi:10.1029/2003GL018793.
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+! Computes acetone quantum yields according to:
+! IUPAC (2005) recommendation based on
+! Blitz, M. A., D. E. Heard, M. J. Pilling, S. R. Arnold, and M. P. Chipperfield
+!       (2004), Pressure and temperature-dependent quantum yields for the
+!       photodissociation of acetone between 279 and 327.5 nm, Geophys.
+!       Res. Lett., 31, L06111, doi:10.1029/2003GL018793.
+!-----------------------------------------------------------------------
 
       IMPLICIT NONE
 
-C***arguments
+!***arguments
 
       REAL, INTENT(IN) :: TEMP        ! air temperature, K
       REAL, INTENT(IN) :: DENS_NUMB   ! air number density, 1/cm^3
       REAL, INTENT(IN) :: LAMBDA      ! wavelength, nm
 
-C***local
+!***local
 
-      REAL A0           ! 1st coef for qy
-      REAL A1           ! 2nd coef for qy
-      REAL A2           ! 3rd coef for qy
-      REAL A3           ! 4th coef for qy
-      REAL A4           ! 5th coef for qy
-      REAL A5           ! 6th coef for qy
-      REAL A6           ! 7th coef for qy
+      REAL :: A0           ! 1st coef for qy
+      REAL :: A1           ! 2nd coef for qy
+      REAL :: A2           ! 3rd coef for qy
+      REAL :: A3           ! 4th coef for qy
+      REAL :: A4           ! 5th coef for qy
+      REAL :: A5           ! 6th coef for qy
+      REAL :: A6           ! 7th coef for qy
 
-      REAL PHI_CO       ! CO branch of IUPAC (2005) acetone QYZ
-      REAL PHI_CH3CO    ! CH3CO branch of IUPAC (2005) acetone QYZ
-      REAL AA           ! scratch variable for IUPAC (2005) acetone QYZ
-      REAL BB           ! scratch variable for IUPAC (2005) acetone QYZ
-      REAL CC           ! scratch variable for IUPAC (2005) acetone QYZ
+      REAL :: PHI_CO       ! CO branch of IUPAC (2005) acetone QYZ
+      REAL :: PHI_CH3CO    ! CH3CO branch of IUPAC (2005) acetone QYZ
+      REAL :: AA           ! scratch variable for IUPAC (2005) acetone QYZ
+      REAL :: BB           ! scratch variable for IUPAC (2005) acetone QYZ
+      REAL :: CC           ! scratch variable for IUPAC (2005) acetone QYZ
+
+      REAL :: TEMP_ARGUE   ! temperature over 295 K
+      REAL :: INV_LAMBDA   ! reciprocal of wavelength, 1.E+7/nm
+
+      REAL, PARAMETER :: T295K = 295
+
+      TEMP_ARGUE = T295K / TEMP
+      INV_LAMBDA = 1.0E+7 / LAMBDA
 
       IF ( LAMBDA .GE. 248.0 .AND. LAMBDA .LE. 349.0 ) THEN
 
-         AA = 0.350 * ( TEMP / 295.0 )**(-1.28)
-         BB = 0.068 * ( TEMP / 295.0 )**(-2.65)
+         AA = 0.350 * TEMP_ARGUE**(1.28)
+         BB = 0.068 * TEMP_ARGUE**(2.65)
          A0 = ( AA / ( 1.0 - AA ) ) * EXP( BB * ( LAMBDA - 248.0 ) )
          PHI_CO = 1.0 / ( 1.0 + A0 )
 
          IF ( LAMBDA .LE. 302.0 ) THEN
 
-C***wavelengths 248-302 nm
+!***wavelengths 248-302 nm
 
-            AA = 1.600 * 1.0E-19 * ( TEMP / 295.0 )**(-2.38)
-            BB =  0.55 * 1.0E-03 * ( TEMP / 295.0 )**(-3.19)
-            A1 = AA * EXP( -BB * ( ( 1.0E+07 / LAMBDA ) - 33113.0 ) )
+            AA = 1.600 * 1.0E-19 * TEMP_ARGUE**(2.38)
+            BB =  0.55 * 1.0E-03 * TEMP_ARGUE**(3.19)
+            A1 = AA * EXP( -BB * ( INV_LAMBDA - 33113.0 ) )
             PHI_CH3CO = ( 1.0 - PHI_CO ) / ( 1.0 + A1*DENS_NUMB )
 
-C***wavelengths 302-349 nm
+!***wavelengths 302-349 nm
 
          ELSE
 
-            AA = 1.62 * 1.0E-17 * ( TEMP / 295.0 )**(-10.03)
-            BB = 1.79 * 1.0E-3  * ( TEMP / 295.0 )**(-1.364)
-            A2 = AA * EXP( -BB * ( ( 1.0E+07 / LAMBDA ) - 30488.0 ) )
+            AA = 1.62 * 1.0E-17 * TEMP_ARGUE**(10.03)
+            BB = 1.79 * 1.0E-3  * TEMP_ARGUE**(1.364)
+            A2 = AA * EXP( -BB * ( INV_LAMBDA  - 30488.0 ) )
 
-            AA = 26.29 * ( TEMP / 295.0 )**(-6.59)
-            BB = 5.72 * 1.0E-7 * ( TEMP / 295.0 )**(-2.93)
-            CC = ( 30006.0 )   * ( TEMP / 295.0 )**(-0.064)
-            A3 = AA * EXP( -BB * ( ( 1.0E+07 / LAMBDA ) - CC )**2.0 )
+            AA = 26.29 * TEMP_ARGUE**(6.59)
+            BB = 5.72 * 1.0E-7 * TEMP_ARGUE**(2.93)
+            CC =   30006.0     * TEMP_ARGUE**(0.064)
+            A3 = AA * EXP( -BB * (INV_LAMBDA - CC )**2.0 )
 
-            AA = 1.67 * 1.0E-15 * ( TEMP / 295.0 )**(-7.25)
-            BB = 2.08 * 1.0E-3  * ( TEMP / 295.0 )**(-1.16)
-            A4 = AA * EXP( -BB * ( ( 1.0E+07 / LAMBDA ) - 30488.0 ) )
+            AA = 1.67 * 1.0E-15 * TEMP_ARGUE**(7.25)
+            BB = 2.08 * 1.0E-3  * TEMP_ARGUE**(1.16)
+            A4 = AA * EXP( -BB * ( INV_LAMBDA - 30488.0 ) )
 
             PHI_CH3CO = ( 1.0 - PHI_CO )
      &                * ( 1.0 + A4 * DENS_NUMB + A3 )
      &                / ( ( 1.0 + A2 * DENS_NUMB + A3 )
-     &                *   ( 1.0 + A4 * DENS_NUMB ) )
+     &                * ( 1.0 + A4 * DENS_NUMB ) )
          END IF
 
          QY_ACETONE = PHI_CO + PHI_CH3CO
 
       ELSE IF ( LAMBDA .LT. 248.0 .AND. LAMBDA .GT. 0.0 ) THEN ! set QY to 1.0
 
-C***based on IUPAC (2005) data sheet
+!***based on IUPAC (2005) data sheet
 
          PHI_CO    = 0.05
          PHI_CH3CO = 0.95
@@ -3040,582 +3136,5 @@ C***Assume NAME1 is not in list NAME2
       RETURN
       END FUNCTION INDEXR
 
-C///////////////////////////////////////////////////////////////////////
-
-      SUBROUTINE AERO_OPTICAL ( LAMDA, BETA_MOL,
-     &                          NMODE,
-     &                          NR, NI,
-     &                          VOL, DGN, XLNSIG,
-     &                          BEXT, BSCAT, G_BAR )
-C-----------------------------------------------------------------------
-C  calculate the extinction and scattering coefficients and
-C     asymmetry factors for each wavelength as a sum over the
-C     individual lognormal modes. Each mode may have a different
-C     set of refractive indices.
-C
-C  coded 09/08/2004 by Dr. Francis S. Binkowski
-C     FSB modified 10/06/2004, 10/12/2004, 10/18/2005
-C     FSB 01/12/2006
-C     Carolina Environmental Program
-C     University of North Carolina at Chapel Hill
-C     email: frank_binkowski@unc.edu
-C-----------------------------------------------------------------------
-
-      IMPLICIT NONE
-
-C***Arguments
-
-      INTEGER, INTENT(IN) :: NMODE  ! number of lognormal modes
-
-      REAL,  INTENT(IN) :: LAMDA     ! wavelengths  [nm]
-      REAL,  INTENT(IN) :: BETA_MOL  ! molecular scattering coef [ 1/m ]
-      REAL,  INTENT(IN) :: NR ( NMODE ) ! real refractive index
-      REAL,  INTENT(IN) :: NI ( NMODE ) ! imaginary refractive index
-      REAL,  INTENT(IN) :: VOL( NMODE ) ! modal aerosol volume [m**3/m**3]
-      REAL,  INTENT(IN) :: DGN( NMODE ) ! geometric mean diameters
-                                        ! for number distribution [ m ]
-      REAL,  INTENT(IN) :: XLNSIG( NMODE ) ! natural log of geometric standard deviations
-
-      REAL, INTENT(OUT) :: BEXT    ! extinction coefficient [1/m]
-      REAL, INTENT(OUT) :: BSCAT   ! scattering coefficient [1/m]
-      REAL, INTENT(OUT) :: G_BAR   ! asymmetry factor for Mie and molecular scattering
-
-C***internal variables
-
-      INTEGER J                 ! loop index
-
-C***aerosol scattering coefficient
-
-      REAL BETA_SC, BSC
-
-C***aerosol extinction coefficients
-
-      REAL BETA_EX
-      REAL G                    ! modal aerosol asymmetry factors
-      REAL SUM_G
-      REAL VLX, DGX, LSIGX, NRX, NIX
-      REAL SIGMA_G
-      REAL LAMDAM1              ! 1/ lamda
-      REAL ALPHAV               ! Mie size parameter
-      REAL VFAC
-
-      REAL, PARAMETER :: SCALE = 1.0E09   ! scale factor [1/nm] -> [1/m]
-
-C***initialize variables
-
-      BEXT  = 0.0
-      BSCAT = 0.0
-      SUM_G = 0.0
-
-      LAMDAM1 = 1.0 / LAMDA
-
-      DO J = 1, NMODE
-
-C***calculate the extinction and scattering coefficients
-C***  for each mode
-
-         VLX   = VOL( J )
-         DGX   = DGN( J )
-         LSIGX = XLNSIG( J )
-         SIGMA_G = EXP( LSIGX )
-         NRX   = NR( J )
-         NIX   = NI( J )
-
-C***calculate Mie size parameter for volume distribution
-C***  scale converts 1 / lamda in [ 1/ nm] to be in [1 / m]
-C***  exp(3.0 * xlnsig*xlnsig)  converts dgn to dgv (volume diameter)
-
-         ALPHAV = SCALE * PI * DGX *
-     &            EXP( 3.0 * LSIGX * LSIGX ) * LAMDAM1
-
-!!!         CALL FAST_OPTICS ( NRX, NIX, ALPHAV, SIGMA_G, BETA_EX,
-!!!     &                      BETA_SC, G )
-         CALL FAST_OPTICS ( NRX, NIX, ALPHAV, LSIGX, BETA_EX,
-     &                      BETA_SC, G )
-
-C***fast_optics  returns the normalized values
-C***  Calculate the actual extinction and scattering coefficients
-C***  by multplying by the modal volume and dividing by the wavelength.
-C***  and scaling to  [ 1/m ]
-
-         VFAC  = SCALE * VLX * LAMDAM1
-
-C***sum to get total extinction and scattering
-C***  and contribution to the overall asymmetry factor
-
-         BEXT  = BEXT  + VFAC * BETA_EX
-         BSC   = VFAC * BETA_SC
-         BSCAT = BSCAT + BSC
-         SUM_G = SUM_G + BSC * G
-
-      END DO                    ! loop on modes
-
-C***calculate combined asymmetry factor for all modes
-
-      G_BAR = SUM_G / BSCAT     ! changed to divide by bscat
-
-      RETURN
-      END SUBROUTINE AERO_OPTICAL
-
-C///////////////////////////////////////////////////////////////////////
-
-      SUBROUTINE FAST_OPTICS ( NR, NI, ALPHV, XLNSIG,
-     &                         BETA_EXT, BETA_SCAT, G )
-C-----------------------------------------------------------------------
-C  A parameterization of the aerosol extinction and scattering code
-C     Coded by Dr. Francis S. Binkowski
-C     CEMP, The Institute for the Environment
-C     The University of North Carolina at Chapel Hill
-C     email: frank_binkowski@unc.edu
-C     Code dates. Began February 25, 2005, current March 18, 2005
-C     modified by FSB May 10, 2005 to calculate asymmetry factor by the
-C     semi-empirical method of Hanna and Mathur. Note that
-C     the normalized scattering coefficient (non-dimensional) is
-C     interpreted as an average of  scattering efficiency over the
-C     size distribution
-C     Modified 05/25/2005 to ensure that if ni = 0.0, that
-C     beta_scat = beta_ext.
-C     Modified 03/17/2008 to ensure match with reference calculation for
-C     all cases of sigma_g.
-C     Modified 10/25/2009 to be consistent with research version of code.
-C     The modifications include better representation of the
-C     asymmetry factor.
-C     The form of the mathematical expression for extinction
-C     and scattering is based upon that of
-C     Heintzenberg & Baker (1976), and further inspired by the work
-C     of Willeke and Brockmann(1977) who showed the basic shape of
-C     the extinction resulting from an integration of the Mie extinction
-C     efficiency over a log normal particle size distribution.
-C     This current code has been developed from a direct calculation of
-C     extinction and scattering using a Mie code integrated over
-C     a log normal distribution. The results of that calculation
-C     replicate the Willee and Brockmann (1977) results.
-C     The parameterization is based upon a fit to the standard CMAQ
-C     radiative transfer code for visibility. to which a module for
-C     absorption was added so that absorption and scattering would also be
-C     available.
-C
-C     The  shape has been modified for absorption by small particles
-C     by using the formulae of Penndorf (1962). For large particles,
-C     the shape has been altered by using the large sphere values from
-C     Table I of  Irvine (1965)
-C
-C     Results are consistent with those of Willeke and Brockmann (1977).
-C
-C     The asymmetry factor is calculated by a new algorithm FSB - 04/04/2008
-C
-C  References:
-C
-C     Heintzenberg, J. and M. Baker, Spherical particle populations:
-C     approximate analytic relationship between size distribution
-C     parameters and integral optical properties, Applied Optics,
-C     Volume 15, Number 5 pp 1178-1181, May 1976.
-C
-C     Irvine, W. M. Light Scattering by spherical particles: Radiation
-C     pressure, asymmetry factor, and extinction cross section,
-C     Journal of eh Optical Society of Amerioca, Vol. 55, NO. 1,
-C     January ,1965
-C
-C     Penndorf, R. Scattering and Extinction Coefficeints for small
-C     spherical particles, J. Atmospheric Sciences, Volume 19, p 193,
-C     March 1962.
-C
-C     Willeke, K. and  J. E. Brockmann, Extinction coefficients for
-C     multmodal atmospheric particle size distributions, Atmospheric
-C     Environment, vol. 11, pp 95-999, 1977.
-C-----------------------------------------------------------------------
-
-      IMPLICIT NONE
-
-C***arguments
-
-      REAL, INTENT(IN)  :: NR, NI     ! indices of refraction
-      REAL, INTENT(IN)  :: ALPHV       ! Mie parameter for dgv
-      REAL, INTENT(IN)  :: XLNSIG     ! log of geometric standard deviation
-
-      REAL, INTENT(OUT) :: BETA_EXT   ! normalized extinction coefficient
-      REAL, INTENT(OUT) :: BETA_SCAT  ! normalized scattering coefficient
-      REAL, INTENT(OUT) :: G          ! asymmetry factor
-
-C***internal variables
-
-      REAL NR1, NR2, TAU
-      REAL C, CEXT, CSCAT
-      REAL B, BEXT, BSCAT
-      REAL BBFAC
-      REAL ALPHA_I
-      REAL A, LOGX2, XLNSIG2, MM1
-
-      REAL, PARAMETER :: SIGMA_G_TWO = 2.0
-      REAL, PARAMETER :: LOGSIG_TWO = 0.693147
-      REAL, PARAMETER :: LOGSIG_TWO_SQD = LOGSIG_TWO * LOGSIG_TWO
-      REAL, PARAMETER :: LOGSIG_105 = 1.102500
-      REAL, PARAMETER :: DIFFSIG = SIGMA_G_TWO - 1.05
-      REAL, PARAMETER :: A_TWO = 0.5 / LOGSIG_TWO_SQD
-      REAL LARGESCAT  ! large sphere limit for scattering
-      REAL LARGEEXT   ! large sphere limit for extinction
-      REAL SMALL_G, LARGE_G
-
-      REAL ALPHV2, ALPHV3
-      REAL X_ALPHA, X_ALPHA2, X_ALPHA3
-      REAL SIGMA_G, FCORR
-      REAL EXPFAC2, EXPFAC3
-      REAL EFAC, EFAC_EXT, EFAC_SCAT
-      REAL DEN1, FAC1, FAC2
-      REAL F1, F2, F3
-      REAL G1, G2, G3, G4, G5
-      REAL NN, TT
-
-      REAL T1F1, T2F1, T1F2, T2F2, T1F3, T2F3
-      REAL T1G1, T2G1, T1G2, T2G2, T1G3, T2G3, T1G4, T2G4
-      REAL T1G5, T2G5, T1P1, T2P1
-
-C***the following are for calculating the Penndorff Coefficients
-
-      REAL PENN1, A1, A2, A3, PENN2
-      REAL XNR, XNI, XNR2, XNI2, XNRI, XNRI2, XNRMI
-      REAL XRI, XRI2, XRI36, XNX, XNX2
-      REAL Z1, Z12, Z2, XC1
-
-C***coefficients for polynomials
-
-      REAL, PARAMETER :: F1A0 = -1.309193E-1
-      REAL, PARAMETER :: F1A1 =  2.565668E+0
-
-      REAL, PARAMETER :: F2A0 =  1.489233E+1
-      REAL, PARAMETER :: F2A1 = -5.311351E+1
-      REAL, PARAMETER :: F2A2 =  8.180334E+1
-      REAL, PARAMETER :: F2A3 = -4.549854E+1
-
-      REAL, PARAMETER :: F3A0 =  5.549359E-1
-      REAL, PARAMETER :: F3A1 =  2.571002E-1
-      REAL, PARAMETER :: F3A2 =  9.212703E-1
-      REAL, PARAMETER :: F3A3 =  5.155047E-2
-
-      REAL, PARAMETER :: G1A0 =  1.000000E+0
-      REAL, PARAMETER :: G1A1 = -7.636121E-1
-      REAL, PARAMETER :: G1A2 =  1.285532E+0
-      REAL, PARAMETER :: G1A3 =  1.629161E-2
-
-      REAL, PARAMETER :: G2A0 =  1.000000E+0
-      REAL, PARAMETER :: G2A1 = -2.507954E+0
-      REAL, PARAMETER :: G2A2 =  5.170246E+0
-      REAL, PARAMETER :: G2A3 = -4.945515E+0
-
-      REAL, PARAMETER :: G3A0 =  1.000000E+0
-      REAL, PARAMETER :: G3A1 = -2.650134E+0
-      REAL, PARAMETER :: G3A2 =  4.515327E+0
-      REAL, PARAMETER :: G3A3 = -4.027442E+0
-
-      REAL, PARAMETER :: G4A0 =  1.000000E+0
-      REAL, PARAMETER :: G4A1 = -8.532647E-1
-      REAL, PARAMETER :: G4A2 =  6.766073E-1
-
-      REAL, PARAMETER :: G5A0 =  1.0
-      REAL, PARAMETER :: G5A1 = -6.674946E-1
-      REAL, PARAMETER :: G5A2 = -5.426378E-1
-
-C *** Coefficients for quadratic fit for <cos> large particles
-C     from Irvine (1965) Table I
-      REAL, PARAMETER :: IRVA0 =  1.076232E+0
-      REAL, PARAMETER :: IRVA1 = -4.891972E-2
-      REAL, PARAMETER :: IRVA2 = -2.243449E-2
-
-
-C FSB Coefficients for SMALL_G  calculation
-      REAL, PARAMETER :: XXA0 =  3.392224E-2
-      REAL, PARAMETER :: XXA1 =  8.276532E-1
-      REAL, PARAMETER :: XXA2 = -3.784926E-1
-      REAL, PARAMETER :: XXA3 =  5.853108E-2
-      REAL, PARAMETER :: G_ALPHA_I = XXA0 + XXA1 + XXA2 + XXA3
-
-C FSB Coefficients for LARGE_G calculation
-      REAL, PARAMETER :: YYA0 =  6.776173E-1
-      REAL, PARAMETER :: YYA1 =  2.385339E-2
-      REAL, PARAMETER :: YYA2 = -7.952263E-4
-      REAL, PARAMETER :: YYA3 =  9.410370E-6
-
-C FSB Coefficientf for adjusting asymmetry factor calculation
-      REAL, PARAMETER :: CXG0 = -5.845196E-2
-      REAL, PARAMETER :: CXG1 =  3.229183E-1
-      REAL, PARAMETER :: CXG2 =  2.764716E-1
-      REAL, PARAMETER :: CXG3 = -8.790411E-2
-
-C***FSB added for asymmetry factor calculation
-
-      REAL QSCAT_AVG
-
-      REAL, PARAMETER :: AA0 =  88.466
-      REAL, PARAMETER :: AA1 = -61.628
-      REAL, PARAMETER :: AA2 =  34.483
-      REAL, PARAMETER :: AA3 =  -8.543
-      REAL, PARAMETER :: AA4 =   0.77435
-
-      REAL GMAX
-      REAL QANGLE
-      REAL QQ, QF1, QF2, QF3
-      REAL QQSUM, QQF1,QQF2, QQF3, QQCORR
-
-      REAL, PARAMETER :: DEGTORAD = PI180
-      REAL, PARAMETER :: THREE_PI_TWO = 3.0 * PI / 2.0
-
-C***FSB start calculation
-      SIGMA_G = EXP( XLNSIG )
-C FSB check range of SIGMA_G
-C *** Maximum value of SIGMA_G allowed is 2.0
-      SIGMA_G = MIN( 2.0, SIGMA_G )
-C *** Minimum allowed value fo SIGMA_F is 1.05
-      SIGMA_G = MAX( 1.05, SIGMA_G )
-
-      XLNSIG2 = XLNSIG * XLNSIG
-      A = 0.5 / XLNSIG2
-
-      NR1 = NR - 1.0
-      NR2 = NR * NR
-
-C***evaluate polynomials
-C***  optimize for piplined microprocessor
-C***  appproach recommended by Dr. Carlie Coats
-
-      NN = NR1 * NR1
-
-      T1F1 = F1A0 + F1A1 * NR1
-      T1F2 = F2A0 + F2A1 * NR1
-      T2F2 = F2A2 + F2A3 * NR1
-      T1F3 = F3A0 + F3A1 * NR1
-      T2F3 = F3A2 + F3A3 * NR1
-
-      F1 = T1F1                 ! linear
-      F2 = T1F2 + T2F2 * NN     ! cubic
-      F3 = T1F3 + T2F3 * NN     ! cubic
-
-      C       = F1
-
-C FSB correct for values of SIGMA_ less than 2.0.
-C     The smallest value of SIGMA_G allowed is 1.05
-C     2.0 - 1.05 = 0.95
-C      FCORR   = (1.0 - 0.13 * (SIGMA_G - 1.05)  / 0.95 )
-C     1.0 / 0.95 = 1.052632.  1.0 / 0.95 * 0.13 = 0.136842
-
-      FCORR   = 1.0 - 0.136842 * ( SIGMA_G - 1.05 )
-
-      CEXT    = C * FCORR
-      CSCAT   = CEXT
-      B       = F3 * A_TWO
-      ALPHA_I = F2
-      BEXT    = B
-      BSCAT   = B
-      PENN1   = 0.0
-      PENN2   = 0.0
-
-      IF ( NI .GT. 0.0 ) THEN
-
-         TAU = NI / NR1
-
-C***evaluate more polynomials
-C***  optimize for piplined microprocessor
-C***  appproach recommended by Dr. Carlie Coats
-
-         TT = TAU * TAU
-         T1G1 = G1A0 + G1A1 * TAU
-         T2G1 = G1A2 + G1A3 * TAU
-         T1G2 = G2A0 + G2A1 * TAU
-         T2G2 = G2A2 + G2A3 * TAU
-         T1G3 = G3A0 + G3A1 * TAU
-         T2G3 = G3A2 + G3A3 * TAU
-         T1G4 = G4A0 + G4A1 * TAU
-         T2G4 = G4A2            ! quadratic
-         T1G5 = G5A0 + G5A1 * TAU
-         T2G5 = G5A2            ! quadratic
-         G1   = T1G1 + T2G1 * TT
-         G2   = T1G2 + T2G2 * TT
-         G3   = T1G3 + T2G3 * TT
-         G4   = T1G4 + T2G4 * TT
-         G5   = T1G5 + T2G5 * TT
-
-C *** adjust the variables
-
-         CEXT    = CEXT    * G1
-         CSCAT   = CSCAT   * G2
-         BEXT    = BEXT    * G3
-         BSCAT   = BSCAT   * G4
-         ALPHA_I = ALPHA_I * G5
-
-C*** Calculate the Penndorf Coefficients for the small particle limit
-
-         XNR   = NR
-         XNI   = NI
-         XNR2  = XNR   * XNR
-         XNI2  = XNI   * XNI
-         XNRI  = XNR2  + XNI2
-         XNRI2 = XNRI  * XNRI
-         XNRMI = XNR2  - XNI2
-         XRI   = XNR   * XNI
-         XRI2  = XRI   * XRI
-         XRI36 = 36.0  * XRI2
-         XNX   = XNRI2 + XNRMI - 2.0
-         XNX2  = XNX   * XNX
-
-         Z1    = XNRI2 + 4.0 * XNRMI + 4.0
-         Z12   = Z1    * Z1
-         Z2    = 4.0   * XNRI2 + 12.0 * XNRMI + 9.0
-         XC1   = 8.0   / ( 3.0 * Z12 )
-         A1    = 24.0  * XRI / Z1
-
-         A2    = 4.0   * XRI / 15.0 + 20.0 * XRI / ( 3.0 * Z2 ) +
-     &           4.8   * XRI * (  7.0 * XNRI2 +
-     &           4.0   * ( XNRMI - 5.0 ) ) / Z12
-
-         A3    = XC1   * ( XNX2 - XRI36 )
-
-         ALPHV2 = ALPHV * ALPHV
-         ALPHV3 = ALPHV * ALPHV * ALPHV
-         EXPFAC2 = EXP( 2.0 * XLNSIG2 )
-         EXPFAC3 = EXP( 4.5 * XLNSIG2 )
-
-         T1P1 = A1 + A2 * ALPHV2 * EXPFAC2
-         T2P1 = A3 * ALPHV3 * EXPFAC3
-
-C***PENN1 is the analytic integral of the Pendorff formulae over
-C***   a log normal particle size distribution.
-
-         PENN1 = THREE_PI_TWO * ( T1P1 + T2P1 )
-         PENN2 = THREE_PI_TWO * T2P1
-
-      END IF                    ! test of ni > 0.0
-
-      X_ALPHA  = ALPHV / ALPHA_I
-
-      LOGX2    = LOG( X_ALPHA )** 2
-
-      BBFAC    = BEXT * A  / ( BEXT + A )
-
-      EFAC_EXT = EXP( -BBFAC * LOGX2 )
-
-C***FSB calculate normalized extinction and scattering coefficients
-
-      BETA_EXT = THREE_PI_TWO * CEXT *
-     &                      SQRT( A / ( BEXT + A ) ) * EFAC_EXT
-
-      BETA_SCAT = BETA_EXT      ! NI = 0.0 case
-
-C *** Check for 0.0 < NI
-
-      IF ( NI .GT. 0.0 ) THEN
-
-!        BBFAC = 1.5 * BBFAC ! reset BBFAC for scattering
-        BBFAC = 1.1 * BBFAC ! reset BBFAC for scattering
-
-        EFAC_SCAT = EXP( -BBFAC * LOGX2 )
-
-C *** recalculate the normalized scattering coefficient
-
-        BETA_SCAT = THREE_PI_TWO * CSCAT *
-     &                       SQRT( A / ( BSCAT + A ) ) * EFAC_SCAT
-
-C *** Adjust beta_ext for small particle absorption:
-
-         IF ( X_ALPHA .LT. 0.13 ) THEN
-
-           FAC1 = ALPHV + 0.6 * ALPHV2
-
-           BETA_EXT = MAX( BETA_EXT,
-     &                 ( BETA_EXT  * FAC1 + ( 1.0 - FAC1 ) * PENN1 ) )
-
-           BETA_SCAT = MAX( BETA_SCAT,
-     &                 ( BETA_SCAT * FAC1 + ( 1.0 - FAC1 ) * PENN2 ) )
-
-        END IF ! test for   XALPHA < 0.13
-
-      END IF  ! test for 0.0  < NI
-C *** Calculate large sphere limits(Irvine, 1965)
-
-       MM1 = EXP( 0.5 * XLNSIG2 ) / ALPHV
-
-C FSB large sphere limit - scattering
-
-      LARGESCAT = THREE_PI_TWO * ( 8.652439E-1 + 1.501772E-1 * NR ) * MM1
-
-C FSB large spnere limit for extinction ( no edge effectss )
-
-      LARGEEXT = THREE_PI_TWO * ( 2.0 * MM1 )
-
-C FSB Adjust for large sphere limits
-
-      IF ( ALPHV .GE. 10.0 ) THEN
-
-        BETA_EXT  = MAX( BETA_EXT, LARGEEXT )
-
-        BETA_SCAT = MAX( BETA_SCAT, LARGESCAT )
-
-      END IF ! test for 10.0 < ALPHV
-
-C***FSB now calculate the asymmetry factor
-C***  using the Hanna-Mathur quasi-empirical method
-!      GMAX = 0.0
-
-!      QSCAT_AVG = BETA_SCAT
-!      QANGLE = AA0
-
-!      IF ( QSCAT_AVG .GT. 1.0E-4 ) THEN
-!         QQ  = QSCAT_AVG * QSCAT_AVG
-!         QF1 = AA0 + AA1 * QSCAT_AVG
-!         QF2 = AA2 + AA3 * QSCAT_AVG
-!         QF3 = AA4 * QSCAT_AVG * QSCAT_AVG
-!         QANGLE = QF1 + QF2 * QQ + QF3 * QQ
-!      END IF
-
-!      QANGLE = DEGTORAD * QANGLE
-!      G      = COS( QANGLE)     ! asymmetry factor
-
-C***FSB now calculate the asymmetry factor
-C***   using a parametric fit to Mie calculations
-
-      X_ALPHA2 = X_ALPHA * X_ALPHA
-      X_ALPHA3 = X_ALPHA * X_ALPHA * X_ALPHA
-
-      SMALL_G = 0.0
-      LARGE_G = 0.0
-
-      IF ( ALPHV .LT. 2.6 ) THEN
-
-C FSB Calculate SMALL_G for sigma_g = 2.0
-
-         QF1 = XXA0 + XXA1 * ALPHV
-         QF2 = XXA2 * ALPHV2
-         QF3 = XXA3 * ALPHV3
-         SMALL_G = QF1 + QF2 + QF3 ! valid at sigma_g = 2.0
-
-C FSB adjust SMALL_G for values less than 2.0
-C     The smallest sigma_g allowed is 1.05
-
-         QQF1 = CXG0 + CXG1 * ALPHV
-         QQF2 = CXG2 * ALPHV2
-         QQF3 = CXG3 * ALPHV3
-         QQSUM = QQF1 + QQF2 + QQF3
-         FAC1 = 1.052632 * ( 2.0 - SIGMA_G)
-         QQSUM = MAX( 0.0, QQSUM )
-         QQCORR =   ( 1.0 - FAC1 ) + FAC1 * QQSUM
-         SMALL_G = SMALL_G * QQCORR
-         G = SMALL_G
-
-      ELSE IF ( ALPHV .LT. 100.0 ) THEN
-
-         QF1 =  YYA0 + YYA1 * X_ALPHA
-         QF2 = YYA2 * X_ALPHA2
-         QF3 = YYA3 * X_ALPHA3
-         LARGE_G = QF1 + QF2 + QF3
-         G = LARGE_G
-
-      ELSE
-
-C     Very large sphere limit from fit to Irvine (1965).
-
-        G = 1.124484 - 1.153869E-1 * NR
-
-      END IF
-
-      RETURN
-      END SUBROUTINE FAST_OPTICS
 
       END MODULE PHOT_MOD

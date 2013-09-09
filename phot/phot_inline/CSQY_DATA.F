@@ -78,6 +78,15 @@ C...    cross sections (eQY=eCS/CS).
 
       REAL, ALLOCATABLE, SAVE :: EQY_REF( :,:,: ) ! eCS/CS averaged 77 bins in UCI Model
 
+      INTEGER, PARAMETER :: NUM_REFRACTIVE = 5
+      TYPE MODAL_COMPLEX
+         CHARACTER( 16 ) :: NAME                           ! name of complex property
+         REAL, ALLOCATABLE, DIMENSION( :, : ) :: REAL_PART ! real part
+         REAL, ALLOCATABLE, DIMENSION( :, : ) :: IMAG_PART ! imaginary part
+      END TYPE MODAL_COMPLEX
+
+      TYPE( MODAL_COMPLEX ), SAVE :: REFRACTIVE_INDEX( NUM_REFRACTIVE )
+
       INTEGER  :: IWLR  ! wavelength loop variable
       INTEGER  :: ITTR   ! temperature loop variable
             
