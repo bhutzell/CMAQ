@@ -25,7 +25,11 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef isam
+      SUBROUTINE HDIFF ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
       SUBROUTINE HDIFF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
 
 C-----------------------------------------------------------------------
 C Function:
@@ -75,6 +79,7 @@ C                       reported by Talat Odman and Yongtao Hu of GA tech.
 C    21 Jun 10 J.Young: convert for Namelist redesign
 C    16 Feb 11 S. Roselle: replaced I/O-API include files w/UTILIO_DEFN
 C    11 May 11 D.Wong: incorporated twoway model implementation
+C   19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
       
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -83,6 +88,9 @@ C-----------------------------------------------------------------------
       USE SUBST_MODULES         ! stenex
 !     USE SUBST_UTIL_MODULE     ! stenex
 !     USE SUBST_COMM_MODULE     ! stenex
+#ifdef isam
+      USE SA_DEFN               ! 20120823
+#endif
 
 #ifdef parallel
       USE SWAP_SANDIA
@@ -105,6 +113,9 @@ C Arguments:
                                           ! TSTEP(2) = sciproc sync. step (chem)
                                           ! TSTEP(3) = twoway model time step w.r.t. wrf time
                                           !            step and wrf/cmaq call frequency
+#ifdef isam
+      REAL, POINTER :: ISAM( :,:,:,:,: )  ! 20120823
+#endif
 
 C External Functions: None
            
@@ -170,6 +181,19 @@ C Local Variables:
       INTEGER, SAVE :: STARTROW, ENDROW
       INTEGER, SAVE :: STARTCOL, ENDCOL
 
+#ifdef isam
+      INTEGER      JSPCTAG
+      REAL         SA_CONC ( 0:NCOLS+1,0:NROWS+1 )   ! sa_conc working array
+#ifdef parallel
+      REAL, ALLOCATABLE, SAVE :: SA_HALO_SOUTH( :,:,: )
+      REAL, ALLOCATABLE, SAVE :: SA_HALO_NORTH( :,:,: )
+      REAL, ALLOCATABLE, SAVE :: SA_HALO_WEST ( :,:,: )
+      REAL, ALLOCATABLE, SAVE :: SA_HALO_EAST ( :,:,: )
+      REAL, ALLOCATABLE, SAVE :: SA_BUF_NS    ( : )
+      REAL, ALLOCATABLE, SAVE :: SA_BUF_EW    ( : )
+#endif
+#endif
+
       INTERFACE
          SUBROUTINE RHO_J ( JDATE, JTIME, TSTEP, RHOJ )
             USE GRID_CONF
@@ -219,9 +243,23 @@ C Get dx1 from COORD include file
      &              BUF_NS    ( NCOLS*NLAYS*N_SPC_DIFF ),
      &              BUF_EW    ( NROWS*NLAYS*N_SPC_DIFF ), STAT = IOS )
          IF ( IOS .NE. 0 ) THEN
-            XMSG = 'Failure allocating HALO_SOUTH, HALO_NORTH, HALO_WEST, HALO_EAST, BUF_NS, or BUF_EW'
+            XMSG = 'Failure allocating HALO_SOUTH, HALO_NORTH,'
+     &           // ' HALO_WEST, HALO_EAST, BUF_NS, or BUF_EW'
             CALL M3EXIT ( PNAME, FDATE, FTIME, XMSG, XSTAT1 )
          END IF
+#ifdef isam
+         ALLOCATE ( SA_HALO_SOUTH( NCOLS,NLAYS,N_SPCTAG ),
+     &              SA_HALO_NORTH( NCOLS,NLAYS,N_SPCTAG ),
+     &              SA_HALO_WEST ( NROWS,NLAYS,N_SPCTAG ),
+     &              SA_HALO_EAST ( NROWS,NLAYS,N_SPCTAG ),
+     &              SA_BUF_NS    ( NCOLS*NLAYS*N_SPCTAG ),
+     &              SA_BUF_EW    ( NROWS*NLAYS*N_SPCTAG ), STAT = IOS )
+         IF ( IOS .NE. 0 ) THEN
+            XMSG = 'Failure allocating SA_HALO_SOUTH, SA_HALO_NORTH,'
+     &           // ' SA_HALO_WEST, SA_HALO_EAST, SA_BUF_NS, or SA_BUF_EW'
+            CALL M3EXIT ( PNAME, FDATE, FTIME, XMSG, XSTAT1 )
+         END IF
+#endif
 #endif
 
          ALLOCATE ( DIFF_MAP( N_SPC_DIFF ), STAT = IOS )
@@ -372,6 +410,53 @@ C    send to WEST, recv from EAST, fill bound_east
      &             NROWS, NLAYS, EAST )
       CALL SWAP3D( BUF_EW,    HALO_WEST, NROWS, NLAYS, N_SPC_DIFF,
      &             NROWS, NLAYS, WEST )
+
+#ifdef isam
+Ckrt Create and fill four 3d boundary arrays with ISAM/rhoj
+Ckrt    send to SOUTH, recv from NORTH, fill bound_north
+Ckrt    send to NORTH, recv from SOUTH, fill bound_south
+Ckrt    send to EAST, recv from WEST, fill bound_west
+Ckrt    send to WEST, recv from EAST, fill bound_east
+
+      M = 0
+      DO JSPCTAG = 1, N_SPCTAG
+         DO L = 1, NLAYS
+            DO C = 1, NCOLS
+               SA_HALO_SOUTH( C,L,JSPCTAG ) =
+     &            ISAM( C,1,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) ) / RHOJ( C,1,L )
+               SA_HALO_NORTH( C,L,JSPCTAG ) =
+     &            ISAM( C,NROWS,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) ) / RHOJ( C,NROWS,L )
+               M = M + 1
+               SA_BUF_NS( M ) = SA_HALO_NORTH( C,L,JSPCTAG )
+             END DO
+          END DO
+      END DO
+
+      CALL SWAP3D( SA_HALO_SOUTH, SA_HALO_NORTH, NCOLS, NLAYS, N_SPCTAG,
+     &             NCOLS, NLAYS, NORTH )
+      CALL SWAP3D( SA_BUF_NS,     SA_HALO_SOUTH, NCOLS, NLAYS, N_SPCTAG,
+     &             NCOLS, NLAYS, SOUTH )
+
+      M = 0
+      DO JSPCTAG = 1, N_SPCTAG
+         DO L = 1, NLAYS
+            DO R = 1, NROWS
+               SA_HALO_WEST( R,L,JSPCTAG ) =
+     &            ISAM( 1,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) ) / RHOJ( 1,R,L )
+               SA_HALO_EAST( R,L,JSPCTAG ) =
+     &            ISAM( NCOLS,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) ) / RHOJ( NCOLS,R,L )
+               M = M + 1
+               SA_BUF_EW( M ) = SA_HALO_EAST( R,L,JSPCTAG )
+            END DO
+         END DO
+      END DO
+
+      CALL SWAP3D( SA_HALO_WEST, SA_HALO_EAST, NROWS, NLAYS, N_SPCTAG,
+     &             NROWS, NLAYS, EAST )
+      CALL SWAP3D( SA_BUF_EW,    SA_HALO_WEST, NROWS, NLAYS, N_SPCTAG,
+     &             NROWS, NLAYS, WEST )
+#endif
+
 #endif
 
 C Loop over species, layers, nsteps
@@ -462,6 +547,87 @@ C Update CGRID
 
 355      CONTINUE
 366   CONTINUE
+
+#ifdef isam
+CKrt.....Diffuse ISAM as in the nested loop 366 above
+
+      DO 766 JSPCTAG = 1, N_SPCTAG
+         DO 755 L = 1, NLAYS
+            DO 744 N = 1, NSTEPS
+
+C Load working array (ISAM is coupled, SA_CONC is mixing ratio)
+               DO R = 1, MY_NROWS
+                   DO C = 1, MY_NCOLS
+                      SA_CONC( C,R ) =
+     &                ISAM( C,R,L,S_SPCTAG(JSPCTAG),T_SPCTAG(JSPCTAG) ) / RHOJ( C,R,L )
+                   END DO ! C
+               END DO ! R
+
+#ifdef parallel
+C Fill 4 boundaries of working array SA_CONC: south, north, west, east
+               DO C = 1, NCOLS
+                  SA_CONC( C,0 )       = SA_HALO_SOUTH( C,L,JSPCTAG )
+                  SA_CONC( C,NROWS+1 ) = SA_HALO_NORTH( C,L,JSPCTAG )
+               END DO ! C
+
+               DO R = 1, NROWS
+                  SA_CONC( 0,R )       = SA_HALO_WEST( R,L,JSPCTAG )
+                  SA_CONC( NCOLS+1,R ) = SA_HALO_EAST( R,L,JSPCTAG )
+               END DO ! R
+#else
+C South boundary
+               R = 1
+               DO C = 1, MY_NCOLS
+                  SA_CONC( C,R-1 ) = SA_CONC( C,R )
+               END DO ! C
+
+C North boundary
+               R = MY_NROWS
+               DO C = 1, MY_NCOLS
+                  SA_CONC( C,R+1 ) = SA_CONC( C,R )
+               END DO ! C
+
+C West boundary
+               C = 1
+               DO R = 1, MY_NROWS
+                  SA_CONC( C-1,R ) = SA_CONC( C,R )
+               END DO ! R
+
+C East boundary
+               C = MY_NCOLS
+               DO R = 1, MY_NROWS
+                  SA_CONC( C+1,R ) = SA_CONC( C,R )
+               END DO ! R
+
+               CALL SUBST_COMM ( SA_CONC, DSPL_N1_E1_S1_W1, DRCN_N_E_S_W, COMMSTR )
+               CALL SUBST_COMM ( RK11, DSPL_N0_E1_S0_W0, DRCN_E )
+               CALL SUBST_COMM ( RK22, DSPL_N1_E0_S0_W0, DRCN_N )
+#endif
+
+C Update ISAM
+               DO R = 1, MY_NROWS
+                  DO C = 1, MY_NCOLS
+                     ISAM( C,R,L,S_SPCTAG(JSPCTAG),T_SPCTAG(JSPCTAG) ) =
+     &                                RHOJ( C,R,L ) * SA_CONC( C,R )
+     &                                + DTDX1S
+     &                                * ( RK11( C+1,R,L )
+     &                                * ( SA_CONC( C+1,R ) - SA_CONC( C,R ) )
+     &                                - RK11( C,R,L )
+     &                                * ( SA_CONC( C,R )   - SA_CONC( C-1,R ) ) )
+     &                                + DTDX2S
+     &                                * ( RK22( C,R+1,L )
+     &                                * ( SA_CONC( C,R+1 ) - SA_CONC( C,R ) )
+     &                                - RK22( C,R,L )
+     &                                * ( SA_CONC( C,R )   - SA_CONC( C,R-1 ) ) )
+
+                  END DO
+               END DO
+
+744         CONTINUE
+755      CONTINUE
+766   CONTINUE
+#endif
+
 
       RETURN
 

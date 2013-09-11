@@ -25,8 +25,14 @@ C what( 1 ) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef isam
+      SUBROUTINE RESCLD ( CGRID, JDATE, JTIME, TSTEP,
+     &                    N_SPC_WDEP, WDEP_MAP, DEP, RESTRANS,
+     &                    ISAM, ISAMB4, TOT_SADEP )
+#else
       SUBROUTINE RESCLD ( CGRID, JDATE, JTIME, TSTEP,
      &                    N_SPC_WDEP, WDEP_MAP, DEP, RESTRANS )
+#endif
 
 C-----------------------------------------------------------------------
 C  FUNCTION: Resolved-scale CLOUD processor Models-3 science process:
@@ -65,6 +71,7 @@ C      15 01 Jul 11 G. Sarwar: calculate zenith angle to determine daytime and
 C                    nightime needed for sulfur oxidation via metal catalysis
 C      16 02Aug12 S.Roselle:  instrumented to calculate and return
 C                             transmissivity for resolved clouds
+C      17 19 Jul 13 R.Kwok: isam
  
 C  Called by:  CLDPROC
  
@@ -74,6 +81,10 @@ C-----------------------------------------------------------------------
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
+#ifdef isam
+      USE SA_GRD_DEFN         ! 20120827
+      USE OZVOC_DEFN          ! 20120925
+#endif
 
       IMPLICIT NONE
 
@@ -105,6 +116,11 @@ C...........Arguments:
 !     REAL          DEP  ( NCOLS,NROWS,* )  ! depositions (etc.)
       REAL       :: DEP  ( :,:,: )      ! depositions (etc.)
       REAL       :: RESTRANS( :,: )
+#ifdef isam
+      REAL, POINTER    :: ISAM( :,:,:,:,: )                   !KRT
+      REAL, POINTER    :: ISAMB4( :,:,:,:,: )                 !KRT
+      REAL             :: TOT_SADEP( :,:,:,: )                !KRT
+#endif
 
 C...........Local Variables:
 
@@ -138,8 +154,7 @@ C...........Local Variables:
       REAL          ALFA2               ! aitken mode sfc area scavenging coef
       REAL          ALFA3               ! aitken mode mass scavenging coef
       REAL          CTHK1               ! cloud thickness (m)
-      REAL          METSTEP             ! timestep on the met file (hr)
-      SAVE          METSTEP
+      REAL, SAVE :: METSTEP             ! timestep on the met file (hr)
       REAL          PBARC               ! mean cloud pressure (Pa)
       REAL          PRATE1              ! storm rainfall rate (mm/hr)
       REAL          QCRGCOL             ! vert column integrated liquid water content
@@ -186,6 +201,28 @@ C Latitude and longitude for zenith angle calculation: Golam Sarwar * July 1, 20
       REAL          COSZEN( NCOLS, NROWS )          ! cosine of zenith angle
       REAL          COSZ                            ! local cosine of zenith angle
       LOGICAL       DARK                            ! DARK = TRUE is night,  DARK = FALSE is day
+
+#ifdef isam
+CKRT Source apportionment related.......
+      INTEGER, SAVE :: JNOX, JHNO3, JNO3J
+      INTEGER, SAVE :: JSO2, JSO4J, JSULF
+      INTEGER, SAVE :: JNH3, JNH4J
+      INTEGER          P
+      REAL             TTL_CEND_NOX
+      REAL             TTL_CG_NOX
+      INTEGER          JSPC, KTAG
+      REAL             TTL_SA
+      REAL             SO4J_NU, SO2_NU
+      REAL             TTL_SO2_B4, TTL_SO2_AF, BULK_DIFF, TAG_DIFF ! SO2 tag-total at each 3D cell
+      REAL             TTL_HNO3, TTL_NH3 ! precurs' tag-total at each 3D cell
+      REAL             TTL_ALLTAGS( NSPC_SA )
+      INTEGER, SAVE :: VSULF
+      REAL             TTL_SULF_B4, TTL_SULF_AF
+CKRT...VOC
+      INTEGER          JV
+      REAL             TTL_VOC_B4, TTL_VOC_AF
+      REAL             TTL_RMVOC
+#endif
 
 C...........External Functions:
 
@@ -361,6 +398,18 @@ C...  Get LON
          END IF
 
 C  **** Golam Sarwar * July 1, 2011
+
+#ifdef isam
+        JHNO3 = INDEX1( 'HNO3', NSPC_SA, SPC_NAME(:,OTHRTAG) )
+        JNO3J = INDEX1( 'ANO3J', NSPC_SA, SPC_NAME(:,OTHRTAG) )
+
+        JSO2 = INDEX1( 'SO2', NSPC_SA, SPC_NAME(:,OTHRTAG) )
+        JSO4J = INDEX1( 'ASO4J', NSPC_SA, SPC_NAME(:,OTHRTAG) )
+        JSULF = INDEX1( 'SULF', NSPC_SA, SPC_NAME(:,OTHRTAG) )    !Fb22
+
+        JNH3 = INDEX1( 'NH3', NSPC_SA, SPC_NAME(:,OTHRTAG) )
+        JNH4J = INDEX1( 'ANH4J', NSPC_SA, SPC_NAME(:,OTHRTAG) )
+#endif
 
       END IF  ! FIRSTIME
 
@@ -792,6 +841,156 @@ C...load H+ concentration into the deposition array as well
                 DEP( COL, ROW, N_SPC_WDEP+1 ) =
      &                         DEP( COL, ROW, N_SPC_WDEP+1 ) + REMOVAC
 
+#ifdef isam
+!!!KRT Apportionment of ambient conc and wet dep
+C  Total over all tags
+                TTL_ALLTAGS = 0.0
+                DO JSPC = 1, NSPC_SA
+                  DO KTAG = 1, NTAG_SA
+                    TTL_ALLTAGS( JSPC ) = TTL_ALLTAGS( JSPC )
+     &                                  + ISAMB4( COL,ROW,LAY,JSPC,KTAG )
+                  END DO ! ktag
+                END DO ! jspc
+C....Apportion all species' conc as primary
+                DO JSPC = 1, NSPC_SA
+                  DO KTAG = 1, NTAG_SA
+                    IF ( SPC_INDEX(JSPC,1) .EQ. 1 .OR. SPC_INDEX(JSPC,1) .EQ. -50 ) THEN
+                      IF ( CGRID( COL,ROW,LAY,SPC_INDEX( JSPC,2 ) ) .GT. 1.E-30 )
+     &                  ISAM( COL,ROW,LAY,JSPC,KTAG )
+     &                 = ISAMB4( COL,ROW,LAY,JSPC,KTAG ) * MIN( 1.0,
+     &  CEND( SPC_INDEX( JSPC,2 ) ) / CGRID( COL,ROW,LAY,SPC_INDEX( JSPC,2 ) ) )  ! 20130517
+                    ELSE IF ( SPC_NAME( JSPC,KTAG ) .EQ. 'VOC' ) THEN  ! aggregated species such VOC
+                      TTL_VOC_B4 = 0.0
+                      TTL_VOC_AF = 0.0
+                      DO JV = 1, SPC_INDEX( JSPC,1 )
+                        TTL_VOC_B4 = TTL_VOC_B4 +
+     &                    CGRID( COL,ROW,LAY,SPC_INDEX( JSPC,JV+1 ) ) + NCARBON( JV )
+                        TTL_VOC_AF = TTL_VOC_AF +
+     &                    CEND( SPC_INDEX( JSPC,JV+1 ) ) + NCARBON( JV )
+                      END DO ! list of aggregating species
+                      IF ( TTL_VOC_B4 .GT. 1.E-30 )
+     &                  ISAM( COL,ROW,LAY,JSPC,KTAG ) =
+     &                    ISAMB4( COL,ROW,LAY,JSPC,KTAG )
+     &                    * MIN( 1.0, TTL_VOC_AF / TTL_VOC_B4 )  ! 20130517
+                    END IF ! single species, split species or aggregated species
+                  END DO ! ktag
+                END DO ! jspc
+C...Add up the precursors SO2, SULF(Fb22), HNO3 and NH3 over all tags
+                TTL_SO2_B4 = 0.0
+                TTL_SO2_AF = 0.0
+
+                TTL_SULF_B4 = 0.0
+                TTL_SULF_AF = 0.0
+
+                TTL_HNO3 = 0.0
+                TTL_NH3 = 0.0
+                DO KTAG = 1, NTAG_SA
+                  IF ( JSO2 .GT. 0 ) THEN
+                    TTL_SO2_B4 = TTL_SO2_B4 + ISAMB4( COL,ROW,LAY,JSO2,KTAG )
+                    TTL_SO2_AF = TTL_SO2_AF + ISAM( COL,ROW,LAY,JSO2,KTAG )
+                  END IF ! jso2
+                  IF ( JSULF .GT. 0 ) THEN
+                    TTL_SULF_B4 = TTL_SULF_B4 + ISAMB4( COL,ROW,LAY,JSULF,KTAG )
+                    TTL_SULF_AF = TTL_SULF_AF + ISAM( COL,ROW,LAY,JSULF,KTAG )
+                  END IF ! jsulf
+                  IF ( JHNO3 .GT. 0 )
+     &              TTL_HNO3 = TTL_HNO3 + ISAMB4( COL,ROW,LAY,JHNO3,KTAG )
+                  IF ( JNH3 .GT. 0 )
+     &              TTL_NH3 = TTL_NH3 + ISAMB4( COL,ROW,LAY,JNH3,KTAG )
+                END DO ! ktag
+C...Apportion sulfate, nitrate, ammonium as secondary
+C...with SO2 ( tiny fraction converted to Svi ),
+C...HNO3 and N2O5, and NH3 as precursors
+                DO KTAG = 1, NTAG_SA
+                  ! sulfate
+                  IF ( JSO4J .GT. 0 ) THEN
+                    BULK_DIFF = TTL_SO2_AF - TTL_SO2_B4
+                    BULK_DIFF = BULK_DIFF + TTL_SULF_AF - TTL_SULF_B4
+                    TAG_DIFF = ISAM( COL,ROW,LAY,JSO2,KTAG ) - ISAMB4( COL,ROW,LAY,JSO2,KTAG )
+                    TAG_DIFF = TAG_DIFF +
+     &                          ISAM( COL,ROW,LAY,JSULF,KTAG )
+     &                        - ISAMB4( COL,ROW,LAY,JSULF,KTAG )
+                    IF ( BULK_DIFF .LT. -1.E-30 .AND.
+     &                   TAG_DIFF .LT. -1.E-30 .AND.
+     &                  CEND( SPC_INDEX( JSO4J,2 ) )
+     &                  - CGRID( COL,ROW,LAY,SPC_INDEX( JSO4J,2 ) ) .GT. 1.E-30 )
+     &                ISAM( COL,ROW,LAY,JSO4J,KTAG ) =
+     &                ISAMB4( COL,ROW,LAY,JSO4J,KTAG ) +
+     &                 ( CEND( SPC_INDEX( JSO4J,2 ) )
+     &                 - CGRID( COL,ROW,LAY,SPC_INDEX( JSO4J,2 ) ) )
+     &                 * TAG_DIFF / BULK_DIFF
+                  END IF ! jso4j >0
+
+                  ! nitrate ... do HNO3 alone first
+                  IF ( JNO3J .GT. 0 .AND. JHNO3 .GT. 0 ) THEN ! .AND. JNOX .GT. 0 ) THEN
+                    IF ( TTL_HNO3 .GT. 1.E-30 .AND.
+     &                CEND( SPC_INDEX( JNO3J,2 ) )
+     &                - CGRID( COL,ROW,LAY,SPC_INDEX( JNO3J,2 ) ) .GT. 1.E-30 )
+     &                ISAM( COL,ROW,LAY,JNO3J,KTAG ) =
+     &                  ISAMB4( COL,ROW,LAY,JNO3J,KTAG ) +
+     &                 ( CEND( SPC_INDEX( JNO3J,2 ) )
+     &                 - CGRID( COL,ROW,LAY,SPC_INDEX( JNO3J,2 ) ) )
+     &                 * ISAMB4( COL,ROW,LAY,JHNO3,KTAG ) / TTL_HNO3
+                  END IF ! all of jno3j, jhno3 > 0
+
+                  ! ammonium
+                  IF ( JNH4J .GT. 0 ) THEN
+                    IF ( TTL_NH3 .GT. 1.E-30 .AND.
+     &                CEND( SPC_INDEX( JNH4J,2 ) )
+     &                - CGRID( COL,ROW,LAY,SPC_INDEX( JNH4J,2 ) ) .GT. 1.E-30 )
+     &                ISAM( COL,ROW,LAY,JNH4J,KTAG ) =
+     &                  ISAMB4( COL,ROW,LAY,JNH4J,KTAG ) +
+     &                 ( CEND( SPC_INDEX( JNH4J,2 ) )
+     &                 - CGRID( COL,ROW,LAY,SPC_INDEX( JNH4J,2 ) ) )
+     &                * ISAMB4( COL,ROW,LAY,JNH3,KTAG ) / TTL_NH3
+                  END IF ! jnh4 > 0
+
+                END DO ! ktag
+C....Deposition part....
+                DO JSPC = 1, NSPC_SA
+                  ! Sum over all tags for each C,R,L,S
+                  TTL_SA = 0.0
+                  DO KTAG = 1, NTAG_SA
+                    TTL_SA = TTL_SA + ISAM( COL,ROW,LAY,JSPC,KTAG )
+                  END DO ! ktag
+
+                  ! At each C,R,L, apportion bulk dep S to individual tags
+                  IF ( TTL_SA .GT. 1.E-30 .AND. JSPC .NE. JSULF .AND.
+     &                SPC_INDEX(JSPC,1) .NE. -50 ) THEN  !20120906
+                    ! 1-ozone case should be covered here
+                    DO KTAG = 1, NTAG_SA
+                       TOT_SADEP( COL,ROW,JSPC,KTAG ) =
+     &                   TOT_SADEP( COL,ROW,JSPC,KTAG ) +
+     &                   ISAM( COL,ROW,LAY,JSPC,KTAG ) / TTL_SA
+     &                   * REMOV( SPC_INDEX( JSPC,2 ) )
+                    END DO ! ktag
+                  END IF ! positive ttl_sa and as long as its not sulf
+
+                  ! Ozone deposition :  2-regime case 20130627
+                  IF ( TTL_SA .GT. 1.E-30 .AND. SPC_INDEX(JSPC,1) .EQ. -50 ) THEN  !20120906
+                    DO KTAG = 1, NTAG_SA
+                       TOT_SADEP( COL,ROW,JSPC,KTAG ) =
+     &                   TOT_SADEP( COL,ROW,JSPC,KTAG ) +
+     &                   ISAM( COL,ROW,LAY,JSPC,KTAG ) / TTL_SA
+     &                   * 0.5 * REMOV( SPC_INDEX( JSPC,2 ) )
+                    END DO ! ktag
+                  END IF ! positive ttl_sa and happens to be o3v or o3n
+
+                  ! VOC deposition 20120925
+                  IF ( TTL_SA .GT. 1.E-30 .AND. SPC_NAME( JSPC,OTHRTAG ) .EQ. 'VOC' ) THEN
+                    TTL_RMVOC = 0.0
+                    DO JV = 1, SPC_INDEX( JSPC,1 )
+                      TTL_RMVOC = TTL_RMVOC + REMOV( SPC_INDEX( JSPC,JV+1) ) * NCARBON( JV )
+                    END DO ! jv
+                    DO KTAG = 1, NTAG_SA
+                       TOT_SADEP( COL,ROW,JSPC,KTAG ) =
+     &                   TOT_SADEP( COL,ROW,JSPC,KTAG ) +
+     &                   ISAM( COL,ROW,LAY,JSPC,KTAG ) / TTL_SA * TTL_RMVOC
+                    END DO ! ktag
+                  END IF ! +ve ttl_sa and voc
+                END DO ! jspc
+#endif
+
 C...set cgrid to the ending concentrations
 
                 DO SPC = 1, NSPCSD
@@ -800,7 +999,7 @@ C...set cgrid to the ending concentrations
                   END IF
                 END DO
 
-              END IF
+              END IF ! cloud+rain+graupel > 0.00005 ?
             END DO
           END IF
 

@@ -30,20 +30,20 @@ C-----------------------------------------------------------------------
 C Function: emissions interface to the chemistry-transport model
 
 C Revision History:
-C     28 Jul 2006 J.Young: initial implementation
-C     18 Aug 2007 J.Young: move beis part to separate module; add plume rise
-C     23 Sep 2009 B.Hutzell: modified algorithm that loads gas emissions from point
+C   28 Jul 2006 J.Young: initial implementation
+C   18 Aug 2007 J.Young: move beis part to separate module; add plume rise
+C   23 Sep 2009 B.Hutzell: modified algorithm that loads gas emissions from point
 C                 sources into VDEMIS array to enable multi-use of an emission species
-C     26 Jan 2010 J.Young: fix bug overwriting point source layer 1 NH3; inline rdemis
-C     07 Jan 2011 B.Hutzell: updated for namelist definition of model species
-C     16 Feb 2011 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
+C   26 Jan 2010 J.Young: fix bug overwriting point source layer 1 NH3; inline rdemis
+C   07 Jan 2011 B.Hutzell: updated for namelist definition of model species
+C   16 Feb 2011 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                            removed deprecated TRIMLEN
-C      6 Apr 2011 J.Young, R.Pinder: add lightning NO emissions capability
-C     11 May 2011 D.Wong: incorporated twoway model implementation
-C      5 Jun 2012 J.Bash: Added support for NH3 bidirectional exchange. Fertilizer
-C                         sector emissions are subtracted from the total NH3 emissions
-C                         if the CTM_ABFLUX flag is set
-
+C    6 Apr 2011 J.Young, R.Pinder: add lightning NO emissions capability
+C   11 May 2011 D.Wong: incorporated twoway model implementation
+C    5 Jun 2012 J.Bash: Added support for NH3 bidirectional exchange. Fertilizer
+C                       sector emissions are subtracted from the total NH3
+C                       emissions if the CTM_ABFLUX flag is set
+C   19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications      
@@ -63,6 +63,12 @@ C-----------------------------------------------------------------------
       PUBLIC VDEMIS, N_SPC_EMIS, EMLAYS, EMLYRS, EMIS_INIT, GET_EMIS
 #ifdef Verbose2
       public semis
+#endif
+#ifdef isam
+      INTEGER, SAVE :: FRST_GC, LAST_GC, FRST_AE, LAST_AE,
+     &                 FRST_NR, LAST_NR, FRST_TR, LAST_TR
+      PUBLIC           FRST_GC, LAST_GC, FRST_AE, LAST_AE,
+     &                 FRST_NR, LAST_NR, FRST_TR, LAST_TR
 #endif
       PRIVATE
                                            ! a 2d file if inline, otherwise a 3d file
@@ -103,20 +109,16 @@ C-----------------------------------------------------------------------
          IMPLICIT NONE
 
 C Includes:
-
          INCLUDE SUBST_CONST     ! constants
 
 C Arguments:
-
          INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP   ! TSTEP is output time step (HHMMSS)
          LOGICAL :: SUCCESS
 
 C Parameters:
-
          REAL, PARAMETER :: CMLMR = 1.0E+06       ! ppmV/Molar Mixing Ratio
 
 C Local Variables:
-
          REAL    CONVEM          ! conversion for emissions rates to Kg/s
          REAL    DX1, DX2        ! CX x1- and x2-cell widths
 
@@ -304,14 +306,28 @@ C combined gas emssions conversion factor
          FINI_NR = N_GC_EMIS + NEMIS_AE + N_NR_EMIS
          STRT_TR = N_GC_EMIS + NEMIS_AE + N_NR_EMIS + 1
          FINI_TR = N_GC_EMIS + NEMIS_AE + N_NR_EMIS + N_TR_EMIS
-
+#ifdef isam
+         FRST_GC = STRT_GC
+         LAST_GC = FINI_GC
+         FRST_AE = STRT_AE
+         LAST_AE = FINI_AE
+         FRST_NR = STRT_NR
+         LAST_NR = FINI_NR
+         FRST_TR = STRT_TR
+         LAST_TR = FINI_TR
+#endif
          SUCCESS = .TRUE.; RETURN
 
          END FUNCTION EMIS_INIT
 
 C-----------------------------------------------------------------------
+#ifdef isam
+         SUBROUTINE GET_EMIS ( JDATE, JTIME, TSTEP, CONVPA,
+     &                         RDX3F, RRHOJ, RJACM, ISAMEM, MFRC_P )
+#else
          SUBROUTINE GET_EMIS ( JDATE, JTIME, TSTEP, CONVPA,
      &                         RDX3F, RRHOJ, RJACM )
+#endif
 
 C NEW APPROACH:
 C Apply NML factors to all *input* emissions and inline plume rise, aero emis
@@ -327,29 +343,38 @@ C GET_AERO_EMIS has to apply factors - don`t do it at this level.
          USE LTNG_DEFN           ! lightning NO emissions
          USE UTILIO_DEFN
          USE DEPV_DEFN, ONLY: ABFLUX ! ammonia bidi flag
-
+#ifdef isam
+         USE SA_GRD_DEFN         ! 20120712 for gridded SA emis, implicitly assume sa_defn
+         USE OZVOC_DEFN          ! 20120918 for VOC
+         USE AERO_DATA, ONLY: N_EMIS_PM ! 20130319 diagnostic
+#endif
          IMPLICIT NONE
 
 C Includes:
-
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments:
-
          INTEGER, INTENT( IN ) :: JDATE, JTIME  ! date (YYYYDDD), time (HHMMSS)
          INTEGER, INTENT( IN ) :: TSTEP( 3 )    ! time step vector (HHMMSS)
          REAL,    INTENT( IN ) :: CONVPA        ! conversion factor to pressure in Pascals
          REAL,    INTENT( IN ) :: RDX3F( NLAYS )             ! reciprocal layer thickness
          REAL,    INTENT( IN ) :: RRHOJ( NCOLS,NROWS,NLAYS ) ! reciprocal density X Jacobian
          REAL,    INTENT( IN ) :: RJACM( NCOLS,NROWS,NLAYS ) ! reciprocal mid-layer Jacobian
+#ifdef isam
+         REAL, POINTER :: ISAMEM( :,:,:,:,: ) ! array of tagged emis
+         REAL, POINTER :: MFRC_P( :,:,: ) ! fraction of tagging regions
+#endif
 
 C Local Variables:
-
          REAL             CNVTC         ! combined conversion factor
          REAL             CNVTI         ! intermediate combined conv. factor
          REAL,    SAVE :: CNVTP         ! intermediate combined conv. factor
          REAL             DELT          ! interpolation factor
          INTEGER          C, R, L, N, S, V ! loop induction variables
+#ifdef isam
+         INTEGER          V2, V3 ! 20120725 index for non-nox gas emis factor
+         REAL             GASFAC ! 20120725 gas emis factor either from gas_emis or nr_emis lists
+#endif
 
          CHARACTER( 16 ) :: PNAME = 'GET_EMIS'
          CHARACTER( 120 ) :: XMSG = ' '
@@ -360,6 +385,42 @@ C Local Variables:
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
          INTEGER          GXOFF, GYOFF         ! global origin offset from file
          INTEGER, SAVE :: STARTCOL, ENDCOL, STARTROW, ENDROW
+#ifdef isam
+         LOGICAL LAERO, LSULF, LTEST
+         INTEGER JSPCTAG, IBGN, ITAG, JSPC, JV
+C NOX related....
+         CHARACTER( 16 )  NAM_NOX
+         INTEGER JNOX, INOX
+C SA PM emis in IJK....
+         REAL, ALLOCATABLE :: ISAMEM_AE( :,:,:,:,: )
+Ckrt......IO-status just for ENVYN
+         INTEGER IOS
+Ckrt...0922...Diagnostic
+         REAL    SAEM_ICON, TTL_VDE_GRD, TTL_PME_GRD
+         REAL    TTL_VDE_PT, TTL_PME_PT, TTL_EM_AE
+CDc08...Diagnostic
+         REAL    SAEM_AE_TTL( NSPC_SA )
+         INTEGER N_SA2EMAE
+CDc09...Diagnostic
+         REAL    TTL_SULF_GRD
+C....Diagnostic 20130319
+         REAL    SA_CHK
+C....Remedy 20130320
+!        INTEGER LENSPCNAME
+         INTEGER LS
+C VOC related 20130311
+         INTEGER JVE  ! matching emission factors of the 15 VOC's
+
+         INTERFACE
+            SUBROUTINE test_sulf( JDATE, JTIME, TSTEP, NSTEPS, FILE_NAME )
+               IMPLICIT NONE
+               INTEGER   :: JDATE, JTIME
+               INTEGER   :: TSTEP( 3 )
+               INTEGER   :: NSTEPS
+               CHARACTER( 16 ) :: FILE_NAME
+            END SUBROUTINE test_sulf
+         END INTERFACE
+#endif
 
 C-----------------------------------------------------------------------
 
@@ -371,7 +432,16 @@ C-----------------------------------------------------------------------
 C Get domain decomp info from the emissions file
             CALL SUBHFILE ( EMIS_1, GXOFF, GYOFF, STARTCOL, ENDCOL, STARTROW, ENDROW )
             CNVTP = CONVPA * CNVTE
-         END IF
+         END IF   ! firstime
+
+#ifdef isam
+Ckrt allocate or reinitialize isamem_ae....
+         IF ( .NOT. ALLOCATED( ISAMEM_AE ) )
+     &   ALLOCATE( ISAMEM_AE( MY_NCOLS, MY_NROWS, NLAYS, NSPC_SA, NTAG_SA ) )
+         ISAMEM_AE = 0.0
+Ckrt...Keep in mind that ISAMEM should also be reinitialized here...
+         ISAMEM = 0.0
+#endif
 
 C read & interpolate emissions (create VDEMIS in the species class order)
 
@@ -410,6 +480,62 @@ C  loads."
 #endif
 
          END DO   ! V
+
+#ifdef isam
+Ckrt....Read **Gridded** SA gas and non-reactants emission data
+         CALL SA_GRD_EGAS ( JDATE, JTIME, TSTEP )
+
+Ckrt.....Cater for aggregated VOC`s  20130311
+         V = INDEX1( 'VOC', NSPC_SA, SPC_NAME(:,OTHRTAG) )
+         IF ( V .GT. 0 ) THEN
+            DO ITAG = 1, NTAG_SA - 3
+               DO L = 1, EMLYRS
+               DO R = 1, MY_NROWS
+               DO C = 1, MY_NCOLS
+               DO JV = 1, N_EVOC
+               SA_VDEMIS_GRD( C,R,L,V,ITAG ) = SA_VDEMIS_GRD( C,R,L,V,ITAG )
+     &           + VOC_E_GRD( C,R,L,JV,ITAG ) * NCARBON( JV )
+               END DO ! JV
+               END DO ! C
+               END DO ! R
+               END DO ! L
+            END DO ! itag
+         END IF ! v > 0
+
+Ckrt...Convert gridded SA gas emission into ppmV/sec
+         DO L = 1, EMLYRS
+           DO R = 1, MY_NROWS
+             DO C = 1, MY_NCOLS
+               CNVTC = CNVTP * RDX3F( L ) * RRHOJ( C,R,L )
+               DO JSPC = 1, NSPC_SA
+                 DO ITAG = 1, NTAG_SA-3
+                   LS = LEN_TRIM( SPC_NAME( JSPC,ITAG ) )
+                   IF ( LS .GT. 0 .AND.
+     &                  SPC_NAME( JSPC,ITAG )( 1:LS-1 ) .NE. 'O3' .AND.
+     &                  SPC_NAME( JSPC,ITAG )( 1:LS )   .NE. 'SULF' .AND.
+     &                  SPC_NAME( JSPC,ITAG )( LS:LS )  .NE. 'I' .AND.
+     &                  SPC_NAME( JSPC,ITAG )( LS:LS )  .NE. 'J' ) THEN
+                     ISAMEM( C,R,L,JSPC,ITAG ) = ISAMEM( C,R,L,JSPC,ITAG )
+     &      + SA_VDEMIS_GRD( C,R,L,JSPC,ITAG ) * CNVTC * MFRC_P( C,R,ITAG )
+                   END IF ! excludes VOC, O3, SULF, I's and J's
+                 END DO ! itag
+               END DO ! jspc
+
+Ckrt Unit conversion for gridded SULF for PM sulate later...
+               V = INDEX1( 'SULF', N_GC_EMIS, GC_EMIS )
+               IF ( ANY( L_SFATE ) ) THEN
+                 DO ITAG = 1, NTAG_SA - 3
+                   SA_SULF_GRD( C,R,L,ITAG ) = SA_SULF_GRD( C,R,L,ITAG )
+     &               * MFRC_P( C,R,ITAG ) * CNVTC * GC_EMIS_FAC( V )
+                 END DO ! loop of tags for sulf
+               END IF ! v > 0 ?
+             END DO ! C
+           END DO ! R
+         END DO ! L
+
+Ckrt...Read Gridded SA PM emission data
+         CALL SA_GRD_E_PM ( JDATE, JTIME, TSTEP )
+#endif
 
 C beis
 
@@ -488,7 +614,58 @@ C accessed by GET_AERO_EMIS to be "speciated" and merged with the AE emissions.
                   END DO
                END DO
             END DO
-
+#ifdef isam
+Ckrt...update ISAMEM with inline point source gas emission, and convert to ppmV/s
+            DO L = 1, EMLAYS
+              DO R = 1, MY_NROWS
+                DO C = 1, MY_NCOLS
+                  CNVTC = CNVTP * RDX3F( L ) * RRHOJ( C,R,L )
+Ckrt Inline pt src gas....
+                  DO JSPC = 1, NSPC_SA
+                    DO ITAG = 1, NTAG_SA - 3
+                      LS = LEN_TRIM( SPC_NAME( JSPC,ITAG ) )
+                      IF ( LS .GT. 0 ) THEN
+                        IF ( SPC_NAME( JSPC,ITAG )( 1:LS ) .NE. 'VOC' .AND.
+     &                       SPC_NAME( JSPC,ITAG )( 1:LS-1 ) .NE. 'O3' .AND.
+     &                       SPC_NAME( JSPC,ITAG )( 1:LS ) .NE. 'SULF' .AND.
+     &                       SPC_NAME( JSPC,ITAG )( LS:LS ) .NE. 'I' .AND.
+     &                       SPC_NAME( JSPC,ITAG )( LS:LS ) .NE. 'J' ) THEN
+                          V = INDEX1( SPC_NAME( JSPC,ITAG )( 1:LS ), N_SPC_PTEM, STKEM_NAME )
+                          V2 = INDEX1( SPC_NAME( JSPC,ITAG )( 1:LS ), N_GC_EMIS, GC_EMIS )
+                          V3 = INDEX1( SPC_NAME( JSPC,ITAG )( 1:LS ), N_NR_EMIS, NR_EMIS )
+                          IF ( V .GT. 0 ) THEN
+                            IF ( V2 .GT. 0 ) GASFAC = GC_EMIS_FAC( V2 )
+                            IF ( V3 .GT. 0 .AND. V2 .LE. 0 ) GASFAC = NR_EMIS_FAC( V3 )
+                              ISAMEM( C,R,L,JSPC,ITAG ) =
+     &                        ISAMEM( C,R,L,JSPC,ITAG )
+     &                   + SA_VDEMIS_PT( C,R,L,V,ITAG )
+     &                          * MFRC_P( C,R,ITAG ) * CNVTC * GASFAC
+                          END IF !  v > 0, meaning that vnam exists
+                        ELSE IF ( SPC_NAME( JSPC,ITAG )( 1:LS ) .EQ.
+     &                            "VOC" ) THEN ! composite tracer such as VOC
+                          DO JV = 1, N_EVOC
+                            JVE = INDEX1( NAM_VOC( JV ), N_GC_EMIS, GC_EMIS )
+                            ISAMEM( C,R,L,JSPC,ITAG ) =
+     &                      ISAMEM( C,R,L,JSPC,ITAG )
+     &                    + VOC_E_PT( C,R,L,JV,ITAG ) * NCARBON( JV )
+     &                    * MFRC_P(C,R,ITAG) * CNVTC * GC_EMIS_FAC( JVE )
+                          END DO ! jv
+                        END IF ! spc_name excludes o3, IJ's, or includes voc
+                      END IF ! spc_name exists at jscp, itag
+                    END DO  ! loop ITAG
+                  END DO ! loop JSPC
+Ckrt Unit conversion of inline pt src SULF for PM sulfate later......
+                  V = INDEX1( 'SULF', N_GC_EMIS, GC_EMIS )
+                  IF ( ANY( L_SFATE ) ) THEN
+                    DO ITAG = 1, NTAG_SA - 3
+                      SA_SULF_PT( C,R,L,ITAG ) = SA_SULF_PT( C,R,L,ITAG )
+     &                  * MFRC_P( C,R,ITAG ) * CNVTC * GC_EMIS_FAC( V )
+                    END DO ! loop of tags for sulf
+                  END IF ! v > 0 ?
+               END DO ! columns
+             END DO ! rows
+           END DO ! layers
+#endif
          END IF
 
 C aerosol emissions - all units conversions done in GET_AERO_EMIS for aerosols
@@ -510,6 +687,75 @@ C GET_AERO_EMIS in f90 module AERO_EMIS
             END DO
 
          END IF
+
+#ifdef isam
+Ckrt SA_AERO_EMIS - units conversions, allocation to IJK modes are
+Ckrt   done here for tagged aerosols
+
+         LAERO = .FALSE.
+         JSPCTAG = 1
+         DO
+           IF ( JSPCTAG .GT. N_SPCTAG ) EXIT
+           IBGN = INDEX( VNAM_SPCTAG( JSPCTAG ), '_', .FALSE. ) - 1
+           IF ( VNAM_SPCTAG( JSPCTAG )( 1:1 ) .EQ. 'A' .AND.
+     &        ( VNAM_SPCTAG( JSPCTAG )( IBGN:IBGN ) .EQ. 'I' .OR.
+     &          VNAM_SPCTAG( JSPCTAG )( IBGN:IBGN ) .EQ. 'J') ) THEN
+             LAERO = .TRUE.
+             EXIT
+           END IF
+           JSPCTAG = JSPCTAG + 1
+         END DO ! any pm species will do
+
+         IF ( LAERO ) THEN
+Ckrt       print*,'Could CALL SA_AERO_EMIS here....'
+Ckrt...As long as sulfur is among list of tagging species,
+Ckrt.....turn on the SULF extraction.................
+           LSULF = .FALSE.
+           JSPCTAG = 1
+           XTR_SULF: DO
+             IF ( JSPCTAG .GT. N_SPCTAG ) EXIT
+             IBGN = INDEX( VNAM_SPCTAG( JSPCTAG ), '_', .FALSE. ) - 2
+             IF ( VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .EQ. 'ASO4' ) THEN
+               LSULF = .TRUE.
+               EXIT
+             END IF ! begin with aso4 ?
+             JSPCTAG = JSPCTAG + 1
+           END DO XTR_SULF
+
+Ckrt...sa_pmemis_pt absorbed into sa_pmemis_grd....
+           IF ( PT3DEMIS ) THEN
+             DO V = 1, N_SPC_PTPM ! 20120719
+               S = PTPM_MAP(V)    ! 20120719
+               SA_PMEMIS_GRD( :,:,:,S,: ) = SA_PMEMIS_GRD( :,:,:,S,: )
+     &                                    + SA_PMEMIS_PT( :,:,:,V,: )
+             END DO
+             IF ( ALLOCATED( SA_PMEMIS_PT ) ) DEALLOCATE( SA_PMEMIS_PT )
+             IF ( LSULF ) THEN
+               SA_SULF_GRD = SA_SULF_GRD + SA_SULF_PT
+               IF ( ALLOCATED( SA_SULF_PT ) ) DEALLOCATE( SA_SULF_PT )
+             END IF
+           END IF ! pt3demis
+
+           CALL SA_AERO_EMIS ( JDATE, JTIME, TSTEP, RJACM, ISAMEM_AE )
+
+Ckrt...update isamem with the converted PM isamem_ae
+           DO JSPCTAG = 1, N_SPCTAG
+             DO L = 1, EMLAYS
+               DO R = 1, MY_NROWS
+                 DO C = 1, MY_NCOLS
+                   IF ( T_SPCTAG( JSPCTAG ) .LE. NTAG_SA - 3 ) THEN
+                     ISAMEM( C,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) ) =
+     &               ISAMEM( C,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) )
+     &          + ISAMEM_AE( C,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) )
+     &             * MFRC_P( C,R,T_SPCTAG( JSPCTAG ) )
+                   END IF ! cannot have any of bcontag, othrtag and icontag
+                 END DO ! C
+               END DO ! R
+             END DO ! L
+           END DO ! jpsctag
+
+         END IF  ! laero ?
+#endif
 
 C non-reactive gases (conversion to ppmv/s) VDEMIS in this order from RDEMIS
 

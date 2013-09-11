@@ -52,11 +52,16 @@ C   21 Jun 10 J.Young: convert for Namelist redesign
 C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                      removed deprecated TRIMLEN
 C   08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
+C   19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE GRID_CONF            ! horizontal & vertical domain specifications
       USE CGRID_SPCS           ! CGRID mechanism species
       USE UTILIO_DEFN
+#ifdef isam
+      USE SA_DEFN              ! 20120927 for bcontag
+      USE OZVOC_DEFN           ! 20120927 to identify voc species in each source tag
+#endif
 
       IMPLICIT NONE
  
@@ -118,6 +123,10 @@ C Local variables:
 
       INTEGER   GXOFF, GYOFF      ! global origin offset from file
       LOGICAL, SAVE :: WINDOW = .FALSE. ! posit same file and global
+
+#ifdef isam
+      INTEGER   JV          ! 20120927
+#endif
                                         ! processing domain
 C for INTERPX
       INTEGER, SAVE :: STRTCOL,   ENDCOL,   STRTROW,   ENDROW
@@ -215,6 +224,15 @@ C create advected species map to bc's
             END IF
 
          END IF
+
+#ifdef isam
+         IF ( ANY( L_OZONE ) ) THEN  ! bug fix 20120420
+            DO JV = 1, N_EVOC
+               VAR = INDEX1( NAM_VOC( JV ), N_SPC_ADV, BCNAME )
+               IF ( VAR .GT. 0 ) WCH_VOC( JV, BCONTAG ) = 1.0
+            END DO
+         END IF ! ozone tracking at all?
+#endif
 
       END IF                    ! if FIRSTIME
 

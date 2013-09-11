@@ -45,23 +45,25 @@ C-----------------------------------------------------------------------
       INTEGER, SAVE :: N_SPC_PTEM = 0   ! merged no. of unique species for non_PM
 
 C Species names from input file used for point source non-PM emissions mapping
-      INTEGER,          ALLOCATABLE, SAVE :: PTEM_MAP( : )
-      INTEGER,          ALLOCATABLE, SAVE :: SPC_PTEM_MAP( : )
-      CHARACTER( 16 ),  ALLOCATABLE, SAVE :: STKEM_NAME( : ) ! diagnostic file
+      INTEGER,         ALLOCATABLE, SAVE :: PTEM_MAP( : )
+      INTEGER,         ALLOCATABLE, SAVE :: SPC_PTEM_MAP( : )
+      CHARACTER( 16 ), ALLOCATABLE, SAVE :: STKEM_NAME( : ) ! diagnostic file
 
 C Species names from input file used for point source PM emissions mapping
-      INTEGER,          ALLOCATABLE, SAVE :: PTPM_MAP( : )
-      CHARACTER( 16 ),  ALLOCATABLE, SAVE :: STKPM_NAME( : ) ! diagnostic file
+      INTEGER,         ALLOCATABLE, SAVE :: PTPM_MAP( : )
+      CHARACTER( 16 ), ALLOCATABLE, SAVE :: STKPM_NAME( : ) ! diagnostic file
 
 C Mapping for point source non-PM emissions (maps only GC, NR and TR)
-      TYPE ( IARRY1 ),  ALLOCATABLE, SAVE :: STKEM_MAP( : ) ! STKEM index
-      TYPE ( IARRY1 ),  ALLOCATABLE, SAVE :: GAS_MAP  ( : ) ! VDEMIS_PT index
+      TYPE ( IARRY1 ), ALLOCATABLE, SAVE :: STKEM_MAP( : ) ! STKEM index
+      TYPE ( CARRY1 ), ALLOCATABLE, SAVE :: STKEM_VAR( : ) ! just for recording on log
+      TYPE ( IARRY1 ), ALLOCATABLE, SAVE :: GAS_MAP  ( : ) ! VDEMIS_PT index
 
       INTEGER, SAVE :: N_SPC_PTPM = 0   ! merged no. of unique species for PM
 
 C Mapping for point source PM emissions (maps pt. src. PM spcs to PMEMIS_PT)
-      TYPE ( IARRY1 ),  ALLOCATABLE, SAVE :: STKPM_MAP( : ) ! STKPM index
-      TYPE ( IARRY1 ),  ALLOCATABLE, SAVE :: PM_MAP   ( : ) ! PMEMIS_PT index
+      TYPE ( IARRY1 ), ALLOCATABLE, SAVE :: STKPM_MAP( : ) ! STKPM index
+      TYPE ( CARRY1 ), ALLOCATABLE, SAVE :: STKPM_VAR( : ) ! just for recording on log
+      TYPE ( IARRY1 ), ALLOCATABLE, SAVE :: PM_MAP   ( : ) ! PMEMIS_PT index
 
 C-----------------------------------------------------------------------
 
@@ -90,9 +92,6 @@ C-----------------------------------------------------------------------
          TYPE ( STRNDX ), ALLOCATABLE :: V( : )
          TYPE ( STRNDX ), ALLOCATABLE :: VC( : )
          TYPE ( STRNDX )              :: TV
-
-         TYPE ( CARRY1 ), ALLOCATABLE :: STKEM_VAR( : )   ! just to record on log
-         TYPE ( CARRY1 ), ALLOCATABLE :: STKPM_VAR( : )   ! just to record on log
 
          INTEGER          :: N_GAS_EMIS
 

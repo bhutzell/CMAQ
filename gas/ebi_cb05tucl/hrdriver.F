@@ -25,7 +25,11 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef isam
+       SUBROUTINE CHEM( CGRID, JDATE, JTIME, TSTEP, ISAM, CBFOR, ISAMB4 )
+#else
        SUBROUTINE CHEM( CGRID, JDATE, JTIME, TSTEP )
+#endif
 
 C-----------------------------------------------------------------------
 C  Function: Driver subroutine for Euler Backward Iterative solver
@@ -50,13 +54,22 @@ C                       Hertel et al.
 C  21 Jun 10 J.Young: convert for Namelist redesign
 C  29 Mar 11 S.Roselle: Replaced I/O API include files with UTILIO_DEFN
 C  11 May 11 D.Wong: incorporated twoway model implementation
+C  19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE HGRD_DEFN             ! horizontal domain specifications
       USE VGRD_DEFN             ! vertical layer specifications
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
+#ifdef isam
+      USE SA_IRR_DEFN           ! 20120905 inherits hrdata
+#else
       USE HRDATA
+#endif
+#ifdef isam
+      USE SA_DEFN            ! 20130523
+      USE OZVOC_DEFN         ! 20130606
+#endif
 
       IMPLICIT NONE
 
@@ -72,6 +85,11 @@ C..Arguments:
       INTEGER JDATE           ! Current date (YYYYDDD)
       INTEGER JTIME           ! Current time (HHMMSS)
       INTEGER TSTEP( 3 )      ! Time step vector (HHMMSS)
+#ifdef isam
+      REAL, POINTER :: ISAM( :,:,:,:,: ) ! 20130523
+      REAL, POINTER :: CBFOR( :,:,:,: ) ! 20130606
+      REAL, POINTER :: ISAMB4( :,:,:,:,: ) ! 20130606
+#endif
 
 C..Parameters:
       REAL, PARAMETER :: PA2ATM = 1.0 / STDATMPA    ! Pascal to atm conv fac
@@ -125,6 +143,35 @@ C..Scratch Local Variables:
       INTEGER     GXOFF, GYOFF            ! global origin offset from file
 C for INTERPX
       INTEGER, SAVE :: STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3
+
+!Below inserted 20130523
+#ifdef isam
+      INTEGER  JSPC, KTAG
+      ! nitrogen indices in isam
+      INTEGER, SAVE :: JNO, JNO2, JNO3, JHONO, JN2O5
+      INTEGER, SAVE :: JPNA, JPAN, JPANX, JHNO3, JNTR
+      ! tag class sulfate 20130529
+      INTEGER, SAVE :: JSO2, JSULF, JSRXN
+      ! tag class CO  20130529
+      INTEGER, SAVE :: JCO
+      ! vocs for tag class ozone  20130606
+      INTEGER, SAVE :: JVOC
+      REAL             TTL_VOC     !lump together weighted bulk voc spc
+      REAL             SUMUP_VOC   !lump together weighted voc's before assigning it back to each tag 20130626
+      ! 1-ozone 20130627
+      INTEGER, SAVE :: JO3A
+      ! variables borrowed from DDM
+      INTEGER I, J, RXN
+      REAL( 8 ) :: SRK( NRXNS )
+      REAL      :: A( N_GC_SPC, N_GC_SPC )
+      REAL      :: A1( N_GC_SPC, N_GC_SPC )
+      REAL      :: PDT( N_GC_SPC, N_GC_SPC )
+      REAL      :: PRD( N_GC_SPC )
+      REAL      :: SOLD( N_GC_SPC )
+      REAL      :: SUUM
+      INTEGER   :: INFO
+      INTEGER   :: IPVT( N_GC_SPC )
+#endif
 
 C-----------------------------------------------------------------------
 
@@ -195,6 +242,33 @@ c..If emissions processing requested stop
 
          CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
      &                   STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )
+
+#ifdef isam
+         CALL SA_IRR_INIT   ! re-introduced 20130606
+         ALLOCATE( YCDDM( N_GC_SPC ) )
+
+        ! krt Identify species index in ISAM array: tag class nitrate
+        JNO   = INDEX1( 'NO' ,  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JNO2  = INDEX1( 'NO2',  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JNO3  = INDEX1( 'NO3',  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JHONO = INDEX1( 'HONO', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JN2O5 = INDEX1( 'N2O5', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JPNA  = INDEX1( 'PNA',  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JPAN  = INDEX1( 'PAN',  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JPANX = INDEX1( 'PANX', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JHNO3 = INDEX1( 'HNO3', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JNTR  = INDEX1( 'NTR',  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        ! tag class sulfate
+        JSO2  = INDEX1( 'SO2',  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JSULF = INDEX1( 'SULF', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JSRXN = INDEX1( 'SULRXN', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        ! tag class CO
+        JCO   = INDEX1( 'CO' ,  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        ! vocs for tag class ozone
+        JVOC  = INDEX1( 'VOC' ,  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        ! 1-ozone 20130627
+        JO3A  = INDEX1( 'O3A', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+#endif
 
          LFIRST = .FALSE.
 
@@ -307,9 +381,120 @@ c..Update concentration array
                   CGRID( C, R, L, S ) = YC( S )
                END DO
 
-            END DO
-         END DO
-      END DO
+#ifdef isam
+               DO RXN = 1, NRXNS
+                 SRK( RXN ) = RKI( RXN )
+               ENDDO
+
+               ! Construct Jacobian matrix
+               CALL JAC ( YCDDM, PDT, SRK )
+
+               ! Construct matrices (Id - dt/2*Jac) and (Id + dt/2*Jac)
+               DO J = 1, N_GC_SPC
+               DO I = 1, N_GC_SPC
+                  A( I,J ) = 0.0
+                  A1( I,J ) = 0.0
+                  A( I,J ) = -0.5 * CHEMSTEP * PDT( I, J )
+                  IF ( I .EQ. J ) A( I,J ) = 1.0 + A( I,J )
+                  A1( I,J ) = 0.5 * CHEMSTEP * PDT( I,J )
+                  IF ( I .EQ. J ) A1( I,J ) = 1.0 + A1( I,J )
+               END DO
+               END DO
+
+               ! Factorize A = inv(Id-dt/2*Jac)
+               CALL SGEFA( A, N_GC_SPC, N_GC_SPC, IPVT, INFO )
+
+               ! derive voc spc to weighted total voc ratio  20130606
+               IF ( JVOC .GT. 0 ) THEN
+                  TTL_VOC = 1.E-30
+                  DO E = 1, N_EVOC
+                     TTL_VOC = TTL_VOC
+     &                       + CBFOR( C,R,L, SPC_INDEX( JVOC, E+1 ) ) * NCARBON( E )
+                  END DO
+               END IF
+
+               DO 495 KTAG = 1, NTAG_SA
+                  SOLD = 0.0
+                  PRD = 0.0
+                  DO JSPC = 1, NSPC_SA
+                     IF ( JSPC .EQ. JNO .OR. JSPC .EQ. JNO2 .OR.
+     &                    JSPC .EQ. JNO3 .OR. JSPC .EQ. JHONO .OR. JSPC .EQ. JN2O5 .OR.
+     &                    JSPC .EQ. JPNA .OR. JSPC .EQ. JPAN .OR. JSPC .EQ. JPANX .OR.
+     &                    JSPC .EQ. JHNO3 .OR. JSPC .EQ. JNTR ) THEN
+                        ! Populates species from nitrate tag class
+                        SOLD( SPC_INDEX( JSPC, 2 ) ) = ISAMB4( C,R,L,JSPC,KTAG )
+                     ELSE IF ( JSPC .EQ. JVOC ) THEN
+                        ! Populates VOC species from ozone tag class
+                        IF ( TTL_VOC .GT. 1.E-20 ) THEN
+                           DO E = 1, N_EVOC
+                              SOLD( SPC_INDEX( JSPC, E+1 ) ) =
+     &                        ISAMB4( C,R,L,JSPC,KTAG )
+     &                      * CBFOR( C,R,L, SPC_INDEX( JSPC, E+1 ) ) / TTL_VOC
+                           END DO ! E
+                        ELSE
+                           DO E = 1, N_EVOC
+                              SOLD( SPC_INDEX( JSPC, E+1 ) ) =
+     &                        CBFOR( C,R,L, SPC_INDEX( JSPC, E+1 ) ) / REAL( NTAG_SA )
+                           END DO !E
+                        END IF ! ttl_voc > 1e-20 ?
+                     ELSE IF ( JSPC .EQ. JO3A ) THEN
+                     ! For 1-ozone
+                        SOLD( SPC_INDEX( JSPC, 2 ) ) = ISAMB4( C,R,L,JSPC,KTAG )
+                     ELSE IF ( JSPC .EQ. JCO ) THEN
+                     ! Populates CO tag class
+                        SOLD( SPC_INDEX( JSPC, 2 ) ) = ISAMB4( C,R,L,JSPC,KTAG )
+                     ELSE IF ( JSPC .EQ. JSO2 .OR. JSPC .EQ. JSULF .OR. JSPC .EQ. JSRXN ) THEN
+                     ! Populates species from sulfate tag class
+                        SOLD( SPC_INDEX( JSPC, 2 ) ) = ISAMB4( C,R,L,JSPC,KTAG )
+                     END IF ! jspc from either tag classes
+                  END DO ! loop jspc
+
+                  ! Evaluate prd = A1*sold = (Id+dt/2*Jac)*sold
+                  DO S = 1, N_GC_SPC
+                     SUUM = 0.0
+                     DO J = 1, N_GC_SPC
+                        SUUM = SUUM + A1( S, J ) * SOLD( J )
+                     END DO
+                     PRD( S ) = SUUM
+                  END DO
+
+                  ! Evaluate inv(A)*prd = inv(Id-dt/2*Jac) * prd
+                  ! Store results in prd
+                  CALL SGESL( A, N_GC_SPC, N_GC_SPC, IPVT, PRD, 0 )
+
+                  DO JSPC = 1, NSPC_SA
+                     IF ( JSPC .EQ. JNO .OR. JSPC .EQ. JNO2 .OR.
+     &                    JSPC .EQ. JNO3 .OR. JSPC .EQ. JHONO .OR. JSPC .EQ. JN2O5 .OR.
+     &                    JSPC .EQ. JPNA .OR. JSPC .EQ. JPAN .OR. JSPC .EQ. JPANX .OR.
+     &                    JSPC .EQ. JHNO3 .OR. JSPC .EQ. JNTR ) THEN
+                     ! Updates species from nitrate tag class
+                     ISAM( C,R,L,JSPC,KTAG ) = MAX( 0.0, PRD(SPC_INDEX(JSPC,2) ) )
+                     ELSE IF ( JSPC .EQ. JVOC ) THEN
+                        !Updates VOC species from ozone tag class
+                        SUMUP_VOC = 0.0
+                        DO E = 1, N_EVOC
+                           SUMUP_VOC = SUMUP_VOC
+     &                               + MAX( 0.0, PRD( SPC_INDEX( JSPC,E+1 ) ) ) * NCARBON( E )
+                        END DO
+                        ISAM( C,R,L,JSPC,KTAG ) = SUMUP_VOC
+                     ELSE IF ( JSPC .EQ. JO3A ) THEN
+                        ! Updates 1-ozone
+                        ISAM( C,R,L,JSPC,KTAG ) = MAX( 0.0, PRD( SPC_INDEX( JSPC,2 ) ) )
+                     ELSE IF ( JSPC .EQ. JCO ) THEN
+                        ! Updates CO tag class
+                        ISAM( C,R,L,JSPC,KTAG ) = MAX( 0.0, PRD( SPC_INDEX( JSPC,2 ) ) )
+                     ELSE IF ( JSPC .EQ. JSO2 .OR. JSPC .EQ. JSULF .OR. JSPC .EQ. JSRXN ) THEN
+                        ! Updates species from sulfate tag class
+                        ISAM( C,R,L,JSPC,KTAG ) = MAX( 0.0, PRD( SPC_INDEX( JSPC,2 ) ) )
+                     END IF ! jspc is from either tag classes
+                  END DO   ! jspc
+
+495            CONTINUE  ! ktag loop
+#endif
+
+            END DO   ! columns
+         END DO   ! rows
+      END DO   ! layers
 
 #ifdef hrstats
       AVGEBI = SUMEBI / FLOAT( NCOLS * NROWS * NLAYS )

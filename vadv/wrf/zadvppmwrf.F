@@ -25,7 +25,11 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef isam
+      SUBROUTINE ZADV ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
       SUBROUTINE ZADV ( CGRID, JDATE, JTIME, TSTEP )
+#endif
 
 C-----------------------------------------------------------------------
 C Function:
@@ -81,6 +85,7 @@ C    16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 C    11 May 11 D.Wong: incorporated twoway model implementation
 C    31 Jul 12 J.Bash: Changed the zadv dt for cases where cc > 1 to be 
 C                      more stable for conditions when cc > 10
+C    19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -89,8 +94,8 @@ C-----------------------------------------------------------------------
       USE SUBST_MODULES              ! stenex
 !     USE SUBST_GLOBAL_SUM_MODULE    ! stenex
       USE UTILIO_DEFN
-#ifdef snl_timing
-      USE TIMING
+#ifdef isam
+      USE SA_DEFN               ! 20120821
 #endif
 
       IMPLICIT NONE
@@ -109,6 +114,9 @@ C Arguments:
                                 ! TSTEP(2) = sciproc sync. step (chem)
                                 ! TSTEP(3) = twoway model time step w.r.t. wrf time
                                 !            step and wrf/cmaq call frequency
+#ifdef isam
+      REAL, POINTER :: ISAM( :,:,:,:,: )
+#endif
 
 C Parameters:
 
@@ -166,9 +174,18 @@ C for INTERPX
       INTEGER       ALLOCSTAT
 
       INTEGER, SAVE :: LOGDEV
+#ifdef isam
+      CHARACTER( 16 ), ALLOCATABLE, SAVE :: NAME_ADV( : )
+      REAL    :: SA_CON( NLAYS,N_SPCTAG )
+#endif
 
       INTERFACE
+#ifdef isam
+         SUBROUTINE VPPM ( NI, DT, DS, FLX, VEL, CON, SA_CON )
+         USE SA_DEFN
+#else
          SUBROUTINE VPPM ( NI, DT, DS, FLX, VEL, CON )
+#endif
             IMPLICIT NONE
             INTEGER, INTENT( IN )    :: NI
             REAL,    INTENT( IN )    :: DT, DS( NI )
@@ -176,6 +193,9 @@ C for INTERPX
 !           REAL,    INTENT( IN )    :: VEL( NI+1 )
             REAL,    INTENT( INOUT ) :: VEL( NI+1 )
             REAL,    INTENT( INOUT ) :: CON( :,: )
+#ifdef isam
+            REAL,    INTENT( INOUT ) :: SA_CON( NI,N_SPCTAG ) ! KRT
+#endif
          END SUBROUTINE VPPM
       END INTERFACE
 
@@ -200,6 +220,14 @@ C-----------------------------------------------------------------------
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
+#ifdef isam
+         ALLOCATE ( NAME_ADV( N_SPC_ADV ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating NAME_ADV'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+#endif
+
 C Get default file header attibutes from MET_CRO_3D (assumes file already open)
 
 C Get dx3 from the GRID_CONF(VGRD) F90 module
@@ -222,18 +250,30 @@ C Create global map to CGRID
          DO VAR = 1, N_GC_TRNS
             SPC = SPC + 1
             ADV_MAP( SPC ) = GC_STRT - 1 + GC_TRNS_MAP( VAR )
+#ifdef isam
+            NAME_ADV( SPC ) = GC_TRNS( VAR )  ! KRT
+#endif
          END DO
          DO VAR = 1, N_AE_TRNS
             SPC = SPC + 1
             ADV_MAP( SPC ) = AE_STRT - 1 + AE_TRNS_MAP( VAR )
+#ifdef isam
+            NAME_ADV( SPC ) = AE_TRNS( VAR )  ! KRT
+#endif
          END DO
          DO VAR = 1, N_NR_TRNS
             SPC = SPC + 1
             ADV_MAP( SPC ) = NR_STRT - 1 + NR_TRNS_MAP( VAR )
+#ifdef isam
+            NAME_ADV( SPC ) = NR_TRNS( VAR )  ! KRT
+#endif
          END DO
          DO VAR = 1, N_TR_ADV
             SPC = SPC + 1
             ADV_MAP( SPC ) = TR_STRT - 1 + TR_ADV_MAP( VAR )
+#ifdef isam
+            NAME_ADV( SPC ) = TR_ADV( VAR )  ! KRT
+#endif
          END DO
  
          ADV_MAP( N_SPC_ADV ) = ASPC
@@ -253,33 +293,21 @@ C No boundary conditions are needed because VEL(1) = VEL(NLAYS+1) = 0
 C Get rho*J at start of sync step
       MDATE = JDATE
       MTIME = JTIME
-#ifdef snl_timing
-      call start_timing( zadv_int, read_int, 1 )
-#endif
       IF ( .NOT. INTERPX( MET_CRO_3D, 'DENSA_J', PNAME,
      &           STRTCOLMC3,ENDCOLMC3, STRTROWMC3,ENDROWMC3, 1,NLAYS,
      &           MDATE, MTIME, RHOJM1 ) ) THEN
          XMSG = 'Could not read DENSA_J from ' // MET_CRO_3D
          CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
       END IF
-#ifdef snl_timing
-      call stop_timing( zadv_int, read_int )
-#endif
 
 C Get rho*J at end of sync step
       CALL NEXTIME( MDATE, MTIME, TSTEP( 2 ) )
-#ifdef snl_timing
-      call start_timing( zadv_int, read_int, 1 )
-#endif
       IF ( .NOT. INTERPX( MET_CRO_3D, 'DENSA_J', PNAME,
      &           STRTCOLMC3,ENDCOLMC3, STRTROWMC3,ENDROWMC3, 1,NLAYS,
      &           MDATE, MTIME, RHOJM2 ) ) THEN
          XMSG = 'Could not read DENSA_J from ' // MET_CRO_3D
          CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
       END IF
-#ifdef snl_timing
-      call stop_timing( zadv_int, read_int )
-#endif
 
 C Get the contravariant x1 velocity component
 
@@ -330,6 +358,15 @@ C Get the contravariant x1 velocity component
 !              if ( lvl .eq. 15 ) write( logdev,* ) ' DSDT=', dsdt
 !    &                                              ' DIVV=', divv( lvl )
             END DO
+
+#ifdef isam
+Ckrt...import tssa array into sa_con
+            DO SPC = 1, N_SPCTAG
+               DO LVL = 1, NLAYS
+                  SA_CON( LVL,SPC ) = ISAM( COL,ROW,LVL,S_SPCTAG( SPC ),T_SPCTAG( SPC ) )
+               END DO
+            END DO
+#endif
                         
 111         CONTINUE   ! iteration loop if CC > 1
 
@@ -402,7 +439,11 @@ C sub-steps.
 
                DTNEW = MAX( DTNEW, 1.0 )       
 
+#ifdef isam
+               CALL VPPM ( NLAYS, DTNEW, DS, FLX, VEL, CON1, SA_CON )
+#else
                CALL VPPM ( NLAYS, DTNEW, DS, FLX, VEL, CON1 )
+#endif
                DELT = DELT - DTNEW
 
                ITER = ITER + 1
@@ -430,13 +471,26 @@ C sub-steps.
 
             END IF
 
+#ifdef isam
+            CALL VPPM ( NLAYS, DELT, DS, FLX, VEL, CON1, SA_CON )
+#else
             CALL VPPM ( NLAYS, DELT, DS, FLX, VEL, CON1 )
+#endif
             DO SPC = 1, N_SPC_ADV
                A2C = ADV_MAP( SPC )
                DO LVL = 1, NLAYS
                   CGRID( COL,ROW,LVL,A2C ) = CON1( LVL,SPC )
                END DO
             END DO
+
+#ifdef isam
+Ckrt...update ISAM with SA_CON....20120821
+            DO SPC = 1, N_SPCTAG
+               DO LVL = 1, NLAYS
+                  ISAM( COL,ROW,LVL,S_SPCTAG( SPC ),T_SPCTAG( SPC ) ) = SA_CON( LVL,SPC )
+               END DO
+            END DO
+#endif
 
             DO LVL = 1, NLAYS
                WY( LVL,COL,ROW ) = VEL( LVL+1 )

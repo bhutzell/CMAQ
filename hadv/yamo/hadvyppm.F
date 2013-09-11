@@ -25,7 +25,11 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef isam
+      SUBROUTINE HADV ( CGRID, JDATE, JTIME, TSTEP, ASTEP, ISAM )
+#else
       SUBROUTINE HADV ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+#endif
 
 C-----------------------------------------------------------------------
 C Function:
@@ -50,7 +54,7 @@ C                            them as declared in X_YAMO and Y_YAMO
 C   21 Jun 10 J.Young: convert for Namelist redesign
 C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 C   11 May 11 D.Wong: incorporated twoway model implementation
-      
+C   19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -60,6 +64,10 @@ C-----------------------------------------------------------------------
       USE SUBST_MODULES         ! stenex
 !     USE SUBST_COMM_MODULE     ! stenex
 !     USE SUBST_UTIL_MODULE     ! stenex
+
+#ifdef isam
+      USE SA_DEFN               ! 20120816
+#endif
 
       IMPLICIT NONE
       
@@ -80,6 +88,9 @@ C Arguments:
                                 !            step and wrf/cmaq call frequency
 
       INTEGER     ASTEP( : )    ! layer advection time step
+#ifdef isam
+      REAL, POINTER :: ISAM( :,:,:,:,: )
+#endif
 
 C External Functions: None
       
@@ -128,15 +139,26 @@ C Required interface for allocatable array dummy arguments
             INTEGER, INTENT( IN )  :: FDATE, FTIME, TSTEP, LVL
             REAL,    INTENT( OUT ) :: BCON( :,: )
          END SUBROUTINE RDBCON
+#ifdef isam
+         SUBROUTINE X_PPM ( CGRID, FDATE, FTIME, TSTEP, LVL, BCON, ISAM )
+#else
          SUBROUTINE X_PPM ( CGRID, FDATE, FTIME, TSTEP, LVL, BCON )
+#endif
             USE HGRD_DEFN
             IMPLICIT NONE
             REAL, POINTER          :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )  :: FDATE, FTIME, TSTEP, LVL
 !           REAL,    INTENT( IN )  :: BCON( NBNDY,* )
             REAL,    INTENT( IN )  :: BCON( :,: )
+#ifdef isam
+            REAL, POINTER          :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE X_PPM
+#ifdef isam
+         SUBROUTINE X_YAMO ( CGRID, FDATE, FTIME, TSTEP, LVL, BCON, MTRHOJ, ISAM )
+#else
          SUBROUTINE X_YAMO ( CGRID, FDATE, FTIME, TSTEP, LVL, BCON, MTRHOJ )
+#endif
             USE HGRD_DEFN
             IMPLICIT NONE
             REAL, POINTER          :: CGRID( :,:,:,: )
@@ -145,16 +167,30 @@ C Required interface for allocatable array dummy arguments
             REAL,    INTENT( IN )  :: BCON( :,: )
             REAL,    INTENT( IN )  :: MTRHOJ( 0:,1: )
 !           REAL,    INTENT( IN )  :: MTRHOJ( :,: )
+#ifdef isam
+            REAL, POINTER          :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE X_YAMO
+#ifdef isam
+         SUBROUTINE Y_PPM ( CGRID, FDATE, FTIME, TSTEP, LVL, BCON, ISAM )
+#else
          SUBROUTINE Y_PPM ( CGRID, FDATE, FTIME, TSTEP, LVL, BCON )
+#endif
             USE HGRD_DEFN
             IMPLICIT NONE
             REAL, POINTER          :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )  :: FDATE, FTIME, TSTEP, LVL
 !           REAL,    INTENT( IN )  :: BCON( NBNDY,: )
             REAL,    INTENT( IN )  :: BCON( :,: )
+#ifdef isam
+            REAL, POINTER          :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE Y_PPM
+#ifdef isam
+         SUBROUTINE Y_YAMO ( CGRID, FDATE, FTIME, TSTEP, LVL, BCON, MTRHOJ, ISAM )
+#else
          SUBROUTINE Y_YAMO ( CGRID, FDATE, FTIME, TSTEP, LVL, BCON, MTRHOJ )
+#endif
             USE HGRD_DEFN
             IMPLICIT NONE
             REAL, POINTER          :: CGRID( :,:,:,: )
@@ -163,6 +199,9 @@ C Required interface for allocatable array dummy arguments
             REAL,    INTENT( IN )  :: BCON( :,: )
             REAL,    INTENT( IN )  :: MTRHOJ( 1:,0: )
 !           REAL,    INTENT( IN )  :: MTRHOJ( :,: )
+#ifdef isam
+            REAL, POINTER          :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE Y_YAMO
 !        SUBROUTINE LCKSUMMER ( PNAME, CGRID, JDATE, JTIME, LVL )
 !           IMPLICIT NONE
@@ -227,10 +266,18 @@ C Get CGRID offsets
 
 !     write( logdev,* ) ' x_ppm/y_yamo - lvl, fdate, ftime: ', lvl, fdate, ftime
 
+#ifdef isam
+            CALL X_PPM ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON, ISAM )
+#else
             CALL X_PPM ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON )
+#endif
 !           CALL LCKSUMMER ( 'X_PPM', CGRID, FDATE, FTIME, LVL )
 
+#ifdef isam
+            CALL Y_YAMO ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON, YTRHOJ, ISAM )
+#else
             CALL Y_YAMO ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON, YTRHOJ )
+#endif
 !           CALL LCKSUMMER ( 'Y_YAMO', CGRID, FDATE, FTIME, LVL )
 
          ELSE
@@ -246,10 +293,18 @@ C Get CGRID offsets
 
 !     write( logdev,* ) ' y_ppm/x_yamo - lvl, fdate, ftime: ', lvl, fdate, ftime
 
+#ifdef isam
+            CALL Y_PPM ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON, ISAM )
+#else
             CALL Y_PPM ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON )
+#endif
 !           CALL LCKSUMMER ( 'Y_PPM', CGRID, FDATE, FTIME, LVL )
 
+#ifdef isam
+            CALL X_YAMO ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON, XTRHOJ, ISAM )
+#else
             CALL X_YAMO ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON, XTRHOJ )
+#endif
 !           CALL LCKSUMMER ( 'X_YAMO', CGRID, FDATE, FTIME, LVL )
 
          END IF

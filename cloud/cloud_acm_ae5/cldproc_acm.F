@@ -25,7 +25,13 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef isam
+      SUBROUTINE CLDPROC ( CGRID, JDATE, JTIME, TSTEP,
+     &                     CBFOR, ISAM, ISAMB4 )
+#else
       SUBROUTINE CLDPROC ( CGRID, JDATE, JTIME, TSTEP )
+#endif
+
 
 C-----------------------------------------------------------------------
 C
@@ -53,12 +59,20 @@ C     3/01/11 S.Roselle       replaced I/O API include files with UTILIO_DEFN
 C     5/11/11 D.Wong:         incorporated twoway model implementation
 C     02Aug12 S.Roselle:      instrumented to output transmissivity for 
 C                             convective and resolved clouds
+C     19Jul13 R.Kwok:         isam
 
 C-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
+#ifdef isam
+      USE SA_DEFN             ! 20120827
+      USE PCGRID_DEFN         ! 20130305
+      USE PCBFOR_DEFN         ! 20130305
+      USE PISAM_DEFN          ! 20130305
+      USE PISAMB4_DEFN        ! 20130305
+#endif
 
       IMPLICIT NONE
 
@@ -91,6 +105,11 @@ C...........ARGUMENTS
       INTEGER       JDATE            ! current model date, coded YYYYDDD
       INTEGER       JTIME            ! current model time, coded HHMMSS
       INTEGER       TSTEP( 3 )       ! model time step, coded HHMMSS
+#ifdef isam
+      REAL, POINTER :: CBFOR( :,:,:,: )       ! old concentrations
+      REAL, POINTER :: ISAM( :,:,:,:,: )      ! 20120827
+      REAL, POINTER :: ISAMB4( :,:,:,:,: )    ! 20120827
+#endif
 
 C...........Local Variables
 
@@ -143,11 +162,25 @@ C...........Local Variables
 C for INTERPX
       INTEGER, SAVE :: STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3
 
+#ifdef isam
+      CHARACTER( 16 ), ALLOCATABLE, SAVE :: NAM_WDEP( : ) ! specie names of bulk wetdep
+      REAL, ALLOCATABLE, SAVE :: CONV_SADEP( :,:,:,: ) ! convective wdep for the tags
+      REAL, ALLOCATABLE, SAVE :: TOT_SADEP ( :,:,:,: ) ! total wdep for the tags
+      REAL, ALLOCATABLE, SAVE :: BUFF2 ( :,: )
+      INTEGER IBGN
+#endif
+
 C...........EXTERNAL FUNCTIONS
 
       INTERFACE
+#ifdef isam
+         SUBROUTINE RESCLD ( CGRID, JDATE, JTIME, TSTEP,
+     &                       N_SPC_WDEP, WDEP_MAP, DEP, RESTRANS,
+     &                       ISAM, ISAMB4, TOT_SADEP )
+#else
          SUBROUTINE RESCLD ( CGRID, JDATE, JTIME, TSTEP,
      &                       N_SPC_WDEP, WDEP_MAP, DEP, RESTRANS )
+#endif
             IMPLICIT NONE
             REAL, POINTER          :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )  :: JDATE, JTIME, TSTEP( 3 )
@@ -155,6 +188,11 @@ C...........EXTERNAL FUNCTIONS
             INTEGER, INTENT( IN )  :: WDEP_MAP( : )
             REAL,    INTENT( OUT ) :: DEP( :,:,: )
             REAL,    INTENT( OUT ) :: RESTRANS( :,: )
+#ifdef isam
+            REAL, POINTER          :: ISAM( :,:,:,:,: )     !20120827
+            REAL, POINTER          :: ISAMB4( :,:,:,:,: )   !20120827
+            REAL                   :: TOT_SADEP( :,:,:,: )  !20120827
+#endif
          END SUBROUTINE RESCLD
          SUBROUTINE CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                            N_SPC_WDEP, WDEP_MAP, DEP, SUBTRANS )
@@ -166,6 +204,31 @@ C...........EXTERNAL FUNCTIONS
             REAL,    INTENT( OUT ) :: DEP( :,:,: )
             REAL,    INTENT( OUT ) :: SUBTRANS( :,:,: )
          END SUBROUTINE CONVCLD_ACM
+#ifdef isam
+         SUBROUTINE SA_OPWDDEP ( SADEPFILE, JDATE, JTIME, TSTEP )
+            IMPLICIT NONE
+            CHARACTER( 16 ) :: SADEPFILE ! Dry or wet dep file for tags
+            INTEGER         :: JDATE, JTIME, TSTEP
+         END SUBROUTINE SA_OPWDDEP
+         SUBROUTINE SA_WRAP_CLD( CGRID, CBFOR, ISAM, ISAMB4 )
+            IMPLICIT NONE
+            REAL, POINTER         :: CGRID( :,:,:,: )
+            REAL, POINTER         :: CBFOR( :,:,:,: )
+            REAL, POINTER         :: ISAM( :,:,:,:,: )
+            REAL, POINTER         :: ISAMB4( :,:,:,:,: )
+         END SUBROUTINE SA_WRAP_CLD
+         SUBROUTINE SA_WDEP( ISAM, ISAMB4,
+     &     N_WDEP, WDEP_MAP, NAM_WDEP, BULK_DEP, SADEP )
+            IMPLICIT NONE
+            REAL, POINTER         :: ISAM( :,:,:,:,: )
+            REAL, POINTER         :: ISAMB4( :,:,:,:,: )
+            INTEGER, INTENT( IN ) :: N_WDEP
+            INTEGER, INTENT( IN ) :: WDEP_MAP( N_WDEP )
+            CHARACTER( 16 ), INTENT( IN ) :: NAM_WDEP( N_WDEP )
+            REAL, INTENT( IN )    :: BULK_DEP( :,:,: )
+            REAL, INTENT( OUT )   :: SADEP( :,:,:,: )
+         END SUBROUTINE SA_WDEP
+#endif
       END INTERFACE
 C-----------------------------------------------------------------------
 C   begin body of subroutine  CLDPROC
@@ -197,6 +260,13 @@ C...and return
           CALL M3MESG ( XMSG )
 
         END IF
+#ifdef isam
+        ALLOCATE ( NAM_WDEP( N_SPC_WDEP ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating NAM_WDEP'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+#endif
 
 C...check to see if user wants to output extra diagnostic files
 
@@ -223,6 +293,9 @@ C...check to see if user wants to output extra diagnostic files
         DO VAR = STRT, FINI
           SPC = SPC + 1
           WDEP_MAP( VAR ) = GC_STRT - 1 + GC_WDEP_MAP( SPC )
+#ifdef isam
+          NAM_WDEP( VAR ) = GC_WDEP( SPC )
+#endif
         END DO
 
         SPC = 0
@@ -231,6 +304,9 @@ C...check to see if user wants to output extra diagnostic files
         DO VAR = STRT, FINI
           SPC = SPC + 1
           WDEP_MAP( VAR ) = AE_STRT - 1 + AE_WDEP_MAP( SPC )
+#ifdef isam
+          NAM_WDEP( VAR ) = AE_WDEP( SPC )
+#endif
         END DO
 
         SPC = 0
@@ -239,6 +315,9 @@ C...check to see if user wants to output extra diagnostic files
         DO VAR = STRT, FINI
           SPC = SPC + 1
           WDEP_MAP( VAR ) = NR_STRT - 1 + NR_WDEP_MAP( SPC )
+#ifdef isam
+          NAM_WDEP( VAR ) = NR_WDEP( SPC )
+#endif
         END DO
 
         SPC = 0
@@ -247,6 +326,9 @@ C...check to see if user wants to output extra diagnostic files
         DO VAR = STRT, FINI
           SPC = SPC + 1
           WDEP_MAP( VAR ) = TR_STRT - 1 + TR_WDEP_MAP( SPC )
+#ifdef isam
+          NAM_WDEP( VAR ) = TR_WDEP( SPC )
+#endif
         END DO
 
 C Try to open existing wet deposition file for update
@@ -522,6 +604,10 @@ C...try to open the diagnostic output file
 
         END IF   ! MYPE = 0
 
+#ifdef isam
+        IF ( MYPE .EQ. 0 ) CALL SA_OPWDDEP ( SA_WD_1, JDATE, JTIME, TSTEP( 1 ) )
+#endif
+
         IF ( N_AE_SPC .GT. 0 ) THEN
 C...create aerosol species pointers to distinguish micro-grams / m**3
 C...  # / m**3 (number density), and m**2 / m**3 (surface area) units
@@ -596,6 +682,24 @@ C...initialize the deposition array before processing clouds
            XMSG = 'Failure allocating DENS'
            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
+
+#ifdef isam
+Ckrt deposition arrays for tagged species.....
+        ALLOCATE ( TOT_SADEP ( MY_NCOLS,MY_NROWS,NSPC_SA,NTAG_SA ),
+     &            CONV_SADEP ( MY_NCOLS,MY_NROWS,NSPC_SA,NTAG_SA ),
+     &             STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating TOT_ or CONV_SADEP'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+        TOT_SADEP = 0.0
+        CONV_SADEP = 0.0
+        ALLOCATE( BUFF2( MY_NCOLS, MY_NROWS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating BUFF2'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+#endif
 
         CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
      &                  STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )
@@ -719,17 +823,71 @@ C...determine no. of moles of tracer gas per moles of air by volume
         END DO
       END DO
 
-C...compute cloud effects for the resolved clouds and resolved rainwater
+#ifdef isam
+Ckrt...Forward Unit Conversion of isam array
+      DO SPC = 1, N_SPCTAG
+        IBGN = INDEX( VNAM_SPCTAG( SPC ), '_', .FALSE. ) - 1
+        IF ( VNAM_SPCTAG( SPC )( 1:1 ) .EQ. 'A' .AND.
+     &     ( VNAM_SPCTAG( SPC )( IBGN:IBGN ) .EQ. 'I' .OR.
+     &       VNAM_SPCTAG( SPC )( IBGN:IBGN ) .EQ. 'J' ) ) THEN
+          DO LAY = 1, NLAYS
+          DO ROW = 1, MY_NROWS
+          DO COL = 1, MY_NCOLS
+            VAR = SPC_INDEX( S_SPCTAG( SPC ),2 )
+            FAC = CNV1 / DENS( COL,ROW,LAY ) / AE_MOLWT( VAR - AE_STRT + 1 )
+            ISAM( COL,ROW,LAY,S_SPCTAG( SPC ), T_SPCTAG( SPC ) ) =
+     &         MAX( ISAM( COL,ROW,LAY,S_SPCTAG( SPC ), T_SPCTAG( SPC ) )
+     &             * FAC, 1.0E-30 )
+          END DO ! col
+          END DO ! row
+          END DO ! lay
+        ELSE ! non pm spc
+          DO LAY = 1, NLAYS
+          DO ROW = 1, MY_NROWS
+          DO COL = 1, MY_NCOLS
+            ISAM( COL, ROW, LAY, S_SPCTAG( SPC ), T_SPCTAG( SPC ) ) =
+     &         MAX( ISAM( COL, ROW, LAY, S_SPCTAG( SPC ), T_SPCTAG( SPC ) )
+     &             * 1.0E-06, 1.0E-30 )
+          END DO ! col                                                        
+          END DO ! row                                                          
+          END DO ! lay
+        END IF ! pm or non-pm
+      END DO ! n_spctag
+#endif
 
+C...compute cloud effects for the resolved clouds and resolved rainwater
+#ifdef isam
+!     CBFOR = CGRID
+!     ISAMB4 = ISAM
+      PCBFOR = PCGRID
+      PISAMB4 = PISAM
+      CALL RESCLD ( CGRID, JDATE, JTIME, TSTEP,
+     &              N_SPC_WDEP, WDEP_MAP, TOT_DEP, RESTRANS,
+     &              ISAM, ISAMB4, TOT_SADEP )
+#else
       CALL RESCLD ( CGRID, JDATE, JTIME, TSTEP,
      &              N_SPC_WDEP, WDEP_MAP, TOT_DEP, RESTRANS )
+#endif
 
 C...compute cloud effects for convective (subgrid) clouds
 
+#ifdef isam
+!     CBFOR = CGRID
+!     ISAMB4 = ISAM
+      PCBFOR = PCGRID
+      PISAMB4 = PISAM
+#endif
       CALL CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                   N_SPC_WDEP, WDEP_MAP, CONV_DEP, SUBTRANS )
+#ifdef isam
+Ckrt source apportionment for the remaining conc
+      CALL SA_WRAP_CLD( CGRID, CBFOR, ISAM, ISAMB4 )
+Ckrt source apportionment for wet deposition
+      CALL SA_WDEP ( ISAM, ISAMB4,
+     &     N_SPC_WDEP, WDEP_MAP, NAM_WDEP, CONV_DEP, CONV_SADEP )
+#endif
 
-C...now check to see if it's time to write the deposition file
+C...now check to see if it`s time to write the deposition file
 
       CALL NEXTIME ( MDATE, MTIME, TSTEP( 2 ) ) ! set mdate:mtime to next tstep
       NDATE = JDATE
@@ -765,6 +923,20 @@ C...now check to see if it's time to write the deposition file
         RESTRANS = 1.0
         SUBTRANS = 1.0
 
+#ifdef isam
+Ckrt Sum up the wetdep from both resolved and convective clouds
+Ckrt  for the tagged species as well....
+        DO SPC = 1, N_SPCTAG
+          DO ROW = 1, MY_NROWS
+            DO COL = 1, MY_NCOLS
+              TOT_SADEP( COL,ROW,S_SPCTAG( SPC ),T_SPCTAG( SPC ) ) =
+     &        TOT_SADEP( COL,ROW,S_SPCTAG( SPC ),T_SPCTAG( SPC ) ) +
+     &       CONV_SADEP( COL,ROW,S_SPCTAG( SPC ),T_SPCTAG( SPC ) )
+            END DO ! col
+          END DO ! row
+        END DO ! n_spctag
+#endif
+
 C...write data to the normal wet deposition file
 
         IF ( .NOT. WRITE3( CTM_WET_DEP_1, ALLVAR3, NDATE,
@@ -793,10 +965,31 @@ C...write data to the diagnostic file if requested by the user
 
         END IF   ! CLD_DIAG
 
+#ifdef isam
+Ckrt....write data to wet dep file for tagged species
+        BUFF2 = 0.0
+        DO SPC = 1, N_SPCTAG
+          DO ROW = 1, MY_NROWS
+            DO COL = 1, MY_NCOLS
+              BUFF2( COL,ROW ) = TOT_SADEP( COL,ROW,S_SPCTAG( SPC ),T_SPCTAG( SPC ) )
+            END DO ! col
+          END DO ! row
+          IF ( .NOT. WRITE3( SA_WD_1, VNAM_SPCTAG( SPC ),
+     &                       NDATE, NTIME, BUFF2 ) ) THEN
+            XMSG = 'Could not write ' // SA_WD_1 // ' file'
+            CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
+          END IF
+       END DO ! n_spctag
+#endif
+
 C...reinitialize deposition array
 
         TOT_DEP  = 0.0
         CONV_DEP = 0.0
+#ifdef isam
+        TOT_SADEP = 0.0 !KRT
+        CONV_SADEP = 0.0 ! KRT
+#endif
 
       END IF   ! time to write
 
@@ -897,6 +1090,36 @@ C...convert to ppmV tracer gas
           END DO
         END DO
       END DO
+
+#ifdef isam
+Ckrt...Backward Unit Conversion of tssa array
+      DO SPC = 1, N_SPCTAG
+        IBGN = INDEX( VNAM_SPCTAG( SPC ), '_', .FALSE. ) - 1
+        IF ( VNAM_SPCTAG( SPC )( 1:1 ) .EQ. 'A' .AND.
+     &     ( VNAM_SPCTAG( SPC )( IBGN:IBGN ) .EQ. 'I' .OR.
+     &       VNAM_SPCTAG( SPC )( IBGN:IBGN ) .EQ. 'J' ) ) THEN
+          DO LAY = 1, NLAYS
+          DO ROW = 1, MY_NROWS
+          DO COL = 1, MY_NCOLS
+             VAR = SPC_INDEX( S_SPCTAG( SPC ), 2 )
+             FAC = CNV1I * DENS( COL,ROW,LAY ) * AE_MOLWT( VAR - AE_STRT + 1 )
+             ISAM( COL,ROW,LAY,S_SPCTAG( SPC ),T_SPCTAG( SPC ) ) =
+     &       ISAM( COL,ROW,LAY,S_SPCTAG( SPC ),T_SPCTAG( SPC ) ) * FAC
+          END DO ! col
+          END DO ! row
+          END DO ! lay
+        ELSE ! non pm spc
+          DO LAY = 1, NLAYS
+          DO ROW = 1, MY_NROWS
+          DO COL = 1, MY_NCOLS
+             ISAM( COL,ROW,LAY,S_SPCTAG( SPC ),T_SPCTAG( SPC ) ) =    
+     &       ISAM( COL,ROW,LAY,S_SPCTAG( SPC ),T_SPCTAG( SPC ) ) * 1.0E+06
+          END DO ! col                                                        
+          END DO ! row                                                          
+          END DO ! lay
+        END IF ! pm or non-pm
+      END DO ! n_spctag
+#endif
 
       RETURN
 

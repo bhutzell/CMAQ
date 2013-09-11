@@ -25,7 +25,11 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C @(#)initscen.F        1.4 /project/mod3/CMAQ/src/init/init/SCCS/s.initscen.F 25 Jul 1997 14:32:52
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef isam
+      SUBROUTINE INITSCEN ( CGRID, STDATE, STTIME, TSTEP, NSTEPS, ISAM )
+#else
       SUBROUTINE INITSCEN ( CGRID, STDATE, STTIME, TSTEP, NSTEPS )
+#endif
 
 C-----------------------------------------------------------------------
 C Function:
@@ -68,11 +72,15 @@ C   21 Jun 10 J.Young: convert for Namelist redesign
 C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                        removed deprecated TRIMLEN
 C   11 May 11 D.Wong: incorporated twoway model implementation
+C   19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE HGRD_DEFN             ! horizontal domain specifications
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
+#ifdef isam
+      USE SA_DEFN               ! Mc06
+#endif
 
       USE SUBST_MODULES         ! stenex
 !     USE SUBST_UTIL_MODULE     ! stenex
@@ -95,6 +103,9 @@ C Arguments:
                                 ! TSTEP(3) = twoway model time step w.r.t. wrf time
                                 !            step and wrf/cmaq call frequency
       INTEGER      NSTEPS       ! run duration, as number of output time steps
+#ifdef isam
+      REAL, POINTER :: ISAM( :,:,:,:,: )
+#endif
 
 C Parameters:
 
@@ -145,11 +156,33 @@ C  environment variable description
             REAL, POINTER                 :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )         :: STDATE, STTIME, TSTEP
          END SUBROUTINE OPCONC
+#ifdef isam
+         SUBROUTINE SA_ARRAY_INIT ( CGRID, ISAM )
+            IMPLICIT NONE
+            REAL, POINTER                 :: CGRID( :,:,:,: )
+            REAL, POINTER                 :: ISAM( :,:,:,:,: )
+         END SUBROUTINE SA_ARRAY_INIT
+         SUBROUTINE OP_SA ( JDATE, JTIME, TSTEP, NSTEPS, ISAM, FNAME )
+            IMPLICIT NONE
+            INTEGER :: JDATE, JTIME
+            INTEGER :: TSTEP(2)
+            INTEGER :: NSTEPS
+            REAL, POINTER                 :: ISAM( :,:,:,:,: )
+            CHARACTER( 16 ) :: FNAME
+         END SUBROUTINE OP_SA
+#endif
       END INTERFACE
 
 C-----------------------------------------------------------------------
 
       LOGDEV = INIT3()
+
+#ifdef isam
+      IF ( MYPE .EQ. 0 ) THEN
+         WRITE( LOGDEV,* ) 'Entered INITSCEN...'
+         WRITE( LOGDEV,* ) 'NSPC_SA, NTAG_SA:', NSPC_SA, NTAG_SA
+      END IF
+#endif
 
       TSTEP( 1 )  = 010000         ! default
       VARDESC = 'Scenario Output Time Step (HHMMSS)'
@@ -351,6 +384,19 @@ C Test opening existing conc file for update
 !     END IF
 
       CALL SUBST_BARRIER
+
+#ifdef isam
+C KWOK: initialize ISAM array
+      CALL SA_ARRAY_INIT ( CGRID, ISAM )
+
+C KWOK: open new files SA_CONC_1, SA_CGRID_1 and write data to it
+      CALL SUBST_BARRIER
+      CALL OP_SA ( STDATE, STTIME, TSTEP, 1, ISAM, SA_CONC_1 )
+c kwok: new files opened, initial data written
+      IF ( YES_PRINT ) THEN
+         if ( MYPE .eq. 0 ) print*, 'Initscen Completed...'
+      END IF !yes_print
+#endif
 
       RETURN
       END

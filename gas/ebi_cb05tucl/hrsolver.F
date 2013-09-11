@@ -42,11 +42,16 @@ C                             to reduce the chance of code crash; it does
 C                             not change results
 C   21 Jun 10 J.Young: convert for Namelist redesign
 C   29 Mar 11 S.Roselle: Replaced I/O API include files with UTILIO_DEFN
+C   19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE CGRID_SPCS, ONLY: N_GC_SPC, GC_SPC     ! CGRID mechanism species      
       USE UTILIO_DEFN
+#ifdef isam
+      USE SA_IRR_DEFN
+#else
       USE HRDATA
+#endif
 
       IMPLICIT NONE
 
@@ -249,6 +254,12 @@ c..if predictions growing too large, treat as a convergence failure
                      MXFL = .TRUE.
                      GO TO 1010
                   END IF
+#ifdef isam
+                  IF ( NEBI .EQ. CEILING( N_EBI_STEPS / 2.0 ) ) THEN
+                     YCDDM( S ) = 0.5 * ( YC( S ) + YCP( S ) )
+                  END IF
+                  IF ( YCDDM( S ) .LT. 1E-25 ) YCDDM( S ) = 0.0
+#endif
                   YC( S ) = YCP( S )
                END DO
 
@@ -273,6 +284,11 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 #endif
 c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 
+#ifdef isam
+               IF ( NEBI .EQ. CEILING( N_EBI_STEPS / 2.0 ) ) THEN
+                  RKI_INIT( C,R,L,: ) = RKI
+               END IF   ! record rki
+#endif
 
                IF ( LEBI_CONV ) GO TO 2000
 

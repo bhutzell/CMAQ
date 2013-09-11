@@ -25,7 +25,13 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef isam
+      SUBROUTINE SCIPROC ( CGRID, JDATE, JTIME, TSTEP, ASTEP,
+     &                     ISAM, MFRC_P, CBFOR, ISAMB4 )
+#else
       SUBROUTINE SCIPROC ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+#endif
+
 
 C-----------------------------------------------------------------------
 C Function:
@@ -57,9 +63,18 @@ C                       HADV negative conc's until after ZADV
 C    25 Jul 08 S.Roselle: removed PING from modeled processes
 C    16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 C    11 May 11 D.Wong: incorporated twoway model implementation
+C    19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
+#ifdef isam
+      USE GRID_CONF
+      USE SA_DEFN
+      USE PCGRID_DEFN   !KRT20121212
+      USE PCBFOR_DEFN   !KRT20121212
+      USE PISAM_DEFN    !KRT20121212
+      USE PISAMB4_DEFN  !KRT20121212
+#endif
 
       IMPLICIT NONE   
 
@@ -80,6 +95,12 @@ C Arguments:
 
 !     INTEGER      ASTEP( NLAYS )  ! layer advection time step
       INTEGER      ASTEP( : )      ! layer advection time step
+#ifdef isam
+      REAL, POINTER :: ISAM( :,:,:,:,: )
+      REAL, POINTER :: MFRC_P( :,:,: )
+      REAL, POINTER :: CBFOR( :,:,:,: )
+      REAL, POINTER :: ISAMB4( :,:,:,:,: )
+#endif
 
 C Parameters:
 
@@ -106,6 +127,16 @@ C Local Variables:
       CHARACTER( 16 ) :: CTM_CKSUM = 'CTM_CKSUM'     ! env var for cksum on
       LOGICAL, SAVE   :: CKSUM     ! flag for cksum on, default = [T]
 
+#ifdef isam
+      LOGICAL         :: LOUTPUT
+      INTEGER         :: JSPC, ITAG, K
+      INTEGER         :: IERR
+      LOGICAL         :: LSA_CHKSUM
+      LOGICAL         :: LSA_RMNGTV
+      !below just to check if there's any difference in cgrid before and after chem
+!20130627      INTEGER, SAVE   :: JO3V
+#endif
+
       INTERFACE
          SUBROUTINE CKSUMMER ( PNAME, CGRID, JDATE, JTIME )
             IMPLICIT NONE
@@ -120,61 +151,147 @@ C Local Variables:
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
          END SUBROUTINE PA_UPDATE
+#ifdef isam
+         SUBROUTINE HADV ( CGRID, JDATE, JTIME, TSTEP, ASTEP, ISAM )
+#else
          SUBROUTINE HADV ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+#endif
             IMPLICIT NONE
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
             INTEGER, INTENT( IN )     :: ASTEP( : )
+#ifdef isam
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE HADV
+#ifdef isam
+         SUBROUTINE ZADV ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
          SUBROUTINE ZADV ( CGRID, JDATE, JTIME, TSTEP )
+#endif
             IMPLICIT NONE
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
+#ifdef isam
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE ZADV
+#ifdef isam
+         SUBROUTINE COUPLE_WRF ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
          SUBROUTINE COUPLE_WRF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
             IMPLICIT NONE
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
+#ifdef isam
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE COUPLE_WRF
+#ifdef isam
+         SUBROUTINE DECOUPLE_WRF ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
          SUBROUTINE DECOUPLE_WRF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
             IMPLICIT NONE
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
+#ifdef isam
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE DECOUPLE_WRF
+#ifdef isam
+         SUBROUTINE HDIFF ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
          SUBROUTINE HDIFF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
             IMPLICIT NONE
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
+#ifdef isam
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE HDIFF
+#ifdef isam
+         SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP, ISAM, MFRC_P )
+#else
          SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
             IMPLICIT NONE
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
+#ifdef isam
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+            REAL, POINTER             :: MFRC_P( :,:,: )
+#endif
          END SUBROUTINE VDIFF
+#ifdef isam
+         SUBROUTINE CLDPROC ( CGRID, JDATE, JTIME, TSTEP,
+     &                        CBFOR, ISAM, ISAMB4 )
+#else
          SUBROUTINE CLDPROC ( CGRID, JDATE, JTIME, TSTEP )
+#endif
             IMPLICIT NONE
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
+#ifdef isam
+            REAL, POINTER             :: CBFOR( :,:,:,: )
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+            REAL, POINTER             :: ISAMB4( :,:,:,:,: )
+#endif
          END SUBROUTINE CLDPROC
+#ifdef isam
+         SUBROUTINE CHEM ( CGRID, JDATE, JTIME, TSTEP, ISAM, CBFOR, ISAMB4 )
+#else
          SUBROUTINE CHEM ( CGRID, JDATE, JTIME, TSTEP )
+#endif
             IMPLICIT NONE
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
+#ifdef isam
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+            REAL, POINTER             :: CBFOR( :,:,:,: )
+            REAL, POINTER             :: ISAMB4( :,:,:,:,: )
+#endif
          END SUBROUTINE CHEM
+#ifdef isam
+         SUBROUTINE SA_WRAP_OZ( CGRID, CBFOR, ISAM, ISAMB4, JDATE, JTIME, TSTEP )
+            IMPLICIT NONE
+            REAL, POINTER             :: CGRID( :,:,:,: )
+            REAL, POINTER             :: CBFOR( :,:,:,: )
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+            REAL, POINTER             :: ISAMB4( :,:,:,:,: )
+            INTEGER, INTENT( IN )     :: JDATE, JTIME
+            INTEGER, INTENT( IN )     :: TSTEP( 3 )
+         END SUBROUTINE SA_WRAP_OZ
+#endif
          SUBROUTINE AERO ( CGRID, JDATE, JTIME, TSTEP )
             IMPLICIT NONE
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
          END SUBROUTINE AERO
+#ifdef isam
+Ckrt...aero wrapper
+         SUBROUTINE SA_WRAP_AE( CGRID, CBFOR, ISAM, ISAMB4, JDATE, JTIME, TSTEP )
+            IMPLICIT NONE
+            REAL, POINTER             :: CGRID( :,:,:,: )
+            REAL, POINTER             :: CBFOR( :,:,:,: )
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+            REAL, POINTER             :: ISAMB4( :,:,:,:,: )
+            INTEGER, INTENT( IN )     :: JDATE
+            INTEGER, INTENT( IN )     :: JTIME
+            INTEGER, INTENT( IN )     :: TSTEP( 3 )
+         END SUBROUTINE SA_WRAP_AE
+#endif
       END INTERFACE
   
 C-----------------------------------------------------------------------
@@ -200,26 +317,54 @@ C-----------------------------------------------------------------------
 
       END IF       ! if firstime
 
+#ifdef isam
+      LSA_CHKSUM = .FALSE.  ! do checksum over all tags ?
+      LSA_RMNGTV = .FALSE.  ! reset any -ve tags ?
+! 20130529 reinitialize SULRXN if any
+      JSPC = INDEX1( 'SULRXN', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+      IF ( JSPC .GT. 0 ) ISAM( :,:,:,JSPC,: ) = 0.0
+#endif
+
 C Synchronization Step Physical Processes Sequence
 
+#ifdef isam
+      CALL VDIFF ( CGRID, JDATE, JTIME, TSTEP, ISAM, MFRC_P )
+#else
       CALL VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
       IF ( CKSUM ) CALL CKSUMMER ( 'VDIFF', CGRID, JDATE, JTIME )
       IF ( LIPR ) CALL PA_UPDATE ( 'VDIF', CGRID, JDATE, JTIME, TSTEP )
 
 C couple CGRID for advection and horizontal diffusion
 
+#ifdef isam
+      CALL COUPLE_WRF ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
       CALL COUPLE_WRF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
       IF ( CKSUM ) CALL CKSUMMER ( 'COUPLE_WRF', CGRID, JDATE, JTIME )
 
+#ifdef isam
+      CALL HADV ( CGRID, JDATE, JTIME, TSTEP, ASTEP, ISAM )
+#else
       CALL HADV ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+#endif
 !     IF ( CKSUM ) CALL CKSUMMER ( 'HADV', CGRID, JDATE, JTIME )
       IF ( LIPR ) CALL PA_UPDATE ( 'HADV', CGRID, JDATE, JTIME, TSTEP )
 
+#ifdef isam
+      CALL ZADV ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
       CALL ZADV ( CGRID, JDATE, JTIME, TSTEP )
+#endif
       IF ( CKSUM ) CALL CKSUMMER ( 'ADV', CGRID, JDATE, JTIME )
       IF ( LIPR ) CALL PA_UPDATE ( 'ZADV', CGRID, JDATE, JTIME, TSTEP )
 
+#ifdef isam
+      CALL HDIFF ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
       CALL HDIFF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
       IF ( CKSUM ) CALL CKSUMMER ( 'HDIFF', CGRID, JDATE, JTIME )
       IF ( LIPR ) CALL PA_UPDATE ( 'HDIF', CGRID, JDATE, JTIME, TSTEP )
 
@@ -229,20 +374,47 @@ C decouple CGRID for cloud and chemistry
       STIME = JTIME
       CALL NEXTIME ( SDATE, STIME, TSTEP( 2 ) )
 
+#ifdef isam
+      CALL DECOUPLE_WRF ( CGRID, SDATE, STIME, TSTEP, ISAM )
+#else
       CALL DECOUPLE_WRF ( CGRID, SDATE, STIME, TSTEP )
+#endif
       IF ( CKSUM ) CALL CKSUMMER ( 'DECOUPLE_WRF', CGRID, JDATE, JTIME )
 
+#ifdef isam
+      PCBFOR = PCGRID
+      PISAMB4 = PISAM
+      CALL CLDPROC ( CGRID, JDATE, JTIME, TSTEP,
+     &               CBFOR, ISAM, ISAMB4 )
+#else
       CALL CLDPROC ( CGRID, JDATE, JTIME, TSTEP )
+#endif
       IF ( CKSUM ) CALL CKSUMMER ( 'CLDPROC', CGRID, JDATE, JTIME )
       IF ( LIPR ) CALL PA_UPDATE ( 'CLDS', CGRID, JDATE, JTIME, TSTEP )
 
+#ifdef isam
+      CALL CHEM ( CGRID, JDATE, JTIME, TSTEP, ISAM, CBFOR, ISAMB4 )
+#else
       CALL CHEM ( CGRID, JDATE, JTIME, TSTEP )
+#endif
       IF ( CKSUM ) CALL CKSUMMER ( 'CHEM', CGRID, JDATE, JTIME )
       IF ( LIPR ) CALL PA_UPDATE ( 'CHEM', CGRID, JDATE, JTIME, TSTEP ) 
 
+#ifdef isam
+      CALL SA_WRAP_OZ( CGRID, CBFOR, ISAM, ISAMB4, JDATE, JTIME, TSTEP )
+#endif
+
+#ifdef isam
+      PCBFOR = PCGRID
+      PISAMB4 = PISAM
+#endif
       CALL AERO ( CGRID, JDATE, JTIME, TSTEP )
       IF ( CKSUM ) CALL CKSUMMER ( 'AERO', CGRID, JDATE, JTIME )
       IF ( LIPR ) CALL PA_UPDATE ( 'AERO', CGRID, JDATE, JTIME, TSTEP )
+
+#ifdef isam
+      CALL SA_WRAP_AE( CGRID, CBFOR, ISAM, ISAMB4, JDATE, JTIME, TSTEP )
+#endif
 
       CALL NEXTIME ( JDATE, JTIME, TSTEP( 2 ) )
       WRITE( LOGDEV,'(/ 5X, A, I8, I7.6)' ) NMSG, JDATE, JTIME

@@ -23,9 +23,10 @@
 !   13 Aug 2008, S.Napelenok, added files for ddm-3d
 !   28 Feb 2011, J.Bash, Added files for NH3 bidi and MOSAIC
 !   11 May 11 D.Wong: added files for sub-domain time series
+!   19 Jul 13 R.Kwok: isam
 !.......................................................................
 
-      INTEGER, PARAMETER :: N_FILES = 69
+      INTEGER, PARAMETER :: N_FILES = 76
 
       CHARACTER( 16 ) :: LGCL_NAME( N_FILES ) 
       LOGICAL            IN_MODE( N_FILES )
@@ -100,6 +101,16 @@
       CHARACTER( 16 ) :: BELD4_LU
       CHARACTER( 16 ) :: CTM_SD_TS
 
+C.....Source Apportionment (SA) Output files that contain tagged concentrations.....
+C.....Roger Kwok, Jul 2012
+      CHARACTER( 16 ) :: SA_CONC_1
+      CHARACTER( 16 ) :: SA_CGRID_1
+      CHARACTER( 16 ) :: SA_ACONC_1
+      CHARACTER( 16 ) :: SA_DD_1
+      CHARACTER( 16 ) :: SA_WD_1
+      CHARACTER( 16 ) :: SA_RNORM_1
+      CHARACTER( 16 ) :: O3INDIC_1
+
       DATA GRID_DOT_2D      / 'GRID_DOT_2D     ' /
       DATA GRID_CRO_2D      / 'GRID_CRO_2D     ' /
       DATA GRID_CRO_3D      / 'GRID_CRO_3D     ' /
@@ -169,6 +180,13 @@
       DATA E2C_SOIL         / 'E2C_SOIL        ' /
       DATA BELD4_LU         / 'BELD4_LU        ' /
       DATA CTM_SD_TS        / 'CTM_SD_TS       ' /
+      DATA  SA_CONC_1       / 'SA_CONC_1       ' /
+      DATA  SA_CGRID_1      / 'SA_CGRID_1      ' /
+      DATA  SA_ACONC_1      / 'SA_ACONC_1      ' /
+      DATA  SA_DD_1         / 'SA_DD_1         ' /
+      DATA  SA_WD_1         / 'SA_WD_1         ' /
+      DATA  SA_RNORM_1      / 'SA_RNORM_1      ' /
+      DATA  O3INDIC_1       / 'O3INDIC_1       ' /
 
       DATA LGCL_NAME(  1 ), IN_MODE(  1 )    / 'GRID_DOT_2D     ', .TRUE. /
       DATA LGCL_NAME(  2 ), IN_MODE(  2 )    / 'GRID_CRO_2D     ', .TRUE. /
@@ -239,5 +257,12 @@
       DATA LGCL_NAME( 67 ), IN_MODE( 67 )    / 'E2C_SOIL        ', .FALSE. /
       DATA LGCL_NAME( 68 ), IN_MODE( 68 )    / 'BELD4_LU        ', .FALSE. /
       DATA LGCL_NAME( 69 ), IN_MODE( 69 )    / 'CTM_SD_TS       ', .FALSE. /
+      DATA LGCL_NAME( 70 ), IN_MODE( 70 )    / 'SA_CONC_1       ', .FALSE. /
+      DATA LGCL_NAME( 71 ), IN_MODE( 71 )    / 'SA_CGRID_1      ', .FALSE. /
+      DATA LGCL_NAME( 72 ), IN_MODE( 72 )    / 'SA_ACONC_1      ', .FALSE. /
+      DATA LGCL_NAME( 73 ), IN_MODE( 73 )    / 'SA_DD_1         ', .FALSE. /
+      DATA LGCL_NAME( 74 ), IN_MODE( 74 )    / 'SA_WD_1         ', .FALSE. /
+      DATA LGCL_NAME( 75 ), IN_MODE( 75 )    / 'SA_RNORM_1      ', .FALSE. /
+      DATA LGCL_NAME( 76 ), IN_MODE( 76 )    / 'O3INDIC_1       ', .FALSE. /
 
 !................   end   FILES3_CTM.EXT   .............................

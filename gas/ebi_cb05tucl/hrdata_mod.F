@@ -35,6 +35,7 @@ C
 C  Key Subroutines/Functions Called: None
 C
 C  Revision History: Created by EBI solver program, Jan. 21, 2011
+C    19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
 c..EBI solver fixed parameters
@@ -78,6 +79,9 @@ c...Allocatable arrays
       REAL,      ALLOCATABLE :: PROD   ( : )     ! Prod of species
       REAL,      ALLOCATABLE :: LOSS   ( : )     ! Loss of species
       REAL,      ALLOCATABLE :: PNEG   ( : )     ! Negative production rates
+#ifdef isam
+      REAL,      ALLOCATABLE :: YCDDM( : )    !20130523
+#endif
 
 c..Species indices
       INTEGER   NO2

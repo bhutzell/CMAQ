@@ -25,7 +25,11 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C @(#)vdiffim.F 1.8 /project/mod3/CMAQ/src/vdiff/eddy/SCCS/s.vdiffim.F 25 Jul 1997 12:57:45
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef isam
+      SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP, ISAM, MFRC_P )
+#else
       SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
 
 C-----------------------------------------------------------------------
 C Asymmetric Convective Model v2 (ACM2) -- Pleim(2006)
@@ -63,6 +67,7 @@ C              This additional loss is now accounted for in vdiff.F
 C 14 Sep 11 J.Young: fix TSTEP bug in call to DEPV_INIT
 C 11 Apr 13 J.Young: fix double adjustment of conc for DDBF in heterogeneous HONO
 C                    if-then-else clauses; eliminate some white space
+C 19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE CGRID_SPCS          ! CGRID mechanism species
@@ -73,6 +78,11 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE BIDI_MOD
       USE LSM_MOD, ONLY: n_lufrac
+#ifdef isam
+      USE PSAEM_DEFN
+      USE SA_DEFN
+      USE OZVOC_DEFN         ! 20120918
+#endif
 
       USE SUBST_MODULES              ! stenex
 !     USE SUBST_GLOBAL_SUM_MODULE    ! stenex
@@ -95,6 +105,10 @@ C Arguments:
                                 ! TSTEP(2) = sciproc sync. step (chem)
                                 ! TSTEP(3) = twoway model time step w.r.t. wrf time
                                 !            step and wrf/cmaq call frequency
+#ifdef isam
+      REAL, POINTER :: ISAM( :,:,:,:,: )
+      REAL, POINTER :: MFRC_P( :,:,: )
+#endif
 
 C Parameters:
 
@@ -151,6 +165,9 @@ C Local Variables:
       REAL          WRDDJ( NCOLS,NROWS,N_LUFRAC+1 )   ! mosaic ddep write buffer
       REAL          WRDDJ_FST( NCOLS,NROWS,N_LUFRAC+1 ) ! mosaic stomatal flux write buffer
 
+#ifdef isam
+      REAL, ALLOCATABLE, SAVE :: SA_DDEP( :,:,: )   ! 20120712 ddep for tags
+#endif
       REAL, ALLOCATABLE, SAVE :: EMIS_PA( :,:,:,: ) ! emis for process analysis
 
       INTEGER, SAVE :: N_SPC_CGRID              ! no. of CGRID species
@@ -170,6 +187,16 @@ C Local Variables:
       REAL         DELT                         ! DT
       REAL         DTDENS1                      ! DT * layer 1 air density
       REAL         DTSEC                        ! model time step in seconds
+#ifdef isam
+      REAL, ALLOCATABLE, SAVE :: SA_DDBF( : )   ! 20120712 secondary SA_DDEP
+      INTEGER CNT, JV
+      INTEGER JSPC_VOC
+      REAL    DD_FAC_VOC
+      REAL    TTL_CVOC
+      REAL    DEPV_VOC
+      REAL    EFAC1_VOC
+      REAL    EFAC2_VOC
+#endif
 
 C ACM Local Variables
       REAL        MBAR                          ! ACM2 mixing rate (S-1)
@@ -211,6 +238,23 @@ C ACM Local Variables
       INTEGER      C, R, L, S, V, I, J          ! loop induction variables
       INTEGER      MDATE, MTIME, MSTEP          ! internal simulation date&time
                                                 ! array in vert. mixing
+#ifdef isam
+      INTEGER ITAG
+      REAL, POINTER :: ISAMEM( :,:,:,:,: )      ! 20120712 SA Emis Array
+      LOGICAL LTEST                             ! 20120712 diagnosis
+      REAL    KNTAG                             ! 20120712 for othrtag updates
+      INTEGER IBGN, JSPCTAG, JSPC, N            ! 20120712 for othrtag updates
+Ckrt Diffusion for tagged species....
+      REAL    :: SACONC( N_SPCTAG,NLAYS )
+      REAL    :: SAEMIS( N_SPCTAG,NLAYS )
+      REAL    :: SA_DD( N_SPCTAG,NLAYS )
+      REAL    :: SA_UU( N_SPCTAG,NLAYS )
+Ckrt Just for io-status when using ENVYN
+      INTEGER IOS
+Ckrt Corrections to tagged nox conc and ddep
+      REAL    SUMCONC, SUMDDBF
+#endif
+
       INTERFACE
          SUBROUTINE RDMET( MDATE, MTIME, RDEPVHT, RJACM, RVJACMF, RRHOJ,
      &                     DENS1 )
@@ -236,17 +280,31 @@ C ACM Local Variables
             INTEGER,        INTENT( IN )  :: JDATE, JTIME
             INTEGER,        INTENT( IN )  :: TSTEP( 3 )
          END SUBROUTINE PA_UPDATE_DDEP
+#ifdef isam
+         SUBROUTINE CONV_CGRID ( CGRID, JDATE, JTIME, CNGRD, ISAM )
+#else
          SUBROUTINE CONV_CGRID ( CGRID, JDATE, JTIME, CNGRD )
+#endif
             IMPLICIT NONE
             REAL, POINTER :: CGRID( :,:,:,: )
             INTEGER,        INTENT( IN )  :: JDATE, JTIME
             REAL,           INTENT( INOUT ) :: CNGRD( :,:,:,: )
+#ifdef isam
+            REAL, POINTER :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE CONV_CGRID
+#ifdef isam
+         SUBROUTINE REV_CGRID ( CNGRD, JDATE, JTIME, CGRID, ISAM )
+#else
          SUBROUTINE REV_CGRID ( CNGRD, JDATE, JTIME, CGRID )
+#endif
             IMPLICIT NONE
             REAL,           INTENT( INOUT ) :: CNGRD( :,:,:,: )
             INTEGER,        INTENT( IN )  :: JDATE, JTIME
             REAL, POINTER :: CGRID( :,:,:,: )
+#ifdef isam
+            REAL, POINTER :: ISAM( :,:,:,:,: )
+#endif
          END SUBROUTINE REV_CGRID
          SUBROUTINE EDDYX ( JDATE, JTIME, TSTEP,
      &                      EDDYV, HOL, XPBL, LPBL, CONVCT )
@@ -270,6 +328,42 @@ C ACM Local Variables
             REAL,           INTENT( IN )  :: B( :,: )
             REAL,           INTENT( OUT ) :: X( :,: )
          END SUBROUTINE TRI
+#ifdef isam
+         SUBROUTINE SA_OPWDDEP ( SADEPFILE, JDATE, JTIME, TSTEP )
+            IMPLICIT NONE
+            CHARACTER( 16 ) SADEPFILE ! Dry or wet dep file for tags
+            INTEGER      JDATE      ! current model date, coded YYYYDDD
+            INTEGER      JTIME      ! current model time, coded HHMMSS
+            INTEGER      TSTEP      ! output time step
+         END SUBROUTINE SA_OPWDDEP
+Ckrt...Filling up other tags..........
+         SUBROUTINE SA_FIL_OTHRTAG( ISAMEM, JDATE, JTIME )
+            IMPLICIT NONE
+            REAL, POINTER :: ISAMEM( :,:,:,:,: )
+            INTEGER, INTENT( IN ) :: JDATE, JTIME
+         END SUBROUTINE SA_FIL_OTHRTAG
+Ckrt...Diagnostic output for tagged emissions
+         SUBROUTINE test_saem( JDATE, JTIME, TSTEP, NSTEPS, ISAMEM, FILE_NAME )
+            IMPLICIT NONE
+            INTEGER   :: JDATE, JTIME
+            INTEGER   :: TSTEP( 3 )
+            INTEGER   :: NSTEPS
+            REAL, POINTER :: ISAMEM( :,:,:,:,: )
+            CHARACTER( 16 ) :: FILE_NAME
+         END SUBROUTINE test_saem
+         SUBROUTINE SA_MATRIX ( A, B, C, D, E, X )
+            IMPLICIT NONE
+            REAL,           INTENT( IN )  :: A( : ), B( : ), C( : ), E( : )
+            REAL,           INTENT( IN )  :: D( :,: )
+            REAL,           INTENT( OUT ) :: X( :,: )
+         END SUBROUTINE SA_MATRIX
+         SUBROUTINE SA_TRI ( L, D, U, B, X )
+            IMPLICIT NONE
+            REAL,           INTENT( IN )  :: L( : ), D( : ), U( : )
+            REAL,           INTENT( IN )  :: B( :,: )
+            REAL,           INTENT( OUT ) :: X( :,: )
+         END SUBROUTINE SA_TRI
+#endif
       END INTERFACE
 
 C-----------------------------------------------------------------------
@@ -334,6 +428,9 @@ C Open the met files
 C Set output file characteristics based on COORD.EXT and open the dry dep file
 
          IF ( MYPE .EQ. 0 ) CALL OPDDEP ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP, ABFLUX )
+#ifdef isam
+         IF ( MYPE .EQ. 0 ) CALL SA_OPWDDEP ( SA_DD_1, JDATE, JTIME, TSTEP( 1 ) )
+#endif
          
          IF ( ABFLUX .AND. MYPE .EQ. 0 ) THEN
             CALL OPASX_MEDIA( JDATE, JTIME, TSTEP( 1 ) )
@@ -356,6 +453,16 @@ C Allocate and initialize dry deposition array
          DDEP = 0.0   ! array assignment
          ICMP = 0.0   ! array assignment
 
+#ifdef isam
+Ckrt Allocate and initialize SA_DDEP
+         ALLOCATE ( SA_DDEP( MY_NCOLS,MY_NROWS,N_SPCTAG ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SA_DDEP'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         SA_DDEP = 0.0
+#endif
+
 C set auxiliary depv arrays
 
          ALLOCATE ( DD_FAC( N_SPC_DEPV  ),
@@ -368,6 +475,15 @@ C set auxiliary depv arrays
             XMSG = 'Failure allocating DD_FAC, DDBF, DEPVCR, EFAC1, EFAC2, or POL'
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+
+#ifdef isam
+Ckrt Allocate SA_DDBF
+         ALLOCATE (  SA_DDBF( N_SPCTAG ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SA_DDBF'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+#endif
  
          ALLOCATE ( CMPF( LCMP ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -379,6 +495,15 @@ C set auxiliary depv arrays
             XMSG = 'Failure initializing emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+
+#ifdef isam
+Ckrt...Pointer for isamem array
+         IF ( .NOT. PSAEM_INIT ( NSPC_SA, NTAG_SA ) ) THEN
+           XMSG = 'Failure in defining SA horizontal domain'
+           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2  )
+         END IF
+         ISAMEM => PSAEM( 1:MY_NCOLS,1:MY_NROWS,:,:,: )
+#endif
 
          IF ( LIPR ) THEN
             ALLOCATE ( EMIS_PA( MY_NCOLS,MY_NROWS,EMLAYS,N_SPC_EMIS+1 ),
@@ -470,6 +595,12 @@ C Allocate FST array
 
          END IF         ! if Mosaic
 
+#ifdef isam
+      ELSE         ! 20120725 keep pointer ISAMEM pointed to what's supposed to point to
+         NULLIFY( ISAMEM )
+         ISAMEM => PSAEM( 1:MY_NCOLS,1:MY_NROWS,:,:,: )
+#endif
+
       END IF          !  if Firstime
 
       MDATE = JDATE
@@ -489,7 +620,14 @@ C read & interpolate deposition velocities
       
 C read & interpolate emissions data => VDEMIS from EMIS_DEFN module
 
+#ifdef isam
+      CALL GET_EMIS ( MDATE, MTIME, TSTEP, CONVPA, RDX3F, RRHOJ, RJACM,
+     &                ISAMEM, MFRC_P )
+Ckrt Fill up isamem(:,:,:,:,othrtag)
+      CALL SA_FIL_OTHRTAG ( ISAMEM, JDATE, JTIME )
+#else
       CALL GET_EMIS ( MDATE, MTIME, TSTEP, CONVPA, RDX3F, RRHOJ, RJACM )
+#endif
 
       IF ( LIPR ) THEN
          DO S = 1, N_SPC_EMIS+1
@@ -521,8 +659,11 @@ C EDDYV returned = Kz, where Kz is in m**2/sec
       IF ( IFACM .EQ. 0 ) CONVCT = .FALSE.   ! no ACM
 
 C Convert non-molar mixing ratio species and re-order CGRID
-
+#ifdef isam
+      CALL CONV_CGRID ( CGRID, JDATE, JTIME, CNGRD, ISAM )
+#else
       CALL CONV_CGRID ( CGRID, MDATE, MTIME, CNGRD )
+#endif
 
       IF ( WSTEP .EQ. 0 ) DDEP = 0.0
       IF ( WSTEP .EQ. 0 ) ICMP = 0.0
@@ -618,6 +759,12 @@ C End ACM insert
             DO V = 1, N_SPC_DIFF
                CONC( V,L ) = CNGRD( DIFF_MAP( V ),L,C,R )
             END DO
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here.......
+           DO JSPCTAG = 1, N_SPCTAG
+             SACONC( JSPCTAG,L ) = ISAM( C,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) )
+           END DO
+#endif
          END DO
 
          EMIS = 0.0
@@ -625,6 +772,12 @@ C End ACM insert
             DO V = 1, N_SPC_DIFF
                EMIS( V,L ) = VDEMIS( DF2EM( V ),L,C,R ) * DTS
             END DO
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here.......
+            DO JSPCTAG = 1, N_SPCTAG
+               SAEMIS( JSPCTAG,L ) = ISAMEM( C,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) ) * DTS
+           END DO
+#endif
          END DO
 
          DO L = 1, NLAYS
@@ -644,6 +797,37 @@ C End ACM insert
                END DO
             END IF            
          END DO
+
+#ifdef isam
+!KRT..20120918 derive averaged vdep for voc
+         IF ( ANY( L_OZONE ) ) THEN
+            JSPC_VOC = INDEX1( 'VOC', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+            DD_FAC_VOC = 0.0
+            TTL_CVOC = 0.0
+            DEPV_VOC = 0.0
+            EFAC1_VOC = 0.0
+            EFAC2_VOC = 0.0
+!KRT20120924           CNT = 0
+            DO JV = 1, N_EVOC
+               TTL_CVOC = TTL_CVOC + CNGRD( SPC_INDEX( JSPC_VOC,JV+1 ),1,C,R ) * NCARBON( JV )
+               DO V = 1, N_SPC_DEPV
+                  IF ( NAM_VOC( JV ) .EQ. TRIM( DEPV_SPC( V ) ) ) THEN
+!KRT20120924         CNT = CNT + 1
+                     DD_FAC_VOC = DD_FAC_VOC + DTDENS1 * DD_CONV( V ) * DEPVCR( V )
+!KRT20120924         DD_FAC_VOC = DD_FAC_VOC * REAL( CNT - 1 )/REAL( CNT )
+!KRT20120924     &              + DTDENS1 * DD_CONV( V ) * DEPVCR( V ) / REAL( CNT )
+!KRT20120924         TTL_CVOC = TTL_CVOC + CONC( DV2DF( V ), 1 ) * NCARBON( JV )
+                     DEPV_VOC = DEPV_VOC
+     &                        + CONC( DV2DF(V), 1 ) * NCARBON( JV ) * DEPVCR( V )
+                  END IF
+               END DO
+            END DO
+            DD_FAC_VOC = DD_FAC_VOC / REAL( N_EVOC )
+            IF ( TTL_CVOC .GT. 1.E-30 ) DEPV_VOC = DEPV_VOC / TTL_CVOC
+            EFAC1_VOC = EXP( -DEPV_VOC * RDEPVHT( C,R ) * THBAR * DTS )
+            EFAC2_VOC = EXP( -DEPV_VOC * RDEPVHT( C,R ) * THETA * DTS )
+         END IF ! any l_ozone
+#endif
 
          IF ( MOSAIC ) THEN
             DO V = 1, N_SPC_DEPV
@@ -666,6 +850,13 @@ C End ACM insert
 
          PLDV_HONO = PLDV( HONO_HIT,C,R )
          CONC_NO2 = CONC( NO2_MAP,1 )
+
+#ifdef isam
+Ckrt Load sa_ddep into sa_ddbf....
+         DO JSPCTAG = 1, N_SPCTAG
+            SA_DDBF( JSPCTAG ) = SA_DDEP( C,R,JSPCTAG )
+         END DO
+#endif
 
 C-----------------------------------------------------------------------
 
@@ -788,6 +979,33 @@ C --------- END of HET HONO RX ----------
 
             END IF   ! MOSAIC
 
+#ifdef isam
+Ckrt ...Update Dry Deposition for the Tags
+            DO JSPCTAG = 1, N_SPCTAG
+               IBGN = INDEX( VNAM_SPCTAG( JSPCTAG ), '_', .FALSE. ) - 1
+Ckrt nonNOX....
+               DO V = 1, N_SPC_DEPV
+                  IF ( VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .EQ. TRIM( DV2DF_SPC( V ) ) ) THEN
+                     SACONC( JSPCTAG,1 ) = SACONC( JSPCTAG,1 ) * EFAC1( V )
+                     SA_DDBF( JSPCTAG ) = SA_DDBF( JSPCTAG )
+     &                                  + THBAR * DD_FAC( V ) *  SACONC( JSPCTAG,1 )
+!krt &                                  + THETA * DD_FAC( S ) * ( SACONC( JSPCTAG,1 ) - POL( S ) )
+                  ELSE IF ( VNAM_SPCTAG( JSPCTAG)( 1:IBGN-1 ) .EQ. 'O3' .AND.
+     &                      TRIM ( DV2DF_SPC( V ) ) .EQ. 'O3' ) THEN
+                     SACONC( JSPCTAG,1 ) = SACONC( JSPCTAG,1 ) * EFAC1( V )
+                     SA_DDBF( JSPCTAG ) = SA_DDBF( JSPCTAG )
+     &                                  + THBAR * DD_FAC( V ) *  SACONC( JSPCTAG,1 )
+                  END IF ! vnam_spctag begins with one of ddep_spc ?
+               END DO
+
+               IF ( VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .EQ. 'VOC' ) THEN
+                  SACONC( JSPCTAG,1 ) = SACONC( JSPCTAG,1 ) * EFAC1_VOC
+                  SA_DDBF( JSPCTAG ) = SA_DDBF( JSPCTAG )
+     &                               + THBAR * DD_FAC_VOC *  SACONC( JSPCTAG,1 )
+               END IF
+            END DO
+#endif
+
 C Init variables for use below
 
             DO L = 1, NLAYS
@@ -799,6 +1017,13 @@ C Init variables for use below
                   DD( V,L ) = 0.0
                   UU( V,L ) = 0.0
                END DO
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here.....
+               DO JSPCTAG = 1, N_SPCTAG
+                  SA_DD( JSPCTAG,L ) = 0.0
+                  SA_UU( JSPCTAG,L ) = 0.0
+               END DO
+#endif
             END DO
 
 C Compute tendency of CBL concentrations - semi-implicit solution
@@ -817,8 +1042,17 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
      &                              + MFAC      * CONC( V,L+1 ) )
                      DD( V,L ) = CONC( V,L ) + CRANKQ * DELC
                   END DO
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here....
+                  DO JSPCTAG = 1, N_SPCTAG
+                    DELC = DTS * ( MBARKS( L ) * SACONC( JSPCTAG,1 )
+     &                   - MDWN( L ) * SACONC( JSPCTAG,L )
+     &                   + MFAC      * SACONC( JSPCTAG,L+1 ) )
+                    SA_DD( JSPCTAG,L ) = SACONC( JSPCTAG,L ) + CRANKQ * DELC
+                  END DO
+#endif
                END DO
-            END IF
+            END IF   ! convct?
 
             AA( 2 ) = AA( 2 ) - EDDY( 1 ) * CRANKP * RDX3F( 2 ) * DTS
             EE( 1 ) = EE( 1 ) - EDDY( 1 ) * CRANKP * RDX3F( 1 ) * DTS
@@ -829,7 +1063,13 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
                   DO V = 1, N_SPC_DIFF
                      DD( V,L ) = CONC( V,L )
                   END DO
-               END IF
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here.....
+                  DO JSPCTAG = 1, N_SPCTAG
+                     SA_DD( JSPCTAG,L ) = SACONC( JSPCTAG,L )
+                  END DO
+#endif
+               END IF ! L > lcbl ?
                XPLUS  = EDDY( L )   * RDX3F( L ) * DTS
                XMINUS = EDDY( L-1 ) * RDX3F( L ) * DTS
                BB( L ) = BB( L ) + ( XPLUS + XMINUS ) * CRANKP
@@ -841,6 +1081,14 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
      &                         - CRANKQ * XMINUS
      &                         * ( CONC( V,L ) - CONC( V,L-1 ) )
                   END DO
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here....
+                  DO JSPCTAG = 1, N_SPCTAG
+                    SA_DD( JSPCTAG,L ) = SA_DD( JSPCTAG,L )
+     &                                 - CRANKQ * XMINUS
+     &                                 * ( SACONC( JSPCTAG,L ) - SACONC( JSPCTAG,L-1 ) )
+                  END DO
+#endif
                ELSE
                   LFAC1 = CRANKQ * XPLUS
                   LFAC2 = CRANKQ * XMINUS
@@ -852,6 +1100,18 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
      &                         * ( CONC( V,L ) - CONC( V,L-1 ) )
                      IF ( L .LE. EMLAYS ) DD( V,L ) = DD( V,L ) + EMIS( V,L )
                   END DO
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here....
+                  DO JSPCTAG = 1, N_SPCTAG
+                     SA_DD( JSPCTAG,L ) = SA_DD( JSPCTAG,L )
+     &                                  + LFAC1
+     &                                  * ( SACONC( JSPCTAG,L+1 ) - SACONC( JSPCTAG,L ) )
+     &                                  - LFAC2
+     &                                  * ( SACONC( JSPCTAG,L ) - SACONC( JSPCTAG,L-1 ) )
+                     IF ( L .LE. EMLAYS ) SA_DD( JSPCTAG,L ) =
+     &                                    SA_DD( JSPCTAG,L ) + SAEMIS( JSPCTAG,L )
+                  END DO
+#endif
                END IF
             END DO
 
@@ -859,6 +1119,12 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
             DO V = 1, N_SPC_DIFF
                DD( V,1 ) = CONC( V,1 )
             END DO
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here....
+            DO JSPCTAG = 1, N_SPCTAG
+               SA_DD( JSPCTAG,1 ) = SACONC( JSPCTAG,1 )
+            END DO
+#endif
 
             IF ( CONVCT( C,R ) ) THEN
                LFAC1 = ( XPBL( C,R ) - X3FACE_GD( 1 ) ) * RDX3F( 1 ) * DTS
@@ -871,7 +1137,15 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
      &                      - LFAC1 * CONC( V,1 )
      &                      + LFAC2 * CONC( V,2 ) ! net mixing above
                END DO
-            END IF
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here....
+               DO JSPCTAG = 1, N_SPCTAG
+                  SA_DD( JSPCTAG,1 ) = SA_DD( JSPCTAG,1 )
+     &                               - LFAC1 * SACONC( JSPCTAG,1 )
+     &                               + LFAC2 * SACONC( JSPCTAG,2 ) ! net mixing above
+               END DO
+#endif
+            END IF ! convct ?
 
             BB( 1 ) = BB( 1 ) + CRANKP * EDDY( 1 ) * RDX3F( 1 ) * DTS
             LFAC1 = CRANKQ * EDDY( 1 ) * RDX3F( 1 ) * DTS
@@ -880,13 +1154,27 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
      &                   + LFAC1 * ( CONC( V,2 ) - CONC( V,1 ) )
      &                   + EMIS( V,1 )
             END DO
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here....
+            DO JSPCTAG = 1, N_SPCTAG
+               SA_DD( JSPCTAG,1 ) = SA_DD( JSPCTAG,1 )
+     &                            + LFAC1 * ( SACONC( JSPCTAG,2 ) - SACONC( JSPCTAG,1 ) )
+     &                            + SAEMIS( JSPCTAG,1 )
+            END DO
+#endif
 
 C Subroutine MATRIX then solves for U if ACM2, else TRI solves for U
 
             IF ( CONVCT( C,R ) ) THEN
                CALL MATRIX ( AA, BB, CC, DD, EE, UU )
+#ifdef isam
+               CALL SA_MATRIX ( AA, BB, CC, SA_DD, EE, SA_UU ) ! Mc06 , N_SPCTAG ) ! KRT
+#endif
             ELSE
                CALL TRI ( CC, BB, EE, DD, UU )
+#ifdef isam
+               CALL SA_TRI ( CC, BB, EE, SA_DD, SA_UU ) ! Mc06 , N_SPCTAG ) ! KRT
+#endif
             END IF
 
 C Load into CGRID
@@ -894,6 +1182,12 @@ C Load into CGRID
                DO V = 1, N_SPC_DIFF
                   CONC( V,L ) = UU( V,L )
                END DO
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here.....
+              DO JSPCTAG = 1, N_SPCTAG
+                 SACONC( JSPCTAG,L ) = SA_UU( JSPCTAG,L )
+              END DO
+#endif
             END DO
             
             DO V = 1, N_SPC_DEPV
@@ -985,12 +1279,44 @@ C For NH3, use bi-directional flux
                END IF   ! FST
             END IF   ! MOSAIC
 
+#ifdef isam
+Ckrt ...Update Dry Deposition for the Tags
+            DO JSPCTAG = 1, N_SPCTAG
+               IBGN = INDEX( VNAM_SPCTAG( JSPCTAG ), '_', .FALSE. ) - 1
+Ckrt nonNOX....
+               DO V = 1, N_SPC_DEPV
+                  IF ( VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .EQ. DV2DF_SPC( V ) ) THEN
+                     SACONC( JSPCTAG,1 ) = SACONC( JSPCTAG,1 ) * EFAC2( V )
+                     SA_DDBF( JSPCTAG ) = SA_DDBF( JSPCTAG )
+     &                                  + THETA * DD_FAC( V ) *  SACONC( JSPCTAG,1 )
+                  ELSE IF ( VNAM_SPCTAG( JSPCTAG )( 1:IBGN-1 ) .EQ. 'O3' .AND.
+     &                      TRIM ( DV2DF_SPC( V ) ) .EQ. 'O3' ) THEN
+                     SACONC( JSPCTAG,1 ) = SACONC( JSPCTAG,1 ) * EFAC2( V )
+                     SA_DDBF( JSPCTAG ) = SA_DDBF( JSPCTAG )
+     &                                  + THETA * DD_FAC( V ) *  SACONC( JSPCTAG,1 )
+                  END IF  ! vnam_spctag begins with one of ddep_spc ?
+               END DO ! V
+
+               IF ( VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .EQ. 'VOC' ) THEN
+                  SACONC( JSPCTAG,1 ) = SACONC( JSPCTAG,1 ) * EFAC2_VOC
+                  SA_DDBF( JSPCTAG ) = SA_DDBF( JSPCTAG )
+     &                               + THETA * DD_FAC_VOC *  SACONC( JSPCTAG,1 )
+               END IF
+            END DO
+#endif
+
 301      CONTINUE                 ! end sub time loop
 
          DO L = 1, NLAYS
             DO V = 1, N_SPC_DIFF
                CNGRD( DIFF_MAP( V ),L,C,R ) = CONC( V,L )
             END DO
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here and update ISAM array......
+           DO JSPCTAG = 1, N_SPCTAG
+              ISAM( C,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) ) = SACONC( JSPCTAG,L )
+           END DO
+#endif
          END DO
 
          DO V = 1, N_SPC_DEPV
@@ -1018,12 +1344,23 @@ C For NH3, use bi-directional flux
             END IF
          END IF
 
+#ifdef isam
+Ckrt Would Insert JSPCTAG Loop Here and update dry dep for the tags....
+         DO JSPCTAG = 1, N_SPCTAG
+            SA_DDEP( C,R,JSPCTAG ) = SA_DDBF( JSPCTAG )
+         END DO
+#endif
+
 344   CONTINUE         !  end loop on col C
 345   CONTINUE         !  end loop on row R
 
 C Revert non-molar mixing ratio species and re-order CGRID
 
+#ifdef isam
+      CALL REV_CGRID ( CNGRD, JDATE, JTIME, CGRID, ISAM )
+#else
       CALL REV_CGRID ( CNGRD, MDATE, MTIME, CGRID )
+#endif
 
 C If last call this hour:  write accumulated depositions:
 
@@ -1115,7 +1452,7 @@ C If last call this hour:  write accumulated depositions:
                            END IF
                         END DO
                         WRDDJ_FST( C,R,N_LUFRAC+1 ) = WRDD( C,R )  ! last array element is total across all land use categories
-                    END DO
+                     END DO
                   END DO
              
                   IF ( .NOT. WRITE3( CTM_DRY_DEP_FST, DDEP_SPC( V ),
@@ -1137,6 +1474,24 @@ C If last call this hour:  write accumulated depositions:
          IF ( ABFLUX ) THEN    
             CALL WRASX_MEDIA( MDATE, MTIME )
          END IF 
+
+#ifdef isam
+Ckrt Insert JSPCTAG Loop to write out sa_dd_1 here.....
+         WRDD = 0.0
+         DO JSPCTAG = 1, N_SPCTAG
+            DO R = 1, MY_NROWS
+               DO C = 1, MY_NCOLS
+                  WRDD( C,R ) = SA_DDEP( C,R,JSPCTAG )
+               END DO
+            END DO
+
+            IF ( .NOT. WRITE3( SA_DD_1, VNAM_SPCTAG( JSPCTAG ),
+     &                         MDATE, MTIME, WRDD ) ) THEN
+               XMSG = 'Could not write ' // SA_DD_1 // ' file'
+               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+            END IF
+         END DO
+#endif
  
          IF ( LIPR ) THEN
             DO V = 1, N_SPC_DEPV
@@ -1153,12 +1508,15 @@ C re-set dry deposition array to zero
 
          DDEP = 0.0
          ICMP = 0.0
+#ifdef isam
+         SA_DDEP = 0.0
+#endif
          IF ( MOSAIC ) THEN
             DDEPJ = 0.0   ! array assignment
             IF ( FST ) DDEPJ_FST = 0.0   ! array assignment
          END IF
 
-      END IF
+      END IF   ! wstep >= tstep1 ?
 
       RETURN
       END

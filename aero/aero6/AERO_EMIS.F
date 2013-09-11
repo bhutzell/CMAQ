@@ -65,6 +65,7 @@ C   11 May 11 D.Wong: incorporated twoway model implementation
 C   18 Aug 11 David Wong: In the merge inline point source PM species calculation,
 C                         arrays EMBUFF and PMEMIS_PT have incorrect index values
 C   17 Apr 13 J.Young: replace "SPFC ASO4" (found by Havala Pye) with "SPFC_ASO4"
+C   19 Jul 13 R.Kwok: isam
 
 C-----------------------------------------------------------------------
 
@@ -78,6 +79,9 @@ C aerosol emissions: [ppmv/s] for mass & number spcs, [m2/mol/s] for surface are
       INTEGER :: PM_EMLYRS   ! number of vertical layers on emis file (set in EMIS_DEFN)
 
       PUBLIC VDEMIS_AE, PM_EMLYRS, AERO_EMIS_INIT, GET_AERO_EMIS
+#ifdef isam
+      PUBLIC SA_AERO_EMIS
+#endif
       PRIVATE
 
 C Variables for converting mass emissions rate to number emissions rate
@@ -986,6 +990,150 @@ C     [m2/mol/s].  Save results in the VDEMIS_AE array.
          RETURN
 
          END SUBROUTINE GET_AERO_EMIS
+
+#ifdef isam
+C..Isam aero emis allocation
+         SUBROUTINE SA_AERO_EMIS ( JDATE, JTIME, TSTEP, RJACM, ISAMEM_AE )
+C
+C..July 20, 2012, R. Kwok: Replicated from GET_AERO_EMIS for tagged PM emissions
+C
+C ----------------------------------------------------------------------
+         USE GRID_CONF           ! horizontal & vertical domain specifications
+         USE CGRID_SPCS          ! CGRID mechanism species
+         USE PT3D_DEFN, ONLY: PT3DEMIS, PMEMIS_PT ! from plume rise
+         USE PTMAP, ONLY: N_SPC_PTPM, PTPM_MAP    ! defines emissions file(s) PM mapping
+         USE AERO_DATA
+         USE PRECURSOR_DATA
+         USE UTILIO_DEFN
+         USE SA_GRD_DEFN         ! 20120720
+
+         INCLUDE SUBST_CONST     ! physical and mathematical constants
+         INCLUDE SUBST_FILES_ID  ! file name parameters
+
+C Arguments:
+
+         INTEGER, INTENT( IN ) :: JDATE      ! current model date, coded YYYYDDD
+         INTEGER, INTENT( IN ) :: JTIME      ! current model time, coded HHMMSS
+         INTEGER, INTENT( IN ) :: TSTEP( 3 ) ! time step vector (HHMMSS)
+                                             ! TSTEP(1) = local output step
+                                             ! TSTEP(2) = sciproc sync. step (chem)
+                                             ! TSTEP(3) = twoway model time step w.r.t. wrf time
+                                             !            step and wrf/cmaq call frequency
+         REAL,    INTENT( IN ) :: RJACM( NCOLS,NROWS,NLAYS ) ! recip of mid-layer
+                                                             ! Jacobian [1/m]
+         REAL,    INTENT( INOUT ) :: ISAMEM_AE( :,:,:,:,: ) ! aero emissions [ppmv/s]
+
+
+         REAL( 8 ) :: GSFAC                        ! into [ug/m3/sec]
+
+C Variables interpolated from the meteorological input files
+         REAL DENS( NCOLS,NROWS,NLAYS )        ! air density [kg/m3]
+
+C Variables for converting emission rates into molar-mixing-ratio units
+         REAL, PARAMETER :: RAVO = 1.0 / AVO   ! reciprocal of Avogadro
+         REAL( 8 ) :: CONVM     ! conversion factor for mass emissions [m3/mol]
+
+C Third moment emissions rates [m3/m3/s]
+         REAL( 8 ) :: EMISM3( N_MODE )
+
+C Number emissions rates [1/m3/s]
+         REAL( 8 ) :: EM_NUM( N_MODE )
+
+C Surface area emission rates [m2/m3/s]
+         REAL( 8 ) :: EM_SRF( N_MODE )
+
+C Miscellaneous variables
+         CHARACTER( 16 ), SAVE :: PNAME = 'SA_AERO_EMIS'
+         INTEGER C, R, L, N, V, S         ! Loop indices
+         INTEGER JSPC, ITAG               ! 20120723 isam indices
+
+C....20130319
+         INTEGER :: VMODE( N_MODE )
+
+C diagnostic....20130319
+         REAL    SA_CHK
+
+#ifdef Verbose2
+         real sumem
+#endif
+
+C ----------------------------------------------------------------------
+
+C *** Read air density [kg/m3], atmospheric pressure [Pa], air temperature
+C     [K], specific humidity [kg H2O / kg air], and 10m wind speed [m/s]
+C     from meteorology file.  Interpolate to the current time.  Store results
+C     in DENS, PRES, TA, QV, and WSPD10 arrays.
+         IF ( .NOT. INTERPX( MET_CRO_3D, 'DENS', PNAME,
+     &                       STRTCOLMC3,ENDCOLMC3, STRTROWMC3,ENDROWMC3,
+     &                       1,NLAYS, JDATE, JTIME, DENS ) ) THEN
+            XMSG = 'Could not interpolate DENS from ' // MET_CRO_3D
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+
+
+         DO L = 1, PM_EMLYRS
+           DO R = 1, MY_NROWS
+             DO C = 1, MY_NCOLS
+               DO ITAG = 1, NTAG_SA - 3
+
+C *** Store aerosol emission rates for this grid cell in a 1D array
+                 DO S = 1, N_EMIS_PM
+                   PM_EM( S ) = SA_PMEMIS_GRD( C,R,L,S,ITAG )
+                 END DO
+
+C *** Calculate scaling factor for converting mass emissions into [ug/m3/s]
+C     note: RJACM converts grid heights from sigma coordinates to meters
+C     Also calculate scaling factors for converting to molar-mixing-ratio units
+                 GSFAC = CONVEM_PM( L ) * RJACM( C,R,L )
+                 CONVM = MWAIR / GPKG / DENS( C,R,L )   ! [m3/mol]
+
+C *** Calculate speciated mass emission rates for fine aerosol [ug/m3/s]
+                 DO S = 1, N_EMIS_PM
+                   EM_RATE( S ) = PM_EM( S ) * GSFAC
+                 END DO
+
+C *** Extract H2SO4 vapor emission rate from the VDEMIS array, add it to
+C     the fine-PM sulfate emissions, and remove it from the gas emissions
+                 EM_RATE( VPSO4 ) = EM_RATE( VPSO4 ) + SA_SULF_GRD( C,R,L,ITAG )
+     &                            * PRECURSOR_MW( SULF_IDX ) / CONVM
+                 SA_SULF_GRD( C,R,L,ITAG ) = 0.0
+
+C *** Calculate emissions rate for third moments [m3/m3/s] of each mode
+C     (excluding sea salt), as in Equation 7a of Binkowski & Roselle (2003).
+                 EM_PART = 0.0   ! array assignment
+                 EMISM3 = 0.0    ! array assignment
+                 DO S = 1, N_EMIS_PM
+                   IDX = PMEM_MAP( S )
+                   DO N = 1, N_MODE - 1
+                     EM_PART( IDX,N ) = AEROSPC( IDX )%EMIS_SPLIT( N )
+     &                                * EM_RATE( S )
+                   END DO
+                 END DO
+
+C *** Convert emission rates into molar-mixing-ratio units, as required by
+C     the vertical diffusion routines.  Mass emissions are
+C     converted to [ppmv/s]. Save results in the ISAMEM_AE array.
+                 DO JSPC = 1, NSPC_SA
+                   VMODE( 1 ) = INDEX1( SPC_NAME( JSPC,ITAG ), N_EMIS_PM, ANAMI )
+                   VMODE( 2 ) = INDEX1( SPC_NAME( JSPC,ITAG ), N_EMIS_PM, ANAMJ )
+                   DO N = 1, N_MODE - 1
+                     IF ( VMODE( N ) .GT. 0 ) THEN
+                       IDX = PMEM_MAP( VMODE( N ) )
+                       ISAMEM_AE( C,R,L,JSPC,ITAG ) = EM_PART( IDX,N ) *EM_FAC( IDX,N )
+     &                                              * CONVM / AEROSPC_MW( IDX )
+                     END IF ! vmode( N ) > 0
+                   END DO ! loop N
+                 END DO   ! loop on jspc
+
+               END DO   ! loop on itag
+             END DO   ! loop on MY_NCOLS
+           END DO   ! loop on MY_NROWS
+         END DO   ! loop on PM_EMLYRS
+
+         RETURN
+
+         END SUBROUTINE SA_AERO_EMIS
+#endif
 
       END MODULE AERO_EMIS
 

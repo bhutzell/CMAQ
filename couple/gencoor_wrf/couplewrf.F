@@ -25,7 +25,12 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C @(#)couple.F	1.1 /project/mod3/CMAQ/src/convert/couple/SCCS/s.couple.F 03 Jun 1997 11:41:33
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef isam
+      SUBROUTINE COUPLE_WRF ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
       SUBROUTINE COUPLE_WRF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
+
 
 C-----------------------------------------------------------------------
 C Function:
@@ -50,11 +55,15 @@ C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                      removed deprecated TRIMLEN
 C   16 Sep 11 S.Roselle: for Pleim`s zadv-wrf blend
 C   11 Oct 11 J.Young: eliminate ppmv_msmr
+C   19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
+#ifdef isam
+      USE SA_DEFN               ! 20120815
+#endif
 
       IMPLICIT NONE   
 
@@ -71,6 +80,9 @@ C Arguments:
                                           ! TSTEP(2) = sciproc sync. step (chem)
                                           ! TSTEP(3) = twoway model time step w.r.t.
                                           ! wrf time step and wrf/cmaq call frequency
+#ifdef isam
+      REAL, POINTER :: ISAM( :,:,:,:,: )
+#endif
 C Parameters:
       REAL, PARAMETER :: GPKG = 1.0E+03   ! g/kg
       REAL, PARAMETER :: MGPG = 1.0E+06   ! micro-g/g
@@ -105,6 +117,10 @@ C for INTERPX
       INTEGER     OFF              ! loop offset to CGRID species
       INTEGER     C, R, L, SPC, V  ! loop counters
       INTEGER     RHOJ_LOC         ! pointer to transported RHOJ (in CGRID)
+
+#ifdef isam
+      INTEGER     IBGN
+#endif
 
 C-----------------------------------------------------------------------
 
@@ -273,12 +289,44 @@ C CGRID in mixing ratio [ppmV] -> (air density X "total" Jacobian) X mixing rati
          END DO
       END IF
 
+#ifdef isam
+      DO V = 1, N_SPCTAG
+         IBGN = INDEX( VNAM_SPCTAG( V ), '_', .FALSE. ) - 1
+         IF ( VNAM_SPCTAG( V )( 1:1 ) .EQ. 'A' .AND.
+     &      ( VNAM_SPCTAG( V )( IBGN:IBGN ) .EQ. 'I' .OR.
+     &        VNAM_SPCTAG( V )( IBGN:IBGN ) .EQ. 'J' .OR.
+     &        VNAM_SPCTAG( V )( IBGN:IBGN ) .EQ. 'K' ) ) THEN
+            DO L = 1, NLAYS
+            DO R = 1, MY_NROWS
+            DO C = 1, MY_NCOLS
+               ISAM( C,R,L,S_SPCTAG( V ),T_SPCTAG( V ) ) =
+     &         ISAM( C,R,L,S_SPCTAG( V ),T_SPCTAG( V ) ) * JACOBM( C,R,L )
+     &                                                   / CONV
+            END DO ! C
+            END DO ! R
+            END DO ! L
+         ELSE
+            DO L = 1, NLAYS
+            DO R = 1, MY_NROWS
+            DO C = 1, MY_NCOLS
+               ISAM( C,R,L,S_SPCTAG( V ),T_SPCTAG( V ) ) =
+     &         ISAM( C,R,L,S_SPCTAG( V ),T_SPCTAG( V ) ) * RHOJ( C,R,L )
+            END DO ! C
+            END DO ! R
+            END DO ! L
+        END IF ! vnam begins with 'a' and ends with i,j or k
+      END DO ! n_spctag
+#endif
+
       RETURN
  
-C............................................................................
-C entry DECOUPLE
+C............................................................................  C entry DECOUPLE
  
+#ifdef isam
+      ENTRY DECOUPLE_WRF ( CGRID, JDATE, JTIME, TSTEP, ISAM )
+#else
       ENTRY DECOUPLE_WRF ( CGRID, JDATE, JTIME, TSTEP )
+#endif
 
       VNAME = 'JACOBM'
       IF ( .NOT. INTERPX( MET_CRO_3D, VNAME, PNAME,
@@ -388,6 +436,35 @@ C CGRID in mixing ratio [ppmV] X (air density X "total" jacobian) -> mixing rati
             END DO
          END DO
       END IF
+
+#ifdef isam
+      DO V = 1, N_SPCTAG
+         IBGN = INDEX( VNAM_SPCTAG( V ),'_', .FALSE. ) - 1
+         IF ( VNAM_SPCTAG( V )( 1:1 ) .EQ. 'A' .AND.
+     &      ( VNAM_SPCTAG( V )( IBGN:IBGN ) .EQ. 'I' .OR.
+     &        VNAM_SPCTAG( V )( IBGN:IBGN ) .EQ. 'J' .OR.
+     &        VNAM_SPCTAG( V )( IBGN:IBGN ) .EQ. 'K' ) ) THEN
+            DO L = 1, NLAYS
+            DO R = 1, MY_NROWS
+            DO C = 1, MY_NCOLS
+               ISAM( C,R,L,S_SPCTAG( V ),T_SPCTAG( V ) ) =
+     &         ISAM( C,R,L,S_SPCTAG( V ),T_SPCTAG( V ) ) * CONV
+     &                                                   / JACOBM( C,R,L )
+            END DO ! C
+            END DO ! R
+            END DO ! L
+         ELSE
+            DO L = 1, NLAYS
+            DO R = 1, MY_NROWS
+            DO C = 1, MY_NCOLS
+               ISAM( C,R,L,S_SPCTAG( V ),T_SPCTAG( V ) ) =
+     &         ISAM( C,R,L,S_SPCTAG( V ),T_SPCTAG( V ) ) / RHOJ( C,R,L )
+            END DO ! C
+            END DO ! R
+            END DO ! L
+         END IF ! vnam begins with 'a' and ends with i,j or k
+      END DO ! n_spctag
+#endif
 
       RETURN
       END
