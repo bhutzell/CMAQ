@@ -49,6 +49,8 @@ C                       Hertel et al.
 C   21 Jun 10 J.Young: convert for Namelist redesign
 C   11 May 11 D.Wong: incorporated twoway model implementation
 C   27 Sep 11 B.Hutzell: revised method for defining CALL_DEG variable
+C   19 Apr 13 S.Roselle: Added SAPRC07TB_AE6ST_AQ to the mechanisms supported
+C                       by this solver
 C
 C**********************************************************************
 
@@ -140,7 +142,8 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          LOGDEV = INIT3( )
 
          IF ( MECHNAME .NE. 'SAPRC07TB_AE5_AQ' .AND.
-     &        MECHNAME .NE. 'SAPRC07TB_AE6_AQ' ) THEN
+     &        MECHNAME .NE. 'SAPRC07TB_AE6_AQ' .AND.
+     &        MECHNAME .NE. 'SAPRC07TB_AE6ST_AQ' ) THEN
              MSG = 'This version of the EBI solver can only be used with'
      &            // ' the SAPRC07TB chemical mechanisms'
              CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
