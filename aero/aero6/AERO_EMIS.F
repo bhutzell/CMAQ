@@ -256,6 +256,7 @@ C Miscellaneous variables
          CHARACTER( 16 ), SAVE :: PNAME = 'AERO_EMIS_INIT  '
          CHARACTER( 16 ) :: VNAME         ! temp var for species names
          INTEGER L, N, S                  ! Loop indices
+         logical firstwrite
 
 C ----------------------------------------------------------------------
 
@@ -385,7 +386,7 @@ C *** Map indices of emission species
 
 C *** set across-the-board adjustment factors (from Namelist file)
 C     Strategy: first check Namelist Emis_Fac for antrhop. emis, then check for non-zero split factor
-      write( logdev,* ) 'modified aerospc em_fac'
+         firstwrite = .true.
          EM_FAC = 1.0 ! array assignment
          DO S = 1, N_AEROSPC
             IF ( AEROSPC( S )%EMIS .NE. ' ' ) THEN
@@ -395,6 +396,10 @@ C     Strategy: first check Namelist Emis_Fac for antrhop. emis, then check for 
                      IF ( L .GT. 0 ) THEN
                         EM_FAC( S,N ) = AE_EMIS_FAC( L )
                         if ( em_fac( s,n ) .ne. 1.0 ) then
+                           if ( firstwrite ) then
+                              firstwrite = .false.
+                              write( logdev,* ) 'modified aerospc em_fac'
+                           end if
                            write( logdev,* ) ' ', s, n, aerospc( s )%name( n ), em_fac( s,n )
                         end if
                      END IF
@@ -407,6 +412,10 @@ C     Strategy: first check Namelist Emis_Fac for antrhop. emis, then check for 
                      IF ( AE_EMIS( L ) .NE. ' ' ) THEN
                         EM_FAC( S,N ) = AE_EMIS_FAC( L )
                         if ( em_fac( s,n ) .ne. 1.0 ) then
+                           if ( firstwrite ) then
+                              firstwrite = .false.
+                              write( logdev,* ) 'modified aerospc em_fac'
+                           end if
                            write( logdev,* ) ' ', s, n, aerospc( s )%name( n ), em_fac( s,n )
                         end if
                      END IF
@@ -1016,7 +1025,9 @@ C     [m2/mol/s].  Save results in the VDEMIS_AE array.
          END DO   ! loop on PM_EMLYRS
 
 #ifdef Verbose2
-         write( logdev,'(/"@@@1", i8, i7.6)') jdate, jtime
+         do s = 1, n_ae_emis
+         end do
+         write( logdev,'(/"sum layer 1 ae_emis" /"@@@1", i8, i7.6)') jdate, jtime
          l = 1
          do s = 1, n_ae_emis
             sumem = 0.0
