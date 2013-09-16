@@ -83,7 +83,8 @@ C-----------------------------------------------------------------------
 
 #ifdef Verbose2
       character( 16 ), allocatable, save :: emis_spc( : ) ! global emis surrogates
-      integer,         allocatable, save :: emis_map( : )  ! name map to CGRID
+      integer,         allocatable, save :: emis_map( : ) ! name map to CGRID
+      real,            allocatable, save :: emis_fac( : ) ! namelist factor
 #endif
 
       CONTAINS
@@ -210,40 +211,48 @@ C lightning NO emissions?
      &              + N_TR_EMIS
 
 #ifdef Verbose2
+C        Note: emis_fac used just for listing here what the namelist files have
          allocate ( emis_spc ( n_spc_emis+1 ),
-     &              emis_map ( n_spc_emis+1 ), stat = status )
+     &              emis_map ( n_spc_emis+1 ),
+     &              emis_fac ( n_spc_emis+1 ), stat = status )
          if ( status .ne. 0 ) then
-            xmsg = 'emis_spc or emis_map memory allocation failed'
+            xmsg = 'emis_spc, emis_map, or emis_fac memory allocation failed'
             call m3warn ( pname, jdate, jtime, xmsg )
             success = .false.; return
          end if
          emis_spc = ' '   ! array assignment
          emis_map = 0     ! array assignment
+         emis_fac = 0.0   ! array assignment
 
+         write( logdev,* ) '  v   emis_map  emis_spc           emis_fac'
          s = 0
          do v = 1, n_gc_emis
             s = s + 1
             emis_spc( s ) = gc_emis( v )
             emis_map( s ) = gc_strt - 1 + gc_emis_map( v )
+            emis_fac( s ) = gc_emis_fac( v )
          end do
          do v = 1, n_ae_emis
             s = s + 1
             emis_spc( s ) = ae_emis( v )
             emis_map( s ) = ae_strt - 1 + ae_emis_map( v )
+            emis_fac( s ) = ae_emis_fac( v )
          end do
          do v = 1, n_nr_emis
             s = s + 1
             emis_spc( s ) = nr_emis( v )
             emis_map( s ) = nr_strt - 1 + nr_emis_map( v )
+            emis_fac( s ) = nr_emis_fac( v )
          end do
          do v = 1, n_tr_emis
             s = s + 1
             emis_spc( s ) = tr_emis( v )
             emis_map( s ) = tr_strt - 1 + tr_emis_map( v )
+            emis_fac( s ) = tr_emis_fac( v )
          end do
          do v = 1, n_spc_emis   ! debug
-            write( logdev,'(a,2i4,3x,a)' ) ' v, emis_map(v), emis_spc(v): ',
-     &                                       v, emis_map( v ), emis_spc( v )
+            write( logdev,'(i4, i7, 6x, a, 2x, 1pg13.5)' )
+     &                      v, emis_map( v ), emis_spc( v ), emis_fac( v )
          end do
 #endif
 
@@ -351,10 +360,12 @@ C Local Variables:
          REAL             DELT          ! interpolation factor
          INTEGER          C, R, L, N, S, V ! loop induction variables
 
-         CHARACTER( 16 ) :: PNAME = 'GET_EMIS'
+         CHARACTER( 16 ) :: PNAME = 'Get_Emis'
          CHARACTER( 120 ) :: XMSG = ' '
 #ifdef Verbose2
          integer, save :: logdev
+         logical, save :: onetime = .true.
+         logical firstwrite
          real sumem
 #endif
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
@@ -377,6 +388,9 @@ C read & interpolate emissions (create VDEMIS in the species class order)
 
          VDEMIS = 0.0   ! array assignment
 
+#ifdef Verbose2
+         firstwrite = .true.
+#endif
          DO V = STRT_GC, FINI_GC
             S = V + 1 - STRT_GC
             BUFF = 0.0   ! array assignment
@@ -406,7 +420,16 @@ C  loads."
             END DO
 
 #ifdef Verbose2
-            write( logdev,* ) '  GC EMIS: ', s, '  ', gc_emis( s )
+            if ( onetime ) then
+               if ( firstwrite) then
+                  firstwrite = .false.
+                  write( logdev,2021 ) ' GC'
+               end if
+               write( logdev,2023 ) s, gc_emis( s ), gc_emis_fac( s )
+2021           format( 5x, 15('='), a3, ' EMIS ', 15('=')
+     &               / 5x, 'CGRID INDX', 2x, 'EMIS NAME', 10x, 'EMIS_FAC' )
+2023           format( 5x, i6, 8x, a, 1pg13.5 )
+            end if
 #endif
 
          END DO   ! V
@@ -421,12 +444,23 @@ C tmpbeis312 is based on hourly input - need to interpolate return value
 C merge: VDEMIS_BI in mol/hr. Convert to ppm/sec
 
 #ifdef Verbose2
-            do s = 1, mspcs
-               v = beis_map( s )
-               if ( v .gt. 0 ) then
-                  write( logdev,* ) '  BEIS_MAP: ', s, v, '  ', gc_emis( v ), gc_emis_fac( v )
-               end if
-            end do
+            if ( onetime ) then
+               firstwrite = .true.
+               do s = 1, mspcs
+                  v = beis_map( s )
+                  if ( v .gt. 0 ) then
+                     if ( firstwrite) then
+                        firstwrite = .false.
+                        write( logdev,2027 ) 'G C'
+                     end if
+                     write( logdev,2029 ) s, v, gc_emis( s ), gc_emis_fac( s )
+                  end if
+               end do
+2027           format( 5x, 14('='), ' BEIS MAP ', 14('=')
+     &               / 5x, 'BEIS INDX', 'CGRID INDX', 1x, 'EMIS NAME',
+     &                 9x, 'EMIS_FAC' )
+2029           format( 5x, 2i4, a, 1pg13.5 )
+            end if
 #endif
             L = 1
             CNVTI = CONVPA * CNVTE * RDX3F( L )  ! per sec
@@ -513,6 +547,9 @@ C GET_AERO_EMIS in f90 module AERO_EMIS
 
 C non-reactive gases (conversion to ppmv/s) VDEMIS in this order from RDEMIS
 
+#ifdef Verbose2
+         firstwrite = .true.
+#endif
          DO V = STRT_NR, FINI_NR
             S = V + 1 - STRT_NR
             BUFF = 0.0   ! array assignment
@@ -538,7 +575,7 @@ C                                       vvvvvvv - emis surrogate names
                DO R = 1, MY_NROWS
                   DO C = 1, MY_NCOLS
                      BUFF( C,R,1 ) = BUFF( C,R,1 ) - FERT( C,R,1 )
-                     IF(BUFF( C,R,1 ) .LT. 0.0 ) THEN
+                     IF ( BUFF( C,R,1 ) .LT. 0.0 ) THEN
                         XMSG = 'Negative values in NH3 emissions' 
      &                       //'Error in NH3 Bidi emissions'                          
                         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -560,7 +597,13 @@ C                                       vvvvvvv - emis surrogate names
             END DO
 
 #ifdef Verbose2
-            write( logdev,* ) '  NR EMIS: ', s, '  ', nr_emis( s )
+            if ( onetime ) then
+               if ( firstwrite) then
+                  firstwrite = .false.
+                  write( logdev,2021 ) 'NR'
+               end if
+               write( logdev,2023 ) s, nr_emis( s ), nr_emis_fac( s )
+            end if
 #endif
 
          END DO
@@ -569,6 +612,9 @@ C tracer gases (conversion to ppmv/s)
 
          IF ( EM_TRAC ) THEN
 
+#ifdef Verbose2
+            firstwrite = .true.
+#endif
             DO V = STRT_TR, FINI_TR
                S = V + 1 - STRT_TR
                BUFF = 0.0   ! array assignment
@@ -593,7 +639,13 @@ C                                               vvvvvvv - emis surrogate names
                END DO
 
 #ifdef Verbose2
-               write( logdev,* ) '  TR EMIS: ', s, '  ', tr_emis( s )
+               if ( onetime ) then
+                  if ( firstwrite) then
+                     firstwrite = .false.
+                     write( logdev,2021 ) 'TR'
+                  end if
+                  write( logdev,2023 ) s, tr_emis( s ), tr_emis_fac( s )
+               end if
 #endif
 
             END DO
@@ -631,6 +683,10 @@ C accounts for emissions species names as a subset of the vert. diffused species
             end do
             write( logdev,'("@@@3 ", a, g16.6)') nr_emis( s ), sumem
          end do
+#endif
+
+#ifdef Verbose2
+         onetime = .false.
 #endif
 
          RETURN
