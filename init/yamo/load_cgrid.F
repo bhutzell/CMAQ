@@ -47,7 +47,9 @@ C   21 Jun 10 J.Young: convert for Namelist redesign
 C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                      removed deprecated TRIMLEN
 C    2 Sep 11 J.Young: change ICBC_FAC policy to always assigning factor,
-C                      if specified, not just if a surrogate is also specified 
+C                      if specified, not just if a surrogate is also specified
+C    3 Sep 13 J.Young: change ICBC_FAC policy to assign factor, if specified;
+C                      requires a surrogate character or string to be specified 
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -123,7 +125,7 @@ C for XTRACT3
       INTEGER      NDX                        ! loop copy of INDX
       INTEGER      ISUR                       ! surrogate index
       INTEGER, ALLOCATABLE, SAVE :: INDX( : ) ! Variable indices for all IC species
-      REAL,    ALLOCATABLE, SAVE :: ICBC_FAC( : ) ! Factor to be applied to ICs
+      REAL,    ALLOCATABLE, SAVE :: IC_FAC( : ) ! Factor to be applied to ICs
       INTEGER      C, R, L, SPC, V            ! loop counters
       INTEGER      ASPC                       ! CGRID RHOJ pointer
       INTEGER      NCOLSDENS, NROWSDENS       ! local for DENS
@@ -137,8 +139,10 @@ C for XTRACT3
       CHARACTER( 34 ) :: ESTR2 = ' '
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
-
       INTEGER, SAVE :: LOGDEV
+#ifdef Verbose3
+      logical firstwrite
+#endif
 
 C-----------------------------------------------------------------------
 
@@ -150,9 +154,9 @@ C-----------------------------------------------------------------------
 C IOFDESC common now loaded with MET_CRO_3D header
 
          MXSPC = N_GC_SPC + N_AE_SPC + N_NR_SPC + N_TR_SPC
-         ALLOCATE ( INDX( MXSPC ), ICBC_FAC( MXSPC ), STAT = ASTAT )
+         ALLOCATE ( INDX( MXSPC ), IC_FAC( MXSPC ), STAT = ASTAT )
          IF ( ASTAT .NE. 0 ) THEN
-            XMSG = 'ERROR allocating INDX or ICBC_FAC'
+            XMSG = 'ERROR allocating INDX or IC_FAC'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
          END IF
       END IF
@@ -195,12 +199,16 @@ C scale factor (default = 1.0).
 C Note: parsing in CGRID_SPCS follows this policy for all the Namelist surrogate
 C types (EMIS, DEPV, ICBC, and SCAV).
 C => Change this for ICBC:
-C First check if there's a surrogate name in the Namelist and use it (and the
-C corresponding scale factor) if it exists. If it's not on the IC file, which it
+C First check if there`s a surrogate name in the Namelist and use it (and the
+C corresponding scale factor) if it exists. If it`s not on the IC file, which it
 C wouldn`t be if it were blank, then look for the Namelist species name.
+C => Further mod:
+C First check if the species name in the Namelist is on the IC file. If so, also
+C check if there`s a char or string in the Namelist surrogate name slot. If so, use
+C the associated scale factor. If the Namelist species name is not on file, follow
+C the preceding strategy.
 
 C Get INDX
-!     INDX = 0   ! array assignment
       DO SPC = 1, MXSPC
          INDX( SPC ) = 0
       END DO
@@ -209,41 +217,45 @@ C Get INDX
          WRITE( LOGDEV,1009 ) 'transported gas-phase species'
          SPC_STRT = GC_STRT
          N_SPCS = N_GC_SPC
+#ifdef Verbose3
+         firstwrite = .true.
+#endif
          DO SPC = 1, N_SPCS
-C is there a surrogate name?
-            ISUR = FINDEX ( SPC, N_GC_ICBC, GC_ICBC_MAP )
-!           write( logdev,* ) '=c=spc,isur: ', spc, isur
-            IF ( ISUR .NE. 0 ) THEN
-C is it on the IC file?
-               NDX = INDEX1( GC_ICBC( ISUR ), NVARS3D, VNAME3D )
-               IF ( NDX .NE. 0 ) THEN
-C if there`s a surrogate name, CGRID_SPCS handles setting GC_ICBC_FAC
-                  INDX( SPC ) = NDX   ! index in the IC file
-                  ICBC_FAC( SPC ) = GC_ICBC_FAC( ISUR )
-!                 write( logdev,* ) '=c=_fac in sur: ', icbc_fac( spc )
-               ELSE
-                  XMSG = ESTR1 // TRIM( GC_SPC( SPC ) ) // ESTR2
-                  CALL M3MESG( XMSG )
-               END IF
-            ELSE
 C is the (main) species name on the IC file?
-               NDX = INDEX1( GC_SPC( SPC ), NVARS3D, VNAME3D )
-               IF ( NDX .NE. 0 ) THEN
-                  INDX( SPC ) = NDX
-                  ICBC_FAC( SPC ) = 1.0
-               ELSE
-                  XMSG = ESTR1 // TRIM( GC_SPC( SPC ) ) // ESTR2
-                  CALL M3MESG( XMSG )
-               END IF
-            END IF
+            ndx = index1( gc_spc( spc ), nvars3d, vname3d ) ! is species on file?
+            ic_fac( spc ) = 1.0
+            if ( ndx .eq. 0 ) then                          ! no, check if surrogate is
+               isur = findex( spc, n_gc_icbc, gc_icbc_map ) ! get surrogate pointer
+               if ( isur .ne. 0 ) then                      ! there is a surrogate name
+                  ndx = index1( gc_icbc( isur ), nvars3d, vname3d )
+                  if ( ndx .ne. 0 ) then                    ! surrogate on file
+                     indx( spc ) = ndx                      ! species index in IC file
+                     ic_fac( spc ) = gc_icbc_fac( isur )
+                  else                                      ! no surrogate on file either
+                     xmsg = 'No IC found for species '
+     &               // trim( gc_spc( spc ) ) // ' in ' // trim( fname )
+     &               // ' Set to ' // concmin
+                     call m3mesg( xmsg )
+                  end if
+               end if
+            else                                            ! species name on file
+               indx( spc ) = ndx                            ! species index in IC file
+               isur = findex( spc, n_gc_icbc, gc_icbc_map ) ! get surrogate pointer
+               if ( isur .ne. 0 ) then
+                  ic_fac( spc ) = gc_icbc_fac( isur )
+               end if
+            end if
 
 #ifdef Verbose3
-            write( logdev,* ) '=c=spc,indx: ', spc, indx( spc ), trim( gc_spc( spc ) ),
-     &                        '   icbc_fac:', icbc_fac( spc )
-            write( logdev,* ) ' '
+            if ( firstwrite ) then
+               firstwrite = .false.
+            write( logdev,* ) '=c= spc indx  name               ic_fac'
+            end if
+            write( logdev,2021 ) spc, indx( spc ), gc_spc( spc ), ic_fac( spc )
+2021        format( 1x, '=c=', 2i4, 3x, a, f10.5 )
 #endif
             IF ( INDX( SPC ) .GT. 0 )
-     &         WRITE( LOGDEV,1013 ) INDX( SPC ), GC_SPC( SPC ), ICBC_FAC( SPC )
+     &         WRITE( LOGDEV,1013 ) INDX( SPC ), GC_SPC( SPC ), IC_FAC( SPC )
 
          END DO
 
@@ -251,40 +263,45 @@ C is the (main) species name on the IC file?
          WRITE( LOGDEV,1009 ) 'transported aerosol species'
          SPC_STRT = AE_STRT
          N_SPCS = N_AE_SPC
+#ifdef Verbose3
+         firstwrite = .true.
+#endif
          DO SPC = 1, N_SPCS
-C is there a surrogate name?
-            ISUR = FINDEX ( SPC, N_AE_ICBC, AE_ICBC_MAP )
-!           write( logdev,* ) '=c=spc,isur: ', spc, isur
-            IF ( ISUR .NE. 0 ) THEN
-C is it on the IC file?
-               NDX = INDEX1( AE_ICBC( ISUR ), NVARS3D, VNAME3D )
-               IF ( NDX .NE. 0 ) THEN
-                  INDX( SPC ) = NDX   ! index in the IC file
-                  ICBC_FAC( SPC ) = AE_ICBC_FAC( ISUR )
-!                 write( logdev,* ) '=c=_fac in sur: ', icbc_fac( spc )
-               ELSE
-                  XMSG = ESTR1 // TRIM( AE_SPC( SPC ) ) // ESTR2
-                  CALL M3MESG( XMSG )
-               END IF
-            ELSE
 C is the (main) species name on the IC file?
-               NDX = INDEX1( AE_SPC( SPC ), NVARS3D, VNAME3D )
-               IF ( NDX .NE. 0 ) THEN
-                  INDX( SPC ) = NDX
-                  ICBC_FAC( SPC ) = 1.0
-               ELSE
-                  XMSG = ESTR1 // TRIM( AE_SPC( SPC ) ) // ESTR2
-                  CALL M3MESG( XMSG )
-               END IF
-            END IF
+            ndx = index1( ae_spc( spc ), nvars3d, vname3d ) ! is species on file?
+            ic_fac( spc ) = 1.0
+            if ( ndx .eq. 0 ) then                          ! no, check if surrogate is
+               isur = findex( spc, n_ae_icbc, ae_icbc_map ) ! get surrogate pointer
+               if ( isur .ne. 0 ) then                      ! there is a surrogate name
+                  ndx = index1( ae_icbc( isur ), nvars3d, vname3d )
+                  if ( ndx .ne. 0 ) then                    ! surrogate on file
+                     indx( spc ) = ndx                      ! species index in IC file
+                     ic_fac( spc ) = ae_icbc_fac( isur )
+                  else                                      ! no surrogate on file either
+                     xmsg = 'No IC found for species '
+     &               // trim( ae_spc( spc ) ) // ' in ' // trim( fname )
+     &               // ' Set to ' // concmin
+                     call m3mesg( xmsg )
+                  end if
+               end if
+            else                                            ! species name on file
+               indx( spc ) = ndx                            ! species index in IC file
+               isur = findex( spc, n_ae_icbc, ae_icbc_map ) ! get surrogate pointer
+               if ( isur .ne. 0 ) then
+                  ic_fac( spc ) = ae_icbc_fac( isur )
+               end if
+            end if
 
 #ifdef Verbose3
-            write( logdev,* ) '=c=spc,indx: ', spc, indx( spc ), trim( ae_spc( spc ) ),
-     &                        '   icbc_fac:', icbc_fac( spc )
-            write( logdev,* ) ' '
+            if ( firstwrite ) then
+               firstwrite = .false.
+            write( logdev,* ) '=c= spc indx  name               ic_fac'
+            end if
+            write( logdev,2021 ) spc, indx( spc ), ae_spc( spc ), ic_fac( spc )
 #endif
+
             IF ( INDX( SPC ) .GT. 0 )
-     &         WRITE( LOGDEV,1013 ) INDX( SPC ), AE_SPC( SPC ), ICBC_FAC( SPC )
+     &         WRITE( LOGDEV,1013 ) INDX( SPC ), AE_SPC( SPC ), IC_FAC( SPC )
  
          END DO
 
@@ -292,40 +309,45 @@ C is the (main) species name on the IC file?
          WRITE( LOGDEV,1009 ) 'transported non-reactive gas species'
          SPC_STRT = NR_STRT
          N_SPCS = N_NR_SPC
+#ifdef Verbose3
+         firstwrite = .true.
+#endif
          DO SPC = 1, N_SPCS
-C is there a surrogate name?
-            ISUR = FINDEX ( SPC, N_NR_ICBC, NR_ICBC_MAP )
-!           write( logdev,* ) '=c=spc,isur: ', spc, isur
-            IF ( ISUR .NE. 0 ) THEN
-C is it on the IC file?
-               NDX = INDEX1( NR_ICBC( ISUR ), NVARS3D, VNAME3D )
-               IF ( NDX .NE. 0 ) THEN
-                  INDX( SPC ) = NDX   ! index in the IC file
-                  ICBC_FAC( SPC ) = NR_ICBC_FAC( ISUR )
-!                 write( logdev,* ) '=c=_fac in sur: ', icbc_fac( spc )
-               ELSE
-                  XMSG = ESTR1 // TRIM( NR_SPC( SPC ) ) // ESTR2
-                  CALL M3MESG( XMSG )
-               END IF
-            ELSE
 C is the (main) species name on the IC file?
-               NDX = INDEX1( NR_SPC( SPC ), NVARS3D, VNAME3D )
-               IF ( NDX .NE. 0 ) THEN
-                  INDX( SPC ) = NDX
-                  ICBC_FAC( SPC ) = 1.0
-               ELSE
-                  XMSG = ESTR1 // TRIM( NR_SPC( SPC ) ) // ESTR2
-                  CALL M3MESG( XMSG )
-               END IF
-            END IF
+            ndx = index1( nr_spc( spc ), nvars3d, vname3d ) ! is species on file?
+            ic_fac( spc ) = 1.0
+            if ( ndx .eq. 0 ) then                          ! no, check if surrogate is
+               isur = findex( spc, n_nr_icbc, nr_icbc_map ) ! get surrogate pointer
+               if ( isur .ne. 0 ) then                      ! there is a surrogate name
+                  ndx = index1( nr_icbc( isur ), nvars3d, vname3d )
+                  if ( ndx .ne. 0 ) then                    ! surrogate on file
+                     indx( spc ) = ndx                      ! species index in IC file
+                     ic_fac( spc ) = nr_icbc_fac( isur )
+                  else                                      ! no surrogate on file either
+                     xmsg = 'No IC found for species '
+     &               // trim( nr_spc( spc ) ) // ' in ' // trim( fname )
+     &               // ' Set to ' // concmin
+                     call m3mesg( xmsg )
+                  end if
+               end if
+            else                                            ! species name on file
+               indx( spc ) = ndx                            ! species index in IC file
+               isur = findex( spc, n_nr_icbc, nr_icbc_map ) ! get surrogate pointer
+               if ( isur .ne. 0 ) then
+                  ic_fac( spc ) = nr_icbc_fac( isur )
+               end if
+            end if
 
 #ifdef Verbose3
-            write( logdev,* ) '=c=spc,indx: ', spc, indx( spc ), trim( nr_spc( spc ) ),
-     &                        '   icbc_fac:', icbc_fac( spc )
-            write( logdev,* ) ' '
+            if ( firstwrite ) then
+               firstwrite = .false.
+            write( logdev,* ) '=c= spc indx  name               ic_fac'
+            end if
+            write( logdev,2021 ) spc, indx( spc ), nr_spc( spc ), ic_fac( spc )
 #endif
+
             IF ( INDX( SPC ) .GT. 0 )
-     &         WRITE( LOGDEV,1013 ) INDX( SPC ), NR_SPC( SPC ), ICBC_FAC( SPC )
+     &         WRITE( LOGDEV,1013 ) INDX( SPC ), NR_SPC( SPC ), IC_FAC( SPC )
 
          END DO
 
@@ -333,40 +355,46 @@ C is the (main) species name on the IC file?
          WRITE( LOGDEV,1009 ) 'transported inert tracer gas species'
          SPC_STRT = TR_STRT
          N_SPCS = N_TR_SPC
+#ifdef Verbose3
+         firstwrite = .true.
+#endif
          DO SPC = 1, N_SPCS
 C is there a surrogate name?
-            ISUR = FINDEX ( SPC, N_TR_ICBC, TR_ICBC_MAP )
-!           write( logdev,* ) '=c=spc,isur: ', spc, isur
-            IF ( ISUR .NE. 0 ) THEN
-C is it on the IC file?
-               NDX = INDEX1( TR_ICBC( ISUR ), NVARS3D, VNAME3D )
-               IF ( NDX .NE. 0 ) THEN
-                  INDX( SPC ) = NDX   ! index in the IC file
-                  ICBC_FAC( SPC ) = TR_ICBC_FAC( ISUR )
-!                 write( logdev,* ) '=c=_fac in sur: ', icbc_fac( spc )
-               ELSE
-                  XMSG = ESTR1 // TRIM( TR_SPC( SPC ) ) // ESTR2
-                  CALL M3MESG( XMSG )
-               END IF
-            ELSE
 C is the (main) species name on the IC file?
-               NDX = INDEX1( TR_SPC( SPC ), NVARS3D, VNAME3D )
-               IF ( NDX .NE. 0 ) THEN
-                  INDX( SPC ) = NDX
-                  ICBC_FAC( SPC ) = 1.0
-               ELSE
-                  XMSG = ESTR1 // TRIM( TR_SPC( SPC ) ) // ESTR2
-                  CALL M3MESG( XMSG )
-               END IF
-            END IF
+            ndx = index1( tr_spc( spc ), nvars3d, vname3d ) ! is species on file?
+            ic_fac( spc ) = 1.0
+            if ( ndx .eq. 0 ) then                          ! no, check if surrogate is
+               isur = findex( spc, n_tr_icbc, tr_icbc_map ) ! get surrogate pointer
+               if ( isur .ne. 0 ) then                      ! there is a surrogate name
+                  ndx = index1( tr_icbc( isur ), nvars3d, vname3d )
+                  if ( ndx .ne. 0 ) then                    ! surrogate on file
+                     indx( spc ) = ndx                      ! species index in IC file
+                     ic_fac( spc ) = tr_icbc_fac( isur )
+                  else                                      ! no surrogate on file either
+                     xmsg = 'No IC found for species '
+     &               // trim( tr_spc( spc ) ) // ' in ' // trim( fname )
+     &               // ' Set to ' // concmin
+                     call m3mesg( xmsg )
+                  end if
+               end if
+            else                                            ! species name on file
+               indx( spc ) = ndx                            ! species index in IC file
+               isur = findex( spc, n_tr_icbc, tr_icbc_map ) ! get surrogate pointer
+               if ( isur .ne. 0 ) then
+                  ic_fac( spc ) = tr_icbc_fac( isur )
+               end if
+            end if
 
 #ifdef Verbose3
-            write( logdev,* ) '=c=spc,indx: ', spc, indx( spc ), trim( tr_spc( spc ) ),
-     &                        '   icbc_fac:', icbc_fac( spc )
-            write( logdev,* ) ' '
+            if ( firstwrite ) then
+               firstwrite = .false.
+            write( logdev,* ) '=c= spc indx  name               ic_fac'
+            end if
+            write( logdev,2021 ) spc, indx( spc ), tr_spc( spc ), ic_fac( spc )
 #endif
+
             IF ( INDX( SPC ) .GT. 0 )
-     &         WRITE( LOGDEV,1013 ) INDX( SPC ), TR_SPC( SPC ), ICBC_FAC( SPC )
+     &         WRITE( LOGDEV,1013 ) INDX( SPC ), TR_SPC( SPC ), IC_FAC( SPC )
 
          END DO
 
@@ -384,13 +412,24 @@ C Read into CGRID
      &                STRTCOLINI, ENDCOLINI, STRTROWINI, ENDROWINI )
 C IOFDESC common now loaded with FNAME header
 
+#ifdef Verbose3
+      firstwrite = .true.
+#endif
       DO SPC = 1, N_SPCS
          V = SPC_STRT - 1 + SPC
          NDX = INDX( SPC )
 
          IF ( NDX .GT. 0 ) THEN
 #ifdef Verbose3
-            write( logdev,* ) '=vname3d=: ', spc, v, ndx, icbc_fac( spc ), vname3d( ndx )
+            if ( firstwrite ) then
+               firstwrite = .false.
+               write( logdev,2027 )
+            end if
+            write( logdev,2029 ) spc, v, ndx, ic_fac( spc ), vname3d( ndx )
+2027  format( /5x, '   === Species used on IC file ==='
+     &        /5x, 'NML', 4x, 'cgrid', 2x, 'file', 4x, 'ic_fac'
+     &        /5x, 'indx', 3x, 'indx', 3x, 'indx', 16x, 'name' )
+2029  format( 1x, 3i7, 1pg15.5, 2x, a )
 #endif
             IF ( .NOT. XTRACT3( FNAME, VNAME3D ( NDX ),
      &           1,NLAYS, STRTROWINI,ENDROWINI, STRTCOLINI,ENDCOLINI,
@@ -403,7 +442,7 @@ C IOFDESC common now loaded with FNAME header
             DO L = 1, NLAYS
                DO R = 1, MY_NROWS
                   DO C = 1, MY_NCOLS
-                     CGRID( C,R,L,V ) = ICBC_FAC( SPC ) * DBUFF( C,R,L )
+                     CGRID( C,R,L,V ) = IC_FAC( SPC ) * DBUFF( C,R,L )
                   END DO
                END DO
             END DO
@@ -509,10 +548,6 @@ C Set pointers for gas (vapor) phase sulfur species
 C IOFDESC now loaded with MET_CRO_3D header
 
             VNAME = 'DENS'
-!           IF ( .NOT. INTERPX( MET_CRO_3D, VNAME, PNAME,
-!    &                          STRTCOLMC3,ENDCOLMC3, STRTROWMC3,ENDROWMC3,
-!    &                          1,NLAYS,
-!    &                          JDATE, JTIME, DENS ) ) THEN
             IF ( .NOT. XTRACT3( MET_CRO_3D, VNAME, 1,NLAYS,
      &                          STRTROWMC3,ENDROWMC3, STRTCOLMC3,ENDCOLMC3,
      &                          JDATE, JTIME, DENS ) ) THEN
@@ -573,13 +608,8 @@ C correct sulfate vapor concentration for part removed:
 
 C Close the file
 
-!     IF ( .NOT. CLOSE3( FNAME ) ) THEN
-!        XMSG = 'Could not close ' // FNAME // ' file'
-!        CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-!     END IF
-
       RETURN
 
 1009  FORMAT( / 5X, 'IC/BC Factors used for ', A )
-1013  FORMAT( 5X, I3, 2X, A, 1PG13.5 )
+1013  FORMAT( 9X, I3, 3X, A, 1PG13.5 )
       END

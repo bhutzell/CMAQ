@@ -48,7 +48,8 @@ C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                      removed deprecated TRIMLEN
 C   10 Sep 11 J.Young: changed Namelist surrogate policy to enable use of
 C                      icbc factors
-
+C    3 Sep 13 J.Young: change ICBC_FAC policy to assign factor, if specified;
+C                      requires a surrogate character or string to be specified
 C-----------------------------------------------------------------------
 
       USE CGRID_SPCS          ! CGRID mechanism species
@@ -69,8 +70,8 @@ C External Functions:
 
 C Local variables:
       CHARACTER( 16 ) :: PNAME = 'ADVBC_MAP'
-!     CHARACTER( 16 ) :: BLNK = ' '
-      CHARACTER( 16 ) :: BLNK = '                '
+      CHARACTER( 16 ) :: BLNK = ' '
+!     CHARACTER( 16 ) :: BLNK = '                '
       CHARACTER( 96 ) :: XMSG = ' '
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: WRVAR( : )
 
@@ -82,6 +83,10 @@ C Local variables:
       INTEGER    SPC, VAR             ! loop copunters
       INTEGER    LOGDEV, IERR
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
+#ifdef Verbose3
+      logical, save :: onetime = .true.
+      logical firstwrite
+#endif
 
 C Map advected species to bc`s
 
@@ -113,45 +118,58 @@ C Map advected reactive gas species to bc`s
             CALL M3EXIT( PNAME, XDATE, XTIME, XMSG, XSTAT1 )
          END IF
 
+#ifdef Verbose3
+         firstwrite = .true.
+#endif
          WRCNT = 0
          DO VAR = 1, N_GC_TRNS
             SPC = SPC + 1
             BCFAC( SPC ) = 1.0
-C is there a surrogate name?
-            ISUR = FINDEX( GC_TRNS_MAP( VAR ), N_GC_ICBC, GC_ICBC_MAP )
-!           write( logdev,* ) '=b=var,spc,isur: ', var, spc, isur
-            IF ( ISUR .NE. 0 ) THEN
-C is it on the BC file?
-               INDX = INDEX1( GC_ICBC( ISUR ), NVARS3D, VNAME3D )
-               IF ( INDX .NE. 0 ) THEN
-C if there`s a surrogate name, CGRID_SPCS will handle setting GC_ICBC_FAC
-                  BCNAME( SPC ) = VNAME3D( INDX )
-               ELSE   ! not on the BC file
-                  BCNAME( SPC ) = BLNK
-                  WRCNT = WRCNT + 1
-                  WRVAR( WRCNT ) = GC_TRNS( VAR )
-               END IF
-               BCFAC( SPC ) = GC_ICBC_FAC( ISUR )
-!              write( logdev,* ) '=b=_fac in sur: ', bcfac( spc )
-            ELSE
 C is the (main) species name on the BC file?
-               INDX = INDEX1( GC_TRNS( VAR ), NVARS3D, VNAME3D )
-               IF ( INDX .NE. 0 ) THEN
-                  BCNAME( SPC ) = VNAME3D( INDX )
-               ELSE
-                  BCNAME( SPC ) = BLNK
-                  WRCNT = WRCNT + 1
-                  WRVAR( WRCNT ) = GC_TRNS( VAR )
-               END IF
-            END IF
+            indx = index1( gc_trns( var ), nvars3d, vname3d )
+            if ( indx .eq. 0 ) then             ! name not on file, check if surrogate is
+               isur = findex( gc_trns_map( var ), n_gc_icbc, gc_icbc_map )
+               if ( isur .eq. 0 ) then          ! surrogate not in ICBC table either
+                  bcname( spc ) = blnk
+                  wrcnt = wrcnt + 1
+                  wrvar( wrcnt ) = gc_trns( var )
+               else                             ! surrogate found in ICBC table
+                  indx = index1( gc_icbc( isur), nvars3d, vname3d )
+                  if ( indx .ne. 0 ) then       ! surrogate found on file
+                     bcname( spc ) = vname3d( indx )
+                     bcfac( spc ) = gc_icbc_fac( isur )
+                  else
+                     bcname( spc ) = blnk
+                     wrcnt = wrcnt + 1
+                     wrvar( wrcnt ) = gc_trns( var )
+                  end if
+               end if
+            else                                ! name on file
+               bcname( spc ) = vname3d( indx )
+               isur = findex( gc_trns_map( var ), n_gc_icbc, gc_icbc_map )
+               if ( isur .ne. 0 ) then
+                  bcfac( spc ) = gc_icbc_fac( isur )
+               end if
+            end if
 
 #ifdef Verbose3
-            write( logdev,* ) '=b=spc,name: ', spc, bcname( spc ),
-     &                        '   bcfac:', bcfac( spc )
-            write( logdev,* ) ' '
+            if ( onetime ) then
+               if ( firstwrite ) then
+                  firstwrite = .false.
+                  write( logdev,1031 )
+               end if
+               if ( bcname( spc ) .ne. blnk ) then
+                  write( logdev,1033 ) spc, bcname( spc ), bcfac( spc )
+               else
+                  write( logdev,1033 ) spc, 'not on file'
+               end if
+            end if
+1031  format( ' =b=', 3x, 'spc', 6x, 'name', 15x, 'bcfac' )
+1033  format( ' =b=', i5, 6x, a, 1pg13.5 )
 #endif
 
          END DO
+
          IF ( WRCNT .GT. 0 ) THEN
             WRITE( LOGDEV,1019 ) TRIM( BNDY_GASC_1 ), TRIM( CONCMIN )
             DO VAR = 1, WRCNT
@@ -175,41 +193,52 @@ C Map advected aerosol species to bc`s
             CALL M3EXIT( PNAME, XDATE, XTIME, XMSG, XSTAT1 )
          END IF
 
+#ifdef Verbose3
+         firstwrite = .true.
+#endif
          WRCNT = 0
          DO VAR = 1, N_AE_TRNS
             SPC = SPC + 1
             BCFAC( SPC ) = 1.0
-C is there a surrogate name?
-            ISUR = FINDEX( AE_TRNS_MAP( VAR ), N_AE_ICBC, AE_ICBC_MAP )
-!           write( logdev,* ) '=b=var,spc,isur: ', var, spc, isur
-            IF ( ISUR .NE. 0 ) THEN
-C is it on the BC file?
-               INDX = INDEX1( AE_ICBC( ISUR ), NVARS3D, VNAME3D )
-               IF ( INDX .NE. 0 ) THEN
-                  BCNAME( SPC ) = VNAME3D( INDX )
-               ELSE   ! not on the BC file
-                  BCNAME( SPC ) = BLNK
-                  WRCNT = WRCNT + 1
-                  WRVAR( WRCNT ) = AE_TRNS( VAR )
-               END IF
-               BCFAC( SPC ) = AE_ICBC_FAC( ISUR )
-!              write( logdev,* ) '=b=_fac in sur: ', bcfac( spc )
-            ELSE
 C is the (main) species name on the BC file?
-               INDX = INDEX1( AE_TRNS( VAR ), NVARS3D, VNAME3D )
-               IF ( INDX .NE. 0 ) THEN
-                  BCNAME( SPC ) = VNAME3D( INDX )
-               ELSE
-                  BCNAME( SPC ) = BLNK
-                  WRCNT = WRCNT + 1
-                  WRVAR( WRCNT ) = AE_TRNS( VAR )
-               END IF
-            END IF
+            indx = index1( ae_trns( var ), nvars3d, vname3d )
+            if ( indx .eq. 0 ) then             ! name not on file, check if surrogate is
+               isur = findex( ae_trns_map( var ), n_ae_icbc, ae_icbc_map )
+               if ( isur .eq. 0 ) then          ! surrogate not in ICBC table either
+                  bcname( spc ) = blnk
+                  wrcnt = wrcnt + 1
+                  wrvar( wrcnt ) = ae_trns( var )
+               else                             ! surrogate found in ICBC table
+                  indx = index1( ae_icbc( isur), nvars3d, vname3d )
+                  if ( indx .ne. 0 ) then       ! surrogate found on file
+                     bcname( spc ) = vname3d( indx )
+                     bcfac( spc ) = ae_icbc_fac( isur )
+                  else
+                     bcname( spc ) = blnk
+                     wrcnt = wrcnt + 1
+                     wrvar( wrcnt ) = ae_trns( var )
+                  end if
+               end if
+            else                                ! name on file
+               bcname( spc ) = vname3d( indx )
+               isur = findex( ae_trns_map( var ), n_ae_icbc, ae_icbc_map )
+               if ( isur .ne. 0 ) then
+                  bcfac( spc ) = ae_icbc_fac( isur )
+               end if
+            end if
 
 #ifdef Verbose3
-            write( logdev,* ) '=b=spc,name: ', spc, bcname( spc ),
-     &                        '   bcfac:', bcfac( spc )
-            write( logdev,* ) ' '
+            if ( onetime ) then
+               if ( firstwrite ) then
+                  firstwrite = .false.
+                  write( logdev,1031 )
+               end if
+               if ( bcname( spc ) .ne. blnk ) then
+                  write( logdev,1033 ) spc, bcname( spc ), bcfac( spc )
+               else
+                  write( logdev,1033 ) spc, 'not on file'
+               end if
+            end if
 #endif
 
          END DO
@@ -236,41 +265,52 @@ C Map advected non-reactive species to bc`s
             CALL M3EXIT( PNAME, XDATE, XTIME, XMSG, XSTAT1 )
          END IF
 
+#ifdef Verbose3
+         firstwrite = .true.
+#endif
          WRCNT = 0
          DO VAR = 1, N_NR_TRNS
             SPC = SPC + 1
             BCFAC( SPC ) = 1.0
-C is there a surrogate name?
-            ISUR = FINDEX( NR_TRNS_MAP( VAR ), N_NR_ICBC, NR_ICBC_MAP )
-!           write( logdev,* ) '=b=var,spc,isur: ', var, spc, isur
-            IF ( ISUR .NE. 0 ) THEN
-C is it on the BC file?
-               INDX = INDEX1( NR_ICBC( ISUR ), NVARS3D, VNAME3D )
-               IF ( INDX .NE. 0 ) THEN
-                  BCNAME( SPC ) = VNAME3D( INDX )
-               ELSE   ! not on the BC file
-                  BCNAME( SPC ) = BLNK
-                  WRCNT = WRCNT + 1
-                  WRVAR( WRCNT ) = NR_TRNS( VAR )
-               END IF
-               BCFAC( SPC ) = NR_ICBC_FAC( ISUR )
-!              write( logdev,* ) '=b=_fac in sur: ', bcfac( spc )
-            ELSE
 C is the (main) species name on the BC file?
-               INDX = INDEX1( NR_TRNS( VAR ), NVARS3D, VNAME3D )
-               IF ( INDX .NE. 0 ) THEN
-                  BCNAME( SPC ) = VNAME3D( INDX )
-               ELSE
-                  BCNAME( SPC ) = BLNK
-                  WRCNT = WRCNT + 1
-                  WRVAR( WRCNT ) = NR_TRNS( VAR )
-               END IF
-            END IF
+            indx = index1( nr_trns( var ), nvars3d, vname3d )
+            if ( indx .eq. 0 ) then             ! name not on file, check if surrogate is
+               isur = findex( nr_trns_map( var ), n_nr_icbc, nr_icbc_map )
+               if ( isur .eq. 0 ) then          ! surrogate not in ICBC table either
+                  bcname( spc ) = blnk
+                  wrcnt = wrcnt + 1
+                  wrvar( wrcnt ) = nr_trns( var )
+               else                             ! surrogate found in ICBC table
+                  indx = index1( nr_icbc( isur), nvars3d, vname3d )
+                  if ( indx .ne. 0 ) then       ! surrogate found on file
+                     bcname( spc ) = vname3d( indx )
+                     bcfac( spc ) = nr_icbc_fac( isur )
+                  else
+                     bcname( spc ) = blnk
+                     wrcnt = wrcnt + 1
+                     wrvar( wrcnt ) = nr_trns( var )
+                  end if
+               end if
+            else                                ! name on file
+               bcname( spc ) = vname3d( indx )
+               isur = findex( nr_trns_map( var ), n_nr_icbc, nr_icbc_map )
+               if ( isur .ne. 0 ) then
+                  bcfac( spc ) = nr_icbc_fac( isur )
+               end if
+            end if
 
 #ifdef Verbose3
-            write( logdev,* ) '=b=spc,name: ', spc, bcname( spc ),
-     &                        '   bcfac:', bcfac( spc )
-            write( logdev,* ) ' '
+            if ( onetime ) then
+               if ( firstwrite ) then
+                  firstwrite = .false.
+                  write( logdev,1031 )
+               end if
+               if ( bcname( spc ) .ne. blnk ) then
+                  write( logdev,1033 ) spc, bcname( spc ), bcfac( spc )
+               else
+                  write( logdev,1033 ) spc, 'not on file'
+               end if
+            end if
 #endif
 
          END DO
@@ -297,41 +337,52 @@ C Map advected tracer species to bc`s
             CALL M3EXIT( PNAME, XDATE, XTIME, XMSG, XSTAT1 )
          END IF
 
+#ifdef Verbose3
+         firstwrite = .true.
+#endif
          WRCNT = 0
          DO VAR = 1, N_TR_ADV
             SPC = SPC + 1
             BCFAC( SPC ) = 1.0
-C is there a surrogate name?
-            ISUR = FINDEX( TR_ADV_MAP( VAR ), N_TR_ICBC, TR_ICBC_MAP )
-!           write( logdev,* ) '=b=var,spc,isur: ', var, spc, isur
-            IF ( ISUR .NE. 0 ) THEN
-C is it on the BC file?
-               INDX = INDEX1( TR_ICBC( ISUR ), NVARS3D, VNAME3D )
-               IF ( INDX .NE. 0 ) THEN
-                  BCNAME( SPC ) = VNAME3D( INDX )
-               ELSE   ! not on the BC file
-                  BCNAME( SPC ) = BLNK
-                  WRCNT = WRCNT + 1
-                  WRVAR( WRCNT ) = TR_ADV( VAR )
-               END IF
-               BCFAC( SPC ) = TR_ICBC_FAC( ISUR )
-!              write( logdev,* ) '=b=_fac in sur: ', bcfac( spc )
-            ELSE
 C is the (main) species name on the BC file?
-               INDX = INDEX1( TR_ADV( VAR ), NVARS3D, VNAME3D )
-               IF ( INDX .NE. 0 ) THEN
-                  BCNAME( SPC ) = VNAME3D( INDX )
-               ELSE
-                  BCNAME( SPC ) = BLNK
-                  WRCNT = WRCNT + 1
-                  WRVAR( WRCNT ) = TR_ADV( VAR )
-               END IF
-            END IF
+            indx = index1( tr_adv( var ), nvars3d, vname3d )
+            if ( indx .eq. 0 ) then             ! name not on file, check if surrogate is
+               isur = findex( tr_adv_map( var ), n_tr_icbc, tr_icbc_map )
+               if ( isur .eq. 0 ) then          ! surrogate not in ICBC table either
+                  bcname( spc ) = blnk
+                  wrcnt = wrcnt + 1
+                  wrvar( wrcnt ) = tr_adv( var )
+               else                             ! surrogate found in ICBC table
+                  indx = index1( tr_icbc( isur), nvars3d, vname3d )
+                  if ( indx .ne. 0 ) then       ! surrogate found on file
+                     bcname( spc ) = vname3d( indx )
+                     bcfac( spc ) = tr_icbc_fac( isur )
+                  else
+                     bcname( spc ) = blnk
+                     wrcnt = wrcnt + 1
+                     wrvar( wrcnt ) = tr_adv( var )
+                  end if
+               end if
+            else                                ! name on file
+               bcname( spc ) = vname3d( indx )
+               isur = findex( tr_adv_map( var ), n_tr_icbc, tr_icbc_map )
+               if ( isur .ne. 0 ) then
+                  bcfac( spc ) = tr_icbc_fac( isur )
+               end if
+            end if
 
 #ifdef Verbose3
-            write( logdev,* ) '=b=spc,name: ', spc, bcname( spc ),
-     &                        '   bcfac:', bcfac( spc )
-            write( logdev,* ) ' '
+            if ( onetime ) then
+               if ( firstwrite ) then
+                  firstwrite = .false.
+                  write( logdev,1031 )
+               end if
+               if ( bcname( spc ) .ne. blnk ) then
+                  write( logdev,1033 ) spc, bcname( spc ), bcfac( spc )
+               else
+                  write( logdev,1033 ) spc, 'not on file'
+               end if
+            end if
 #endif
 
          END DO
@@ -342,12 +393,16 @@ C is the (main) species name on the BC file?
             END DO
          END IF 
 
+#ifdef Verbose3
+      onetime = .false.
+#endif
+
       END IF
 
       RETURN
 
-1019  FORMAT( / 5X, 'No BC''s in file ', A, ' for the following adv species:',
-     &          1X, 'Set to ', A )
+1019  FORMAT( / 5X, "No BC's in file ", A, " for the following adv species:",
+     &          1X, "Set to ", A )
 1025  FORMAT( 10X, A )
 
       END
