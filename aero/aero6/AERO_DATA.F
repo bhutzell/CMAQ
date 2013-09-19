@@ -49,7 +49,13 @@ C              made MG, K, CA, SEACAT required species;
 C JY  04/21/11 Added optional log messages (verbose)
 C JY  05/02/11 Added Reshape to aerospc_ssf initialization for pgf90 compiler
 C JY  06/08/12 remove full character blank padding put in for GNU Fortran (GCC) 4.1.2
+C SN  08/15/13 ddm-3d implementation for cmaq5.0.1
 C----------------------------------------------------------------------
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NP, NPMAX
+      Use aero6_ddm3d, ONLY : s_aerospc_conc, ae_ddm3d_ready, init_aero6_ddm3d
+#endif 
 
       Implicit None
 
@@ -542,7 +548,11 @@ C Check that all emissions units match
       End Subroutine map_pmemis
 
 C-----------------------------------------------------------------------
+#ifdef sens
+      Subroutine extract_aero( conc, minchk, s_conc )
+#else
       Subroutine extract_aero( conc, minchk )
+#endif
 
 C  Extracts the required aerosol data from CGRID into conc.
  
@@ -556,6 +566,9 @@ C-----------------------------------------------------------------------
 C Arguments:
       Real,    Intent( In ) :: conc( : )
       Logical, Intent( In ) :: minchk
+#ifdef sens
+      Real,    Intent( In ) :: s_conc( :,: )
+#endif
 
 C Local Variables:
       Integer m, n, spc 
@@ -564,14 +577,33 @@ C Local Variables:
          Call map_aero()
       End If
 
+#ifdef sens
+      If ( .Not. ae_ddm3d_ready ) Then
+         Call init_aero6_ddm3d()
+      End If
+#endif
+
 C Copy grid cell concentrations of aero species to aerospc_conc
       aerospc_conc = 0.0
+#ifdef sens
+      s_aerospc_conc = 0.0D0
+#endif
+
       If ( minchk ) Then
          Do m = 1, n_mode
             Do spc = 1, n_aerospc
                n = aerospc_map( spc,m )
                If ( n .ne. 0 ) Then
                   aerospc_conc( spc,m ) = Max( conc( n ), aerospc( spc )%min_conc( m ) ) ! [ug/m^3]
+#ifdef sens
+                  Do np = 1, npmax
+                     If ( aerospc_conc( spc,m ) .Eq. aerospc( spc )%min_conc( m ) ) Then
+                        s_aerospc_conc( spc,m,np ) = 0.0D0
+                     Else
+                        s_aerospc_conc( spc,m,np ) = Real( s_conc( np,n ), 8 )
+                     End If
+                  End Do                
+#endif
                End If
             End Do
          End Do
@@ -581,6 +613,11 @@ C Copy grid cell concentrations of aero species to aerospc_conc
                n = aerospc_map( spc,m )
                If ( n .ne. 0 ) Then
                   aerospc_conc( spc,m ) = conc( n )   ! [ug/m^3]
+#ifdef sens
+                  Do np = 1, npmax
+                     s_aerospc_conc( spc,m,np ) = Real( s_conc( np,n ), 8 )
+                  End Do
+#endif
                End If
             End Do
          End Do
@@ -612,7 +649,11 @@ C Convert and assign to moment0_conc and moment2_conc
       End Subroutine extract_aero
 
 C-----------------------------------------------------------------------
+#ifdef sens
+      Subroutine update_aero( conc, minchk, s_conc )
+#else
       Subroutine update_aero( conc, minchk )
+#endif
 
 C  Updates aerosol values in CGRID from the conc array.
  
@@ -629,6 +670,9 @@ C-----------------------------------------------------------------------
 C Arguments:
       Real, Intent( Out ) :: conc( : )
       Logical, Intent( In ) :: minchk
+#ifdef sens 
+      Real,    Intent( Out ) :: s_conc( :,: )
+#endif
 
 C Local variables:
       Character( 80 ) :: xmsg
@@ -647,6 +691,15 @@ C Copy aerospc_conc back to grid cell concentrations
                n = aerospc_map( spc,m )
                If ( n .Ne. 0 ) Then
                     conc( n ) = Max( aerospc_conc( spc,m ), aerospc( spc )%min_conc( m ) )
+#ifdef sens
+                    Do np = 1, npmax
+                       If ( conc( n ) .Eq. aerospc( spc )%min_conc( m ) ) Then
+                          s_conc( np,n ) = 0.0
+                       Else
+                          s_conc( np,n ) = Real( s_aerospc_conc( spc,m,np ), 4 )
+                       End If
+                    End Do
+#endif
                End If
             End Do
          End Do
@@ -656,6 +709,11 @@ C Copy aerospc_conc back to grid cell concentrations
                n = aerospc_map( spc,m )
                If ( n .Ne. 0 ) Then
                     conc( n ) = aerospc_conc( spc,m )
+#ifdef sens
+                    Do np = 1, npmax
+                       s_conc( np,n ) = Real( s_aerospc_conc( spc,m,np ), 4 )
+                    End Do
+#endif
                End If
             End Do
          End Do

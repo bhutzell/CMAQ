@@ -1,26 +1,3 @@
-
-!------------------------------------------------------------------------!
-!  The Community Multiscale Air Quality (CMAQ) system software is in     !
-!  continuous development by various groups and is based on information  !
-!  from these groups: Federal Government employees, contractors working  !
-!  within a United States Government contract, and non-Federal sources   !
-!  including research institutions.  These groups give the Government    !
-!  permission to use, prepare derivative works of, and distribute copies !
-!  of their work in the CMAQ system to the public and to permit others   !
-!  to do so.  The United States Environmental Protection Agency          !
-!  therefore grants similar permission to use the CMAQ system software,  !
-!  but users are requested to provide copies of derivative works or      !
-!  products designed to operate in the CMAQ system to the United States  !
-!  Government without restrictions as to use by others.  Software        !
-!  that is used with the CMAQ system but distributed under the GNU       !
-!  General Public License or the GNU Lesser General Public License is    !
-!  subject to their copyright restrictions.                              !
-!------------------------------------------------------------------------!
-
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero6/isrpia.inc,v 1.4 2011/10/21 16:10:15 yoj Exp $
-
 C=======================================================================
 C *** ISORROPIA CODE II
 C *** INCLUDE FILE 'ISRPIA.INC'
@@ -93,7 +70,7 @@ C
 C
 C *** VARIABLES FOR GAS PHASE ******************************************
 C
-      COMMON /GAS / GNH3, GHNO3, GHCL 
+      COMMON /GAS / GNH3, GHNO3, GHCL, GNH3D, GHNO3D, GHCLD 
 C
 C *** EQUILIBRIUM CONSTANTS ********************************************
 C
@@ -127,6 +104,20 @@ C *** GENERIC VARIABLES ************************************************
 C
       CHARACTER VERSION*15
       COMMON /CGEN/ GREAT, TINY, TINY2, ZERO, ONE, VERSION
+
+C *** Wen added for ddmisrpia
+C
+C *** MOLAL BEFORE ADJUSTMENT OF MINOR SPEICIES ************************
+C
+      DOUBLE PRECISION MOLALD
+      COMMON /MINOR/ MOLALD(NIONS)
+
+
+C
+C *** WEN ADDED FOR FILTERING OUT NONPHYSICAL POINTS IN CALCD3
+C
+      INTEGER NONPYS,SAT
+      COMMON /FILT/ NONPYS,SAT
 C
 C *** END OF INCLUDE FILE **********************************************
 C

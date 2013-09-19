@@ -1,26 +1,3 @@
-
-!------------------------------------------------------------------------!
-!  The Community Multiscale Air Quality (CMAQ) system software is in     !
-!  continuous development by various groups and is based on information  !
-!  from these groups: Federal Government employees, contractors working  !
-!  within a United States Government contract, and non-Federal sources   !
-!  including research institutions.  These groups give the Government    !
-!  permission to use, prepare derivative works of, and distribute copies !
-!  of their work in the CMAQ system to the public and to permit others   !
-!  to do so.  The United States Environmental Protection Agency          !
-!  therefore grants similar permission to use the CMAQ system software,  !
-!  but users are requested to provide copies of derivative works or      !
-!  products designed to operate in the CMAQ system to the United States  !
-!  Government without restrictions as to use by others.  Software        !
-!  that is used with the CMAQ system but distributed under the GNU       !
-!  General Public License or the GNU Lesser General Public License is    !
-!  subject to their copyright restrictions.                              !
-!------------------------------------------------------------------------!
-
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero6/isocom.f,v 1.4 2011/10/21 16:10:14 yoj Exp $
-
 C ======================================================================
 C
 C *** ISORROPIA CODE II
@@ -175,12 +152,16 @@ C
 C=======================================================================
 C
       SUBROUTINE ISOROPIA (WI, RHI, TEMPI,  CNTRL,
-     &                     WT, GAS, AERLIQ, AERSLD, SCASI, OTHER)
+     &                     WT, GAS, AERLIQ, AERSLD, SCASI, OTHER )
+c    &                     TEST)
       INCLUDE 'isrpia.inc'
       PARAMETER (NCTRL=2,NOTHER=9)
       CHARACTER SCASI*15
       DIMENSION WI(NCOMP), WT(NCOMP),   GAS(NGASAQ),  AERSLD(NSLDS),
      &          AERLIQ(NIONS+NGASAQ+2), CNTRL(NCTRL), OTHER(NOTHER)
+      DOUBLE PRECISION MD(NIONS)
+c     PARAMETER (NT = 4)
+c     DIMENSION TEST(NT)
 C
 C *** PROBLEM TYPE (0=FOREWARD, 1=REVERSE) ******************************
 C
@@ -253,6 +234,7 @@ C
       DO 250 I=8,10              ! Liquid aerosol species
          AERLIQ(I+5) = MOLAL(I)
  250  CONTINUE
+
 C
       AERSLD(1)  = CNANO3           ! Solid aerosol species
       AERSLD(2)  = CNH4NO3
@@ -273,12 +255,14 @@ C
       AERSLD(17) = CMGSO4
       AERSLD(18) = CMGNO32
       AERSLD(19) = CMGCL2
+
 C
       IF(WATER.LE.TINY) THEN       ! Dry flag
         OTHER(1) = 1.d0
       ELSE
         OTHER(1) = 0.d0
       ENDIF
+
 C
       OTHER(2) = SULRAT            ! Other stuff
       OTHER(3) = SULRATW
@@ -288,6 +272,7 @@ C
       OTHER(7) = SO4RAT
       OTHER(8) = CRNARAT
       OTHER(9) = CRRAT
+
 C
       SCASI = SCASE
 C
@@ -300,12 +285,22 @@ C
       WT(7) = WI(7)
       WT(8) = WI(8)
 
-
       IF (IPROB.GT.0 .AND. WATER.GT.TINY) THEN
          WT(3) = WT(3) + GNH3
          WT(4) = WT(4) + GHNO3
          WT(5) = WT(5) + GHCL
       ENDIF
+C
+C *** GET MOLALD FOR DDM CALCULATION, ADDED BY WENXIAN ZHANG***
+C
+      DO I = 1,NIONS
+         MD(I) = MOLALD(I)
+      ENDDO
+
+c     TEST(1) = log(GAMA(7))/log(10.d0)
+c     TEST(2) = log(GAMA(8))/log(10.d0)
+c     TEST(3) = log(GAMA(5))/log(10.d0)
+c     TEST(4) = log(GAMA(10))/log(10.d0)
 C
       RETURN
 C
@@ -1458,7 +1453,7 @@ C     &                             XX,XX,XX,XX,XX,XX,XX,XX,XX)
 C         M0(03) = M0(03)*EXP(LN10*(GI0-GII))
 C      ENDIF
 C
-      M0(04) = AWAS(IRH)      ! (NH4)2SO4
+C     M0(04) = AWAS(IRH)      ! (NH4)2SO4
 CC      IF (M0(04) .LT. 100.0) THEN
 CC         IC = 3.0*M0(04)
 CC         CALL KMTAB(IC,298.0,     XX,XX,XX,GI0,XX,XX,XX,XX,XX,XX,XX,XX,
@@ -1609,7 +1604,7 @@ CCC      XK4  = 3.638e6   ! HNO3(g)          <==> H(aq)     + NO3(aq) ! SEQUIL
       XK41 = 2.100e5   ! HNO3(g)          <==> HNO3(aq)
       XK5  = 0.4799D0  ! NA2SO4(s)        <==> 2*NA(aq)  + SO4(aq)
       XK6  = 1.086D-16 ! NH4CL(s)         <==> NH3(g)    + HCL(g)
-      XK7  = 1.817D0   ! (NH4)2SO4(s)     <==> 2*NH4(aq) + SO4(aq)
+      XK7  = 1.817D0            ! (NH4)2SO4(s)     <==> 2*NH4(aq) + SO4(aq)
       XK8  = 37.661D0  ! NACL(s)          <==> NA(aq)    + CL(aq)
       XK10 = 5.746D-17 ! NH4NO3(s)        <==> NH3(g)    + HNO3(g) ! ISORR
 CCC      XK10 = 2.985e-17 ! NH4NO3(s)        <==> NH3(g)    + HNO3(g) ! SEQUIL
@@ -3010,7 +3005,7 @@ C
       MOLAL(7) = MOLAL(7) - DELT
       GHNO3    = MOLAL(1)*MOLAL(7)/ALFA
       
-!     write (*,*) ALFA, MOLAL(1), MOLAL(7), GHNO3, DELT
+      write (*,*) ALFA, MOLAL(1), MOLAL(7), GHNO3, DELT
 C 
       RETURN
 C
@@ -3588,7 +3583,6 @@ C
 C *** GET APPROPRIATE ROOT.
 C
       IF (DEL1.LT.ZERO .OR. DEL1.GT.HI .OR. DEL1.GT.NO3I) THEN
-!        print *, DELT
          DELT = ZERO
       ELSE
          DELT = DEL1
@@ -3705,9 +3699,7 @@ C
 C *** NH4-SO4 SYSTEM ; SULFATE RICH CASE ; FREE ACID
 C
       ELSE IF (SC.EQ.'C') THEN
-C *** March 1, 2011, Golam Sarwar (bug fix suggested by Havala Pye and agreed by Shannon Capps)
-C        MOLALR(4) = MOLAL(3)                     ! NH4HSO4
-         MOLALR(9) = MOLAL(3)                     ! NH4HSO4                 
+         MOLALR(4) = MOLAL(3)                     ! NH4HSO4
          MOLALR(7) = MAX(W(2)-W(3), ZERO)         ! H2SO4
 C
 C *** NH4-SO4-NO3 SYSTEM ; SULFATE POOR CASE
@@ -3733,9 +3725,7 @@ C
 C *** NH4-SO4-NO3 SYSTEM ; SULFATE RICH CASE ; FREE ACID
 C
       ELSE IF (SC.EQ.'F') THEN
-C *** March 1, 2011, Golam Sarwar (bug fix suggested by Havala Pye and agreed by Shannon Capps)
-C        MOLALR(4) = MOLAL(3)                              ! NH4HSO4
-         MOLALR(9) = MOLAL(3)                              ! NH4HSO4
+         MOLALR(4) = MOLAL(3)                              ! NH4HSO4
          MOLALR(7) = MAX(MOLAL(5)+MOLAL(6)-MOLAL(3),ZERO)  ! H2SO4
 C
 C *** NA-NH4-SO4-NO3-CL SYSTEM ; SULFATE POOR ; SODIUM POOR CASE
@@ -3827,7 +3817,7 @@ C
      &               -MOLALR(19)-2.D0*MOLALR(22), ZERO)      ! "FREE" NO3
          FRCL      = MAX(MOLAL(4)-MOLALR(1)-2.D0*MOLALR(16)
      &               -MOLALR(20)-2.D0*MOLALR(23), ZERO)      ! "FREE" CL
-         MOLALR(5) = MIN(MOLAL(3),FRNO3)                     ! NH4NO3
+         MOLALR(5) = MIN(MOLAL(3),FRNO3)                     ! NH4NO3 
          FRNH4     = MAX(MOLAL(3) - MOLALR(5), ZERO)         ! "FREE" NH3
          MOLALR(6) = MIN(FRCL, FRNH4)                        ! NH4CL
          MOLALR(17)= PSI9                                    ! K2SO4
@@ -16065,7 +16055,7 @@ C
 C
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
       PARAMETER (EXPON=1.D0/3.D0,     ZERO=0.D0, THET1=120.D0/180.D0,
-     &           THET2=240.D0/180.D0, PI=3.141592653589793D0, EPS=1D-50)
+     &           THET2=240.D0/180.D0, PI=3.14159265358932, EPS=1D-50)
       DOUBLE PRECISION  X(3)
 C
 C *** SPECIAL CASE : QUADRATIC*X EQUATION *****************************
@@ -16078,8 +16068,8 @@ C
          IF (D.GE.ZERO) THEN
             IX   = 3
             SQD  = SQRT(D)
-            X(2) = 0.5D0*(-A1+SQD)
-            X(3) = 0.5D0*(-A1-SQD)
+            X(2) = 0.5*(-A1+SQD)
+            X(3) = 0.5*(-A1-SQD)
          ENDIF
       ELSE
 C

@@ -87,6 +87,8 @@ c              met_data) in lieu of CBLK array and AERO_INFO module
 c
 c SH  03/10/11 Renamed met_data to aeromet_data
 c
+c SLN 08/16/13 ddm-3d implementation for cmaq5.0.1
+c
 c  REFERENCES:
 c   1. Pleim, J.E., F.S. Binkowski, J.K.S. Ching, R.L. Dennis, and N.V.
 c      Gallani, An improved representation of the reaction of N2O5 on
@@ -114,6 +116,12 @@ C-----------------------------------------------------------------------
       USE AERO_DATA
       USE PRECURSOR_DATA
       USE AEROMET_DATA   ! Includes CONST.EXT
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NP, NPMAX
+      USE AERO6_DDM3D, ONLY : s_aerospc_conc, s_precursor_conc
+      USE UTILIO_DEFN
+#endif
 
       IMPLICIT NONE
 
@@ -165,6 +173,16 @@ C *** variables for 2 NO2 + H2O -> HONO + HNO3 conversion
 C *** first time switch
       LOGICAL, SAVE ::  firstime = .true.
 
+#ifdef sens
+      INTEGER       ALLOCSTAT
+      CHARACTER( 120 ) :: XMSG = ' ' ! exit status message string
+
+      REAL( 8 ), ALLOCATABLE, SAVE :: S_GHNO3( : )    ! gas-phase nitric acid [ug/m3]
+      REAL( 8 ), ALLOCATABLE, SAVE :: S_GN2O5( : )    ! gas-phase dinitrogen pentoxide [ug/m3]
+      REAL( 8 ), ALLOCATABLE, SAVE :: S_GNO2( : )     ! gas-phase NO2 [ug/m3]
+      REAL( 8 ), ALLOCATABLE, SAVE :: S_GHONO( : )    ! gas-phase HONO [ug/m3]
+#endif
+
 C-----------------------------------------------------------------------
 
 C *** compute only on first pass
@@ -174,6 +192,17 @@ C *** compute only on first pass
         FAERN2O5 = 1.0E-6 / precursor_mw( N2O5_IDX )
         DFHONO = precursor_mw( HONO_IDX ) / 1.0E-6
         DFHNO3 = precursor_mw( HNO3_IDX ) / 1.0E-6
+
+#ifdef sens
+        Allocate ( S_GHNO3( NPMAX ),
+     &             S_GN2O5( NPMAX ),
+     &             S_GNO2( NPMAX ),
+     &             S_GHONO( NPMAX ),STAT = ALLOCSTAT )
+        If ( ALLOCSTAT .Ne. 0 ) Then
+            XMSG = 'Failure allocating sensitivity variables in HETCHEM'
+            CALL M3EXIT( 'HETCHEM', 0, 0, XMSG, XSTAT1 )
+        End If
+#endif
       End If   ! first time condition
 
 C *** fetch vapor-phase concentrations [ug/m3]
@@ -181,6 +210,15 @@ C *** fetch vapor-phase concentrations [ug/m3]
       GN2O5 = precursor_conc( N2O5_IDX )
       GNO2  = precursor_conc( NO2_IDX )
       GHONO = precursor_conc( HONO_IDX )
+
+#ifdef sens
+      DO NP = 1, NPMAX
+        S_GHNO3( NP ) = s_precursor_conc( HNO3_IDX,NP )
+        S_GN2O5( NP ) = s_precursor_conc( N2O5_IDX,NP )
+        S_GNO2 ( NP ) = s_precursor_conc( NO2_IDX,NP )
+        S_GHONO( NP ) = s_precursor_conc( HONO_IDX,NP )
+      END DO
+#endif
 
 C *** set up variables needed for calculating KN2O5
 
@@ -276,6 +314,42 @@ C     Ensure that all species remain above the minimum concentration.
       precursor_conc( NO2_IDX )  = MAX( GNO2, CONMIN )
       precursor_conc( HONO_IDX ) = MAX( GHONO, CONMIN )
 
+#ifdef sens
+      Do NP = 1, NPMAX
+
+         If ( precursor_conc( HONO_IDX ) .Eq. CONMIN ) Then
+            s_precursor_conc( HONO_IDX,NP ) = 0.0D0
+         Else
+            S_GHONO( NP ) = S_GHONO( NP )
+     &      + ( 0.5 * S_GNO2( NP )  * FAERNO2  * DFHONO ) * ( 1.0 - EXPDT_NO2 )
+            s_precursor_conc( HONO_IDX,NP ) = S_GHONO( NP )
+         End If
+
+         If ( precursor_conc( HNO3_IDX ) .Eq. CONMIN ) Then
+            s_precursor_conc( HNO3_IDX,NP ) = 0.0D0
+         Else
+            S_GHNO3( NP ) = S_GHNO3( NP )
+     &      + ( 2.0 * S_GN2O5( NP ) * FAERN2O5 * DFHNO3 ) * ( 1.0 - EXPDT_N2O5 )
+     &      + ( 0.5 * S_GNO2( NP )  * FAERNO2  * DFHNO3 ) * ( 1.0 - EXPDT_NO2 )
+            s_precursor_conc( HNO3_IDX,NP ) = S_GHNO3( NP )
+         End If
+
+         If ( precursor_conc( N2O5_IDX ) .Eq. CONMIN ) Then
+            s_precursor_conc( N2O5_IDX,NP ) = 0.0D0
+         Else
+            S_GN2O5( NP ) = S_GN2O5( NP ) * EXPDT_N2O5
+            s_precursor_conc( N2O5_IDX,NP ) = S_GN2O5( NP )
+         End If
+
+         If ( precursor_conc( NO2_IDX ) .Eq. CONMIN ) Then
+            s_precursor_conc( NO2_IDX,NP ) = 0.0D0
+         Else
+            S_GNO2( NP )  = S_GNO2( NP )  * EXPDT_NO2
+            s_precursor_conc( NO2_IDX,NP ) = S_GNO2( NP )
+         End If
+
+      End Do
+#endif
       RETURN
 
       END SUBROUTINE HETCHEM

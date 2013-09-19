@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero6/aero_subs.F,v 1.8 2012/01/19 13:21:28 yoj Exp $
+C $Header: /project/work/rep/arc/CCTM/src/aero/aero6/aero_subs.F,v 1.8 2012/01/19 13:21:28 yoj Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
@@ -175,6 +175,8 @@ C HS  03/10/11 Added call to POAAGE between ORGAER and HETCHEM
 
 C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
 
+C SLN 08/16/13 ddm-3d implementation for cmaq5.0.1
+
 C  REFERENCES:
 C   1. Binkowski, F.S. and U. Shankar, The regional particulate matter
 C      model 1. Model description and preliminary results, J. Geophys.
@@ -195,6 +197,11 @@ C-----------------------------------------------------------------------
       USE SOA_DEFN
       USE AEROMET_DATA
       USE UTILIO_DEFN
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NP, NPMAX
+      USE AERO6_DDM3D, ONLY : s_aerospc_conc, s_precursor_conc, s_so4rate, s_vapor_conc, s_orgprod_conc
+#endif
 
       IMPLICIT NONE
 
@@ -269,6 +276,11 @@ C *** local variables
 
       integer, save :: logdev 
       logical, save :: firstime = .true.
+
+#ifdef sens
+      REAL( 8 ) S_TMASS
+#endif
+
 C-----------------------------------------------------------------------
 
       if ( firstime ) then
@@ -584,6 +596,21 @@ C     intermodal coagulation.
      &                                REAL( AEROSPC_CONC( SPC,1 ) * EXPDT ) )
          AEROSPC_CONC( SPC,2 ) = MAX( AEROSPC( SPC )%MIN_CONC( 2 ),
      &                                TMASS - AEROSPC_CONC( SPC,1 ) )
+#ifdef sens
+         DO NP = 1, NPMAX
+            S_TMASS = S_AEROSPC_CONC( SPC,1,NP ) + S_AEROSPC_CONC( SPC,2,NP )
+            IF ( AEROSPC_CONC( SPC,1 ) .EQ. AEROSPC( SPC )%MIN_CONC( 1 ) ) THEN
+               S_AEROSPC_CONC( SPC,1,NP ) = 0.0D0
+            ELSE
+               S_AEROSPC_CONC( SPC,1,NP ) = REAL( S_AEROSPC_CONC( SPC,1,NP ) * EXPDT )
+            END IF
+            IF ( AEROSPC_CONC( SPC,2 ) .EQ. AEROSPC( SPC )%MIN_CONC( 2 ) ) THEN
+               S_AEROSPC_CONC( SPC,2,NP ) = 0.0D0
+            ELSE
+               S_AEROSPC_CONC( SPC,2,NP ) = S_TMASS - S_AEROSPC_CONC( SPC,1,NP )
+            END IF
+         END DO
+#endif
       END DO
 
 C *** end of update for species mass concentrations
@@ -661,6 +688,12 @@ C     using Equation 11b of Binkowski and Roselle (2003).
 
             AEROSPC_CONC( SPC,2 ) = AEROSPC_CONC( SPC,2 ) + AEROSPC_CONC( SPC,1 ) * FM3
             AEROSPC_CONC( SPC,1 ) = AEROSPC_CONC( SPC,1 ) * PHM3
+#ifdef sens
+            DO NP = 1, NPMAX
+               S_AEROSPC_CONC( SPC,2,NP ) = S_AEROSPC_CONC( SPC,2,NP ) + S_AEROSPC_CONC( SPC,1,NP ) * REAL(FM3,8)
+               S_AEROSPC_CONC( SPC,1,NP ) = S_AEROSPC_CONC( SPC,1,NP ) * REAL(PHM3,8)
+            END DO
+#endif
          END DO
 
       END IF ! end check on necessity for merging
@@ -679,6 +712,13 @@ C *** Set minimum value for all concentrations in the CBLK array
          DO SPC = 1, N_AEROSPC
             AEROSPC_CONC( SPC,N ) = MAX( AEROSPC_CONC( SPC,N ),
      &                                   AEROSPC( SPC )%MIN_CONC( N ) )
+#ifdef sens
+            DO NP = 1, NPMAX
+               IF ( AEROSPC_CONC( SPC,N ) .EQ. AEROSPC( SPC )%MIN_CONC( N ) ) THEN
+                  S_AEROSPC_CONC( SPC,N,NP ) = 0.0D0
+               ENDIF
+            END DO
+#endif
          END DO
       END DO
 
@@ -713,6 +753,7 @@ C SH  03/10/11 Renamed met_data to aeromet_data
 C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
 C GS  04/26/11 Replaced existing ISORROPIA with ISORROPIA 2.1
 C              Updated coarse-mode aerosol speciation and H+ calculation  
+C SLN 08/20/13 ddm-3d implementation for cmaq5.0.1
 
 C *** References
 C 1. Pilinis C, Capaldo KP, Nenes A, Pandis SN (2000) MADM - A new
@@ -732,6 +773,11 @@ C    aerosols. ATMOSPHERIC CHEMISTRY AND PHYSICS. 7, 4639-4659
       USE SOA_DEFN
       USE AEROMET_DATA   ! Includes CONST.EXT
       USE UTILIO_DEFN
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NP, NPMAX
+      USE AERO6_DDM3D, ONLY : s_so4rate, s_precursor_conc
+#endif
 
       IMPLICIT NONE
 
@@ -776,6 +822,7 @@ C *** Outputs from HCOND3: size-dependent term in the condensational-growth
 C     expressions defined in Equations A13-A14 of [Binkowski & Shankar,1995]
       REAL( 8 ) :: FCONC_SO4( N_MODE,2 )  ! All sizes 2nd and 3rd moments
       REAL( 8 ) :: FCONCM1_SO4       ! reciprocals of total SO4 cond rates
+      REAL( 8 ) :: FCONC_SO4_TEMP( 2 )  ! temporary variable for HCOND3 calls - sln 08/20/2013
 
 C *** Modal partition factors [ dimensionless ]
 C     defined in Equations A17-A18 of [Binkowski & Shankar,1995]
@@ -900,6 +947,12 @@ C *** Local Saved Variables
 
       logical, save :: write1 = .true.
 
+#ifdef sens
+      REAL( 8 ), ALLOCATABLE, SAVE :: S_XH2SO4( : )            ! steady state H2SO4 concentration
+      CHARACTER( 96 ) :: XMSG = ' '
+      INTEGER ALLOCSTAT
+#endif
+
 C-----------------------------------------------------------------------
  
       IF ( FIRSTIME ) THEN
@@ -947,7 +1000,34 @@ C-----------------------------------------------------------------------
          NH3RAT  = PRECURSOR_MW( NH3_IDX )  / AEROSPC_MW( ANH4_IDX )
          HNO3RAT = PRECURSOR_MW( HNO3_IDX ) / AEROSPC_MW( ANO3_IDX )
          HCLRAT  = PRECURSOR_MW( HCL_IDX )  / AEROSPC_MW( ACL_IDX )
+
+#ifdef sens
+         ALLOCATE ( S_XH2SO4( NPMAX ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating S_XH2SO4( NPMAX )'
+            CALL M3EXIT( 'VOLINORG', 0 , 0, XMSG, XSTAT2 )
+         END IF
+#endif
       END IF
+
+
+c     WRITE(LOGDEV,*) " TOP OF VOLINORG:" 
+
+c     WRITE(LOGDEV,*) "NH3  = ",PRECURSOR_CONC( NH3_IDX ),S_PRECURSOR_CONC( NH3_IDX,1 )
+c     WRITE(LOGDEV,*) "HNO3 = ",PRECURSOR_CONC( HNO3_IDX ),S_PRECURSOR_CONC( HNO3_IDX,1 )
+c     WRITE(LOGDEV,*) "HCL  = ",PRECURSOR_CONC( HCL_IDX ),S_PRECURSOR_CONC( HCL_IDX,1 )
+c     WRITE(LOGDEV,*) "SULF = ",PRECURSOR_CONC( SULF_IDX ),S_PRECURSOR_CONC( SULF_IDX,1 )
+c     WRITE(LOGDEV,*) "SULPRD = ",PRECURSOR_CONC( SULPRD_IDX ),S_PRECURSOR_CONC( SULPRD_IDX,1 )
+
+c     WRITE(LOGDEV,*) "SO4  = ",AEROSPC_CONC( ASO4_IDX, 2 ),S_PRECURSOR_CONC( ASO4_IDX,  1 )
+c     WRITE(LOGDEV,*) "NH4  = ",AEROSPC_CONC( ANH4_IDX, 2 ),S_PRECURSOR_CONC( ANH4_IDX,  1 )
+c     WRITE(LOGDEV,*) "NO3  = ",AEROSPC_CONC( ANO3_IDX, 2 ),S_PRECURSOR_CONC( ANO3_IDX,  1 )
+c     WRITE(LOGDEV,*) "NA   = ",AEROSPC_CONC( ANA_IDX,  2 ),S_PRECURSOR_CONC( ANA_IDX,   1 )
+c     WRITE(LOGDEV,*) "CL   = ",AEROSPC_CONC( ACL_IDX,  2 ),S_PRECURSOR_CONC( ACL_IDX,   1 )
+c     WRITE(LOGDEV,*) "CA   = ",AEROSPC_CONC( ACA_IDX,  2 ),S_PRECURSOR_CONC( ACA_IDX,   1 )
+c     WRITE(LOGDEV,*) "K    = ",AEROSPC_CONC( AK_IDX,   2 ),S_PRECURSOR_CONC( AK_IDX,    1 )
+c     WRITE(LOGDEV,*) "MG   = ",AEROSPC_CONC( AMG_IDX,  2 ),S_PRECURSOR_CONC( AMG_IDX,   1 )
+
 
 C *** Determine if Hybrid
       TMP = 0.0
@@ -1000,9 +1080,15 @@ C *** Calculate the size-dependent terms in the condensational-
 C     growth factor expressions for sulfate using 
 C     Equations A13-A14 of Binkowski & Shankar (1995). 
        
+c     DO I = 1, N_MODE
+c        CALL HCOND3( AM0( I ), AM1( I ), AM2( I ),
+c    &                DV_SO4, ALPHSULF, CBAR_SO4, FCONC_SO4( I,: ) )
+c     END DO 
+
       DO I = 1, N_MODE
          CALL HCOND3( AM0( I ), AM1( I ), AM2( I ),
-     &                DV_SO4, ALPHSULF, CBAR_SO4, FCONC_SO4( I,: ) )
+     &                DV_SO4, ALPHSULF, CBAR_SO4, FCONC_SO4_TEMP )
+         FCONC_SO4( I,: ) = FCONC_SO4_TEMP
       END DO 
 
       IF ( .NOT. HYBRID ) THEN
@@ -1045,6 +1131,17 @@ C     on Equations A21 and A23 of Binkowski & Shankar (1995).
          XH2SO4 = SO4RATE / TMP
          XH2SO4 = MAX( XH2SO4, CONMIN )
          PRECURSOR_CONC( SULF_IDX ) = XH2SO4
+
+#ifdef sens
+         DO NP = 1, NPMAX
+            IF ( XH2SO4 .EQ. CONMIN ) THEN
+               S_XH2SO4( NP ) = 0.0D0
+            ELSE
+               S_XH2SO4( NP ) = S_SO4RATE( NP ) / REAL(TMP,8)
+            END IF
+            S_PRECURSOR_CONC( SULF_IDX, NP ) = S_XH2SO4( NP )
+         END DO
+#endif
 
 C *** Calculate new particle production rate for 0th, 2nd, & 3rd moments
          CALL NEWPART3 ( AIRRH, AIRTEMP, XH2SO4, SO4RATE,
@@ -1121,8 +1218,13 @@ C     N.B: these are for a "wet" size distribution
 C *** Calculate the size-dependent terms in the condensational-
 C     growth factor expressions for sulfate using 
 C     Equations A13-A14 of Binkowski & Shankar (1995). 
+c              CALL HCOND3( AM0( 3 ), AM1( 3 ), AM2( 3 ), DV_SO4, ALPHSULF, 
+c    &                      CBAR_SO4, FCONC_SO4( 3,: ) )  ! adapted from Eq A14
+
                CALL HCOND3( AM0( 3 ), AM1( 3 ), AM2( 3 ), DV_SO4, ALPHSULF, 
-     &                      CBAR_SO4, FCONC_SO4( 3,: ) )  ! adapted from Eq A14
+     &                      CBAR_SO4, FCONC_SO4_TEMP )  ! adapted from Eq A14
+               FCONC_SO4( 3,: ) = FCONC_SO4_TEMP
+
 
                GRFAC1( 3 ) = FCONC_SO4( 3,1 ) 
                GRFAC2( 3 ) = FCONC_SO4( 3,2 ) 
@@ -1364,6 +1466,26 @@ C     densities.
 
       write1 = .false.
 
+c'
+c     WRITE(LOGDEV,*) "=-=-=-=-=-=-=-=-=-=-=-="
+c     WRITE(LOGDEV,*) " AFTER HYYBRID:"
+
+c     WRITE(LOGDEV,*) "NH3  = ",PRECURSOR_CONC( NH3_IDX ),S_PRECURSOR_CONC( NH3_IDX,1 )
+c     WRITE(LOGDEV,*) "HNO3 = ",PRECURSOR_CONC( HNO3_IDX ),S_PRECURSOR_CONC( HNO3_IDX,1 )
+c     WRITE(LOGDEV,*) "HCL  = ",PRECURSOR_CONC( HCL_IDX ),S_PRECURSOR_CONC( HCL_IDX,1 )
+c     WRITE(LOGDEV,*) "SULF = ",PRECURSOR_CONC( SULF_IDX ),S_PRECURSOR_CONC( SULF_IDX,1 )
+c     WRITE(LOGDEV,*) "SULPRD = ",PRECURSOR_CONC( SULPRD_IDX ),S_PRECURSOR_CONC( SULPRD_IDX,1 )
+
+c     WRITE(LOGDEV,*) "SO4  = ",AEROSPC_CONC( ASO4_IDX, 2 ),S_PRECURSOR_CONC( ASO4_IDX,  1 )
+c     WRITE(LOGDEV,*) "NH4  = ",AEROSPC_CONC( ANH4_IDX, 2 ),S_PRECURSOR_CONC( ANH4_IDX,  1 )
+c     WRITE(LOGDEV,*) "NO3  = ",AEROSPC_CONC( ANO3_IDX, 2 ),S_PRECURSOR_CONC( ANO3_IDX,  1 )
+c     WRITE(LOGDEV,*) "NA   = ",AEROSPC_CONC( ANA_IDX,  2 ),S_PRECURSOR_CONC( ANA_IDX,   1 )
+c     WRITE(LOGDEV,*) "CL   = ",AEROSPC_CONC( ACL_IDX,  2 ),S_PRECURSOR_CONC( ACL_IDX,   1 )
+c     WRITE(LOGDEV,*) "CA   = ",AEROSPC_CONC( ACA_IDX,  2 ),S_PRECURSOR_CONC( ACA_IDX,   1 )
+c     WRITE(LOGDEV,*) "K    = ",AEROSPC_CONC( AK_IDX,   2 ),S_PRECURSOR_CONC( AK_IDX,    1 )
+c     WRITE(LOGDEV,*) "MG   = ",AEROSPC_CONC( AMG_IDX,  2 ),S_PRECURSOR_CONC( AMG_IDX,   1 )
+
+
 C *** End of dynamic mass transfer calculations for coarse mode
 
 C *** Call ISORROPIA in forward mode to calculate gas-particle equilibrium in 
@@ -1422,6 +1544,13 @@ C *** Set flags to account for mass conservation violations in ISRP3F
 #endif
 
 #ifndef noiso
+
+
+c     WRITE(LOGDEV,*) "BEFORE ISOROPIA"
+c     WRITE(LOGDEV,*) "WI=",WI
+c     WRITE(LOGDEV,*) "RHI=",RHI,"TEMPI=",TEMPI
+
+
       CALL ISOROPIA( WI, RHI, TEMPI, CNTRL, WT, GAS, AERLIQ,
      &               AERSLD, SCASI, OTHER )
 
@@ -1429,6 +1558,30 @@ C *** Update gas-phase concentrations
       PRECURSOR_CONC( NH3_IDX )  = GAS( 1 ) * 1.0D6 * REAL( PRECURSOR_MW( NH3_IDX ), 8 )
       PRECURSOR_CONC( HNO3_IDX ) = GAS( 2 ) * 1.0D6 * REAL( PRECURSOR_MW( HNO3_IDX ), 8 )
       PRECURSOR_CONC( HCL_IDX )  = GAS( 3 ) * 1.0D6 * REAL( PRECURSOR_MW( HCL_IDX ), 8 )
+
+#ifdef sens
+      CALL AERO_SENS( SCASI, WI )
+#endif
+
+c     WRITE(LOGDEV,*) "=-=-=-=-=-=-=-=-=-=-=-="
+c     WRITE(LOGDEV,*) " AFTER AERO_SENS:"
+
+c     WRITE(LOGDEV,*) "NH3  = ",PRECURSOR_CONC( NH3_IDX ),S_PRECURSOR_CONC( NH3_IDX,1 )
+c     WRITE(LOGDEV,*) "HNO3 = ",PRECURSOR_CONC( HNO3_IDX ),S_PRECURSOR_CONC( HNO3_IDX,1 )
+c     WRITE(LOGDEV,*) "HCL  = ",PRECURSOR_CONC( HCL_IDX ),S_PRECURSOR_CONC( HCL_IDX,1 )
+c     WRITE(LOGDEV,*) "SULF = ",PRECURSOR_CONC( SULF_IDX ),S_PRECURSOR_CONC( SULF_IDX,1 )
+c     WRITE(LOGDEV,*) "SULPRD = ",PRECURSOR_CONC( SULPRD_IDX ),S_PRECURSOR_CONC( SULPRD_IDX,1 )
+
+c     WRITE(LOGDEV,*) "SO4  = ",AEROSPC_CONC( ASO4_IDX, 2 ),S_PRECURSOR_CONC( ASO4_IDX,  1 )
+c     WRITE(LOGDEV,*) "NH4  = ",AEROSPC_CONC( ANH4_IDX, 2 ),S_PRECURSOR_CONC( ANH4_IDX,  1 )
+c     WRITE(LOGDEV,*) "NO3  = ",AEROSPC_CONC( ANO3_IDX, 2 ),S_PRECURSOR_CONC( ANO3_IDX,  1 )
+c     WRITE(LOGDEV,*) "NA   = ",AEROSPC_CONC( ANA_IDX,  2 ),S_PRECURSOR_CONC( ANA_IDX,   1 )
+c     WRITE(LOGDEV,*) "CL   = ",AEROSPC_CONC( ACL_IDX,  2 ),S_PRECURSOR_CONC( ACL_IDX,   1 )
+c     WRITE(LOGDEV,*) "CA   = ",AEROSPC_CONC( ACA_IDX,  2 ),S_PRECURSOR_CONC( ACA_IDX,   1 )
+c     WRITE(LOGDEV,*) "K    = ",AEROSPC_CONC( AK_IDX,   2 ),S_PRECURSOR_CONC( AK_IDX,    1 )
+c     WRITE(LOGDEV,*) "MG   = ",AEROSPC_CONC( AMG_IDX,  2 ),S_PRECURSOR_CONC( AMG_IDX,   1 )
+
+
 #else
       gas( 1 ) = real( precursor_conc( nh3_idx ),  8 ) * 1.0d-6 / real( precursor_mw( nh3_idx ), 8 )
       gas( 2 ) = real( precursor_conc( hno3_idx ), 8 ) * 1.0d-6 / real( precursor_mw( hno3_idx ), 8 )
@@ -1631,6 +1784,25 @@ C *** Add water and SOA to 2nd moment while preserving standard deviation
          END DO
 
       END DO    ! end fine mode mass transfer calculations
+
+c     WRITE(LOGDEV,*) "=-=-=-=-=-=-=-=-=-=-=-="
+c     WRITE(LOGDEV,*) " BOTTOM OF VOLINORG:"
+
+c     WRITE(LOGDEV,*) "NH3  = ",PRECURSOR_CONC( NH3_IDX ),S_PRECURSOR_CONC( NH3_IDX,1 )
+c     WRITE(LOGDEV,*) "HNO3 = ",PRECURSOR_CONC( HNO3_IDX ),S_PRECURSOR_CONC( HNO3_IDX,1 )
+c     WRITE(LOGDEV,*) "HCL  = ",PRECURSOR_CONC( HCL_IDX ),S_PRECURSOR_CONC( HCL_IDX,1 )
+c     WRITE(LOGDEV,*) "SULF = ",PRECURSOR_CONC( SULF_IDX ),S_PRECURSOR_CONC( SULF_IDX,1 )
+c     WRITE(LOGDEV,*) "SULPRD = ",PRECURSOR_CONC( SULPRD_IDX ),S_PRECURSOR_CONC( SULPRD_IDX,1 )
+
+
+c     WRITE(LOGDEV,*) "SO4  = ",AEROSPC_CONC( ASO4_IDX, 2 ),S_PRECURSOR_CONC( ASO4_IDX,  1 )
+c     WRITE(LOGDEV,*) "NH4  = ",AEROSPC_CONC( ANH4_IDX, 2 ),S_PRECURSOR_CONC( ANH4_IDX,  1 )
+c     WRITE(LOGDEV,*) "NO3  = ",AEROSPC_CONC( ANO3_IDX, 2 ),S_PRECURSOR_CONC( ANO3_IDX,  1 )
+c     WRITE(LOGDEV,*) "NA   = ",AEROSPC_CONC( ANA_IDX,  2 ),S_PRECURSOR_CONC( ANA_IDX,   1 )
+c     WRITE(LOGDEV,*) "CL   = ",AEROSPC_CONC( ACL_IDX,  2 ),S_PRECURSOR_CONC( ACL_IDX,   1 )
+c     WRITE(LOGDEV,*) "CA   = ",AEROSPC_CONC( ACA_IDX,  2 ),S_PRECURSOR_CONC( ACA_IDX,   1 )
+c     WRITE(LOGDEV,*) "K    = ",AEROSPC_CONC( AK_IDX,   2 ),S_PRECURSOR_CONC( AK_IDX,    1 )
+c     WRITE(LOGDEV,*) "MG   = ",AEROSPC_CONC( AMG_IDX,  2 ),S_PRECURSOR_CONC( AMG_IDX,   1 )
 
 C *** Update the third moments, geometric mean diameters, geometric 
 C     standard deviations, modal mass totals, and modal particle 

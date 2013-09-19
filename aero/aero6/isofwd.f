@@ -1,26 +1,3 @@
-
-!------------------------------------------------------------------------!
-!  The Community Multiscale Air Quality (CMAQ) system software is in     !
-!  continuous development by various groups and is based on information  !
-!  from these groups: Federal Government employees, contractors working  !
-!  within a United States Government contract, and non-Federal sources   !
-!  including research institutions.  These groups give the Government    !
-!  permission to use, prepare derivative works of, and distribute copies !
-!  of their work in the CMAQ system to the public and to permit others   !
-!  to do so.  The United States Environmental Protection Agency          !
-!  therefore grants similar permission to use the CMAQ system software,  !
-!  but users are requested to provide copies of derivative works or      !
-!  products designed to operate in the CMAQ system to the United States  !
-!  Government without restrictions as to use by others.  Software        !
-!  that is used with the CMAQ system but distributed under the GNU       !
-!  General Public License or the GNU Lesser General Public License is    !
-!  subject to their copyright restrictions.                              !
-!------------------------------------------------------------------------!
-
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero6/isofwd.f,v 1.4 2011/10/21 16:10:14 yoj Exp $
-
 C=======================================================================
 C
 C *** ISORROPIA CODE
@@ -71,6 +48,8 @@ C
             CALL CALCA2              ! Only liquid          ; case A2
          ENDIF
       ENDIF
+
+
 C
 C *** SULFATE RICH (NO ACID)
 C
@@ -98,6 +77,15 @@ C
             CALL CALCB4              ! Only liquid          ; case B4
          ENDIF
       ENDIF
+
+c modified by Wenxian Zhang for DDM sensitivity calculation
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GNH3D  = GNH3
+      GHNO3D = GHNO3
+      GHCLD  = GHCL 
+
       CALL CALCNH3
 C
 C *** SULFATE RICH (FREE ACID)
@@ -119,6 +107,15 @@ C
 C
          ENDIF
       ENDIF
+
+c modified by Wenxian Zhang for DDM sensitivity calculation
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GNH3D  = GNH3
+      GHNO3D = GHNO3
+      GHCLD  = GHCL
+
       CALL CALCNH3
       ENDIF
 C
@@ -218,7 +215,21 @@ C
          ENDIF
       ENDIF
 C
+C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
+C By Wenxian Zhang
+C
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GHNO3D = GHNO3
+      GNH3D  = GNH3
+      GHCLD  = GHCL
+
+C *********************************************************************
+
+
       CALL CALCNA                 ! HNO3(g) DISSOLUTION
+
 C
 C *** SULFATE RICH (FREE ACID)
 C     FOR SOLVING THIS CASE, NITRIC ACID IS ASSUMED A MINOR SPECIES, 
@@ -246,6 +257,17 @@ C
          ENDIF
       ENDIF
 C
+C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
+C
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GHNO3D = GHNO3
+      GNH3D  = GNH3
+      GHCLD  = GHCL
+
+C *********************************************************************
+
       CALL CALCNA                 ! HNO3(g) DISSOLUTION
       ENDIF
 C
@@ -407,7 +429,17 @@ C
             CALL CALCI6              ! NO SOLIDS
          ENDIF
       ENDIF
-C                                    
+C
+C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
+C
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GHNO3D = GHNO3
+      GNH3D  = GNH3
+      GHCLD  = GHCL
+
+C *********************************************************************                                    
       CALL CALCNHA                ! MINOR SPECIES: HNO3, HCl       
       CALL CALCNH3                !                NH3 
 C
@@ -433,7 +465,17 @@ C
             CALL CALCJ3              
          ENDIF
       ENDIF
-C                                    
+C
+C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
+C
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GHNO3D = GHNO3
+      GNH3D  = GNH3
+      GHCLD  = GHCL
+
+C *********************************************************************                                    
       CALL CALCNHA                ! MINOR SPECIES: HNO3, HCl       
       CALL CALCNH3                !                NH3 
       ENDIF
@@ -469,15 +511,15 @@ C
 C
 C *** ADJUST FOR TOO LITTLE AMMONIUM AND CHLORIDE ***********************
 C
-      WI(3) = MAX (WI(3), 1.D-10)  ! NH4+ : 1e-4 umoles/m3
-      WI(5) = MAX (WI(5), 1.D-10)  ! Cl-  : 1e-4 umoles/m3
+C      WI(3) = MAX (WI(3), 1.D-10)  ! NH4+ : 1e-4 umoles/m3
+C      WI(5) = MAX (WI(5), 1.D-10)  ! Cl-  : 1e-4 umoles/m3
 C
 C *** ADJUST FOR TOO LITTLE SODIUM, SULFATE AND NITRATE COMBINED ********
 C
-      IF (WI(1)+WI(2)+WI(4) .LE. 1d-10) THEN
-         WI(1) = 1.D-10  ! Na+  : 1e-4 umoles/m3
-         WI(2) = 1.D-10  ! SO4- : 1e-4 umoles/m3
-      ENDIF
+C      IF (WI(1)+WI(2)+WI(4) .LE. 1d-10) THEN
+C         WI(1) = 1.D-10  ! Na+  : 1e-4 umoles/m3
+C         WI(2) = 1.D-10  ! SO4- : 1e-4 umoles/m3
+C      ENDIF
 C
 C *** INITIALIZE ALL VARIABLES IN COMMON BLOCK **************************
 C
@@ -486,9 +528,12 @@ C
 C *** CHECK IF TOO MUCH SODIUM+CRUSTALS ; ADJUST AND ISSUE ERROR MESSAGE
 C
       REST = 2.D0*W(2) + W(4) + W(5)
+c      print*,'Rest',rest
+c      print*,'po',W(1)+W(6)+W(7)+W(8)
 C
       IF (W(1)+W(6)+W(7)+W(8).GT.REST) THEN
 C
+c      print*, 'yes1'
       CCASO4I  = MIN (W(2),W(6))
       FRSO4I   = MAX (W(2) - CCASO4I, ZERO)
       CAFRI    = MAX (W(6) - CCASO4I, ZERO)
@@ -527,6 +572,7 @@ C
              CALL PUSHERR (0051, 'ISRP4F')       ! Warning error: Ca, Na, K, Mg in excess
 C
          ELSE IF (W(1).GT.REST1) THEN                 ! Na > 2*FRSO4+FRCL+FRNO3 ?
+
              W(1) = (ONE-1D-6)*REST1             ! Adjust Na amount
              W(7)= ZERO                          ! Adjust K amount
              W(8)= ZERO                          ! Adjust Mg amount
@@ -753,8 +799,20 @@ C
 	 ENDIF
        ENDIF
 C
+C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
+C
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GHNO3D = GHNO3
+      GNH3D  = GNH3
+      GHCLD  = GHCL
+
+C *********************************************************************
+
       CALL CALCNHA                ! MINOR SPECIES: HNO3, HCl
       CALL CALCNH3                !                NH3
+
 C
 C *** SULFATE SUPER RICH (FREE ACID): Rso4<1;
 C
@@ -783,6 +841,17 @@ C
          ENDIF
        ENDIF
 C
+C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
+C
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GHNO3D = GHNO3
+      GNH3D  = GNH3
+      GHCLD  = GHCL
+
+C *********************************************************************
+
       CALL CALCNHA                  ! MINOR SPECIES: HNO3, HCl
       CALL CALCNH3                  !                NH3
 C
@@ -2137,12 +2206,24 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
+
+c modified by Wenxian Zhang for DDM sensitivity calculation
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GNH3D  = GNH3
+      GHNO3D = GHNO3
+      GHCLD  = GHCL
+
       IF (MOLAL(1).GT.TINY) THEN
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                     ! H+   EFFECT
          MOLAL(5) = MOLAL(5) - DELTA                     ! SO4  EFFECT
          MOLAL(6) = DELTA                                ! HSO4 EFFECT
+      ELSE
+         NONPYS = 1
       ENDIF
+      
       RETURN
 C
 C *** END OF SUBROUTINE CALCD3 ******************************************
@@ -2664,6 +2745,15 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
+
+c modified by Wenxian Zhang for DDM sensitivity calculation
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GNH3D  = GNH3
+      GHNO3D = GHNO3
+      GHCLD  = GHCL
+
       IF (MOLAL(1).GT.TINY .AND. MOLAL(5).GT.TINY) THEN  ! If quadrat.called
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                    ! H+   EFFECT
@@ -3921,6 +4011,16 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
+C
+C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION
+C
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GNH3D  = GNH3
+      GHNO3D = GHNO3
+      GHCLD  = GHCL
+
       IF (MOLAL(1).GT.TINY .AND. MOLAL(5).GT.TINY) THEN
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                     ! H+   EFFECT
@@ -7123,6 +7223,16 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
+C
+C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION
+C
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GNH3D  = GNH3
+      GHNO3D = GHNO3
+      GHCLD  = GHCL 
+
       IF (MOLAL(1).GT.TINY .AND. MOLAL(5).GT.TINY) THEN  ! If quadrat.called
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                    ! H+   EFFECT
@@ -8839,7 +8949,7 @@ C
       RTSQ    = R*TEMP*R*TEMP
       A1      = XK6/RTSQ
       A2      = XK10/RTSQ
-!     print *, A2
+c      print *, A2
 C
       THETA1  = GAM - BET*(A2/A1)
       THETA2  = A2/A1
@@ -9041,6 +9151,16 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
+C
+C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION
+C
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GNH3D  = GNH3
+      GHNO3D = GHNO3
+      GHCLD  = GHCL
+
       IF (MOLAL(1).GT.TINY .AND. MOLAL(5).GT.TINY) THEN
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                     ! H+   EFFECT
@@ -11219,7 +11339,7 @@ C
       FRNO3   = MAX (W(4) - 2.D0*CHI12, ZERO)
       CHI17   = MIN (FRCA, 0.5D0*FRCL)              ! CCACL2
       FRCA    = MAX (FRCA - CHI17, ZERO)
-      FRCL    = MAX (FRCL - 2.D0*CHI17, ZERO)
+      FRCL    = MAX (FRCL - 2.D0*CHI17, ZERO) 
       CHI15   = MIN (FRMG, 0.5D0*FRNO3)             ! CMGNO32
       FRMG    = MAX (FRMG - CHI15, ZERO)
       FRNO3   = MAX (FRNO3 - 2.D0*CHI15, ZERO)
@@ -11293,6 +11413,16 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
+C
+C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION
+C
+      DO I = 1,NIONS
+         MOLALD(I) = MOLAL(I)
+      ENDDO
+      GNH3D  = GNH3
+      GHNO3D = GHNO3 
+      GHCLD  = GHCL
+
       IF (MOLAL(1).GT.TINY .AND. MOLAL(5).GT.TINY) THEN
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                     ! H+   EFFECT
@@ -15957,7 +16087,9 @@ C
       CC   = -A9*(PSI8 + PSI1 + PSI2 + PSI3)
       DD   = MAX(BB*BB - 4.D0*CC, ZERO)
       LAMDA= 0.5D0*(-BB + SQRT(DD))
+
       LAMDA= MIN(MAX (LAMDA, TINY), PSI8+PSI3+PSI2+PSI1)
+
 C
 C *** CALCULATE SPECIATION ********************************************
 C
@@ -18037,6 +18169,8 @@ C
       CNA2SO4 = MIN (0.5D0*W(1), FRSO4)             ! CNA2SO4
       FRNA    = MAX(W(1) - 2.D0*CNA2SO4, ZERO)
       FRSO4   = MAX(FRSO4 - CNA2SO4, ZERO)
+c      print*, 'frso4',frso4
+c      print*, 'tmg',W(8)
       CMGSO4  = MIN (W(8), FRSO4)                   ! CMGSO4
       FRMG    = MAX(W(8) - CMGSO4, ZERO)
       FRSO4   = MAX(FRSO4 - CMGSO4, ZERO)
