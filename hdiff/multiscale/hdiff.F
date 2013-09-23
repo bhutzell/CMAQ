@@ -75,6 +75,7 @@ C                       reported by Talat Odman and Yongtao Hu of GA tech.
 C    21 Jun 10 J.Young: convert for Namelist redesign
 C    16 Feb 11 S. Roselle: replaced I/O-API include files w/UTILIO_DEFN
 C    11 May 11 D.Wong: incorporated twoway model implementation
+C    17 Jun 13 S.Napelenok: ddm-3d implementation for cmaq5.0.1
 C-----------------------------------------------------------------------
       
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -87,6 +88,10 @@ C-----------------------------------------------------------------------
 #ifdef parallel
       USE SWAP_SANDIA
 #endif
+
+#ifdef sens
+      USE DDM3D_DEFN
+#endif 
 
       IMPLICIT NONE
 
@@ -155,6 +160,14 @@ C Local Variables:
       REAL,    ALLOCATABLE, SAVE :: HALO_EAST ( :,:,: )
       REAL,    ALLOCATABLE, SAVE :: BUF_NS    ( : )
       REAL,    ALLOCATABLE, SAVE :: BUF_EW    ( : )
+#ifdef sens
+      REAL, allocatable, save :: S_HALO_SOUTH( :,:,:,: ) ! ( NCOLS,NLAYS,N_SPC_DIFF,NPMAX )
+      REAL, allocatable, save :: S_HALO_NORTH( :,:,:,: ) ! ( NCOLS,NLAYS,N_SPC_DIFF,NPMAX )
+      REAL, allocatable, save :: S_HALO_WEST ( :,:,:,: ) ! ( NROWS,NLAYS,N_SPC_DIFF,NPMAX )
+      REAL, allocatable, save :: S_HALO_EAST ( :,:,:,: ) ! ( NROWS,NLAYS,N_SPC_DIFF,NPMAX )
+      REAL, allocatable, save :: S_BUF_NS    ( :,: )     ! ( NCOLS*NLAYS*N_SPC_DIFF,NPMAX )
+      REAL, allocatable, save :: S_BUF_EW    ( :,: )     ! ( NROWS*NLAYS*N_SPC_DIFF,NPMAX )
+#endif
 #endif
 
       INTEGER, ALLOCATABLE, SAVE :: DIFF_MAP( : )   ! global diff map to CGRID
@@ -169,6 +182,11 @@ C Local Variables:
       INTEGER MY_TEMP
       INTEGER, SAVE :: STARTROW, ENDROW
       INTEGER, SAVE :: STARTCOL, ENDCOL
+
+
+#ifdef sens
+      REAL         SENSWORK  ( 0:NCOLS+1,0:NROWS+1,NPMAX )   ! sens working array
+#endif
 
       INTERFACE
          SUBROUTINE RHO_J ( JDATE, JTIME, TSTEP, RHOJ )
@@ -222,6 +240,18 @@ C Get dx1 from COORD include file
             XMSG = 'Failure allocating HALO_SOUTH, HALO_NORTH, HALO_WEST, HALO_EAST, BUF_NS, or BUF_EW'
             CALL M3EXIT ( PNAME, FDATE, FTIME, XMSG, XSTAT1 )
          END IF
+#ifdef sens
+         ALLOCATE ( S_HALO_SOUTH( NCOLS,NLAYS,N_SPC_DIFF,NPMAX ),
+     &              S_HALO_NORTH( NCOLS,NLAYS,N_SPC_DIFF,NPMAX ),
+     &              S_HALO_WEST ( NROWS,NLAYS,N_SPC_DIFF,NPMAX ),
+     &              S_HALO_EAST ( NROWS,NLAYS,N_SPC_DIFF,NPMAX ),
+     &              S_BUF_NS    ( NCOLS*NLAYS*N_SPC_DIFF,NPMAX ),
+     &              S_BUF_EW    ( NROWS*NLAYS*N_SPC_DIFF,NPMAX ), STAT = IOS )
+         IF ( IOS .NE. 0 ) THEN
+            XMSG = 'Failure allocating S_HALO_SOUTH, S_HALO_NORTH, S_HALO_WEST, S_HALO_EAST, S_BUF_NS, or S_BUF_EW'
+            CALL M3EXIT ( PNAME, FDATE, FTIME, XMSG, XSTAT1 )
+         END IF
+#endif
 #endif
 
          ALLOCATE ( DIFF_MAP( N_SPC_DIFF ), STAT = IOS )
@@ -355,6 +385,29 @@ C    send to WEST, recv from EAST, fill bound_east
       CALL SWAP3D( BUF_NS,     HALO_SOUTH, NCOLS, NLAYS, N_SPC_DIFF,
      &             NCOLS, NLAYS, SOUTH )
 
+#ifdef sens
+      DO NP = 1, NPMAX
+         M = 0
+         DO S = 1, N_SPC_DIFF
+            D2C = DIFF_MAP( S )
+            DO L = 1, NLAYS
+               DO C = 1, NCOLS
+                  S_HALO_SOUTH( C,L,S,NP ) = SENGRID( C,1,L,NP,D2C ) / RHOJ( C,1,L )
+                  S_HALO_NORTH( C,L,S,NP ) = SENGRID( C,NROWS,L,NP,D2C ) / RHOJ( C,NROWS,L )
+                  M = M + 1
+                  S_BUF_NS( M,NP ) = S_HALO_NORTH( C,L,S,NP )
+               END DO
+            END DO
+         END DO
+
+         CALL SWAP3D( S_HALO_SOUTH(:,:,:,NP), S_HALO_NORTH(:,:,:,NP), NCOLS, NLAYS, N_SPC_DIFF,
+     &                NCOLS, NLAYS, NORTH )
+         CALL SWAP3D( S_BUF_NS(:,NP),         S_HALO_SOUTH(:,:,:,NP), NCOLS, NLAYS, N_SPC_DIFF,
+     &                NCOLS, NLAYS, SOUTH )
+
+      END DO
+#endif
+
       M = 0
       DO S = 1, N_SPC_DIFF
          D2C = DIFF_MAP( S )
@@ -372,6 +425,30 @@ C    send to WEST, recv from EAST, fill bound_east
      &             NROWS, NLAYS, EAST )
       CALL SWAP3D( BUF_EW,    HALO_WEST, NROWS, NLAYS, N_SPC_DIFF,
      &             NROWS, NLAYS, WEST )
+
+#ifdef sens
+      DO NP = 1, NPMAX
+         M = 0
+         DO S = 1, N_SPC_DIFF
+            D2C = DIFF_MAP( S )
+            DO L = 1, NLAYS
+               DO R = 1, NROWS
+                  S_HALO_WEST( R,L,S,NP ) = SENGRID( 1,R,L,NP,D2C ) / RHOJ( 1,R,L )
+                  S_HALO_EAST( R,L,S,NP ) = SENGRID( NCOLS,R,L,NP,D2C ) / RHOJ( NCOLS,R,L )
+                  M = M + 1
+                  S_BUF_EW( M,NP ) = S_HALO_EAST( R,L,S,NP )
+               END DO
+            END DO
+         END DO
+
+         CALL SWAP3D( S_HALO_WEST(:,:,:,NP), S_HALO_EAST(:,:,:,NP), NROWS, NLAYS, N_SPC_DIFF,
+     &                NROWS, NLAYS, EAST )
+         CALL SWAP3D( S_BUF_EW(:,NP),        S_HALO_WEST(:,:,:,NP), NROWS, NLAYS, N_SPC_DIFF,
+     &                NROWS, NLAYS, WEST )
+
+      END DO
+#endif
+
 #endif
 
 C Loop over species, layers, nsteps
@@ -391,6 +468,16 @@ C Load working array (CGRID is coupled, CONC is mixing ratio)
                   END DO
                END DO
 
+#ifdef sens
+               DO NP = 1, NPMAX
+                  DO R = 1, MY_NROWS
+                     DO C = 1, MY_NCOLS
+                        SENSWORK( C,R,NP ) = SENGRID( C,R,L,NP,D2C ) / RHOJ( C,R,L )
+                     END DO
+                  END DO
+               END DO
+#endif
+
 #ifdef parallel
 C Fill 4 boundaries of working array CONC: south, north, west, east
 
@@ -403,6 +490,21 @@ C Fill 4 boundaries of working array CONC: south, north, west, east
                   CONC( 0,R )       = HALO_WEST( R,L,S )
                   CONC( NCOLS+1,R ) = HALO_EAST( R,L,S )
                END DO
+
+#ifdef sens
+               DO NP = 1, NPMAX
+                  DO C = 1, NCOLS
+                     SENSWORK( C,0,NP ) = S_HALO_SOUTH( C,L,S,NP )
+                     SENSWORK( C,NROWS+1,NP ) = S_HALO_NORTH( C,L,S,NP )
+                  END DO
+
+                  DO R = 1, NROWS
+                     SENSWORK( 0,R,NP ) = S_HALO_WEST( R,L,S,NP )
+                     SENSWORK( NCOLS+1,R,NP ) = S_HALO_EAST( R,L,S,NP )
+                  END DO
+               END DO
+#endif
+
 #else
 
 C South boundary
@@ -432,10 +534,40 @@ C East boundary
                DO R = 1, MY_NROWS
                   CONC( C+1,R ) = CONC( C,R )
                END DO
+#ifdef sens
+               DO NP = 1, NPMAX
 
+                  R = 1 ! South
+                  DO C = 1, MY_NCOLS
+                     SENSWORK( C,R-1,NP ) = SENSWORK( C,R,NP )
+                  END DO
+
+                  R = MY_NROWS ! North
+                  DO C = 1, MY_NCOLS
+                     SENSWORK( C,R+1,NP ) = SENSWORK( C,R,NP )
+                  END DO
+
+                  C = 1 ! West
+                  DO R = 1, MY_NROWS
+                     SENSWORK( C-1,R,NP ) = SENSWORK( C,R,NP )
+                  END DO
+
+                  C = MY_NCOLS ! East
+                  DO R = 1, MY_NROWS
+                     SENSWORK( C+1,R,NP ) = SENSWORK( C,R,NP )
+                  END DO
+
+               END DO
+#endif
                CALL SUBST_COMM ( CONC, DSPL_N1_E1_S1_W1, DRCN_N_E_S_W, COMMSTR )
                CALL SUBST_COMM ( RK11, DSPL_N0_E1_S0_W0, DRCN_E )
                CALL SUBST_COMM ( RK22, DSPL_N1_E0_S0_W0, DRCN_N )
+#ifdef sens
+               DO NP = 1, NPMAX
+                  CALL SUBST_COMM (SENSWORK(:,:,NP),DSPL_N1_E1_S1_W1,DRCN_N_E_S_W,COMMSTR)
+               END DO
+#endif
+
 #endif
 
 C Update CGRID
@@ -454,7 +586,22 @@ C Update CGRID
      &                                    * ( CONC( C,R+1 ) - CONC( C,R ) )
      &                                    - RK22( C,R,L )
      &                                    * ( CONC( C,R )   - CONC( C,R-1 ) ) )
+#ifdef sens
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,D2C ) = RHOJ( C,R,L ) * SENSWORK( C,R,NP )
+     &                                          + DTDX1S
+     &                                          * ( RK11( C+1,R,L )
+     &                                          * ( SENSWORK( C+1,R,NP ) - SENSWORK( C,R,NP ) )
+     &                                          - RK11( C,R,L )
+     &                                          * ( SENSWORK( C,R,NP )   - SENSWORK( C-1,R,NP )))
+     &                                          + DTDX2S
+     &                                          * ( RK22( C,R+1,L )
+     &                                          * ( SENSWORK( C,R+1,NP ) - SENSWORK( C,R,NP ) )
+     &                                          - RK22( C,R,L )
+     &                                          * ( SENSWORK( C,R,NP )   - SENSWORK( C,R-1,NP )))
+                     END DO
 
+#endif
                   END DO
                END DO
 
