@@ -370,9 +370,12 @@ c     DO I = 1, NIONSPC
       DATA Q  / 2.23,-0.19,-0.39,-0.25,-1.15,0.82,-0.1,
      &          8.0,2.6,6.0 /
 
-      REAL SION ! sln 13sep13
+      REAL SION  ! sln 13sep13
+      REAL AGAMA ! sln 23sep13
 
       SION = SQRT(IONIC) ! sln 13sep13
+      AGAMA = 0.511*(298.0/TEMP)**1.5 ! Debye Huckel const. at T  ! sln 23sep13
+
 
 
       DO I = 1, NPAIRD
@@ -416,9 +419,11 @@ c     DO I = 1, NIONSPC
       DATA Q  / 2.23,-0.19,-0.39,-0.25,-1.15,0.82,-0.1,
      &          8.0,2.6,6.0 /
 
-      REAL SION ! sln 13sep13
+      REAL SION  ! sln 13sep13
+      REAL AGAMA ! sln 23sep13
 
       SION = SQRT(IONIC) ! sln 13sep13
+      AGAMA = 0.511*(298.0/TEMP)**1.5 ! Debye Huckel const. at T  ! sln 23sep13
 
       DO I = 1, NPAIRD
          CALL RDMKBI(RG0(IG(I)), IONIC, Q(I), ZI(I), RI, RHG,
