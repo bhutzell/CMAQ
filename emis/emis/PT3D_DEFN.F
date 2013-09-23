@@ -50,12 +50,27 @@ C                          synchronization time steps rather than the number of 
 C-----------------------------------------------------------------------
 
       USE UDTYPES           ! implementation for multiple groups of stack input files
+
+#ifdef sens
+         USE DDM3D_DEFN, ONLY: PT3D_NUM, PT3D_FILE, NPMAX, NP
+#endif 
+
       IMPLICIT NONE
 
       LOGICAL,                       SAVE :: PT3DEMIS   ! flag in-lining plume rise
       INTEGER,                       SAVE :: NPTGRPS    ! no. pt src input file groups
       REAL,             ALLOCATABLE, SAVE :: VDEMIS_PT( :,:,:,: ) ! 3D pt src non-PM emis
       REAL,             ALLOCATABLE, SAVE :: PMEMIS_PT( :,:,:,: ) ! 3D pt src PM emis
+
+#ifdef sens
+      INTEGER,                       SAVE :: S_NPTGRPS    ! no. pt src input file groups
+      REAL,             ALLOCATABLE, SAVE :: SVDEMIS_PT( :,:,:,:,: ) ! 3D pt src non-PM emis
+      REAL,             ALLOCATABLE, SAVE :: SPMEMIS_PT( :,:,:,:,: ) ! 3D pt src PM emis
+      INTEGER,          ALLOCATABLE, SAVE :: SENS_MAP  ( : )
+     
+      PUBLIC SVDEMIS_PT, SPMEMIS_PT
+      PRIVATE S_NPTGRPS,SENS_MAP
+#endif
 
       PUBLIC PT3DEMIS, NPTGRPS, VDEMIS_PT, PMEMIS_PT, PT3D_INIT, GET_PT3D_EMIS
       PRIVATE
@@ -251,6 +266,20 @@ C get number of different file groups (sectors)
          NPTGRPS = ENVINT( 'NPTGRPS',
      &                     'Number of file groups',
      &                      1, IOS )
+
+#ifdef sens
+c count additional point source file groups for sensitivities
+         S_NPTGRPS = 0
+         DO NP = 1, NPMAX
+            S_NPTGRPS = S_NPTGRPS + PT3D_NUM( NP )
+         END DO
+         NPTGRPS = NPTGRPS + S_NPTGRPS
+
+         ALLOCATE ( SENS_MAP( NPTGRPS ), STAT = IOS )
+         CALL CHECKMEM( IOS, 'SENS_MAP', PNAME )
+         SENS_MAP = 0
+#endif
+
 
 C get diagnostic files options
 
@@ -455,11 +484,31 @@ C Get stack data
          CALL CHECKMEM( IOS, 'STKGNAME', PNAME )
          STKGNAME = ' '   ! array
 
+#ifdef sens
+         DO N = 1, ( NPTGRPS - S_NPTGRPS )
+            WRITE( VNAME,'( "STK_GRPS_",I2.2 )' ) N
+            STKGNAME( N ) = PROMPTMFILE( 'Enter name for stack groups file',
+     &                                   FSREAD3, VNAME, PNAME )
+         END DO
+
+         N = NPTGRPS - S_NPTGRPS + 1
+         DO NP = 1, NPMAX
+            IF ( PT3D_NUM( NP ) .NE. 0 ) THEN
+               DO S = 1, PT3D_NUM( NP )
+                  STKGNAME( N ) = PT3D_FILE( NP, 1, S )
+                  SENS_MAP( N ) = NP
+                  N = N + 1
+               END DO
+            END IF
+         END DO
+#else
+
          DO N = 1, NPTGRPS
             WRITE( VNAME,'( "STK_GRPS_",I2.2 )' ) N
             STKGNAME( N ) = PROMPTMFILE( 'Enter name for stack groups file',
      &                                   FSREAD3, VNAME, PNAME )
          END DO
+#endif
 
          IF ( .NOT. STK_PRMS_INIT( STKGNAME ) ) THEN
             XMSG = 'Could not initialize stack parameters'
@@ -483,11 +532,29 @@ C Initialize stack emissions data
          CALL CHECKMEM( IOS, 'STKENAME', PNAME )
          STKENAME = ' '   ! array
 
+#ifdef sens
+         DO N = 1, ( NPTGRPS - S_NPTGRPS )
+            WRITE( VNAME,'( "STK_EMIS_",I2.2 )' ) N
+            STKENAME( N ) = PROMPTMFILE( 'Enter name for stack emissions file',
+     &                                   FSREAD3, VNAME, PNAME )
+         END DO
+
+         N = NPTGRPS - S_NPTGRPS + 1
+         DO NP = 1, NPMAX
+            IF ( PT3D_NUM( NP ) .NE. 0 ) THEN
+               DO S = 1, PT3D_NUM( NP )
+                  STKENAME( N ) = PT3D_FILE( NP, 2, S )
+                  N = N + 1
+               END DO
+            END IF
+         END DO
+#else
          DO N = 1, NPTGRPS
             WRITE( VNAME,'( "STK_EMIS_",I2.2 )' ) N
             STKENAME( N ) = PROMPTMFILE( 'Enter name for stack emissions file',
      &                                   FSREAD3, VNAME, PNAME )
          END DO
+#endif 
 
          IF ( .NOT. STK_EMIS_INIT( STKENAME, JDATE, JTIME ) ) THEN
             XMSG = 'Could not initialize stack parameters'
@@ -522,6 +589,16 @@ C Initialize stack emissions data
          ALLOCATE ( PMEMIS_PT( MY_NCOLS,MY_NROWS,EMLYRS,N_SPC_PTPM ), STAT = IOS )
          CALL CHECKMEM( IOS, 'PMEMIS_PT', PNAME )
          PMEMIS_PT = 0.0   ! array
+
+#ifdef sens
+         ALLOCATE ( SVDEMIS_PT( MY_NCOLS,MY_NROWS,EMLYRS,N_SPC_PTEM, NPMAX ), STAT = IOS )
+         CALL CHECKMEM( IOS, 'SVDEMIS_PT', PNAME )
+         SVDEMIS_PT = 0.0   ! array
+
+         ALLOCATE ( SPMEMIS_PT( MY_NCOLS,MY_NROWS,EMLYRS,N_SPC_PTPM, NPMAX ), STAT = IOS )
+         CALL CHECKMEM( IOS, 'SPMEMIS_PT', PNAME )
+         SPMEMIS_PT = 0.0   ! array
+#endif
 
 C Set up and open 3d point source emissions diagnostic file?
          IF ( PT3DDIAG ) THEN
@@ -830,6 +907,11 @@ C Convert pt source met data to bi-linear interpolated data
 
          VDEMIS_PT = 0.0   ! array assignment
          PMEMIS_PT = 0.0   ! array assignment
+
+#ifdef sens
+         SVDEMIS_PT = 0.0   ! array assignment
+         SPMEMIS_PT = 0.0   ! array assignment
+#endif
 
          DO N = 1, NPTGRPS
 
@@ -1144,6 +1226,7 @@ C Apportion emissions to the layers
                STKEM( : ) = STKEMIS( N )%ARRY( SRC,: )   ! array of species
 
                C = MY_STKCOL( N )%ARRY( S ); R = MY_STKROW( N )%ARRY( S )
+
                DO L = 1, EMLYRS
                   LFRC = TFRAC( L )
                   IF ( LFRC .LE. 0.0 ) CYCLE
@@ -1151,15 +1234,40 @@ C Apportion emissions to the layers
                   DO V = 1, STKEM_MAP( N )%LEN
                      I = GAS_MAP( N )%ARRY( V )
                      J = STKEM_MAP( N )%ARRY( V )
+#ifdef sens
+                     IF ( N .LE. ( NPTGRPS - S_NPTGRPS ) ) THEN ! this is CMAQ emissions
+
+                        VDEMIS_PT( C,R,L,I ) = VDEMIS_PT( C,R,L,I )
+!    &                                    + LFRC * STKEM( J )
+     &                                    + LFRC * EMIS_FAC( V ) * STKEM( J )
+                     ELSE                                     ! this is for sensitivities
+                        SVDEMIS_PT( C,R,L,I,SENS_MAP(N) ) = SVDEMIS_PT( C,R,L,I,SENS_MAP(N) )
+!    &                                    + LFRC * STKEM( J )
+     &                                    + LFRC * EMIS_FAC( V ) * STKEM( J )
+                     END IF
+#else
                      VDEMIS_PT( C,R,L,I ) = VDEMIS_PT( C,R,L,I )
 !    &                                    + LFRC * STKEM( J )
      &                                    + LFRC * EMIS_FAC( V ) * STKEM( J )
+#endif
                   END DO
+
                   DO V = 1, STKPM_MAP( N )%LEN
                      I = PM_MAP( N )%ARRY( V )
                      J = STKPM_MAP( N )%ARRY( V )
+#ifdef sens
+                     IF ( N .LE. ( NPTGRPS - S_NPTGRPS ) ) THEN ! this is CMAQ emissions
+
+                        PMEMIS_PT( C,R,L,I ) = PMEMIS_PT( C,R,L,I )
+     &                                    + LFRC * STKEM( J )
+                     ELSE                                     ! this is for sensitivities
+                        SPMEMIS_PT( C,R,L,I,SENS_MAP(N) ) = SPMEMIS_PT( C,R,L,I,SENS_MAP(N) )
+     &                                    + LFRC * STKEM( J )
+                     END IF
+#else
                      PMEMIS_PT( C,R,L,I ) = PMEMIS_PT( C,R,L,I )
      &                                    + LFRC * STKEM( J )   ! emis fac applied in AERO_EMIS
+#endif
                   END DO
 
                END DO

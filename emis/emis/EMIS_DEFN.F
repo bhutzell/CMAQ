@@ -60,16 +60,28 @@ C-----------------------------------------------------------------------
                                                ! EMLAYS must be .LT. NLAYS
       INTEGER,              SAVE :: EMLYRS     ! no. of layers on base emis input file -
 
+#ifdef sens
+c move these here so they are visible for SEMIS_DEFN
+      LOGICAL,          SAVE :: EM_TRAC = .FALSE. ! do tracer emissions?
+      REAL,             SAVE :: CNVTE      ! combined conversion factor
+      INTEGER          GXOFF, GYOFF         ! global origin offset from file
+      INTEGER, SAVE :: STARTCOL, ENDCOL, STARTROW, ENDROW
+      REAL,    SAVE :: CNVTP         ! intermediate combined conv. factor
+      PUBLIC EM_TRAC, CNVTE, GXOFF, GYOFF, STARTCOL, ENDCOL, STARTROW, ENDROW, CNVTP
+#endif
+
       PUBLIC VDEMIS, N_SPC_EMIS, EMLAYS, EMLYRS, EMIS_INIT, GET_EMIS
 #ifdef Verbose2
       public semis
 #endif
+
       PRIVATE
                                            ! a 2d file if inline, otherwise a 3d file
       INTEGER, SAVE :: NEMIS_AE   ! no. of aero emis species
-
+#ifndef sens
       LOGICAL, SAVE :: EM_TRAC = .FALSE. ! do tracer emissions?
       REAL,    SAVE :: CNVTE      ! combined conversion factor
+#endif
       REAL,    SAVE :: DT         ! TSTEP (output) in sec
 
       REAL,    ALLOCATABLE, SAVE :: BUFF( :,:,: )        ! read buffer
@@ -347,7 +359,9 @@ C Local Variables:
 
          REAL             CNVTC         ! combined conversion factor
          REAL             CNVTI         ! intermediate combined conv. factor
+#ifndef sens
          REAL,    SAVE :: CNVTP         ! intermediate combined conv. factor
+#endif
          REAL             DELT          ! interpolation factor
          INTEGER          C, R, L, N, S, V ! loop induction variables
 
@@ -358,8 +372,10 @@ C Local Variables:
          real sumem
 #endif
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
+#ifndef sens
          INTEGER          GXOFF, GYOFF         ! global origin offset from file
          INTEGER, SAVE :: STARTCOL, ENDCOL, STARTROW, ENDROW
+#endif
 
 C-----------------------------------------------------------------------
 
