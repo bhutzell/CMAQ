@@ -50,7 +50,7 @@ C                            them as declared in X_YAMO and Y_YAMO
 C   21 Jun 10 J.Young: convert for Namelist redesign
 C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 C   11 May 11 D.Wong: incorporated twoway model implementation
-      
+C   18 Jun 13 S.Napelenok: ddm-3d implementation for cmaq5.0.1
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -60,6 +60,10 @@ C-----------------------------------------------------------------------
       USE SUBST_MODULES         ! stenex
 !     USE SUBST_COMM_MODULE     ! stenex
 !     USE SUBST_UTIL_MODULE     ! stenex
+
+#ifdef sens
+      USE DDM3D_DEFN
+#endif 
 
       IMPLICIT NONE
       
@@ -186,6 +190,13 @@ C Get CGRID offsets
             XMSG = 'Failure allocating BCON'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+#ifdef sens
+         ALLOCATE ( BSEN( NBNDY,N_SPC_ADV,NPMAX ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN 
+            XMSG = 'Failure allocating BSEN'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+#endif
 
          ASPC = GC_STRT - 1 + N_GC_SPCD
 
