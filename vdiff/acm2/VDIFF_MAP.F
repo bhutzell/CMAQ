@@ -49,7 +49,7 @@ C global dry dep species
       INTEGER, SAVE :: N_SPC_DDEP 
 
       INTEGER, ALLOCATABLE, SAVE :: DIFF_MAP( : ) ! global diff map to CGRID
-!     INTEGER, ALLOCATABLE, SAVE :: DF2DV   ( : ) ! map from diff spc to depv spc
+      INTEGER, ALLOCATABLE, SAVE :: DF2DV   ( : ) ! map from diff spc to depv spc
       INTEGER, ALLOCATABLE, SAVE :: DF2EM   ( : ) ! map from diff spc to emis spc
       INTEGER, ALLOCATABLE, SAVE :: DD2DV   ( : ) ! map from ddep spc to depv spc
       INTEGER, ALLOCATABLE, SAVE :: DEPV_MAP( : ) ! global depv map to CGRID
@@ -118,7 +118,7 @@ C-----------------------------------------------------------------------
          N_SPC_DIFF = N_GC_TRNS + N_AE_TRNS + N_NR_TRNS + N_TR_DIFF
 
          ALLOCATE ( DIFF_MAP( N_SPC_DIFF+1 ),
-!    &              DF2DV( N_SPC_DIFF+1 ),
+     &              DF2DV( N_SPC_DIFF+1 ),
      &              DF2EM( N_SPC_DIFF+1 ),
      &              diff_spc( n_spc_diff ), stat = allocstat )
          IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -213,54 +213,54 @@ C create global maps to CGRID
             END IF
          END DO
 
-!        I = 0; S = 0; N = 0
-!        DO V = 1, N_GC_TRNS ! assumes dep.vel species subset of vdif species
-!           N = N + 1
-!           INDX = FINDEX( GC_TRNS_MAP( V ), N_GC_DEPV, GC_DEPV_MAP )
-!           IF ( INDX .GT. 0 ) THEN
-!              I = I + 1
-!              DF2DV( N ) = S + INDX
-!           ELSE
-!              DF2DV( N ) = N_SPC_DEPV + 1
-!           END IF
-!        END DO
-!        S = S + I     ! S should now be = N_GC_DEPV
+         I = 0; S = 0; N = 0
+         DO V = 1, N_GC_TRNS ! assumes dep.vel species subset of vdif species
+            N = N + 1
+            INDX = FINDEX( GC_TRNS_MAP( V ), N_GC_DEPV, GC_DEPV_MAP )
+            IF ( INDX .GT. 0 ) THEN
+               I = I + 1
+               DF2DV( N ) = S + INDX
+            ELSE
+               DF2DV( N ) = N_SPC_DEPV + 1
+            END IF
+         END DO
+         S = S + I     ! S should now be = N_GC_DEPV
 
-!        I = 0
-!        DO V = 1, N_AE_TRNS
-!           N = N + 1
-!           INDX = FINDEX( AE_TRNS_MAP( V ), N_AE_DEPV, AE_DEPV_MAP )
-!           IF ( INDX .GT. 0 ) THEN
-!              I = I + 1
-!              DF2DV( N ) = S + INDX
-!           ELSE
-!              DF2DV( N ) = N_SPC_DEPV + 1
-!           END IF
-!        END DO
-!        S = S + I     ! S should now be = N_GC_DEPV + N_AE_DEPV
+         I = 0
+         DO V = 1, N_AE_TRNS
+            N = N + 1
+            INDX = FINDEX( AE_TRNS_MAP( V ), N_AE_DEPV, AE_DEPV_MAP )
+            IF ( INDX .GT. 0 ) THEN
+               I = I + 1
+               DF2DV( N ) = S + INDX
+            ELSE
+               DF2DV( N ) = N_SPC_DEPV + 1
+            END IF
+         END DO
+         S = S + I     ! S should now be = N_GC_DEPV + N_AE_DEPV
 
-!        I = 0
-!        DO V = 1, N_NR_TRNS
-!           N = N + 1
-!           INDX = FINDEX( NR_TRNS_MAP( V ), N_NR_DEPV, NR_DEPV_MAP )
-!           IF ( INDX .GT. 0 ) THEN
-!              I = I + 1
-!              DF2DV( N ) = S + INDX
-!           ELSE
-!              DF2DV( N ) = N_SPC_DEPV + 1
-!           END IF
-!        END DO
-!        S = S + I     ! S should now be = N_GC_DEPV + N_AE_DEPV + N_NR_DEPV
+         I = 0
+         DO V = 1, N_NR_TRNS
+            N = N + 1
+            INDX = FINDEX( NR_TRNS_MAP( V ), N_NR_DEPV, NR_DEPV_MAP )
+            IF ( INDX .GT. 0 ) THEN
+               I = I + 1
+               DF2DV( N ) = S + INDX
+            ELSE
+               DF2DV( N ) = N_SPC_DEPV + 1
+            END IF
+         END DO
+         S = S + I     ! S should now be = N_GC_DEPV + N_AE_DEPV + N_NR_DEPV
 
-!        DO V = 1, N_TR_DIFF
-!           N = N + 1
-!           INDX = FINDEX( TR_DIFF_MAP( V ), N_TR_DEPV, TR_DEPV_MAP )
-!           IF ( INDX .GT. 0 ) THEN
-!              DF2DV( N ) = S + INDX
-!           ELSE
-!              DF2DV( N ) = N_SPC_DEPV + 1
-!           END IF
-!        END DO
+         DO V = 1, N_TR_DIFF
+            N = N + 1
+            INDX = FINDEX( TR_DIFF_MAP( V ), N_TR_DEPV, TR_DEPV_MAP )
+            IF ( INDX .GT. 0 ) THEN
+               DF2DV( N ) = S + INDX
+            ELSE
+               DF2DV( N ) = N_SPC_DEPV + 1
+            END IF
+         END DO
 
 #ifdef Verbose
          DO N = 1, N_SPC_DIFF   ! debug

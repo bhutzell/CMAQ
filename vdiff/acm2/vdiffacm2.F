@@ -63,6 +63,7 @@ C              This additional loss is now accounted for in vdiff.F
 C 14 Sep 11 J.Young: fix TSTEP bug in call to DEPV_INIT
 C 11 Apr 13 J.Young: fix double adjustment of conc for DDBF in heterogeneous HONO
 C                    if-then-else clauses; eliminate some white space
+C 17 Jun 13 S.Napelenok: ddm-3d implementation for cmaq5.0.1
 C-----------------------------------------------------------------------
 
       USE CGRID_SPCS          ! CGRID mechanism species
@@ -76,6 +77,11 @@ C-----------------------------------------------------------------------
 
       USE SUBST_MODULES              ! stenex
 !     USE SUBST_GLOBAL_SUM_MODULE    ! stenex
+
+#ifdef sens
+      USE DDM3D_DEFN
+      USE S_EMIS_DEFN
+#endif 
 
       IMPLICIT NONE
 
@@ -210,6 +216,32 @@ C ACM Local Variables
       INTEGER      ALLOCSTAT
       INTEGER      C, R, L, S, V, I, J          ! loop induction variables
       INTEGER      MDATE, MTIME, MSTEP          ! internal simulation date&time
+
+#ifdef sens
+      REAL, ALLOCATABLE, SAVE :: SENS       ( :,:,: )      ! secondary SENGRID expression
+      REAL, ALLOCATABLE, SAVE :: SENDDEP( :,:,:,: )        ! ddep sens accumulator 
+c     REAL, POINTER           :: SENGRID_TEMP( :,:,:,: )   ! temp SENGRID to feed into conversion routines
+      REAL, ALLOCATABLE, SAVE :: SNGRD( :,:,:,:,: )        ! sengrid replacement
+
+      REAL, ALLOCATABLE, SAVE :: DVS1  ( : )               ! ( N_SPC_DEPV )
+      REAL, ALLOCATABLE, SAVE :: S_EMIS( :,:,: )           ! stores SVDEMIS*DTS
+      REAL, ALLOCATABLE, SAVE :: SENDDBF( :,: )            ! incremental SENDDEP
+
+      REAL, ALLOCATABLE, SAVE :: SDEPVCON( :,:,: )         ! dry deposition velocity sens
+      REAL, ALLOCATABLE, SAVE :: SDIFFCON( :,:,: )         ! eddy diffusion coefficient sens
+
+      LOGICAL TIMEFLAG
+      INTEGER STRT, FINI                                   ! loop induction variables
+
+      REAL, ALLOCATABLE, SAVE :: SDD ( :,:,: )             ! DD for sens
+      REAL, ALLOCATABLE, SAVE :: SUU ( :,:,: )             ! UU for sens
+      REAL SDELC
+
+      CHARACTER( 7 )  :: SPCNAME
+      CHARACTER( 16 ) :: PARNAME              ! full name of sensitivity paramber (eg 'NO2_EMIS_NOX')
+
+
+#endif
                                                 ! array in vert. mixing
       INTERFACE
          SUBROUTINE RDMET( MDATE, MTIME, RDEPVHT, RJACM, RVJACMF, RRHOJ,
@@ -470,6 +502,79 @@ C Allocate FST array
 
          END IF         ! if Mosaic
 
+#ifdef sens
+         ALLOCATE ( SENDDEP( N_SPC_DEPV,MY_NCOLS,MY_NROWS,NPMAX ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SENDDEP'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            END IF
+         SENDDEP = 0.0
+
+         ALLOCATE ( SENDDBF( N_SPC_DEPV, NPMAX ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SENDDBF'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            END IF
+         SENDDEP = 0.0
+
+c        ALLOCATE ( SENGRID_TEMP(MY_NCOLS,MY_NROWS,NLAYS,N_SPC_CGRID ), STAT = ALLOCSTAT )
+c        IF ( ALLOCSTAT .NE. 0 ) THEN
+c           XMSG = 'Failure allocating SENGRID_TEMP'
+c           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+c        END IF
+c        SENGRID_TEMP = 0.0
+
+         ALLOCATE ( SNGRD( NPMAX,N_SPC_CGRID,NLAYS,MY_NCOLS,MY_NROWS ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SNGRD'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         SNGRD = 0.0
+
+         ALLOCATE ( SENS( N_SPC_DIFF,NLAYS,NPMAX ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SENS'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         SENS = 0.0
+
+         ALLOCATE ( SDD( NPMAX,N_SPC_DIFF,NLAYS ),
+     &              SUU( NPMAX,N_SPC_DIFF,NLAYS ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SDD or SUU'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         SDD = 0.0; SUU = 0.0   ! array assignment
+
+         ALLOCATE ( SDEPVCON( N_SPC_DEPV, NLAYS, NPMAX ),
+     &              SDIFFCON( N_SPC_DIFF, NLAYS, NPMAX ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SDEPVCON or SDIFFCON'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         SDEPVCON = 0.0; SDIFFCON = 0.0
+
+         ALLOCATE ( S_EMIS( NPMAX, N_SPC_DIFF, NLAYS ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating S_EMIS'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         S_EMIS = 0.0   ! array assignment
+
+         ALLOCATE ( DVS1  ( N_SPC_DEPV ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating DVS1'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         DVS1 = 0.0
+
+         IF ( .NOT. S_EMIS_INIT ( JDATE, JTIME, TSTEP( 1 ) ) ) THEN
+            XMSG = 'Failure initializing sensitivity emissions module'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+
+#endif
+
       END IF          !  if Firstime
 
       MDATE = JDATE
@@ -490,6 +595,10 @@ C read & interpolate deposition velocities
 C read & interpolate emissions data => VDEMIS from EMIS_DEFN module
 
       CALL GET_EMIS ( MDATE, MTIME, TSTEP, CONVPA, RDX3F, RRHOJ, RJACM )
+
+#ifdef sens
+      CALL GET_SEMIS ( MDATE, MTIME, JDATE, JTIME, TSTEP, CONVPA, RDX3F, RRHOJ, RJACM )
+#endif
 
       IF ( LIPR ) THEN
          DO S = 1, N_SPC_EMIS+1
@@ -523,6 +632,21 @@ C EDDYV returned = Kz, where Kz is in m**2/sec
 C Convert non-molar mixing ratio species and re-order CGRID
 
       CALL CONV_CGRID ( CGRID, MDATE, MTIME, CNGRD )
+
+#ifdef sens
+      DO NP = 1, NPMAX
+         DO L = 1, NLAYS
+            DO R = 1, MY_NROWS
+               DO C = 1, MY_NCOLS
+                  DO S = 1, N_SPC_CGRID
+                     SENGRID_TEMP( C,R,L,S ) = SENGRID( C,R,L,NP,S )
+                  END DO
+               END DO
+            END DO
+         END DO
+         CALL CONV_CGRID ( SENGRID_TEMP,MDATE, MTIME, SNGRD(NP,:,:,:,:) )
+      END DO
+#endif
 
       IF ( WSTEP .EQ. 0 ) DDEP = 0.0
       IF ( WSTEP .EQ. 0 ) ICMP = 0.0
@@ -667,6 +791,36 @@ C End ACM insert
          PLDV_HONO = PLDV( HONO_HIT,C,R )
          CONC_NO2 = CONC( NO2_MAP,1 )
 
+#ifdef sens
+
+         DO V = 1, N_SPC_DEPV
+            DVS1( V ) = DEPV( V,C,R ) * DTS * RDEPVHT( C,R )
+         END DO
+
+         SENS = 0.0
+         S_EMIS = 0.0
+         DO NP = 1, NPMAX
+
+            DO L = 1, NLAYS
+               DO V = 1, N_SPC_DIFF
+                  SENS( V,L,NP ) = SNGRD( NP,DIFF_MAP( V ),L,C,R )
+               END DO
+            END DO
+
+            DO L = 1, EMLAYS
+               DO V = 1, N_SPC_DIFF
+                  S_EMIS( NP,V,L ) = SVDEMIS( DF2EM( V ),L,C,R, NP ) * DTS
+               END DO
+            END DO
+
+            DO V = 1, N_SPC_DEPV
+               SENDDBF( V, NP ) = SENDDEP( V, C, R, NP )
+            END DO
+
+         END DO
+#endif
+
+
 C-----------------------------------------------------------------------
 
          DO 301 NL = 1, NLP      ! loop over sub time
@@ -788,6 +942,147 @@ C --------- END of HET HONO RX ----------
 
             END IF   ! MOSAIC
 
+
+c !!! NOTE !!! this thing does not do bi-directional anything, so don't set that option
+c change this later to add the fancy stuff
+
+#ifdef sens
+            DO NP = 1, NPMAX
+
+               DO V = 1, N_SPC_DEPV
+                  SENS( DV2DF( V ),1,NP ) = EFAC1( V ) * SENS( DV2DF( V ),1,NP )
+                  SENDDBF( V, NP ) = SENDDBF( V, NP ) + THBAR * DD_FAC( V )
+     &                      * SENS( DV2DF( V ), 1,NP )
+               END DO
+
+            END DO
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C Begin code of sensitivity specific to dry deposition velocity & eddy diffusion
+C coefficient 
+C Added by W.Tang & D.Cohan 07102009
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+C If IPT = 6, then put the dry deposition into SDEPVCON for the relevant species
+C Otherwise, SDEPVCON = 0
+        SDEPVCON = 0.0                  !Initialize SDEPVCON
+        DO NP = 1, NPMAX
+          IF ( IPT( NP ) .EQ. 6 ) THEN
+
+
+            XMSG = '!!! dep. velocity sensitivity turned off!' //
+     &             ' need to check index calcs in vdiffacm2.F'
+            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+
+            
+
+            CALL CKTIME( JDATE,JTIME,NP,TIMEFLAG) ! Check if the current time is within the time range
+            IF ( TIMEFLAG ) THEN
+                    L = 1
+c gas species deposition
+                    DO V = 1, N_GC_DEPV
+                        SDEPVCON( V, L, NP ) =
+     &                      DVS1( V ) * CONC( DV2DF( V ),L ) *
+     &                      IREGION( C, R, L, NP ) *
+     &                      REAL( IPARM( NP, GC_DEPV_MAP( V ) ) )
+                    END DO
+c aerosol deposition
+                    S = 0
+                    STRT = N_GC_DEPV + 1
+                    FINI = N_GC_DEPV + N_AE_DEPV
+                    DO V = STRT, FINI
+                    S = S + 1
+                          SDEPVCON( V, L, NP ) =
+     &                      DVS1( V ) * CONC( DV2DF( V ),L ) *
+     &                      IREGION( C, R, L, NP ) *
+     &                      REAL( IPARM( NP, N_GC_SPC + 1 +
+     &                                      AE_DEPV_MAP( S ) ) )
+                    END DO
+c non-reactive deposition
+                    S = 0
+                    STRT = N_GC_DEPV + N_AE_DEPV + 1
+                    FINI = N_GC_DEPV + N_AE_DEPV + N_NR_DEPV
+                    DO V = STRT, FINI
+                    S = S + 1
+                          SDEPVCON( V, L, NP ) =
+     &                      DVS1( V ) * CONC( DV2DF( V ), L ) *
+     &                      IREGION( C, R, L, NP ) *
+     &                      REAL( IPARM( NP, N_GC_SPC + 1 + N_AE_SPC +
+     &                                      NR_DEPV_MAP( S ) ) )
+                    END DO
+            END IF !TIMEFLAG
+          END IF !IPT=6
+        END DO !P
+
+C If IPT = 7, then put the vertical diffusion into SDIFFCON
+C Otherwise, SDIFFCON = 0
+        SDIFFCON = 0.0                  !Initialize SDIFFCON
+        DO NP = 1, NPMAX
+          IF ( IPT( NP ) .EQ. 7 ) THEN
+
+
+            XMSG = '!!! diff sensitivity turned off!' //
+     &             ' need to check index calcs in vdiffacm2.F'
+            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+
+
+
+            CALL CKTIME( JDATE,JTIME,NP,TIMEFLAG) ! Check if the current time is within the time range
+            IF ( TIMEFLAG ) THEN
+             DO L = 1, NLAYS
+              DO V = 1 , N_SPC_DIFF
+               IF ( L.GE.2.AND.L.LE.( NLAYS-1 ) ) THEN
+                 SDIFFCON( V,  L,  NP ) =
+     &                          ( ( EDDY( L ) * RDX3F( L ) * DTS )
+     &                         * ( CONC( V,L+1 ) - CONC( V,L ) )
+     &                         -  ( EDDY( L-1 ) * RDX3F( L ) * DTS )
+     &                         * ( CONC( V,L ) - CONC( V,L-1 ) ) )
+     &                         * IREGION( C, R, L, NP )
+     &                         * REAL( ILAYER( NP,L ) )
+                 IF ( CONVCT(C,R).AND.L.LE.LCBL ) THEN
+                    SDIFFCON(V,L,NP) = SDIFFCON(V,L,NP) +
+     &                              ( DTS * ( MBARKS( L ) * CONC( V,1 )
+     &                              - MDWN( L ) * CONC( V,L )
+     &                              + (DX3F( L+1 ) * RDX3F( L )
+     &                              * MDWN( L+1 )) * CONC( V,L+1 ) ) )
+     &                              * IREGION( C, R, L, NP )
+     &                              * REAL( ILAYER( NP,L ) )
+                 ELSE
+                    SDIFFCON(V,L,NP) = SDIFFCON(V,L,NP)
+                 END IF
+               ELSE IF ( L.EQ.1 ) THEN
+                 SDIFFCON( V,  L, NP ) =
+     &                          ( EDDY( L ) * RDX3F( L ) * DTS ) *
+     &                          ( CONC( V,L+1 ) - CONC( V,L ) ) *
+     &                          IREGION( C, R, L, NP ) *
+     &                          REAL( ILAYER( NP,L ) )
+                 IF ( CONVCT(C,R) ) THEN
+                    SDIFFCON(V,L,NP) = SDIFFCON(V,L,NP) +
+     &                                (-( MBARKS( 1 ) * ( XPBL( C,R )
+     &                                - X3FACE_GD( 1 ) ) * RDX3F( 1 )
+     &                                * DTS)* CONC( V,1 )
+     &                                + (MDWN( 2 ) * DX3F( 2 )
+     &                                * RDX3F( 1 ) * DTS)* CONC( V,2 ))
+     &                                * IREGION( C, R, L, NP )
+     &                                * REAL( ILAYER( NP,L ) )
+                 ELSE
+                    SDIFFCON(V,L,NP) = SDIFFCON(V,L,NP)
+                 END IF
+               ELSE
+                 SDIFFCON( V,  L, NP ) =
+     &                          ( EDDY( L-1 ) * RDX3F( L ) * DTS ) *
+     &                          ( CONC( V,L ) - CONC( V,L-1 ) ) *
+     &                          IREGION( C, R, L, NP ) *
+     &                          REAL( ILAYER( NP,L ) )
+
+               END IF !LAYER
+              END DO !SPECIES 
+             END DO !LAYER
+            END IF !TIMEFLAG
+          END IF !IPT
+         END DO !P                          
+#endif
+
 C Init variables for use below
 
             DO L = 1, NLAYS
@@ -798,6 +1093,12 @@ C Init variables for use below
                DO V = 1, N_SPC_DIFF
                   DD( V,L ) = 0.0
                   UU( V,L ) = 0.0
+#ifdef sens
+               DO NP = 1, NPMAX
+                  SDD( NP,V,L) = 0.0
+                  SUU( NP,V,L) = 0.0
+               END DO
+#endif
                END DO
             END DO
 
@@ -816,6 +1117,14 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
      &                              - MDWN( L ) * CONC( V,L )
      &                              + MFAC      * CONC( V,L+1 ) )
                      DD( V,L ) = CONC( V,L ) + CRANKQ * DELC
+#ifdef sens
+                     DO NP = 1, NPMAX
+                        SDELC = DTS * ( MBARKS( L ) * SENS( V,1,NP )
+     &                              - MDWN( L ) * SENS( V,L,NP )
+     &                              + MFAC      * SENS( V,L+1,NP ) )
+                        SDD( NP,V,L ) = SENS( V,L,NP ) + CRANKQ * SDELC
+                     END DO
+#endif
                   END DO
                END DO
             END IF
@@ -828,6 +1137,11 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
                   BB( L ) = 1.0
                   DO V = 1, N_SPC_DIFF
                      DD( V,L ) = CONC( V,L )
+#ifdef sens
+                     DO NP = 1, NPMAX
+                        SDD( NP,V,L ) = SENS( V,L,NP )
+                     END DO
+#endif
                   END DO
                END IF
                XPLUS  = EDDY( L )   * RDX3F( L ) * DTS
@@ -840,6 +1154,14 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
                      DD( V,L ) = DD( V,L )
      &                         - CRANKQ * XMINUS
      &                         * ( CONC( V,L ) - CONC( V,L-1 ) )
+#ifdef sens                 
+                     DO NP = 1, NPMAX
+                        SDD( NP,V,L ) = SDD( NP,V,L )
+     &                     - CRANKQ * XMINUS
+     &                     * ( SENS( V,L,NP ) - SENS( V,L-1,NP ) )
+     &                     - SDIFFCON ( V, L ,NP )
+                     END DO
+#endif
                   END DO
                ELSE
                   LFAC1 = CRANKQ * XPLUS
@@ -851,6 +1173,18 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
      &                         - LFAC2
      &                         * ( CONC( V,L ) - CONC( V,L-1 ) )
                      IF ( L .LE. EMLAYS ) DD( V,L ) = DD( V,L ) + EMIS( V,L )
+#ifdef sens
+                     DO NP = 1, NPMAX
+                        SDD( NP,V,L ) = SDD( NP,V,L )
+     &                     + LFAC1
+     &                     * ( SENS( V,L+1,NP ) - SENS( V,L,NP ) )
+     &                     - LFAC2
+     &                     * ( SENS( V,L,NP ) - SENS( V,L-1,NP ) )
+     &                     + SDIFFCON ( V, L, NP )
+                        IF ( L .LE. EMLAYS )  SDD( NP,V,L ) = SDD( NP,V,L )
+     &                                           + S_EMIS( NP,V,L )
+                     END DO
+#endif
                   END DO
                END IF
             END DO
@@ -858,6 +1192,11 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
             BB( 1 ) = 1.0
             DO V = 1, N_SPC_DIFF
                DD( V,1 ) = CONC( V,1 )
+#ifdef sens
+               DO NP = 1, NPMAX
+                  SDD( NP,V,1 ) = SENS( V,1,NP )
+               END DO
+#endif
             END DO
 
             IF ( CONVCT( C,R ) ) THEN
@@ -870,6 +1209,13 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
                   DD( V,1 ) = DD( V,1 )
      &                      - LFAC1 * CONC( V,1 )
      &                      + LFAC2 * CONC( V,2 ) ! net mixing above
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     SDD( NP,V,1 ) = SDD( NP,V,1 )
+     &                      - LFAC1 * SENS( V,1,NP )
+     &                      + LFAC2 * SENS( V,2,NP )
+                  END DO
+#endif
                END DO
             END IF
 
@@ -879,6 +1225,15 @@ C Define arrays A,B,E which make up MATRIX and D which is RHS
                DD( V,1 ) = DD( V,1 )
      &                   + LFAC1 * ( CONC( V,2 ) - CONC( V,1 ) )
      &                   + EMIS( V,1 )
+#ifdef sens
+               DO NP = 1, NPMAX
+                  SDD( NP,V,1 ) = SDD( NP,V,1 )
+     &               + LFAC1 * ( SENS( V,2,NP ) - SENS( V,1,NP ) )
+     &               + S_EMIS( NP,V,1 )
+c    &               - SDEPVCON ( DF2DV(V), 1, NP )   !  this is a problem
+c    &               + SDIFFCON ( V, 1, NP )          !  turn off for now
+               END DO
+#endif 
             END DO
 
 C Subroutine MATRIX then solves for U if ACM2, else TRI solves for U
@@ -888,6 +1243,16 @@ C Subroutine MATRIX then solves for U if ACM2, else TRI solves for U
             ELSE
                CALL TRI ( CC, BB, EE, DD, UU )
             END IF
+
+#ifdef sens
+            DO NP = 1, NPMAX
+               IF ( CONVCT( C,R ) ) THEN
+                  CALL MATRIX ( AA, BB, CC, SDD(NP,:,:), EE, SUU(NP,:,:) )
+               ELSE
+                  CALL TRI ( CC, BB, EE, SDD(NP,:,:), SUU(NP,:,:) )
+               END IF
+            END DO
+#endif
 
 C Load into CGRID
             DO L = 1, NLAYS
@@ -985,6 +1350,25 @@ C For NH3, use bi-directional flux
                END IF   ! FST
             END IF   ! MOSAIC
 
+c !!! NOTE !!! this thing does not do bi-directional anything, so don't set that option
+c change this later to add the fancy stuff
+
+#ifdef sens
+            DO NP = 1, NPMAX
+               DO L = 1, NLAYS
+                  DO V = 1, N_SPC_DIFF
+                     SENS( V,L,NP ) = SUU ( NP,V,L )
+                  END DO
+               END DO
+               DO V = 1, N_SPC_DEPV
+                  SENS( DV2DF( V ),1,NP ) = EFAC2( V ) *
+     &                                      SENS( DV2DF( V ),1,NP )
+                  SENDDBF( V, NP ) = SENDDBF( V, NP ) + THETA * DD_FAC( V )
+     &                      * SENS( DV2DF( V ), 1, NP )
+               END DO
+            END DO
+#endif
+
 301      CONTINUE                 ! end sub time loop
 
          DO L = 1, NLAYS
@@ -1018,12 +1402,45 @@ C For NH3, use bi-directional flux
             END IF
          END IF
 
+#ifdef sens
+! Upload SEN_TEMP back in to SNGRD
+         DO L = 1, NLAYS
+            DO V = 1, N_SPC_DIFF
+               S = DIFF_MAP( V )
+               DO NP = 1, NPMAX
+                  SNGRD( NP, DIFF_MAP( V ), L, C, R ) = SENS( V, L, NP )
+               END DO
+            END DO
+         END DO
+C WT - update dry deposition sensitivities
+         DO V = 1, N_SPC_DEPV
+            DO NP = 1, NPMAX
+               SENDDEP( V, C, R, NP ) = SENDDBF( V, NP )
+            END DO
+         END DO
+#endif
+
 344   CONTINUE         !  end loop on col C
 345   CONTINUE         !  end loop on row R
 
 C Revert non-molar mixing ratio species and re-order CGRID
 
       CALL REV_CGRID ( CNGRD, MDATE, MTIME, CGRID )
+
+#ifdef sens
+      DO NP = 1, NPMAX
+         CALL REV_CGRID ( SNGRD(NP,:,:,:,:), MDATE, MTIME, SENGRID_TEMP )
+         DO L = 1, NLAYS
+            DO R = 1, MY_NROWS
+               DO C = 1, MY_NCOLS
+                  DO S = 1, N_SPC_CGRID
+                     SENGRID( C,R,L,NP,S ) = SENGRID_TEMP( C,R,L,S ) 
+                  END DO
+               END DO
+            END DO
+         END DO
+      END DO
+#endif
 
 C If last call this hour:  write accumulated depositions:
 
@@ -1157,6 +1574,34 @@ C re-set dry deposition array to zero
             DDEPJ = 0.0   ! array assignment
             IF ( FST ) DDEPJ_FST = 0.0   ! array assignment
          END IF
+
+#ifdef sens
+C WT - write out dry deposition sensitivities
+         DO V = 1, N_SPC_DDEP
+            S = DD2DV( V )
+            SPCNAME = DDEP_SPC( V )( 1:7 )                       ! <- these lines have to
+            DO NP = 1, NPMAX
+               PARNAME = TRIM( SPCNAME ) //'_' // SEN_PAR( NP )  ! <- match what is in opddep.F
+               DO R = 1, MY_NROWS
+                  DO C = 1, MY_NCOLS
+                     WRDD( C,R ) = SENDDEP( S, C, R, NP )
+                  ENDDO
+               ENDDO
+
+               IF ( .NOT. WRITE3( CTM_SDRYDEP_1, PARNAME,
+     &                 MDATE, MTIME, WRDD ) ) THEN
+                  XMSG = 'Could not write ' // CTM_SDRYDEP_1 // ' file'
+                  CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+               END IF
+
+            ENDDO
+         ENDDO
+         WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
+     &         'Timestep written to', CTM_SDRYDEP_1,
+     &         'for date and time', MDATE, MTIME
+
+         SENDDEP = 0.0
+#endif
 
       END IF
 
