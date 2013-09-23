@@ -19,7 +19,7 @@
 
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/init/yamo/initscen.F,v 1.7 2011/10/21 16:11:24 yoj Exp $
+C $Header: /project/work/rep/arc/CCTM/src/init/yamo/initscen.F,v 1.7 2011/10/21 16:11:24 yoj Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C @(#)initscen.F        1.4 /project/mod3/CMAQ/src/init/init/SCCS/s.initscen.F 25 Jul 1997 14:32:52
@@ -68,6 +68,7 @@ C   21 Jun 10 J.Young: convert for Namelist redesign
 C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                        removed deprecated TRIMLEN
 C   11 May 11 D.Wong: incorporated twoway model implementation
+C   09 Nov 12 S.L.Napelenok: update for cmaq 5.0
 C-----------------------------------------------------------------------
 
       USE HGRD_DEFN             ! horizontal domain specifications
@@ -76,6 +77,11 @@ C-----------------------------------------------------------------------
 
       USE SUBST_MODULES         ! stenex
 !     USE SUBST_UTIL_MODULE     ! stenex
+
+#ifdef sens
+      USE DDM3D_DEFN      
+      USE VGRD_DEFN, ONLY: NLAYS
+#endif
 
       IMPLICIT NONE
 
@@ -131,6 +137,10 @@ C  environment variable description
       integer c, r, l, s, v
 #endif
 
+#ifdef sens
+      integer COL,ROW,LAY,SPC
+#endif
+
       INTERFACE
          SUBROUTINE LOAD_CGRID ( FNAME, STDATE, STTIME, SPC_CAT, CMIN, CGRID )
             IMPLICIT NONE
@@ -145,6 +155,18 @@ C  environment variable description
             REAL, POINTER                 :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )         :: STDATE, STTIME, TSTEP
          END SUBROUTINE OPCONC
+#ifdef sens
+         SUBROUTINE LOAD_SENGRID ( FNAME, STDATE, STTIME, SPC_CAT )
+            IMPLICIT NONE
+            CHARACTER( 16 ), INTENT( IN ) :: FNAME
+            INTEGER, INTENT( IN )         :: STDATE, STTIME
+            CHARACTER(  2 ), INTENT( IN ) :: SPC_CAT
+         END SUBROUTINE LOAD_SENGRID
+c        SUBROUTINE SINPUT ( STDATE, STTIME )
+c           IMPLICIT NONE
+c           INTEGER, INTENT( IN )         :: STDATE, STTIME
+c        END SUBROUTINE SINPUT
+#endif
       END INTERFACE
 
 C-----------------------------------------------------------------------
@@ -334,7 +356,8 @@ C Get tracer IC's. Note: INIT_TRAC_1 may be setenv'ed to INIT_GASC_1
 
 C Test opening existing conc file for update
       IF ( .NOT. OPEN3( CTM_CONC_1, FSRDWR3, PNAME ) ) THEN
-         MSG = 'Could not open ' // TRIM( CTM_CONC_1 ) // ' for update - '
+         MSG = 'Could not open ' // TRIM( CTM_CONC_1 ) 
+     &        // ' for update - '
      &        // 'try to open new'
          CALL M3MESG( MSG )
          ! Open the file new
@@ -352,5 +375,70 @@ C Test opening existing conc file for update
 
       CALL SUBST_BARRIER
 
+#ifdef sens
+c     CALL SINPUT( STDATE, STTIME )
+
+      IF ( RST ) THEN ! Load SENGRID from a file
+
+         IF ( N_GC_SPC .GT. 0 ) THEN
+            FNAME = INIT_GASC_S
+            CALL LOAD_SENGRID ( FNAME, STDATE, STTIME, 'GC' )
+         END IF  ! N_GC_SPC > 0
+
+         FNAME = MET_CRO_3D
+         CALL LOAD_SENGRID ( FNAME, STDATE, STTIME, 'RJ' )
+
+         IF ( N_AE_SPC .GT. 0 ) THEN
+            FNAME = INIT_AERO_S
+            CALL LOAD_SENGRID ( FNAME, STDATE, STTIME, 'AE')
+         END IF  ! N_AE_SPC > 0
+
+         IF ( N_NR_SPC .GT. 0 ) THEN
+            FNAME = INIT_NONR_S
+            CALL LOAD_SENGRID ( FNAME, STDATE, STTIME, 'NR' )
+         END IF  ! N_NR_SPC > 0
+
+         IF ( N_TR_SPC .GT. 0 ) THEN
+            FNAME = INIT_TRAC_S
+            CALL LOAD_SENGRID ( FNAME, STDATE, STTIME, 'TR' )
+         END IF  ! N_TR_SPC > 0
+
+      ELSE  ! Set to initial conditions or 0.0
+
+         DO NP = 1, NPMAX
+            IF ( IPT( NP ) .EQ. 1 ) THEN
+               DO SPC = 1, NSPCSD
+                  DO LAY = 1, NLAYS
+                     DO ROW = 1, NROWS
+                        DO COL = 1, NCOLS
+                           SENGRID( COL, ROW, LAY, NP, SPC) =
+     &                             CGRID( COL, ROW, LAY, SPC ) *
+     &                             REAL( IPARM( NP, SPC ) ) *
+     &                             IREGION( COL, ROW, LAY, NP )
+                        END DO
+                     END DO
+                  END DO
+               END DO
+            ELSE
+               DO SPC = 1, NSPCSD
+                  DO LAY = 1, NLAYS
+                     DO ROW = 1, NROWS
+                        DO COL = 1, NCOLS
+                           SENGRID( COL, ROW, LAY, NP, SPC) = 0.0
+                        END DO
+                     END DO
+                  END DO
+               END DO
+            END IF
+         END DO
+
+      END IF
+
+      CALL SUBST_BARRIER
+
+#endif
+
       RETURN
       END
+
+
