@@ -79,6 +79,7 @@ C    18 Nov 09 J.Young: Combine VPPMY and VPPM functionality
 C    21 Jun 10 J.Young: convert for Namelist redesign
 C    16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 C    11 May 11 D.Wong: incorporated twoway model implementation
+C    18 Jun 13 S.Napelenok: ddm-3d implementation for cmaq5.0.1
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -87,6 +88,10 @@ C-----------------------------------------------------------------------
       USE SUBST_MODULES              ! stenex
 !     USE SUBST_GLOBAL_SUM_MODULE    ! stenex
       USE UTILIO_DEFN
+
+#ifdef sens
+      USE DDM3D_DEFN
+#endif 
 
       IMPLICIT NONE
 
@@ -157,7 +162,24 @@ C for INTERPX
  
       INTEGER, SAVE :: LOGDEV
 
+#ifdef sens
+      REAL, ALLOCATABLE, SAVE :: SEN1( :,:,: ) ! ( NLAYS,N_SPC_ADV,NPMAX ) sens subset
+#endif
+
+
       INTERFACE
+#ifdef sens
+         SUBROUTINE VPPM ( NI, DT, DS, FLX, VEL, CON, SEN1 )
+            IMPLICIT NONE
+            INTEGER, INTENT( IN )    :: NI
+            REAL,    INTENT( IN )    :: DT, DS( NI )
+            REAL,    INTENT( IN )    :: FLX( NI+1 )
+!           REAL,    INTENT( IN )    :: VEL( NI+1 )
+            REAL,    INTENT( INOUT ) :: VEL( NI+1 )
+            REAL,    INTENT( INOUT ) :: CON( :,: )
+            REAL,    INTENT( INOUT ) :: SEN1( :,:,: )
+         END SUBROUTINE VPPM
+#else
          SUBROUTINE VPPM ( NI, DT, DS, FLX, VEL, CON )
             IMPLICIT NONE
             INTEGER, INTENT( IN )    :: NI
@@ -167,6 +189,7 @@ C for INTERPX
             REAL,    INTENT( INOUT ) :: VEL( NI+1 )
             REAL,    INTENT( INOUT ) :: CON( :,: )
          END SUBROUTINE VPPM
+#endif
       END INTERFACE
 
 C-----------------------------------------------------------------------
@@ -189,6 +212,13 @@ C-----------------------------------------------------------------------
             XMSG = 'Failure allocating CON1 or ADV_MAP'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+#ifdef sens
+         ALLOCATE ( SEN1( NLAYS,N_SPC_ADV,NPMAX ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SEN1'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+#endif
 
 C Get default file header attibutes from MET_CRO_3D (assumes file already open)
 
@@ -256,6 +286,11 @@ C Get rho*J at end of sync step
                A2C = ADV_MAP( SPC )
                DO LVL = 1, NLAYS
                   CON1( LVL,SPC ) = CGRID( COL,ROW,LVL,A2C )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     SEN1 ( LVL,SPC,NP ) = SENGRID( COL,ROW,LVL,NP,A2C )
+                  END DO
+#endif
                END DO
             END DO
 
@@ -320,7 +355,11 @@ C sub-steps.
                NSTEP = FLOAT( INT( CC ) + 1 )
                DTNEW = DELT / NSTEP
 
+#ifdef sens
+               CALL VPPM ( NLAYS, DTNEW, DS, FLX, VEL, CON1, SEN1 )
+#else
                CALL VPPM ( NLAYS, DTNEW, DS, FLX, VEL, CON1 )
+#endif
                DELT = DELT - DTNEW
 
                ITER = ITER + 1
@@ -350,11 +389,20 @@ C sub-steps.
 
             END IF
 
+#ifdef sens
+            CALL VPPM ( NLAYS, DELT, DS, FLX, VEL, CON1, SEN1 )
+#else
             CALL VPPM ( NLAYS, DELT, DS, FLX, VEL, CON1 )
+#endif
             DO SPC = 1, N_SPC_ADV
                A2C = ADV_MAP( SPC )
                DO LVL = 1, NLAYS
                   CGRID( COL,ROW,LVL,A2C ) = CON1( LVL,SPC )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     SENGRID( COL,ROW,LVL,NP,A2C ) = SEN1 ( LVL,SPC,NP )
+                  END DO
+#endif
                END DO
             END DO
 
