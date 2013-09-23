@@ -53,6 +53,7 @@ C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                        removed deprecated TRIMLEN
 C   10 Aug 11 David Wong: reset output format 1PEw.d to meet the standard
 C                         w-d > 6
+C   14 Aug 13 Sergey Napelenok: ddm-3d implementation for cmaq5.0.1
 C-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -60,6 +61,10 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE SUBST_MODULES              ! stenex
 !     USE SUBST_GLOBAL_SUM_MODULE    ! stenex
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : SENGRID, NP, NPMAX
+#endif 
 
       IMPLICIT NONE
 
@@ -153,6 +158,11 @@ C-----------------------------------------------------------------------
                         WRITE( OUTDEV,1003 ) JDATE, JTIME, C, R, L, S,
      &                                       GC_SPC( V ), CGRID( C,R,L,S )
                         CGRID( C,R,L,S ) = CMIN
+#ifdef sens
+                        DO NP = 1, NPMAX
+                          SENGRID( C,R,L,NP,S ) = 0.0
+                        END DO
+#endif
                      END IF
                   END DO
                END DO
@@ -191,6 +201,11 @@ C-----------------------------------------------------------------------
                         WRITE( OUTDEV,1003 ) JDATE, JTIME, C, R, L, S,
      &                                       AE_SPC( V ), CGRID( C,R,L,S )
                         CGRID( C,R,L,S ) = CMIN
+#ifdef sens
+                        DO NP = 1, NPMAX
+                          SENGRID( C,R,L,NP,S ) = 0.0
+                        END DO
+#endif
                      END IF
                   END DO
                END DO
@@ -229,6 +244,11 @@ C-----------------------------------------------------------------------
                         WRITE( OUTDEV,1003 ) JDATE, JTIME, C, R, L, S,
      &                                       NR_SPC( V ), CGRID( C,R,L,S )
                         CGRID( C,R,L,S ) = CMIN
+#ifdef sens
+                        DO NP = 1, NPMAX
+                          SENGRID( C,R,L,NP,S ) = 0.0
+                        END DO
+#endif
                      END IF
                   END DO
                END DO
@@ -267,6 +287,11 @@ C-----------------------------------------------------------------------
                         WRITE( OUTDEV,1003 ) JDATE, JTIME, C, R, L, S,
      &                                       TR_SPC( V ), CGRID( C,R,L,S )
                         CGRID( C,R,L,S ) = CMIN
+#ifdef sens
+                        DO NP = 1, NPMAX
+                          SENGRID( C,R,L,NP,S ) = 0.0
+                        END DO
+#endif
                      END IF
                   END DO
                END DO
