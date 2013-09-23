@@ -42,11 +42,16 @@ C                             to reduce the chance of code crash; it does
 C                             not change results
 C   21 Jun 10 J.Young: convert for Namelist redesign
 C   29 Mar 11 S.Roselle: Replaced I/O API include files with UTILIO_DEFN
+C   19 Jun 13 S.Napelenok: ddm-3d implementation for cmaq5.0.1
 C-----------------------------------------------------------------------
 
       USE CGRID_SPCS, ONLY: N_GC_SPC, GC_SPC     ! CGRID mechanism species      
       USE UTILIO_DEFN
       USE HRDATA
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY: YCDDM
+#endif 
 
       IMPLICIT NONE
 
@@ -106,6 +111,12 @@ C..Scratch Local Variables:
       LOGICAL, SAVE :: LOPEN = .FALSE.
 #endif
 
+#ifdef sens
+      INTEGER N_EBI_MID            ! the midpoint ebi step; half of N_EBI_STEPS
+      LOGICAL ODD_STEPS            ! true if N_EBI_STEPS is odd
+      LOGICAL DDM_CHECK( N_GC_SPC) ! check YCDDM set for all species
+#endif
+
 C-----------------------------------------------------------------------
 
       IF ( LFIRST ) THEN
@@ -155,6 +166,18 @@ c      IF ( JTIME .EQ. 160000 ) THEN
       END IF
 #endif
 c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
+
+#ifdef sens
+      DO S = 1, N_SPEC
+         DDM_CHECK( S ) = .FALSE.
+      END DO
+      N_EBI_MID = CEILING( N_EBI_STEPS / 2.0 )
+      IF ( MOD( N_EBI_STEPS, 2 ) .EQ. 1 ) THEN
+         ODD_STEPS = .TRUE.
+      ELSE
+         ODD_STEPS = .FALSE.
+      END IF
+#endif
 
       N_EBI_IT = 0
 
@@ -249,6 +272,18 @@ c..if predictions growing too large, treat as a convergence failure
                      MXFL = .TRUE.
                      GO TO 1010
                   END IF
+#ifdef sens
+C YCDDM is the value at the middle time step
+                  IF ( N_EBI_MID .EQ. NEBI ) THEN
+                     DDM_CHECK ( S ) = .TRUE.
+                     IF ( ODD_STEPS ) THEN
+                        YCDDM( S ) = 0.5 * ( YC( S ) + YCP( S ) )
+                     ELSE
+                        YCDDM( S ) = YCP( S )
+                     END IF
+                     IF ( YCDDM( S ) .LT. 1.e-25) YCDDM( S ) = 0.
+                  END IF
+#endif
                   YC( S ) = YCP( S )
                END DO
 
@@ -320,6 +355,17 @@ c.....start inner loop over unless max backups exceeded
 2000     CONTINUE
 
 3000  CONTINUE
+
+#ifdef sens
+      DO S = 1, N_SPEC
+         IF ( .NOT. DDM_CHECK( S ) ) THEN
+            MSG = 'ERROR: HRSOLVER failed to assign YCDDM to ' //
+     &             GC_SPC( S )
+            CALL M3EXIT( PNAME, JDATE, JTIME, MSG, STAT )
+         END IF
+      END DO
+#endif
+
 
       RETURN
 
