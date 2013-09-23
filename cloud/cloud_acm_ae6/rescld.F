@@ -65,6 +65,7 @@ C      15 01 Jul 11 G. Sarwar: calculate zenith angle to determine daytime and
 C                    nightime needed for sulfur oxidation via metal catalysis
 C      16 02Aug12 S.Roselle:  instrumented to calculate and return
 C                             transmissivity for resolved clouds
+C      17 15Jul13 S.Napelenok: ddm-3d implementation for cmaq5.0.1
  
 C  Called by:  CLDPROC
  
@@ -74,6 +75,10 @@ C-----------------------------------------------------------------------
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY: SENGRID, NP, NPMAX, S_CONDEP, S_POLC, S_CEND, S_REMOV, S_REMOVAC, S_CONDEP, S_TOTDEP, WRFLAG
+#endif 
 
       IMPLICIT NONE
 
@@ -327,6 +332,33 @@ C...  the met timestep in hours
           XMSG = 'Failure allocating CEND, POLC or REMOV'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
+
+#ifdef sens
+        IF ( .NOT. ALLOCATED( S_CEND ) ) ALLOCATE ( S_CEND ( NPMAX, MXSPCS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_CEND'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+        IF ( .NOT. ALLOCATED( S_POLC ) ) ALLOCATE ( S_POLC ( NPMAX, MXSPCS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_POLC'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+        IF ( .NOT. ALLOCATED( S_REMOV ) ) ALLOCATE ( S_REMOV ( NPMAX, MXSPCS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_REMOV'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+        IF ( .NOT. ALLOCATED( S_REMOVAC ) ) ALLOCATE ( S_REMOVAC ( NPMAX ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_REMOVAC'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF 
+        S_REMOVAC = 0.0
+#endif
 
 C...  Get LAT, Golam Sarwar * July 1, 2011 
 
@@ -696,6 +728,16 @@ C...  per mole air
                   REMOV( SPC ) = 0.0
                 END DO
 
+#ifdef sens
+                DO NP = 1, NPMAX
+                  DO SPC = 1, NSPCSD
+                    S_POLC ( NP, SPC ) = SENGRID( COL, ROW, LAY, NP, SPC )
+                    S_CEND ( NP, SPC ) = S_POLC( NP, SPC)
+                    S_REMOV( NP, SPC ) = 0.0
+                  END DO
+                END DO
+#endif
+
 C...perform scavenging and aqueous chemistry within the cloud
 C...  and re-adjust the ending and removed amounts for those species
 C...  that were scavenged or that participated in cloud chemistry
@@ -740,6 +782,12 @@ C...  for gases
                   SPC = SPC + 1
                   REMOV( VAR ) = REMOV( VAR ) * GC_MOLWT( SPC )
      &                         * M2PHA_OVER_GPKG
+#ifdef sens
+                  DO NP = 1, NPMAX
+                    S_REMOV( NP, VAR ) = S_REMOV( NP, VAR ) * GC_MOLWT( SPC )
+     &                                 * M2PHA_OVER_GPKG
+                  END DO
+#endif
                 END DO
 
 C...  for aerosols
@@ -753,8 +801,19 @@ C...  for aerosols
      &                ( INDEX( AE_SPC( SPC ), 'SRF' ) .EQ. 0 )) THEN
                     REMOV( VAR ) = REMOV( VAR ) * AE_MOLWT( SPC )
      &                           * M2PHA_OVER_GPKG
+#ifdef sens
+                    DO NP = 1, NPMAX
+                      S_REMOV( NP, VAR ) = S_REMOV( NP, VAR ) * AE_MOLWT( SPC )
+     &                                   * M2PHA_OVER_GPKG
+                    END DO
+#endif
                   ELSE
                     REMOV( VAR ) = REMOV( VAR ) * M2PHA
+#ifdef sens
+                    DO NP = 1, NPMAX
+                      S_REMOV( NP, VAR ) = S_REMOV( NP, VAR ) * M2PHA
+                    END DO
+#endif
                   END IF
                 END DO
 
@@ -767,8 +826,14 @@ C...  for non-reactives
                   SPC = SPC + 1
                   REMOV( VAR ) = REMOV( VAR ) * NR_MOLWT( SPC )
      &                         * M2PHA_OVER_GPKG
-                END DO
+#ifdef sens
+                  DO NP = 1, NPMAX
+                    S_REMOV( NP, VAR ) = S_REMOV( NP, VAR ) * NR_MOLWT( SPC )
+     &                                 * M2PHA_OVER_GPKG
+                  END DO
+#endif
 
+                END DO
 C...  for tracers
 
                 SPC = 0
@@ -778,6 +843,12 @@ C...  for tracers
                   SPC = SPC + 1
                   REMOV( VAR ) = REMOV( VAR ) * TR_MOLWT( SPC )
      &                         * M2PHA_OVER_GPKG
+#ifdef sens
+                  DO NP = 1, NPMAX
+                    S_REMOV( NP, VAR ) = S_REMOV( NP, VAR ) * TR_MOLWT( SPC )
+     &                                 * M2PHA_OVER_GPKG
+                  END DO
+#endif
                 END DO
 
 C...load deposition amounts into the DEP array
@@ -800,6 +871,26 @@ C...set cgrid to the ending concentrations
                   END IF
                 END DO
 
+#ifdef sens
+                DO NP = 1, NPMAX
+               
+ 
+                  DO VAR = 1, N_SPC_WDEP
+                    S_TOTDEP( COL, ROW, NP, VAR ) = S_TOTDEP( COL, ROW, NP, VAR )
+     &                                            + S_REMOV( NP, WDEP_MAP( VAR ) )
+                  END DO
+
+                   S_TOTDEP( COL, ROW, NP, N_SPC_WDEP+1 ) =
+     &                     S_TOTDEP( COL, ROW, NP, N_SPC_WDEP+1 ) + S_REMOVAC( NP )
+
+                   DO SPC = 1, NSPCSD
+                     IF ( SPC .NE. N_GC_SPCD ) THEN
+                       SENGRID( COL, ROW, LAY, NP, SPC ) = S_CEND( NP, SPC )
+                     END IF
+                   END DO
+
+                END DO
+#endif
               END IF
             END DO
           END IF

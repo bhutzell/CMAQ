@@ -102,12 +102,18 @@ C             uses a convective cloud parameterization (removed minimum
 C             horizontal grid resolution restriction)
 C       02Aug12 S.Roselle:  instrumented to calculate and return
 C                           transmissivity for convective clouds
+C       23Jul13 S.Napelenok: ddm-3d implementation for cmaq5.0.1
 C-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
       USE AQ_DATA
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY: SENGRID, NP, NPMAX, S_CONDEP, S_POLC, S_CEND, S_REMOV, S_REMOVAC, S_CONDEP, S_TOTDEP, 
+     &                      S_CCR, S_CBELOW, WRFLAG
+#endif 
 
       IMPLICIT NONE
 
@@ -422,6 +428,21 @@ C...........Statement Functions
 
       QSAT( E, P ) = MVOMA * ( E / ( P - E ) )
 
+#ifdef sens
+c     REAL(8), ALLOCATABLE, SAVE :: S_CCR     ( :,:,: )
+      REAL(8), ALLOCATABLE, SAVE :: S_CONC    ( :,:,: )
+c     REAL(8), ALLOCATABLE, SAVE :: S_CBELOW  ( :,: )   
+      REAL(8), ALLOCATABLE, SAVE :: S_BMOL    ( :,: )   ! moles/m2 species below cloud
+      REAL(8), ALLOCATABLE, SAVE :: S_CBASE0  ( :,: )   ! initial ave trace gas mix rat below cld
+      REAL(8), ALLOCATABLE, SAVE :: S_CBASEF  ( :,: )   ! final ave trac gas mix rat blw cld (moles/mole)
+      REAL(8), ALLOCATABLE, SAVE :: S_BCLDWT  ( :,:,: ) ! below cloud weighting function
+      REAL(8), ALLOCATABLE, SAVE :: S_INCLOUD ( :,:,: ) ! fin. in cloud conc. after mix and chem moles/mole
+      REAL(8), ALLOCATABLE, SAVE :: S_OUTCLOUD( :,:,: ) ! fin. outside cld conc. "   "   "   " moles/mole
+      REAL(8), ALLOCATABLE, SAVE :: S_PCLD    ( :,:,: ) ! moles sp/mole air in cloud
+      REAL(8) S_CONDIS, LMT1, LMT1D
+      REAL(8) DDM3D_CONCMINL                            ! the conc small number is too small even with real(8)!!!!
+#endif
+
       INTERFACE
         SUBROUTINE SCAVWDEP ( JDATE, JTIME, WTBAR, WCBAR, TBARC, PBARC,
      &                        CTHK1, AIRM, PRATE1, TAUCLD, POLC, CEND,
@@ -656,6 +677,71 @@ C...  Get LON
      &                       1, 1, JDATE, JTIME, LON ) ) THEN
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+
+#ifdef sens
+        IF ( .NOT. ALLOCATED( S_CEND ) ) ALLOCATE ( S_CEND ( NPMAX, MXSPCS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_CEND'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+        IF ( .NOT. ALLOCATED( S_POLC ) ) ALLOCATE ( S_POLC ( NPMAX, MXSPCS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_POLC'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+        IF ( .NOT. ALLOCATED( S_REMOV ) ) ALLOCATE ( S_REMOV ( NPMAX, MXSPCS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_REMOV'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+        IF ( .NOT. ALLOCATED( S_REMOVAC ) ) ALLOCATE ( S_REMOVAC ( NPMAX ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_REMOVAC'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF 
+        S_REMOVAC = 0.0
+
+        IF ( .NOT. ALLOCATED( S_CCR ) ) ALLOCATE ( S_CCR ( NPMAX,MXSPCS,NLAYS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_CCR'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+        S_REMOVAC = 0.0
+
+        IF ( .NOT. ALLOCATED( S_CBELOW ) ) ALLOCATE ( S_CBELOW ( NPMAX,MXSPCS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_REMOVAC'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+        S_REMOVAC = 0.0
+
+        ALLOCATE ( S_CONC  ( NPMAX,MXSPCS,NLAYS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_CONC'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+        ALLOCATE ( S_BMOL   ( NPMAX,MXSPCS ),
+     &             S_CBASE0 ( NPMAX,MXSPCS ),
+     &             S_CBASEF ( NPMAX,MXSPCS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_BMOL, S_CBASE0, or S_CBASEF'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+        ALLOCATE ( S_BCLDWT  ( NPMAX,MXSPCS,NLAYS ),
+c    &             S_CONCMINL( NPMAX,MXSPCS,NLAYS ),
+     &             S_INCLOUD ( NPMAX,MXSPCS,NLAYS ),
+     &             S_OUTCLOUD( NPMAX,MXSPCS,NLAYS ),
+     &             S_PCLD    ( NPMAX,MXSPCS,NLAYS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating S_BCLDWT, S_INCLOUD, S_OUTCLOUD or S_PCLD'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+#endif
 
       END IF   ! Firstime
 
@@ -930,6 +1016,10 @@ C...  initialize all species to CMIN
 
 !         CONCMINL = CMIN
           CONCMINL =  1.0E-25
+#ifdef sens
+c         CONCMINL =  1.0E-20
+          DDM3D_CONCMINL = 1.0E-15
+#endif
 
 C...  set minimum for aerosol species
 
@@ -948,6 +1038,15 @@ C...  set minimum for aerosol species
 !              CONC( SPC,LAY ) = CGRID( COL,ROW,LAY,SPC )
               CONC( SPC,LAY ) = MAX(CGRID( COL,ROW,LAY,SPC ),
      &                                  CONCMINL( SPC, LAY ))
+#ifdef sens
+              DO NP = 1, NPMAX
+                IF ( CGRID( COL,ROW,LAY,SPC ) .LT. CONCMINL( SPC, LAY ) ) THEN
+                  S_CONC( NP, SPC, LAY ) = 0.0D0
+                ELSE
+                  S_CONC( NP, SPC, LAY ) = REAL ( SENGRID( COL, ROW, LAY, NP, SPC ), 8 )
+                END IF
+              END DO
+#endif
             END DO
           END DO
 
@@ -1286,6 +1385,15 @@ C...First, get moles air/m2 at each layer, initialize FSIDE
 
           END DO
 
+#ifdef sens
+          S_REMOV  = 0.0D0
+          S_CEND   = 0.0D0
+          S_BMOL   = 0.0D0
+          S_POLC   = 0.0D0
+          S_BCLDWT = 0.0D0
+          S_PCLD   = 0.0D0
+#endif
+
 C...compute no. of moles air below cloud base and inverse
 
           AIRMB0 = 0.0
@@ -1306,6 +1414,12 @@ C...   determine no. of moles/m2 of trace gas
             DO SPC = 1, NSPCSD
               BMOL( SPC ) = BMOL( SPC )
      &                    + CONC( SPC,LAY ) * RHOM2( LAY )
+#ifdef sens
+              DO NP = 1, NPMAX
+                S_BMOL( NP,SPC ) = S_BMOL( NP,SPC )
+     &                    + S_CONC( NP,SPC,LAY ) * REAL ( RHOM2( LAY ), 8 )
+              END DO
+#endif
             END DO
 
           END DO
@@ -1315,6 +1429,12 @@ C...determine average trace gas mixing ratio below cloud level
           DO SPC = 1, NSPCSD
             CBASE0( SPC ) = BMOL( SPC ) * AIRMBI
             CBASEF( SPC ) = CBASE0( SPC )
+#ifdef sens
+            DO NP = 1, NPMAX
+              S_CBASE0( NP,SPC ) = S_BMOL( NP,SPC ) * REAL ( AIRMBI, 8 )
+              S_CBASEF( NP,SPC ) = S_CBASE0( NP,SPC )
+            END DO
+#endif
           END DO
 
 C...Initialize variables needed for entrainment and in-cloud properties solver
@@ -1630,33 +1750,30 @@ C...  using direct exchange mixing mechanism by McHenry.
           DO SPC = 1, MXSPCS
             DO LAY = 1, NLAYS
               CCR( SPC, LAY ) = CONC( SPC,LAY )
+#ifdef sens
+              DO NP = 1, NPMAX
+                S_CCR( NP,SPC, LAY ) = S_CONC( NP,SPC,LAY )
+              END DO
+#endif
             END DO
             CBELOW( SPC ) = CBASE0( SPC )
+#ifdef sens
+            DO NP = 1, NPMAX
+              S_CBELOW( NP,SPC ) = S_CBASE0( NP,SPC )
+            END DO
+#endif 
           END DO
-
-!         IF ( ROW .EQ. 46 .AND. COL .EQ. 62 ) THEN
-!           WRITE( LOGDEV, * ) ' BASE,TOP=',CLBASE,CLTOP,
-!    &                         ' frac=',FRAC
-!           WRITE( LOGDEV, * ) ' CB=',CBELOW(9),' PRATE,PRATE1=',PRATE,PRATE1
-!           DO LAY = NLAYS, 1, -1
-!             WRITE( LOGDEV, * ) LAY, TAL( LAY ),
-!    &                           QVL( LAY ), PRESL( LAY ),
-!    &                           ZH(COL, ROW, LAY ), ZF(COL, ROW, LAY ), CCR( 9, LAY )
-!           END DO
-!         END IF
 
           CALL ACMCLD ( F, CCR, SIGF, CBELOW, CLBASE, CLTOP,
      &                  FRAC, NSPCSD, NLAYS, TCLIFE, DTCLD )
 
-!         IF ( ROW .EQ. 46 .AND. COL .EQ. 62 ) THEN
-!           WRITE( LOGDEV, * ) ' CBELOW=',CBELOW( 9 )
-!           DO LAY = NLAYS, 1, -1
-!             WRITE( LOGDEV, * ) ' Lay,c=',LAY, CCR( 9,LAY )
-!           END DO
-!         END IF
-
           DO SPC = 1, MXSPCS
             CBASEF( SPC ) =  CBELOW( SPC ) 
+#ifdef sens
+            DO NP = 1, NPMAX
+              S_CBASEF( NP,SPC ) =  S_CBELOW( NP,SPC )
+            END DO
+#endif
           END DO
 
           DO LAY = CLTOP, CLBASE, -1
@@ -1664,12 +1781,32 @@ C...  using direct exchange mixing mechanism by McHenry.
               CONDIS = CONC( SPC,LAY )
               PCLD( SPC, LAY ) = F( LAY ) * ( FSIDE( LAY ) * CONDIS )
      &                         + ( 1.0 - F( LAY ) ) * CBASE0( SPC )
+#ifdef sens
+              DO NP = 1, NPMAX
+                S_CONDIS = S_CONC( NP, SPC, LAY )
+
+                S_PCLD( NP, SPC, LAY ) = REAL ( F( LAY ), 8 ) * ( REAL ( FSIDE( LAY ), 8 ) * S_CONDIS )
+     &                         + ( 1.0D0 - REAL ( F( LAY ), 8 ) ) * S_CBASE0( NP, SPC )
+                IF ( PCLD( SPC, LAY ) .GT. CCR( SPC, LAY ) / FRAC ) THEN
+                  S_PCLD( NP, SPC, LAY ) = S_CCR( NP, SPC, LAY ) / REAL ( FRAC, 8 )
+                  PCLD( SPC, LAY ) = CCR( SPC, LAY ) / FRAC 
+                END IF
+              END DO
+#else
               PCLD( SPC, LAY ) = MIN( PCLD( SPC, LAY ), CCR( SPC, LAY ) / FRAC )
+#endif
 
 C...POLC in moles sp/m2
 
               POLC( SPC ) = POLC( SPC )
      &                    + PCLD( SPC, LAY ) * RHOM2( LAY )
+
+#ifdef sens
+              DO NP = 1, NPMAX
+                S_POLC( NP, SPC ) = S_POLC( NP, SPC )
+     &                            + S_PCLD( NP, SPC, LAY ) * REAL ( RHOM2( LAY ), 8 )
+              END DO
+#endif
             END DO
           END DO
 
@@ -1682,19 +1819,62 @@ C...  to be part of the aqueous reaction chamber
               DO SPC = 1, NSPCSD
                 IF ( CBASE0( SPC ) .EQ. 0.0 ) THEN
                   BCLDWT( SPC, LAY ) = 1.0 / CLBASE
+#ifdef sens
+                  DO NP = 1, NPMAX
+c                   S_BCLDWT( NP, SPC, LAY ) = REAL( (1.0 / CLBASE), 8 )
+                    S_BCLDWT( NP, SPC, LAY ) = 0.0D0
+                  END DO
+#endif
                 ELSE
                   BCLDWT( SPC, LAY ) = CONC( SPC, LAY )
      &                               / MAX( CBASE0( SPC ), 1.0E-30 )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                    IF ( CBASE0( SPC ) .LT. DDM3D_CONCMINL ) THEN
+!                     LMT1  = 1.0D-30
+                      LMT1  = DDM3D_CONCMINL
+                      LMT1D = 0.0D0
+                    ELSE
+                      LMT1  = REAL ( CBASE0( SPC ), 8 )
+                      LMT1D = S_CBASE0( NP, SPC )
+                    END IF
+                    S_BCLDWT( NP, SPC, LAY ) = (   S_CONC( NP, SPC, LAY ) * LMT1
+     &                                           - REAL ( CONC( SPC, LAY ), 8 ) * LMT1D      )
+     &                                       / ( LMT1**2.0D0 )
+c limit weighting term to prevent instability
+                    LMT1 = 1.5D0 * REAL(BCLDWT( SPC, LAY ),8)
+                    S_BCLDWT( NP, SPC, LAY ) = MAX( S_BCLDWT( NP, SPC, LAY ), -LMT1 )
+                    S_BCLDWT( NP, SPC, LAY ) = MIN( S_BCLDWT( NP, SPC, LAY ),  LMT1 )
+                  END DO
+#endif
                 END IF
+
+
+
                 PCLD( SPC, LAY ) = CBASEF( SPC ) * BCLDWT( SPC, LAY )
-         
+#ifdef sens
+                DO NP = 1, NPMAX
+c                 S_PCLD( NP, SPC, LAY ) = S_CBASEF( NP, SPC ) * REAL ( BCLDWT( SPC, LAY ), 8 )
+c    &                                   + REAL ( CBASEF( SPC ), 8 ) * S_BCLDWT( NP, SPC, LAY )
+                  S_PCLD( NP, SPC, LAY ) = S_CBASEF( NP, SPC ) * REAL ( BCLDWT( SPC, LAY ), 8 )
+
+                END DO
+#endif
+ 
 C...Necessary because CBASEF and CBASE0 are the ending vertical averages
 C...  below cloud concentrations in moles sp/mole air
 
                 IF ( ICLDTYPE .EQ. 1 ) THEN
                   POLC( SPC ) = POLC( SPC )
      &                        + PCLD( SPC, LAY ) * RHOM2( LAY )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                    S_POLC( NP, SPC ) = S_POLC( NP, SPC )
+     &                        + S_PCLD( NP, SPC, LAY ) * REAL ( RHOM2( LAY ), 8 )
+                  END DO
+#endif
                 END IF
+
               END DO
             END DO
 
@@ -1749,9 +1929,19 @@ C...  per mole air
             POLC ( SPC ) = POLC( SPC ) / AIRM
             CEND ( SPC ) = POLC( SPC )
             REMOV( SPC ) = 0.0
+#ifdef sens
+            DO NP = 1, NPMAX
+              S_POLC ( NP, SPC ) = S_POLC( NP, SPC ) / REAL ( AIRM, 8 )
+              S_CEND ( NP, SPC ) = S_POLC( NP, SPC )
+              S_REMOV( NP, SPC ) = 0.0D0
+            END DO
+#endif
           END DO
 
           REMOVAC = 0.0
+#ifdef sens
+          S_REMOVAC = 0.0D0
+#endif
 
           ARPRES = PBARC / STDATMPA
           RTCH = ( MOLVOL / STDTEMP ) * TBARC
@@ -1804,6 +1994,12 @@ C...  for gases
             SPC = SPC + 1
             REMOV( VAR ) = REMOV( VAR ) * GC_MOLWT( SPC )
      &                   * M2PHA / GPKG * FRAC
+#ifdef sens
+            DO NP = 1, NPMAX
+              S_REMOV( NP, VAR ) = S_REMOV( NP, VAR ) *  REAL ( ( GC_MOLWT( SPC )
+     &                           * M2PHA / GPKG * FRAC ), 8 )
+            END DO
+#endif
           END DO
 
 C...  for aerosols
@@ -1817,8 +2013,19 @@ C...  for aerosols
      &           ( INDEX( AE_SPC( SPC ), 'SRF' ) .EQ. 0 ) ) THEN
               REMOV( VAR ) = REMOV( VAR ) * AE_MOLWT( SPC )
      &                     * M2PHA / GPKG * FRAC
+#ifdef sens
+              DO NP = 1, NPMAX
+                S_REMOV( NP, VAR ) = S_REMOV( NP, VAR ) * REAL ( ( AE_MOLWT( SPC )
+     &                     * M2PHA / GPKG * FRAC ), 8 )
+              END DO
+#endif
             ELSE
               REMOV( VAR ) = REMOV( VAR ) * M2PHA * FRAC
+#ifdef sens
+              DO NP = 1, NPMAX
+                S_REMOV( NP, VAR ) = S_REMOV( NP, VAR ) * REAL ( ( M2PHA * FRAC ), 8 )
+              END DO
+#endif
             END IF
           END DO
 
@@ -1831,6 +2038,12 @@ C...  for non-reactives
             SPC = SPC + 1
             REMOV( VAR ) = REMOV( VAR ) * NR_MOLWT( SPC )
      &                   * M2PHA / GPKG * FRAC
+#ifdef sens
+            DO NP = 1, NPMAX
+              S_REMOV( NP, VAR ) = S_REMOV( NP, VAR ) * REAL ( ( NR_MOLWT( SPC )
+     &                           * M2PHA / GPKG * FRAC ), 8 )
+            END DO
+#endif
           END DO
 
 C...  for tracers
@@ -1842,6 +2055,12 @@ C...  for tracers
             SPC = SPC + 1
             REMOV( VAR ) = REMOV( VAR ) * TR_MOLWT( SPC )
      &                   * M2PHA / GPKG * FRAC
+#ifdef sens
+            DO NP = 1, NPMAX
+              S_REMOV( NP, VAR ) = S_REMOV( NP, VAR ) * REAL ( ( TR_MOLWT( SPC )
+     &                           * M2PHA / GPKG * FRAC ), 8 )
+            END DO
+#endif
           END DO
 
 C...add deposition amounts into the DEP array
@@ -1849,12 +2068,25 @@ C...add deposition amounts into the DEP array
           DO VAR = 1, N_SPC_WDEP
             CONV_DEP( COL, ROW, VAR ) = CONV_DEP( COL, ROW, VAR )
      &                                + REMOV( WDEP_MAP( VAR ) )
+#ifdef sens
+            DO NP = 1, NPMAX
+              S_CONDEP( COL, ROW, NP, VAR ) = S_CONDEP( COL, ROW, NP, VAR )
+     &                                      + S_REMOV( NP, WDEP_MAP( VAR ) )
+            END DO
+#endif
           END DO
 
 C...  and load H+ concentration into the deposition array as well
 
           CONV_DEP( COL,ROW,N_SPC_WDEP+1 ) = CONV_DEP( COL,ROW,N_SPC_WDEP+1 )
      &                                     + REMOVAC
+#ifdef sens
+          DO NP = 1, NPMAX
+            S_CONDEP( COL,ROW,NP,N_SPC_WDEP+1 ) = S_CONDEP( COL,ROW,NP,N_SPC_WDEP+1 )
+     &                                          + S_REMOVAC( NP )
+          END DO
+#endif
+
 
 C...Compute concentration changes in the grid column resulting
 C...  from subgrid scale vertical mixing:
@@ -1873,8 +2105,37 @@ C...   include raining region below cld base
      &                                    INCLOUD ( SPC, LAY ) * FRAC
      &                                  + OUTCLOUD( SPC, LAY ) * ( 1.0 - FRAC )
                 END IF
+#ifdef sens
+                DO NP = 1, NPMAX
+
+                  IF ( POLC( SPC ) .LT. DDM3D_CONCMINL ) THEN
+c                   LMT1  = REAL ( CONCMINL( SPC, LAY ), 8 )
+                    LMT1  = DDM3D_CONCMINL
+                    LMT1D = 0.0D0
+                  ELSE
+                    LMT1  = REAL ( POLC( SPC ), 8 )
+                    LMT1D = S_POLC( NP, SPC )
+                  END IF
+                  S_INCLOUD( NP, SPC, LAY ) = ( (  S_PCLD( NP,SPC,LAY ) * REAL ( CEND( SPC ), 8 )
+     &                                          + REAL ( PCLD( SPC,LAY ), 8 ) * S_CEND( NP,SPC ) )
+     &                                         * LMT1
+     &                                         - REAL ( ( PCLD( SPC,LAY ) * CEND( SPC ) ), 8 ) * LMT1D )
+     &                                       / ( LMT1**2.0D0 )
+                  S_OUTCLOUD( NP, SPC, LAY ) = S_PCLD( NP,SPC, LAY )
+                  IF ( SPC .NE. N_GC_SPCD ) THEN
+                    SENGRID( COL, ROW, LAY, NP, SPC ) = REAL  ( (
+     &                                    S_INCLOUD ( NP, SPC, LAY ) * REAL ( FRAC, 8 )
+     &                                  + S_OUTCLOUD( NP,SPC, LAY ) * ( 1.0D0 - REAL ( FRAC, 8 ) ) ), 4 )
+                  END IF
+                END DO
+#endif
               ELSE
                 CGRID( COL, ROW, LAY, SPC ) = PCLD( SPC, LAY )
+#ifdef sens
+                DO NP = 1, NPMAX
+                  SENGRID( COL, ROW, LAY, NP, SPC ) = REAL ( S_PCLD( NP, SPC, LAY ), 4 )
+                END DO
+#endif 
               ENDIF
             END DO
           END DO
@@ -1893,16 +2154,50 @@ C...Now do changes in cloudy layers :
      &                                    INCLOUD ( SPC, LAY ) * FRAC
      &                                  + OUTCLOUD( SPC, LAY ) * ( 1.0 - FRAC )
               END IF
+#ifdef sens
+              DO NP = 1, NPMAX
+
+                IF ( POLC( SPC ) .LT. DDM3D_CONCMINL ) THEN
+c                 LMT1  = REAL ( CONCMINL( SPC, LAY ), 8 )
+                  LMT1  = DDM3D_CONCMINL
+                  LMT1D = 0.0D0
+                ELSE
+                  LMT1  = REAL ( POLC( SPC ), 8 )
+                  LMT1D = S_POLC( NP, SPC )
+                END IF
+                S_INCLOUD( NP, SPC, LAY ) = ( (  S_PCLD( NP,SPC,LAY ) * REAL ( CEND( SPC ), 8 )
+     &                                        + REAL ( PCLD( SPC,LAY ), 8 ) * S_CEND( NP,SPC ) )
+     &                                       * LMT1
+     &                                       - REAL ( ( PCLD( SPC,LAY ) * CEND( SPC ) ), 8 ) * LMT1D  )
+     &                                     / ( LMT1**2.0D0)
+                S_OUTCLOUD( NP, SPC, LAY ) = ( S_CCR( NP, SPC, LAY ) - S_PCLD( NP, SPC,LAY ) * REAL( FRAC, 8 ) )
+     &                                     / ( 1.0D0 - REAL ( FRAC, 8 ) )
+                IF ( OUTCLOUD( SPC, LAY ) .EQ. CONCMINL( SPC, LAY ) ) THEN
+                  S_OUTCLOUD( NP, SPC, LAY ) = 0.0D0
+                END IF
+
+                IF ( SPC .NE. N_GC_SPCD ) THEN
+                  SENGRID( COL, ROW, LAY, NP, SPC ) = REAL ( (
+     &                                    S_INCLOUD ( NP, SPC, LAY ) * REAL ( FRAC, 8 )
+     &                                  + S_OUTCLOUD( NP, SPC, LAY ) * ( 1.0D0 - REAL ( FRAC, 8 ) ) ), 4 )
+                END IF
+              END DO
+#endif
             END DO
           END DO
+
         GO TO 301
 
 299     CONTINUE
-        
+
         DO VAR = 1, N_SPC_WDEP+8
           CONV_DEP( COL,ROW,VAR ) = 0.0
         END DO
-          
+
+#ifdef sens
+        S_CONDEP = 0.0D0
+#endif        
+  
 301     CONTINUE        !  end loop on columns COL
 311   CONTINUE        !  end loop on rows    ROW
 
