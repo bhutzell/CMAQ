@@ -235,7 +235,9 @@ C Local Variables:
       REAL :: DENSA_J ( NCOLS,NROWS,NLAYS )  ! Density times Jacobian
       REAL :: TDENSA_J( NCOLS,NROWS,NLAYS )  
 
+#ifndef sens
       REAL :: DENS ( NCOLS,NROWS,NLAYS )     ! Density of air
+#endif
       REAL :: TDENS( NCOLS,NROWS,NLAYS )  
 
       REAL :: TVEMIS( NCOLS,NROWS,NLAYS )
