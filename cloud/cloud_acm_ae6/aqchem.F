@@ -153,13 +153,16 @@ C-----------------------------------------------------------------------
 #ifdef sens
       USE DDM3D_DEFN, ONLY : NP, NPMAX, S_POLC, S_CEND, S_REMOV, S_REMOVAC, S_HPWDEP, S_GAS, S_GASWDEP,
      &                       S_AEROSOL, S_AERWDEP, IHIGH, IPT
-      USE AQCHEM_DDM3D   ! ddm-3d variables 
 #endif 
 
       IMPLICIT NONE
 
       INCLUDE SUBST_CONST          ! constants
       INCLUDE SUBST_RXCMMN         ! Mechanism reaction common block
+
+#ifdef sens
+      INCLUDE 'AQCHEM_DDM3D.EXT'   ! ddm-3d variables 
+#endif
 
       CHARACTER( 120 ) :: XMSG = ' '  ! Exit status message
 
