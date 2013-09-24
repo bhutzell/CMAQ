@@ -160,10 +160,6 @@ C-----------------------------------------------------------------------
       INCLUDE SUBST_CONST          ! constants
       INCLUDE SUBST_RXCMMN         ! Mechanism reaction common block
 
-#ifdef sens
-      INCLUDE 'AQCHEM_DDM3D.EXT'   ! ddm-3d variables 
-#endif
-
       CHARACTER( 120 ) :: XMSG = ' '  ! Exit status message
 
 C...........Parameters:
@@ -440,6 +436,10 @@ C...........External Functions:
 
       INTEGER, SAVE :: LOGDEV
       INTEGER, EXTERNAL :: SETUP_LOGDEV
+
+#ifdef sens
+      INCLUDE 'AQCHEM_DDM3D.EXT'   ! ddm-3d variables 
+#endif
 
 
 C*********************************************************************
