@@ -153,6 +153,7 @@ C-----------------------------------------------------------------------
 #ifdef sens
       USE DDM3D_DEFN, ONLY : NP, NPMAX, S_POLC, S_CEND, S_REMOV, S_REMOVAC, S_HPWDEP, S_GAS, S_GASWDEP,
      &                       S_AEROSOL, S_AERWDEP, IHIGH, IPT
+      USE AQCHEM_DDM3D   ! ddm-3d variables 
 #endif 
 
       IMPLICIT NONE
@@ -437,9 +438,6 @@ C...........External Functions:
       INTEGER, SAVE :: LOGDEV
       INTEGER, EXTERNAL :: SETUP_LOGDEV
 
-#ifdef sens
-      INCLUDE SUBST_AQCHEM_DDM3D   ! ddm-3d variables 
-#endif
 
 C*********************************************************************
 

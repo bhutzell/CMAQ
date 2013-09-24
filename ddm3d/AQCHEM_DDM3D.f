@@ -1,3 +1,4 @@
+      Module AQCHEM_DDM3D
 
 ! Include file with all ddm-3d variables used by aqchem
 
@@ -220,4 +221,6 @@ c     REAL( 8 ) :: S_DTW   ( NPMAX, 0:NUMOX ) ! cloud chemistry timestep (sec)
       REAL( 8 ) :: pwr1
 
       INTEGER IP1, IP2
+
+      End Module AQCHEM_DDM3D
 
