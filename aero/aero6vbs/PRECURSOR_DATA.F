@@ -45,7 +45,7 @@ C    -changed precursor_conc to Real(8)
 C H.Pye 05/22/11: added ALK5RXN to precursor list for SAPRC mechanisms
 C 08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
 C B.Koo 07/04/12: revised for VBS
-C
+C H.Pye 09/24/13: removed full charac blank padding for consistency with J. Young
 C-----------------------------------------------------------------------
 
       Implicit None
@@ -61,48 +61,48 @@ C-----------------------------------------------------------------------
 
       Type ( precursor_type ), Private :: precursor( n_precursor ) = (/
 C                       Name      RxnCounter  Update
-C                    ----------   ----------  ------
-     & precursor_type( 'NO2             ', .False. , .True.  ),
-     & precursor_type( 'N2O5            ', .False. , .True.  ),
-     & precursor_type( 'HNO3            ', .False. , .True.  ),
-     & precursor_type( 'HONO            ', .False. , .True.  ),
-     & precursor_type( 'SULF            ', .False. , .True.  ),
-     & precursor_type( 'SULPRD          ', .True.  , .True.  ),
-     & precursor_type( 'HCL             ', .False. , .True.  ),
-     & precursor_type( 'SV_AVB1         ', .False. , .True.  ),
-     & precursor_type( 'SV_AVB2         ', .False. , .True.  ),
-     & precursor_type( 'SV_AVB3         ', .False. , .True.  ),
-     & precursor_type( 'SV_AVB4         ', .False. , .True.  ),
-     & precursor_type( 'SV_BVB1         ', .False. , .True.  ),
-     & precursor_type( 'SV_BVB2         ', .False. , .True.  ),
-     & precursor_type( 'SV_BVB3         ', .False. , .True.  ),
-     & precursor_type( 'SV_BVB4         ', .False. , .True.  ),
-     & precursor_type( 'SV_PVB1         ', .False. , .True.  ),
-     & precursor_type( 'SV_PVB2         ', .False. , .True.  ),
-     & precursor_type( 'SV_PVB3         ', .False. , .True.  ),
-     & precursor_type( 'SV_PVB4         ', .False. , .True.  ),
-     & precursor_type( 'SV_FVB1         ', .False. , .True.  ),
-     & precursor_type( 'SV_FVB2         ', .False. , .True.  ),
-     & precursor_type( 'SV_FVB3         ', .False. , .True.  ),
-     & precursor_type( 'SV_FVB4         ', .False. , .True.  ),
-     & precursor_type( 'SV_AVB0         ', .True.  , .True.  ),
-     & precursor_type( 'SV_BVB0         ', .True.  , .True.  ),
-     & precursor_type( 'SV_PVB0         ', .True.  , .True.  ),
-     & precursor_type( 'SV_FVB0         ', .True.  , .True.  ),
-     & precursor_type( 'NH3             ', .False. , .True.  ),
-     & precursor_type( 'OH              ', .False. , .False. ) /)
+C                       -------   ----------  ------
+     & precursor_type( 'NO2    ', .False. , .True.  ),
+     & precursor_type( 'N2O5   ', .False. , .True.  ),
+     & precursor_type( 'HNO3   ', .False. , .True.  ),
+     & precursor_type( 'HONO   ', .False. , .True.  ),
+     & precursor_type( 'SULF   ', .False. , .True.  ),
+     & precursor_type( 'SULPRD ', .True.  , .True.  ),
+     & precursor_type( 'HCL    ', .False. , .True.  ),
+     & precursor_type( 'SV_AVB1', .False. , .True.  ),
+     & precursor_type( 'SV_AVB2', .False. , .True.  ),
+     & precursor_type( 'SV_AVB3', .False. , .True.  ),
+     & precursor_type( 'SV_AVB4', .False. , .True.  ),
+     & precursor_type( 'SV_BVB1', .False. , .True.  ),
+     & precursor_type( 'SV_BVB2', .False. , .True.  ),
+     & precursor_type( 'SV_BVB3', .False. , .True.  ),
+     & precursor_type( 'SV_BVB4', .False. , .True.  ),
+     & precursor_type( 'SV_PVB1', .False. , .True.  ),
+     & precursor_type( 'SV_PVB2', .False. , .True.  ),
+     & precursor_type( 'SV_PVB3', .False. , .True.  ),
+     & precursor_type( 'SV_PVB4', .False. , .True.  ),
+     & precursor_type( 'SV_FVB1', .False. , .True.  ),
+     & precursor_type( 'SV_FVB2', .False. , .True.  ),
+     & precursor_type( 'SV_FVB3', .False. , .True.  ),
+     & precursor_type( 'SV_FVB4', .False. , .True.  ),
+     & precursor_type( 'SV_AVB0', .True.  , .True.  ),
+     & precursor_type( 'SV_BVB0', .True.  , .True.  ),
+     & precursor_type( 'SV_PVB0', .True.  , .True.  ),
+     & precursor_type( 'SV_FVB0', .True.  , .True.  ),
+     & precursor_type( 'NH3    ', .False. , .True.  ),
+     & precursor_type( 'OH     ', .False. , .False. ) /)
 
 
 C Required species
-      Character( 16 ), Private, Parameter :: req_NO2    = 'NO2             '
-      Character( 16 ), Private, Parameter :: req_N2O5   = 'N2O5            '
-      Character( 16 ), Private, Parameter :: req_HNO3   = 'HNO3            '
-      Character( 16 ), Private, Parameter :: req_HONO   = 'HONO            '
-      Character( 16 ), Private, Parameter :: req_SULF   = 'SULF            '
-      Character( 16 ), Private, Parameter :: req_SULPRD = 'SULPRD          '
-      Character( 16 ), Private, Parameter :: req_HCL    = 'HCL             '
-      Character( 16 ), Private, Parameter :: req_NH3    = 'NH3             '
-      Character( 16 ), Private, Parameter :: req_OH     = 'OH              '
+      Character( 16 ), Private, Parameter :: req_NO2    = 'NO2'
+      Character( 16 ), Private, Parameter :: req_N2O5   = 'N2O5'
+      Character( 16 ), Private, Parameter :: req_HNO3   = 'HNO3'
+      Character( 16 ), Private, Parameter :: req_HONO   = 'HONO'
+      Character( 16 ), Private, Parameter :: req_SULF   = 'SULF'
+      Character( 16 ), Private, Parameter :: req_SULPRD = 'SULPRD'
+      Character( 16 ), Private, Parameter :: req_HCL    = 'HCL'
+      Character( 16 ), Private, Parameter :: req_NH3    = 'NH3'
+      Character( 16 ), Private, Parameter :: req_OH     = 'OH'
 
 C Indices of required species
       Integer :: NO2_idx

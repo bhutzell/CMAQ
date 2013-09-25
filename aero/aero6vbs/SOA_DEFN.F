@@ -42,6 +42,7 @@ C               BNZ, TOL, XYL numbers now match Ng et al. 2007 Atmos. Chem. Phys
 C 08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
 C BK  11/08/12 Revised for VBS
 C BK  09/20/13 Added alternate initial guess scheme for NEWT
+C HP  09/24/13 Removed extra spaces, modified alignment
 C-----------------------------------------------------------------------
       Implicit None
 
@@ -60,24 +61,25 @@ C-----------------------------------------------------------------------
       End Type vapor_type
 
       Type( vapor_type ), Parameter :: vaporspc( n_vapor ) = (/
-C                        Name           Alpha    CStar     Enth       SOA Name    Origin  Decay     Drog Name
-C                  ----------------    -------  --------  -------  ----------------   --   ----   ----------------
-     & vapor_type('SV_AVB1         ',  0.0,      1.0,     35.0E3, 'A_AVB1J         ', 'A',  0.0, 'DUMMY           '),
-     & vapor_type('SV_AVB2         ',  0.0,     10.0,     35.0E3, 'A_AVB2J         ', 'A',  0.0, 'DUMMY           '),
-     & vapor_type('SV_AVB3         ',  0.0,    100.0,     35.0E3, 'A_AVB3J         ', 'A',  0.0, 'DUMMY           '),
-     & vapor_type('SV_AVB4         ',  0.0,   1000.0,     35.0E3, 'A_AVB4J         ', 'A',  0.0, 'DUMMY           '),
-     & vapor_type('SV_BVB1         ',  0.0,      1.0,     35.0E3, 'A_BVB1J         ', 'B',  0.0, 'DUMMY           '),
-     & vapor_type('SV_BVB2         ',  0.0,     10.0,     35.0E3, 'A_BVB2J         ', 'B',  0.0, 'DUMMY           '),
-     & vapor_type('SV_BVB3         ',  0.0,    100.0,     35.0E3, 'A_BVB3J         ', 'B',  0.0, 'DUMMY           '),
-     & vapor_type('SV_BVB4         ',  0.0,   1000.0,     35.0E3, 'A_BVB4J         ', 'B',  0.0, 'DUMMY           '),
-     & vapor_type('SV_PVB1         ',  0.0,      1.0,     85.0E3, 'A_PVB1J         ', 'A',  0.0, 'DUMMY           '),
-     & vapor_type('SV_PVB2         ',  0.0,     10.0,     74.0E3, 'A_PVB2J         ', 'A',  0.0, 'DUMMY           '),
-     & vapor_type('SV_PVB3         ',  0.0,    100.0,     63.0E3, 'A_PVB3J         ', 'A',  0.0, 'DUMMY           '),
-     & vapor_type('SV_PVB4         ',  0.0,   1000.0,     52.0E3, 'A_PVB4J         ', 'A',  0.0, 'DUMMY           '),
-     & vapor_type('SV_FVB1         ',  0.0,      1.0,     85.0E3, 'A_FVB1J         ', 'F',  0.0, 'DUMMY           '),
-     & vapor_type('SV_FVB2         ',  0.0,     10.0,     74.0E3, 'A_FVB2J         ', 'F',  0.0, 'DUMMY           '),
-     & vapor_type('SV_FVB3         ',  0.0,    100.0,     63.0E3, 'A_FVB3J         ', 'F',  0.0, 'DUMMY           '),
-     & vapor_type('SV_FVB4         ',  0.0,   1000.0,     52.0E3, 'A_FVB4J         ', 'F',  0.0, 'DUMMY           ')/)
+C                   Name       Alpha    CStar     Enth     SOA           Decay  Drog
+C                                                          Name   Origin        Name
+C                  -------    -------  --------  -------  ------    --  ----   ------
+     & vapor_type('SV_AVB1',     0.0,      1.0,  35.0E3, 'A_AVB1J', 'A', 0.0, 'DUMMY'),
+     & vapor_type('SV_AVB2',     0.0,     10.0,  35.0E3, 'A_AVB2J', 'A', 0.0, 'DUMMY'),
+     & vapor_type('SV_AVB3',     0.0,    100.0,  35.0E3, 'A_AVB3J', 'A', 0.0, 'DUMMY'),
+     & vapor_type('SV_AVB4',     0.0,   1000.0,  35.0E3, 'A_AVB4J', 'A', 0.0, 'DUMMY'),
+     & vapor_type('SV_BVB1',     0.0,      1.0,  35.0E3, 'A_BVB1J', 'B', 0.0, 'DUMMY'),
+     & vapor_type('SV_BVB2',     0.0,     10.0,  35.0E3, 'A_BVB2J', 'B', 0.0, 'DUMMY'),
+     & vapor_type('SV_BVB3',     0.0,    100.0,  35.0E3, 'A_BVB3J', 'B', 0.0, 'DUMMY'),
+     & vapor_type('SV_BVB4',     0.0,   1000.0,  35.0E3, 'A_BVB4J', 'B', 0.0, 'DUMMY'),
+     & vapor_type('SV_PVB1',     0.0,      1.0,  85.0E3, 'A_PVB1J', 'A', 0.0, 'DUMMY'),
+     & vapor_type('SV_PVB2',     0.0,     10.0,  74.0E3, 'A_PVB2J', 'A', 0.0, 'DUMMY'),
+     & vapor_type('SV_PVB3',     0.0,    100.0,  63.0E3, 'A_PVB3J', 'A', 0.0, 'DUMMY'),
+     & vapor_type('SV_PVB4',     0.0,   1000.0,  52.0E3, 'A_PVB4J', 'A', 0.0, 'DUMMY'),
+     & vapor_type('SV_FVB1',     0.0,      1.0,  85.0E3, 'A_FVB1J', 'F', 0.0, 'DUMMY'),
+     & vapor_type('SV_FVB2',     0.0,     10.0,  74.0E3, 'A_FVB2J', 'F', 0.0, 'DUMMY'),
+     & vapor_type('SV_FVB3',     0.0,    100.0,  63.0E3, 'A_FVB3J', 'F', 0.0, 'DUMMY'),
+     & vapor_type('SV_FVB4',     0.0,   1000.0,  52.0E3, 'A_FVB4J', 'F', 0.0, 'DUMMY')/)
 
 C Required species
       Character( 16 ), Private, Parameter :: req_aeorgc  = 'AORGC           '
@@ -102,13 +104,13 @@ C   This default orgprod table is for CB05, parent names are changed in subrouti
 C   extract_soa for the SAPRC99 and SAPRC07T mechanisms
 C
       Type( orgprod_type ), Save      :: orgprod( n_orgprod ) = (/
-C                          Name                Parent             Aerospc        AlphaH
-C                     ----------------    ----------------    ----------------   ------ 
-     & orgprod_type( 'DUMMY           ', 'DUMMY           ', '                ', 0.000 ),
-     & orgprod_type( 'SV_AVB0         ', 'SV_AVB0         ', 'A_AVB0J         ', 1.000 ),
-     & orgprod_type( 'SV_BVB0         ', 'SV_BVB0         ', 'A_BVB0J         ', 1.000 ),
-     & orgprod_type( 'SV_PVB0         ', 'SV_PVB0         ', 'A_PVB0J         ', 1.000 ),
-     & orgprod_type( 'SV_FVB0         ', 'SV_FVB0         ', 'A_FVB0J         ', 1.000 ) /)
+C                      Name      Parent     Aerospc  AlphaH
+C                     -------    -------    ------   ------ 
+     & orgprod_type( 'DUMMY  ', 'DUMMY  ', '       ', 0.000 ),
+     & orgprod_type( 'SV_AVB0', 'SV_AVB0', 'A_AVB0J', 1.000 ),
+     & orgprod_type( 'SV_BVB0', 'SV_BVB0', 'A_BVB0J', 1.000 ),
+     & orgprod_type( 'SV_PVB0', 'SV_PVB0', 'A_PVB0J', 1.000 ),
+     & orgprod_type( 'SV_FVB0', 'SV_FVB0', 'A_FVB0J', 1.000 ) /)
 
 
       Real    :: orgprod_mw     ( n_orgprod )  ! Mol weight of reactive organic gases
@@ -183,16 +185,16 @@ C define orgprod parent names based on mechanism dependence
 
 cvbs            If ( INDEX( MECHNAME, 'SAPRC99' ) .GT. 0 ) then
 cvbs               alk_factor = 0.57    ! fraction of ALK5 that can produce SOA
-cvbs               orgprod( 2 )%parent = 'ARO2            '
-cvbs               orgprod( 3 )%parent = 'ARO2            '
-cvbs               orgprod( 4 )%parent = 'ARO1            '
-cvbs               orgprod( 5 )%parent = 'ARO1            '
+cvbs               orgprod( 2 )%parent = 'ARO2'
+cvbs               orgprod( 3 )%parent = 'ARO2'
+cvbs               orgprod( 4 )%parent = 'ARO1'
+cvbs               orgprod( 5 )%parent = 'ARO1'
 cvbs            Else If ( INDEX( MECHNAME, 'SAPRC07T' ) .GT. 0 ) then
 cvbs               alk_factor = 0.57    ! fraction of ALK5 that can produce SOA
-cvbs               orgprod( 2 )%parent = 'MXYL            '
-cvbs               orgprod( 3 )%parent = 'MXYL            '
-cvbs               orgprod( 4 )%parent = 'TOLUENE         '
-cvbs               orgprod( 5 )%parent = 'TOLUENE         '
+cvbs               orgprod( 2 )%parent = 'MXYL'
+cvbs               orgprod( 3 )%parent = 'MXYL'
+cvbs               orgprod( 4 )%parent = 'TOLUENE'
+cvbs               orgprod( 5 )%parent = 'TOLUENE'
 cvbs            Else
                xmsg =  'Mechanism ' // MECHNAME
      &              // ' is not supported in this version of the model'
