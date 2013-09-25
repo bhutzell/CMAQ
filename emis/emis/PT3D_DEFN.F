@@ -46,6 +46,7 @@ C                                STATCOL and STRTROw in the west and south direc
 C     29 Oct 2011 J.Young: fix domain windowing
 C     30 Apr 2012 C.Nolte: fix number of substeps, NTICS to be the number of
 C                          synchronization time steps rather than the number of seconds. 
+C     20 Sep 2013 B.Koo: Revised for VBS (POC <- POC + NCOM)
 
 C-----------------------------------------------------------------------
 
@@ -766,6 +767,7 @@ C Local variables:
          INTEGER          IOS        ! i/o and allocate memory status
          INTEGER          L, S, V    ! counters
          INTEGER          C, R, I, J, K, N
+         INTEGER          IDX_POC, IDX_NCOM
 
          INTEGER, SAVE :: WSTEP = 0
          INTEGER          WDATE, WTIME
@@ -865,8 +867,11 @@ C Ensure that the model and stack groups emissions timestamp dates stay synchron
                LOC_STKDATE = STKDATE( N )
             END IF
 
+            IDX_POC = 0; IDX_NCOM = 0
             DO V = 1, NVARS_EMIS( N )
                VNAME = STKSPC( N )%ARRY( V )
+               IF ( VNAME.EQ.'POC'   ) IDX_POC  = V
+               IF ( VNAME.EQ.'PNCOM' ) IDX_NCOM = V
                IF ( .NOT. INTERPX( STKENAME( N ), VNAME, PNAME,
      &                             1,1, MY_STRT_SRC( N ),MY_END_SRC( N ), 1,1,
 !    &                             STKDATE( N ), JTIME,
@@ -877,6 +882,8 @@ C Ensure that the model and stack groups emissions timestamp dates stay synchron
                   CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
                END IF
             END DO
+            IF ( IDX_POC.NE.0 .AND. IDX_NCOM.NE.0 ) STKEMIS(N)%ARRY(:,IDX_POC) ! POC <- POC + NCOM
+     &               = STKEMIS(N)%ARRY(:,IDX_POC) + STKEMIS(N)%ARRY(:,IDX_NCOM)
 
             IF ( FIREFLAG( N ) ) THEN
                DO V = 1, NVARS_FIRE

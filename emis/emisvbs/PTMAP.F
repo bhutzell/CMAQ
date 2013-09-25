@@ -37,6 +37,7 @@ C   17 Sep 09 B.Hutzell: extended mapping algorithm to allow multiple usage
 C                        of an emission species from an individual source  
 C    6 Apr 11 S.Howard: replace Module PMEM_DEFN with AERO_DATA
 C    8 Sep 12 B.Koo: revised for VBS
+C   20 Sep 13 B.Koo: POA_OP <- POC (= POC + NCOM)
 C-----------------------------------------------------------------------
 
       USE UDTYPES, ONLY: IARRY1, CARRY1 ! implementation for multiple
@@ -486,11 +487,11 @@ C point source emissions to PM species map
                VNAME = AEROSPC( K )%EMIS
                IDX = INDEX1( VNAME, NVARS_EMIS( N ), STKSPC( N )%ARRY )
 cvbs=> special case for VBS emissions
-c              if not VBS-ready, look for POA instead of POA_OP and ignore POA_BB
+c              if not VBS-ready, look for POC instead of POA_OP and ignore POA_BB
 c              no need to look for POA_GV and POA_DV as point source files won't have them
                if ( .not. VBS_READY_FLAG ) then
                   if ( VNAME .eq. 'POA_OP' ) then
-                     VNAME = 'POA'
+                     VNAME = 'POC'
                      IDX = INDEX1( VNAME, NVARS_EMIS( N ), STKSPC( N )%ARRY )
                   else if ( VNAME .eq. 'POA_BB' ) then
                      IDX = 0
@@ -564,11 +565,11 @@ C Check that the PM species names match EMIS_1
                   K = PMEM_MAP( I )
                   IDX = INDEX1( AEROSPC( K )%EMIS, STKPM_VAR( N )%LEN, STKPM_VAR( N )%ARRY )
 cvbs=> special case for VBS emissions
-c                 if not VBS-ready, look for POA instead of POA_OP and ignore POA_BB
+c                 if not VBS-ready, look for POC instead of POA_OP and ignore POA_BB
 c                 no need to look for POA_GV and POA_DV as point source files won't have them
                   if ( .not. VBS_READY_FLAG ) then
                      if ( AEROSPC( K )%EMIS .eq. 'POA_OP' ) then
-                        IDX = INDEX1( 'POA', STKPM_VAR( N )%LEN, STKPM_VAR( N )%ARRY )
+                        IDX = INDEX1( 'POC', STKPM_VAR( N )%LEN, STKPM_VAR( N )%ARRY )
                      else if ( AEROSPC( K )%EMIS .eq. 'POA_BB' ) then
                         IDX = 0
                      end if

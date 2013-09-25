@@ -66,6 +66,7 @@ C   18 Aug 11 David Wong: In the merge inline point source PM species calculatio
 C                         arrays EMBUFF and PMEMIS_PT have incorrect index values
 C   08 Sep 12 Bonyoung Koo: revised for VBS
 C   17 Apr 13 J.Young: replace "SPFC ASO4" (found by Havala Pye) with "SPFC_ASO4"
+C   20 Sep 13 Bonyoung Koo: POA_OP <- POC (= POC + NCOM)
 
 C-----------------------------------------------------------------------
 
@@ -699,15 +700,22 @@ cvbs=> special case for VBS emissions
                      end do
                      end do
                   else
-                     if ( .NOT. INTERPX( EMIS_1, 'POA', PNAME,
+                     if ( .NOT. INTERPX( EMIS_1, 'POC', PNAME,
      &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,1,
      &                                   JDATE, JTIME, EMBUFF( 1,1,1,S ) ) ) then
                         XMSG = 'Could not read POA from ' // EMIS_1
                         CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
                      end if
+                     if ( .NOT. INTERPX( EMIS_1, 'PNCOM', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,1,
+     &                                   JDATE, JTIME, EM_POA_OP ) ) then
+                        XMSG = 'Could not read PNCOM from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
                      do R = 1, MY_NROWS
                      do C = 1, MY_NCOLS
-                        EMBUFF( C,R,1,S ) = EMBUFF( C,R,1,S ) * POA_OP_EF( AEROSPC( IDX )%VBS_BIN )
+                        EMBUFF( C,R,1,S ) = ( EMBUFF( C,R,1,S ) + EM_POA_OP( C,R,1 ) )
+     &                                                         * POA_OP_EF( AEROSPC( IDX )%VBS_BIN )
                      end do
                      end do
                   end if
@@ -820,16 +828,23 @@ cvbs=> special case for VBS emissions
                      end do
                      end do
                   else
-                     if ( .NOT. INTERPX( EMIS_1, 'POA', PNAME,
+                     if ( .NOT. INTERPX( EMIS_1, 'POC', PNAME,
      &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,PM_EMLYRS,
      &                                   JDATE, JTIME, EMBUFF( 1,1,1,S ) ) ) then
                         XMSG = 'Could not read POA from ' // EMIS_1
                         CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
                      end if
+                     if ( .NOT. INTERPX( EMIS_1, 'PNCOM', PNAME,
+     &                                   STARTCOL,ENDCOL, STARTROW,ENDROW, 1,PM_EMLYRS,
+     &                                   JDATE, JTIME, EM_POA_OP ) ) then
+                        XMSG = 'Could not read PNCOM from ' // EMIS_1
+                        CALL M3WARN ( PNAME, JDATE, JTIME, XMSG  )
+                     end if
                      do L = 1, PM_EMLYRS
                      do R = 1, MY_NROWS
                      do C = 1, MY_NCOLS
-                        EMBUFF( C,R,L,S ) = EMBUFF( C,R,L,S ) * POA_OP_EF( AEROSPC( IDX )%VBS_BIN )
+                        EMBUFF( C,R,L,S ) = ( EMBUFF( C,R,L,S ) + EM_POA_OP( C,R,L ) )
+     &                                                         * POA_OP_EF( AEROSPC( IDX )%VBS_BIN )
                      end do
                      end do
                      end do

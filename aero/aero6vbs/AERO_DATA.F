@@ -50,6 +50,7 @@ C JY  04/21/11 Added optional log messages (verbose)
 C JY  05/02/11 Added Reshape to aerospc_ssf initialization for pgf90 compiler
 C JY  06/08/12 remove full character blank padding put in for GNU Fortran (GCC) 4.1.2
 C BK  10/18/12 Revised for VBS (POA emission split factors set here)
+C BK  09/20/13 Revised to support non-VBS-ready emissions (POC)
 C----------------------------------------------------------------------
 
       Implicit None
@@ -228,12 +229,12 @@ C VBS_READY_FLAG
 
 C POA_?? Emission Split Factors
       Integer, Parameter :: N_VBS_BIN = 5
-      ! Low IVOC Case
+      ! No SVOC Case
       !Real, Parameter :: POA_GV_EF(N_VBS_BIN) = (/0.09,0.09,0.14,0.18,0.5/)
       !Real, Parameter :: POA_DV_EF(N_VBS_BIN) = (/0.09,0.09,0.14,0.18,0.5/)
       !Real, Parameter :: POA_OP_EF(N_VBS_BIN) = (/0.09,0.09,0.14,0.18,0.5/)
       !Real, Parameter :: POA_BB_EF(N_VBS_BIN) = (/0.09,0.09,0.14,0.18,0.5/)
-      ! High IVOC/SVOC Case
+      ! High SVOC Case
       Real, Parameter :: POA_GV_EF(N_VBS_BIN) = (/0.40,0.26,0.40,0.51,1.43/)
       Real, Parameter :: POA_DV_EF(N_VBS_BIN) = (/0.40,0.26,0.40,0.51,1.43/)
       Real, Parameter :: POA_OP_EF(N_VBS_BIN) = (/0.40,0.26,0.40,0.51,1.43/)
@@ -587,11 +588,11 @@ C are the same and set pmem_units
             indx = index1( aerospc( v )%emis, nvars3d, vname3d )
 cvbs=> special case for VBS emissions
             if ( aerospc( v )%emis .EQ. 'POA_OP' ) then
-               if ( indx .le. 0 ) then          ! if no POA_OP then must have POA instead
+               if ( indx .le. 0 ) then          ! if no POA_OP then must have POC instead
                   VBS_READY_FLAG = .false.
-                  indx = index1( 'POA', nvars3d, vname3d )
+                  indx = index1( 'POC', nvars3d, vname3d )
                   if ( indx .le. 0 ) then
-                     xmsg1 = Trim( xmsg1 ) // crlf() // blank10 // 'POA_OP & POA'
+                     xmsg1 = Trim( xmsg1 ) // crlf() // blank10 // 'POA_OP & POC'
                      found = .False.
                      Cycle
                   end if

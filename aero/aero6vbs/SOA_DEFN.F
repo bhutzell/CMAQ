@@ -41,6 +41,7 @@ C HP  07/24/11 Changed aromatic SOA alphas for consistency with updated reaction
 C               BNZ, TOL, XYL numbers now match Ng et al. 2007 Atmos. Chem. Phys.
 C 08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
 C BK  11/08/12 Revised for VBS
+C BK  09/20/13 Added alternate initial guess scheme for NEWT
 C-----------------------------------------------------------------------
       Implicit None
 
@@ -743,13 +744,15 @@ C Variables used in equilibrium partitioning calculations
                              ! converged to a spurious root
 
 C Subset variables for the solver
-      Integer n_vap_sub
+      Integer, Parameter :: loop_imax = 5
+      Integer n_vap_sub,loop_i
       Integer idx_sub(n_vapor)
       Real, Parameter :: thresh_sub = 1.0E-06
       Real invmw_sub(n_vapor)
-      Real caer_sub(n_vapor)
+      Real caer_sub(n_vapor),caer_sub_sav(n_vapor)
       Real ctot_sub(n_vapor)
       Real c0_sub(n_vapor)
+      Real totorg_sav,deltot,deltot_sav
 
 C Variables for updating 2nd and 3rd moments
       Real old_m3  ! initial 3rd moment minus nonvol SOA [ mom/m3 ]
@@ -918,8 +921,40 @@ C Try again with initial guess of 50/50 gas/aerosol split.
             Call newt( layer, caer_sub, n_vap_sub, check,
      &                 ctot_sub, c0_sub, invmw_sub, totorgsw )
             If ( check ) Then
-               Write( xmsg,'( A,I4 )' ) ' *** Problem in NEWT at Layer = ', layer
-               Call m3exit( pname, 0, 0, xmsg, xstat3 )
+C Try one more time with different initial guess
+               totorg_sav = totorg ! save total org mass at t = 0
+               totorg = totorgsw
+               Do i = 1, n_vap_sub
+                  caer_sub(i) = caer(idx_sub(i)) ! original initial guess
+                  totorg = totorg + caer_sub(i) * invmw_sub(i)
+               End Do
+               deltot = ABS(totorg - totorg_sav) ! delta by the initial guess
+
+               Do loop_i = 1, loop_imax
+                  deltot_sav = deltot ! save delta
+                  totorg_sav = totorg ! save tot org mass
+                  totorg = totorgsw
+                  Do i = 1, n_vap_sub
+                     caer_sub_sav(i) = caer_sub(i) ! save the previous initial guess
+                     caer_sub(i) = ctot_sub(i) * totorg_sav /  ! new initial guess
+     &                         ( totorg_sav + c0_sub(i) * invmw_sub(i) )
+                     totorg = totorg + caer_sub(i) * invmw_sub(i)
+                  End Do
+                  deltot = ABS(totorg - totorg_sav) ! delta by the new initial guess
+                  if ( deltot .ge. deltot_sav ) then ! continue the loop if delta decreases
+                     Do i = 1, n_vap_sub
+                        caer_sub(i) = caer_sub_sav(i)
+                     End Do
+                     EXIT
+                  endif
+               End Do
+
+               Call newt( layer, caer_sub, n_vap_sub, check,
+     &                    ctot_sub, c0_sub, invmw_sub, totorgsw )
+               If ( check ) Then
+                  Write( xmsg,'( A,I4 )' ) ' *** Problem in NEWT at Layer = ', layer
+                  Call m3exit( pname, 0, 0, xmsg, xstat3 )
+               End If
             End If
          End If
 
