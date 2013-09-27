@@ -105,7 +105,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       USE CGRID_SPCS
 
 #ifdef sens
-      USE DDM3D_DEFN, ONLY : NP, NPMAX, SENGRID, WRFLAG
+      USE DDM3D_DEFN, ONLY : NP, NPMAX, SENGRID
       Use aero6_ddm3d, ONLY : s_so4rate, s_precursor_conc, s_aerospc_conc
 #endif 
 
@@ -404,13 +404,6 @@ C *** initialize conc arrays
       DO L = 1, NLAYS
          DO R = 1, MY_NROWS
             DO C = 1, MY_NCOLS
-
-c           IF ( C .EQ. 5 .AND. R .EQ. 13 .AND. L .EQ. 24 ) THEN
-c              WRFLAG = .TRUE.
-c              write(logdev,*) " BEGIN AERO6: C=",C,"R=",R,"L=",L
-c           ELSE
-c              WRFLAG = .FALSE.
-c           ENDIF
 
 C *** Grid cell meteorological data.
                AIRTEMP  = TA   ( C,R,L )

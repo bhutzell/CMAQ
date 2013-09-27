@@ -1,7 +1,29 @@
+
+!------------------------------------------------------------------------!
+!  The Community Multiscale Air Quality (CMAQ) system software is in     !
+!  continuous development by various groups and is based on information  !
+!  from these groups: Federal Government employees, contractors working  !
+!  within a United States Government contract, and non-Federal sources   !
+!  including research institutions.  These groups give the Government    !
+!  permission to use, prepare derivative works of, and distribute copies !
+!  of their work in the CMAQ system to the public and to permit others   !
+!  to do so.  The United States Environmental Protection Agency          !
+!  therefore grants similar permission to use the CMAQ system software,  !
+!  but users are requested to provide copies of derivative works or      !
+!  products designed to operate in the CMAQ system to the United States  !
+!  Government without restrictions as to use by others.  Software        !
+!  that is used with the CMAQ system but distributed under the GNU       !
+!  General Public License or the GNU Lesser General Public License is    !
+!  subject to their copyright restrictions.                              !
+!------------------------------------------------------------------------!
+
 C ===================================================================
 C This subroutine calculates first-order sensitivity of ISORROPIAII
 C 
 C Written by Wenxian Zhang in August 2011
+C
+C 27 September 2013: Sergey L. Napelenok 
+C    --- implemented into CMAQv5.0.2
 C
 C Reference: 
 C Zhang, W., Capps, S. L., Hu, Y., Nenes, A., Napelenok, S. L., & 
@@ -13,8 +35,6 @@ C     doi: 10.5194/gmd-5-355-2012
 C ===================================================================
 
       SUBROUTINE DDMSENS(STOT,SENS,SENSD,SCASI)
-
-      USE UTILIO_DEFN
 
       INCLUDE 'isrpia.inc'
       INCLUDE 'ddmisrpia.inc'
@@ -28,20 +48,17 @@ C ===================================================================
       DOUBLE PRECISION COEF(NSEN,NSEN)        ! COEFFICIENT MATRIX 
       DOUBLE PRECISION DGAMA(NIONSPC,NPAIR)   ! dGAMA/dA
     
-      INTEGER, SAVE :: LOGDEV
-      LOGICAL, SAVE :: FIRSTIME = .TRUE.
+c     INTEGER, SAVE :: LOGDEV
+c     LOGICAL, SAVE :: FIRSTIME = .TRUE.
 
-
-      IF ( FIRSTIME ) THEN
-         FIRSTIME = .FALSE.
-         LOGDEV = INIT3 ()
-      ENDIF
+c     IF ( FIRSTIME ) THEN
+c        FIRSTIME = .FALSE.
+c        LOGDEV = INIT3 ()
+c     ENDIF
       
       CC = SCASI(1:1)
 
 C *** INITIALIZE SINI ***
-
-c     write(logdev,*) "CC=",CC,SCASI
 
       DO I = 1,NSEN
          SINI(I) = 0.0D0
@@ -110,7 +127,6 @@ C *** END OF DDMSENS ***
       RETURN
       END
 
-
 C ============================================================================
 C SET FLAGS FOR MATRIX SUBSTRACTION
 C ============================================================================
@@ -120,8 +136,6 @@ C ============================================================================
       INCLUDE 'ddmisrpia.inc'
 
       INTEGER FROW(NSEN),FCOL(NSEN)
-      
-
       
 C *** CLEAR FLAGS ***
  
@@ -226,12 +240,6 @@ C *** CLEAR FLAGS ***
          FCOL(jHSO4)  = 1
          FCOL(jNA)    = 1
 
-c sln 5sep2013
-         IF(MOLALD(jH).EQ.ZERO)THEN
-           FROW(IK1) = 0
-           FCOL(jH) = 0
-         ENDIF
-
       ELSEIF (CC.EQ.'K'.OR.CC.EQ.'L') THEN
         
          FROW(iK1)    = 1
@@ -251,18 +259,6 @@ c sln 5sep2013
          FCOL(jNA)    = 1
          FCOL(jK)     = 1
          FCOL(jMG)    = 1
-
-         IF(MOLALD(jH).LT.TINY)THEN
-           FROW(IK1) = 0
-           FCOL(jHSO4) = 0
-         ENDIF
-
-c        IF(CC.EQ.'L'.AND.MOLALD(jHSO4).EQ.ZERO)THEN
-c        IF((CC.EQ.'L'.OR.CC.EQ.'K').AND.MOLALD(jHSO4).EQ.ZERO)THEN
-         IF(MOLALD(jHSO4).EQ.ZERO)THEN
-           FROW(IK1) = 0
-           FCOL(jHSO4) = 0
-         ENDIF
 
       ELSEIF (CC.EQ.'O'.OR.CC.EQ.'M'.OR.
      &        CC.EQ.'P') THEN
@@ -294,6 +290,17 @@ c        IF((CC.EQ.'L'.OR.CC.EQ.'K').AND.MOLALD(jHSO4).EQ.ZERO)THEN
          FCOL(jMG)    = 1
 
       ENDIF    
+
+c sln 25sep2013
+      IF(MOLALD(jHSO4).LT.TINY)THEN
+        FROW(IK1) = 0
+        FCOL(jHSO4) = 0
+      ENDIF
+
+      IF(MOLALD(jH).LT.TINY)THEN
+         FROW(IK1) = 0
+         FCOL(jHSO4) = 0
+       ENDIF
 
 c     FROW(iZSR)   = 0  ! set to ignore water
 c     FCOL(jH2O)   = 0  ! set to ignore water
@@ -849,9 +856,7 @@ C =============================================================================
 
       SUBROUTINE AMAT(AM,FROW,FCOL,DGAMA)
 
-c     USE UTILIO_DEFN
-
-c     implicit none
+      USE UTILIO_DEFN
 
       INCLUDE 'isrpia.inc'
       INCLUDE 'ddmisrpia.inc'
@@ -1238,11 +1243,11 @@ c     ENDIF
 
       iEQ = iCB
       IF(MOLALD(jH).LT.TINY) THEN
-      AM(iEQ,jH)    =  1.
-      AM(iEQ,jH2O)  =  0
+         AM(iEQ,jH)    =  1.
+         AM(iEQ,jH2O)  =  0
       ELSE
-      AM(iEQ,jH)    =  1. + XKW*RH*(WATER/MOLALD(jH))**2.
-      AM(iEQ,jH2O)  = -2.*XKW*RH*WATER/MOLALD(jH)
+         AM(iEQ,jH)    =  1. + XKW*RH*(WATER/MOLALD(jH))**2.
+         AM(iEQ,jH2O)  = -2.*XKW*RH*WATER/MOLALD(jH)
       ENDIF
 
       AM(iEQ,jNA)   =  1.
@@ -1255,9 +1260,7 @@ c     ENDIF
       AM(iEQ,jCL)   = -1.
       AM(iEQ,jNO3)  = -1.
 
-
       iEQ = iZSR
-c     CALL DZSR(AM(iEQ,:))
 
       DO I = 1, NSEN
          AM_TEMP(I) = AM(iEQ,I)

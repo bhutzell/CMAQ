@@ -993,7 +993,6 @@ C...don't allow aerosol concentrations to go below zero
           END DO
         END IF
 
-
         IF ( ORGC .EQ. 0.0D0 ) THEN
           DO NP = 1, NPMAX
             S_ORGC( NP ) = 0.0D0
@@ -1529,9 +1528,8 @@ C...load the liquid concentration array with current values
         LIQUID( LMNACCL   ) = MNACC   ! AE6 - SLN 22March2011
 
 #ifdef sens
+        S_LIQUID = 0.0D0
         DO NP = 1, NPMAX
-          S_LIQUID = 0.0D0
-
 c         S_LIQUID( NP, LACL      ) = S_AC( NP )    
           S_LIQUID( NP, LNH4ACCL  ) = S_NH4ACC( NP) 
           S_LIQUID( NP, LCACORL   ) = S_CACOR( NP )
@@ -2158,17 +2156,17 @@ C...gas concentrations (mol/molV)
 #ifdef sens
       DO NP = 1, NPMAX
         S_GAS( NP, LSO2   ) = ( S_PSO2F( NP )  + XL *  S_SIV( NP ) )   * RECIPAP1
-        S_GAS( NP, LH2O2  ) = ( S_PH2O2F( NP ) + XL *  S_H2O2L( NP ) ) * RECIPAP1
-        S_GAS( NP, LO3    ) = ( S_PO3F( NP )   + XL *  S_O3L( NP ) )   * RECIPAP1
-        S_GAS( NP, LCO2   ) = ( S_PCO2F( NP )  + XL *  S_CO2L( NP ) )  * RECIPAP1
-        S_GAS( NP, LFOA   ) = ( S_PFOAF( NP )  + XL * ( S_FOAL( NP ) + S_HCO2( NP ) ) ) * RECIPAP1
-        S_GAS( NP, LMHP   ) = ( S_PMHPF( NP )  + XL *  S_MHPL( NP ) )  * RECIPAP1
-        S_GAS( NP, LPAA   ) = ( S_PPAAF( NP )  + XL *  S_PAAL( NP ) )  * RECIPAP1
-        S_GAS( NP, LHCL   ) = ( S_PHCLF( NP )  + XL *  S_HCLL( NP ) )  * RECIPAP1
-        S_GAS( NP, LGLY   ) = ( S_PGLYF( NP )  + XL *  S_GLYL( NP ) )  * RECIPAP1
-        S_GAS( NP, LMGLY  ) = ( S_PMGLYF( NP ) + XL *  S_MGLYL( NP ))  * RECIPAP1
-        S_GAS( NP, LNH3   ) = S_FNH3( NP )  * S_TOTAMM( NP )
-        S_GAS( NP, LHNO3  ) = S_FHNO3( NP ) * S_TOTNIT( NP )
+c       S_GAS( NP, LH2O2  ) = ( S_PH2O2F( NP ) + XL *  S_H2O2L( NP ) ) * RECIPAP1
+c       S_GAS( NP, LO3    ) = ( S_PO3F( NP )   + XL *  S_O3L( NP ) )   * RECIPAP1
+c       S_GAS( NP, LCO2   ) = ( S_PCO2F( NP )  + XL *  S_CO2L( NP ) )  * RECIPAP1
+c       S_GAS( NP, LFOA   ) = ( S_PFOAF( NP )  + XL * ( S_FOAL( NP ) + S_HCO2( NP ) ) ) * RECIPAP1
+c       S_GAS( NP, LMHP   ) = ( S_PMHPF( NP )  + XL *  S_MHPL( NP ) )  * RECIPAP1
+c       S_GAS( NP, LPAA   ) = ( S_PPAAF( NP )  + XL *  S_PAAL( NP ) )  * RECIPAP1
+c       S_GAS( NP, LHCL   ) = ( S_PHCLF( NP )  + XL *  S_HCLL( NP ) )  * RECIPAP1
+c       S_GAS( NP, LGLY   ) = ( S_PGLYF( NP )  + XL *  S_GLYL( NP ) )  * RECIPAP1
+c       S_GAS( NP, LMGLY  ) = ( S_PMGLYF( NP ) + XL *  S_MGLYL( NP ))  * RECIPAP1
+c       S_GAS( NP, LNH3   ) = S_FNH3( NP )  * S_TOTAMM( NP )
+c       S_GAS( NP, LHNO3  ) = S_FHNO3( NP ) * S_TOTNIT( NP )
         S_GAS( NP, LN2O5  ) = 0.0D0 ! assume all into aerosol
         S_GAS( NP, LH2SO4 ) = 0.0D0 ! assume all into aerosol
       END DO

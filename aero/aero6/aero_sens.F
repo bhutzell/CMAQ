@@ -1,29 +1,23 @@
 
-C***********************************************************************
-C   Portions of Models-3/CMAQ software were developed or based on      *
-C   information from various groups: Federal Government employees,     *
-C   contractors working on a United States Government contract, and    *
-C   non-Federal sources (including research institutions).  These      *
-C   research institutions have given the Government permission to      *
-C   use, prepare derivative works, and distribute copies of their      *
-C   work in Models-3/CMAQ to the public and to permit others to do     *
-C   so.  EPA therefore grants similar permissions for use of the       *
-C   Models-3/CMAQ software, but users are requested to provide copies  *
-C   of derivative works to the Government without restrictions as to   *
-C   use by others.  Users are responsible for acquiring their own      *
-C   copies of commercial software associated with Models-3/CMAQ and    *
-C   for complying with vendor requirements.  Software copyrights by    *
-C   the MCNC Environmental Modeling Center are used with their         *
-C   permissions subject to the above restrictions.                     *
-C***********************************************************************
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /cee/ted_raid8b/data/Models_3_CMAQ_4.7.1/models/CCTM/src/aero/aero5_ddm3d/aero_sens.f,v 1.1.1.1 2010/06/14 16:02:59 sjr Exp $
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
+!------------------------------------------------------------------------!
+!  The Community Multiscale Air Quality (CMAQ) system software is in     !
+!  continuous development by various groups and is based on information  !
+!  from these groups: Federal Government employees, contractors working  !
+!  within a United States Government contract, and non-Federal sources   !
+!  including research institutions.  These groups give the Government    !
+!  permission to use, prepare derivative works of, and distribute copies !
+!  of their work in the CMAQ system to the public and to permit others   !
+!  to do so.  The United States Environmental Protection Agency          !
+!  therefore grants similar permission to use the CMAQ system software,  !
+!  but users are requested to provide copies of derivative works or      !
+!  products designed to operate in the CMAQ system to the United States  !
+!  Government without restrictions as to use by others.  Software        !
+!  that is used with the CMAQ system but distributed under the GNU       !
+!  General Public License or the GNU Lesser General Public License is    !
+!  subject to their copyright restrictions.                              !
+!------------------------------------------------------------------------!
 
       SUBROUTINE AERO_SENS( SCASI, W )
-c
 c
 c  Jim Boylan, Yeuh-Jin Yang, Ted Russell, and others at Georgia Tech - Aug 99
 c     -- derived the aerosol equilibrium sensitivity equations for ISORROPIA
@@ -43,12 +37,12 @@ c     -- now uses AERO_INFO to get index assignments
 c     -- cleared a bunch of unused variables
 c
 c  Wenxian Zhang - Sep 2013
-c     -- 
+c     -- restructure for new ddm and hddm calculations
 c
 c  Sergey L. Napelenok - May 08
 c     --  implementation for CMAQ ver 5.0.2
 c
-c  Variables passed from ISORROPIA
+c  Variables passed from ISORROPIA:
 c
 c  W		total concentration vector (mole/m3-air)
 c               WI(1) - sodium
@@ -60,6 +54,10 @@ c               WI(6) - calcium
 c               WI(7) - potassium
 c               WI(8) - MG 
 c
+c               SCASI - ISORROPIA case name
+c
+c  Variables calculated:
+c
 c  asen		speciated aerosol sensitivities (total of I & J modes)
 c  		asen(1)	aerosol sulfate
 c  		asen(2)	aerosol nitrate
@@ -67,16 +65,9 @@ c  		asen(3)	aerosol ammonia
 c  		asen(4)	aerosol sodium
 c  		asen(5)	aerosol chlorine
 c  		asen(6)	aerosol hydrogen
-c
-c  nsize	size of a_coef
-c  NPMAX	size of sensitivity parameter
-c  naq		number of aqueous aerosol species
-c  nsolid	number of solid aerosol species
-c  dt		time step (min)
-c
-c     USE AERO_DATA           ! aero include files
+
       USE AERO_DATA, ONLY : aerospc_conc, aerospc_mw, ASO4_IDX, ANH4_IDX, ANO3_IDX
-      USE DDM3D_DEFN, ONLY : NPMAX, IPT, IPARM, HIGH, SEN_PAR, IHIGH, WRFLAG
+      USE DDM3D_DEFN, ONLY : NPMAX, IPT, IPARM, HIGH, SEN_PAR, IHIGH
       Use aero6_ddm3d, ONLY : s_precursor_conc, s_aerospc_conc
       USE UTILIO_DEFN
 
@@ -108,7 +99,7 @@ C sln =-=-=-=-=-=-=  DDM-3D sensitivity variables
       REAL(KIND=8), DIMENSION(ncomp)    :: stot
 
       REAL mi, mj
-      REAL(KIND=8) fji                                      ! inorganic Aitken  mode fraction
+      REAL(KIND=8) fji                           ! inorganic Aitken  mode fraction
 
       INTEGER, SAVE :: LOGDEV
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
@@ -270,7 +261,6 @@ c-------------------------------------------------------------------------------
      &          + s_aerospc_conc( AMG_IDX,2,ip ) )                ! AMGJ
      &        * 1.0d-6 / REAL( aerospc_mw(ANA_IDX), 8 )
 
-
       return
       end
 
@@ -296,15 +286,13 @@ c-------------------------------------------------------------------------------
       real(kind=8)                     :: f
       real(kind=8)                     :: fji
 
+c     INTEGER, SAVE :: LOGDEV
+c     LOGICAL, SAVE :: FIRSTIME = .TRUE.
 
-      INTEGER, SAVE :: LOGDEV
-      LOGICAL, SAVE :: FIRSTIME = .TRUE.
-
-
-      IF ( FIRSTIME ) THEN
-         FIRSTIME = .FALSE.
-         LOGDEV = INIT3 ()
-      ENDIF
+c     IF ( FIRSTIME ) THEN
+c        FIRSTIME = .FALSE.
+c        LOGDEV = INIT3 ()
+c     ENDIF
       
       f = 1.0D6
 
@@ -318,12 +306,13 @@ c-------------------------------------------------------------------------------
       asen(8) =  csens(10)            * f * dble(aerospc_mw(amg_idx))
 
 c SO4
+
       s_precursor_conc( SULPRD_IDX, ip ) = 0.0D0
       if ( bflag(2) .eq. 0 ) then
            s_aerospc_conc( ASO4_IDX,1,ip ) = asen(1) * fji
            s_aerospc_conc( ASO4_IDX,2,ip ) = asen(1) - s_aerospc_conc( ASO4_IDX,1,ip )
       endif
-           
+
 c NH4
       if ( bflag(3) .eq. 0 ) then
            s_aerospc_conc( ANH4_IDX,1,ip ) = asen(2) * fji

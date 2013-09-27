@@ -77,7 +77,7 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
 
 #ifdef sens
-      USE DDM3D_DEFN, ONLY: SENGRID, NP, NPMAX, S_CONDEP, S_POLC, S_CEND, S_REMOV, S_REMOVAC, S_CONDEP, S_TOTDEP, WRFLAG
+      USE DDM3D_DEFN, ONLY: SENGRID, NP, NPMAX, S_CONDEP, S_POLC, S_CEND, S_REMOV, S_REMOVAC, S_CONDEP, S_TOTDEP
 #endif 
 
       IMPLICIT NONE
@@ -880,14 +880,14 @@ C...set cgrid to the ending concentrations
      &                                            + S_REMOV( NP, WDEP_MAP( VAR ) )
                   END DO
 
-                   S_TOTDEP( COL, ROW, NP, N_SPC_WDEP+1 ) =
+                  S_TOTDEP( COL, ROW, NP, N_SPC_WDEP+1 ) =
      &                     S_TOTDEP( COL, ROW, NP, N_SPC_WDEP+1 ) + S_REMOVAC( NP )
 
-                   DO SPC = 1, NSPCSD
-                     IF ( SPC .NE. N_GC_SPCD ) THEN
-                       SENGRID( COL, ROW, LAY, NP, SPC ) = S_CEND( NP, SPC )
-                     END IF
-                   END DO
+                  DO SPC = 1, NSPCSD
+                    IF ( SPC .NE. N_GC_SPCD ) THEN
+                      SENGRID( COL, ROW, LAY, NP, SPC ) = S_CEND( NP, SPC )
+                    END IF
+                  END DO
 
                 END DO
 #endif

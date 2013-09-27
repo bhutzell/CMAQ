@@ -112,7 +112,7 @@ C-----------------------------------------------------------------------
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY: SENGRID, NP, NPMAX, S_CONDEP, S_POLC, S_CEND, S_REMOV, S_REMOVAC, S_CONDEP, S_TOTDEP, 
-     &                      S_CCR, S_CBELOW, WRFLAG
+     &                      S_CCR, S_CBELOW
 #endif 
 
       IMPLICIT NONE
@@ -429,9 +429,7 @@ C...........Statement Functions
       QSAT( E, P ) = MVOMA * ( E / ( P - E ) )
 
 #ifdef sens
-c     REAL(8), ALLOCATABLE, SAVE :: S_CCR     ( :,:,: )
       REAL(8), ALLOCATABLE, SAVE :: S_CONC    ( :,:,: )
-c     REAL(8), ALLOCATABLE, SAVE :: S_CBELOW  ( :,: )   
       REAL(8), ALLOCATABLE, SAVE :: S_BMOL    ( :,: )   ! moles/m2 species below cloud
       REAL(8), ALLOCATABLE, SAVE :: S_CBASE0  ( :,: )   ! initial ave trace gas mix rat below cld
       REAL(8), ALLOCATABLE, SAVE :: S_CBASEF  ( :,: )   ! final ave trac gas mix rat blw cld (moles/mole)
@@ -733,7 +731,6 @@ C...  Get LON
         END IF
 
         ALLOCATE ( S_BCLDWT  ( NPMAX,MXSPCS,NLAYS ),
-c    &             S_CONCMINL( NPMAX,MXSPCS,NLAYS ),
      &             S_INCLOUD ( NPMAX,MXSPCS,NLAYS ),
      &             S_OUTCLOUD( NPMAX,MXSPCS,NLAYS ),
      &             S_PCLD    ( NPMAX,MXSPCS,NLAYS ), STAT = ALLOCSTAT )
@@ -1017,7 +1014,6 @@ C...  initialize all species to CMIN
 !         CONCMINL = CMIN
           CONCMINL =  1.0E-25
 #ifdef sens
-c         CONCMINL =  1.0E-20
           DDM3D_CONCMINL = 1.0E-15
 #endif
 
@@ -1787,11 +1783,14 @@ C...  using direct exchange mixing mechanism by McHenry.
 
                 S_PCLD( NP, SPC, LAY ) = REAL ( F( LAY ), 8 ) * ( REAL ( FSIDE( LAY ), 8 ) * S_CONDIS )
      &                         + ( 1.0D0 - REAL ( F( LAY ), 8 ) ) * S_CBASE0( NP, SPC )
-                IF ( PCLD( SPC, LAY ) .GT. CCR( SPC, LAY ) / FRAC ) THEN
-                  S_PCLD( NP, SPC, LAY ) = S_CCR( NP, SPC, LAY ) / REAL ( FRAC, 8 )
-                  PCLD( SPC, LAY ) = CCR( SPC, LAY ) / FRAC 
-                END IF
               END DO
+
+              IF ( PCLD( SPC, LAY ) .GT. CCR( SPC, LAY ) / FRAC ) THEN
+                PCLD( SPC, LAY ) = CCR( SPC, LAY ) / FRAC 
+                DO NP = 1, NPMAX
+                  S_PCLD( NP, SPC, LAY ) = S_CCR( NP, SPC, LAY ) / REAL ( FRAC, 8 )
+                END DO
+              END IF
 #else
               PCLD( SPC, LAY ) = MIN( PCLD( SPC, LAY ), CCR( SPC, LAY ) / FRAC )
 #endif
@@ -1819,45 +1818,21 @@ C...  to be part of the aqueous reaction chamber
               DO SPC = 1, NSPCSD
                 IF ( CBASE0( SPC ) .EQ. 0.0 ) THEN
                   BCLDWT( SPC, LAY ) = 1.0 / CLBASE
-#ifdef sens
-                  DO NP = 1, NPMAX
-c                   S_BCLDWT( NP, SPC, LAY ) = REAL( (1.0 / CLBASE), 8 )
-                    S_BCLDWT( NP, SPC, LAY ) = 0.0D0
-                  END DO
-#endif
                 ELSE
                   BCLDWT( SPC, LAY ) = CONC( SPC, LAY )
      &                               / MAX( CBASE0( SPC ), 1.0E-30 )
-#ifdef sens
-                  DO NP = 1, NPMAX
-                    IF ( CBASE0( SPC ) .LT. DDM3D_CONCMINL ) THEN
-!                     LMT1  = 1.0D-30
-                      LMT1  = DDM3D_CONCMINL
-                      LMT1D = 0.0D0
-                    ELSE
-                      LMT1  = REAL ( CBASE0( SPC ), 8 )
-                      LMT1D = S_CBASE0( NP, SPC )
-                    END IF
-                    S_BCLDWT( NP, SPC, LAY ) = (   S_CONC( NP, SPC, LAY ) * LMT1
-     &                                           - REAL ( CONC( SPC, LAY ), 8 ) * LMT1D      )
-     &                                       / ( LMT1**2.0D0 )
-c limit weighting term to prevent instability
-                    LMT1 = 1.5D0 * REAL(BCLDWT( SPC, LAY ),8)
-                    S_BCLDWT( NP, SPC, LAY ) = MAX( S_BCLDWT( NP, SPC, LAY ), -LMT1 )
-                    S_BCLDWT( NP, SPC, LAY ) = MIN( S_BCLDWT( NP, SPC, LAY ),  LMT1 )
-                  END DO
-#endif
                 END IF
-
-
-
                 PCLD( SPC, LAY ) = CBASEF( SPC ) * BCLDWT( SPC, LAY )
+
 #ifdef sens
                 DO NP = 1, NPMAX
-c                 S_PCLD( NP, SPC, LAY ) = S_CBASEF( NP, SPC ) * REAL ( BCLDWT( SPC, LAY ), 8 )
-c    &                                   + REAL ( CBASEF( SPC ), 8 ) * S_BCLDWT( NP, SPC, LAY )
-                  S_PCLD( NP, SPC, LAY ) = S_CBASEF( NP, SPC ) * REAL ( BCLDWT( SPC, LAY ), 8 )
-
+                   IF ( ABS( S_CBASE0( NP, SPC ) ) .LT. DDM3D_CONCMINL ) THEN
+                     S_BCLDWT( NP, SPC, LAY ) = 1.0 / CLBASE
+                   ELSE
+                     S_BCLDWT( NP, SPC, LAY ) = S_CONC( NP, SPC, LAY ) 
+     &                                        / S_CBASE0( NP, SPC )
+                   END IF
+                   S_PCLD( NP, SPC, LAY ) = S_CBASEF( NP, SPC ) * S_BCLDWT( NP, SPC, LAY )
                 END DO
 #endif
  
@@ -2107,26 +2082,14 @@ C...   include raining region below cld base
                 END IF
 #ifdef sens
                 DO NP = 1, NPMAX
-
-                  IF ( POLC( SPC ) .LT. DDM3D_CONCMINL ) THEN
-c                   LMT1  = REAL ( CONCMINL( SPC, LAY ), 8 )
-                    LMT1  = DDM3D_CONCMINL
-                    LMT1D = 0.0D0
+                  IF( ABS( S_POLC( NP, SPC ) ) .LT. DDM3D_CONCMINL ) THEN
+                    S_INCLOUD( NP, SPC, LAY ) = 0.0D0
                   ELSE
-                    LMT1  = REAL ( POLC( SPC ), 8 )
-                    LMT1D = S_POLC( NP, SPC )
-                  END IF
-                  S_INCLOUD( NP, SPC, LAY ) = ( (  S_PCLD( NP,SPC,LAY ) * REAL ( CEND( SPC ), 8 )
-     &                                          + REAL ( PCLD( SPC,LAY ), 8 ) * S_CEND( NP,SPC ) )
-     &                                         * LMT1
-     &                                         - REAL ( ( PCLD( SPC,LAY ) * CEND( SPC ) ), 8 ) * LMT1D )
-     &                                       / ( LMT1**2.0D0 )
+                    S_INCLOUD( NP, SPC, LAY ) = S_PCLD( NP,SPC,LAY ) * S_CEND( NP,SPC )
+     &                                      / S_POLC( NP, SPC )
+                  ENDIF
                   S_OUTCLOUD( NP, SPC, LAY ) = S_PCLD( NP,SPC, LAY )
-                  IF ( SPC .NE. N_GC_SPCD ) THEN
-                    SENGRID( COL, ROW, LAY, NP, SPC ) = REAL  ( (
-     &                                    S_INCLOUD ( NP, SPC, LAY ) * REAL ( FRAC, 8 )
-     &                                  + S_OUTCLOUD( NP,SPC, LAY ) * ( 1.0D0 - REAL ( FRAC, 8 ) ) ), 4 )
-                  END IF
+
                 END DO
 #endif
               ELSE
@@ -2156,20 +2119,12 @@ C...Now do changes in cloudy layers :
               END IF
 #ifdef sens
               DO NP = 1, NPMAX
-
-                IF ( POLC( SPC ) .LT. DDM3D_CONCMINL ) THEN
-c                 LMT1  = REAL ( CONCMINL( SPC, LAY ), 8 )
-                  LMT1  = DDM3D_CONCMINL
-                  LMT1D = 0.0D0
+                IF( ABS( S_POLC( NP, SPC ) ) .LT. DDM3D_CONCMINL ) THEN
+                  S_INCLOUD( NP, SPC, LAY ) = 0.0D0
                 ELSE
-                  LMT1  = REAL ( POLC( SPC ), 8 )
-                  LMT1D = S_POLC( NP, SPC )
+                  S_INCLOUD( NP, SPC, LAY ) = S_PCLD( NP,SPC,LAY ) * S_CEND( NP,SPC )
+     &                                    / S_POLC( NP, SPC )
                 END IF
-                S_INCLOUD( NP, SPC, LAY ) = ( (  S_PCLD( NP,SPC,LAY ) * REAL ( CEND( SPC ), 8 )
-     &                                        + REAL ( PCLD( SPC,LAY ), 8 ) * S_CEND( NP,SPC ) )
-     &                                       * LMT1
-     &                                       - REAL ( ( PCLD( SPC,LAY ) * CEND( SPC ) ), 8 ) * LMT1D  )
-     &                                     / ( LMT1**2.0D0)
                 S_OUTCLOUD( NP, SPC, LAY ) = ( S_CCR( NP, SPC, LAY ) - S_PCLD( NP, SPC,LAY ) * REAL( FRAC, 8 ) )
      &                                     / ( 1.0D0 - REAL ( FRAC, 8 ) )
                 IF ( OUTCLOUD( SPC, LAY ) .EQ. CONCMINL( SPC, LAY ) ) THEN

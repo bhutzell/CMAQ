@@ -1,6 +1,4 @@
 
-! Include file with all ddm-3d variables used by aqchem
-
 ! 16 Jul 13 S.Napelenok: initial version for ddm-3d implementation for cmaq5.0.1
 
 c     REAL( 8 ) :: S_DEPSUM( NPMAX )
