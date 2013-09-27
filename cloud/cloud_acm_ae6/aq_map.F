@@ -83,7 +83,7 @@ C-----------------------------------------------------------------------
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY : NP, NPMAX, S_POLC, S_CEND, S_REMOV, S_REMOVAC, S_HPWDEP, S_GAS, S_GASWDEP,
-     &                       S_AEROSOL, S_AERWDEP, S_WSRGGAS, S_WSRGAER, WRFLAG
+     &                       S_AEROSOL, S_AERWDEP, S_WSRGGAS, S_WSRGAER
 #endif 
 
       IMPLICIT NONE
@@ -229,7 +229,7 @@ C...load gas-phase concentrations
           GAS( IGAS ) = GAS( IGAS ) + REAL( POLC( PNTR ), 8 )
 #ifdef sens
           DO NP = 1, NPMAX
-            S_GAS( NP, IGAS ) = S_GAS( NP, IGAS ) + REAL ( S_POLC ( NP, PNTR ), 8 )
+            S_GAS( NP, IGAS ) = S_GAS( NP, IGAS ) + S_POLC ( NP, PNTR )
           ENDDO
 #endif
         END DO
@@ -250,7 +250,7 @@ C...load gas-phase concentrations
           IF ( S_GAS( NP, IGAS ) .NE. 0.0D0 ) THEN
             DO ISRG = 1, NSRGGAS( IGAS )
               PNTR = CGRID2AQ_MAP( LSRGGAS( IGAS, ISRG ) )
-              S_WSRGGAS( NP, IGAS, ISRG ) = REAL( S_POLC( NP,PNTR ), 8 ) / S_GAS(NP,IGAS)
+              S_WSRGGAS( NP, IGAS, ISRG ) = S_POLC( NP,PNTR ) / S_GAS(NP,IGAS)
             ENDDO
           ELSE
             DO ISRG = 1, NSRGGAS( IGAS )
@@ -266,7 +266,8 @@ C...set background values for gases if no surrogates were specified
           GAS( IGAS ) = REAL( SRGGAS( IGAS )%BACKGND, 8 ) * 1.0D-6
 #ifdef sens
           DO NP =1, NPMAX
-             S_GAS( NP, IGAS ) = 1.0D-30
+c            S_GAS( NP, IGAS ) = 1.0D-30
+             S_GAS( NP, IGAS ) = 0.0D0
           ENDDO 
 #endif
         END IF
@@ -309,11 +310,11 @@ C...load aerosol concentrations
 
 #ifdef sens
             DO NP = 1, NPMAX
-              IF ( S_AEROSOL( NP, IAER, IMODE ) .NE. 0.0 ) THEN
+              IF ( S_AEROSOL( NP, IAER, IMODE ) .NE. 0.0D0 ) THEN
                 DO ISRG = 1, NSRGAER( IAER, IMODE )
                   PNTR = CGRID2AQ_MAP( LSRGAER( IAER, IMODE, ISRG ) )
-                  S_WSRGAER( NP, IAER, IMODE, ISRG ) = REAL ( S_POLC( NP, PNTR ), 8 )
-     &                                               / REAL ( S_AEROSOL( NP, IAER, IMODE ), 8 )
+                  S_WSRGAER( NP, IAER, IMODE, ISRG ) = S_POLC( NP, PNTR )
+     &                                               / S_AEROSOL( NP, IAER, IMODE )
                 END DO
               ELSE
                 DO ISRG = 1, NSRGAER( IAER, IMODE )
@@ -322,6 +323,7 @@ C...load aerosol concentrations
               END IF
             ENDDO
 #endif
+
 
 C...set background values for aerosols if no surrogates were specified
 
@@ -334,7 +336,8 @@ C...set background values for aerosols if no surrogates were specified
               END IF
 #ifdef sens
               DO NP = 1, NPMAX
-                S_AEROSOL( NP, IAER, IMODE ) = 1.0D-30
+c               S_AEROSOL( NP, IAER, IMODE ) = 1.0D-30
+                S_AEROSOL( NP, IAER, IMODE ) = 0.0D0
               ENDDO
 #endif
             END IF
@@ -371,6 +374,10 @@ C...perform aqueous-phase chemistry calculations
       CALL AQCHEM ( JDATE, JTIME, TBARC, PBARC, TAUCLD, PRATE1,
      &              WCBAR, WTBAR, AIRM, ALFA0, ALFA2, ALFA3, GAS,
      &              AEROSOL, GASWDEP, AERWDEP, HPWDEP, BETASO4, DARK )
+
+c     HPWDEP = 0.0
+c     BETASO4 = 0.0
+
 
 C...  compute the scavenging coefficient
       EALFA2T = EXP( -ALFA2 * TAUCLD )
@@ -463,7 +470,10 @@ C...Update surface area
      &                             / POLC( AERONUM_MAP( 3 ) ) ) ** ONETHIRD
      &                         * ( M3NEW(3) / M3OLD( 3 ) ) ** TWOTHIRDS
 
-#ifdef sens
+! This makes problems because ddm allows for zeros. If anyone ever cares about sensitivity of
+! these moments, then this needs to be addressed.
+!
+cifdef sens
 c     DO NP = 1, NPMAX
 
 c       S_CEND( NP, AEROSRF_MAP( 1 ) ) = S_POLC( NP, AEROSRF_MAP( 1 ) ) * EALFA2T
@@ -477,7 +487,7 @@ c    &                                 * ( S_CEND( NP, AERONUM_MAP( 3 ) )
 c    &                                     / S_POLC( NP, AERONUM_MAP( 3 ) ) ) ** ONETHIRD
 c    &                                 * ( M3NEW(3) / M3OLD( 3 ) ) ** TWOTHIRDS
 c     END DO
-#endif
+cendif
 
       RETURN
       END

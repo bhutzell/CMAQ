@@ -1,7 +1,31 @@
+
+!------------------------------------------------------------------------!
+!  The Community Multiscale Air Quality (CMAQ) system software is in     !
+!  continuous development by various groups and is based on information  !
+!  from these groups: Federal Government employees, contractors working  !
+!  within a United States Government contract, and non-Federal sources   !
+!  including research institutions.  These groups give the Government    !
+!  permission to use, prepare derivative works of, and distribute copies !
+!  of their work in the CMAQ system to the public and to permit others   !
+!  to do so.  The United States Environmental Protection Agency          !
+!  therefore grants similar permission to use the CMAQ system software,  !
+!  but users are requested to provide copies of derivative works or      !
+!  products designed to operate in the CMAQ system to the United States  !
+!  Government without restrictions as to use by others.  Software        !
+!  that is used with the CMAQ system but distributed under the GNU       !
+!  General Public License or the GNU Lesser General Public License is    !
+!  subject to their copyright restrictions.                              !
+!------------------------------------------------------------------------!
+
 C ===================================================================
 C This subroutine calculates second-order sensitivity of ISORROPIAII
 C
 C Written by Wenxian Zhang in August 2011
+C
+C 27 September 2013: Sergey L. Napelenok 
+C    --- implemented into CMAQv5.0.2
+C    --- disabled hddm activity and water sensitivity calculations
+C    --- to finish code development for these
 C 
 C Reference: 
 C Zhang, W., Capps, S. L., Hu, Y., Nenes, A., Napelenok, S. L., & 
@@ -14,7 +38,7 @@ C ===================================================================
 
       SUBROUTINE HDDMSENS(STOT,SENS,S1,S2,S1D,S2D,SCASI)
 
-      USE DDM3D_DEFN, ONLY : WRFLAG
+c     USE DDM3D_DEFN, ONLY : WRFLAG
 
       INCLUDE 'isrpia.inc'
       INCLUDE 'ddmisrpia.inc'
@@ -33,14 +57,14 @@ C ===================================================================
       DOUBLE PRECISION DGAMA(NIONSPC,NPAIR)   !dGAMA/dA
       DOUBLE PRECISION RGAMA(NPAIR)       ! RHS FROM 2ND-ORDER GAMA SENSITIVITIES
 
-      INTEGER, SAVE :: LOGDEV
-      LOGICAL, SAVE :: FIRSTIME = .TRUE.
+c     INTEGER, SAVE :: LOGDEV
+c     LOGICAL, SAVE :: FIRSTIME = .TRUE.
 
 
-      IF ( FIRSTIME ) THEN
-         FIRSTIME = .FALSE.
-         LOGDEV = INIT3 ()
-      ENDIF
+c     IF ( FIRSTIME ) THEN
+c        FIRSTIME = .FALSE.
+c        LOGDEV = INIT3 ()
+c     ENDIF
 
       CC = SCASI(1:1)
 
@@ -192,7 +216,7 @@ c     DO I = 1, NIONSPC
      &              + Y(I,J)  * RHG *ZPL *ZMI
      &              + RY(I,J) *(G0P(IJMAP(I,J)) +ZPL*ZMI*H)
 
-            RF2(I) =  SX2(I,J)*(SG01(IJMAP(I,J)) +ZPL*ZMI*SH1)
+            RF2(J) =  SX2(I,J)*(SG01(IJMAP(I,J)) +ZPL*ZMI*SH1)
      &              + SX1(I,J)*(SG02(IJMAP(I,J)) +ZPL*ZMI*SH2)
      &              + X(I,J)  * RG0(IJMAP(I,J))
      &              + X(I,J)  * RHG *ZPL *ZMI
@@ -292,7 +316,7 @@ c     DO I = 1, NIONSPC
      &              + RX(I,J) *(G0P(IJMAP(I,J)) +ZPL*ZMI*H)
  
            RG(IJMAP(I,J)) =    ZPL*ZMI*(
-     &                    (RF1(I)/ZPL + RF2A(I)/ZMI)/(ZPL + ZMI) -RHG)
+     &                    (RF1(I)/ZPL + RF2A(J)/ZMI)/(ZPL + ZMI) -RHG)
          ENDDO
       ENDDO
   
@@ -331,7 +355,7 @@ c     DO I = 1, NIONSPC
      &              + Y(I,J)  * RHG *ZPL *ZMI
      &              + RY(I,J) *(G0P(IJMAP(I,J)) +ZPL*ZMI*H)
 
-            RF2B(I) = SX2(I,J)*(SG01(IJMAP(I,J)) +ZPL*ZMI*SH1)
+            RF2B(J) = SX2(I,J)*(SG01(IJMAP(I,J)) +ZPL*ZMI*SH1)
      &              + SX1(I,J)*(SG02(IJMAP(I,J)) +ZPL*ZMI*SH2)
      &              + X(I,J)  * RG0(IJMAP(I,J))
      &              + X(I,J)  * RHG *ZPL *ZMI
