@@ -438,7 +438,7 @@ C...........External Functions:
       INTEGER, EXTERNAL :: SETUP_LOGDEV
 
 #ifdef sens
-      INCLUDE SUBST_AQCHEM_DDM3D   ! ddm-3d variables 
+      INCLUDE 'AQCHEM_DDM3D.EXT'   ! ddm-3d variables 
 #endif
 
 C*********************************************************************
@@ -2163,8 +2163,8 @@ c       S_GAS( NP, LFOA   ) = ( S_PFOAF( NP )  + XL * ( S_FOAL( NP ) + S_HCO2( N
 c       S_GAS( NP, LMHP   ) = ( S_PMHPF( NP )  + XL *  S_MHPL( NP ) )  * RECIPAP1
 c       S_GAS( NP, LPAA   ) = ( S_PPAAF( NP )  + XL *  S_PAAL( NP ) )  * RECIPAP1
 c       S_GAS( NP, LHCL   ) = ( S_PHCLF( NP )  + XL *  S_HCLL( NP ) )  * RECIPAP1
-c       S_GAS( NP, LGLY   ) = ( S_PGLYF( NP )  + XL *  S_GLYL( NP ) )  * RECIPAP1
-c       S_GAS( NP, LMGLY  ) = ( S_PMGLYF( NP ) + XL *  S_MGLYL( NP ))  * RECIPAP1
+        S_GAS( NP, LGLY   ) = ( S_PGLYF( NP )  + XL *  S_GLYL( NP ) )  * RECIPAP1
+        S_GAS( NP, LMGLY  ) = ( S_PMGLYF( NP ) + XL *  S_MGLYL( NP ))  * RECIPAP1
 c       S_GAS( NP, LNH3   ) = S_FNH3( NP )  * S_TOTAMM( NP )
 c       S_GAS( NP, LHNO3  ) = S_FHNO3( NP ) * S_TOTNIT( NP )
         S_GAS( NP, LN2O5  ) = 0.0D0 ! assume all into aerosol
