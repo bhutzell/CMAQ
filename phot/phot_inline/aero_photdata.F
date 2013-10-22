@@ -69,6 +69,10 @@ C-----------------------------------------------------------------------
       USE SOA_DEFN            ! gas soa data
       USE AEROMET_DATA        ! Includes CONST.EXT
 
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : SENGRID
+#endif 
+
       IMPLICIT NONE
 
 C Includes:
