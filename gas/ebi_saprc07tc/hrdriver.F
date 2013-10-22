@@ -49,6 +49,7 @@ C                       Hertel et al.
 C   21 Jun 10 J.Young: convert for Namelist redesign
 C   11 May 11 D.Wong: incorporated twoway model implementation
 C   27 Sep 11 B.Hutzell: revised method for defining CALL_DEG variable
+C   30 Sep 13 S.Napelenok: ddm-3d implementation for cmaq5.0.2
 C
 C**********************************************************************
 
@@ -57,6 +58,10 @@ C**********************************************************************
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN           ! IOAPI parameters and functions declarations
       USE HRDATA
+
+#ifdef sens
+      USE DDM3D_DEFN
+#endif 
 
       IMPLICIT NONE
 
@@ -126,6 +131,45 @@ C..Scratch Local Variables:
       INTEGER     GXOFF, GYOFF            ! global origin offset from file
 C for INTERPX
       INTEGER, SAVE :: STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3
+
+#ifdef sens
+      LOGICAL RXNFLAG( NPMAX )
+      INTEGER I, J, RXN, N
+      REAL*8 SRK( NRXNS )              ! rate constants
+
+      REAL A( N_GC_SPC, N_GC_SPC )   ! An upper triangular matrix and the
+                                     ! multipliers used to obtain it
+                                     ! (See s_lu.F)
+      REAL A1( N_GC_SPC, N_GC_SPC )
+      REAL PDT( N_GC_SPC, N_GC_SPC )
+      REAL PRD( N_GC_SPC )
+      REAL PRD_RATE( N_GC_SPC )      ! Contribution to PRD from rxn rate sens
+      REAL SOLD( N_GC_SPC )
+      INTEGER INFO                   ! see s_lu.F
+      INTEGER IPVT ( N_GC_SPC )      ! an integer vector of pivot indices.
+      REAL SUM
+      REAL IREGTEMP                  ! Holds relevant value of IREGION
+      REAL KSTEP                     ! Holds k times timestep(in min)
+      REAL RXNMULT                   ! Holds product of concs of reactants
+      INTEGER NRCT                   ! Counter over reactants
+      INTEGER NPROD                  ! Counter over products
+
+
+
+C Variables used for hddm-3d
+      REAL*8 SRK2 ( NRXNS )            ! rate constants
+      LOGICAL ORDER1 ( NRXNS )       ! true if order 1; else, false
+      INTEGER HIPARM( 2 )            ! index numbers of the 1st order sens
+                                     ! parameters to which we're taking
+                                     ! 2nd order sensitivity
+      REAL PDT2( N_GC_SPC, N_GC_SPC )  ! Used for 2nd order call of JAC
+      REAL SMID( NPMAX, N_GC_SPC )     ! SENGRID in middle of timestep
+      REAL SMIDJAC( N_GC_SPC )         ! SMID for the relevant 1st order
+                                       ! sensitivity parameter
+      REAL*8 RK ( NRXNS )
+      INTEGER HITMP1
+      INTEGER HITMP2
+#endif
 
 
 C**********************************************************************
@@ -266,6 +310,31 @@ C.. Get pressure in Pascals
 C.. Get photolysis rates in /min
       CALL PHOT ( MIDDATE, MIDTIME, JDATE, JTIME, NDARK, RJ )
 
+#ifdef sens
+      DATENUM = 1 + JDATE - STARTDATE !  Set the date and hour counters used in sensitivity calls
+
+C For reaction rate sensitivities
+      DO NP = 1, NPMAX
+         IF ( IPT( NP ) .EQ. 5 ) THEN
+            CALL CKTIME( JDATE,JTIME,NP,RXNFLAG(NP) ) ! Rxnflag set to true iff ipt=5 and time, date within bounds
+            IF ( IDATE( NP, DATENUM ) .NE. 1 ) RXNFLAG( NP ) = .FALSE.
+         ELSE
+            RXNFLAG( NP ) = .FALSE.
+         END IF
+      END DO
+
+C For higher order sensitivities
+      IF ( HIGH ) THEN
+         DO RXN = 1, NRXNS
+            IF( NREACT( RXN ) .EQ. 1 ) THEN
+               ORDER1( RXN ) = .TRUE.
+            ELSE
+               ORDER1( RXN ) = .FALSE.
+            END IF
+         END DO
+      END IF
+#endif sens
+
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Top of loop over cells
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -319,6 +388,226 @@ c..Update concentration array
                DO S = 1, N_GC_SPC
                   CGRID( C, R, L, S ) = YC( S )
                END DO
+
+#ifdef sens
+               DO RXN = 1, NRXNS
+                  SRK( RXN ) = RKI( RXN )
+                  IF ( HIGH ) THEN
+                     IF ( ORDER1 (RXN ) ) THEN
+                        SRK2( RXN ) = 0.0
+                     ELSE
+                        SRK2( RXN ) = RKI( RXN )
+                     END IF
+                  END IF
+               END DO
+
+               CALL JAC ( YCDDM, PDT, SRK ) ! Create the Jacobian matrix; YCDDM is set in mid-timestep of hrsolver.F
+
+               DO 433 J = 1, N_GC_SPC
+                  DO 434 I = 1, N_GC_SPC
+                     A( I, J ) = 0.0
+                     A1( I, J ) = 0.0
+                     A( I, J ) = -0.5 * CHEMSTEP * PDT( I, J )
+                     IF ( I .EQ. J ) THEN
+                        A( I, J ) = 1.0 + A( I, J )
+                     END IF
+                     A1( I, J ) = 0.5 * CHEMSTEP * PDT( I, J )
+                     IF ( I .EQ. J ) THEN
+                        A1( I, J ) = 1.0 + A1( I, J )
+                     END IF
+434               CONTINUE
+433            CONTINUE
+
+C Factor matrix A by Gaussian elimination
+               CALL SGEFA(A, N_GC_SPC, N_GC_SPC, IPVT,INFO)
+
+
+               DO 495 NP = 1, NPMAX
+
+                  IF ( IPT( NP ) .NE. 4 ) THEN
+
+                     DO S = 1, N_GC_SPC
+                        PRD( S ) = 0.0
+                        PRD_RATE( S ) = 0.0
+                        SOLD(S) = SENGRID( C, R, L, NP,S )
+                        IF (ABS(SOLD( S )) .LT. 1.e-25 ) THEN
+                           SOLD(S) = 0.
+                        END IF
+                     END DO
+
+C Begin code specific to reaction rate sensitivities
+                     IF ( RXNFLAG( NP ) ) THEN ! RXNFLAG is true if IPT = 5 and time, date within bounds
+                        IREGTEMP = IREGION( C, R, L, NP )
+                        DO RXN = 1, NRXNS
+                           IF ( IRXN( NP, RXN ) ) THEN ! This checks if it's a reaction in the sens parameter
+                              KSTEP = SRK( RXN ) * CHEMSTEP ! KSTEP = k * timestep(in min)
+                              ! RXNMULT is the product of the concs of the reactants
+                              ! Note that the first 3 slots of IRR are for reactants,
+                              ! and slots 4- are for products
+                              IF ( NREACT( RXN ) .EQ. 1 ) THEN
+                                 RXNMULT = KSTEP
+     &                                   * YCDDM( IRR( RXN, 1 ) )
+                              ELSE IF ( NREACT( RXN ) .EQ. 2 ) THEN
+                                 RXNMULT = KSTEP
+     &                                   * YCDDM( IRR( RXN, 1 ) )
+     &                                   * YCDDM( IRR( RXN, 2 ) )
+                              ELSE IF ( NREACT( RXN ) .EQ. 3 ) THEN
+                                 RXNMULT = KSTEP
+     &                                   * YCDDM( IRR( RXN, 1 ) )
+     &                                   * YCDDM( IRR( RXN, 2 ) )
+     &                                   * YCDDM( IRR( RXN, 3 ) )
+                              ELSE
+                                 MSG = 'NREACT out of expected bounds of 1-3.'
+                                 CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
+                              END IF
+  
+                              DO NRCT = 1, NREACT( RXN ) ! Loop over the reactants
+                                 PRD_RATE( IRR( RXN, NRCT ) ) = PRD_RATE( IRR( RXN, NRCT ) )
+     &                                                        - RXNMULT * IREGTEMP  ! Subtract RXNMULT from PRD_RATE for reactant species
+                              END DO
+
+                              DO NPROD = 1, NPRDCT( RXN ) ! Loop over the products
+                                 ! Add RXNMULT to PRD_RATE for product species
+                                 ! The +3 reflects that slots >=4 of IRR are for products
+                                 ! SC are the stoichiometric coefficients of products
+                                 !    and do not need the +3 (see RXDT.EXT)
+                                 PRD_RATE( IRR( RXN, 3+NPROD ) ) = PRD_RATE( IRR( RXN, 3+NPROD ) )
+     &                                                           + ( RXNMULT * SC( RXN, NPROD ) * IREGTEMP )
+                              END DO
+                           END IF
+                        END DO  ! RXN
+                     END IF  ! RXNFLAG
+C End code specific to reaction rate sensitivities
+
+                     DO S = 1, N_GC_SPC
+                        SUM = 0.0
+                        DO J = 1, N_GC_SPC
+                           SUM = SUM + A1( S, J ) * SOLD( J )
+                        END DO
+C edits by A.Digar
+                        PRD( S ) = SUM + PRD_RATE( S )
+C end edit
+                     END DO
+
+                     CALL SGESL( A, N_GC_SPC, N_GC_SPC, IPVT, PRD, 0 )
+
+                     DO S = 1, N_GC_SPC
+                        IF ( ABS ( PRD ( S ) ) .LT. 1.e-25 ) THEN
+                           IF ( HIGH ) THEN
+                              SMID( NP, S ) = 0.5 * SENGRID( C, R, L, NP, S )
+                           END IF
+                           SENGRID( C, R, L, NP, S ) = 0.
+                        ELSE
+                           IF ( HIGH ) THEN ! SMID is the average of SENGRID before and after chemistry
+                              SMID( NP, S ) = 0.5 * ( SENGRID( C, R, L, NP, S ) + PRD( S) )
+                           END IF
+                           SENGRID( C, R, L, NP, S ) = PRD( S )
+                        END IF
+                     END DO
+
+                  ELSE ! IPT( NP ) = 4 2nd order sensitivity
+
+                     HIPARM( 1 ) = 0
+                     HIPARM( 2 ) = 0
+                     DO J = 1, NP - 1
+                        IF ( IPARM( NP, J ) .EQ. 1 ) THEN
+                           HIPARM( 1 ) = J
+                        ELSE IF ( IPARM( NP, J ) .EQ. 2 ) THEN
+                           HIPARM( 2 ) = J
+                        ELSE IF ( IPARM( NP, J ) .EQ. 3 ) THEN
+                           HIPARM( 1 ) = J
+                           HIPARM( 2 ) = J
+                        END IF
+                     END DO
+
+                     DO S = 1, N_GC_SPC
+                        SMIDJAC( S ) = SMID( HIPARM( 1 ), S )
+                     END DO
+C Added by A.Digar
+                     DO S = 1, N_GC_SPC
+                        PRD( S ) = 0.0
+                        SOLD(S) = SENGRID( C, R, L,NP,S )
+                        IF (ABS(SOLD( S )) .LT. 1.e-25 ) THEN
+                           SOLD(S) = 0.
+                        END IF
+                     END DO
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C Begin code specific to high-order sensitivity with one/more 1st order term/s
+C being reaction rate sensitivity
+C added by A.Digar
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+                     HITMP1 = HIPARM( 1 )
+                     HITMP2 = HIPARM( 2 )
+
+                     DO N = 1, 2 ! loop for two 1st-order sens parameters
+                        IF ( ( IPT( HITMP1 ) .EQ. 5 ) .AND. ( RXNFLAG( HITMP1 ) ) ) THEN ! check for rate constant sens, date & time
+                           IREGTEMP = IREGION ( C, R, L, HITMP1 )
+                           DO RXN = 1, NRXNS
+                              ! keeping the rate terms that contain only the
+                              ! rate constants of interest and setting rest to zero
+                              RK( RXN ) = SRK( RXN ) * IRXN( HITMP1, RXN )
+                           END DO
+                           ! Jacobian for first-order,
+                           ! called with sensitivities and
+                           ! rxn rates with 1st order rxns effective  
+                           CALL JAC ( YCDDM, PDT, RK )
+                           DO S = 1, N_GC_SPC
+                              DO J = 1, N_GC_SPC
+                                 PRD( S ) = PRD( S ) + CHEMSTEP * PDT( S,J ) * SMID( HITMP2,J ) * IREGTEMP
+                              END DO
+                           END DO
+                           IF ( IPT( HITMP1 ) .eq. IPT( HITMP2 ) ) THEN
+                              PRD = 2.0 * PRD
+                              EXIT
+                           ENDIF
+                        ENDIF
+                        HITMP1 = HIPARM( 2 )
+                        HITMP2 = HIPARM( 1 )
+                     END DO
+C End of modification by A.Digar
+
+                     ! Jacobian for higher-order,
+                     ! called with sensitivities and
+                     ! rxn rates with 1st order rxns removed
+                     CALL JAC ( SMIDJAC, PDT2, SRK2 )
+
+C removed by A.Digar
+c              DO S = 1, N_GC_SPC
+c                PRD( S ) = 0.0
+c                SOLD(S) = SENGRID( C, R, L,IP,S )
+c                IF (ABS(SOLD( S )) .LT. 1.e-25 ) THEN
+c                  SOLD(S) = 0.
+c                END IF
+c              END DO
+C end of edits
+
+                     DO S = 1, N_GC_SPC
+                        SUM = 0.0
+                        DO J = 1, N_GC_SPC
+                           SUM = SUM + A1( S, J ) * SOLD( J )
+     &                         + CHEMSTEP * PDT2( S,J ) * SMID( HIPARM( 2 ),J )
+                        END DO
+C edits by A.Digar
+                        PRD( S ) = SUM + PRD( S )
+C end of edits
+                     END DO
+
+                     CALL SGESL( A, N_GC_SPC, N_GC_SPC, IPVT, PRD, 0 )
+ 
+                     DO S = 1, N_GC_SPC
+                        IF ( ABS ( PRD ( S ) ) .LT. 1.e-25 ) THEN
+                           SENGRID( C, R, L, NP, S ) = 0.
+                        ELSE
+                           SENGRID( C, R, L, NP, S ) = PRD( S )
+                        END IF
+                     END DO
+
+                  END IF
+
+495            CONTINUE    ! End of do loop over NP
+
+#endif
 
 
             END DO
