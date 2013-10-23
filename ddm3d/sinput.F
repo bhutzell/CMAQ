@@ -650,10 +650,8 @@ CCCCCCC Sensitivity to a chemical reaction rate constant CCCCC
 
 CCCCCCC Unrecognized or non-implemented sens type CCCCCCCCCCCC
         ELSE
-          XMSG = 'Sentype not recognized. ' //
-     &           'Only Emission (EMIS), Initial Condition ' //
-     &           '(INIT), & Bdry Condition (BOUN) ' //
-     &           'implemented so far.'
+          XMSG = 'Sentype not recognized: ' // TXT( 2:5 ) //
+     &           '. Use EMIS, INIT, BOUN, RATE, or HIGH. '
           CALL M3EXIT( PNAME,STDATE,STTIME,XMSG,XSTAT1 )
 
         END IF  ! Finished setting sentype
