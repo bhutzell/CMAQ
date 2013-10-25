@@ -36,6 +36,8 @@ C ===================================================================
 
       SUBROUTINE DDMSENS(STOT,SENS,SENSD,SCASI)
 
+      USE DDM3D_DEFN, ONLY : WRFLAG
+
       INCLUDE 'isrpia.inc'
       INCLUDE 'ddmisrpia.inc'
 
@@ -57,6 +59,8 @@ c        LOGDEV = INIT3 ()
 c     ENDIF
       
       CC = SCASI(1:1)
+
+c     write(logdev,*) "CASE = ",SCASI
 
 C *** INITIALIZE SINI ***
 
@@ -98,6 +102,9 @@ C *** SOLVE SENSITIVITIES ***
 
       CALL EQNSLV( FROW, FCOL, COEF, SENS, SENSD )
 
+c     write(logdev,*) "SENS 1",SENS
+c     write(logdev,*) "SENSD 1",SENSD
+
 
 C *** ADJUST FOR MINOR SPECIES ***
 
@@ -122,6 +129,11 @@ c     SGAMA = 0.0D0 ! set to ignore activity
      &        CC.EQ.'O'.OR.CC.EQ.'M'.OR.CC.EQ.'P') THEN
          CALL DCALCHS4(SENS)
       ENDIF
+
+c     write(logdev,*) "SENS 2",SENS
+c     write(logdev,*) "SENSD 2",SENSD
+
+
 
 C *** END OF DDMSENS ***
       RETURN
@@ -1800,14 +1812,35 @@ C
  
       DOUBLE PRECISION SENS(NSEN)
       DOUBLE PRECISION DPSI,GR,C,SR
-      
+     
+c     INTEGER, SAVE :: LOGDEV
+c     LOGICAL, SAVE :: FIRSTIME = .TRUE.
 
-      IF (WATER.LE.TINY) RETURN
+c     IF ( FIRSTIME ) THEN
+c        FIRSTIME = .FALSE.
+c        LOGDEV = INIT3 ()
+c     ENDIF
+
+c     write(logdev,*) "IN DCALCNH3 "
+c     write(logdev,*) "MOLAL(jNH4)=",MOLAL(jNH4),"MOLAL(jH)=",MOLAL(jH)
+c     write(logdev,*) "GNH3=",GNH3
+
+
+c     IF (WATER.LE.TINY) RETURN
+      IF ( WATER       .LE. TINY .OR.
+     &     MOLAL(jNH4) .LE. TINY .OR.
+     &     MOLAL(jH)   .LE. TINY .OR.
+     &     GNH3        .LE. TINY      ) THEN
+         RETURN
+      ENDIF
 
       GR   = -2.D0*LN10*(SGAMA(mHNO3)-SGAMA(mNH4NO3))     !GAMA RELATED
       C    = ONE/MOLAL(jNH4) +ONE/MOLAL(jH) +ONE/GNH3
       SR   = SENS(jNH4)/MOLAL(jNH4) -SENS(jH)/MOLAL(jH)    !SENS RELATED
       DPSI = (SR +GR)/C
+
+
+c     write(logdev,*) "DPSI=",DPSI, "GR=",GR,"C=",C,"SR=",SR
 
       SENS(jNH3) = DPSI
       SENS(jNH4) = SENS(jNH4) -DPSI
@@ -1824,7 +1857,10 @@ C
       DOUBLE PRECISION SENS(NSEN)
       DOUBLE PRECISION DELT,GR,SR,WR,C
       
-      IF (WTAER.LE.TINY) RETURN
+c     IF (WTAER.LE.TINY) RETURN
+      IF ( WATER      .LE. TINY .OR. 
+     &     MOLAL(jH)  .LE. TINY .OR. 
+     &     MOLAL(jNO3).LE. TINY      ) RETURN
  
       WR   =  2.D0*SENS(jH2O)/WATER
       GR   = -2.D0*LN10*SGAMA(mHNO3)
@@ -1853,6 +1889,16 @@ C
       DOUBLE PRECISION SENS(NSEN)
       DOUBLE PRECISION DNO,DCL,C11,C12,C21,C22,B1,B2,SR,WR,GR
 
+      INTEGER, SAVE :: LOGDEV
+      LOGICAL, SAVE :: FIRSTIME = .TRUE.
+
+      IF ( FIRSTIME ) THEN
+         FIRSTIME = .FALSE.
+         LOGDEV = INIT3 ()
+      ENDIF
+
+
+
       IF (WATER.LE.TINY) THEN
          SENS(jHNO3) = SINI(iMBNO3)
          SENS(jHCL ) = SINI(iMBCL )
@@ -1863,6 +1909,22 @@ C
          CALL DCALCNA(SENS)
       ELSEIF (W(jTNO3).LE.TINY) THEN
          CALL DCALCHA(SENS)
+      ENDIF
+
+c     write(logdev,*) "IN DCALCNHA "
+c     write(logdev,*) "MOLAL(jH) = ",MOLAL(jH), "MOLAL(jNO3)=",MOLAL(jNO3)
+c     write(logdev,*) "GHNO3 = ",GHNO3,"MOLAL(jCL)=",MOLAL(jCL)
+c     write(logdev,*) "GHCL=",GHCL,"WATER=",WATER
+
+
+      IF ( MOLAL(jH)   .LE. TINY .OR.
+     &     MOLAL(jNO3) .LE. TINY .OR.
+     &     GHNO3       .LE. TINY .OR.
+     &     MOLAL(jCL)  .LE. TINY .OR.
+     &     GHCL        .LE. TINY      ) THEN
+         DCL = ZERO
+         DNO = ZERO
+         RETURN
       ENDIF
 
       C11 = ONE/MOLAL(jH) +ONE/MOLAL(jNO3) +ONE/GHNO3
@@ -1881,10 +1943,14 @@ C
       IF (MOLAL(jCL).EQ.W(jTCL)) DCL = SINI(iMBCL)
       DNO = (B1 -C12*DCL)/C11
       IF (MOLAL(jNO3).EQ.W(jTNO3)) DNO = SINI(iMBNO3)
-      IF (MOLAL(jCL).EQ.TINY.AND.MOLAL(jNO3).EQ.TINY) THEN
+
+c     IF (MOLAL(jCL).EQ.TINY.AND.MOLAL(jNO3).EQ.TINY) THEN
+      IF (MOLAL(jCL).LE.TINY.AND.MOLAL(jNO3).LE.TINY) THEN
          DCL = ZERO
          DNO = ZERO
       ENDIF
+
+c     write(logdev,*) "DCL=",DCL,"DNO=",DNO
 
       SENS(jH)    = SENS(jH)   +DCL +DNO
       SENS(jCL)   = DCL
@@ -1903,7 +1969,10 @@ C
       DOUBLE PRECISION SENS(NSEN)
       DOUBLE PRECISION DELT,GR,SR,WR,C
       
-      IF (WTAER.LE.TINY) RETURN
+c     IF (WTAER.LE.TINY) RETURN
+      IF (WATER      .LE. TINY .OR. 
+     &    MOLAL(jH)  .LE. TINY .OR.
+     &    MOLAL(jCL) .LE. TINY     ) RETURN
  
       WR   =  2.D0*SENS(jH2O)/WATER
       GR   = -2.D0*LN10*SGAMA(mHCL)
@@ -1932,9 +2001,13 @@ C
       DOUBLE PRECISION SENS(NSEN)
       DOUBLE PRECISION DELTA,GR,SR,WR,C
       
-      IF (WATER.LE.1D1*TINY) RETURN
+c     IF (WATER.LE.1D1*TINY) RETURN
+c     IF (MOLAL(jHSO4).EQ.ZERO) RETURN
 
-      IF (MOLAL(jHSO4).EQ.ZERO) RETURN
+      IF ( WATER.LE.1D1*TINY .OR. 
+     &     MOLAL(jHSO4) .LE. TINY .OR.
+     &     MOLAL(jH)    .LE. TINY .OR.
+     &     MOLAL(jSO4)  .LE. TINY      )  RETURN
 
       WR    =  ONE*SENS(jH2O)/WATER
       GR    =  2.D0*LN10*SGAMA(mHHSO4)-3.D0*LN10*SGAMA(mH2SO4)
