@@ -19,8 +19,6 @@
 
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/gas/ebi_saprc99/hrsolver.F,v 1.3 2011/10/21 16:11:07 yoj Exp $
-
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
 
@@ -29,24 +27,29 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 C-----------------------------------------------------------------------
 C  Function: EBI solver
- 
+C
 C  Preconditions: For the SAPRC99 family of mechanisms
- 
+C
 C  Key Subroutines/Functions Called:  HRRATES, HRG1, HRG2, HRG3,
 C                                     HRG4, HRPRODLOSS
- 
-C  Revision History: Created by EBI solver program, Feb. 11, 2011
+C
+C  Revision History: Created by EBI solver program, Jan. 21, 2011
 C                     Revised hrsolver.F by Golam Sarwar, December, 2007
 C                             rearranged a statement suggested by CARB
 C                             to reduce the chance of code crash; it does
 C                             not change results
 C   21 Jun 10 J.Young: convert for Namelist redesign
-C   05 Apr 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
+C   29 Mar 11 S.Roselle: Replaced I/O API include files with UTILIO_DEFN
+C   13 Nov 13 S.Napelenok: ddm-3d implementation for cmaq5.0.2
 C-----------------------------------------------------------------------
 
-      USE CGRID_SPCS, ONLY: N_GC_SPC, GC_SPC   ! CGRID mechanism species
+      USE CGRID_SPCS, ONLY: N_GC_SPC, GC_SPC     ! CGRID mechanism species      
       USE UTILIO_DEFN
       USE HRDATA
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY: YCDDM
+#endif 
 
       IMPLICIT NONE
 
@@ -76,7 +79,7 @@ C..Scratch Local Variables:
 
       CHARACTER( 132 ) :: MSG           ! Message text
 
-      INTEGER CELLNO        ! Cell no. for debug output
+      INTEGER CELLNO        ! Cell no. fo debug output
       INTEGER ITER          ! Loop index for Backward Euler iterations
       INTEGER S             ! Loop index for species
       INTEGER NEBI          ! Loop index for time steps
@@ -106,6 +109,12 @@ C..Scratch Local Variables:
       LOGICAL, SAVE :: LOPEN = .FALSE.
 #endif
 
+#ifdef sens
+      INTEGER N_EBI_MID            ! the midpoint ebi step; half of N_EBI_STEPS
+      LOGICAL ODD_STEPS            ! true if N_EBI_STEPS is odd
+      LOGICAL DDM_CHECK( N_GC_SPC) ! check YCDDM set for all species
+#endif
+
 C-----------------------------------------------------------------------
 
       IF ( LFIRST ) THEN
@@ -125,7 +134,7 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
       ROW = 0
       LEV = 0
       IF ( C .EQ. COL .AND. R .EQ. ROW .AND. L .EQ. LEV ) THEN
-c      IF( JTIME .EQ. 160000 ) THEN
+c      IF ( JTIME .EQ. 160000 ) THEN
          LDEBUG = .TRUE.
       ELSE
          LDEBUG = .FALSE.
@@ -155,6 +164,18 @@ c      IF( JTIME .EQ. 160000 ) THEN
       END IF
 #endif
 c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
+
+#ifdef sens
+      DO S = 1, N_SPEC
+         DDM_CHECK( S ) = .FALSE.
+      END DO
+      N_EBI_MID = CEILING( N_EBI_STEPS / 2.0 )
+      IF ( MOD( N_EBI_STEPS, 2 ) .EQ. 1 ) THEN
+         ODD_STEPS = .TRUE.
+      ELSE
+         ODD_STEPS = .FALSE.
+      END IF
+#endif
 
       N_EBI_IT = 0
 
@@ -215,8 +236,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
                DO EBI = 1, N_EBISP
                   S = EBISP( EBI )
-                  YCP( S ) = YC( S )*( ( YC0( S ) + PROD( S ) * DTC ) /
-     &                                 ( YC ( S ) + LOSS( S ) * DTC ) )
+                  YCP( S ) = YC( S ) * ( ( YC0( S ) + PROD( S ) * DTC ) /
+     &                                   ( YC ( S ) + LOSS( S ) * DTC ) )
                END DO
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -237,6 +258,18 @@ c..if predictions growing too large, treat as a convergence failure
                      MXFL = .TRUE.
                      GO TO 1010
                   END IF
+#ifdef sens
+C YCDDM is the value at the middle time step
+                  IF ( N_EBI_MID .EQ. NEBI ) THEN
+                     DDM_CHECK ( S ) = .TRUE.
+                     IF ( ODD_STEPS ) THEN
+                        YCDDM( S ) = 0.5 * ( YC( S ) + YCP( S ) )
+                     ELSE
+                        YCDDM( S ) = YCP( S )
+                     END IF
+                     IF ( YCDDM( S ) .LT. 1.e-25) YCDDM( S ) = 0.
+                  END IF
+#endif
                   YC( S ) = YCP( S )
                END DO
 
@@ -264,7 +297,7 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 
                IF ( LEBI_CONV ) GO TO 2000
 
- 1000       CONTINUE
+1000        CONTINUE
 
 c...Convergence failure section; cut the inner time step in half &
 c.....start inner loop over unless max backups exceeded
@@ -308,6 +341,17 @@ c.....start inner loop over unless max backups exceeded
 2000     CONTINUE
 
 3000  CONTINUE
+
+#ifdef sens
+      DO S = 1, N_SPEC
+         IF ( .NOT. DDM_CHECK( S ) ) THEN
+            MSG = 'ERROR: HRSOLVER failed to assign YCDDM to ' //
+     &             GC_SPC( S )
+            CALL M3EXIT( PNAME, JDATE, JTIME, MSG, STAT )
+         END IF
+      END DO
+#endif
+
 
       RETURN
 
