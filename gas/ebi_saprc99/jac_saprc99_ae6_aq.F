@@ -123,7 +123,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF( FIRSTIME ) THEN                                               
 
          IF( MECHNAME .NE. 'SAPRC99_AE6_AQ                  ' ) THEN    
-            MSG =  'This Jacobian was built for SAPRC99_AE6_AQ          
+            MSG =  'This Jacobian was built for SAPRC99_AE6_AQ '        
      &            // MECHNAME // ' is in use. Exiting.'                 
             CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )                     
          ENDIF                                                          
