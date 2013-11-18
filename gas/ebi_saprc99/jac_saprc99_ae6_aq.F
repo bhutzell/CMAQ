@@ -7,12 +7,14 @@ C
 C =-=-= MECHANISM: SAPRC99_AE6_AQ                   =-=-=               
 C                                                                       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      USE CGRID_SPCS            ! CGRID mechanism species
+      USE UTILIO_DEFN
 
-      IMPLICIT NONE                                                     
+      IMPLICIT NONE
 
-      INCLUDE SUBST_RXCMMN                                              
-      INCLUDE SUBST_GC_SPC                                              
-      INCLUDE SUBST_IOPARMS                                             
+      INCLUDE SUBST_RXCMMN
+c     INCLUDE SUBST_GC_SPC                        
+c     INCLUDE SUBST_IOPARMS                       
 
       INTEGER, PARAMETER :: NJACSPC =  88                               
       INTEGER, PARAMETER :: NJACRXN = 224                               
