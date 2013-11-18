@@ -1,211 +1,214 @@
-      SUBROUTINE JAC( C, PD, RK )                                                                                       
+      SUBROUTINE JAC( C, PD, RK )                 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C                                                                                                                       
-C Automatically generated Jacobian for DDM-3D                                                                           
-C                                                                                                                       
+C                                                 
+C Automatically generated Jacobian for DDM-3D     
+C                                                 
 C =-=-= MECHANISM: SAPRC07TC_AE6_AQ                 =-=-=                                                               
-C                                                                                                                       
+C                                                 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      IMPLICIT NONE                                                                                                     
+      USE CGRID_SPCS            ! CGRID mechanism species
+      USE UTILIO_DEFN
 
-      INCLUDE SUBST_RXCMMN                                                                                              
-      INCLUDE SUBST_GC_SPC                                                                                              
-      INCLUDE SUBST_IOPARMS                                                                                             
+      IMPLICIT NONE                               
 
-      INTEGER, PARAMETER :: NJACSPC = 150                                                                               
-      INTEGER, PARAMETER :: NJACRXN = 689                                                                               
+      INCLUDE SUBST_RXCMMN                        
+c     INCLUDE SUBST_GC_SPC                        
+c     INCLUDE SUBST_IOPARMS                       
 
-      CHARACTER( 16 ), SAVE :: PNAME = 'JAC'                                                                            
-      CHARACTER( 132 ) :: MSG                                                                                           
+      INTEGER, PARAMETER :: NJACSPC = 150         
+      INTEGER, PARAMETER :: NJACRXN = 689         
 
-      REAL, DIMENSION( NJACSPC ) :: C                                                                                   
-      REAL, DIMENSION( NJACSPC, NJACSPC ) :: PD                                                                         
-      REAL(KIND=8), DIMENSION( NJACRXN ) :: RK                                                                          
+      CHARACTER( 16 ), SAVE :: PNAME = 'JAC'      
+      CHARACTER( 132 ) :: MSG                     
 
-      INTEGER, SAVE :: LOGDEV                                                                                           
-      LOGICAL, SAVE :: FIRSTIME = .TRUE.                                                                                
+      REAL, DIMENSION( NJACSPC ) :: C             
+      REAL, DIMENSION( NJACSPC, NJACSPC ) :: PD   
+      REAL(KIND=8), DIMENSION( NJACRXN ) :: RK    
 
-      INTEGER, PARAMETER :: NO2              =   1                                                                      
-      INTEGER, PARAMETER :: NO               =   2                                                                      
-      INTEGER, PARAMETER :: O3P              =   3                                                                      
-      INTEGER, PARAMETER :: O3               =   4                                                                      
-      INTEGER, PARAMETER :: NO3              =   5                                                                      
-      INTEGER, PARAMETER :: N2O5             =   6                                                                      
-      INTEGER, PARAMETER :: HNO3             =   7                                                                      
-      INTEGER, PARAMETER :: O1D              =   8                                                                      
-      INTEGER, PARAMETER :: OH               =   9                                                                      
-      INTEGER, PARAMETER :: HONO             =  10                                                                      
-      INTEGER, PARAMETER :: HO2              =  11                                                                      
-      INTEGER, PARAMETER :: CO               =  12                                                                      
-      INTEGER, PARAMETER :: CO2              =  13                                                                      
-      INTEGER, PARAMETER :: HNO4             =  14                                                                      
-      INTEGER, PARAMETER :: HO2H             =  15                                                                      
-      INTEGER, PARAMETER :: SO2              =  16                                                                      
-      INTEGER, PARAMETER :: SULF             =  17                                                                      
-      INTEGER, PARAMETER :: SULRXN           =  18                                                                      
-      INTEGER, PARAMETER :: NO2EX            =  19                                                                      
-      INTEGER, PARAMETER :: MEO2             =  20                                                                      
-      INTEGER, PARAMETER :: HCHO             =  21                                                                      
-      INTEGER, PARAMETER :: COOH             =  22                                                                      
-      INTEGER, PARAMETER :: MEOH             =  23                                                                      
-      INTEGER, PARAMETER :: RO2C             =  24                                                                      
-      INTEGER, PARAMETER :: RO2XC            =  25                                                                      
-      INTEGER, PARAMETER :: MECO3            =  26                                                                      
-      INTEGER, PARAMETER :: PAN              =  27                                                                      
-      INTEGER, PARAMETER :: CCOOOH           =  28                                                                      
-      INTEGER, PARAMETER :: CCOOH            =  29                                                                      
-      INTEGER, PARAMETER :: RCO3             =  30                                                                      
-      INTEGER, PARAMETER :: PAN2             =  31                                                                      
-      INTEGER, PARAMETER :: xHO2             =  32                                                                      
-      INTEGER, PARAMETER :: yROOH            =  33                                                                      
-      INTEGER, PARAMETER :: xCCHO            =  34                                                                      
-      INTEGER, PARAMETER :: RCOOOH           =  35                                                                      
-      INTEGER, PARAMETER :: RCOOH            =  36                                                                      
-      INTEGER, PARAMETER :: BZCO3            =  37                                                                      
-      INTEGER, PARAMETER :: PBZN             =  38                                                                      
-      INTEGER, PARAMETER :: BZO              =  39                                                                      
-      INTEGER, PARAMETER :: MACO3            =  40                                                                      
-      INTEGER, PARAMETER :: MAPAN            =  41                                                                      
-      INTEGER, PARAMETER :: TBUO             =  42                                                                      
-      INTEGER, PARAMETER :: RNO3             =  43                                                                      
-      INTEGER, PARAMETER :: ACETONE          =  44                                                                      
-      INTEGER, PARAMETER :: NPHE             =  45                                                                      
-      INTEGER, PARAMETER :: CRES             =  46                                                                      
-      INTEGER, PARAMETER :: xOH              =  47                                                                      
-      INTEGER, PARAMETER :: xNO2             =  48                                                                      
-      INTEGER, PARAMETER :: xMEO2            =  49                                                                      
-      INTEGER, PARAMETER :: xMECO3           =  50                                                                      
-      INTEGER, PARAMETER :: xRCO3            =  51                                                                      
-      INTEGER, PARAMETER :: xMACO3           =  52                                                                      
-      INTEGER, PARAMETER :: xTBUO            =  53                                                                      
-      INTEGER, PARAMETER :: xCO              =  54                                                                      
-      INTEGER, PARAMETER :: CCHO             =  55                                                                      
-      INTEGER, PARAMETER :: RCHO             =  56                                                                      
-      INTEGER, PARAMETER :: xHCHO            =  57                                                                      
-      INTEGER, PARAMETER :: MEK              =  58                                                                      
-      INTEGER, PARAMETER :: zRNO3            =  59                                                                      
-      INTEGER, PARAMETER :: xRCHO            =  60                                                                      
-      INTEGER, PARAMETER :: HCOOH            =  61                                                                      
-      INTEGER, PARAMETER :: xMGLY            =  62                                                                      
-      INTEGER, PARAMETER :: xBACL            =  63                                                                      
-      INTEGER, PARAMETER :: ROOH             =  64                                                                      
-      INTEGER, PARAMETER :: xPROD2           =  65                                                                      
-      INTEGER, PARAMETER :: R6OOH            =  66                                                                      
-      INTEGER, PARAMETER :: PRD2             =  67                                                                      
-      INTEGER, PARAMETER :: yR6OOH           =  68                                                                      
-      INTEGER, PARAMETER :: RAOOH            =  69                                                                      
-      INTEGER, PARAMETER :: MGLY             =  70                                                                      
-      INTEGER, PARAMETER :: IPRD             =  71                                                                      
-      INTEGER, PARAMETER :: xGLY             =  72                                                                      
-      INTEGER, PARAMETER :: xMEK             =  73                                                                      
-      INTEGER, PARAMETER :: xAFG1            =  74                                                                      
-      INTEGER, PARAMETER :: xAFG2            =  75                                                                      
-      INTEGER, PARAMETER :: GLY              =  76                                                                      
-      INTEGER, PARAMETER :: AFG1             =  77                                                                      
-      INTEGER, PARAMETER :: AFG2             =  78                                                                      
-      INTEGER, PARAMETER :: BACL             =  79                                                                      
-      INTEGER, PARAMETER :: BALD             =  80                                                                      
-      INTEGER, PARAMETER :: AFG3             =  81                                                                      
-      INTEGER, PARAMETER :: xIPRD            =  82                                                                      
-      INTEGER, PARAMETER :: MACR             =  83                                                                      
-      INTEGER, PARAMETER :: MVK              =  84                                                                      
-      INTEGER, PARAMETER :: xHOCCHO          =  85                                                                      
-      INTEGER, PARAMETER :: xRNO3            =  86                                                                      
-      INTEGER, PARAMETER :: HOCCHO           =  87                                                                      
-      INTEGER, PARAMETER :: xACETONE         =  88                                                                      
-      INTEGER, PARAMETER :: ACROLEIN         =  89                                                                      
-      INTEGER, PARAMETER :: xBALD            =  90                                                                      
-      INTEGER, PARAMETER :: xAFG3            =  91                                                                      
-      INTEGER, PARAMETER :: xMACR            =  92                                                                      
-      INTEGER, PARAMETER :: xMVK             =  93                                                                      
-      INTEGER, PARAMETER :: yRAOOH           =  94                                                                      
-      INTEGER, PARAMETER :: xACROLEIN        =  95                                                                      
-      INTEGER, PARAMETER :: ETHENE           =  96                                                                      
-      INTEGER, PARAMETER :: PROPENE          =  97                                                                      
-      INTEGER, PARAMETER :: BUTADIENE13      =  98                                                                      
-      INTEGER, PARAMETER :: ISOPRENE         =  99                                                                      
-      INTEGER, PARAMETER :: ISOPRXN          = 100                                                                      
-      INTEGER, PARAMETER :: APIN             = 101                                                                      
-      INTEGER, PARAMETER :: TRPRXN           = 102                                                                      
-      INTEGER, PARAMETER :: ACETYLENE        = 103                                                                      
-      INTEGER, PARAMETER :: BENZENE          = 104                                                                      
-      INTEGER, PARAMETER :: BENZRO2          = 105                                                                      
-      INTEGER, PARAMETER :: TOLUENE          = 106                                                                      
-      INTEGER, PARAMETER :: TOLRO2           = 107                                                                      
-      INTEGER, PARAMETER :: MXYL             = 108                                                                      
-      INTEGER, PARAMETER :: XYLRO2           = 109                                                                      
-      INTEGER, PARAMETER :: OXYL             = 110                                                                      
-      INTEGER, PARAMETER :: PXYL             = 111                                                                      
-      INTEGER, PARAMETER :: TRIMETH_BENZ124  = 112                                                                      
-      INTEGER, PARAMETER :: ETOH             = 113                                                                      
-      INTEGER, PARAMETER :: ALK1             = 114                                                                      
-      INTEGER, PARAMETER :: ALK2             = 115                                                                      
-      INTEGER, PARAMETER :: ALK3             = 116                                                                      
-      INTEGER, PARAMETER :: ALK4             = 117                                                                      
-      INTEGER, PARAMETER :: ALK5             = 118                                                                      
-      INTEGER, PARAMETER :: ALK5RXN          = 119                                                                      
-      INTEGER, PARAMETER :: OLE1             = 120                                                                      
-      INTEGER, PARAMETER :: OLE2             = 121                                                                      
-      INTEGER, PARAMETER :: ARO1             = 122                                                                      
-      INTEGER, PARAMETER :: ARO2             = 123                                                                      
-      INTEGER, PARAMETER :: TERP             = 124                                                                      
-      INTEGER, PARAMETER :: SESQ             = 125                                                                      
-      INTEGER, PARAMETER :: SESQRXN          = 126                                                                      
-      INTEGER, PARAMETER :: CL2              = 127                                                                      
-      INTEGER, PARAMETER :: CL               = 128                                                                      
-      INTEGER, PARAMETER :: CLNO             = 129                                                                      
-      INTEGER, PARAMETER :: CLONO            = 130                                                                      
-      INTEGER, PARAMETER :: CLNO2            = 131                                                                      
-      INTEGER, PARAMETER :: HCL              = 132                                                                      
-      INTEGER, PARAMETER :: CLO              = 133                                                                      
-      INTEGER, PARAMETER :: CLONO2           = 134                                                                      
-      INTEGER, PARAMETER :: HOCL             = 135                                                                      
-      INTEGER, PARAMETER :: xCL              = 136                                                                      
-      INTEGER, PARAMETER :: xCLCCHO          = 137                                                                      
-      INTEGER, PARAMETER :: xCLACET          = 138                                                                      
-      INTEGER, PARAMETER :: CLCCHO           = 139                                                                      
-      INTEGER, PARAMETER :: CLACET           = 140                                                                      
-      INTEGER, PARAMETER :: CLCHO            = 141                                                                      
-      INTEGER, PARAMETER :: BNZNRXN          = 142                                                                      
-      INTEGER, PARAMETER :: BNZHRXN          = 143                                                                      
-      INTEGER, PARAMETER :: XYLNRXN          = 144                                                                      
-      INTEGER, PARAMETER :: XYLHRXN          = 145                                                                      
-      INTEGER, PARAMETER :: TOLNRXN          = 146                                                                      
-      INTEGER, PARAMETER :: TOLHRXN          = 147                                                                      
-      INTEGER, PARAMETER :: HCHO_PRIMARY     = 148                                                                      
-      INTEGER, PARAMETER :: CCHO_PRIMARY     = 149                                                                      
-      INTEGER, PARAMETER :: ACROLEIN_PRIMARY = 150                                                                      
+      INTEGER, SAVE :: LOGDEV                     
+      LOGICAL, SAVE :: FIRSTIME = .TRUE.          
+
+      INTEGER, PARAMETER :: NO2              =   1
+      INTEGER, PARAMETER :: NO               =   2
+      INTEGER, PARAMETER :: O3P              =   3
+      INTEGER, PARAMETER :: O3               =   4
+      INTEGER, PARAMETER :: NO3              =   5
+      INTEGER, PARAMETER :: N2O5             =   6
+      INTEGER, PARAMETER :: HNO3             =   7
+      INTEGER, PARAMETER :: O1D              =   8
+      INTEGER, PARAMETER :: OH               =   9
+      INTEGER, PARAMETER :: HONO             =  10
+      INTEGER, PARAMETER :: HO2              =  11
+      INTEGER, PARAMETER :: CO               =  12
+      INTEGER, PARAMETER :: CO2              =  13
+      INTEGER, PARAMETER :: HNO4             =  14
+      INTEGER, PARAMETER :: HO2H             =  15
+      INTEGER, PARAMETER :: SO2              =  16
+      INTEGER, PARAMETER :: SULF             =  17
+      INTEGER, PARAMETER :: SULRXN           =  18
+      INTEGER, PARAMETER :: NO2EX            =  19
+      INTEGER, PARAMETER :: MEO2             =  20
+      INTEGER, PARAMETER :: HCHO             =  21
+      INTEGER, PARAMETER :: COOH             =  22
+      INTEGER, PARAMETER :: MEOH             =  23
+      INTEGER, PARAMETER :: RO2C             =  24
+      INTEGER, PARAMETER :: RO2XC            =  25
+      INTEGER, PARAMETER :: MECO3            =  26
+      INTEGER, PARAMETER :: PAN              =  27
+      INTEGER, PARAMETER :: CCOOOH           =  28
+      INTEGER, PARAMETER :: CCOOH            =  29
+      INTEGER, PARAMETER :: RCO3             =  30
+      INTEGER, PARAMETER :: PAN2             =  31
+      INTEGER, PARAMETER :: xHO2             =  32
+      INTEGER, PARAMETER :: yROOH            =  33
+      INTEGER, PARAMETER :: xCCHO            =  34
+      INTEGER, PARAMETER :: RCOOOH           =  35
+      INTEGER, PARAMETER :: RCOOH            =  36
+      INTEGER, PARAMETER :: BZCO3            =  37
+      INTEGER, PARAMETER :: PBZN             =  38
+      INTEGER, PARAMETER :: BZO              =  39
+      INTEGER, PARAMETER :: MACO3            =  40
+      INTEGER, PARAMETER :: MAPAN            =  41
+      INTEGER, PARAMETER :: TBUO             =  42
+      INTEGER, PARAMETER :: RNO3             =  43
+      INTEGER, PARAMETER :: ACETONE          =  44
+      INTEGER, PARAMETER :: NPHE             =  45
+      INTEGER, PARAMETER :: CRES             =  46
+      INTEGER, PARAMETER :: xOH              =  47
+      INTEGER, PARAMETER :: xNO2             =  48
+      INTEGER, PARAMETER :: xMEO2            =  49
+      INTEGER, PARAMETER :: xMECO3           =  50
+      INTEGER, PARAMETER :: xRCO3            =  51
+      INTEGER, PARAMETER :: xMACO3           =  52
+      INTEGER, PARAMETER :: xTBUO            =  53
+      INTEGER, PARAMETER :: xCO              =  54
+      INTEGER, PARAMETER :: CCHO             =  55
+      INTEGER, PARAMETER :: RCHO             =  56
+      INTEGER, PARAMETER :: xHCHO            =  57
+      INTEGER, PARAMETER :: MEK              =  58
+      INTEGER, PARAMETER :: zRNO3            =  59
+      INTEGER, PARAMETER :: xRCHO            =  60
+      INTEGER, PARAMETER :: HCOOH            =  61
+      INTEGER, PARAMETER :: xMGLY            =  62
+      INTEGER, PARAMETER :: xBACL            =  63
+      INTEGER, PARAMETER :: ROOH             =  64
+      INTEGER, PARAMETER :: xPROD2           =  65
+      INTEGER, PARAMETER :: R6OOH            =  66
+      INTEGER, PARAMETER :: PRD2             =  67
+      INTEGER, PARAMETER :: yR6OOH           =  68
+      INTEGER, PARAMETER :: RAOOH            =  69
+      INTEGER, PARAMETER :: MGLY             =  70
+      INTEGER, PARAMETER :: IPRD             =  71
+      INTEGER, PARAMETER :: xGLY             =  72
+      INTEGER, PARAMETER :: xMEK             =  73
+      INTEGER, PARAMETER :: xAFG1            =  74
+      INTEGER, PARAMETER :: xAFG2            =  75
+      INTEGER, PARAMETER :: GLY              =  76
+      INTEGER, PARAMETER :: AFG1             =  77
+      INTEGER, PARAMETER :: AFG2             =  78
+      INTEGER, PARAMETER :: BACL             =  79
+      INTEGER, PARAMETER :: BALD             =  80
+      INTEGER, PARAMETER :: AFG3             =  81
+      INTEGER, PARAMETER :: xIPRD            =  82
+      INTEGER, PARAMETER :: MACR             =  83
+      INTEGER, PARAMETER :: MVK              =  84
+      INTEGER, PARAMETER :: xHOCCHO          =  85
+      INTEGER, PARAMETER :: xRNO3            =  86
+      INTEGER, PARAMETER :: HOCCHO           =  87
+      INTEGER, PARAMETER :: xACETONE         =  88
+      INTEGER, PARAMETER :: ACROLEIN         =  89
+      INTEGER, PARAMETER :: xBALD            =  90
+      INTEGER, PARAMETER :: xAFG3            =  91
+      INTEGER, PARAMETER :: xMACR            =  92
+      INTEGER, PARAMETER :: xMVK             =  93
+      INTEGER, PARAMETER :: yRAOOH           =  94
+      INTEGER, PARAMETER :: xACROLEIN        =  95
+      INTEGER, PARAMETER :: ETHENE           =  96
+      INTEGER, PARAMETER :: PROPENE          =  97
+      INTEGER, PARAMETER :: BUTADIENE13      =  98
+      INTEGER, PARAMETER :: ISOPRENE         =  99
+      INTEGER, PARAMETER :: ISOPRXN          = 100
+      INTEGER, PARAMETER :: APIN             = 101
+      INTEGER, PARAMETER :: TRPRXN           = 102
+      INTEGER, PARAMETER :: ACETYLENE        = 103
+      INTEGER, PARAMETER :: BENZENE          = 104
+      INTEGER, PARAMETER :: BENZRO2          = 105
+      INTEGER, PARAMETER :: TOLUENE          = 106
+      INTEGER, PARAMETER :: TOLRO2           = 107
+      INTEGER, PARAMETER :: MXYL             = 108
+      INTEGER, PARAMETER :: XYLRO2           = 109
+      INTEGER, PARAMETER :: OXYL             = 110
+      INTEGER, PARAMETER :: PXYL             = 111
+      INTEGER, PARAMETER :: TRIMETH_BENZ124  = 112
+      INTEGER, PARAMETER :: ETOH             = 113
+      INTEGER, PARAMETER :: ALK1             = 114
+      INTEGER, PARAMETER :: ALK2             = 115
+      INTEGER, PARAMETER :: ALK3             = 116
+      INTEGER, PARAMETER :: ALK4             = 117
+      INTEGER, PARAMETER :: ALK5             = 118
+      INTEGER, PARAMETER :: ALK5RXN          = 119
+      INTEGER, PARAMETER :: OLE1             = 120
+      INTEGER, PARAMETER :: OLE2             = 121
+      INTEGER, PARAMETER :: ARO1             = 122
+      INTEGER, PARAMETER :: ARO2             = 123
+      INTEGER, PARAMETER :: TERP             = 124
+      INTEGER, PARAMETER :: SESQ             = 125
+      INTEGER, PARAMETER :: SESQRXN          = 126
+      INTEGER, PARAMETER :: CL2              = 127
+      INTEGER, PARAMETER :: CL               = 128
+      INTEGER, PARAMETER :: CLNO             = 129
+      INTEGER, PARAMETER :: CLONO            = 130
+      INTEGER, PARAMETER :: CLNO2            = 131
+      INTEGER, PARAMETER :: HCL              = 132
+      INTEGER, PARAMETER :: CLO              = 133
+      INTEGER, PARAMETER :: CLONO2           = 134
+      INTEGER, PARAMETER :: HOCL             = 135
+      INTEGER, PARAMETER :: xCL              = 136
+      INTEGER, PARAMETER :: xCLCCHO          = 137
+      INTEGER, PARAMETER :: xCLACET          = 138
+      INTEGER, PARAMETER :: CLCCHO           = 139
+      INTEGER, PARAMETER :: CLACET           = 140
+      INTEGER, PARAMETER :: CLCHO            = 141
+      INTEGER, PARAMETER :: BNZNRXN          = 142
+      INTEGER, PARAMETER :: BNZHRXN          = 143
+      INTEGER, PARAMETER :: XYLNRXN          = 144
+      INTEGER, PARAMETER :: XYLHRXN          = 145
+      INTEGER, PARAMETER :: TOLNRXN          = 146
+      INTEGER, PARAMETER :: TOLHRXN          = 147
+      INTEGER, PARAMETER :: HCHO_PRIMARY     = 148
+      INTEGER, PARAMETER :: CCHO_PRIMARY     = 149
+      INTEGER, PARAMETER :: ACROLEIN_PRIMARY = 150
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      IF( FIRSTIME ) THEN                                                                                               
+      IF( FIRSTIME ) THEN                         
 
          IF( MECHNAME .NE. 'SAPRC07TC_AE6_AQ                ' ) THEN                                                    
             MSG =  'This Jacobian was built for SAPRC07TC_AE6_AQ                 '                                      
      &            // MECHNAME // ' is in use. Exiting.'                                                                 
             CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )                                                                     
-         ENDIF                                                                                                          
+         ENDIF                                    
 
-         IF ( N_GC_SPC .NE. NJACSPC ) THEN                                                                              
+         IF ( N_GC_SPC .NE. NJACSPC ) THEN        
             MSG =  'ERROR: Number of species in Jacobian '                                                              
-     &          // 'does not match N_GC_SPC.'                                                                           
+     &          // 'does not match N_GC_SPC.'     
             CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )                                                                     
-         ELSE IF ( NRXNS .NE. NJACRXN ) THEN                                                                            
+         ELSE IF ( NRXNS .NE. NJACRXN ) THEN      
             MSG =  'ERROR: Number of reactions in Jacobian '                                                            
-     &          // 'does not match NRXNS.'                                                                              
+     &          // 'does not match NRXNS.'        
             CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )                                                                     
-         ENDIF                                                                                                          
+         ENDIF                                    
 
-         FIRSTIME = .FALSE.                                                                                             
+         FIRSTIME = .FALSE.                       
 
-      ENDIF                                                                                                             
+      ENDIF                                       
 
-      PD = 0.0                                                                                                          
+      PD = 0.0                                    
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species   1: NO2                                                                        
+C  PDs of the rate of change of species   1: NO2  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( NO2             ,NO2              ) = -           RK( 001 )                                                   
      &                                          -           RK( 005 ) * C( O3P              )                           
@@ -331,7 +334,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          +           RK( 585 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species   2: NO                                                                         
+C  PDs of the rate of change of species   2: NO   
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( NO              ,NO2              ) =             RK( 001 )                                                   
      &                                          +           RK( 005 ) * C( O3P              )                           
@@ -372,7 +375,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( NO              ,CLO              ) = -           RK( 581 ) * C( NO               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species   3: O3P                                                                        
+C  PDs of the rate of change of species   3: O3P  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( O3P             ,NO2              ) =             RK( 001 )                                                   
      &                                          -           RK( 005 ) * C( O3P              )                           
@@ -413,7 +416,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( O3P             ,SESQ             ) = -           RK( 569 ) * C( O3P              )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species   4: O3                                                                         
+C  PDs of the rate of change of species   4: O3   
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( O3              ,NO2              ) = -           RK( 008 ) * C( O3               )                           
       PD( O3              ,NO               ) = -           RK( 007 ) * C( O3               )                           
@@ -474,7 +477,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( O3              ,CL               ) = -           RK( 579 ) * C( O3               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species   5: NO3                                                                        
+C  PDs of the rate of change of species   5: NO3  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( NO3             ,NO2              ) =             RK( 006 ) * C( O3P              )                           
      &                                          +           RK( 008 ) * C( O3               )                           
@@ -562,7 +565,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          +           RK( 586 ) * C( CL               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species   6: N2O5                                                                       
+C  PDs of the rate of change of species   6: N2O5 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( N2O5            ,NO2              ) =             RK( 011 ) * C( NO3              )                           
       PD( N2O5            ,NO3              ) =             RK( 011 ) * C( NO2              )                           
@@ -571,7 +574,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 014 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species   7: HNO3                                                                       
+C  PDs of the rate of change of species   7: HNO3 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HNO3            ,NO2              ) =             RK( 025 ) * C( OH               )                           
       PD( HNO3            ,NO3              ) =   0.20000 * RK( 039 ) * C( HO2              )                           
@@ -606,14 +609,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HNO3            ,ACROLEIN         ) =   0.96700 * RK( 280 ) * C( NO3              )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species   8: O1D                                                                        
+C  PDs of the rate of change of species   8: O1D  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( O1D             ,O3               ) =             RK( 018 )                                                   
       PD( O1D             ,O1D              ) = -           RK( 020 )                                                   
      &                                          -           RK( 021 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species   9: OH                                                                         
+C  PDs of the rate of change of species   9: OH   
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( OH              ,NO2              ) = -           RK( 025 ) * C( OH               )                           
       PD( OH              ,NO               ) = -           RK( 022 ) * C( OH               )                           
@@ -834,7 +837,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( OH              ,CLCCHO           ) = -           RK( 612 ) * C( OH               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  10: HONO                                                                       
+C  PDs of the rate of change of species  10: HONO 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HONO            ,NO               ) =             RK( 022 ) * C( OH               )                           
       PD( HONO            ,OH               ) =             RK( 022 ) * C( NO               )                           
@@ -845,7 +848,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HONO            ,NPHE             ) =             RK( 245 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  11: HO2                                                                        
+C  PDs of the rate of change of species  11: HO2  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HO2             ,NO2              ) = -           RK( 032 ) * C( HO2              )                           
       PD( HO2             ,NO               ) = -           RK( 031 ) * C( HO2              )                           
@@ -1060,7 +1063,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HO2             ,CLCCHO           ) =             RK( 611 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  12: CO                                                                         
+C  PDs of the rate of change of species  12: CO   
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CO              ,NO               ) =             RK( 198 ) * C( xCO              )                           
       PD( CO              ,O3P              ) =   0.51000 * RK( 521 ) * C( ETHENE           )                           
@@ -1157,7 +1160,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CO              ,CLCCHO           ) =             RK( 611 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  13: CO2                                                                        
+C  PDs of the rate of change of species  13: CO2  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CO2             ,NO               ) =             RK( 070 ) * C( MECO3            )                           
      &                                          +           RK( 080 ) * C( RCO3             )                           
@@ -1270,7 +1273,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CO2             ,SESQ             ) =   0.06300 * RK( 567 ) * C( O3               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  14: HNO4                                                                       
+C  PDs of the rate of change of species  14: HNO4 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HNO4            ,NO2              ) =             RK( 032 ) * C( HO2              )                           
       PD( HNO4            ,OH               ) = -           RK( 035 ) * C( HNO4             )                           
@@ -1280,7 +1283,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 035 ) * C( OH               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  15: HO2H                                                                       
+C  PDs of the rate of change of species  15: HO2H 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HO2H            ,OH               ) = -           RK( 042 ) * C( HO2H             )                           
       PD( HO2H            ,HO2              ) =   4.00000 * RK( 037 ) * C( HO2              )                           
@@ -1289,13 +1292,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 042 ) * C( OH               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  16: SO2                                                                        
+C  PDs of the rate of change of species  16: SO2  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( SO2             ,OH               ) = -           RK( 044 ) * C( SO2              )                           
       PD( SO2             ,SO2              ) = -           RK( 044 ) * C( OH               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  17: SULF                                                                       
+C  PDs of the rate of change of species  17: SULF 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( SULF            ,OH               ) =             RK( 044 ) * C( SO2              )                           
       PD( SULF            ,SO2              ) =             RK( 044 ) * C( OH               )                           
@@ -1307,7 +1310,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( SULRXN          ,SO2              ) =             RK( 044 ) * C( OH               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  19: NO2EX                                                                      
+C  PDs of the rate of change of species  19: NO2EX
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( NO2EX           ,NO2              ) =             RK( 046 )                                                   
       PD( NO2EX           ,NO2EX            ) = -           RK( 047 )                                                   
@@ -1315,7 +1318,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 049 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  20: MEO2                                                                       
+C  PDs of the rate of change of species  20: MEO2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MEO2            ,NO               ) = -           RK( 050 ) * C( MEO2             )                           
      &                                          +           RK( 070 ) * C( MECO3            )                           
@@ -1396,7 +1399,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MEO2            ,CL               ) =             RK( 645 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  21: HCHO                                                                       
+C  PDs of the rate of change of species  21: HCHO 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HCHO            ,NO               ) =             RK( 050 ) * C( MEO2             )                           
      &                                          +           RK( 103 ) * C( MACO3            )                           
@@ -1501,7 +1504,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          +           RK( 594 ) * C( MEOH             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  22: COOH                                                                       
+C  PDs of the rate of change of species  22: COOH 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( COOH            ,OH               ) = -           RK( 226 ) * C( COOH             )                           
       PD( COOH            ,HO2              ) =             RK( 051 ) * C( MEO2             )                           
@@ -1510,7 +1513,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 227 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  23: MEOH                                                                       
+C  PDs of the rate of change of species  23: MEOH 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MEOH            ,OH               ) = -           RK( 222 ) * C( MEOH             )                           
       PD( MEOH            ,MEO2             ) =   4.00000 * RK( 054 ) * C( MEO2             )                           
@@ -1523,7 +1526,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MEOH            ,CL               ) = -           RK( 594 ) * C( MEOH             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  24: RO2C                                                                       
+C  PDs of the rate of change of species  24: RO2C 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RO2C            ,NO               ) = -           RK( 056 ) * C( RO2C             )                           
      &                                          +           RK( 080 ) * C( RCO3             )                           
@@ -1789,7 +1792,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RO2C            ,CLACET           ) =             RK( 614 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  25: RO2XC                                                                      
+C  PDs of the rate of change of species  25: RO2XC
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RO2XC           ,NO               ) = -           RK( 061 ) * C( RO2XC            )                           
       PD( RO2XC           ,O3P              ) =   0.01500 * RK( 529 ) * C( BUTADIENE13      )                           
@@ -1971,7 +1974,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.58200 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  26: MECO3                                                                      
+C  PDs of the rate of change of species  26: MECO3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MECO3           ,NO2              ) = -           RK( 067 ) * C( MECO3            )                           
       PD( MECO3           ,NO               ) = -           RK( 070 ) * C( MECO3            )                           
@@ -2057,7 +2060,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MECO3           ,CLACET           ) =             RK( 614 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  27: PAN                                                                        
+C  PDs of the rate of change of species  27: PAN  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( PAN             ,NO2              ) =             RK( 067 ) * C( MECO3            )                           
       PD( PAN             ,MECO3            ) =             RK( 067 ) * C( NO2              )                           
@@ -2074,7 +2077,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 284 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  29: CCOOH                                                                      
+C  PDs of the rate of change of species  29: CCOOH
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CCOOH           ,O3               ) =   0.07500 * RK( 523 ) * C( PROPENE          )                           
      &                                          + 0.06500 * RK( 557 ) * C( OLE2             )                           
@@ -2089,7 +2092,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CCOOH           ,OLE2             ) =   0.06500 * RK( 557 ) * C( O3               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  30: RCO3                                                                       
+C  PDs of the rate of change of species  30: RCO3 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RCO3            ,NO2              ) = -           RK( 077 ) * C( RCO3             )                           
       PD( RCO3            ,NO               ) = -           RK( 080 ) * C( RCO3             )                           
@@ -2152,7 +2155,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          +           RK( 613 ) * C( CL               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  31: PAN2                                                                       
+C  PDs of the rate of change of species  31: PAN2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( PAN2            ,NO2              ) =             RK( 077 ) * C( RCO3             )                           
       PD( PAN2            ,RCO3             ) =             RK( 077 ) * C( NO2              )                           
@@ -2160,7 +2163,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 079 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  32: xHO2                                                                       
+C  PDs of the rate of change of species  32: xHO2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xHO2            ,NO               ) =             RK( 080 ) * C( RCO3             )                           
      &                                          -           RK( 118 ) * C( xHO2             )                           
@@ -2401,7 +2404,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.25200 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  33: yROOH                                                                      
+C  PDs of the rate of change of species  33: yROOH
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( yROOH           ,NO               ) =             RK( 080 ) * C( RCO3             )                           
      &                                          -           RK( 457 ) * C( yROOH            )                           
@@ -2550,7 +2553,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( yROOH           ,CLACET           ) =             RK( 614 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  34: xCCHO                                                                      
+C  PDs of the rate of change of species  34: xCCHO
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xCCHO           ,NO               ) =             RK( 080 ) * C( RCO3             )                           
      &                                          -           RK( 297 ) * C( xCCHO            )                           
@@ -2677,7 +2680,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RCOOOH          ,MACO3            ) =   0.75000 * RK( 104 ) * C( HO2              )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  36: RCOOH                                                                      
+C  PDs of the rate of change of species  36: RCOOH
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RCOOH           ,O3               ) =   0.37200 * RK( 268 ) * C( IPRD             )                           
      &                                          + 0.15900 * RK( 553 ) * C( OLE1             )                           
@@ -2699,7 +2702,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RCOOH           ,SESQ             ) =   0.06800 * RK( 567 ) * C( O3               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  37: BZCO3                                                                      
+C  PDs of the rate of change of species  37: BZCO3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( BZCO3           ,NO2              ) = -           RK( 088 ) * C( BZCO3            )                           
       PD( BZCO3           ,NO               ) = -           RK( 091 ) * C( BZCO3            )                           
@@ -2732,7 +2735,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( BZCO3           ,CL               ) =             RK( 603 ) * C( BALD             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  38: PBZN                                                                       
+C  PDs of the rate of change of species  38: PBZN 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( PBZN            ,NO2              ) =             RK( 088 ) * C( BZCO3            )                           
       PD( PBZN            ,BZCO3            ) =             RK( 088 ) * C( NO2              )                           
@@ -2740,7 +2743,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 090 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  39: BZO                                                                        
+C  PDs of the rate of change of species  39: BZO  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( BZO             ,NO2              ) = -           RK( 115 ) * C( BZO              )                           
       PD( BZO             ,NO               ) =             RK( 091 ) * C( BZCO3            )                           
@@ -2773,7 +2776,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          +           RK( 243 ) * C( NO3              )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  40: MACO3                                                                      
+C  PDs of the rate of change of species  40: MACO3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MACO3           ,NO2              ) = -           RK( 100 ) * C( MACO3            )                           
       PD( MACO3           ,NO               ) = -           RK( 103 ) * C( MACO3            )                           
@@ -2844,7 +2847,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.15400 * RK( 610 ) * C( IPRD             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  41: MAPAN                                                                      
+C  PDs of the rate of change of species  41: MAPAN
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MAPAN           ,NO2              ) =             RK( 100 ) * C( MACO3            )                           
       PD( MAPAN           ,MACO3            ) =             RK( 100 ) * C( NO2              )                           
@@ -2852,7 +2855,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 102 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  42: TBUO                                                                       
+C  PDs of the rate of change of species  42: TBUO 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( TBUO            ,NO2              ) = -           RK( 113 ) * C( TBUO             )                           
       PD( TBUO            ,NO               ) =             RK( 188 ) * C( xTBUO            )                           
@@ -2877,7 +2880,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          +           RK( 197 ) * C( MACO3            )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  43: RNO3                                                                       
+C  PDs of the rate of change of species  43: RNO3 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RNO3            ,NO2              ) =             RK( 113 ) * C( TBUO             )                           
       PD( RNO3            ,NO               ) =             RK( 447 ) * C( xRNO3            )                           
@@ -2938,7 +2941,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ACETONE         ,CL               ) = -           RK( 596 ) * C( ACETONE          )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  45: NPHE                                                                       
+C  PDs of the rate of change of species  45: NPHE 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( NPHE            ,NO2              ) =             RK( 115 ) * C( BZO              )                           
       PD( NPHE            ,OH               ) = -           RK( 244 ) * C( NPHE             )                           
@@ -2948,7 +2951,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 246 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  46: CRES                                                                       
+C  PDs of the rate of change of species  46: CRES 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CRES            ,NO3              ) = -           RK( 243 ) * C( CRES             )                           
       PD( CRES            ,OH               ) = -           RK( 242 ) * C( CRES             )                           
@@ -2977,7 +2980,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CRES            ,CL               ) = -           RK( 602 ) * C( CRES             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  47: xOH                                                                        
+C  PDs of the rate of change of species  47: xOH  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xOH             ,NO               ) = -           RK( 128 ) * C( xOH              )                           
       PD( xOH             ,NO3              ) = -           RK( 130 ) * C( xOH              )                           
@@ -3017,7 +3020,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.02400 * RK( 606 ) * C( RAOOH            )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  48: xNO2                                                                       
+C  PDs of the rate of change of species  48: xNO2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xNO2            ,NO               ) = -           RK( 138 ) * C( xNO2             )                           
       PD( xNO2            ,NO3              ) = -           RK( 140 ) * C( xNO2             )                           
@@ -3057,7 +3060,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xNO2            ,CL               ) =   0.15900 * RK( 598 ) * C( RNO3             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  49: xMEO2                                                                      
+C  PDs of the rate of change of species  49: xMEO2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xMEO2           ,NO               ) = -           RK( 148 ) * C( xMEO2            )                           
       PD( xMEO2           ,NO3              ) = -           RK( 150 ) * C( xMEO2            )                           
@@ -3156,7 +3159,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.03400 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  51: xRCO3                                                                      
+C  PDs of the rate of change of species  51: xRCO3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xRCO3           ,NO               ) = -           RK( 168 ) * C( xRCO3            )                           
       PD( xRCO3           ,O3               ) =   0.65200 * RK( 251 ) * C( AFG1             )                           
@@ -3262,7 +3265,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.01600 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  53: xTBUO                                                                      
+C  PDs of the rate of change of species  53: xTBUO
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xTBUO           ,NO               ) = -           RK( 188 ) * C( xTBUO            )                           
       PD( xTBUO           ,NO3              ) = -           RK( 190 ) * C( xTBUO            )                           
@@ -3290,7 +3293,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xTBUO           ,CL               ) =   0.09400 * RK( 660 ) * C( ALK3             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  54: xCO                                                                        
+C  PDs of the rate of change of species  54: xCO  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xCO             ,NO               ) = -           RK( 198 ) * C( xCO              )                           
       PD( xCO             ,O3P              ) =   0.27800 * RK( 521 ) * C( ETHENE           )                           
@@ -3370,7 +3373,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.03500 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  55: CCHO                                                                       
+C  PDs of the rate of change of species  55: CCHO 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CCHO            ,NO               ) =             RK( 297 ) * C( xCCHO            )                           
       PD( CCHO            ,O3P              ) =   0.10000 * RK( 521 ) * C( ETHENE           )                           
@@ -3412,7 +3415,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.68800 * RK( 657 ) * C( ETOH             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  56: RCHO                                                                       
+C  PDs of the rate of change of species  56: RCHO 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RCHO            ,NO               ) =             RK( 307 ) * C( xRCHO            )                           
       PD( RCHO            ,O3P              ) =             RK( 261 ) * C( MACR             )                           
@@ -3476,7 +3479,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.41400 * RK( 604 ) * C( ROOH             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  57: xHCHO                                                                      
+C  PDs of the rate of change of species  57: xHCHO
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xHCHO           ,NO               ) = -           RK( 287 ) * C( xHCHO            )                           
       PD( xHCHO           ,O3P              ) =   0.27800 * RK( 521 ) * C( ETHENE           )                           
@@ -3627,7 +3630,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xHCHO           ,CLACET           ) =             RK( 614 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  58: MEK                                                                        
+C  PDs of the rate of change of species  58: MEK  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MEK             ,NO               ) =             RK( 327 ) * C( xMEK             )                           
       PD( MEK             ,O3P              ) =   0.55000 * RK( 265 ) * C( MVK              )                           
@@ -3686,7 +3689,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.01800 * RK( 598 ) * C( RNO3             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  59: zRNO3                                                                      
+C  PDs of the rate of change of species  59: zRNO3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( zRNO3           ,NO               ) = -           RK( 487 ) * C( zRNO3            )                           
       PD( zRNO3           ,O3P              ) =   0.01500 * RK( 529 ) * C( BUTADIENE13      )                           
@@ -3869,7 +3872,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.58200 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  60: xRCHO                                                                      
+C  PDs of the rate of change of species  60: xRCHO
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xRCHO           ,NO               ) = -           RK( 307 ) * C( xRCHO            )                           
       PD( xRCHO           ,O3               ) =   0.24000 * RK( 535 ) * C( APIN             )                           
@@ -3990,7 +3993,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.18500 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  61: HCOOH                                                                      
+C  PDs of the rate of change of species  61: HCOOH
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HCOOH           ,O3               ) =   0.33300 * RK( 259 ) * C( MACR             )                           
      &                                          + 0.35100 * RK( 264 ) * C( MVK              )                           
@@ -4022,7 +4025,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HCOOH           ,SESQ             ) =   0.17200 * RK( 567 ) * C( O3               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  62: xMGLY                                                                      
+C  PDs of the rate of change of species  62: xMGLY
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xMGLY           ,NO               ) = -           RK( 357 ) * C( xMGLY            )                           
       PD( xMGLY           ,O3               ) =   0.09500 * RK( 257 ) * C( AFG3             )                           
@@ -4098,7 +4101,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.01700 * RK( 610 ) * C( IPRD             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  63: xBACL                                                                      
+C  PDs of the rate of change of species  63: xBACL
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xBACL           ,NO               ) = -           RK( 367 ) * C( xBACL            )                           
       PD( xBACL           ,O3               ) =   0.08100 * RK( 535 ) * C( APIN             )                           
@@ -4150,7 +4153,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.00300 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  64: ROOH                                                                       
+C  PDs of the rate of change of species  64: ROOH 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ROOH            ,OH               ) = -           RK( 228 ) * C( ROOH             )                           
       PD( ROOH            ,HO2              ) =             RK( 458 ) * C( yROOH            )                           
@@ -4227,7 +4230,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.35900 * RK( 666 ) * C( ARO2             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  66: R6OOH                                                                      
+C  PDs of the rate of change of species  66: R6OOH
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( R6OOH           ,OH               ) = -           RK( 230 ) * C( R6OOH            )                           
       PD( R6OOH           ,HO2              ) =             RK( 468 ) * C( yR6OOH           )                           
@@ -4238,7 +4241,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( R6OOH           ,CL               ) = -           RK( 605 ) * C( R6OOH            )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  67: PRD2                                                                       
+C  PDs of the rate of change of species  67: PRD2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( PRD2            ,NO               ) =             RK( 337 ) * C( xPROD2           )                           
       PD( PRD2            ,O3P              ) =   0.75000 * RK( 529 ) * C( BUTADIENE13      )                           
@@ -4478,7 +4481,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          +           RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  69: RAOOH                                                                      
+C  PDs of the rate of change of species  69: RAOOH
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RAOOH           ,OH               ) = -           RK( 232 ) * C( RAOOH            )                           
       PD( RAOOH           ,HO2              ) =             RK( 478 ) * C( yRAOOH           )                           
@@ -4489,7 +4492,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( RAOOH           ,CL               ) = -           RK( 606 ) * C( RAOOH            )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  70: MGLY                                                                       
+C  PDs of the rate of change of species  70: MGLY 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MGLY            ,NO               ) =             RK( 357 ) * C( xMGLY            )                           
       PD( MGLY            ,O3               ) =   0.56800 * RK( 251 ) * C( AFG1             )                           
@@ -4536,7 +4539,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.14700 * RK( 606 ) * C( RAOOH            )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  71: IPRD                                                                       
+C  PDs of the rate of change of species  71: IPRD 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( IPRD            ,NO               ) =             RK( 437 ) * C( xIPRD            )                           
       PD( IPRD            ,O3               ) =   0.00300 * RK( 257 ) * C( AFG3             )                           
@@ -4575,7 +4578,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 610 ) * C( IPRD             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  72: xGLY                                                                       
+C  PDs of the rate of change of species  72: xGLY 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xGLY            ,NO               ) = -           RK( 347 ) * C( xGLY             )                           
       PD( xGLY            ,O3P              ) =   0.01200 * RK( 521 ) * C( ETHENE           )                           
@@ -4641,7 +4644,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.00700 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  73: xMEK                                                                       
+C  PDs of the rate of change of species  73: xMEK 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xMEK            ,NO               ) = -           RK( 327 ) * C( xMEK             )                           
       PD( xMEK            ,O3               ) =   0.00100 * RK( 557 ) * C( OLE2             )                           
@@ -4712,7 +4715,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.04200 * RK( 664 ) * C( OLE2             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  74: xAFG1                                                                      
+C  PDs of the rate of change of species  74: xAFG1
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xAFG1           ,NO               ) = -           RK( 387 ) * C( xAFG1            )                           
       PD( xAFG1           ,O3P              ) =   0.00100 * RK( 529 ) * C( BUTADIENE13      )                           
@@ -4768,7 +4771,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.00600 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  75: xAFG2                                                                      
+C  PDs of the rate of change of species  75: xAFG2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xAFG2           ,NO               ) = -           RK( 397 ) * C( xAFG2            )                           
       PD( xAFG2           ,O3P              ) =   0.00100 * RK( 529 ) * C( BUTADIENE13      )                           
@@ -4824,7 +4827,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.00600 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  76: GLY                                                                        
+C  PDs of the rate of change of species  76: GLY  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( GLY             ,NO               ) =             RK( 347 ) * C( xGLY             )                           
       PD( GLY             ,O3               ) =   0.43200 * RK( 251 ) * C( AFG1             )                           
@@ -4868,7 +4871,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( GLY             ,CL               ) = -           RK( 600 ) * C( GLY              )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  77: AFG1                                                                       
+C  PDs of the rate of change of species  77: AFG1 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( AFG1            ,NO               ) =             RK( 387 ) * C( xAFG1            )                           
       PD( AFG1            ,O3               ) = -           RK( 251 ) * C( AFG1             )                           
@@ -4900,7 +4903,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( AFG1            ,CL               ) =   0.04200 * RK( 610 ) * C( IPRD             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  78: AFG2                                                                       
+C  PDs of the rate of change of species  78: AFG2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( AFG2            ,NO               ) =             RK( 397 ) * C( xAFG2            )                           
       PD( AFG2            ,O3               ) = -           RK( 254 ) * C( AFG2             )                           
@@ -4932,7 +4935,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( AFG2            ,CL               ) =   0.04200 * RK( 610 ) * C( IPRD             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  79: BACL                                                                       
+C  PDs of the rate of change of species  79: BACL 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( BACL            ,NO               ) =             RK( 367 ) * C( xBACL            )                           
       PD( BACL            ,NO3              ) =             RK( 369 ) * C( xBACL            )                           
@@ -4955,7 +4958,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( BACL            ,BACL             ) = -           RK( 241 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  80: BALD                                                                       
+C  PDs of the rate of change of species  80: BALD 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( BALD            ,NO               ) =             RK( 377 ) * C( xBALD            )                           
       PD( BALD            ,NO3              ) = -           RK( 249 ) * C( BALD             )                           
@@ -4984,7 +4987,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( BALD            ,CL               ) = -           RK( 603 ) * C( BALD             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  81: AFG3                                                                       
+C  PDs of the rate of change of species  81: AFG3 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( AFG3            ,NO               ) =             RK( 407 ) * C( xAFG3            )                           
       PD( AFG3            ,O3               ) = - 0.86100 * RK( 257 ) * C( AFG3             )                           
@@ -5026,7 +5029,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( AFG3            ,ARO2             ) =   0.17800 * RK( 561 ) * C( OH               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  82: xIPRD                                                                      
+C  PDs of the rate of change of species  82: xIPRD
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xIPRD           ,NO               ) = -           RK( 437 ) * C( xIPRD            )                           
       PD( xIPRD           ,O3               ) =   0.00100 * RK( 563 ) * C( TERP             )                           
@@ -5094,7 +5097,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.15800 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  83: MACR                                                                       
+C  PDs of the rate of change of species  83: MACR 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MACR            ,NO               ) =             RK( 417 ) * C( xMACR            )                           
       PD( MACR            ,O3P              ) = -           RK( 261 ) * C( MACR             )                           
@@ -5131,7 +5134,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MACR            ,CL               ) = -           RK( 608 ) * C( MACR             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  84: MVK                                                                        
+C  PDs of the rate of change of species  84: MVK  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MVK             ,NO               ) =             RK( 427 ) * C( xMVK             )                           
       PD( MVK             ,O3P              ) = -           RK( 265 ) * C( MVK              )                           
@@ -5208,7 +5211,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xHOCCHO         ,CL               ) =   0.06100 * RK( 657 ) * C( ETOH             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  86: xRNO3                                                                      
+C  PDs of the rate of change of species  86: xRNO3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xRNO3           ,NO               ) = -           RK( 447 ) * C( xRNO3            )                           
       PD( xRNO3           ,NO3              ) =   0.57200 * RK( 269 ) * C( IPRD             )                           
@@ -5396,7 +5399,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ACROLEIN        ,CL               ) = -           RK( 607 ) * C( ACROLEIN         )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  90: xBALD                                                                      
+C  PDs of the rate of change of species  90: xBALD
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xBALD           ,NO               ) = -           RK( 377 ) * C( xBALD            )                           
       PD( xBALD           ,NO3              ) = -           RK( 379 ) * C( xBALD            )                           
@@ -5446,7 +5449,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.46900 * RK( 666 ) * C( ARO2             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  91: xAFG3                                                                      
+C  PDs of the rate of change of species  91: xAFG3
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xAFG3           ,NO               ) = -           RK( 407 ) * C( xAFG3            )                           
       PD( xAFG3           ,NO3              ) = -           RK( 409 ) * C( xAFG3            )                           
@@ -5482,7 +5485,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          + 0.00100 * RK( 668 ) * C( SESQ             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  92: xMACR                                                                      
+C  PDs of the rate of change of species  92: xMACR
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xMACR           ,NO               ) = -           RK( 417 ) * C( xMACR            )                           
       PD( xMACR           ,O3               ) =   0.00200 * RK( 563 ) * C( TERP             )                           
@@ -5520,7 +5523,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xMACR           ,CL               ) =   0.02500 * RK( 664 ) * C( OLE2             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species  93: xMVK                                                                       
+C  PDs of the rate of change of species  93: xMVK 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xMVK            ,NO               ) = -           RK( 427 ) * C( xMVK             )                           
       PD( xMVK            ,NO3              ) = -           RK( 429 ) * C( xMVK             )                           
@@ -5706,7 +5709,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ISOPRXN         ,ISOPRENE         ) =             RK( 530 ) * C( OH               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 101: APIN                                                                       
+C  PDs of the rate of change of species 101: APIN 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( APIN            ,O3P              ) = -           RK( 537 ) * C( APIN             )                           
       PD( APIN            ,O3               ) = -           RK( 535 ) * C( APIN             )                           
@@ -5786,7 +5789,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( TOLRO2          ,ARO1             ) =             RK( 560 ) * C( OH               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 108: MXYL                                                                       
+C  PDs of the rate of change of species 108: MXYL 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( MXYL            ,OH               ) = -           RK( 542 ) * C( MXYL             )                           
       PD( MXYL            ,MXYL             ) = -           RK( 542 ) * C( OH               )                           
@@ -5812,7 +5815,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( XYLRO2          ,ARO2             ) =             RK( 561 ) * C( OH               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 110: OXYL                                                                       
+C  PDs of the rate of change of species 110: OXYL 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( OXYL            ,OH               ) = -           RK( 543 ) * C( OXYL             )                           
       PD( OXYL            ,OXYL             ) = -           RK( 543 ) * C( OH               )                           
@@ -5820,7 +5823,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( OXYL            ,CL               ) = -           RK( 654 ) * C( OXYL             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 111: PXYL                                                                       
+C  PDs of the rate of change of species 111: PXYL 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( PXYL            ,OH               ) = -           RK( 544 ) * C( PXYL             )                           
       PD( PXYL            ,PXYL             ) = -           RK( 544 ) * C( OH               )                           
@@ -5836,7 +5839,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( TRIMETH_BENZ124 ,CL               ) = -           RK( 656 ) * C( TRIMETH_BENZ124  )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 113: ETOH                                                                       
+C  PDs of the rate of change of species 113: ETOH 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ETOH            ,OH               ) = -           RK( 546 ) * C( ETOH             )                           
       PD( ETOH            ,ETOH             ) = -           RK( 546 ) * C( OH               )                           
@@ -5844,7 +5847,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ETOH            ,CL               ) = -           RK( 657 ) * C( ETOH             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 114: ALK1                                                                       
+C  PDs of the rate of change of species 114: ALK1 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ALK1            ,OH               ) = -           RK( 547 ) * C( ALK1             )                           
       PD( ALK1            ,ALK1             ) = -           RK( 547 ) * C( OH               )                           
@@ -5852,7 +5855,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ALK1            ,CL               ) = -           RK( 658 ) * C( ALK1             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 115: ALK2                                                                       
+C  PDs of the rate of change of species 115: ALK2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ALK2            ,OH               ) = -           RK( 548 ) * C( ALK2             )                           
       PD( ALK2            ,ALK2             ) = -           RK( 548 ) * C( OH               )                           
@@ -5860,7 +5863,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ALK2            ,CL               ) = -           RK( 659 ) * C( ALK2             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 116: ALK3                                                                       
+C  PDs of the rate of change of species 116: ALK3 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ALK3            ,OH               ) = -           RK( 549 ) * C( ALK3             )                           
       PD( ALK3            ,ALK3             ) = -           RK( 549 ) * C( OH               )                           
@@ -5868,7 +5871,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ALK3            ,CL               ) = -           RK( 660 ) * C( ALK3             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 117: ALK4                                                                       
+C  PDs of the rate of change of species 117: ALK4 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ALK4            ,OH               ) = -           RK( 550 ) * C( ALK4             )                           
       PD( ALK4            ,ALK4             ) = -           RK( 550 ) * C( OH               )                           
@@ -5876,7 +5879,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ALK4            ,CL               ) = -           RK( 661 ) * C( ALK4             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 118: ALK5                                                                       
+C  PDs of the rate of change of species 118: ALK5 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ALK5            ,OH               ) = -           RK( 551 ) * C( ALK5             )                           
       PD( ALK5            ,ALK5             ) = -           RK( 551 ) * C( OH               )                           
@@ -5890,7 +5893,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ALK5RXN         ,ALK5             ) =             RK( 551 ) * C( OH               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 120: OLE1                                                                       
+C  PDs of the rate of change of species 120: OLE1 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( OLE1            ,O3P              ) = -           RK( 555 ) * C( OLE1             )                           
       PD( OLE1            ,O3               ) = -           RK( 553 ) * C( OLE1             )                           
@@ -5904,7 +5907,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( OLE1            ,CL               ) = -           RK( 663 ) * C( OLE1             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 121: OLE2                                                                       
+C  PDs of the rate of change of species 121: OLE2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( OLE2            ,O3P              ) = -           RK( 559 ) * C( OLE2             )                           
       PD( OLE2            ,O3               ) = -           RK( 557 ) * C( OLE2             )                           
@@ -5918,7 +5921,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( OLE2            ,CL               ) = -           RK( 664 ) * C( OLE2             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 122: ARO1                                                                       
+C  PDs of the rate of change of species 122: ARO1 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ARO1            ,OH               ) = -           RK( 560 ) * C( ARO1             )                           
       PD( ARO1            ,ARO1             ) = -           RK( 560 ) * C( OH               )                           
@@ -5926,7 +5929,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ARO1            ,CL               ) = -           RK( 665 ) * C( ARO1             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 123: ARO2                                                                       
+C  PDs of the rate of change of species 123: ARO2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ARO2            ,OH               ) = -           RK( 561 ) * C( ARO2             )                           
       PD( ARO2            ,ARO2             ) = -           RK( 561 ) * C( OH               )                           
@@ -5934,7 +5937,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( ARO2            ,CL               ) = -           RK( 666 ) * C( ARO2             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 124: TERP                                                                       
+C  PDs of the rate of change of species 124: TERP 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( TERP            ,O3P              ) = -           RK( 565 ) * C( TERP             )                           
       PD( TERP            ,O3               ) = -           RK( 563 ) * C( TERP             )                           
@@ -5948,7 +5951,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( TERP            ,CL               ) = -           RK( 667 ) * C( TERP             )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 125: SESQ                                                                       
+C  PDs of the rate of change of species 125: SESQ 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( SESQ            ,O3P              ) = -           RK( 569 ) * C( SESQ             )                           
       PD( SESQ            ,O3               ) = -           RK( 567 ) * C( SESQ             )                           
@@ -5974,7 +5977,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          +           RK( 569 ) * C( O3P              )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 127: CL2                                                                        
+C  PDs of the rate of change of species 127: CL2  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CL2             ,CL2              ) = -           RK( 570 )                                                   
       PD( CL2             ,CL               ) =             RK( 586 ) * C( CLONO2           )                           
@@ -5982,7 +5985,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CL2             ,CLONO2           ) =             RK( 586 ) * C( CL               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 128: CL                                                                         
+C  PDs of the rate of change of species 128: CL   
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CL              ,NO2              ) = -           RK( 573 ) * C( CL               )                           
      &                                          -           RK( 574 ) * C( CL               )                           
@@ -6119,28 +6122,28 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CL              ,CLCCHO           ) = -           RK( 613 ) * C( CL               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 129: CLNO                                                                       
+C  PDs of the rate of change of species 129: CLNO 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CLNO            ,NO               ) =             RK( 571 ) * C( CL               )                           
       PD( CLNO            ,CL               ) =             RK( 571 ) * C( NO               )                           
       PD( CLNO            ,CLNO             ) = -           RK( 572 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 130: CLONO                                                                      
+C  PDs of the rate of change of species 130: CLONO
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CLONO           ,NO2              ) =             RK( 573 ) * C( CL               )                           
       PD( CLONO           ,CL               ) =             RK( 573 ) * C( NO2              )                           
       PD( CLONO           ,CLONO            ) = -           RK( 575 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 131: CLNO2                                                                      
+C  PDs of the rate of change of species 131: CLNO2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CLNO2           ,NO2              ) =             RK( 574 ) * C( CL               )                           
       PD( CLNO2           ,CL               ) =             RK( 574 ) * C( NO2              )                           
       PD( CLNO2           ,CLNO2            ) = -           RK( 576 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 132: HCL                                                                        
+C  PDs of the rate of change of species 132: HCL  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HCL             ,OH               ) = -           RK( 590 ) * C( HCL              )                           
       PD( HCL             ,HO2              ) =             RK( 577 ) * C( CL               )                           
@@ -6214,7 +6217,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HCL             ,CLCCHO           ) =             RK( 613 ) * C( CL               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 133: CLO                                                                        
+C  PDs of the rate of change of species 133: CLO  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CLO             ,NO2              ) = -           RK( 582 ) * C( CLO              )                           
       PD( CLO             ,NO               ) = -           RK( 581 ) * C( CLO              )                           
@@ -6244,14 +6247,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 586 ) * C( CL               )                           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 135: HOCL                                                                       
+C  PDs of the rate of change of species 135: HOCL 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( HOCL            ,HO2              ) =             RK( 587 ) * C( CLO              )                           
       PD( HOCL            ,CLO              ) =             RK( 587 ) * C( HO2              )                           
       PD( HOCL            ,HOCL             ) = -           RK( 588 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 136: xCL                                                                        
+C  PDs of the rate of change of species 136: xCL  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( xCL             ,NO               ) = -           RK( 615 ) * C( xCL              )                           
       PD( xCL             ,NO3              ) = -           RK( 617 ) * C( xCL              )                           
@@ -6421,7 +6424,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CLACET          ,CLACET           ) = -           RK( 614 )                                                   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  PDs of the rate of change of species 141: CLCHO                                                                      
+C  PDs of the rate of change of species 141: CLCHO
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       PD( CLCHO           ,ETHENE           ) =             RK( 646 ) * C( CL               )                           
       PD( CLCHO           ,CL               ) =             RK( 646 ) * C( ETHENE           )                           
@@ -6501,5 +6504,5 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                                          -           RK( 689 ) * C( CL               )                           
 
 
-      RETURN                                                                                                            
-      END                                                                                                               
+      RETURN                                      
+      END                                         
