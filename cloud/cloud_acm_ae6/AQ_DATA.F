@@ -34,6 +34,7 @@ C     Mar 2011: Sergey Napelenok - AE6 update for Ca/Mg/K/Fe/Mn
 C               indexing, density, variable names
 C     Mar 2011: Shawn Roselle, replaced I/O API include files with UTILIO_DEFN
 C     Jun 2012: J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
+C     Nov.2013: B.Hutzell = increased mxsrg from 20 to 25 based on H.Pye's isoprene SOA model
 C
 C-----------------------------------------------------------------------
       Use aero_data, Only: n_aerospc, conmin
@@ -46,7 +47,7 @@ C-----------------------------------------------------------------------
       Integer, Parameter :: naer = n_aerospc + naddaer  ! number of aerosol surrogate species for AQCHEM
       Integer, Parameter :: nliqs = 51  ! number of liquid-phase species in AQCHEM
       Integer, Parameter :: nmodes = 3  ! number of aerosol modes
-      Integer, Parameter :: mxsrg = 20  ! maximum number of species for surrogate
+      Integer, Parameter :: mxsrg = 25  ! maximum number of species for surrogate
 
       integer, parameter :: akn = 1     ! number for Aitken mode
       Integer, Parameter :: acc = 2     ! number for Accumulation mode
