@@ -37,7 +37,6 @@
 !C    11 Apr 2011: S.Roselle: replaced I/O API include files with UTILIO_DEFN
 !C    11 May 11 D.Wong: incorporated twoway model implementation
 !C     6 May 13 D.Wong: replaced species name RC with RCA in the twoway model
-!C    10 Jun 13 D.Wong: modified the code to work in the twoway model mode
 !C    24 Sep 13 D.Wong: modified the code to allow finer met data time step
 !C                      rather than fixed with one hour data
 !C----------------------------------------------------------------------
@@ -293,22 +292,10 @@ C        INTEGER, INTENT( IN ) :: EMLAYS     ! number of emissions layers
 
 !C Set up domain based on met file
 !C Open met file
-#ifdef twoway
-            IF (MYPE == 0) then
-               MNAME = PROMPTMFILE( 
-     &                 'Enter name for gridded met input file',
-     &                 FSRDWR3, CTM_CONC_1, PNAME )
-            ELSE
-               MNAME = PROMPTMFILE( 
-     &                 'Enter name for gridded met input file',
-     &                 FSREAD3, CTM_CONC_1, PNAME )
-            END IF
-#else
             MNAME = PROMPTMFILE( 
      &              'Enter name for gridded met input file',
      &              FSREAD3, 'MET_CRO_3D', PNAME )
 !           write(*,*) "LTNG INIT MNAME", MNAME
-#endif
 
 !C Read description of domain (there may be a better way to get this info)
             IF ( .NOT. DESC3( MNAME ) ) THEN
