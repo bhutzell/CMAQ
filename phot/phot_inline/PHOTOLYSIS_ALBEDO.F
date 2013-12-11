@@ -131,10 +131,6 @@ C...compute start time data and frequency of annual cycle considering leap year
                 JYFREQ = 2.0 * PI / 365.0
              END IF
              
-             HAS_SEAICE  = .TRUE.
-             VARNM = 'SEAICE'
-             V = INDEX1( VARNM, NVARS3D, VNAME3D )
-
 C...Get met file offsets
 
              CALL SUBHFILE ( GRID_CRO_2D, GXOFF, GYOFF,
@@ -151,6 +147,10 @@ C...Get met file offsets
                   RETURN
              END IF
              
+             HAS_SEAICE  = .TRUE.
+             VARNM = 'SEAICE'
+             V = INDEX1( VARNM, NVARS3D, VNAME3D )
+
              IF ( V .EQ. 0 ) THEN
                 HAS_SEAICE = .FALSE.
                 XMSG = 'Could not find ' // VARNM // 'in ' // MET_CRO_2D
