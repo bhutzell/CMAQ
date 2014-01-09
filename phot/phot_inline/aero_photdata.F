@@ -69,6 +69,10 @@ C-----------------------------------------------------------------------
       USE SOA_DEFN            ! gas soa data
       USE AEROMET_DATA        ! Includes CONST.EXT
 
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : SENGRID
+#endif 
+
       IMPLICIT NONE
 
 C Includes:
@@ -179,10 +183,18 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 C ***    extract grid cell concentrations of aero species from CGRID
 C        into aerospc_conc in aero_data module
+#ifdef sens
+         CALL EXTRACT_AERO ( CGRID( COL,ROW,L,: ), .FALSE., SENGRID( COL,ROW,L,:,: ) )
+#else
          CALL EXTRACT_AERO ( CGRID( COL,ROW,L,: ), .TRUE. )
+#endif
 
 C ***    extract soa concentrations from CGRID
+#ifdef sens
+         CALL EXTRACT_SOA ( CGRID( COL,ROW,L,: ), SENGRID( COL,ROW,L,:,: ) )
+#else
          CALL EXTRACT_SOA ( CGRID( COL,ROW,L,: ) )
+#endif
 
 C ***    Calculate aerosol surface area to 2nd moment.
          DO M = 1, N_MODE

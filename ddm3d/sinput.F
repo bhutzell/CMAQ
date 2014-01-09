@@ -650,10 +650,8 @@ CCCCCCC Sensitivity to a chemical reaction rate constant CCCCC
 
 CCCCCCC Unrecognized or non-implemented sens type CCCCCCCCCCCC
         ELSE
-          XMSG = 'Sentype not recognized. ' //
-     &           'Only Emission (EMIS), Initial Condition ' //
-     &           '(INIT), & Bdry Condition (BOUN) ' //
-     &           'implemented so far.'
+          XMSG = 'Sentype not recognized: ' // TXT( 2:5 ) //
+     &           '. Use EMIS, INIT, BOUN, RATE, or HIGH. '
           CALL M3EXIT( PNAME,STDATE,STTIME,XMSG,XSTAT1 )
 
         END IF  ! Finished setting sentype
@@ -1202,9 +1200,9 @@ c Calculate 2nd order mapping
                End If
             End If
          End Do
-      Else
-         XMSG = 'DDM-3D HIGH option not enabled - check runscript'
-         CALL M3EXIT ( 'sinput', 0, 0, XMSG, XSTAT2 )
+c     Else
+c        XMSG = 'DDM-3D HIGH option not enabled - check runscript'
+c        CALL M3EXIT ( 'sinput', 0, 0, XMSG, XSTAT2 )
       End If
 
       RETURN

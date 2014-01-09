@@ -757,7 +757,13 @@ c     DO I = 1, NIONSPC
       DOUBLE PRECISION SENS(NSEN), S1(NSEN), S2(NSEN)
       DOUBLE PRECISION DPSI,GR,C,SR
 
-      IF (WATER.LE.TINY) RETURN
+c     IF (WATER.LE.TINY) RETURN
+      IF ( WATER       .LE. TINY .OR.
+     &     MOLAL(jNH4) .LE. TINY .OR.
+     &     MOLAL(jH)   .LE. TINY .OR.
+     &     GNH3        .LE. TINY      ) THEN
+         RETURN
+      ENDIF
 
       GR   = -2.D0*LN10*(SGAMA(mHNO3)-SGAMA(mNH4NO3))     !GAMA RELATED
       C    = ONE/MOLAL(jNH4) +ONE/MOLAL(jH) +ONE/GNH3
@@ -783,7 +789,10 @@ c     DO I = 1, NIONSPC
       DOUBLE PRECISION SENS(NSEN), S1(NSEN), S2(NSEN)
       DOUBLE PRECISION DELT,GR,SR,WR,C
       
-      IF (WTAER.LE.TINY) RETURN
+c     IF (WTAER.LE.TINY) RETURN
+      IF ( WATER      .LE. TINY .OR.
+     &     MOLAL(jH)  .LE. TINY .OR.
+     &     MOLAL(jNO3).LE. TINY      ) RETURN
  
       WR   =  2.D0*SENS(jH2O)/WATER -2.*S1(jH2O)*S2(jH2O)/WATER/WATER
       GR   = -2.D0*LN10*SGAMA(mHNO3)
@@ -817,7 +826,18 @@ c     DO I = 1, NIONSPC
       DOUBLE PRECISION DELT,GR,SR,WR,C
  
  
-      IF (WTAER.LE.TINY) RETURN
+c     IF (WTAER.LE.TINY) RETURN
+      IF (WATER.LE.TINY) RETURN
+
+      IF ( MOLAL(jH)   .LE. TINY .OR.
+     &     MOLAL(jNO3) .LE. TINY .OR.
+     &     GHNO3       .LE. TINY .OR.
+     &     MOLAL(jCL)  .LE. TINY .OR.
+     &     GHCL        .LE. TINY      ) THEN
+         DCL = ZERO
+         DNO = ZERO
+         RETURN
+      ENDIF
  
       WR   =  2.D0*SENS(jH2O)/WATER -2.*S1(jH2O)*S2(jH2O)/WATER/WATER
       GR   = -2.D0*LN10*SGAMA(mHCL)
@@ -861,6 +881,12 @@ c     DO I = 1, NIONSPC
       ELSEIF (W(jTNO3).LE.TINY) THEN
          CALL HDCALCHA(SENS, S1, S2)
       ENDIF
+
+      IF( MOLAL(jH)   .LE. TINY .OR.
+     &    MOLAL(jNO3) .LE. TINY .OR.
+     &    GHNO3       .LE. TINY .OR.
+     &    GHCL        .LE. TINY .OR.
+     &    MOLAL(jCL)  .LE. TINY       ) RETURN
 
       C11 = ONE/MOLAL(jH) +ONE/MOLAL(jNO3) +ONE/GHNO3
       C12 = ONE/MOLAL(jH)
@@ -907,9 +933,14 @@ c     DO I = 1, NIONSPC
       DOUBLE PRECISION DELTA,GR,SR,WR,C
      
  
-      IF (WATER.LE.1D1*TINY) RETURN
+c     IF (WATER.LE.1D1*TINY) RETURN
+c     IF (MOLAL(jHSO4).EQ.ZERO) RETURN
 
-      IF (MOLAL(jHSO4).EQ.ZERO) RETURN
+      IF ( WATER.LE.1D1*TINY .OR.
+     &     MOLAL(jHSO4) .LE. TINY .OR.
+     &     MOLAL(jH)    .LE. TINY .OR.
+     &     MOLAL(jSO4)  .LE. TINY      )  RETURN
+
 
       WR    = -SENS(jH2O)/WATER +S1(jH2O)*S2(jH2O)/WATER/WATER 
       GR    = -2.D0*LN10*SGAMA(mHHSO4)+3.D0*LN10*SGAMA(mH2SO4)
