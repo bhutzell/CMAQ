@@ -88,7 +88,7 @@ C-------------------------------------------------------------------
          NAM_VOC(  5 ) = 'ETOH' ! ncarbon= 2, rki = 170, mir =  1.042
          NAM_VOC(  6 ) = 'FORM' ! ncarbon= 1, rki = 73,  mir =  4.496
          NAM_VOC(  7 ) = 'IOLE' ! ncarbon= 4, rki = 125, mir = 13.109
-         NAM_VOC(  8 ) = 'ISOP' ! ncarbon= 5, rki = 158, mir = 11.555
+         NAM_VOC(  8 ) = 'ISOP' ! ncarbon= 5, rki = 158, mir = 11.555 * 2
          NAM_VOC(  9 ) = 'MEOH' ! ncarbon= 1, rki = 72,  mir =  0.361
          NAM_VOC( 10 ) = 'OLE'  ! ncarbon= 2, rki = 117, mir =  8.235
          NAM_VOC( 11 ) = 'PAR'  ! ncarbon= 1, rki = 112, mir =  0.319
@@ -137,7 +137,7 @@ C-------------------------------------------------------------------
          MIR(  5 ) =  1.042
          MIR(  6 ) =  4.496
          MIR(  7 ) = 13.109
-         MIR(  8 ) = 11.555
+         MIR(  8 ) = 11.555 * 2.0
          MIR(  9 ) =  0.361
          MIR( 10 ) =  8.235
          MIR( 11 ) =  0.319
