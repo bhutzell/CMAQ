@@ -19,7 +19,7 @@
 
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero6/AERO_EMIS.F,v 1.11 2012/01/19 13:20:08 yoj Exp $
+C $Header: /project/work/rep/arc/CCTM/src/aero/aero6/AERO_EMIS.F,v 1.11 2012/01/19 13:20:08 yoj Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
@@ -64,8 +64,6 @@ C   25 Mar 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 C   11 May 11 D.Wong: incorporated twoway model implementation
 C   18 Aug 11 David Wong: In the merge inline point source PM species calculation,
 C                         arrays EMBUFF and PMEMIS_PT have incorrect index values
-C   17 Apr 13 J.Young: replace "SPFC ASO4" (found by Havala Pye) with "SPFC_ASO4"
-C   19 Jul 13 R.Kwok: isam
 
 C-----------------------------------------------------------------------
 
@@ -126,7 +124,7 @@ C Factor for converting aerosol emissions from input units ...
 
 C *** PVB: temporary hack to speciate PMC
       REAL,    SAVE :: SPFC_ACORS
-      REAL,    SAVE :: SPFC_ASO4
+      REAL,    SAVE :: SPFC ASO4
       REAL,    SAVE :: SPFC_ANO3
       REAL,    SAVE :: SPFC_ACL
       REAL,    SAVE :: SPFC_AH2O
@@ -271,7 +269,8 @@ C *** set up for sea-salt emission processing
          END IF
 
 C *** windblown dust emissions?
-         WB_DUST = ENVYN( 'CTM_WB_DUST', 'Flag for windblown dust emissions',
+         WB_DUST = ENVYN( 'CTM_WB_DUST', 
+     &                    'Flag for windblown dust emissions',
      &                   .TRUE., STATUS )
 
          IF ( WB_DUST ) THEN
@@ -334,7 +333,8 @@ C *** Allocate memory for PM_EM, EMBUFF, CELLHGT, CELLVOL, and CONVEM_PM
      &              CELLHGT( PM_EMLYRS ),
      &              CELLVOL( PM_EMLYRS ), STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
-            XMSG = '*** CONVEM_PM, CELLHGT or CELLVOL memory allocation failed'
+            XMSG = 
+     &    '*** CONVEM_PM, CELLHGT or CELLVOL memory allocation failed'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
          
@@ -355,8 +355,8 @@ C *** Allocate memory for EM_RATE, EM_PART, EM_MAP, EM_FAC, NUM_MAP, NUM_FAC, SR
      &              SS_MAP  ( N_AEROSPC, N_MODE ),
      &              DUST_MAP( N_AEROSPC, N_MODE ), STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
-            XMSG = '*** memory allocation failed for '
-     &           // 'EM_PART, EM_MAP, EM_FAC, NUM_MAP, NUM_FAC, SRF_MAP, SRF_FAC, SS_MAP or DUST_MAP'
+            XMSG = '*** memory allocation failed for EM_PART, EM_MAP,'
+     &  // 'EM_FAC,NUM_MAP,NUM_FAC,SRF_MAP,SRF_FAC,SS_MAP or DUST_MAP'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
@@ -445,7 +445,7 @@ C *** Map aerosol surface emission species and set across-the-board adjustment f
 
 C *** PVB: temporary hack to speciate PMC
          SPFC_ACORS = ( 1.0 - 0.00325 ) * AEROSPC( ACORS_IDX )%EMIS_SPLIT( N_MODE )
-         SPFC_ASO4  = 0.00100 * AEROSPC( ASO4_IDX )%EMIS_SPLIT( N_MODE )
+         SPFC ASO4  = 0.00100 * AEROSPC( ASO4_IDX )%EMIS_SPLIT( N_MODE )
          SPFC_ANO3  = 0.00048 * AEROSPC( ANO3_IDX )%EMIS_SPLIT( N_MODE )
          SPFC_ACL   = 0.00145 * AEROSPC( ACL_IDX )%EMIS_SPLIT( N_MODE )
          SPFC_AH2O  = 0.00032 * AEROSPC( AH2O_IDX )%EMIS_SPLIT( N_MODE )
@@ -794,7 +794,7 @@ C     Binkowski & Roselle (2003).
                   END DO
                   N = N_MODE
                   IF ( IDX .EQ. ASO4_IDX ) THEN
-                     EM_PART( IDX,N ) = SPFC_ASO4 * EM_RATE( S )
+                     EM_PART( IDX,N ) = SPFC ASO4 * EM_RATE( S )
                   ELSE IF ( IDX .EQ. ANO3_IDX ) THEN
                      EM_PART( IDX,N ) = SPFC_ANO3 * EM_RATE( S )
                   ELSE IF ( IDX .EQ. ACL_IDX ) THEN
@@ -923,7 +923,7 @@ C     (excluding sea salt), as in Equation 7a of Binkowski & Roselle (2003).
                      END DO
                      N = N_MODE
                      IF ( IDX .EQ. ASO4_IDX ) THEN
-                        EM_PART( IDX,N ) = SPFC_ASO4 * EM_RATE( S )
+                        EM_PART( IDX,N ) = SPFC ASO4 * EM_RATE( S )
                      ELSE IF ( IDX .EQ. ANO3_IDX ) THEN
                         EM_PART( IDX,N ) = SPFC_ANO3 * EM_RATE( S )
                      ELSE IF ( IDX .EQ. ACL_IDX ) THEN
@@ -990,13 +990,12 @@ C     [m2/mol/s].  Save results in the VDEMIS_AE array.
          RETURN
 
          END SUBROUTINE GET_AERO_EMIS
-
 #ifdef isam
-C..Isam aero emis allocation
+C...Isam aero emis allocation
          SUBROUTINE SA_AERO_EMIS ( JDATE, JTIME, TSTEP, RJACM, ISAMEM_AE )
 C
-C..July 20, 2012, R. Kwok: Replicated from GET_AERO_EMIS for tagged PM emissions
-C
+C .....July 20, 2012, R. Kwok: Replicated from GET_AERO_EMIS for tagged PM emissions
+C 
 C ----------------------------------------------------------------------
          USE GRID_CONF           ! horizontal & vertical domain specifications
          USE CGRID_SPCS          ! CGRID mechanism species
@@ -1023,7 +1022,7 @@ C Arguments:
                                                              ! Jacobian [1/m]
          REAL,    INTENT( INOUT ) :: ISAMEM_AE( :,:,:,:,: ) ! aero emissions [ppmv/s]
 
-
+         
          REAL( 8 ) :: GSFAC                        ! into [ug/m3/sec]
 
 C Variables interpolated from the meteorological input files
@@ -1048,7 +1047,7 @@ C Miscellaneous variables
          INTEGER JSPC, ITAG               ! 20120723 isam indices
 
 C....20130319
-         INTEGER :: VMODE( N_MODE )
+         INTEGER :: VMODE( N_MODE ) 
 
 C diagnostic....20130319
          REAL    SA_CHK
@@ -1059,9 +1058,10 @@ C diagnostic....20130319
 
 C ----------------------------------------------------------------------
 
-C *** Read air density [kg/m3], atmospheric pressure [Pa], air temperature
-C     [K], specific humidity [kg H2O / kg air], and 10m wind speed [m/s]
-C     from meteorology file.  Interpolate to the current time.  Store results
+
+C *** Read air density [kg/m3], atmospheric pressure [Pa], air temperature 
+C     [K], specific humidity [kg H2O / kg air], and 10m wind speed [m/s] 
+C     from meteorology file.  Interpolate to the current time.  Store results 
 C     in DENS, PRES, TA, QV, and WSPD10 arrays.
          IF ( .NOT. INTERPX( MET_CRO_3D, 'DENS', PNAME,
      &                       STRTCOLMC3,ENDCOLMC3, STRTROWMC3,ENDROWMC3,
@@ -1078,7 +1078,7 @@ C     in DENS, PRES, TA, QV, and WSPD10 arrays.
 
 C *** Store aerosol emission rates for this grid cell in a 1D array
                  DO S = 1, N_EMIS_PM
-                   PM_EM( S ) = SA_PMEMIS_GRD( C,R,L,S,ITAG )
+                   PM_EM( S ) = SA_PMEMIS_GRD( C,R,L,S, ITAG )
                  END DO
 
 C *** Calculate scaling factor for converting mass emissions into [ug/m3/s]
@@ -1094,11 +1094,11 @@ C *** Calculate speciated mass emission rates for fine aerosol [ug/m3/s]
 
 C *** Extract H2SO4 vapor emission rate from the VDEMIS array, add it to
 C     the fine-PM sulfate emissions, and remove it from the gas emissions
-                 EM_RATE( VPSO4 ) = EM_RATE( VPSO4 ) + SA_SULF_GRD( C,R,L,ITAG )
-     &                            * PRECURSOR_MW( SULF_IDX ) / CONVM
-                 SA_SULF_GRD( C,R,L,ITAG ) = 0.0
+                 EM_RATE( VPSO4 ) = EM_RATE( VPSO4 ) + SA_SULF_GRD( C,R,L, ITAG )
+     &                             * PRECURSOR_MW( SULF_IDX ) / CONVM
+                 SA_SULF_GRD( C,R,L, ITAG ) = 0.0
 
-C *** Calculate emissions rate for third moments [m3/m3/s] of each mode
+C *** Calculate emissions rate for third moments [m3/m3/s] of each mode 
 C     (excluding sea salt), as in Equation 7a of Binkowski & Roselle (2003).
                  EM_PART = 0.0   ! array assignment
                  EMISM3 = 0.0    ! array assignment
@@ -1106,23 +1106,23 @@ C     (excluding sea salt), as in Equation 7a of Binkowski & Roselle (2003).
                    IDX = PMEM_MAP( S )
                    DO N = 1, N_MODE - 1
                      EM_PART( IDX,N ) = AEROSPC( IDX )%EMIS_SPLIT( N )
-     &                                * EM_RATE( S )
+     &                                   * EM_RATE( S )
                    END DO
                  END DO
 
 C *** Convert emission rates into molar-mixing-ratio units, as required by
-C     the vertical diffusion routines.  Mass emissions are
+C     the vertical diffusion routines.  Mass emissions are 
 C     converted to [ppmv/s]. Save results in the ISAMEM_AE array.
                  DO JSPC = 1, NSPC_SA
-                   VMODE( 1 ) = INDEX1( SPC_NAME( JSPC,ITAG ), N_EMIS_PM, ANAMI )
-                   VMODE( 2 ) = INDEX1( SPC_NAME( JSPC,ITAG ), N_EMIS_PM, ANAMJ )
+                   VMODE( 1 ) = INDEX1( SPC_NAME(JSPC,ITAG), N_EMIS_PM, ANAMI )
+                   VMODE( 2 ) = INDEX1( SPC_NAME(JSPC,ITAG), N_EMIS_PM, ANAMJ )
                    DO N = 1, N_MODE - 1
                      IF ( VMODE( N ) .GT. 0 ) THEN
                        IDX = PMEM_MAP( VMODE( N ) )
-                       ISAMEM_AE( C,R,L,JSPC,ITAG ) = EM_PART( IDX,N ) *EM_FAC( IDX,N )
-     &                                              * CONVM / AEROSPC_MW( IDX )
-                     END IF ! vmode( N ) > 0
-                   END DO ! loop N
+                       ISAMEM_AE( C,R,L,JSPC,ITAG ) = EM_PART(IDX,N) *EM_FAC(IDX,N)
+     &                                            * CONVM / AEROSPC_MW( IDX )
+                     ENDIF ! vmode( N ) > 0
+                   ENDDO ! loop N
                  END DO   ! loop on jspc
 
                END DO   ! loop on itag
@@ -1134,6 +1134,5 @@ C     converted to [ppmv/s]. Save results in the ISAMEM_AE array.
 
          END SUBROUTINE SA_AERO_EMIS
 #endif
-
       END MODULE AERO_EMIS
 
