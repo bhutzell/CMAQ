@@ -19,7 +19,7 @@
 
 
 C RCS file, release, date & time of last delta, author, state, [locker]
-C $Header: /project/work/rep/arc/CCTM/src/aero/aero6/hetchem.f,v 1.7 2012/01/19 13:13:59 yoj Exp $
+C $Header: /project/yoj/arc/CCTM/src/aero/aero5/hetchem.f,v 1.7 2012/01/19 13:13:59 yoj Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%

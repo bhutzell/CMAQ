@@ -19,7 +19,7 @@
 
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/aero/aero6/aero_driver.F,v 1.11 2012/01/19 13:12:57 yoj Exp $
+C $Header: /project/yoj/arc/CCTM/src/aero/aero5/aero_driver.F,v 1.11 2012/01/19 13:12:57 yoj Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
@@ -270,8 +270,7 @@ C ------------------ begin body of AERO_DRIVER -------------------------
          IF ( N .NE. 0 ) THEN
             O3 = GC_STRT - 1 + GC_CONC_MAP( N )
          ELSE
-            XMSG = 'Could not find ' // VNAME // 
-     & 'in gas chem aerosol table'
+            XMSG = 'Could not find ' // VNAME // 'in gas chem aerosol table'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
          END IF
 #endif
@@ -285,8 +284,7 @@ C *** Get aerosol diagnostic file flag.
             XMSG = 'Environment variable improperly formatted'
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
          ELSE IF ( STATUS .EQ. -1 ) THEN
-            XMSG = 
-     & 'Environment variable set, but empty ... Using default:'
+            XMSG = 'Environment variable set, but empty ... Using default:'
             WRITE( LOGDEV, '(5X, A, I9)' ) XMSG, JTIME
          ELSE IF ( STATUS .EQ. -2 ) THEN
             XMSG = 'Environment variable not set ... Using default:'
@@ -323,8 +321,7 @@ C *** Get domain decomp info from the MET_CRO_3D file
             PRINT *, 'Environment variable improperly formatted'
             STOP
          ELSE IF ( STATUS .EQ. -1 ) THEN
-            PRINT *, 
-     & 'Environment variable set, but empty ... Using default:'
+            PRINT *, 'Environment variable set, but empty ... Using default:'
          ELSE IF ( STATUS .EQ. -2 ) THEN
             PRINT *, 'Environment variable not set ... Using default:'
          END IF
@@ -350,8 +347,7 @@ C *** pressure [Pa]
       IF ( .NOT. INTERPX( MET_CRO_3D, VNAME, PNAME,
      &                    STRTCOLMC3,ENDCOLMC3, STRTROWMC3,ENDROWMC3, 1,NLAYS,
      &                    MDATE, MTIME, PRES ) ) THEN
-         XMSG = 
-     & 'Could not interpolate '// TRIM( VNAME ) // ' from MET_CRO_3D '
+         XMSG = 'Could not interpolate '// TRIM( VNAME ) // ' from MET_CRO_3D '
          CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
       END IF
 
@@ -360,8 +356,7 @@ C *** temperature [K]
       IF ( .NOT. INTERPX( MET_CRO_3D, VNAME, PNAME,
      &                    STRTCOLMC3,ENDCOLMC3, STRTROWMC3,ENDROWMC3, 1,NLAYS,
      &                    MDATE, MTIME, TA ) ) THEN
-         XMSG = 'Could not interpolate '// TRIM( VNAME ) // 
-     & ' from MET_CRO_3D '
+         XMSG = 'Could not interpolate '// TRIM( VNAME ) // ' from MET_CRO_3D '
          CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
       END IF
 
@@ -370,8 +365,7 @@ C *** specific humidity [g H2O/g air]
       IF ( .NOT. INTERPX( MET_CRO_3D, VNAME, PNAME,
      &                    STRTCOLMC3,ENDCOLMC3, STRTROWMC3,ENDROWMC3, 1,NLAYS,
      &                    MDATE, MTIME, QV ) ) THEN
-         XMSG = 'Could not interpolate '// TRIM( VNAME ) //
-     & ' from MET_CRO_3D '
+         XMSG = 'Could not interpolate '// TRIM( VNAME ) // ' from MET_CRO_3D '
          CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
       END IF
 
@@ -380,8 +374,7 @@ C *** air density [kg/m3]
       IF ( .NOT. INTERPX( MET_CRO_3D, VNAME, PNAME,
      &                    STRTCOLMC3,ENDCOLMC3, STRTROWMC3,ENDROWMC3, 1,NLAYS,
      &                    MDATE, MTIME, DENS ) ) THEN
-         XMSG = 'Could not interpolate '// TRIM( VNAME ) //
-     & ' from MET_CRO_3D '
+         XMSG = 'Could not interpolate '// TRIM( VNAME ) // ' from MET_CRO_3D '
          CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
       END IF
 

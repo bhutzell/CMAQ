@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/aero/aero6/aero_subs.F,v 1.8 2012/01/19 13:21:28 yoj Exp $
+C $Header: /project/yoj/arc/CCTM/src/aero/aero6/aero_subs.F,v 1.8 2012/01/19 13:21:28 yoj Exp $
 
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
@@ -1254,18 +1254,15 @@ C     than the minimum aerosol conc.
             END IF 
 
             IF ( J( KNH4 ) * TSTEP * DF( KNH4 ) * NH3RAT .GT. GNH3R8 ) THEN
-               WRITE( LOGDEV,* )
-     & 'Condensed amt. exceeds NH3 conc: aero_subs.f'
+               WRITE( LOGDEV,* ) 'Condensed amt. exceeds NH3 conc: aero_subs.f'
                J( KNH4 ) = GNH3R8 / ( TSTEP * DF( KNH4 ) * NH3RAT )
             END IF
             IF ( J( KNO3 ) * TSTEP * DF( KNO3 ) * HNO3RAT .GT. GNO3R8 ) THEN
-               WRITE( LOGDEV,* )
-     & 'Condensed amt. exceeds HNO3 conc: aero_subs.f'
+               WRITE( LOGDEV,* ) 'Condensed amt. exceeds HNO3 conc: aero_subs.f'
                J( KNO3 ) = GNO3R8 / ( TSTEP * DF( KNO3 ) * HNO3RAT )
             END IF
             IF ( J( KCL ) * TSTEP * DF(KCL) * HCLRAT .GT. GCLR8 ) THEN
-               WRITE( LOGDEV,* )
-     & 'Condensed amt. exceeds HCl conc: aero_subs.f'
+               WRITE( LOGDEV,* ) 'Condensed amt. exceeds HCl conc: aero_subs.f'
                J( KCL ) = GCLR8 / ( TSTEP * DF( KCL ) * HCLRAT )
             END IF
 
@@ -1544,8 +1541,7 @@ C *** Initialize excess evaporated mass array
                      IF ( ABS( CFINAL( ISP,1 ) ) .LT. 1.0D-15 ) THEN
                         CFINAL( ISP,1 ) = 0.0D0
                      ELSE
-                        WRITE( LOGDEV,* )
-     & 'VOLINORG: Too much evaporation'
+                        WRITE( LOGDEV,* ) 'VOLINORG: Too much evaporation'
                         CFINAL( ISP,1 ) = 0.0D0
 !                       STOP
                      END IF
@@ -1641,8 +1637,7 @@ C     standard deviations, modal mass totals, and modal particle
 C     densities.
       CALL GETPAR( M3_WET_FLAG, LIMIT_Sg )
 
-2023  FORMAT( 1X,
-     & 'VOLINORG returning negative gas concentrations from ISOROPIA:'
+2023  FORMAT( 1X, 'VOLINORG returning negative gas concentrations from ISOROPIA:'
      &       /10X, 'GAS(1) = NH3, GAS(2) = HNO3, GAS(3) = HCl' )
 2029  FORMAT( 1X, '[see VOLINORG msg]'
      &        1X, 'at (C,R,L): ', 3I4, 1X, 'GAS Conc:', 3( 1PE11.3 ) )
