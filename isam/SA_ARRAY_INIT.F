@@ -1,22 +1,3 @@
-
-!------------------------------------------------------------------------!
-!  The Community Multiscale Air Quality (CMAQ) system software is in     !
-!  continuous development by various groups and is based on information  !
-!  from these groups: Federal Government employees, contractors working  !
-!  within a United States Government contract, and non-Federal sources   !
-!  including research institutions.  These groups give the Government    !
-!  permission to use, prepare derivative works of, and distribute copies !
-!  of their work in the CMAQ system to the public and to permit others   !
-!  to do so.  The United States Environmental Protection Agency          !
-!  therefore grants similar permission to use the CMAQ system software,  !
-!  but users are requested to provide copies of derivative works or      !
-!  products designed to operate in the CMAQ system to the United States  !
-!  Government without restrictions as to use by others.  Software        !
-!  that is used with the CMAQ system but distributed under the GNU       !
-!  General Public License or the GNU Lesser General Public License is    !
-!  subject to their copyright restrictions.                              !
-!------------------------------------------------------------------------!
-
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     functionality: update isam array according to configuration files:
 c
@@ -52,7 +33,7 @@ c.....arguments
 c.....local variables
 
       INTEGER          C, R, L, S, K              ! loop index
-      INTEGER          N, NSPC, JVOC              ! 20140123
+      INTEGER          N, NSPC, JVOC
 
       CHARACTER*1      NEW_START
 
@@ -90,7 +71,7 @@ Ckrt  print*, NSPC_SA, NLAYS, MY_NROWS, MY_NCOLS, ICONTAG
             endif ! position of spc_index( s,2 ) in cgrid species list
           endif ! mype0 ?
 
-          IF( N .EQ. 1) THEN  ! query is for an original species, includes O3A 20130627
+          IF( N .EQ. 1) THEN  ! query is for an original species, includes O3A, 20130627; 14 voc species, 20131209
             DO L = 1, NLAYS
               DO C = 1, MY_NCOLS
                 DO R = 1, MY_NROWS
@@ -98,7 +79,7 @@ Ckrt  print*, NSPC_SA, NLAYS, MY_NROWS, MY_NCOLS, ICONTAG
                 END DO ! R
               END DO ! C
             END DO ! L
-            JVOC = INDEX1( SPC_NAME( S, ICONTAG ), N_EVOC, NAM_VOC ) ! 14 voc spcs, 20140123
+            JVOC = INDEX1( SPC_NAME( S, ICONTAG ), N_EVOC, NAM_VOC )
             IF ( JVOC .GT. 0 ) THEN
               WCH_VOC( JVOC, ICONTAG ) = 1.0
             ENDIF ! spc_name is voc ?
@@ -116,7 +97,7 @@ Ckrt  print*, NSPC_SA, NLAYS, MY_NROWS, MY_NCOLS, ICONTAG
                 DO C = 1, MY_NCOLS
                   DO R = 1, MY_NROWS
                     ISAM(C,R,L,S, ICONTAG) =
-     &                  ISAM(C,R,L,S, ICONTAG)+ CGRID(C,R,L,SPC_INDEX(S, 1+NSPC))
+     &  ISAM(C,R,L,S, ICONTAG)+ CGRID(C,R,L,SPC_INDEX(S, 1+NSPC))
                   END DO ! R
                 END DO ! C
               END DO ! L

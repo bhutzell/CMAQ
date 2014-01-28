@@ -518,6 +518,7 @@ C North boundary
 
            IBGN  = INDEX( VNAM_SPCTAG( SPC ), '_', .FALSE. ) - 1
            ILAST = LEN_TRIM( VNAM_SPCTAG( SPC ) )
+
            DO ROW = 1, MY_NROWS
              SA_CONY( ROW,SPC ) = ISAM( COL,ROW,LVL,S_SPCTAG( SPC ),T_SPCTAG( SPC ) )
            END DO
@@ -546,14 +547,6 @@ C South boundary
      &                        VNAM_SPCTAG( SPC )( 1:IBGN ) .EQ. 'O3N' ) THEN
                        IF ( INDX_O3 .GT. 0 ) SA_CONY( 1-SWP:0,SPC ) =
      &                                       0.5 * BCCN( SFX,COL,INDX_O3 )
-                    ELSE IF ( VNAM_SPCTAG( SPC )( 1:IBGN ) .EQ. 'VOC' ) THEN ! 20120925
-                       BC_VOC = 0.0
-                       DO JV = 1, N_EVOC
-                          S = INDEX1( NAM_VOC(JV), N_SPC_ADV, NAME_ADV )
-                          IF ( S .GT. 0 ) BC_VOC =
-     &                                    BC_VOC + BCCN( SFX,COL,S ) * NCARBON( JV )
-                       END DO
-                       SA_CONY( 1-SWP:0,SPC ) = BC_VOC
                     END IF   ! tracking species exist in south
                  ELSE   ! non-bcon tags
                     SA_CONY( 1-SWP:0,SPC ) = 0.0
@@ -579,14 +572,6 @@ C North boundary
      &                        VNAM_SPCTAG( SPC )( 1:IBGN ) .EQ. 'O3N' ) THEN
                        IF ( INDX_O3 .GT. 0 ) SA_CONY( MY_NROWS+1:MY_NROWS+SWP,SPC ) =
      &                                       0.5* BCCN( NFX,COL,INDX_O3 )
-                    ELSE IF ( VNAM_SPCTAG( SPC )( 1:IBGN ) .EQ. 'VOC' ) THEN
-                       BC_VOC = 0.0
-                       DO JV = 1, N_EVOC
-                          S = INDEX1( NAM_VOC(JV), N_SPC_ADV, NAME_ADV )
-                          IF ( S .GT. 0 ) BC_VOC =
-     &                                    BC_VOC + BCCN( NFX,COL,S ) * NCARBON( JV )
-                       END DO
-                       SA_CONY( MY_NROWS+1:MY_NROWS+SWP,SPC ) = BC_VOC
                     END IF   ! tracking species exist in north
                  ELSE   ! non-bcon tags ?
                     SA_CONY( MY_NROWS+1:MY_NROWS+SWP,SPC ) = 0.0

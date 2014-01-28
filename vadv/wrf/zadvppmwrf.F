@@ -360,7 +360,7 @@ C Get the contravariant x1 velocity component
             END DO
 
 #ifdef isam
-Ckrt...import tssa array into sa_con
+Ckrt...import isam array into sa_con
             DO SPC = 1, N_SPCTAG
                DO LVL = 1, NLAYS
                   SA_CON( LVL,SPC ) = ISAM( COL,ROW,LVL,S_SPCTAG( SPC ),T_SPCTAG( SPC ) )

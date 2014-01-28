@@ -1,22 +1,4 @@
 
-!------------------------------------------------------------------------!
-!  The Community Multiscale Air Quality (CMAQ) system software is in     !
-!  continuous development by various groups and is based on information  !
-!  from these groups: Federal Government employees, contractors working  !
-!  within a United States Government contract, and non-Federal sources   !
-!  including research institutions.  These groups give the Government    !
-!  permission to use, prepare derivative works of, and distribute copies !
-!  of their work in the CMAQ system to the public and to permit others   !
-!  to do so.  The United States Environmental Protection Agency          !
-!  therefore grants similar permission to use the CMAQ system software,  !
-!  but users are requested to provide copies of derivative works or      !
-!  products designed to operate in the CMAQ system to the United States  !
-!  Government without restrictions as to use by others.  Software        !
-!  that is used with the CMAQ system but distributed under the GNU       !
-!  General Public License or the GNU Lesser General Public License is    !
-!  subject to their copyright restrictions.                              !
-!------------------------------------------------------------------------!
-
       SUBROUTINE SA_FIL_OTHRTAG( ISAMEM, JDATE, JTIME ) 
 
 C*************************************************************
@@ -87,11 +69,6 @@ Ckrt...Search from Gas emis species list
              IF ( ABS(ISAMEM(C,R,L,JSPC,OTHRTAG)) .LE. 1.E-10 ) THEN
                ISAMEM(C,R,L,JSPC,OTHRTAG) = 0.
              ELSE
-               IF ( YES_PRINT ) THEN
-                 print*,'mype,L,R,C,JSPC,spc_nam,vdemis,kntag:'
-                 print*, MYPE,L,R,C,JSPC,SPC_NAME(JSPC,OTHRTAG),
-     &                   VDEMIS(V,L,C,R),KNTAG
-               END IF !optional yes print
                XMSG = 'Total tagging GC emiss exceeds basic emiss !'
                CALL M3EXIT( PNAME,JDATE,JTIME,XMSG,3 )
              ENDIF ! negative number very small ?

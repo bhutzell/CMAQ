@@ -1,21 +1,3 @@
-!------------------------------------------------------------------------!
-!  The Community Multiscale Air Quality (CMAQ) system software is in     !
-!  continuous development by various groups and is based on information  !
-!  from these groups: Federal Government employees, contractors working  !
-!  within a United States Government contract, and non-Federal sources   !
-!  including research institutions.  These groups give the Government    !
-!  permission to use, prepare derivative works of, and distribute copies !
-!  of their work in the CMAQ system to the public and to permit others   !
-!  to do so.  The United States Environmental Protection Agency          !
-!  therefore grants similar permission to use the CMAQ system software,  !
-!  but users are requested to provide copies of derivative works or      !
-!  products designed to operate in the CMAQ system to the United States  !
-!  Government without restrictions as to use by others.  Software        !
-!  that is used with the CMAQ system but distributed under the GNU       !
-!  General Public License or the GNU Lesser General Public License is    !
-!  subject to their copyright restrictions.                              !
-!------------------------------------------------------------------------!
-
       MODULE SA_DEFN
 
 C KWOK: Define tagging emissions, species, dimensions, etc, based on user-supplied sa_io_list
@@ -524,7 +506,7 @@ c----------------------------------------------------------
               IF ( .NOT. ANY( L_VOC ) ) THEN
                 NSPC_SA = NSPC_SA + 14 !20131209 ald2,aldx,eth,etha,etoh,form,iole,isop,meoh,ole,par,terp,tol,xyl
               ENDIF
-              L_VOC( ITAG ) = .TRUE.
+              L_NTRATE( ITAG ) = .TRUE.
             ENDIF
 
             LBACK = .FALSE.

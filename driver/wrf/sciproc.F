@@ -393,6 +393,8 @@ C decouple CGRID for cloud and chemistry
       IF ( LIPR ) CALL PA_UPDATE ( 'CLDS', CGRID, JDATE, JTIME, TSTEP )
 
 #ifdef isam
+      PCBFOR = PCGRID
+      PISAMB4 = PISAM
       CALL CHEM ( CGRID, JDATE, JTIME, TSTEP, ISAM, CBFOR, ISAMB4 )
 #else
       CALL CHEM ( CGRID, JDATE, JTIME, TSTEP )

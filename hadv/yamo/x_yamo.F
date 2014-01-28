@@ -520,6 +520,7 @@ C East boundary
 
             IBGN  = INDEX( VNAM_SPCTAG( SPC ), '_', .FALSE. ) - 1
             ILAST = LEN_TRIM( VNAM_SPCTAG( SPC ) )
+
             DO COL = 1, MY_NCOLS
                SA_CONX( COL,SPC ) = ISAM( COL,ROW,LVL,S_SPCTAG( SPC ),T_SPCTAG( SPC ) )
             END DO
@@ -548,14 +549,6 @@ C West boundary
      &                         VNAM_SPCTAG( SPC )( 1:IBGN ) .EQ. 'O3N' ) THEN
                         IF ( INDX_O3 .GT. 0 ) SA_CONX( 1-SWP:0,SPC ) =
      &                                        0.5* BCCN( WFX,ROW,INDX_O3 )
-                     ELSE IF ( VNAM_SPCTAG( SPC )( 1:IBGN ) .EQ. 'VOC' ) THEN
-                        BC_VOC = 0.0
-                        DO JV = 1, N_EVOC
-                           S = INDEX1( NAM_VOC( JV ), N_SPC_ADV, NAME_ADV )
-                           IF ( S .GT. 0 ) BC_VOC =
-     &                                     BC_VOC + BCCN( WFX,ROW,S ) * NCARBON( JV )
-                        END DO
-                        SA_CONX( 1-SWP:0,SPC ) = BC_VOC
                      END IF   ! tracking species exist in west
                   ELSE    ! non-bcon tags ?
                      SA_CONX( 1-SWP:0,SPC ) = 0.0
@@ -581,14 +574,6 @@ C East boundary
      &                         VNAM_SPCTAG( SPC )( 1:IBGN ) .EQ. 'O3N' ) THEN
                         IF ( INDX_O3 .GT. 0 ) SA_CONX( MY_NCOLS+1:MY_NCOLS+SWP,SPC ) =
      &                                        0.5 * BCCN( EFX,ROW,INDX_O3 )
-                     ELSE IF ( VNAM_SPCTAG( SPC )( 1:IBGN ) .EQ. 'VOC' ) THEN
-                        BC_VOC = 0.0
-                        DO JV = 1, N_EVOC
-                           S = INDEX1( NAM_VOC(JV), N_SPC_ADV, NAME_ADV )
-                           IF ( S .GT. 0 ) BC_VOC =
-     &                                     BC_VOC + BCCN( EFX,ROW,S ) * NCARBON( JV )
-                        END DO
-                        SA_CONX( MY_NCOLS+1:MY_NCOLS+SWP,SPC ) = BC_VOC
                      END IF   ! tracking species exist in east
                   ELSE   ! non-bcon tags ?
                      SA_CONX( MY_NCOLS+1:MY_NCOLS+SWP,SPC ) = 0.0

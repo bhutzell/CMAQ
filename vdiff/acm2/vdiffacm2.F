@@ -495,8 +495,12 @@ Ckrt Allocate SA_DDBF
             XMSG = 'Failure initializing emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
-
 #ifdef isam
+         IF ( YES_PRINT ) THEN
+           IF ( MYPE .EQ. 0 ) 
+     &       WRITE( LOGDEV,'(/5X, A )' ) 'EMIS_INIT done'
+         END IF ! yes_print
+
 Ckrt...Pointer for isamem array
          IF ( .NOT. PSAEM_INIT ( NSPC_SA, NTAG_SA ) ) THEN
            XMSG = 'Failure in defining SA horizontal domain'
@@ -798,36 +802,6 @@ Ckrt Would Insert JSPCTAG Loop Here.......
             END IF            
          END DO
 
-#ifdef isam
-!KRT..20120918 derive averaged vdep for voc
-         IF ( ANY( L_OZONE ) ) THEN
-            JSPC_VOC = INDEX1( 'VOC', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
-            DD_FAC_VOC = 0.0
-            TTL_CVOC = 0.0
-            DEPV_VOC = 0.0
-            EFAC1_VOC = 0.0
-            EFAC2_VOC = 0.0
-!KRT20120924           CNT = 0
-            DO JV = 1, N_EVOC
-               TTL_CVOC = TTL_CVOC + CNGRD( SPC_INDEX( JSPC_VOC,JV+1 ),1,C,R ) * NCARBON( JV )
-               DO V = 1, N_SPC_DEPV
-                  IF ( NAM_VOC( JV ) .EQ. TRIM( DEPV_SPC( V ) ) ) THEN
-!KRT20120924         CNT = CNT + 1
-                     DD_FAC_VOC = DD_FAC_VOC + DTDENS1 * DD_CONV( V ) * DEPVCR( V )
-!KRT20120924         DD_FAC_VOC = DD_FAC_VOC * REAL( CNT - 1 )/REAL( CNT )
-!KRT20120924     &              + DTDENS1 * DD_CONV( V ) * DEPVCR( V ) / REAL( CNT )
-!KRT20120924         TTL_CVOC = TTL_CVOC + CONC( DV2DF( V ), 1 ) * NCARBON( JV )
-                     DEPV_VOC = DEPV_VOC
-     &                        + CONC( DV2DF(V), 1 ) * NCARBON( JV ) * DEPVCR( V )
-                  END IF
-               END DO
-            END DO
-            DD_FAC_VOC = DD_FAC_VOC / REAL( N_EVOC )
-            IF ( TTL_CVOC .GT. 1.E-30 ) DEPV_VOC = DEPV_VOC / TTL_CVOC
-            EFAC1_VOC = EXP( -DEPV_VOC * RDEPVHT( C,R ) * THBAR * DTS )
-            EFAC2_VOC = EXP( -DEPV_VOC * RDEPVHT( C,R ) * THETA * DTS )
-         END IF ! any l_ozone
-#endif
 
          IF ( MOSAIC ) THEN
             DO V = 1, N_SPC_DEPV
@@ -998,11 +972,6 @@ Ckrt nonNOX....
                   END IF ! vnam_spctag begins with one of ddep_spc ?
                END DO
 
-               IF ( VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .EQ. 'VOC' ) THEN
-                  SACONC( JSPCTAG,1 ) = SACONC( JSPCTAG,1 ) * EFAC1_VOC
-                  SA_DDBF( JSPCTAG ) = SA_DDBF( JSPCTAG )
-     &                               + THBAR * DD_FAC_VOC *  SACONC( JSPCTAG,1 )
-               END IF
             END DO
 #endif
 
@@ -1297,11 +1266,6 @@ Ckrt nonNOX....
                   END IF  ! vnam_spctag begins with one of ddep_spc ?
                END DO ! V
 
-               IF ( VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .EQ. 'VOC' ) THEN
-                  SACONC( JSPCTAG,1 ) = SACONC( JSPCTAG,1 ) * EFAC2_VOC
-                  SA_DDBF( JSPCTAG ) = SA_DDBF( JSPCTAG )
-     &                               + THETA * DD_FAC_VOC *  SACONC( JSPCTAG,1 )
-               END IF
             END DO
 #endif
 

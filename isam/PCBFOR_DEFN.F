@@ -21,6 +21,9 @@
 C RCS file, release, date & time of last delta, author, state, [and locker]
 C $Header: /work/MOD3EVAL/krt/CMAQv5.0/models/CCTM/src/grid/cartesian/PCBFOR_DEFN.F,v 1.1.1.1 2012/01/27 20:25:19 sjr Exp $
 
+C what(1) key, module and SID; SCCS file; date and time of last delta:
+C %W% %P% %G% %U%
+
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE PCBFOR_DEFN
 

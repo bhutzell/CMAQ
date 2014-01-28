@@ -50,6 +50,9 @@ C     19 Jul 13 R.Kwok: isam
 C-----------------------------------------------------------------------
 
       USE UDTYPES           ! implementation for multiple groups of stack input files
+#ifdef isam
+      USE SA_DEFN   !20140121
+#endif
       IMPLICIT NONE
 
       LOGICAL,                       SAVE :: PT3DEMIS   ! flag in-lining plume rise
@@ -63,7 +66,9 @@ C-----------------------------------------------------------------------
       REAL,             ALLOCATABLE, SAVE :: SA_PMEMIS_PT( :,:,:,:,: ) ! 3D pt src PM emis for tags
       REAL,             ALLOCATABLE, SAVE :: SA_SULF_PT( :,:,:,: ) ! 3D pt src SULF emis for tags
       REAL,             ALLOCATABLE, SAVE :: VOC_E_PT( :,:,:,:,: ) ! 20120919 for pt src VOC
-      PUBLIC SA_VDEMIS_PT, SA_PMEMIS_PT, SA_SULF_PT, VOC_E_PT
+      !krt to map indices of pt pm emis species to isam tracers 20140121
+      INTEGER, ALLOCATABLE, SAVE :: J_ISAM_PTPM( : )
+      PUBLIC SA_VDEMIS_PT, SA_PMEMIS_PT, SA_SULF_PT, VOC_E_PT, J_ISAM_PTPM
 #endif
       PRIVATE
 
@@ -132,6 +137,10 @@ C Stack parameters
       TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STK_HT( : )
       TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STK_TK( : )
       TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STK_VEL( : )
+#ifdef isam
+      !krt 20140121
+      TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STK_SAID( : )
+#endif
 
 C Private Parameters:
       CHARACTER(  10 ), PARAMETER :: BLANK10 = '          '
@@ -164,6 +173,7 @@ C use N_SPC_EMIS+1 for non-accessed emissions
 #ifdef isam
          USE SA_DEFN
          USE OZVOC_DEFN
+         USE AERO_DATA   ! 20140121
 #endif
 
          IMPLICIT NONE
@@ -209,6 +219,10 @@ C Local Variables:
 
          LOGICAL, SAVE :: WINDOW = .FALSE. ! posit same file and global
                                            ! processing domain
+!krt 20130926
+#ifdef isam  
+         INTEGER          JSPCTAG, IBGN, JAE
+#endif
 
          INTERFACE
             SUBROUTINE DELTA_ZS( EMLYRS, MY_NSRC, SRC_MAP, STKHT, ZF, ZSTK, DDZF )
@@ -521,6 +535,13 @@ C Initialize stack emissions data
             SUCCESS = .FALSE.; RETURN
          END IF
 
+#ifdef isam
+         IF ( YES_PRINT ) THEN
+           IF ( MYPE .EQ. 0 )
+     &         WRITE( LOGDEV,'(/5X, A )' ) 'ptmap_init Done!'
+         END IF ! yes_print
+#endif
+
          ALLOCATE ( VDEMIS_PT( MY_NCOLS,MY_NROWS,EMLYRS,N_SPC_PTEM ), STAT = IOS )
          CALL CHECKMEM( IOS, 'VDEMIS_PT', PNAME )
          VDEMIS_PT = 0.0   ! array assignment
@@ -540,7 +561,18 @@ C Initialize stack emissions data
          SA_VDEMIS_PT = 0.0   ! array assignment
          ALLOCATE ( VOC_E_PT( MY_NCOLS,MY_NROWS,EMLYRS,N_EVOC,NTAG_SA ), STAT = IOS )
          CALL CHECKMEM( IOS, 'VOC_E_PT', PNAME )
-         SA_VDEMIS_PT = 0.0   ! array assignment
+         VOC_E_PT = 0.0   ! array assignment
+         ALLOCATE ( J_ISAM_PTPM( N_SPCTAG ), STAT = IOS )  !krt 20140121
+         CALL CHECKMEM( IOS, 'J_ISAM_PTPM', PNAME )
+         J_ISAM_PTPM = 0
+
+         IF ( YES_PRINT ) THEN
+           IF ( MYPE .EQ. 0 ) THEN
+             WRITE( LOGDEV,'(/5X, A )' ) 'sa_vdemis_pt allocated'
+             WRITE( LOGDEV,'(/5X, A )' ) 'voc_e_pt allocated'
+             WRITE( LOGDEV,'(/5X, A )' ) 'j_isam_ptpm allocated'
+           END IF ! mype0
+         END IF ! yes_print
 #endif
 
 C Set up and open 3d point source emissions diagnostic file?
@@ -593,6 +625,10 @@ C Open diagnostic layer fractions file?
 
          ALLOCATE( STK_VEL( NPTGRPS ), STAT = IOS )
          CALL CHECKMEM( IOS, 'STK_VEL', PNAME )
+#ifdef isam
+         ALLOCATE( STK_SAID( NPTGRPS ), STAT = IOS )
+         CALL CHECKMEM( IOS, 'STK_SAID', PNAME )
+#endif
 
          DO N = 1, NPTGRPS
 
@@ -617,6 +653,12 @@ C Allocate and set stack parameters
             CALL CHECKMEM( IOS, 'STK_VEL', PNAME )
             STK_VEL( N )%ARRY = 0.0   ! 1D array
             STK_VEL( N )%LEN = MY_NSRC( N )
+#ifdef isam
+            ALLOCATE( STK_SAID( N )%ARRY( MY_NSRC( N ) ), STAT = IOS )  ! krt 20140121
+            CALL CHECKMEM( IOS, 'STK_SAID', PNAME )
+            STK_SAID( N )%ARRY = 0.0   ! 1D array
+            STK_SAID( N )%LEN = MY_NSRC( N )
+#endif
 
             DO S = 1, MY_NSRC( N )
                SRC = SOURCE( N )%ARRY( S )
@@ -624,7 +666,12 @@ C Allocate and set stack parameters
                STK_HT( N )%ARRY( S )  = STKHT( N )%ARRY( SRC )
                STK_TK( N )%ARRY( S )  = STKTK( N )%ARRY( SRC )
                STK_VEL( N )%ARRY( S ) = STKVEL( N )%ARRY( SRC )
+#ifdef isam
+               IF ( SAID_ON( N ) )
+     &           STK_SAID( N )%ARRY( S ) = STKSAID( N )%ARRY( SRC )
+#endif
             END DO
+
 
 C If wildfire, allocate and fire parameters (assumes only one file group)
             IF ( FIREFLAG( N ) ) THEN
@@ -645,6 +692,12 @@ C If wildfire, allocate and fire parameters (assumes only one file group)
             END IF
 
          END DO
+#ifdef isam
+         IF ( YES_PRINT ) THEN
+           IF ( MYPE .EQ. 0 )
+     &         WRITE( LOGDEV,'(/5X, A )' ) 'STK_SAID(n)%ARRY(s) assigned!'      
+         END IF ! yes print
+#endif
 
          IF ( .NOT. PTBILIN_INIT ( NPTGRPS ) ) THEN
             XMSG = 'Could not initialize stack met bilinear interpolation data'
@@ -705,6 +758,30 @@ C Set Namelist emissions factors
             END IF
 
          END DO
+
+!krt map indices of pt pm emis species to isam tracers 20140121
+#ifdef isam
+         DO N = 1, NPTGRPS
+           DO V = 1, STKPM_MAP(N)%LEN
+             J = PM_MAP(N)%ARRY(V)
+             DO JSPCTAG = 1, N_SPCTAG
+               IBGN = INDEX( VNAM_SPCTAG(JSPCTAG), '_', .FALSE. )
+               AEFOUND : DO JAE = 1, N_AEROSPC
+                 IF ( VNAM_SPCTAG(JSPCTAG)(1:IBGN-1) .EQ.
+     &  AEROSPC(JAE)%NAME(2) .AND.
+     &  TRIM(STKPM_VAR(N)%ARRY(V)) .EQ.
+     &  AEROSPC(JAE)%EMIS ) THEN
+                  J_ISAM_PTPM( JSPCTAG ) = J
+                ENDIF
+               ENDDO AEFOUND
+             ENDDO ! jspctag
+           ENDDO ! V
+         ENDDO ! N
+         IF ( YES_PRINT ) THEN
+           IF ( MYPE .EQ. 0 )
+     &         WRITE( LOGDEV,'(/5X, A )' ) 'j_isam_ptpm(jspctag) assigned!'      
+         END IF ! yes print
+#endif
 
          SUCCESS = .TRUE.; RETURN
 
@@ -808,10 +885,12 @@ C Local variables:
          CHARACTER( 256 ) :: DUMLONG
          INTEGER  IBGN
          LOGICAL  LSULF
-         INTEGER  JAE
          INTEGER  JV   ! 20120919 for VOC
          ! To deal with multi-sectors-for-single-tag situation 20130308
          INTEGER ISGSTK
+         ! stack group ID values 20130801
+         LOGICAL  YES_XTRAC
+         INTEGER  JCNT
 #endif
 
 #ifdef Verbose1
@@ -1249,91 +1328,73 @@ C Apportion emissions to the layers
 Ckrt .... LOOP through SPCTAGLOOP ...............................
 
                SPCTAGLOOP: DO JSPCTAG = 1, N_SPCTAG
-               IBGN = INDEX( VNAM_SPCTAG( JSPCTAG ), '_', .FALSE. ) - 1
+               IBGN = INDEX( VNAM_SPCTAG( JSPCTAG ), '_', .FALSE. )
 
                MULTISECT: DO ISGSTK = 1, N_SGSTACKS
 
-Ckrt ...Tap certain inline pt emissions to tagging arrays.....GASES
-               IF ( SGNAME( T_SPCTAG( JSPCTAG ),ISGSTK ) .EQ. SENAME( N ) ) THEN
+!krt...20130801 Only if stack emis from SA matches one of those in base model
+               IF ( SGNAME( T_SPCTAG(JSPCTAG),ISGSTK ) .EQ. SENAME( N ) ) THEN
 
-                  DO L = 1, EMLYRS
+!krt...20130801 either no sa_id needed, or sa_id from SA matches those in base model
+                 YES_XTRAC = .FALSE.
+                 IF ( STK_SAID( N )%ARRY( S ) .EQ. 0 ) THEN
+                   YES_XTRAC = .TRUE.
+                 ELSEIF ( T_SPCTAG(JSPCTAG) .LE. NTAG_SA-3 .AND.
+     & TAGRGN( T_SPCTAG(JSPCTAG) )(1:6) .NE. 'INLINE' ) THEN !20130920
+                   YES_XTRAC = .TRUE.
+                 ELSE
+                   DO JCNT = 1, NINLN
+                     IF ( STK_SAID( N )%ARRY( S ) .EQ. SAIDVALU( T_SPCTAG(JSPCTAG),JCNT )
+     & .AND. SAIDVALU( T_SPCTAG(JSPCTAG),JCNT ) .GT. 0.0
+     & .AND. .NOT. YES_XTRAC )  YES_XTRAC = .TRUE.
+                   ENDDO !jcnt
+                 ENDIF ! stk_said(n)%arry(s) = 0 or...
+
+                 IF ( YES_XTRAC ) THEN
+
+!krt...20130926 reduce to single layer loop, and single gas species loop
+                   DO L = 1, EMLYRS
                      LFRC = TFRAC( L )
                      IF ( LFRC .LE. 0.0 ) CYCLE
                      DO V = 1, STKEM_MAP( N )%LEN
-                        I = GAS_MAP( N )%ARRY( V )
-                        J = STKEM_MAP( N )%ARRY( V )
-                        IF ( STKEM_VAR( N )%ARRY( V ) .EQ.
-     &                       VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .AND.
-     &                       VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .NE. "SULF" ) THEN
-                           SA_VDEMIS_PT( C,R,L,I,T_SPCTAG( JSPCTAG ) ) =
-     &                     SA_VDEMIS_PT( C,R,L,I,T_SPCTAG( JSPCTAG ) ) +
-     &                     LFRC * STKEM( J )
-                        END IF
-                     END DO
-                  END DO
-
-Ckrt ...20120919 tap inline pt VOC emissions .....................
-                  IF ( VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .EQ. 'VOC' ) THEN
-                     DO L = 1, EMLYRS
-                        LFRC = TFRAC( L )
-                        IF ( LFRC .LE. 0.0 ) CYCLE
-                        DO V = 1, STKEM_MAP( N )%LEN
-                           I = GAS_MAP( N )%ARRY( V )
-                           J = STKEM_MAP( N )%ARRY( V )
-                           JV = INDEX1( STKEM_VAR( N )%ARRY( V ), N_EVOC, NAM_VOC )
-                           IF ( JV .GT. 0 ) THEN
-                              WCH_VOC( JV, T_SPCTAG(JSPCTAG) ) = 1.0
-                              VOC_E_PT( C,R,L,JV,T_SPCTAG( JSPCTAG ) ) =
-     &                        VOC_E_PT( C,R,L,JV,T_SPCTAG( JSPCTAG ) ) + LFRC * STKEM( J )
-                           END IF
-                        END DO
-                     END DO
-                  END IF
+                       I = GAS_MAP( N )%ARRY( V )
+                       J = STKEM_MAP( N )%ARRY( V )
+                       IF ( STKEM_VAR( N )%ARRY( V ) .EQ.
+     &    VNAM_SPCTAG(JSPCTAG)(1:IBGN-1) ) THEN
+                       !krt inline pt sulf or gas emis. 20130926
+                         IF ( VNAM_SPCTAG(JSPCTAG)(1:IBGN-1) .EQ. "SULF" ) THEN
+                           SA_SULF_PT( C,R,L,T_SPCTAG(JSPCTAG) ) =
+     &                       SA_SULF_PT( C,R,L,T_SPCTAG(JSPCTAG) ) +
+     &                       LFRC * STKEM( J )
+                         ELSE ! other gas species
+                           SA_VDEMIS_PT( C,R,L,I,T_SPCTAG(JSPCTAG) ) =
+     &                       SA_VDEMIS_PT( C,R,L,I,T_SPCTAG(JSPCTAG) ) +
+     &                       LFRC * STKEM( J )
+                         ENDIF ! sulf or other gases?
+                       ENDIF ! gaseous, sulf or voc species names matched
+                     ENDDO ! V of gaseous, sulf or voc
 
 Ckrt ...Tap certain inline pt emissions to an INTERMEDIATE array.....PM
-                  DO L = 1, EMLYRS
-                     LFRC = TFRAC( L )
-                     IF ( LFRC .LE. 0.0 ) CYCLE
                      DO V = 1, STKPM_MAP( N )%LEN
-                        I = PM_MAP( N )%ARRY( V )
-                        J = STKPM_MAP( N )%ARRY( V )
-                        AEFOUND: DO JAE = 1, N_AEROSPC
-                           IF ( VNAM_SPCTAG( JSPCTAG )( 1:IBGN ) .EQ.
-     &                          AEROSPC( JAE )%NAME( 2 ) .AND.
-     &                          TRIM( STKPM_VAR( N )%ARRY( V ) ) .EQ.
-     &                          AEROSPC( JAE )%EMIS ) THEN
-                             SA_PMEMIS_PT( C,R,L,I,T_SPCTAG( JSPCTAG ) ) =
-     &                       SA_PMEMIS_PT( C,R,L,I,T_SPCTAG( JSPCTAG ) ) +
-     &                       LFRC * STKEM( J )
-                           END IF
-                        END DO AEFOUND
-                     END DO
-                  END DO
+                       I = PM_MAP( N )%ARRY( V )
+                       J = STKPM_MAP( N )%ARRY( V )
+                       IF ( J_ISAM_PTPM(JSPCTAG) .EQ. J ) THEN
+                         SA_PMEMIS_PT( C,R,L,I,T_SPCTAG(JSPCTAG) ) =
+     &                    SA_PMEMIS_PT( C,R,L,I,T_SPCTAG(JSPCTAG) ) +
+     &                      LFRC * STKEM( J )
+                       ENDIF
+                     END DO ! loop of V again
+                   END DO ! loop of L
 
-               END IF ! sgname = sename ?
+                 ENDIF  ! yes_xtrac
+
+               ENDIF ! sgname = sename ?
 
                END DO MULTISECT  ! loop of multisectors-4-single-tags
 
                END DO SPCTAGLOOP ! jspctag loop
 
 Ckrt ....................inline emission captured for tagging arrays above.....
-Ckrt ...Read SULF anyway....
-               DO ITAG = 1, NTAG_SA-3
-                  DO ISGSTK = 1, N_SGSTACKS
-                     IF ( SGNAME( ITAG, ISGSTK ) .EQ. SENAME( N ) ) THEN
-                        V = INDEX1( 'SULF', STKEM_MAP( N )%LEN, STKEM_VAR( N )%ARRY )
-                        IF ( V .GT. 0 ) THEN
-                           J = STKEM_MAP( N )%ARRY( V )
-                           DO L = 1, EMLYRS
-                              LFRC = TFRAC( L )
-                              IF ( LFRC .LE. 0.0 ) CYCLE
-                              SA_SULF_PT( C,R,L,ITAG ) =
-     &                        SA_SULF_PT( C,R,L,ITAG ) + LFRC * STKEM( J )
-                           END DO
-                        END IF
-                     END IF ! sgname = sename
-                  END DO ! isgstk
-               END DO ! itag
 #endif
 
                IF ( PT3DFRAC ) THEN   ! Store layer fractions
