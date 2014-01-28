@@ -275,12 +275,25 @@ Ckrt Set vname3d for SA_CONC_1 file
              T_SPCTAG  ( JSPCTAG ) = ITAG
              VNAM_SPCTAG ( JSPCTAG ) = VNAME(JSPC,ITAG)
            ENDIF ! NOx-limited ozone
-           IF ( SPC_NAME(JSPC,ITAG) .EQ. 'VOC' .AND.    
-     &          L_OZONE( ITAG ) ) THEN
+           IF ( (SPC_NAME(JSPC,ITAG) .EQ. 'ALD2' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'ALDX' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'ETH' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'ETHA' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'ETOH' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'FORM' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'IOLE' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'ISOP' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'MEOH' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'OLE' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'PAR' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'TERP' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'TOL' .OR.
+     &           SPC_NAME(JSPC,ITAG) .EQ. 'XYL' ) .AND.
+     &          L_VOC( ITAG ) ) THEN
              JSPCTAG = JSPCTAG + 1
              VTYPE3D( JSPCTAG ) = M3REAL
              VNAME3D( JSPCTAG ) = VNAME(JSPC,ITAG)
-             UNITS3D( JSPCTAG ) = "ppmvC           "
+             UNITS3D( JSPCTAG ) = "ppmV            "
              S_SPCTAG  ( JSPCTAG ) = JSPC
              T_SPCTAG  ( JSPCTAG ) = ITAG
              VNAM_SPCTAG ( JSPCTAG ) = VNAME(JSPC,ITAG)

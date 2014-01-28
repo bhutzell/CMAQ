@@ -1,4 +1,3 @@
-
 !------------------------------------------------------------------------!
 !  The Community Multiscale Air Quality (CMAQ) system software is in     !
 !  continuous development by various groups and is based on information  !
@@ -40,8 +39,10 @@ c...Variables regarding the tag list
 !20130702      CHARACTER( 16 ), ALLOCATABLE, SAVE :: STKFILE( : )
 
 c...20130702 multi-sectors-for-a-single-tag
-      INTEGER,          PARAMETER :: N_SGSTACKS = 40
+      INTEGER,         PARAMETER :: N_SGSTACKS = 40
       LOGICAL, ALLOCATABLE, SAVE :: YESSTK( :,: )
+c...20130731 stack group id counting
+      REAL,    ALLOCATABLE, SAVE :: SAIDVALU( :,: )
 
 c...Tagging species, regular or combined
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: SPC_NAME( :,: )
@@ -56,6 +57,7 @@ c...Logical values for tagging species
       LOGICAL, ALLOCATABLE, SAVE :: L_PM25( : )  !0705
       LOGICAL, ALLOCATABLE, SAVE :: L_CO( : )    !0705
       LOGICAL, ALLOCATABLE, SAVE :: L_OZONE( : ) !0705
+      LOGICAL, ALLOCATABLE, SAVE :: L_VOC( : )   !20131209
 !KRT20120917      LOGICAL, ALLOCATABLE, SAVE :: L_NOX( : )   !20120914
 
 c...Final, combined tags
@@ -75,6 +77,9 @@ C ...Tagging indices for bcon, others, icon
 
 !20130709 optional printout to log files
       LOGICAL, SAVE :: YES_PRINT
+
+!20130731  stack group id counting
+      INTEGER, SAVE :: NINLN
 
       CONTAINS
 
@@ -169,6 +174,9 @@ C...multi-sectors-for-a-single-tag 20130702
         LOGICAL LBACK
         INTEGER BGN_SG
 
+C...stack group id counting 20130731
+        INTEGER CNTCMA ! number of commas on a text line
+
 C-----------------------------------------------------------
         CALL NAMEVAL( 'SA_IOLIST', EQNAME )
         INPUT_UNIT = JUNIT()
@@ -183,6 +191,10 @@ C-----------------------------------------------------------
           PRINT*, 'SA_IO_LIST Sucessfully Opened'
           PRINT*, 'Start reading the list...'
         endif
+
+        !20130731 For stack group id counting
+        NINLN = 0
+
         DO ITAG = 1, NTAGS 
           READ ( INPUT_UNIT, '(A)' ) TXTLINE
           TAGNAME( ITAG ) = TXTLINE(18:LEN_TRIM( TXTLINE ) )
@@ -192,6 +204,12 @@ C-----------------------------------------------------------
 
           READ ( INPUT_UNIT, '(A)' ) TXTLINE
           TAGRGN( ITAG ) = TXTLINE(18:LEN_TRIM( TXTLINE ) )
+
+          !20130731 For stack group id counting
+          IF ( TAGRGN( ITAG )(1:6) .EQ. 'INLINE' ) THEN
+            CALL COUNTCOMMAS( TXTLINE, CNTCMA )
+            IF ( CNTCMA .GT. NINLN ) NINLN = CNTCMA
+          ENDIF !tagrgn = inline
 
           READ ( INPUT_UNIT, '(A)' ) TXTLINE
 !20130702          SGFILE( ITAG ) = TXTLINE(18:LEN_TRIM( TXTLINE ) )
@@ -216,8 +234,9 @@ C-----------------------------------------------------------
      & PRINT*, ITAG, TAGNAME( ITAG ), TAGCLASSES( ITAG ), TAGRGN( ITAG )
         ENDDO ! ITAG
 
-!krt20130702 To acknowledge exactly which stack emissions are to be read for each tag....
         if ( mype .eq. 0 ) then
+          print*,'max # inline sources among all tags, NINLN =',NINLN
+          !krt20130702 To acknowledge exactly which stack emissions are to be read for each tag....
           print*,'itag, list_of_sg_files_for_each_tag'
           do ITAG = 1, NTAGS
             do ISGSTK = 1, N_SGSTACKS
@@ -267,12 +286,36 @@ C0709...optional test
 
 !20130702 ...Multiple regions for single tags
         INTEGER YESRGN
+        INTEGER LENRGN   ! 20130801
 
 !20130715
         INTEGER LENVNAM  ! length of variable name from map frac file
 
 !20130716
         LOGICAL YES_XTRAC ! true if sector is to be extracted
+
+!...stack group id counting 20130731
+        LOGICAL YES_INLN  ! true if inline group id request is ever picked up
+        INTEGER CNTCMA ! number of commas on a text line
+        INTEGER, ALLOCATABLE :: LOCATCMA( : )  ! commas' location on a text line
+        INTEGER JCNT
+        !SA_ID values
+        CHARACTER( 6 ) CVALU    ! XXXX.X read off from SA_ID line
+        REAL    VALU            ! converted from the characters XXX.X
+
+        INTERFACE
+          SUBROUTINE COUNTCOMMAS( TXTLN, NCMAS )
+            IMPLICIT NONE
+            CHARACTER( * ), INTENT( IN ) :: TXTLN
+            INTEGER,       INTENT( OUT ) :: NCMAS
+          END SUBROUTINE  COUNTCOMMAS
+          SUBROUTINE LOCATECOMMAS( TXTLN, NCMAS, CMAPOS )
+            IMPLICIT NONE
+            CHARACTER( * ), INTENT( IN ) :: TXTLN
+            INTEGER,        INTENT( IN ) :: NCMAS
+            INTEGER,       INTENT( OUT ) :: CMAPOS( NCMAS )
+          END SUBROUTINE  LOCATECOMMAS
+        END INTERFACE
 
 C------------------------------------------------------------
 
@@ -306,14 +349,58 @@ c Domain decomposition
         ALLOCATE ( BUFF2( NCOLS, NROWS ), STAT = IOST )
         MAPFRAC = 0.0
         NRGNS = NVARS3D
+        YES_INLN = .FALSE.
         DO ITAG = 1, NTAGS
-          print*, TAGRGN( ITAG )
+          LENRGN = LEN_TRIM( TAGRGN( ITAG ) )
+          print*, TAGRGN( ITAG )( 1:LENRGN )
           IF ( TAGRGN( ITAG )( 1:10 ) .EQ. 'EVERYWHERE' ) THEN
             DO R = 1, MY_NROWS
               DO C = 1, MY_NCOLS
                 MAPFRAC( C,R,ITAG ) = 1.0
               ENDDO !C
             ENDDO !R
+          ELSEIF ( TAGRGN( ITAG )( 1:6 ) .EQ. 'INLINE' ) THEN
+            DO R = 1, MY_NROWS
+              DO C = 1, MY_NCOLS
+                MAPFRAC( C,R,ITAG ) = 1.0
+              ENDDO !C
+            ENDDO !R
+            !20130731
+            IF ( .NOT. YES_INLN ) THEN
+              YES_INLN = .TRUE.
+              ALLOCATE( SAIDVALU( NTAGS, NINLN ) )
+              SAIDVALU = -666.6
+            ENDIF ! tagrgn = inline
+            CALL COUNTCOMMAS( TAGRGN( ITAG )( 1:LENRGN ), CNTCMA )
+            IF ( YES_PRINT ) THEN
+              if ( MYPE .EQ. 0 ) print*,
+     & 'For ITAG=',ITAG,', # commas in TAGRGN is CNTCMA =',CNTCMA
+            ENDIF ! yes_print
+            ALLOCATE( LOCATCMA( CNTCMA ) )
+            CALL LOCATECOMMAS( TAGRGN( ITAG )( 1:LENRGN ), CNTCMA, LOCATCMA )
+            IF ( YES_PRINT ) THEN 
+             if ( MYPE .EQ. 0 ) then
+              print*,'TAGRGN = ',TAGRGN(ITAG)
+              print*,'Positions of commas in TAGRGN:'
+              write( *,* )( LOCATCMA(JCNT), JCNT = 1,CNTCMA )
+             endif ! mype0
+            ENDIF ! yes_print
+            DO JCNT = 1, CNTCMA
+              IF ( CNTCMA .EQ. 1 .OR. JCNT .EQ. CNTCMA ) THEN
+                CVALU = TAGRGN( ITAG )( LOCATCMA(JCNT)+1:LOCATCMA(JCNT)+6 )
+              ELSE
+                CVALU = TAGRGN( ITAG )( LOCATCMA(JCNT)+1:LOCATCMA(JCNT+1)-1 )
+              ENDIF ! cntcma =1 or jcnt comes to cntcma
+              READ( CVALU, '(F6.1)' ) VALU
+              SAIDVALU( ITAG,JCNT ) = VALU
+              if ( YES_PRINT ) then
+                if ( MYPE .EQ. 0 ) 
+     & print*,'itag=',ITAG,', jcnt=',JCNT,
+     & ', saidvalu=',SAIDVALU( ITAG,JCNT )
+              endif ! yes_print
+            ENDDO ! jcnt            
+            DEALLOCATE( LOCATCMA )
+
           ELSE
             DO IRGN = 1, NRGNS
               YESRGN = INDEX( TAGRGN(ITAG)(1:LEN_TRIM(TAGRGN(ITAG))),
@@ -375,7 +462,7 @@ c...external above
         INTEGER J
 
         LOGICAL LBACK
-        INTEGER BGN_SP, BGN_NTRATE
+        INTEGER BGN_SP, BGN_NTRATE, BGN_VOC
 
         !20130627
         INTEGER IOST
@@ -390,6 +477,7 @@ c----------------------------------------------------------
         L_PM25 = .FALSE.   ! 0705
         L_CO = .FALSE.   !0705
         L_OZONE = .FALSE.   !0705
+        L_VOC = .FALSE.   !20131209
 
         NSPC_SA = 0
         DO ITAG = 1, NTAG_SA-3
@@ -431,6 +519,15 @@ c----------------------------------------------------------
             ENDIF
 
             LBACK = .FALSE.
+            BGN_SP = INDEX( TAGCLASSES( ITAG ),'VOC',LBACK )
+            IF ( BGN_SP .NE. 0 ) THEN
+              IF ( .NOT. ANY( L_VOC ) ) THEN
+                NSPC_SA = NSPC_SA + 14 !20131209 ald2,aldx,eth,etha,etoh,form,iole,isop,meoh,ole,par,terp,tol,xyl
+              ENDIF
+              L_VOC( ITAG ) = .TRUE.
+            ENDIF
+
+            LBACK = .FALSE.
             BGN_SP = INDEX( TAGCLASSES( ITAG ),'AMMONIUM',LBACK )
             IF ( BGN_SP .NE. 0 ) THEN
               IF ( .NOT. ANY( L_NH4 ) ) THEN
@@ -469,7 +566,7 @@ c----------------------------------------------------------
                 ELSE
                   NUMOZRGM = 1
                 ENDIF ! yes_2regime
-                NSPC_SA = NSPC_SA + NUMOZRGM + 1  ! O3V, O3N, VOC
+                NSPC_SA = NSPC_SA + NUMOZRGM   ! O3V, O3N
               ENDIF  ! any(l_ozone)
               L_OZONE( ITAG ) = .TRUE.
               BGN_NTRATE = INDEX( TAGCLASSES( ITAG ),'NITRATE',LBACK )
@@ -480,11 +577,17 @@ c----------------------------------------------------------
                 ENDIF  ! no nitrate tracked so far
                 L_NTRATE( ITAG ) = .TRUE.
               ENDIF ! bgn_ntrate nonzero
+              BGN_VOC = INDEX( TAGCLASSES( ITAG ),'VOC',LBACK )
+              IF ( BGN_VOC .EQ. 0 ) THEN
+                IF ( .NOT. ANY( L_VOC ) ) THEN
+                  NSPC_SA = NSPC_SA + 14  ! ald2, aldx, eth, etha, etoh, form, iole, isop, meoh, ole, par, terp, tol, xyl
+                ENDIF  ! no VOC tracked so far
+                L_VOC( ITAG ) = .TRUE.
+              ENDIF ! bgn_ntrate nonzero
             ENDIF
         ENDDO ! number of tags
 
-
-        print*,'NSPC_SA = ', NSPC_SA
+        IF ( YES_PRINT ) print*,'NSPC_SA = ', NSPC_SA
 
 c...assign tags to bcon, others or icon for any tagging species
 
@@ -497,6 +600,7 @@ c...assign tags to bcon, others or icon for any tagging species
           IF ( ANY( L_PM25 ) ) L_PM25( ITAG ) = .TRUE.
           IF ( ANY( L_CO ) ) L_CO( ITAG ) = .TRUE.
           IF ( ANY( L_OZONE ) ) L_OZONE( ITAG ) = .TRUE.
+          IF ( ANY( L_VOC ) ) L_VOC( ITAG ) = .TRUE.
         ENDDO
 
         END SUBROUTINE GET_NSPC_SA
@@ -623,6 +727,65 @@ c----------------------------------------------------------
           ENDDO ! itag
         ENDIF
 
+        IF ( ANY( L_VOC ) ) THEN
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'ALD2'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'ALDX'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'ETH'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'ETHA'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'ETOH'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'FORM'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'IOLE'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'ISOP'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'MEOH'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'OLE'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'PAR'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'TERP'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'TOL'
+          ENDDO ! itag
+          J_SPC = J_SPC + 1
+          DO ITAG = 1, NTAG_SA  ! 20131209
+            IF ( L_VOC( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'XYL'
+          ENDDO ! itag
+        ENDIF ! any l_voc
+
         IF ( ANY( L_NH4 ) ) THEN
           J_SPC = J_SPC + 1
           DO ITAG = 1, NTAG_SA  ! 20120718
@@ -720,10 +883,6 @@ c----------------------------------------------------------
               IF ( L_OZONE( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'O3N'
             ENDDO ! itag
           ENDIF ! numozrgm = 1 or 2 ? 20130627
-          J_SPC = J_SPC + 1
-          DO ITAG = 1, NTAG_SA  ! 20120911
-            IF ( L_OZONE( ITAG ) ) SPC_NAME( J_SPC,ITAG ) = 'VOC'
-          ENDDO ! itag
         ENDIF
 
 
@@ -750,7 +909,7 @@ C...Assign species index with CMAQ species mappings
           IF ( N .GE. GC_STRT .AND. N .LE. GC_FINI ) THEN
 
             DO J_SPC = 1, NSPC_SA
-              IF ( SPC_NAME( J_SPC,ICONTAG ) .EQ. GC_SPC( N ) ) THEN
+              IF ( SPC_NAME( J_SPC,ICONTAG ) .EQ. GC_SPC( N ) ) THEN  !20131209 14 voc species covered
                 SPC_INDEX( J_SPC,1 ) = 1
                 SPC_INDEX( J_SPC,2 ) = N
               ELSEIF ( SPC_NAME( J_SPC,ICONTAG )(1:3) .EQ. 'O3A' ) THEN !1 ozone
@@ -760,22 +919,6 @@ C...Assign species index with CMAQ species mappings
      & SPC_NAME( J_SPC,ICONTAG )(1:3) .EQ. 'O3V' ) THEN !2-regime ozone
                 SPC_INDEX( J_SPC,1 ) = -50
                 SPC_INDEX( J_SPC,2 ) = N_OZN
-              ELSEIF ( SPC_NAME( J_SPC,ICONTAG ) .EQ. 'VOC' ) THEN ! voc tag for voc-limited ozone regime
-                SPC_INDEX( J_SPC,1 ) = 14     ! ald2, aldx, eth, etha, etoh, form, iole, isop, meoh, ole, par, terp, tol, xyl
-                SPC_INDEX( J_SPC, 2 ) = INDEX1( 'ALD2', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 3 ) = INDEX1( 'ALDX', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 4 ) = INDEX1( 'ETH', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 5 ) = INDEX1( 'ETHA', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 6 ) = INDEX1( 'ETOH', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 7 ) = INDEX1( 'FORM', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 8 ) = INDEX1( 'IOLE', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 9 ) = INDEX1( 'ISOP', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 10 ) = INDEX1( 'MEOH', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 11 ) = INDEX1( 'OLE', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 12 ) = INDEX1( 'PAR', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 13 ) = INDEX1( 'TERP', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 14 ) = INDEX1( 'TOL', N_GC_SPC, GC_SPC )
-                SPC_INDEX( J_SPC, 15 ) = INDEX1( 'XYL', N_GC_SPC, GC_SPC )
               ENDIF ! spc_name and gc_spc match
             ENDDO
 

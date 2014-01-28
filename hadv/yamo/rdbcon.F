@@ -226,7 +226,8 @@ C create advected species map to bc's
          END IF
 
 #ifdef isam
-         IF ( ANY( L_OZONE ) ) THEN  ! bug fix 20120420
+         !IF ( ANY( L_OZONE ) .OR. ANY( L_VOC ) ) THEN  ! krt 20140122
+         IF ( ANY( L_VOC ) ) THEN  ! krt 20140122
             DO JV = 1, N_EVOC
                VAR = INDEX1( NAM_VOC( JV ), N_SPC_ADV, BCNAME )
                IF ( VAR .GT. 0 ) WCH_VOC( JV, BCONTAG ) = 1.0
