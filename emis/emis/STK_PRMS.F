@@ -67,6 +67,10 @@ c     END TYPE RARRY1
       TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STKHT  ( : )
       TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STKTK  ( : )
       TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STKVEL ( : )
+#ifdef isam
+      TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STKSAID( : )
+      LOGICAL, ALLOCATABLE :: SAID_ON( : )
+#endif
 
       CONTAINS
 
@@ -153,6 +157,15 @@ C-----------------------------------------------------------------------
          CALL CHECKMEM( ASTAT, 'FIRE_ON', PNAME )
          FIRE_ON = .FALSE.   ! array assignment
 
+#ifdef isam
+         ALLOCATE ( SAID_ON( NGRPS ), STAT = ASTAT )
+         CALL CHECKMEM( ASTAT, 'SAID_ON', PNAME )
+         SAID_ON = .FALSE.   ! array assignment
+
+         ALLOCATE ( STKSAID( NGRPS ), STAT = ASTAT )
+         CALL CHECKMEM( ASTAT, 'STKSAID', PNAME )
+#endif
+
          DO N = 1, NGRPS
 
             IF ( .NOT. OPEN3( STKPRMS( N ), FSREAD3, PNAME ) ) THEN
@@ -174,6 +187,9 @@ C-----------------------------------------------------------------------
 
             DO V = 1, NVARS3D
                IF ( TRIM( VNAME3D( V ) ) .EQ. 'ACRESBURNED' ) FIRE_ON( N ) = .TRUE.
+#ifdef isam
+               IF ( TRIM( VNAME3D( V ) ) .EQ. 'SA_ID' ) SAID_ON( N ) = .TRUE.
+#endif
             END DO
 
             ALLOCATE ( XLOCA( NSRC( N ) ), STAT = ASTAT )
@@ -294,6 +310,13 @@ C SOURCE maps STKEMIS read from stk emis file to local STKEM in GET_PT3D_EMIS.
                ALLOCATE ( ACRES_BURNED( MY_DELTA ), STAT = ASTAT )
                CALL CHECKMEM( ASTAT, 'ACRES_BURNED', PNAME )
             END IF
+#ifdef isam
+            IF ( SAID_ON( N ) ) THEN
+              STKSAID( N )%LEN = MY_DELTA
+              ALLOCATE ( STKSAID( N )%ARRY( MY_DELTA ), STAT = ASTAT )
+              CALL CHECKMEM( ASTAT, 'STKSAID', PNAME )
+            END IF ! said_on
+#endif
 
             MY_XLOCA( N )%LEN = MY_NSRC( N )
             ALLOCATE ( MY_XLOCA( N )%ARRY( MY_NSRC( N ) ), STAT = ASTAT )
@@ -348,6 +371,17 @@ C SOURCE maps STKEMIS read from stk emis file to local STKEM in GET_PT3D_EMIS.
                      SUCCESS = .FALSE.; RETURN
                   END IF
                END IF
+#ifdef isam
+               IF ( SAID_ON( N ) ) THEN
+                 IF ( .NOT. XTRACT3( STKPRMS( N ), 'SA_ID', 1,NLAYS,
+     &                             MY_STRT_SRC( N ),MY_END_SRC( N ),
+     &                             1,1, SDATE, STIME, STKSAID( N )%ARRY ) ) THEN
+                    XMSG = 'Could not read SA_ID from ' // TRIM( STKPRMS( N ) )
+                    CALL M3MESG( XMSG )
+                    SUCCESS = .FALSE.; RETURN
+                 END IF ! xtract3
+               END IF ! said_on
+#endif
 
             ELSE
 

@@ -167,7 +167,7 @@ C for INTERPX
       REAL, ALLOCATABLE, SAVE :: CONV_SADEP( :,:,:,: ) ! convective wdep for the tags
       REAL, ALLOCATABLE, SAVE :: TOT_SADEP ( :,:,:,: ) ! total wdep for the tags
       REAL, ALLOCATABLE, SAVE :: BUFF2 ( :,: )
-      INTEGER IBGN
+      INTEGER JSPCTAG, V, IBGN
 #endif
 
 C...........EXTERNAL FUNCTIONS
@@ -1092,7 +1092,7 @@ C...convert to ppmV tracer gas
       END DO
 
 #ifdef isam
-Ckrt...Backward Unit Conversion of tssa array
+Ckrt...Backward Unit Conversion of isam array
       DO SPC = 1, N_SPCTAG
         IBGN = INDEX( VNAM_SPCTAG( SPC ), '_', .FALSE. ) - 1
         IF ( VNAM_SPCTAG( SPC )( 1:1 ) .EQ. 'A' .AND.

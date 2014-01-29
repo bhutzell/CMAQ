@@ -119,19 +119,6 @@ Clrt....even though PM sulfate, nitrate and ammonium will be overwritten with up
      &                  CGRID( C,R,L,SPC_INDEX(S,2) ) / real(NTAG_SA)
                     ENDIF ! ozone or non-ozone ?
                   ENDIF ! cbfor > 0 ?
-                ELSEIF ( SPC_NAME( S, K ) .EQ. 'VOC' ) THEN  ! aggregated species such VOC
-                  TTL_VOC_B4 = 0.0
-                  TTL_VOC_AF = 0.0
-                  DO JV = 1, SPC_INDEX( S, 1 )
-                    TTL_VOC_B4 = TTL_VOC_B4
-     &     + CBFOR( C, R, L, SPC_INDEX(S, JV+1) ) + NCARBON( JV )
-                    TTL_VOC_AF = TTL_VOC_AF
-     &     + CGRID( C, R, L, SPC_INDEX(S, JV+1) ) + NCARBON( JV )
-                  ENDDO ! list of aggregating species
-                  IF ( TTL_VOC_B4 .GT. 1.E-30 ) THEN
-                    ISAM( C, R, L, S, K ) = ISAMB4( C, R, L, S, K )
-     &  * MIN( 1.0, TTL_VOC_AF / TTL_VOC_B4 )       ! 20130514
-                  ENDIF !ttl_voc_b4 > 0
                 ENDIF ! single species, split species or combined species ?
               ENDDO ! K tags
             ENDDO ! S species

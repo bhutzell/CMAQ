@@ -1,22 +1,3 @@
-
-!------------------------------------------------------------------------!
-!  The Community Multiscale Air Quality (CMAQ) system software is in     !
-!  continuous development by various groups and is based on information  !
-!  from these groups: Federal Government employees, contractors working  !
-!  within a United States Government contract, and non-Federal sources   !
-!  including research institutions.  These groups give the Government    !
-!  permission to use, prepare derivative works of, and distribute copies !
-!  of their work in the CMAQ system to the public and to permit others   !
-!  to do so.  The United States Environmental Protection Agency          !
-!  therefore grants similar permission to use the CMAQ system software,  !
-!  but users are requested to provide copies of derivative works or      !
-!  products designed to operate in the CMAQ system to the United States  !
-!  Government without restrictions as to use by others.  Software        !
-!  that is used with the CMAQ system but distributed under the GNU       !
-!  General Public License or the GNU Lesser General Public License is    !
-!  subject to their copyright restrictions.                              !
-!------------------------------------------------------------------------!
-
       MODULE SA_GRD_DEFN
 C---------------------------------------------------------------------
 C Function: reads *GRIDDED* Source Apportionment Emission data
@@ -265,34 +246,6 @@ Ckrt ...model gas species and composite gas species 20130319
                      ENDDO ! L
                    END IF ! gas data interpx-ed ?
                  ENDIF ! tagged gas or NR found in emis file ?
-
-               ELSEIF ( SPC_INDEX(JSPC,1) .GT. 1
-     & .AND. SPC_NAME(JSPC,ITAG)(1:LENSPCNAME) .EQ. 'VOC' ) THEN ! composite species such as VOC
-
-                 BUFF = 0.0
-                 DO JV = 1, SPC_INDEX(JSPC,1)
-                   V = INDEX1(NAM_VOC(JV),N_GC_EMIS,GC_EMIS)
-                   IF ( V .GT. 0 ) THEN
-                    IF ( .NOT. INTERPX( SGFILE, GC_EMIS( V ), PNAME,
-     &                STARTCOL,ENDCOL, STARTROW,ENDROW, 1,ELAYS,
-     &                TRUDATE, JTIME, BUFF ) ) THEN
-                     XMSG = 'Could not read  ' // GC_EMIS( V )
-     &                // ' from ' // SGFILE
-                     CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
-                    ELSE
-                     WCH_VOC( JV, ITAG ) = 1.0
-                     DO L = 1, ELAYS
-                       DO R = 1, MY_NROWS
-                         DO C = 1, MY_NCOLS
-                           VOC_E_GRD( C,R,L,JV,ITAG ) =
-     &                       VOC_E_GRD( C,R,L,JV,ITAG )
-     &                       + BUFF( C,R,L ) * GC_EMIS_FAC( V )
-                         ENDDO ! C
-                       ENDDO ! R
-                     ENDDO ! L
-                    ENDIF ! interpx
-                   ENDIF ! v > 0 ?
-                 ENDDO ! jv
 
                ENDIF ! spc_index >= 1 ?
 

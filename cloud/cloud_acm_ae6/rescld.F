@@ -859,19 +859,6 @@ C....Apportion all species' conc as primary
      &                  ISAM( COL,ROW,LAY,JSPC,KTAG )
      &                 = ISAMB4( COL,ROW,LAY,JSPC,KTAG ) * MIN( 1.0,
      &  CEND( SPC_INDEX( JSPC,2 ) ) / CGRID( COL,ROW,LAY,SPC_INDEX( JSPC,2 ) ) )  ! 20130517
-                    ELSE IF ( SPC_NAME( JSPC,KTAG ) .EQ. 'VOC' ) THEN  ! aggregated species such VOC
-                      TTL_VOC_B4 = 0.0
-                      TTL_VOC_AF = 0.0
-                      DO JV = 1, SPC_INDEX( JSPC,1 )
-                        TTL_VOC_B4 = TTL_VOC_B4 +
-     &                    CGRID( COL,ROW,LAY,SPC_INDEX( JSPC,JV+1 ) ) + NCARBON( JV )
-                        TTL_VOC_AF = TTL_VOC_AF +
-     &                    CEND( SPC_INDEX( JSPC,JV+1 ) ) + NCARBON( JV )
-                      END DO ! list of aggregating species
-                      IF ( TTL_VOC_B4 .GT. 1.E-30 )
-     &                  ISAM( COL,ROW,LAY,JSPC,KTAG ) =
-     &                    ISAMB4( COL,ROW,LAY,JSPC,KTAG )
-     &                    * MIN( 1.0, TTL_VOC_AF / TTL_VOC_B4 )  ! 20130517
                     END IF ! single species, split species or aggregated species
                   END DO ! ktag
                 END DO ! jspc
@@ -976,18 +963,6 @@ C....Deposition part....
                     END DO ! ktag
                   END IF ! positive ttl_sa and happens to be o3v or o3n
 
-                  ! VOC deposition 20120925
-                  IF ( TTL_SA .GT. 1.E-30 .AND. SPC_NAME( JSPC,OTHRTAG ) .EQ. 'VOC' ) THEN
-                    TTL_RMVOC = 0.0
-                    DO JV = 1, SPC_INDEX( JSPC,1 )
-                      TTL_RMVOC = TTL_RMVOC + REMOV( SPC_INDEX( JSPC,JV+1) ) * NCARBON( JV )
-                    END DO ! jv
-                    DO KTAG = 1, NTAG_SA
-                       TOT_SADEP( COL,ROW,JSPC,KTAG ) =
-     &                   TOT_SADEP( COL,ROW,JSPC,KTAG ) +
-     &                   ISAM( COL,ROW,LAY,JSPC,KTAG ) / TTL_SA * TTL_RMVOC
-                    END DO ! ktag
-                  END IF ! +ve ttl_sa and voc
                 END DO ! jspc
 #endif
 

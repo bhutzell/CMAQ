@@ -428,7 +428,7 @@ Ckrt User specified number of layers output for tags
 
          CALL GET_SPC_INDEX ()
 
-         IF ( ANY( L_OZONE ) ) THEN
+         IF ( ANY( L_OZONE ) .OR. ANY( L_VOC ) ) THEN
             CALL VOC_INIT ()
          END IF
 
@@ -464,10 +464,11 @@ C Determine the number of combined species-tags
      &            +  4 * COUNT( L_OC )
      &            +  5 * COUNT( L_SFATE )
      &            + 12 * COUNT( L_NTRATE )
+     &            + 14 * COUNT( L_VOC )
      &            +  3 * COUNT( L_NH4 )
      &            + 14 * COUNT( L_PM25 )
      &            +      COUNT( L_CO )
-     &            + ( NUMOZRGM + 1 ) * COUNT( L_OZONE )
+     &            + NUMOZRGM * COUNT( L_OZONE )
          IF ( MYPE .EQ. 0 ) WRITE( LOGDEV,* ) 'In driver, N_SPCTAG =', N_SPCTAG
 
 C Allocate arrays of species indices, tagging indices, and

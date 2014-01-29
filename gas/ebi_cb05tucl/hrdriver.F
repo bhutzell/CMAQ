@@ -154,10 +154,9 @@ C for INTERPX
       INTEGER, SAVE :: JSO2, JSULF, JSRXN
       ! tag class CO  20130529
       INTEGER, SAVE :: JCO
-      ! vocs for tag class ozone  20130606
-      INTEGER, SAVE :: JVOC
-      REAL             TTL_VOC     !lump together weighted bulk voc spc
-      REAL             SUMUP_VOC   !lump together weighted voc's before assigning it back to each tag 20130626
+      ! vocs for tag class ozone  20130606; voc species made explicit, 20131211
+      INTEGER, ALLOCATABLE, SAVE :: JVOC( : )
+      INTEGER   IVOC   ! running voc index 20131211
       ! 1-ozone 20130627
       INTEGER, SAVE :: JO3A
       ! variables borrowed from DDM
@@ -265,7 +264,10 @@ c..If emissions processing requested stop
         ! tag class CO
         JCO   = INDEX1( 'CO' ,  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
         ! vocs for tag class ozone
-        JVOC  = INDEX1( 'VOC' ,  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        IF ( .NOT. ALLOCATED( JVOC ) ) ALLOCATE ( JVOC( N_EVOC ) )
+        DO IVOC = 1, N_EVOC
+          JVOC( IVOC ) = INDEX1( NAM_VOC( IVOC ), NSPC_SA, SPC_NAME( :, OTHRTAG ) )
+        ENDDO ! ivoc
         ! 1-ozone 20130627
         JO3A  = INDEX1( 'O3A', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
 #endif
@@ -404,14 +406,6 @@ c..Update concentration array
                ! Factorize A = inv(Id-dt/2*Jac)
                CALL SGEFA( A, N_GC_SPC, N_GC_SPC, IPVT, INFO )
 
-               ! derive voc spc to weighted total voc ratio  20130606
-               IF ( JVOC .GT. 0 ) THEN
-                  TTL_VOC = 1.E-30
-                  DO E = 1, N_EVOC
-                     TTL_VOC = TTL_VOC
-     &                       + CBFOR( C,R,L, SPC_INDEX( JVOC, E+1 ) ) * NCARBON( E )
-                  END DO
-               END IF
 
                DO 495 KTAG = 1, NTAG_SA
                   SOLD = 0.0
@@ -423,20 +417,14 @@ c..Update concentration array
      &                    JSPC .EQ. JHNO3 .OR. JSPC .EQ. JNTR ) THEN
                         ! Populates species from nitrate tag class
                         SOLD( SPC_INDEX( JSPC, 2 ) ) = ISAMB4( C,R,L,JSPC,KTAG )
-                     ELSE IF ( JSPC .EQ. JVOC ) THEN
-                        ! Populates VOC species from ozone tag class
-                        IF ( TTL_VOC .GT. 1.E-20 ) THEN
-                           DO E = 1, N_EVOC
-                              SOLD( SPC_INDEX( JSPC, E+1 ) ) =
-     &                        ISAMB4( C,R,L,JSPC,KTAG )
-     &                      * CBFOR( C,R,L, SPC_INDEX( JSPC, E+1 ) ) / TTL_VOC
-                           END DO ! E
-                        ELSE
-                           DO E = 1, N_EVOC
-                              SOLD( SPC_INDEX( JSPC, E+1 ) ) =
-     &                        CBFOR( C,R,L, SPC_INDEX( JSPC, E+1 ) ) / REAL( NTAG_SA )
-                           END DO !E
-                        END IF ! ttl_voc > 1e-20 ?
+                     ELSEIF ( JSPC .EQ. JVOC( 1 ) .OR. JSPC .EQ. JVOC( 2 )
+     &    .OR. JSPC .EQ. JVOC( 3 ) .OR. JSPC .EQ. JVOC( 4 )
+     &    .OR. JSPC .EQ. JVOC( 5 ) .OR. JSPC .EQ. JVOC( 6 )
+     &    .OR. JSPC .EQ. JVOC( 7 ) .OR. JSPC .EQ. JVOC( 8 )
+     &    .OR. JSPC .EQ. JVOC( 9 ) .OR. JSPC .EQ. JVOC(10 )
+     &    .OR. JSPC .EQ. JVOC( 11) .OR. JSPC .EQ. JVOC(12 )
+     &    .OR. JSPC .EQ. JVOC( 13) .OR. JSPC .EQ. JVOC(14 ) ) THEN
+                        SOLD( SPC_INDEX( JSPC, 2 ) ) = ISAMB4( C,R,L,JSPC,KTAG ) 
                      ELSE IF ( JSPC .EQ. JO3A ) THEN
                      ! For 1-ozone
                         SOLD( SPC_INDEX( JSPC, 2 ) ) = ISAMB4( C,R,L,JSPC,KTAG )
@@ -467,16 +455,16 @@ c..Update concentration array
      &                    JSPC .EQ. JNO3 .OR. JSPC .EQ. JHONO .OR. JSPC .EQ. JN2O5 .OR.
      &                    JSPC .EQ. JPNA .OR. JSPC .EQ. JPAN .OR. JSPC .EQ. JPANX .OR.
      &                    JSPC .EQ. JHNO3 .OR. JSPC .EQ. JNTR ) THEN
-                     ! Updates species from nitrate tag class
-                     ISAM( C,R,L,JSPC,KTAG ) = MAX( 0.0, PRD(SPC_INDEX(JSPC,2) ) )
-                     ELSE IF ( JSPC .EQ. JVOC ) THEN
-                        !Updates VOC species from ozone tag class
-                        SUMUP_VOC = 0.0
-                        DO E = 1, N_EVOC
-                           SUMUP_VOC = SUMUP_VOC
-     &                               + MAX( 0.0, PRD( SPC_INDEX( JSPC,E+1 ) ) ) * NCARBON( E )
-                        END DO
-                        ISAM( C,R,L,JSPC,KTAG ) = SUMUP_VOC
+                       ! Updates species from nitrate tag class
+                       ISAM( C,R,L,JSPC,KTAG ) = MAX( 0.0, PRD(SPC_INDEX(JSPC,2) ) )
+                     ELSEIF ( JSPC .EQ. JVOC( 1 ) .OR. JSPC .EQ. JVOC( 2 )
+     &    .OR. JSPC .EQ. JVOC( 3 ) .OR. JSPC .EQ. JVOC( 4 )
+     &    .OR. JSPC .EQ. JVOC( 5 ) .OR. JSPC .EQ. JVOC( 6 )
+     &    .OR. JSPC .EQ. JVOC( 7 ) .OR. JSPC .EQ. JVOC( 8 )
+     &    .OR. JSPC .EQ. JVOC( 9 ) .OR. JSPC .EQ. JVOC(10 )
+     &    .OR. JSPC .EQ. JVOC( 11) .OR. JSPC .EQ. JVOC(12 )
+     &    .OR. JSPC .EQ. JVOC( 13) .OR. JSPC .EQ. JVOC(14 ) ) THEN
+                       ISAM( C,R,L,JSPC,KTAG ) = MAX( 0.0, PRD(SPC_INDEX(JSPC,2) ) )
                      ELSE IF ( JSPC .EQ. JO3A ) THEN
                         ! Updates 1-ozone
                         ISAM( C,R,L,JSPC,KTAG ) = MAX( 0.0, PRD( SPC_INDEX( JSPC,2 ) ) )

@@ -105,6 +105,9 @@ C-----------------------------------------------------------------------
          USE AERO_EMIS           ! inherits GRID_CONF
          USE AERO_DATA, ONLY: MAP_PMEMIS  ! access subroutine map_pmemis
          USE DEPV_DEFN, ONLY: ABFLUX ! ammonia bidi flag
+#ifdef isam
+         USE SA_DEFN
+#endif
 
          IMPLICIT NONE
 
@@ -254,7 +257,12 @@ C 3D point source emissions (N_SPC_EMIS+1 serves as the null map for PTEM_MAP)
             XMSG = 'Failure initializing plume rise emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
-
+#ifdef isam
+         IF ( YES_PRINT ) THEN
+           IF ( MYPE .EQ. 0 ) 
+     &       WRITE( LOGDEV,'(/5X, A )' ) 'PT3D_INIT done'
+         END IF ! yes_print
+#endif
          ALLOCATE ( VDEMIS( N_SPC_EMIS+1,EMLAYS,MY_NCOLS,MY_NROWS ),
 #ifdef Verbose2
      &              semis( emlays,my_ncols,my_nrows ),
@@ -409,7 +417,7 @@ C....Remedy 20130320
 !        INTEGER LENSPCNAME
          INTEGER LS
 C VOC related 20130311
-         INTEGER JVE  ! matching emission factors of the 15 VOC's
+         INTEGER JVE  ! matching emission factors of the 14 VOC's
 
          INTERFACE
             SUBROUTINE test_sulf( JDATE, JTIME, TSTEP, NSTEPS, FILE_NAME )
@@ -485,27 +493,11 @@ C  loads."
 Ckrt....Read **Gridded** SA gas and non-reactants emission data
          CALL SA_GRD_EGAS ( JDATE, JTIME, TSTEP )
 
-Ckrt.....Cater for aggregated VOC`s  20130311
-         V = INDEX1( 'VOC', NSPC_SA, SPC_NAME(:,OTHRTAG) )
-         IF ( V .GT. 0 ) THEN
-            DO ITAG = 1, NTAG_SA - 3
-               DO L = 1, EMLYRS
-               DO R = 1, MY_NROWS
-               DO C = 1, MY_NCOLS
-               DO JV = 1, N_EVOC
-               SA_VDEMIS_GRD( C,R,L,V,ITAG ) = SA_VDEMIS_GRD( C,R,L,V,ITAG )
-     &           + VOC_E_GRD( C,R,L,JV,ITAG ) * NCARBON( JV )
-               END DO ! JV
-               END DO ! C
-               END DO ! R
-               END DO ! L
-            END DO ! itag
-         END IF ! v > 0
 
 Ckrt...Convert gridded SA gas emission into ppmV/sec
-         DO L = 1, EMLYRS
-           DO R = 1, MY_NROWS
-             DO C = 1, MY_NCOLS
+         DO R = 1, MY_NROWS
+           DO C = 1, MY_NCOLS
+             DO L = 1, EMLYRS
                CNVTC = CNVTP * RDX3F( L ) * RRHOJ( C,R,L )
                DO JSPC = 1, NSPC_SA
                  DO ITAG = 1, NTAG_SA-3
@@ -529,9 +521,9 @@ Ckrt Unit conversion for gridded SULF for PM sulate later...
      &               * MFRC_P( C,R,ITAG ) * CNVTC * GC_EMIS_FAC( V )
                  END DO ! loop of tags for sulf
                END IF ! v > 0 ?
-             END DO ! C
-           END DO ! R
-         END DO ! L
+             END DO ! L
+           END DO ! C
+         END DO ! R
 
 Ckrt...Read Gridded SA PM emission data
          CALL SA_GRD_E_PM ( JDATE, JTIME, TSTEP )
@@ -616,9 +608,9 @@ C accessed by GET_AERO_EMIS to be "speciated" and merged with the AE emissions.
             END DO
 #ifdef isam
 Ckrt...update ISAMEM with inline point source gas emission, and convert to ppmV/s
-            DO L = 1, EMLAYS
-              DO R = 1, MY_NROWS
-                DO C = 1, MY_NCOLS
+            DO R = 1, MY_NROWS
+              DO C = 1, MY_NCOLS
+                DO L = 1, EMLAYS
                   CNVTC = CNVTP * RDX3F( L ) * RRHOJ( C,R,L )
 Ckrt Inline pt src gas....
                   DO JSPC = 1, NSPC_SA
@@ -641,16 +633,7 @@ Ckrt Inline pt src gas....
      &                   + SA_VDEMIS_PT( C,R,L,V,ITAG )
      &                          * MFRC_P( C,R,ITAG ) * CNVTC * GASFAC
                           END IF !  v > 0, meaning that vnam exists
-                        ELSE IF ( SPC_NAME( JSPC,ITAG )( 1:LS ) .EQ.
-     &                            "VOC" ) THEN ! composite tracer such as VOC
-                          DO JV = 1, N_EVOC
-                            JVE = INDEX1( NAM_VOC( JV ), N_GC_EMIS, GC_EMIS )
-                            ISAMEM( C,R,L,JSPC,ITAG ) =
-     &                      ISAMEM( C,R,L,JSPC,ITAG )
-     &                    + VOC_E_PT( C,R,L,JV,ITAG ) * NCARBON( JV )
-     &                    * MFRC_P(C,R,ITAG) * CNVTC * GC_EMIS_FAC( JVE )
-                          END DO ! jv
-                        END IF ! spc_name excludes o3, IJ's, or includes voc
+                        END IF ! spc_name not any of voc, o3, sulf, pm spc
                       END IF ! spc_name exists at jscp, itag
                     END DO  ! loop ITAG
                   END DO ! loop JSPC
@@ -662,9 +645,9 @@ Ckrt Unit conversion of inline pt src SULF for PM sulfate later......
      &                  * MFRC_P( C,R,ITAG ) * CNVTC * GC_EMIS_FAC( V )
                     END DO ! loop of tags for sulf
                   END IF ! v > 0 ?
-               END DO ! columns
-             END DO ! rows
-           END DO ! layers
+               END DO ! layers
+             END DO ! columns
+           END DO ! rows
 #endif
          END IF
 

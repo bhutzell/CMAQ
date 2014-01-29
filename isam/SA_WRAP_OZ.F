@@ -1,22 +1,4 @@
 
-!------------------------------------------------------------------------!
-!  The Community Multiscale Air Quality (CMAQ) system software is in     !
-!  continuous development by various groups and is based on information  !
-!  from these groups: Federal Government employees, contractors working  !
-!  within a United States Government contract, and non-Federal sources   !
-!  including research institutions.  These groups give the Government    !
-!  permission to use, prepare derivative works of, and distribute copies !
-!  of their work in the CMAQ system to the public and to permit others   !
-!  to do so.  The United States Environmental Protection Agency          !
-!  therefore grants similar permission to use the CMAQ system software,  !
-!  but users are requested to provide copies of derivative works or      !
-!  products designed to operate in the CMAQ system to the United States  !
-!  Government without restrictions as to use by others.  Software        !
-!  that is used with the CMAQ system but distributed under the GNU       !
-!  General Public License or the GNU Lesser General Public License is    !
-!  subject to their copyright restrictions.                              !
-!------------------------------------------------------------------------!
-
       SUBROUTINE SA_WRAP_OZ( CGRID, CBFOR, ISAM, ISAMB4, JDATE, JTIME, TSTEP )
 
 !*************************************************************
@@ -84,15 +66,15 @@
       REAL             VOTE_NOX
 !      REAL             P_H2O2, P_ROOH, P_HNO3
 
-! VOC related 20120928
-      INTEGER, SAVE :: JVOC
+! VOC related 20120928; voc species made explicit, 20131211
+      INTEGER, ALLOCATABLE, SAVE :: JVOC( : )
       REAL             DO3, PO3  ! ozone destruction and production
       INTEGER, SAVE :: INDICTYP  ! Type of O3 regime indicator: 
       INTEGER          IOST
       REAL          :: INDICREG( N_INDIC )  ! indicators of ozone regimes
-      REAL             VXMIR     ! Tag-total of the product: VOC tag times weighted MIR tag
+      REAL, ALLOCATABLE, SAVE ::  NUMERO( : )     ! For each tag, sum over all species each product of voc and respective mir
+      REAL             DENOMINO     ! Tag-total of the product: VOC tag times weighted MIR tag
       INTEGER          JV        ! index running through VOC list from 1 to N_EVOC
-      REAL             TTL_VOC   ! sum over tags for each VOC species in each grid cell
 
 ! Logical
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
@@ -121,8 +103,13 @@
 
         JO3V  = INDEX1( 'O3V',  NSPC_SA, SPC_NAME( :, OTHRTAG ) )
         JO3N  = INDEX1( 'O3N',  NSPC_SA, SPC_NAME( :, OTHRTAG ) )
-        JVOC  = INDEX1( 'VOC',  NSPC_SA, SPC_NAME( :, OTHRTAG ) )
 
+        IF ( .NOT. ALLOCATED( JVOC ) ) ALLOCATE( JVOC( N_EVOC ) )
+        if ( mype .eq. 0 ) print*,'jv, nam_voc(jv), jvoc(jv):'
+        DO JV = 1, N_EVOC
+          JVOC( JV )  = INDEX1( NAM_VOC( JV ),  NSPC_SA, SPC_NAME( :, OTHRTAG ) )
+          if ( mype .eq. 0 ) print*,JV, NAM_VOC( JV ), JVOC( JV )
+        ENDDO ! jv
 
         IF ( .NOT. ALLOCATED( TTLB4 ) )
      &    ALLOCATE( TTLB4( MY_NCOLS, MY_NROWS, NLAYS, NSPC_SA ) )
@@ -133,13 +120,8 @@
 
         IF ( .NOT. ALLOCATED( CGMID ) ) ALLOCATE( CGMID( N_SPEC ) )
 
-         ! Weighted MIR
-         DO K = 1, NTAG_SA
-          DO JV = 1, N_EVOC 
-            MIR_WEITD( K ) = MIR_WEITD( K ) + WCH_VOC( JV, K ) * MIR( JV )
-          ENDDO ! loop jv
-         ENDDO ! loop K
-         MIR_WEITD = MIR_WEITD / REAL( N_EVOC )
+        ! 20131211
+        IF ( .NOT. ALLOCATED( NUMERO ) ) ALLOCATE( NUMERO( NTAG_SA ) )
 
          ! Determine O3 regime indicator type
          INDICTYP = ENVINT( 'O3INDICATOR_TYPE','1=P(perox)/P(HNO3), etc', -999, IOST )
@@ -293,15 +275,23 @@ Ckrt....20120928 Ozone
                     ENDIF ! bulk no + bulk no2 > 0 ?
                   ENDDO ! loop K
                 ELSE  ! voc-limited in the abundance of NOx
-                  VXMIR = 0.0
+                  NUMERO = 0.0
+                  DENOMINO = 0.0
+!20131212         if ( mype .eq. 0 .and. C .eq. 1 .and. R .eq. 1 .and. L .eq. 1 ) 
+!20131212     &  print*,'ktag, jv, nam_voc(jv), jvoc(jv)'
                   DO K = 1, NTAG_SA
-                    VXMIR = VXMIR + ISAMB4( C,R,L, JVOC, K ) * MIR_WEITD( K )
+                    DO JV = 1, N_EVOC
+!20131212             if ( mype .eq. 0 .and. C .eq. 1 .and. R .eq. 1 .and. L .eq. 1 ) 
+!20131212     &   print*,K, JV, NAM_VOC(JV), JVOC( JV )
+                      NUMERO( K ) = NUMERO( K ) 
+     &   + ISAMB4( C,R,L,JVOC(JV), K ) * MIR( JV )
+                    ENDDO ! jv
+                    DENOMINO = DENOMINO + NUMERO( K )
                   ENDDO ! loop K
                   DO K = 1, NTAG_SA
-                    IF ( VXMIR .GT. 1.E-20 ) THEN
+                    IF ( DENOMINO .GT. 1.E-20 ) THEN
                       ISAM( C,R,L, JO3V, K ) = ISAMB4( C,R,L, JO3V, K )
-     &                        + DO3
-     &                         * ISAMB4( C,R,L, JVOC, K ) * MIR_WEITD( K ) / VXMIR
+     &                        + DO3 * NUMERO( K ) / DENOMINO
                     ELSE
                       ISAM( C,R,L, JO3V, K ) = ISAMB4( C,R,L, JO3V, K )
      &                        + DO3 / R_OZTAGS

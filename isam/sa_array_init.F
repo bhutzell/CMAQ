@@ -52,7 +52,7 @@ c.....arguments
 c.....local variables
 
       INTEGER          C, R, L, S, K              ! loop index
-      INTEGER          N, NSPC
+      INTEGER          N, NSPC, JVOC              ! 20140123
 
       CHARACTER*1      NEW_START
 
@@ -98,6 +98,10 @@ Ckrt  print*, NSPC_SA, NLAYS, MY_NROWS, MY_NCOLS, ICONTAG
                 END DO ! R
               END DO ! C
             END DO ! L
+            JVOC = INDEX1( SPC_NAME( S, ICONTAG ), N_EVOC, NAM_VOC ) ! 14 voc spcs, 20140123
+            IF ( JVOC .GT. 0 ) THEN
+              WCH_VOC( JVOC, ICONTAG ) = 1.0
+            ENDIF ! spc_name is voc ?
           ELSEIF( N .EQ. -50) THEN  ! 50/50 for each of VOC- and NOx limited ozone
             DO L = 1, NLAYS
               DO C = 1, MY_NCOLS
@@ -108,26 +112,14 @@ Ckrt  print*, NSPC_SA, NLAYS, MY_NROWS, MY_NCOLS, ICONTAG
             END DO ! L
           ELSEIF(N .NE. -1) THEN ! query is for constructed species
             DO NSPC = 1, N
-              if ( mype .eq. 0 ) then
-                print*,'VOC species, cgrid index:', NAM_VOC( NSPC ), 
-     &             SPC_INDEX( S, 1+NSPC )
-              endif ! mype0 ?
               DO L = 1, NLAYS
                 DO C = 1, MY_NCOLS
                   DO R = 1, MY_NROWS
-                    IF ( SPC_NAME(S,ICONTAG) .EQ. 'VOC' ) THEN
-                      ISAM(C,R,L,S, ICONTAG) =
-     &                  ISAM(C,R,L,S, ICONTAG)+ NCARBON( NSPC ) * CGRID(C,R,L,SPC_INDEX(S, 1+NSPC))
-                    ELSE
-                      ISAM(C,R,L,S, ICONTAG) =
+                    ISAM(C,R,L,S, ICONTAG) =
      &                  ISAM(C,R,L,S, ICONTAG)+ CGRID(C,R,L,SPC_INDEX(S, 1+NSPC))
-                    ENDIF ! voc ?
                   END DO ! R
                 END DO ! C
               END DO ! L
-              IF ( SPC_NAME( S, ICONTAG ) .EQ. 'VOC' ) THEN
-                WCH_VOC( NSPC, ICONTAG ) = 1.0
-              ENDIF ! spc_name is voc ?
             END DO ! NSPC of constructed species
           END IF ! original species, or constructed species ?
         END DO ! loop of isam species NSPC_SA

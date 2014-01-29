@@ -75,10 +75,6 @@ C==========================================================
           DO ITAG = 1, NTAG_SA - 3
            KNTAG = KNTAG + ISAMEM( C,R,L,JSPC,ITAG )
           ENDDO ! itag
-!KRT20120925          if ( MYPE .eq. 0 ) then
-!KRT20120925            if ( C .eq. 13 .and. R .eq. 10 .and. L .eq. 1 .and. JSPC .eq. 1 )   ! Mc05
-!KRT20120925     &      print*,'KNTAG=isamem(13,10,1,1,1)=',KNTAG                          ! Mc05
-!KRT20120925          endif ! mype0
 
 Ckrt...Search from Gas emis species list
           NVARI = LAST_GC - FRST_GC + 1
@@ -91,6 +87,11 @@ Ckrt...Search from Gas emis species list
              IF ( ABS(ISAMEM(C,R,L,JSPC,OTHRTAG)) .LE. 1.E-10 ) THEN
                ISAMEM(C,R,L,JSPC,OTHRTAG) = 0.
              ELSE
+               IF ( YES_PRINT ) THEN
+                 print*,'mype,L,R,C,JSPC,spc_nam,vdemis,kntag:'
+                 print*, MYPE,L,R,C,JSPC,SPC_NAME(JSPC,OTHRTAG),
+     &                   VDEMIS(V,L,C,R),KNTAG
+               END IF !optional yes print
                XMSG = 'Total tagging GC emiss exceeds basic emiss !'
                CALL M3EXIT( PNAME,JDATE,JTIME,XMSG,3 )
              ENDIF ! negative number very small ?
@@ -117,12 +118,6 @@ Ckrt...Search from PM emis species list
            V = N + FRST_AE - 1
            ISAMEM(C,R,L,JSPC,OTHRTAG) =
      &       VDEMIS( V,L,C,R ) - KNTAG
-!KRT20120925           if ( MYPE .eq. 0 ) then
-!KRT20120925             if ( C .eq. 13 .and. R .eq. 10 .and. L .eq. 1 .and. JSPC .eq. 1 ) then  ! Mc05
-!KRT20120925               print*,'SPC_NAME,C,R,L,VDEMIS,KNTAG'
-!KRT20120925               print*, SPC_NAME(JSPC,OTHRTAG),C,R,L,VDEMIS(V,L,C,R),KNTAG 
-!KRT20120925             endif  ! Mc05
-!KRT20120925           endif ! mype0
            IF ( ISAMEM(C,R,L,JSPC,OTHRTAG) .LT. 0. ) THEN
              IF ( ABS(ISAMEM(C,R,L,JSPC,OTHRTAG)) .LE. 1.E-10 ) THEN
                ISAMEM(C,R,L,JSPC,OTHRTAG) = 0.
@@ -152,32 +147,6 @@ Ckrt...Search from NR emis species list
            ENDIF ! indeed a negative number ?
           ENDIF ! species matched
 
-Ckrt....20120918 Now deal with VOC.....
-          IF ( SPC_NAME( JSPC, OTHRTAG ) .EQ. 'VOC' ) THEN
-            VDEMIS_VOC = 0.0
-            NVARI = LAST_GC - FRST_GC + 1
-            DO JV = 1, N_EVOC
-              N = INDEX1( NAM_VOC(JV), NVARI, GC_EMIS )
-              IF ( N .GT. 0 ) THEN
-                V = N
-                VDEMIS_VOC = VDEMIS_VOC + VDEMIS( V,L,C,R ) * NCARBON( JV )
-!KRT20120921    if ( mype .eq. 0 .and. C .eq. 5 .and. R .eq. 5 .and. L .eq. 1 ) then
-!KRT20120921      print*,'JV, NAM_VOC, NCARBON:',JV, NAM_VOC(JV), NCARBON(JV)
-!KRT20120921    endif ! mype0
-              ENDIF ! n > 0 ?
-            ENDDO ! jv
-            ISAMEM( C,R,L,JSPC,OTHRTAG ) = VDEMIS_VOC - KNTAG
-            IF ( ISAMEM(C,R,L,JSPC,OTHRTAG) .GT. 1.E-10 ) THEN ! 20120924
-              WCH_VOC( :, OTHRTAG ) = 1.0
-            ELSEIF ( ISAMEM(C,R,L,JSPC,OTHRTAG) .LT. 0 ) THEN
-             IF ( ABS(ISAMEM(C,R,L,JSPC,OTHRTAG)) .LE. 1.E-10 ) THEN
-               ISAMEM(C,R,L,JSPC,OTHRTAG) = 0.
-             ELSE
-               XMSG = 'Total tagging VOC emiss exceeds basic emiss !'
-               CALL M3EXIT( PNAME,JDATE,JTIME,XMSG,3 )
-             ENDIF ! negative number very small ?
-            ENDIF ! indeed a negative number ?
-          ENDIF  ! spc_name = voc?
 
          ENDDO ! jspc
         ENDDO ! C

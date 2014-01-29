@@ -88,7 +88,9 @@ C..Assign Tag Indices To ICON, BCON, OTHER *in that order*
           OTHRTAG = BCONTAG + 1
           ICONTAG = OTHRTAG + 1
           NTAG_SA = ICONTAG
-          print*,'NTAG_SA =',NTAG_SA
+          IF ( YES_PRINT ) THEN
+            if ( MYPE .EQ. 0 ) print*,'NTAG_SA =',NTAG_SA
+          ENDIF ! yes_print
 
 c...Only for the calling of GET_NSPC_SA
           ALLOCATE ( L_EC( NTAGS+3 ), STAT = IOST ) 
@@ -107,6 +109,8 @@ c...Only for the calling of GET_NSPC_SA
           CALL CHECKMEM( IOST, 'L_CO', PNAME )
           ALLOCATE ( L_OZONE( NTAGS+3 ), STAT = IOST )
           CALL CHECKMEM( IOST, 'L_OZONE', PNAME )
+          ALLOCATE ( L_VOC( NTAGS+3 ), STAT = IOST )
+          CALL CHECKMEM( IOST, 'L_VOC', PNAME )
 
           CALL GET_NSPC_SA 
 
