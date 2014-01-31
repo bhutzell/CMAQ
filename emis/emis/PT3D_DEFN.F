@@ -47,6 +47,9 @@ C     29 Oct 2011 J.Young: fix domain windowing
 C     30 Apr 2012 C.Nolte: fix number of substeps, NTICS to be the number of
 C                          synchronization time steps rather than the number of seconds. 
 C     20 Sep 2013 B.Koo: Revised for VBS (POC <- POC + NCOM)
+C     19 Dec 2013 D. Wong: used WRTIME, a robust way to determine when to write the
+C                          PT3D diagnostic file instead of relying on NTICS in particular
+C                          for the twoway model where a time step can be sub-divided.
 
 C-----------------------------------------------------------------------
 
@@ -1222,7 +1225,7 @@ C Possible report to REPRTLAY
 #ifdef Verbose1
             write( logdev,* ) '   ntics, jtime: ', ntics, jtime
 #endif
-            IF ( NTICS .GE. TIME2SEC( TSTEP( 1 ) ) / TIME2SEC( TSTEP( 2 ) ) ) THEN
+            IF ( WRTIME ) THEN
                DIVFAC = 1.0 / FLOAT( NTICS )
 #ifdef Verbose1
                write( logdev,* ) '   ntics, divfac: ', ntics, divfac
