@@ -177,6 +177,9 @@ C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
 
 C SLN 08/16/13 ddm-3d implementation for cmaq5.0.1
 
+C JB  02/07/14 Added Jai Xing's mass balance fix when there is excessive
+C              condensation or evaporation under cold conditions
+
 C  REFERENCES:
 C   1. Binkowski, F.S. and U. Shankar, The regional particulate matter
 C      model 1. Model description and preliminary results, J. Geophys.
@@ -1636,6 +1639,46 @@ C *** Initialize excess evaporated mass array
          CINORG( KK,  IMODE ) = AEROSPC_CONC( AK_IDX,   IMODE )
          CINORG( KMG, IMODE ) = AEROSPC_CONC( AMG_IDX,  IMODE )
 
+!** Jai Xing's VOLINORG fix
+         DO ISP = 1, NVOLINORG
+
+            CFINAL( ISP,IMODE ) = CINORG( ISP,IMODE )
+     &                          + OMEGA( IMODE ) * DVOLINORG( ISP )
+     &                          * DF( ISP )
+
+            IF ( IMODE .EQ. 1 ) THEN
+
+               IF ( CFINAL( ISP,IMODE ) .LT. 0.0D0 ) THEN
+                  DMASS( ISP ) = CFINAL( ISP,IMODE )
+                  CFINAL( ISP,IMODE ) = 0.0D0
+               END IF
+
+            ELSE   ! IMODE = 2
+
+               CFINAL( ISP,IMODE ) = CFINAL( ISP,IMODE ) + DMASS( ISP )
+
+               IF ( CFINAL( ISP,IMODE ) .LT. 0.0D0 ) THEN
+                  CFINAL( ISP,1 ) = CFINAL( ISP,1 ) + CFINAL( ISP,IMODE )
+                  CFINAL( ISP,IMODE ) = 0.0D0
+
+                  IF ( CFINAL( ISP, 1 ) .LT. 0.0D0 ) THEN
+                     IF ( ABS( CFINAL( ISP,1 ) ) .LT. 1.0D-15 ) THEN
+                        CFINAL( ISP,1 ) = 0.0D0
+                     ELSE
+                        WRITE( LOGDEV,* ) 'VOLINORG: Too much evaporation'
+                        CFINAL( ISP,1 ) = 0.0D0
+                     END IF
+                  END IF
+               END IF
+
+            END IF  ! IMODE = 1
+
+         END DO ! ISP
+
+      END DO    ! IMODE
+      
+      DO IMODE = 1, 2  ! modal partitioning of equilibrium aerosol mass
+
          WETM3 = MOMENT3_CONC( IMODE )
          WETM2 = MOMENT2_CONC( IMODE )
 
@@ -1669,42 +1712,6 @@ C *** Initialize excess evaporated mass array
          DRYM3 = WETM3 - H2OFAC * REAL( AEROSPC_CONC( AH2O_IDX,IMODE ), 8 ) - M3SOA
          DRYM20 = WETM2 * ( DRYM3 / WETM3 ) ** D_TWOTHIRDS
 
-         DO ISP = 1, NVOLINORG
-         
-            CFINAL( ISP,IMODE ) = CINORG( ISP,IMODE )
-     &                          + OMEGA( IMODE ) * DVOLINORG( ISP )
-     &                          * DF( ISP )
-
-            IF ( IMODE .EQ. 1 ) THEN
-
-               IF ( CFINAL( ISP,IMODE ) .LT. 0.0D0 ) THEN
-                  DMASS( ISP ) = CFINAL( ISP,IMODE )
-                  CFINAL( ISP,IMODE ) = 0.0D0
-               END IF
-
-            ELSE   ! IMODE = 2
-
-               CFINAL( ISP,IMODE ) = CFINAL( ISP,IMODE ) + DMASS( ISP )
-
-               IF ( CFINAL( ISP,IMODE ) .LT. 0.0D0 ) THEN
-                  CFINAL( ISP,1 ) = CFINAL( ISP,1 ) + CFINAL( ISP,IMODE ) 
-                  CFINAL( ISP,IMODE ) = 0.0D0
-
-                  IF ( CFINAL( ISP, 1 ) .LT. 0.0D0 ) THEN
-                     IF ( ABS( CFINAL( ISP,1 ) ) .LT. 1.0D-15 ) THEN
-                        CFINAL( ISP,1 ) = 0.0D0
-                     ELSE
-                        WRITE( LOGDEV,* ) 'VOLINORG: Too much evaporation'
-                        CFINAL( ISP,1 ) = 0.0D0
-!                       STOP
-                     END IF
-                  END IF 
-               END IF
-
-            END IF   ! IMODE = 1
-            
-         END DO 
-                        
          SO4 = CINORG( KSO4,IMODE ) + RATE * CONVFAC
 
 C *** Double precision vars for CALC_H2O

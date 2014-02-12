@@ -272,8 +272,9 @@ C *** CLEAR FLAGS ***
          FCOL(jK)     = 1
          FCOL(jMG)    = 1
 
-      ELSEIF (CC.EQ.'O'.OR.CC.EQ.'M'.OR.
-     &        CC.EQ.'P') THEN
+c     ELSEIF (CC.EQ.'O'.OR.CC.EQ.'M'.OR.
+      ELSEIF (             CC.EQ.'M'.OR.
+     &        CC.EQ.'P') THEN !  sln 11feb 2014 split out case "O"
 
          FROW(iK2)    = 1
          FROW(iK3)    = 1
@@ -295,9 +296,37 @@ C *** CLEAR FLAGS ***
          FCOL(jSO4)   = 1
          FCOL(jNO3)   = 1
          FCOL(jHNO3)  = 1
-         FCOL(jNA)    = 1
+         FCOL(jNA)    = 1 
          FCOL(jCL)    = 1
          FCOL(jHCL)   = 1 
+         FCOL(jK)     = 1
+         FCOL(jMG)    = 1
+
+      ELSEIF (CC.EQ.'O') THEN
+
+         FROW(iK2)    = 1
+         FROW(iK3)    = 1
+         FROW(iK4)    = 1
+         FROW(iMBNO3) = 1
+         FROW(iMBSO4) = 1
+         FROW(iMBNH4) = 1
+         FROW(iMBCL)  = 1
+c        FROW(iMBNA)  = 1
+         FROW(iMBK)   = 1
+         FROW(iMBMG)  = 1
+         FROW(iCB)    = 1
+         FROW(iZSR)   = 1
+
+         FCOL(jNH3)   = 1
+         FCOL(jNH4)   = 1
+         FCOL(jH)     = 1
+         FCOL(jH2O)   = 1
+         FCOL(jSO4)   = 1
+         FCOL(jNO3)   = 1
+         FCOL(jHNO3)  = 1
+c        FCOL(jNA)    = 1 
+         FCOL(jCL)    = 1
+         FCOL(jHCL)   = 1
          FCOL(jK)     = 1
          FCOL(jMG)    = 1
 
@@ -1767,19 +1796,21 @@ C
 
       INFO = 0
       CALL dgefa(AAT,NDIM,NDIM,IPVT,INFO)
+
       IF (INFO.NE.0) THEN
          WRITE(*,*) 'ERROR IN DGEFA'
-      print*,CC
-      print*, 'tot',W
-      print*,'ndim',ndim
-      print*,'frow',frow
-      print*,'fcol',fcol
-      print*, 'AA'
-      do i = 1,ndim
-         print*, i
-         write(*,*) (AA(i,j),j=1,ndim)
-      enddo
-      write(*,*) 'bb',(BB(i),i=1,ndim)
+
+         WRITE(*,*) "ISOROPIA case = ",SCASE
+         WRITE(*,*) 'ISOROPIA W =',W
+         WRITE(*,*) 'ndim = ',ndim
+         WRITE(*,*) 'frow = ',frow
+         WRITE(*,*) 'fcol = ',fcol
+         WRITE(*,*) 'AA = '
+         do i = 1,ndim
+            write(*,*), i
+            write(*,*) (AA(i,j),j=1,ndim)
+         enddo
+         write(*,*) 'BB = ',(BB(i),i=1,ndim)
          STOP
       ENDIF
 C
