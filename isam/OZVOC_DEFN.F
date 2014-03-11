@@ -28,18 +28,19 @@
 
 !KRT optional output of regime indicator - Type 1
       LOGICAL,           SAVE :: YES_INDIC
-      INTEGER,      PARAMETER :: N_INDIC = 9
+      INTEGER,      PARAMETER :: N_INDIC = 10
       REAL, ALLOCATABLE, SAVE :: INDICVALU( :,:,:,: )
       CHARACTER(16)           :: VNAM_INDIC( N_INDIC )
-      DATA  VNAM_INDIC / 'PEROX2HNO3', 'H2O2_HNO3', 'H2O2_O3NO2',
-     &                   'NOY', 'O3_NOX', 'O3_NOY',
+      DATA  VNAM_INDIC / 'PEROX2HNO3', 'PH2O2HNO3','H2O2_HNO3', 
+     &                   'H2O2_O3NO2','NOY', 'O3_NOX', 'O3_NOY',
      &                   'O3_NOZ', 'FORM_NOY', 'FORM_NO2' /
       CHARACTER(16)           :: UNITS_INDIC( N_INDIC )
-      DATA  UNITS_INDIC / 'unitless','unitless','unitless',
+      DATA  UNITS_INDIC / 'unitless','unitless','unitless','unitless',
      &                    'ppmV', 'unitless', 'unitless',
      &                    'unitless', 'unitless', 'unitless' /
       CHARACTER(80)           :: DESC_INDIC( N_INDIC )
       DATA  DESC_INDIC / 'Ratio: productions (H2O2+ROOH)/HNO3',
+     &                   'Ratio: productions H2O2/HNO3',
      &                   'Ratio: Concs H2O2/HNO3',
      &                   'Ratio: Concs H2O2/(O3+NO2)',
      &                   'NOY = NOX +NO3+HNO3+N2O5+PAN',  !Fahey et al 1985: J Atmos Chem, 3(4), pp 435-468
@@ -51,7 +52,22 @@
       !transition values Zhang et al 2009: JGR, 114, D22305, doi:10.1029/2009JD011900
       REAL                    :: TRANSV( N_INDIC )
       !DATA  TRANSV / 0.5, 0.35, 0.04, 0.02, 15.0, 7.0, 20.0, 0.28, 1.0 /
-      DATA  TRANSV / 0.5, 0.35, 0.02, 0.02, 15.0, 7.0, 20.0, 0.28, 1.0 / !Zhang's preference about H2O2/Ox
+      DATA  TRANSV / 0.5, 0.35, 0.35, 0.02, 0.02, 15.0, 7.0, 20.0, 0.28, 1.0 / !Zhang's preference about H2O2/Ox
+
+!20140305 optional output of indicators' original species
+      INTEGER,      PARAMETER :: N_INDORIG = 12
+      REAL, ALLOCATABLE, SAVE :: INDORIG( :,:,:,: )
+      CHARACTER( 16 )         :: VNAM_INDORIG( N_INDORIG )
+      DATA VNAM_INDORIG / 'PH2O2', 'PROOH', 'PHNO3',
+     &                    'H2O2', 'HNO3', 'O3',
+     &                    'NO', 'NO2', 'NO3',
+     &                    'N2O5', 'PAN', 'FORM' /
+      CHARACTER( 16 )         :: UNITS_INDORIG( N_INDORIG )
+      DATA UNITS_INDORIG / 'ppmV/s','ppmV/s','ppmV/s',
+     &                     'ppmV','ppmV','ppmV',
+     &                     'ppmV','ppmV','ppmV',
+     &                     'ppmV','ppmV','ppmV'/
+
 
 !KRT destruction of ozone 20120928
       REAL,            SAVE :: OZ_VOC
@@ -201,7 +217,7 @@ C===============================================================================
 C-----------------------------------------------------------------------
 !       CALL SUBST_BARRIER
 
-       NVARS3D = N_INDIC + 1
+       NVARS3D = N_INDIC + 1 + N_INDORIG
 
        DO S = 1, N_INDIC
          VNAME3D( S ) = VNAM_INDIC( S )
@@ -213,8 +229,17 @@ C-----------------------------------------------------------------------
        VNAME3D( N_INDIC + 1 ) = 'VOTE_NOX'
        VTYPE3D( N_INDIC + 1 ) = M3REAL
        UNITS3D( N_INDIC + 1 ) = 'unitless'
-       VDESC3D( S ) = 'Fraction of indicators '
+       VDESC3D( N_INDIC + 1 ) = 'Fraction of indicators '
      &               // 'in favor of NOx-limited regime'
+
+
+!20140305 additional outputs of indicators' original variables
+       DO S = N_INDIC + 1 + 1, N_INDIC + 1 + N_INDORIG
+         VNAME3D( S ) = VNAM_INDORIG( S - N_INDIC - 1 )
+         VTYPE3D( S ) = M3REAL
+         UNITS3D( S ) = UNITS_INDORIG( S - N_INDIC -1 )
+         VDESC3D( S ) = VNAM_INDORIG( S - N_INDIC - 1 )
+       END DO ! indicators original variables
 
        SDATE3D = JDATE
        STIME3D = JTIME
@@ -264,6 +289,12 @@ C-----------------------------------------------------------------------
 
        ALLOCATE( INDICVALU( MY_NCOLS, MY_NROWS, NLAYS, N_INDIC+1 ), STAT=ALLOCSTAT )
        IF ( .NOT. ALLOCATED( INDICVALU ) ) THEN
+         XMSG = 'Failure allocating INDICVALU'
+         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+       ENDIF
+
+       ALLOCATE( INDORIG( MY_NCOLS, MY_NROWS, NLAYS, N_INDORIG ), STAT=ALLOCSTAT )
+       IF ( .NOT. ALLOCATED( INDORIG ) ) THEN
          XMSG = 'Failure allocating INDICVALU'
          CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
        ENDIF
