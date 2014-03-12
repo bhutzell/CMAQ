@@ -241,6 +241,7 @@ Ckrt Set vname3d for SA_CONC_1 file
              VTYPE3D( JSPCTAG ) = M3REAL
              VNAME3D( JSPCTAG ) = VNAME(JSPC,ITAG)
              UNITS3D( JSPCTAG ) = "ppmV            "
+             VDESC3D( JSPCTAG ) = "tracer conc."
              S_SPCTAG  ( JSPCTAG ) = JSPC
              T_SPCTAG  ( JSPCTAG ) = ITAG
              VNAM_SPCTAG ( JSPCTAG ) = VNAME(JSPC,ITAG)
@@ -251,6 +252,7 @@ Ckrt Set vname3d for SA_CONC_1 file
              VTYPE3D( JSPCTAG ) = M3REAL
              VNAME3D( JSPCTAG ) = VNAME(JSPC,ITAG)
              UNITS3D( JSPCTAG ) = "ppmV            "
+             VDESC3D( JSPCTAG ) = "tracer conc."
              S_SPCTAG  ( JSPCTAG ) = JSPC
              T_SPCTAG  ( JSPCTAG ) = ITAG
              VNAM_SPCTAG ( JSPCTAG ) = VNAME(JSPC,ITAG)
@@ -261,6 +263,7 @@ Ckrt Set vname3d for SA_CONC_1 file
              VTYPE3D( JSPCTAG ) = M3REAL
              VNAME3D( JSPCTAG ) = VNAME(JSPC,ITAG)
              UNITS3D( JSPCTAG ) = "ppmV            "
+             VDESC3D( JSPCTAG ) = "tracer conc."
              S_SPCTAG  ( JSPCTAG ) = JSPC
              T_SPCTAG  ( JSPCTAG ) = ITAG
              VNAM_SPCTAG ( JSPCTAG ) = VNAME(JSPC,ITAG)
@@ -271,6 +274,7 @@ Ckrt Set vname3d for SA_CONC_1 file
              VTYPE3D( JSPCTAG ) = M3REAL
              VNAME3D( JSPCTAG ) = VNAME(JSPC,ITAG)
              UNITS3D( JSPCTAG ) = "ppmV            "
+             VDESC3D( JSPCTAG ) = "tracer conc."
              S_SPCTAG  ( JSPCTAG ) = JSPC
              T_SPCTAG  ( JSPCTAG ) = ITAG
              VNAM_SPCTAG ( JSPCTAG ) = VNAME(JSPC,ITAG)
@@ -294,6 +298,7 @@ Ckrt Set vname3d for SA_CONC_1 file
              VTYPE3D( JSPCTAG ) = M3REAL
              VNAME3D( JSPCTAG ) = VNAME(JSPC,ITAG)
              UNITS3D( JSPCTAG ) = "ppmV            "
+             VDESC3D( JSPCTAG ) = "tracer conc."
              S_SPCTAG  ( JSPCTAG ) = JSPC
              T_SPCTAG  ( JSPCTAG ) = ITAG
              VNAM_SPCTAG ( JSPCTAG ) = VNAME(JSPC,ITAG)
