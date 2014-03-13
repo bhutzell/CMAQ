@@ -161,6 +161,7 @@
 !KRT20130131 initialize ozone indicator
       IF ( YES_INDIC ) THEN
         INDICVALU = -1.0
+        INDORIG = 1.E-30
       ENDIF ! yes_indic
 
 Ckrt Apportion the conc
@@ -203,17 +204,18 @@ Ckrt....20120928 Ozone
               DENOM2 = CBFOR(C,R,L, NO3) + CBFOR(C,R,L, HNO3)
      &                 + CBFOR(C,R,L, N2O5) + CBFOR(C,R,L, PAN)
               INDICREG( 1 ) = ( P_H2O2 + P_ROOH ) / MAX( P_HNO3, 1.E-30 )
-              INDICREG( 2 ) = CBFOR( C,R,L, H2O2 )/ MAX( CBFOR( C,R,L, HNO3 ) , 1.E-30 )
-              INDICREG( 3 ) = CBFOR ( C,R,L, H2O2 )
+              INDICREG( 2 ) = P_H2O2 / MAX( P_HNO3, 1.E-30 )
+              INDICREG( 3 ) = CBFOR( C,R,L, H2O2 )/ MAX( CBFOR( C,R,L, HNO3 ) , 1.E-30 )
+              INDICREG( 4 ) = CBFOR ( C,R,L, H2O2 )
      &             / MAX( CBFOR(C,R,L, O3)+CBFOR(C,R,L, NO2 ) , 1.E-30 )
-              INDICREG( 4 ) = DENOM1 + DENOM2
-              INDICREG( 5 ) = CBFOR( C,R,L, O3 ) / MAX( DENOM1, 1.E-30 )
-              INDICREG( 6 ) = CBFOR( C,R,L, O3 ) 
+              INDICREG( 5 ) = DENOM1 + DENOM2
+              INDICREG( 6 ) = CBFOR( C,R,L, O3 ) / MAX( DENOM1, 1.E-30 )
+              INDICREG( 7 ) = CBFOR( C,R,L, O3 ) 
      &              / MAX( DENOM1 + DENOM2, 1.E-30 )
-              INDICREG( 7 ) = CBFOR( C,R,L, O3 ) / MAX( DENOM2, 1.E-30 )
-              INDICREG( 8 ) = CBFOR( C,R,L, FORM ) 
-     &              / MAX( DENOM1 + DENOM2, 1.E-30 )
+              INDICREG( 8 ) = CBFOR( C,R,L, O3 ) / MAX( DENOM2, 1.E-30 )
               INDICREG( 9 ) = CBFOR( C,R,L, FORM ) 
+     &              / MAX( DENOM1 + DENOM2, 1.E-30 )
+              INDICREG( 10 ) = CBFOR( C,R,L, FORM ) 
      &                / MAX( CBFOR(C,R,L, NO2), 1.E-30 )
 
               DO3 = CGRID( C,R,L, SPC_INDEX(JO3V,2)) - CBFOR( C,R,L, SPC_INDEX(JO3V,2))
@@ -242,26 +244,26 @@ Ckrt....20120928 Ozone
                   ENDIF ! cbfor > 0 ?
                 ENDDO ! loop K
               ELSE   ! overall ozone production in each grid cell
-                IF ( YES_INDIC .OR. INDICTYP .EQ. 10 ) THEN
+                IF ( YES_INDIC .OR. INDICTYP .EQ. N_INDIC + 1 ) THEN
                   VOTE_NOX = 0.0
                   DO S = 1 , N_INDIC
-                   IF ( S .NE. 4 ) THEN
+                   IF ( S .NE. 5 ) THEN
                     COND_INDIC = INDICREG( S ) .GE. TRANSV( S )
                    ELSE
                     COND_INDIC = INDICREG( S ) .LE. TRANSV( S )
-                   ENDIF ! indictyp != 4 ?
+                   ENDIF ! indictyp != 5 ?
                    ! nox-limited?
                    IF ( COND_INDIC ) VOTE_NOX = VOTE_NOX + 1  
                   ENDDO ! S 1:n_indic
                   INDICVALU( C,R,L, N_INDIC+1 ) = VOTE_NOX / REAL(N_INDIC)
                 ENDIF ! yes_indic
-                IF ( INDICTYP .EQ. 4 ) THEN
+                IF ( INDICTYP .EQ. 5 ) THEN
                   COND_INDIC = INDICREG(INDICTYP) .LE. TRANSV(INDICTYP)
-                ELSEIF ( INDICTYP .EQ. 10 ) THEN
-                  COND_INDIC = VOTE_NOX .GT. 4.5
+                ELSEIF ( INDICTYP .EQ. N_INDIC + 1 ) THEN
+                  COND_INDIC = VOTE_NOX .GT. N_INDIC / 2.0
                 ELSE
                   COND_INDIC = INDICREG(INDICTYP) .GE. TRANSV(INDICTYP)
-                ENDIF ! indictyp != 4 ?
+                ENDIF ! indictyp != 5 ?
                 IF ( COND_INDIC ) THEN ! nox-limited in the abundance of VOC
                   DO K = 1, NTAG_SA
                     IF ( TTLB4( C,R,L,JNO ) + TTLB4( C,R,L,JNO2 ) .GT. 1.E-20 ) THEN
@@ -303,6 +305,19 @@ Ckrt....20120928 Ozone
                   DO S = 1, N_INDIC
                     INDICVALU( C,R,L,S ) = INDICREG( S )
                   ENDDO ! S 1:n_indic
+                  !20140305 outputs indicators' originating variables
+                  INDORIG( C,R,L,1 ) = P_H2O2
+                  INDORIG( C,R,L,2 ) = P_ROOH
+                  INDORIG( C,R,L,3 ) = P_HNO3
+                  INDORIG( C,R,L,4 ) = CBFOR( C,R,L, H2O2 )
+                  INDORIG( C,R,L,5 ) = CBFOR( C,R,L, HNO3 )
+                  INDORIG( C,R,L,6 ) = CBFOR( C,R,L, O3 )
+                  INDORIG( C,R,L,7 ) = CBFOR( C,R,L, NO )
+                  INDORIG( C,R,L,8 ) = CBFOR( C,R,L, NO2 )
+                  INDORIG( C,R,L,9 ) = CBFOR( C,R,L, NO3 )
+                  INDORIG( C,R,L,10 ) = CBFOR( C,R,L, N2O5 )
+                  INDORIG( C,R,L,11 ) = CBFOR( C,R,L, PAN )
+                  INDORIG( C,R,L,12 ) = CBFOR( C,R,L, FORM )
                 ENDIF ! yes_indic
               ENDIF ! cgrid - cbfor < 0 ?             
 
@@ -318,15 +333,23 @@ Ckrt....20120928 Ozone
          DO S = 1, N_INDIC
           IF ( .NOT. WRITE3( O3INDIC_1, VNAM_INDIC(S), JDATE, JTIME,
      &              INDICVALU( :,:,1,S ) ) ) THEN
-            XMSG = 'Could not write to ' // INDICNAME
+            XMSG = 'Could not write to ' // VNAM_INDIC(S)
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
           ENDIF
          ENDDO ! 1 to n_indic
          IF ( .NOT. WRITE3( O3INDIC_1, 'VOTE_NOX', JDATE, JTIME,
      &              INDICVALU( :,:,1,N_INDIC+1 ) ) ) THEN
-           XMSG = 'Could not write to ' // INDICNAME
+           XMSG = 'Could not write to ' // VNAME3D( N_INDIC + 1 )
            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          ENDIF
+         !20140305 outputs indicators' originating variables
+         DO S = 1, N_INDORIG
+          IF ( .NOT. WRITE3( O3INDIC_1, VNAM_INDORIG(S), JDATE, JTIME,
+     &              INDORIG( :,:,1,S ) ) ) THEN
+            XMSG = 'Could not write to ' // VNAM_INDORIG(S)
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+          ENDIF
+         ENDDO ! 1 to n_indic
         ENDIF ! hour loop
       ENDIF ! yes_indic
 

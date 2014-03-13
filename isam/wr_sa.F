@@ -55,13 +55,14 @@ C...End of argument declaration
 C Local variables:
       
       INTEGER          ALLOCSTAT, LOGDEV
+      LOGICAL, SAVE :: FIRSTIME = .TRUE.    !20140228
 
       CHARACTER( 16 ) :: PNAME = 'WR_SA'
       CHARACTER( 96 ) :: XMSG = ' '
       
       INTEGER   C,R,S,K,N, L, ITAG, JSPC    ! loop induction variables
 
-      REAL, ALLOCATABLE :: ISAM_BUFF ( :,:,:,: )
+      REAL, ALLOCATABLE, SAVE :: ISAM_BUFF ( :,:,:,: )  ! save added on 20140306
 
 C-----------------------------------------------------------------------
 
@@ -82,35 +83,57 @@ Ckrt     print*, N_SPCTAG, JDATE, JTIME
 !0711       CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
 !0711    END IF
 
-         IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
-            XMSG = 'Could not get file description from ' // SA_CONC_1
+      IF ( FIRSTIME ) THEN  ! 20140228
+
+        FIRSTIME = .FALSE.
+        LOGDEV = INIT3 ()
+
+        IF ( MYPE .NE. 0 ) THEN
+          IF ( .NOT. OPEN3( SA_CONC_1, FSREAD3, PNAME ) ) THEN
+            XMSG = 'Could not open ' // SA_CONC_1 // 'file for update'
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+          END IF !open3
+        END IF ! mype nonzero
 
+        IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
+          XMSG = 'Could not get file description from ' // SA_CONC_1
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
 
+!20140306 relocated here the following five lines
          ALLOCATE ( ISAM_BUFF( MY_NCOLS, MY_NROWS, SA_NLAYS, N_SPCTAG ),
      &     STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ISAM_BUFF'
            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          ENDIF
-         ISAM_BUFF = 0.0
 
-Ckrt     print*,'S,VNAME3D(S),S_SPCTAG(S),T_SPCTAG(S)'
-         DO S = 1, N_SPCTAG
-          DO L = ISAM_BLEV, ISAM_ELEV
-            ISAM_BUFF( :,:,L,S ) = ISAM( :,:,L,S_SPCTAG(S),T_SPCTAG(S) )
-          ENDDO
-!0711     IF ( .NOT. WRITE3( FILE_NAME, VNAME3D(S), JDATE, JTIME,
-          IF ( .NOT. WRITE3( SA_CONC_1, VNAME3D(S), JDATE, JTIME,
-     &     ISAM_BUFF(:,:,:,S)) ) THEN
-            XMSG = 'Could not write to ' 
-!0711&           // FILE_NAME 
-     &           // SA_CONC_1 
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-          END IF
-         END DO
-         DEALLOCATE( ISAM_BUFF )
+      END IF ! firstime
+
+      ISAM_BUFF = 0.0
+
+Ckrt  print*,'S,VNAME3D(S),S_SPCTAG(S),T_SPCTAG(S)'
+      DO S = 1, N_SPCTAG
+       DO L = ISAM_BLEV, ISAM_ELEV
+        DO R = 1, MY_NROWS
+         DO C = 1, MY_NCOLS
+          ISAM_BUFF( C,R,L,S ) = ISAM( C,R,L,S_SPCTAG(S),T_SPCTAG(S) )
+         ENDDO
+        ENDDO
+       ENDDO
+
+
+!20140306 Mentioning of vname3d is dangerous. Use vnam_spctag instead
+!20140306       IF ( .NOT. WRITE3( SA_CONC_1, VNAME3D(S), JDATE, JTIME,
+       IF ( .NOT. WRITE3( SA_CONC_1, VNAM_SPCTAG(S), JDATE, JTIME,
+     &    ISAM_BUFF(:,:,:,S)) ) THEN
+         XMSG = 'Could not write to ' 
+!0711&        // FILE_NAME 
+     &        // SA_CONC_1 
+         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+       END IF
+      END DO
+!20140306         IF ( ALLOCATED(ISAM_BUFF) ) DEALLOCATE( ISAM_BUFF )
       
 c.....couple ISAM after writing
 

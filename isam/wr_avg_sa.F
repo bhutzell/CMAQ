@@ -119,7 +119,7 @@ C Try to open existing file for update
 
          CALL SUBST_BARRIER
 
-         A_NLYS = ISAM_ELEV - ISAM_BLEV + 1
+         A_NLYS = AISAM_ELEV - AISAM_BLEV + 1
 
          OK = OPEN3( SA_ACONC_1, FSRDWR3, PNAME )
          CALL SUBST_GLOBAL_LOGICAL( OK, 'AND' )
@@ -146,10 +146,10 @@ C Set file header attributes that differ from CONC and open the file
                STIME3D = MTIME
                TSTEP3D = TSTEP
 !0711          NVARS3D = N_SPCTAG
-!0711          NLAYS3D = A_NLYS
+               NLAYS3D = A_NLYS
 
                L = 0
-               DO K = ISAM_BLEV, ISAM_ELEV
+               DO K = AISAM_BLEV, AISAM_ELEV
                   L = L + 1
                   VGLVS3D( L ) = VGLVS_GD( K )
                END DO
@@ -164,7 +164,7 @@ C Set file header attributes that differ from CONC and open the file
      &              'Timestamp represents beginning computed date/time '
                FDESC3D( 4 ) = 'Layer mapping (ISAM to AISAM):'
                KD = 4
-               VAR = ISAM_BLEV
+               VAR = AISAM_BLEV
                L = 0
                DO K = KD + 1, MIN ( A_NLYS + KD, MXDESC3 )
                   L = L + 1
