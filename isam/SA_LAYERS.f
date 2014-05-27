@@ -23,6 +23,9 @@ C $Header: /amber/home/krt/cmq471/models/CCTM/src/driver/yamo/STD_CONC.F,v 1.1.1
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE SA_LAYERS
 
+C20140428 Has subroutine GET_SA_LAYS
+C
+
       IMPLICIT NONE
 
 C Function: species, layer pointers and definitions for standard CONC
@@ -38,6 +41,11 @@ C calculations
       CONTAINS
 
          SUBROUTINE GET_SA_LAYS ()
+
+C20140428 Determine from run scripty4 number of vertical layers in outputs
+C         SA_CONC_1 and SA_ACONC_1.
+C
+C         Called by driver.F
 
          USE HGRD_DEFN             ! horizontal domain specifications
          USE VGRD_DEFN             ! vertical layer specifications
@@ -100,7 +108,8 @@ C Retrieve the layer range used in the concentration file
          END IF
 
          SA_NLAYS = ISAM_ELEV - ISAM_BLEV + 1
-         print*,'In SA_LAYERS.F, ISAM_BLEV, ISAM_ELEV, SA_NLAYS:',ISAM_BLEV, ISAM_ELEV, SA_NLAYS
+         IF ( MYPE .EQ. 0 ) 
+     &      print*,'In SA_LAYERS.F, ISAM_BLEV, ISAM_ELEV, SA_NLAYS:',ISAM_BLEV, ISAM_ELEV, SA_NLAYS
 
 C Retrieve the layer range used in the sa_aconc file
 

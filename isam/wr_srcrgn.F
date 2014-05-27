@@ -1,6 +1,11 @@
 
       SUBROUTINE WR_SRCRGN( MFRC_P, NTAGS )
 
+C20140428  Writes source regions to a netcdf for diagnostic purpose.
+C          However, this subroutine is no longer in use.
+C
+C          Would be called by driver.F
+
       USE GRID_CONF
       USE UTILIO_DEFN            ! 20120615
 

@@ -1,11 +1,6 @@
       MODULE PSAEM_DEFN
 c
-c
-C     This module is referenced in driver and sciproc. driver must call 
-c     HGRD_INIT, CGRID_MAP, and PAR_INIT prior to calling PSAEM_INIT (below).
-c
-c     Author: bo wang
-c     Email:  bwang@cert.ucr.edu
+c20140428  Has function PSAEM_INIT
 c 
 c-----------------------------------------------------------------------
 
@@ -19,6 +14,13 @@ c-----------------------------------------------------------------------
 
       CONTAINS
         FUNCTION PSAEM_INIT (NSPC_TSSA, NTAG_TSSA) RESULT ( SUCCESS )
+
+C-----------------------------------------------------------------------
+C20140428   Create ISAMEM target, PSAEM; just like ISAM on PISAM.
+C           Stores emission rates of individual sectors.
+C            Called by vdiffacm2.F
+C      
+C-----------------------------------------------------------------------
 
 !         INCLUDE SUBST_VGRD_ID     ! vertical dimensioning parameters
 !0712    INCLUDE SUBST_IODECL      ! I/O definitions and declarations

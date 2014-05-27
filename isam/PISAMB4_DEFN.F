@@ -1,11 +1,7 @@
       MODULE PISAMB4_DEFN
 c
+c20140428 Has function PISAMB4_INIT
 c
-C     This module is referenced in driver and sciproc. driver must call 
-c     HGRD_INIT, CGRID_MAP, and PAR_INIT prior to calling PISAMB4_INIT (below).
-c
-c     Author: bo wang
-c     Email:  bwang@cert.ucr.edu
 c 
 c-----------------------------------------------------------------------
 
@@ -19,6 +15,13 @@ c-----------------------------------------------------------------------
 
       CONTAINS
         FUNCTION PISAMB4_INIT (NSPC_ISAM, NTAG_ISAM) RESULT ( SUCCESS )
+
+C-----------------------------------------------------------------------
+C20140428   Create ISAMB4 target, PISAMB4; just like ISAM on PISAM.
+C           ISAMB4 backs up ISAM before the latter gets changed.
+C            Called by driver.F
+C      
+C-----------------------------------------------------------------------
 
 !         INCLUDE SUBST_VGRD_ID     ! vertical dimensioning parameters
 !0615    INCLUDE SUBST_IODECL      ! I/O definitions and declarations

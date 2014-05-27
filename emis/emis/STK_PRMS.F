@@ -37,6 +37,10 @@ C      3 Nov 2011 D.Wong: fix source location within grid determination bug
 C-----------------------------------------------------------------------
 
       USE UDTYPES, ONLY: IARRY1, RARRY1
+#ifdef isam
+!20140514
+      USE SA_DEFN
+#endif
 
       IMPLICIT NONE
 
@@ -68,8 +72,9 @@ c     END TYPE RARRY1
       TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STKTK  ( : )
       TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STKVEL ( : )
 #ifdef isam
-      TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STKSAID( : )
-      LOGICAL, ALLOCATABLE :: SAID_ON( : )
+      !TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STKSAID( : )
+      TYPE( IARRY1 ), ALLOCATABLE, SAVE :: STKSAID( : )
+      LOGICAL, ALLOCATABLE, SAVE :: SAID_ON( : )
 #endif
 
       CONTAINS
@@ -99,6 +104,9 @@ c     END TYPE RARRY1
          INTEGER M, S, SRC, V, ASTAT
          CHARACTER( 96 ) :: XMSG = ' '
          CHARACTER( 16 ) :: PNAME = 'STK_PRMS_INIT'
+
+!20140509 Look for SA_ID, ISTACK or IGROUP
+         CHARACTER( 16 ) :: STKGRPNAM
 
 C-----------------------------------------------------------------------
 
@@ -188,7 +196,12 @@ C-----------------------------------------------------------------------
             DO V = 1, NVARS3D
                IF ( TRIM( VNAME3D( V ) ) .EQ. 'ACRESBURNED' ) FIRE_ON( N ) = .TRUE.
 #ifdef isam
-               IF ( TRIM( VNAME3D( V ) ) .EQ. 'SA_ID' ) SAID_ON( N ) = .TRUE.
+               IF ( TRIM( VNAME3D( V ) ) .EQ. 'SA_ID'  .OR.
+     &              TRIM( VNAME3D( V ) ) .EQ. 'ISTACK' .OR. 
+     &              TRIM( VNAME3D( V ) ) .EQ. 'IGROUP' ) THEN
+                 SAID_ON( N ) = .TRUE.
+                 STKGRPNAM = VNAME3D( V )
+               ENDIF
 #endif
             END DO
 
@@ -218,9 +231,9 @@ C-----------------------------------------------------------------------
                SUCCESS = .FALSE.; RETURN
             END IF
 
-            IF ( .NOT. READ3( STKPRMS( N ), 'ISTACK', ALLAYS3,
+            IF ( .NOT. READ3( STKPRMS( N ), STKGRPNAM, ALLAYS3,
      &                        SDATE, STIME, STKID ) ) THEN
-               XMSG = 'Could not read ISTACK from ' // TRIM( STKPRMS( N ) )
+               XMSG = 'Could not read ' // STKGRPNAM // ' from ' // TRIM( STKPRMS( N ) )
                CALL M3MESG( XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
@@ -373,13 +386,17 @@ C SOURCE maps STKEMIS read from stk emis file to local STKEM in GET_PT3D_EMIS.
                END IF
 #ifdef isam
                IF ( SAID_ON( N ) ) THEN
-                 IF ( .NOT. XTRACT3( STKPRMS( N ), 'SA_ID', 1,NLAYS,
+                 IF ( .NOT. XTRACT3( STKPRMS( N ), STKGRPNAM, 1,NLAYS,
      &                             MY_STRT_SRC( N ),MY_END_SRC( N ),
      &                             1,1, SDATE, STIME, STKSAID( N )%ARRY ) ) THEN
-                    XMSG = 'Could not read SA_ID from ' // TRIM( STKPRMS( N ) )
+                    XMSG = 'Could not read ' //STKGRPNAM // ' from ' // TRIM( STKPRMS( N ) )
                     CALL M3MESG( XMSG )
                     SUCCESS = .FALSE.; RETURN
                  END IF ! xtract3
+                 IF ( YES_PRINT ) THEN
+                   WRITE(LOGDEV,*)'N=',N,'STKPRMS(N)=',STKPRMS(N),
+     & 'stkgrpnam=',STKGRPNAM,'stksaid(n)%arry(1)=',STKSAID(N)%ARRY(1)
+                 ENDIF
                END IF ! said_on
 #endif
 

@@ -2,17 +2,10 @@
       SUBROUTINE SA_WRAP_OZ( CGRID, CBFOR, ISAM, ISAMB4, JDATE, JTIME, TSTEP )
 
 !*************************************************************
-!  As a wrapper to apportion ozone tags by taking ratio of CGRIDs
-!  after and before a process. 
+!20140428  Apportions ozone tags into either NOx- or VOC-sensitive regime
+!          first with total O3 production then with O3 destruction.
 !
-!  Jun 6, 2013 - KRT....modified from SA_WRAP_GC.F, now only deals with
-!                 2-regime ozone apportionment
-!
-!  Feb 22, 2011 - KRT...applied to CB05, though applicable to other
-!                  mechanisms and/or solvers
-!  Jun 1, 2011 - KRT...SULF produced from SO2 is to be tracked and fed back
-!                      to sulfate conversion process in next time step 
-!
+!          Called by sciproc.F
 !*************************************************************
       USE GRID_CONF
       USE CGRID_SPCS
@@ -64,12 +57,12 @@
       LOGICAL          COND_INDIC
       REAL             DENOM1, DENOM2
       REAL             VOTE_NOX
-!      REAL             P_H2O2, P_ROOH, P_HNO3
+!      REAL             P_H2O2, P_ROOH, P_HNO3   
+!                        GST...are the above 3 varibles declared? Yes, in OZVOC_DEFN
 
 ! VOC related 20120928; voc species made explicit, 20131211
       INTEGER, ALLOCATABLE, SAVE :: JVOC( : )
-      REAL             DO3, PO3  ! ozone destruction and production
-      INTEGER, SAVE :: INDICTYP  ! Type of O3 regime indicator: 
+       INTEGER, SAVE :: INDICTYP  ! Type of O3 regime indicator: 
       INTEGER          IOST
       REAL          :: INDICREG( N_INDIC )  ! indicators of ozone regimes
       REAL, ALLOCATABLE, SAVE ::  NUMERO( : )     ! For each tag, sum over all species each product of voc and respective mir
@@ -78,6 +71,31 @@
 
 ! Logical
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
+
+! 20140309 destruction-production
+      CHARACTER( 10 )  CHPO3       ! O3 production term
+      CHARACTER( 10 )  CHDO3       ! Delta O3
+      CHARACTER( 10 )  CHTROY      ! O3 destruction term
+      CHARACTER( 10 )  CHMJR       ! Major component of TROYO3; 20140311
+      CHARACTER( 10 )  CHOXX       ! Other Ox loss in TROYO3; 20140311
+
+      CHARACTER( 10 )  CHDOXNET    ! Ox error term
+      CHARACTER(  3 )  CHCOL       ! column internally written
+      CHARACTER(  3 )  CHROW       ! row internally written
+      CHARACTER(  3 )  CHLAY       ! layerinternally written
+
+!20140321      LOGICAL          FLAGOxSA    ! flag to select O3 or Ox SA
+
+      REAL             DO3         ! net change of ozone  20140307
+      REAL             PO3         ! Ox or O3 production (O3 inferred from DO3 and destruction)
+!      REAL             TROYO3      ! Ox or O3 destruction term ; already declared in OZVOC_DEFN
+      REAL             OxProd      ! Ox production
+      REAL             OxLoss      ! Ox destruction
+      REAL             DOxNet      ! net Ox loss calculated by summing conc change in chem step
+      REAL             DOx_error   ! difference between POx from integrate reaction and DOxNet 
+
+      REAL, ALLOCATABLE, SAVE :: SA_O3N( : )  ! Intermediate NOx-lim O3 array of ntag_sa; 20140314
+      REAL, ALLOCATABLE, SAVE :: SA_O3V( : )  ! Intermediate VOC-lim O3 array of ntag_sa; 20140314
 
 
 !-------------------------------------------------------------------
@@ -105,7 +123,9 @@
         JO3N  = INDEX1( 'O3N',  NSPC_SA, SPC_NAME( :, OTHRTAG ) )
 
         IF ( .NOT. ALLOCATED( JVOC ) ) ALLOCATE( JVOC( N_EVOC ) )
-        if ( mype .eq. 0 ) print*,'jv, nam_voc(jv), jvoc(jv):'
+        IF ( YES_PRINT ) THEN
+          if ( mype .eq. 0 ) print*,'jv, nam_voc(jv), jvoc(jv):'
+        ENDIF ! yes_print
         DO JV = 1, N_EVOC
           JVOC( JV )  = INDEX1( NAM_VOC( JV ),  NSPC_SA, SPC_NAME( :, OTHRTAG ) )
           if ( mype .eq. 0 ) print*,JV, NAM_VOC( JV ), JVOC( JV )
@@ -123,22 +143,31 @@
         ! 20131211
         IF ( .NOT. ALLOCATED( NUMERO ) ) ALLOCATE( NUMERO( NTAG_SA ) )
 
-         ! Determine O3 regime indicator type
-         INDICTYP = ENVINT( 'O3INDICATOR_TYPE','1=P(perox)/P(HNO3), etc', -999, IOST )
-         IF ( IOST .NE. 0 )
+        !Determine users' choice between  Ox and O3 SA
+        FLAGOXSA = ENVYN( 'YES_OXLOSS', 'Y= use Ox; N= use O3', .FALSE., IOST )
+
+        ! Determine O3 regime indicator type
+!20140416        INDICTYP = ENVINT( 'O3INDICATOR_TYPE','2=P(H2O2)/P(HNO3), etc', 2, IOST )
+        INDICTYP = 2
+        IF ( IOST .NE. 0 )
      &    CALL M3EXIT( PNAME, 0, 0, 'O3 indicator type undetermined', 2 )
 
-         ! Choose to write out the regime indicator
-         YES_INDIC = ENVYN( 'WR_INDICATOR',
+        ! Choose to write out the regime indicator
+        YES_INDIC = ENVYN( 'WR_INDICATOR',
      &           'Want to output peroxides-to-hno3 as regime indicator?',
      &           .FALSE., IOST )
-         IF ( YES_INDIC ) THEN
-           CALL OP_O3INDICAT ( JDATE, JTIME, TSTEP )
-         ENDIF ! yes_indic
+        IF ( YES_INDIC ) THEN
+          CALL OP_O3INDICAT ( JDATE, JTIME, TSTEP )
+        ENDIF ! yes_indic
   
-         ! Count number of ozone tags in the first place
-         R_OZTAGS = REAL( COUNT( L_OZONE ) )
- 
+        ! Count number of ozone tags in the first place
+        R_OZTAGS = REAL( COUNT( L_OZONE ) )
+
+        !Allocate intermediate either regime O3 arrays
+        IF ( .NOT. ALLOCATED( SA_O3N ) ) ALLOCATE( SA_O3N( NTAG_SA ) )
+        IF ( .NOT. ALLOCATED( SA_O3V ) ) ALLOCATE( SA_O3V( NTAG_SA ) )
+        SA_O3N = 0.0
+        SA_O3V = 0.0
     
       ENDIF ! firstime
       
@@ -179,22 +208,13 @@ Ckrt Apportion the conc
             ! Calculate production of H2O2, ROOH, and HNO3
             P_H2O2  =   RKI_INIT( C,R,L,34 ) * CGMID( HO2 ) * CGMID( HO2 )
      &            + RKI_INIT( C,R,L,35 ) * CGMID( HO2 ) * CGMID( HO2 )
-     &            + RKI_INIT( C,R,L,42 ) * CGMID( OH ) * CGMID( OH )
+!20140307     &            + RKI_INIT( C,R,L,42 ) * CGMID( OH ) * CGMID( OH )
+
             P_ROOH  =  RKI_INIT( C,R,L,56 ) * CGMID( XO2 ) * CGMID( HO2 )
      &            + RKI_INIT( C,R,L,57 ) * CGMID( XO2N ) * CGMID( HO2 )
-            P_HNO3  =  2.000 * RKI_INIT( C,R,L, 19 ) * CGMID( N2O5 )
-     &            + 2.000 * RKI_INIT( C,R,L, 20 ) * CGMID( N2O5 )
-     &            +         RKI_INIT( C,R,L, 28 ) * CGMID( NO2 ) * CGMID( OH )
-     &            +         RKI_INIT( C,R,L, 48 ) * CGMID( NO3 ) * CGMID( HO2 )
-     &            +         RKI_INIT( C,R,L, 61 ) * CGMID( NTR ) * CGMID( OH )
-     &            +         RKI_INIT( C,R,L, 77 ) * CGMID( FORM ) * CGMID( NO3 )
-     &            +         RKI_INIT( C,R,L, 85 ) * CGMID( ALD2 ) * CGMID( NO3 )
-     &            +         RKI_INIT( C,R,L,100 ) * CGMID( ALDX ) * CGMID( NO3 )
-     &            +         RKI_INIT( C,R,L,132 ) * CGMID( CRES ) * CGMID( NO3 )
-     &            +         RKI_INIT( C,R,L,136 ) * CGMID( CRON ) * CGMID( NO3 )
-     &            +         RKI_INIT( C,R,L,146 ) * CGMID( OPEN ) * CGMID( NO3 )
-     &            +         RKI_INIT( C,R,L,148 ) * CGMID( CAT1 ) * CGMID( NO3 )
-     &            + 0.150 * RKI_INIT( C,R,L,163 ) * CGMID( NO3 ) * CGMID( ISPD )
+
+
+            P_HNO3  =  RKI_INIT( C,R,L, 28 ) * CGMID( NO2 ) * CGMID( OH )
 
 
 Ckrt....20120928 Ozone
@@ -218,32 +238,207 @@ Ckrt....20120928 Ozone
               INDICREG( 10 ) = CBFOR( C,R,L, FORM ) 
      &                / MAX( CBFOR(C,R,L, NO2), 1.E-30 )
 
-              DO3 = CGRID( C,R,L, SPC_INDEX(JO3V,2)) - CBFOR( C,R,L, SPC_INDEX(JO3V,2))
-              IF ( DO3 .LE. 0.0 ) THEN  ! overall ozone destruction in each grid cell
-                ! Sum of tags based on which tags are updated 20130409
-                DENOMO3 = 0.0
-                DO K = 1, NTAG_SA
-                  DENOMO3 = DENOMO3 + ISAMB4( C,R,L,JO3N,K ) + ISAMB4( C,R,L,JO3V,K )
-                ENDDO ! loop K for sum of tags
-                DO K = 1, NTAG_SA
-                  IF ( CBFOR( C,R,L, SPC_INDEX(JO3V,2) ) .LE. 1.E-20 ) THEN
-                    ISAM( C,R,L, JO3N, K ) = 0.0
-                    ISAM( C,R,L, JO3V, K ) = 0.0
-                  ELSE
-                    IF ( DENOMO3 .LE. 1.E-20 ) THEN
-                      ISAM( C,R,L, JO3N, K ) = 0.0
-                      ISAM( C,R,L, JO3V, K ) = 0.0
-                    ELSE
-                      ISAM( C,R,L, JO3N, K ) = ISAMB4( C,R,L, JO3N, K ) 
-     &                         + DO3  * ISAMB4( C,R,L, JO3N, K ) / DENOMO3
-                      ISAM( C,R,L, JO3V, K ) = ISAMB4( C,R,L, JO3V, K ) 
-     &                         + DO3  * ISAMB4( C,R,L, JO3V, K ) / DENOMO3
-                      IF ( ISAM( C,R,L,JO3N,K ) .LT. 0.0 ) ISAM( C,R,L,JO3N,K ) = 1.E-30
-                      IF ( ISAM( C,R,L,JO3V,K ) .LT. 0.0 ) ISAM( C,R,L,JO3V,K ) = 1.E-30
-                    ENDIF ! denomo3 > 0 ?
-                  ENDIF ! cbfor > 0 ?
-                ENDDO ! loop K
-              ELSE   ! overall ozone production in each grid cell
+
+
+!20140321 Need to add a global logical flag to select O3 or Ox SA
+              IF ( FLAGOXSA ) THEN
+               ! We don't need to calculate net delta Ox because we calculate integrated 
+               ! production and loss rates of Ox, but we can to a mass balance check
+               ! to to see if OxProd - OxLoss = DOxNet
+               DOxNet = CGRID( C,R,L, SPC_INDEX(JO3V,2)) - CBFOR( C,R,L, SPC_INDEX(JO3V,2))  !O3
+     &             + CGRID( C,R,L, SPC_INDEX(JNO2,2)) - CBFOR( C,R,L, SPC_INDEX(JNO2,2))  !NO2
+     &             + 2.*(CGRID( C,R,L, SPC_INDEX(JNO3,2)) - CBFOR( C,R,L, SPC_INDEX(JNO3,2)))   !NO3
+     &             + 3.*(CGRID( C,R,L, SPC_INDEX(JN2O5,2)) - CBFOR( C,R,L, SPC_INDEX(JN2O5,2))) !N2O5
+     &             + CGRID( C,R,L, SPC_INDEX(JPNA,2)) - CBFOR( C,R,L, SPC_INDEX(JPNA,2))    !PNA
+     &             + CGRID( C,R,L, SPC_INDEX(JPAN,2)) - CBFOR( C,R,L, SPC_INDEX(JPAN,2))    !PAN
+     &             + CGRID( C,R,L, SPC_INDEX(JPANX,2)) - CBFOR( C,R,L, SPC_INDEX(JPANX,2))  !PANX
+              ELSE
+                DO3 = CGRID( C,R,L, SPC_INDEX(JO3V,2)) - CBFOR( C,R,L, SPC_INDEX(JO3V,2))
+              ENDIF
+
+                !Update intermediate O3 with ISAMB4  20140320
+              DO K = 1, NTAG_SA
+                SA_O3N( K ) = ISAMB4( C,R,L,JO3N, K )
+                SA_O3V( K ) = ISAMB4( C,R,L,JO3V, K )
+              ENDDO ! loop K
+
+              IF ( FLAGOXSA ) THEN
+                OxProd = 
+     &                2.000*RKI_INIT(C,R,L, 22)*CGMID(NO)*CGMID(NO)
+     &              + 1.000*RKI_INIT(C,R,L, 26)*CGMID(OH)*CGMID(HONO)
+     &              + 1.000*RKI_INIT(C,R,L, 27)*CGMID(HONO)*CGMID(HONO)
+     &              + 2.000*RKI_INIT(C,R,L, 29)*CGMID(OH)*CGMID(HNO3)
+     &              + 1.000*RKI_INIT(C,R,L, 30)*CGMID(HO2)*CGMID(NO)
+     &              + 1.000*RKI_INIT(C,R,L, 41)*CGMID(OH)*CGMID(OH)
+     &              + 0.390*RKI_INIT(C,R,L, 51)*CGMID(PNA)
+     &              + 1.000*RKI_INIT(C,R,L, 52)*CGMID(HNO3)
+     &              + 1.000*RKI_INIT(C,R,L, 54)*CGMID(XO2)*CGMID(NO)
+     &              + 1.000*RKI_INIT(C,R,L, 62)*CGMID(NTR)
+     &              + 1.000*RKI_INIT(C,R,L, 67)*CGMID(MEO2)*CGMID(NO)
+     &              + 1.000*RKI_INIT(C,R,L, 80)*CGMID(HCO3)*CGMID(NO)
+     &              + 1.000*RKI_INIT(C,R,L, 87)*CGMID(C2O3)*CGMID(NO)
+     &              + 0.200*RKI_INIT(C,R,L, 91)*CGMID(C2O3)*CGMID(HO2)
+     &              + 1.000*RKI_INIT(C,R,L,102)*CGMID(CXO3)*CGMID(NO)
+     &              + 0.200*RKI_INIT(C,R,L,107)*CGMID(CXO3)*CGMID(HO2)
+     &              + 0.860*RKI_INIT(C,R,L,129)*CGMID(TO2)*CGMID(NO)
+     &              + 1.000*RKI_INIT(C,R,L,139)*CGMID(CRN2)*CGMID(NO)
+     &              + 0.860*RKI_INIT(C,R,L,149)*CGMID(CAO2)*CGMID(NO)
+     &              + 1.000*RKI_INIT(C,R,L,151)*CGMID(OPO3)*CGMID(NO)
+     &              + 1.000*RKI_INIT(C,R,L,153)*CGMID(OPAN)
+     &              + 1.000*RKI_INIT(C,R,L,177)*CGMID(CLO)*CGMID(NO)
+
+                OxLoss = 
+     &                2.000*RKI_INIT(C,R,L,  4)*CGMID(O)*CGMID(NO2)
+     &              + 1.000*RKI_INIT(C,R,L, 11)*CGMID(O1D)
+     &              + 1.000*RKI_INIT(C,R,L, 12)*CGMID(O3)*CGMID(OH)
+     &              + 1.000*RKI_INIT(C,R,L, 13)*CGMID(O3)*CGMID(HO2)
+     &              + 2.000*RKI_INIT(C,R,L, 15)*CGMID(NO3)
+     &              + 2.000*RKI_INIT(C,R,L, 17)*CGMID(NO3)*CGMID(NO2)
+     &              + 3.000*RKI_INIT(C,R,L, 19)*CGMID(N2O5)
+     &              + 3.000*RKI_INIT(C,R,L, 20)*CGMID(N2O5)
+     &              + 1.000*RKI_INIT(C,R,L, 23)*CGMID(NO)*CGMID(NO2)
+     &              + 1.000*RKI_INIT(C,R,L, 28)*CGMID(NO2)*CGMID(OH)
+     &              + 1.000*RKI_INIT(C,R,L, 38)*CGMID(O1D)
+     &              + 1.000*RKI_INIT(C,R,L, 40)*CGMID(OH)*CGMID(O)
+     &              + 1.000*RKI_INIT(C,R,L, 44)*CGMID(HO2)*CGMID(O)
+     &              + 1.000*RKI_INIT(C,R,L, 45)*CGMID(H2O2)*CGMID(O)
+     &              + 2.000*RKI_INIT(C,R,L, 46)*CGMID(NO3)*CGMID(O)
+     &              + 1.000*RKI_INIT(C,R,L, 47)*CGMID(NO3)*CGMID(OH)
+     &              + 2.000*RKI_INIT(C,R,L, 48)*CGMID(NO3)*CGMID(HO2)
+     &              + 2.000*RKI_INIT(C,R,L, 49)*CGMID(NO3)*CGMID(O3)
+     &              + 2.000*RKI_INIT(C,R,L, 50)*CGMID(NO3)*CGMID(NO3)
+     &              + 1.000*RKI_INIT(C,R,L, 76)*CGMID(FORM)*CGMID(O)
+     &              + 2.000*RKI_INIT(C,R,L, 77)*CGMID(FORM)*CGMID(NO3)
+     &              + 1.000*RKI_INIT(C,R,L, 83)*CGMID(ALD2)*CGMID(O)
+     &              + 2.000*RKI_INIT(C,R,L, 85)*CGMID(ALD2)*CGMID(NO3)
+     &              + 1.000*RKI_INIT(C,R,L, 98)*CGMID(ALDX)*CGMID(O)
+     &              + 2.000*RKI_INIT(C,R,L,100)*CGMID(ALDX)*CGMID(NO3)
+     &              + 1.000*RKI_INIT(C,R,L,115)*CGMID(ROR)*CGMID(NO2)
+     &              + 1.000*RKI_INIT(C,R,L,116)*CGMID(O)*CGMID(OLE)
+     &              + 1.000*RKI_INIT(C,R,L,118)*CGMID(O3)*CGMID(OLE)
+     &              + 1.000*RKI_INIT(C,R,L,119)*CGMID(NO3)*CGMID(OLE)
+     &              + 1.000*RKI_INIT(C,R,L,120)*CGMID(O)*CGMID(ETH)
+     &              + 1.000*RKI_INIT(C,R,L,122)*CGMID(O3)*CGMID(ETH)
+     &              + 1.000*RKI_INIT(C,R,L,123)*CGMID(NO3)*CGMID(ETH)
+     &              + 1.000*RKI_INIT(C,R,L,124)*CGMID(IOLE)*CGMID(O)
+     &              + 0.500*RKI_INIT(C,R,L,126)*CGMID(IOLE)*CGMID(O3)
+     &              + 1.000*RKI_INIT(C,R,L,127)*CGMID(IOLE)*CGMID(NO3)
+     &              + 2.000*RKI_INIT(C,R,L,132)*CGMID(CRES)*CGMID(NO3)
+     &              + 1.000*RKI_INIT(C,R,L,133)*CGMID(CRO)*CGMID(NO2)
+     &              + 2.000*RKI_INIT(C,R,L,136)*CGMID(CRON)*CGMID(NO3)
+     &              + 1.000*RKI_INIT(C,R,L,137)*CGMID(CRNO)*CGMID(NO2)
+     &              + 1.000*RKI_INIT(C,R,L,138)*CGMID(CRNO)*CGMID(O3)
+     &              + 1.000*RKI_INIT(C,R,L,145)*CGMID(OPEN)*CGMID(O3)
+     &              + 2.000*RKI_INIT(C,R,L,146)*CGMID(OPEN)*CGMID(NO3)
+     &              + 2.000*RKI_INIT(C,R,L,148)*CGMID(CAT1)*CGMID(NO3)
+     &              + 1.000*RKI_INIT(C,R,L,152)*CGMID(OPO3)*CGMID(NO2)
+     &              + 1.000*RKI_INIT(C,R,L,157)*CGMID(O)*CGMID(ISOP)
+     &              + 1.000*RKI_INIT(C,R,L,159)*CGMID(O3)*CGMID(ISOP)
+     &              + 1.800*RKI_INIT(C,R,L,160)*CGMID(NO3)*CGMID(ISOP)
+     &              + 1.000*RKI_INIT(C,R,L,162)*CGMID(O3)*CGMID(ISPD)
+     &              + 2.000*RKI_INIT(C,R,L,163)*CGMID(NO3)*CGMID(ISPD)
+     &              + 1.000*RKI_INIT(C,R,L,165)*CGMID(TERP)*CGMID(O)
+     &              + 1.000*RKI_INIT(C,R,L,167)*CGMID(TERP)*CGMID(O3)
+     &              + 1.530*RKI_INIT(C,R,L,168)*CGMID(TERP)*CGMID(NO3)
+     &              + 1.000*RKI_INIT(C,R,L,172)*CGMID(NO2)*CGMID(ISOP)
+     &              + 1.000*RKI_INIT(C,R,L,175)*CGMID(CL)*CGMID(O3)
+
+             !Flag for O3 SA, calculate destruction terms for O3
+              ELSE
+                TROYO3  =
+     &          - 2.000*RKI_INIT(C,R,L,  4) *CGMID(O)*CGMID(NO2)
+     &          - 1.000*RKI_INIT(C,R,L, 11) *CGMID(O1D)
+     &          - 1.000*RKI_INIT(C,R,L, 12) *CGMID(O3)*CGMID(OH)
+     &          - 1.000*RKI_INIT(C,R,L, 13) *CGMID(O3)*CGMID(HO2)
+     &          - 1.000*RKI_INIT(C,R,L, 15) *CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L, 17) *CGMID(NO3)*CGMID(NO2)
+     &          - 1.000*RKI_INIT(C,R,L, 19) *CGMID(N2O5)
+     &          - 1.000*RKI_INIT(C,R,L, 20) *CGMID(N2O5)
+     &          - 1.000*RKI_INIT(C,R,L, 38) *CGMID(O1D)
+     &          - 1.000*RKI_INIT(C,R,L, 40) *CGMID(OH)*CGMID(O)
+     &          - 1.000*RKI_INIT(C,R,L, 44) *CGMID(HO2)*CGMID(O)
+     &          - 1.000*RKI_INIT(C,R,L, 45) *CGMID(H2O2)*CGMID(O)
+     &          - 1.000*RKI_INIT(C,R,L, 46) *CGMID(NO3)*CGMID(O)
+     &          - 1.000*RKI_INIT(C,R,L, 47) *CGMID(NO3)*CGMID(OH)
+     &          - 1.000*RKI_INIT(C,R,L, 48) *CGMID(NO3)*CGMID(HO2)
+     &          - 2.000*RKI_INIT(C,R,L, 49) *CGMID(NO3)*CGMID(O3)
+     &          - 2.000*RKI_INIT(C,R,L, 50) *CGMID(NO3)*CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L, 76) *CGMID(FORM)*CGMID(O)
+     &          - 1.000*RKI_INIT(C,R,L, 77) *CGMID(FORM)*CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L, 83) *CGMID(ALD2)*CGMID(O)
+     &          - 1.000*RKI_INIT(C,R,L, 85) *CGMID(ALD2)*CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L, 98) *CGMID(ALDX)*CGMID(O)
+     &          - 1.000*RKI_INIT(C,R,L,100) *CGMID(ALDX)*CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L,115) *CGMID(ROR)*CGMID(NO2)
+     &          - 1.000*RKI_INIT(C,R,L,116) *CGMID(O)*CGMID(OLE)
+     &          - 1.000*RKI_INIT(C,R,L,118) *CGMID(O3)*CGMID(OLE)
+     &          - 1.000*RKI_INIT(C,R,L,119) *CGMID(NO3)*CGMID(OLE)
+     &          - 1.000*RKI_INIT(C,R,L,120) *CGMID(O)*CGMID(ETH)
+     &          - 1.000*RKI_INIT(C,R,L,122) *CGMID(O3)*CGMID(ETH)
+     &          - 1.000*RKI_INIT(C,R,L,123) *CGMID(NO3)*CGMID(ETH)
+     &          - 1.000*RKI_INIT(C,R,L,124) *CGMID(IOLE)*CGMID(O)
+     &          - 0.500*RKI_INIT(C,R,L,126) *CGMID(IOLE)*CGMID(O3)
+     &          - 1.000*RKI_INIT(C,R,L,127) *CGMID(IOLE)*CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L,132) *CGMID(CRES)*CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L,136) *CGMID(CRON)*CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L,138) *CGMID(CRNO)*CGMID(O3)
+     &          - 1.000*RKI_INIT(C,R,L,145) *CGMID(OPEN)*CGMID(O3)
+     &          - 1.000*RKI_INIT(C,R,L,146) *CGMID(OPEN)*CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L,148) *CGMID(CAT1)*CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L,152) *CGMID(OPO3)*CGMID(NO2)
+     &          - 1.000*RKI_INIT(C,R,L,157) *CGMID(O)*CGMID(ISOP)
+     &          - 1.000*RKI_INIT(C,R,L,159) *CGMID(O3)*CGMID(ISOP)
+     &          - 1.800*RKI_INIT(C,R,L,160) *CGMID(NO3)*CGMID(ISOP)
+     &          - 1.000*RKI_INIT(C,R,L,162) *CGMID(O3)*CGMID(ISPD)
+     &          - 1.000*RKI_INIT(C,R,L,163) *CGMID(NO3)*CGMID(ISPD)
+     &          - 1.000*RKI_INIT(C,R,L,165) *CGMID(TERP)*CGMID(O)
+     &          - 1.000*RKI_INIT(C,R,L,167) *CGMID(TERP)*CGMID(O3)
+     &          - 1.530*RKI_INIT(C,R,L,168) *CGMID(TERP)*CGMID(NO3)
+     &          - 1.000*RKI_INIT(C,R,L,175) *CGMID(CL)*CGMID(O3)
+              ENDIF !flag for Ox or O3 SA
+
+
+c examples of possible cases:
+c PO3 = DO3 - destroyed O3
+c  8  =  5  - (-3)  PO3 greater than net postive DO3
+c  2  = -4  - (-6)  PO3 postive when net DO3 negative        
+c  0  = -4  - (-4)  PO3 zero
+c
+cGST...perform update for each time step after convergence 
+c
+c  Note that PO3 and TROYO3 are used below for either Ox or O3 SA, depending on flagOxSA
+
+              IF ( FLAGOXSA ) THEN
+                PO3 = OxProd * TIME2SEC( TSTEP(2) )/60.0
+                TROYO3 = -OxLoss * TIME2SEC( TSTEP(2) )/60.0
+                DOx_error = DOxNet - ( PO3 + TROYO3 )
+                IF ( DOx_error .GT. 0.001) THEN
+                  WRITE( CHDOXNET, FMT = '(E10.1E2)' ) DOxNet
+                  WRITE( CHPO3, FMT = '(E10.1E2)' ) PO3
+                  WRITE( CHTROY, FMT = '(E10.1E2)' ) TROYO3
+                  WRITE( CHCOL, FMT ='(I3)' ) C
+                  WRITE( CHROW, FMT ='(I3)' ) R
+                  WRITE( CHLAY, FMT ='(I3)' ) L
+                 XMSG = 'DOx_error at (' // CHCOL // ',' // CHROW // ','
+     &  // CHLAY // ')' // CHDOXNET // ',' // CHPO3 // ',' // CHTROY
+!20140324                  CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
+                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                ENDIF
+
+              ELSE
+                TROYO3 = TROYO3 * TIME2SEC( TSTEP(2) )/60.0
+                TROYO3 = MIN( DO3,TROYO3 ) 
+                PO3 = DO3 - TROYO3
+              ENDIF          
+
+!20140320              WRITE( CHPO3, FMT = '(E10.1E2)' ) PO3
+!20140320              WRITE( CHDO3, FMT = '(E10.1E2)' ) DO3
+!20140320              WRITE( CHTROY, FMT = '(E10.1E2)' ) TROYO3
+
+              IF ( PO3 .GT. 0.0 ) THEN  !GST.. you can have some PO3 even if DO3 was negative
+
+              !  3. Update ISAM tracers for production of O3 or Ox 
+
                 IF ( YES_INDIC .OR. INDICTYP .EQ. N_INDIC + 1 ) THEN
                   VOTE_NOX = 0.0
                   DO S = 1 , N_INDIC
@@ -267,36 +462,32 @@ Ckrt....20120928 Ozone
                 IF ( COND_INDIC ) THEN ! nox-limited in the abundance of VOC
                   DO K = 1, NTAG_SA
                     IF ( TTLB4( C,R,L,JNO ) + TTLB4( C,R,L,JNO2 ) .GT. 1.E-20 ) THEN
-                      ISAM( C,R,L, JO3N, K ) = ISAMB4( C,R,L, JO3N, K )
-     &                        + DO3 
-     &                         * ( ISAMB4(C,R,L, JNO, K) + ISAMB4(C,R,L, JNO2, K) )
-     &                         / ( TTLB4( C,R,L, JNO ) + TTLB4( C,R,L, JNO2 ) )
+                      SA_O3N( K ) = ISAMB4( C,R,L, JO3N, K )
+     &                    + PO3 
+     &                     * ( ISAMB4(C,R,L, JNO, K) + ISAMB4(C,R,L, JNO2, K) )
+     &                     / ( TTLB4( C,R,L, JNO ) + TTLB4( C,R,L, JNO2 ) )
                     ELSE
-                      ISAM( C,R,L, JO3N, K ) = ISAMB4( C,R,L, JO3N, K )
-     &                                        + DO3 / REAL( NTAG_SA )
+                      SA_O3N( K ) = ISAMB4( C,R,L, JO3N, K )
+     &                                    + PO3 / R_OZTAGS
                     ENDIF ! bulk no + bulk no2 > 0 ?
                   ENDDO ! loop K
                 ELSE  ! voc-limited in the abundance of NOx
                   NUMERO = 0.0
                   DENOMINO = 0.0
-!20131212         if ( mype .eq. 0 .and. C .eq. 1 .and. R .eq. 1 .and. L .eq. 1 ) 
-!20131212     &  print*,'ktag, jv, nam_voc(jv), jvoc(jv)'
                   DO K = 1, NTAG_SA
                     DO JV = 1, N_EVOC
-!20131212             if ( mype .eq. 0 .and. C .eq. 1 .and. R .eq. 1 .and. L .eq. 1 ) 
-!20131212     &   print*,K, JV, NAM_VOC(JV), JVOC( JV )
                       NUMERO( K ) = NUMERO( K ) 
-     &   + ISAMB4( C,R,L,JVOC(JV), K ) * MIR( JV )
+     &                          + ISAMB4( C,R,L,JVOC(JV), K ) * MIR( JV )
                     ENDDO ! jv
                     DENOMINO = DENOMINO + NUMERO( K )
                   ENDDO ! loop K
                   DO K = 1, NTAG_SA
                     IF ( DENOMINO .GT. 1.E-20 ) THEN
-                      ISAM( C,R,L, JO3V, K ) = ISAMB4( C,R,L, JO3V, K )
-     &                        + DO3 * NUMERO( K ) / DENOMINO
+                      SA_O3V( K ) = ISAMB4( C,R,L, JO3V, K )
+     &                    + PO3 * NUMERO( K ) / DENOMINO
                     ELSE
-                      ISAM( C,R,L, JO3V, K ) = ISAMB4( C,R,L, JO3V, K )
-     &                        + DO3 / R_OZTAGS
+                      SA_O3V( K ) = ISAMB4( C,R,L, JO3V, K )
+     &                    + PO3 / R_OZTAGS
                     ENDIF ! vxmir > 0 ?
                   ENDDO ! loop K
                 ENDIF ! indicreg >= 0.5 ?
@@ -319,7 +510,37 @@ Ckrt....20120928 Ozone
                   INDORIG( C,R,L,11 ) = CBFOR( C,R,L, PAN )
                   INDORIG( C,R,L,12 ) = CBFOR( C,R,L, FORM )
                 ENDIF ! yes_indic
-              ENDIF ! cgrid - cbfor < 0 ?             
+
+              ENDIF !done updating tracers for Production of O3 or Ox
+
+                     
+              !  4. Update ISAM tracers for destruction of O3 or Ox
+
+              IF (TROYO3.LT.0.0) THEN 
+                DENOMO3 = 0.0
+                DO K = 1, NTAG_SA
+                  DENOMO3 = DENOMO3 + SA_O3N( K ) + SA_O3V( K )
+                ENDDO ! loop K for sum of tags
+                DO K = 1, NTAG_SA
+                  IF ( CBFOR( C,R,L, SPC_INDEX(JO3V,2) ) .LE. 1.E-20 ) THEN
+                    ISAM( C,R,L, JO3N, K ) = 0.0
+                    ISAM( C,R,L, JO3V, K ) = 0.0
+                  ELSE
+                    IF ( DENOMO3 .LE. 1.E-20 ) THEN
+                      ISAM( C,R,L, JO3N, K ) = 0.0
+                      ISAM( C,R,L, JO3V, K ) = 0.0
+                    ELSE
+                      ISAM( C,R,L, JO3N, K ) = SA_O3N( K )
+     &                     + TROYO3 * SA_O3N( K ) / DENOMO3
+                      ISAM( C,R,L, JO3V, K ) = SA_O3V( K )
+     &                     + TROYO3 * SA_O3V( K ) / DENOMO3
+                      IF ( ISAM( C,R,L,JO3N,K ) .LT. 0.0 ) ISAM( C,R,L,JO3N,K ) = 1.E-30
+                      IF ( ISAM( C,R,L,JO3V,K ) .LT. 0.0 ) ISAM( C,R,L,JO3V,K ) = 1.E-30
+                    ENDIF ! denomo3 > 0 ?
+                  ENDIF ! cbfor > 0 ?
+                ENDDO ! loop K
+
+              ENDIF ! done updating for destruction of O3 or Ox
 
             ENDIF ! jo3v ( and hence jo3n ) > 0
 
@@ -352,6 +573,10 @@ Ckrt....20120928 Ozone
          ENDDO ! 1 to n_indic
         ENDIF ! hour loop
       ENDIF ! yes_indic
+
+! 20140309 Reinitialize the integrated rates
+      INTRXN = 0.0
+
 
       END 
 

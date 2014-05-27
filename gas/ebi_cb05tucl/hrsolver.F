@@ -126,9 +126,9 @@ C-----------------------------------------------------------------------
 
 c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 #ifdef hrdebug
-      COL = 0
-      ROW = 0
-      LEV = 0
+      COL = 8
+      ROW = 13
+      LEV = 1
       IF ( C .EQ. COL .AND. R .EQ. ROW .AND. L .EQ. LEV ) THEN
 c      IF ( JTIME .EQ. 160000 ) THEN
          LDEBUG = .TRUE.
@@ -186,6 +186,13 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 #ifdef hrdebug
                IF ( LDEBUG ) THEN
+!20140311 krt added below
+                  WRITE( DBGOUT, '( A, F12.5 )' ) 'EBI_TMSEP:',EBI_TMSTEP
+                  WRITE( DBGOUT, '( A, I5 )' ) 'N_EBI_STEPS: ', N_EBI_STEPS
+                  WRITE( DBGOUT, '( A, I5 )' ) 'Which NBKUPS: ', NBKUPS
+                  WRITE( DBGOUT, '( A, I5 )' ) 
+     &                 'Which NINR backup time step: ', NINR
+!20140311 krt added above
                   WRITE( DBGOUT, '( A, I5 )' ) 'ITER NO ', ITER
                   WRITE( DBGOUT, '( A, F12.5 )' )
      &               ' DTC=', DTC
@@ -285,9 +292,12 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 
 #ifdef isam
-               IF ( NEBI .EQ. CEILING( N_EBI_STEPS / 2.0 ) ) THEN
-                  RKI_INIT( C,R,L,: ) = RKI
-               END IF   ! record rki
+               ! Accumulates reaction rates, 20140307
+               IF ( LEBI_CONV ) THEN
+                 RKI_INIT( C,R,L,: ) = RKI
+                 !CALL ACCUMRR( C, R, L )
+                 GOTO 2000
+               END IF 
 #endif
 
                IF ( LEBI_CONV ) GO TO 2000

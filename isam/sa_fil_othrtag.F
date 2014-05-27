@@ -20,16 +20,11 @@
       SUBROUTINE SA_FIL_OTHRTAG( ISAMEM, JDATE, JTIME ) 
 
 C*************************************************************
-Ckrt  Dec 23, 2010  R. Kwok
-Ckrt   In each grid cell, subtract total tagged emission, 
-Ckrt   ISAMEM(non-othrtag), 
-Ckrt   from total emission, VDEMIS.
-Ckrt   Then fill up ISAMEM(othrtag) with this difference.
-Ckrt
-Ckrt  Dec 7, 2011 : get rid of n_spctag, s_spctag, t_spctag, vnam_spctag
-Ckrt                use spc_name instead
-Ckrt
-Ckrt  Jul 12, 2012 : transcribed to cmaq501
+C20140428 Subtracts total tagged emission ISAMEM(non-othrtag) 
+C         from total emission VDEMIS.
+C         Then fill up ISAMEM(othrtag) with this difference.
+C
+C         Called by vdiffacm2.F
 C*************************************************************
 
       USE HGRD_DEFN        ! 20120712 just for diagnosis with single mype

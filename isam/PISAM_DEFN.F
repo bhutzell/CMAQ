@@ -1,11 +1,6 @@
       MODULE PISAM_DEFN
 c
-c
-C     This module is referenced in driver and sciproc. driver must call 
-c     HGRD_INIT, CGRID_MAP, and PAR_INIT prior to calling PISAM_INIT (below).
-c
-c     Author: bo wang
-c     Email:  bwang@cert.ucr.edu
+c20140428 Has function PISAM_INIT
 c 
 c-----------------------------------------------------------------------
 
@@ -19,6 +14,12 @@ c-----------------------------------------------------------------------
 
       CONTAINS
         FUNCTION PISAM_INIT (NSPC_TSSA, NTAG_TSSA) RESULT ( SUCCESS )
+
+C-----------------------------------------------------------------------
+C20140428   Create ISAM target, PISAM; just like CGRID on PCGRID.
+C            Called by driver.F
+C      
+C-----------------------------------------------------------------------
 
 !         INCLUDE SUBST_VGRD_ID     ! vertical dimensioning parameters
 !0615    INCLUDE SUBST_IODECL      ! I/O definitions and declarations

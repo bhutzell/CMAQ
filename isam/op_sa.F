@@ -17,15 +17,15 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
+      SUBROUTINE OP_SA ( JDATE, JTIME, TSTEP, NSTEPS, ISAM, FILE_NAME )
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     
-c      [1] open tssa (tracer) IOAPI output file
-c     
-C     Revision history
-C     created on 28 Oct 02 by Bo Wang: 
+c20140428  Opens ISAM's SA_CONC_1 file
+c       op_sa.F called by initscen.F
+c
+c
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-      SUBROUTINE OP_SA ( JDATE, JTIME, TSTEP, NSTEPS, ISAM, FILE_NAME )
 
 !      USE HGRD_DEFN             ! horizontal domain specifications
       USE GRID_CONF

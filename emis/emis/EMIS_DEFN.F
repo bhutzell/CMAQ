@@ -418,7 +418,10 @@ C....Remedy 20130320
          INTEGER LS
 C VOC related 20130311
          INTEGER JVE  ! matching emission factors of the 14 VOC's
-
+#ifdef isam
+!20140516
+         INTEGER              LOGDEV1
+#endif
          INTERFACE
             SUBROUTINE test_sulf( JDATE, JTIME, TSTEP, NSTEPS, FILE_NAME )
                IMPLICIT NONE
@@ -437,6 +440,11 @@ C-----------------------------------------------------------------------
 #ifdef Verbose2
             logdev = init3()
 #endif
+#ifdef isam
+! 20140516
+            LOGDEV1 = INIT3()
+#endif 
+
 C Get domain decomp info from the emissions file
             CALL SUBHFILE ( EMIS_1, GXOFF, GYOFF, STARTCOL, ENDCOL, STARTROW, ENDROW )
             CNVTP = CONVPA * CNVTE
@@ -711,6 +719,14 @@ Ckrt...sa_pmemis_pt absorbed into sa_pmemis_grd....
                S = PTPM_MAP(V)    ! 20120719
                SA_PMEMIS_GRD( :,:,:,S,: ) = SA_PMEMIS_GRD( :,:,:,S,: )
      &                                    + SA_PMEMIS_PT( :,:,:,V,: )
+               IF ( YES_PRINT ) THEN
+                 IF ( TRIM(STKPM_NAME(V)) .EQ. 'PEC' ) THEN
+                   WRITE( LOGDEV1,*) 
+     & 'At C=60, R=23, L=1, tag=1, sa_pmemis_pt(pec)=',
+     &  SA_PMEMIS_PT(60,23,1,V,1),' sa_pmemis_grd(pec)=',
+     &  SA_PMEMIS_GRD(60,23,1,S,1)
+                 END IF  
+               END IF
              END DO
              IF ( ALLOCATED( SA_PMEMIS_PT ) ) DEALLOCATE( SA_PMEMIS_PT )
              IF ( LSULF ) THEN

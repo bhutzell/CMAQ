@@ -20,14 +20,9 @@
       SUBROUTINE SA_WRAP_CLD( CGRID, CBFOR, ISAM, ISAMB4 )
 
 !*************************************************************
-!  As a wrapper to apportion the tags by taking ratio of CGRIDs
-!  after and before a process. 
+!20140428 As a wrapper to apportion the tags with bulk conc after CONVCLD_ACM
 !
-!  Feb 22, 2011 - KRT...applied to CB05, though applicable to other
-!                  mechanisms and/or solvers
-!
-!  Jun 17, 2011 - KRT...specifically for in-cloud aerosols
-!
+!         Called by cldproc.acm.F
 !*************************************************************
       USE HGRD_DEFN
       USE VGRD_DEFN
