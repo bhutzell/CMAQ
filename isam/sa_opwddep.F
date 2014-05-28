@@ -26,12 +26,10 @@ C %W% %P% %G% %U%
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE SA_OPWDDEP ( SADEPFILE, JDATE, JTIME, TSTEP )
 
-C   30 Mar 01 J.Young: dyn alloc - Use HGRD_DEFN
-C   03 Sep 01 David Wong: for new pario
-C   31 Jan 05 J.Young: dyn alloc - establish both horizontal & vertical
-C                      domain specifications in one module
-C   30 Dec 10 R. Kwok : modified from OPDDEP for tags
-C   04 Mar 11 R. Kwok : modified from SA_OPDDEP to process SA_WD_1 as well
+C20140428  Open dry or wet deposition file (SA_DD_1 or SA_WD_1 as SADEPFILE)
+C          for ISAM tracers.
+C
+C          Called by vdiffacm2.F (dry) or cldproc_acm.F (wet)
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE UTILIO_DEFN         ! 20120712 replaces ioparms, iofdesc, iodecl

@@ -21,6 +21,9 @@
 
 C KWOK: Determine dimensions of tagging array based on user-supplied sa_io_list
 C KWOK: Created Oct 20, 2010
+C
+C20140428  Called by driver.F
+C
 
 C PCGRID_DEFN inherits CGRID_SPC and GRID_CONF( inherits HGRD_DEFN, VGRD_DEFN )
         USE PCGRID_DEFN

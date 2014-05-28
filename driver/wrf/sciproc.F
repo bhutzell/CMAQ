@@ -263,6 +263,15 @@ C Local Variables:
 #endif
          END SUBROUTINE CHEM
 #ifdef isam
+         SUBROUTINE SA_RNORM( JDATE, JTIME, TSTEP, CGRID, ISAM )
+            IMPLICIT NONE
+            INTEGER, INTENT( IN )     :: JDATE, JTIME
+            INTEGER, INTENT( IN )     :: TSTEP( 3 )
+            REAL, POINTER             :: CGRID( :,:,:,: )
+            REAL, POINTER             :: ISAM( :,:,:,:,: )
+         END SUBROUTINE SA_RNORM
+#endif
+#ifdef isam
          SUBROUTINE SA_WRAP_OZ( CGRID, CBFOR, ISAM, ISAMB4, JDATE, JTIME, TSTEP )
             IMPLICIT NONE
             REAL, POINTER             :: CGRID( :,:,:,: )
@@ -393,9 +402,11 @@ C decouple CGRID for cloud and chemistry
       IF ( LIPR ) CALL PA_UPDATE ( 'CLDS', CGRID, JDATE, JTIME, TSTEP )
 
 #ifdef isam
+      IF ( YES_RENORM ) CALL SA_RNORM( JDATE, JTIME, TSTEP, CGRID, ISAM )
       PCBFOR = PCGRID
       PISAMB4 = PISAM
       CALL CHEM ( CGRID, JDATE, JTIME, TSTEP, ISAM, CBFOR, ISAMB4 )
+      IF ( YES_RENORM ) CALL SA_RNORM( JDATE, JTIME, TSTEP, CGRID, ISAM )
 #else
       CALL CHEM ( CGRID, JDATE, JTIME, TSTEP )
 #endif

@@ -22,11 +22,9 @@
 
 
 !*************************************************************
-!  As a wrapper to apportion the tags' wet deposition
-!  by multiplying bulk wetdep with the ratio of ISAM at a specific tag
-!  to tag-totaled ISAM arrays
+!20140428 As a wrapper to apportion the tags' wet deposition with bulk wetdep
 !
-!  Mar 15, 2011 - KRT... modified from SA_WRAP.F
+!         Called by cldproc_acm.F
 !
 !*************************************************************
       USE HGRD_DEFN

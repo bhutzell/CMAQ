@@ -20,6 +20,14 @@
 
 C KWOK: Define tagging emissions, species, dimensions, etc, based on user-supplied sa_io_list
 C KWOK: Created Oct 5, 2010
+C
+C20140428 Has subroutines CNT_SA_IO_LIST,
+C                          RD_SA_IO_LIST, 
+C                               MAP_FRAC,
+C                            GET_NSPC_SA,
+C                          GET_SPC_INDEX.
+C
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
       IMPLICIT NONE
 
@@ -43,6 +51,8 @@ c...20130702 multi-sectors-for-a-single-tag
       LOGICAL, ALLOCATABLE, SAVE :: YESSTK( :,: )
 c...20130731 stack group id counting
       REAL,    ALLOCATABLE, SAVE :: SAIDVALU( :,: )
+      !20140514
+      !INTEGER,  ALLOCATABLE, SAVE :: SAIDVALU( :,: )
 
 c...Tagging species, regular or combined
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: SPC_NAME( :,: )
@@ -81,11 +91,22 @@ C ...Tagging indices for bcon, others, icon
 !20130731  stack group id counting
       INTEGER, SAVE :: NINLN
 
+!20140321  Option to use Ox production-loss for ozone apportionment
+      LOGICAL, SAVE :: FLAGOXSA
+
+!20140416 Option to renormalise ISAM
+      LOGICAL, SAVE :: YES_RENORM
+
       CONTAINS
 
 C============================================================
 
         SUBROUTINE CNT_SA_IO_LIST ( NTAGS )
+
+C20140428  Counts the number of emissions tags in the input control file
+C         Called by sa_dim.F
+C
+C
 
         USE UTILIO_DEFN     ! 20120615
         USE HGRD_DEFN       ! just for mype0 20130702
@@ -141,6 +162,11 @@ C-----------------------------------------------------------
 C============================================================
 
         SUBROUTINE RD_SA_IO_LIST ( NTAGS )
+
+C20140428  Read entries in each emissions tag in the input control file
+C         Called by sa_dim.F
+C
+C
 
         USE UTILIO_DEFN      ! 20120615
         USE HGRD_DEFN        ! just for mype
@@ -218,7 +244,8 @@ C-----------------------------------------------------------
             LBACK = .FALSE.
             BGN_SG = INDEX( TXTLINE(18:LEN_TRIM(TXTLINE)),
      &                FNAME(1:LEN_TRIM(FNAME)), LBACK )
-!            print*,'Currently itag, sg file:', ITAG, FNAME
+            if ( MYPE .EQ. 0 ) 
+     &  print*,'Currently txtline18end, itag, sg file:',TXTLINE(18:LEN_TRIM(TXTLINE)), ITAG, FNAME
             IF ( BGN_SG .NE. 0 ) THEN
               YESSTK( ITAG, ISGSTK ) = .TRUE.
 !              print*,'After screening, itag, sg file:', ITAG, FNAME
@@ -240,7 +267,8 @@ C-----------------------------------------------------------
           print*,'itag, list_of_sg_files_for_each_tag'
           do ITAG = 1, NTAGS
             do ISGSTK = 1, N_SGSTACKS
-              if ( YESSTK( ITAG, ISGSTK ) ) print*,ITAG, ISGSTK
+              !if ( YESSTK( ITAG, ISGSTK ) ) print*,ITAG, ISGSTK
+              print*,ITAG, ISGSTK, YESSTK( ITAG, ISGSTK )
             enddo ! isgstk
           enddo ! itag
         endif ! mype0
@@ -249,6 +277,10 @@ C-----------------------------------------------------------
 C============================================================
         
         SUBROUTINE MAP_FRAC( NTAGS, MAPFRAC )
+
+C20140428  Determine map fractions of regions on each grid cell
+C         Called by driver.F
+C
 
         USE GRID_CONF
         USE UTILIO_DEFN       ! 20120615
@@ -276,6 +308,10 @@ C Interim variables
 c External functions
 !0615   CHARACTER( 16 ) :: PROMPTMFILE
         INTEGER LEN_TRIM
+
+        !20140512
+        INTEGER, EXTERNAL :: SETUP_LOGDEV  
+        INTEGER  LOGDEV
 c external above  
         
         INTEGER  GXOFF, GYOFF
@@ -319,6 +355,8 @@ C0709...optional test
 
 C------------------------------------------------------------
 
+        LOGDEV = SETUP_LOGDEV()       !20140512
+
         CALL ENVSTR( 'SA_APPMAP','Source region ncf file','SA_APPMAP',
      &         EQNAME, IOST )
         if ( MYPE .eq. 0 ) print*,'EQNAME is ',EQNAME
@@ -329,30 +367,34 @@ C------------------------------------------------------------
           MAPFRAC = 1.0
           if ( MYPE .eq. 0 ) print*, 
      &       'Environment variable set, but empty ... Carry On...'
-          RETURN
+!20140512          RETURN
         ELSE IF ( IOST .EQ. -2 ) THEN
           MAPFRAC = 1.0
           if ( MYPE .eq. 0 ) print*,
      &       'Environment variable not set ... Carry On...'
-          RETURN
+!20140512          RETURN
+        ELSE IF ( IOST .EQ. 0 ) THEN
+          MAPNAME = PROMPTMFILE( 'Enter name for source region ncf file',
+     &       FSREAD3, 'SA_APPMAP', PNAME )
+          !print*,'in MAP_FRAC, MAPNAME is ',MAPNAME
+        
+          ! Domain decomposition
+          CALL SUBHFILE( MAPNAME, GXOFF, GYOFF, 
+     &       STRTCOL, ENDCOL, STRTROW, ENDROW )
+          NRGNS = NVARS3D
         END IF
 
 
-        MAPNAME = PROMPTMFILE( 'Enter name for source region ncf file',
-     &       FSREAD3, 'SA_APPMAP', PNAME )
-        !print*,'in MAP_FRAC, MAPNAME is ',MAPNAME
-        
-c Domain decomposition
-        CALL SUBHFILE( MAPNAME, GXOFF, GYOFF, 
-     &       STRTCOL, ENDCOL, STRTROW, ENDROW )
-
         ALLOCATE ( BUFF2( NCOLS, NROWS ), STAT = IOST )
         MAPFRAC = 0.0
-        NRGNS = NVARS3D
         YES_INLN = .FALSE.
         DO ITAG = 1, NTAGS
           LENRGN = LEN_TRIM( TAGRGN( ITAG ) )
-          print*, TAGRGN( ITAG )( 1:LENRGN )
+          IF ( YES_PRINT ) THEN
+            IF ( MYPE .EQ. 0 ) print*, 'Tagrgn is ' // TAGRGN( ITAG )( 1:LENRGN )
+!            IF ( MYPE .EQ. 1 ) 
+!     & WRITE( LOGDEV,'(/5X, A )' ) TAGRGN( ITAG )( 1:LENRGN )
+          ENDIF
           IF ( TAGRGN( ITAG )( 1:10 ) .EQ. 'EVERYWHERE' ) THEN
             DO R = 1, MY_NROWS
               DO C = 1, MY_NCOLS
@@ -387,11 +429,12 @@ c Domain decomposition
             ENDIF ! yes_print
             DO JCNT = 1, CNTCMA
               IF ( CNTCMA .EQ. 1 .OR. JCNT .EQ. CNTCMA ) THEN
-                CVALU = TAGRGN( ITAG )( LOCATCMA(JCNT)+1:LOCATCMA(JCNT)+6 )
+!20140512       CVALU = TAGRGN( ITAG )( LOCATCMA(JCNT)+1:LOCATCMA(JCNT)+6 )
+                CVALU = TAGRGN( ITAG )( LOCATCMA(JCNT)+1:LENRGN )
               ELSE
                 CVALU = TAGRGN( ITAG )( LOCATCMA(JCNT)+1:LOCATCMA(JCNT+1)-1 )
               ENDIF ! cntcma =1 or jcnt comes to cntcma
-              READ( CVALU, '(F6.1)' ) VALU
+              READ( CVALU, '(F6.0)' ) VALU
               SAIDVALU( ITAG,JCNT ) = VALU
               if ( YES_PRINT ) then
                 if ( MYPE .EQ. 0 ) 
@@ -450,6 +493,11 @@ c===============================================================
 
         SUBROUTINE GET_NSPC_SA ()
 
+C20140428  Determine number of ISAM species
+C         Called by sa_dim.F
+C
+
+        USE GRID_CONF    ! just for mype 20140327
         USE UTILIO_DEFN  ! 20130627
 
         IMPLICIT NONE
@@ -558,14 +606,15 @@ c----------------------------------------------------------
             BGN_SP = INDEX( TAGCLASSES( ITAG ),'OZONE',LBACK )
             IF ( BGN_SP .NE. 0 ) THEN
               IF ( .NOT. ANY( L_OZONE ) ) THEN
-                YES_2REGIME = ENVYN( 'OZ_2REGIME',
-     & 'yes=2 ozone regimes; no=1 ozone from Jacobian',
-     & .TRUE., IOST )
-                IF ( YES_2REGIME ) THEN
+!20140410                YES_2REGIME = ENVYN( 'OZ_2REGIME',
+!20140410     & 'yes=2 ozone regimes; no=1 ozone from Jacobian',
+!20140410     & .TRUE., IOST )
+!20140410                IF ( YES_2REGIME ) THEN
+                  YES_2REGIME = .TRUE.
                   NUMOZRGM = 2
-                ELSE
-                  NUMOZRGM = 1
-                ENDIF ! yes_2regime
+!20140410                ELSE
+!20140410                  NUMOZRGM = 1
+!20140410                ENDIF ! yes_2regime
                 NSPC_SA = NSPC_SA + NUMOZRGM   ! O3V, O3N
               ENDIF  ! any(l_ozone)
               L_OZONE( ITAG ) = .TRUE.
@@ -587,7 +636,9 @@ c----------------------------------------------------------
             ENDIF
         ENDDO ! number of tags
 
-        IF ( YES_PRINT ) print*,'NSPC_SA = ', NSPC_SA
+        IF ( YES_PRINT ) THEN
+          IF ( MYPE .EQ. 0 )  print*,'NSPC_SA = ', NSPC_SA
+        ENDIF
 
 c...assign tags to bcon, others or icon for any tagging species
 
@@ -608,6 +659,10 @@ c...assign tags to bcon, others or icon for any tagging species
 c===============================================================
 
         SUBROUTINE GET_SPC_INDEX ()
+
+C20140428  Map CGRID species index to ISAM tracer species index
+C         Called by driver.F
+C
 
         USE CGRID_SPCS       ! 20120615
         USE HGRD_DEFN        ! 20120710 just for print out from single processor

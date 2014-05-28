@@ -23,21 +23,14 @@ C $Header: /project/work/rep/arc/CCTM/src/driver/wrf/wr_aconc.F,v 1.6 2011/10/21
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE WR_AVG_SA ( AISAM, JDATE, JTIME, TSTEP )
 
-C Revision History:
-C   Jeff - July 01
-C   Note: If previous A_CONC exists, check that user hasn't changed what
-C         species/layers to save (or domain).
-C   30 Mar 01 J.Young: dyn alloc - Use HGRD_DEFN
-C   31 Jan 05 J.Young: dyn alloc - establish both horizontal & vertical
-C                      domain specifications in one module
-C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
-C                        removed deprecated TRIMLEN
-C   20 Jul 11 J.Young: added option for ending time timestamp
+C20140428  Writes hourly averaged ISAM conc to SA_ACONC_1
+C
+C          Called by driver.F
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE UTILIO_DEFN
-      USE SA_LAYERS             ! 20120711 for ISAM_BLEV, ISAM_ELEV, SA_NLAYS
+      USE SA_LAYERS             ! 20140428 for AISAM_BLEV, AISAM_ELEV, SA_NLAYS
       USE SA_DEFN
 
       USE SUBST_MODULES         ! stenex

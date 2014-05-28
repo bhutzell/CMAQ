@@ -1,5 +1,11 @@
       MODULE OZVOC_DEFN
 
+C20140428  has subroutines VOC_INIT, OP_O3INDICAT
+c
+c
+
+      IMPLICIT NONE
+
 !KRT20120911  Populates VOC Emission species, and
 !KRT20120911  corresponding carbon numbers, 
 !KRT20120911  maximum incremental reactivity (MIR, CAMx530 mostly),
@@ -74,11 +80,17 @@
       REAL,            SAVE :: O3P_VOC
       REAL,            SAVE :: O1D_VOC
       REAL,            SAVE :: OZ_HOX      
+      !20140307
+      REAL,            SAVE :: TROYO3  ! negative number
 
       CONTAINS
 
 C===================================================================
        SUBROUTINE VOC_INIT
+
+C20140428  Initialize parameters of the 14 VOC emission species
+c        Called by driver.F
+c
 
        USE SA_DEFN
        USE GRID_CONF             ! 20120918 for my_ncols, my_nrows, nlays
@@ -193,6 +205,13 @@ C-------------------------------------------------------------------
 
 C===========================================================================================
        SUBROUTINE OP_O3INDICAT( JDATE, JTIME, TSTEP )
+
+C20140428
+c       Opens O3_INDIC_1 file to store multiple O3-regime indicators' values.
+c       However, under O3 production-destruction formulation, this subroutine is not used.
+c
+c       Called by SA_WRAP_OZ.F
+c 
 
        USE GRID_CONF
        USE UTILIO_DEFN

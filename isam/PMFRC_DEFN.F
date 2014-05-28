@@ -1,11 +1,6 @@
       MODULE PMFRC_DEFN
 c
-c
-C     This module is referenced in driver and sciproc. driver must call 
-c     HGRD_INIT, CGRID_MAP, and PAR_INIT prior to calling PMFRC_INIT (below).
-c
-c     Author: bo wang
-c     Email:  bwang@cert.ucr.edu
+c20140428  Has function PMFRC_INIT
 c 
 c-----------------------------------------------------------------------
 
@@ -19,6 +14,13 @@ c-----------------------------------------------------------------------
 
       CONTAINS
         FUNCTION PMFRC_INIT ( NTAG_ISAM ) RESULT ( SUCCESS )
+
+C-----------------------------------------------------------------------
+C20140428   Create MFRC_P target, PMFRC; just like CGRID on PCGRID.
+C           MFRC_P map fractions from region map file.
+C            Called by driver.F
+C      
+C-----------------------------------------------------------------------
 
 !         INCLUDE SUBST_VGRD_ID     ! vertical dimensioning parameters
 !0615    INCLUDE SUBST_IODECL      ! I/O definitions and declarations

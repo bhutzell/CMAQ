@@ -1,6 +1,10 @@
 
       SUBROUTINE COUNTCOMMAS( TXTLINE, NCOMMAS )  ! KRT 20130313
 
+!20140428 count number of commas on a text line
+!       Countcommas.F called by RD_SA_IO_LIST, MAP_FRAC ( both from SA_DEFN.f )   
+!
+
       IMPLICIT NONE
 
 ! Arguments

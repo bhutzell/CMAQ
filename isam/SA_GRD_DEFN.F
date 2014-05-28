@@ -1,8 +1,7 @@
       MODULE SA_GRD_DEFN
 C---------------------------------------------------------------------
-C Function: reads *GRIDDED* Source Apportionment Emission data
+C20140428  Has subroutines SA_GRD_EGAS and SA_GRD_E_PM
 C
-C Dec 9, 2010 R. Kwok
 C---------------------------------------------------------------------
 
       USE SA_DEFN       ! Mc06
@@ -25,8 +24,13 @@ C Extract and save aerospc%name(2), aerospc%emis, and associated ae_emis_fac 201
 
       CONTAINS
 
-C---------------------------------------------------------------------
         SUBROUTINE SA_GRD_EGAS( JDATE, JTIME, TSTEP )
+
+C---------------------------------------------------------------------
+C20140428 Reads *GRIDDED* gaseous emissions from sectors
+C       
+C         Called by GET_EMIS in EMIS_DEFN.F  
+C---------------------------------------------------------------------
         
         USE GRID_CONF
 !       USE PMEM_DEFN           ! 20120713 not existent in cmaq50+; use aero_data instead
@@ -264,6 +268,12 @@ Ckrt
         END SUBROUTINE SA_GRD_EGAS
 C---------------------------------------------------------------------
         SUBROUTINE SA_GRD_E_PM( JDATE, JTIME, TSTEP )
+        
+C---------------------------------------------------------------------
+C20140428 Reads *GRIDDED* PM emissions from sectors
+C
+C         Called by GET_EMIS in EMIS_DEFN.F  
+C---------------------------------------------------------------------
         
         USE GRID_CONF
 !       USE PMEM_DEFN           ! 20120713 not exist; use aero-data instead

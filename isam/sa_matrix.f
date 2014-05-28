@@ -24,6 +24,8 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE SA_MATRIX ( A, B, C, D, E, X ) !Mc06 , N_SPCTAG )
 
 C---------------------------------------------------------
+C20140428      Called by vdiffacm2.F
+C
 C-- Bordered band diagonal matrix solver for ACM2
 
 C-- ACM2 Matrix is in this form:

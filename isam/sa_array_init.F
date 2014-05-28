@@ -17,14 +17,14 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     functionality: update isam array according to configuration files:
-c
-C     Revision history
-C     created on 07/18/03 by Bo Wang: 
-C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
       SUBROUTINE SA_ARRAY_INIT(CGRID, ISAM )
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c20140428 If cold start, write ICON values to ISAM; otherwise,
+c         write to ISAM those ISAM values from last hour of previous day
+c           Called by initscen.F
+c
+C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       USE GRID_CONF
       USE UTILIO_DEFN           ! replaces ioparms, iofdesc, iodecl
@@ -79,16 +79,18 @@ Ckrt  print*, NSPC_SA, NLAYS, MY_NROWS, MY_NCOLS, ICONTAG
         DO S = 1, NSPC_SA
 
           N = SPC_INDEX( S, 1 )
-          if ( mype .eq. 0 ) then
-            print*,'SPC_INDEX( S,1 ) = ',N,'SPC_INDEX( S,2 )=',SPC_INDEX( S,2 )
-            if ( SPC_INDEX( S,2 ) .LE. GC_FINI ) then 
-              print*,"cgrid specs =",GC_SPC(SPC_INDEX(S,2))
-            elseif ( SPC_INDEX( S,2 ) .LE. AE_FINI ) then 
-              print*,"cgrid specs =",AE_SPC(SPC_INDEX(S,2)-AE_STRT+1)
-            elseif ( SPC_INDEX( S,2 ) .LE. NR_FINI ) then 
-              print*,"cgrid specs =",NR_SPC(SPC_INDEX(S,2)-NR_STRT+1)
-            endif ! position of spc_index( s,2 ) in cgrid species list
-          endif ! mype0 ?
+          IF ( YES_PRINT ) THEN
+            if ( mype .eq. 0 ) then
+              print*,'SPC_INDEX( S,1 ) = ',N,'SPC_INDEX( S,2 )=',SPC_INDEX( S,2 )
+              if ( SPC_INDEX( S,2 ) .LE. GC_FINI ) then 
+                print*,"cgrid specs =",GC_SPC(SPC_INDEX(S,2))
+              elseif ( SPC_INDEX( S,2 ) .LE. AE_FINI ) then 
+                print*,"cgrid specs =",AE_SPC(SPC_INDEX(S,2)-AE_STRT+1)
+              elseif ( SPC_INDEX( S,2 ) .LE. NR_FINI ) then 
+                print*,"cgrid specs =",NR_SPC(SPC_INDEX(S,2)-NR_STRT+1)
+              endif ! position of spc_index( s,2 ) in cgrid species list
+            endif ! mype0 ?
+          ENDIF ! yes_print
 
           IF( N .EQ. 1) THEN  ! query is for an original species, includes O3A 20130627
             DO L = 1, NLAYS
@@ -126,8 +128,10 @@ Ckrt  print*, NSPC_SA, NLAYS, MY_NROWS, MY_NCOLS, ICONTAG
 
       ELSE
         ! Initialize ISAM array by isam output from previous day
-        if ( mype .eq. 0 )
-     &   print*, "    Create Initial Conc from PREVDAY data"
+        IF ( YES_PRINT ) THEN
+          if ( mype .eq. 0 )
+     &      print*, "    Create Initial Conc from PREVDAY data"
+        ENDIF ! yes_print
         CALL CREATE_ICON( ISAM )
 
       END IF
@@ -145,8 +149,6 @@ C
 C  FUNCTION: [1] read in a ISAM IOAPI output file
 C            [2] Load the last step's ISAM data into ISAM buffer array 
 C
-C  created by:  Bo Wang, 07/18/2003
-Ckrt  Modified by KRT, March 23, 2011
 C
 C**********************************************************************
 

@@ -3,16 +3,9 @@
      &               JDATE, JTIME, TSTEP )
 
 !*************************************************************
-!  As a wrapper to apportion the tags by taking ratio of CGRIDs
-!  after and before a process. 
+!20140428 As a wrapper to apportion the tags with bulk conc after AERO process
 !
-!  Feb 22, 2011 - KRT...applied to CB05, though applicable to other
-!                  mechanisms and/or solvers
-!  May 20, 2011 - KRT...PM ammonium to be updated with changes in NH3 and ammonium tags
-!                    ...PM nitrate to be updated with changes in HNO3 and nitrate tags
-!                    ...The changes in NH3 and HNO3 take place in isoropia
-!  Sep 06, 2012 - KRT.....Upgraded to cater for AE6
-!
+!     Called by sciproc.F
 !*************************************************************
       USE GRID_CONF
       USE CGRID_SPCS

@@ -27,6 +27,10 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       SUBROUTINE WR_SA ( JDATE, JTIME, TSTEP, NSTEPS, ISAM )
 
+C20140428  Writes ISAM values to SA_CONC_1 file
+C
+C          Called by driver.F
+
 !      USE HGRD_DEFN             ! horizontal domain specifications
       USE GRID_CONF
       USE UTILIO_DEFN           ! 20120615

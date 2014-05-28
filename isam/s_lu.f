@@ -23,6 +23,13 @@ C $Header: /project/work/rep/CCTM/src/init/yamo_ddm3d/s_lu.F,v 1.1.1.1 2009/09/2
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
 
+C20140428 This file contains subroutines sgeco,
+C                                        SAXPY,
+C                                        SGEFA,
+C                                        SSCAL,
+C                                        SGESL;
+C                           and function  SDOT.
+
       subroutine sgeco(a,lda,n,ipvt,rcond,z)
       integer lda,n,ipvt(*)
       real a(lda,*),z(*)
@@ -271,6 +278,8 @@ C
       SUBROUTINE SGEFA(A,LDA,N,IPVT,INFO)
       INTEGER LDA,N,IPVT(*),INFO
       REAL A(LDA,*)
+
+C20140428 Called by hrdriver.F
 C
 C     DGEFA FACTORS A MATRIX BY GAUSSIAN ELIMINATION.
 C
@@ -459,6 +468,8 @@ C
       SUBROUTINE SGESL(A,LDA,N,IPVT,B,JOB)
       INTEGER LDA,N,IPVT(*),JOB
       REAL A(LDA,*),B(*)
+C
+C20140428  Called by hrdriver.F
 C
 C     SGESL SOLVES THE REAL SYSTEM
 C     A * X + B OR TRANS(A) * X + B

@@ -1,6 +1,10 @@
 
       SUBROUTINE LOCATECOMMAS( TXTLINE, NCOMMAS, CMAPOS )  ! KRT 20130313
 
+!20140428  locate the commas in the textline
+!       Locatecommas.F is called by MAP_FRAC in SA_DEFN.f 
+!
+
       IMPLICIT NONE
 
 ! Arguments

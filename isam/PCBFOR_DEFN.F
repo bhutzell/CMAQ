@@ -28,30 +28,8 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE PCBFOR_DEFN
 
 C-----------------------------------------------------------------------
-C Function:
-C   Create CGRID target, PCBFOR. CGRID becomes a pointer to enable a one-
-C   cell ghost region around CGRID for PinG
-
-C Preconditions:
-C   Horizontal domain extents must be set (subroutine PAR_INIT -> HGRD_DEFN)
-C   Number of species in the species groups must be available (include files
-C   in CGRID_SPCS)
-C   This module is referenced in driver and sciproc. driver must call HGRD_INIT,
-C   CGRID_MAP, and PAR_INIT prior to calling PCBFOR_INIT (below).
-
-C Subroutines and functions called:
-
-C Revision history:
-C    Apr 00 - Al, David, Jeff - initial implementation
-C    Dec 00 - Jeff - add CGRID_MAP "method"
-C    Jan 01 - Jeff - remove CGRID_MAP "method" - now in module CGRID_SPCS
-C    Nov 01 - Jeff - correct pointer reference for ping
-C    Dec 04 - Jeff - dyn alloc - USE VGRD_DEFN
-C    Jan 05 - Jeff - dyn alloc - establish both horizontal & vertical
-C                    domain specifications in one module
-C 21 Jun 10 J.Young: convert for Namelist redesign
-C   29 Mar 11 S.Roselle: Replaced I/O API include files with UTILIO_DEFN
-
+C20140428   Has function PCBFOR_INIT
+C      
 C-----------------------------------------------------------------------
 
       USE GRID_CONF                ! horizontal & vertical domain specifications
@@ -63,6 +41,13 @@ C-----------------------------------------------------------------------
 
       CONTAINS
          FUNCTION PCBFOR_INIT () RESULT ( SUCCESS )
+
+C-----------------------------------------------------------------------
+C20140428   Create CBFOR target, PCBFOR; just like CGRID on PCGRID.
+C           CBFOR backs up CGRID before the latter gets changed.
+C            Called by driver.F
+C      
+C-----------------------------------------------------------------------
 
          USE UTILIO_DEFN
 

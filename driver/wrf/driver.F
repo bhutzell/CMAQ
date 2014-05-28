@@ -282,7 +282,7 @@ C Local variables:
          END SUBROUTINE WR_AVG_SA
          SUBROUTINE WR_SA_CGRID ( JDATE, JTIME, TSTEP, ISAM )
             IMPLICIT NONE
-            INTEGER                  :: JDATE, JTIME, TSTEP( 3 )
+            INTEGER                  :: JDATE, JTIME, TSTEP
             REAL, POINTER            :: ISAM( :,:,:,:,: )
          END SUBROUTINE WR_SA_CGRID
 #endif
@@ -458,6 +458,9 @@ C Test output of tagged regions in ncf format
          LTEST = ENVYN( 'WR_TAGMAP', 'Output tagged regions ?', .FALSE., ALLOCSTAT )
          IF ( LTEST ) CALL WR_SRCRGN ( MFRC_P, NTAG_SA-3 )
          LTEST = .FALSE.
+
+!20140416 Renormalization or not?
+         YES_RENORM = ENVYN( 'DO_RENORM','Wanna renormalize ISAM ?', .FALSE., ALLOCSTAT )
 
 C Determine the number of combined species-tags
          N_SPCTAG =  2 * COUNT( L_EC )
@@ -718,7 +721,7 @@ C write conc fields
 C write CGRID state file for subsequent runs
          CALL WR_CGRID ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
 #ifdef isam
-         CALL WR_SA_CGRID ( JDATE, JTIME, TSTEP, ISAM )
+         CALL WR_SA_CGRID ( JDATE, JTIME, TSTEP( 1 ), ISAM )
 #endif
       END IF
 

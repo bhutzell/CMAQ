@@ -143,7 +143,9 @@ C Stack parameters
       TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STK_VEL( : )
 #ifdef isam
       !krt 20140121
-      TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STK_SAID( : )
+      !TYPE( RARRY1 ), ALLOCATABLE, SAVE :: STK_SAID( : )
+      !20140514
+      TYPE( IARRY1 ), ALLOCATABLE, SAVE :: STK_SAID( : )
 #endif
 
 C Private Parameters:
@@ -516,6 +518,12 @@ C Initialize stack emissions data
             WRITE( VNAME,'( "STK_EMIS_",I2.2 )' ) N
             STKENAME( N ) = PROMPTMFILE( 'Enter name for stack emissions file',
      &                                   FSREAD3, VNAME, PNAME )
+#ifdef isam
+!20140514  
+!20140515   IF ( YES_PRINT ) THEN
+!20140515     WRITE(LOGDEV,*)'Stack emis files for base run: N=',N,' stkename=',STKENAME(N)
+!20140515   ENDIF
+#endif
          END DO
 
          IF ( .NOT. STK_EMIS_INIT( STKENAME, JDATE, JTIME ) ) THEN
@@ -541,7 +549,7 @@ C Initialize stack emissions data
 
 #ifdef isam
          IF ( YES_PRINT ) THEN
-           IF ( MYPE .EQ. 0 )
+           IF ( MYPE .EQ. 1 )
      &         WRITE( LOGDEV,'(/5X, A )' ) 'ptmap_init Done!'
          END IF ! yes_print
 #endif
@@ -571,7 +579,7 @@ C Initialize stack emissions data
          J_ISAM_PTPM = 0
 
          IF ( YES_PRINT ) THEN
-           IF ( MYPE .EQ. 0 ) THEN
+           IF ( MYPE .EQ. 1 ) THEN
              WRITE( LOGDEV,'(/5X, A )' ) 'sa_vdemis_pt allocated'
              WRITE( LOGDEV,'(/5X, A )' ) 'voc_e_pt allocated'
              WRITE( LOGDEV,'(/5X, A )' ) 'j_isam_ptpm allocated'
@@ -662,6 +670,9 @@ C Allocate and set stack parameters
             CALL CHECKMEM( IOS, 'STK_SAID', PNAME )
             STK_SAID( N )%ARRY = 0.0   ! 1D array
             STK_SAID( N )%LEN = MY_NSRC( N )
+!20140515   IF ( YES_PRINT ) THEN
+!20140515     WRITE(LOGDEV,*)'N=',N,' said_on(n)=',SAID_ON(N)
+!20140515   ENDIF
 #endif
 
             DO S = 1, MY_NSRC( N )
@@ -671,6 +682,10 @@ C Allocate and set stack parameters
                STK_TK( N )%ARRY( S )  = STKTK( N )%ARRY( SRC )
                STK_VEL( N )%ARRY( S ) = STKVEL( N )%ARRY( SRC )
 #ifdef isam
+!20140515               IF ( YES_PRINT ) THEN
+!20140515                 WRITE(LOGDEV,*)'N=',N,'S=',S,'src=',SRC,
+!20140515     & 'stksaid(n)%arry(src)=',STKSAID(N)%ARRY(SRC)
+!20140515               ENDIF
                IF ( SAID_ON( N ) )
      &           STK_SAID( N )%ARRY( S ) = STKSAID( N )%ARRY( SRC )
 #endif
@@ -698,8 +713,8 @@ C If wildfire, allocate and fire parameters (assumes only one file group)
          END DO
 #ifdef isam
          IF ( YES_PRINT ) THEN
-           IF ( MYPE .EQ. 0 )
-     &         WRITE( LOGDEV,'(/5X, A )' ) 'STK_SAID(n)%ARRY(s) assigned!'      
+           IF ( MYPE .EQ. 1 )
+     &       WRITE( LOGDEV,'(/5X, A )' ) 'STK_SAID(n)%ARRY(s) assigned!'      
          END IF ! yes print
 #endif
 
@@ -782,7 +797,7 @@ C Set Namelist emissions factors
            ENDDO ! V
          ENDDO ! N
          IF ( YES_PRINT ) THEN
-           IF ( MYPE .EQ. 0 )
+           IF ( MYPE .EQ. 1 )
      &         WRITE( LOGDEV,'(/5X, A )' ) 'j_isam_ptpm(jspctag) assigned!'      
          END IF ! yes print
 #endif
@@ -895,6 +910,8 @@ C Local variables:
          ! stack group ID values 20130801
          LOGICAL  YES_XTRAC
          INTEGER  JCNT
+         ! 20140515 figure out pec's location in stkpm_var
+         INTEGER GOTPEC
 #endif
 
 #ifdef Verbose1
@@ -918,7 +935,7 @@ C-----------------------------------------------------------------------
                      IBGN = INDEX( DUMLONG, '/', .TRUE. ) + 1
                      SGNAME( ITAG,ISGSTK ) = DUMLONG( IBGN:LEN_TRIM( DUMLONG ) )
                      IF ( IOS .EQ. 0 ) THEN
-Ckrt                    WRITE( LOGDEV,* ) SGNAME( ITAG )
+!20140515               WRITE( LOGDEV,* ) 'In get_pt3d_emis, sgname=', SGNAME( ITAG, ISGSTK )
                      ELSE
                         WRITE( LOGDEV,* ) 'Failed to obtain value of logical SG??'
                      END IF
@@ -1002,6 +1019,7 @@ Ckrt...For now, allocate sa_sulf_pt for inline point source SULF
                ZPLUM = 0.0   ! 2-D array - Initialize plume centroid height
             END IF
 
+
             IF ( MY_NSRC( N ) .LE. 0 ) THEN
                IF ( ALLOCATED( STKEM ) ) DEALLOCATE( STKEM )
                IF ( PT3DFRAC ) THEN
@@ -1010,6 +1028,7 @@ Ckrt...For now, allocate sa_sulf_pt for inline point source SULF
                END IF
                CYCLE
             END IF
+
 
 C Ensure that the model and stack groups emissions timestamp dates stay synchronized
 !           IF ( SECSDIFF( JDATE,JTIME, STKDATE( N ),JTIME ) .NE. SYNCOFF( N ) ) THEN
@@ -1057,8 +1076,14 @@ C Ensure that the model and stack groups emissions timestamp dates stay synchron
 #ifdef isam
 Ckrt Acquire filename of stkename(n)
            CALL ENVSTR( STKENAME( N ), 'stack emis file','for basic run', DUMLONG, IOS )
+           IF ( IOS .GT. 0 ) THEN
+             WRITE(LOGDEV,*)'stkename N=',N,' fails to show'
+           ENDIF
            IBGN = INDEX( DUMLONG, '/', .TRUE. ) + 1
            SENAME( N ) = DUMLONG( IBGN:LEN_TRIM( DUMLONG ) )
+!20140515  IF ( YES_PRINT ) THEN
+!20140515    WRITE(LOGDEV,*)'Cmplete stack emis file: N=',N,' sename=',SENAME(N)
+!20140515  ENDIF
 #endif
 
 C Loop through sources and compute plume rise
@@ -1329,6 +1354,13 @@ C Apportion emissions to the layers
                END DO
 
 #ifdef isam
+!20140515
+!20140516      IF ( YES_PRINT ) THEN
+!20140516        GOTPEC = INDEX1( 'PEC', STKPM_VAR( N )%LEN, STKPM_VAR(N)%ARRY )
+!20140516        IF ( GOTPEC .GT. 0 ) THEN
+!20140516          WRITE(LOGDEV,*)'N=',N,'location of pec in stkpm_var=',GOTPEC
+!20140516        ENDIF
+!20140516      ENDIF
 Ckrt .... LOOP through SPCTAGLOOP ...............................
 
                SPCTAGLOOP: DO JSPCTAG = 1, N_SPCTAG
@@ -1348,9 +1380,18 @@ Ckrt .... LOOP through SPCTAGLOOP ...............................
                    YES_XTRAC = .TRUE.
                  ELSE
                    DO JCNT = 1, NINLN
-                     IF ( STK_SAID( N )%ARRY( S ) .EQ. SAIDVALU( T_SPCTAG(JSPCTAG),JCNT )
+                     IF ( YES_PRINT ) THEN  !20140513
+                       WRITE(LOGDEV,*)'N=',N,'S=',S,'stk_said(n)%arry(s)=',STK_SAID(N)%ARRY(S),
+     & 'jspctag=',JSPCTAG,'t_spctag=',T_SPCTAG(JSPCTAG),'jcnt=',JCNT,
+     & 'vnam_spctag=',VNAM_SPCTAG(JSPCTAG),'saidvalu=',SAIDVALU(T_SPCTAG(JSPCTAG),JCNT )
+                     ENDIF
+                  IF ( STK_SAID( N )%ARRY( S ) .EQ. INT(SAIDVALU( T_SPCTAG(JSPCTAG),JCNT ))
      & .AND. SAIDVALU( T_SPCTAG(JSPCTAG),JCNT ) .GT. 0.0
-     & .AND. .NOT. YES_XTRAC )  YES_XTRAC = .TRUE.
+     & .AND. .NOT. YES_XTRAC ) THEN  
+                       YES_XTRAC = .TRUE.
+                       !20140513
+                       IF ( YES_PRINT ) WRITE(LOGDEV,*)'mype=',MYPE,'stack hit.'
+                     ENDIF
                    ENDDO !jcnt
                  ENDIF ! stk_said(n)%arry(s) = 0 or...
 
@@ -1382,10 +1423,18 @@ Ckrt ...Tap certain inline pt emissions to an INTERMEDIATE array.....PM
                      DO V = 1, STKPM_MAP( N )%LEN
                        I = PM_MAP( N )%ARRY( V )
                        J = STKPM_MAP( N )%ARRY( V )
-                       IF ( J_ISAM_PTPM(JSPCTAG) .EQ. J ) THEN
+!20140516              IF ( J_ISAM_PTPM(JSPCTAG) .EQ. J ) THEN
+                       IF ( J_ISAM_PTPM(JSPCTAG) .EQ. I ) THEN
                          SA_PMEMIS_PT( C,R,L,I,T_SPCTAG(JSPCTAG) ) =
      &                    SA_PMEMIS_PT( C,R,L,I,T_SPCTAG(JSPCTAG) ) +
      &                      LFRC * STKEM( J )
+                         IF ( YES_PRINT ) THEN
+                           IF ( TRIM(STKPM_NAME(I)) .EQ. 'PEC'  .AND. L .EQ. 1 ) WRITE(LOGDEV,*) 
+     & 'MYPE Equals ',MYPE,' Col=',C,' Row=',R,' L=1',
+     & 'N=',N,' stkem=',STKEM(J),' lfrc=',LFRC,' jspctag=',JSPCTAG,
+     & ' t_spctag=',T_SPCTAG(JSPCTAG),
+     & ' sa_pmemis_pt=',SA_PMEMIS_PT(C,R,L,I,T_SPCTAG(JSPCTAG))
+                         ENDIF
                        ENDIF
                      END DO ! loop of V again
                    END DO ! loop of L
