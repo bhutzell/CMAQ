@@ -1,4 +1,4 @@
-Table for Mechanism = RACM2_AE6_AQ                    
+Table for Mechanism = RACM2_AE6_AQ
 NPHOTAB =   30
 !Individual rates listed below:
 O3O3P_NASA06    
@@ -30,7 +30,7 @@ OP1_RACM2
 PAA_RACM2       
 ONIT_RACM2      
 PAN1_RACM2      
-PAN2_RACM2      
+PAN2_RACM2 
 NTEMP =    6
 ! I   TEMP( I ) K
   1  210.00

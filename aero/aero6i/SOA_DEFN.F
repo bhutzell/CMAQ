@@ -40,10 +40,10 @@ C HP  03/11/11 Updated monoterpene SOA alphas and Cstars to Carlton et al. 2010 
 C HP  07/24/11 Changed aromatic SOA alphas for consistency with updated reaction counters
 C               BNZ, TOL, XYL numbers now match Ng et al. 2007 Atmos. Chem. Phys.
 C 08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
+C HOTP 01/16/13 Remove acid enhanced isoprene and isoprene oligomers
 C 13 Aug 13 H. Pye: Xylene and toluene low-NOx yields switched. Values now
 C               follow experimental data of Ng et al. 2007 ACP as shown in Table 3.
 C               Values in Table 6 of Ng et al. (previously used) are incorrect.
-C 18 Dec 13 G.Sarwar: added orgprod parent names based on RACM2 
 C-----------------------------------------------------------------------
       Implicit None
 
@@ -74,8 +74,8 @@ C                  -------    -------  --------  -------  ------    --  ----   -
      & vapor_type('SV_BNZ2',  0.8880, 111.1100,  18.0E3, 'ABNZ2J', 'A',  6.0, 'BNZNRXN'),
      & vapor_type('SV_TRP1',  0.1393,  14.7920,  40.0E3, 'ATRP1J', 'B', 10.0, 'TRPRXN '),
      & vapor_type('SV_TRP2',  0.4542, 133.7297,  40.0E3, 'ATRP2J', 'B', 10.0, 'TRPRXN '),
-     & vapor_type('SV_ISO1',  0.2320, 116.0100,  40.0E3, 'AISO1J', 'B',  5.0, 'ISOPRXN'),
-     & vapor_type('SV_ISO2',  0.0288,   0.6170,  40.0E3, 'AISO2J', 'B',  5.0, 'ISOPRXN'),
+     & vapor_type('SV_ISO1',  0.2320, 116.0100,  40.0E3, 'AISO1J', 'B',  0.0, 'ISOPRXN'),
+     & vapor_type('SV_ISO2',  0.0288,   0.6170,  40.0E3, 'AISO2J', 'B',  0.0, 'ISOPRXN'),
      & vapor_type('SV_SQT ',  1.5370,  24.9840,  40.0E3, 'ASQTJ ', 'B', 15.0, 'SESQRXN')/)
 
 C Required species
@@ -83,7 +83,6 @@ C Required species
       Character( 16 ), Private, Parameter :: req_sviso2  = 'SV_ISO2'
       Character( 16 ), Private, Parameter :: req_aeiso1  = 'AISO1'
       Character( 16 ), Private, Parameter :: req_aeiso2  = 'AISO2'
-      Character( 16 ), Private, Parameter :: req_aeiso3  = 'AISO3'
       Character( 16 ), Private, Parameter :: req_aeolga  = 'AOLGA'
       Character( 16 ), Private, Parameter :: req_aeolgb  = 'AOLGB'
       Character( 16 ), Private, Parameter :: req_aeorgc  = 'AORGC'
@@ -93,7 +92,6 @@ C Indices of required species
       Integer :: iso2_idx
       Integer :: aiso1_idx
       Integer :: aiso2_idx
-      Integer :: aiso3_idx
       Integer :: aolga_idx
       Integer :: aolgb_idx
       Integer :: aorgc_idx
@@ -210,12 +208,7 @@ C define orgprod parent names based on mechanism dependence
                orgprod( 2 )%parent = 'MXYL'
                orgprod( 3 )%parent = 'MXYL'
                orgprod( 4 )%parent = 'TOLUENE'
-            Else If( INDEX(MECHNAME, 'RACM2') .GT. 0) then 
-               alk_factor = 0.57    ! fraction of ALK5 that can produce SOA
-               orgprod( 2 )%parent = 'XYM'
-               orgprod( 3 )%parent = 'XYM'
-               orgprod( 4 )%parent = 'TOL'
-               orgprod( 5 )%parent = 'TOL'
+               orgprod( 5 )%parent = 'TOLUENE'
             Else
                xmsg =  'Mechanism ' // MECHNAME
      &              // ' is not supported in this version of the model'
@@ -248,7 +241,6 @@ C Find indices of required species
          iso2_idx   = findVapor( req_sviso2 )
          aiso1_idx  = findAero( req_aeiso1, .True. )
          aiso2_idx  = findAero( req_aeiso2, .True. )
-         aiso3_idx  = findAero( req_aeiso3, .True. )
          aolga_idx  = findAero( req_aeolga, .True. )
          aolgb_idx  = findAero( req_aeolgb, .True. )
          aorgc_idx  = findAero( req_aeorgc, .True. )
@@ -718,6 +710,7 @@ C External functions:
 
 C Local variables:
       Logical, Save :: first_time = .True.
+      Logical, Save :: first_time_debug = .True.
       Integer, Save :: logdev
       Character( 80 ) :: xmsg
       Integer       :: i
@@ -736,7 +729,6 @@ C Parameters & variables for adjusting cstar to ambient conditions
       Real, Parameter :: rgas1  = 1.0 / rgasuniv ! reciprocal of universal gas constant
       Real, Parameter :: kolig  = 0.69314718 / 72000.0  ! 20h half-life of oligomerization rate [ 1/s ]
       Real, Parameter :: olgrat = 2.1            ! SOA/SOC ratio for oligomers
-      Real, Parameter :: kacid  = 0.00361        ! acid-induced enhancement factor
       Real, Parameter :: orgfac = 1.0E-9 * f6dpi / 2.0E3
       Real, Parameter :: convfac_298 = 101325.0 * rgas1 * trefm1  ! P/RT at 1 atm and 298 K [ mole/m**3 ]
 
@@ -748,13 +740,6 @@ C Variables used in oligomerization calculations
       Real expdt         ! non-dimensional loss coefficient
       Real nsvpa         ! particle-phase anthropogenic SVOC [ umolC/m3 ]
       Real nsvpb         ! particle-phase biogenic SVOC [ umolC/m3 ]
-
-C Variables used in acid-enhanced isoprene SOA calculations
-      Real hplus         ! accumulation-mode H+ conc [ nmol/m3 ]
-      Real aiso12        ! particle-phase isoprene SVOC [ ug/m3 ]
-      Real vviso         ! vapor-phase isoprene SVOC [ ug/m3 ]
-      Real xiso3         ! newly produced AISO3J [ ug/m3 ]
-      Real isofrac       ! ratio for depletion of vapor-phase products
 
 C Variables used in equilibrium partitioning calculations
       Real drog( n_orgprod ) ! change in precursor conc [ ug/m3 ]
@@ -853,10 +838,19 @@ C process that conserves carbon mass.
 
       expdt = exp( - kolig * dt )
 
+C Only decrease aerosol concentrations for species that participate in oligomerization
       Do i = 1, n_vapor
-         aerospc_conc( soa_aeroMap( i ),2 ) =
-     &   aerospc_conc( soa_aeroMap( i ),2 ) * expdt
+         if ( vaporspc( i )%soa_decay .Gt. 0.0 ) Then
+            aerospc_conc( soa_aeroMap( i ),2 ) =
+     &      aerospc_conc( soa_aeroMap( i ),2 ) * expdt
+            ! debug check
+            !if ( first_time_debug ) Then
+            !   print*, vaporspc(i)%name ,' oligomerized'
+            !endif
+         endif
       End Do
+
+      first_time_debug = .false.
 
       aerospc_conc( aolga_idx,2 ) = aerospc_conc( aolga_idx,2 )
      &                            + 12.0 * nsvpa * ( 1.0 - expdt ) * olgrat
@@ -961,46 +955,6 @@ C Transfer particle-phase SOA and vapor-phase SVOCs back to CBLK
          aerospc_conc( soa_aeroMap( i ),2 ) = caer( i )
          vapor_conc( i ) = ctotf( i ) - caer( i )
       End Do
-
-C Acid-induced Isoprene SOA
-
-C Particle-phase acidity is parameterized by the air concentration of hydrogen
-C ion in the particle phase (hplus).  This is computed by electroneutrality,
-C and is bounded so that it cannot fall below zero (acid-neutral) nor above the
-C range of experimental conditions (530 nmol/m3) tested by Surratt et al.
-C (2007).  In future code updates, molecular weights of inorganic ions should
-C be inherited from include or namelist files to avoid hard-coded values.
-
-      hplus = 0.0
-      Do i = 1, n_aerospc
-         hplus = hplus - 1000.0 * aerospc( i )%charge * aerospc_conc( i,2 )
-     &         / aerospc_mw( i )
-      End Do
-      hplus = Min( 530.0, Max ( 0.0, hplus ) ) ! restrict extrapolation
-
-C Compute amount of acid-enhanced isoprene SOA that is produced during the current
-C time step (xiso3) using the normalized expression derived from Surratt et al. (2007)
-
-      aiso12 = aerospc_conc( aiso1_idx, 2 ) + aerospc_conc( aiso2_idx, 2 )
-      xiso3  = kacid * hplus * aiso12 - aerospc_conc( aiso3_idx,2 )
-
-C Update CBLK(VISO3J) while conserving the total concentration of low-volatility
-C isoprene-derived products.  Since the acid-enhanced product is assumed to be
-C non-volatile, only positive values of xiso3 are considered below.  Also, xiso3
-C is not allowed to exceed the vapor-phase concentration of isoprene SVOC.  We assume
-C the xiso3 mass is depleted from the 2 vapor-phase isoprene products in quantities
-C proportional to their equilibrium concentrations.  The factor of 2.7/1.6 accounts
-C for the enhancement in the OM/OC ratio when isoprene SOA is formed in the presence
-C of SO2, based on the lab experiments of Kleindienst et al. (2007)
-
-      If ( xiso3 .Gt. 0.0 ) Then
-         vviso = vapor_conc( iso1_idx ) + vapor_conc( iso2_idx )
-         xiso3  = Min( xiso3, vviso )
-         aerospc_conc( aiso3_idx,2 ) = aerospc_conc( aiso3_idx,2 ) + xiso3 * ( 2.7 / 1.6 )
-         isofrac = vapor_conc( iso1_idx ) / vviso
-         vapor_conc( iso1_idx ) = vapor_conc( iso1_idx ) - isofrac * xiso3
-         vapor_conc( iso2_idx ) = vapor_conc( iso2_idx ) - ( 1.0 - isofrac ) * xiso3
-      End If
 
 C Update 3rd moment, 2nd moment, and Dg in CBLK array by assuming that SOA
 C condensation/evaporation does not affect the geometric standard deviation.
