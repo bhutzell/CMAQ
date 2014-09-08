@@ -24,6 +24,8 @@ C Written by Wenxian Zhang in August 2011
 C
 C 27 September 2013: Sergey L. Napelenok 
 C    --- implemented into CMAQv5.0.2
+C 08 September 2014: Sergey L. Napelenok
+C    --- some bug fixes and better error reporting
 C
 C Reference: 
 C Zhang, W., Capps, S. L., Hu, Y., Nenes, A., Napelenok, S. L., & 
@@ -102,10 +104,6 @@ C *** SOLVE SENSITIVITIES ***
 
       CALL EQNSLV( FROW, FCOL, COEF, SENS, SENSD )
 
-c     write(logdev,*) "SENS 1",SENS
-c     write(logdev,*) "SENSD 1",SENSD
-
-
 C *** ADJUST FOR MINOR SPECIES ***
 
       DO I = 1,NPAIR
@@ -129,11 +127,6 @@ c     SGAMA = 0.0D0 ! set to ignore activity
      &        CC.EQ.'O'.OR.CC.EQ.'M'.OR.CC.EQ.'P') THEN
          CALL DCALCHS4(SENS)
       ENDIF
-
-c     write(logdev,*) "SENS 2",SENS
-c     write(logdev,*) "SENSD 2",SENSD
-
-
 
 C *** END OF DDMSENS ***
       RETURN
@@ -358,6 +351,8 @@ C ============================================================================
 C CALCULATE dGAMA/dA, A IS IONIC SPECIES FOR A-J CASES
 C ============================================================================
       SUBROUTINE DELGAMA1 ( DGAMA )
+
+c     IMPLICIT NONE
  
       INCLUDE 'isrpia.inc'
       INCLUDE 'ddmisrpia.inc'
@@ -368,6 +363,14 @@ C ============================================================================
       DOUBLE PRECISION XIJ,YJI,DXIJ,DYJI
       DOUBLE PRECISION DGAMA(NIONSPC,NPAIR)
       DOUBLE PRECISION SION
+
+c     INTEGER, SAVE :: LOGDEV
+c     LOGICAL, SAVE :: FIRSTIME = .TRUE.
+
+c     IF ( FIRSTIME ) THEN
+c        FIRSTIME = .FALSE.
+c        LOGDEV = INIT3 ()
+c     ENDIF
 
 C 
 C *** Mapping of electrolyte to ion index ***
@@ -404,7 +407,7 @@ C
 C
 C *** dG0/dA ***
 C
-      CALL DKMFUL (NIONSPC,NPAIR,IONIC,SNGL(TEMP),DI,G0,DG0)
+      CALL DKMFUL (NIONSPC,NPAIR,IONIC,SNGL(TEMP),DI,G0P,DG0)
 
 C
 C *** MULTICOMPONENT ACTIVITY COEFFICIENT ***
@@ -416,12 +419,12 @@ C
 
       DO K = 1, NIONSPC
         DO I=1,3
-           DF1(K,I)=0.0
-           DF2(K,I)=0.0
+           DF1(K,I)=0.0D0
+           DF2(K,I)=0.0D0
         ENDDO
-        DF2(K,4)=0.0
+        DF2(K,4)=0.0D0
         DO I = 1, NPAIR
-           DGAMA(K,I) = 0.0
+           DGAMA(K,I) = 0.0D0
         ENDDO
       ENDDO
 
@@ -728,6 +731,8 @@ C CALCULATE dG0/dA, CASES A - J
 C =============================================================================
       SUBROUTINE DKMFUL (N,NPAIRS,IONIC,TEMP,DELI,G0,DELG0)
 
+      IMPLICIT NONE
+
       INTEGER   N, NPAIRS
       REAL      IONIC,SION,CUBI,TEMP
       DOUBLE PRECISION DELI(N), G0(NPAIRS), DELG0(N,NPAIRS)
@@ -790,6 +795,8 @@ C =============================================================================
 C CALCULATE dG0/dA, CASES O - K
 C =============================================================================
       SUBROUTINE DKMFUL2 (N,NPAIRS,IONIC,TEMP,DELI,G0,DELG0)
+
+      IMPLICIT NONE
 
       INTEGER   N, NPAIRS
       REAL      IONIC,SION,CUBI,TEMP
@@ -1765,6 +1772,15 @@ C
       DOUBLE PRECISION AA(NDIM,NDIM),BB(NDIM)
       DOUBLE PRECISION AAT(NDIM*NDIM)
 
+      INTEGER, SAVE :: LOGDEV
+      LOGICAL, SAVE :: FIRSTIME = .TRUE.
+
+      IF ( FIRSTIME ) THEN
+         FIRSTIME = .FALSE.
+         LOGDEV = INIT3 ()
+      ENDIF
+
+
 C
 C *** ELIMINATE A-MATRIX AND B-VECTOR ***
 C
@@ -1798,19 +1814,30 @@ C
       CALL dgefa(AAT,NDIM,NDIM,IPVT,INFO)
 
       IF (INFO.NE.0) THEN
-         WRITE(*,*) 'ERROR IN DGEFA'
+         WRITE(LOGDEV,*) 'ERROR IN DGEFA'
 
-         WRITE(*,*) "ISOROPIA case = ",SCASE
-         WRITE(*,*) 'ISOROPIA W =',W
-         WRITE(*,*) 'ndim = ',ndim
-         WRITE(*,*) 'frow = ',frow
-         WRITE(*,*) 'fcol = ',fcol
-         WRITE(*,*) 'AA = '
+         write(LOGDEV,*) 'IONS', MOLALD
+         write(LOGDEV,*) 'GASES', GNH3, GHNO3, GHCL, GNH3D, GHNO3D, GHCLD
+         write(LOGDEV,*) 'WATER', WATER
+
+         WRITE(LOGDEV,*) 'ISOROPIA case = ',SCASE
+         WRITE(LOGDEV,*) 'ISOROPIA W =',W
+         WRITE(LOGDEV,*) 'ndim = ',ndim
+         WRITE(LOGDEV,*) 'frow = ',frow
+         WRITE(LOGDEV,*) 'fcol = ',fcol
+         WRITE(LOGDEV,*) 'AA = '
          do i = 1,ndim
-            write(*,*), i
-            write(*,*) (AA(i,j),j=1,ndim)
+            write(LOGDEV,*), i
+            write(LOGDEV,*) (AA(i,j),j=1,ndim)
          enddo
-         write(*,*) 'BB = ',(BB(i),i=1,ndim)
+         write(LOGDEV,*) 'BB = ',(BB(i),i=1,ndim)
+
+c        DO I = 1,NSEN
+c           DO J = 1,NSEN
+c              WRITE(LOGDEV,*) I,J,COEF(I,J)
+c           ENDDO
+c        ENDDO
+
          STOP
       ENDIF
 C
@@ -1852,10 +1879,6 @@ c        FIRSTIME = .FALSE.
 c        LOGDEV = INIT3 ()
 c     ENDIF
 
-c     write(logdev,*) "IN DCALCNH3 "
-c     write(logdev,*) "MOLAL(jNH4)=",MOLAL(jNH4),"MOLAL(jH)=",MOLAL(jH)
-c     write(logdev,*) "GNH3=",GNH3
-
 
 c     IF (WATER.LE.TINY) RETURN
       IF ( WATER       .LE. TINY .OR.
@@ -1869,9 +1892,6 @@ c     IF (WATER.LE.TINY) RETURN
       C    = ONE/MOLAL(jNH4) +ONE/MOLAL(jH) +ONE/GNH3
       SR   = SENS(jNH4)/MOLAL(jNH4) -SENS(jH)/MOLAL(jH)    !SENS RELATED
       DPSI = (SR +GR)/C
-
-
-c     write(logdev,*) "DPSI=",DPSI, "GR=",GR,"C=",C,"SR=",SR
 
       SENS(jNH3) = DPSI
       SENS(jNH4) = SENS(jNH4) -DPSI
@@ -1920,15 +1940,13 @@ c     IF (WTAER.LE.TINY) RETURN
       DOUBLE PRECISION SENS(NSEN)
       DOUBLE PRECISION DNO,DCL,C11,C12,C21,C22,B1,B2,SR,WR,GR
 
-      INTEGER, SAVE :: LOGDEV
-      LOGICAL, SAVE :: FIRSTIME = .TRUE.
+c     INTEGER, SAVE :: LOGDEV
+c     LOGICAL, SAVE :: FIRSTIME = .TRUE.
 
-      IF ( FIRSTIME ) THEN
-         FIRSTIME = .FALSE.
-         LOGDEV = INIT3 ()
-      ENDIF
-
-
+c     IF ( FIRSTIME ) THEN
+c        FIRSTIME = .FALSE.
+c        LOGDEV = INIT3 ()
+c     ENDIF
 
       IF (WATER.LE.TINY) THEN
          SENS(jHNO3) = SINI(iMBNO3)
@@ -1941,12 +1959,6 @@ c     IF (WTAER.LE.TINY) RETURN
       ELSEIF (W(jTNO3).LE.TINY) THEN
          CALL DCALCHA(SENS)
       ENDIF
-
-c     write(logdev,*) "IN DCALCNHA "
-c     write(logdev,*) "MOLAL(jH) = ",MOLAL(jH), "MOLAL(jNO3)=",MOLAL(jNO3)
-c     write(logdev,*) "GHNO3 = ",GHNO3,"MOLAL(jCL)=",MOLAL(jCL)
-c     write(logdev,*) "GHCL=",GHCL,"WATER=",WATER
-
 
       IF ( MOLAL(jH)   .LE. TINY .OR.
      &     MOLAL(jNO3) .LE. TINY .OR.
@@ -1980,8 +1992,6 @@ c     IF (MOLAL(jCL).EQ.TINY.AND.MOLAL(jNO3).EQ.TINY) THEN
          DCL = ZERO
          DNO = ZERO
       ENDIF
-
-c     write(logdev,*) "DCL=",DCL,"DNO=",DNO
 
       SENS(jH)    = SENS(jH)   +DCL +DNO
       SENS(jCL)   = DCL
