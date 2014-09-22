@@ -44,12 +44,7 @@ C      Date   Who             What
 C    -------- ---             -----------------------------------------
 C     06/2005 J.Pleim         Initial version
 C     07/2005 J.Young         Clean up for CMAQ-F
-C     07/2013 S.Napelenok     ddm-3d implementation for cmaq5.0.1
 C-----------------------------------------------------------------------
-
-#ifdef sens
-      USE DDM3D_DEFN, ONLY : NP, NPMAX, S_CCR, S_CBELOW
-#endif 
 
       IMPLICIT NONE
 
@@ -77,7 +72,7 @@ C Local variables
       INTEGER KB
 
       REAL DTLIM, F1
-c     REAL TOT1, TOT2
+      REAL TOT1, TOT2
       REAL DTS, DELC, M1UP
       REAL( 8 ) :: AI( NLAYS ), BI( NLAYS ), EI( NLAYS )
       REAL( 8 ) :: DI( NLAYS ), UI( NLAYS )
@@ -86,24 +81,15 @@ c     REAL TOT1, TOT2
       REAL MBARKS( NLAYS ), MDWN( NLAYS )
       REAL DSIGH( NLAYS ), DSIGHI( NLAYS )
 
-#ifdef sens
-      REAL( 8 ) :: S_VCI( NPMAX,NLAYS,NSP )
-      REAL( 8 ) :: S_UI( NPMAX,NLAYS )
-      REAL( 8 ) :: S_DI( NPMAX,NLAYS )
-      REAL( 8 ) :: S_DELC( NPMAX )
-      REAL( 8 ) :: S_F1( NPMAX )
-      REAL( 8 ) :: S_BETA( NPMAX )
-#endif
-
 C-----------------------------------------------------------------------
 
       DTLIM = DTCLD
       MDWN ( CLTOP + 1 ) = 0.0
       DSIGH( CLTOP + 1 ) = 1.0
-c     SIGMAF( 0 ) = 1
+      SIGMAF( 0 ) = 1
       M1UP = 0.0
       KB  = CLBASE - 1
-c     CLBASE = CLBASE
+      CLBASE = CLBASE
       DSIGH ( KB ) = SIGMAF( KB ) - 1.0
       DSIGHI( KB ) = 1.0 / DSIGH( KB )
 
@@ -120,27 +106,10 @@ C Compute ACM mixing rate
       END DO
       DTLIM = MIN( HALF / ( M1UP * DSIGHI( KB ) ), DTLIM )
 
-#ifdef sens
-      S_VCI = 0.0D0
-      S_DI  = 0.0D0
-#endif
-
       DO S = 1, NSP
-#ifdef sens
-        DO NP = 1, NPMAX
-          S_VCI( NP, KB, S ) = S_CBELOW( NP, S )
-          S_VCI( NP,CLTOP+1,S ) = 0.0D0
-        END DO
-#endif
         VCI( KB, S ) = CBELOW( S )
         VCI( CLTOP+1,S ) = 9999.0
         DO K = CLBASE, CLTOP
-#ifdef sens
-          DO NP = 1, NPMAX
-            S_VCI( NP,K,S ) = S_CCR( NP,S,K )
-            S_UI( NP,K )  = 0.0D0
-          END DO
-#endif
           VCI( K,S ) = C( S,K )
           UI( K )  = 0.0           ! init variable for use below
         END DO
@@ -154,15 +123,6 @@ C Compute ACM mixing rate
 C Compute tendency of CBL concentrations - Semi-Implicit solution
 
           DO K = CLBASE, CLTOP
-#ifdef sens
-            DO NP = 1, NPMAX
-              S_DELC( NP ) = REAL( DTS, 8 )
-     &                     * ( REAL ( MBARKS( K ), 8 ) * S_VCI( NP,KB,S )
-     &                     -   REAL ( MDWN( K ), 8 ) * S_VCI( NP,K,S )
-     &                     + REAL( (DSIGH( K+1 ) * DSIGHI( K ) * MDWN( K+1 )), 8 ) * S_VCI( NP,K+1,S ) )
-              S_DI( NP,K ) = S_VCI( NP,K,S ) + ( 1.0D0 - REAL( CRANKP, 8 ) ) * S_DELC( NP )
-            END DO
-#endif
             DELC = DTS
      &           * ( MBARKS( K ) * VCI( KB,S )
      &           -   MDWN( K ) * VCI( K,S )
@@ -172,13 +132,7 @@ C Compute tendency of CBL concentrations - Semi-Implicit solution
             BI( K ) = 1.0 + CRANKP * MDWN( K ) * DTS
             AI( K ) = -CRANKP * MBARKS( K ) * DTS
           END DO
-#ifdef sens
-          DO NP = 1, NPMAX
-            S_F1( NP ) = REAL (M1UP, 8) * S_VCI( NP,KB,S )
-     &                 - REAL (MDWN( CLBASE ), 8) * S_VCI( NP,CLBASE,S ) * REAL(DSIGH( CLBASE ), 8)
-            S_DI( NP,KB ) = S_VCI( NP,KB,S ) - ( 1.0D0 - REAL(CRANKP,8) ) * S_F1( NP ) * REAL( (DSIGHI( KB ) * DTS), 8)
-          END DO
-#endif
+
           BI( KB ) = 1.0 + CRANKP * M1UP * DTS * DSIGHI( KB )
           F1 = M1UP * VCI( KB,S )
      &       - MDWN( CLBASE ) * VCI( CLBASE,S ) * DSIGH( CLBASE )
@@ -187,45 +141,22 @@ C Compute tendency of CBL concentrations - Semi-Implicit solution
 C Define arrays A,B,E which make up matrix and D which is RHS
 
           BETA = DI( KB )
-#ifdef sens
-          DO NP = 1, NPMAX
-            S_BETA( NP ) = S_DI( NP,KB )
-          END DO
-#endif
           GAMA = BI( KB )
           ALPHA = 1.0
           DO K = CLBASE, CLTOP
             ALPHA = -ALPHA * EI( K ) / BI( K )
             BETA  = ALPHA * DI( K ) + BETA
             GAMA  = ALPHA * AI( K ) + GAMA
-#ifdef sens
-            DO NP = 1, NPMAX
-              S_BETA( NP )  = ALPHA * S_DI( NP,K ) + S_BETA( NP )
-            END DO
-#endif
           END DO
-
-#ifdef sens
-          DO NP = 1, NPMAX
-            S_UI( NP,KB )   = S_BETA( NP ) / GAMA
-            S_UI( NP,CLTOP ) = ( S_DI( NP,CLTOP ) - AI( CLTOP ) * S_UI( NP,KB ) ) / BI( CLTOP )
-          END DO
-#endif
           UI( KB )   = BETA / GAMA
           UI( CLTOP ) = ( DI( CLTOP ) - AI( CLTOP ) * UI( KB ) ) / BI( CLTOP )
 
-c         BETA = DI( KB )
-c         GAMA = BI( KB )
-c         ALPHA = 1.0
+          BETA = DI( KB )
+          GAMA = BI( KB )
+          ALPHA = 1.0
 
 C Back substitution:
           DO K = CLTOP - 1, CLBASE, -1
-#ifdef sens
-            DO NP = 1 , NPMAX
-              S_UI( NP,K ) = ( S_DI( NP,K ) - AI( K ) * S_UI( NP,KB ) - EI( K+1 ) * S_UI( NP,K+1 ) )
-     &                     / BI( K )
-            END DO
-#endif
             UI( K ) = ( DI( K ) - AI( K ) * UI( KB ) - EI( K+1 ) * UI( K+1 ) )
      &              / BI( K )
           END DO
@@ -233,39 +164,28 @@ C Back substitution:
 C Update concentrations
           DO K = KB, CLTOP
             VCI( K,S ) = UI( K )
-#ifdef sens
-            DO NP = 1 , NPMAX
-              S_VCI( NP,K,S ) = S_UI( NP,K )
-            END DO
-#endif
           END DO
-
 
 1000    CONTINUE                 ! end loop for species
 2000  CONTINUE               ! end timestep loop
 
       DO S = 1, NSP
-c       TOT1 = 0.0
-c       TOT2 = 0.0
+        TOT1 = 0.0
+        TOT2 = 0.0
 
-c       DO K = 1, CLTOP
-c         TOT1 = TOT1 + C( S,K ) * ( SIGMAF( K-1 ) - SIGMAF( K ) )
-c       END DO
+        DO K = 1, CLTOP
+          TOT1 = TOT1 + C( S,K ) * ( SIGMAF( K-1 ) - SIGMAF( K ) )
+        END DO
 
         CBELOW( S ) = VCI( KB,S )
 
         DO K = CLBASE, CLTOP
           C( S,K ) = VCI( K,S )
         END DO
-#ifdef sens
-        DO NP = 1, NPMAX
-          S_CBELOW( NP,S ) = S_VCI( NP,KB,S )
-          DO K = CLBASE, CLTOP
-            S_CCR( NP,S,K ) = S_VCI( NP,K,S )
-          END DO
-        END DO
-#endif
+
       END DO
 
       RETURN
       END
+
+

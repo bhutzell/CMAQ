@@ -50,6 +50,7 @@ C   21 Jun 10 J.Young: convert for Namelist redesign
 C   11 May 11 D.Wong: incorporated twoway model implementation
 C   27 Sep 11 B.Hutzell: revised method for defining CALL_DEG variable
 C   30 Sep 13 S.Napelenok: ddm-3d implementation for cmaq5.0.2
+C   9 Sep 14 S.Napelenok: bug fix for IRXN logic check
 C
 C**********************************************************************
 
@@ -439,7 +440,8 @@ C Begin code specific to reaction rate sensitivities
                      IF ( RXNFLAG( NP ) ) THEN ! RXNFLAG is true if IPT = 5 and time, date within bounds
                         IREGTEMP = IREGION( C, R, L, NP )
                         DO RXN = 1, NRXNS
-                           IF ( IRXN( NP, RXN ) ) THEN ! This checks if it's a reaction in the sens parameter
+c                          IF ( IRXN( NP, RXN ) ) THEN ! This checks if it's a reaction in the sens parameter
+                           IF ( IRXN( NP, RXN ) .EQ. 1 ) THEN ! This checks if it's a reaction in the sens parameter
                               KSTEP = SRK( RXN ) * CHEMSTEP ! KSTEP = k * timestep(in min)
                               ! RXNMULT is the product of the concs of the reactants
                               ! Note that the first 3 slots of IRR are for reactants,
