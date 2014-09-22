@@ -26,6 +26,8 @@ C 27 September 2013: Sergey L. Napelenok
 C    --- implemented into CMAQv5.0.2
 C    --- disabled hddm activity and water sensitivity calculations
 C    --- to finish code development for these
+C 08 September 2014: Sergey L. Napelenok
+C    --- some minor bug fixes
 C 
 C Reference: 
 C Zhang, W., Capps, S. L., Hu, Y., Nenes, A., Napelenok, S. L., & 
@@ -477,7 +479,8 @@ c     DO I = 1, NIONSPC
   
       REAL IONIC, Q, ZIP
       DOUBLE PRECISION RI, RHG, RI1, RI2, RG0
-  
+      DOUBLE PRECISION SI1, SI2 ! sln 4sep14 
+ 
       REAL B, BI, XX1, XX2
       DOUBLE PRECISION RB
  

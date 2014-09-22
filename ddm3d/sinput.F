@@ -702,7 +702,7 @@ CCCCCCC Specify emission amount? CCCCCCCCCCCCCCCCCCCCCCCCC
 
           DO S = 1, NSPC( NPSEN )
             SPC = SPCORDER( NPSEN, S )
-            READ( JVUNIT, '( a2, f )', END = 999 )
+            READ( JVUNIT, '( a2, f8.2 )', END = 999 )
      &          TXT, AMOUNT
 
             IF ( TXT( :2 ) .NE. BLANK2 ) THEN
@@ -710,12 +710,11 @@ CCCCCCC Specify emission amount? CCCCCCCCCCCCCCCCCCCCCCCCC
               CALL M3EXIT( PNAME,STDATE,STTIME,XMSG,XSTAT1 )
             END IF
 
-
             IF ( AMOUNT .GE. 0 ) THEN
               IAMOUNT( NPSEN, SPC, 1:24 ) = AMOUNT
             ELSE
               DO HOUR = 1, 24
-                READ( JVUNIT, '( a2, f )', END = 999 )
+                READ( JVUNIT, '( a2, f8.2 )', END = 999 )
      &            TXT, AMOUNT
                 IF ( TXT( :2 ) .NE. BLANK2 ) THEN
                   XMSG = 'Expected two blanks before specifying amount.'
@@ -740,7 +739,7 @@ CCCCCCC Specify emission amount? CCCCCCCCCCCCCCCCCCCCCCCCC
 
           ! Which layer?
           IF ( TXT( :7 ) .EQ. '  LAYER' ) THEN
-            READ( JVUNIT, '( a3, i )', END = 999 )
+            READ( JVUNIT, '( a3, i3 )', END = 999 )
      &          TXT, LAYER
             IF ( TXT( :3 ) .NE. BLANK3 ) THEN
               XMSG = 'Expected three blanks before layer number.'
@@ -775,7 +774,7 @@ CCCCCCC What date(s)? CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
             CALL M3EXIT( PNAME,STDATE,STTIME,XMSG,XSTAT1 )
           END IF
 
-          READ( JVUNIT, '( a2, i )', END = 999 )
+          READ( JVUNIT, '( a2, i7 )', END = 999 )
      &          TXT, NUMDATES
 
           IF ( TXT( :2 ) .NE. BLANK2 ) THEN

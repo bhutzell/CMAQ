@@ -103,6 +103,9 @@ C             horizontal grid resolution restriction)
 C       02Aug12 S.Roselle:  instrumented to calculate and return
 C                           transmissivity for convective clouds
 C       23Jul13 S.Napelenok: ddm-3d implementation for cmaq5.0.1
+C       08Sep14 S.Napelenok: fixes for stability to S_BCLDWT and removal
+C                            of ACMLD calls for sensivitity
+C
 C-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -112,7 +115,7 @@ C-----------------------------------------------------------------------
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY: SENGRID, NP, NPMAX, S_CONDEP, S_POLC, S_CEND, S_REMOV, S_REMOVAC, S_CONDEP, S_TOTDEP, 
-     &                      S_CCR, S_CBELOW
+     &                      S_CCR, S_CBELOW, IPT
 #endif 
 
       IMPLICIT NONE
@@ -437,8 +440,12 @@ C...........Statement Functions
       REAL(8), ALLOCATABLE, SAVE :: S_INCLOUD ( :,:,: ) ! fin. in cloud conc. after mix and chem moles/mole
       REAL(8), ALLOCATABLE, SAVE :: S_OUTCLOUD( :,:,: ) ! fin. outside cld conc. "   "   "   " moles/mole
       REAL(8), ALLOCATABLE, SAVE :: S_PCLD    ( :,:,: ) ! moles sp/mole air in cloud
-      REAL(8) S_CONDIS, LMT1, LMT1D
+c     REAL(8) S_CONDIS, LMT1, LMT1D
+      REAL(8) S_CONDIS
       REAL(8) DDM3D_CONCMINL                            ! the conc small number is too small even with real(8)!!!!
+c     REAL, ALLOCATABLE, SAVE :: CCR_TEMP( :,: ), CBELOW_TEMP( : )
+
+
 #endif
 
       INTERFACE
@@ -707,14 +714,28 @@ C...  Get LON
           XMSG = 'Failure allocating S_CCR'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
-        S_REMOVAC = 0.0
+        S_CCR = 0.0D0
+
+c       IF( .NOT. ALLOCATED( CCR_TEMP ) ) ALLOCATE ( CCR_TEMP  ( MXSPCS,NLAYS ), STAT = ALLOCSTAT )
+c       IF ( ALLOCSTAT .NE. 0 ) THEN
+c         XMSG = 'Failure allocating CCR_TEMP'
+c         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+c       END IF
+c       CCR_TEMP = 0.0
+
+c       IF( .NOT. ALLOCATED( CBELOW_TEMP ) ) ALLOCATE ( CBELOW_TEMP  ( MXSPCS ), STAT = ALLOCSTAT )
+c       IF ( ALLOCSTAT .NE. 0 ) THEN
+c         XMSG = 'Failure allocating CBELOW_TEMP'
+c         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+c       END IF
+c       CBELOW_TEMP = 0.0
 
         IF ( .NOT. ALLOCATED( S_CBELOW ) ) ALLOCATE ( S_CBELOW ( NPMAX,MXSPCS ), STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
           XMSG = 'Failure allocating S_REMOVAC'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
-        S_REMOVAC = 0.0
+        S_CBELOW = 0.0D0
 
         ALLOCATE ( S_CONC  ( NPMAX,MXSPCS,NLAYS ), STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -1014,7 +1035,7 @@ C...  initialize all species to CMIN
 !         CONCMINL = CMIN
           CONCMINL =  1.0E-25
 #ifdef sens
-          DDM3D_CONCMINL = 1.0E-15
+          DDM3D_CONCMINL = 1.0D-15
 #endif
 
 C...  set minimum for aerosol species
@@ -1760,6 +1781,7 @@ C...  using direct exchange mixing mechanism by McHenry.
 #endif 
           END DO
 
+
           CALL ACMCLD ( F, CCR, SIGF, CBELOW, CLBASE, CLTOP,
      &                  FRAC, NSPCSD, NLAYS, TCLIFE, DTCLD )
 
@@ -1777,22 +1799,18 @@ C...  using direct exchange mixing mechanism by McHenry.
               CONDIS = CONC( SPC,LAY )
               PCLD( SPC, LAY ) = F( LAY ) * ( FSIDE( LAY ) * CONDIS )
      &                         + ( 1.0 - F( LAY ) ) * CBASE0( SPC )
+              PCLD( SPC, LAY ) = MIN( PCLD( SPC, LAY ), CCR( SPC, LAY ) / FRAC )
+
 #ifdef sens
               DO NP = 1, NPMAX
                 S_CONDIS = S_CONC( NP, SPC, LAY )
+                S_PCLD( NP, SPC, LAY ) = F( LAY ) * ( FSIDE( LAY ) * S_CONDIS )
+     &                         + ( 1.0 - F( LAY ) ) * S_CBASE0( NP,SPC )
+                IF ( PCLD( SPC, LAY ) .EQ. ( CCR( SPC, LAY ) / FRAC ) ) THEN
+                   S_PCLD( NP, SPC, LAY ) = S_CCR( NP, SPC, LAY ) / FRAC
+                END IF
 
-                S_PCLD( NP, SPC, LAY ) = REAL ( F( LAY ), 8 ) * ( REAL ( FSIDE( LAY ), 8 ) * S_CONDIS )
-     &                         + ( 1.0D0 - REAL ( F( LAY ), 8 ) ) * S_CBASE0( NP, SPC )
               END DO
-
-              IF ( PCLD( SPC, LAY ) .GT. CCR( SPC, LAY ) / FRAC ) THEN
-                PCLD( SPC, LAY ) = CCR( SPC, LAY ) / FRAC 
-                DO NP = 1, NPMAX
-                  S_PCLD( NP, SPC, LAY ) = S_CCR( NP, SPC, LAY ) / REAL ( FRAC, 8 )
-                END DO
-              END IF
-#else
-              PCLD( SPC, LAY ) = MIN( PCLD( SPC, LAY ), CCR( SPC, LAY ) / FRAC )
 #endif
 
 C...POLC in moles sp/m2
@@ -1818,24 +1836,44 @@ C...  to be part of the aqueous reaction chamber
               DO SPC = 1, NSPCSD
                 IF ( CBASE0( SPC ) .EQ. 0.0 ) THEN
                   BCLDWT( SPC, LAY ) = 1.0 / CLBASE
+#ifdef sens
+                  DO NP = 1, NPMAX
+c                    S_BCLDWT( NP, SPC, LAY ) = 1.0 / CLBASE
+                     S_BCLDWT( NP, SPC, LAY ) =  0.0D0
+                  END DO
+#endif
                 ELSE
                   BCLDWT( SPC, LAY ) = CONC( SPC, LAY )
      &                               / MAX( CBASE0( SPC ), 1.0E-30 )
+#ifdef sens     
+                  DO NP = 1, NPMAX
+                     IF ( CBASE0( SPC ) .GT. 1.0E-30 ) THEN
+
+                        IF ( S_CBASE0( NP, SPC ) .LT. DDM3D_CONCMINL ) THEN
+c                         S_BCLDWT( NP, SPC, LAY ) = 1.0D0
+                          S_BCLDWT( NP, SPC, LAY ) =  0.0D0
+                        ELSE
+                          S_BCLDWT( NP, SPC, LAY ) = S_CONC( NP, SPC, LAY ) 
+     &                                            / S_CBASE0( NP, SPC )
+                        END IF
+
+
+                     ELSE 
+c                       S_BCLDWT( NP, SPC, LAY ) = S_CONC( NP, SPC, LAY )
+c    &                                           / DDM3D_CONCMINL
+c                       S_BCLDWT( NP, SPC, LAY ) = 1.0D0
+                        S_BCLDWT( NP, SPC, LAY ) =  0.0D0
+                     END IF
+                  END DO
+#endif          
                 END IF
                 PCLD( SPC, LAY ) = CBASEF( SPC ) * BCLDWT( SPC, LAY )
-
 #ifdef sens
                 DO NP = 1, NPMAX
-                   IF ( ABS( S_CBASE0( NP, SPC ) ) .LT. DDM3D_CONCMINL ) THEN
-                     S_BCLDWT( NP, SPC, LAY ) = 1.0 / CLBASE
-                   ELSE
-                     S_BCLDWT( NP, SPC, LAY ) = S_CONC( NP, SPC, LAY ) 
-     &                                        / S_CBASE0( NP, SPC )
-                   END IF
                    S_PCLD( NP, SPC, LAY ) = S_CBASEF( NP, SPC ) * S_BCLDWT( NP, SPC, LAY )
                 END DO
 #endif
- 
+
 C...Necessary because CBASEF and CBASE0 are the ending vertical averages
 C...  below cloud concentrations in moles sp/mole air
 
@@ -2067,7 +2105,7 @@ C...Compute concentration changes in the grid column resulting
 C...  from subgrid scale vertical mixing:
 
 C...first, below cloud base,
-C...   include raining region below cld base
+C...   include raining region below cld base'
 
           DO LAY = 1, CLBASE - 1
             DO SPC = 1, NSPCSD
@@ -2090,6 +2128,13 @@ C...   include raining region below cld base
                   ENDIF
                   S_OUTCLOUD( NP, SPC, LAY ) = S_PCLD( NP,SPC, LAY )
 
+                  IF ( SPC .NE. N_GC_SPCD ) THEN
+                    SENGRID( COL, ROW, LAY, NP, SPC ) =
+     &                      S_INCLOUD ( NP, SPC, LAY ) * FRAC
+     &                    + S_OUTCLOUD( NP, SPC, LAY ) * ( 1.0 - FRAC )
+
+                  END IF
+
                 END DO
 #endif
               ELSE
@@ -2100,6 +2145,7 @@ C...   include raining region below cld base
                 END DO
 #endif 
               ENDIF
+
             END DO
           END DO
 
@@ -2132,9 +2178,9 @@ C...Now do changes in cloudy layers :
                 END IF
 
                 IF ( SPC .NE. N_GC_SPCD ) THEN
-                  SENGRID( COL, ROW, LAY, NP, SPC ) = REAL ( (
-     &                                    S_INCLOUD ( NP, SPC, LAY ) * REAL ( FRAC, 8 )
-     &                                  + S_OUTCLOUD( NP, SPC, LAY ) * ( 1.0D0 - REAL ( FRAC, 8 ) ) ), 4 )
+                  SENGRID( COL, ROW, LAY, NP, SPC ) = 
+     &                      S_INCLOUD ( NP, SPC, LAY ) * FRAC 
+     &                    + S_OUTCLOUD( NP, SPC, LAY ) * ( 1.0 - FRAC )
                 END IF
               END DO
 #endif

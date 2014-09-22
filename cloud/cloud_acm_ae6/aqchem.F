@@ -112,6 +112,7 @@ C                       removed from the calculation of the estimate for doublin
 C                       the time step based on sulfur oxidized < 5%.
 C   28 Nov 12 G.Sarwar: Sulfate inhibition effect is implemented in the metal catalysis pathway
 C   16 Jul 13 S.Napelenok: ddm-3d implementation for cmaq5.0.1
+C    8 Sep 14 S.Napelenok: fix for stability in AORGC sensitivity
 C
 C  References:
 C     Walcek & Taylor, 1986, A theoretical Method for computing
@@ -1845,17 +1846,25 @@ C...calculate the change in sulfur iv for this time step
           DO NP = 1, NPMAX
             S_TGLY( NP )  = S_INITGAS( NP, LGLY ) * ONE_OVER_XL
             S_TMGLY( NP ) = S_INITGAS( NP, LMGLY ) * ONE_OVER_XL
-            IF ( IPT(NP) .EQ. 4 ) THEN ! hddm
-              IP1 = IHIGH(NP,1)
-              IP2 = IHIGH(NP,2)
-              S_DGLYDT( NP ) = -RGLY3 * ( S_GLYL( NP )  * OHL          + S_GLYL( IP1 ) * S_OHL( IP2 )
-     &                                  + S_GLYL( IP2 ) * S_OHL( IP1 ) + GLYL          * S_OHL( NP ) )
-              S_DMGLYDT( NP ) = -RMGLY3 * ( S_MGLYL( NP )  * OHL          + S_MGLYL( IP1 ) * S_OHL( IP2 )
-     &                                    + S_MGLYL( IP2 ) * S_OHL( IP1 ) + MGLYL          * S_OHL( NP ) )
-            ELSE
-              S_DGLYDT( NP ) = -RGLY3 * ( S_GLYL( NP ) * OHL + GLYL * S_OHL( NP ) )
-              S_DMGLYDT( NP ) = -RMGLY3 * ( S_MGLYL( NP ) * OHL + MGLYL * S_OHL( NP ) )
-            ENDIF
+c           IF ( IPT(NP) .EQ. 4 ) THEN ! hddm
+c             IP1 = IHIGH(NP,1)
+c             IP2 = IHIGH(NP,2)
+c             S_DGLYDT( NP ) = -RGLY3 * ( S_GLYL( NP )  * OHL          + S_GLYL( IP1 ) * S_OHL( IP2 )
+c    &                                  + S_GLYL( IP2 ) * S_OHL( IP1 ) + GLYL          * S_OHL( NP ) )
+c             S_DMGLYDT( NP ) = -RMGLY3 * ( S_MGLYL( NP )  * OHL          + S_MGLYL( IP1 ) * S_OHL( IP2 )
+c    &                                    + S_MGLYL( IP2 ) * S_OHL( IP1 ) + MGLYL          * S_OHL( NP ) )
+c           ELSE
+c             S_DGLYDT( NP ) = -RGLY3 * ( S_GLYL( NP ) * OHL + GLYL * S_OHL( NP ) )
+c             S_DMGLYDT( NP ) = -RMGLY3 * ( S_MGLYL( NP ) * OHL + MGLYL * S_OHL( NP ) )
+c           ENDIF
+
+c assume no OH sensitivity for now, because it causes instability in sensitvities
+
+            S_DGLYDT( NP ) = -RGLY3 * S_GLYL( NP ) * OHL 
+            S_DMGLYDT( NP ) = -RMGLY3 * S_MGLYL( NP ) * OHL 
+
+
+
           END DO
 #endif
 
@@ -2157,7 +2166,7 @@ C...gas concentrations (mol/molV)
       DO NP = 1, NPMAX
         S_GAS( NP, LSO2   ) = ( S_PSO2F( NP )  + XL *  S_SIV( NP ) )   * RECIPAP1
 c       S_GAS( NP, LH2O2  ) = ( S_PH2O2F( NP ) + XL *  S_H2O2L( NP ) ) * RECIPAP1
-c       S_GAS( NP, LO3    ) = ( S_PO3F( NP )   + XL *  S_O3L( NP ) )   * RECIPAP1
+        S_GAS( NP, LO3    ) = ( S_PO3F( NP )   + XL *  S_O3L( NP ) )   * RECIPAP1
 c       S_GAS( NP, LCO2   ) = ( S_PCO2F( NP )  + XL *  S_CO2L( NP ) )  * RECIPAP1
 c       S_GAS( NP, LFOA   ) = ( S_PFOAF( NP )  + XL * ( S_FOAL( NP ) + S_HCO2( NP ) ) ) * RECIPAP1
 c       S_GAS( NP, LMHP   ) = ( S_PMHPF( NP )  + XL *  S_MHPL( NP ) )  * RECIPAP1
