@@ -919,8 +919,10 @@ C hard-coded values.
 
 C Initialize ctoti as sum of vapor-phase and particle-phase SVOCs
 C Note: all of these CBLK species are in [ug/m**3]
+      upb = 0.0 ! upper bound for bisection method
       Do i = 1, n_vapor
          ctoti( i ) = vapor_conc( i ) + aerospc_conc( soa_aeroMap( i ),2 )
+         upb        = upb + ctoti( i) * mw_vap_m1( i )    ! upper: all moles (semi and nonvolatile)
       End Do
 
 C Equilibrium Partitioning Calculations
@@ -978,8 +980,8 @@ C      of orgaic aerosol. Caer is then calculated based on that number.
         Else
 
 C        Solve for total number of organic moles in aerosol (hotp 7/5/11)
-         lowb      = totorgsw ! lower: moles of nonvolatile
-         upb       = totorg   ! upper: all moles (semi and nonvolatile)
+         lowb      = totorgsw   ! lower: moles of nonvolatile
+         upb       = lowb + upb ! upper: all moles (semi and nonvolatile)
          orgmoles  = soabisect( lowb, upb, totorgsw, c0, ctotf, vapor_mw ) 
 
 C        Determine concentration of each semivoltile (hotp 7/5/11)
@@ -1730,7 +1732,8 @@ C     Result
 C     Local variables
       Real             :: nguess              ! current guess for total moles organic aerosol
       Real             :: oldn, lower, upper, flower, fnguess ! intermediate values
-      Real             :: ea                  ! difference b/w old and new guesses (ug/m3)
+      Real             :: fupper              ! function evaluated at upper bound
+      Real             :: ea                  ! difference b/w old and new guesses (umol/m3)
       Real             :: test                ! to detect sign change
       Integer          :: iter                ! counter to prevent infinite loops
 
@@ -1738,6 +1741,7 @@ C     Store current lower and upper bound, evaluate at lower bound
       lower      = lowerb
       upper      = upperb
       flower     = soaequation( nonvolmol, cstaratt, totsemivol, mlwt, lowerb )
+      fupper     = soaequation( nonvolmol, cstaratt, totsemivol, mlwt, upperb )
 
 C     First guess: solution at upperb
       nguess    = upperb
@@ -1747,6 +1751,13 @@ C     Counter of iterations to prevent infinite loops
 
 C     Iterate until the number of moles changes by less than fractol (percent) or abstol (absolute) amount
       Do
+
+        if ( flower * fupper .gt. 0.0 ) then
+           ! function does not change sign between bounds
+           Call m3exit( pname, 0, 0, 'Error: no solution between bounds
+     &                                in soa bisection', xstat3) 
+        endif
+
         iter    = iter + 1
         oldn    = nguess                        ! store last guess
         nguess  = ( lower + upper )/ 2.0e0      ! new guess is halfway b/w old lower and upper
@@ -1760,6 +1771,7 @@ C     Iterate until the number of moles changes by less than fractol (percent) o
         test = fnguess * flower
         If ( test .lt. 0.0 ) then               ! if function changes sign b/w guess and lower, guess becomes upper
            upper  = nguess
+           fupper = fnguess
         Else If ( test .gt. 0.0 ) then          ! if function does not change sign, guess becomes lowerbound
            lower  = nguess
            flower = fnguess
@@ -1767,6 +1779,8 @@ C     Iterate until the number of moles changes by less than fractol (percent) o
            ea      = 0.0
            nguess  = lower
            fnguess = flower
+        Else If ( fnguess .eq. 0.0 ) then       ! guess is the root
+           ea      = 0.0
         End If
 
         ! solution found if error is less than ABSTOL/100 % or N bounded by values less than 1e-10
