@@ -25,7 +25,6 @@
 ! 17 March 15 D. Luecken:  Added NTR heterogeneous hydrolysis as per
 !    the CB6r3 chemical mechanism used by the Environ CAMX model consult 
 !    references 8 and 9.
-! 22 Feb 16 B.Hutzell: Added Flag stating whether module is initialized
 !-----------------------------------------------------------------------
 
        IMPLICIT NONE
@@ -37,15 +36,13 @@
        REAL,      ALLOCATABLE :: GAMMA_IEPOX(  :,:,:  ) ! IEPOX uptake coeff
        REAL,      ALLOCATABLE :: YCLNO2IJ   (  :,:,:  ) ! Yield CLNO2 in Fine modes 
        REAL,      ALLOCATABLE :: YCLNO2K    (  :,:,:  ) ! Yield CLNO2 in coarse mode 
-
-       LOGICAL                :: AERO_CHEM_SET = .FALSE.
-             
+       
        PUBLIC  KHETERO, GAMMA_N2O5IJ, GAMMA_N2O5K, GAMMA_IEPOX,
-     &         YCLNO2IJ, YCLNO2K, HETCHEM_RATES, AERO_CHEM_SET
+     &         YCLNO2IJ, YCLNO2K, HETCHEM_RATES
        
        PRIVATE 
 
-       INTEGER, PARAMETER :: NUMB_AERO_RATES = 19
+       INTEGER, PARAMETER :: NUMB_AERO_RATES = 21
        
        CHARACTER( 17 ), PARAMETER :: NAMES_AERO_RATES( NUMB_AERO_RATES ) = 
      &                    (/ 'HETERO_N2O5IJ    ', 'HETERO_N2O5K     ', 
@@ -57,7 +54,8 @@
      &                       'HETERO_H2NO3PBJ  ', 'HETERO_N2O5I     ', 
      &                       'HETERO_N2O5J     ', 'HETERO_PNCOMLI   ',
      &                       'HETERO_PNCOMLJ   ', 'HETERO_IEPOX     ',
-     &                       'HETERO_NTR2      ' /)
+     &                       'HETERO_NTR2      ', 'HETERO_BRONO2IJ  ', 
+     &                       'HETERO_BRONO2K '/)     
 
        INTEGER, PARAMETER  :: IA_N2O5IJ         =   1
        INTEGER, PARAMETER  :: IA_N2O5K          =   2
@@ -78,6 +76,8 @@
        INTEGER, PARAMETER  :: IA_PNCOMLJ        =   17
        INTEGER, PARAMETER  :: IA_IEPOX          =   18
        INTEGER, PARAMETER  :: IA_NTR2           =   19
+       INTEGER, PARAMETER  :: IA_BRONO2IJ       =   20
+       INTEGER, PARAMETER  :: IA_BRONO2K        =   21
 
 
        INTEGER, PARAMETER :: INDEX_AERO_RATES( NUMB_AERO_RATES ) = 
@@ -90,8 +90,8 @@
      &                       IA_H2NO3PBJ , IA_N2O5I    , 
      &                       IA_N2O5J    , IA_PNCOMLI  ,
      &                       IA_PNCOMLJ  , IA_IEPOX    ,
-     &                       IA_NTR2    /)
- 
+     &                       IA_NTR2     , IA_BRONO2IJ , 
+     &                       IA_BRONO2K  /) 
        INTEGER               :: SELECTED_AERO_RATES
        INTEGER, ALLOCATABLE  :: WHICH_AERO_RATE( : )
        
@@ -114,7 +114,6 @@ C *** 2nd and 3rd moments before equilibration (without H2O)
 C Isoprene product particle phase reaction rates (Eddingsaas et al. 2010) [1/(M^2 s)]
       REAL ( 8 ), PARAMETER :: K_H_WATER    = 9.0D-4
       REAL ( 8 ), PARAMETER :: K_H_NUC      = 2.0D-4
-      REAL ( 8 ), PARAMETER :: K_H_SO4      = 8.83D-3 ! Piletic et al. 2013, Budisulistiorini et al. in prep
       REAL ( 8 ), PARAMETER :: K_HSO4_WATER = 1.31D-5
       REAL ( 8 ), PARAMETER :: K_HSO4_NUC   = 2.92D-6
 
@@ -137,7 +136,7 @@ C                  Parent   Nucleophile     Acid     Acid    Remove   Rate Const
 C                 (parent)    (nuc)        (acid)    Index   Index       (kchem)      (prod)
 C                 --------  -----------  ----------  -----   ------   -------------  --------
      &   ACID_CAT('IEPOX',  'AH2OJ    ', 'HPLUS   ',   1,     0,       K_H_WATER,    'AISO3J' ),
-     &   ACID_CAT('IEPOX',  'ASO4J    ', 'HPLUS   ',   1,     2,       K_H_SO4,      'AISO3J'  ),
+     &   ACID_CAT('IEPOX',  'ASO4J    ', 'HPLUS   ',   1,     2,       K_H_NUC,      'AISO3J'  ),
      &   ACID_CAT('IEPOX',  'ANO3J    ', 'HPLUS   ',   1,     0,       K_H_NUC,      'AISO3J'  ),
      &   ACID_CAT('IEPOX',  'AH2OJ    ', 'HSO4    ',   2,     0,       K_HSO4_WATER, 'AISO3J' ),
      &   ACID_CAT('IEPOX',  'ASO4J    ', 'HSO4    ',   2,     2,       K_HSO4_NUC,   'AISO3J'  ),
@@ -172,6 +171,7 @@ c            www.atmos-chem-phys-discuss.net/14/15645/2014/doi:10.5194/acpd-14-1
 C 02/09/15 - B.Hutzell - corrected NO2 rate by a factor of two based consulting the stoiciometery for 
 C            reaction published in Sarwar et al. (2008) and its analytical solution
 
+c 12/16/15 - G. Sarwar - Heterogeneous uptake of BRONO2 on aerosols
 c
 c
 c  REFERENCES:
@@ -244,12 +244,14 @@ C *** Parameters
       REAL( 8 ), PARAMETER :: AQUEOUS_FREQUENCY = 1.0D+9
       REAL( 8 ), PARAMETER :: INV_SQRT_MWNO2  = 1.47425932467825D-1
       REAL( 8 ), PARAMETER :: INV_SQRT_MWN2O5 = 9.62161363758323D-2
+      REAL( 8 ), PARAMETER :: INV_SQRT_MWBRONO2 = 8.394770000000D-2  
+
       REAL( 8 ), PARAMETER :: UGM3_CONV_FAC   = 8.31251724585556D00 ! =1.0E-3*AIRDENS_STD*(PRESS_STD/TEMP_STD)
       REAL( 8 ), PARAMETER :: COEF1           = 7.24382926227485D10 ! Molec/cc to ppm conv factor 
       REAL( 8 ), PARAMETER :: COEF2           = 2.14805198392421D13 ! convert air density [kg/m3] to number density [ppm]
 
-
       REAL( 8 ), PARAMETER :: STD_DIFF_N2O5 = 0.0855D-4  ! N2O5 molecular diffusivity at 101325 Pa and 273.15 K [m2/sec]
+      REAL( 8 ), PARAMETER :: STD_DIFF_BRONO2 = 0.1051D-4  ! BRONO2 molecular diffusivity at 101325 Pa and 273.15 K [m2/sec]
 
       REAL,      PARAMETER :: GPKG        = 1.0E+03                      ! g/kg unit conversion
       REAL,      PARAMETER :: CFACTOR     = 8.0 * GPKG  * RGASUNIV / PI  ! factor in cbar_coeff
@@ -279,6 +281,7 @@ C *** Local Variables
       REAL( 8 )    :: KN2O5( N_MODE  ) ! pseudo-first order rate constant, sec-1
       REAL( 8 )    :: KNO2             ! pseudo-first order rate constant, sec-1
       REAL( 8 )    :: KIEPOX           ! pseudo-first order rate constant, sec-1
+      REAL( 8 )    :: KBRONO2          ! pseudo-first order rate constant, sec-1
 
       REAL( 8 )    :: CBAR_COEFF       ! cell coefficient for mean molecular speed
       REAL( 8 )    :: ADJUST_DIFF      ! Cell temp and press correction to diffusivity
@@ -298,8 +301,11 @@ C *** Local Variables
       
       REAL( 8 )    :: CBAR             ! molecular velocity of N2O5 (m/s)
       REAL( 8 )    :: CBARIEPOX        ! molecular velocity of IEPOX (m/s)
+      REAL( 8 )    :: CBAR_BRONO2      ! molecular velocity of BRONO2 (m/s)  
 
-
+      REAL( 8 )    :: GAMMA_BRONO2     ! rxn probability for BRONO2 on aerosol, Yang et al., JGR, 2005
+      REAL( 8 )    :: INV_DIFF_BRONO2  ! reciprocal molecular diffusivity [m2/sec] 
+                  
       LOGICAL      :: M3_WET_FLAG ! true = include H2O and SOA in 3rd moment
       LOGICAL      :: LIMIT_SG    ! fix coarse and accum Sg's to the input value?
 
@@ -471,8 +477,6 @@ C *** 2nd and 3rd moments before equilibration (without H2O)
 
        F_PART_NTR2 = 0.0
 
-       AERO_CHEM_SET = .TRUE.
-
       END IF   ! first time condition
 
       KHETERO      = 0.0D0
@@ -578,6 +582,10 @@ C *** correct N2O5 molecular diffusivity for ambient conditions
 
                INV_DIFFUSIVITY  = 1.0D0 / ( STD_DIFF_N2O5 * ADJUST_DIFF )
 
+C *** correct BRONO2 molecular diffusivity for ambient conditions - assumed similar to that of N2O5
+
+               INV_DIFF_BRONO2  = 1.0D0 / ( STD_DIFF_BRONO2 * ADJUST_DIFF )
+
 C *** get KN2O5 rate constants YIELD_CLNO2 for each mode
                YIELD_CLNO2 = 0.0D0
                YIELDIJ     = 0.0D0
@@ -627,8 +635,12 @@ c *** compute yield from lumped Aitken and Accumulations concentrations
 C *** calculate aerosol surface area
                TOTSURFA = ( WET_M2( 1 ) + WET_M2( 2 ) ) * DPI
 
-               LOOP_RATES: DO IRATE = 1, SELECTED_AERO_RATES
-             
+C *** set up variables needed for calculating K_BRONO2 
+              CBAR_BRONO2 = CBAR_COEFF * INV_SQRT_MWBRONO2
+
+              GAMMA_BRONO2 = 0.3D0                       ! rxn probability for BRONO2 on aerosol, Yang et al., JGR, 2005
+
+               LOOP_RATES: DO IRATE = 1, SELECTED_AERO_RATES             
  
                SELECT CASE( WHICH_AERO_RATE( IRATE ) )
                   CASE( IA_N2O5IJ )  
@@ -799,6 +811,27 @@ C hydrolysis
                         KHETERO( IRATE, C, R, L ) = REAL( F_PART_NTR2 * KHON, 8 ) ! [1/min]
      &                                            * ( 5.0D0 * AIRRH - 1.0D0 )
                      END IF
+
+C *** calculate KBRONO2 for each mode
+
+                 CASE( IA_BRONO2IJ )                              
+     
+                  KBRONO2 = WET_M2( 1 ) * DPI /
+     &                         ( 0.5D0 * DE_WET( 1 ) * INV_DIFF_BRONO2 + 
+     &                           4.0D0 / ( CBAR_BRONO2 * GAMMA_BRONO2 )) 
+     &        +             WET_M2( 2 ) * DPI /
+     &                         ( 0.5D0 * DE_WET( 2 ) * INV_DIFF_BRONO2 +
+     &                           4.0D0 / ( CBAR_BRONO2 * GAMMA_BRONO2 )) 
+              
+                  KHETERO( IRATE, C,R,L ) = 60.0D0 * KBRONO2
+
+                 CASE( IA_BRONO2K )                              
+
+                  KBRONO2 = WET_M2( 3 ) * DPI /
+     &                         ( 0.5D0 * DE_WET( 3 ) * INV_DIFF_BRONO2 + 
+     &                           4.0D0 / ( CBAR_BRONO2 * GAMMA_BRONO2 ))
+
+                  KHETERO( IRATE, C,R,L ) = 60.0D0 * KBRONO2
 
                END SELECT
 
