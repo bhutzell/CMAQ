@@ -226,6 +226,14 @@ C Open the grid file, with contains latitude and longitude
             CALL SUBHFILE ( GRID_CRO_2D, GXOFF, GYOFF,
      &                      STRTCOLGC2, ENDCOLGC2, STRTROWGC2, ENDROWGC2 )
 
+C Read longitude from the grid file
+           IF ( .NOT. INTERPX( GRID_CRO_2D, 'LON', PNAME,
+     &                         STRTCOLGC2,ENDCOLGC2,STRTROWGC2,ENDROWGC2,
+     &                         1, 1, 0, 0, ILON ) ) THEN
+              XMSG = 'Could not interpolate LON from ' // GRID_CRO_2D
+              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+           END IF
+
 C Get the surface ozone concentration (ppbv)
             VARNM = 'O3'
             LGC_O3 = INDEX1( VARNM, N_GC_SPC, GC_SPC )
@@ -570,14 +578,6 @@ C Store results in the OCEAN and SZONE arrays.
               XMSG = 'Could not interpolate CHLO from ' // OCEAN_1 //
      &               '.  Chlorophyll-a concentrations set to zero.'
               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
-           END IF
-
-C Read longitude from the grid file
-           IF ( .NOT. INTERPX( GRID_CRO_2D, 'LON', PNAME,
-     &                         STRTCOLGC2,ENDCOLGC2,STRTROWGC2,ENDROWGC2,
-     &                         1, 1, 0, 0, ILON ) ) THEN
-              XMSG = 'Could not interpolate LON from ' // GRID_CRO_2D
-              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
            END IF
 
 
