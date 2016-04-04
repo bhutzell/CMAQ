@@ -44,8 +44,6 @@ C      5 Jun 2012 J.Bash: Added support for NH3 bidirectional exchange. Fertiliz
 C                         sector emissions are subtracted from the total NH3 emissions
 C                         if the CTM_ABFLUX flag is set
 C     07 Nov 14 J.Bash: Updated for the ASX_DATA_MOD shared data module. 
-C     24 Feb 16 B.Murphy: Generalize scaling of point source species based on
-C                         mapping model species, not point source species
 C     03 Mar 16 B.Gantt/G. Sarwar: incorporated halogen emissions
 C-----------------------------------------------------------------------
 
@@ -92,7 +90,7 @@ C-----------------------------------------------------------------------
       CONTAINS
 
 C-----------------------------------------------------------------------
-         FUNCTION EMIS_INIT ( JDATE, JTIME, TSTEP, CGRID ) RESULT ( SUCCESS )
+         FUNCTION EMIS_INIT ( JDATE, JTIME, TSTEP ) RESULT ( SUCCESS )
 
          USE CGRID_SPCS          ! CGRID mechanism species
          USE BEIS_DEFN           ! biogenic emissions
@@ -111,7 +109,6 @@ C Includes:
 
 C Arguments:
          INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP   ! TSTEP is output time step (HHMMSS)
-         REAL, POINTER :: CGRID( :,:,:,: )
          LOGICAL :: SUCCESS
 
 C Parameters:
@@ -154,7 +151,7 @@ C In-line biogenic emissions?
 
 C In-line marine gas emissions?
 
-         IF ( .NOT. MGEMIS_INIT( JDATE, JTIME, TSTEP, CGRID ) ) THEN
+         IF ( .NOT. MGEMIS_INIT( JDATE, JTIME, TSTEP ) ) THEN
             XMSG = 'Failure initializing marine gas emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
@@ -314,7 +311,7 @@ C combined gas emssions conversion factor
          END FUNCTION EMIS_INIT
 
 C-----------------------------------------------------------------------
-         SUBROUTINE GET_EMIS ( JDATE, JTIME, TSTEP, CONVPA )
+         SUBROUTINE GET_EMIS ( JDATE, JTIME, TSTEP, CONVPA, CGRID )
 
 C NEW APPROACH:
 C Apply NML factors to all *input* emissions and inline plume rise, aero emis
@@ -339,9 +336,10 @@ C Includes:
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments:
-         INTEGER, INTENT( IN ) :: JDATE, JTIME  ! date (YYYYDDD), time (HHMMSS)
-         INTEGER, INTENT( IN ) :: TSTEP( 3 )    ! time step vector (HHMMSS)
-         REAL,    INTENT( IN ) :: CONVPA        ! conversion factor to pressure in Pascals
+         INTEGER, INTENT( IN ) :: JDATE, JTIME     ! date (YYYYDDD), time (HHMMSS)
+         INTEGER, INTENT( IN ) :: TSTEP( 3 )       ! time step vector (HHMMSS)
+         REAL,    INTENT( IN ) :: CONVPA           ! conversion factor to pressure in Pascals
+         REAL, POINTER :: CGRID( :,:,:,: )
 
 C Local Variables:
          REAL             CNVTC         ! combined conversion factor
@@ -438,8 +436,7 @@ C merge: VDEMIS_BI in mol/hr. Convert to ppm/sec
                      IF ( V .GT. 0 ) THEN
                         N = N + 1
                         VDEMIS( V,L,C,R ) = VDEMIS( V,L,C,R )
-     &                                    + CNVTC * GC_EMIS_FAC( V )
-     &                                            * VDEMIS_BI( N,C,R )
+     &                                    + CNVTC * GC_EMIS_FAC( V ) * VDEMIS_BI( N,C,R )
                       END IF
                   END DO
                END DO
@@ -449,7 +446,7 @@ C merge: VDEMIS_BI in mol/hr. Convert to ppm/sec
 
 C marine gas emissions
          IF ( MGEM ) THEN
-         CALL GET_MGEMIS ( JDATE, JTIME, TSTEP )
+            CALL GET_MGEMIS ( JDATE, JTIME, TSTEP, CGRID )
 
             L = 1
             CNVTI = CONVPA * CNVTE * Grid_Data%RDX3F( L )  ! per sec
@@ -482,8 +479,7 @@ C lightning NO
                      CNVTC = CNVTI * Met_Data%RRHOJ( C,R,L )
                      V = LTNG_MAP
                      VDEMIS( V,L,C,R ) = VDEMIS( V,L,C,R )
-     &                                 + CNVTC * GC_EMIS_FAC( V )
-     &                                         * VDEMIS_LT( C,R,L )
+     &                                 + CNVTC * GC_EMIS_FAC( V ) * VDEMIS_LT( C,R,L )
                   END DO
                END DO
             END DO
@@ -508,8 +504,7 @@ C accessed by GET_AERO_EMIS to be "speciated" and merged with the AE emissions.
                         N = PTEM_MAP( S )     ! <- pointer to non-PM emissions
                         IF ( V .LT. 1 ) CYCLE
                         VDEMIS( V,L,C,R ) = VDEMIS( V,L,C,R )
-     &                                    + CNVTC * SPC_PTEM_FAC( S )
-     &                                            * VDEMIS_PT( C,R,L,N )
+     &                                    + CNVTC * VDEMIS_PT( C,R,L,N )
                      END DO
                   END DO
                END DO
