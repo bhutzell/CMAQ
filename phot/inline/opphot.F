@@ -204,6 +204,24 @@ C...CSA Variables, Units and Descriptions for RJ_FILE
          VDESC3D( N ) = 'broad band reflection for clear sky at top of atmosphere'
          VTYPE3D( N ) = M3REAL
 
+         N = N + 1
+         VNAME3D( N ) = 'ADJ_TROP_0ZONE'
+         UNITS3D( N ) = 'NONE'
+         VDESC3D( N ) = 'Factor used to adjust tropospheric (below model top) ozone optical depth'
+         VTYPE3D( N ) = M3REAL
+
+         N = N + 1
+         VNAME3D( N ) = 'NUM_ADJ_TROPO3'
+         UNITS3D( N ) = 'per TSTEP'
+         VDESC3D( N ) = 'Number of adjustments to tropospheric ozone optical depth'
+         VTYPE3D( N ) = M3INT
+
+         N = N + 1
+         VNAME3D( N ) = 'MIN_FRAC_STRATO3'
+         UNITS3D( N ) = 'NONE'
+         VDESC3D( N ) = 'Minimum fraction of total ozone column density above the top pressure level'
+         VTYPE3D( N ) = M3REAL
+
          DO JWL = 1, NWL
 
 C...assumes that lamba in nanometers is on order of 100 or less
