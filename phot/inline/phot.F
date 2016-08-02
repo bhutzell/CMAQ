@@ -127,7 +127,7 @@ C...modules
       USE PHOTOLYSIS_ALBEDO    ! surface albedo data and routines
       USE PHOT_MET_DATA        ! Met and Grid data
       USE CLOUD_OPTICS         ! data and routines for optics of cloud hydrometeors
-      USE STRATOS_O3_MINFRACS  ! annual minimum fraction of ozone column density above Pressure TOP
+!     USE STRATOS_O3_MINFRACS  ! annual minimum fraction of ozone column density above Pressure TOP
       USE SEAS_STRAT_O3_FRACS  ! monthly minimum fraction of ozone column density above Pressure TOP
 
 #ifdef parallel

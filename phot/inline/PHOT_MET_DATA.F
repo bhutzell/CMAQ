@@ -65,7 +65,9 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &             DENS, TA, PRES, ZM, ZFULL, DIST_TO_SUN
 
 ! public procedures:
-         PUBLIC :: GET_PHOT_MET, UPDATE_SUN, CLEAR_ACM_CLOUD, CAPTURE_ACM_CLOUD
+         PUBLIC :: GET_PHOT_MET, UPDATE_SUN, CLEAR_ACM_CLOUD, CAPTURE_ACM_CLOUD,
+     &             INIT_PHOT_MET
+
            
          PRIVATE
 
