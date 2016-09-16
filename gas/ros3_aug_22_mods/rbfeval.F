@@ -94,59 +94,56 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Loop over reactions to calculate dc/dt
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-!      DO 100 NRX = 1, NUSERAT( NCSP )
+      DO 100 NRX = 1, NUSERAT( NCSP )
 
-!         NRK = NKUSERAT( NRX,NCSP )
-      DO 100 NRX = RXNS_START(NCSP), NRXNS
-
-!         NRK = NKUSERAT( NRX,NCSP )
+         NRK = NKUSERAT( NRX,NCSP )
 
 c..Calculate reaction rate
-         IF ( NREACT( NRX ) .EQ. 1 ) THEN
-            ISP1 = IRM2( 1, NRX )
+         IF ( NREACT( NRK ) .EQ. 1 ) THEN
+            ISP1 = IRM2( 1, NRK )
             DO NCELL = 1, NUMCELLS
-               RXRAT( NCELL,NRX ) = RKI( NCELL,NRX )
+               RXRAT( NCELL,NRK ) = RKI( NCELL,NRK )
      &                            * YIN( NCELL,ISP1 )
             END DO
-         ELSE IF ( NREACT( NRX ) .EQ. 2 ) THEN
-            ISP1 = IRM2( 1,NRX )
-            ISP2 = IRM2( 2,NRX )
+         ELSE IF ( NREACT( NRK ) .EQ. 2 ) THEN
+            ISP1 = IRM2( 1,NRK )
+            ISP2 = IRM2( 2,NRK )
             DO NCELL = 1, NUMCELLS
-               RXRAT( NCELL,NRX ) = RKI( NCELL,NRX )
+               RXRAT( NCELL,NRK ) = RKI( NCELL,NRK )
      &                            * YIN( NCELL,ISP1 )
      &                            * YIN( NCELL,ISP2 )
             END DO
-         ELSE IF ( NREACT( NRX ) .EQ. 3 ) THEN
-            ISP1 = IRM2( 1,NRX )
-            ISP2 = IRM2( 2,NRX )
-            ISP3 = IRM2( 3,NRX )
+         ELSE IF ( NREACT( NRK ) .EQ. 3 ) THEN
+            ISP1 = IRM2( 1,NRK )
+            ISP2 = IRM2( 2,NRK )
+            ISP3 = IRM2( 3,NRK )
             DO NCELL = 1, NUMCELLS
-               RXRAT( NCELL,NRX) = RKI( NCELL,NRX )
+               RXRAT( NCELL,NRK ) = RKI( NCELL,NRK )
      &                            * YIN( NCELL,ISP1 )
      &                            * YIN( NCELL,ISP2 )
      &                            * YIN( NCELL,ISP3 )
             END DO 
-         ELSE IF ( NREACT( NRX ) .EQ. 0 ) THEN
+         ELSE IF ( NREACT( NRK ) .EQ. 0 ) THEN
             DO NCELL = 1, NUMCELLS
-               RXRAT( NCELL,NRX ) = RKI( NCELL,NRX )
+               RXRAT( NCELL,NRK ) = RKI( NCELL,NRK )
             END DO
          END IF
          
 c..Subtract loss terms from dc/dt for this reaction 
-         DO NR = 1, NREACT( NRX )
-            ISP1 = IRM2( NR,NRX )
+         DO NR = 1, NREACT( NRK )
+            ISP1 = IRM2( NR,NRK )
             DO NCELL = 1, NUMCELLS
                YDOT( NCELL,ISP1 ) = YDOT( NCELL,ISP1 )
-     &                            - RXRAT( NCELL,NRX )
+     &                            - RXRAT( NCELL,NRK )
             END DO
          END DO
   
 c..Add production terms to dc/dt for this reaction
-         DO NP = 1, NPRDCT( NRX )
-            ISP1 = IRM2( NP+3,NRX )
+         DO NP = 1, NPRDCT( NRK )
+            ISP1 = IRM2( NP+3,NRK )
             DO NCELL = 1, NUMCELLS
              YDOT( NCELL,ISP1 ) = YDOT( NCELL,ISP1 )
-     &                          + SC( NRX,NP ) * RXRAT( NCELL,NRX )
+     &                          + SC( NRK,NP ) * RXRAT( NCELL,NRK )
             END DO
          END DO
 

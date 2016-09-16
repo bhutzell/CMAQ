@@ -395,9 +395,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          END IF
       END DO
 
-      RXNS_START( 1 ) = 1
-      RXNS_START( 2 ) = RXNS_START( 1 ) + NSUNLIGHT_RXNS
-      
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Do symbolic LU decomposition to determine sparse storage array
 c  structures. Done twice, first for day and then for night. An entry
@@ -416,17 +413,16 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Fill in the rest of the entries in the Jacobian
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-!         DO NRX = 1, NUSERAT( NCSP )
-          DO NRX = RXNS_START( NCSP), NRXNS
-!            NK = NKUSERAT( NRX,NCSP )
-            DO NR = 1, NREACT( NRX )
-               IRE = IRM2( NR, NRX )
-               DO JAL = 1, NREACT( NRX )
-                  JRE = IRM2( JAL,NRX )
+         DO NRX = 1, NUSERAT( NCSP )
+            NK = NKUSERAT( NRX,NCSP )
+            DO NR = 1, NREACT( NK )
+               IRE = IRM2( NR, NK )
+               DO JAL = 1, NREACT( NK )
+                  JRE = IRM2( JAL,NK )
                   LZERO( JRE,IRE ) = 1
                END DO
-               DO IAP = 1, NPRDCT( NRX )
-                  JPR = IRM2( 3+IAP,NRX )
+               DO IAP = 1, NPRDCT( NK )
+                  JPR = IRM2( 3+IAP,NK )
                   LZERO( JPR,IRE ) = 1 
                END DO
            END DO
@@ -699,32 +695,31 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Set final arrays for partial derivative calculations
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-!         DO NRX = 1, NUSERAT( NCSP )
-          DO NRX = RXNS_START( NCSP), NRXNS
-!            NK = NKUSERAT( NRX,NCSP )
-            DO IAL = 1, NREACT( NRX )
-               IR = IRM2( IAL,NRX )
+         DO NRX = 1, NUSERAT( NCSP )
+            NK = NKUSERAT( NRX,NCSP )
+            DO IAL = 1, NREACT( NK )
+               IR = IRM2( IAL,NK )
 
-               DO JAL = 1, NREACT( NRX )
-                  JR = IRM2( JAL,NRX )
+               DO JAL = 1, NREACT( NK )
+                  JR = IRM2( JAL,NK )
                   IAR = JARRAYPT( JR,IR,NCSP )
-                  NDERIVL( NRX,NCSP ) = NDERIVL( NRX,NCSP ) + 1
-                  NLS = NDERIVL( NRX,NCSP )
-                  JARRL( NLS,NRX,NCSP ) = IAR
-                  JLIAL( NLS,NRX,NCSP ) = IAL
+                  NDERIVL( NK,NCSP ) = NDERIVL( NK,NCSP ) + 1
+                  NLS = NDERIVL( NK,NCSP )
+                  JARRL( NLS,NK,NCSP ) = IAR
+                  JLIAL( NLS,NK,NCSP ) = IAL
                   NDLMAX = MAX( NLS,NDLMAX )
                END DO
                
-               DO IAP = 1, NPRDCT( NRX )
-                  JP = IRM2( IAP+3,NRX )
+               DO IAP = 1, NPRDCT( NK )
+                  JP = IRM2( IAP+3,NK )
                   IAR = JARRAYPT( JP,IR,NCSP )
-                  NDERIVP( NRX,NCSP ) = NDERIVP( NRX,NCSP ) + 1
-                  NPR = NDERIVP( NRX,NCSP )
-                  JARRP(  NPR,NRX,NCSP ) = IAR
-                  JPIAL(  NPR,NRX,NCSP ) = IAL
-                  ICOEFF( NPR,NRX,NCSP ) = 0
-                  IF ( ABS( SC( NRX,IAP ) - 1.0D0 ) .GT. 1.0D-06 ) THEN
-                     ICOEFF( NPR,NRX,NCSP ) = IAP
+                  NDERIVP( NK,NCSP ) = NDERIVP( NK,NCSP ) + 1
+                  NPR = NDERIVP( NK,NCSP )
+                  JARRP(  NPR,NK,NCSP ) = IAR
+                  JPIAL(  NPR,NK,NCSP ) = IAL
+                  ICOEFF( NPR,NK,NCSP ) = 0
+                  IF ( ABS( SC( NK,IAP ) - 1.0D0 ) .GT. 1.0D-06 ) THEN
+                     ICOEFF( NPR,NK,NCSP ) = IAP
                   END IF
                   NDPMAX = MAX( NPR,NDPMAX )
                END DO

@@ -266,7 +266,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             NOCHANG = NOCHANG - 1
          ENDIF
       ENDDO
-  
+ 
+      DO J = 1, ISCHANG( NCS )
+         I = IOLD2NEW( J,NCS )
+         write(6,'(A,2(I4,1X),A16,1X,I6)')'Before PD sort:JOLD,JNEW,CHEMISTRY_SPC( JNEW )ISAPORL( JNEW )= ',
+     &             J,I,CHEMISTRY_SPC( I ),ISAPORL( I )
+      END DO
+ 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Now sort by number of PD terms, fewest at position 1, most at
 c  the end position. 
@@ -296,6 +302,12 @@ c  uncomment the above three lines to turn off ordering
          IOLD2NEW( JOLD, NCS )    = IMINNEW
          IOLD2NEW( IMINOLD, NCS ) = JNEW
       ENDDO
+
+      DO J = 1, ISCHANG( NCS )
+         I = IOLD2NEW( J,NCS )
+         write(6,'(A,2(I4,1X),A16,1X,I6)')'After PD sort:JOLD,JNEW,CHEMISTRY_SPC( JNEW )ISAPORL( JNEW )= ',
+     &             J,I,CHEMISTRY_SPC( I ),ISAPORL( I )
+      END DO
                
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Fill the irm2 array using the new species order developed above.

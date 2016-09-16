@@ -108,14 +108,6 @@ C***********************************************************************
                MSG = 'Error allocating SYC'
                CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
           END IF
-          ALLOCATE( IOLD2NEW( N_SPEC, 1 ), STAT = IOS )
-          IF ( IOS .NE. 0 ) THEN
-               MSG = 'Error allocating IOLD2NEW'
-               CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
-          END IF
-          DO N = 1, NUMB_MECH_SPC
-             IOLD2NEW( N, 1 ) = N
-          END DO
        END IF
 
        IF( .NOT. MAP_CHEMISTRY_SPECIES() )THEN

@@ -97,11 +97,10 @@ c..Block variables
       INTEGER :: NUMCELLS                        ! No. of cells in a block
 
 c..Sparse Matrix variables 
-      INTEGER :: ISCHAN              ! No. of reacting species in current mech
-      INTEGER :: ISCHANG( NCS  )     ! No. of reacting species in day & nite
-      INTEGER :: NUSERAT( NCS2 )     ! No. of active rxns in day & nite
-      INTEGER :: IARRAY(  NCS2 )     ! No. of PD terms in I-hJ matrix
-      INTEGER :: RXNS_START(  NCS2 ) ! start index of reactions constant for 
+      INTEGER :: ISCHAN          ! No. of reacting species in current mech
+      INTEGER :: ISCHANG( NCS  ) ! No. of reacting species in day & nite
+      INTEGER :: NUSERAT( NCS2 ) ! No. of active rxns in day & nite
+      INTEGER :: IARRAY(  NCS2 ) ! No. of PD terms in I-hJ matrix
 
 C Most of the following are allocated in RBINIT
       INTEGER, ALLOCATABLE :: NKUSERAT( :,: )     ! Rxn nos of active rxns
