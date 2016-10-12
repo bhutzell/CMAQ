@@ -477,6 +477,9 @@ C                 IPH(IP,2) to be resolved in caller (CHEMMECH.f)
 
          ELSE IF ( CHR .EQ. 'H' .OR. CHR .EQ. 'h' )THEN
             CALL GETCHAR ( IMECH, INBUF, LPOINT, IEOL, CHR )
+! set to photolysis rate values because depends on sunlight
+            IRXBITS( NXX ) = 0
+            IRXBITS( NXX ) = IBSET ( IRXBITS( NXX ), 1 )
             KTYPE( NXX )        = 12
             NFALLOFF            = NFALLOFF + 1
             IRRFALL( NFALLOFF ) = NXX

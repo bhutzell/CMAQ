@@ -68,7 +68,7 @@ C Local Variables
       LOGICAL, PARAMETER  :: FALSE = .FALSE.
    
       
-      INTEGER ISPC, IRX, IFLD0, IFLD1, IFLD2, NLINES
+      INTEGER ISPC, ISPCNEW, IRX, IFLD0, IFLD1, IFLD2, NLINES
 
       INTEGER, EXTERNAL :: JUNIT
       EXTERNAL NAMEVAL
@@ -156,89 +156,100 @@ C                    1234567890123456789012345678901234567890123456789012
       EXHEAD_RXCM = 'Mechanism Reactions, Rates, etc. COMMON INCLUDE File'
 
       IF( WRITE_CGRID_DATA )THEN
-          WRITE( WRUNIT, 1043 )
+         IF( LITE )THEN
+           WRITE( WRUNIT, 1143 )
+         ELSE
+           WRITE( WRUNIT, 1043 )
+         END IF 
       ELSE
           WRITE( WRUNIT, 1243 )
       END IF
       
 1043  FORMAT( /'!', 1X, 'The following are reserved symbols declared in this',
      &              1X, 'file:'
-     &        /'!', 4X, 'MECHNAME       = Mechanism name'
-     &        /'!', 4X, 'N_GAS_CHEM_SPC = Total number of gas species in chemical mechanism'
-     &        /'!', 4X, 'NUMB_CHEM_SPC  = Total number of species in chemical mechanism'
-     &        /'!', 4X, 'N_ACT_SP       = Number of active (determined by ODE solver) species in mechanism'
-     &        /'!', 4X, 'GAS_CHEM_SPC   = Names of gas species in chemical mechanism'
-     &        /'!', 4X, 'CHEMISTRY_SPC  = Names of species in chemical mechanism'
-     &        /'!', 4X, 'CGRID_INDEX    = CGRID Index of species in chemical mechanism'
-     &        /'!', 4X, 'SPECIES_TYPE   = Group or type of species '
-     &        /'!', 4X, 'SPECIES_MOLWT  = Molecular Weight of species (gm/mole)'
-     &        /'!', 4X, 'NRXNS          = Number of mechanism reactions'
-     &        /'!', 4X, 'KUNITS         = Units of mechanism reactions'
-     &        /'!', 4X, 'KTYPE          = Reaction type'
-     &        /'!', 4X, 'IRXBITS        = Bit test mask vector for selected reactions'
-     &        /'!', 4X, 'IORDER         = Order of the reaction'
-     &        /'!', 4X, 'KTN1           = Number of type 1 reactions'
-     &        /'!', 4X, 'KRX1           = Reactions list pointer to type 1 reactions'
-     &        /'!', 4X, 'KTN2           = Number of type 2 reactions'
-     &        /'!', 4X, 'KRX2           = Reactions list pointer to type 2 reactions'
-     &        /'!', 4X, 'KTN3           = Number of type 3 reactions'
-     &        /'!', 4X, 'KRX3           = Reactions list pointer to type 3 reactions'
-     &        /'!', 4X, 'KTN4           = Number of type 4 reactions'
-     &        /'!', 4X, 'KRX4           = Reactions list pointer to type 4 reactions'
-     &        /'!', 4X, 'KTN5           = Number of type 5 reactions'
-     &        /'!', 4X, 'KRX5           = Reactions list pointer to type 5 reactions'
-     &        /'!', 4X, 'KTN6           = Number of type 6 reactions'
-     &        /'!', 4X, 'KRX6           = Reactions list pointer to type 6 reactions'
-     &        /'!', 4X, 'KTN7           = Number of type 7 reactions'
-     &        /'!', 4X, 'KRX7           = Reactions list pointer to type 7 reactions' )
+     &        /'!', 4X, 'MECHNAME        = Mechanism name'
+     &        /'!', 4X, 'N_GAS_CHEM_SPC  = Total number of gas species in chemical mechanism'
+     &        /'!', 4X, 'NUMB_CHEM_SPC   = Total number of species in chemical mechanism'
+     &        /'!', 4X, 'N_ACT_SP        = Number of active (determined by ODE solver) species in mechanism'
+     &        /'!', 4X, 'GAS_CHEM_SPC    = Names of gas species in chemical mechanism'
+     &        /'!', 4X, 'CHEMISTRY_SPC   = Names of species in chemical mechanism'
+     &        /'!', 4X, 'CGRID_INDEX     = CGRID Index of species in chemical mechanism'
+     &        /'!', 4X, 'SPECIES_TYPE    = Group or type of species '
+     &        /'!', 4X, 'SPECIES_MOLWT   = Molecular Weight of species (gm/mole)'
+     &        /'!', 4X, 'NRXNS           = Number of mechanism reactions'
+     &        /'!', 4X, 'NSUNLIGHT_RXNS  = Number of mechanism reactions requiring sunlight',
+     &        /'!', 4X, 'NTHERMAL_RXNS   = Number of mechanism reactions not requiring sunlight',
+     &        /'!', 4X, 'KUNITS          = Units of mechanism reactions'
+     &        /'!', 4X, 'KTYPE           = Reaction type'
+     &        /'!', 4X, 'IRXBITS         = Bit test mask vector for selected reactions'
+     &        /'!', 4X, 'IORDER          = Order of the reaction'
+     &        /'!', 4x, 'NTERMS_JACOB    = Maximum number of nonzero terms in day/night Jacobian'
+     &        /'!', 4x, 'MSTEPS_JACOB    = Maximum number of LU Decomposition steps to solve each Jacobian'
+     &        /'!', 4X, 'KTN1            = Number of type 1 reactions'
+     &        /'!', 4X, 'KRX1            = Reactions list pointer to type 1 reactions'
+     &        /'!', 4X, 'KTN2            = Number of type 2 reactions'
+     &        /'!', 4X, 'KRX2            = Reactions list pointer to type 2 reactions'
+     &        /'!', 4X, 'KTN3            = Number of type 3 reactions'
+     &        /'!', 4X, 'KRX3            = Reactions list pointer to type 3 reactions'
+     &        /'!', 4X, 'KTN4            = Number of type 4 reactions'
+     &        /'!', 4X, 'KRX4            = Reactions list pointer to type 4 reactions'
+     &        /'!', 4X, 'KTN5            = Number of type 5 reactions'
+     &        /'!', 4X, 'KRX5            = Reactions list pointer to type 5 reactions'
+     &        /'!', 4X, 'KTN6            = Number of type 6 reactions'
+     &        /'!', 4X, 'KRX6            = Reactions list pointer to type 6 reactions'
+     &        /'!', 4X, 'KTN7            = Number of type 7 reactions'
+     &        /'!', 4X, 'KRX7            = Reactions list pointer to type 7 reactions' )
 
 1243  FORMAT( /'C', 1X, 'The following are reserved symbols declared in this',
      &              1X, 'INCLUDE file:'
-     &        /'C', 4X, 'MECHNAME       = Mechanism name'
-     &        /'C', 4X, 'N_GAS_CHEM_SPC = Total number of gas species in chemical mechanism'
-     &        /'C', 4X, 'NUMB_CHEM_SPC  = Total number of species in chemical mechanism'
-     &        /'C', 4X, 'N_ACT_SP       = Number of active (determined by ODE solver) species in mechanism'
-     &        /'C', 4X, 'GAS_CHEM_SPC   = Names of gas species in chemical mechanism'
-     &        /'C', 4X, 'NRXNS          = Number of mechanism reactions'
-     &        /'C', 4X, 'KUNITS         = Units of mechanism reactions'
-     &        /'C', 4X, 'KTYPE          = Reaction type'
-     &        /'C', 4X, 'IRXBITS        = Bit test mask vector for selected reactions'
-     &        /'C', 4X, 'IORDER         = Order of the reaction'
-     &        /'C', 4X, 'KTN1           = Number of type 1 reactions'
-     &        /'C', 4X, 'KRX1           = Reactions list pointer to type 1 reactions'
-     &        /'C', 4X, 'KTN2           = Number of type 2 reactions'
-     &        /'C', 4X, 'KRX2           = Reactions list pointer to type 2 reactions'
-     &        /'C', 4X, 'KTN3           = Number of type 3 reactions'
-     &        /'C', 4X, 'KRX3           = Reactions list pointer to type 3 reactions'
-     &        /'C', 4X, 'KTN4           = Number of type 4 reactions'
-     &        /'C', 4X, 'KRX4           = Reactions list pointer to type 4 reactions'
-     &        /'C', 4X, 'KTN5           = Number of type 5 reactions'
-     &        /'C', 4X, 'KRX5           = Reactions list pointer to type 5 reactions'
-     &        /'C', 4X, 'KTN6           = Number of type 6 reactions'
-     &        /'C', 4X, 'KRX6           = Reactions list pointer to type 6 reactions'
-     &        /'C', 4X, 'KTN7           = Number of type 7 reactions'
-     &        /'C', 4X, 'KRX7           = Reactions list pointer to type 7 reactions' )
+     &        /'C', 4X, 'MECHNAME        = Mechanism name'
+     &        /'C', 4X, 'N_GAS_CHEM_SPC  = Total number of gas species in chemical mechanism'
+     &        /'C', 4X, 'NUMB_CHEM_SPC   = Total number of species in chemical mechanism'
+     &        /'C', 4X, 'N_ACT_SP        = Number of active (determined by ODE solver) species in mechanism'
+     &        /'C', 4X, 'GAS_CHEM_SPC    = Names of gas species in chemical mechanism'
+     &        /'C', 4X, 'NRXNS           = Number of mechanism reactions'
+     &        /'!', 4X, 'NSUNLIGHT_RXNS  = Number of mechanism reactions requiring sunlight',
+     &        /'!', 4X, 'NTHERMAL_RXNS   = Number of mechanism reactions not requiring sunlight',
+     &        /'C', 4X, 'KUNITS          = Units of mechanism reactions'
+     &        /'C', 4X, 'KTYPE           = Reaction type'
+     &        /'C', 4X, 'IRXBITS         = Bit test mask vector for selected reactions'
+     &        /'C', 4X, 'IORDER          = Order of the reaction'
+     &        /'!', 4x, 'NTERMS_JACOB    = Maximum number of nonzero terms in day/night Jacobian'
+     &        /'!', 4x, 'NSTEPS_JACOB    = Maximum number of LU Decomposition steps to solve each Jacobian'
+     &        /'C', 4X, 'KTN1            = Number of type 1 reactions'
+     &        /'C', 4X, 'KRX1            = Reactions list pointer to type 1 reactions'
+     &        /'C', 4X, 'KTN2            = Number of type 2 reactions'
+     &        /'C', 4X, 'KRX2            = Reactions list pointer to type 2 reactions'
+     &        /'C', 4X, 'KTN3            = Number of type 3 reactions'
+     &        /'C', 4X, 'KRX3            = Reactions list pointer to type 3 reactions'
+     &        /'C', 4X, 'KTN4            = Number of type 4 reactions'
+     &        /'C', 4X, 'KRX4            = Reactions list pointer to type 4 reactions'
+     &        /'C', 4X, 'KTN5            = Number of type 5 reactions'
+     &        /'C', 4X, 'KRX5            = Reactions list pointer to type 5 reactions'
+     &        /'C', 4X, 'KTN6            = Number of type 6 reactions'
+     &        /'C', 4X, 'KRX6            = Reactions list pointer to type 6 reactions'
+     &        /'C', 4X, 'KTN7            = Number of type 7 reactions'
+     &        /'C', 4X, 'KRX7            = Reactions list pointer to type 7 reactions' )
 
 1143  FORMAT( /'!', 1X, 'The following are reserved symbols declared in this',
      &              1X, 'file:'
-     &        /'!', 4X, 'MECHNAME       = Mechanism name'
-     &        /'!', 4X, 'N_GAS_CHEM_SPC = Total number of gas species in chemical mechanism'
-     &        /'!', 4X, 'NUMB_CHEM_SPC  = Total number of species in chemical mechanism'
-     &        /'!', 4X, 'N_ACT_SP       = Number of active (determined by ODE solver) species in mechanism'
-     &        /'!', 4X, 'GAS_CHEM_SPC   = Names of gas species in chemical mechanism'
-     &        /'!', 4X, 'CHEMISTRY_SPC  = Names of species in chemical mechanism'
-     &        /'!', 4X, 'CGRID_INDEX    = CGRID Index of species in chemical mechanism'
-     &        /'!', 4X, 'SPECIES_TYPE   = Group or type of species in chemical mechanism'
-     &        /'!', 4X, 'SPECIES_MOLWT  = Molecular Weight of species (gm/mole)'
-     &        /'!', 4X, 'NRXNS          = Number of mechanism reactions'
-     &        /'!', 4X, 'IRXBITS        = Bit test mask vector for selected reactions'
-     &        /'!', 4X, 'IORDER         = Order of the reaction')
+     &        /'!', 4X, 'MECHNAME        = Mechanism name'
+     &        /'!', 4X, 'N_GAS_CHEM_SPC  = Total number of gas species in chemical mechanism'
+     &        /'!', 4X, 'NUMB_CHEM_SPC   = Total number of species in chemical mechanism'
+     &        /'!', 4X, 'N_ACT_SP        = Number of active (determined by ODE solver) species in mechanism'
+     &        /'!', 4X, 'GAS_CHEM_SPC    = Names of gas species in chemical mechanism'
+     &        /'!', 4X, 'CHEMISTRY_SPC   = Names of species in chemical mechanism'
+     &        /'!', 4X, 'CGRID_INDEX     = CGRID Index of species in chemical mechanism'
+     &        /'!', 4X, 'SPECIES_TYPE    = Group or type of species in chemical mechanism'
+     &        /'!', 4X, 'SPECIES_MOLWT   = Molecular Weight of species (gm/mole)'
+     &        /'!', 4X, 'NRXNS           = Number of mechanism reactions'
+     &        /'!', 4X, 'NSUNLIGHT_RXNS  = Number of mechanism reactions requiring sunlight',
+     &        /'!', 4X, 'NTHERMAL_RXNS   = Number of mechanism reactions not requiring sunlight',
+     &        /'!', 4X, 'IRXBITS         = Bit test mask vector for selected reactions'
+     &        /'!', 4X, 'IORDER          = Order of the reaction'
+     &        /'!', 4x, 'NTERMS_JACOB    = Maximum number of nonzero terms in day/night Jacobian'
+     &        /'!', 4x, 'NSTEPS_JACOB    = Maximum number of LU Decomposition steps to solve each Jacobian' )
 
-      IF( LITE )THEN
-        WRITE( WRUNIT, 1143 )
-      ELSE
-        WRITE( WRUNIT, 1043 )
-      END IF 
 
 
       IF ( HAS_CONSTS ) THEN
@@ -421,15 +432,17 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
       IRX = 0
       DO ISPC = 1, NS 
-         IF( SPECIES_TYPE( ISPC ) .EQ. 'AE' )CYCLE
+         ISPCNEW = INEW2OLD( ISPC )
+         IF( SPECIES_TYPE( ISPCNEW ) .EQ. 'AE' )CYCLE
          IRX = IRX + 1
-         WRITE( WRUNIT, 2059 ) IRX, SPCLIS( ISPC )
+         WRITE( WRUNIT, 2059 ) IRX, SPCLIS( ISPCNEW )
 2059     FORMAT( 6X, 'DATA', 1X, 'GAS_CHEM_SPC(', I4, ' ) / ''', A16, ''' /')
       END DO
 
       DO ISPC = 1, N_SS_SPC
-         IF( SPECIES_TYPE( ISPC ) .NE. 'GC' )CYCLE
-         WRITE( WRUNIT, 2059 ) ISPC + NS, SS_SPC( ISPC )
+         ISPCNEW = INEW2OLD( ISPC )
+         IF( SPECIES_TYPE( ISPCNEW ) .NE. 'GC' )CYCLE
+         WRITE( WRUNIT, 2059 ) ISPC + NS, SS_SPC( ISPCNEW )
       END DO
 
       WRITE( WRUNIT,'( 2/ )')
@@ -439,39 +452,93 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       ELSE
          WRITE( WRUNIT, 3061 )
       END IF
-      
+ 
+      WRITE( WRUNIT, 2052 )
+2249  FORMAT(/, '! The below type is used to define species in the photochemical mechanism.',
+     &       /, '! The array based on type contains the needed data for these names. The data should agree with',
+     &       /, '! the CGRID_SPCS module' /)
+
+      WRITE( WRUNIT, 2064 )      
+      WRITE( WRUNIT, 2063 ) 
+
+
+      IF( USE_SPCS_NAMELISTS )THEN
+          WRITE( WRUNIT, 2250 )
+          DO ISPC = 1, (NS + N_SS_SPC - 1)
+              ISPCNEW = INEW2OLD( ISPC )
+             WRITE( WRUNIT, 2161 ) MECHANISM_SPC( ISPCNEW ), CGRID_INDEX( ISPCNEW ), 
+     &       SPECIES_TYPE( ISPCNEW ), SPECIES_MOLWT( ISPCNEW ), CONVERT_CONC( ISPCNEW )
+          END DO
+          ISPC = (NS + N_SS_SPC)
+          ISPCNEW = INEW2OLD( ISPC )
+          WRITE( WRUNIT, 2162 ) MECHANISM_SPC( ISPCNEW ), CGRID_INDEX( ISPCNEW ), 
+     &    SPECIES_TYPE( ISPCNEW ), SPECIES_MOLWT( ISPCNEW ), CONVERT_CONC( ISPCNEW )
+      ELSE
+          WRITE( WRUNIT, 2250 )
+          DO ISPC = 1, (NS + N_SS_SPC - 1)
+              ISPCNEW = INEW2OLD( ISPC )
+             WRITE( WRUNIT, 2161 ) MECHANISM_SPC( ISPCNEW ), CGRID_INDEX( ISPCNEW ), 
+     &       SPECIES_TYPE( ISPCNEW ), ZERO, FALSE
+          END DO
+          ISPC = (NS + N_SS_SPC)
+          ISPCNEW = INEW2OLD( ISPC )
+          WRITE( WRUNIT, 2162 ) MECHANISM_SPC( ISPCNEW ), CGRID_INDEX( ISPCNEW ), 
+     &    SPECIES_TYPE( ISPCNEW ), ZERO, FALSE
+      END IF
+
+
+2250  FORMAT(6X,  'TYPE MEMBER'
+     &       /6X, '   CHARACTER( 16 ) :: CHEMISTRY_SPC',
+     &       /6X, '   INTEGER         :: CGRID_INDEX',
+     &       /6X, '   CHARACTER(  2 ) :: SPECIES_TYPE',
+     &       /6X, '   LOGICAL         :: CONVERT_CONC',
+     &       /6X, '   REAL            :: SPECIES_MOLWT',
+     &       /6X, 'END TYPE MEMBER',
+     &       /6X, 'TYPE( MEMBER ) ::  SPECIES_LIST( NUMB_CHEM_SPC ) = (/ &')
+2161   FORMAT( 6X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,'), &')
+2162   FORMAT( 6X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,') /)' /)
 
       IF( USE_SPCS_NAMELISTS )THEN
           DO ISPC = 1, NS + N_SS_SPC
+              ISPCNEW = INEW2OLD( ISPC )
 !             WRITE( WRUNIT, 2161 ) ISPC, ISPC, ISPC, ISPC,  ISPC, MECHANISM_SPC( ISPC ), CGRID_INDEX( ISPC ), 
 !     &       SPECIES_TYPE( ISPC ), SPECIES_MOLWT( ISPC ), CONVERT_CONC( ISPC )
-              WRITE( WRUNIT, 2061 ) ISPC, ISPC, MECHANISM_SPC( ISPC ), SPECIES_MOLWT( ISPC )
+              WRITE( WRUNIT, 2061 ) ISPC, ISPC, MECHANISM_SPC( ISPCNEW ), SPECIES_MOLWT( ISPCNEW )
           END DO
           WRITE( WRUNIT,'( / )')
-          WRITE( WRUNIT, 2063 ) 
-          WRITE( WRUNIT, 2064 )      
           DO ISPC = 1, NS + N_SS_SPC
-              WRITE( WRUNIT, 2065 ) ISPC, ISPC, ISPC, CGRID_INDEX( ISPC ), 
-     &       SPECIES_TYPE( ISPC ), CONVERT_CONC( ISPC ), TRIM( MECHANISM_SPC( ISPC ) )
+              ISPCNEW = INEW2OLD( ISPC )
+              WRITE( WRUNIT, 2065 ) ISPC, ISPC, ISPC, CGRID_INDEX( ISPCNEW ), 
+     &       SPECIES_TYPE( ISPCNEW ), CONVERT_CONC( ISPCNEW ), TRIM( MECHANISM_SPC( ISPCNEW ) )
           END DO
       ELSE
           DO ISPC = 1, NS + N_SS_SPC
+              ISPCNEW = IOLD2NEW( ISPC )
 !             WRITE( WRUNIT, 2161 ) ISPC, ISPC, ISPC, ISPC, ISPC, MECHANISM_SPC( ISPC ), CGRID_INDEX( ISPC ), 
 !     &       SPECIES_TYPE( ISPC ), ONE, USE_SPCS_NAMELISTS
-              WRITE( WRUNIT, 2061 ) ISPC, ISPC, MECHANISM_SPC( ISPC ), ZERO 
+              WRITE( WRUNIT, 2061 ) ISPC, ISPC, MECHANISM_SPC( ISPCNEW ), ZERO 
           END DO
           WRITE( WRUNIT,'( / )')
-          WRITE( WRUNIT, 2063 ) 
-          WRITE( WRUNIT, 2064 )      
           DO ISPC = 1, NS + N_SS_SPC
-              WRITE( WRUNIT, 2065 ) ISPC, ISPC, ISPC, CGRID_INDEX( ISPC ), 
-     &       SPECIES_TYPE( ISPC ), FALSE, TRIM( MECHANISM_SPC( ISPC ) )
+              ISPCNEW = INEW2OLD( ISPC )
+              WRITE( WRUNIT, 2065 ) ISPC, ISPC, ISPC, CGRID_INDEX( ISPCNEW ), 
+     &       SPECIES_TYPE( ISPCNEW ), FALSE, TRIM( MECHANISM_SPC( ISPCNEW ) )
           END DO
       END IF
 
-2161   FORMAT( 6X, 'DATA', 1X, 'CHEMISTRY_SPC(', I4, ' ), CGRID_INDEX(', I4,' ), SPECIES_TYPE(', I4,
-     &       ' ), SPECIES_MOLWT(', I4,' ), CONVERT_CONC(', I4,' ) / ''', A16, ''', ', I4,', ''', A2, ''', ', 
-     &       F7.2,', ', L1,' /')
+      WRITE( WRUNIT, 2260 )
+2260  FORMAT(/, '! The below integers define the locations of mechanism species in the solver',
+     &       /, '! concentration array.' / )
+     
+          DO ISPC = 1, NS + N_SS_SPC
+              ISPCNEW = INEW2OLD( ISPC )
+!             WRITE( WRUNIT, 2161 ) ISPC, ISPC, ISPC, ISPC,  ISPC, MECHANISM_SPC( ISPC ), CGRID_INDEX( ISPC ), 
+!     &       SPECIES_TYPE( ISPC ), SPECIES_MOLWT( ISPC ), CONVERT_CONC( ISPC )
+              WRITE( WRUNIT, 2261 ) MECHANISM_SPC( ISPCNEW )(1:16), ISPC
+          END DO
+2261   FORMAT( 6X, 'INTEGER :: ', 1X, 'INDEX_', A16, ' = ', I4  )
+
+
 
 2061   FORMAT( 6X, 'DATA', 1X, 'CHEMISTRY_SPC(', I4, ' ), SPECIES_MOLWT(', I4,' ) / ''', A16, ''', ', F7.2,' /')
 
@@ -498,6 +565,12 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       WRITE( WRUNIT, 1076 ) NR
 1076  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NRXNS =', I4 )
 
+      WRITE( WRUNIT, 1080 ) NSUNLIGHT
+1080  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NSUNLIGHT_RXNS =', I4 )
+
+      WRITE( WRUNIT, 1081 ) NTHERMAL
+1081  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NTHERMAL_RXNS  =', I4 )
+
 
       WRITE( WRUNIT, 1077 )
 1077  FORMAT( /6X, 'INTEGER', 12X, ':: KUNITS' )
@@ -507,6 +580,41 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
       WRITE( WRUNIT, 1079 )
 1079  FORMAT( /6X, 'INTEGER IRXXN' )
+c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+c     IP, IPH
+c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+
+      IF ( IP .NE. 0 ) THEN
+
+         WRITE( WRUNIT, 1701 ) IP
+1701     FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NMPHOT =', I4 )
+
+         WRITE( WRUNIT, 1703 )
+1703     FORMAT(  6X, 'INTEGER', 12X, ':: IPH( NMPHOT,3 )' )
+
+         WRITE( WRUNIT, 1705 ) '1'
+1705     FORMAT( /6X, 'DATA ( IPH( IRXXN,', A, ' ), IRXXN = 1, NMPHOT ) / & ' )
+
+         CALL WRBF6_FORTRAN90( WRUNIT, 10, IP, IPH( 1:IP,1 ) )
+
+         WRITE( WRUNIT, 1705 ) '2'
+
+         CALL WRBF6_FORTRAN90( WRUNIT, 10, IP, IPH( 1:IP,2 ) )
+
+         WRITE( WRUNIT, 1705 ) '3'
+
+         CALL WRBF6_FORTRAN90( WRUNIT, 10, IP, IPH( 1:IP,3 ) )
+
+      ELSE
+
+         WRITE( WRUNIT, 1707 )
+1707     FORMAT( /'C Photolysis reactions information not available ...'
+     &           /6X, 'INTEGER, PARAMETER', 1X, ':: NMPHOT = 0' )
+
+         WRITE( WRUNIT, 1709 )
+1709     FORMAT( /6X, 'INTEGER', 12X, ':: IPH( 1,3 )' )
+
+      END IF
 
       IF( .NOT. LITE )THEN
 c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -555,6 +663,15 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 1107  FORMAT( /6X, 'DATA ( IRXBITS( IRXXN ), IRXXN = 1, NRXNS ) / & ' )
 
       CALL WRBF6_FORTRAN90( WRUNIT, 10, NR, IRXBITS )
+
+c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+c     Jacobian information
+c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+      WRITE( WRUNIT, 1115 ) MXARRAY
+1115  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NTERMS_JACOB = ', I5 )
+
+      WRITE( WRUNIT, 1117 ) MAXGL3
+1117  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NSTEPS_JACOB = ', I6 )
    
 c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 c     IORDER
@@ -821,7 +938,14 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       
       WRITE( WRUNIT, 1403 )
 1403  FORMAT(  6X, 'INTEGER', 12X, ':: IRR( NRXNS,MXPRD+3 )' )
-      
+
+! reset IRR to sorted species from SET_SPARSE_DATA
+      DO IRX = 1, NR
+         DO ISPC = 1, MXPRD+3
+            IRR(IRX, ISPC) = IRM2(ISPC,IRX)
+         END DO
+      END DO
+
       DO 701 ISPC = 1, MXPRD+3
 
       WRITE( WRUNIT, 1405 ) ISPC
@@ -920,7 +1044,7 @@ c     SC
 c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
       WRITE( WRUNIT, 1551 )
-1551  FORMAT( /6X, 'REAL', 15X, ':: SC( NRXNS,MXPRD )' )
+1551  FORMAT( /6X, 'REAL( 8 )', 15X, ':: SC( NRXNS,MXPRD )' )
 
       DO 801 ISPC = 1, MXPRD
 
@@ -928,9 +1052,10 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 1553     FORMAT( /6X, 'DATA ( SC( IRXXN,', I3, ' ), IRXXN = 1, NRXNS ) / & ' )
 
          DO IRX = 1, NR
-            SBUFF( IRX ) = SC( IRX,ISPC )
+            DBUFF( IRX ) = REAL( SC( IRX,ISPC ), 8 )
          END DO
-         CALL WRBF12S_FORTRAN90 ( WRUNIT, 5, NR, SBUFF, 'F' )
+!         CALL WRBF12S_FORTRAN90 ( WRUNIT, 5, NR, SBUFF, 'F' )
+          CALL WRBF12D_FORTRAN90 ( WRUNIT, 5, NR, DBUFF, 'D' )
 
 801   CONTINUE
 
@@ -954,41 +1079,6 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
       CALL WRBF6_FORTRAN90( WRUNIT, 10, NR, NPRDCT )
 
-c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-c     IP, IPH
-c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-
-      IF ( IP .NE. 0 ) THEN
-
-         WRITE( WRUNIT, 1701 ) IP
-1701     FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NMPHOT =', I4 )
-
-         WRITE( WRUNIT, 1703 )
-1703     FORMAT(  6X, 'INTEGER', 12X, ':: IPH( NMPHOT,3 )' )
-
-         WRITE( WRUNIT, 1705 ) '1'
-1705     FORMAT( /6X, 'DATA ( IPH( IRXXN,', A, ' ), IRXXN = 1, NMPHOT ) / & ' )
-
-         CALL WRBF6_FORTRAN90( WRUNIT, 10, IP, IPH( 1:IP,1 ) )
-
-         WRITE( WRUNIT, 1705 ) '2'
-
-         CALL WRBF6_FORTRAN90( WRUNIT, 10, IP, IPH( 1:IP,2 ) )
-
-         WRITE( WRUNIT, 1705 ) '3'
-
-         CALL WRBF6_FORTRAN90( WRUNIT, 10, IP, IPH( 1:IP,3 ) )
-
-      ELSE
-
-         WRITE( WRUNIT, 1707 )
-1707     FORMAT( /'C Photolysis reactions information not available ...'
-     &           /6X, 'INTEGER, PARAMETER', 1X, ':: NMPHOT = 0' )
-
-         WRITE( WRUNIT, 1709 )
-1709     FORMAT( /6X, 'INTEGER', 12X, ':: IPH( 1,3 )' )
-
-      END IF
 
 c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 c     MHETERO, IHETERO

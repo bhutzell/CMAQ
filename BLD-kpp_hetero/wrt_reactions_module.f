@@ -57,9 +57,8 @@ c..local Variables for steady-state species
       INTEGER, EXTERNAL :: INDEX1
       INTEGER, EXTERNAL :: INDEXES
       INTEGER            :: LPOINT, IEOL
-      INTEGER            :: ICOL, ISPC, IRX, IDX
+      INTEGER            :: ICOL, ISPC, ISPCNEW, IRX, IDX
       INTEGER            :: NXX, IPR, IPHOTAB, NC
-      INTEGER            :: MXRCT                         ! max no. of reactants
       INTEGER            :: DUMMY_COEF( MAXRXNUM )        ! Yields for the DUMMY variable in each reaction
       INTEGER            :: SS1RX( MAXNLIST )             ! First reaction occurrence for each SS species
       
@@ -112,7 +111,7 @@ c..Variables for species to be dropped from mechanism
       INTEGER :: ICLO( NCS2 )        ! Pointer to # of ops in decomp loop 1
       INTEGER :: JCLO( NCS2 )        ! Pointer to # of ops in decomp loop 2
       INTEGER :: NSPECT( NCS )       ! Number of species in mechanism ncs
-      INTEGER :: DBUFF( MXARRAY )
+
       INTEGER, ALLOCATABLE, SAVE :: ISAPORL( : )  ! Count of PD terms for each species
 
       INTEGER, ALLOCATABLE, SAVE :: ISPARDER( :,: )  ! Indicator of a PD term in the 
@@ -187,7 +186,7 @@ c..Variables for species to be dropped from mechanism
       INTEGER COUNT_TERMS           ! Active count of terms in a special rate
       INTEGER TEMPLATE_UNIT         ! IO unit # for mapping subroutine
       INTEGER IDIFF_ORDER           ! difference between order of two separate reactions
-            
+
       CHARACTER(  32 ) :: MAPPING_ROUTINE = 'MAPPING_ROUTINE'
       CHARACTER( 256 ) :: EQNAME
 
@@ -284,18 +283,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           ALLOCATE( INDEX_FIXED_SPECIES( MAXRXNUM, MAXRCTNTS ) )
       END IF
       
-      N_SPEC = NS
-      N_RXNS = NR   ! loads RBDATA from RXCM.EXT
-
-      MXRCT = MAXRCTNTS
-      
-      MXRR = 3 * MXRCT
-      MXRP = 3 * MXPRD
-
-      MXCOUNT1 = N_SPEC * MAXGL3 * 3
-      MXCOUNT2 = N_SPEC * MAXGL3 * 3
-      
-
+   
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C Find names for output module file
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -304,8 +292,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       WRITE( MODULE_UNIT,'(7X,"MODULE RXNS_DATA", 3/ 7X, "IMPLICIT NONE" 3/ )')
        
-
-      LITE = .FALSE.
+      LITE = .TRUE.
       
       CALL WREXTS_FORTRAN90 ( MODULE_UNIT, EQUATIONS_MECHFILE,
      &              MECHNAME,
@@ -322,6 +309,50 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 
       CALL WRSS_EXT_FORTRAN90( MODULE_UNIT, NR ) 
+C Error-check phot tables and report to log
+!      WRITE( LUNOUT, * ) ' '
+!      IPHOTAB = 0
+!      NMPHOT  = IP
+!      DO IPR = 1, IP
+!         IF ( IPH( IPR,3 ) .NE. 0 ) THEN ! table
+!            IPHOTAB = IPHOTAB + 1
+!            IRX = IPH( IPR,1 )
+!            NXX = IPH( IPR,2 )
+!            WRITE( 6, 1009 ) IRX, PHOTAB( NXX ), RTDAT( 1,IRX ) 
+!         END IF
+!      END DO
+
+C Error-check heteorogeneous tables and report to log
+!      WRITE( LUNOUT, * ) ' '
+!      IPHOTAB = 0
+!      DO IPR = 1, MHETERO
+!         IPHOTAB = IPHOTAB + 1
+!         IRX = IHETERO(IPR,1)
+!         IF( IRX .LT. 1 .OR. IRX .GT. NR )THEN
+!            WRITE(6,'(A,I4,A,I4)')
+!     &      '*** ERROR IHETERO(MHETERO,1) < 1 or > # of Reactions, i.e.,',NR,
+!     &      ' IHETERO(MHETERO,1) = ', IRX
+!            STOP
+!         END IF
+!         NXX = IHETERO(IPR,2)
+!         IF( NXX .LT. 1 .OR. NXX .GT. NHETERO )THEN
+!            WRITE(6,'(A,I4,A,I4)')
+!     &      '*** ERROR IHETERO(MHETERO,2) < 1 or > NHETERO, i.e.,',NHETERO,
+!     &      ' IHETERO(MHETERO,1) = ', NXX
+!            STOP
+!         END IF
+!         WRITE( 6, 1109 ) IRX, HETERO( NXX ), RTDAT( 1,IRX ) 
+!1109     FORMAT(  3X, 'Reaction', I4,
+!     &            1X, 'uses heterogeneous rate table: ', A16,
+!     &            1X, 'scaled by:', 1PG13.5 )
+!
+!      END DO
+      
+!      WRITE( 6, 1012 ) IPHOTAB, MHETERO
+!1012  FORMAT(/ 5X, 'There are', I3,
+!     &         1X, 'heterogeneous table references out of', I3,
+!     &         1X, 'tables' / )
+
 
 ! set up variables equal to the rate constant of type 10 fall off reactions      
 !      DO NXX = 1, NR
@@ -338,6 +369,18 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       END IF
 ! set up pointers and names for photolysis rate array
       WRITE(MODULE_UNIT,4502)
+C Error-check phot tables and report to log
+!      WRITE( LUNOUT, * ) ' '
+!      IPHOTAB = 0
+!      NMPHOT  = IP
+!      DO IPR = 1, IP
+!         IF ( IPH( IPR,3 ) .NE. 0 ) THEN ! table
+!            IPHOTAB = IPHOTAB + 1
+!            IRX = IPH( IPR,1 )
+!            NXX = IPH( IPR,2 )
+!            WRITE( 6, 1009 ) IRX, PHOTAB( NXX ), RTDAT( 1,IRX ) 
+!         END IF
+!      END DO
       DO IPR = 1, NPHOTAB
          WRITE(MODULE_UNIT,4503),PHOTAB(IPR),IPR
       END DO
@@ -377,6 +420,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           WRITE(MODULE_UNIT, 4506)SPECIAL(ISPC)
        END DO
        WRITE(MODULE_UNIT,95051)
+      
+!      WRITE( 6, 1011 ) IPHOTAB, NPHOTAB
 
        DO NXX = 1, NSPECIAL
 ! count total number of terms in special rates
@@ -438,12 +483,16 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
              END IF
              ISPC = INDEX_CTERM( NXX, IREACT )
              IF( ISPC .LT. 1 )CYCLE
+              ISPCNEW = IOLD2NEW( ISPC )
+!              ISPC    = IRM2SP( IREACT, NXX )
 !             WRITE(PHRASE,'(A,I4,A)')' * Y( NCELL, ', IOLD2NEW(ISPC,NCS) , ' ) '
 !             IF( IRX .GT. 0 .AND. KC_COEFFS( NXX, IREACT ) .NE. 1.0 )THEN
              IF( IRX .GT. 0 )THEN
-                WRITE(PHRASE,'(A,I4,A)')'* Y( NCELL, IOLD2NEW( ', ISPC, ', NCS) ) '
+!                WRITE(PHRASE,'(A,I4,A)')'* Y( NCELL, IOLD2NEW( ', ISPC, ', NCS) ) '
+                WRITE(PHRASE,'(A,A16,A)')'* Y( NCELL, INDEX_',MECHANISM_SPC( ISPC )(1:16), ' ) '
              ELSE
-                WRITE(PHRASE,'(A,I4,A)')'Y( NCELL, IOLD2NEW( ', ISPC, ', NCS) ) '
+!                WRITE(PHRASE,'(A,I4,A)')'Y( NCELL, IOLD2NEW( ', ISPC, ', NCS) ) '
+                WRITE(PHRASE,'(A,A16,A)')'Y( NCELL, INDEX_',MECHANISM_SPC( ISPC )(1:16), ' ) '
              END IF
              WRITE(MODULE_UNIT, 4709, ADVANCE = 'NO')TRIM( PHRASE )
              IF( IREACT .LT. MAXSPECTERMS )THEN
@@ -521,7 +570,29 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           WRITE(MODULE_UNIT,'(3A)')'! Remainder use ppm and 1/min '
       END IF
 
+C Error-check phot tables and report to log
+!      WRITE( LUNOUT, * ) ' '
+!      IPHOTAB = 0
+!      NMPHOT  = IP
+!      DO IPR = 1, IP
+!         IF ( IPH( IPR,3 ) .NE. 0 ) THEN ! table
+!            IPHOTAB = IPHOTAB + 1
+!            IRX = IPH( IPR,1 )
+!            NXX = IPH( IPR,2 )
+!            WRITE( 6, 1009 ) IRX, PHOTAB( NXX ), RTDAT( 1,IRX ) 
+!1009        FORMAT(  3X, 'Reaction', I4,
+!     &               1X, 'uses photolysis table: ', A16,
+!     &               1X, 'scaled by:', 1PG13.5 )
+!         END IF
+!      END DO
+      
+!      WRITE( 6, 1011 ) IPHOTAB, NPHOTAB
+!1011  FORMAT(/ 5X, 'There are', I3,
+!     &         1X, 'photolysis table references out of', I3,
+!     &         1X, 'tables' / )
+
 ! write IF block for photolysis rates
+
       
       IF( IP .GT. 0 )THEN
          WRITE(MODULE_UNIT,99879)
@@ -568,8 +639,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF( ( KTN5 + KTN6 ) .GT. 0 )WRITE(MODULE_UNIT,99883)
       
 ! write loop for remaining rates
-      
       DO NXX = 1, NR
+!         WRITE(6,'(A,I4,3A,I4)')'Writing Reaction #',NXX,': ',TRIM(RXLABEL(NXX)),' out of Reaction:',NXX
 
          IF( KTYPE( NXX ) .NE. 11 .AND. KTYPE( NXX ) .NE. 0 )THEN
 !          WRITE(MODULE_UNIT, 1498 )TRIM(LABEL(NXX,1))
@@ -640,8 +711,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
              WRITE(MODULE_UNIT,5115, ADVANCE = 'NO')IRX, 1.0D0/RTDAT( 1, NXX ), -RTDAT(2, NXX )
           CASE( 6 )
              IRX = INT( RTDAT( 2, NXX) )
+             print*,RXLABEL(NXX),RTDAT( 2, NXX)
              IF( IRX .GT. NXX )CYCLE
              WRITE(MODULE_UNIT, 1501, ADVANCE= 'NO')LABEL(NXX,1), NXX
+             
              IDIFF_ORDER = IORDER(NXX) - IORDER(IRX)
              IF( IDIFF_ORDER .NE. 0 )THEN
                  FALLOFF_RATE = ( KTYPE(IRX) .GT. 7 .AND. KTYPE(IRX) .LT. 11 )
@@ -694,6 +767,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 	      DO IDX = 1, NSPECIAL_RXN
 	         IF( ISPECIAL( IDX, 1) .EQ. NXX )EXIT
               END DO       
+             print*,RXLABEL(NXX),ISPECIAL( IDX, 1:2)
              IF( ORDER_SPECIAL( ISPECIAL( IDX, 2 ) ) .EQ. 0 )THEN
                   IDIFF_ORDER = IORDER(NXX) - 1
              ELSE IF( ORDER_SPECIAL( ISPECIAL( IDX, 2 ) ) .GT. 0 )THEN
@@ -1239,15 +1313,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 94200 FORMAT( 1X,'DIMENSION: MXRP     = ',I6,' VARIABLE: NDPMAX  = ',I6)
 94220 FORMAT( 1X,'DIMENSION: MXRR     = ',I6,' VARIABLE: NDLMAX  = ',I6)
 
-95050  FORMAT( 7X,'SUBROUTINE SPECIAL_RATES( NUMCELLS, IOLD2NEW, NCS, Y, RKI )'
+95050  FORMAT( 7X,'SUBROUTINE SPECIAL_RATES( NUMCELLS, Y, RKI )'
      &       /  '! Purpose: calculate special rate operators and update'
      &       /  '!         appropriate rate constants'
      &      //  7X,'USE RXNS_DATA'
      &      /   7X,'IMPLICIT NONE'
      &      //  '! Arguments:'
      &      /   7X,'INTEGER,      INTENT( IN  )   :: NUMCELLS        ! Number of cells in block '
-     &      /   7X,'INTEGER,      INTENT( IN  )   :: IOLD2NEW( :,: ) ! species map'
-     &      /   7X,'INTEGER,      INTENT( IN  )   :: NCS             ! index for which reaction set'
      &      /   7X,'REAL( 8 ),    INTENT( IN )    :: Y( :, : )       ! species concs'
      &      /   7X,'REAL( 8 ),    INTENT( INOUT ) :: RKI( :, : )     ! reaction rate constant, ppm/min '
      &      /   '! Local:'

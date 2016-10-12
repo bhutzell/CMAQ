@@ -29,8 +29,14 @@ C $Header$
 C what(1) key, module and SID; SCCS file; date and time of last delta:
 C @(#)CHEMMECH.F 1.1 /project/mod3/MECH/src/driver/mech/SCCS/s.CHEMMECH.F 02 Jan 1997 15:26:41
 
+      MODULE WIKI_TABLE
+
+        IMPLICIT NONE
+
+          PUBLIC  :: WRT_WIKI_TABLE    
+        CONTAINS
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE WRT_KPP_INPUTS( NR, IP, LABEL, NS  )
+      SUBROUTINE WRT_WIKI_TABLE( NR, IP, LABEL, NS  )
 
  
       USE KPP_DATA
@@ -51,9 +57,9 @@ c..local Variables for steady-state species
       CHARACTER( 16 ) :: WORD
       CHARACTER( 37 ) :: PHRASE
       CHARACTER( 81 ) :: INBUF
-      CHARACTER( 16 ) :: EQNS_KPP_FILE = 'EQNS_KPP_FILE'
-      CHARACTER( 16 ) :: SPCS_KPP_FILE = 'SPCS_KPP_FILE'
-      CHARACTER(  3 ) :: END
+      CHARACTER( 16 ) :: WIKI_OUT_FILE = 'WIKI_OUT_FILE'
+!      CHARACTER( 16 ) :: SPCS_KPP_FILE = 'SPCS_KPP_FILE'
+!      CHARACTER(  3 ) :: END
 
       INTEGER, EXTERNAL :: INDEX1
       INTEGER, EXTERNAL :: INDEXES
@@ -71,10 +77,11 @@ c..Variables for species to be dropped from mechanism
       LOGICAL         :: FIRST_TERM  = .TRUE.
       REAL( 8 )       :: WREXT_COEFFS( MAXSPECTERMS)
       INTEGER         :: WREXT_INDEX(  MAXSPECTERMS)
+      INTEGER         :: TABLE_UNIT
 
       INTEGER SPC1RX( MAXSPEC )              ! rx index of 1st occurence of species
                                              ! in mechanism table
-      CHARACTER( 120 ) :: EQN_MECH_KPP
+      CHARACTER( 120 ) :: WIKI_TABLE
       CHARACTER( 120 ) :: SPC_MECH_KPP
       CHARACTER( 891 ) :: REACTION_STR(  MAXRXNUM )
       CHARACTER(  16 ) :: COEFF_STR
@@ -182,8 +189,8 @@ c..Variables for species to be dropped from mechanism
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C Find names for KPP output files
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      CALL NAMEVAL ( EQNS_KPP_FILE, EQN_MECH_KPP )
-      CALL NAMEVAL ( SPCS_KPP_FILE, SPC_MECH_KPP )
+      CALL NAMEVAL ( WIKI_OUT_FILE, WIKI_TABLE )
+!      CALL NAMEVAL ( SPCS_KPP_FILE, SPC_MECH_KPP )
 
 
 ! write out reactions strings to determine KPP information
@@ -247,111 +254,81 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF(  KPP_DUMMY )KPP_DUMMY = .TRUE.
          
        END DO
-! create species list
-      OPEN ( UNIT = KPPEQN_UNIT, FILE = SPC_MECH_KPP, STATUS = 'UNKNOWN' )
-      WRITE(KPPEQN_UNIT,'(3A)')'#INCLUDE atoms'
-      WRITE(KPPEQN_UNIT,'(3A)')'#DEFVAR'
-      DO ISPC = 1, NS
-         WRITE(KPPEQN_UNIT,6001)SPARSE_SPECIES( ISPC )
-      END DO
-      WRITE(KPPEQN_UNIT,'(3A)')'#DEFFIX'
-      DO ISPC = 1, NFIXED_SPECIES
-         WRITE(KPPEQN_UNIT,6001)FIXED_SPECIES( ISPC )
-      END DO
-      IF( KPP_DUMMY )WRITE(KPPEQN_UNIT,6001)'DUMMY'
-6001  FORMAT(8X,A18,' =  IGNORE ;')      
-      WRITE(KPPEQN_UNIT,4555) ! '#INLINE F90_INIT'
-      WRITE(KPPEQN_UNIT,4556)
-      DO ISPC = 1, NFIXED_SPECIES
-         IF( NRXN_FIXED_SPECIES( ISPC  ) .LT. 1 )CYCLE
-         DO IPR = 1, MAXCONSTS
-            IF( NAMCONSTS( IPR )( 5:LEN_TRIM(NAMCONSTS( IPR )) ) .EQ. FIXED_SPECIES( ISPC ) )THEN
-                WORD = 'indf_' // TRIM( FIXED_SPECIES( ISPC ) ) 
-                WRITE( KPPEQN_UNIT, 1309 ) WORD, TRIM( NAMCONSTS( IPR ))
-            END IF
-            IF( NAMCONSTS( IPR ) .EQ. 'ATM_AIR' .AND. FIXED_SPECIES( ISPC ) .EQ. 'M' )THEN
-                WORD = 'indf_' // TRIM( FIXED_SPECIES( ISPC ) ) 
-                WRITE( KPPEQN_UNIT, 1309 ) WORD, TRIM( NAMCONSTS( IPR ))
-            END IF
-         END DO
-      END DO
-1309  FORMAT('FIX( ', A16,' ) = ', A9,  ' * CAIR '  )
-      WRITE(KPPEQN_UNIT,4504)
-      CLOSE( KPPEQN_UNIT )
-! create equations file      
-      OPEN ( UNIT = KPPEQN_UNIT, FILE = EQN_MECH_KPP, STATUS = 'UNKNOWN' )
+
+! create wiki table file      
+      OPEN ( FILE = WIKI_OUT_FILE, STATUS = 'UNKNOWN', NEWUNIT = TABLE_UNIT )
 ! define inline function for rate constant of type 10 fall off reactions 
-      WRITE(KPPEQN_UNIT,4500)
+      WRITE(TABLE_UNIT,4500)
 ! mechanism parameters
-      WRITE(KPPEQN_UNIT,'(A)')'#INLINE F90_GLOBAL'
-      WRITE(KPPEQN_UNIT,4501)TRIM( MECHNAME ), NPHOTAB
+      WRITE(TABLE_UNIT,'(A)')'#INLINE F90_GLOBAL'
+      WRITE(TABLE_UNIT,4501)TRIM( MECHNAME ), NPHOTAB
 ! create pointers for unused fixed species
       DO IPR = 1, NFIXED_SPECIES
          IF( NRXN_FIXED_SPECIES( IPR  ) .LT. 1 )THEN
-             WRITE(KPPEQN_UNIT,4603)'indf_' // TRIM( FIXED_SPECIES( IPR ) )
+             WRITE(TABLE_UNIT,4603)'indf_' // TRIM( FIXED_SPECIES( IPR ) )
          END IF
       END DO
 4603  FORMAT('INTEGER,  SAVE       :: ', A16,' = 0 ' )
 4604  FORMAT('REAL(dp), PARAMETER  :: ', A16,' = ', 1PD12.4 )
 ! write inline data for constant species
-      WRITE(KPPEQN_UNIT, 4714 )
+      WRITE(TABLE_UNIT, 4714 )
       IF ( MAXVAL( CONST ) .GT. 0.0D0 ) THEN
          DO IPR = 1, MAXCONSTS
             ISPC = INDEX1 ( TRIM( NAMCONSTS( IPR ) ), MAXCONSTS, NAMCONSTS )
             IF( ISPC .LT. 1 )CYCLE
-            WRITE( KPPEQN_UNIT, 1310 )  NAMCONSTS( IPR ), REAL(CONST( ISPC ), 8)
+            WRITE( TABLE_UNIT, 1310 )  NAMCONSTS( IPR ), REAL(CONST( ISPC ), 8)
          END DO
 1310     FORMAT('REAL(dp), PARAMETER ::', 1X, A16,' =', 1PD12.5  )
       END IF
 ! set up variables equal to the rate constant of type 10 fall off reactions      
       DO NXX = 1, NR
          IF( KTYPE( NXX ) .EQ. 10 )THEN
-             WRITE(KPPEQN_UNIT, 4505)LABEL(NXX,1)
+             WRITE(TABLE_UNIT, 4505)LABEL(NXX,1)
          END IF
       END DO       
 ! set up variables equal to the rate constant of type 11 reactions      
-      WRITE(KPPEQN_UNIT,4749)
+      WRITE(TABLE_UNIT,4749)
       IF( NSPECIAL .GT. 0 )THEN
-         WRITE(KPPEQN_UNIT,4750)
+         WRITE(TABLE_UNIT,4750)
          DO ISPC = 1, NSPECIAL
-             WRITE(KPPEQN_UNIT, 4506)SPECIAL(ISPC)
+             WRITE(TABLE_UNIT, 4506)SPECIAL(ISPC)
          END DO
       ELSE
-         WRITE(KPPEQN_UNIT,4751)
+         WRITE(TABLE_UNIT,4751)
       END IF
 ! set up pointers and names for photolysis rate array
-      WRITE(KPPEQN_UNIT,4502)
+      WRITE(TABLE_UNIT,4502)
       DO IPR = 1, NPHOTAB
-         WRITE(KPPEQN_UNIT,4503),PHOTAB(IPR),IPR
+         WRITE(TABLE_UNIT,4503),PHOTAB(IPR),IPR
       END DO
       DO IPR = 1, NPHOTAB
-         WRITE(KPPEQN_UNIT,4557)IPR, PHOTAB(IPR)
+         WRITE(TABLE_UNIT,4557)IPR, PHOTAB(IPR)
       END DO
       IF( NHETERO .GT. 0 )THEN
-          WRITE(KPPEQN_UNIT,5023)NHETERO
+          WRITE(TABLE_UNIT,5023)NHETERO
           DO IPR = 1, NHETERO
-             WRITE(KPPEQN_UNIT,5024)HETERO(IPR),IPR
+             WRITE(TABLE_UNIT,5024)HETERO(IPR),IPR
           END DO
           DO IPR = 1, NHETERO
-             WRITE(KPPEQN_UNIT,5025)IPR, HETERO(IPR)
+             WRITE(TABLE_UNIT,5025)IPR, HETERO(IPR)
           END DO
       ELSE 
-          WRITE(KPPEQN_UNIT,5026)NHETERO
+          WRITE(TABLE_UNIT,5026)NHETERO
       END IF
 
-      WRITE(KPPEQN_UNIT,4504)
-!      WRITE(KPPEQN_UNIT,'(A)')'#INLINE F90_UTIL'
-!      WRITE(KPPEQN_UNIT,4504)
+      WRITE(TABLE_UNIT,4504)
+!      WRITE(TABLE_UNIT,'(A)')'#INLINE F90_UTIL'
+!      WRITE(TABLE_UNIT,4504)
 ! write formulas for specail rate expressions
-      WRITE(KPPEQN_UNIT,'(A)')'#INLINE F90_UTIL'
-      ISPC = INDEX(EQN_MECH_KPP,'/mech', BACK= .TRUE.) + 1
-      NXX  = INDEX(EQN_MECH_KPP,'.eqn', BACK= .TRUE.)  - 1
-      PHRASE = EQN_MECH_KPP(ISPC:NXX)
+      WRITE(TABLE_UNIT,'(A)')'#INLINE F90_UTIL'
+      ISPC = INDEX(WIKI_OUT_FILE,'/mech', BACK= .TRUE.) + 1
+      NXX  = INDEX(WIKI_OUT_FILE,'.eqn', BACK= .TRUE.)  - 1
+      PHRASE = WIKI_OUT_FILE(ISPC:NXX)
 !      PHRASE =  'mech' // DESCRP_MECH
 !      CALL CONVERT_CASE ( PHRASE, .FALSE. )
-      WRITE(KPPEQN_UNIT,95050)TRIM( PHRASE )
+      WRITE(TABLE_UNIT,95050)TRIM( PHRASE )
       DO NXX = 1, NSPECIAL
-         WRITE(KPPEQN_UNIT,'(5X, A16)', ADVANCE = 'NO' )SPECIAL( NXX ) 
+         WRITE(TABLE_UNIT,'(5X, A16)', ADVANCE = 'NO' )SPECIAL( NXX ) 
          FIRST_TERM = .TRUE.
 ! first write standard rate constants time concentrations
          DO IREACT = 1, MAXSPECTERMS
@@ -362,25 +339,25 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                 FIRST_TERM = .FALSE.
                 IF(KC_COEFFS( NXX, IREACT ) .LT. 0.0 )PHRASE = ' = ' // ' - '
              ELSE
-                WRITE(KPPEQN_UNIT, 4711, ADVANCE = 'NO' )
+                WRITE(TABLE_UNIT, 4711, ADVANCE = 'NO' )
                 PHRASE = ' + '
                 IF(KC_COEFFS( NXX, IREACT ) .LT. 0.0 )PHRASE = ' - '
              END IF
              IF( KC_COEFFS( NXX, IREACT ) .NE. 1.0 )THEN
-                 WRITE(KPPEQN_UNIT, 4708, ADVANCE = 'NO')TRIM(PHRASE),
+                 WRITE(TABLE_UNIT, 4708, ADVANCE = 'NO')TRIM(PHRASE),
      &          REAL( ABS( KC_COEFFS( NXX, IREACT ) ), 8), IRX
              ELSE
-                 WRITE(KPPEQN_UNIT, 4706, ADVANCE = 'NO')TRIM(PHRASE),IRX
+                 WRITE(TABLE_UNIT, 4706, ADVANCE = 'NO')TRIM(PHRASE),IRX
              END IF
              ISPC = IOLD2NEW( INDEX_CTERM( NXX, IREACT ) )
              IF( ISPC .LT. 1 )CYCLE
              PHRASE = ' * Y( ind_' // TRIM( SPARSE_SPECIES( ISPC ) ) // ' ) '
-             WRITE(KPPEQN_UNIT, 4709, ADVANCE = 'NO')TRIM( PHRASE )
+             WRITE(TABLE_UNIT, 4709, ADVANCE = 'NO')TRIM( PHRASE )
 !             IF( ISPC .LT. 1 )THEN
-!                WRITE(KPPEQN_UNIT, 4708, ADVANCE = 'NO')TRIM(PHRASE),
+!                WRITE(TABLE_UNIT, 4708, ADVANCE = 'NO')TRIM(PHRASE),
 !     &          REAL( ABS( KC_COEFFS( NXX, IREACT ) ), 8), IRX
 !             ELSE
-!                WRITE(KPPEQN_UNIT, 4711, ADVANCE = 'NO')TRIM(PHRASE),
+!                WRITE(TABLE_UNIT, 4711, ADVANCE = 'NO')TRIM(PHRASE),
 !     &          REAL( ABS( KC_COEFFS( NXX, IREACT ) ), 8), IRX, TRIM( SPARSE_SPECIES( ISPC ) )
 !             END IF
          END DO
@@ -393,66 +370,66 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                 IF(OPERATOR_COEFFS( NXX, IREACT ) .LT. 0.0 )PHRASE = ' = ' // ' - '
                 FIRST_TERM = .FALSE.
              ELSE
-                WRITE(KPPEQN_UNIT, 4711, ADVANCE = 'NO' )
+                WRITE(TABLE_UNIT, 4711, ADVANCE = 'NO' )
                 PHRASE = ' + '
                 IF(OPERATOR_COEFFS( NXX, IREACT ) .LT. 0.0 )PHRASE = ' - '
              END IF
              IF( OPERATOR_COEFFS( NXX, IREACT ) .NE. 1.0 )THEN
-                 WRITE(KPPEQN_UNIT, 4710, ADVANCE = 'NO')TRIM(PHRASE),
+                 WRITE(TABLE_UNIT, 4710, ADVANCE = 'NO')TRIM(PHRASE),
      &           REAL( ABS( OPERATOR_COEFFS( NXX, IREACT ) ), 8), TRIM( SPECIAL( IDX ) )
              ELSE
-                 WRITE(KPPEQN_UNIT, 4712, ADVANCE = 'NO')TRIM(PHRASE),TRIM( SPECIAL( IDX ) )
+                 WRITE(TABLE_UNIT, 4712, ADVANCE = 'NO')TRIM(PHRASE),TRIM( SPECIAL( IDX ) )
              END IF
          END DO 
-         WRITE(KPPEQN_UNIT, * )' '
+         WRITE(TABLE_UNIT, * )' '
       END DO
       DO NXX = 1, NSPECIAL_RXN 
 ! define rate constants interms of special rate operators
-         WRITE(KPPEQN_UNIT,95070)ISPECIAL( NXX,1 ),SPECIAL( ISPECIAL( NXX,2 ) ),
+         WRITE(TABLE_UNIT,95070)ISPECIAL( NXX,1 ),SPECIAL( ISPECIAL( NXX,2 ) ),
      &   TRIM( LABEL( ISPECIAL( NXX,1 ),1 ) )
       END DO
 95070 FORMAT(5X,'RCONST(',I4,' ) = ',A16,' ! reaction: ',A)
-      WRITE(KPPEQN_UNIT,95060)
-      WRITE(KPPEQN_UNIT,4504)
-      WRITE(KPPEQN_UNIT,'(A)')'#INLINE F90_RCONST'
+      WRITE(TABLE_UNIT,95060)
+      WRITE(TABLE_UNIT,4504)
+      WRITE(TABLE_UNIT,'(A)')'#INLINE F90_RCONST'
 ! initialize special rate expressions in Update_Rconst subroutine
       DO NXX = 1, NSPECIAL
-         WRITE(KPPEQN_UNIT,95100)SPECIAL( NXX ) 
+         WRITE(TABLE_UNIT,95100)SPECIAL( NXX ) 
       END DO
 !    
-      WRITE(KPPEQN_UNIT, 4713)
+      WRITE(TABLE_UNIT, 4713)
 ! write functions define CMAQ specific fall off rate constant
       DO NXX = 1, NR
          IF( KTYPE( NXX ) .EQ. 10 )THEN
              DO IDX = 1, NFALLOFF
                 IF( IRRFALL( IDX ) .EQ. NXX )EXIT
              END DO
-             WRITE(KPPEQN_UNIT, 4507, ADVANCE = 'NO')LABEL(NXX,1),' = ' 
-             WRITE(KPPEQN_UNIT, 5010)RTDAT(1,NXX),RTDAT(3,NXX),RTDAT(2,NXX),
+             WRITE(TABLE_UNIT, 4507, ADVANCE = 'NO')LABEL(NXX,1),' = ' 
+             WRITE(TABLE_UNIT, 5010)RTDAT(1,NXX),RTDAT(3,NXX),RTDAT(2,NXX),
      &      RFDAT(1,IDX),RFDAT(3,IDX),RFDAT(2,IDX),RFDAT(5,IDX),RFDAT(4,IDX)
          END IF
       END DO       
-      WRITE(KPPEQN_UNIT,4504)
+      WRITE(TABLE_UNIT,4504)
 ! write equations for mechanism
-      WRITE(KPPEQN_UNIT,'(3A)')'#EQNTAGS ON'
-      WRITE(KPPEQN_UNIT,'(3A)')'#EQUATIONS'
       IF( KUNITS .EQ. 2 )THEN
-          WRITE(KPPEQN_UNIT,'(3A)')'// All rate constants converted from  molec/cm3 to ppm'
-          WRITE(KPPEQN_UNIT,'(3A)')'// and 1/sec to 1/min'
+          WRITE(TABLE_UNIT,'(3A)')'// All rate constants converted from  molec/cm3 to ppm'
+          WRITE(TABLE_UNIT,'(3A)')'// and 1/sec to 1/min'
       ELSE
-          WRITE(KPPEQN_UNIT,'(3A)')'// Only fall off rate constants converted from  molec/cm3 '
-          WRITE(KPPEQN_UNIT,'(3A)')'// and 1/sec to 1/min'
-          WRITE(KPPEQN_UNIT,'(3A)')'// Remainder use ppm and 1/min '
+          WRITE(TABLE_UNIT,'(3A)')'// Only fall off rate constants converted from  molec/cm3 '
+          WRITE(TABLE_UNIT,'(3A)')'// and 1/sec to 1/min'
+          WRITE(TABLE_UNIT,'(3A)')'// Remainder use ppm and 1/min '
       END IF
+      WRITE(TABLE_UNIT,'(3A)')'#EQNTAGS ON'
+      WRITE(TABLE_UNIT,'(3A)')'#EQUATIONS'
       DO NXX = 1, NR
-         WRITE(KPPEQN_UNIT,'(3A)', ADVANCE= 'NO')' <',TRIM(LABEL( NXX,1 )),'> '
+         WRITE(TABLE_UNIT,'(3A)', ADVANCE= 'NO')' <',TRIM(LABEL( NXX,1 )),'> '
          DO IREACT = 1, NREACT( NXX )
             ISPC = IRR( NXX, IREACT )
                IF( IREACT .LT. 2 )THEN
-                  WRITE(KPPEQN_UNIT,'(A, A)', ADVANCE = 'NO')TRIM(SPARSE_SPECIES( ISPC )),' '
+                  WRITE(TABLE_UNIT,'(A, A)', ADVANCE = 'NO')TRIM(SPARSE_SPECIES( ISPC )),' '
                   ICOUNT = 1 + LEN( SPARSE_SPECIES( ISPC ) )
                ELSE
-                  WRITE(KPPEQN_UNIT,'(3A)', ADVANCE = 'NO')'+ ',TRIM(SPARSE_SPECIES( ISPC )),' '
+                  WRITE(TABLE_UNIT,'(3A)', ADVANCE = 'NO')'+ ',TRIM(SPARSE_SPECIES( ISPC )),' '
                   ICOUNT = 1 + LEN( SPARSE_SPECIES( ISPC ) )
                   ICOUNT = 3 + LEN( SPARSE_SPECIES( ISPC ) )                  
                END IF
@@ -460,7 +437,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          DO I = 1, MAXRCTNTS
          IF( INDEX_FIXED_SPECIES( NXX, I ) .GT. 0 .AND. INDEX_FIXED_SPECIES( NXX, I ) .LT. 7 )THEN
               ISPC = INDEX_FIXED_SPECIES( NXX, I  )
-              WRITE(KPPEQN_UNIT,'(3A)', ADVANCE = 'NO')'+ ',TRIM(FIXED_SPECIES( ISPC )),' '
+              WRITE(TABLE_UNIT,'(3A)', ADVANCE = 'NO')'+ ',TRIM(FIXED_SPECIES( ISPC )),' '
               ICOUNT = 3 + LEN( FIXED_SPECIES( ISPC ) )
          ELSE 
               IF( INDEX_FIXED_SPECIES( NXX, I ) .GE. 7 )THEN
@@ -468,63 +445,63 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
               END IF
          END IF    
          END DO     
-         WRITE(KPPEQN_UNIT, '(A)', ADVANCE = 'NO' )'='
+         WRITE(TABLE_UNIT, '(A)', ADVANCE = 'NO' )'='
 ! write out products
          DO IPRODUCT = 1, NPRDCT( NXX )
             ISPC = IRR( NXX, IPRODUCT + 3 )
             IF ( ABS( SC( NXX,IPRODUCT ) ) .NE. 1.0 ) THEN
                IF ( SC( NXX,IPRODUCT ) .LT. 0 ) THEN
-                  WRITE(KPPEQN_UNIT,'(A,F8.5,3A)', ADVANCE = 'NO')
+                  WRITE(TABLE_UNIT,'(A,F8.5,3A)', ADVANCE = 'NO')
      &           '- ',ABS(SC( NXX,IPRODUCT )),'*',TRIM(SPARSE_SPECIES( ISPC )),' '
                   ICOUNT = ICOUNT + 12 + LEN( SPARSE_SPECIES( ISPC ) )
                ELSE
                   IF( IPRODUCT .EQ. 1 )THEN
-                     WRITE(KPPEQN_UNIT,'(F8.5, 3A)', ADVANCE = 'NO')
+                     WRITE(TABLE_UNIT,'(F8.5, 3A)', ADVANCE = 'NO')
      &               SC( NXX,IPRODUCT ),'*',TRIM(SPARSE_SPECIES( ISPC )),' '
                      ICOUNT = ICOUNT + 10 + LEN( SPARSE_SPECIES( ISPC ) )
                   ELSE
-                     WRITE(KPPEQN_UNIT,'(A,F8.5,3A)', ADVANCE = 'NO')
+                     WRITE(TABLE_UNIT,'(A,F8.5,3A)', ADVANCE = 'NO')
      &               '+ ',SC( NXX,IPRODUCT ),'*',TRIM(SPARSE_SPECIES( ISPC )),' '
                      ICOUNT = ICOUNT + 12 + LEN( SPARSE_SPECIES( ISPC ) )
                   END IF
                END IF
             ELSE IF ( SC( NXX,IPRODUCT ) .LT. 0.0 ) THEN
-               WRITE(KPPEQN_UNIT,'(3A)', ADVANCE = 'NO')
+               WRITE(TABLE_UNIT,'(3A)', ADVANCE = 'NO')
      &               '- ',TRIM(SPARSE_SPECIES( ISPC )),' '
                ICOUNT = ICOUNT + 3 + LEN( SPARSE_SPECIES( ISPC ) )
             ELSE
                IF( IPRODUCT .EQ. 1 )THEN
-                  WRITE(KPPEQN_UNIT,'(3A)', ADVANCE = 'NO')
+                  WRITE(TABLE_UNIT,'(3A)', ADVANCE = 'NO')
      &           ' ',TRIM(SPARSE_SPECIES( ISPC )),' '
                   ICOUNT = ICOUNT + 2 + LEN( SPARSE_SPECIES( ISPC ) )
                ELSE
-                  WRITE(KPPEQN_UNIT,'(3A)', ADVANCE = 'NO')
+                  WRITE(TABLE_UNIT,'(3A)', ADVANCE = 'NO')
      &             '+ ',TRIM(SPARSE_SPECIES( ISPC )),' '
                   ICOUNT = ICOUNT + 3 + LEN( SPARSE_SPECIES( ISPC ) )
                END IF
             END IF
             IF( ICOUNT .GT. 132 .AND. IPRODUCT .LT.  NPRDCT( NXX ) )THEN
                 ICOUNT = 0
-                WRITE(KPPEQN_UNIT, * )' '
-                WRITE(KPPEQN_UNIT,'(A16)', ADVANCE = 'NO')' '
+                WRITE(TABLE_UNIT, * )' '
+                WRITE(TABLE_UNIT,'(A16)', ADVANCE = 'NO')' '
             END IF
          END DO 
 ! add dummy variable to reaction with no production or reaction that are identical
 ! to previous reactions but with different rate constants         
          IF( DUMMY_COEF( NXX ) .GT. 1 )THEN
              IF( NPRDCT( NXX ) .LT. 1 )THEN
-                 WRITE(KPPEQN_UNIT,'(F8.5,A)', ADVANCE = 'NO')REAL(DUMMY_COEF(NXX)),'*DUMMY   : '
+                 WRITE(TABLE_UNIT,'(F8.5,A)', ADVANCE = 'NO')REAL(DUMMY_COEF(NXX)),'*DUMMY   : '
              ELSE
-                 WRITE(KPPEQN_UNIT,'(A,F8.5,A)', ADVANCE = 'NO')' + ',REAL(DUMMY_COEF(NXX)),'*DUMMY   : '
+                 WRITE(TABLE_UNIT,'(A,F8.5,A)', ADVANCE = 'NO')' + ',REAL(DUMMY_COEF(NXX)),'*DUMMY   : '
              END IF
          ELSE IF( DUMMY_COEF( NXX ) .EQ. 1 )THEN
              IF( NPRDCT( NXX ) .LT. 1 )THEN
-                 WRITE(KPPEQN_UNIT,'(A)', ADVANCE = 'NO')' DUMMY   : '
+                 WRITE(TABLE_UNIT,'(A)', ADVANCE = 'NO')' DUMMY   : '
              ELSE!
-                 WRITE(KPPEQN_UNIT,'(A)', ADVANCE = 'NO')' + DUMMY   : '
+                 WRITE(TABLE_UNIT,'(A)', ADVANCE = 'NO')' + DUMMY   : '
              END IF
          ELSE IF (DUMMY_COEF( NXX ) .EQ. 0 )THEN
-             WRITE(KPPEQN_UNIT,'(A)', ADVANCE = 'NO')' : '
+             WRITE(TABLE_UNIT,'(A)', ADVANCE = 'NO')' : '
          END IF
          SELECT CASE( KTYPE( NXX ) )
           CASE( -1 )
@@ -533,10 +510,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
              END DO
              IDX = IHETERO( IPR, 2 )
              IF( RTDAT(1, NXX) .NE. 1.0 )THEN
-                 WRITE(KPPEQN_UNIT,5027, ADVANCE = 'NO')REAL(RTDAT(1, NXX),8),TRIM( HETERO(IDX) )
+                 WRITE(TABLE_UNIT,5027, ADVANCE = 'NO')REAL(RTDAT(1, NXX),8),TRIM( HETERO(IDX) )
                  PRINT*,REAL(RTDAT(1, NXX),8),TRIM( HETERO(IDX) )
              ELSE
-                 WRITE(KPPEQN_UNIT,5028, ADVANCE = 'NO')TRIM( HETERO(IDX) )
+                 WRITE(TABLE_UNIT,5028, ADVANCE = 'NO')TRIM( HETERO(IDX) )
              END IF
           CASE(  0 )
              DO IPR = 1, IP
@@ -545,30 +522,30 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
              IF ( IPH( IPR,3 ) .NE. 0 )THEN
                 IDX = IPH( IPR, 2 )
                 IF( RTDAT(1, NXX) .NE. 1.0 )THEN
-                   WRITE(KPPEQN_UNIT,5000, ADVANCE = 'NO')REAL(RTDAT(1, NXX),8),TRIM( PHOTAB(IDX) )
+                   WRITE(TABLE_UNIT,5000, ADVANCE = 'NO')REAL(RTDAT(1, NXX),8),TRIM( PHOTAB(IDX) )
                 ELSE
-                   WRITE(KPPEQN_UNIT,5001, ADVANCE = 'NO')TRIM( PHOTAB(IDX) )
+                   WRITE(TABLE_UNIT,5001, ADVANCE = 'NO')TRIM( PHOTAB(IDX) )
                 END IF
              ELSE IF( IPH( NXX,3 ) .EQ. 0 )THEN
                 IDX = IPH(IPH( NXX,2 ), 2)
                 IF( RTDAT(1, NXX) .NE. 1.0 )THEN
-                   WRITE(KPPEQN_UNIT,5100, ADVANCE = 'NO')REAL(RTDAT(1, NXX),8), IDX
+                   WRITE(TABLE_UNIT,5100, ADVANCE = 'NO')REAL(RTDAT(1, NXX),8), IDX
                 ELSE
-                   WRITE(KPPEQN_UNIT,5101, ADVANCE = 'NO')IDX
+                   WRITE(TABLE_UNIT,5101, ADVANCE = 'NO')IDX
                 END IF
              END IF
           CASE( 1 )
-             IF( KUNITS .EQ. 2 )CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IORDER(NXX))
-             WRITE(KPPEQN_UNIT,'(1PD12.4)', ADVANCE = 'NO')REAL(RTDAT(1, NXX), 8)
+             IF( KUNITS .EQ. 2 )CALL WRITE_RATE_CONVERT(TABLE_UNIT, IORDER(NXX))
+             WRITE(TABLE_UNIT,'(1PD12.4)', ADVANCE = 'NO')REAL(RTDAT(1, NXX), 8)
           CASE( 2 )
-             IF( KUNITS .EQ. 2 )CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IORDER(NXX))
-             WRITE(KPPEQN_UNIT,5002, ADVANCE = 'NO')RTDAT(1, NXX), RTDAT(2, NXX)
+             IF( KUNITS .EQ. 2 )CALL WRITE_RATE_CONVERT(TABLE_UNIT, IORDER(NXX))
+             WRITE(TABLE_UNIT,5002, ADVANCE = 'NO')RTDAT(1, NXX), RTDAT(2, NXX)
           CASE( 3 )
-             IF( KUNITS .EQ. 2 )CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IORDER(NXX))
-             WRITE(KPPEQN_UNIT,5003, ADVANCE = 'NO')RTDAT(1, NXX), RTDAT(3, NXX)
+             IF( KUNITS .EQ. 2 )CALL WRITE_RATE_CONVERT(TABLE_UNIT, IORDER(NXX))
+             WRITE(TABLE_UNIT,5003, ADVANCE = 'NO')RTDAT(1, NXX), RTDAT(3, NXX)
           CASE( 4 )
-             IF( KUNITS .EQ. 2 )CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IORDER(NXX))
-             WRITE(KPPEQN_UNIT,5004, ADVANCE = 'NO')RTDAT(1, NXX), RTDAT(3, NXX), RTDAT(2, NXX)
+             IF( KUNITS .EQ. 2 )CALL WRITE_RATE_CONVERT(TABLE_UNIT, IORDER(NXX))
+             WRITE(TABLE_UNIT,5004, ADVANCE = 'NO')RTDAT(1, NXX), RTDAT(3, NXX), RTDAT(2, NXX)
           CASE( 5 )
 !             DO IDX = 1, KTN5
 !                IF( KRX5( IDX ) .EQ. NXX )EXIT
@@ -578,10 +555,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 	     IF( IDIFF_ORDER .NE. 0 )THEN
 	         FALLOFF_RATE = ( KTYPE(IRX) .GT. 7 .AND. KTYPE(IRX) .LT. 11 )
                  IF( KUNITS .EQ. 2 .OR. FALLOFF_RATE )THEN
-	           CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IDIFF_ORDER )
+	           CALL WRITE_RATE_CONVERT(TABLE_UNIT, IDIFF_ORDER )
 		 END IF
 	     END IF
-             WRITE(KPPEQN_UNIT,5005, ADVANCE = 'NO')IRX,RTDAT( 1, NXX ), RTDAT(2, NXX )
+             WRITE(TABLE_UNIT,5005, ADVANCE = 'NO')IRX,RTDAT( 1, NXX ), RTDAT(2, NXX )
           CASE( 6 )
 !             DO IDX = 1, KTN6
 !                IF( KRX6( IDX ) .EQ. NXX )EXIT
@@ -591,45 +568,45 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 	     IF( IDIFF_ORDER .NE. 0 )THEN
 	         FALLOFF_RATE = ( KTYPE(IRX) .GT. 7 .AND. KTYPE(IRX) .LT. 11 )
                  IF( KUNITS .EQ. 2 .OR. FALLOFF_RATE )THEN
-	           CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IDIFF_ORDER )
+	           CALL WRITE_RATE_CONVERT(TABLE_UNIT, IDIFF_ORDER )
 		 END IF
 	     END IF
              IF( RTDAT( 1, NXX ) .NE. 1.0 )THEN
-                 WRITE(KPPEQN_UNIT, 5006, ADVANCE = 'NO')REAL(RTDAT( 1, NXX ), 8), IRX
+                 WRITE(TABLE_UNIT, 5006, ADVANCE = 'NO')REAL(RTDAT( 1, NXX ), 8), IRX
              ELSE
-                 WRITE(KPPEQN_UNIT, 4706, ADVANCE = 'NO')' ', IRX
+                 WRITE(TABLE_UNIT, 4706, ADVANCE = 'NO')' ', IRX
              END IF
           CASE( 7 )
              IF( RTDAT(1, NXX) .NE. 0.0 )THEN
-                 WRITE(KPPEQN_UNIT,5014, ADVANCE = 'NO')REAL(RTDAT(1, NXX), 8),REAL(RTDAT(2, NXX), 8)
+                 WRITE(TABLE_UNIT,5014, ADVANCE = 'NO')REAL(RTDAT(1, NXX), 8),REAL(RTDAT(2, NXX), 8)
              ELSE
-                 WRITE(KPPEQN_UNIT,5007, ADVANCE = 'NO')REAL(RTDAT(1, NXX), 8)
+                 WRITE(TABLE_UNIT,5007, ADVANCE = 'NO')REAL(RTDAT(1, NXX), 8)
              END IF
           CASE( 8 )
              DO IDX = 1, NFALLOFF
                 IF( IRRFALL( IDX ) .EQ. NXX )EXIT
              END DO
-             CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IORDER(NXX))
-             WRITE(KPPEQN_UNIT,5008, ADVANCE = 'NO')RTDAT(1,NXX),(1.0*RTDAT(2,NXX)),RTDAT(3,NXX),
+             CALL WRITE_RATE_CONVERT(TABLE_UNIT, IORDER(NXX))
+             WRITE(TABLE_UNIT,5008, ADVANCE = 'NO')RTDAT(1,NXX),(1.0*RTDAT(2,NXX)),RTDAT(3,NXX),
      &      (1.0*RFDAT(1,IDX)),RFDAT(2,IDX),(1.0*RFDAT(3,IDX))
           CASE( 9 )
              DO IDX = 1, NFALLOFF
                 IF( IRRFALL( IDX ) .EQ. NXX )EXIT
              END DO
-             CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IORDER(NXX))
+             CALL WRITE_RATE_CONVERT(TABLE_UNIT, IORDER(NXX))
              IF( RFDAT( 2, IDX ) .EQ. 0.0 .AND. RFDAT( 3, IDX ) .EQ. 0.0 )THEN
-                 WRITE(KPPEQN_UNIT,5009, ADVANCE = 'NO')RTDAT(1,NXX),RTDAT(2,NXX),
+                 WRITE(TABLE_UNIT,5009, ADVANCE = 'NO')RTDAT(1,NXX),RTDAT(2,NXX),
      &           RTDAT(3,NXX),1.0*RFDAT(1,IDX)
              ELSE 
-                 WRITE(KPPEQN_UNIT,5019, ADVANCE = 'NO')RTDAT(1,NXX),RFDAT(2, IDX),RTDAT(2,NXX),
+                 WRITE(TABLE_UNIT,5019, ADVANCE = 'NO')RTDAT(1,NXX),RFDAT(2, IDX),RTDAT(2,NXX),
      &           RTDAT(3,NXX),RFDAT(3, IDX),1.0*RFDAT(1,IDX),RFDAT(4, IDX),RFDAT(5, IDX)
               END IF 
           CASE( 10 )
              DO IDX = 1, NFALLOFF
                 IF( IRRFALL( IDX ) .EQ. NXX )EXIT
              END DO
-             CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IORDER(NXX))
-             WRITE(KPPEQN_UNIT, 4507, ADVANCE = 'NO')LABEL(NXX,1)
+             CALL WRITE_RATE_CONVERT(TABLE_UNIT, IORDER(NXX))
+             WRITE(TABLE_UNIT, 4507, ADVANCE = 'NO')LABEL(NXX,1)
           CASE( 11 )
              DO IDX = 1, NSPECIAL_RXN
                 IF( ISPECIAL( IDX, 1 ) .EQ. NXX )EXIT
@@ -637,19 +614,19 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
              I   = ISPECIAL( IDX, 1)
              IRX = ISPECIAL( IDX, 2)
              IF( RTDAT( 1, I) .NE. 1.0 )THEN
-                WRITE(KPPEQN_UNIT,5011, ADVANCE = 'NO')REAL(RTDAT( 1, I),8), TRIM( SPECIAL( IRX ) )
+                WRITE(TABLE_UNIT,5011, ADVANCE = 'NO')REAL(RTDAT( 1, I),8), TRIM( SPECIAL( IRX ) )
              ELSE
-                WRITE(KPPEQN_UNIT,5012, ADVANCE = 'NO')TRIM( SPECIAL( IRX ) )
+                WRITE(TABLE_UNIT,5012, ADVANCE = 'NO')TRIM( SPECIAL( IRX ) )
              END IF
            CASE( 12 )
              DO IDX = 1, NFALLOFF
                 IF( IRRFALL( IDX ) .EQ. NXX )EXIT
              END DO
-             CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IORDER(NXX))
-             WRITE(KPPEQN_UNIT,5020, ADVANCE = 'NO')RTDAT(1, NXX ),RFDAT(1, IDX),RTDAT(2, NXX ),
+             CALL WRITE_RATE_CONVERT(TABLE_UNIT, IORDER(NXX))
+             WRITE(TABLE_UNIT,5020, ADVANCE = 'NO')RTDAT(1, NXX ),RFDAT(1, IDX),RTDAT(2, NXX ),
      &       RFDAT(2, IDX)
           END SELECT
-         WRITE(KPPEQN_UNIT,'(A)')' ;'
+         WRITE(TABLE_UNIT,'(A)')' ;'
       END DO
 
       RETURN
@@ -818,7 +795,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 95100  FORMAT(2X,A16,' = 0.0D0')        
 
 
-       END SUBROUTINE WRT_KPP_INPUTS
+       END SUBROUTINE WRT_WIKI_TABLE
           
        SUBROUTINE  CONVERT_CASE_BAK ( BUFFER, UPPER )
 C***********************************************************************
@@ -907,3 +884,151 @@ C   begin body of subroutine  UPCASE
 95003   FORMAT(' RFACTOR_SQU * ')                
         RETURN
       END SUBROUTINE WRITE_RATE_CONVERT_BAK
+       REAL( 8 ) FUNCTION POWER_T02( TEMPOT300,A0,B0 )
+         IMPLICIT NONE
+! rate constant for CMAQ Arrhenuis reaction type 2
+! Arguements:
+         REAL( 8 ), INTENT( IN ) :: TEMPOT300
+         REAL( 8 ), INTENT( IN ) :: A0
+         REAL( 8 ), INTENT( IN ) :: B0
+         ! Local: None
+         POWER_T02 =  A0 * TEMPOT300**B0
+         RETURN
+       END FUNCTION POWER_T02
+       REAL( 8 ) FUNCTION ARRHENUIS_T04( INV_TEMP,TEMPOT300,A0,B0,C0 )
+         IMPLICIT NONE
+! rate constant for CMAQ Arrhenuis reaction type 4
+! Arguements:
+         REAL( 8 ), INTENT( IN ) :: INV_TEMP
+         REAL( 8 ), INTENT( IN ) :: TEMPOT300
+         REAL( 8 ), INTENT( IN ) :: A0
+         REAL( 8 ), INTENT( IN ) :: B0
+         REAL( 8 ), INTENT( IN ) :: C0
+         ! Local:
+         INTRINSIC DEXP
+         ARRHENUIS_T04 =  A0 * DEXP( B0 * INV_TEMP ) * TEMPOT300**C0
+         RETURN
+       END FUNCTION ARRHENUIS_T04
+       REAL( 8 ) FUNCTION ARRHENUIS_T03( INV_TEMP,A0,B0 )
+! rate constant for CMAQ Arrhenuis reaction type 3
+         IMPLICIT NONE
+! Arguements:
+         REAL( 8 ),   INTENT( IN ) ::  INV_TEMP
+         REAL( 8 ),     INTENT(IN) ::  A0
+         REAL( 8 ),     INTENT(IN) ::  B0
+         ! Local:
+         INTRINSIC DEXP
+         ARRHENUIS_T03 =  A0 * DEXP( B0 * INV_TEMP )
+         RETURN
+       END FUNCTION ARRHENUIS_T03 
+       REAL( 8 ) FUNCTION FALLOFF_T08(INV_TEMP,CAIR,A0,C0,A2,C2,A3,C3)
+! rate constant for CMAQ fall off reaction type 8
+         IMPLICIT NONE
+! Arguements:
+         REAL( 8 ), INTENT( IN ) :: INV_TEMP
+         REAL( 8 ), INTENT( IN ) :: CAIR
+         REAL( 8 ), INTENT( IN ) :: A0
+         REAL( 8 ), INTENT( IN ) :: C0
+         REAL( 8 ), INTENT( IN ) :: A2
+         REAL( 8 ), INTENT( IN ) :: C2
+         REAL( 8 ), INTENT( IN ) :: A3
+         REAL( 8 ), INTENT( IN ) :: C3
+         ! Local:
+         REAL( 8 ) K0
+         REAL( 8 ) K2
+         REAL( 8 ) K3
+         INTRINSIC DEXP
+         K0 = A0 * DEXP( C0 * INV_TEMP )
+         K2 = A2 * DEXP( C2 * INV_TEMP )
+         K3 = A3 * DEXP( C3 * INV_TEMP )
+         K3 = K3 * CAIR
+         FALLOFF_T08 = K0 + K3/( 1.0D0 + K3/K2 )
+         RETURN
+       END FUNCTION FALLOFF_T08
+       REAL( 8 ) FUNCTION FALLOFF_T09(INV_TEMP,CAIR,A1,C1,A2,C2)
+! rate constant for CMAQ fall off reaction type 9
+         IMPLICIT NONE
+! Arguements:
+         REAL( 8 ), INTENT( IN ) :: INV_TEMP
+         REAL( 8 ), INTENT( IN ) :: CAIR
+         REAL( 8 ), INTENT( IN ) :: A1
+         REAL( 8 ), INTENT( IN ) :: C1
+         REAL( 8 ), INTENT( IN ) :: A2
+         REAL( 8 ), INTENT( IN ) :: C2
+         !  Local:
+         REAL( 8 ) K1
+         REAL( 8 ) K2
+         INTRINSIC DEXP
+         K1 = A1 * DEXP( C1 * INV_TEMP )
+         K2 = A2 * DEXP( C2 * INV_TEMP )
+         FALLOFF_T09 = K1 + K2 * CAIR
+         RETURN
+       END FUNCTION FALLOFF_T09
+       REAL( 8 ) FUNCTION FALLOFF_T10(INV_TEMP,TEMPOT300,CAIR,A0,B0,C0,A1,B1,C1,CE,CF)
+         IMPLICIT NONE
+! rate constant for CMAQ fall off reaction type 10
+! Arguements:
+         REAL( 8 ), INTENT( IN ) :: INV_TEMP
+         REAL( 8 ), INTENT( IN ) :: TEMPOT300
+         REAL( 8 ), INTENT( IN ) :: CAIR
+         REAL( 8 ), INTENT( IN ) :: A0
+         REAL( 8 ), INTENT( IN ) :: B0
+         REAL( 8 ), INTENT( IN ) :: C0
+         REAL( 8 ), INTENT( IN ) :: A1
+         REAL( 8 ), INTENT( IN ) :: B1
+         REAL( 8 ), INTENT( IN ) :: C1
+         REAL( 8 ), INTENT( IN ) :: CE
+         REAL( 8 ), INTENT( IN ) :: CF
+         ! Local:
+         REAL( 8 ) K0
+         REAL( 8 ) K1
+         REAL( 8 ) KEND
+         K0 = A0 * CAIR * DEXP(B0*INV_TEMP)* TEMPOT300**C0
+         K1 = A1 * DEXP(B1*INV_TEMP) * TEMPOT300**C1
+         KEND = ( ( 1.0D0 + ( ( 1.0D0 / CE ) * DLOG10( K0 / K1 ) ) ** 2.0D0 ) )
+         KEND = 1.0D0 / KEND
+         FALLOFF_T10 = ( K0 / ( 1.0D0 + K0/K1 ) ) * CF ** KEND
+         RETURN
+       END FUNCTION FALLOFF_T10
+       REAL( 8 ) FUNCTION FALLOFF_T11(INV_TEMP,TEMPOT300,CAIR,A1,B1,C1,A2, B2, C2, D1, D2)
+! rate constant for CMAQ fall off reaction type 11
+! actually expanded form of type 9
+         IMPLICIT NONE
+! Arguements:
+         REAL( 8 ), INTENT( IN ) :: INV_TEMP
+         REAL( 8 ), INTENT( IN ) :: TEMPOT300
+         REAL( 8 ), INTENT( IN ) :: CAIR
+         REAL( 8 ), INTENT( IN ) :: A1
+         REAL( 8 ), INTENT( IN ) :: B1
+         REAL( 8 ), INTENT( IN ) :: C1
+         REAL( 8 ), INTENT( IN ) :: A2
+         REAL( 8 ), INTENT( IN ) :: B2
+         REAL( 8 ), INTENT( IN ) :: C2
+         REAL( 8 ), INTENT( IN ) :: D1
+         REAL( 8 ), INTENT( IN ) :: D2
+         !  Local:
+         REAL( 8 ) K1
+         REAL( 8 ) K2
+         REAL( 8 ) K3
+         INTRINSIC DEXP
+         K1 = A1 * DEXP( C1 * INV_TEMP ) * TEMPOT300**B1
+         K2 = A2 * DEXP( C2 * INV_TEMP ) * TEMPOT300**B2
+         K3 = D1 * DEXP( D2 * INV_TEMP )
+         FALLOFF_T11 = K1 + K2 * CAIR + K3
+         RETURN
+       END FUNCTION FALLOFF_T11
+       REAL( 8 ) FUNCTION HALOGEN_FALLOFF(PRESS,A1,B1,A2,B2)
+         IMPLICIT NONE
+         REAL( 8 ), PARAMETER    :: MAX_RATE = 2.4D-06  ! Maximum loss rate (1/sec)
+         REAL( 8 ), INTENT( IN ) :: PRESS
+         REAL( 8 ), INTENT( IN ) :: A1
+         REAL( 8 ), INTENT( IN ) :: B1
+         REAL( 8 ), INTENT( IN ) :: A2
+         REAL( 8 ), INTENT( IN ) :: B2
+         INTRINSIC DEXP
+         HALOGEN_FALLOFF = A1 * DEXP( B1 * PRESS ) + A2 * DEXP( B2 * PRESS )
+         HALOGEN_FALLOFF = DMIN1 (MAX_RATE, HALOGEN_FALLOFF )
+         RETURN
+       END FUNCTION HALOGEN_FALLOFF
+
+       END MODULE WIKI_TABLE
