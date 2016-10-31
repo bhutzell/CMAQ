@@ -44,10 +44,12 @@ endif
 
 OBJECTS =\
     MECHANISM_PARMS.o \
-    MECHANISM_DATA.o \
     KPP_DATA.o \
+    MECHANISM_DATA.o \
     CGRID_SPCS.o \
+    WIKI_TABLE.o \
     chemmech.o \
+    set_sparse_data.o \
     eatcom.o \
     check_ss_spc.o \
     check_order_specials.o \

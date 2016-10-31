@@ -191,12 +191,11 @@ c..Variables for species to be dropped from mechanism
        SUBROUTINE WRSS_EXT( NR ) 
          INTEGER, INTENT ( IN )         :: NR   ! No. of reactions
        END SUBROUTINE WRSS_EXT
-       SUBROUTINE WRT_KPP_INPUTS( NR, IP, LABEL, NS, SPCLIS  )
+       SUBROUTINE WRT_KPP_INPUTS( NR, IP, LABEL, NS  )
          INTEGER,         INTENT( IN ) :: NR ! number of reactions
          INTEGER,         INTENT( IN ) :: IP ! number of photolysis reaction
          CHARACTER( 16 ), INTENT( IN ) :: LABEL( :,: ) ! LABEL(NXX,1) 1st label found in rx NXX
          INTEGER,         INTENT( IN ) :: NS ! number of species
-         CHARACTER( 16 ), INTENT( IN ) :: SPCLIS( : )
        END SUBROUTINE WRT_KPP_INPUTS
        SUBROUTINE WREXTS_FORTRAN90 ( WRUNIT,
      &                              EQNAME_MECH,
@@ -600,9 +599,31 @@ C next reaction
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       CALL GETCHAR ( IMECH, INBUF, LPOINT, IEOL, CHR )
       END = '   '
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C Load reactions in photolysis or thermal reaction list based on Ktype
+C of reaction
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      NMPHOT  = IP
+      IF( KTYPE( NXX ) .EQ. 0 .OR. KTYPE( NXX ) .EQ. 12 )THEN
+!          print*,'loading photolysis reaction',IP,RXLABEL(NXX)
+          NSUNLIGHT = NSUNLIGHT + 1
+          CALL LOAD_REACTION_LIST( NSUNLIGHT, NXX, LABEL, PHOTOLYSIS_REACTIONS  )
+      ELSE
+          NTHERMAL = NTHERMAL + 1
+!          print*,'loading thermal reaction',NTHERMAL,RXLABEL(NXX)
+          CALL LOAD_REACTION_LIST( NTHERMAL, NXX, LABEL, THERMAL_REACTIONS  )
+      END IF
+
       IF ( CHR .EQ. 'E' .OR. CHR .EQ. 'e' ) END = INBUF( LPOINT:LPOINT+2 )
       IF ( END .NE. 'END' .AND. END .NE. 'end' ) GO TO 201
       NR = NXX
+!      DO NC = 1, NMPHOT
+!        WRITE(6,'(A,I4,1X,A16)')'NC, PHOTOLYSIS_REACTIONS( NC )%LABEL = ',NC, PHOTOLYSIS_REACTIONS( NC )%LABEL
+!      END DO
+!      DO NC = 1, NTHERMAL
+!        WRITE(6,'(A,I4,1X,A16)')'NC, THERMAL_REACTIONS( NC )%LABEL = ',NC, THERMAL_REACTIONS( NC )%LABEL
+!      END DO
+      CALL PUT_PHOTRXNS_ONTOP(LABEL)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C Get mechanism constant values for NRXWM, NRXWO2, NRXWN2, NRXWCH4, and NRXWH2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -702,26 +723,6 @@ C if we get here, LABEL(,1) match not found
          END IF  ! LABEL .NE.  ...
 501   CONTINUE
 
-C Error-check phot tables and report to log
-      WRITE( LUNOUT, * ) ' '
-      IPHOTAB = 0
-      NMPHOT  = IP
-      DO IPR = 1, IP
-         IF ( IPH( IPR,3 ) .NE. 0 ) THEN ! table
-            IPHOTAB = IPHOTAB + 1
-            IRX = IPH( IPR,1 )
-            NXX = IPH( IPR,2 )
-            WRITE( LUNOUT, 1009 ) IRX, PHOTAB( NXX ), RTDAT( 1,IRX ) 
-1009        FORMAT(  3X, 'Reaction', I4,
-     &               1X, 'uses photolysis table: ', A16,
-     &               1X, 'scaled by:', 1PG13.5 )
-         END IF
-      END DO
-      
-      WRITE( LUNOUT, 1011 ) IPHOTAB, NPHOTAB
-1011  FORMAT(/ 5X, 'There are', I3,
-     &         1X, 'photolysis table references out of', I3,
-     &         1X, 'tables' / )
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C Determine pointers to rate coefficients and species listed in the
@@ -794,7 +795,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       NUMB_MECH_SPCS = NS + N_SS_SPC
       
        ALLOCATE( MECHANISM_INDEX( NUMB_MECH_SPCS ), MECHANISM_SPC( NUMB_MECH_SPCS ),
-     &          CGRID_INDEX( NUMB_MECH_SPCS ), SPECIES_TYPE( NUMB_MECH_SPCS )  )
+     &           CGRID_INDEX( NUMB_MECH_SPCS ), SPECIES_TYPE( NUMB_MECH_SPCS ),
+     &           SPARSE_SPECIES( NUMB_MECH_SPCS )  )
 
        
        DO I = 1, NUMB_MECH_SPCS
@@ -825,6 +827,18 @@ C Set CGRID mechanism
        END DO
 
       NRXNS = NR
+!      N_SPEC = NS
+
+!      MXRCT = MAXRCTNTS
+      
+      MXRR   = 3 * MAXRCTNTS
+      MXRP   = 3 * MXPRD
+      MAXGL3  = 2 * NRXNS
+      MXARRAY = NUMB_MECH_SPCS * NUMB_MECH_SPCS
+      CALL SET_SPARSE_DATA( )
+
+!      MXCOUNT1 = N_SPEC * MAXGL3 * 3
+!      MXCOUNT2 = N_SPEC * MAXGL3 * 3
       
       CALL WREXTS ( EQNAME_MECH, DESCRP_MECH,
      &              NS, SPCLIS, SPC1RX, SS1RX ) 
@@ -840,6 +854,58 @@ C Set CGRID mechanism
       CLOSE( KPPEQN_UNIT )
       
       EQUATIONS_MECHFILE = EQNAME_MECH
+
+C Error-check phot tables and report to log
+      WRITE( LUNOUT, * ) ' '
+      IPHOTAB = 0
+      NMPHOT  = IP
+      DO IPR = 1, IP
+         IF ( IPH( IPR,3 ) .NE. 0 ) THEN ! table
+            IPHOTAB = IPHOTAB + 1
+            IRX = IPH( IPR,1 )
+            NXX = IPH( IPR,2 )
+            WRITE( LUNOUT, 1009 ) IRX, PHOTAB( NXX ), RTDAT( 1,IRX ) 
+1009        FORMAT(  3X, 'Reaction', I4,
+     &               1X, 'uses photolysis table: ', A16,
+     &               1X, 'scaled by:', 1PG13.5 )
+         END IF
+      END DO
+      
+      WRITE( LUNOUT, 1011 ) IPHOTAB, NPHOTAB
+1011  FORMAT(/ 5X, 'There are', I3,
+     &         1X, 'photolysis table references out of', I3,
+     &         1X, 'tables' / )
+
+C Error-check heteorogeneous tables and report to log
+      WRITE( LUNOUT, * ) ' '
+      IPHOTAB = 0
+      DO IPR = 1, MHETERO
+         IPHOTAB = IPHOTAB + 1
+         IRX = IHETERO(IPR,1)
+         IF( IRX .LT. 1 .OR. IRX .GT. NR )THEN
+            WRITE(LUNOUT,'(A,I4,A,I4)')
+     &      '*** ERROR IHETERO(MHETERO,1) < 1 or > # of Reactions, i.e.,',NR,
+     &      ' IHETERO(MHETERO,1) = ', IRX
+            STOP
+         END IF
+         NXX = IHETERO(IPR,2)
+         IF( NXX .LT. 1 .OR. NXX .GT. NHETERO )THEN
+            WRITE(LUNOUT,'(A,I4,A,I4)')
+     &      '*** ERROR IHETERO(MHETERO,2) < 1 or > NHETERO, i.e.,',NHETERO,
+     &      ' IHETERO(MHETERO,1) = ', NXX
+            STOP
+         END IF
+         WRITE( LUNOUT, 1109 ) IRX, HETERO( NXX ), RTDAT( 1,IRX ) 
+1109     FORMAT(  3X, 'Reaction', I4,
+     &            1X, 'uses heterogeneous rate table: ', A16,
+     &            1X, 'scaled by:', 1PG13.5 )
+
+      END DO
+      
+      WRITE( LUNOUT, 1012 ) IPHOTAB, MHETERO
+1012  FORMAT(/ 5X, 'There are', I3,
+     &         1X, 'heterogeneous table references out of', I3,
+     &         1X, 'tables' / )
       
       CALL WRT_RATE_CONSTANT( NR, IP, NS, SPCLIS, LABEL  )
       
@@ -848,7 +914,7 @@ C Set CGRID mechanism
 !      CLOSE( EXUNIT_RXCM )
 
 
-      CALL WRT_KPP_INPUTS( NR, IP, LABEL, NS, SPCLIS  )
+      CALL WRT_KPP_INPUTS( NR, IP, LABEL, NS  )
 
       WRITE( LUNOUT, * ) '   Normal Completion of CHEMMECH'
 
