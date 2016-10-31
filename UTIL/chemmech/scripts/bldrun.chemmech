@@ -1,46 +1,34 @@
 #! /bin/csh -f
 
-
- date
  set echo
-
  set BASE  = $cwd
 
-#option to set compiler and build a new executable (not required)
-  setenv COMPILER  INTEL
-# setenv COMPILER  PGF90
-# setenv COMPILER  GFORT
-  set recompile = "T"
+#> option to set compiler and build a new executable (not required)
+ setenv COMPILER  GFORT #> INTEL, PGF90, or GFORT
+ set compile = "F"    #> Compile the program? T or F
 
-#set path and name of executable mechanism porcessor
- set Xpath = ${BASE}/src
- set EXEC  = CHEMMECH_ggb_SS4
+#> CMAQv5.1 Mechanism Options: cb05tucl_ae6_aq cb05tump_ae6_aq cb05e51_ae6_aq saprc07tb_ae6_aq saprc07tc_ae6_aq  saprc07tic_ae6i_aq   racm2_ae6_aq 
+ set Mechanism = racm2_ae6_aq          #> CMAQ mechanism ID
 
- if( ${recompile} == "T" )then
-   cd ${Xpath}; make clean; \rm -f ${EXEC}; make
+ set Xpath = ${BASE}/src               #> Executable directory
+ set EXEC  = CHEMMECH                  #> Executable name
+ set Opath = ${BASE}"/output/"${Mechanism}   #> Output Directory
+ set Mpath = ${BASE}/input/${Mechanism}  #> Directory with mechanism definitions
+ 
+#> option use CMAQ species namelists to determine CGRID species indices
+ setenv USE_SPCS_NAMELISTS T
+
+#> compile the program 
+ if( ${compile} == "T" )then
+   cd ${Xpath}; make clean; make
    if( ! ( -e ${EXEC} ) )then
-      echo "failed to recompile" ${Xpath}/${EXEC}
+      echo "failed to compile ${Xpath}/${EXEC}"
       exit()
    endif
    cd ${BASE}
  endif
 
-#option use CMAQ species namelists to determine CGRID species indices
- setenv USE_SPCS_NAMELISTS T
-
-# mechanism input file ........................................................
-
-
- 
-    set mechanisms = saprc07tb_ae6_aq
-#set mechanisms = ( cb05tucl_ae6_aq cb05tump_ae6_aq cb05e51_ae6_aq saprc07tb_ae6_aq saprc07tc_ae6_aq  saprc07tic_ae6i_aq   racm2_ae6_aq )
-
-
-foreach Mechanism ( $mechanisms )
-
-  set  Mpath = ${BASE}/input/${Mechanism}
-
-cd ${Mpath} ; set MCFL =  ` \ls mech*def ` ; cd ${BASE}
+ cd ${Mpath} ; set MCFL =  ` \ls mech*def ` ; cd ${BASE}
 
  if( !( -e $Mpath/$MCFL ) )then
    \ls $Mpath/$MCFL
@@ -48,10 +36,8 @@ cd ${Mpath} ; set MCFL =  ` \ls mech*def ` ; cd ${BASE}
  endif
  set echo
  setenv MECHDEF  $Mpath/$MCFL
-
-  setenv MAPPING_ROUTINE "${BASE}/src/map_chemistry_spc.F90"
+ setenv MAPPING_ROUTINE "${Xpath}/map_chemistry_spc.F90"
  
-
  set NML    = ${Mpath}
  set NML_TR = ${BASE}/input/trac0
  set GC_NML = $NML/GC_${Mechanism}.nml
@@ -59,7 +45,6 @@ cd ${Mpath} ; set MCFL =  ` \ls mech*def ` ; cd ${BASE}
  set NR_NML = $NML/NR_${Mechanism}.nml
 
  set TR_NML = $NML_TR/Species_Table_TR_0.nml
-
 
 setenv gc_matrix_nml $GC_NML
 setenv ae_matrix_nml $AE_NML
@@ -98,10 +83,16 @@ set day = ` date "+%b-%d-%Y" `
   exit()
  endif
 
-$Xpath/$EXEC
+ $Xpath/$EXEC
 
-end
+ unset echo 
+
+ if( ( -e ${RXNS_DATA_MODULE} ) && ( -e ${RXNS_FUNC_MODULE} ) )then
+      echo "output written to ${Opath}"
+ else
+      echo "failed to create ${RXNS_DATA_MODULE} or ${RXNS_FUNC_MODULE}"
+      exit()
+ endif
 
  exit()
-
 
