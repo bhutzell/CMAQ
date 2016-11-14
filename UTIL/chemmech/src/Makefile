@@ -104,4 +104,4 @@ $(MODEL): $(OBJECTS)
 	$(CC) $(C_FLAGS) -c $<
 
 clean:
-	\rm -f *.o *.mod
+	\rm -f *.o *.mod $(MODEL)

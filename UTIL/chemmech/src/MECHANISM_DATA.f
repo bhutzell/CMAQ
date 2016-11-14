@@ -39,11 +39,22 @@
          INTEGER         :: NPDERIV                    ! number nonzero PD in mechanism
          INTEGER         :: NMPHOT                     ! number of photolysis reactions
          INTEGER         :: NSUNLIGHT                  ! number of sunlight reactions
+         INTEGER         :: ZERO_REACT_SUNLIGHT  = 0   ! number zero reactant reactions in sunlight reactions
+         INTEGER         :: ONE_REACT_SUNLIGHT   = 0   ! number one reactant reactions in sunlight reactions
          INTEGER         :: NTHERMAL                   ! number of thermal (non-sunlight-dependent) reactions
+         INTEGER         :: ONE_REACT_THERMAL    = 0   ! number one reactant reactions in thermal (non-sunlight-dependent) reactions
+         INTEGER         :: ZERO_REACT_THERMAL   = 0   ! number zero reactant reactions in thermal (non-sunlight-dependent) reactions
+         INTEGER         :: TWO_REACT_THERMAL    = 0   ! number second order reactions in thermal (non-sunlight-dependent) reactions
+         INTEGER         :: THREE_REACT_THERMAL  = 0   ! number three reactant reactions in thermal (non-sunlight-dependent) reactions
          INTEGER         :: NSPECIAL_RXN               ! number of special rate constant reactions
          INTEGER         :: ISPECIAL( MAXSPECRXNS,2 )
          INTEGER         :: NSPECIAL                   ! number of special rate expressions
          INTEGER         :: MSPECTERMS                 ! highest number of terms in the expressions
+
+         INTEGER         :: ZERO_REACT_REACTIONS  = 0  ! number zero reactant reactions
+         INTEGER         :: ONE_REACT_REACTIONS   = 0  ! number one reactant reactions
+         INTEGER         :: TWO_REACT_REACTIONS   = 0  ! number second order reactions
+         INTEGER         :: THREE_REACT_REACTIONS = 0  ! number three reactant reactions
 
          CHARACTER( 16 ) :: SPECIAL( MAXSPECRXNS )     
 
@@ -394,7 +405,99 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             REACTION_LIST( IREACTION )%NCH4_RCTNTS    = 0       ! # times methane a reactant
            END DO
            
-         END SUBROUTINE 
+         END SUBROUTINE INIT_REACTION_LIST
+         SUBROUTINE SORT_REACTION_LIST( OFFSET ,NREACTIONS, REACTION_LIST )
+! routine sorts the reactant based on the lowest number of reactants
+             IMPLICIT NONE
+             INTEGER,           INTENT( IN    ) :: OFFSET             ! in master list, #reactions before REACTION_LIST 
+             INTEGER,           INTENT( IN    ) :: NREACTIONS         ! number of reactions in list
+             TYPE( REACTION ),  INTENT( INOUT ) :: REACTION_LIST( : ) ! data for individual reactions
+!            INTEGER,           INTENT( INOUT ) :: INEW_BUBBLE  ( : )
+           
+             TYPE( REACTION ) :: SWAPVALUE
+             INTEGER          :: I, J
+             INTEGER          :: INEW
+             LOGICAL          :: SWAPPED
+             
+             INTEGER, ALLOCATABLE :: INEW_BUBBLE  ( : )
+
+             ALLOCATE( INEW_BUBBLE ( NREACTIONS ) )
+             INEW_BUBBLE = (/ (I, I = 1, NREACTIONS) /)
+                 
+             DO J =  (NREACTIONS-1), 1, -1
+                SWAPPED = .FALSE.
+                DO I = 1, J
+                  IF ( REACTION_LIST( I )%NREACT .GT. REACTION_LIST( I+1 )%NREACT ) THEN
+                    SWAPVALUE          = REACTION_LIST(I)
+                    REACTION_LIST(I)   = REACTION_LIST(I+1)
+                    REACTION_LIST(I+1) = SWAPVALUE
+                    INEW               = INEW_BUBBLE( I )
+                    INEW_BUBBLE( I )     = INEW_BUBBLE( I + 1 )
+                    INEW_BUBBLE( I + 1 ) = INEW
+                    SWAPPED = .TRUE.
+                  END IF
+                END DO
+                IF (.NOT. SWAPPED) EXIT
+             END DO
+
+!            WRITE(6,'(A)')'Results from sorting REACTION_LIST by number of reactants '
+             WRITE(6,99815)
+             DO J = 1, NREACTIONS
+                WRITE(6,99816)OFFSET+J,REACTION_LIST( J )%LABEL( 1 ),REACTION_LIST( J )%NREACT,
+     &          OFFSET+INEW_BUBBLE( J )
+             END DO
+
+             DEALLOCATE( INEW_BUBBLE )
+99815        FORMAT("Results from sorting REACTION_LIST by number of reactants"
+     &              / "INDEX",6X,"LABEL",7X,"NREACT",1X,"OLD INDEX")
+99816        FORMAT(1X,I4,1X,A16,3X,I1,3X,I4)
+         END SUBROUTINE SORT_REACTION_LIST 
+         SUBROUTINE REV_SORT_REACTION_LIST( OFFSET ,NREACTIONS, REACTION_LIST )
+! routine sorts the reactant based on the highest number of reactants
+             IMPLICIT NONE
+             INTEGER,           INTENT( IN    ) :: OFFSET             ! in master list, #reactions before REACTION_LIST 
+             INTEGER,           INTENT( IN    ) :: NREACTIONS         ! number of reactions in list
+             TYPE( REACTION ),  INTENT( INOUT ) :: REACTION_LIST( : ) ! data for individual reactions
+!            INTEGER,           INTENT( INOUT ) :: INEW_BUBBLE  ( : )
+           
+             TYPE( REACTION ) :: SWAPVALUE
+             INTEGER          :: I, J
+             INTEGER          :: INEW
+             LOGICAL          :: SWAPPED
+             
+             INTEGER, ALLOCATABLE :: INEW_BUBBLE  ( : )
+
+             ALLOCATE( INEW_BUBBLE ( NREACTIONS ) )
+             INEW_BUBBLE = (/ (I, I = 1, NREACTIONS) /)
+                 
+             DO J =  (NREACTIONS-1), 1, -1
+                SWAPPED = .FALSE.
+                DO I = 1, J
+                  IF ( REACTION_LIST( I )%NREACT .LT. REACTION_LIST( I+1 )%NREACT ) THEN
+                    SWAPVALUE          = REACTION_LIST(I)
+                    REACTION_LIST(I)   = REACTION_LIST(I+1)
+                    REACTION_LIST(I+1) = SWAPVALUE
+                    INEW               = INEW_BUBBLE( I )
+                    INEW_BUBBLE( I )     = INEW_BUBBLE( I + 1 )
+                    INEW_BUBBLE( I + 1 ) = INEW
+                    SWAPPED = .TRUE.
+                  END IF
+                END DO
+                IF (.NOT. SWAPPED) EXIT
+             END DO
+
+!            WRITE(6,'(A)')'Results from sorting REACTION_LIST by number of reactants '
+             WRITE(6,99815)
+             DO J = 1, NREACTIONS
+                WRITE(6,99816)OFFSET+J,REACTION_LIST( J )%LABEL( 1 ),REACTION_LIST( J )%NREACT,
+     &          OFFSET+INEW_BUBBLE( J )
+             END DO
+
+             DEALLOCATE( INEW_BUBBLE )
+99815        FORMAT("Results from reverse sorting REACTION_LIST by number of reactants"
+     &              / "INDEX",6X,"LABEL",7X,"NREACT",1X,"OLD INDEX")
+99816        FORMAT(1X,I4,1X,A16,3X,I1,3X,I4)
+         END SUBROUTINE REV_SORT_REACTION_LIST 
          SUBROUTINE LOAD_REACTION_LIST( IREACTION, JREACTION, LABELS, REACTION_LIST  )
            IMPLICIT NONE
            INTEGER, INTENT( IN )              :: IREACTION
@@ -517,7 +620,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             N_H2_REACTION  = 0
 ! reset varaible of KPP_DATA
             INDEX_FIXED_SPECIES = 0
-            DO I = 1, NSUNLIGHT   
+            DO I = 1, NSUNLIGHT
+
+               IF( PHOTOLYSIS_REACTIONS( I )%NREACT .EQ. 1 )THEN
+                   ONE_REACT_SUNLIGHT = ONE_REACT_SUNLIGHT + 1
+               ELSE IF( PHOTOLYSIS_REACTIONS( I )%NREACT .EQ. 0 )THEN
+                   ZERO_REACT_SUNLIGHT = ZERO_REACT_SUNLIGHT + 1
+               END IF
+!redefine first part of total mechanism data                  
                FIXED_SPC_COUNT       = 0
                LABELS( I,1 )         = PHOTOLYSIS_REACTIONS( I )%LABEL(1)                     
                LABELS( I,2 )         = PHOTOLYSIS_REACTIONS( I )%LABEL(2)                     
@@ -598,7 +708,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  WRITE( *,* )'Number of Constant Species Exceeds Three for Reaction:', LABELS( I,1 )
                  STOP
                END IF
-            END DO         
+            END DO
+            IF( NSUNLIGHT .NE. ONE_REACT_SUNLIGHT )THEN
+               WRITE( 6,'(a)')"FATAL ERROR"
+               WRITE( 6,'(a)')"Below sunlight dependent reactions not have only one reactant"
+               DO I = 1, NSUNLIGHT
+                  IF( PHOTOLYSIS_REACTIONS( I )%NREACT .EQ. 1 )CYCLE
+                  WRITE(6,'(8X,A16)')PHOTOLYSIS_REACTIONS( I )%LABEL( 1 )
+               END DO
+               STOP
+            END IF
+!redefine second part of total mechanism data                  
             I = NSUNLIGHT
             DO J = 1, NTHERMAL
                I = I + 1
@@ -608,7 +728,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                IRXBITS( I )          = THERMAL_REACTIONS( J )%IRXBITS            
                KTYPE( I )            = THERMAL_REACTIONS( J )%RATE_TYPE          
                NPRDCT( I )           = THERMAL_REACTIONS( J )%NPRDCT             
-               NREACT( I )           = THERMAL_REACTIONS( J )%NREACT             
+               NREACT( I )           = THERMAL_REACTIONS( J )%NREACT
+               SELECT CASE (THERMAL_REACTIONS( J )%NREACT )
+                 CASE( 0 )
+                   ZERO_REACT_THERMAL = ZERO_REACT_THERMAL + 1
+                 CASE( 1 )
+                   ONE_REACT_THERMAL  = ONE_REACT_THERMAL + 1
+                 CASE( 2 )
+                   TWO_REACT_THERMAL  = TWO_REACT_THERMAL + 1
+                 CASE( 3 )
+                   THREE_REACT_THERMAL = THREE_REACT_THERMAL + 1
+               END SELECT
                IORDER( I )           = THERMAL_REACTIONS( J )%ORDER             
                RTDAT( 1:3,I )        = THERMAL_REACTIONS( J )%RTDAT(1:3)         
 !              WRITE(6,'(A,7(ES12.4,1X))')'THERMAL_REACTIONS( J )%RTDAT(1:3),RTDAT( 1:3,I )',
@@ -703,6 +833,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             NWN2  = N_N2_3BODY
             NWH2  = N_H2_REACTION
             NWCH4 = N_CH4_REACTION
+!set total count of reactant per reaction
+            ONE_REACT_REACTIONS   = ONE_REACT_SUNLIGHT + ONE_REACT_THERMAL
+            ZERO_REACT_REACTIONS  = ZERO_REACT_THERMAL 
+            TWO_REACT_REACTIONS   = TWO_REACT_THERMAL 
+            THREE_REACT_REACTIONS = THREE_REACT_THERMAL 
 ! update labels
             DO J = 1, (NMPHOT + NTHERMAL)
                RXLABEL( J ) = LABELS( J,1 )

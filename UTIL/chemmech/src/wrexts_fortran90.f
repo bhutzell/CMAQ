@@ -68,7 +68,7 @@ C Local Variables
       LOGICAL, PARAMETER  :: FALSE = .FALSE.
    
       
-      INTEGER ISPC, ISPCNEW, IRX, IFLD0, IFLD1, IFLD2, NLINES
+      INTEGER ISPC, ISPCNEW, IRX, IRXOUT, IFLD0, IFLD1, IFLD2, NLINES
 
       INTEGER, EXTERNAL :: JUNIT
       EXTERNAL NAMEVAL
@@ -177,6 +177,10 @@ C                    1234567890123456789012345678901234567890123456789012
      &        /'!', 4X, 'SPECIES_TYPE    = Group or type of species '
      &        /'!', 4X, 'SPECIES_MOLWT   = Molecular Weight of species (gm/mole)'
      &        /'!', 4X, 'NRXNS           = Number of mechanism reactions'
+     &        /'!', 4X, 'ZERO_REACT_REACTIONS  = number zero reactant reactions',
+     &        /'!', 4X, 'ONE_REACT_REACTIONS   = number one reactant reactions',
+     &        /'!', 4X, 'TWO_REACT_REACTIONS   = number second order reactions',
+     &        /'!', 4X, 'THREE_REACT_REACTIONS = number three reactant reactions',
      &        /'!', 4X, 'NSUNLIGHT_RXNS  = Number of mechanism reactions requiring sunlight',
      &        /'!', 4X, 'NTHERMAL_RXNS   = Number of mechanism reactions not requiring sunlight',
      &        /'!', 4X, 'KUNITS          = Units of mechanism reactions'
@@ -208,6 +212,10 @@ C                    1234567890123456789012345678901234567890123456789012
      &        /'C', 4X, 'N_ACT_SP        = Number of active (determined by ODE solver) species in mechanism'
      &        /'C', 4X, 'GAS_CHEM_SPC    = Names of gas species in chemical mechanism'
      &        /'C', 4X, 'NRXNS           = Number of mechanism reactions'
+     &        /'!', 4X, 'ZERO_REACT_REACTIONS  = number zero reactant reactions',
+     &        /'!', 4X, 'ONE_REACT_REACTIONS   = number one reactant reactions',
+     &        /'!', 4X, 'TWO_REACT_REACTIONS   = number second order reactions',
+     &        /'!', 4X, 'THREE_REACT_REACTIONS = number three reactant reactions',
      &        /'!', 4X, 'NSUNLIGHT_RXNS  = Number of mechanism reactions requiring sunlight',
      &        /'!', 4X, 'NTHERMAL_RXNS   = Number of mechanism reactions not requiring sunlight',
      &        /'C', 4X, 'KUNITS          = Units of mechanism reactions'
@@ -243,6 +251,10 @@ C                    1234567890123456789012345678901234567890123456789012
      &        /'!', 4X, 'SPECIES_TYPE    = Group or type of species in chemical mechanism'
      &        /'!', 4X, 'SPECIES_MOLWT   = Molecular Weight of species (gm/mole)'
      &        /'!', 4X, 'NRXNS           = Number of mechanism reactions'
+     &        /'!', 4X, 'ZERO_REACT_REACTIONS  = number zero reactant reactions',
+     &        /'!', 4X, 'ONE_REACT_REACTIONS   = number one reactant reactions',
+     &        /'!', 4X, 'TWO_REACT_REACTIONS   = number second order reactions',
+     &        /'!', 4X, 'THREE_REACT_REACTIONS = number three reactant reactions',
      &        /'!', 4X, 'NSUNLIGHT_RXNS  = Number of mechanism reactions requiring sunlight',
      &        /'!', 4X, 'NTHERMAL_RXNS   = Number of mechanism reactions not requiring sunlight',
      &        /'!', 4X, 'IRXBITS         = Bit test mask vector for selected reactions'
@@ -556,7 +568,7 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
 
 c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-c     NR, KUNITS, NFALLOFF
+c     NR, KUNITS, NFALLOFF, etc.
 c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
       WRITE( WRUNIT, 1075 ) NS
@@ -565,6 +577,43 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       WRITE( WRUNIT, 1076 ) NR
 1076  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NRXNS =', I4 )
 
+      WRITE( WRUNIT, 1083 ) 'ZERO_REACT_REACTIONS',  ZERO_REACT_REACTIONS
+      WRITE( WRUNIT, 1083 ) 'ONE_REACT_REACTIONS',   ONE_REACT_REACTIONS
+      WRITE( WRUNIT, 1083 ) 'TWO_REACT_REACTIONS',   TWO_REACT_REACTIONS
+      WRITE( WRUNIT, 1083 ) 'THREE_REACT_REACTIONS', THREE_REACT_REACTIONS
+1083  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: ', A23,' =', I4 )
+
+1250  FORMAT( /'!', 1X, 'Reactions are grouped based on number of reactants',
+     &        /'!', 1X, 'Following parameters state the starting index for each group')
+      IRX = 1
+      IF ( ONE_REACT_REACTIONS .LT. 1 )THEN
+          IRXOUT = IRX - 1
+      ELSE
+          IRXOUT = IRX
+      END IF
+      WRITE( WRUNIT, 1083 ) 'ONE_REACT_START',   IRXOUT
+      IRX = ONE_REACT_REACTIONS + IRX
+      IF ( ZERO_REACT_REACTIONS .LT. 1 )THEN
+          IRXOUT = IRX - 1
+      ELSE
+          IRXOUT = IRX
+      END IF
+      WRITE( WRUNIT, 1083 ) 'ZERO_REACT_START',  IRXOUT
+      IRX = ZERO_REACT_REACTIONS + IRX
+      IF ( TWO_REACT_REACTIONS .LT. 1 )THEN
+          IRXOUT = IRX - 1
+      ELSE
+          IRXOUT = IRX
+      END IF
+      WRITE( WRUNIT, 1083 ) 'TWO_REACT_START',   IRXOUT
+      IRX = TWO_REACT_REACTIONS + IRX
+      IF ( THREE_REACT_REACTIONS .LT. 1 )THEN
+          IRXOUT = IRX - 1
+      ELSE
+          IRXOUT = IRX
+      END IF
+      WRITE( WRUNIT, 1083 ) 'THREE_REACT_START', IRXOUT
+      
       WRITE( WRUNIT, 1080 ) NSUNLIGHT
 1080  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NSUNLIGHT_RXNS =', I4 )
 

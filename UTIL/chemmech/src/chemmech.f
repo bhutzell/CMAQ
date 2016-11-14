@@ -623,6 +623,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !      DO NC = 1, NTHERMAL
 !        WRITE(6,'(A,I4,1X,A16)')'NC, THERMAL_REACTIONS( NC )%LABEL = ',NC, THERMAL_REACTIONS( NC )%LABEL
 !      END DO
+      NC = 0
+      CALL REV_SORT_REACTION_LIST( NC, NSUNLIGHT, PHOTOLYSIS_REACTIONS )
+      CALL SORT_REACTION_LIST( NSUNLIGHT, NTHERMAL, THERMAL_REACTIONS )
       CALL PUT_PHOTRXNS_ONTOP(LABEL)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C Get mechanism constant values for NRXWM, NRXWO2, NRXWN2, NRXWCH4, and NRXWH2 
