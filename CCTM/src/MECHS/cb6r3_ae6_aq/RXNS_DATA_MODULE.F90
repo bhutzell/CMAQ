@@ -227,8 +227,8 @@
          CHARACTER(  2 ) :: SPECIES_TYPE
          LOGICAL         :: CONVERT_CONC
          REAL            :: SPECIES_MOLWT
-      END TYPE MEMBER
-      TYPE( MEMBER ) ::  SPECIES_LIST( NUMB_CHEM_SPC ) = (/ &
+      END TYPE MEMBER 
+      TYPE( MEMBER ) ::  SPECIES_LIST( NUMB_MECH_SPC ) = (/ &
       & MEMBER("AISO3J          ",  181, "AE",  168.20, T), &
       & MEMBER("AXYL1J          ",  128, "AE",  174.00, T), &
       & MEMBER("AXYL2J          ",  129, "AE",  185.00, T), &

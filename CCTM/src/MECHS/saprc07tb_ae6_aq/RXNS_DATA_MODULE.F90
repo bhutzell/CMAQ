@@ -283,7 +283,7 @@
          LOGICAL         :: CONVERT_CONC
          REAL            :: SPECIES_MOLWT
       END TYPE MEMBER
-      TYPE( MEMBER ) ::  SPECIES_LIST( NUMB_CHEM_SPC ) = (/ &
+      TYPE( MEMBER ) ::  SPECIES_LIST( NUMB_MECH_SPC )  = (/ &
       & MEMBER("AXYL1J          ",  183, "AE",  174.00, T), &
       & MEMBER("AXYL2J          ",  184, "AE",  185.00, T), &
       & MEMBER("ATOL1J          ",  186, "AE",  163.00, T), &
@@ -478,6 +478,7 @@
       & MEMBER("RO2C            ",   23, "GC",    1.00, F), &
       & MEMBER("HO2             ",   11, "GC",   33.00, F), &
       & MEMBER("OH              ",    9, "GC",   17.00, F) /)
+
 
       DATA CHEMISTRY_SPC(   1 ), SPECIES_MOLWT(   1 ) / 'AXYL1J          ',  174.00 /
       DATA CHEMISTRY_SPC(   2 ), SPECIES_MOLWT(   2 ) / 'AXYL2J          ',  185.00 /

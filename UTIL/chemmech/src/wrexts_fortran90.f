@@ -169,7 +169,7 @@ C                    1234567890123456789012345678901234567890123456789012
      &              1X, 'file:'
      &        /'!', 4X, 'MECHNAME        = Mechanism name'
      &        /'!', 4X, 'N_GAS_CHEM_SPC  = Total number of gas species in chemical mechanism'
-     &        /'!', 4X, 'NUMB_CHEM_SPC   = Total number of species in chemical mechanism'
+     &        /'!', 4X, 'NUMB_MECH_SPC   = Total number of species in chemical mechanism'
      &        /'!', 4X, 'N_ACT_SP        = Number of active (determined by ODE solver) species in mechanism'
      &        /'!', 4X, 'GAS_CHEM_SPC    = Names of gas species in chemical mechanism'
      &        /'!', 4X, 'CHEMISTRY_SPC   = Names of species in chemical mechanism'
@@ -208,7 +208,7 @@ C                    1234567890123456789012345678901234567890123456789012
      &              1X, 'INCLUDE file:'
      &        /'C', 4X, 'MECHNAME        = Mechanism name'
      &        /'C', 4X, 'N_GAS_CHEM_SPC  = Total number of gas species in chemical mechanism'
-     &        /'C', 4X, 'NUMB_CHEM_SPC   = Total number of species in chemical mechanism'
+     &        /'C', 4X, 'NUMB_MECH_SPC   = Total number of species in chemical mechanism'
      &        /'C', 4X, 'N_ACT_SP        = Number of active (determined by ODE solver) species in mechanism'
      &        /'C', 4X, 'GAS_CHEM_SPC    = Names of gas species in chemical mechanism'
      &        /'C', 4X, 'NRXNS           = Number of mechanism reactions'
@@ -243,7 +243,7 @@ C                    1234567890123456789012345678901234567890123456789012
      &              1X, 'file:'
      &        /'!', 4X, 'MECHNAME        = Mechanism name'
      &        /'!', 4X, 'N_GAS_CHEM_SPC  = Total number of gas species in chemical mechanism'
-     &        /'!', 4X, 'NUMB_CHEM_SPC   = Total number of species in chemical mechanism'
+     &        /'!', 4X, 'NUMB_MECH_SPC   = Total number of species in chemical mechanism'
      &        /'!', 4X, 'N_ACT_SP        = Number of active (determined by ODE solver) species in mechanism'
      &        /'!', 4X, 'GAS_CHEM_SPC    = Names of gas species in chemical mechanism'
      &        /'!', 4X, 'CHEMISTRY_SPC   = Names of species in chemical mechanism'
@@ -506,7 +506,7 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
      &       /6X, '   LOGICAL         :: CONVERT_CONC',
      &       /6X, '   REAL            :: SPECIES_MOLWT',
      &       /6X, 'END TYPE MEMBER',
-     &       /6X, 'TYPE( MEMBER ) ::  SPECIES_LIST( NUMB_CHEM_SPC ) = (/ &')
+     &       /6X, 'TYPE( MEMBER ) ::  SPECIES_LIST( NUMB_MECH_SPC ) = (/ &')
 2161   FORMAT( 6X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,'), &')
 2162   FORMAT( 6X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,') /)' /)
 
