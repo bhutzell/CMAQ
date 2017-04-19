@@ -105,13 +105,13 @@ c.. Variables for steady-state species
 
          CHARACTER( 16 ) RXLABEL( MAXRXNUM )   ! label for rx 
 
-         CHARACTER( 120 ) :: EQNAME_SPCS
-         CHARACTER( 120 ) :: EQNAME_RXDT
-         CHARACTER( 120 ) :: EQNAME_RXCM
-         CHARACTER( 120 ) :: FNAME_MODULE
-         CHARACTER( 120 ) :: FNAME_DATA_MODULE
-         CHARACTER( 120 ) :: FNAME_FUNC_MODULE
-         CHARACTER( 120 ) :: OUTDIR 
+         CHARACTER( 586 ) :: EQNAME_SPCS
+         CHARACTER( 586 ) :: EQNAME_RXDT
+         CHARACTER( 586 ) :: EQNAME_RXCM
+         CHARACTER( 586 ) :: FNAME_MODULE
+         CHARACTER( 586 ) :: FNAME_DATA_MODULE
+         CHARACTER( 586 ) :: FNAME_FUNC_MODULE
+         CHARACTER( 586 ) :: OUTDIR 
 
          INTEGER        ::  EXUNIT_SPCS
          INTEGER        ::  EXUNIT_RXDT

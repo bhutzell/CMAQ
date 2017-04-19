@@ -62,8 +62,10 @@
       
       IF( .NOT. FIRSTCALL )RETURN
       
-      IF ( NSPECIAL .LT. 1 ) RETURN
-
+      IF ( NSPECIAL .LT. 1 )THEN
+         WRITE( 6, 90001)(MSPECTERMS-1)
+         RETURN
+      ENDIF
 
       ORDER_TERM     = -999
       ERROR_FLAG     = .FALSE.
