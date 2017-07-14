@@ -429,8 +429,8 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
      &            /6X, 'CHARACTER( 16 ) :: SPECIES_TYPE(  NUMB_MECH_SPC )',
      &            /6X, 'INTEGER         :: CGRID_INDEX (  NUMB_MECH_SPC )',
      &            /6X, 'INTEGER         :: TYPE_INDEX  (  NUMB_MECH_SPC )',
-     &            /6X, 'REAL            :: SPECIES_MOLWT( NUMB_MECH_SPC )')
-     &            /6X, 'LOGICAL         :: CONVERT_CONC(  NUMB_MECH_SPC )',
+     &            /6X, 'REAL            :: SPECIES_MOLWT( NUMB_MECH_SPC )',
+     &            /6X, 'LOGICAL         :: CONVERT_CONC(  NUMB_MECH_SPC )')
       ELSE
           WRITE( WRUNIT, 2157 )
 2157      FORMAT( /6X, 'CHARACTER( 16 ) :: GAS_CHEM_SPC( N_GAS_CHEM_SPC )')
@@ -503,8 +503,8 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
      &       /6X, '   CHARACTER( 16 ) :: CHEMISTRY_SPC',
      &       /6X, '   INTEGER         :: CGRID_INDEX',
      &       /6X, '   CHARACTER(  2 ) :: SPECIES_TYPE',
-     &       /6X, '   LOGICAL         :: CONVERT_CONC',
      &       /6X, '   REAL            :: SPECIES_MOLWT',
+     &       /6X, '   LOGICAL         :: CONVERT_CONC',
      &       /6X, 'END TYPE MEMBER',
      &       /6X, 'TYPE( MEMBER ) ::  SPECIES_LIST( NUMB_MECH_SPC ) = (/ &')
 2161   FORMAT( 6X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,'), &')
