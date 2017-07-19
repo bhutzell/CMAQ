@@ -36,6 +36,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       USE KPP_DATA
       USE MECHANISM_DATA, MECHANISM => MECHNAME
       USE CGRID_SPCS     ! CGRID mechanism species    
+      USE WIKI_TABLE
       
       IMPLICIT NONE
 
@@ -805,6 +806,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
        DO I = 1, NUMB_MECH_SPCS
          MECHANISM_INDEX( I ) = I
          MECHANISM_SPC( I )   = SPCLIS( I )
+         SPARSE_SPECIES( I )  = SPCLIS( I )
        END DO
 
       MECHANISM( 1:LEN(MECHANISM) ) = DESCRP_MECH( 1:LEN(MECHANISM) )
@@ -917,7 +919,11 @@ C Error-check heteorogeneous tables and report to log
 !      CLOSE( EXUNIT_RXCM )
 
 
-      CALL WRT_KPP_INPUTS( NR, IP, LABEL, NS  )
+!      CALL WRT_KPP_INPUTS( NR, IP, LABEL, NS, SPCLIS  )
+      CALL WRT_WIKI_TABLE( NR, IP, LABEL, NS  )
+      CALL WRT_MD_TABLE( NR, IP, LABEL, NS  )
+      CALL WRT_CSV_TABLE( NR, IP, LABEL, NS  )
+      CALL WRT_HTML_TABLE( NR, IP, LABEL, NS  )
 
       WRITE( LUNOUT, * ) '   Normal Completion of CHEMMECH'
 
