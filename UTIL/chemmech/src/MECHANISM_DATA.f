@@ -980,6 +980,49 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &         LABELS( J,1:2), RXLABEL( J ), KTYPE( J )
             END DO
          END SUBROUTINE REPLACE_REACTIONS
+         SUBROUTINE REORDER_REACTION_LIST(NREACTIONS, REACTION_LIST)
+ !sorts a reaction based on a specified order of reactants
+            IMPLICIT NONE
+
+           INTEGER, INTENT( IN )              :: NREACTIONS
+           TYPE( REACTION ),  INTENT( INOUT ) :: REACTION_LIST( : )
+
+           TYPE( REACTION ),  ALLOCATABLE     :: SORTED_LIST  ( : )
+
+           INTEGER, PARAMETER  :: NPRIORITY = 4
+           INTEGER, PARAMETER  :: IPRIORITY( NPRIORITY ) = (/ 
+     &                            1, 2, 3, 0 /)
+
+           INTEGER             :: IRXN
+           INTEGER             :: ICOUNT, IPR
+
+           ALLOCATE( SORTED_LIST  ( NREACTIONS ) )
+
+           ICOUNT = 0
+           DO IPR = 1, NPRIORITY
+              DO IRXN = 1, NREACTIONS
+                  IF( REACTION_LIST( IRXN )%NREACT .EQ. IPRIORITY( IPR ) )THEN
+                     ICOUNT = ICOUNT + 1
+                     SORTED_LIST( ICOUNT ) = REACTION_LIST( IRXN )
+                     print*, REACTION_LIST( IRXN )%LABEL(1:2),REACTION_LIST( IRXN )%NREACT,IPRIORITY( IPR )
+                  END IF
+              END DO
+           END DO
+
+           IF( ICOUNT .NE. NREACTIONS )THEN
+               WRITE(6,*)'BELOW Reactions have # of Reactants <0 and >3'
+               DO IRXN = 1, NREACTIONS
+                  IF( REACTION_LIST( IRXN )%NREACT .LT. 0 .OR. REACTION_LIST( IRXN )%NREACT .GT. 3 )THEN
+                     WRITE(6,'(I5,2(1X,A16))')IRXN,REACTION_LIST( IRXN )%LABEL(1:2)
+                  END IF
+               END DO
+               STOP
+           END IF    
+           REACTION_LIST = SORTED_LIST
+
+           DEALLOCATE( SORTED_LIST )
+
+          END SUBROUTINE REORDER_REACTION_LIST 
        END MODULE MECHANISM_DATA
             
             
