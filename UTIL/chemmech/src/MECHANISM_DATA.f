@@ -66,8 +66,8 @@
          INTEGER         :: N_OPERATORS( MAXSPECRXNS )
          INTEGER         :: OPERATORS( MAXSPECRXNS, MAXSPECTERMS )
          REAL( 8 )       :: OPERATOR_COEFFS( MAXSPECRXNS, MAXSPECTERMS)
-	 
-	 INTEGER, ALLOCATABLE :: ORDER_SPECIAL( : )
+
+         INTEGER, ALLOCATABLE :: ORDER_SPECIAL( : )
          
          INTEGER IPH( MAXPHOTRXNS,3 )
          INTEGER NPHOTAB                          ! no. of unique photolysis rates
