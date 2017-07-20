@@ -403,8 +403,6 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       WRITE( WRUNIT, 1061 ) DESCRP_MECH(1:LEN_TRIM(DESCRP_MECH))
 1061  FORMAT( /6X, 'CHARACTER( 32 ), PARAMETER ::',
      &         1X, 'MECHNAME = ''', A, '''' )
-
-      print*,'WREXTS_FORTRAN90: WRITE_CGRID_DATA = ',WRITE_CGRID_DATA
       
       N_GAS_CHEM_SPC = 0 
       DO ISPC = 1, NUMB_MECH_SPCS
@@ -577,10 +575,10 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       WRITE( WRUNIT, 1076 ) NR
 1076  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NRXNS =', I4 )
 
-      WRITE( WRUNIT, 1083 ) 'ZERO_REACT_REACTIONS',  ZERO_REACT_REACTIONS
       WRITE( WRUNIT, 1083 ) 'ONE_REACT_REACTIONS',   ONE_REACT_REACTIONS
       WRITE( WRUNIT, 1083 ) 'TWO_REACT_REACTIONS',   TWO_REACT_REACTIONS
       WRITE( WRUNIT, 1083 ) 'THREE_REACT_REACTIONS', THREE_REACT_REACTIONS
+      WRITE( WRUNIT, 1083 ) 'ZERO_REACT_REACTIONS',  ZERO_REACT_REACTIONS
 1083  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: ', A23,' =', I4 )
 
 1250  FORMAT( /'!', 1X, 'Reactions are grouped based on number of reactants',
@@ -618,21 +616,63 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       END IF
       WRITE( WRUNIT, 1083 ) 'ZERO_REACT_START',  IRXOUT
       
-      WRITE( WRUNIT, 1080 ) NSUNLIGHT
-1080  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NSUNLIGHT_RXNS =', I4 )
+!     WRITE( WRUNIT, 1080 ) NSUNLIGHT
+!1080  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NSUNLIGHT_RXNS =', I4 )
+!      IF( SUN_BELOW )THEN 
+!         IRXOUT = IRX
+!         IRX = ZERO_REACT_REACTIONS + IRX 
+!         WRITE( WRUNIT, 1083 ) 'ZERO_REACT_START',  IRXOUT
+!         WRITE( WRUNIT, 1083 ) 'ZERO_REACT_STOP ',  IRX - 1
+!         IRXOUT = IRX
+!         IRX    = THREE_REACT_REACTIONS + IRX
+!         WRITE( WRUNIT, 1083 ) 'THREE_REACT_START', IRXOUT
+!         WRITE( WRUNIT, 1083 ) 'THREE_REACT_STOP ', IRX - 1
+!         IRXOUT = IRX
+!         IRX = TWO_REACT_REACTIONS + IRX
+!         WRITE( WRUNIT, 1083 ) 'TWO_REACT_START',   IRXOUT
+!         WRITE( WRUNIT, 1083 ) 'TWO_REACT_STOP ',   IRX - 1
+!         IRXOUT = IRX
+!         IRX    = ONE_REACT_REACTIONS + IRX 
+!         WRITE( WRUNIT, 1083 ) 'ONE_REACT_START',   IRXOUT
+!         WRITE( WRUNIT, 1083 ) 'ONE_REACT_STOP ',   IRX - 1
+!         WRITE( WRUNIT, 1251 ) 'SUNLIGHT_BELOW','.TRUE.'
+!         IRXOUT = NTHERMAL +  1
+!         IRX    = IRXOUT + NSUNLIGHT 
+!         WRITE( WRUNIT, 1083 ) 'NSUN_RXNS_START',  IRXOUT
+!         WRITE( WRUNIT, 1083 ) 'NSUN_RXNS_STOP',  IRX - 1
+!      ELSE
+!         IRXOUT = IRX
+!         IRX    = ONE_REACT_REACTIONS + IRX 
+!         WRITE( WRUNIT, 1083 ) 'ONE_REACT_START',   IRXOUT
+!         WRITE( WRUNIT, 1083 ) 'ONE_REACT_STOP ',   IRX - 1
+!         IRXOUT = IRX
+!         IRX = TWO_REACT_REACTIONS + IRX
+!         WRITE( WRUNIT, 1083 ) 'TWO_REACT_START',   IRXOUT
+!         WRITE( WRUNIT, 1083 ) 'TWO_REACT_STOP ',   IRX - 1
+!         IRXOUT = IRX
+!         IRX    = THREE_REACT_REACTIONS + IRX
+!         WRITE( WRUNIT, 1083 ) 'THREE_REACT_START', IRXOUT
+!         WRITE( WRUNIT, 1083 ) 'THREE_REACT_STOP ', IRX - 1
+!         IRXOUT = IRX
+!         IRX = ZERO_REACT_REACTIONS + IRX 
+!         WRITE( WRUNIT, 1083 ) 'ZERO_REACT_START',  IRXOUT
+!         WRITE( WRUNIT, 1083 ) 'ZERO_REACT_STOP ',  IRX - 1
+!         WRITE( WRUNIT, 1251 ) 'SUNLIGHT_BELOW', '.FALSE.'
+!         IRXOUT = 1
+!         IRX    = IRXOUT + NSUNLIGHT 
+!         WRITE( WRUNIT, 1083 ) 'NSUN_RXNS_START',  IRXOUT
+!         WRITE( WRUNIT, 1083 ) 'NSUN_RXNS_STOP',  IRX - 1
+!      END IF
+!1251  FORMAT(/6X,'LOGICAL, PARAMETER', 1X, ':: ',A23,' = ', A)
 
-      WRITE( WRUNIT, 1081 ) NTHERMAL
-1081  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NTHERMAL_RXNS  =', I4 )
+      WRITE( WRUNIT, 1083 ) 'NSUNLIGHT_RXNS  ',  NSUNLIGHT
 
-
-      WRITE( WRUNIT, 1077 )
-1077  FORMAT( /6X, 'INTEGER', 12X, ':: KUNITS' )
-
-      WRITE( WRUNIT, 1078 ) KUNITS
-1078  FORMAT( /6X, 'DATA  KUNITS /', I4, ' /' )
+      WRITE( WRUNIT, 1083 ) 'NTHERMAL_RXNS   ',  NTHERMAL
+      WRITE( WRUNIT, 1083 ) 'KUNITS          ',  KUNITS
 
       WRITE( WRUNIT, 1079 )
-1079  FORMAT( /6X, 'INTEGER IRXXN' )
+
+1079  FORMAT( /6X, 'INTEGER  :: IRXXN' )
 c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 c     IP, IPH
 c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-

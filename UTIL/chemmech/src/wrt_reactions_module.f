@@ -1,4 +1,3 @@
-
 C***************************************************************************
 C  Significant portions of Models-3/CMAQ software were developed by        *
 C  Government employees and under a United States Government contract.     *
@@ -273,6 +272,9 @@ c..Variables for species to be dropped from mechanism
          INTEGER, INTENT( IN )    ::  WRUNIT     ! logical write unit no.
          INTEGER, INTENT ( IN )   :: NR   ! No. of reactions
        END SUBROUTINE WRSS_EXT_FORTRAN90
+       SUBROUTINE WRT_RATES( IOUNIT )
+         INTEGER, INTENT( IN ) :: IOUNIT
+       END SUBROUTINE WRT_RATES
       END INTERFACE 
   
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -538,7 +540,6 @@ C Error-check phot tables and report to log
 75006 FORMAT(2X, "&")      
       WRITE(MODULE_UNIT,95701)
 95701 FORMAT(/ '! define rate constants in terms of special rate operators ' /)
-      print*,size(label,1),size(label,2)
       DO NXX = 1, NSPECIAL_RXN
          IDX = ISPECIAL( NXX,1 )
          IF( RTDAT( 1, IDX ) .NE. 1.0 )THEN
@@ -711,7 +712,6 @@ C Error-check phot tables and report to log
              WRITE(MODULE_UNIT,5115, ADVANCE = 'NO')IRX, 1.0D0/RTDAT( 1, NXX ), -RTDAT(2, NXX )
           CASE( 6 )
              IRX = INT( RTDAT( 2, NXX) )
-             print*,RXLABEL(NXX),RTDAT( 2, NXX)
              IF( IRX .GT. NXX )CYCLE
              WRITE(MODULE_UNIT, 1501, ADVANCE= 'NO')LABEL(NXX,1), NXX
              
@@ -767,7 +767,6 @@ C Error-check phot tables and report to log
 	      DO IDX = 1, NSPECIAL_RXN
 	         IF( ISPECIAL( IDX, 1) .EQ. NXX )EXIT
               END DO       
-             print*,RXLABEL(NXX),ISPECIAL( IDX, 1:2)
              IF( ORDER_SPECIAL( ISPECIAL( IDX, 2 ) ) .EQ. 0 )THEN
                   IDIFF_ORDER = IORDER(NXX) - 1
              ELSE IF( ORDER_SPECIAL( ISPECIAL( IDX, 2 ) ) .GT. 0 )THEN
@@ -829,6 +828,9 @@ C Error-check phot tables and report to log
       END DO
 
       WRITE(MODULE_UNIT,99991)
+
+!...write reaction rates routine to module 
+      CALL WRT_RATES( MODULE_UNIT )
       
       TEMPLATE_UNIT = JUNIT()
       CALL NAMEVAL( MAPPING_ROUTINE, EQNAME )
@@ -1437,12 +1439,18 @@ C Error-check phot tables and report to log
      & '        REAL( 8 ) :: INV_RFACT     ! ppm/min to molec/(cm^3*min)' /
      & '        REAL( 8 ) :: RFACT_SQU     ! cm^6/(molec^2*min) to 1/(ppm^2*min)' /
      & '        REAL( 8 ) :: RFACT         ! cm^3/(molec*min) to 1/(ppm*min)' /
-     & '        REAL      :: H2O           ! Cell H2O mixing ratio (ppmV)'  //
-     & '        RKI = 0.0D0 ' / )
+     & '        REAL      :: H2O           ! Cell H2O mixing ratio (ppmV)'  // )
+!     & '        RKI = 0.0D0 ' / )
 99879   FORMAT(/'        IF( LSUNLIGHT )THEN ' /
      &          '            DO NCELL = 1, NUMCELLS ' )
-99881   FORMAT(/'            END DO ' /     
-     &          '        END IF ' )
+99881   FORMAT(/'            END DO '
+     &         / '       ELSE '
+     &         / '         DO N = 1, NSUNLIGHT_RXNS '
+     &         / '            DO NCELL = 1, NUMCELLS '
+     &         / '               RKI(NCELL, N ) = 0.0D0 '
+     &         / '            END DO'
+     &         / '         END DO'
+     &         / '       END IF ' )
 99882   FORMAT(/
      & '        DO NCELL = 1, NUMCELLS ' /
      & '!  Set-up conversion factors '/

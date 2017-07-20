@@ -13,26 +13,26 @@ ifeq ($(COMPILER),INTEL)
 
 FC = ifort
 CC = icc
-F_FLAGS = -fixed -132 -O3 -override-limits -check uninit -check bounds -check format -g -traceback -warn nounused -override-limits -fno-alias -mp1  -I . -g
+F_FLAGS = -fixed -132 -O0 -override-limits -check uninit -check bounds -check format -g -traceback -warn nounused -override-limits -fno-alias -mp1  -I . -g
 C_FLAGS =  -O2  -DFLDMN=1
 LINK_FLAGS = 
 
 else
  FC = pgf90
  CC = pgcc
- F_FLAGS = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O3 -I . -g
- f_FLAGS = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O3 -I . -g
+ F_FLAGS = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
+ f_FLAGS = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
  C_FLAGS =  -O2  -DFLDMN=1
  LINK_FLAGS = 
 
  ifeq ($(COMPILER),GFORT)
    FC    = gfortran
    CC    = gcc
-   f_FLAGS       = -ffixed-form -ffixed-line-length-132 -O3 -funroll-loops -finit-character=32 -fcheck=all -I. 
-   f_FLAGS       = -ffixed-form -ffixed-line-length-132 -O3 -funroll-loops -finit-character=32 -I. 
+   f_FLAGS       = -ffixed-form -ffixed-line-length-132 -O0 -funroll-loops -finit-character=32 -fcheck=all -I. 
+   f_FLAGS       = -ffixed-form -ffixed-line-length-132 -O0 -funroll-loops -finit-character=32 -I. 
    F_FLAGS       = $(f_FLAGS)
-   f90_FLAGS     = -cpp -ffree-form -ffree-line-length-none -O3 -funroll-loops -finit-character=32 -fcheck=all -I. 
-   f90_FLAGS     = -cpp -ffree-form -ffree-line-length-none -O3 -funroll-loops -finit-character=32 -I. 
+   f90_FLAGS     = -cpp -ffree-form -ffree-line-length-none -O0 -funroll-loops -finit-character=32 -fcheck=all -I. 
+   f90_FLAGS     = -cpp -ffree-form -ffree-line-length-none -O0 -funroll-loops -finit-character=32 -I. 
    F90_FLAGS     = $(f90_FLAGS)
    C_FLAGS       = -O2 -DFLDMN -I /home/wdx/lib/x86_64/gcc/mpich/include
    LINKER        = $(FC)
@@ -68,12 +68,12 @@ OBJECTS =\
     lkupspec.o \
     rdline.o \
     size.o \
-    wrexts.o \
     wrhdr1.o \
     wrbf6.o \
     wrbf16c.o \
     wrbf12d.o \
     wrbf12s.o \
+    wrexts.o \
     wrspecial_ext.o \
     wrss_ext.o  \
     wrt_kpp_inputs.o \
@@ -84,6 +84,7 @@ OBJECTS =\
     wrbf12s_fortran90.o \
     wrspecial_ext_fortran90.o \
     wrexts_fortran90.o \
+    wrt_rates.o \
     wrss_ext_fortran90.o  \
     vallabchr.o \
     valwrdchr.o \

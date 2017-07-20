@@ -36,7 +36,7 @@
          REAL( 8 ) :: RFDAT( 5,MAXFALLOFF )
          REAL( 8 ) :: CONST( MAXCONSTS )        
           
-         INTEGER         :: NPDERIV                    ! number nonzero PD in mechanism
+         INTEGER         :: NPDERIV             = 0    ! number nonzero PD in mechanism
          INTEGER         :: NMPHOT                     ! number of photolysis reactions
          INTEGER         :: NSUNLIGHT                  ! number of sunlight reactions
          INTEGER         :: ZERO_REACT_SUNLIGHT  = 0   ! number zero reactant reactions in sunlight reactions
@@ -255,7 +255,8 @@ c..indices for decomposition
 
          LOGICAL, SAVE  :: LREORDER = .TRUE.             ! Flag to reorder or not
 
-
+         LOGICAL        :: SUN_BELOW                 ! flag to determining to put sunlight reactions
+                                                     ! below other reactions in reorder reactions
          CONTAINS
          
          SUBROUTINE INIT_MECH_DATA()
@@ -415,37 +416,62 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !            INTEGER,           INTENT( INOUT ) :: INEW_BUBBLE  ( : )
            
              TYPE( REACTION ) :: SWAPVALUE
+
              INTEGER          :: I, J
-             INTEGER          :: INEW
+             INTEGER          :: INEW, JNEW           ! Index for sorted species number
+             INTEGER          :: IOLD, JOLD           ! Index for old species number
+             INTEGER          :: IMINNEW              ! Index holder for sort routine
+             INTEGER          :: IMINOLD              ! Index holder for sort routine
+             INTEGER          :: MINVALU              ! Current number of PD terms in sort
              LOGICAL          :: SWAPPED
+             TYPE( REACTION ), ALLOCATABLE :: SWAPZERO( : )
              
              INTEGER, ALLOCATABLE :: INEW_BUBBLE  ( : )
+             INTEGER, ALLOCATABLE :: IMID_BUBBLE  ( : )
 
-             ALLOCATE( INEW_BUBBLE ( NREACTIONS ) )
-             INEW_BUBBLE = (/ (I, I = 1, NREACTIONS) /)
+             ALLOCATE( IMID_BUBBLE ( NREACTIONS ), INEW_BUBBLE ( NREACTIONS ) )
+             IMID_BUBBLE = (/ (I, I = 1, NREACTIONS) /)
                  
-             DO J =  (NREACTIONS-1), 1, -1
-                SWAPPED = .FALSE.
-                DO I = 1, J
-                  IF ( REACTION_LIST( I )%NREACT .GT. REACTION_LIST( I+1 )%NREACT ) THEN
-                    SWAPVALUE          = REACTION_LIST(I)
-                    REACTION_LIST(I)   = REACTION_LIST(I+1)
-                    REACTION_LIST(I+1) = SWAPVALUE
-                    INEW               = INEW_BUBBLE( I )
-                    INEW_BUBBLE( I )     = INEW_BUBBLE( I + 1 )
-                    INEW_BUBBLE( I + 1 ) = INEW
-                    SWAPPED = .TRUE.
-                  END IF
-                END DO
-                IF (.NOT. SWAPPED) EXIT
+
+             DO JNEW = 1, NREACTIONS
+                JOLD    = IMID_BUBBLE( JNEW )
+                      MINVALU = REACTION_LIST( JOLD )%NREACT
+                      IMINOLD = JOLD
+                      IMINNEW = JNEW
+
+                      DO INEW = JNEW + 1, NREACTIONS
+                         IOLD = IMID_BUBBLE( INEW )
+                         IF ( REACTION_LIST( IOLD )%NREACT .LT. MINVALU ) THEN
+                            MINVALU = REACTION_LIST( IOLD )%NREACT
+                            IMINOLD = IOLD
+                            IMINNEW = INEW
+                         END IF
+                      END DO
+
+                      IMID_BUBBLE( IMINNEW ) = JOLD
+                      IMID_BUBBLE( JNEW )    = IMINOLD
+                      INEW_BUBBLE( JOLD )    = IMINNEW
+                      INEW_BUBBLE( IMINOLD ) = JNEW
              END DO
+
+             ALLOCATE( SWAPZERO ( NREACTIONS ) )
+             SWAPZERO = REACTION_LIST
+             DO J = 1, NREACTIONS
+                I = IMID_BUBBLE( J ) 
+                REACTION_LIST( J ) = SWAPZERO( I )
+                WRITE(6,99816)OFFSET+J,REACTION_LIST( J )%LABEL( 1 ),REACTION_LIST( J )%NREACT,
+     &          OFFSET+IMID_BUBBLE( J )
+             END DO
+
 
 !            WRITE(6,'(A)')'Results from sorting REACTION_LIST by number of reactants '
              WRITE(6,99815)
              DO J = 1, NREACTIONS
                 WRITE(6,99816)OFFSET+J,REACTION_LIST( J )%LABEL( 1 ),REACTION_LIST( J )%NREACT,
-     &          OFFSET+INEW_BUBBLE( J )
+     &          OFFSET+IMID_BUBBLE( J )
              END DO
+
+
 
              DEALLOCATE( INEW_BUBBLE )
 99815        FORMAT("Results from sorting REACTION_LIST by number of reactants"
@@ -462,29 +488,56 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
            
              TYPE( REACTION ) :: SWAPVALUE
              INTEGER          :: I, J
-             INTEGER          :: INEW
+             INTEGER          :: INEW, JNEW           ! Index for sorted species number
+             INTEGER          :: IOLD, JOLD           ! Index for old species number
+             INTEGER          :: IMINNEW              ! Index holder for sort routine
+             INTEGER          :: IMINOLD              ! Index holder for sort routine
+             INTEGER          :: MINVALU              ! Current number of PD terms in sort
              LOGICAL          :: SWAPPED
+             TYPE( REACTION ), ALLOCATABLE :: SWAPZERO( : )
              
              INTEGER, ALLOCATABLE :: INEW_BUBBLE  ( : )
+             INTEGER, ALLOCATABLE :: IMID_BUBBLE  ( : )
 
-             ALLOCATE( INEW_BUBBLE ( NREACTIONS ) )
-             INEW_BUBBLE = (/ (I, I = 1, NREACTIONS) /)
+             ALLOCATE( IMID_BUBBLE ( NREACTIONS ), INEW_BUBBLE ( NREACTIONS ) )
+             IMID_BUBBLE = (/ (I, I = 1, NREACTIONS) /)
                  
-             DO J =  (NREACTIONS-1), 1, -1
-                SWAPPED = .FALSE.
-                DO I = 1, J
-                  IF ( REACTION_LIST( I )%NREACT .LT. REACTION_LIST( I+1 )%NREACT ) THEN
-                    SWAPVALUE          = REACTION_LIST(I)
-                    REACTION_LIST(I)   = REACTION_LIST(I+1)
-                    REACTION_LIST(I+1) = SWAPVALUE
-                    INEW               = INEW_BUBBLE( I )
-                    INEW_BUBBLE( I )     = INEW_BUBBLE( I + 1 )
-                    INEW_BUBBLE( I + 1 ) = INEW
-                    SWAPPED = .TRUE.
-                  END IF
+             DO JNEW = 1, NREACTIONS
+                JOLD    = IMID_BUBBLE( JNEW )
+                MINVALU = REACTION_LIST( JOLD )%NREACT
+                IMINOLD = JOLD
+                IMINNEW = JNEW
+
+                DO INEW = JNEW + 1, NREACTIONS
+                   IOLD = IMID_BUBBLE( INEW )
+                   IF ( REACTION_LIST( IOLD )%NREACT .LT. MINVALU ) THEN
+                      MINVALU = REACTION_LIST( IOLD )%NREACT
+                      IMINOLD = IOLD
+                      IMINNEW = INEW
+                   END IF
                 END DO
-                IF (.NOT. SWAPPED) EXIT
+
+                IMID_BUBBLE( IMINNEW ) = JOLD
+                IMID_BUBBLE( JNEW )    = IMINOLD
+                INEW_BUBBLE( JOLD )    = IMINNEW
+                INEW_BUBBLE( IMINOLD ) = JNEW
              END DO
+
+             ALLOCATE( SWAPZERO ( NREACTIONS ) )
+             SWAPZERO = REACTION_LIST
+             DO J = 1, NREACTIONS
+                I = IMID_BUBBLE( J ) 
+                REACTION_LIST( J ) = SWAPZERO( I )
+                WRITE(6,99816)OFFSET+J,REACTION_LIST( J )%LABEL( 1 ),REACTION_LIST( J )%NREACT,
+     &          OFFSET+IMID_BUBBLE( J )
+             END DO
+             
+             SWAPZERO = REACTION_LIST
+             DO J =  1, NREACTIONS
+                I = NREACTIONS - J + 1
+                REACTION_LIST( J ) = SWAPZERO( I )
+                INEW_BUBBLE( J )   = IMID_BUBBLE( I )
+             END DO 
 
 !            WRITE(6,'(A)')'Results from sorting REACTION_LIST by number of reactants '
              WRITE(6,99815)
@@ -492,12 +545,86 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                 WRITE(6,99816)OFFSET+J,REACTION_LIST( J )%LABEL( 1 ),REACTION_LIST( J )%NREACT,
      &          OFFSET+INEW_BUBBLE( J )
              END DO
-
-             DEALLOCATE( INEW_BUBBLE )
+             
+             DEALLOCATE( SWAPZERO, IMID_BUBBLE, INEW_BUBBLE )
 99815        FORMAT("Results from reverse sorting REACTION_LIST by number of reactants"
      &              / "INDEX",6X,"LABEL",7X,"NREACT",1X,"OLD INDEX")
 99816        FORMAT(1X,I4,1X,A16,3X,I1,3X,I4)
+
          END SUBROUTINE REV_SORT_REACTION_LIST 
+         SUBROUTINE PUT_ZEROS_BELOW( OFFSET ,NREACTIONS, REACTION_LIST )
+! routine sorts the reactant based on the highest number of reactants
+             IMPLICIT NONE
+             INTEGER,           INTENT( IN    ) :: OFFSET             ! in master list, #reactions before REACTION_LIST 
+             INTEGER,           INTENT( IN    ) :: NREACTIONS         ! number of reactions in list
+             TYPE( REACTION ),  INTENT( INOUT ) :: REACTION_LIST( : ) ! data for individual reactions
+!            INTEGER,           INTENT( INOUT ) :: INEW_BUBBLE  ( : )
+           
+             TYPE( REACTION ) :: SWAPVALUE
+             INTEGER          :: I, J
+             INTEGER          :: INEW, NZERO
+             LOGICAL          :: SWAPPED
+             TYPE( REACTION ), ALLOCATABLE :: SWAPZERO( : )
+             
+             NZERO = 0 
+             DO I = 1, NREACTIONS
+                 IF ( REACTION_LIST( I )%NREACT .EQ. 0 ) NZERO = NZERO + 1
+             END DO
+! put reaction with no reactants last
+             IF( NZERO .LT. 1 ) RETURN
+
+             ALLOCATE( SWAPZERO ( NREACTIONS ) )
+             SWAPZERO = REACTION_LIST
+             REACTION_LIST( 1:(NREACTIONS-NZERO) ) = SWAPZERO( (NREACTIONS-NZERO+1):NREACTIONS )
+             REACTION_LIST( (NREACTIONS-NZERO+1):NREACTIONS ) = SWAPZERO( 1:NZERO )
+             DEALLOCATE( SWAPZERO )
+
+!            WRITE(6,'(A)')'Results from putting zero order reactions in REACTION_LIST below '
+             WRITE(6,99815)
+             DO J = 1, NREACTIONS
+                WRITE(6,99816)OFFSET+J,REACTION_LIST( J )%LABEL( 1 ),REACTION_LIST( J )%NREACT
+             END DO
+
+99815        FORMAT("Results from reverse sorting REACTION_LIST by number of reactants"
+     &              / "INDEX",6X,"LABEL",7X,"NREACT",1X,"OLD INDEX")
+99816        FORMAT(1X,I4,1X,A16,3X,I1,3X,I4)
+         END SUBROUTINE PUT_ZEROS_BELOW 
+         SUBROUTINE PUT_ZEROS_ABOVE( NREACTIONS, REACTION_LIST )
+! routine sorts the reactant based on the highest number of reactants
+             IMPLICIT NONE
+             INTEGER,           INTENT( IN    ) :: NREACTIONS         ! number of reactions in list
+             TYPE( REACTION ),  INTENT( INOUT ) :: REACTION_LIST( : ) ! data for individual reactions
+!            INTEGER,           INTENT( INOUT ) :: INEW_BUBBLE  ( : )
+           
+             TYPE( REACTION ) :: SWAPVALUE
+             INTEGER          :: I, J
+             INTEGER          :: INEW, NZERO
+             LOGICAL          :: SWAPPED
+             TYPE( REACTION ), ALLOCATABLE :: SWAPZERO( : )
+             
+             NZERO = 0 
+             DO I = 1, NREACTIONS
+                 IF ( REACTION_LIST( I )%NREACT .EQ. 0 ) NZERO = NZERO + 1
+             END DO
+! put reaction with no reactants last
+             IF( NZERO .LT. 1 ) RETURN
+
+             ALLOCATE( SWAPZERO ( NREACTIONS ) )
+             SWAPZERO = REACTION_LIST
+             REACTION_LIST( 1:NZERO ) = SWAPZERO( (NREACTIONS-NZERO+1):NREACTIONS )
+             REACTION_LIST( (NREACTIONS-NZERO+1):NREACTIONS ) = SWAPZERO( 1:(NREACTIONS-NZERO) )
+             DEALLOCATE( SWAPZERO )
+
+!            WRITE(6,'(A)')'Results from putting zero order reactions in REACTION_LIST below '
+             WRITE(6,99815)
+             DO J = 1, NREACTIONS
+                WRITE(6,99816)J,REACTION_LIST( J )%LABEL( 1 ),REACTION_LIST( J )%NREACT
+             END DO
+
+99815        FORMAT("Results from reverse sorting REACTION_LIST by number of reactants"
+     &              / "INDEX",6X,"LABEL",7X,"NREACT",1X,"OLD INDEX")
+99816        FORMAT(1X,I4,1X,A16,3X,I1,3X,I4)
+         END SUBROUTINE PUT_ZEROS_ABOVE 
          SUBROUTINE LOAD_REACTION_LIST( IREACTION, JREACTION, LABELS, REACTION_LIST  )
            IMPLICIT NONE
            INTEGER, INTENT( IN )              :: IREACTION
@@ -621,7 +748,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ! reset varaible of KPP_DATA
             INDEX_FIXED_SPECIES = 0
             DO I = 1, NSUNLIGHT
-
                IF( PHOTOLYSIS_REACTIONS( I )%NREACT .EQ. 1 )THEN
                    ONE_REACT_SUNLIGHT = ONE_REACT_SUNLIGHT + 1
                ELSE IF( PHOTOLYSIS_REACTIONS( I )%NREACT .EQ. 0 )THEN
@@ -838,13 +964,282 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ZERO_REACT_REACTIONS  = ZERO_REACT_THERMAL 
             TWO_REACT_REACTIONS   = TWO_REACT_THERMAL 
             THREE_REACT_REACTIONS = THREE_REACT_THERMAL 
-! update labels
+! update labels and calculate the number of partial derivative in the mechanism
+            NPDERIV = 0
             DO J = 1, (NMPHOT + NTHERMAL)
                RXLABEL( J ) = LABELS( J,1 )
+               NPDERIV = NPDERIV + NREACT( J )
                WRITE(6,'(A,I4,1X,3(A16,1X),I2)')"MECHANISM: J, LABELS(J,1:2),RXLABEL( J ), KTYPE( J ) = ", J,
      &         LABELS( J,1:2), RXLABEL( J ), KTYPE( J )
             END DO
          END SUBROUTINE PUT_PHOTRXNS_ONTOP
+         SUBROUTINE PLACE_PHOTRXNS( LABELS )
+            USE KPP_DATA
+            IMPLICIT NONE
+            
+            CHARACTER(LEN=16), INTENT( INOUT ) :: LABELS( :,: )
+
+            INTEGER :: I, J, K
+            INTEGER :: IFALLOFF
+            INTEGER :: IPHOT
+            INTEGER :: IHET
+            INTEGER :: JSPECIAL
+            INTEGER :: N_AIR_3BODY
+            INTEGER :: N_H2O_3BODY
+            INTEGER :: N_N2_3BODY
+            INTEGER :: N_O2_3BODY
+            INTEGER :: N_CH4_REACTION
+            INTEGER :: N_H2_REACTION
+            INTEGER :: FIXED_SPC_COUNT
+
+            IFALLOFF = 0
+            IPHOT    = 0
+            IHET     = 0
+            JSPECIAL = 0
+            N_AIR_3BODY    = 0
+            N_H2O_3BODY    = 0
+            N_N2_3BODY     = 0  
+            N_O2_3BODY     = 0
+            N_CH4_REACTION = 0
+            N_H2_REACTION  = 0
+! reset varaible of KPP_DATA
+            INDEX_FIXED_SPECIES = 0
+            IF( SUN_BELOW )THEN
+                I = NTHERMAL
+            ELSE
+                I = 0
+            END IF
+            DO J = 1, NSUNLIGHT
+               I = I + 1
+               IF( PHOTOLYSIS_REACTIONS( J )%NREACT .EQ. 1 )THEN
+                   ONE_REACT_SUNLIGHT = ONE_REACT_SUNLIGHT + 1
+               ELSE IF( PHOTOLYSIS_REACTIONS( J )%NREACT .EQ. 0 )THEN
+                   ZERO_REACT_SUNLIGHT = ZERO_REACT_SUNLIGHT + 1
+               END IF
+!redefine first part of total mechanism data                  
+               FIXED_SPC_COUNT       = 0
+               LABELS( I,1 )         = PHOTOLYSIS_REACTIONS( J )%LABEL(1)                     
+               LABELS( I,2 )         = PHOTOLYSIS_REACTIONS( J )%LABEL(2)                     
+               IRXBITS( I )          = PHOTOLYSIS_REACTIONS( J )%IRXBITS            
+               KTYPE( I )            = PHOTOLYSIS_REACTIONS( J )%RATE_TYPE          
+               NPRDCT( I )           = PHOTOLYSIS_REACTIONS( J )%NPRDCT             
+               NREACT( I )           = PHOTOLYSIS_REACTIONS( J )%NREACT             
+               IORDER( I )           = PHOTOLYSIS_REACTIONS( J )%ORDER             
+               RTDAT( 1:3,I )        = PHOTOLYSIS_REACTIONS( J )%RTDAT(1:3)         
+               IRR( I,1:MAXPRODS+3 ) = PHOTOLYSIS_REACTIONS( J )%IRR(1:MAXPRODS+3)  
+               SC( I, 1:MAXPRODS )   = PHOTOLYSIS_REACTIONS( J )%SC(1:MAXPRODS)     
+               IF( KTYPE( I ) .EQ. 12 .OR. ( KTYPE( I ) .GT. 7 .AND. KTYPE( I ) .LT. 11  ) )THEN
+                 IFALLOFF = IFALLOFF + 1
+                 IRRFALL( IFALLOFF )   = I ! PHOTOLYSIS_REACTIONS( J )%FALLOFF_INDEX
+                 RFDAT( 1:5,IFALLOFF ) = PHOTOLYSIS_REACTIONS( J )%RFDAT(1:5)
+               WRITE(6,'(A,I4,1X,(A16,1X),(I2,1X),5(ES12.4,1X))')"PHOTOLYSIS: I, LABELS( I, 1 ), IRRFALL = ", I, 
+     &         LABELS( I, 1 ),IRRFALL( IFALLOFF ),RFDAT( 1:5,IFALLOFF )
+               END IF
+               IF( KTYPE( I ) .EQ. 0 )THEN
+                 IPHOT = IPHOT + 1
+                 IPH( IPHOT,1 ) = I ! PHOTOLYSIS_REACTIONS( J )%PHOTO_INDEX(1:3)
+                 IPH( IPHOT,2 ) = PHOTOLYSIS_REACTIONS( J )%PHOTO_INDEX(2)
+                 IPH( IPHOT,3 ) = PHOTOLYSIS_REACTIONS( J )%PHOTO_INDEX(3)
+               WRITE(6,'(A,I4,1X,(A16,1X),(I3,1X),A16,1X,I3)')"PHOTOLYSIS: I, LABELS( I, 1 ), IPH = ", I, 
+     &         LABELS( I, 1 ),IPH( IPHOT,1 ),PHOTAB(IPH( IPHOT,2 )),IPH( IPHOT,3 )
+               END IF
+               IF( KTYPE( I ) .EQ. 11 )THEN
+                 JSPECIAL = JSPECIAL + 1
+                 ISPECIAL( JSPECIAL,1 ) = I ! PHOTOLYSIS_REACTIONS( J )%SPECIAL_INDEX(1:2)
+                 ISPECIAL( JSPECIAL,2 ) = PHOTOLYSIS_REACTIONS( J )%SPECIAL_INDEX(2)
+               END IF
+               IF( KTYPE( I ) .EQ. -1 )THEN
+                 IHET = IHET + 1
+                 IHETERO(IHET,1) = I ! PHOTOLYSIS_REACTIONS( J )%HETEO_INDEX(1:2)
+                 IHETERO(IHET,2) = PHOTOLYSIS_REACTIONS( J )%HETEO_INDEX(2)
+               END IF
+!reset third body, CH4 and H2 reaction pointers
+               DO K = 1, PHOTOLYSIS_REACTIONS( J )%NAIR_RCTNTS
+                  N_AIR_3BODY = N_AIR_3BODY  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWM(N_AIR_3BODY) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 1
+                  print*,'I, N_AIR_3BODY, NRXWM(N_AIR_3BODY) = ',I, N_AIR_3BODY, NRXWM(N_AIR_3BODY)
+               END DO
+               DO K = 1, PHOTOLYSIS_REACTIONS( J )%NH2O_RCTNTS
+                  N_H2O_3BODY = N_H2O_3BODY  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWW(N_AIR_3BODY) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 2
+               END DO
+               DO K = 1, PHOTOLYSIS_REACTIONS( J )%N_O2_RCTNTS
+                  N_O2_3BODY = N_O2_3BODY  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWO2(N_O2_3BODY) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 3
+               END DO
+               DO K = 1, PHOTOLYSIS_REACTIONS( J )%N_N2_RCTNTS
+                  N_N2_3BODY = N_N2_3BODY  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWN2(N_N2_3BODY) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 4
+               END DO
+               DO K = 1, PHOTOLYSIS_REACTIONS( J )%N_H2_RCTNTS
+                  N_H2_REACTION = N_H2_REACTION  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWH2(N_H2_REACTION) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 6
+               END DO
+               DO K = 1, PHOTOLYSIS_REACTIONS( J )%NCH4_RCTNTS
+                  N_CH4_REACTION = N_CH4_REACTION  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWH2(N_CH4_REACTION) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 5
+               END DO
+               WRITE(6,'(A,I4,1X,(A16,1X),2(I2,1X))')"PHOTOLYSIS: I, LABELS( I, 1 ), KTYPE( I ), IORDER = ", I, 
+     &         LABELS( I, 1 ),KTYPE( I ),IORDER( I )
+               IF ( FIXED_SPC_COUNT .GT. 3 ) THEN
+                 WRITE( *,* )'Number of Constant Species Exceeds Three for Reaction:', LABELS( I,1 )
+                 STOP
+               END IF
+            END DO
+            IF( NSUNLIGHT .NE. ONE_REACT_SUNLIGHT )THEN
+               WRITE( 6,'(a)')"FATAL ERROR"
+               WRITE( 6,'(a)')"Below sunlight dependent reactions not have only one reactant"
+               DO I = 1, NSUNLIGHT
+                  IF( PHOTOLYSIS_REACTIONS( K )%NREACT .EQ. 1 )CYCLE
+                  WRITE(6,'(8X,A16)')PHOTOLYSIS_REACTIONS( K )%LABEL( 1 )
+               END DO
+               STOP
+            END IF
+!redefine second part of total mechanism data
+            IF( SUN_BELOW )THEN
+                I = 0
+            ELSE
+                I = NSUNLIGHT
+            END IF
+            DO J = 1, NTHERMAL
+               I = I + 1
+               FIXED_SPC_COUNT       = 0
+               LABELS( I,1 )         = THERMAL_REACTIONS( J )%LABEL(1)                     
+               LABELS( I,2 )         = THERMAL_REACTIONS( J )%LABEL(2)                     
+               IRXBITS( I )          = THERMAL_REACTIONS( J )%IRXBITS            
+               KTYPE( I )            = THERMAL_REACTIONS( J )%RATE_TYPE          
+               NPRDCT( I )           = THERMAL_REACTIONS( J )%NPRDCT             
+               NREACT( I )           = THERMAL_REACTIONS( J )%NREACT
+               SELECT CASE (THERMAL_REACTIONS( J )%NREACT )
+                 CASE( 0 )
+                   ZERO_REACT_THERMAL = ZERO_REACT_THERMAL + 1
+                 CASE( 1 )
+                   ONE_REACT_THERMAL  = ONE_REACT_THERMAL + 1
+                 CASE( 2 )
+                   TWO_REACT_THERMAL  = TWO_REACT_THERMAL + 1
+                 CASE( 3 )
+                   THREE_REACT_THERMAL = THREE_REACT_THERMAL + 1
+               END SELECT
+               IORDER( I )           = THERMAL_REACTIONS( J )%ORDER             
+               RTDAT( 1:3,I )        = THERMAL_REACTIONS( J )%RTDAT(1:3)         
+!              WRITE(6,'(A,7(ES12.4,1X))')'THERMAL_REACTIONS( J )%RTDAT(1:3),RTDAT( 1:3,I )',
+!     &          THERMAL_REACTIONS( J )%RTDAT(1:3), RTDAT( 1:3,I)
+               IRR( I,1:MAXPRODS+3 ) = THERMAL_REACTIONS( J )%IRR(1:MAXPRODS+3)  
+               SC( I, 1:MAXPRODS )   = THERMAL_REACTIONS( J )%SC(1:MAXPRODS)
+               IF( KTYPE( I ) .EQ. 12 .OR. ( KTYPE( I ) .GT. 7 .AND. KTYPE( I ) .LT. 11 ) )THEN
+                 IFALLOFF = IFALLOFF + 1
+                 IRRFALL( IFALLOFF )   = I ! THERMAL_REACTIONS( J )%FALLOFF_INDEX
+                 DO K = 1, 5
+                    RFDAT( K,IFALLOFF ) = THERMAL_REACTIONS( J )%RFDAT(K)
+                 END DO
+              WRITE(6,'(2(I4,1x),2A,7(ES12.4,1X))')IFALLOFF, I, 'FALLOFF RXN:' // TRIM(LABELS( I,1 )), 
+     &           ': THERMAL_REACTIONS( J )%RFDAT(1:3),RFDAT( 1:5,I )',
+     &          THERMAL_REACTIONS( J )%RFDAT(1:5), RFDAT( 1:5,IFALLOFF)
+               END IF
+               IF( KTYPE( I ) .EQ. 0 )THEN
+                 IPHOT = IPHOT + 1
+                 IPH( IPHOT,1 ) = I ! THERMAL_REACTIONS( J )%PHOTO_INDEX(1:3)
+                 IPH( IPHOT,2 ) = THERMAL_REACTIONS( J )%PHOTO_INDEX(2)
+                 IPH( IPHOT,3 ) = THERMAL_REACTIONS( J )%PHOTO_INDEX(3)
+               END IF
+               IF( KTYPE( I ) .EQ. 11 )THEN
+                 JSPECIAL = JSPECIAL + 1
+                 ISPECIAL( JSPECIAL,1 ) = I ! THERMAL_REACTIONS( J )%SPECIAL_INDEX(1:2)
+                 ISPECIAL( JSPECIAL,2 ) = THERMAL_REACTIONS( J )%SPECIAL_INDEX(2)
+               WRITE(6,'(A,I4,1X,(A16,1X),2(I4,1X))')"THERMAL: I, LABELS( I, 1 ), ISPECIAL = ", I, 
+     &         LABELS( I, 1 ),ISPECIAL( JSPECIAL,1 ),ISPECIAL( JSPECIAL,2 )
+               END IF
+               IF( KTYPE( I ) .EQ. -1 )THEN
+                 IHET = IHET + 1
+                 IHETERO(IHET,1) = I ! THERMAL_REACTIONS( J )%HETEO_INDEX(1:2)
+                 IHETERO(IHET,2) = THERMAL_REACTIONS( J )%HETEO_INDEX(2)
+               WRITE(6,'(A,I4,1X,(A16,1X),2(I4,1X))')"THERMAL: I, LABELS( I, 1 ), I = ", I, 
+     &         LABELS( I, 1 ),IHETERO(IHET,1),IHETERO(IHET,2)
+               END IF
+!reset third body, CH4 and H2 reaction pointers
+               DO K = 1, THERMAL_REACTIONS( J )%NAIR_RCTNTS
+                  N_AIR_3BODY = N_AIR_3BODY  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWM(N_AIR_3BODY) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 1
+         WRITE(6,'(A,4(I4,1X))')'I, N_AIR_3BODY, NRXWM(N_AIR_3BODY) = ',J,I, N_AIR_3BODY, NRXWM(N_AIR_3BODY)
+               END DO
+               DO K = 1, THERMAL_REACTIONS( J )%NH2O_RCTNTS
+                  N_H2O_3BODY = N_H2O_3BODY  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWW(N_H2O_3BODY) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 2
+         WRITE(6,'(A,4(I4,1X))')'J, I, N_H2O_3BODY, NRXWW(N_H2O_3BODY) = ',J, I, N_H2O_3BODY, NRXWW(N_H2O_3BODY)
+               END DO
+               DO K = 1, THERMAL_REACTIONS( J )%N_O2_RCTNTS
+                  N_O2_3BODY = N_O2_3BODY  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWO2(N_O2_3BODY) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 3
+               WRITE(6,'(A,4(I4,1X))')'I, N_O2_3BODY, NRXWO2(N_O2_3BODY) = ',J,I, N_O2_3BODY, NRXWO2(N_O2_3BODY)
+               END DO
+               DO K = 1, THERMAL_REACTIONS( J )%N_N2_RCTNTS
+                  N_N2_3BODY = N_N2_3BODY  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWN2(N_N2_3BODY) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 4
+               WRITE(6,'(A,4(I4,1X))')'I, N_N2_3BODY, NRXWN2(N_N2_3BODY) = ',J,I, N_N2_3BODY, NRXWN2(N_N2_3BODY)
+               END DO
+               DO K = 1, THERMAL_REACTIONS( J )%N_H2_RCTNTS
+                  N_H2_REACTION = N_H2_REACTION  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWH2(N_H2_REACTION) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 6
+               WRITE(6,'(A,4(I4,1X))')'I, N_H2_REACTION, NRXWH2(N_H2_REACTION) = ',J,I, N_H2_REACTION, NRXWH2(N_H2_REACTION)
+               END DO
+               DO K = 1, THERMAL_REACTIONS( J )%NCH4_RCTNTS
+                  N_CH4_REACTION = N_CH4_REACTION  + 1
+                  FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
+                  NRXWCH4(N_CH4_REACTION) = I
+                  INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 5
+           WRITE(6,'(A,4(I4,1X))')'I, N_CH4_REACTION, NRXWCH4(N_CH4_REACTION) = ',J,I, N_CH4_REACTION, NRXWCH4(N_CH4_REACTION)
+               END DO
+               IF ( FIXED_SPC_COUNT .GT. 3 ) THEN
+                 WRITE( *,* )'Number of Constant Species Exceeds Three for Reaction:', LABELS( I,1 )
+                 STOP
+               END IF
+
+               WRITE(6,'(A,I4,1X,(A16,1X),2(I2,1X))')"THERMAL: I, LABELS( I, 1 ), KTYPE( I ), IORDER = ", I, 
+     &         LABELS( I, 1 ),KTYPE( I ),IORDER( I )               
+            END DO
+! rest number of third body, CH4 and H2 reactions
+            NWM   = N_AIR_3BODY
+            NWW   = N_H2O_3BODY
+            NWO2  = N_O2_3BODY
+            NWN2  = N_N2_3BODY
+            NWH2  = N_H2_REACTION
+            NWCH4 = N_CH4_REACTION
+!set total count of reactant per reaction
+            ONE_REACT_REACTIONS   = ONE_REACT_SUNLIGHT + ONE_REACT_THERMAL
+            ZERO_REACT_REACTIONS  = ZERO_REACT_THERMAL 
+            TWO_REACT_REACTIONS   = TWO_REACT_THERMAL 
+            THREE_REACT_REACTIONS = THREE_REACT_THERMAL 
+! update labels and calculate the number of partial derivative in the mechanism
+            NPDERIV = 0
+            DO J = 1, (NMPHOT + NTHERMAL)
+               RXLABEL( J ) = LABELS( J,1 )
+               NPDERIV = NPDERIV + NREACT( J )
+               WRITE(6,'(A,I4,1X,3(A16,1X),I2)')"MECHANISM: J, LABELS(J,1:2),RXLABEL( J ), KTYPE( J ) = ", J,
+     &         LABELS( J,1:2), RXLABEL( J ), KTYPE( J )
+            END DO
+         END SUBROUTINE PLACE_PHOTRXNS
          SUBROUTINE REPLACE_REACTIONS( REACTION_LIST, NREACTIONS, ISTART, LABELS )
             USE KPP_DATA
             IMPLICIT NONE
@@ -974,10 +1369,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             NWH2  = N_H2_REACTION
             NWCH4 = N_CH4_REACTION
 ! update labels
+            NPDERIV = 0
             DO J = 1, (NMPHOT + NTHERMAL)
                RXLABEL( J ) = LABELS( J,1 )
-               WRITE(6,'(A,I4,1X,3(A16,1X),I2)')"MECHANISM: J, LABELS(J,1:2),RXLABEL( J ), KTYPE( J ) = ", J,
-     &         LABELS( J,1:2), RXLABEL( J ), KTYPE( J )
+               NPDERIV = NPDERIV + NREACT( J )
+!               WRITE(6,'(A,I4,1X,3(A16,1X),I2)')"MECHANISM: J, LABELS(J,1:2),RXLABEL( J ), KTYPE( J ) = ", J,
+!     &         LABELS( J,1:2), RXLABEL( J ), KTYPE( J )
             END DO
          END SUBROUTINE REPLACE_REACTIONS
          SUBROUTINE REORDER_REACTION_LIST(NREACTIONS, REACTION_LIST)

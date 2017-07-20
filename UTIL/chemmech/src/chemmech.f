@@ -37,7 +37,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       USE MECHANISM_DATA, MECHANISM => MECHNAME
       USE CGRID_SPCS     ! CGRID mechanism species    
       USE WIKI_TABLE
-      
+
       IMPLICIT NONE
 
       CHARACTER(  1 ) :: CHR
@@ -47,6 +47,8 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       CHARACTER( 12 ) :: MECHNAME      = 'MECHDEF'
       CHARACTER( 16 ) :: EQNS_KPP_FILE = 'EQNS_KPP_FILE'
       CHARACTER( 16 ) :: SPCS_KPP_FILE = 'SPCS_KPP_FILE'
+      CHARACTER( 16 ) :: USER_NAME     = 'NAME'
+
       CHARACTER(  3 ) :: END
       CHARACTER( 16 ) :: SPCLIS( MAXSPEC )
       INTEGER, EXTERNAL :: INDEX1
@@ -85,9 +87,10 @@ c..Variables for species to be dropped from mechanism
                                              ! LABEL(NXX,2) 2nd label found in rx NXX
       INTEGER SPC1RX( MAXSPEC )              ! rx index of 1st occurence of species
                                              ! in mechanism table
+      CHARACTER( 120 ) :: AUTHOR
       CHARACTER( 120 ) :: EQNAME_MECH
-      CHARACTER( 120 ) :: EQN_MECH_KPP
-      CHARACTER( 120 ) :: SPC_MECH_KPP
+      CHARACTER( 256 ) :: EQN_MECH_KPP
+      CHARACTER( 256 ) :: SPC_MECH_KPP
       CHARACTER( 891 ) :: REACTION_STR(  MAXRXNUM )
       CHARACTER(  16 ) :: COEFF_STR
       CHARACTER(  32 ) :: DESCRP_MECH
@@ -227,6 +230,10 @@ c..Variables for species to be dropped from mechanism
            CHARACTER( 16 ), INTENT( IN ) :: SPCLIS( : )
            CHARACTER( 16 ), INTENT( IN ) :: LABEL( :,: ) ! LABEL(NXX,1) 1st label found in rx NXX
        END SUBROUTINE WRT_RATE_CONSTANT
+       SUBROUTINE CONVERT_CASE ( BUFFER, UPPER )
+         CHARACTER*(*), INTENT( INOUT ) :: BUFFER
+         LOGICAL,       INTENT( IN )    :: UPPER
+       END SUBROUTINE CONVERT_CASE
       END INTERFACE 
   
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -256,6 +263,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 ! determine whether to write out CMAQ CGRID species name and indices to output
 
+         CALL NAMEVAL ( USER_NAME, AUTHOR )
          CALL NAMEVAL ( CGRID_NMLS, CGRID_DATA )
 
          CALL CONVERT_CASE( CGRID_DATA, .TRUE.)
@@ -629,6 +637,22 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !      CALL SORT_REACTION_LIST( NSUNLIGHT, NTHERMAL, THERMAL_REACTIONS )
       CALL REORDER_REACTION_LIST(NTHERMAL, THERMAL_REACTIONS)
       CALL PUT_PHOTRXNS_ONTOP(LABEL)
+!      SUN_BELOW = .FALSE.
+!      IF( SUN_BELOW )THEN
+!         NC = NTHERMAL
+!         CALL SORT_REACTION_LIST( NC, NSUNLIGHT, PHOTOLYSIS_REACTIONS )
+!         NC = 0
+!         CALL REV_SORT_REACTION_LIST( NC, NTHERMAL, THERMAL_REACTIONS )
+!         CALL PUT_ZEROS_ABOVE( NTHERMAL, THERMAL_REACTIONS )
+!      ELSE
+!         NC = 0
+!         CALL REV_SORT_REACTION_LIST( NC, NSUNLIGHT, PHOTOLYSIS_REACTIONS )
+!         NC = NSUNLIGHT
+!         CALL SORT_REACTION_LIST( NC, NTHERMAL, THERMAL_REACTIONS )
+!         CALL PUT_ZEROS_BELOW( NC, NTHERMAL, THERMAL_REACTIONS )
+!      END IF
+!      CALL PUT_PHOTRXNS_ONTOP(LABEL)
+!      CALL PLACE_PHOTRXNS(LABEL)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C Get mechanism constant values for NRXWM, NRXWO2, NRXWN2, NRXWCH4, and NRXWH2 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -920,14 +944,14 @@ C Error-check heteorogeneous tables and report to log
 !      CLOSE( EXUNIT_RXCM )
 
 
-!      CALL WRT_KPP_INPUTS( NR, IP, LABEL, NS, SPCLIS  )
+      CALL WRT_KPP_INPUTS( NR, IP, LABEL, NS  )
       CALL WRT_WIKI_TABLE( NR, IP, LABEL, NS  )
       CALL WRT_MD_TABLE( NR, IP, LABEL, NS  )
       CALL WRT_CSV_TABLE( NR, IP, LABEL, NS  )
       CALL WRT_HTML_TABLE( NR, IP, LABEL, NS  )
 
       WRITE( LUNOUT, * ) '   Normal Completion of CHEMMECH'
-
+      WRITE( LUNOUT, * )' Author is ', TRIM( AUTHOR )
 
 1993  FORMAT( / 5X, '*** ERROR: Special label already used'
      &        / 5X, 'Processing for special label number:', I6 )
@@ -1094,8 +1118,8 @@ C***********************************************************************
 
 C...........   ARGUMENTS and their descriptions:
 
-        CHARACTER*(*)   BUFFER
-        LOGICAL         UPPER
+        CHARACTER*(*), INTENT( INOUT ) :: BUFFER
+        LOGICAL,       INTENT( IN )    :: UPPER
 
 
 C...........   PARAMETER:  ASCII for 'a', 'z', 'A'
