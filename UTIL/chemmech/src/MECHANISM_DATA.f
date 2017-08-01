@@ -1415,7 +1415,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                END DO
                STOP
            END IF    
-           REACTION_LIST = SORTED_LIST
+           REACTION_LIST( 1:NREACTIONS ) = SORTED_LIST( 1:NREACTIONS )
 
            DEALLOCATE( SORTED_LIST )
 
