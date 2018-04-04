@@ -4,10 +4,16 @@
 
          IMPLICIT NONE
 
-
-
+         
+         CHARACTER( 120 ) :: AUTHOR
+         CHARACTER( 586 ) :: OUTDIR 
          CHARACTER( 120 ) :: EQUATIONS_MECHFILE
          CHARACTER(  32 ) :: MECHNAME
+
+         INTEGER          :: UNIT_FUNCTIONS
+         CHARACTER( 599 ) :: FUNCTIONS_CAPTURED
+         INTEGER          :: LINES_CAPTURED
+         
          
          INTEGER KUNITS, 
      &           KTYPE       ( MAXRXNUM ),
@@ -24,6 +30,10 @@
      &           NFALLOFF, 
      &           IRRFALL( MAXFALLOFF ),
      &           HAL_PHOTAB( MAXRXNUM )
+
+         INTEGER         :: NRATE_STRING                 = 0
+         INTEGER         :: KSTRING( MAXFUNCTIONS )      = 0
+         CHARACTER( 81 ) :: RATE_STRING( MAXFUNCTIONS )  = ''
 
          INTEGER NWM,   NRXWM  ( MAX3BODIES )
          INTEGER NWW,   NRXWW  ( MAX3BODIES )
@@ -51,12 +61,16 @@
          INTEGER         :: NSPECIAL                   ! number of special rate expressions
          INTEGER         :: MSPECTERMS                 ! highest number of terms in the expressions
 
+         INTEGER         :: NFUNCTIONS = 0                ! number of user defined functions
+
          INTEGER         :: ZERO_REACT_REACTIONS  = 0  ! number zero reactant reactions
          INTEGER         :: ONE_REACT_REACTIONS   = 0  ! number one reactant reactions
          INTEGER         :: TWO_REACT_REACTIONS   = 0  ! number second order reactions
          INTEGER         :: THREE_REACT_REACTIONS = 0  ! number three reactant reactions
 
-         CHARACTER( 16 ) :: SPECIAL( MAXSPECRXNS )     
+         CHARACTER( 16 ) :: SPECIAL( MAXSPECRXNS )     = ' '
+         CHARACTER( 16 ) :: FUNCTIONS( MAXFUNCTIONS )  = ' '   
+         CHARACTER( 500) :: FORMULA( MAXFUNCTIONS )    = ''  
 
          INTEGER         :: NKC_TERMS(  MAXSPECRXNS )
          CHARACTER( 16 ) :: KC_TERMS(   MAXSPECRXNS,  MAXSPECTERMS, 2)
@@ -84,7 +98,12 @@
          INTEGER   :: NREACT( MAXRXNUM )               ! no. of reactants for rx j
          INTEGER   :: IRR( MAXRXNUM,MAXPRODS+3 )
          REAL( 8 ) ::  SC ( MAXRXNUM,MAXPRODS )
-         REAL( 8 ), ALLOCATABLE, SAVE :: NET_RCOEFF( :, :)
+
+         INTEGER,   ALLOCATABLE, SAVE :: IRR_NET    ( :,: )       ! species indices having net change from reaction
+         REAL( 8 ), ALLOCATABLE, SAVE :: SC_NET     ( :,: )       ! stio coefficients for net species
+         INTEGER,   ALLOCATABLE, SAVE :: NET_SPECIES( : )         ! # species having net change from reaction
+         INTEGER,   ALLOCATABLE, SAVE :: PURE_NREACT( : )         ! # reactants that are not also products
+         REAL( 8 ), ALLOCATABLE, SAVE :: NET_RCOEFF ( :,: )       ! stio coefficients for net species  
 
 c.. Variables for steady-state species
          INTEGER         :: N_SS_SPC = 0                         ! No. of SS species
@@ -111,7 +130,6 @@ c.. Variables for steady-state species
          CHARACTER( 586 ) :: FNAME_MODULE
          CHARACTER( 586 ) :: FNAME_DATA_MODULE
          CHARACTER( 586 ) :: FNAME_FUNC_MODULE
-         CHARACTER( 586 ) :: OUTDIR 
 
          INTEGER        ::  EXUNIT_SPCS
          INTEGER        ::  EXUNIT_RXDT
@@ -142,26 +160,32 @@ c.. Variables for steady-state species
          INTEGER, PARAMETER :: NCONSTANT_SPECIES = 6
 
          TYPE REACTION
-            CHARACTER( 16 ) :: LABEL( 2 )     ! name of reaction and if needed reference 
-            INTEGER   :: IRXBITS              ! bit value for rate constant
-            INTEGER   :: RATE_TYPE            ! type of rate constant
-            INTEGER   :: NPRDCT               ! no. of products
-            INTEGER   :: NREACT               ! no. of reactants
-            INTEGER   :: ORDER                ! order of reaction
-            INTEGER   :: IRR( MAXPRODS+3 )    ! reactant and product species indices
-            INTEGER   :: HETEO_INDEX( 2 )     ! mechanism reaction indices if heterogeneous type
-            INTEGER   :: PHOTO_INDEX( 3 )     ! mechanism reaction indices if rate constant photolysis
-            INTEGER   :: FALLOFF_INDEX        ! mechanism reaction indices if falloff type
-            INTEGER   :: SPECIAL_INDEX( 2 )   ! mechanism reaction indices if rate constant a special expression
-            REAL( 8 ) :: SC( MAXPRODS )       ! product stiochometric coefficients
-            REAL( 8 ) :: RTDAT( 3 )           ! general data for rate constant
-            REAL( 8 ) :: RFDAT( 5 )           ! data of fall rate constant type
-            INTEGER   :: NAIR_RCTNTS          ! # times M or air a reactant
-            INTEGER   :: NH2O_RCTNTS          ! # times water a reactant
-            INTEGER   :: N_O2_RCTNTS          ! # times O2 a reactant
-            INTEGER   :: N_N2_RCTNTS          ! # times H2 a reactant
-            INTEGER   :: N_H2_RCTNTS          ! # times N2 a reactant
-            INTEGER   :: NCH4_RCTNTS          ! # times methane a reactant
+            CHARACTER( 16 ) :: LABEL( 2 )      ! name of reaction and if needed reference 
+            INTEGER   :: IRXBITS               ! bit value for rate constant
+            INTEGER   :: RATE_TYPE             ! type of rate constant
+            INTEGER   :: NPRDCT                ! no. of products
+            INTEGER   :: NREACT                ! no. of reactants
+            INTEGER   :: ORDER                 ! order of reaction
+            INTEGER   :: IRR( MAXPRODS+3 )     ! reactant and product species indices
+            INTEGER   :: HETEO_INDEX( 2 )      ! mechanism reaction indices if heterogeneous type
+            INTEGER   :: PHOTO_INDEX( 3 )      ! mechanism reaction indices if rate constant photolysis
+            INTEGER   :: FALLOFF_INDEX         ! mechanism reaction indices if falloff type
+            INTEGER   :: SPECIAL_INDEX( 2 )    ! mechanism reaction indices if rate constant a special expression
+            REAL( 8 ) :: SC( MAXPRODS )        ! product stiochometric coefficients
+            REAL( 8 ) :: RTDAT( 3 )            ! general data for rate constant
+            REAL( 8 ) :: RFDAT( 5 )            ! data of fall rate constant type
+            INTEGER   :: NAIR_RCTNTS           ! # times M or air a reactant
+            INTEGER   :: NH2O_RCTNTS           ! # times water a reactant
+            INTEGER   :: N_O2_RCTNTS           ! # times O2 a reactant
+            INTEGER   :: N_N2_RCTNTS           ! # times H2 a reactant
+            INTEGER   :: N_H2_RCTNTS           ! # times N2 a reactant
+            INTEGER   :: NCH4_RCTNTS           ! # times methane a reactant
+            INTEGER   :: NET_SPECIES           ! Net # Species Producd or Lost
+            INTEGER   :: PURE_NREACT           ! no. of reactant that are not also products
+            REAL( 8 ) :: SC_NET ( MAXPRODS+3 ) ! net reactant and product stiochometric coefficients
+            INTEGER   :: IRR_NET( MAXPRODS+3 ) ! reactant and product species indices            
+            CHARACTER( 81 ) :: RATE_STRING   = ' '
+            INTEGER         :: STRING_INDEX  = 0
          END TYPE REACTION
  
          TYPE ( REACTION ), ALLOCATABLE :: PHOTOLYSIS_REACTIONS( : )  
@@ -260,12 +284,28 @@ c..indices for decomposition
          CONTAINS
          
          SUBROUTINE INIT_MECH_DATA()
+
+           USE GET_ENV_VARS
 !   Function initialize module variables         
            IMPLICIT NONE
          
          
            INTEGER    :: ISPC, IRX    ! loop counters
+           INTEGER    :: STATUS       ! get environment status
+           
+           CHARACTER( 32 )    :: SPECIES_REORDER   = 'REORDER_SPECIES'
+           CHARACTER( 32 )    :: REACTIONS_REORDER = 'REORDER_REACTIONS'
+           CHARACTER( 32 )    :: EFFECTS_ASSESS    = 'ASSESS_EFFECTS'
 
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c get environment values for optimization options
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  
+            REORDER_SPECIES   = GET_ENV_FLAG( SPECIES_REORDER, " ", .TRUE., STATUS)
+            REORDER_REACTIONS = GET_ENV_FLAG( REACTIONS_REORDER, " ", .TRUE., STATUS)
+            ASSESS_EFFECTS    = GET_ENV_FLAG( EFFECTS_ASSESS, " ", .FALSE., STATUS)
+            
+            
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C Initialize mechanism array variables
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -365,16 +405,30 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             SS_RCT_IND  = 0                 ! Array initialization
             MAX_SS_LOSS = 0
             MAX_SS_PROD = 0
-
-            ALLOCATE( PHOTOLYSIS_REACTIONS( MAXPHOTRXNS ) )
-            CALL INIT_REACTION_LIST( PHOTOLYSIS_REACTIONS )
-
-            ALLOCATE( THERMAL_REACTIONS( ( MAXRXNUM - MAXPHOTRXNS ) ) )
-            CALL INIT_REACTION_LIST( THERMAL_REACTIONS )
+            
+            CALL CREATE_REACTION_LISTS()
 
          RETURN
          END SUBROUTINE INIT_MECH_DATA
- 
+         SUBROUTINE CREATE_REACTION_LISTS()
+           IMPLICIT NONE
+            
+            LOGICAL, SAVE :: LISTS_CREATED = .FALSE.
+
+            IF( LISTS_CREATED )THEN
+                RETURN
+            END IF
+            LISTS_CREATED = .TRUE.
+            
+                
+            ALLOCATE( PHOTOLYSIS_REACTIONS( MAXRXNUM ) )
+            CALL INIT_REACTION_LIST( PHOTOLYSIS_REACTIONS )
+
+            ALLOCATE( THERMAL_REACTIONS( MAXRXNUM ) )
+            CALL INIT_REACTION_LIST( THERMAL_REACTIONS )
+            RETURN
+
+         END SUBROUTINE CREATE_REACTION_LISTS
          SUBROUTINE INIT_REACTION_LIST( REACTION_LIST  )
            IMPLICIT NONE
 
@@ -404,6 +458,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             REACTION_LIST( IREACTION )%N_N2_RCTNTS    = 0       ! # times H2 a reactant
             REACTION_LIST( IREACTION )%N_H2_RCTNTS    = 0       ! # times N2 a reactant
             REACTION_LIST( IREACTION )%NCH4_RCTNTS    = 0       ! # times methane a reactant
+            REACTION_LIST( IREACTION )%SC_NET( : )    = 0.0D0   ! net stiochometric coefficients
+            REACTION_LIST( IREACTION )%NET_SPECIES    = 0       ! no. of transform species
+            REACTION_LIST( IREACTION )%PURE_NREACT    = 0       ! no. of reactant that are not also products
+            REACTION_LIST( IREACTION )%IRR_NET( : )   = 0       ! net reactant and product species indices
            END DO
            
          END SUBROUTINE INIT_REACTION_LIST
@@ -632,7 +690,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
            CHARACTER(LEN=16), INTENT( IN )    :: LABELS( :,: )
            TYPE( REACTION ),  INTENT( INOUT ) :: REACTION_LIST( : )
 
-           INTEGER :: I
+           INTEGER   :: I, J, K, L
+           REAL( 8 ) :: COEFF
+           LOGICAL   :: TRUE_REACTANT
+
            IF( SIZE( REACTION_LIST, 1 ) .LT. IREACTION )THEN
                WRITE( 6, * )'In LOAD_REACTION_LIST: array index exceeds REACTION_LIST size'
                WRITE( 6, '(A,I4)' )'IREACTION = ',IREACTION
@@ -652,6 +713,51 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !     &          REACTION_LIST( IREACTION )%RTDAT(1:3), RTDAT( 1:3,JREACTION )
               REACTION_LIST( IREACTION )%IRR(1:MAXPRODS+3) = IRR( JREACTION,1:MAXPRODS+3 )        
               REACTION_LIST( IREACTION )%SC(1:MAXPRODS)    = SC( JREACTION, 1:MAXPRODS )
+              IF( KTYPE( JREACTION ) .EQ. 13 )THEN
+                 REACTION_LIST( IREACTION )%RATE_STRING  = RATE_STRING( NRATE_STRING )
+                 REACTION_LIST( IREACTION )%STRING_INDEX = IREACTION
+           WRITE(6,'(A,3(1X,I4),2(1X,A))')'JREACTION, RATE_STRING( JREACTION ), REACTION_LIST( IREACTION )%RATE_STRING = ', 
+     &           JREACTION,KSTRING( NRATE_STRING ),REACTION_LIST( IREACTION )%STRING_INDEX, TRIM(RATE_STRING( JREACTION )),
+     &             TRIM( REACTION_LIST( IREACTION )%RATE_STRING)
+              END IF
+
+              DO I = 1, NREACT( JREACTION )
+                 J = IRR( JREACTION,  I )
+                 COEFF = -1.0D0
+                 TRUE_REACTANT = .TRUE.
+                 DO K = 1, NPRDCT( JREACTION )
+                    L = IRR( JREACTION,  K+3 )
+                    IF( J .EQ. L )THEN
+                        COEFF = COEFF + SC( JREACTION, K )
+                        TRUE_REACTANT = .FALSE.
+                    END IF
+                 END DO
+                 IF( ABS( COEFF ) .GT. 1.0D-6 )THEN
+                     REACTION_LIST( IREACTION )%NET_SPECIES = REACTION_LIST( IREACTION )%NET_SPECIES  + 1
+                     K = REACTION_LIST( IREACTION )%NET_SPECIES
+                     REACTION_LIST( IREACTION )%SC_NET( K ) = COEFF
+                     REACTION_LIST( IREACTION )%IRR_NET( K ) = J  
+                 END IF
+                 IF( TRUE_REACTANT )THEN
+                     REACTION_LIST( IREACTION )%PURE_NREACT = REACTION_LIST( IREACTION )%PURE_NREACT
+     &                                                      + 1
+                 END IF
+              END DO
+
+              LOOP_PRODUCT: DO I = 1, NPRDCT( JREACTION )
+                 J = IRR( JREACTION, I+3 )
+                 LOOP_REACTANT: DO K = 1, NREACT( JREACTION ) 
+                    L = IRR( JREACTION, K )
+                    IF( L .EQ. J )CYCLE LOOP_PRODUCT
+                 END DO LOOP_REACTANT
+                 REACTION_LIST( IREACTION )%NET_SPECIES = REACTION_LIST( IREACTION )%NET_SPECIES + 1
+                 K = REACTION_LIST( IREACTION )%NET_SPECIES
+                 REACTION_LIST( IREACTION )%SC_NET( K ) = SC( JREACTION, I )
+                 REACTION_LIST( IREACTION )%IRR_NET( K ) = J
+              END DO LOOP_PRODUCT  
+                 
+                 
+
               IF( KTYPE( JREACTION ) .EQ. 11 )THEN
                  REACTION_LIST( IREACTION )%SPECIAL_INDEX(1) = IREACTION
                  REACTION_LIST( IREACTION )%SPECIAL_INDEX(2) = ISPECIAL( NSPECIAL_RXN,2 )
@@ -674,47 +780,25 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   REACTION_LIST( IREACTION )%HETEO_INDEX(2) = IHETERO(MHETERO,2)
               END IF
               DO I = 1, MAX3BODIES
-!                  IF( NRXWM( I ) .GT. 0 )print*,'I, NRXWM( I ),JREACTION= ',I, NRXWM( I ),JREACTION
                  IF( NRXWM( I ) .EQ. JREACTION  )THEN
-               WRITE(6,'(A,3(I4,1X))')'NRXWM( I ), JREACTION,REACTION_LIST( IREACTION )%NAIR_RCTNTS = ', NRXWM( I ), JREACTION, 
-     &             REACTION_LIST( IREACTION )%NAIR_RCTNTS
                    REACTION_LIST( IREACTION )%NAIR_RCTNTS = REACTION_LIST( IREACTION )%NAIR_RCTNTS  + 1
-               WRITE(6,'(A,3(I4,1X))')'NRXWM( I ), JREACTION,REACTION_LIST( IREACTION )%NAIR_RCTNTS = ', NRXWM( I ), JREACTION, 
-     &             REACTION_LIST( IREACTION )%NAIR_RCTNTS
                  END IF
                  IF( NRXWW( I ) .EQ. JREACTION  )THEN
                    REACTION_LIST( IREACTION )%NH2O_RCTNTS = REACTION_LIST( IREACTION )%NH2O_RCTNTS  + 1
-            WRITE(6,'(A,3(I4,1X))')'NRXWW( I ), JREACTION, REACTION_LIST( IREACTION )%NH2O_RCTNTS = ', NRXWw( I ), JREACTION,
-     &             REACTION_LIST( IREACTION )%NH2O_RCTNTS
                  END IF
                  IF( NRXWO2( I ) .EQ. JREACTION  )THEN
                    REACTION_LIST( IREACTION )%N_O2_RCTNTS = REACTION_LIST( IREACTION )%N_O2_RCTNTS  + 1
-              WRITE(6,'(A,3(I4,1X))')'NRXWO2( I ), JREACTION, REACTION_LIST( IREACTION )%N_O2_RCTNTS = ', NRXWO2( I ), JREACTION,
-     &             REACTION_LIST( IREACTION )%N_O2_RCTNTS
                  END IF
                  IF( NRXWN2( I ) .EQ. JREACTION  )THEN
                    REACTION_LIST( IREACTION )%N_N2_RCTNTS = REACTION_LIST( IREACTION )%N_N2_RCTNTS  + 1
-              WRITE(6,'(A,3(I4,1X))')'NRXWN2( I ), JREACTION, REACTION_LIST( IREACTION )%N_N2_RCTNTS = ', NRXWN2( I ), JREACTION,
-     &              REACTION_LIST( IREACTION )%N_N2_RCTNTS
                  END IF
                  IF( NRXWH2( I ) .EQ. JREACTION  )THEN
                    REACTION_LIST( IREACTION )%N_H2_RCTNTS = REACTION_LIST( IREACTION )%N_H2_RCTNTS  + 1
-              WRITE(6,'(A,3(I4,1X))')'NRXWH2( I ), JREACTION, REACTION_LIST( IREACTION )%N_H2_RCTNTS = ', NRXWH2( I ), JREACTION,
-     &              REACTION_LIST( IREACTION )%N_H2_RCTNTS
                  END IF
                  IF( NRXWCH4( I ) .EQ. JREACTION  )THEN
                    REACTION_LIST( IREACTION )%NCH4_RCTNTS = REACTION_LIST( IREACTION )%NCH4_RCTNTS  + 1
-           WRITE(6,'(A,3(I4,1X))')'NRXWCH4( I ), JREACTION, REACTION_LIST( IREACTION )%NCH4_RCTNTS = ', NRXWCH4( I ), JREACTION,
-     &             REACTION_LIST( IREACTION )%NCH4_RCTNTS
                  END IF
               END DO
-!              REACTION_LIST( IREACTION )%NH2O_RCTNTS = COUNT( NRXWW .EQ. JREACTION  )
-!              REACTION_LIST( IREACTION )%N_O2_RCTNTS = COUNT( NRXWO2 .EQ. JREACTION  )
-!              REACTION_LIST( IREACTION )%N_N2_RCTNTS = COUNT( NRXWN2 .EQ. JREACTION  )
-!              REACTION_LIST( IREACTION )%N_H2_RCTNTS = COUNT( NRXWH2 .EQ. JREACTION  )
-!              REACTION_LIST( IREACTION )%NCH4_RCTNTS = COUNT( NRXWCH4 .EQ. JREACTION  )
-!              print*,"IREACTION, REACTION_LIST( IREACTION )%LABEL = ", IREACTION, REACTION_LIST( IREACTION )%LABEL(1),
-!     &        REACTION_LIST( IREACTION )%RATE_TYPE 
          END SUBROUTINE LOAD_REACTION_LIST
          SUBROUTINE PUT_PHOTRXNS_ONTOP( LABELS )
             USE KPP_DATA
@@ -734,6 +818,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             INTEGER :: N_CH4_REACTION
             INTEGER :: N_H2_REACTION
             INTEGER :: FIXED_SPC_COUNT
+            INTEGER :: STRING_COUNT
+
+            ALLOCATE( NET_SPECIES( NRXNS ), PURE_NREACT( NRXNS ) )       
+            ALLOCATE( IRR_NET    ( MAXPRODS+3,NRXNS )  )     
+            ALLOCATE( SC_NET     ( MAXPRODS+3,NRXNS )  )        
 
             IFALLOFF = 0
             IPHOT    = 0
@@ -745,6 +834,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             N_O2_3BODY     = 0
             N_CH4_REACTION = 0
             N_H2_REACTION  = 0
+            IRR_NET        = 0
+            NET_SPECIES    = 0 
+            PURE_NREACT    = 0
+            STRING_COUNT   = 0
+            SC_NET         = 0.0D0
+
 ! reset varaible of KPP_DATA
             INDEX_FIXED_SPECIES = 0
             DO I = 1, NSUNLIGHT
@@ -765,20 +860,27 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                RTDAT( 1:3,I )        = PHOTOLYSIS_REACTIONS( I )%RTDAT(1:3)         
                IRR( I,1:MAXPRODS+3 ) = PHOTOLYSIS_REACTIONS( I )%IRR(1:MAXPRODS+3)  
                SC( I, 1:MAXPRODS )   = PHOTOLYSIS_REACTIONS( I )%SC(1:MAXPRODS)     
+               NET_SPECIES( I )      = PHOTOLYSIS_REACTIONS( I )%NET_SPECIES
+               PURE_NREACT( I )      = PHOTOLYSIS_REACTIONS( I )%PURE_NREACT             
+               IRR_NET( :, I )       = PHOTOLYSIS_REACTIONS( I )%IRR_NET( : )
+               SC_NET ( :, I )       = PHOTOLYSIS_REACTIONS( I )%SC_NET( : )
+              
+               IF( KTYPE( I ) .EQ. 13 )THEN
+                   STRING_COUNT = STRING_COUNT + 1
+                   KSTRING( STRING_COUNT )     = I
+                   RATE_STRING( STRING_COUNT ) = PHOTOLYSIS_REACTIONS( I )%RATE_STRING
+               END IF
+
                IF( KTYPE( I ) .EQ. 12 .OR. ( KTYPE( I ) .GT. 7 .AND. KTYPE( I ) .LT. 11  ) )THEN
                  IFALLOFF = IFALLOFF + 1
                  IRRFALL( IFALLOFF )   = I ! PHOTOLYSIS_REACTIONS( I )%FALLOFF_INDEX
                  RFDAT( 1:5,IFALLOFF ) = PHOTOLYSIS_REACTIONS( I )%RFDAT(1:5)
-               WRITE(6,'(A,I4,1X,(A16,1X),(I2,1X),5(ES12.4,1X))')"PHOTOLYSIS: I, LABELS( I, 1 ), IRRFALL = ", I, 
-     &         LABELS( I, 1 ),IRRFALL( IFALLOFF ),RFDAT( 1:5,IFALLOFF )
                END IF
                IF( KTYPE( I ) .EQ. 0 )THEN
                  IPHOT = IPHOT + 1
                  IPH( IPHOT,1 ) = I ! PHOTOLYSIS_REACTIONS( I )%PHOTO_INDEX(1:3)
                  IPH( IPHOT,2 ) = PHOTOLYSIS_REACTIONS( I )%PHOTO_INDEX(2)
                  IPH( IPHOT,3 ) = PHOTOLYSIS_REACTIONS( I )%PHOTO_INDEX(3)
-               WRITE(6,'(A,I4,1X,(A16,1X),(I3,1X),A16,1X,I3)')"PHOTOLYSIS: I, LABELS( I, 1 ), IPH = ", I, 
-     &         LABELS( I, 1 ),IPH( IPHOT,1 ),PHOTAB(IPH( IPHOT,2 )),IPH( IPHOT,3 )
                END IF
                IF( KTYPE( I ) .EQ. 11 )THEN
                  JSPECIAL = JSPECIAL + 1
@@ -828,8 +930,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   NRXWH2(N_CH4_REACTION) = I
                   INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 5
                END DO
-               WRITE(6,'(A,I4,1X,(A16,1X),2(I2,1X))')"PHOTOLYSIS: I, LABELS( I, 1 ), KTYPE( I ), IORDER = ", I, 
-     &         LABELS( I, 1 ),KTYPE( I ),IORDER( I )
                IF ( FIXED_SPC_COUNT .GT. 3 ) THEN
                  WRITE( *,* )'Number of Constant Species Exceeds Three for Reaction:', LABELS( I,1 )
                  STOP
@@ -855,6 +955,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                KTYPE( I )            = THERMAL_REACTIONS( J )%RATE_TYPE          
                NPRDCT( I )           = THERMAL_REACTIONS( J )%NPRDCT             
                NREACT( I )           = THERMAL_REACTIONS( J )%NREACT
+               NET_SPECIES( I )      = THERMAL_REACTIONS( J )%NET_SPECIES
+               PURE_NREACT( I )      = THERMAL_REACTIONS( J )%PURE_NREACT             
+               IRR_NET( :, I )       = THERMAL_REACTIONS( J )%IRR_NET( : )
+               SC_NET ( :, I )       = THERMAL_REACTIONS( J )%SC_NET( : )
+               KSTRING( I )          = THERMAL_REACTIONS( J )%STRING_INDEX
+               RATE_STRING( I )      = THERMAL_REACTIONS( J )%RATE_STRING
+
                SELECT CASE (THERMAL_REACTIONS( J )%NREACT )
                  CASE( 0 )
                    ZERO_REACT_THERMAL = ZERO_REACT_THERMAL + 1
@@ -867,8 +974,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                END SELECT
                IORDER( I )           = THERMAL_REACTIONS( J )%ORDER             
                RTDAT( 1:3,I )        = THERMAL_REACTIONS( J )%RTDAT(1:3)         
-!              WRITE(6,'(A,7(ES12.4,1X))')'THERMAL_REACTIONS( J )%RTDAT(1:3),RTDAT( 1:3,I )',
-!     &          THERMAL_REACTIONS( J )%RTDAT(1:3), RTDAT( 1:3,I)
                IRR( I,1:MAXPRODS+3 ) = THERMAL_REACTIONS( J )%IRR(1:MAXPRODS+3)  
                SC( I, 1:MAXPRODS )   = THERMAL_REACTIONS( J )%SC(1:MAXPRODS)
                IF( KTYPE( I ) .EQ. 12 .OR. ( KTYPE( I ) .GT. 7 .AND. KTYPE( I ) .LT. 11 ) )THEN
@@ -877,9 +982,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  DO K = 1, 5
                     RFDAT( K,IFALLOFF ) = THERMAL_REACTIONS( J )%RFDAT(K)
                  END DO
-              WRITE(6,'(2(I4,1x),2A,7(ES12.4,1X))')IFALLOFF, I, 'FALLOFF RXN:' // TRIM(LABELS( I,1 )), 
-     &           ': THERMAL_REACTIONS( J )%RFDAT(1:3),RFDAT( 1:5,I )',
-     &          THERMAL_REACTIONS( J )%RFDAT(1:5), RFDAT( 1:5,IFALLOFF)
                END IF
                IF( KTYPE( I ) .EQ. 0 )THEN
                  IPHOT = IPHOT + 1
@@ -891,15 +993,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                  JSPECIAL = JSPECIAL + 1
                  ISPECIAL( JSPECIAL,1 ) = I ! THERMAL_REACTIONS( J )%SPECIAL_INDEX(1:2)
                  ISPECIAL( JSPECIAL,2 ) = THERMAL_REACTIONS( J )%SPECIAL_INDEX(2)
-               WRITE(6,'(A,I4,1X,(A16,1X),2(I4,1X))')"THERMAL: I, LABELS( I, 1 ), ISPECIAL = ", I, 
-     &         LABELS( I, 1 ),ISPECIAL( JSPECIAL,1 ),ISPECIAL( JSPECIAL,2 )
                END IF
                IF( KTYPE( I ) .EQ. -1 )THEN
                  IHET = IHET + 1
                  IHETERO(IHET,1) = I ! THERMAL_REACTIONS( J )%HETEO_INDEX(1:2)
                  IHETERO(IHET,2) = THERMAL_REACTIONS( J )%HETEO_INDEX(2)
-               WRITE(6,'(A,I4,1X,(A16,1X),2(I4,1X))')"THERMAL: I, LABELS( I, 1 ), I = ", I, 
-     &         LABELS( I, 1 ),IHETERO(IHET,1),IHETERO(IHET,2)
+               END IF
+
+               IF( KTYPE( I ) .EQ. 13 )THEN
+                   STRING_COUNT = STRING_COUNT + 1
+                   KSTRING( STRING_COUNT )     = I
+                   RATE_STRING( STRING_COUNT ) = THERMAL_REACTIONS( J )%RATE_STRING
                END IF
 !reset third body, CH4 and H2 reaction pointers
                DO K = 1, THERMAL_REACTIONS( J )%NAIR_RCTNTS
@@ -952,6 +1056,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                WRITE(6,'(A,I4,1X,(A16,1X),2(I2,1X))')"THERMAL: I, LABELS( I, 1 ), KTYPE( I ), IORDER = ", I, 
      &         LABELS( I, 1 ),KTYPE( I ),IORDER( I )               
             END DO
+
+            IF( STRING_COUNT .NE. NRATE_STRING )THEN
+               WRITE(6, * )'A reaction of KTYPE equal to 13 was dropped'
+               STOP
+            END IF
+
 ! rest number of third body, CH4 and H2 reactions
             NWM   = N_AIR_3BODY
             NWW   = N_H2O_3BODY
@@ -1059,7 +1169,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
                   NRXWM(N_AIR_3BODY) = I
                   INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 1
-                  print*,'I, N_AIR_3BODY, NRXWM(N_AIR_3BODY) = ',I, N_AIR_3BODY, NRXWM(N_AIR_3BODY)
                END DO
                DO K = 1, PHOTOLYSIS_REACTIONS( J )%NH2O_RCTNTS
                   N_H2O_3BODY = N_H2O_3BODY  + 1
@@ -1287,6 +1396,18 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                KTYPE( I )            = REACTION_LIST( I )%RATE_TYPE          
                NPRDCT( I )           = REACTION_LIST( I )%NPRDCT             
                NREACT( I )           = REACTION_LIST( I )%NREACT             
+               IF( KTYPE( I ) .NE. 0 .OR. KTYPE( I ) .NE. 12 )THEN
+                  SELECT CASE ( NREACT( I ) )
+                    CASE( 0 )
+                       ZERO_REACT_THERMAL = ZERO_REACT_THERMAL + 1
+                    CASE( 1 )
+                       ONE_REACT_THERMAL  = ONE_REACT_THERMAL + 1
+                    CASE( 2 )
+                       TWO_REACT_THERMAL  = TWO_REACT_THERMAL + 1
+                    CASE( 3 )
+                       THREE_REACT_THERMAL = THREE_REACT_THERMAL + 1
+                   END SELECT
+               END IF
                IORDER( I )           = REACTION_LIST( I )%ORDER             
                RTDAT( 1:3,I )        = REACTION_LIST( I )%RTDAT(1:3)         
                IRR( I,1:MAXPRODS+3 ) = REACTION_LIST( I )%IRR(1:MAXPRODS+3)  
@@ -1322,7 +1443,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   FIXED_SPC_COUNT = FIXED_SPC_COUNT + 1
                   NRXWM(N_AIR_3BODY) = I
                   INDEX_FIXED_SPECIES( I, FIXED_SPC_COUNT ) = 1
-                  print*,'I, N_AIR_3BODY, NRXWM(N_AIR_3BODY) = ',I, N_AIR_3BODY, NRXWM(N_AIR_3BODY)
                END DO
                DO K = 1, REACTION_LIST( I )%NH2O_RCTNTS
                   N_H2O_3BODY = N_H2O_3BODY  + 1
@@ -1370,7 +1490,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             NWCH4 = N_CH4_REACTION
 ! update labels
             NPDERIV = 0
-            DO J = 1, (NMPHOT + NTHERMAL)
+            DO J = 1, NREACTIONS ! (NMPHOT + NTHERMAL)
                RXLABEL( J ) = LABELS( J,1 )
                NPDERIV = NPDERIV + NREACT( J )
 !               WRITE(6,'(A,I4,1X,3(A16,1X),I2)')"MECHANISM: J, LABELS(J,1:2),RXLABEL( J ), KTYPE( J ) = ", J,
@@ -1401,7 +1521,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   IF( REACTION_LIST( IRXN )%NREACT .EQ. IPRIORITY( IPR ) )THEN
                      ICOUNT = ICOUNT + 1
                      SORTED_LIST( ICOUNT ) = REACTION_LIST( IRXN )
-                     print*, REACTION_LIST( IRXN )%LABEL(1:2),REACTION_LIST( IRXN )%NREACT,IPRIORITY( IPR )
                   END IF
               END DO
            END DO

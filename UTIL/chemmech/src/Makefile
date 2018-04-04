@@ -28,13 +28,14 @@ else
  ifeq ($(COMPILER),GFORT)
    FC    = gfortran
    CC    = gcc
-   f_FLAGS       = -ffixed-form -ffixed-line-length-132 -O0 -funroll-loops -finit-character=32 -fcheck=all -I. 
-   f_FLAGS       = -ffixed-form -ffixed-line-length-132 -O0 -funroll-loops -finit-character=32 -I. 
+   FC    = /share/linux86_64/gcc-4.6.3/bin/gfortran
+   CC    = /share/linux86_64/gcc-4.6.3/bin/gcc
+   f_FLAGS       = -ffixed-form -ffixed-line-length-132 -O0 -funroll-loops -finit-character=32 -fbacktrace -fcheck=all -I. 
    F_FLAGS       = $(f_FLAGS)
-   f90_FLAGS     = -cpp -ffree-form -ffree-line-length-none -O0 -funroll-loops -finit-character=32 -fcheck=all -I. 
-   f90_FLAGS     = -cpp -ffree-form -ffree-line-length-none -O0 -funroll-loops -finit-character=32 -I. 
+   f90_FLAGS     = -cpp -ffree-form -ffree-line-length-none -O0 -funroll-loops -finit-character=32 --fbacktrace fcheck=all -I. 
    F90_FLAGS     = $(f90_FLAGS)
-   C_FLAGS       = -O2 -DFLDMN -I /home/wdx/lib/x86_64/gcc/mpich/include
+#  C_FLAGS       = -O2 -DFLDMN -I /share/linux86_64/gcc-4.6.3/include/c++/4.6.3 -I /share/linux86_64/gcc-4.6.3/include/c++/4.6.3/tr1
+   C_FLAGS       = -O2 -DFLDMN -I .
    LINKER        = $(FC)
    LINK_FLAGS    = 
  endif
@@ -44,9 +45,11 @@ endif
 
 OBJECTS =\
     MECHANISM_PARMS.o \
+    module_envvar.o \
     KPP_DATA.o \
     MECHANISM_DATA.o \
-    CGRID_SPCS.o \
+    CGRID_SPCS.o  \
+    module_functions_evaluator.o \
     WIKI_TABLE.o \
     chemmech.o \
     set_sparse_data.o \
@@ -87,8 +90,7 @@ OBJECTS =\
     wrt_rates.o \
     wrss_ext_fortran90.o  \
     vallabchr.o \
-    valwrdchr.o \
-    nameval.o
+    valwrdchr.o 
         
 .SUFFIXES: .f .c
 

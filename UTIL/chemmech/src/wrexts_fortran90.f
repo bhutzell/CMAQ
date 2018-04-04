@@ -71,7 +71,6 @@ C Local Variables
       INTEGER ISPC, ISPCNEW, IRX, IRXOUT, IFLD0, IFLD1, IFLD2, NLINES
 
       INTEGER, EXTERNAL :: JUNIT
-      EXTERNAL NAMEVAL
       INTEGER, EXTERNAL :: INDEX1
  
       CHARACTER(  47 ) :: EXHEAD_SPCS
@@ -523,7 +522,7 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
           END DO
       ELSE
           DO ISPC = 1, NS + N_SS_SPC
-              ISPCNEW = IOLD2NEW( ISPC )
+              ISPCNEW = INEW2OLD( ISPC )
 !             WRITE( WRUNIT, 2161 ) ISPC, ISPC, ISPC, ISPC, ISPC, MECHANISM_SPC( ISPC ), CGRID_INDEX( ISPC ), 
 !     &       SPECIES_TYPE( ISPC ), ONE, USE_SPCS_NAMELISTS
               WRITE( WRUNIT, 2061 ) ISPC, ISPC, MECHANISM_SPC( ISPCNEW ), ZERO 
@@ -761,10 +760,10 @@ c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 c     Jacobian information
 c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       WRITE( WRUNIT, 1115 ) MXARRAY
-1115  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NTERMS_JACOB = ', I5 )
+1115  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NTERMS_JACOB = ', I8 )
 
       WRITE( WRUNIT, 1117 ) MAXGL3
-1117  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NSTEPS_JACOB = ', I6 )
+1117  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NSTEPS_JACOB = ', I8 )
    
 c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 c     IORDER
@@ -1032,12 +1031,13 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       WRITE( WRUNIT, 1403 )
 1403  FORMAT(  6X, 'INTEGER', 12X, ':: IRR( NRXNS,MXPRD+3 )' )
 
-! reset IRR to sorted species from SET_SPARSE_DATA
-      DO IRX = 1, NR
-         DO ISPC = 1, MXPRD+3
-            IRR(IRX, ISPC) = IRM2(ISPC,IRX)
+      IF ( REORDER_SPECIES ) THEN ! reset IRR to sorted species from SET_SPARSE_DATA
+         DO IRX = 1, NR
+            DO ISPC = 1, MXPRD+3
+               IRR(IRX, ISPC) = IRM2(ISPC,IRX)
+            END DO
          END DO
-      END DO
+      END IF
 
       DO 701 ISPC = 1, MXPRD+3
 

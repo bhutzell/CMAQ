@@ -34,6 +34,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
  
       USE KPP_DATA
+      USE GET_ENV_VARS
       USE MECHANISM_DATA
       
       IMPLICIT NONE
@@ -47,13 +48,14 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 c..local Variables for steady-state species
 
        
-      CHARACTER(  1 ) :: CHR
-      CHARACTER( 16 ) :: WORD
-      CHARACTER( 37 ) :: PHRASE
-      CHARACTER( 81 ) :: INBUF
-      CHARACTER( 16 ) :: EQNS_KPP_FILE = 'EQNS_KPP_FILE'
-      CHARACTER( 16 ) :: SPCS_KPP_FILE = 'SPCS_KPP_FILE'
-      CHARACTER(  3 ) :: END
+      CHARACTER(  1 )  :: CHR
+      CHARACTER( 16 )  :: WORD
+      CHARACTER( 37 )  :: PHRASE
+      CHARACTER( 81 )  :: INBUF
+      CHARACTER( 16 )  :: EQNS_KPP_FILE = 'EQNS_KPP_FILE'
+      CHARACTER( 16 )  :: SPCS_KPP_FILE = 'SPCS_KPP_FILE'
+      CHARACTER(  3 )  :: END
+      CHARACTER( 140 ) :: FILE_LINE
 
       INTEGER, EXTERNAL :: INDEX1
       INTEGER, EXTERNAL :: INDEXES
@@ -74,8 +76,8 @@ c..Variables for species to be dropped from mechanism
 
       INTEGER SPC1RX( MAXSPEC )              ! rx index of 1st occurence of species
                                              ! in mechanism table
-      CHARACTER( 120 ) :: EQN_MECH_KPP
-      CHARACTER( 120 ) :: SPC_MECH_KPP
+      CHARACTER( 586 ) :: EQN_MECH_KPP
+      CHARACTER( 586 ) :: SPC_MECH_KPP
       CHARACTER( 891 ) :: REACTION_STR(  MAXRXNUM )
       CHARACTER(  16 ) :: COEFF_STR
       CHARACTER(  16 ) :: NAMCONSTS( MAXCONSTS ) = (/
@@ -87,10 +89,11 @@ c..Variables for species to be dropped from mechanism
 
       CHARACTER(  16 )    :: CLABEL                  ! mechanism constants label
       REAL( 8 )           :: CONSTVAL                ! retrieved constant
-      REAL( 8 )            :: CVAL( MAXCONSTS )       ! mechanism constants value
+      REAL( 8 )            :: CVAL( MAXCONSTS )      ! mechanism constants value
       INTEGER, PARAMETER  :: LUNOUT = 6
-      INTEGER             :: IDIFF_ORDER           ! difference between order of two separate reactions
-      LOGICAL             :: FALLOFF_RATE       ! whether a reaction is a falloff type
+      INTEGER             :: IDIFF_ORDER             ! difference between order of two separate reactions
+      LOGICAL             :: FALLOFF_RATE            ! whether a reaction is a falloff type
+      LOGICAL             :: EXISTING
 
 
       CHARACTER(  12 ) :: EXFLNM_SPCS = 'SPCSDATX'
@@ -99,7 +102,6 @@ c..Variables for species to be dropped from mechanism
 
       INTEGER, EXTERNAL :: JUNIT
       INTEGER            :: ICOUNT, IREACT, IPRODUCT
-      EXTERNAL           :: NAMEVAL
 
       INTERFACE 
        SUBROUTINE GETRCTNT ( IMECH, INBUF, IEOL, LPOINT, CHR, WORD,
@@ -182,8 +184,8 @@ c..Variables for species to be dropped from mechanism
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C Find names for KPP output files
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      CALL NAMEVAL ( EQNS_KPP_FILE, EQN_MECH_KPP )
-      CALL NAMEVAL ( SPCS_KPP_FILE, SPC_MECH_KPP )
+      CALL VALUE_NAME ( EQNS_KPP_FILE, EQN_MECH_KPP )
+      CALL VALUE_NAME ( SPCS_KPP_FILE, SPC_MECH_KPP )
 
 
 ! write out reactions strings to determine KPP information
@@ -319,6 +321,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ELSE
          WRITE(KPPEQN_UNIT,4751)
       END IF
+      IF( NFUNCTIONS .GT. 0 )THEN
+         WRITE( KPPEQN_UNIT, '(/ "! User Defined rate functions " )' )
+         DO ISPC = 1, NFUNCTIONS
+            PHRASE = TRIM( FUNCTIONS( ISPC ) )
+            CALL CONVERT_CASE ( PHRASE, .TRUE. )
+            WRITE( KPPEQN_UNIT, 4612 )PHRASE
+         END DO 
+4612  FORMAT(9X,'REAL( Kind = dp ) :: ', A )
+      END IF
 ! set up pointers and names for photolysis rate array
       WRITE(KPPEQN_UNIT,4502)
       DO IPR = 1, NPHOTAB
@@ -372,7 +383,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
              ELSE
                  WRITE(KPPEQN_UNIT, 4706, ADVANCE = 'NO')TRIM(PHRASE),IRX
              END IF
-             ISPC = IOLD2NEW( INDEX_CTERM( NXX, IREACT ) )
+             IF( REORDER_SPECIES )THEN
+                ISPC = IOLD2NEW( INDEX_CTERM( NXX, IREACT ) )
+             ELSE
+                ISPC = INDEX_CTERM( NXX, IREACT )
+             END IF
              IF( ISPC .LT. 1 )CYCLE
              PHRASE = ' * Y( ind_' // TRIM( SPARSE_SPECIES( ISPC ) ) // ' ) '
              WRITE(KPPEQN_UNIT, 4709, ADVANCE = 'NO')TRIM( PHRASE )
@@ -432,6 +447,22 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &      RFDAT(1,IDX),RFDAT(3,IDX),RFDAT(2,IDX),RFDAT(5,IDX),RFDAT(4,IDX)
          END IF
       END DO       
+! write function block from mech.def file
+      IF( LINES_CAPTURED .GT. 0 )THEN
+          INQUIRE( FILE = TRIM( FUNCTIONS_CAPTURED ), EXIST = EXISTING )
+          IF( .NOT. EXISTING )THEN
+             WRITE(6,*)'ERROR: CANNOT LOCATE FILE: ' // TRIM(FUNCTIONS_CAPTURED)
+             STOP
+          END IF
+          OPEN( UNIT = UNIT_FUNCTIONS, FILE = TRIM( FUNCTIONS_CAPTURED ), STATUS = 'OLD' )
+          WRITE( KPPEQN_UNIT,'("! Lines capture from MECH_DEF FUNCTIONS blocks." )')
+          DO NC = 1, LINES_CAPTURED
+            READ (UNIT_FUNCTIONS,'(A)')FILE_LINE
+            WRITE( KPPEQN_UNIT,'(11X,A)')TRIM( FILE_LINE )
+          END DO
+          CLOSE( UNIT_FUNCTIONS )
+      END IF
+
       WRITE(KPPEQN_UNIT,4504)
 ! write equations for mechanism
       WRITE(KPPEQN_UNIT,'(3A)')'#EQNTAGS ON'
@@ -638,6 +669,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
              IRX = ISPECIAL( IDX, 2)
              IF( RTDAT( 1, I) .NE. 1.0 )THEN
                 WRITE(KPPEQN_UNIT,5011, ADVANCE = 'NO')REAL(RTDAT( 1, I),8), TRIM( SPECIAL( IRX ) )
+             ELSE IF( RTDAT( 1, I) .NE. 1.0 .AND. ABS( RTDAT( 3, I ) ) .GT. 0.0 )THEN
+                WRITE(KPPEQN_UNIT,5013, ADVANCE = 'NO')REAL(RTDAT( 1, I ), 8),REAL(RTDAT( 3, I ), 8),
+     &          TRIM( SPECIAL( IRX) )
+             ELSE IF( RTDAT( 1, I) .EQ. 1.0 .AND. ABS( RTDAT( 3, I ) ) .GT. 0.0 )THEN
+                WRITE(KPPEQN_UNIT,5015, ADVANCE = 'NO')REAL(RTDAT( 3, I ), 8),
+     &          TRIM( SPECIAL( IRX) )
              ELSE
                 WRITE(KPPEQN_UNIT,5012, ADVANCE = 'NO')TRIM( SPECIAL( IRX ) )
              END IF
@@ -648,6 +685,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
              CALL WRITE_RATE_CONVERT(KPPEQN_UNIT, IORDER(NXX))
              WRITE(KPPEQN_UNIT,5020, ADVANCE = 'NO')RTDAT(1, NXX ),RFDAT(1, IDX),RTDAT(2, NXX ),
      &       RFDAT(2, IDX)
+          CASE( 13 )
+             DO IDX = 1, NRATE_STRING
+                IF( KSTRING( IDX ) .EQ. NXX )EXIT
+             END DO
+             CALL WRITE_RATE_CONVERT_BEFORE(KPPEQN_UNIT, IORDER(NXX))
+             WRITE(KPPEQN_UNIT,'(A)', ADVANCE = 'NO')TRIM( RATE_STRING( IDX ) )
           END SELECT
          WRITE(KPPEQN_UNIT,'(A)')' ;'
       END DO
@@ -791,6 +834,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 5010   FORMAT('FALL_OFF( ', 2(1PD12.4,', '),' & ' / ' &', 5(1PD12.4,', '),' & ' / ' &', 1PD12.4,' )')
 5011   FORMAT(1PD12.4,' * ',A)             
 5012   FORMAT(A)
+5013   FORMAT(ES12.4,"*exp(",ES12.4,"*INV_TEMP)*",A,"")             
+5015   FORMAT("exp(",ES12.4,"*INV_TEMP)*",A,"")             
 5014   FORMAT('ARRD( ',1PD12.4,', 0.0000D+0,', 1PD12.4,' )  * PRESS ')             
 5019   FORMAT('EP4D( ', 7(1PD12.4,', '), 1PD12.4,' )')
 5020   FORMAT('HALOGEN_FALLOFF( ', 3(1PD12.4,', '), 1PD12.4,' )')
