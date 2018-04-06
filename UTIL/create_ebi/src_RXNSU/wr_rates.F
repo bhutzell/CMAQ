@@ -72,6 +72,9 @@ C**********************************************************************
         CLINE( N : N ) = 'c'
       END DO
 
+c reset values of CHEMISTRY_SPC array in rxns_dta_mod
+      CHEMISTRY_SPC( : ) = SPECIES_LIST( : )%CHEMISTRY_SPC
+             
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Open ouput file and code template 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -147,16 +150,16 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          IF( N_AE_SPC .GT. 0 .AND. N_AQ_SPC .GT. 0 )THEN
             IF( IRR( N, 1 ) .NE. 0 )
-     &      IND1 = MAX( NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AE_SPC, AE_SPC ),
-     &                  NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC ) )
+     &      IND1 = MAX( NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AE_SPC, AE_SPC ),
+     &                  NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC ) )
 
             IF( IRR( N, 2 ) .NE. 0 )
-     &         IND2 = MAX( NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AE_SPC, AE_SPC ),
-     &                     NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC ) )
+     &         IND2 = MAX( NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AE_SPC, AE_SPC ),
+     &                     NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC ) )
 
             IF( IRR( N, 2 ) .NE. 0 )
-     &          IND2 = MAX( NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AE_SPC, AE_SPC ),
-     &                      NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC ) )
+     &          IND2 = MAX( NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AE_SPC, AE_SPC ),
+     &                      NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC ) )
          END IF
 
 c..skip rxn if any reactant is a AE or AQ species
@@ -172,7 +175,7 @@ c..skip rxn if any reactant is a AE or AQ species
 
          DO S = 1, NREACT( N )
             IF( IRR( N, S ) .NE. 0 ) THEN
-               SPEC = ADJUSTL( SPECIES( IRR( N, S ) ) )
+               SPEC = ADJUSTL( CHEMISTRY_SPC( IRR( N, S ) ) )
                E2   = LEN_TRIM( SPEC )
                LINOUT = LINOUT( 1 : E1 ) // ' * YC(  ' // SPEC( 1 : E2 ) //
      &                 ' )'
@@ -202,13 +205,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          IF( N_AE_SPC .GT. 0 )THEN
            IF( IRR( N, 1 ) .NE. 0 )
-     &         IND1 = NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AE_SPC, AE_SPC )
+     &         IND1 = NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AE_SPC, AE_SPC )
 
             IF( IRR( N, 2 ) .NE. 0 )
-     &         IND2 = NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AE_SPC, AE_SPC )
+     &         IND2 = NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AE_SPC, AE_SPC )
 
             IF( IRR( N, 3 ) .NE. 0 )
-     &          IND3 = NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AE_SPC, AE_SPC )
+     &          IND3 = NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AE_SPC, AE_SPC )
          END IF
 
 
@@ -233,7 +236,7 @@ c..do rxn if any reactant is a AE or AQ species
 
             DO S = 1, NREACT( N )
                IF( IRR( N, S ) .NE. 0 ) THEN
-                  SPEC = ADJUSTL( SPECIES( IRR( N, S ) ) )
+                  SPEC = ADJUSTL( CHEMISTRY_SPC( IRR( N, S ) ) )
                   LINOUT = LINOUT( 1 : E1 ) // ' * YC(  ' // SPEC( 1 : CL ) //
      &                 ' )'
                   E1 = LEN_TRIM( LINOUT )
@@ -264,13 +267,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          IF( N_AQ_SPC .GT. 0 )THEN
              IF( IRR( N, 1 ) .NE. 0 )
-     &       IND1 = NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC )
+     &       IND1 = NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC )
 
              IF( IRR( N, 2 ) .NE. 0 )
-     &        IND2 = NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC )
+     &        IND2 = NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC )
 
               IF( IRR( N, 3 ) .NE. 0 )
-     &        IND3 = NAME_INDEX( SPECIES( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC )
+     &        IND3 = NAME_INDEX( CHEMISTRY_SPC( IRR( N, 1 ) ), N_AQ_SPC, AQ_SPC )
         END IF
 
 
@@ -296,7 +299,7 @@ c..do rxn if any reactant is a AE or AQ species
 
             DO S = 1, NREACT( N )
                IF( IRR( N, S ) .NE. 0 ) THEN
-                  SPEC = ADJUSTL( SPECIES( IRR( N, S ) ) )
+                  SPEC = ADJUSTL( CHEMISTRY_SPC( IRR( N, S ) ) )
                   LINOUT = LINOUT( 1 : E1 ) // ' * YC(  ' // SPEC( 1 : CL ) //
      &                 ' )'
                   E1 = LEN_TRIM( LINOUT )

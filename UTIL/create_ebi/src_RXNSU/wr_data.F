@@ -138,7 +138,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
             EPOS = 16 ! LEN_TRIM( SPECIES( N ) )
            
-            WRITE( IOUT, 93081 ) SPECIES( N ) ( 1 : EPOS ), N
+            WRITE( IOUT, 93081 ) SOLVER_SPECIES( N )%SPECIES_NAME ( 1 : EPOS ), N
 
          END DO
 

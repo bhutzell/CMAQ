@@ -53,6 +53,8 @@ C.....INCLUDES:
 C.....ARGUMENTS: NONE
  
 C.....PARAMETERS: NONE
+      LOGICAL, PARAMETER :: F = .FALSE.
+      LOGICAL, PARAMETER :: T = .TRUE.
 
 
 C.....SAVED VARIABLES:
@@ -65,6 +67,7 @@ C.....LOCAL VARIABLES:
       INTEGER N               ! Loop index
       INTEGER IOS             ! Allocate error status
 
+R6
 C***********************************************************************
 
       N_SPEC = NUMB_MECH_SPC
@@ -93,6 +96,7 @@ R4   &          PNEG( N_SPEC),
        ALLOCATE( ATMPRES( MAX_CELLS_EBI ), 
      &           H2O    ( MAX_CELLS_EBI ),
      &           TEMP   ( MAX_CELLS_EBI ),
+     &           DENSITY( MAX_CELLS_EBI ),
      &           HET    ( MAX_CELLS_EBI, NHETERO ), 
      &           RJIN   ( MAX_CELLS_EBI, NPHOTAB ), 
      &           LAND   ( MAX_CELLS_EBI ) ,
@@ -119,14 +123,20 @@ R4   &          PNEG( N_SPEC),
           END DO
        END IF
 
+! reset order RXNS data of species arrays and types for EBI solver before mapping
+       DO N = 1, NUMB_MECH_SPC
+          SPECIES_LIST( N ) = EBI_SPECIES_LIST( N )
+       END DO
+
+
        IF( .NOT. MAP_CHEMISTRY_SPECIES() )THEN
           MSG = 'Detected above error(s) when mapping Chemistry species from CGRID species'
           CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT2 )
        END IF
 
        DO N = 1, NUMB_MECH_SPC
-          FORWARD_CONV( N ) = 1.0E-3 * MWAIR / SPECIES_MOLWT( N )
-          REVERSE_CONV( N ) = 1.0E+3 / MWAIR * SPECIES_MOLWT( N )
+          FORWARD_CONV( N ) = REAL( 1.0E-3 * MWAIR, 8 ) / SPECIES_MOLWT( N )
+          REVERSE_CONV( N ) = 1.0 / REAL( FORWARD_CONV( N ), 4 )
        END DO
 
 ! initialize all reaction rates to zero so unused array elements are defined

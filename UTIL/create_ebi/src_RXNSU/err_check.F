@@ -147,22 +147,22 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( .NOT. LERROR ) THEN
          WRITE( LOGDEV, 93000 ) 
-     &       SPECIES( NO   )( 1 : LEN_TRIM( SPECIES( NO   ) ) ),
-     &       SPECIES( NO2  )( 1 : LEN_TRIM( SPECIES( NO2  ) ) ),
-     &       SPECIES( O3   )( 1 : LEN_TRIM( SPECIES( O3   ) ) ),
-     &       SPECIES( O3P  )( 1 : LEN_TRIM( SPECIES( O3P  ) ) ),
-     &       SPECIES( O1D  )( 1 : LEN_TRIM( SPECIES( O1D  ) ) ),
-     &       SPECIES( OH   )( 1 : LEN_TRIM( SPECIES( OH   ) ) ),
-     &       SPECIES( HO2  )( 1 : LEN_TRIM( SPECIES( HO2  ) ) ),
-     &       SPECIES( HONO )( 1 : LEN_TRIM( SPECIES( HONO ) ) ),
-     &       SPECIES( HNO4 )( 1 : LEN_TRIM( SPECIES( HNO4 ) ) ),
-     &       SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) ),
-     &       SPECIES( N2O5 )( 1 : LEN_TRIM( SPECIES( N2O5 ) ) ),
-     &       SPECIES( C2O3 )( 1 : LEN_TRIM( SPECIES( C2O3 ) ) ),
-     &       SPECIES( PAN  )( 1 : LEN_TRIM( SPECIES( PAN  ) ) )
+     &       TRIM( SPECIES_LIST( NO   )%CHEMISTRY_SPC ),  
+     &       TRIM( SPECIES_LIST( NO2  )%CHEMISTRY_SPC ), 
+     &       TRIM( SPECIES_LIST( O3   )%CHEMISTRY_SPC ),  
+     &       TRIM( SPECIES_LIST( O3P  )%CHEMISTRY_SPC ), 
+     &       TRIM( SPECIES_LIST( O1D  )%CHEMISTRY_SPC ), 
+     &       TRIM( SPECIES_LIST( OH   )%CHEMISTRY_SPC ),  
+     &       TRIM( SPECIES_LIST( HO2  )%CHEMISTRY_SPC ), 
+     &       TRIM( SPECIES_LIST( HONO )%CHEMISTRY_SPC ), 
+     &       TRIM( SPECIES_LIST( HNO4 )%CHEMISTRY_SPC ), 
+     &       TRIM( SPECIES_LIST( NO3  )%CHEMISTRY_SPC ),  
+     &       TRIM( SPECIES_LIST( N2O5 )%CHEMISTRY_SPC ), 
+     &       TRIM( SPECIES_LIST( C2O3 )%CHEMISTRY_SPC ), 
+     &       TRIM( SPECIES_LIST( PAN  )%CHEMISTRY_SPC )  
 
          IF( LNO2EX_CYCLE ) WRITE( LOGDEV, 93010 ) 
-     &       SPECIES( NO2EX )( 1 : LEN_TRIM( SPECIES( NO2EX ) ) )
+     &       TRIM( SPECIES_LIST( NO2EX )%CHEMISTRY_SPC )
       END IF
 
 

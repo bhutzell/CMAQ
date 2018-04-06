@@ -71,9 +71,11 @@ C set up SPECIES array
       ALLOCATE( SPECIES( N_SPECIES + 1 ) )
       SPECIES = ' '
       DO N = 1, N_SPECIES
-         SPECIES( N ) =  CHEMISTRY_SPC( N )
+         SPECIES( N ) =  SPECIES_LIST( N )%CHEMISTRY_SPC
       END DO
       
+      ALLOCATE( SOLVER_SPECIES( NUMB_MECH_SPC ) )
+
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Get group species indices
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -85,6 +87,7 @@ c..NO
       IF( NO .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_NO
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( NO )
       ELSE
          EOS = LEN_TRIM( MECH_NO )
          MSG = 'ERROR: MECH_NO Group species ' // MECH_NO( 1 : EOS ) //
@@ -98,6 +101,7 @@ c..NO2
       IF( NO2 .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_NO2
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( NO2 )
       ELSE
         EOS = LEN_TRIM( MECH_NO2 )
         MSG = 'ERROR: MECH_NO2 Group species ' // MECH_NO2( 1 : EOS ) //
@@ -111,6 +115,7 @@ c..O3
       IF( NO2 .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_O3
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( O3 )
       ELSE
          EOS = LEN_TRIM( MECH_O3 )
          MSG = 'ERROR: MECH_O3 Group species ' // MECH_O3( 1 : EOS ) //
@@ -124,6 +129,7 @@ c..O3P
       IF( O3P .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_O3P
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( O3P )
       ELSE
          EOS = LEN_TRIM( MECH_O3P )
          MSG = 'ERROR: ECH_O3P Group species ' // MECH_O3P( 1 : EOS ) //
@@ -137,6 +143,7 @@ c..O1D
       IF( O1D .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_O1D
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( O1D )
       ELSE
          EOS = LEN_TRIM( MECH_O1D )
          MSG = 'ERROR: MECH_O1D Group species value: ' // MECH_O1D( 1 : EOS ) //
@@ -150,6 +157,7 @@ c..OH
       IF( OH .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_OH
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( OH )
       ELSE
          EOS = LEN_TRIM( MECH_OH )
          MSG = 'ERROR: MECH_OH Group species ' // MECH_OH( 1 : EOS ) //
@@ -163,6 +171,7 @@ c..HO2
       IF( HO2 .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_HO2
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( HO2 )
       ELSE
          EOS = LEN_TRIM( MECH_HO2 )
          MSG = 'ERROR: MECH_HO2 Group species ' // MECH_HO2( 1 : EOS ) //
@@ -175,6 +184,7 @@ c..HONO
       IF( HONO .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_HONO
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( HONO )
       ELSE
          EOS = LEN_TRIM( MECH_HONO )
          MSG = 'ERROR: MECH_HONO Group species ' // MECH_HONO( 1 : EOS ) //
@@ -188,6 +198,7 @@ c..HNO4
       IF( HNO4 .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_HNO4
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( HNO4 )
       ELSE
          EOS = LEN_TRIM( MECH_HNO4 )
          MSG = 'ERROR: MECH_HNO4 Group species ' // MECH_HNO4( 1 : EOS ) //
@@ -201,6 +212,7 @@ C..C2O3
       IF( C2O3 .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_C2O3
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( C2O3 )
       ELSE
          EOS = LEN_TRIM( MECH_C2O3 )
          MSG = 'ERROR: MECH_C2O3 Group species ' // MECH_C2O3( 1 : EOS ) //
@@ -214,6 +226,7 @@ C..PAN
       IF( PAN .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_PAN
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( PAN )
       ELSE
          EOS = LEN_TRIM( MECH_PAN )
          MSG = 'ERROR: MECH_PAN Group species ' // MECH_PAN( 1 : EOS ) //
@@ -227,6 +240,7 @@ c..NO3
       IF( NO3 .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_NO3
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( NO3 )
       ELSE
          EOS = LEN_TRIM( MECH_NO3 )
          MSG = 'ERROR: MECH_NO3 Group species ' // MECH_NO3( 1 : EOS ) //
@@ -238,6 +252,7 @@ c..N2O5
       IF( N2O5 .NE. 0 ) THEN
          N = N +1
          GRP_SPC( N ) = MECH_N2O5
+         SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( N2O5 )
       ELSE
          EOS = LEN_TRIM( MECH_N2O5 )
          MSG = 'ERROR: MECH_N2O5 Group species ' // MECH_N2O5( 1 : EOS ) //
@@ -252,6 +267,7 @@ c..NO2EX
          IF( NO2EX .NE. 0 ) THEN
             N = N +1
             GRP_SPC( N ) = MECH_NO2EX
+            SOLVER_SPECIES( N )%SPECIES_NAME = SPECIES( NO2EX )
          ELSE
             EOS = LEN_TRIM( MECH_NO2EX )
             MSG = 'ERROR: MECH_NO2EXGroup species ' // MECH_NO2EX( 1 : EOS ) //
@@ -268,6 +284,36 @@ c..NO2EX
         STOP
       END IF
 
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  Tag each species as EBI or group
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      ALLOCATE( L_GC_EBI( N_SPECIES ) )
+      L_GC_EBI = .FALSE.
+
+      IND = N_GRP_SPC
+      DO N = 1, N_SPECIES
+         IF(  NAME_INDEX( SPECIES( N ), N_GRP_SPC, GRP_SPC ) .LT. 1 ) THEN
+             N_GC_EBI = N_GC_EBI + 1
+             L_GC_EBI( N ) = .TRUE.
+             IND = IND + 1
+             SOLVER_SPECIES( IND )%SPECIES_NAME = SPECIES( N )
+             SOLVER_SPECIES( IND )%SOLVE        = .TRUE.
+!             print*,SPECIES( N ), SOLVER_SPECIES( IND )%SPECIES_NAME
+         END IF
+      END DO
+
+C..define remaining empty data in solver_species array
+
+      DO N = 1, N_SPECIES
+!         print*,SPECIES( N ), SOLVER_SPECIES( N )%SPECIES_NAME
+         IND =  NAME_INDEX( SOLVER_SPECIES( N )%SPECIES_NAME, N_SPECIES, SPECIES )
+         IF( IND .GT. 0 ) THEN
+             SOLVER_SPECIES( N )%CGRID_INDEX   = SPECIES_LIST( IND )%CGRID_INDEX
+             SOLVER_SPECIES( N )%SPECIES_TYPE  = SPECIES_LIST( IND )%SPECIES_TYPE
+             SOLVER_SPECIES( N )%SPECIES_MOLWT = SPECIES_LIST( IND )%SPECIES_MOLWT
+             SOLVER_SPECIES( N )%CONVERT_CONC  = SPECIES_LIST( IND )%CONVERT_CONC
+         END IF
+      END DO
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c If doing all mechanisms, get a list of species & find unique AE/AQ
@@ -367,18 +413,6 @@ c      END IF
           LL = MAX( LL, LEN_TRIM( RXLABEL( N ) ) )       
        END DO
 
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  Tag each species as EBI or group
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      ALLOCATE( L_GC_EBI( N_SPECIES ) )
-      L_GC_EBI = .FALSE.
-
-      DO N = 1, N_SPECIES
-         IF( NAME_INDEX( SPECIES( N ), N_GRP_SPC, GRP_SPC ) .EQ. 0 ) THEN
-             N_GC_EBI = N_GC_EBI + 1
-             L_GC_EBI( N ) = .TRUE.
-         END IF
-      END DO
 
       IF( L_ALL_MECHS ) THEN
 
@@ -437,8 +471,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          ALLOCATE(L_HII_TOL_SPC( N_SPECIES ) )
          L_HII_TOL_SPC = .FALSE.
 
+         
          DO N = 1, N_SPECIES
-            IF( NAME_INDEX( SPECIES( N ), N_LOW_TOL_SPC, LOW_TOL_SPC )
+            IF( NAME_INDEX( SOLVER_SPECIES( N )%SPECIES_NAME, N_LOW_TOL_SPC, LOW_TOL_SPC )
      &          .NE. 0 ) THEN
                 L_LOW_TOL_SPC( N ) = .TRUE.
             END IF
@@ -454,7 +489,6 @@ c..Tag NO2EX as low tol if cycle is in group 1 and 2
          
 
       END IF
-
 
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

@@ -234,7 +234,7 @@ c..determine length of RXOUT string
 
 c..Load reactant species data into work arrays
       DO R = 1, NREACT( IRX )
-         RSPEC( R ) = SPECIES( IRR( IRX, R ) )
+         RSPEC( R ) = CHEMISTRY_SPC( IRR( IRX, R ) )
          RINDX( R ) = IRR( IRX, R )
       END DO
 
@@ -272,7 +272,7 @@ c..Shuffle reactant positions if necessary
 c..Load product species data into work arrays
       DO P = 1, NPRDCT( IRX )
          PINDX( P ) = IRR( IRX, P + 3 )
-         PSPEC( P ) = SPECIES( IRR( IRX, P + 3 ) )
+         PSPEC( P ) = CHEMISTRY_SPC( IRR( IRX, P + 3 ) )
          YCOEF( P ) = REAL( SC( IRX, P ), 8 )
       END DO
 
@@ -581,7 +581,7 @@ c..build the output line
          EPOS = LEN_TRIM( LINOUT )
 
          IF( NR .EQ. 1 ) THEN
-            SPOUT = ADJUSTL( SPECIES( RCT( 1 ) ) )
+            SPOUT = ADJUSTL( CHEMISTRY_SPC( RCT( 1 ) ) )
             LINOUT = LINOUT( 1 : EPOS ) // ' * YC( ' // SPOUT  // ' )'
             EPOS = LEN_TRIM( LINOUT )
          ELSE
@@ -673,7 +673,7 @@ c..Special case for HONO being formed from NO2EX -- relate it to NO2
      &               'RXRAT( ' // RNUM // ' )'
          ELSE
             LINOUT = '     &'  // FILLR( 1 : MAX( 1, (EV-1) )) // '  +  ' 
-     &             // COUT // 'RXRAT( ' // RNUM // ' )'
+     &             // COUT // 'RXRAT( ' // RNUM // ' )' 
          END IF
 
          READ( RNUM, '(I3)' ) N

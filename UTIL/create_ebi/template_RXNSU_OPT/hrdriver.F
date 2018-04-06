@@ -126,7 +126,7 @@ C..Scratch Local Variables:
   
       LOGICAL LSUNLIGHT       ! Flag for sunlight
 
-      REAL       INV_DENS     ! reciprocal of air mass density, m3/Kg
+      REAL( 8 )  INV_DENS     ! reciprocal of air mass density, m3/Kg
 #ifdef hrstats 
       REAL       SUMEBI       ! Sum of EBI iterations
 #endif
@@ -425,15 +425,11 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             DO C = 1, MY_NCOLS
  
 c..Load ICs
-               INV_DENS = 1.0 / DENS( C,R,L )
+               INV_DENS = REAL( 1.0 / DENS( C,R,L ), 8 )
                DO SPC = 1, NUMB_MECH_SPC
                   S = CGRID_INDEX( SPC )
-                  IF( CONVERT_CONC( SPC ) )THEN 
-                      YC( SPC ) = REAL( MAX( CONCMIN, 
-     &                            INV_DENS*FORWARD_CONV( SPC )*CGRID( C,R,L,S )), 8 )
-                  ELSE
-                      YC( SPC ) = REAL( MAX( CGRID( C,R,L,S ), CONCMIN), 8 )
-                  END IF
+                  YC( SPC ) = REAL( MAX( CGRID( C,R,L,S ), CONCMIN), 8 )
+                  IF( CONVERT_CONC( SPC ) )YC( SPC ) = INV_DENS*FORWARD_CONV( SPC )*YC( SPC )
                END DO
 
 R5               IF(CALL_DEG)THEN ! INITIALIZE degradation routines
@@ -447,7 +443,8 @@ R5     &                              JDATE, JTIME, LOGDEV)
 R5               END IF
 
 c..Set physical quantities
-               TEMP( NCELL )     = REAL( TA( C,R,L ), 8)
+               TEMP   ( NCELL )  = REAL(   TA( C,R,L ), 8)
+               DENSITY( NCELL )  = REAL( DENS( C,R,L ), 8)
 !                PRESCELL( NCELL ) = REAL( PRES( C,R,L ), 8)
                ATMPRES( NCELL )  = PA2ATM * REAL( PRES( C,R,L ), 8)
                H2O( NCELL )      = REAL( MAX ( MAOMV * QV( C,R,L ), 0.0 ), 8)

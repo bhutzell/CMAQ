@@ -99,7 +99,6 @@ R5      INTEGER M               ! species index
       INTEGER NBKUPS          ! No. of times time step reduced
       INTEGER ERR             ! Allocate error flag
 
-
       LOGICAL LEBI_CONV          ! Flag for EBI convergence
       LOGICAL MXFL               ! hit MAXPRED flag
 
@@ -108,6 +107,7 @@ R5      REAL( 8 ) DTG         ! Time step in degrade routines, sec
       REAL( 8 ) FXDLOSS          ! Total loss due to negative stoichiometry
       REAL( 8 ) VARLOSS          ! Loss excluding negative stoichiometry
 
+      INTEGER, SAVE :: EBI_START       ! array index for first EBI solved species
 
 #ifdef hrdebug
       CHARACTER( 8 ) :: NOTE  ! Convergence fail note
@@ -167,6 +167,8 @@ C**********************************************************************
              MSG = 'Error allocating AERROR'
              CALL M3EXIT( PNAME, JDATE, JTIME, MSG, XSTAT1 )
           END IF
+
+          EBI_START = NUMB_MECH_SPC - N_EBISP + 1
 
        END IF
 
@@ -232,7 +234,7 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
          SUBSTEP_EBI: DO NINR = 1, N_INR_STEPS   ! time substeps loop 
 !  first attempt is sub time-step equals EBI time-step
 
-            IF( LEBI_CONV ) FORALL( S = 1:NUMB_MECH_SPC )YC0( S ) = YC( S )   ! Set ICs for EBI iterations
+            IF( LEBI_CONV ) YC0 = YC   ! Set ICs for EBI iterations
 
             ITER_SUBSTEP: DO ITER = 1, NEBITER  ! iteration loop solving for sub time-step
 
@@ -278,8 +280,8 @@ c  Do the Euler backward method
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                CALL HRPRODLOSS
 
-               DO EBI = 1, N_EBISP
-                  S = EBISP( EBI )
+               DO S = EBI_START, NUMB_MECH_SPC
+!                 S = EBISP( EBI )
                   YCP( S ) =  YC( S )*( ( YC0( S ) + PROD( S ) * DTC )
      &                     / ( YC( S ) + LOSS( S ) * DTC ) )
                END DO
@@ -297,7 +299,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   YCP( S ) = MAX( ZERO, YCP( S ) )
                   AERROR( S ) = ABS( YC(S)-YCP(S) ) 
                   RERROR( S ) = AERROR( S ) / ABS( YC(S)+YCP(S) )
-                   IF( RERROR( S ) .GT. RTOL(S) .OR. AERROR( S ) .GT. 1.0D-5 )THEN
+                  IF( RERROR( S ) .GT. RTOL(S) .OR. AERROR( S ) .GT. 1.0D-5 )THEN
 !                 IF( RERROR( S ) .GT. RTOL(S)  )THEN
                      LEBI_CONV     = .FALSE.
                      LEBISPFL( S ) = .TRUE.
@@ -368,7 +370,7 @@ R5
                   END DO
                END IF
 
-               FORALL( S = 1:NUMB_MECH_SPC )YC( S ) = YC0( S )   ! Set ICs for EBI time-step
+               YC = YC0   ! Set ICs for EBI time-step
 
                DTC = 0.5D0 * DTC
 

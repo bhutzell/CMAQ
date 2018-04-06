@@ -59,6 +59,7 @@ C..SCRATCH LOCAL VARIABLES:
       LOGICAL  :: LOUT3 = .FALSE.  ! Flag for group 3 output processed
       LOGICAL  :: LOUT4 = .FALSE.  ! Flag for group 4 output processed
       LOGICAL  :: LOUT5 = .FALSE.  ! Flag for group 5 output processed
+      LOGICAL  :: LOUT6 = .FALSE.  ! Flag for group 6 output processed
 
 
 C**********************************************************************
@@ -138,6 +139,21 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
             LOUT5 = .FALSE.
 
+         ELSEIF( LINEIN( 2 : 2 ) .EQ. '6' .AND. .NOT. LOUT5 ) THEN
+
+            WRITE( IOUT, 97000 )
+            DO S = 1, (NUMB_MECH_SPC-1) 
+               WRITE( IOUT, 97001 ) SOLVER_SPECIES( S )%SPECIES_NAME, 
+     &         SOLVER_SPECIES( S )%CGRID_INDEX, SOLVER_SPECIES( S )%SPECIES_TYPE, 
+     &         SOLVER_SPECIES( S )%SPECIES_MOLWT, SOLVER_SPECIES( S )%CONVERT_CONC
+            END DO
+            S = NUMB_MECH_SPC
+            WRITE( IOUT, 97002 ) SOLVER_SPECIES( S )%SPECIES_NAME, 
+     &      SOLVER_SPECIES( S )%CGRID_INDEX, SOLVER_SPECIES( S )%SPECIES_TYPE, 
+     &      SOLVER_SPECIES( S )%SPECIES_MOLWT, SOLVER_SPECIES( S )%CONVERT_CONC
+
+            LOUT6 = .FALSE.
+
          END IF
 
       END IF
@@ -146,7 +162,23 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
  1000 CONTINUE
 
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  Write section resetting RXNS_DATA indices for species locations in  
+C  concentration array
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+      WRITE(IOUT,97003)
+      DO S = 1, NUMB_MECH_SPC-1
+         SPOUT = ADJUSTL( SOLVER_SPECIES( S )%SPECIES_NAME )
+         WRITE(IOUT,97004)SPOUT( 1:CL ), SPOUT( 1:CL )
+      END DO
+      S = NUMB_MECH_SPC
+      SPOUT = ADJUSTL( SOLVER_SPECIES( S )%SPECIES_NAME )
+      WRITE(IOUT,97005)SPOUT( 1:CL ), SPOUT( 1:CL )
 
+97003 FORMAT('! reset RXNS_DATA indices for species locations in concentration '
+     &     / '! array using HRDATA parameters ' /)
+97004 FORMAT(6X,'INDEX_' ,A, ' = ', A)
+97005 FORMAT(6X,'INDEX_' ,A, ' = ', A /)
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C  Write first section for one mech
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -159,8 +191,8 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 c..create indices for all mechanism species
 !         DO N = 1, N_SPECIES
 !            SPOUT = '                '         
-!            EPOS = LEN_TRIM( SPECIES( N ) )
-!            SPOUT( 1 : EPOS ) = SPECIES( N )( 1 : EPOS ) 
+!            EPOS = LEN_TRIM( SOLVER_SPECIES( N )%SPECIES_NAME )
+!            SPOUT( 1 : EPOS ) = SOLVER_SPECIES( N )%SPECIES_NAME( 1 : EPOS ) 
 !            WRITE( IOUT, 93120 ) SPOUT( 1 : CL ), N
 !         END DO
 
@@ -172,10 +204,10 @@ c..form ebi species array (all species except those in groups 1-4)
 
             IND = 0
             DO N = 1, N_SPECIES
-               IF( L_GC_EBI( N ) ) THEN
+               IF( SOLVER_SPECIES( N )%SOLVE ) THEN
                   IND = IND + 1
-                  WRITE( IOUT, 93160 ) IND, SPECIES( N )
-     &                 ( 1 : LEN_TRIM( SPECIES( N ) ) )
+                  WRITE( IOUT, 93160 ) IND, SOLVER_SPECIES( N )%SPECIES_NAME
+     &                 ( 1 : LEN_TRIM( SOLVER_SPECIES( N )%SPECIES_NAME ) )
                END IF
             END DO
 
@@ -185,11 +217,11 @@ c..form ebi species array ( no SS species, no group species )
             WRITE( IOUT, 93140 ) ( N_GC_EBI - N_SS_SPC )
             IND = 0
             DO N = 1, N_SPECIES
-               IF( NAME_INDEX( SPECIES( N ), N_SS_SPC, SS_SPC) .EQ. 0 .AND.
-     &             L_GC_EBI( N ) ) THEN  
+               IF( NAME_INDEX( SOLVER_SPECIES( N )%SPECIES_NAME, N_SS_SPC, SS_SPC) .EQ. 0 .AND.
+     &             SOLVER_SPECIES( N )%SOLVE ) THEN  
                    IND = IND + 1
-                   WRITE( IOUT, 93160 ) IND, SPECIES( N )
-     &                  ( 1 : LEN_TRIM( SPECIES( N ) ) )
+                   WRITE( IOUT, 93160 ) IND, SOLVER_SPECIES( N )%SPECIES_NAME
+     &                  ( 1 : LEN_TRIM( SOLVER_SPECIES( N )%SPECIES_NAME ) )
                END IF
             END DO  
 
@@ -206,10 +238,10 @@ c..form active species array ( all species except SS species )
             WRITE( IOUT, 93220 ) N_SPECIES - N_SS_SPC
             IND = 0
             DO N = 1, N_SPECIES
-               IF( NAME_INDEX( SPECIES( N ), N_SS_SPC, SS_SPC ) .EQ. 0 ) THEN  
+               IF( NAME_INDEX( SOLVER_SPECIES( N )%SPECIES_NAME, N_SS_SPC, SS_SPC ) .EQ. 0 ) THEN  
                    IND = IND + 1
                    WRITE( IOUT, 93240 ) IND, 
-     &                    SPECIES( N )( 1 : LEN_TRIM( SPECIES( N ) ) )
+     &                    SOLVER_SPECIES( N )%SPECIES_NAME( 1 : LEN_TRIM( SOLVER_SPECIES( N )%SPECIES_NAME ) )
                END IF
             END DO 
            
@@ -252,7 +284,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
                IF( S .EQ. 1 ) SPEC = GC_ONLY_SPC( N )
                IF( S .EQ. 2 ) SPEC = GC_AE_SPC( N )
                IF( S .EQ. 3 ) SPEC = GC_AQ_SPC( N )
-               IF( S .EQ. 4 ) SPEC = SPECIES( N )
+               IF( S .EQ. 4 ) SPEC = SOLVER_SPECIES( N )%SPECIES_NAME
 
                SPOUT = '                '         
                EPOS = LEN_TRIM( SPEC )
@@ -272,12 +304,12 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
                IF( S .EQ. 1 ) LFLAG = L_GC_ONLY_EBI( N )
                IF( S .EQ. 2 ) LFLAG = L_GC_AE_EBI( N )
                IF( S .EQ. 3 ) LFLAG = L_GC_AQ_EBI( N )
-               IF( S .EQ. 4 ) LFLAG = L_GC_EBI( N )
+               IF( S .EQ. 4 ) LFLAG = SOLVER_SPECIES( N )%SOLVE
 
                IF( S .EQ. 1 ) SPEC = GC_ONLY_SPC( N )
                IF( S .EQ. 2 ) SPEC = GC_AE_SPC( N )
                IF( S .EQ. 3 ) SPEC = GC_AQ_SPC( N )
-               IF( S .EQ. 4 ) SPEC = SPECIES( N )
+               IF( S .EQ. 4 ) SPEC = SOLVER_SPECIES( N )%SPECIES_NAME
 
                IF( LFLAG ) THEN
                   IND = IND + 1
@@ -321,11 +353,11 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          DO N = 1, N_SPECIES
 
             IF( L_LOW_TOL_SPC( N ) ) THEN
-               WRITE( IOUT, 95020 ) SPECIES( N )( 1 : CL ), LOW_TOL
+               WRITE( IOUT, 95020 ) SOLVER_SPECIES( N )%SPECIES_NAME( 1 : CL ), LOW_TOL
             ELSEIF( L_HII_TOL_SPC( N ) ) THEN
-               WRITE( IOUT, 95020 ) SPECIES( N )( 1 : CL ), HII_TOL
+               WRITE( IOUT, 95020 ) SOLVER_SPECIES( N )%SPECIES_NAME( 1 : CL ), HII_TOL
             ELSE
-               WRITE( IOUT, 95020 ) SPECIES( N )( 1 : CL ), STD_TOL
+               WRITE( IOUT, 95020 ) SOLVER_SPECIES( N )%SPECIES_NAME( 1 : CL ), STD_TOL
             END IF
 
          END DO
@@ -432,6 +464,12 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 95080 FORMAT(  9X, 'RTOL( ', A, ' ) = ', A )
 
 96000 FORMAT( //6X, 'RETURN' // 6X, 'END' )
+
+97000 FORMAT( 'C...Define type array used to reset order in SPECIES_LIST '
+     &      / 6X, 'TYPE( MEMBER ) ::  EBI_SPECIES_LIST( NUMB_MECH_SPC ) = (/ ')
+97001 FORMAT( 5X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,'), ')
+97002 FORMAT( 5X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,') /)' /)
+
           
       END
 

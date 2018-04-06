@@ -159,8 +159,8 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 93000 FORMAT( 'C  PRECONDITIONS: For the ', A, ' family of mechanisms' )
 93020 FORMAT( 'C  REVISION HISTORY: Created by EBI solver program, ', A )
 93029 FORMAT( 6X,'USE RXNS_FUNCTION, ONLY : SPECIAL_RATES' )
-93030 FORMAT( 2/15X, 'FORALL( S=1:N_SPEC )SYC( NCELL, S ) = YC( S ) '
-     &        /15X, 'CALL SPECIAL_RATES( NUMCELLS=NCELL, IOLD2NEW=IOLD2NEW, NCS=1, ',
+93030 FORMAT( 2/15X, 'FORALL( S=1:NUMB_MECH_SPC )SYC( NCELL, S ) = YC( S ) '
+     &        /15X, 'CALL SPECIAL_RATES( NUMCELLS=NCELL, TEMP=TEMP, DENS=DENSITY, ',
      &         'Y=SYC, RKI=RKI_SAV )' 
      &        /15X, 'FORALL( S = 1:NRXNS )RKI( S ) = RKI_SAV( NCELL, S )' / )
 93040 FORMAT( 'c..Special treatment of PAR because of negative product ',

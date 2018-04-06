@@ -71,4 +71,15 @@ c..complete list of species in AE, AQ, & gas-phase mechanisms
 
       LOGICAL, ALLOCATABLE :: L_SS_RXN_FLAG( : )
 
+      TYPE EBI_MEMBERS
+         CHARACTER( 16 ) :: SPECIES_NAME  = "EMPTY"
+         INTEGER         :: CGRID_INDEX   = -1
+         CHARACTER(  2 ) :: SPECIES_TYPE  = "XX"
+         REAL            :: SPECIES_MOLWT = -1.0
+         LOGICAL         :: CONVERT_CONC  = .FALSE.
+         LOGICAL         :: SOLVE         = .FALSE.
+      END TYPE EBI_MEMBERS 
+
+      TYPE( EBI_MEMBERS ), ALLOCATABLE :: SOLVER_SPECIES( : )
+      
       END MODULE GLOBAL_DATA

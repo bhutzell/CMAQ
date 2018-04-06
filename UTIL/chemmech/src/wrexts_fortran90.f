@@ -426,7 +426,7 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
      &            /6X, 'CHARACTER( 16 ) :: SPECIES_TYPE(  NUMB_MECH_SPC )',
      &            /6X, 'INTEGER         :: CGRID_INDEX (  NUMB_MECH_SPC )',
      &            /6X, 'INTEGER         :: TYPE_INDEX  (  NUMB_MECH_SPC )',
-     &            /6X, 'REAL            :: SPECIES_MOLWT( NUMB_MECH_SPC )',
+     &            /6X, 'REAL( 8 )       :: SPECIES_MOLWT( NUMB_MECH_SPC )',
      &            /6X, 'LOGICAL         :: CONVERT_CONC(  NUMB_MECH_SPC )')
       ELSE
           WRITE( WRUNIT, 2157 )
@@ -487,12 +487,12 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
           DO ISPC = 1, (NS + N_SS_SPC - 1)
               ISPCNEW = INEW2OLD( ISPC )
              WRITE( WRUNIT, 2161 ) MECHANISM_SPC( ISPCNEW ), CGRID_INDEX( ISPCNEW ), 
-     &       SPECIES_TYPE( ISPCNEW ), ZERO, FALSE
+     &       SPECIES_TYPE( ISPCNEW ), ONE, FALSE
           END DO
           ISPC = (NS + N_SS_SPC)
           ISPCNEW = INEW2OLD( ISPC )
           WRITE( WRUNIT, 2162 ) MECHANISM_SPC( ISPCNEW ), CGRID_INDEX( ISPCNEW ), 
-     &    SPECIES_TYPE( ISPCNEW ), ZERO, FALSE
+     &    SPECIES_TYPE( ISPCNEW ), ONE, FALSE
       END IF
 
 
@@ -500,12 +500,12 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
      &       /6X, '   CHARACTER( 16 ) :: CHEMISTRY_SPC',
      &       /6X, '   INTEGER         :: CGRID_INDEX',
      &       /6X, '   CHARACTER(  2 ) :: SPECIES_TYPE',
-     &       /6X, '   REAL            :: SPECIES_MOLWT',
+     &       /6X, '   REAL( 8 )       :: SPECIES_MOLWT',
      &       /6X, '   LOGICAL         :: CONVERT_CONC',
      &       /6X, 'END TYPE MEMBER',
      &       /6X, 'TYPE( MEMBER ) ::  SPECIES_LIST( NUMB_MECH_SPC ) = (/ &')
-2161   FORMAT( 6X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,'), &')
-2162   FORMAT( 6X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,') /)' /)
+2161   FORMAT( 6X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,'D0, ', L1,'), &')
+2162   FORMAT( 6X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,'D0, ', L1,') /)' /)
 
       IF( USE_SPCS_NAMELISTS )THEN
           DO ISPC = 1, NS + N_SS_SPC
@@ -525,7 +525,7 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
               ISPCNEW = INEW2OLD( ISPC )
 !             WRITE( WRUNIT, 2161 ) ISPC, ISPC, ISPC, ISPC, ISPC, MECHANISM_SPC( ISPC ), CGRID_INDEX( ISPC ), 
 !     &       SPECIES_TYPE( ISPC ), ONE, USE_SPCS_NAMELISTS
-              WRITE( WRUNIT, 2061 ) ISPC, ISPC, MECHANISM_SPC( ISPCNEW ), ZERO 
+              WRITE( WRUNIT, 2061 ) ISPC, ISPC, MECHANISM_SPC( ISPCNEW ), ONE 
           END DO
           WRITE( WRUNIT,'( / )')
           DO ISPC = 1, NS + N_SS_SPC
@@ -549,7 +549,7 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
 
 
-2061   FORMAT( 6X, 'DATA', 1X, 'CHEMISTRY_SPC(', I4, ' ), SPECIES_MOLWT(', I4,' ) / ''', A16, ''', ', F7.2,' /')
+2061   FORMAT( 6X, 'DATA', 1X, 'CHEMISTRY_SPC(', I4, ' ), SPECIES_MOLWT(', I4,' ) / ''', A16, ''', ', F7.2,'D0 /')
 
 2065   FORMAT( 6X, 'DATA', 1X, 'CGRID_INDEX(', I4,' ), SPECIES_TYPE(', I4,' ), CONVERT_CONC(', I4,' ) / ', 
      &              I4, ', ''', A2, ''', ',  L1,' /  ! ', A)
