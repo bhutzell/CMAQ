@@ -7,8 +7,10 @@
          
          CHARACTER( 120 ) :: AUTHOR
          CHARACTER( 586 ) :: OUTDIR 
-         CHARACTER( 120 ) :: EQUATIONS_MECHFILE
-         CHARACTER(  32 ) :: MECHNAME
+         CHARACTER( 586 ) :: EQUATIONS_MECHFILE
+         CHARACTER(  32 ) :: MECHNAME            = 'UNDEFINED'
+         CHARACTER(  32 ) :: MECHNAME_LOWER_CASE = 'undefined'
+
 
          INTEGER          :: UNIT_FUNCTIONS
          CHARACTER( 599 ) :: FUNCTIONS_CAPTURED

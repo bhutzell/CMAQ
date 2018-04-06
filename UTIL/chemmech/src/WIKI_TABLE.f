@@ -81,7 +81,7 @@ c..local Variables for steady-state species
       CHARACTER( 37 ) :: PHRASE
       CHARACTER( 81 ) :: INBUF
       CHARACTER( 16 )  :: WIKI_OUT_FILE = 'WIKI_OUT_FILE'
-      CHARACTER( 586 ) :: FWIKI_OUT_FILE
+      CHARACTER( 627 ) :: FWIKI_OUT_FILE
 
       INTEGER, EXTERNAL :: INDEX1
       INTEGER, EXTERNAL :: INDEXES
@@ -213,10 +213,11 @@ c..Variables for species to be dropped from mechanism
   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C Find names for output file
+C Create name for output file
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      CALL VALUE_NAME ( WIKI_OUT_FILE, FWIKI_OUT_FILE )
-
+  
+      FWIKI_OUT_FILE = TRIM( OUTDIR ) // '/wiki_' // 
+     &                 TRIM( MECHNAME_LOWER_CASE )  // '.txt'
       CALL CALCULATE_RATES( NR )
       
       IF( .NOT. ALLOCATED( IOLD2NEW ) )THEN
@@ -230,7 +231,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IOLD2NEW( I ) = I
          END DO
       END IF
-! write out reactions strings to determine KPP information
+! write out reactions strings to determine mechanism information
 
        DO NXX = 1, NR
          DO IREACT = 1, NREACT( NXX )
@@ -747,7 +748,7 @@ c..local Variables for steady-state species
       CHARACTER( 37 ) :: PHRASE
       CHARACTER( 81 ) :: INBUF
       CHARACTER( 16 )  :: WIKI_OUT_FILE = 'WIKI_OUT_FILE'
-      CHARACTER( 586 ) :: FWIKI_OUT_FILE
+      CHARACTER( 627 ) :: FWIKI_OUT_FILE
 
       INTEGER, EXTERNAL :: INDEX1
       INTEGER, EXTERNAL :: INDEXES
@@ -879,13 +880,11 @@ c..Variables for species to be dropped from mechanism
   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C Find names for output file
+C Create name for output file
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      CALL VALUE_NAME ( WIKI_OUT_FILE, FWIKI_OUT_FILE )
-
-      NXX = SCAN( FWIKI_OUT_FILE, '.', BACK = .TRUE. ) - 1
   
-      FWIKI_OUT_FILE = FWIKI_OUT_FILE(1:NXX) // '.md'
+      FWIKI_OUT_FILE = TRIM( OUTDIR ) // '/mech_' // 
+     &                 TRIM( MECHNAME_LOWER_CASE )  // '.md'
 
       CALL CALCULATE_RATES( NR )
 
@@ -900,7 +899,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IOLD2NEW( I ) = I
          END DO
       END IF
-! write out reactions strings to determine KPP information
+! write out reactions strings to determine mechanism information
 
        DO NXX = 1, NR
          DO IREACT = 1, NREACT( NXX )
@@ -1981,7 +1980,7 @@ c..local Variables for steady-state species
       CHARACTER( 37 ) :: PHRASE
       CHARACTER( 81 ) :: INBUF
       CHARACTER( 16 )  :: WIKI_OUT_FILE = 'WIKI_OUT_FILE'
-      CHARACTER( 586 ) :: FWIKI_OUT_FILE
+      CHARACTER( 627 ) :: FWIKI_OUT_FILE
 
       INTEGER, EXTERNAL :: INDEX1
       INTEGER, EXTERNAL :: INDEXES
@@ -2113,13 +2112,11 @@ c..Variables for species to be dropped from mechanism
   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C Find names for output file
+C Create name for output file
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      CALL VALUE_NAME ( WIKI_OUT_FILE, FWIKI_OUT_FILE )
-
-      NXX = SCAN( FWIKI_OUT_FILE, '.', BACK = .TRUE. ) - 1
   
-      FWIKI_OUT_FILE = FWIKI_OUT_FILE(1:NXX) // '.csv'
+      FWIKI_OUT_FILE = TRIM( OUTDIR ) // '/mech_' // 
+     &                 TRIM( MECHNAME_LOWER_CASE )  // '.csv'
 
       CALL CALCULATE_RATES( NR )
 
@@ -2134,7 +2131,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IOLD2NEW( I ) = I
          END DO
       END IF
-! write out reactions strings to determine KPP information
+! write out reactions strings to determine mechanism information
 
        DO NXX = 1, NR
          DO IREACT = 1, NREACT( NXX )
@@ -2633,7 +2630,7 @@ c..local Variables for steady-state species
       CHARACTER( 37 ) :: PHRASE
       CHARACTER( 81 ) :: INBUF
       CHARACTER( 16 )  :: WIKI_OUT_FILE = 'WIKI_OUT_FILE'
-      CHARACTER( 586 ) :: FWIKI_OUT_FILE
+      CHARACTER( 627 ) :: FWIKI_OUT_FILE
 
       INTEGER, EXTERNAL :: INDEX1
       INTEGER, EXTERNAL :: INDEXES
@@ -2767,13 +2764,11 @@ c..Variables for species to be dropped from mechanism
   
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C Find names for output file
+C Create name for output file
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      CALL VALUE_NAME ( WIKI_OUT_FILE, FWIKI_OUT_FILE )
-
-      NXX = SCAN( FWIKI_OUT_FILE, '.', BACK = .TRUE. ) - 1
   
-      FWIKI_OUT_FILE = FWIKI_OUT_FILE(1:NXX) // '.html'
+      FWIKI_OUT_FILE = TRIM( OUTDIR ) // '/mech_' // 
+     &                 TRIM( MECHNAME_LOWER_CASE )  // '.html'
 
       CALL CALCULATE_RATES( NR )
 
@@ -3383,7 +3378,7 @@ c..local Variables for steady-state species
       CHARACTER( 37 ) :: PHRASE
       CHARACTER( 81 ) :: INBUF
       CHARACTER( 16 )  :: WIKI_OUT_FILE = 'WIKI_OUT_FILE'
-      CHARACTER( 586 ) :: FWIKI_OUT_FILE
+      CHARACTER( 627 ) :: FWIKI_OUT_FILE
 
       INTEGER, EXTERNAL :: INDEX1
       INTEGER, EXTERNAL :: INDEXES
@@ -3540,13 +3535,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       EQUIL_NOTE  = .FALSE.
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C Find names for output file
+C Create name for output file
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      CALL VALUE_NAME ( WIKI_OUT_FILE, FWIKI_OUT_FILE )
-
-      NXX = SCAN( FWIKI_OUT_FILE, '.', BACK = .TRUE. ) - 1
   
-      FWIKI_OUT_FILE = FWIKI_OUT_FILE(1:NXX) // '.md'
+      FWIKI_OUT_FILE = TRIM( OUTDIR ) // '/mech_' // 
+     &                 TRIM( MECHNAME_LOWER_CASE )  // '.md'
 
       CALL CALCULATE_RATES( NR )
 
@@ -3561,7 +3554,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IOLD2NEW( I ) = I
          END DO
       END IF
-! write out reactions strings to determine KPP information
+! write out reactions strings to determine mechanism information
 
        DO NXX = 1, NR
          DO IREACT = 1, NREACT( NXX )

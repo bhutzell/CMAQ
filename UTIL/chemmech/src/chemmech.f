@@ -83,9 +83,9 @@ c..Variables for species to be dropped from mechanism
                                              ! LABEL(NXX,2) 2nd label found in rx NXX
       INTEGER SPC1RX( MAXSPEC )              ! rx index of 1st occurence of species
                                              ! in mechanism table
-      CHARACTER( 120 ) :: EQNAME_MECH
-      CHARACTER( 256 ) :: EQN_MECH_KPP
-      CHARACTER( 256 ) :: SPC_MECH_KPP
+      CHARACTER( 586 ) :: EQNAME_MECH
+      CHARACTER( 586 ) :: EQN_MECH_KPP
+      CHARACTER( 586 ) :: SPC_MECH_KPP
       CHARACTER( 891 ) :: REACTION_STR(  MAXRXNUM )
       CHARACTER(  16 ) :: COEFF_STR
       CHARACTER(  32 ) :: DESCRP_MECH
@@ -356,8 +356,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          CALL GETWORD ( IMECH, INBUF, LPOINT, IEOL, CHR, WORD )
       ELSE
          DESCRP_MECH = '00000000'
-!        CALL GETWORD ( IMECH, INBUF, LPOINT, IEOL, CHR, WORD )
-!        CALL GETCHAR ( IMECH, INBUF, LPOINT, IEOL, CHR )
       END IF
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C Read Special Block for reaction coefficients
@@ -409,7 +407,6 @@ C                       CALL GETCHAR ( IMECH, INBUF, LPOINT, IEOL, CHR)
          CALL RDLINE ( IMECH, INBUF, LPOINT, IEOL )
          CALL GETCHAR ( IMECH, INBUF, LPOINT, IEOL, CHR )
          CALL GETWORD ( IMECH, INBUF, LPOINT, IEOL, CHR, WORD )
-!210         print*,'WORD = ',WORD, TRIM(INBUF)
 210      CONTINUE
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C Read block to get steady-state species
@@ -965,8 +962,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          SPARSE_SPECIES( I )  = SPCLIS( I )
        END DO
 
-      MECHANISM( 1:LEN(MECHANISM) ) = DESCRP_MECH( 1:LEN(MECHANISM) )
-
+      IF( LEN( DESCRP_MECH ) .GT. 0 )THEN
+C set name for mechanism
+         MECHANISM = TRIM( DESCRP_MECH )
+         CALL CONVERT_CASE( MECHNAME, .TRUE. )
+C set name of mechanism lower case
+         MECHNAME_LOWER_CASE  =  MECHANISM
+         CALL CONVERT_CASE( MECHNAME_LOWER_CASE, .FALSE. )
+      END IF   
+      
       CONST( 1:MAXCONSTS ) = CVAL( 1:MAXCONSTS )
 C Set CGRID mechanism
 
@@ -1001,7 +1005,7 @@ C Set CGRID mechanism
 !      MXCOUNT1 = N_SPEC * MAXGL3 * 3
 !      MXCOUNT2 = N_SPEC * MAXGL3 * 3
       
-      CALL WREXTS ( EQNAME_MECH, DESCRP_MECH,
+      CALL WREXTS ( EQNAME_MECH, MECHANISM,
      &              NS, SPCLIS, SPC1RX, SS1RX ) 
      
 
