@@ -562,20 +562,16 @@ C  Put the grid cell concentrations in the block arrays
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          DO ISP = 1, ISCHANG( NCS )
             SPC    = CGRID_INDEX( ISP )
-!            SPC    = ISP 
-!            ISPNEW = IOLD2NEW( ISP,NCS )
             DO NCELL = 1, NUMCELLS
                CELLNUM = NORDCELL( OFFSET + NCELL )
                COL = CCOL( CELLNUM )
                ROW = CROW( CELLNUM )
                LEV = CLEV( CELLNUM )
                IF( CONVERT_CONC( ISP ) )THEN 
-!                   Y( NCELL,ISPNEW ) = REAL( MAX( FORWARD_CONV( ISP ) * BLKSVOL( NCELL )
                    Y( NCELL,ISP ) = REAL( MAX( FORWARD_CONV( ISP ) * BLKSVOL( NCELL )
-     &                            *       CONC( COL,ROW,LEV,SPC ), CONCMIN), 8 )
+     &                               *       CONC( COL,ROW,LEV,SPC ), CONCMIN), 8 )
                ELSE
-!                   Y( NCELL,ISPNEW ) = REAL( MAX( CONC( COL,ROW,LEV,SPC ), CONCMIN), 8 )
-                    Y( NCELL,ISP ) = REAL( MAX( CONC( COL,ROW,LEV,SPC ), CONCMIN), 8 )
+                   Y( NCELL,ISP ) = REAL( MAX( CONC( COL,ROW,LEV,SPC ), CONCMIN), 8 )
                END IF
             END DO                 
          END DO
@@ -648,17 +644,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 C..Update concentrations
             DO ISP = 1, ISCHANG( NCS )
-!               ISPOLD  = INEW2OLD( ISP,NCS )
-!               SPC     = CGRID_INDEX( ISPOLD )
                SPC     = CGRID_INDEX( ISP )
                DO NCELL = 1, NUMCELLS
                   CELLNUM = NORDCELL( OFFSET + NCELL )
                   COL = CCOL( CELLNUM )
                   ROW = CROW( CELLNUM )
                   LEV = CLEV( CELLNUM )
-!                  IF( CONVERT_CONC( ISPOLD ) )THEN 
-!                     CONC( COL,ROW,LEV,SPC ) = REAL( REVERSE_CONV( ISPOLD ) 
-                  IF( CONVERT_CONC( ISP  ) )THEN 
+                  IF( CONVERT_CONC( ISP ) )THEN 
                      CONC( COL,ROW,LEV,SPC ) = REAL( REVERSE_CONV( ISP ) 
      &                                       *       BLKDENS( NCELL ) * Y( NCELL,ISP ), 4)
                   ELSE
@@ -671,16 +663,6 @@ C..Update concentrations
 
 
             IF ( CALL_DEG ) THEN
-
-C  Update degradation array with species treated by Rosenbach solver
-C
-C               DO ISP = 1, ISCHANG( NCS )
-C                  ISPOLD  = INEW2OLD( ISP, NCS )
-C                  DO NCELL = 1, NUMCELLS
-C                     Y_DEGRADE( NCELL,ISPOLD ) = Y( NCELL,ISP )
-C                  END DO
-C               END DO
-
 
 C  Update CGRID based on the degradation routines
                CALL FINAL_DEGRADE( Y_DEGRADE )

@@ -93,14 +93,18 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IK1 = IKDECB( IC )
             KJ0 = KJDECA( IC )
             KJ1 = KJDECB( IC )
+            
             DO NCELL = 1, NUMCELLS
                CC2( NCELL,IJ0 ) = CC2( NCELL,IJ0 )
      &                          - CC2( NCELL,IK0 ) * CC2( NCELL,KJ0 )
+!               print*,IC,IJ1,IK1,KJ1,CC2( NCELL,IJ1 ),CC2( NCELL,IK1 ),CC2( NCELL,KJ1 )
                CC2( NCELL,IJ1 ) = CC2( NCELL,IJ1 )
      &                          - CC2( NCELL,IK1 ) * CC2( NCELL,KJ1 )
+!               if( IJ1 .eq. 0 .or. IK1 .eq. 0 .or. KJ1 .eq. 0 )STOP
             END DO
          END DO
     
+
 c...vdiag = 1 / current diagonal term of the decomposed matrix
          IAR = JARRAYPT( J, J, NCSP )
          DO NCELL = 1, NUMCELLS

@@ -538,7 +538,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             BLKDENS( NCELL ) = REAL( DENS( COL,ROW,LEV ), 8 )
             BLKSVOL( NCELL ) = REAL( 1.0 / BLKDENS( NCELL ), 8 )
             BLKPRES( NCELL ) = REAL( PA2ATM * PRES( COL, ROW, LEV ), 8 )
-            BLKCH2O( NCELL ) = REAL( MAX( QV( COL,ROW,LEV ) * MAOMV * CONCOFM, 0.0 ), 8)
+            BLKCH2O( NCELL ) = 2.0D4 ! REAL( MAX( QV( COL,ROW,LEV ) * MAOMV * CONCOFM, 0.0 ), 8)
             IF( LAND_ZONE( COL,ROW ) .OR. SEAICE (COL,ROW) .GT. 0.0 )THEN
                 BLKLAND (NCELL) = .TRUE.
             ELSE
@@ -921,7 +921,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ENDIF
        
       !Update Aerosol Surface Area
-      CALL HETCHEM_UPDATE_AERO( CONC )
+      IF ( NHETERO .GT. 0 ) CALL HETCHEM_UPDATE_AERO( CONC )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C  Output performance statistics if required and return

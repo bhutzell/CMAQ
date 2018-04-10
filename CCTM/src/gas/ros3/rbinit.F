@@ -102,45 +102,41 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       MXRR = 3 * MXRCT
       MXRP = 3 * MXPRD
 
-      MXCOUNT1 = NSTEPS_JACOB ! NUMB_MECH_SPC * MAXGL3 * 3
-      MXCOUNT2 = NSTEPS_JACOB ! NUMB_MECH_SPC * MAXGL3 * 3
-      MXARRAY  = NTERMS_JACOB
+!      MXCOUNT1 = NSTEPS_JACOB ! NUMB_MECH_SPC * MAXGL3 * 3
+!      MXCOUNT2 = NSTEPS_JACOB ! NUMB_MECH_SPC * MAXGL3 * 3
 
+!      ALLOCATE( RXRAT( BLKSIZE,NRXNS ), STAT = STATUS )
+!      IF ( STATUS .NE. 0 ) THEN
+!         XMSG = 'ERROR allocating RXRAT'
+!         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+!      END IF
 
-      ALLOCATE( INEW2OLD( NUMB_MECH_SPC,NCS ),
-     &          IOLD2NEW( NUMB_MECH_SPC,NCS ), STAT = STATUS )
-      IF ( STATUS .NE. 0 ) THEN
-         XMSG = 'ERROR allocating INEW2OLD or IOLD2NEW'
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
-      END IF
-
-      ALLOCATE( IRM2( MXRCT+MXPRD,NRXNS ), STAT = STATUS )
-      IF ( STATUS .NE. 0 ) THEN
-         XMSG = 'ERROR allocating IRM2'
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
-      END IF
-
-      ALLOCATE( NKUSERAT( NRXNS,NCS2 ),
-     &          NDERIVL ( NRXNS,NCS2 ), 
+      ALLOCATE( NDERIVL ( NRXNS,NCS2 ),
      &          NDERIVP ( NRXNS,NCS2 ), STAT = STATUS )
       IF ( STATUS .NE. 0 ) THEN
-         XMSG = 'ERROR allocating NDERIVP, NKUSERAT or NDERIVL '
+         XMSG = 'ERROR allocating NKUSERAT, NDERIVL or NDERIVP'
          CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
-      ALLOCATE( JARRL( MXRR,NRXNS,NCS2 ),
-     &          JARRP( MXRP,NRXNS,NCS2 ),
-     &          JLIAL( MXRR,NRXNS,NCS2 ),
-     &          JPIAL( MXRP,NRXNS,NCS2 ),
+      ALLOCATE( IRM2( MXRCT+MXPRD,NRXNS,NCS2 ),
      &          ICOEFF( MXRP,NRXNS,NCS2 ), STAT = STATUS )
       IF ( STATUS .NE. 0 ) THEN
-         XMSG = 'ERROR allocating JARRL, JARRP, JLIAL, JPIAL or ICOEFF'
+         XMSG = 'ERROR allocating IRM2 or ICOEFF'
          CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
       ALLOCATE( JARRAYPT( NUMB_MECH_SPC,NUMB_MECH_SPC,NCS2 ), STAT = STATUS )
       IF ( STATUS .NE. 0 ) THEN
          XMSG = 'ERROR allocating JARRAYPT'
+         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+      END IF
+
+      ALLOCATE( JARRL( MXRR,NRXNS,NCS2 ),
+     &          JARRP( MXRP,NRXNS,NCS2 ),
+     &          JLIAL( MXRR,NRXNS,NCS2 ),
+     &          JPIAL( MXRP,NRXNS,NCS2 ), STAT = STATUS )
+      IF ( STATUS .NE. 0 ) THEN
+         XMSG = 'ERROR allocating JARRL, JARRP, JLIAL, or JPIAL'
          CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 

@@ -46,6 +46,10 @@ C                   species concentration unit based on species type
 C*************************************************************************
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
+      USE RXNS_DATA, ONLY: LIGHT_DEPENDENT => NSUNLIGHT_RXNS, 
+     &                     MXARRAY  => NTERMS_JACOB,
+     &                     MXCOUNT1 => NSTEPS_JACOB, 
+     &                     MXCOUNT2 => NSTEPS_JACOB
 
       IMPLICIT NONE
 
@@ -65,13 +69,15 @@ c..Sparse Matrix maximum dimensions
       INTEGER, PARAMETER :: MAXGL   = 150   ! Max # of P/L terms per species
       INTEGER, PARAMETER :: MAXGL2  = 70    ! Dimension (smaller than maxgl)
       INTEGER, PARAMETER :: MAXGL3  = 100   ! Dimension (smaller than maxgl)
+!      INTEGER, PARAMETER :: MXARRAY = 5400  ! Max # of terms in I-hJ matrix
+C
+      INTEGER, PARAMETER :: NRXNS_START( NCS2 ) = (/ 1, LIGHT_DEPENDENT+1 /)
 
 c..Mechanism specific variables
       INTEGER :: N_SPEC               ! No. of species in mech
       INTEGER :: N_RXNS               ! No. of reactions in mech
 
-      INTEGER :: MXARRAY              ! Max # of terms in I-hJ matrix
-      INTEGER :: MXCOUNT1, MXCOUNT2   ! Sparse matrx pntr dimensions
+!      INTEGER :: MXCOUNT1, MXCOUNT2   ! Sparse matrx pntr dimensions
       INTEGER :: MXRR, MXRP           ! Max # of PD terms
 
       LOGICAL :: LREORDER             ! Flag to reorder or not
@@ -97,15 +103,12 @@ c..Block variables
       INTEGER :: NUMCELLS                        ! No. of cells in a block
 
 c..Sparse Matrix variables 
-      INTEGER :: ISCHAN              ! No. of reacting species in current mech
-      INTEGER :: ISCHANG( NCS  )     ! No. of reacting species in day & nite
-      INTEGER :: NUSERAT( NCS2 )     ! No. of active rxns in day & nite
-      INTEGER :: IARRAY(  NCS2 )     ! No. of PD terms in I-hJ matrix
-      INTEGER :: RXNS_START(  NCS2 ) ! start index of reactions constant for 
+      INTEGER :: ISCHAN          ! No. of reacting species in current mech
+      INTEGER :: ISCHANG( NCS  ) ! No. of reacting species in day & nite
+      INTEGER :: IARRAY(  NCS2 ) ! No. of PD terms in I-hJ matrix
 
 C Most of the following are allocated in RBINIT
-      INTEGER, ALLOCATABLE :: NKUSERAT( :,: )     ! Rxn nos of active rxns
-      INTEGER, ALLOCATABLE :: IRM2  ( :,: )     ! Species rxn array
+      INTEGER, ALLOCATABLE :: IRM2  ( :,:,: )     ! Species rxn array
       INTEGER, ALLOCATABLE :: ICOEFF( :,:,: )     ! stoich coeff indx
 
       INTEGER, ALLOCATABLE :: JARRAYPT( :,:,: )   ! A-Matrix index
@@ -113,9 +116,6 @@ C Most of the following are allocated in RBINIT
       INTEGER, ALLOCATABLE :: JARRP( :,:,: )      ! Pntr to PD Prod term
       INTEGER, ALLOCATABLE :: JLIAL( :,:,: )      ! Spec # for PD loss term
       INTEGER, ALLOCATABLE :: JPIAL( :,:,: )      ! Spec # for PD prod term 
-
-      INTEGER, ALLOCATABLE :: INEW2OLD( :,: )     ! Spec index xref
-      INTEGER, ALLOCATABLE :: IOLD2NEW( :,: )     ! Spec index xref
 
       INTEGER, ALLOCATABLE :: NDERIVL( :,: )      ! # of PD loss terms
       INTEGER, ALLOCATABLE :: NDERIVP( :,: )      ! # of PD prod terms
@@ -167,6 +167,7 @@ C Domain decomposition info from CONC file
       INTEGER :: ENDROWCO
 
       REAL( 8 ), ALLOCATABLE :: VDIAG( :,: )    ! LU-Matrix diagonal terms
+!      REAL( 8 ), ALLOCATABLE :: RXRAT( :,: )    ! Computed rxn rates
       REAL( 8 ), ALLOCATABLE :: CC2( :,: )      ! Array holding LU-Matrix
 
 

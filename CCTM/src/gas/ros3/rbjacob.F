@@ -80,7 +80,7 @@ C..Local Variables:
       INTEGER NONDIAG1       ! Pointer to start of diagonal entries
       
       REAL( 8 ) :: CR2                   ! Temporary product for 3 reactant rxns
-!      REAL( 8 ) :: FRACN                 ! Stoichiometric coeff. times b*h
+      REAL( 8 ) :: FRACN                 ! Stoichiometric coeff. times b*h
       REAL( 8 ) :: EXPLIC( BLKSIZE,3 )   ! Reaction partial derivative terms
 
 C***********************************************************************
@@ -107,37 +107,33 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Loop over reaction rates adding partial derivative terms; EXPLIC
 c  holds the PD terms according to number of reactants
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-!      DO 240 NRX = 1, NUSERAT( NCSP )
-
-!         NRK = NKUSERAT( NRX,NCSP )
-      DO 240 NRX = RXNS_START( NCSP ), NRXNS
-         
+      LOOP_REACTIONS: DO NRK = NRXNS_START( NCSP ), NRXNS         
 c...partial derivative term for reactions with 1 reactant
-         IF ( NREACT( NRX ) .EQ. 1 ) THEN
+         IF ( NREACT( NRK ) .EQ. 1 ) THEN
             DO NCELL = 1, NUMCELLS
-               EXPLIC( NCELL,1 ) = RKI( NCELL,NRX ) 
+               EXPLIC( NCELL,1 ) = RKI( NCELL,NRK ) 
             END DO
   
 c...partial derivative terms for reactions with 2 reactants
-         ELSE IF ( NREACT( NRX ) .EQ. 2 ) THEN
-            JR1 = IRM2( 1,NRX )
-            JR2 = IRM2( 2,NRX )
+         ELSE IF ( NREACT( NRK ) .EQ. 2 ) THEN
+            JR1 = IRM2( 1,NRK,NCS )
+            JR2 = IRM2( 2,NRK,NCS )
             DO NCELL  = 1, NUMCELLS
-               EXPLIC( NCELL,1 )  = RKI( NCELL,NRX )
+               EXPLIC( NCELL,1 )  = RKI( NCELL,NRK )
      &                            * YIN( NCELL,JR2 )
-               EXPLIC( NCELL,2 )  = RKI( NCELL,NRX )
+               EXPLIC( NCELL,2 )  = RKI( NCELL,NRK )
      &                            * YIN( NCELL,JR1 )
             END DO
  
 c.....partial derivative terms for reactions with 3 reactants
-         ELSE IF ( NREACT( NRX ) .EQ. 3 ) THEN
-            JR1 = IRM2( 1,NRX )
-            JR2 = IRM2( 2,NRX )
-            JR3 = IRM2( 3,NRX )
+         ELSE IF ( NREACT( NRK ) .EQ. 3 ) THEN
+            JR1 = IRM2( 1,NRK,NCS )
+            JR2 = IRM2( 2,NRK,NCS )
+            JR3 = IRM2( 3,NRK,NCS )
             DO NCELL = 1, NUMCELLS
-               CR2 = RKI( NCELL,NRX ) * YIN( NCELL,JR2 )
+               CR2 = RKI( NCELL,NRK ) * YIN( NCELL,JR2 )
                EXPLIC( NCELL,1 ) = CR2 * YIN( NCELL,JR3 )
-               EXPLIC( NCELL,2 ) = RKI( NCELL,NRX )
+               EXPLIC( NCELL,2 ) = RKI( NCELL,NRK )
      &                           * YIN( NCELL,JR1 )
      &                           * YIN( NCELL,JR3 ) 
                EXPLIC( NCELL,3 ) = CR2 * YIN( NCELL,JR1 )
@@ -148,23 +144,23 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Add PD terms to [J] for this reaction
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c...loss terms
-         NLD = NDERIVL( NRX,NCSP )         
-         DO NL = 1, NLD
-            IARP = JARRL( NL,NRX,NCSP )
-            IALP = JLIAL( NL,NRX,NCSP )
+         NLD = NDERIVL( NRK,NCSP )         
+         LOOP_REACTANTS: DO NL = 1, NLD
+            IARP = JARRL( NL,NRK,NCSP )
+            IALP = JLIAL( NL,NRK,NCSP )
             DO NCELL = 1, NUMCELLS
                CC2( NCELL,IARP ) = CC2( NCELL,IARP ) - EXPLIC( NCELL,IALP ) 
             END DO
-         END DO    ! End loop over loss terms
+         END DO LOOP_REACTANTS   ! End loop over loss terms
 
 c...production terms with stoichiomteric coeff EQ 1.0 and NE 1.0
-         NPD = NDERIVP( NRX,NCSP )
-         DO 220 NP = 1, NPD
+         NPD = NDERIVP( NRK,NCSP )
+         LOOP_PRODUCTS: DO NP = 1, NPD
 
-            IARP = JARRP( NP,NRX,NCSP )
-            IALP = JPIAL( NP,NRX,NCSP )
+            IARP = JARRP( NP,NRK,NCSP )
+            IALP = JPIAL( NP,NRK,NCSP )
 
-            IF ( ICOEFF( NP,NRX,NCSP ) .EQ. 0 ) THEN
+            IF ( ICOEFF( NP,NRK,NCSP ) .EQ. 0 ) THEN
 c..production terms with unit stoichiometry
                DO NCELL = 1, NUMCELLS
                   CC2( NCELL,IARP ) = CC2( NCELL,IARP ) + EXPLIC( NCELL,IALP ) 
@@ -172,18 +168,17 @@ c..production terms with unit stoichiometry
 
             ELSE
 c..production terms with non-unit stoichiometry
-               ISCP = ICOEFF( NP,NRX,NCSP )
-!               FRACN = SC( NRX,ISCP ) 
+               ISCP = ICOEFF( NP,NRK,NCSP )
+               FRACN = SC( NRK,ISCP ) 
                DO NCELL = 1, NUMCELLS
-                  CC2( NCELL,IARP ) = CC2( NCELL,IARP ) 
-     &                              + SC( NRX,ISCP ) * EXPLIC( NCELL,IALP ) 
+                  CC2( NCELL,IARP ) = CC2( NCELL,IARP ) + FRACN
+     &                              * EXPLIC( NCELL,IALP ) 
                END DO
  
             END IF
 
-220      CONTINUE      ! End loop over production terms
-
-240   CONTINUE      ! End loop over reactions
+         END DO LOOP_PRODUCTS
+      END DO LOOP_REACTIONS
 
       RETURN 
       END

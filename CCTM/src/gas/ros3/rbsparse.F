@@ -69,8 +69,8 @@ C..Local Variables:
       INTEGER :: NDLMAX  = 0     ! Max # of PD loss terms in any reaction
       INTEGER :: NDPMAX  = 0     ! Max # of PD prod terms in any reaction
 
-      CHARACTER( 16 ), PARAMETER :: PNAME = 'RBSPRSE_A'     ! Procedure name
-      CHARACTER( 80 ) :: MSG                     ! Mesaage text for output log
+      CHARACTER( 16 ) :: PNAME = 'RBSPARSE'    ! Procedure name
+      CHARACTER( 80 ) :: MSG                   ! Mesaage text for output log
 
       INTEGER I,J,K,I1,J1,I2       ! Matrix loop indices
       INTEGER IA, IB               ! I,J index holders for decomp loop 2
@@ -123,37 +123,28 @@ C..Local Variables:
       INTEGER NU                   ! Active reaction count holder
       INTEGER MCNT                 ! op. counter for bksub loop 2 w/ Sp. Mat.
       INTEGER MCNTA                ! op. counter for bksub loop 2 w/o Sp. Mat.
-      INTEGER MINVALU              ! Current minimum number of PD terms in sort
-      INTEGER SWAPVALUE             ! swapping number of PD terms used in sort
+      INTEGER MINVALU              ! Current number of PD terms in sort
       INTEGER MZ                   ! # of nonzero calcs in backsub loop 2
 
-      INTEGER, ALLOCATABLE :: ICLO( : )        ! Pointer to # of ops in decomp loop 1
-      INTEGER, ALLOCATABLE :: JCLO( : )        ! Pointer to # of ops in decomp loop 2
+!KSPARSE
+
+      INTEGER, ALLOCATABLE :: ICLO( : )    ! Pointer to # of ops in decomp loop 1
+      INTEGER, ALLOCATABLE :: JCLO( : )    ! Pointer to # of ops in decomp loop 2
       INTEGER, ALLOCATABLE :: IZEROI( : )  ! Pointer to decomp loop 1 i index
       INTEGER, ALLOCATABLE :: IZEROK( : )  ! Pointer to decomp loop 1 k index
       INTEGER, ALLOCATABLE :: JZERO ( : )  ! Pointer to decomp loop 2 i index
-      INTEGER, ALLOCATABLE :: NSPECT( : )       ! Number of species in mechanism ncs
-
+      INTEGER, ALLOCATABLE :: IZILCH  ( :,: )  ! # of nonzero calcs in decomp loop 1
+      INTEGER, ALLOCATABLE :: JZILCH  ( :,: )  ! # of nonzero calcs in decomp loop 2
+      INTEGER, ALLOCATABLE :: LZERO   ( :,: )  ! Symbolic Jacobian matrix
+     
+!JSPARSE
+      
       INTEGER, ALLOCATABLE :: ISAPORL( : )  ! Count of PD terms for each species
       INTEGER, ALLOCATABLE :: ISPARDER( :,: )  ! Indicator of a PD term in the 
                                                      ! Jacobian matrix
-      INTEGER, ALLOCATABLE :: IZILCH  ( :,: )  ! # of nonzero calcs in decomp
-                                                     ! loop 1
-      INTEGER, ALLOCATABLE :: JZILCH  ( :,: )  ! # of nonzero calcs in decomp
-                                                     ! loop 2
-      INTEGER, ALLOCATABLE :: LZERO   ( :,: )  ! Symbolic Jacobian matrix
+
       INTEGER IOS                  ! status
 
-      INTEGER                     :: IOLD_BUBBLE( NUMB_MECH_SPC )
-      INTEGER                     :: INEW_BUBBLE( NUMB_MECH_SPC )
-
-      LOGICAL                     :: SWAPPED
-      INTERFACE 
-       SUBROUTINE Bubble_Sort(a)
-        IMPLICIT NONE
-        INTEGER, INTENT(in out) :: a( : )
-       END SUBROUTINE Bubble_Sort
-      END INTERFACE
 c..The following can be uncommented to print symbolic J-matrix
 c      integer iglg
 c      character(1), allocatable :: ichrout( : )
@@ -169,74 +160,21 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
           RETURN
       ELSE
           INITIALIZED = .TRUE.
-      END IF 
+      END IF    
 
-         
+      ALLOCATE( ISAPORL ( NUMB_MECH_SPC ),
+     &          ISPARDER( NUMB_MECH_SPC,NUMB_MECH_SPC ), 
+     &          STAT = IOS )
+      IF ( IOS .NE. 0 ) THEN
+         MSG = '*** Memory allocation failed'
+         CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
+      END IF
 
-         ALLOCATE(  ICLO( NCS2 ),       
-     &              JCLO( NCS2 ),       
-     &              IZEROI( MXCOUNT1 ), 
-     &              IZEROK( MXCOUNT2 ), 
-     &              JZERO ( MXCOUNT1 ), 
-     &              NSPECT( NCS ), STAT = IOS )
-         IF ( IOS .NE. 0 ) THEN
-            MSG = '*** Failed at first Memory allocation'
-            CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
-         END IF   
-		       
-         ALLOCATE( ISAPORL ( NUMB_MECH_SPC ),
-     &             ISPARDER( NUMB_MECH_SPC,NUMB_MECH_SPC ), 
-     &             STAT = IOS )
-         IF ( IOS .NE. 0 ) THEN
-            MSG = '*** Failed at second Memory allocation'
-            CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
-         END IF
-
-         DO NCSP = 1, NCS2
-            DO ISP = 1, NUMB_MECH_SPC
-               IZILCH( ISP,NCSP ) = 0
-               JZILCH( ISP,NCSP ) = 0
-               JHIZ1 ( ISP,NCSP ) = 0
-               JHIZ2 ( ISP,NCSP ) = 0
-               KZILCH( ISP,NCSP ) = 0
-               MZILCH( ISP,NCSP ) = 0
-            END DO
-         END DO
-
-         DO NCSP = 1, NCS2
-            NUSERAT( NCSP ) = 0
-            DO NK = 1, NRXNS
-               NDERIVL( NK,NCSP ) = 0
-               NDERIVP( NK,NCSP ) = 0
-            END DO
-         END DO
-         
-         DO NCSP = 1, NCS
-            ISCHANG( NCSP ) = 0
-         END DO
-         
-         JARRAYPT = 0
-
-         IJDECA = 0
-         IKDECA = 0
-         KJDECA = 0
-
-         IJDECB = 0
-         IKDECB = 0
-         KJDECB = 0
-
-      ELSE
-      
-         RETURN
-	 
-      END IF   ! LFIRST
-       
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Initialize Prod/loss and PD tabulator arrays
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-        NCSP     = NCS
-        ISAPORL  = 0
-        ISPARDER = 0
+      ISAPORL  = 0
+      ISPARDER = 0
    
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Set the number of Partial derivative terms in the Jacobian and
@@ -272,97 +210,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF ( ISAPORL( JOLD ) .GT. 0 ) THEN
             ISCHANG( NCS ) = ISCHANG( NCS ) + 1
             JNEW = ISCHANG( NCS )
-            INEW2OLD( JNEW,NCS ) = JOLD
-            IOLD2NEW( JOLD,NCS ) = JNEW
          ELSE
-            INEW2OLD( NOCHANG,NCS ) = JOLD
-            IOLD2NEW( JOLD,NCS ) = NOCHANG
             NOCHANG = NOCHANG - 1
          END IF
       END DO
-
-      INEW_BUBBLE(:) = IOLD2NEW(:,NCS)
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  Now sort by number of PD terms, fewest at position 1, most at
-c  the end position. 
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      DO JNEW = 1, ISCHANG( NCS )
-c  Uncomment the following three lines to turn off species ordering;
-c  not recommended since computational efficiency reduced
-!        INEW2OLD( JNEW,NCS ) = JNEW
-!        IOLD2NEW( JNEW,NCS ) = JNEW
-!        IF ( JNEW .NE. 0 ) GO TO 180
-         JOLD = INEW2OLD( JNEW,NCS )
-         MINVALU = ISAPORL( JOLD )
-         IMINOLD = JOLD
-         IMINNEW = JNEW
-
-         DO INEW = JNEW + 1, ISCHANG( NCS )
-            IOLD = INEW2OLD( INEW,NCS )
-            IF ( ISAPORL( IOLD ) .LT. MINVALU ) THEN
-               MINVALU = ISAPORL( IOLD )
-               IMINOLD = IOLD
-               IMINNEW = INEW
-            END IF
-         END DO
-
-         INEW2OLD( IMINNEW,NCS ) = JOLD
-         INEW2OLD( JNEW,NCS )    = IMINOLD
-         IOLD2NEW( JOLD,NCS )    = IMINNEW
-         IOLD2NEW( IMINOLD,NCS ) = JNEW
-      if( JNEW .eq. ISCHANG( NCS ) )then
-         print*,'Final Sort'
-      else
-         print*,'JNEW = ',JNEW
-      end if
-
-      DO J = 1, ISCHANG( NCS )
-         I = INEW2OLD( J,NCS )
-         write(6,'(A,2(I4,1X),2(A16,1X),I6)')'JOLD,JNEW,CHEMISTRY_SPC( JNEW )ISAPORL( JNEW )= ',
-     &             J,I,CHEMISTRY_SPC( J ),CHEMISTRY_SPC( I ),ISAPORL( I )
-      END DO
-      END DO
-
-      DO I = 1, NSPECT( NCS )
-         J = INEW2OLD( I,NCS )
-         write(6,'(A,2(I4,1X),A16,1X,I6)')'Before bubble sort: J, ISAPORL( J )= ',
-     &             I, ISAPORL( J ),CHEMISTRY_SPC( J ),INEW_BUBBLE(J)
-      END DO
-
-!      call Bubble_Sort(ISAPORL)
-        DO j = NSPECT( NCS )-1, 1, -1
-         swapped = .FALSE.
-         DO i = 1, j
-           IF ( ISAPORL(i) .GT. ISAPORL(i+1) ) THEN
-             SWAPVALUE    = ISAPORL(i)
-             ISAPORL(i)   = ISAPORL(i+1)
-             ISAPORL(i+1) = SWAPVALUE
-             INEW         = INEW_BUBBLE( i )
-             INEW_BUBBLE( i )     = INEW_BUBBLE( i + 1 )
-             INEW_BUBBLE( i + 1 ) = INEW
-             swapped = .TRUE.
-           END IF
-         END DO
-         IF (.NOT. swapped) EXIT
-       END DO
-
-      DO J = 1, NSPECT( NCS )
-         I = INEW_BUBBLE(J)
-         INEW2OLD(J,NCS) = INEW_BUBBLE(J)
-         IOLD_BUBBLE(I) = J
-         write(6,'(A,2(I4,1X),A16,1X,I6)')'After bubble sort: J, ISAPORL( J )= ',
-     &             J, ISAPORL( J ),CHEMISTRY_SPC( I ),INEW_BUBBLE(I)
-      END DO
-
-      
-      DO J = 1, NSPECT( NCS )
-         I = IOLD_BUBBLE(J)
-         IOLD2NEW(J,NCS) = IOLD_BUBBLE(J)
-         write(6,'(A,2(I4,1X),A16,1X,I6)')'IOLD_BUBBLE result: I, ISAPORL( I )= ',
-     &             I, ISAPORL( I ),CHEMISTRY_SPC( J ),J
-      END DO
-
-               
+      DEALLOCATE( ISAPORL, ISPARDER )         
+                
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Fill the irm2 array using the new species order developed above.
 c  Also determine active reactions for day and then night (i.e., photo
@@ -371,30 +224,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       NUSERAT = 0
       DO NRX = 1, NRXNS
          DO NR = 1, NREACT( NRX )
-            IREACT = IRR( NRX,NR )
-            IRM2( NR,NRX ) =  IREACT ! IOLD2NEW( IREACT,NCS ) 
+            IRM2( NR,NRX,NCS ) = IRR( NRX,NR ) 
          END DO
-
          DO NP = 1, NPRDCT( NRX )
-            IPROD = IRR( NRX, NP + 3 )
-            IRM2( NP+3,NRX ) = IPROD ! IOLD2NEW( IPROD,NCS )
-         END DO
-         
-         IF ( NREACT( NRX ) .GT. 0 ) THEN
-            NUSERAT( NCS ) = NUSERAT( NCS ) + 1
-            NU = NUSERAT( NCS )
-            NKUSERAT( NU, NCS ) = NRX
-            IF ( .NOT. ( BTEST ( IRXBITS( NRX ),1 ) ) ) THEN
-               NUSERAT( NCS + 1 ) = NUSERAT( NCS + 1 ) + 1
-               NU = NUSERAT( NCS + 1 )
-               NKUSERAT( NU, NCS + 1 ) = NRX
-            END IF
-         END IF
+            IRM2( NP+3,NRX,NCS ) = IRR( NRX, NP + 3 )
+         END DO         
       END DO
-
-      RXNS_START( 1 ) = 1
-      RXNS_START( 2 ) = RXNS_START( 1 ) + NSUNLIGHT_RXNS
-      
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Do symbolic LU decomposition to determine sparse storage array
 c  structures. Done twice, first for day and then for night. An entry
@@ -402,6 +237,7 @@ c  of 1 in lzero means a non-negative entry in the Jacobian. First
 c  put ones on the diagonal and zeroes everywhere else.
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
+ 
       ALLOCATE( ICLO( NCS2 ),
      &          JCLO( NCS2 ),
      &          IZEROI( MXCOUNT1 ),
@@ -431,6 +267,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       NDERIVL = 0
       NDERIVP = 0
       
+      ICOEFF  = 0
       
       JARRAYPT = 0
 
@@ -443,7 +280,6 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       KJDECB = 0
                 
       LOOP_SUN: DO IFSUN = 1, 2
-         NCSP = IFSUN
          DO I = 1, NUMB_MECH_SPC
             DO J = 1, NUMB_MECH_SPC
                LZERO( J,I ) = 0
@@ -454,17 +290,15 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Fill in the rest of the entries in the Jacobian
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-!         DO NRX = 1, NUSERAT( NCSP )
-          DO NRX = RXNS_START( NCSP), NRXNS
-!            NK = NKUSERAT( NRX,NCSP )
-            DO NR = 1, NREACT( NRX )
-               IRE = IRM2( NR, NRX )
-               DO JAL = 1, NREACT( NRX )
-                  JRE = IRM2( JAL,NRX )
+          DO NK = NRXNS_START( IFSUN ), NRXNS
+            DO NR = 1, NREACT( NK )
+               IRE = IRM2( NR,NK,NCS )
+               DO JAL = 1, NREACT( NK )
+                  JRE = IRM2( JAL,NK,NCS )
                   LZERO( JRE,IRE ) = 1
                END DO
-               DO IAP = 1, NPRDCT( NRX )
-                  JPR = IRM2( 3+IAP,NRX )
+               DO IAP = 1, NPRDCT( NK )
+                  JPR = IRM2( 3+IAP,NK,NCS )
                   LZERO( JPR,IRE ) = 1 
                END DO
            END DO
@@ -476,15 +310,14 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c        iglg = 0
 c        write( logdev,8200 ) 
 c8200    format(//1x,'jacobian ')
-c        write( logdev,8211 ) (chemistry_spc(inew2old(j,ncs))(1:1),j=1,n_spec)
+c        write( logdev,8211 ) (chemistry_spc(j)(1:1),j=1,n_spec)
 c8211    format( 9x, 40( 2x,A1 ) )
-c        write( logdev,8211 ) (chemistry_spc(inew2old(j,ncs))(2:2),j=1,n_spec)
-c        write( logdev,8211 ) (chemistry_spc(inew2old(j,ncs))(3:3),j=1,n_spec)
-c        write( logdev,8211 ) (chemistry_spc(inew2old(j,ncs))(4:4),j=1,n_spec)
+c        write( logdev,8211 ) (chemistry_spc(j)(2:2),j=1,n_spec)
+c        write( logdev,8211 ) (chemistry_spc(j))(3:3),j=1,n_spec)
+c        write( logdev,8211 ) (chemistry_spc(j)(4:4),j=1,n_spec)
 c        write( logdev,8210 ) (i,i=1,ischang(ncs))
 c8210    format( /9x, 40I3 )
 c        DO 585 i = 1, ischang( ncs )
-c           k = inew2old( i,ncs )
 c           DO 584 j=1,n_spec
 c               if ( lzero(i,j ) .NE. 0 ) then
 c                 iglg = iglg + 1
@@ -493,7 +326,7 @@ c              else
 c                 ichrout( j ) = ' '
 c              end if
 c584         continue
-c            write( logdev,8220 ) chemistry_spc( k ), i, (ichrout( j ), j=1,n_spec)
+c            write( logdev,8220 ) chemistry_spc( i ), i, (ichrout( j ), j=1,n_spec)
 c8220        format( 1x, A4, 1x, I2, 1x, 40( 2x,A1 ) )
 c585     continue
 c        write( logdev,8230 ) iglg
@@ -525,17 +358,20 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Count number of entries w/ and w/o sparse matrix storage
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc         
+         KOUNT0A = 0
+         KOUNT0  = 0
          DO J = 1, ISCHANG( NCS )
             DO K = 1, ISCHANG( NCS )
                KOUNT0A = KOUNT0A + 1
-               IF ( LZERO( J,K ) .EQ. 1 ) KOUNT0 = KOUNT0 + 1
+               IF ( LZERO( J,K ) .GT. 0 ) KOUNT0 = KOUNT0 + 1
             END DO
          END DO
+         print*,IFSUN,KOUNT0A,KOUNT0         
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Do the symbolic decomposition (ludcmp) converting [A] to [L][U] 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-         ICLO( NCSP ) = ICNT + 1
-         JCLO( NCSP ) = JCNT + 1
+         ICLO( IFSUN ) = ICNT + 1
+         JCLO( IFSUN ) = JCNT + 1
          DO J = 1, ISCHANG( NCS )
             J1 = J - 1
             
@@ -547,7 +383,7 @@ c...  First loop of decomposition
                   ICNTA = ICNTA + 1
                   IF ( LZERO( I,K ) .EQ. 1 .AND. LZERO( K,J ) .EQ. 1 )
      &               THEN
-                     IZILCH( J,NCSP ) = IZILCH( J,NCSP ) + 1
+                     IZILCH( J,IFSUN ) = IZILCH( J,IFSUN ) + 1
                      ICNT             = ICNT + 1
                      ICNTB            = ICNTB + 1
                      IZEROK( ICNT )   = K   
@@ -560,14 +396,23 @@ c... Second loop of decomposition
             DO I = J + 1, ISCHANG( NCS ) 
                JCNTA = JCNTA + 1
                IF ( LZERO( I,J ) .EQ. 1 ) THEN
-                  JZILCH( J,NCSP ) = JZILCH( J,NCSP ) + 1
+                  JZILCH( J,IFSUN ) = JZILCH( J,IFSUN ) + 1
                   JCNT             = JCNT  + 1
                   JCNTB            = JCNTB + 1
                   JZERO( JCNT )    = I  
                END IF
             END DO 
          END DO
-  
+         KOUNT0A = 0
+         KOUNT0  = 0
+         DO J = 1, ISCHANG( NCS )
+            DO K = 1, ISCHANG( NCS )
+               KOUNT0A = KOUNT0A + 1
+               IF ( LZERO( J,K ) .GT. 0 ) KOUNT0 = KOUNT0 + 1
+            END DO
+         END DO
+         print*,IFSUN,KOUNT0A,KOUNT0         
+
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Do symbolic back-substition for solving [L][U]{x}={b}. Store data
 c  in sparse matrix pointer jarraypt.
@@ -578,14 +423,23 @@ c... First loop of back-substitution
             DO J = 1, I1    
                KCNTA = KCNTA + 1
                IF ( LZERO( I,J ) .EQ. 1 ) THEN 
-                  KZILCH( I,NCSP ) = KZILCH( I,NCSP ) + 1
+                  KZILCH( I,IFSUN ) = KZILCH( I,IFSUN ) + 1
                   KCNT = KCNT + 1
                   IARRAY2 = IARRAY2 + 1
-                  KZERO( IARRAY2,NCSP ) = J
-                  JARRAYPT( I,J,NCSP ) = IARRAY2 
+                  KZERO( IARRAY2,IFSUN ) = J
+                  JARRAYPT( I,J,IFSUN ) = IARRAY2 
                END IF
             END DO
          END DO 
+         KOUNT0A = 0
+         KOUNT0  = 0
+         DO J = 1, ISCHANG( NCS )
+            DO K = 1, ISCHANG( NCS )
+               KOUNT0A = KOUNT0A + 1
+               IF ( LZERO( J,K ) .GT. 0 ) KOUNT0 = KOUNT0 + 1
+            END DO
+         END DO
+         print*,IFSUN,KOUNT0A,KOUNT0         
 
 c... Second loop of back-substitution 
          DO I = ISCHANG( NCS ) - 1, 1, -1
@@ -593,11 +447,11 @@ c... Second loop of back-substitution
             DO J = I + 1, ISCHANG( NCS )
                MCNTA = MCNTA + 1
                IF ( LZERO( I,J ) .EQ. 1 ) THEN 
-                  MZILCH( I,NCSP )      = MZILCH( I,NCSP ) + 1
+                  MZILCH( I,IFSUN )      = MZILCH( I,IFSUN ) + 1
                   MCNT                  = MCNT + 1
                   IARRAY2               = IARRAY2 + 1
-                  KZERO( IARRAY2,NCSP ) = J
-                  JARRAYPT( I,J,NCSP )  = IARRAY2 
+                  KZERO( IARRAY2,IFSUN ) = J
+                  JARRAYPT( I,J,IFSUN )  = IARRAY2 
                END IF
             END DO
          END DO
@@ -606,63 +460,63 @@ c Fill jarraypt with remaining diagonal array points and save counts
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          DO I = 1, ISCHANG( NCS ) 
             IARRAY2 = IARRAY2 + 1
-            JARRAYPT( I,I,NCSP ) = IARRAY2 
+            JARRAYPT( I,I,IFSUN ) = IARRAY2 
          END DO
-         IARRAY( NCSP ) = IARRAY2 
+         IARRAY( IFSUN ) = IARRAY2 
          KNTARRAY = KCNTA + MCNTA + ISCHANG( NCS )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Do decomposition again to change arrays to use jarraypt
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-         JCB = JCLO( NCSP ) 
-         JZLO( NCSP ) = JCCOUNT
-         ICBSUM = ICLO( NCSP ) - 1 
+         JCB = JCLO( IFSUN ) 
+         JZLO( IFSUN ) = JCCOUNT
+         ICBSUM = ICLO( IFSUN ) - 1 
          IJSTEP = 2   
 
          DO J = 1, ISCHANG( NCS )
 
 c...First loop of decomposition
-            IDEC1LO( J,NCSP ) = ICCOUNT + 1
+            IDEC1LO( J,IFSUN ) = ICCOUNT + 1
             ICB = ICBSUM  + 1
-            ICBSUM = ICBSUM + IZILCH( J, NCSP ) 
+            ICBSUM = ICBSUM + IZILCH( J, IFSUN ) 
 
-            DO KA = 1, IZILCH( J,NCSP ), IJSTEP
+            DO KA = 1, IZILCH( J,IFSUN ), IJSTEP
                ICCOUNT = ICCOUNT + 1
                IPA = IZEROI( ICB ) 
                KPA = IZEROK( ICB ) 
-               IJDECA( ICCOUNT ) = JARRAYPT( IPA,  J,NCSP ) 
-               IKDECA( ICCOUNT ) = JARRAYPT( IPA,KPA,NCSP )
-               KJDECA( ICCOUNT ) = JARRAYPT( KPA,  J,NCSP )
+               IJDECA( ICCOUNT ) = JARRAYPT( IPA,  J,IFSUN ) 
+               IKDECA( ICCOUNT ) = JARRAYPT( IPA,KPA,IFSUN )
+               KJDECA( ICCOUNT ) = JARRAYPT( KPA,  J,IFSUN )
                IF ( ICB + 1 .LE. ICBSUM ) THEN
                   IPB = IZEROI( ICB + 1 ) 
                   KPB = IZEROK( ICB + 1 ) 
-                  IJDECB( ICCOUNT ) = JARRAYPT( IPB,  J,NCSP ) 
-                  IKDECB( ICCOUNT ) = JARRAYPT( IPB,KPB,NCSP )
-                  KJDECB( ICCOUNT ) = JARRAYPT( KPB,  J,NCSP )
+                  IJDECB( ICCOUNT ) = JARRAYPT( IPB,  J,IFSUN ) 
+                  IKDECB( ICCOUNT ) = JARRAYPT( IPB,KPB,IFSUN )
+                  KJDECB( ICCOUNT ) = JARRAYPT( KPB,  J,IFSUN )
                END IF
                ICB = ICB + IJSTEP   
             END DO
 
-            IDEC1HI( J,NCSP ) = ICCOUNT  
+            IDEC1HI( J,IFSUN ) = ICCOUNT  
             
 c...Second loop of decomposition
-            JZ = JZILCH( J, NCSP )
+            JZ = JZILCH( J, IFSUN )
 
             DO I = 1, JZ - 1, 2
                JCCOUNT           = JCCOUNT + 1
-               JHIZ1( J,NCSP )   = JHIZ1( J,NCSP ) + 1
+               JHIZ1( J,IFSUN )   = JHIZ1( J,IFSUN ) + 1
                IA                = JZERO( JCB )
                IB                = JZERO( JCB + 1 )
-               JZEROA( JCCOUNT ) = JARRAYPT( IA,J,NCSP )
-               JZEROB( JCCOUNT ) = JARRAYPT( IB,J,NCSP )
+               JZEROA( JCCOUNT ) = JARRAYPT( IA,J,IFSUN )
+               JZEROB( JCCOUNT ) = JARRAYPT( IB,J,IFSUN )
                JCB = JCB + 2
             END DO
 
             IF ( MOD( JZ,2 ) .EQ. 1 ) THEN 
                JCCOUNT           = JCCOUNT + 1
-               JHIZ2( J,NCSP )   = JHIZ2( J,NCSP ) + 1
+               JHIZ2( J,IFSUN )   = JHIZ2( J,IFSUN ) + 1
                IA                = JZERO( JCB )
-               JZEROA( JCCOUNT ) = JARRAYPT( IA,J,NCSP )
+               JZEROA( JCCOUNT ) = JARRAYPT( IA,J,IFSUN )
                JCB               = JCB + 1 
             END IF
          END DO
@@ -672,49 +526,51 @@ c  Group terms to increase efficiency in back-substition
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c... First back-substitution loop
          DO I = 1, ISCHANG( NCS ) 
-            KZ              = KZILCH( I,NCSP )
-            KZHI0( I,NCSP ) = KZ - 4 
+            KZ              = KZILCH( I,IFSUN )
+            KZHI0( I,IFSUN ) = KZ - 4 
             JZ3             = 0
 
-            DO JZ = 1, KZHI0( I,NCSP ), 5     
+            DO JZ = 1, KZHI0( I,IFSUN ), 5     
                JZ3 = JZ + 4
             END DO  
 
-            KZLO1( I,NCSP ) = JZ3 + 1
-            KZHI1( I,NCSP ) = KZ  - 1 
+            KZLO1( I,IFSUN ) = JZ3 + 1
+            KZHI1( I,IFSUN ) = KZ  - 1 
             JZ4 = JZ3 
 
             DO JZ = JZ3 + 1, KZ - 1, 2    
                JZ4 = JZ + 1
             END DO
 
-            KZLO2( I,NCSP ) = JZ4 + 1
+            KZLO2( I,IFSUN ) = JZ4 + 1
          END DO
  
 c... Second loop of back-substitution
          DO I = ISCHANG( NCS ), 1, -1
-            MZ = MZILCH( I,NCSP ) 
-            MZHI0( I,NCSP ) = MZ - 4  
+            MZ = MZILCH( I,IFSUN ) 
+            MZHI0( I,IFSUN ) = MZ - 4  
             JZ3 = 0 
 
-            DO JZ = 1, MZHI0( I,NCSP ), 5  
+            DO JZ = 1, MZHI0( I,IFSUN ), 5  
                JZ3 = JZ + 4 
             END DO
 
-            MZLO1( I,NCSP ) = JZ3 + 1
-            MZHI1( I,NCSP ) = MZ  - 1
+            MZLO1( I,IFSUN ) = JZ3 + 1
+            MZHI1( I,IFSUN ) = MZ  - 1
             JZ4 = JZ3 
 
             DO JZ = JZ3+1, MZ-1, 2 
                JZ4 = JZ + 1 
             END DO
 
-            MZLO2( I,NCSP ) = JZ4 + 1
+            MZLO2( I,IFSUN ) = JZ4 + 1
          END DO
  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Check dimensions 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+         IF( IFSUN .EQ. 1 )WRITE(LOGDEV,93998)
+         IF( IFSUN .EQ. 2 )WRITE(LOGDEV,93999)
          IF ( ICNT .GT. MXCOUNT2 .OR. JCNT .GT. MXCOUNT1 .OR. 
      &        IARRAY2 .GT. MXARRAY .OR. ICCOUNT .GT. MXCOUNT2 .OR.
      &        JCCOUNT .GT. MXARRAY ) THEN
@@ -732,37 +588,47 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             WRITE( LOGDEV,94110 )
             CALL M3MESG( MSG )
             CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT1 )
+         ELSE
+            WRITE( MSG, 94001 ) 
+            CALL M3MESG( MSG )
+            WRITE( MSG, 94020 ) MXCOUNT2, ICNT 
+            CALL M3MESG( MSG )
+            WRITE( MSG, 94040 ) MXCOUNT1, JCNT 
+            CALL M3MESG( MSG )
+            WRITE( MSG, 94060 ) MXARRAY, IARRAY2 
+            CALL M3MESG( MSG )
+            WRITE( MSG, 94080 ) MXCOUNT2, ICCOUNT 
+            CALL M3MESG( MSG )
+            WRITE( MSG, 94100 ) MXARRAY, JCCOUNT, MAXGL3
+            CALL M3MESG( MSG )
          END IF           
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Set final arrays for partial derivative calculations
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-!         DO NRX = 1, NUSERAT( NCSP )
-          DO NRX = RXNS_START( NCSP), NRXNS
-!            NK = NKUSERAT( NRX,NCSP )
-            DO IAL = 1, NREACT( NRX )
-               IR = IRM2( IAL,NRX )
+          DO NK = NRXNS_START( IFSUN ), NRXNS
+            DO IAL = 1, NREACT( NK )
+               IR = IRM2( IAL,NK,NCS )
 
-               DO JAL = 1, NREACT( NRX )
-                  JR = IRM2( JAL,NRX )
-                  IAR = JARRAYPT( JR,IR,NCSP )
-                  NDERIVL( NRX,NCSP ) = NDERIVL( NRX,NCSP ) + 1
-                  NLS = NDERIVL( NRX,NCSP )
-                  JARRL( NLS,NRX,NCSP ) = IAR
-                  JLIAL( NLS,NRX,NCSP ) = IAL
+               DO JAL = 1, NREACT( NK )
+                  JR = IRM2( JAL,NK,NCS )
+                  IAR = JARRAYPT( JR,IR,IFSUN )
+                  NDERIVL( NK,IFSUN ) = NDERIVL( NK,IFSUN ) + 1
+                  NLS = NDERIVL( NK,IFSUN )
+                  JARRL( NLS,NK,IFSUN ) = IAR
+                  JLIAL( NLS,NK,IFSUN ) = IAL
                   NDLMAX = MAX( NLS,NDLMAX )
                END DO
                
-               DO IAP = 1, NPRDCT( NRX )
-                  JP = IRM2( IAP+3,NRX )
-                  IAR = JARRAYPT( JP,IR,NCSP )
-                  NDERIVP( NRX,NCSP ) = NDERIVP( NRX,NCSP ) + 1
-                  NPR = NDERIVP( NRX,NCSP )
-                  JARRP(  NPR,NRX,NCSP ) = IAR
-                  JPIAL(  NPR,NRX,NCSP ) = IAL
-                  ICOEFF( NPR,NRX,NCSP ) = 0
-                  IF ( ABS( SC( NRX,IAP ) - 1.0D0 ) .GT. 1.0D-06 ) THEN
-                     ICOEFF( NPR,NRX,NCSP ) = IAP
+               DO IAP = 1, NPRDCT( NK )
+                  JP = IRM2( IAP+3,NK,NCS )
+                  IAR = JARRAYPT( JP,IR,IFSUN )
+                  NDERIVP( NK,IFSUN ) = NDERIVP( NK,IFSUN ) + 1
+                  NPR = NDERIVP( NK,IFSUN )
+                  JARRP(  NPR,NK,IFSUN ) = IAR
+                  JPIAL(  NPR,NK,IFSUN ) = IAL
+                  IF ( ABS( SC( NK,IAP ) - 1.0 ) .GT. 1.0E-06 ) THEN
+                     ICOEFF( NPR,NK,IFSUN ) = IAP
                   END IF
                   NDPMAX = MAX( NPR,NDPMAX )
                END DO
@@ -792,14 +658,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &            IZILCH,  
      &            JZILCH ) 
      
-         
-          
  
       RETURN
       
 C********************** FORMAT STATEMENTS ******************************      
  
+93998 FORMAT( 1X,'For Day Time Mechanism')
+93999 FORMAT( 1X,'For Night Time Mechanism')
 94000 FORMAT( 1X,'One of the dimensions below is too small:')
+94001 FORMAT( 1X,'Dimensions of Jacobian and Solver Arrays versus Dimensions Required:')
 94020 FORMAT( 1X,'DIMENSION: MXCOUNT2 = ',I6,' VARIABLE: ICNT    = ',I6)  
 94040 FORMAT( 1X,'DIMENSION: MXCOUNT1 = ',I6,' VARIABLE: JCNT    = ',I6)  
 94060 FORMAT( 1X,'DIMENSION: MXARRAY  = ',I6,' VARIABLE: IARRAY2 = ',I6)  
@@ -809,23 +676,3 @@ C********************** FORMAT STATEMENTS ******************************
 94200 FORMAT( 1X,'DIMENSION: MXRP     = ',I6,' VARIABLE: NDPMAX  = ',I6)
 94220 FORMAT( 1X,'DIMENSION: MXRR     = ',I6,' VARIABLE: NDLMAX  = ',I6)
       END
-       SUBROUTINE Bubble_Sort(a)
-       IMPLICIT NONE
-       INTEGER, INTENT(in out) :: a( : )
-       REAL :: temp
-       INTEGER :: i, j
-       LOGICAL :: swapped
- 
-        DO j = SIZE(a)-1, 1, -1
-         swapped = .FALSE.
-         DO i = 1, j
-           IF (a(i) > a(i+1)) THEN
-             temp = a(i)
-             a(i) = a(i+1)
-             a(i+1) = temp
-             swapped = .TRUE.
-           END IF
-         END DO
-         IF (.NOT. swapped) EXIT
-       END DO
-      END SUBROUTINE Bubble_Sort

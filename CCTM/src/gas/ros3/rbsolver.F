@@ -142,7 +142,6 @@ C..Local Variables:
       REAL( 8 ) :: TEND           ! Elapsed time at end of integration step
       REAL( 8 ) :: DT_DEGRADE     ! WTH: Time step for degradation routine
       REAL( 8 ) :: YTOL           ! Species tolerance
-      REAL( 8 ), SAVE :: RNSPEC   ! Recipricol of # of species
       REAL( 8 ) :: X1, X2         ! Temp ROS3 variables
       REAL( 8 ) :: ERRYMAX        ! Cell/species stiffness estimate
       REAL( 8 ) :: YLOWEPS        ! Tolerance ratio used in stiffness calc
@@ -155,6 +154,7 @@ C..Local Variables:
       INTEGER    CELL_MAXERR      ! cell with maximum error estimate
       REAL( 8 ) :: MAX_SPC_ERR      ! species error in the cell
       
+      REAL( 8 ), SAVE :: RNSPEC   ! Recipricol of # of species
       REAL( 8 ), ALLOCATABLE, SAVE :: YDOT( :,: )   ! dc/dt array
 
 c.....ROS3 intermediate variables
@@ -350,9 +350,8 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
             DTCELL( NCELL ) = 0.0
          END DO
          DO I = 1, ISCHAN
-            ISPOLD = INEW2OLD( I, NCS )
             DO NCELL = 1, NIRRCLS
-               CIRR( NCELL, ISPOLD ) = REAL( Y( IRRCELL( NCELL ),I ), 4 )
+               CIRR( NCELL, I ) = REAL( Y( IRRCELL( NCELL ),I ), 4 )
             END DO
          END DO
          CALL PA_IRR ( .TRUE., .FALSE., RKIRR, CIRR, DTCELL, NIRRCLS, DUMMY )
@@ -459,24 +458,15 @@ c..Estimate error
            END DO
          END DO
 
-         MAXERR      = 0.0D+00
-         OLDERR      = MAXERR
-         MAX_SPC_ERR = 0.0D+00
-      
+         MAXERR      = UROUND
+     
          DO NCELL = 1, NUMCELLS
-            MAXERR = MAX( MAXERR, UROUND, SQRT( ERR( NCELL ) * RNSPEC ) )
-            IF ( OLDERR .NE. MAXERR )THEN
-               OLDERR  =  MAXERR
-               COL_ERR = CCOL( NCELL )
-               ROW_ERR = CROW( NCELL )
-               LAY_ERR = CLEV( NCELL )
-               CELL_MAXERR = NCELL 
-            END IF
+            MAXERR = MAX( MAXERR, ERR( NCELL )*RNSPEC )
          END DO
 
-         DTFAC = 0.9D+00 / MAXERR ** GROW
-
          IF ( MAXERR .LE. 1.0D+00 ) THEN
+             MAXERR = SQRT( MAXERR )
+             DTFAC  = 0.9D+00 / MAXERR ** GROW
 
 #ifdef rbstats
             NSTEPS = NSTEPS + 1
@@ -493,9 +483,7 @@ c..Estimate error
                   DTCELL( NCELL ) = REAL( DT, 4 )
                END DO
                DO I = 1, ISCHAN
-                  ISPOLD = INEW2OLD( I, NCS )
                   DO NCELL = 1, NIRRCLS
-!                     CIRR( NCELL,ISPOLD ) = REAL( Y( IRRCELL( NCELL ), I ), 4 )
                      CIRR( NCELL,I ) = REAL( Y( IRRCELL( NCELL ), I ), 4 )
                   END DO
                END DO
@@ -508,8 +496,7 @@ c..Estimate error
                DT_DEGRADE = 60.0D0 * ( TEND - TNOW )
 
                DO I = 1, ISCHAN
-!                  ISPOLD = INEW2OLD( I,NCS )
-                  N      = CGRID_INDEX( ISPOLD )
+                  N      = CGRID_INDEX( I )
                   DO NCELL = 1, NUMCELLS
                      Y_DEGRADE( NCELL,N ) = Y( NCELL,I )
                   END DO
@@ -547,6 +534,11 @@ c..Estimate error
             LPASS = .FALSE.
 
             IF ( DT .LT. DTMIN ) THEN
+! find cell with maximum error and report
+               CELL_MAXERR = MAXLOC( ERR, DIM = 1 )
+               COL_ERR = CCOL( CELL_MAXERR )
+               ROW_ERR = CROW( CELL_MAXERR )
+               LAY_ERR = CLEV( CELL_MAXERR )
 
                WRITE( LOGDEV, 92110 ) JDATE, JTIME,
      &        (COL_ERR + STARTCOLCO ), ( ROW_ERR + STARTROWCO ), LAY_ERR
@@ -554,6 +546,7 @@ c..Estimate error
                WRITE( LOGDEV, 92113) N_SPEC, NUMB_MECH_SPC
                WRITE( LOGDEV, 92216) MAXERR, SQRT( ERR( CELL_MAXERR ) * RNSPEC )
      
+
                DO N = 1, N_SPEC
                   YTOL = ATOL( N ) + RTOL( N ) * ABS( YP( CELL_MAXERR, N ) )
                   MAX_SPC_ERR = ( ( D1 * K1( CELL_MAXERR,N ) 
@@ -561,8 +554,6 @@ c..Estimate error
      &                        +     D3 * K3( CELL_MAXERR,N ) ) / YTOL ) ** 2.0D0
      &                        / ERR( CELL_MAXERR )
      
-!                  ISPOLD = INEW2OLD( N, NCS )
-!                  WRITE( LOGDEV, 92114 ) ISPOLD, TRIM( CHEMISTRY_SPC( ISPOLD ) ),
                   WRITE( LOGDEV, 92114 ) ISPOLD, TRIM( CHEMISTRY_SPC( N ) ),
      &            MAX_SPC_ERR, Y( CELL_MAXERR,N ), YP( CELL_MAXERR,N )
      
@@ -582,8 +573,8 @@ c..write photolysis rates used in cell
                   IF ( IPH( N,3 ) .NE. 0 ) THEN
                      I = IPH( N,1 )
                      J = IPH( N,2 )
-                     WRITE( LOGDEV, 92116 ) TRIM( RXLABEL( I ) ),
-     &               TRIM( PHOTAB( J ) ), RKI( CELL_MAXERR,I )
+                        WRITE( LOGDEV, 92116 ) TRIM( RXLABEL( I ) ),
+     &                  TRIM( PHOTAB( J ) ), RKI( CELL_MAXERR,I ) 
                   END IF
                END DO
           
