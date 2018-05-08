@@ -75,6 +75,8 @@ C set up SPECIES array
       END DO
       
       ALLOCATE( SOLVER_SPECIES( NUMB_MECH_SPC ) )
+      ALLOCATE( EBI_TO_IRR_MAP( NUMB_MECH_SPC ) )
+      EBI_TO_IRR_MAP = 0
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Get group species indices
@@ -305,9 +307,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C..define remaining empty data in solver_species array
 
       DO N = 1, N_SPECIES
-!         print*,SPECIES( N ), SOLVER_SPECIES( N )%SPECIES_NAME
          IND =  NAME_INDEX( SOLVER_SPECIES( N )%SPECIES_NAME, N_SPECIES, SPECIES )
          IF( IND .GT. 0 ) THEN
+             EBI_TO_IRR_MAP( IND )             = N
              SOLVER_SPECIES( N )%CGRID_INDEX   = SPECIES_LIST( IND )%CGRID_INDEX
              SOLVER_SPECIES( N )%SPECIES_TYPE  = SPECIES_LIST( IND )%SPECIES_TYPE
              SOLVER_SPECIES( N )%SPECIES_MOLWT = SPECIES_LIST( IND )%SPECIES_MOLWT
@@ -315,6 +317,10 @@ C..define remaining empty data in solver_species array
          END IF
       END DO
 
+      DO N = 1, N_SPECIES
+      IND = EBI_TO_IRR_MAP( N )
+      print*,N, SPECIES( N ), SOLVER_SPECIES( IND )%SPECIES_NAME, EBI_TO_IRR_MAP( N )
+      END DO
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c If doing all mechanisms, get a list of species & find unique AE/AQ
 c species. Note three subroutines are needed because the include files 

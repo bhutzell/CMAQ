@@ -81,5 +81,6 @@ c..complete list of species in AE, AQ, & gas-phase mechanisms
       END TYPE EBI_MEMBERS 
 
       TYPE( EBI_MEMBERS ), ALLOCATABLE :: SOLVER_SPECIES( : )
+      INTEGER,             ALLOCATABLE :: EBI_TO_IRR_MAP( : )
       
       END MODULE GLOBAL_DATA

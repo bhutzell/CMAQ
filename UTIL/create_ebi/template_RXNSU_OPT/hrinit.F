@@ -64,7 +64,7 @@ C.....SAVED VARIABLES:
 C.....LOCAL VARIABLES: 
       CHARACTER( 132 ) ::  MSG       ! Log message
 
-      INTEGER N               ! Loop index
+      INTEGER N, NR, ISPC     ! Loop index
       INTEGER IOS             ! Allocate error status
 
 R6
@@ -75,16 +75,16 @@ C***********************************************************************
 R3
       ALLOCATE( RKI( NRXNS ),
      &          RKI_SAV( MAX_CELLS_EBI, NRXNS ),
-     &          FORWARD_CONV( N_SPEC),
-     &          REVERSE_CONV( N_SPEC),
+     &          FORWARD_CONV( NUMB_MECH_SPC),
+     &          REVERSE_CONV( NUMB_MECH_SPC),
      &          RXRAT( NRXNS ),
-     &          RTOL( N_SPEC),
-     &          YC(   N_SPEC),
-     &          YC0(  N_SPEC),
-     &          YCP(  N_SPEC),
-     &          PROD( N_SPEC),
-     &          LOSS( N_SPEC),
-R4   &          PNEG( N_SPEC), 
+     &          RTOL( NUMB_MECH_SPC),
+     &          YC(   NUMB_MECH_SPC),
+     &          YC0(  NUMB_MECH_SPC),
+     &          YCP(  NUMB_MECH_SPC),
+     &          PROD( NUMB_MECH_SPC),
+     &          LOSS( NUMB_MECH_SPC),
+R4   &          PNEG( NUMB_MECH_SPC), 
      &          STAT = IOS )
 
        IF ( IOS .NE. 0 ) THEN
@@ -108,12 +108,12 @@ R4   &          PNEG( N_SPEC),
        END IF
 
        IF( NSPECIAL .GT. 0 )THEN
-          ALLOCATE( SYC( MAX_CELLS_EBI, N_SPEC ), STAT = IOS )
+          ALLOCATE( SYC( MAX_CELLS_EBI, NUMB_MECH_SPC ), STAT = IOS )
           IF ( IOS .NE. 0 ) THEN
                MSG = 'Error allocating SYC'
                CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
           END IF
-          ALLOCATE( IOLD2NEW( N_SPEC, 1 ), STAT = IOS )
+          ALLOCATE( IOLD2NEW( NUMB_MECH_SPC, 1 ), STAT = IOS )
           IF ( IOS .NE. 0 ) THEN
                MSG = 'Error allocating IOLD2NEW'
                CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
@@ -139,6 +139,15 @@ R4   &          PNEG( N_SPEC),
           REVERSE_CONV( N ) = 1.0 / REAL( FORWARD_CONV( N ), 4 )
        END DO
 
+! translate IRR array to EBI solver species
+
+       DO NR = 1, NRXNS
+          DO N = 1, NUMB_MECH_SPC
+             ISPC         = TRANSLATE_IRR_TO_EBI( IRR( NR, N ) ) 
+             IRR( NR, N ) = ISPC
+          END DO
+       END DO
+       
 ! initialize all reaction rates to zero so unused array elements are defined
 
        RXRAT = 0.0D0

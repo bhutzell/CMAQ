@@ -81,6 +81,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
 
 
+
       IIN = JUNIT()
 
       EPOS = LEN_TRIM( TMPLPATH )
@@ -152,6 +153,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &      SOLVER_SPECIES( S )%CGRID_INDEX, SOLVER_SPECIES( S )%SPECIES_TYPE, 
      &      SOLVER_SPECIES( S )%SPECIES_MOLWT, SOLVER_SPECIES( S )%CONVERT_CONC
 
+
+            WRITE( IOUT, 97013 )
+      
             LOUT6 = .FALSE.
 
          END IF
@@ -161,6 +165,27 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       GO TO 100
 
  1000 CONTINUE
+
+97013 FORMAT(6X,'INTEGER, ALLOCATABLE :: TRANSLATE_IRR_TO_EBI( : ) ! map translating IRR array to solver ')
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  Write section defining arrat translating IRR to EBI solver
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+
+      WRITE(IOUT,97014)
+      DO N = 1, NUMB_MECH_SPC
+         S = EBI_TO_IRR_MAP( N )
+         WRITE(IOUT,97015)N, S, TRIM( SOLVER_SPECIES( S )%SPECIES_NAME )
+      END DO
+
+97014 FORMAT('! define map for translating IRR array to solver',
+     &      /6X, 'ALLOCATE( TRANSLATE_IRR_TO_EBI( NUMB_MECH_SPC ), STAT = IOS )',
+     &      /6X, 'IF ( IOS .NE. 0 ) THEN'
+     &      /6X, '   MSG = "Error allocating TRANSLATE_IRR_TO_EBI" ',
+     &      /6X, 'END IF ', /  )
+     
+97015 FORMAT(6X,'TRANSLATE_IRR_TO_EBI( ', I4,' ) = ', I4, ' ! moves ', 
+     &        A, ' to latter position' )
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C  Write section resetting RXNS_DATA indices for species locations in  
@@ -175,8 +200,8 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
       SPOUT = ADJUSTL( SOLVER_SPECIES( S )%SPECIES_NAME )
       WRITE(IOUT,97005)SPOUT( 1:CL ), SPOUT( 1:CL )
 
-97003 FORMAT('! reset RXNS_DATA indices for species locations in concentration '
-     &     / '! array using HRDATA parameters ' /)
+97003 FORMAT(/ '! reset RXNS_DATA indices for species locations in concentration '
+     &       / '! array using HRDATA parameters ' /)
 97004 FORMAT(6X,'INDEX_' ,A, ' = ', A)
 97005 FORMAT(6X,'INDEX_' ,A, ' = ', A /)
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -463,7 +488,8 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 95060 FORMAT( /6X, 'IF( L_AQ_VRSN ) THEN' / )
 95080 FORMAT(  9X, 'RTOL( ', A, ' ) = ', A )
 
-96000 FORMAT( //6X, 'RETURN' // 6X, 'END' )
+96000 FORMAT( //6X, 'DEALLOCATE( TRANSLATE_IRR_TO_EBI )',
+     &        //6X, 'RETURN' // 6X, 'END' )
 
 97000 FORMAT( 'C...Define type array used to reset order in SPECIES_LIST '
      &      / 6X, 'TYPE( MEMBER ) ::  EBI_SPECIES_LIST( NUMB_MECH_SPC ) = (/ ')
