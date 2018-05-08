@@ -317,10 +317,6 @@ C..define remaining empty data in solver_species array
          END IF
       END DO
 
-      DO N = 1, N_SPECIES
-      IND = EBI_TO_IRR_MAP( N )
-      print*,N, SPECIES( N ), SOLVER_SPECIES( IND )%SPECIES_NAME, EBI_TO_IRR_MAP( N )
-      END DO
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c If doing all mechanisms, get a list of species & find unique AE/AQ
 c species. Note three subroutines are needed because the include files 
