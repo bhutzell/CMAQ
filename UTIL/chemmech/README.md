@@ -157,11 +157,9 @@ The values have units of parts per million. ATM_AIR equals the mixing ratio of M
 
 Two methods exist for building CHEMMECH. The method to use depends on the user’s preferences but also the FORTRAN and C compilers that will be used. If the Intel, Portland or GCC compiler are available, the first and standard method executes the bldit_chemmech.csh script after changing the script’s COMPILER variable to one of the three options. If none of these compilers are to be used, the user has to modify src/Makefile to use the intended compiler and create CHEMMECH using the make command.  As implied by the compilers available in the bldit script, CHEMMECH has been tested with each to verify consistent results between compilers. The current Makefile includes the debug flags in the compilers options so the user can identify the cause and location when CHEMMECH crashes. Crashes occur the mech.def contains information that exceeds the parameters defining array dimensions. The src/MECHANISM_PARMS.f file defines these parameters. The user can change many of the parameters then rebuild CHEMMECH so the utility fits the application. Table 2 lists the parameter and state whether user should change their values.
 
-Table 2.     
+
 | Parameter	| Value |        
 |:-----|----:|           
-
-
 | MAXRXNUM    |  	2000 |     
 | MAXSPEC     |  	700 | 
 | MAXPRODS    |  	40 | 
