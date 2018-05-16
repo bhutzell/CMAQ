@@ -1,84 +1,69 @@
-# CMAQ.mech_processor
-FORTRAN and c code that creates the RXNS modules for the CMAQ model version 5.2
+# CHEMMECH, the CMAQ photochemical mechanism processor
 
-This repository  contains the template bldrun script under script and code directory to generates the RXNS_DATA_MODULE.F90 and RXNS_FUNC_MODULE.F90 files
+## Quick Start
+
+FORTRAN codes that create the RXNS modules for the CMAQ model version 5.2
+
+This directory contains the template bldrun script under script and code directory to generates the RXNS_DATA_MODULE.F90 and RXNS_FUNC_MODULE.F90 files
 for CMAQ version 5.2.
 
 To use this tool:
 
-1) Compile the tool by modifying the bldit script in the scripts directory. Set Fortran compiler based on your system, save and run the script.
+1.  Compile the tool by modifying the bldit script in the scripts directory. Set Fortran compiler based on your system, save and run the script.
 
-2) Modify the run script by setting the Mechanism that you are building.
+2.  Modify the run script by setting the Mechanism that you are building.
 
-3) Execute the run script and inspect the results under the output directory.
+3.  Execute the run script and inspect the results under the output directory.
 
-#  Background
+##  Background
 
 The chemical mechanism processor (CHEMMECH) allows altering a photochemical mechanisms or using a different mechanism in the CMAQ model. Two output files implement the photochemical mechanism and are compiled along CMAQ’s source code. Both output files contain FORTRAN 90 modules. RXNS_DATA_MOD.F90 defines the mechanism species, their reactions and rate constants. RXN_FUNC_MOD.F90 specifies functions that map CMAQ model species to photochemical mechanism species and calculate reaction rate constants. CHEMMECH produces additional output files to check whether the two modules represent the photochemical mechanism intended by the user.  One additional ouput file, SPCS.ext, list the species participating in the mechanism. Two other additional output file are prototypes for the species and equations files used to run the Kinetic PreProcess (KPP) (Damian et al., 2002).  The KPP inputs have not been tested in several years so a user should use them with discretion.
 
 CHEMMECH inputs include the mechanism chemical definitions (mech.def) file and the three CMAQ species namelist files. All are ASCII files. Namelists specify species participating in photochemical reaction divided into the Gas (GC), Aerosol (AE) and Nonreactive (NR) groups but not all namelist species have to participate in photochemical reactions. The namelist are optional but are recommended when modifying an existing photochemical mechanism because CHEMMECH can cross check whether species used in the mech.def are found the namelists. The mech.def file lists the reactions and other data representing the photochemistry. Input tiles follow a rigid format; the CCTM/src/MECHS subdirectories contain examples. For namelists, the examples show the data in each file and the formatting rules. The following information regards formatting used in the mech.def file.
 
-# Chemical Reactions Input Format
+## Chemical Reactions Input Format
 
 A mech.def file follows formatting rules based on Gery and Grouse (1990) and Jeffries (1990) but the rules evolved along with the CMAQ model.  The file consists five sequential blocks: a mechanism name, operator definitions, an ignored species list, the reactions list, and constant definitions. The first four blocks are optional based on the photochemical mechanism described by the mech.def file. Blocks after the mechanism name begin with the respective key words, SPECIAL, ELIMINATE, REACTIONS, and CONSTANT. These blocks terminate with “END” or “end” (case sensitive). Their content also follows the below rules and use the same elements to define information.
 
 Each block will be discussed separately below but first the discussion lists rules and elements for entering the mechanism data.
 
-## General rules.
+### General rules.
 
-•	Data Lines lie between columns 1 and 80.
+* Data Lines lie between columns 1 and 80.  
+* White spaces are ignored.  
+* Data lines can wrap around (i.e., entries can be continued on a subsequent line after a hard return).  
+* Lines beginning with an exclamation point contain a comment line.  
+* Data lines cannot contain a comment line.   
+* Text enclosed by “{}” or “()” contain comments within a data line.
 
-•	White spaces are ignored.
+### Defining Elements.
 
-•	Data lines can wrap around (i.e., entries can be continued on a subsequent line after a hard return).
+1.  Species Types and Naming Rules.  
+    1.  Constants species whose names and volume mixing ratio are fixed. Names include M (any molecule in the atmosphere), O2 (oxygen), CH4 (methane), H2 (hydrogen), N2 (nitrogen), and H2O (water vapor).  Reactions use constant species to calculate rate constants by including them as reactants. Their names cannot be used to represent other species.  
+    2.  Model species are produced or destroyed by the mechanism’s reactions. Species namelist define them. Their names satisfy the below rules.  
+        1.   Do not contain blanks and can be up to 16 characters long. However, the maximum length is recommended to equal 13 if the mechanism is to be used in DDM version of the CMAQ model.  
+        2.   Must begin with an alphabetic character but may contain any alphanumeric character (i.e., "A-Z," "a-z," and "0-9") or the characters ":" and "\_" after the first position.  
+        3.   Changing case to change the species so NO2 and no2 represent two different model species.  
+        4.   Using embedded comments in a species name cannot span two lines.  
+2.  Labels are used to define or refer to reactions, operators or other processes.  
+    1.   Often start with "<" and ends with ">".  
+    2.   Contain up to 16 non-blank characters long.  
+    3.   Cannot contain a comment or a label delimiter.   
+    4.   A label may span lines.  
+3.  Numbers can be read as the below types.  
+    1.  Integer (e.g., 5)  
+    2.  Floating point (e.g., 5.0)  
+    3.  Exponential (e.g., 5.0E+00).   
+    4.  With the exponential format, the "E" may be either upper or lowercase; a positive exponent is assumed if the sign of the exponent is missing.  
+    5.   All numbers are read in as REAL(4) FORTRAN types but may converted to REAL (8) FORTRAN type in output files.  
 
-•	Lines beginning with an exclamation point contain a comment line.
+### Format of Specific Blocks
 
-•	Data lines cannot contain a comment line.
-
-•	Text enclosed by “{}” or “()” contain comments within a data line.
-
-## Defining Elements.
-
-1)	Species Types and Naming Rules.  
-
-a)	Constants species whose names and volume mixing ratio are fixed. Names include M (any molecule in the atmosphere), O2 (oxygen), CH4 (methane), H2 (hydrogen), N2 (nitrogen), and H2O (water vapor).  Reactions use constant species to calculate rate constants by including them as reactants. Their names cannot be used to represent other species.  
-
-b)	Model species are produced or destroyed by the mechanism’s reactions. Species namelist define them. Their names satisfy the below rules.
-
-i)	Does not contain blanks and can be up to 16 characters long. However, the maximum length is recommended to equal 13 if the mechanism is to be used in DDM version of the CMAQ model.
-
-ii)	Begins with an alphabetic character but may contain any alphanumeric character (i.e., "A-Z," "a-z," and "0-9") or the characters ":" and "\_" after the first position.
-
-iii)	Changes in case change the model species so NO2 and no2 represent two different model species.
-
-iv)	Using embedded comments in a species name cannot span two lines.
-
-2)	Labels are used to define or refer to reactions, operators or other processes.
-
-a)	Often start with "<" and ends with ">".
-
-b)	Contain up to 16 non-blank characters long.
-
-c)	Cannot contain a comment or a label delimiter.  
-
-d)	A label may span lines.
-
-3)	Numbers can be read as the below types.
-
-a)	Integer (e.g., 5)
-b)	Floating point (e.g., 5.0)
-c)	Exponential (e.g., 5.0E+00).
-d)	With the exponential format, the "E" may be either upper or lowercase; a positive exponent is              assumed if the sign of the exponent is missing.
-e)	All numbers are read in as REAL(4) FORTRAN types but may converted to REAL (8) FORTRAN type in output files.
-
-## Format of Specific Blocks
-
-### Mechanism Name.
+#### Mechanism Name.
 
 The mechanism name is an optional input. If it is included, it must be the first non-comment entry in the mechanism. Rules for the mechanism name are the same as those for species names except that it can be up to 32 characters long.   No delimiter is required to end of the name but a "hard return" after the entry is suggested for creating a legible input file.
 
-### SPECIAL.
+#### SPECIAL.
 
 The key word SPECIAL lists operators used in the REACTIONS block to express reaction rate constant. Operators combine reaction rate constant and concentrations. A mechanism often uses them to lump reactions together with an already defined rate constant. An example shows an operator called RY is derived from two following reactions with respective rate constants, RKA and RKB, that are used in a mechanism.
 
@@ -104,11 +89,11 @@ RY equal the sum of RKA*X and RKB*W. The SPECIAL block expresses RY with formula
 
 Using operators can increase efficiency for solving species concentrations if they are used correctly and the approximation regarding concentration is acceptable.
 
-### ELIMINATE.
+#### ELIMINATE.
 
 This key word followed by an equal sign lists products used in reactions that are not to be included as a model species or accounted for in CHEMMECH output files. A semicolon must follow each species name in the list. A developer may want to omit specific products because they lack relevance to research goals or because solving their concentrations greatly increases duration of model simulations.
 
-### REACTIONS.
+#### REACTIONS.
 
 The key word proceeds the list of reactions in the mechanism. Only the first four characters (i.e., REAC) are actually required. The key word is followed closed brackets and an equal sign. The bracket’s enclosure indicates units for rate constants. Allowed enclosures "PP" and "CM," ppm-min units and molecule-cc-sec units, respectively. Either enclosure is case insensitive. A delimiter is not required after the equal sign but a "hard return" after the entry is suggested for clarity of the input file. Examples of valid inputs include the following:
 
@@ -137,7 +122,7 @@ Products consist species names separated by plus (+) or minus (-) signs with opt
 
 Rate constant parameters begin with either a # sign or the expression, "%s#", where s equal 1, 2, 3, or H. The following characters and numbers specify parameters to calculate the reaction’s rate constant. Table 1 define formats corresponding to the available formulas. A semi-colon (;) denote the end of a reaction’s definition.   
 
-<center> Table 1. </center>
+<center>  Table 1.  </center>
 
 | Type | Mechanism Definition File Expression| Formula, where M is air number density (molecules/cm3), T is air temperature(degrees K), and P is air pressure (Atm) |  
 |:---:|:-------------------:|:---:|   
@@ -162,7 +147,7 @@ Rate constant parameters begin with either a # sign or the expression, "%s#", wh
 3.  Operators are defined the SPECIAL block where <''REACTION''> is the rate constant for the given ''REACTION'' and [''species''] equals the concentration of a mechanism ''species'' at the beginning of the integration time-step for the chemistry's numerical solver.   
 4.  Type 12 is used to include ozone destruction by marine bromine and iodide compounds. It parameters effects from reactions predicted by a photochemical mechanism that includes them.  
 
-### CONSTANTS.
+#### CONSTANTS.
 
 The key word defines volume mixing ratio of the subset of fixed list of constant species as below.
 
@@ -176,7 +161,7 @@ The key word defines volume mixing ratio of the subset of fixed list of constant
 
 The values have units of parts per million. ATM_AIR equals the mixing ratio of M, any gas molecule. The block does not define the mixing ratio for H2O because the meteorological input data specific their values so the values depend on time and location.
 
-# Building and Running
+## Building and Running
 
 Two methods exist for building CHEMMECH. The method to use depends on the user’s preferences but also the FORTRAN and C compilers that will be used. If the Intel, Portland or GCC compiler are available, the first and standard method executes the bldit_chemmech.csh script after changing the script’s COMPILER variable to one of the three options. If none of these compilers are to be used, the user has to modify src/Makefile to use the intended compiler and create CHEMMECH using the make command.  As implied by the compilers available in the bldit script, CHEMMECH has been tested with each to verify consistent results between compilers. The current Makefile includes the debug flags in the compilers options so the user can identify the cause and location when CHEMMECH crashes. Crashes occur the mech.def contains information that exceeds the parameters defining array dimensions. The src/MECHANISM_PARMS.f file defines these parameters. The user can change many of the parameters then rebuild CHEMMECH so the utility fits the application. Table 2 lists the parameter and state whether user should change their values.
 
@@ -205,7 +190,7 @@ Running CHEMMECH is accomplished by modifying and executing the run script under
 
 CHEMMECH produces two files, RXNS_DATA_MODULE.F90 and RXNS_FUNCTION.F90, to compile the CMAQ Chemical Transport Model (CCTM) that uses the photochemical mechanism. The data module contains parameters describing the reactions, rates, and species. The functions module contains routines for setting up the photochemical mechanism and calculating its rate constants. Compiling the CCTM requires no additional files if the model uses the Sparse Matrix Vectorized versions of the Rosenbrock or Gear chemistry solver (repository directories, CCTM/src/gas/ros3 or CCTM/src/gas/smvgear). Besides the species namelists, executing the CCTM requires a CSQY_DATA_mechanism_name file containing cross-sections and quantum yields for the photolysis rates used by the mechanism. The inline_phot_preproc utility creates file by using the data module. Check the subdirectory containing this utility for more information. If the user wants CCTM to use a gas chemistry solver faster than Rosenbrock or Gear, they have to create a Euler Backward Interative (EBI) solver for the photochemical mechanism. The create_ebi utility creates an EBI solver specific to a photochemical mechanism by using its data module. Check this utility’s subdirectory for more information.
 
-# References.
+## References.
 
 Damian V., Sandu A., Damian M., Potra F., Carmichael G.R. (2002). The kinetic preprocessor KPP - A software environment for solving chemical kinetics. Computers and Chemical Engineering,  26(11) , pp. 1567-1579.
 
