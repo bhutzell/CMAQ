@@ -20,7 +20,6 @@
             INTEGER J1, J2              ! SURROGATE TYPE 2 COUNTERS
             INTEGER K1, K2, K3, K4, K5  ! CONTROL TYPE COUNTERS
             INTEGER ICALL
-            INTEGER LOGDEV
 
             LOGICAL :: ORDER = .TRUE.
             LOGICAL :: FOUND = .TRUE.
