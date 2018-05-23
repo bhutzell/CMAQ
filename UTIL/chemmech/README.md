@@ -135,17 +135,18 @@ Rate constant parameters begin with either a # sign or the expression, "%s#", wh
 | 6   |	#  A*K<REACTION>   | A\*K |  
 | 7   |	%1  #  A           | A\*(1+0.6\*P) |  
 | 8   |	%2  #  A0@E0&A2@E2&A3@E3       | k0  +  k3\*M/(1+k3/k2) where  k0  =  A0\*exp(-E0/T),  k2  =  A2\*EXP(-E2/T),  and  k3  =  A3\*EXP(-E3/T)  |  
-| 9   |	%3  #  A0@E0&A1@E1             | A0\*EXP(-B/T)+A1\*EXP(-E1/T)\*M |  
-| 9.1 | %3  #  A0^B0@E0&A1^B1@E1&A2@E2 | A0\*(T/300)\*\*B0\*EXP(-B/T)+A1\*(T/300)\*\*B1\*EXP(-E1/T)\*M+A2\*EXP(-E2/T) |  
-| 10  | #  A0^B0@E0&A1^B1@E1&F^N       | [  ko\*M/(1+ko\*M/kinf)]F\*\*G  where  ko  =  A0\*(T/300)\*\*B0\*EXP(-E0/T),  kinf  =  A1\*(T/300)\*\*B1\*EXP(-E1/T)  and  G  =  G=1/[1+(log10(k0\*M/kinf)/n)**2)]  |  
+| 9   |	%3  #  A0@E0&A1@E1             | A0\*EXP(-E0/T)+A1\*EXP(-E1/T)\*M |  
+| 9.1 | %3  #  A0^B0@E0&A1^B1@E1&A2@E2 | A0\*(T/300)\*\*B0\*EXP(-E0/T)+A1\*(T/300)\*\*B1\*EXP(-E1/T)\*M+A2\*EXP(-E2/T) |  
+| 10  | #  A0^B0@E0&A1^B1@E1&N&F       | [  ko\*M/(1+ko\*M/kinf)]F\*\*G  where  ko  =  A0\*(T/300)\*\*B0\*EXP(-E0/T),  kinf  =  A1\*(T/300)\*\*B1\*EXP(-E1/T)  and  G  =  G=1/[1+(log10(k0\*M/kinf)/n)**2)]  |  
 | 11  | #A?OPERATOR                    | A\*O |  
-| 12  |  %H  #  A0@E0&A1@E1            | A0\*EXP(-E0\*P)+A1\*EXP(-E1\*P)  if  the  sun  is  above  the  horizon  and  the  surface  is over  open  water  with  no  surf  zone 0.0  if  the  sun  is  below the  horizon |  
+| 12  |  %H  #  A0@E0&A1@E1            | A0\*EXP(-E0\*P)+A1\*EXP(-E1\*P)  if  the  sun  is  above  the  horizon  and  the  surface  is over  open  water  with  no  surf  zone.  0.0  if  otherwise |  
 
 **Notes:**   
-1.  For rate constants with the form A<Reference> or A*Reference, reference gives label for a photolysis rate (J), a heteorogeneous rate constant (H), rate constant for the given (K) reaction label or an operator (O). A equals one if not given.   
-2.  Calculating the photolysis and heteorogeneous rates takes place outside the RXNS_FUNC_MODULE.F90 file produced by the CHEMMECH processor.   
-3.  Operators are defined the SPECIAL block where <''REACTION''> is the rate constant for the given ''REACTION'' and [''species''] equals the concentration of a mechanism ''species'' at the beginning of the integration time-step for the chemistry's numerical solver.   
-4.  Type 12 is used to include ozone destruction by marine bromine and iodide compounds. It parameters effects from reactions predicted by a photochemical mechanism that includes them.  
+1.  For rate constants with the form A<Reference> or A*Reference, reference gives label for a photolysis rate (J), a heteorogeneous rate constant (H), rate constant for the given (K) reaction label or an operator (O). A equals one if not given.
+2.  Reaction Type 4 represents the rate constant for the reverse equilibrium reaction to the reaction labeled K.  
+3.  Calculating the photolysis and heteorogeneous rates takes place outside the RXNS_FUNC_MODULE.F90 file produced by the CHEMMECH processor.   
+4.  Operators are defined the SPECIAL block where <''REACTION''> is the rate constant for the given ''REACTION'' and [''species''] equals the concentration of a mechanism ''species'' at the beginning of the integration time-step for the chemistry's numerical solver.   
+5.  Type 12 is used to include ozone destruction by marine bromine and iodide compounds. It parameters effects from reactions predicted by a photochemical mechanism that includes them.  
 
 #### CONSTANTS.
 
