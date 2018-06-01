@@ -39,7 +39,7 @@ C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables                    
 C   01 Jun 18 B.Hutzell: replaced steady solution for O1D with backward Euler
 C                        approximation. To match conditions where the initial
-C                        conconcentration cannot be neglected.
+C                        concentration cannot be neglected.
 C**********************************************************************
       USE HRDATA
 

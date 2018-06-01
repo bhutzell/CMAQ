@@ -221,7 +221,6 @@ c  Fill the irm2 array using the new species order developed above.
 c  Also determine active reactions for day and then night (i.e., photo
 c  reactions determined by BTEST=.TRUE. are not included for nighttime)
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      NUSERAT = 0
       DO NRX = 1, NRXNS
          DO NR = 1, NREACT( NRX )
             IRM2( NR,NRX,NCS ) = IRR( NRX,NR ) 
