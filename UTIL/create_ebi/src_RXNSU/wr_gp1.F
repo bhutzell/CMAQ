@@ -1017,7 +1017,11 @@ c..Find NO2->NO2EX Rxn no. if NO2EX included in group
 
       WRITE( RNUM, '(I5)' ) KO3_O1D
       RNUM = ADJUSTL( RNUM )
-      WRITE( IOUT, 96120 ) SPECIES( O1D )( 1 : LEN_TRIM( SPECIES( O1D ) ) ),
+!      WRITE( IOUT, 96120 ) SPECIES( O1D )( 1 : LEN_TRIM( SPECIES( O1D ) ) ),
+!     &                     RNUM( 1 : LEN_TRIM( RNUM ) ),
+!     &                     SPECIES( O3  )( 1 : LEN_TRIM( SPECIES( O3 ) ) )
+      WRITE( IOUT, 96121 ) SPECIES( O1D )( 1 : LEN_TRIM( SPECIES( O1D ) ) ),
+     &                     SPECIES( O1D )( 1 : LEN_TRIM( SPECIES( O1D ) ) ),      
      &                     RNUM( 1 : LEN_TRIM( RNUM ) ),
      &                     SPECIES( O3  )( 1 : LEN_TRIM( SPECIES( O3 ) ) )
 
@@ -1111,6 +1115,8 @@ c..Find NO2->NO2EX Rxn no. if NO2EX included in group
 96100 FORMAT( '      YCP( ', A, ' ) = S1 * L12_INV' / )
 96120 FORMAT( '      YCP( ', A, ' ) = RKI( ', A, ' ) * YCP( ', A, 
      &               ' ) / O1D_S' / )
+96121 FORMAT( '      YCP( ', A, ' ) = ( YC0( ', A,' ) + RKI( ', A, ' ) * YCP( ', A, ' ) * DTC ) ',
+     &       /'     &           / ( 1.0D0 + O1D_S * DTC )' / )
 96130 FORMAT(  'C Steady State Solution ' /
      &         'C     YCP( ', A, ' ) = RKI( ', A, ' ) * YCP( ', A, 
      &               ' ) / EXN_S' / )
