@@ -578,7 +578,10 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       WRITE( WRUNIT, 1083 ) 'TWO_REACT_REACTIONS',   TWO_REACT_REACTIONS
       WRITE( WRUNIT, 1083 ) 'THREE_REACT_REACTIONS', THREE_REACT_REACTIONS
       WRITE( WRUNIT, 1083 ) 'ZERO_REACT_REACTIONS',  ZERO_REACT_REACTIONS
-1083  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: ', A23,' =', I4 )
+1083  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: ', A23,' = ', I4 )
+1084  FORMAT( /6X, 'LOGICAL, PARAMETER', 1X, ':: ', A23,' = .FALSE.' )
+1085  FORMAT( /6X, 'LOGICAL, PARAMETER', 1X, ':: ', A23,' = .TRUE.' )
+
 
 1250  FORMAT( /'!', 1X, 'Reactions are grouped based on number of reactants',
      &        /'!', 1X, 'Following parameters state the starting index for each group')
@@ -586,34 +589,50 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       IRX = 1
       IF ( ONE_REACT_REACTIONS .LT. 1 )THEN
           IRXOUT = IRX - 1
+          WRITE( WRUNIT, 1084 )'UNITARY_REACTIONS'
       ELSE
           IRXOUT = IRX
+          WRITE( WRUNIT, 1085 )'UNITARY_REACTIONS'
       END IF
       WRITE( WRUNIT, 1083 ) 'ONE_REACT_START',   IRXOUT
+      IRXOUT = IRXOUT + ONE_REACT_REACTIONS - 1
+      WRITE( WRUNIT, 1083 ) 'ONE_REACT_STOP ',   IRXOUT
       IRX = ONE_REACT_REACTIONS + IRX
 
       IF ( TWO_REACT_REACTIONS .LT. 1 )THEN
           IRXOUT = IRX - 1
+          WRITE( WRUNIT, 1084 )'BINARY_REACTIONS '
       ELSE
           IRXOUT = IRX
+          WRITE( WRUNIT, 1085 )'BINARY_REACTIONS '
       END IF
       WRITE( WRUNIT, 1083 ) 'TWO_REACT_START',   IRXOUT
+      IRXOUT = IRXOUT + TWO_REACT_REACTIONS - 1
+      WRITE( WRUNIT, 1083 ) 'TWO_REACT_STOP ',   IRXOUT
       IRX = TWO_REACT_REACTIONS + IRX
 
       IF ( THREE_REACT_REACTIONS .LT. 1 )THEN
           IRXOUT = IRX - 1
+          WRITE( WRUNIT, 1084 )'TERNARY_REACTIONS'
       ELSE
           IRXOUT = IRX
+          WRITE( WRUNIT, 1085 )'TERNARY_REACTIONS'
       END IF
       WRITE( WRUNIT, 1083 ) 'THREE_REACT_START', IRXOUT
+      IRXOUT = IRXOUT + THREE_REACT_REACTIONS - 1
+      WRITE( WRUNIT, 1083 ) 'THREE_REACT_STOP ',   IRXOUT
       IRX = THREE_REACT_REACTIONS + IRX
 
       IF ( ZERO_REACT_REACTIONS .LT. 1 )THEN
           IRXOUT = IRX - 1
+          WRITE( WRUNIT, 1084 )'NULL_REACTIONS   '
       ELSE
           IRXOUT = IRX
+          WRITE( WRUNIT, 1085 )'NULL_REACTIONS   '
       END IF
       WRITE( WRUNIT, 1083 ) 'ZERO_REACT_START',  IRXOUT
+      IRXOUT = IRXOUT + ZERO_REACT_REACTIONS - 1
+      WRITE( WRUNIT, 1083 ) 'ZERO_REACT_STOP ',   IRXOUT
       
 !     WRITE( WRUNIT, 1080 ) NSUNLIGHT
 !1080  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: NSUNLIGHT_RXNS =', I4 )
