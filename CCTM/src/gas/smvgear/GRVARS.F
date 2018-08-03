@@ -23,15 +23,17 @@ C $Header: /project/yoj/arc/CCTM/src/gas/smvgear/GRVARS.F,v 1.3 2011/10/21 16:11
 
       MODULE GRVARS
 
-!     USE GRID_CONF, ONLY: BLKSIZE  ! horizontal & vertical domain specifications
       USE GRID_CONF                 ! horizontal & vertical domain specifications
       USE RXNS_DATA, ONLY: LIGHT_DEPENDENT => NSUNLIGHT_RXNS, 
      &                     MXARRAY  => NTERMS_JACOB,
      &                     MXCOUNT1 => NSTEPS_JACOB, 
      &                     MXCOUNT2 => NSTEPS_JACOB
 
-      IMPLICIT NONE
+C Maximum # of terms in [P]=[I]-bh[J]: PARAMETER, MXARRAY
+C Sparse matrix pointer dimension, MXCOUNT1
+C Sparse matrix pointer dimension, MXCOUNT2
 
+      IMPLICIT NONE
 
 C......................................................................
 C  INCLUDE FILE: GRPARMS.EXT
@@ -55,9 +57,6 @@ C 2 * # of chemical mechanisms
       INTEGER, PARAMETER :: NCS2 = 2 * NCS
       INTEGER, PARAMETER :: MXRCT = 3       ! max no. of reactants
 
-C Maximum # of terms in [P]=[I]-bh[J]
-!      INTEGER, PARAMETER :: MXARRAY = NTERMS_JACOB ! 5400
-
 C Maximum # prod/loss terms for a species
       INTEGER, PARAMETER :: MAXGL = 150
 
@@ -69,12 +68,6 @@ C A dimension smaller MAXGL2
 
 C Maximum order possible      
       INTEGER, PARAMETER :: MXORDER = 7
-
-C Sparse matrix pointer dimension     
-!      INTEGER :: MXCOUNT1
-
-C Sparse matrix pointer dimension     
-!      INTEGER :: MXCOUNT2
 
 C Sparse matrix pointer dimension     
       INTEGER :: MXCOUNT3 
@@ -385,9 +378,6 @@ C.....Includes:
             CHARACTER( 96 ) :: MSG = ' '
 
 C-----------------------------------------------------------------------
-
-!            MXCOUNT1 = NSTEPS_JACOB ! NUMB_MECH_SPC * MAXGL3 * 3
-!            MXCOUNT2 = NSTEPS_JACOB ! NUMB_MECH_SPC * MAXGL3 * 3
 
             MXCOUNT3 = NRXNS * 4
             MXCOUNT4 = NRXNS * 5
