@@ -11,37 +11,47 @@ endif
 
 ifeq ($(COMPILER),INTEL)
 
-FC = ifort
-CC = icc
-F_FLAGS = -fixed -132 -O0 -override-limits -check uninit -check bounds -check format -g -traceback -warn nounused -override-limits -fno-alias -mp1  -I . -g
-C_FLAGS =  -O2  -DFLDMN=1
-LINK_FLAGS = 
-
-else
- FC = pgf90
- CC = pgcc
- F_FLAGS = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
- f_FLAGS = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
- C_FLAGS =  -O2  -DFLDMN=1
+ FC = ifort
+ CC = icc
+#f_FLAGS = -fixed -132 -O0 -override-limits -check uninit -check bounds -check format -g -traceback -warn nounused -fno-alias -mp1  -I . -g
+ f_FLAGS   = -fixed -132 -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -mp1  -I . 
+ F_FLAGS   = $(f_FLAGS)
+ f90_FLAGS = -free -132 -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -mp1  -I . 
+ F90_FLAGS = $(f90_FLAGS)
+ C_FLAGS   =  -O2  -DFLDMN=1
  LINK_FLAGS = 
 
- ifeq ($(COMPILER),GFORT)
-   FC    = gfortran
-   CC    = gcc
-   FC    = /share/linux86_64/gcc-4.6.3/bin/gfortran
-   CC    = /share/linux86_64/gcc-4.6.3/bin/gcc
-   f_FLAGS       = -ffixed-form -ffixed-line-length-132 -O0 -funroll-loops -finit-character=32 -fbacktrace -fcheck=all -I. 
-   F_FLAGS       = $(f_FLAGS)
-   f90_FLAGS     = -cpp -ffree-form -ffree-line-length-none -O0 -funroll-loops -finit-character=32 --fbacktrace fcheck=all -I. 
-   F90_FLAGS     = $(f90_FLAGS)
-#  C_FLAGS       = -O2 -DFLDMN -I /share/linux86_64/gcc-4.6.3/include/c++/4.6.3 -I /share/linux86_64/gcc-4.6.3/include/c++/4.6.3/tr1
-   C_FLAGS       = -O2 -DFLDMN -I .
-   LINKER        = $(FC)
-   LINK_FLAGS    = 
- endif
+else ifeq ($(COMPILER),PGF90)
 
+ FC = pgf90
+ CC = pgcc
+ f_FLAGS   = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
+ F_FLAGS   = $(f_FLAGS) 
+ f90_FLAGS = -Mfree -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
+ F90_FLAGS = $(f90_FLAGS)
+ C_FLAGS   =  -O2  -DFLDMN=1
+ LINK_FLAGS = 
+
+else ifeq ($(COMPILER),GFORT)
+
+ FC    = gfortran
+ CC    = gcc
+ f_FLAGS       = -ffixed-form -ffixed-line-length-132 -O0 -funroll-loops -finit-character=32 -fbacktrace -fcheck=all -I. 
+ F_FLAGS       = $(f_FLAGS)
+ f90_FLAGS     = -cpp -ffree-form -ffree-line-length-none -O0 -funroll-loops -finit-character=32 --fbacktrace fcheck=all -I. 
+ F90_FLAGS     = $(f90_FLAGS)
+ C_FLAGS       = -O2 -DFLDMN -I .
+ LINKER        = $(FC)
+ LINK_FLAGS    = 
+
+else
+ ERROR1 = "Makefile not configured to support the specified compiler, $(COMPILER). User must modify Makefile."
 endif
  
+ifdef ERROR1
+ $(error $(ERROR1))
+endif
+
 
 OBJECTS =\
     MECHANISM_PARMS.o \
