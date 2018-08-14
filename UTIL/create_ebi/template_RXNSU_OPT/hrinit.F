@@ -139,15 +139,6 @@ R4   &          PNEG( NUMB_MECH_SPC),
           REVERSE_CONV( N ) = 1.0 / REAL( FORWARD_CONV( N ), 4 )
        END DO
 
-! translate IRR array to EBI solver species
-
-       DO NR = 1, NRXNS
-          DO N = 1, NUMB_MECH_SPC
-             ISPC         = TRANSLATE_IRR_TO_EBI( IRR( NR, N ) ) 
-             IRR( NR, N ) = ISPC
-          END DO
-       END DO
-       
 ! initialize all reaction rates to zero so unused array elements are defined
 
        RXRAT = 0.0D0
@@ -165,4 +156,4 @@ R5     IF ( IOS .NE. 0 ) THEN
 R5        MSG = 'Error allocating YCCELL '
 R5        CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
 R5     END IF
-
+       

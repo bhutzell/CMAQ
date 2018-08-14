@@ -10,6 +10,8 @@ ifeq ($(COMPILER),INTEL)
 FC = ifort
 FPP = $(FC)
 #F_FLAGS    = -fixed -132 -O3 -qoverride-limits -fno-alias -mp1   -I.  -g -CB -CU -traceback
+f_FLAGS    = -fixed -132 -O0 -fno-alias -mp1 -fpe0  -I.  -g -CB -CU -traceback
+f90_FLAGS  = -free -O0 -fno-alias -mp1  -I. -fpe0 -g -CB -CU -traceback
 F_FLAGS    = -fixed -132 -O0 -fno-alias -mp1 -fpe0  -I.  -g -CB -CU -traceback
 F90_FLAGS  = -free -O0 -fno-alias -mp1  -I. -fpe0 -g -CB -CU -traceback
  
@@ -23,21 +25,19 @@ LINK_FLAGS = -i-static
 C_FLAGS    = -O2  -DFLDMN
 LINK_FLAGS = -i-static
 
-endif
-
-ifeq ($(COMPILER),PGF90)
+else ifeq ($(COMPILER),PGF90)
  FC = pgf90
  CC = pgcc
  
 # compiler options for subroutines
-  F_FLAGS = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
+  F_FLAGS   = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
+  f_FLAGS   = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
   F90_FLAGS = -Mfree -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
-   f_FLAGS = -Mfixed -Mextend -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
-    C_FLAGS =  -O2  -DFLDMN=1
-     LINK_FLAGS = -Bstatic  -Bstatic_pgi
-endif
+  f90_FLAGS = -Mfree -Mbounds  -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
+  C_FLAGS   =  -O2  -DFLDMN=1
+  LINK_FLAGS = -Bstatic  -Bstatic_pgi
 
-ifeq ($(COMPILER),GFORT)
+else ifeq ($(COMPILER),GFORT)
    FC    = gfortran
 #  FC    = /usr/local/gcc-4.6/bin/gfortran
    CC    = gcc

@@ -177,6 +177,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          S = EBI_TO_IRR_MAP( N )
          WRITE(IOUT,97015)N, S, TRIM( SOLVER_SPECIES( S )%SPECIES_NAME )
       END DO
+      WRITE(IOUT,97016)
 
 97014 FORMAT('! define map for translating IRR array to solver',
      &      /6X, 'ALLOCATE( TRANSLATE_IRR_TO_EBI( NUMB_MECH_SPC ), STAT = IOS )',
@@ -496,6 +497,13 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 97001 FORMAT( 5X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,'), ')
 97002 FORMAT( 5X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,') /)' /)
 
-          
+97016 FORMAT(/ '! translate IRR array to EBI solver species'
+     &      / 6X, 'DO NR = 1, NRXNS'
+     &      / 9X, 'DO N = 1, NUMB_MECH_SPC'
+     &      /12X, 'ISPC         = TRANSLATE_IRR_TO_EBI( IRR( NR, N ) )'
+     &      /12X, 'IRR( NR, N ) = ISPC'
+     &      / 9X, 'END DO'
+     &      / 6X, 'END DO' / )
+
       END
 
