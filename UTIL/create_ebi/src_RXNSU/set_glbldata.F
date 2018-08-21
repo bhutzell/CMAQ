@@ -65,13 +65,22 @@ C     &                   'O3P'   , 'O1D'     , 'SULF'  /           !radm2
      &                   'BZNO2_O', 'HOCOO'    , 'ALK5RXN',
      &                   'ALKRXN' , 'PAHRO2'   , 'PAHHRXN', 'PAHNRXN' / !  version 5.1 SOA production
 
-C set up SPECIES array
+C set orginal order of mechanism species data
+      ALLOCATE( MECHANISM_SPECIES( NUMB_MECH_SPC ) )
+      DO N = 1, NUMB_MECH_SPC
+         MECHANISM_SPECIES( N )%SPECIES_NAME  = CHEMISTRY_SPC( N )
+         MECHANISM_SPECIES( N )%CGRID_INDEX   = CGRID_INDEX  ( N )
+         MECHANISM_SPECIES( N )%SPECIES_TYPE  = SPECIES_TYPE ( N )
+         MECHANISM_SPECIES( N )%SPECIES_MOLWT = SPECIES_MOLWT( N ) 
+         MECHANISM_SPECIES( N )%CONVERT_CONC  = CONVERT_CONC ( N ) 
+      END DO 
 
+C set up SPECIES array
       N_SPECIES = NUMB_MECH_SPC
       ALLOCATE( SPECIES( N_SPECIES + 1 ) )
       SPECIES = ' '
       DO N = 1, N_SPECIES
-         SPECIES( N ) =  SPECIES_LIST( N )%CHEMISTRY_SPC
+         SPECIES( N ) =  MECHANISM_SPECIES( N )%SPECIES_NAME
       END DO
       
       ALLOCATE( SOLVER_SPECIES( NUMB_MECH_SPC ) )
@@ -310,10 +319,10 @@ C..define remaining empty data in solver_species array
          IND =  NAME_INDEX( SOLVER_SPECIES( N )%SPECIES_NAME, N_SPECIES, SPECIES )
          IF( IND .GT. 0 ) THEN
              EBI_TO_IRR_MAP( IND )             = N
-             SOLVER_SPECIES( N )%CGRID_INDEX   = SPECIES_LIST( IND )%CGRID_INDEX
-             SOLVER_SPECIES( N )%SPECIES_TYPE  = SPECIES_LIST( IND )%SPECIES_TYPE
-             SOLVER_SPECIES( N )%SPECIES_MOLWT = SPECIES_LIST( IND )%SPECIES_MOLWT
-             SOLVER_SPECIES( N )%CONVERT_CONC  = SPECIES_LIST( IND )%CONVERT_CONC
+             SOLVER_SPECIES( N )%CGRID_INDEX   = MECHANISM_SPECIES( IND )%CGRID_INDEX
+             SOLVER_SPECIES( N )%SPECIES_TYPE  = MECHANISM_SPECIES( IND )%SPECIES_TYPE
+             SOLVER_SPECIES( N )%SPECIES_MOLWT = MECHANISM_SPECIES( IND )%SPECIES_MOLWT
+             SOLVER_SPECIES( N )%CONVERT_CONC  = MECHANISM_SPECIES( IND )%CONVERT_CONC
          END IF
       END DO
 

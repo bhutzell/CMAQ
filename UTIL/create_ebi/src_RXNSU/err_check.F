@@ -149,22 +149,22 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( .NOT. LERROR ) THEN
          WRITE( LOGDEV, 93000 ) 
-     &       TRIM( SPECIES_LIST( NO   )%CHEMISTRY_SPC ),  
-     &       TRIM( SPECIES_LIST( NO2  )%CHEMISTRY_SPC ), 
-     &       TRIM( SPECIES_LIST( O3   )%CHEMISTRY_SPC ),  
-     &       TRIM( SPECIES_LIST( O3P  )%CHEMISTRY_SPC ), 
-     &       TRIM( SPECIES_LIST( O1D  )%CHEMISTRY_SPC ), 
-     &       TRIM( SPECIES_LIST( OH   )%CHEMISTRY_SPC ),  
-     &       TRIM( SPECIES_LIST( HO2  )%CHEMISTRY_SPC ), 
-     &       TRIM( SPECIES_LIST( HONO )%CHEMISTRY_SPC ), 
-     &       TRIM( SPECIES_LIST( HNO4 )%CHEMISTRY_SPC ), 
-     &       TRIM( SPECIES_LIST( NO3  )%CHEMISTRY_SPC ),  
-     &       TRIM( SPECIES_LIST( N2O5 )%CHEMISTRY_SPC ), 
-     &       TRIM( SPECIES_LIST( C2O3 )%CHEMISTRY_SPC ), 
-     &       TRIM( SPECIES_LIST( PAN  )%CHEMISTRY_SPC )  
+     &       TRIM( MECHANISM_SPECIES( NO   )%SPECIES_NAME ),  
+     &       TRIM( MECHANISM_SPECIES( NO2  )%SPECIES_NAME ), 
+     &       TRIM( MECHANISM_SPECIES( O3   )%SPECIES_NAME ),  
+     &       TRIM( MECHANISM_SPECIES( O3P  )%SPECIES_NAME ), 
+     &       TRIM( MECHANISM_SPECIES( O1D  )%SPECIES_NAME ), 
+     &       TRIM( MECHANISM_SPECIES( OH   )%SPECIES_NAME ),  
+     &       TRIM( MECHANISM_SPECIES( HO2  )%SPECIES_NAME ), 
+     &       TRIM( MECHANISM_SPECIES( HONO )%SPECIES_NAME ), 
+     &       TRIM( MECHANISM_SPECIES( HNO4 )%SPECIES_NAME ), 
+     &       TRIM( MECHANISM_SPECIES( NO3  )%SPECIES_NAME ),  
+     &       TRIM( MECHANISM_SPECIES( N2O5 )%SPECIES_NAME ), 
+     &       TRIM( MECHANISM_SPECIES( C2O3 )%SPECIES_NAME ), 
+     &       TRIM( MECHANISM_SPECIES( PAN  )%SPECIES_NAME )  
 
          IF( LNO2EX_CYCLE ) WRITE( LOGDEV, 93010 ) 
-     &       TRIM( SPECIES_LIST( NO2EX )%CHEMISTRY_SPC )
+     &       TRIM( MECHANISM_SPECIES( NO2EX )%SPECIES_NAME )
       END IF
 
 
@@ -438,9 +438,9 @@ c..Check that all NO2EX loss reactions are psuedo-first order
             CALL SUM_COEFF( RXN_LOSS, 'R', N, M )
             CALL SUM_COEFF( RXN_PROD, 'P', N, M )
             IF( RXN_LOSS + RXN_PROD .GE. 0.0D0 )CYCLE
-            IF( LPAR_NEG .AND. TRIM( CHEMISTRY_SPC( N ) ) .EQ. 'PAR' )CYCLE
+            IF( LPAR_NEG .AND. TRIM( MECHANISM_SPECIES( N )%SPECIES_NAME ) .EQ. 'PAR' )CYCLE
             LERROR = .TRUE.
-            IF( .NOT. LPAR_NEG .AND. TRIM( CHEMISTRY_SPC( N ) ) .EQ. 'PAR' )THEN
+            IF( .NOT. LPAR_NEG .AND. TRIM( MECHANISM_SPECIES( N )%SPECIES_NAME ) .EQ. 'PAR' )THEN
                WRITE( RNUM, '(I5)') N
                MSG = '     ERROR: REACTION ' // TRIM( RXLABEL( M ) )
      &            // ' has negative net yield for PAR but PAR_NEG_FLAG set to false. '
@@ -449,7 +449,7 @@ c..Check that all NO2EX loss reactions are psuedo-first order
                CYCLE               
             END IF
             MSG =  '     ERROR: REACTION ' // TRIM( RXLABEL( M ) )
-     &          // ' has negative net yield for ' // TRIM( CHEMISTRY_SPC( N ) )  
+     &          // ' has negative net yield for ' // TRIM( MECHANISM_SPECIES( N )%SPECIES_NAME )  
      &          // '. Not Permitted.'
             WRITE(LOGDEV,92000)TRIM( MSG )
          END DO

@@ -80,6 +80,7 @@ c..complete list of species in AE, AQ, & gas-phase mechanisms
          LOGICAL         :: SOLVE         = .FALSE.
       END TYPE EBI_MEMBERS 
 
+      TYPE( EBI_MEMBERS ), ALLOCATABLE :: MECHANISM_SPECIES( : )
       TYPE( EBI_MEMBERS ), ALLOCATABLE :: SOLVER_SPECIES( : )
       INTEGER,             ALLOCATABLE :: EBI_TO_IRR_MAP( : )
       

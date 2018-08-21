@@ -72,9 +72,8 @@ R5    INTEGER, SAVE ::   MODEL_SPECIES ! No. of species in CGRID
       REAL( 8 )    EBI_TMSTEP          ! Time step for EBI loops (min)
 
 c...Allocatable arrays
-      INTEGER, ALLOCATABLE :: EBISP( : )         ! Index of EBI species
-      INTEGER, ALLOCATABLE :: SSASP( : )         ! Index of ss species
-      INTEGER, ALLOCATABLE :: ACTSP( : )         ! Index of active species
+!     INTEGER, ALLOCATABLE :: SSASP( : )         ! Index of ss species
+!     INTEGER, ALLOCATABLE :: ACTSP( : )         ! Index of active species
       INTEGER, ALLOCATABLE :: IOLD2NEW( :,: )    ! YC species map, used if NSPECIAL > 0
 
       REAL( 8 ), ALLOCATABLE ::  RKI(  : )     ! Rate constants 

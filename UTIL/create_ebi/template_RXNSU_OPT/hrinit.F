@@ -67,6 +67,14 @@ C.....LOCAL VARIABLES:
       INTEGER N, NR, ISPC     ! Loop index
       INTEGER IOS             ! Allocate error status
 
+      TYPE ELEMENT
+         CHARACTER( 16 ) :: CHEMISTRY_SPC
+         INTEGER         :: CGRID_INDEX
+         CHARACTER(  2 ) :: SPECIES_TYPE
+         REAL( 8 )       :: SPECIES_MOLWT
+         LOGICAL         :: CONVERT_CONC
+      END TYPE ELEMENT
+
 R6
 C***********************************************************************
 
@@ -125,9 +133,12 @@ R4   &          PNEG( NUMB_MECH_SPC),
 
 ! reset order RXNS data of species arrays and types for EBI solver before mapping
        DO N = 1, NUMB_MECH_SPC
-          SPECIES_LIST( N ) = EBI_SPECIES_LIST( N )
+          CHEMISTRY_SPC( N ) = EBI_SPECIES_LIST( N )%CHEMISTRY_SPC
+          CGRID_INDEX  ( N ) = EBI_SPECIES_LIST( N )%CGRID_INDEX
+          SPECIES_TYPE ( N ) = EBI_SPECIES_LIST( N )%SPECIES_TYPE
+          SPECIES_MOLWT( N ) = EBI_SPECIES_LIST( N )%SPECIES_MOLWT
+          CONVERT_CONC ( N ) = EBI_SPECIES_LIST( N )%CONVERT_CONC
        END DO
-
 
        IF( .NOT. MAP_CHEMISTRY_SPECIES() )THEN
           MSG = 'Detected above error(s) when mapping Chemistry species from CGRID species'

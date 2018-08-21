@@ -226,30 +226,30 @@ c..create indices for all mechanism species
          IF( N_SS_SPC .EQ. 0 ) THEN    !  no ss species in mech
 
 c..form ebi species array (all species except those in groups 1-4) 
-            WRITE( IOUT, 93140 ) N_GC_EBI
+            WRITE( IOUT, 93141 ) N_GC_EBI
 
-            IND = 0
-            DO N = 1, N_SPECIES
-               IF( SOLVER_SPECIES( N )%SOLVE ) THEN
-                  IND = IND + 1
-                  WRITE( IOUT, 93160 ) IND, SOLVER_SPECIES( N )%SPECIES_NAME
-     &                 ( 1 : LEN_TRIM( SOLVER_SPECIES( N )%SPECIES_NAME ) )
-               END IF
-            END DO
+!           IND = 0
+!           DO N = 1, N_SPECIES
+!              IF( SOLVER_SPECIES( N )%SOLVE ) THEN
+!                 IND = IND + 1
+!                 WRITE( IOUT, 93160 ) IND, SOLVER_SPECIES( N )%SPECIES_NAME
+!    &                 ( 1 : LEN_TRIM( SOLVER_SPECIES( N )%SPECIES_NAME ) )
+!              END IF
+!           END DO
 
          ELSE                          ! some species in mech are in ss
 
 c..form ebi species array ( no SS species, no group species )
-            WRITE( IOUT, 93140 ) ( N_GC_EBI - N_SS_SPC )
-            IND = 0
-            DO N = 1, N_SPECIES
-               IF( NAME_INDEX( SOLVER_SPECIES( N )%SPECIES_NAME, N_SS_SPC, SS_SPC) .EQ. 0 .AND.
-     &             SOLVER_SPECIES( N )%SOLVE ) THEN  
-                   IND = IND + 1
-                   WRITE( IOUT, 93160 ) IND, SOLVER_SPECIES( N )%SPECIES_NAME
-     &                  ( 1 : LEN_TRIM( SOLVER_SPECIES( N )%SPECIES_NAME ) )
-               END IF
-            END DO  
+            WRITE( IOUT, 93141 ) ( N_GC_EBI - N_SS_SPC )
+!           IND = 0
+!           DO N = 1, N_SPECIES
+!              IF( NAME_INDEX( SOLVER_SPECIES( N )%SPECIES_NAME, N_SS_SPC, SS_SPC) .EQ. 0 .AND.
+!    &             SOLVER_SPECIES( N )%SOLVE ) THEN  
+!                  IND = IND + 1
+!                  WRITE( IOUT, 93160 ) IND, SOLVER_SPECIES( N )%SPECIES_NAME
+!    &                  ( 1 : LEN_TRIM( SOLVER_SPECIES( N )%SPECIES_NAME ) )
+!              END IF
+!           END DO  
 
 c..form ss species array  
             WRITE( IOUT, 93180 )        
@@ -319,30 +319,30 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
             END DO
 
-            IF( S .EQ. 1 ) WRITE( IOUT, 94200 ) N_GC_ONLY_EBI
-            IF( S .EQ. 2 ) WRITE( IOUT, 94200 ) N_GC_AE_EBI
-            IF( S .EQ. 3 ) WRITE( IOUT, 94200 ) N_GC_AQ_EBI
-            IF( S .EQ. 4 ) WRITE( IOUT, 94200 ) N_GC_EBI
+            IF( S .EQ. 1 ) WRITE( IOUT, 94201 ) N_GC_ONLY_EBI
+            IF( S .EQ. 2 ) WRITE( IOUT, 94201 ) N_GC_AE_EBI
+            IF( S .EQ. 3 ) WRITE( IOUT, 94201 ) N_GC_AQ_EBI
+            IF( S .EQ. 4 ) WRITE( IOUT, 94201 ) N_GC_EBI
 
             IND = 0
-            DO N = 1, NSPEC
+!           DO N = 1, NSPEC
 
-               IF( S .EQ. 1 ) LFLAG = L_GC_ONLY_EBI( N )
-               IF( S .EQ. 2 ) LFLAG = L_GC_AE_EBI( N )
-               IF( S .EQ. 3 ) LFLAG = L_GC_AQ_EBI( N )
-               IF( S .EQ. 4 ) LFLAG = SOLVER_SPECIES( N )%SOLVE
+!              IF( S .EQ. 1 ) LFLAG = L_GC_ONLY_EBI( N )
+!              IF( S .EQ. 2 ) LFLAG = L_GC_AE_EBI( N )
+!              IF( S .EQ. 3 ) LFLAG = L_GC_AQ_EBI( N )
+!              IF( S .EQ. 4 ) LFLAG = SOLVER_SPECIES( N )%SOLVE
 
-               IF( S .EQ. 1 ) SPEC = GC_ONLY_SPC( N )
-               IF( S .EQ. 2 ) SPEC = GC_AE_SPC( N )
-               IF( S .EQ. 3 ) SPEC = GC_AQ_SPC( N )
-               IF( S .EQ. 4 ) SPEC = SOLVER_SPECIES( N )%SPECIES_NAME
+!              IF( S .EQ. 1 ) SPEC = GC_ONLY_SPC( N )
+!              IF( S .EQ. 2 ) SPEC = GC_AE_SPC( N )
+!              IF( S .EQ. 3 ) SPEC = GC_AQ_SPC( N )
+!              IF( S .EQ. 4 ) SPEC = SOLVER_SPECIES( N )%SPECIES_NAME
 
-               IF( LFLAG ) THEN
-                  IND = IND + 1
-                  WRITE( IOUT, 94220 ) IND, SPEC( 1 : LEN_TRIM( SPEC ) )
-               END IF
+!              IF( LFLAG ) THEN
+!                 IND = IND + 1
+!                 WRITE( IOUT, 94220 ) IND, SPEC( 1 : LEN_TRIM( SPEC ) )
+!              END IF
 
-            END DO
+!           END DO
 
             WRITE( IOUT, 94240 ) 
 
@@ -431,7 +431,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 93020 FORMAT( 'C  REVISION HISTORY: Created by EBI solver program, ', A )
 93025 FORMAT( 6X, 'N_SPCL_RKS = ', I3 )
 
-93040 FORMAT( 5X, '&          PNEG( N_SPEC),' )
+93040 FORMAT( 5X, '&          PNEG( NUMB_MECH_SPC ),' )
 
 93045 FORMAT( 6X, 'ALLOCATE( RKI_SAV( MAX_CELLS_EBI, NRXNS ) )' )
 
@@ -449,6 +449,8 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
      &         6X, "   MSG = 'Error allocating EBISP' "  /
      &         6X, '   CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )' /
      &         6X, 'END IF' /  )
+93141 FORMAT( /'c..Define ebi species' /
+     &         /6X, 'N_EBISP  = ', I3 / )
 
 93160 FORMAT(  6X, 'EBISP( ', I3, ' ) = ', A )
 
@@ -479,6 +481,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
      &         9X, "   MSG = 'Error allocating EBISP' "  /
      &         9X, '   CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )' /
      &         9x, 'END IF'  )
+94201 FORMAT( /9X, 'N_EBISP  = ', I3 / )
 94220 FORMAT(  9X, 'EBISP( ', I3, ' ) = ', A )
 94240 FORMAT( /6X, 'END IF' )
 
@@ -493,9 +496,9 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
      &        //6X, 'RETURN' // 6X, 'END' )
 
 97000 FORMAT( 'C...Define type array used to reset order in SPECIES_LIST '
-     &      / 6X, 'TYPE( MEMBER ) ::  EBI_SPECIES_LIST( NUMB_MECH_SPC ) = (/ ')
-97001 FORMAT( 5X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,'), ')
-97002 FORMAT( 5X, '& MEMBER("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,') /)' /)
+     &      / 6X, 'TYPE( ELEMENT ) ::  EBI_SPECIES_LIST( NUMB_MECH_SPC ) = (/ ')
+97001 FORMAT( 5X, '& ELEMENT("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,'), ')
+97002 FORMAT( 5X, '& ELEMENT("', A16, '", ', I4,', "', A2, '"', ', ', F7.2,', ', L1,') /)' /)
 
 97016 FORMAT(/ '! translate IRR array to EBI solver species'
      &      / 6X, 'DO NR = 1, NRXNS'

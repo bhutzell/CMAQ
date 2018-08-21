@@ -73,7 +73,7 @@ C**********************************************************************
       END DO
 
 c reset values of CHEMISTRY_SPC array in rxns_dta_mod
-      CHEMISTRY_SPC( : ) = SPECIES_LIST( : )%CHEMISTRY_SPC
+      CHEMISTRY_SPC( : ) = MECHANISM_SPECIES( : )%SPECIES_NAME
              
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Open ouput file and code template 
