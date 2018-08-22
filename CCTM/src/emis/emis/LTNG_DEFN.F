@@ -55,6 +55,8 @@
 !C                       * called SUBHFILE only once to improve code efficiency
 !C  13 Jun 2018 D. Kang: Changes to accommodate the twoway WRF-CMAQ coupled model 
 !C                       with/without data passing (lightning assimilation and NO emissions)
+!C    21 Aug 2018 D. Wong: Used GRID_CRO_2D rather than MET_CRO_3D in calling SUBHFILE
+!C                         to provide robust implementation in WINDOWing scenario
 !C----------------------------------------------------------------------
       USE EMIS_VARS
 
@@ -121,7 +123,7 @@
       INTEGER,              SAVE :: LT_ASM_DT    !Lightning assimilation input time step
 
       INTEGER,              SAVE :: GXOFF, GYOFF   ! global origin offset from file
-      INTEGER,              SAVE :: STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3
+      INTEGER,              SAVE :: STRTCOLGC2, ENDCOLGC2, STRTROWGC2, ENDROWGC2
 
       INTEGER                    :: LT_TSTEP
 
@@ -223,7 +225,7 @@
 #else
             MNAME = PROMPTMFILE(
      &              'Enter name for gridded met input file',
-     &              FSREAD3, 'MET_CRO_3D', PNAME )
+     &              FSREAD3, 'GRID_CRO_2D', PNAME )
 #endif
 
 !C Read description of domain (there may be a better way to get this info)
@@ -239,7 +241,7 @@
 
 !C Get domain window info for met_cro_3d file
             CALL SUBHFILE ( MNAME, GXOFF, GYOFF,
-     &              STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )
+     &                      STRTCOLGC2, ENDCOLGC2, STRTROWGC2, ENDROWGC2 )
 
          VARDESC = 'Flag for lightning NO production rate'
          MOLSNCG = ENVREAL( 'MOLSNCG', VARDESC, 350.0, STATUS )
@@ -366,46 +368,46 @@
 !C read in the ocean mask and parameter file if needed, if NLDN strike
 !C is used, only the OCEAN MASK values are needed, the rest will be ignored          
                IF ( .NOT. XTRACT3( ONAME, "OCNMASK", 1, 1,  
-     &                             STRTROWMC3,ENDROWMC3,STRTCOLMC3,ENDCOLMC3,
+     &                             STRTROWGC2,ENDROWGC2,STRTCOLGC2,ENDCOLGC2,
      &                             JDATE, JTIME, OCEAN_MASK ) ) THEN
                   XMSG = 'Could not read OCNMASK from' // TRIM( ONAME ) // '"'
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
 
                IF ( .NOT. XTRACT3( ONAME, "SLOPE", 1, 1,
-     &                             STRTROWMC3,ENDROWMC3,STRTCOLMC3,ENDCOLMC3, 
+     &                             STRTROWGC2,ENDROWGC2,STRTCOLGC2,ENDCOLGC2, 
      &                             JDATE, JTIME, SLOPE ) ) THEN
                   XMSG = 'Could not read SLOPE from' // TRIM( ONAME ) // '"'
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
                IF ( .NOT. XTRACT3( ONAME, "INTERCEPT", 1, 1, 
-     &                             STRTROWMC3,ENDROWMC3,STRTCOLMC3,ENDCOLMC3,
+     &                             STRTROWGC2,ENDROWGC2,STRTCOLGC2,ENDCOLGC2,
      &                             JDATE, JTIME, INTERCEPT ) ) THEN
                   XMSG = 'Could not read INTERCEPT from' // TRIM( ONAME) // '"'
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
                IF ( .NOT. XTRACT3( ONAME, "SLOPE_lg", 1, 1,
-     &                             STRTROWMC3,ENDROWMC3,STRTCOLMC3,ENDCOLMC3,
+     &                             STRTROWGC2,ENDROWGC2,STRTCOLGC2,ENDCOLGC2,
      &                             JDATE, JTIME, SLOPE_lg ) ) THEN
                   XMSG = 'Could not read SLOPE_lg from' // TRIM( ONAME ) // '"'
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
                IF ( .NOT. XTRACT3( ONAME, "INTERCEPT_lg", 1, 1,
-     &                             STRTROWMC3,ENDROWMC3,STRTCOLMC3,ENDCOLMC3,
+     &                             STRTROWGC2,ENDROWGC2,STRTCOLGC2,ENDCOLGC2,
      &                             JDATE, JTIME, INTERCEPT_lg ) ) THEN
                   XMSG = 'Could not read INTERCEPT_lg from' // TRIM( ONAME ) // '"'
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
                IF ( CJDATE .GT. 90 .AND. CJDATE .LT. 274 ) THEN
                   IF ( .NOT. XTRACT3( ONAME, "ICCG_SUM", 1, 1,
-     &                                STRTROWMC3,ENDROWMC3,STRTCOLMC3,ENDCOLMC3,
+     &                                STRTROWGC2,ENDROWGC2,STRTCOLGC2,ENDCOLGC2,
      &                             JDATE, JTIME, ICCG ) ) THEN
                      XMSG = 'Could not read ICCG from' // TRIM( ONAME ) // '"'
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                   END IF
                ELSE
                   IF ( .NOT. XTRACT3( ONAME, "ICCG_WIN", 1, 1,
-     &                                STRTROWMC3,ENDROWMC3,STRTCOLMC3,ENDCOLMC3,
+     &                                STRTROWGC2,ENDROWGC2,STRTCOLGC2,ENDCOLGC2,
      &                             JDATE, JTIME, ICCG ) ) THEN
                      XMSG = 'Could not read ICCG from' // TRIM( ONAME ) // '"'
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -662,14 +664,14 @@ C statement function for ERF approximation
             IF ( R_READY ) THEN
                IF ( .NOT. NLDN_FILE ) THEN
                  IF ( .NOT. XTRACT3( RNAME, RC_NAME, 1, 1,
-     &                       STRTROWMC3,ENDROWMC3,STRTCOLMC3,ENDCOLMC3,
+     &                       STRTROWGC2,ENDROWGC2,STRTCOLGC2,ENDCOLGC2,
      &                       LDATE, LTIME, LTNG_RC) ) THEN
                      XMSG = 'Could not extract LTNG_RC from ' // TRIM(RNAME)
                      CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
                  END IF
                END IF
                IF ( .NOT. XTRACT3( RNAME, 'PRSFC', 1, 1,
-     &                       STRTROWMC3,ENDROWMC3,STRTCOLMC3,ENDCOLMC3,
+     &                       STRTROWGC2,ENDROWGC2,STRTCOLGC2,ENDCOLGC2,
      &                       LDATE, LTIME, LTNG_PRSFC ) ) THEN
                      XMSG = 'Could not extract PRSFC from ' // TRIM(RNAME)
                      WRITE( LOGDEV,'(5X,A,I7.7,1X,I6.6)')'For ',
@@ -685,7 +687,7 @@ C statement function for ERF approximation
             IF( R_READY ) THEN
                IF ( NLDN_FILE ) THEN
                   IF ( .NOT. XTRACT3( ANAME, "NLDNstrk", 1, 1,
-     &                          STRTROWMC3,ENDROWMC3,STRTCOLMC3,ENDCOLMC3, 
+     &                          STRTROWGC2,ENDROWGC2,STRTCOLGC2,ENDCOLGC2, 
      &                             LDATE, LTIME, NLDN_STRIKE ) ) THEN
                         XMSG = 'Could not read NLDN_STRIKE from' // TRIM( ANAME )
                         CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
@@ -868,7 +870,7 @@ C statement function for ERF approximation
             BUFF = 0.0
 
             IF ( .NOT. INTERPX( LNAME, LTSPC, PNAME,
-     &                          STRTCOLMC3,ENDCOLMC3, STRTROWMC3,ENDROWMC3, 1,LTLYRS,
+     &                          STRTCOLGC2,ENDCOLGC2, STRTROWGC2,ENDROWGC2, 1,LTLYRS,
      &                          JDATE, JTIME, BUFF ) ) THEN
                XMSG = 'Could not read NO' //
      &                ' from file "' // TRIM( LNAME ) // '"'
