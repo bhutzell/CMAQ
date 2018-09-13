@@ -237,9 +237,9 @@ c  the end position.
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       DO JNEW = 1, ISCHANG( NCS )
 c  uncomment the following three lines to turn off ordering
-!         INEW2OLD( JNEW, NCS ) = JNEW
-!         IOLD2NEW( JNEW, NCS ) = JNEW
-!         IF( JNEW .NE. 0 ) GO TO 180
+         INEW2OLD( JNEW, NCS ) = JNEW
+         IOLD2NEW( JNEW, NCS ) = JNEW
+         IF( IOLD2NEW( JNEW, NCS ) .EQ. IOLD2NEW( JNEW, NCS ) )CYCLE
 c  uncomment the above three lines to turn off ordering
          JOLD = INEW2OLD( JNEW, NCS )
          MINVALU = ISAPORL( JOLD )
@@ -269,13 +269,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       NUSERAT = 0
       DO NRX = 1, NRXNS
          DO NR = 1, NREACT( NRX )
-            IREACT = IRR( NRX, NR )
-            IRM2( NRX, NR, NCS ) = IOLD2NEW( IREACT,NCS ) 
+            IRM2( NRX, NR, NCS ) = IRR( NRX, NR )
          ENDDO
 
          DO NP = 1, NPRDCT( NRX )
-            IPROD = IRR( NRX, NP + 3 )
-            IRM2( NRX, NP+3, NCS ) = IOLD2NEW( IPROD, NCS )
+            IRM2( NRX, NP+3, NCS ) = IRR( NRX, NP + 3 )
          ENDDO
          
          IF( NREACT( NRX ) .GT. 0 ) THEN

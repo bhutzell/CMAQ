@@ -81,6 +81,8 @@ C Maximum # of reactant PD terms
 C Maximum # of product PD terms
       INTEGER :: MXRP 
 
+C First Active Reaction between day and night mechanisms
+      INTEGER, PARAMETER :: NRXNS_START( NCS2 ) = (/ 1, LIGHT_DEPENDENT+1 /)
       
 C............................ end GRPARMS.EXT .........................
 
@@ -322,7 +324,7 @@ C......................................................................
 
 
       REAL( 8 ), ALLOCATABLE, SAVE :: FORWARD_CONV( : )  ! CGRID to CHEM Species conversion factor 
-      REAL( 8 ), ALLOCATABLE, SAVE :: REVERSE_CONV( : )  ! CHEM to CGRID Species conversion factor
+      REAL,      ALLOCATABLE, SAVE :: REVERSE_CONV( : )  ! CHEM to CGRID Species conversion factor
 
 C........................... end GRVARS3.EXT ..........................
 
@@ -493,8 +495,8 @@ c..cell & solver data
           END IF
 
           DO N = 1, NUMB_MECH_SPC
-             FORWARD_CONV( N ) = 1.0D-3 * MWAIR / SPECIES_MOLWT( N )
-             REVERSE_CONV( N ) = 1.0D+3 / MWAIR * SPECIES_MOLWT( N )
+             FORWARD_CONV( N ) = 1.0D-3 * REAL( MWAIR,8 ) / SPECIES_MOLWT( N )
+             REVERSE_CONV( N ) = 1.0E+3 / MWAIR * REAL( SPECIES_MOLWT( N ) )
           END DO
 
           ALLOCATE( NKUSERAT( NRXNS,NCS2 ),

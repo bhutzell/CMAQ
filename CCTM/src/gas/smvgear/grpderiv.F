@@ -158,8 +158,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Loop over reaction rates adding partial derivative terms; EXPLIC
 c  holds the PD terms according to number of reactants
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      DO 240 NRX = 1, NUSERAT( NCSP )
-         NRK = NKUSERAT( NRX, NCSP )
+      DO 240 NRK = NRXNS_START( NCSP ), NRXNS
+!         NRK = NKUSERAT( NRX, NCSP )
          
 c...partial derivative term for reactions with 1 reactant
          IF( NREACT( NRK ) .EQ. 1 ) THEN

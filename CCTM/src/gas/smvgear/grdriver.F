@@ -112,7 +112,8 @@ C Integer zero
       INTEGER, PARAMETER :: IZERO = 0
 
 C Conc. of M = 1E+06 ppm 
-      REAL, PARAMETER :: CONCOFM = 1.0E+06
+      REAL, PARAMETER :: CONCOFM    = 1.0E+06
+      REAL, PARAMETER :: CGRID_MIN  = 1.0E-30
 
 C Pascal to atm conversion factor
       REAL, PARAMETER :: PA2ATM = 1.0 / STDATMPA
@@ -124,7 +125,6 @@ C..EXTERNAL FUNCTIONS:
 
 C..SAVED LOCAL VARIABLES:
       LOGICAL, SAVE :: LFIRST = .TRUE. ! Flag for first call to this subroutine
-      LOGICAL, SAVE :: EMISVD = .TRUE. ! emission rates in vertical diffusion 
 
       INTEGER, SAVE :: IRUNC     ! Counter of calls to this subroutine
       INTEGER, SAVE :: LOGDEV    ! Unit number of output log
@@ -285,7 +285,6 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          MAOMV =  MWAIR / MWWAT
          
 C...Initialize and report data
-         EMBLK = 0.0
 
          WRITE( LOGDEV, 92020 ) NOXYZ, BLKSIZE, NBLKS, BLKLEN( 1 ), 
      &                          BLKLEN( NBLKS )
@@ -504,7 +503,6 @@ C  Put the grid cell physical data in the block arrays, converting
 C  pressure to atmospheres, water vapor to ppm, emissions to ppm/min,
 C  setting to land if seaice coverage is nonzero  
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-         IF ( .NOT. EMISVD )EMBLK = 0.0
 
          DO NCELL = 1, NUMCELLS
             CELLNUM = NORDCELL( OFFSET + NCELL )
@@ -528,19 +526,18 @@ C  Put the grid cell concentrations in the block arrays
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          DO ISP = 1, ISCHANG( NCS )
             SPC    = CGRID_INDEX( ISP )
-            ISPNEW = IOLD2NEW( ISP, NCS )
             DO NCELL = 1, NUMCELLS
                CELLNUM = NORDCELL( OFFSET + NCELL )
                COL = CCOL( CELLNUM )
                ROW = CROW( CELLNUM )
                LEV = CLEV( CELLNUM )
+               CNEW( NCELL,ISP ) = REAL( CONC( COL,ROW,LEV,SPC ), 8 )
                IF( CONVERT_CONC( ISP ) )THEN 
-                   CNEW( NCELL,ISPNEW )  = REAL( MAX( FORWARD_CONV( ISP ) * BLKSVOL( NCELL )
-     &                                   *       CONC( COL,ROW,LEV,SPC ), CONCMIN), 8 )
-               ELSE
-                   CNEW( NCELL,ISPNEW ) = REAL( MAX( CONC( COL,ROW,LEV,SPC ), CONCMIN), 8 )
+                   CNEW( NCELL,ISP )  = FORWARD_CONV( ISP ) * BLKSVOL( NCELL )
+     &                                * CNEW( NCELL,ISP )
                END IF
-               BLKCONC( NCELL, ISP ) = CNEW( NCELL,ISPNEW )
+               CNEW( NCELL,ISP ) = MAX( CNEW( NCELL,ISP ), CONCMIN )
+               BLKCONC( NCELL, ISP ) = CNEW( NCELL,ISP )
             ENDDO                 
          ENDDO
 
@@ -563,23 +560,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             END DO
          ENDDO
          
-!        CALL CALCKS( NPHOTAB, RJBLK )
          CALL CALC_RCONST( BLKTEMP, BLKPRES, BLKCH2O, RJBLK, BLKHET, LSUNLIGHT, BLKLAND, RK, NUMCELLS )
 
-!         DO NCELL = 1, NUMCELLS
-!            CELLNUM = NORDCELL( OFFSET + NCELL )
-!            COL = CCOL( CELLNUM )   ! wrong order
-!            ROW = CROW( CELLNUM )
-!            LEV = CLEV( CELLNUM )
-!            IF( LEV .EQ. INT(NLAYS/2)+1.AND. ROW .EQ. INT(MY_NROWS/2)+1 .AND. COL .EQ. INT(MY_NCOLS/2)+1 )THEN
-!                WRITE(LOGDEV,'(A,ES12.4)')'TEMP = ',BLKTEMP( NCELL ) 
-!                WRITE(LOGDEV,'(A,ES12.4)')'PRES = ',BLKPRES( NCELL ) 
-!                WRITE(LOGDEV,'(A,ES12.4)')'VH2O = ',BLKCH2O( NCELL )
-!                DO NPH = 1, NRXNS
-!                   WRITE(LOGDEV,'(A4,A16,A3,ES12.4)')'RXN:',RXLABEL(NPH),' = ',RK(NCELL, NPH)
-!                END DO
-!             END IF
-!         END DO
 
          IF ( LSUNLIGHT ) THEN
             HMAX = HMAXDAY( NCS )
@@ -791,34 +773,23 @@ C..debug output
 
 C..Update concentrations
            DO ISP = 1, ISCHANG( NCS )
-               ISPOLD = INEW2OLD( ISP, NCS )
-               SPC    = CGRID_INDEX( ISPOLD )
+               SPC = CGRID_INDEX( ISP )
                DO NCELL = 1, NUMCELLS
                   CELLNUM = NORDCELL( OFFSET + NCELL )
                   ROW = CROW( CELLNUM )
                   COL = CCOL( CELLNUM )
                   LEV = CLEV( CELLNUM )
-                  IF( CONVERT_CONC( ISPOLD ) )THEN 
-                     CONC( COL,ROW,LEV,SPC ) = REAL( REVERSE_CONV( ISPOLD ) 
-     &                                       *       BLKDENS( NCELL ) * CNEW( NCELL,ISP ), 4)
-
-                  ELSE
-                     CONC( COL,ROW,LEV,SPC ) = REAL( CNEW( NCELL,ISP ), 4)
-                  ENDIF
-               ENDDO
-            ENDDO
+                  CONC( COL,ROW,LEV,SPC ) = REAL( CNEW( NCELL,ISP ), 4)
+                  IF( CONVERT_CONC( ISP ) )THEN 
+                     CONC( COL,ROW,LEV,SPC ) = REVERSE_CONV( ISP ) 
+     &                                       * BLKDENS( NCELL ) * CONC( COL,ROW,LEV,SPC )
+                  END IF
+                  CONC( COL,ROW,LEV,SPC ) = MAX( CONC( COL,ROW,LEV,SPC ), CGRID_MIN )
+               END DO
+            END DO
 
 
             IF ( CALL_DEG ) THEN
-
-C  Update degradation array with species treated by Rosenbach solver
-C
-C               DO ISP = 1, ISCHANG( NCS )
-C                  ISPOLD  = INEW2OLD( ISP, NCS )
-C                  DO NCELL = 1, NUMCELLS
-C                     Y_DEGRADE( NCELL,ISPOLD ) = Y( NCELL,ISP )
-C                  END DO
-C               END DO
 
 
 C  Update CGRID based on the degradation routines
@@ -867,11 +838,6 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IF ( IRVAL.EQ.1 ) THEN
                ERRMX2( IRVAL ) = VALLOW
                NORDCELL( IRVAL ) = JREORD
-!              if ( bingo2 ) then
-!                 bingo1 = .true.
-!                 bingo2 = .false.
-!                 write( *,* ) 'grdriver-mype,heapsort,LORDERING: ', mype, lordering
-!              end if
                GO TO 100
             ENDIF
          ENDIF

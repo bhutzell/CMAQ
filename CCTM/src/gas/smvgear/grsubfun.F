@@ -95,15 +95,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       NSUBFUN = NSUBFUN + 1
       DO ISP = 1, ISCHAN
          DO NCELL = 1, NUMCELLS
-            GLOSS( NCELL, ISP ) = EMBLK( NCELL, ISP )
+            GLOSS( NCELL, ISP ) = 0.0D0 ! EMBLK( NCELL, ISP )
          ENDDO
       ENDDO
    
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  loop over reactions and calculate rate of reaction 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      DO 220 NRX = 1, NUSERAT( NCSP )
-        NRK = NKUSERAT( NRX, NCSP )
+      DO 220 NRK = 1, NUSERAT( NCSP )
+!        NRK = NKUSERAT( NRX, NCSP )
         IF( NREACT( NRK ) .EQ. 1 ) THEN
             ISP1 = IRM2( NRK, 1, NCS )
             DO NCELL = 1, NUMCELLS
