@@ -350,8 +350,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ENDDO
             WRITE( IUNDBG, 93040 ) IRUN, NSTEPS + 1, NSUBFUN
             DO ISPNEW = 1, ISCHAN
-               ISPOLD = INEW2OLD( ISPNEW, NCS )
-               WRITE( IUNDBG, 93060 ) ISPNEW, CHEMISTRY_SPC( ISPOLD ), 
+               WRITE( IUNDBG, 93060 ) ISPNEW, CHEMISTRY_SPC( ISPNEW ), 
      &                                CNEW( ICPR, ISPNEW )
             ENDDO
             WRITE( IUNDBG, 93080 ) ISCHAN + 1, CONCOFM
@@ -360,8 +359,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             WRITE( IUNDBG, 93140 ) ISCHAN + 4, BLKCH2O( ICPR )
             WRITE( IUNDBG, 93160 ) IRUN, NSTEPS+1, NSUBFUN
             DO ISPNEW = 1, ISCHAN
-               ISPOLD = INEW2OLD( ISPNEW, NCS )
-               WRITE( IUNDBG, 93180 ) ISPNEW, CHEMISTRY_SPC( ISPOLD ),
+               WRITE( IUNDBG, 93180 ) ISPNEW, CHEMISTRY_SPC( ISPNEW ),
      &                                GLOSS( ICPR, ISPNEW )
             ENDDO
          ENDIF
@@ -451,8 +449,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF( CALL_DEG ) THEN   !:WTH Initialize for degradation routines
          YNEW_DEGRADE = 0.0D0
          DO I = 1, ISCHAN
-            ISPOLD = INEW2OLD( I,NCS )
-            SPC    = CGRID_INDEX( ISPOLD )
+            SPC    = CGRID_INDEX( I )
             DO NCELL = 1, NUMCELLS
                YNEW_DEGRADE( NCELL,SPC ) = BLKCONC( NCELL, I )
             END DO
@@ -517,11 +514,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF( NSTEPS + 1 .EQ. NSTEPOUT ) THEN
             WRITE( IUNDBG, 93280 ) 
             DO ISPNEW = 1, ISCHAN
-               ISPOLD = INEW2OLD( ISPNEW, NCS )
                JSPC1  = ISPNEW +     ISCHAN
                JSPC2  = ISPNEW + 2 * ISCHAN
                JSPC3  = ISPNEW + 3 * ISCHAN
-               WRITE( IUNDBG, 93300 ) ISPNEW, CHEMISTRY_SPC( ISPOLD ),
+               WRITE( IUNDBG, 93300 ) ISPNEW, CHEMISTRY_SPC( ISPNEW ),
      &                        CONC( ICPR, ISPNEW ), CONC( ICPR, JSPC1 ),
      &                        CONC( ICPR, JSPC2 ),  CONC( ICPR, JSPC3 )
             ENDDO
@@ -542,9 +538,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          NYLOWRED  =  NYLOWRED + 1
          IF( NYLOWRED .LT. MXLOWRED ) THEN
             DO 340 ISPNEW = 1, ISCHAN 
-               ISPOLD   = INEW2OLD( ISPNEW, NCS )
                DO 340 NCELL = 1, NUMCELLS
-                  CNEW( NCELL, ISPNEW ) = BLKCONC( NCELL, ISPOLD )
+                  CNEW( NCELL, ISPNEW ) = BLKCONC( NCELL, ISPNEW )
  340        CONTINUE
             GO TO 100 
          ELSE
@@ -603,11 +598,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF( LDBOUT .AND. NSTEPS+1 .EQ. NSTEPOUT ) THEN
          WRITE( IUNDBG, 93320 ) IRUN, NSTEPS+1, DELT      
          DO ISPNEW = 1, ISCHAN
-            ISPOLD = INEW2OLD( ISPNEW, NCS )            
             JSPC1 = ISPNEW +     ISCHAN
             JSPC2 = ISPNEW + 2 * ISCHAN
             JSPC3 = ISPNEW + 3 * ISCHAN
-            WRITE( IUNDBG, 93340 ) ISPNEW, CHEMISTRY_SPC( ISPOLD ), 
+            WRITE( IUNDBG, 93340 ) ISPNEW, CHEMISTRY_SPC( ISPNEW ), 
      &                        CONC( ICPR, ISPNEW ), CONC( ICPR, JSPC1 ),
      &                        CONC( ICPR, JSPC2 ), CONC( ICPR, JSPC3 )
          ENDDO
@@ -649,10 +643,8 @@ c.....JEVAL = -1 to prevent recalling PDERIV until necessary
                   DO 480 JSPC = 1, ISCHAN
                      IPTR = JARRAYPT( ISPC, JSPC, NCSP )
                      IF( JARRAYPT( ISPC, JSPC, NCSP ) .EQ. 0 ) GO TO 480
-                     ISPOLD = INEW2OLD( ISPC, NCS )
-                     JSPOLD = INEW2OLD( JSPC, NCS )
                      WRITE( IUNDBG, 93420 ) ISPC, JSPC, IPTR, 
-     &                               CHEMISTRY_SPC( ISPOLD ), CHEMISTRY_SPC( JSPOLD ),
+     &                               CHEMISTRY_SPC( ISPC ), CHEMISTRY_SPC( ISPC ),
      &                               CC2( ICPR, IPTR )
   480             CONTINUE
                ENDDO
@@ -682,8 +674,7 @@ c.....output if necessary
                ENDDO
                WRITE( IUNDBG, 93040 ) IRUN, NSTEPS+1, NSUBFUN
                DO ISPNEW = 1, ISCHAN
-                  ISPOLD = INEW2OLD( ISPNEW, NCS )
-                  WRITE( IUNDBG, 93060 ) ISPNEW, CHEMISTRY_SPC( ISPOLD ),
+                  WRITE( IUNDBG, 93060 ) ISPNEW, CHEMISTRY_SPC( ISPNEW ),
      &                                   CNEW( ICPR, ISPNEW )
                ENDDO
                WRITE( IUNDBG, 93080 ) ISCHAN + 1, CONCOFM
@@ -693,8 +684,7 @@ c.....output if necessary
             ENDIF
             WRITE( IUNDBG, 93500 ) IRUN, NSTEPS+1, NSUBFUN
             DO ISPNEW = 1,ISCHAN
-               ISPOLD = INEW2OLD( ISPNEW, NCS )
-               WRITE( IUNDBG, 93520 ) ISPNEW, CHEMISTRY_SPC( ISPOLD ), 
+               WRITE( IUNDBG, 93520 ) ISPNEW, CHEMISTRY_SPC( ISPNEW ), 
      &                                GLOSS( ICPR, ISPNEW )
             ENDDO
             WRITE( IUNDBG, 93360 )
@@ -702,8 +692,7 @@ c.....output if necessary
          IF( NSTEPS + 1 .EQ. NSTEPOUT ) THEN
             WRITE( IUNDBG, 93460 ) L3+1, IRUN, NSTEPS+1, DELT      
             DO ISPNEW = 1,ISCHAN
-               ISPOLD = INEW2OLD( ISPNEW, NCS )
-               WRITE( IUNDBG, 93480 ) L3, ISPNEW, CHEMISTRY_SPC( ISPOLD ), 
+               WRITE( IUNDBG, 93480 ) L3, ISPNEW, CHEMISTRY_SPC( ISPNEW ), 
      &                                CNEW( ICPR, ISPNEW )
             ENDDO
          ENDIF        
@@ -721,8 +710,7 @@ c.....first derivative and do debug output if necessary
       IF( LDBOUT .AND. NSTEPS + 1 .EQ. NSTEPOUT ) THEN
          WRITE( IUNDBG, 93540 ) IRUN ,NSTEPS+1, L3+1, DELT
          DO ISPNEW = 1, ISCHAN
-            ISPOLD = INEW2OLD( ISPNEW, NCS )
-            WRITE( IUNDBG, 93560 ) ISPNEW, CHEMISTRY_SPC( ISPOLD ), 
+            WRITE( IUNDBG, 93560 ) ISPNEW, CHEMISTRY_SPC( ISPNEW ), 
      &                             GLOSS( ICPR, ISPNEW )
          ENDDO
       ENDIF
@@ -734,8 +722,7 @@ c.....Backsub.f originally from numerical recipes (Press et al.)
       IF( LDBOUT .AND. NSTEPS + 1 .EQ. NSTEPOUT ) THEN
          WRITE( IUNDBG, 93580 ) IRUN, NSTEPS+1, L3+1, DELT
          DO ISPNEW = 1, ISCHAN
-           ISPOLD = INEW2OLD( ISPNEW, NCS )
-           WRITE( IUNDBG, 93600 ) ISPNEW, CHEMISTRY_SPC( ISPOLD ),
+           WRITE( IUNDBG, 93600 ) ISPNEW, CHEMISTRY_SPC( ISPNEW ),
      &                            GLOSS( ICPR, ISPNEW )
          ENDDO
          WRITE( IUNDBG, 93360 )
@@ -843,8 +830,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             DO ISPC = 1, ISCHAN
                CCONOUT = CONC(  ICPR, ISPC ) + ASET( NQQ, 1 ) * 
      &                   DTLOS( ICPR, ISPC )
-               ISPOLD = INEW2OLD( ISPC, NCS )
-               WRITE( IUNDBG, 93720 ) I, CHEMISTRY_SPC( ISPOLD ), CCONOUT
+               WRITE( IUNDBG, 93720 ) I, CHEMISTRY_SPC( ISPC ), CCONOUT
             ENDDO
             WRITE( IUNDBG, 93360 )
          ENDIF
@@ -971,9 +957,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF( LIRRFLAG ) THEN
             DTCELL = DELT
             DO I = 1, ISCHAN
-               ISPOLD = INEW2OLD( I, NCS )
                DO NCELL = 1, NIRRCLS
-                  CIRR( NCELL, ISPOLD ) = CONC( IRRCELL( NCELL ), I )
+                  CIRR( NCELL, I ) = CONC( IRRCELL( NCELL ), I )
                ENDDO
             ENDDO
             CALL PA_IRR ( .FALSE., .FALSE., RKIRR, CIRR, DTCELL, 
@@ -984,8 +969,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             DT_DEGRADE = 60.0D0 * DELT + DT_DEGRADE
             IF( DT_DEGRADE .GE. DTMIN_DEGRADE .OR. ( CHEMSTEP - XELAPS ) .LE. OMIC ) THEN
                DO I = 1, ISCHAN
-                  ISPOLD = INEW2OLD( I, NCS )
-                  SPC      = CGRID_INDEX( ISPOLD )
+                  SPC      = CGRID_INDEX( I )
                   DO NCELL = 1, NUMCELLS
                      YNEW_DEGRADE( NCELL, SPC ) = CONC( NCELL, I )
                   ENDDO
@@ -1007,11 +991,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IF( NSTEPS .EQ. NSTEPOUT ) THEN
                WRITE( IUNDBG, 93780 ) NSTEPS, IRUN
                DO JSPC = 1, ISCHAN
-                  ISPOLD = INEW2OLD( JSPC, NCS )
                   JSPC1  = I + ISCHAN
                   JSPC2  = I + 2 * ISCHAN
                   JSPC3  = I + 3 * ISCHAN
-                  WRITE( IUNDBG, 93800 ) JSPC, CHEMISTRY_SPC( ISPOLD ), 
+                  WRITE( IUNDBG, 93800 ) JSPC, CHEMISTRY_SPC( JSPC ), 
      &                                   CONC( ICPR,  JSPC ),
      &                                   CONC( ICPR, JSPC1 ),
      &                                   CONC( ICPR, JSPC2 ),
