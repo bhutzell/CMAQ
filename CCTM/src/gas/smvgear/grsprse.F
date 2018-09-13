@@ -269,11 +269,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       NUSERAT = 0
       DO NRX = 1, NRXNS
          DO NR = 1, NREACT( NRX )
-            IRM2( NRX, NR, NCS ) = IRR( NRX, NR )
+            IRM2( NR, NRX, NCS ) = IRR( NRX, NR )
          ENDDO
 
          DO NP = 1, NPRDCT( NRX )
-            IRM2( NRX, NP+3, NCS ) = IRR( NRX, NP + 3 )
+            IRM2( NP+3, NRX, NCS ) = IRR( NRX, NP + 3 )
          ENDDO
          
          IF( NREACT( NRX ) .GT. 0 ) THEN
@@ -351,13 +351,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          DO NRX = 1, NUSERAT( NCS12 )
             NK = NKUSERAT( NRX, NCS12 )
             DO NR = 1, NREACT( NK )
-               IRE = IRM2( NK, NR, NCS )
+               IRE = IRM2( NR, NK, NCS )
                DO JAL = 1, NREACT( NK )
-                  JRE = IRM2( NK, JAL, NCS )
+                  JRE = IRM2( JAL, NK, NCS )
                   LZERO( JRE, IRE ) = 1
                ENDDO
                DO IAP = 1, NPRDCT( NK )
-                  JPR = IRM2( NK, 3+IAP, NCS )
+                  JPR = IRM2( 3+IAP, NK, NCS )
                   LZERO( JPR, IRE ) = 1 
                ENDDO
            ENDDO
@@ -610,28 +610,28 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          DO NRX = 1, NUSERAT( NCS12 )
             NK = NKUSERAT( NRX, NCS12 )
             DO IAL = 1, NREACT( NK )
-               IR = IRM2( NK, IAL, NCS )
+               IR = IRM2( IAL, NK, NCS )
 
                DO JAL = 1, NREACT( NK )
-                  JR = IRM2( NK, JAL, NCS )
+                  JR = IRM2( JAL, NK, NCS )
                   IAR = JARRAYPT( JR, IR, NCS12 )
                   NDERIVL( NK, NCS12 ) = NDERIVL( NK, NCS12 ) + 1
                   NLS = NDERIVL( NK, NCS12 )
-                  JARRL( NK, NLS, NCS12 ) = IAR
-                  JLIAL( NK, NLS, NCS12 ) = IAL
+                  JARRL( NLS, NK, NCS12 ) = IAR
+                  JLIAL( NLS, NK, NCS12 ) = IAL
                   NDLMAX = MAX( NLS, NDLMAX )
                ENDDO
                
                DO IAP = 1, NPRDCT( NK )
-                  JP = IRM2( NK, IAP + 3, NCS )
+                  JP = IRM2( IAP + 3, NK, NCS )
                   IAR = JARRAYPT( JP, IR, NCS12 )
                   NDERIVP( NK, NCS12 ) = NDERIVP( NK, NCS12 ) + 1
                   NPR = NDERIVP( NK, NCS12 )
-                  JARRP(  NK, NPR, NCS12 ) = IAR
-                  JPIAL(  NK, NPR, NCS12 ) = IAL
-                  ICOEFF( NK, NPR, NCS12 ) = 0
+                  JARRP(  NPR, NK, NCS12 ) = IAR
+                  JPIAL(  NPR, NK, NCS12 ) = IAL
+                  ICOEFF( NPR, NK, NCS12 ) = 0
                   IF( ABS( SC( NK, IAP ) - 1.0 ) .GT. 1.0E-06 ) THEN
-                     ICOEFF( NK, NPR, NCS12 ) = IAP
+                     ICOEFF( NPR, NK, NCS12 ) = IAP
                   ENDIF
                   NDPMAX = MAX( NPR, NDPMAX )
                ENDDO
