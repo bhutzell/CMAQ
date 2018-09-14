@@ -56,10 +56,11 @@ R5! SWITCH for calling DEGRADE routine
 R5    LOGICAL, SAVE :: CALL_DEG = .TRUE.
 
 c..Miscellaneous variables
-      INTEGER   LOGDEV        ! Unit number of output log
       INTEGER   N_EBI_IT      ! No. of iterations for EBI
       INTEGER   N_EBI_STEPS   ! No. of time steps for EBI
       INTEGER   N_INR_STEPS   ! No. of inner time steps for EBI
+      INTEGER   PECOL_OFFSET  ! Local Column Offset for processor
+      INTEGER   PEROW_OFFSET  ! Local Column Offset for processor
 R5
 R5    INTEGER, SAVE ::   MODEL_SPECIES ! No. of species in CGRID
 
@@ -91,7 +92,6 @@ R3      REAL( 8 ), ALLOCATABLE ::  PNEG( : )   ! Negative production rates
       REAL, ALLOCATABLE      :: PRES( :, :, : )          ! pressure (Pa)
       REAL, ALLOCATABLE      :: QV  ( :, :, : )          ! water vapor (Kg/Kg air)
       REAL, ALLOCATABLE      :: TA  ( :, :, : )          ! temperature (K)
-      REAL, ALLOCATABLE      :: RJ  ( :, :, :, : )       ! J-values (min-1)
 
       REAL, ALLOCATABLE      :: SEAICE ( :, :)            ! fractional seaice cover, [-]
       REAL, ALLOCATABLE      :: DENS( :, :, : )           ! mass density (Kg/m^3)

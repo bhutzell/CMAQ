@@ -65,8 +65,6 @@
  !          Region   | Stream Label  |Emission | CMAQ-   |Phase/ |Scale  | Op
  !           Label   |               |Surrogate| Species |Mode   |Factor |
  !<EXAMPLE> 'WATER'  , 'All'         ,'All'    ,'All'    ,'All'  ,0.     ,'o',
-       'EVERYWHERE'  , 'All'         ,'PNH4'   ,'ANH4'   ,'FINE' ,0.     ,'o',
-       'EVERYWHERE'  , 'All'         ,'PNH4'   ,'ANH4'   ,'AIT_NULL' ,1.     ,'a',
 
 /
 
@@ -139,7 +137,7 @@
 /
 
 !------------------------------------------------------------------------------!
-! Additional Emissions Scaling Variables                                        !
+! Additional Emissions Scaling Variables                                       !
 !    This section includes additional specific variables for governing the     !
 !    behavior of the emissions scaling routines. Explanations are provided     !
 !    below.                                                                    !

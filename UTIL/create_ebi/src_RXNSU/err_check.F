@@ -450,6 +450,7 @@ c..Check that all NO2EX loss reactions are psuedo-first order
             END IF
             MSG =  '     ERROR: REACTION ' // TRIM( RXLABEL( M ) )
      &          // ' has negative net yield for ' // TRIM( MECHANISM_SPECIES( N )%SPECIES_NAME )  
+     &          // ' has negative net yield for ' // TRIM( CHEMISTRY_SPC( N ) )  
      &          // '. Not Permitted.'
             WRITE(LOGDEV,92000)TRIM( MSG )
          END DO
