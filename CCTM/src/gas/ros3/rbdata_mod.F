@@ -93,7 +93,7 @@ c...Allocatable arrays
       REAL( 8 ), ALLOCATABLE :: ATOL( : )          ! Species absolute tolerances 
       REAL( 8 ), ALLOCATABLE :: RTOL( : )          ! Species relative tolerances 
       REAL( 8 ), ALLOCATABLE :: FORWARD_CONV( : )  ! CGRID to CHEM Species conversion factor 
-      REAL( 8 ), ALLOCATABLE :: REVERSE_CONV( : )  ! CHEM to CGRID Species conversion factor
+      REAL,      ALLOCATABLE :: REVERSE_CONV( : )  ! CHEM to CGRID Species conversion factor
       REAL( 8 ), ALLOCATABLE :: Y( :,: )           ! Species concentrations
       REAL( 8 ), ALLOCATABLE :: Y_DEGRADE( :,: )   ! Concentration for degradation
 

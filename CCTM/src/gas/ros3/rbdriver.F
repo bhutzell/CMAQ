@@ -105,7 +105,8 @@ C..Parameters:
 
       INTEGER, PARAMETER :: IZERO = 0                ! Integer zero
 
-      REAL,    PARAMETER :: CONCMIN   = 1.0E-30         ! Minimum conc
+      REAL,    PARAMETER :: CONCMIN   = 1.0E-30         ! Minimum conc for cgrid result
+      REAL,    PARAMETER :: DCONCMIN  = 1.0D-30         ! Minimum conc for solver inputs
       REAL,    PARAMETER :: CONCOFM   = 1.0E+06         ! conc. of M = 1E+06 ppm
       REAL,    PARAMETER :: PA2ATM    = 1.0 / STDATMPA  ! Pascal to atm conv fac
       REAL,    PARAMETER :: MAOMV     = MWAIR / MWWAT   ! Mol Wt of air over Mol Wt of water
@@ -548,12 +549,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                COL = CCOL( CELLNUM )
                ROW = CROW( CELLNUM )
                LEV = CLEV( CELLNUM )
+               Y( NCELL,ISP ) = REAL( CONC( COL,ROW,LEV,SPC ) 8 )
                IF( CONVERT_CONC( ISP ) )THEN 
-                   Y( NCELL,ISP ) = REAL( MAX( FORWARD_CONV( ISP ) * BLKSVOL( NCELL )
-     &                               *       CONC( COL,ROW,LEV,SPC ), CONCMIN), 8 )
-               ELSE
-                   Y( NCELL,ISP ) = REAL( MAX( CONC( COL,ROW,LEV,SPC ), CONCMIN), 8 )
+                   Y( NCELL,ISP ) = FORWARD_CONV( ISP ) * BLKSVOL( NCELL )
+     &                            * Y( NCELL,ISP )
                END IF
+               Y( NCELL,ISP ) = MAX( Y( NCELL,ISP ),DCONCMIN )
             END DO                 
          END DO
 
@@ -631,12 +632,12 @@ C..Update concentrations
                   COL = CCOL( CELLNUM )
                   ROW = CROW( CELLNUM )
                   LEV = CLEV( CELLNUM )
+                  CONC( COL,ROW,LEV,SPC ) = REAL( Y( NCELL,ISP ),4 )
                   IF( CONVERT_CONC( ISP ) )THEN 
-                     CONC( COL,ROW,LEV,SPC ) = REAL( REVERSE_CONV( ISP ) 
-     &                                       *       BLKDENS( NCELL ) * Y( NCELL,ISP ), 4)
-                  ELSE
-                     CONC( COL,ROW,LEV,SPC ) = REAL( Y( NCELL,ISP ), 4)
+                     CONC( COL,ROW,LEV,SPC ) = REVERSE_CONV( ISP ) 
+     &                                       * BLKDENS( NCELL ) * CONC( COL,ROW,LEV,SPC )
                   END IF
+                  CONC( COL,ROW,LEV,SPC ) = MAX( CONC( COL,ROW,LEV,SPC ),CONCMIN )
               END DO
             END DO
 
