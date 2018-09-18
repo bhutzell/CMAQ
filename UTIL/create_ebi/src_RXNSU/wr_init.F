@@ -502,9 +502,13 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 97016 FORMAT(/ '! translate IRR array to EBI solver species'
      &      / 6X, 'DO NR = 1, NRXNS'
-     &      / 9X, 'DO N = 1, NUMB_MECH_SPC'
+     &      / 9X, 'DO N = 1, NREACT( NR )'
      &      /12X, 'ISPC         = TRANSLATE_IRR_TO_EBI( IRR( NR, N ) )'
      &      /12X, 'IRR( NR, N ) = ISPC'
+     &      / 9X, 'END DO'
+     &      / 9X, 'DO N = 1, NPRDCT( NR )'
+     &      /12X, 'ISPC         = TRANSLATE_IRR_TO_EBI( IRR( NR, N+3 ) )'
+     &      /12X, 'IRR( NR, N+3 ) = ISPC'
      &      / 9X, 'END DO'
      &      / 6X, 'END DO' / )
 
