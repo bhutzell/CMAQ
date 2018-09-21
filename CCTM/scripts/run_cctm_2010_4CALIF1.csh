@@ -617,6 +617,13 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Harvest Timing Output so that it may be reported below
   set rtarray = "${rtarray} `tail -3 buff_${EXECUTION_ID}.txt | grep -Eo '[+-]?[0-9]+([.][0-9]+)?' | head -1` "
+  rm -rf buff_${EXECUTION_ID}.txt
+
+  #> Abort script if abnormal termination
+  if ( ! -e $S_CGRID ) then
+    echo "Error: CGRID file not written. Aborting execution."
+    exit 1
+  endif
 
   #> Print Concluding Text
   echo 
@@ -624,7 +631,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   echo
   echo "\\\\\=====\\\\\=====\\\\\=====\\\\\=====/////=====/////=====/////=====/////"
   echo
-  rm -rf buff_${EXECUTION_ID}.txt
 
 # ===================================================================
 #> Finalize Run for This Day and Loop to Next Day
