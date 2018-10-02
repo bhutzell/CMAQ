@@ -36,6 +36,7 @@
       INTEGER              :: N_EM_SRM   ! global number of emissions streams
       INTEGER              :: N_EMIS_ISTR! global emissions instructions
       INTEGER              :: N_EM_RGN   ! no. of region masks
+      INTEGER              :: EMLAYS
 
       CHARACTER( 16 ), ALLOCATABLE :: EM_SPEC  ( : ) ! Vector of Internal CMAQ Species names for 
                                                      ! each emission operation
@@ -410,7 +411,6 @@
      &                     ACORSEM_RENORM,   POA_OP_VF,
      &                     POA_AMF, POG_AMF, PCVOC_FAC
       USE RXNS_DATA, ONLY: MECHNAME
-      USE M3UTILIO
 
       IMPLICIT NONE
 
