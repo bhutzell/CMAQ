@@ -521,7 +521,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                COL = CCOL( CELLNUM )
                ROW = CROW( CELLNUM )
                LEV = CLEV( CELLNUM )
-               Y( NCELL,ISP ) = REAL( CONC( COL,ROW,LEV,SPC ) 8 )
+               Y( NCELL,ISP ) = REAL( CONC( COL,ROW,LEV,SPC ), 8 )
                IF( CONVERT_CONC( ISP ) )THEN 
                    Y( NCELL,ISP ) = FORWARD_CONV( ISP ) * BLKSVOL( NCELL )
      &                            * Y( NCELL,ISP )
