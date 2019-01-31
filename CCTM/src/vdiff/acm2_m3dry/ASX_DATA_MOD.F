@@ -453,6 +453,8 @@ C-----------------------------------------------------------------------
 
          If( MET_INITIALIZED )Return
 
+         CALL INIT_LSM( JDATE, JTIME )
+
 !> Allocate buffers
          ALLOCATE ( BUFF1D( NLAYS ),
      &              BUFF2D( NCOLS,NROWS ),

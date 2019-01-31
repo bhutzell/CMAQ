@@ -123,7 +123,7 @@ C           use in radiative transfer calculation for actinic fluxes
             USE PHOT_MOD          ! photolysis in-line module
             USE PCGRID_DEFN       ! get cgrid
 
-            USE LSM_MOD, ONLY: N_LUFRAC, LSM_SCHEME => LAND_SCHEME
+            USE LSM_MOD, ONLY: INIT_LSM, N_LUFRAC, LSM_SCHEME => LAND_SCHEME
 
             IMPLICIT NONE
 
@@ -199,6 +199,8 @@ C...Get met file offsets
                XMSG = 'Could not find ' // VARNM // 'in ' // MET_CRO_2D
                WRITE(LOGDEV,'( A )')TRIM( PNAME ) // ' : ' // XMSG
             END IF
+          
+            CALL INIT_LSM( MDATE, MTIME )
 
             SELECT CASE( LSM_SCHEME )
                CASE( 'USGS24' )

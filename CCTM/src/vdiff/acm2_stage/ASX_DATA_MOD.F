@@ -286,6 +286,7 @@ C-----------------------------------------------------------------------
 
          If ( MET_INITIALIZED ) Return
 
+         CALL INIT_LSM( JDATE, JTIME )
          CALL INIT_MOSAIC( JDATE, JTIME )
 
 !> Allocate buffers

@@ -398,7 +398,6 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
 
       USE AERO_DATA           ! aero variable data
-      USE SOA_DEFN            ! gas soa data
       USE AEROMET_DATA        ! constants and met data
       
       USE CSQY_DATA,  ONLY : NWL => NWL_REF, NUM_REFRACTIVE, REFRACTIVE_INDEX,
@@ -505,9 +504,6 @@ C *** extract grid cell concentrations of aero species from CGRID into aerospc_c
 C *** in aero_data module
 C     Also converts dry surface area to wet second moment
          CALL EXTRACT_AERO ( CGRID( COL,ROW,L,: ), .TRUE. )
-
-C *** extract soa concentrations from CGRID
-         CALL EXTRACT_SOA ( CGRID( COL,ROW,L,: ) )
 
 C *** Calculate geometric mean diameters and standard deviations of "wet" size distribution
          CALL GETPAR ( .FALSE. )

@@ -305,6 +305,11 @@ C-------------------------------------------------------------------------------
          INTEGER      :: GXOFF, GYOFF            ! global origin offset from file
          INTEGER      :: STRTCOLGC2, ENDCOLGC2, STRTROWGC2, ENDROWGC2
          INTEGER l                             
+          
+         LOGICAL, SAVE :: INITIALIZED = .FALSE.
+
+         IF( INITIALIZED )RETURN
+         INITIALIZED = .TRUE.
                                                
          LAND_SCHEME = 'UNKNOWN'               
          CALL SUBHFILE ( GRID_CRO_2D, GXOFF, GYOFF,
