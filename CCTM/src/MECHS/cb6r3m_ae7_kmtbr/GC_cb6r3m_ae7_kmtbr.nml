@@ -1,5 +1,4 @@
 &GC_nml
-
 GC_SPECIES_DATA = 
 
 !SPECIES        ,MOLWT    ,ICBC   ,FAC ,DRYDEP SURR       ,FAC  ,WET-SCAV SURR     ,FAC ,GC2AE SURR     ,GC2AQ SURR,TRNS  ,DDEP  ,WDEP  ,CONC           
@@ -163,5 +162,5 @@ GC_SPECIES_DATA =
 'IBR'           ,206.8    ,       ,    ,                  ,     ,'IBR'             ,1   ,               ,          ,'Yes' ,      ,      ,'Yes',         
 'MI2'           ,267.8    ,       ,    ,                  ,     ,'MI2'             ,1   ,               ,          ,'Yes' ,      ,      ,'Yes',         
 'MIB'           ,219.9    ,       ,    ,                  ,     ,'MIB'             ,1   ,               ,          ,'Yes' ,      ,      ,'Yes',         
-'MIC'           ,176.4    ,       ,    ,                  ,     ,'MIC'             ,1   ,               ,          ,'Yes' ,      ,      ,'Yes'          
+'MIC'           ,176.4    ,       ,    ,                  ,     ,'MIC'             ,1   ,               ,          ,'Yes' ,      ,      ,'Yes', 
 /
