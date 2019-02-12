@@ -136,7 +136,8 @@ c init routine to allocate the above allocatables
 c !! NO   and to populate the allocated arrays from the stnd gc_spc.ext  !!! NO
 
          function cgrid_spcs_init() result ( success )
-
+             
+            USE GET_ENV_VARS
             USE MECHANISM_DATA
             
             implicit none
@@ -254,7 +255,7 @@ c-------------------------------------------------------------------------------
             GC_SPECIES_DATA%WDEP_FLAG = ''
             GC_SPECIES_DATA%CONC_FLAG = ''
 
-            call nameval( gc_matrix, eqname )
+            call value_name( gc_matrix, eqname )
 
             write( logdev,* ) ' '
             write( logdev,* ) '    GC Species Namelist: ', trim( eqname )
@@ -331,7 +332,7 @@ c-------------------------------------------------------------------------------
             AE_SPECIES_DATA%CONC_FLAG = ''
                                                                                              
 
-            call nameval( ae_matrix, eqname )
+            call value_name( ae_matrix, eqname )
 
             write( logdev,* ) ' '
             write( logdev,* ) '    AE Species Namelist: ', trim( eqname )
@@ -406,7 +407,7 @@ c-------------------------------------------------------------------------------
             NR_SPECIES_DATA%WDEP_FLAG = ''
             NR_SPECIES_DATA%CONC_FLAG = ''
 
-            call nameval( nr_matrix, eqname )
+            call value_name( nr_matrix, eqname )
 
             write( logdev,* ) ' '
             write( logdev,* ) '    NR Species Namelist: ', trim( eqname )
@@ -483,7 +484,7 @@ c-------------------------------------------------------------------------------
             TR_SPECIES_DATA%WDEP_FLAG = ''
             TR_SPECIES_DATA%CONC_FLAG = ''
 
-            call nameval( tr_matrix, eqname )
+            call value_name( tr_matrix, eqname )
 
             write( logdev,* ) ' '
             write( logdev,* ) '    TR Species Namelist: ', trim( eqname )
