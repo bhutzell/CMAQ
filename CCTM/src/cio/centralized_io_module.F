@@ -1249,7 +1249,7 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
 
-#ifdef m3dry_opt
+#ifndef stage_opt
           Allocate ( por1 ( ncols, nrows, e2c_cats ),
      &               por2 ( ncols, nrows, e2c_cats ),
      &               wp1  ( ncols, nrows, e2c_cats ),
@@ -1344,7 +1344,7 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
 
-#ifdef m3dry_opt
+#ifndef stage_opt
 
           Allocate ( wep1 ( ncols, nrows, e2c_cats ),
      &               wep2 ( ncols, nrows, e2c_cats ),

@@ -184,9 +184,9 @@ set ParOpt                             #> uncomment to build a multiple processo
  endif
 
  if ($DepMod == m3dry) then
-    set cpp_depmod = '-Dm3dry_opt'
- else
     set cpp_depmod = ''
+ else
+    set cpp_depmod = '-Dstage_opt'
  endif
 
 #> Set variables needed for multiprocessor and serial builds
