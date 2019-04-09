@@ -105,6 +105,7 @@ GC_SPECIES_DATA =
 'ETEG'          , 62.0    ,''     ,-1  ,''                ,-1   ,'ETHYLENEGLYCOL'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',         
 'ISHP'          ,118.0    ,''     ,-1  ,'VD_OP'           , 1   ,'METHACROLEIN'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',         
 'IEPOX'         ,118.1    ,''     ,-1  ,'VD_OP'           ,1.5  ,'HYDROXY_PEROXIDE', 1  ,'IEPOX'        ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',         
+'IEPOXP'        ,118.1    ,''     ,-1  ,''                ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',         
 'MAHP'          ,102.0    ,''     ,-1  ,'VD_OP'           , 1   ,'METHACROLEIN'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',         
 'ORA2'          , 60.0    ,''     ,-1  ,'VD_ORA'          , 1   ,'ACETIC_ACID'     , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',         
 'ORAP'          ,109.0    ,''     ,-1  ,''                ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',         

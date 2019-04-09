@@ -1809,60 +1809,64 @@
              RKI( NCELL,  719) =  BLKHET(  NCELL, IK_HETERO_H2NO3PBIJ )
 !  Reaction Label HET_H2NO3PKB    
              RKI( NCELL,  720) =  BLKHET(  NCELL, IK_HETERO_H2NO3PBK )
-!  Reaction Label OLIG_XYLENE1    
-             RKI( NCELL,  722) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_XYLENE2    
-             RKI( NCELL,  723) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_TOLUENE1   
-             RKI( NCELL,  724) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_TOLUENE2   
-             RKI( NCELL,  725) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_BENZENE1   
-             RKI( NCELL,  726) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_BENZENE2   
-             RKI( NCELL,  727) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_TERPENE1   
-             RKI( NCELL,  728) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_TERPENE2   
-             RKI( NCELL,  729) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_ISOPRENE1  
-             RKI( NCELL,  730) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_ISOPRENE2  
-             RKI( NCELL,  731) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_SESQT1     
-             RKI( NCELL,  732) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_PAH1       
-             RKI( NCELL,  733) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_PAH2       
-             RKI( NCELL,  734) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_ALK1       
-             RKI( NCELL,  735) =   9.4882D-06 * SFACT 
-!  Reaction Label OLIG_ALK2       
-             RKI( NCELL,  736) =   9.4882D-06 * SFACT 
-!  Reaction Label PCSOA           
-             RKI( NCELL,  737) =   1.2500D-11 * CFACT 
-!  Reaction Label POA_AGE1        
-             RKI( NCELL,  738) =   4.0000D-11 * CFACT 
-!  Reaction Label POA_AGE2        
-             RKI( NCELL,  739) =   4.0000D-11 * CFACT 
-!  Reaction Label POA_AGE3        
-             RKI( NCELL,  740) =   4.0000D-11 * CFACT 
-!  Reaction Label POA_AGE4        
-             RKI( NCELL,  741) =   4.0000D-11 * CFACT 
-!  Reaction Label POA_AGE5        
-             RKI( NCELL,  742) =   4.0000D-11 * CFACT 
-!  Reaction Label POA_AGE6        
-             RKI( NCELL,  743) =   4.0000D-11 * CFACT 
-!  Reaction Label POA_AGE7        
-             RKI( NCELL,  744) =   4.0000D-11 * CFACT 
-!  Reaction Label POA_AGE8        
-             RKI( NCELL,  745) =   4.0000D-11 * CFACT 
-!  Reaction Label POA_AGE9        
-             RKI( NCELL,  746) =   4.0000D-11 * CFACT 
-!  Reaction Label POA_AGE10       
-             RKI( NCELL,  747) =   4.0000D-11 * CFACT 
 !  Reaction Label HET_IEPOX       
-             RKI( NCELL,  748) =  BLKHET(  NCELL, IK_HETERO_IEPOX )
+             RKI( NCELL,  722) =  BLKHET(  NCELL, IK_HETERO_IEPOX )
+!  Reaction Label HET_IEPOXOS     
+             RKI( NCELL,  723) =  BLKHET(  NCELL, IK_HETERO_IEPOXOS )
+!  Reaction Label HET_TETROL      
+             RKI( NCELL,  724) =  BLKHET(  NCELL, IK_HETERO_TETROL )
+!  Reaction Label OLIG_XYLENE1    
+             RKI( NCELL,  725) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_XYLENE2    
+             RKI( NCELL,  726) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_TOLUENE1   
+             RKI( NCELL,  727) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_TOLUENE2   
+             RKI( NCELL,  728) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_BENZENE1   
+             RKI( NCELL,  729) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_BENZENE2   
+             RKI( NCELL,  730) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_TERPENE1   
+             RKI( NCELL,  731) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_TERPENE2   
+             RKI( NCELL,  732) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_ISOPRENE1  
+             RKI( NCELL,  733) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_ISOPRENE2  
+             RKI( NCELL,  734) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_SESQT1     
+             RKI( NCELL,  735) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_PAH1       
+             RKI( NCELL,  736) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_PAH2       
+             RKI( NCELL,  737) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_ALK1       
+             RKI( NCELL,  738) =   9.4882D-06 * SFACT 
+!  Reaction Label OLIG_ALK2       
+             RKI( NCELL,  739) =   9.4882D-06 * SFACT 
+!  Reaction Label PCSOA           
+             RKI( NCELL,  740) =   1.2500D-11 * CFACT 
+!  Reaction Label POA_AGE1        
+             RKI( NCELL,  741) =   4.0000D-11 * CFACT 
+!  Reaction Label POA_AGE2        
+             RKI( NCELL,  742) =   4.0000D-11 * CFACT 
+!  Reaction Label POA_AGE3        
+             RKI( NCELL,  743) =   4.0000D-11 * CFACT 
+!  Reaction Label POA_AGE4        
+             RKI( NCELL,  744) =   4.0000D-11 * CFACT 
+!  Reaction Label POA_AGE5        
+             RKI( NCELL,  745) =   4.0000D-11 * CFACT 
+!  Reaction Label POA_AGE6        
+             RKI( NCELL,  746) =   4.0000D-11 * CFACT 
+!  Reaction Label POA_AGE7        
+             RKI( NCELL,  747) =   4.0000D-11 * CFACT 
+!  Reaction Label POA_AGE8        
+             RKI( NCELL,  748) =   4.0000D-11 * CFACT 
+!  Reaction Label POA_AGE9        
+             RKI( NCELL,  749) =   4.0000D-11 * CFACT 
+!  Reaction Label POA_AGE10       
+             RKI( NCELL,  750) =   4.0000D-11 * CFACT 
 
         END DO  
 !  Multiply rate constants by [M], [O2], [N2], [H2O], [H2], or [CH4]
@@ -2296,6 +2300,9 @@
              INDEX_ACLI         = IOLD2NEW( INDEX_ACLI        , 1 )
              INDEX_ACLJ         = IOLD2NEW( INDEX_ACLJ        , 1 )
              INDEX_ACLK         = IOLD2NEW( INDEX_ACLK        , 1 )
+             INDEX_IEPOXP       = IOLD2NEW( INDEX_IEPOXP      , 1 )
+             INDEX_ASO4J        = IOLD2NEW( INDEX_ASO4J       , 1 )
+             INDEX_AISO3J       = IOLD2NEW( INDEX_AISO3J      , 1 )
              INDEX_AXYL1J       = IOLD2NEW( INDEX_AXYL1J      , 1 )
              INDEX_AOLGAJ       = IOLD2NEW( INDEX_AOLGAJ      , 1 )
              INDEX_AXYL2J       = IOLD2NEW( INDEX_AXYL2J      , 1 )
@@ -2325,6 +2332,5 @@
              INDEX_VSVOO2       = IOLD2NEW( INDEX_VSVOO2      , 1 )
              INDEX_VSVOO3       = IOLD2NEW( INDEX_VSVOO3      , 1 )
              INDEX_VSVOO1       = IOLD2NEW( INDEX_VSVOO1      , 1 )
-             INDEX_AISO3J       = IOLD2NEW( INDEX_AISO3J      , 1 )
           END SUBROUTINE RESET_SPECIES_POINTERS
        END MODULE RXNS_FUNCTION

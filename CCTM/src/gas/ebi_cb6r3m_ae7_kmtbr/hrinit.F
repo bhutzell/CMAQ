@@ -23,13 +23,13 @@ C***********************************************************************
 C
 C  FUNCTION: To initialize species tolerances, arrays, and indices
 C
-C  PRECONDITIONS: For the CB6R3M family of mechanisms
+C  PRECONDITIONS: For the CB6R3M_AE7_KMTBR mechanism
 C
 C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Feb  1, 2019
+C  REVISION HISTORY: Created by EBI solver program, Apr  9, 2019
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -146,7 +146,7 @@ C***********************************************************************
 
 c..Allocate and define ebi species
 
-      N_EBISP  = 164
+      N_EBISP  = 166
       ALLOCATE( EBISP( N_EBISP ), STAT = IOS ) 
       IF ( IOS .NE. 0 ) THEN
          MSG = 'Error allocating EBISP' 
@@ -247,76 +247,78 @@ c..Allocate and define ebi species
       EBISP(  92 ) = ACLI
       EBISP(  93 ) = ACLJ
       EBISP(  94 ) = ACLK
-      EBISP(  95 ) = AISO3J
-      EBISP(  96 ) = AGLYJ
-      EBISP(  97 ) = MTNO3
-      EBISP(  98 ) = AMTNO3J
-      EBISP(  99 ) = AMTHYDJ
-      EBISP( 100 ) = AAVB2J
-      EBISP( 101 ) = AOLGAJ
-      EBISP( 102 ) = AAVB3J
-      EBISP( 103 ) = AAVB4J
-      EBISP( 104 ) = AISO1J
-      EBISP( 105 ) = AOLGBJ
-      EBISP( 106 ) = AISO2J
-      EBISP( 107 ) = ASQTJ
-      EBISP( 108 ) = PCVOC
-      EBISP( 109 ) = PCSOARXN
-      EBISP( 110 ) = VLVPO1
-      EBISP( 111 ) = VSVPO1
-      EBISP( 112 ) = VSVPO2
-      EBISP( 113 ) = VSVPO3
-      EBISP( 114 ) = VIVPO1
-      EBISP( 115 ) = VLVOO1
-      EBISP( 116 ) = VLVOO2
-      EBISP( 117 ) = VSVOO2
-      EBISP( 118 ) = VSVOO3
-      EBISP( 119 ) = VSVOO1
-      EBISP( 120 ) = FORM_PRIMARY
-      EBISP( 121 ) = ALD2_PRIMARY
-      EBISP( 122 ) = BUTADIENE13
-      EBISP( 123 ) = ACROLEIN
-      EBISP( 124 ) = ACRO_PRIMARY
-      EBISP( 125 ) = TOLU
-      EBISP( 126 ) = HG
-      EBISP( 127 ) = HGIIAER
-      EBISP( 128 ) = HGIIGAS
-      EBISP( 129 ) = BR
-      EBISP( 130 ) = BRO
-      EBISP( 131 ) = HOBR
-      EBISP( 132 ) = HBR
-      EBISP( 133 ) = BR2
-      EBISP( 134 ) = BRNO3
-      EBISP( 135 ) = BRNO2
-      EBISP( 136 ) = FMBR
-      EBISP( 137 ) = CH3BR
-      EBISP( 138 ) = MB3
-      EBISP( 139 ) = MB2
-      EBISP( 140 ) = MB2C
-      EBISP( 141 ) = MBC2
-      EBISP( 142 ) = MBC
-      EBISP( 143 ) = DMS
-      EBISP( 144 ) = MSA
-      EBISP( 145 ) = BRCL
-      EBISP( 146 ) = ABRJ
-      EBISP( 147 ) = I
-      EBISP( 148 ) = IO
-      EBISP( 149 ) = HI
-      EBISP( 150 ) = I2
-      EBISP( 151 ) = HOI
-      EBISP( 152 ) = INO
-      EBISP( 153 ) = INO2
-      EBISP( 154 ) = INO3
-      EBISP( 155 ) = OIO
-      EBISP( 156 ) = I2O4
-      EBISP( 157 ) = I2O2
-      EBISP( 158 ) = I2O3
-      EBISP( 159 ) = CH3I
-      EBISP( 160 ) = ICL
-      EBISP( 161 ) = IBR
-      EBISP( 162 ) = MI2
-      EBISP( 163 ) = MIB
-      EBISP( 164 ) = MIC
+      EBISP(  95 ) = IEPOXP
+      EBISP(  96 ) = ASO4J
+      EBISP(  97 ) = AISO3J
+      EBISP(  98 ) = AGLYJ
+      EBISP(  99 ) = MTNO3
+      EBISP( 100 ) = AMTNO3J
+      EBISP( 101 ) = AMTHYDJ
+      EBISP( 102 ) = AAVB2J
+      EBISP( 103 ) = AOLGAJ
+      EBISP( 104 ) = AAVB3J
+      EBISP( 105 ) = AAVB4J
+      EBISP( 106 ) = AISO1J
+      EBISP( 107 ) = AOLGBJ
+      EBISP( 108 ) = AISO2J
+      EBISP( 109 ) = ASQTJ
+      EBISP( 110 ) = PCVOC
+      EBISP( 111 ) = PCSOARXN
+      EBISP( 112 ) = VLVPO1
+      EBISP( 113 ) = VSVPO1
+      EBISP( 114 ) = VSVPO2
+      EBISP( 115 ) = VSVPO3
+      EBISP( 116 ) = VIVPO1
+      EBISP( 117 ) = VLVOO1
+      EBISP( 118 ) = VLVOO2
+      EBISP( 119 ) = VSVOO2
+      EBISP( 120 ) = VSVOO3
+      EBISP( 121 ) = VSVOO1
+      EBISP( 122 ) = FORM_PRIMARY
+      EBISP( 123 ) = ALD2_PRIMARY
+      EBISP( 124 ) = BUTADIENE13
+      EBISP( 125 ) = ACROLEIN
+      EBISP( 126 ) = ACRO_PRIMARY
+      EBISP( 127 ) = TOLU
+      EBISP( 128 ) = HG
+      EBISP( 129 ) = HGIIAER
+      EBISP( 130 ) = HGIIGAS
+      EBISP( 131 ) = BR
+      EBISP( 132 ) = BRO
+      EBISP( 133 ) = HOBR
+      EBISP( 134 ) = HBR
+      EBISP( 135 ) = BR2
+      EBISP( 136 ) = BRNO3
+      EBISP( 137 ) = BRNO2
+      EBISP( 138 ) = FMBR
+      EBISP( 139 ) = CH3BR
+      EBISP( 140 ) = MB3
+      EBISP( 141 ) = MB2
+      EBISP( 142 ) = MB2C
+      EBISP( 143 ) = MBC2
+      EBISP( 144 ) = MBC
+      EBISP( 145 ) = DMS
+      EBISP( 146 ) = MSA
+      EBISP( 147 ) = BRCL
+      EBISP( 148 ) = ABRJ
+      EBISP( 149 ) = I
+      EBISP( 150 ) = IO
+      EBISP( 151 ) = HI
+      EBISP( 152 ) = I2
+      EBISP( 153 ) = HOI
+      EBISP( 154 ) = INO
+      EBISP( 155 ) = INO2
+      EBISP( 156 ) = INO3
+      EBISP( 157 ) = OIO
+      EBISP( 158 ) = I2O4
+      EBISP( 159 ) = I2O2
+      EBISP( 160 ) = I2O3
+      EBISP( 161 ) = CH3I
+      EBISP( 162 ) = ICL
+      EBISP( 163 ) = IBR
+      EBISP( 164 ) = MI2
+      EBISP( 165 ) = MIB
+      EBISP( 166 ) = MIC
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -429,6 +431,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( ACLI         ) = 5.0D-04
       RTOL( ACLJ         ) = 5.0D-04
       RTOL( ACLK         ) = 5.0D-04
+      RTOL( IEPOXP       ) = 5.0D-04
+      RTOL( ASO4J        ) = 5.0D-04
       RTOL( AISO3J       ) = 5.0D-04
       RTOL( AGLYJ        ) = 5.0D-04
       RTOL( MTNO3        ) = 5.0D-04

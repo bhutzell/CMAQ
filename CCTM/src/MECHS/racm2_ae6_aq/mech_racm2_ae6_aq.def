@@ -1191,7 +1191,11 @@ REACTIONS[CM] =
 
 <HAL_Ozone> O3 =  %H # 2.8964E-11@-11.9978 & 0.0E-0@-0.0;
 
-<HET_IEPOX> IEPOX = AISO3J  # 1.0~<HETERO_IEPOX>;
+! heterogeneous acid-catalyzed uptake of isoprene-epoxydiols 
+<HET_IEPOX>   IEPOX = IEPOXP              # 1.0~<HETERO_IEPOX>;
+<HET_IEPOXOS> IEPOXP + ASO4J = AISO3J     # 1.0~<HETERO_IEPOXOS>;
+<HET_TETROL>  IEPOXP = AISO3J             # 1.0~<HETERO_TETROL>;
+
 
 ! oligomerization reaction for secondary organic aerosols
 

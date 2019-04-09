@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /home/gsarwar/util/MP/MECHS/cb6r3_ae6_aq/mech_cb6r3_ae6_aq.def
+! Source file: /home/hwo/CCTM_git_repository/CCTM/src/MECHS/cb6r3_ae6_aq/mech_cb6r3_ae6_aq.def
 ! for Mechanism Name: CB6R3_AE6_AQ                    
 
 ! This file is used to create mechanism data and functions
@@ -86,8 +86,8 @@
 
       CHARACTER( 32 ), PARAMETER :: MECHNAME = 'CB6R3_AE6_AQ'
 
-      INTEGER, PARAMETER :: N_GAS_CHEM_SPC = 128
-      INTEGER, PARAMETER :: NUMB_MECH_SPC  = 150
+      INTEGER, PARAMETER :: N_GAS_CHEM_SPC = 129
+      INTEGER, PARAMETER :: NUMB_MECH_SPC  = 152
 
       CHARACTER( 16 ) :: GAS_CHEM_SPC( N_GAS_CHEM_SPC )
       CHARACTER( 16 ) :: CHEMISTRY_SPC( NUMB_MECH_SPC )
@@ -209,27 +209,28 @@
       DATA GAS_CHEM_SPC( 105 ) / 'ALKRXN          ' /
       DATA GAS_CHEM_SPC( 106 ) / 'H2NO3PIJ        ' /
       DATA GAS_CHEM_SPC( 107 ) / 'H2NO3PK         ' /
-      DATA GAS_CHEM_SPC( 108 ) / 'PCVOC           ' /
-      DATA GAS_CHEM_SPC( 109 ) / 'PCSOARXN        ' /
-      DATA GAS_CHEM_SPC( 110 ) / 'VLVPO1          ' /
-      DATA GAS_CHEM_SPC( 111 ) / 'VSVPO1          ' /
-      DATA GAS_CHEM_SPC( 112 ) / 'VSVPO2          ' /
-      DATA GAS_CHEM_SPC( 113 ) / 'VSVPO3          ' /
-      DATA GAS_CHEM_SPC( 114 ) / 'VIVPO1          ' /
-      DATA GAS_CHEM_SPC( 115 ) / 'VLVOO1          ' /
-      DATA GAS_CHEM_SPC( 116 ) / 'VLVOO2          ' /
-      DATA GAS_CHEM_SPC( 117 ) / 'VSVOO2          ' /
-      DATA GAS_CHEM_SPC( 118 ) / 'VSVOO3          ' /
-      DATA GAS_CHEM_SPC( 119 ) / 'VSVOO1          ' /
-      DATA GAS_CHEM_SPC( 120 ) / 'FORM_PRIMARY    ' /
-      DATA GAS_CHEM_SPC( 121 ) / 'ALD2_PRIMARY    ' /
-      DATA GAS_CHEM_SPC( 122 ) / 'BUTADIENE13     ' /
-      DATA GAS_CHEM_SPC( 123 ) / 'ACROLEIN        ' /
-      DATA GAS_CHEM_SPC( 124 ) / 'ACRO_PRIMARY    ' /
-      DATA GAS_CHEM_SPC( 125 ) / 'TOLU            ' /
-      DATA GAS_CHEM_SPC( 126 ) / 'HG              ' /
-      DATA GAS_CHEM_SPC( 127 ) / 'HGIIAER         ' /
-      DATA GAS_CHEM_SPC( 128 ) / 'HGIIGAS         ' /
+      DATA GAS_CHEM_SPC( 108 ) / 'IEPOXP          ' /
+      DATA GAS_CHEM_SPC( 109 ) / 'PCVOC           ' /
+      DATA GAS_CHEM_SPC( 110 ) / 'PCSOARXN        ' /
+      DATA GAS_CHEM_SPC( 111 ) / 'VLVPO1          ' /
+      DATA GAS_CHEM_SPC( 112 ) / 'VSVPO1          ' /
+      DATA GAS_CHEM_SPC( 113 ) / 'VSVPO2          ' /
+      DATA GAS_CHEM_SPC( 114 ) / 'VSVPO3          ' /
+      DATA GAS_CHEM_SPC( 115 ) / 'VIVPO1          ' /
+      DATA GAS_CHEM_SPC( 116 ) / 'VLVOO1          ' /
+      DATA GAS_CHEM_SPC( 117 ) / 'VLVOO2          ' /
+      DATA GAS_CHEM_SPC( 118 ) / 'VSVOO2          ' /
+      DATA GAS_CHEM_SPC( 119 ) / 'VSVOO3          ' /
+      DATA GAS_CHEM_SPC( 120 ) / 'VSVOO1          ' /
+      DATA GAS_CHEM_SPC( 121 ) / 'FORM_PRIMARY    ' /
+      DATA GAS_CHEM_SPC( 122 ) / 'ALD2_PRIMARY    ' /
+      DATA GAS_CHEM_SPC( 123 ) / 'BUTADIENE13     ' /
+      DATA GAS_CHEM_SPC( 124 ) / 'ACROLEIN        ' /
+      DATA GAS_CHEM_SPC( 125 ) / 'ACRO_PRIMARY    ' /
+      DATA GAS_CHEM_SPC( 126 ) / 'TOLU            ' /
+      DATA GAS_CHEM_SPC( 127 ) / 'HG              ' /
+      DATA GAS_CHEM_SPC( 128 ) / 'HGIIAER         ' /
+      DATA GAS_CHEM_SPC( 129 ) / 'HGIIGAS         ' /
 
 
 
@@ -322,93 +323,95 @@
       & MEMBER("HPLD            ",   61, "GC",  116.10D0, F), &
       & MEMBER("OPO3            ",   62, "GC",  115.00D0, F), &
       & MEMBER("EPOX            ",   63, "GC",  118.10D0, F), &
-      & MEMBER("EPX2            ",   64, "GC",  149.10D0, F), &
-      & MEMBER("TERP            ",   65, "GC",  136.20D0, F), &
-      & MEMBER("TRPRXN          ",   66, "GC",  136.20D0, F), &
-      & MEMBER("BENZENE         ",   67, "GC",   78.10D0, F), &
-      & MEMBER("CRES            ",   68, "GC",  108.10D0, F), &
-      & MEMBER("BZO2            ",   69, "GC",  159.10D0, F), &
-      & MEMBER("OPEN            ",   70, "GC",   84.00D0, F), &
-      & MEMBER("BENZRO2         ",   71, "GC",  127.00D0, F), &
-      & MEMBER("TOL             ",   72, "GC",   92.10D0, F), &
-      & MEMBER("TO2             ",   73, "GC",  173.10D0, F), &
-      & MEMBER("TOLRO2          ",   74, "GC",  141.00D0, F), &
-      & MEMBER("XOPN            ",   75, "GC",   98.10D0, F), &
-      & MEMBER("XYLMN           ",   76, "GC",  106.20D0, F), &
-      & MEMBER("XLO2            ",   77, "GC",  187.10D0, F), &
-      & MEMBER("XYLRO2          ",   78, "GC",  155.00D0, F), &
-      & MEMBER("NAPH            ",   79, "GC",  128.20D0, F), &
-      & MEMBER("PAHRO2          ",   80, "GC",  187.20D0, F), &
-      & MEMBER("CRO             ",   81, "GC",  107.10D0, F), &
-      & MEMBER("CAT1            ",   82, "GC",  124.10D0, F), &
-      & MEMBER("CRON            ",   83, "GC",  153.10D0, F), &
-      & MEMBER("OPAN            ",   84, "GC",  161.00D0, F), &
-      & MEMBER("ECH4            ",   85, "GC",   16.00D0, F), &
-      & MEMBER("CL2             ",   86, "GC",   71.00D0, F), &
-      & MEMBER("CL              ",   87, "GC",   35.50D0, F), &
-      & MEMBER("HOCL            ",   88, "GC",   52.50D0, F), &
-      & MEMBER("CLO             ",   89, "GC",   51.50D0, F), &
-      & MEMBER("FMCL            ",   90, "GC",   64.50D0, F), &
-      & MEMBER("HCL             ",   91, "GC",   36.50D0, F), &
-      & MEMBER("CLNO2           ",   92, "GC",   81.50D0, F), &
-      & MEMBER("CLNO3           ",   93, "GC",   97.50D0, F), &
-      & MEMBER("TOLNRXN         ",   94, "GC",  141.00D0, F), &
-      & MEMBER("TOLHRXN         ",   95, "GC",  141.00D0, F), &
-      & MEMBER("XYLNRXN         ",   96, "GC",  155.00D0, F), &
-      & MEMBER("XYLHRXN         ",   97, "GC",  155.00D0, F), &
-      & MEMBER("BNZNRXN         ",   98, "GC",  127.00D0, F), &
-      & MEMBER("BNZHRXN         ",   99, "GC",  127.00D0, F), &
-      & MEMBER("SESQ            ",  100, "GC",  204.00D0, F), &
-      & MEMBER("SESQRXN         ",  101, "GC",  204.00D0, F), &
-      & MEMBER("PAHNRXN         ",  102, "GC",  187.20D0, F), &
-      & MEMBER("PAHHRXN         ",  103, "GC",  187.20D0, F), &
-      & MEMBER("SOAALK          ",  104, "GC",  112.00D0, F), &
-      & MEMBER("ALKRXN          ",  105, "GC",  112.00D0, F), &
-      & MEMBER("H2NO3PIJ        ",  106, "GC",   64.00D0, F), &
-      & MEMBER("H2NO3PK         ",  107, "GC",   64.00D0, F), &
-      & MEMBER("ACLI            ",  183, "AE",   35.50D0, T), &
-      & MEMBER("ACLJ            ",  182, "AE",   35.50D0, T), &
-      & MEMBER("ACLK            ",  185, "AE",   35.50D0, T), &
-      & MEMBER("AISO3J          ",  191, "AE",  168.20D0, T), &
-      & MEMBER("AGLYJ           ",  194, "AE",   66.40D0, T), &
-      & MEMBER("AXYL1J          ",  138, "AE",  174.00D0, T), &
-      & MEMBER("AOLGAJ          ",  192, "AE",  206.00D0, T), &
-      & MEMBER("AXYL2J          ",  139, "AE",  185.00D0, T), &
-      & MEMBER("ATOL1J          ",  141, "AE",  163.00D0, T), &
-      & MEMBER("ATOL2J          ",  142, "AE",  175.00D0, T), &
-      & MEMBER("ABNZ1J          ",  144, "AE",  161.00D0, T), &
-      & MEMBER("ABNZ2J          ",  145, "AE",  134.00D0, T), &
-      & MEMBER("ATRP1J          ",  150, "AE",  177.00D0, T), &
-      & MEMBER("AOLGBJ          ",  193, "AE",  248.00D0, T), &
-      & MEMBER("ATRP2J          ",  151, "AE",  198.00D0, T), &
-      & MEMBER("AISO1J          ",  152, "AE",  132.00D0, T), &
-      & MEMBER("AISO2J          ",  153, "AE",  133.00D0, T), &
-      & MEMBER("ASQTJ           ",  154, "AE",  273.00D0, T), &
-      & MEMBER("APAH1J          ",  147, "AE",  195.60D0, T), &
-      & MEMBER("APAH2J          ",  148, "AE",  178.70D0, T), &
-      & MEMBER("AALK1J          ",  136, "AE",  225.00D0, T), &
-      & MEMBER("AALK2J          ",  137, "AE",  205.10D0, T), &
-      & MEMBER("PCVOC           ",  118, "GC",  170.00D0, F), &
-      & MEMBER("PCSOARXN        ",  119, "GC",  170.00D0, F), &
-      & MEMBER("VLVPO1          ",  108, "GC",  218.00D0, F), &
-      & MEMBER("VSVPO1          ",  109, "GC",  230.00D0, F), &
-      & MEMBER("VSVPO2          ",  110, "GC",  241.00D0, F), &
-      & MEMBER("VSVPO3          ",  111, "GC",  253.00D0, F), &
-      & MEMBER("VIVPO1          ",  112, "GC",  266.00D0, F), &
-      & MEMBER("VLVOO1          ",  113, "GC",  136.00D0, F), &
-      & MEMBER("VLVOO2          ",  114, "GC",  136.00D0, F), &
-      & MEMBER("VSVOO2          ",  116, "GC",  135.00D0, F), &
-      & MEMBER("VSVOO3          ",  117, "GC",  134.00D0, F), &
-      & MEMBER("VSVOO1          ",  115, "GC",  135.00D0, F), &
-      & MEMBER("FORM_PRIMARY    ",  120, "GC",   30.00D0, F), &
-      & MEMBER("ALD2_PRIMARY    ",  121, "GC",   44.00D0, F), &
-      & MEMBER("BUTADIENE13     ",  122, "GC",   54.00D0, F), &
-      & MEMBER("ACROLEIN        ",  123, "GC",   56.10D0, F), &
-      & MEMBER("ACRO_PRIMARY    ",  124, "GC",   56.10D0, F), &
-      & MEMBER("TOLU            ",  125, "GC",   92.00D0, F), &
-      & MEMBER("HG              ",  126, "GC",  200.60D0, F), &
-      & MEMBER("HGIIAER         ",  127, "GC",  200.60D0, F), &
-      & MEMBER("HGIIGAS         ",  128, "GC",  271.50D0, F) /)
+      & MEMBER("EPX2            ",   65, "GC",  149.10D0, F), &
+      & MEMBER("TERP            ",   66, "GC",  136.20D0, F), &
+      & MEMBER("TRPRXN          ",   67, "GC",  136.20D0, F), &
+      & MEMBER("BENZENE         ",   68, "GC",   78.10D0, F), &
+      & MEMBER("CRES            ",   69, "GC",  108.10D0, F), &
+      & MEMBER("BZO2            ",   70, "GC",  159.10D0, F), &
+      & MEMBER("OPEN            ",   71, "GC",   84.00D0, F), &
+      & MEMBER("BENZRO2         ",   72, "GC",  127.00D0, F), &
+      & MEMBER("TOL             ",   73, "GC",   92.10D0, F), &
+      & MEMBER("TO2             ",   74, "GC",  173.10D0, F), &
+      & MEMBER("TOLRO2          ",   75, "GC",  141.00D0, F), &
+      & MEMBER("XOPN            ",   76, "GC",   98.10D0, F), &
+      & MEMBER("XYLMN           ",   77, "GC",  106.20D0, F), &
+      & MEMBER("XLO2            ",   78, "GC",  187.10D0, F), &
+      & MEMBER("XYLRO2          ",   79, "GC",  155.00D0, F), &
+      & MEMBER("NAPH            ",   80, "GC",  128.20D0, F), &
+      & MEMBER("PAHRO2          ",   81, "GC",  187.20D0, F), &
+      & MEMBER("CRO             ",   82, "GC",  107.10D0, F), &
+      & MEMBER("CAT1            ",   83, "GC",  124.10D0, F), &
+      & MEMBER("CRON            ",   84, "GC",  153.10D0, F), &
+      & MEMBER("OPAN            ",   85, "GC",  161.00D0, F), &
+      & MEMBER("ECH4            ",   86, "GC",   16.00D0, F), &
+      & MEMBER("CL2             ",   87, "GC",   71.00D0, F), &
+      & MEMBER("CL              ",   88, "GC",   35.50D0, F), &
+      & MEMBER("HOCL            ",   89, "GC",   52.50D0, F), &
+      & MEMBER("CLO             ",   90, "GC",   51.50D0, F), &
+      & MEMBER("FMCL            ",   91, "GC",   64.50D0, F), &
+      & MEMBER("HCL             ",   92, "GC",   36.50D0, F), &
+      & MEMBER("CLNO2           ",   93, "GC",   81.50D0, F), &
+      & MEMBER("CLNO3           ",   94, "GC",   97.50D0, F), &
+      & MEMBER("TOLNRXN         ",   95, "GC",  141.00D0, F), &
+      & MEMBER("TOLHRXN         ",   96, "GC",  141.00D0, F), &
+      & MEMBER("XYLNRXN         ",   97, "GC",  155.00D0, F), &
+      & MEMBER("XYLHRXN         ",   98, "GC",  155.00D0, F), &
+      & MEMBER("BNZNRXN         ",   99, "GC",  127.00D0, F), &
+      & MEMBER("BNZHRXN         ",  100, "GC",  127.00D0, F), &
+      & MEMBER("SESQ            ",  101, "GC",  204.00D0, F), &
+      & MEMBER("SESQRXN         ",  102, "GC",  204.00D0, F), &
+      & MEMBER("PAHNRXN         ",  103, "GC",  187.20D0, F), &
+      & MEMBER("PAHHRXN         ",  104, "GC",  187.20D0, F), &
+      & MEMBER("SOAALK          ",  105, "GC",  112.00D0, F), &
+      & MEMBER("ALKRXN          ",  106, "GC",  112.00D0, F), &
+      & MEMBER("H2NO3PIJ        ",  107, "GC",   64.00D0, F), &
+      & MEMBER("H2NO3PK         ",  108, "GC",   64.00D0, F), &
+      & MEMBER("ACLI            ",  184, "AE",   35.50D0, T), &
+      & MEMBER("ACLJ            ",  183, "AE",   35.50D0, T), &
+      & MEMBER("ACLK            ",  186, "AE",   35.50D0, T), &
+      & MEMBER("IEPOXP          ",   64, "GC",  118.10D0, F), &
+      & MEMBER("ASO4J           ",  131, "AE",   96.00D0, T), &
+      & MEMBER("AISO3J          ",  192, "AE",  168.20D0, T), &
+      & MEMBER("AGLYJ           ",  195, "AE",   66.40D0, T), &
+      & MEMBER("AXYL1J          ",  139, "AE",  174.00D0, T), &
+      & MEMBER("AOLGAJ          ",  193, "AE",  206.00D0, T), &
+      & MEMBER("AXYL2J          ",  140, "AE",  185.00D0, T), &
+      & MEMBER("ATOL1J          ",  142, "AE",  163.00D0, T), &
+      & MEMBER("ATOL2J          ",  143, "AE",  175.00D0, T), &
+      & MEMBER("ABNZ1J          ",  145, "AE",  161.00D0, T), &
+      & MEMBER("ABNZ2J          ",  146, "AE",  134.00D0, T), &
+      & MEMBER("ATRP1J          ",  151, "AE",  177.00D0, T), &
+      & MEMBER("AOLGBJ          ",  194, "AE",  248.00D0, T), &
+      & MEMBER("ATRP2J          ",  152, "AE",  198.00D0, T), &
+      & MEMBER("AISO1J          ",  153, "AE",  132.00D0, T), &
+      & MEMBER("AISO2J          ",  154, "AE",  133.00D0, T), &
+      & MEMBER("ASQTJ           ",  155, "AE",  273.00D0, T), &
+      & MEMBER("APAH1J          ",  148, "AE",  195.60D0, T), &
+      & MEMBER("APAH2J          ",  149, "AE",  178.70D0, T), &
+      & MEMBER("AALK1J          ",  137, "AE",  225.00D0, T), &
+      & MEMBER("AALK2J          ",  138, "AE",  205.10D0, T), &
+      & MEMBER("PCVOC           ",  119, "GC",  170.00D0, F), &
+      & MEMBER("PCSOARXN        ",  120, "GC",  170.00D0, F), &
+      & MEMBER("VLVPO1          ",  109, "GC",  218.00D0, F), &
+      & MEMBER("VSVPO1          ",  110, "GC",  230.00D0, F), &
+      & MEMBER("VSVPO2          ",  111, "GC",  241.00D0, F), &
+      & MEMBER("VSVPO3          ",  112, "GC",  253.00D0, F), &
+      & MEMBER("VIVPO1          ",  113, "GC",  266.00D0, F), &
+      & MEMBER("VLVOO1          ",  114, "GC",  136.00D0, F), &
+      & MEMBER("VLVOO2          ",  115, "GC",  136.00D0, F), &
+      & MEMBER("VSVOO2          ",  117, "GC",  135.00D0, F), &
+      & MEMBER("VSVOO3          ",  118, "GC",  134.00D0, F), &
+      & MEMBER("VSVOO1          ",  116, "GC",  135.00D0, F), &
+      & MEMBER("FORM_PRIMARY    ",  121, "GC",   30.00D0, F), &
+      & MEMBER("ALD2_PRIMARY    ",  122, "GC",   44.00D0, F), &
+      & MEMBER("BUTADIENE13     ",  123, "GC",   54.00D0, F), &
+      & MEMBER("ACROLEIN        ",  124, "GC",   56.10D0, F), &
+      & MEMBER("ACRO_PRIMARY    ",  125, "GC",   56.10D0, F), &
+      & MEMBER("TOLU            ",  126, "GC",   92.00D0, F), &
+      & MEMBER("HG              ",  127, "GC",  200.60D0, F), &
+      & MEMBER("HGIIAER         ",  128, "GC",  200.60D0, F), &
+      & MEMBER("HGIIGAS         ",  129, "GC",  271.50D0, F) /)
 
       DATA CHEMISTRY_SPC(   1 ), SPECIES_MOLWT(   1 ) / 'NO2             ',   46.00D0 /
       DATA CHEMISTRY_SPC(   2 ), SPECIES_MOLWT(   2 ) / 'NO              ',   30.00D0 /
@@ -520,46 +523,48 @@
       DATA CHEMISTRY_SPC( 108 ), SPECIES_MOLWT( 108 ) / 'ACLI            ',   35.50D0 /
       DATA CHEMISTRY_SPC( 109 ), SPECIES_MOLWT( 109 ) / 'ACLJ            ',   35.50D0 /
       DATA CHEMISTRY_SPC( 110 ), SPECIES_MOLWT( 110 ) / 'ACLK            ',   35.50D0 /
-      DATA CHEMISTRY_SPC( 111 ), SPECIES_MOLWT( 111 ) / 'AISO3J          ',  168.20D0 /
-      DATA CHEMISTRY_SPC( 112 ), SPECIES_MOLWT( 112 ) / 'AGLYJ           ',   66.40D0 /
-      DATA CHEMISTRY_SPC( 113 ), SPECIES_MOLWT( 113 ) / 'AXYL1J          ',  174.00D0 /
-      DATA CHEMISTRY_SPC( 114 ), SPECIES_MOLWT( 114 ) / 'AOLGAJ          ',  206.00D0 /
-      DATA CHEMISTRY_SPC( 115 ), SPECIES_MOLWT( 115 ) / 'AXYL2J          ',  185.00D0 /
-      DATA CHEMISTRY_SPC( 116 ), SPECIES_MOLWT( 116 ) / 'ATOL1J          ',  163.00D0 /
-      DATA CHEMISTRY_SPC( 117 ), SPECIES_MOLWT( 117 ) / 'ATOL2J          ',  175.00D0 /
-      DATA CHEMISTRY_SPC( 118 ), SPECIES_MOLWT( 118 ) / 'ABNZ1J          ',  161.00D0 /
-      DATA CHEMISTRY_SPC( 119 ), SPECIES_MOLWT( 119 ) / 'ABNZ2J          ',  134.00D0 /
-      DATA CHEMISTRY_SPC( 120 ), SPECIES_MOLWT( 120 ) / 'ATRP1J          ',  177.00D0 /
-      DATA CHEMISTRY_SPC( 121 ), SPECIES_MOLWT( 121 ) / 'AOLGBJ          ',  248.00D0 /
-      DATA CHEMISTRY_SPC( 122 ), SPECIES_MOLWT( 122 ) / 'ATRP2J          ',  198.00D0 /
-      DATA CHEMISTRY_SPC( 123 ), SPECIES_MOLWT( 123 ) / 'AISO1J          ',  132.00D0 /
-      DATA CHEMISTRY_SPC( 124 ), SPECIES_MOLWT( 124 ) / 'AISO2J          ',  133.00D0 /
-      DATA CHEMISTRY_SPC( 125 ), SPECIES_MOLWT( 125 ) / 'ASQTJ           ',  273.00D0 /
-      DATA CHEMISTRY_SPC( 126 ), SPECIES_MOLWT( 126 ) / 'APAH1J          ',  195.60D0 /
-      DATA CHEMISTRY_SPC( 127 ), SPECIES_MOLWT( 127 ) / 'APAH2J          ',  178.70D0 /
-      DATA CHEMISTRY_SPC( 128 ), SPECIES_MOLWT( 128 ) / 'AALK1J          ',  225.00D0 /
-      DATA CHEMISTRY_SPC( 129 ), SPECIES_MOLWT( 129 ) / 'AALK2J          ',  205.10D0 /
-      DATA CHEMISTRY_SPC( 130 ), SPECIES_MOLWT( 130 ) / 'PCVOC           ',  170.00D0 /
-      DATA CHEMISTRY_SPC( 131 ), SPECIES_MOLWT( 131 ) / 'PCSOARXN        ',  170.00D0 /
-      DATA CHEMISTRY_SPC( 132 ), SPECIES_MOLWT( 132 ) / 'VLVPO1          ',  218.00D0 /
-      DATA CHEMISTRY_SPC( 133 ), SPECIES_MOLWT( 133 ) / 'VSVPO1          ',  230.00D0 /
-      DATA CHEMISTRY_SPC( 134 ), SPECIES_MOLWT( 134 ) / 'VSVPO2          ',  241.00D0 /
-      DATA CHEMISTRY_SPC( 135 ), SPECIES_MOLWT( 135 ) / 'VSVPO3          ',  253.00D0 /
-      DATA CHEMISTRY_SPC( 136 ), SPECIES_MOLWT( 136 ) / 'VIVPO1          ',  266.00D0 /
-      DATA CHEMISTRY_SPC( 137 ), SPECIES_MOLWT( 137 ) / 'VLVOO1          ',  136.00D0 /
-      DATA CHEMISTRY_SPC( 138 ), SPECIES_MOLWT( 138 ) / 'VLVOO2          ',  136.00D0 /
-      DATA CHEMISTRY_SPC( 139 ), SPECIES_MOLWT( 139 ) / 'VSVOO2          ',  135.00D0 /
-      DATA CHEMISTRY_SPC( 140 ), SPECIES_MOLWT( 140 ) / 'VSVOO3          ',  134.00D0 /
-      DATA CHEMISTRY_SPC( 141 ), SPECIES_MOLWT( 141 ) / 'VSVOO1          ',  135.00D0 /
-      DATA CHEMISTRY_SPC( 142 ), SPECIES_MOLWT( 142 ) / 'FORM_PRIMARY    ',   30.00D0 /
-      DATA CHEMISTRY_SPC( 143 ), SPECIES_MOLWT( 143 ) / 'ALD2_PRIMARY    ',   44.00D0 /
-      DATA CHEMISTRY_SPC( 144 ), SPECIES_MOLWT( 144 ) / 'BUTADIENE13     ',   54.00D0 /
-      DATA CHEMISTRY_SPC( 145 ), SPECIES_MOLWT( 145 ) / 'ACROLEIN        ',   56.10D0 /
-      DATA CHEMISTRY_SPC( 146 ), SPECIES_MOLWT( 146 ) / 'ACRO_PRIMARY    ',   56.10D0 /
-      DATA CHEMISTRY_SPC( 147 ), SPECIES_MOLWT( 147 ) / 'TOLU            ',   92.00D0 /
-      DATA CHEMISTRY_SPC( 148 ), SPECIES_MOLWT( 148 ) / 'HG              ',  200.60D0 /
-      DATA CHEMISTRY_SPC( 149 ), SPECIES_MOLWT( 149 ) / 'HGIIAER         ',  200.60D0 /
-      DATA CHEMISTRY_SPC( 150 ), SPECIES_MOLWT( 150 ) / 'HGIIGAS         ',  271.50D0 /
+      DATA CHEMISTRY_SPC( 111 ), SPECIES_MOLWT( 111 ) / 'IEPOXP          ',  118.10D0 /
+      DATA CHEMISTRY_SPC( 112 ), SPECIES_MOLWT( 112 ) / 'ASO4J           ',   96.00D0 /
+      DATA CHEMISTRY_SPC( 113 ), SPECIES_MOLWT( 113 ) / 'AISO3J          ',  168.20D0 /
+      DATA CHEMISTRY_SPC( 114 ), SPECIES_MOLWT( 114 ) / 'AGLYJ           ',   66.40D0 /
+      DATA CHEMISTRY_SPC( 115 ), SPECIES_MOLWT( 115 ) / 'AXYL1J          ',  174.00D0 /
+      DATA CHEMISTRY_SPC( 116 ), SPECIES_MOLWT( 116 ) / 'AOLGAJ          ',  206.00D0 /
+      DATA CHEMISTRY_SPC( 117 ), SPECIES_MOLWT( 117 ) / 'AXYL2J          ',  185.00D0 /
+      DATA CHEMISTRY_SPC( 118 ), SPECIES_MOLWT( 118 ) / 'ATOL1J          ',  163.00D0 /
+      DATA CHEMISTRY_SPC( 119 ), SPECIES_MOLWT( 119 ) / 'ATOL2J          ',  175.00D0 /
+      DATA CHEMISTRY_SPC( 120 ), SPECIES_MOLWT( 120 ) / 'ABNZ1J          ',  161.00D0 /
+      DATA CHEMISTRY_SPC( 121 ), SPECIES_MOLWT( 121 ) / 'ABNZ2J          ',  134.00D0 /
+      DATA CHEMISTRY_SPC( 122 ), SPECIES_MOLWT( 122 ) / 'ATRP1J          ',  177.00D0 /
+      DATA CHEMISTRY_SPC( 123 ), SPECIES_MOLWT( 123 ) / 'AOLGBJ          ',  248.00D0 /
+      DATA CHEMISTRY_SPC( 124 ), SPECIES_MOLWT( 124 ) / 'ATRP2J          ',  198.00D0 /
+      DATA CHEMISTRY_SPC( 125 ), SPECIES_MOLWT( 125 ) / 'AISO1J          ',  132.00D0 /
+      DATA CHEMISTRY_SPC( 126 ), SPECIES_MOLWT( 126 ) / 'AISO2J          ',  133.00D0 /
+      DATA CHEMISTRY_SPC( 127 ), SPECIES_MOLWT( 127 ) / 'ASQTJ           ',  273.00D0 /
+      DATA CHEMISTRY_SPC( 128 ), SPECIES_MOLWT( 128 ) / 'APAH1J          ',  195.60D0 /
+      DATA CHEMISTRY_SPC( 129 ), SPECIES_MOLWT( 129 ) / 'APAH2J          ',  178.70D0 /
+      DATA CHEMISTRY_SPC( 130 ), SPECIES_MOLWT( 130 ) / 'AALK1J          ',  225.00D0 /
+      DATA CHEMISTRY_SPC( 131 ), SPECIES_MOLWT( 131 ) / 'AALK2J          ',  205.10D0 /
+      DATA CHEMISTRY_SPC( 132 ), SPECIES_MOLWT( 132 ) / 'PCVOC           ',  170.00D0 /
+      DATA CHEMISTRY_SPC( 133 ), SPECIES_MOLWT( 133 ) / 'PCSOARXN        ',  170.00D0 /
+      DATA CHEMISTRY_SPC( 134 ), SPECIES_MOLWT( 134 ) / 'VLVPO1          ',  218.00D0 /
+      DATA CHEMISTRY_SPC( 135 ), SPECIES_MOLWT( 135 ) / 'VSVPO1          ',  230.00D0 /
+      DATA CHEMISTRY_SPC( 136 ), SPECIES_MOLWT( 136 ) / 'VSVPO2          ',  241.00D0 /
+      DATA CHEMISTRY_SPC( 137 ), SPECIES_MOLWT( 137 ) / 'VSVPO3          ',  253.00D0 /
+      DATA CHEMISTRY_SPC( 138 ), SPECIES_MOLWT( 138 ) / 'VIVPO1          ',  266.00D0 /
+      DATA CHEMISTRY_SPC( 139 ), SPECIES_MOLWT( 139 ) / 'VLVOO1          ',  136.00D0 /
+      DATA CHEMISTRY_SPC( 140 ), SPECIES_MOLWT( 140 ) / 'VLVOO2          ',  136.00D0 /
+      DATA CHEMISTRY_SPC( 141 ), SPECIES_MOLWT( 141 ) / 'VSVOO2          ',  135.00D0 /
+      DATA CHEMISTRY_SPC( 142 ), SPECIES_MOLWT( 142 ) / 'VSVOO3          ',  134.00D0 /
+      DATA CHEMISTRY_SPC( 143 ), SPECIES_MOLWT( 143 ) / 'VSVOO1          ',  135.00D0 /
+      DATA CHEMISTRY_SPC( 144 ), SPECIES_MOLWT( 144 ) / 'FORM_PRIMARY    ',   30.00D0 /
+      DATA CHEMISTRY_SPC( 145 ), SPECIES_MOLWT( 145 ) / 'ALD2_PRIMARY    ',   44.00D0 /
+      DATA CHEMISTRY_SPC( 146 ), SPECIES_MOLWT( 146 ) / 'BUTADIENE13     ',   54.00D0 /
+      DATA CHEMISTRY_SPC( 147 ), SPECIES_MOLWT( 147 ) / 'ACROLEIN        ',   56.10D0 /
+      DATA CHEMISTRY_SPC( 148 ), SPECIES_MOLWT( 148 ) / 'ACRO_PRIMARY    ',   56.10D0 /
+      DATA CHEMISTRY_SPC( 149 ), SPECIES_MOLWT( 149 ) / 'TOLU            ',   92.00D0 /
+      DATA CHEMISTRY_SPC( 150 ), SPECIES_MOLWT( 150 ) / 'HG              ',  200.60D0 /
+      DATA CHEMISTRY_SPC( 151 ), SPECIES_MOLWT( 151 ) / 'HGIIAER         ',  200.60D0 /
+      DATA CHEMISTRY_SPC( 152 ), SPECIES_MOLWT( 152 ) / 'HGIIGAS         ',  271.50D0 /
 
 
       DATA CGRID_INDEX(   1 ), SPECIES_TYPE(   1 ), CONVERT_CONC(   1 ) /    1, 'GC', F /  ! NO2
@@ -625,93 +630,95 @@
       DATA CGRID_INDEX(  61 ), SPECIES_TYPE(  61 ), CONVERT_CONC(  61 ) /   61, 'GC', F /  ! HPLD
       DATA CGRID_INDEX(  62 ), SPECIES_TYPE(  62 ), CONVERT_CONC(  62 ) /   62, 'GC', F /  ! OPO3
       DATA CGRID_INDEX(  63 ), SPECIES_TYPE(  63 ), CONVERT_CONC(  63 ) /   63, 'GC', F /  ! EPOX
-      DATA CGRID_INDEX(  64 ), SPECIES_TYPE(  64 ), CONVERT_CONC(  64 ) /   64, 'GC', F /  ! EPX2
-      DATA CGRID_INDEX(  65 ), SPECIES_TYPE(  65 ), CONVERT_CONC(  65 ) /   65, 'GC', F /  ! TERP
-      DATA CGRID_INDEX(  66 ), SPECIES_TYPE(  66 ), CONVERT_CONC(  66 ) /   66, 'GC', F /  ! TRPRXN
-      DATA CGRID_INDEX(  67 ), SPECIES_TYPE(  67 ), CONVERT_CONC(  67 ) /   67, 'GC', F /  ! BENZENE
-      DATA CGRID_INDEX(  68 ), SPECIES_TYPE(  68 ), CONVERT_CONC(  68 ) /   68, 'GC', F /  ! CRES
-      DATA CGRID_INDEX(  69 ), SPECIES_TYPE(  69 ), CONVERT_CONC(  69 ) /   69, 'GC', F /  ! BZO2
-      DATA CGRID_INDEX(  70 ), SPECIES_TYPE(  70 ), CONVERT_CONC(  70 ) /   70, 'GC', F /  ! OPEN
-      DATA CGRID_INDEX(  71 ), SPECIES_TYPE(  71 ), CONVERT_CONC(  71 ) /   71, 'GC', F /  ! BENZRO2
-      DATA CGRID_INDEX(  72 ), SPECIES_TYPE(  72 ), CONVERT_CONC(  72 ) /   72, 'GC', F /  ! TOL
-      DATA CGRID_INDEX(  73 ), SPECIES_TYPE(  73 ), CONVERT_CONC(  73 ) /   73, 'GC', F /  ! TO2
-      DATA CGRID_INDEX(  74 ), SPECIES_TYPE(  74 ), CONVERT_CONC(  74 ) /   74, 'GC', F /  ! TOLRO2
-      DATA CGRID_INDEX(  75 ), SPECIES_TYPE(  75 ), CONVERT_CONC(  75 ) /   75, 'GC', F /  ! XOPN
-      DATA CGRID_INDEX(  76 ), SPECIES_TYPE(  76 ), CONVERT_CONC(  76 ) /   76, 'GC', F /  ! XYLMN
-      DATA CGRID_INDEX(  77 ), SPECIES_TYPE(  77 ), CONVERT_CONC(  77 ) /   77, 'GC', F /  ! XLO2
-      DATA CGRID_INDEX(  78 ), SPECIES_TYPE(  78 ), CONVERT_CONC(  78 ) /   78, 'GC', F /  ! XYLRO2
-      DATA CGRID_INDEX(  79 ), SPECIES_TYPE(  79 ), CONVERT_CONC(  79 ) /   79, 'GC', F /  ! NAPH
-      DATA CGRID_INDEX(  80 ), SPECIES_TYPE(  80 ), CONVERT_CONC(  80 ) /   80, 'GC', F /  ! PAHRO2
-      DATA CGRID_INDEX(  81 ), SPECIES_TYPE(  81 ), CONVERT_CONC(  81 ) /   81, 'GC', F /  ! CRO
-      DATA CGRID_INDEX(  82 ), SPECIES_TYPE(  82 ), CONVERT_CONC(  82 ) /   82, 'GC', F /  ! CAT1
-      DATA CGRID_INDEX(  83 ), SPECIES_TYPE(  83 ), CONVERT_CONC(  83 ) /   83, 'GC', F /  ! CRON
-      DATA CGRID_INDEX(  84 ), SPECIES_TYPE(  84 ), CONVERT_CONC(  84 ) /   84, 'GC', F /  ! OPAN
-      DATA CGRID_INDEX(  85 ), SPECIES_TYPE(  85 ), CONVERT_CONC(  85 ) /   85, 'GC', F /  ! ECH4
-      DATA CGRID_INDEX(  86 ), SPECIES_TYPE(  86 ), CONVERT_CONC(  86 ) /   86, 'GC', F /  ! CL2
-      DATA CGRID_INDEX(  87 ), SPECIES_TYPE(  87 ), CONVERT_CONC(  87 ) /   87, 'GC', F /  ! CL
-      DATA CGRID_INDEX(  88 ), SPECIES_TYPE(  88 ), CONVERT_CONC(  88 ) /   88, 'GC', F /  ! HOCL
-      DATA CGRID_INDEX(  89 ), SPECIES_TYPE(  89 ), CONVERT_CONC(  89 ) /   89, 'GC', F /  ! CLO
-      DATA CGRID_INDEX(  90 ), SPECIES_TYPE(  90 ), CONVERT_CONC(  90 ) /   90, 'GC', F /  ! FMCL
-      DATA CGRID_INDEX(  91 ), SPECIES_TYPE(  91 ), CONVERT_CONC(  91 ) /   91, 'GC', F /  ! HCL
-      DATA CGRID_INDEX(  92 ), SPECIES_TYPE(  92 ), CONVERT_CONC(  92 ) /   92, 'GC', F /  ! CLNO2
-      DATA CGRID_INDEX(  93 ), SPECIES_TYPE(  93 ), CONVERT_CONC(  93 ) /   93, 'GC', F /  ! CLNO3
-      DATA CGRID_INDEX(  94 ), SPECIES_TYPE(  94 ), CONVERT_CONC(  94 ) /   94, 'GC', F /  ! TOLNRXN
-      DATA CGRID_INDEX(  95 ), SPECIES_TYPE(  95 ), CONVERT_CONC(  95 ) /   95, 'GC', F /  ! TOLHRXN
-      DATA CGRID_INDEX(  96 ), SPECIES_TYPE(  96 ), CONVERT_CONC(  96 ) /   96, 'GC', F /  ! XYLNRXN
-      DATA CGRID_INDEX(  97 ), SPECIES_TYPE(  97 ), CONVERT_CONC(  97 ) /   97, 'GC', F /  ! XYLHRXN
-      DATA CGRID_INDEX(  98 ), SPECIES_TYPE(  98 ), CONVERT_CONC(  98 ) /   98, 'GC', F /  ! BNZNRXN
-      DATA CGRID_INDEX(  99 ), SPECIES_TYPE(  99 ), CONVERT_CONC(  99 ) /   99, 'GC', F /  ! BNZHRXN
-      DATA CGRID_INDEX( 100 ), SPECIES_TYPE( 100 ), CONVERT_CONC( 100 ) /  100, 'GC', F /  ! SESQ
-      DATA CGRID_INDEX( 101 ), SPECIES_TYPE( 101 ), CONVERT_CONC( 101 ) /  101, 'GC', F /  ! SESQRXN
-      DATA CGRID_INDEX( 102 ), SPECIES_TYPE( 102 ), CONVERT_CONC( 102 ) /  102, 'GC', F /  ! PAHNRXN
-      DATA CGRID_INDEX( 103 ), SPECIES_TYPE( 103 ), CONVERT_CONC( 103 ) /  103, 'GC', F /  ! PAHHRXN
-      DATA CGRID_INDEX( 104 ), SPECIES_TYPE( 104 ), CONVERT_CONC( 104 ) /  104, 'GC', F /  ! SOAALK
-      DATA CGRID_INDEX( 105 ), SPECIES_TYPE( 105 ), CONVERT_CONC( 105 ) /  105, 'GC', F /  ! ALKRXN
-      DATA CGRID_INDEX( 106 ), SPECIES_TYPE( 106 ), CONVERT_CONC( 106 ) /  106, 'GC', F /  ! H2NO3PIJ
-      DATA CGRID_INDEX( 107 ), SPECIES_TYPE( 107 ), CONVERT_CONC( 107 ) /  107, 'GC', F /  ! H2NO3PK
-      DATA CGRID_INDEX( 108 ), SPECIES_TYPE( 108 ), CONVERT_CONC( 108 ) /  183, 'AE', T /  ! ACLI
-      DATA CGRID_INDEX( 109 ), SPECIES_TYPE( 109 ), CONVERT_CONC( 109 ) /  182, 'AE', T /  ! ACLJ
-      DATA CGRID_INDEX( 110 ), SPECIES_TYPE( 110 ), CONVERT_CONC( 110 ) /  185, 'AE', T /  ! ACLK
-      DATA CGRID_INDEX( 111 ), SPECIES_TYPE( 111 ), CONVERT_CONC( 111 ) /  191, 'AE', T /  ! AISO3J
-      DATA CGRID_INDEX( 112 ), SPECIES_TYPE( 112 ), CONVERT_CONC( 112 ) /  194, 'AE', T /  ! AGLYJ
-      DATA CGRID_INDEX( 113 ), SPECIES_TYPE( 113 ), CONVERT_CONC( 113 ) /  138, 'AE', T /  ! AXYL1J
-      DATA CGRID_INDEX( 114 ), SPECIES_TYPE( 114 ), CONVERT_CONC( 114 ) /  192, 'AE', T /  ! AOLGAJ
-      DATA CGRID_INDEX( 115 ), SPECIES_TYPE( 115 ), CONVERT_CONC( 115 ) /  139, 'AE', T /  ! AXYL2J
-      DATA CGRID_INDEX( 116 ), SPECIES_TYPE( 116 ), CONVERT_CONC( 116 ) /  141, 'AE', T /  ! ATOL1J
-      DATA CGRID_INDEX( 117 ), SPECIES_TYPE( 117 ), CONVERT_CONC( 117 ) /  142, 'AE', T /  ! ATOL2J
-      DATA CGRID_INDEX( 118 ), SPECIES_TYPE( 118 ), CONVERT_CONC( 118 ) /  144, 'AE', T /  ! ABNZ1J
-      DATA CGRID_INDEX( 119 ), SPECIES_TYPE( 119 ), CONVERT_CONC( 119 ) /  145, 'AE', T /  ! ABNZ2J
-      DATA CGRID_INDEX( 120 ), SPECIES_TYPE( 120 ), CONVERT_CONC( 120 ) /  150, 'AE', T /  ! ATRP1J
-      DATA CGRID_INDEX( 121 ), SPECIES_TYPE( 121 ), CONVERT_CONC( 121 ) /  193, 'AE', T /  ! AOLGBJ
-      DATA CGRID_INDEX( 122 ), SPECIES_TYPE( 122 ), CONVERT_CONC( 122 ) /  151, 'AE', T /  ! ATRP2J
-      DATA CGRID_INDEX( 123 ), SPECIES_TYPE( 123 ), CONVERT_CONC( 123 ) /  152, 'AE', T /  ! AISO1J
-      DATA CGRID_INDEX( 124 ), SPECIES_TYPE( 124 ), CONVERT_CONC( 124 ) /  153, 'AE', T /  ! AISO2J
-      DATA CGRID_INDEX( 125 ), SPECIES_TYPE( 125 ), CONVERT_CONC( 125 ) /  154, 'AE', T /  ! ASQTJ
-      DATA CGRID_INDEX( 126 ), SPECIES_TYPE( 126 ), CONVERT_CONC( 126 ) /  147, 'AE', T /  ! APAH1J
-      DATA CGRID_INDEX( 127 ), SPECIES_TYPE( 127 ), CONVERT_CONC( 127 ) /  148, 'AE', T /  ! APAH2J
-      DATA CGRID_INDEX( 128 ), SPECIES_TYPE( 128 ), CONVERT_CONC( 128 ) /  136, 'AE', T /  ! AALK1J
-      DATA CGRID_INDEX( 129 ), SPECIES_TYPE( 129 ), CONVERT_CONC( 129 ) /  137, 'AE', T /  ! AALK2J
-      DATA CGRID_INDEX( 130 ), SPECIES_TYPE( 130 ), CONVERT_CONC( 130 ) /  118, 'GC', F /  ! PCVOC
-      DATA CGRID_INDEX( 131 ), SPECIES_TYPE( 131 ), CONVERT_CONC( 131 ) /  119, 'GC', F /  ! PCSOARXN
-      DATA CGRID_INDEX( 132 ), SPECIES_TYPE( 132 ), CONVERT_CONC( 132 ) /  108, 'GC', F /  ! VLVPO1
-      DATA CGRID_INDEX( 133 ), SPECIES_TYPE( 133 ), CONVERT_CONC( 133 ) /  109, 'GC', F /  ! VSVPO1
-      DATA CGRID_INDEX( 134 ), SPECIES_TYPE( 134 ), CONVERT_CONC( 134 ) /  110, 'GC', F /  ! VSVPO2
-      DATA CGRID_INDEX( 135 ), SPECIES_TYPE( 135 ), CONVERT_CONC( 135 ) /  111, 'GC', F /  ! VSVPO3
-      DATA CGRID_INDEX( 136 ), SPECIES_TYPE( 136 ), CONVERT_CONC( 136 ) /  112, 'GC', F /  ! VIVPO1
-      DATA CGRID_INDEX( 137 ), SPECIES_TYPE( 137 ), CONVERT_CONC( 137 ) /  113, 'GC', F /  ! VLVOO1
-      DATA CGRID_INDEX( 138 ), SPECIES_TYPE( 138 ), CONVERT_CONC( 138 ) /  114, 'GC', F /  ! VLVOO2
-      DATA CGRID_INDEX( 139 ), SPECIES_TYPE( 139 ), CONVERT_CONC( 139 ) /  116, 'GC', F /  ! VSVOO2
-      DATA CGRID_INDEX( 140 ), SPECIES_TYPE( 140 ), CONVERT_CONC( 140 ) /  117, 'GC', F /  ! VSVOO3
-      DATA CGRID_INDEX( 141 ), SPECIES_TYPE( 141 ), CONVERT_CONC( 141 ) /  115, 'GC', F /  ! VSVOO1
-      DATA CGRID_INDEX( 142 ), SPECIES_TYPE( 142 ), CONVERT_CONC( 142 ) /  120, 'GC', F /  ! FORM_PRIMARY
-      DATA CGRID_INDEX( 143 ), SPECIES_TYPE( 143 ), CONVERT_CONC( 143 ) /  121, 'GC', F /  ! ALD2_PRIMARY
-      DATA CGRID_INDEX( 144 ), SPECIES_TYPE( 144 ), CONVERT_CONC( 144 ) /  122, 'GC', F /  ! BUTADIENE13
-      DATA CGRID_INDEX( 145 ), SPECIES_TYPE( 145 ), CONVERT_CONC( 145 ) /  123, 'GC', F /  ! ACROLEIN
-      DATA CGRID_INDEX( 146 ), SPECIES_TYPE( 146 ), CONVERT_CONC( 146 ) /  124, 'GC', F /  ! ACRO_PRIMARY
-      DATA CGRID_INDEX( 147 ), SPECIES_TYPE( 147 ), CONVERT_CONC( 147 ) /  125, 'GC', F /  ! TOLU
-      DATA CGRID_INDEX( 148 ), SPECIES_TYPE( 148 ), CONVERT_CONC( 148 ) /  126, 'GC', F /  ! HG
-      DATA CGRID_INDEX( 149 ), SPECIES_TYPE( 149 ), CONVERT_CONC( 149 ) /  127, 'GC', F /  ! HGIIAER
-      DATA CGRID_INDEX( 150 ), SPECIES_TYPE( 150 ), CONVERT_CONC( 150 ) /  128, 'GC', F /  ! HGIIGAS
+      DATA CGRID_INDEX(  64 ), SPECIES_TYPE(  64 ), CONVERT_CONC(  64 ) /   65, 'GC', F /  ! EPX2
+      DATA CGRID_INDEX(  65 ), SPECIES_TYPE(  65 ), CONVERT_CONC(  65 ) /   66, 'GC', F /  ! TERP
+      DATA CGRID_INDEX(  66 ), SPECIES_TYPE(  66 ), CONVERT_CONC(  66 ) /   67, 'GC', F /  ! TRPRXN
+      DATA CGRID_INDEX(  67 ), SPECIES_TYPE(  67 ), CONVERT_CONC(  67 ) /   68, 'GC', F /  ! BENZENE
+      DATA CGRID_INDEX(  68 ), SPECIES_TYPE(  68 ), CONVERT_CONC(  68 ) /   69, 'GC', F /  ! CRES
+      DATA CGRID_INDEX(  69 ), SPECIES_TYPE(  69 ), CONVERT_CONC(  69 ) /   70, 'GC', F /  ! BZO2
+      DATA CGRID_INDEX(  70 ), SPECIES_TYPE(  70 ), CONVERT_CONC(  70 ) /   71, 'GC', F /  ! OPEN
+      DATA CGRID_INDEX(  71 ), SPECIES_TYPE(  71 ), CONVERT_CONC(  71 ) /   72, 'GC', F /  ! BENZRO2
+      DATA CGRID_INDEX(  72 ), SPECIES_TYPE(  72 ), CONVERT_CONC(  72 ) /   73, 'GC', F /  ! TOL
+      DATA CGRID_INDEX(  73 ), SPECIES_TYPE(  73 ), CONVERT_CONC(  73 ) /   74, 'GC', F /  ! TO2
+      DATA CGRID_INDEX(  74 ), SPECIES_TYPE(  74 ), CONVERT_CONC(  74 ) /   75, 'GC', F /  ! TOLRO2
+      DATA CGRID_INDEX(  75 ), SPECIES_TYPE(  75 ), CONVERT_CONC(  75 ) /   76, 'GC', F /  ! XOPN
+      DATA CGRID_INDEX(  76 ), SPECIES_TYPE(  76 ), CONVERT_CONC(  76 ) /   77, 'GC', F /  ! XYLMN
+      DATA CGRID_INDEX(  77 ), SPECIES_TYPE(  77 ), CONVERT_CONC(  77 ) /   78, 'GC', F /  ! XLO2
+      DATA CGRID_INDEX(  78 ), SPECIES_TYPE(  78 ), CONVERT_CONC(  78 ) /   79, 'GC', F /  ! XYLRO2
+      DATA CGRID_INDEX(  79 ), SPECIES_TYPE(  79 ), CONVERT_CONC(  79 ) /   80, 'GC', F /  ! NAPH
+      DATA CGRID_INDEX(  80 ), SPECIES_TYPE(  80 ), CONVERT_CONC(  80 ) /   81, 'GC', F /  ! PAHRO2
+      DATA CGRID_INDEX(  81 ), SPECIES_TYPE(  81 ), CONVERT_CONC(  81 ) /   82, 'GC', F /  ! CRO
+      DATA CGRID_INDEX(  82 ), SPECIES_TYPE(  82 ), CONVERT_CONC(  82 ) /   83, 'GC', F /  ! CAT1
+      DATA CGRID_INDEX(  83 ), SPECIES_TYPE(  83 ), CONVERT_CONC(  83 ) /   84, 'GC', F /  ! CRON
+      DATA CGRID_INDEX(  84 ), SPECIES_TYPE(  84 ), CONVERT_CONC(  84 ) /   85, 'GC', F /  ! OPAN
+      DATA CGRID_INDEX(  85 ), SPECIES_TYPE(  85 ), CONVERT_CONC(  85 ) /   86, 'GC', F /  ! ECH4
+      DATA CGRID_INDEX(  86 ), SPECIES_TYPE(  86 ), CONVERT_CONC(  86 ) /   87, 'GC', F /  ! CL2
+      DATA CGRID_INDEX(  87 ), SPECIES_TYPE(  87 ), CONVERT_CONC(  87 ) /   88, 'GC', F /  ! CL
+      DATA CGRID_INDEX(  88 ), SPECIES_TYPE(  88 ), CONVERT_CONC(  88 ) /   89, 'GC', F /  ! HOCL
+      DATA CGRID_INDEX(  89 ), SPECIES_TYPE(  89 ), CONVERT_CONC(  89 ) /   90, 'GC', F /  ! CLO
+      DATA CGRID_INDEX(  90 ), SPECIES_TYPE(  90 ), CONVERT_CONC(  90 ) /   91, 'GC', F /  ! FMCL
+      DATA CGRID_INDEX(  91 ), SPECIES_TYPE(  91 ), CONVERT_CONC(  91 ) /   92, 'GC', F /  ! HCL
+      DATA CGRID_INDEX(  92 ), SPECIES_TYPE(  92 ), CONVERT_CONC(  92 ) /   93, 'GC', F /  ! CLNO2
+      DATA CGRID_INDEX(  93 ), SPECIES_TYPE(  93 ), CONVERT_CONC(  93 ) /   94, 'GC', F /  ! CLNO3
+      DATA CGRID_INDEX(  94 ), SPECIES_TYPE(  94 ), CONVERT_CONC(  94 ) /   95, 'GC', F /  ! TOLNRXN
+      DATA CGRID_INDEX(  95 ), SPECIES_TYPE(  95 ), CONVERT_CONC(  95 ) /   96, 'GC', F /  ! TOLHRXN
+      DATA CGRID_INDEX(  96 ), SPECIES_TYPE(  96 ), CONVERT_CONC(  96 ) /   97, 'GC', F /  ! XYLNRXN
+      DATA CGRID_INDEX(  97 ), SPECIES_TYPE(  97 ), CONVERT_CONC(  97 ) /   98, 'GC', F /  ! XYLHRXN
+      DATA CGRID_INDEX(  98 ), SPECIES_TYPE(  98 ), CONVERT_CONC(  98 ) /   99, 'GC', F /  ! BNZNRXN
+      DATA CGRID_INDEX(  99 ), SPECIES_TYPE(  99 ), CONVERT_CONC(  99 ) /  100, 'GC', F /  ! BNZHRXN
+      DATA CGRID_INDEX( 100 ), SPECIES_TYPE( 100 ), CONVERT_CONC( 100 ) /  101, 'GC', F /  ! SESQ
+      DATA CGRID_INDEX( 101 ), SPECIES_TYPE( 101 ), CONVERT_CONC( 101 ) /  102, 'GC', F /  ! SESQRXN
+      DATA CGRID_INDEX( 102 ), SPECIES_TYPE( 102 ), CONVERT_CONC( 102 ) /  103, 'GC', F /  ! PAHNRXN
+      DATA CGRID_INDEX( 103 ), SPECIES_TYPE( 103 ), CONVERT_CONC( 103 ) /  104, 'GC', F /  ! PAHHRXN
+      DATA CGRID_INDEX( 104 ), SPECIES_TYPE( 104 ), CONVERT_CONC( 104 ) /  105, 'GC', F /  ! SOAALK
+      DATA CGRID_INDEX( 105 ), SPECIES_TYPE( 105 ), CONVERT_CONC( 105 ) /  106, 'GC', F /  ! ALKRXN
+      DATA CGRID_INDEX( 106 ), SPECIES_TYPE( 106 ), CONVERT_CONC( 106 ) /  107, 'GC', F /  ! H2NO3PIJ
+      DATA CGRID_INDEX( 107 ), SPECIES_TYPE( 107 ), CONVERT_CONC( 107 ) /  108, 'GC', F /  ! H2NO3PK
+      DATA CGRID_INDEX( 108 ), SPECIES_TYPE( 108 ), CONVERT_CONC( 108 ) /  184, 'AE', T /  ! ACLI
+      DATA CGRID_INDEX( 109 ), SPECIES_TYPE( 109 ), CONVERT_CONC( 109 ) /  183, 'AE', T /  ! ACLJ
+      DATA CGRID_INDEX( 110 ), SPECIES_TYPE( 110 ), CONVERT_CONC( 110 ) /  186, 'AE', T /  ! ACLK
+      DATA CGRID_INDEX( 111 ), SPECIES_TYPE( 111 ), CONVERT_CONC( 111 ) /   64, 'GC', F /  ! IEPOXP
+      DATA CGRID_INDEX( 112 ), SPECIES_TYPE( 112 ), CONVERT_CONC( 112 ) /  131, 'AE', T /  ! ASO4J
+      DATA CGRID_INDEX( 113 ), SPECIES_TYPE( 113 ), CONVERT_CONC( 113 ) /  192, 'AE', T /  ! AISO3J
+      DATA CGRID_INDEX( 114 ), SPECIES_TYPE( 114 ), CONVERT_CONC( 114 ) /  195, 'AE', T /  ! AGLYJ
+      DATA CGRID_INDEX( 115 ), SPECIES_TYPE( 115 ), CONVERT_CONC( 115 ) /  139, 'AE', T /  ! AXYL1J
+      DATA CGRID_INDEX( 116 ), SPECIES_TYPE( 116 ), CONVERT_CONC( 116 ) /  193, 'AE', T /  ! AOLGAJ
+      DATA CGRID_INDEX( 117 ), SPECIES_TYPE( 117 ), CONVERT_CONC( 117 ) /  140, 'AE', T /  ! AXYL2J
+      DATA CGRID_INDEX( 118 ), SPECIES_TYPE( 118 ), CONVERT_CONC( 118 ) /  142, 'AE', T /  ! ATOL1J
+      DATA CGRID_INDEX( 119 ), SPECIES_TYPE( 119 ), CONVERT_CONC( 119 ) /  143, 'AE', T /  ! ATOL2J
+      DATA CGRID_INDEX( 120 ), SPECIES_TYPE( 120 ), CONVERT_CONC( 120 ) /  145, 'AE', T /  ! ABNZ1J
+      DATA CGRID_INDEX( 121 ), SPECIES_TYPE( 121 ), CONVERT_CONC( 121 ) /  146, 'AE', T /  ! ABNZ2J
+      DATA CGRID_INDEX( 122 ), SPECIES_TYPE( 122 ), CONVERT_CONC( 122 ) /  151, 'AE', T /  ! ATRP1J
+      DATA CGRID_INDEX( 123 ), SPECIES_TYPE( 123 ), CONVERT_CONC( 123 ) /  194, 'AE', T /  ! AOLGBJ
+      DATA CGRID_INDEX( 124 ), SPECIES_TYPE( 124 ), CONVERT_CONC( 124 ) /  152, 'AE', T /  ! ATRP2J
+      DATA CGRID_INDEX( 125 ), SPECIES_TYPE( 125 ), CONVERT_CONC( 125 ) /  153, 'AE', T /  ! AISO1J
+      DATA CGRID_INDEX( 126 ), SPECIES_TYPE( 126 ), CONVERT_CONC( 126 ) /  154, 'AE', T /  ! AISO2J
+      DATA CGRID_INDEX( 127 ), SPECIES_TYPE( 127 ), CONVERT_CONC( 127 ) /  155, 'AE', T /  ! ASQTJ
+      DATA CGRID_INDEX( 128 ), SPECIES_TYPE( 128 ), CONVERT_CONC( 128 ) /  148, 'AE', T /  ! APAH1J
+      DATA CGRID_INDEX( 129 ), SPECIES_TYPE( 129 ), CONVERT_CONC( 129 ) /  149, 'AE', T /  ! APAH2J
+      DATA CGRID_INDEX( 130 ), SPECIES_TYPE( 130 ), CONVERT_CONC( 130 ) /  137, 'AE', T /  ! AALK1J
+      DATA CGRID_INDEX( 131 ), SPECIES_TYPE( 131 ), CONVERT_CONC( 131 ) /  138, 'AE', T /  ! AALK2J
+      DATA CGRID_INDEX( 132 ), SPECIES_TYPE( 132 ), CONVERT_CONC( 132 ) /  119, 'GC', F /  ! PCVOC
+      DATA CGRID_INDEX( 133 ), SPECIES_TYPE( 133 ), CONVERT_CONC( 133 ) /  120, 'GC', F /  ! PCSOARXN
+      DATA CGRID_INDEX( 134 ), SPECIES_TYPE( 134 ), CONVERT_CONC( 134 ) /  109, 'GC', F /  ! VLVPO1
+      DATA CGRID_INDEX( 135 ), SPECIES_TYPE( 135 ), CONVERT_CONC( 135 ) /  110, 'GC', F /  ! VSVPO1
+      DATA CGRID_INDEX( 136 ), SPECIES_TYPE( 136 ), CONVERT_CONC( 136 ) /  111, 'GC', F /  ! VSVPO2
+      DATA CGRID_INDEX( 137 ), SPECIES_TYPE( 137 ), CONVERT_CONC( 137 ) /  112, 'GC', F /  ! VSVPO3
+      DATA CGRID_INDEX( 138 ), SPECIES_TYPE( 138 ), CONVERT_CONC( 138 ) /  113, 'GC', F /  ! VIVPO1
+      DATA CGRID_INDEX( 139 ), SPECIES_TYPE( 139 ), CONVERT_CONC( 139 ) /  114, 'GC', F /  ! VLVOO1
+      DATA CGRID_INDEX( 140 ), SPECIES_TYPE( 140 ), CONVERT_CONC( 140 ) /  115, 'GC', F /  ! VLVOO2
+      DATA CGRID_INDEX( 141 ), SPECIES_TYPE( 141 ), CONVERT_CONC( 141 ) /  117, 'GC', F /  ! VSVOO2
+      DATA CGRID_INDEX( 142 ), SPECIES_TYPE( 142 ), CONVERT_CONC( 142 ) /  118, 'GC', F /  ! VSVOO3
+      DATA CGRID_INDEX( 143 ), SPECIES_TYPE( 143 ), CONVERT_CONC( 143 ) /  116, 'GC', F /  ! VSVOO1
+      DATA CGRID_INDEX( 144 ), SPECIES_TYPE( 144 ), CONVERT_CONC( 144 ) /  121, 'GC', F /  ! FORM_PRIMARY
+      DATA CGRID_INDEX( 145 ), SPECIES_TYPE( 145 ), CONVERT_CONC( 145 ) /  122, 'GC', F /  ! ALD2_PRIMARY
+      DATA CGRID_INDEX( 146 ), SPECIES_TYPE( 146 ), CONVERT_CONC( 146 ) /  123, 'GC', F /  ! BUTADIENE13
+      DATA CGRID_INDEX( 147 ), SPECIES_TYPE( 147 ), CONVERT_CONC( 147 ) /  124, 'GC', F /  ! ACROLEIN
+      DATA CGRID_INDEX( 148 ), SPECIES_TYPE( 148 ), CONVERT_CONC( 148 ) /  125, 'GC', F /  ! ACRO_PRIMARY
+      DATA CGRID_INDEX( 149 ), SPECIES_TYPE( 149 ), CONVERT_CONC( 149 ) /  126, 'GC', F /  ! TOLU
+      DATA CGRID_INDEX( 150 ), SPECIES_TYPE( 150 ), CONVERT_CONC( 150 ) /  127, 'GC', F /  ! HG
+      DATA CGRID_INDEX( 151 ), SPECIES_TYPE( 151 ), CONVERT_CONC( 151 ) /  128, 'GC', F /  ! HGIIAER
+      DATA CGRID_INDEX( 152 ), SPECIES_TYPE( 152 ), CONVERT_CONC( 152 ) /  129, 'GC', F /  ! HGIIGAS
 
 ! The below integers define the locations of mechanism species in the solver
 ! concentration array.
@@ -826,50 +833,52 @@
       INTEGER :: INDEX_ACLI         =  108
       INTEGER :: INDEX_ACLJ         =  109
       INTEGER :: INDEX_ACLK         =  110
-      INTEGER :: INDEX_AISO3J       =  111
-      INTEGER :: INDEX_AGLYJ        =  112
-      INTEGER :: INDEX_AXYL1J       =  113
-      INTEGER :: INDEX_AOLGAJ       =  114
-      INTEGER :: INDEX_AXYL2J       =  115
-      INTEGER :: INDEX_ATOL1J       =  116
-      INTEGER :: INDEX_ATOL2J       =  117
-      INTEGER :: INDEX_ABNZ1J       =  118
-      INTEGER :: INDEX_ABNZ2J       =  119
-      INTEGER :: INDEX_ATRP1J       =  120
-      INTEGER :: INDEX_AOLGBJ       =  121
-      INTEGER :: INDEX_ATRP2J       =  122
-      INTEGER :: INDEX_AISO1J       =  123
-      INTEGER :: INDEX_AISO2J       =  124
-      INTEGER :: INDEX_ASQTJ        =  125
-      INTEGER :: INDEX_APAH1J       =  126
-      INTEGER :: INDEX_APAH2J       =  127
-      INTEGER :: INDEX_AALK1J       =  128
-      INTEGER :: INDEX_AALK2J       =  129
-      INTEGER :: INDEX_PCVOC        =  130
-      INTEGER :: INDEX_PCSOARXN     =  131
-      INTEGER :: INDEX_VLVPO1       =  132
-      INTEGER :: INDEX_VSVPO1       =  133
-      INTEGER :: INDEX_VSVPO2       =  134
-      INTEGER :: INDEX_VSVPO3       =  135
-      INTEGER :: INDEX_VIVPO1       =  136
-      INTEGER :: INDEX_VLVOO1       =  137
-      INTEGER :: INDEX_VLVOO2       =  138
-      INTEGER :: INDEX_VSVOO2       =  139
-      INTEGER :: INDEX_VSVOO3       =  140
-      INTEGER :: INDEX_VSVOO1       =  141
-      INTEGER :: INDEX_FORM_PRIMARY =  142
-      INTEGER :: INDEX_ALD2_PRIMARY =  143
-      INTEGER :: INDEX_BUTADIENE13  =  144
-      INTEGER :: INDEX_ACROLEIN     =  145
-      INTEGER :: INDEX_ACRO_PRIMARY =  146
-      INTEGER :: INDEX_TOLU         =  147
-      INTEGER :: INDEX_HG           =  148
-      INTEGER :: INDEX_HGIIAER      =  149
-      INTEGER :: INDEX_HGIIGAS      =  150
+      INTEGER :: INDEX_IEPOXP       =  111
+      INTEGER :: INDEX_ASO4J        =  112
+      INTEGER :: INDEX_AISO3J       =  113
+      INTEGER :: INDEX_AGLYJ        =  114
+      INTEGER :: INDEX_AXYL1J       =  115
+      INTEGER :: INDEX_AOLGAJ       =  116
+      INTEGER :: INDEX_AXYL2J       =  117
+      INTEGER :: INDEX_ATOL1J       =  118
+      INTEGER :: INDEX_ATOL2J       =  119
+      INTEGER :: INDEX_ABNZ1J       =  120
+      INTEGER :: INDEX_ABNZ2J       =  121
+      INTEGER :: INDEX_ATRP1J       =  122
+      INTEGER :: INDEX_AOLGBJ       =  123
+      INTEGER :: INDEX_ATRP2J       =  124
+      INTEGER :: INDEX_AISO1J       =  125
+      INTEGER :: INDEX_AISO2J       =  126
+      INTEGER :: INDEX_ASQTJ        =  127
+      INTEGER :: INDEX_APAH1J       =  128
+      INTEGER :: INDEX_APAH2J       =  129
+      INTEGER :: INDEX_AALK1J       =  130
+      INTEGER :: INDEX_AALK2J       =  131
+      INTEGER :: INDEX_PCVOC        =  132
+      INTEGER :: INDEX_PCSOARXN     =  133
+      INTEGER :: INDEX_VLVPO1       =  134
+      INTEGER :: INDEX_VSVPO1       =  135
+      INTEGER :: INDEX_VSVPO2       =  136
+      INTEGER :: INDEX_VSVPO3       =  137
+      INTEGER :: INDEX_VIVPO1       =  138
+      INTEGER :: INDEX_VLVOO1       =  139
+      INTEGER :: INDEX_VLVOO2       =  140
+      INTEGER :: INDEX_VSVOO2       =  141
+      INTEGER :: INDEX_VSVOO3       =  142
+      INTEGER :: INDEX_VSVOO1       =  143
+      INTEGER :: INDEX_FORM_PRIMARY =  144
+      INTEGER :: INDEX_ALD2_PRIMARY =  145
+      INTEGER :: INDEX_BUTADIENE13  =  146
+      INTEGER :: INDEX_ACROLEIN     =  147
+      INTEGER :: INDEX_ACRO_PRIMARY =  148
+      INTEGER :: INDEX_TOLU         =  149
+      INTEGER :: INDEX_HG           =  150
+      INTEGER :: INDEX_HGIIAER      =  151
+      INTEGER :: INDEX_HGIIGAS      =  152
 
-      INTEGER, PARAMETER :: N_ACT_SP = 150
+      INTEGER, PARAMETER :: N_ACT_SP = 152
 
-      INTEGER, PARAMETER :: NRXNS = 334
+      INTEGER, PARAMETER :: NRXNS = 336
 
       INTEGER, PARAMETER ::     ONE_REACT_REACTIONS =    0
 
@@ -905,7 +914,7 @@
 
       INTEGER, PARAMETER ::        NSUNLIGHT_RXNS   =   41
 
-      INTEGER, PARAMETER ::        NTHERMAL_RXNS    =  293
+      INTEGER, PARAMETER ::        NTHERMAL_RXNS    =  295
 
       INTEGER, PARAMETER ::        KUNITS           =    2
 
@@ -918,7 +927,7 @@
      &      1,    8,    9,   21,   27,   28,   38,   43,   47,   50, & 
      &     56,   64,   88,   90,   92,   97,   98,  108,  112,  114, & 
      &    117,  119,  128,  129,  161,  163,  197,  198,  202,  221, & 
-     &    222,  229,  247,  249,  250,  306,  307,  312,  321,  326/
+     &    222,  229,  247,  249,  250,  308,  309,  314,  323,  328/
 
       DATA ( IPH( IRXXN,2 ), IRXXN = 1, NMPHOT ) / & 
      &      1,    2,    3,    4,    5,    6,    7,    8,    9,   10, & 
@@ -967,13 +976,13 @@
      &      1,    3,    4,    1,    1,    1,    0,   10,    0,    0, & ! 4   
      &     -1,    3,    3,    3,    3,    3,    3,    1,    1,    1, & ! 5   
      &      3,    3,    3,   -1,   -1,   -1,   -1,   -1,   -1,   -1, & ! 6   
-     &     -1,   -1,   12,   -1,   -1,   -1,    1,    1,    1,    1, & ! 7   
+     &     -1,   -1,   12,   -1,   -1,   -1,   -1,   -1,    1,    1, & ! 7   
      &      1,    1,    1,    1,    1,    1,    1,    1,    1,    1, & ! 8   
      &      1,    1,    1,    1,    1,    1,    1,    1,    1,    1, & ! 9   
-     &      1,    1,    3,    1,    3,    0,    0,    3,    3,    3, & ! O   
-     &      3,    0,    1,    3,    3,    1,    1,    1,    1,    1, & ! 1   
-     &      0,    1,    1,    1,    1,    0,    1,    3,    1,    3, & ! 2   
-     &      1,    1,    1,    3/     !  3   
+     &      1,    1,    1,    1,    3,    1,    3,    0,    0,    3, & ! O   
+     &      3,    3,    3,    0,    1,    3,    3,    1,    1,    1, & ! 1   
+     &      1,    1,    0,    1,    1,    1,    1,    0,    1,    3, & ! 2   
+     &      1,    3,    1,    1,    1,    3/     !  3   
 
       INTEGER            :: IRXBITS( NRXNS )
 
@@ -1005,17 +1014,17 @@
      &      0,    0,    0,    0,    0,    0,    2,    1,    2,    2, & ! 4   
      &      1,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 5   
      &      0,    0,    0,    1,    1,    1,    1,    1,    1,    1, & ! 6   
-     &      1,    1,    2,    1,    1,    1,    0,    0,    0,    0, & ! 7   
+     &      1,    1,    2,    1,    1,    1,    1,    1,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 9   
-     &      0,    0,    0,    0,    0,    2,    2,    0,    0,    0, & ! O   
-     &      0,    2,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
-     &      2,    0,    0,    0,    0,    2,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,  260/     !  3   
+     &      0,    0,    0,    0,    0,    0,    0,    2,    2,    0, & ! O   
+     &      0,    0,    0,    2,    0,    0,    0,    0,    0,    0, & ! 1   
+     &      0,    0,    2,    0,    0,    0,    0,    2,    0,    0, & ! 2   
+     &      0,    0,    0,    0,    0,  260/     !  3   
 
-      INTEGER, PARAMETER :: NTERMS_JACOB =    22500
+      INTEGER, PARAMETER :: NTERMS_JACOB =    23104
 
-      INTEGER, PARAMETER :: NSTEPS_JACOB =      668
+      INTEGER, PARAMETER :: NSTEPS_JACOB =      672
 
       INTEGER            :: IORDER( NRXNS )
 
@@ -1047,13 +1056,13 @@
      &      2,    2,    2,    2,    2,    2,    1,    2,    1,    1, & ! 4   
      &      1,    2,    2,    2,    2,    2,    2,    2,    2,    2, & ! 5   
      &      2,    2,    2,    1,    1,    1,    1,    1,    2,    2, & ! 6   
-     &      2,    1,    1,    1,    1,    1,    1,    1,    1,    1, & ! 7   
+     &      2,    1,    1,    1,    2,    1,    1,    1,    1,    1, & ! 7   
      &      1,    1,    1,    1,    1,    1,    1,    1,    1,    1, & ! 8   
-     &      1,    2,    2,    2,    2,    2,    2,    2,    2,    2, & ! 9   
-     &      2,    2,    2,    2,    2,    1,    1,    2,    2,    2, & ! O   
-     &      2,    1,    2,    2,    2,    2,    2,    2,    2,    2, & ! 1   
-     &      1,    2,    2,    2,    2,    1,    2,    2,    2,    2, & ! 2   
-     &      2,    2,    2,    3/     !  3   
+     &      1,    1,    1,    2,    2,    2,    2,    2,    2,    2, & ! 9   
+     &      2,    2,    2,    2,    2,    2,    2,    1,    1,    2, & ! O   
+     &      2,    2,    2,    1,    2,    2,    2,    2,    2,    2, & ! 1   
+     &      2,    2,    1,    2,    2,    2,    2,    1,    2,    2, & ! 2   
+     &      2,    2,    2,    2,    2,    3/     !  3   
 
       INTEGER, PARAMETER :: KTN1 =  97
       INTEGER            :: KRX1( KTN1 )
@@ -1064,11 +1073,11 @@
      &    185,  186,  192,  193,  194,  195,  196,  199,  201,  203, & ! 2   
      &    205,  206,  207,  208,  214,  215,  218,  220,  224,  228, & ! 3   
      &    231,  232,  234,  235,  236,  237,  239,  240,  241,  244, & ! 4   
-     &    245,  246,  258,  259,  260,  277,  278,  279,  280,  281, & ! 5   
-     &    282,  283,  284,  285,  286,  287,  288,  289,  290,  291, & ! 6   
-     &    292,  293,  294,  295,  296,  297,  298,  299,  300,  301, & ! 7   
-     &    302,  304,  313,  316,  317,  318,  319,  320,  322,  323, & ! 8   
-     &    324,  325,  327,  329,  331,  332,  333/     !  9   
+     &    245,  246,  258,  259,  260,  279,  280,  281,  282,  283, & ! 5   
+     &    284,  285,  286,  287,  288,  289,  290,  291,  292,  293, & ! 6   
+     &    294,  295,  296,  297,  298,  299,  300,  301,  302,  303, & ! 7   
+     &    304,  306,  315,  318,  319,  320,  321,  322,  324,  325, & ! 8   
+     &    326,  327,  329,  331,  333,  334,  335/     !  9   
 
       INTEGER, PARAMETER :: KTN2 =   2
       INTEGER            :: KRX2( KTN2 )
@@ -1091,8 +1100,8 @@
      &    160,  162,  164,  165,  166,  167,  172,  173,  174,  175, & ! 8   
      &    176,  178,  180,  181,  183,  187,  188,  191,  200,  204, & ! 9   
      &    216,  223,  225,  226,  227,  230,  233,  238,  242,  252, & ! O   
-     &    253,  254,  255,  256,  257,  261,  262,  263,  303,  305, & ! 1   
-     &    308,  309,  310,  311,  314,  315,  328,  330,  334/     !2   
+     &    253,  254,  255,  256,  257,  261,  262,  263,  305,  307, & ! 1   
+     &    310,  311,  312,  313,  316,  317,  330,  332,  336/     !2   
 
       INTEGER, PARAMETER :: KTN4 =   3
       INTEGER            :: KRX4( KTN4 )
@@ -1122,7 +1131,7 @@
       INTEGER            :: NRXWM( NWM )
 
       DATA ( NRXWM( IRXXN ), IRXXN = 1, NWM ) /  & 
-     &      2,    4,   10,  334/
+     &      2,    4,   10,  336/
       REAL( 8 ),    PARAMETER :: ATM_AIR = 1.00000D+06
 
       INTEGER, PARAMETER :: NWW =   4
@@ -1189,13 +1198,13 @@
      &     87,   87,   91,   87,   87,   87,   92,   89,   93,   93, & ! 4   
      &     93,   74,   74,   78,   78,   71,   71,  100,  100,  100, & ! 5   
      &     80,   80,  104,   34,   10,   10,  106,  107,  106,  106, & ! 6   
-     &    107,    1,    4,   63,   40,   41,  113,  115,  116,  117, & ! 7   
-     &    118,  119,  120,  122,  123,  124,  125,  126,  127,  128, & ! 8   
-     &    129,  130,  132,  133,  134,  135,  136,  137,  138,  141, & ! 9   
-     &    139,  140,  142,  142,  142,  142,  142,  142,  143,  143, & ! O   
-     &    143,  143,  143,  144,  144,  144,  144,  146,  146,  146, & ! 1   
-     &    146,  146,  145,  145,  145,  145,  145,  147,  147,  148, & ! 2   
-     &    148,  148,  148,  148/     !  3   
+     &    107,    1,    4,   63,  111,  111,   40,   41,  115,  117, & ! 7   
+     &    118,  119,  120,  121,  122,  124,  125,  126,  127,  128, & ! 8   
+     &    129,  130,  131,  132,  134,  135,  136,  137,  138,  139, & ! 9   
+     &    140,  143,  141,  142,  144,  144,  144,  144,  144,  144, & ! O   
+     &    145,  145,  145,  145,  145,  146,  146,  146,  146,  148, & ! 1   
+     &    148,  148,  148,  148,  147,  147,  147,  147,  147,  149, & ! 2   
+     &    149,  150,  150,  150,  150,  150/     !  3   
 
       DATA ( IRR( IRXXN,  2 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    2,    2,    1,    1,    4,    0,    0,    0, & ! O   
@@ -1225,13 +1234,13 @@
      &     29,   43,    7,   72,   76,   79,    0,    1,    0,    0, & ! 4   
      &      0,    2,    8,    2,    8,    2,    8,    4,    7,    5, & ! 5   
      &      2,    8,    7,    0,    0,    0,    0,    0,  108,  109, & ! 6   
-     &    110,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 7   
+     &    110,    0,    0,    0,  112,    0,    0,    0,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
-     &      0,    7,    7,    7,    7,    7,    7,    7,    7,    7, & ! 9   
-     &      7,    7,    7,    5,    3,    0,    0,   87,    7,    5, & ! O   
-     &      3,    0,   87,    7,    4,    5,   87,    7,    4,    5, & ! 1   
-     &      0,   87,    7,    4,    5,    0,   87,    7,   87,    4, & ! 2   
-     &     86,    9,    7,   87/     !  3   
+     &      0,    0,    0,    7,    7,    7,    7,    7,    7,    7, & ! 9   
+     &      7,    7,    7,    7,    7,    5,    3,    0,    0,   87, & ! O   
+     &      7,    5,    3,    0,   87,    7,    4,    5,   87,    7, & ! 1   
+     &      4,    5,    0,   87,    7,    4,    5,    0,   87,    7, & ! 2   
+     &     87,    4,   86,    9,    7,   87/     !  3   
 
       DATA ( IRR( IRXXN,  3 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1267,7 +1276,7 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN,  4 ), IRXXN = 1, NRXNS ) / & 
      &      2,    4,    1,    1,    2,    5,    0,    3,    6,    3, & ! O   
@@ -1297,13 +1306,13 @@
      &     91,   91,   87,   91,   91,   91,   87,   93,   89,   87, & ! 4   
      &     88,    2,    8,    2,    8,    2,    8,    4,    7,    5, & ! 5   
      &      2,    8,    7,   11,   11,   11,   11,   11,   92,   92, & ! 6   
-     &     92,   12,    0,  111,  112,  112,  114,  114,  114,  114, & ! 7   
-     &    114,  114,  121,  121,  121,  121,  121,  114,  114,  114, & ! 8   
-     &    114,    7,    7,    7,    7,    7,    7,    7,    7,    7, & ! 9   
-     &      7,    7,    7,    5,    3,    0,    0,   87,    7,    5, & ! O   
-     &      3,    0,   87,    7,    4,    5,   87,    7,    4,    5, & ! 1   
-     &      0,   87,    7,    4,    5,    0,   87,    7,   87,  149, & ! 2   
-     &    150,  150,  149,  148/     !  3   
+     &     92,   12,    0,  111,  113,  113,  114,  114,  116,  116, & ! 7   
+     &    116,  116,  116,  116,  123,  123,  123,  123,  123,  116, & ! 8   
+     &    116,  116,  116,    7,    7,    7,    7,    7,    7,    7, & ! 9   
+     &      7,    7,    7,    7,    7,    5,    3,    0,    0,   87, & ! O   
+     &      7,    5,    3,    0,   87,    7,    4,    5,   87,    7, & ! 1   
+     &      4,    5,    0,   87,    7,    4,    5,    0,   87,    7, & ! 2   
+     &     87,  151,  152,  152,  151,  150/     !  3   
 
       DATA ( IRR( IRXXN,  5 ), IRXXN = 1, NRXNS ) / & 
      &      3,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1335,11 +1344,11 @@
      &    102,  103,  105,    0,  106,  107,    0,    0,    0,    0, & ! 6   
      &      0,   11,    0,    0,    0,    0,    0,    0,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
-     &      0,  131,  132,  132,  132,  132,  132,  137,  137,  137, & ! 9   
-     &    137,  137,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
-     &      0,    0,    0,  145,  145,  145,  145,    0,    0,    0, & ! 1   
-     &      0,    0,    0,    0,    0,    0,    0,    0,    0,  150, & ! 2   
-     &     86,    9,  150,  150/     !  3   
+     &      0,    0,    0,  133,  134,  134,  134,  134,  134,  139, & ! 9   
+     &    139,  139,  139,  139,    0,    0,    0,    0,    0,    0, & ! O   
+     &      0,    0,    0,    0,    0,  147,  147,  147,  147,    0, & ! 1   
+     &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
+     &      0,  152,   86,    9,  152,  152/     !  3   
 
       DATA ( IRR( IRXXN,  6 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1371,11 +1380,11 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 6   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
-     &      0,    0,  133,  133,  133,  133,  133,  138,  138,  138, & ! 9   
-     &    138,  138,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
+     &      0,    0,    0,    0,  135,  135,  135,  135,  135,  140, & ! 9   
+     &    140,  140,  140,  140,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
-     &      0,    0,    0,    0,    0,    0,    0,    0,    0,    4, & ! 2   
-     &      0,    0,    7,   87/     !  3   
+     &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
+     &      0,    4,    0,    0,    7,   87/     !  3   
 
       DATA ( IRR( IRXXN,  7 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1407,11 +1416,11 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 6   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
-     &      0,    0,  134,  134,  134,  134,  134,  141,  141,  141, & ! 9   
-     &    141,  141,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
+     &      0,    0,    0,    0,  136,  136,  136,  136,  136,  143, & ! 9   
+     &    143,  143,  143,  143,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN,  8 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1443,11 +1452,11 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 6   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
-     &      0,    0,  135,  135,  135,  135,  137,  139,  139,  139, & ! 9   
-     &    139,  139,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
+     &      0,    0,    0,    0,  137,  137,  137,  137,  139,  141, & ! 9   
+     &    141,  141,  141,  141,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN,  9 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1479,11 +1488,11 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 6   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
-     &      0,    0,  136,  137,  137,  137,  138,  140,  140,  140, & ! 9   
-     &    140,  140,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
+     &      0,    0,    0,    0,  138,  139,  139,  139,  140,  142, & ! 9   
+     &    142,  142,  142,  142,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN, 10 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1515,11 +1524,11 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 6   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
-     &      0,    0,  137,  138,  138,  138,    0,    0,    0,    0, & ! 9   
+     &      0,    0,    0,    0,  139,  140,  140,  140,    0,    0, & ! 9   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN, 11 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1551,11 +1560,11 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 6   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
-     &      0,    0,  138,    0,    0,    0,    0,    0,    0,    0, & ! 9   
+     &      0,    0,    0,    0,  140,    0,    0,    0,    0,    0, & ! 9   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN, 12 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1587,11 +1596,11 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 6   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
-     &      0,    0,  139,    0,    0,    0,    0,    0,    0,    0, & ! 9   
+     &      0,    0,    0,    0,  141,    0,    0,    0,    0,    0, & ! 9   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN, 13 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1623,11 +1632,11 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 6   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 7   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 8   
-     &      0,    0,  140,    0,    0,    0,    0,    0,    0,    0, & ! 9   
+     &      0,    0,    0,    0,  142,    0,    0,    0,    0,    0, & ! 9   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN, 14 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1663,7 +1672,7 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN, 15 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1699,7 +1708,7 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN, 16 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1735,7 +1744,7 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN, 17 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
@@ -1771,7 +1780,7 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! O   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 1   
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
-     &      0,    0,    0,    0/     !  3   
+     &      0,    0,    0,    0,    0,    0/     !  3   
 
       DATA ( RTDAT( 1,IRXXN ), IRXXN = 1, NRXNS ) / & 
      &     1.0000D+00, 5.6800D-34, 1.4000D-12, 1.0000D-31, 5.5000D-12, & ! O   
@@ -1829,18 +1838,19 @@
      &     2.7000D-12, 1.9000D-13, 2.7000D-12, 1.4000D+00, 1.0000D+00, & ! 6   
      &     1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! +   
      &     1.0000D+00, 1.0000D+00, 2.8964D-11, 1.0000D+00, 1.0000D+00, & ! 7   
-     &     1.0000D+00, 9.4882D-06, 9.4882D-06, 9.4882D-06, 9.4882D-06, & ! +   
+     &     1.0000D+00, 1.0000D+00, 1.0000D+00, 9.4882D-06, 9.4882D-06, & ! +   
      &     9.4882D-06, 9.4882D-06, 9.4882D-06, 9.4882D-06, 9.4882D-06, & ! 8   
      &     9.4882D-06, 9.4882D-06, 9.4882D-06, 9.4882D-06, 9.4882D-06, & ! +   
-     &     9.4882D-06, 1.2500D-11, 4.0000D-11, 4.0000D-11, 4.0000D-11, & ! 9   
+     &     9.4882D-06, 9.4882D-06, 9.4882D-06, 1.2500D-11, 4.0000D-11, & ! 9   
      &     4.0000D-11, 4.0000D-11, 4.0000D-11, 4.0000D-11, 4.0000D-11, & ! +   
-     &     4.0000D-11, 4.0000D-11, 5.4000D-12, 5.5000D-16, 3.4000D-11, & ! O   
-     &     1.0000D+00, 1.0000D+00, 8.2000D-11, 4.7000D-12, 1.4000D-12, & ! +   
-     &     1.8000D-11, 1.0000D+00, 7.9000D-11, 1.4800D-11, 1.3400D-14, & ! 1   
-     &     1.7900D-13, 2.5100D-10, 2.0000D-11, 2.6100D-19, 1.1500D-15, & ! +   
-     &     1.0000D+00, 2.3700D-10, 2.0000D-11, 2.6100D-19, 1.1500D-15, & ! 2   
-     &     1.0000D+00, 2.3700D-10, 1.8000D-12, 6.1000D-11, 2.1100D-18, & ! +   
-     &     2.6000D-18, 8.5000D-19, 7.7000D-14, 2.2500D-33/           !3   
+     &     4.0000D-11, 4.0000D-11, 4.0000D-11, 4.0000D-11, 5.4000D-12, & ! O   
+     &     5.5000D-16, 3.4000D-11, 1.0000D+00, 1.0000D+00, 8.2000D-11, & ! +   
+     &     4.7000D-12, 1.4000D-12, 1.8000D-11, 1.0000D+00, 7.9000D-11, & ! 1   
+     &     1.4800D-11, 1.3400D-14, 1.7900D-13, 2.5100D-10, 2.0000D-11, & ! +   
+     &     2.6100D-19, 1.1500D-15, 1.0000D+00, 2.3700D-10, 2.0000D-11, & ! 2   
+     &     2.6100D-19, 1.1500D-15, 1.0000D+00, 2.3700D-10, 1.8000D-12, & ! +   
+     &     6.1000D-11, 2.1100D-18, 2.6000D-18, 8.5000D-19, 7.7000D-14, & ! 3   
+     &     2.2500D-33/           !        +   
 
       DATA ( RTDAT( 2,IRXXN ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00,-2.6000D+00, 0.0000D+00,-1.6000D+00, 0.0000D+00, & ! O   
@@ -1909,7 +1919,8 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       DATA ( RTDAT( 3,IRXXN ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00,-1.3100D+03, 0.0000D+00, 1.8800D+02, & ! O   
@@ -1972,13 +1983,14 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 9   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 1.3500D+02, 0.0000D+00,-1.6000D+03, & ! O   
-     &     0.0000D+00, 0.0000D+00,-3.4000D+01, 3.4500D+02,-1.8600D+03, & ! +   
-     &    -1.1000D+03, 0.0000D+00, 0.0000D+00, 4.4800D+02,-2.2830D+03, & ! 1   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3500D+02, & ! O   
+     &     0.0000D+00,-1.6000D+03, 0.0000D+00, 0.0000D+00,-3.4000D+01, & ! +   
+     &     3.4500D+02,-1.8600D+03,-1.1000D+03, 0.0000D+00, 0.0000D+00, & ! 1   
+     &     4.4800D+02,-2.2830D+03, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
-     &     0.0000D+00, 0.0000D+00, 3.4000D+02, 0.0000D+00,-1.2565D+03, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.8000D+02/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 3.4000D+02, & ! +   
+     &     0.0000D+00,-1.2565D+03, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     6.8000D+02/           !        +   
       INTEGER            :: IRRFALL( NFALLOFF )
 
       DATA ( IRRFALL( IRXXN ), IRXXN = 1, NFALLOFF ) / & 
@@ -2079,18 +2091,19 @@
      &     1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! 6   
      &     1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! +   
      &     1.0000D+00, 5.0000D-01, 0.0000D+00, 1.0000D+00, 1.0000D+00, & ! 7   
-     &     1.0000D+00, 8.5710D-01, 1.1429D+00, 8.5710D-01, 1.1429D+00, & ! +   
-     &     7.1430D-01, 7.1430D-01, 8.0000D-01, 9.0000D-01, 5.0000D-01, & ! 8   
-     &     5.0000D-01, 1.5000D+00, 1.4286D+00, 1.4286D+00, 1.7143D+00, & ! +   
-     &     1.7143D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! 9   
+     &     1.0000D+00, 1.0000D+00, 1.0000D+00, 8.5710D-01, 1.1429D+00, & ! +   
+     &     8.5710D-01, 1.1429D+00, 7.1430D-01, 7.1430D-01, 8.0000D-01, & ! 8   
+     &     9.0000D-01, 5.0000D-01, 5.0000D-01, 1.5000D+00, 1.4286D+00, & ! +   
+     &     1.4286D+00, 1.7143D+00, 1.7143D+00, 1.0000D+00, 1.0000D+00, & ! 9   
      &     1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! +   
      &     1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! O   
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! +   
-     &     1.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! 1   
+     &     1.0000D+00, 1.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, & ! +   
+     &     1.0000D+00, 1.0000D+00, 1.0000D+00, 0.0000D+00, 1.0000D+00, & ! 1   
      &     1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! +   
-     &     0.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! 2   
-     &     0.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 5.0000D-01, & ! +   
-     &     1.0000D+00, 1.0000D+00, 5.0000D-01, 5.0000D-01/           !3   
+     &     1.0000D+00, 1.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00, & ! 2   
+     &     1.0000D+00, 1.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00, & ! +   
+     &     1.0000D+00, 5.0000D-01, 1.0000D+00, 1.0000D+00, 5.0000D-01, & ! 3   
+     &     5.0000D-01/           !        +   
 
       DATA ( SC( IRXXN,  2 ), IRXXN = 1, NRXNS ) / & 
      &     1.0000D+00, 1.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, & ! O   
@@ -2151,15 +2164,16 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 8   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 1.0000D+00, 4.8570D-01, 3.0030D-01, 3.8560D-01, & ! 9   
-     &     2.1810D-01, 2.4120D-01, 6.6640D-01, 2.8580D-01, 3.3030D-01, & ! +   
-     &     3.4440D-01, 3.8860D-01, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, 4.8570D-01, & ! 9   
+     &     3.0030D-01, 3.8560D-01, 2.1810D-01, 2.4120D-01, 6.6640D-01, & ! +   
+     &     2.8580D-01, 3.3030D-01, 3.4440D-01, 3.8860D-01, 0.0000D+00, & ! O   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.8000D-01, 5.2000D-01, & ! 1   
-     &     4.5000D-02, 5.8000D-01, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 1   
+     &     5.8000D-01, 5.2000D-01, 4.5000D-02, 5.8000D-01, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D-01, & ! +   
-     &     1.0000D+00, 1.0000D+00, 5.0000D-01, 5.0000D-01/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
+     &     0.0000D+00, 5.0000D-01, 1.0000D+00, 1.0000D+00, 5.0000D-01, & ! 3   
+     &     5.0000D-01/           !        +   
 
       DATA ( SC( IRXXN,  3 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2220,15 +2234,16 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 8   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 6.2000D-03, 2.8620D-01, 9.5000D-02, & ! 9   
-     &     3.0630D-01, 2.0890D-01, 1.4300D-02, 3.9310D-01, 2.2720D-01, & ! +   
-     &     2.7490D-01, 2.4210D-01, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 6.2000D-03, & ! 9   
+     &     2.8620D-01, 9.5000D-02, 3.0630D-01, 2.0890D-01, 1.4300D-02, & ! +   
+     &     3.9310D-01, 2.2720D-01, 2.7490D-01, 2.4210D-01, 0.0000D+00, & ! O   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 1   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
+     &     0.0000D+00, 1.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, & ! 3   
+     &     1.0000D+00/           !        +   
 
       DATA ( SC( IRXXN,  4 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2289,15 +2304,16 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 8   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 2.5000D-03, 4.1000D-03, 1.3730D-01, & ! 9   
-     &     1.5300D-02, 3.0000D-01, 1.2300D-02, 1.3900D-02, 2.6070D-01, & ! +   
-     &     4.9100D-02, 6.4000D-02, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 2.5000D-03, & ! 9   
+     &     4.1000D-03, 1.3730D-01, 1.5300D-02, 3.0000D-01, 1.2300D-02, & ! +   
+     &     1.3900D-02, 2.6070D-01, 4.9100D-02, 6.4000D-02, 0.0000D+00, & ! O   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 1   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     1.0000D+00/           !        +   
 
       DATA ( SC( IRXXN,  5 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2358,15 +2374,16 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 8   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 2.6000D-03, 3.5000D-03, 5.0000D-04, & ! 9   
-     &     1.0430D-01, 2.0280D-01, 1.2390D-01, 1.0270D-01, 7.0200D-02, & ! +   
-     &     2.5770D-01, 3.8500D-02, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 2.6000D-03, & ! 9   
+     &     3.5000D-03, 5.0000D-04, 1.0430D-01, 2.0280D-01, 1.2390D-01, & ! +   
+     &     1.0270D-01, 7.0200D-02, 2.5770D-01, 3.8500D-02, 0.0000D+00, & ! O   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 1   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       DATA ( SC( IRXXN,  6 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2427,15 +2444,16 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 8   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 2.3000D-03, 2.2390D-01, 2.0510D-01, & ! 9   
-     &     1.8930D-01, 4.7100D-02, 1.8310D-01, 2.0450D-01, 1.1160D-01, & ! +   
-     &     7.3900D-02, 2.6670D-01, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 2.3000D-03, & ! 9   
+     &     2.2390D-01, 2.0510D-01, 1.8930D-01, 4.7100D-02, 1.8310D-01, & ! +   
+     &     2.0450D-01, 1.1160D-01, 7.3900D-02, 2.6670D-01, 0.0000D+00, & ! O   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 1   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       DATA ( SC( IRXXN,  7 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2496,15 +2514,16 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 8   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 2.9440D-01, 1.8200D-01, 1.7640D-01, & ! 9   
-     &     1.6680D-01, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 2.9440D-01, & ! 9   
+     &     1.8200D-01, 1.7640D-01, 1.6680D-01, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 1   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       DATA ( SC( IRXXN,  8 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2565,7 +2584,7 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 8   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 2.0210D-01, 0.0000D+00, 0.0000D+00, & ! 9   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0210D-01, & ! 9   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
@@ -2573,7 +2592,8 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       DATA ( SC( IRXXN,  9 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2634,7 +2654,7 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 8   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 1.9000D-03, 0.0000D+00, 0.0000D+00, & ! 9   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 1.9000D-03, & ! 9   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
@@ -2642,7 +2662,8 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       DATA ( SC( IRXXN, 10 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2703,7 +2724,7 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 8   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 2.3000D-03, 0.0000D+00, 0.0000D+00, & ! 9   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 2.3000D-03, & ! 9   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
@@ -2711,7 +2732,8 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       DATA ( SC( IRXXN, 11 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2780,7 +2802,8 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       DATA ( SC( IRXXN, 12 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2849,7 +2872,8 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       DATA ( SC( IRXXN, 13 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2918,7 +2942,8 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       DATA ( SC( IRXXN, 14 ), IRXXN = 1, NRXNS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
@@ -2987,7 +3012,8 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/           !3   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
+     &     0.0000D+00/           !        +   
 
       INTEGER            :: NREACT( NRXNS )
 
@@ -3019,13 +3045,13 @@
      &      2,    2,    2,    2,    2,    2,    1,    2,    1,    1, & ! 4   
      &      1,    2,    2,    2,    2,    2,    2,    2,    2,    2, & ! 5   
      &      2,    2,    2,    1,    1,    1,    1,    1,    2,    2, & ! 6   
-     &      2,    1,    1,    1,    1,    1,    1,    1,    1,    1, & ! 7   
+     &      2,    1,    1,    1,    2,    1,    1,    1,    1,    1, & ! 7   
      &      1,    1,    1,    1,    1,    1,    1,    1,    1,    1, & ! 8   
-     &      1,    2,    2,    2,    2,    2,    2,    2,    2,    2, & ! 9   
-     &      2,    2,    2,    2,    2,    1,    1,    2,    2,    2, & ! O   
-     &      2,    1,    2,    2,    2,    2,    2,    2,    2,    2, & ! 1   
-     &      1,    2,    2,    2,    2,    1,    2,    2,    2,    2, & ! 2   
-     &      2,    2,    2,    2/     !  3   
+     &      1,    1,    1,    2,    2,    2,    2,    2,    2,    2, & ! 9   
+     &      2,    2,    2,    2,    2,    2,    2,    1,    1,    2, & ! O   
+     &      2,    2,    2,    1,    2,    2,    2,    2,    2,    2, & ! 1   
+     &      2,    2,    1,    2,    2,    2,    2,    1,    2,    2, & ! 2   
+     &      2,    2,    2,    2,    2,    2/     !  3   
       INTEGER            :: NPRDCT( NRXNS )
 
       DATA ( NPRDCT( IRXXN ), IRXXN = 1, NRXNS ) / & 
@@ -3058,22 +3084,22 @@
      &      2,    2,    2,    1,    2,    2,    1,    1,    1,    1, & ! 6   
      &      1,    2,    0,    1,    1,    1,    1,    1,    1,    1, & ! 7   
      &      1,    1,    1,    1,    1,    1,    1,    1,    1,    1, & ! 8   
-     &      1,    2,   10,    7,    7,    7,    6,    6,    6,    6, & ! 9   
-     &      6,    6,    1,    1,    1,    0,    0,    1,    1,    1, & ! O   
-     &      1,    0,    1,    2,    2,    2,    2,    1,    1,    1, & ! 1   
-     &      0,    1,    1,    1,    1,    0,    1,    1,    1,    3, & ! 2   
-     &      2,    2,    3,    3/     !  3   
+     &      1,    1,    1,    2,   10,    7,    7,    7,    6,    6, & ! 9   
+     &      6,    6,    6,    6,    1,    1,    1,    0,    0,    1, & ! O   
+     &      1,    1,    1,    0,    1,    2,    2,    2,    2,    1, & ! 1   
+     &      1,    1,    0,    1,    1,    1,    1,    0,    1,    1, & ! 2   
+     &      1,    3,    2,    2,    3,    3/     !  3   
 
-      INTEGER, PARAMETER :: MHETERO =  13
+      INTEGER, PARAMETER :: MHETERO =  15
       INTEGER            :: IHETERO( MHETERO,2 )
 
       DATA ( IHETERO( IRXXN,1 ), IRXXN = 1, MHETERO ) / & 
      &    251,  264,  265,  266,  267,  268,  269,  270,  271,  272, & 
-     &    274,  275,  276/
+     &    274,  275,  276,  277,  278/
 
       DATA ( IHETERO( IRXXN,2 ), IRXXN = 1, MHETERO ) / & 
      &      1,    2,    3,    4,    5,    6,    7,    7,    8,    9, & 
-     &     10,   11,   12/
+     &     10,   11,   12,   13,   14/
 
       INTEGER, PARAMETER :: NPHOTAB =  31
       CHARACTER( 16 )    :: PHOTAB( NPHOTAB )
@@ -3091,14 +3117,15 @@
      &   'CLNO2_IUPAC13   ', 'CLONO2_1        ', 'CLONO2_2        ', & 
      &   'ACRO_09         '/
 
-      INTEGER, PARAMETER :: NHETERO =  12
+      INTEGER, PARAMETER :: NHETERO =  14
       CHARACTER( 16 )    :: HETERO( NHETERO )
 
       DATA ( HETERO( IRXXN ), IRXXN = 1, NHETERO ) / & 
      &   'HETERO_CLNO3_WAJ', 'HETERO_NTR2     ', 'HETERO_N2O5IJ   ', &
      &   'HETERO_N2O5K    ', 'HETERO_H2NO3PAIJ', 'HETERO_H2NO3PAK ', &
      &   'HETERO_H2NO3PBIJ', 'HETERO_H2NO3PBK ', 'HETERO_NO2      ', &
-     &   'HETERO_IEPOX    ', 'HETERO_GLY      ', 'HETERO_MGLY     '/
+     &   'HETERO_IEPOX    ', 'HETERO_IEPOXOS  ', 'HETERO_TETROL   ', &
+     &   'HETERO_GLY      ', 'HETERO_MGLY     '/
 
       CHARACTER( 16 )    :: RXLABEL( NRXNS )
 
@@ -3194,27 +3221,27 @@
      &    'HET_N2O5IJ      ', 'HET_N2O5K       ', 'HET_H2NO3PIJA   ', & ! 8   
      &    'HET_H2NO3PKA    ', 'HET_H2NO3PIB    ', 'HET_H2NO3PJB    ', & ! 9   
      &    'HET_H2NO3PKB    ', 'HET_N02         ', 'HAL_Ozone       ', & ! 0   
-     &    'HET_IEPOX       ', 'HET_GLY         ', 'HET_MGLY        ', & ! 1   
-     &    'OLIG_XYLENE1    ', 'OLIG_XYLENE2    ', 'OLIG_TOLUENE1   ', & ! 2   
-     &    'OLIG_TOLUENE2   ', 'OLIG_BENZENE1   ', 'OLIG_BENZENE2   ', & ! 3   
-     &    'OLIG_TERPENE1   ', 'OLIG_TERPENE2   ', 'OLIG_ISOPRENE1  ', & ! 4   
-     &    'OLIG_ISOPRENE2  ', 'OLIG_SESQT1     ', 'OLIG_PAH1       ', & ! 5   
-     &    'OLIG_PAH2       ', 'OLIG_ALK1       ', 'OLIG_ALK2       ', & ! 6   
-     &    'PCSOA           ', 'POA_AGE1        ', 'POA_AGE2        ', & ! 7   
-     &    'POA_AGE3        ', 'POA_AGE4        ', 'POA_AGE5        ', & ! 8   
-     &    'POA_AGE6        ', 'POA_AGE7        ', 'POA_AGE8        ', & ! 9   
-     &    'POA_AGE9        ', 'POA_AGE10       ', 'T01             ', & ! 0   
-     &    'T02             ', 'T03             ', 'T04             ', & ! 1   
-     &    'T05             ', 'TCL1            ', 'T06             ', & ! 2   
-     &    'T07             ', 'T08             ', 'T09             ', & ! 3   
-     &    'TCL2            ', 'T10             ', 'T11             ', & ! 4   
-     &    'T12             ', 'TCL3            ', 'T13             ', & ! 5   
-     &    'T14             ', 'T15             ', 'T16             ', & ! 6   
-     &    'TCL4            ', 'T17             ', 'T18             ', & ! 7   
-     &    'T19             ', 'T20             ', 'TCL5            ', & ! 8   
-     &    'T21             ', 'TCL6            ', 'HG1             ', & ! 9   
-     &    'HG2             ', 'HG3             ', 'HG4             ', & ! 0   
-     &    'HG5             '/                   !                    
+     &    'HET_IEPOX       ', 'HET_IEPOXOS     ', 'HET_TETROL      ', & ! 1   
+     &    'HET_GLY         ', 'HET_MGLY        ', 'OLIG_XYLENE1    ', & ! 2   
+     &    'OLIG_XYLENE2    ', 'OLIG_TOLUENE1   ', 'OLIG_TOLUENE2   ', & ! 3   
+     &    'OLIG_BENZENE1   ', 'OLIG_BENZENE2   ', 'OLIG_TERPENE1   ', & ! 4   
+     &    'OLIG_TERPENE2   ', 'OLIG_ISOPRENE1  ', 'OLIG_ISOPRENE2  ', & ! 5   
+     &    'OLIG_SESQT1     ', 'OLIG_PAH1       ', 'OLIG_PAH2       ', & ! 6   
+     &    'OLIG_ALK1       ', 'OLIG_ALK2       ', 'PCSOA           ', & ! 7   
+     &    'POA_AGE1        ', 'POA_AGE2        ', 'POA_AGE3        ', & ! 8   
+     &    'POA_AGE4        ', 'POA_AGE5        ', 'POA_AGE6        ', & ! 9   
+     &    'POA_AGE7        ', 'POA_AGE8        ', 'POA_AGE9        ', & ! 0   
+     &    'POA_AGE10       ', 'T01             ', 'T02             ', & ! 1   
+     &    'T03             ', 'T04             ', 'T05             ', & ! 2   
+     &    'TCL1            ', 'T06             ', 'T07             ', & ! 3   
+     &    'T08             ', 'T09             ', 'TCL2            ', & ! 4   
+     &    'T10             ', 'T11             ', 'T12             ', & ! 5   
+     &    'TCL3            ', 'T13             ', 'T14             ', & ! 6   
+     &    'T15             ', 'T16             ', 'TCL4            ', & ! 7   
+     &    'T17             ', 'T18             ', 'T19             ', & ! 8   
+     &    'T20             ', 'TCL5            ', 'T21             ', & ! 9   
+     &    'TCL6            ', 'HG1             ', 'HG2             ', & ! 0   
+     &    'HG3             ', 'HG4             ', 'HG5             '/!    
 
 !    NSPECIAL     = Number of special rate coefficients
 !    SPECIAL      = Names of special rate coefficients
@@ -3318,6 +3345,8 @@
        INTEGER, PARAMETER  :: IK_HETERO_H2NO3PBK  =   8
        INTEGER, PARAMETER  :: IK_HETERO_NO2       =   9
        INTEGER, PARAMETER  :: IK_HETERO_IEPOX     =  10
-       INTEGER, PARAMETER  :: IK_HETERO_GLY       =  11
-       INTEGER, PARAMETER  :: IK_HETERO_MGLY      =  12
+       INTEGER, PARAMETER  :: IK_HETERO_IEPOXOS   =  11
+       INTEGER, PARAMETER  :: IK_HETERO_TETROL    =  12
+       INTEGER, PARAMETER  :: IK_HETERO_GLY       =  13
+       INTEGER, PARAMETER  :: IK_HETERO_MGLY      =  14
        END MODULE RXNS_DATA

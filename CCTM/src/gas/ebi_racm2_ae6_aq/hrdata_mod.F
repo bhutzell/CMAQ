@@ -23,11 +23,11 @@ C*************************************************************************
 C
 C  FUNCTION:  Mechanism & solver data for EBI solver
 C
-C  PRECONDITIONS: For the RACM2 family of mechanisms
+C  PRECONDITIONS: For the RACM2_AE6_AQ mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Dec 11, 2018
+C  REVISION HISTORY: Created by EBI solver program, Apr  9, 2019
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables for solution
 C*************************************************************************
@@ -240,35 +240,37 @@ c..Species indices
       INTEGER, PARAMETER :: PAHHRXN          =  132
       INTEGER, PARAMETER :: SOAALK           =  133
       INTEGER, PARAMETER :: ALKRXN           =  134
-      INTEGER, PARAMETER :: AISO3J           =  135
-      INTEGER, PARAMETER :: AXYL1J           =  136
-      INTEGER, PARAMETER :: AOLGAJ           =  137
-      INTEGER, PARAMETER :: AXYL2J           =  138
-      INTEGER, PARAMETER :: ATOL1J           =  139
-      INTEGER, PARAMETER :: ATOL2J           =  140
-      INTEGER, PARAMETER :: ABNZ1J           =  141
-      INTEGER, PARAMETER :: ABNZ2J           =  142
-      INTEGER, PARAMETER :: ATRP1J           =  143
-      INTEGER, PARAMETER :: AOLGBJ           =  144
-      INTEGER, PARAMETER :: ATRP2J           =  145
-      INTEGER, PARAMETER :: AISO1J           =  146
-      INTEGER, PARAMETER :: AISO2J           =  147
-      INTEGER, PARAMETER :: ASQTJ            =  148
-      INTEGER, PARAMETER :: APAH1J           =  149
-      INTEGER, PARAMETER :: APAH2J           =  150
-      INTEGER, PARAMETER :: AALK1J           =  151
-      INTEGER, PARAMETER :: AALK2J           =  152
-      INTEGER, PARAMETER :: PCVOC            =  153
-      INTEGER, PARAMETER :: PCSOARXN         =  154
-      INTEGER, PARAMETER :: VLVPO1           =  155
-      INTEGER, PARAMETER :: VSVPO1           =  156
-      INTEGER, PARAMETER :: VSVPO2           =  157
-      INTEGER, PARAMETER :: VSVPO3           =  158
-      INTEGER, PARAMETER :: VIVPO1           =  159
-      INTEGER, PARAMETER :: VLVOO1           =  160
-      INTEGER, PARAMETER :: VLVOO2           =  161
-      INTEGER, PARAMETER :: VSVOO2           =  162
-      INTEGER, PARAMETER :: VSVOO3           =  163
-      INTEGER, PARAMETER :: VSVOO1           =  164
+      INTEGER, PARAMETER :: IEPOXP           =  135
+      INTEGER, PARAMETER :: ASO4J            =  136
+      INTEGER, PARAMETER :: AISO3J           =  137
+      INTEGER, PARAMETER :: AXYL1J           =  138
+      INTEGER, PARAMETER :: AOLGAJ           =  139
+      INTEGER, PARAMETER :: AXYL2J           =  140
+      INTEGER, PARAMETER :: ATOL1J           =  141
+      INTEGER, PARAMETER :: ATOL2J           =  142
+      INTEGER, PARAMETER :: ABNZ1J           =  143
+      INTEGER, PARAMETER :: ABNZ2J           =  144
+      INTEGER, PARAMETER :: ATRP1J           =  145
+      INTEGER, PARAMETER :: AOLGBJ           =  146
+      INTEGER, PARAMETER :: ATRP2J           =  147
+      INTEGER, PARAMETER :: AISO1J           =  148
+      INTEGER, PARAMETER :: AISO2J           =  149
+      INTEGER, PARAMETER :: ASQTJ            =  150
+      INTEGER, PARAMETER :: APAH1J           =  151
+      INTEGER, PARAMETER :: APAH2J           =  152
+      INTEGER, PARAMETER :: AALK1J           =  153
+      INTEGER, PARAMETER :: AALK2J           =  154
+      INTEGER, PARAMETER :: PCVOC            =  155
+      INTEGER, PARAMETER :: PCSOARXN         =  156
+      INTEGER, PARAMETER :: VLVPO1           =  157
+      INTEGER, PARAMETER :: VSVPO1           =  158
+      INTEGER, PARAMETER :: VSVPO2           =  159
+      INTEGER, PARAMETER :: VSVPO3           =  160
+      INTEGER, PARAMETER :: VIVPO1           =  161
+      INTEGER, PARAMETER :: VLVOO1           =  162
+      INTEGER, PARAMETER :: VLVOO2           =  163
+      INTEGER, PARAMETER :: VSVOO2           =  164
+      INTEGER, PARAMETER :: VSVOO3           =  165
+      INTEGER, PARAMETER :: VSVOO1           =  166
 
       END MODULE HRDATA
