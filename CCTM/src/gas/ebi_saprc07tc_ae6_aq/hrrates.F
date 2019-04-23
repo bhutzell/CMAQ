@@ -23,11 +23,11 @@ C***********************************************************************
 C
 C  FUNCTION: To calculate rates of reactions
 C
-C  PRECONDITIONS: For the SAPRC07TC_AE6_AQ mechanism
+C  PRECONDITIONS: For the SAPRC07TC family of mechanisms
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Apr  9, 2019
+C  REVISION HISTORY: Created by EBI solver program, Dec 11, 2018
 C
 C***********************************************************************
       USE HRDATA
@@ -775,35 +775,33 @@ C..NOTE: RXRAT commented out are not referenced by any routine
       RXRAT(    719 ) = RKI(   719 ) * YC(  H2NO3PIJ ) * YC(  ACLJ )
       RXRAT(    720 ) = RKI(   720 ) * YC(  H2NO3PK ) * YC(  ACLK )
 !     RXRAT(    721 ) = RKI(   721 ) * YC(  O3 )
-      RXRAT(    722 ) = RKI(   722 ) * YC(  IEPOX )
-      RXRAT(    723 ) = RKI(   723 ) * YC(  IEPOXP ) * YC(  ASO4J )
-      RXRAT(    724 ) = RKI(   724 ) * YC(  IEPOXP )
-      RXRAT(    725 ) = RKI(   725 ) * YC(  AXYL1J )
-      RXRAT(    726 ) = RKI(   726 ) * YC(  AXYL2J )
-      RXRAT(    727 ) = RKI(   727 ) * YC(  ATOL1J )
-      RXRAT(    728 ) = RKI(   728 ) * YC(  ATOL2J )
-      RXRAT(    729 ) = RKI(   729 ) * YC(  ABNZ1J )
-      RXRAT(    730 ) = RKI(   730 ) * YC(  ABNZ2J )
-      RXRAT(    731 ) = RKI(   731 ) * YC(  ATRP1J )
-      RXRAT(    732 ) = RKI(   732 ) * YC(  ATRP2J )
-      RXRAT(    733 ) = RKI(   733 ) * YC(  AISO1J )
-      RXRAT(    734 ) = RKI(   734 ) * YC(  AISO2J )
-      RXRAT(    735 ) = RKI(   735 ) * YC(  ASQTJ )
-      RXRAT(    736 ) = RKI(   736 ) * YC(  APAH1J )
-      RXRAT(    737 ) = RKI(   737 ) * YC(  APAH2J )
-      RXRAT(    738 ) = RKI(   738 ) * YC(  AALK1J )
-      RXRAT(    739 ) = RKI(   739 ) * YC(  AALK2J )
-      RXRAT(    740 ) = RKI(   740 ) * YC(  PCVOC ) * YC(  OH )
-      RXRAT(    741 ) = RKI(   741 ) * YC(  VLVPO1 ) * YC(  OH )
-      RXRAT(    742 ) = RKI(   742 ) * YC(  VSVPO1 ) * YC(  OH )
-      RXRAT(    743 ) = RKI(   743 ) * YC(  VSVPO2 ) * YC(  OH )
-      RXRAT(    744 ) = RKI(   744 ) * YC(  VSVPO3 ) * YC(  OH )
-      RXRAT(    745 ) = RKI(   745 ) * YC(  VIVPO1 ) * YC(  OH )
-      RXRAT(    746 ) = RKI(   746 ) * YC(  VLVOO1 ) * YC(  OH )
-      RXRAT(    747 ) = RKI(   747 ) * YC(  VLVOO2 ) * YC(  OH )
-      RXRAT(    748 ) = RKI(   748 ) * YC(  VSVOO1 ) * YC(  OH )
-      RXRAT(    749 ) = RKI(   749 ) * YC(  VSVOO2 ) * YC(  OH )
-      RXRAT(    750 ) = RKI(   750 ) * YC(  VSVOO3 ) * YC(  OH )
+      RXRAT(    722 ) = RKI(   722 ) * YC(  AXYL1J )
+      RXRAT(    723 ) = RKI(   723 ) * YC(  AXYL2J )
+      RXRAT(    724 ) = RKI(   724 ) * YC(  ATOL1J )
+      RXRAT(    725 ) = RKI(   725 ) * YC(  ATOL2J )
+      RXRAT(    726 ) = RKI(   726 ) * YC(  ABNZ1J )
+      RXRAT(    727 ) = RKI(   727 ) * YC(  ABNZ2J )
+      RXRAT(    728 ) = RKI(   728 ) * YC(  ATRP1J )
+      RXRAT(    729 ) = RKI(   729 ) * YC(  ATRP2J )
+      RXRAT(    730 ) = RKI(   730 ) * YC(  AISO1J )
+      RXRAT(    731 ) = RKI(   731 ) * YC(  AISO2J )
+      RXRAT(    732 ) = RKI(   732 ) * YC(  ASQTJ )
+      RXRAT(    733 ) = RKI(   733 ) * YC(  APAH1J )
+      RXRAT(    734 ) = RKI(   734 ) * YC(  APAH2J )
+      RXRAT(    735 ) = RKI(   735 ) * YC(  AALK1J )
+      RXRAT(    736 ) = RKI(   736 ) * YC(  AALK2J )
+      RXRAT(    737 ) = RKI(   737 ) * YC(  PCVOC ) * YC(  OH )
+      RXRAT(    738 ) = RKI(   738 ) * YC(  VLVPO1 ) * YC(  OH )
+      RXRAT(    739 ) = RKI(   739 ) * YC(  VSVPO1 ) * YC(  OH )
+      RXRAT(    740 ) = RKI(   740 ) * YC(  VSVPO2 ) * YC(  OH )
+      RXRAT(    741 ) = RKI(   741 ) * YC(  VSVPO3 ) * YC(  OH )
+      RXRAT(    742 ) = RKI(   742 ) * YC(  VIVPO1 ) * YC(  OH )
+      RXRAT(    743 ) = RKI(   743 ) * YC(  VLVOO1 ) * YC(  OH )
+      RXRAT(    744 ) = RKI(   744 ) * YC(  VLVOO2 ) * YC(  OH )
+      RXRAT(    745 ) = RKI(   745 ) * YC(  VSVOO1 ) * YC(  OH )
+      RXRAT(    746 ) = RKI(   746 ) * YC(  VSVOO2 ) * YC(  OH )
+      RXRAT(    747 ) = RKI(   747 ) * YC(  VSVOO3 ) * YC(  OH )
+      RXRAT(    748 ) = RKI(   748 ) * YC(  IEPOX )
 
 
       RETURN

@@ -23,11 +23,11 @@ C*************************************************************************
 C
 C  FUNCTION:  Mechanism & solver data for EBI solver
 C
-C  PRECONDITIONS: For the SAPRC07TC_AE6_AQ mechanism
+C  PRECONDITIONS: For the SAPRC07TC family of mechanisms
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Apr  9, 2019
+C  REVISION HISTORY: Created by EBI solver program, Dec 11, 2018
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables for solution
 C*************************************************************************
@@ -270,37 +270,35 @@ c..Species indices
       INTEGER, PARAMETER :: ACLI             =  162
       INTEGER, PARAMETER :: ACLJ             =  163
       INTEGER, PARAMETER :: ACLK             =  164
-      INTEGER, PARAMETER :: IEPOXP           =  165
-      INTEGER, PARAMETER :: ASO4J            =  166
-      INTEGER, PARAMETER :: AISO3J           =  167
-      INTEGER, PARAMETER :: AXYL1J           =  168
-      INTEGER, PARAMETER :: AOLGAJ           =  169
-      INTEGER, PARAMETER :: AXYL2J           =  170
-      INTEGER, PARAMETER :: ATOL1J           =  171
-      INTEGER, PARAMETER :: ATOL2J           =  172
-      INTEGER, PARAMETER :: ABNZ1J           =  173
-      INTEGER, PARAMETER :: ABNZ2J           =  174
-      INTEGER, PARAMETER :: ATRP1J           =  175
-      INTEGER, PARAMETER :: AOLGBJ           =  176
-      INTEGER, PARAMETER :: ATRP2J           =  177
-      INTEGER, PARAMETER :: AISO1J           =  178
-      INTEGER, PARAMETER :: AISO2J           =  179
-      INTEGER, PARAMETER :: ASQTJ            =  180
-      INTEGER, PARAMETER :: APAH1J           =  181
-      INTEGER, PARAMETER :: APAH2J           =  182
-      INTEGER, PARAMETER :: AALK1J           =  183
-      INTEGER, PARAMETER :: AALK2J           =  184
-      INTEGER, PARAMETER :: PCVOC            =  185
-      INTEGER, PARAMETER :: PCSOARXN         =  186
-      INTEGER, PARAMETER :: VLVPO1           =  187
-      INTEGER, PARAMETER :: VSVPO1           =  188
-      INTEGER, PARAMETER :: VSVPO2           =  189
-      INTEGER, PARAMETER :: VSVPO3           =  190
-      INTEGER, PARAMETER :: VIVPO1           =  191
-      INTEGER, PARAMETER :: VLVOO1           =  192
-      INTEGER, PARAMETER :: VLVOO2           =  193
-      INTEGER, PARAMETER :: VSVOO2           =  194
-      INTEGER, PARAMETER :: VSVOO3           =  195
-      INTEGER, PARAMETER :: VSVOO1           =  196
+      INTEGER, PARAMETER :: AXYL1J           =  165
+      INTEGER, PARAMETER :: AOLGAJ           =  166
+      INTEGER, PARAMETER :: AXYL2J           =  167
+      INTEGER, PARAMETER :: ATOL1J           =  168
+      INTEGER, PARAMETER :: ATOL2J           =  169
+      INTEGER, PARAMETER :: ABNZ1J           =  170
+      INTEGER, PARAMETER :: ABNZ2J           =  171
+      INTEGER, PARAMETER :: ATRP1J           =  172
+      INTEGER, PARAMETER :: AOLGBJ           =  173
+      INTEGER, PARAMETER :: ATRP2J           =  174
+      INTEGER, PARAMETER :: AISO1J           =  175
+      INTEGER, PARAMETER :: AISO2J           =  176
+      INTEGER, PARAMETER :: ASQTJ            =  177
+      INTEGER, PARAMETER :: APAH1J           =  178
+      INTEGER, PARAMETER :: APAH2J           =  179
+      INTEGER, PARAMETER :: AALK1J           =  180
+      INTEGER, PARAMETER :: AALK2J           =  181
+      INTEGER, PARAMETER :: PCVOC            =  182
+      INTEGER, PARAMETER :: PCSOARXN         =  183
+      INTEGER, PARAMETER :: VLVPO1           =  184
+      INTEGER, PARAMETER :: VSVPO1           =  185
+      INTEGER, PARAMETER :: VSVPO2           =  186
+      INTEGER, PARAMETER :: VSVPO3           =  187
+      INTEGER, PARAMETER :: VIVPO1           =  188
+      INTEGER, PARAMETER :: VLVOO1           =  189
+      INTEGER, PARAMETER :: VLVOO2           =  190
+      INTEGER, PARAMETER :: VSVOO2           =  191
+      INTEGER, PARAMETER :: VSVOO3           =  192
+      INTEGER, PARAMETER :: VSVOO1           =  193
+      INTEGER, PARAMETER :: AISO3J           =  194
 
       END MODULE HRDATA

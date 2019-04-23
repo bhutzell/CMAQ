@@ -30,8 +30,10 @@ compared to IEPOX (e.g. Amazon, future US emission scenarios).
 
 ## Affected Files
 CCTM/src/aero/aero7/AEROSOL_CHEMISTRY.F   
-CCTM/src/MECHS/*/mech*.def   
-CCTM/src/MECHS/*/GC*.nml   
+CCTM/src/MECHS/*ae7*/mech*.def   
+CCTM/src/MECHS/saprc07tic_ae6i_*/mech*.def   
+CCTM/src/MECHS/*ae7*/GC*.nml   
+CCTM/src/MECHS/saprc07tic_ae6i_*/GC*.nml   
 associated RXNS*F90 and ebi files   
 
 
