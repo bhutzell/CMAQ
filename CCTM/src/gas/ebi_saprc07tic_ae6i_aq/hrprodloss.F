@@ -32,7 +32,6 @@ C
 C  REVISION HISTORY: Created by EBI solver program, Apr  9, 2019
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
-
 C***********************************************************************
       USE HRDATA
 
