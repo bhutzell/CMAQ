@@ -74,7 +74,7 @@
       ! local variables
       Character( FLD_LEN ) :: cmdline
 
-      cmdline = 'rm ' // Trim(file)
+      cmdline = 'rm -f ' // Trim(file)
 
       status = system( Trim(cmdline) )
       If ( status .Ne. 0 ) Then
@@ -260,10 +260,14 @@
       ! local variables
       Character( FLD_LEN ) :: cmdline
 
+      cmdline = 'make'
+
       if ( debug_cctm ) then
-         cmdline = 'make DEBUG=TRUE'
-      else
-         cmdline = 'make'
+         cmdline = trim(cmdline) // ' DEBUG=TRUE'
+      end if
+
+      if ( isam_cctm ) then
+         cmdline = trim(cmdline) // ' isam=TRUE'
       end if
 
       status = system( Trim(cmdline) )
