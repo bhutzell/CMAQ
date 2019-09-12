@@ -782,6 +782,7 @@ C Local variables:
          INTEGER, SAVE :: LOGDEV
 
          INTEGER, SAVE :: PRE_JDATE, LOC_STKDATE
+         INTEGER       :: LACRESBURNED
 
          INTERFACE
            SUBROUTINE PREPLM( FIREFLG, EMLAYS, HMIX, HTS, PSFC, TS, DDZF, QV,
@@ -885,6 +886,8 @@ C-----------------------------------------------------------------------
 #endif
          END IF
 
+         LACRESBURNED = 0
+ 
 C For each time step, compute the layer fractions...
 
          WRITE( XMSG,'(A, I7.6)' )
@@ -1226,13 +1229,14 @@ C If layer fractions are negative, put in the first layer
 C If source is a fire, adjust for fire smoldering effects (include fractions below LBOT)
 C calculate smoldering fraction:
 
-                  IF ( ACRES( N )%ARRY ( S ) .NE. 0.0 ) THEN
+                  IF ( ACRES( N )%ARRY ( S ) .GT. 0.0 ) THEN
                      BESIZE = 0.0703 * LOG( ACRES( N )%ARRY( S ) ) + 0.3
                      BESIZE = MIN( BESIZE, 1.0 )
                      SFRACT = 1.0 - BESIZE
                   ELSE
                      SFRACT = 1.0
-                     write( logdev,* ) "we can't get here: ", n, s
+                     LACRESBURNED = LACRESBURNED + 1
+!                    write( logdev,* ) "we can't get here: ", n, s
                   END IF
 
                   ZDIFF = ZBOT - P_D( N )%ZZF( 0 )   ! Note: ZDIFF redefined
@@ -1306,6 +1310,13 @@ C Possible report to REPRTLAY
                END IF
 
             END DO    ! end loop on sources S
+! Print warning if any ACRES-BURNED values were negative
+           IF ( LACRESBURNED .GT. 0 ) THEN
+                write( XMSG,'(A,I8,A,I8,A)') "Warning: the value of ACRESBURNED for ",LACRESBURNED, " fire sources on stream ",
+     &                                        N, " is negative. CMAQ will set the smodlering fraction equal to 1.0 for these cases."
+                write( logdev, '(a)' ) XMSG
+           END IF
+
 
             IF ( PT3DFRAC .AND. WRTIME ) THEN     ! Write out layer fractions
                IF ( .NOT. WRITE3_DISTR( PLAYNAME( N ), 'LFRAC', WDATE, WTIME,
