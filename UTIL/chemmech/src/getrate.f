@@ -366,10 +366,20 @@ C                 IPH(IP,2) to be resolved in caller (CHEMMECH.f)
 
       ELSE IF ( CHR .EQ. '%' ) THEN
          CALL GETCHAR ( IMECH, INBUF, LPOINT, IEOL, CHR )
-         IF ( CHR .EQ. '4' )THEN
-            KTYPE( NXX ) = 13
+         IF ( CHR .EQ. '4' .OR. CHR .EQ. '5' )THEN
+
             NRATE_STRING = NRATE_STRING + 1
             KSTRING( NRATE_STRING )      = NXX
+
+            IF( CHR .EQ. '5' )THEN
+               KTYPE( NXX ) = 14
+               NSPECIAL_RXN = NSPECIAL_RXN + 1
+               ISPECIAL( NSPECIAL_RXN,1 ) = NXX
+               ISPECIAL( NSPECIAL_RXN,2 ) = NRATE_STRING
+            ELSE
+               KTYPE( NXX ) = 13
+            END IF
+
             CALL GETCHAR ( IMECH, INBUF, LPOINT, IEOL, CHR )
             IF ( CHR .NE. '#' ) THEN
                WRITE( *,'(A,1X,A)')'CHR is ',CHR
@@ -406,6 +416,9 @@ C                 IPH(IP,2) to be resolved in caller (CHEMMECH.f)
                LPOINT = LSTOP
                CALL GETCHAR ( IMECH, INBUF, LPOINT, IEOL, CHR )
                LSTART = LPOINT
+               
+               RATE_STRING = ADJUSTL( RATE_STRING )
+               
             END DO READ_RATE_STRING
             LPOINT = IEOL - 1 
             CALL GETCHAR ( IMECH, INBUF, LPOINT, IEOL, CHR )

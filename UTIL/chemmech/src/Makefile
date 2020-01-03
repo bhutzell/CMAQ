@@ -11,8 +11,9 @@ endif
 
 ifeq "$(COMPILER)" "INTEL"
 
- FC = ifort
- CC = icc
+#FC = ifort
+ FC = /share/linux86_64/Intel2019/compilers_and_libraries_2019.5.281/linux/bin/intel64/ifort
+ CC = /share/linux86_64/Intel2019/compilers_and_libraries_2019.5.281/linux/bin/intel64/icc
 #f_FLAGS = -fixed -132 -O0 -override-limits -check uninit -check bounds -check format -g -traceback -warn nounused -fno-alias -mp1  -I . -g
  f_FLAGS   = -fixed -132 -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -mp1  -I . 
  F_FLAGS   = $(f_FLAGS)

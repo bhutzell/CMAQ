@@ -1,3 +1,6 @@
+
+
+
 C***************************************************************************
 C  Significant portions of Models-3/CMAQ software were developed by        *
 C  Government employees and under a United States Government contract.     *
@@ -567,6 +570,10 @@ C Error-check phot tables and report to log
 95701 FORMAT(/ '! define rate constants in terms of special rate operators ' /)
       DO NXX = 1, NSPECIAL_RXN
          IDX = ISPECIAL( NXX,1 )
+         IF( KTYPE( IDX ) .EQ. 14 )THEN
+           WRITE(MODULE_UNIT, 95046 )IDX,ADJUSTL( RATE_STRING( ISPECIAL( NXX,2 ) ) )
+           CYCLE
+         END IF
          IF( RTDAT( 1, IDX ) .NE. 1.0 .AND. RTDAT( 1, IDX ) .GE. 0.0 )THEN
              IF( RTDAT( 3, IDX ) .EQ. 0.0 )THEN
                  WRITE(MODULE_UNIT, 95068 )IDX,REAL(RTDAT( 1, IDX ), 8),
@@ -1441,7 +1448,7 @@ C Error-check phot tables and report to log
 94200 FORMAT( 1X,'DIMENSION: MXRP     = ',I6,' VARIABLE: NDPMAX  = ',I6)
 94220 FORMAT( 1X,'DIMENSION: MXRR     = ',I6,' VARIABLE: NDLMAX  = ',I6)
 
-95050  FORMAT( 7X,'SUBROUTINE SPECIAL_RATES( NUMCELLS, Y, TEMP, DENS, RKI )'
+95050  FORMAT( 7X,'SUBROUTINE SPECIAL_RATES( NUMCELLS, Y, TAIR, DENS, RKI )'
      &       /  '! Purpose: calculate special rate operators and update'
      &       /  '!         appropriate rate constants'
      &      //  7X,'USE RXNS_DATA'
@@ -1449,27 +1456,34 @@ C Error-check phot tables and report to log
      &      //  '! Arguments:'
      &      /   7X,'INTEGER,      INTENT( IN  )   :: NUMCELLS        ! Number of cells in block '
      &      /   7X,'REAL( 8 ),    INTENT( IN )    :: Y( :, : )       ! species concs'
-     &      /   7X,'REAL( 8 ),    INTENT( IN )    :: TEMP( : )       ! air temperature, K '
+     &      /   7X,'REAL( 8 ),    INTENT( IN )    :: TAIR( : )       ! air temperature, K '
      &      /   7X,'REAL( 8 ),    INTENT( IN )    :: DENS( : )       ! air density, Kg/m3'
      &      /   7X,'REAL( 8 ),    INTENT( INOUT ) :: RKI( :, : )     ! reaction rate constant, ppm/min '
      &      /   '! Local:'
      &      /   7X,'REAL( 8 ), PARAMETER :: DENSITY_TO_NUMBER = 2.07930D+19 ! Kg/m3 to molecules/cm3' /
      &      /   7X,'INTEGER   :: NCELL'
+     &      /   7X,'REAL( 8 ) :: TEMP'
      &      /   7X,'REAL( 8 ) :: INV_TEMP'
-     &      /   7X,'REAL( 8 ) :: CAIR'
-     &      /   7X,'REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule) to 1/(ppm)'
-     &      /   7X,'REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molec^2) to 1/(ppm^2)'
-     &      /   '! special rate operators listed below' //)
+     &      /   7X,'REAL( 8 ) :: CAIR'  )
      
      
-95051  FORMAT(/ 7X,'DO NCELL = 1, NUMCELLS'
-     &      /   7X,'   INV_TEMP  = 1.0D0 / TEMP( NCELL )'
+95051  FORMAT(  7X,'REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule*min) to 1/(ppm*min)'
+     &      /   7X,'REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molec^2*min) to 1/(ppm^2*min)'
+     &      /   '! special rate operators listed below'
+     &      //  7X,'DO NCELL = 1, NUMCELLS'
+     &      /   7X,'   TEMP      = TAIR( NCELL )'
+     &      /   7X,'   INV_TEMP  = 1.0D0 / TEMP '
      &      /   7X,'   CAIR      = DENSITY_TO_NUMBER * DENS( NCELL )'
-     &      /   7X,'   CFACT     = 1.0D-06 * CAIR'  
-     &      /   7X,'   CFACT_SQU = 1.0D-12 * CAIR * CAIR' /
+     &      /   7X,'   CFACT     = 6.0D-05 * CAIR'  
+     &      /   7X,'   CFACT_SQU = 6.0D-11 * CAIR * CAIR' /
      &      //  '! define special rate operators' / )
-95052  FORMAT(/ 7X,'DO NCELL = 1, NUMCELLS'
-     &      /   7X,'   INV_TEMP  = 1.0D0 / TEMP( NCELL )'
+     
+95052  FORMAT(  7X,'REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, 1/(ppm*min) to 1/(ppm*min)'
+     &      /   7X,'REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, 1/(ppm^2*min) to 1/(ppm*min)'
+     &      /   '! special rate operators listed below'
+     &      //  7X,'DO NCELL = 1, NUMCELLS'
+     &      /   7X,'   TEMP      = TAIR( NCELL )'
+     &      /   7X,'   INV_TEMP  = 1.0D0 / TEMP '
      &      /   7X,'   CAIR      = 1.0D+6'
      &      /   7X,'   CFACT     = 1.0D0'  
      &      /   7X,'   CFACT_SQU = 1.0D0' /
@@ -1479,6 +1493,7 @@ C Error-check phot tables and report to log
      &          / 7X,'END SUBROUTINE SPECIAL_RATES')
 95100  FORMAT(2X,A16,' = 0.0D0')        
 
+95046 FORMAT(11X,'RKI( NCELL,',I4,' ) = ',A )
 95066 FORMAT(11X,'RKI( NCELL,',I4,' ) = DEXP( -',1PD10.4,'*INV_TEMP ) * ', A16,' ! reaction: ',A)
 95067 FORMAT(11X,'RKI( NCELL,',I4,' ) = ',1PD10.4,' * DEXP( -',1PD10.4,'*INV_TEMP ) * ', A16,' ! reaction: ',A)
 95068 FORMAT(11X,'RKI( NCELL,',I4,' ) = ',1PD10.4,' * ', A16,' ! reaction: ',A)
