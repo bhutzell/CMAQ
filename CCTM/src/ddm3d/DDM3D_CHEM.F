@@ -13,7 +13,7 @@ C-----------------------------------------------------------------------
       
       Implicit None
 
-      Real, Allocatable, Save ::  YCDDM( : )  ! Concs used by DDM
+      Real(8), Allocatable, Save ::  YCDDM( : )  ! Concs used by DDM
                                               ! (avg of pre- and post-chem,
                                               !  or mid-chemstep concs,
                                               !  depending on implementation)
@@ -21,26 +21,26 @@ C-----------------------------------------------------------------------
 
       Logical, Allocatable, Save :: RXNFLAG( : )
       INTEGER RXN
-      Real*8, Allocatable, Save :: SRK( : )                ! rate constants
+      Real(8), Allocatable, Save :: SRK( : )                ! rate constants
 
-      Real, Allocatable, Save :: A( :, : )                 ! An upper triangular matrix and the
+      Real(8), Allocatable, Save :: A( :, : )                 ! An upper triangular matrix and the
                                               ! multipliers used to obtain it
                                               ! (See s_lu.F)
-      Real, Allocatable, Save :: A1( :, : )
-      Real, Allocatable, Save :: PDT( :, : )
-      Real, Allocatable, Save :: PRD( : )
-      Real, Allocatable, Save :: PRD_RATE( : )             ! Contribution to PRD from rxn rate sens
-      Real, Allocatable, Save :: SOLD( : )
+      Real(8), Allocatable, Save :: A1( :, : )
+      Real(8), Allocatable, Save :: PDT( :, : )
+      Real(8), Allocatable, Save :: PRD( : )
+      Real(8), Allocatable, Save :: PRD_RATE( : )             ! Contribution to PRD from rxn rate sens
+      Real(8), Allocatable, Save :: SOLD( : )
       Integer, Allocatable, Save :: IPVT ( : )             ! an integer vector of pivot indices.
 
 C Variables used for hddm-3d
-      Real*8, Allocatable, Save :: SRK2 ( : )              ! rate constants
+      Real(8), Allocatable, Save :: SRK2 ( : )              ! rate constants
       LOGICAL, Allocatable, Save :: ORDER1 ( : )           ! true if order 1; else, false
-      Real, Allocatable, Save :: PDT2( :, : )              ! Used for 2nd order call of JAC
-      Real, Allocatable, Save :: SMID( :, : )              ! SENGRID in middle of timestep
-      Real, Allocatable, Save :: SMIDJAC( : )              ! SMID for the relevant 1st order
+      Real(8), Allocatable, Save :: PDT2( :, : )              ! Used for 2nd order call of JAC
+      Real(8), Allocatable, Save :: SMID( :, : )              ! SENGRID in middle of timestep
+      Real(8), Allocatable, Save :: SMIDJAC( : )              ! SMID for the relevant 1st order
                                               ! sensitivity parameter
-      Real*8, Allocatable, Save :: RK ( : )
+      Real(8), Allocatable, Save :: RK ( : )
 
       Integer N_EBI_MID            ! the midpoint ebi step; half of N_EBI_STEPS
       Logical ODD_STEPS            ! true if N_EBI_STEPS is odd
@@ -52,26 +52,25 @@ C-----------------------------------------------------------------------
       Subroutine INIT_DDM3D_CHEM
 
       Use RXNS_DATA, Only: NUMB_MECH_SPC, NRXNS
-      Use UTILIO_DEFN                   ! IOAPI parameters and functions declarations
+      Use RUNTIME_VARS, Only: LOGDEV
+      USE UTILIO_DEFN
 
       Implicit None
 
       Character( 16 ), Save :: PNAME = 'INIT_DDM3D_CHEM'
-      Integer LOGDEV 
       Character( 96 ) :: XMSG = ' '
       Integer ALLOCSTAT
-      LOGDEV = INIT3 ()
 
 
-      ALLOCATE( YCDDM ( NUMB_MECH_SPC), STAT = ALLOCSTAT )
+      ALLOCATE( YCDDM ( NUMB_MECH_SPC ), STAT = ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
-         XMSG = 'Failure allocating DDM_CHECK'
+         XMSG = 'Failure allocating YCDDM'
          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
-      ALLOCATE( DDM_CHECK( NUMB_MECH_SPC), STAT = ALLOCSTAT )
+      ALLOCATE( DDM_CHECK( NUMB_MECH_SPC ), STAT = ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
-         XMSG = 'Failure allocating YCDDM'
+         XMSG = 'Failure allocating DDM_CHECK'
          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
@@ -81,18 +80,18 @@ C-----------------------------------------------------------------------
          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
-      ALLOCATE( SRK( NRXNS ), 
-     &          SRK2 ( NRXNS ),
-     &          RK ( NRXNS ),
-     &          ORDER1 ( NRXNS ), STAT = ALLOCSTAT )
+      ALLOCATE( SRK   ( NRXNS ), 
+     &          SRK2  ( NRXNS ),
+     &          RK    ( NRXNS ),
+     &          ORDER1( NRXNS ), STAT = ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
          XMSG = 'Failure allocating SRK, SRK2, RK, or ORDER1'
          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
-      ALLOCATE( A( NUMB_MECH_SPC, NUMB_MECH_SPC ),
-     &          A1( NUMB_MECH_SPC, NUMB_MECH_SPC ),
-     &          PDT( NUMB_MECH_SPC, NUMB_MECH_SPC ),
+      ALLOCATE( A   ( NUMB_MECH_SPC, NUMB_MECH_SPC ),
+     &          A1  ( NUMB_MECH_SPC, NUMB_MECH_SPC ),
+     &          PDT ( NUMB_MECH_SPC, NUMB_MECH_SPC ),
      &          PDT2( NUMB_MECH_SPC, NUMB_MECH_SPC ), STAT = ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
          XMSG = 'Failure allocating A, A1, PDT, or PDT2'
@@ -105,11 +104,11 @@ C-----------------------------------------------------------------------
          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
-      ALLOCATE( PRD( NUMB_MECH_SPC ),
-     &          SOLD( NUMB_MECH_SPC ),
-     &          IPVT ( NUMB_MECH_SPC ),
+      ALLOCATE( PRD     ( NUMB_MECH_SPC ),
+     &          SOLD    ( NUMB_MECH_SPC ),
+     &          IPVT    ( NUMB_MECH_SPC ),
      &          PRD_RATE( NUMB_MECH_SPC ),
-     &          SMIDJAC( NUMB_MECH_SPC ), STAT = ALLOCSTAT )
+     &          SMIDJAC ( NUMB_MECH_SPC ), STAT = ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
         XMSG = 'Failure allocating PRD, SOLD, IPVT, PRD_RATE,or SMIDJAC'
          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
@@ -125,21 +124,25 @@ C-----------------------------------------------------------------------
       Use DDM3D_DEFN, Only: SENGRID, NPMAX, NP, DATENUM, IPT, 
      &                      IDATE, HIGH, IREGION, IRXN, IPARM, STARTDATE
       Use RXNS_DATA, Only: NRXNS, NREACT, NPRDCT, SC, IRR, CGRID_INDEX, NUMB_MECH_SPC
-      Use UTILIO_DEFN                   ! IOAPI parameters and functions declarations
+
+      Use MECHANISM_FUNCTIONS  
+
+      Use RUNTIME_VARS, Only: LOGDEV
+      USE UTILIO_DEFN
 
       Implicit None
 
       Character( 16 ), Save :: PNAME = 'SOLVE_DDM3D_CHEM'
 
-      Integer C,R,L
-      Real( 8 )  CHEMSTEP
+      Integer, Intent( In ) :: C,R,L
+      Real(8), Intent( In ) :: CHEMSTEP
 
       Integer I,J,S,N
       Integer INFO                            ! see s_lu.F
-      Real SUM
-      Real IREGTEMP                           ! Holds relevant value of IREGION
-      Real KSTEP                              ! Holds k times timestep(in min)
-      Real RXNMULT                            ! Holds product of concs of reactants
+      Real(8) TOTAL
+      Real(8) IREGTEMP                           ! Holds relevant value of IREGION
+      Real(8) KSTEP                              ! Holds k times timestep(in min)
+      Real(8) RXNMULT                            ! Holds product of concs of reactants
       Integer NRCT                            ! Counter over reactants
       Integer NPROD                           ! Counter over products
 
@@ -152,33 +155,40 @@ C-----------------------------------------------------------------------
 
       Character( 96 ) :: XMSG = ' '
       Logical, Save :: FIRSTIME = .TRUE.
-      Integer, Save :: LOGDEV
 
+      INTERFACE
+         SUBROUTINE JAC( C, PD, RK )
+           REAL(KIND=8), DIMENSION( : ), INTENT ( IN ):: C
+           REAL(KIND=8), DIMENSION( :,: ), INTENT( INOUT ) :: PD
+           REAL(KIND=8), DIMENSION( : ), INTENT( IN ) :: RK 
+         END SUBROUTINE JAC           
+      END INTERFACE
 
 
       IF ( FIRSTIME ) THEN
 
          FIRSTIME = .FALSE.
-         LOGDEV = INIT3()
+         DDM_LOG = LOGDEV
+         CALL SET_MECHANISM( )
 
       END IF
 
       CALL JAC ( YCDDM, PDT, SRK ) ! Create the Jacobian matrix; YCDDM is set in mid-timestep of hrsolver.F
 
-      DO 433 J = 1, NUMB_MECH_SPC
-         DO 434 I = 1, NUMB_MECH_SPC
-            A( I, J ) = 0.0
-            A1( I, J ) = 0.0
-            A( I, J ) = -0.5 * CHEMSTEP * PDT( I, J )
+      DO J = 1, NUMB_MECH_SPC
+         DO I = 1, NUMB_MECH_SPC
+            A( I, J )  = 0.0D0
+            A1( I, J ) = 0.0D0
+            A( I, J )  = -0.5D0 * CHEMSTEP * PDT( I, J )
             IF ( I .EQ. J ) THEN
-               A( I, J ) = 1.0 + A( I, J )
+               A( I, J ) = 1.0D0 + A( I, J )
             END IF
-            A1( I, J ) = 0.5 * CHEMSTEP * PDT( I, J )
+            A1( I, J ) = 0.5D0 * CHEMSTEP * PDT( I, J )
             IF ( I .EQ. J ) THEN
-               A1( I, J ) = 1.0 + A1( I, J )
+               A1( I, J ) = 1.0D0 + A1( I, J )
             END IF
-434      CONTINUE
-433   CONTINUE
+         END DO
+      END DO
 C Factor matrix A by Gaussian elimination
 
       CALL SGEFA(A, NUMB_MECH_SPC, NUMB_MECH_SPC, IPVT,INFO)
@@ -188,11 +198,11 @@ C Factor matrix A by Gaussian elimination
          IF ( IPT( NP ) .NE. 4 ) THEN
 
             DO S = 1, NUMB_MECH_SPC
-               PRD( S ) = 0.0
-               PRD_RATE( S ) = 0.0
+               PRD( S ) = 0.0D0
+               PRD_RATE( S ) = 0.0D0
                SOLD(S) = SENGRID( C, R, L, NP, CGRID_INDEX(S) )
-               IF (ABS(SOLD( S )) .LT. 1.e-25 ) THEN
-                  SOLD(S) = 0.
+               IF (ABS(SOLD( S )) .LT. 1.0D-25 ) THEN
+                  SOLD(S) = 0.0D0
                END IF
             END DO
 
@@ -202,7 +212,7 @@ C Begin code specific to reaction rate sensitivities
                IREGTEMP = IREGION( C, R, L, NP )
                DO RXN = 1, NRXNS
                   IF ( IRXN( NP, RXN ) .EQ. 1 ) THEN ! This checks if it's a reaction in the sens parameter
-                              KSTEP = SRK( RXN ) * CHEMSTEP ! KSTEP = k * timestep(in min)
+                     KSTEP = SRK( RXN ) * CHEMSTEP ! KSTEP = k * timestep(in min)
                      ! RXNMULT is the product of the concs of
                      ! the reactants
                      ! Note that the first 3 slots of IRR are
@@ -247,25 +257,25 @@ C Begin code specific to reaction rate sensitivities
             END IF  ! RXNFLAG
 C End code specific to reaction rate sensitivities
             DO S = 1, NUMB_MECH_SPC
-               SUM = 0.0
+               TOTAL = 0.0D0
                DO J = 1, NUMB_MECH_SPC
-                  SUM = SUM + A1( S, J ) * SOLD( J )
+                  TOTAL = TOTAL + A1( S, J ) * SOLD( J )
                END DO
 C edits by A.Digar
-                PRD( S ) = SUM + PRD_RATE( S )
+               PRD( S ) = TOTAL + PRD_RATE( S )
 C end edit
             END DO
 
             CALL SGESL( A, NUMB_MECH_SPC, NUMB_MECH_SPC, IPVT, PRD, 0 )
             DO S = 1, NUMB_MECH_SPC
-               IF ( ABS ( PRD ( S ) ) .LT. 1.e-25 ) THEN
+               IF ( ABS ( PRD ( S ) ) .LT. 1.0D-25 ) THEN
                   IF ( HIGH ) THEN
-                     SMID( NP, S ) = 0.5 * SENGRID( C, R, L, NP, CGRID_INDEX(S) )
+                     SMID( NP, S ) = 0.5D0 * SENGRID( C, R, L, NP, CGRID_INDEX(S) )
                   END IF
-                  SENGRID( C, R, L, NP, CGRID_INDEX(S) ) = 0.
+                  SENGRID( C, R, L, NP, CGRID_INDEX(S) ) = 0.0D0
                ELSE
                   IF ( HIGH ) THEN ! SMID is the average of SENGRID before and after chemistry
-                     SMID( NP, S ) = 0.5 * ( SENGRID( C, R, L, NP, CGRID_INDEX(S) ) + PRD( S) )
+                     SMID( NP, S ) = 0.5D0 * ( SENGRID( C, R, L, NP, CGRID_INDEX(S) ) + PRD( S) )
                   END IF
                   SENGRID( C, R, L, NP, CGRID_INDEX(S) ) = PRD( S )
                END IF
@@ -290,10 +300,10 @@ C end edit
             END DO
 C Added by A.Digar
             DO S = 1, NUMB_MECH_SPC
-               PRD( S ) = 0.0
+               PRD( S ) = 0.0D0
                SOLD(S) = SENGRID( C, R, L,NP,CGRID_INDEX(S) )
-               IF (ABS(SOLD( S )) .LT. 1.e-25 ) THEN
-                  SOLD(S) = 0.
+               IF (ABS(SOLD( S )) .LT. 1.0D-25 ) THEN
+                  SOLD(S) = 0.0D0
                END IF
             END DO
 
@@ -326,7 +336,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                      END DO
                   END DO
                   IF ( IPT( HITMP1 ) .eq. IPT( HITMP2 ) ) THEN
-                     PRD = 2.0 * PRD
+                     PRD = 2.0D0 * PRD
                      EXIT
                   ENDIF
                ENDIF
@@ -341,21 +351,21 @@ C End of modification by A.Digar
             CALL JAC ( SMIDJAC, PDT2, SRK2 )
 
             DO S = 1, NUMB_MECH_SPC
-               SUM = 0.0
+               TOTAL = 0.0D0
                DO J = 1, NUMB_MECH_SPC
-                  SUM = SUM + A1( S, J ) * SOLD( J )
-     &                + CHEMSTEP * PDT2( S,J ) * SMID( HIPARM( 2 ),J )
+                  TOTAL = TOTAL + A1( S, J ) * SOLD( J )
+     &                  + CHEMSTEP * PDT2( S,J ) * SMID( HIPARM( 2 ),J )
                END DO
 C edits by A.Digar
-               PRD( S ) = SUM + PRD( S )
+               PRD( S ) = TOTAL + PRD( S )
 C end of edits
             END DO
 
             CALL SGESL( A, NUMB_MECH_SPC, NUMB_MECH_SPC, IPVT, PRD, 0 )
  
             DO S = 1, NUMB_MECH_SPC
-               IF ( ABS ( PRD ( S ) ) .LT. 1.e-25 ) THEN
-                  SENGRID( C, R, L, NP, CGRID_INDEX(S) ) = 0.
+               IF ( ABS ( PRD ( S ) ) .LT. 1.0D-25 ) THEN
+                  SENGRID( C, R, L, NP, CGRID_INDEX(S) ) = 0.0D0
                ELSE
                   SENGRID( C, R, L, NP, CGRID_INDEX(S) ) = PRD( S )
                END IF

@@ -352,15 +352,20 @@ C For reaction rate sensitivities
       END DO
 
 C For higher order sensitivities
-      IF ( HIGH ) THEN
-         DO RXN = 1, NRXNS
-            IF( NREACT( RXN ) .EQ. 1 ) THEN
-               ORDER1( RXN ) = .TRUE.
-            ELSE
-               ORDER1( RXN ) = .FALSE.
-            END IF
-         END DO
-      END IF
+!      IF ( HIGH ) THEN
+!         WHERE ( NREACT .EQ. 1 )
+!            ORDER1 = .TRUE.
+!         ELSE WHERE
+!            ORDER1 = .FALSE.
+!         END WHERE   
+!         DO RXN = 1, NRXNS
+!            IF( NREACT( RXN ) .EQ. 1 ) THEN
+!               ORDER1( RXN ) = .TRUE.
+!            ELSE
+!               ORDER1( RXN ) = .FALSE.
+!            END IF
+!         END DO
+!     END IF
 #endif sens
 
 
@@ -488,16 +493,21 @@ c..update irrout arrays if needed
                IF ( LFLAGIRR( C,R,L ) )CALL PA_IRR_CELLENDF( C, R, L )
 
 #ifdef sens
-               DO RXN = 1, NRXNS
-                  SRK( RXN ) = RKI( RXN )
-                  IF ( HIGH ) THEN
-                     IF ( ORDER1 (RXN ) ) THEN
-                        SRK2( RXN ) = 0.0
-                     ELSE
-                        SRK2( RXN ) = RKI( RXN )
-                     END IF
-                  END IF
-               END DO
+               SRK = RKI
+               IF ( HIGH ) THEN
+                  WHERE ( ORDER1 )
+                    SRK2 = 0.0D0
+                  ELSE WHERE
+                    SRK2 = RKI
+                  END WHERE  
+               END IF
+!                     IF ( ORDER1 (RXN ) ) THEN
+!                       SRK2( RXN ) = 0.0D0
+!                    ELSE
+!                        SRK2( RXN ) = RKI( RXN )
+!                     END IF
+!               END IF
+!               END DO
 
 
                CALL SOLVE_DDM3D_CHEM( C,R,L,CHEMSTEP )

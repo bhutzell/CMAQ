@@ -340,7 +340,9 @@ c..test if predictions growing too large
                      LEBI_CONV     = .FALSE.
                      LEBISPFL( S ) = .TRUE.
                   END IF
+
                   YC( S ) = YCP( S )
+
                END DO
 c..test if predictions growing too large, abort interation loop
                IF( MXFL ) EXIT ITER_SUBSTEP
@@ -381,15 +383,16 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
                  CALL SA_IRR_UNBLOCKED ( .FALSE., RKI, YC, DTC )
                  UPDATE_PROBABILITIES = .FALSE.
 #endif
-
 #ifdef sens
-C YCDDM is the value at the middle time step
+C YCDDM equals concentrations at the middle substep over total integration time 
                   IF ( N_EBI_MID .EQ. NEBI ) THEN
-                   DO S = 1, NUMB_MECH_SPC
-                     DDM_CHECK ( S ) = .TRUE.
-                     YCDDM( S ) = YC( S )
-                     IF ( YCDDM( S ) .LT. 1.e-25) YCDDM( S ) = 0.0
-                   END DO
+                     DDM_CHECK = .TRUE.
+                     IF ( ODD_STEPS ) THEN
+                        YCDDM = 0.5D0 * ( YC + YC0 )
+                     ELSE
+                        YCDDM = YC
+                     END IF
+                     WHERE( YCDDM .LT. 1.0D-25 ) YCDDM = 0.0D0
                   END IF
 #endif
 

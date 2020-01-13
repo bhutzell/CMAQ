@@ -19,9 +19,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       CHARACTER( 16 ), SAVE :: PNAME = 'JAC'                                                                            
       CHARACTER( 132 ) :: MSG                                                                                           
 
-      REAL, DIMENSION( NJACSPC ) :: C                                                                                   
-      REAL, DIMENSION( NJACSPC, NJACSPC ) :: PD                                                                         
-      REAL(KIND=8), DIMENSION( NJACRXN ) :: RK                                                                          
+      REAL(KIND=8), DIMENSION( : ), INTENT ( IN ):: C                                                                                   
+      REAL(KIND=8), DIMENSION( :,: ), INTENT( INOUT ) :: PD                                                                         
+      REAL(KIND=8), DIMENSION( : ), INTENT( IN ) :: RK                                                                          
 
       INTEGER, SAVE :: LOGDEV                                                                                           
       LOGICAL, SAVE :: FIRSTIME = .TRUE.                                                                                

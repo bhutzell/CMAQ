@@ -556,6 +556,11 @@ endif
  echo "Module ${ModISAM};"                                         >> $Cfile
  echo                                                              >> $Cfile
 
+ set text = "// Decoupled Direct Method in 3D"
+ echo $text                                                        >> $Cfile
+ echo "Module ${ModDDM3D};"                                        >> $Cfile
+ echo                                                              >> $Cfile
+
  set text = "util"
  echo "// options are" $text                                       >> $Cfile
  echo "Module ${ModUtil};"                                         >> $Cfile

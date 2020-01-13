@@ -25,10 +25,10 @@ C %W% %P% %G% %U%
 
       subroutine sgeco(a,lda,n,ipvt,rcond,z)
       integer lda,n,ipvt(*)
-      real a(lda,*),z(*)
-      real rcond
+      real(8) a(lda,*),z(*)
+      real(8) rcond
 c
-c     sgeco factors a real matrix by gaussian elimination
+c     sgeco factors a real(8) matrix by gaussian elimination
 c     and estimates the condition of the matrix.
 c
 c     if  rcond  is not needed, sgefa is slightly faster.
@@ -88,16 +88,16 @@ c     fortran abs,amax1,sign
 c
 c     internal variables
 c
-      real sdot,ek,t,wk,wkm
-      real anorm,s,sasum,sm,ynorm
+      real(8) sdot,ek,t,wk,wkm
+      real(8) anorm,s,sasum,sm,ynorm
       integer info,j,k,kb,kp1,l
 c
 c
 c     compute 1-norm of a
 c
-      anorm = 0.0e0
+      anorm = 0.0d0
       do 10 j = 1, n
-         anorm = amax1(anorm,sasum(n,a(1,j),1))
+         anorm = max(anorm,sasum(n,a(1,j),1))
    10 continue
 c
 c     factor
@@ -113,12 +113,12 @@ c     overflow.
 c
 c     solve trans(u)*w = e
 c
-      ek = 1.0e0
+      ek = 1.0d0
       do 20 j = 1, n
-         z(j) = 0.0e0
+         z(j) = 0.0d0
    20 continue
       do 100 k = 1, n
-         if (z(k) .ne. 0.0e0) ek = sign(ek,-z(k))
+         if (z(k) .ne. 0.0d0) ek = sign(ek,-z(k))
          if (abs(ek-z(k)) .le. abs(a(k,k))) go to 30
             s = abs(a(k,k))/abs(ek-z(k))
             call sscal(n,s,z,1)
@@ -128,13 +128,13 @@ c
          wkm = -ek - z(k)
          s = abs(wk)
          sm = abs(wkm)
-         if (a(k,k) .eq. 0.0e0) go to 40
+         if (a(k,k) .eq. 0.0d0) go to 40
             wk = wk/a(k,k)
             wkm = wkm/a(k,k)
          go to 50
    40    continue
-            wk = 1.0e0
-            wkm = 1.0e0
+            wk = 1.0d0
+            wkm = 1.0d0
    50    continue
          kp1 = k + 1
          if (kp1 .gt. n) go to 90
@@ -153,7 +153,7 @@ c
    90    continue
          z(k) = wk
   100 continue
-      s = 1.0e0/sasum(n,z,1)
+      s = 1.0d0/sasum(n,z,1)
       call sscal(n,s,z,1)
 c
 c     solve trans(l)*y = w
@@ -161,8 +161,8 @@ c
       do 120 kb = 1, n
          k = n + 1 - kb
          if (k .lt. n) z(k) = z(k) + sdot(n-k,a(k+1,k),1,z(k+1),1)
-         if (abs(z(k)) .le. 1.0e0) go to 110
-            s = 1.0e0/abs(z(k))
+         if (abs(z(k)) .le. 1.0d0) go to 110
+            s = 1.0d0/abs(z(k))
             call sscal(n,s,z,1)
   110    continue
          l = ipvt(k)
@@ -170,10 +170,10 @@ c
          z(l) = z(k)
          z(k) = t
   120 continue
-      s = 1.0e0/sasum(n,z,1)
+      s = 1.0d0/sasum(n,z,1)
       call sscal(n,s,z,1)
 c
-      ynorm = 1.0e0
+      ynorm = 1.0d0
 c
 c     solve l*v = y
 c
@@ -183,13 +183,13 @@ c
          z(l) = z(k)
          z(k) = t
          if (k .lt. n) call saxpy(n-k,t,a(k+1,k),1,z(k+1),1)
-         if (abs(z(k)) .le. 1.0e0) go to 130
-            s = 1.0e0/abs(z(k))
+         if (abs(z(k)) .le. 1.0d0) go to 130
+            s = 1.0d0/abs(z(k))
             call sscal(n,s,z,1)
             ynorm = s*ynorm
   130    continue
   140 continue
-      s = 1.0e0/sasum(n,z,1)
+      s = 1.0d0/sasum(n,z,1)
       call sscal(n,s,z,1)
       ynorm = s*ynorm
 c
@@ -202,18 +202,18 @@ c
             call sscal(n,s,z,1)
             ynorm = s*ynorm
   150    continue
-         if (a(k,k) .ne. 0.0e0) z(k) = z(k)/a(k,k)
-         if (a(k,k) .eq. 0.0e0) z(k) = 1.0e0
+         if (a(k,k) .ne. 0.0d0) z(k) = z(k)/a(k,k)
+         if (a(k,k) .eq. 0.0d0) z(k) = 1.0d0
          t = -z(k)
          call saxpy(k-1,t,a(1,k),1,z(1),1)
   160 continue
 c     make znorm = 1.0
-      s = 1.0e0/sasum(n,z,1)
+      s = 1.0d0/sasum(n,z,1)
       call sscal(n,s,z,1)
       ynorm = s*ynorm
 c
-      if (anorm .ne. 0.0e0) rcond = ynorm/anorm
-      if (anorm .eq. 0.0e0) rcond = 0.0e0
+      if (anorm .ne. 0.0d0) rcond = ynorm/anorm
+      if (anorm .eq. 0.0d0) rcond = 0.0d0
       return
       end
 
@@ -224,11 +224,11 @@ C     CONSTANT TIMES A VECTOR PLUS A VECTOR.
 C     USES UNROLLED LOOPS FOR INCREMENTS EQUAL TO ONE.
 C     JACK DONGARRA, LINPACK, 3/11/78.
 C
-      REAL SX(*),SY(*),SA
+      REAL(8) SX(*),SY(*),SA
       INTEGER I,INCX,INCY,IX,IY,M,MP1,N
 C
       IF(N.LE.0)RETURN
-      IF (SA .EQ. 0.0) RETURN
+      IF (SA .EQ. 0.0D0) RETURN
       IF(INCX.EQ.1.AND.INCY.EQ.1)GO TO 20
 C
 C        CODE FOR UNEQUAL INCREMENTS OR EQUAL INCREMENTS
@@ -270,7 +270,7 @@ C
 C
       SUBROUTINE SGEFA(A,LDA,N,IPVT,INFO)
       INTEGER LDA,N,IPVT(*),INFO
-      REAL A(LDA,*)
+      REAL(8) A(LDA,*)
 C
 C     DGEFA FACTORS A MATRIX BY GAUSSIAN ELIMINATION.
 C
@@ -317,7 +317,7 @@ C     BLAS SAXPY,SSCAL,ISAMAX
 C
 C     INTERNAL VARIABLES
 C
-      REAL T
+      REAL(8) T
       INTEGER ISAMAX,J,K,KP1,L,NM1
 C
 C
@@ -336,7 +336,7 @@ C
 C
 C        ZERO PIVOT IMPLIES THIS COLUMN ALREADY TRIANGULARIZED
 C
-         IF (A(L,K) .EQ. 0.0E0) GO TO 40
+         IF (A(L,K) .EQ. 0.0D0) GO TO 40
 C
 C           INTERCHANGE IF NECESSARY
 C
@@ -348,7 +348,7 @@ C
 C
 C           COMPUTE MULTIPLIERS
 C
-            T = -1.0E0/A(K,K)
+            T = -1.0D0/A(K,K)
             CALL SSCAL(N-K,T,A(K+1,K),1)
 C
 C           ROW ELIMINATION WITH COLUMN INDEXING
@@ -368,7 +368,7 @@ C
    60 CONTINUE
    70 CONTINUE
       IPVT(N) = N
-      IF (A(N,N) .EQ. 0.0E0) INFO = N
+      IF (A(N,N) .EQ. 0.0D0) INFO = N
       RETURN
       END
 
@@ -380,7 +380,7 @@ C     SCALES A VECTOR BY A CONSTANT.
 C     USES UNROLLED LOOPS FOR INCREMENT EQUAL TO ONE.
 C     JACK DONGARRA, LINPACK, 3/11/78.
 C
-      REAL SA, SX(*)
+      REAL(8) SA, SX(*)
       INTEGER I,INCX,M,MP1,N,NINCX
 C
       IF(N.LE.0)RETURN
@@ -423,7 +423,7 @@ C
 C     FINDS THE INDEX OF ELEMENT HAVING MAX. ABSOLUTE VALUE.
 C     JACK DONGARRA, LINPACK, 3/11/78.
 C
-      REAL SX(*),SMAX
+      REAL(8) SX(*),SMAX
       INTEGER I,INCX,IX,N
 C
       ISAMAX = 0
@@ -458,9 +458,9 @@ C
 
       SUBROUTINE SGESL(A,LDA,N,IPVT,B,JOB)
       INTEGER LDA,N,IPVT(*),JOB
-      REAL A(LDA,*),B(*)
+      REAL(8) A(LDA,*),B(*)
 C
-C     SGESL SOLVES THE REAL SYSTEM
+C     SGESL SOLVES THE REAL(8) SYSTEM
 C     A * X + B OR TRANS(A) * X + B
 C     USING THE FACTORS COMPUTED BY SGECO OR SGEFA.
 C
@@ -511,7 +511,7 @@ C     BLAS SAXPY,SDOT
 C
 C     INTERNAL VARIABLES
 C
-      REAL SDOT,T
+      REAL(8) SDOT,T
       INTEGER K,KB,L,NM1
 C
       NM1 = N -1
@@ -570,17 +570,17 @@ C
       END
 C
 C
-      REAL FUNCTION SDOT(N,SX,INCX,SY,INCY)
+      REAL(8) FUNCTION SDOT(N,SX,INCX,SY,INCY)
 C
 C     FORMS THE DOT PRODUCT OF TWO VECTORS.
 C     USES UNROLLED LOOPS FOR INCREMENTS EQUAL TO ONE.
 C     JACK DONGARRA, LINPACK, 3/11/78.
 C
-      REAL SX(*),SY(*),STEMP
+      REAL(8) SX(*),SY(*),STEMP
       INTEGER I,INCX,INCY,IX,IY,M,MP1,N
 C
-      STEMP = 0.0E0
-      SDOT = 0.0E0
+      STEMP = 0.0D0
+      SDOT = 0.0D0
       IF(N.LE.0) RETURN
       IF(INCX .EQ. 1 .AND. INCY .EQ. 1) GO TO 20
 C
@@ -620,16 +620,16 @@ C
       END
 C
 C
-      REAL FUNCTION SASUM(N,X,INCX)
+      REAL(8) FUNCTION SASUM(N,X,INCX)
 C
 C     TAKES THE SUM OF THE ABSOLUTE VALUES.
 C     JACK DONGARRA, LINPACK, 3/11/78.
 C
-      REAL X(*),TEMP
+      REAL(8) X(*),TEMP
       INTEGER I,INCX,M,MP1,N,NINCX
 C
-      SASUM = 0.0E0
-      TEMP = 0.0E0
+      SASUM = 0.0D0
+      TEMP = 0.0D0
       IF(N.LE.0)RETURN
       IF(INCX.EQ.1)GO TO 20
 C
