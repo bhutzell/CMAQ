@@ -548,15 +548,27 @@ C Retrieve Emissions from All Stream Types
                    SA_VDEMIS_DIFF_OTHER = 0.0
                  ELSE
                    DO RGN = 1, ISAMRGN_NUM( ITAG )
-                     SA_VDEMIS_DIFF_ALL( 1:N_SPC_DIFF,1:NL,:,:,ITAG ) = 
-     &                    SA_VDEMIS_DIFF_ALL( 1:N_SPC_DIFF,1:NL,:,:,ITAG )
-     &                       + VDEMIS_CONV( 1:N_SPC_DIFF,1:NL,:,: )
-     &                          * EM_REG_FAC(:,:,ISAMRGN_MAP(ITAG,RGN))
-            
-                     SA_VDEMIS_DIFF_OTHER( 1:N_SPC_DIFF,1:NL,:,: ) = 
-     &                    SA_VDEMIS_DIFF_OTHER( 1:N_SPC_DIFF,1:NL,:,: )
-     &                       - VDEMIS_CONV( 1:N_SPC_DIFF,1:NL,:,: )
-     &                          * EM_REG_FAC(:,:,ISAMRGN_MAP(ITAG,RGN))
+c                    SA_VDEMIS_DIFF_ALL( 1:N_SPC_DIFF,1:NL,:,:,ITAG ) = 
+c    &                    SA_VDEMIS_DIFF_ALL( 1:N_SPC_DIFF,1:NL,:,:,ITAG )
+c    &                       + VDEMIS_CONV( 1:N_SPC_DIFF,1:NL,:,: )
+c    &                          * EM_REG_FAC(:,:,ISAMRGN_MAP(ITAG,RGN))
+c           
+c                    SA_VDEMIS_DIFF_OTHER( 1:N_SPC_DIFF,1:NL,:,: ) = 
+c    &                    SA_VDEMIS_DIFF_OTHER( 1:N_SPC_DIFF,1:NL,:,: )
+c    &                       - VDEMIS_CONV( 1:N_SPC_DIFF,1:NL,:,: )
+c    &                          * EM_REG_FAC(:,:,ISAMRGN_MAP(ITAG,RGN))
+                     DO LAYER = 1, NL
+                       DO SPC = 1, N_SPC_DIFF
+      SA_VDEMIS_DIFF_ALL( SPC,LAYER,:,:,ITAG ) = SA_VDEMIS_DIFF_ALL( SPC,LAYER,:,:,ITAG )
+     &                                         + VDEMIS_CONV( SPC,LAYER,:,: )
+     &                                         * EM_REG_FAC(:,:,ISAMRGN_MAP(ITAG,RGN))
+
+      SA_VDEMIS_DIFF_OTHER( SPC,LAYER,:,: ) = SA_VDEMIS_DIFF_OTHER( SPC,LAYER,:,: )
+     &                                      - VDEMIS_CONV( SPC,LAYER,:,: )
+     &                                      * EM_REG_FAC(:,:,ISAMRGN_MAP(ITAG,RGN))
+
+                       END DO
+                     END DO
                    END DO
                  END IF
                END DO
@@ -2257,8 +2269,7 @@ C and allowing the model to proceed.
      &              'ERROR: Surrogate Species ',TRIM(SPEC),' on emission stream ',
      &              ISRM, ' has units ',TRIM(UNITS),' which are unkown to CMAQ. ',
      &              'Please correct them to proceed.'
-            CALL LOG_MESSAGE( OUTDEV, XMSG )
-            STOP
+            CALL M3EXIT( 'CHECK_EMIS_UNITS', 0, 0, XMSG, 2 )
          END IF
           
          ! Check for Time Units
@@ -2286,8 +2297,7 @@ C and allowing the model to proceed.
      &              'ERROR: Surrogate Species ',TRIM(SPEC),' on emission stream ',
      &              ISRM, ' has units ',TRIM(UNITS),' which are unkown to CMAQ. ',
      &              'Please correct them to proceed.'
-            CALL LOG_MESSAGE( OUTDEV, XMSG )
-            STOP
+            CALL M3EXIT( 'CHECK_EMIS_UNITS', 0, 0, XMSG, 2 )
          END IF
 
          END SUBROUTINE CHECK_EMIS_UNITS
@@ -2314,8 +2324,7 @@ C and allowing the model to proceed.
              WRITE( XMSG,'(A,I3,A,A1)' ),
      &              'ERROR: OP parameter for rule ',IRULE,
      &              ' has invalid value: ',OP
-             CALL LOG_MESSAGE( OUTDEV, XMSG )
-             STOP
+             CALL M3EXIT( 'CHECK_OP (EMIS_DEFN)', 0, 0, XMSG, 2 )
          END IF
 
          END SUBROUTINE CHECK_OP
@@ -2345,8 +2354,7 @@ C and allowing the model to proceed.
              WRITE( XMSG,'(A,I3,A,A4)' ),
      &              'ERROR: BASIS parameter for rule ',IRULE,
      &              ' has invalid value: ',BASIS
-             CALL LOG_MESSAGE( OUTDEV, XMSG )
-             STOP
+             CALL M3EXIT( 'CHECK_BASIS (EMIS_DEFN)', 0, 0, XMSG, 2 )
          END IF
 
          END SUBROUTINE CHECK_BASIS
