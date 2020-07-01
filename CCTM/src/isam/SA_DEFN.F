@@ -254,7 +254,7 @@ C external functions
 
         INTEGER ILINE
         INTEGER ITAG, TAGLOOP
-        CHARACTER( 128 ) :: TXTLINE
+        CHARACTER( 180 ) :: TXTLINE
 
 C...multi-sectors-for-a-single-tag 20130702
         INTEGER ISGSTK

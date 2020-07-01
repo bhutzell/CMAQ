@@ -73,7 +73,8 @@ Additionally, ISAM can track emissions confined to geographic regions.  This fun
 
 ### 11.3.1 ISAM control file (SA_IOLIST)
 
-The ISAM `SA_IOLIST` is a text file used to configure which tag classes, emissions streams, and source regions the model will track.  An example of this file, `isam_control.txt`, is provided in $CMAQ_HOME/CCTM/scripts.  The order and formating of this file must be kept intact, but it does allow for insertion of comment lines.  
+The ISAM `SA_IOLIST` is a text file used to configure which tag classes, emissions streams, and source regions the model will track.  An example of this file, `isam_control.txt`, is provided in $CMAQ_HOME/CCTM/scripts.  The order and formating of this file must be kept intact, but it does allow for insertion of comment lines. Note that input or noncomment lines should not exceed 180 characters long because
+the text line will not be read beyond character 180.
 
 Each ISAM simulation requires the specification of the `TAG CLASSES` that the user desires to apportion.  The current list includes the following choices `SULFATE, NITRATE, AMMONIUM, EC, OC, VOC, PM25_IONS, OZONE`.  Species associated with each of these are provided in section 11.1.  One or more of these tag classes must be specified in `SA_IOLIST`.  Multiple tag classes are comma delimited. Incorrectly specified choices for this field will cause a model crash.
 
@@ -101,7 +102,7 @@ or
 REGION(S)       |NC, SC, GA
 ```
 
-Finally, the emissions streams labels are required as the third option in the control file.  Labels correspond to emissions and other input streams set in build and run scripts for the base CMAQ simulation. Additionally, it is possible to specify 'PVO3' as a stream label in order to track contribution to concentrations from upper layer injections due to potential vorticity calculations.  This option also requires model compilation with the appropriate options to support these calculations. 
+Finally, the emission streams labels are required as the third option in the control file.  Labels correspond to emissions and other input streams set in build and run scripts for the base CMAQ simulation. Additionally, it is possible to specify 'PVO3' as a stream label in order to track contribution to concentrations from upper layer injections due to potential vorticity calculations.  This option also requires model compilation with the appropriate options to support these calculations. 
 
 ```
 EMIS STREAM(S)  |PT_EGU, PT_NONEGU
