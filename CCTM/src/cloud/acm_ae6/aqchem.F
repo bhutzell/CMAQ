@@ -462,7 +462,7 @@ C...for sulfur tracking
 
 C...........Local Variables (arrays):
 
-      REAL( 8 ) :: LOADING( MAX_NAER, NMODES ) ! aerosol loading (mol/liter)
+      REAL( 8 ) :: LOADING( NAER, N_MODE ) ! aerosol loading (mol/liter)
       REAL( 8 ) :: INITGAS( NGAS ) ! initial gas partial pressure (atm)
       REAL( 8 ) :: LIQUID( NLIQS ) ! wet deposition array (mm mol/liter)
       REAL( 8 ) :: WETDEP( NLIQS ) ! wet deposition array (mm mol/liter)
@@ -892,9 +892,9 @@ C...   = Initial amount - amount deposited  (mol/liter)
 !       NACOR   = MAX( LOADING( LNA,   COR ) - WETDEP( LNACORL  ) * XC1, 0.0D0 ) ! SLN 29March2011
         CLCOR   = MAX( LOADING( LCL,   COR ) - WETDEP( LCLCORL  ) * XC1, 0.0D0 )
         NH4COR  = MAX( LOADING( LNH4,  COR ) - WETDEP( LNH4CORL ) * XC1, 0.0D0 )
-        SOILCOR = MAX( LOADING( LSOILC,COR ) - WETDEP( LSOILCL  ) * XC1, 0.0D0 ) ! SLN 16March2011
-        ANTHCOR = MAX( LOADING( LANTHC,COR ) - WETDEP( LANTHCL  ) * XC1, 0.0D0 ) ! SLN 16March2011
-        SEASCOR = MAX( LOADING( LSEASC,COR ) - WETDEP( LSEASCL  ) * XC1, 0.0D0 ) ! SLN 16March2011
+        SOILCOR = MAX( LOADING( LSOIL, COR ) - WETDEP( LSOILCL  ) * XC1, 0.0D0 ) ! SLN 16March2011
+        ANTHCOR = MAX( LOADING( LANTH, COR ) - WETDEP( LANTHCL  ) * XC1, 0.0D0 ) ! SLN 16March2011
+        SEASCOR = MAX( LOADING( LSEAS, COR ) - WETDEP( LSEASCL  ) * XC1, 0.0D0 ) ! SLN 16March2011
         FECOR   = SOIL_FE_FAC * SOILCOR + CORS_FE_FAC * ANTHCOR     ! SLN 22Mar2011
         MNCOR   = SOIL_MN_FAC * SOILCOR + CORS_MN_FAC * ANTHCOR
         NACOR   = SEAS_NA_FAC * SEASCOR + SOIL_NA_FAC * SOILCOR + CORS_NA_FAC * ANTHCOR
@@ -920,22 +920,16 @@ C...   = Initial amount - amount deposited  (mol/liter)
 
         NA      = LOADING( LNA,   ACC ) + LOADING( LNA, AKN ) + NACOR
      &          - WETDEP( LNAACCL ) * XC1
-!       CA      = LOADING( LCACO3,COR ) - WETDEP( LCAL ) * XC1
-!       MG      = LOADING( LMGCO3,COR ) - WETDEP( LMGL ) * XC1
-!       K       = LOADING( LK,    COR ) - WETDEP( LKL  ) * XC1
-!       FE      = LOADING( LA3FE, COR ) - WETDEP( LFEL ) * XC1
-!       MN      = LOADING( LB2MN, COR ) - WETDEP( LMNL ) * XC1
-        CA      = LOADING( LCAACC, ACC) - WETDEP( LCAACCL ) * XC1 + CACOR
-        MG      = LOADING( LMGACC, ACC) - WETDEP( LMGACCL ) * XC1 + MGCOR
-        K       = LOADING( LKACC,  ACC) - WETDEP( LKACCL  ) * XC1 + KCOR
-        FE      = LOADING( LFEACC, ACC) - WETDEP( LFEACCL ) * XC1 + FECOR
-        MN      = LOADING( LMNACC, ACC) - WETDEP( LMNACCL ) * XC1 + MNCOR
+        CA      = LOADING( LCA,   ACC) - WETDEP( LCAACCL ) * XC1 + CACOR
+        MG      = LOADING( LMG,   ACC) - WETDEP( LMGACCL ) * XC1 + MGCOR
+        K       = LOADING( LK,    ACC) - WETDEP( LKACCL  ) * XC1 + KCOR
+        FE      = LOADING( LFE,   ACC) - WETDEP( LFEACCL ) * XC1 + FECOR
+        MN      = LOADING( LMN,   ACC) - WETDEP( LMNACCL ) * XC1 + MNCOR
         SOA     = LOADING( LSOA,  ACC ) - WETDEP( LSOAL  ) * XC1
         ORGC    = LOADING( LORGC, ACC ) + DORGC - WETDEP( LORGCL ) * XC1             ! new in-cloud organic
         POA     = LOADING( LPOA,  ACC ) + LOADING( LPOA, AKN ) - WETDEP( LPOAL ) * XC1
         EC      = LOADING( LEC,   ACC ) + LOADING( LEC,   AKN ) - WETDEP( LECL   ) * XC1
         PRIM    = LOADING( LPRI,  ACC ) + LOADING( LPRI,  AKN ) - WETDEP( LPRIML ) * XC1
-!       PRIMCOR = LOADING( LPRICOR, COR ) - WETDEP( LPRIMCORL ) * XC1
         NUMCOR  = LOADING( LNUM,  COR ) - WETDEP( LNUMCORL  ) * XC1
 !       A       = 3.0D0 * FE
 !       B       = 2.0D0 * MN
@@ -949,9 +943,9 @@ C...   = Initial amount - amount deposited  (mol/liter)
           S_NO3COR(NP)  = S_LOADING( NP, LNO3,  COR ) - S_WETDEP( NP, LNO3CORL ) * XC1
           S_CLCOR(NP)   = S_LOADING( NP, LCL,   COR ) - S_WETDEP( NP, LCLCORL  ) * XC1
           S_NH4COR(NP)  = S_LOADING( NP, LNH4,  COR ) - S_WETDEP( NP, LNH4CORL ) * XC1
-          S_SOILCOR(NP) = S_LOADING( NP, LSOILC,COR ) - S_WETDEP( NP, LSOILCL  ) * XC1
-          S_ANTHCOR(NP) = S_LOADING( NP, LANTHC,COR ) - S_WETDEP( NP, LANTHCL  ) * XC1
-          S_SEASCOR(NP) = S_LOADING( NP, LSEASC,COR ) - S_WETDEP( NP, LSEASCL  ) * XC1
+          S_SOILCOR(NP) = S_LOADING( NP, LSOIL, COR ) - S_WETDEP( NP, LSOILCL  ) * XC1
+          S_ANTHCOR(NP) = S_LOADING( NP, LANTH, COR ) - S_WETDEP( NP, LANTHCL  ) * XC1
+          S_SEASCOR(NP) = S_LOADING( NP, LSEAS, COR ) - S_WETDEP( NP, LSEASCL  ) * XC1
           S_FECOR(NP)   = SOIL_FE_FAC * S_SOILCOR( NP ) + CORS_FE_FAC * S_ANTHCOR( NP )
           S_MNCOR(NP)   = SOIL_MN_FAC * S_SOILCOR( NP ) + CORS_MN_FAC * S_ANTHCOR( NP )
           S_NACOR(NP)   = SEAS_NA_FAC * S_SEASCOR( NP ) + SOIL_NA_FAC * S_SOILCOR( NP ) + CORS_NA_FAC * S_ANTHCOR( NP )
@@ -964,11 +958,11 @@ C...   = Initial amount - amount deposited  (mol/liter)
      &            - S_DS4( NP, 0 )
           S_NA(NP)      = S_LOADING( NP, LNA,   ACC ) + S_LOADING( NP, LNA, AKN ) + S_NACOR( NP )
      &            - S_WETDEP( NP, LNAACCL ) * XC1
-          S_CA(NP)      = S_LOADING( NP, LCAACC, ACC) - S_WETDEP( NP, LCAACCL ) * XC1 + S_CACOR( NP )
-          S_MG(NP)      = S_LOADING( NP, LMGACC, ACC) - S_WETDEP( NP, LMGACCL ) * XC1 + S_MGCOR( NP )
-          S_K(NP)       = S_LOADING( NP, LKACC,  ACC) - S_WETDEP( NP, LKACCL  ) * XC1 + S_KCOR( NP )
-          S_FE(NP)      = S_LOADING( NP, LFEACC, ACC) - S_WETDEP( NP, LFEACCL ) * XC1 + S_FECOR( NP )
-          S_MN(NP)      = S_LOADING( NP, LMNACC, ACC) - S_WETDEP( NP, LMNACCL ) * XC1 + S_MNCOR( NP )
+          S_CA(NP)      = S_LOADING( NP, LCA,   ACC) - S_WETDEP( NP, LCAACCL ) * XC1 + S_CACOR( NP )
+          S_MG(NP)      = S_LOADING( NP, LMG,   ACC) - S_WETDEP( NP, LMGACCL ) * XC1 + S_MGCOR( NP )
+          S_K(NP)       = S_LOADING( NP, LK,    ACC) - S_WETDEP( NP, LKACCL  ) * XC1 + S_KCOR( NP )
+          S_FE(NP)      = S_LOADING( NP, LFE,   ACC) - S_WETDEP( NP, LFEACCL ) * XC1 + S_FECOR( NP )
+          S_MN(NP)      = S_LOADING( NP, LMN,   ACC) - S_WETDEP( NP, LMNACCL ) * XC1 + S_MNCOR( NP )
           S_SOA(NP)     = S_LOADING( NP, LSOA,  ACC ) - S_WETDEP( NP, LSOAL  ) * XC1
           S_ORGC(NP)    = S_LOADING( NP, LORGC, ACC ) + S_DORGC( NP ) - S_WETDEP( NP, LORGCL ) * XC1
           S_POA(NP)     = S_LOADING( NP, LPOA,  ACC ) + S_LOADING( NP, LPOA, AKN ) - S_WETDEP( NP, LPOAL ) * XC1
@@ -1128,18 +1122,18 @@ C...don't allow gas concentrations to go below zero
 
 C...Aerosol specific to TXHG Versions
 
-        TRACER     = LOADING( LTRACER_ACC,  ACC ) + LOADING( LTRACER_AKN,  AKN )
+        TRACER     = LOADING( LTRACER,  ACC ) + LOADING( LTRACER,  AKN )
      &             - WETDEP( LTRACERL ) * XC1
         TRACER    = MAX( TRACER,    0.0D0 )
         
-        TRACERCOR  = LOADING( LTRACER_COR,  COR ) - WETDEP( LTRACERCORL ) * XC1
+        TRACERCOR  = LOADING( LTRACER,  COR ) - WETDEP( LTRACERCORL ) * XC1
         TRACERCOR = MAX( TRACERCOR, 0.0D0 )
  
-        HGFINE    = LOADING( LPHG_ACC,  ACC ) + LOADING( LPHG_AKN,  AKN )
+        HGFINE    = LOADING( LPHG,  ACC ) + LOADING( LPHG,  AKN )
      &             - WETDEP( LPHGFINEL ) * XC1
         HGFINE    = MAX( HGFINE,    0.0D0 )
 
-        HGCOR     = LOADING( LPHG_COR, COR ) - WETDEP( LPHGCORL ) * XC1
+        HGCOR     = LOADING( LPHG, COR ) - WETDEP( LPHGCORL ) * XC1
         HGCOR     = MAX( HGCOR ,     0.0D0 )
 
         DO I7777C = 1, 10001
@@ -1189,8 +1183,6 @@ C...calculate liquid phase concentrations (moles/liter)
 
 C...compute functional value
 
-!         FA = AE + NH4 + NA + 2.0D0 * ( CA + MG - CO3 - SO3 - SO4 )
-!    &       - OH - HCO3 - HSO3 - NO3 - HSO4 - HCO2 - CL
           FA = AE + NH4 + NA + K + 2.0D0 * ( CA + MG - CO3 - SO3 - SO4 )  ! SLN 16March2011
      &       - OH - HCO3 - HSO3 - NO3 - HSO4 - HCO2 - CL
 
@@ -1246,8 +1238,6 @@ C...calculate liquid phase concentrations (moles/liter)
             CL   = HCL1H   * PHCLF  * RECIPA1 ! new for sea salt
 
 C...compute functional value
-!           FB = AE + NH4 + NA + 2.0D0 * ( CA + MG - CO3 - SO3 - SO4 )
-!    &         - OH - HCO3 - HSO3 - NO3 - HSO4 - HCO2 - CL
             FB = AE + NH4 + NA + K + 2.0D0 * ( CA + MG - CO3 - SO3 - SO4 )  ! SLN 16March2011
      &         - OH - HCO3 - HSO3 - NO3 - HSO4 - HCO2 - CL
 
@@ -1275,8 +1265,6 @@ C...compute Ionic strength and activity coefficient by the Davies equation
      &          * ( AE + NH4 + OH + HCO3 + HSO3
      &              + 4.0D0 * ( SO4 + CO3 + SO3 + CA + MG + MN_OX )
      &              + NO3 + HSO4 + 9.0D0 * FE_OX + NA + K + CL + A + B + HCO2 ) ! KMF 08September2011
-C     &              + 4.0D0 * ( SO4 + CO3 + SO3 + CA + MG + MN )
-C     &              + NO3 + HSO4 + 9.0D0 * FE + NA + K + CL + A + B + HCO2 )
           GM1LOG = -0.509D0 * ( SQRT( STION )
      &           / ( 1.0D0 + SQRT( STION ) ) - 0.2D0 * STION )
           GM2LOG = GM1LOG * 4.0D0
@@ -1359,9 +1347,6 @@ C...calculate liquid phase concentrations (moles/liter)
             S_HCO2( NP ) = FOA1H   * S_PFOAF( NP )  * RECIPA1
             S_NO3( NP )  = HNO31H  * S_PHNO3F( NP ) * RECIPA1
             S_CL( NP )   = HCL1H   * S_PHCLF( NP )  * RECIPA1
-C...compute functional value
-c           FB = AE + NH4 + NA + K + 2.0D0 * ( CA + MG - CO3 - SO3 - SO4 )
-c    &         - OH - HCO3 - HSO3 - NO3 - HSO4 - HCO2 - CL
         END DO
 #endif
 
@@ -1622,7 +1607,6 @@ C...load the liquid concentration array with current values
         LIQUID( LKCORL    ) = KCOR
         LIQUID( LBL       ) = B
         LIQUID( LHNO3L    ) = HNO3L
-!       LIQUID( LPRIMCORL ) = PRIMCOR
         LIQUID( LNUMCORL  ) = NUMCOR
         LIQUID( LTS6CORL  ) = TS6COR
         LIQUID( LNACORL   ) = NACOR
@@ -2181,7 +2165,6 @@ C...  and methylglyoxal is assumed
 
 C...Compute depositions and concentrations for each species
 
-!!!     WETFAC = PRCRATE * FRACLIQ * DTW( 0 ) * SEC2HR     !!!numerical integration errors with this expression
         WETFAC = ( 1.0D0 - EXP( -DTW( 0 ) / TWASH ) ) / XC1  !!!new analytic soln to be used in CMAQv5.0
 
         DO LIQ = 1, NLIQS
@@ -2247,7 +2230,6 @@ C...gas-phase species wet deposition (mm mol/lit)
       GASWDEP( LH2SO4 ) = 0.0D0
       GASWDEP( LGLY   ) = WETDEP( LGLYL  )
       GASWDEP( LMGLY  ) = WETDEP( LMGLYL )
-!     GASWDEP( LHO    ) = WETDEP( LOHL   )
 
 #ifdef sens
       DO NP = 1, NPMAX
@@ -2282,7 +2264,6 @@ C...gas concentrations (mol/molV)
       GAS( LHCL   ) = ( PHCLF  + XL *  HCLL )  * RECIPAP1
       GAS( LGLY   ) = ( PGLYF  + XL *  GLYL )  * RECIPAP1
       GAS( LMGLY  ) = ( PMGLYF + XL *  MGLYL)  * RECIPAP1
-!     GAS( LHO    ) = ( PHOF   + XL *  OHL  )  * RECIPAP1
 
       GAS( LNH3   ) = FNH3  * TOTAMM
       GAS( LHNO3  ) = FHNO3 * TOTNIT
@@ -2340,7 +2321,6 @@ C...  to the accumulation mode particles
       AERWDEP( LSO4, COR ) = WETDEP( LTS6CORL  )
       AERWDEP( LNO3, COR ) = WETDEP( LNO3CORL  )
       AERWDEP( LNH4, COR ) = WETDEP( LNH4CORL  )
-!     AERWDEP( LPRICOR, COR ) = WETDEP( LPRIMCORL )
 
       AERWDEP( LNA, AKN  ) = 0.0D0
       AERWDEP( LCL, AKN  ) = 0.0D0
@@ -2355,14 +2335,14 @@ C...  to the accumulation mode particles
 !     AERWDEP( LCACO3, COR ) = WETDEP( LCACORL )
 !     AERWDEP( LMGCO3, COR ) = WETDEP( LMGCORL )
 
-      AERWDEP( LCAACC, ACC ) = WETDEP( LCAACCL )  ! AE6 - SLN 16March2011
-      AERWDEP( LMGACC, ACC ) = WETDEP( LMGACCL )  ! AE6 - SLN 16March2011
-      AERWDEP( LKACC,  ACC ) = WETDEP( LKACCL  )  ! AE6 - SLN 16March2011
-      AERWDEP( LSOILC, COR ) = WETDEP( LSOILCL )  ! AE6 - SLN 16March2011
-      AERWDEP( LANTHC, COR ) = WETDEP( LANTHCL )  ! AE6 - SLN 16March2011
-      AERWDEP( LSEASC, COR ) = WETDEP( LSEASCL )  ! AE6 - SLN 16March2011
-      AERWDEP( LFEACC, ACC ) = WETDEP( LFEACCL )  ! AE6 - SLN 22March2011
-      AERWDEP( LMNACC, ACC ) = WETDEP( LMNACCL )  ! AE6 - SLN 22March2011
+      AERWDEP( LCA,   ACC ) = WETDEP( LCAACCL )  ! AE6 - SLN 16March2011
+      AERWDEP( LMG,   ACC ) = WETDEP( LMGACCL )  ! AE6 - SLN 16March2011
+      AERWDEP( LK,    ACC ) = WETDEP( LKACCL  )  ! AE6 - SLN 16March2011
+      AERWDEP( LSOIL, COR ) = WETDEP( LSOILCL )  ! AE6 - SLN 16March2011
+      AERWDEP( LANTH, COR ) = WETDEP( LANTHCL )  ! AE6 - SLN 16March2011
+      AERWDEP( LSEAS, COR ) = WETDEP( LSEASCL )  ! AE6 - SLN 16March2011
+      AERWDEP( LFE,   ACC ) = WETDEP( LFEACCL )  ! AE6 - SLN 22March2011
+      AERWDEP( LMN,   ACC ) = WETDEP( LMNACCL )  ! AE6 - SLN 22March2011
 
 !     AERWDEP( LNUM, AKN ) = 0.0D0
 !     AERWDEP( LNUM, ACC ) = 0.0D0
@@ -2387,33 +2367,33 @@ C...  to the accumulation mode particles
         S_AERWDEP( NP, LSOA,  ACC )  = S_WETDEP( NP, LSOAL  )
         S_AERWDEP( NP, LORGC, ACC )  = S_WETDEP( NP, LORGCL )
         S_AERWDEP( NP, LPOA,  ACC )  = S_WETDEP( NP, LPOAL )
-        S_AERWDEP( NP, LSO4, COR )   = S_WETDEP( NP, LTS6CORL  )
-        S_AERWDEP( NP, LNO3, COR )   = S_WETDEP( NP, LNO3CORL  )
-        S_AERWDEP( NP, LNH4, COR )   = S_WETDEP( NP, LNH4CORL  )
-        S_AERWDEP( NP, LNA, AKN  )   = 0.0D0
-        S_AERWDEP( NP, LCL, AKN  )   = 0.0D0
-        S_AERWDEP( NP, LNA, ACC  )   = S_WETDEP( NP, LNAACCL )
-        S_AERWDEP( NP, LCL, ACC  )   = S_WETDEP( NP, LCLACCL )
-        S_AERWDEP( NP, LCL, COR  )   = S_WETDEP( NP, LCLCORL )
-        S_AERWDEP( NP, LCAACC, ACC ) = S_WETDEP( NP, LCAACCL )
-        S_AERWDEP( NP, LMGACC, ACC ) = S_WETDEP( NP, LMGACCL )
-        S_AERWDEP( NP, LKACC,  ACC ) = S_WETDEP( NP, LKACCL  )
-        S_AERWDEP( NP, LSOILC, COR ) = S_WETDEP( NP, LSOILCL )
-        S_AERWDEP( NP, LANTHC, COR ) = S_WETDEP( NP, LANTHCL )
-        S_AERWDEP( NP, LSEASC, COR ) = S_WETDEP( NP, LSEASCL )
-        S_AERWDEP( NP, LFEACC, ACC ) = S_WETDEP( NP, LFEACCL )
-        S_AERWDEP( NP, LMNACC, ACC ) = S_WETDEP( NP, LMNACCL )
+        S_AERWDEP( NP, LSO4,  COR )  = S_WETDEP( NP, LTS6CORL  )
+        S_AERWDEP( NP, LNO3,  COR )  = S_WETDEP( NP, LNO3CORL  )
+        S_AERWDEP( NP, LNH4,  COR )  = S_WETDEP( NP, LNH4CORL  )
+        S_AERWDEP( NP, LNA ,  AKN )  = 0.0D0
+        S_AERWDEP( NP, LCL ,  AKN )  = 0.0D0
+        S_AERWDEP( NP, LNA,   ACC )  = S_WETDEP( NP, LNAACCL )
+        S_AERWDEP( NP, LCL,   ACC )  = S_WETDEP( NP, LCLACCL )
+        S_AERWDEP( NP, LCL,   COR )  = S_WETDEP( NP, LCLCORL )
+        S_AERWDEP( NP, LCA,   ACC ) = S_WETDEP( NP, LCAACCL )
+        S_AERWDEP( NP, LMG,   ACC ) = S_WETDEP( NP, LMGACCL )
+        S_AERWDEP( NP, LK,    ACC ) = S_WETDEP( NP, LKACCL  )
+        S_AERWDEP( NP, LSOIL, COR ) = S_WETDEP( NP, LSOILCL )
+        S_AERWDEP( NP, LANTH, COR ) = S_WETDEP( NP, LANTHCL )
+        S_AERWDEP( NP, LSEAS, COR ) = S_WETDEP( NP, LSEASCL )
+        S_AERWDEP( NP, LFE,   ACC ) = S_WETDEP( NP, LFEACCL )
+        S_AERWDEP( NP, LMN,   ACC ) = S_WETDEP( NP, LMNACCL )
       END DO
 #endif
 
 C...Compute for Aerosol species in  TXHG Version
 
-      AERWDEP( LTRACER_AKN, AKN ) = 0.0D0
-      AERWDEP( LTRACER_ACC, ACC ) = WETDEP( LTRACERL )
-      AERWDEP( LTRACER_COR, COR ) = WETDEP( LTRACERCORL )
-      AERWDEP( LPHG_AKN, AKN ) = 0.0D0
-      AERWDEP( LPHG_ACC, ACC ) = WETDEP( LPHGFINEL )
-      AERWDEP( LPHG_COR, COR ) = WETDEP( LPHGCORL )
+      AERWDEP( LTRACER, AKN ) = 0.0D0
+      AERWDEP( LTRACER, ACC ) = WETDEP( LTRACERL )
+      AERWDEP( LTRACER, COR ) = WETDEP( LTRACERCORL )
+      AERWDEP( LPHG,    AKN ) = 0.0D0
+      AERWDEP( LPHG,    ACC ) = WETDEP( LPHGFINEL )
+      AERWDEP( LPHG,    COR ) = WETDEP( LPHGCORL )
 
 C...aerosol concentrations (mol/molV)
 
@@ -2446,7 +2426,6 @@ C...aerosol concentrations (mol/molV)
       AEROSOL( LSO4, COR )    = TS6COR * XL * RECIPAP1
       AEROSOL( LNO3, COR )    = NO3COR * XL * RECIPAP1
       AEROSOL( LNH4, COR )    = NH4COR * XL * RECIPAP1
-!     AEROSOL( LPRICOR, COR ) = PRIMCOR* XL * RECIPAP1
 !     AEROSOL( LK, COR )      = KCOR   * XL * RECIPAP1
 !     AEROSOL( LA3FE, COR )   = FECOR  * XL * RECIPAP1
 !     AEROSOL( LB2MN, COR )   = MNCOR  * XL * RECIPAP1
@@ -2464,14 +2443,14 @@ C...aerosol concentrations (mol/molV)
       AEROSOL( LNUM, ACC ) = AEROSOL( LNUM, ACC ) * EBETASO4T
       AEROSOL( LNUM, COR ) = AEROSOL( LNUM, COR ) * EXP(-TAUCLD / TWASH )
 
-      AEROSOL( LCAACC, ACC ) = CAACC   * XL * RECIPAP1 ! AE6 - SLN 16March2011
-      AEROSOL( LMGACC, ACC ) = MGACC   * XL * RECIPAP1 ! AE6 - SLN 16March2011
-      AEROSOL( LKACC,  ACC ) = KACC    * XL * RECIPAP1 ! AE6 - SLN 16March2011
-      AEROSOL( LSOILC, COR ) = SOILCOR * XL * RECIPAP1 ! AE6 - SLN 16March2011
-      AEROSOL( LANTHC, COR ) = ANTHCOR * XL * RECIPAP1 ! AE6 - SLN 16March2011
-      AEROSOL( LSEASC, COR ) = SEASCOR * XL * RECIPAP1 ! AE6 - SLN 16March2011
-      AEROSOL( LFEACC, ACC ) = FEACC   * XL * RECIPAP1 ! AE6 - SLN 22March2011
-      AEROSOL( LMNACC, ACC ) = MNACC   * XL * RECIPAP1 ! AE6 - SLN 22March2011
+      AEROSOL( LCA,   ACC ) = CAACC   * XL * RECIPAP1 ! AE6 - SLN 16March2011
+      AEROSOL( LMG,   ACC ) = MGACC   * XL * RECIPAP1 ! AE6 - SLN 16March2011
+      AEROSOL( LK,    ACC ) = KACC    * XL * RECIPAP1 ! AE6 - SLN 16March2011
+      AEROSOL( LSOIL, COR ) = SOILCOR * XL * RECIPAP1 ! AE6 - SLN 16March2011
+      AEROSOL( LANTH, COR ) = ANTHCOR * XL * RECIPAP1 ! AE6 - SLN 16March2011
+      AEROSOL( LSEAS, COR ) = SEASCOR * XL * RECIPAP1 ! AE6 - SLN 16March2011
+      AEROSOL( LFE,   ACC ) = FEACC   * XL * RECIPAP1 ! AE6 - SLN 22March2011
+      AEROSOL( LMN,   ACC ) = MNACC   * XL * RECIPAP1 ! AE6 - SLN 22March2011
 
 #ifdef sens
       DO NP =1, NPMAX
@@ -2500,25 +2479,25 @@ c       S_AEROSOL( NP, LCL, COR  )   = S_CLCOR( NP ) * XL * RECIPAP1
 c       S_AEROSOL( NP, LNUM, AKN )   = S_AEROSOL( NP, LNUM, AKN ) * EALFA0T
 c       S_AEROSOL( NP, LNUM, ACC )   = S_AEROSOL( NP, LNUM, ACC ) * EBETASO4T
 c       S_AEROSOL( NP, LNUM, COR )   = S_NUMCOR( NP ) * XL * RECIPAP1
-c       S_AEROSOL( NP, LCAACC, ACC ) = S_CAACC( NP )   * XL * RECIPAP1
-c       S_AEROSOL( NP, LMGACC, ACC ) = S_MGACC( NP )   * XL * RECIPAP1
-c       S_AEROSOL( NP, LKACC,  ACC ) = S_KACC( NP )    * XL * RECIPAP1
-c       S_AEROSOL( NP, LSOILC, COR ) = S_SOILCOR( NP ) * XL * RECIPAP1
-c       S_AEROSOL( NP, LANTHC, COR ) = S_ANTHCOR( NP ) * XL * RECIPAP1
-c       S_AEROSOL( NP, LSEASC, COR ) = S_SEASCOR( NP ) * XL * RECIPAP1
-c       S_AEROSOL( NP, LFEACC, ACC ) = S_FEACC( NP )   * XL * RECIPAP1
-c       S_AEROSOL( NP, LMNACC, ACC ) = S_MNACC( NP )   * XL * RECIPAP1
+c       S_AEROSOL( NP, LCA,  ACC )   = S_CAACC( NP )   * XL * RECIPAP1
+c       S_AEROSOL( NP, LMG,  ACC )   = S_MGACC( NP )   * XL * RECIPAP1
+c       S_AEROSOL( NP, LK,   ACC )   = S_KACC( NP )    * XL * RECIPAP1
+c       S_AEROSOL( NP, LSOIL,COR )   = S_SOILCOR( NP ) * XL * RECIPAP1
+c       S_AEROSOL( NP, LANTH,COR )   = S_ANTHCOR( NP ) * XL * RECIPAP1
+c       S_AEROSOL( NP, LSEAS,COR )   = S_SEASCOR( NP ) * XL * RECIPAP1
+c       S_AEROSOL( NP, LFE,  ACC )   = S_FEACC( NP )   * XL * RECIPAP1
+c       S_AEROSOL( NP, LMN,  ACC )   = S_MNACC( NP )   * XL * RECIPAP1
       END DO
 #endif
 
 C...Compute for Aerosol species in  TXHG Version
 
-      AEROSOL( LTRACER_AKN, AKN ) = AEROSOL( LTRACER_AKN, AKN ) * EALFA3T
-      AEROSOL( LTRACER_ACC, ACC ) = TRACER    * XL * RECIPAP1
-      AEROSOL( LTRACER_COR, COR ) = TRACERCOR * XL * RECIPAP1
-      AEROSOL( LPHG_AKN, AKN )    = AEROSOL( LPHG_AKN, AKN ) * EALFA3T
-      AEROSOL( LPHG_ACC, ACC )    = HGFINE * XL * RECIPAP1
-      AEROSOL( LPHG_COR, COR )    = HGCOR * XL * RECIPAP1
+      AEROSOL( LTRACER, AKN ) = AEROSOL( LTRACER, AKN ) * EALFA3T
+      AEROSOL( LTRACER, ACC ) = TRACER    * XL * RECIPAP1
+      AEROSOL( LTRACER, COR ) = TRACERCOR * XL * RECIPAP1
+      AEROSOL( LPHG, AKN )    = AEROSOL( LPHG, AKN ) * EALFA3T
+      AEROSOL( LPHG, ACC )    = HGFINE * XL * RECIPAP1
+      AEROSOL( LPHG, COR )    = HGCOR * XL * RECIPAP1
 
 C...store the amount of hydrogen deposition
 

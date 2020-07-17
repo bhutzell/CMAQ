@@ -124,27 +124,26 @@ C Local Variables (scalars):
       CHARACTER(16), SAVE :: PNAME = 'AQ_MAP' ! program name
 
       INTEGER       IAER                ! aerosol loop counter
-      INTEGER       IMODE               ! aerosol mode loop counter
+      INTEGER       IM                  ! aerosol mode loop counter
       INTEGER       IGAS                ! gas loop counter
       INTEGER       ISRG                ! surrogate loop counter
       INTEGER       PNTR                ! relative pointer variable
-      INTEGER       SPC                 ! liquid species loop counter
+      INTEGER       SPC, ISPC, IAQ      ! liquid species loop counter
       INTEGER ::    STAT
 
       REAL( 8 )  :: BETASO4
       REAL       :: EALFA2T                ! EXP( -ALFA2 * TAUCLD )
-      REAL( 8 )  :: M3NEW( NMODES )        ! modal mass at time t
-      REAL( 8 )  :: M3OLD( NMODES )        ! modal mass at time 0
-      REAL( 8 )  :: Dens_wmean_old( NMODES ) ! concentration weighted molecular weight g/mol
-      REAL( 8 )  :: Dens_wmean_new( NMODES ) ! concentration weighted molecular weight g/mol
+      REAL( 8 )  :: M3NEW( N_MODE )        ! modal mass at time t
+      REAL( 8 )  :: M3OLD( N_MODE )        ! modal mass at time 0
+      REAL( 8 )  :: Dens_wmean_old( N_MODE ) ! concentration weighted molecular weight g/mol
+      REAL( 8 )  :: Dens_wmean_new( N_MODE ) ! concentration weighted molecular weight g/mol
 
       REAL       :: HPWDEP                        ! hydrogen wet dep (mm mol/liter)
       REAL( 8 ), ALLOCATABLE, SAVE :: GAS    ( : )    ! gas phase conc (mol/mol)
       REAL( 8 ), ALLOCATABLE, SAVE :: GASWDEP( : )    ! gas phase wet dep array (mm mol/liter)
       REAL( 8 ), ALLOCATABLE, SAVE :: AEROSOL( :, :)  ! aerosol conc (mol/mol)
       REAL( 8 ), ALLOCATABLE, SAVE :: AERWDEP( :, :)  ! aerosol wet dep array (mm mol/liter)
-      REAL( 8 )  :: WSRGGAS( NGAS, MXSRG)             ! weights for surrogate
-      REAL( 8 )  :: WSRGAER( MAX_NAER, NMODES, MXSRG) ! weights for surrogate
+      REAL( 8 ), ALLOCATABLE, SAVE :: WSRGAQ( : )     ! weights for surrogate
 
 C External Functions:
 
@@ -190,8 +189,9 @@ C...  event-statistics variables.
 
         ALLOCATE ( GAS    ( NGAS ),
      &             GASWDEP( NGAS ),
-     &             AEROSOL( NAER, NMODES),
-     &             AERWDEP( NAER, NMODES),
+     &             AEROSOL( NAER, N_MODE),
+     &             AERWDEP( NAER, N_MODE),
+     &             WSRGAQ ( N_CGRID_SPC ),
      &             STAT = STAT)
         IF (STAT .NE. 0) THEN
            XMSG = 'Memory allocation failure'
@@ -212,15 +212,15 @@ C... Allocate sensitivity arrays
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
-        ALLOCATE ( S_AEROSOL( NPMAX,NAER,NMODES ), S_AERWDEP( NPMAX,NAER,NMODES ), STAT = STAT )
+        ALLOCATE ( S_AEROSOL( NPMAX,NAER,N_MODE ), S_AERWDEP( NPMAX,NAER,N_MODE ), STAT = STAT )
         IF ( STAT .NE. 0 ) THEN
           XMSG = 'Failure allocating S_AEROSOL or S_AERWDEP'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
-        ALLOCATE ( S_WSRGGAS( NPMAX,NGAS,MXSRG ), S_WSRGAER( NPMAX,NAER,NMODES,MXSRG ), STAT = STAT )
+        ALLOCATE ( S_WSRGAQ( NPMAX,NGAS,MXSRG ), STAT = STAT )
         IF ( STAT .NE. 0 ) THEN
-          XMSG = 'Failure allocating S_WSRGGAS or S_WSRGAER'
+          XMSG = 'Failure allocating S_WSRGGAS or S_WSRGAQ'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 #endif
@@ -230,148 +230,122 @@ C... Allocate sensitivity arrays
 C...for subsequent calls, check to make sure some surrogates were
 C...  specified, otherwise there is no need to perform aqueous chemistry
 
-      IF ( SIZE( CGRID2AQ_MAP ) .EQ. 0 ) THEN
-        RETURN
-      END IF
+      IF ( N_SPC_AQ .EQ. 0 ) RETURN
 
-C...load gas-phase concentrations
+C...Zero out concentrations
 
       GAS     = 0.0D0
-      WSRGGAS = 0.0D0
       GASWDEP = 0.0D0
+      AEROSOL = 0.0D0
+      AERWDEP = 0.0D0
+      WSRGAQ  = 0.0D0
+      
+      ! Initialize Gas and Aerosol Vectors at Background
+      DO ISPC = 1,N_CGRID_SPC
+        IAQ = MAP_CGRIDtoSRG( ISPC )
+        IF ( IAQ .GT. 0 ) THEN 
+          IF ( CGRID_MASK_GAS( ISPC ) .OR.
+     &         CGRID_MASK_NR( ISPC ) .OR.
+     &         CGRID_MASK_TRAC( ISPC ) ) THEN
+             GAS( IAQ ) = REAL( SRGGAS( IAQ )%BACKGND, 8 ) * 1.0D-6
+          ELSE IF ( CGRID_MASK_NUM( ISPC ) .OR.
+     &              CGRID_MASK_SRF( ISPC ) ) THEN
+             AEROSOL( IAQ,: ) = REAL( SRGAER( IAQ )%BACKGND * CTHK1 / AIRM, 8 )
+
+          ELSE IF ( CGRID_MASK_AERO( ISPC ) ) THEN
+             AEROSOL( IAQ,: ) = REAL( SRGAER( IAQ )%BACKGND * 1.0E-6 * CTHK1, 8 )
+     &                         / REAL( CGRID_MW( ISPC ) * AIRM, 8 )
+
+          END IF
+        END IF
+      END DO
 
 #ifdef sens
       S_GAS = 0.0D0
-      S_WSRGGAS = 0.0D0
       S_GASWDEP = 0.0D0
+      S_AEROSOL = 0.0D0
+      S_AERWDEP = 0.0D0
+      S_WSRGAQ = 0.0D0
 #endif
 
-      DO IGAS = 1, NGAS
+      ! Load all Gas and Aerosol Concentrations
+      DO ISPC = 1,N_CGRID_SPC
+        IAQ = MAP_CGRIDtoSRG( ISPC )
+        IF ( IAQ .GT. 0 ) THEN 
 
-        DO ISRG = 1, NSRGGAS( IGAS )
-          PNTR = CGRID2AQ_MAP( LSRGGAS( IGAS, ISRG ) )
-          GAS( IGAS ) = GAS( IGAS ) + REAL( POLC( PNTR ), 8 )
+          IF ( CGRID_MASK_GAS( ISPC ) .OR.
+     &         CGRID_MASK_NR( ISPC ) .OR.
+     &         CGRID_MASK_TRAC( ISPC ) ) THEN
+             GAS( IAQ ) = GAS( IAQ ) + REAL( POLC( ISPC ), 8 )
 #ifdef sens
-          DO NP = 1, NPMAX
-            S_GAS( NP, IGAS ) = S_GAS( NP, IGAS ) + S_POLC ( NP, PNTR )
-          ENDDO
+             DO NP = 1, NPMAX
+                S_GAS( NP, IAQ ) = S_GAS( NP, IAQ ) + S_POLC ( NP, ISPC )
+             ENDDO
 #endif
-        END DO
-
-        IF ( GAS( IGAS ) .GT. 0.0D0 ) THEN
-          DO ISRG = 1, NSRGGAS( IGAS )
-            PNTR = CGRID2AQ_MAP( LSRGGAS( IGAS, ISRG ) )
-            WSRGGAS( IGAS, ISRG ) = REAL( POLC( PNTR ), 8 ) / GAS( IGAS )
+          ELSE IF ( CGRID_MASK_AERO( ISPC ) ) THEN
+             IM = MAP_CGRIDtoSRGMODE( ISPC )
+             AEROSOL( IAQ,IM ) = AEROSOL( IAQ,IM ) + REAL( POLC( ISPC ),8 )
 #ifdef sens
-            DO NP = 1, NPMAX
-               IF ( S_GAS( NP, IGAS ) .NE. 0.0D0 ) THEN
-                  S_WSRGGAS( NP, IGAS, ISRG ) = S_POLC( NP,PNTR ) / S_GAS(NP,IGAS)
-               ELSE
-                  S_WSRGGAS( NP, IGAS, ISRG ) = 0.0D0
-               END IF
-            END DO
+             DO NP = 1, NPMAX
+                S_AEROSOL( NP, IAQ, IM ) = S_AEROSOL( NP, IAQ, IM ) + S_POLC( NP, ISPC )
+             ENDDO
 #endif
-          END DO
-        ELSE
-          DO ISRG = 1, NSRGGAS( IGAS )
-            WSRGGAS( IGAS, ISRG ) = 1.0D0 / REAL( NSRGGAS( IGAS ), 8 )
-#ifdef sens
-            DO NP = 1, NPMAX
-               S_WSRGGAS( NP, IGAS, ISRG ) = 0.0D0
-            END DO
-#endif
-          END DO
+          END IF
         END IF
-
-C...set background values for gases if no surrogates were specified
-
-        IF ( NSRGGAS( IGAS ) .EQ. 0 ) THEN
-          GAS( IGAS ) = REAL( SRGGAS( IGAS )%BACKGND, 8 ) * 1.0D-6
-#ifdef sens
-          DO NP =1, NPMAX
-             S_GAS( NP, IGAS ) = 0.0D0
-          ENDDO
-#endif
-        END IF
-
       END DO
 
-C...load aerosol concentrations
-
-      AEROSOL = 0.0D0
-      WSRGAER = 0.0D0
-      AERWDEP = 0.0D0
-
-#ifdef sens
-      S_AEROSOL = 0.0D0
-      S_WSRGAER = 0.0D0
-      S_AERWDEP = 0.0D0
-#endif
-
-      DO IAER = 1, NAER
-        DO IMODE = 1, NMODES
-
-          IF ( SRGAER( IAER )%NAME( IMODE ) .NE. ' ' ) THEN
-            AEROSOL( IAER, IMODE ) = 0.0D0
-#ifdef sens
-            DO NP =1, NPMAX
-               S_AEROSOL( NP, IAER, IMODE ) = 0.0D0
-            ENDDO
-#endif
-            DO ISRG = 1, NSRGAER( IAER, IMODE )
-              PNTR = CGRID2AQ_MAP( LSRGAER( IAER, IMODE, ISRG ) )
-              AEROSOL( IAER, IMODE ) = AEROSOL( IAER, IMODE ) + REAL( POLC( PNTR ), 8 )
-#ifdef sens
-              DO NP = 1, NPMAX
-                S_AEROSOL( NP, IAER, IMODE ) = S_AEROSOL( NP, IAER, IMODE ) + S_POLC( NP, PNTR )
-              ENDDO
-#endif
-            END DO
-
-            IF ( AEROSOL( IAER, IMODE ) .GT. 0.0D0 ) THEN
-              DO ISRG = 1, NSRGAER( IAER, IMODE )
-                PNTR = CGRID2AQ_MAP( LSRGAER( IAER, IMODE, ISRG ) )
-                WSRGAER( IAER, IMODE, ISRG ) = REAL( POLC( PNTR ), 8 )
-     &                                       / REAL( AEROSOL( IAER, IMODE ), 8 )
+      ! Now Calculate Surrogate Fractions
+      DO ISPC = 1,N_CGRID_SPC
+        IAQ = MAP_CGRIDtoSRG( ISPC ) 
+        IF ( IAQ .GT. 0 ) THEN 
+          IF ( CGRID_MASK_GAS( ISPC ) .OR.
+     &         CGRID_MASK_NR( ISPC ) .OR.
+     &         CGRID_MASK_TRAC( ISPC ) ) THEN
+             IF ( GAS( IAQ ) .GT. 0.0D0 ) THEN
+               WSRGAQ( ISPC ) = REAL( POLC( ISPC ), 8 ) / GAS( IAQ )
 #ifdef sens
                DO NP = 1, NPMAX
-                  IF ( S_AEROSOL( NP, IAER, IMODE ) .NE. 0.0D0 ) THEN
-                     S_WSRGAER( NP, IAER, IMODE, ISRG ) = S_POLC( NP, PNTR )
-     &                                               / S_AEROSOL( NP, IAER, IMODE )
+                  IF ( S_GAS( NP, IGAS ) .NE. 0.0D0 ) THEN
+                     S_WSRGAQ( NP, ISPC ) = S_POLC( NP,ISPC ) / S_GAS(NP,IGAS)
                   ELSE
-                     S_WSRGAER( NP, IAER, IMODE, ISRG ) = 0.0D0
+                     S_WSRGAQ( NP, ISPC ) = 0.0D0
                   END IF
                END DO
 #endif
-              END DO
-            ELSE
-              DO ISRG = 1, NSRGAER( IAER, IMODE )
-                WSRGAER( IAER, IMODE, ISRG ) = 1.0D0 / REAL( NSRGAER( IAER, IMODE ), 8 )
+             ELSE
+                WSRGAQ( ISPC ) = 1.0D0 / N_AQSRG_GAS( IAQ )
 #ifdef sens
                 DO NP = 1, NPMAX
-                    S_WSRGAER( NP, IAER, IMODE, ISRG ) = 0.0D0
+                  S_WSRGAQ( NP, ISPC ) = 0.0D0
+                END DO
+#endif
+             END IF
+
+          ELSE IF ( CGRID_MASK_AERO( ISPC ) ) THEN
+             IM = MAP_CGRIDtoSRGMODE( ISPC )
+             IF ( AEROSOL( IAER, IM ) .GT. 0.0D0 ) THEN
+                WSRGAQ( ISPC ) = REAL( POLC( ISPC ), 8 )
+     &                                       / REAL( AEROSOL( IAQ, IM ), 8 )
+#ifdef sens
+                DO NP = 1, NPMAX
+                   IF ( S_AEROSOL( NP, IAQ, IM ) .NE. 0.0D0 ) THEN
+                      S_WSRGAQ( NP, ISPC ) = S_POLC( NP, ISPC ) / S_AEROSOL( NP, IAQ, IM )
+                   ELSE
+                      S_WSRGAQ( NP, ISPC ) = 0.0D0
+                   END IF
+                END DO
+#endif
+            ELSE
+                WSRGAQ( ISPC ) = 1.0D0 / REAL( N_AQSRG_AER( IAQ, IM ), 8 )
+#ifdef sens
+                DO NP = 1, NPMAX
+                    S_WSRGAQ( NP, ISPC ) = 0.0D0
                 ENDDO
 #endif
-              END DO
-            END IF
-
-C...set background values for aerosols if no surrogates were specified
-
-            IF ( NSRGAER( IAER, IMODE ) .EQ. 0 ) THEN
-              IF ( SRGAER( IAER )%MOLWT .GT. 0.0 ) THEN
-                AEROSOL( IAER, IMODE ) = REAL( SRGAER( IAER )%BACKGND * 1.0E-6 * CTHK1, 8 )
-     &                                 / REAL( SRGAER( IAER )%MOLWT * AIRM, 8 )
-              ELSE
-                AEROSOL( IAER, IMODE ) = REAL( SRGAER( IAER )%BACKGND * CTHK1 / AIRM, 8 )
-              END IF
-#ifdef sens
-              DO NP = 1, NPMAX
-                S_AEROSOL( NP, IAER, IMODE ) = 0.0D0
-              ENDDO
-#endif             
             END IF
           END IF
-        END DO
+        END IF
+
       END DO
 
 C *** extract grid cell concentrations of aero species from CGRID
@@ -387,17 +361,17 @@ C *** Calculate pseudo aerosol 3rd moment (ignore factors that cancel in the div
 C ... M3OLD is in units of m3/kmol_air
       M3OLD = 0.0
       Dens_wmean_old = 0.0
-      DO IMODE = 2, N_MODE
+      DO IM = 2, N_MODE
 
         DO SPC = 1, N_AEROSPC
           IF (  AEROSPC( SPC )%TRACER ) CYCLE 
-          IF ( ( AEROSPC( SPC )%NAME( IMODE ) .NE. ' ' ) .AND.
+          IF ( ( AEROSPC( SPC )%NAME( IM ) .NE. ' ' ) .AND.
      &         ( .NOT. AEROSPC( SPC )%NO_M2WET ) ) THEN
-             M3OLD( IMODE ) = M3OLD( IMODE )
-     &                      + ( AEROSPC_CONC( SPC,IMODE ) * AEROSPC_MW( SPC )
+             M3OLD( IM ) = M3OLD( IM )
+     &                      + ( AEROSPC_CONC( SPC,IM ) * AEROSPC_MW( SPC )
      &                      / AEROSPC( SPC )%DENSITY )
-             Dens_wmean_old( IMODE ) = Dens_wmean_old( IMODE )  
-     &                      + AEROSPC_CONC( SPC,IMODE ) * AEROSPC_MW( SPC )
+             Dens_wmean_old( IM ) = Dens_wmean_old( IM )  
+     &                      + AEROSPC_CONC( SPC,IM ) * AEROSPC_MW( SPC )
           END IF
         END DO
       END DO
@@ -423,38 +397,36 @@ C...store the amount of hydrogen deposition
 
 C...Now, re-apportion mass back into cend/remov (cgrid-type) array
 
-      DO IGAS = 1, NGAS
-        DO ISRG = 1, NSRGGAS( IGAS )
-          PNTR = CGRID2AQ_MAP( LSRGGAS( IGAS, ISRG ) )
-          CEND ( PNTR ) = GAS    ( IGAS ) * WSRGGAS( IGAS, ISRG )
-          REMOV( PNTR ) = GASWDEP( IGAS ) * WSRGGAS( IGAS, ISRG )
-#ifdef sens
-          DO NP = 1, NPMAX
-            S_CEND ( NP, PNTR ) = S_GAS    ( NP, IGAS ) * S_WSRGGAS( NP, IGAS, ISRG )
-            S_REMOV( NP, PNTR ) = S_GASWDEP( NP, IGAS ) * S_WSRGGAS( NP, IGAS, ISRG )
-          ENDDO
-#endif
-        END DO
-      END DO
+      DO ISPC = 1,N_CGRID_SPC
+        IAQ = MAP_CGRIDtoSRG( ISPC )
+        IF ( IAQ .GT. 0 ) THEN 
 
-      DO IAER = 1, NAER
-        DO IMODE = 1, NMODES
-          IF( SRGAER( IAER )%NAME( IMODE ) .NE. ' ' ) THEN
-            DO ISRG = 1, NSRGAER( IAER, IMODE )
-              PNTR = CGRID2AQ_MAP( LSRGAER( IAER, IMODE, ISRG ) )
-              CEND ( PNTR ) = AEROSOL( IAER, IMODE ) * WSRGAER( IAER, IMODE, ISRG )
-              REMOV( PNTR ) = AERWDEP( IAER, IMODE ) * WSRGAER( IAER, IMODE, ISRG )
+          IF ( CGRID_MASK_GAS( ISPC ) .OR.
+     &         CGRID_MASK_NR( ISPC ) .OR.
+     &         CGRID_MASK_TRAC( ISPC ) ) THEN
+             CEND ( ISPC ) = GAS    ( IAQ ) * WSRGAQ( ISPC )
+             REMOV( ISPC ) = GASWDEP( IAQ ) * WSRGAQ( ISPC )
 #ifdef sens
-              DO NP = 1, NPMAX
-                S_CEND ( NP, PNTR ) = S_AEROSOL( NP, IAER, IMODE ) * S_WSRGAER( NP, IAER, IMODE, ISRG )
-                S_REMOV( NP, PNTR ) = S_AERWDEP( NP, IAER, IMODE ) * S_WSRGAER( NP, IAER, IMODE, ISRG )
-              ENDDO
+             DO NP = 1, NPMAX
+               S_CEND ( NP, ISPC ) = S_GAS    ( NP, IAQ ) * S_WSRGAQ( NP, ISPC )
+               S_REMOV( NP, ISPC ) = S_GASWDEP( NP, IAQ ) * S_WSRGAQ( NP, ISPC )
+             ENDDO
 #endif
-            END DO
-          END IF 
-        END DO
+          
+           ELSE IF ( CGRID_MASK_AERO( ISPC ) ) THEN
+             IM = MAP_CGRIDtoSRGMODE( ISPC )
+             CEND ( ISPC ) = AEROSOL( IAQ, IM ) * WSRGAQ( ISPC )
+             REMOV( ISPC ) = AERWDEP( IAQ, IM ) * WSRGAQ( ISPC )
+#ifdef sens
+             DO NP = 1, NPMAX
+                S_CEND ( NP,ISPC ) = S_AEROSOL( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
+                S_REMOV( NP,ISPC ) = S_AERWDEP( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
+             ENDDO
+#endif
+          END IF
+        END IF
       END DO
-
+      
 C *** extract grid cell concentrations of aero species from CGRID
 C     into aerospc_conc in aero_data module
 
@@ -468,17 +440,17 @@ C *** Calculate pseudo aerosol 3rd moment (ignore factors that cancel in the div
 C ... M3NEW is in units of m3/kmol_air
       M3NEW = 0.0
       Dens_wmean_new = 0.0
-      DO IMODE = 2, NMODES
+      DO IM = 2, N_MODE
 
         DO SPC = 1, N_AEROSPC
           IF (  AEROSPC( SPC )%TRACER ) CYCLE 
-          IF ( ( AEROSPC( SPC )%NAME( IMODE ) .NE. ' ' ) .AND.
+          IF ( ( AEROSPC( SPC )%NAME( IM ) .NE. ' ' ) .AND.
      &         ( .NOT. AEROSPC( SPC )%NO_M2WET ) ) THEN
-             M3NEW( IMODE ) = M3NEW( IMODE )
-     &                      + ( AEROSPC_CONC( SPC,IMODE ) * AEROSPC_MW( SPC )
+             M3NEW( IM ) = M3NEW( IM )
+     &                      + ( AEROSPC_CONC( SPC,IM ) * AEROSPC_MW( SPC )
      &                      / AEROSPC( SPC )%DENSITY )
-             Dens_wmean_new( IMODE ) = Dens_wmean_new( IMODE )  
-     &                      + AEROSPC_CONC( SPC,IMODE ) * AEROSPC_MW( SPC )
+             Dens_wmean_new( IM ) = Dens_wmean_new( IM )  
+     &                      + AEROSPC_CONC( SPC,IM ) * AEROSPC_MW( SPC )
           END IF
         END DO
       END DO
@@ -497,11 +469,11 @@ C... Remove number sensitivity calculations for now
 
 C...check for minimums
 C...ug/m3*m3/mol_air*1e3 mol_air/kmol_air*1e-9kg/ug*m3/kg=> m3/kmol_air
-      DO IMODE = 2, NMODES
-        IF ( M3NEW( IMODE ) .GT. 0.0D0 ) THEN  ! Dens_wmean_new will be .GT. 0 also
-           Dens_wmean_new( IMODE ) = Dens_wmean_new( IMODE ) / M3NEW( IMODE )
-           M3OLD( IMODE ) = MAX( M3OLD( IMODE ), CONMIND * 1.0d-6 / ( Dens_wmean_old( IMODE ) * AIRM / CTHK1 ) )
-           M3NEW( IMODE ) = MAX( M3NEW( IMODE ), CONMIND * 1.0d-6 / ( Dens_wmean_new( IMODE ) * AIRM / CTHK1 ) )
+      DO IM = 2, N_MODE
+        IF ( M3NEW( IM ) .GT. 0.0D0 ) THEN  ! Dens_wmean_new will be .GT. 0 also
+           Dens_wmean_new( IM ) = Dens_wmean_new( IM ) / M3NEW( IM )
+           M3OLD( IM ) = MAX( M3OLD( IM ), CONMIND * 1.0d-6 / ( Dens_wmean_old( IM ) * AIRM / CTHK1 ) )
+           M3NEW( IM ) = MAX( M3NEW( IM ), CONMIND * 1.0d-6 / ( Dens_wmean_new( IM ) * AIRM / CTHK1 ) )
         END IF
       END DO
 

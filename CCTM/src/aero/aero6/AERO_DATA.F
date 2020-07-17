@@ -127,10 +127,12 @@ C Number of aerosol species and modes
 
       Integer, Parameter :: n_aerolist = 110    ! number of aero species
       Integer, Parameter :: n_mode = 3          ! number of modes:
-                                                ! 1 = Aitken
-                                                ! 2 = accumulation
-                                                ! 3 = coarse
+      Integer, Parameter :: akn = 1             ! 1 = Aitken
+      Integer, Parameter :: acc = 2             ! 2 = Accumulation
+      Integer, Parameter :: cor = 3             ! 3 = Coarse
+
       Character(1), Parameter :: modesuff( n_mode ) = (/ 'I','J','K' /)
+      Character(6), Parameter :: modename( n_mode ) = (/'AITKEN','ACCUM','COARSE'/)
 
       Integer, Save :: n_aerospc ! number of aero species
 

@@ -105,6 +105,7 @@ c control species
 
       INTEGER, SAVE              :: N_CGRID_SPC
       INTEGER, SAVE              :: N_SPC_WDEP
+      INTEGER, SAVE              :: N_SPC_AQ
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: CGRID_NAME     ( : )
       REAL,    ALLOCATABLE, SAVE :: CGRID_MW       ( : )
       LOGICAL, ALLOCATABLE, SAVE :: CGRID_MASK_GAS ( : )
@@ -114,6 +115,8 @@ c control species
       LOGICAL, ALLOCATABLE, SAVE :: CGRID_MASK_NR  ( : )
       LOGICAL, ALLOCATABLE, SAVE :: CGRID_MASK_TRAC( : )
       INTEGER, ALLOCATABLE, SAVE :: MAP_WDEPtoCGRID( : )
+      INTEGER, ALLOCATABLE, SAVE :: MAP_AQtoCGRID( : )
+      CHARACTER( 16 ), ALLOCATABLE, SAVE :: AQ_SPC     ( : )
 
 
       type, public :: base_type
@@ -156,7 +159,7 @@ c !! NO   and to populate the allocated arrays from the stnd gc_spc.ext  !!! NO
             integer, parameter :: spc_dim = 1000
             logical :: order = .true., found = .true.
             character( 120 ) :: xmsg
-            INTEGER :: ISPC, IGRID, IWDEP
+            INTEGER :: ISPC, IGRID, IWDEP, IAQ
 
 c namelist variables
             ! Namelist Registry Format for Gases and Nonreactives
@@ -356,7 +359,7 @@ c-------------------------------------------------------------------------------
                 IF ( GC_SPECIES_DATA( IGC )%CLOUD_SURR .NE. '' ) THEN
                     N_GC_G2AQ = N_GC_G2AQ + 1
                     GC_G2AQ( N_GC_G2AQ )     = GC_SPECIES_DATA( IGC )%CLOUD_SURR 
-                    GC_G2AQ_MAP( N_GC_G2AQ ) = IGC
+                    GC_G2AQ_MAP( IGC ) = N_GC_G2AQ
                 END IF
                 
                 ! Gas - Perform Transport
@@ -379,8 +382,8 @@ c-------------------------------------------------------------------------------
                 LWDEP = GET_LOGICAL_NML( GC_SPECIES_DATA( IGC )%WDEP_FLAG )
                 IF ( LWDEP ) THEN
                     N_GC_WDEP = N_GC_WDEP + 1
-                    GC_WDEP( N_GC_WDEP )     = GC_SPECIES_DATA( IGC )%SPECIES_NAME
-                    GC_WDEP_MAP( N_GC_WDEP ) = IGC
+                    GC_WDEP( N_GC_WDEP ) = GC_SPECIES_DATA( IGC )%SPECIES_NAME
+                    GC_WDEP_MAP( IGC ) = N_GC_WDEP
                 END IF
                 
                 ! Gas - Output Concentration Field
@@ -571,7 +574,7 @@ c-------------------------------------------------------------------------------
                 IF ( AE_SPECIES_DATA( IAE )%CLOUD_SURR .NE. '' ) THEN
                     N_AE_A2AQ = N_AE_A2AQ + 1
                     AE_A2AQ( N_AE_A2AQ )     = AE_SPECIES_DATA( IAE )%CLOUD_SURR 
-                    AE_A2AQ_MAP( N_AE_A2AQ ) = IAE
+                    AE_A2AQ_MAP( IAE ) = N_AE_A2AQ
                 END IF
                 
                 ! Aerosol - Perform Transport
@@ -595,7 +598,7 @@ c-------------------------------------------------------------------------------
                 IF ( LWDEP ) THEN
                     N_AE_WDEP = N_AE_WDEP + 1
                     AE_WDEP( N_AE_WDEP )     = AE_SPECIES_DATA( IAE )%SPECIES_NAME
-                    AE_WDEP_MAP( N_AE_WDEP ) = IAE
+                    AE_WDEP_MAP( IAE ) = N_AE_WDEP
                 END IF
                 
                 ! Aerosol - Output Concentration Field
@@ -761,7 +764,7 @@ c-------------------------------------------------------------------------------
                 IF ( NR_SPECIES_DATA( INR )%CLOUD_SURR .NE. '' ) THEN
                     N_NR_N2AQ = N_NR_N2AQ + 1
                     NR_N2AQ( N_NR_N2AQ )     = NR_SPECIES_DATA( INR )%CLOUD_SURR 
-                    NR_N2AQ_MAP( N_NR_N2AQ ) = INR
+                    NR_N2AQ_MAP( INR ) = N_NR_N2AQ
                 END IF
                 
                 ! Nonreactive - Perform Transport
@@ -785,7 +788,7 @@ c-------------------------------------------------------------------------------
                 IF ( LWDEP ) THEN
                     N_NR_WDEP = N_NR_WDEP + 1
                     NR_WDEP( N_NR_WDEP )     = NR_SPECIES_DATA( INR )%SPECIES_NAME
-                    NR_WDEP_MAP( N_NR_WDEP ) = INR
+                    NR_WDEP_MAP( INR ) = N_NR_WDEP
                 END IF
                 
                 ! Nonreactive - Output Concentration Field
@@ -926,7 +929,7 @@ c-------------------------------------------------------------------------------
                 IF ( TR_SPECIES_DATA( ITR )%CLOUD_SURR .NE. '' ) THEN
                     N_TR_T2AQ = N_TR_T2AQ + 1
                     TR_T2AQ( N_TR_T2AQ )     = TR_SPECIES_DATA( ITR )%CLOUD_SURR 
-                    TR_T2AQ_MAP( N_TR_T2AQ ) = ITR
+                    TR_T2AQ_MAP( ITR ) = N_TR_T2AQ
                 END IF
                 
                 ! Tracer - Perform Advection?
@@ -958,7 +961,7 @@ c-------------------------------------------------------------------------------
                 IF ( LWDEP ) THEN
                     N_TR_WDEP = N_TR_WDEP + 1
                     TR_WDEP( N_TR_WDEP )     = TR_SPECIES_DATA( ITR )%SPECIES_NAME
-                    TR_WDEP_MAP( N_TR_WDEP ) = ITR
+                    TR_WDEP_MAP( ITR ) = N_TR_WDEP
                 END IF
                 
                 ! Tracer - Output Concentration Field
@@ -988,7 +991,9 @@ c-------------------------------------------------------------------------------
      &                CGRID_MASK_SRF( N_CGRID_SPC ),
      &                CGRID_MASK_NR( N_CGRID_SPC ),
      &                CGRID_MASK_TRAC( N_CGRID_SPC ),
-     &                MAP_WDEPtoCGRID( N_CGRID_SPC ) )
+     &                MAP_WDEPtoCGRID( N_CGRID_SPC ),
+     &                MAP_AQtoCGRID( N_CGRID_SPC ),
+     &                AQ_SPC( N_CGRID_SPC ) )
             CGRID_NAME = ''
             CGRID_MW   = 0.
             CGRID_MASK_GAS = .FALSE.
@@ -998,9 +1003,12 @@ c-------------------------------------------------------------------------------
             CGRID_MASK_NR  = .FALSE.
             CGRID_MASK_TRAC= .FALSE.
             MAP_WDEPtoCGRID= 0
+            MAP_AQtoCGRID= 0
+            AQ_SPC= ''
 
             IGRID = 0
             IWDEP = 0
+            IAQ = 0
             DO ISPC = gc_strt,n_gc_spcd
                 IGRID = IGRID + 1
                 CGRID_NAME( IGRID ) = GC_SPC( ISPC )
@@ -1009,6 +1017,11 @@ c-------------------------------------------------------------------------------
                 IF ( GC_WDEP_MAP( ISPC ) .NE. 0 ) THEN
                     IWDEP = IWDEP + 1
                     MAP_WDEPtoCGRID( IWDEP ) = IGRID
+                END IF
+                IF ( GC_G2AQ_MAP( ISPC ) .NE. 0 ) THEN
+                    IAQ = IAQ + 1
+                    MAP_AQtoCGRID( IAQ ) = IGRID
+                    AQ_SPC( IAQ ) = GC_G2AQ( ISPC )
                 END IF
             END DO
             DO ISPC = 1,n_ae_spc
@@ -1022,6 +1035,11 @@ c-------------------------------------------------------------------------------
                     IWDEP = IWDEP + 1
                     MAP_WDEPtoCGRID( IWDEP ) = IGRID
                 END IF
+                IF ( AE_A2AQ_MAP( ISPC ) .NE. 0 ) THEN
+                    IAQ = IAQ + 1
+                    MAP_AQtoCGRID( IAQ ) = IGRID
+                    AQ_SPC( IAQ ) = AE_A2AQ( ISPC )
+                END IF
             END DO
             DO ISPC = 1,n_nr_spc
                 IGRID = IGRID + 1
@@ -1031,6 +1049,11 @@ c-------------------------------------------------------------------------------
                 IF ( NR_WDEP_MAP( ISPC ) .NE. 0 ) THEN
                     IWDEP = IWDEP + 1
                     MAP_WDEPtoCGRID( IWDEP ) = IGRID
+                END IF
+                IF ( NR_N2AQ_MAP( ISPC ) .NE. 0 ) THEN
+                    IAQ = IAQ + 1
+                    MAP_AQtoCGRID( IAQ ) = IGRID
+                    AQ_SPC( IAQ ) = NR_N2AQ( ISPC )
                 END IF
             END DO
             DO ISPC = 1,n_tr_spc
@@ -1042,9 +1065,14 @@ c-------------------------------------------------------------------------------
                     IWDEP = IWDEP + 1
                     MAP_WDEPtoCGRID( IWDEP ) = IGRID
                 END IF
+                IF ( TR_T2AQ_MAP( ISPC ) .NE. 0 ) THEN
+                    IAQ = IAQ + 1
+                    MAP_AQtoCGRID( IAQ ) = IGRID
+                    AQ_SPC( IAQ ) = TR_T2AQ( ISPC )
+                END IF
             END DO
             N_SPC_WDEP = IWDEP
-
+            N_SPC_AQ   = IAQ
          return
 
          end function cgrid_spcs_init
