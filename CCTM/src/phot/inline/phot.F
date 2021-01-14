@@ -539,13 +539,13 @@ C...modules
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
 
-            ALLOCATE ( AERO_EXT_550( NCOLS,NROWS,NLAYS_DIAG ), STAT = ALLOCSTAT )
+            ALLOCATE ( AERO_EXT_550( NCOLS,NROWS,NLAYS ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating 3D AERO_EXT_550'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
             
-            ALLOCATE ( ELMO_EXT_550( NCOLS,NROWS,NLAYS_DIAG ), STAT = ALLOCSTAT )
+            ALLOCATE ( ELMO_EXT_550( NCOLS,NROWS,NLAYS ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating 3D ELMO_EXT_550'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -711,9 +711,11 @@ C...modules
       !ELSE
       !END IF
 
-      CALCULATE_EXT_550 = JTIME_CHK
+      CALCULATE_EXT_550 = .TRUE. !JTIME_CHK
       ELMO_AOD_550 = 0.0
       ELMO_EXT_550 = 0.0
+      AERO_EXT_550 = 0.0
+      TAU_AERO_550 = 0.0
 
 !...If sun below horizon at all cells, zero photolysis rates & exit
 !...  (assumes sun below horizon at *all* levels!)
@@ -724,7 +726,6 @@ C...modules
          RJ_SUB = 0.0
          RJ_RES = 0.0
          ETOT_SFC_WL  = 0.0
-
 
 !...Initialize ETOT_SFC, TAU_AERO, TAU_TOT, TAUO3_TOP to 0.0
 
@@ -743,7 +744,6 @@ C...modules
             TOT_EXT      = 0.0
             GAS_EXT      = 0.0
             AERO_EXT     = 0.0
-            AERO_EXT_550 = 0.0
             AERO_SSA     = 0.0
             AERO_ASYM    = 0.0
             ACTINIC_FX   = 0.0
@@ -807,7 +807,6 @@ C...modules
                      TOT_EXT     ( COL,ROW, :,: ) = 0.0
                      GAS_EXT     ( COL,ROW, :,: ) = 0.0
                      AERO_EXT    ( COL,ROW, :,: ) = 0.0
-                     AERO_EXT_550( COL,ROW, : )   = 0.0
                      AERO_SSA    ( COL,ROW, :,: ) = 0.0
                      AERO_ASYM   ( COL,ROW, :,: ) = 0.0
                      ACTINIC_FX  ( COL,ROW, :,: ) = 0.0
@@ -958,6 +957,16 @@ C...modules
      &                           TAU_RAY, SSA, TAU_CLOUD, TOTAL_O3_COLUMN )
 
 !...load diagnostic file arrays
+               ! Aerosol extinction and optical depth are saved every
+               ! time step
+               FORALL ( L = 1:NLAYS )
+                  AERO_EXT_550( COL,ROW,L ) = 1000.0 * AERO_EXTI_550( L )
+               END FORALL
+               DO LEV = 1, NLAYS
+                  TAU_AERO_550 ( COL,ROW ) = TAU_AERO_550 ( COL,ROW )
+     &                                     + AERO_EXTI_550( LEV ) * BLKDZ( LEV )
+               END DO
+
                IF ( PHOTDIAG .AND. .NOT. STRATO3_MINS_MET ) THEN
                     N_EXCEED_TROPO3( COL,ROW ) =  N_EXCEED_TROPO3( COL,ROW ) + 1.0
                     TROPO_O3_EXCEED( COL,ROW ) = TROPO_O3_COLUMN/(MAX_TROPOO3_FRAC*TOTAL_O3_COLUMN) - 1.0
@@ -968,7 +977,7 @@ C...modules
                   ETOT_SFC_WL ( COL,ROW,IWL ) = IRRADIANCE( 1,IWL )
                END FORALL   
 
-               IF ( JTIME_CHK  ) THEN
+               IF ( JTIME_CHK .AND. PHOTDIAG  ) THEN
                   TOTAL_OC( COL,ROW )         = TOTAL_O3_COLUMN
                   TRANSMIS_DIFFUSE( COL,ROW ) = TRANSMISSION
                   TRANSMIS_DIRECT( COL,ROW )  = TRANS_DIRECT
@@ -986,13 +995,6 @@ C...modules
 #endif
                   END DO
 
-                  FORALL ( L = 1:NLAYS_DIAG )
-                     AERO_EXT_550( COL,ROW,L ) = 1000.0 * AERO_EXTI_550( L )
-                  END FORALL
-                  DO LEV = 1, NLAYS
-                     TAU_AERO_550 ( COL,ROW ) = TAU_AERO_550 ( COL,ROW )
-     &                                        + AERO_EXTI_550( LEV ) * BLKDZ( LEV )
-                  END DO
 
                   DO L = 1, N_DIAG_WVL
                      IWL = DIAG_WVL( L )
@@ -1013,7 +1015,7 @@ C...modules
                      END FORALL
                   END DO
                   IF ( COSZEN .LE. COS85 ) THEN 
-                  ! calculate because NEW_OPTICS sets BLKDZ and TROPO_O3_COLUMN to zero
+                     ! calculate because NEW_OPTICS sets BLKDZ and TROPO_O3_COLUMN to zero
                      BLKDZ( 1 ) = BLKZF( 2 )
                      DO L = 2, NLAYS
                         BLKDZ( L ) = BLKZF( L+1 ) - BLKZF( L )
@@ -1095,7 +1097,7 @@ C...modules
      &                                             + ACM_CLOUDS( COL,ROW ) * IRRADIANCE( 1,IWL )
                      END DO
 
-                     IF ( JTIME_CHK ) THEN
+                     IF ( JTIME_CHK .AND. PHOTDIAG ) THEN
 
                         TRANSMIS_DIRECT( COL,ROW )  = MSCALE * TRANSMIS_DIRECT( COL,ROW )
      &                                              + ACM_CLOUDS( COL,ROW ) * TRANS_DIRECT
@@ -1135,7 +1137,7 @@ C...modules
                   END IF
                END IF ! not USE_ACM_CLOUD and  ACM_CLOUDS > 0
 
-               IF ( JTIME_CHK ) THEN ! compute clear sky reflection and transmission coefficients
+               IF ( JTIME_CHK .AND. PHOTDIAG) THEN ! compute clear sky reflection and transmission coefficients
                   IF ( ANY( CLOUDS ) ) THEN
                      IF ( CFRAC_2D( COL,ROW ) .GT. 0.0 ) THEN ! resolved and subgrid clouds exist
                         CLOUDS         = .FALSE.
@@ -1166,10 +1168,11 @@ C...modules
             END DO LOOP_COLS
          END DO LOOP_ROWS
 
-         ! Store PM Diagnostic AOD and extinction
-         ELMO_AOD_550 = TAU_AERO_550
-         ELMO_EXT_550 = AERO_EXT_550
       END IF
+         
+      ! Store PM Diagnostic AOD and extinction
+      ELMO_AOD_550 = TAU_AERO_550
+      ELMO_EXT_550 = AERO_EXT_550
 
 !...report on whether stratospheric ozone column satisfies climatological minimums
       IF( N_TROPO_O3_TOGGLE .GT. 0 )THEN
@@ -1458,8 +1461,8 @@ C...modules
         TROPO_O3_EXCEED = 0.0 ! reset sum and counter
         TSTEP_COUNT     = 0
         N_EXCEED_TROPO3 = 0.0 ! reset counter
-        TAU_AERO_550 = 0.0
       END IF   ! if JTIME_CHK
+      TAU_AERO_550 = 0.0
 
 1003  FORMAT( 8X, 'Processor ',I4.4,' is in darkness at ', I8.7, ':', I6.6,
      &        1X, 'GMT - no photolysis')
