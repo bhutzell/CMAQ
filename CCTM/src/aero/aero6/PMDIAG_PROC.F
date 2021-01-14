@@ -194,10 +194,15 @@
           CALL UPCASE( INST_PARS_REG( INUM ) )
       ENDDO
       DO INUM = 1,N_END-1
-         DO JNUM = INUM+1,N_END
-            IF ( INST_PARS_REG( INUM ) .EQ. INST_PARS_REG( JNUM ) ) THEN
+         JNUM = INUM + 1
+         DO WHILE ( JNUM .LE. N_END )
+            IF ( INST_PARS_REG( INUM ) .EQ. '' ) THEN
+               JNUM = N_END + 1
+            ELSEIF ( INST_PARS_REG( INUM ) .EQ. INST_PARS_REG( JNUM ) ) THEN
                INST_PARS_REG( JNUM:N_END-1 ) = INST_PARS_REG( JNUM+1:N_END )
                INST_PARS_REG( N_END ) = ''
+            ELSE
+               JNUM = JNUM + 1
             END IF
          END DO
       END DO
@@ -239,7 +244,7 @@
      &           'assumed.'
       END IF
  
-      ! Expand INST list Using Keywords
+      ! Expand AVRG list Using Keywords
       N_END = INDEX1( '', N_REG, AVRG_PARS_REG ) - 1
       INUM = 1
       DO WHILE ( INUM .LE. N_END )
@@ -279,14 +284,19 @@
           CALL UPCASE( AVRG_PARS_REG( INUM ) )
       ENDDO
       DO INUM = 1,N_END-1
-         DO JNUM = INUM+1,N_END
-            IF ( AVRG_PARS_REG( INUM ) .EQ. AVRG_PARS_REG( JNUM ) ) THEN
+         JNUM = INUM + 1
+         DO WHILE ( JNUM .LE. N_END )
+            IF ( AVRG_PARS_REG( INUM ) .EQ. '' ) THEN
+               JNUM = N_END + 1
+            ELSEIF ( AVRG_PARS_REG( INUM ) .EQ. AVRG_PARS_REG( JNUM ) ) THEN
                AVRG_PARS_REG( JNUM:N_END-1 ) = AVRG_PARS_REG( JNUM+1:N_END )
                AVRG_PARS_REG( N_END ) = ''
+            ELSE
+               JNUM = JNUM + 1
             END IF
          END DO
       END DO
-
+       
       ! Populate INST_PARS parameters list
       N_PMDIAG_AVRG = INDEX1( '', N_REG, AVRG_PARS_REG ) - 1
       ALLOCATE( AVRG_PARS( N_PMDIAG_AVRG ) )
@@ -378,7 +388,7 @@
       END IF
 
       PMDIAG_KEY( 3 )%LIST = (/'PMF_MASS','PMC_MASS','PM01    ','PM1     ',
-     &              'PM25    ','PM10    ','PM25to10','PMU_MASS','PMAMS   ' /)
+     &              'PM25    ','PM10    ','PM25TO10','PMU_MASS','PMAMS   ' /)
      
       PMDIAG_KEY( 4 )%WORD = 'NUMBER'
       PMDIAG_KEY( 4 )%N = 7
@@ -510,7 +520,7 @@
      &           'PM25_TI     ','PM25_MN     ','PM25_AL     ','PM25_SOIL   ',
      &           'PM25_UNSP1  ','PM25_UNSPCRS','PM25_HP     ' /)
 
-      PMDIAG_KEY( 15 )%WORD = 'PM25to10_SPECIES'
+      PMDIAG_KEY( 15 )%WORD = 'PM25TO10_SPECIES'
       PMDIAG_KEY( 15 )%N = 6
       ALLOCATE( PMDIAG_KEY( 15 )%LIST( 6 ), STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -518,8 +528,8 @@
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
-      PMDIAG_KEY( 15 )%LIST = (/'PM25to10    ','PM25to10_SO4','PM25to10_NO3',
-     &                          'PM25to10_NH4','PM25to10_CL ','PM25to10_NA ' /)
+      PMDIAG_KEY( 15 )%LIST = (/'PM25TO10    ','PM25TO10_SO4','PM25TO10_NO3',
+     &                          'PM25TO10_NH4','PM25TO10_CL ','PM25TO10_NA ' /)
 
       PMDIAG_KEY( 16 )%WORD = 'OPTICAL'
       PMDIAG_KEY( 16 )%N = 2
@@ -554,23 +564,22 @@
       END IF
 
       PMDIAG_KEY( 18 )%LIST = (/'FPM01    ','FPM1     ','FPM25    ',
-     &                          'FPM10    ','FPM25to10','FAMS     ' /)
+     &                          'FPM10    ','FPM25TO10','FAMS     ' /)
 
       PMDIAG_KEY( 19 )%WORD = 'TOXICS'
-      PMDIAG_KEY( 19 )%N = 26
-      ALLOCATE( PMDIAG_KEY( 19 )%LIST( 26 ), STAT=ALLOCSTAT )
+      PMDIAG_KEY( 19 )%N = 21
+      ALLOCATE( PMDIAG_KEY( 19 )%LIST( 21 ), STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating PMDIAG_KEY(19)'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
       PMDIAG_KEY( 19 )%LIST = (/'PM25_HDIESEL','PM25_HBE    ','PM25_HCD    ',
-     &           'PM25_HCR 3  ','PM25_HCR6   ','PM25_HCR    ','PM25_HPB    ',
-     &           'PM25_HMN    ','PM25_HMN    ','PM25_HNI    ','PM25_HNI    ',
-     &           'PM25_HAS    ','PM25_HG     ','PM10_HDIESEL','PM10_HBE    ',
-     &           'PM10_HCD    ','PM10_HCR3   ','PM10_HCR6   ','PM10_HCR    ',
-     &           'PM10_HPB    ','PM10_HMN    ','PM10_HMN    ','PM10_HNI    ',
-     &           'PM10_HNI    ','PM10_HAS    ','PM10_HG     '  /)
+     &           'PM25_HCR3   ','PM25_HCR6   ','PM25_HCR    ','PM25_HPB    ',
+     &           'PM25_HMN    ','PM25_HNI    ','PM25_HAS    ','PM25_HG     ',
+     &           'PM10_HDIESEL','PM10_HBE    ','PM10_HCD    ','PM10_HCR3   ',
+     &           'PM10_HCR6   ','PM10_HCR    ','PM10_HPB    ','PM10_HMN    ',
+     &           'PM10_HAS    ','PM10_HG     '  /)
 
       PMDIAG_KEY( 20 )%WORD = 'SIMPLE'
       PMDIAG_KEY( 20 )%N = 2
@@ -1381,31 +1390,31 @@
              ! Map PM25to10_SO4 - PM2.5-10.0 Sulfate
              CASE ( ID_PM25to10_SO4 ) 
                N_VARS = 1
-               CALL INIT_PMDIAG_COEFFS( IDG, N_VARS, 'PM25to10' )
+               CALL INIT_PMDIAG_COEFFS( IDG, N_VARS, 'PM25TO10' )
                CALL SET_PMDIAG_COEFF_MAP( IDG, 1, 'AERO', 'ASO4', 1.0 )
  
              ! Map PM25to10_NO3 - PM2.5-10.0 Nitrate
              CASE ( ID_PM25to10_NO3 ) 
                N_VARS = 1
-               CALL INIT_PMDIAG_COEFFS( IDG, N_VARS, 'PM25to10' )
+               CALL INIT_PMDIAG_COEFFS( IDG, N_VARS, 'PM25TO10' )
                CALL SET_PMDIAG_COEFF_MAP( IDG, 1, 'AERO', 'ANO3', 1.0 )
  
              ! Map PM25to10_NH4 - PM2.5-10.0 Ammonium
              CASE ( ID_PM25to10_NH4 ) 
                N_VARS = 1
-               CALL INIT_PMDIAG_COEFFS( IDG, N_VARS, 'PM25to10' )
+               CALL INIT_PMDIAG_COEFFS( IDG, N_VARS, 'PM25TO10' )
                CALL SET_PMDIAG_COEFF_MAP( IDG, 1, 'AERO', 'ANH4', 1.0 )
  
              ! Map PM25to10_CL - PM2.5-10.0 Chloride
              CASE ( ID_PM25to10_CL ) 
                N_VARS = 1
-               CALL INIT_PMDIAG_COEFFS( IDG, N_VARS, 'PM25to10' )
+               CALL INIT_PMDIAG_COEFFS( IDG, N_VARS, 'PM25TO10' )
                CALL SET_PMDIAG_COEFF_MAP( IDG, 1, 'AERO', 'ACL', 1.0 )
  
              ! Map PM25to10_NA - PM2.5-10.0 Sodium
              CASE ( ID_PM25to10_NA ) 
                N_VARS = 1
-               CALL INIT_PMDIAG_COEFFS( IDG, N_VARS, 'PM25to10' )
+               CALL INIT_PMDIAG_COEFFS( IDG, N_VARS, 'PM25TO10' )
                CALL SET_PMDIAG_COEFF_MAP( IDG, 1, 'AERO', 'ANA', 1.0 )
  
              !!!! Toxics !!!!  
@@ -1419,7 +1428,7 @@
                CALL SET_PMDIAG_COEFF_MAP( IDG, 3, 'AERO', 'ADE_OC', 1.0 )
                CALL SET_PMDIAG_COEFF_MAP( IDG, 4, 'AERO', 'ADE_SO4', 1.0 )
                CALL SET_PMDIAG_COEFF_MAP( IDG, 5, 'AERO', 'ADE_NO3', 1.0 )
-               CALL SET_PMDIAG_COEFF_MAP( IDG, 6, 'AERO', 'ADE_K', 1.0 )
+               CALL SET_PMDIAG_COEFF_MAP( IDG, 6, 'AERO', 'ADE_CORS', 1.0 )
  
              ! Map PM25_HBE - HAP inventory Beryllium
              CASE ( ID_PM25_HBE ) 
@@ -1491,7 +1500,7 @@
                CALL SET_PMDIAG_COEFF_MAP( IDG, 3, 'AERO', 'ADE_OC', 1.0 )
                CALL SET_PMDIAG_COEFF_MAP( IDG, 4, 'AERO', 'ADE_SO4', 1.0 )
                CALL SET_PMDIAG_COEFF_MAP( IDG, 5, 'AERO', 'ADE_NO3', 1.0 )
-               CALL SET_PMDIAG_COEFF_MAP( IDG, 6, 'AERO', 'ADE_K', 1.0 )
+               CALL SET_PMDIAG_COEFF_MAP( IDG, 6, 'AERO', 'ADE_CORS', 1.0 )
  
              ! Map PM10_HBE - HAP inventory Beryllium
              CASE ( ID_PM10_HBE ) 
@@ -1946,7 +1955,7 @@
      &                     AEROMODE, DRY_AERO_DENS, APOC_IDX, APNCOM_IDX
       USE AEROMET_DATA, ONLY: AIRRH, PI, AIRTEMP, SRFTEMP, AIRPRES
       USE SOA_DEFN, ONLY : N_OA, OASPC, MAP_OAtoAERO
-      USE PHOT_MOD, ONLY : TAU_AERO_550, AERO_EXT_550
+      USE PHOT_MOD, ONLY : ELMO_AOD_550, ELMO_EXT_550
       USE RUNTIME_VARS, ONLY : PHOTDIAG
 
       INTEGER, INTENT( IN ) :: IDG, IM
@@ -2232,7 +2241,7 @@
             CALL CALC_PMDIAG( ID_PMF_H2O, 1, VAL2 )
 
             !PMF_PH = -1*LOG10(HPMOLAL)
-            OUTVAL = -999999.0
+            OUTVAL = BADVAL3
             IF ( VAL2 .GT. 0.01 )
      &           OUTVAL = -1.0 * LOG10( VAL )
 
@@ -2557,11 +2566,11 @@
 
          ! Retrieve AOD at 550 nm
          CASE ( ID_AOD550 )
-            IF ( PHOTDIAG ) OUTVAL = TAU_AERO_550( C1,R1 )
+            OUTVAL = ELMO_AOD_550( C1,R1 )
 
          ! Retrieve Aerosol Extinction at 550 nm
          CASE ( ID_PMEXT550 )
-            IF ( PHOTDIAG ) OUTVAL = AERO_EXT_550( C1,R1,L1 )
+            OUTVAL = ELMO_EXT_550( C1,R1,L1 )
 
          ! Retrieve Relative Humidity
          CASE ( ID_RH )

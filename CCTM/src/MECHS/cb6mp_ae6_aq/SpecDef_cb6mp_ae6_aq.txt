@@ -269,8 +269,8 @@ PMC_SO4         ,ug m-3    ,PM25TO10_SO4[3]
 PMC_TOT         ,ug m-3    ,PM25TO10[3] 
 
 !! Deisel PM Species
-DIESEL_PM10     ,ng m-3    ,1000.0*PM10_HDIESEL[3]
-DIESEL_PM25  	,ng m-3    ,1000.0*PM25_HDIESEL[3]
+DIESEL_PM10     ,ug m-3    ,PM10_HDIESEL[3]
+DIESEL_PM25  	,ug m-3    ,PM25_HDIESEL[3]
 
 !Toxic Metallic PM species
 BERYLLIUM_PM10  ,ng m-3    ,1000.0*PM10_HBE[3]

@@ -339,7 +339,7 @@ C...modules
          TSTEP  = TIME2SEC( DTSTEP( 1 ) ) ! output timestep for phot diagnostic files
 
 !...Set flag to initialize calculating aerosol extinction at 550 nm via Angstrom Exponents
-         CALCULATE_EXT_550 = PHOTDIAG
+         CALCULATE_EXT_550 = .TRUE. !PHOTDIAG
 
          PECOL_OFFSET = COLSD_PE( 1, MYPE+1 ) - 1
          PEROW_OFFSET = ROWSD_PE( 1, MYPE+1 ) - 1
@@ -393,7 +393,7 @@ C...modules
 
          ALLOCATE( TOTAL_OC ( NCOLS,NROWS ) )
 
-         IF ( PHOTDIAG ) THEN
+         !IF ( PHOTDIAG ) THEN
 
             ALLOCATE( TROPO_OC   ( NCOLS,NROWS ) )
             ALLOCATE( CO_COLUMN  ( NCOLS,NROWS ) )
@@ -411,6 +411,7 @@ C...modules
             ALLOCATE( TAU_AERO_550    ( NCOLS,NROWS ) )
             ALLOCATE( TAU_AERO_WL     ( NCOLS,NROWS,NWL ) )
             ALLOCATE( TAU_CLOUD_WL    ( NCOLS,NROWS,NWL ) )
+            ALLOCATE( ELMO_AOD_550    ( NCOLS,NROWS ) )
 #ifdef phot_debug
             ALLOCATE( SSA_CLOUD_WL( NCOLS,NROWS,NWL ) )
             ALLOCATE( ASY_CLOUD_WL( NCOLS,NROWS,NWL ) )
@@ -422,6 +423,7 @@ C...modules
             TROPO_O3_EXCEED = 0.0
             TSTEP_COUNT     = 0
             TAU_AERO_550    = 0.0
+            ELMO_AOD_550    = 0.0
             TROPO_OC        = 0.0
             CO_COLUMN       = 0.0
             SO2_COLUMN      = 0.0
@@ -542,6 +544,12 @@ C...modules
                XMSG = 'Failure allocating 3D AERO_EXT_550'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+            
+            ALLOCATE ( ELMO_EXT_550( NCOLS,NROWS,NLAYS_DIAG ), STAT = ALLOCSTAT )
+            IF ( ALLOCSTAT .NE. 0 ) THEN
+               XMSG = 'Failure allocating 3D ELMO_EXT_550'
+               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            END IF
 
             ALLOCATE ( TOT_EXT( NCOLS,NROWS,NLAYS_DIAG,N_DIAG_WVL ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -596,6 +604,7 @@ C...modules
             END IF
          END IF
          
+         IF ( PHOTDIAG ) THEN
 !...open the photolysis diagnostic files
             ODATE = START_DATE; OTIME = START_TIME; OSTEP = 0
 #ifdef phot_write_start
@@ -607,9 +616,9 @@ C...modules
             ODATE = START_DATE; OTIME = START_TIME
 #endif
 
-            CALL SUBST_BARRIER
 
          END IF  ! photdiag
+         CALL SUBST_BARRIER
 
 !...set pointers to species O3 and NO2 in CGRID
 
@@ -671,7 +680,8 @@ C...modules
 
 !...SA  Write COSINE_ZENITH array at the end of each output tstep
 
-      IF ( PHOTDIAG ) THEN
+         JTIME_CHK         = .FALSE.
+      !IF ( PHOTDIAG ) THEN
          OSTEP  = OSTEP + TIME2SEC( DTSTEP( 2 ) )
          JTIME_CHK = ( OSTEP .GE. TIME2SEC( DTSTEP( 1 ) ) )
          IF ( JTIME_CHK ) THEN 
@@ -698,11 +708,12 @@ C...modules
             END IF
          END IF
 #endif
-      ELSE
-         JTIME_CHK         = .FALSE.
-      END IF
+      !ELSE
+      !END IF
 
       CALCULATE_EXT_550 = JTIME_CHK
+      ELMO_AOD_550 = 0.0
+      ELMO_EXT_550 = 0.0
 
 !...If sun below horizon at all cells, zero photolysis rates & exit
 !...  (assumes sun below horizon at *all* levels!)
@@ -723,8 +734,6 @@ C...modules
 
             TAUO3_TOP_WL = 0.0
             TAU_AERO_WL  = 0.0
-! commented out because TAU_AERO_550 is set to zero after allocation and after written to PHOTDIAG1
-!           TAU_AERO_550 = 0.0
             TAU_CLOUD_WL = 0.0
 #ifdef phot_debug
             SSA_CLOUD_WL = 0.0
@@ -1157,6 +1166,9 @@ C...modules
             END DO LOOP_COLS
          END DO LOOP_ROWS
 
+         ! Store PM Diagnostic AOD and extinction
+         ELMO_AOD_550 = TAU_AERO_550
+         ELMO_EXT_550 = AERO_EXT_550
       END IF
 
 !...report on whether stratospheric ozone column satisfies climatological minimums
@@ -1171,6 +1183,7 @@ C...modules
 !...write diagnostic data to output file at the end of every output tstep
 
       IF ( JTIME_CHK ) THEN
+        IF ( PHOTDIAG ) THEN
 
          VARNM = 'COSZENS'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME,
@@ -1255,15 +1268,12 @@ C...modules
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
-         TROPO_O3_EXCEED = 0.0 ! reset sum and counter
-         TSTEP_COUNT     = 0
 
          VARNM = 'N_EXCEED_TROPO3'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, N_EXCEED_TROPO3 ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
-         N_EXCEED_TROPO3 = 0.0 ! reset counter
 
          VARNM = 'JNO2'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, RJ( :,:,1, LNO2 ) ) ) THEN
@@ -1369,7 +1379,6 @@ C...modules
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
-         TAU_AERO_550 = 0.0
 
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &          'Photolysis Surface Summary written to', CTM_RJ_1,
@@ -1445,6 +1454,11 @@ C...modules
      &          'Radiative and Optical Data written to', CTM_RJ_3,
      &          'for date and time', ODATE, OTIME
 
+        END IF   ! PHOTDIAG
+        TROPO_O3_EXCEED = 0.0 ! reset sum and counter
+        TSTEP_COUNT     = 0
+        N_EXCEED_TROPO3 = 0.0 ! reset counter
+        TAU_AERO_550 = 0.0
       END IF   ! if JTIME_CHK
 
 1003  FORMAT( 8X, 'Processor ',I4.4,' is in darkness at ', I8.7, ':', I6.6,
