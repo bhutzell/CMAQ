@@ -134,7 +134,7 @@ c  Output prod loss terms for gas-phase EBI species
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       DO S = 1, N_SPECIES
 
-         IF( .NOT. L_GC_EBI( S ) ) CYCLE        ! Skip non-EBI species
+!        IF( .NOT. L_GC_EBI( S ) ) CYCLE        ! Skip non-EBI species
 
          IF( .NOT. L_GC_ONLY_SPC( S ) ) CYCLE   ! Skip non gas-only species
 

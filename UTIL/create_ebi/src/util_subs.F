@@ -697,8 +697,17 @@ c..Special case for HONO being formed from NO2EX -- relate it to NO2
                   END IF
                END DO
             ELSE
+!               LINOUT = '      '  // VNAME( 1 : EV ) // ' =  ' // COUT //
+!     &                  'RXRAT( ' // RNUM // ' )'
                LINOUT = '      '  // VNAME( 1 : EV ) // ' =  ' // COUT //
-     &                  'RXRAT( ' // RNUM // ' )'
+     &                  'RKI( ' // RNUM // ' )'
+               DO R = 1, NREACT( IRX )
+                  EPOS = LEN_TRIM( LINOUT )
+                  S = IRR( IRX,R )
+                  SPOUT(1:CL) = SPECIES( S )(1:CL)
+                  LINOUT = LINOUT(1:EPOS)
+     &                  // ' * YC ( ' // SPOUT(1:CL)  // ' ) '
+               END DO
             END IF
          ELSE
             IF( VNAME .EQ. 'P15'  ) THEN
@@ -718,7 +727,14 @@ c..Special case for HONO being formed from NO2EX -- relate it to NO2
                END DO  
             ELSE
                LINOUT = '     &'  // FILLR( 1 : MAX( 1, (EV-1) )) // '  +  ' 
-     &                // COUT // 'RXRAT( ' // RNUM // ' )'
+     &                // COUT // 'RKI( ' // RNUM // ' )'
+               DO R = 1, NREACT( IRX )
+                  EPOS = LEN_TRIM( LINOUT )
+                  S = IRR( IRX,R )
+                  SPOUT(1:CL) = SPECIES( S )(1:CL)
+                  LINOUT = LINOUT(1:EPOS) 
+     &                  // ' * YC ( ' // SPOUT(1:CL) // ' ) '
+               END DO  
             END IF
          END IF
 

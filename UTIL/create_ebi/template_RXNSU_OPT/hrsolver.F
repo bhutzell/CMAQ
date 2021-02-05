@@ -67,10 +67,11 @@ C..PARAMETERS:
       INTEGER, PARAMETER :: MXBKUPS = 5  ! Max no. of back-ups allowed
       INTEGER, PARAMETER :: STAT = 1     ! Status code
 
-      REAL( 8 ), PARAMETER :: DTMIN   = 1.0D-08    ! Smallest time step allowed, min
-      REAL( 8 ), PARAMETER :: EPSLON  = 1.0D-30    ! Small number
-      REAL( 8 ), PARAMETER :: MAXPRED = 1.0D+03    ! Upper limit on predicted conc
-      REAL( 8 ), PARAMETER :: ZERO    = 1.0D-40    ! effective zero 
+      REAL( 8 ), PARAMETER :: DTMIN   = 1.0D-08        ! Smallest time step allowed, min
+      REAL( 8 ), PARAMETER :: EPSLON  = 1.0D-40        ! Small number
+      REAL( 8 ), PARAMETER :: MAXPRED = 1.0D+03        ! Upper limit on predicted conc
+      REAL( 8 ), PARAMETER :: ZERO    = 1.0D-30        ! effective zero 
+      REAL( 8 ), PARAMETER :: ATOL    = 2.0D+05*EPSLON ! twice lowest trusted conc
 
 C..EXTERNAL FUNCTIONS:
 
@@ -253,8 +254,6 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 
                N_EBI_IT = N_EBI_IT + 1
 R3
-               CALL HRRATES
-
 c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 #ifdef hrdebug
                IF( LDEBUG ) THEN
@@ -275,21 +274,9 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c  Call routines to compute concentrations of groups 1-4
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-               CALL HRG1( DTC )
-
-               CALL HRG2( DTC )
-
-               CALL HRG3( DTC )
-
-               CALL HRG4( DTC )
-
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Do the Euler backward method
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+               CALL HRRATES
                CALL HRPRODLOSS
 
                DO EBI = 1, N_EBISP
@@ -301,6 +288,18 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 R4
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  Call routines to compute concentrations of groups 1-4
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+               CALL HRG1( DTC )
+
+               CALL HRG2( DTC )
+
+               CALL HRG3( DTC )
+
+               CALL HRG4( DTC )
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Check for convergence
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                LEBI_CONV = .TRUE.
@@ -309,10 +308,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                DO S = 1, NUMB_MECH_SPC
                   LEBISPFL( S ) = .FALSE.
                   YCP( S ) = MAX( ZERO, YCP( S ) )
-                  AERROR( S ) = ABS( YC(S)-YCP(S) ) 
-                  RERROR( S ) = AERROR( S ) / ABS( YC(S)+YCP(S) )
-                   IF( RERROR( S ) .GT. RTOL(S) .OR. AERROR( S ) .GT. 1.0D-5 )THEN
-!                 IF( RERROR( S ) .GT. RTOL(S)  )THEN
+                  AERROR( S ) = MAX( ABS( YC(S)-YCP(S) ), EPSLON ) 
+                  RERROR( S ) = AERROR( S ) / MAX( ATOL, ABS( YC(S)+YCP(S) ) )
+!                   IF( RERROR( S ) .GT. RTOL(S) .OR. AERROR( S ) .GT. 1.0D-5 )THEN
+                  IF( RERROR( S ) .GT. RTOL(S)  )THEN
                      LEBI_CONV     = .FALSE.
                      LEBISPFL( S ) = .TRUE.
                   END IF

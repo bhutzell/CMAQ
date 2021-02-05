@@ -347,7 +347,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Set reaction rate flags - indicates RXRAT reference
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       ALLOCATE( L_RXFLAG( NRXNS ) )
-      L_RXFLAG = .FALSE.
+      L_RXFLAG = .TRUE. ! .FALSE.
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Set SS reactannt flags 
