@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ===================== CCTMv5.3.1 Run Script ========================= 
+# ===================== CCTMv5.3.X Run Script ========================= 
 # Usage: run.cctm >&! cctm_2016_12US1.log &                                
 #
 # To report problems or request help with this script/program:
@@ -33,7 +33,7 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v531              #> Code Version
+ set VRSN      = v532              #> Code Version
  set PROC      = mpi               #> serial or mpi
  set MECH      = cb6r3_ae7_aq      #> Mechanism ID
  set EMIS      = 2016ff            #> Emission Inventory Details
@@ -91,7 +91,17 @@ else
 endif
 
 #> Define Execution ID: e.g. [CMAQ-Version-Info]_[User]_[Date]_[Time]
-setenv EXECUTION_ID "CMAQ_CCTM${VRSN}_`id -u -n`_`date -u +%Y%m%d_%H%M%S_%N`"    #> Inform IO/API of the Execution ID
+if ( ! -e ${BLD}/CCTM_${VRSN}.cfg ) then
+   set SHAID = ""
+else
+   set SHAID = `grep "sha_ID" ${BLD}/CCTM_${VRSN}.cfg | cut -c 13-22`
+   if ( $SHAID == not_a_repo ) then
+     set SHAID = ""
+   else
+     set SHAID = "_sha="$SHAID
+   endif
+endif
+setenv EXECUTION_ID "CMAQ_CCTM${VRSN}${SHAID}_`id -u -n`_`date -u +%Y%m%d_%H%M%S_%N`"    #> Inform IO/API of the Execution ID
 echo ""
 echo "---CMAQ EXECUTION ID: $EXECUTION_ID ---"
 
@@ -159,7 +169,10 @@ setenv CTM_HGBIDI N          #> mercury bi-directional flux for in-line depositi
                              #>    velocities [ default: N ]
 setenv CTM_SFC_HONO Y        #> surface HONO interaction [ default: Y ]
 setenv CTM_GRAV_SETL Y       #> vdiff aerosol gravitational sedimentation [ default: Y ]
-setenv CTM_BIOGEMIS Y        #> calculate in-line biogenic emissions [ default: N ]
+setenv CTM_BIOGEMIS_BEIS Y   #> calculate in-line biogenic emissions [ default: N ]
+setenv CTM_BIOGEMIS_MEGAN N  #> turns on MEGAN biogenic emission [ default: N ]
+setenv USE_MEGAN_LAI N       #> use separate LAI input file [ default: N ]
+
 
 #> Vertical Extraction Options
 setenv VERTEXT N
@@ -193,10 +206,6 @@ setenv NLAYS_PHOTDIAG "1"    #> Number of layers for PHOTDIAG2 and PHOTDIAG3 fro
                                                       #>   in PHOTDIAG2 and PHOTDIAG3 
                                                       #>   [ default: all wavelengths ]
 
-setenv CTM_PMDIAG N          #> Instantaneous Aerosol Diagnostic File [ default: Y ]
-setenv CTM_APMDIAG Y         #> Hourly-Average Aerosol Diagnostic File [ default: Y ]
-setenv APMDIAG_BLEV_ELEV "1 1"  #> layer range for average pmdiag = NLAYS
-
 setenv CTM_SSEMDIAG N        #> sea-spray emissions diagnostic file [ default: N ]
 setenv CTM_DUSTEM_DIAG N     #> windblown dust emissions diagnostic file [ default: N ]; 
                              #>     Ignore if CTM_WB_DUST = N
@@ -211,13 +220,13 @@ setenv CTM_WVEL Y            #> save derived vertical velocity component to conc
 #> Input Directories and Filenames
 # =====================================================================
 
-set ICpath    = $INPDIR/icbc              #> initial conditions input directory
-set BCpath    = $INPDIR/icbc              #> boundary conditions input directory
+set ICpath    = $INPDIR/icbc                                       #> initial conditions input directory
+set BCpath    = $INPDIR/icbc                                       #> boundary conditions input directory
 set EMISpath  = $INPDIR/emis/cb6r3_ae6_20190221/cmaq_ready/gridded #> surface emissions input directory
-set EMISpath2 = $INPDIR/emis/cb6r3_ae6_20190221/cmaq_ready/rwc	#> surface residential wood combustion emissions directory
-set IN_PTpath = $INPDIR/emis/cb6r3_ae6_20190221/cmaq_ready  #> elevated emissions input directory (in-line point only)
-set IN_LTpath = $INPDIR/met/lightning     #> lightning NOx input directory
-set METpath   = $INPDIR/met/mcip_v43_wrf_v381_ltng              #> meteorology input directory
+set EMISpath2 = $INPDIR/emis/cb6r3_ae6_20190221/cmaq_ready/rwc	   #> surface residential wood combustion emissions directory
+set IN_PTpath = $INPDIR/emis/cb6r3_ae6_20190221/cmaq_ready         #> elevated emissions input directory (in-line point only)
+set IN_LTpath = $INPDIR/met/lightning                              #> lightning NOx input directory
+set METpath   = $INPDIR/met/mcip_v50_wrf_v411_ltng_compressed      #> meteorology input directory
 #set JVALpath  = $INPDIR/jproc            #> offline photolysis rate table directory
 set OMIpath   = $BLD                      #> ozone column data for the photolysis model
 set LUpath    = $INPDIR/surface           #> BELD landuse data for windblown dust model
@@ -285,21 +294,32 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #set JVALfile  = JTABLE_${YYYYJJJ}
 
   #> Ozone column data
-  set OMIfile   = OMI_1979_to_2017.dat
+  set OMIfile   = OMI_1979_to_2019.dat
 
   #> Optics file
   set OPTfile = PHOT_OPTICS.dat
 
   #> MCIP meteorology files
-  setenv GRID_BDY_2D $METpath/GRIDBDY2D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv GRID_CRO_2D $METpath/GRIDCRO2D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv GRID_CRO_3D $METpath/GRIDCRO3D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv GRID_DOT_2D $METpath/GRIDDOT2D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_CRO_2D  $METpath/METCRO2D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_CRO_3D  $METpath/METCRO3D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_DOT_3D  $METpath/METDOT3D.$GRID_NAME.${NZ}L.$YYMMDD
-  setenv MET_BDY_3D  $METpath/METBDY3D.$GRID_NAME.${NZ}L.$YYMMDD
-# setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.$GRID_NAME.${NZ}L.$YYMMDD
+  setenv GRID_BDY_2D $METpath/GRIDBDY2D_$YYMMDD".nc4"
+  setenv GRID_CRO_2D $METpath/GRIDCRO2D_$YYMMDD".nc4"
+# setenv GRID_CRO_3D $METpath/GRIDCRO3D_$YYMMDD".nc4"
+  setenv GRID_DOT_2D $METpath/GRIDDOT2D_$YYMMDD".nc4"
+  setenv MET_CRO_2D  $METpath/METCRO2D_$YYMMDD".nc4"
+  setenv MET_CRO_3D  $METpath/METCRO3D_$YYMMDD".nc4"
+  setenv MET_DOT_3D  $METpath/METDOT3D_$YYMMDD".nc4"
+  setenv MET_BDY_3D  $METpath/METBDY3D_$YYMMDD".nc4"
+  setenv LUFRAC_CRO  $METpath/LUFRAC_CRO_$YYMMDD".nc4"
+
+  set MET_FILES = ( ${GRID_BDY_2D} ${GRID_CRO_2D} ${GRID_DOT_2D} \
+                    ${MET_CRO_2D}  ${MET_CRO_3D}  ${MET_DOT_3D}  ${MET_BDY_3D}  \
+                    ${LUFRAC_CRO} )
+
+  foreach met_file ( ${MET_FILES} )
+    if( ! ( -e ${met_file} ) )then
+      \ls $met_file
+      exit()
+    endif
+  end
 
   #> Emissions Control File
   #>
@@ -413,7 +433,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
 
   #> In-line biogenic emissions configuration
-  if ( $CTM_BIOGEMIS == 'Y' ) then   
+  if ( $CTM_BIOGEMIS_BEIS == 'Y' ) then   
      set IN_BEISpath = ${INPDIR}/surface
      setenv GSPRO      ${BLD}/gspro_biogenics.txt
      setenv B3GRD      $IN_BEISpath/b3grd.smoke30_beis361.12US1.2011NLCD_FIA5.1_CDL_norm_v3.ncf
@@ -423,6 +443,15 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      setenv PX_VERSION Y     #> MCIP is PX version? [ default: N ]
      setenv SOILINP    $OUTDIR/CCTM_SOILOUT_${RUNID}_${YESTERDAY}.nc
                              #> Biogenic NO soil input file; ignore if INITIAL_RUN = Y
+  endif
+  if ( $CTM_BIOGEMIS_MEGAN == 'Y' ) then
+    setenv SOILINP    $OUTDIR/CCTM_SOILOUT_${RUNID}_${YESTERDAY}.nc
+                             #> Biogenic NO soil input file; ignore if INITIAL_RUN = Y
+                             #>                            ; ignore if IGNORE_SOILINP = Y
+         setenv MEGAN_CTS /work/MOD3DATA/2016_12US1/surface/megan/CT3_CONUS_12km.ncf
+         setenv MEGAN_EFS /work/MOD3DATA/2016_12US1/surface/megan/EFMAPS_CONUS_12km.ncf
+         setenv MEGAN_LAI /work/MOD3DATA/2016_12US1/surface/megan/LAI3_CONUS_12km.ncf
+         setenv MEGAN_LDF /work/MOD3DATA/2016_12US1/surface/megan/LDF_CONUS_12km.ncf
   endif
 
   #> Windblown dust emissions configuration
