@@ -188,9 +188,9 @@ cyqwang...end
       JTIME = STIME3D
       NSPCTAG = NVARS3D
 
-Ckrt....assign spc_name( nspc_sa, ntag_sa ) to spcname1( nspc_sa )
+Ckrt....assign isam_spec( nspc_sa, ntag_sa ) to spcname1( nspc_sa )
       DO S = 1, NSPC_SA
-        SPCNAME1( S ) = SPC_NAME( S, NTAG_SA )
+        SPCNAME1( S ) = ISAM_SPEC( S, NTAG_SA )
       ENDDO ! s
 
 Ckrt allocate data-loading array 
