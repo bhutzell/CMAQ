@@ -119,9 +119,9 @@ Ckrt Identify species index in ISAM array
         LAE_CL  = .FALSE.
         LAE_SO4 = .FALSE.
 
-        JNH3  = INDEX1( 'NH3', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
-        JNH4I = INDEX1( 'ANH4I', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
-        JNH4J = INDEX1( 'ANH4J', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JNH3  = INDEX1( 'NH3', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
+        JNH4I = INDEX1( 'ANH4I', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
+        JNH4J = INDEX1( 'ANH4J', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
         IF ( JNH3 .GT. 0 .AND. JNH4I .GT. 0 .AND. JNH4J .GT. 0 ) THEN
           LAE_NH4 = .TRUE.
           CNH3  = SPC_INDEX( JNH3, 2 )
@@ -129,9 +129,9 @@ Ckrt Identify species index in ISAM array
           CNH4J = SPC_INDEX( JNH4J,2 )
         END IF
 
-        JHNO3 = INDEX1( 'HNO3', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
-        JNO3I = INDEX1( 'ANO3I', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
-        JNO3J = INDEX1( 'ANO3J', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JHNO3 = INDEX1( 'HNO3', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
+        JNO3I = INDEX1( 'ANO3I', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
+        JNO3J = INDEX1( 'ANO3J', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
         IF ( JHNO3 .GT. 0 .AND. JNO3I .GT. 0 .AND. JNO3J .GT. 0 ) THEN
           LAE_NO3 = .TRUE.
           CHNO3 = SPC_INDEX( JHNO3,2 )
@@ -139,9 +139,9 @@ Ckrt Identify species index in ISAM array
           CNO3J = SPC_INDEX( JNO3J,2 )
         END IF
  
-        JHCL = INDEX1( 'HCL',  NSPC_SA, SPC_NAME( :,OTHRTAG ) )
-        JCLI = INDEX1( 'ACLI', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
-        JCLJ = INDEX1( 'ACLJ', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
+        JHCL = INDEX1( 'HCL',  NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
+        JCLI = INDEX1( 'ACLI', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
+        JCLJ = INDEX1( 'ACLJ', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
         IF ( JHCL .GT. 0 .AND. JCLI .GT. 0 .AND. JCLJ .GT. 0 ) THEN
           LAE_CL = .TRUE.
           CHCL = SPC_INDEX( JHCL,2 )
@@ -149,10 +149,10 @@ Ckrt Identify species index in ISAM array
           CCLJ = SPC_INDEX( JCLJ,2 )
         END IF
  
-        JSULF = INDEX1( 'SULF', NSPC_SA, SPC_NAME( :,OTHRTAG ) )  
-        JSO4I = INDEX1( 'ASO4I', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
-        JSO4J = INDEX1( 'ASO4J', NSPC_SA, SPC_NAME( :,OTHRTAG ) )
-        JSRXN = INDEX1( 'SULRXN', NSPC_SA, SPC_NAME( :,OTHRTAG ) )  
+        JSULF = INDEX1( 'SULF', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )  
+        JSO4I = INDEX1( 'ASO4I', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
+        JSO4J = INDEX1( 'ASO4J', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )
+        JSRXN = INDEX1( 'SULRXN', NSPC_SA, ISAM_SPEC( :,OTHRTAG ) )  
         IF ( JSULF .GT. 0 .AND. JSO4I .GT. 0 .AND. JSO4J .GT. 0 
      &       .AND. JSRXN .GT. 0 ) LAE_SO4 = .TRUE.
 
@@ -166,7 +166,7 @@ Ckrt Identify species index in ISAM array
         MAP_AEROtoSA( :,: ) = 0
         DO IM = 1,N_MODE
             DO IAER = 1,N_AEROSPC
-                INDX = INDEX1( AEROSPC( IAER )%NAME( IM ), NSPC_SA, SPC_NAME( :,2 ) )
+                INDX = INDEX1( AEROSPC( IAER )%NAME( IM ), NSPC_SA, ISAM_SPEC( :,2 ) )
                 IF ( INDX .NE. 0 ) MAP_AEROtoSA( IAER,IM ) = INDX
             END DO
         END DO
