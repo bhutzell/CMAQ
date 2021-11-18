@@ -169,12 +169,12 @@ run_cctm.csh |& tee run_cctm.log
 
 ### 5.7.1 CCTM Logfiles
 
-The CCTM simulation will write two types of logfile, a master logfile (e.g. run_cctm.log) and processor-specific logfiles that have the name convention:  
+The CCTM simulation will write two types of logfile, a main logfile (e.g. run_cctm.log) and processor-specific logfiles that have the name convention:  
 ```
 CTM_LOG_[ProcessorID].v53_[compiler]_[data_name]/_[RUNDATE].log
 ```
 
-The master logfile contains extensive metadata and useful information about the details of your simulation. The following examples describe some of this information:  
+The main logfile contains extensive metadata and useful information about the details of your simulation. The following examples describe some of this information:  
 ```
 Start Model Run At  Tue Apr 9 08:18:06 EDT 2019
 Compiler is set to intel
@@ -463,6 +463,6 @@ Check the last few lines of the CCTM output log for messages to help diagnose wh
 <!-- BEGIN COMMENT -->
 
 [<< Previous Chapter](CMAQ_UG_ch04_model_inputs.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch06_model_configuration_options.md)<br>
-CMAQ User's Guide (c) 2020<br>
+CMAQ User's Guide (c) 2021<br>
 
 <!-- END COMMENT -->
