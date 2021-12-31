@@ -126,7 +126,7 @@ C----------------------------------------------------------------------
 
 C Number of aerosol species and modes
 
-      Integer, Parameter :: n_aerolist = 133    ! number of aero species
+      Integer, Parameter :: n_aerolist = 137    ! number of aero species
       Integer, Parameter :: n_mode = 3          ! number of modes:
                                                 ! 1 = Aitken
                                                 ! 2 = accumulation
@@ -258,8 +258,10 @@ C                     ---------- -------- ------- ------------------------------
      & spcs_list_type('AISO2   ', cm_set, 1400.0, 'SVISO2 ','ISOPRXN',.0288,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Isoprene SOA 2
      & spcs_list_type('AISO3   ', cm_set, 1400.0, '       ','       ',.0000,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.21), ! Isoprene SOA 3
      & spcs_list_type('ASQT    ', cm_set, 1400.0, 'SVSQT  ','SESQRXN',1.537,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), ! Sesquiterpene SOA
-     & spcs_list_type('ATRPN   ', cm_set, 1400.0, 'TRPN   ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! Monoterpene Nitrate SOA
-     & spcs_list_type('AISON   ', cm_set, 1400.0, 'ISON   ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.32), ! Isoprene Nitrate SOA
+     & spcs_list_type('ATRPN   ', cm_set, 1400.0, 'TRPN   ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! Monoterpene Nitrate SOA
+     & spcs_list_type('AISON   ', cm_set, 1400.0, 'ISON   ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.17), ! Isoprene Nitrate SOA
+     & spcs_list_type('AHOM    ', cm_set, 1400.0, 'HOM    ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! HOM SOA
+     & spcs_list_type('AELHOM  ', cm_set, 1400.0, 'ELHOM  ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.09), ! ELHOM SOA
      & spcs_list_type('APAH1   ', cm_set, 1480.0, 'SVPAH1 ','PAHNRXN',0.210,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! PAH SOA 1
      & spcs_list_type('APAH2   ', cm_set, 1480.0, 'SVPAH2 ','PAHNRXN',1.070,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.06), ! PAH SOA 2
      & spcs_list_type('APAH3   ', cm_set, 1550.0, '       ','PAHHRXN',0.730,'IRV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.09), ! PAH SOA 3               #40
@@ -279,6 +281,11 @@ C                     ---------- -------- ------- ------------------------------
      & spcs_list_type('ADIM    ', cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), !
      & spcs_list_type('AIMGA   ', cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.18), !
      & spcs_list_type('AIMOS   ', cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.36), !
+
+       ! Associated with cracmm1
+     & spcs_list_type('AISO3NOS', cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Iso. nonsulfated SOA
+     & spcs_list_type('AISO3OS ', cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.30), ! Iso. Organosulfate SOA
+
                                                                                          
        ! Updated monoterpene SOA following Saha and Grieshop ES&T 2016                  
      & spcs_list_type('AMT1    ', cm_set, 1400.0, 'SVMT1  ','TRPRXN ',0.040,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! MT SOA Lowest Volatility
@@ -330,7 +337,7 @@ C                     ---------- -------- ------- ------------------------------
      & spcs_list_type('AROCP1OXY1',cm_set,1400.0,'VROCP1OXY1','     ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.09), ! 
      & spcs_list_type('AROCP1OXY3',cm_set,1400.0,'VROCP1OXY3','     ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.09), ! 
      & spcs_list_type('AROCP2OXY2',cm_set,1400.0,'VROCP2OXY2','     ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.08), ! 
-     & spcs_list_type('AROCP2OXY2',cm_set,1400.0,'VROCP2OXY2','     ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.08), ! 
+     & spcs_list_type('AROCP3OXY2',cm_set,1400.0,'VROCP3OXY2','     ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.08), ! 
               
        ! The following species are associated with the Multi-Pollutant code
      & spcs_list_type('ANI     ', cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Nickel
