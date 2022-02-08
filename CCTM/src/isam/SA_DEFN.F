@@ -22,8 +22,12 @@
 ! KWOK: Created Oct 5, 2010
 ! 29 Oct 18 L.Zhou, S.Napelenok: update for cmaq 5.3 release
 ! 35 Mar 19 S.Napelenok: recode REGION handling and clean-up for release
-! 
+! 10 Jun 21 G. Sarwar: Added CB6R3M
+! 23 Jun 21 G. Sarwar: Replaced CB6R3M with CB6R5M
+! 25 June 21 G. Sarwar: Removed CB6R3_AE6_AQ since it is not suported in CMAQ any more
 
+      USE RUNTIME_VARS, ONLY : VOC_NOX_TRANS, ISAM_NOX_CASE, ISAM_VOC_CASE
+      
       IMPLICIT NONE
 
       SAVE
@@ -34,6 +38,7 @@
 
 c...Tagging maps
       CHARACTER( 16 ), ALLOCATABLE :: ISAM_SPEC( :,: )
+      INTEGER, ALLOCATABLE, SAVE   :: SPC_INDEX( :,: )
       INTEGER, ALLOCATABLE, SAVE   :: MAP_SAtoCGR( : )
       INTEGER, ALLOCATABLE, SAVE   :: MAP_CGRtoSA( : )
       LOGICAL, ALLOCATABLE, SAVE   :: L_ISAM_AERO( : )
@@ -43,6 +48,7 @@ c...Tagging maps
       INTEGER, ALLOCATABLE, SAVE   :: MAP_AEROCTRtoSA( : )
       LOGICAL, ALLOCATABLE, SAVE   :: IS_SPC_AEROSOL( :,: )
       LOGICAL, ALLOCATABLE, SAVE   :: TRANSPORT_SPC ( : )
+      LOGICAL, ALLOCATABLE, SAVE   :: SPECIES_BIAS( :,: )
       INTEGER, ALLOCATABLE, SAVE   :: STREAM_TO_TAG ( :,: )
       INTEGER, ALLOCATABLE, SAVE   :: TAGS_PER_STREAM( : )
       INTEGER, ALLOCATABLE, SAVE   :: MAP_DIFFtoSA( : )
@@ -54,6 +60,8 @@ c...Tagging maps
       INTEGER ::     NTAG_SA
       INTEGER ::     NSPC_TRANSPORT
       INTEGER ::     NSPC_SA_ORG
+      INTEGER ::     ISAM_CHEMISTRY_BIAS 
+      INTEGER, PARAMETER :: NCONSTRAINTS = 4
 
 c...Define Allocatable Apportionment Arrays
       REAL, POINTER :: ISAM  ( :,:,:,:,: )
@@ -1302,6 +1310,7 @@ C
         
         CHARACTER( 16 ), ALLOCATABLE :: SPC_LIST( : )
         LOGICAL,         ALLOCATABLE :: SPC_KEEP( : )
+        LOGICAL,         ALLOCATABLE :: SPC_BIAS( :,: )
         
         INTEGER FRST, LAST, CMAQ_ADV
 
@@ -1375,6 +1384,12 @@ c----------------------------------------------------------
 
         EFLAG = .FALSE.
         DO J_SPC = 1, NSPC_SA
+          IF ( SPC_INDEX( J_SPC,2 ) .LT. 1 ) THEN
+             write(logdev,'(A)')'Tracked species '
+     &       // TRIM( ISAM_SPEC( J_SPC,ICONTAG ) ) //
+     &          ' not found among model species '
+             EFLAG = .TRUE.
+          END IF
           IF ( MAP_SAtoCGR( J_SPC ) .LT. 1 ) THEN
              write(logdev,'(A,A,A)')'Tracked species '
      &       // TRIM( ISAM_SPEC( J_SPC,ICONTAG ) ) //
