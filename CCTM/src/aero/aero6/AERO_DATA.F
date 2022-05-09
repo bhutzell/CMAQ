@@ -126,6 +126,10 @@ C----------------------------------------------------------------------
 
       Implicit None
 
+C Define Logical values as T and F for the aerospc table
+      Logical, Parameter, Private :: T = .true.
+      Logical, Parameter, Private :: F = .false.
+
 C Number of aerosol species and modes
 
       Integer, Parameter :: n_aerolist = 111    ! number of aero species
@@ -134,6 +138,7 @@ C Number of aerosol species and modes
       Integer, Parameter :: iacc = 2            ! 2 = accumulation 
       Integer, Parameter :: icor = 3            ! 3 = coarse       
       
+      Logical, Parameter :: reqd_modes( n_mode ) = (/ T,T,T /)
       Character(1), Parameter :: modesuff( n_mode ) = (/ 'I','J','K' /)
 
       Integer, Save :: n_aerospc ! number of aero species
@@ -171,10 +176,6 @@ C by analytical approximation (True) or by Gauss-Hermite quadrature (False)
                                                   ! for coagulation 
                                                   ! 2 = number and volume
                                                   ! 3 = number, volume, and surface area
-
-C Define Logical values as T and F for the aerospc table
-      Logical, Parameter, Private :: T = .true.
-      Logical, Parameter, Private :: F = .false.
 
 C-------------------------------------------------------------------------------------------------------
 
@@ -256,25 +257,25 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('AORGH2O ',F,T,F, cm_set, 1000.0, '       ','       ',0.0  ,'H2O',T,F,  0,  0.0, 0.0,F, 'WATER ', 0.00), ! Organic Water
      & spcs_list_type('AH3OP   ',T,T,T, cm_set, 1000.0, '       ','       ',0.0  ,'H2O',T,T,  0,  0.0, 0.0,F, 'WATER ', 0.00), ! Hydronium
      & spcs_list_type('AOTHR   ',T,T,F, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  0,  1.0, 1.0,F, 'DUST  ', 0.00), ! Other                   #20
-     & spcs_list_type('AALK1   ',F,T,F, cm_set, 1400.0, 'SVALK1 ','ALKRXN ',.0334,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), ! Alkane SOA 1            
-     & spcs_list_type('AALK2   ',F,T,F, cm_set, 1400.0, 'SVALK2 ','ALKRXN ',.2164,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.06), ! Alkane SOA 2
-     & spcs_list_type('AXYL1   ',F,T,F, cm_set, 1480.0, 'SVXYL1 ','XYLNRXN',.0310,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.17), ! Xylene SOA 1
-     & spcs_list_type('AXYL2   ',F,T,F, cm_set, 1480.0, 'SVXYL2 ','XYLNRXN',.0900,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! Xylene SOA 2
+     & spcs_list_type('AALK1   ',F,T,F, cm_set, 1400.0, 'SVALK1 ','ALKRXN ',.0334,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), ! Alkane SOA 1            
+     & spcs_list_type('AALK2   ',F,T,F, cm_set, 1400.0, 'SVALK2 ','ALKRXN ',.2164,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.06), ! Alkane SOA 2
+     & spcs_list_type('AXYL1   ',F,T,F, cm_set, 1480.0, 'SVXYL1 ','XYLNRXN',.0310,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.17), ! Xylene SOA 1
+     & spcs_list_type('AXYL2   ',F,T,F, cm_set, 1480.0, 'SVXYL2 ','XYLNRXN',.0900,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! Xylene SOA 2
      & spcs_list_type('AXYL3   ',F,T,F, cm_set, 1330.0, '       ','XYLHRXN',.3600,'IRV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Xylene SOA 3
-     & spcs_list_type('ATOL1   ',F,T,F, cm_set, 1240.0, 'SVTOL1 ','TOLNRXN',.0580,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Toluene SOA 1
-     & spcs_list_type('ATOL2   ',F,T,F, cm_set, 1240.0, 'SVTOL2 ','TOLNRXN',.1130,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! Toluene SOA 2
+     & spcs_list_type('ATOL1   ',F,T,F, cm_set, 1240.0, 'SVTOL1 ','TOLNRXN',.0580,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Toluene SOA 1
+     & spcs_list_type('ATOL2   ',F,T,F, cm_set, 1240.0, 'SVTOL2 ','TOLNRXN',.1130,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! Toluene SOA 2
      & spcs_list_type('ATOL3   ',F,T,F, cm_set, 1450.0, '       ','TOLHRXN',.3000,'IRV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.20), ! Toluene SOA 3
-     & spcs_list_type('ABNZ1   ',F,T,F, cm_set, 1400.0, 'SVBNZ1 ','BNZNRXN',.0720,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.19), ! Benzene SOA 1
-     & spcs_list_type('ABNZ2   ',F,T,F, cm_set, 1400.0, 'SVBNZ2 ','BNZNRXN',.8880,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Benzene SOA 2           #30
+     & spcs_list_type('ABNZ1   ',F,T,F, cm_set, 1400.0, 'SVBNZ1 ','BNZNRXN',.0720,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.19), ! Benzene SOA 1
+     & spcs_list_type('ABNZ2   ',F,T,F, cm_set, 1400.0, 'SVBNZ2 ','BNZNRXN',.8880,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Benzene SOA 2           #30
      & spcs_list_type('ABNZ3   ',F,T,F, cm_set, 1400.0, '       ','BNZHRXN',.3700,'IRV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.23), ! Benzene SOA 3           
-     & spcs_list_type('ATRP1   ',F,T,F, cm_set, 1400.0, 'SVTRP1 ','TRPRXN ',.1393,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! Terpene SOA 1
-     & spcs_list_type('ATRP2   ',F,T,F, cm_set, 1400.0, 'SVTRP2 ','TRPRXN ',.4542,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! Terpene SOA 2
-     & spcs_list_type('AISO1   ',F,T,F, cm_set, 1400.0, 'SVISO1 ','ISOPRXN',.2320,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14), ! Isoprene SOA 1
-     & spcs_list_type('AISO2   ',F,T,F, cm_set, 1400.0, 'SVISO2 ','ISOPRXN',.0288,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Isoprene SOA 2
+     & spcs_list_type('ATRP1   ',F,T,F, cm_set, 1400.0, 'SVTRP1 ','TRPRXN ',.1393,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! Terpene SOA 1
+     & spcs_list_type('ATRP2   ',F,T,F, cm_set, 1400.0, 'SVTRP2 ','TRPRXN ',.4542,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! Terpene SOA 2
+     & spcs_list_type('AISO1   ',F,T,F, cm_set, 1400.0, 'SVISO1 ','ISOPRXN',.2320,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14), ! Isoprene SOA 1
+     & spcs_list_type('AISO2   ',F,T,F, cm_set, 1400.0, 'SVISO2 ','ISOPRXN',.0288,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Isoprene SOA 2
      & spcs_list_type('AISO3   ',F,T,F, cm_set, 1400.0, '       ','       ',.0000,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.21), ! Isoprene SOA 3
-     & spcs_list_type('ASQT    ',F,T,F, cm_set, 1400.0, 'SVSQT  ','SESQRXN',1.537,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), ! Sesquiterpene SOA
-     & spcs_list_type('APAH1   ',F,T,F, cm_set, 1480.0, 'SVPAH1 ','PAHNRXN',0.210,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! PAH SOA 1
-     & spcs_list_type('APAH2   ',F,T,F, cm_set, 1480.0, 'SVPAH2 ','PAHNRXN',1.070,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.06), ! PAH SOA 2
+     & spcs_list_type('ASQT    ',F,T,F, cm_set, 1400.0, 'SVSQT  ','SESQRXN',1.537,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), ! Sesquiterpene SOA
+     & spcs_list_type('APAH1   ',F,T,F, cm_set, 1480.0, 'SVPAH1 ','PAHNRXN',0.210,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! PAH SOA 1
+     & spcs_list_type('APAH2   ',F,T,F, cm_set, 1480.0, 'SVPAH2 ','PAHNRXN',1.070,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.06), ! PAH SOA 2
      & spcs_list_type('APAH3   ',F,T,F, cm_set, 1550.0, '       ','PAHHRXN',0.730,'IRV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.09), ! PAH SOA 3               #40
      & spcs_list_type('AOLGA   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.18), ! Anth. Oligomer SOA      
      & spcs_list_type('AOLGB   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! Biogenic Oligomer SOA
@@ -284,8 +285,8 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('ASEACAT ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! SeaSpray Cations        
                                                                                          
        ! Associated with ae6i                                                                
-     & spcs_list_type('AMTNO3  ',F,T,F, cm_set, 1400.0, 'MTNO3  ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! Monoterpene Nitrate SOA
-     & spcs_list_type('AISOPNN ',F,T,F, cm_set, 1400.0, 'ISOPNN ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.32), ! Isoprene Nitrate SOA
+     & spcs_list_type('AMTNO3  ',F,T,F, cm_set, 1400.0, 'MTNO3  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! Monoterpene Nitrate SOA
+     & spcs_list_type('AISOPNN ',F,T,F, cm_set, 1400.0, 'ISOPNN ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.32), ! Isoprene Nitrate SOA
      & spcs_list_type('AMTHYD  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), ! 
      & spcs_list_type('AIETET  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Iso. Tetrol SOA         #50
      & spcs_list_type('AIEOS   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.30), ! Iso. Organosulfate SOA  
@@ -294,35 +295,35 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('AIMOS   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.36), !
                                                                                          
        ! Updated monoterpene SOA following Saha and Grieshop ES&T 2016                  
-     & spcs_list_type('AMT1    ',F,T,F, cm_set, 1400.0, 'SVMT1  ','TRPRXN ',0.040,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! MT SOA Lowest Volatility
-     & spcs_list_type('AMT2    ',F,T,F, cm_set, 1400.0, 'SVMT2  ','TRPRXN ',0.032,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! 
-     & spcs_list_type('AMT3    ',F,T,F, cm_set, 1400.0, 'SVMT3  ','TRPRXN ',0.032,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.09), !
-     & spcs_list_type('AMT4    ',F,T,F, cm_set, 1400.0, 'SVMT4  ','TRPRXN ',0.103,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), !
-     & spcs_list_type('AMT5    ',F,T,F, cm_set, 1400.0, 'SVMT5  ','TRPRXN ',0.143,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), !
-     & spcs_list_type('AMT6    ',F,T,F, cm_set, 1400.0, 'SVMT6  ','TRPRXN ',0.285,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.05), !                         #60
-     & spcs_list_type('AMT7    ',F,T,F, cm_set, 1400.0, 'SVMT7  ','TRPRXN ',0.160,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.06), ! MT SOA Highest Volatility
+     & spcs_list_type('AMT1    ',F,T,F, cm_set, 1400.0, 'SVMT1  ','TRPRXN ',0.040,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! MT SOA Lowest Volatility
+     & spcs_list_type('AMT2    ',F,T,F, cm_set, 1400.0, 'SVMT2  ','TRPRXN ',0.032,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! 
+     & spcs_list_type('AMT3    ',F,T,F, cm_set, 1400.0, 'SVMT3  ','TRPRXN ',0.032,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.09), !
+     & spcs_list_type('AMT4    ',F,T,F, cm_set, 1400.0, 'SVMT4  ','TRPRXN ',0.103,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), !
+     & spcs_list_type('AMT5    ',F,T,F, cm_set, 1400.0, 'SVMT5  ','TRPRXN ',0.143,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), !
+     & spcs_list_type('AMT6    ',F,T,F, cm_set, 1400.0, 'SVMT6  ','TRPRXN ',0.285,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.05), !                         #60
+     & spcs_list_type('AMT7    ',F,T,F, cm_set, 1400.0, 'SVMT7  ','TRPRXN ',0.160,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.06), ! MT SOA Highest Volatility
                                                                                        
        ! ae6i and cb6                                                                 
-     & spcs_list_type('AGLY    ',F,T,F, cm_set, 1400.0, '      ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! Glyoxal SOA
+     & spcs_list_type('AGLY    ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! Glyoxal SOA
                                                                                       
        ! Semivolatile POA                                                             
-     & spcs_list_type('ALVPO1  ',T,T,F, cm_set, 1400.0, 'VLVPO1 ','       ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.05), ! LV-POA
-     & spcs_list_type('ASVPO1  ',T,T,F, cm_set, 1400.0, 'VSVPO1 ','       ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.05), ! SV-POA 1
-     & spcs_list_type('ASVPO2  ',T,T,F, cm_set, 1400.0, 'VSVPO2 ','       ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.04), ! SV-POA 2
-     & spcs_list_type('ASVPO3  ',T,T,F, cm_set, 1400.0, 'VSVPO3 ','       ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! SV-POA 3
-     & spcs_list_type('AIVPO1  ',T,T,F, cm_set, 1400.0, 'VIVPO1 ','       ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! IV-POA 
-     & spcs_list_type('ALVOO1  ',T,T,F, cm_set, 1400.0, 'VLVOO1 ','       ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.15), ! LV-SOA 1                
-     & spcs_list_type('ALVOO2  ',T,T,F, cm_set, 1400.0, 'VLVOO2 ','       ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.13), ! LV-SOA 2
-     & spcs_list_type('ASVOO1  ',T,T,F, cm_set, 1400.0, 'VSVOO1 ','       ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.11), ! SV-SOA 1                #70
-     & spcs_list_type('ASVOO2  ',T,T,F, cm_set, 1400.0, 'VSVOO2 ','       ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.09), ! SV-SOA 2
-     & spcs_list_type('ASVOO3  ',T,T,F, cm_set, 1400.0, 'VSVOO3 ','       ',0.0  ,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.08), ! SV-SOA 3
-     & spcs_list_type('APCSO   ',T,T,F, cm_set, 1400.0, 'LVPCSOG','PCSOARXN',1.0,'REV',T,F,  0,  4.0, 6.1,T, 'DUST  ', 0.12), ! pcSOA
+     & spcs_list_type('ALVPO1  ',T,T,F, cm_set, 1400.0, 'VLVPO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.05), ! LV-POA
+     & spcs_list_type('ASVPO1  ',T,T,F, cm_set, 1400.0, 'VSVPO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.05), ! SV-POA 1
+     & spcs_list_type('ASVPO2  ',T,T,F, cm_set, 1400.0, 'VSVPO2 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.04), ! SV-POA 2
+     & spcs_list_type('ASVPO3  ',F,T,F, cm_set, 1400.0, 'VSVPO3 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! SV-POA 3
+     & spcs_list_type('AIVPO1  ',F,T,F, cm_set, 1400.0, 'VIVPO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! IV-POA 
+     & spcs_list_type('ALVOO1  ',T,T,F, cm_set, 1400.0, 'VLVOO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.15), ! LV-SOA 1                
+     & spcs_list_type('ALVOO2  ',T,T,F, cm_set, 1400.0, 'VLVOO2 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.13), ! LV-SOA 2
+     & spcs_list_type('ASVOO1  ',T,T,F, cm_set, 1400.0, 'VSVOO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.11), ! SV-SOA 1                #70
+     & spcs_list_type('ASVOO2  ',T,T,F, cm_set, 1400.0, 'VSVOO2 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.09), ! SV-SOA 2
+     & spcs_list_type('ASVOO3  ',F,T,F, cm_set, 1400.0, 'VSVOO3 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.08), ! SV-SOA 3
+     & spcs_list_type('APCSO   ',F,T,F, cm_set, 1400.0, 'LVPCSOG','PCSOARXN',1.0 ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.12), ! pcSOA
                                                                                   
        ! Lumped anthropogenic SOA (introduced aero7, M. Qin, 8/2018)
      & spcs_list_type('AAVB1   ',F,T,F, cm_set, 1400.0, 'SVAVB1 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.20),
-     & spcs_list_type('AAVB2   ',F,T,F, cm_set, 1400.0, 'SVAVB2 ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15),
-     & spcs_list_type('AAVB3   ',F,T,F, cm_set, 1400.0, 'SVAVB3 ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14),
-     & spcs_list_type('AAVB4   ',F,T,F, cm_set, 1400.0, 'SVAVB4 ','       ',0.0  ,'REV',T,F,  0,  2.8, 6.1,T, 'DUST  ', 0.12),
+     & spcs_list_type('AAVB2   ',F,T,F, cm_set, 1400.0, 'SVAVB2 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15),
+     & spcs_list_type('AAVB3   ',F,T,F, cm_set, 1400.0, 'SVAVB3 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14),
+     & spcs_list_type('AAVB4   ',F,T,F, cm_set, 1400.0, 'SVAVB4 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.12),
                                                           
        ! The following species are associated with the Multi-Pollutant code
      & spcs_list_type('ANI     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Nickel
@@ -2111,259 +2112,3 @@ C Local variables:
 
       End Module aero_data
  
-C-----------------------------------------------------------------------
-      Subroutine process_aero_nml_modes
-          
-C         This function expands the AE namelist rows to account for 
-C         mode-specific variables. If just one mode is requested for an 
-C         aerosol species, then no rows are added. If more than one mode
-C         is requested, then rows are added to accomodate those. 
-C
-C         Ben Murphy 2022-03-25
-C-----------------------------------------------------------------------
-          Use aero_data, only : n_aerolist, aerolist, modesuff,
-     &                          iait, iacc, icor
-          Use runtime_vars, only : log_message, log_subheading, logdev,
-     &                             outdev
-          Use cgrid_spcs_types
-          Use utilio_defn, only : index1, xstat2
-
-          Implicit None
-
-          Type(species_data_reg_2) :: aedat( size( ae_species_data,1 ) )
-          Type(species_data_reg_2) :: aedat_mode( size( ae_species_data,1 ) )
-
-          integer nsp2, naero
-
-          Integer isp, im, iaer, iost
-          Character(300) xmsg
-          Character(20) :: pname = 'process_aero_species'
-                    
-          aedat = ae_species_data
-          aedat_mode = aedat
-          nsp2 = 0
-
-          call log_message( LOGDEV,"")
-          Call log_subheading( LOGDEV, "Add Modal Dimension to CMAQ Aerosol Species" )
-          call log_message( LOGDEV,"")
-
-          do isp = 1,size( aedat,1 )
-              if ( aedat(isp)%species_name .EQ. '' ) EXIT
-
-              ! Get Index on Aerosol Table
-              iaer = index1( aedat(isp)%species_name, 
-     &                       n_aerolist, aerolist(:)%bulkname )
-              if ( iaer . eq. 0 .and. 
-     &             trim(aedat(isp)%species_name) .ne. 'NUM' .and.
-     &             trim(aedat(isp)%species_name) .ne. 'SRF'      ) then
-                  xmsg = 'An aerosol chemical species appears on the AE '//
-     &                    'namelist that is not available in AERO_DATA. Please '//
-     &                    'see the aerolist table.'
-                  Call log_message( OUTDEV, 'Error: '//xmsg )
-                  call m3exit( pname, 0, 0, xmsg, xstat2 )
-              end if
-
-              if ( .not.aedat(isp)%lait .and. 
-     %             .not.aedat(isp)%lacc .and. 
-     &             .not.aedat(isp)%lcor ) then
-                    xmsg = 'No aerosol modes have been requested for '//
-     &                     TRIM(aedat(isp)%species_name)//' on the AE namelist.' 
-                    call m3warn( pname, 0, 0, xmsg ) 
-              end if
-
-              ! For Aitken-Mode Particles
-              if ( aedat(isp)%lait ) then
-                 if ( aedat(isp)%species_name .eq. 'NUM' .OR. 
-     &                aedat(isp)%species_name .eq. 'SRF' ) THEN
-                    ! Add Aitken Mode Number or Surface Area
-                    nsp2 = nsp2 + 1
-                    aedat_mode(nsp2)%species_name = 
-     &                    trim(aedat(isp)%species_name)//'ATKN'
-                    aedat_mode(nsp2)%depv_surr = 
-     &                    trim(aedat(isp)%depv_surr)//'ATKN'
-                    aedat_mode(nsp2)%scav_surr = 
-     &                    trim(aedat(isp)%scav_surr)//'_AITKEN'
-                    aedat_mode(nsp2)%cloud_surr = 
-     &                    trim(aedat(isp)%cloud_surr)//'_AITKEN'
-                 elseif ( aerolist(iaer)%lait ) then
-                    ! Add Aitken Mode Mass
-                    nsp2 = nsp2 + 1
-                    aedat_mode(nsp2)%species_name = 
-     &                    trim(aedat(isp)%species_name)//modesuff(iait)
-                    aedat_mode(nsp2)%depv_surr = 
-     &                    trim(aedat(isp)%depv_surr)//'I'
-                    aedat_mode(nsp2)%scav_surr = 
-     &                    trim(aedat(isp)%scav_surr)//'_AITKEN'
-                    aedat_mode(nsp2)%cloud_surr = 
-     &                    trim(aedat(isp)%cloud_surr)//'_AITKEN'
-                 else
-                    ! Mode not allowed for this species. Exit CMAQ
-                    xmsg = 'Aitken-mode aerosols have been requested for '//
-     &                     TRIM(aedat(isp)%species_name)//
-     &                     ' but they are not available for this species. See '//
-     &                     'aerolist table in AERO_DATA.'
-                    Call log_message( outdev, 'Error: '//xmsg )
-                    call m3exit( pname, 0, 0, xmsg, xstat2 ) 
-                 end if
- 
-                 aedat_mode(nsp2)%molwt = aedat(isp)%molwt
-                 aedat_mode(nsp2)%lait = .True.
-                 aedat_mode(nsp2)%lacc = .False.
-                 aedat_mode(nsp2)%lcor = .False.
-                 aedat_mode(nsp2)%optics_surr = aedat(isp)%optics_surr
-                 aedat_mode(nsp2)%ic_surr     = aedat(isp)%ic_surr
-                 aedat_mode(nsp2)%ic_fac      = aedat(isp)%ic_fac
-                 aedat_mode(nsp2)%bc_surr     = aedat(isp)%bc_surr
-                 aedat_mode(nsp2)%bc_fac      = aedat(isp)%bc_fac
-                 aedat_mode(nsp2)%depv_fac    = aedat(isp)%depv_fac
-                 aedat_mode(nsp2)%scav_fac    = aedat(isp)%scav_fac
-                 aedat_mode(nsp2)%trns_flag   = aedat(isp)%trns_flag
-                 aedat_mode(nsp2)%ddep_flag   = aedat(isp)%ddep_flag
-                 aedat_mode(nsp2)%wdep_flag   = aedat(isp)%wdep_flag
-                 aedat_mode(nsp2)%conc_flag   = aedat(isp)%conc_flag
-
-                 xmsg = 'Added an Aitken Mode for Aerosol Species '//
-     &                  trim(aedat_mode(nsp2)%species_name)
-                 Call log_message( LOGDEV, xmsg )
- 
-              end if
-
-              ! For Accumulation-Mode Particles
-              if ( aedat(isp)%lacc ) then
-                 if ( aedat(isp)%species_name .eq. 'NUM' .OR. 
-     &                aedat(isp)%species_name .eq. 'SRF' ) THEN
-                    ! Add Accumulation Mode Number or Surface Area
-                    nsp2 = nsp2 + 1
-                    aedat_mode(nsp2)%species_name = 
-     &                    trim(aedat(isp)%species_name)//'ACC'
-                    aedat_mode(nsp2)%depv_surr = 
-     &                    trim(aedat(isp)%depv_surr)//'ACC'
-                    aedat_mode(nsp2)%scav_surr = 
-     &                    trim(aedat(isp)%scav_surr)//'_ACCUM'
-                    aedat_mode(nsp2)%cloud_surr = 
-     &                    trim(aedat(isp)%cloud_surr)//'_ACCUM'
-                 elseif ( aerolist(iaer)%lacc ) then
-                    ! Add Accumulation Mode Mass
-                    nsp2 = nsp2 + 1
-                    aedat_mode(nsp2)%species_name = 
-     &                    trim(aedat(isp)%species_name)//modesuff(iacc)
-                    aedat_mode(nsp2)%depv_surr = 
-     &                    trim(aedat(isp)%depv_surr)//'J'
-                    aedat_mode(nsp2)%scav_surr = 
-     &                    trim(aedat(isp)%scav_surr)//'_ACCUM'
-                    aedat_mode(nsp2)%cloud_surr = 
-     &                    trim(aedat(isp)%cloud_surr)//'_ACCUM'
-                 else
-                    ! Mode not allowed for this species. Exit CMAQ
-                    xmsg = 'Accumulation-mode aerosols have been requested for '//
-     &                     TRIM(aedat(isp)%species_name)//
-     &                     ' but they are not available for this species. See '//
-     &                     'aerolist table in AERO_DATA.'
-                    Call log_message( outdev, 'Error: '//xmsg )
-                    call m3exit( pname, 0, 0, xmsg, xstat2 ) 
-                 end if
- 
-                 aedat_mode(nsp2)%molwt = aedat(isp)%molwt
-                 aedat_mode(nsp2)%lait = .False.
-                 aedat_mode(nsp2)%lacc = .True.
-                 aedat_mode(nsp2)%lcor = .False.
-                 aedat_mode(nsp2)%optics_surr = aedat(isp)%optics_surr
-                 aedat_mode(nsp2)%ic_surr     = aedat(isp)%ic_surr
-                 aedat_mode(nsp2)%ic_fac      = aedat(isp)%ic_fac
-                 aedat_mode(nsp2)%bc_surr     = aedat(isp)%bc_surr
-                 aedat_mode(nsp2)%bc_fac      = aedat(isp)%bc_fac
-                 aedat_mode(nsp2)%depv_fac    = aedat(isp)%depv_fac
-                 aedat_mode(nsp2)%scav_fac    = aedat(isp)%scav_fac
-                 aedat_mode(nsp2)%trns_flag   = aedat(isp)%trns_flag
-                 aedat_mode(nsp2)%ddep_flag   = aedat(isp)%ddep_flag
-                 aedat_mode(nsp2)%wdep_flag   = aedat(isp)%wdep_flag
-                 aedat_mode(nsp2)%conc_flag   = aedat(isp)%conc_flag
-                 
-                 xmsg = 'Added an Accumulation Mode for Aerosol Species '//
-     &                  trim(aedat_mode(nsp2)%species_name)
-                 Call log_message( LOGDEV, xmsg )
-              end if
-
-              ! For Coarse-Mode Particles
-              if ( aedat(isp)%lcor ) then
-                 if ( aedat(isp)%species_name .eq. 'NUM' .OR. 
-     &                aedat(isp)%species_name .eq. 'SRF' ) THEN
-                    ! Add Coarse Mode Number or Surface Area
-                    nsp2 = nsp2 + 1
-                    aedat_mode(nsp2)%species_name = 
-     &                    trim(aedat(isp)%species_name)//'COR'
-                    aedat_mode(nsp2)%depv_surr = 
-     &                    trim(aedat(isp)%depv_surr)//'COR'
-                    aedat_mode(nsp2)%scav_surr = 
-     &                    trim(aedat(isp)%scav_surr)//'_COARSE'
-                    aedat_mode(nsp2)%cloud_surr = 
-     &                    trim(aedat(isp)%cloud_surr)//'_COARSE'
-
-                 elseif ( aerolist(iaer)%lcor ) then
-                    ! Add Coarse Mode Mass
-                    nsp2 = nsp2 + 1
-                    if ( aedat(isp)%species_name .eq. 'ACORS' .OR.
-     &                    aedat(isp)%species_name .eq. 'ASOIL' .OR.
-     &                    aedat(isp)%species_name .eq. 'ASEACAT' .OR.
-     &                    aedat(isp)%species_name .eq. 'ADE_CORS' ) THEN
-                       aedat_mode(nsp2)%species_name = 
-     &                       trim(aedat(isp)%species_name)
-                       aedat_mode(nsp2)%depv_surr = 
-     &                       trim(aedat(isp)%depv_surr)//'C'
-                       aedat_mode(nsp2)%scav_surr = 
-     &                       trim(aedat(isp)%scav_surr)//'_COARSE'
-                       aedat_mode(nsp2)%cloud_surr = 
-     &                       trim(aedat(isp)%cloud_surr)//'_COARSE' 
-                    else  
-                       aedat_mode(nsp2)%species_name = 
-     &                       trim(aedat(isp)%species_name)//modesuff(icor)
-                       aedat_mode(nsp2)%depv_surr = 
-     &                       trim(aedat(isp)%depv_surr)//'C'
-                       aedat_mode(nsp2)%scav_surr = 
-     &                       trim(aedat(isp)%scav_surr)//'_COARSE'
-                       aedat_mode(nsp2)%cloud_surr = 
-     &                       trim(aedat(isp)%cloud_surr)//'_COARSE'
-                    end if
-                 else
-                    ! Mode not allowed for this species. Exit CMAQ
-                    xmsg = 'Coarse-mode aerosols have been requested for '//
-     &                     TRIM(aedat(isp)%species_name)//
-     &                     ' but they are not available for this species. See '//
-     &                     'aerolist table in AERO_DATA.'
-                    Call log_message( outdev, 'Error: '//xmsg )
-                    call m3exit( pname, 0, 0, xmsg, xstat2 ) 
-                 end if
-
-                 aedat_mode(nsp2)%molwt = aedat(isp)%molwt
-                 aedat_mode(nsp2)%lait = .False.
-                 aedat_mode(nsp2)%lacc = .False.
-                 aedat_mode(nsp2)%lcor = .True.
-                 aedat_mode(nsp2)%optics_surr = aedat(isp)%optics_surr
-                 aedat_mode(nsp2)%ic_surr     = aedat(isp)%ic_surr
-                 aedat_mode(nsp2)%ic_fac      = aedat(isp)%ic_fac
-                 aedat_mode(nsp2)%bc_surr     = aedat(isp)%bc_surr
-                 aedat_mode(nsp2)%bc_fac      = aedat(isp)%bc_fac
-                 aedat_mode(nsp2)%depv_fac    = aedat(isp)%depv_fac
-                 aedat_mode(nsp2)%scav_fac    = aedat(isp)%scav_fac
-                 aedat_mode(nsp2)%trns_flag   = aedat(isp)%trns_flag
-                 aedat_mode(nsp2)%ddep_flag   = aedat(isp)%ddep_flag
-                 aedat_mode(nsp2)%wdep_flag   = aedat(isp)%wdep_flag
-                 aedat_mode(nsp2)%conc_flag   = aedat(isp)%conc_flag
-                 
-                 xmsg = 'Added a Coarse Mode for Aerosol Species '//
-     &                  trim(aedat_mode(nsp2)%species_name)
-                 Call log_message( LOGDEV, xmsg )
- 
-              end if
-
-          end do
-
-          write( xmsg, '(A,I3)' ), 'Total number of aerosol species: ',nsp2
-          Call log_message( LOGDEV, '' )
-          Call log_message( LOGDEV, xmsg )
-          Call log_message( LOGDEV, '' )
-
-          ae_species_data(1:nsp2) = aedat_mode(1:nsp2)
-
-      End Subroutine process_aero_nml_modes
-C----------------------------------------------------------------------- 
