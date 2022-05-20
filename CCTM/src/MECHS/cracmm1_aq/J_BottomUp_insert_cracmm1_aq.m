@@ -156,7 +156,7 @@ QY{i} = 'Quantum_Yield_BALD_RACM2.csv';
 
 
 i = i + 1
-Jnames{i}   = 'J_OP1_RACM2'; % OPB ----> HO + HO2 + ALD
+Jnames{i}   = 'J_OP1_RACM2'; % OP3 ----> HO + HO2 + ALD
 CS{i} = 'Cross_Section_OP1_RACM2.csv';
 QY{i} = 'Quantum_Yield_OP1_RACM2.csv';
 
