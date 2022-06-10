@@ -399,7 +399,7 @@ C Arguments:
 
 C Local Variables:
          REAL             DELT          ! interpolation factor
-         INTEGER          C, R, L, N, S, V, IRGN, ISTR, ISRM, NL, I, J ! loop induction variables
+         INTEGER          C, R, L, N, S, V, ISTR, ISRM, NL, I, J ! loop induction variables
          INTEGER          S_STRT, S_END ! substitute loop induction variables
          REAL, ALLOCATABLE, SAVE :: VDEMIS_READ  ( :,:,:,: ) ! Emissions as they are provided by each stream
          REAL, ALLOCATABLE, SAVE :: VDEMIS_SCALED( :,:,:,: ) ! Emissions after user scaling, and spatial scaling
@@ -414,7 +414,7 @@ C Local Variables:
          LOGICAL, SAVE   :: FIRST_TIME = .TRUE.
 
 #ifdef isam
-         INTEGER                    :: IDX, SPC, LAYER, RGN
+         INTEGER                    :: IDX, SPC, LAYER, RGN, IRGN
          CHARACTER(96)              :: TXTSTRING
          REAL                       :: MINCHECK, TOTAL
 #endif
@@ -570,8 +570,13 @@ C Map the user specified ISAM regions to available CMAQ regions
 #endif
          END IF  ! First Time
 
+C Initialize Emissions Array
+         VDEMIS_DIFF = 0.0
+         VDEMIS_CONV = 0.0
+
 #ifdef isam
          SA_VDEMIS_DIFF = 0.0
+         SA_VDEMIS_CONV = 0.0
 #endif
 
 #ifdef sens
