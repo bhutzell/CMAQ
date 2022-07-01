@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ================ CCTMv5.3.2 Mechanism Build Script ==================== 
+# ================ CCTMv5.4 Mechanism Build Script ==================== 
 # Usage: bldit_mech.csh >&! bldit_mech.log                                   
 # Requirements: I/O API & netCDF libraries, a Fortran compiler,               
 #               and MPI for multiprocessor computing                     
@@ -228,7 +228,6 @@
     
     # Copy EBI files to EBI_SOLVER_OUT directory
     cp -f ${EBI_OUTPUT}/hr*.F ${EBI_SOLVER_OUT}/.
-    cp -f ${EBI_OUTPUT}/[d,D,f,i]*.[f,F]  ${EBI_SOLVER_OUT}/.
  endif
 
 exit

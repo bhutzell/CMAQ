@@ -412,13 +412,16 @@ C Local Variables:
          INTEGER         :: ERROR_NEG
          INTEGER, SAVE   :: WSTEP
          LOGICAL, SAVE   :: FIRST_TIME = .TRUE.
+         LOGICAL         :: EFLAG
 
 #ifdef isam
-         INTEGER                    :: IDX, SPC, LAYER, RGN
+         INTEGER                    :: IDX, SPC, LAYER, RGN, IRGN
          CHARACTER(96)              :: TXTSTRING
          REAL                       :: MINCHECK, TOTAL
 #endif
 C-----------------------------------------------------------------------
+
+         EFLAG = .FALSE.
 
          IF ( FIRST_TIME ) THEN
             FIRST_TIME = .FALSE.
@@ -486,7 +489,8 @@ C Find emissions stream in the list of available streams
                    XMSG = " User specified ISAM tag - " //
      &                    TRIM( TAGSTREAMS(ITAG,ISRM) )// 
      &                    " - not found in available emissions streams "
-                   CALL M3EXIT( 'ISAM_STREAMS', 1, 1, XMSG, XSTAT1 )
+                   CALL M3MESG(XMSG)
+                   EFLAG = .TRUE.
                  ELSE
                    TAGS_PER_STREAM( IDX ) = TAGS_PER_STREAM( IDX ) + 1
                    STREAM_TO_TAG(IDX,TAGS_PER_STREAM( IDX )) = ITAG
@@ -494,6 +498,14 @@ C Find emissions stream in the list of available streams
               END DO
 
             END DO
+            IF( EFLAG )THEN
+                WRITE(LOGDEV,'(A)')'Available Emissions Streams'
+                DO ITAG = 1,DESID_N_SRM
+                   WRITE(LOGDEV,'(4X,A)')DESID_STREAM_LAB(ITAG)
+                END DO
+                XMSG = 'INCORRECT Emissions Stream used in ISAM control file'
+                CALL M3EXIT( 'ISAM_STREAMS', 1, 1, XMSG, XSTAT1 )
+            END IF
 
 C Develop a map of emitted/diffused ISAM species
             MAP_DIFFtoSA = 0
@@ -502,7 +514,7 @@ C Develop a map of emitted/diffused ISAM species
             END DO
 
 C Initialize geographic regions for ISAM tagging
-            ALLOCATE( ISAMRGN( NTAG_SA, DESID_N_REN ) )
+            ALLOCATE( ISAMRGN( NTAG_SA, DESID_N_REG ) )
             ISAMRGN = 'EVERYWHERE'
             ALLOCATE( ISAMRGN_MAP( NTAG_SA, DESID_N_REG ) )
             ISAMRGN_MAP = 0
@@ -570,8 +582,13 @@ C Map the user specified ISAM regions to available CMAQ regions
 #endif
          END IF  ! First Time
 
+C Initialize Emissions Array
+         VDEMIS_DIFF = 0.0
+         VDEMIS_CONV = 0.0
+
 #ifdef isam
          SA_VDEMIS_DIFF = 0.0
+         SA_VDEMIS_CONV = 0.0
 #endif
 
 #ifdef sens
