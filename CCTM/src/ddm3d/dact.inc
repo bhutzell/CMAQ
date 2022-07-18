@@ -1,4 +1,4 @@
-C ===================================================================
+===================================================================
 C This file is the include file for calculating sensitivit of 
 C the activity coefficient of ISORROPIAII
 C 
@@ -20,7 +20,7 @@ C ===================================================================
       DOUBLE PRECISION DG0(NIONSPC,NPAIR)
       DOUBLE PRECISION H,DH
       DOUBLE PRECISION X(6,4), Y(6,4)
-   	  DOUBLE PRECISION DX(NIONSPC,6,4),DY(NIONSPC,6,4)
+      DOUBLE PRECISION DX(NIONSPC,6,4),DY(NIONSPC,6,4)
       INTEGER IJMAP(6,4)
       DOUBLE PRECISION AGAMA
 
