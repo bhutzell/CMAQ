@@ -339,6 +339,8 @@ c     22 MAR 2017: S.L.Napelenok do updates only if case was solved.
  
 c     USE DDM3D_DEFN, ONLY : WRFLAG
 
+      implicit none
+
       integer ncomp
       integer nsize
       INTEGER FCOL(nsize)           ! Flags for matrix reduction
