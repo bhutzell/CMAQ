@@ -1,4 +1,4 @@
-
+#ifdef sens
 !------------------------------------------------------------------------!
 !  The Community Multiscale Air Quality (CMAQ) system software is in     !
 !  continuous development by various groups and is based on information  !
@@ -45,16 +45,17 @@ c     USE DDM3D_DEFN, ONLY : WRFLAG
       INCLUDE 'isrpia.inc'
       INCLUDE 'aero_sens_data.inc'
 
-      INTEGER FROW(NSEN),FCOL(NSEN)
-      DOUBLE PRECISION STOT(NCOMP)
-      DOUBLE PRECISION COEF(NSEN,NSEN)   !COEFFICIENT MATRIX 
-      DOUBLE PRECISION SENS(NSEN)        !OUTPUT, HDDM
-      DOUBLE PRECISION S1(NSEN)          !INPUT, 1ST ORDER SENS
-      DOUBLE PRECISION S2(NSEN)          !INPUT, 2ND ORDER SENS
-      DOUBLE PRECISION S1D(NSEN)         !INPUT, 1ST ORDER SENS
-      DOUBLE PRECISION S2D(NSEN)         !INPUT, 2ND ORDER SENS
-      CHARACTER( 15 ) :: SCASI                ! (input) subcase number from ISOROPIA
+      INTEGER, INTENT (INOUT) :: FCOL( : )
+      DOUBLE PRECISION, INTENT( IN    ) :: STOT( : )
+      DOUBLE PRECISION, INTENT( OUT   ) :: SENS( : )     !OUTPUT, HDDM
+      DOUBLE PRECISION, INTENT( IN    ) :: S1( : )       !INPUT, 1ST ORDER SENS
+      DOUBLE PRECISION, INTENT( IN    ) :: S2( : )       !INPUT, 2ND ORDER SENS
+      DOUBLE PRECISION, INTENT( IN    ) :: S1D( : )      !INPUT, 1ST ORDER SENS
+      DOUBLE PRECISION, INTENT( IN    ) :: S2D( : )      !INPUT, 2ND ORDER SENS
+      CHARACTER( 15 ),  INTENT( IN    ) :: SCASI         ! (input) subcase number from ISOROPIA
 
+      INTEGER FROW(NSEN)
+      DOUBLE PRECISION :: COEF(NSEN,NSEN) !COEFFICIENT MATRIX 
       DOUBLE PRECISION SENSD(NSEN)
       DOUBLE PRECISION DGAMA(NIONSPC,NPAIR)   !dGAMA/dA
       DOUBLE PRECISION RGAMA(NPAIR)       ! RHS FROM 2ND-ORDER GAMA SENSITIVITIES
@@ -145,7 +146,7 @@ c     ENDIF
 C *** END OF HDDMSENS ***
 
       RETURN
-      END
+      END SUBROUTINE AERO_SENS_CALC2
          
       SUBROUTINE RHSGAMA1( RG, S1, S2 )
       INCLUDE 'isrpia.inc'
@@ -238,7 +239,7 @@ c     DO I = 1, NIONSPC
       ENDDO
   
       RETURN
-      END
+      END 
   
       SUBROUTINE RHSGAMA2( RG, S1, S2 )
       INCLUDE 'isrpia.inc'
@@ -964,4 +965,5 @@ c     IF (MOLAL(jHSO4).EQ.ZERO) RETURN
       RETURN
       END  
 
+#endif
 

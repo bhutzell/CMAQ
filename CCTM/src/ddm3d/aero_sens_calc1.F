@@ -1,4 +1,3 @@
-
 !------------------------------------------------------------------------!
 !  The Community Multiscale Air Quality (CMAQ) system software is in     !
 !  continuous development by various groups and is based on information  !
@@ -38,7 +37,9 @@ C     Geoscientific Model Development, 5(2), 355-368.
 C     doi: 10.5194/gmd-5-355-2012
 C ===================================================================
 
+#ifdef sens
       SUBROUTINE AERO_SENS_CALC1(STOT,SENS,SENSD,SCASI,FCOL)
+
 
 c     USE DDM3D_DEFN, ONLY : WRFLAG
       Use aero_ddm3d, ONLY : cbsens
@@ -46,12 +47,13 @@ c     USE DDM3D_DEFN, ONLY : WRFLAG
       INCLUDE 'isrpia.inc'
       INCLUDE 'aero_sens_data.inc'
 
-      DOUBLE PRECISION STOT(NCOMP)            ! (input) gas+pm total sensitivity
-      DOUBLE PRECISION SENS(NSEN)             ! (output) partitioned SENSITIVITIES
-      DOUBLE PRECISION SENSD(NSEN)            ! (output) partitioned SENSITIVITIES BEFORE MINOR
-      CHARACTER( 15 ) :: SCASI                ! (input) subcase number from ISOROPIA
+      DOUBLE PRECISION, INTENT( IN  ) :: STOT( : )  ! (input) gas+pm total sensitivity
+      DOUBLE PRECISION, INTENT( OUT ) :: SENS( : )  ! (output) partitioned SENSITIVITIES
+      DOUBLE PRECISION, INTENT( OUT ) :: SENSD( : ) ! (output) partitioned SENSITIVITIES BEFORE MINOR
+      CHARACTER( 15 ),  INTENT( IN  ) :: SCASI      ! (input) subcase number from ISOROPIA
+      INTEGER, INTENT( IN ) :: FCOL( : )            ! Flags for matrix reduction
 
-      INTEGER FROW(NSEN),FCOL(NSEN)           ! Flags for matrix reduction
+      INTEGER FROW( NSEN )           ! Flags for matrix reduction
       DOUBLE PRECISION COEF(NSEN,NSEN)        ! COEFFICIENT MATRIX 
       DOUBLE PRECISION DGAMA(NIONSPC,NPAIR)   ! dGAMA/dA
     
@@ -144,7 +146,7 @@ c     ENDIF
 
 C *** END OF DDMSENS ***
       RETURN
-      END
+      END  SUBROUTINE AERO_SENS_CALC1
 
 C ============================================================================
 C SET FLAGS FOR MATRIX SUBSTRACTION
@@ -733,11 +735,11 @@ C =============================================================================
 
       INTEGER   NPAIRD, I, J, K
       PARAMETER (NPAIRD=10)               ! Number of ion pairs whose Q value is available
-      INTEGER   IG(NPAIRD)
+      INTEGER, SAVE :: IG(NPAIRD)
       DATA IG / 1,2,3,4,5,6,7,8,10,11 /
-      REAL    ZI(NPAIRD)                ! Mapping of Q to the internal order of ion pairs
+      REAL, SAVE :: ZI(NPAIRD)                ! Mapping of Q to the internal order of ion pairs
       DATA ZI / 1., 2., 1., 2., 1., 1., 2., 1., 1., 1. /
-      REAL  Q(NPAIRD)                 ! Kusik-Meissner parameters (see KMFUL)
+      REAL, SAVE :: Q(NPAIRD)                 ! Kusik-Meissner parameters (see KMFUL)
       DATA Q  / 2.23,-0.19,-0.39,-0.25,-1.15,0.82,-0.1,
      &          8.0,2.6,6.0 /
 
@@ -798,12 +800,12 @@ C =============================================================================
 
       INTEGER   NPAIRD, I, K
       PARAMETER (NPAIRD=18)               ! Number of ion pairs whose Q value is available
-      INTEGER   IG(NPAIRD)
+      INTEGER, SAVE :: IG(NPAIRD)
       DATA IG / 1,2,3,4,5,6,7,8,10,11,15,16,17,19,20,21,22,23 /
-      REAL      ZI(NPAIRD)                ! Mapping of Q to the internal order of ion pairs
+      REAL,    SAVE :: ZI(NPAIRD)                ! Mapping of Q to the internal order of ion pairs
       DATA ZI / 1., 2., 1., 2., 1., 1., 2., 1., 1., 1., 2., 2., 
      &          2., 1., 1., 4., 2., 2. /
-      REAL      Q(NPAIRD)                 ! Kusik-Meissner parameters (see KMFUL)
+      REAL, SAVE ::    Q(NPAIRD)                 ! Kusik-Meissner parameters (see KMFUL)
       DATA Q  / 2.23,-0.19,-0.39,-0.25,-1.15,0.82,-0.1,8.0,2.6,6.0,
      &          0.93,2.4,-0.25,-2.33,0.92,0.15,2.32,2.9 /
 C
@@ -2483,3 +2485,4 @@ c
    30 continue
       return
       end
+#endif
