@@ -1,5 +1,5 @@
 C ===================================================================
-C This file is the include file for calculating sensitivit of 
+C This file is the include file for calculating sensitivity of 
 C the activity coefficient of ISORROPIAII
 C 
 C Written by Wenxian Zhang in August 2011
