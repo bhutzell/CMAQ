@@ -802,11 +802,10 @@ C Error-check phot tables and report to log
 !          WRITE( MODULE_UNIT,'(/)')
       END DO
       DO NXX = 1, NR
-         IF( KTYPE( NXX ) .NE. 5 .OR. KTYPE( NXX ) .NE. 6 )CYCLE
          SELECT CASE( KTYPE( NXX ) )
           CASE( 5 )
              IRX = INT( RTDAT( 3, NXX) )
-             IF( IRX .GT. NXX )CYCLE
+             IF( IRX .LT. NXX )CYCLE
              WRITE(MODULE_UNIT, 1501, ADVANCE= 'NO')LABEL(NXX,1), NXX
              IDIFF_ORDER = IORDER(NXX) - IORDER(IRX)
              IF( IDIFF_ORDER .NE. 0 )THEN
@@ -818,7 +817,7 @@ C Error-check phot tables and report to log
              WRITE(MODULE_UNIT,5115, ADVANCE = 'NO')IRX, 1.0D0/RTDAT( 1, NXX ), -RTDAT(2, NXX )
           CASE( 6 )
              IRX = INT( RTDAT( 2, NXX) )
-             IF( IRX .GT. NXX )CYCLE
+             IF( IRX .LT. NXX )CYCLE
              IDIFF_ORDER = IORDER(NXX) - IORDER(IRX)
              WRITE(MODULE_UNIT, 1501, ADVANCE= 'NO')LABEL(NXX,1), NXX
              IF( IDIFF_ORDER .NE. 0 )THEN
