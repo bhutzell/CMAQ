@@ -84,6 +84,12 @@
    'EVERYWHERE', 'ALL'        ,'ACROLEIN','ACRO_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'     ,'BUTADIENE13','BUTADIENE13' ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'SULF'        ,'GAS'  ,0.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'GLY'    ,'GLY'         ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'GLYD'   ,'GLYD'        ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'FACD'   ,'FACD'        ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'PACD'   ,'PACD'        ,'GAS'  ,1.  ,'UNIT','a',
+
 
    ! Marine Halogen Chemistry
    'EVERYWHERE', 'ALL'         ,'DMS'    ,'DMS'         ,'GAS'  ,1.  ,'UNIT','a',
