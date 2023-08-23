@@ -1,0 +1,46 @@
+GLYF_JPL19
+! GLY + HV = HCHO + CO 
+! Source: Chemical Kinetics and Photochemical Data for Use in Atmospheric Studies, Evaluation No.
+!         19," JPL Publication 19-5, Jet Propulsion Laboratory, Pasadena,
+!         2019 http://jpldataeval.jpl.nasa.gov (May 2020)
+! Absorption x-section from Table 4D-29-1 (pages 4-142 & 4-143)
+! Quantum yield data are from Table 4D-29-2 (pages 4-144)
+! Supplied by Dr. William Stockwell, reformatted by Dr. Golam Sarwar to make it compatible with CMAQ
+Points 
+! With FAC, units are (cm^2/molecule)
+FAC=1.0
+250	1.73E-20	0.314
+255	1.67E-20	0.334
+260	1.83E-20	0.352
+265	2.26E-20	0.369
+270	2.51E-20	0.387
+275	3.00E-20	0.404
+280	3.13E-20	0.420
+285	3.67E-20	0.430
+290	3.73E-20	0.440
+295	3.81E-20	0.451
+300	4.04E-20	0.457
+305	3.24E-20	0.460
+310	3.10E-20	0.458
+315	2.80E-20	0.452
+320	1.85E-20	0.433
+325	1.60E-20	0.408
+330	1.69E-20	0.379
+335	7.37E-21	0.337
+340	5.53E-21	0.279
+345	6.24E-21	0.204
+350	3.91E-21	0.150
+355	4.22E-21	0.108
+360	5.46E-21	0.072
+365	6.65E-21	0.040
+370	1.14E-20	0.022
+375	1.33E-20	0.014
+380	1.93E-20	0.011
+385	1.89E-20	0.008
+390	3.48E-20	0.007
+395	3.86E-20	0.005
+400	3.87E-20	0.004
+405	4.49E-20	0.003
+410	5.66E-20	0.002
+415	1.02E-19	0.001
+420	5.60E-20	0.000
