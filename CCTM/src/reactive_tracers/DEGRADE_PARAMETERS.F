@@ -44,7 +44,7 @@ C.....INCLUDES:
 
 C..declare and define variables used by maps and data
 
-      INTEGER, PARAMETER :: N_REACT       = 37   ! number of  species being degraded
+      INTEGER, PARAMETER :: N_REACT       = 38   ! number of  species being degraded
       INTEGER, PARAMETER :: N_UNI_LOSS    = 1     ! Number of Unimolecular Loss Processes
       INTEGER, PARAMETER :: N_BI_LOSS     = 5     ! Number of Bimolcular Loss processes
       INTEGER, PARAMETER :: N_TRI_LOSS    = 2     ! Number of Bimolcular Loss processes
@@ -560,6 +560,13 @@ C.. Tracer for acrolein emissions
             PHOTO_NAME(1:1,37 ) = (/"ACRO_09"/)
             A_PHOTO(1:1,37)     = 1.0D0
 
+
+C..hydrogen cyanide
+            REACT(38)        = 'HYD_CYANIDE'
+            BICAUSE(1:2,38)  = (/   'OH ',    'HO '/)
+            BIRATE(1:2,38)   = (/  1.20D-13, 1.20D-13/)
+            BI_ACT(1:2,38)   = (/  4.0005D2, 4.0005D2/)
+        
 
            NDEGRADED_FOUND = 0
            DO I = 1, N_REACT
