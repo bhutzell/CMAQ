@@ -40,7 +40,7 @@
       INTEGER, PARAMETER      :: BDGSAVE_ID = 0
 
       PUBLIC BUDGET_INIT, STORE_BUDGET, STORE_BUDGET_DDEP, 
-     &       WRITE_BUDGET, BDGC0_ID, BUDGETVARIABLES, N_BUDGET_VARS_REG
+     &       WRITE_BUDGET, BDGC0_ID, BUDGETVARIABLES, MAX_BUDGET_VARS_NML
 
 
       INTEGER, SAVE         :: BDG_UNIT
@@ -146,8 +146,21 @@ C-----------------------------------------------------------------------
           DEALLOCATE( CONC )
           
           ! Open Output tab-separated file and print header
-          IF ( MYPE .EQ. 0 ) THEN 
-              BDG_FILE = TRIM(OUTDIR) // "/CCTM_BUDGET_" // TRIM(APPL_NAME) // ".txt"
+          IF ( MYPE .EQ. 0 ) THEN
+              IF ( BUDGET_FNAME .EQ. 'CCTM_BUDGET' ) THEN
+                 IF ( OUTDIR .EQ. '' ) THEN
+                   BDG_FILE = "CCTM_BUDGET_" // TRIM(APPL_NAME) // ".txt"
+                 ELSE
+                   BDG_FILE = TRIM(OUTDIR) // "/CCTM_BUDGET_" // TRIM(APPL_NAME) // ".txt"
+                 END IF
+              ELSE
+                 J = INDEX( BUDGET_FNAME, ".txt" ) 
+                 IF ( J .NE. 0 ) THEN
+                    BDG_FILE = BUDGET_FNAME(1:J+3)
+                 ELSE
+                    BDG_FILE = TRIM( BUDGET_FNAME ) // ".txt"
+                 END IF
+              END IF
               BDG_UNIT = JUNIT()
               OPEN( UNIT = BDG_UNIT, FILE = BDG_FILE, STATUS = "REPLACE" )
           
@@ -180,7 +193,7 @@ C-----------------------------------------------------------------------
           END IF
           
           ! Map Budget Variables to CGRID Species
-          N_BDG_REG = INDEX1( '', N_BUDGET_VARS_REG, BudgetVariables ) - 1
+          N_BDG_REG = INDEX1( '', MAX_BUDGET_VARS_NML, BudgetVariables ) - 1
           IF ( N_BDG_REG .LE. 0 ) THEN
              WRITE( LOGDEV, * )
              WRITE( XMSG, '(A,A)' ),
@@ -200,6 +213,9 @@ C-----------------------------------------------------------------------
              IF ( BDGVAR(1:1) .EQ. '*' ) THEN
                 Expand_Spec = .TRUE.
                 BDGVAR(1:15) = BDGVAR(2:16)
+             END IF
+             IF ( TRIM(BDGVAR) .EQ. 'ALL' ) THEN
+                Expand_Spec = .TRUE.
              END IF
 
              ! Retrieve logical vector, DIFF_VEC, indicating diffused species
