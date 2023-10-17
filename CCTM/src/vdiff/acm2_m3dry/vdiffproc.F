@@ -81,8 +81,8 @@ C-----------------------------------------------------------------------
 
       USE CGRID_SPCS          ! CGRID mechanism species
       USE GRID_CONF
-      USE EMIS_VARS, ONLY : VDEMIS_DIFF, EMLAYS
-      USE EMIS_DEFN, ONLY : EMIS_INIT, GET_EMIS_DRIVER
+      USE DESID_VARS, ONLY : VDEMIS_DIFF, DESID_LAYS
+      USE DESID_MODULE, ONLY : DESID_INIT, DESID_DRIVER
       USE DEPV_DEFN
       USE ASX_DATA_MOD
 !      USE MPAS_DATA_MOD
@@ -98,7 +98,7 @@ C-----------------------------------------------------------------------
 
 #ifdef isam
       USE SA_DEFN, Only: ITAG, N_SPCTAG, VNAM_SPCTAG, SA_DDEP, SA_BIDI, ISAM, NTAG_SA, 
-     &                   VNAM_SPCTAG, NSPC_SA, ISAM_SPEC, OTHRTAG
+     &                   S_SPCTAG, NSPC_SA, ISAM_SPEC, OTHRTAG
 #endif
 
 #ifdef sens
@@ -163,6 +163,7 @@ C Local Variables
       INTEGER     MDATE, MTIME, MSTEP           ! internal simulation date&time
       CHARACTER(LEN=8), PARAMETER :: NAME_NH3_EMIS = 'NH3_Emis'
       CHARACTER(LEN=8), PARAMETER :: NAME_NH3_FLUX = 'NH3_Flux'
+      CHARACTER(LEN=16) :: SPCBASE
 
 #ifdef isam
       REAL NH3_SUM
@@ -282,7 +283,7 @@ C Allocate and initialize dry deposition array
          CALL LOG_HEADING( LOGDEV, "Initialize Emissions Module" )
 
 C Allocate and initialize emissions
-         IF ( .NOT. EMIS_INIT ( JDATE, JTIME, TSTEP( 1 ) ) ) THEN
+         IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP( 1 ) ) ) THEN
             XMSG = 'Failure initializing emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
@@ -364,8 +365,7 @@ C Set up for grav. settling
           ISAM_DEPV     = 0
           DO ITAG = 1, N_SPCTAG
             DO V = 1, N_SPC_DEPV
-              IBGN         = INDEX( VNAM_SPCTAG( ITAG ), '_', .FALSE. ) - 1
-              ISAM_SPECIES = VNAM_SPCTAG( ITAG )( 1:IBGN )
+              ISAM_SPECIES =  ISAM_SPEC( S_SPCTAG(ITAG),1 )
               IF ( TRIM( ISAM_SPECIES ) .EQ. DV2DF_SPC( V ) ) THEN
                 ISAM_DEPV( ITAG ) = V
               END IF
@@ -421,12 +421,12 @@ C Calculate the changes in the layer J-,K-mode aerosol concentrations
       END IF
 
 C read & interpolate emissions data => VDEMIS_DIFF from EMIS_DEFN module
-      CALL GET_EMIS_DRIVER ( MDATE, MTIME, TSTEP, CGRID )
+      CALL DESID_DRIVER ( MDATE, MTIME, TSTEP, CGRID )
 
       IF ( BUDGET_DIAG .OR. LIPR ) THEN
          EMIS_PA = 0.0
          DO S = 1, N_SPC_DIFF
-            DO L = 1, EMLAYS
+            DO L = 1, DESID_LAYS
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      EMIS_PA( C,R,L,DIFF_MAP(S) ) = VDEMIS_DIFF( S,L,C,R )
@@ -550,7 +550,7 @@ C If last call this hour:  write accumulated depositions:
 
 #ifdef sens
                IF ( .NOT. OPEN3( CTM_SDRYDEP_1, FSNONIO, PNAME ) ) THEN
-                  XMSG = 'Could not open ' // TRIM(CTM_SDRYDEP_1`)
+                  XMSG = 'Could not open ' // TRIM(CTM_SDRYDEP_1)
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
 #endif 
@@ -759,14 +759,16 @@ C re-set dry deposition array to zero
 C WT - write out dry deposition sensitivities
          DO V = 1, N_SPC_DDEP
             S = DD2DV( V )
-            SPCNAME = DDEP_SPC( V )( 1:12 )                       ! <- these lines have to
+            SPCBASE = DDEP_SPC( V )( 1:12 )                       ! <- these lines have to
+!           WRITE( LOGDEV,'(A)')'DDEP_SPC value: ' // TRIM( SPCBASE )
             DO NP = 1, NPMAX
-               SPCNAME = TRIM( SPCNAME ) //'_' // SEN_PAR( NP )   ! <- match what is in opddep.F
+               SPCNAME = TRIM( SPCBASE ) //'_' // SEN_PAR( NP )   ! <- match what is in opddep.F
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      WRDD( C,R ) = S_DDEP( S, C, R, NP )
                   ENDDO
                ENDDO
+!           WRITE( LOGDEV,'(A)')'WRITE3D for ' // TRIM( SPCNAME )
 
                IF ( .NOT. WRITE3( CTM_SDRYDEP_1, SPCNAME,
      &                 MDATE, MTIME, WRDD ) ) THEN

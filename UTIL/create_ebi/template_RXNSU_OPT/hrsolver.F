@@ -50,6 +50,7 @@ C**********************************************************************
       USE DDM3D_CHEM, ONLY: YCDDM
       USE CGRID_SPCS, ONLY: GC_SPC
 #endif 
+R5      USE DEGRADE_ROUTINES, ONLY : DEGRADE, SA_DEGRADE_STEP
 
 R0
 
@@ -70,7 +71,8 @@ C..PARAMETERS:
       REAL( 8 ), PARAMETER :: DTMIN   = 1.0D-08    ! Smallest time step allowed, min
       REAL( 8 ), PARAMETER :: EPSLON  = 1.0D-30    ! Small number
       REAL( 8 ), PARAMETER :: MAXPRED = 1.0D+03    ! Upper limit on predicted conc
-      REAL( 8 ), PARAMETER :: ZERO    = 1.0D-40    ! effective zero 
+      REAL( 8 ), PARAMETER :: ZERO    = 1.0D-40    ! effective zero
+      REAL( 8 ), PARAMETER :: FLOOR   = 1.0D-08    ! Min conc for RTOL 
 
 C..EXTERNAL FUNCTIONS:
 
@@ -126,14 +128,6 @@ R5      REAL( 8 ) DTG         ! Time step in degrade routines, sec
       LOGICAL, SAVE  :: LOPEN = .FALSE.
 #endif
 
-R5      INTERFACE ! for degrade algorithm
-R5        SUBROUTINE DEGRADE( CBLK, DT, JDATE, JTIME )
-R5          REAL( 8 ), INTENT( IN ) :: CBLK( : )      ! array holding species concentrations
-R5          REAL( 8 ), INTENT( IN ) :: DT             ! time step for integrations [sec]
-R5          INTEGER,   INTENT( IN ) :: JDATE          ! current model date , coded YYYYDDD
-R5          INTEGER,   INTENT( IN ) :: JTIME          ! current model time , coded HHMMSS
-R5        END SUBROUTINE
-R5      END INTERFACE
 
 C**********************************************************************
 
@@ -241,6 +235,7 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 
 ! Initial PA_IRR 
       IF( CALL_IRR ) CALL PA_IRR ( .TRUE., RKI, YC, DTC )
+R5      SA_DEGRADE_STEP = 0      
       TSTEP_EBI: DO    ! EBI time-step loop
          
          SUBSTEP_EBI: DO NINR = 1, N_INR_STEPS   ! time substeps loop 
@@ -309,10 +304,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                DO S = 1, NUMB_MECH_SPC
                   LEBISPFL( S ) = .FALSE.
                   YCP( S ) = MAX( ZERO, YCP( S ) )
-                  AERROR( S ) = ABS( YC(S)-YCP(S) ) 
-                  RERROR( S ) = AERROR( S ) / ABS( YC(S)+YCP(S) )
-                   IF( RERROR( S ) .GT. RTOL(S) .OR. AERROR( S ) .GT. 1.0D-5 )THEN
-!                 IF( RERROR( S ) .GT. RTOL(S)  )THEN
+                  AERROR( S ) = MAX( ABS( YC(S)-YCP(S) ), EPSLON )
+                  RERROR( S ) = AERROR( S ) / MAX( FLOOR, ABS( YC(S)+YCP(S) ) )
+                  IF( RERROR( S ) .GT. RTOL(S) .OR. AERROR( S ) .GT. 1.0D-5 )THEN
                      LEBI_CONV     = .FALSE.
                      LEBISPFL( S ) = .TRUE.
                   END IF
@@ -355,6 +349,9 @@ R5                DO S = 1, NUMB_MECH_SPC
 R5                   M = CGRID_INDEX( S )
 R5                   YCCELL( M ) = YC( S )
 R5                END DO
+#if defined(isam) || defined(verbose_isam)
+R5                SA_DEGRADE_STEP = SA_DEGRADE_STEP + 1
+#endif             
 R5                IF( CALL_DEG )CALL DEGRADE(YCCELL, DTG, JDATE, JTIME) ! :WTH Call degradation routine
 R5
                  IF( CALL_IRR ) CALL PA_IRR ( .FALSE., RKI, YC, DTC )
