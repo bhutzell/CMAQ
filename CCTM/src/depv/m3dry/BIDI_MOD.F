@@ -88,7 +88,7 @@ C Prevent initilializing the code twice
          ! Define Media Concentration Output Variables and Descriptions
          If ( ABFLUX .And. .Not. HGBIDI ) Then
          
-            N_TOT = NHx_TOT
+            N_TOT = NHx_TOT + 1
             N_Hg  = 0            
             Allocate( MEDIA_NAMES( N_TOT ), MEDIA_UNITS( N_TOT ), MEDIA_DESCR( N_TOT )  )
 
@@ -104,9 +104,12 @@ C Prevent initilializing the code twice
             MEDIA_NAMES( 4 ) = 'MHpsl2          '
             MEDIA_UNITS( 4 ) = 'mol/l'
             MEDIA_DESCR( 4 ) = 'Molar H+ in Soil layer 2'
+            MEDIA_NAMES( 5 ) = 'SNOWAGE'
+            MEDIA_UNITS( 5 ) = 'days'
+            MEDIA_DESCR( 5 ) = 'time since last actual snow fall greater than 1 cm'
                
          Else If ( .Not. ABFLUX .And. HGBIDI ) Then
-            N_TOT = HG_TOT
+            N_TOT = HG_TOT + 1
             N_Hg  = HG_TOT
             Allocate( MEDIA_NAMES( HG_TOT ), MEDIA_UNITS( N_TOT ), MEDIA_DESCR( N_TOT )  )
 
@@ -128,9 +131,12 @@ C Prevent initilializing the code twice
             MEDIA_NAMES( 6 ) = 'HGCUT           ' ! cuticular Hg  
             MEDIA_UNITS( 6 ) = 'umol/g'      
             MEDIA_DESCR( 6 ) = 'Hg(0) bound to vegetation surfaces'      
+            MEDIA_NAMES( 6 ) = 'SNOWAGE'
+            MEDIA_UNITS( 6 ) = 'days'
+            MEDIA_DESCR( 6 ) = 'time since last actual snow fall greater than 1 cm'
             
          Else If ( ABFLUX .And. HGBIDI ) Then
-            N_TOT = HG_TOT + NHx_TOT
+            N_TOT = HG_TOT + NHx_TOT + 1
             N_Hg  = HG_TOT
             Allocate( MEDIA_NAMES( N_TOT ), MEDIA_UNITS( N_TOT ), MEDIA_DESCR( N_TOT )  )
 
@@ -164,7 +170,19 @@ C Prevent initilializing the code twice
             MEDIA_NAMES( 10 ) = 'MHpsl2         '
             MEDIA_UNITS( 10 ) = 'mol/l' 
             MEDIA_DESCR( 10 ) = 'Molar H+ in Soil layer 2'
+            MEDIA_NAMES( 11 ) = 'SNOWAGE'
+            MEDIA_UNITS( 11 ) = 'days'
+            MEDIA_DESCR( 11 ) = 'time since last actual snow fall greater than 1 cm'
+
+         Else
             
+            N_TOT = 1 
+            Allocate( MEDIA_NAMES( N_TOT ), MEDIA_UNITS( N_TOT ), MEDIA_DESCR( N_TOT )  )
+
+            MEDIA_NAMES( 1 ) = 'SNOWAGE'
+            MEDIA_UNITS( 1 ) = 'days'
+            MEDIA_DESCR( 1 ) = 'time since last actual snow fall greater than 1 cm'
+
          End If
          
          ! allocate the media array variable
@@ -216,7 +234,7 @@ C--------------------------------------------------------------------------
                TSTEP3D = TSTEP
                Call NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
 
-               NVARS3D = N_TOT
+               NVARS3D = N_TOT + 1
                NCOLS3D = GL_NCOLS
                NROWS3D = GL_NROWS
                NLAYS3D =     1
@@ -272,6 +290,13 @@ C--------------------------------------------------------------------------
                   UNITS3D( N ) = 'umol g-1'
                   VDESC3D( N ) = 'Solid phase concentration'
                End Do              
+
+               N = N + 1
+               VTYPE3D( N ) = M3REAL
+               VNAME3D( N ) = MEDIA_NAMES( N )
+               UNITS3D( N ) = 'days'
+               VDESC3D( N ) = 'time since last snow fall greater than 1 cm'
+
             End If
             
          Else If ( .Not. ABFLUX .And. HGBIDI ) Then              
@@ -341,8 +366,15 @@ C--------------------------------------------------------------------------
                   UNITS3D( N ) = 'umol g-1'
                   VDESC3D( N ) = 'Solid phase concentration'
                End Do
-            End If
             
+               N = N + 1
+               VTYPE3D( N ) = M3REAL
+               VNAME3D( N ) = MEDIA_NAMES( N )
+               UNITS3D( N ) = 'days'
+               VDESC3D( N ) = 'time since last snow fall greater than 1 cm'
+
+            End If
+
          Else If ( ABFLUX .And. HGBIDI ) Then         
             
             If ( .Not. OPEN3( MEDIA_CONC, FSRDWR3, PNAME ) ) Then
@@ -440,8 +472,64 @@ C--------------------------------------------------------------------------
                   UNITS3D( N ) = 'umol g-1'
                   VDESC3D( N ) = 'Solid phase concentration'
                End Do        
-            End If
-                                                  
+
+               N = N + 1
+               VTYPE3D( N ) = M3REAL
+               VNAME3D( N ) = MEDIA_NAMES( N )
+               UNITS3D( N ) = 'days'
+               VDESC3D( N ) = 'time since last snow fall greater than 1 cm'
+
+            End If                                                  
+
+         Else
+
+            If ( .Not. OPEN3( MEDIA_CONC, FSRDWR3, PNAME ) ) Then!
+
+
+               XMSG = 'Could not open ' // MEDIA_CONC // ' file for update - '
+     &             // 'try to open new'
+               Call M3MESG( XMSG )
+
+               FTYPE3D = GRDDED3
+               SDATE3D = JDATE
+               STIME3D = JTIME
+               TSTEP3D = TSTEP
+               Call NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
+               NVARS3D = N_TOT
+               NCOLS3D = GL_NCOLS
+               NROWS3D = GL_NROWS
+               NLAYS3D =     1
+               NTHIK3D =     1
+               GDTYP3D = GDTYP_GD
+               P_ALP3D = P_ALP_GD
+               P_BET3D = P_BET_GD
+               P_GAM3D = P_GAM_GD
+               XORIG3D = XORIG_GD
+               YORIG3D = YORIG_GD
+               XCENT3D = XCENT_GD
+               YCENT3D = YCENT_GD
+               XCELL3D = XCELL_GD
+               YCELL3D = YCELL_GD
+               VGTYP3D = VGTYP_GD
+               VGTOP3D = VGTOP_GD
+
+               FDESC3D = ' '   ! array
+
+               FDESC3D( 1 ) = 'Multimedia concentration estimates from integrated ambient '
+     &                     // 'HG concentrations and surface exchange algorithms'
+
+               NLAYS3D = 1
+
+               N = N + 1
+               VTYPE3D( 1 ) = M3REAL
+               VNAME3D( 1 ) = MEDIA_NAMES( 1 )
+               UNITS3D( 1 ) = 'days'
+               VDESC3D( 1 ) = 'time since last actaul snow fall greater than 1 cm'
+
+               print*,'OPENing MEDIA_CONC'
+
+            End If 
+
          End If         
 ! Open file, then close it for subsequent open by all processors
             
@@ -449,6 +537,16 @@ C--------------------------------------------------------------------------
             XMSG = 'Could not create '// TRIM( MEDIA_CONC) // ' file'
             Call M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
          End If                   
+C Get description of media_conc file
+         write(LOGDEV,'(A)' )VNAME3D(1:NVARS3D)
+
+
+
+
+         Write( LOGDEV, '( /5X, A, I8, ":", I6.6 )' )
+     &         'Created "' // TRIM( MEDIA_CONC ) //
+     &         '" at date and time', SDATE3D, STIME3D
+
 
          Return
 
@@ -523,6 +621,10 @@ C--------------------------------------------------------------------------
             End If
 
          End Do                 
+C Get description of media_conc file
+         write(LOGDEV,'(A)' )VNAME3D(1:NVARS3D)
+
+
 
          Write( LOGDEV, '( /5X, A, I8, ":", I6.6 )' )
      &         'Timestep written to "' // TRIM( MEDIA_CONC ) //

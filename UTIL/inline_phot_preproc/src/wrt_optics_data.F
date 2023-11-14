@@ -389,10 +389,12 @@
           WRITE(ODATA_UNIT,5013)'INDEX_OCEAN_WATER  = ', INDEX_OCEAN_WATER
           WRITE(ODATA_UNIT,5013)'INDEX_SEA_ICE     = ', INDEX_SEA_ICE
           WRITE(ODATA_UNIT,5009)'! I','LANDUSE_CATEGORY',
-     &   'ZENITH_ANGLE_COEFF', 'SEASONAL_COEFF','SNOW_COVER_COEEF'
+     &   'ZENITH_ANGLE_COEFF', 'SEASONAL_COEFF','SNOW_COVER_COEEF',
+     &   'CRITICAL_SNOW_DEPTH'
           DO I = 1, NUMB_LANDUSE_MODIS
             WRITE(ODATA_UNIT,5012)I, LANDUSE( I ), 
-     &      ZENITH_COEFF( I ), SEASON_COEFF( I ), SNOW_COEFF( I )
+     &      ZENITH_COEFF( I ), SEASON_COEFF( I ), SNOW_COEFF( I),
+     &      CRITICAL_SNOW_DEPTH( I )
           ENDDO
           WRITE(ODATA_UNIT,'(A7,7X,A16,2X,40(A5,I3,A1,5X))')'!      ',
      &    'LANDUSE CATEGORY',('WBIN(',J,')', J = 1, N_INLINE_BAND)
@@ -479,7 +481,7 @@
      &       /,'! REFERENCE:  CERES/SARB Surface Properties database',
      &       /,'! http://www-surf.larc.nasa.gov/surf/pages/explan.html',
      &       /,'!(last accessed: 30 January 2014).')
-5012  FORMAT(I3,1X,A30,1X,3(F8.3,2X))
+5012  FORMAT(I3,1X,A30,1X,4(F8.3,2X))
 5013  FORMAT(A21,1X,I3)
 5014  FORMAT('! Following two indices denote the categories assigned as generic',
      &       /,'! land and water surfaces. The surfaces are used as the default',

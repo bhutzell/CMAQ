@@ -1269,12 +1269,17 @@ C...modules
          TROPO_O3_EXCEED = 0.0 ! reset sum and counter
          TSTEP_COUNT     = 0
 
-         VARNM = 'N_EXCEED_TROPO3'
-         IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, N_EXCEED_TROPO3 ) ) THEN
+         VARNM = 'SNOW_COVER_MET'
+         IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, SNOCOV ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
-         N_EXCEED_TROPO3 = 0.0 ! reset counter
+
+         VARNM = 'SNOW_COVER_KOR'
+         IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, CALCULATED_SNOCOV ) ) THEN
+            XMSG = 'Error writing variable ' // VARNM
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
 
          VARNM = 'JNO2'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, RJ( :,:,1, LNO2 ) ) ) THEN
@@ -1368,6 +1373,7 @@ C...modules
 
             VARNM = 'ALBEDO_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME,
+!     &                         DIFFUSE_ALBEDO( IWL,:,: ) ) ) THEN
      &                         SURFACE_ALBEDO( IWL,:,: ) ) ) THEN
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )

@@ -286,6 +286,7 @@
      &             Q2_AVAIL       = .true.,  ! flag for Q2, two meter mixing ratio available in MET_CRO_2D
      &             LH_AVAIL,                 ! flag for LH, two meter mixing ratio available in MET_CRO_2D
      &             HAS_SEAICE,               ! flag for SEAICE in MET_CRO_2D
+     &             HAS_SNOWN      = .false., ! flag for snow and ice fall in MET_CRO_2D
      &             WR_AVAIL       = .true.,  ! flag for WR, canopy wetness available in MET_CRO_2D
      &             MEDC_AVAIL     = .true.,  ! file INIT_MEDC_1 is available
      &             E2C_CHEM_AVAIL = .true.,  ! file E2C_CHEM is available
@@ -391,6 +392,7 @@
 !  beis_norm_emis_setup
 !  depv_data_setup
 !  medc_file_setup
+!  medc_get_snowage
 !  soilinp_setup
 !  retrieve_grid_cro_2d_data
 !  retrieve_grid_dot_2d_data
@@ -569,6 +571,7 @@
           end if
 
           HAS_SEAICE = (INDEX1( 'SEAICE', NVARS3D, VNAME3D ) .gt. 0)
+          HAS_SNOWN  = (INDEX1( 'SNOWN',  NVARS3D, VNAME3D ) .gt. 0)
 
 ! include an additional variable TSEASFC when MET_CRO_2D does not have it and CMAQ code is looking for it
           n_c2d = nvars3d + adj
@@ -1431,14 +1434,14 @@
                    IF ( .NOT. INTERPX( MET_CRO_3D, cio_grid_var_name(v,1), PNAME, 
      &                                 STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3, 1, nlays, 
      &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
-                      XMSG = 'Could not extract ' // MET_CRO_3D // ' file'
+                      XMSG = 'Could not extract ' // Trim( cio_grid_var_name(v,1) ) // ' from ' // MET_CRO_3D // ' file'
                       CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
                    END IF
 #else
                    IF ( .NOT. XTRACT3( MET_CRO_3D, cio_grid_var_name(v,1), 
      &                                 1, nlays, STRTROWMC3, ENDROWMC3, STRTCOLMC3, ENDCOLMC3, 
      &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
-                      XMSG = 'Could not extract ' // MET_CRO_3D // ' file'
+                      XMSG = 'Could not extract ' // Trim( cio_grid_var_name(v,1) ) // ' from ' //  MET_CRO_3D // ' file'
                       CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
                    END IF
 #endif
@@ -3103,6 +3106,50 @@ C Read the various categories of normalized emissions
           END DO
 
         end subroutine medc_file_setup
+
+! -------------------------------------------------------------------------
+        subroutine medc_get_snowage
+
+          USE UTILIO_DEFN
+          use bidi_mod
+
+          INCLUDE SUBST_FILES_ID             ! file name parameters
+
+          Character( 40 ), parameter :: pname = 'medc_get_snowage'
+
+          CHARACTER( 256 ) :: xmsg
+          integer :: v
+          integer :: startcol, endcol, startrow, endrow, gxoff, gyoff
+
+          CALL INIT_BIDI( )
+
+          IF ( .NOT. OPEN3( INIT_MEDC_1, FSREAD3, PNAME ) ) THEN
+             XMSG = 'Open failure for ' // INIT_MEDC_1
+             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+          END IF
+          n_opened_file = n_opened_file + 1
+
+          call subhfile ( INIT_MEDC_1, gxoff, gyoff,
+     &                    startcol, endcol, startrow, endrow )
+
+          V = INDEX1( 'SNOWAGE',N_TOT,MEDIA_NAMES )
+          
+          IF ( V .GT. 0 ) THEN
+            IF ( .NOT. Xtract3( INIT_MEDC_1, MEDIA_NAMES( V ), 1, 1, 
+     &                          startrow, endrow, startcol, endcol,
+     &                          cio_model_sdate, 0, CMEDIA(:,:,v) ) )THEN
+               xmsg = 'Could not read ' // trim( MEDIA_NAMES( V ) )
+     &                // ' from ' // trim( INIT_MEDC_1 )
+               call m3exit( pname, cio_model_sdate, 0, xmsg, xstat1 )
+            END IF
+          ELSE
+             xmsg = 'Could not find  SNOWAGE in MEDIA_NAMES ' 
+     &            // 'in BIDI_MOD. Check version of BIDI_MOD.F '
+     &            // 'being using. ' 
+             call m3exit( pname, cio_model_sdate, 0, xmsg, xstat1 )
+          END IF
+
+        end subroutine medc_get_snowage
 
 ! -------------------------------------------------------------------------
         subroutine soilinp_setup
@@ -4796,7 +4843,8 @@ C   mminlu and num_land_cat are WRF global variables
              END IF
 
              if (MEDC_AVAIL) then
-                n_opened_file = n_opened_file + 1
+                call medc_get_snowage
+!                n_opened_file = n_opened_file + 1
              end if
 
              call gridded_files_setup

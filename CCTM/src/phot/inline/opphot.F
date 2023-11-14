@@ -242,6 +242,18 @@ C...CSA Variables, Units and Descriptions for RJ_FILE
      &               // 'per file time step'          
          VTYPE3D( N ) = M3REAL
 
+         N = N + 1
+         VNAME3D( N ) = 'SNOW_COVER_MET'
+         UNITS3D( N ) = 'fraction'
+         VDESC3D( N ) = 'fractional snow coverage from meteorological input file'
+         VTYPE3D( N ) = M3REAL
+
+         N = N + 1
+         VNAME3D( N ) = 'SNOW_COVER_KOR'
+         UNITS3D( N ) = 'fraction'
+         VDESC3D( N ) = 'fractional snow coverage based on method in Koren et al. (1999)'
+         VTYPE3D( N ) = M3REAL
+
 
          DO JWL = 1, NWL
 

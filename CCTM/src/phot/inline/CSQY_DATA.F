@@ -236,14 +236,17 @@
       INTEGER :: IREFTEMPS  ! number of ref. temperatures
 
       INTEGER :: NUMB_LANDUSE_REF
-      INTEGER :: INDEX_GRASSLAND_REF
-      INTEGER :: INDEX_OCEAN_REF
-      INTEGER :: INDEX_SEA_ICE
+      INTEGER :: INDEX_GRASSLAND_REF = 0
+
+      INTEGER :: INDEX_OCEAN_REF = 0
+      INTEGER :: INDEX_SEA_ICE   = 0
+      INTEGER :: INDEX_SNOW      = 0                                                 
 
       CHARACTER(30), ALLOCATABLE :: LANDUSE_REF( : )
       REAL,          ALLOCATABLE :: ZENITH_COEFF_REF( : )
       REAL,          ALLOCATABLE :: SEASON_COEFF_REF( : )
       REAL,          ALLOCATABLE :: SNOW_COEFF_REF( : )
+      REAL,          ALLOCATABLE :: CRITICAL_SNOW_DEPTH_REF( : )
       REAL,          ALLOCATABLE :: SPECTRAL_ALBEDO_REF( :,: )
 
       INTEGER, PARAMETER         :: NUMB_EXPECT_NLCD50  = 50
@@ -1219,6 +1222,7 @@ C...begin read
       ALLOCATE( ZENITH_COEFF_REF( NUMB_LANDUSE_REF ) )
       ALLOCATE( SEASON_COEFF_REF( NUMB_LANDUSE_REF ) )
       ALLOCATE( SNOW_COEFF_REF  ( NUMB_LANDUSE_REF ) )
+      ALLOCATE( CRITICAL_SNOW_DEPTH_REF( NUMB_LANDUSE_REF ) )
       ALLOCATE( SPECTRAL_ALBEDO_REF( NWL_OPTICS, NUMB_LANDUSE_REF ) )
 
       READ( OPTICS_UNIT,'(A)' ) FILE_LINE ! skip line
@@ -1230,12 +1234,14 @@ C...begin read
          READ( OPTICS_UNIT,5012 ) LANDUSE_REF( ITT_LOAD ),
      &                            ZENITH_COEFF_REF( ITT_LOAD ),
      &                            SEASON_COEFF_REF( ITT_LOAD ),
-     &                            SNOW_COEFF_REF( ITT_LOAD )
+     &                            SNOW_COEFF_REF( ITT_LOAD ),
+     &                            CRITICAL_SNOW_DEPTH_REF( ITT_LOAD )
 #ifdef verbose_phot
          write( LOGDEV,5012 ) landuse_ref( itt_load ),
      &                          zenith_coeff_ref( itt_load ),
      &                          season_coeff_ref( itt_load ),
      &                          snow_coeff_ref( itt_load )
+     &                          critical_snow_depth_ref( itt_load )
 #endif
       END DO
 
@@ -1393,7 +1399,7 @@ C...begin read
       CLOSE(OPTICS_UNIT)
 
 4999  FORMAT(17X,I3,2X,17X,I3)
-5012  FORMAT( 4X,A30,1X,3(F8.3,2X) )
+5012  FORMAT( 4X,A30,1X,4(F8.3,2X) )
 5013  FORMAT( 22X,I3 )
 5016  FORMAT( 4X,A60,1X,I3,2X,3(F8.3,2X) )
 99946 FORMAT(4x,3(f8.3,2x),2x,2(es12.4,2x),f8.3,2x,12(es12.4,2x))

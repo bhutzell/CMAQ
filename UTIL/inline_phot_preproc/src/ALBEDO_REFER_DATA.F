@@ -167,6 +167,7 @@
                 
           INTEGER, PARAMETER :: INDEX_GRASSLAND    = 10
           INTEGER, PARAMETER :: INDEX_OCEAN_WATER  = 17
+          INTEGER, PARAMETER :: INDEX_SNOW         = 15
           INTEGER, PARAMETER :: INDEX_SEA_ICE      = 20
           
           REAL ZENITH_COEFF( NUMB_LANDUSE_MODIS )
@@ -267,6 +268,35 @@
      &                   4.0,   ! TUNDRA		(modified with Lundberg et al (2005))
      &                   1.0,   ! FRESH SNOW
      &                   1.3 / ! SEA ICE
+
+! Snow Height Water Equivalent where snow coverage equals one if exceeded.
+! Theory comes from NOAH Land Surface Model but used values adapted from 
+!     Wang, Z. and Zeng, X. (2010). Evaluation of Snow Albedo in Land
+!     Models for Weather and Climate Studies. Journal of Applied Meteorology and
+!     Climatology - J APPL METEOROL CLIMATOL. 49. 363-380. 10.1175/2009JAMC2134.1. 
+
+          REAL CRITICAL_SNOW_DEPTH( NUMB_LANDUSE_MODIS ) ! liquid water equivalent (m)
+          DATA CRITICAL_SNOW_DEPTH  /
+     &                   0.20,   ! EVERGREEN NEEDLE FOR
+     &                   0.20,   ! EVERGREEN BROADLEAF FOR
+     &                   0.20,   ! DECIDUOUS NEEDLE FOR
+     &                   0.20,   ! DECIDUOUS BROADLEAF FOR
+     &                   0.20,   ! MIXED FOREST
+     &                   0.02,   ! CLOSED SHRUBS
+     &                   0.02,   ! OPEN/SHRUBS
+     &                   0.02,   ! WOODY SAVANNA
+     &                   0.01,   ! SAVANNA
+     &                   0.01,   ! GRASSLAND
+     &                   0.01,   ! WETLAND
+     &                   0.01,   ! CROPLAND
+     &                   0.05,   ! URBAN
+     &                   0.01,   ! CROP MOSAIC
+     &                   0.01,   ! PERMANENT SNOW
+     &                   0.01,   ! BARREN/DESERT
+     &                   -1.0,   ! OCEAN WATER
+     &                   0.02,   ! TUNDRA
+     &                   0.01,   ! FRESH SNOW
+     &                   0.01 / ! SEA ICE
 	     
           INTEGER, PARAMETER :: NUMB_USGS =   24
           

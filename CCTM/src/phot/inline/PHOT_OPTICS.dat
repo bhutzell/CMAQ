@@ -431,27 +431,27 @@ NUMB_LANDUSE_MODIS =   20
 INDEX_GRASSLAND    =   10
 INDEX_OCEAN_WATER  =   17
  INDEX_SEA_ICE     =   20
-! I,      LANDUSE_CATEGORY,    ZENITH_ANGLE_COEFF,        SEASONAL_COEFF,      SNOW_COVER_COEEF, 
-  1 EVERGREEN NEEDLE FOREST           0.400     0.730     3.000
-  2 EVERGREEN BROADLEAF FOREST        0.440     0.840     4.100
-  3 DECIDUOUS NEEDLE FOREST           0.320     0.770     3.100
-  4 DECIDUOUS BROADLEAF FOREST        0.390     0.730     2.700
-  5 MIXED FOREST                      0.220     0.780     3.000
-  6 CLOSED SHRUBS                     0.280     0.730     8.600
-  7 OPEN / SHRUBS                     0.400     0.770     3.600
-  8 WOODY SAVANNA                     0.470     0.780     7.800
-  9 SAVANNA                           0.530     0.780    25.900
- 10 GRASSLAND                         0.530     0.790    19.600
- 11 PERMANENT WETLANDS                0.350     0.780     4.900
- 12 CROPLAND                          0.410     0.800    26.500
- 13 URBAN                             0.100     0.670     3.600
- 14 CROP MOSAIC                       0.400     0.800    15.900
- 15 PERMANENT SNOW                    0.100     1.000     1.700
- 16 BARREN / DESSERT                  0.400     0.960     5.700
- 17 OCEAN WATER                       0.410     1.000     1.000
- 18 TUNDRA                            0.580     0.250     4.000
- 19 FRESH SNOW                        0.100     1.000     1.000
- 20 SEA ICE                           0.100     1.000     1.300
+! I,      LANDUSE_CATEGORY,    ZENITH_ANGLE_COEFF,        SEASONAL_COEFF,      SNOW_COVER_COEEF,   CRITICAL_SNOW_DEPTH, 
+  1 EVERGREEN NEEDLE FOREST           0.400     0.730     3.000     0.200
+  2 EVERGREEN BROADLEAF FOREST        0.440     0.840     4.100     0.200
+  3 DECIDUOUS NEEDLE FOREST           0.320     0.770     3.100     0.200
+  4 DECIDUOUS BROADLEAF FOREST        0.390     0.730     2.700     0.200
+  5 MIXED FOREST                      0.220     0.780     3.000     0.200
+  6 CLOSED SHRUBS                     0.280     0.730     8.600     0.020
+  7 OPEN / SHRUBS                     0.400     0.770     3.600     0.020
+  8 WOODY SAVANNA                     0.470     0.780     7.800     0.020
+  9 SAVANNA                           0.530     0.780    25.900     0.010
+ 10 GRASSLAND                         0.530     0.790    19.600     0.010
+ 11 PERMANENT WETLANDS                0.350     0.780     4.900     0.010
+ 12 CROPLAND                          0.410     0.800    26.500     0.010
+ 13 URBAN                             0.100     0.670     3.600     0.050
+ 14 CROP MOSAIC                       0.400     0.800    15.900     0.010
+ 15 PERMANENT SNOW                    0.100     1.000     1.700     0.010
+ 16 BARREN / DESSERT                  0.400     0.960     5.700     0.010
+ 17 OCEAN WATER                       0.410     1.000     1.000    -1.000
+ 18 TUNDRA                            0.580     0.250     4.000     0.020
+ 19 FRESH SNOW                        0.100     1.000     1.000     0.010
+ 20 SEA ICE                           0.100     1.000     1.300     0.010
 !             LANDUSE CATEGORY  WBIN(  1)     WBIN(  2)     WBIN(  3)     WBIN(  4)     WBIN(  5)     WBIN(  6)     WBIN(  7)
        EVERGREEN NEEDLE FOREST 1.120000E-01  1.120000E-01  1.120000E-01  1.120000E-01  1.120000E-01  1.120000E-01  2.389658E-01
     EVERGREEN BROADLEAF FOREST 1.100000E-01  1.100000E-01  1.100000E-01  1.100000E-01  1.100000E-01  1.100000E-01  1.729747E-01

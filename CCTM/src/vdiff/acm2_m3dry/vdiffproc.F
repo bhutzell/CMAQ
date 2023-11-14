@@ -246,7 +246,15 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
 #ifdef isam
             CALL SA_OPWDDEP ( SA_DD_1, JDATE, JTIME,TSTEP( 1 ) )
 #endif
-            IF ( ABFLUX .OR. HGBIDI ) CALL OPASX_MEDIA( JDATE, JTIME, TSTEP( 1 ) )
+            CALL OPASX_MEDIA( JDATE, JTIME, TSTEP( 1 ) )
+C Get description of media_conc file
+!        IF ( .NOT. DESC3( MEDIA_CONC ) ) THEN
+!           XMSG = 'Could not get description of file "'
+!    &           // TRIM( MEDIA_CONC ) // '"'
+!           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!        END IF
+         write(6,'(A)' )VNAME3D(1:NVARS3D)
+
          END IF
 
 C Open vdiff diagnostics file (ioapi header from cgrd)
@@ -727,10 +735,24 @@ C Write other diagnostics
 
          END IF
          
-         IF ( ABFLUX .OR. HGBIDI ) THEN    
-            CALL WRASX_MEDIA( MDATE, MTIME )
-         END IF 
+!        IF ( ABFLUX .OR. HGBIDI ) THEN    
+!           CALL WRASX_MEDIA( MDATE, MTIME )
+!        END IF 
 
+         DO R = 1, NROWS
+            DO C = 1, NCOLS
+             CMEDIA( C,R,N_TOT  ) =  Met_Data%SNOWAGE( C,R )
+            END DO
+         END DO
+C Get description of media_conc file
+!        IF ( .NOT. DESC3( MEDIA_CONC ) ) THEN
+!           XMSG = 'Could not get description of file "'
+!    &           // TRIM( MEDIA_CONC ) // '"'
+!           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!        END IF
+
+         CALL WRASX_MEDIA( MDATE, MTIME )
+!        write(666666,'(A)' )VNAME3D(1:NVARS3D)
 
 #ifdef isam
          WRDD = 0.0
