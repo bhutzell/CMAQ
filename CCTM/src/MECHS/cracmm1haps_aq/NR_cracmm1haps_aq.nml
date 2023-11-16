@@ -6,7 +6,7 @@ NR_SPECIES_DATA =
 'NH3'            , 17.0   ,''     ,-1      ,''     ,-1     ,'VD_NH3'          , 1   ,'NH3'             , 1  ,'NH3'          ,'NH3'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Ammonia,E,DTXSID0023872,N
 'HCL'            , 36.0   ,''     ,-1      ,''     ,-1     ,'VD_HCL'          , 1   ,'HCL'             , 1  ,'HCL'          ,'HCL'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrochloric acid,E,DTXSID2020711,Cl
 'HCHO_PRIM'      , 30.0   ,'HCHO' ,1.0     ,'HCHO' ,1.0    ,'VD_HCHO'         , 1   ,'FORMALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'CH3CHO_PRIM'    , 44.0   ,'ACD'  ,1.0     ,'ACD'  ,1.0    ,'VD_ACD'          , 1   ,'GENERIC_ALDEHYDE', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
+'CH3CHO_PRIM'    , 44.0   ,'ACD'  ,1.0     ,'ACD'  ,1.0    ,'VD_ACD'          , 1   ,'ACETALDEHYDE', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
 'ACRO_PRIM'      , 56.1   ,'ACRO' ,1.0     ,'ACRO' ,1.0    ,'VD_ACRO'         , 1   ,'ACROOPERA'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,''    ,'Yes',
 'ACRY_NITRILE'   , 53.10  ,''   ,-1      ,''   ,-1     ,''                ,-1   ,'ACRYLONITRILE'   , 1  ,''           ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'CARBONTET'      ,153.80  ,''   ,-1      ,''   ,-1     ,''                ,-1   ,'CARBONTETRACHLOR', 1  ,''           ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
@@ -39,6 +39,8 @@ NR_SPECIES_DATA =
 'CHLOROPRENE'    , 88.50  ,''   ,-1      ,''   ,-1     ,''                ,-1   ,'CHLOROPRENE'     , 1  ,''           ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'ETHYLBENZENE'   ,106.00  ,''   ,-1      ,''   ,-1     ,'VD_TOL'          , 1   ,'ETHYLBENZENE'    , 1  ,''           ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
 'BENAPY'         ,252.3   ,''   ,-1      ,''   ,-1     ,''                ,-1   ,'BENAPY'          , 1  ,''           ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
+'HG'             ,200.6   ,''   ,-1    ,''     ,-1     ,'VD_HG'           , 1   ,'HG'              , 1  ,''           ,'HG'      ,'Yes' ,'Yes' ,'Yes' ,'Yes',
+'HGIIGAS'        ,271.5   ,''   ,-1    ,''     ,-1     ,'VD_HGIIGAS'      , 1   ,'HGIIGAS'         , 1  ,''           ,'HGIIGAS' ,'Yes' ,'Yes' ,'Yes' ,'Yes',
 'PAH_000E0'      ,186.2   ,''   ,-1      ,''   ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''           ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'PAH_176E5'      ,197.7   ,''   ,-1      ,''   ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''           ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'PAH_880E5'      ,197.9   ,''   ,-1      ,''   ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''           ,''        ,'Yes' ,''    ,'Yes' ,'Yes',

@@ -144,7 +144,8 @@
 | AAVB4 | semivolailte organic particulate matter from oxidation of anthropogenic VOCs | 158.0 |  L |
 | ABE               | Beryllium                                            | 9.0                  | E                      |
 | ABENAPY           | Aerosol Phase Benzo-a-Pyrene                         | 252.30               | E                      |
-| ACA               | Calcium                                              | 40.1                 | E                      |
+| ACADMIUM          | Cadmium                                              | 40.1                 | E                      |
+| ACA               | Calcium                                              | 112.4                | E                      |
 | ACL               | Chloride                                             | 35.5                 | E                      |
 | ACORS             | Anthropogenic Coarse-mode particle mass              | 100.0                | L                      |
 | ACR_III           | Trivalent Chromium                                   | 52.0                 | E                      |

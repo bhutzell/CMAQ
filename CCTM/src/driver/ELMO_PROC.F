@@ -1716,7 +1716,7 @@
              CASE ( ID_PM25_HCD ) 
                N_VARS = 1
                CALL INIT_ELMO_COEFFS( IDG, N_VARS, 'PM25' )
-               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACD', 1.0 )
+               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACADMIUM', 1.0 )
  
              ! Map PM25_HCR3 - HAP inventory Chromium III
              CASE ( ID_PM25_HCR3 ) 
@@ -1794,7 +1794,7 @@
              CASE ( ID_PM10_HCD ) 
                N_VARS = 1
                CALL INIT_ELMO_COEFFS( IDG, N_VARS, 'PM10' )
-               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACD', 1.0 )
+               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACADMIUM', 1.0 )
  
              ! Map PM10_HCR3 - HAP inventory Chromium III
              CASE ( ID_PM10_HCR3 ) 

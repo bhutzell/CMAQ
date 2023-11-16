@@ -65,7 +65,7 @@ AE_SPECIES_DATA =
 'ADE_NO3' , 62.00  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'ADE_SO4' , 96.00  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'ADE_CORS',100.00  ,F      ,F     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ACD'     ,112.40  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
+'ACADMIUM',112.40  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'AMN_HAPS', 54.90  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'APHG'    ,200.50  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'PHG'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'AAS'     , 74.92  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
