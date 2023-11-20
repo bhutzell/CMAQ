@@ -37,6 +37,18 @@ DDEP_SO2           ,kg ha-1     ,SO2[1]
 DDEP_O3            ,kg ha-1     ,O3[1]
 WDEP_O3            ,kg ha-1     ,O3[2]
 WDEP_PNA           ,kg ha-1     ,HNO4[2]   ! PeroxyNitric Acid
+DDEP_BENZENE       ,kg ha-1     ,BEN[1] 
+WDEP_BENZENE       ,kg ha-1     ,BEN[2] 
+DDEP_TOLUENE       ,kg ha-1     ,TOL[1] 
+WDEP_TOLUENE       ,kg ha-1     ,TOL[2] 
+DDEP_ETHYLBENZENE  ,kg ha-1     ,ETHYLBENZENE[1] 
+WDEP_ETHYLBENZENE  ,kg ha-1     ,ETHYLBENZENE[2] 
+DDEP_DICLORBENZENE ,kg ha-1     ,DICL_BENZENE[1] 
+WDEP_DICLORBENZENE ,kg ha-1     ,DICL_BENZENE[2] 
+DDEP_STYRENE       ,kg ha-1     ,STYRENE[1] 
+WDEP_STYRENE       ,kg ha-1     ,STYRENE[2] 
+DDEP_XYLENE        ,kg ha-1     ,XYLENE[1] 
+WDEP_XYLENE        ,kg ha-1     ,XYLENE[2] 
 
 !---------------------------------------------------!
 !------------- Aerosol Deposition ------------------!
@@ -124,6 +136,50 @@ WDEP_KJK           ,kg ha-1     ,AKJ[2]+WDEP_KK[0]
 !! Manganese
 DDEP_MNJ           ,kg ha-1     ,AMNJ[1]
 WDEP_MNJ           ,kg ha-1     ,AMNJ[2]
+
+! lead
+DDEP_LEAD          ,kg ha-1   ,APBI[1] + APBJ[1] + APBK[1]
+WDEP_LEAD          ,kg ha-1   ,APBI[2] + APBJ[2] + APBK[2]
+
+! Manganese for Air Toxics Inventory
+DDEP_MN_HAPS       ,kg ha-1   ,AMN_HAPSI[1] + AMN_HAPSJ[1] + AMN_HAPSK[1]
+WDEP_MN_HAPS       ,kg ha-1   ,AMN_HAPSI[2] + AMN_HAPSJ[2] + AMN_HAPSK[2]
+
+! Arsenic
+DDEP_ARSENIC        ,kg ha-1   ,AASI[1] + AASJ[1] + AASK[1]
+WDEP_ARSENIC        ,kg ha-1   ,AASI[2] + AASJ[2] + AASK[2]
+
+! Trivalent Chromium
+DDEP_CRIII         ,kg ha-1   ,ACR_IIII[1] + ACR_IIIJ[1] + ACR_IIIK[1]
+WDEP_CRIII         ,kg ha-1   ,ACR_IIII[2] + ACR_IIIJ[2] + ACR_IIIK[2]
+
+! Hexavalent Chromium
+DDEP_CRVI          ,kg ha-1   ,ACR_VII[1] + ACR_VIJ[1] + ACR_VIK[1]
+WDEP_CRVI          ,kg ha-1   ,ACR_VII[2] + ACR_VIJ[2] + ACR_VIK[2]
+
+! BERYLLIUM
+DDEP_BERYLLIUM     ,kg ha-1   ,ABEI[1] + ABEJ[1] + ABEK[1]
+WDEP_BERYLLIUM     ,kg ha-1   ,ABEI[2] + ABEJ[2] + ABEK[2]
+
+! CADMIUM
+DDEP_CADMIUM        ,kg ha-1   ,ACADMIUMI[1] + ACADMIUMJ[1] + ACADMIUMK[1]
+WDEP_CADMIUM        ,kg ha-1   ,ACADMIUMI[2] + ACADMIUMJ[2] + ACADMIUMK[2]
+
+! NICKLE
+DDEP_NICKLE        ,kg ha-1   ,ANII[1] + ANIJ[1] + ANIK[1]
+WDEP_NICKLE        ,kg ha-1   ,ANII[2] + ANIJ[2] + ANIK[2]
+
+! Total Chromium
+DDEP_CHROMIUM      ,kg ha-1   ,DDEP_CRIII[0] + DDEP_CRVI[0]
+WDEP_CHROMIUM      ,kg ha-1   ,WDEP_CRIII[0] + WDEP_CRVI[0]
+
+! Gas plus Aerosol Mercury Deposition
+DDEP_HG           ,kg ha-1   ,APHGI[1] + APHGJ[1] + APHGK[1] + HG[1] + HGIIGAS[1]
+WDEP_HG           ,kg ha-1   ,APHGI[2] + APHGJ[2] + APHGK[2] + HG[2] + HGIIGAS[2]
+
+! Gas plus Aerosol Benzo-A-Pyrene Deposition
+DDEP_BENAPY       ,kg ha-1   ,ABENAPYI[1] + ABENAPYJ[1]
+WDEP_BENAPY       ,kg ha-1   ,ABENAPYI[2] + ABENAPYJ[2] + BENAPY[2]
 
 
 !---------------------------------------------------!
