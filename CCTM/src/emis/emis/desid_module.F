@@ -56,6 +56,7 @@ C                          Day Emissions
 C     16 Dec 2019 S.L.Napelenok: ddm-3d implementation for version 5.3.1
 C     6 Jul 2021 D.Wong: fixed time marching through a day line during simulation w.r.t.
 C                        representative Day Emissions in subroutine GR3D
+C     12 July 2022 B.H. Baek & C. Coats: USE METEMIS and related changes
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE GRID_CONF           ! horizontal & vertical domain specifications      
@@ -81,6 +82,7 @@ C-----------------------------------------------------------------------
          USE MGEMIS              ! marine gas emissions
          USE LTNG_DEFN           ! NO emissions from lightning strikes
          USE PT3D_DEFN           ! plume rise emissions
+         USE METEMIS             ! met-modulated (mobile) emissions
          USE UTILIO_DEFN         ! I/O API
          USE AERO_EMIS           ! inherits GRID_CONF
          !USE AERO_DATA           ! access subroutine map_pmemis
@@ -193,22 +195,24 @@ C Initialize 3D Point Source Emissions
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
-         IF ( BIOGEMIS_MEGAN ) THEN
 C Initialize Online Biogenic Emissions, MEGAN
+         IF ( BIOGEMIS_MEGAN ) THEN
           CALL LOG_SUBHEADING( LOGDEV, 'Initialize BEIS Biogenic Emissions' )
           IF ( .NOT. MEGAN_INIT( JDATE, JTIME, TSTEP ) ) THEN
              XMSG = 'Failure initializing biogenics emissions module'
              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
           END IF
          END IF
-         IF ( BIOGEMIS_BEIS ) THEN 
+
 C Initialize Online Biogenic Emissions, BEIS
+         IF ( BIOGEMIS_BEIS ) THEN 
           CALL LOG_SUBHEADING( LOGDEV, 'Initialize MEGAN Biogenic Emissions' )
           IF ( .NOT. BEIS_INIT( JDATE, JTIME, TSTEP ) ) THEN
             XMSG = 'Failure initializing biogenics emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
           END IF
          END IF
+
 C Initialize Online Marine Gas Emissions
          CALL LOG_SUBHEADING( LOGDEV, 'Initialize Marine Gas Emissions' )
          IF ( .NOT. MGEMIS_INIT( JDATE, JTIME, TSTEP ) ) THEN
@@ -221,6 +225,15 @@ C Initialize Online Lightning NOx Emissions
          IF ( .NOT. LTNG_INIT( JDATE, JTIME, TSTEP ) ) THEN
             XMSG = 'Failure initializing lightning emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+
+C Initialize Online Meteorology-Dependent Emissions
+         IF ( USE_MET_EMIS ) THEN 
+           CALL LOG_SUBHEADING( LOGDEV, 'Initialize Met-Modulated Emissions' )
+           IF ( .NOT. METEMIS_INIT( JDATE, JTIME, TSTEP ) ) THEN
+              XMSG = 'Failure initializing met-modulated emissions module'
+              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+           END IF
          END IF
 
 C Initialize Aerosol Emissions         
@@ -364,6 +377,7 @@ C Return From Initialization
          USE MGEMIS              ! marine gas emissions
          USE PT3D_DEFN           ! plume rise emissions
          USE LTNG_DEFN           ! lightning NO emissions
+         USE METEMIS             ! met-modulated emissions
          USE UTILIO_DEFN
          USE HGRD_DEFN
          USE ASX_DATA_MOD, ONLY: MET_DATA, GRID_DATA
@@ -680,6 +694,7 @@ C Retrieve Emissions from All Stream Types
                CALL DESID_SCALING( VDEMIS_READ, ISRM, NL, VDEMIS_SCALED )
                CALL DESID_SIZE_DIST( ISRM, VDEMIS_SCALED, NL )
 
+             ! Retrieve MEGAN Online Biogenic Emissions
              CASE ( 9 )
                NL = 1
                CALL GET_MEGAN ( JDATE, JTIME, TSTEP, L_DESID_DIAG)
@@ -687,6 +702,17 @@ C Retrieve Emissions from All Stream Types
                   VDEMIS_READ( ISTR,1,:,: ) = VDEMIS_ME( MAP_ISTRtoEMVAR( ISTR,ISRM ),:,: ) 
                END FORALL
                CALL DESID_SCALING( VDEMIS_READ, ISRM, NL, VDEMIS_SCALED )
+
+             ! Retrieve Met-Modulated Emissions
+             CASE ( 10 )
+               NL = 1
+               CALL GET_METEMIS ( JDATE, JTIME, TSTEP, L_DESID_DIAG)
+               FORALL( ISTR = 1:DESID_N_ISTR, MAP_ISTRtoEMVAR( ISTR,ISRM ) .GT. 0 )
+                  VDEMIS_READ( ISTR,1,:,: ) = VDEMIS_MV( MAP_ISTRtoEMVAR( ISTR,ISRM ),:,: ) 
+               END FORALL
+               CALL DESID_SCALING( VDEMIS_READ, ISRM, NL, VDEMIS_SCALED )
+               CALL DESID_SIZE_DIST( ISRM, VDEMIS_SCALED, NL )
+
 
            END SELECT
            
@@ -1512,7 +1538,8 @@ C and allowing the model to proceed.
 
             IF ( ISRM .EQ. ISEASRM .OR. ISRM .EQ. IBIOSRM .OR. 
      &           ISRM .EQ. IDUSTSRM.OR. ISRM .EQ. ILTSRM  .OR.
-     &           ISRM .EQ. IMGSRM  .OR. ISRM .EQ. IMIOGSRM ) CYCLE
+     &           ISRM .EQ. IMGSRM  .OR. ISRM .EQ. IMIOGSRM .OR.
+     &           ISRM .EQ. IMETSRM ) CYCLE
 
             ALLOCATE( DESID_EMVAR( ISRM )%MW      ( DESID_EMVAR( ISRM )%LEN ) )
             ALLOCATE( DESID_EMVAR( ISRM )%USED    ( DESID_EMVAR( ISRM )%LEN ) )
@@ -2757,6 +2784,9 @@ C and allowing the model to proceed.
          ! Marine gas emissions; use online marine gas option only if CB6R5M is used
          IF ( USE_MARINE_GAS_EMISSION ) DESID_N_SRM = DESID_N_SRM + 1
   
+         ! Met-Modulated Emissions; use if met-emis is activated
+         IF ( USE_MET_EMIS ) DESID_N_SRM = DESID_N_SRM + 1
+  
          ! Lightning NO Emissions
          IF ( LTNG_NO ) DESID_N_SRM = DESID_N_SRM + 1
   
@@ -2971,6 +3001,17 @@ C stkemis_init.
              IDUSTSRM = ISRM
          END IF
          
+         ! Met-Modulated Emissions
+         IF ( USE_MET_EMIS ) THEN
+           ISRM = ISRM + 1
+           DESID_STREAM_TYPE( ISRM ) = 'METEMIS'
+           DESID_STREAM_ITYPE( ISRM ) = 10
+           DESID_STREAM_LAB ( ISRM ) = 'METEMIS'
+           DESID_STREAM_DESC( ISRM ) = 'Met-Modulated Emissions'
+
+           IMETSRM = ISRM
+         END IF
+
         END SUBROUTINE DESID_INIT_STREAMS 
  
 !-----------------------------------------------------------------------
