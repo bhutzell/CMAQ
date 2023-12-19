@@ -256,7 +256,7 @@
    'EVERYWHERE', 'ALL'    ,'PMFINE_BE'      ,'ABE'      ,'FINE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMFINE_PHG'     ,'APHG'     ,'FINE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMFINE_PB'      ,'APB'      ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_CD'      ,'ACD'      ,'FINE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMFINE_CD'      ,'ACADMIUM' ,'FINE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMFINE_MN_HAPS' ,'AMN_HAPS' ,'FINE',1.   ,'UNIT','a', 
 
 
@@ -275,7 +275,7 @@
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_BE'      ,'ABE'      ,'COARSE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_PHG'     ,'APHG'     ,'COARSE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_PB'      ,'APB'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CD'      ,'ACD'      ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CD'      ,'ACADMIUM' ,'COARSE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_MN_HAPS' ,'AMN_HAPS' ,'COARSE',1.   ,'UNIT','a', 
    
 /
