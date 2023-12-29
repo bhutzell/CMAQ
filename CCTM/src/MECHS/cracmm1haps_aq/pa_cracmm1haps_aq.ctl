@@ -173,7 +173,7 @@ IRR_OUTPUT NewHOxfromHNOX = HNO4cyc[NEGONLY];
 ! from photolysis not including HCHO, HNO3 and HNO4
 IRR_OUTPUT NewHOxfromhv = <R011> + <R028> + <R029>+ <TRP03> + <R029a> + <R013> 
 + <R012> + 2.0*<R023> + <R030> + <R031> + <R018> + 0.340*<R019> 
-+ <R201> + <R027b>;
++ <R201> + <R027>;
 ! from O3+alkene reactions
 IRR_OUTPUT NewHOxfromO3 =0.230*<R126> + 0.550*<R127> + 0.510*<R128> +0.500*<R130>
 +0.900*<R131> + 0.190*<R132> + 0.040*<TRP08> + 0.160*<R134>;  
