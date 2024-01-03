@@ -839,8 +839,8 @@ c----------------------------------------------------------
         ISAM_SPEC_HAPGAS( 7 )%LIST = (/'DIEN        '/)
 
         !CRACMM1_AQ
-        ALLOCATE( ISAM_SPEC_HAPGAS( 8 )%LIST( 1 ) )
-        ISAM_SPEC_HAPGAS( 8 )%LIST = (/'HCHO        '/)
+        ALLOCATE( ISAM_SPEC_HAPGAS( 8 )%LIST( 2 ) )
+        ISAM_SPEC_HAPGAS( 8 )%LIST = (/'BDE13       ','ACRO        '/)
 
 
         !AEROSOL HAPS
@@ -857,14 +857,15 @@ c----------------------------------------------------------
      &                             'PAH_176E3','PAH_192E3','PAH_101E2','PAH_176E2',
      &                             'PAH_114E1'/)   
 
-       ALLOCATE( ISAM_SPEC_TOXICS%LIST( 30 ) )
+       ALLOCATE( ISAM_SPEC_TOXICS%LIST( 34 ) )
        ISAM_SPEC_TOXICS%LIST( 1:30 ) = (/'ACRY_NITRILE','CARBONTET   ','PROPYL_DICL ',
      &     'DICL_PROPENE','CL4_ETHANE  ','CHCL3       ','BR2_C2_12   ','CL2_C2_12   ',
      &     'ETOX        ','ACET_NITRILE','XYLENE      ','STYRENE     ','ACRYACID    ',
      &     'HEXANE      ','METHCHLORIDE','CARBSULFIDE ','CHLOROPRENE ','ETHYLBENZENE',
      &     'HEXMETH_DIS ','HYDRAZINE   ','MAL_ANHYDRID','CL_ETHE     ','NAPHTHALENE ',
      &     'QUINOLINE   ','TOL_DIIS    ','TRIETHYLAMIN','DICL_BENZENE','CL2_ME      ',
-     &     'CL4_ETHE    ','CL3_ETHE    '/)
+     &     'CL4_ETHE    ','CL3_ETHE    ','HCHO_PRIM   ','ACD_PRIM    ','ACRO_PRIM   ',
+     &     'HCN         '/)
 
 
         ALLOCATE( ISAM_SPEC_MERCURY%LIST( 4 ) )
