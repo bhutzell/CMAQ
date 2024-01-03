@@ -309,6 +309,7 @@ C Return From Initialization
          LOGICAL         :: WRTIME
          CHARACTER( 200 ):: XMSG
 
+         CALL LOG_MESSAGE( LOGDEV, '' )
          CALL LOG_MESSAGE( LOGDEV, 'Beginning Emissions' )
          
          IF ( FIRST_TIME ) THEN
@@ -345,7 +346,6 @@ C Return From Initialization
      &          '  Calling Diagnostic Emissions at Date: ',MDATE,
      &          '  and time: ',MTIME
            CALL LOG_MESSAGE( LOGDEV, XMSG )
-           CALL LOG_MESSAGE( LOGDEV, '' )
            CALL DESID_GET_EMIS( MDATE, MTIME, TSTEP, CGRID, .TRUE. )
 
          END IF
@@ -354,9 +354,11 @@ C Return From Initialization
            WRITE( XMSG, '(A,I10,A,I10)' ),
      &          '  Calling Real Emissions at Date: ',JDATE,
      &          '  and time: ',JTIME
-           CALL LOG_MESSAGE( LOGDEV, XMSG )
            CALL LOG_MESSAGE( LOGDEV, '' )
+           CALL LOG_MESSAGE( LOGDEV, XMSG )
          CALL DESID_GET_EMIS( JDATE, JTIME, TSTEP, CGRID, .FALSE. )
+
+         CALL LOG_MESSAGE( LOGDEV, '' )
 
          END SUBROUTINE DESID_DRIVER
 

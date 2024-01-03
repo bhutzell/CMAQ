@@ -40,6 +40,8 @@
         USE UTILIO_DEFN
 
         IMPLICIT NONE
+        
+        INCLUDE SUBST_FILES_ID  ! file name parameters
 
         PUBLIC METEMIS_INIT, GET_METEMIS
 
@@ -75,7 +77,6 @@
         INTEGER, SAVE :: TSTEPMT
 
         CHARACTER*16, SAVE :: TBLNAME = 'METEMIS_TBL'
-        CHARACTER*16, SAVE :: CTM_METEMIS_DIAG_1 = 'METEMIS_DIAG'
 
         REAL, ALLOCATABLE, SAVE :: ETABLE( :,:,:,: )  !! ( NCOLS,NROWS,NMTEMP,NMETSPC )
         REAL, ALLOCATABLE, SAVE :: TEMPVAL( :,: )     !! ( NCOLS,NROWS ) for temperature
@@ -149,10 +150,11 @@
      &                ETABLE( NCOLS,NROWS,NMTEMP,NMETSPC ),
      &                TEMPVAL( NCOLS,NROWS ), MTEMPS( NMTEMP ),
      &                QVMOL( NCOLS,NROWS), VDEMIS_MV( NMETSPC,NCOLS,NROWS ),
-     &                STAT = ISTAT )
+     &                VDEMIS_MVDIAG( NMETSPC,NCOLS,NROWS ), STAT = ISTAT )
             ETABLE = 0.0
             TEMPVAL= 0.0
             QVMOL= 0.0
+            VDEMIS_MVDIAG = 0.0
 
             MTEMPS( 1:NMTEMP )  = VGLVS3D( 1:NMTEMP )
             MTNAME( 1:NMETSPC ) = VNAME3D( 1:NMETSPC )
@@ -178,6 +180,8 @@
             
             MV_TSTEP = TIME2SEC( TSTEP )
             MV_TSTEP_F = TSTEP
+
+            LDATE = STDATE; LTIME = STTIME
 
             IF ( .NOT.METEMDIAG ) THEN
                 CONTINUE
@@ -211,8 +215,8 @@
                 !! borrow rest of FDESC from input-file...
                 FDESC3D      = ' '
                 FDESC3D( 1 ) = 'hourly met-modulated emissions (diagnostic outputs)'
-                IF ( .NOT. OPEN3( CTM_METEMIS_DIAG_1, FSUNKN3, PNAME ) ) THEN
-                    CALL M3WARN( PNAME, 0,0, 'Could not open '//CTM_METEMIS_DIAG_1 )
+                IF ( .NOT. OPEN3( CTM_METEMIS_DIAG, FSUNKN3, PNAME ) ) THEN
+                    CALL M3WARN( PNAME, 0,0, 'Could not open '//CTM_METEMIS_DIAG )
                     METEMIS_INIT = .FALSE.
                     RETURN
                 END IF
@@ -269,9 +273,13 @@
                FIRSTIME = .FALSE.
             END IF
 
-            WRITE( LOGDEV,'(A,I8)') '     Processing Met-modulated '
-     &                            //'emissions table for date:', JDATE
+            WRITE( MESG, '(A,I8)' ),
+     &         '     Processing Met-modulated '
+     &          //'emissions table for date:', JDATE
+            CALL LOG_MESSAGE( LOGDEV, MESG )
 
+            ! Read METEMIS_TBL Data if this is the first timestep past
+            ! the most recent time point on the table.
             STIMEMT = INT( JTIME/10000 ) * 10000
             IF ( PRVHR .NE. STIMEMT ) THEN
                 IF( .NOT.XTRACT3( TBLNAME, ALLVAR3, 1, NMTEMP,
@@ -280,8 +288,9 @@
                     MESG = 'Error(s) reading "'//TRIM(TBLNAME)//'"'
                     CALL M3EXIT( PNAME, SDATEMT, STIMEMT, MESG, 2 )
                 END IF
+                PRVHR = STIMEMT
             END IF
-
+            
             !!.......   Retrieve Met variable (TEMP2) to compute MetEmis
             CALL interpolate_var ( 'TEMP2', JDATE, JTIME, TEMPVAL )
             CALL interpolate_var ( 'QV', JDATE, JTIME, QVMOL )
@@ -349,36 +358,29 @@ C ..........  Determine the time to read and/or write the hourly files
                  CALL NEXTIME( LDATE, LTIME, MV_TSTEP_F)
                  R_READY = .TRUE.
               END IF
-            END IF
 
 
 C ..........  Output diagnostic emissions
-            IF ( PRVHR .NE. STIMEMT ) THEN
-            IF ( METEMDIAG .AND. .NOT. L_DESID_DIAG ) THEN
+              IF ( METEMDIAG ) THEN
+                
+                 VDEMIS_MVDIAG = VDEMIS_MVDIAG + VDEMIS_MV   ! array assignment
+                 IF ( LASTTIC ) THEN   ! time to write out
+                    VDEMIS_MVDIAG = VDEMIS_MVDIAG / REAL( MTICS, 4 )  ! array assignment
+                    DO V = 1, NMETSPC
+                      IF ( .NOT. WRITE3( CTM_METEMIS_DIAG, MTNAME(V), 
+     &                                   ADJ_LDATE, ADJ_LTIME,VDEMIS_MVDIAG( V,:,:) ) ) THEN
+                         XMSG = 'Could not write to ' // TRIM( CTM_METEMIS_DIAG )
+                         CALL M3EXIT( PNAME, ADJ_LDATE, ADJ_LTIME, XMSG, XSTAT2 )
+                      END IF
+                    END DO
+                    WRITE( LOGDEV,94040 )
+     &                     'Timestep written to', TRIM( CTM_METEMIS_DIAG ),
+     &                     'for date and time', ADJ_LDATE, ADJ_LTIME
+                    VDEMIS_MVDIAG = 0.0   ! array assignment
+                 END IF ! LASTTIC
 
-               VDEMIS_MVDIAG = VDEMIS_MVDIAG + VDEMIS_MV   ! array assignment
-               IF ( LASTTIC ) THEN   ! time to write out
-                  VDEMIS_MVDIAG = VDEMIS_MVDIAG / REAL( MTICS, 4 )  ! array assignment
-                  DO V = 1, NMETSPC
-                    IF ( .NOT. WRITE3( CTM_METEMIS_DIAG_1, MTNAME(V), 
-     &                                 ADJ_LDATE, ADJ_LTIME, VDEMIS_MVDIAG( V,:,:) ) )  THEN
-                       XMSG = 'Could not write to ' // TRIM( CTM_METEMIS_DIAG_1 )
-                       CALL M3EXIT( PNAME, ADJ_LDATE, ADJ_LTIME, XMSG, XSTAT2 )
-                    ELSE
-                       WRITE( LOGDEV,94040 )
-     &                      'Timestep written to', TRIM( CTM_METEMIS_DIAG_1 ),
-     &                      'for date and time', ADJ_LDATE, ADJ_LTIME
-                    END IF
-                  END DO
-
-                  VDEMIS_MVDIAG = 0.0   ! array assignment
-               END IF ! LASTTIC
-
-
-            END IF      !!  if metemdiag
-            END IF      !!  if metemdiag
-
-            IF ( PRVHR .NE. STIMEMT ) PRVHR = STIMEMT
+              END IF      !!  if metemdiag
+            END IF
 
             RETURN
 
