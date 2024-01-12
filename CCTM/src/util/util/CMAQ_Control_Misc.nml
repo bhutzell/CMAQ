@@ -130,6 +130,13 @@
 !    emissions via an emission rule, use the 'VOC' family for either the       !
 !    emission variable or CMAQ species, consistent with how you have defined it!
 !    here, and use the 'ALL' keyword for the other field.                      !
+!                                                                              !
+!    Options for ChemFamilyUnits are: 'PPMV' - part per million mixing ratio   !
+!                                     'UG M-3' - mass concentration            !
+!                                     'PPMC' - part per million carbon         !
+!                                     'UGC M-3' - carbon mass concentration    !
+!                                     'PPMN' - part per million nitrogen       !
+!                                     'UGN M-3' - nitrogen mass concentration  !
 !------------------------------------------------------------------------------!
 &Chemical_FamVars
  N_Chem_Fams = 0
@@ -138,6 +145,7 @@
 
 &ChemicalFamilies
 ! ChemFamilyName(1)     = 'NOX'
+! ChemFamilyUnits(1)    = 'PPMV'
 ! ChemFamilyMembers(1,:)= 'NO','NO2'
 /
 

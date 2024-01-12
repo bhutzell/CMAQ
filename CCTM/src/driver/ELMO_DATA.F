@@ -237,6 +237,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         INTEGER              :: ID        !ID Number in Case Statement
         INTEGER              :: VAR_TYPE  !IOAPI Variable Type
         LOGICAL              :: MODE      !Is this property mode-dependent?
+        LOGICAL              :: L_COMB    !Is this variable a linear combination of other variables
         CHARACTER (LEN = 16) :: UNIT      !Units for Parameter
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
@@ -244,213 +245,213 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: N_ELMO_LIST = 189
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
-     &ELDTP( 'STDEV        ',ID_STDEV,      M3REAL, T, '      ', 'Mode standard deviation (dry and wet)' ),
-     &ELDTP( 'DRY_DG       ',ID_DRY_DG,     M3REAL, T, 'um    ', 'Mode mean diameter (dry)' ),
-     &ELDTP( 'WET_DG       ',ID_WET_DG,     M3REAL, T, 'um    ', 'Mode mean diameter (wet)' ),
-     &ELDTP( 'WET_M2       ',ID_WET_M2,     M3REAL, T, 'm2 m-3', 'Mode 2nd moment (wet)' ),
-     &ELDTP( 'DRY_M3       ',ID_DRY_M3,     M3REAL, T, 'm3 m-3', 'Mode 3rd moment (dry)' ),
-     &ELDTP( 'WET_M3       ',ID_WET_M3,     M3REAL, T, 'm3 m-3', 'Mode 3rd moment (wet)' ),
-     &ELDTP( 'PM_NUM       ',ID_PM_NUM,     M3REAL, F, 'N m-3' , 'Total Particle Number' ),
-     &ELDTP( 'PMU_NUM      ',ID_PMU_NUM,    M3REAL, F, 'N m-3' , 'Ultrafine-Mode Particle Number' ),
-     &ELDTP( 'PMF_NUM      ',ID_PMF_NUM,    M3REAL, F, 'N m-3' , 'Fine-Mode Particle Number' ),
-     &ELDTP( 'PMC_NUM      ',ID_PMC_NUM,    M3REAL, F, 'N m-3' , 'Coarse-Mode Particle Number' ),
-     &ELDTP( 'N10          ',ID_N10,        M3REAL, F, 'N m-3' , 'Total Particle Number greater than 10 nm' ),
-     &ELDTP( 'N20          ',ID_N20,        M3REAL, F, 'N m-3' , 'Total Particle Number greater than 20 nm' ),
-     &ELDTP( 'N40          ',ID_N40,        M3REAL, F, 'N m-3' , 'Total Particle Number greater than 40 nm' ),
-     &ELDTP( 'N100         ',ID_N100,       M3REAL, F, 'N m-3' , 'Total Particle Number greater than 100 nm' ),
-     &ELDTP( 'PM_SRF       ',ID_PM_SRF,     M3REAL, F, 'm2 m-3', 'Particle Surface Area' ),
-     &ELDTP( 'PMU_SRF      ',ID_PMU_SRF,    M3REAL, F, 'm2 m-3', 'Ultrafine-Mode Surface Area' ),
-     &ELDTP( 'PMF_SRF      ',ID_PMF_SRF,    M3REAL, F, 'm2 m-3', 'Fine-Mode Surface Area' ),
-     &ELDTP( 'PMC_SRF      ',ID_PMC_SRF,    M3REAL, F, 'm2 m-3', 'Coarse-Mode Surface Area' ),
-     &ELDTP( 'PM_MASS      ',ID_PM_MASS,    M3REAL, F, 'ug m-3', 'Total Particle Mass' ),
-     &ELDTP( 'PMU_MASS     ',ID_PMU_MASS,   M3REAL, F, 'ug m-3', 'Ultrafine Particle Mass' ),
-     &ELDTP( 'PMF_MASS     ',ID_PMF_MASS,   M3REAL, F, 'ug m-3', 'Fine Particle Mass' ),
-     &ELDTP( 'PMC_MASS     ',ID_PMC_MASS,   M3REAL, F, 'ug m-3', 'Coarse Particle Mass' ),
-     &ELDTP( 'PMNUC_MASS   ',ID_PMNUC_MASS, M3REAL, F, 'ug m-3', 'Nucleation Mode Total PM' ),
-     &ELDTP( 'PMAIT_MASS   ',ID_PMAIT_MASS, M3REAL, F, 'ug m-3', 'Aitken Mode Total PM' ),
-     &ELDTP( 'PMACC_MASS   ',ID_PMACC_MASS, M3REAL, F, 'ug m-3', 'Accumulation Mode Total PM' ),
-     &ELDTP( 'DRY_DENS     ',ID_DRY_DENS,   M3REAL, T, 'kg m-3', 'Bulk Density of Particles excluding particle water' ),
-     &ELDTP( 'WET_DENS     ',ID_WET_DENS,   M3REAL, T, 'kg m-3', 'Bulk Density of Particles including particle water' ),
-     &ELDTP( 'FPM01        ',ID_FPM01,      M3REAL, T, '1     ', 'PM01 fraction of mode' ),
-     &ELDTP( 'FPM1         ',ID_FPM1,       M3REAL, T, '1     ', 'PM1 fraction of mode' ),
-     &ELDTP( 'FPM25        ',ID_FPM25,      M3REAL, T, '1     ', 'PM2.5 fraction of mode' ),
-     &ELDTP( 'FPM10        ',ID_FPM10,      M3REAL, T, '1     ', 'PM10 fraction of mode' ),
-     &ELDTP( 'FPM25TO10    ',ID_FPM25to10,  M3REAL, T, '1     ', 'PM2.5-10 fraction of mode' ),
-     &ELDTP( 'FAMS         ',ID_FAMS,       M3REAL, T, '1     ', 'AMS Transmission Fraction of mode' ),
-     &ELDTP( 'PM01         ',ID_PM01,       M3REAL, F, 'ug m-3', 'Bulk PM0.1 Concentration' ), 
-     &ELDTP( 'PM1          ',ID_PM1,        M3REAL, F, 'ug m-3', 'Bulk PM1.0 Concentration' ), 
-     &ELDTP( 'PM25         ',ID_PM25,       M3REAL, F, 'ug m-3', 'Bulk PM2.5 Concentration' ), 
-     &ELDTP( 'PM10         ',ID_PM10,       M3REAL, F, 'ug m-3', 'Bulk PM10.0 Concentration' ),
-     &ELDTP( 'PM25TO10     ',ID_PM25to10,   M3REAL, F, 'ug m-3', 'Coarse-Mode Total' ),
-     &ELDTP( 'PMAMS        ',ID_PMAMS,      M3REAL, F, 'ug m-3', 'Bulk PM Concentration in AMS' ),
+     &ELDTP( 'STDEV        ',ID_STDEV,      M3REAL, T,F, '      ', 'Mode standard deviation (dry and wet)' ),
+     &ELDTP( 'DRY_DG       ',ID_DRY_DG,     M3REAL, T,F, 'um    ', 'Mode mean diameter (dry)' ),
+     &ELDTP( 'WET_DG       ',ID_WET_DG,     M3REAL, T,F, 'um    ', 'Mode mean diameter (wet)' ),
+     &ELDTP( 'WET_M2       ',ID_WET_M2,     M3REAL, T,F, 'm2 m-3', 'Mode 2nd moment (wet)' ),
+     &ELDTP( 'DRY_M3       ',ID_DRY_M3,     M3REAL, T,F, 'm3 m-3', 'Mode 3rd moment (dry)' ),
+     &ELDTP( 'WET_M3       ',ID_WET_M3,     M3REAL, T,F, 'm3 m-3', 'Mode 3rd moment (wet)' ),
+     &ELDTP( 'PM_NUM       ',ID_PM_NUM,     M3REAL, F,F, 'N m-3' , 'Total Particle Number' ),
+     &ELDTP( 'PMU_NUM      ',ID_PMU_NUM,    M3REAL, F,F, 'N m-3' , 'Ultrafine-Mode Particle Number' ),
+     &ELDTP( 'PMF_NUM      ',ID_PMF_NUM,    M3REAL, F,F, 'N m-3' , 'Fine-Mode Particle Number' ),
+     &ELDTP( 'PMC_NUM      ',ID_PMC_NUM,    M3REAL, F,F, 'N m-3' , 'Coarse-Mode Particle Number' ),
+     &ELDTP( 'N10          ',ID_N10,        M3REAL, F,F, 'N m-3' , 'Total Particle Number greater than 10 nm' ),
+     &ELDTP( 'N20          ',ID_N20,        M3REAL, F,F, 'N m-3' , 'Total Particle Number greater than 20 nm' ),
+     &ELDTP( 'N40          ',ID_N40,        M3REAL, F,F, 'N m-3' , 'Total Particle Number greater than 40 nm' ),
+     &ELDTP( 'N100         ',ID_N100,       M3REAL, F,F, 'N m-3' , 'Total Particle Number greater than 100 nm' ),
+     &ELDTP( 'PM_SRF       ',ID_PM_SRF,     M3REAL, F,F, 'm2 m-3', 'Particle Surface Area' ),
+     &ELDTP( 'PMU_SRF      ',ID_PMU_SRF,    M3REAL, F,F, 'm2 m-3', 'Ultrafine-Mode Surface Area' ),
+     &ELDTP( 'PMF_SRF      ',ID_PMF_SRF,    M3REAL, F,F, 'm2 m-3', 'Fine-Mode Surface Area' ),
+     &ELDTP( 'PMC_SRF      ',ID_PMC_SRF,    M3REAL, F,F, 'm2 m-3', 'Coarse-Mode Surface Area' ),
+     &ELDTP( 'PM_MASS      ',ID_PM_MASS,    M3REAL, F,F, 'ug m-3', 'Total Particle Mass' ),
+     &ELDTP( 'PMU_MASS     ',ID_PMU_MASS,   M3REAL, F,F, 'ug m-3', 'Ultrafine Particle Mass' ),
+     &ELDTP( 'PMF_MASS     ',ID_PMF_MASS,   M3REAL, F,F, 'ug m-3', 'Fine Particle Mass' ),
+     &ELDTP( 'PMC_MASS     ',ID_PMC_MASS,   M3REAL, F,F, 'ug m-3', 'Coarse Particle Mass' ),
+     &ELDTP( 'PMNUC_MASS   ',ID_PMNUC_MASS, M3REAL, F,F, 'ug m-3', 'Nucleation Mode Total PM' ),
+     &ELDTP( 'PMAIT_MASS   ',ID_PMAIT_MASS, M3REAL, F,F, 'ug m-3', 'Aitken Mode Total PM' ),
+     &ELDTP( 'PMACC_MASS   ',ID_PMACC_MASS, M3REAL, F,F, 'ug m-3', 'Accumulation Mode Total PM' ),
+     &ELDTP( 'DRY_DENS     ',ID_DRY_DENS,   M3REAL, T,F, 'kg m-3', 'Bulk Density of Particles excluding particle water' ),
+     &ELDTP( 'WET_DENS     ',ID_WET_DENS,   M3REAL, T,F, 'kg m-3', 'Bulk Density of Particles including particle water' ),
+     &ELDTP( 'FPM01        ',ID_FPM01,      M3REAL, T,F, '1     ', 'PM01 fraction of mode' ),
+     &ELDTP( 'FPM1         ',ID_FPM1,       M3REAL, T,F, '1     ', 'PM1 fraction of mode' ),
+     &ELDTP( 'FPM25        ',ID_FPM25,      M3REAL, T,F, '1     ', 'PM2.5 fraction of mode' ),
+     &ELDTP( 'FPM10        ',ID_FPM10,      M3REAL, T,F, '1     ', 'PM10 fraction of mode' ),
+     &ELDTP( 'FPM25TO10    ',ID_FPM25to10,  M3REAL, T,F, '1     ', 'PM2.5-10 fraction of mode' ),
+     &ELDTP( 'FAMS         ',ID_FAMS,       M3REAL, T,F, '1     ', 'AMS Transmission Fraction of mode' ),
+     &ELDTP( 'PM01         ',ID_PM01,       M3REAL, F,F, 'ug m-3', 'Bulk PM0.1 Concentration' ), 
+     &ELDTP( 'PM1          ',ID_PM1,        M3REAL, F,F, 'ug m-3', 'Bulk PM1.0 Concentration' ), 
+     &ELDTP( 'PM25         ',ID_PM25,       M3REAL, F,F, 'ug m-3', 'Bulk PM2.5 Concentration' ), 
+     &ELDTP( 'PM10         ',ID_PM10,       M3REAL, F,F, 'ug m-3', 'Bulk PM10.0 Concentration' ),
+     &ELDTP( 'PM25TO10     ',ID_PM25to10,   M3REAL, F,F, 'ug m-3', 'Coarse-Mode Total' ),
+     &ELDTP( 'PMAMS        ',ID_PMAMS,      M3REAL, F,F, 'ug m-3', 'Bulk PM Concentration in AMS' ),
                                             
       ! Coarse-Mode PM Species                             
-     &ELDTP( 'PMC_SO4      ',ID_PMC_SO4,    M3REAL, F, 'ug m-3', 'Coarse-Mode Sulfate' ),
-     &ELDTP( 'PMC_NO3      ',ID_PMC_NO3,    M3REAL, F, 'ug m-3', 'Coarse-Mode Nitrate' ),
-     &ELDTP( 'PMC_NH4      ',ID_PMC_NH4,    M3REAL, F, 'ug m-3', 'Coarse-Mode Ammonium' ),
-     &ELDTP( 'PMC_CL       ',ID_PMC_CL,     M3REAL, F, 'ug m-3', 'Coarse-Mode Chloride' ),
-     &ELDTP( 'PMC_NA       ',ID_PMC_NA,     M3REAL, F, 'ug m-3', 'Recon Crs Sodium (.8373*ASEACAT+.0626*ASOIL+.0023*ACORS)' ),
-     &ELDTP( 'PMC_MG       ',ID_PMC_MG,     M3REAL, F, 'ug m-3', 'Recon Crs Magnesium (.0997*ASEACAT+.0170*ASOIL+.0032*ACORS)'),
-     &ELDTP( 'PMC_K        ',ID_PMC_K,      M3REAL, F, 'ug m-3', 'Recon Crs Potasium (.0310*ASEACAT+.0242*ASOIL+.0176*ACORS)' ),
-     &ELDTP( 'PMC_CA       ',ID_PMC_CA,     M3REAL, F, 'ug m-3', 'Recon Crs Calcium (.0320*ASEACAT+.0838*ASOIL+.0562*ACORS)' ),
+     &ELDTP( 'PMC_SO4      ',ID_PMC_SO4,    M3REAL, F,T, 'ug m-3', 'Coarse-Mode Sulfate' ),
+     &ELDTP( 'PMC_NO3      ',ID_PMC_NO3,    M3REAL, F,T, 'ug m-3', 'Coarse-Mode Nitrate' ),
+     &ELDTP( 'PMC_NH4      ',ID_PMC_NH4,    M3REAL, F,T, 'ug m-3', 'Coarse-Mode Ammonium' ),
+     &ELDTP( 'PMC_CL       ',ID_PMC_CL,     M3REAL, F,T, 'ug m-3', 'Coarse-Mode Chloride' ),
+     &ELDTP( 'PMC_NA       ',ID_PMC_NA,     M3REAL, F,T, 'ug m-3', 'Recon Crs Sodium (.8373*ASEACAT+.0626*ASOIL+.0023*ACORS)' ),
+     &ELDTP( 'PMC_MG       ',ID_PMC_MG,     M3REAL, F,T, 'ug m-3', 'Recon Crs Magnesium (.0997*ASEACAT+.0170*ASOIL+.0032*ACORS)'),
+     &ELDTP( 'PMC_K        ',ID_PMC_K,      M3REAL, F,T, 'ug m-3', 'Recon Crs Potasium (.0310*ASEACAT+.0242*ASOIL+.0176*ACORS)' ),
+     &ELDTP( 'PMC_CA       ',ID_PMC_CA,     M3REAL, F,T, 'ug m-3', 'Recon Crs Calcium (.0320*ASEACAT+.0838*ASOIL+.0562*ACORS)' ),
                                             
       ! Fine-Mode PM Species                               
-     &ELDTP( 'PMF_SO4      ',ID_PMF_SO4,    M3REAL, F, 'ug m-3', 'Fine-Mode Sulfate' ),
-     &ELDTP( 'PMF_NO3      ',ID_PMF_NO3,    M3REAL, F, 'ug m-3', 'Fine-Mode Nitrate' ),
-     &ELDTP( 'PMF_NH4      ',ID_PMF_NH4,    M3REAL, F, 'ug m-3', 'Fine-Mode Ammonium' ),
-     &ELDTP( 'PMF_CL       ',ID_PMF_CL,     M3REAL, F, 'ug m-3', 'Fine-Mode Chloride' ),
-     &ELDTP( 'PMF_NA       ',ID_PMF_NA,     M3REAL, F, 'ug m-3', 'Fine-Mode Sodium' ),
-     &ELDTP( 'PMF_EC       ',ID_PMF_EC,     M3REAL, F, 'ug m-3', 'Fine-Mode Black Carbon' ),
-     &ELDTP( 'PMF_OC       ',ID_PMF_OC,     M3REAL, F, 'ugC m-3','Fine-Mode Organic Carbon' ),
-     &ELDTP( 'PMF_OA       ',ID_PMF_OA,     M3REAL, F, 'ug m-3', 'Fine-Mode Organic Aerosol' ),
-     &ELDTP( 'PMF_FE       ',ID_PMF_FE,     M3REAL, F, 'ug m-3', 'Fine-Mode Iron' ),
-     &ELDTP( 'PMF_AL       ',ID_PMF_AL,     M3REAL, F, 'ug m-3', 'Fine-Mode Aluminum' ),
-     &ELDTP( 'PMF_SI       ',ID_PMF_SI,     M3REAL, F, 'ug m-3', 'Fine-Mode Silicon' ),
-     &ELDTP( 'PMF_TI       ',ID_PMF_TI,     M3REAL, F, 'ug m-3', 'Fine-Mode Titanium' ),
-     &ELDTP( 'PMF_CA       ',ID_PMF_CA,     M3REAL, F, 'ug m-3', 'Fine-Mode Calcium' ),
-     &ELDTP( 'PMF_MG       ',ID_PMF_MG,     M3REAL, F, 'ug m-3', 'Fine-Mode Magnesium' ),
-     &ELDTP( 'PMF_K        ',ID_PMF_K,      M3REAL, F, 'ug m-3', 'Fine-Mode Potassium' ),
-     &ELDTP( 'PMF_MN       ',ID_PMF_MN,     M3REAL, F, 'ug m-3', 'Fine-Mode Manganese' ),
-     &ELDTP( 'PMF_H2O      ',ID_PMF_H2O,    M3REAL, F, 'ug m-3', 'Fine-Mode Particle Water' ),
-     &ELDTP( 'PMF_SOILIMPV ',ID_SOIL_IMPV,  M3REAL, F, 'ug m-3', 'Recon of Soil PM from correlations at IMPROVE sites' ),
-     &ELDTP( 'PMF_UN_IMPV1 ',ID_PMF_UNSP1,  M3REAL, F, 'ug m-3', 'Unspeciated PM including non-carbon organic mass' ),
-     &ELDTP( 'PMF_UN_IMPV2 ',ID_PMF_UNSP2,  M3REAL, F, 'ug m-3', 'Unspeciated PM excluding non-carbon organic mass' ),
-     &ELDTP( 'PMF_HP       ',ID_PMF_HP,     M3REAL, F, 'umol m-3','Fine-Mode H+ Ion' ),
-     &ELDTP( 'PMF_HPMOLAL  ',ID_PMF_HPM,    M3REAL, F, 'mol L-1','Fine-Mode Concentration of H+ in Particle Water' ),
-     &ELDTP( 'PMF_PH       ',ID_PMF_PH,     M3REAL, F, '1'     , 'Fine-Mode pH' ),
+     &ELDTP( 'PMF_SO4      ',ID_PMF_SO4,    M3REAL, F,T, 'ug m-3', 'Fine-Mode Sulfate' ),
+     &ELDTP( 'PMF_NO3      ',ID_PMF_NO3,    M3REAL, F,T, 'ug m-3', 'Fine-Mode Nitrate' ),
+     &ELDTP( 'PMF_NH4      ',ID_PMF_NH4,    M3REAL, F,T, 'ug m-3', 'Fine-Mode Ammonium' ),
+     &ELDTP( 'PMF_CL       ',ID_PMF_CL,     M3REAL, F,T, 'ug m-3', 'Fine-Mode Chloride' ),
+     &ELDTP( 'PMF_NA       ',ID_PMF_NA,     M3REAL, F,T, 'ug m-3', 'Fine-Mode Sodium' ),
+     &ELDTP( 'PMF_EC       ',ID_PMF_EC,     M3REAL, F,T, 'ug m-3', 'Fine-Mode Black Carbon' ),
+     &ELDTP( 'PMF_OC       ',ID_PMF_OC,     M3REAL, F,F, 'ugC m-3','Fine-Mode Organic Carbon' ),
+     &ELDTP( 'PMF_OA       ',ID_PMF_OA,     M3REAL, F,F, 'ug m-3', 'Fine-Mode Organic Aerosol' ),
+     &ELDTP( 'PMF_FE       ',ID_PMF_FE,     M3REAL, F,T, 'ug m-3', 'Fine-Mode Iron' ),
+     &ELDTP( 'PMF_AL       ',ID_PMF_AL,     M3REAL, F,T, 'ug m-3', 'Fine-Mode Aluminum' ),
+     &ELDTP( 'PMF_SI       ',ID_PMF_SI,     M3REAL, F,T, 'ug m-3', 'Fine-Mode Silicon' ),
+     &ELDTP( 'PMF_TI       ',ID_PMF_TI,     M3REAL, F,T, 'ug m-3', 'Fine-Mode Titanium' ),
+     &ELDTP( 'PMF_CA       ',ID_PMF_CA,     M3REAL, F,T, 'ug m-3', 'Fine-Mode Calcium' ),
+     &ELDTP( 'PMF_MG       ',ID_PMF_MG,     M3REAL, F,T, 'ug m-3', 'Fine-Mode Magnesium' ),
+     &ELDTP( 'PMF_K        ',ID_PMF_K,      M3REAL, F,T, 'ug m-3', 'Fine-Mode Potassium' ),
+     &ELDTP( 'PMF_MN       ',ID_PMF_MN,     M3REAL, F,T, 'ug m-3', 'Fine-Mode Manganese' ),
+     &ELDTP( 'PMF_H2O      ',ID_PMF_H2O,    M3REAL, F,T, 'ug m-3', 'Fine-Mode Particle Water' ),
+     &ELDTP( 'PMF_SOILIMPV ',ID_SOIL_IMPV,  M3REAL, F,T, 'ug m-3', 'Recon of Soil PM from correlations at IMPROVE sites' ),
+     &ELDTP( 'PMF_UN_IMPV1 ',ID_PMF_UNSP1,  M3REAL, F,T, 'ug m-3', 'Unspeciated PM including non-carbon organic mass' ),
+     &ELDTP( 'PMF_UN_IMPV2 ',ID_PMF_UNSP2,  M3REAL, F,T, 'ug m-3', 'Unspeciated PM excluding non-carbon organic mass' ),
+     &ELDTP( 'PMF_HP       ',ID_PMF_HP,     M3REAL, F,T, 'umol m-3','Fine-Mode H+ Ion' ),
+     &ELDTP( 'PMF_HPMOLAL  ',ID_PMF_HPM,    M3REAL, F,F, 'mol L-1','Fine-Mode Concentration of H+ in Particle Water' ),
+     &ELDTP( 'PMF_PH       ',ID_PMF_PH,     M3REAL, F,F, '1'     , 'Fine-Mode pH' ),
                                             
       ! Organic Aerosol Relevant Aggregates                
-     &ELDTP( 'PMF_POC      ',ID_PMF_POC,    M3REAL, F, 'ugC m-3','Fine-Mode Primary Organic Carbon' ),
-     &ELDTP( 'PMF_SOC      ',ID_PMF_SOC,    M3REAL, F, 'ugC m-3','Fine-Mode Secondary Organic Carbon' ),
-     &ELDTP( 'PMF_POA      ',ID_PMF_POA,    M3REAL, F, 'ug m-3', 'Fine-Mode Primary Organic Aerosol' ),
-     &ELDTP( 'PMF_SOA      ',ID_PMF_SOA,    M3REAL, F, 'ug m-3', 'Fine-Mode Secondary Organic Aerosol' ),
-     &ELDTP( 'PMF_NCOM     ',ID_PMF_NCOM,   M3REAL, F, 'ug m-3', 'Fine-Mode Non-Carbon Organic Matter in POA' ),
-     &ELDTP( 'PMF_OMOC     ',ID_PMF_OMOC,   M3REAL, F, '1     ','Fine-Mode OM/OC' ),
-     &ELDTP( 'PMF_OTOC     ',ID_PMF_OtoC,   M3REAL, F, '1     ','Fine-Mode O:C' ),
-     &ELDTP( 'PMF_ASOA     ',ID_PMF_ASOA,   M3REAL, F, 'ug m-3', 'Fine-Mode Anthropogenic-VOC Derived OA' ),
-     &ELDTP( 'PMF_BSOA     ',ID_PMF_BSOA,   M3REAL, F, 'ug m-3', 'Fine-Mode Biogenic-VOC Derived OA' ),
-     &ELDTP( 'PMF_CLDGLY   ',ID_PMF_CLDGLY, M3REAL, F, 'ug m-3', 'Fine-Mode SOA from glyoxal and methylglyoxal' ),
-     &ELDTP( 'PMF_ISOPSOA  ',ID_PMF_ISOP,   M3REAL, F, 'ug m-3', 'Fine-Mode Isoprene SOA excl IEPOX SOA' ),
-     &ELDTP( 'PMF_IEPOXSOA ',ID_PMF_IEPOX,  M3REAL, F, 'ug m-3', 'Fine-Mode IEPOX SOA' ),
-     &ELDTP( 'PMF_MTNSOA   ',ID_PMF_MTNSOA, M3REAL, F, 'ug m-3', 'Fine-Mode Monoterpene Nitrate SOA' ),
-     &ELDTP( 'PMF_MTSOA    ',ID_PMF_MTSOA,  M3REAL, F, 'ug m-3', 'Fine-Mode Monoterpene SOA excl Nitrates' ),
+     &ELDTP( 'PMF_POC      ',ID_PMF_POC,    M3REAL, F,F, 'ugC m-3','Fine-Mode Primary Organic Carbon' ),
+     &ELDTP( 'PMF_SOC      ',ID_PMF_SOC,    M3REAL, F,F, 'ugC m-3','Fine-Mode Secondary Organic Carbon' ),
+     &ELDTP( 'PMF_POA      ',ID_PMF_POA,    M3REAL, F,F, 'ug m-3', 'Fine-Mode Primary Organic Aerosol' ),
+     &ELDTP( 'PMF_SOA      ',ID_PMF_SOA,    M3REAL, F,F, 'ug m-3', 'Fine-Mode Secondary Organic Aerosol' ),
+     &ELDTP( 'PMF_NCOM     ',ID_PMF_NCOM,   M3REAL, F,T, 'ug m-3', 'Fine-Mode Non-Carbon Organic Matter in POA' ),
+     &ELDTP( 'PMF_OMOC     ',ID_PMF_OMOC,   M3REAL, F,F, '1     ','Fine-Mode OM/OC' ),
+     &ELDTP( 'PMF_OTOC     ',ID_PMF_OtoC,   M3REAL, F,F, '1     ','Fine-Mode O:C' ),
+     &ELDTP( 'PMF_ASOA     ',ID_PMF_ASOA,   M3REAL, F,F, 'ug m-3', 'Fine-Mode Anthropogenic-VOC Derived OA' ),
+     &ELDTP( 'PMF_BSOA     ',ID_PMF_BSOA,   M3REAL, F,F, 'ug m-3', 'Fine-Mode Biogenic-VOC Derived OA' ),
+     &ELDTP( 'PMF_CLDGLY   ',ID_PMF_CLDGLY, M3REAL, F,T, 'ug m-3', 'Fine-Mode SOA from glyoxal and methylglyoxal' ),
+     &ELDTP( 'PMF_ISOPSOA  ',ID_PMF_ISOP,   M3REAL, F,T, 'ug m-3', 'Fine-Mode Isoprene SOA excl IEPOX SOA' ),
+     &ELDTP( 'PMF_IEPOXSOA ',ID_PMF_IEPOX,  M3REAL, F,T, 'ug m-3', 'Fine-Mode IEPOX SOA' ),
+     &ELDTP( 'PMF_MTNSOA   ',ID_PMF_MTNSOA, M3REAL, F,T, 'ug m-3', 'Fine-Mode Monoterpene Nitrate SOA' ),
+     &ELDTP( 'PMF_MTSOA    ',ID_PMF_MTSOA,  M3REAL, F,T, 'ug m-3', 'Fine-Mode Monoterpene SOA excl Nitrates' ),
                                             
       ! AMS Speciation                      
-     &ELDTP( 'PMAMS_SO4    ',ID_AMS_SO4,    M3REAL, F, 'ug m-3', 'Sulfate Collected by the AMS' ),
-     &ELDTP( 'PMAMS_NO3    ',ID_AMS_NO3,    M3REAL, F, 'ug m-3', 'Nitrate Collected by the AMS' ),
-     &ELDTP( 'PMAMS_NH4    ',ID_AMS_NH4,    M3REAL, F, 'ug m-3', 'Ammonium Collected by the AMS' ),
-     &ELDTP( 'PMAMS_CL     ',ID_AMS_CL,     M3REAL, F, 'ug m-3', 'Chloride Collected by the AMS' ),
-     &ELDTP( 'PMAMS_OA     ',ID_AMS_OA,     M3REAL, F, 'ug m-3', 'Organic Aerosol Collected by the AMS' ),
-     &ELDTP( 'PMAMS_OTOC   ',ID_AMS_OTOC,   M3REAL, F, 'ug ug-1','O:C Collected and Measured by the AMS' ),
+     &ELDTP( 'PMAMS_SO4    ',ID_AMS_SO4,    M3REAL, F,T, 'ug m-3', 'Sulfate Collected by the AMS' ),
+     &ELDTP( 'PMAMS_NO3    ',ID_AMS_NO3,    M3REAL, F,T, 'ug m-3', 'Nitrate Collected by the AMS' ),
+     &ELDTP( 'PMAMS_NH4    ',ID_AMS_NH4,    M3REAL, F,T, 'ug m-3', 'Ammonium Collected by the AMS' ),
+     &ELDTP( 'PMAMS_CL     ',ID_AMS_CL,     M3REAL, F,T, 'ug m-3', 'Chloride Collected by the AMS' ),
+     &ELDTP( 'PMAMS_OA     ',ID_AMS_OA,     M3REAL, F,F, 'ug m-3', 'Organic Aerosol Collected by the AMS' ),
+     &ELDTP( 'PMAMS_OTOC   ',ID_AMS_OTOC,   M3REAL, F,T, 'ug ug-1','O:C Collected and Measured by the AMS' ),
                                             
       ! PM1 Speciation                      
-     &ELDTP( 'PM1_SO4      ',ID_PM1_SO4,    M3REAL, F, 'ug m-3', 'PM1 Sulfate' ),
-     &ELDTP( 'PM1_NO3      ',ID_PM1_NO3,    M3REAL, F, 'ug m-3', 'PM1 Nitrate' ),
-     &ELDTP( 'PM1_NH4      ',ID_PM1_NH4,    M3REAL, F, 'ug m-3', 'PM1 Ammonium' ),
-     &ELDTP( 'PM1_CL       ',ID_PM1_CL,     M3REAL, F, 'ug m-3', 'PM1 Chloride' ),
-     &ELDTP( 'PM1_NA       ',ID_PM1_NA,     M3REAL, F, 'ug m-3', 'PM1 Sodium' ),
-     &ELDTP( 'PM1_EC       ',ID_PM1_EC,     M3REAL, F, 'ug m-3', 'PM1 Black Carbon' ),
-     &ELDTP( 'PM1_OC       ',ID_PM1_OC,     M3REAL, F, 'ugC m-3','PM1 Organic Carbon' ),
-     &ELDTP( 'PM1_OA       ',ID_PM1_OA,     M3REAL, F, 'ug m-3', 'PM1 Organic Aerosol' ),
-     &ELDTP( 'PM1_MG       ',ID_PM1_MG,     M3REAL, F, 'ug m-3', 'PM1 Magnesium' ),
-     &ELDTP( 'PM1_K        ',ID_PM1_K,      M3REAL, F, 'ug m-3', 'PM1 Potassium' ),
-     &ELDTP( 'PM1_CA       ',ID_PM1_CA,     M3REAL, F, 'ug m-3', 'PM1 Calcium' ),
-     &ELDTP( 'PM1_OTHER    ',ID_PM1_OT,     M3REAL, F, 'ug m-3', 'PM1 Other Mass' ),
-     &ELDTP( 'PM1_FE       ',ID_PM1_FE,     M3REAL, F, 'ug m-3', 'PM1 Iron' ),
-     &ELDTP( 'PM1_SI       ',ID_PM1_SI,     M3REAL, F, 'ug m-3', 'PM1 Silicon' ),
-     &ELDTP( 'PM1_TI       ',ID_PM1_TI,     M3REAL, F, 'ug m-3', 'PM1 Titanium' ),
-     &ELDTP( 'PM1_MN       ',ID_PM1_MN,     M3REAL, F, 'ug m-3', 'PM1 Manganese' ),
-     &ELDTP( 'PM1_AL       ',ID_PM1_AL,     M3REAL, F, 'ug m-3', 'PM1 Aluminum' ),
-     &ELDTP( 'PM1_SOIL     ',ID_PM1_SOIL,   M3REAL, F, 'ug m-3', 'PM1 Recon Soil (Fine) and Explicit (Coarse)' ),
-     &ELDTP( 'PM1_UNSP1    ',ID_PM1_UNSP1,  M3REAL, F, 'ug m-3', 'PM1 Unsp. Coarse Mass for the IMPROVE Method' ),
-     &ELDTP( 'PM1_UNSPCRS  ',ID_PM1_UN,     M3REAL, F, 'ug m-3', 'PM1 Unspeciated Coarse Mass' ),
-     &ELDTP( 'PM1_HP       ',ID_PM1_HP,     M3REAL, F, 'ug m-3', 'PM1 H+ Ion' ),
+     &ELDTP( 'PM1_SO4      ',ID_PM1_SO4,    M3REAL, F,T, 'ug m-3', 'PM1 Sulfate' ),
+     &ELDTP( 'PM1_NO3      ',ID_PM1_NO3,    M3REAL, F,T, 'ug m-3', 'PM1 Nitrate' ),
+     &ELDTP( 'PM1_NH4      ',ID_PM1_NH4,    M3REAL, F,T, 'ug m-3', 'PM1 Ammonium' ),
+     &ELDTP( 'PM1_CL       ',ID_PM1_CL,     M3REAL, F,T, 'ug m-3', 'PM1 Chloride' ),
+     &ELDTP( 'PM1_NA       ',ID_PM1_NA,     M3REAL, F,T, 'ug m-3', 'PM1 Sodium' ),
+     &ELDTP( 'PM1_EC       ',ID_PM1_EC,     M3REAL, F,T, 'ug m-3', 'PM1 Black Carbon' ),
+     &ELDTP( 'PM1_OC       ',ID_PM1_OC,     M3REAL, F,F, 'ugC m-3','PM1 Organic Carbon' ),
+     &ELDTP( 'PM1_OA       ',ID_PM1_OA,     M3REAL, F,F, 'ug m-3', 'PM1 Organic Aerosol' ),
+     &ELDTP( 'PM1_MG       ',ID_PM1_MG,     M3REAL, F,T, 'ug m-3', 'PM1 Magnesium' ),
+     &ELDTP( 'PM1_K        ',ID_PM1_K,      M3REAL, F,T, 'ug m-3', 'PM1 Potassium' ),
+     &ELDTP( 'PM1_CA       ',ID_PM1_CA,     M3REAL, F,T, 'ug m-3', 'PM1 Calcium' ),
+     &ELDTP( 'PM1_OTHER    ',ID_PM1_OT,     M3REAL, F,T, 'ug m-3', 'PM1 Other Mass' ),
+     &ELDTP( 'PM1_FE       ',ID_PM1_FE,     M3REAL, F,T, 'ug m-3', 'PM1 Iron' ),
+     &ELDTP( 'PM1_SI       ',ID_PM1_SI,     M3REAL, F,T, 'ug m-3', 'PM1 Silicon' ),
+     &ELDTP( 'PM1_TI       ',ID_PM1_TI,     M3REAL, F,T, 'ug m-3', 'PM1 Titanium' ),
+     &ELDTP( 'PM1_MN       ',ID_PM1_MN,     M3REAL, F,T, 'ug m-3', 'PM1 Manganese' ),
+     &ELDTP( 'PM1_AL       ',ID_PM1_AL,     M3REAL, F,T, 'ug m-3', 'PM1 Aluminum' ),
+     &ELDTP( 'PM1_SOIL     ',ID_PM1_SOIL,   M3REAL, F,T, 'ug m-3', 'PM1 Recon Soil (Fine) and Explicit (Coarse)' ),
+     &ELDTP( 'PM1_UNSP1    ',ID_PM1_UNSP1,  M3REAL, F,T, 'ug m-3', 'PM1 Unsp. Coarse Mass for the IMPROVE Method' ),
+     &ELDTP( 'PM1_UNSPCRS  ',ID_PM1_UN,     M3REAL, F,T, 'ug m-3', 'PM1 Unspeciated Coarse Mass' ),
+     &ELDTP( 'PM1_HP       ',ID_PM1_HP,     M3REAL, F,F, 'ug m-3', 'PM1 H+ Ion' ),
                                             
       ! PM2.5 Speciation                    
-     &ELDTP( 'PM25_SO4     ',ID_PM25_SO4,   M3REAL, F, 'ug m-3', 'PM2.5 Sulfate' ),
-     &ELDTP( 'PM25_NO3     ',ID_PM25_NO3,   M3REAL, F, 'ug m-3', 'PM2.5 Nitrate' ),
-     &ELDTP( 'PM25_NH4     ',ID_PM25_NH4,   M3REAL, F, 'ug m-3', 'PM2.5 Ammonium' ),
-     &ELDTP( 'PM25_CL      ',ID_PM25_CL,    M3REAL, F, 'ug m-3', 'PM2.5 Chloride' ),
-     &ELDTP( 'PM25_NA      ',ID_PM25_NA,    M3REAL, F, 'ug m-3', 'PM2.5 Sodium' ),
-     &ELDTP( 'PM25_EC      ',ID_PM25_EC,    M3REAL, F, 'ug m-3', 'PM2.5 Black Carbon' ),
-     &ELDTP( 'PM25_OC      ',ID_PM25_OC,    M3REAL, F, 'ugC m-3','PM2.5 Organic Carbon' ),
-     &ELDTP( 'PM25_OA      ',ID_PM25_OA,    M3REAL, F, 'ug m-3', 'PM2.5 Organic Aerosol' ),
-     &ELDTP( 'PM25_MG      ',ID_PM25_MG,    M3REAL, F, 'ug m-3', 'PM2.5 Magnesium' ),
-     &ELDTP( 'PM25_K       ',ID_PM25_K,     M3REAL, F, 'ug m-3', 'PM2.5 Potassium' ),
-     &ELDTP( 'PM25_CA      ',ID_PM25_CA,    M3REAL, F, 'ug m-3', 'PM2.5 Calcium' ),
-     &ELDTP( 'PM25_OTHER   ',ID_PM25_OT,    M3REAL, F, 'ug m-3', 'PM2.5 Other Mass' ),
-     &ELDTP( 'PM25_FE      ',ID_PM25_FE,    M3REAL, F, 'ug m-3', 'PM2.5 Iron' ),
-     &ELDTP( 'PM25_SI      ',ID_PM25_SI,    M3REAL, F, 'ug m-3', 'PM2.5 Silicon' ),
-     &ELDTP( 'PM25_TI      ',ID_PM25_TI,    M3REAL, F, 'ug m-3', 'PM2.5 Titanium' ),
-     &ELDTP( 'PM25_MN      ',ID_PM25_MN,    M3REAL, F, 'ug m-3', 'PM2.5 Manganese' ),
-     &ELDTP( 'PM25_AL      ',ID_PM25_AL,    M3REAL, F, 'ug m-3', 'PM2.5 Aluminum' ),
-     &ELDTP( 'PM25_SOIL    ',ID_PM25_SOIL,  M3REAL, F, 'ug m-3', 'PM2.5 Recon Soil (Fine) and Explicit (Coarse)' ),
-     &ELDTP( 'PM25_UNSP1   ',ID_PM25_UNSP1, M3REAL, F, 'ug m-3', 'PM2.5 Unsp. Coarse Mass for the IMPROVE method' ),
-     &ELDTP( 'PM25_UNSPCRS ',ID_PM25_UN,    M3REAL, F, 'ug m-3', 'PM2.5 Unspeciated Coarse Mass' ),
-     &ELDTP( 'PM25_HP      ',ID_PM25_HP,    M3REAL, F, 'ug m-3', 'PM2.5 H+ Ion' ),
+     &ELDTP( 'PM25_SO4     ',ID_PM25_SO4,   M3REAL, F,T, 'ug m-3', 'PM2.5 Sulfate' ),
+     &ELDTP( 'PM25_NO3     ',ID_PM25_NO3,   M3REAL, F,T, 'ug m-3', 'PM2.5 Nitrate' ),
+     &ELDTP( 'PM25_NH4     ',ID_PM25_NH4,   M3REAL, F,T, 'ug m-3', 'PM2.5 Ammonium' ),
+     &ELDTP( 'PM25_CL      ',ID_PM25_CL,    M3REAL, F,T, 'ug m-3', 'PM2.5 Chloride' ),
+     &ELDTP( 'PM25_NA      ',ID_PM25_NA,    M3REAL, F,T, 'ug m-3', 'PM2.5 Sodium' ),
+     &ELDTP( 'PM25_EC      ',ID_PM25_EC,    M3REAL, F,T, 'ug m-3', 'PM2.5 Black Carbon' ),
+     &ELDTP( 'PM25_OC      ',ID_PM25_OC,    M3REAL, F,F, 'ugC m-3','PM2.5 Organic Carbon' ),
+     &ELDTP( 'PM25_OA      ',ID_PM25_OA,    M3REAL, F,F, 'ug m-3', 'PM2.5 Organic Aerosol' ),
+     &ELDTP( 'PM25_MG      ',ID_PM25_MG,    M3REAL, F,T, 'ug m-3', 'PM2.5 Magnesium' ),
+     &ELDTP( 'PM25_K       ',ID_PM25_K,     M3REAL, F,T, 'ug m-3', 'PM2.5 Potassium' ),
+     &ELDTP( 'PM25_CA      ',ID_PM25_CA,    M3REAL, F,T, 'ug m-3', 'PM2.5 Calcium' ),
+     &ELDTP( 'PM25_OTHER   ',ID_PM25_OT,    M3REAL, F,T, 'ug m-3', 'PM2.5 Other Mass' ),
+     &ELDTP( 'PM25_FE      ',ID_PM25_FE,    M3REAL, F,T, 'ug m-3', 'PM2.5 Iron' ),
+     &ELDTP( 'PM25_SI      ',ID_PM25_SI,    M3REAL, F,T, 'ug m-3', 'PM2.5 Silicon' ),
+     &ELDTP( 'PM25_TI      ',ID_PM25_TI,    M3REAL, F,T, 'ug m-3', 'PM2.5 Titanium' ),
+     &ELDTP( 'PM25_MN      ',ID_PM25_MN,    M3REAL, F,T, 'ug m-3', 'PM2.5 Manganese' ),
+     &ELDTP( 'PM25_AL      ',ID_PM25_AL,    M3REAL, F,T, 'ug m-3', 'PM2.5 Aluminum' ),
+     &ELDTP( 'PM25_SOIL    ',ID_PM25_SOIL,  M3REAL, F,T, 'ug m-3', 'PM2.5 Recon Soil (Fine) and Explicit (Coarse)' ),
+     &ELDTP( 'PM25_UNSP1   ',ID_PM25_UNSP1, M3REAL, F,T, 'ug m-3', 'PM2.5 Unsp. Coarse Mass for the IMPROVE method' ),
+     &ELDTP( 'PM25_UNSPCRS ',ID_PM25_UN,    M3REAL, F,T, 'ug m-3', 'PM2.5 Unspeciated Coarse Mass' ),
+     &ELDTP( 'PM25_HP      ',ID_PM25_HP,    M3REAL, F,T, 'ug m-3', 'PM2.5 H+ Ion' ),
 
       ! PM2.5-10.0 Speciation
-     &ELDTP( 'PM25TO10_SO4 ',ID_PM25to10_SO4,M3REAL,F, 'ug m-3', 'Coarse-Mode Sulfate' ),
-     &ELDTP( 'PM25TO10_NO3 ',ID_PM25to10_NO3,M3REAL,F, 'ug m-3', 'Coarse-Mode Nitrate' ),
-     &ELDTP( 'PM25TO10_NH4 ',ID_PM25to10_NH4,M3REAL,F, 'ug m-3', 'Coarse-Mode Ammonium' ),
-     &ELDTP( 'PM25TO10_CL  ',ID_PM25to10_CL, M3REAL,F, 'ug m-3', 'Coarse-Mode Chloride' ),
-     &ELDTP( 'PM25TO10_NA  ',ID_PM25to10_NA, M3REAL,F, 'ug m-3', 'Coarse-Mode Sodium' ),
-
+     &ELDTP( 'PM25TO10_SO4 ',ID_PM25to10_SO4,M3REAL,F,T, 'ug m-3', 'Coarse-Mode Sulfate' ),
+     &ELDTP( 'PM25TO10_NO3 ',ID_PM25to10_NO3,M3REAL,F,T, 'ug m-3', 'Coarse-Mode Nitrate' ),
+     &ELDTP( 'PM25TO10_NH4 ',ID_PM25to10_NH4,M3REAL,F,T, 'ug m-3', 'Coarse-Mode Ammonium' ),
+     &ELDTP( 'PM25TO10_CL  ',ID_PM25to10_CL, M3REAL,F,T, 'ug m-3', 'Coarse-Mode Chloride' ),
+     &ELDTP( 'PM25TO10_NA  ',ID_PM25to10_NA, M3REAL,F,T, 'ug m-3', 'Coarse-Mode Sodium' ),
+                                                      
       ! PM Toxics that are part of the Multipollutant (mp) Mechanism
-     &ELDTP( 'PM25_HDIESEL ',ID_PM25_HDSL,   M3REAL,F, 'ug m-3', 'PM2.5 Diesel Total from HAP inventory' ),
-     &ELDTP( 'PM25_HBE     ',ID_PM25_HBE,    M3REAL,F, 'ug m-3', 'PM2.5 Beryllium from HAP inventory' ),
-     &ELDTP( 'PM25_HCD     ',ID_PM25_HCD,    M3REAL,F, 'ug m-3', 'PM2.5 Cadmium from HAP inventory' ),
-     &ELDTP( 'PM25_HCR3    ',ID_PM25_HCR3,   M3REAL,F, 'ug m-3', 'PM2.5 Chromium-III from HAP inventory' ),
-     &ELDTP( 'PM25_HCR6    ',ID_PM25_HCR6,   M3REAL,F, 'ug m-3', 'PM2.5 Chromium-VI from HAP inventory' ),
-     &ELDTP( 'PM25_HCR     ',ID_PM25_HCR,    M3REAL,F, 'ug m-3', 'PM2.5 Chromium Total from HAP inventory' ),
-     &ELDTP( 'PM25_HPB     ',ID_PM25_HPB,    M3REAL,F, 'ug m-3', 'PM2.5 Lead from HAP inventory' ),
-     &ELDTP( 'PM25_HMN     ',ID_PM25_HMN,    M3REAL,F, 'ug m-3', 'PM2.5 Manganese from HAP inventory' ),
-     &ELDTP( 'PM25_HNI     ',ID_PM25_HNI,    M3REAL,F, 'ug m-3', 'PM2.5 Nickel from HAP inventory' ),
-     &ELDTP( 'PM25_HAS     ',ID_PM25_HAS,    M3REAL,F, 'ug m-3', 'PM2.5 Arsenic from HAP inventory' ),
-     &ELDTP( 'PM25_HG      ',ID_PM25_HG,     M3REAL,F, 'ug m-3', 'PM2.5 Mercury from HAP inventory' ),
-     &ELDTP( 'PM10_HDIESEL ',ID_PM10_HDSL,   M3REAL,F, 'ug m-3', 'PM10.0 Diesel Total from HAP inventory' ),
-     &ELDTP( 'PM10_HBE     ',ID_PM10_HBE,    M3REAL,F, 'ug m-3', 'PM10.0 Beryllium from HAP inventory' ),
-     &ELDTP( 'PM10_HCD     ',ID_PM10_HCD,    M3REAL,F, 'ug m-3', 'PM10.0 Cadmium from HAP inventory' ),
-     &ELDTP( 'PM10_HCR3    ',ID_PM10_HCR3,   M3REAL,F, 'ug m-3', 'PM10.0 Chromium-III from HAP inventory' ),
-     &ELDTP( 'PM10_HCR6    ',ID_PM10_HCR6,   M3REAL,F, 'ug m-3', 'PM10.0 Chromium-VI from HAP inventory' ),
-     &ELDTP( 'PM10_HCR     ',ID_PM10_HCR,    M3REAL,F, 'ug m-3', 'PM10.0 Chromium Total from HAP inventory' ),
-     &ELDTP( 'PM10_HPB     ',ID_PM10_HPB,    M3REAL,F, 'ug m-3', 'PM10.0 Lead from HAP inventory' ),
-     &ELDTP( 'PM10_HMN     ',ID_PM10_HMN,    M3REAL,F, 'ug m-3', 'PM10.0 Manganese from HAP inventory' ),
-     &ELDTP( 'PM10_HNI     ',ID_PM10_HNI,    M3REAL,F, 'ug m-3', 'PM10.0 Nickel from HAP inventory' ),
-     &ELDTP( 'PM10_HAS     ',ID_PM10_HAS,    M3REAL,F, 'ug m-3', 'PM10.0 Arsenic from HAP inventory' ),
-     &ELDTP( 'PM10_HG      ',ID_PM10_HG,     M3REAL,F, 'ug m-3', 'PM10.0 Mercury from HAP inventory' ),
-     &ELDTP( 'PM25_BENAPY  ',ID_PM25_BENAPY, M3REAL,F, 'ug m-3', 'PM2.5 Benzo-a-Pyrene' ),
-     &ELDTP( 'PM10_BENAPY  ',ID_PM10_BENAPY, M3REAL,F, 'ug m-3', 'PM10.0 Benzo-a-Pyrene' ),
-     &ELDTP( 'PMF_BENAPY   ',ID_PMF_BENAPY,  M3REAL,F, 'ug m-3', 'Fine-Mode Benzo-a-Pyrene' ),
-     &ELDTP( 'GAS_BENAPY   ',ID_GAS_BENAPY,  M3REAL,F, 'ug m-3', 'Gas-Phase Benzo-a-Pyrene' ),
-     &ELDTP( 'BENAPY_FAERO ',ID_BENAPY_FAERO,M3REAL,F, '',       'Benzo-a-Pyrene Aerosol-Phase Fraction' ),
-     &ELDTP( 'GAS_HNO3     ',ID_GAS_HNO3,    M3REAL,F, 'ug m-3', 'Gas-Phase Nitric Acid' ),
-     &ELDTP( 'GAS_NH3      ',ID_GAS_NH3,     M3REAL,F, 'ug m-3', 'Gas-Phase Ammonia' ),
+     &ELDTP( 'PM25_HDIESEL ',ID_PM25_HDSL,   M3REAL,F,T, 'ug m-3', 'PM2.5 Diesel Total from HAP inventory' ),
+     &ELDTP( 'PM25_HBE     ',ID_PM25_HBE,    M3REAL,F,T, 'ug m-3', 'PM2.5 Beryllium from HAP inventory' ),
+     &ELDTP( 'PM25_HCD     ',ID_PM25_HCD,    M3REAL,F,T, 'ug m-3', 'PM2.5 Cadmium from HAP inventory' ),
+     &ELDTP( 'PM25_HCR3    ',ID_PM25_HCR3,   M3REAL,F,T, 'ug m-3', 'PM2.5 Chromium-III from HAP inventory' ),
+     &ELDTP( 'PM25_HCR6    ',ID_PM25_HCR6,   M3REAL,F,T, 'ug m-3', 'PM2.5 Chromium-VI from HAP inventory' ),
+     &ELDTP( 'PM25_HCR     ',ID_PM25_HCR,    M3REAL,F,T, 'ug m-3', 'PM2.5 Chromium Total from HAP inventory' ),
+     &ELDTP( 'PM25_HPB     ',ID_PM25_HPB,    M3REAL,F,T, 'ug m-3', 'PM2.5 Lead from HAP inventory' ),
+     &ELDTP( 'PM25_HMN     ',ID_PM25_HMN,    M3REAL,F,T, 'ug m-3', 'PM2.5 Manganese from HAP inventory' ),
+     &ELDTP( 'PM25_HNI     ',ID_PM25_HNI,    M3REAL,F,T, 'ug m-3', 'PM2.5 Nickel from HAP inventory' ),
+     &ELDTP( 'PM25_HAS     ',ID_PM25_HAS,    M3REAL,F,T, 'ug m-3', 'PM2.5 Arsenic from HAP inventory' ),
+     &ELDTP( 'PM25_HG      ',ID_PM25_HG,     M3REAL,F,T, 'ug m-3', 'PM2.5 Mercury from HAP inventory' ),
+     &ELDTP( 'PM10_HDIESEL ',ID_PM10_HDSL,   M3REAL,F,T, 'ug m-3', 'PM10.0 Diesel Total from HAP inventory' ),
+     &ELDTP( 'PM10_HBE     ',ID_PM10_HBE,    M3REAL,F,T, 'ug m-3', 'PM10.0 Beryllium from HAP inventory' ),
+     &ELDTP( 'PM10_HCD     ',ID_PM10_HCD,    M3REAL,F,T, 'ug m-3', 'PM10.0 Cadmium from HAP inventory' ),
+     &ELDTP( 'PM10_HCR3    ',ID_PM10_HCR3,   M3REAL,F,T, 'ug m-3', 'PM10.0 Chromium-III from HAP inventory' ),
+     &ELDTP( 'PM10_HCR6    ',ID_PM10_HCR6,   M3REAL,F,T, 'ug m-3', 'PM10.0 Chromium-VI from HAP inventory' ),
+     &ELDTP( 'PM10_HCR     ',ID_PM10_HCR,    M3REAL,F,T, 'ug m-3', 'PM10.0 Chromium Total from HAP inventory' ),
+     &ELDTP( 'PM10_HPB     ',ID_PM10_HPB,    M3REAL,F,T, 'ug m-3', 'PM10.0 Lead from HAP inventory' ),
+     &ELDTP( 'PM10_HMN     ',ID_PM10_HMN,    M3REAL,F,T, 'ug m-3', 'PM10.0 Manganese from HAP inventory' ),
+     &ELDTP( 'PM10_HNI     ',ID_PM10_HNI,    M3REAL,F,T, 'ug m-3', 'PM10.0 Nickel from HAP inventory' ),
+     &ELDTP( 'PM10_HAS     ',ID_PM10_HAS,    M3REAL,F,T, 'ug m-3', 'PM10.0 Arsenic from HAP inventory' ),
+     &ELDTP( 'PM10_HG      ',ID_PM10_HG,     M3REAL,F,T, 'ug m-3', 'PM10.0 Mercury from HAP inventory' ),
+     &ELDTP( 'PM25_BENAPY  ',ID_PM25_BENAPY, M3REAL,F,T, 'ug m-3', 'PM2.5 Benzo-a-Pyrene' ),
+     &ELDTP( 'PM10_BENAPY  ',ID_PM10_BENAPY, M3REAL,F,T, 'ug m-3', 'PM10.0 Benzo-a-Pyrene' ),
+     &ELDTP( 'PMF_BENAPY   ',ID_PMF_BENAPY,  M3REAL,F,T, 'ug m-3', 'Fine-Mode Benzo-a-Pyrene' ),
+     &ELDTP( 'GAS_BENAPY   ',ID_GAS_BENAPY,  M3REAL,F,T, 'ug m-3', 'Gas-Phase Benzo-a-Pyrene' ),
+     &ELDTP( 'BENAPY_FAERO ',ID_BENAPY_FAERO,M3REAL,F,T, '',       'Benzo-a-Pyrene Aerosol-Phase Fraction' ),
+     &ELDTP( 'GAS_HNO3     ',ID_GAS_HNO3,    M3REAL,F,T, 'ug m-3', 'Gas-Phase Nitric Acid' ),
+     &ELDTP( 'GAS_NH3      ',ID_GAS_NH3,     M3REAL,F,T, 'ug m-3', 'Gas-Phase Ammonia' ),
 
       ! Other Special Variables and Properties
-     &ELDTP( 'TNO3         ',ID_TNO3,       M3REAL, F, 'ug m-3', 'Total Nitrate only Including Inorganics' ),
-     &ELDTP( 'TNO3TOT      ',ID_TNO3TOT,    M3REAL, F, 'ug m-3', 'Total Nitrate including Inorganics and Organics' ),
-     &ELDTP( 'PM25_FRM     ',ID_PM25_FRM,   M3REAL, F, 'ug m-3', 'Federal Reference Method PM2.5' ),
-     &ELDTP( 'PMF_FRM      ',ID_PMF_FRM,    M3REAL, F, 'ug m-3', 'Federal Reference Method PMIJ' ),
-     &ELDTP( 'AOD_550      ',ID_AOD550,     M3REAL, F, '1     ', 'Aerosol Optical Depth at 550 nm -Angstrom interp' ),
-     &ELDTP( 'PM_EXT_550   ',ID_PMEXT550,   M3REAL, F, 'Mm-1  ', 'Aerosol Extinction at 550 nm -Angstrom interp' ),
-     &ELDTP( 'RH           ',ID_RH,         M3REAL, F, '1     ', 'Relative humidity' ),
-     &ELDTP( 'TA           ',ID_TEMP,       M3REAL, F, 'K     ', 'Temperature' ),
-     &ELDTP( 'TSURF        ',ID_SRFTEMP,    M3REAL, F, 'K     ', '2-meter Surface Temperature' ),
-     &ELDTP( 'PRES         ',ID_PRES,       M3REAL, F, 'Pa    ', 'Pressure' ),
-     &ELDTP( 'GAMMA_N2O5   ',ID_GN2O5F,     M3REAL, F, '1     ', 'Fine Mode N2O5 Heterogeneous rxn probability' ),
-     &ELDTP( 'GAMMA_N2O5K  ',ID_GN2O5C,     M3REAL, F, '1     ', 'Coarse Mode N2O5 Heterogeneous rxn probability' ),
-     &ELDTP( 'YIELD_CLNO2  ',ID_YCLNO2F,    M3REAL, F, '1     ', 'Fine Mode CLNO2 Heterogeneous reaction yield' ),
-     &ELDTP( 'YIELD_CLNO2K ',ID_YCLNO2C,    M3REAL, F, '1     ', 'Coarse Mode CLNO2 Heterogeneous reaction yield' ),
-     &ELDTP( 'GAMMA_IEPOX  ',ID_GIEPOX,     M3REAL, F, '1     ', 'IEPOX heterogeneous uptake coefficient' ),
-     &ELDTP( 'K_IEPOX      ',ID_KIEPOX,     M3REAL, F, 's-1   ', 'IEPOX 1st order particle phase reaction rate const' ),
-     &ELDTP( 'GAMMA_IMAE   ',ID_GIMAE,      M3REAL, F, '1     ', 'IMAE+HMML heterogeneous uptake coefficient' ),
-     &ELDTP( 'DZ           ',ID_DZ,         M3REAL, F, 'm     ', 'Height of each grid cell computed from top layer height' ),
-     &ELDTP( 'ZH           ',ID_ZH,         M3REAL, F, 'm     ', 'Height of grid cell midpoints (mass-weighted)' ),
-     &ELDTP( 'CFRAC        ',ID_CFRAC,      M3REAL, F, '      ', 'Cloud Fraction' ),
-     &ELDTP( 'PV           ',ID_PV,         M3REAL, F, '      ', 'Potential Vorticity' ),
-     &ELDTP( 'DENS         ',ID_DENS,       M3REAL, F, 'kg m-3', 'Advected Density' ),
-     &ELDTP( 'RHOJ         ',ID_RHOJ,       M3REAL, F, 'kg m-3', 'Advected Density x Jacobian/MSFX^2' ) /)
+     &ELDTP( 'TNO3         ',ID_TNO3,       M3REAL, F,T, 'ug m-3', 'Total Nitrate only Including Inorganics' ),
+     &ELDTP( 'TNO3TOT      ',ID_TNO3TOT,    M3REAL, F,T, 'ug m-3', 'Total Nitrate including Inorganics and Organics' ),
+     &ELDTP( 'PM25_FRM     ',ID_PM25_FRM,   M3REAL, F,F, 'ug m-3', 'Federal Reference Method PM2.5' ),
+     &ELDTP( 'PMF_FRM      ',ID_PMF_FRM,    M3REAL, F,F, 'ug m-3', 'Federal Reference Method PMIJ' ),
+     &ELDTP( 'AOD_550      ',ID_AOD550,     M3REAL, F,F, '1     ', 'Aerosol Optical Depth at 550 nm -Angstrom interp' ),
+     &ELDTP( 'PM_EXT_550   ',ID_PMEXT550,   M3REAL, F,F, 'Mm-1  ', 'Aerosol Extinction at 550 nm -Angstrom interp' ),
+     &ELDTP( 'RH           ',ID_RH,         M3REAL, F,F, '1     ', 'Relative humidity' ),
+     &ELDTP( 'TA           ',ID_TEMP,       M3REAL, F,F, 'K     ', 'Temperature' ),
+     &ELDTP( 'TSURF        ',ID_SRFTEMP,    M3REAL, F,F, 'K     ', '2-meter Surface Temperature' ),
+     &ELDTP( 'PRES         ',ID_PRES,       M3REAL, F,F, 'Pa    ', 'Pressure' ),
+     &ELDTP( 'GAMMA_N2O5   ',ID_GN2O5F,     M3REAL, F,F, '1     ', 'Fine Mode N2O5 Heterogeneous rxn probability' ),
+     &ELDTP( 'GAMMA_N2O5K  ',ID_GN2O5C,     M3REAL, F,F, '1     ', 'Coarse Mode N2O5 Heterogeneous rxn probability' ),
+     &ELDTP( 'YIELD_CLNO2  ',ID_YCLNO2F,    M3REAL, F,F, '1     ', 'Fine Mode CLNO2 Heterogeneous reaction yield' ),
+     &ELDTP( 'YIELD_CLNO2K ',ID_YCLNO2C,    M3REAL, F,F, '1     ', 'Coarse Mode CLNO2 Heterogeneous reaction yield' ),
+     &ELDTP( 'GAMMA_IEPOX  ',ID_GIEPOX,     M3REAL, F,F, '1     ', 'IEPOX heterogeneous uptake coefficient' ),
+     &ELDTP( 'K_IEPOX      ',ID_KIEPOX,     M3REAL, F,F, 's-1   ', 'IEPOX 1st order particle phase reaction rate const' ),
+     &ELDTP( 'GAMMA_IMAE   ',ID_GIMAE,      M3REAL, F,F, '1     ', 'IMAE+HMML heterogeneous uptake coefficient' ),
+     &ELDTP( 'DZ           ',ID_DZ,         M3REAL, F,F, 'm     ', 'Height of each grid cell computed from top layer height' ),
+     &ELDTP( 'ZH           ',ID_ZH,         M3REAL, F,F, 'm     ', 'Height of grid cell midpoints (mass-weighted)' ),
+     &ELDTP( 'CFRAC        ',ID_CFRAC,      M3REAL, F,F, '      ', 'Cloud Fraction' ),
+     &ELDTP( 'PV           ',ID_PV,         M3REAL, F,F, '      ', 'Potential Vorticity' ),
+     &ELDTP( 'DENS         ',ID_DENS,       M3REAL, F,F, 'kg m-3', 'Advected Density' ),
+     &ELDTP( 'RHOJ         ',ID_RHOJ,       M3REAL, F,F, 'kg m-3', 'Advected Density x Jacobian/MSFX^2' ) /)
      
 
         TYPE ELMO_KEY_TYPE
@@ -483,32 +484,46 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   
         LOGICAL, SAVE           :: AERO_CHEM_SET = .FALSE.
  
-        ! Define type for storing coeffieicnets and variable indices for
-        ! aggregating PM diagnostics like ATOTIJ, ACLK, etc.
-        TYPE ELMO_COEFFS_TYPE
-            LOGICAL L_MAPPED                 ! Record whether or not this aggregate has been mapped
-            INTEGER N_VARS                   ! Number of variables to store coefficients for. 
-                                             !   This should not account for modes. For example, 
-                                             !   to sum ASO4IJK, N_VARS would be 1 since only 
-                                             !   ASO4 is being used.
-            LOGICAL, ALLOCATABLE :: L_GAS(:)    ! Is this variable a gas?
-            LOGICAL, ALLOCATABLE :: L_SPC(:)    ! Is this variable a CMAQ species?
-            LOGICAL, ALLOCATABLE :: L_AGG(:)    ! Is this variable another aggregated diagnostic parameter?
-            LOGICAL, ALLOCATABLE :: L_MODE(:)   ! For which modes does this aggregate apply
-            INTEGER, ALLOCATABLE :: I_SPEC(:)   ! Index of this Variable in Aerosol/Gas/Aggregate Array
-            REAL,    ALLOCATABLE :: COEFF(:)    ! Coefficient for each variable
-            INTEGER              :: UNIT        ! Indicates the units for output:
+        ! Define type for storing names, properties, and components of
+        ! all EMO variables 
+        TYPE ELMO_TABLE_TYPE
+            CHARACTER (LEN = 16) :: NAME        ! Variable Name ( as it appears on the ELMO_LIST, in CGRID, etc.)
+            CHARACTER (LEN = 16) :: OUTNAME     ! Variable Name that will be written to the output file
+            INTEGER              :: IDG         ! ID Number in Case Statement. Maps to specific calculation
+            INTEGER              :: VAR_TYPE    ! IOAPI Variable Type
+            CHARACTER (LEN = 16) :: CUNIT       ! Units in Character Format
+            INTEGER              :: UNIT        ! Units in Integer Format:
+                                                !   0 = 'ug m-3';  1 = 'ppmv'   ;  2 = 'ugC m-3'; 
+                                                !   3 = 'ppmC'  ;  4 = 'ugN m-3';  5 = 'ppmN'
+            CHARACTER (LEN = 80) :: DESC        ! Description for Output File
+            INTEGER              :: IM          ! Mode of interest if mode-dependent
+                                                
+            LOGICAL              :: L_COMB      ! Is this variable a linear combination of other variables
+            INTEGER              :: N_VARS      ! Some variables are linear combinations of other variables.
+                                                !   N_VARS is the number of components within such a combination. 
+                                                !   This should not account for modes. For example, 
+                                                !   to sum ASO4IJK, N_VARS would be 1 since only 
+                                                !   ASO4 is being used.
+            LOGICAL, ALLOCATABLE :: L_ELMO(:)   ! Is this component another ELMO aggregate variable?
+            LOGICAL, ALLOCATABLE :: L_CGRID(:)  ! Is this component in the CGRID vector?
+            LOGICAL, ALLOCATABLE :: L_AERO(:)   ! Is this component a bulk aerosol species?
+            LOGICAL, ALLOCATABLE :: L_FAM(:)    ! Is this component a chemical family?
+            LOGICAL, ALLOCATABLE :: L_DEP(:)    ! Is this component deposition 
+            REAL,    ALLOCATABLE :: MW(:)       ! Species molecular weight, if defined
+            INTEGER              :: SPC_UNIT(:) ! Indicates the units for output of each component
                                                 !   0 = 'ug m-3';  1 = 'ppmv'
                                                 !   2 = 'ugC m-3'; 3 = 'ppmC'
                                                 !   4 = 'ugN m-3'; 5 = 'ppmN'
-            INTEGER INLET                    ! Integer pointing to the corresponding inlet of choice 
-                                             !   in the ELMO_INLET structure
-            INTEGER WETNESS                  ! Integer prescribing wet or dry aerosol (1 = wet, 2 = dry)
-                                             !   Default is wet
-        END TYPE ELMO_COEFFS_TYPE
+            LOGICAL, ALLOCATABLE :: L_MODE(:)   ! For which modes does this aggregate apply
+            INTEGER, ALLOCATABLE :: I_SPEC(:)   ! Index of this Variable in Aerosol/Gas/Aggregate Array
+            REAL,    ALLOCATABLE :: COEFF(:)    ! Coefficient for each variable
+            INTEGER              :: INLET       ! Integer pointing to the corresponding inlet of choice 
+                                                !   in the ELMO_INLET structure
+            INTEGER              :: WETNESS     ! Integer prescribing wet or dry aerosol (1 = wet, 2 = dry)
+                                                !   Default is wet
+        END TYPE ELMO_TABLE_TYPE
 
-        TYPE (ELMO_COEFFS_TYPE), ALLOCATABLE, SAVE :: ELMO_COEFFS( : ) 
-
+        TYPE (ELMO_TABLE_TYPE), ALLOCATABLE, SAVE :: ELMO_TABLE( : ) 
 
         TYPE ELMO_INLET_TYPE
             CHARACTER( 16 ) CINLET            ! Inlet Name
@@ -566,6 +581,42 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         elmo_ext_550 = 0.0
 
         end subroutine elmo_init_shared
-!------------------------------------------------------------------------------------------            
 
+!------------------------------------------------------------------------------------------            
+      SUBROUTINE MAP_ELMO_UNITS( UNIT_TMP, IUNIT )
+!     This subroutine maps units in character strings to a standard
+!     vector of ELMO units that are available for output.
+!-------------------------------------------------------------------------
+
+      IMPLICIT NONE
+
+      CHARACTER( * ), INTENT( IN ) :: UNIT_TMP 
+      INTEGER, INTENT( OUT )       :: IUNIT
+      CHARACTER(  4 ) UNITTYPE
+      CHARACTER( 200 ) XMSG
+ 
+      ! Assign Unit to Aggregate Variable
+      UNITTYPE = UNIT_TMP
+      CALL UPCASE( UNITTYPE )
+      SELECT CASE ( UNITTYPE )
+        CASE ( 'UG M-3' )
+           IUNIT = 0
+        CASE ( 'PPMV' )
+           IUNIT = 1
+        CASE ( 'UGC M-3' )
+           IUNIT = 2
+        CASE ( 'PPMC' )
+           IUNIT = 3
+        CASE ( 'UGN M-3' )
+           IUNIT = 4
+        CASE ( 'PPMN' )
+           IUNIT = 5
+        CASE DEFAULT
+           XMSG = 'A unit (' // trim(UNIT_TMP) // ') has been given ' //
+     &            'for the mapping of an ELMO aggregate variable. It is not recognized.'
+           CALL M3EXIT( 'MAP_ELMO_UNITS', 0, 0, XMSG, XSTAT1 )
+      END SELECT
+ 
+      END SUBROUTINE MAP_ELMO_UNITS
+ 
       END MODULE ELMO_DATA

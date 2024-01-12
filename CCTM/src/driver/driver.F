@@ -107,7 +107,7 @@ C-----------------------------------------------------------------------
       USE BUDGET_DEFN
       USE AERO_DATA
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP
-      USE ELMO_PROC, ONLY : ELMO_DRIVER, WRITE_ELMO, MAP_ELMO
+      USE ELMO_PROC, ONLY : ELMO_DRIVER, WRITE_ELMO, ELMO_INIT
 #ifdef mpas
       USE CGRID_SPCS            ! CGRID mechanism species
       USE HGRD_DEFN, ONLY: MYPE
@@ -509,7 +509,7 @@ C Initiliaze IO Arrays and Open Files
          call centralized_io_init
 
 C Initialize ELMO Arrays and Maps
-         call map_elmo
+         call elmo_init
 
 C Initialize conc field: Copy IC's to CONC file as step 0
 C Convention: the input file concentration units are always ppmV.

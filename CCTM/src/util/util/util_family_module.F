@@ -37,6 +37,7 @@
       Integer                     :: Max_Chem_Fam_Members = 0
       Character( 32 ),Allocatable :: ChemFamilyName( : ) 
       Integer,Allocatable         :: ChemFamilyNum( : ) 
+      Character( 16 ),Allocatable :: ChemFamilyUnits( : ) 
       Character( 32 ),Allocatable :: ChemFamilyMembers( :,: ) 
 
       ! Define Stream Family Variables
@@ -84,7 +85,7 @@
 
       ! Define Chemical Families           
       NAMELIST / Chemical_FamVars / N_Chem_Fams, Max_Chem_Fam_Members
-      NAMELIST / ChemicalFamilies / ChemFamilyName, ChemFamilyMembers
+      NAMELIST / ChemicalFamilies / ChemFamilyName, ChemFamilyUnits, ChemFamilyMembers
 
       ! Define Stream Families
       NAMELIST / Desid_StreamFamVars / Desid_N_Stream_Fams, Desid_Max_Stream_Fam_Members
@@ -147,10 +148,12 @@
       N_Chem_Fams = N_Chem_Fams + n_aerospc
       ALLOCATE( ChemFamilyName( N_Chem_Fams),
      &          ChemFamilyNum( N_Chem_Fams),
+     &          ChemFamilyUnits( N_Chem_Fams),
      &          ChemFamilyMembers( N_Chem_Fams, Max_Chem_Fam_Members ),
      &          STAT = IOST)
       CALL CHECKMEM( IOST, 'ChemFamilies', 'Read_Families' )
-      ChemFamilyName = ''
+      ChemFamilyName    = ''
+      ChemFamilyUnits   = ''
       ChemFamilyMembers = ''
 
       REWIND( FUNIT )
@@ -187,7 +190,8 @@
            ! list
            DO IFAM = 1,N_Chem_Fams
              if ( ChemFamilyName(ifam) .eq. '' ) then
-                  ChemFamilyName(ifam) = aerospc(iaer)%bulkname
+                ChemFamilyName(ifam) = aerospc(iaer)%bulkname
+                ChemFamilyUnits(ifam) = 'ug m-3'
                 inum = 0
                 do im = 1,n_mode
                   if ( .not.aero_missing(iaer,im) ) then
@@ -206,7 +210,8 @@
       ! Reallocate Chemical Family Arrays in case N_Chem_Fams was
       ! shortened due to aerosol bulknames being already present in the
       ! user-defined family list.
-      ChemFamilyName = ChemFamilyName(1:N_Chem_Fams)
+      ChemFamilyName    = ChemFamilyName(1:N_Chem_Fams)
+      ChemFamilyUnits   = ChemFamilyUnits(1:N_Chem_Fams)
       ChemFamilyMembers = ChemFamilyMembers(1:N_Chem_Fams,1:Max_Chem_Fam_Members)
 
       ! Populate and Error Check All Family and Member Names
