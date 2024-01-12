@@ -20,10 +20,12 @@
 !-----------------------------------------------------------------------
       MODULE ELMO_PROC
 !-----------------------------------------------------------------------
-! This module will collect all procedures used for subsetting the 
-!      pm diagnostic variables requested by the user. It will also
-!      open the output files and do the actual calculations of 
-!      diagnostic variables of interest.
+! This module will:
+!      - collect all procedures used for subsetting the ELMO variables 
+!        requested by the user. 
+!      - open the ELMO output files and populate with metadata
+!        reflecting the user-requested ELMO variables
+!      - Calculate values of ELMO variables during the CCTM runtime
 !
 ! Revision History:
 ! Ben Murphy 2020 Feb: Created
@@ -63,7 +65,7 @@
 
 !-------------------------------------------------------------------------
       SUBROUTINE READ_ELMO_NML( )
-!     This subroutine maps the PM diagnostic variables that the user has
+!     This subroutine maps the ELMO variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
          
@@ -111,16 +113,16 @@
       AVRG_LAYER_BOT   = 1
       AVRG_VARS_NML(:) = ''
 
-      ! Retrieve the Name of the Emission Control File
+      ! Retrieve the Name of the CMAQ Miscellaneous Control File
       IF ( MISC_CTRL .EQ. "MISC_CTRL_NML" ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A)"),
      &           'You have chosen not to indicate the location of an',
-     &           'Emission Control namelist file. Default settings ',
+     &           'CMAQ_Control_Misc.nml namelist file. Default settings ',
      &           'will be assumed.'
           RETURN
       END IF
 
-      ! Open Emission Control Namelist File
+      ! Open Miscellaneous Control Namelist File
       FUNIT = JUNIT()
       OPEN( FILE = MISC_CTRL, UNIT = FUNIT, STATUS = 'OLD',
      &      POSITION = 'REWIND', FORM='FORMATTED', IOSTAT = STAT )
@@ -128,7 +130,7 @@
       ! Check for Error in File Open Process
       IF ( STAT .NE. 0 ) THEN
           WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
-     &           'emissions control namelist file: ',TRIM( MISC_CTRL )
+     &           'CMAQ miscellaneous control namelist file: ',TRIM( MISC_CTRL )
           CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
       END IF
  
@@ -138,7 +140,7 @@
       IF ( STAT .NE. 0 ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
      &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_ACTIVATE section of the CMAQ Control ',
+     &           'ELMO_ACTIVATE section of the CMAQ Miscellaneous Control ',
      &           'Namelist. Default values for this section will be ',
      &           'assumed.'
       END IF
@@ -153,13 +155,13 @@
 
       CALL POPULATE_ELMO_KEY
 
-      ! Read Desired ELMO_INST parameters from input namelist
+      ! Read Desired ELMO_INST variables from input namelist
       REWIND( FUNIT )
       READ( NML = elmo_inst, UNIT = FUNIT, IOSTAT=STAT )
       IF ( STAT .NE. 0 ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
      &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_INST section of the CMAQ Control ',
+     &           'ELMO_INST section of the CMAQ Miscellaneous Control ',
      &           'Namelist. Default values for this section will be ',
      &           'assumed.'
       END IF
@@ -188,15 +190,15 @@
      &      I4 = INDEX1( INST_VARS_NML( INUM ), N_Chem_Fams, CHEMFAMILYNAME )
 
          IF ( INST_VARS_NML( INUM ) .EQ. 'ALL' ) THEN
-            ! Add All Diagnostic Parameters to the End of the Registry List
+            ! Add All ELMO variables to the End of the Registry List
             INST_VARS_NML( N_END+1:N_END+N_ELMO_LIST ) = ELMO_LIST%NAME
             N_END = N_END + N_ELMO_LIST
             
-            ! Add All Raw Output Species to the End of the Registry List
+            ! Add All Raw CGRID Species to the End of the Registry List
             INST_VARS_NML( N_END+1:N_END+N_CGRID_SPC ) = CGRID_NAME(1:N_CGRID_SPC)
             N_END = N_END + N_CGRID_SPC
 
-            ! Add All Family Names defined in the Emission Control
+            ! Add All Family Names defined in the Miscellaneous Control
             ! Interface to the End of the Registry List
             IF ( N_Chem_Fams .GT. 0 ) 
      &           INST_VARS_NML( N_END+1:N_END+N_Chem_Fams ) = 
@@ -208,19 +210,19 @@
             INST_VARS_NML( N_END ) = ''
             N_END = N_END - 1
          ELSE IF ( INST_VARS_NML( INUM ) .EQ. 'ALLCONC' ) THEN
-            ! Add All Raw Output Species to the End of the Registry List
+            ! Add All Raw CGRID Species to the End of the Registry List
             INST_VARS_NML( N_END+1:N_END+N_CGRID_SPC ) = CGRID_NAME(1:N_CGRID_SPC)
             N_END = N_END + N_CGRID_SPC
 
-            ! Remove 'ALLCONC' Keyword from INST Parameter List
+            ! Remove 'ALLCONC' Keyword from INST Variable List
             INST_VARS_NML( INUM:N_END-1 ) = INST_VARS_NML( INUM+1:N_END )
             INST_VARS_NML( N_END ) = ''
             N_END = N_END - 1 
          ELSE IF ( I1 .GT. 0 ) THEN
-            ! Entry Matches a parameter on the ELMO list. 
+            ! Entry Matches a variable on the ELMO list. 
             INUM = INUM + 1
          ELSE IF ( I2 .GT. 0 ) THEN
-            ! ELMO Keyword. Add parameters associated with a keyword
+            ! ELMO Keyword. Add variables associated with a keyword
             INST_VARS_NML( N_END+1:N_END+ELMO_KEY( I2 )%N ) =
      &                                   ELMO_KEY( I2 )%LIST
             N_END = N_END + ELMO_KEY( I2 )%N
@@ -228,7 +230,7 @@
             INST_VARS_NML( N_END ) = ''
             N_END = N_END - 1
          ELSE IF ( I3 .GT. 0 ) THEN
-            ! CMAQ Raw Model Species. Go to Next Entry
+            ! CMAQ Raw CGRID Species. Go to Next Entry
             INUM = INUM + 1
          ELSE IF ( I4 .GT. 0 ) THEN
             ! CMAQ Chemical Family. Go to Next entry or expand if the * was
@@ -250,9 +252,9 @@
                INUM = INUM + 1
             END IF
          ELSE
-            ! Entry Doesn't Match any parameter or Keyword. Crash the
+            ! Entry Doesn't Match any variable or Keyword. Crash the
             ! model.
-            XMSG = 'An Instantaneous ELMO Parameter ' // TRIM( INST_VARS_NML( INUM )) //
+            XMSG = 'An Instantaneous ELMO variable ' // TRIM( INST_VARS_NML( INUM )) //
      &             ' has been requested that does not exist.'
             CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
          END IF
@@ -276,7 +278,7 @@
          END DO
       END DO
 
-      ! Populate Final INST_PARS parameters list
+      ! Populate Final INST_PARS variables list
       N_ELMO_INST = INDEX1( '', N_NML, INST_VARS_NML ) - 1
       ALLOCATE( INST_PARS( N_ELMO_INST ), STAT=IOS )
       CALL CHECKMEM( IOS, 'INST_PARS',PNAME )
@@ -299,13 +301,13 @@
       END IF
       NLAY_ELMO_INST = INST_LAYER_TOP - INST_LAYER_BOT + 1
 
-      ! Read Desired ELMO_AVRG parameters from input namelist
+      ! Read Desired ELMO_AVRG variables from input namelist
       REWIND( FUNIT )
       READ( NML = elmo_avrg, UNIT = FUNIT, IOSTAT=STAT )
       IF ( STAT .NE. 0 ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
      &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_AVRG section of the CMAQ Control ',
+     &           'ELMO_AVRG section of the CMAQ Miscellaneous Control ',
      &           'Namelist. Default values for this section will be ',
      &           'assumed.'
       END IF
@@ -334,39 +336,39 @@
      &      I4 = INDEX1( AVRG_VARS_NML( INUM ), N_Chem_Fams, CHEMFAMILYNAME )
 
          IF ( AVRG_VARS_NML( INUM ) .EQ. 'ALL' ) THEN
-             ! Add All Parameters to the End of the Registry List
+             ! Add All ELMO variables to the End of the Registry List
             AVRG_VARS_NML( N_END+1:N_END+N_ELMO_LIST ) = ELMO_LIST%NAME
             N_END = N_END + N_ELMO_LIST
 
-            ! Add All Raw Output Species to the End of the Registry List
+            ! Add All Raw CGRID Species to the End of the Registry List
             AVRG_VARS_NML( N_END+1:N_END+N_CGRID_SPC ) = CGRID_NAME(1:N_CGRID_SPC)
             N_END = N_END + N_CGRID_SPC
 
-            ! Add All Family Names defined in the Emission Control
+            ! Add All Family Names defined in the Miscellaneous Control
             ! Interface to the End of the Registry List
             IF ( N_Chem_Fams .GT. 0 ) 
      &           AVRG_VARS_NML( N_END+1:N_END+N_Chem_Fams ) = 
      &                        CHEMFAMILYNAME(1:N_Chem_Fams)
             N_END = N_END + N_Chem_Fams
  
-            ! Remove 'ALL' Keyword from AVRG Parameter List
+            ! Remove 'ALL' Keyword from AVRG variable List
             AVRG_VARS_NML( INUM:N_END-1 ) = AVRG_VARS_NML( INUM+1:N_END )
             AVRG_VARS_NML( N_END ) = ''
             N_END = N_END - 1
          ELSE IF ( AVRG_VARS_NML( INUM ) .EQ. 'ALLCONC' ) THEN
-            ! Add All Raw Output Species to the End of the Registry List
+            ! Add All Raw CGRID Species to the End of the Registry List
             AVRG_VARS_NML( N_END+1:N_END+N_CGRID_SPC ) = CGRID_NAME(1:N_CGRID_SPC)
             N_END = N_END + N_CGRID_SPC
 
-            ! Remove 'ALLCONC' Keyword from AVRG Parameter List
+            ! Remove 'ALLCONC' Keyword from AVRG variable List
             AVRG_VARS_NML( INUM:N_END-1 ) = AVRG_VARS_NML( INUM+1:N_END )
             AVRG_VARS_NML( N_END ) = ''
             N_END = N_END - 1
          ELSE IF ( I1 .GT. 0 ) THEN
-            ! Entry Matches a parameter on the ELMO list. 
+            ! Entry Matches a variable on the ELMO list. 
             INUM = INUM + 1
          ELSE IF ( I2 .GT. 0 ) THEN
-            ! Add Parameters associated with a keyword
+            ! Add variables associated with a keyword
             AVRG_VARS_NML( N_END+1:N_END+ELMO_KEY( I2 )%N ) =
      &                                   ELMO_KEY( I2 )%LIST
             N_END = N_END + ELMO_KEY( I2 )%N
@@ -374,7 +376,7 @@
             AVRG_VARS_NML( N_END ) = ''
             N_END = N_END - 1
          ELSE IF ( I3 .GT. 0 ) THEN
-            ! CMAQ Raw Model Species. Go to Next Entry
+            ! CMAQ Raw CGRID Species. Go to Next Entry
             INUM = INUM + 1
          ELSE IF ( I4 .GT. 0 ) THEN
             ! CMAQ Chemical Family. Go to Next entry or expand if the * was
@@ -397,9 +399,9 @@
             END IF
  
          ELSE
-            ! Entry Doesn't Match any parameter or Keyword. Crash the
+            ! Entry Doesn't Match any variable or Keyword. Crash the
             ! model.
-            XMSG = 'An Average ELMO Parameter ' // TRIM( AVRG_VARS_NML( INUM )) //
+            XMSG = 'An Average ELMO variable ' // TRIM( AVRG_VARS_NML( INUM )) //
      &             ' has been requested that does not exist.'
             CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
          END IF
@@ -423,7 +425,7 @@
          END DO
       END DO
        
-      ! Populate INST_PARS parameters list
+      ! Populate AVRG_PARS variable list
       N_ELMO_AVRG = INDEX1( '', N_NML, AVRG_VARS_NML ) - 1
       ALLOCATE( AVRG_PARS( N_ELMO_AVRG ), STAT = IOS )
       CALL CHECKMEM( IOS, 'AVRG_PARS',PNAME )
@@ -453,8 +455,8 @@
 !-------------------------------------------------------------------------
       SUBROUTINE POPULATE_ELMO_KEY
 !     This subroutine allocates and populates the structure of potential
-!       keywords to which users may refer to activate various diagnostic
-!       parameters. It also contains the definitions of the ocntents of
+!       keywords to which users may refer to activate various ELMO
+!       variables. It also contains the definitions of the ocntents of
 !       each keyword.
 !-------------------------------------------------------------------------
       USE CGRID_SPCS, ONLY: CGRID_NAME, N_CGRID_SPC
@@ -760,7 +762,7 @@
 
 !-------------------------------------------------------------------------
       SUBROUTINE MAP_ELMO
-!     This subroutine maps the PM diagnostic variables that the user has
+!     This subroutine maps the ELMO variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
       
@@ -777,14 +779,13 @@
       CHARACTER( 300 ) :: XMSG
       INTEGER ALLOCSTAT, IOS
 
-      ! Read User-Input from Namelist input file (Emission Control File
-      ! For Now)
+      ! Read User-Input from Namelist input file (Miscellaneous Control File)
       CALL ELMO_INIT_SHARED()
       CALL READ_ELMO_NML()
       IF ( .NOT. L_ELMO ) RETURN
 
       ! Map user-defined INST_PARS and AVRG_PARS arrays to the ELMO 
-      ! parameters available on the ELMO_LIST. 
+      ! variables available on the ELMO_LIST. 
       N_ELMO = 0
       
       ALLOCATE( USED_ELMO_MODE( N_ELMO_LIST*N_MODE+N_CGRID_SPC+N_Chem_Fams ),
@@ -804,14 +805,13 @@
       USED_FAM_ID = 0
       MAP_ID2USED = 0
 
-      ! Map Parameter ID's to ELMO_List Entries
+      ! Map Variable ID's to ELMO_List Entries
       MAP_ID2LIST = 0
       DO ILIST = 1,N_ELMO_LIST
           MAP_ID2LIST( ELMO_LIST( ILIST )%ID ) = ILIST
       END DO
 
-      ! Initialize number of IDs as equal to the number of Diagnostic
-      ! Parameters
+      ! Initialize number of IDs as equal to the number of ELMO variables
       NTOT_ELMO_IDS = N_ELMO_LIST
 
       IF ( INST_ACTIVE ) THEN
@@ -829,8 +829,8 @@
          ! Initialize number of Instantaneous Output Variables
          N_ELMO_INST_OUT = 0
 
-         ! Loop over all user-requested Instantaneous parameter and link
-         ! each to parameter IDs, Units, descriptions, etc.
+         ! Loop over all user-requested Instantaneous variables and link
+         ! each to ELMO IDs, Units, descriptions, etc.
          DO J = 1,N_ELMO_INST
              N = INDEX1( INST_PARS( J ), N_ELMO_LIST, ELMO_LIST%NAME )
              S = INDEX1( INST_PARS( J ), N_CGRID_SPC, CGRID_NAME )
@@ -839,11 +839,11 @@
      &          F = INDEX1( INST_PARS( J ), N_Chem_Fams, CHEMFAMILYNAME )
 
              IF ( N .NE. 0 ) THEN
-                ! Add Room for the Other Modes if this Parameter is
+                ! Add Room for the Other Modes if this variable is
                 ! Mode-Dependent
                 IF ( ELMO_LIST( N )%MODE ) THEN
                    DO IM = 1,N_MODE
-                      ! Add Entry for this Parameter
+                      ! Add Entry for this variable
                       N_ELMO = N_ELMO + 1
                       N_ELMO_INST_OUT = N_ELMO_INST_OUT + 1
                       USED_ELMO_ID( N_ELMO ) = ELMO_LIST(N)%ID
@@ -858,7 +858,7 @@
                       INST_DESC_OUT( N_ELMO_INST_OUT ) = ELMO_LIST( N )%DESC
                    END DO
                 ELSE
-                   ! Add Entry for this Parameter
+                   ! Add Entry for this variable
                    N_ELMO = N_ELMO + 1
                    N_ELMO_INST_OUT = N_ELMO_INST_OUT + 1
                    USED_ELMO_ID( N_ELMO ) = ELMO_LIST(N)%ID
@@ -904,7 +904,7 @@
                 INST_DESC_OUT( N_ELMO_INST_OUT ) = 'Chemical Family. See Definition in Control File.' 
 
              ELSE
-                XMSG = 'An Instantaneous ELMO Parameter '//TRIM(INST_PARS(J))//
+                XMSG = 'An Instantaneous ELMO variable '//TRIM(INST_PARS(J))//
      &                 ' has been requested that does not exist.'
                 CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
              END IF
@@ -918,7 +918,7 @@
          ELMO_INST = 0.0
       END IF
       
-      ! Process Average Parameter User Input
+      ! Process Average Variable User Input
       IF ( AVRG_ACTIVE ) THEN
          ALLOCATE( MAP_AVRG2USED( N_ELMO_AVRG*N_MODE ),
      &             AVRG_PARS_OUT( N_ELMO_AVRG*N_MODE ) ,
@@ -934,8 +934,8 @@
          ! Initialize number of Average output variables
          N_ELMO_AVRG_OUT = 0
 
-         ! Loop over all user-requested Average parameter and link
-         ! each to parameter IDs, Units, descriptions, etc.
+         ! Loop over all user-requested Average variables and link
+         ! each to ELMO IDs, Units, descriptions, etc.
          DO J = 1,N_ELMO_AVRG
              N = INDEX1( AVRG_PARS( J ), N_ELMO_LIST, ELMO_LIST%NAME ) 
              S = INDEX1( AVRG_PARS( J ), N_CGRID_SPC, CGRID_NAME )
@@ -943,25 +943,15 @@
              IF ( N_Chem_Fams .GT. 0 ) 
      &          F = INDEX1( AVRG_PARS( J ), N_Chem_Fams, CHEMFAMILYNAME )
 
-             ! Check if this parameter is duplicated on the
+             ! Check if this variable is duplicated on the
              ! instantaneous list. Don't need to duplicate calculation
              ! but do need to add it to the output
              M = 0
              IF ( INST_ACTIVE ) 
      &            M = INDEX1( AVRG_PARS( J ), N_ELMO_INST, INST_PARS ) 
-
-             !IF ( MYPE . EQ. 14 ) THEN
-          ! print *,'J = ',J,' avrg_pars_j=',avrg_pars(j)
-          ! print *,'avrg_pars = ',avrg_pars(:)
-          ! print *,'N_Chem_Fams = ',N_Chem_Fams
-          ! print *,'chemfamilynames = ',chemfamilyname(:)
-          ! print *,N, ' ',S, ' ',F, ' ',M
-         !END IF
-
-
              IF ( N .NE. 0 ) THEN
 
-                ! Add Room for the Other Modes if this Parameter is
+                ! Add Room for the Other Modes if this variable is
                 ! Mode-Dependent
                 IF ( ELMO_LIST( N )%MODE ) THEN
                     DO IM = 1,N_MODE
@@ -984,7 +974,7 @@
                        END IF
                     END DO
                 ELSE
-                    ! Add Entry for this Parameter
+                    ! Add Entry for this variable
                     N_ELMO_AVRG_OUT = N_ELMO_AVRG_OUT + 1
 
                     AVRG_PARS_OUT( N_ELMO_AVRG_OUT ) = AVRG_PARS( J )
@@ -1047,7 +1037,7 @@
                    MAP_AVRG2USED( N_ELMO_AVRG_OUT ) = MAP_INST2USED( P )
                 END IF   
              ELSE
-                XMSG = 'An Average ELMO Parameter '//TRIM(AVRG_PARS(J))//
+                XMSG = 'An Average ELMO variable '//TRIM(AVRG_PARS(J))//
      &                 ' has been requested that does not exist.'
                 CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
              END IF
@@ -1077,7 +1067,7 @@
 
 !-------------------------------------------------------------------------
       SUBROUTINE MAP_ELMO_COEFFS
-!     This subroutine maps the PM diagnostic variables that the user has
+!     This subroutine maps the ELMO variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
       USE CGRID_SPCS, ONLY : CGRID_NAME
@@ -1090,14 +1080,14 @@
       ALLOCATE( ELMO_COEFFS( NTOT_ELMO_IDS ) )
       ELMO_COEFFS( : )%L_MAPPED = .FALSE.
       
-      ! Save the number of ELMO parameters that should be output. In the
-      ! course of mapping various parameters, it may be necessary to add
-      ! some used parameters to N_ELMO that are intermediates to the desired
-      ! parameters. For example, PMF_MASS must be calculated in order to
+      ! Save the number of ELMO variables that should be output. In the
+      ! course of mapping each variable, it may be necessary to add
+      ! some component variables, to N_ELMO that are intermediates to the desired
+      ! variables. For example, PMF_MASS must be calculated in order to
       ! then calculate AUNSP1_IMPVIJ
       N_ELMO_OUT = N_ELMO
                 
-      ! Loop through all available ELMO_LIST Parameters
+      ! Loop through all available ELMO_LIST Variables
       IELMO = 0
       DO WHILE ( IELMO .LE. N_ELMO_OUT )
           IELMO = IELMO + 1
@@ -1105,7 +1095,7 @@
           
           SELECT CASE ( IDG )
              
-             !!!! Coarse-Mode Parameters !!!!  
+             !!!! Coarse-Mode Variables !!!!  
 
              ! Map PMC_SO4 - Coarse-Mode Sulfate
              CASE ( ID_PMC_SO4 ) 
@@ -1164,7 +1154,7 @@
                CALL SET_ELMO_COEFF_MAP( IDG, 3, 'AERO', 'ACORS', 0.0562 )
 
              
-             !!!! Fine-Mode Parameters !!!!  
+             !!!! Fine-Mode Variables !!!!  
 
              ! Map PMF_SO4 - Fine-Mode Sulfate
              CASE ( ID_PMF_SO4 ) 
@@ -1375,7 +1365,7 @@
                CALL SET_ELMO_COEFF_MAP( IDG, 1, 'GAS', 'HNO3',2175.6 ) ! Scale by 1000*MW_BENAPY/MW_Air
  
              
-             !!!! AMS Parameters !!!!  
+             !!!! AMS Variables !!!!  
 
              ! Map AMS_SO4 - AMS-Measure Sulfate
              CASE ( ID_AMS_SO4 ) 
@@ -1402,7 +1392,7 @@
                CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACL', 1.0 )
  
              
-             !!!! PM1.0 Parameters !!!!  
+             !!!! PM1.0 Variables !!!!  
 
              ! Map PM1_SO4 - PM1 Sulfate
              CASE ( ID_PM1_SO4 ) 
@@ -1537,7 +1527,7 @@
                CALL INIT_ELMO_COEFFS( IDG, N_VARS, 'PM1' )
                CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'AH3OP', 1.0/19.0 ) 
              
-             !!!! PM2.5 Parameters !!!!  
+             !!!! PM2.5 Variables !!!!  
 
              ! Map PM25_SO4 - PM2.5 Sulfate
              CASE ( ID_PM25_SO4 ) 
@@ -1673,7 +1663,7 @@
                CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'AH3OP', 1.0/19.0 )
  
              
-             !!!! PM2.5 - 10.0 Parameters !!!!  
+             !!!! PM2.5 - 10.0 Variables !!!!  
 
              ! Map PM25to10_SO4 - PM2.5-10.0 Sulfate
              CASE ( ID_PM25to10_SO4 ) 
@@ -1863,7 +1853,7 @@
                CALL INIT_ELMO_COEFFS( IDG, N_VARS, 'PM10' )
                CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ABENAPY', 1.0 )
  
-             !!!! Other Parameters !!!!  
+             !!!! Other Variables !!!!  
 
              ! Map TNO3 - Total Inorganic Nitrate
              CASE ( ID_TNO3 ) 
@@ -1884,7 +1874,7 @@
              ! Otherwise
              CASE DEFAULT
                ! If the IDG is less than N_ELMO_LIST, then do nothing
-               ! because it is a parameter that would have been defined
+               ! because it is a variable that would have been defined
                ! in one of the previous cases. If IDG is larger than
                ! N_ELMO_LIST, then look through CMAQ model species and
                ! Chemical Families to determine how to map it
@@ -1914,14 +1904,14 @@
       END SUBROUTINE MAP_ELMO_COEFFS
  
 !-------------------------------------------------------------------------
-      SUBROUTINE INIT_ELMO_COEFFS( IDG, N_VARS, AEROTYPE_TMP )
+      SUBROUTINE INIT_ELMO_COEFFS( IDG, N_VARS, AEROTYPE_TMP, UNIT_TMP )
 !     This subroutine allocates and initalizes all of the elements of an 
 !        index IDG within the ELMO_COEFFS structure
 !
-!     IDG - the index of this diagnostic parameter in the space defined
+!     IDG - the index of this ELMO variable in the space defined
 !           by the integer index variables like ID_PMF_POC, etc.
-!     N_VARS - Number of variables used to create this parameter. Does
-!           not include the number of modes. For example, ASO4I+ASO4J 
+!     N_VARS - Number of variables used to create this aggregate variable. 
+!           Does not include the number of modes. For example, ASO4I+ASO4J 
 !           counts as 1 variable (ASO4). It will be expanded to modes later.
 !     AEROTYPE - Aerosol size range or mode to be calculated. This defines 
 !           the modes considered and the inlet type if any. Options
@@ -1938,7 +1928,9 @@
       INTEGER, INTENT( IN ) :: IDG 
       INTEGER, INTENT( IN ) :: N_VARS
       CHARACTER( * ), INTENT( IN ) ::  AEROTYPE_TMP
+      CHARACTER( * ), INTENT( IN ) ::  UNIT_TMP     ! Options are PPMV and UGM3
       CHARACTER( 20 ) AEROTYPE
+      CHARACTER(  4 ) UNITTYPE
       CHARACTER( 200 ) XMSG
       CHARACTER(16), SAVE :: PNAME = 'INIT_ELMO_COEF'
       INTEGER ALLOCSTAT
@@ -1952,6 +1944,7 @@
      &          ELMO_COEFFS( IDG )%L_AGG ( N_VARS ),
      &          ELMO_COEFFS( IDG )%I_SPEC( N_VARS ),
      &          ELMO_COEFFS( IDG )%COEFF ( N_VARS ),
+     &          ELMO_COEFFS( IDG )%UNIT  ( N_VARS ),
      &          STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_COEFFS' 
@@ -1966,6 +1959,7 @@
       ELMO_COEFFS( IDG )%COEFF  ( : )   = 0.
       ELMO_COEFFS( IDG )%INLET          = 0
       ELMO_COEFFS( IDG )%WETNESS        = IWET
+      ELMO_COEFFS( IDG )%UNIT           = 0       ! 0 = ug m-3
 
       ! Specify the Aerosol Modes Needed and Inlet Type based on User
       ! Input through the AEROTYPE variable.
@@ -2012,10 +2006,35 @@
              ELMO_COEFFS( IDG )%L_MODE( : ) = .TRUE.
              ELMO_COEFFS( IDG )%INLET = IPMAMS
              ELMO_COEFFS( IDG )%WETNESS = IWET
+         CASE ('GAS')
+             ! No Aerosol Parameters need to be set since
+             ! this aggregate will be all gas.
          CASE DEFAULT
              XMSG = 'An aerosol descriptor (' // trim(AEROTYPE) // ') has been given ' //
-     &              'for the mapping of a ELMO parameter. It is not recognized.'
+     &              'for the mapping of an ELMO aggregate variable. It is not recognized.'
              CALL M3EXIT( 'INIT_ELMO_COEFFS', 0, 0, XMSG, XSTAT1 )
+      END SELECT
+
+      ! Assign Unit to Aggregate Variable
+      UNITTYPE = UNIT_TMP
+      CALL UPCASE( UNITTYPE )
+      SELECT CASE ( UNITTYPE )
+        CASE ( 'UG M-3' )
+           ELMO_COEFFS( IDG )%UNIT = 0
+        CASE ( 'PPMV' )
+           ELMO_COEFFS( IDG )%UNIT = 1
+        CASE ( 'UGC M-3' )
+           ELMO_COEFFS( IDG )%UNIT = 2
+        CASE ( 'PPMC' )
+           ELMO_COEFFS( IDG )%UNIT = 3
+        CASE ( 'UGN M-3' )
+           ELMO_COEFFS( IDG )%UNIT = 4
+        CASE ( 'PPMN' )
+           ELMO_COEFFS( IDG )%UNIT = 5
+        CASE DEFAULT
+           XMSG = 'A unit (' // trim(UNITTYPE) // ') has been given ' //
+     &            'for the mapping of an ELMO aggregate variable. It is not recognized.'
+           CALL M3EXIT( 'INIT_ELMO_COEFFS', 0, 0, XMSG, XSTAT1 )
       END SELECT
 
 
@@ -2057,11 +2076,11 @@
           ELSE
              ! Could not find the species in the CGRID Array. Print an
              ! Error and Warn
-             XMSG = "A PM Diagnostic variable has been requested that relies " //
+             XMSG = "An ELMO variable has been requested that relies " //
      &           "on gas species " // TRIM(CSPEC) // ". This species has not been " //
      &           "incorporated in the GC namelist though. Please check that your "//
-     &           "GC_namelist is compatible with the PM diagnostics you have called "//
-     &           "for in the Emmissions Control Namelist."
+     &           "GC_namelist is compatible with the output variables you have requested "//
+     &           "in the Miscellaneous Control Namelist."
              !CALL LOG_MESSAGE( LOGDEV, XMSG )
              !CALL M3WARN( 'MAP_ELMO_COEFFS', 0, 0, '' )
              ELMO_COEFFS( IDG )%L_GAS( IVAR )  = .FALSE.
@@ -2130,9 +2149,8 @@
 
 !-------------------------------------------------------------------------
       SUBROUTINE CALC_CONCOUT_AGG( IDG, VAL )
-!     This subroutine sums aggregate PM diagnostic parameters using the
-!         ELMO_COEFFS structure as a guide for summing aerosol
-!         components.          
+!     This subroutine sums aggregate ELMO variables using the
+!         ELMO_COEFFS structure as a guide.
 !-------------------------------------------------------------------------
       USE AERO_DATA, ONLY : WET_AERO_M3, WET_AERO_M2, MOMENT0_CONC,
      &                      AH2O_IDX, AEROSPC, AEROSPC_CONC,
@@ -2160,19 +2178,19 @@
       ! error and crash the model
       IF ( .NOT. ELMO_COEFFS( IDG )%L_MAPPED ) THEN
          ILIST = MAP_ID2LIST( IDG )  
-         XMSG = 'ELMO Parameter ' // TRIM( ELMO_LIST( ILIST )%NAME ) //
+         XMSG = 'ELMO variable ' // TRIM( ELMO_LIST( ILIST )%NAME ) //
      &          ' has not been mapped to a procedure within ELMO_PROC even ' //
-     &          'though it does appear to be an acceptable parameter on the ' //
-     &          'ELMO_LIST. If you have added this parameter yourself, make ' //
+     &          'though it does appear to be an acceptable variable on the ' //
+     &          'ELMO_LIST. If you have added this variable yourself, make ' //
      &          'sure it is being mapped to an actual calculation in CALC_ELMO ' //
-     &          'or MAP_ELMO_COEFFS. If this parameter is needed for a different ' //
-     &          'aggregate parameter you requested, please add this parameter ' //
+     &          'or MAP_ELMO_COEFFS. If this variable is needed for a different ' //
+     &          'aggregate variable you requested, please add this variable ' //
      &          'explicitly as an ELMO requested output.'
          CALL LOG_MESSAGE( LOGDEV, XMSG )
          CALL M3EXIT( 'CALC_CONCOUT_AGG', 0, 0, '', XSTAT1 )
       END IF
 
-      ! Initialize value of aggregate parameter
+      ! Initialize value of aggregate variable
       VAL = 0.0
       
       ! Retrieve size cutoff if necessary
@@ -2276,10 +2294,10 @@
      &     PM25_NH4_LOSS
 
       ! Map this combination of ID number and mode to the USED
-      ! Parameters list, which is how ELMO_LOCAL is defined.
+      ! variables list, which is how ELMO_LOCAL is defined.
       IUSED = MAP_ID2USED( IDG, IM )
 
-      ! First determine if this parameter has been mapped already. If it
+      ! First determine if this variable has been mapped already. If it
       ! has, send it back
       IF ( L_CALC( IUSED ) ) THEN
           OUTVAL = ELMO_LOCAL( IUSED )
@@ -2288,7 +2306,7 @@
 
       OUTVAL = 0.0
 
-      ! Determine which parameter to calculate
+      ! Determine which variable to calculate
       SELECT CASE( IDG )
 
          ! Retrieve Standard Deviation of Each Mode
@@ -2948,17 +2966,17 @@
             OUTVAL = MET_DATA%DENS( C1,R1,L1 ) ! kg m-3
 
          CASE DEFAULT
-            ! For most parameters the ELMO_COEFF structure will
+            ! For most variables the ELMO_COEFF structure will
             ! define all of the mappings and coefficients needed for
             ! a particular summation. This can therefore be used in
-            ! most cases. Parameters in this category are linear
+            ! most cases. iVariables in this category are linear
             ! combinations of CMAQ species. For example, PMF_SO4 = 
             ! ASO4I + ASO4J.
             CALL CALC_CONCOUT_AGG( IDG, OUTVAL )
 
          END SELECT 
  
-         ! Save the fact that this parameter has been calculated
+         ! Save the fact that this variable has been calculated
          L_CALC( IUSED ) = .TRUE.
          ELMO_LOCAL( IUSED ) = OUTVAL
  
@@ -3006,17 +3024,17 @@
         ! Calculate All Aerosol Size Distribution Parameters
         CALL CALC_AERODIST_PARAMS( INIT_TIME )
       
-        ! Loop Through Used Parameters List and Call ELMO Functions 
+        ! Loop Through Used Variables List and Call ELMO Functions 
         ! to fill in Local Array. ELMO_LOCAL is the same length as the
         ! ELMO_LIST and is ordered by the ELMO ID numbers so that it
         ! can be used seamlessly with the CALC_ELMO internal order.
         DO IUSED = 1,N_ELMO_OUT
            IM  = USED_ELMO_MODE( IUSED ) ! Map to 
-           IDG = USED_ELMO_ID( IUSED ) ! Map to Parameter ID numbers
+           IDG = USED_ELMO_ID( IUSED ) ! Map to ELMO Variable ID numbers
            CALL CALC_ELMO( IDG, IM, ELMO_LOCAL( IUSED ) )
         END DO
 
-        ! *** Aggregate Diagnostic Parameters in Average Array
+        ! *** Aggregate Diagnostic Variables in Average Array
         !     using trapezoidal rule
         IF ( AVRG_ACTIVE .AND. 
      &       L.GE.AVRG_LAYER_BOT .AND. L.LE.AVRG_LAYER_TOP ) THEN
@@ -3055,7 +3073,7 @@
            END DO
         END IF
        
-        ! *** Populate Diagnostic Parameters to Instantaneous Array if this is a write step
+        ! *** Populate Diagnostic Variables to Instantaneous Array if this is a write step
         IF ( INST_ACTIVE .AND. ( INIT_TIME .OR. WRITE_STEP ) .AND.
      &       L.GE.INST_LAYER_BOT .AND. L.LE.INST_LAYER_TOP ) THEN
            IL = L - INST_LAYER_BOT + 1
@@ -3326,7 +3344,7 @@
             UNITS3D(1:NVARS3D) = INST_UNIT_OUT( 1:NVARS3D )
             VDESC3D(1:NVARS3D) = INST_DESC_OUT( 1:NVARS3D )
          
-            FDESC3D( 1 ) = 'Parameters Relevant for PM Formation and Distribution'
+            FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
             DO L = 2, MXDESC3
                FDESC3D( L ) = ' '
             END DO
@@ -3367,7 +3385,7 @@
             UNITS3D(1:NVARS3D) = AVRG_UNIT_OUT( 1:NVARS3D )
             VDESC3D(1:NVARS3D) = AVRG_DESC_OUT( 1:NVARS3D )
          
-            FDESC3D( 1 ) = 'Parameters Relevant for PM Formation and Distribution'
+            FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
             DO L = 2, MXDESC3
                FDESC3D( L ) = ' '
             END DO

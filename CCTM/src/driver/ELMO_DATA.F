@@ -496,7 +496,11 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             LOGICAL, ALLOCATABLE :: L_AGG(:)    ! Is this variable another aggregated diagnostic parameter?
             LOGICAL, ALLOCATABLE :: L_MODE(:)   ! For which modes does this aggregate apply
             INTEGER, ALLOCATABLE :: I_SPEC(:)   ! Index of this Variable in Aerosol/Gas/Aggregate Array
-            REAL,    ALLOCATABLE :: COEFF(:)       ! Coefficient for each variable
+            REAL,    ALLOCATABLE :: COEFF(:)    ! Coefficient for each variable
+            INTEGER              :: UNIT        ! Indicates the units for output:
+                                                !   0 = 'ug m-3';  1 = 'ppmv'
+                                                !   2 = 'ugC m-3'; 3 = 'ppmC'
+                                                !   4 = 'ugN m-3'; 5 = 'ppmN'
             INTEGER INLET                    ! Integer pointing to the corresponding inlet of choice 
                                              !   in the ELMO_INLET structure
             INTEGER WETNESS                  ! Integer prescribing wet or dry aerosol (1 = wet, 2 = dry)
