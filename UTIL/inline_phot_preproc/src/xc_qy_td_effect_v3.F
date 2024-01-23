@@ -904,7 +904,7 @@
 !J.C. Mössinger, D.E. Shallcross, and R.A. Cox,
 !"UV-VIS absorption cross-sections and atmospheric lifetimes of CH2Br2, CH2I2, and CH2BrI,"
 !J. Chem. Soc. Faraday Trans. 94, 1391-1396 (1998); DOI: 10.1039/A709160E
-!The parameterization of the cross section temperature dependence (215-300 nm, 270-285 K)
+!The parameterization of the cross section temperature dependence (215-300 nm, 270-348 K)
 ! using the expression: ln XC(wavelength, T) = ln XC(wavelength, 298 K) + B(wavelength) (T-298)
 ! temperature correction to cross-section 
 
@@ -927,16 +927,16 @@
 !J.C. Mössinger, D.E. Shallcross, and R.A. Cox,
 !"UV-VIS absorption cross-sections and atmospheric lifetimes of CH2Br2, CH2I2, and CH2BrI,"
 !J. Chem. Soc. Faraday Trans. 94, 1391-1396 (1998); DOI: 10.1039/A709160E
-!The parameterization of the cross section temperature dependence (215-300 nm, 270-285 K)
+!The parameterization of the cross section temperature dependence (215-300 nm, 250-348 K)
 ! using the expression: ln XC(wavelength, T) = ln XC(wavelength, 298 K) + B(wavelength) (T-298)
 ! temperature correction to cross-section 
 
            DO IW = 1, NW               
                DO I = 1, NZ                    
-                    IF( TLEV(I) .GE. 285.0 )THEN
-                        TDUM = -13.0
+                    IF( TLEV(I) .GE. 348.0 )THEN
+                        TDUM = 50.0
                     ELSE
-                       TDUM = ( MAX( 270.0,TLEV(I) ) - T298K )
+                       TDUM = ( MAX( 250.0,TLEV(I) ) - T298K )
                     END IF
                     FACTOR    = EXP( CH2BR2_XCROSS_B(IW)*TDUM )
                     XC(I, IW) = FACTOR * XC(I, IW)
@@ -3129,23 +3129,24 @@ C-----------------------------------------------------------------------
               REAL, INTENT( IN ) :: WAVELENGTH  ! nm
               REAL, INTENT( IN ) :: TEMPERATURE ! deg K
 ! local:
-              REAL, PARAMETER :: A( 0:5 ) = (/
-     &        -3.2607E+01,  1.0308E-01, 6.3900E-05,
-     &        -7.7392E-07, -2.2513E-09, 6.1376E-12 /)
-              REAL, PARAMETER :: B( 0:5 ) = (/
-     &        1.5820E-01, -1.4758E-03, 3.8058E-06,
-     &       -9.1870E-10, -1.0772E-11, 0.0000E+00  /)
+              REAL(8), PARAMETER :: A( 0:5 ) = (/
+     &        -3.2607D+01,  1.0308D-01, 6.3900D-05,
+     &        -7.7392D-07, -2.2513D-09, 6.1376D-12 /)
+              REAL(8), PARAMETER :: B( 0:5 ) = (/
+     &        1.5820D-01, -1.4758D-03, 3.8058D-06,
+     &        9.1870D-10, -1.0772D-11, 0.0000D+00  /)
      
               INTEGER :: I
-              REAL    :: XCROSS_296K
-              REAL    :: XCROSS
-              REAL    :: SUM_A
-              REAL    :: SUM_B
-              REAL    :: SUM_C
-              REAL    :: WAVE_FACTOR 
+              REAL(8) :: XCROSS_296K
+              REAL(8) :: XCROSS
+              REAL(8) :: SUM_A
+              REAL(8) :: SUM_B
+              REAL(8) :: SUM_C
+              REAL(8) :: WAVE_FACTOR 
+              REAL(8) :: TEMP_FACTOR 
 
-              XCROSS_296K = 0.0
-              XCROSS      = 0.0
+              XCROSS_296K = 0.0D0
+              XCROSS      = 0.0D0
               
               
               IF( WAVELENGTH .GE. 345.0 .OR. WAVELENGTH .LE. 260.0 )THEN
@@ -3156,23 +3157,26 @@ C-----------------------------------------------------------------------
               SUM_A = 0.0
               SUM_B = 0.0
               DO I = 0,5,1
-                 WAVE_FACTOR = WAVELENGTH**REAL( I )
+                 WAVE_FACTOR = REAL( WAVELENGTH**REAL( I ),8 )
                  SUM_A = SUM_A
      &                 + A( I )*WAVE_FACTOR                
                  SUM_B = SUM_B
      &                 + B( I )*WAVE_FACTOR                               
               END DO
 
-              SUM_B = SUM_A 
-     &              + ( 296.0-MAX( 260.0,MIN(330.0,TEMPERATURE) ) )*SUM_B
-              XCROSS_296K = 10.0**SUM_A
-              XCROSS      = 10.0**SUM_B
-              IF( XCROSS_296K .LE. 1.0E-25 )THEN
-                  RFACTOR_XCROSS_CHBR3 = 1.0
+              TEMP_FACTOR =  ( 296.0D0-MAX( 260.0D0,MIN(330.0D0,TEMPERATURE) ) )
+              SUM_B       =  TEMP_FACTOR*SUM_B
+              XCROSS_296K = 10.0D0**SUM_A
+              XCROSS      = XCROSS_296K * ( 10.0D0**SUM_B )
+!             IF( XCROSS_296K .LE. 1.0E-30 )THEN
+!                 RFACTOR_XCROSS_CHBR3 = 1.0
 !                 RETURN
-              END IF
-              RFACTOR_XCROSS_CHBR3 = XCROSS/MAX( XCROSS_296K,1.0E-30 )
-              write(6,'(A,2(F8.2,1x),3(ES12.4,1x))')'RFACTOR_XCROSS_CHBR3: ',WAVELENGTH,TEMPERATURE,XCROSS,XCROSS_296K,
+!             END IF
+              RFACTOR_XCROSS_CHBR3 = REAL( 10.0D0**SUM_B ) !  REAL( XCROSS/MAX( XCROSS_296K,1.0D0E-30 ) )
+              write(6,'(A,2(F8.2,1x),8(ES12.4,1x))')
+     &        'WAVELENGTH,TEMPERATURE,XCROSS,XCROSS_296K,SUMA,SUMB,TEMP_FACTOR,RFACTOR_XCROSS_CHBR3: ',
+     &        WAVELENGTH,TEMPERATURE,XCROSS,XCROSS_296K,
+     &        SUM_A,SUM_B,TEMP_FACTOR,
      &        RFACTOR_XCROSS_CHBR3
               RETURN
         END FUNCTION RFACTOR_XCROSS_CHBR3
