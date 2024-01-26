@@ -1491,12 +1491,14 @@
              CASE ( ID_PM25_UN ) 
                N_VARS = 3
                CALL INIT_ELMO_COEFFS( IDG, N_VARS, 'PM25' )
-               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ASEACAT', 0.0 ) ! All Seaspray Cation mass has been 
-                                                                           ! apportined to Na, Mg, K, and Ca
-               CALL SET_ELMO_COEFF_MAP( IDG, 2, 'AERO', 'ASOIL', 1.0 - real( asoil_na_fac + asoil_mg_fac +
-     &                                                                       asoil_k_fac  + asoil_ca_fac  ))
-               CALL SET_ELMO_COEFF_MAP( IDG, 3, 'AERO', 'ACORS', 1.0 - real( acors_na_fac + acors_mg_fac +
-     &                                                                       acors_k_fac  + acors_ca_fac  ))
+               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ASEACAT', 1.0 - real( ascat_na_fac + ascat_mg_fac +  
+     &                                                                         ascat_k_fac  + ascat_ca_fac  )) 
+               CALL SET_ELMO_COEFF_MAP( IDG, 2, 'AERO', 'ASOIL',   1.0 - real( asoil_na_fac + asoil_mg_fac +
+     &                                                                         asoil_k_fac  + asoil_ca_fac +
+     &                                                                         asoil_mn_fac + asoil_fe_fac  ))
+               CALL SET_ELMO_COEFF_MAP( IDG, 3, 'AERO', 'ACORS',   1.0 - real( acors_na_fac + acors_mg_fac +
+     &                                                                         acors_k_fac  + acors_ca_fac +
+     &                                                                         acors_mn_fac + acors_fe_fac  ))
  
              ! Map PM25_HP - PM2.5 Hydronium Ion
              CASE ( ID_PM25_HP ) 
@@ -2569,7 +2571,7 @@
          CASE ( ID_PM1_OC )
             ! Save PM1 Fraction for each mode
             DO IMODE = 1,N_MODE
-                CALL GET_AERO_INLET( IPM1, IM, IWET, FRAC( IMODE ) ) 
+                CALL GET_AERO_INLET( IPM1, IMODE, IWET, FRAC( IMODE ) ) 
             END DO
             ! Sum up primary organic aerosol species normalized to
             ! just carbon mass
@@ -2585,7 +2587,7 @@
          CASE ( ID_PM1_OA )
             ! Save PM1 Fraction for each mode
             DO IMODE = 1,N_MODE
-                CALL GET_AERO_INLET( IPM1, IM, IWET, FRAC( IMODE ) ) 
+                CALL GET_AERO_INLET( IPM1, IMODE, IWET, FRAC( IMODE ) ) 
             END DO
             ! Sum up primary organic aerosol species
             VAL = 0.0
@@ -2598,7 +2600,7 @@
          CASE ( ID_PM25_OC )
             ! Save PM2.5 Fraction for each mode
             DO IMODE = 1,N_MODE
-                CALL GET_AERO_INLET( IPM25, IM, IWET, FRAC( IMODE ) ) 
+                CALL GET_AERO_INLET( IPM25, IMODE, IWET, FRAC( IMODE ) ) 
             END DO
             ! Sum up primary organic aerosol species normalized to
             ! just carbon mass
@@ -2614,7 +2616,7 @@
          CASE ( ID_PM25_OA )
             ! Save PM2.5 Fraction for each mode
             DO IMODE = 1,N_MODE
-                CALL GET_AERO_INLET( IPM25, IM, IWET, FRAC( IMODE ) ) 
+                CALL GET_AERO_INLET( IPM25, IMODE, IWET, FRAC( IMODE ) ) 
             END DO
             ! Sum up primary organic aerosol species
             VAL = 0.0
