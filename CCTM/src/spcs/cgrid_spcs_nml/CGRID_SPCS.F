@@ -312,7 +312,7 @@ c-------------------------------------------------------------------------------
                     GC_TRNS_MAP( N_GC_TRNS ) = IGC
                 END IF
                 
-                ! Gas - Output Deposition Velocity
+                ! Gas - Output Dry Deposition Flux
                 LDDEP = GET_LOGICAL_NML( GC_SPECIES_DATA( IGC )%DDEP_FLAG )
                 IF ( LDDEP ) THEN
                     N_GC_DDEP = N_GC_DDEP + 1
@@ -551,7 +551,7 @@ c-------------------------------------------------------------------------------
                     AE_TRNS_MAP( N_AE_TRNS ) = IAE
                 END IF
                 
-                ! Aerosol - Output Deposition Velocity
+                ! Aerosol - Output Dry Deposition Flux
                 LDDEP = GET_LOGICAL_NML( AE_SPECIES_DATA( IAE )%DDEP_FLAG )
                 IF ( LDDEP ) THEN
                     N_AE_DDEP = N_AE_DDEP + 1
@@ -741,7 +741,7 @@ c-------------------------------------------------------------------------------
                     NR_TRNS_MAP( N_NR_TRNS ) = INR
                 END IF
                 
-                ! Nonreactive - Output Deposition Velocity
+                ! Nonreactive - Output Dry Deposition Flux
                 LDDEP = GET_LOGICAL_NML( NR_SPECIES_DATA( INR )%DDEP_FLAG )
                 IF ( LDDEP ) THEN
                     N_NR_DDEP = N_NR_DDEP + 1
@@ -914,7 +914,7 @@ c-------------------------------------------------------------------------------
                     TR_DIFF_MAP( N_TR_DIFF ) = ITR
                 END IF
                 
-                ! Tracer - Output Deposition Velocity
+                ! Tracer - Output Dry Deposition Flux
                 LDDEP = GET_LOGICAL_NML( TR_SPECIES_DATA( ITR )%DDEP_FLAG )
                 IF ( LDDEP ) THEN
                     N_TR_DDEP = N_TR_DDEP + 1

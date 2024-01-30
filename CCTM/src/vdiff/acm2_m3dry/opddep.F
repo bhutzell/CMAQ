@@ -157,19 +157,19 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = TR_DDEP( N )
-            UNITS3D( V ) = 'ha-1'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
          IF ( ABFLUX ) THEN
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = 'NH3_Flux'
-            UNITS3D( V ) = 'kg/hectare'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly bidi flux values'
   
             VTYPE3D( V+1 ) = M3REAL
             VNAME3D( V+1 ) = 'NH3_Emis'
-            UNITS3D( V+1 ) = 'kg/hectare'
+            UNITS3D( V+1 ) = 'kg ha-1'
             VDESC3D( V+1 ) = 'hourly NH3_Emis values'
          END IF
 

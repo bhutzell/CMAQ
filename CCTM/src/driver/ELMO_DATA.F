@@ -488,15 +488,17 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         ! all EMO variables 
         TYPE ELMO_TABLE_TYPE
             CHARACTER (LEN = 16) :: NAME        ! Variable Name ( as it appears on the ELMO_LIST, in CGRID, etc.)
-            CHARACTER (LEN = 16) :: OUTNAME     ! Variable Name that will be written to the output file
-            INTEGER              :: IDG         ! ID Number in Case Statement. Maps to specific calculation
-            INTEGER              :: VAR_TYPE    ! IOAPI Variable Type
+            CHARACTER (LEN = 16) :: OUT_NAME    ! Variable Name that will be written to the output file
+            INTEGER              :: OUT_TYPE    ! IOAPI Variable Type
+            INTEGER              :: ID          ! ID Number mapping to specific calculation, CGRID index, AERO 
+                                                !   index, Family, etc.
+            INTEGER              :: IM          ! Mode of interest if mode-dependent
+            INTEGER              :: VAR_TYPE    ! ELMO Variable Type (ELMO, CGRID, AEROBULK, FAM, WDEP, DDEP)
             CHARACTER (LEN = 16) :: CUNIT       ! Units in Character Format
             INTEGER              :: UNIT        ! Units in Integer Format:
                                                 !   0 = 'ug m-3';  1 = 'ppmv'   ;  2 = 'ugC m-3'; 
                                                 !   3 = 'ppmC'  ;  4 = 'ugN m-3';  5 = 'ppmN'
             CHARACTER (LEN = 80) :: DESC        ! Description for Output File
-            INTEGER              :: IM          ! Mode of interest if mode-dependent
                                                 
             LOGICAL              :: L_COMB      ! Is this variable a linear combination of other variables
             INTEGER              :: N_VARS      ! Some variables are linear combinations of other variables.
@@ -504,7 +506,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                                                 !   This should not account for modes. For example, 
                                                 !   to sum ASO4IJK, N_VARS would be 1 since only 
                                                 !   ASO4 is being used.
-            LOGICAL, ALLOCATABLE :: L_ELMO(:)   ! Is this component another ELMO aggregate variable?
+            LOGICAL, ALLOCATABLE :: IDG(:)      ! Is this component another ELMO aggregate variable?
             LOGICAL, ALLOCATABLE :: L_CGRID(:)  ! Is this component in the CGRID vector?
             LOGICAL, ALLOCATABLE :: L_AERO(:)   ! Is this component a bulk aerosol species?
             LOGICAL, ALLOCATABLE :: L_FAM(:)    ! Is this component a chemical family?
@@ -524,6 +526,14 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         END TYPE ELMO_TABLE_TYPE
 
         TYPE (ELMO_TABLE_TYPE), ALLOCATABLE, SAVE :: ELMO_TABLE( : ) 
+
+        ! Define Parameters indicating what kind of variable each ELMO
+        ! output is
+        INTEGER, PARAMETER :: ETYPE_ELMO = 1, ETYPE_CGRID = 2,
+     &                        ETYPE_AEROBULK = 3, ETYPE_FAM = 4, 
+     &                        ETYPE_WDEP = 5, ETYPE_DDEP = 6,
+     &        ETYPE_ISAM = 7, ETYPE_ISAM_WDEP = 8, ETYPE_ISAM_DDEP = 9,
+     &        ETYPE_DDM = 10, ETYPE_DDM_WDEP = 11, ETYPE_DDM_DDEP = 12
 
         TYPE ELMO_INLET_TYPE
             CHARACTER( 16 ) CINLET            ! Inlet Name
@@ -619,4 +629,106 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  
       END SUBROUTINE MAP_ELMO_UNITS
  
+!------------------------------------------------------------------------------------------            
+      RECURSIVE SUBROUTINE MAP_ELMO_NML( VARS_NML, L_ELMO_TABLE, LERROR )
+!     This subroutine maps user input from the CMAQ_Control namelist to
+!     the ELMO_TABLE to define which variables should be output. It
+!     expands Keywords, maps to concentrations, deposition fluxes, and
+!     families, with expansion for families if reuqested (using a * in
+!     front of the family name).
+!-------------------------------------------------------------------------
+
+      IMPLICIT NONE
+
+      CHARACTER(16), INTENT( IN ) :: VARS_NML( : )
+      LOGICAL, INTENT( OUT ) :: L_ELMO_TABLE( N_ELMO_TABLE )
+      INTEGER, INTENT( OUT ) :: LERROR
+             
+      ! Expand INST list Using Keywords
+      N_END = INDEX1( '', N_NML, VARS_NML ) - 1
+      IF ( N_END .LE. 0 ) THEN
+          WRITE( XMSG, '(A)' ),'ERROR: Undefined variables requested ',
+          CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
+      END IF
+
+      INUM = 1
+      DO WHILE ( INUM .LE. N_END )
+         CALL UPCASE( VARS_NML( INUM ) )
+         EXPAND_NML = .FALSE.
+         IF ( VARS_NML( INUM )(1:1) .EQ. '*' ) THEN
+             EXPAND_NML = .TRUE.
+             INST_VARS_NML( INUM ) = INST_VARS_NML( INUM )(2:16)//' '
+         END IF
+
+         I1 = INDEX1( INST_VARS_NML( INUM ), N_ELMO_TABLE, ELMO_TABLE%NAME )
+
+         IF ( INST_VARS_NML( INUM ) .EQ. 'ALL' ) THEN
+            ! Add All ELMO_TABLE variables to the Instaneous File
+            ELMO_TABLE_INST( : ) = .TRUE.
+
+         ELSE IF ( INST_VARS_NML( INUM ) .EQ. 'ALLCONC' ) THEN
+            ! Activate all CGRID species
+            DO IT = 1,N_ELMO_TABLE
+                IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_CGRID )
+     &                  ELMO_TABLE_INST( IT ) = .TRUE.
+            END DO
+          
+         ELSE IF ( I1 .GT. 0 ) THEN
+            ! Expand the chemical family if the * was used
+            IF ( EXPAND_NML .AND. ELMO_TABLE( I1 )%VAR_TYPE .EQ. ETYPE_FAM ) THEN
+               IFAM = INDEX1( SPECIES, N_Chem_Fams, ChemFamilyName )
+               DO IX = 1,CHEM_FAMILY_NUM( IFAM )
+                   INDX = INDEX1( CHEMFAMILYMEMBERS( IFAM, IX ), N_ELMO_TABLE,
+     &                            ELMO_TABLE( : )%NAME )
+                   IF ( INDX .GT. 0 )
+     &                  ELMO_TABLE_INST( INDX ) = .TRUE.
+               END DO
+
+            ELSE
+               ! Entry Matches a variable on the ELMO Table
+               ELMO_TABLE_INST( I1 ) = .TRUE.
+            END IF
+         ELSE
+            ! Entry Doesn't Match any variable on the ELMO table. Crash the
+            ! model.
+            XMSG = 'An Instantaneous ELMO variable ' // TRIM( INST_VARS_NML( INUM )) //
+     &             ' has been requested that does not exist.'
+            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+         END IF
+      END DO
+
+      END SUBROUTINE MAP_ELMO_NML    
+
+!------------------------------------------------------------------------------------------            
+      SUBROUTINE ELMO_CHECK_LAYERS( LAYER_TOP, LAYER_BOT, FNAME )
+!     This subroutine checks that the layers specified for an ELMO file
+!     are allowed.
+!-------------------------------------------------------------------------
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT( INOUT )    :: LAYER_TOP
+      INTEGER, INTENT( IN )       :: LAYER_BOT
+      CHARACTER(16), INTENT( IN ) :: FNAME
+
+      IF ( INST_LAYER_TOP .EQ. -1 ) INST_LAYER_TOP = NLAYS
+      IF ( LAYER_TOP .LE. 0 .OR. LAYER_TOP .GT. NLAYS ) THEN
+           XMSG = TRIM( FNAME ) // '_LAYER_TOP must be prescribed between '//
+     &            '1 and NLAYS, or set to -1 to automatically choose NLAYS.'
+           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+      END IF
+      IF ( LAYER_BOT .LE. 0 .OR. LAYER_BOT .GT. NLAYS ) THEN
+           XMSG = TRIM(FNAME) // '_LAYER_BOT must be prescribed between '// 
+     &            '1 and NLAYS.'
+           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+      END IF
+      IF ( LAYER_BOT .GT. LAYER_TOP ) THEN
+           XMSG = TRIM(FNAME) // 'INST_LAYER_BOT must be less than or equal '// 
+     &            'to ' // TRIM(FNAME) // '_LAYER_TOP.'
+           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+      END IF
+
+      END SUBROUTINE ELMO_CHECK_LAYERS
+
+
       END MODULE ELMO_DATA

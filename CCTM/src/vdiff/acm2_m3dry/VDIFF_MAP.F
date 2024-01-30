@@ -193,8 +193,8 @@ C Local variables:
             V = V + 1
             INDX = FINDEX ( GC_DDEP_MAP( N ), N_GC_DEPV, GC_DEPV_MAP )
             IF ( INDX .GT. 0 ) THEN
-               DD2DV ( V ) = S + INDX
-               DDEP_SPC( V ) = GC_DDEP( N )
+               DD2DV ( V ) = S + INDX         ! Dry Dep species --> Dep Vel Index
+               DDEP_SPC( V ) = GC_DDEP( N )   ! Dep Species Name = Gas Name
             ELSE
                XMSG = 'ERROR: No deposition velocity for DDEP species ' //
      &               GC_DDEP( N )
