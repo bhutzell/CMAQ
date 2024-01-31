@@ -132,15 +132,10 @@
 !-------------------------------------------------------------------------
          
       USE RUNTIME_VARS, ONLY: MISC_CTRL, LOGDEV
-      USE CGRID_SPCS, ONLY: CGRID_NAME, N_CGRID_SPC
-      USE UTIL_FAMILY_MODULE, ONLY: N_Chem_Fams,ChemFamilyName,
-     &                              Map_Chem_Families
-      USE GRID_CONF, ONLY : MYPE
       
       IMPLICIT NONE
 
       INTEGER, PARAMETER :: N_NML = 1000
-      INTEGER            :: INUM, J, N_END, I1, I2, I3, I4, JNUM
       INTEGER            :: FUNIT
       INTEGER            :: STAT
       LOGICAL, SAVE      :: INSTANT  =.TRUE., 
@@ -149,7 +144,6 @@
       CHARACTER( 16 ), SAVE :: PNAME = 'READ_ELMO_NML'
       CHARACTER( 200 )   :: XMSG
       INTEGER IOS
-      LOGICAL EXPAND_NML
 
       NAMELIST / elmo_activate / instant, average 
       NAMELIST / elmo_inst / inst_layer_top, 

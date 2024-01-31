@@ -1,0 +1,135 @@
+&species_content_nml
+
+GC_SPECIES_CONTENT = 
+
+!SPECIES       ,C  ,O  ,N  ,S  ,VOC , NOx , NOz , Ox , Oz
+'NO2'          ,0  ,2  ,1  ,0  , 0  ,  1  ,  0  , 1  , 0 ,
+'NO'           ,0  ,1  ,1  ,0  , 0  ,  1  ,  0  , 0  , 0 ,
+'O'            ,0  ,1  ,0  ,0  , 0  ,  0  ,  0  , 1  , 0 ,
+'O3'           ,0  ,3  ,0  ,0  , 0  ,  0  ,  0  , 1  , 0 ,
+'NO3'          ,0  ,3  ,1  ,0  , 0  ,  0  ,  1  , 2  , 0 ,
+'O1D'          ,0  ,1  ,0  ,0
+'OH'           ,0  ,1  ,0  ,0
+'HO2'          ,0  ,2  ,0  ,0
+'H2O2'         ,0  ,2  ,0  ,0
+'N2O5'         ,0  ,5  ,2  ,0
+'HNO3'         ,0  ,3  ,1  ,0
+'HONO'         ,0  ,2  ,1  ,0
+'PNA'          ,0  ,4  ,1  ,0
+'SO2'          ,0  ,2  ,0  ,1
+'SULF'         ,0  ,4  ,0  ,1
+'SULRXN'       ,0  ,4  ,0  ,1
+'C2O3'         ,2  ,3  ,0  ,0
+'MEO2'         ,1  ,2  ,0  ,0
+'RO2'          ,4  ,2  ,0  ,0
+'PAN'          ,2  ,5  ,1  ,0
+'PACD'         ,2  ,3  ,0  ,0
+'AACD'         ,2  ,2  ,0  ,0
+'CXO3'         ,3  ,3  ,0  ,0
+'ALD2'         ,2  ,1  ,0  ,0
+'XO2H'         ,4  ,2  ,0  ,0
+'PANX'         ,3  ,5  ,1  ,0
+'FORM'         ,1  ,1  ,0  ,0
+'MEPX'         ,1  ,2  ,0  ,0
+'MEOH'         ,1  ,1  ,0  ,0
+'ROOH'         ,4  ,2  ,0  ,0
+'XO2'          ,4  ,2  ,0  ,0
+'XO2N'         ,
+'XPAR'         ,
+'XPRP'         ,
+'NTR1'         ,
+'NTR2'         ,
+'FACD'         ,
+'CO'           ,
+'HCO3'         ,
+'ALDX'         ,
+'GLYD'         ,
+'GLY'          ,
+'MGLY'         ,
+'ETHA'         ,
+'ETOH'         ,
+'KET'          ,
+'PAR'          ,
+'ACET'         ,
+'PRPA'         ,
+'ROR'          ,
+'ETHY'         ,
+'ETH'          ,
+'OLE'          ,
+'IOLE'         ,
+'ISOP'         ,
+'ISO2'         ,
+'ISOPRXN'      ,
+'ISPD'         ,
+'INTR'         ,
+'ISPX'         ,
+'HPLD'         ,
+'OPO3'         ,
+'EPOX'         ,
+'IEPOXP'       ,         
+'EPX2'         ,
+'TERP'         ,
+'APIN'         ,
+'TERPNRO2'     ,
+'MTNO3'        ,
+'TRPRXN'       ,
+'BENZENE'      ,
+'CRES'         ,
+'BZO2'         ,
+'OPEN'         ,
+'BENZRO2'      ,
+'TOL'          ,
+'TO2'          ,
+'TOLRO2'       ,
+'XOPN'         ,
+'XYLMN'        ,
+'XLO2'         ,
+'XYLRO2'       ,
+'NAPH'         ,
+'PAHRO2'       ,
+'CRO'          ,
+'CAT1'         ,
+'CRON'         ,
+'OPAN'         ,
+'ECH4'         ,
+'CL2'          ,
+'CL'           ,
+'HOCL'         ,
+'CLO'          ,
+'FMCL'         ,
+'HCL'          ,
+'CLNO2'        ,
+'CLNO3'        ,
+'SESQ'         ,
+'SESQRXN'      ,
+'SOAALK'       ,
+'H2NO3PIJ'     ,
+'H2NO3PK'      ,
+'VLVPO1'       ,
+'VSVPO1'       ,
+'VSVPO2'       ,
+'VSVPO3'       ,
+'VIVPO1'       ,
+'VLVOO1'       ,
+'VLVOO2'       ,
+'VSVOO1'       ,
+'VSVOO2'       ,
+'VSVOO3'       ,
+'PCVOC'        ,
+'PCSOARXN'     ,
+'FORM_PRIMARY' ,
+'ALD2_PRIMARY' ,
+'BUTADIENE13'  ,
+'ACROLEIN'     ,
+'ACRO_PRIMARY' ,
+'TOLU'         ,
+'HG'           ,
+'HGIIAER'      ,
+'HGIIGAS'      ,
+'SVAVB1'       ,
+'SVAVB2'       ,
+'SVAVB3'       ,
+'SVAVB4'       ,
+'DMS'          , 
+'MSA'          , 
+/
