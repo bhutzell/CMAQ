@@ -200,6 +200,9 @@
       INST_ACTIVE = INSTANT
       AVRG_ACTIVE = AVERAGE
       L_ELMO = ( INST_ACTIVE .OR. AVRG_ACTIVE )
+#ifdef mpas
+      L_ELMO = .false.
+#endif
       
       IF ( .NOT. L_ELMO ) THEN
           RETURN
@@ -1531,6 +1534,7 @@
         INTEGER :: L          ! loop induction variables
         INTEGER :: MDATE, MTIME
 
+#ifndef mpas
       ! Define General Output File Parameters
       FTYPE3D = GRDDED3
       GDNAM3D = GRID_NAME  ! from HGRD_DEFN
@@ -1550,10 +1554,12 @@
       VGTYP3D = VGTYP_GD
       VGTOP3D = VGTOP_GD
       NTHIK3D =     1
+#endif
 
       ! Open Instantaneous PM Diagnostic File
       IF ( INST_ACTIVE ) THEN
-        
+
+#ifndef mpas
          ! Try to open existing file for update
          IF ( .NOT. OPEN3( CTM_ELMO_1, FSRDWR3, PNAME ) ) THEN
 
@@ -1585,13 +1591,15 @@
                CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
             END IF
 
-         END IF
+         END IF 
+#endif
       END IF
  
 
       ! Open Average Output PM Diagnostic File
       IF ( AVRG_ACTIVE ) THEN
-        
+      
+#ifndef mpas
          ! Try to open existing file for update
          IF ( .NOT. OPEN3( CTM_AELMO_1, FSRDWR3, PNAME ) ) THEN
 
@@ -1627,6 +1635,7 @@
             END IF
  
          END IF
+#endif
       END IF
  
       END SUBROUTINE OPEN_ELMO 

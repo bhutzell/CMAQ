@@ -63,6 +63,7 @@
 
       CONTAINS
 
+
 !-------------------------------------------------------------------------
       SUBROUTINE ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME )
 !     This subroutine maps the PM diagnostic variables that the user has
@@ -152,11 +153,11 @@
          INIT_STEP = .TRUE.
       ELSE
          WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )
-         IF ( WSTEP .GE. TIME2SEC( TSTEP( 1 ) ) ) 
+         IF ( WSTEP .GE. TIME2SEC( TSTEP( 1 ) ) )
      &        WRITE_STEP = .TRUE.
       END IF
       ELMO_NSTEP = ELMO_NSTEP + 1.0
-     
+
       ! Get Meteorological Variables
 
       ! pressure [Pa]
@@ -183,7 +184,11 @@
       if ( pv_avail ) then
            call interpolate_var ('PV', jdate, jtime, PVS)
       else
-           PVS = AMISS3
+#ifdef mpas
+            PVS = -9.000E36
+#else
+            PVS = AMISS3
+#endif
       end if
       
       ! retrieve layer midpoint heights. This is a mass weighted
@@ -213,7 +218,11 @@
              CFRAC= CFRACS( C,R ) 
          ELSE
              DZ   = ZF( C,R,L ) - ZF( C,R,L-1 )
-             CFRAC= AMISS3
+#ifdef mpas
+            CFRAC = -9.000E36
+#else
+            CFRAC = AMISS3
+#endif
          END IF
          ZH       = ZHS( C,R,L )
          PV       = PVS( C,R,L )
@@ -346,10 +355,151 @@
  
       END IF
       END SUBROUTINE LOAD_ELMO
-
  
 !-------------------------------------------------------------------------
-      RECURSIVE SUBROUTINE CALC_ELMO( IDG, IM, IV, ISRC, OUTVAL )
+      SUBROUTINE CALC_ELMO( IDG, VAL )
+!     This subroutine sums aggregate PM diagnostic parameters using the
+!         ELMO_COEFFS structure as a guide for summing aerosol
+!         components.          
+!-------------------------------------------------------------------------
+      USE AERO_DATA, ONLY : WET_AERO_M3, WET_AERO_M2, MOMENT0_CONC,
+     &                      AH2O_IDX, AEROSPC, AEROSPC_CONC,
+     &                      WET_AERO_DENS, N_MODE, AERO_MISSING,
+     &                      AEROMODE
+      USE PRECURSOR_DATA, ONLY : PRECURSOR_CONC
+      USE AEROMET_DATA, ONLY : AIRDENS
+      USE RUNTIME_VARS
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT( IN ) :: IDG
+      REAL, INTENT( INOUT ) :: VAL
+      REAL VAL2
+      INTEGER IVAR, ILIST
+      LOGICAL L_CALC( N_ELMO )
+      REAl    COEFF
+      INTEGER IM, WETNESS, ISPEC, INLET
+      LOGICAL LMODE
+      REAL    FRAC( N_MODE )
+
+      CHARACTER( 500 ) :: XMSG
+
+      ! For most variables the ELMO_TABLE structure will
+      ! define all of the mappings and coefficients needed for
+      ! a particular summation. This can therefore be used in
+      ! most cases. Variables in this category are linear
+      ! combinations of CMAQ species. For example, PMF_SO4 = 
+      ! ASO4I + ASO4J.
+
+      ! If this Aggregate has not been mapped already, then return an
+      ! error and crash the model
+      IF ( .NOT. ELMO_COEFFS( IDG )%L_MAPPED ) THEN
+         ILIST = MAP_ID2LIST( IDG )  
+         XMSG = 'ELMO variable ' // TRIM( ELMO_LIST( ILIST )%NAME ) //
+     &          ' has not been mapped to a procedure within ELMO_PROC even ' //
+     &          'though it does appear to be an acceptable variable on the ' //
+     &          'ELMO_LIST. If you have added this variable yourself, make ' //
+     &          'sure it is being mapped to an actual calculation in CALC_ELMO ' //
+     &          'or MAP_ELMO_COEFFS. If this variable is needed for a different ' //
+     &          'aggregate variable you requested, please add this variable ' //
+     &          'explicitly as an ELMO requested output.'
+         CALL LOG_MESSAGE( LOGDEV, XMSG )
+         CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+      END IF
+
+      ! Initialize value of aggregate variable
+      VAL = 0.0
+      
+      ! Retrieve size cutoff if necessary
+      INLET = ELMO_TABLE( J )%INLET
+      WETNESS = ELMO_TABLE( J )%WETNESS
+      DO IM = 1,N_MODE
+         CALL GET_AERO_INLET( INLET, IM, WETNESS, FRAC( IM ) )
+      END DO
+      
+      ! Loop through N_VARS and add species together
+      DO IVAR = 1,ELMO_COEFFS( IDG )%N_VARS
+          ISPEC = ELMO_COEFFS( IDG )%I_SPEC( IVAR )
+          COEFF = ELMO_COEFFS( IDG )%COEFF( IVAR )
+          SPC_UNIT = ELMO_COEFFS( IDG )%UNIT_SP( IVAR )
+          MW    = ELMO_COEFFS( IDG )%MW( IVAR )
+      
+          FAC = COEFF
+          ! Calculate Unit Conversions
+          SELECT CASE ( SPC_UNIT )
+            CASE ( 0 ) ! ug m-3
+              IF ( OUT_UNIT .EQ. 0 ) THEN
+                FAC = FAC 
+              ELSE IF ( OUT_UNIT .EQ. 1 ) THEN
+                FAC = FAC / MW * MWAIR / AIRDENS / 1000.0 ! to ppmv
+              ELSE IF ( OUT_UNIT .EQ. 2 ) THEN
+                FAC = FAC * ELMO_COEFFS( IDG )%CNUM( IVAR ) * 
+     &                      12.0 / MW ! to ugC m-3
+              ELSE IF ( OUT_UNIT .EQ. 3 ) THEN
+                FAC = FAC / MW * MWAIR / AIRDENS / 1000.0 * 
+     &                      ELMO_COEFFS( IDG )%CNUM( IVAR ) ! to ppmC
+              ELSE IF ( OUT_UNIT .EQ. 4 ) THEN
+                FAC = FAC * ELMO_COEFFS( IDG )%NNUM( IVAR ) * 
+     &                      28.02 / MW ! to ugN m-3
+              ELSE IF ( OUT_UNIT .EQ. 5 ) THEN
+                FAC = FAC / MW * MWAIR / AIRDENS / 1000.0 * 
+     &                      ELMO_COEFFS( IDG )%NNUM( IVAR ) ! to ppmN
+              END IF
+            CASE ( 1 ) ! ppmv
+              IF ( OUT_UNIT .EQ. 0 ) THEN
+                FAC = FAC * MW / MWAIR * AIRDENS * 1000.0 ! to ug m-3
+              ELSE IF ( OUT_UNIT .EQ. 1 ) THEN
+                FAC = FAC ! to ppmv
+              ELSE IF ( OUT_UNIT .EQ. 2 ) THEN
+                FAC = FAC / MWAIR * AIRDENS * 1000.0 * 
+     &                      ELMO_COEFFS( IDG )%CNUM( IVAR ) *
+     &                      12.0 ! to ugC m-3
+              ELSE IF ( OUT_UNIT .EQ. 3 ) THEN
+                FAC = FAC * ELMO_COEFFS( IDG )%CNUM( IVAR ) ! to ppmC
+              ELSE IF ( OUT_UNIT .EQ. 4 ) THEN
+                FAC = FAC / MWAIR * AIRDENS * 1000.0 * 
+     &                      ELMO_COEFFS( IDG )%NNUM( IVAR ) * 
+     &                      28.02 ! to ugN m-3
+              ELSE IF ( OUT_UNIT .EQ. 5 ) THEN
+                FAC = FAC * ELMO_COEFFS( IDG )%NNUM( IVAR ) ! to ppmN
+              END IF 
+          END SELECT 
+         
+          ! Add up variable while applying coefficient, size parameter 
+          ! (for aerosols) and unit conversion
+          IF ( ISPEC .GT. 0 ) THEN
+             IF ( ELMO_COEFFS( IDG )%L_AERO( IVAR ) ) THEN
+                 DO IM = 1,N_MODE
+                   ! If this mode is supposed to be added (LMODE) and the
+                   ! species is not missing, then add it up
+                   LMODE = ELMO_COEFFS( IDG )%L_MODE( IM )
+                   IF ( LMODE .AND. ( .NOT. AERO_MISSING( ISPEC,IM ) ) ) 
+     &                 VAL = VAL + AEROSPC_CONC( ISPEC, IM ) * 
+     &                             FRAC( IM )* FAC
+                 END DO
+                 
+             ELSE IF ( ELMO_COEFFS( IDG )%L_CGRID( IVAR ) ) THEN
+                 VAL = VAL + CONC_VEC( ISPEC ) * FAC
+                  
+             ELSE IF ( ELMO_COEFFS( IDG )%L_AGG( IVAR ) ) THEN
+                 CALL CALC_ELMO( ISPEC, 1, VAL2 )
+                 VAL = VAL + VAL2 * FAC
+         
+             ELSE IF ( ELMO_COEFFS( IDG )%L_FAM( IVAR ) ) THEN
+                 CALL CALC_ELMO( ISPEC, 1, VAL2 )
+                 VAL = VAL + VAL2 * FAC
+         
+             END IF
+         
+          END IF
+         
+      END DO 
+ 
+      END SUBROUTINE CALC_ELMO
+ 
+ 
+!-------------------------------------------------------------------------
+      RECURSIVE SUBROUTINE CALC_ELMO_ELAB( IDG, IM, IV, ISRC, OUTVAL )
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
@@ -1037,110 +1187,6 @@
             ! combinations of CMAQ species. For example, PMF_SO4 = 
             ! ASO4I + ASO4J.
 
-            ! If this Aggregate has not been mapped already, then return an
-            ! error and crash the model
-            IF ( .NOT. ELMO_COEFFS( IDG )%L_MAPPED ) THEN
-               ILIST = MAP_ID2LIST( IDG )  
-               XMSG = 'ELMO variable ' // TRIM( ELMO_LIST( ILIST )%NAME ) //
-     &                ' has not been mapped to a procedure within ELMO_PROC even ' //
-     &                'though it does appear to be an acceptable variable on the ' //
-     &                'ELMO_LIST. If you have added this variable yourself, make ' //
-     &                'sure it is being mapped to an actual calculation in CALC_ELMO ' //
-     &                'or MAP_ELMO_COEFFS. If this variable is needed for a different ' //
-     &                'aggregate variable you requested, please add this variable ' //
-     &                'explicitly as an ELMO requested output.'
-               CALL LOG_MESSAGE( LOGDEV, XMSG )
-               CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
-            END IF
-
-            ! Initialize value of aggregate variable
-            VAL = 0.0
-      
-            ! Retrieve size cutoff if necessary
-            INLET = ELMO_TABLE( J )%INLET
-            WETNESS = ELMO_TABLE( J )%WETNESS
-            DO IM = 1,N_MODE
-               CALL GET_AERO_INLET( INLET, IM, WETNESS, FRAC( IM ) )
-            END DO
-         
-            ! Loop through N_VARS and add species together
-            DO IVAR = 1,ELMO_COEFFS( IDG )%N_VARS
-                ISPEC = ELMO_COEFFS( IDG )%I_SPEC( IVAR )
-                COEFF = ELMO_COEFFS( IDG )%COEFF( IVAR )
-                SPC_UNIT = ELMO_COEFFS( IDG )%UNIT_SP( IVAR )
-                MW    = ELMO_COEFFS( IDG )%MW( IVAR )
-         
-                FAC = COEFF
-                ! Calculate Unit Conversions
-                SELECT CASE ( SPC_UNIT )
-                  CASE ( 0 ) ! ug m-3
-                    IF ( OUT_UNIT .EQ. 0 ) THEN
-                      FAC = FAC 
-                    ELSE IF ( OUT_UNIT .EQ. 1 ) THEN
-                      FAC = FAC / MW * MWAIR / AIRDENS / 1000.0 ! to ppmv
-                    ELSE IF ( OUT_UNIT .EQ. 2 ) THEN
-                      FAC = FAC * ELMO_COEFFS( IDG )%CNUM( IVAR ) * 
-     &                            12.0 / MW ! to ugC m-3
-                    ELSE IF ( OUT_UNIT .EQ. 3 ) THEN
-                      FAC = FAC / MW * MWAIR / AIRDENS / 1000.0 * 
-     &                            ELMO_COEFFS( IDG )%CNUM( IVAR ) ! to ppmC
-                    ELSE IF ( OUT_UNIT .EQ. 4 ) THEN
-                      FAC = FAC * ELMO_COEFFS( IDG )%NNUM( IVAR ) * 
-     &                            28.02 / MW ! to ugN m-3
-                    ELSE IF ( OUT_UNIT .EQ. 5 ) THEN
-                      FAC = FAC / MW * MWAIR / AIRDENS / 1000.0 * 
-     &                            ELMO_COEFFS( IDG )%NNUM( IVAR ) ! to ppmN
-                    END IF
-                  CASE ( 1 ) ! ppmv
-                    IF ( OUT_UNIT .EQ. 0 ) THEN
-                      FAC = FAC * MW / MWAIR * AIRDENS * 1000.0 ! to ug m-3
-                    ELSE IF ( OUT_UNIT .EQ. 1 ) THEN
-                      FAC = FAC ! to ppmv
-                    ELSE IF ( OUT_UNIT .EQ. 2 ) THEN
-                      FAC = FAC / MWAIR * AIRDENS * 1000.0 * 
-     &                            ELMO_COEFFS( IDG )%CNUM( IVAR ) *
-     &                            12.0 ! to ugC m-3
-                    ELSE IF ( OUT_UNIT .EQ. 3 ) THEN
-                      FAC = FAC * ELMO_COEFFS( IDG )%CNUM( IVAR ) ! to ppmC
-                    ELSE IF ( OUT_UNIT .EQ. 4 ) THEN
-                      FAC = FAC / MWAIR * AIRDENS * 1000.0 * 
-     &                            ELMO_COEFFS( IDG )%NNUM( IVAR ) * 
-     &                            28.02 ! to ugN m-3
-                    ELSE IF ( OUT_UNIT .EQ. 5 ) THEN
-                      FAC = FAC * ELMO_COEFFS( IDG )%NNUM( IVAR ) ! to ppmN
-                    END IF 
-                END SELECT 
-               
-                ! Add up variable while applying coefficient, size parameter 
-                ! (for aerosols) and unit conversion
-                IF ( ISPEC .GT. 0 ) THEN
-                   IF ( ELMO_COEFFS( IDG )%L_AERO( IVAR ) ) THEN
-                       DO IM = 1,N_MODE
-                         ! If this mode is supposed to be added (LMODE) and the
-                         ! species is not missing, then add it up
-                         LMODE = ELMO_COEFFS( IDG )%L_MODE( IM )
-                         IF ( LMODE .AND. ( .NOT. AERO_MISSING( ISPEC,IM ) ) ) 
-     &                       VAL = VAL + AEROSPC_CONC( ISPEC, IM ) * 
-     &                                   FRAC( IM )* FAC
-                       END DO
-                       
-                   ELSE IF ( ELMO_COEFFS( IDG )%L_CGRID( IVAR ) ) THEN
-                       VAL = VAL + CONC_VEC( ISPEC ) * FAC
-                        
-                   ELSE IF ( ELMO_COEFFS( IDG )%L_AGG( IVAR ) ) THEN
-                       CALL CALC_ELMO( ISPEC, 1, VAL2 )
-                       VAL = VAL + VAL2 * FAC
-               
-                   ELSE IF ( ELMO_COEFFS( IDG )%L_FAM( IVAR ) ) THEN
-                       CALL CALC_ELMO( ISPEC, 1, VAL2 )
-                       VAL = VAL + VAL2 * FAC
-               
-                   END IF
-               
-                END IF
-               
-            END DO 
- 
          END SELECT 
  
          ! Save the fact that this variable has been calculated
@@ -1148,152 +1194,7 @@
            L_CALCULATED( ILOC ) = .TRUE.
            ELMO_LOCAL( ILOC ) = OUTVAL
          END IF
+
+      END SUBROUTINE CALC_ELMO_ELAB
  
-
-      END SUBROUTINE CALC_ELMO
-
-!-------------------------------------------------------------------------
-      SUBROUTINE OPEN_ELMO ( JDATE, JTIME, TSTEP )
-! Revision history
-!   ??? Frank Binkowski
-!   8 Sep 01 J.Young: dyn alloc - Use HGRD_DEFN
-!   03 Sep 01 David Wong: for new pario
-!   13 May 04 P.Bhave: added RH to species list; removed M0 and dry M2
-!                      conc's from species list
-!   31 Jan 05 J.Young: dyn alloc - establish both horizontal & vertical
-!                      domain specifications in one module
-!   18 Jul 05 P.Bhave: Added mass fractions of each mode < 2.5um to output list
-!   06 Apr 06 P.Bhave: Added GAMMA_N2O5 to output list
-!   25 May 06 P.Bhave: Changed units of all DG variables from m to um, as 
-!                      suggested by Dr. Bill Hutzell
-!   11 Apr 08 J.Kelly: Added STDEVCOR and variables to account for dry & wet
-!                      DGCOR, M2COR_WET, and M3COR_DRY
-!   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
-!   26 Sep 14 H. Pye: Added GAMMA_IEPOX and replaced blank units with na
-!   11 May 16 D. Wong: - Modified the code to retreive ELMO information from
-!                        construct ELMO_SPC_RECORD stored in module cgrid_spcs
-!                        to provide flexibility to handle AE6 and AE61
-!                      - renamed the procedure name from OPDIAM to OPELMO
-!-------------------------------------------------------------------------
-
-      USE GRID_CONF           ! horizontal & vertical domain specifications
-
-      IMPLICIT NONE
-
-      INCLUDE SUBST_FILES_ID  ! file name parameters
-
-      !...Arguments:
-
-        INTEGER, INTENT( IN ) :: JDATE      ! current model date, coded YYYYDDD
-        INTEGER, INTENT( IN ) :: JTIME      ! current model time, coded HHMMSS
-        INTEGER, INTENT( IN ) :: TSTEP      ! output time step
-
-      !...Local variables:
-
-        CHARACTER( 16 ), SAVE :: PNAME = 'OPEN_ELMO'
-        CHARACTER( 96 ) :: XMSG = ' '
-
-        INTEGER :: L          ! loop induction variables
-        INTEGER :: MDATE, MTIME
-
-      ! Define General Output File Parameters
-      FTYPE3D = GRDDED3
-      GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-      TSTEP3D = TSTEP
-      NCOLS3D = GL_NCOLS
-      NROWS3D = GL_NROWS
-      GDTYP3D = GDTYP_GD
-      P_ALP3D = P_ALP_GD
-      P_BET3D = P_BET_GD 
-      P_GAM3D = P_GAM_GD
-      XORIG3D = XORIG_GD
-      YORIG3D = YORIG_GD
-      XCENT3D = XCENT_GD
-      YCENT3D = YCENT_GD
-      XCELL3D = XCELL_GD
-      YCELL3D = YCELL_GD
-      VGTYP3D = VGTYP_GD
-      VGTOP3D = VGTOP_GD
-      NTHIK3D =     1
-
-      ! Open Instantaneous PM Diagnostic File
-      IF ( INST_ACTIVE ) THEN
-        
-         ! Try to open existing file for update
-         IF ( .NOT. OPEN3( CTM_ELMO_1, FSRDWR3, PNAME ) ) THEN
-
-            ! Set output file characteristics based on COORD.EXT and open the aerosol
-            ! diagnostic file
-            SDATE3D = JDATE
-            STIME3D = JTIME
-            !CALL NEXTIME ( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
-         
-            NLAYS3D = INST_LAYER_TOP - INST_LAYER_BOT + 1
-            DO L = INST_LAYER_BOT, INST_LAYER_TOP + 1
-               VGLVS3D( L ) = VGLVS_GD( L )
-            END DO
-         
-            NVARS3D = N_ELMO_INST_OUT 
-            VTYPE3D(1:NVARS3D) = INST_TYPE_OUT( 1:NVARS3D )
-            VNAME3D(1:NVARS3D) = INST_PARS_OUT( 1:NVARS3D )
-            UNITS3D(1:NVARS3D) = INST_UNIT_OUT( 1:NVARS3D )
-            VDESC3D(1:NVARS3D) = INST_DESC_OUT( 1:NVARS3D )
-         
-            FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
-            DO L = 2, MXDESC3
-               FDESC3D( L ) = ' '
-            END DO
-         
-            ! Open the Instantaneous aerosol diagnostic file
-            IF ( .NOT. OPEN3( CTM_ELMO_1, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not create '// CTM_ELMO_1 // ' file'
-               CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-            END IF
-
-         END IF
-      END IF
- 
-
-      ! Open Average Output PM Diagnostic File
-      IF ( AVRG_ACTIVE ) THEN
-        
-         ! Try to open existing file for update
-         IF ( .NOT. OPEN3( CTM_AELMO_1, FSRDWR3, PNAME ) ) THEN
-
-            ! Get end time information from environment variable AVG_FILE_ENDTIME
-            MDATE = JDATE; MTIME = JTIME
-            IF ( END_TIME ) CALL NEXTIME ( MDATE, MTIME, TSTEP )
-
-            ! Set output file characteristics based on COORD.EXT and open the aerosol
-            ! diagnostic file
-            SDATE3D = MDATE
-            STIME3D = MTIME
-         
-            NLAYS3D = AVRG_LAYER_TOP - AVRG_LAYER_BOT + 1
-            DO L = AVRG_LAYER_BOT, AVRG_LAYER_TOP + 1
-               VGLVS3D( L ) = VGLVS_GD( L )
-            END DO
-         
-            NVARS3D = N_ELMO_AVRG_OUT 
-            VTYPE3D(1:NVARS3D) = AVRG_TYPE_OUT( 1:NVARS3D )
-            VNAME3D(1:NVARS3D) = AVRG_PARS_OUT( 1:NVARS3D )
-            UNITS3D(1:NVARS3D) = AVRG_UNIT_OUT( 1:NVARS3D )
-            VDESC3D(1:NVARS3D) = AVRG_DESC_OUT( 1:NVARS3D )
-         
-            FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
-            DO L = 2, MXDESC3
-               FDESC3D( L ) = ' '
-            END DO
-         
-            ! Open the Instantaneous aerosol diagnostic file
-            IF ( .NOT. OPEN3( CTM_AELMO_1, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not create '// CTM_AELMO_1 // ' file'
-               CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-            END IF
- 
-         END IF
-      END IF
- 
-      END SUBROUTINE OPEN_ELMO 
-
       END MODULE ELMO_PROC
