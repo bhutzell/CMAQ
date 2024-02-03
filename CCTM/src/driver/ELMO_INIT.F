@@ -41,7 +41,7 @@
       CALL ELMO_INIT_SHARED()
 
       ! Initialize Main Table for all possible output variables
-      CALL ELMO_TABLE()
+      CALL BUILD_ELMO_TABLE()
 
       ! Map ELMO User Input to ELMO_TABLE
       CALL ELMO_KEYWORDS
