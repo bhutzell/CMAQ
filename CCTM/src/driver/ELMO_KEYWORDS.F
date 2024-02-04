@@ -14,7 +14,7 @@
       CHARACTER(200) :: XMSG
       CHARACTER(16), SAVE :: PNAME = 'ELMO_KEY'
 
-      N_KEY = 26
+      N_KEY = 27
       ALLOCATE( ELMO_KEY( N_KEY ), STAT=IOS )
       CALL CHECKMEM( IOS, 'ELMO_KEY',PNAME )
 
@@ -304,14 +304,14 @@
       ELMO_KEY( 25 )%LIST = (/'O3  ','NO2 ','NO  ','SO2  ','CO  ',
      &                        'NH3 ','HNO3'/)
  
-      ! All Concentrations
-      ELMO_KEY( 26 )%WORD = 'ALLCONC'
-      ELMO_KEY( 26 )%N = N_CGRID_SPC
-      ALLOCATE( ELMO_KEY( 26 )%LIST( N_CGRID_SPC ), STAT=ALLOCSTAT )
+      ! All Deposition Variables
+      ELMO_KEY( 26 )%WORD = 'ALLDEP'
+      ELMO_KEY( 26 )%N = 2
+      ALLOCATE( ELMO_KEY( 26 )%LIST( 2 ), STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_KEY(26)'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
-      ELMO_KEY( 26 )%LIST = CGRID_NAME(:)
+      ELMO_KEY( 26 )%LIST = (/'ALLWDEP','ALLDDEP'/)
  
       END SUBROUTINE ELMO_KEYWORDS

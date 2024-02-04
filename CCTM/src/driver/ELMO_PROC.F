@@ -296,13 +296,7 @@
         ! ELMO_LIST and is ordered by the ELMO ID numbers so that it
         ! can be used seamlessly with the CALC_ELMO internal order.
         DO ILOC = 1,N_ELMO_LOCAL
-           IDG = ELMO_LOCAL_ID( ILOC ) ! Map to ELMO Variable ID numbers
-           IM  = ELMO_LOCAL_IM( ILOC ) ! Specify mode of interest for
-                                       !   mode-specific variables (e.g. WET_DG)
-           IV  = ELMO_LOCAL_IV( ILOC ) ! Specify Variable Type (e.g. CGRID, FAM, 
-                                       !   ISAM)
-           ISRC= ELMO_LOCAL_ISRC( ILOC)! Specify Source Type, for ISAM or DDM
-           CALL CALC_ELMO( IDG, IM, IV, ISRC, ELMO_LOCAL( ILOC ) )
+           CALL CALC_ELMO( ELMO_LOCALtoTABLE( ILOC ), ELMO_LOCAL( ILOC ) )
         END DO
 
         ! *** Aggregate Diagnostic Variables in Average Array
@@ -312,8 +306,8 @@
            AL = L - AVRG_LAYER_BOT + 1
            DO  IAVRG = 1,N_ELMO_AVRG
               IF ( ELMO_LOCAL_ID( ELMO_AVRGtoLOCAL( IAVRG )) .EQ. ID_PMF_PH
-     &             .AND. ELMO_LOCAL( ELMO_AVERGtoLOCAL( IAVRG ) ) .LT. -100. ) THEN
-                 ! Special Averageing for Particle pH
+     &             .AND. ELMO_LOCAL( ELMO_AVRGtoLOCAL( IAVRG ) ) .LT. -100. ) THEN
+                 ! Special Averaging for Particle pH
                  ! Add whatever the current average is right now.
                  ! Certainly this is problematic, particularly
                  ! at the beginning of an hour where ELMO_AVRG =
@@ -322,23 +316,20 @@
                  ! offline.
                  IF ( INIT_STEP ) THEN
                     ELMO_AVRG( C,R,AL,IAVRG ) = 3.5  ! Assume relatively acidic particles
-                 ELSE IF ( WRITE_STEP ) THEN
+                 ELSE IF ( .NOT. WRITE_STEP ) THEN
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-                 ELSE
-                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                      + 2.0 * ELMO_AVRG( C,R,AL,IAVRG )
+     &                                  + 2.0 * ELMO_AVRG( C,R,AL,IAVRG )
                  END IF
               ELSE
-                 ! For all other variables, apply trapezoidal rule for
-                 ! averaging.
+                 ! For all other variables, apply trapezoidal rule for averaging.
                  IF ( INIT_STEP ) THEN
-                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_LOCAL( MAP_AVRG2USED( IAVRG ) ) 
+                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_LOCAL( ELMO_AVRGtoLOCAL( IAVRG ) ) 
                  ELSE IF ( WRITE_STEP ) THEN
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                                        + ELMO_LOCAL( MAP_AVRG2USED( IAVRG ) )
+     &                                        + ELMO_LOCAL( ELMO_AVRGtoLOCAL( IAVRG ) )
                  ELSE
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                      + 2.0 * ELMO_LOCAL( MAP_AVRG2USED( IAVRG ) )
+     &                      + 2.0 * ELMO_LOCAL( ELMO_AVRGtoLOCAL( IAVRG ) )
                  END IF 
               END IF
            END DO
@@ -349,7 +340,7 @@
      &       L.GE.INST_LAYER_BOT .AND. L.LE.INST_LAYER_TOP ) THEN
            IL = L - INST_LAYER_BOT + 1
            DO IINST = 1,N_ELMO_INST_OUT
-              ELMO_INST( C,R,IL,IINST ) = ELMO_LOCAL( MAP_INST2USED( IINST ) )
+              ELMO_INST( C,R,IL,IINST ) = ELMO_LOCAL( ELMO_INSTtoLOCAL( IINST ) )
            END DO
         END IF
  
@@ -357,7 +348,7 @@
       END SUBROUTINE LOAD_ELMO
  
 !-------------------------------------------------------------------------
-      SUBROUTINE CALC_ELMO( IDG, VAL )
+      RECURSIVE SUBROUTINE CALC_ELMO( J, OUTVAL )
 !     This subroutine sums aggregate PM diagnostic parameters using the
 !         ELMO_COEFFS structure as a guide for summing aerosol
 !         components.          
@@ -372,8 +363,9 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT( IN ) :: IDG
-      REAL, INTENT( INOUT ) :: VAL
+      INTEGER, INTENT( IN ) :: J
+      REAL, INTENT( INOUT ) :: OUTVAL
+      INTEGER ID, IM, VAR_TYPE, ISRC
       REAL VAL2
       INTEGER IVAR, ILIST
       LOGICAL L_CALC( N_ELMO )
@@ -383,115 +375,96 @@
       REAL    FRAC( N_MODE )
 
       CHARACTER( 500 ) :: XMSG
+  
+      ! Map this ELMO_TABLE variable to the Local Array
+      ILOC = ELMO_TABLEtoLOCAL( J )
 
-      ! For most variables the ELMO_TABLE structure will
-      ! define all of the mappings and coefficients needed for
-      ! a particular summation. This can therefore be used in
-      ! most cases. Variables in this category are linear
-      ! combinations of CMAQ species. For example, PMF_SO4 = 
-      ! ASO4I + ASO4J.
-
-      ! If this Aggregate has not been mapped already, then return an
-      ! error and crash the model
-      IF ( .NOT. ELMO_COEFFS( IDG )%L_MAPPED ) THEN
-         ILIST = MAP_ID2LIST( IDG )  
-         XMSG = 'ELMO variable ' // TRIM( ELMO_LIST( ILIST )%NAME ) //
-     &          ' has not been mapped to a procedure within ELMO_PROC even ' //
-     &          'though it does appear to be an acceptable variable on the ' //
-     &          'ELMO_LIST. If you have added this variable yourself, make ' //
-     &          'sure it is being mapped to an actual calculation in CALC_ELMO ' //
-     &          'or MAP_ELMO_COEFFS. If this variable is needed for a different ' //
-     &          'aggregate variable you requested, please add this variable ' //
-     &          'explicitly as an ELMO requested output.'
-         CALL LOG_MESSAGE( LOGDEV, XMSG )
-         CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+      ! First determine if this variable has been mapped already. If it
+      ! has, send it back
+      IF ( ILOC .GT. 0 ) THEN
+        IF ( L_CALCULATED( ILOC ) ) THEN
+           OUTVAL = ELMO_LOCAL( ILOC )
+           RETURN
+        END IF
       END IF
-
+ 
+      ! For most variables, the ELMO_TABLE and ELMO_COMP structures 
+      ! will define all of the mappings and coefficients needed for
+      ! a particular summation. This can therefore be used in most 
+      ! cases. Variables in this category are linear combinations 
+      ! of CMAQ species. For example, PMF_SO4 = ASO4I + ASO4J.
+ 
       ! Initialize value of aggregate variable
-      VAL = 0.0
+      OUTVAL = 0.0
+      ID  = ELMO_TABLE( J )%ID       ! Map to ELMO Variable ID numbers
+      VAR_TYPE  = ELMO_TABLE( J )%VAR_TYPE ! Specify Variable Type (e.g. CGRID, FAM, 
+                                     !   ISAM)
       
       ! Retrieve size cutoff if necessary
       INLET = ELMO_TABLE( J )%INLET
-      WETNESS = ELMO_TABLE( J )%WETNESS
-      DO IM = 1,N_MODE
-         CALL GET_AERO_INLET( INLET, IM, WETNESS, FRAC( IM ) )
-      END DO
-      
-      ! Loop through N_VARS and add species together
-      DO IVAR = 1,ELMO_COEFFS( IDG )%N_VARS
-          ISPEC = ELMO_COEFFS( IDG )%I_SPEC( IVAR )
-          COEFF = ELMO_COEFFS( IDG )%COEFF( IVAR )
-          SPC_UNIT = ELMO_COEFFS( IDG )%UNIT_SP( IVAR )
-          MW    = ELMO_COEFFS( IDG )%MW( IVAR )
-      
-          FAC = COEFF
-          ! Calculate Unit Conversions
-          SELECT CASE ( SPC_UNIT )
-            CASE ( 0 ) ! ug m-3
-              IF ( OUT_UNIT .EQ. 0 ) THEN
-                FAC = FAC 
-              ELSE IF ( OUT_UNIT .EQ. 1 ) THEN
-                FAC = FAC / MW * MWAIR / AIRDENS / 1000.0 ! to ppmv
-              ELSE IF ( OUT_UNIT .EQ. 2 ) THEN
-                FAC = FAC * ELMO_COEFFS( IDG )%CNUM( IVAR ) * 
-     &                      12.0 / MW ! to ugC m-3
-              ELSE IF ( OUT_UNIT .EQ. 3 ) THEN
-                FAC = FAC / MW * MWAIR / AIRDENS / 1000.0 * 
-     &                      ELMO_COEFFS( IDG )%CNUM( IVAR ) ! to ppmC
-              ELSE IF ( OUT_UNIT .EQ. 4 ) THEN
-                FAC = FAC * ELMO_COEFFS( IDG )%NNUM( IVAR ) * 
-     &                      28.02 / MW ! to ugN m-3
-              ELSE IF ( OUT_UNIT .EQ. 5 ) THEN
-                FAC = FAC / MW * MWAIR / AIRDENS / 1000.0 * 
-     &                      ELMO_COEFFS( IDG )%NNUM( IVAR ) ! to ppmN
-              END IF
-            CASE ( 1 ) ! ppmv
-              IF ( OUT_UNIT .EQ. 0 ) THEN
-                FAC = FAC * MW / MWAIR * AIRDENS * 1000.0 ! to ug m-3
-              ELSE IF ( OUT_UNIT .EQ. 1 ) THEN
-                FAC = FAC ! to ppmv
-              ELSE IF ( OUT_UNIT .EQ. 2 ) THEN
-                FAC = FAC / MWAIR * AIRDENS * 1000.0 * 
-     &                      ELMO_COEFFS( IDG )%CNUM( IVAR ) *
-     &                      12.0 ! to ugC m-3
-              ELSE IF ( OUT_UNIT .EQ. 3 ) THEN
-                FAC = FAC * ELMO_COEFFS( IDG )%CNUM( IVAR ) ! to ppmC
-              ELSE IF ( OUT_UNIT .EQ. 4 ) THEN
-                FAC = FAC / MWAIR * AIRDENS * 1000.0 * 
-     &                      ELMO_COEFFS( IDG )%NNUM( IVAR ) * 
-     &                      28.02 ! to ugN m-3
-              ELSE IF ( OUT_UNIT .EQ. 5 ) THEN
-                FAC = FAC * ELMO_COEFFS( IDG )%NNUM( IVAR ) ! to ppmN
-              END IF 
-          END SELECT 
+      WETNESS = ELMO_TABLE( J )%WETNESS 
+      FRAC( : ) = 1.0
+      IF ( INLET .NE. 0 ) THEN
+        DO IMODE = 1,N_MODE
+           CALL GET_AERO_INLET( INLET, IMODE, WETNESS, FRAC( IMODE ) )
+        END DO
+      END IF
+ 
+      ! Retrieve value from corresponding array
+      FAC = 1.0
+
+      SELECT CASE ( VAR_TYPE ) 
+         CASE ( ETYPE_CGRID )
+            ! Variable is in CGRID
+            OUTVAL = CONC_VEC( ID ) * FAC
          
-          ! Add up variable while applying coefficient, size parameter 
-          ! (for aerosols) and unit conversion
-          IF ( ISPEC .GT. 0 ) THEN
-             IF ( ELMO_COEFFS( IDG )%L_AERO( IVAR ) ) THEN
-                 DO IM = 1,N_MODE
-                   ! If this mode is supposed to be added (LMODE) and the
-                   ! species is not missing, then add it up
-                   LMODE = ELMO_COEFFS( IDG )%L_MODE( IM )
-                   IF ( LMODE .AND. ( .NOT. AERO_MISSING( ISPEC,IM ) ) ) 
-     &                 VAL = VAL + AEROSPC_CONC( ISPEC, IM ) * 
-     &                             FRAC( IM )* FAC
-                 END DO
-                 
-             ELSE IF ( ELMO_COEFFS( IDG )%L_CGRID( IVAR ) ) THEN
-                 VAL = VAL + CONC_VEC( ISPEC ) * FAC
-                  
-             ELSE IF ( ELMO_COEFFS( IDG )%L_AGG( IVAR ) ) THEN
-                 CALL CALC_ELMO( ISPEC, 1, VAL2 )
-                 VAL = VAL + VAL2 * FAC
-         
-             ELSE IF ( ELMO_COEFFS( IDG )%L_FAM( IVAR ) ) THEN
-                 CALL CALC_ELMO( ISPEC, 1, VAL2 )
-                 VAL = VAL + VAL2 * FAC
-         
-             END IF
-         
-          END IF
+         CASE ( ETYPE_AEROBULK )
+            ! Variable is a Bulk Aerosol
+            DO IMODE = 1,N_MODE
+              ! If this mode is supposed to be added (LMODE) and the
+              ! species is not missing, then add it up
+              LMODE = ELMO_COMP( J )%L_MODE( IMODE )
+              IF ( LMODE .AND. ( .NOT. AERO_MISSING( ID,IMODE ) ) ) 
+     &            OUTVAL = OUTVAL + AEROSPC_CONC( ID, IMODE ) * 
+     &                        FRAC( IMODE )* FAC
+            END DO
+                
+         CASE ( ETYPE_FAM )
+            ! Variable is a Chemical Family
+            DO IVAR = 1,ELMO_COMP( J )%N_VARS
+              CALL CALC_ELMO( ELMO_COMP( J )%TABID(IVAR), VAL2 )
+              CALL COMP_UNIT_CONVERSION( J, IVAR, FAC )
+              OUTVAL = OUTVAL + VAL2 * FAC
+            END DO 
+
+         CASE ( ETYPE_ELMO, ETYPE_ELMO_ISAM, ETYPE_ELMO_DDM,
+     &          ETYPE_ELMO_DEP, ETYPE_ELMO_WDEP, ETYPE_ELMO_DDEP )   
+            ! Variable is an ELMO Variable
+            IF ( ELMO_TABLE( J )%L_COMP ) THEN
+               ! Sum up Linear Combination Variable
+               DO IVAR = 1,ELMO_COMP( J )%N_VARS
+                 CALL CALC_ELMO( ELMO_COMP( J )%TABID(IVAR), VAL2 )
+                 CALL COMP_UNIT_CONVERSION( J, IVAR, FAC )
+                 OUTVAL = OUTVAL + VAL2 * FAC
+               END DO 
+            ELSE
+               ! Retrieve Elaborate ELMO Variable
+               IM  = ELMO_TABLE( J )%IM     ! Specify mode of interest for
+                                            !   mode-specific variables (e.g. WET_DG)
+               ISRC= ELMO_TABLE( J )%SOURCE ! Specify Source Type, for ISAM or DDM
+               CALL CALC_ELMO_ELAB( ELMO_TABLE( J )%ID, IM, VAR_TYPE, ISRC, VAL2 )
+               OUTVAL = OUTVAL * FAC
+            END IF
+
+         CASE DEFAULT
+
+            ! Invalid Variable Type
+            XMSG = 'ELMO variable ' // TRIM( ELMO_TABLE( J )%NAME ) //
+     &             ' has an invalid variable type. Please check that it is '//
+     &             'mapped correctly.'
+            CALL LOG_MESSAGE( LOGDEV, XMSG )
+            CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+         END SELECT
          
       END DO 
  
@@ -518,7 +491,7 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT( IN ) :: IDG, IM, IV, ISRC
+      INTEGER, INTENT( IN ), OPTIONAL :: J, IDG, IM, IV, ISRC
       REAL, INTENT( INOUT ) :: OUTVAL
       INTEGER ILOC, IMODE, IVAR, IOA
       REAL VAL4, VAL3, VAL2, VAL, FRAC( N_MODE )
@@ -530,7 +503,7 @@
 
       ! Map this combination of ID number and mode to the USED
       ! variables list, which is how ELMO_LOCAL is defined.
-      ILOC = ELMO_IDtoLOCAL( IDG, IM, IV, ISRC )
+      ILOC = ELMO_IDtoLOCAL( IDG, IM, IV, ISRC+1 )
 
       ! First determine if this variable has been mapped already. If it
       ! has, send it back
@@ -793,21 +766,25 @@
          ! Particle Water
          CASE ( ID_PMF_HPM )
             ! Retrieve AHPLUSIJ
-            CALL CALC_ELMO( ID_PMF_HP, 1, VAL )
+            CALL CALC_ELMO_ELAB( ID_PMF_HP, 1, ETYPE_ELMO, 0, VAL )
             ! Retrieve AH2OIJ
-            CALL CALC_ELMO( ID_PMF_H2O, 1, VAL2 )
+            CALL CALC_ELMO_ELAB( ID_PMF_H2O, 1, ETYPE_ELMO, 0, VAL2 )
             ! HPMOLAL = AHPLUSIJ / AH2OIJ * 1000.0 [mol L-1]
             OUTVAL = VAL / VAL2 * 1000.0
 
          ! Calculate PMF_PH - Fine-Mode pH
          CASE ( ID_PMF_PH )
             ! Retrieve HPMOLAL
-            CALL CALC_ELMO( ID_PMF_HPM, 1, VAL )
+            CALL CALC_ELMO_ELAB( ID_PMF_HPM, 1, ETYPE_ELMO, 0, VAL )
             ! Retrieve AH2OIJ
-            CALL CALC_ELMO( ID_PMF_H2O, 1, VAL2 )
+            CALL CALC_ELMO_ELAB( ID_PMF_H2O, 1, ETYPE_ELMO, 0, VAL2 )
 
             !PMF_PH = -1*LOG10(HPMOLAL)
+#ifdef mpas
+            OUTVAL = -9.999E36
+#else
             OUTVAL = BADVAL3
+#endif
             IF ( VAL2 .GT. 0.01 )
      &           OUTVAL = -1.0 * LOG10( VAL )
 
@@ -916,13 +893,13 @@
          CASE ( ID_PMF_OMOC )
             VAL  = 0.0
             VAL2 = 0.0
-            CALL CALC_ELMO( ID_PMF_OA, 1, VAL  )
-            CALL CALC_ELMO( ID_PMF_OC, 1, VAL2 )
+            CALL CALC_ELMO_ELAB( ID_PMF_OA, 1, ETYPE_ELMO, 0, VAL  )
+            CALL CALC_ELMO_ELAB( ID_PMF_OC, 1, ETYPE_ELMO, 0, VAL2 )
             OUTVAL = VAL / ( VAL2 + TINY( 0.0 ) )
             
          ! Calculate PMF_OtoC - Fine-Mode O:C 
          CASE ( ID_PMF_OtoC )
-            CALL CALC_ELMO( ID_PMF_OA, 1, VAL  )
+            CALL CALC_ELMO_ELAB( ID_PMF_OA, 1, ETYPE_ELMO, 0, VAL  )
 
             VAL2 = 0.0
             DO IOA = 1,N_OA_NotTracers
@@ -1013,7 +990,7 @@
               
          ! Calculate O:C relevant for AMS observations
          CASE ( ID_AMS_OtoC )
-            CALL CALC_ELMO( ID_AMS_OA, 1, VAL  )
+            CALL CALC_ELMO_ELAB( ID_AMS_OA, 1, ETYPE_ELMO, 0, VAL  )
 
             ! Save AMS Fraction for each mode
             DO IMODE = 1,N_MODE
@@ -1043,8 +1020,8 @@
  
          ! Calculate Aerosol Fraction of Benzo-a-Pyrene
          CASE ( ID_BENAPY_FAERO )
-            CALL CALC_ELMO( ID_PMF_BENAPY, 1, VAL  )
-            CALL CALC_ELMO( ID_GAS_BENAPY, 1, VAL2  )
+            CALL CALC_ELMO_ELAB( ID_PMF_BENAPY, 1, ETYPE_ELMO, 0, VAL  )
+            CALL CALC_ELMO_ELAB( ID_GAS_BENAPY, 1, ETYPE_ELMO, 0, VAL2  )
             OUTVAL = VAL / ( VAL + VAL2 + TINY( 0.0 ) )
 
          ! Retrieve Fine-Mode Particle Mass Collected by the Federal
@@ -1061,14 +1038,14 @@
                 K2 = ( K * ( P1 - P2*a + P3*a*a ) * ( a**1.75 ) ) ** 0.5
             END IF
 
-            CALL CALC_ELMO( ID_PMF_NO3, 1, PMF_NO3 )
+            CALL CALC_ELMO_ELAB( ID_PMF_NO3, 1, ETYPE_ELMO, 0, PMF_NO3 )
             PMF_NO3_LOSS = MIN( 745.7/SRFTEMP * K2, PMF_NO3 )
 
             PMF_NH4_LOSS = PMF_NO3_LOSS * 18.0 / 62.0
 
-            CALL CALC_ELMO( ID_PMF_NH4, 1, PMF_NH4 )
-            CALL CALC_ELMO( ID_PMF_SO4, 1, PMF_SO4 ) 
-            CALL CALC_ELMO( ID_PMF_MASS,1, PMF_MASS) 
+            CALL CALC_ELMO_ELAB( ID_PMF_NH4, 1, ETYPE_ELMO, 0, PMF_NH4 )
+            CALL CALC_ELMO_ELAB( ID_PMF_SO4, 1, ETYPE_ELMO, 0, PMF_SO4 ) 
+            CALL CALC_ELMO_ELAB( ID_PMF_MASS,1, ETYPE_ELMO, 0, PMF_MASS) 
 
             OUTVAL = PMF_MASS - PMF_NO3_LOSS - PMF_NH4_LOSS
      &                      +0.24 * ( PMF_SO4 + PMF_NH4 - PMF_NH4_LOSS ) + 0.5
@@ -1087,13 +1064,13 @@
                 K2 = ( K * ( P1 - P2*a + P3*a*a ) * ( a**1.75 ) ) ** 0.5
             END IF
 
-            CALL CALC_ELMO( ID_PM25_NO3, 1, PM25_NO3 )
+            CALL CALC_ELMO_ELAB( ID_PM25_NO3, 1, ETYPE_ELMO, 0, PM25_NO3 )
             PM25_NO3_LOSS = MIN( 745.7/SRFTEMP * K2, PM25_NO3 )
 
             PM25_NH4_LOSS = PM25_NO3_LOSS * 18.0 / 62.0
 
-            CALL CALC_ELMO( ID_PM25_NH4, 1, PM25_NH4 )
-            CALL CALC_ELMO( ID_PM25_SO4, 1, PM25_SO4 ) 
+            CALL CALC_ELMO_ELAB( ID_PM25_NH4, 1, ETYPE_ELMO, 0, PM25_NH4 )
+            CALL CALC_ELMO_ELAB( ID_PM25_SO4, 1, ETYPE_ELMO, 0, PM25_SO4 ) 
             CALL SUM_INLET_PM( IPM25, IWET, PM25 )
 
             OUTVAL = PM25 - PM25_NO3_LOSS - PM25_NH4_LOSS
@@ -1132,7 +1109,11 @@
              IF ( L1 .EQ. 1 ) THEN
                  OUTVAL = ELMO_AOD_550( C1,R1 )
              ELSE
+#ifdef mpas
+                 OUTVAL = -9.000E36
+#else
                  OUTVAL = AMISS3
+#endif
              END IF
 
          ! Retrieve Aerosol Extinction at 550 nm
@@ -1180,12 +1161,6 @@
             OUTVAL = MET_DATA%DENS( C1,R1,L1 ) ! kg m-3
 
          CASE DEFAULT
-            ! For most variables the ELMO_TABLE structure will
-            ! define all of the mappings and coefficients needed for
-            ! a particular summation. This can therefore be used in
-            ! most cases. Variables in this category are linear
-            ! combinations of CMAQ species. For example, PMF_SO4 = 
-            ! ASO4I + ASO4J.
 
          END SELECT 
  

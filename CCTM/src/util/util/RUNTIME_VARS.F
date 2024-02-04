@@ -301,6 +301,17 @@
       INTEGER  :: ISAM_NOX_CASE = 2         ! option of ISAM_CHEM_BIAS representing NOx limiting O3 production
       INTEGER  :: ISAM_VOC_CASE = 4         ! option of ISAM_CHEM_BIAS representing VOC limiting O3 production
 
+      ! MIO Structure
+      TYPE MIO_TABLE_TYPE
+          INTEGER :: FUNIT
+          INTEGER :: NVARS
+          CHARACTER(16), ALLOCATABLE  :: VARS(:)
+          INTEGER, ALLOCATABLE        :: TYPE(:)
+          CHARACTER(16), ALLOCATABLE  :: UNIT(:)
+          CHARACTER(250), ALLOCATABLE :: DESC(:)
+      END TYPE MIO_TABLE
+      TYPE( MIO_TABLE_TYPE ), ALLOCATABLE, SAVE :: MIO_FILE(:)
+
       CONTAINS
           
 !.........................................................................
@@ -1025,6 +1036,9 @@
 #endif
 
 #endif
+
+      ! Allocate Structure for Passing MIO Parameters
+      ALLOCATE( MIO_FILE( 100 ) )
 
       END SUBROUTINE INIT_ENV_VARS
 
