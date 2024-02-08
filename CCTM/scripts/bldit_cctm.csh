@@ -246,6 +246,7 @@ set make_options = "-j"                #> additional options for make command if
     set MakeFileOnly   
 #   set Modwrfcmaq = wrf_cmaq
     set Modwrfcmaq = twoway
+    set Modcoupler  = coupler
  endif
 
 #> If the MPAS-CMAQ coupled model is being built,
