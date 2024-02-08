@@ -795,7 +795,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
 
 #> Rename Makefile to specify compiler option and link back to Makefile
  if ( $?build_mpas_cmaq ) then
-    ln -s Makefile.mpascmaq Makefile
+    ln -s Makefile.mpas_cmaq Makefile
  else if ( ! $?build_wrf_cmaq ) then
     mv Makefile Makefile.$compilerString
     if ( -e Makefile.$compilerString && -e Makefile ) rm Makefile
