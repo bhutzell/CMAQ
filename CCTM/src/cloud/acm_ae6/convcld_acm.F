@@ -2139,7 +2139,6 @@ C...convert removal change from moles/m**2 to kg/m**2 and kg/m**2 to kg/hectare
                      ! area
 
                   ELSE
-                      
                      ! Gas and Aerosol Mass (moles m-2 -> kg ha-1)
                      REMOV( I ) = REMOV( I ) * CGRID_MW( I ) * M2PHA_OVER_GPKG * FRAC
 #ifdef sens

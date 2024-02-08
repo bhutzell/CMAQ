@@ -141,6 +141,7 @@ C Number of aerosol species and modes
       
       Logical, Parameter :: reqd_modes( n_mode ) = (/ T,T,T /)
       Character(1), Parameter :: modesuff( n_mode ) = (/ 'I','J','K' /)
+      Character(6), Parameter :: modename( n_mode ) = (/'AITKEN','ACCUM','COARSE'/)
 
       Integer, Save :: n_aerospc ! number of aero species
 
