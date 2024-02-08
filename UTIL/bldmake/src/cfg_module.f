@@ -26,6 +26,7 @@
 !  routines under PARIO rather than under GLOBAL_MODULES by D. Wong (Aug 2015)
 !  Added netCDF Fortran Library Path. Makefile generated consistent with 
 !  netCDF library format. (July 2019)
+!  modified the code so it can build MPAS-CMAQ or WRF-CMAQ coupled models by D. Wong (Jan 2024)
 !-------------------------------------------------------------------------------
       Module ModelCfg
 

@@ -42,6 +42,8 @@
 !                       when build_twoway is turned on
 !     jan 2020 D. Wong: indlucded a help message for option -twoway
 !     June 2021 F. Sidi: Restore reading of MPICH string from cfg for mpi libraries 
+!     Jan 2024 D. Wong: modified the code so it can build MPAS-CMAQ or
+!                       WRF-CMAQ coupled models
 !-------------------------------------------------------------------------------
 
       Program bldmake
