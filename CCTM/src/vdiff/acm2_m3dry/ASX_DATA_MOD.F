@@ -80,6 +80,7 @@ C    D. Wong: Implemented centralized I/O approach, removed all MY_N clauses, re
 C             unnecessary SAVE attribute (02/2019)
 C    G. Sarwar: Removed CH3BR (03/2021)
 C    R. Gilliam: Include PX soil texture information when available (03/2022)
+C    D. Wong: Incorporated unified coupler implmentation (01/10/2024)
 C-------------------------------------------------------------------------------
       Use RUNTIME_VARS
       Use GRID_CONF           ! horizontal & vertical domain specifications
@@ -736,8 +737,8 @@ C-----------------------------------------------------------------------
 !> reciprocal of msfx2**2
 #ifdef mpas
          Grid_Data%RMSFX4 = 1.0
-         Grid_Data%PURB = g2ddata(:,:,purb_ind)
-         Grid_Data%SLTYP = INT( g2ddata(:,:,sltyp_ind) )
+         call coupler_data_retrieving ('PURB', Grid_Data%PURB)
+         call coupler_data_retrieving ('SLTYP', Grid_Data%SLTYP)
          Grid_Data%LUFRAC = LUFRAC
 
          DO R = 1, NROWS
@@ -901,7 +902,7 @@ C Soil vars
 #ifdef mpas
          Met_Data%SOIM1 = smois_data(:,:,1)
          Met_Data%SOIM2 = smois_data(:,:,2)
-         Met_Data%CLDFRAC = g2ddata(:,:,cfrac2dt_ind) ! for BDSNP soil NO
+!        Met_Data%CLDFRAC = g2ddata(:,:,cfrac2dt_ind) ! for BDSNP soil NO
 #else
          call interpolate_var ('SOIM1', jdate, jtime, Met_Data%SOIM1)
 
@@ -1068,7 +1069,8 @@ C-------------------------------- Calculated Variables -------------------------
          Met_Data%THETAV = BUFF3D * ( P0 / Met_Data%PRES ) ** 0.286
 
 #ifdef mpas
-         Met_Data%MOL = 1./g2ddata(:,:,rmol_ind)
+!        Met_Data%MOL = 1./g2ddata(:,:,rmol_ind)
+         call coupler_data_retrieving ('rmol', Met_Data%MOL)   ! divided by 1.0 is done in data preparation step
 #endif
 
 C------  Updating MOL, then WSTAR, MOLI, HOL 

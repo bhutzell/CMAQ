@@ -63,6 +63,7 @@ C                         related to ZSTATIC
 C     05 June 2019 F. Sidi: Bugfix related to Parallel I/O Implementation
 C     05 Aug  2019 D. Wong: Removed USE BMATVEC_MODULE statement and PTBILIIN
 C     19 Sep  2019 D. Wong: Fixed the way to advance to next day on an emission file, DESID_STREAM_DATE
+C     10 Jan  2024 D. Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE UDTYPES, ONLY: RARRY1
@@ -181,6 +182,8 @@ C Local Variables:
          INTEGER :: GXOFF, GYOFF
          INTEGER :: STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC
 
+         CHARACTER( 16 ) :: LAYER_FILE = 'LAYER_FILE'
+
          INTERFACE
             SUBROUTINE DELTA_ZS( DESID_LAYS, MY_NSRC, SRC_MAP, STKHT, ZF, ZSTK, DDZF )
                INTEGER, INTENT( IN )  :: DESID_LAYS, MY_NSRC
@@ -284,6 +287,17 @@ C get scenario timing
 
 C open met files
 
+#ifdef twoway
+         IF ( .NOT. OPEN3( LAYER_FILE, FSREAD3, PNAME ) ) THEN
+            XMSG = 'Could not open '// LAYER_FILE
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+         END IF
+
+         IF ( .NOT. DESC3( LAYER_FILE ) ) THEN
+            XMSG = 'Could not get description of file LAYER_FILE'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+         END IF
+#else
          MC2NAME = PROMPTMFILE( 'Enter name for CROSS-POINT SURFACE MET file',
      &                          FSREAD3, 'MET_CRO_2D', PNAME )
 
@@ -338,6 +352,7 @@ C (declared and stored in PTBILIN module)
             METDXORIG = XORIG3D
             METDYORIG = YORIG3D
          END IF
+#endif
 
 C Compare number of meteorology layers to number of emissions layers
 !         IF ( DESID_LAYS .LE. NLAYS ) THEN
@@ -876,7 +891,8 @@ C=======================================================================
 
 C-----------------------------------------------------------------------
 
-      USE VGRD_DEFN, ONLY : VGTOP_GD
+      USE VGRD_DEFN, ONLY : VGTOP_GD, nlays
+      USE HGRD_DEFN, ONLY : ncols
       USE STK_EMIS, ONLY : FIREVAR, FIREFLAG
 #ifdef mpas
       USE STK_PRMS, ONLY : MY_STRT_SRC, MY_END_SRC, MY_NSRC, SOURCE, my_nsrc_pressure, my_nsrc_mesh_index
@@ -939,6 +955,7 @@ C Includes:
       REAL    :: DELZ, DELFH
       REAL, ALLOCATABLE, SAVE :: TV( : )   ! Virtual temperature
       REAL, ALLOCATABLE, SAVE :: TF( : )   ! Full-layer height temperatures
+      REAL, ALLOCATABLE, SAVE :: temp_data( :,:,: )
       real, allocatable :: tdata(:)
       LOGICAL :: DETERMINED
       REAL    :: THV1
@@ -1026,6 +1043,7 @@ C Includes:
        IF (.NOT. ALLOCATED(TV)) THEN
           ALLOCATE (TV(DESID_LAYS),
      &              TF(DESID_LAYS),
+     &              temp_data(ncols, 1, nlays),
      &              STAT=STAT)
        END IF
 #endif
@@ -1096,7 +1114,7 @@ C Get pressures: Use SIGMA values and surface pres. p=sigma*(psfc-ptop)+ptop
             END DO
          END IF
 
-         P_D( N )%WSPD = g3ddata(my_nsrc_mesh_index(s, n),1,:,wspd_ind)
+         P_D( N )%WSPD = coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,:,wspd_loc,1)
 
          P_D( N )%DDZF( 1,S ) = 1.0 / P_D( N )%ZF( 1,S )
          DO L = 2, DESID_LAYS
@@ -1104,28 +1122,33 @@ C Get pressures: Use SIGMA values and surface pres. p=sigma*(psfc-ptop)+ptop
          END DO
 
          IF ( FIREFLAG( N ) ) THEN
-            TSTK = g2ddata(my_nsrc_mesh_index(s, n),1,temp2_ind)
+            call coupler_data_retrieving ('TEMP2', temp_data(:,1,1))
+            TSTK = temp_data(my_nsrc_mesh_index(s, n),1,1)
             WSTK = P_D( N )%WSPD (1)
          ELSE
             m = MAX( 1, LSTK - DEG - 1 )
-            TSTK = g3ddata(my_nsrc_mesh_index(s, n),1,m,temp_ind)
+            TSTK = coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,m,temp_loc,1)
             WSTK = P_D( N )%WSPD (m)
          END IF
 
          DO L = 1, DESID_LAYS
             TV( L ) = P_D( N )%TA( L,S ) * ( 1.0 + 0.622 *
-     &                (   g3ddata(my_nsrc_mesh_index(s, n),1,L,qv_ind)
-     &                  / ( 1.0 + g3ddata(my_nsrc_mesh_index(s, n),1,L,qv_ind) ) ) )
+     &                (   coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,qv_loc,1)
+     &                  / ( 1.0 + coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,qv_loc,1) ) ) )
          END DO
 
          DO L = 1, DESID_LAYS - 1
-            DELZ  = g3ddata(my_nsrc_mesh_index(s, n),1,L+1,zh_ind) - g3ddata(my_nsrc_mesh_index(s, n),1,L,zh_ind)
-            DELFH = g3ddata(my_nsrc_mesh_index(s, n),1,L,zf_ind) - g3ddata(my_nsrc_mesh_index(s, n),1,L,zh_ind)
+            DELZ  =  coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L+1,zh_loc,1)
+     &             - coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zh_loc,1)
+            DELFH =  coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zf_loc,1)
+     &             - coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zh_loc,1)
             TF( L ) = TV( L ) + ( TV( L+1 ) - TV( L ) ) * DELFH / DELZ
          END DO
          L = DESID_LAYS
-         DELZ  = g3ddata(my_nsrc_mesh_index(s, n),1,L,zh_ind) - g3ddata(my_nsrc_mesh_index(s, n),1,L-1,zh_ind)
-         DELFH = g3ddata(my_nsrc_mesh_index(s, n),1,L,zf_ind) - g3ddata(my_nsrc_mesh_index(s, n),1,L,zh_ind)
+         DELZ  =  coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zh_loc,1)
+     &          - coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L-1,zh_loc,1)
+         DELFH =  coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zf_loc,1)
+     &          - coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zh_loc,1)
          TF( L ) = TV( L ) + ( TV( L ) - TV( L-1 ) ) * DELFH / DELZ
 
          THV1  = TF( 1 ) * ( 1000.0 / P_D( N )%PRESF( 1 ) ) ** 0.286

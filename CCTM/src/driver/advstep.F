@@ -98,6 +98,7 @@ C                      to updates in Centralized I/O
 C   10 Feb 20 D. Wong: Updated sync step calculation to include input 
 C                      meterology temporal frequency, to allow running with
 C                      finer temporal scale.
+C   10 Jan 24 D. Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -223,6 +224,7 @@ C-----------------------------------------------------------------------
 
 C Check file data against COORD.EXT
 
+#ifndef twoway
          IF ( ABS( FILE_XCELL(F_MET) - XCELL_GD ) .GT. TOL .OR.
      &        ABS( FILE_YCELL(F_MET) - YCELL_GD ) .GT. TOL      ) THEN
             WRITE( LOGDEV,* ) 'XCELL3D, XCELL_GD, YCELL3D, YCELL_GD: '
@@ -230,6 +232,7 @@ C Check file data against COORD.EXT
             XMSG = 'File grid sizes do not match CTM domain definition'
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
          END IF
+#endif
 
 C Get cell size in meters (from COORD.EXT)
 

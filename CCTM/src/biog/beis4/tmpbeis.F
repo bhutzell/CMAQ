@@ -60,6 +60,7 @@ C  07 Nov 14 J.Bash: Updated for the ASX_DATA_MOD shared data module.
 C  12 Aug 15 D.Wong: Replaced MYPE with IO_PE_INCLUSIVE for parallel I/O implementation
 C  07 May 18 D. Schwede: Removed call to CZANGLE. COSZEN now calculated in ASX_DATA_MOD
 C  01 Feb 19 D. Wong: Implemented centralized I/O approach, removed all MY_N clauses
+C  10 Jan 24 D. Wong: Removed unneeded variables
 C-----------------------------------------------------------------------
 C Modified from:
  
@@ -134,9 +135,9 @@ C BEIS3 internal, output species:
 C Logical names and unit numbers:
             
       CHARACTER( 16 ), SAVE :: SNAME   ! logical name for diagnostic emis output (mass)
-      CHARACTER( 16 ), SAVE :: NNAME   ! logical name for normalized-emissions input
-      CHARACTER( 16 ), SAVE :: GNAME   ! logical name for GRID_CRO_2D
-      CHARACTER( 16 ), SAVE :: BNAME   ! logical name for frost switch input
+!     CHARACTER( 16 ), SAVE :: NNAME   ! logical name for normalized-emissions input
+!     CHARACTER( 16 ), SAVE :: GNAME   ! logical name for GRID_CRO_2D
+!     CHARACTER( 16 ), SAVE :: BNAME   ! logical name for frost switch input
       CHARACTER( 16 ), SAVE :: MNAME   ! logical name for MET_CRO_2D
 
 C Other variables:
@@ -198,9 +199,10 @@ C Allocate seasonality array
 
 #ifndef mpas
 C Ensure met data time and grid for this run match beis emissions data files
-         MNAME = PROMPTMFILE( 
-     &           'Enter name for gridded met input file',
-     &           FSREAD3, 'MET_CRO_2D', PNAME )
+         MNAME = 'MET_CRO_2D'
+!        MNAME = PROMPTMFILE( 
+!    &           'Enter name for gridded met input file',
+!    &           FSREAD3, 'MET_CRO_2D', PNAME )
 
 C Get description of met file 
          IF ( .NOT. DESC3( MNAME ) ) THEN

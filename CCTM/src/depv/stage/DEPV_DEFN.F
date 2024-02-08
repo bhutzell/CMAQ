@@ -49,6 +49,8 @@ C                          parallel I/O implementation
 C                        Added a block of code to let non I/O processors to
 C                          open CTM_DEPV_DIAG in parallel I/O implementation
 C   Feb 2019 D. Wong:    removed all MY_N clauses
+C   Jan 2024 D. Wong:    removed all STRT* and END* variables which are not being
+C                        used in the offline and WRF-CMAQ model
 C-------------------------------------------------------------------------------
       USE RUNTIME_VARS
       USE CGRID_SPCS, ONLY : N_SPC_DEPV
@@ -83,8 +85,8 @@ C flag for diagnostic DEPV file
 
       INTEGER :: GXOFF, GYOFF              ! global origin offset from file
 C for INTERPX
-      INTEGER, SAVE :: STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2
-      INTEGER, SAVE :: STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3
+!     INTEGER, SAVE :: STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2
+!     INTEGER, SAVE :: STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3
 
       REAL,    ALLOCATABLE, SAVE :: UCROSS( :,:,:)
       REAL,    ALLOCATABLE, SAVE :: VCROSS( :,:,:)
@@ -180,10 +182,10 @@ C set dry dep conversion factor (done here so that vdiff doesn`t need the includ
             DD_CONV( S ) = CNVTD * TR_MOLWT( TR_DEPV_MAP( V ) )
          END DO
 
-         CALL SUBHFILE ( MET_CRO_2D, GXOFF, GYOFF,
-     &                   STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2 )
-         CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
-     &                   STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )                       
+!        CALL SUBHFILE ( MET_CRO_2D, GXOFF, GYOFF,
+!    &                   STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2 )
+!        CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
+!    &                   STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )                       
 
          INIT_GAS_DV:
      &   IF ( N_GAS_DEPV .GT. 0 ) THEN

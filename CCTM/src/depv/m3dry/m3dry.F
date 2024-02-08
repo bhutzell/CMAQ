@@ -1,4 +1,3 @@
-
 !------------------------------------------------------------------------!
 !  The Community Multiscale Air Quality (CMAQ) system software is in     !
 !  continuous development by various groups and is based on information  !
@@ -147,6 +146,7 @@ C            June 2018  revised for v5.3 - removed mosaic, new epic-bidi - j ple
 C          01 Feb 2019  D. Wong: Implemented centralized I/O approach, removed all MY_N clauses
 C          12 Dec 2019  S.L.Napelenok: update for cmaq 5.3.1
 C          August 2020  J Pleim: corrected TSTEP to be DTSEC. Corrects NH3 bidi emis, dep outputs
+C          10 Jan 2024  D. Wong: Incorporated unified coupler implmentation
 C-------------------------------------------------------------------------------
 
       USE RUNTIME_VARS
@@ -169,6 +169,7 @@ C-------------------------------------------------------------------------------
       Use HGSIM
 #ifdef twoway
       USE twoway_data_module, only : num_land_cat
+      USE coupler_module, only : coupled_model_xcent, coupled_model_ycent
 #endif
       Use CENTRALIZED_IO_MODULE, only : WR_AVAIL
 
@@ -309,9 +310,12 @@ C-------------------------------------------------------------------------------
             END IF
          END DO
 
-#ifdef mpas
+#if defined(mpas)
          xcent = 0.0
          ycent = 0.0
+#elif defined(twoway)
+         xcent = coupled_model_xcent
+         ycent = coupled_model_ycent
 #else
          IF ( .NOT. desc3( met_cro_2d ) ) THEN
             xmsg = 'Could not get  met_cro_2d  file description'

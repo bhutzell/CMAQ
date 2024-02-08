@@ -23,14 +23,15 @@ SUBROUTINE feedback_setup ( jdate, jtime, tstep )
 !           26 Jul 2022  (David Wong)
 !              -- Added a prefix tw_ for these variables: sc, ec, sr, er sc_d, ec_d, 
 !                 sr_d, and er_d to avoid naming conflicts
+!           10 Jan 2024  (David Wong)
+!              --  Incorporated unified coupler implmentation
 !===============================================================================
 
   USE twoway_header_data_module
-  USE twoway_met_param_module
   USE twoway_data_module
   USE twoway_util_module
-  USE twoway_cgrid_aerosol_spc_map_module
   USE aero_data
+  USE coupler_module
 
   use cgrid_spcs
 
@@ -42,106 +43,76 @@ SUBROUTINE feedback_setup ( jdate, jtime, tstep )
 
   CHARACTER (LEN = 16), PARAMETER :: pname = 'feedback_setup  '
 
-  CHARACTER (LEN = 16) :: feedback_fname
+  integer :: i, j, k, n, stat, slen
+  logical :: found
 
-    integer :: i, j, k, n, stat, slen
-    logical :: found
+  allocate (cmaq_wrf_c_send_to(0:9, 0:twoway_nprocs-1),              &
+            cmaq_wrf_c_recv_from(0:9, 0:twoway_nprocs-1),            &
+            cmaq_wrf_c_send_index_g(9*3, 2, 0:twoway_nprocs-1),      &   ! starting and ending dimension, dimenionality
+            cmaq_wrf_c_send_index_l(9*3, 2, 0:twoway_nprocs-1),      &   ! starting and ending dimension, dimenionality
+            cmaq_wrf_c_recv_index_g(9*3, 2, 0:twoway_nprocs-1),      &   ! starting and ending dimension, dimenionality
+            cmaq_wrf_c_recv_index_l(9*3, 2, 0:twoway_nprocs-1),      &   ! starting and ending dimension, dimenionality
+            stat=stat) 
+  if (stat .ne. 0) then
+     print *, ' Error: Allocating communication indices arrays'
+     stop
+  end if
 
-    character (len = 4), save :: pe_str
-
-       allocate (cmaq_wrf_c_send_to(0:9, 0:twoway_nprocs-1),              &
-                 cmaq_wrf_c_recv_from(0:9, 0:twoway_nprocs-1),            &
-                 cmaq_wrf_c_send_index_g(9*3, 2, 0:twoway_nprocs-1),      &   ! starting and ending dimension, dimenionality
-                 cmaq_wrf_c_send_index_l(9*3, 2, 0:twoway_nprocs-1),      &   ! starting and ending dimension, dimenionality
-                 cmaq_wrf_c_recv_index_g(9*3, 2, 0:twoway_nprocs-1),      &   ! starting and ending dimension, dimenionality
-                 cmaq_wrf_c_recv_index_l(9*3, 2, 0:twoway_nprocs-1),      &   ! starting and ending dimension, dimenionality
-                 stat=stat) 
-       if (stat .ne. 0) then
-          print *, ' Error: Allocating communication indices arrays'
-          stop
-       end if
-
-       cmaq_wrf_c_send_to = wrf_cmaq_c_recv_from
-       cmaq_wrf_c_recv_from = wrf_cmaq_c_send_to
-       cmaq_wrf_c_send_index_l = wrf_cmaq_c_recv_index_l
-       cmaq_wrf_c_recv_index_l = wrf_cmaq_c_send_index_l
-
-       write (pe_str, 11) '_', twoway_mype
- 11    format (a1, i3.3)
-
-       feedback_fname = 'feed_back' // pe_str
-
-       call aq_set_ioapi_header ('C', ioapi_header%ncols, ioapi_header%nrows)
-
-       xorig3d = ioapi_header%xorig - ioapi_header%xcell
-       yorig3d = ioapi_header%yorig - ioapi_header%ycell
-       nlays3d = ioapi_header%nlays
-       nvars3d = n_feedback_var
-       vname3d(1:nvars3d) = feedback_vlist
-       units3d(1:nvars3d) = ''
-       tstep3d = tstep
-       vtype3d(1:nvars3d) = ioapi_header%vtype
-
-       sdate3d = jdate
-       stime3d = jtime
-
-       if ( .not. open3 (feedback_fname, FSRDWR3, pname) ) then
-          print *, ' Error: Could not open file ', trim(feedback_fname), 'for update'
-          if ( .not. open3 (feedback_fname, FSNEW3, pname) ) then
-             print *, ' Error: Could not open file ', trim(feedback_fname)
-          end if
-       end if
+  cmaq_wrf_c_send_to = wrf_cmaq_c_recv_from
+  cmaq_wrf_c_recv_from = wrf_cmaq_c_send_to
+  cmaq_wrf_c_send_index_l = wrf_cmaq_c_recv_index_l
+  cmaq_wrf_c_recv_index_l = wrf_cmaq_c_send_index_l
 
 ! The water soluble and insoluble lists are actually used to differentiate between two
 ! refractive index values. They do not necessarily align completely with water soluble
 ! and insoluble species. The detemrination for what goes into each list is from the 
 ! AERO_DATA table, column "OptSurr". Species with "solute" in this column will be in the
 ! ws_spc_index list and species with "dust" will be in the wi_spc_index list.
-       allocate (ws_spc_index(n_ae_spc, n_mode),     &
-                 wi_spc_index(n_ae_spc, n_mode),     &
-                 stat=stat)
+  allocate (ws_spc_index(n_ae_spc, n_mode),     &
+            wi_spc_index(n_ae_spc, n_mode),     &
+            stat=stat)
 
 ! to create water soluble and insoluble list
-       num_ws_spc = 0
-       num_wi_spc = 0
-       ws_spc_index = 0
-       wi_spc_index = 0
-       do i = 1, n_ae_spc
-          slen = len(trim(ae_spc(i)))
-          if ((ae_spc(i) .ne. 'AECI') .and.       &   ! skip species that will be
-              (ae_spc(i) .ne. 'AECJ') .and.       &   ! considered later in EC,
-              (ae_spc(i) .ne. 'ANAJ') .and.       &   ! sea salt and H2O catergories
-              (ae_spc(i) .ne. 'ACLJ') .and.       &
-              (ae_spc(i) .ne. 'ACLK') .and.       &
-              (ae_spc(i) .ne. 'ASO4K') .and.      &
-              (ae_spc(i) .ne. 'ASEACATK') .and.    &
-              (ae_spc(i) .ne. 'AH2OI') .and.      &
-              (ae_spc(i) .ne. 'AH2OJ') .and.      &
-              (ae_spc(i) .ne. 'AH2OK') .and.      &
-              (ae_spc(i)(slen:slen) .ne. 'K')) then   ! not consider K mode ANH4K and ANO3K
-             found = .false.
-             k = 0
-             do while ((.not. found) .and. (k .lt. n_aerospc))
-               k = k + 1
-               n = 0
-               do while ((.not. found) .and. (n .lt. n_mode))
-                  n = n + 1
-                  if (aerospc(k)%name(n) .eq. ae_spc(i)) then
-                     found = .true.
-                  end if
-               end do
-             end do
-             if (found) then
-                if (aerospc(k)%optic_surr .eq. 'SOLUTE') then
-                   num_ws_spc(n) = num_ws_spc(n) + 1
-                   ws_spc_index(num_ws_spc(n), n) = i
-                else if (aerospc(k)%optic_surr .eq. 'DUST') then
-                   num_wi_spc(n) = num_wi_spc(n) + 1
-                   wi_spc_index(num_wi_spc(n), n) = i
-                end if 
+  num_ws_spc = 0
+  num_wi_spc = 0
+  ws_spc_index = 0
+  wi_spc_index = 0
+  do i = 1, n_ae_spc
+     slen = len(trim(ae_spc(i)))
+     if ((ae_spc(i) .ne. 'AECI') .and.       &   ! skip species that will be
+         (ae_spc(i) .ne. 'AECJ') .and.       &   ! considered later in EC,
+         (ae_spc(i) .ne. 'ANAJ') .and.       &   ! sea salt and H2O catergories
+         (ae_spc(i) .ne. 'ACLJ') .and.       &
+         (ae_spc(i) .ne. 'ACLK') .and.       &
+         (ae_spc(i) .ne. 'ASO4K') .and.      &
+         (ae_spc(i) .ne. 'ASEACATK') .and.    &
+         (ae_spc(i) .ne. 'AH2OI') .and.      &
+         (ae_spc(i) .ne. 'AH2OJ') .and.      &
+    (ae_spc(i) .ne. 'AH2OK') .and.      &
+    (ae_spc(i)(slen:slen) .ne. 'K')) then   ! not consider K mode ANH4K and ANO3K
+        found = .false.
+        k = 0
+        do while ((.not. found) .and. (k .lt. n_aerospc))
+          k = k + 1
+          n = 0
+          do while ((.not. found) .and. (n .lt. n_mode))
+             n = n + 1
+             if (aerospc(k)%name(n) .eq. ae_spc(i)) then
+                found = .true.
              end if
-          end if
-       end do
+          end do
+        end do
+        if (found) then
+           if (aerospc(k)%optic_surr .eq. 'SOLUTE') then
+              num_ws_spc(n) = num_ws_spc(n) + 1
+              ws_spc_index(num_ws_spc(n), n) = i
+           else if (aerospc(k)%optic_surr .eq. 'DUST') then
+              num_wi_spc(n) = num_wi_spc(n) + 1
+              wi_spc_index(num_wi_spc(n), n) = i
+           end if 
+        end if
+     end if
+  end do
 
 END SUBROUTINE feedback_setup
 
@@ -155,20 +126,17 @@ SUBROUTINE feedback_write ( c, r, l, cgrid, o3_value, jdate, jtime )
 !           22 Nov 2016  Constructed water soluble and insoluble list dynamically
 !                        based on a given chemical mechanism and AE scheme
 !           12 Mar 2019  Implemented centralized I/O approach
+!           10 Jan 2024  Incorporated unified coupler implmentation (David Wong)
 !===============================================================================
-
-! SUBROUTINE feedback_write ( c, r, l, cgrid, o3_value, aeromode_lnsg, &
-!                             aeromode_diam, jdate, jtime )
 
   USE HGRD_DEFN
   USE aero_data
   USE UTILIO_DEFN
   USE twoway_header_data_module
-  USE twoway_met_param_module
   USE twoway_data_module
   USE twoway_util_module
-  USE twoway_cgrid_aerosol_spc_map_module
   Use CENTRALIZED_IO_MODULE, only : interpolate_var
+  Use coupler_module
 
   use utilio_defn
   use cgrid_spcs
@@ -212,39 +180,34 @@ SUBROUTINE feedback_write ( c, r, l, cgrid, o3_value, jdate, jtime )
 
   IF ( firstime ) THEN
 
-     write (pe_str, 11) '_', twoway_mype
- 11  format (a1, i3.3)
-
-     feedback_fname = 'feed_back' // pe_str
-
-     nlays = ioapi_header%nlays
+     nlays = coupler_a2m_nlays
 
 ! feedback_vlist defines the feedback variable list (twoway_cgrid_aerosol_spc_map_module.F90)
 ! the first 22 variables are for direct aerosol effect.
-     allocate ( feedback_data_cmaq (cmaq_c_ncols, cmaq_c_nrows, nlays, n_feedback_var), stat=stat)
+     allocate ( feedback_data_cmaq (cmaq_c_ncols, cmaq_c_nrows, nlays, n_cmaq_dfb_vars), stat=stat)
 
      allocate (dens( NCOLS, NROWS, nlays ), stat=stat)
 
 ! begin: this is for indirect effect only, temporary blocked
-     if (indirect_effect) then
-        inumatkn = index1('NUMATKN', n_ae_spc, ae_spc) + n_gc_spcd
-        inumacc  = index1('NUMACC', n_ae_spc, ae_spc) + n_gc_spcd
-        inumcor  = index1('NUMCOR', n_ae_spc, ae_spc) + n_gc_spcd
+!    if (indirect_effect) then
+!       inumatkn = index1('NUMATKN', n_ae_spc, ae_spc) + n_gc_spcd
+!       inumacc  = index1('NUMACC', n_ae_spc, ae_spc) + n_gc_spcd
+!       inumcor  = index1('NUMCOR', n_ae_spc, ae_spc) + n_gc_spcd
 
-        do i = 1, num_twoway_ae_cmaq_spc
-           twoway_ae_cmaq_spc_name_index(i)  = index1 (twoway_ae_cmaq_spc_name(i), n_ae_spc, ae_spc) + n_gc_spcd
-           if (twoway_ae_cmaq_spc_name_index(i) == n_gc_spcd) then   ! species not found
-              print *, ' Warning: AE species ', trim(twoway_ae_cmaq_spc_name(i)), ' is not on the list'
-           end if
-        end do
+!       do i = 1, num_twoway_ae_cmaq_spc
+!          twoway_ae_cmaq_spc_name_index(i)  = index1 (twoway_ae_cmaq_spc_name(i), n_ae_spc, ae_spc) + n_gc_spcd
+!          if (twoway_ae_cmaq_spc_name_index(i) == n_gc_spcd) then   ! species not found
+!             print *, ' Warning: AE species ', trim(twoway_ae_cmaq_spc_name(i)), ' is not on the list'
+!          end if
+!       end do
 
-        do i = 1, num_twoway_ae_cmaq_spc_other
-           twoway_ae_cmaq_spc_name_other_index(i)  = index1 (twoway_ae_cmaq_spc_name_other(i), n_ae_spc, ae_spc) + n_gc_spcd
-           if (twoway_ae_cmaq_spc_name_other_index(i) == n_gc_spcd) then   ! species not found
-              print *, ' Warning: AE species ', trim(twoway_ae_cmaq_spc_name_other(i)), ' is not on the list'
-           end if
-        end do
-     end if
+!       do i = 1, num_twoway_ae_cmaq_spc_other
+!          twoway_ae_cmaq_spc_name_other_index(i)  = index1 (twoway_ae_cmaq_spc_name_other(i), n_ae_spc, ae_spc) + n_gc_spcd
+!          if (twoway_ae_cmaq_spc_name_other_index(i) == n_gc_spcd) then   ! species not found
+!             print *, ' Warning: AE species ', trim(twoway_ae_cmaq_spc_name_other(i)), ' is not on the list'
+!          end if
+!       end do
+!    end if
 ! end: this is for indirect effect only, temporary blocked
 
      do j = 1, n_mode
@@ -295,8 +258,6 @@ SUBROUTINE feedback_write ( c, r, l, cgrid, o3_value, jdate, jtime )
            h2o_spc_index(i) = h2o_spc_index(i) + n_gc_spcd
         end if
      end do
-
-     CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF, STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )
 
      firstime = .false.
 
@@ -407,10 +368,6 @@ SUBROUTINE feedback_write ( c, r, l, cgrid, o3_value, jdate, jtime )
  
         call interpolate_var ('DENS', jdate, jtime, dens)
  
-        if ( .not. open3 (feedback_fname, FSRDWR3, pname) ) then
-           print *, ' Error: Could not open file ', feedback_fname, 'for update'
-        end if
-
 ! begin: this is for indirect effect only, temporary blocked
 !       if (indirect_effect) then
 !          do k = 1, size(feedback_data_cmaq,3)
@@ -425,10 +382,9 @@ SUBROUTINE feedback_write ( c, r, l, cgrid, o3_value, jdate, jtime )
 !       end if
 ! end: this is for indirect effect only, temporary blocked
 
-        if ( .not. buf_write3 (feedback_fname, allvar3, jdate, jtime, feedback_data_cmaq) ) then
-           print *, ' Error: Could not write to file ', trim(feedback_fname), jdate, jtime
-           stop
-        end if
+        do s = 1, n_cmaq_dfb_vars
+           call coupler_data_storing (cmaq_dfb_vlist(s), feedback_data_cmaq(:,:,:,s))
+        end do
 
      end if
 
@@ -448,16 +404,17 @@ SUBROUTINE feedback_read (grid, jdate, jtime)
 !           08 Sep 2022  (David Wong)
 !              -- fixed a bug that caused by changed value of NLAYS3D in the
 !                 subsequent time step
+!           10 Jan 2024  (David Wong)
+!              --  Incorporated unified coupler implmentation
 !===============================================================================
 
   USE module_domain           ! WRF module
   USE module_state_description
 
   USE twoway_data_module
-  USE twoway_met_param_module
-  USE twoway_cgrid_aerosol_spc_map_module
   USE SE_MODULES
   USE HGRD_DEFN
+  USE coupler_module
 
   use utilio_defn
 
@@ -475,7 +432,7 @@ SUBROUTINE feedback_read (grid, jdate, jtime)
   integer :: stat, l, c, r, s, d, e
 
   integer, save :: tstep = 0
-  integer, save :: o3
+  integer, save :: loc_nlays
 
   real, allocatable, save :: feedback_data_wrf (:,:,:,:)
   real, allocatable, save :: feedback_data_cmaq (:,:,:,:)
@@ -487,29 +444,12 @@ SUBROUTINE feedback_read (grid, jdate, jtime)
 
   character (len = 4), save :: pe_str
 
-  integer, save :: loc_nlays
-
   tstep = tstep + 1
 
   if (firstime) then
 
-     write (pe_str, 11) '_', twoway_mype
- 11  format (a1, i3.3)
-
-     feedback_fname = 'feed_back' // pe_str
-
-     if ( .not. open3 (feedback_fname, FSREAD3, pname) ) then
-        print *, ' Error: Could not open file ', trim(feedback_fname), 'for reading'
-     end if
-
-     if ( .not. desc3 (feedback_fname) ) then
-        print *, ' Error: Could not get file descript of file ', trim(feedback_fname)
-     end if
-
-     o3 = 41
-
-     allocate ( feedback_data_wrf (wrf_c_ncols, wrf_c_nrows, nlays3d, nvars3d), stat=stat)
-     allocate ( feedback_data_cmaq (cmaq_c_ncols, cmaq_c_nrows, nlays3d, nvars3d), stat=stat)
+     allocate ( feedback_data_wrf (wrf_c_ncols, wrf_c_nrows, coupler_a2m_nlays, coupler_a2m_nvars), stat=stat)
+     allocate ( feedback_data_cmaq (cmaq_c_ncols, cmaq_c_nrows, coupler_a2m_nlays, coupler_a2m_nvars), stat=stat)
 
      if ((twoway_nprocs - mype) .le. npcol) then
         north_bndy_pe = .true.
@@ -527,16 +467,15 @@ SUBROUTINE feedback_read (grid, jdate, jtime)
         west_bndy_pe = .true.
      end if
 
-     loc_nlays = nlays3d
+     loc_nlays = coupler_a2m_nlays
 
      firstime = .false.
 
   end if
 
-  if ( .not. read3(feedback_fname, allvar3, allays3, jdate, jtime, feedback_data_cmaq) ) then
-     print *, ' Error: Could not read data from file ', trim(feedback_fname)
-     stop
-  end if
+  do s = 1, n_cmaq_dfb_vars
+     call coupler_data_retrieving (cmaq_dfb_vlist(s), feedback_data_cmaq(:,:,:,s))
+  end do
 
   feedback_data_wrf = 0.0
 

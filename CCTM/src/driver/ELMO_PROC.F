@@ -144,9 +144,10 @@
       END IF
       INST_ACTIVE = INSTANT
       AVRG_ACTIVE = AVERAGE
-      L_ELMO = ( INST_ACTIVE .OR. AVRG_ACTIVE )
 #ifdef mpas
       L_ELMO = .false.  
+#else
+      L_ELMO = ( INST_ACTIVE .OR. AVRG_ACTIVE )
 #endif
       
       IF ( .NOT. L_ELMO ) THEN

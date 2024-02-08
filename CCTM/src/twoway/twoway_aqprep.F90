@@ -113,6 +113,8 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 !                 sr_d, and er_d to avoid naming conflicts
 !           16 Mar 2023  (David Wong)
 !              -- fixed a bug in creating u and v components
+!           10 Jan 2024  (David Wong)
+!              --  Incorporated unified coupler implmentation
 !===============================================================================
 
   USE module_domain                                ! WRF module
@@ -123,10 +125,10 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
   USE twoway_util_module
   USE twoway_header_data_module
-  USE twoway_met_param_module
   USE twoway_data_module
   USE HGRD_DEFN
   USE SE_MODULES
+  USE coupler_module
 
   use se_comm_info_ext
   use utilio_defn
@@ -190,7 +192,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
   CHARACTER (LEN = 16), PARAMETER :: pname = 'aq_prep         '
 
-  CHARACTER (LEN = 16) :: fname, pfname
+  CHARACTER (LEN = 16) :: pfname
 
 ! Calc for PV
 
@@ -274,7 +276,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
     integer :: i, j, status(MPI_STATUS_SIZE)
     character (len = 50) :: myfmt
 
-!   character (len = 4), save :: pe_str
+    character (16) :: vname
 
     logical, parameter :: debug = .true.
 
@@ -457,6 +459,8 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
      cmaq_tstep = sec2time(grid%time_step*wrf_cmaq_freq)
 
+     coupled_model_tstep = cmaq_tstep
+
      jdate = sdate
      jtime = stime
 
@@ -600,6 +604,8 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
         end if
      end if
 
+     CALL coupler_init (cmaq_c_ncols, cmaq_c_nrows, nlays, config_flags%num_land_cat)
+
      if (config_flags%cu_physics == 0) then
         wrf_convective_scheme = .false.
      else
@@ -611,9 +617,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 ! only need to do this once per run, not each step
 !-------------------------------------------------------------------------------
 
-     if (wrf_cmaq_option .gt. 1) then
-        fname = 'GRID_CRO_2D'
-     end if
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         pfname = 'PGRID_CRO_2D'
      end if
@@ -644,14 +647,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
         allocate ( gridcro2d_data_wrf (wrf_c_ncols, wrf_c_nrows, nvars3d), stat=stat)
         allocate ( gridcro2d_data_cmaq (cmaq_c_ncols, cmaq_c_nrows, nvars3d), stat=stat)
 
-        if (wrf_cmaq_option .gt. 1) then
-           if ( .not. open3 (fname, FSRDWR3, pname) ) then
-              print *, ' Error: Could not open file ', fname, 'for update'
-              if ( .not. open3 (fname, FSNEW3, pname) ) then
-                 print *, ' Error: Could not open file ', fname
-              end if
-           end if
-        end if
         if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
            if (twoway_mype == 0) then
               ncols3d = cmaq_c_col_dim
@@ -697,6 +692,8 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
            print *, ' Warning: Unknow landuse type ', config_flags%mminlu, grid%num_land_cat
         end if
      end if
+
+     mminlu_wrf = mminlu
 
      allocate ( land_use_index (wrf_c_ncols, wrf_c_nrows), stat=stat)
      land_use_index = grid%lu_index (tw_sc:tw_ec, tw_sr:tw_er)
@@ -793,10 +790,14 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
                             wrf_cmaq_c_send_index_l, wrf_cmaq_c_recv_index_l, 1)
 
      if (wrf_cmaq_option .gt. 1) then
-        if ( .not. buf_write3 (fname, allvar3, jdate, jtime, gridcro2d_data_cmaq ) ) then
-           print *, ' Error: Could not write to file ', fname
-           stop
-        end if
+        do v = 1, n_gridcro2d_var
+           call coupler_data_storing (gridcro2d_vlist(v), gridcro2d_data_cmaq(:,:,v))
+        end do
+
+        do v = 1, numlu
+           write (vname, '(a7, i2.2)') 'LUFRAC_', v
+           call coupler_data_storing (vname, gridcro2d_data_cmaq(:,:,v+n_gridcro2d_var))
+        end do
      end if
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         if ( .not. write3 (pfname, allvar3, jdate, jtime, gridcro2d_data_cmaq ) ) then
@@ -814,9 +815,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
     ! factors that are readily available in WRF using four-point interpolation.
     !---------------------------------------------------------------------------
 
-     if (wrf_cmaq_option .gt. 1) then
-        fname = 'GRID_DOT_2D'
-     end if
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         pfname = 'PGRID_DOT_2D'
      end if
@@ -833,14 +831,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
         tstep3d = 0
         vtype3d = ioapi_header%vtype
 
-        if (wrf_cmaq_option .gt. 1) then
-           if ( .not. open3 (fname, FSRDWR3, pname) ) then
-              print *, ' Error: Could not open file ', fname, 'for update'
-              if ( .not. open3 (fname, FSNEW3, pname) ) then
-                 print *, ' Error: Could not open file ', fname
-              end if
-           end if
-        end if
         if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
            if (twoway_mype == 0) then
               ncols3d = cmaq_c_col_dim + 1
@@ -880,10 +870,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
                             wrf_cmaq_d_send_index_l, wrf_cmaq_d_recv_index_l, 2)
 
      if (wrf_cmaq_option .gt. 1) then
-        if ( .not. buf_write3 (fname, allvar3, jdate, jtime, griddot2d_data_cmaq ) ) then
-           print *, ' Error: Could not write to file ', fname
-           stop
-        end if
+        call coupler_data_storing ('MSFD2', griddot2d_data_cmaq)
      end if
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         tsc_d = 1
@@ -909,9 +896,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
   ENDIF  ! first
 
-  if (wrf_cmaq_option .gt. 1) then
-     fname = 'MET_CRO_3D'
-  end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      pfname = 'PMET_CRO_3D'
   end if
@@ -961,15 +945,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
            ter_e = ter_e + 1
         end if
 
-     end if
-
-     if (wrf_cmaq_option .gt. 1) then
-        if ( .not. open3 (fname, FSRDWR3, pname) ) then
-           print *, ' Error: Could not open file ', fname, 'for update'
-           if ( .not. open3 (fname, FSNEW3, pname) ) then
-              print *, ' Error: Could not open file ', fname
-           end if
-        end if
      end if
 
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
@@ -1425,10 +1400,9 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
                          wrf_cmaq_ce_send_index_l, wrf_cmaq_ce_recv_index_l, 3)
 
   if (wrf_cmaq_option .gt. 1) then
-     if ( .not. buf_write3 (fname, allvar3, jdate, jtime, metcro3d_data_cmaq ) ) then
-        print *, ' Error: Could not write to file ', fname
-        stop
-     end if
+     do v = 1, n_metcro3d_var
+        call coupler_data_storing (metcro3d_vlist(v), metcro3d_data_cmaq(:,:,:,v))
+     end do
   end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      if (mod(time2sec(jtime), file_time_step_in_sec) == 0) then
@@ -1444,9 +1418,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
 ! --------------------------
 
-  if (wrf_cmaq_option .gt. 1) then
-     fname = 'MET_DOT_3D'
-  end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      pfname = 'PMET_DOT_3D'
   end if
@@ -1478,15 +1449,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
            ter_d = cmaq_de_domain_map(3,2,twoway_mype) - 1
         else
            ter_d = cmaq_de_domain_map(3,2,twoway_mype) - 2
-        end if
-     end if
-
-     if (wrf_cmaq_option .gt. 1) then
-        if ( .not. open3 (fname, FSRDWR3, pname) ) then
-           print *, ' Error: Could not open file ', fname, 'for update'
-           if ( .not. open3 (fname, FSNEW3, pname) ) then
-              print *, ' Error: Could not open file ', fname
-           end if
         end if
      end if
 
@@ -1577,10 +1539,9 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
                          wrf_cmaq_de_send_index_l, wrf_cmaq_de_recv_index_l, 4)
 
   if (wrf_cmaq_option .gt. 1) then
-     if ( .not. buf_write3 (fname, allvar3, jdate, jtime, metdot3d_data_cmaq ) ) then
-       print *, ' Error: Could not write to file ', fname
-       stop
-     end if
+     do v = 1, n_metdot3d_var
+        call coupler_data_storing (metdot3d_vlist(v), metdot3d_data_cmaq(:,:,:,v))
+     end do
   end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      if (write_to_physical_file) then
@@ -1593,9 +1554,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
 ! ------------------
 
-  if (wrf_cmaq_option .gt. 1) then
-     fname = 'MET_CRO_2D'
-  end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      pfname = 'PMET_CRO_2D'
   end if
@@ -1622,15 +1580,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
                    stat=stat)
         temp_rainnc = 0.0
         temp_rainc  = 0.0
-     end if
-
-     if (wrf_cmaq_option .gt. 1) then
-        if ( .not. open3 (fname, FSRDWR3, pname) ) then
-           print *, ' Error: Could not open file ', fname, 'for update'
-           if ( .not. open3 (fname, FSNEW3, pname) ) then
-              print *, ' Error: Could not open file ', fname
-           end if
-        end if
      end if
 
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
@@ -1828,26 +1777,26 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
   end if
 
   if (wrf_cmaq_option .gt. 1) then
-     if ( .not. buf_write3 (fname, allvar3, jdate, jtime, metcro2d_data_cmaq ) ) then
-       print *, ' Error: Could not write to file ', fname
-       stop
-     end if
+     do v = 1, n_metcro2d_var
+        call coupler_data_storing (metcro2d_vlist(v), metcro2d_data_cmaq(:,:,v))
+     end do
   end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      if (write_to_physical_file) then
         do v = 1, n_metcro2d_var   
+           vname = metcro2d_vlist(v)
            if (v == 13) then
-              if ( .not. write3 (pfname, metcro2d_vlist(v), jdate, jtime, temp_rainnc(tsc_c:tec_c, tsr_c:ter_c) ) ) then
+              if ( .not. write3 (pfname, vname, jdate, jtime, temp_rainnc(tsc_c:tec_c, tsr_c:ter_c) ) ) then
                  print *, ' Error: Could not write to file ', pfname
                  stop
               end if
            else if (v == 14) then
-              if ( .not. write3 (pfname, metcro2d_vlist(v), jdate, jtime, temp_rainc(tsc_c:tec_c, tsr_c:ter_c) ) ) then
+              if ( .not. write3 (pfname, vname, jdate, jtime, temp_rainc(tsc_c:tec_c, tsr_c:ter_c) ) ) then
                  print *, ' Error: Could not write to file ', pfname
                  stop
               end if
            else
-              if ( .not. write3 (pfname, metcro2d_vlist(v), jdate, jtime, metcro2d_data_cmaq(tsc_c:tec_c, tsr_c:ter_c, v) ) ) then
+              if ( .not. write3 (pfname, vname, jdate, jtime, metcro2d_data_cmaq(tsc_c:tec_c, tsr_c:ter_c, v) ) ) then
                  print *, ' Error: Could not write to file ', pfname
                  stop
               end if

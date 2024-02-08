@@ -72,6 +72,7 @@ C 05 Mar 15 J.Pleim: correct layer thickness index off by 1
 C 15 Jul 15 J.Young: correct sub timestep calculation and apply Martin Otte`s
 C                    correction for the first-order upstream sedimentation
 C  1 Feb 19 David Wong: removed all MY_N clauses
+C 10 Jan 24 David Wong: renamed variable inv_cell_thickness to inv_cell_ht
 C-----------------------------------------------------------------------
 
       use cgrid_spcs          ! cgrd mechanism species
@@ -273,8 +274,8 @@ C subset all the layers and species in cgrid for this grid cell
 #endif
          do l = 1, nlays
 #ifdef mpas
-            rdl( l ) = alpha * Met_Data%rjacf( c,r,l ) * inv_cell_thickness(c, r, l)
-            rrhodz( l ) = Met_Data%rrhoj( c,r,l ) * inv_cell_thickness(c, r, l)
+            rdl( l ) = alpha * Met_Data%rjacf( c,r,l ) * inv_cell_ht(c, r, l)
+            rrhodz( l ) = Met_Data%rrhoj( c,r,l ) * inv_cell_ht(c, r, l)
 #else
             rdl( l ) = alpha * Met_Data%rjacf( c,r,l ) * Grid_Data%rdx3f( l )
             rrhodz( l ) = Met_Data%rrhoj( c,r,l ) * Grid_Data%rdx3f( l )

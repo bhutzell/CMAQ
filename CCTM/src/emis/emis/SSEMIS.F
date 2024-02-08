@@ -32,6 +32,7 @@ C   09 Dec 15 D.Wong: Open CTM_SSEMIS_1 file in a IO_PE_INCLUSIVE conditional bl
 C   24 Mar 16 G.Sarwar: updated to calculate NACL emissions (needed for BR2 emissions) 
 C   16 Aug 18 G. Sarwar: Removed NACL
 C    1 Feb 19 David Wong: removed all MY_N clauses
+C   10 Jan 24 David Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE HGRD_DEFN
@@ -582,7 +583,7 @@ C-----------------------------------------------------------------------
             USE AEROMET_DATA   ! Includes CONST.EXT
             USE ASX_DATA_MOD, ONLY: MET_DATA, GRID_DATA, svp2, svp3
 #ifdef mpas
-            use coupler_module, only : cell_vol, cell_thickness
+            use coupler_module, only : cell_vol, cell_ht
 #endif
 
             IMPLICIT NONE
@@ -720,7 +721,7 @@ C Initialize sea-salt output buffer
                      U10     = Met_Data%WSPD10     ( C,R )
                      SST     = max(Met_Data%TSEASFC( C,R ) - 273.15, 0.0 )
 #ifdef mpas
-                     RLAY1HT = Met_Data%RJACM ( C,R,1 ) / cell_thickness(C,1,1)
+                     RLAY1HT = Met_Data%RJACM ( C,R,1 ) / cell_ht(C,1,1)
 #else
                      RLAY1HT = Met_Data%RJACM ( C,R,1 ) / CELLHGT(c,r)
 #endif

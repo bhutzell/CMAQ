@@ -83,6 +83,7 @@ C SLN 12/30/2019 ddm-3d implementaiton for v 5.3.1
 C     10 Mar 2021 G. Sarwar: Changed CB6R3M_AE7_KMTBR to CB6R3M_AE7_AQ
 C     10 June 2021 G. Sarwar: Added CB6R5M_AE7_AQ
 C 23 Jun 21 G. Sarwar: Replaced CB6R3M with CB6R5M
+C 10 Jan 24 D. Wong: Incorporated unified coupler implmentation
 
 C References:
 C 1. Eddingsaas, N. C., Vandervelde, D. G., Wennberg, P. O., "Kinetics and
@@ -858,6 +859,10 @@ C-----------------------------------------------------------------------
       Use cgrid_spcs      ! CGRID mechanism species
       Use aeromet_data
       Use vdiff_data, only : n_spc_diff, diff_spc
+#ifdef mpas
+      Use util_module, only : index1
+#endif
+
       Implicit None
 
 C Local Variables:

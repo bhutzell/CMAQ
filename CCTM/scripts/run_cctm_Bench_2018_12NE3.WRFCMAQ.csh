@@ -353,15 +353,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set OPTfile = PHOT_OPTICS.dat
 
   #> MCIP meteorology files 
-  setenv GRID_BDY_2D BUFFERED  # GRID files are static, not day-specific
-  setenv GRID_CRO_2D BUFFERED
-  setenv GRID_CRO_3D BUFFERED
-  setenv GRID_DOT_2D BUFFERED
-  setenv MET_CRO_2D BUFFERED 
-  setenv MET_CRO_3D BUFFERED
-  setenv MET_DOT_3D BUFFERED
-  setenv MET_BDY_3D BUFFERED
-  #setenv LUFRAC_CRO BUFFERED
 
   #> Control Files
   #>
@@ -654,13 +645,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   if ($SD_TIME_SERIES == T) then
      setenv CTM_SD_TS "$OUTDIR/SD_TSfile_${CTM_APPL}.nc -v"
   endif
-  setenv     LAYER_FILE      MET_CRO_3D
-  @ n = 0
-  while ($n < $NPROCS)
-    set name = `printf "_%3.3d\n" $n`
-    setenv feed_back$name BUFFERED   # for feedback file
-    @ n++
-  end
+  setenv     LAYER_FILE      $ICpath/$ICFILE
 
   #> set floor file (neg concs)
   setenv FLOOR_FILE ${OUTDIR}/FLOOR_${CTM_APPL}.txt
