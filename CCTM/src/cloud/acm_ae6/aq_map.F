@@ -143,7 +143,8 @@ C Local Variables (scalars):
       REAL( 8 ), ALLOCATABLE, SAVE :: GASWDEP( : )    ! gas phase wet dep array (mm mol/liter)
       REAL( 8 ), ALLOCATABLE, SAVE :: AEROSOL( :, :)  ! aerosol conc (mol/mol)
       REAL( 8 ), ALLOCATABLE, SAVE :: AERWDEP( :, :)  ! aerosol wet dep array (mm mol/liter)
-      REAL( 8 ), ALLOCATABLE, SAVE :: WSRGAQ( : )     ! weights for surrogate
+      REAL( 8 ), ALLOCATABLE, SAVE :: WSRGAQ( : )     ! weights of each CGRID species in 
+                                                      !   its surrogate
       REAL( 8 ) :: FRACTR, FRACPOA, FRACPRI, FRACSOA
       INTEGER IAERI
 
@@ -247,21 +248,21 @@ C...Zero out concentrations
       AERWDEP = 0.0D0
       WSRGAQ  = 0.0D0
       
-      ! Initialize Gas and Aerosol Vectors at Background
-      DO ISPC = 1,N_CGRID_SPC
-        IAQ = MAP_CGRIDtoSRG( ISPC )
-        IF ( IAQ .GT. 0 ) THEN 
-          IF ( CGRID_MASK_GAS( ISPC ) .OR.
-     &         CGRID_MASK_NR( ISPC ) .OR.
-     &         CGRID_MASK_TRAC( ISPC ) ) THEN
-             GAS( IAQ ) = REAL( SRGGAS( IAQ )%BACKGND, 8 ) * 1.0D-6
-          ELSE IF ( CGRID_MASK_NUM( ISPC ) .OR.
-     &              CGRID_MASK_SRF( ISPC ) ) THEN
-             AEROSOL( IAQ,: ) = REAL( SRGAER( IAQ )%BACKGND * CTHK1 / AIRM, 8 )
+      ! Initialize Gas and Aerosol Vectors at Background 
+      DO IGAS = 1,N_AQ_GAS
+        IF ( N_AQSRG_GAS( IGAS ) .EQ. 0 ) THEN
+     &     GAS( IGAS ) = REAL( SRGGAS( IGAS )%BACKGND, 8 ) * 1.0D-6 ! [mol/molV]
+      END DO
 
-          ELSE IF ( CGRID_MASK_AERO( ISPC ) ) THEN
-             AEROSOL( IAQ,: ) = REAL( SRGAER( IAQ )%BACKGND * 1.0E-6 * CTHK1, 8 )
-     &                         / REAL( CGRID_MW( ISPC ) * AIRM, 8 )
+      DO IAER = 1,N_AQ_AER
+        DO IM = 1,N_MODE
+          IF ( N_AQSRG_AER( IAER, IM ) .EQ. 0 ) THEN
+            IF ( IAER .EQ. LNUM .OR. IAER .EQ. LSRF ) THEN
+               AEROSOL( IAER,: ) = REAL( SRGAER( IAER )%BACKGND 
+     &                                        * CTHK1 / AIRM, 8 ) ! [mol/molV]
+            ELSE
+               AEROSOL( IAER,: ) = REAL( SRGAER( IAER )%BACKGND * 1.0E-6 * CTHK1, 8 )
+     &                           / REAL( CGRID_MW( ISPC ) * AIRM, 8 )  ! [molmolV]
 
           END IF
         END IF
@@ -277,58 +278,55 @@ C...Zero out concentrations
 
       ! Load all Gas and Aerosol Concentrations
       DO ISPC = 1,N_CGRID_SPC
-        IAQ = MAP_CGRIDtoSRG( ISPC )
+        IAQ = MAP_CGRIDtoAQGAS( ISPC )
         IF ( IAQ .GT. 0 ) THEN 
+           GAS( IAQ ) = GAS( IAQ ) + REAL( POLC( ISPC ), 8 )
+#ifdef sens
+           DO NP = 1, NPMAX
+              S_GAS( NP, IAQ ) = S_GAS( NP, IAQ ) + S_POLC ( NP, ISPC )
+           ENDDO
+#endif
+        END IF
 
-          IF ( CGRID_MASK_GAS( ISPC ) .OR.
-     &         CGRID_MASK_NR( ISPC ) .OR.
-     &         CGRID_MASK_TRAC( ISPC ) ) THEN
-             GAS( IAQ ) = GAS( IAQ ) + REAL( POLC( ISPC ), 8 )
+        IAQ = MAP_CGRIDtoAQAERO( ISPC )
+        IF ( IAQ .GT. 0 ) THEN
+           IM = MAP_CGRIDtoAQMODE( ISPC )
+           AEROSOL( IAQ,IM ) = AEROSOL( IAQ,IM ) + REAL( POLC( ISPC ),8 )
 #ifdef sens
-             DO NP = 1, NPMAX
-                S_GAS( NP, IAQ ) = S_GAS( NP, IAQ ) + S_POLC ( NP, ISPC )
-             ENDDO
+           DO NP = 1, NPMAX
+              S_AEROSOL( NP, IAQ, IM ) = S_AEROSOL( NP, IAQ, IM ) + S_POLC( NP, ISPC )
+           ENDDO
 #endif
-          ELSE IF ( CGRID_MASK_AERO( ISPC ) ) THEN
-             IM = MAP_CGRIDtoSRGMODE( ISPC )
-             AEROSOL( IAQ,IM ) = AEROSOL( IAQ,IM ) + REAL( POLC( ISPC ),8 )
-#ifdef sens
-             DO NP = 1, NPMAX
-                S_AEROSOL( NP, IAQ, IM ) = S_AEROSOL( NP, IAQ, IM ) + S_POLC( NP, ISPC )
-             ENDDO
-#endif
-          END IF
         END IF
       END DO
 
       ! Now Calculate Surrogate Fractions
       DO ISPC = 1,N_CGRID_SPC
-        IAQ = MAP_CGRIDtoSRG( ISPC ) 
+        IAQ = MAP_CGRIDtoAQGAS( ISPC ) 
         IF ( IAQ .GT. 0 ) THEN 
-          IF ( CGRID_MASK_GAS( ISPC ) .OR.
-     &         CGRID_MASK_NR( ISPC ) .OR.
-     &         CGRID_MASK_TRAC( ISPC ) ) THEN
-             IF ( GAS( IAQ ) .GT. 0.0D0 ) THEN
-               WSRGAQ( ISPC ) = REAL( POLC( ISPC ), 8 ) / GAS( IAQ )
+           IF ( GAS( IAQ ) .GT. 0.0D0 ) THEN
+              WSRGAQ( ISPC ) = REAL( POLC( ISPC ), 8 ) / GAS( IAQ )
 #ifdef sens
-               DO NP = 1, NPMAX
-                  IF ( S_GAS( NP, IGAS ) .NE. 0.0D0 ) THEN
-                     S_WSRGAQ( NP, ISPC ) = S_POLC( NP,ISPC ) / S_GAS(NP,IGAS)
-                  ELSE
-                     S_WSRGAQ( NP, ISPC ) = 0.0D0
-                  END IF
-               END DO
+              DO NP = 1, NPMAX
+                 IF ( S_GAS( NP, IGAS ) .NE. 0.0D0 ) THEN
+                    S_WSRGAQ( NP, ISPC ) = S_POLC( NP,ISPC ) / S_GAS(NP,IGAS)
+                 ELSE
+                    S_WSRGAQ( NP, ISPC ) = 0.0D0
+                 END IF
+              END DO
 #endif
-             ELSE
-                WSRGAQ( ISPC ) = 1.0D0 / N_AQSRG_GAS( IAQ )
+           ELSE
+              WSRGAQ( ISPC ) = 1.0D0 / N_AQSRG_GAS( IAQ )
 #ifdef sens
-                DO NP = 1, NPMAX
-                  S_WSRGAQ( NP, ISPC ) = 0.0D0
-                END DO
+              DO NP = 1, NPMAX
+                S_WSRGAQ( NP, ISPC ) = 0.0D0
+              END DO
 #endif
-             END IF
+           END IF
+        END IF
 
-          ELSE IF ( CGRID_MASK_AERO( ISPC ) ) THEN
+        IAQ = MAP_CGRIDtoAQGAS( ISPC ) 
+        IF ( CGRID_MASK_AERO( ISPC ) ) THEN
              IM = MAP_CGRIDtoSRGMODE( ISPC )
              IF ( AEROSOL( IAER, IM ) .GT. 0.0D0 ) THEN
                 WSRGAQ( ISPC ) = REAL( POLC( ISPC ), 8 )
@@ -405,220 +403,10 @@ C...store the amount of hydrogen deposition
 #endif
 
 C...Now, re-apportion mass back into cend/remov (cgrid-type) array
-
-<<<<<<< HEAD
-      DO IGAS = 1, NGAS
-        DO ISRG = 1, NSRGGAS( IGAS )
-          PNTR = CGRID2AQ_MAP( LSRGGAS( IGAS, ISRG ) )
-          CEND ( PNTR ) = GAS    ( IGAS ) * WSRGGAS( IGAS, ISRG )
-          REMOV( PNTR ) = GASWDEP( IGAS ) * WSRGGAS( IGAS, ISRG )
-#ifdef sens
-          DO NP = 1, NPMAX
-            S_CEND ( NP, PNTR ) = S_GAS    ( NP, IGAS ) * WSRGGAS( IGAS, ISRG )
-            S_REMOV( NP, PNTR ) = S_GASWDEP( NP, IGAS ) * WSRGGAS( IGAS, ISRG )
-          ENDDO
-#endif
-        END DO
-      END DO
-
-      DO IAER = 1, NAER
-        DO IMODE = 1, NMODES
-	  
-	  IF(IAER .eq. LTRACER_ACC) THEN
-	     IAERI = LTRACER_AKN 
-          ELSE
-	     IAERI = IAER
-          END IF
-	  
-          IF( SRGAER( IAER )%NAME( IMODE ) .NE. ' ' ) THEN
-            DO ISRG = 1, NSRGAER( IAER, IMODE )
-              PNTR = CGRID2AQ_MAP( LSRGAER( IAER, IMODE, ISRG ) )
-              CEND ( PNTR ) = AEROSOL( IAER, IMODE ) * WSRGAER( IAER, IMODE, ISRG )
-              REMOV( PNTR ) = AERWDEP( IAER, IMODE ) * WSRGAER( IAER, IMODE, ISRG )
-#ifdef sens
-              DO NP = 1, NPMAX
-                S_CEND ( NP, PNTR ) = S_AEROSOL( NP, IAER, IMODE ) * WSRGAER( IAER, IMODE, ISRG )
-                S_REMOV( NP, PNTR ) = S_AERWDEP( NP, IAER, IMODE ) * WSRGAER( IAER, IMODE, ISRG )
-              ENDDO
-#endif
-
-	      IF( IMODE .EQ. 2 ) THEN
-			
-                 IF( IAER .EQ. LPOA ) THEN
-		    IF( AKNSRG( IAER,ISRG ) .GT. 0 ) THEN
-		       CEND ( PNTR ) = (1.d0 - FRACPOA) * AEROSOL( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACPOA * 
-     &                               AEROSOL( IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-     
-                       REMOV( PNTR ) = (1.d0 - FRACPOA) * AERWDEP( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACPOA * 
-     &                               AERWDEP( IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-#ifdef sens
-                       DO NP = 1, NPMAX
-                         S_CEND ( NP, PNTR ) = (1.d0 - FRACPOA) * S_AEROSOL( NP, IAER, IMODE ) *
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACPOA * 
-     &                               S_AEROSOL( NP, IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-     
-                         S_REMOV( NP, PNTR ) = (1.d0 - FRACPOA) * S_AERWDEP( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACPOA * 
-     &                               S_AERWDEP( NP, IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-                       ENDDO
-#endif
-                    ELSE
-		    
-		       CEND ( PNTR ) = (1.d0 - FRACPOA) * AEROSOL( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-     
-                       REMOV( PNTR ) = (1.d0 - FRACPOA) * AERWDEP( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-#ifdef sens
-                       DO NP = 1, NPMAX
-                         S_CEND ( NP, PNTR ) = (1.d0 - FRACPOA) * S_AEROSOL( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-     
-                         S_REMOV( NP, PNTR ) = (1.d0 - FRACPOA) * S_AERWDEP( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-                       END DO
-#endif
-		    END IF
-		    
-                 ELSE IF ( IAER .EQ. LPRI ) THEN
-		    IF(AKNSRG(IAER,ISRG) .GT. 0) THEN
-		       CEND ( PNTR ) = (1.d0 - FRACPRI) * AEROSOL( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACPRI * 
-     &                               AEROSOL( IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-     
-                       REMOV( PNTR ) = (1.d0 - FRACPRI) * AERWDEP( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACPRI * 
-     &                               AERWDEP( IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-#ifdef sens
-                       DO NP = 1, NPMAX
-                         S_CEND ( NP, PNTR ) = (1.d0 - FRACPRI) * S_AEROSOL( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACPRI * 
-     &                               S_AEROSOL( NP, IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-     
-                         S_REMOV( NP, PNTR ) = (1.d0 - FRACPRI) * S_AERWDEP( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACPRI * 
-     &                               S_AERWDEP( NP, IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-                       END DO
-#endif
-		    ELSE
-		    
-		       CEND ( PNTR ) = (1.d0 - FRACPRI) * AEROSOL( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-     
-                       REMOV( PNTR ) = (1.d0 - FRACPRI) * AERWDEP( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-#ifdef sens
-                       DO NP = 1, NPMAX
-                         S_CEND ( NP, PNTR ) = (1.d0 - FRACPRI) * S_AEROSOL( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-     
-                         S_REMOV( NP, PNTR ) = (1.d0 - FRACPRI) * S_AERWDEP( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG )                        
-                       END DO
-#endif
-		    END IF
-		   
-                 ELSE IF ( IAER .EQ. LTRACER_ACC ) THEN
-		    
-		    IF(AKNSRG(IAER,ISRG) .GT. 0) THEN
-		       CEND ( PNTR ) = (1.d0 - FRACTR) * AEROSOL( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACTR * 
-     &                               AEROSOL( IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-     
-                       REMOV( PNTR ) = (1.d0 - FRACTR) * AERWDEP( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACTR * 
-     &                               AERWDEP( IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-#ifdef sens
-                       DO NP = 1, NPMAX
-                         S_CEND ( NP, PNTR ) = (1.d0 - FRACTR) * S_AEROSOL( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACTR * 
-     &                               S_AEROSOL( NP,IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-     
-                         S_REMOV( NP, PNTR ) = (1.d0 - FRACTR) * S_AERWDEP( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACTR * 
-     &                               S_AERWDEP( NP, IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-                       END DO
-#endif     
-                    ELSE
-		    
-		       CEND ( PNTR ) = (1.d0 - FRACTR) * AEROSOL( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-     
-                       REMOV( PNTR ) = (1.d0 - FRACTR) * AERWDEP( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-#ifdef sens
-                       DO NP = 1, NPMAX
-                         S_CEND ( NP, PNTR ) = (1.d0 - FRACTR) * S_AEROSOL( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-     
-                         S_REMOV( NP,PNTR ) = (1.d0 - FRACTR) * S_AERWDEP( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-                       END DO
-#endif                       
-                    END IF
-		    
-		 ELSE IF ( IAER .EQ. LSOA ) THEN
-		    
-		    IF(AKNSRG(IAER,ISRG) .GT. 0) THEN
-		       CEND ( PNTR ) = (1.d0 - FRACSOA) * AEROSOL( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACSOA * 
-     &                               AEROSOL( IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-     
-                       REMOV( PNTR ) = (1.d0 - FRACSOA) * AERWDEP( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACSOA * 
-     &                               AERWDEP( IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-#ifdef sens
-                       DO NP = 1, NPMAX
-                         S_CEND ( NP,PNTR ) = (1.d0 - FRACSOA) * S_AEROSOL( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACSOA * 
-     &                               S_AEROSOL( NP, IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-     
-                         S_REMOV( NP,PNTR ) = (1.d0 - FRACSOA) * S_AERWDEP( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) + FRACSOA * 
-     &                               S_AERWDEP( NP, IAER, IMODE ) * WSRGAER( IAERI, 1, AKNSRG(IAER,ISRG) )
-                       END DO     
-#endif                       
-                    ELSE
-		    
-		       CEND ( PNTR ) = (1.d0 - FRACSOA) * AEROSOL( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-     
-                       REMOV( PNTR ) = (1.d0 - FRACSOA) * AERWDEP( IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-#ifdef sens
-                       DO NP = 1, NPMAX
-                         S_CEND ( NP, PNTR ) = (1.d0 - FRACSOA) * S_AEROSOL( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-     
-                         S_REMOV( NP, PNTR ) = (1.d0 - FRACSOA) * S_AERWDEP( NP, IAER, IMODE ) * 
-     &                               WSRGAER( IAER, IMODE, ISRG ) 
-                       END DO
-#endif                       
-                    END IF   
-                 END IF    
-	      END IF      
-
-cifdef sens
-c             DO NP = 1, NPMAX
-c               S_CEND ( NP, PNTR ) = S_AEROSOL( NP, IAER, IMODE ) * WSRGAER( IAER, IMODE, ISRG )
-c               S_REMOV( NP, PNTR ) = S_AERWDEP( NP, IAER, IMODE ) * WSRGAER( IAER, IMODE, ISRG )			 
-c             ENDDO
-cendif
-            END DO
-          END IF 
-        END DO
-      END DO     
-
-=======
       DO ISPC = 1,N_CGRID_SPC
-        IAQ = MAP_CGRIDtoSRG( ISPC )
+        IAQ = MAP_CGRIDtoAQGAS( ISPC )
         IF ( IAQ .GT. 0 ) THEN 
 
-          IF ( CGRID_MASK_GAS( ISPC ) .OR.
-     &         CGRID_MASK_NR( ISPC ) .OR.
-     &         CGRID_MASK_TRAC( ISPC ) ) THEN
              CEND ( ISPC ) = GAS    ( IAQ ) * WSRGAQ( ISPC )
              REMOV( ISPC ) = GASWDEP( IAQ ) * WSRGAQ( ISPC )
 #ifdef sens
@@ -627,22 +415,44 @@ cendif
                S_REMOV( NP, ISPC ) = S_GASWDEP( NP, IAQ ) * S_WSRGAQ( NP, ISPC )
              ENDDO
 #endif
-          
-           ELSE IF ( CGRID_MASK_AERO( ISPC ) ) THEN
-             IM = MAP_CGRIDtoSRGMODE( ISPC )
-             CEND ( ISPC ) = AEROSOL( IAQ, IM ) * WSRGAQ( ISPC )
-             REMOV( ISPC ) = AERWDEP( IAQ, IM ) * WSRGAQ( ISPC )
+        END IF 
+ 
+        IAQ = MAP_CGRIDtoAQAERO( ISPC )
+        IF ( IAQ .GT. 0 ) THEN
+             IM = MAP_CGRIDtoAQMODE( ISPC )
+             JSPC = MAP_ACCtoAIT( ISPC )  ! JSPC will have a value if ISPC is an 
+                                          ! accumulation-mode species and it connects 
+                                          ! to an Aitken mode species
+             IF ( JSPC .GT. 0 ) THEN
+                ! Transfer Accumulation-Mode Mass, including Aitken-mode
+                ! mass that was scavenged and combined with the accumulation mode
+                CEND ( ISPC ) = (1.d0 - FRACAIT(IAQ)) * AEROSOL( IAQ,IM ) * WSRGAQ( ISPC )
+     &                                + FRACAIT(IAQ)  * AEROSOL( IAQ,IM ) * WSRGAQ( JSPC )
+                REMOV( ISPC ) = (1.d0 - FRACAIT(IAQ)) * AERWDEP( IAQ,IM ) * WSRGAQ( ISPC )
+     &                                + FRACAIT(IAQ)  * AERWDEP( IAQ,IM ) * WSRGAQ( JSPC )
 #ifdef sens
-             DO NP = 1, NPMAX
-                S_CEND ( NP,ISPC ) = S_AEROSOL( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
-                S_REMOV( NP,ISPC ) = S_AERWDEP( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
-             ENDDO
+                DO NP = 1, NPMAX
+                   S_CEND ( NP,ISPC ) = (1.d0 - FRACAIT(IAQ)) * S_AEROSOL(NP,IAQ,IM) * WSRGAQ( ISPC )
+     &                                        + FRACAIT(IAQ)  * S_AEROSOL(NP,IAQ,IM) * WSRGAQ( JSPC )
+                   S_REMOV( NP,ISPC ) = (1.d0 - FRACAIT(IAQ)) * S_AERWDEP(NP,IAQ,IM) * WSRGAQ( ISPC )
+     &                                        + FRACAIT(IAQ)  * S_AERWDEP(NP,IAQ,IM) * WSRGAQ( JSPC )
+                ENDDO
 #endif
-          END IF
+
+             ELSE
+                ! Transfer Aitken and Coarse Mode Mass
+                CEND ( ISPC ) = AEROSOL( IAQ, IM ) * WSRGAQ( ISPC )
+                REMOV( ISPC ) = AERWDEP( IAQ, IM ) * WSRGAQ( ISPC )
+#ifdef sens
+                DO NP = 1, NPMAX
+                   S_CEND ( NP,ISPC ) = S_AEROSOL( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
+                   S_REMOV( NP,ISPC ) = S_AERWDEP( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
+                ENDDO
+#endif
+             END IF
         END IF
       END DO
-      
->>>>>>> cloud_processes2
+ 
 C *** extract grid cell concentrations of aero species from CGRID
 C     into aerospc_conc in aero_data module
 
@@ -656,7 +466,7 @@ C *** Calculate pseudo aerosol 3rd moment (ignore factors that cancel in the div
 C ... M3NEW is in units of m3/kmol_air
       M3NEW = 0.0
       Dens_wmean_new = 0.0
-      DO IM = 2, N_MODE
+      DO IM = IACC, N_MODE
 
         DO SPC = 1, N_AEROSPC
           IF (  AEROSPC( SPC )%TRACER ) CYCLE 
@@ -672,20 +482,20 @@ C ... M3NEW is in units of m3/kmol_air
       END DO
 
 C...Update aerosol number 
-      CEND( AERONUM_MAP( 1 ) ) = MAX( CEND( AERONUM_MAP( 1 ) ), aeromode_minNum( 1 )/ (AIRM/CTHK1) )
-      CEND( AERONUM_MAP( 2 ) ) = MAX( CEND( AERONUM_MAP( 2 ) ), aeromode_minNum( 2 )/ (AIRM/CTHK1) )
-      CEND( AERONUM_MAP( 3 ) ) = MAX( CEND( AERONUM_MAP( 3 ) ), aeromode_minNum( 3 )/ (AIRM/CTHK1) )
+      CEND( AERONUM_MAP( iait ) ) = MAX( CEND( AERONUM_MAP( iait ) ), aeromode_minNum( iait )/ (AIRM/CTHK1) )
+      CEND( AERONUM_MAP( iacc ) ) = MAX( CEND( AERONUM_MAP( iacc ) ), aeromode_minNum( iacc )/ (AIRM/CTHK1) )
+      CEND( AERONUM_MAP( icor ) ) = MAX( CEND( AERONUM_MAP( icor ) ), aeromode_minNum( icor )/ (AIRM/CTHK1) )
 
 #ifdef sens
 C... Remove number sensitivity calculations for now
-      S_CEND( :, AERONUM_MAP( 1 ) ) = 0.0
-      S_CEND( :, AERONUM_MAP( 2 ) ) = 0.0
-      S_CEND( :, AERONUM_MAP( 3 ) ) = 0.0
+      S_CEND( :, AERONUM_MAP( iait ) ) = 0.0
+      S_CEND( :, AERONUM_MAP( iacc ) ) = 0.0
+      S_CEND( :, AERONUM_MAP( icor ) ) = 0.0
 #endif
 
 C...check for minimums
 C...ug/m3*m3/mol_air*1e3 mol_air/kmol_air*1e-9kg/ug*m3/kg=> m3/kmol_air
-      DO IM = 2, N_MODE
+      DO IM = IACC, N_MODE
         IF ( M3NEW( IM ) .GT. 0.0D0 ) THEN  ! Dens_wmean_new will be .GT. 0 also
            Dens_wmean_new( IM ) = Dens_wmean_new( IM ) / M3NEW( IM )
            M3OLD( IM ) = MAX( M3OLD( IM ), CONMIND * 1.0d-6 / ( Dens_wmean_old( IM ) * AIRM / CTHK1 ) )
@@ -695,25 +505,25 @@ C...ug/m3*m3/mol_air*1e3 mol_air/kmol_air*1e-9kg/ug*m3/kg=> m3/kmol_air
 
 C...Update surface area
 
-      CEND( AEROSRF_MAP( 1 ) ) = POLC( AEROSRF_MAP( 1 ) ) * EALFA2T
-      CEND( AEROSRF_MAP( 1 ) ) = MAX( CEND( AEROSRF_MAP( 1 ) ), aeromode_minM2( 1 ) * DPI / (AIRM/CTHK1) )
+      CEND( AEROSRF_MAP( IAIT ) ) = POLC( AEROSRF_MAP( IAIT ) ) * EALFA2T
+      CEND( AEROSRF_MAP( IAIT ) ) = MAX( CEND( AEROSRF_MAP( IAIT ) ), aeromode_minM2( IAIT ) * DPI / (AIRM/CTHK1) )
       
-      CEND( AEROSRF_MAP( 2 ) ) = POLC( AEROSRF_MAP( 2 ) )
+      CEND( AEROSRF_MAP( IACC ) ) = POLC( AEROSRF_MAP( IACC ) )
      &                         * EXP( -BETASO4 * TAUCLD * ONETHIRD )
-     &                         * ( M3NEW( 2 ) / M3OLD( 2 ) ) ** TWOTHIRDS
-      CEND( AEROSRF_MAP( 2 ) ) = MAX( CEND( AEROSRF_MAP( 2 ) ), aeromode_minM2( 2 ) * DPI / (AIRM/CTHK1) )
+     &                         * ( M3NEW( IACC ) / M3OLD( IACC ) ) ** TWOTHIRDS
+      CEND( AEROSRF_MAP( IACC ) ) = MAX( CEND( AEROSRF_MAP( IACC ) ), aeromode_minM2( IACC ) * DPI / (AIRM/CTHK1) )
 
-      CEND( AEROSRF_MAP( 3 ) ) = POLC( AEROSRF_MAP( 3 ) )
-     &                         * ( CEND( AERONUM_MAP( 3 ) )
-     &                             / POLC( AERONUM_MAP( 3 ) ) ) ** ONETHIRD
-     &                         * ( M3NEW( 3 ) / M3OLD( 3 ) ) ** TWOTHIRDS
-      CEND( AEROSRF_MAP( 3 ) ) = MAX( CEND( AEROSRF_MAP( 3 ) ), aeromode_minM2( 3 ) * DPI / (AIRM/CTHK1) )
+      CEND( AEROSRF_MAP( ICOR ) ) = POLC( AEROSRF_MAP( ICOR ) )
+     &                         * ( CEND( AERONUM_MAP( ICOR ) )
+     &                             / POLC( AERONUM_MAP( ICOR ) ) ) ** ONETHIRD
+     &                         * ( M3NEW( ICOR ) / M3OLD( ICOR ) ) ** TWOTHIRDS
+      CEND( AEROSRF_MAP( ICOR ) ) = MAX( CEND( AEROSRF_MAP( ICOR ) ), aeromode_minM2( ICOR ) * DPI / (AIRM/CTHK1) )
 
 #ifdef sens
 C... Remove surface area sensitivity calculations for now
-      S_CEND( :, AEROSRF_MAP( 1 ) ) = 0.0
-      S_CEND( :, AEROSRF_MAP( 2 ) ) = 0.0
-      S_CEND( :, AEROSRF_MAP( 3 ) ) = 0.0
+      S_CEND( :, AEROSRF_MAP( IAIT ) ) = 0.0
+      S_CEND( :, AEROSRF_MAP( IACC ) ) = 0.0
+      S_CEND( :, AEROSRF_MAP( ICOR ) ) = 0.0
 #endif
 
       RETURN

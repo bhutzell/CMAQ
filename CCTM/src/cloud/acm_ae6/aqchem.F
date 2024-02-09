@@ -935,26 +935,12 @@ C...   = Initial amount - amount deposited  (mol/liter)
 
         NA      = LOADING( LNA,   ACC ) + LOADING( LNA, AKN ) + NACOR
      &          - WETDEP( LNAACCL ) * XC1
-<<<<<<< HEAD
-!       CA      = LOADING( LCACO3,COR ) - WETDEP( LCAL ) * XC1
-!       MG      = LOADING( LMGCO3,COR ) - WETDEP( LMGL ) * XC1
-!       K       = LOADING( LK,    COR ) - WETDEP( LKL  ) * XC1
-!       FE      = LOADING( LA3FE, COR ) - WETDEP( LFEL ) * XC1
-!       MN      = LOADING( LB2MN, COR ) - WETDEP( LMNL ) * XC1
-        CA      = LOADING( LCAACC, ACC) - WETDEP( LCAACCL ) * XC1 + CACOR
-        MG      = LOADING( LMGACC, ACC) - WETDEP( LMGACCL ) * XC1 + MGCOR
-        K       = LOADING( LKACC,  ACC) - WETDEP( LKACCL  ) * XC1 + KCOR
-        FE      = LOADING( LFEACC, ACC) - WETDEP( LFEACCL ) * XC1 + FECOR
-        MN      = LOADING( LMNACC, ACC) - WETDEP( LMNACCL ) * XC1 + MNCOR
-        SOA     = LOADING( LSOA,  ACC ) + LOADING( LSOA, AKN ) - WETDEP( LSOAL  ) * XC1
-=======
         CA      = LOADING( LCA,   ACC) - WETDEP( LCAACCL ) * XC1 + CACOR
         MG      = LOADING( LMG,   ACC) - WETDEP( LMGACCL ) * XC1 + MGCOR
         K       = LOADING( LK,    ACC) - WETDEP( LKACCL  ) * XC1 + KCOR
         FE      = LOADING( LFE,   ACC) - WETDEP( LFEACCL ) * XC1 + FECOR
         MN      = LOADING( LMN,   ACC) - WETDEP( LMNACCL ) * XC1 + MNCOR
-        SOA     = LOADING( LSOA,  ACC ) - WETDEP( LSOAL  ) * XC1
->>>>>>> cloud_processes2
+        SOA     = LOADING( LSOA,  ACC ) + LOADING( LSOA, AKN ) - WETDEP( LSOAL  ) * XC1
         ORGC    = LOADING( LORGC, ACC ) + DORGC - WETDEP( LORGCL ) * XC1             ! new in-cloud organic
         POA     = LOADING( LPOA,  ACC ) + LOADING( LPOA, AKN ) - WETDEP( LPOAL ) * XC1
         EC      = LOADING( LEC,   ACC ) + LOADING( LEC,   AKN ) - WETDEP( LECL   ) * XC1
@@ -963,10 +949,10 @@ C...   = Initial amount - amount deposited  (mol/liter)
 !       A       = 3.0D0 * FE
 !       B       = 2.0D0 * MN
 	
-        TRACI = LOADING( LTRACER_AKN, AKN ) - WETDEP( LTRACIL ) * XC1
-	POAI = LOADING( LPOA, AKN ) - WETDEP( LPOAIL ) * XC1
-	PRII = LOADING( LPRI, AKN ) - WETDEP( LPRIIL ) * XC1
-	SOAI = LOADING( LSOA, AKN ) - WETDEP( LSOAIL ) * XC1
+        TRACI = LOADING( LTRACER, AKN ) - WETDEP( LTRACIL ) * XC1
+        POAI = LOADING( LPOA, AKN ) - WETDEP( LPOAIL ) * XC1
+        PRII = LOADING( LPRI, AKN ) - WETDEP( LPRIIL ) * XC1
+        SOAI = LOADING( LSOA, AKN ) - WETDEP( LSOAIL ) * XC1
 
 !       FE_OX = 0.5D0 * 0.62D0 * FE      ! SLN 28March2011
 !       MN_OX = 1.0D0 * 0.84D0 * MN      ! SLN 28March2011
@@ -992,21 +978,12 @@ C...   = Initial amount - amount deposited  (mol/liter)
      &            - S_DS4( NP, 0 )
           S_NA(NP)      = S_LOADING( NP, LNA,   ACC ) + S_LOADING( NP, LNA, AKN ) + S_NACOR( NP )
      &            - S_WETDEP( NP, LNAACCL ) * XC1
-<<<<<<< HEAD
-          S_CA(NP)      = S_LOADING( NP, LCAACC, ACC) - S_WETDEP( NP, LCAACCL ) * XC1 + S_CACOR( NP )
-          S_MG(NP)      = S_LOADING( NP, LMGACC, ACC) - S_WETDEP( NP, LMGACCL ) * XC1 + S_MGCOR( NP )
-          S_K(NP)       = S_LOADING( NP, LKACC,  ACC) - S_WETDEP( NP, LKACCL  ) * XC1 + S_KCOR( NP )
-          S_FE(NP)      = S_LOADING( NP, LFEACC, ACC) - S_WETDEP( NP, LFEACCL ) * XC1 + S_FECOR( NP )
-          S_MN(NP)      = S_LOADING( NP, LMNACC, ACC) - S_WETDEP( NP, LMNACCL ) * XC1 + S_MNCOR( NP )
-          S_SOA(NP)     = S_LOADING( NP, LSOA,  ACC ) + S_LOADING( NP, LSOA, AKN ) - S_WETDEP( NP, LSOAL  ) * XC1
-=======
           S_CA(NP)      = S_LOADING( NP, LCA,   ACC) - S_WETDEP( NP, LCAACCL ) * XC1 + S_CACOR( NP )
           S_MG(NP)      = S_LOADING( NP, LMG,   ACC) - S_WETDEP( NP, LMGACCL ) * XC1 + S_MGCOR( NP )
           S_K(NP)       = S_LOADING( NP, LK,    ACC) - S_WETDEP( NP, LKACCL  ) * XC1 + S_KCOR( NP )
           S_FE(NP)      = S_LOADING( NP, LFE,   ACC) - S_WETDEP( NP, LFEACCL ) * XC1 + S_FECOR( NP )
           S_MN(NP)      = S_LOADING( NP, LMN,   ACC) - S_WETDEP( NP, LMNACCL ) * XC1 + S_MNCOR( NP )
-          S_SOA(NP)     = S_LOADING( NP, LSOA,  ACC ) - S_WETDEP( NP, LSOAL  ) * XC1
->>>>>>> cloud_processes2
+          S_SOA(NP)     = S_LOADING( NP, LSOA,  ACC ) + S_LOADING( NP, LSOA, AKN ) - S_WETDEP( NP, LSOAL  ) * XC1
           S_ORGC(NP)    = S_LOADING( NP, LORGC, ACC ) + S_DORGC( NP ) - S_WETDEP( NP, LORGCL ) * XC1
           S_POA(NP)     = S_LOADING( NP, LPOA,  ACC ) + S_LOADING( NP, LPOA, AKN ) - S_WETDEP( NP, LPOAL ) * XC1
           S_EC(NP)      = S_LOADING( NP, LEC,   ACC ) + S_LOADING( NP, LEC,   AKN ) - S_WETDEP( NP, LECL   ) * XC1
@@ -1235,7 +1212,7 @@ C...compute functional value
           FA = AE + NH4 + NA + K + 2.0D0 * ( CA + MG - CO3 - SO3 - SO4 )  ! SLN 16March2011
      &       - OH - HCO3 - HSO3 - NO3 - HSO4 - HCO2 - CL
 
-C...Start iteration and bisection ****************<<<<<<<
+C...Start iteration and bisection ****************
           DO I30C = 1, 10000
 
             IF ( I30C .GE. 10000 ) THEN
@@ -1306,7 +1283,7 @@ C...Check convergence of solutions
             IF ( HTST .GT. TST ) EXIT  ! exit loop I30C
           END DO   ! I30C
 
-C...end of zero-finding routine ****************<<<<<<<<<<<<
+C...end of zero-finding routine ****************
 
 C...compute Ionic strength and activity coefficient by the Davies equation
 
@@ -2562,49 +2539,31 @@ c       S_AEROSOL( NP, LMN,  ACC )   = S_MNACC( NP )   * XL * RECIPAP1
 
 C...Compute for Aerosol species in  TXHG Version
 
-<<<<<<< HEAD
-      AEROSOL( LTRACER_AKN, AKN ) = AEROSOL( LTRACER_AKN, AKN ) * EALFA3T
-      AEROSOL( LTRACER_ACC, ACC ) = TRACER    * XL * RECIPAP1
-      AEROSOL( LTRACER_COR, COR ) = TRACERCOR * XL * RECIPAP1
-      AEROSOL( LPHG_AKN, AKN )    = AEROSOL( LPHG_AKN, AKN ) * EALFA3T
-      AEROSOL( LPHG_ACC, ACC )    = HGFINE * XL * RECIPAP1
-      AEROSOL( LPHG_COR, COR )    = HGCOR * XL * RECIPAP1
-      
-      IF( AEROSOL(LTRACER_ACC, ACC) .GT. 0.d0 ) THEN
-         FRACTR  = MIN((TRACI  * XL * RECIPAP1) / 
-     &             AEROSOL(LTRACER_ACC, ACC), 1.0D0) 
-      ELSE 
-         FRACTR = 0.d0
-      END IF
-      
-      IF( AEROSOL(LPOA, ACC) .GT. 0.d0 ) THEN
-         FRACPOA = MIN((POAI  * XL * RECIPAP1) / 
-     &             AEROSOL(LPOA, ACC), 1.0D0)
-      ELSE 
-         FRACPOA = 0.d0
-      END IF 
-      
-      IF( AEROSOL(LPRI, ACC) .GT. 0.d0 ) THEN
-         FRACPRI = MIN((PRII  * XL * RECIPAP1) / 
-     &             AEROSOL(LPRI, ACC), 1.0D0)
-      ELSE 
-         FRACPRI = 0.d0
-      END IF 
-      
-      IF( AEROSOL(LSOA, ACC) .GT. 0.d0 ) THEN
-         FRACSOA = MIN((SOAI  * XL * RECIPAP1) / 
-     &             AEROSOL(LSOA, ACC), 1.0D0)
-      ELSE 
-         FRACSOA = 0.d0
-      END IF 
-=======
       AEROSOL( LTRACER, AKN ) = AEROSOL( LTRACER, AKN ) * EALFA3T
       AEROSOL( LTRACER, ACC ) = TRACER    * XL * RECIPAP1
       AEROSOL( LTRACER, COR ) = TRACERCOR * XL * RECIPAP1
       AEROSOL( LPHG, AKN )    = AEROSOL( LPHG, AKN ) * EALFA3T
       AEROSOL( LPHG, ACC )    = HGFINE * XL * RECIPAP1
       AEROSOL( LPHG, COR )    = HGCOR * XL * RECIPAP1
->>>>>>> cloud_processes2
+     
+C...Store the fraction of aitken-mode associated mass in the 
+C   bulk aerosol aqueous chemistry tracer
+      FRACAIT( : ) = 0.0
+      IF( AEROSOL(LTRACER, ACC) .GT. 0.d0 ) THEN
+     &   FRACAIT( LTRACER )  = MIN((TRACI  * XL * RECIPAP1) / 
+     &                         AEROSOL(LTRACER, ACC), 1.0D0) 
+      
+      IF( AEROSOL(LPOA, ACC) .GT. 0.d0 ) THEN
+     &   FRACAIT( LPOA ) = MIN((POAI  * XL * RECIPAP1) / 
+     &                     AEROSOL(LPOA, ACC), 1.0D0)
+      
+      IF( AEROSOL(LPRI, ACC) .GT. 0.d0 ) THEN
+     &   FRACAIT( LPRI ) = MIN((PRII  * XL * RECIPAP1) / 
+     &                     AEROSOL(LPRI, ACC), 1.0D0)
+      
+      IF( AEROSOL(LSOA, ACC) .GT. 0.d0 ) THEN
+     &   FRACAIT( LSOA ) = MIN((SOAI  * XL * RECIPAP1) / 
+     &                     AEROSOL(LSOA, ACC), 1.0D0)
 
 C...store the amount of hydrogen deposition
 

@@ -44,10 +44,10 @@ C-----------------------------------------------------------------------
 
       Implicit None
 
-      Integer, Parameter :: ngas = 15   ! number of gas-phase species for AQCHEM
-      Integer, Parameter :: naer = 31   ! number of aerosol surrogate species for AQCHEM
+      Integer, Parameter :: n_aq_gas = 15   ! number of gas-phase species for AQCHEM
+      Integer, Parameter :: n_aq_aer = 31   ! number of aerosol surrogate species for AQCHEM
 
-      Integer, Parameter :: nliqs = 64  ! number of liquid-phase species in AQCHEM
+      Integer, Parameter :: n_aq_liqs = 64  ! number of liquid-phase species in AQCHEM
       Integer, Parameter :: mxsrg = 70  ! maximum number of species for surrogate
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
@@ -56,10 +56,10 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
       Type sur_gas_type
          Character( 16 ) :: name               ! surrogate name
-         Real            :: backgnd            ! background value
+         Real            :: backgnd            ! background value [ppm]
       End Type sur_gas_type
 
-      Type ( sur_gas_type ), Parameter :: srggas( ngas ) = (/
+      Type ( sur_gas_type ), Parameter :: srggas( n_aq_gas ) = (/
 C                          Name       Background
 C                       ----------    ----------
      & sur_gas_type( 'SO2       ',        0.0 ),
@@ -103,75 +103,48 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
       Character(16) :: srgaer_name( naer,n_mode )
       Type sur_aer_type
          Character( 16 ) :: name     ! bulk surrogate name
-         Real            :: backgnd  ! background value
+         Real            :: backgnd  ! background value [ug m-3]
          Real            :: density  ! density [kg m-3] 
+         Real            :: molwt    ! molecular weight [g mol-1]
       End Type sur_aer_type
 
       Type ( sur_aer_type ), Parameter  :: srgaer( naer ) = (/
 
-C                      Name     Background  Density
-C                    ----------  ----------  ------
-     & sur_aer_type('SO4       ',   0.0,     1800.0),
-     & sur_aer_type('NH4       ',   0.0,     1800.0),
-     & sur_aer_type('NO3       ',   0.0,     1800.0),
-     & sur_aer_type('SOA       ',   0.0,     1400.0),
-     & sur_aer_type('AORGC     ',   0.0,     1400.0),
-     & sur_aer_type('POA       ',   0.0,     1400.0),
-     & sur_aer_type('EC        ',   0.0,     2200.0),
-     & sur_aer_type('PRI       ',   0.0,     1400.0),
-     & sur_aer_type('NA        ',   0.0,     2200.0),
-     & sur_aer_type('CL        ',   0.0,     2200.0),
-     & sur_aer_type('CA        ',   0.0,     2200.0),
-     & sur_aer_type('MG        ',   0.0,     2200.0),
-     & sur_aer_type('K         ',   0.0,     2200.0),
-     & sur_aer_type('FE        ',   0.0,     2200.0),
-     & sur_aer_type('MN        ',   0.0,     2200.0),
-     & sur_aer_type('SOIL      ',   0.0,     2600.0),
-     & sur_aer_type('ANTH      ',   0.0,     2200.0),
-     & sur_aer_type('SEAS      ',   0.0,     2200.0),
-     & sur_aer_type('TRACER    ',   0.0,     2200.0),
-     & sur_aer_type('PHG       ',   0.0,     2200.0),
-     & sur_aer_type('CACO3     ',   0.0,     2200.0),
-     & sur_aer_type('MGCO3     ',   0.0,     2200.0),
-     & sur_aer_type('A3FE      ',   0.0,     2200.0),
-     & sur_aer_type('B2MN      ',   0.0,     2200.0),
-     & sur_aer_type('SO4_AQH2O2',   0.0,     1800.0),
-     & sur_aer_type('SO4_AQO3  ',   0.0,     1800.0),
-     & sur_aer_type('SO4_AQFEMN',   0.0,     1800.0),
-     & sur_aer_type('SO4_AQMHP ',   0.0,     1800.0),
-     & sur_aer_type('SO4_AQPAA ',   0.0,     1800.0),
-     & sur_aer_type('NUM       ',   0.0,        1.0),
-     & sur_aer_type('SRF       ',   0.0,        1.0)/)
+C                      Name     Background  Density  MolWt
+C                    ----------  ----------  ------  -----
+     & sur_aer_type('SO4       ',   0.0,     1800.0,  96.0 ),
+     & sur_aer_type('NH4       ',   0.0,     1800.0,  18.0 ),
+     & sur_aer_type('NO3       ',   0.0,     1800.0,  62.0 ),
+     & sur_aer_type('SOA       ',   0.0,     1400.0, 200.0 ),
+     & sur_aer_type('AORGC     ',   0.0,     1400.0, 177.0 ),
+     & sur_aer_type('POA       ',   0.0,     1400.0, 220.0 ),
+     & sur_aer_type('EC        ',   0.0,     2200.0,  12.0 ),
+     & sur_aer_type('PRI       ',   0.0,     1400.0, 218.0 ),
+     & sur_aer_type('NA        ',   0.0,     2200.0,  23.0 ),
+     & sur_aer_type('CL        ',   0.0,     2200.0,  35.5 ),
+     & sur_aer_type('CA        ',   0.0,     2200.0,  40.1 ),
+     & sur_aer_type('MG        ',   0.0,     2200.0,  24.3 ),
+     & sur_aer_type('K         ',   0.0,     2200.0,  39.1 ),
+     & sur_aer_type('FE        ',   0.0,     2200.0,  55.8 ),
+     & sur_aer_type('MN        ',   0.0,     2200.0,  54.9 ),
+     & sur_aer_type('SOIL      ',   0.0,     2600.0, 100.0 ),
+     & sur_aer_type('ANTH      ',   0.0,     2200.0, 100.0 ),
+     & sur_aer_type('SEAS      ',   0.0,     2200.0,  23.75),
+     & sur_aer_type('TRACER    ',   0.0,     2200.0,  60.0 ),
+     & sur_aer_type('PHG       ',   0.0,     2200.0, 200.5 ),
+     & sur_aer_type('CACO3     ',   0.0,     2200.0, 100.08),
+     & sur_aer_type('MGCO3     ',   0.0,     2200.0,  84.31),
+     & sur_aer_type('A3FE      ',   0.0,     2200.0,  55.85),
+     & sur_aer_type('B2MN      ',   0.0,     2200.0,  54.93),
+     & sur_aer_type('SO4_AQH2O2',   0.0,     1800.0,  96.0 ),
+     & sur_aer_type('SO4_AQO3  ',   0.0,     1800.0,  96.0 ),
+     & sur_aer_type('SO4_AQFEMN',   0.0,     1800.0,  96.0 ),
+     & sur_aer_type('SO4_AQMHP ',   0.0,     1800.0,  96.0 ),
+     & sur_aer_type('SO4_AQPAA ',   0.0,     1800.0,  96.0 ),
+     & sur_aer_type('NUM       ',   0.0,        1.0,   1.0 ),
+     & sur_aer_type('SRF       ',   0.0,        1.0,   1.0 )/)
 
 C...Pointers for the AQCHEM array AEROSOL
-<<<<<<< HEAD
-      Integer :: lso4     !  Sulfate
-      Integer :: lnh4     !  Ammonium
-      Integer :: lno3     !  Nitrate
-      Integer :: lsoa     !  SOA
-      Integer :: lorgc    !  SOA (anthropogenic organic oligomers)
-      Integer :: lpoa     !  Primary organic aerosol
-      Integer :: lec      !  Elemental carbon
-      Integer :: lpri     !  Primary aerosol (Aitken and Accumulation)
-!     Integer :: lpricor  !  Primary aerosol (coarse)
-      Integer :: lna      !  Sodium
-      Integer :: lcl      !  Chloride ion
-!     Integer :: lcaco3   !  Calcium Carbonate aerosol (place holder)
-!     Integer :: lmgco3   !  Magnesium Carbonate aerosol (place holder)
-!     Integer :: la3fe    !  Iron aerosol (place holder)
-!     Integer :: lb2mn    !  Manganese aerosol (place holder)
-!     Integer :: lk       !  Potassium aerosol (Cl- tracked separately) (place holder)
-      Integer :: lnum     !  Number
-      Integer :: lsrf     !  Surface area
-      
-C...TXHG aersosols      
-      Integer :: ltracer_akn  !  Tracer aerosols (Aitken)
-      Integer :: ltracer_acc  !  Tracer aerosols (Accumulation)
-      Integer :: ltracer_cor  !  Tracer aerosols (Coarse)
-      Integer :: lphg_akn     !  Mercuric aerosols (Aitken and Accumulation)
-      Integer :: lphg_acc     !  Mercuric aerosols (Aitken and Accumulation)
-      Integer :: lphg_cor     !  Mercuric aerosols (Coarse)
-=======
       Integer, Parameter :: lso4       = 1  !  Sulfate
       Integer, Parameter :: lnh4       = 2  !  Ammonium
       Integer, Parameter :: lno3       = 3  !  Nitrate
@@ -203,9 +176,6 @@ C...TXHG aersosols
       Integer, Parameter :: lso4aqpaa  = 29 ! Sulfate from aq PAA rxn
       Integer, Parameter :: lnum       = 30 !  Number
       Integer, Parameter :: lsrf       = 31 !  Surface area
->>>>>>> cloud_processes2
-C...Sulfur Tracking Model      
-
 
 C...Pointers for the AQCHEM arrays LIQUID and WETDEP
       Integer, Parameter :: lacl        = 01  ! Hydrogen ion
@@ -277,22 +247,12 @@ C for sulfur tracking model
       Integer, Parameter :: lpriil = 63
       Integer, Parameter :: lsoail = 64
 
-<<<<<<< HEAD
-      Integer    :: nsrggas( ngas )           ! # surrogates in CGRID for each gas
-      Integer    :: lsrggas( ngas,mxsrg )
-
-      Integer, Allocatable, Save :: nsrgaer( :,: )    ! # surrogates in CGRID for each aerosol
-      Integer, Allocatable, Save :: lsrgaer( :,:,: )
-      Integer, Allocatable, Save :: aknsrg( :,: )
-
-      Integer, Allocatable, Save :: cgrid2aq_map( : ) ! allocated in AQ_DATA_INIT
-      Character( 16 ), Allocatable, Save :: cgrid2aq_name( : ) ! allocated in AQ_DATA_INIT
-=======
-      Integer, Save :: n_aqsrg_gas( ngas ) ! # surrogates in CGRID for each gas
-      Integer, Save :: n_aqsrg_aer( naer,n_mode ) ! # surrogates in CGRID for each aerosol
-      Integer, Allocatable, Save :: MAP_CGRIDtoSRG( : ) ! Map from CGRID to Surrogates
-      Integer, Allocatable, Save :: MAP_CGRIDtoSRGMODE( : ) ! Map from CGRID to Surrogates
->>>>>>> cloud_processes2
+      Integer, Save :: n_aqsrg_gas( n_aq_gas )             ! Store Number of CGRID species pointing to each surrogate
+      Integer, Save :: n_aqsrg_aer( n_aq_aer,n_mode )      ! Store Number of CGRID species pointing to each surrogate
+      Integer, Allocatable, Save :: MAP_CGRIDtoAQGAS( : )  ! Map from CGRID to Surrogates
+      Integer, Allocatable, Save :: MAP_CGRIDtoAQAERO( : ) ! Map from CGRID to Surrogates
+      Integer, Allocatable, Save :: MAP_CGRIDtoAQMODE( : ) ! Map from CGRID to Surrogates
+      Integer, Allocatable, Save :: MAP_ACCtoAIT( : )
 
       Real( 8 )   :: jh2o2_hydrometeors    ! H2O2 photolysis rate in condensed water [sec-1]
       Real( 8 )   :: jhno3_hydrometeors    ! HNO3 photolysis rate in condensed water [sec-1]
@@ -336,15 +296,13 @@ C Local Variables:
       Logical :: new, Jexist
       Integer :: lsrg( mxsrg )
       Integer :: ios
-<<<<<<< HEAD
+
 C Local Variable used to determine what optional TX to add to surrogates
       !Logical :: found_all_modes
       !Integer :: n_missing_tx
       !Integer :: n_which_txadd( nadd_tx )
       CHARACTER(16) :: NAMEI, NAMEJ
       INTEGER LS2, LS1, LS3, LS4, ISRG2, ISRGI, IAERI, SPCI      
-=======
->>>>>>> cloud_processes2
 
       Logical, Save :: Firstcall = .True.
       
@@ -360,133 +318,34 @@ C-----------------------------------------------------------------------
       Call init_phot_shared()
       
 C...Allocate Maps from CGRID to Aqueous Chemistry Vectors
-      Allocate ( MAP_CGRIDtoSRG( n_cgrid_spc ), stat = ios )
+      Allocate ( MAP_CGRIDtoAQGAS( n_cgrid_spc ), stat = ios )
       If ( ios .Ne. 0 ) Then
-         xmsg = '*** Error allocating MAP_CGRIDtoSRG'
+         xmsg = '*** Error allocating MAP_CGRIDtoAQGAS'
          Call m3exit( 'aq_data_init', 0, 0, xmsg, xstat3 )
       End If
 
-      Allocate ( MAP_CGRIDtoSRGMODE( n_cgrid_spc ), stat = ios )
+      Allocate ( MAP_CGRIDtoAQAERO( n_cgrid_spc ), stat = ios )
       If ( ios .Ne. 0 ) Then
-         xmsg = '*** Error allocating MAP_CGRIDtoSRGMODE'
+         xmsg = '*** Error allocating MAP_CGRIDtoAQAERO'
+         Call m3exit( 'aq_data_init', 0, 0, xmsg, xstat3 )
+      End If
+
+      Allocate ( MAP_CGRIDtoAQMODE( n_cgrid_spc ), stat = ios )
+      If ( ios .Ne. 0 ) Then
+         xmsg = '*** Error allocating MAP_CGRIDtoAQMODE'
+         Call m3exit( 'aq_data_init', 0, 0, xmsg, xstat3 )
+      End If
+
+      Allocate ( MAP_ACCtoAIT( n_cgrid_spc ), stat = ios )
+      If ( ios .Ne. 0 ) Then
+         xmsg = '*** Error allocating MAP_ACCtoAIT'
          Call m3exit( 'aq_data_init', 0, 0, xmsg, xstat3 )
       End If
 
 C...Map aero species
       Call map_aero()
 
-<<<<<<< HEAD
-      naer = n_aerospc + naddaer + nadd_tx
-
-      Allocate ( srgaer( naer ), stat = ios )
-      If ( ios .Ne. 0 ) Then
-         xmsg = '*** Error allocating srgaer'
-         Call m3exit( 'aq_data_init', 0, 0, xmsg, xstat3 )
-      End If
-
-      Allocate ( nsrgaer( naer,nmodes ), stat = ios )
-      If ( ios .Ne. 0 ) Then
-         xmsg = '*** Error allocating nsrgaer'
-         Call m3exit( 'aq_data_init', 0, 0, xmsg, xstat3 )
-      End If
-
-      Allocate ( lsrgaer( naer,nmodes,mxsrg ), stat = ios )
-      If ( ios .Ne. 0 ) Then
-         xmsg = '*** Error allocating lsrgaer'
-         Call m3exit( 'aq_data_init', 0, 0, xmsg, xstat3 )
-      End If
-      
-      Allocate ( aknsrg( naer,mxsrg ), stat = ios )
-      If ( ios .Ne. 0 ) Then
-         xmsg = '*** Error allocating aknsrg'
-         Call m3exit( 'aq_data_init', 0, 0, xmsg, xstat3 )
-      End If
-
-C...Populate optional aerosol surrogate species (e.g.
-C   TRACER_AITKEN, TRACER_ACCUM, TRACER_COARSE, 
-C   PHG_AITKEN,    PHG_ACCUM,    PHG_COARSE     )
-      Do spc = 1, nadd_tx
-         srgaer( spc ) = srgaer_addtx( spc )
-      End Do
-
-C...Initialize aerosol surrogate species from AERO_DATA table
-      Do var = 1, n_aerospc
-         spc = nadd_tx + var
-         srgaer( spc ) = sur_aer_type( (/' ',' ',' '/), 0.0, 0.0, 0.0 )
-
-         ! Skip H2O, H2OP, and SOIL species
-         If ( var .Eq. ah2o_idx .Or. var .Eq. ah3op_idx ) Then
-              write(xmsg,'(4(A,1x))')'Skipping AQ surrogate for AEROSPC ',
-     &                               aerospc( spc-nadd_tx )%name( 1:n_mode )
-              Call m3warn( 'aq_data_init', 0, 0, xmsg )
-              Cycle
-         End if
-
-         Do mode = 1, n_mode
-            n = index1( aerospc( var )%name( mode ), n_ae_a2aq, aename )
-    
-            If ( n .Gt. 0 ) Then
-               ! Verify that surrogate is new
-               new = .True. 
-               Do i = 1, spc
-                  If ( ae_a2aq( n ) .Eq. srgaer( i )%name( mode ) ) Then
-                     new = .False.; Exit
-                  End If
-                 
-		  Jexist = .false.            ! Does J mode exist for a new I mode species?	  
-		  If ( mode .eq. 1) then
-		     spci = spc
-		     ls1 = len_trim(ae_a2aq(n))
-		     ls2 = len_trim(srgaer(i)%name(2))
-		     namei = ae_a2aq(n)
-		     namei = namei(1:ls1-7)   ! Remove "_AITKEN" to get base name for I mode
-		     namej = srgaer(i)%name(2)
-		     namej = namej(1:ls2-6)   ! Remove "_ACCUM" to get base name for J mode
-		     If (trim(namei) .eq. trim(namej)) then
-		        spci = i
-		        Jexist = .true.; Exit
-		     End If
-		  End If	     
-		  
-               End Do	  
-	       
-	       If ( new ) Then
-	          
-		  If (Jexist) then 
-	             srgaer( spci )%name( mode ) = ae_a2aq( n )
-                     srgaer( spci )%density = aerospc( var )%density
-                     srgaer( spci )%molwt = aerospc_mw( var )
-		  Else
-                     srgaer( spc )%name( mode ) = ae_a2aq( n )
-                     srgaer( spc )%density = aerospc( var )%density
-                     srgaer( spc )%molwt = aerospc_mw( var ) 
-		  End If
-
-               End If
-           End If
-         End Do   ! mode
-      End Do   ! spc
-           
-
-C...Initialize aerosol moment surrogates (i.e.
-C   NUM_AITKEN, NUM_ACCUM, NUM_COARSE,
-C   SRF_AITKEB, SRF_ACCUM, SRF_COARSE )
-      Do n = 1, naddaer
-         spc = n_aerospc + nadd_tx + n
-         srgaer( spc ) = addsrgaer( n )
-      End Do
-   
-
-#ifdef verbose_cloud
-C...write out SRGGAS and SRGAER to verify
-      Write( logdev, 1005 )ngas
-      Do spc = 1, ngas
-         Write( logdev,1007 ) srggas( spc )%name, srggas( spc )%backgnd
-      End Do
-      Write( logdev,1009 ) naer
-=======
 C...Initialize aerosol surrogate species names 
->>>>>>> cloud_processes2
       Do spc = 1, naer
         Do im = 1,n_mode
           srgaer_name( spc,im ) = srgaer( spc )%name // '_' // modename( im )
@@ -494,148 +353,12 @@ C...Initialize aerosol surrogate species names
       End Do
 
 C...Create Map Directly from CGRID to the gas and aerosol species in AQCHEM
-      MAP_CGRIDtoSRG = 0
-      MAP_CGRIDtoSRGMODE = 0
+      MAP_CGRIDtoAQGAS  = 0
+      MAP_CGRIDtoAQAERO = 0
+      MAP_CGRIDtoAQMODE = 0
       N_AQSRG_GAS = 0
       N_AQSRG_AER = 0
-
-<<<<<<< HEAD
-C...CGRID map to aqueous species pointers for the non-reactives
-      Do var = 1, n_nr_n2aq
-         spc = spc + 1
-         cgrid2aq( spc ) = nr_n2aq( var )
-         cgrid2aq_map( spc ) = nr_n2aq_map( var ) + nr_strt - 1
-         cgrid2aq_name( spc ) = nr_spc( nr_n2aq_map( var ) )
-      End Do
-
-C...CGRID map to aqueous species pointers for the tracers
-      Do var = 1, n_tr_t2aq
-         spc = spc + 1
-         cgrid2aq( spc ) = tr_t2aq( var )
-         cgrid2aq_map( spc ) = tr_t2aq_map( var ) + tr_strt - 1
-         cgrid2aq_name( spc ) = tr_spc( tr_t2aq_map( var ) )
-      End Do
-
-      write(logdev, 1114)
-C...Create the pointers from CGRID to the gaseous species needed by AQCHEM
-      nsrggas = 0
-      Do igas = 1, ngas
-         nsrggas( igas ) = indexn( srggas( igas )%name, n_cgrid2aq, cgrid2aq, lsrg )
-         If ( nsrggas( igas ) .Eq. 0 ) Then
-            Write ( bkground, '(F8.4)' ) srggas( igas )%backgnd
-            xmsg = trim( srggas( igas )%name )
-     &           // ' is not in GC or NR namelist so using background value of '
-     &           // trim( bkground )
-            Call m3mesg( xmsg )
-         Else
-            Do isrg = 1, nsrggas( igas )
-               lsrggas( igas,isrg ) = lsrg( isrg )
-#ifdef verbose_cloud
-               write( logdev,1113 ) cgrid2aq_name( lsrggas( igas,isrg ) ),
-     &         cgrid2aq_map( lsrggas( igas,isrg ) ), srggas( igas )%name,
-     &         igas,lsrggas( igas,isrg )
-#endif                  
-            End Do
-         End If
-      End Do
-
-C...Create the pointers from CGRID to the aerosol species needed by AQCHEM
-      nsrgaer = 0
-      aknsrg = 0
-      write(logdev, 1114)
-      Do iaer = 1, naer
-         Do n = 1, nmodes
-            If ( srgaer( iaer )%name( n ) .Ne. ' ' ) Then
-               nsrgaer( iaer,n ) = indexn( srgaer( iaer )%name( n ), n_cgrid2aq,
-     &                                     cgrid2aq, lsrg )
-               If ( nsrgaer( iaer,n ) .Eq. 0 ) Then
-                  Write ( bkground, '(f8.4)' ) srgaer( iaer )%backgnd
-                  xmsg = trim( srgaer( iaer )%name( n ) )
-     &           // ' is not in AE namelist so using background value of '
-     &           // trim( bkground )
-                  Call m3mesg( xmsg )
-               Else
-                  Do isrg = 1, nsrgaer( iaer,n )
-                     If ( isrg .Gt. mxsrg ) Then
-                        xmsg = 'lsrg will index out of bounds. Increase mxsrg in AQ_DATA.F'
-                        Call m3exit( 'AQ_DATA', 0, 0, xmsg, xstat3 )
-                     End If
-                     lsrgaer( iaer,n,isrg ) = lsrg( isrg )
-			
-#ifdef verbose_cloud
-                     write( logdev,1113 ) cgrid2aq_name( lsrgaer( iaer,n,isrg ) ),
-     &               cgrid2aq_map( lsrgaer( iaer,n,isrg ) ), srgaer( iaer )%name( n ),
-     &               iaer, lsrgaer( iaer,n,isrg )
-#endif          		     
-                  
-                  End Do
-               End If
-            End If
-         End Do
-      End Do
             
-C...Create the pointers for required gas surrogate species needed by AQCHEM
-      lso2   = findSgrGas( req_so2 )    ! Sulfur Dioxide
-      lhno3  = findSgrGas( req_hno3 )   ! Nitric Acid
-      ln2o5  = findSgrGas( req_n2o5 )   ! Dinitrogen Pentoxide
-      lco2   = findSgrGas( req_co2 )    ! Carbon Dioxide
-      lnh3   = findSgrGas( req_nh3 )    ! Ammonia
-      lh2o2  = findSgrGas( req_h2o2 )   ! Hydrogen Perioxide
-      lo3    = findSgrGas( req_o3 )     ! Ozone
-      lfoa   = findSgrGas( req_foa )    ! Formic Acid
-      lmhp   = findSgrGas( req_mhp )    ! Methyl Hydrogen Peroxide
-      lpaa   = findSgrGas( req_paa )    ! Peroxyacidic Acid
-      lh2so4 = findSgrGas( req_h2so4 )  ! Sulfuric Acid
-      lhcl   = findSgrGas( req_hcl )    ! Hydrogen Chloride
-      lgly   = findSgrGas( req_gly )    ! Glyoxal
-      lmgly  = findSgrGas( req_mgly )   ! Methylglyoxal
-      lho    = findSgrGas( req_ho )     ! OH, hydroxyl radical
-
-C...Create the pointers for required aerosol surrogate species needed by AQCHEM
-      lso4   = findSgrAer( req_aso4 )    !  Sulfate
-      lnh4   = findSgrAer( req_anh4 )    !  Ammonium
-      lno3   = findSgrAer( req_ano3 )    !  Nitrate
-      lsoa   = findSgrAer( req_asoa )    !  SOA
-      lorgc  = findSgrAer( req_aorgc )   !  SOA (anthropogenic organic oligomers)
-      lpoa   = findSgrAer( req_apoa )    !  Primary organic aerosol
-      lec    = findSgrAer( req_aec )     !  Elemental carbon
-      lpri   = findSgrAer( req_apri )    !  Primary aerosol (Aitken and Accumulation)
-!     lpricor= findSgrAer( req_apric )   !  Primary aerosol (coarse)
-      lna    = findSgrAer( req_ana )     !  Sodium
-      lcl    = findSgrAer( req_acl )     !  Chloride ion
-!     lcaco3 = findSgrAer( req_acaco3 )  !  Calcium Carbonate aerosol (place holder)
-!     lmgco3 = findSgrAer( req_amgco3 )  !  Magnesium Carbonate aerosol (place holder)
-!     la3fe  = findSgrAer( req_aa3fe )   !  Iron aerosol (place holder)
-!     lb2mn  = findSgrAer( req_ab2mn )   !  Manganese aerosol (place holder)
-!     lk     = findSgrAer( req_ak )      !  Potassium aerosol (Cl- tracked separately)
-      lnum   = findSgrAer( req_num )     !  Number
-      lsrf   = findSgrAer( req_srf )     !  Surface area
-      lcaacc = findSgrAer( req_caacc )   !  Ca in Accumulation mode (AE6) SLN 16March2011
-      lmgacc = findSgrAer( req_mgacc )   !  Mg in Accumulation mode (AE6) SLN 16March2011
-      lkacc  = findSgrAer( req_kacc )    !  K in Accumulation mode (AE6)  SLN 16March2011
-      lfeacc = findSgrAer( req_feacc )   !  Fe in Accumulation mode (AE6) SLN 22March2011
-      lmnacc = findSgrAer( req_mnacc )   !  Mn in Accumulation mode (AE6) SLN 22March2011
-      lsoilc = findSgrAer( req_soilc )   !  SOIL in Coarse mode  (AE6)    SLN 16March2011
-      lanthc = findSgrAer( req_anthc )   !  CORS in Coarse mode  (AE6)    SLN 16March2011
-      lseasc = findSgrAer( req_seasc )   !  SEAS in Coarse mode  (AE6)    SLN 16March2011
-      
-      
-C...For TXHG version
-      ltracer_akn    = findSgrAer( req_traceri  )   !  Tracer aitken mode 
-      ltracer_acc    = findSgrAer( req_tracerj  )   !  Tracer accumation mode 
-      ltracer_cor    = findSgrAer( req_tracerk  )   !  Tracer coarse mode 
-      lphg_akn       = findSgrAer( req_phgi )       !  Mercuric aitken and accumulation modes
-      lphg_acc       = findSgrAer( req_phgj )       !  Mercuric aitken and accumulation modes
-      lphg_cor       = findSgrAer( req_phgk )       !  Mercuric coarse mode
-C...For sulfur tracking model
-      If ( stm ) Then
-         lso4aqh2o2 = findSgrAer( req_aso4aqh2o2 ) ! Sulfate from aq H2O2 rxn
-         lso4aqo3   = findSgrAer( req_aso4aqo3 )   ! Sulfate from aq O3 rxn
-         lso4aqfemn = findSgrAer( req_aso4aqfemn ) ! Sulfate from aq rxn catalyzed by FE&MN
-         lso4aqmhp  = findSgrAer( req_aso4aqmhp )  ! Sulfate from aq MHP rxn
-         lso4aqpaa  = findSgrAer( req_aso4aqpaa )  ! Sulfate from aq PAA rxn
-      End If
-=======
       DO I = 1,N_SPC_AQ
          SPC = MAP_AQtoCGRID( I ) 
          IF ( CGRID_MASK_GAS( SPC ) .OR. CGRID_MASK_NR( SPC ) .OR.
@@ -643,11 +366,11 @@ C...For sulfur tracking model
            igas = index1( aq_spc( I ), ngas, srggas(:)%name )
            if ( igas .eq. 0 ) then
              Write ( xmsg, '(A,A,A,A,A,A)' ),'Aqueous Chem Surrogate ',trim( aq_spc(I) ),
-     &             ' for species ',trim( CGRID_NAME( SPC )),' is not available in the ',
+     &             ' for species ',trim( CGRID_NAME( SPC )),' is not available as a gas in the ',
      &             ' Aq Chem Solver. Please Correct or Delete.'
              Call m3exit( 'AQ_INIT', 0, 0, xmsg, xstat3 )
            else
-             MAP_CGRIDtoSRG( SPC ) = IGAS
+             MAP_CGRIDtoAQGAS( SPC ) = IGAS
              N_AQSRG_GAS( IGAS ) = N_AQSRG_GAS( IGAS ) + 1
            end if
          ELSEIF ( CGRID_MASK_AERO( SPC ) ) THEN
@@ -660,122 +383,37 @@ C...For sulfur tracking model
            end do
            if ( iaero .eq. 0 ) then
              Write ( xmsg, '(A,A,A,A,A,A)' ),'Aqueous Chem Surrogate ',trim( aq_spc(I) ),
-     &             ' for species ',trim( CGRID_NAME( SPC )),' is not available in the ',
-     &             ' Aq Chem Solver. Please Correct or Delete.'
+     &             ' for species ',trim( CGRID_NAME( SPC )),' is not available as an ',
+     &             'aerosol in the Aq Chem Solver. Please Correct or Delete.'
              Call m3exit( 'AQ_INIT', 0, 0, xmsg, xstat3 )
            else
-             MAP_CGRIDtoSRG( SPC ) = IAERO
-             MAP_CGRIDtoSRGMODE( SPC ) = IM
+             MAP_CGRIDtoAQAERO( SPC ) = IAERO
+             MAP_CGRIDtoAQMODE( SPC ) = IM
              N_AQSRG_AER( IAERO,IM ) = N_AQSRG_AER( IAERO,IM ) + 1
            end if
         END IF
       END DO
->>>>>>> cloud_processes2
 
       mapped = .True.
       
-C...Match ACC mode surrogate indices to their AKN mode counterparts
+C...Match Accumulation mode surrogate indices to their Aitken mode counterparts
+      DO IAERO = 1,N_AEROSPC
+         ! Find the CGRID Indeces for the Accumulation and Aitken 
+         ! mode species
+         JACC = AEROSPC_MAP( IAERO, IACC )
+         JAIT = AEROSPC_MAP( IAERO, IAIT )
 
-     
-      DO IAER = 1, NAER
-	 DO ISRG = 1, NSRGAER( IAER,2 )		
-		        NAMEJ = CGRID2AQ_NAME( LSRGAER( IAER,2,ISRG ) )
-		        LS1 = LEN_TRIM(NAMEJ)
-		        LS2 = 0
-		        DO I = 1, LS1
-		           IF(NAMEJ(I:I) .NE. ' ') THEN
-			      LS2 = LS2+1
-		           END IF
-		        END DO
-		        ISRGI = 0
-			
-                        IF(IAER .EQ. LTRACER_ACC) THEN
-		          IAERI = LTRACER_AKN 
-		        ELSE
-		          IAERI = IAER
-		        END IF
-			
-		    LOOP_SRGI: DO ISRG2 = 1, NSRGAER( IAERI, 1 )
-			          NAMEI = CGRID2AQ_NAME( LSRGAER( IAERI,1,ISRG2 ) )
-			          LS3 = LEN_TRIM(NAMEI)
-		                  LS4 = 0
-		                  DO I = 1, LS3
-		                     IF(NAMEI(I:I) .NE. ' ') THEN
-			                LS4 = LS4+1
-			             END IF
-			          END DO
-			
-			          IF( TRIM(NAMEJ(1:LS2-1)) .EQ. TRIM(NAMEI(1:LS4-1)) ) THEN
-			             ISRGI = ISRG2
-			             EXIT LOOP_SRGI
-			          END IF
-			       END DO LOOP_SRGI	
-			       
-			
-			AKNSRG(IAER, ISRG) = ISRGI		
+         ! Determine if these species have aqueous chemistry surrogates
+         JAQ_ACC = MAP_CGRIDtoAQAERO( JACC )
+         JAQ_AIT = MAP_CGRIDtoAQAERO( JAIT )
 
-	 END DO
+         ! If both species are mapped and both have aqueous-chemistry
+         ! surrogates that are the same, then link them.
+         IF ( JACC .GT. 0 .AND. JAIT .GT. 0 .AND.
+     &        JAQ_ACC .GT. 0 .AND. JAQ_ACC .EQ. JAQ_AIT ) THEN
+     &       MAP_ACCtoAIT( JACC ) = JAIT
       END DO
 
-
-<<<<<<< HEAD
-#ifdef verbose_cloud
-      Write( logdev,'( /5x, a )' ) 'AQCHEM gas surrogate species'
-      Write( logdev,'( 5x, a, i4 )' ) 'lso2:   ', lso2
-      Write( logdev,'( 5x, a, i4 )' ) 'lhno3:  ', lhno3
-      Write( logdev,'( 5x, a, i4 )' ) 'ln2o5:  ', ln2o5
-      Write( logdev,'( 5x, a, i4 )' ) 'lco2:   ', lco2
-      Write( logdev,'( 5x, a, i4 )' ) 'lnh3:   ', lnh3
-      Write( logdev,'( 5x, a, i4 )' ) 'lh2o2:  ', lh2o2
-      Write( logdev,'( 5x, a, i4 )' ) 'lo3:    ', lo3
-      Write( logdev,'( 5x, a, i4 )' ) 'lfoa:   ', lfoa
-      Write( logdev,'( 5x, a, i4 )' ) 'lmhp:   ', lmhp
-      Write( logdev,'( 5x, a, i4 )' ) 'lpaa:   ', lpaa
-      Write( logdev,'( 5x, a, i4 )' ) 'lh2so4: ', lh2so4
-      Write( logdev,'( 5x, a, i4 )' ) 'lhcl:   ', lhcl
-      Write( logdev,'( 5x, a, i4 )' ) 'lgly:   ', lgly
-      Write( logdev,'( 5x, a, i4 )' ) 'lmgly:  ', lmgly
-      Write( logdev,'( 5x, a, i4 )' ) 'lho:    ', lho
-
-      Write( logdev,'( /5x, a )' ) 'AQCHEM aer  osol surrogate species'
-      Write( logdev,'( 5x, a, i4 )' ) 'lso4:     ', lso4
-      Write( logdev,'( 5x, a, i4 )' ) 'lnh4:     ', lnh4
-      Write( logdev,'( 5x, a, i4 )' ) 'lno3:     ', lno3
-      Write( logdev,'( 5x, a, i4 )' ) 'lsoa:     ', lsoa
-      Write( logdev,'( 5x, a, i4 )' ) 'lorgc:    ', lorgc
-      Write( logdev,'( 5x, a, i4 )' ) 'lpoa:     ', lpoa
-      Write( logdev,'( 5x, a, i4 )' ) 'lec:      ', lec
-      Write( logdev,'( 5x, a, i4 )' ) 'lpri:     ', lpri
-      Write( logdev,'( 5x, a, i4 )' ) 'lna:      ', lna
-      Write( logdev,'( 5x, a, i4 )' ) 'lcl:      ', lcl
-      Write( logdev,'( 5x, a, i4 )' ) 'lnum:     ', lnum
-      Write( logdev,'( 5x, a, i4 )' ) 'lsrf:     ', lsrf
-      Write( logdev,'( 5x, a, i4 )' ) 'lcaacc:   ', lcaacc
-      Write( logdev,'( 5x, a, i4 )' ) 'lmgacc:   ', lmgacc
-      Write( logdev,'( 5x, a, i4 )' ) 'lkacc:    ', lkacc
-      Write( logdev,'( 5x, a, i4 )' ) 'lfeacc:   ', lfeacc
-      Write( logdev,'( 5x, a, i4 )' ) 'lmnacc:   ', lmnacc
-      Write( logdev,'( 5x, a, i4 )' ) 'lsoilc:   ', lsoilc
-      Write( logdev,'( 5x, a, i4 )' ) 'lanthc:   ', lanthc
-      Write( logdev,'( 5x, a, i4 )' ) 'lseasc:   ', lseasc
-      Write( logdev,'( 5x, a, i4 )' ) 'ltracer_akn:  ', ltracer_akn
-      Write( logdev,'( 5x, a, i4 )' ) 'ltracer_acc:  ', ltracer_acc
-      Write( logdev,'( 5x, a, i4 )' ) 'ltracer_cor:  ', ltracer_cor
-      Write( logdev,'( 5x, a, i4 )' ) 'lphg_akn:     ', lphg_akn
-      Write( logdev,'( 5x, a, i4 )' ) 'lphg_acc:     ', lphg_acc
-      Write( logdev,'( 5x, a, i4 )' ) 'lphg_cor:     ', lphg_cor
-      
-      If ( stm ) Then
-         Write( logdev,'( 5x, a, i4 )' ) 'lso4aqh2o2:', lso4aqh2o2
-         Write( logdev,'( 5x, a, i4 )' ) 'lso4aqo3:  ', lso4aqo3
-         Write( logdev,'( 5x, a, i4 )' ) 'lso4aqfemn:', lso4aqfemn
-         Write( logdev,'( 5x, a, i4 )' ) 'lso4aqmhp: ', lso4aqmhp
-         Write( logdev,'( 5x, a, i4 )' ) 'lso4aqpaa: ', lso4aqpaa
-      End If
-#endif
-
-=======
->>>>>>> cloud_processes2
       Write( logdev,'( / 5x, a / )' ) ' --- AQCHEM Gas and Aerosol Species Mapped ---'
 
       Return
