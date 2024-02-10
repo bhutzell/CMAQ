@@ -128,7 +128,7 @@ C Local Variables (scalars):
       INTEGER       IGAS                ! gas loop counter
       INTEGER       ISRG                ! surrogate loop counter
       INTEGER       PNTR                ! relative pointer variable
-      INTEGER       SPC, ISPC, IAQ      ! liquid species loop counter
+      INTEGER       SPC, ISPC, IAQ, JSPC! species loop counters
       INTEGER ::    STAT
 
       REAL( 8 )  :: BETASO4
@@ -145,8 +145,6 @@ C Local Variables (scalars):
       REAL( 8 ), ALLOCATABLE, SAVE :: AERWDEP( :, :)  ! aerosol wet dep array (mm mol/liter)
       REAL( 8 ), ALLOCATABLE, SAVE :: WSRGAQ( : )     ! weights of each CGRID species in 
                                                       !   its surrogate
-      REAL( 8 ) :: FRACTR, FRACPOA, FRACPRI, FRACSOA
-      INTEGER IAERI
 
 C External Functions:
 
@@ -156,8 +154,7 @@ C External Functions:
       INTERFACE
         SUBROUTINE AQCHEM ( JDATE, JTIME, TEMP, PRES_PA, TAUCLD, PRCRATE,
      &                      WCAVG, WTAVG, AIRM, ALFA0, ALFA2, ALFA3, GAS,
-     &                      AEROSOL, GASWDEP, AERWDEP, HPWDEP, BETASO4, DARK,
-     &                      FRACTR, FRACPOA, FRACPRI, FRACSOA ) 
+     &                      AEROSOL, GASWDEP, AERWDEP, HPWDEP, BETASO4, DARK)
            INTEGER,   INTENT( IN )  :: JDATE  ! current model date, coded YYYYDDD
            INTEGER,   INTENT( IN )  :: JTIME  ! current model time, coded HHMMSS
            REAL,      INTENT( IN )  :: AIRM      ! total air mass in cloudy layers (mol/m2)
@@ -176,10 +173,6 @@ C External Functions:
            REAL( 8 ), INTENT( INOUT ) :: AEROSOL( :,: ) ! aerosol concentrations (mol/molV)
            REAL( 8 ), INTENT( INOUT ) :: GASWDEP( : )   ! gas phase wet deposition array (mm mol/liter)
            REAL( 8 ), INTENT( INOUT ) :: AERWDEP( :,: ) ! aerosol wet deposition array (mm mol/liter)
-	   REAL( 8 ), INTENT( OUT ) :: FRACTR    ! Fraction of J mode tracer scavenged from I mode
-	   REAL( 8 ), INTENT( OUT ) :: FRACPOA   ! Fraction of J mode POA scavenged from I mode
-	   REAL( 8 ), INTENT( OUT ) :: FRACPRI   ! Fraction of J mode PRI scavenged from I mode
-	   REAL( 8 ), INTENT( OUT ) :: FRACSOA   ! Fraction of J mode SOA scavenged from I mode
            LOGICAL,   INTENT( IN )    :: DARK           ! DARK = TRUE is night,  DARK = FALSE is day
         END SUBROUTINE AQCHEM
       END INTERFACE      
@@ -195,10 +188,10 @@ C...  event-statistics variables.
 
         CALL AQ_DATA_INIT()  
 	
-        ALLOCATE ( GAS    ( NGAS ),
-     &             GASWDEP( NGAS ),
-     &             AEROSOL( NAER, N_MODE),
-     &             AERWDEP( NAER, N_MODE),
+        ALLOCATE ( GAS    ( N_AQ_GAS ),
+     &             GASWDEP( N_AQ_GAS ),
+     &             AEROSOL( N_AQ_AER, N_MODE),
+     &             AERWDEP( N_AQ_AER, N_MODE),
      &             WSRGAQ ( N_CGRID_SPC ),
      &             STAT = STAT)
         IF (STAT .NE. 0) THEN
@@ -214,19 +207,19 @@ C... Allocate sensitivity arrays
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
-        ALLOCATE ( S_GAS( NPMAX,NGAS ), S_GASWDEP( NPMAX,NGAS ), STAT = STAT )
+        ALLOCATE ( S_GAS( NPMAX,N_AQ_GAS ), S_GASWDEP( NPMAX,N_AQ_GAS ), STAT = STAT )
         IF ( STAT .NE. 0 ) THEN
           XMSG = 'Failure allocating S_GAS or S_GASWDEP'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
-        ALLOCATE ( S_AEROSOL( NPMAX,NAER,N_MODE ), S_AERWDEP( NPMAX,NAER,N_MODE ), STAT = STAT )
+        ALLOCATE ( S_AEROSOL( NPMAX,N_AQ_AER,N_MODE ), S_AERWDEP( NPMAX,N_AQ_AER,N_MODE ), STAT = STAT )
         IF ( STAT .NE. 0 ) THEN
           XMSG = 'Failure allocating S_AEROSOL or S_AERWDEP'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
-        ALLOCATE ( S_WSRGAQ( NPMAX,NGAS,MXSRG ), STAT = STAT )
+        ALLOCATE ( S_WSRGAQ( NPMAX,N_AQ_GAS,MXSRG ), STAT = STAT )
         IF ( STAT .NE. 0 ) THEN
           XMSG = 'Failure allocating S_WSRGGAS or S_WSRGAQ'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -250,7 +243,7 @@ C...Zero out concentrations
       
       ! Initialize Gas and Aerosol Vectors at Background 
       DO IGAS = 1,N_AQ_GAS
-        IF ( N_AQSRG_GAS( IGAS ) .EQ. 0 ) THEN
+        IF ( N_AQSRG_GAS( IGAS ) .EQ. 0 ) 
      &     GAS( IGAS ) = REAL( SRGGAS( IGAS )%BACKGND, 8 ) * 1.0D-6 ! [mol/molV]
       END DO
 
@@ -264,8 +257,9 @@ C...Zero out concentrations
                AEROSOL( IAER,: ) = REAL( SRGAER( IAER )%BACKGND * 1.0E-6 * CTHK1, 8 )
      &                           / REAL( CGRID_MW( ISPC ) * AIRM, 8 )  ! [molmolV]
 
+            END IF
           END IF
-        END IF
+        END DO
       END DO
 
 #ifdef sens
@@ -327,28 +321,27 @@ C...Zero out concentrations
 
         IAQ = MAP_CGRIDtoAQGAS( ISPC ) 
         IF ( CGRID_MASK_AERO( ISPC ) ) THEN
-             IM = MAP_CGRIDtoSRGMODE( ISPC )
-             IF ( AEROSOL( IAER, IM ) .GT. 0.0D0 ) THEN
-                WSRGAQ( ISPC ) = REAL( POLC( ISPC ), 8 )
-     &                                       / REAL( AEROSOL( IAQ, IM ), 8 )
+           IM = MAP_CGRIDtoAQMODE( ISPC )
+           IF ( AEROSOL( IAER, IM ) .GT. 0.0D0 ) THEN
+              WSRGAQ( ISPC ) = REAL( POLC( ISPC ), 8 )
+     &                       / REAL( AEROSOL( IAQ, IM ), 8 )
 #ifdef sens
-                DO NP = 1, NPMAX
-                   IF ( S_AEROSOL( NP, IAQ, IM ) .NE. 0.0D0 ) THEN
+              DO NP = 1, NPMAX
+                 IF ( S_AEROSOL( NP, IAQ, IM ) .NE. 0.0D0 ) THEN
                       S_WSRGAQ( NP, ISPC ) = S_POLC( NP, ISPC ) / S_AEROSOL( NP, IAQ, IM )
-                   ELSE
+                 ELSE
                       S_WSRGAQ( NP, ISPC ) = 0.0D0
-                   END IF
-                END DO
+                 END IF
+              END DO
 #endif
-            ELSE
-                WSRGAQ( ISPC ) = 1.0D0 / REAL( N_AQSRG_AER( IAQ, IM ), 8 )
+           ELSE
+              WSRGAQ( ISPC ) = 1.0D0 / REAL( N_AQSRG_AER( IAQ, IM ), 8 )
 #ifdef sens
-                DO NP = 1, NPMAX
+              DO NP = 1, NPMAX
                     S_WSRGAQ( NP, ISPC ) = 0.0D0
-                ENDDO
+              ENDDO
 #endif
-            END IF
-          END IF
+           END IF
         END IF
 
       END DO
@@ -387,8 +380,7 @@ C...perform aqueous-phase chemistry calculations
 
       CALL AQCHEM ( JDATE, JTIME, TBARC, PBARC, TAUCLD, PRATE1,
      &              WCBAR, WTBAR, AIRM, ALFA0, ALFA2, ALFA3, GAS,
-     &              AEROSOL, GASWDEP, AERWDEP, HPWDEP, BETASO4, DARK,
-     &              FRACTR, FRACPOA, FRACPRI, FRACSOA  )
+     &              AEROSOL, GASWDEP, AERWDEP, HPWDEP, BETASO4, DARK)
 
 C...  compute the scavenging coefficient
       EALFA2T = EXP( -ALFA2 * TAUCLD )

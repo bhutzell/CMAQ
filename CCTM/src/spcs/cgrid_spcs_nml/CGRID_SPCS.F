@@ -115,6 +115,7 @@ c control species
       INTEGER, SAVE              :: N_SPC_DEPV
       INTEGER, SAVE              :: N_SPC_AQ
       INTEGER, SAVE              :: RHOJ_LOC
+      CHARACTER( 16 ), ALLOCATABLE, SAVE :: CGRID_NAME( : )
       REAL,    ALLOCATABLE, SAVE :: CGRID_MW       ( : )
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: CGRID_UNITS    ( : )
       LOGICAL, ALLOCATABLE, SAVE :: CGRID_MASK_GAS ( : )

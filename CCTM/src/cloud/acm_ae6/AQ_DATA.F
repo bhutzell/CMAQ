@@ -36,7 +36,8 @@ C     Oct 2014: B.Hutzell:forcing to skip mapping if aerosol species
 C     index equals the values for H3OP species as for aerosol water
 C     species 
 C-----------------------------------------------------------------------
-      Use aero_data, Only: n_aerolist, n_aerospc, conmin, n_mode, akn, acc, cor
+      Use aero_data, Only: n_aerolist, n_aerospc, conmin, n_mode, 
+     &                     iait, iacc, icor
       Use runtime_vars
 #ifdef mpas
       Use util_module, only : index1
@@ -100,7 +101,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C...Aerosol surrogates species 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-      Character(16) :: srgaer_name( naer,n_mode )
+      Character(16) :: srgaer_name( n_aq_aer,n_mode )
       Type sur_aer_type
          Character( 16 ) :: name     ! bulk surrogate name
          Real            :: backgnd  ! background value [ug m-3]
@@ -108,7 +109,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          Real            :: molwt    ! molecular weight [g mol-1]
       End Type sur_aer_type
 
-      Type ( sur_aer_type ), Parameter  :: srgaer( naer ) = (/
+      Type ( sur_aer_type ), Parameter  :: srgaer( n_aq_aer ) = (/
 
 C                      Name     Background  Density  MolWt
 C                    ----------  ----------  ------  -----
@@ -252,7 +253,8 @@ C for sulfur tracking model
       Integer, Allocatable, Save :: MAP_CGRIDtoAQGAS( : )  ! Map from CGRID to Surrogates
       Integer, Allocatable, Save :: MAP_CGRIDtoAQAERO( : ) ! Map from CGRID to Surrogates
       Integer, Allocatable, Save :: MAP_CGRIDtoAQMODE( : ) ! Map from CGRID to Surrogates
-      Integer, Allocatable, Save :: MAP_ACCtoAIT( : )
+      Integer, Allocatable, Save :: MAP_ACCtoAIT( : )      ! Map Accumulation to Aitken Mode Species
+      Real,    Save              :: FRACAIT( N_AQ_AER )    ! Store fraction of Aitken mode in each aerosol surrogate
 
       Real( 8 )   :: jh2o2_hydrometeors    ! H2O2 photolysis rate in condensed water [sec-1]
       Real( 8 )   :: jhno3_hydrometeors    ! HNO3 photolysis rate in condensed water [sec-1]
@@ -302,7 +304,7 @@ C Local Variable used to determine what optional TX to add to surrogates
       !Integer :: n_missing_tx
       !Integer :: n_which_txadd( nadd_tx )
       CHARACTER(16) :: NAMEI, NAMEJ
-      INTEGER LS2, LS1, LS3, LS4, ISRG2, ISRGI, IAERI, SPCI      
+      INTEGER JAIT, JACC, JAQ_ACC, JAQ_AIT
 
       Logical, Save :: Firstcall = .True.
       
@@ -346,7 +348,7 @@ C...Map aero species
       Call map_aero()
 
 C...Initialize aerosol surrogate species names 
-      Do spc = 1, naer
+      Do spc = 1, n_aq_aer
         Do im = 1,n_mode
           srgaer_name( spc,im ) = srgaer( spc )%name // '_' // modename( im )
         End Do
@@ -363,7 +365,7 @@ C...Create Map Directly from CGRID to the gas and aerosol species in AQCHEM
          SPC = MAP_AQtoCGRID( I ) 
          IF ( CGRID_MASK_GAS( SPC ) .OR. CGRID_MASK_NR( SPC ) .OR.
      &        CGRID_MASK_TRAC( SPC ) ) THEN
-           igas = index1( aq_spc( I ), ngas, srggas(:)%name )
+           igas = index1( aq_spc( I ), n_aq_gas, SRGGAS(:)%name )
            if ( igas .eq. 0 ) then
              Write ( xmsg, '(A,A,A,A,A,A)' ),'Aqueous Chem Surrogate ',trim( aq_spc(I) ),
      &             ' for species ',trim( CGRID_NAME( SPC )),' is not available as a gas in the ',
@@ -375,7 +377,7 @@ C...Create Map Directly from CGRID to the gas and aerosol species in AQCHEM
            end if
          ELSEIF ( CGRID_MASK_AERO( SPC ) ) THEN
            do im0 = 1,n_mode
-             iaero0 = index1( aq_spc( I ), naer, srgaer_name(:,im0) )
+             iaero0 = index1( aq_spc( I ), n_aq_aer, SRGAER_name(:,im0) )
              if ( iaero0 .ne. 0 ) then
                  iaero = iaero0
                  im = im0
@@ -409,8 +411,8 @@ C...Match Accumulation mode surrogate indices to their Aitken mode counterparts
 
          ! If both species are mapped and both have aqueous-chemistry
          ! surrogates that are the same, then link them.
-         IF ( JACC .GT. 0 .AND. JAIT .GT. 0 .AND.
-     &        JAQ_ACC .GT. 0 .AND. JAQ_ACC .EQ. JAQ_AIT ) THEN
+         IF ( JACC .GT. 0 .AND. JAIT .GT. 0 .AND. 
+     &        JAQ_ACC .GT. 0 .AND. JAQ_ACC .EQ. JAQ_AIT ) 
      &       MAP_ACCtoAIT( JACC ) = JAIT
       END DO
 
