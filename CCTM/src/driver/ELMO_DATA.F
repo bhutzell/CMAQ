@@ -489,7 +489,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         LOGICAL, SAVE           :: AERO_CHEM_SET = .FALSE.
  
         ! Define type for storing names, properties, and components of
-        ! all EMO variables 
+        ! all ELMO variables 
         TYPE ELMO_TABLE_TYPE
             CHARACTER (LEN = 16) :: NAME        ! Variable Name ( as it appears on the ELMO_LIST, in CGRID, etc.)
             CHARACTER (LEN = 16) :: OUT_NAME    ! Variable Name that will be written to the output file
