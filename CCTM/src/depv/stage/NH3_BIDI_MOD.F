@@ -17,9 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-! RCS file, release, date & time of last delta, author, state, [and locker]
-! $Header: /project/work/rep/arc/CCTM/src/depv/m3dry/ABFLUX_MOD.F,v 1.11 2012/04/19 17:03:23 yoj Exp $
-
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       Module NH3_Bidi_Mod
 
@@ -64,12 +61,12 @@ C-------------------------------------------------------------------------------
 ! shared variables
       Real, Save, Allocatable :: frac_ir( :,: ) ! irrigated fraction of ag 
 ! Private variables used in this module and subroutines     
-      Real, Save,              Private :: C_gam           ! Canadian fertilizer facter   
-      Real, Parameter,         Private :: maxgam   = 2.0e5 ! maximum soil gamm. It is assumed that any excess NH4 would from salts
+      Real, Save,              Private :: C_gam           ! Canadian fertilizer factor   
+      Real, Parameter,         Private :: maxgam   = 2.0e5 ! maximum soil gamma. It is assumed that any excess NH4 is from salts
 !      Real, Parameter,         Private :: natgam   = 20.0  ! Background soil gamma
 ! variables for STAGE bidi NH3
       Real, Save, Allocatable, Private :: frac_ag( :,: ) ! fraction of ag    
-      Real, Save, Allocatable, Private :: knit1  ( :,: ) ! EPIC Grid nitrificaiton rate
+      Real, Save, Allocatable, Private :: knit1  ( :,: ) ! EPIC Grid nitrification rate
       Real, Save, Allocatable, Private :: knit2  ( :,: ) ! EPIC Grid nitrification rate
       Real, Save, Allocatable, Private :: NH4_G1 ( :,: ) ! EPIC Grid soil ammonium
       Real, Save, Allocatable, Private :: NH4_G2 ( :,: ) ! EPIC Grid soil ammonium
@@ -112,7 +109,7 @@ C-------------------------------------------------------------------------------
 ! STAGE bidi variables
          Real,       Allocatable :: L1_MIN     ( :,:,: ) ! Epic Layer 1 organic N mineralization
          Real,       Allocatable :: L2_MIN     ( :,:,: ) ! Epic Layer 2 organic N mineralization 
-         Real,       Allocatable :: C_knit1    ( :,:,: ) ! EPIC Crop nitrificaiton rate
+         Real,       Allocatable :: C_knit1    ( :,:,: ) ! EPIC Crop nitrification rate
          Real,       Allocatable :: C_knit2    ( :,:,: ) ! EPIC Crop nitrification rate
          Real,       Allocatable :: fagam1     ( :,: )   ! delta gamma due to fertilizer app and mineralization
          Real,       Allocatable :: fagam2     ( :,: )   ! delta gamma due to fertilizer app and mineralization           
@@ -354,7 +351,7 @@ C-------------------------------------------------------------------------------
 ! Eliminate unrealistically low bulk density 
             Where( BDs1 .Lt. 1.0 ) BDs1 = 1.6
             Where( BDs2 .Lt. 1.0 ) BDs2 = 1.6
-! prevent missmatched data between soil and daily files
+! prevent mismatched data between soil and daily files
             Where( MHp1 .Eq. 0.0 .Or. MHp2 .Eq. 0.0 )
                gamma1 = 0.0
                gamma2 = 0.0  
@@ -371,21 +368,8 @@ C-------------------------------------------------------------------------------
                Knit2 = 0.0
             End Where
 
-         End If ! INIT_MEDC_1
+         End If ! MEDC_AVAIL
          
-         Return
-!------------------------------------------------------------------------------
-! Error handling section
-!------------------------------------------------------------------------------
-1001     Continue
-         Call M3exit( pname, jdate, jtime, xmsg, xstat1 )
-
-C-------------------------------------------------------------------------------
-C Format statements.
-C-------------------------------------------------------------------------------
-
-9001     Format( 'Failure reading ', a, 1x, 'from ', a )
-
          Return
          
          End Subroutine Init_NH3_Bidi
