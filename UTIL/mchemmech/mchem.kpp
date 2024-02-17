@@ -1,0 +1,36 @@
+// define chemical species
+#INCLUDE mchem.spc
+
+// define chemical equations
+#INCLUDE mchem.eqn
+
+// select programming language
+#LANGUAGE Fortran90
+
+// choose an integrator and define substeps
+#INCLUDE integr.kpp
+
+// set indices of unused species to ind_*=0
+#DUMMYINDEX ON
+
+// do not create Stoichiom files
+#STOICMAT OFF
+
+// whether to split time derivatives into production and loss terms does not work
+// Have to modify rosenbrock_tloopv3.f90 to call Fun_split and compute Vdot
+//#FUNCTION SPLIT
+
+// do not create Hessian files
+#HESSIAN OFF
+
+// do not create Mex files
+#MEX OFF
+
+// equation tags
+#EQNTAGS ON
+
+// show kpp-options in output
+//#WRITE_OPT
+// produce driver routine for solver
+#DRIVER general
+

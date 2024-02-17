@@ -1,0 +1,8 @@
+# Ignore all files created by python-scripts
+gas.eqn
+gas.spc
+mchem.eqn
+mchem.spc
+
+# Ignore all files created by KPP
+mchem_*.F90

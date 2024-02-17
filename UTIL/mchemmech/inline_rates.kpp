@@ -1,0 +1,171 @@
+#INLINE F90_RATES
+REAL(kind=dp) FUNCTION FALL_OFF ( A0,B0,C0,A1,B1,C1,CE,CF)
+  IMPLICIT NONE
+  REAL(kind=dp), INTENT( IN ) :: A0,B0,C0,A1,B1,C1,CE,CF
+  REAL(kind=dp) K0, K1, KEND
+! K0 = A0 * COEFF_FALLOFF * DEXP(B0/TEMP)* (TEMP/300.0_dp)**C0
+! K1 = A1 * DEXP(B1/TEMP) * (TEMP/300.0_dp)**C1
+  K0 = A0 * COEFF_FALLOFF * DEXP(B0*INV_TEMP)* (TEMP/300.0_dp)**C0
+  K1 = A1 * DEXP(B1*INV_TEMP) * (TEMP/300.0_dp)**C1
+  KEND = ( ( 1.0_dp + ( ( 1.0_dp / CE ) * DLOG10( K0 / K1 ) ) ** 2.0_dp ) )
+  KEND = 1.0_dp / KEND
+  FALL_OFF = ( K0 / ( 1.0_dp + K0/K1 ) ) * CF ** KEND
+END FUNCTION FALL_OFF
+
+REAL( kind=dp ) FUNCTION HALOGEN_FALLOFF(A1,B1,A2,B2,A3)
+   IMPLICIT NONE
+   REAL( kind=dp ), INTENT( IN ) :: A1
+   REAL( kind=dp ), INTENT( IN ) :: B1
+   REAL( kind=dp ), INTENT( IN ) :: A2
+   REAL( kind=dp ), INTENT( IN ) :: B2
+   REAL( kind=dp ), INTENT( IN ) :: A3
+   INTRINSIC DEXP
+   IF ( ( OPEN_WATER ) .AND. LSUNLIGHT ) THEN
+       HALOGEN_FALLOFF = A1 * DEXP( B1 * PRESS ) + A2 * DEXP( B2 * PRESS )
+       HALOGEN_FALLOFF = DMIN1( A3, HALOGEN_FALLOFF) 
+       HALOGEN_FALLOFF = HALOGEN_FALLOFF * SEAWATER
+   ELSE
+       HALOGEN_FALLOFF = 0.0_dp
+   END IF
+   RETURN
+END FUNCTION HALOGEN_FALLOFF
+
+   REAL(kind=dp) FUNCTION ARR2_DP( A0,B0 )
+   ! Same as ARR2 just taking A0 and B0 in dp
+      REAL(kind=dp) A0,B0
+      ARR2_DP =  A0 * EXP( B0/TEMP )
+   END FUNCTION ARR2_DP
+
+       REAL( kind=dp ) FUNCTION POWER_T02( A0,B0 )
+         IMPLICIT NONE
+! rate constant for CMAQ Arrhenuis reaction type 2
+! Arguements:
+         REAL( kind=dp ), INTENT( IN ) :: A0
+         REAL( kind=dp ), INTENT( IN ) :: B0
+         ! Local
+         REAL( kind=dp ) :: TEMPOT300
+         TEMPOT300 = TEMP / 300.0D0
+         POWER_T02 =  A0 * TEMPOT300**B0
+         RETURN
+       END FUNCTION POWER_T02
+
+       REAL( kind=dp ) FUNCTION ARRHENUIS_T04( A0,B0,C0 )
+         IMPLICIT NONE
+! rate constant for CMAQ Arrhenuis reaction type 4
+! Arguements:
+         REAL( kind=dp ), INTENT( IN ) :: A0
+         REAL( kind=dp ), INTENT( IN ) :: B0
+         REAL( kind=dp ), INTENT( IN ) :: C0
+         ! Local:
+         INTRINSIC DEXP
+         REAL( kind=dp ) :: INV_TEMP
+         REAL( kind=dp ) :: TEMPOT300
+         INV_TEMP  = 1.0D0 / TEMP
+         TEMPOT300 = TEMP / 300.0D0
+         ARRHENUIS_T04 =  A0 * DEXP( B0 * INV_TEMP ) * TEMPOT300**C0
+         RETURN
+       END FUNCTION ARRHENUIS_T04
+
+       REAL( kind=dp ) FUNCTION FALLOFF_T08(A0,C0,A2,C2,A3,C3)
+! rate constant for CMAQ fall off reaction type 8
+         IMPLICIT NONE
+! Arguements:
+         REAL( kind=dp ), INTENT( IN ) :: A0
+         REAL( kind=dp ), INTENT( IN ) :: C0
+         REAL( kind=dp ), INTENT( IN ) :: A2
+         REAL( kind=dp ), INTENT( IN ) :: C2
+         REAL( kind=dp ), INTENT( IN ) :: A3
+         REAL( kind=dp ), INTENT( IN ) :: C3
+         ! Local:
+         REAL( kind=dp ) K0
+         REAL( kind=dp ) K2
+         REAL( kind=dp ) K3
+         REAL( kind=dp ) :: INV_TEMP
+         INTRINSIC DEXP
+         INV_TEMP  = 1.0D0 / TEMP
+         K0 = A0 * DEXP( C0 * INV_TEMP )
+         K2 = A2 * DEXP( C2 * INV_TEMP )
+         K3 = A3 * DEXP( C3 * INV_TEMP )
+         K3 = K3 * COEFF_FALLOFF
+         FALLOFF_T08 = K0 + K3/( 1.0D0 + K3/K2 )
+         RETURN
+       END FUNCTION FALLOFF_T08
+
+       REAL( kind=dp ) FUNCTION FALLOFF_T09(A1,C1,A2,C2)
+! rate constant for CMAQ fall off reaction type 9
+         IMPLICIT NONE
+! Arguements:
+         REAL( kind=dp ), INTENT( IN ) :: A1
+         REAL( kind=dp ), INTENT( IN ) :: C1
+         REAL( kind=dp ), INTENT( IN ) :: A2
+         REAL( kind=dp ), INTENT( IN ) :: C2
+         !  Local:
+         REAL( kind=dp ) K1
+         REAL( kind=dp ) K2
+         REAL( kind=dp ) :: INV_TEMP
+         INTRINSIC DEXP
+         INV_TEMP  = 1.0D0 / TEMP
+         K1 = A1 * DEXP( C1 * INV_TEMP )
+         K2 = A2 * DEXP( C2 * INV_TEMP )
+         FALLOFF_T09 = K1 + K2 * COEFF_FALLOFF
+         RETURN
+       END FUNCTION FALLOFF_T09
+       REAL( kind=dp ) FUNCTION FALLOFF_T10(A0,B0,C0,A1,B1,C1,CE,CF)
+         IMPLICIT NONE
+! rate constant for CMAQ fall off reaction type 10
+! Arguements:
+         REAL( kind=dp ), INTENT( IN ) :: A0
+         REAL( kind=dp ), INTENT( IN ) :: B0
+         REAL( kind=dp ), INTENT( IN ) :: C0
+         REAL( kind=dp ), INTENT( IN ) :: A1
+         REAL( kind=dp ), INTENT( IN ) :: B1
+         REAL( kind=dp ), INTENT( IN ) :: C1
+         REAL( kind=dp ), INTENT( IN ) :: CE
+         REAL( kind=dp ), INTENT( IN ) :: CF
+         ! Local:
+         REAL( kind=dp ) K0
+         REAL( kind=dp ) K1
+         REAL( kind=dp ) KEND
+         REAL( kind=dp ) :: INV_TEMP
+         REAL( kind=dp ) :: TEMPOT300
+         INV_TEMP  = 1.0D0 / TEMP
+         TEMPOT300 = TEMP / 300.0D0
+         K0 = A0 * COEFF_FALLOFF * DEXP(B0*INV_TEMP)* TEMPOT300**C0
+         K1 = A1 * DEXP(B1*INV_TEMP) * TEMPOT300**C1
+         KEND = ( ( 1.0D0 + ( ( 1.0D0 / CE ) * DLOG10( K0 / K1 ) ) ** 2.0D0 ) )
+         KEND = 1.0D0 / KEND
+         FALLOFF_T10 = ( K0 / ( 1.0D0 + K0/K1 ) ) * CF ** KEND
+         RETURN
+       END FUNCTION FALLOFF_T10
+
+       REAL( dp ) FUNCTION KMT(TEMP,LWC,MMASS,DG,HENRY,ACOM,FB)
+         IMPLICIT NONE
+         REAL( dp ), INTENT( IN ) :: TEMP
+         REAL( dp ), INTENT( IN ) :: LWC
+         REAL( dp ), INTENT( IN ) :: MMASS
+         REAL( dp ), INTENT( IN ) :: DG
+         REAL( dp ), INTENT( IN ) :: HENRY
+         REAL( dp ), INTENT( IN ) :: ACOM
+         INTEGER,   INTENT( IN ) :: FB ! logical (forward/backward)
+         REAL( dp )               :: RAD
+         REAL( dp )               :: R_KMT
+         REAL( dp )               :: R2_KMT
+         REAL( dp )               :: PI_KMT
+         REAL( dp )               :: V_mean
+         INTRINSIC DEXP
+
+         RAD    = 0.8D-5
+         R_KMT  = 8.3145D0
+         R2_KMT = 0.08206D0
+         PI_KMT = 3.1415926536D0
+
+         V_mean = SQRT( 8D0 * R_KMT * TEMP * 1000.0D0 / PI_KMT / MMASS )
+         KMT    = 1.0D0/((RAD*RAD)/(3D0*DG)+(4D0*RAD/(3D0*V_mean*ACOM)))
+         IF ( FB .EQ. 0 ) THEN
+            KMT = KMT * LWC / 1000.0D0
+         ELSE
+            KMT   = KMT  / ( R2_KMT * TEMP * HENRY )
+         END IF
+         RETURN
+       END FUNCTION KMT
+#ENDINLINE
