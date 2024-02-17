@@ -1,0 +1,359 @@
+
+!------------------------------------------------------------------------!
+!  The Community Multiscale Air Quality (CMAQ) system software is in     !
+!  continuous development by various groups and is based on information  !
+!  from these groups: Federal Government employees, contractors working  !
+!  within a United States Government contract, and non-Federal sources   !
+!  including research institutions.  These groups give the Government    !
+!  permission to use, prepare derivative works of, and distribute copies !
+!  of their work in the CMAQ system to the public and to permit others   !
+!  to do so.  The United States Environmental Protection Agency          !
+!  therefore grants similar permission to use the CMAQ system software,  !
+!  but users are requested to provide copies of derivative works or      !
+!  products designed to operate in the CMAQ system to the United States  !
+!  Government without restrictions as to use by others.  Software        !
+!  that is used with the CMAQ system but distributed under the GNU       !
+!  General Public License or the GNU Lesser General Public License is    !
+!  subject to their copyright restrictions.                              !
+!------------------------------------------------------------------------!
+
+
+      MODULE MCHEM_CLOUDS
+
+      USE CGRID_SPCS            ! CGRID mechanism species
+      USE UTILIO_DEFN
+      USE mchem_Model
+
+      IMPLICIT NONE
+
+      INTEGER, PARAMETER  :: SPC_DIM = 1000
+      INTEGER, SAVE                         :: N_CL_SPC               ! Number of cloud species per cloud
+      INTEGER, PARAMETER                    :: N_IC = 2               ! Number of possible surrogate species.
+                                                                      !   Currently this is limited to two species.
+      INTEGER, PARAMETER                    :: CL_TYPES = 2           ! Number of cloud types
+      CHARACTER( 2 ), DIMENSION( CL_TYPES ) :: CL_NAMES = ['RS','CV'] ! Name of cloud type (RS=Resolved, CV=Convective)
+      INTEGER, PARAMETER                    :: IRS = 1                ! Index for resolved clouds
+      INTEGER, PARAMETER                    :: ICV = 2                ! Index for convective clouds
+      REAL,    PARAMETER                    :: LWC_LIMIT = 0.00001    ! LWC limit used for cloud chemistry
+
+      TYPE SPECIES_DATA_CLOUDS
+          CHARACTER( 16 ) :: SPECIES_NAME  ! CMAQ Species Name
+          REAL            :: MOLWT         ! Molar weight of species
+          REAL            :: CHARGE        ! Charge of species
+          CHARACTER( 16 ) :: IC1_SURR      ! IC1 Surrogate
+          REAL            :: IC1_FAC       ! IC1 Scale Factor
+          CHARACTER( 16 ) :: IC1_RESET     ! IC1 reset needed?
+          CHARACTER( 16 ) :: IC2_SURR      ! IC2 Surrogate
+          REAL            :: IC2_FAC       ! IC2 Scale Factor
+          CHARACTER( 16 ) :: IC2_RESET     ! IC2 reset needed?
+          CHARACTER( 16 ) :: EV_SURR       ! EV Surrogate
+          REAL            :: EV_FAC        ! EV Scale Factor
+          CHARACTER( 16 ) :: WETSUB        ! If coarse mode aerosols will be affected by scavenging only
+      END TYPE SPECIES_DATA_CLOUDS
+
+      TYPE (SPECIES_DATA_CLOUDS), DIMENSION(SPC_DIM), SAVE :: CL_SPECIES_DATA
+
+      TYPE MECH_SPECIES_CLOUDS
+          CHARACTER( 19 ), DIMENSION( CL_TYPES ) :: NAME      ! MECH Species Name
+          INTEGER        , DIMENSION( CL_TYPES ) :: KPP_INDEX ! MECH Species Index
+          REAL                                   :: MOLWT     ! Molar weight of species
+          REAL                                   :: CHARGE    ! Charge of species
+          CHARACTER( 16 ), DIMENSION( N_IC )     :: IC_NAME   ! IC Surrogate Name
+          INTEGER        , DIMENSION( N_IC )     :: IC_CGRID_INDEX  ! IC Surrogate Index
+          REAL           , DIMENSION( N_IC )     :: IC_FAC    ! IC Scale Factor
+          LOGICAL        , DIMENSION( N_IC )     :: IC_RESET  ! IC reset needed?
+          REAL           , DIMENSION( N_IC )     :: IC_MW     ! IC molar weight
+          CHARACTER( 2 )                         :: EV_TYPE   ! Evaporation species type
+          CHARACTER( 16 )                        :: EV_NAME   ! EV Surrogate Name
+          INTEGER                                :: EV_CGRID_INDEX  ! EV Surrogate Index
+          REAL                                   :: EV_FAC    ! EV Scale Factor
+          REAL                                   :: EV_MW     ! EV molar weight
+          CHARACTER( 16 )                        :: WETSUB    ! If coarse mode aerosols will be affected by scavenging only
+          INTEGER                                :: WETSUB_CGRID_INDEX  ! WETSUB Surrogate Index
+      END TYPE MECH_SPECIES_CLOUDS
+
+      TYPE (MECH_SPECIES_CLOUDS), ALLOCATABLE, SAVE :: MECH_SPC_CL(:)
+
+      CONTAINS
+
+      SUBROUTINE CL_SPCS_DEF ( )
+
+        IMPLICIT NONE
+
+        INTEGER, SAVE       :: DEV_CL_NML
+        INTEGER             :: ICL, ICLT                   ! Loop indices
+        CHARACTER( 200 )    :: FMT                         ! Format for log-file output
+        CHARACTER( 16 )     :: CL_NML_NAME = 'CL_spec.nml' ! Name of cloud-nml file
+
+        CL_SPECIES_DATA%SPECIES_NAME = ''
+        CL_SPECIES_DATA%MOLWT        = 0.
+        CL_SPECIES_DATA%CHARGE       = 0.
+        CL_SPECIES_DATA%IC1_SURR     = ''
+        CL_SPECIES_DATA%IC1_FAC      = 1.
+        CL_SPECIES_DATA%IC1_RESET    = ''
+        CL_SPECIES_DATA%IC2_SURR     = ''
+        CL_SPECIES_DATA%IC2_FAC      = 1.
+        CL_SPECIES_DATA%IC2_RESET    = ''
+        CL_SPECIES_DATA%EV_SURR      = ''
+        CL_SPECIES_DATA%EV_FAC       = 1.
+        CL_SPECIES_DATA%WETSUB       = ''
+
+        NAMELIST / CL_NML / CL_SPECIES_DATA
+
+        DEV_CL_NML = JUNIT()
+        OPEN( FILE = TRIM( CL_NML_NAME ), UNIT = DEV_CL_NML,
+     &        STATUS = 'old', POSITION = 'rewind' )
+        READ( NML = CL_NML, UNIT = DEV_CL_NML )
+
+        ! Determine Number of Cloud Species
+        N_CL_SPC = 0
+        DO ICL = 1,SPC_DIM
+           IF ( CL_SPECIES_DATA( ICL )%SPECIES_NAME .EQ. '' ) EXIT
+           N_CL_SPC = ICL
+        END DO
+
+        ALLOCATE( MECH_SPC_CL( N_CL_SPC ) )
+        DO ICL = 1,N_CL_SPC
+           MECH_SPC_CL( ICL )%CHARGE  = 0.
+           MECH_SPC_CL( ICL )%MOLWT   = 0.
+           MECH_SPC_CL( ICL )%EV_TYPE = ''
+           MECH_SPC_CL( ICL )%EV_NAME = ''
+           MECH_SPC_CL( ICL )%EV_CGRID_INDEX = 0
+           MECH_SPC_CL( ICL )%EV_FAC  = 0.
+           MECH_SPC_CL( ICL )%EV_MW   = 0.
+           MECH_SPC_CL( ICL )%WETSUB  = ''
+           MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX = 0
+           DO ICLT = 1,CL_TYPES
+              MECH_SPC_CL( ICL )%NAME( ICLT )       = ''
+              MECH_SPC_CL( ICL )%KPP_INDEX( ICLT )  = 0
+           END DO
+           DO ICLT = 1,N_IC
+              MECH_SPC_CL( ICL )%IC_NAME( ICLT )  = ''
+              MECH_SPC_CL( ICL )%IC_CGRID_INDEX( ICLT ) = 0
+              MECH_SPC_CL( ICL )%IC_FAC( ICLT )   = 0.
+              MECH_SPC_CL( ICL )%IC_RESET( ICLT ) = .FALSE.
+              MECH_SPC_CL( ICL )%IC_MW( ICLT )    = 0.
+           END DO
+        END DO
+
+        DO ICL = 1,N_CL_SPC
+           DO ICLT = 1,CL_TYPES
+              MECH_SPC_CL( ICL )%NAME( ICLT )    = TRIM(CL_SPECIES_DATA( ICL )%SPECIES_NAME) // '_' // CL_NAMES( ICLT )
+              MECH_SPC_CL( ICL )%KPP_INDEX( ICLT ) = INDEX_KPP( MECH_SPC_CL( ICL )%NAME( ICLT ) )
+           END DO
+           MECH_SPC_CL( ICL )%CHARGE = CL_SPECIES_DATA( ICL )%CHARGE
+           MECH_SPC_CL( ICL )%MOLWT  = CL_SPECIES_DATA( ICL )%MOLWT
+           IF ( TRIM(CL_SPECIES_DATA( ICL )%IC1_SURR) .NE. '' ) THEN
+              MECH_SPC_CL( ICL )%IC_NAME( 1 )         = CL_SPECIES_DATA( ICL )%IC1_SURR
+              MECH_SPC_CL( ICL )%IC_FAC ( 1 )         = CL_SPECIES_DATA( ICL )%IC1_FAC
+              MECH_SPC_CL( ICL )%IC_CGRID_INDEX ( 1 ) = INDEX_CGRID( MECH_SPC_CL( ICL )%IC_NAME( 1 ) )
+              MECH_SPC_CL( ICL )%IC_RESET ( 1 )       = GET_LOGICAL_NML( CL_SPECIES_DATA( ICL )%IC1_RESET )
+              MECH_SPC_CL( ICL )%IC_MW  ( 1 )         = CGRID_MW( MECH_SPC_CL( ICL )%IC_CGRID_INDEX( 1 ) )
+           END IF
+           IF ( TRIM(CL_SPECIES_DATA( ICL )%IC2_SURR) .NE. '' ) THEN
+              MECH_SPC_CL( ICL )%IC_NAME( 2 )         = CL_SPECIES_DATA( ICL )%IC2_SURR
+              MECH_SPC_CL( ICL )%IC_FAC ( 2 )         = CL_SPECIES_DATA( ICL )%IC2_FAC
+              MECH_SPC_CL( ICL )%IC_CGRID_INDEX ( 2 ) = INDEX_CGRID( MECH_SPC_CL( ICL )%IC_NAME( 2 ) )
+              MECH_SPC_CL( ICL )%IC_RESET ( 2 )       = GET_LOGICAL_NML( CL_SPECIES_DATA( ICL )%IC2_RESET )
+              MECH_SPC_CL( ICL )%IC_MW  ( 2 )         = CGRID_MW( MECH_SPC_CL( ICL )%IC_CGRID_INDEX( 2 ) )
+           END IF
+           IF ( TRIM(CL_SPECIES_DATA( ICL )%EV_SURR) .NE. '' ) THEN
+              MECH_SPC_CL( ICL )%EV_NAME        = CL_SPECIES_DATA( ICL )%EV_SURR
+              MECH_SPC_CL( ICL )%EV_CGRID_INDEX = INDEX_CGRID( MECH_SPC_CL( ICL )%EV_NAME )
+              MECH_SPC_CL( ICL )%EV_TYPE        = SPC_TYPE( MECH_SPC_CL( ICL )%EV_CGRID_INDEX )
+              MECH_SPC_CL( ICL )%EV_FAC         = CL_SPECIES_DATA( ICL )%EV_FAC
+              MECH_SPC_CL( ICL )%EV_MW          = CGRID_MW( MECH_SPC_CL( ICL )%EV_CGRID_INDEX )
+           END IF
+           IF ( TRIM(CL_SPECIES_DATA( ICL )%WETSUB) .NE. '' ) THEN
+              MECH_SPC_CL( ICL )%WETSUB             = CL_SPECIES_DATA( ICL )%WETSUB
+              MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX = INDEX_CGRID( MECH_SPC_CL( ICL )%WETSUB )
+           END IF
+        END DO
+
+C..   Report cloud species definitions to log-file
+        WRITE(LOGDEV,"(A)") 'Cloud species definition used in MCHEM:'
+        FMT = "(A16,A6,X,A6,X,A9,X,A8,X,A9,X,A7,X,A9,X,A8,X,A9,X,A7,X,A9,X,A8,X,A8,X,A7,X,A6,X,A8,X,A12)"
+        WRITE(LOGDEV,FMT)   'NAME            ','MOLWT','CHARGE','KPP_INDEX',
+     &                      'IC1_NAME','IC1_INDEX','IC1_FAC','IC1_RESET',
+     &                      'IC2_NAME','IC2_INDEX','IC2_FAC','IC2_RESET',
+     &                      'EV_NAME ','EV_INDEX','EV_TYPE','EV_FAC',
+     &                      'WETSUB  ','WETSUB_INDEX'
+        FMT = "(A16,F6.1,X,F6.1,X,I9,X,A8,X,I9,X,F7.1,X,L9,X,A8,X,I9,X,F7.1,X,L9,X,A8,X,I8,X,A7,X,F6.1,X,A8,X,I12)"
+        DO ICL = 1,N_CL_SPC
+           DO ICLT = 1,CL_TYPES
+              WRITE(LOGDEV,FMT) MECH_SPC_CL( ICL )%NAME( ICLT ), MECH_SPC_CL( ICL )%MOLWT,
+     &                          MECH_SPC_CL( ICL )%CHARGE, MECH_SPC_CL( ICL )%KPP_INDEX( ICLT ),
+     &                          MECH_SPC_CL( ICL )%IC_NAME( 1 ), MECH_SPC_CL( ICL )%IC_CGRID_INDEX ( 1 ),
+     &                          MECH_SPC_CL( ICL )%IC_FAC ( 1 ), MECH_SPC_CL( ICL )%IC_RESET ( 1 ),
+     &                          MECH_SPC_CL( ICL )%IC_NAME( 2 ), MECH_SPC_CL( ICL )%IC_CGRID_INDEX ( 2 ),
+     &                          MECH_SPC_CL( ICL )%IC_FAC ( 2 ), MECH_SPC_CL( ICL )%IC_RESET ( 2 ),
+     &                          MECH_SPC_CL( ICL )%EV_NAME, MECH_SPC_CL( ICL )%EV_CGRID_INDEX,
+     &                          MECH_SPC_CL( ICL )%EV_TYPE, MECH_SPC_CL( ICL )%EV_FAC,
+     &                          MECH_SPC_CL( ICL )%WETSUB, MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX
+           END DO
+        END DO
+
+      END SUBROUTINE CL_SPCS_DEF
+
+      SUBROUTINE INIT_CLOUDS ( CONC, LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
+
+        IMPLICIT NONE
+        REAL, INTENT ( INOUT ) :: CONC( N_CGRID_SPC )    !  species concentration in cell
+        REAL(dp), INTENT( IN ) :: LWC_RS, LWC_CV, PHI2_RS, PHI2_CV
+        INTEGER                :: ICL, ICLT, ICGRID, IKPP_RS, IKPP_CV
+        REAL(dp)               :: FRAC_RS, FRAC_CV, LWC_SUM, SCAL
+        REAL, PARAMETER        :: ZERO = 1.0E-30
+
+        REAL(dp)               :: SUM_CHARGE, DELINVT, Kw, CHGBAL
+        INTEGER, DIMENSION( CL_TYPES )  :: IHp  = [IND_Hp_RS,IND_Hp_CV]
+        INTEGER, DIMENSION( CL_TYPES )  :: IOHm = [IND_OHm_RS,IND_OHm_CV]
+        REAL(dp), DIMENSION( CL_TYPES ) :: PHI2
+        INTEGER                :: IKPP
+
+C.. Initialise cloud tracer
+        LWC_SUM = LWC_RS + LWC_CV
+        FRAC_RS = 0.0
+        IF ( LWC_RS .GT. LWC_LIMIT ) FRAC_RS = LWC_RS / LWC_SUM
+        FRAC_CV = 0.0
+        IF ( LWC_CV .GT. LWC_LIMIT ) FRAC_CV = LWC_CV / LWC_SUM
+
+        DO ICL = 1,N_CL_SPC
+           IF ( ( TRIM(MECH_SPC_CL( ICL )%IC_NAME( 1 )) .NE. '' ) .OR.
+     &          ( TRIM(MECH_SPC_CL( ICL )%IC_NAME( 2 )) .NE. '' ) ) THEN
+              IKPP_RS = MECH_SPC_CL( ICL )%KPP_INDEX( IRS )
+              IKPP_CV = MECH_SPC_CL( ICL )%KPP_INDEX( ICV )
+              DO ICLT = 1,N_IC
+                 ICGRID  = MECH_SPC_CL( ICL )%IC_CGRID_INDEX( ICLT )
+                 IF ( ICGRID .NE. 0 ) THEN
+                    SCAL = MECH_SPC_CL( ICL )%IC_FAC( ICLT ) ! Scale by IC fraction
+                    SCAL = SCAL * ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%IC_MW( ICLT ) ) ! Scale by molar weight
+                    IF ( FRAC_RS .GT. 0.0 ) C( IKPP_RS ) = C( IKPP_RS ) +
+     &                       ( CONC( ICGRID ) * FRAC_RS * SCAL )
+                    IF ( FRAC_CV .GT. 0.0 ) C( IKPP_CV ) = C( IKPP_CV ) +
+     &                       ( CONC( ICGRID ) * FRAC_CV * SCAL )
+                    IF ( MECH_SPC_CL( ICL )%IC_RESET ( ICLT ) )
+     &                   CONC( ICGRID ) = MAX( CONC( ICGRID ) -
+     &                 ( CONC( ICGRID ) * MECH_SPC_CL( ICL )%IC_FAC ( ICLT ) ), ZERO ) ! In this scaling molar weight does not need to be taken into account
+                 END IF
+              END DO
+           END IF
+        END DO
+
+C.. Initialise Hp and OHm
+        PHI2( 1 ) = PHI2_RS
+        PHI2( 2 ) = PHI2_CV
+        DO ICLT = 1,CL_TYPES
+           IF ( PHI2( ICLT ) .GT. 0. ) THEN
+           SUM_CHARGE = 0.
+           DO ICL = 1,N_CL_SPC
+              IF ( MECH_SPC_CL( ICL )%CHARGE .NE. 0.0 ) THEN
+                 IKPP = MECH_SPC_CL( ICL )%KPP_INDEX( ICLT )
+                 SUM_CHARGE = SUM_CHARGE + C( IKPP ) * MECH_SPC_CL( ICL )%CHARGE
+              END IF
+           END DO ! N_CL_SPC
+           DELINVT = ( 298.D0 - TEMP ) / ( 298.D0 * TEMP )
+           Kw = 1.00D-14 * EXP( -6.955D+03 * DELINVT )  ! includes conc of H2O
+           CHGBAL = SUM_CHARGE * PHI2( ICLT )
+           C( IOHm( ICLT ) ) = ( CHGBAL + SQRT( CHGBAL * CHGBAL + 4.D0 * Kw ) ) * 0.5D0
+           C( IHp ( ICLT ) ) = Kw / C( IOHm( ICLT ) )
+           IF ( -LOG10( C( IHp ( ICLT ) ) ) .LT. .0 ) WRITE(*,*) -LOG10( C( IHp ( ICLT ) ) )
+           C( IOHm( ICLT ) ) = MAX( C( IOHm( ICLT ) ) / PHI2( ICLT ), ZERO ) !Convert to molec/cm3
+           C( IHp ( ICLT ) ) = MAX( C( IHp ( ICLT ) ) / PHI2( ICLT ), ZERO ) !Convert to molec/cm3
+           C( IND_O2_RS ) = ( 0.21 * PRESS * 1.3D-3 * EXP( 1500.D0 * DELINVT ) ) / PHI2( ICLT )
+           C( IND_O2_CV ) = ( 0.21 * PRESS * 1.3D-3 * EXP( 1500.D0 * DELINVT ) ) / PHI2( ICLT )
+           END IF
+        END DO ! CL_TYPES
+
+      END SUBROUTINE INIT_CLOUDS
+
+      SUBROUTINE EVAP_CLOUDS ( CONC, WFAC_RS, WFAC_CV, TSTEP )
+
+        IMPLICIT NONE
+        REAL, INTENT ( INOUT ) :: CONC( N_CGRID_SPC )    !  species concentration in cell
+        REAL(dp), INTENT( IN ) :: WFAC_RS, WFAC_CV, TSTEP
+        INTEGER                :: ICL, ICLW, ICGRID, IKPP_RS, IKPP_CV
+        REAL, PARAMETER        :: ZERO = 1.0E-30
+        REAL(dp)               :: SCAL, CONC_TEMP, EXPWDEP
+        INTRINSIC DEXP
+
+C.. Evaporate cloud tracer
+        DO ICL = 1,N_CL_SPC
+           IF ( TRIM(MECH_SPC_CL( ICL )%EV_NAME) .NE. '' ) THEN
+              IKPP_RS = MECH_SPC_CL( ICL )%KPP_INDEX( IRS )
+              IKPP_CV = MECH_SPC_CL( ICL )%KPP_INDEX( ICV )
+              ICGRID  = MECH_SPC_CL( ICL )%EV_CGRID_INDEX
+              SCAL = MECH_SPC_CL( ICL )%EV_FAC
+              SCAL = SCAL * ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%EV_MW ) ! Scale by molar weight
+              CONC_TEMP = C( IKPP_RS ) + C( IKPP_CV )
+              CONC( ICGRID ) = MAX( CONC( ICGRID ) +
+     &                 ( MECH_SPC_CL( ICL )%EV_FAC * CONC_TEMP ), ZERO )
+              C( IKPP_RS ) = ZERO ! reseting these fields should not be necessary
+              C( IKPP_CV ) = ZERO ! reseting these fields should not be necessary
+           END IF
+        END DO
+
+        DO ICL = 1,N_CL_SPC
+C.. Coarse species are only affected by scavenging. Thus subtract coarse aerosol for now
+C.. This code needs modifications once we take scavenging into account
+              IF ( TRIM(MECH_SPC_CL( ICL )%WETSUB) .NE. '' ) THEN
+                 ICLW = MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX
+                 ICGRID  = MECH_SPC_CL( ICL )%EV_CGRID_INDEX
+                 EXPWDEP = DEXP( - ( WFAC_RS + WFAC_CV ) * TSTEP )
+                 CONC( ICLW ) = CONC( ICLW ) * EXPWDEP
+                 CONC( ICGRID ) = MAX( CONC( ICGRID ) - CONC( ICLW ), ZERO )
+              END IF
+C.. The code above needs modifications once we take scavenging into account
+        END DO
+
+      END SUBROUTINE EVAP_CLOUDS
+
+      INTEGER FUNCTION INDEX_KPP( NAME )
+
+        IMPLICIT NONE
+
+        CHARACTER( 16 ), INTENT( IN ) :: NAME
+        INTEGER :: SPC
+
+        DO SPC = 1, NSPEC
+           IF ( TRIM(NAME) == TRIM(SPC_NAMES(SPC)) ) THEN
+              INDEX_KPP = SPC
+           END IF
+        END DO
+
+      END FUNCTION INDEX_KPP
+
+      INTEGER FUNCTION INDEX_CGRID( NAME )
+
+        IMPLICIT NONE
+
+        CHARACTER( 16 ), INTENT( IN ) :: NAME
+        INTEGER :: SPC
+
+        DO SPC = 1, N_CGRID_SPC
+           IF ( TRIM(NAME) == TRIM(CGRID_NAME(SPC)) ) THEN
+              INDEX_CGRID = SPC
+           END IF
+        END DO
+
+      END FUNCTION INDEX_CGRID
+
+      CHARACTER( 2 ) FUNCTION SPC_TYPE( IND )
+
+        IMPLICIT NONE
+
+        INTEGER, INTENT( IN ) :: IND
+        INTEGER               :: IGC, IAE, INR, ITR
+
+        IGC = N_GC_SPCD
+        IAE = N_GC_SPCD + N_AE_SPC
+        INR = N_GC_SPCD + N_AE_SPC + N_NR_SPC
+        ITR = N_GC_SPCD + N_AE_SPC + N_NR_SPC + N_TR_SPC
+
+        IF ( IND .LE. IGC ) SPC_TYPE = 'GC'
+        IF ( ( IND .GT. IGC ) .AND. ( IND .LE. IAE ) ) SPC_TYPE = 'AE'
+        IF ( ( IND .GT. IAE ) .AND. ( IND .LE. INR ) ) SPC_TYPE = 'NR'
+        IF ( ( IND .GT. INR ) .AND. ( IND .LE. ITR ) ) SPC_TYPE = 'TR'
+
+      END FUNCTION SPC_TYPE
+
+      END MODULE MCHEM_CLOUDS
