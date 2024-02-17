@@ -158,10 +158,16 @@ set make_options = "-j"                #> additional options for make command if
  else                                      
      setenv ChemSolver ebi                   #> [ default for most mechanisms: ebi ]
  endif
+
+ # Uncomment if mchem is used
+ #setenv ChemSolver mchem
                                          
  if ( $ChemSolver == ebi ) then             
     set ModGas    = gas/${ChemSolver}_${Mechanism}
-                                            
+ else if ( $ChemSolver == mchem ) then
+    set ModGas    = mchem
+    set ModCloud  = cloud/acm_ae7_kmt2
+    set ModAero   = aero/aero7
  else
     set ModGas    = gas/${ChemSolver}
  endif
@@ -199,7 +205,13 @@ set make_options = "-j"                #> additional options for make command if
  set DBG        = "${myDBG}"
  setenv F_FLAGS   "${myFFLAGS}"            #> F77 flags
  set F90_FLAGS  = "${myFRFLAGS}"           #> F90 flags
- set CPP_FLAGS  = ""                       #> Fortran preprocessor flags
+
+ if ( $ChemSolver == mchem ) then
+    set CPP_FLAGS  = "-Dkpp_cloud"   #> Fortran preprocessor flags
+ else
+    set CPP_FLAGS  = ""              #> Fortran preprocessor flags
+ endif
+
  set C_FLAGS    = "${myCFLAGS} -DFLDMN -I" #> C flags
  set LINK_FLAGS = "${myLINK_FLAG}"         # Link flags
 
