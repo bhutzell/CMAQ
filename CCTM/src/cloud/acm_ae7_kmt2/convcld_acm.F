@@ -545,6 +545,17 @@ C...Mocko and Cotton (1995)
         RCRITW = 0.879 + SQRT( 1.0 / ( 100.0 + XKM * XKM ) )
         RCRITL = 0.839 + SQRT( 1.0 / ( 50.0 + 0.5 * XKM ** 3 ) )
 
+#ifdef kpp_cloud
+        ALLOCATE ( WCBAR_CV ( NCOLS, NROWS, NLAYS ),
+     &             WETFAC_CV( NCOLS, NROWS, NLAYS ),
+     &             ALFA0_CV ( NCOLS, NROWS, NLAYS ),
+     &             ALFA3_CV ( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = '*** Error allocating WCBAR_CV, WETFAC_CV, ALFA0_CV, and ALFA3_CV'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+#endif
+
       END IF   ! Firstime
 
       IF ( .NOT. CONVECTIVE_SCHEME) RETURN
@@ -592,6 +603,14 @@ C...  set the time to the half hour for data interpolation
         MTIME = 10000 * ( JTIME / 10000 ) + 3000
       
       END IF
+
+#ifdef kpp_cloud
+      ! reset convective cloud lwc, wet deposition rate, and ALFA3
+      WCBAR_CV  = 0.0D0
+      WETFAC_CV = 0.0D0
+      ALFA0_CV  = 0.0D0
+      ALFA3_CV  = 0.0D0
+#endif
 
 C...clear arrays that capture ACM cloud results
 
@@ -1456,6 +1475,21 @@ C...  then perform the aqueous chemistry within the cloud and
 C...  re-adjust the ending and removed amounts for those species
 C...  that participated in cloud chemistry
 
+#ifdef kpp_cloud
+          IF ( WCBAR .GT. 1.0E-05 ) THEN
+             WCBAR_CV  ( COL, ROW, LAY ) = WCBAR
+             WETFAC_CV ( COL, ROW, LAY ) = REAL( WTBAR * 1000.0D0 * CTHK1 * 3600.0D0 /
+     &                                     ( 1000.0D0 * MAX( 1.0D-20, PRATE1 ) ), 8 )
+             WETFAC_CV ( COL, ROW, LAY ) = 1.0D0 /  WETFAC_CV ( COL, ROW, LAY )
+             ALFA0_CV  ( COL, ROW, LAY ) = ALFA0
+             ALFA3_CV  ( COL, ROW, LAY ) = ALFA3
+          ELSE
+             WCBAR_CV  ( COL, ROW, LAY ) = 0.0D0
+             WETFAC_CV ( COL, ROW, LAY ) = 0.0D0
+             ALFA0_CV  ( COL, ROW, LAY ) = 0.0D0
+             ALFA3_CV  ( COL, ROW, LAY ) = 0.0D0
+          END IF
+#else
           IF ( WCBAR .GT. 1.0E-05 ) THEN
  
 C...  determine day or night from cosine of zenith angle for the cell; Golam Sarwar
@@ -1480,6 +1514,7 @@ C...convert mean photolysis rates to 1/sec
      &                    REMOV, REMOVAC, ALFA0, ALFA2, ALFA3, COSZ )
 
           END IF
+#endif
 
           DO SPC = 1, NSPCSD
             IF ( CEND( SPC ) .LT. 0.0 ) WRITE( LOGDEV,* ) ' CEND,R,C,SP=',
