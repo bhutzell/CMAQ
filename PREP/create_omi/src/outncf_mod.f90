@@ -1,0 +1,817 @@
+MODULE OUTNCF_FILE_ROUTINES
+
+  IMPLICIT NONE
+
+!-------------------------------------------------------------------------------
+! The definitions and declarations in this include file follow those
+! given in the I/O-API include file FDESC3C.EXT and replace similar
+! definitions.  This include file is compatible with FDESC3C.EXT.
+!
+! All variable names end in string "_GD", which is a grid identifier for
+! multiple grid applications. "_GD" should be "_G1" for the first grid,
+! "_G2" for the second grid, etc.
+!
+! The horizontal grid definition information is REAL*8 in order 
+! to achieve the required precision in geographic-to/from-grid
+! coordinate conversions.
+!-------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------
+! FORTRAN units and file names.
+  INTEGER                           :: cdfid_CMAQ
+  INTEGER                           :: cdfid_FULL
+  
+!-------------------------------------------------------------------------------
+! GDTYP_GD:
+! The map projection type:
+!   1: LATGRD for lat-lon coordinates (unused)
+!   2: LAMGRD for Lambert coordinates
+!   3: MERGRD for Mercator coordinates
+!   4: STEGRD for Stereographic coordinates
+!   5: UTMGRD for UTM coordinates
+!-------------------------------------------------------------------------------
+
+  INTEGER                      :: gdtyp_gd = 1
+
+!-------------------------------------------------------------------------------
+! The definitions of the map projection specification parameters:
+!   P_ALP_GD  (PROJ_ALPHA),
+!   P_BET_GD  (PROJ_BETA),
+!   P_GAM_GD  (PROJ_GAMMA),
+! depend upon the projection type, as follows:
+! (Note: if P_ALP_GD < AMISS (=-9E36, from PARMS3.EXT), then the grid
+!  description is missing or invalid.)
+! 
+! Lambert        P_ALP_GD <= P_BET_GD are the two latitudes that
+!                determine the projection cone; P_GAM_GD is the
+!                central meridian.
+! 
+! Mercator       P_ALP_GD and P_BET_GD are the latitude and longitude
+!                of the coordinate origin (within the tangent circle);
+!                P_GAM_GD is the angle between the cylinder axis
+!                and the North polar axis.
+! 
+! Stereographic  P_ALP_GD and P_BET_GD are the latitude and longitude
+!                of the point of tangency; P_GAM_GD is the angle from
+!                true North to the Y-axis.
+!    
+! UTM:           P_ALP_GD is the UTM zone.
+!                P_BET_GD and P_GAM_GD are unused.
+!    
+! lat-lon:       Currently not used.  Coordinate units are degrees, with
+!                -180.0 < X <= 180.0,  -90.0 <= Y <= 90.0   
+!                Western longitudes and southern latitudes are negative.
+!-------------------------------------------------------------------------------
+
+  REAL(8)                      :: p_alp_gd   ! degrees
+  REAL(8)                      :: p_bet_gd   ! degrees
+  REAL(8)                      :: p_gam_gd   ! degrees
+
+!-------------------------------------------------------------------------------
+! (XCENT_GD, YCENT_GD):
+! For Lambert, Mercator, and Stereographic, these are the 
+!     longitude, -180 < X <= 180, and the latitude, -90 <= Y <= 90, 
+!     for the center of the grid's respective Cartesian coordinate system.
+! For UTM:  ?
+! For Lat-Lon:  unused
+!-------------------------------------------------------------------------------
+     
+  REAL(8)                      :: xcent_gd   ! degrees longitude
+  REAL(8)                      :: ycent_gd   ! degrees latitude
+
+!-------------------------------------------------------------------------------
+! (XORIG_GD, YORIG_GD):
+! For Lambert, Mercator, Stereographic, and UTM these are the
+!     location in map units (Km) of the origin cell (1,1) (lower left corner)
+!     of the of the horizontal grid measured from (XCENT_GD, YCENT_GD).
+! For Lat-Lon: units are degrees - unused
+!-------------------------------------------------------------------------------
+     
+  REAL(8)                      :: xorig_gd = -90.0  ! X-origin [m]
+  REAL(8)                      :: yorig_gd = -180.0  ! Y-origin [m]
+
+!-------------------------------------------------------------------------------
+! (XCELL_GD, YCELL_GD):
+! The X-direction and Y-direction cell dimensions (m) for a regular grid
+! If zero, the grid is assumed irregular and described by other means (e.g.
+! a grid-geometry file).
+!-------------------------------------------------------------------------------
+     
+  REAL(8)                      :: xcell_gd = 1.0  ! X-cell dimension [m]
+  REAL(8)                      :: ycell_gd = 1.0  ! Y-cell dimension [m]
+
+!-------------------------------------------------------------------------------
+! VGTYP_GD:
+! The vertical grid type:
+!   1: VGSIGP for sigma-P coordinates
+!   2: VGSGP0 for sigma-P0 coordinates
+!   3: VGSIGZ for sigma-Z coordinates
+!   4: VGETAP for eta-P coordinates
+!   5: VGPRES for pressure coordinates
+!   6: VGZVAL for Z (meters above ground)
+!   7: VHZVAL for H (meters above mean sea level)
+!   8: IMISS  for vertical coordinates not stored in VGLVSD
+!             (e.g., temporally or spatially changing vertical coordinates)
+!-------------------------------------------------------------------------------
+     
+  INTEGER                      :: vgtyp_gd = 7
+
+!-------------------------------------------------------------------------------
+! VGTPUN_GD:
+! The units of the vertical coordinate top.
+!-------------------------------------------------------------------------------
+
+  CHARACTER(LEN=16)            :: vgtpun_gd
+
+!-------------------------------------------------------------------------------
+! VGTOP_GD:
+! The value for the model top used in the definition of the sigma
+! coordinate systems in the VGTPUN_GD units
+! For sigma-P, the relationship between pressure levels P and sigma-P is
+! given by the following formula:
+!    sigma-P = ( P - VGTOP_GD ) / (P_srf - VGTOP_GD ),
+! where P_srf is the surface pressure.
+!-------------------------------------------------------------------------------
+
+  REAL                         :: vgtop_gd = 5000.0
+
+!-------------------------------------------------------------------------------
+! VGLVUN_GD:
+! The units of the vertical coordinate surface values
+!-------------------------------------------------------------------------------
+
+  CHARACTER(LEN=16)            :: vglvun_gd
+
+!-------------------------------------------------------------------------------
+! VGLVS_GD( 1...NLAYS+1 ):
+! The list of vertical coordinate surface values in the VGLVUN_GD units
+! Layer k extends from VGLVS3D( k ) to VGLVS3D( k+1 ).
+!-------------------------------------------------------------------------------
+
+  REAL :: vglvs_gd   ( 2 ) = (/ 0.0, 1.0 /)
+
+
+!-------------------------------------------------------------------------------
+! COORDNAM_GD:
+! The coordinate system name used for I/O-API description and GRIDDESC.
+!-------------------------------------------------------------------------------
+
+  CHARACTER(LEN=16)            :: coordnam_gd = 'OMI_GLOBE'
+
+!-------------------------------------------------------------------------------
+! GDNAME_GD:
+! The grid name used for I/O-API description and GRIDDESC.
+!-------------------------------------------------------------------------------
+
+  CHARACTER(LEN=16)            :: gdname_gd  = 'OMI_CMAQ'
+
+!-------------------------------------------------------------------------------
+! Dimensions of CTM domain.
+!-------------------------------------------------------------------------------
+  INTEGER            :: data_source = 1
+  INTEGER            :: ncols = 1     ! number of grid columns (X direction)
+  INTEGER            :: nrows = 1     ! number of grid rows (Y direction)
+  INTEGER            :: nlays = 1     ! number of vertical layers
+  INTEGER, PARAMETER :: nthik = 1     ! boundary thickness (cells)
+  INTEGER            :: nbndy = 1     ! number of cells in one layer of boundary
+  INTEGER            :: ncg_x = 0.5   ! coarse grid X
+  INTEGER            :: ncg_y = 0.5   ! coarse grid Y
+
+  REAL,    PARAMETER :: eradm = 6.37E+5 ! earth radius [m]
+
+  INTEGER, PARAMETER :: maxlays = 100   ! max allowed in NLAYS
+
+  INTEGER, PARAMETER :: ttol_sec = 300  ! time tolerance [in seconds] for output
+                                        ! from the meteorological model to
+                                        ! deviate from valid time and still be
+                                        ! considered valid at that time
+!-------------------------------------------------------------------------------
+! Dimensions for netCDF output.
+!-------------------------------------------------------------------------------
+
+  INTEGER           :: nlucat
+  INTEGER           :: nmos
+  INTEGER           :: nperim
+  INTEGER           :: nsoi
+  INTEGER           :: nsoicat
+  INTEGER           :: nx
+  INTEGER           :: nxp1       ! nx + 1
+  INTEGER           :: ny
+  INTEGER           :: nyp1       ! ny + 1
+  INTEGER           :: nz
+  INTEGER           :: nzp1       ! nz + 1
+
+!-------------------------------------------------------------------------------
+! Program and version descriptors.
+!-------------------------------------------------------------------------------
+
+  CHARACTER(LEN=16),  PARAMETER     :: progname   = 'CREATE_OMI'
+  CHARACTER(LEN=10),  PARAMETER     :: vdate      = '07/12/2024'
+  CHARACTER(LEN=8),   PARAMETER     :: ver        = 'V6.0'
+
+!-------------------------------------------------------------------------------
+! Time-varying 2d fields at cell centers.
+!-------------------------------------------------------------------------------
+
+  INTEGER           :: nfld2dxyt 
+
+  TYPE fld2ddata
+    REAL,         ALLOCATABLE  :: fld        ( : , : )
+    CHARACTER(LEN=16)          :: fldname
+    CHARACTER(LEN=80)          :: long_name
+    CHARACTER(LEN=16)          :: units
+    CHARACTER(LEN=16)          :: dimnames   ( 4 )
+    INTEGER                    :: istart     ( 4 )
+    INTEGER                    :: iend       ( 4 )
+  END TYPE fld2ddata
+
+  TYPE(fld2ddata), ALLOCATABLE :: fld2dxyt ( : )
+
+CONTAINS
+
+SUBROUTINE outncf (time_now, sdate, stime, cdfid_m)
+
+!-------------------------------------------------------------------------------
+! Name:     Output netCDF File
+! Purpose:  Create a netCDF file of output.
+!-------------------------------------------------------------------------------
+
+  use netcdf
+ 
+  IMPLICIT NONE
+! Arguments:
+  CHARACTER(LEN=24),  INTENT(IN)    :: time_now
+  INTEGER,            INTENT(IN)    :: sdate
+  INTEGER,            INTENT(IN)    :: stime
+  INTEGER,            INTENT(INOUT) :: cdfid_m
+! LOCAL:
+
+  INTEGER                         :: dim_nlucat
+  INTEGER                         :: dim_nmos
+  INTEGER                         :: dim_nsoillay
+  INTEGER                         :: dim_nx
+  INTEGER                         :: dim_nxp1
+  INTEGER                         :: dim_ny
+  INTEGER                         :: dim_nyp1
+  INTEGER                         :: dim_nz
+  INTEGER                         :: dim_nzp1
+  INTEGER                         :: dim_time
+  INTEGER                         :: dim_timestr
+  LOGICAL,            SAVE        :: first      = .TRUE.
+  CHARACTER(LEN=256)              :: fl
+  INTEGER,  SAVE,     ALLOCATABLE :: id_fld     ( : )
+  INTEGER,  SAVE                  :: id_time
+  INTEGER,  SAVE                  :: it         = 0
+  INTEGER,            PARAMETER   :: len_time   = 19
+  INTEGER                         :: mydimx
+  INTEGER                         :: mydimy
+  INTEGER                         :: myendx
+  INTEGER                         :: myendy
+  INTEGER                         :: myendz
+  INTEGER                         :: n
+  INTEGER                         :: nn
+  INTEGER                         :: ntot
+  INTEGER                         :: nvars
+  CHARACTER(LEN=16),  PARAMETER   :: pname      = 'OUTNCF'
+  INTEGER                         :: rcode
+  CHARACTER(LEN=32)               :: var
+
+!-------------------------------------------------------------------------------
+! Error, warning, and informational messages.
+!-------------------------------------------------------------------------------
+
+  CHARACTER(LEN=256), PARAMETER :: f9100 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR CREATING DIMENSION FOR ', a, &
+    & /, 1x, '***   IN FILE ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
+  CHARACTER(LEN=256), PARAMETER :: f9200 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR DEFINING VARIABLE ', a, &
+    & /, 1x, '***   IN FILE ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
+  CHARACTER(LEN=256), PARAMETER :: f9300 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR CREATING ATTRIBUTE FOR', a, &
+    & /, 1x, '***   IN FILE ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
+  CHARACTER(LEN=256), PARAMETER :: f9350 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR ENDING DEFINITIONS ', &
+    & /, 1x, '***   IN FILE ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
+  CHARACTER(LEN=256), PARAMETER :: f9400 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR WRITING VARIABLE ', a, &
+    & /, 1x, '***   TO FILE ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
+  CHARACTER(LEN=256), PARAMETER :: f9500 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR CREATING NETCDF FILE', &
+    & /, 1x, '***   FILE = ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
+  CHARACTER(LEN=256), PARAMETER :: f9700 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR CLOSING NETCDF FILE', &
+    & /, 1x, '***   FILE = ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
+!-------------------------------------------------------------------------------
+! Allocate necessary variables.
+!-------------------------------------------------------------------------------
+
+  it = it + 1
+
+  nvars = nfld2dxyt  
+
+  IF ( .NOT. ALLOCATED ( id_fld ) ) ALLOCATE ( id_fld ( nvars ) )
+
+!-------------------------------------------------------------------------------
+! If first time calling this routine, set up the netCDF output file.
+!-------------------------------------------------------------------------------
+
+  IF ( first ) THEN
+
+  !-----------------------------------------------------------------------------
+  ! Create netCDF file.
+  !-----------------------------------------------------------------------------
+
+    fl = TRIM('test.ncf')
+
+    rcode = nf90_create (fl, nf90_noclobber, cdfid_m)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9500) TRIM(pname), TRIM(fl), TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+  !-----------------------------------------------------------------------------
+  ! Set up dimensions.
+  !-----------------------------------------------------------------------------
+
+    var = "time"
+    rcode = nf90_def_dim (cdfid_m, TRIM(var), nf90_unlimited, dim_time)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+    var = "timestr"
+    rcode = nf90_def_dim (cdfid_m, TRIM(var), len_time, dim_timestr)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+    var = "nx"
+    rcode = nf90_def_dim (cdfid_m, TRIM(var), nx, dim_nx)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+    var = "ny"
+    rcode = nf90_def_dim (cdfid_m, TRIM(var), ny, dim_ny)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+    var = "nz"
+    rcode = nf90_def_dim (cdfid_m, TRIM(var), nz, dim_nz)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+    var = "nxp1"
+    rcode = nf90_def_dim (cdfid_m, TRIM(var), nxp1, dim_nxp1)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+    var = "nyp1"
+    rcode = nf90_def_dim (cdfid_m, TRIM(var), nyp1, dim_nyp1)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+    var = "nzp1"
+    rcode = nf90_def_dim (cdfid_m, TRIM(var), nzp1, dim_nzp1)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+  !-----------------------------------------------------------------------------
+  ! Define variables that will populate the file.
+  !-----------------------------------------------------------------------------
+
+    var = "mtime"
+    rcode = nf90_def_var (cdfid_m, TRIM(var), nf90_char,  &
+                          (/ dim_timestr, dim_time /), id_time)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9200) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+    DO n = 1, nfld2dxyt
+      nn = ntot + n
+      var = TRIM(fld2dxyt(n)%fldname)
+      rcode = nf90_def_var (cdfid_m, TRIM(var), nf90_float,  &
+                            (/ dim_nx, dim_ny, dim_time /), id_fld(nn))
+      IF ( rcode /= nf90_noerr ) THEN
+        WRITE (6,f9200) TRIM(pname), TRIM(var), TRIM(fl),  &
+                        TRIM(nf90_strerror(rcode))
+        CALL graceful_stop (pname,sdate,stime)
+      ENDIF
+    ENDDO
+    ntot = ntot + nfld2dxyt
+
+  !-----------------------------------------------------------------------------
+  ! Define global attributes.
+  !-----------------------------------------------------------------------------
+
+    CALL outncfglobal (cdfid_m, fl, sdate, stime)
+
+  !-----------------------------------------------------------------------------
+  ! Define attributes for the variables.
+  !-----------------------------------------------------------------------------
+
+    DO n = 1, nfld2dxyt
+      nn = ntot + n
+      var = TRIM(fld2dxyt(n)%fldname)
+      rcode = nf90_put_att (cdfid_m, id_fld(nn), 'long_name',  &
+                            TRIM(fld2dxyt(n)%long_name))
+      IF ( rcode /= nf90_noerr ) THEN
+        WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                        TRIM(nf90_strerror(rcode))
+        CALL graceful_stop (pname,sdate,stime)
+      ENDIF
+      rcode = nf90_put_att (cdfid_m, id_fld(nn), 'units',  &
+                            TRIM(fld2dxyt(n)%units))
+      IF ( rcode /= nf90_noerr ) THEN
+        WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                        TRIM(nf90_strerror(rcode))
+        CALL graceful_stop (pname,sdate,stime)
+      ENDIF
+    ENDDO
+    ntot = ntot + nfld2dxyt
+
+  ENDIF  ! first = .TRUE.
+
+!-------------------------------------------------------------------------------
+! Write variables.
+!-------------------------------------------------------------------------------
+
+  var = "mtime"
+  rcode = nf90_put_var (cdfid_m, id_time, time_now(1:len_time),  &
+                        start = (/ 1, it /), count = (/ len_time, 1 /) )
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9400) TRIM(pname), TRIM(var), TRIM(fl), TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+
+  DO n = 1, nfld2dxyt
+    nn = ntot + n
+    var = TRIM(fld2dxyt(n)%fldname)
+    rcode = nf90_put_var (cdfid_m, id_fld(nn), fld2dxyt(n)%fld,  &
+                          start = (/ 1, 1, it /),  &
+                          count = (/ fld2dxyt(n)%iend(1), &
+                                     fld2dxyt(n)%iend(2), 1 /) )
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9400) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+  ENDDO
+  ntot = ntot + nfld2dxyt
+
+  first = .FALSE.
+
+END SUBROUTINE outncf
+
+SUBROUTINE outncfglobal (cdfid_in,fl,sdate,stime)
+
+!-------------------------------------------------------------------------------
+! Name:     Output netCDF Global Attributes
+! Purpose:  Write netCDF global attributes.
+!-------------------------------------------------------------------------------
+
+  use netcdf
+ 
+  IMPLICIT NONE
+! Arguments
+  INTEGER,            INTENT(IN)  :: cdfid_in
+  CHARACTER(LEN=256), INTENT(IN)  :: fl
+  INTEGER,            INTENT(IN)  :: sdate
+  INTEGER,            INTENT(IN)  :: stime
+! local:
+  CHARACTER(LEN=32)               :: cstr
+  CHARACTER(LEN=16),  PARAMETER   :: pname      = 'OUTNCFGLOBAL'
+  INTEGER                         :: rcode
+  CHARACTER(LEN=32)               :: var
+
+!-------------------------------------------------------------------------------
+! Error, warning, and informational messages.
+!-------------------------------------------------------------------------------
+
+  CHARACTER(LEN=256), PARAMETER :: f9300 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR CREATING ATTRIBUTE FOR', a, &
+    & /, 1x, '***   IN FILE ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
+!-------------------------------------------------------------------------------
+! Define global attributes.
+!-------------------------------------------------------------------------------
+
+  var = "PROGNAME"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, progname)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "VERSION"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, ver)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "CODE_DATE"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, vdate)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "INPUT_MODEL"
+  IF ( data_source == 2 ) THEN
+    cstr = "TOMS " 
+  ELSE
+    cstr = "unspecified"
+  ENDIF
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, cstr)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "NCOLS"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, ncols)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "NROWS"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, nrows)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "NLAYS"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, nlays)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "NTHIK"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, nthik)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "GDTYP"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, gdtyp_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "P_ALP"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, p_alp_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "P_BET"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, p_bet_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "P_GAM"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, p_gam_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "XCENT"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, xcent_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "YCENT"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, ycent_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "XORIG"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, xorig_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "YORIG"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, yorig_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "XCELL"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, xcell_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "YCELL"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, ycell_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "VGTYP"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, vgtyp_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "VGTOP"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, vgtop_gd)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+
+  var = "VGLVLS"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, vglvs_gd(:))
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+  var = "EARTH_RADIUS"
+  rcode = nf90_put_att (cdfid_in, nf90_global, var, eradm)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+
+END SUBROUTINE outncfglobal
+SUBROUTINE graceful_stop (pname,sdate,stime)
+
+!-------------------------------------------------------------------------------
+! Name:     Graceful Stop
+! Purpose:  Gracefully stop program and close I/O API files.
+! Revised:  09 Jan 2002  Original version.  (T. Otte)
+!           30 Aug 2011  Changed F77 character declarations to F90 standard.
+!                        (T. Otte)
+!           07 Sep 2011  Updated disclaimer.  (T. Otte)
+!-------------------------------------------------------------------------------
+
+
+  IMPLICIT NONE
+
+! Arguements:
+  CHARACTER(LEN=16),  INTENT(IN)    :: pname
+  INTEGER,            INTENT(IN)    :: sdate
+  INTEGER,            INTENT(IN)    :: stime
+! local:
+  CHARACTER(LEN=80)                 :: xmsg
+
+  xmsg = 'ABNORMAL TERMINATION IN ' // TRIM(pname) // ' at '
+  write(6,'(A,2(I8,1X))')TRIM(xmsg), sdate, stime
+
+END SUBROUTINE graceful_stop
+SUBROUTINE close_files(sdate,stime)
+
+!-------------------------------------------------------------------------------
+! Name:     Close NETCDF Files
+! Purpose:  Close I/O API files.
+!-------------------------------------------------------------------------------
+
+  USE netcdf
+
+  IMPLICIT NONE
+
+! Arguments:
+  INTEGER,            INTENT(IN)    :: sdate
+  INTEGER,            INTENT(IN)    :: stime
+! local:
+  CHARACTER(LEN=16),  PARAMETER     :: pname      = 'CLOSE_FILES'
+  INTEGER                           :: rcode
+
+!-------------------------------------------------------------------------------
+! Error, warning, and informational messages.
+!-------------------------------------------------------------------------------
+
+  CHARACTER(LEN=256), PARAMETER :: f9000 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   COULD NOT CLOSE I/O API OUTPUT FILES', &
+    & /, 1x, 70('*'))"
+
+  CHARACTER(LEN=256), PARAMETER :: f9100 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR CLOSING NETCDF FILE', &
+    & /, 1x, '***   FILE = ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
+!-------------------------------------------------------------------------------
+! Gracefully close output files.
+!-------------------------------------------------------------------------------
+
+      rcode = nf90_close (cdfid_CMAQ)
+      IF ( rcode /= nf90_noerr ) THEN
+        WRITE (6,f9100) TRIM(pname), TRIM('test1.ncf'),  &
+                        TRIM(nf90_strerror(rcode))
+        CALL graceful_stop (pname,sdate,stime)
+      ENDIF
+
+      rcode = nf90_close (cdfid_FULL)
+      IF ( rcode /= nf90_noerr ) THEN
+        WRITE (6,f9100) TRIM(pname), TRIM('test2.ncf'),  &
+                        TRIM(nf90_strerror(rcode))
+        CALL graceful_stop (pname,sdate,stime)
+      ENDIF
+
+
+END SUBROUTINE close_files
+
+END MODULE OUTNCF_FILE_ROUTINES
