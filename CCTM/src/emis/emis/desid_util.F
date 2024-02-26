@@ -380,6 +380,9 @@
 ! This subroutine checks for invalid values of the operation parameter 
 ! in the rules from the emission control list
 
+         use utilio_defn
+
+
          IMPLICIT NONE
 
          REAL, INTENT( OUT )              :: CONV
@@ -651,6 +654,8 @@
 ! This subroutine checks for invalid values of the operation parameter 
 ! in the rules from the emission control list
 
+         use utilio_defn
+
          IMPLICIT NONE
 
          CHARACTER( 1 )        :: OP
@@ -677,6 +682,8 @@
 
 ! This subroutine checks for invalid values of the operation parameter 
 ! in the rules from the emission control list
+
+         use utilio_defn
 
          IMPLICIT NONE
 
