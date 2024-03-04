@@ -50,7 +50,7 @@ c     returns julian_date day (julday), year fraction (yrfrac)
       integer   yrlength,leap,m4,m100,m400,
      &          i
 
-      integer daytab(13,2)
+      integer, save :: daytab(13,2)
       data daytab / 0,31,28,31,30,31,30,31,31,30,31,30,31,
      +              0,31,29,31,30,31,30,31,31,30,31,30,31 /
 
@@ -76,6 +76,76 @@ c     returns julian_date day (julday), year fraction (yrfrac)
        yrfrac = (real(julday, 8)-0.5d0)/(real(yrlength,8))
       return
       end subroutine julian_date
+!***********************************************************************
+      subroutine get_date_string (julday,jultime,date_string)
+
+c     input julian data (YYYYDDDD) and julian time (HHMMSS)
+c     returns date string for gregorian date and time
+
+      implicit none
+      integer, intent( in )         :: julday
+      integer, intent( in )         :: jultime
+      character(24), intent( inout ) :: date_string
+
+      integer   year,month,days
+      integer   hours,minutes,seconds
+      integer   yrlength,leap,m4,m100,m400,
+     &          i
+
+      integer, parameter :: DaysInMonth(13,2) =
+     &               ( / 0,31,28,31,30,31,30,31,31,30,31,30,31,
+     &                   0,31,29,31,30,31,30,31,31,30,31,30,31 /)
+
+      integer, parameter :: TotalDaysOverMonths(13,2) =
+     &                      (/   0, 
+     &                           31, 59, 90,120,
+     &                          151,181,212,243,
+     &                          273,304,334,365,
+     &                            0,
+     &                           31, 60, 91,121,
+     &                          152,182,213,244,
+     &                          274,305,335,366 /)
+
+
+      yrlength = 365
+      year = int( julday/1000)
+      days = mod(julday,1000)
+
+      leap = 1
+      m4       = mod(year,4  )
+      m100     = mod(year,100)
+      m400     = mod(year,400)
+      if(((m4.eq.0).and.(m100.ne.0)).or.(m400.eq.0))then
+       leap = 2
+      endif
+
+      yrlength = TotalDaysOverMonths(13,leap)
+      if( days .le. 0 .or. days .gt. yrlength )then
+          print*,'Error date_string: invalid # of days in julian date, ',julday,days
+          stop
+      end if
+
+      do i=2,13
+       if( days .le.  TotalDaysOverMonths(i,leap) )exit
+      end do
+      month = i - 1
+      if( month .gt. 12 )then
+          print*,'Error date_string: too many days in julian date, ',julday
+          stop
+      end if
+      days = days - TotalDaysOverMonths(month,leap)
+      seconds = min( 59,mod(jultime,100) )
+      hours   = min( 23,int(jultime/1000) )
+      minutes = min( 59,max(jultime - hours - seconds,0))
+
+      write(date_string,9500)year,month,days,hours,minutes,seconds
+! example date_string format
+! 1969-07-16-00:00:00.0000
+9500  format(i4.4,"-",i2.2,"-",i2.2,"-",i2.2,":",i2.2,":",i2.2,".0000")
+
+      return
+      end subroutine get_date_string
+!***********************************************************************
       Subroutine Julian_Plus_One( Jdate )
 ! increments date by one day
         Implicit None

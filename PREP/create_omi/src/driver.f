@@ -3,6 +3,7 @@
       USE m3utilio
       USE ENV_VARS
       USE utilities_module
+      USE OUTNCF_FILE_ROUTINES
 
       implicit none
       
@@ -261,7 +262,6 @@
 
       if( CREATE_FULL_FILES )then
          call CREATE_IOAPI_OMI( OMI_FILE_NCF, jdate_init, nlatitude, nlongitude )
-!          call CREATE_EXTEND_OMI( EXTEN_FILE_NCF, jdate( 1 ) )
          IF ( .NOT. WRITE3( OMI_FILE_NCF, 'OZONE_COLUMN', JDATE_INIT, 0,
      &                      OZ_IOAPI ) ) THEN
              XMSG = 'Error writing variable OZONE_COLUMN'
@@ -282,11 +282,14 @@
              CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
          END IF
 
-         IF ( .NOT. WRITE3( OMI_FILE_NCF, 'LATITUDE', JDATE_INIT, 0,
-     &                   LAT_IOAPI ) ) THEN
-             XMSG = 'Error writing variable LATITUDE'
-             CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
-         END IF
+        fld2dxyt_FULL(1)%fld = OZ_IOAPI
+        fld2dxyt_FULL(2)%fld = CLOUD_FRACTION
+        fld2dxyt_FULL(3)%fld = O3_MISSING
+        call  get_date_string (jdate_init,000000,omi_start)
+        print*,'omi_start = ',omi_start
+        CALL outncf (fld2dxyt=fld2dxyt_FULL,nfld2dxyt=nfld2dxyt_FULL,
+     &                time_now=omi_start, sdate=jdate_init, stime=000000, cdfid_m=cdfid_FULL)
+
       end if
 
 ! set initial previous values to mean from all files      
@@ -372,6 +375,7 @@
      &  maxval(oz_ioapi),'/',maxval(oz),':',minval(oz_ioapi),'/',minval(oz)
 
 ! Test whether Observation's date matches expected date
+        print*,' cdfid_FULL = ', cdfid_FULL
         Call Julian_plus_One( jdate_next )
         If( jdate_next .ne. JDATE( J ) )Then ! corrected expected date
               delta_date = Delta_julian( jdate_next, JDATE( J ) )
@@ -394,11 +398,9 @@
                         XMSG = 'Error writing variable O3_MISSING'
                         CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
                      END IF
-                     IF ( .NOT. WRITE3( OMI_FILE_NCF, 'LATITUDE', jdate_next, 0,
-     &                                  LAT_IOAPI ) ) THEN
-                         XMSG = 'Error writing variable LATITUDE'
-                         CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
-                     END IF
+                     fld2dxyt_FULL(1)%fld = OZ_IOAPI
+                     fld2dxyt_FULL(2)%fld = CLOUD_FRACTION
+                     fld2dxyt_FULL(3)%fld = O3_MISSING
                      Call Julian_plus_One( jdate_next )
                  End Do
               Else
@@ -424,11 +426,9 @@
                  XMSG = 'Error writing variable O3_MISSING'
                  CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
            END IF
-           IF ( .NOT. WRITE3( OMI_FILE_NCF, 'LATITUDE', JDATE( J ), 0,
-     &                        LAT_IOAPI ) ) THEN
-                XMSG = 'Error writing variable LATITUDE'
-                CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
-           END IF
+           fld2dxyt_FULL(1)%fld = OZ_IOAPI
+           fld2dxyt_FULL(2)%fld = CLOUD_FRACTION
+           fld2dxyt_FULL(3)%fld = O3_MISSING
         End If
 
         IOAPI_PREV = OZ_IOAPI
@@ -494,6 +494,7 @@
 !      write(12,*)date(j)
      
       close(io_files)       
+      call close_files( cdfid_FULL,0,0 )
       if( CREATE_FULL_FILES )close(io_full_dat)
 !      close(unit_expand)
 999   stop

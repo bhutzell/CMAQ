@@ -40,6 +40,7 @@ C     -------- ----------   -----------------------------------------
 C-----------------------------------------------------------------------
 
       USE M3UTILIO
+      USE OUTNCF_FILE_ROUTINES
 
       IMPLICIT NONE
 
@@ -88,8 +89,23 @@ C...  the photolysis diagnostic file
 
          VGLVS3D( 1 ) = 1.0
          VGLVS3D( 2 ) = 0.9975
-      
+         
+         NCOLS = NCOLS3D
+         NROWS = NROWS3D
+         gdtyp_gd = LATGRD3
+         p_alp_gd = 0.0D0
+         p_bet_gd = 0.0D0
+         p_gam_gd = 0.0D0
+         XCELL_GD = REAL( 360.0 / REAL( NLON, 4 ),8 )
+         YCELL_GD = REAL( 180.0 / REAL( NLAT, 4 ),8 )
+         XORIG_GD = -180.0D0
+         YORIG_GD =  -90.0D0
+         VGTYP_GD = 7
+         VGTOP_GD = 5000.0
 
+         VGLVS_GD( 1 ) = 0.0
+         VGLVS_GD( 2 ) = 1.0
+           
          GDNAM3D = 'OMI_GLOBE' 
 
 C...CSA Variables, Units and Descriptions for FILE_NAME
@@ -111,17 +127,24 @@ C...CSA Variables, Units and Descriptions for FILE_NAME
          VDESC3D( N ) = 'Ozone Column Density Not Avialable'
          VTYPE3D( N ) = M3REAL
 
-         N = N + 1
-         VNAME3D( N ) = 'LATITUDE'
-         UNITS3D( N ) = 'DEG'
-         VDESC3D( N ) = 'Latitude Coordinate'
-         VTYPE3D( N ) = M3REAL
-
          NVARS3D = N
          FDESC3D( 1 ) = 'OMI Satellite Obseravations'
          DO L = 2, MXDESC3
             FDESC3D( L ) = ' '
          END DO
+         nfld2dxyt_FULL = NVARS3D
+         
+         CALL ALLOC_fld2xyt(fld2dxyt_FULL,nfld2dxyt_FULL,NCOLS3D,NROWS3D)
+
+         DO L = 1,nfld2dxyt_FULL
+            fld2dxyt_FULL( L )%fldname   = VNAME3D( L )
+            fld2dxyt_FULL( L )%long_name = VDESC3D( L )
+            fld2dxyt_FULL( L )%units     = UNITS3D( L )
+         END DO
+         
+         CALL outncf (fld2dxyt=fld2dxyt_FULL,nfld2dxyt=nfld2dxyt_FULL,
+     &                time_now=omi_start, sdate=0, stime=0, cdfid_m=cdfid_FULL)
+                      
 ! Determine if file exists and delete if needed
          INQUIRE( FILE = FILE_NAME, EXIST = EXISTS )
          IF( EXISTS )THEN
