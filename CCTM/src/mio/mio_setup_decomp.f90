@@ -31,6 +31,8 @@
         integer, intent(out) :: colde_pe(:,:,:)  ! column index range for each PE
         integer, intent(out) :: rowde_pe(:,:,:)  ! column index range for each PE
 
+        integer, parameter :: iunit = 11
+
         integer :: i, j           ! loop counter
         integer :: t1, t2, pe     ! temporary variable
         integer :: quotient
@@ -178,9 +180,6 @@
 
            ncols_pe = 0
            nrows_pe = 0
-       if (mio_mype == 0) then
-          write (6, *) '==j==', mio_mpas_dmap_file
-       end if
 
            if (mio_mpas_dmap_file .ne. ' ') then
 
@@ -191,16 +190,17 @@
                  allocate (mio_mpas_dmap(0:t1, 0:nprocs-1),   &
                            count(0:nprocs-1),                 &
                            stat=stat)
-                 open (unit = 107, file=mio_mpas_dmap_file, status='old', iostat=stat)
-       write (6, *) ' ==d== mio ', stat, trim(mio_mpas_dmap_file), '==', ncols, nprocs, npcol, nprow
+                 open (unit = iunit, file=mio_mpas_dmap_file, status='old')
                  count = 0
+     write (6, *) ' ==d== mio a ', nprocs, mio_nprocs, trim(mio_mpas_dmap_file)
+
                  do i = 1, ncols
-                    read (107, *) t2
+                    read (iunit, *) t2
                     count(t2) = count(t2) + 1
                     mio_mpas_dmap(count(t2), t2) = i
                  end do
                  mio_mpas_dmap(0,:) = count
-                 close (107)
+                 close (iunit)
               end if
               ncols_pe( mio_mype_p1,1 ) = count(mio_mype)
               nrows_pe( mio_mype_p1,1 ) = 1

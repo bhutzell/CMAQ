@@ -37,8 +37,8 @@
           real, intent(out)   :: out_data(:)
 
 #ifdef parallel
-        include 'mpif.h'
-        integer :: status(mpi_status_size)
+          include 'mpif.h'
+          integer :: status(mpi_status_size)
 #endif
 
           character(23), parameter :: pname = 'mio_gather_data_1d_real'
@@ -113,8 +113,8 @@
           real, intent(out)     :: out_data(:,:)
 
 #ifdef parallel
-        include 'mpif.h'
-        integer :: status(mpi_status_size)
+          include 'mpif.h'
+          integer :: status(mpi_status_size)
 #endif
 
           character(23), parameter :: pname = 'mio_gather_data_2d_real'
@@ -271,8 +271,8 @@
           real, intent(out)     :: out_data(:,:,:)
 
 #ifdef parallel
-        include 'mpif.h'
-        integer :: status(mpi_status_size)
+          include 'mpif.h'
+          integer :: status(mpi_status_size)
 #endif
 
           character(23), parameter :: pname = 'mio_gather_data_3d_real'
@@ -398,8 +398,8 @@
           real*8, intent(out) :: out_data(:)
 
 #ifdef parallel
-        include 'mpif.h'
-        integer :: status(mpi_status_size)
+          include 'mpif.h'
+          integer :: status(mpi_status_size)
 #endif
 
           character(25), parameter :: pname = 'mio_gather_data_1d_double'
@@ -474,8 +474,8 @@
           real*8, intent(out)   :: out_data(:,:)
 
 #ifdef parallel
-        include 'mpif.h'
-        integer :: status(mpi_status_size)
+          include 'mpif.h'
+          integer :: status(mpi_status_size)
 #endif
 
           character(25), parameter :: pname = 'mio_gather_data_2d_double'
@@ -632,8 +632,8 @@
           real*8, intent(out)   :: out_data(:,:,:)
 
 #ifdef parallel
-        include 'mpif.h'
-        integer :: status(mpi_status_size)
+          include 'mpif.h'
+          integer :: status(mpi_status_size)
 #endif
 
           character(25), parameter :: pname = 'mio_gather_data_3d_double'
@@ -759,8 +759,8 @@
           integer, intent(out) :: out_data(:)
 
 #ifdef parallel
-        include 'mpif.h'
-        integer :: status(mpi_status_size)
+          include 'mpif.h'
+          integer :: status(mpi_status_size)
 #endif
 
           character(22), parameter :: pname = 'mio_gather_data_1d_int'
@@ -835,8 +835,8 @@
           integer, intent(out)  :: out_data(:,:)
 
 #ifdef parallel
-        include 'mpif.h'
-        integer :: status(mpi_status_size)
+          include 'mpif.h'
+          integer :: status(mpi_status_size)
 #endif
 
           character(22), parameter :: pname = 'mio_gather_data_2d_int'
@@ -993,8 +993,8 @@
           integer, intent(out)  :: out_data(:,:,:)
 
 #ifdef parallel
-        include 'mpif.h'
-        integer :: status(mpi_status_size)
+          include 'mpif.h'
+          integer :: status(mpi_status_size)
 #endif
 
           character(22), parameter :: pname = 'mio_gather_data_3d_int'

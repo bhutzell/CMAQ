@@ -212,15 +212,16 @@
                  mio_file_data(floc)%bndy_thickness = mio_file_data(floc)%glo_att_ival(t)
               end if
 
-              mio_file_data(floc)%nlays = mio_file_data(floc)%dim_value(3)
-
               mio_file_data(floc)%time_dim_loc = mio_search ('TSTEP',                        &
                                                              mio_file_data(floc)%dim_name,   &
                                                              mio_file_data(floc)%ndims)
  
-              mio_file_data(floc)%layer_dim_loc = mio_search ('LAY',                          &
-                                                              mio_file_data(floc)%dim_name,   &
-                                                              mio_file_data(floc)%ndims)
+              i = mio_search ('LAY',                                                         &
+                              mio_file_data(floc)%dim_name,                                  &
+                              mio_file_data(floc)%ndims)
+              mio_file_data(floc)%layer_dim_loc = i
+
+              mio_file_data(floc)%nlays = mio_file_data(floc)%dim_value(i)
  
               mio_file_data(floc)%var_decomp = .false.
               do i = 1, fnvars

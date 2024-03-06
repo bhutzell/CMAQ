@@ -131,7 +131,11 @@
               n = mio_search ('west_east', mio_file_data(dest)%dim_name, mio_file_data(dest)%ndims)
               mio_file_data(dest)%gl_ncols = mio_file_data(dest)%dim_value(n)
               n = mio_search ('bottom_top', mio_file_data(dest)%dim_name, mio_file_data(dest)%ndims)
-              mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n)
+              if (n < 0) then
+                 mio_file_data(dest)%nlays = 1
+              else
+                 mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n)
+              end if
               n = mio_search ('south_north', mio_file_data(dest)%dim_name, mio_file_data(dest)%ndims)
               mio_file_data(dest)%gl_nrows = mio_file_data(dest)%dim_value(n)
            end if
@@ -336,7 +340,11 @@
               n = mio_search ('west_east', mio_file_data(dest)%dim_name, mio_file_data(dest)%ndims)
               mio_file_data(dest)%gl_ncols = mio_file_data(dest)%dim_value(n)
               n = mio_search ('bottom_top', mio_file_data(dest)%dim_name, mio_file_data(dest)%ndims)
-              mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n)
+              if (n < 0) then
+                 mio_file_data(dest)%nlays = 1
+              else
+                 mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n)
+              end if
               n = mio_search ('south_north', mio_file_data(dest)%dim_name, mio_file_data(dest)%ndims)
               mio_file_data(dest)%gl_nrows = mio_file_data(dest)%dim_value(n)
            end if

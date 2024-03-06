@@ -615,9 +615,9 @@
                 north_pe = (mio_mype .ge. mio_npcol * (mio_nprow - 1))
                 south_pe = (mio_mype .lt. mio_npcol)
 
-  write (6, '(a19, 20i5)') ' ==d== inter 2db a ', mio_mype, size(data,1), size(data,2), &
-     ls_start, ls_end, le_start, le_end, ln_start, ln_end, lw_start, lw_end, &
-     gs_skip, ge_skip, gn_skip, gw_skip
+! write (6, '(a19, 20i5)') ' ==d== inter 2db a ', mio_mype, size(data,1), size(data,2), &
+!    ls_start, ls_end, le_start, le_end, ln_start, ln_end, lw_start, lw_end, &
+!    gs_skip, ge_skip, gn_skip, gw_skip
 
              end if
 
@@ -630,7 +630,7 @@
 ! mio_file_data(floc)%colde_pe( :, mio_mype_p1, 1 ), mio_file_data(floc)%rowde_pe( :, mio_mype_p1, 1 ), &
 ! gs_skip, ge_skip, gn_skip, gw_skip
 
-  write (6, '(a19, 20i5)') ' ==d== inter 2db b ', dim1, dim2
+! write (6, '(a19, 20i5)') ' ==d== inter 2db b ', dim1, dim2
 
              allocate (loc_data(dim1, dim2), stat=stat)
 
@@ -664,23 +664,23 @@
                 head_end_index = mio_file_data(floc)%data_index(2,loc_head,vloc)
 
                 call mio_fread (fname, vname, pname, loc_data, mio_file_data(floc)%timestamp(head_time_loc))
-    write (6, '(a14, 2i7, i3, a19, 2e15.8)') ' ==d== 2db a0 ', mio_mype, dsize, head_time_loc, &
-       trim(mio_file_data(floc)%timestamp(head_time_loc)), minval(loc_data), maxval(loc_data)
+!   write (6, '(a14, 2i7, i3, a19, 2e15.8)') ' ==d== 2db a0 ', mio_mype, dsize, head_time_loc, &
+!      trim(mio_file_data(floc)%timestamp(head_time_loc)), minval(loc_data), maxval(loc_data)
                 mio_file_data(floc)%r_data(head_beg_index:head_end_index) = reshape (loc_data, (/ dsize /))
-    write (6, '(a14, 3i10, 2e15.8)') ' ==d== 2db a1 ', mio_mype, head_beg_index, head_end_index, &
-      minval(mio_file_data(floc)%r_data(head_beg_index:head_end_index)), &
-      maxval(mio_file_data(floc)%r_data(head_beg_index:head_end_index))
+!   write (6, '(a14, 3i10, 2e15.8)') ' ==d== 2db a1 ', mio_mype, head_beg_index, head_end_index, &
+!     minval(mio_file_data(floc)%r_data(head_beg_index:head_end_index)), &
+!     maxval(mio_file_data(floc)%r_data(head_beg_index:head_end_index))
 
                 tail_beg_index = mio_file_data(floc)%data_index(1,loc_tail,vloc)
                 tail_end_index = mio_file_data(floc)%data_index(2,loc_tail,vloc)
 
                 call mio_fread (fname, vname, pname, loc_data, mio_file_data(floc)%timestamp(tail_time_loc))
-    write (6, '(a14, 2i7, i3, a19, 2e15.8)') ' ==d== 2db a2 ', mio_mype, dsize, tail_time_loc, &
-       trim(mio_file_data(floc)%timestamp(tail_time_loc)), minval(loc_data), maxval(loc_data)
+!   write (6, '(a14, 2i7, i3, a19, 2e15.8)') ' ==d== 2db a2 ', mio_mype, dsize, tail_time_loc, &
+!      trim(mio_file_data(floc)%timestamp(tail_time_loc)), minval(loc_data), maxval(loc_data)
                 mio_file_data(floc)%r_data(tail_beg_index:tail_end_index) = reshape (loc_data, (/ dsize /))
-    write (6, '(a14, 3i10, 2e15.8)') ' ==d== 2db a3 ', mio_mype, tail_beg_index, tail_end_index, &
-      minval(mio_file_data(floc)%r_data(tail_beg_index:tail_end_index)), &
-      maxval(mio_file_data(floc)%r_data(tail_beg_index:tail_end_index))
+!   write (6, '(a14, 3i10, 2e15.8)') ' ==d== 2db a3 ', mio_mype, tail_beg_index, tail_end_index, &
+!     minval(mio_file_data(floc)%r_data(tail_beg_index:tail_end_index)), &
+!     maxval(mio_file_data(floc)%r_data(tail_beg_index:tail_end_index))
 
              else if (case == 2) then
 
@@ -737,11 +737,11 @@
                 end_k = mio_file_data(floc)%nlays
              end if
 
-  write (6, '(a19, i3, 4l)') ' ==d== inter 2db b ', mio_mype, north_pe, east_pe, south_pe, west_pe
-  write (6, '(a19, l)') ' ==d== inter 2db h ', allocated(mio_file_data(floc)%r_data)
-  write (6, '(a19, 4i10, l)') ' ==d== inter 2db k ', floc, size(mio_file_data(floc)%r_data), stored_beg_index,stored_end_index
+! write (6, '(a19, i3, 4l)') ' ==d== inter 2db b ', mio_mype, north_pe, east_pe, south_pe, west_pe
+! write (6, '(a19, l)') ' ==d== inter 2db h ', allocated(mio_file_data(floc)%r_data)
+! write (6, '(a19, 4i10, l)') ' ==d== inter 2db k ', floc, size(mio_file_data(floc)%r_data), stored_beg_index,stored_end_index
 
-  write (6, '(a19, 2i10, 22e15.8)') ' ==d== inter 2db m ', stored_beg_index, stored_end_index
+! write (6, '(a19, 2i10, 22e15.8)') ' ==d== inter 2db m ', stored_beg_index, stored_end_index
 !   minval(mio_file_data(floc)%r_data(stored_beg_index:stored_end_index)), &
 !   maxval(mio_file_data(floc)%r_data(stored_beg_index:stored_end_index))
 
@@ -754,10 +754,10 @@
                    do ib = ls_start, ls_end
                       data( ib,k ) = mio_file_data(floc)%r_data( m+ib )
                    end do
-  if (k == 1) then
-   write (6, '(a21, 10i7)') ' ==d== inter south b ', mio_mype, k, ls_start, ls_end, m, starting_pt, gs_skip, m+ls_start, m+ls_end
+! if (k == 1) then
+!  write (6, '(a21, 10i7)') ' ==d== inter south b ', mio_mype, k, ls_start, ls_end, m, starting_pt, gs_skip, m+ls_start, m+ls_end
 !  write (6, '(a21, 3i10, 2e15.8)') ' ==d== inter south b ', mio_mype, k, ib, minval(data(:,k)), maxval(data(:,k))
-  end if
+! end if
                 end if
 
 ! Construct EAST boundary
@@ -766,10 +766,10 @@
                    do ib = le_start, le_end
                       data( ib,k ) = mio_file_data(floc)%r_data( m+ib)
                    end do
-  if (k == 1) then
-   write (6, '(a21, 10i7)') ' ==d== inter east  b ', mio_mype, k, le_start, le_end, m, starting_pt, ge_skip, m+le_start, m+le_end
+! if (k == 1) then
+!  write (6, '(a21, 10i7)') ' ==d== inter east  b ', mio_mype, k, le_start, le_end, m, starting_pt, ge_skip, m+le_start, m+le_end
 !  write (6, '(a21, 3i10, 2e15.8)') ' ==d== inter east  b ', mio_mype, k, ib, minval(data(:,k)), maxval(data(:,k))
-   end if
+!  end if
                 end if
 
 ! Construct NORTH boundary
@@ -778,10 +778,10 @@
                    do ib = ln_start, ln_end
                       data( ib,k ) = mio_file_data(floc)%r_data( m+ib)
                    end do
-  if (k == 1) then
-   write (6, '(a21, 10i7)') ' ==d== inter north b ', mio_mype, k, ln_start, ln_end, m, starting_pt, gn_skip, m+ln_start, m+ln_end
+! if (k == 1) then
+!  write (6, '(a21, 10i7)') ' ==d== inter north b ', mio_mype, k, ln_start, ln_end, m, starting_pt, gn_skip, m+ln_start, m+ln_end
 !  write (6, '(a21, 3i10, 2e15.8)') ' ==d== inter north b ', mio_mype, k, ib, minval(data(:,k)), maxval(data(:,k))
-   end if
+!  end if
                 end if
 
 ! Construct WEST boundary
@@ -790,10 +790,10 @@
                    do ib = lw_start, lw_end
                       data( ib,k ) = mio_file_data(floc)%r_data( m+ib)
                    end do
-  if (k == 1) then
-   write (6, '(a21, 10i7)') ' ==d== inter west  b ', mio_mype, k, lw_start, lw_end, m, starting_pt, gw_skip, m+lw_start, m+lw_end
+! if (k == 1) then
+!  write (6, '(a21, 10i7)') ' ==d== inter west  b ', mio_mype, k, lw_start, lw_end, m, starting_pt, gw_skip, m+lw_start, m+lw_end
 !  write (6, '(a21, 3i10, 2e15.8)') ' ==d== inter west  b ', mio_mype, k, ib, minval(data(:,k)), maxval(data(:,k))
-   end if
+!  end if
                 end if
              end do
 

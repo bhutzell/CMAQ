@@ -110,7 +110,7 @@
 
           integer :: stat
 
-     write (6, *) ' ==d== put 3d a ', fid, vid
+!    write (6, *) ' ==d== put 3d a ', fid, vid
 
           stat = nf90_put_var(fid,              &
                               vid,              &

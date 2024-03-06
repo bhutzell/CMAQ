@@ -42,7 +42,6 @@
         mio_nprocs   = 1
 #endif
 
-        write (6, *) ' ==d== mio a ', mio_nprocs, npcol, nprow, ncols, nrows
         mio_npcol    = npcol
         mio_nprow    = nprow
 
@@ -124,8 +123,7 @@
 
               mio_file_data(mio_cfile)%filename = ext_str(1)
               mio_file_data(mio_cfile)%mode = mode
-      
-           write (mio_logdev, *) 'Attempting to open ',ext_str(1) 
+
               call mio_fopen (ext_str(1), mode)
            end if
  

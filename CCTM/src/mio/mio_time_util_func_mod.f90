@@ -103,7 +103,6 @@
           integer, parameter :: numday_non_leap_year(12) =     &
                                 (/ 31, 28, 31, 30, 31, 30,     &
                                    31, 31, 30, 31, 30, 31 /)
-
           read (timestamp(1:10), '(i4, 2(1x, i2))') year, month, day
           read (timestamp(12:19), '(i2, 1x, i2, 1x, i2)') hour, minute, second
 
