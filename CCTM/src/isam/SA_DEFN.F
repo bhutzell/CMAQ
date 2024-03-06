@@ -690,18 +690,18 @@ c----------------------------------------------------------
      &         'BENP','ETEP'/ )
 
         !CRACMM1_AQ
-        ALLOCATE( ISAM_SPEC_NO3( 8 )%LIST( 27 ) )
+        ALLOCATE( ISAM_SPEC_NO3( 8 )%LIST( 28 ) )
         ISAM_SPEC_NO3( 8 )%LIST = (/   'HNO3 ','NO   ','NO2  ','NO3  ','HONO ',
      &         'N2O5 ','PAN  ','HNO4 ','ONIT ','MPAN ','PPN  ','ISON ','TRPN ',
      &         'NALD ','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
-     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP '/ )
+     &         'ETHP ','RCO3 ','XYEP ','TR2  ','BENP ','ETEP '/ )
 
         !CRACMM2
         ALLOCATE( ISAM_SPEC_NO3( 9 )%LIST( 27 ) )
         ISAM_SPEC_NO3( 9 )%LIST = (/   'HNO3 ','NO   ','NO2  ','NO3  ','HONO ',
      &         'N2O5 ','PAN  ','HNO4 ','ONIT ','MPAN ','PPN  ','ISON ','TRPN ',
      &         'NALD ','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
-     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP '/ )
+     &         'ETHP ','RCO3 ','XYMP ','XYEP ','TR2  ','BENP ','ETEP '/ )
         
         !PRESCRIBE SPECIES RELEVANT FOR ASSIGNING BIAS TO VOCs
         !CB6R3_AE7_AQ
@@ -904,7 +904,7 @@ c----------------------------------------------------------
      &                             'PAH_114E1'/)   
 
        ALLOCATE( ISAM_SPEC_TOXICS%LIST( 34 ) )
-       ISAM_SPEC_TOXICS%LIST( 1:30 ) = (/'ACRY_NITRILE','CARBONTET   ','PROPYL_DICL ',
+       ISAM_SPEC_TOXICS%LIST( 1:34 ) = (/'ACRY_NITRILE','CARBONTET   ','PROPYL_DICL ',
      &     'DICL_PROPENE','CL4_ETHANE  ','CHCL3       ','BR2_C2_12   ','CL2_C2_12   ',
      &     'ETOX        ','ACET_NITRILE','XYLENE      ','STYRENE     ','ACRYACID    ',
      &     'HEXANE      ','METHCHLORIDE','CARBSULFIDE ','CHLOROPRENE ','ETHYLBENZENE',
