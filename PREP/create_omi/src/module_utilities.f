@@ -245,6 +245,7 @@ c     returns date string for gregorian date and time
 
       USE m3utilio
       USE ENV_VARS
+      USE OUTNCF_FILE_ROUTINES
 
       implicit none
 
@@ -483,6 +484,11 @@ c     returns date string for gregorian date and time
          end do
       end do
 
+      file_CMAQ_omi%fld(:,:,1) = ozone_viz( :,: )
+
+
+
+
       If( jdate_expect .ne. jdate )Then
 ! write interpolated values up to current date
          delta_date = Delta_julian( jdate, jdate_expect )
@@ -490,6 +496,10 @@ c     returns date string for gregorian date and time
 
          Do j = 1, delta_date
             viz_prev = viz_prev + viz_adjust
+! write to NetCdf file
+            call  get_date_string (jdate_expect,000000,cmaq_start)
+            CALL file_out_ncf (outfile_2dxyt = file_CMAQ_omi,time_now=cmaq_start, sdate=0, stime=0 )
+
             If ( .not. write3( OMI_CMAQ_NCF, 'OZONE_COLUMN', jdate_expect, 0,
      &                           viz_prev ) ) THEN
                    xmsg = 'Error writing variable OZONE_COLUMN'
@@ -501,6 +511,10 @@ c     returns date string for gregorian date and time
             call Julian_plus_One( jdate_expect )
          End Do
       End If
+
+! write to NetCdf file
+      call  get_date_string (jdate,000000,cmaq_start)
+      CALL file_out_ncf (outfile_2dxyt = file_CMAQ_omi,time_now=cmaq_start, sdate=0, stime=0 )
 
       If ( .not. write3( OMI_CMAQ_NCF, 'OZONE_COLUMN', jdate, 0,
      &                        ozone_viz ) ) THEN

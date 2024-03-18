@@ -290,6 +290,12 @@
         CALL outncf (fld2dxyt=fld2dxyt_FULL,nfld2dxyt=nfld2dxyt_FULL,
      &                time_now=omi_start, sdate=jdate_init, stime=000000, cdfid_m=cdfid_FULL)
 
+
+        file_FULL_omi%fld(:,:,1) = OZ_IOAPI( :,: )
+        file_FULL_omi%fld(:,:,2) = CLOUD_FRACTION( :,: )
+        file_FULL_omi%fld(:,:,3) = O3_MISSING( :,: )
+        CALL file_out_ncf (outfile_2dxyt = file_FULL_omi,time_now=omi_start, sdate=0, stime=0 )
+
       end if
 
 ! set initial previous values to mean from all files      
@@ -391,16 +397,29 @@
                     IF ( .NOT. WRITE3( OMI_FILE_NCF, 'CLOUD_FRACT', jdate_next, 0,
      &                                 IOAPI_BUFF ) ) THEN
                          XMSG = 'Error writing variable CLOUD_FRACT'
-                         CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
+                         CALL M3EXIT ( 'RO3', JDATE_NEXT, 0, XMSG, XSTAT1 )
                     END IF
                     IF ( .NOT. WRITE3( OMI_FILE_NCF, 'O3_MISSING', jdate_next, 0,
      &                                 IOAPI_BUFF ) ) THEN
                         XMSG = 'Error writing variable O3_MISSING'
-                        CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
+                        CALL M3EXIT ( 'RO3', JDATE_NEXT, 0, XMSG, XSTAT1 )
                      END IF
+
                      fld2dxyt_FULL(1)%fld = OZ_IOAPI
                      fld2dxyt_FULL(2)%fld = CLOUD_FRACTION
                      fld2dxyt_FULL(3)%fld = O3_MISSING
+
+
+                     call  get_date_string (jdate_next,000000,omi_start)
+                     print*,'omi_start = ',omi_start
+                     CALL outncf (fld2dxyt=fld2dxyt_FULL,nfld2dxyt=nfld2dxyt_FULL,
+     &                time_now=omi_start, sdate=jdate_next, stime=000000, cdfid_m=cdfid_FULL)
+
+                     file_FULL_omi%fld(:,:,1) = OZ_IOAPI( :,: )
+                     file_FULL_omi%fld(:,:,2) = CLOUD_FRACTION( :,: )
+                     file_FULL_omi%fld(:,:,3) = O3_MISSING( :,: )
+                     CALL file_out_ncf (outfile_2dxyt = file_FULL_omi,time_now=omi_start, sdate=0, stime=0 )
+
                      Call Julian_plus_One( jdate_next )
                  End Do
               Else
@@ -419,16 +438,27 @@
            IF ( .NOT. WRITE3( OMI_FILE_NCF, 'CLOUD_FRACT', JDATE( J ), 0,
      &                        CLOUD_FRACTION ) ) THEN
                  XMSG = 'Error writing variable CLOUD_FRACT'
-                 CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
+                 CALL M3EXIT ( 'RO3', JDATE( J ), 0, XMSG, XSTAT1 )
            END IF
            IF ( .NOT. WRITE3( OMI_FILE_NCF, 'O3_MISSING', JDATE( J ), 0,
      &                        O3_MISSING ) ) THEN
                  XMSG = 'Error writing variable O3_MISSING'
-                 CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
+                 CALL M3EXIT ( 'RO3', JDATE( J ), 0, XMSG, XSTAT1 )
            END IF
            fld2dxyt_FULL(1)%fld = OZ_IOAPI
            fld2dxyt_FULL(2)%fld = CLOUD_FRACTION
            fld2dxyt_FULL(3)%fld = O3_MISSING
+           call  get_date_string (jdate(j),000000,omi_start)
+           print*,'omi_start = ',omi_start
+           CALL outncf (fld2dxyt=fld2dxyt_FULL,nfld2dxyt=nfld2dxyt_FULL,
+     &     time_now=omi_start, sdate=jdate(j), stime=000000, cdfid_m=cdfid_FULL)
+
+
+           file_FULL_omi%fld(:,:,1) = OZ_IOAPI( :,: )
+           file_FULL_omi%fld(:,:,2) = CLOUD_FRACTION( :,: )
+           file_FULL_omi%fld(:,:,3) = O3_MISSING( :,: )
+           CALL file_out_ncf (outfile_2dxyt = file_FULL_omi,time_now=omi_start, sdate=0, stime=0 )
+
         End If
 
         IOAPI_PREV = OZ_IOAPI
@@ -459,11 +489,6 @@
            end do
         end do
 
-!        IF ( .NOT. WRITE3( EXTEN_FILE_NCF, 'OZONE_COLUMN', JDATE( J ), 0,
-!     &                     OZ_EXTEND ) ) THEN
-!             XMSG = 'Error writing variable OZONE_COLUMN'
-!             CALL M3EXIT ( 'RO3', JDATE( J ), 0, XMSG, XSTAT1 )
-!       END IF
 
 
         If( CREATE_FULL_FILES )Then
@@ -495,6 +520,9 @@
      
       close(io_files)       
       call close_files( cdfid_FULL,0,0 )
+      call close_files( file_FULL_omi%cdfid_m,0,0 )
+      call close_files( file_CMAQ_omi%cdfid_m,0,0 )
+     
       if( CREATE_FULL_FILES )close(io_full_dat)
 !      close(unit_expand)
 999   stop

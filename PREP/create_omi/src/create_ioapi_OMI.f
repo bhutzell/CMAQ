@@ -108,6 +108,24 @@ C...  the photolysis diagnostic file
            
          GDNAM3D = 'OMI_GLOBE' 
 
+         file_FULL_omi%NCOLS = NCOLS3D
+         file_FULL_omi%NROWS = NROWS3D
+         file_FULL_omi%gdtyp_gd = LATGRD3
+         file_FULL_omi%p_alp_gd = 0.0D0
+         file_FULL_omi%p_bet_gd = 0.0D0
+         file_FULL_omi%p_gam_gd = 0.0D0
+         file_FULL_omi%XCELL_GD = REAL( 360.0 / REAL( NLON, 4 ),8 )
+         file_FULL_omi%YCELL_GD = REAL( 180.0 / REAL( NLAT, 4 ),8 )
+         file_FULL_omi%XORIG_GD = -180.0D0
+         file_FULL_omi%YORIG_GD =  -90.0D0
+         file_FULL_omi%VGTYP_GD = 7
+         file_FULL_omi%VGTOP_GD = 5000.0
+
+         file_FULL_omi%VGLVS_GD( 1 ) = 0.0
+         file_FULL_omi%VGLVS_GD( 2 ) = 1.0
+           
+         file_FULL_omi%GDNAME_GD = 'OMI_GLOBE' 
+
 C...CSA Variables, Units and Descriptions for FILE_NAME
          N = 1
          VNAME3D( N ) = 'OZONE_COLUMN'
@@ -133,18 +151,28 @@ C...CSA Variables, Units and Descriptions for FILE_NAME
             FDESC3D( L ) = ' '
          END DO
          nfld2dxyt_FULL = NVARS3D
+         file_FULL_omi%nfld2dxyt = NVARS3D
          
          CALL ALLOC_fld2xyt(fld2dxyt_FULL,nfld2dxyt_FULL,NCOLS3D,NROWS3D)
+         CALL INIT_file2dxyt(file_FULL_omi,nfld2dxyt_FULL,NCOLS,NROWS)
 
          DO L = 1,nfld2dxyt_FULL
             fld2dxyt_FULL( L )%fldname   = VNAME3D( L )
             fld2dxyt_FULL( L )%long_name = VDESC3D( L )
             fld2dxyt_FULL( L )%units     = UNITS3D( L )
          END DO
+         DO L = 1,file_FULL_omi%nfld2dxyt
+            file_FULL_omi%fldname( L )   = VNAME3D( L )
+            file_FULL_omi%long_name( L ) = VDESC3D( L )
+            file_FULL_omi%units( L )     = UNITS3D( L )
+         END DO
+         print*,'size( file_FULL_omi%fld2dxyt(1)%fld ) = ', size( file_FULL_omi%fld,DIM=1 ),
+     &    size( file_FULL_omi%fld,DIM=2 ),  size( file_FULL_omi%fld,DIM=3 )
          
          CALL outncf (fld2dxyt=fld2dxyt_FULL,nfld2dxyt=nfld2dxyt_FULL,
      &                time_now=omi_start, sdate=0, stime=0, cdfid_m=cdfid_FULL)
                       
+         CALL file_out_ncf (outfile_2dxyt = file_FULL_omi,time_now=omi_start, sdate=0, stime=0 )
 ! Determine if file exists and delete if needed
          INQUIRE( FILE = FILE_NAME, EXIST = EXISTS )
          IF( EXISTS )THEN

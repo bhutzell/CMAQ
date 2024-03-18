@@ -40,6 +40,8 @@ C     -------- ----------   -----------------------------------------
 C-----------------------------------------------------------------------
 
       USE M3UTILIO
+      USE utilities_module, Only: get_date_string
+      USE OUTNCF_FILE_ROUTINES
 
       IMPLICIT NONE
 
@@ -61,6 +63,8 @@ C...Local variables
       INTEGER               :: N, L, JWL, INCR   ! loop variables
       INTEGER               :: SYSTEM            ! exteral function for line commands
       LOGICAL               :: EXISTS             
+      INTEGER               :: CMAQ_NROWS
+      INTEGER               :: CMAQ_NCOLS
 C-----------------------------------------------------------------------
 
 C...Set output file characteristics based on COORD.EXT and open
@@ -73,6 +77,8 @@ C...  the photolysis diagnostic file
 
          NCOLS3D = SIZE( LON ) - 1 
          NROWS3D = SIZE( LAT )  
+         CMAQ_NCOLS   = SIZE( LON ) - 1 
+         CMAQ_NROWS   = SIZE( LAT )  
          NLAYS3D = 1
          NTHIK3D = 1
          GDTYP3D = LATGRD3 
@@ -92,6 +98,32 @@ C...  the photolysis diagnostic file
 
          GDNAM3D = 'OMI_CMAQ' 
 
+         file_CMAQ_omi%filename = ''
+         file_CMAQ_omi%filename = TRIM('file_cmaq.ncf')
+         print*,' file_CMAQ_omi%filename = ',TRIM(file_CMAQ_omi%filename)
+         file_CMAQ_omi%NCOLS = SIZE( LON ) - 1
+         file_CMAQ_omi%NROWS = SIZE( LAT )
+         CMAQ_NCOLS =  SIZE( LON ) - 1
+         CMAQ_NROWS = SIZE( LAT )
+         print*,' file_CMAQ_omi%NCOLS, file_CMAQ_omi%NROWS = ', file_CMAQ_omi%NROWS,
+     &   file_CMAQ_omi%NROWS
+         file_CMAQ_omi%gdtyp_gd = 1
+         file_CMAQ_omi%p_alp_gd = 0.0D0
+         file_CMAQ_omi%p_bet_gd = 0.0D0
+         file_CMAQ_omi%p_gam_gd = 0.0D0
+         file_CMAQ_omi%XCELL_GD = REAL( 360.0 / REAL( file_CMAQ_omi%NCOLS ),8 ) ! 22.5 if ncols3d = 16
+         file_CMAQ_omi%YCELL_GD = REAL( ABS(LAT(1)-LAT(file_CMAQ_omi%NROWS))
+     &                          / REAL(file_CMAQ_omi%NROWS-1),8 )               ! 10.0 if nrows3d = 17
+         file_CMAQ_omi%XORIG_GD = -180.0D0
+         file_CMAQ_omi%YORIG_GD = REAL( LAT( file_CMAQ_omi%NROWS ),8 )
+         file_CMAQ_omi%VGTYP_GD = 7
+         file_CMAQ_omi%VGTOP_GD = 5000.0
+
+         file_CMAQ_omi%VGLVS_GD( 1 ) = 0.0
+         file_CMAQ_omi%VGLVS_GD( 2 ) = 1.0
+
+         file_CMAQ_omi%GDNAME_GD = 'OMI_CMAQ'
+
 C...CSA Variables, Units and Descriptions for FILE_NAME
          N = 1
          VNAME3D( N ) = 'OZONE_COLUMN'
@@ -104,6 +136,25 @@ C...CSA Variables, Units and Descriptions for FILE_NAME
          DO L = 2, MXDESC3
             FDESC3D( L ) = ' '
          END DO
+
+         file_CMAQ_omi%nfld2dxyt = 1
+
+         CALL INIT_file2dxyt(file_CMAQ_omi,file_CMAQ_omi%nfld2dxyt,CMAQ_NCOLS,CMAQ_NROWS)
+
+
+         file_CMAQ_omi%fldname( 1 )   = 'OZONE_COLUMN'
+         file_CMAQ_omi%long_name( 1 ) = 'OMI Ozone Column Density'
+         file_CMAQ_omi%units( 1 )     = 'DU'
+
+         print*,'size( file_CMAQ_omi%fld2dxyt(1)%fld ) = ', size( file_CMAQ_omi%fld,DIM=1 ),
+     &    size( file_CMAQ_omi%fld,DIM=2 ),  size( file_CMAQ_omi%fld,DIM=3 )
+
+
+         call  get_date_string (jdate,000000,cmaq_start)
+
+         CALL file_out_ncf (outfile_2dxyt = file_CMAQ_omi,time_now=cmaq_start, sdate=0, stime=0 )
+
+
 ! Determine if file exists and delete if needed
          INQUIRE( FILE = FILE_NAME, EXIST = EXISTS )
          IF( EXISTS )THEN
