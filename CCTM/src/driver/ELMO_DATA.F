@@ -939,5 +939,72 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
               END IF 
           END SELECT 
  
+      END SUBROUTINE COMP_UNIT_CONVERSION
+
+!----------------------------------------------------------------------------      
+      FUNCTION FIND_ELMO_TABLE( IDG, IM, IV, ISRC )
+!----------------------------------------------------------------------------      
+!     Look up the index in the ELMO Table given the calculation ID,
+!     variable type, mode number, and source number.
+!----------------------------------------------------------------------------      
+
+      IMPLICIT NONE
+
+      INTEGER :: IDG, IM, IV, ISRC
+
+      IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
+         XMSG = 'ELMO is searching for a variable on the ELMO Table with ' //
+     &          'calculation ID ' // IDG // ' and variable type ' // IV // '. ' //
+     &          'Neither of these indices are allowed to be zero.'
+         CALL LOG_MESSAGE( LOGDEV, XMSG )
+         CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+      END IF
+
+
+      ! Check if this combination of IDG and IV have multiple modes
+      ! and/or sources. If so, look up Table ID on alternate maps.
+      IF ( N_ELMOTABLE_MODE( IDG,IV ).GT.0 .AND. N_ELMOTABLE_SOURCE( IDG,IV ).GT.0 ) THEN
+          ! Look up Table ID on multiple mode and source map
+          IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
+             XMSG = 'ELMO is searching for a variable on the ELMO Table with ' //
+     &              'mode number ' // IM // ' and source number ' // ISRC // '. ' //
+     &              'Neither of these indices are allowed to be zero.'
+             CALL LOG_MESSAGE( LOGDEV, XMSG )
+             CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+          END IF
+          I = MAP_ELMOTABLE( IDG,IV )
+          J = MAP_ELMO_IDtoTABLE_MODE_SOURCE( I )%( IM,ISRC )
+
+      ELSE IF ( N_ELMOTABLE_MODE( IDG,IV ).GT.0 ) THEN
+          ! Look up Table ID on multiple mode map
+          IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
+             XMSG = 'ELMO is searching for a variable on the ELMO Table with ' //
+     &              'mode number ' // IM // '. This index is not allowed to be zero.'
+             CALL LOG_MESSAGE( LOGDEV, XMSG )
+             CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+          END IF
+          I = MAP_ELMOTABLE( IDG,IV )
+          J = MAP_ELMO_IDtoTABLE_MODE( I )%( IM )
+
+      ELSE IF ( N_ELMOTABLE_SOURCE( IDG,IV ).GT.0 ) THEN
+          ! Look up Table ID on multiple source map
+          IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
+             XMSG = 'ELMO is searching for a variable on the ELMO Table with ' //
+     &              'source number ' // ISRC // ' This index is not allowed to be zero.'
+             CALL LOG_MESSAGE( LOGDEV, XMSG )
+             CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+          END IF
+          I = MAP_ELMOTABLE( IDG,IV )
+          J = MAP_ELMO_IDtoTABLE_SOURCE( I )%( ISRC )
+
+      ELSE
+          ! Look up Table ID on default map
+          I = MAP_ELMOTABLE( IDG,IV )
+          J = MAP_ELMO_IDtoTABLE( I )
+      END IF
+
+      FIND_ELMO_TABLE = J
+      
+      END FUNCTION FIND_ELMO_TABLE
 
       END MODULE ELMO_DATA
