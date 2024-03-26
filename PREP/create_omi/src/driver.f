@@ -150,6 +150,7 @@
            write(6,'(a)')xmsg
            Stop 
         End If
+        data_source = 2
         Close( io_file_init )
       End If
 
@@ -282,15 +283,7 @@
              CALL M3EXIT ( 'RO3', JDATE_INIT, 0, XMSG, XSTAT1 )
          END IF
 
-        fld2dxyt_FULL(1)%fld = OZ_IOAPI
-        fld2dxyt_FULL(2)%fld = CLOUD_FRACTION
-        fld2dxyt_FULL(3)%fld = O3_MISSING
         call  get_date_string (jdate_init,000000,omi_start)
-        print*,'omi_start = ',omi_start
-        CALL outncf (fld2dxyt=fld2dxyt_FULL,nfld2dxyt=nfld2dxyt_FULL,
-     &                time_now=omi_start, sdate=jdate_init, stime=000000, cdfid_m=cdfid_FULL)
-
-
         file_FULL_omi%fld(:,:,1) = OZ_IOAPI( :,: )
         file_FULL_omi%fld(:,:,2) = CLOUD_FRACTION( :,: )
         file_FULL_omi%fld(:,:,3) = O3_MISSING( :,: )
@@ -405,15 +398,7 @@
                         CALL M3EXIT ( 'RO3', JDATE_NEXT, 0, XMSG, XSTAT1 )
                      END IF
 
-                     fld2dxyt_FULL(1)%fld = OZ_IOAPI
-                     fld2dxyt_FULL(2)%fld = CLOUD_FRACTION
-                     fld2dxyt_FULL(3)%fld = O3_MISSING
-
-
                      call  get_date_string (jdate_next,000000,omi_start)
-                     print*,'omi_start = ',omi_start
-                     CALL outncf (fld2dxyt=fld2dxyt_FULL,nfld2dxyt=nfld2dxyt_FULL,
-     &                time_now=omi_start, sdate=jdate_next, stime=000000, cdfid_m=cdfid_FULL)
 
                      file_FULL_omi%fld(:,:,1) = OZ_IOAPI( :,: )
                      file_FULL_omi%fld(:,:,2) = CLOUD_FRACTION( :,: )
@@ -445,15 +430,8 @@
                  XMSG = 'Error writing variable O3_MISSING'
                  CALL M3EXIT ( 'RO3', JDATE( J ), 0, XMSG, XSTAT1 )
            END IF
-           fld2dxyt_FULL(1)%fld = OZ_IOAPI
-           fld2dxyt_FULL(2)%fld = CLOUD_FRACTION
-           fld2dxyt_FULL(3)%fld = O3_MISSING
+
            call  get_date_string (jdate(j),000000,omi_start)
-           print*,'omi_start = ',omi_start
-           CALL outncf (fld2dxyt=fld2dxyt_FULL,nfld2dxyt=nfld2dxyt_FULL,
-     &     time_now=omi_start, sdate=jdate(j), stime=000000, cdfid_m=cdfid_FULL)
-
-
            file_FULL_omi%fld(:,:,1) = OZ_IOAPI( :,: )
            file_FULL_omi%fld(:,:,2) = CLOUD_FRACTION( :,: )
            file_FULL_omi%fld(:,:,3) = O3_MISSING( :,: )
@@ -519,7 +497,7 @@
 !      write(12,*)date(j)
      
       close(io_files)       
-      call close_files( cdfid_FULL,0,0 )
+!     call close_files( cdfid_FULL,0,0 )
       call close_files( file_FULL_omi%cdfid_m,0,0 )
       call close_files( file_CMAQ_omi%cdfid_m,0,0 )
      

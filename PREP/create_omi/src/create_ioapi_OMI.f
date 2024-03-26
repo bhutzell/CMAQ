@@ -90,27 +90,11 @@ C...  the photolysis diagnostic file
          VGLVS3D( 1 ) = 1.0
          VGLVS3D( 2 ) = 0.9975
          
-         NCOLS = NCOLS3D
-         NROWS = NROWS3D
-         gdtyp_gd = LATGRD3
-         p_alp_gd = 0.0D0
-         p_bet_gd = 0.0D0
-         p_gam_gd = 0.0D0
-         XCELL_GD = REAL( 360.0 / REAL( NLON, 4 ),8 )
-         YCELL_GD = REAL( 180.0 / REAL( NLAT, 4 ),8 )
-         XORIG_GD = -180.0D0
-         YORIG_GD =  -90.0D0
-         VGTYP_GD = 7
-         VGTOP_GD = 5000.0
-
-         VGLVS_GD( 1 ) = 0.0
-         VGLVS_GD( 2 ) = 1.0
-           
          GDNAM3D = 'OMI_GLOBE' 
 
-         file_FULL_omi%NCOLS = NCOLS3D
-         file_FULL_omi%NROWS = NROWS3D
-         file_FULL_omi%gdtyp_gd = LATGRD3
+         file_FULL_omi%NCOLS = NLON
+         file_FULL_omi%NROWS = NLAT
+         file_FULL_omi%gdtyp_gd = 1
          file_FULL_omi%p_alp_gd = 0.0D0
          file_FULL_omi%p_bet_gd = 0.0D0
          file_FULL_omi%p_gam_gd = 0.0D0
@@ -150,29 +134,34 @@ C...CSA Variables, Units and Descriptions for FILE_NAME
          DO L = 2, MXDESC3
             FDESC3D( L ) = ' '
          END DO
-         nfld2dxyt_FULL = NVARS3D
-         file_FULL_omi%nfld2dxyt = NVARS3D
-         
-         CALL ALLOC_fld2xyt(fld2dxyt_FULL,nfld2dxyt_FULL,NCOLS3D,NROWS3D)
-         CALL INIT_file2dxyt(file_FULL_omi,nfld2dxyt_FULL,NCOLS,NROWS)
 
-         DO L = 1,nfld2dxyt_FULL
-            fld2dxyt_FULL( L )%fldname   = VNAME3D( L )
-            fld2dxyt_FULL( L )%long_name = VDESC3D( L )
-            fld2dxyt_FULL( L )%units     = UNITS3D( L )
-         END DO
-         DO L = 1,file_FULL_omi%nfld2dxyt
-            file_FULL_omi%fldname( L )   = VNAME3D( L )
-            file_FULL_omi%long_name( L ) = VDESC3D( L )
-            file_FULL_omi%units( L )     = UNITS3D( L )
-         END DO
-         print*,'size( file_FULL_omi%fld2dxyt(1)%fld ) = ', size( file_FULL_omi%fld,DIM=1 ),
-     &    size( file_FULL_omi%fld,DIM=2 ),  size( file_FULL_omi%fld,DIM=3 )
+         file_FULL_omi%nfld2dxyt = 3
          
-         CALL outncf (fld2dxyt=fld2dxyt_FULL,nfld2dxyt=nfld2dxyt_FULL,
-     &                time_now=omi_start, sdate=0, stime=0, cdfid_m=cdfid_FULL)
+         CALL INIT_file2dxyt(file_FULL_omi)
+
+!        DO L = 1,file_FULL_omi%nfld2dxyt
+!           file_FULL_omi%fldname( L )   = VNAME3D( L )
+!           file_FULL_omi%long_name( L ) = VDESC3D( L )
+!           file_FULL_omi%units( L )     = UNITS3D( L )
+!        END DO
                       
+         N = 1
+         file_FULL_omi%fldname( N ) = 'OZONE_COLUMN'
+         file_FULL_omi%long_name( N ) = 'DU'
+         file_FULL_omi%units( N ) = 'Total Ozone Column Density'
+
+         N = N + 1
+         file_FULL_omi%fldname( N ) = 'CLOUD_FRACT'
+         file_FULL_omi%long_name( N ) = 'None'
+         file_FULL_omi%units( N ) = 'Radiative Cloud Fraction'
+
+         N = N + 1
+         file_FULL_omi%fldname( N ) = 'O3_MISSING'
+         file_FULL_omi%long_name( N ) = 'None'
+         file_FULL_omi%units( N ) = 'Ozone Column Density Not Available'
+
          CALL file_out_ncf (outfile_2dxyt = file_FULL_omi,time_now=omi_start, sdate=0, stime=0 )
+
 ! Determine if file exists and delete if needed
          INQUIRE( FILE = FILE_NAME, EXIST = EXISTS )
          IF( EXISTS )THEN

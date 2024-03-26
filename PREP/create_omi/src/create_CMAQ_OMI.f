@@ -105,8 +105,6 @@ C...  the photolysis diagnostic file
          file_CMAQ_omi%NROWS = SIZE( LAT )
          CMAQ_NCOLS =  SIZE( LON ) - 1
          CMAQ_NROWS = SIZE( LAT )
-         print*,' file_CMAQ_omi%NCOLS, file_CMAQ_omi%NROWS = ', file_CMAQ_omi%NROWS,
-     &   file_CMAQ_omi%NROWS
          file_CMAQ_omi%gdtyp_gd = 1
          file_CMAQ_omi%p_alp_gd = 0.0D0
          file_CMAQ_omi%p_bet_gd = 0.0D0
@@ -139,21 +137,15 @@ C...CSA Variables, Units and Descriptions for FILE_NAME
 
          file_CMAQ_omi%nfld2dxyt = 1
 
-         CALL INIT_file2dxyt(file_CMAQ_omi,file_CMAQ_omi%nfld2dxyt,CMAQ_NCOLS,CMAQ_NROWS)
-
+         CALL INIT_file2dxyt(file_CMAQ_omi)
 
          file_CMAQ_omi%fldname( 1 )   = 'OZONE_COLUMN'
          file_CMAQ_omi%long_name( 1 ) = 'OMI Ozone Column Density'
          file_CMAQ_omi%units( 1 )     = 'DU'
 
-         print*,'size( file_CMAQ_omi%fld2dxyt(1)%fld ) = ', size( file_CMAQ_omi%fld,DIM=1 ),
-     &    size( file_CMAQ_omi%fld,DIM=2 ),  size( file_CMAQ_omi%fld,DIM=3 )
-
-
          call  get_date_string (jdate,000000,cmaq_start)
 
          CALL file_out_ncf (outfile_2dxyt = file_CMAQ_omi,time_now=cmaq_start, sdate=0, stime=0 )
-
 
 ! Determine if file exists and delete if needed
          INQUIRE( FILE = FILE_NAME, EXIST = EXISTS )

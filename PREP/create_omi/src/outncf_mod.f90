@@ -163,7 +163,7 @@ MODULE OUTNCF_FILE_ROUTINES
 ! The grid name used for I/O-API description and GRIDDESC.
 !-------------------------------------------------------------------------------
 
-  CHARACTER(LEN=16)            :: gdname_gd  = 'OMI_CMAQ'
+  CHARACTER(LEN=16)            :: gdname_gd  = 'OMI_GLOBE'
 
 !-------------------------------------------------------------------------------
 ! Dimensions of CTM domain.
@@ -282,69 +282,35 @@ MODULE OUTNCF_FILE_ROUTINES
   
 CONTAINS
 
-SUBROUTINE ALLOC_fld2xyt(fld2dxyt,nvars,ncols,nrows)
- IMPLICIT NONE
- 
-!Arguments:
-  Type(fld2ddata), ALLOCATABLE, INTENT(INOUT) :: fld2dxyt( : )
-  INTEGER,                      INTENT(IN)    :: nvars
-  INTEGER,                      INTENT(IN)    :: ncols
-  INTEGER,                      INTENT(IN)    :: nrows
-!Local:
-  INTEGER  :: nn 
-  
-  ALLOCATE ( fld2dxyt ( nvars ) )
+SUBROUTINE INIT_file2dxyt(file)
 
-  
-  DO nn = 1, nvars
-    ALLOCATE ( fld2dxyt(nn)%fld(ncols,nrows) )
-    fld2dxyt(nn)%fld = -1.0
-    fld2dxyt(nn)%istart(:) = 1
-    fld2dxyt(nn)%iend(1)   = ncols
-    fld2dxyt(nn)%iend(2)   = nrows
-  ENDDO
-
-
-END SUBROUTINE ALLOC_fld2xyt
-
-SUBROUTINE INIT_file2dxyt(file,nvars,ncols,nrows)
  IMPLICIT NONE
 
 !Arguments:
   Type(file_2dxyt),             INTENT(INOUT) :: file
-  INTEGER,                      INTENT(IN)    :: nvars
-  INTEGER,                      INTENT(IN)    :: ncols
-  INTEGER,                      INTENT(IN)    :: nrows
 !Local:
   INTEGER  :: nn
 
   IF ( file%INITIALIZED )RETURN
   
-! ALLOCATE ( file%fld2dxyt ( nvars ) )
-  ALLOCATE ( file%id_fld(nvars) )
-  ALLOCATE ( file%fldname(nvars) )
-  ALLOCATE ( file%long_name(nvars) )
-  ALLOCATE ( file%units(nvars) )
-  ALLOCATE ( file%fld(ncols,nrows,nvars) )
+  ALLOCATE ( file%id_fld(file%nfld2dxyt) )
+  ALLOCATE ( file%fldname(file%nfld2dxyt) )
+  ALLOCATE ( file%long_name(file%nfld2dxyt) )
+  ALLOCATE ( file%units(file%nfld2dxyt) )
+  ALLOCATE ( file%fld(file%ncols,file%nrows,file%nfld2dxyt) )
   
-  file%nfld2dxyt = nvars
-  file%ncols = ncols
-  file%nrows = nrows
   file%nlays = 1
 
-  DO nn = 1, nvars
+  DO nn = 1, file%nfld2dxyt
     file%id_fld(nn)  = -1.0
     file%fld(:,:,nn) = -1.0
     file%fldname(nn) = ''
     file%long_name(nn) = ''
     file%units(nn)    = ''
-!   file%fld2dxyt(nn)%istart(:) = 1
-!   file%fld2dxyt(nn)%iend(1)   = ncols
-!   file%fld2dxyt(nn)%iend(2)   = nrows
   ENDDO
   file%istart(:) = 1
-  file%iend(1)  = ncols
-  file%iend(2)   = nrows
+  file%iend(1)   = file%ncols
+  file%iend(2)   = file%nrows
 
   file%INITIALIZED = .FALSE.
 
@@ -368,6 +334,8 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
 ! LOCAL:
 
   INTEGER                         :: cdfid_m
+  INTEGER                         :: id_xcoor = 0
+  INTEGER                         :: id_ycoor = 0
   INTEGER                         :: dim_nlucat
   INTEGER                         :: dim_nmos
   INTEGER                         :: dim_nsoillay
@@ -381,8 +349,6 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
   INTEGER                         :: dim_timestr
   LOGICAL,            SAVE        :: first      = .TRUE.
   CHARACTER( MAX_LEN_FILENAME )   :: fl
-  INTEGER,  SAVE,     ALLOCATABLE :: id_fld     ( : )
-  INTEGER,  SAVE                  :: id_time
   INTEGER,  SAVE                  :: it         = 0
   INTEGER,            PARAMETER   :: len_time   = 19
   INTEGER                         :: mydimx
@@ -397,7 +363,9 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
   CHARACTER(LEN=16),  PARAMETER   :: pname      = 'FILE_OUT_NCF'
   INTEGER                         :: rcode
   CHARACTER(LEN=32)               :: var
-
+  
+  real, allocatable               :: lon( : )
+  real, allocatable               :: lat( : )
 !-------------------------------------------------------------------------------
 ! Error, warning, and informational messages.
 !-------------------------------------------------------------------------------
@@ -480,6 +448,8 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
 
     fl = TRIM(outfile_2dxyt%filename)
 
+    cdfid_m = 0
+    print*,TRIM(fl), nf90_clobber, cdfid_m
     rcode = nf90_create (fl, nf90_clobber, cdfid_m)
     IF ( rcode /= nf90_noerr ) THEN
       WRITE (6,f9500) TRIM(pname), TRIM(fl), TRIM(nf90_strerror(rcode))
@@ -575,6 +545,24 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
       CALL graceful_stop (pname,sdate,stime)
     ENDIF
 
+    var = "latitude"
+    rcode = nf90_def_var (cdfid_m, TRIM(var), nf90_real,  &
+                           dim_ny, id_ycoor)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9200) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
+    var = "longitude"
+    rcode = nf90_def_var (cdfid_m, TRIM(var), nf90_real,  &
+                           dim_nx, id_xcoor)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9200) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
     DO n = 1, nvars
       nn = n
       var = TRIM(outfile_2dxyt%fldname(n))
@@ -598,9 +586,25 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
   ! Define attributes for the variables.
   !-----------------------------------------------------------------------------
 
+    rcode = nf90_put_att (cdfid_m, id_ycoor, 'units',  &
+                          "degrees_north" )
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9300) TRIM(pname), 'longitude', TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode) )
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+	
+    rcode = nf90_put_att (cdfid_m, id_xcoor, 'units',  &
+                          "degrees_east" )
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9300) TRIM(pname), 'latitude', TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+
     DO n = 1, nvars
       nn = n
-      var = TRIM(outfile_2dxyt%long_name(n))
+      var = TRIM(outfile_2dxyt%fldname(n))
       rcode = nf90_put_att (cdfid_m, outfile_2dxyt%id_fld(n), 'long_name',  &
                             var)
       IF ( rcode /= nf90_noerr ) THEN
@@ -624,6 +628,35 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
       CALL graceful_stop (pname,sdate,stime)
     ENDIF
 
+! write latitude and longitude points covered by file's domain
+    ALLOCATE( lat(ny) )    
+    ALLOCATE( lon(nx) )
+    do n = 1, NY
+       lat(n) = outfile_2dxyt%yorig_gd + real(n - 1) * outfile_2dxyt%ycell_gd
+    end do
+    do n = 1, NX
+       lon(n) = outfile_2dxyt%xorig_gd + real(n - 1) * outfile_2dxyt%xcell_gd
+    end do
+
+    var = 'latitude'
+    rcode = nf90_put_var (cdfid_m, id_ycoor, lat )
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9400) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF
+    
+    var = 'longitude'
+    rcode = nf90_put_var (cdfid_m, id_xcoor, lon )
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (6,f9400) TRIM(pname), TRIM(var), TRIM(fl),  &
+                      TRIM(nf90_strerror(rcode))
+      CALL graceful_stop (pname,sdate,stime)
+    ENDIF 
+    
+    DEALLOCATE( lat )
+    DEALLOCATE( lon )
+   
     first = .FALSE.
     outfile_2dxyt%CREATED = .TRUE.
 
@@ -728,7 +761,7 @@ SUBROUTINE file_out_ncfglobal(outfile_2dxyt,sdate,stime)
     CALL graceful_stop (pname,sdate,stime)
   ENDIF
 
-  var = "INPUT_MODEL"
+  var = "INPUT_DATA"
   IF ( data_source == 2 ) THEN
     cstr = "TOMS " 
   ELSE
@@ -887,535 +920,6 @@ SUBROUTINE file_out_ncfglobal(outfile_2dxyt,sdate,stime)
   ENDIF
 
 END SUBROUTINE file_out_ncfglobal
-SUBROUTINE outncf (fld2dxyt,nfld2dxyt,time_now, sdate, stime, cdfid_m)
-
-!-------------------------------------------------------------------------------
-! Name:     Output netCDF File
-! Purpose:  Create a netCDF file of output.
-!-------------------------------------------------------------------------------
-
-  use netcdf
- 
-  IMPLICIT NONE
-! Arguments:
-  Type(fld2ddata),    INTENT(INOUT) :: fld2dxyt( : )
-  INTEGER,            INTENT(IN)    :: nfld2dxyt
-  CHARACTER( 24 ),    INTENT(INOUT) :: time_now
-  INTEGER,            INTENT(IN)    :: sdate
-  INTEGER,            INTENT(IN)    :: stime
-  INTEGER,            INTENT(INOUT) :: cdfid_m
-! LOCAL:
-
-  INTEGER                         :: dim_nlucat
-  INTEGER                         :: dim_nmos
-  INTEGER                         :: dim_nsoillay
-  INTEGER                         :: dim_nx
-  INTEGER                         :: dim_nxp1
-  INTEGER                         :: dim_ny
-  INTEGER                         :: dim_nyp1
-  INTEGER                         :: dim_nz
-  INTEGER                         :: dim_nzp1
-  INTEGER                         :: dim_time
-  INTEGER                         :: dim_timestr
-  LOGICAL,            SAVE        :: first      = .TRUE.
-  CHARACTER(LEN=256)              :: fl
-  INTEGER,  SAVE,     ALLOCATABLE :: id_fld     ( : )
-  INTEGER,  SAVE                  :: id_time
-  INTEGER,  SAVE                  :: it         = 0
-  INTEGER,            PARAMETER   :: len_time   = 19
-  INTEGER                         :: mydimx
-  INTEGER                         :: mydimy
-  INTEGER                         :: myendx
-  INTEGER                         :: myendy
-  INTEGER                         :: myendz
-  INTEGER                         :: n
-  INTEGER                         :: nn
-  INTEGER                         :: ntot
-  INTEGER                         :: nvars
-  CHARACTER(LEN=16),  PARAMETER   :: pname      = 'OUTNCF'
-  INTEGER                         :: rcode
-  CHARACTER(LEN=32)               :: var
-
-!-------------------------------------------------------------------------------
-! Error, warning, and informational messages.
-!-------------------------------------------------------------------------------
-
-  CHARACTER(LEN=256), PARAMETER :: f9100 = "(/, 1x, 70('*'), &
-    & /, 1x, '*** SUBROUTINE: ', a, &
-    & /, 1x, '***   ERROR CREATING DIMENSION FOR ', a, &
-    & /, 1x, '***   IN FILE ', a, &
-    & /, 1x, '***   ', a, &
-    & /, 1x, 70('*'))"
-
-  CHARACTER(LEN=256), PARAMETER :: f9200 = "(/, 1x, 70('*'), &
-    & /, 1x, '*** SUBROUTINE: ', a, &
-    & /, 1x, '***   ERROR DEFINING VARIABLE ', a, &
-    & /, 1x, '***   IN FILE ', a, &
-    & /, 1x, '***   ', a, &
-    & /, 1x, 70('*'))"
-
-  CHARACTER(LEN=256), PARAMETER :: f9300 = "(/, 1x, 70('*'), &
-    & /, 1x, '*** SUBROUTINE: ', a, &
-    & /, 1x, '***   ERROR CREATING ATTRIBUTE FOR', a, &
-    & /, 1x, '***   IN FILE ', a, &
-    & /, 1x, '***   ', a, &
-    & /, 1x, 70('*'))"
-
-  CHARACTER(LEN=256), PARAMETER :: f9350 = "(/, 1x, 70('*'), &
-    & /, 1x, '*** SUBROUTINE: ', a, &
-    & /, 1x, '***   ERROR ENDING DEFINITIONS ', &
-    & /, 1x, '***   IN FILE ', a, &
-    & /, 1x, '***   ', a, &
-    & /, 1x, 70('*'))"
-
-  CHARACTER(LEN=256), PARAMETER :: f9400 = "(/, 1x, 70('*'), &
-    & /, 1x, '*** SUBROUTINE: ', a, &
-    & /, 1x, '***   ERROR WRITING VARIABLE ', a, &
-    & /, 1x, '***   TO FILE ', a, &
-    & /, 1x, '***   ', a, &
-    & /, 1x, 70('*'))"
-
-  CHARACTER(LEN=256), PARAMETER :: f9500 = "(/, 1x, 70('*'), &
-    & /, 1x, '*** SUBROUTINE: ', a, &
-    & /, 1x, '***   ERROR CREATING NETCDF FILE', &
-    & /, 1x, '***   FILE = ', a, &
-    & /, 1x, '***   ', a, &
-    & /, 1x, 70('*'))"
-
-  CHARACTER(LEN=256), PARAMETER :: f9700 = "(/, 1x, 70('*'), &
-    & /, 1x, '*** SUBROUTINE: ', a, &
-    & /, 1x, '***   ERROR CLOSING NETCDF FILE', &
-    & /, 1x, '***   FILE = ', a, &
-    & /, 1x, '***   ', a, &
-    & /, 1x, 70('*'))"
-
-!-------------------------------------------------------------------------------
-! Allocate necessary variables.
-!-------------------------------------------------------------------------------
-
-
-  nvars = nfld2dxyt  
-
-! IF ( .NOT. ALLOCATED ( id_fld ) ) ALLOCATE ( id_fld ( nvars ) )
-
-
-!-------------------------------------------------------------------------------
-! overwrite time_now based sdate and stime
-!-------------------------------------------------------------------------------
-
-!  year = int(sdate/1000)
-!  month = 
-
-!-------------------------------------------------------------------------------
-! If first time calling this routine, set up the netCDF output file.
-!-------------------------------------------------------------------------------
-
-  IF ( first ) THEN
-
-  !-----------------------------------------------------------------------------
-  ! Create netCDF file.
-  !-----------------------------------------------------------------------------
-
-    fl = TRIM('test.ncf')
-
-    rcode = nf90_create (fl, nf90_clobber, cdfid_m)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9500) TRIM(pname), TRIM(fl), TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-  !-----------------------------------------------------------------------------
-  ! Set up dimensions.
-  !-----------------------------------------------------------------------------
-
-    var = "time"
-    rcode = nf90_def_dim (cdfid_m, TRIM(var), nf90_unlimited, dim_time)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
-                      TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-    var = "timestr"
-    rcode = nf90_def_dim (cdfid_m, TRIM(var), len_time, dim_timestr)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
-                      TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-    var = "nx"
-    nx = ncols
-    rcode = nf90_def_dim (cdfid_m, TRIM(var), nx, dim_nx)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
-                      TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-    var = "ny"
-    ny = nrows
-    rcode = nf90_def_dim (cdfid_m, TRIM(var), ny, dim_ny)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
-                      TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-    var = "nz"
-    nz = nlays    
-    rcode = nf90_def_dim (cdfid_m, TRIM(var), nz, dim_nz)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
-                      TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-    var = "nxp1"
-    nxp1 = nx + 1
-    rcode = nf90_def_dim (cdfid_m, TRIM(var), nxp1, dim_nxp1)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
-                      TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-    var = "nyp1"
-    nyp1 = ny + 1
-    rcode = nf90_def_dim (cdfid_m, TRIM(var), nyp1, dim_nyp1)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
-                      TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-    var = "nzp1"
-    nzp1 = nz + 1
-    rcode = nf90_def_dim (cdfid_m, TRIM(var), nzp1, dim_nzp1)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9100) TRIM(pname), TRIM(var), TRIM(fl),  &
-                      TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-  !-----------------------------------------------------------------------------
-  ! Define variables that will populate the file.
-  !-----------------------------------------------------------------------------
-
-    var = "mtime"
-    rcode = nf90_def_var (cdfid_m, TRIM(var), nf90_char,  &
-                          (/ dim_timestr, dim_time /), fld2dxyt( 1 )%id_time)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9200) TRIM(pname), TRIM(var), TRIM(fl),  &
-                      TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-    DO n = 1, nfld2dxyt
-      nn = n
-      var = TRIM(fld2dxyt(n)%fldname)
-      rcode = nf90_def_var (cdfid_m, TRIM(var), nf90_float,  &
-                            (/ dim_nx, dim_ny, dim_time /), fld2dxyt(nn)%id_fld)
-      IF ( rcode /= nf90_noerr ) THEN
-        WRITE (6,f9200) TRIM(pname), TRIM(var), TRIM(fl),  &
-                        TRIM(nf90_strerror(rcode))
-        CALL graceful_stop (pname,sdate,stime)
-      ENDIF
-    ENDDO
-    ntot = nfld2dxyt
-
-  !-----------------------------------------------------------------------------
-  ! Define global attributes.
-  !-----------------------------------------------------------------------------
-
-    CALL outncfglobal (cdfid_m, fl, sdate, stime)
-
-  !-----------------------------------------------------------------------------
-  ! Define attributes for the variables.
-  !-----------------------------------------------------------------------------
-
-    DO n = 1, nfld2dxyt
-      nn = n
-      var = TRIM(fld2dxyt(n)%fldname)
-      rcode = nf90_put_att (cdfid_m, fld2dxyt(n)%id_fld, 'long_name',  &
-                            TRIM(fld2dxyt(n)%long_name))
-      IF ( rcode /= nf90_noerr ) THEN
-        WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                        TRIM(nf90_strerror(rcode))
-        CALL graceful_stop (pname,sdate,stime)
-      ENDIF
-      rcode = nf90_put_att (cdfid_m, fld2dxyt(n)%id_fld, 'units',  &
-                            TRIM(fld2dxyt(n)%units))
-      IF ( rcode /= nf90_noerr ) THEN
-        WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                        TRIM(nf90_strerror(rcode))
-        CALL graceful_stop (pname,sdate,stime)
-      ENDIF
-    ENDDO
-    ntot = nfld2dxyt
-    
-    rcode = nf90_enddef (cdfid_m)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9350) TRIM(pname), TRIM(fl), TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-
-    first = .FALSE.
-    Return
-
-  ENDIF  ! first = .TRUE.
-
-!-------------------------------------------------------------------------------
-! Write variables.
-!-------------------------------------------------------------------------------
-
-  it = it + 1
-  var = "mtime"
-  rcode = nf90_put_var (cdfid_m, fld2dxyt( 1 )%id_time, time_now(1:len_time),  &
-                        start = (/ 1, it /), count = (/ len_time, 1 /) )
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9400) TRIM(pname), TRIM(var), TRIM(fl), TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-
-  DO n = 1, nfld2dxyt
-    nn = n
-    var = TRIM(fld2dxyt(n)%fldname)
-    rcode = nf90_put_var (cdfid_m, fld2dxyt(n)%id_fld, fld2dxyt(n)%fld,  &
-                          start = (/ 1, 1, it /),  &
-                          count = (/ fld2dxyt(n)%iend(1), &
-                                     fld2dxyt(n)%iend(2), 1 /) )
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (6,f9400) TRIM(pname), TRIM(var), TRIM(fl),  &
-                      TRIM(nf90_strerror(rcode))
-      CALL graceful_stop (pname,sdate,stime)
-    ENDIF
-  ENDDO
-  ntot = nfld2dxyt
-
-
-END SUBROUTINE outncf
-
-SUBROUTINE outncfglobal (cdfid_in,fl,sdate,stime)
-
-!-------------------------------------------------------------------------------
-! Name:     Output netCDF Global Attributes
-! Purpose:  Write netCDF global attributes.
-!-------------------------------------------------------------------------------
-
-  use netcdf
- 
-  IMPLICIT NONE
-! Arguments
-  INTEGER,            INTENT(IN)  :: cdfid_in
-  CHARACTER(LEN=256), INTENT(IN)  :: fl
-  INTEGER,            INTENT(IN)  :: sdate
-  INTEGER,            INTENT(IN)  :: stime
-! local:
-  CHARACTER(LEN=32)               :: cstr
-  CHARACTER(LEN=16),  PARAMETER   :: pname      = 'OUTNCFGLOBAL'
-  INTEGER                         :: rcode
-  CHARACTER(LEN=32)               :: var
-
-!-------------------------------------------------------------------------------
-! Error, warning, and informational messages.
-!-------------------------------------------------------------------------------
-
-  CHARACTER(LEN=256), PARAMETER :: f9300 = "(/, 1x, 70('*'), &
-    & /, 1x, '*** SUBROUTINE: ', a, &
-    & /, 1x, '***   ERROR CREATING ATTRIBUTE FOR', a, &
-    & /, 1x, '***   IN FILE ', a, &
-    & /, 1x, '***   ', a, &
-    & /, 1x, 70('*'))"
-
-!-------------------------------------------------------------------------------
-! Define global attributes.
-!-------------------------------------------------------------------------------
-
-  var = "PROGNAME"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, progname)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "VERSION"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, ver)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "CODE_DATE"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, vdate)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "INPUT_MODEL"
-  IF ( data_source == 2 ) THEN
-    cstr = "TOMS " 
-  ELSE
-    cstr = "unspecified"
-  ENDIF
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, cstr)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "NCOLS"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, ncols)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "NROWS"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, nrows)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "NLAYS"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, nlays)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "NTHIK"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, nthik)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "GDTYP"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, gdtyp_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "P_ALP"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, p_alp_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "P_BET"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, p_bet_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "P_GAM"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, p_gam_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "XCENT"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, xcent_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "YCENT"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, ycent_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "XORIG"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, xorig_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "YORIG"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, yorig_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "XCELL"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, xcell_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "YCELL"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, ycell_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "VGTYP"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, vgtyp_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "VGTOP"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, vgtop_gd)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-
-  var = "VGLVLS"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, vglvs_gd(:))
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-  var = "EARTH_RADIUS"
-  rcode = nf90_put_att (cdfid_in, nf90_global, var, eradm)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
-                    TRIM(nf90_strerror(rcode))
-    CALL graceful_stop (pname,sdate,stime)
-  ENDIF
-
-END SUBROUTINE outncfglobal
 SUBROUTINE graceful_stop (pname,sdate,stime)
 
 !-------------------------------------------------------------------------------
