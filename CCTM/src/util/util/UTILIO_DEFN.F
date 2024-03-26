@@ -62,12 +62,15 @@ C....................................................................
 
 #ifdef parallel
 
+       use replacement_util_module, only: time2sec
+       
          USE M3UTILIO, EXCLUDE_INTERPB => INTERP3,
      &                 EXCLUDE_M3EXIT  => M3EXIT,
      &                 EXCLUDE_M3WARN  => M3WARN,
      &                 EXCLUDE_SHUT3   => SHUT3,
      &                 EXCLUDE_WRITE3  => WRITE3,
-     &                 BUF_WRITE3      => WRITE3
+     &                 BUF_WRITE3      => WRITE3,
+     &                 exclude_time2sec => time2sec
 
          USE PARUTILIO, 
      &                  M3ERR   => PM3ERR,
