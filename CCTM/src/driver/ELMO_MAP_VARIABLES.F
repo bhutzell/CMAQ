@@ -42,6 +42,14 @@
           IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ELMO ) THEN
            SELECT CASE ( ID )
              
+             !!!! Gas-Phase Variables !!!!
+             ! Map NOx
+             CASE ( ID_NOX ) 
+               N_VARS = 2
+               CALL INIT_ELMO_COMP( J, N_VARS, 'GAS' )
+               CALL SET_ELMO_COMP( J, 1, 'NO', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'NO2', 1.0 )
+
              !!!! Coarse-Mode Variables !!!!  
 
              ! Map PMC_SO4 - Coarse-Mode Sulfate
@@ -634,14 +642,14 @@
              CASE ( ID_PM25_UN ) 
                N_VARS = 3
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ASEACAT', 1.0 - real( ascat_na_fac + ascat_mg_fac +  
-     &                                                                    ascat_k_fac  + ascat_ca_fac  )) 
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASOIL',   1.0 - real( asoil_na_fac + asoil_mg_fac +
-     &                                                                    asoil_k_fac  + asoil_ca_fac +
-     &                                                                    asoil_mn_fac + asoil_fe_fac  ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ACORS',   1.0 - real( acors_na_fac + acors_mg_fac +
-     &                                                                    acors_k_fac  + acors_ca_fac +
-     &                                                                    acors_mn_fac + acors_fe_fac  ))
+               CALL SET_ELMO_COMP( J, 1, 'ASEACAT', 1.0 - real( ascat_na_fac + ascat_mg_fac +  
+     &                                                          ascat_k_fac  + ascat_ca_fac  )) 
+               CALL SET_ELMO_COMP( J, 2, 'ASOIL',   1.0 - real( asoil_na_fac + asoil_mg_fac +
+     &                                                          asoil_k_fac  + asoil_ca_fac +
+     &                                                          asoil_mn_fac + asoil_fe_fac  ))
+               CALL SET_ELMO_COMP( J, 3, 'ACORS',   1.0 - real( acors_na_fac + acors_mg_fac +
+     &                                                          acors_k_fac  + acors_ca_fac +
+     &                                                          acors_mn_fac + acors_fe_fac  ))
  
              ! Map PM25_HP - PM2.5 Hydronium Ion
              CASE ( ID_PM25_HP ) 
@@ -845,8 +853,19 @@
  
              !!!! Other Variables !!!!  
 
-             ! Map TNO3 - Total Inorganic Nitrate
+             ! Map TNO3 - Total Inorganic Nitrate in mass concentration
+             ! units. The units are specified in the ELMO_LIST Table in
+             ! ELMO_DATA.F.
              CASE ( ID_TNO3 ) 
+               N_VARS = 2
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'ANO3', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'HNO3', 1.0 ) 
+ 
+             ! Map TNO3_MOL - Total Inorganic Nitrate in Mixing Ratio
+             ! Units. The units are specified in the ELMO_LIST Table in
+             ! ELMO_DATA.F.
+             CASE ( ID_TNO3_MOL ) 
                N_VARS = 2
                CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
                CALL SET_ELMO_COMP( J, 1, 'ANO3', 1.0 )
@@ -859,42 +878,128 @@
                CALL SET_ELMO_COMP( J, 1, 'ANO3', 1.0 )
                CALL SET_ELMO_COMP( J, 2, 'HNO3', 1.0 ) 
                CALL SET_ELMO_COMP( J, 3, 'AISOPNN', 1.0 ) ! Convert to just NO3
-               CALL SET_ELMO_COMP( J, 4, 'AMTNO3', 1.0 )      ! Convert to just NO3
+               CALL SET_ELMO_COMP( J, 4, 'AMTNO3', 1.0 )  ! Convert to just NO3
  
+             ! Map Dry Deposition of Oxidized Nitrogen from NOx
+             CASE ( ID_DD_OXN_NOX )
+               N_VARS = 2
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'DD_NO2' , 0.30435 )
+               CALL SET_ELMO_COMP( J, 2, 'DD_NO'  , 0.46667 )
+             
+             ! Map Wet Deposition of Oxidized Nitrogen from NOx
+             CASE ( ID_WD_OXN_NOX )
+               N_VARS = 2
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'WD_NO2' , 0.30435 )
+               CALL SET_ELMO_COMP( J, 2, 'WD_NO'  , 0.46667 )
+             
+             ! Map Dry Deposition of Oxidized Nitrogen from NO3
+             CASE ( ID_DD_OXN_TNO3 )
+               N_VARS = 2
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'DD_HNO3', 0.22222 )
+               CALL SET_ELMO_COMP( J, 2, 'DD_ANO3', 0.22581 )
+             
+             ! Map Wet Deposition of Oxidized Nitrogen from NO3
+             CASE ( ID_WD_OXN_TNO3 )
+               N_VARS = 2
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'WD_HNO3', 0.22222 )
+               CALL SET_ELMO_COMP( J, 2, 'WD_ANO3', 0.22581 )
+             
+             ! Map Dry Deposition of Oxidized Nitrogen from PAN
+             CASE ( ID_DD_OXN_PANT )
+               N_VARS = 3
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'DD_PAN' , 0.11570 )
+               CALL SET_ELMO_COMP( J, 2, 'DD_PPN' , 0.11570 )
+               CALL SET_ELMO_COMP( J, 3, 'DD_MPAN', 0.11570 )
+             
+             ! Map Wet Deposition of Oxidized Nitrogen from PAN
+             CASE ( ID_WD_OXN_PANT )
+               N_VARS = 3
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'WD_PAN' , 0.11570 )
+               CALL SET_ELMO_COMP( J, 2, 'WD_PPN' , 0.11570 )
+               CALL SET_ELMO_COMP( J, 3, 'WD_MPAN', 0.11570 )
+             
+             ! Map Dry Deposition of Oxidized Nitrogen from ORGN
+             CASE ( ID_DD_OXN_ORGN )
+               N_VARS = 6
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'DD_ONIT', 0.10770 )
+               CALL SET_ELMO_COMP( J, 2, 'DD_ISON', 0.10770 )
+               CALL SET_ELMO_COMP( J, 3, 'DD_TRPN', 0.10770 )
+               CALL SET_ELMO_COMP( J, 4, 'DD_NALD', 0.10770 )
+               CALL SET_ELMO_COMP( J, 5, 'DD_IPN' , 0.10770 )
+               CALL SET_ELMO_COMP( J, 6, 'DD_IPC' , 0.10770 )
+             
+             ! Map Wet Deposition of Oxidized Nitrogen from ORGN
+             CASE ( ID_WD_OXN_ORGN )
+               N_VARS = 6
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'WD_ONIT', 0.10770 )
+               CALL SET_ELMO_COMP( J, 2, 'WD_ISON', 0.10770 )
+               CALL SET_ELMO_COMP( J, 3, 'WD_TRPN', 0.10770 )
+               CALL SET_ELMO_COMP( J, 4, 'WD_NALD', 0.10770 )
+               CALL SET_ELMO_COMP( J, 5, 'WD_IPN' , 0.10770 )
+               CALL SET_ELMO_COMP( J, 6, 'WD_IPC' , 0.10770 )
+             
+             ! Map Dry Deposition of Oxidized Nitrogen from Other
+             CASE ( ID_DD_OXN_OTHR )
+               N_VARS = 3
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'DD_N2O5', 0.25926 )
+               CALL SET_ELMO_COMP( J, 2, 'DD_HONO', 0.29787 )
+               CALL SET_ELMO_COMP( J, 3, 'DD_HNO4', 0.00    )
+             
+             ! Map Wet Deposition of Oxidized Nitrogen from Other
+             CASE ( ID_WD_OXN_OTHR )
+               N_VARS = 6
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'WD_N2O5', 0.25926 )
+               CALL SET_ELMO_COMP( J, 2, 'WD_HONO', 0.29787 )
+               CALL SET_ELMO_COMP( J, 3, 'WD_HNO4', 0.17772 )
+
+             ! Map Dry Deposition of Oxidized Nitrogen
+             CASE ( ID_DD_OXN_TOT )
+               N_VARS = 5
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'DD_OXN_NOX' , 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'DD_OXN_TNO3', 1.0 )
+               CALL SET_ELMO_COMP( J, 3, 'DD_OXN_PANT', 1.0 )
+               CALL SET_ELMO_COMP( J, 4, 'DD_OXN_ORGN', 1.0 )
+               CALL SET_ELMO_COMP( J, 5, 'DD_OXN_OTHR', 1.0 )
+
+             ! Map Wet Deposition of Oxidized Nitrogen
+             CASE ( ID_WD_OXN_TOT )
+               N_VARS = 5
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'WD_OXN_NOX' , 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'WD_OXN_TNO3', 1.0 )
+               CALL SET_ELMO_COMP( J, 3, 'WD_OXN_PANT', 1.0 )
+               CALL SET_ELMO_COMP( J, 4, 'WD_OXN_ORGN', 1.0 )
+               CALL SET_ELMO_COMP( J, 5, 'WD_OXN_OTHR', 1.0 )
+
+             ! Map Total Deposition of Oxidized Nitrogen
+             CASE ( ID_TD_OXN_TOT )
+               N_VARS = 2
+               CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
+               CALL SET_ELMO_COMP( J, 1, 'DD_OXN_TOT', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'WD_OXN_TOT', 1.0 )
+
+
           END SELECT
 
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_CGRID ) THEN
-           ! CGRID Variables are already mapped
-
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_AEROBULK ) THEN
-           ! Bulk Aerosols will be retrieved manually
-
          ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_FAM ) THEN
-           ! Chemical Family
-           ELMO_TABLE( J )%L_COMP = .TRUE.
+           ! Populate the members of this Chemical Family in the
+           ! ELMO_COMP array.
            N_VARS = CHEMFAMILYNUM( ID )
            CALL INIT_ELMO_COMP( J, N_VARS, 'ALL' )
            DO K = 1,N_VARS
              CALL SET_ELMO_COMP( J, K, CHEMFAMILYMEMBERS(ID,K), 1.0 )
            END DO
-
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_WDEP ) THEN
-           ! Wet Dep Variables are already mapped
-
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_DDEP ) THEN
-           ! Dry Dep Variables are already mapped
-
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ISAM ) THEN
-
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ISAM_WDEP ) THEN
-
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ISAM_DDEP ) THEN
-
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_DDM ) THEN
-
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_DDM_WDEP ) THEN
-
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_DDM_DDEP ) THEN
 
          END IF
 

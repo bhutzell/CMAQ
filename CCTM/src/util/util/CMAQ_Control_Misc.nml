@@ -95,8 +95,11 @@
   Avrg_Vars_Nml  = 'DEFAULT'
 
 ! Example for limited output
-! Avrg_Vars_Nml = 'NO2', 'FORM', 'SO2', 'O3', 'PM25', 'PM10', 'DENS', 'NOX', 'AOD_550'
-/
+  Avrg_Vars_Nml = 'NO2', 'FORM', 'SO2', 'O3', 'PM25', 'PM10', 'DENS', 'NOX', 'AOD_550',
+                  'ALL_ISAM','NO2_PTEGU','*ISAM_NOX','ISAM_NOX_PTEGU','ISAM_PMF_MASS_PTEGU','ISAM_PMF_MASS',
+                  'DD_NO2_PTEGU','DDM_DD_NO2','ISAM_WD_NO2',
+                  '*ISAM_NO2','ISAM_NO2','*ISAM_ASO4*','*ISAM_ASO4','ISAM_ASO4_BULK'
+/                                                               
 
 
 

@@ -34,13 +34,13 @@ GC_SPECIES_CONTENT =
 'MEOH'         ,1  ,1  ,0  ,0
 'ROOH'         ,4  ,2  ,0  ,0
 'XO2'          ,4  ,2  ,0  ,0
-'XO2N'         ,
-'XPAR'         ,
-'XPRP'         ,
-'NTR1'         ,
-'NTR2'         ,
-'FACD'         ,
-'CO'           ,
+'XO2N'         ,2  ,3  ,1  ,0
+'XPAR'         ,4  ,3  ,1  ,0
+'XPRP'         ,2  ,3  ,1  ,0
+'NTR1'         ,3  ,4  ,1  ,0
+'NTR2'         ,3  ,5  ,1  ,0
+'FACD'         ,1  ,2  ,0  ,0
+'CO'           ,1  ,1  ,0  ,0
 'HCO3'         ,
 'ALDX'         ,
 'GLYD'         ,

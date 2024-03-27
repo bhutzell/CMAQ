@@ -735,6 +735,7 @@ C-------------------------------------------------------------------------------
          Character( 3  ) :: suff         ! Suffix
          Character( 16 ) :: num_name     ! name of aerosol number variable
          Character( 16 ) :: srf_name     ! name of aerosol surface area variable
+         Logical         :: all_mask     ! is this mode ultrafine PM?
          Logical         :: ultrafine_mask ! is this mode ultrafine PM?
          Logical         :: fine_mask    ! is this mode fine PM?
          Logical         :: coarse_mask  ! is this mode coarse PM?
@@ -748,11 +749,11 @@ C-------------------------------------------------------------------------------
 
       Type ( mode_type ), Parameter  :: aeromode( n_mode ) = (/
 C                  suffix   number     surface         Masks       minimum minimum minimum
-C                            name       name     U  F  C AC AI NU  numconc  m2conc  m3conc
-C                  ------- ----------  -------   -  -  - -- -- --  -------- -------  ------
-     &   mode_type('AIT'  ,'NUMATKN', 'SRFATKN', T, T, F, F, T, F, conmin,  conmin, conmin),
-     &   mode_type('ACC'  ,'NUMACC ', 'SRFACC ', F, T, F, T, F, F, conmin,  conmin, conmin),
-     &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', F, F, T, F, F, F, conmin,  conmin, conmin)/)
+C                            name       name     ALL U  F  C AC AI NU  numconc  m2conc  m3conc
+C                  ------- ----------  -------   --- -  -  - -- -- --  -------- -------  ------
+     &   mode_type('AIT'  ,'NUMATKN', 'SRFATKN', T,  T, T, F, F, T, F, conmin,  conmin, conmin),
+     &   mode_type('ACC'  ,'NUMACC ', 'SRFACC ', T,  F, T, F, T, F, F, conmin,  conmin, conmin),
+     &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', T,  F, F, T, F, F, F, conmin,  conmin, conmin)/)
 
 
       Real          :: moment0_conc( n_mode )     ! 0th moment concentration

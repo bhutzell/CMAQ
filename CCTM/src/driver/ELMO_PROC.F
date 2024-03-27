@@ -234,9 +234,37 @@
 #else
          CALL EXTRACT_AERO( CGRID( C,R,L,: ), .TRUE. )
          CALL EXTRACT_SOA( CGRID( C,R,L,: ) )
-#endif         
+#endif   
+         ! Load All Raw Concentrations and Fluxes
+         CONC_VEC(:) = CGRID(C,R,L,:)
+
+         IF ( L.EQ.1 .AND. L_ELMO_WDEP )
+     &        WDEP_VEC(:) = TOT_DEP(C,R,:)
+         IF ( L.EQ.1 .AND. L_ELMO_DDEP )
+     &        DDEP_VEC(:) = DDEP(:,C,R)  ! N_SPC_DDEP --> DD2DV
+
+#ifdef isam
+         ! Load All Raw Concentrations and Fluxes
+         ISAM_VEC(:) = CGRID(C,R,L,:)
+
+         IF ( L.EQ.1 .AND. L_ELMO_WDEP )
+     &        ISAM_WDEP_VEC(:,:) = TOT_SADEP(C,R,:,:) ! N_ISAM_SPEC, NTAG_SA
+         IF ( L.EQ.1 .AND. L_ELMO_DDEP )
+     &        ISAM_DDEP_VEC(:) = SA_DDEP(C,R,:)   ! N_SPCTAG
+#endif
+
+#ifdef sens
+         ! Load All Raw Concentrations and Fluxes
+         DDM_VEC(:) = CGRID(C,R,L,:)
+
+         IF ( L.EQ.1 .AND. L_ELMO_WDEP )
+     &        DDM_WDEP_VEC(:,:) = S_TOTDEP(C,R,:,:) !NPMAX, N_SPC_WDEP
+         IF ( L.EQ.1 .AND. L_ELMO_DDEP )
+     &        DDM_DDEP_VEC(:) = S_DDEP(:,C,R,:)  ! N_SPC_DDEP --> DD2DV, NPMAX
+#endif
+
          ! Populate Diagnostic Arrays
-         CALL LOAD_ELMO( C,R,L, CGRID(C,R,L,:), WRITE_STEP, INIT_STEP, INIT_TIME )
+         CALL LOAD_ELMO( C,R,L, WRITE_STEP, INIT_STEP, INIT_TIME )
 
       END DO
       END DO
@@ -245,7 +273,7 @@
       END SUBROUTINE ELMO_DRIVER
 
 !-------------------------------------------------------------------------
-      SUBROUTINE LOAD_ELMO( C,R,L,CONC,WRITE_STEP, INIT_STEP, INIT_TIME )
+      SUBROUTINE LOAD_ELMO( C,R,L,WRITE_STEP, INIT_STEP, INIT_TIME )
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
@@ -261,8 +289,6 @@
 
       INTEGER, INTENT( IN ) :: C, R, L
       INTEGER IDG, IM, AL, IL, IUSED, IAVRG, IINST
-
-      REAL, INTENT( IN ) :: CONC( : )
 
       LOGICAL, INTENT( IN ) :: WRITE_STEP
       LOGICAL, INTENT( IN ) :: INIT_STEP
@@ -281,7 +307,6 @@
       ELMO_LOCAL( : )   = 0.0
       INLET_FRAC(:,:,:) = -1.
       L_CALCULATED      = .FALSE.
-      CONC_VEC( : )     = CONC( : )
 
       ! Check to make sure the current layer is requested for diagnostic
       ! output.
@@ -348,7 +373,7 @@
       END SUBROUTINE LOAD_ELMO
  
 !-------------------------------------------------------------------------
-      RECURSIVE SUBROUTINE CALC_ELMO( OUTVAL, J, IDG, IM, IV, ISRC )
+      RECURSIVE SUBROUTINE CALC_ELMO( OUTVAL, OUT_UNIT, J, IDG, IM, IV, ISRC )
 !     This subroutine sums aggregate PM diagnostic parameters using the
 !         ELMO_COEFFS structure as a guide for summing aerosol
 !         components.          
@@ -364,7 +389,8 @@
       IMPLICIT NONE
 
       INTEGER, INTENT( IN ), OPTIONAL :: J, IDG, IM, IV, ISRC ! Table Index
-      REAL, INTENT( INOUT ) :: OUTVAL  ! Output Value
+      REAL, INTENT( INOUT ) :: OUTVAL   ! Output Value
+      INTEGER, INTENT( IN ) :: OUT_UNIT ! The desired output unit
       INTEGER ID, VAR_TYPE
       REAL VAL2
       INTEGER IVAR, ILIST
@@ -419,9 +445,17 @@
         END DO
       END IF
  
-      ! Retrieve value from corresponding array
+      ! Calculate conversion factor for transforming between units. For
+      ! example, ppbC or kgN ha-1 can be calculated using this routine.
+      ! The inputs are the current variable being calculated and the
+      ! desired output units. The output units are most often equivalent
+      ! to those of the variable being calculated.
       FAC = 1.0
+      CALL COMP_UNIT_CONVERSION( J, OUT_UNIT, FAC )
 
+      ! Retrieve value from corresponding array. These can come from
+      ! CGRID, the Detailed ELMO variables, linear combinations of CGRID
+      ! variables, deposition arrays, ISAM arrays, or DDM3D arrays.
       SELECT CASE ( VAR_TYPE ) 
          CASE ( ETYPE_CGRID )
             ! Variable is in CGRID
@@ -441,26 +475,57 @@
          CASE ( ETYPE_FAM )
             ! Variable is a Chemical Family
             DO IVAR = 1,ELMO_COMP( J )%N_VARS
-              CALL CALC_ELMO( OUTVAL=VAL2, J=ELMO_COMP( J )%TABID(IVAR) )
-              CALL COMP_UNIT_CONVERSION( J, IVAR, FAC )
-              OUTVAL = OUTVAL + VAL2 * FAC
+              CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, 
+     &                        J=ELMO_COMP( J )%TABID(IVAR) )
+              OUTVAL = OUTVAL + VAL2
             END DO 
 
-         CASE ( ETYPE_ELMO, ETYPE_ELMO_ISAM, ETYPE_ELMO_DDM,
-     &          ETYPE_ELMO_DEP, ETYPE_ELMO_WDEP, ETYPE_ELMO_DDEP )   
+         CASE ( ETYPE_ELMO )   
             ! Variable is an ELMO Variable
             IF ( ELMO_TABLE( J )%L_COMP ) THEN
                ! Sum up Linear Combination Variable
                DO IVAR = 1,ELMO_COMP( J )%N_VARS
-                 CALL CALC_ELMO( OUTVAL=VAL2, J=ELMO_COMP( J )%TABID(IVAR) )
-                 CALL COMP_UNIT_CONVERSION( J, IVAR, FAC )
-                 OUTVAL = OUTVAL + VAL2 * FAC
+                 CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, 
+     &                           J=ELMO_COMP( J )%TABID(IVAR) )
+                 OUTVAL = OUTVAL + VAL2 * ELMO_COMP( J )%COEFF(IVAR)
                END DO 
             ELSE
-               ! Retrieve Elaborate ELMO Variable
-               CALL CALC_ELMO_DETAILED( VAL2, J )
+               ! Retrieve Detailed ELMO Variable
+               CALL ELMO_CALC_DETAILED( VAL2, J )
                OUTVAL = OUTVAL + VAL2 * FAC
             END IF
+
+         CASE ( ETYPE_WDEP )
+            ! Variable is a Wet Deposition Flux
+            OUTVAL = WDEP_VEC( ID ) * FAC
+         
+         CASE ( ETYPE_DDEP )
+            ! Variable is a Dry Deposition Flux
+            OUTVAL = DDEP_VEC( ID ) * FAC
+         
+         CASE ( ETYPE_ISAM )
+            ! Variable is in the ISAM Array
+            OUTVAL = ISAM_VEC( ID ) * FAC
+         
+         CASE ( ETYPE_ISAM_WDEP )
+            ! Variable is in the ISAM Array
+            OUTVAL = ISAM_WDEP_VEC( ID ) * FAC
+         
+         CASE ( ETYPE_ISAM_DDEP )
+            ! Variable is in the ISAM Array
+            OUTVAL = ISAM_DDEP_VEC( ID ) * FAC
+
+         CASE ( ETYPE_DDM )
+            ! Variable is in the DDM3D Array
+            OUTVAL = DDM_VEC( ID ) * FAC
+
+         CASE ( ETYPE_DDM_WDEP )
+            ! Variable is in the DDM3D Array
+            OUTVAL = DDM_WDEP_VEC( ID ) * FAC
+
+         CASE ( ETYPE_DDM_DDEP )
+            ! Variable is in the DDM3D Array
+            OUTVAL = DDM_DDEP_VEC( ID ) * FAC
 
          CASE DEFAULT
 
@@ -475,6 +540,5 @@
       END DO 
  
       END SUBROUTINE CALC_ELMO
- 
  
       END MODULE ELMO_PROC

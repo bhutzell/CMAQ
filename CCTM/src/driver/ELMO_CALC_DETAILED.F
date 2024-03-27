@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 !-------------------------------------------------------------------------
-      SUBROUTINE CALC_ELMO_DETAILED( OUTVAL, J )
+      SUBROUTINE ELMO_CALC_DETAILED( OUTVAL, J )
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
@@ -59,10 +59,11 @@
 
       OUTVAL = 0.0
 
-      IDG = ELMO_TABLE( J )%ID
-      IM  = ELMO_TABLE( J )%IM
-      IV  = ELMO_TABLE( J )%VAR_TYPE
-      ISRC= ELMO_TABLE( J )%SOURCE
+      IDG    = ELMO_TABLE( J )%ID
+      IM     = ELMO_TABLE( J )%IM
+      IV     = ELMO_TABLE( J )%VAR_TYPE
+      ISRC   = ELMO_TABLE( J )%SOURCE
+      IUNIT  = ELMO_TABLE( J )%IUNIT
 
       ! Determine which variable to calculate
       SELECT CASE( IDG )
@@ -147,100 +148,31 @@
 
          ! Retrieve Total Particle Mass
          CASE ( ID_PM_MASS )
-           SELECT CASE ( IV )
-            CASE ( ETYPE_CGRID )
-              DO IMODE = 1,N_MODE
-                 OUTVAL = OUTVAL +
-     &             SUM( AEROSPC_CONC( :,IMODE ),
-     &                  MASK=.NOT.AEROSPC(:)%TRACER ) ! ug m-3
-     &              - AEROSPC_CONC( AH2O_IDX,IMODE )
-                 IF ( AORGH2O_IDX .GT. 0 ) OUTVAL = OUTVAL
-     &              - AEROSPC_CONC( AORGH2O_IDX,IMODE ) ! ug m-3 
-              END DO
-            CASE ( ETYPE_ISAM )
-
-            CASE ( ETYPE_DDM )
-
-           END SELECT
-             
+            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, IV, ISRC ) 
 
          ! Retrieve Ultrafine Particle Mass
          CASE ( ID_PMU_MASS )
-            DO IMODE = 1,N_MODE
-               IF ( AEROMODE( IMODE )%ULTRAFINE_MASK ) THEN
-                    OUTVAL = OUTVAL +
-     &                 SUM( AEROSPC_CONC( :,IMODE ),
-     &                      MASK=.NOT.AEROSPC(:)%TRACER ) ! ug m-3
-     &                  - AEROSPC_CONC( AH2O_IDX,IMODE )
-                    IF ( AORGH2O_IDX .GT. 0 ) OUTVAL = OUTVAL
-     &                  - AEROSPC_CONC( AORGH2O_IDX,IMODE ) ! ug m-3
-               END IF
-            END DO
+            OUTVAL = SUM_PM_MODES( AEROMODE%ULTRAFINE_MASK, IV, ISRC ) 
 
          ! Retrieve Fine Particle Mass
          CASE ( ID_PMF_MASS )
-            DO IMODE = 1,N_MODE
-               IF ( AEROMODE( IMODE )%FINE_MASK ) THEN
-                    OUTVAL = OUTVAL +
-     &                 SUM( AEROSPC_CONC( :,IMODE ),
-     &                      MASK=.NOT.AEROSPC(:)%TRACER )
-     &                  - AEROSPC_CONC( AH2O_IDX,IMODE )
-                    IF ( AORGH2O_IDX .GT. 0 ) OUTVAL = OUTVAL
-     &                  - AEROSPC_CONC( AORGH2O_IDX,IMODE ) ! ug m-3
-               END IF
-            END DO
+            OUTVAL = SUM_PM_MODES( AEROMODE%FINE_MASK, IV, ISRC ) 
 
          ! Retrieve Coarse Particle Mass
          CASE ( ID_PMC_MASS )
-            DO IMODE = 1,N_MODE
-               IF ( AEROMODE( IMODE )%COARSE_MASK ) THEN
-                    OUTVAL = OUTVAL +
-     &                 SUM( AEROSPC_CONC( :,IMODE ),
-     &                      MASK=.NOT.AEROSPC(:)%TRACER ) ! ug m-3
-     &                  - AEROSPC_CONC( AH2O_IDX,IMODE )
-                    IF ( AORGH2O_IDX .GT. 0 ) OUTVAL = OUTVAL
-     &                  - AEROSPC_CONC( AORGH2O_IDX,IMODE ) ! ug m-3
-               END IF
-            END DO
+            OUTVAL = SUM_PM_MODES( AEROMODE%COARSE_MASK, IV, ISRC ) 
 
          ! Retrieve Nucleation-Mode Particle Mass
          CASE ( ID_PMNUC_MASS )
-            DO IMODE = 1,N_MODE
-               IF ( AEROMODE( IMODE )%NUC_MASK ) THEN
-                    OUTVAL = OUTVAL +
-     &                 SUM( AEROSPC_CONC( :,IMODE ),
-     &                      MASK=.NOT.AEROSPC(:)%TRACER ) ! ug m-3
-     &                  - AEROSPC_CONC( AH2O_IDX,IMODE )
-                    IF ( AORGH2O_IDX .GT. 0 ) OUTVAL = OUTVAL
-     &                  - AEROSPC_CONC( AORGH2O_IDX,IMODE ) ! ug m-3
-               END IF
-            END DO
+            OUTVAL = SUM_PM_MODES( AEROMODE%NUC_MASK, IV, ISRC ) 
 
          ! Retrieve Aitken-Mode Particle Mass
          CASE ( ID_PMAIT_MASS )
-            DO IMODE = 1,N_MODE
-               IF ( AEROMODE( IMODE )%AITKEN_MASK ) THEN
-                    OUTVAL = OUTVAL +
-     &                 SUM( AEROSPC_CONC( :,IMODE ),
-     &                      MASK=.NOT.AEROSPC(:)%TRACER ) ! ug m-3
-     &                  - AEROSPC_CONC( AH2O_IDX,IMODE )
-                    IF ( AORGH2O_IDX .GT. 0 ) OUTVAL = OUTVAL
-     &                  - AEROSPC_CONC( AORGH2O_IDX,IMODE ) ! ug m-3
-               END IF
-            END DO
+            OUTVAL = SUM_PM_MODES( AEROMODE%AITKEN_MASK, IV, ISRC ) 
 
          ! Retrieve Accumution-Mode Particle Mass
          CASE ( ID_PMACC_MASS )
-            DO IMODE = 1,N_MODE
-               IF ( AEROMODE( IMODE )%ACCUM_MASK ) THEN
-                    OUTVAL = OUTVAL +
-     &                 SUM( AEROSPC_CONC( :,IMODE ),
-     &                      MASK=.NOT.AEROSPC(:)%TRACER ) ! ug m-3
-     &                  - AEROSPC_CONC( AH2O_IDX,IMODE )
-                    IF ( AORGH2O_IDX .GT. 0 ) OUTVAL = OUTVAL
-     &                  - AEROSPC_CONC( AORGH2O_IDX,IMODE ) ! ug m-3
-               END IF
-            END DO
+            OUTVAL = SUM_PM_MODES( AEROMODE%ACCUM_MASK, IV, ISRC ) 
 
          ! Retrieve Dry Mode Density [kg m-3]
          CASE ( ID_DRY_DENS )
@@ -314,20 +246,19 @@
          ! Particle Water
          CASE ( ID_PMF_HPM )
             ! Retrieve AHPLUSIJ
-            CALL CALC_ELMO( OUTVAL=VAL, IDG=ID_PMF_HP,  IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_HP,  IV=ETYPE_ELMO )
             ! Retrieve AH2OIJ
-            CALL CALC_ELMO( OUTVAL=VAL2,IDG=ID_PMF_H2O, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, IDG=ID_PMF_H2O, IV=ETYPE_ELMO )
             ! HPMOLAL = AHPLUSIJ / AH2OIJ * 1000.0 [mol L-1]
             OUTVAL = VAL / VAL2 * 1000.0
 
          ! Calculate PMF_PH - Fine-Mode pH
          CASE ( ID_PMF_PH )
             ! Retrieve HPMOLAL
-            CALL CALC_ELMO( OUTVAL=VAL, IDG=ID_PMF_HPM, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_HPM, IV=ETYPE_ELMO )
             ! Retrieve AH2OIJ
-            CALL CALC_ELMO( OUTVAL=VAL2,IDG=ID_PMF_H2O, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, IDG=ID_PMF_H2O, IV=ETYPE_ELMO )
 
-            !PMF_PH = -1*LOG10(HPMOLAL)
 #ifdef mpas
             OUTVAL = -9.999E36
 #else
@@ -441,13 +372,13 @@
          CASE ( ID_PMF_OMOC )
             VAL  = 0.0
             VAL2 = 0.0
-            CALL CALC_ELMO( OUTVAL=VAL, IDG=ID_PMF_OA, IV=ETYPE_ELMO )
-            CALL CALC_ELMO( OUTVAL=VAL2,IDG=ID_PMF_OC, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_OA, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, IDG=ID_PMF_OC, IV=ETYPE_ELMO )
             OUTVAL = VAL / ( VAL2 + TINY( 0.0 ) )
             
          ! Calculate PMF_OtoC - Fine-Mode O:C 
          CASE ( ID_PMF_OtoC )
-            CALL CALC_ELMO( OUTVAL=VAL, IDG=ID_PMF_OA, IV=ETYPE_ELMO  )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_OA, IV=ETYPE_ELMO  )
 
             VAL2 = 0.0
             DO IOA = 1,N_OA_NotTracers
@@ -542,7 +473,7 @@
               
          ! Calculate O:C relevant for AMS observations
          CASE ( ID_AMS_OtoC )
-            CALL CALC_ELMO( OUTVAL=VAL, IDG=ID_AMS_OA, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_AMS_OA, IV=ETYPE_ELMO )
 
             ! Save AMS Fraction for each mode
             DO IMODE = 1,N_MODE
@@ -575,8 +506,8 @@
  
          ! Calculate Aerosol Fraction of Benzo-a-Pyrene
          CASE ( ID_BENAPY_FAERO )
-            CALL CALC_ELMO( OUTVAL=VAL,  IDG=ID_PMF_BENAPY, IV=ETYPE_ELMO )
-            CALL CALC_ELMO( OUTVAL=VAL2, IDG=ID_GAS_BENAPY, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL,  OUT_UNIT=IUNIT, IDG=ID_PMF_BENAPY, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, IDG=ID_GAS_BENAPY, IV=ETYPE_ELMO )
             OUTVAL = VAL / ( VAL + VAL2 + TINY( 0.0 ) )
 
          ! Retrieve Fine-Mode Particle Mass Collected by the Federal
@@ -593,14 +524,14 @@
                 K2 = ( K * ( P1 - P2*a + P3*a*a ) * ( a**1.75 ) ) ** 0.5
             END IF
 
-            CALL CALC_ELMO( OUTVAL=PMF_NO3, IDG=ID_PMF_NO3, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=PMF_NO3, OUT_UNIT=IUNIT, IDG=ID_PMF_NO3, IV=ETYPE_ELMO )
             PMF_NO3_LOSS = MIN( 745.7/SRFTEMP * K2, PMF_NO3 )
 
             PMF_NH4_LOSS = PMF_NO3_LOSS * 18.0 / 62.0
 
-            CALL CALC_ELMO( OUTVAL=PMF_NH4,  IDG=ID_PMF_NH4, IV=ETYPE_ELMO )
-            CALL CALC_ELMO( OUTVAL=PMF_SO4,  IDG=ID_PMF_SO4, IV=ETYPE_ELMO ) 
-            CALL CALC_ELMO( OUTVAL=PMF_MASS, IDG=ID_PMF_MASS,IV=ETYPE_ELMO ) 
+            CALL CALC_ELMO( OUTVAL=PMF_NH4,  OUT_UNIT=IUNIT, IDG=ID_PMF_NH4, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=PMF_SO4,  OUT_UNIT=IUNIT, IDG=ID_PMF_SO4, IV=ETYPE_ELMO ) 
+            CALL CALC_ELMO( OUTVAL=PMF_MASS, OUT_UNIT=IUNIT, IDG=ID_PMF_MASS,IV=ETYPE_ELMO ) 
 
             OUTVAL = PMF_MASS - PMF_NO3_LOSS - PMF_NH4_LOSS
      &                      +0.24 * ( PMF_SO4 + PMF_NH4 - PMF_NH4_LOSS ) + 0.5
@@ -619,13 +550,13 @@
                 K2 = ( K * ( P1 - P2*a + P3*a*a ) * ( a**1.75 ) ) ** 0.5
             END IF
 
-            CALL CALC_ELMO( OUTVAL=PM25_NO3, IDG=ID_PM25_NO3, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=PM25_NO3, OUT_UNIT=IUNIT, IDG=ID_PM25_NO3, IV=ETYPE_ELMO )
             PM25_NO3_LOSS = MIN( 745.7/SRFTEMP * K2, PM25_NO3 )
 
             PM25_NH4_LOSS = PM25_NO3_LOSS * 18.0 / 62.0
 
-            CALL CALC_ELMO( OUTVAL=PM25_NH4, IDG=ID_PM25_NH4, IV=ETYPE_ELMO )
-            CALL CALC_ELMO( OUTVAL=PM25_SO4, IDG=ID_PM25_SO4, IV=ETYPE_ELMO ) 
+            CALL CALC_ELMO( OUTVAL=PM25_NH4, OUT_UNIT=IUNIT, IDG=ID_PM25_NH4, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=PM25_SO4, OUT_UNIT=IUNIT, IDG=ID_PM25_SO4, IV=ETYPE_ELMO ) 
             CALL SUM_INLET_PM( IPM25, IWET, PM25 )
 
             OUTVAL = PM25 - PM25_NO3_LOSS - PM25_NH4_LOSS
@@ -725,5 +656,55 @@
            ELMO_LOCAL( ILOC ) = OUTVAL
          END IF
 
-      END SUBROUTINE CALC_ELMO_DETAILED
+      END SUBROUTINE ELMO_CALC_DETAILED
  
+!----------------------------------------------------------------------
+      FUNCTION SUM_PM_MODES( MODE_MASK, IV, ISRC )
+!----------------------------------------------------------------------
+!     SUM_PM_MODES returns the sum of total PM Mass ignoring water,
+!     organic water, and mass of all aerosol tracer species. It uses the
+!     MODE_MASK input variable, which is a vector of logical variables,
+!     to determine which modes to sum.
+!
+!     The input variable IV instructs the function to sum for ISAM or
+!     DDM variables instead, and the variable ISRC identifies which
+!     source to sum.          
+!----------------------------------------------------------------------
+
+      USE AERO_DATA, ONLY: N_MODE, AEROSPC_CONC, AH2O_IDX, AORGH2O_IDX, AEROSPC
+
+      IMPLICIT NONE
+
+      LOGICAL :: MODE_MASK
+      INTEGER :: IV, ISRC
+      INTEGER :: IM
+      REAL    :: OUTVAL
+
+      ! Determine Which Type of ELMO Variable is Requested
+      SELECT CASE ( IV )
+         CASE ( ETYPE_ELMO )
+            ! Standard ELMO PM Sum
+            DO IM = 1,N_MODE
+               IF ( MODE_MASK( IM ) ) THEN
+                 OUTVAL = OUTVAL +
+     &                    SUM( AEROSPC_CONC( :,IM ),
+     &                    MASK=.NOT.AEROSPC(:)%TRACER ) ! ug m-3
+     &                    - AEROSPC_CONC( AH2O_IDX,IM )
+                 IF ( AORGH2O_IDX .GT. 0 ) OUTVAL = OUTVAL
+     &                - AEROSPC_CONC( AORGH2O_IDX,IM ) ! ug m-3 
+               END IF
+            END DO
+
+         CASE ( ETYPE_ELMO_ISAM )
+           ! ISAM PM Sum
+
+
+         CASE ( ETYPE_ELMO_DDM )
+           ! DDM PM Sum
+
+
+      END SELECT
+ 
+      SUM_PM_MODES = OUTVAL
+
+      END FUNCTION SUM_PM_MODES
