@@ -39,7 +39,7 @@ C       Date   Who          What
 C     -------- ----------   -----------------------------------------
 C-----------------------------------------------------------------------
 
-      USE M3UTILIO
+      USE GET_ENV_VARS
       USE OUTNCF_FILE_ROUTINES
 
       IMPLICIT NONE
@@ -64,34 +64,9 @@ C...Local variables
       LOGICAL               :: EXISTS             
 C-----------------------------------------------------------------------
 
-C...Set output file characteristics based on COORD.EXT and open
-C...  the photolysis diagnostic file
+C...Set output file characteristics 
 
-         FTYPE3D = GRDDED3
-         SDATE3D = JDATE
-         STIME3D = 0
-         TSTEP3D = 240000
-
-         NCOLS3D = NLON
-         NROWS3D = NLAT
-         NLAYS3D = 1
-         NTHIK3D = 1
-         GDTYP3D = LATGRD3 
-         P_ALP3D = 0
-         P_BET3D = 0
-         P_GAM3D = 0
-         XORIG3D = -180.0D0
-         YORIG3D =  -90.0D0
-         YCELL3D = REAL( 180.0 / REAL( NLAT, 4 ),8 )
-         XCELL3D = REAL( 360.0 / REAL( NLON, 4 ),8 )
-         VGTYP3D = 7
-         VGTOP3D = 5000
-
-         VGLVS3D( 1 ) = 1.0
-         VGLVS3D( 2 ) = 0.9975
-         
-         GDNAM3D = 'OMI_GLOBE' 
-
+         CALL VALUE_NAME( FILE_NAME, file_FULL_omi%filename )
          file_FULL_omi%NCOLS = NLON
          file_FULL_omi%NROWS = NLAT
          file_FULL_omi%gdtyp_gd = 1
@@ -110,41 +85,12 @@ C...  the photolysis diagnostic file
            
          file_FULL_omi%GDNAME_GD = 'OMI_GLOBE' 
 
-C...CSA Variables, Units and Descriptions for FILE_NAME
-         N = 1
-         VNAME3D( N ) = 'OZONE_COLUMN'
-         UNITS3D( N ) = 'DU'
-         VDESC3D( N ) = 'Total Ozone Column Density'
-         VTYPE3D( N ) = M3REAL
-
-         N = N + 1
-         VNAME3D( N ) = 'CLOUD_FRACT'
-         UNITS3D( N ) = 'None'
-         VDESC3D( N ) = 'Radiative Cloud Fraction'
-         VTYPE3D( N ) = M3REAL
-
-         N = N + 1
-         VNAME3D( N ) = 'O3_MISSING'
-         UNITS3D( N ) = 'None'
-         VDESC3D( N ) = 'Ozone Column Density Not Avialable'
-         VTYPE3D( N ) = M3REAL
-
-         NVARS3D = N
-         FDESC3D( 1 ) = 'OMI Satellite Obseravations'
-         DO L = 2, MXDESC3
-            FDESC3D( L ) = ' '
-         END DO
+C... Variables, Units and Descriptions for FILE_NAME
 
          file_FULL_omi%nfld2dxyt = 3
          
          CALL INIT_file2dxyt(file_FULL_omi)
 
-!        DO L = 1,file_FULL_omi%nfld2dxyt
-!           file_FULL_omi%fldname( L )   = VNAME3D( L )
-!           file_FULL_omi%long_name( L ) = VDESC3D( L )
-!           file_FULL_omi%units( L )     = UNITS3D( L )
-!        END DO
-                      
          N = 1
          file_FULL_omi%fldname( N ) = 'OZONE_COLUMN'
          file_FULL_omi%long_name( N ) = 'DU'
@@ -161,25 +107,5 @@ C...CSA Variables, Units and Descriptions for FILE_NAME
          file_FULL_omi%units( N ) = 'Ozone Column Density Not Available'
 
          CALL file_out_ncf (outfile_2dxyt = file_FULL_omi,time_now=omi_start, sdate=0, stime=0 )
-
-! Determine if file exists and delete if needed
-         INQUIRE( FILE = FILE_NAME, EXIST = EXISTS )
-         IF( EXISTS )THEN
-             COMMAND = '\rm ' // TRIM( FILE_NAME )
-             XMSG    = 'WARNING: ' // Trim( FILE_NAME ) 
-     &              // ' exists and deleting '
-             WRITE( 6, * )
-             N = SYSTEM( COMMAND )
-             IF( N .EQ. -1 )THEN
-                XMSG = 'Cannot delete '// FILE_NAME // ' file'
-                CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-             END IF 
-         END IF
-! create file
-         IF ( .NOT. OPEN3( FILE_NAME, FSCREA3, PNAME ) ) THEN
-            XMSG = 'Could not create '// FILE_NAME // ' file'
-            CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         END IF
-
 
       END SUBROUTINE CREATE_IOAPI_OMI

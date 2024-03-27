@@ -995,4 +995,61 @@ SUBROUTINE close_files(cdfid,sdate,stime)
 
 END SUBROUTINE close_files
 
+SUBROUTINE clear_file(file,sdate,stime)
+
+!-------------------------------------------------------------------------------
+! Name:     Clear I/O NETCDF file type
+! Purpose:  Close I/O file unit and deallocate arrays in type.
+!-------------------------------------------------------------------------------
+
+  USE netcdf
+
+  IMPLICIT NONE
+
+! Arguments:
+!Arguments:
+  Type(file_2dxyt),   INTENT(INOUT) :: file
+  INTEGER,            INTENT(IN)    :: sdate
+  INTEGER,            INTENT(IN)    :: stime
+! local:
+  CHARACTER(LEN=16),  PARAMETER     :: pname      = 'CLEAR_FILE'
+  INTEGER                           :: rcode
+
+!-------------------------------------------------------------------------------
+! Error, warning, and informational messages.
+!-------------------------------------------------------------------------------
+
+  CHARACTER(LEN=256), PARAMETER :: f9000 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   COULD NOT CLOSE I/O API OUTPUT FILES', &
+    & /, 1x, 70('*'))"
+
+  CHARACTER(LEN=256), PARAMETER :: f9100 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR CLOSING NETCDF FILE', &
+    & /, 1x, '***   FILE UNIT = ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
+!-------------------------------------------------------------------------------
+! Gracefully close output files.
+!-------------------------------------------------------------------------------
+
+      IF ( file%CREATED ) THEN
+         rcode = nf90_close (file%cdfid_m)
+         IF ( rcode /= nf90_noerr ) THEN
+            WRITE (6,f9100) TRIM(pname), Trim(file%filename),  &
+                        TRIM(nf90_strerror(rcode))
+            CALL graceful_stop (pname,sdate,stime)
+         END IF
+      END IF
+      
+      IF ( file%INITIALIZED .And. SIZE( file%id_fld ) .Gt. 0 ) THEN
+         DEALLOCATE( file%id_fld, file%fld, file%fldname,  &
+                     file%long_name, file%units )
+      END IF
+
+
+END SUBROUTINE clear_file
+
 END MODULE OUTNCF_FILE_ROUTINES

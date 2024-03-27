@@ -243,7 +243,6 @@ c     returns date string for gregorian date and time
 !     Jun 2015 J.Young: maintain code stnds
 !----------------------------------------------------------------------
 
-      USE m3utilio
       USE ENV_VARS
       USE OUTNCF_FILE_ROUTINES
 
@@ -472,9 +471,6 @@ c     returns date string for gregorian date and time
       ozone = -1.0
 !      max_lat_omi = maxval( latitude )
 !      min_lat_omi = minval( latitude )
-
-
-
           
       do j = 1, nlon
          do i = 1, nlat
@@ -486,9 +482,6 @@ c     returns date string for gregorian date and time
 
       file_CMAQ_omi%fld(:,:,1) = ozone_viz( :,: )
 
-
-
-
       If( jdate_expect .ne. jdate )Then
 ! write interpolated values up to current date
          delta_date = Delta_julian( jdate, jdate_expect )
@@ -499,28 +492,16 @@ c     returns date string for gregorian date and time
 ! write to NetCdf file
             call  get_date_string (jdate_expect,000000,cmaq_start)
             CALL file_out_ncf (outfile_2dxyt = file_CMAQ_omi,time_now=cmaq_start, sdate=0, stime=0 )
-
-            If ( .not. write3( OMI_CMAQ_NCF, 'OZONE_COLUMN', jdate_expect, 0,
-     &                           viz_prev ) ) THEN
-                   xmsg = 'Error writing variable OZONE_COLUMN'
-                  call m3exit ( pname, jdate_expect, 0, xmsg, xstat1 )
-            Else
-               write(6,*)'observation missing on ', jdate_expect
-               write(6,*)'writing to netcdf file inpolation between observations'
-            End If
+            write(6,*)'observation missing on ', jdate_expect
+            write(6,*)'writing to netcdf file inpolation between observations'
             call Julian_plus_One( jdate_expect )
          End Do
+
       End If
 
 ! write to NetCdf file
       call  get_date_string (jdate,000000,cmaq_start)
       CALL file_out_ncf (outfile_2dxyt = file_CMAQ_omi,time_now=cmaq_start, sdate=0, stime=0 )
-
-      If ( .not. write3( OMI_CMAQ_NCF, 'OZONE_COLUMN', jdate, 0,
-     &                        ozone_viz ) ) THEN
-             xmsg = 'Error writing variable OZONE_COLUMN'
-             call m3exit ( pname, jdate, 0, xmsg, xstat1 )
-      End If
 
       write(output_format,'(a,i8,a)')'(f9.4,tr1,f7.1,',(nlon+1),'(i7,tr1))'
       do i = 1,nlat          
