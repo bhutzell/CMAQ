@@ -369,9 +369,9 @@ C ..........  Output diagnostic emissions
                     VDEMIS_MVDIAG = VDEMIS_MVDIAG / REAL( MTICS, 4 )  ! array assignment
                     DO V = 1, NMETSPC
                       IF ( .NOT. WRITE3( CTM_METEMIS_DIAG, MTNAME(V), 
-     &                                   LDATE, ADJ_LTIME,VDEMIS_MVDIAG( V,:,:) ) ) THEN
+     &                                   LDATE, LTIME,VDEMIS_MVDIAG( V,:,:) ) ) THEN
                          XMSG = 'Could not write to ' // TRIM( CTM_METEMIS_DIAG )
-                         CALL M3EXIT( PNAME, LDATE, ADJ_LTIME, XMSG, XSTAT2 )
+                         CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
                       END IF
                     END DO
                     WRITE( LOGDEV,94040 )
