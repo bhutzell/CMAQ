@@ -275,18 +275,18 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'WET_M2       ',ID_WET_M2,     M3REAL, T,F,F, 'm2 m-3', 'Mode 2nd moment (wet)' ),
      &ELDTP( 'DRY_M3       ',ID_DRY_M3,     M3REAL, T,F,F, 'm3 m-3', 'Mode 3rd moment (dry)' ),
      &ELDTP( 'WET_M3       ',ID_WET_M3,     M3REAL, T,F,F, 'm3 m-3', 'Mode 3rd moment (wet)' ),
-     &ELDTP( 'PM_NUM       ',ID_PM_NUM,     M3REAL, F,F,T, 'N m-3' , 'Total Particle Number' ),
-     &ELDTP( 'PMU_NUM      ',ID_PMU_NUM,    M3REAL, F,F,T, 'N m-3' , 'Ultrafine-Mode Particle Number' ),
-     &ELDTP( 'PMF_NUM      ',ID_PMF_NUM,    M3REAL, F,F,T, 'N m-3' , 'Fine-Mode Particle Number' ),
-     &ELDTP( 'PMC_NUM      ',ID_PMC_NUM,    M3REAL, F,F,T, 'N m-3' , 'Coarse-Mode Particle Number' ),
-     &ELDTP( 'N10          ',ID_N10,        M3REAL, F,F,T, 'N m-3' , 'Total Particle Number greater than 10 nm' ),
-     &ELDTP( 'N20          ',ID_N20,        M3REAL, F,F,T, 'N m-3' , 'Total Particle Number greater than 20 nm' ),
-     &ELDTP( 'N40          ',ID_N40,        M3REAL, F,F,T, 'N m-3' , 'Total Particle Number greater than 40 nm' ),
-     &ELDTP( 'N100         ',ID_N100,       M3REAL, F,F,T, 'N m-3' , 'Total Particle Number greater than 100 nm' ),
-     &ELDTP( 'PM_SRF       ',ID_PM_SRF,     M3REAL, F,F,T, 'm2 m-3', 'Particle Surface Area' ),
-     &ELDTP( 'PMU_SRF      ',ID_PMU_SRF,    M3REAL, F,F,T, 'm2 m-3', 'Ultrafine-Mode Surface Area' ),
-     &ELDTP( 'PMF_SRF      ',ID_PMF_SRF,    M3REAL, F,F,T, 'm2 m-3', 'Fine-Mode Surface Area' ),
-     &ELDTP( 'PMC_SRF      ',ID_PMC_SRF,    M3REAL, F,F,T, 'm2 m-3', 'Coarse-Mode Surface Area' ),
+     &ELDTP( 'PM_NUM       ',ID_PM_NUM,     M3REAL, F,F,F, 'N m-3' , 'Total Particle Number' ),
+     &ELDTP( 'PMU_NUM      ',ID_PMU_NUM,    M3REAL, F,F,F, 'N m-3' , 'Ultrafine-Mode Particle Number' ),
+     &ELDTP( 'PMF_NUM      ',ID_PMF_NUM,    M3REAL, F,F,F, 'N m-3' , 'Fine-Mode Particle Number' ),
+     &ELDTP( 'PMC_NUM      ',ID_PMC_NUM,    M3REAL, F,F,F, 'N m-3' , 'Coarse-Mode Particle Number' ),
+     &ELDTP( 'N10          ',ID_N10,        M3REAL, F,F,F, 'N m-3' , 'Total Particle Number greater than 10 nm' ),
+     &ELDTP( 'N20          ',ID_N20,        M3REAL, F,F,F, 'N m-3' , 'Total Particle Number greater than 20 nm' ),
+     &ELDTP( 'N40          ',ID_N40,        M3REAL, F,F,F, 'N m-3' , 'Total Particle Number greater than 40 nm' ),
+     &ELDTP( 'N100         ',ID_N100,       M3REAL, F,F,F, 'N m-3' , 'Total Particle Number greater than 100 nm' ),
+     &ELDTP( 'PM_SRF       ',ID_PM_SRF,     M3REAL, F,F,F, 'm2 m-3', 'Particle Surface Area' ),
+     &ELDTP( 'PMU_SRF      ',ID_PMU_SRF,    M3REAL, F,F,F, 'm2 m-3', 'Ultrafine-Mode Surface Area' ),
+     &ELDTP( 'PMF_SRF      ',ID_PMF_SRF,    M3REAL, F,F,F, 'm2 m-3', 'Fine-Mode Surface Area' ),
+     &ELDTP( 'PMC_SRF      ',ID_PMC_SRF,    M3REAL, F,F,F, 'm2 m-3', 'Coarse-Mode Surface Area' ),
      &ELDTP( 'PM_MASS      ',ID_PM_MASS,    M3REAL, F,T,T, 'ug m-3', 'Total Particle Mass' ),
      &ELDTP( 'PMU_MASS     ',ID_PMU_MASS,   M3REAL, F,T,T, 'ug m-3', 'Ultrafine Particle Mass' ),
      &ELDTP( 'PMF_MASS     ',ID_PMF_MASS,   M3REAL, F,T,T, 'ug m-3', 'Fine Particle Mass' ),
@@ -949,7 +949,9 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       IF ( VAR_TYPE .EQ. ETYPE_ELMO_ISAM .OR. VAR_TYPE .EQ. ETYPE_ISAM 
      & .OR.VAR_TYPE .EQ. ETYPE_ISAM_WDEP .OR. VAR_TYPE .EQ. ETYPE_ISAM_DDEP
      & .OR.VAR_TYPE .EQ. ETYPE_ELMO_DDM  .OR. VAR_TYPE .EQ. ETYPE_DDM
-     & .OR.VAR_TYPE .EQ. ETYPE_DDM_WDEP  .OR. VAR_TYPE .EQ. ETYPE_DDM_DDEP ) THEN
+     & .OR.VAR_TYPE .EQ. ETYPE_DDM_WDEP  .OR. VAR_TYPE .EQ. ETYPE_DDM_DDEP 
+     & .OR.VAR_TYPE .EQ. ETYPE_ISAM_FAM  .OR. VAR_TYPE .EQ. ETYPE_DDM_FAM
+     &        ) THEN
             
          ! The only options are one source or all sources summed
          ! together (SOURCE from the ELMO Table variable = 0). 

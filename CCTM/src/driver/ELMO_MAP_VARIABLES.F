@@ -39,7 +39,9 @@
       DO J = 1,N_ELMO_TABLE
           ID = ELMO_TABLE( J )%ID
 
-          IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ELMO ) THEN
+          IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ELMO .OR.
+               ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ELMO_ISAM .OR.
+               ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ELMO_DDM ) THEN
            SELECT CASE ( ID )
              
              !!!! Gas-Phase Variables !!!!
@@ -992,7 +994,9 @@
 
           END SELECT
 
-         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_FAM ) THEN
+         ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_FAM .OR.
+     &             ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ISAM_FAM .OR.
+     &             ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_DDM_FAM ) THEN
            ! Populate the members of this Chemical Family in the
            ! ELMO_COMP array.
            N_VARS = CHEMFAMILYNUM( ID )

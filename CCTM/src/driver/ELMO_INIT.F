@@ -944,9 +944,13 @@
       ! Details in the processing of the components of variable J rely
       ! on knowing what type of variable it is
       VAR_TYPE = ELMO_TABLE( J )%VAR_TYPE
-      IF ( VAR_TYPE .EQ. ETYPE_ISAM ) THEN
-         DO ISRC = 1,NTAG_SA
-           CSPEC = 'ISAM_' // CSPEC // 
+
+      ! For ISAM ELMO Variables, we need to make sure the components
+      ! match the source number, or apply to all sources (i.e. ISAM
+      ! Bulk)
+      IF ( VAR_TYPE .EQ. ETYPE_ELMO_ISAM ) THEN
+         DO K = 1,N_ELMO_TABLE
+            CSPEC = 'ISAM_' // CSPEC // 
 
 
 

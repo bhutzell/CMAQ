@@ -502,7 +502,7 @@
          CASE ( ETYPE_DDEP )
             ! Variable is a Dry Deposition Flux
             OUTVAL = DDEP_VEC( ID ) * FAC
-         
+ 
          CASE ( ETYPE_ISAM )
             ! Variable is in the ISAM Array
             OUTVAL = ISAM_VEC( ID ) * FAC
