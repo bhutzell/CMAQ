@@ -86,7 +86,8 @@
         INTEGER,SAVE  :: MTICS = 0 ! temporary sub for NTICS before it is set to 0
         INTEGER,SAVE  :: LDATE     ! test date to update emissions diag avg
         INTEGER,SAVE  :: LTIME     ! test time to update emissions diag avg
-        INTEGER       :: FTIME     ! Start time to write to diagnostic files
+        INTEGER       :: FDATE     ! Start date to Write to Diagnostic files
+        INTEGER       :: FTIME     ! Start time to Write to Diagnostic files
         INTEGER,SAVE  :: MV_TSTEP
         INTEGER       :: MV_TSTEP_F  ! same time step info as MV_TSTEP but in HHMMSS format
 
@@ -188,10 +189,13 @@
 
             ELSE IF( IO_PE_INCLUSIVE ) THEN
 
-                FTYPE3D = GRDDED3
-                SDATE3D = JDATE
-                STIME3D = JTIME
+                FDATE = STDATE
+                FTIME = STTIME
+                CALL NEXTIME( FDATE, FTIME, TSTEP )
+                SDATE3D = FDATE
+                STIME3D = FTIME
                 TSTEP3D = TSTEP
+                FTYPE3D = GRDDED3
                 NCOLS3D = GL_NCOLS
                 NROWS3D = GL_NROWS
                 NLAYS3D = 1
@@ -244,7 +248,7 @@
             IMPLICIT NONE
 
             INTEGER, INTENT(IN   ) :: JDATE, JTIME
-            INTEGER, INTENT(IN   ) :: TSTEP( 3 )    ! time step vector (HHMMSS)\
+            INTEGER, INTENT(IN   ) :: TSTEP( 3 )    ! time step vector (HHMMSS)
             LOGICAL, INTENT(IN   ) :: L_DESID_DIAG  ! flag for determining whether or not 
                                                     !   DESID is in diagnostic mode
 
@@ -257,7 +261,6 @@
             INTEGER,SAVE  ::PRVHR=-10000
             LOGICAL,SAVE  :: LASTTIC   ! true: last sync step this output step
             INTEGER,SAVE  :: TOT_TSTEP 
-            INTEGER       :: ADJ_LDATE, ADJ_LTIME
             LOGICAL,SAVE  :: R_READY = .TRUE.
 
             CHARACTER( 120 )  :: XMSG = ' '
@@ -350,8 +353,6 @@ C ..........  Determine the time to read and/or write the hourly files
               TOT_TSTEP = TOT_TSTEP + TIME2SEC( TSTEP( 2 ) )
               LASTTIC = TOT_TSTEP .GE. MV_TSTEP
               IF ( LASTTIC ) THEN
-                 ADJ_LDATE = LDATE
-                 ADJ_LTIME = LTIME
                  MTICS = NTICS
                  NTICS = 0
                  TOT_TSTEP = 0
@@ -368,14 +369,14 @@ C ..........  Output diagnostic emissions
                     VDEMIS_MVDIAG = VDEMIS_MVDIAG / REAL( MTICS, 4 )  ! array assignment
                     DO V = 1, NMETSPC
                       IF ( .NOT. WRITE3( CTM_METEMIS_DIAG, MTNAME(V), 
-     &                                   ADJ_LDATE, ADJ_LTIME,VDEMIS_MVDIAG( V,:,:) ) ) THEN
+     &                                   LDATE, ADJ_LTIME,VDEMIS_MVDIAG( V,:,:) ) ) THEN
                          XMSG = 'Could not write to ' // TRIM( CTM_METEMIS_DIAG )
-                         CALL M3EXIT( PNAME, ADJ_LDATE, ADJ_LTIME, XMSG, XSTAT2 )
+                         CALL M3EXIT( PNAME, LDATE, ADJ_LTIME, XMSG, XSTAT2 )
                       END IF
                     END DO
                     WRITE( LOGDEV,94040 )
      &                     'Timestep written to', TRIM( CTM_METEMIS_DIAG ),
-     &                     'for date and time', ADJ_LDATE, ADJ_LTIME
+     &                     'for date and time', LDATE, LTIME
                     VDEMIS_MVDIAG = 0.0   ! array assignment
                  END IF ! LASTTIC
 
