@@ -54,7 +54,13 @@ c...Tagging maps
       INTEGER, ALLOCATABLE, SAVE   :: MAP_DIFFtoSA( : )
       INTEGER, ALLOCATABLE, SAVE   :: MAP_ADVtoSA( : )
  
+      INTEGER, ALLOCATABLE, SAVE   :: ISAM_TO_AERO( : )  ! maps tracked species to bulk concentration if aerosol species
+      INTEGER, ALLOCATABLE, SAVE   :: SA_AERO_INDX( : )  ! index of tracked aerosol in ISAM concentration array
+
       INTEGER, ALLOCATABLE, SAVE   :: ISAM_PVO3_MAP( : ) ! potential vorticity map
+
+      INTEGER ::     NSPC_SA_AE        ! number of tracked species that are aerosols
+      INTEGER ::     N_SA_AEROSPC      ! number of unique aerospc in all tracked aerosols
 
       INTEGER, SAVE ::     NSPC_SA
       INTEGER, SAVE ::     NTAG_SA
@@ -437,7 +443,7 @@ C
         
 c----------------------------------------------------------
 
-        N_ISAM_MECH = 8
+        N_ISAM_MECH = 9
         ALLOCATE( ISAM_MECHLIST( N_ISAM_MECH ),   MERCURY_MECH ( N_ISAM_MECH ),
      &            ISAM_SPEC_OZONE( N_ISAM_MECH ), ISAM_SPEC_VOC( N_ISAM_MECH ), 
      &            ISAM_SPEC_NO3  ( N_ISAM_MECH ), ISAM_SPEC_SO4( N_ISAM_MECH ), 
@@ -449,7 +455,7 @@ c----------------------------------------------------------
      &                    'CB6R5M_AE7_AQ     ', 
      &                    'SAPRC07TC_AE6_AQ  ', 'SAPRC07TIC_AE6I_AQ', 
      &                    'SAPRC07TIC_AE7I_AQ', 'RACM2_AE6_AQ      ',
-     &                    'CRACMM1_AQ        '/ )  
+     &                    'CRACMM1_AQ        ', 'CRACMM2           '/ )  
 
         MERCURY_MECH = (/  .TRUE.,  .TRUE.,  
      &                     .TRUE.,  .FALSE., 
@@ -491,6 +497,9 @@ c----------------------------------------------------------
 
         !CRACMM1_AQ
         ISAM_SPEC_OZONE( 8 )%LIST = (/'O3 ','O1D','HO2','O3P'/)
+
+        !CRACMM2
+        ISAM_SPEC_OZONE( 9 )%LIST = (/'O3 ','O1D','HO2','O3P'/)
 
         ! PRESCRIBE VOC SPECIES
         !CB6R3_AE7_AQ
@@ -596,6 +605,28 @@ c----------------------------------------------------------
      &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
      &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1'/ )
 
+        !CRACMM2
+        ALLOCATE( ISAM_SPEC_VOC( 9 )%LIST( 96 ) )
+        ISAM_SPEC_VOC( 8 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
+     &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
+     &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
+     &    'ELHOM     ','EOH       ','ETE       ','ETEG      ','ETH       ',
+     &    'FURAN     ','FURANONE  ','GLY       ','HOM       ','HC3       ',
+     &    'HC5       ','HC10      ','HCHO      ','HKET      ','IEPOX     ',
+     &    'ISHP      ','IPN       ','IHN       ','IPC       ','ISO       ',
+     &    'KET       ','LIM       ','LIMAL     ','MACR      ','MAHP      ',
+     &    'MCT       ','MEK       ','MGLY      ','MOH       ','MVK       ',
+     &    'NAPH      ','OLI       ','OLT       ','OP1       ','OP2       ',
+     &    'OP3       ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
+     &    'PHEN      ','PROG      ','ROH       ','SESQ      ','SLOWROC   ',
+     &    'TOL       ','UALD      ','XYM       ','XYE       ','PAA       ',
+     &    'PAN       ','PPN       ','MPAN      ','ONIT      ','ISON      ',
+     &    'TRPN      ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
+     &    'NROCN1ALK ','VROCP0ALK ','VROCP1ALK ','VROCP2ALK ','VROCP3ALK ',
+     &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
+     &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
+     &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1'/ )
 
         !PRESCRIBE NITRATE SPECIES
         !CB6R3_AE7_AQ
@@ -665,6 +696,12 @@ c----------------------------------------------------------
      &         'NALD ','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
      &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP '/ )
 
+        !CRACMM2
+        ALLOCATE( ISAM_SPEC_NO3( 9 )%LIST( 27 ) )
+        ISAM_SPEC_NO3( 9 )%LIST = (/   'HNO3 ','NO   ','NO2  ','NO3  ','HONO ',
+     &         'N2O5 ','PAN  ','HNO4 ','ONIT ','MPAN ','PPN  ','ISON ','TRPN ',
+     &         'NALD ','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
+     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP '/ )
         
         !PRESCRIBE SPECIES RELEVANT FOR ASSIGNING BIAS TO VOCs
         !CB6R3_AE7_AQ
@@ -714,6 +751,11 @@ c----------------------------------------------------------
      &      'KET  ','ACO3 ','HC3P ','HC5P ','HC10P','ISOP ','RCO3 ',
      &      'XYLP '/ )
 
+        !CRACMM2
+        ALLOCATE( ISAM_BIAS_VOC( 9 )%LIST( 12 ) )
+        ISAM_BIAS_VOC( 9 )%LIST = (/'HCHO ','ACD  ','ALD  ','UALD ',
+     &      'KET  ','ACO3 ','HC3P ','HC5P ','HC10P','ISOP ','RCO3 ',
+     &      'XYLP '/ )
 
         !PRESCRIBE SPECIES RELEVANT FOR ASSIGNING BIAS TO NOx EMISSIONS
         !CB6R3_AE7_AQ
@@ -756,6 +798,10 @@ c----------------------------------------------------------
         ISAM_BIAS_NOY( 8 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
      &                              'HONO','N2O5' / )
 
+        !CRACMM2
+        ALLOCATE( ISAM_BIAS_NOY( 9 )%LIST( 6 ) )
+        ISAM_BIAS_NOY( 9 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5' / )
 
         !PRESCRIBE SULFATE SPECIES
         !CB6R3_AE7_AQ
@@ -790,6 +836,9 @@ c----------------------------------------------------------
         ALLOCATE( ISAM_SPEC_SO4( 8 )%LIST( 1 ) )
         ISAM_SPEC_SO4( 8 )%LIST = (/'SO2'/ )
 
+        !CRACMM2
+        ALLOCATE( ISAM_SPEC_SO4( 9 )%LIST( 1 ) )
+        ISAM_SPEC_SO4( 9 )%LIST = (/'SO2'/ )
 
         !PRESCRIBE HAP SPECIES
         !CB6R3_AE7_AQ
@@ -836,6 +885,9 @@ c----------------------------------------------------------
         ALLOCATE( ISAM_SPEC_HAPGAS( 8 )%LIST( 1 ) )
         ISAM_SPEC_HAPGAS( 8 )%LIST = (/'HCHO        '/)
 
+        !CRACMM2
+        ALLOCATE( ISAM_SPEC_HAPGAS( 9 )%LIST( 1 ) )
+        ISAM_SPEC_HAPGAS( 9 )%LIST = (/'HCHO        '/)
 
         !AEROSOL HAPS
         ALLOCATE( ISAM_SPEC_HAPAERO%LIST( 14 ) )
@@ -1513,7 +1565,13 @@ c----------------------------------------------------------
            DO J_SPC = 1, NSPC_SA
               ISUM = ISUM + 1
               DO N = 1, N_AE_SPC
-                 IF( ISAM_SPEC( J_SPC,ITAG ) .EQ. AE_SPC( N ) )THEN
+                 IF( TRIM( ISAM_SPEC( J_SPC,ITAG ) ) .EQ. TRIM( AE_SPC( N ) ))THEN
+                     IS_SPC_AEROSOL( J_SPC,ITAG ) = .TRUE.
+                     IF ( ITAG .LT. 2 ) NSPC_SA_AE = NSPC_SA_AE + 1
+                 END IF
+              END DO
+              DO N = 1, N_AE_SPC
+                 IF( TRIM( ISAM_SPEC( J_SPC,ITAG ) ) .EQ. TRIM( AE_SPC( N ) ) )THEN
                      IS_SPC_AEROSOL( J_SPC,ITAG ) = .TRUE.
                  END IF
               END DO
@@ -1535,6 +1593,30 @@ c----------------------------------------------------------
            END DO  
         END DO
 
+        ALLOCATE ( ISAM_TO_AERO( NSPC_SA_AE ), STAT = ALLOCSTAT )
+        CALL CHECKMEM( ALLOCSTAT, 'ISAM_TO_AERO', 'GET_SPC_INDEX' )
+        ISAM_TO_AERO = -1
+        ALLOCATE ( SA_AERO_INDX( NSPC_SA_AE ), STAT = ALLOCSTAT )
+        CALL CHECKMEM( ALLOCSTAT, 'SA_AERO_INDX', 'GET_SPC_INDEX' )
+        SA_AERO_INDX = -1
+
+        ITAG = 1
+        N = 0
+        DO J_SPC = 1, NSPC_SA
+           IF( .NOT. IS_SPC_AEROSOL( J_SPC,ITAG ) )CYCLE
+           N = N + 1
+           DO I_SPC = 1, N_AE_SPC
+               IF( TRIM( ISAM_SPEC( J_SPC,ITAG ) ) .NE. TRIM( AE_SPC( I_SPC ) ) ) CYCLE
+               ISAM_TO_AERO( N ) = I_SPC ! + AE_STRT - 1
+               SA_AERO_INDX( N ) = J_SPC
+               WRITE(LOGDEV,'(A,I4,1X,I5,1X,A16,I3,1X,A16)')
+     &         'ISAM SPECIES, AEROSOL SPECIES = ',N,SA_AERO_INDX( N ),ISAM_SPEC( J_SPC,ITAG ),
+     &         ISAM_TO_AERO( N ),AE_SPC( I_SPC )
+           END DO
+        END DO
+
+
+C...Assign species index with CMAQ species mappings
         ! Assign species index with CMAQ species mappings
         ALLOCATE( MAP_CGRtoSA( NSPCSD ) )
         MAP_CGRtoSA = 0

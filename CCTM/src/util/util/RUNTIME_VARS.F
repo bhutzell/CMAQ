@@ -66,6 +66,10 @@
       MODULE RUNTIME_VARS
 
       use get_env_module
+#ifdef mpas
+      use universal_data_module, only : logdev
+      use mydata_module
+#endif
 
       IMPLICIT NONE
 
@@ -74,7 +78,9 @@
       PUBLIC
 
       INTEGER :: OUTDEV = 6   ! File Unit for Standard Output
+#ifndef mpas
       INTEGER :: LOGDEV = -1  ! File Unit for Ascii Log File
+#endif
       INTEGER :: TOTPE  = 1   ! Number of Total Processors
       INTEGER :: NPROCS = 1   ! Number of Total Processors
       INTEGER :: MYPE   = -1  ! Processor Number
@@ -170,6 +176,7 @@
       REAL    :: GEAR_CONC_FLOOR = 1.0E-12 ! Lowest Concentration used determing ATOL in Gear Solver (ppmV)
       REAL    :: GLBL_ATOL = 1.0E-7        ! Absolute Tolerance for Rosenbrock Solver (ppmV)
       REAL    :: GLBL_RTOL = 1.0E-3        ! Relative Tolerance for Rosenbrock Solver
+      LOGICAL :: LPVO3     = .FALSE.       ! Activate Potential Vorticity Module (default=False)
 
       ! Aerosols
       LOGICAL :: IC_AERO_M2WET=.FALSE.! flag for specifying wet aerosol size parameters 
@@ -263,6 +270,7 @@
       INTEGER :: PA_ENDROW = 0       ! ending row for PA output
       INTEGER :: PA_BEGLEV = 0       ! Starting layer for PA output
       INTEGER :: PA_ENDLEV = 0       ! ending layer for PA output
+      CHARACTER( MAXLEN_CCTM_APPL ) :: BUDGET_FNAME  = 'CCTM_BUDGET' ! STAGE Deposition Control Filename
 
       ! Sulfur tracking
       LOGICAL :: STM        = .FALSE. ! flag for sulfur tracking option
@@ -304,7 +312,11 @@
 !.........................................................................
 
       USE RXNS_DATA, ONLY : MECHNAME
+#ifdef mpas
+      use utilio_defn
+#else
       USE M3UTILIO
+#endif
 
       IMPLICIT NONE                         
 
@@ -399,7 +411,7 @@
 
       ! Retrieve the domain decomposition processor array
       IF ( NPROCS .GT. 1 ) THEN
-         CALL GET_ENV ( 'NPCOL_NPROW', NV, V_LIST2, VARDEV )
+         CALL GET_ENVLIST ( 'NPCOL_NPROW', NV, V_LIST2, VARDEV )
          IF ( NV .NE. 2 ) THEN
             XMSG = 'Environment variable problem for NPCOL_NPROW'
      &           // ' using default 1X1'
@@ -444,13 +456,13 @@
       CALL GET_ENV ( END_TIME, 'AVG_FILE_ENDTIME', END_TIME, VARDEV )
       
       ! ACONC File Species List
-      CALL GET_ENV ( 'AVG_CONC_SPCS', N_ACONC_VARS, ACONC_FILE_SPCS, VARDEV )
+      CALL GET_ENVLIST ( 'AVG_CONC_SPCS', N_ACONC_VARS, ACONC_FILE_SPCS, VARDEV )
 
       ! CONC File Species List 
-      CALL GET_ENV ( 'CONC_SPCS', N_CONC_VARS, CONC_FILE_SPCS, VARDEV )
+      CALL GET_ENVLIST ( 'CONC_SPCS', N_CONC_VARS, CONC_FILE_SPCS, VARDEV )
  
       ! ACONC Layer Specification
-      CALL GET_ENV ( 'ACONC_BLEV_ELEV', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'ACONC_BLEV_ELEV', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   ! assume 1:NLAYS
          ACONC_BLEV = 1
          ACONC_ELEV = -1
@@ -466,7 +478,7 @@
       END IF
   
       ! CONC File Vertical Layer Range and Speciation
-      CALL GET_ENV ( 'CONC_BLEV_ELEV', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'CONC_BLEV_ELEV', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   ! assume 1:NLAYS
          CONC_BLEV = 1
          CONC_ELEV = -1
@@ -527,7 +539,7 @@
       CALL GET_ENV ( ISAM_NEW_START, 'ISAM_NEW_START', ISAM_NEW_START, VARDEV )
     
       ! SA_ACONC Layer Specification
-      CALL GET_ENV ( 'AISAM_BLEV_ELEV', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'AISAM_BLEV_ELEV', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   ! assume 1:NLAYS
          AISAM_BLEV = 1
          AISAM_ELEV = -1
@@ -543,7 +555,7 @@
       END IF
 
       ! SA_CONC File Vertical Layer Range and Speciation
-      CALL GET_ENV ( 'ISAM_BLEV_ELEV', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'ISAM_BLEV_ELEV', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   ! assume 1:NLAYS
          ISAM_BLEV = 1
          ISAM_ELEV = -1
@@ -611,7 +623,7 @@
          CALL GET_ENV ( NLAYS_DIAG, 'NLAYS_PHOTDIAG', NLAYS_DIAG, VARDEV )
 
       ! Get Desired Wavelengths for Diagnostic Output
-        CALL GET_ENV( 'NWAVE_PHOTDIAG', NWAVE, WAVE_ENV, VARDEV )
+        CALL GET_ENVLIST( 'NWAVE_PHOTDIAG', NWAVE, WAVE_ENV, VARDEV )
       END IF  
 
       ! Get flag to use core-shell mixing model for aerosol optical properties
@@ -641,6 +653,9 @@
 
       ! Absolute Tolerance for RB Solver
       CALL GET_ENV ( GLBL_ATOL, 'RB_ATOL', GLBL_ATOL, VARDEV )
+      
+      ! Get option for scaling ozone in free-troposphere to potential vorticity
+      CALL GET_ENV ( LPVO3, 'CTM_PVO3', LPVO3, VARDEV )
  
       !-------------------------------------------------------------------------------------------------------
       !>> Aerosols
@@ -753,8 +768,8 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
-      ! CTM_VDIFF_DIAG_FILE
-      CALL GET_ENV ( VDIFFDIAG, 'CTM_VDIFF_DIAG_FILE', VDIFFDIAG, VARDEV )
+      ! Flag for writing vertical diffusion diagnostic file and possibly gravitational settling diagnostic file
+      CALL GET_ENV ( VDIFFDIAG, 'VDIFF_DIAG_FILE', VDIFFDIAG, VARDEV )
 
       ! Get Minimum Layer for Advection Time Step Adjustment
       CALL GET_ENV ( SIGST, 'SIGMA_SYNC_TOP', SIGST, VARDEV )
@@ -769,7 +784,11 @@
       CALL GET_ENV ( MINKZ, 'KZMIN', MINKZ, VARDEV )
 
       ! CTM_WVEL
+#ifdef mpas
+      W_VEL = .FALSE.
+#else
       CALL GET_ENV ( W_VEL, 'CTM_WVEL', W_VEL, VARDEV )
+#endif
 
       ! CTM_GRAV_SETL
       CALL GET_ENV ( GRAV_SETL, 'CTM_GRAV_SETL', GRAV_SETL, VARDEV )
@@ -902,7 +921,7 @@
       CALL GET_ENV ( PROCAN, 'CTM_PROCAN', PROCAN, VARDEV )
        
       ! Get the Beginning and Ending Columns for Process Analysis
-      CALL GET_ENV ( 'PA_BCOL_ECOL', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'PA_BCOL_ECOL', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   
          PA_BEGCOL = 1; PA_ENDCOL = 0
       ELSE IF ( NV .EQ. 2 ) THEN
@@ -914,7 +933,7 @@
       END IF
 
       ! Get the Beginning and Ending Rows for Process Analysis
-      CALL GET_ENV ( 'PA_BROW_EROW', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'PA_BROW_EROW', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   
          PA_BEGROW = 1; PA_ENDROW = 0
       ELSE IF ( NV .EQ. 2 ) THEN
@@ -926,7 +945,7 @@
       END IF
 
       ! Get the Beginning and Ending Layers for Process Analysis
-      CALL GET_ENV ( 'PA_BLEV_ELEV', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'PA_BLEV_ELEV', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN  
          PA_BEGLEV = 1; PA_ENDLEV = 0
       ELSE IF ( NV .EQ. 2 ) THEN
@@ -936,6 +955,10 @@
          XMSG = 'Environment variable error for PA_BLEV_ELEV'
          CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
       END IF
+
+      ! Get the Budget File Name
+      CALL GET_ENV ( BUDGET_FNAME, 'CTM_BUDGET', BUDGET_FNAME, VARDEV )
+
 
       IF ( OCEAN_CHEM ) THEN
        IF ( (INDEX( MECHNAME, 'CB6R5M_AE7_AQ') .GT. 0 ) .OR. 
@@ -948,7 +971,7 @@
 #ifdef mpas
       call get_env (ncd_64bit_offset, 'ncd_64bit_offset', .false., vardev)
       call get_env( cell_num, 'cell_num', 1, vardev)
-#endif
+#else
 
 #ifdef twoway
       WRF_V4P = .TRUE.
@@ -1005,6 +1028,8 @@
       END IF
 #endif
 
+#endif
+
       END SUBROUTINE INIT_ENV_VARS
 
 !.........................................................................
@@ -1016,6 +1041,10 @@
 !  we would like to try limiting lines to 80 characters and a heading
 !  should probably just be one line.
 !.........................................................................
+
+#ifdef mpas
+      use util_module
+#endif
 
       IMPLICIT NONE
 
