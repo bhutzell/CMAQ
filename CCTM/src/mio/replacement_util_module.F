@@ -752,6 +752,10 @@
 
 ! ------------------------------------------------------------------------------
           integer function getefile ( lname, rdonly, fmtflag, caller )
+! CGN: should this routine take LOGDEV as an argument, rather than 
+!        printing error messages to the default device * ?
+! CGN: should this routine consider the ENDIAN nature of the file?
+!        or rename the function to indicate it is only for formatted text files?
 
             use get_env_module
 
@@ -770,12 +774,12 @@
             inquire (file=fname, exist=exist, iostat=stat)
 
             if (stat .ne. 0) then
-               print *, 'Error: inquiring about ', trim(lname)
+               print *, 'Error inquiring about file with logical name ', trim(lname)
                getefile = -1
             else
 
                if (.not. exist) then
-                  print *, trim(lname), ' does not exist '
+                  print *, 'Error: file with logical name ', trim(lname), ' does not exist '
                   getefile = -1
                else
                   funit = junit()
@@ -797,7 +801,7 @@
      &                  iostat = stat)
 
                   if (stat .ne. 0) then
-                     print *, ' Error: not able to open file ', trim(lname)
+                     print *, ' Error: could not open file ', trim(lname)
                      getefile = -1
                   else
                      getefile = funit

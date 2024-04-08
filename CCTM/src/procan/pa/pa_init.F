@@ -83,7 +83,8 @@ C-----------------------------------------------------------------------
 #endif
 #endif
       USE PA_DEFN               ! Process Anaylsis control and data variables
-
+      USE RUNTIME_VARS, ONLY : LOGDEV
+      
       IMPLICIT NONE 
 
 C..Includes:
@@ -158,8 +159,7 @@ C..open each one
             ENV_DESC = 'IPR Output file ' // OUTFNAME 
             ENV_DFLT = ' '       
             XMSG = 'IPR output file ' // TRIM( OUTFNAME ) // ' not assigned'
-            CALL ENVSTR( OUTFNAME, ENV_DESC, ENV_DFLT, RET_VAL, STATUS)
-            IF ( STATUS .NE. 0 ) CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
+            CALL GET_ENV( RET_VAL, OUTFNAME, ENV_DFLT, LOGDEV ) 
 
             IF ( MYPE .EQ. 0 ) THEN
 
@@ -224,7 +224,7 @@ C..open each one
 
             ENV_DESC = 'IRR Output file ' // OUTFNAME 
             ENV_DFLT = ' '       
-            CALL ENVSTR( OUTFNAME, ENV_DESC, ENV_DFLT, RET_VAL, STATUS )
+            CALL GET_ENV( RET_VAL, OUTFNAME, ENV_DFLT, LOGDEV )
             XMSG = 'IRR output file ' // TRIM( OUTFNAME ) // ' not assigned'
             IF ( STATUS .NE. 0 ) CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
 
