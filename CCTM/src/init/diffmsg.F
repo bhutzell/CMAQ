@@ -42,6 +42,7 @@ C                        fortran intrinsic functions
 C----------------------------------------------------------------------
 
       USE UTILIO_DEFN
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
       IMPLICIT NONE 
 

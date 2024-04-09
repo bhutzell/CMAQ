@@ -51,6 +51,7 @@ C-----------------------------------------------------------------------
       USE PA_DEFN, Only: LIPR, LIRR, NIPRVAR, NIRRVAR,
      &                   IRRNAME, IRRDESC, LPARTIRR, LFULLIRR, N_IPR_SPC
       USE PA_PARSE
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
       IMPLICIT NONE
       

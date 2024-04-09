@@ -66,6 +66,7 @@ C     19 Sep  2019 D. Wong: Fixed the way to advance to next day on an emission 
 C-----------------------------------------------------------------------
 
       USE UDTYPES, ONLY: RARRY1
+      USE RUNTIME_VARS, ONLY : LOG_MESSAGE
 
       IMPLICIT NONE
 

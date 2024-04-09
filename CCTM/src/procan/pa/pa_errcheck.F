@@ -48,6 +48,7 @@ C-----------------------------------------------------------------------
       USE PA_VARS
       USE PA_PARSE
       USE PA_DEFN
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
       IMPLICIT NONE
       

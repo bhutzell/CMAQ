@@ -59,6 +59,7 @@ C Last updated: $Date: 2011/10/21 16:10:17 $
 C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
       IMPLICIT NONE
 

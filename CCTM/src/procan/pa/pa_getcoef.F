@@ -38,6 +38,7 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN, Only: M3MESG, M3EXIT, XSTAT2      ! IOAPI module
       USE PA_GLOBAL     ! Mech data used 
       USE PA_PARSE
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
       IMPLICIT NONE
       

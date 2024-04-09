@@ -39,6 +39,7 @@ C-----------------------------------------------------------------------
       USE PA_VARS, Only: NIRROUT
       USE PA_DEFN
       USE PA_PARSE
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
       IMPLICIT NONE
       
