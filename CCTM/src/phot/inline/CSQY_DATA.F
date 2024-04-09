@@ -1368,7 +1368,7 @@ C...begin read
      &       // TRIM( OPTICS_FILE )
      &       // ' does not contain data for NLCD40 land use and'
      &       // ' corresponds to CMAQ version 5.01.'
-          CALL M3MESG( MSG )
+          CALL LOG_MESSAGE( LOGDEV ,  MSG )
       END IF
 
 ! set the default values for surface albedo

@@ -243,7 +243,7 @@ C...and return
 
           XMSG = 'ONLY CLOUD DIAGNOSTICS WILL BE WRITTEN TO THE ' //
      &           'WETDEP OUTPUT FILE!'
-          CALL M3MESG ( XMSG )
+          CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
         END IF
 

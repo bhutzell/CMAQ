@@ -592,7 +592,7 @@ C...Create the pointers from CGRID to the gaseous species needed by AQCHEM
             xmsg = trim( srggas( igas )%name )
      &           // ' is not in GC or NR namelist so using background value of '
      &           // trim( bkground )
-            Call m3mesg( xmsg )
+            CALL LOG_MESSAGE( LOGDEV ,  xmsg )
          Else
             Do isrg = 1, nsrggas( igas )
                lsrggas( igas,isrg ) = lsrg( isrg )
@@ -619,7 +619,7 @@ C...Create the pointers from CGRID to the aerosol species needed by AQCHEM
                   xmsg = trim( srgaer( iaer )%name( n ) )
      &           // ' is not in AE namelist so using background value of '
      &           // trim( bkground )
-                  Call m3mesg( xmsg )
+                  CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                Else
                   Do isrg = 1, nsrgaer( iaer,n )
                      If ( isrg .Gt. mxsrg ) Then

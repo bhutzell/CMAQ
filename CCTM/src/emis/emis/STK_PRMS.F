@@ -138,13 +138,13 @@ C-----------------------------------------------------------------------
 
 !           IF ( .NOT. OPEN3( STKPRMS( N ), FSREAD3, PNAME ) ) THEN
 !              XMSG = 'Could not open '// TRIM( STKPRMS( N ) ) // ' file'
-!              CALL M3MESG( XMSG )
+!              CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 !              SUCCESS = .FALSE.; RETURN
 !           END IF
 
 !           IF ( .NOT. DESC3( STKPRMS( N ) ) ) THEN
 !              XMSG = 'Could not get ' // TRIM( STKPRMS( N ) ) // ' file description'
-!              CALL M3MESG( XMSG )
+!              CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 !              SUCCESS = .FALSE.; RETURN
 !           END IF
 

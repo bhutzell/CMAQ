@@ -198,7 +198,7 @@ C Local variables:
             ELSE
                XMSG = 'ERROR: No deposition velocity for DDEP species ' //
      &               GC_DDEP( N )
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                LERROR = .TRUE.
             END IF
          END DO
@@ -213,7 +213,7 @@ C Local variables:
             ELSE
                XMSG = 'ERROR: No deposition velocity for DDEP species ' //
      &               AE_DDEP( N )
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                LERROR = .TRUE.
             END IF
          END DO
@@ -228,7 +228,7 @@ C Local variables:
             ELSE
                XMSG = 'ERROR: No deposition velocity for DDEP species ' //
      &               NR_DDEP( N )
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                LERROR = .TRUE.
             END IF
          END DO
@@ -243,7 +243,7 @@ C Local variables:
             ELSE
                XMSG = 'ERROR: No deposition velocity for DDEP species ' //
      &               TR_DDEP( N )
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                LERROR = .TRUE.
             END IF
          END DO
@@ -344,7 +344,7 @@ C Local variables:
             ELSE
                XMSG = 'ERROR: deposition velocity specified for non-diff species '
      &               // GC_SPC( GC_DEPV_MAP( N ) )
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                LERROR = .TRUE.
             END IF
          END DO
@@ -359,7 +359,7 @@ C Local variables:
             ELSE
                XMSG = 'ERROR: deposition velocity specified for non-diff species '
      &               // AE_SPC( AE_DEPV_MAP( N ) )
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                LERROR = .TRUE.
             END IF
          END DO
@@ -374,7 +374,7 @@ C Local variables:
             ELSE
                XMSG = 'ERROR: deposition velocity specified for non-diff species '
      &               // NR_SPC( NR_DEPV_MAP( N ) )
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                LERROR = .TRUE.
             END IF
          END DO
@@ -389,7 +389,7 @@ C Local variables:
             ELSE
                XMSG = 'ERROR: deposition velocity specified for non-diff species '
      &               // TR_SPC( TR_DEPV_MAP( N ) )
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                LERROR = .TRUE.
             END IF
          END DO

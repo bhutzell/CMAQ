@@ -64,11 +64,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       NRXSUMS = NRXSUMS + 1
       IF ( NRXSUMS .GT. MAXRXNSUM )  THEN
          WRITE( MSG, 94000 )  
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          WRITE( MSG, 94500 )  LINNUM,  INBUF
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          WRITE( MSG, 94020 )  MAXRXNSUM
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          CALL M3EXIT( 'GETRXNSUM',  IZERO,  IZERO, ' ', XSTAT2 ) 
       END IF
 
@@ -78,11 +78,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF ( CHR .NE. '=' )  THEN
          WRITE( MSG, 94040 )  
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          WRITE( MSG, 94500 )  LINNUM,  INBUF
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          WRITE( MSG, 94520 )  CHR
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          CALL M3EXIT( 'GETRXNSUM',  IZERO,  IZERO, ' ', XSTAT2 ) 
       ELSE
          CALL GETCHR
@@ -96,11 +96,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF ( TERMNUM .GT. MAXRXTERMS )  THEN
          WRITE( MSG, 94060 )  
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          WRITE( MSG, 94500 )  LINNUM,  INBUF
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          WRITE( MSG, 94080 )  MAXRXTERMS
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          CALL M3EXIT( 'GETRXNSUM',  IZERO,  IZERO, ' ', XSTAT2 ) 
       END IF
 
@@ -113,11 +113,11 @@ c..Get the reaction label
          RXSUMLBL( NRXSUMS, TERMNUM )  = LABEL
       ELSE
          WRITE( MSG, 94100 )  
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          WRITE( MSG, 94500 )  LINNUM,  INBUF
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          WRITE( MSG, 94520 )  CHR
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          CALL M3EXIT( 'GETRXNSUM',  IZERO,  IZERO, ' ', XSTAT2 ) 
       END IF
 
@@ -130,11 +130,11 @@ c..check for more terms or end delimiter
          RETURN
       ELSE
          WRITE( MSG, 94120 )  
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          WRITE( MSG, 94500 )  LINNUM,  INBUF
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          WRITE( MSG, 94520 )  CHR
-         CALL M3MESG( MSG ) 
+         CALL LOG_MESSAGE( LOGDEV ,  MSG ) 
          CALL M3EXIT( 'GETRXNSUM',  IZERO,  IZERO, ' ', XSTAT2 ) 
       END IF
       

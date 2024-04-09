@@ -75,7 +75,7 @@ C----------------------------------------------------------------------
      &       // TRIM( ADJUSTL( VNAME ) ) // ': '
      &       // TRIM( ADJUSTL( CHR1  ) ) // ' versus '
      &       // TRIM( ADJUSTL( CHR2  ) )
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          RETURN
 
          ENTRY CHRDIFF ( VNAME, STR1, STR2 )
@@ -83,7 +83,7 @@ C----------------------------------------------------------------------
      &       // TRIM( ADJUSTL( VNAME ) ) // ': '
      &       // TRIM( ADJUSTL( STR1  ) ) // ' versus '
      &       // TRIM( ADJUSTL( STR2  ) )
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          RETURN
 
 94020    FORMAT(I20)

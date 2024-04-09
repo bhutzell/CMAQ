@@ -719,7 +719,7 @@ C...  for the accumulation mode, add aqueous tracked species
           DO VAR = STRT, FINI
             SPC = SPC + 1
             WRITE( XMSG, '(i6,1x,A16,1x,i6,1x,a16)') VAR, AE_SPC( SPC ), SURCLDMX( VAR ), AE_SPC( SURCLDMX( VAR )-AE_STRT+1 )
-             CALL M3MESG ( XMSG )
+             CALL LOG_MESSAGE( LOGDEV ,  XMSG )
           END DO
 
         END IF ! stm

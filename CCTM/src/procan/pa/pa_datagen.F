@@ -60,10 +60,10 @@ C----------------------------------------------------------------------
       JDATE = 0; JTIME = 0
       IF ( PROCAN ) THEN
          XMSG = TRIM( PNAME ) // ': Process Analysis is activated'
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
       ELSE
          XMSG = TRIM( PNAME ) // ': Process Analysis is not activated'
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          RETURN
       END IF
         
@@ -74,8 +74,8 @@ C----------------------------------------------------------------------
       CALL PA_COMPMECH
 !     CALL PA_WRTPADEFN
       IF ( MYPE .EQ. 0 ) CALL PA_REPORT
-      CALL M3MESG( 'End of initial Process Analysis Control data generation' )
-      CALL M3MESG( ' ' )
+      CALL LOG_MESSAGE( LOGDEV ,  'End of initial Process Analysis Control data generation' )
+      CALL LOG_MESSAGE( LOGDEV ,  ' ' )
 
       NFAMLYS = 0
       NRXSUMS = 0

@@ -106,7 +106,7 @@ C-----------------------------------------------------------------------
                       xmsg = 'Aitken Flag for '//
      &                       TRIM(aedat(isp)%species_name)//' set incorrectly in the AE namelist.'
                       xmsg = Trim( pname ) // ': ' // xmsg
-                      call m3mesg( xmsg )
+                      CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                       eflag = .True.
                    end if
 
@@ -114,7 +114,7 @@ C-----------------------------------------------------------------------
                       xmsg = 'Accumulation Flag for '//
      &                       TRIM(aedat(isp)%species_name)//' set incorrectly in the AE namelist.'
                       xmsg = Trim( pname ) // ': ' // xmsg
-                      call m3mesg( xmsg )
+                      CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                       eflag = .True.
                    end if
 
@@ -122,7 +122,7 @@ C-----------------------------------------------------------------------
                       xmsg = 'Coarse Flag for '//
      &                       TRIM(aedat(isp)%species_name)//' set incorrectly in the AE namelist.'
                       xmsg = Trim( pname ) // ': ' // xmsg
-                      call m3mesg( xmsg )
+                      CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                       eflag = .True.
                    end if
               end if
@@ -132,7 +132,7 @@ C-----------------------------------------------------------------------
      &                 // Trim( cmype )
                   Call log_message( outdev, 'Error: '//xmsg )
                   xmsg = Trim( pname ) // ': ' // xmsg
-                  call m3mesg( xmsg )
+                  CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                   call m3exit( pname, 0, 0, 'FATAL ERROR', xstat2 )
               end if
 

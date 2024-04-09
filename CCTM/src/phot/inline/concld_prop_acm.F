@@ -439,7 +439,7 @@ C...  field if a convective parameterization was not used in the WRF simulation
      &        // 'used in the WRF simulation'
           CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
           XMSG = 'Processing will continue without subgrid clouds'
-          CALL M3MESG ( XMSG )
+          CALL LOG_MESSAGE( LOGDEV ,  XMSG )
           RETURN
         END IF
 

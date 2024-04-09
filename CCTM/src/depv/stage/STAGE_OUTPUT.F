@@ -105,7 +105,7 @@ C Local variables:
 
             XMSG = 'Could not open ' // CTM_DEPV_DIAG // ' file for update - '
      &           // 'try to open new'
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 C Set output file characteristics based on GRIDDESC and open the dep velocity dignostic file
             NVARS3D = Tile_Data%n_Vd
@@ -141,7 +141,7 @@ C Open diagnostic file, then close it for subsequent open by all processors
 
             XMSG = 'Could not open ' // CTM_DEPV_MOS // ' file for update - '
      &           // 'try to open new'
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 C Set output file characteristics based on GRIDDESC and open the dep velocity dignostic file
             NVARS3D = Tile_Data%n_Vd + 7

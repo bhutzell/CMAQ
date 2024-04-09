@@ -127,7 +127,7 @@ C-----------------------------------------------------------------------
       ALLOCATE ( TV( EMLAYS ), TF( EMLAYS ), STAT=STAT )
       IF ( STAT .NE. 0 ) THEN
          WRITE( XMSG, *) ' Cannot allocate TV and TF in PREPLM'
-         CALL M3MSG2( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          STOP
       END IF
 

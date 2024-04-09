@@ -224,10 +224,10 @@ C-----------------------------------------------------------------------
      &        // TRIM( MET_CRO_3D ) // ', '
      &        // TRIM( MET_BDY_3D ) // ' and '
      &        // TRIM( MET_DOT_3D )
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          WRITE( AMSG,'( 2I8 )' ) LDATE( 1 ), LTIME( 1 )
          XMSG = 'Using data for last file step: ' // AMSG
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          MDATE = LDATE( 1 )
          MTIME = LTIME( 1 )
       END IF

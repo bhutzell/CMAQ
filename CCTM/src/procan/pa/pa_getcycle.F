@@ -59,11 +59,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       NCYCLES = NCYCLES + 1
       IF( NCYCLES .GT. MAXCYCLES ) THEN
          WRITE( MSG, 94000 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94020 ) MAXCYCLES
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETCYCLE', IZERO, IZERO, ' ', XSTAT2 )
       ENDIF
 
@@ -72,11 +72,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( CHR .NE. '=' ) THEN
          WRITE( MSG, 94040 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETCYCLE', IZERO, IZERO, ' ', XSTAT2 )
       ELSE
          CALL GETCHR
@@ -93,11 +93,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          RETURN
       ELSE
          WRITE( MSG, 94060 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETCYCLE', IZERO, IZERO, ' ', XSTAT2 ) 
       END IF
 

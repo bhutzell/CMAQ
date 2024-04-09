@@ -107,7 +107,7 @@ C-----------------------------------------------------------------------
                   IF ( FTYPE3D .EQ. GRDDED3 .OR. FTYPE3D .EQ. BNDARY3 ) THEN
 
                      MSG = 'Checking header data for file: ' // LGCL_NAME( N )
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
 
                      CALL GRDCHECK ( LGCL_NAME( N ), LOK )
 
@@ -120,7 +120,7 @@ C-----------------------------------------------------------------------
      &                                     JDATE, JTIME ) ) THEN
                            LOK = .FALSE.
                            MSG = 'Starting time not on file'
-                           CALL M3MESG( MSG )
+                           CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         END IF
  
                         ! skip checking ending time for output files
@@ -130,7 +130,7 @@ C-----------------------------------------------------------------------
      &                                        JDATE, JTIME ) ) THEN
                               LOK = .FALSE.
                               MSG = 'Ending time not on file'
-                              CALL M3MESG( MSG )
+                              CALL LOG_MESSAGE( LOGDEV ,  MSG )
                            END IF
                         END IF
 
@@ -144,7 +144,7 @@ C-----------------------------------------------------------------------
 
                   LOK = .FALSE.
                   MSG = 'DESC3 failed for ' // LGCL_NAME( N )
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
 
                END IF   ! DESC3 successful
 

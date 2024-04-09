@@ -131,7 +131,7 @@ C Check settings that must be consistent for exact grid match
      &             CRLF() // BLANK10 // FILETYPE // 
      &             ' are inconsistent with GRID NAME: ' // 
      &             TRIM( GRDNM )
-            CALL M3MSG2( MESG ) 
+            CALL LOG_MESSAGE( LOGDEV ,  MESG ) 
          END IF
 #endif
 
@@ -153,7 +153,7 @@ C Check settings that must be consistent for grids and subgrids
      &              CRLF() // BLANK10 // FILETYPE // 
      &             ' are inconsistent with with GRID NAME: ' 
      &             // TRIM( GRDNM )
-            CALL M3MSG2( MESG ) 
+            CALL LOG_MESSAGE( LOGDEV ,  MESG ) 
          END IF
 
 C Ensure that origins are compatible with each other by making sure they line up
@@ -169,7 +169,7 @@ C based on the cell sizes
      &             'between ' // FNAME // ' in ' // 
      &             CRLF() // BLANK10 // FILETYPE // 
      &             ' and set by GRID NAME: ' // TRIM( GRDNM )
-            CALL M3MSG2( MESG ) 
+            CALL LOG_MESSAGE( LOGDEV ,  MESG ) 
          END IF
 
 C If offset has been set, then check to ensure its the same
@@ -189,7 +189,7 @@ C If file has different origin from the subgrid...
      &                   FILETYPE // 'is ' //
      &                  'inconsistent with with GRID NAME: ' 
      &                   // TRIM( GRDNM )
-                  CALL M3MSG2( MESG ) 
+                  CALL LOG_MESSAGE( LOGDEV ,  MESG ) 
                END IF
 
 C If file has same origin as subgrid
@@ -208,7 +208,7 @@ C Check that current subgrid is the same as the previous subgrid
      &                   // CRLF() // BLANK10 // FILETYPE // 
      &                   'are inconsistent with values from ' // 
      &                   TRIM( GRDNM)
-                  CALL M3MSG2( MESG ) 
+                  CALL LOG_MESSAGE( LOGDEV ,  MESG ) 
                END IF
 
             END IF
@@ -262,7 +262,7 @@ C Store initial grid information
      &          TRIM( FNAME ) // ' in ' // CRLF() // BLANK10 // 
      &          FILETYPE // ' GRID NAME: ' // TRIM( GRDNM )
 
-         CALL M3MSG2( MESG )
+         CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
       END IF
 
@@ -271,7 +271,7 @@ C Store initial grid information
          MESG = 'ERROR: Grid parameters for ' // FNAME // ' in ' //
      &          CRLF() // BLANK10 // FILETYPE //
      &          ' are inconsistent with GRID NAME: ' // TRIM( GRDNM )
-         CALL M3MSG2( MESG )
+         CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
       END IF
 #endif

@@ -977,7 +977,7 @@ C Build mapping to CGRID for each species in the master AeroList
                      xmsg = 'FATAL ERROR: In AErosol namelist, OPTICS value ' 
      &                    // 'for bulk ' // Trim( aerolist( spc )%bulkname )
      &                    // ' is inconsistent across modes. CORRECT the AE namelist'
-                     Call m3mesg( xmsg )
+                     CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                      If( Len_Trim( ae_optics( n ) ) .lt. 1 ) Then
                         xmsg2 = 'blank'
                      Else
@@ -985,7 +985,7 @@ C Build mapping to CGRID for each species in the master AeroList
                      End If
                      Write( xmsg,* ) 'Bad Value is ', Trim( xmsg2 ),
      &               '; Expected value is ', Trim( refractive_index( spc ) )
-                     Call m3mesg( xmsg )
+                     CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                      AE_eflag  = .True.
                   End If   
                End If

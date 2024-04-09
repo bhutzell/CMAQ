@@ -81,7 +81,7 @@ C-----------------------------------------------------------------------
 
       L = LEN_TRIM( WKDAYS( DAY ) )
       MESG = '>>> Processing ' // WKDAYS( DAY )( 1:L ) // ' ' // MMDDYY( JDATE )
-      CALL M3MSG2( MESG )
+      CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
       RETURN
 

@@ -93,7 +93,7 @@
 #endif
          XMSG = 'Could not open ' // TRIM( A_CONC_1 )
      &        // ' file for update - try to open new'
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
          IF ( IO_PE_INCLUSIVE ) THEN
 

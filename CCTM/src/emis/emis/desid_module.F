@@ -512,7 +512,7 @@ C Find emissions stream in the list of available streams
                    XMSG = " User specified ISAM tag - " //
      &                    TRIM( TAGSTREAMS(ITAG,ISRM) )// 
      &                    " - not found in available emissions streams "
-                   CALL M3MESG(XMSG)
+                   CALL LOG_MESSAGE( LOGDEV , XMSG)
                    EFLAG = .TRUE.
                  ELSE
                    TAGS_PER_STREAM( IDX ) = TAGS_PER_STREAM( IDX ) + 1
@@ -3364,7 +3364,7 @@ C Open All Tracer Emission Files
 #else  
            IF ( .NOT. OPEN3( DESID_STREAM_NAME( ISRM ), FSREAD3, PNAME ) ) THEN
               XMSG = 'Could not open tracer file'
-              CALL M3MESG( XMSG )
+              CALL LOG_MESSAGE( LOGDEV ,  XMSG )
               file_exist = .false.
            ELSE
               file_exist = .true.
@@ -3429,7 +3429,7 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
 #else
           IF ( .NOT. OPEN3( DESID_STREAM_NAME( ISRM ), FSREAD3, PNAME ) ) THEN
               XMSG = 'Could not open file ' // DESID_STREAM_NAME( ISRM )
-              CALL M3MESG( XMSG )
+              CALL LOG_MESSAGE( LOGDEV ,  XMSG )
           ELSE
   
             IF ( .NOT. DESC3( DESID_STREAM_NAME( ISRM ) ) ) THEN

@@ -62,11 +62,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       NIRROUT = NIRROUT + 1
       IF ( NIRROUT .GT. MAXIRROUT ) THEN
          WRITE( MSG, 94000 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94020 ) MAXIRROUT
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
       END IF
 
@@ -78,11 +78,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF ( CHR .NE. '=' ) THEN
          WRITE( MSG, 94040 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
       ELSE
          CALL GETCHR
@@ -96,11 +96,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       TERMNUM = TERMNUM + 1
       IF ( TERMNUM .GT. MAXOUTTERMS ) THEN
          WRITE( MSG, 94060 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94080 ) MAXOUTTERMS
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
       END IF      
 
@@ -130,11 +130,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                OUTSPEC1( NIRROUT, TERMNUM ) = LABEL
             ELSE
                WRITE( MSG, 94100 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94500 ) LINNUM, INBUF
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94520 ) CHR
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
             END IF
 
@@ -144,11 +144,11 @@ c..FROM option
                CALL GETWORD
                IF ( WORD .NE. 'FROM' ) THEN
                   WRITE( MSG, 94120 ) 
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94500 ) LINNUM, INBUF
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94540 ) WORD
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
                END IF
                IF ( CHR .EQ. '[' ) THEN
@@ -156,11 +156,11 @@ c..FROM option
                   OUTSPEC2( NIRROUT, TERMNUM ) = LABEL
                ELSE
                   WRITE( MSG, 94100 ) 
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94500 ) LINNUM, INBUF
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94520 ) CHR
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
                END IF
             END IF
@@ -173,11 +173,11 @@ c..AND/OR operator
                CALL GETWORD
                IF ( WORD .NE. 'AND' .AND. WORD .NE. 'OR' ) THEN
                   WRITE( MSG, 94140 ) 
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94500 ) LINNUM, INBUF
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94540 ) WORD
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
                ELSE
                   OUTOP2( NIRROUT, TERMNUM ) = WORD
@@ -186,11 +186,11 @@ c..AND/OR operator
                      OUTSPEC3( NIRROUT, TERMNUM ) = LABEL
                   ELSE
                      WRITE( MSG, 94100 ) 
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      WRITE( MSG, 94500 ) LINNUM, INBUF
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      WRITE( MSG, 94520 ) CHR
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
                    END IF
                 END IF
@@ -206,11 +206,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                OUTSPEC1( NIRROUT, TERMNUM ) = LABEL
             ELSE
                WRITE( MSG, 94100 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94500 ) LINNUM, INBUF
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94520 ) CHR
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
             END IF
 
@@ -223,11 +223,11 @@ c..AND/OR operator
                CALL GETWORD
                IF ( WORD .NE. 'AND' .AND. WORD. NE. 'OR' ) THEN
                   WRITE( MSG, 94140 ) 
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94500 ) LINNUM, INBUF
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94540 ) WORD
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
                ELSE
                   OUTOP2( NIRROUT, TERMNUM ) = WORD
@@ -236,11 +236,11 @@ c..AND/OR operator
                      OUTSPEC3( NIRROUT, TERMNUM ) = LABEL
                   ELSE
                      WRITE( MSG, 94100 ) 
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      WRITE( MSG, 94500 ) LINNUM, INBUF
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      WRITE( MSG, 94520 ) CHR
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
                   END IF
                END IF
@@ -259,11 +259,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                OUTSPEC1( NIRROUT, TERMNUM ) = LABEL
             ELSE
                WRITE( MSG, 94100 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94500 ) LINNUM, INBUF
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94520 ) CHR
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
             END IF
 
@@ -278,11 +278,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                IF ( LABEL .NE. 'POSONLY' .AND. LABEL .NE. 'NEGONLY' ) 
      &              THEN
                   WRITE( MSG, 94180 ) 
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94500 ) LINNUM, INBUF
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94540 ) LABEL
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
                ELSE          
                   OUTPNFLAG( NIRROUT, TERMNUM ) = LABEL
@@ -301,11 +301,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          RETURN
       ELSE
          WRITE( MSG, 94200 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETIRROUT', IZERO, IZERO, ' ', XSTAT2 )
       END IF            
 

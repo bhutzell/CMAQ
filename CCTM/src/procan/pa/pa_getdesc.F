@@ -61,11 +61,11 @@ c Make sure the = sign is there
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF ( CHR .NE. '=' ) THEN
          WRITE( MSG, 94000 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETDESC', IZERO, IZERO, ' ', XSTAT2 )
       ELSE
          CALL GETCHR
@@ -76,11 +76,11 @@ c Check for a leading apostrophe and get the description
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF ( CHR .NE. APOSTROPHE ) THEN
          WRITE( MSG, 94020 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETDESC', IZERO, IZERO, ' ', XSTAT2 )
       ELSE
          CALL GETQUOTE
@@ -88,9 +88,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IRRDESC( NIRROUT ) = QUOTE
          ELSE
             WRITE( MSG, 94600 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94500 ) LINNUM, INBUF
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
          END IF
       END IF
 
@@ -99,11 +99,11 @@ c Check for the ending semicolon
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF ( CHR .NE. ';' ) THEN
          WRITE( MSG, 94040 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETDESC', IZERO, IZERO, ' ', XSTAT2 )
       ELSE
          CALL GETCHR

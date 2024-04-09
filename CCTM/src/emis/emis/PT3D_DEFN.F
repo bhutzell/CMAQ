@@ -210,7 +210,7 @@ C-----------------------------------------------------------------------
 C In-line 3D point source emissions?
          IF ( NPTGRPS .GT. 0 ) THEN
             XMSG = 'Using in-line 3d point source emissions option'
-            CALL M3MSG2( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          ELSE
             RETURN
          END IF
@@ -242,7 +242,7 @@ C get diagnostic files options
 
          END IF
 
-         CALL M3MSG2( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 #ifndef mpas
 #ifdef srcid
          IF ( PT3DFRAC ) THEN   ! save local source id's
@@ -344,7 +344,7 @@ C Compare number of meteorology layers to number of emissions layers
 !            WRITE( XMSG,94010 ) 'NOTE: The number of emission layers ' //
 !     &                          'is', DESID_LAYS, ', and the maximum ' // CRLF()
 !     &                          // BLANK10 // 'possible layers is', NLAYS
-!            CALL M3MSG2( XMSG )
+!            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 !         ELSE
 !            WRITE( XMSG,94010 ) 'Resetting number of emission layers ' //
 !     &                          'from', DESID_LAYS, 'to number of ' // CRLF() //
@@ -665,7 +665,7 @@ C Based on the current time step, find whether or not a report should be written
 !         WRITE( XMSG,'(A, I7.6)' )
 !     &   'Calculating emissions point source layer fractions for', JTIME
 !         WRITE( LOGDEV,* ) ' '
-!         CALL M3MSG2( XMSG )
+!         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 !
 !         IF ( LDATE .NE. JDATE ) THEN  ! write day and date to stdout & XMSG
 !            CALL WRDAYMSG( JDATE, XMSG )
@@ -1212,7 +1212,7 @@ C (~mass concentration -- minor hydrostatic assumption) from bottom to top.
             WRITE( CINT,'( I8 )' ) S
             WRITE( XMSG,94010 ) 'ERROR: Top of plume is less than '
      &                          // 'top of stack for source:' // CINT
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
             WRITE( LOGDEV,* ) '    Zbot: ', ZBOT, ' Ztop: ', ZTOP
             WRITE( LOGDEV,* ) '    Stack Top: ', STK_HT( N )%ARRY( S ),
      &                        ' Plume Top: ', ZPLM
@@ -1308,7 +1308,7 @@ C If layer fractions are negative, put in the first layer
      &               // 'fractions found for source:' // CINT
      &               // CRLF() // BLANK10 // 'Plume reset to '
      &               // 'put all emissions in surface layer.'
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
             TFRAC( 1,S ) = 1.0
             TFRAC( 2:DESID_LAYS,S ) = 0.0

@@ -354,7 +354,7 @@ C calculate fseas based on deep soil temperature following WRF 3.8.1 PX
       END IF   ! if new day
 
       WRITE( MESG,94030 ) HHMMSS( JTIME )
-      CALL M3MSG2( MESG )
+      CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
 #ifndef mpas
 C repopulate the met_cro_2d variable attributes

@@ -394,13 +394,13 @@ C Check min bounds for temperature and limit to 303 deg K
                IF ( TAIR .LT. 200.0 ) THEN
                   WRITE( MESG, 94010 ) 'TAIR=', TAIR,
      &                 'out of range at (C,R)=', C, R
-                  CALL M3MESG( MESG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MESG )
                   Write( MESG,94010 ) 'Max TAIR: ', Maxval( MET_DATA%TEMP2 ),
      &                 'at (C,R)', Maxloc( MET_DATA%TEMP2 )
-                  CALL M3MESG( MESG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MESG )
                   Write( MESG,94010 ) 'Min TAIR: ', Minval( MET_DATA%TEMP2 ),
      &                 'at (C,R)', Minloc( MET_DATA%TEMP2 )
-                  CALL M3MESG( MESG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MESG )
                   CALL M3EXIT( PNAME, JDATE, JTIME, '*** ABORT', 2 )
                END IF
                TAIR = MIN( TAIR, 303.0 )

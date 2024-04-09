@@ -267,11 +267,11 @@ C Store the segment from the input string
 
             MESG = 'ERROR: Overflow prevented while ' //
      &             'parsing line ' // PNAME
-            CALL M3MSG2( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
             MESG = 'First 200 characters of line contents are:'
-            CALL M3MSG2( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
             MESG = STRNG( 1:200 )
-            CALL M3MSG2( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
             MESG = 'Formatting problem'
             CALL M3EXIT( PNAME, 0, 0, MESG, 2 )

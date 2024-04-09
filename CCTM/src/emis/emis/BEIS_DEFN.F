@@ -76,7 +76,7 @@ C biogenics to gas-phase species map
          IF ( BIOGEMIS_BEIS ) THEN
 
             XMSG = 'Using in-line biogenic emissions option'
-            CALL M3MSG2( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
             IF ( .NOT. BIOG_INIT() ) THEN
                 XMSG = 'Could not initialize biogenic emissions variables'
