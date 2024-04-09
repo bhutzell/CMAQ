@@ -752,10 +752,14 @@
 
 ! ------------------------------------------------------------------------------
           integer function getefile ( lname, rdonly, fmtflag, caller )
-! CGN: should this routine take LOGDEV as an argument, rather than 
-!        printing error messages to the default device * ?
-! CGN: should this routine consider the ENDIAN nature of the file?
-!        or rename the function to indicate it is only for formatted text files?
+! CGN: this routine should write to LOGDEV, but using the runtime_vars module
+!      creates a circular dependency and passing in logdev as an argument changes
+!      its interface compared to IOAPI.
+!
+! CGN: Note this routine handles only formatted text files. It is not a full
+!      replacement of the IOAPI function in that it does not portably handle
+!      binary files by considering their ENDIAN nature. However, these are
+!      not used anywhere in CMAQ.
 
             use get_env_module
 
