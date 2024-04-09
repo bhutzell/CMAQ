@@ -1,3 +1,30 @@
+! -----------------------------------------------------------------------------
+! This module contains IOAPI replacement routines which are used in the CMAQ 
+! model. All routines except INIT3, INITLOG3, and FLUSH, are completely
+! rewritten and perform the exact same function as the original IOAPI routines.
+!
+! Note 1. secsdiff is the original IOAPI routine which takes in two set of
+!         jdate and jtime and forms a difference in seconds. This routine is
+!         expanded to handle two variations of input format,
+!         YYYY-MM-DD_hh:mm:ss, and hhmmss, respectively. 
+!
+!      2. index1 is the original IOAPI routine which determins whether a given
+!         character string is in a list of character string items. This routine
+!         is expanded to handle integer. 
+!
+!      3. Here is the list of replaced IOAPI routines
+!         daymon    julian  wkday        isdstime  upcase  
+!         hhmmss    dt2str  yr2day       nextime   junit  
+!         time2sec  crlf    getefile     sec2time  str2real  
+!         lblank    sortic  promptffile  currstep  findc  
+!         poly
+!
+!      4. Here is the newly added routines list
+!         leap_year  quicksort_partition  quicksort  date_time_minus_sec
+
+! History: David Wong, 04/2024 created
+! -----------------------------------------------------------------------------
+
         module replacement_util_module
 
           implicit none
@@ -20,6 +47,8 @@
 ! -----------------------------------------------------------
           logical function leap_year (year)
 
+! determine a given year is a leap year or not
+
             integer :: year
 
             if (mod(year, 4) .ne. 0) then
@@ -36,6 +65,8 @@
 
 ! -----------------------------------------------------------
           subroutine daymon (jdate, mon, day)
+
+! convert jdate in Julian date format into month and day
 
             implicit none
 
@@ -70,6 +101,8 @@
 ! ----------------------------------------------------------
           integer function julian (year, month, day)
 
+! convert year month day to Julian date (without year) format
+
             implicit none
 
             integer, intent(in) :: year, month, day
@@ -95,36 +128,10 @@
 
           end function julian
 
-! ----------------------------------------------------------
-          integer function num_julian_day (year, month, day)
-
-            implicit none
-
-            integer, intent(in) :: year, month, day
-
-            integer, parameter :: numday(12) =
-     &                            (/ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /)
-
-            integer :: i, temp_julian
-
-            i = 1
-            temp_julian= 0
-            do while (i < month)
-              temp_julian= temp_julian+ numday(i)
-              i = i + 1
-            end do
-            temp_julian= temp_julian + day
-
-            if (leap_year(year) .and. (month > 2)) then
-               temp_julian= temp_julian+ 1
-            end if
-
-            num_julian_day = temp_julian
-
-          end function num_julian_day
-
 ! -----------------------------------------------------------
           integer function wkday ( jdate )
+
+! determine the day of a week for a given Julian date
 
 ! based on Zeller's Rule, Monday = 1, Tuseday = 2, ... Sunday = 7
 
@@ -160,6 +167,8 @@
 
 ! ------------------------------------------------------
           logical function isdstime(jdate)
+
+! determine whether a given Julian date is in daylight saving time or not
 
 ! <  2007: first Sunday in April and the last Sunday in October
 ! >= 2007: secnd Sunday in March and the first Sunday in November
@@ -237,6 +246,8 @@
 ! ------------------------------------------------------------------------------
           subroutine upcase (string)
 
+! convert all English alphabet in the given string to upper case 
+
             character (len = *), intent(inout) :: string
 
             integer, parameter :: lcase_a_pos = ichar('a')
@@ -260,6 +271,8 @@
 
 ! ------------------------------------------------------------------------------
           character*14 function mmddyy (jdate)
+
+! convert a Julian date to mmddyy format
 
             integer, intent(in) :: jdate
 
@@ -312,6 +325,8 @@
 ! ------------------------------------------------------------------------------
           character*10 function hhmmss (jtime)
 
+! convert jtime in hhmmss format to character string format
+
             integer, intent(in) :: jtime
 
             integer :: hour, min, sec
@@ -331,6 +346,8 @@
 ! ------------------------------------------------------------------------------
           character*24 function dt2str (jdate, jtime)
 
+! combine jdate and jtime which both are in integer format, to a character string
+
             integer, intent(in) :: jdate, jtime
 
             dt2str = hhmmss(jtime) // mmddyy(jdate)
@@ -339,6 +356,8 @@
 
 ! ------------------------------------------------------------------------------
           real function yr2day (year)
+
+! compute the reciprocal of number of days in a given year
 
             integer, intent(in) :: year
 
@@ -352,6 +371,8 @@
 
 ! ------------------------------------------------------------------------------
           subroutine nextime (jdate, jtime, dtime)
+
+! adjust given jdate and jtime w.r.t dtime which is in hhmmss format
 
             integer, intent(inout) :: jdate, jtime
             integer, intent(in)    :: dtime
@@ -453,6 +474,9 @@
 ! ------------------------------------------------------------------------------
           integer function index1_char (name, n, list)
 
+! acts as the original IOAPI routine index1 to determine a character
+! string, name in the character string item list
+
             character (*), intent(in) :: name
             character (*), intent(in) :: list(:)
             integer, intent(in)       :: n
@@ -479,6 +503,8 @@
 
 ! ------------------------------------------------------------------------------
           integer function index1_int (name, n, list)
+
+! perform same function as in index1_char but for integer
 
             integer, intent(in) :: name
             integer, intent(in) :: list(:)
@@ -507,6 +533,8 @@
 ! ------------------------------------------------------------------------------
           integer function junit()
 
+! determine an output file unit number
+
             integer, parameter :: bottom = 20
             integer, save :: top = 99
             logical :: found, status
@@ -530,6 +558,9 @@
 
 ! ------------------------------------------------------------------------------
           integer recursive function secsdiff_jdate_jtime (jdate1, jtime1, jdate2, jtime2) result (return_value)
+
+! acts as the original IOAPI routine secsdiff to determine the time
+! difference between two set of jdate and jtime
 
             integer, intent(in) :: jdate1, jtime1, jdate2, jtime2
 
@@ -564,7 +595,7 @@
                   loc_secsdiff = 0
                   do yr = year1, year2
                      if (yr .eq. year1) then
-                        loc_date = year1 * 1000 + num_julian_day (year1, 12, 31)
+                        loc_date = year1 * 1000 + julian (year1, 12, 31)
                         loc_time = 235959
 
 ! + 1 adjustment is for the difference between 12-31:23:59:59 and 01-01:00:00:00
@@ -595,6 +626,9 @@
 ! -----------------------------------------------------------
           integer recursive function secsdiff_time_str (date1, date2, flag) result (return_value)
 
+! performs the same function as secsdiff_jdate_jtime but the input dates
+! are in YYYY-MM-DD_hh:mm:ss format
+
             implicit none
 
             character (20), intent(in) :: date1, date2
@@ -612,8 +646,8 @@
                read (date2, '(i4, 5(1x, i2))') year2, month2, day2, hour2, minute2, sec2
 
                if (year1 .eq. year2) then
-                  jdate1 = num_julian_day (year1, month1, day1)
-                  jdate2 = num_julian_day (year2, month2, day2)
+                  jdate1 = julian (year1, month1, day1)
+                  jdate2 = julian (year2, month2, day2)
 
                   loc_secsdiff = (jdate2 - jdate1) * 86400 -
      &                           ((hour1 - hour2) * 3600 +
@@ -658,6 +692,8 @@
 ! ------------------------------------------------------------------------------
           integer function time2sec (time)
 
+! convert time which is in hhmmss format, to seconds
+
             integer, intent(in) :: time    ! in hhmmss format
             integer :: neg_time
             integer :: time_in_sec, hr, min, sec
@@ -680,66 +716,18 @@
 ! -------------------------------------------------------------------------
           integer function secsdiff_jtime (time1, time2)
 
+! performs the same function as secsdiff_time_str but the inputs are in hhmmss format
+
             integer, intent(in) :: time1, time2    ! in hhmmss format
 
             secsdiff_jtime = time2sec(time1) - time2sec(time2)
 
           end function secsdiff_jtime
 
-! -------------------------------------------------------------------------
-          subroutine data_time_minus_sec (date, time, minus_sec)
-
-            integer, intent(inout) :: date        ! date in julian date format
-            integer, intent(inout) :: time        ! time in hhmmss format
-            integer, intent(in   ) :: minus_sec
-
-            integer :: loc_sec, subtract_hr, subtract_min, subtract_sec,
-     &                 temp, hr, min, sec, num_days
-
-            if (minus_sec .ge. 86400) then
-               num_days = minus_sec / 86400
-               loc_sec = mod(minus_sec, 86400)
-               date = date - num_days
-            else
-               loc_sec = minus_sec
-            end if
-
-            subtract_hr  = loc_sec / 3600
-            temp         = mod(loc_sec, 3600)
-            subtract_sec = mod(temp, 60)
-            subtract_min = temp / 60
-
-            hr = time / 10000
-            sec = mod(time, 100)
-            min = mod(time/100, 100)
-
-            sec = sec - subtract_sec
-
-            if (sec .lt. 0) then
-               min = min - 1 - subtract_min
-               sec = sec + 60
-            else
-               min = min - subtract_min
-            end if
-
-            if (min .lt. 0) then
-               hr = hr - 1 - subtract_hr
-               min = min + 60
-            else
-               hr = hr - subtract_hr
-            end if
-
-            if (hr .lt. 0) then
-               date = date - 1
-               hr = hr + 24
-            end if
-
-            time = hr * 10000 + min * 100 + sec
-
-          end subroutine data_time_minus_sec
-
 ! -----------------------------------------------------------
           character (2) function crlf()
+
+! Return character string of character return and line feed (from IOAPI_
 
             character (2) :: temp
 
@@ -752,6 +740,8 @@
 
 ! ------------------------------------------------------------------------------
           integer function getefile ( lname, rdonly, fmtflag, caller )
+
+! determine the nature of a file associated with a logical name, lname
 
             use get_env_module
 
@@ -810,6 +800,8 @@
 ! ------------------------------------------------------------------------------
           integer function sec2time ( secs )
 
+! convert input secs to hhmmss format
+
             integer, intent(in) :: secs
 
             integer :: sec, min, hour, temp, loc_secs
@@ -832,6 +824,8 @@
 ! ------------------------------------------------------------------------------
           real function str2real( string )
 
+! convert a given string to real number
+
             character(*), intent(in) :: string
 
             read (string, *) str2real
@@ -840,6 +834,8 @@
 
 ! ------------------------------------------------------------------------------
           integer function lblank ( string )
+
+! remove left leading blanks
 
             character*(*), intent(in) :: string
 
@@ -865,6 +861,8 @@
 ! ------------------------------------------------------------------------------
           subroutine sortic (n, index, name)
 
+! sort an integer index w.r.t. a string list
+
             character (16), intent(in) :: name(:)
             integer, intent(in)        :: n
             integer, intent(inout)     :: index(:)
@@ -875,6 +873,8 @@
 
 ! -------------------------------------------------------------------------
           integer function quicksort_partition (n, name, index)
+
+! quicksort operation
 
             character (16), intent(in) :: name(:)
             integer, intent(in) :: n
@@ -916,6 +916,8 @@
 ! -------------------------------------------------------------------------
           recursive subroutine quicksort (n, name, index)
 
+! recursive quicksort algorithm
+
             implicit none
 
             character (16), intent(in) :: name(:)
@@ -934,8 +936,9 @@
           end subroutine quicksort
 
 ! ------------------------------------------------------------------------------
- 
           integer function promptffile (prompt, rdonly, fmtted, default, caller)
+
+! prompt user to provide file characteristics and open the file accordingly
 
             character*(*), intent(in) :: prompt         !  prompt for user
             logical      , intent(in) :: rdonly         !  TRUE iff file is input-only
@@ -953,6 +956,8 @@
 
 ! -------------------------------------------------------------------------
           subroutine date_time_minus_sec (date, time, minus_sec)
+
+! subtract a Julian jdate and jtime in hhmmss format with minus_sec seconds
 
             integer, intent(inout) :: date        ! date in julian date format
             integer, intent(inout) :: time        ! time in hhmmss format
@@ -1025,6 +1030,9 @@
      &                               sdate, stime, tstep,
      &                               cdate, ctime )
 
+! compute cdate and ctime from starting date and time, sdate and stime w.r.t.
+! time step, tstep such that it is closest to and smaller than jdate and jtime
+
             integer, intent(in)  :: jdate, jtime, sdate, stime, tstep
             integer, intent(out) :: cdate, ctime
 
@@ -1050,6 +1058,8 @@
 
 ! ------------------------------------------------------------------------------
           integer function findc (key, n, list)
+
+! find the location of a key in a sorted list
 
             character*(*), intent(in) :: key
             integer, intent(in)       :: n
@@ -1081,8 +1091,10 @@
           end function findc
 
 ! ------------------------------------------------------------------------------
-
           real function poly (pt, x, fx, n)
+
+! Performs arbitrary-degree polynomial interpolation for pt on curve determined 
+! by x and fx using Newton divided-differences. (from IOAPI)
 
             implicit none
 
@@ -1118,7 +1130,6 @@
           end function poly
 
 ! -------------------------------------------------------------------------
-
         INTEGER FUNCTION INIT3 ( )
 
         use universal_data_module
@@ -1227,7 +1238,6 @@ C-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #endif
 
 ! ------------------------------------------------------------------------------
-
         INTEGER FUNCTION INITLOG3 ( CALLER )
 
          use universal_data_module
