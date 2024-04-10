@@ -65,8 +65,8 @@ C Local Variables
       CHARACTER( 11 ) :: COUT      ! Output coefficient
       CHARACTER( 80 ) :: CEES      ! Line of asterisks
       CHARACTER( 80 ) :: LINOUT    ! line of output
-      CHARACTER(  5 ) :: TZ        ! Time zone label
-      CHARACTER( 24 ) :: TIMNDAT   ! Wall clock time and date
+!      CHARACTER(  5 ) :: TZ        ! Time zone label
+!      CHARACTER( 24 ) :: TIMNDAT   ! Wall clock time and date
 
       CHARACTER( 50 ) :: STRING( 20 )             ! Strings to concatenate
       CHARACTER( LABLEN ) :: RJLABL( MXRXNS ) ! Right justified reaction label
@@ -139,21 +139,21 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Get the time and date to be used as the time stamp for all outputs;
 c  Convert from GMT to EDT or EST
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      CALL GETDTTIME( IDATE, ITIME )
-
-      IF ( ISDSTIME( IDATE ) ) THEN
-         CALL NEXTIME( IDATE, ITIME, -40000 )
-         TZ = ' EDT '
-      ELSE
-         CALL NEXTIME( IDATE, ITIME, -50000 )
-         TZ = ' EST '
-      END IF
-
-      TIMNDAT = DT2STR( IDATE, ITIME )
-      TDATOUT = TIMNDAT( 1:8 ) // TZ // TIMNDAT( 10:24 )
-
-      WRITE( IOUT, 93020 ) TDATOUT
-      WRITE( IOUT, 93000 )
+c      CALL GETDTTIME( IDATE, ITIME )
+c
+c      IF ( ISDSTIME( IDATE ) ) THEN
+c         CALL NEXTIME( IDATE, ITIME, -40000 )
+c         TZ = ' EDT '
+c      ELSE
+c         CALL NEXTIME( IDATE, ITIME, -50000 )
+c         TZ = ' EST '
+c      END IF
+c
+c      TIMNDAT = DT2STR( IDATE, ITIME )
+c      TDATOUT = TIMNDAT( 1:8 ) // TZ // TIMNDAT( 10:24 )
+c
+c      WRITE( IOUT, 93020 ) TDATOUT
+c      WRITE( IOUT, 93000 )
 
       DO N = 1, 80
          CEES( N:N ) = C
