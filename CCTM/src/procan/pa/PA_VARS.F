@@ -104,7 +104,7 @@ C Common Variables:
                                                             ! output operator
       CHARACTER( 16 ), SAVE :: IRRNAME_TMP( MAXIRROUT ) ! for IRRNAME
 
-      CHARACTER( 28 ) :: TDATOUT    ! Output clock time and date
+!      CHARACTER( 28 ) :: TDATOUT    ! Output clock time and date
 
       CHARACTER( 60 ), SAVE :: IRRDESC_TMP( MAXIRROUT ) ! for IRRDESC
 
