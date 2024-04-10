@@ -57,7 +57,7 @@
           if (present(logdev)) then
              loc_logdev = logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
           regular = .false.
@@ -97,7 +97,7 @@
           if (present(logdev)) then
              loc_logdev = logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
           regular = .false.
@@ -137,7 +137,7 @@
           if (present(logdev)) then
              loc_logdev = logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
           regular = .false.
@@ -178,7 +178,7 @@
           if (present(logdev)) then
              loc_logdev = logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
           regular = .false.
@@ -226,7 +226,7 @@
           if (present(logdev)) then
              loc_logdev = logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
           length = len(trim(loc_str))
@@ -292,7 +292,7 @@
 ! get a list env var (quoted string of items delimited by white space,
 ! commas or semi-colons) and parse out the items into variables. Two data
 ! types: character strings and integers (still represented as strings in
-! the env var vaules).
+! the env var values).
 ! Examples:
 ! 1)   setenv AVG_CONC_VARS "O3 NO NO2"
 ! 2)   setenv AVG_CONC_LAYS "2 5"          < start at two, end at 5
@@ -336,8 +336,10 @@
           call get_env( e_val, env_var, ' ', loc_logdev )
 
           if ( e_val .eq. " " ) then
-             xmsg = 'Environment variable ' // env_var // ' not set'
-             write( loc_logdev, '(A)' ) xmsg
+             if ( loc_logdev .ge. 0 ) then
+                xmsg = 'Environment variable ' // env_var // ' not set'
+                write( loc_logdev, '(A)' ) xmsg
+             end if
              nvars = 0
              val_list = ''
              return
