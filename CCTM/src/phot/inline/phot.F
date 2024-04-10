@@ -590,7 +590,7 @@ C...modules
             LGC_CO = INDEX1( VARNM, N_GC_SPC, GC_SPC )
             IF ( LGC_CO .LE. 0 ) THEN
                XMSG = 'Could not find ' // VARNM // 'in species table'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                WRITE(LOGDEV,95101)
             END IF
             
@@ -598,7 +598,7 @@ C...modules
             LGC_SO2 = INDEX1( VARNM, N_GC_SPC, GC_SPC )
             IF ( LGC_SO2 .LE. 0 ) THEN
                XMSG = 'Could not find ' // VARNM // 'in species table'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                WRITE(LOGDEV,95101)
             END IF
             
@@ -609,7 +609,7 @@ C...modules
                LGC_HCHO = INDEX1( VARNM, N_GC_SPC, GC_SPC )
                IF ( LGC_HCHO .LE. 0 ) THEN
                   XMSG = 'Could not find HCHO or FORM, i.e., formaldehyde, in species table'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   WRITE(LOGDEV,95101)
                END IF
             END IF

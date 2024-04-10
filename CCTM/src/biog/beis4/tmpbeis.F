@@ -213,7 +213,7 @@ C Check that grid description matches BGRD file
          IF ( .NOT. CHKGRID( MNAME ) ) THEN
             MESG = 'Grid in file "' // TRIM( MNAME )
      &           // '" does not match previously set grid.'
-            CALL M3WARN( PNAME, 0, 0, MESG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MESG)
          END IF
 
          IF ( BEMIS_DIAG ) THEN

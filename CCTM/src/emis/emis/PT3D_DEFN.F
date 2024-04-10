@@ -145,7 +145,7 @@ C=======================================================================
      &                      METDXORIG, METDYORIG, XCELLDG, YCELLDG
 
          USE UTILIO_DEFN
-         USE RUNTIME_VARS, ONLY: LOGDEV, MYPE, PT3DFRAC, PT_DATE, STDATE, STTIME,
+         USE RUNTIME_VARS, ONLY: LOGDEV,LOG_WARNING, MYPE, PT3DFRAC, PT_DATE, STDATE, STTIME,
      &                           PT_TIME, PT_NSTEPS, REP_LAYR
          USE DESID_VARS, ONLY: DESID_LAYS, DESID_MAXLAYS
          USE stack_group_data_module
@@ -223,7 +223,7 @@ C rise algorithm
             XMSG = 'Environment variable CTM_DESID_LAYS must be set to ' //
      &             'a number from 4 to the ' // CRLF() // BLANK10 //
      &             'number of layers in the meteorology inputs.'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 C get diagnostic files options
@@ -350,7 +350,7 @@ C Compare number of meteorology layers to number of emissions layers
 !            WRITE( XMSG,94010 ) 'Resetting number of emission layers ' //
 !     &                          'from', DESID_LAYS, 'to number of ' // CRLF() //
 !     &                          BLANK10 // 'layers in the meteorology file,', NLAYS
-!            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+!            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 !            DESID_LAYS = NLAYS
 !         END IF
 
@@ -384,7 +384,7 @@ C Get stack data
 
 !        IF ( .NOT. STK_PRMS_INIT( STKGNAME ) ) THEN
 !           XMSG = 'Could not initialize stack parameters'
-!           CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+!           CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 !           SUCCESS = .FALSE.; RETURN
 !        END IF
 #endif
@@ -414,7 +414,7 @@ C Initialize stack emissions data
          ! Initialize Point Source Emissions
          IF ( .NOT. STK_EMIS_INIT( STKENAME, JDATE, JTIME ) ) THEN
             XMSG = 'Could not initialize stack parameters'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -424,7 +424,7 @@ C Initialize stack emissions data
             IF ( NSRC( N ) .NE. NSRC_EMIS( N ) ) THEN
                WRITE( LOGDEV,* ) 'NSRC vs. NSRC_EMIS:', N, NSRC( N ), NSRC_EMIS( N )
                XMSG = 'No. of sources for stack files don''t match'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
          END DO
@@ -442,7 +442,7 @@ C Open diagnostic layer fractions file?
 
          IF ( .NOT. PTMET_INIT ( ) ) THEN
             XMSG = 'Could not initialize stack met data'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -885,7 +885,7 @@ C-----------------------------------------------------------------------
       USE STK_PRMS, ONLY : MY_STRT_SRC, MY_END_SRC, MY_NSRC, SOURCE
 #endif
       USE PTMET, ONLY : DESID_LAYS, P_D => PTMET_DATA
-      USE RUNTIME_VARS, ONLY : LOGDEV, IPVERT, PT3DFRAC, REP_LAYR, LOG_MESSAGE
+      USE RUNTIME_VARS, ONLY : LOGDEV, IPVERT, PT3DFRAC, REP_LAYR, LOG_MESSAGE, LOG_WARNING
       USE UTILIO_DEFN
       USE CENTRALIZED_IO_MODULE, only : interpolate_var
 #ifdef mpas
@@ -1284,7 +1284,7 @@ C  ZZF( LTOP-1 ) <= ZTOP < ZZF( LTOP )
      &            'Infinitely small plume created for source:,'
      &            // CINT // CRLF() // BLANK10
      &            // 'All emissions put in first layer.'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                LBOT = 1; LTOP = 1
                TFRAC( LBOT,S ) = 1.0
 

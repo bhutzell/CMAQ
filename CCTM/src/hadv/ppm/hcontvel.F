@@ -168,7 +168,7 @@ C-----------------------------------------------------------------------
          VNAME = 'UWINDC'
          IF ( INDEX1( VNAME, NVARS3D, VNAME3D ) .LE. 0 ) THEN
             XMSG = 'Could not find ' // VNAME // ' in ' // MET_DOT_3D
-            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             CSTAGUV = .FALSE.
          END IF
 

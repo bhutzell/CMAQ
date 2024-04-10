@@ -176,7 +176,7 @@ C Allocate MG arrays using NMGSPC value
             ALLOCATE ( VDEMIS_MG( NMGSPC,NCOLS,NROWS), STAT = STATUS )
             IF ( STATUS .NE. 0 ) THEN
                XMSG = '*** VDEMIS_MG, memory allocation failed'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -185,7 +185,7 @@ C Allocate MG arrays using NMGSPC value
      &                 SEAICE( NCOLS,NROWS ), STAT = STATUS )
             IF ( STATUS .NE. 0 ) THEN
               XMSG = '*** DMSL, TSEASFC, U10, or SEAICE memory'
-              CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+              CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
               SUCCESS = .FALSE.; RETURN
             END IF   
             U10     = 0.0
@@ -209,7 +209,7 @@ C Allocate diagnostic arrays
      &                     WRMG_SPC( NMGDIAG ), STAT = STATUS )
                 IF ( STATUS .NE. 0 ) THEN
                     XMSG = '*** MGOUTD or WRMG_SPC memory alloc failed'
-                    CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                    CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                     SUCCESS = .FALSE.; RETURN
                 END IF
 
@@ -236,7 +236,7 @@ C Open the marine gas emission dignostic file
      &                     WRMG( NCOLS,NROWS ), STAT = STATUS )
                 IF ( STATUS .NE. 0 ) THEN
                    XMSG = '*** MGBF or WRMG memory allocation failed'
-                   CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                   CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                    SUCCESS = .FALSE.; RETURN
                 END IF
                 MGBF = 0.0

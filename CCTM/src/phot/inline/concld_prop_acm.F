@@ -437,7 +437,7 @@ C...  field if a convective parameterization was not used in the WRF simulation
           CONVCLD = .FALSE.
           XMSG = 'MCIP files indicate no convective parameterization was '
      &        // 'used in the WRF simulation'
-          CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
           XMSG = 'Processing will continue without subgrid clouds'
           CALL LOG_MESSAGE( LOGDEV ,  XMSG )
           RETURN

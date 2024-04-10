@@ -235,7 +235,7 @@
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'ICCG, OCEAN_MASK, LTNG_Parameters'
      &                 // '  memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
                IF ( CJDATE .GT. 90 .AND. CJDATE .LT. 274 ) THEN
@@ -312,14 +312,14 @@
                ALLOCATE( VDEMIS_LTDIAG( NCOLS,NROWS,DESID_LAYS ), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'VDEMIS_LTDIAG memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
                VDEMIS_LTDIAG = 0.0   ! array assignment
                ALLOCATE( COLUMN_DIAG( NCOLS,NROWS), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'COLUMN_DIAG memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
                COLUMN_DIAG = 0.0   ! array assignment
@@ -342,7 +342,7 @@
          ALLOCATE( VDEMIS_LT( NCOLS,NROWS,LTLYRS ), STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'VDEMIS_LT memory allocation failed'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
  

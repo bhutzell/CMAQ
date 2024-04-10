@@ -48,6 +48,8 @@
 #endif
         CHARACTER( 96 ) :: XMSG = ' '
 
+        CHARACTER( 200 ) :: APP_NAME_IN = 'APPL' ! Logfile Names
+
         INTEGER :: MODEL_TSTEP, NSTEPS, ISTEP,
      $             JDATE, JTIME, TOTSECS, STEPSECS
         CHARACTER( 96 ) :: MSG = ' '
@@ -73,6 +75,13 @@ C processes (NPROCS)
         MYPE = 0
         CALL CPU_TIME( BEGTIME )
 #endif
+
+        ! Get Simulation Scenario Name to Label Log Files, etc
+        CALL GET_ENV( APP_NAME_IN, 'CTM_APPL', APP_NAME_IN, 6 )
+
+        ! Start I/O-API and set up log file(s)
+        CALL SETUP_LOGDEV(APP_NAME_IN)
+
         ! Initialize all runscript environmental variables
         CALL INIT_ENV_VARS( 0, 0 )
 

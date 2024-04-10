@@ -63,7 +63,7 @@ C PISAM extents
      &                 STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating PISAM'
-               CALL M3WARN ( 'PISAM_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'PISAM_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
             
@@ -71,7 +71,7 @@ C PISAM extents
             
          ELSE
             XMSG = 'PISAM already ALLOCATED'
-            CALL M3WARN ( 'PISAM_INIT', 0, 0, XMSG )
+            CALL LOG_WARNING( 'PISAM_INIT', LOGDEV, XMSG )
             SUCCESS = .FALSE.; RETURN
          END IF
          

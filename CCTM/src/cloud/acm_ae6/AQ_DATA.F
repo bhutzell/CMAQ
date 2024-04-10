@@ -475,7 +475,7 @@ C...Initialize aerosol surrogate species from AERO_DATA table
          If ( var .Eq. ah2o_idx .Or. var .Eq. ah3op_idx ) Then
               write(xmsg,'(4(A,1x))')'Skipping AQ surrogate for AEROSPC ',
      &                               aerospc( spc-nadd_tx )%name( 1:n_mode )
-              Call m3warn( 'aq_data_init', 0, 0, xmsg )
+              Call LOG_WARNING( 'aq_data_init', logdev, xmsg )
               Cycle
          End if
 

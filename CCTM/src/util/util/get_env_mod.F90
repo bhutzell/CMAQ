@@ -24,6 +24,7 @@
 !        2010 D.Wong: initial implementation
 !  2 Feb 2010 D.Wong: provided an optional outputing device option,
 !                     absorbed get_envlist function
+        use logdev_mod, only : logdev, log_warning
 
         implicit none
 
@@ -342,7 +343,7 @@
           if ( e_val .eq. " " ) then
              xmsg = 'Environment variable ' // env_var // ' not set'
 #ifndef mpas
-             call m3warn( pname, 0, 0, xmsg )
+             call LOG_WARNING( pname, logdev, xmsg)
 #endif
              nvars = 0
              val_list = ''

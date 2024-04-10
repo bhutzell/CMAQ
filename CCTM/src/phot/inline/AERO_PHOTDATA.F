@@ -802,7 +802,7 @@ C***  and contribution to the overall asymmetry factor
      &               BLK_AE_LSG( MODE,L )
      
                      XMSG =  'FAILURE IN AERO_OPTICAL2: shell only case '
-                     CALL M3WARN( PNAME, 0, 0, XMSG )
+                     CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                      
                   END IF
 

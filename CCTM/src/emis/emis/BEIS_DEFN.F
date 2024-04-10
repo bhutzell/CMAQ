@@ -80,14 +80,14 @@ C biogenics to gas-phase species map
 
             IF ( .NOT. BIOG_INIT() ) THEN
                 XMSG = 'Could not initialize biogenic emissions variables'
-                CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                 SUCCESS = .FALSE.; RETURN
             END IF
 
             ALLOCATE( VDEMIS_BI( MSPCS,NCOLS,NROWS ), STAT = STATUS )
             IF ( STATUS .NE. 0 ) THEN
               XMSG = 'VDEMIS_BI memory allocation failed'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 

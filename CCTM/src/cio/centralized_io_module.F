@@ -701,7 +701,7 @@
 ! lufrac cro file
           IF ( .NOT. OPEN3( LUFRAC_CRO, FSREAD3, PNAME ) ) THEN
              XMSG = 'Could not open '// LUFRAC_CRO // ' file'
-             CALL M3WARN ( PNAME, 0, 0, XMSG )
+             CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
              LUCRO_AVAIL = .FALSE.
              XMSG = 'Solution: Reading Land Use Fractions from GRID_CRO_2D file'
              WRITE(LOGDEV,'(5X,A)')TRIM( XMSG )
@@ -1590,7 +1590,7 @@
                          cio_grid_data(begin:end) = 0.0
                          XMSG = 'MCIP files indicate no convective parameterization was '
      &                          // 'used in the WRF simulation'
-                         CALL M3WARN (PNAME, JDATE, JTIME, XMSG)
+                         CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                          XMSG = 'Processing will continue without subgrid clouds'
                          CALL LOG_MESSAGE( LOGDEV , XMSG)
                       else
@@ -2072,7 +2072,7 @@
      &                                         0, 0, DESID_REG_FAC( 1,1,DESID_N_REG ) ) ) Then
                               XMSG = 'Could not read ' // VNAME3D(IVAR) //
      &                               'from file ' // FILENAMES( IFILE ) 
-                              CALL M3WARN ( PNAME, 0, 0, XMSG )
+                              CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                            End If
 #endif
 
@@ -2092,7 +2092,7 @@
      &                                   0, 0, DESID_REG_FAC( 1,1,DESID_N_REG ) ) ) Then
                         XMSG = 'Could not read ' // VNAME //
      &                         'from file ' // FILENAMES( IFILE ) 
-                        CALL M3WARN ( PNAME, 0, 0, XMSG )
+                        CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                      End If
 #endif
 

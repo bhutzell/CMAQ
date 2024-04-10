@@ -133,7 +133,7 @@ C Retrieve the layer range used in the concentration file
          IF ( CONC_BLEV .NE. 1 ) THEN
                WRITE( XMSG,'( "Layer", I3, " Not 1st layer in CGRID" )' )
      &         CONC_BLEV
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
          END IF
 
          C_NLAYS = CONC_ELEV - CONC_BLEV + 1

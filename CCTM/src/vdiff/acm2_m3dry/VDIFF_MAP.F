@@ -110,7 +110,7 @@ C Local variables:
      &              DIFF_SPC( N_SPC_DIFF+1 ), stat = allocstat )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating DIFF_MAP, DF2DV or DIFF_SPC'
-            CALL M3WARN( PNAME, 0, 0, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -120,7 +120,7 @@ C Local variables:
      &              DDEP_SPC( N_SPC_DDEP+1 ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating DD2DV or DDEP_SPC'
-            CALL M3WARN( PNAME, 0, 0, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -130,7 +130,7 @@ C Local variables:
      &              dv2df_spc( n_spc_depv ), stat = allocstat )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating DEPV_MAP, DEPV_SPC, DV2DF or dv2df_spc'
-            CALL M3WARN( PNAME, 0, 0, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -397,7 +397,7 @@ C Local variables:
 ! Check for Errors and Exit
          IF ( LERROR ) THEN
             XMSG = '*** Species mapping error(s) in VDIFF_MAP'
-            CALL M3WARN( PNAME, 0, 0, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.
          END IF
 

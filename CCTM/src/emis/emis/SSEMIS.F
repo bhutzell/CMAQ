@@ -341,7 +341,7 @@ C Allocate SS arrays using NSSSPC value
      &                 SEA_FACTSRF( N_MODE,NCOLS,NROWS ), STAT = STATUS )
             IF ( STATUS .NE. 0 ) THEN
                XMSG = '*** SSOUTM, SSOUTN or SSOUTS memory allocation failed'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -362,7 +362,7 @@ C Allocate diagnostic arrays
      &                    WRSS_SPC( NSSDIAG ), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = '*** SSOUTD or WRSS_SPC memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
 
@@ -399,7 +399,7 @@ C Open the sea-salt emission dignostic file
      &                    WRSS( NCOLS,NROWS ), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = '*** SSBF or WRSS memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
 

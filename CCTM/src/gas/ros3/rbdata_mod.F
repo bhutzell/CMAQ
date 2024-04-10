@@ -205,7 +205,7 @@ C This function is expected to be called only once - at startup
             ALLOCATE ( CCOL( MXCELLS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** CCOL Memory allocation failed'
-               CALL M3WARN ( 'CELLVAR_ALLOC', 0, 0, XMSG )
+               CALL LOG_WARNING( 'CELLVAR_ALLOC', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -214,7 +214,7 @@ C This function is expected to be called only once - at startup
             ALLOCATE ( CROW( MXCELLS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** CROW Memory allocation failed'
-               CALL M3WARN ( 'CELLVAR_ALLOC', 0, 0, XMSG )
+               CALL LOG_WARNING( 'CELLVAR_ALLOC', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -223,7 +223,7 @@ C This function is expected to be called only once - at startup
             ALLOCATE ( CLEV( MXCELLS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** CLEV Memory allocation failed'
-               CALL M3WARN ( 'CELLVAR_ALLOC', 0, 0, XMSG )
+               CALL LOG_WARNING( 'CELLVAR_ALLOC', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -232,7 +232,7 @@ C This function is expected to be called only once - at startup
             ALLOCATE ( BLKCNO( MXBLKS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** BLKCNO Memory allocation failed'
-               CALL M3WARN ( 'CELLVAR_ALLOC', 0, 0, XMSG )
+               CALL LOG_WARNING( 'CELLVAR_ALLOC', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
                  
@@ -241,7 +241,7 @@ C This function is expected to be called only once - at startup
             ALLOCATE ( BLKLEN( MXBLKS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** BLKLEN Memory allocation failed'
-               CALL M3WARN ( 'CELLVAR_ALLOC', 0, 0, XMSG )
+               CALL LOG_WARNING( 'CELLVAR_ALLOC', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -250,7 +250,7 @@ C This function is expected to be called only once - at startup
             ALLOCATE ( NORDCELL( MXCELLS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** NORDCELL Memory allocation failed'
-               CALL M3WARN ( 'CELLVAR_ALLOC', 0, 0, XMSG )
+               CALL LOG_WARNING( 'CELLVAR_ALLOC', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -259,7 +259,7 @@ C This function is expected to be called only once - at startup
             ALLOCATE ( ERRMX2( MXCELLS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** ERRMX2 Memory allocation failed'
-               CALL M3WARN ( 'CELLVAR_ALLOC', 0, 0, XMSG )
+               CALL LOG_WARNING( 'CELLVAR_ALLOC', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -268,7 +268,7 @@ C This function is expected to be called only once - at startup
          ELSE   ! called more than once
 
             XMSG = 'Horizontal domain dependent variables already allocated'
-            CALL M3WARN ( 'CELLVAR_ALLOC', 0, 0, XMSG )
+            CALL LOG_WARNING( 'CELLVAR_ALLOC', LOGDEV, XMSG )
             SUCCESS = .FALSE.; RETURN
 
          END IF   ! FIRSTIME

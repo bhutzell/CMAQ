@@ -30,7 +30,7 @@ C-----------------------------------------------------------------------
           Use aero_data, only : n_aerolist, aerolist, modesuff,
      &                          iait, iacc, icor, reqd_modes
           Use runtime_vars, only : log_message, log_subheading, logdev,
-     &                             outdev, cmype
+     &                             log_warning, outdev, cmype
           Use cgrid_spcs_types
           Use utilio_defn, only : index1, xstat2, m3exit, m3warn, m3mesg
 
@@ -142,7 +142,7 @@ C-----------------------------------------------------------------------
      &             .not.aedat(isp)%lcor ) then
                     xmsg = 'No aerosol modes have been requested for '//
      &                     TRIM(aedat(isp)%species_name)//' on the AE namelist.' 
-                    call m3warn( pname, 0, 0, xmsg ) 
+                    CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
               end if
 
               ! For Aitken-Mode Particles

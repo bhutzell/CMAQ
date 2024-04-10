@@ -42,7 +42,7 @@ C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
       USE RUNTIME_VARS, ONLY : LOG_HEADING, LOG_SUBHEADING, LOG_MESSAGE,
-     &                         RUNLEN, FL_ERR_STOP, LOGDEV
+     &                         LOG_WARNING, RUNLEN, FL_ERR_STOP, LOGDEV
 
       IMPLICIT NONE 
 
@@ -159,7 +159,7 @@ C-----------------------------------------------------------------------
          IF ( FL_ERR_STOP ) THEN       
             CALL M3EXIT ( PNAME, STDATE, STTIME, MSG, XSTAT2 )
          ELSE
-            CALL M3WARN ( PNAME, STDATE, STTIME, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             RETURN
          END IF
       ELSE

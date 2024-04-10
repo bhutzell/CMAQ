@@ -163,7 +163,7 @@ C Retrieve Number of Emission Streams of Various Types (sectors)
          CALL DESID_INIT_STREAMS( JDATE, JTIME )
          IF ( DESID_N_SRM .EQ. 0 ) THEN 
             XMSG = 'No Emissions Streams Have Been Selected.'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .TRUE.; RETURN
          END IF
 
@@ -253,7 +253,7 @@ C Allocate Space for Master Emissions Computation
          ALLOCATE ( VDEMIS_DIFF( N_SPC_DIFF,DESID_LAYS,NCOLS,NROWS ),STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'VDEMIS_DIFF memory allocation failed'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -264,7 +264,7 @@ C Allocate Space for Master Emissions Computation
      &                                                  STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'SA_VDEMIS_DIFF memory allocation failed'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 #endif
@@ -273,7 +273,7 @@ C Allocate Space for Master Emissions Computation
          ALLOCATE ( SVDEMIS_DIFF( N_SPC_DIFF,DESID_LAYS,NCOLS,NROWS,NPMAX ),STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'SVDEMIS_DIFF memory allocation failed'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 #endif
@@ -815,7 +815,7 @@ C Retrieve Emissions from All Stream Types
                   XMSG = " ISAM mass balance error for emissions stream " //
      &                     TRIM( DESID_STREAM_DESC( ISRM ) ) // 
      &                    " - check isam control file. "
-                  CALL M3WARN( 'ISAM_EMISSIONS', 1, 1, XMSG )
+                  CALL LOG_WARNING( 'ISAM_EMISSIONS', LOGDEV, XMSG )
 
                   ! Repair OTHER By Distributing Negative Among Populated Tags 
                   ! and assigning positive part to the "OTHR" Tag as
@@ -2648,7 +2648,7 @@ C and allowing the model to proceed.
          ! Warn the User if there are no emissions instructions provided        
          IF ( DESID_N_ISTR .LE. 0 ) THEN
             XMSG = 'There are no emissions instructions: VDEMIS is set to zero' ! below
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
          END IF
 
          ! Print a message for each emissions stream variable that is not used.

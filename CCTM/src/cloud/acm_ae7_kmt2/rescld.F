@@ -226,7 +226,7 @@ C...  the met timestep in hours
         IF ( .not. QI_AVAIL ) THEN
           XMSG = 'Parameter QI (cloud ice) was not found on file '
      &           // MET_CRO_3D
-          CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
           WRITE( LOGDEV, '(3(/10X,A),(/10X,3(A,1X)),(/10X,A))' )
      &           'YOU SHOULD VERIFY that the cloud microphysics scheme used',
      &           'in the Meteorological Model did not include ice/snow.  If',
@@ -240,7 +240,7 @@ C...  the met timestep in hours
 
         IF ( .not. QS_AVAIL ) THEN
           XMSG = 'Parameter QS (snow) was not found on file ' // MET_CRO_3D
-          CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
           WRITE( LOGDEV, '(3(/10X,A),(/10X,3(A,1X)),(/10X,A))' )
      &           'YOU SHOULD VERIFY that the cloud microphysics scheme used',
      &           'in the Meteorological Model did not include ice/snow.  If',

@@ -211,7 +211,7 @@
              if( jdate_prev .ne. jdate )then ! write message to log
                 xmsg = 'Requested date is beyond available data on OMI file:  <' 
      &              // dt2str( jenddate, 0 )
-                call m3warn ( pname, jdate, 0, xmsg )
+                CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                 xmsgs( 1 ) = 'Total column ozone will be estimated from the corresponding Julian Day '
                 xmsgs( 2 ) = 'of the last available year on the '
      &                    // 'OMI input file:' // dt2str( jtdate_temp, 0 ) // '<<---<<'
@@ -235,7 +235,7 @@
              if( jdate_prev .ne. jdate )then ! write message to log
                 xmsg = 'Requested date preceeds available data on OMI file:  >' 
      &              // dt2str( jstdate, 0 )
-                call m3warn ( pname, jdate, 0, xmsg )
+                CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                 xmsgs( 1 ) = 'Total column ozone will be estimated from the corresponding Julian Day'
                 xmsgs( 2 ) = 'of the next available year on the OMI input file:'
      &                 // dt2str( jtdate_temp, 0 ) // '<<---<<'
@@ -260,7 +260,7 @@
              if( jdate_prev .ne. jdate )then ! write message to log
                 xmsg = 'Requested date falls within satellite data'
      &              // ' measurement gap: 24 Nov 1994 - 22 Jul 1996'
-                call m3warn ( pname, jdate, 0, xmsg )
+                CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                 xmsgs( 1 ) = 'Total column ozone will be estimated from the corresponding Julian Day'
                 xmsgs( 2 ) = 'of the closest available year on the OMI input file:'
      &                     // dt2str( jtdate_temp, 0 ) // '<<---<<'
