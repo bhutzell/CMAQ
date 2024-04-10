@@ -63,6 +63,8 @@ C-----------------------------------------------------------------------
       USE WVEL_DEFN             ! derived vertical velocity component
       USE STD_CONC              ! standard CONC
       USE UTILIO_DEFN
+      USE MIO_ASCII
+      USE RUNTIME_VARS, ONLY : CONC_BLEV, CONC_ELEV
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -92,6 +94,11 @@ C environment variable for no. of layers from bottom to save on CONC file
 
 C  environment variable description
       CHARACTER( 80 ) :: VARDESC
+      INTEGER, ALLOCATABLE :: NDIMS3D(:)
+      LOGICAL, ALLOCATABLE :: L_TSTEP(:)
+      LOGICAL, ALLOCATABLE :: L_LAY(:)
+      LOGICAL, ALLOCATABLE :: L_COL(:)
+      LOGICAL, ALLOCATABLE :: L_ROW(:)
 
       INTEGER      K, KD, L, SPC, V, VAR   ! loop counters
       INTEGER      STRT, FINI         ! loop counters
@@ -238,6 +245,20 @@ C Set output file characteristics based on COORD.EXT and open it
          UNITS3D( VAR ) = 'Pa'
          VDESC3D( VAR ) = 'Air Pressure'
       END IF
+
+      ! Store MIO Metadata
+      ALLOCATE( NDIMS3D( N_CONC_VARS ), L_TSTEP( N_CONC_VARS ),
+     &          L_LAY( N_CONC_VARS ), L_COL( N_CONC_VARS ),
+     &          L_ROW( N_CONC_VARS ) )
+      NDIMS3D( : ) = 4
+      L_TSTEP( : ) = .True.
+      L_LAY  ( : ) = .True.
+      L_COL  ( : ) = .True.
+      L_ROW  ( : ) = .True.
+
+      CALL LOAD_MIO_FILE ( 'CTM_CONC_1', NLAYS3D, CONC_BLEV, CONC_ELEV,
+     &     VNAME3D, TYPE3D, UNITS3D, VDESC3D, NDIMS3D, 
+     &     L_TSTEP, L_LAY, L_COL, L_ROW )
 
 C create header
 
