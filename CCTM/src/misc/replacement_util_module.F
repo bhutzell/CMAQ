@@ -740,6 +740,14 @@
 
 ! ------------------------------------------------------------------------------
           integer function getefile ( lname, rdonly, fmtflag, caller )
+! CGN: this routine should write to LOGDEV, but using the runtime_vars module
+!      creates a circular dependency and passing in logdev as an argument changes
+!      its interface compared to IOAPI.
+!
+! CGN: Note this routine handles only formatted text files. It is not a full
+!      replacement of the IOAPI function in that it does not portably handle
+!      binary files by considering their ENDIAN nature. However, these are
+!      not used anywhere in CMAQ.
 
 ! determine the nature of a file associated with a logical name, lname
 
@@ -760,12 +768,12 @@
             inquire (file=fname, exist=exist, iostat=stat)
 
             if (stat .ne. 0) then
-               print *, 'Error: inquiring about ', trim(lname)
+               print *, 'Error inquiring about file with logical name ', trim(lname)
                getefile = -1
             else
 
                if (.not. exist) then
-                  print *, trim(lname), ' does not exist '
+                  print *, 'Error: file with logical name ', trim(lname), ' does not exist '
                   getefile = -1
                else
                   funit = junit()
@@ -787,7 +795,7 @@
      &                  iostat = stat)
 
                   if (stat .ne. 0) then
-                     print *, ' Error: not able to open file ', trim(lname)
+                     print *, ' Error: could not open file ', trim(lname)
                      getefile = -1
                   else
                      getefile = funit
