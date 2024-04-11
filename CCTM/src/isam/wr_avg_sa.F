@@ -37,6 +37,7 @@ C-----------------------------------------------------------------------
 c     USE SA_LAYERS             ! 20140428 for AISAM_BLEV, AISAM_ELEV, SA_NLAYS
       USE SA_DEFN
       USE RUNTIME_VARS
+      USE MIO_ASCII
 
 !     USE SUBST_MODULES         ! stenex
 !     USE SUBST_UTIL_MODULE     ! stenex
@@ -191,7 +192,21 @@ C Set file header attributes that differ from CONC and open the file
      &            TRIM( FDESC3D( K ) )
                END DO
 
+               ! Store MIO Metadata
+               NDIMS3D( 1:NVARS3D ) = 4
+               L_TSTEP( 1:NVARS3D ) = .True.
+               L_LAY  ( 1:NVARS3D ) = .True.
+               L_COL  ( 1:NVARS3D ) = .True.
+               L_ROW  ( 1:NVARS3D ) = .True.
+               L_VEXT ( 1:NVARS3D ) = .False.
+              
+               CALL LOAD_MIO_FILE ( 'SA_ACONC_1', A_NLYS, AISAM_BLEV, AISAM_ELEV,
+     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &              L_VEXT(1:NVARS3D) )
 
+ 
                IF ( .NOT. OPEN3( SA_ACONC_1, FSNEW3, PNAME ) ) THEN
                   XMSG = 'Could not open '
      &                 // TRIM( SA_ACONC_1 ) // ' file'

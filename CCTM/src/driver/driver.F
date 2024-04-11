@@ -554,7 +554,7 @@ C Initialize ELMO Arrays and Maps
          call map_elmo
 
 C Initialize MIO - placeholder
-         if ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_input_file.txt' )
+         if ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_file_input.txt' )
 !         call mio_init
 
 C Initialize conc field: Copy IC's to CONC file as step 0
@@ -832,6 +832,9 @@ C Main processing loop:
          ! Output ELMO Diagnostic Information
          IF ( L_ELMO ) CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
 
+         ! Output Verification of MIO Input File
+         IF ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_file_input_check.txt' )
+
       END DO
 
 #ifndef mpas 
@@ -962,7 +965,5 @@ C Shut down IOAPI
          END IF
 #endif
       END IF
-
-      call write_mio_ascii( 'mio_input_file_check.txt' )
 
       END SUBROUTINE CMAQ_DRIVER        
