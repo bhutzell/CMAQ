@@ -350,14 +350,6 @@
  
       IF ( MYPE .EQ. 0 ) VARDEV = OUTDEV
 
-
-      IF ( MYPE .EQ. 0 ) THEN 
-         CALL LOG_HEADING( OUTDEV, "Environment Variable Report" )
-         CALL LOG_SUBHEADING( OUTDEV, "Grid and High-Level Model Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
-      END IF
-
        ! Get Logfile Directory
       CALL GET_ENV ( BLDFOLD, 'BLD', BLDFOLD, VARDEV ) 
  
