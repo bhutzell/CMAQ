@@ -40,6 +40,7 @@ C   S.Napelenok 26 Nov 2019 - create from opaconc.f for cmaq-ddm3d-v5.3.1
 #endif
 
       USE DDM3D_DEFN, ONLY: NP, NPMAX, SEN_PAR, N_ASENS_VARS
+      USE MIO_ASCII
 
       IMPLICIT NONE
 

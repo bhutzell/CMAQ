@@ -49,6 +49,7 @@ C-----------------------------------------------------------------------
 #endif
 
       USE DDM3D_DEFN
+      USE MIO_ASCII
 
       IMPLICIT NONE
 
