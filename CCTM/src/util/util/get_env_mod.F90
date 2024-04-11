@@ -24,7 +24,6 @@
 !        2010 D.Wong: initial implementation
 !  2 Feb 2010 D.Wong: provided an optional outputing device option,
 !                     absorbed get_envlist function
-        use logdev_mod, only : logdev, log_warning
 
         implicit none
 

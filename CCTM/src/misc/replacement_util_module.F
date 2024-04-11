@@ -1251,79 +1251,79 @@ C-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #endif
 
 ! ------------------------------------------------------------------------------
-        INTEGER FUNCTION INITLOG3 ( CALLER )
-
-         use universal_data_module
-         use logdev_mod
-         use get_env_module
-
-      IMPLICIT NONE
-
-C...........   ARGUMENT and its description:
-
-        CHARACTER*(*), INTENT(IN   ) :: CALLER
-
-C...........   EXTERNAL FUNCTIONS and their descriptions:
-
-!       INTEGER, EXTERNAL :: JUNIT
-!       EXTERNAL          :: INITBLK3
-
-
-C...........   SCRATCH LOCAL VARIABLES and their descriptions:
-
-        CHARACTER*512   EQNAME
-        CHARACTER*256   MESG            !  message/warning buffer
-
-        INTEGER         L, IOST
-
-C...........   SAVED LOCAL VARIABLES and their descriptions:
-C...........   NOTE:  the ANSI standard requires the use of SAVE statements
-C...........   for variables which must retain their values from call to call.
-
-        CHARACTER*16, PARAMETER :: LOGFILE = 'LOGFILE'
-
-
-C***********************************************************************
-C   begin body of subroutine  INITLOG
-
-#if defined(__sgi)    || defined(__mips__)
-
-        !!==========>  *HACK*  to deal with SGI v7.4 or later compilers,
-        !!             that do not follow industry standards with respect
-        !!             to how to make sure that BLOCK DATA modules are
-        !!             properly linked into an executable:
-
-        CALL INITBLK3
-
-#endif
-
-        IF ( LOGDEV .LT. 0 ) THEN
-
-                LOGDEV = JUNIT()
-                OPEN ( UNIT    =  LOGDEV,
-     &                 IOSTAT  =  IOST,
-     &                 FILE    =  mylogfile_name,
-     &                 STATUS  =  'NEW',
-     &                 ACCESS  =  'SEQUENTIAL')
-
-            IF ( IOST .NE. 0 ) THEN
-                MESG =TRIM( CALLER ) // '/INITLOG3'
-                WRITE( *, '( /, 5X, 3 A )' )
-     &                    '***  ERROR in ', TRIM( MESG ), '  ***'
-                WRITE( *, '( 5X, A, I10 )' )
-     &                    'Error opening log file on unit', LOGDEV,
-     &                    'I/O STATUS =', IOST
-                WRITE( *, '( 5X, 2 A, / )' )
-     &                    'File: ', TRIM( EQNAME )
-                stop
-            END IF
-
-        END IF          !  if logdev < 0
-
-        INITLOG3 = LOGDEV
-
-        RETURN
-
-        END FUNCTION INITLOG3
+!        INTEGER FUNCTION INITLOG3 ( CALLER )
+!
+!         use universal_data_module
+!         use logdev_mod
+!         use get_env_module
+!
+!      IMPLICIT NONE
+!
+!C...........   ARGUMENT and its description:
+!
+!        CHARACTER*(*), INTENT(IN   ) :: CALLER
+!
+!C...........   EXTERNAL FUNCTIONS and their descriptions:
+!
+!!       INTEGER, EXTERNAL :: JUNIT
+!!       EXTERNAL          :: INITBLK3
+!
+!
+!C...........   SCRATCH LOCAL VARIABLES and their descriptions:
+!
+!        CHARACTER*512   EQNAME
+!        CHARACTER*256   MESG            !  message/warning buffer
+!
+!        INTEGER         L, IOST
+!
+!C...........   SAVED LOCAL VARIABLES and their descriptions:
+!C...........   NOTE:  the ANSI standard requires the use of SAVE statements
+!C...........   for variables which must retain their values from call to call.
+!
+!        CHARACTER*16, PARAMETER :: LOGFILE = 'LOGFILE'
+!
+!
+!C***********************************************************************
+!C   begin body of subroutine  INITLOG
+!
+!#if defined(__sgi)    || defined(__mips__)
+!
+!        !!==========>  *HACK*  to deal with SGI v7.4 or later compilers,
+!        !!             that do not follow industry standards with respect
+!        !!             to how to make sure that BLOCK DATA modules are
+!        !!             properly linked into an executable:
+!
+!        CALL INITBLK3
+!
+!#endif
+!
+!        IF ( LOGDEV .LT. 0 ) THEN
+!
+!                LOGDEV = JUNIT()
+!                OPEN ( UNIT    =  LOGDEV,
+!     &                 IOSTAT  =  IOST,
+!     &                 FILE    =  mylogfile_name,
+!     &                 STATUS  =  'NEW',
+!     &                 ACCESS  =  'SEQUENTIAL')
+!
+!            IF ( IOST .NE. 0 ) THEN
+!                MESG =TRIM( CALLER ) // '/INITLOG3'
+!                WRITE( *, '( /, 5X, 3 A )' )
+!     &                    '***  ERROR in ', TRIM( MESG ), '  ***'
+!                WRITE( *, '( 5X, A, I10 )' )
+!     &                    'Error opening log file on unit', LOGDEV,
+!     &                    'I/O STATUS =', IOST
+!                WRITE( *, '( 5X, 2 A, / )' )
+!     &                    'File: ', TRIM( EQNAME )
+!                stop
+!            END IF
+!
+!        END IF          !  if logdev < 0
+!
+!        INITLOG3 = LOGDEV
+!
+!        RETURN
+!
+!        END FUNCTION INITLOG3
 
         end module replacement_util_module
