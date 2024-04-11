@@ -273,25 +273,39 @@
           character*14 function mmddyy (jdate)
 
 ! convert a Julian date to mmddyy format
-
+! Modified to handle some error conditions.
+          
             integer, intent(in) :: jdate
 
             integer, parameter :: numdays (12) = (/ 31, 28 ,31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /)
             character (len = 4) :: month_name (12)  = (/ 'Jan.', 'Feb.', 'Mar.', 'Apr.', 'May ', 'Jun.', 
      &                                                 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.' /)
+            character (len = 14) :: errstr = "<DATE ERROR>"
                                                
             integer :: year, day, numjdays(12), i, j
             logical :: done
 
             year = jdate / 1000
+            if ( year .le. 0 ) then
+               mmddyy = errstr
+               return
+            end if
             day  = mod(jdate, 1000)
 
 ! compute number of jdays
             numjdays(1) = 1
             numjdays(2) = 32
             if (leap_year(year)) then
+               if (day .le. 0 .or. day .gt. 366) then
+                  mmddyy = errstr
+                  return
+               end if
                numjdays(3) = numjdays(2) + 29
             else
+               if (day .le. 0 .or. day .gt. 365) then
+                  mmddyy = errstr
+                  return
+               end if
                numjdays(3) = numjdays(2) + 28
             end if
             do i = 4, 12
@@ -324,14 +338,19 @@
 
 ! ------------------------------------------------------------------------------
           character*10 function hhmmss (jtime)
-
 ! convert jtime in hhmmss format to character string format
+! Modified to handle some error conditions.
 
             integer, intent(in) :: jtime
 
             integer :: hour, min, sec
+            character (len = 14) :: errstr = "<TIME ERROR>"
 
             hour = jtime / 10000
+            if (hour .lt. 0 .or. hour. gt. 99 .or. min .gt. 60 .or. sec .gt. 60) then
+               hhmmss = errstr
+               return
+            end if
             min  = mod(jtime, 10000) / 100
             sec  = mod(jtime,100)
 
