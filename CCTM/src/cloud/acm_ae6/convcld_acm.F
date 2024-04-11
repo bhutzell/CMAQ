@@ -1780,7 +1780,7 @@ C...POLC in mol sp/m2
      &                    + PCLD( SPC,LAY ) * RHOM2( LAY )
 #ifdef isam
               CSPC = 0
-              CSPC = INDEXINT1(SPC,NSPC_SA,MAP_SAtoCGR(:))
+              CSPC = INDEX1(SPC,NSPC_SA,MAP_SAtoCGR(:))
 
               IF ( CSPC .NE. 0) THEN
                 DO ITAG = 1, NTAG_SA
@@ -1880,7 +1880,7 @@ C...  below cloud concentrations in mol sp/mol air
 
 #ifdef isam
                 CSPC = 0
-                CSPC = INDEXINT1(SPC,NSPC_SA,MAP_SAtoCGR(:))
+                CSPC = INDEX1(SPC,NSPC_SA,MAP_SAtoCGR(:))
                 IF ( CSPC .NE. 0) THEN
                   DO ITAG = 1, NTAG_SA
 
@@ -2150,7 +2150,7 @@ C...  for gases
      &                   * M2PHA / GPKG * FRAC
 #ifdef isam
             CSPC = 0
-            CSPC = INDEXINT1(VAR,NSPC_SA,MAP_SAtoCGR(:))
+            CSPC = INDEX1(VAR,NSPC_SA,MAP_SAtoCGR(:))
             IF ( CSPC .GT. 0 ) THEN
               DO ITAG = 1, NTAG_SA
                 SA_REMOV( CSPC,ITAG ) = SA_REMOV( CSPC,ITAG ) * GC_MOLWT( SPC )
@@ -2181,7 +2181,7 @@ C...  for aerosols
      &                     * M2PHA / GPKG * FRAC
 #ifdef isam
               CSPC = 0
-              CSPC = INDEXINT1(VAR,NSPC_SA,MAP_SAtoCGR(:))
+              CSPC = INDEX1(VAR,NSPC_SA,MAP_SAtoCGR(:))
               IF ( CSPC .GT. 0 ) THEN
                 DO ITAG = 1, NTAG_SA
                   SA_REMOV( CSPC,ITAG ) = SA_REMOV( CSPC,ITAG ) * AE_MOLWT( SPC )
@@ -2218,7 +2218,7 @@ C...  for non-reactives
      &                   * M2PHA / GPKG * FRAC
 #ifdef isam
             CSPC = 0
-            CSPC = INDEXINT1(VAR,NSPC_SA,MAP_SAtoCGR(:))
+            CSPC = INDEX1(VAR,NSPC_SA,MAP_SAtoCGR(:))
             IF ( CSPC .GT. 0 ) THEN
               DO ITAG = 1, NTAG_SA
                 SA_REMOV( CSPC,ITAG ) = SA_REMOV( CSPC,ITAG ) * NR_MOLWT( SPC )

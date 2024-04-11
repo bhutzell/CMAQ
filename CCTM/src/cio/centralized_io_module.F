@@ -1126,7 +1126,7 @@
 ! remove duplicate name from MET_CRO_3D file
           adj = nvars3d
           do v = nvars3d, 1, -1
-             n = index1 (vname3d(v), n_c3d, c3d_name) 
+             n = index1 (vname3d(v), n_c3d, c3d_name(:,1)) 
              if (n .gt. 0) then
                 do idx = v+1, adj
                    vname3d(idx-1) = vname3d(idx)

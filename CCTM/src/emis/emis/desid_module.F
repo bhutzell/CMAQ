@@ -2428,11 +2428,8 @@ C and allowing the model to proceed.
                      ! Check if IRGN and JRGN have a common Sub-Region 
                      ! and that that sub-region is not an active region
                      IF ( DESID_REG_SUB(I,K) .AND. DESID_REG_SUB(J,K) .AND.
-#ifndef mpas
-     &                    INDEXINT1( K, NREG, REG_UNQ(1:NREG) ) .EQ. 0 ) THEN
-#else
      &                    INDEX1( K, NREG, REG_UNQ(1:NREG) ) .EQ. 0 ) THEN
-#endif
+
                        ! Add Sub-Region K to Active Region List
                        NREG = NREG + 1
                        REG_UNQ( NREG ) = K
