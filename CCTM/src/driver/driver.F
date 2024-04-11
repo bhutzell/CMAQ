@@ -832,9 +832,6 @@ C Main processing loop:
          ! Output ELMO Diagnostic Information
          IF ( L_ELMO ) CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
 
-         ! Output Verification of MIO Input File
-         IF ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_file_input_check.txt' )
-
       END DO
 
 #ifndef mpas 
@@ -965,5 +962,8 @@ C Shut down IOAPI
          END IF
 #endif
       END IF
+
+      ! Output Verification of MIO Input File
+      IF ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_file_input_check.txt' )
 
       END SUBROUTINE CMAQ_DRIVER        
