@@ -748,11 +748,8 @@
 !      replacement of the IOAPI function in that it does not portably handle
 !      binary files by considering their ENDIAN nature. However, these are
 !      not used anywhere in CMAQ.
-<<<<<<< HEAD:CCTM/src/misc/replacement_util_module.F
 
 ! determine the nature of a file associated with a logical name, lname
-=======
->>>>>>> 70a75d7d2 (suppress get_env logging when logdev not specified):CCTM/src/mio/replacement_util_module.F
 
             use get_env_module
 
