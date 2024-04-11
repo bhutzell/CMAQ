@@ -491,9 +491,9 @@
 #else
       IF( LVEXT ) THEN
           LVEXT = .FALSE.
-          WRITE( OUTDEV,'(A)')'Option to extract a Vertical Column of Ouptut Data set to YES'
+          WRITE( OUTDEV,'(A)')'Option to extract a Vertical Column of Output Data set to YES'
           WRITE( OUTDEV,'(A)')'However, the serial version cannot execute the option'
-          WRITE( LOGDEV,'(A)')'Option to extract a Vertical Column of Ouptut Data set to YES'
+          WRITE( LOGDEV,'(A)')'Option to extract a Vertical Column of Output Data set to YES'
           WRITE( LOGDEV,'(A)')'However, the serial version cannot execute the option'
       END IF
 #endif

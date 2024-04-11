@@ -63,7 +63,7 @@ C-----------------------------------------------------------------------
          USE UTILIO_DEFN
          USE CGRID_SPCS, ONLY : N_CGRID_SPC, CGRID_NAME, CGRID_MW
 #ifdef mpas
-         USE util_module, only : PROMPTFFILE, index1, str2real, sortic
+         USE util_module, only : index1, str2real, sortic
 #endif
 
          IMPLICIT NONE
@@ -163,10 +163,7 @@ C-----------------------------------------------------------------------
          SUCCESS = .TRUE.
 
 C Open speciation profiles file
-         RDEV = PROMPTFFILE(
-     &            'Enter logical name for Speciation Profiles file',
-     &            .TRUE., .TRUE., 'GSPRO', PNAME )
-
+         RDEV = GETEFILE( 'GSPRO', .TRUE., .TRUE., PNAME )
          IF ( SPPRO .EQ. 'DEFAULT' ) THEN 
             INDX = INDEX1( MECHNAME, NMECHS, BIOG_MECH_MAP%CHEMMECH )
             SPPRO = BIOG_MECH_MAP( INDX )%BIOGMECH

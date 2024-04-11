@@ -69,7 +69,7 @@ C-----------------------------------------------------------------------
       USE RUNTIME_VARS, ONLY : LOG_MESSAGE
 
       IMPLICIT NONE
-
+      INCLUDE SUBST_FILES_ID
 
       PUBLIC PT3D_INIT, GET_PT3D_EMIS
       PRIVATE
@@ -250,15 +250,14 @@ C get diagnostic files options
             ALLOCATE ( LDEV( NPTGRPS ), STAT = IOS )
             CALL CHECKMEM( IOS, 'LDEV', PNAME )
             LDEV = 0   ! array
-            WRITE( XMSG,94010 ) "Enter logical name for file containing " //
-     &                          "source id's of play files"
+!            WRITE( XMSG,94010 ) "Enter logical name for file containing " //
+!     &                          "source id's of play files"
             ALLOCATE ( PLAY_SRCID_NAME( NPTGRPS ), STAT = IOS )
             CALL CHECKMEM( IOS, 'PLAY_SRCID_NAME', PNAME )
             DO N = 1, NPTGRPS
                WRITE( REPSTR,'( "SRCIDLAY", I2.2, "_" )' ) N
                WRITE( PLAY_SRCID_NAME( N ),'( A, I2.2 )' ) REPSTR, MYPE   ! limited to 99 PE's
-               LDEV( N ) = PROMPTFFILE( XMSG, .FALSE., .TRUE.,
-     &                                  PLAY_SRCID_NAME( N ), PNAME )
+               LDEV( N ) = GETEFILE( PLAY_SRCID_NAME( N ), .FALSE., .TRUE., PNAME )
             END DO
          END IF
 #endif
@@ -267,14 +266,14 @@ C get diagnostic files options
          CALL CHECKMEM( IOS, 'RDEV', PNAME )
          RDEV = 0   ! array
          IF ( REP_LAYR .GT. 0 ) THEN
-            WRITE( XMSG,94010 ) 'Enter logical name for report of ' //
-     &                          'plumes exceeding layer', REP_LAYR
+!            WRITE( XMSG,94010 ) 'Enter logical name for report of ' //
+!     &                          'plumes exceeding layer', REP_LAYR
             ALLOCATE ( REPTNAME( NPTGRPS ), STAT = IOS )
             CALL CHECKMEM( IOS, 'REPTNAME', PNAME )
             DO N = 1, NPTGRPS
                WRITE( REPSTR,'( "REPRTLAY", I2.2, "_" )' ) N
                WRITE( REPTNAME( N ),'( A, I2.2 )' ) REPSTR, MYPE   ! limited to 99 PE's
-               RDEV( N ) = PROMPTFFILE( XMSG, .FALSE., .TRUE., REPTNAME( N ), PNAME )
+               RDEV( N ) = GETEFILE( REPTNAME( N ), .FALSE., .TRUE., PNAME )
             END DO
          END IF
 
@@ -285,14 +284,9 @@ C get scenario timing
 
 C open met files
 
-         MC2NAME = PROMPTMFILE( 'Enter name for CROSS-POINT SURFACE MET file',
-     &                          FSREAD3, 'MET_CRO_2D', PNAME )
-
-         MC3NAME = PROMPTMFILE( 'Enter name for CROSS-POINT LAYERED MET file',
-     &                          FSREAD3, 'MET_CRO_3D', PNAME )
-
-         MD3NAME = PROMPTMFILE( 'Enter name for DOT-POINT LAYERED MET file',
-     &                          FSREAD3, 'MET_DOT_3D', PNAME )
+         MC2NAME = MET_CRO_2D
+         MC3NAME = MET_CRO_3D
+         MD3NAME = MET_DOT_3D
 
 C Get grid parameters from 3-d cross-point met file and store header information.
 C Use time parameters for time defaults.
