@@ -48,10 +48,7 @@ C....................................................................
        use mio_module
        
        use prog_interrupt_module, M3WARN => prog_interrupt_warning,
-     &                             M3EXIT => prog_interrupt_exit,
-     &                             M3MESG => prog_interrupt_msg,
-     &                             M3MSG2 => prog_interrupt_msg,
-     &                             m3parag => prog_interrupt_nmsgs
+     &                            M3EXIT => prog_interrupt_exit
 
 
        INTEGER, PARAMETER :: XSTAT1 = 1
@@ -64,17 +61,17 @@ C....................................................................
 
        use replacement_util_module, only: time2sec, getefile, index1, sortic, findc
        
-         USE M3UTILIO, EXCLUDE_INTERPB => INTERP3,
-     &                 EXCLUDE_M3EXIT  => M3EXIT,
-     &                 EXCLUDE_M3WARN  => M3WARN,
-     &                 EXCLUDE_SHUT3   => SHUT3,
-     &                 EXCLUDE_WRITE3  => WRITE3,
-     &                 BUF_WRITE3      => WRITE3,
+         USE M3UTILIO, EXCLUDE_INTERPB  => INTERP3,
+     &                 EXCLUDE_M3EXIT   => M3EXIT,
+     &                 EXCLUDE_M3WARN   => M3WARN,
+     &                 EXCLUDE_SHUT3    => SHUT3,
+     &                 EXCLUDE_WRITE3   => WRITE3,
+     &                 BUF_WRITE3       => WRITE3,
      &                 exclude_time2sec => time2sec,
      &                 exclude_getefile => getefile,
-     &                 exclude_index1  => index1,
-     &                 exclude_findc   => findc,
-     &                 exclude_sortic  => sortic    
+     &                 exclude_index1   => index1,
+     &                 exclude_findc    => findc,
+     &                 exclude_sortic   => sortic    
 
          USE PARUTILIO, 
      &                  M3ERR   => PM3ERR,

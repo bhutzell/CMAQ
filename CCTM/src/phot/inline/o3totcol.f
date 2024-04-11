@@ -55,8 +55,7 @@
 
       character( 16 ), save :: tmfile = 'OMI'
       character( 16 ), save :: pname = 'O3TOTCOL'
-      character( 96 ) :: xmsg = ' '
-      character( 96 ) :: xmsgs( 3 )
+      character(240 ) :: xmsg = ' '
 
       integer :: allocstat
       integer :: ilat
@@ -212,11 +211,12 @@
                 xmsg = 'Requested date is beyond available data on OMI file:  <' 
      &              // dt2str( jenddate, 0 )
                 CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-                xmsgs( 1 ) = 'Total column ozone will be estimated from the corresponding Julian Day '
-                xmsgs( 2 ) = 'of the last available year on the '
-     &                    // 'OMI input file:' // dt2str( jtdate_temp, 0 ) // '<<---<<'
-                write(xmsgs( 3 ),'(A,F14.8)')'Exact date: ',tdate_temp
-                call m3parag ( 3, xmsgs )
+                write( xmsg, '(A, F14.8)')
+     &                 'Total column ozone will be estimated from the corresponding Julian Day '
+     &              // 'of the last available year on the '
+     &              // 'OMI input file:' // dt2str( jtdate_temp, 0 ) // '<<---<<'
+     &              // 'Exact date: ',tdate_temp
+                call LOG_MESSAGE( LOGDEV, xmsg )
              end if
            else if ( tdate .le. strdate ) then
 ! Submitted date is outside of ozone database range.
@@ -236,11 +236,10 @@
                 xmsg = 'Requested date preceeds available data on OMI file:  >' 
      &              // dt2str( jstdate, 0 )
                 CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-                xmsgs( 1 ) = 'Total column ozone will be estimated from the corresponding Julian Day'
-                xmsgs( 2 ) = 'of the next available year on the OMI input file:'
-     &                 // dt2str( jtdate_temp, 0 ) // '<<---<<'
-                xmsgs( 3 ) = ' '
-                call m3parag ( 3, xmsgs )
+                xmsg =   'Total column ozone will be estimated from the corresponding Julian Day '
+     &                // 'of the next available year on the OMI input file:'
+     &                // dt2str( jtdate_temp, 0 ) // '<<---<<'
+                call log_message ( logdev, xmsg ) 
              end if
 
 ! Submitted date falls within the satellite data measurement gap beginning
@@ -261,19 +260,17 @@
                 xmsg = 'Requested date falls within satellite data'
      &              // ' measurement gap: 24 Nov 1994 - 22 Jul 1996'
                 CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-                xmsgs( 1 ) = 'Total column ozone will be estimated from the corresponding Julian Day'
-                xmsgs( 2 ) = 'of the closest available year on the OMI input file:'
-     &                     // dt2str( jtdate_temp, 0 ) // '<<---<<'
-                xmsgs( 3 ) = ' '
-                call m3parag ( 3, xmsgs )
+                xmsg = 'Total column ozone will be estimated from the corresponding Julian Day '
+     &              // 'of the closest available year on the OMI input file:'
+     &              // dt2str( jtdate_temp, 0 ) // '<<---<<'
+                call log_message( logdev, xmsg ) 
              end if
            else
              if( jdate_prev .ne. jdate )then ! write message to log
-               xmsgs( 1 ) = 'Total column ozone will be interpolated to day '
-     &                    // dt2str( jdate, 0 )
-               xmsgs( 2 ) = 'from data available on the OMI input file'
-               xmsgs( 3 ) = ' '
-               call m3parag ( 3, xmsgs )
+               xmsg = 'Total column ozone will be interpolated to day '
+     &              // dt2str( jdate, 0 )
+     &              // ' from data available on the OMI input file'
+               call log_message( logdev, xmsg )
              end if  
            end if
 
