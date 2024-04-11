@@ -67,7 +67,8 @@
           subroutine daymon (jdate, mon, day)
 
 ! convert jdate in Julian date format into month and day
-
+! TO DO: add optional argument for climatological 365-day calendars
+          
             implicit none
 
             integer, intent(in) :: jdate
