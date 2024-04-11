@@ -111,7 +111,7 @@ C-----------------------------------------------------------------------
       USE BUDGET_DEFN
       USE AERO_DATA
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP
-      USE ELMO_PROC, ONLY : ELMO_DRIVER, WRITE_ELMO, MAP_ELMO
+      USE ELMO_PROC, ONLY : ELMO_DRIVER, WRITE_ELMO
       USE UTILIO_DEFN
       USE util_Family_module
       USE RUNTIME_VARS
@@ -550,8 +550,8 @@ C Initiliaze IO Arrays and Open Files
          call centralized_io_init
 #endif
 
-C Initialize ELMO Arrays and Maps
-         call map_elmo
+C Initialize Modules
+         call init_cctm_modules
 
 C Initialize MIO - placeholder
          if ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_file_input.txt' )
