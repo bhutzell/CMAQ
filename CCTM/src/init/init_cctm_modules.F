@@ -24,19 +24,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       
       IMPLICIT NONE
 
-      INTERFACE
-         SUBROUTINE INITSCEN ( CGRID, TSTEP )
-            REAL, POINTER            :: CGRID( :,:,:,: )
-            INTEGER, INTENT( OUT )   :: TSTEP( 3 )
-         END SUBROUTINE INITSCEN
-      
-
-      ! Initialize ELMO Arrays and Maps
-      call map_elmo
-
-      
 
 
-
-      END SUBROUTINE INIT_MIO_FILE_DATA
+      END SUBROUTINE INIT_CCTM_MODULES
 
