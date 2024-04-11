@@ -107,7 +107,7 @@
 
         use RUNTIME_VARS, only : LTNG_NO, STDATE, STTIME, ABFLUX, MOSAIC, 
      &                           NPTGRPS, USE_MARINE_GAS_EMISSION, logdev,
-     &                           CONVECTIVE_SCHEME, EMIS_SYM_DATE, LOG_MESSAGE
+     &                           CONVECTIVE_SCHEME, EMIS_SYM_DATE, LOG_MESSAGE, LOG_WARNING
         use CENTRALIZED_IO_UTIL_MODULE
         use get_env_module 
         USE UTILIO_DEFN
