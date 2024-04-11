@@ -702,7 +702,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "// options are" $text                                       >> $Cfile
  echo "Module misc;"                                               >> $Cfile
  echo                                                              >> $Cfile 
- 
+
  if ( $?ModMisc ) then
     echo "Module ${ModMisc};"                                      >> $Cfile
     echo                                                           >> $Cfile

@@ -2115,7 +2115,6 @@
      &           "GC_namelist is compatible with the PM diagnostics you have called "//
      &           "for in the Emmissions Control Namelist."
              !CALL LOG_MESSAGE( LOGDEV, XMSG )
-             !CALL M3WARN( 'MAP_ELMO_COEFFS', 0, 0, '' )
              ELMO_COEFFS( IDG )%L_GAS( IVAR )  = .FALSE.
           END IF
       
@@ -2173,7 +2172,6 @@
      &           "AE_namelist is compatible with the PM diagnostics you have called "//
      &           "for in the Emmissions Control Namelist."
              !CALL LOG_MESSAGE( LOGDEV, XMSG )
-             !CALL M3WARN( 'MAP_ELMO_COEFFS', 0, 0, '' )
           END IF
       END IF
       ELMO_COEFFS( IDG )%COEFF( IVAR ) = COEFF

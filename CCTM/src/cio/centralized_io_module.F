@@ -107,7 +107,7 @@
 
         use RUNTIME_VARS, only : LTNG_NO, STDATE, STTIME, ABFLUX, MOSAIC, 
      &                           NPTGRPS, USE_MARINE_GAS_EMISSION, logdev,
-     &                           CONVECTIVE_SCHEME, EMIS_SYM_DATE
+     &                           CONVECTIVE_SCHEME, EMIS_SYM_DATE, LOG_MESSAGE, LOG_WARNING
         use CENTRALIZED_IO_UTIL_MODULE
         use get_env_module 
         USE UTILIO_DEFN
@@ -701,7 +701,7 @@
 ! lufrac cro file
           IF ( .NOT. OPEN3( LUFRAC_CRO, FSREAD3, PNAME ) ) THEN
              XMSG = 'Could not open '// LUFRAC_CRO // ' file'
-             CALL M3WARN ( PNAME, 0, 0, XMSG )
+             CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
              LUCRO_AVAIL = .FALSE.
              XMSG = 'Solution: Reading Land Use Fractions from GRID_CRO_2D file'
              WRITE(LOGDEV,'(5X,A)')TRIM( XMSG )
@@ -1590,9 +1590,9 @@
                          cio_grid_data(begin:end) = 0.0
                          XMSG = 'MCIP files indicate no convective parameterization was '
      &                          // 'used in the WRF simulation'
-                         CALL M3WARN (PNAME, JDATE, JTIME, XMSG)
+                         CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                          XMSG = 'Processing will continue without subgrid clouds'
-                         CALL M3MESG (XMSG)
+                         CALL LOG_MESSAGE( LOGDEV , XMSG)
                       else
                          where (cio_grid_data(begin:end) .lt. 0.0) cio_grid_data(begin:end) = 0.0
                       end if
@@ -2072,7 +2072,7 @@
      &                                         0, 0, DESID_REG_FAC( 1,1,DESID_N_REG ) ) ) Then
                               XMSG = 'Could not read ' // VNAME3D(IVAR) //
      &                               'from file ' // FILENAMES( IFILE ) 
-                              CALL M3WARN ( PNAME, 0, 0, XMSG )
+                              CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                            End If
 #endif
 
@@ -2092,7 +2092,7 @@
      &                                   0, 0, DESID_REG_FAC( 1,1,DESID_N_REG ) ) ) Then
                         XMSG = 'Could not read ' // VNAME //
      &                         'from file ' // FILENAMES( IFILE ) 
-                        CALL M3WARN ( PNAME, 0, 0, XMSG )
+                        CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                      End If
 #endif
 
@@ -4975,14 +4975,14 @@ C   mminlu and num_land_cat are WRF global variables
 
              IF ( .NOT. OPEN3( cio_stack_file_name( pt ), FSREAD3, PNAME ) ) THEN
                 XMSG = 'Could not open '// TRIM( cio_stack_file_name( pt ) ) // ' file'
-                CALL M3MESG( XMSG )
+                CALL LOG_MESSAGE( LOGDEV ,  XMSG )
              END IF
              n_opened_file = n_opened_file + 1
              f_stk_emis(pt) = n_opened_file
 
              IF ( .NOT. DESC3( cio_stack_file_name( pt ) ) ) THEN
                 XMSG = 'Could not get ' // TRIM( cio_stack_file_name( pt ) ) // ' file description'
-                CALL M3MESG( XMSG )
+                CALL LOG_MESSAGE( LOGDEV ,  XMSG )
              END IF
 
              n_cio_stack_emis_vars(pt) = nvars3d
@@ -5047,7 +5047,7 @@ C   mminlu and num_land_cat are WRF global variables
           do pt = 1, NPTGRPS
              IF ( .NOT. DESC3( cio_stack_file_name( pt ) ) ) THEN
                 XMSG = 'Could not get ' // TRIM( cio_stack_file_name( pt ) ) // ' file description'
-                CALL M3MESG( XMSG )
+                CALL LOG_MESSAGE( LOGDEV ,  XMSG )
              END IF
 
              cio_stack_var_name(1:nvars3d, pt) = vname3d(1:nvars3d)
@@ -5091,13 +5091,13 @@ C   mminlu and num_land_cat are WRF global variables
 
           IF ( .NOT. OPEN3( biogemis_fname, FSREAD3, PNAME ) ) THEN
              XMSG = 'Could not open ' // trim(biogemis_fname) // ' file'
-             CALL M3MESG( XMSG )
+             CALL LOG_MESSAGE( LOGDEV ,  XMSG )
           END IF
           n_opened_file = n_opened_file + 1
 
           IF ( .NOT. DESC3( biogemis_fname ) ) THEN
              XMSG = 'Could not get ' // trim(biogemis_fname) // ' file description'
-             CALL M3MESG( XMSG )
+             CALL LOG_MESSAGE( LOGDEV ,  XMSG )
           END IF
 
           call subhfile ( biogemis_fname, gxoff, gyoff,
@@ -5143,7 +5143,7 @@ C Read the various categories of normalized emissions
 
           IF ( .NOT. OPEN3( fname, FSREAD3, PNAME ) ) THEN
              MESG = 'Could not open ' // trim(fname) // ' file '
-             CALL M3MESG( MESG )
+             CALL LOG_MESSAGE( LOGDEV ,  MESG )
           END IF
           n_opened_file = n_opened_file + 1
 
@@ -5205,7 +5205,7 @@ C Read the various categories of normalized emissions
 
           IF ( .NOT. OPEN3( E2C_LU, FSREAD3, PNAME ) ) THEN
              mesg = 'Could not open ' // trim(E2C_LU) // ' file'
-             CALL M3MESG( mesg )
+             CALL LOG_MESSAGE( LOGDEV ,  mesg )
           END IF
           n_opened_file = n_opened_file + 1
 

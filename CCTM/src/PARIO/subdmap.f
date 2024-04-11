@@ -70,6 +70,7 @@ C .......................................................................
 
 !     USE PIOMAPS_MODULE
       USE M3UTILIO              ! i/o api
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_WARNING
 
       IMPLICIT  NONE
 
@@ -115,14 +116,14 @@ C Allocate arrays.
       ALLOCATE ( NCOLS_WE( NPCOL ), STAT=IERR )
       IF ( IERR .NE. 0 ) THEN
          MSG = 'Error allocating NCOLS_WE.'
-         CALL M3WARN ( 'SUBDMAP', 0, 0, MSG )
+         CALL LOG_WARNING ( 'SUBDMAP', LOGDEV, MSG )
          RETURN
       END IF
 
       ALLOCATE ( NROWS_SN( NPROW ), STAT=IERR )
       IF ( IERR .NE. 0 ) THEN
          MSG = 'Error allocating NCOLS_SN.'
-         CALL M3WARN ( 'SUBDMAP', 0, 0, MSG )
+         CALL LOG_WARNING ( 'SUBDMAP', LOGDEV, MSG )
          RETURN
       END IF
 
@@ -212,13 +213,13 @@ C Free memory allocated for dynamic arrays.
       DEALLOCATE ( NCOLS_WE, STAT=IERR )
       IF ( IERR .NE. 0 ) THEN
          MSG = 'Error deallocating NCOLS_WE.'
-         CALL M3WARN ( 'SUBDMAP', 0, 0, MSG )
+         CALL LOG_WARNING( 'SUBDMAP', LOGDEV, MSG )
       END IF
 
       DEALLOCATE ( NROWS_SN, STAT=IERR )
       IF ( IERR .NE. 0 ) THEN
          MSG = 'Error deallocating NROWS_SN.'
-         CALL M3WARN ( 'SUBDMAP', 0, 0, MSG )
+         CALL LOG_WARNING( 'SUBDMAP', LOGDEV, MSG )
       END IF
 
       RETURN

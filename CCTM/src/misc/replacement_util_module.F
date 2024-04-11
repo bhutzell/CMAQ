@@ -1137,101 +1137,106 @@
 
           end function poly
 
+
+
 ! -------------------------------------------------------------------------
-        INTEGER FUNCTION INIT3 ( )
 
-        use universal_data_module
+!        INTEGER FUNCTION INIT3 ( )
+!
+!        !use universal_data_module
+!        use logdev_mod
+!
+!      IMPLICIT NONE
+!
+!!       INTEGER, EXTERNAL :: INITLOG3, JUNIT
+!!       EXTERNAL          :: INITBLK3        !!  BLOCK DATA to initialize STATE3 commons
+!
+!        CHARACTER*16, PARAMETER:: SCENFILE = 'SCENFILE'
+!        CHARACTER*64, PARAMETER :: NOTICE( 17 ) = (/
+!     &'                                                              ',
+!     &'This program uses the EPA-AREAL/MCNC-EnvPgms/BAMS Models-3    ',
+!     &'I/O Applications Programming Interface, [I/O API] which is    ',
+!     &'built on top of the netCDF I/O library (Copyright 1993, 1996  ',
+!     &'University Corporation for Atmospheric Research/Unidata       ',
+!     &'Program) and the PVM parallel-programming library (from       ',
+!     &'Oak Ridge National Laboratory).  Copyright (C) 1992-2002 MCNC ',
+!     &'and Carlie J. Coats, Jr., and 2003-2006 Baron Advanced        ',
+!     &'Meteorological Systems, LLC and released under the GNU LGPL   ',
+!     &'License, version 2.1.  See URL                                ',
+!     &'                                                              ',
+!     &'    http://www.baronams.com/products/ioapi/LGPL.txt           ',
+!     &'                                                              ',
+!     &'for conditions of use.                                        ',
+!     &'                                                              ',
+!     &'Library release tag: $JDate: 2010068 $                        ',
+!     &'                                                              '
+!     &   /)
+!
+!
+!C...........   SCRATCH LOCAL VARIABLES and their descriptions:
+!
+!        CHARACTER*512   EQNAME
+!        INTEGER         I, J, IOST, IDEV
+!        LOGICAL         AFLAG
+!
+!        CHARACTER *80 VARVER
+!        CHARACTER *80 NCFVER
+!        CHARACTER *80, PARAMETER :: IOAPILIBVER =
+!     &             '$Id: @(#) ioapi library version 3.1'
+!     &             // ' $'
+!
+!        logical, save :: finit3 = .false.
+!
+!C***********************************************************************
+!C   begin body of subroutine  INIT3
+!
+!#if defined(__sgi)    || defined(__mips__)
+!
+!        !!==========>  *HACK*  to deal with SGI v7.4  compilers, that
+!        !!             do not follow industry standards with respect
+!        !!             to how to make sure that BLOCK DATA modules are
+!        !!             properly linked into an executable:
+!
+!        CALL INITBLK3
+!
+!#endif
+!
+!        IF ( FINIT3 ) THEN
+!            INIT3 = LOGDEV
+!            RETURN           !  M3 I/O already set up
+!        END IF
+!
+!        LOGDEV = INITLOG3( 'INIT3' )
+!
+!        WRITE (LOGDEV, '( 5X, A )' ) ' '
+!
+!	CALL FLUSH( LOGDEV )
+!
+!        FINIT3 = .TRUE.
+!        INIT3  = LOGDEV
+!
+!        RETURN
+!
+!
+!C******************  FORMAT  STATEMENTS   ******************************
+!
+!C...........   Error and warning message formats..... 91xxx
+!
+!91010   FORMAT ( //5X , '*** ERROR ABORT in subroutine INIT3 ***',
+!     &            /5X , A , I3, :,
+!     &            /5X , A , A , // )
+!
+!91020   FORMAT ( //5X , '>>> WARNING in subroutine INIT3 <<<',
+!     &            /5X , A , I3, :,
+!     &            /5X , A , A , // )
+!
+!91030   FORMAT ( //5X , '>>> WARNING in subroutine INIT3 <<<',
+!     &            /5X , A , I3, :,
+!     &            /5X , A , A , // )
+!
+!
+!        END FUNCTION INIT3
 
-      IMPLICIT NONE
-
-!       INTEGER, EXTERNAL :: INITLOG3, JUNIT
-!       EXTERNAL          :: INITBLK3        !!  BLOCK DATA to initialize STATE3 commons
-
-        CHARACTER*16, PARAMETER:: SCENFILE = 'SCENFILE'
-        CHARACTER*64, PARAMETER :: NOTICE( 17 ) = (/
-     &'                                                              ',
-     &'This program uses the EPA-AREAL/MCNC-EnvPgms/BAMS Models-3    ',
-     &'I/O Applications Programming Interface, [I/O API] which is    ',
-     &'built on top of the netCDF I/O library (Copyright 1993, 1996  ',
-     &'University Corporation for Atmospheric Research/Unidata       ',
-     &'Program) and the PVM parallel-programming library (from       ',
-     &'Oak Ridge National Laboratory).  Copyright (C) 1992-2002 MCNC ',
-     &'and Carlie J. Coats, Jr., and 2003-2006 Baron Advanced        ',
-     &'Meteorological Systems, LLC and released under the GNU LGPL   ',
-     &'License, version 2.1.  See URL                                ',
-     &'                                                              ',
-     &'    http://www.baronams.com/products/ioapi/LGPL.txt           ',
-     &'                                                              ',
-     &'for conditions of use.                                        ',
-     &'                                                              ',
-     &'Library release tag: $JDate: 2010068 $                        ',
-     &'                                                              '
-     &   /)
-
-
-C...........   SCRATCH LOCAL VARIABLES and their descriptions:
-
-        CHARACTER*512   EQNAME
-        INTEGER         I, J, IOST, IDEV
-        LOGICAL         AFLAG
-
-        CHARACTER *80 VARVER
-        CHARACTER *80 NCFVER
-        CHARACTER *80, PARAMETER :: IOAPILIBVER =
-     &             '$Id: @(#) ioapi library version 3.1'
-     &             // ' $'
-
-        logical, save :: finit3 = .false.
-
-C***********************************************************************
-C   begin body of subroutine  INIT3
-
-#if defined(__sgi)    || defined(__mips__)
-
-        !!==========>  *HACK*  to deal with SGI v7.4  compilers, that
-        !!             do not follow industry standards with respect
-        !!             to how to make sure that BLOCK DATA modules are
-        !!             properly linked into an executable:
-
-        CALL INITBLK3
-
-#endif
-
-        IF ( FINIT3 ) THEN
-            INIT3 = LOGDEV
-            RETURN           !  M3 I/O already set up
-        END IF
-
-        LOGDEV = INITLOG3( 'INIT3' )
-
-        WRITE (LOGDEV, '( 5X, A )' ) ' '
-
-	CALL FLUSH( LOGDEV )
-
-        FINIT3 = .TRUE.
-        INIT3  = LOGDEV
-
-        RETURN
-
-
-C******************  FORMAT  STATEMENTS   ******************************
-
-C...........   Error and warning message formats..... 91xxx
-
-91010   FORMAT ( //5X , '*** ERROR ABORT in subroutine INIT3 ***',
-     &            /5X , A , I3, :,
-     &            /5X , A , A , // )
-
-91020   FORMAT ( //5X , '>>> WARNING in subroutine INIT3 <<<',
-     &            /5X , A , I3, :,
-     &            /5X , A , A , // )
-
-91030   FORMAT ( //5X , '>>> WARNING in subroutine INIT3 <<<',
-     &            /5X , A , I3, :,
-     &            /5X , A , A , // )
-
-
-        END FUNCTION INIT3
 
 C-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -1246,78 +1251,79 @@ C-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #endif
 
 ! ------------------------------------------------------------------------------
-        INTEGER FUNCTION INITLOG3 ( CALLER )
-
-         use universal_data_module
-         use get_env_module
-
-      IMPLICIT NONE
-
-C...........   ARGUMENT and its description:
-
-        CHARACTER*(*), INTENT(IN   ) :: CALLER
-
-C...........   EXTERNAL FUNCTIONS and their descriptions:
-
-!       INTEGER, EXTERNAL :: JUNIT
-!       EXTERNAL          :: INITBLK3
-
-
-C...........   SCRATCH LOCAL VARIABLES and their descriptions:
-
-        CHARACTER*512   EQNAME
-        CHARACTER*256   MESG            !  message/warning buffer
-
-        INTEGER         L, IOST
-
-C...........   SAVED LOCAL VARIABLES and their descriptions:
-C...........   NOTE:  the ANSI standard requires the use of SAVE statements
-C...........   for variables which must retain their values from call to call.
-
-        CHARACTER*16, PARAMETER :: LOGFILE = 'LOGFILE'
-
-
-C***********************************************************************
-C   begin body of subroutine  INITLOG
-
-#if defined(__sgi)    || defined(__mips__)
-
-        !!==========>  *HACK*  to deal with SGI v7.4 or later compilers,
-        !!             that do not follow industry standards with respect
-        !!             to how to make sure that BLOCK DATA modules are
-        !!             properly linked into an executable:
-
-        CALL INITBLK3
-
-#endif
-
-        IF ( LOGDEV .LT. 0 ) THEN
-
-                LOGDEV = JUNIT()
-                OPEN ( UNIT    =  LOGDEV,
-     &                 IOSTAT  =  IOST,
-     &                 FILE    =  mylogfile_name,
-     &                 STATUS  =  'NEW',
-     &                 ACCESS  =  'SEQUENTIAL')
-
-            IF ( IOST .NE. 0 ) THEN
-                MESG =TRIM( CALLER ) // '/INITLOG3'
-                WRITE( *, '( /, 5X, 3 A )' )
-     &                    '***  ERROR in ', TRIM( MESG ), '  ***'
-                WRITE( *, '( 5X, A, I10 )' )
-     &                    'Error opening log file on unit', LOGDEV,
-     &                    'I/O STATUS =', IOST
-                WRITE( *, '( 5X, 2 A, / )' )
-     &                    'File: ', TRIM( EQNAME )
-                stop
-            END IF
-
-        END IF          !  if logdev < 0
-
-        INITLOG3 = LOGDEV
-
-        RETURN
-
-        END FUNCTION INITLOG3
+!        INTEGER FUNCTION INITLOG3 ( CALLER )
+!
+!         use universal_data_module
+!         use logdev_mod
+!         use get_env_module
+!
+!      IMPLICIT NONE
+!
+!C...........   ARGUMENT and its description:
+!
+!        CHARACTER*(*), INTENT(IN   ) :: CALLER
+!
+!C...........   EXTERNAL FUNCTIONS and their descriptions:
+!
+!!       INTEGER, EXTERNAL :: JUNIT
+!!       EXTERNAL          :: INITBLK3
+!
+!
+!C...........   SCRATCH LOCAL VARIABLES and their descriptions:
+!
+!        CHARACTER*512   EQNAME
+!        CHARACTER*256   MESG            !  message/warning buffer
+!
+!        INTEGER         L, IOST
+!
+!C...........   SAVED LOCAL VARIABLES and their descriptions:
+!C...........   NOTE:  the ANSI standard requires the use of SAVE statements
+!C...........   for variables which must retain their values from call to call.
+!
+!        CHARACTER*16, PARAMETER :: LOGFILE = 'LOGFILE'
+!
+!
+!C***********************************************************************
+!C   begin body of subroutine  INITLOG
+!
+!#if defined(__sgi)    || defined(__mips__)
+!
+!        !!==========>  *HACK*  to deal with SGI v7.4 or later compilers,
+!        !!             that do not follow industry standards with respect
+!        !!             to how to make sure that BLOCK DATA modules are
+!        !!             properly linked into an executable:
+!
+!        CALL INITBLK3
+!
+!#endif
+!
+!        IF ( LOGDEV .LT. 0 ) THEN
+!
+!                LOGDEV = JUNIT()
+!                OPEN ( UNIT    =  LOGDEV,
+!     &                 IOSTAT  =  IOST,
+!     &                 FILE    =  mylogfile_name,
+!     &                 STATUS  =  'NEW',
+!     &                 ACCESS  =  'SEQUENTIAL')
+!
+!            IF ( IOST .NE. 0 ) THEN
+!                MESG =TRIM( CALLER ) // '/INITLOG3'
+!                WRITE( *, '( /, 5X, 3 A )' )
+!     &                    '***  ERROR in ', TRIM( MESG ), '  ***'
+!                WRITE( *, '( 5X, A, I10 )' )
+!     &                    'Error opening log file on unit', LOGDEV,
+!     &                    'I/O STATUS =', IOST
+!                WRITE( *, '( 5X, 2 A, / )' )
+!     &                    'File: ', TRIM( EQNAME )
+!                stop
+!            END IF
+!
+!        END IF          !  if logdev < 0
+!
+!        INITLOG3 = LOGDEV
+!
+!        RETURN
+!
+!        END FUNCTION INITLOG3
 
         end module replacement_util_module

@@ -200,7 +200,7 @@ C species names, and to store the units for mass-based and mole-based conversion
                WRITE( MESG, 94010 )
      &               'I/O error', IOS, 'reading speciation profile ' //
      &               'file at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -219,7 +219,7 @@ C Check for header start
             ELSE IF ( NDX .GT. 0 ) THEN
                WRITE( MESG,94010 ) 'Header end found before header ' //
      &                             'started at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -248,7 +248,7 @@ C Check width of character fields of fixed length
             IF ( N .GT. 16 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Speciation profile code ' //
      &                'exceeds max width of 16 characters at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -256,7 +256,7 @@ C Check width of character fields of fixed length
             IF ( N .GT. 16 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Pollutant name ' //
      &                'exceeds max characters of 16 at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -264,14 +264,14 @@ C Check width of character fields of fixed length
             IF ( N .GT. 16 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Species name ' //
      &                 'exceeds max characters of 16 at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
 C Make sure divisor factor is not zero
             IF ( SDIV .EQ. 0.0 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Zero divisor found at line ', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -287,9 +287,9 @@ C none found (skip entry).  Record number and position of all matches.
                   ELSE      ! Max of 10 profile pollutant names per biotype
                      MESG = 'ERROR: Exceeded max pollutant names' //
      &                      'per biotype in ' // PNAME
-                     CALL M3MSG2( MESG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MESG )
                      MESG = 'Quitting'
-                     CALL M3MESG( MESG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MESG )
                      SUCCESS = .FALSE.; RETURN
                   END IF
                END IF
@@ -330,7 +330,7 @@ C species-per-pollutant counter and add species to list.
                      TMPNAMES( K,IPOS( M ) ) = SPECNM
                   ELSE
                      MESG = 'ERROR: Exceeded TMPNAMES dimension'
-                     CALL M3MESG( MESG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MESG )
                      SUCCESS = .FALSE.; RETURN
                   END IF
                   NSPECA( IPOS( M ) ) = K
@@ -344,13 +344,13 @@ C species-per-pollutant counter and add species to list.
          IF ( POL .EQ. 0 ) THEN
             MESG = 'ERROR: No pollutants found in speciation ' //
      &             'profiles that match the inventory!'
-            CALL M3MESG( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
             SUCCESS = .FALSE.; RETURN
          END IF
 
          IF ( ISP .EQ. 0 ) THEN
             MESG = 'ERROR: No species found in speciation profile!'
-            CALL M3MESG( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -483,7 +483,7 @@ C conversions
                WRITE( MESG, 94010 )
      &              'I/O error', IOS, 'reading speciation profile ' //
      &              'file at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 

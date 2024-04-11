@@ -455,7 +455,7 @@ C -----------------------------------------------------
       ELSE ! add things until it dies
       WRITE( MESG,*) 'BDSNP testing terms'
       
-      !!CALL M3MESG(MESG)
+      !!CALL LOG_MESSAGE( LOGDEV , MESG)
          DO R = 1, NROWS
          DO C = 1, NCOLS
             K = BDSNP_LANDTYPE( C,R ) !Skip LANDTYPE not present
@@ -489,13 +489,13 @@ C     &                       PFACTOR( C,R ), DRYPERIOD( C,R ) )
 
       SOILMPREV = SOILM !save soilM array to soilMprev for next time step
       MESG = 'BDSNP calculated emissions'
-      !CALL M3MESG(MESG)
+      !CALL LOG_MESSAGE( LOGDEV , MESG)
       CALL CPU_TIME(TIMECHECK)
       WRITE(MESG,*)  'PROCESS TOOK:', TIMECHECK, 'SECONDS'
-      !CALL M3MESG(MESG)
+      !CALL LOG_MESSAGE( LOGDEV , MESG)
       EMPOLAVG = EMPOLSUM/FLOAT(NCOLS*NROWS)
       WRITE( MESG,*) 'average value:', EMPOLAVG
-      !CALL M3MESG(MESG)
+      !CALL LOG_MESSAGE( LOGDEV , MESG)
       EMPOLSUM = 0d0 !array
   
       RETURN

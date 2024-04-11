@@ -53,7 +53,7 @@ C-----------------------------------------------------------------------
 
       USE PIOMAPS_MODULE
       USE M3UTILIO              ! i/o api
-      USE RUNTIME_VARS , ONLY : PWRTFLAG
+      USE RUNTIME_VARS , ONLY : PWRTFLAG, LOG_WARNING
 
       IMPLICIT NONE
 
@@ -186,7 +186,7 @@ C Get file description.
          IF ( .NOT. DESC3( FNAME ) ) THEN
              MSG = 'Could not get '// TRIM( FNAME )
      &           // ' file description'
-             CALL M3WARN( 'PWRITE3', JDATE, JTIME, MSG )
+             CALL LOG_WARNING( 'PWRITE3', LOGDEV, MSG )
          END IF
 
       END IF
@@ -206,7 +206,7 @@ C Operation valid only for gridded files.
                   MSG = 'WRITE3 failed writing variable '
      &                // TRIM( VNAME )
      &                // ' to file '// TRIM( FNAME )
-                  CALL M3WARN( 'PWRITE3', JDATE, JTIME, MSG )
+                  CALL LOG_WARNING( 'PWRITE3', LOGDEV, MSG )
                   PWRITE3 = .FALSE.
                END IF
             END IF

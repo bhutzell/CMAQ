@@ -69,6 +69,7 @@ C Last updated: $Date: 2011/10/21 16:11:31 $
 C-----------------------------------------------------------------------
  
       USE UTILIO_DEFN
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
       IMPLICIT NONE
  
@@ -127,7 +128,7 @@ C-----------------------------------------------------------------------
       ALLOCATE ( TV( EMLAYS ), TF( EMLAYS ), STAT=STAT )
       IF ( STAT .NE. 0 ) THEN
          WRITE( XMSG, *) ' Cannot allocate TV and TF in PREPLM'
-         CALL M3MSG2( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          STOP
       END IF
 

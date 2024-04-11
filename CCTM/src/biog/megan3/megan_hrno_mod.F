@@ -172,7 +172,7 @@ C Check that grid description matches B3GRD file
             MESG = 'Grid in file "' // TRIM( MET_CRO_2D )
      &           // '" does not match grid in file ' // TRIM( MET_CRO_2D ) // '"'
 #ifdef twoway
-            CALL M3WARN( PNAME, 0, 0, MESG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 #else
             CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
 #endif

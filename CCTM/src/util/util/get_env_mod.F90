@@ -25,6 +25,7 @@
 !  2 Feb 2010 D.Wong: provided an optional outputing device option,
 !                     absorbed get_envlist function
 
+! To do: change logdev optional argument to a logical?         
         implicit none
 
         integer, parameter :: max_str_len = 10000
@@ -328,7 +329,7 @@
           if (present(in_logdev)) then
              loc_logdev = in_logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
            max_len = 16 * size( val_list )

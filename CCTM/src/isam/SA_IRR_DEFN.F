@@ -222,7 +222,7 @@ C=======================================================
               MSG = 'ISAM SPECIES: ' 
      &           // TRIM( FIND_IN_ISAM( S ) ) 
      &           // ' not found in CHEMISTRY_SPC array  '
-              CALL M3WARN( PNAME, 0, 0, MSG )
+              CALL LOG_WARNING( PNAME, LOGDEV , MSG)
               CYCLE
            END IF
            ISAM_CHEMISTRY_SPC = ISAM_CHEMISTRY_SPC
@@ -282,7 +282,7 @@ C..Save pointer for isam species found in chemistry species
            END IF
         ELSE
            MSG = 'NO ISAM species participate in photochemistry '
-           CALL M3WARN ( PNAME, 0, 0, MSG )
+           CALL LOG_WARNING( PNAME, LOGDEV , MSG)
         END IF
         L = 0
         DO S = 1, SPC

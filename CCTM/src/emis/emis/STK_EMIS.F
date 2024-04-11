@@ -121,13 +121,13 @@ C-----------------------------------------------------------------------
 
             IF ( .NOT. OPEN3( STKENAME( N ), FSREAD3, PNAME ) ) THEN
                XMSG = 'Could not open '// TRIM( STKENAME( N ) ) // ' file'
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
             IF ( .NOT. DESC3( STKENAME( N ) ) ) THEN
                XMSG = 'Could not get ' // TRIM( STKENAME( N ) ) // ' file description'
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 

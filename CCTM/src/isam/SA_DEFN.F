@@ -1693,7 +1693,7 @@ C...Map SA species for Advection
         END DO
         
         IF ( TRANS_WARN ) THEN
-          CALL M3WARN( 'GET_MAP_SAtoCGR', 0, 0, 'Species above are not transported.' )
+          CALL LOG_WARNING( 'GET_MAP_SAtoCGR', LOGDEV, 'Species above are not transported.' )
         END IF
 
 95000    FORMAT(2(I3,1X),A,L4,1X,I4)

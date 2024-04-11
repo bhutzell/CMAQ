@@ -215,7 +215,7 @@ C Set the dep vel surrogate pointers
             ELSE
                XMSG = 'Could not find ' // AE_DEPV( V ) // ' in aerosol' //
      &                ' surrogate table. >>> Dep vel set to zero <<< '
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                DEPV_SUR( V ) = 0
             END IF
          END DO

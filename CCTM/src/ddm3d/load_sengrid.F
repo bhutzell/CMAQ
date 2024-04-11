@@ -207,7 +207,7 @@ c           SPCNAME = GC_SPC( SPC )( 1:12 )
                  XMSG = 'No IC found for sensitivity '
      &                // SPCNAME  // ' in ' // TRIM(FNAME)
      &                // ' Set to zero.'
-                 CALL M3MESG ( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
                IF ( INDX( SENNUM ) .GT. 0 )
      &            WRITE( LOGDEV,1013 ) INDX( SPC ), GC_SPC( SPC )
@@ -231,7 +231,7 @@ c           SPCNAME = AE_SPC( SPC )( 1:12 )
                  XMSG = 'No IC found for sensitivity ' 
      &                // SPCNAME  // ' in ' // TRIM(FNAME) 
      &                // ' Set to zero.'
-                 CALL M3MESG ( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
                IF ( INDX( SENNUM ) .GT. 0 )
      &            WRITE( LOGDEV,1013 ) INDX( SPC ), AE_SPC( SPC )
@@ -255,7 +255,7 @@ c           SPCNAME = NR_SPC( SPC )( 1:12 )
                  XMSG = 'No IC found for sensitivity '
      &                // SPCNAME  // ' in ' // TRIM(FNAME)
      &                // ' Set to zero.'
-                 CALL M3MESG ( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
                IF ( INDX( SENNUM ) .GT. 0 )
      &            WRITE( LOGDEV,1013 ) INDX( SPC ), NR_SPC( SPC )
@@ -279,7 +279,7 @@ c           SPCNAME = TR_SPC( SPC )( 1:12 )
                  XMSG = 'No IC found for sensitivity '
      &                // SPCNAME  // ' in ' // TRIM(FNAME)
      &                // ' Set to zero.'
-                 CALL M3MESG ( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
                IF ( INDX( SENNUM ) .GT. 0 )
      &            WRITE( LOGDEV,1013 ) INDX( SPC ), NR_SPC( SPC )

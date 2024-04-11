@@ -126,7 +126,7 @@ C Retrieve the process analysis subdomain dimensions:
      &              PA_BEGROW .LT. 1 .OR. PA_ENDROW .GT. GL_NROWS .OR.
      &              PA_BEGLEV .LT. 1 .OR. PA_ENDLEV .GT. NLAYS ) THEN
                   XMSG = 'Process Analysis domain inconsistent with CTM domain' 
-                  CALL M3WARN ( PNAME, 0, 0, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
 
@@ -147,7 +147,7 @@ C Determine IPR subgrid mapping with data redistribution
      &                    NROWS_PE( NPROCS ), STAT = ALST )
                IF ( ALST .NE. 0 ) THEN
                   XMSG = '*** PA_NCOLS_PE or PA_NROWS_PE Memory allocation failed'
-                  CALL M3WARN ( PNAME, 0, 0, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
 
@@ -155,7 +155,7 @@ C Determine IPR subgrid mapping with data redistribution
      &                    ROWSZ_PE( 2,NPROCS ), STAT = ALST )
                IF ( ALST .NE. 0 ) THEN
                   XMSG = '*** COLSX_PE or ROWSX_PE Memory allocation failed'
-                  CALL M3WARN ( PNAME, 0, 0, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
 
@@ -172,7 +172,7 @@ C Construct the processor-to-subdomain map for IPR domain
      &                       STAT = ALST )
                   IF ( ALST .NE. 0 ) THEN
                      XMSG = '*** DELC Memory allocation failed'
-                     CALL M3WARN ( PNAME, 0, 0, XMSG )
+                     CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                      SUCCESS = .FALSE.; RETURN
                   END IF
 
@@ -198,14 +198,14 @@ C Determine IRR subgrid mapping without data redistribution
      &                       STAT = ALST )
                   IF ( ALST .NE. 0 ) THEN
                      XMSG = '*** IRROUT Memory allocation failed'
-                     CALL M3WARN ( PNAME, 0, 0, XMSG )
+                     CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                      SUCCESS = .FALSE.; RETURN
                   END IF
 
                   ALLOCATE ( DBUFF( MY_PACOLS,MY_PAROWS,PALEVS ), STAT = ALST )
                   IF ( ALST .NE. 0 ) THEN
                      XMSG = 'ERROR allocating DBUFF'
-                     CALL M3WARN ( PNAME, 0, 0, XMSG )
+                     CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                      SUCCESS = .FALSE.; RETURN
                   ENDIF
 
@@ -221,7 +221,7 @@ C Determine IRR subgrid mapping without data redistribution
                PA_ENDLEV = 1
 
                XMSG = 'No Process Analysis for this run'
-               CALL M3WARN ( PNAME, 0, 0, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .TRUE.; RETURN
 
             END IF
@@ -229,7 +229,7 @@ C Determine IRR subgrid mapping without data redistribution
          ELSE   ! called more than once
 
             XMSG = 'Horizontal domain dependent variables already allocated'
-            CALL M3WARN ( PNAME, 0, 0, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
 
          END IF   ! FIRSTIME

@@ -210,7 +210,7 @@ C Check that grid description matches BGRD file
          IF ( .NOT. CHKGRID( MET_CRO_2D ) ) THEN
             MESG = 'Grid in file "' // TRIM( MET_CRO_2D )
      &           // '" does not match previously set grid.'
-            CALL M3WARN( PNAME, 0, 0, MESG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MESG)
          END IF
 
          IF ( BEMIS_DIAG ) THEN
@@ -351,7 +351,7 @@ C calculate fseas based on deep soil temperature following WRF 3.8.1 PX
       END IF   ! if new day
 
       WRITE( MESG,94030 ) HHMMSS( JTIME )
-      CALL M3MSG2( MESG )
+      CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
 #ifndef mpas
 C repopulate the met_cro_2d variable attributes

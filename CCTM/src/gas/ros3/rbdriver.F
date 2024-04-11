@@ -215,7 +215,7 @@ C**********************************************************************
 
 
       IF ( NUMB_MECH_SPC .EQ. 0 ) THEN
-         CALL M3MESG( '*** WARNING: Gas-Chemistry processing bypassed!' )
+         CALL LOG_MESSAGE( LOGDEV ,  '*** WARNING: Gas-Chemistry processing bypassed!' )
          RETURN
       END IF
 
