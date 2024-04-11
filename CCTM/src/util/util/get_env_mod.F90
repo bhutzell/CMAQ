@@ -58,7 +58,7 @@
           if (present(logdev)) then
              loc_logdev = logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
           regular = .false.
@@ -98,7 +98,7 @@
           if (present(logdev)) then
              loc_logdev = logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
           regular = .false.
@@ -138,7 +138,7 @@
           if (present(logdev)) then
              loc_logdev = logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
           regular = .false.
@@ -179,7 +179,7 @@
           if (present(logdev)) then
              loc_logdev = logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
           regular = .false.
@@ -227,7 +227,7 @@
           if (present(logdev)) then
              loc_logdev = logdev
           else
-             loc_logdev = 6
+             loc_logdev = -1
           end if
 
           length = len(trim(loc_str))
@@ -293,7 +293,7 @@
 ! get a list env var (quoted string of items delimited by white space,
 ! commas or semi-colons) and parse out the items into variables. Two data
 ! types: character strings and integers (still represented as strings in
-! the env var vaules).
+! the env var values).
 ! Examples:
 ! 1)   setenv AVG_CONC_VARS "O3 NO NO2"
 ! 2)   setenv AVG_CONC_LAYS "2 5"          < start at two, end at 5
@@ -309,10 +309,6 @@
 ! 13 Dec 2013 J.Young: 1000 breaks BUFLEN in IOAPI's envgets.c. Change to 512.
 ! 17 Jun 2016 J.Young: IOAPI's envgets.c BUFLEN has been increased to 10000.
 ! 20 Jun 2016 J.Young: Forget IOAPI's envgets.c: use Fortran GETENV
-
-#ifndef mpas
-          use utilio_defn
-#endif
 
           character( * ),  intent ( in )  :: env_var
           integer,         intent ( out ) :: nvars
@@ -341,10 +337,10 @@
           call get_env( e_val, env_var, ' ', loc_logdev )
 
           if ( e_val .eq. " " ) then
-             xmsg = 'Environment variable ' // env_var // ' not set'
-#ifndef mpas
-             call LOG_WARNING( pname, logdev, xmsg)
-#endif
+             if ( loc_logdev .ge. 0 ) then
+                xmsg = 'Environment variable ' // env_var // ' not set'
+                write( loc_logdev, '(A)' ) xmsg
+             end if
              nvars = 0
              val_list = ''
              return
@@ -364,10 +360,10 @@
 201   continue
           ip = ip + 1
           if ( ip .gt. max_len ) then
-             xmsg = 'Environment variable value too long'
-#ifndef mpas
-             call m3exit( pname, 0, 0, xmsg, 2 )
-#endif
+             xmsg = 'Warning: Environment variable value too long'
+             write( loc_logdev, '(A)' ) xmsg
+             nvars = nvars + 1  ! this fail case not yet tested
+             go to 301
           end if
           chr = e_val( ip:ip )
           if ( chr .ne. ' ' .and.    &
@@ -391,4 +387,5 @@
 
         end subroutine get_envlist
 
+! --------------------------------------------------------------------------------
       end module get_env_module
