@@ -3491,6 +3491,7 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
       USE GRID_CONF
       USE VDIFF_MAP, ONLY : N_SPC_DIFF, DIFF_SPC, DIFF_MASK_GAS, DIFF_MASK_NR,
      &                      DIFF_MASK_AERO, DIFF_MASK_NUM, DIFF_MASK_SRF
+      USE MIO_ASCII
   
       IMPLICIT NONE
   
@@ -3553,6 +3554,20 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
      &                   TRIM(DESID_DIAG_LAB( IDIAG ) ) 
           FDESC3D( 2:MXDESC3 ) = ''
   
+          ! Store MIO Metadata
+          NDIMS3D( 1:NVARS3D ) = 4
+          L_TSTEP( 1:NVARS3D ) = .True.
+          L_LAY  ( 1:NVARS3D ) = .True.
+          L_COL  ( 1:NVARS3D ) = .True.
+          L_ROW  ( 1:NVARS3D ) = .True.
+          L_VEXT ( 1:NVARS3D ) = .False.
+
+          CALL LOAD_MIO_FILE ( DESID_DIAG_LOGICAL( IDIAG ), NLAYS3D, 1, NLAYS3D,
+     &         VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &         VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &         L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &         L_VEXT(1:NVARS3D) )
+
           ! Open emissions stream diagnostic file
           IF ( .NOT. OPEN3( DESID_DIAG_LOGICAL( IDIAG ), FSNEW3, PNAME ) ) THEN
              XMSG = 'Could not create the ' // TRIM( DESID_DIAG_FILENAME( IDIAG ) ) // ' file'

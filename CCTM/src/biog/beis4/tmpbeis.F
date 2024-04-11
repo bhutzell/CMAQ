@@ -82,6 +82,7 @@ C-----------------------------------------------------------------------
       USE BIOG_EMIS             ! beis
       USE centralized_io_module, only : AVGEMIS, interpolate_var
       Use ASX_DATA_MOD, only: MET_DATA
+      USE MIO_ASCII
 
 #ifdef mpas
       USE util_module, only : hhmmss, time2sec
@@ -264,6 +265,21 @@ C Build description for, and open beis diagnostic file
             FDESC3D( 1 ) = 'Gridded biogenic emissions from CMAQ-BEIS3'
             FDESC3D( 2 ) = '/from/ ' // PNAME
             FDESC3D( 3 ) = '/Version/ CMAQ'
+
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'B3GTS_S', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+
 
 C Open mass output file (tons/hour)
 

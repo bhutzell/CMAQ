@@ -94,11 +94,6 @@ C environment variable for no. of layers from bottom to save on CONC file
 
 C  environment variable description
       CHARACTER( 80 ) :: VARDESC
-      INTEGER, ALLOCATABLE :: NDIMS3D(:)
-      LOGICAL, ALLOCATABLE :: L_TSTEP(:)
-      LOGICAL, ALLOCATABLE :: L_LAY(:)
-      LOGICAL, ALLOCATABLE :: L_COL(:)
-      LOGICAL, ALLOCATABLE :: L_ROW(:)
 
       INTEGER      K, KD, L, SPC, V, VAR   ! loop counters
       INTEGER      STRT, FINI         ! loop counters
@@ -247,18 +242,18 @@ C Set output file characteristics based on COORD.EXT and open it
       END IF
 
       ! Store MIO Metadata
-      ALLOCATE( NDIMS3D( N_CONC_VARS ), L_TSTEP( N_CONC_VARS ),
-     &          L_LAY( N_CONC_VARS ), L_COL( N_CONC_VARS ),
-     &          L_ROW( N_CONC_VARS ) )
-      NDIMS3D( : ) = 4
-      L_TSTEP( : ) = .True.
-      L_LAY  ( : ) = .True.
-      L_COL  ( : ) = .True.
-      L_ROW  ( : ) = .True.
+      NDIMS3D( 1:NVARS3D ) = 4
+      L_TSTEP( 1:NVARS3D ) = .True.
+      L_LAY  ( 1:NVARS3D ) = .True.
+      L_COL  ( 1:NVARS3D ) = .True.
+      L_ROW  ( 1:NVARS3D ) = .True.
+      L_VEXT ( 1:NVARS3D ) = .False.
 
       CALL LOAD_MIO_FILE ( 'CTM_CONC_1', NLAYS3D, CONC_BLEV, CONC_ELEV,
-     &     VNAME3D, TYPE3D, UNITS3D, VDESC3D, NDIMS3D, 
-     &     L_TSTEP, L_LAY, L_COL, L_ROW )
+     &     VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D), 
+     &     VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D), 
+     &     L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &     L_VEXT(1:NVARS3D) )
 
 C create header
 
