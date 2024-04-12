@@ -23,6 +23,7 @@
 !         leap_year  quicksort_partition  quicksort  date_time_minus_sec
 
 ! History: David Wong, 04/2024 created
+!          Bill Hutzell, 04/2024 added implementation of GETDTTIME, named GETCDTTIME      
 ! -----------------------------------------------------------------------------
 
         module replacement_util_module
@@ -67,7 +68,8 @@
           subroutine daymon (jdate, mon, day)
 
 ! convert jdate in Julian date format into month and day
-
+! TO DO: add optional argument for climatological 365-day calendars
+          
             implicit none
 
             integer, intent(in) :: jdate
@@ -102,16 +104,28 @@
           integer function julian (year, month, day)
 
 ! convert year month day to Julian date (without year) format
-
+          
+! TO DO: handle climatological 365-day years.
+!        Maybe rather than optional argument, use a module variable for calendar type
+!        What should ERRVAL be set to?
+          
             implicit none
 
             integer, intent(in) :: year, month, day
 
             integer, parameter :: numday(12) =
      &                            (/ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /)
-
             integer :: i, temp_julian
 
+            integer,parameter  :: ERRVAL = -1  
+            if ( month .le. 0 .or. month .gt. 12 .or. day .le. 0 ) then
+               julian = ERRVAL
+               return
+            else if ( day .gt. numday(month) ) then
+               julian = ERRVAL
+               return
+            end if
+            
             i = 1
             temp_julian= 0
             do while (i < month)
@@ -132,8 +146,9 @@
           integer function wkday ( jdate )
 
 ! determine the day of a week for a given Julian date
-
-! based on Zeller's Rule, Monday = 1, Tuseday = 2, ... Sunday = 7
+! based on Zeller's Rule, Monday = 1, Tuesday = 2, ... Sunday = 7
+! TO DO: add optional argument for climatological 365-day year.
+!        make some assumption regarding 'standard' year.
 
             integer, intent(in) :: jdate
 
@@ -171,8 +186,12 @@
 ! determine whether a given Julian date is in daylight saving time or not
 
 ! <  2007: first Sunday in April and the last Sunday in October
-! >= 2007: secnd Sunday in March and the first Sunday in November
+! >= 2007: second Sunday in March and the first Sunday in November
 
+! Gives slightly different bounds for DST from IOAPI, but I think this is correct.
+! 2023308 = Sat Nov 4 2023 TRUE, but IOAPI returns FALSE
+! 2024307 = Sat Nov 2 2024 TRUE, but IOAPI returns FALSE
+          
             integer, intent(in) :: jdate
 
             integer, parameter :: cut_off_year = 2006
@@ -273,25 +292,39 @@
           character*14 function mmddyy (jdate)
 
 ! convert a Julian date to mmddyy format
-
+! Modified to handle some error conditions.
+          
             integer, intent(in) :: jdate
 
             integer, parameter :: numdays (12) = (/ 31, 28 ,31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /)
             character (len = 4) :: month_name (12)  = (/ 'Jan.', 'Feb.', 'Mar.', 'Apr.', 'May ', 'Jun.', 
      &                                                 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.' /)
+            character (len = 14) :: errstr = "<DATE ERROR>"
                                                
             integer :: year, day, numjdays(12), i, j
             logical :: done
 
             year = jdate / 1000
+            if ( year .le. 0 ) then
+               mmddyy = errstr
+               return
+            end if
             day  = mod(jdate, 1000)
 
 ! compute number of jdays
             numjdays(1) = 1
             numjdays(2) = 32
             if (leap_year(year)) then
+               if (day .le. 0 .or. day .gt. 366) then
+                  mmddyy = errstr
+                  return
+               end if
                numjdays(3) = numjdays(2) + 29
             else
+               if (day .le. 0 .or. day .gt. 365) then
+                  mmddyy = errstr
+                  return
+               end if
                numjdays(3) = numjdays(2) + 28
             end if
             do i = 4, 12
@@ -324,14 +357,19 @@
 
 ! ------------------------------------------------------------------------------
           character*10 function hhmmss (jtime)
-
 ! convert jtime in hhmmss format to character string format
+! Modified to handle some error conditions.
 
             integer, intent(in) :: jtime
 
             integer :: hour, min, sec
+            character (len = 14) :: errstr = "<TIME ERROR>"
 
             hour = jtime / 10000
+            if (hour .lt. 0 .or. hour. gt. 99 .or. min .gt. 60 .or. sec .gt. 60) then
+               hhmmss = errstr
+               return
+            end if
             min  = mod(jtime, 10000) / 100
             sec  = mod(jtime,100)
 
@@ -358,7 +396,7 @@
           real function yr2day (year)
 
 ! compute the reciprocal of number of days in a given year
-
+! TO DO: add optional argument for climatological 365-day calendar
             integer, intent(in) :: year
 
             if (leap_year(year)) then
@@ -373,6 +411,7 @@
           subroutine nextime (jdate, jtime, dtime)
 
 ! adjust given jdate and jtime w.r.t dtime which is in hhmmss format
+! TO DO: crashes if dtime is negative and crosses year, e.g., 2024001, 0, -10000
 
             integer, intent(inout) :: jdate, jtime
             integer, intent(in)    :: dtime
@@ -1325,5 +1364,26 @@ C-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !        RETURN
 !
 !        END FUNCTION INITLOG3
+
+        SUBROUTINE GETCDTTIME(JDATE,JTIME)
+
+            IMPLICIT NONE
+            INTEGER, INTENT(INOUT) :: JDATE
+            INTEGER, INTENT(INOUT) :: JTIME
+
+            INTEGER        :: TSTEP, VALUES(8)
+
+! get local julian date and time
+           CALL DATE_AND_TIME(VALUES=VALUES)
+           JDATE = 1000 * VALUES(1) + JULIAN( VALUES(1), VALUES(2), VALUES(3) )
+           JTIME = 10000 * VALUES(5) + 100 * VALUES(6) + VALUES(7)
+
+! convert difference with UTC from whole minutes to HHMMSS format
+           TSTEP = 10000 * VALUES(4)/60 + 100 * MOD( VALUES(4),60 )
+
+! convert to GMT or UTC
+           CALL NEXTIME(JDATE, JTIME, -TSTEP)
+
+        END SUBROUTINE GETCDTTIME
 
         end module replacement_util_module
