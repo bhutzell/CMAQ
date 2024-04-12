@@ -465,6 +465,7 @@ C...open the photolysis rate diagnostic files
 #endif
 
          CALL SUBST_BARRIER
+         RETURN ! Added for MIO Implementation
 
       END IF  ! FIRSTIME
 

@@ -315,6 +315,11 @@ C Local variables:
             INTEGER, INTENT( INOUT ) :: JDATE, JTIME
             INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
          END SUBROUTINE SCIPROC
+         SUBROUTINE INIT_CCTM_MODULES ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+            REAL, POINTER            :: CGRID( :,:,:,: )
+            INTEGER, INTENT( INOUT ) :: JDATE, JTIME
+            INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
+         END SUBROUTINE INIT_CCTM_MODULES
 #ifdef mpas
          SUBROUTINE UNLOAD_CGRID ( CGRID )
             REAL, INTENT(IN)  :: CGRID( :,:,:,: )
@@ -778,12 +783,11 @@ C Main processing loop:
 
 
 C Initialize Modules
-         call init_cctm_modules
+         call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
 
 C Initialize MIO - placeholder
          if ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_file_input.txt' )
 !         call mio_init
-
 
       ! science process sequence:
          
