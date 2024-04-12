@@ -63,7 +63,8 @@ C....................................................................
 #ifdef parallel
 
        use replacement_util_module, only: getefile, index1, sortic, findc,
-     &     nextime, time2sec, daymon, hhmmss, mmddyy, dt2str, wkday, yr2day 
+     &      nextime, time2sec, sec2time, secsdiff, daymon, hhmmss, mmddyy,
+     &      dt2str, wkday, yr2day 
        
          USE M3UTILIO, EXCLUDE_INTERPB  => INTERP3,
      &                 EXCLUDE_M3EXIT   => M3EXIT,
@@ -73,6 +74,8 @@ C....................................................................
      &                 BUF_WRITE3       => WRITE3,
      &                 exclude_nextime  => nextime,
      &                 exclude_time2sec => time2sec,
+     &                 exclude_sec2time => sec2time2,
+     &                 exclude_secsdiff => secsdiff,
      &                 exclude_daymon   => daymon,
      &                 exclude_hhmmss   => hhmmss,
      &                 exclude_mmddyy   => mmddyy,
