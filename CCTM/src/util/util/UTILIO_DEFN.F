@@ -48,10 +48,7 @@ C....................................................................
        use mio_module
        
        use prog_interrupt_module, M3WARN => prog_interrupt_warning,
-     &                             M3EXIT => prog_interrupt_exit,
-     &                             M3MESG => prog_interrupt_msg,
-     &                             M3MSG2 => prog_interrupt_msg,
-     &                             m3parag => prog_interrupt_nmsgs
+     &                            M3EXIT => prog_interrupt_exit
 
 
        INTEGER, PARAMETER :: XSTAT1 = 1
