@@ -36,7 +36,7 @@ C  Aug 2011 Jeff Young: Replaced I/O API include files with IOAPI's M3UTILIO
 C  Sep 2018 C. Nolte, S. Roselle: replace M3UTILIO with UTILIO_DEFN
 C-----------------------------------------------------------------------
       USE UTILIO_DEFN
-!      USE PA_VARS, Only: TDATOUT
+      USE PA_VARS, Only: TDATOUT
       USE PA_IPRVARS, Only: MAXIPROUT
       USE PA_PARSE
       USE PA_DEFN
@@ -109,8 +109,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       WRITE( IOUT, 94000 ) LINOUT( 1:LEN_TRIM( LINOUT ) )
       WRITE( IOUT, 94000 ) LINOUT( 1:1 )
       LINOUT = 'C Created By: Process Analysis Control Program'
-!      WRITE( IOUT, 94000 ) LINOUT( 1:LEN_TRIM( LINOUT ) )
-!      LINOUT = 'C           ' // TDATOUT
+      WRITE( IOUT, 94000 ) LINOUT( 1:LEN_TRIM( LINOUT ) )
+      LINOUT = 'C           ' // TDATOUT
       WRITE( IOUT, 94000 ) LINOUT( 1:LEN_TRIM( LINOUT ) )
       LINOUT = ''
       WRITE( IOUT, 94000 ) LINOUT( 1:LEN_TRIM( LINOUT ) )
