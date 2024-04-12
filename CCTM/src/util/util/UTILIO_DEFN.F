@@ -59,7 +59,7 @@ C....................................................................
 
 #ifdef parallel
 
-       use replacement_util_module, only: getefile, index1, sortic, findc,
+       use replacement_util_module, only: getefile, index1, findc,
      &      nextime, time2sec, sec2time, secsdiff, daymon, hhmmss, mmddyy,
      &      dt2str, wkday, yr2day, isdstime, getcdttime 
        
@@ -83,8 +83,8 @@ C....................................................................
 !     &                 exclude_getdttime => getdttime,
      &                 exclude_getefile => getefile,
      &                 exclude_index1   => index1,
-     &                 exclude_findc    => findc,
-     &                 exclude_sortic   => sortic    
+     &                 exclude_findc    => findc
+!     &                 exclude_sortic   => sortic    
 
          USE PARUTILIO, 
      &                  M3ERR   => PM3ERR,

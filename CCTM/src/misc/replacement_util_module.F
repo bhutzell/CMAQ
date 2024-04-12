@@ -366,12 +366,13 @@
             character (len = 14) :: errstr = "<TIME ERROR>"
 
             hour = jtime / 10000
+            min  = mod(jtime, 10000) / 100
+            sec  = mod(jtime,100)
+
             if (hour .lt. 0 .or. hour. gt. 99 .or. min .gt. 60 .or. sec .gt. 60) then
                hhmmss = errstr
                return
             end if
-            min  = mod(jtime, 10000) / 100
-            sec  = mod(jtime,100)
 
             if (hour .lt. 10) then
                write (hhmmss, '(i1, a1, i2.2, a1, i2.2)') hour, ':', min, ':', sec
