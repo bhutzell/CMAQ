@@ -103,16 +103,28 @@
           integer function julian (year, month, day)
 
 ! convert year month day to Julian date (without year) format
-
+          
+! TO DO: handle climatological 365-day years.
+!        Maybe rather than optional argument, use a module variable for calendar type
+!        What should ERRVAL be set to?
+          
             implicit none
 
             integer, intent(in) :: year, month, day
 
             integer, parameter :: numday(12) =
      &                            (/ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /)
-
             integer :: i, temp_julian
 
+            integer,parameter  :: ERRVAL = -1  
+            if ( month .le. 0 .or. month .gt. 12 .or. day .le. 0 ) then
+               julian = ERRVAL
+               return
+            else if ( day .gt. numday(month) ) then
+               julian = ERRVAL
+               return
+            end if
+            
             i = 1
             temp_julian= 0
             do while (i < month)
@@ -133,8 +145,9 @@
           integer function wkday ( jdate )
 
 ! determine the day of a week for a given Julian date
-
-! based on Zeller's Rule, Monday = 1, Tuseday = 2, ... Sunday = 7
+! based on Zeller's Rule, Monday = 1, Tuesday = 2, ... Sunday = 7
+! TO DO: add optional argument for climatological 365-day year.
+!        make some assumption regarding 'standard' year.
 
             integer, intent(in) :: jdate
 
@@ -378,7 +391,7 @@
           real function yr2day (year)
 
 ! compute the reciprocal of number of days in a given year
-
+! TO DO: add optional argument for climatological 365-day calendar
             integer, intent(in) :: year
 
             if (leap_year(year)) then
@@ -393,6 +406,7 @@
           subroutine nextime (jdate, jtime, dtime)
 
 ! adjust given jdate and jtime w.r.t dtime which is in hhmmss format
+! TO DO: crashes if dtime is negative and crosses year, e.g., 2024001, 0, -10000
 
             integer, intent(inout) :: jdate, jtime
             integer, intent(in)    :: dtime
