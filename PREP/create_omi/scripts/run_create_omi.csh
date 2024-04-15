@@ -13,7 +13,7 @@ set echo
 
 #> Choose compiler and set up CMAQ environment with correct
 #> libraries using config.cmaq. Options: intel | gcc | pgi
-  setenv compiler gcc
+  setenv compiler intel
 
 set echo
 
@@ -44,7 +44,7 @@ echo $compilerString
 # uncomment if using executable compiled with debugging flags
 if( ! ( $?Offline ) )then
 #define paths and create data file list
-   setenv Debugging 
+#  setenv Debugging 
    if( $?Debugging )then
        set XBASE = ${BASE}/BLD_create_omi_${VRSN}_${compilerString}_debug
    else
@@ -71,7 +71,7 @@ set input_dir = ${BASE}
 #\ls -1 $DATA_DIR/*.ascii  >&! ${input_dir}/${infile}
 
 # The below commands uses raw data from NASA TOMS
- set YEAR      = "2019"
+ set YEAR      = "2020"
  set DATA_DIR  = ${BASE}"/TOMS_OMI_O3_column/"${YEAR}
 #set DATA_DIR  = ${BASE}"/TOMS_OMI_O3_column/test_data_"${YEAR}
  set infile = toms_list.dat

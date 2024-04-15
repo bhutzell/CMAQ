@@ -38,7 +38,7 @@
  source ./config_cmaq.csh
 
 #> Source Code Repository
- set    CMAQ_REPO = "/home/hwo/CCTM_git_repository"
+#set    CMAQ_REPO = "/home/bhutzell/CCTM_git_repository"
  setenv PREP_REPO ${CMAQ_REPO}/PREP
  setenv UTIL_REPO ${CMAQ_REPO}/UTIL
  setenv REPOROOT  ${PREP_REPO}/create_omi  #> location of the create_omi's repository
@@ -201,8 +201,8 @@
 
 #> Save Makefile with Compiler-dependent name and create symbolic
 #> link back to generic name.
- mv Makefile Makefile.$compilerString
- if ( -e Makefile.$compilerString && -e Makefile ) rm Makefile
+ if ( -e Makefile.$compilerString ) rm -f Makefile.$compilerString
+ mv -f Makefile Makefile.$compilerString
  ln -s Makefile.$compilerString Makefile
 
 #create make.it script that compiles create_omi without having to source config_cmaq.csh
@@ -213,6 +213,7 @@
  echo "source ../../../../config_cmaq.csh "${compiler}" "${compilerVrsn}  >> ${make_it}
  echo 'if ( $#argv == 1 )then'                                     >> ${make_it}
  echo '   if ( $1  == "clean" )make clean'                         >> ${make_it}
+ echo "#setenv debug true"                                         >> ${make_it}
  echo "endif"                                                      >> ${make_it}
  echo "make"                                                       >> ${make_it}
  echo "unsetenv compiler"                                          >> ${make_it}
