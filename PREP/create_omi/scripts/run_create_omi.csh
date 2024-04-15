@@ -44,12 +44,7 @@ echo $compilerString
 # uncomment if using executable compiled with debugging flags
 if( ! ( $?Offline ) )then
 #define paths and create data file list
-#  setenv Debugging 
-   if( $?Debugging )then
-       set XBASE = ${BASE}/BLD_create_omi_${VRSN}_${compilerString}_debug
-   else
-       set XBASE = ${BASE}/BLD_create_omi_${VRSN}_${compilerString}
-   endif
+ set XBASE = ${BASE}/BLD_create_omi_${VRSN}_${compilerString}
  echo "working online"
 else
  set XBASE = ${BASE}/../src
