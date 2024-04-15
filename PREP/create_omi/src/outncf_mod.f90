@@ -419,6 +419,13 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
     & /, 1x, '***   ', a, &
     & /, 1x, 70('*'))"
 
+  CHARACTER(LEN=256), PARAMETER :: f9800 = "(/, 1x, 70('*'), &
+    & /, 1x, '*** SUBROUTINE: ', a, &
+    & /, 1x, '***   ERROR SYNCHRONIZING WITH DISK COPY', a, &
+    & /, 1x, '***   OF FILE ', a, &
+    & /, 1x, '***   ', a, &
+    & /, 1x, 70('*'))"
+
 !-------------------------------------------------------------------------------
 ! Allocate necessary variables.
 !-------------------------------------------------------------------------------
@@ -440,16 +447,16 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
 ! If first time calling this routine, set up the netCDF output file.
 !-------------------------------------------------------------------------------
   
+  fl = TRIM(outfile_2dxyt%filename)
+
   IF ( .Not. outfile_2dxyt%CREATED ) THEN
 
   !-----------------------------------------------------------------------------
   ! Create netCDF file.
   !-----------------------------------------------------------------------------
 
-    fl = TRIM(outfile_2dxyt%filename)
 
     cdfid_m = 0
-    print*,TRIM(fl), nf90_clobber, cdfid_m
     rcode = nf90_create (fl, nf90_clobber, cdfid_m)
     IF ( rcode /= nf90_noerr ) THEN
       WRITE (6,f9500) TRIM(pname), TRIM(fl), TRIM(nf90_strerror(rcode))
@@ -605,8 +612,16 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
     DO n = 1, nvars
       nn = n
       var = TRIM(outfile_2dxyt%fldname(n))
+      rcode = nf90_put_att (cdfid_m, outfile_2dxyt%id_fld(n), 'fldname',  &
+                            outfile_2dxyt%fldname(n))
+      IF ( rcode /= nf90_noerr ) THEN
+        WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
+                        TRIM(nf90_strerror(rcode))
+        CALL graceful_stop (pname,sdate,stime)
+      ENDIF
+      var = TRIM(outfile_2dxyt%long_name(n))
       rcode = nf90_put_att (cdfid_m, outfile_2dxyt%id_fld(n), 'long_name',  &
-                            var)
+                            outfile_2dxyt%long_name(n))
       IF ( rcode /= nf90_noerr ) THEN
         WRITE (6,f9300) TRIM(pname), TRIM(var), TRIM(fl),  &
                         TRIM(nf90_strerror(rcode))
@@ -659,6 +674,7 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
    
     first = .FALSE.
     outfile_2dxyt%CREATED = .TRUE.
+    write(6,'(A)')'Created output file: ' // TRIM(fl)
 
     Return
 
@@ -694,6 +710,15 @@ SUBROUTINE file_out_ncf (outfile_2dxyt,time_now, sdate, stime )
     ENDIF
   ENDDO
   ntot = nvars
+
+  rcode = nf90_sync(cdfid_m)
+  IF ( rcode /= nf90_noerr ) THEN
+    WRITE (6,f9800) TRIM(pname), TRIM(var), TRIM(fl),  &
+                    TRIM(nf90_strerror(rcode))
+    CALL graceful_stop (pname,sdate,stime)
+  ENDIF
+ 
+  write(6,'(A)')'Write Data to output file: ' // TRIM(fl) // ' for ' // TRIM( time_now )
 
 
 END SUBROUTINE file_out_ncf

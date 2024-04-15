@@ -93,18 +93,18 @@ C... Variables, Units and Descriptions for FILE_NAME
 
          N = 1
          file_FULL_omi%fldname( N ) = 'OZONE_COLUMN'
-         file_FULL_omi%long_name( N ) = 'DU'
-         file_FULL_omi%units( N ) = 'Total Ozone Column Density'
+         file_FULL_omi%units( N )   = 'DU'
+         file_FULL_omi%long_name( N ) = 'Total Ozone Column Density'
 
          N = N + 1
          file_FULL_omi%fldname( N ) = 'CLOUD_FRACT'
-         file_FULL_omi%long_name( N ) = 'None'
-         file_FULL_omi%units( N ) = 'Radiative Cloud Fraction'
+         file_FULL_omi%units( N )   = 'None'
+         file_FULL_omi%long_name( N ) = 'Radiative Cloud Fraction'
 
          N = N + 1
          file_FULL_omi%fldname( N ) = 'O3_MISSING'
-         file_FULL_omi%long_name( N ) = 'None'
-         file_FULL_omi%units( N ) = 'Ozone Column Density Not Available'
+         file_FULL_omi%units( N )   = 'None'
+         file_FULL_omi%long_name( N ) = 'Whether Ozone Column Density Not Available'
 
          CALL file_out_ncf (outfile_2dxyt = file_FULL_omi,time_now=omi_start, sdate=0, stime=0 )
 
