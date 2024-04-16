@@ -78,8 +78,6 @@
  set FP = $FC
 
 #> Set IO/API version
- set IOAPI = ioapi_3.1
-
 #> Set compiler flags
  set FSTD       = "${myFSTD}"
  set DBG        = "${myDBG}"
@@ -88,7 +86,7 @@
  set CPP_FLAGS  = ""      #> Fortran Preprocessor Flags
  set LINK_FLAGS = "${myLINK_FLAG}"  #> Link Flags
 
- set LIB2 = "${ioapi_lib}"
+ set LIB2 = " "
 
 
 #============================================================================================
@@ -127,13 +125,13 @@
  echo                                                              >> $Cfile
  echo "lib_base    ${CMAQ_LIB};"                                   >> $Cfile
  echo                                                              >> $Cfile
- echo "lib_1       ioapi/lib;"                                     >> $Cfile
+ echo "lib_1                ;"                                     >> $Cfile
  echo                                                              >> $Cfile
- echo "lib_2       ioapi/include_files;"                           >> $Cfile
+ echo "lib_2                          ;"                           >> $Cfile
  echo                                                              >> $Cfile
  echo "lib_3       netcdf/include;"                                >> $Cfile
  echo                                                              >> $Cfile
- echo "lib_4       ioapi/lib;"                                     >> $Cfile
+ echo "lib_4                ;"                                     >> $Cfile
  echo                                                              >> $Cfile
  echo "lib_5       netcdff/include;"                               >> $Cfile
  echo 
@@ -201,8 +199,8 @@
 
 #> Save Makefile with Compiler-dependent name and create symbolic
 #> link back to generic name.
- if ( -e Makefile.$compilerString ) rm -f Makefile.$compilerString
- mv -f Makefile Makefile.$compilerString
+ mv -uf Makefile Makefile.$compilerString
+ if ( -e Makefile.$compilerString && -e Makefile ) rm -f Makefile
  ln -s Makefile.$compilerString Makefile
 
 #create make.it script that compiles create_omi without having to source config_cmaq.csh
