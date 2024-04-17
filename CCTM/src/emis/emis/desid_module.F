@@ -76,7 +76,6 @@ C-----------------------------------------------------------------------
          FUNCTION DESID_INIT ( JDATE, JTIME, TSTEP ) RESULT ( SUCCESS )
 
          USE CGRID_SPCS          ! CGRID mechanism species
-         USE BEIS_DEFN           ! biogenic emissions
          USE MEGAN_DEFN          ! biogenic emissions from MEGAN
          USE MGEMIS              ! marine gas emissions
          USE LTNG_DEFN           ! NO emissions from lightning strikes
@@ -86,6 +85,7 @@ C-----------------------------------------------------------------------
          !USE AERO_DATA           ! access subroutine map_pmemis
          USE CENTRALIZED_IO_MODULE, only : interpolate_var
          USE ASX_DATA_MOD, only: MET_DATA
+         USE BEIS_DEFN, only : BEIS_INIT
 
 #ifdef isam
          USE SA_DEFN, ONLY : SA_VDEMIS_DIFF, NTAG_SA, SA_VDEMIS_CONV, NSPC_SA,
@@ -108,8 +108,6 @@ C Arguments:
          INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP   ! TSTEP is output time step (HHMMSS)
          LOGICAL :: SUCCESS
 
-C Parameters:
-                                        
 C Local Variables:
 
          CHARACTER( 16 ) :: PNAME = 'DESID_INIT'
@@ -202,7 +200,7 @@ C Initialize 3D Point Source Emissions
 
          IF ( BIOGEMIS_MEGAN ) THEN
 C Initialize Online Biogenic Emissions, MEGAN
-          CALL LOG_SUBHEADING( LOGDEV, 'Initialize BEIS Biogenic Emissions' )
+          CALL LOG_SUBHEADING( LOGDEV, 'Initialize MEGAN Biogenic Emissions' )
           IF ( .NOT. MEGAN_INIT( JDATE, JTIME, TSTEP ) ) THEN
              XMSG = 'Failure initializing biogenics emissions module'
              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -210,7 +208,7 @@ C Initialize Online Biogenic Emissions, MEGAN
          END IF
          IF ( BIOGEMIS_BEIS ) THEN 
 C Initialize Online Biogenic Emissions, BEIS
-          CALL LOG_SUBHEADING( LOGDEV, 'Initialize MEGAN Biogenic Emissions' )
+          CALL LOG_SUBHEADING( LOGDEV, 'Initialize BEIS Biogenic Emissions' )
           IF ( .NOT. BEIS_INIT( JDATE, JTIME, TSTEP ) ) THEN
             XMSG = 'Failure initializing biogenics emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -373,9 +371,8 @@ C Return From Initialization
 
          USE CGRID_SPCS          ! CGRID mechanism species
          USE AERO_EMIS           ! inherits GRID_CONF
-         USE BEIS_DEFN           ! biogenic emissions
          USE MEGAN_DEFN          ! biogenic emissions from MEGAN
-         USE BIOG_EMIS, ONLY: MSPCS
+         USE BIOG_EMIS, ONLY: MSPCS, VDEMIS_BI
          USE SSEMIS
          USE DUST_EMIS
          USE MGEMIS              ! marine gas emissions
