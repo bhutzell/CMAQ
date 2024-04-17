@@ -138,7 +138,7 @@ C Last updated: $Date: 2011/10/21 16:10:18 $
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE HGRD_DEFN             ! horizontal domain specifications
-      USE BIOG_EMIS, ONLY: NSEF ! beis
+      USE BEIS_DEFN, ONLY: NSEF ! beis
       USE ASX_DATA_MOD
       USE UTILIO_DEFN
 #ifdef mpas

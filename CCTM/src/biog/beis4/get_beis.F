@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE TMPBEIS( JDATE, JTIME, TSTEP, BEIS_MAP, EMISL, L_DESID_DIAG )
+      SUBROUTINE GET_BEIS( JDATE, JTIME, TSTEP, L_DESID_DIAG )
 
 C-----------------------------------------------------------------------
  
@@ -73,13 +73,12 @@ C University of North Carolina at Chapel Hill
 C 137 E. Franklin St., CB# 6116
 C Chapel Hill, NC 27599-6116
 C smoke@unc.edu
-C Pathname: $Source: /project/yoj/arc/CCTM/src/biog/beis3/tmpbeis.F,v $
 C Last updated: $Date: 2011/10/21 16:10:18 $ 
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE UTILIO_DEFN
-      USE BIOG_EMIS             ! beis
+      USE BEIS_DEFN             ! beis
       USE centralized_io_module, only : AVGEMIS, interpolate_var
       Use ASX_DATA_MOD, only: MET_DATA
       USE MIO_ASCII
@@ -102,8 +101,6 @@ C Arguments:
       INTEGER, INTENT(  IN ) :: JDATE   ! current simulation date (YYYYDDD)
       INTEGER, INTENT(  IN ) :: JTIME   ! current simulation time (HHMMSS)
       INTEGER, INTENT(  IN ) :: TSTEP( 3 )      ! timestep vector
-      INTEGER, INTENT(  IN ) :: BEIS_MAP( : )   ! mapping from beis3 to model species
-      REAL,    INTENT( OUT ) :: EMISL( :,:,: )  ! emissions in moles/sec
       LOGICAL, INTENT(  IN ) :: L_DESID_DIAG ! flag determining whether or not DESID
                                              !   is in diagnostic mode              
 
@@ -130,7 +127,6 @@ C BEIS3 internal, output species:
 
 C Logical names and unit numbers:
             
-      CHARACTER( 16 ), SAVE :: SNAME   ! logical name for diagnostic emis output (mass)
       CHARACTER( 16 ), SAVE :: NNAME   ! logical name for normalized-emissions input
       CHARACTER( 16 ), SAVE :: GNAME   ! logical name for GRID_CRO_2D
       CHARACTER( 16 ), SAVE :: BNAME   ! logical name for frost switch input
@@ -153,9 +149,9 @@ C Other variables:
       CHARACTER( 256 ) :: MESG       ! message buffer
       CHARACTER( 256 ) :: EQNAME     ! equivalent filename
       CHARACTER(  16 ) :: VAR        ! variable name
-      CHARACTER(  16 ) :: PNAME = 'TMPBEIS'   ! prodedure name
+      CHARACTER(  16 ) :: PNAME = 'GET_BEIS'   ! prodedure name
 
-#ifdef verbose_tmpbeis
+#ifdef verbose_getbeis
       REAL,    ALLOCATABLE, SAVE :: EMISX( : )
       INTEGER, ALLOCATABLE, SAVE :: CX( : ), RX( : )
 #endif
@@ -213,7 +209,7 @@ C Allocate memory for arrays
 
          LDATE = 0
 
-#ifdef verbose_tmpbeis
+#ifdef verbose_getbeis
          ALLOCATE( EMISX( MSPCS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'EMISX', PNAME )
          ALLOCATE( CX( MSPCS ), STAT=IOS )
@@ -240,9 +236,9 @@ C Allocate memory for arrays
 
 C Loop thru the number of time steps (hourly)
 
-      EMISL = 0.0   ! array
+      VDEMIS_BI = 0.0   ! array
       EMPOL = 0.0   ! array
-#ifdef verbose_tmpbeis
+#ifdef verbose_getbeis
       EMISX = 0.0   ! array
 #endif
 
@@ -293,23 +289,23 @@ C Speciate emissions
             DO C = 1, NCOLS
                EMPL = EMPOL( C,R,K ) * HR2SEC
                IF ( EMPL .GT. 0.0 ) 
-     &            EMISL( :,C,R ) = EMISL( :,C,R ) + EMPL * MLFAC( :,K )
+     &            VDEMIS_BI( :,C,R ) = VDEMIS_BI( :,C,R ) + EMPL * MLFAC( :,K )
             END DO
          END DO
       END DO
 
-#ifdef verbose_tmpbeis
+#ifdef verbose_getbeis
       WRITE( LOGDEV,* ) ' '
-      WRITE( LOGDEV,* ) '       from TMPBEIS'
-      WRITE( LOGDEV,* ) '    Spc   EMISL  MaxC MaxR'
+      WRITE( LOGDEV,* ) '       from GET_BEIS'
+      WRITE( LOGDEV,* ) '    Spc   VDEMIS_BI  MaxC MaxR'
       DO S = 1, MSPCS
          WRITE( LOGDEV,'( 4X, I3, F10.5, 2I4 )' ) S, EMISX( S ), CX( S ), RX( S )
       END DO
 
       EMISX = 0.0    ! array
       WRITE( LOGDEV,* ) ' '
-      WRITE( LOGDEV,* ) '                   from TMPBEIS'
-      WRITE( LOGDEV,* ) '    Spc SpcName  Pol  MLFAC     EMPOL     EMISL( Spc,32,7 )'
+      WRITE( LOGDEV,* ) '                   from GET_BEIS'
+      WRITE( LOGDEV,* ) '    Spc SpcName  Pol  MLFAC     EMPOL     VDEMIS_BI( Spc,32,7 )'
       C = 32; R = 7
       DO K = 1, NSEF
          EMPL = EMPOL( C,R,K ) * HR2SEC
@@ -371,5 +367,5 @@ C------------------  FORMAT  STATEMENTS   ------------------------------
 94030 FORMAT( 5X, 'Temporal BEIS at time ', A8 )
 94040 FORMAT( /5X, 3( A, :, 1X ), I8, ":", I6.6 )
 
-      END SUBROUTINE TMPBEIS  
+      END SUBROUTINE GET_BEIS  
 
