@@ -49,7 +49,6 @@ C-----------------------------------------------------------------------
 
       INTEGER, SAVE                      :: MSPCS         ! no. of emitted species
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: EMSPC( : )    ! emitted species names
-      INTEGER, ALLOCATABLE, SAVE         :: BEIS_MAP( : ) ! mapping from beis3 to model species
       REAL,    ALLOCATABLE, SAVE         :: VDEMIS_BI( :,:,: ) ! beis emis
 
       CHARACTER( 16 ), SAVE :: MNAME   ! logical name for MET_CRO_2D
@@ -92,7 +91,7 @@ C Subroutine arguments:
 C Arguments:
       INTEGER, INTENT(  IN ) :: JDATE   ! current simulation date (YYYYDDD)
       INTEGER, INTENT(  IN ) :: JTIME   ! current simulation time (HHMMSS)
-      INTEGER, INTENT(  IN ) :: TSTEP( 3 )      ! timestep vector
+      INTEGER, INTENT(  IN ) :: TSTEP   ! timestep scalar (output time step)
 
 C Parameters:
 C (A line from the profile file is a record.)
@@ -445,6 +444,7 @@ C Reposition sequential file for second pass
          write( logdev,* ) '    Biogenic emissions species:'
          write( logdev,* ) '    Pol POLNAMES  Spc SPCNAMES         Mspcs EMSPC'
 #endif
+
 C Find emitted CMAQ species names
          MSPCS = 0
          DO POL = 1, NSEF
@@ -454,6 +454,9 @@ C Find emitted CMAQ species names
                IF ( NDX .EQ. 0 ) THEN
                   MSPCS = MSPCS + 1
                   EMSPC( MSPCS ) = SPCNAMES( ISP,POL )
+
+                  WRITE (MESG, '(A,I0,A,A)'),'BEIS: Species ',MSPCS,' is ',TRIM(EMSPC( MSPCS ))
+                  CALL M3MESG( MESG )
 #ifdef Verbose
                   write( logdev,'( 5X, I3, 1X, A5, 5X, I3, 1X, A16, I4, 3X, A16 )' )
      &                   pol, biotypes( pol ), isp, spcnames( isp,pol ), mspcs,
@@ -465,6 +468,9 @@ C Find emitted CMAQ species names
                END IF
             END DO
          END DO
+
+         WRITE (MESG, '(A,I0)'),'BEIS: Number species found in speciation profile = ',MSPCS
+         CALL M3MESG( MESG )
 
 C Save Species names in global array for mapping emissions
          DESID_EMVAR( IBIOSRM )%LEN = MSPCS
@@ -500,15 +506,6 @@ C Save Species names in global array for mapping emissions
                  DESID_EMVAR( IBIOSRM )%MW( ISP ) = 1.0
              END IF
 
-         END DO
-
-C Map out BEIS_MAP using MAP_ISTRtoEMVAR Array
-         ALLOCATE( BEIS_MAP( MSPCS ) )
-         BEIS_MAP = 0
-         DO ISTR = 1,DESID_N_ISTR
-            IF ( MAP_ISTRtoEMVAR( ISTR,IBIOSRM ) .GT. 0 )
-     &         BEIS_MAP( MAP_ISTRtoEMVAR( ISTR,IBIOSRM ) ) =
-     &                MAP_ISTRtoDIFF( ISTR )
          END DO
 
 C Allocate memory for storing mole- and mass-based factors
@@ -595,12 +592,12 @@ C Check that grid description matches BGRD file
          IF ( BEMIS_DIAG ) THEN
 C Build description for, and open beis diagnostic file
             MDATE = STDATE; MTIME = STTIME
-            CALL NEXTIME( MDATE, MTIME, TSTEP( 1 ) )
+            CALL NEXTIME( MDATE, MTIME, TSTEP )
 
             GDNAM3D = GRID_NAME  ! from HGRD_DEFN
             SDATE3D = MDATE
             STIME3D = MTIME
-            TSTEP3D = TSTEP( 1 )
+            TSTEP3D = TSTEP
             NCOLS3D = GL_NCOLS
             NROWS3D = GL_NROWS
             NLAYS3D =     1
@@ -622,15 +619,11 @@ C Build description for, and open beis diagnostic file
                VGLVS3D( I ) = VGLVS_GD( I )
             END DO
 
-            J = 0
-            DO I = 1, MSPCS
-               IF ( BEIS_MAP( I ) .GT. 0 ) THEN
-                  J = J + 1
-                  VNAME3D( J ) = EMSPC( I )
-                  VDESC3D( J ) = 'biogenic emissions of the indicated species'
-                  VTYPE3D( J ) = M3REAL
-                  UNITS3D( J ) = 'gm s-1'
-               END IF
+            DO J = 1, MSPCS
+               VNAME3D( J ) = EMSPC( J )
+               VDESC3D( J ) = 'biogenic emissions of the indicated species'
+               VTYPE3D( J ) = M3REAL
+               UNITS3D( J ) = 'gm s-1'
             END DO
 
             NVARS3D = J

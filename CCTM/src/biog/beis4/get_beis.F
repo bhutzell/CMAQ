@@ -311,13 +311,11 @@ C Speciate emissions
          EMPL = EMPOL( C,R,K ) * HR2SEC
          IF ( EMPL .LE. 0.0 ) CYCLE
          DO S = 1, MSPCS
-            IF ( BEIS_MAP( S ) .GT. 0 ) THEN
-               MLFC = MLFAC( S,K )
-               EMISX( S ) = EMISX( S ) + EMPL * MLFC
-               IF ( MLFC .NE. 0.0 )
-     &            WRITE( LOGDEV,'( 4X, I3, 2X, A6, 2X, I3, 1X, 3( 1PE10.3 ) )' )
-     &                              S, EMSPC( S ), K,  MLFC, EMPL, EMISX( S )
-            END IF
+            MLFC = MLFAC( S,K )
+            EMISX( S ) = EMISX( S ) + EMPL * MLFC
+            IF ( MLFC .NE. 0.0 )
+     &         WRITE( LOGDEV,'( 4X, I3, 2X, A6, 2X, I3, 1X, 3( 1PE10.3 ) )' )
+     &                           S, EMSPC( S ), K,  MLFC, EMPL, EMISX( S )
          END DO
       END DO
 #endif
@@ -338,11 +336,9 @@ C Speciate emissions
          IF ( LASTTIC ) THEN
             EMISS = EMISS * HR2SEC   ! convert from gm/h to gm/s
             DO S = 1,MSPCS
-               IF ( BEIS_MAP( S ) .GT. 0 ) THEN
-                  IF ( .NOT. WRITE3( SNAME, EMSPC( S ), MDATE, MTIME, EMISS(:,:,S) ) ) THEN
-                     MESG = 'Could not write to output file "' // TRIM( SNAME ) // '"'
-                     CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-                  END IF
+               IF ( .NOT. WRITE3( SNAME, EMSPC( S ), MDATE, MTIME, EMISS(:,:,S) ) ) THEN
+                  MESG = 'Could not write to output file "' // TRIM( SNAME ) // '"'
+                  CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
                END IF
             END DO
             WRITE( LOGDEV,94040 )

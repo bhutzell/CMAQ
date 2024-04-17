@@ -85,7 +85,7 @@ C-----------------------------------------------------------------------
          !USE AERO_DATA           ! access subroutine map_pmemis
          USE CENTRALIZED_IO_MODULE, only : interpolate_var
          USE ASX_DATA_MOD, only: MET_DATA
-         USE BEIS_DEFN, only : BEIS_INIT
+         USE BEIS_DEFN
 
 #ifdef isam
          USE SA_DEFN, ONLY : SA_VDEMIS_DIFF, NTAG_SA, SA_VDEMIS_CONV, NSPC_SA,
@@ -372,7 +372,7 @@ C Return From Initialization
          USE CGRID_SPCS          ! CGRID mechanism species
          USE AERO_EMIS           ! inherits GRID_CONF
          USE MEGAN_DEFN          ! biogenic emissions from MEGAN
-         USE BIOG_EMIS, ONLY: MSPCS, VDEMIS_BI
+         USE BEIS_DEFN, ONLY: MSPCS, VDEMIS_BI
          USE SSEMIS
          USE DUST_EMIS
          USE MGEMIS              ! marine gas emissions
