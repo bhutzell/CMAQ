@@ -221,6 +221,7 @@ C Local variables:
       REAL    DIVFAC      ! trapezoidal average factor
 
       LOGICAL, SAVE :: FIRST_RUN = .TRUE.  ! used for twoway model
+      LOGICAL, SAVE :: L_INIT    = .TRUE.  ! used for MIO File Input Initialization
       LOGICAL       :: WFLG = .TRUE.       ! turn on write subdmap in pio_init
 
       INTEGER, SAVE :: myNREPS = 0
@@ -558,8 +559,6 @@ C Initiliaze IO Arrays and Open Files
 C Initialize ELMO Arrays and Maps
          call map_elmo
 
-
-
 C Initialize conc field: Copy IC's to CONC file as step 0
 C Convention: the input file concentration units are always ppmV.
 
@@ -783,11 +782,14 @@ C Main processing loop:
 
 
 C Initialize Modules
-         call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+      IF ( L_INIT ) THEN
+          L_INIT = .FALSE.
+          call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+          if ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_file_input.txt' )
 
 C Initialize MIO - placeholder
-         if ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_file_input.txt' )
 !         call mio_init
+      END IF
 
       ! science process sequence:
          

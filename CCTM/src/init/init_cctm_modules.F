@@ -27,8 +27,8 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 C Arguments:
       REAL, POINTER :: CGRID( :,:,:,: )
 
-      INTEGER, INTENT(INOUT) :: JDATE        ! current model date, coded YYYYDDD
-      INTEGER, INTENT(INOUT) :: JTIME        ! current model time, coded HHMMSS
+      INTEGER, INTENT(IN)    :: JDATE        ! current model date, coded YYYYDDD
+      INTEGER, INTENT(IN)    :: JTIME        ! current model time, coded HHMMSS
       INTEGER, INTENT(IN)    :: TSTEP( 3 )   ! time step vector (HHMMSS)
                                              ! TSTEP(1) = local output step
                                              ! TSTEP(2) = sciproc sync. step (chem)

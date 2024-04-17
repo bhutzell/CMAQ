@@ -107,10 +107,6 @@ C Arguments:
       LOGICAL, INTENT(  IN ) :: L_DESID_DIAG ! flag determining whether or not DESID
                                              !   is in diagnostic mode              
 
-
-C External Functions
-      LOGICAL,         EXTERNAL :: CHKGRID
-
 C Parameters:
       REAL,    PARAMETER :: HR2SEC = 1.0 / 3600.0
 
@@ -138,7 +134,6 @@ C Logical names and unit numbers:
       CHARACTER( 16 ), SAVE :: NNAME   ! logical name for normalized-emissions input
       CHARACTER( 16 ), SAVE :: GNAME   ! logical name for GRID_CRO_2D
       CHARACTER( 16 ), SAVE :: BNAME   ! logical name for frost switch input
-      CHARACTER( 16 ), SAVE :: MNAME   ! logical name for MET_CRO_2D
 
 C Other variables:
       INTEGER, SAVE :: IHR        ! current simulation hour
@@ -196,104 +191,6 @@ C Allocate seasonality array
          ALLOCATE( FSEAS( NCOLS,NROWS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'FSEAS', PNAME )
          FSEAS = 0   ! array
-
-#ifndef mpas
-C Ensure met data time and grid for this run match beis emissions data files
-         MNAME = PROMPTMFILE( 
-     &           'Enter name for gridded met input file',
-     &           FSREAD3, 'MET_CRO_2D', PNAME )
-
-C Get description of met file 
-         IF ( .NOT. DESC3( MNAME ) ) THEN
-            MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-
-C Check that grid description matches BGRD file
-         IF ( .NOT. CHKGRID( MNAME ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MNAME )
-     &           // '" does not match previously set grid.'
-            CALL M3WARN( PNAME, 0, 0, MESG )
-         END IF
-
-         IF ( BEMIS_DIAG ) THEN
-C Build description for, and open beis diagnostic file
-            MDATE = STDATE; MTIME = STTIME
-            CALL NEXTIME( MDATE, MTIME, TSTEP( 1 ) )
-
-            GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-            SDATE3D = MDATE
-            STIME3D = MTIME
-            TSTEP3D = TSTEP( 1 )
-            NCOLS3D = GL_NCOLS
-            NROWS3D = GL_NROWS
-            NLAYS3D =     1
-            NTHIK3D =     1
-            GDTYP3D = GDTYP_GD
-            P_ALP3D = P_ALP_GD
-            P_BET3D = P_BET_GD
-            P_GAM3D = P_GAM_GD
-            XORIG3D = XORIG_GD
-            YORIG3D = YORIG_GD
-            XCENT3D = XCENT_GD
-            YCENT3D = YCENT_GD
-            XCELL3D = XCELL_GD
-            YCELL3D = YCELL_GD
-            VGTYP3D = VGTYP_GD
-            VGTOP3D = VGTOP_GD
-
-            DO I = 1, NLAYS3D + 1
-               VGLVS3D( I ) = VGLVS_GD( I )
-            END DO
-  
-
-            J = 0
-            DO I = 1, MSPCS
-               IF ( BEIS_MAP( I ) .GT. 0 ) THEN
-                  J = J + 1
-                  VNAME3D( J ) = EMSPC( I )
-                  VDESC3D( J ) = 'biogenic emissions of the indicated species'
-                  VTYPE3D( J ) = M3REAL
-                  UNITS3D( J ) = 'gm s-1'
-               END IF
-            END DO
-
-            NVARS3D = J
-            FDESC3D = ' '   ! array
-
-            FDESC3D( 1 ) = 'Gridded biogenic emissions from CMAQ-BEIS3'
-            FDESC3D( 2 ) = '/from/ ' // PNAME
-            FDESC3D( 3 ) = '/Version/ CMAQ'
-
-            ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 3
-            L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .False.
-            L_COL  ( 1:NVARS3D ) = .True.
-            L_ROW  ( 1:NVARS3D ) = .True.
-            L_VEXT ( 1:NVARS3D ) = .False.
-
-            CALL LOAD_MIO_FILE ( 'B3GTS_S', 0, 0, 0,
-     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &           L_VEXT(1:NVARS3D) )
-
-
-C Open mass output file (tons/hour)
-
-            SNAME = 'B3GTS_S'
-            CALL SUBST_BARRIER
-            IF ( IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( SNAME, FSNEW3, PNAME ) ) THEN
-                  MESG = 'Could not open "' // TRIM( SNAME ) // '" file'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
-               END IF
-            END IF
-
-         END IF
-#endif
 
 C Allocate memory for arrays
          
