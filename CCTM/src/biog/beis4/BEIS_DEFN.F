@@ -48,6 +48,7 @@ C=======================================================================
          USE CGRID_SPCS          ! CGRID mechanism species
          USE BIOG_EMIS           ! from beis
          USE UTILIO_DEFN
+         USE MIO_ASCII
 
          IMPLICIT NONE
 
@@ -62,7 +63,7 @@ C=======================================================================
          CHARACTER( 80 )       :: VARDESC   ! env variable description
          CHARACTER( 120 )      :: XMSG = ' '
 
-         INTEGER N_SPC
+         INTEGER N_SPC, ISTR
          INTEGER V, K, STATUS
 
 C-----------------------------------------------------------------------
@@ -74,11 +75,20 @@ C In-line biogenic emissions?
 
 C biogenics to gas-phase species map
          IF ( BIOGEMIS_BEIS ) THEN
+            ! Map out BEIS_MAP using MAP_ISTRtoEMVAR Array
+            ALLOCATE( BEIS_MAP( MSPCS ) )
+            BEIS_MAP = 0
+            DO ISTR = 1,DESID_N_ISTR
+               IF ( MAP_ISTRtoEMVAR( ISTR,IBIOSRM ) .GT. 0 ) 
+     &            BEIS_MAP( MAP_ISTRtoEMVAR( ISTR,IBIOSRM ) ) = 
+     &                   MAP_ISTRtoDIFF( ISTR )
+            END DO
+ 
 
             XMSG = 'Using in-line biogenic emissions option'
             CALL M3MSG2( XMSG )
 
-            IF ( .NOT. BIOG_INIT() ) THEN
+            IF ( .NOT. BIOG_INIT( JDATE, JTIME, TSTEP, BEIS_MAP ) ) THEN
                 XMSG = 'Could not initialize biogenic emissions variables'
                 CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
                 SUCCESS = .FALSE.; RETURN
@@ -92,6 +102,7 @@ C biogenics to gas-phase species map
             END IF
 
          END IF
+ 
 
          SUCCESS = .TRUE.; RETURN
 
@@ -123,18 +134,6 @@ C=======================================================================
 
 C-----------------------------------------------------------------------
 
-         IF ( FIRST_TIME ) THEN
-             ! Map out BEIS_MAP using MAP_ISTRtoEMVAR Array
-             ALLOCATE( BEIS_MAP( MSPCS ) )
-             BEIS_MAP = 0
-             DO ISTR = 1,DESID_N_ISTR
-                 IF ( MAP_ISTRtoEMVAR( ISTR,IBIOSRM ) .GT. 0 ) 
-     &              BEIS_MAP( MAP_ISTRtoEMVAR( ISTR,IBIOSRM ) ) = 
-     &                     MAP_ISTRtoDIFF( ISTR )
-             END DO
-
-             FIRST_TIME = .FALSE.
-         END IF    
 
          CALL TMPBEIS( JDATE, JTIME, TSTEP, BEIS_MAP, VDEMIS_BI, L_DESID_DIAG )
 
