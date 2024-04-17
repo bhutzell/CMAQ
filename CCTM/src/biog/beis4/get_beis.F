@@ -135,8 +135,6 @@ C Other variables:
       INTEGER, SAVE :: IHR        ! current simulation hour
       INTEGER          IOS        ! IO or memory allocation status
       INTEGER, SAVE :: LDATE      ! previous simulation date
-      INTEGER, SAVE :: MDATE      ! test date to update beis diag avg
-      INTEGER, SAVE :: MTIME      ! test time to update beis diag avg
       INTEGER, SAVE :: NSTEPS     ! run duration
       INTEGER, SAVE :: WSTEP  = 0 ! local write counter
       INTEGER          PARTYPE    ! method number to calculate PAR

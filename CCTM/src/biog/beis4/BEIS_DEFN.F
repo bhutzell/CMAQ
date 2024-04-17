@@ -53,6 +53,8 @@ C-----------------------------------------------------------------------
 
       CHARACTER( 16 ), SAVE :: MNAME   ! logical name for MET_CRO_2D
       CHARACTER( 16 ), SAVE :: SNAME   ! logical name for diagnostic emis output (mass)
+      INTEGER, SAVE :: MDATE      ! test date to update beis diag avg
+      INTEGER, SAVE :: MTIME      ! test time to update beis diag avg
 
 
 C Mole and mass factors:
@@ -151,8 +153,6 @@ C Local variables
          CHARACTER(  16 ) :: FILE_SPPRO ! label read from gspro
 
          REAL                SPLTFAC, SDIV, SMFAC ! line speciation profile factors
-         INTEGER, SAVE :: MDATE      ! test date to update beis diag avg
-         INTEGER, SAVE :: MTIME      ! test time to update beis diag avg
 
          TYPE BIOG_MECH_TYPE
               CHARACTER( 32 ) :: CHEMMECH
