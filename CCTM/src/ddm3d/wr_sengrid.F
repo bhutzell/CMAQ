@@ -158,7 +158,7 @@ C Gas species
                      VTYPE3D( VAR ) = M3REAL
                      VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                      UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
 
@@ -170,7 +170,7 @@ C RHOJ - should be zero
                   VTYPE3D( VAR ) = M3REAL
                   VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                   UNITS3D( VAR ) = 'm*Kg/m**3'
-                  VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
+                  VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
                END DO
 
 C Aerosol species
@@ -188,7 +188,7 @@ C Aerosol species
                      ELSE
                         UNITS3D( VAR ) = 'micrograms/m**3'
                      END IF
-                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
 
@@ -201,7 +201,7 @@ C NR species
                      VTYPE3D( VAR ) = M3REAL
                      VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                      UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
 
@@ -214,7 +214,7 @@ c TR species
                      VTYPE3D( VAR ) = M3REAL
                      VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                      UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
 
@@ -324,6 +324,8 @@ c           IF ( MYPE .EQ. 0 ) THEN
          END IF   ! .NOT. OPEN CTM_SENS_1
 
 c         CALL SUBST_BARRIER
+
+         RETURN   ! MIO Initialization
 
       END IF   ! FIRSTIME
 
