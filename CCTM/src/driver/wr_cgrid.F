@@ -290,6 +290,8 @@ C proc 0 has CTM_CONC_1 open
 
          END IF   ! .NOT. OPEN S_CGRID
 
+         RETURN
+
       END IF   ! FIRSTIME
 
 #ifdef parallel_io
