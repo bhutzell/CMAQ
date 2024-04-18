@@ -48,10 +48,13 @@
 #endif
         CHARACTER( 96 ) :: XMSG = ' '
 
+        CHARACTER( 200 ) :: APP_NAME_IN = 'APPL' ! Logfile Names
+
         INTEGER :: MODEL_TSTEP, NSTEPS, ISTEP,
      $             JDATE, JTIME, TOTSECS, STEPSECS
+        INTEGER :: VARDEV = -1
         CHARACTER( 96 ) :: MSG = ' '
-
+        
         INTERFACE
           SUBROUTINE CMAQ_DRIVER ( MODEL_STDATE, MODEL_STTIME, MODEL_TSTEP,
      $                             MODEL_JDATE, MODEL_JTIME, LAST_STEP,
@@ -73,6 +76,21 @@ C processes (NPROCS)
         MYPE = 0
         CALL CPU_TIME( BEGTIME )
 #endif
+
+        IF ( MYPE .EQ. 0 ) THEN
+          VARDEV = OUTDEV  
+          CALL LOG_HEADING( OUTDEV, "Environment Variable Report" )
+          CALL LOG_SUBHEADING( OUTDEV, "Grid and High-Level Model Parameters" )
+          WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+        END IF
+        
+        ! Get Simulation Scenario Name to Label Log Files, etc
+        CALL GET_ENV( APP_NAME_IN, 'CTM_APPL', APP_NAME_IN, VARDEV )
+
+        ! Start I/O-API and set up log file(s)
+        CALL SETUP_LOGDEV(APP_NAME_IN)
+
         ! Initialize all runscript environmental variables
         CALL INIT_ENV_VARS( 0, 0 )
 

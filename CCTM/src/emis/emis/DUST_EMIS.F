@@ -258,7 +258,7 @@ C...Count the number of mass emissions species
      &              dustouts( 2,ncols,nrows ), stat = status )
          if ( status .ne. 0 ) then
             xmsg = '*** Failure allocating DUSTOUTM, DUSTOUTN, or DUSTOUTS'
-            call m3warn ( pname, jdate, jtime, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             success = .false.; return
          end if
 
@@ -266,7 +266,7 @@ C Allocate emissions array
          allocate( dust_em( ncols,nrows ), stat = status )
          if ( status .ne. 0 ) then
             xmsg = '*** Failure allocating DUST_EM'
-            call m3warn( pname, jdate, jtime, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             success = .false.; return
          end if
 
@@ -275,7 +275,7 @@ C Allocate private arrays
      &             sd_ep ( ncols,nrows ), stat = status)
          if ( status .ne. 0 ) then
             xmsg = '*** Failure allocating WMAX, or SD_EP'
-            call m3warn( pname, jdate, jtime, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             success = .false.; return
          end if
          wmax   = 0.0   ! array assignment
@@ -299,7 +299,7 @@ C Set up variable diagnostic names (from LUS_DEFN)
      &                vdiagnm_ustar( n_dlcat ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure allocating VDIAGNM_*'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
             vdiagnm_emis  = diag_type( ' ', ' ', ' ' )  ! array assignment
@@ -338,7 +338,7 @@ C Allocate diagnostic emissions arrays
      &                dustbf( ndust_diag,ncols,nrows ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure allocating DIAGNM, DIAGV or DUSTBF'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
 
@@ -346,7 +346,7 @@ C Allocate diagnostic emissions arrays
             allocate( sdiagv( ndust_diag ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure allocating SDIAGV'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
 #endif
@@ -426,7 +426,7 @@ C...append diagnostic variables with mass emissions species
             allocate( diagnm_swap( ndust_diag ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure allocating DIAGNM_SWAP'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
             diagnm_swap = diagnm 
@@ -437,7 +437,7 @@ C...append diagnostic variables with mass emissions species
             allocate( diagnm( ndust_diag ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure reallocating DIAGNM'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
             diagnm( 1:ndust_diag ) = diagnm_swap( 1:ndust_diag )
@@ -504,7 +504,7 @@ C Try to open existing file for update
          if ( .not. open3( ctm_dust_emis_1, fsrdwr3, pname ) ) then
             xmsg = 'Could not open CTM_DUST_EMIS_1 for update - '
      &           // 'try to open new'
-            call m3mesg( xmsg )
+            CALL LOG_MESSAGE( LOGDEV ,  xmsg )
 
 C Set output file characteristics based on COORD.EXT and open diagnostic file
             ftype3d = grdded3

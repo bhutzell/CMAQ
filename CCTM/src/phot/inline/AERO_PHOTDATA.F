@@ -258,16 +258,16 @@ C ***    Create map for refactive index for each species
 #endif 
 
          IF ( MIE_CALC .AND. .NOT. CORE_SHELL ) THEN
-            CALL M3MESG('For optics of internally mixed aerosol, Mie calculation used')
-            CALL M3MESG('Core-shell mixing model option is set to off')
+            CALL LOG_MESSAGE( LOGDEV , 'For optics of internally mixed aerosol, Mie calculation used')
+            CALL LOG_MESSAGE( LOGDEV , 'Core-shell mixing model option is set to off')
          ELSE IF ( MIE_CALC .AND. CORE_SHELL ) THEN
-            CALL M3MESG('For AERO mixing models, core-shell model is possible')
-            CALL M3MESG('For optics of aerosols with no core, Mie calculation used')
+            CALL LOG_MESSAGE( LOGDEV , 'For AERO mixing models, core-shell model is possible')
+            CALL LOG_MESSAGE( LOGDEV , 'For optics of aerosols with no core, Mie calculation used')
          ELSE IF ( .NOT. MIE_CALC .AND. CORE_SHELL ) THEN
-            CALL M3MESG('For AERO mixing models, core-shell model is possible')
-            CALL M3MESG('For optics of aerosols with no core, FASTER_OPTICS used')
+            CALL LOG_MESSAGE( LOGDEV , 'For AERO mixing models, core-shell model is possible')
+            CALL LOG_MESSAGE( LOGDEV , 'For optics of aerosols with no core, FASTER_OPTICS used')
          ELSE
-            CALL M3MESG('Using internal mixing model for aerosol and FASTER_OPTICS')
+            CALL LOG_MESSAGE( LOGDEV , 'Using internal mixing model for aerosol and FASTER_OPTICS')
          END IF
 
          FORALL ( SPC = 1:N_MODE ) VOL_MINS( SPC ) = PI6 * AEROMODE( SPC )%MIN_M3CONC
@@ -802,7 +802,7 @@ C***  and contribution to the overall asymmetry factor
      &               BLK_AE_LSG( MODE,L )
      
                      XMSG =  'FAILURE IN AERO_OPTICAL2: shell only case '
-                     CALL M3WARN( PNAME, 0, 0, XMSG )
+                     CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                      
                   END IF
 

@@ -148,7 +148,7 @@ C as a subset of the vert. diffused species list
          ALLOCATE ( DD_CONV( N_SPC_DEPV ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating DD_CONV'
-            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -191,7 +191,7 @@ C set dry dep conversion factor (done here so that vdiff doesn`t need the includ
             ALLOCATE ( ALL_GAS_DEPV( N_GAS_DEPV ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating ALL_GAS_DEPV'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -212,7 +212,7 @@ C Identify and remove multiple occurrences of gas deposition velocities
      &                GAS_DEPV_SUR  ( N_GAS_DEPV ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating GAS_DEPV_FOUND or GAS_DEPV_SUR'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -235,7 +235,7 @@ C Identify and remove multiple occurrences of gas deposition velocities
             ALLOCATE( UNIQUE_GDEPV( N_UNIQUE_GDEPV ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating UNIQUE_GDEPV'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -268,7 +268,7 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
             ALLOCATE( AE_DEPV_FOUND( N_AE_DEPV ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating AE_DEPV_FOUND'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
             AE_DEPV_FOUND = .FALSE.
@@ -315,7 +315,7 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
             ALLOCATE ( CGRIDL1   ( N_GAS_DEPV,NCOLS,NROWS ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating CGRIDL1 array'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
             CGRIDL1 = 0.0   

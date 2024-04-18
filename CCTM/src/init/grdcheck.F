@@ -293,7 +293,7 @@ C..Check vertical levels for 3D files only
 
          IF( LDIFF ) THEN    
             MSG = '    Inconsistent value for vertical level'
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             LOK = .FALSE.
          END IF
 

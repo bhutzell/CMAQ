@@ -1,3 +1,31 @@
+! -----------------------------------------------------------------------------
+! This module contains IOAPI replacement routines which are used in the CMAQ 
+! model. All routines except INIT3, INITLOG3, and FLUSH, are completely
+! rewritten and perform the exact same function as the original IOAPI routines.
+!
+! Note 1. secsdiff is the original IOAPI routine which takes in two set of
+!         jdate and jtime and forms a difference in seconds. This routine is
+!         expanded to handle two variations of input format,
+!         YYYY-MM-DD_hh:mm:ss, and hhmmss, respectively. 
+!
+!      2. index1 is the original IOAPI routine which determins whether a given
+!         character string is in a list of character string items. This routine
+!         is expanded to handle integer. 
+!
+!      3. Here is the list of replaced IOAPI routines
+!         daymon    julian  wkday        isdstime  upcase  
+!         hhmmss    dt2str  yr2day       nextime   junit  
+!         time2sec  crlf    getefile     sec2time  str2real  
+!         lblank    sortic  promptffile  currstep  findc  
+!         poly
+!
+!      4. Here is the newly added routines list
+!         leap_year  quicksort_partition  quicksort  date_time_minus_sec
+
+! History: David Wong, 04/2024 created
+!          Bill Hutzell, 04/2024 added implementation of GETDTTIME, named GETCDTTIME      
+! -----------------------------------------------------------------------------
+
         module replacement_util_module
 
           implicit none
@@ -20,6 +48,8 @@
 ! -----------------------------------------------------------
           logical function leap_year (year)
 
+! determine a given year is a leap year or not
+
             integer :: year
 
             if (mod(year, 4) .ne. 0) then
@@ -37,6 +67,9 @@
 ! -----------------------------------------------------------
           subroutine daymon (jdate, mon, day)
 
+! convert jdate in Julian date format into month and day
+! TO DO: add optional argument for climatological 365-day calendars
+          
             implicit none
 
             integer, intent(in) :: jdate
@@ -70,15 +103,29 @@
 ! ----------------------------------------------------------
           integer function julian (year, month, day)
 
+! convert year month day to Julian date (without year) format
+          
+! TO DO: handle climatological 365-day years.
+!        Maybe rather than optional argument, use a module variable for calendar type
+!        What should ERRVAL be set to?
+          
             implicit none
 
             integer, intent(in) :: year, month, day
 
             integer, parameter :: numday(12) =
      &                            (/ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /)
-
             integer :: i, temp_julian
 
+            integer,parameter  :: ERRVAL = -1  
+            if ( month .le. 0 .or. month .gt. 12 .or. day .le. 0 ) then
+               julian = ERRVAL
+               return
+            else if ( day .gt. numday(month) ) then
+               julian = ERRVAL
+               return
+            end if
+            
             i = 1
             temp_julian= 0
             do while (i < month)
@@ -95,38 +142,13 @@
 
           end function julian
 
-! ----------------------------------------------------------
-          integer function num_julian_day (year, month, day)
-
-            implicit none
-
-            integer, intent(in) :: year, month, day
-
-            integer, parameter :: numday(12) =
-     &                            (/ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /)
-
-            integer :: i, temp_julian
-
-            i = 1
-            temp_julian= 0
-            do while (i < month)
-              temp_julian= temp_julian+ numday(i)
-              i = i + 1
-            end do
-            temp_julian= temp_julian + day
-
-            if (leap_year(year) .and. (month > 2)) then
-               temp_julian= temp_julian+ 1
-            end if
-
-            num_julian_day = temp_julian
-
-          end function num_julian_day
-
 ! -----------------------------------------------------------
           integer function wkday ( jdate )
 
-! based on Zeller's Rule, Monday = 1, Tuseday = 2, ... Sunday = 7
+! determine the day of a week for a given Julian date
+! based on Zeller's Rule, Monday = 1, Tuesday = 2, ... Sunday = 7
+! TO DO: add optional argument for climatological 365-day year.
+!        make some assumption regarding 'standard' year.
 
             integer, intent(in) :: jdate
 
@@ -161,9 +183,15 @@
 ! ------------------------------------------------------
           logical function isdstime(jdate)
 
-! <  2007: first Sunday in April and the last Sunday in October
-! >= 2007: secnd Sunday in March and the first Sunday in November
+! determine whether a given Julian date is in daylight saving time or not
 
+! <  2007: first Sunday in April and the last Sunday in October
+! >= 2007: second Sunday in March and the first Sunday in November
+
+! Gives slightly different bounds for DST from IOAPI, but I think this is correct.
+! 2023308 = Sat Nov 4 2023 TRUE, but IOAPI returns FALSE
+! 2024307 = Sat Nov 2 2024 TRUE, but IOAPI returns FALSE
+          
             integer, intent(in) :: jdate
 
             integer, parameter :: cut_off_year = 2006
@@ -237,6 +265,8 @@
 ! ------------------------------------------------------------------------------
           subroutine upcase (string)
 
+! convert all English alphabet in the given string to upper case 
+
             character (len = *), intent(inout) :: string
 
             integer, parameter :: lcase_a_pos = ichar('a')
@@ -261,24 +291,40 @@
 ! ------------------------------------------------------------------------------
           character*14 function mmddyy (jdate)
 
+! convert a Julian date to mmddyy format
+! Modified to handle some error conditions.
+          
             integer, intent(in) :: jdate
 
             integer, parameter :: numdays (12) = (/ 31, 28 ,31, 30, 31, 30, 31, 31, 30, 31, 30, 31 /)
             character (len = 4) :: month_name (12)  = (/ 'Jan.', 'Feb.', 'Mar.', 'Apr.', 'May ', 'Jun.', 
      &                                                 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.' /)
+            character (len = 14) :: errstr = "<DATE ERROR>"
                                                
             integer :: year, day, numjdays(12), i, j
             logical :: done
 
             year = jdate / 1000
+            if ( year .le. 0 ) then
+               mmddyy = errstr
+               return
+            end if
             day  = mod(jdate, 1000)
 
 ! compute number of jdays
             numjdays(1) = 1
             numjdays(2) = 32
             if (leap_year(year)) then
+               if (day .le. 0 .or. day .gt. 366) then
+                  mmddyy = errstr
+                  return
+               end if
                numjdays(3) = numjdays(2) + 29
             else
+               if (day .le. 0 .or. day .gt. 365) then
+                  mmddyy = errstr
+                  return
+               end if
                numjdays(3) = numjdays(2) + 28
             end if
             do i = 4, 12
@@ -311,14 +357,22 @@
 
 ! ------------------------------------------------------------------------------
           character*10 function hhmmss (jtime)
+! convert jtime in hhmmss format to character string format
+! Modified to handle some error conditions.
 
             integer, intent(in) :: jtime
 
             integer :: hour, min, sec
+            character (len = 14) :: errstr = "<TIME ERROR>"
 
             hour = jtime / 10000
             min  = mod(jtime, 10000) / 100
             sec  = mod(jtime,100)
+
+            if (hour .lt. 0 .or. hour. gt. 99 .or. min .gt. 60 .or. sec .gt. 60) then
+               hhmmss = errstr
+               return
+            end if
 
             if (hour .lt. 10) then
                write (hhmmss, '(i1, a1, i2.2, a1, i2.2)') hour, ':', min, ':', sec
@@ -331,6 +385,8 @@
 ! ------------------------------------------------------------------------------
           character*24 function dt2str (jdate, jtime)
 
+! combine jdate and jtime which both are in integer format, to a character string
+
             integer, intent(in) :: jdate, jtime
 
             dt2str = hhmmss(jtime) // mmddyy(jdate)
@@ -340,6 +396,8 @@
 ! ------------------------------------------------------------------------------
           real function yr2day (year)
 
+! compute the reciprocal of number of days in a given year
+! TO DO: add optional argument for climatological 365-day calendar
             integer, intent(in) :: year
 
             if (leap_year(year)) then
@@ -352,6 +410,9 @@
 
 ! ------------------------------------------------------------------------------
           subroutine nextime (jdate, jtime, dtime)
+
+! adjust given jdate and jtime w.r.t dtime which is in hhmmss format
+! TO DO: crashes if dtime is negative and crosses year, e.g., 2024001, 0, -10000
 
             integer, intent(inout) :: jdate, jtime
             integer, intent(in)    :: dtime
@@ -453,6 +514,9 @@
 ! ------------------------------------------------------------------------------
           integer function index1_char (name, n, list)
 
+! acts as the original IOAPI routine index1 to determine a character
+! string, name in the character string item list
+
             character (*), intent(in) :: name
             character (*), intent(in) :: list(:)
             integer, intent(in)       :: n
@@ -479,6 +543,8 @@
 
 ! ------------------------------------------------------------------------------
           integer function index1_int (name, n, list)
+
+! perform same function as in index1_char but for integer
 
             integer, intent(in) :: name
             integer, intent(in) :: list(:)
@@ -507,6 +573,8 @@
 ! ------------------------------------------------------------------------------
           integer function junit()
 
+! determine an output file unit number
+
             integer, parameter :: bottom = 20
             integer, save :: top = 99
             logical :: found, status
@@ -530,6 +598,9 @@
 
 ! ------------------------------------------------------------------------------
           integer recursive function secsdiff_jdate_jtime (jdate1, jtime1, jdate2, jtime2) result (return_value)
+
+! acts as the original IOAPI routine secsdiff to determine the time
+! difference between two set of jdate and jtime
 
             integer, intent(in) :: jdate1, jtime1, jdate2, jtime2
 
@@ -564,7 +635,7 @@
                   loc_secsdiff = 0
                   do yr = year1, year2
                      if (yr .eq. year1) then
-                        loc_date = year1 * 1000 + num_julian_day (year1, 12, 31)
+                        loc_date = year1 * 1000 + julian (year1, 12, 31)
                         loc_time = 235959
 
 ! + 1 adjustment is for the difference between 12-31:23:59:59 and 01-01:00:00:00
@@ -595,6 +666,9 @@
 ! -----------------------------------------------------------
           integer recursive function secsdiff_time_str (date1, date2, flag) result (return_value)
 
+! performs the same function as secsdiff_jdate_jtime but the input dates
+! are in YYYY-MM-DD_hh:mm:ss format
+
             implicit none
 
             character (20), intent(in) :: date1, date2
@@ -612,8 +686,8 @@
                read (date2, '(i4, 5(1x, i2))') year2, month2, day2, hour2, minute2, sec2
 
                if (year1 .eq. year2) then
-                  jdate1 = num_julian_day (year1, month1, day1)
-                  jdate2 = num_julian_day (year2, month2, day2)
+                  jdate1 = julian (year1, month1, day1)
+                  jdate2 = julian (year2, month2, day2)
 
                   loc_secsdiff = (jdate2 - jdate1) * 86400 -
      &                           ((hour1 - hour2) * 3600 +
@@ -658,6 +732,8 @@
 ! ------------------------------------------------------------------------------
           integer function time2sec (time)
 
+! convert time which is in hhmmss format, to seconds
+
             integer, intent(in) :: time    ! in hhmmss format
             integer :: neg_time
             integer :: time_in_sec, hr, min, sec
@@ -680,66 +756,18 @@
 ! -------------------------------------------------------------------------
           integer function secsdiff_jtime (time1, time2)
 
+! performs the same function as secsdiff_time_str but the inputs are in hhmmss format
+
             integer, intent(in) :: time1, time2    ! in hhmmss format
 
             secsdiff_jtime = time2sec(time1) - time2sec(time2)
 
           end function secsdiff_jtime
 
-! -------------------------------------------------------------------------
-          subroutine data_time_minus_sec (date, time, minus_sec)
-
-            integer, intent(inout) :: date        ! date in julian date format
-            integer, intent(inout) :: time        ! time in hhmmss format
-            integer, intent(in   ) :: minus_sec
-
-            integer :: loc_sec, subtract_hr, subtract_min, subtract_sec,
-     &                 temp, hr, min, sec, num_days
-
-            if (minus_sec .ge. 86400) then
-               num_days = minus_sec / 86400
-               loc_sec = mod(minus_sec, 86400)
-               date = date - num_days
-            else
-               loc_sec = minus_sec
-            end if
-
-            subtract_hr  = loc_sec / 3600
-            temp         = mod(loc_sec, 3600)
-            subtract_sec = mod(temp, 60)
-            subtract_min = temp / 60
-
-            hr = time / 10000
-            sec = mod(time, 100)
-            min = mod(time/100, 100)
-
-            sec = sec - subtract_sec
-
-            if (sec .lt. 0) then
-               min = min - 1 - subtract_min
-               sec = sec + 60
-            else
-               min = min - subtract_min
-            end if
-
-            if (min .lt. 0) then
-               hr = hr - 1 - subtract_hr
-               min = min + 60
-            else
-               hr = hr - subtract_hr
-            end if
-
-            if (hr .lt. 0) then
-               date = date - 1
-               hr = hr + 24
-            end if
-
-            time = hr * 10000 + min * 100 + sec
-
-          end subroutine data_time_minus_sec
-
 ! -----------------------------------------------------------
           character (2) function crlf()
+
+! Return character string of character return and line feed (from IOAPI_
 
             character (2) :: temp
 
@@ -752,6 +780,16 @@
 
 ! ------------------------------------------------------------------------------
           integer function getefile ( lname, rdonly, fmtflag, caller )
+! CGN: this routine should write to LOGDEV, but using the runtime_vars module
+!      creates a circular dependency and passing in logdev as an argument changes
+!      its interface compared to IOAPI.
+!
+! CGN: Note this routine handles only formatted text files. It is not a full
+!      replacement of the IOAPI function in that it does not portably handle
+!      binary files by considering their ENDIAN nature. However, these are
+!      not used anywhere in CMAQ.
+
+! determine the nature of a file associated with a logical name, lname
 
             use get_env_module
 
@@ -770,12 +808,12 @@
             inquire (file=fname, exist=exist, iostat=stat)
 
             if (stat .ne. 0) then
-               print *, 'Error: inquiring about ', trim(lname)
+               print *, 'Error inquiring about file with logical name ', trim(lname)
                getefile = -1
             else
 
                if (.not. exist) then
-                  print *, trim(lname), ' does not exist '
+                  print *, 'Error: file with logical name ', trim(lname), ' does not exist '
                   getefile = -1
                else
                   funit = junit()
@@ -797,7 +835,7 @@
      &                  iostat = stat)
 
                   if (stat .ne. 0) then
-                     print *, ' Error: not able to open file ', trim(lname)
+                     print *, ' Error: could not open file ', trim(lname)
                      getefile = -1
                   else
                      getefile = funit
@@ -809,6 +847,8 @@
 
 ! ------------------------------------------------------------------------------
           integer function sec2time ( secs )
+
+! convert input secs to hhmmss format
 
             integer, intent(in) :: secs
 
@@ -832,6 +872,8 @@
 ! ------------------------------------------------------------------------------
           real function str2real( string )
 
+! convert a given string to real number
+
             character(*), intent(in) :: string
 
             read (string, *) str2real
@@ -840,6 +882,8 @@
 
 ! ------------------------------------------------------------------------------
           integer function lblank ( string )
+
+! remove left leading blanks
 
             character*(*), intent(in) :: string
 
@@ -865,6 +909,8 @@
 ! ------------------------------------------------------------------------------
           subroutine sortic (n, index, name)
 
+! sort an integer index w.r.t. a string list
+
             character (16), intent(in) :: name(:)
             integer, intent(in)        :: n
             integer, intent(inout)     :: index(:)
@@ -875,6 +921,8 @@
 
 ! -------------------------------------------------------------------------
           integer function quicksort_partition (n, name, index)
+
+! quicksort operation
 
             character (16), intent(in) :: name(:)
             integer, intent(in) :: n
@@ -916,6 +964,8 @@
 ! -------------------------------------------------------------------------
           recursive subroutine quicksort (n, name, index)
 
+! recursive quicksort algorithm
+
             implicit none
 
             character (16), intent(in) :: name(:)
@@ -934,8 +984,9 @@
           end subroutine quicksort
 
 ! ------------------------------------------------------------------------------
- 
           integer function promptffile (prompt, rdonly, fmtted, default, caller)
+
+! prompt user to provide file characteristics and open the file accordingly
 
             character*(*), intent(in) :: prompt         !  prompt for user
             logical      , intent(in) :: rdonly         !  TRUE iff file is input-only
@@ -953,6 +1004,8 @@
 
 ! -------------------------------------------------------------------------
           subroutine date_time_minus_sec (date, time, minus_sec)
+
+! subtract a Julian jdate and jtime in hhmmss format with minus_sec seconds
 
             integer, intent(inout) :: date        ! date in julian date format
             integer, intent(inout) :: time        ! time in hhmmss format
@@ -1025,6 +1078,9 @@
      &                               sdate, stime, tstep,
      &                               cdate, ctime )
 
+! compute cdate and ctime from starting date and time, sdate and stime w.r.t.
+! time step, tstep such that it is closest to and smaller than jdate and jtime
+
             integer, intent(in)  :: jdate, jtime, sdate, stime, tstep
             integer, intent(out) :: cdate, ctime
 
@@ -1050,6 +1106,8 @@
 
 ! ------------------------------------------------------------------------------
           integer function findc (key, n, list)
+
+! find the location of a key in a sorted list
 
             character*(*), intent(in) :: key
             integer, intent(in)       :: n
@@ -1081,8 +1139,10 @@
           end function findc
 
 ! ------------------------------------------------------------------------------
-
           real function poly (pt, x, fx, n)
+
+! Performs arbitrary-degree polynomial interpolation for pt on curve determined 
+! by x and fx using Newton divided-differences. (from IOAPI)
 
             implicit none
 
@@ -1117,102 +1177,106 @@
 
           end function poly
 
+
+
 ! -------------------------------------------------------------------------
 
-        INTEGER FUNCTION INIT3 ( )
+!        INTEGER FUNCTION INIT3 ( )
+!
+!        !use universal_data_module
+!        use logdev_mod
+!
+!      IMPLICIT NONE
+!
+!!       INTEGER, EXTERNAL :: INITLOG3, JUNIT
+!!       EXTERNAL          :: INITBLK3        !!  BLOCK DATA to initialize STATE3 commons
+!
+!        CHARACTER*16, PARAMETER:: SCENFILE = 'SCENFILE'
+!        CHARACTER*64, PARAMETER :: NOTICE( 17 ) = (/
+!     &'                                                              ',
+!     &'This program uses the EPA-AREAL/MCNC-EnvPgms/BAMS Models-3    ',
+!     &'I/O Applications Programming Interface, [I/O API] which is    ',
+!     &'built on top of the netCDF I/O library (Copyright 1993, 1996  ',
+!     &'University Corporation for Atmospheric Research/Unidata       ',
+!     &'Program) and the PVM parallel-programming library (from       ',
+!     &'Oak Ridge National Laboratory).  Copyright (C) 1992-2002 MCNC ',
+!     &'and Carlie J. Coats, Jr., and 2003-2006 Baron Advanced        ',
+!     &'Meteorological Systems, LLC and released under the GNU LGPL   ',
+!     &'License, version 2.1.  See URL                                ',
+!     &'                                                              ',
+!     &'    http://www.baronams.com/products/ioapi/LGPL.txt           ',
+!     &'                                                              ',
+!     &'for conditions of use.                                        ',
+!     &'                                                              ',
+!     &'Library release tag: $JDate: 2010068 $                        ',
+!     &'                                                              '
+!     &   /)
+!
+!
+!C...........   SCRATCH LOCAL VARIABLES and their descriptions:
+!
+!        CHARACTER*512   EQNAME
+!        INTEGER         I, J, IOST, IDEV
+!        LOGICAL         AFLAG
+!
+!        CHARACTER *80 VARVER
+!        CHARACTER *80 NCFVER
+!        CHARACTER *80, PARAMETER :: IOAPILIBVER =
+!     &             '$Id: @(#) ioapi library version 3.1'
+!     &             // ' $'
+!
+!        logical, save :: finit3 = .false.
+!
+!C***********************************************************************
+!C   begin body of subroutine  INIT3
+!
+!#if defined(__sgi)    || defined(__mips__)
+!
+!        !!==========>  *HACK*  to deal with SGI v7.4  compilers, that
+!        !!             do not follow industry standards with respect
+!        !!             to how to make sure that BLOCK DATA modules are
+!        !!             properly linked into an executable:
+!
+!        CALL INITBLK3
+!
+!#endif
+!
+!        IF ( FINIT3 ) THEN
+!            INIT3 = LOGDEV
+!            RETURN           !  M3 I/O already set up
+!        END IF
+!
+!        LOGDEV = INITLOG3( 'INIT3' )
+!
+!        WRITE (LOGDEV, '( 5X, A )' ) ' '
+!
+!	CALL FLUSH( LOGDEV )
+!
+!        FINIT3 = .TRUE.
+!        INIT3  = LOGDEV
+!
+!        RETURN
+!
+!
+!C******************  FORMAT  STATEMENTS   ******************************
+!
+!C...........   Error and warning message formats..... 91xxx
+!
+!91010   FORMAT ( //5X , '*** ERROR ABORT in subroutine INIT3 ***',
+!     &            /5X , A , I3, :,
+!     &            /5X , A , A , // )
+!
+!91020   FORMAT ( //5X , '>>> WARNING in subroutine INIT3 <<<',
+!     &            /5X , A , I3, :,
+!     &            /5X , A , A , // )
+!
+!91030   FORMAT ( //5X , '>>> WARNING in subroutine INIT3 <<<',
+!     &            /5X , A , I3, :,
+!     &            /5X , A , A , // )
+!
+!
+!        END FUNCTION INIT3
 
-        use universal_data_module
-
-      IMPLICIT NONE
-
-!       INTEGER, EXTERNAL :: INITLOG3, JUNIT
-!       EXTERNAL          :: INITBLK3        !!  BLOCK DATA to initialize STATE3 commons
-
-        CHARACTER*16, PARAMETER:: SCENFILE = 'SCENFILE'
-        CHARACTER*64, PARAMETER :: NOTICE( 17 ) = (/
-     &'                                                              ',
-     &'This program uses the EPA-AREAL/MCNC-EnvPgms/BAMS Models-3    ',
-     &'I/O Applications Programming Interface, [I/O API] which is    ',
-     &'built on top of the netCDF I/O library (Copyright 1993, 1996  ',
-     &'University Corporation for Atmospheric Research/Unidata       ',
-     &'Program) and the PVM parallel-programming library (from       ',
-     &'Oak Ridge National Laboratory).  Copyright (C) 1992-2002 MCNC ',
-     &'and Carlie J. Coats, Jr., and 2003-2006 Baron Advanced        ',
-     &'Meteorological Systems, LLC and released under the GNU LGPL   ',
-     &'License, version 2.1.  See URL                                ',
-     &'                                                              ',
-     &'    http://www.baronams.com/products/ioapi/LGPL.txt           ',
-     &'                                                              ',
-     &'for conditions of use.                                        ',
-     &'                                                              ',
-     &'Library release tag: $JDate: 2010068 $                        ',
-     &'                                                              '
-     &   /)
-
-
-C...........   SCRATCH LOCAL VARIABLES and their descriptions:
-
-        CHARACTER*512   EQNAME
-        INTEGER         I, J, IOST, IDEV
-        LOGICAL         AFLAG
-
-        CHARACTER *80 VARVER
-        CHARACTER *80 NCFVER
-        CHARACTER *80, PARAMETER :: IOAPILIBVER =
-     &             '$Id: @(#) ioapi library version 3.1'
-     &             // ' $'
-
-        logical, save :: finit3 = .false.
-
-C***********************************************************************
-C   begin body of subroutine  INIT3
-
-#if defined(__sgi)    || defined(__mips__)
-
-        !!==========>  *HACK*  to deal with SGI v7.4  compilers, that
-        !!             do not follow industry standards with respect
-        !!             to how to make sure that BLOCK DATA modules are
-        !!             properly linked into an executable:
-
-        CALL INITBLK3
-
-#endif
-
-        IF ( FINIT3 ) THEN
-            INIT3 = LOGDEV
-            RETURN           !  M3 I/O already set up
-        END IF
-
-        LOGDEV = INITLOG3( 'INIT3' )
-
-        WRITE (LOGDEV, '( 5X, A )' ) ' '
-
-	CALL FLUSH( LOGDEV )
-
-        FINIT3 = .TRUE.
-        INIT3  = LOGDEV
-
-        RETURN
-
-
-C******************  FORMAT  STATEMENTS   ******************************
-
-C...........   Error and warning message formats..... 91xxx
-
-91010   FORMAT ( //5X , '*** ERROR ABORT in subroutine INIT3 ***',
-     &            /5X , A , I3, :,
-     &            /5X , A , A , // )
-
-91020   FORMAT ( //5X , '>>> WARNING in subroutine INIT3 <<<',
-     &            /5X , A , I3, :,
-     &            /5X , A , A , // )
-
-91030   FORMAT ( //5X , '>>> WARNING in subroutine INIT3 <<<',
-     &            /5X , A , I3, :,
-     &            /5X , A , A , // )
-
-
-        END FUNCTION INIT3
 
 C-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -1227,79 +1291,100 @@ C-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #endif
 
 ! ------------------------------------------------------------------------------
+!        INTEGER FUNCTION INITLOG3 ( CALLER )
+!
+!         use universal_data_module
+!         use logdev_mod
+!         use get_env_module
+!
+!      IMPLICIT NONE
+!
+!C...........   ARGUMENT and its description:
+!
+!        CHARACTER*(*), INTENT(IN   ) :: CALLER
+!
+!C...........   EXTERNAL FUNCTIONS and their descriptions:
+!
+!!       INTEGER, EXTERNAL :: JUNIT
+!!       EXTERNAL          :: INITBLK3
+!
+!
+!C...........   SCRATCH LOCAL VARIABLES and their descriptions:
+!
+!        CHARACTER*512   EQNAME
+!        CHARACTER*256   MESG            !  message/warning buffer
+!
+!        INTEGER         L, IOST
+!
+!C...........   SAVED LOCAL VARIABLES and their descriptions:
+!C...........   NOTE:  the ANSI standard requires the use of SAVE statements
+!C...........   for variables which must retain their values from call to call.
+!
+!        CHARACTER*16, PARAMETER :: LOGFILE = 'LOGFILE'
+!
+!
+!C***********************************************************************
+!C   begin body of subroutine  INITLOG
+!
+!#if defined(__sgi)    || defined(__mips__)
+!
+!        !!==========>  *HACK*  to deal with SGI v7.4 or later compilers,
+!        !!             that do not follow industry standards with respect
+!        !!             to how to make sure that BLOCK DATA modules are
+!        !!             properly linked into an executable:
+!
+!        CALL INITBLK3
+!
+!#endif
+!
+!        IF ( LOGDEV .LT. 0 ) THEN
+!
+!                LOGDEV = JUNIT()
+!                OPEN ( UNIT    =  LOGDEV,
+!     &                 IOSTAT  =  IOST,
+!     &                 FILE    =  mylogfile_name,
+!     &                 STATUS  =  'NEW',
+!     &                 ACCESS  =  'SEQUENTIAL')
+!
+!            IF ( IOST .NE. 0 ) THEN
+!                MESG =TRIM( CALLER ) // '/INITLOG3'
+!                WRITE( *, '( /, 5X, 3 A )' )
+!     &                    '***  ERROR in ', TRIM( MESG ), '  ***'
+!                WRITE( *, '( 5X, A, I10 )' )
+!     &                    'Error opening log file on unit', LOGDEV,
+!     &                    'I/O STATUS =', IOST
+!                WRITE( *, '( 5X, 2 A, / )' )
+!     &                    'File: ', TRIM( EQNAME )
+!                stop
+!            END IF
+!
+!        END IF          !  if logdev < 0
+!
+!        INITLOG3 = LOGDEV
+!
+!        RETURN
+!
+!        END FUNCTION INITLOG3
 
-        INTEGER FUNCTION INITLOG3 ( CALLER )
+        SUBROUTINE GETCDTTIME(JDATE,JTIME)
 
-         use universal_data_module
-         use get_env_module
+            IMPLICIT NONE
+            INTEGER, INTENT(INOUT) :: JDATE
+            INTEGER, INTENT(INOUT) :: JTIME
 
-      IMPLICIT NONE
+            INTEGER        :: TSTEP, VALUES(8)
 
-C...........   ARGUMENT and its description:
+! get local julian date and time
+           CALL DATE_AND_TIME(VALUES=VALUES)
+           JDATE = 1000 * VALUES(1) + JULIAN( VALUES(1), VALUES(2), VALUES(3) )
+           JTIME = 10000 * VALUES(5) + 100 * VALUES(6) + VALUES(7)
 
-        CHARACTER*(*), INTENT(IN   ) :: CALLER
+! convert difference with UTC from whole minutes to HHMMSS format
+           TSTEP = 10000 * VALUES(4)/60 + 100 * MOD( VALUES(4),60 )
 
-C...........   EXTERNAL FUNCTIONS and their descriptions:
+! convert to GMT or UTC
+           CALL NEXTIME(JDATE, JTIME, -TSTEP)
 
-!       INTEGER, EXTERNAL :: JUNIT
-!       EXTERNAL          :: INITBLK3
-
-
-C...........   SCRATCH LOCAL VARIABLES and their descriptions:
-
-        CHARACTER*512   EQNAME
-        CHARACTER*256   MESG            !  message/warning buffer
-
-        INTEGER         L, IOST
-
-C...........   SAVED LOCAL VARIABLES and their descriptions:
-C...........   NOTE:  the ANSI standard requires the use of SAVE statements
-C...........   for variables which must retain their values from call to call.
-
-        CHARACTER*16, PARAMETER :: LOGFILE = 'LOGFILE'
-
-
-C***********************************************************************
-C   begin body of subroutine  INITLOG
-
-#if defined(__sgi)    || defined(__mips__)
-
-        !!==========>  *HACK*  to deal with SGI v7.4 or later compilers,
-        !!             that do not follow industry standards with respect
-        !!             to how to make sure that BLOCK DATA modules are
-        !!             properly linked into an executable:
-
-        CALL INITBLK3
-
-#endif
-
-        IF ( LOGDEV .LT. 0 ) THEN
-
-                LOGDEV = JUNIT()
-                OPEN ( UNIT    =  LOGDEV,
-     &                 IOSTAT  =  IOST,
-     &                 FILE    =  mylogfile_name,
-     &                 STATUS  =  'NEW',
-     &                 ACCESS  =  'SEQUENTIAL')
-
-            IF ( IOST .NE. 0 ) THEN
-                MESG =TRIM( CALLER ) // '/INITLOG3'
-                WRITE( *, '( /, 5X, 3 A )' )
-     &                    '***  ERROR in ', TRIM( MESG ), '  ***'
-                WRITE( *, '( 5X, A, I10 )' )
-     &                    'Error opening log file on unit', LOGDEV,
-     &                    'I/O STATUS =', IOST
-                WRITE( *, '( 5X, 2 A, / )' )
-     &                    'File: ', TRIM( EQNAME )
-                stop
-            END IF
-
-        END IF          !  if logdev < 0
-
-        INITLOG3 = LOGDEV
-
-        RETURN
-
-        END FUNCTION INITLOG3
+        END SUBROUTINE GETCDTTIME
 
         end module replacement_util_module

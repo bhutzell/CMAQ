@@ -481,7 +481,7 @@
      &              ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
      &              'as an emission rate. If you wish to use this variable for ',
      &              'emissions, please correct the units (e.g. g/s or moles/s).'
-            CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
+            CALL LOG_WARNING( 'CHECK_EMIS_UNITS', LOGDEV, XMSG )
             ! No Conversion and and Unknown Basis
             CONV = 1.0e0
             BASIS = 'UNKNOWN'
@@ -497,7 +497,7 @@
      &              'as an emission rate. If you wish to use this variable for ',
      &              'emissions, please correct the units (e.g. g/s, moles/s, ',
      &              'g/m2/s, or g/s/m2, etc.).'
-            CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
+            CALL LOG_WARNING( 'CHECK_EMIS_UNITS', LOGDEV, XMSG )
             ! No Conversion and and Unknown Basis
             CONV = CONV * 1.0e0
             BASIS = 'UNKNOWN' 
@@ -529,7 +529,7 @@
      &              'as an emission rate. If you wish to use this variable for ',
      &              'emissions, please correct the units (e.g. g/s, moles/s, ',
      &              'g/m2/s, or g/s/m2, etc.).'
-            CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
+            CALL LOG_WARNING( 'CHECK_EMIS_UNITS', LOGDEV, XMSG )
             RETURN
          END IF
 
@@ -544,7 +544,7 @@
      &                'as an emission rate. If you wish to use this variable for ',
      &                'emissions, please correct the units (e.g. g/s, moles/s, ',
      &                'g/m2/s, or g/s/m2, etc.).'
-               CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
+               CALL LOG_WARNING( 'CHECK_EMIS_UNITS', LOGDEV, XMSG )
                RETURN
             END IF
          END IF
@@ -557,7 +557,7 @@
      &             'as an emission rate. If you wish to use this variable for ',
      &             'emissions, please correct the units (e.g. g/s, moles/s, ',
      &             'g/m2/s, or g/s/m2, etc.).'
-            CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
+            CALL LOG_WARNING( 'CHECK_EMIS_UNITS', LOGDEV, XMSG )
             BASIS = 'UNKNOWN'
             RETURN
          END IF 

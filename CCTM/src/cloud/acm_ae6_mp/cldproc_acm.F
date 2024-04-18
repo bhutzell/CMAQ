@@ -189,11 +189,11 @@ C...and return
 
           XMSG = 'No species were specified for wet deposition ' //
      &           'tracking'
-          CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 
           XMSG = 'ONLY CLOUD DIAGNOSTICS WILL BE WRITTEN TO THE ' //
      &           'WETDEP OUTPUT FILE!'
-          CALL M3MESG ( XMSG )
+          CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
         END IF
 

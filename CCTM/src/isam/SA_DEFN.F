@@ -28,6 +28,7 @@
 ! 26 Apr 22 G. Sarwar: Added DMS
 
       USE RUNTIME_VARS, ONLY : VOC_NOX_TRANS, ISAM_NOX_CASE, ISAM_VOC_CASE
+      USE GET_ENV_MODULE
       
       IMPLICIT NONE
 
@@ -190,8 +191,8 @@ c       USE HGRD_DEFN
                 
         IMPLICIT NONE
 
-        CHARACTER( 16 ) :: PNAME = 'CNT_SA_IO_LIST'
-        CHARACTER( 256 ) :: EQNAME 
+        CHARACTER( 16 )  :: PNAME = 'CNT_SA_IO_LIST'
+        CHARACTER( 256 ) :: EQNAME = 'isam_control.txt'
         INTEGER INPUT_UNIT
         INTEGER IOST
         CHARACTER( 80 ) :: XMSG   
@@ -203,7 +204,7 @@ C external functions
         CHARACTER( 180 ) :: TXTLINE
         
 C-----------------------------------------------------------
-        CALL NAMEVAL( 'SA_IOLIST', EQNAME )
+        CALL GET_ENV( EQNAME, 'SA_IOLIST', EQNAME, LOGDEV )
         INPUT_UNIT = JUNIT()
          
         OPEN ( UNIT = INPUT_UNIT, FILE = EQNAME, STATUS = 'OLD', IOSTAT = IOST )
@@ -213,7 +214,7 @@ C-----------------------------------------------------------
         ENDIF
 
         IF ( MYPE .EQ. 0 ) THEN        
-          WRITE(LOGDEV, *) TRIM( EQNAME ) // ': Sucessfully Opened'
+          WRITE(LOGDEV, *) TRIM( EQNAME ) // ': Successfully Opened'
           WRITE(LOGDEV, *) 'Start counting the list...'
         ENDIF
         NTAGS = 0
@@ -260,7 +261,7 @@ C arguments
         INTEGER, INTENT( IN ) :: NTAGS
 
         CHARACTER( 16 )    :: PNAME = 'RD_SA_IO_LIST'
-        CHARACTER( 256 )   :: EQNAME 
+        CHARACTER( 256 )   :: EQNAME = 'isam_control.txt'
         INTEGER INPUT_UNIT
         INTEGER IOST
         CHARACTER( 120 ) :: XMSG   
@@ -281,7 +282,7 @@ C...multi-sectors-for-a-single-tag 20130702
         CHARACTER(1) :: CHR
 
 C-----------------------------------------------------------
-        CALL NAMEVAL( 'SA_IOLIST', EQNAME )
+        CALL GET_ENV( EQNAME, 'SA_IOLIST', EQNAME, LOGDEV )
         INPUT_UNIT = JUNIT()
 
         OPEN ( UNIT = INPUT_UNIT, FILE = EQNAME, STATUS = 'OLD', IOSTAT = IOST )
@@ -1692,7 +1693,7 @@ C...Map SA species for Advection
         END DO
         
         IF ( TRANS_WARN ) THEN
-          CALL M3WARN( 'GET_MAP_SAtoCGR', 0, 0, 'Species above are not transported.' )
+          CALL LOG_WARNING( 'GET_MAP_SAtoCGR', LOGDEV, 'Species above are not transported.' )
         END IF
 
 95000    FORMAT(2(I3,1X),A,L4,1X,I4)

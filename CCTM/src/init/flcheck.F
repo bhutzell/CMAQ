@@ -42,7 +42,7 @@ C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
       USE RUNTIME_VARS, ONLY : LOG_HEADING, LOG_SUBHEADING, LOG_MESSAGE,
-     &                         RUNLEN, FL_ERR_STOP, LOGDEV
+     &                         LOG_WARNING, RUNLEN, FL_ERR_STOP, LOGDEV
 
       IMPLICIT NONE 
 
@@ -107,7 +107,7 @@ C-----------------------------------------------------------------------
                   IF ( FTYPE3D .EQ. GRDDED3 .OR. FTYPE3D .EQ. BNDARY3 ) THEN
 
                      MSG = 'Checking header data for file: ' // LGCL_NAME( N )
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
 
                      CALL GRDCHECK ( LGCL_NAME( N ), LOK )
 
@@ -120,7 +120,7 @@ C-----------------------------------------------------------------------
      &                                     JDATE, JTIME ) ) THEN
                            LOK = .FALSE.
                            MSG = 'Starting time not on file'
-                           CALL M3MESG( MSG )
+                           CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         END IF
  
                         ! skip checking ending time for output files
@@ -130,7 +130,7 @@ C-----------------------------------------------------------------------
      &                                        JDATE, JTIME ) ) THEN
                               LOK = .FALSE.
                               MSG = 'Ending time not on file'
-                              CALL M3MESG( MSG )
+                              CALL LOG_MESSAGE( LOGDEV ,  MSG )
                            END IF
                         END IF
 
@@ -144,7 +144,7 @@ C-----------------------------------------------------------------------
 
                   LOK = .FALSE.
                   MSG = 'DESC3 failed for ' // LGCL_NAME( N )
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
 
                END IF   ! DESC3 successful
 
@@ -159,7 +159,7 @@ C-----------------------------------------------------------------------
          IF ( FL_ERR_STOP ) THEN       
             CALL M3EXIT ( PNAME, STDATE, STTIME, MSG, XSTAT2 )
          ELSE
-            CALL M3WARN ( PNAME, STDATE, STTIME, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             RETURN
          END IF
       ELSE

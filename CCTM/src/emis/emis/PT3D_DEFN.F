@@ -66,9 +66,10 @@ C     19 Sep  2019 D. Wong: Fixed the way to advance to next day on an emission 
 C-----------------------------------------------------------------------
 
       USE UDTYPES, ONLY: RARRY1
+      USE RUNTIME_VARS, ONLY : LOG_MESSAGE
 
       IMPLICIT NONE
-
+      INCLUDE SUBST_FILES_ID
 
       PUBLIC PT3D_INIT, GET_PT3D_EMIS
       PRIVATE
@@ -144,7 +145,7 @@ C=======================================================================
      &                      METDXORIG, METDYORIG, XCELLDG, YCELLDG
 
          USE UTILIO_DEFN
-         USE RUNTIME_VARS, ONLY: LOGDEV, MYPE, PT3DFRAC, PT_DATE, STDATE, STTIME,
+         USE RUNTIME_VARS, ONLY: LOGDEV,LOG_WARNING, MYPE, PT3DFRAC, PT_DATE, STDATE, STTIME,
      &                           PT_TIME, PT_NSTEPS, REP_LAYR
          USE DESID_VARS, ONLY: DESID_LAYS, DESID_MAXLAYS
          USE stack_group_data_module
@@ -210,7 +211,7 @@ C-----------------------------------------------------------------------
 C In-line 3D point source emissions?
          IF ( NPTGRPS .GT. 0 ) THEN
             XMSG = 'Using in-line 3d point source emissions option'
-            CALL M3MSG2( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          ELSE
             RETURN
          END IF
@@ -222,7 +223,7 @@ C rise algorithm
             XMSG = 'Environment variable CTM_DESID_LAYS must be set to ' //
      &             'a number from 4 to the ' // CRLF() // BLANK10 //
      &             'number of layers in the meteorology inputs.'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 C get diagnostic files options
@@ -242,22 +243,21 @@ C get diagnostic files options
 
          END IF
 
-         CALL M3MSG2( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 #ifndef mpas
 #ifdef srcid
          IF ( PT3DFRAC ) THEN   ! save local source id's
             ALLOCATE ( LDEV( NPTGRPS ), STAT = IOS )
             CALL CHECKMEM( IOS, 'LDEV', PNAME )
             LDEV = 0   ! array
-            WRITE( XMSG,94010 ) "Enter logical name for file containing " //
-     &                          "source id's of play files"
+!            WRITE( XMSG,94010 ) "Enter logical name for file containing " //
+!     &                          "source id's of play files"
             ALLOCATE ( PLAY_SRCID_NAME( NPTGRPS ), STAT = IOS )
             CALL CHECKMEM( IOS, 'PLAY_SRCID_NAME', PNAME )
             DO N = 1, NPTGRPS
                WRITE( REPSTR,'( "SRCIDLAY", I2.2, "_" )' ) N
                WRITE( PLAY_SRCID_NAME( N ),'( A, I2.2 )' ) REPSTR, MYPE   ! limited to 99 PE's
-               LDEV( N ) = PROMPTFFILE( XMSG, .FALSE., .TRUE.,
-     &                                  PLAY_SRCID_NAME( N ), PNAME )
+               LDEV( N ) = GETEFILE( PLAY_SRCID_NAME( N ), .FALSE., .TRUE., PNAME )
             END DO
          END IF
 #endif
@@ -266,14 +266,14 @@ C get diagnostic files options
          CALL CHECKMEM( IOS, 'RDEV', PNAME )
          RDEV = 0   ! array
          IF ( REP_LAYR .GT. 0 ) THEN
-            WRITE( XMSG,94010 ) 'Enter logical name for report of ' //
-     &                          'plumes exceeding layer', REP_LAYR
+!            WRITE( XMSG,94010 ) 'Enter logical name for report of ' //
+!     &                          'plumes exceeding layer', REP_LAYR
             ALLOCATE ( REPTNAME( NPTGRPS ), STAT = IOS )
             CALL CHECKMEM( IOS, 'REPTNAME', PNAME )
             DO N = 1, NPTGRPS
                WRITE( REPSTR,'( "REPRTLAY", I2.2, "_" )' ) N
                WRITE( REPTNAME( N ),'( A, I2.2 )' ) REPSTR, MYPE   ! limited to 99 PE's
-               RDEV( N ) = PROMPTFFILE( XMSG, .FALSE., .TRUE., REPTNAME( N ), PNAME )
+               RDEV( N ) = GETEFILE( REPTNAME( N ), .FALSE., .TRUE., PNAME )
             END DO
          END IF
 
@@ -284,14 +284,9 @@ C get scenario timing
 
 C open met files
 
-         MC2NAME = PROMPTMFILE( 'Enter name for CROSS-POINT SURFACE MET file',
-     &                          FSREAD3, 'MET_CRO_2D', PNAME )
-
-         MC3NAME = PROMPTMFILE( 'Enter name for CROSS-POINT LAYERED MET file',
-     &                          FSREAD3, 'MET_CRO_3D', PNAME )
-
-         MD3NAME = PROMPTMFILE( 'Enter name for DOT-POINT LAYERED MET file',
-     &                          FSREAD3, 'MET_DOT_3D', PNAME )
+         MC2NAME = MET_CRO_2D
+         MC3NAME = MET_CRO_3D
+         MD3NAME = MET_DOT_3D
 
 C Get grid parameters from 3-d cross-point met file and store header information.
 C Use time parameters for time defaults.
@@ -344,12 +339,12 @@ C Compare number of meteorology layers to number of emissions layers
 !            WRITE( XMSG,94010 ) 'NOTE: The number of emission layers ' //
 !     &                          'is', DESID_LAYS, ', and the maximum ' // CRLF()
 !     &                          // BLANK10 // 'possible layers is', NLAYS
-!            CALL M3MSG2( XMSG )
+!            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 !         ELSE
 !            WRITE( XMSG,94010 ) 'Resetting number of emission layers ' //
 !     &                          'from', DESID_LAYS, 'to number of ' // CRLF() //
 !     &                          BLANK10 // 'layers in the meteorology file,', NLAYS
-!            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+!            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 !            DESID_LAYS = NLAYS
 !         END IF
 
@@ -383,7 +378,7 @@ C Get stack data
 
 !        IF ( .NOT. STK_PRMS_INIT( STKGNAME ) ) THEN
 !           XMSG = 'Could not initialize stack parameters'
-!           CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+!           CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 !           SUCCESS = .FALSE.; RETURN
 !        END IF
 #endif
@@ -413,7 +408,7 @@ C Initialize stack emissions data
          ! Initialize Point Source Emissions
          IF ( .NOT. STK_EMIS_INIT( STKENAME, JDATE, JTIME ) ) THEN
             XMSG = 'Could not initialize stack parameters'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -423,7 +418,7 @@ C Initialize stack emissions data
             IF ( NSRC( N ) .NE. NSRC_EMIS( N ) ) THEN
                WRITE( LOGDEV,* ) 'NSRC vs. NSRC_EMIS:', N, NSRC( N ), NSRC_EMIS( N )
                XMSG = 'No. of sources for stack files don''t match'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
          END DO
@@ -441,7 +436,7 @@ C Open diagnostic layer fractions file?
 
          IF ( .NOT. PTMET_INIT ( ) ) THEN
             XMSG = 'Could not initialize stack met data'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -665,7 +660,7 @@ C Based on the current time step, find whether or not a report should be written
 !         WRITE( XMSG,'(A, I7.6)' )
 !     &   'Calculating emissions point source layer fractions for', JTIME
 !         WRITE( LOGDEV,* ) ' '
-!         CALL M3MSG2( XMSG )
+!         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 !
 !         IF ( LDATE .NE. JDATE ) THEN  ! write day and date to stdout & XMSG
 !            CALL WRDAYMSG( JDATE, XMSG )
@@ -884,7 +879,7 @@ C-----------------------------------------------------------------------
       USE STK_PRMS, ONLY : MY_STRT_SRC, MY_END_SRC, MY_NSRC, SOURCE
 #endif
       USE PTMET, ONLY : DESID_LAYS, P_D => PTMET_DATA
-      USE RUNTIME_VARS, ONLY : LOGDEV, IPVERT, PT3DFRAC, REP_LAYR, LOG_MESSAGE
+      USE RUNTIME_VARS, ONLY : LOGDEV, IPVERT, PT3DFRAC, REP_LAYR, LOG_MESSAGE, LOG_WARNING
       USE UTILIO_DEFN
       USE CENTRALIZED_IO_MODULE, only : interpolate_var
 #ifdef mpas
@@ -1212,7 +1207,7 @@ C (~mass concentration -- minor hydrostatic assumption) from bottom to top.
             WRITE( CINT,'( I8 )' ) S
             WRITE( XMSG,94010 ) 'ERROR: Top of plume is less than '
      &                          // 'top of stack for source:' // CINT
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
             WRITE( LOGDEV,* ) '    Zbot: ', ZBOT, ' Ztop: ', ZTOP
             WRITE( LOGDEV,* ) '    Stack Top: ', STK_HT( N )%ARRY( S ),
      &                        ' Plume Top: ', ZPLM
@@ -1283,7 +1278,7 @@ C  ZZF( LTOP-1 ) <= ZTOP < ZZF( LTOP )
      &            'Infinitely small plume created for source:,'
      &            // CINT // CRLF() // BLANK10
      &            // 'All emissions put in first layer.'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                LBOT = 1; LTOP = 1
                TFRAC( LBOT,S ) = 1.0
 
@@ -1308,7 +1303,7 @@ C If layer fractions are negative, put in the first layer
      &               // 'fractions found for source:' // CINT
      &               // CRLF() // BLANK10 // 'Plume reset to '
      &               // 'put all emissions in surface layer.'
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
             TFRAC( 1,S ) = 1.0
             TFRAC( 2:DESID_LAYS,S ) = 0.0

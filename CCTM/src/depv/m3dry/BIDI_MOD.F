@@ -212,7 +212,7 @@ C--------------------------------------------------------------------------
 
                XMSG = 'Could not open ' // MEDIA_CONC // ' file for update - '
      &             // 'try to open new'
-               Call M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
                FTYPE3D = GRDDED3
                SDATE3D = JDATE
@@ -284,7 +284,7 @@ C--------------------------------------------------------------------------
 
                XMSG = 'Could not open ' // MEDIA_CONC // ' file for update - '
      &             // 'try to open new'
-               Call M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
                FTYPE3D = GRDDED3
                SDATE3D = JDATE
@@ -353,7 +353,7 @@ C--------------------------------------------------------------------------
 
                XMSG = 'Could not open ' // MEDIA_CONC // ' file for update - '
      &             // 'try to open new'
-               Call M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
                FTYPE3D = GRDDED3
                SDATE3D = JDATE

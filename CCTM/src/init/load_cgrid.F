@@ -265,7 +265,7 @@ C if there`s a surrogate name, CGRID_SPCS handles setting GC_ICBC_FAC
                ELSE
                   XMSG = ESTR1 // TRIM( GC_IC( ISUR ) ) // ESTR2 // 
      &                   TRIM(GC_SPC( SPC ))
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 C If there is no surrogate or it cannot be found, look for the (main) species name on the IC file
@@ -280,7 +280,7 @@ C If there is no surrogate or it cannot be found, look for the (main) species na
                   ICBC_FAC( SPC ) = 1.0
                ELSE
                   XMSG = ESTR1 // TRIM( GC_SPC( SPC ) ) // ESTR3
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 
@@ -312,7 +312,7 @@ C is it on the IC file?
                ELSE
                   XMSG = ESTR1 // TRIM( AE_IC( ISUR ) ) // ESTR2 // 
      &                   TRIM(AE_SPC( SPC ))
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 C If there is no surrogate or it cant be found, look for the (main) species name on the IC file
@@ -327,7 +327,7 @@ C If there is no surrogate or it cant be found, look for the (main) species name
                   ICBC_FAC( SPC ) = 1.0
                ELSE
                   XMSG = ESTR1 // TRIM( AE_SPC( SPC ) ) // ESTR3
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 
@@ -359,7 +359,7 @@ C is it on the IC file?
                ELSE
                   XMSG = ESTR1 // TRIM( NR_IC( ISUR ) ) // ESTR2 // 
      &                   TRIM(NR_SPC( SPC ))
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 C If there is no surrogate or it cant be found, look for the (main) species name on the IC file
@@ -374,7 +374,7 @@ C If there is no surrogate or it cant be found, look for the (main) species name
                   ICBC_FAC( SPC ) = 1.0
                ELSE
                   XMSG = ESTR1 // TRIM( NR_SPC( SPC ) ) // ESTR3
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 
@@ -406,7 +406,7 @@ C is it on the IC file?
                ELSE
                   XMSG = ESTR1 // TRIM( TR_IC( ISUR ) ) // ESTR2 // 
      &                   TRIM(TR_SPC( SPC ))
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 C If there is no surrogate or it cant be found, look for the (main) species name on the IC file
@@ -421,7 +421,7 @@ C If there is no surrogate or it cant be found, look for the (main) species name
                   ICBC_FAC( SPC ) = 1.0
                ELSE
                   XMSG = ESTR1 // TRIM( TR_SPC( SPC ) ) // ESTR3
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 
@@ -621,7 +621,7 @@ C correct sulfate vapor concentration for part removed:
 
             XMSG = 'No IC''s found for aerosol sulfate. ' //
      &             'Gas Chem sulfate used for partitioning.'
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
          END IF  ! NDX .EQ. 0
 

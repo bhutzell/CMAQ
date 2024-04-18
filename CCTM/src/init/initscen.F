@@ -244,7 +244,7 @@ C *** Open the aerosol parameters file (diameters and standard deviations).
 #endif
          MSG = 'Could not open ' // TRIM( CTM_CONC_1 ) // ' for update - '
      &        // 'try to open new'
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          ! Open the file new
          CALL SUBST_BARRIER
          CALL OPCONC ( STDATE, STTIME, TSTEP( 1 ) )

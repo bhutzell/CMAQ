@@ -133,7 +133,7 @@ c        CALL SUBST_BARRIER
 
             XMSG = 'Could not open ' // TRIM( SA_ACONC_1 )
      &           // ' file for update - try to open new'
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
             IF ( MYPE .EQ. 0 ) THEN
 

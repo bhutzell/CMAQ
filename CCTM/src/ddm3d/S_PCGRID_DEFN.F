@@ -106,7 +106,7 @@ C PCGRID extents
 
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating S_PCGRID or S_PCGRID_TEMP'
-               CALL M3WARN ( 'S_PCGRID_IN', 0, 0, XMSG )
+               CALL LOG_WARNING( 'S_PCGRID_IN', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
                END IF
 
@@ -115,7 +115,7 @@ C PCGRID extents
 
             ELSE
             XMSG = 'S_PCGRID or S_PCGRID_TEMP already ALLOCATED'
-            CALL M3WARN ( 'S_PCGRID_IN', 0, 0, XMSG )
+            CALL LOG_WARNING( 'S_PCGRID_IN', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 

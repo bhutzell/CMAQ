@@ -77,6 +77,7 @@ C-----------------------------------------------------------------------
       USE DDM3D_DEFN, ONLY : NP, NPMAX
       Use aero_ddm3d, ONLY : init_aero_ddm3d, ae_ddm3d_ready, og_sens, rog_dsens
 #endif 
+      USE LOGDEV_MOD
       Implicit None
 
       ! Define Logical values as T and F for the OA table
@@ -616,7 +617,7 @@ C-----------------------------------------------------------------------
       xmsg = 'FATAL:' // Trim( vname )
      &  // ' is not found in the G2AE or N2AE values of GC or NR namelists.'
       OA_eflag  = .True.
-      Call m3warn( pname, 0, 0, xmsg )
+      CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
  
 
       Return
@@ -1060,7 +1061,7 @@ C-----------------------------------------------------------------------
          If ( nsvol_NotTracers .Le. 0 ) Then
             xmsg = 'All semivolatile SOA species are tracers. Not realistic model setup.'
             solve_orgmoles = .False.
-            Call m3warn( pname, 0, 0, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
          End If
          
          Allocate( svname( nsvol ), svmw( nsvol ), svmw_inv( nsvol ),
@@ -2281,11 +2282,11 @@ C     abstol (absolute) amount
 !    &      'Warning: possible false convergence in soa bisection:', fnguess, nroot, pfc
             Write( xmsg,'(a,2(1pe15.5))' )
      &      'Warning: possible false convergence in soa bisection:', fnguess, nroot
-            Call m3warn( pname, 0, 0, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 #else
             xmsg = 'Warning: possible false convergence in soa bisection'
 #endif
-!           Call m3warn( pname, 0, 0, xmsg )
+!           CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
           End If
 
           Return

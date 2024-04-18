@@ -97,7 +97,7 @@ C-----------------------------------------------------------------------
         IF ( .NOT. OK ) THEN
           XMSG = 'Could not open ' // SA_CGRID_1 // 
      & ' file for update - try to open new'
-          CALL M3MESG( XMSG )
+          CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
           IF ( MYPE .EQ. 0 ) THEN
             ! open sa_conc_1

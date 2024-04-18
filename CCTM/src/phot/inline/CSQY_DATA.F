@@ -361,7 +361,7 @@ C     NONE
 
       IF ( PHOTAB_UNIT .LT. 0 ) THEN
          MSG = 'Error opening the CSQY data file: ' // TRIM( CSQY_FILE )
-         CALL M3WARN ( PNAME, 0, 0, MSG )
+         CALL LOG_WARNING( PNAME, LOGDEV , MSG)
          ERROR_FLAG = .TRUE.
       END IF
 
@@ -372,7 +372,7 @@ C...begin read
       IF ( JTABLE_REF .NE. MECHNAME ) THEN
          MSG =  'WARNING: JTABLE mechanism is for ' // JTABLE_REF
      &       // ' but gas chemistry name is '       // MECHNAME
-         CALL M3WARN( PNAME, 0, 0, MSG )
+         CALL LOG_WARNING( PNAME, LOGDEV , MSG)
       END IF
 
       READ( PHOTAB_UNIT,'(10X,I4)' ) NPHOT_MAP
@@ -381,7 +381,7 @@ C...begin read
          WRITE( MSG,'( A,1X,I4,1X,A,1X,I4)')
      &   'Error: CSQY data file has',NPHOT_MAP,
      &   'rates but the need number is',NPHOTAB
-          CALL M3WARN( PNAME, 0, 0, MSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , MSG)
          ERROR_FLAG = .TRUE.
       END IF
 
@@ -552,7 +552,7 @@ C...begin read
             IF ( PHOT_EXPECT .NE. PNAME_REF(IPHOT_LOAD) ) THEN
                MSG =  'EQY for ' // TRIM( PHOT_EXPECT )
      &             // ' does match the order the PHOT_MAP array.'
-               CALL M3WARN( PNAME, 0, 0, MSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
                ERROR_FLAG = .TRUE.
             END IF
          END DO
@@ -587,7 +587,7 @@ C...begin read
          IF ( PHOT_EXPECT .NE. 'O3_STRAT' ) THEN
             MSG = 'O3_STRAT not found at expected location in CSQY_FILE. ' //
      &            TRIM( PHOT_EXPECT ) // ' found.'
-            CALL M3WARN( PNAME, 0, 0, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             ERROR_FLAG = .TRUE.
          END IF
       END DO
@@ -640,7 +640,7 @@ C...begin read
      &          // ' not found in ' //
      &             'the reference data! '
              ERROR_FLAG = .TRUE.
-             CALL M3WARN ( PNAME, 0, 0, MSG )
+             CALL LOG_WARNING( PNAME, LOGDEV , MSG)
              CYCLE
           END IF
           IP_REF = PHOT_MAP( IP_MAP )
@@ -695,26 +695,26 @@ C...begin read
        IF ( LNO2   .EQ. 0 ) THEN
           MSG = 'NO2 cross-section not found in the CSQY data! '
           ERROR_FLAG = .TRUE.
-          CALL M3WARN ( PNAME, 0, 0, MSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , MSG)
        END IF
        IF ( LO3O1D .EQ. 0 ) THEN
           MSG = 'O3(1D) production not found in the CSQY data! '
-          CALL M3WARN ( 'NEW_OPTICS', 0, 0, MSG )
+          CALL LOG_WARNING( 'NEW_OPTICS', LOGDEV, MSG )
        END IF
        IF ( LO3O3P .EQ. 0 ) THEN
           MSG = 'O3 cross-section not found in the CSQY data! '
           ERROR_FLAG = .TRUE.
-          CALL M3WARN ( PNAME, 0, 0, MSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , MSG)
        END IF
        IF ( LH2O2 .EQ. 0 ) THEN
           MSG = 'H2O2 cross-section not found in the CSQY data! '
           ERROR_FLAG = .TRUE.
-          CALL M3WARN ( PNAME, 0, 0, MSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , MSG)
        END IF
        IF ( LHNO3 .EQ. 0 ) THEN
           MSG = 'HNO3 cross-section not found in the CSQY data! '
           ERROR_FLAG = .TRUE.
-          CALL M3WARN ( PNAME, 0, 0, MSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , MSG)
        END IF
 
        IF( ERROR_FLAG )THEN
@@ -977,7 +977,7 @@ C...begin read
             IF ( OPTICS_EXPECT .NE. QUANTITY ) THEN
                MSG =  'Optical quantity read ' // TRIM( OPTICS_EXPECT )
      &             // ' does match expected quantity, ' // TRIM( QUANTITY )
-               CALL M3WARN( PNAME, 0, 0, MSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
                ERROR_FLAG = .TRUE.
             END IF
       END DO
@@ -1002,7 +1002,7 @@ C...begin read
             IF ( OPTICS_EXPECT .NE. QUANTITY ) THEN
                MSG =  'Optical quantity read ' // TRIM( OPTICS_EXPECT )
      &             // ' does match expected quantity, ' // TRIM( QUANTITY )
-               CALL M3WARN( PNAME, 0, 0, MSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
                ERROR_FLAG = .TRUE.
             END IF
       END DO
@@ -1027,7 +1027,7 @@ C...begin read
             IF ( OPTICS_EXPECT .NE. QUANTITY ) THEN
                MSG =  'Optical quantity read ' // TRIM( OPTICS_EXPECT )
      &             // ' does match expected quantity, ' // TRIM( QUANTITY )
-               CALL M3WARN( PNAME, 0, 0, MSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
                ERROR_FLAG = .TRUE.
             END IF
       END DO
@@ -1075,7 +1075,7 @@ C...begin read
             IF ( OPTICS_EXPECT .NE. QUANTITY ) THEN
                MSG =  'Optical quantity read ' // TRIM( OPTICS_EXPECT )
      &             // ' does match expected quantity, ' // TRIM( QUANTITY )
-               CALL M3WARN( PNAME, 0, 0, MSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
                ERROR_FLAG = .TRUE.
             END IF
       END DO
@@ -1100,7 +1100,7 @@ C...begin read
             IF ( OPTICS_EXPECT .NE. QUANTITY ) THEN
                MSG =  'Optical quantity read ' // TRIM( OPTICS_EXPECT )
      &             // ' does match expected quantity, ' // TRIM( QUANTITY )
-               CALL M3WARN( PNAME, 0, 0, MSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
                ERROR_FLAG = .TRUE.
             END IF
       END DO
@@ -1125,7 +1125,7 @@ C...begin read
             IF ( OPTICS_EXPECT .NE. QUANTITY ) THEN
                MSG =  'Optical quantity read ' // TRIM( OPTICS_EXPECT )
      &             // ' does match expected quantity, ' // TRIM( QUANTITY )
-               CALL M3WARN( PNAME, 0, 0, MSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
                ERROR_FLAG = .TRUE.
             END IF
       END DO
@@ -1150,7 +1150,7 @@ C...begin read
             IF ( OPTICS_EXPECT .NE. QUANTITY ) THEN
                MSG =  'Optical quantity read ' // TRIM( OPTICS_EXPECT )
      &             // ' does match expected quantity, ' // TRIM( QUANTITY )
-               CALL M3WARN( PNAME, 0, 0, MSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
                ERROR_FLAG = .TRUE.
             END IF
       END DO
@@ -1163,7 +1163,7 @@ C...begin read
 
       IF( DELTA  .LE. EPSILON )THEN
          WRITE( MSG, 99951)DELTA
-               CALL M3WARN( PNAME, 0, 0, MSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
                ERROR_FLAG = .TRUE.
       ELSE
          FREQ_RADIUS_LIQUID = 1.0 / DELTA
@@ -1178,7 +1178,7 @@ C...begin read
 
       IF( DELTA  .LE. EPSILON )THEN
          WRITE( MSG, 99952)DELTA
-         CALL M3WARN( PNAME, 0, 0, MSG )
+         CALL LOG_WARNING( PNAME, LOGDEV , MSG)
          ERROR_FLAG = .TRUE.
       ELSE
          FREQ_DIAMETER_ICE = 1.0 / DELTA
@@ -1368,7 +1368,7 @@ C...begin read
      &       // TRIM( OPTICS_FILE )
      &       // ' does not contain data for NLCD40 land use and'
      &       // ' corresponds to CMAQ version 5.01.'
-          CALL M3MESG( MSG )
+          CALL LOG_MESSAGE( LOGDEV ,  MSG )
       END IF
 
 ! set the default values for surface albedo

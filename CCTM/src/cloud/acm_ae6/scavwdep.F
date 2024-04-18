@@ -179,7 +179,7 @@ C...  for scavenging, otherwise notify the user and return
         IF ( N_CGRID_SCAV .LE. 0 ) THEN
           XMSG = 'No species were specified for scavenging by cloud ' //
      &           'or rain water...SCAVENGING WILL NOT BE PERFORMED!'
-          CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
           RETURN
         END IF
 

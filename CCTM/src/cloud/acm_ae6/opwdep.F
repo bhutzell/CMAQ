@@ -85,11 +85,11 @@
 
           XMSG = 'No species were specified for wet deposition ' //
      &           'tracking'
-          CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 
           XMSG = 'ONLY CLOUD DIAGNOSTICS WILL BE WRITTEN TO THE ' //
      &           'WETDEP OUTPUT FILE!'
-          CALL M3MESG ( XMSG )
+          CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
         END IF
 
@@ -102,7 +102,7 @@ C Try to open existing wet deposition file for update
 
               XMSG = 'Could not open ' // CTM_WET_DEP_1 // ' file for update - '
      &               // 'try to open new'
-              CALL M3MESG( XMSG )
+              CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 !...Create wet deposition file:
 !...   copy most of header description from
@@ -226,7 +226,7 @@ C Try to open existing wet deposition file for update
            IF ( .NOT. OPEN3( CTM_SWETDEP_1, FSRDWR3, PNAME ) ) THEN
                XMSG = 'Could not open ' // CTM_SWETDEP_1 //
      &                ' file for update - try to open new'
-               CALL M3MESG( XMSG )
+               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 C...Create sensitivity wet deposition file:
                NVARS3D = ( N_SPC_WDEP + 1 ) * NPMAX
@@ -332,7 +332,7 @@ C...try to open the output file new
 
                  XMSG = 'Could not open ' // CTM_WET_DEP_2 // ' file for update - '
      &                  // 'try to open new'
-                 CALL M3MESG( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 !...copy most of header description from
 !...CTM_WET_DEP_1 and initialize depositions to zero.

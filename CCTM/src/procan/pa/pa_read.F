@@ -51,6 +51,7 @@ C-----------------------------------------------------------------------
       USE PA_DEFN, Only: LIPR, LIRR, NIPRVAR, NIRRVAR,
      &                   IRRNAME, IRRDESC, LPARTIRR, LFULLIRR, N_IPR_SPC
       USE PA_PARSE
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
       IMPLICIT NONE
       
@@ -88,7 +89,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IFILE = GETEFILE ( PACM_INFILE, LRDONLY, LFMTTED, PNAME )
       IF ( IFILE .LT. 0 ) THEN
          MSG = 'PACM_INFILE not found; looking for pa.inp'
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          IFILE = GETEFILE ( 'pa.inp', LRDONLY, LFMTTED, PNAME )
          IF ( IFILE .LT. 0 ) THEN 
             MSG = 'ERROR: Could not open PACM input file'
@@ -111,11 +112,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          LIRRTYPE = .TRUE.
          IF ( CHR .NE. '=' ) THEN
             WRITE( MSG, 94060 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94000 ) LINNUM, INBUF
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94020 ) CHR
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT2 )
          END IF
          CALL GETCHR
@@ -132,20 +133,20 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             LPARTIRR = .FALSE.             
          ELSE
             WRITE( MSG, 94080 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94000 ) LINNUM, INBUF
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94040 ) WORD
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT2 )
          END IF
          IF ( CHR .NE. ';' ) THEN
             WRITE( MSG, 94100 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94000 ) LINNUM, INBUF
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94020 ) CHR
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT2 )
          ELSE
             CALL GETCHR
@@ -168,11 +169,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             CALL GETCYCLE
          ELSE
             WRITE( MSG, 94120 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94000 ) LINNUM, INBUF
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG,94040 ) WORD
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT2 )
          END IF
       ELSE IF ( WORD .EQ. 'IPR_OUTPUT' ) THEN
@@ -185,11 +186,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          GO TO 100
       ELSE
          WRITE( MSG, 94140 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94000 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94040 ) WORD
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT2 )
       END IF
       LASTCMND = CMND
@@ -242,29 +243,29 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF ( LIRRTYPE ) THEN
          IF ( LFULLIRR .AND. NIRROUT .GT. 0 ) THEN
             WRITE( MSG, 94240 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94260 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
          ELSE IF ( LPARTIRR .AND. NIRROUT .EQ. 0 ) THEN
             LPARTIRR = .FALSE.
             WRITE( MSG, 94280 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94300 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
          ELSE IF ( LIRRNONE .AND. NIRROUT .GT. 0 ) THEN
             WRITE( MSG, 94320 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94340 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
          END IF
       ELSE
          IF ( NIRROUT .GT. 0 ) THEN
             LPARTIRR = .TRUE.
             LFULLIRR = .FALSE.
             WRITE( MSG, 94360 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94380 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
          END IF
       END IF            
       RETURN 
