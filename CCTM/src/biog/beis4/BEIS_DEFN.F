@@ -153,6 +153,7 @@ C Local variables
          CHARACTER(  16 ) :: FILE_SPPRO ! label read from gspro
 
          REAL                SPLTFAC, SDIV, SMFAC ! line speciation profile factors
+         REAL,    ALLOCATABLE, SAVE :: NOPOL( :,: )    ! emissions of NO
 
          TYPE BIOG_MECH_TYPE
               CHARACTER( 32 ) :: CHEMMECH
@@ -669,6 +670,13 @@ C Initialize Biogenic Emission Array Variable
             CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
             SUCCESS = .FALSE.; RETURN
          END IF
+          
+C Initialize temporal non-speciated soil NO emissions
+         ALLOCATE( NOPOL( NCOLS,NROWS ), STAT=IOS )
+         CALL CHECKMEM( IOS, 'NOPOL', PNAME )
+         NOPOL(:,:) = 0.0
+         CALL HRNO( JDATE, JTIME, TSTEP, NOPOL, .FALSE. )
+         DEALLOCATE( NOPOL )
 
          SUCCESS = .TRUE.
 

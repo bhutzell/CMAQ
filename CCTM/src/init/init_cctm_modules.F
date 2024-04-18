@@ -116,6 +116,8 @@ C Arguments:
       !CALL CHEM ( CGRID, JDATE, JTIME, TSTEP )
       !CALL AERO ( CGRID, JDATE, JTIME, TSTEP )
 
+      ! Write CGRID state file for subsequent runs
+      CALL WR_CGRID ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
 
       END SUBROUTINE INIT_CCTM_MODULES
 
