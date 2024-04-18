@@ -118,6 +118,9 @@ C Arguments:
 
       ! Write CGRID state file for subsequent runs
       CALL WR_CGRID ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
+#ifdef sens
+      CALL WR_SENGRID ( JDATE, JTIME, TSTEP( 1 )  )
+#endif
 
       END SUBROUTINE INIT_CCTM_MODULES
 
