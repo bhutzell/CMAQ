@@ -149,8 +149,8 @@ C----------------------------------------------------------------------
       Use aero_data, only: ae6hg, aphgj_idx
       Use cgrid_spcs, only: n_gc_g2ae, gc_g2ae, gc_g2ae_map, gc_molwt, gc_strt,
      &                      n_nr_n2ae, nr_n2ae, nr_n2ae_map, nr_molwt, nr_strt
-      Use utilio_defn, only: index1, xstat3, m3warn, m3exit
-      Use runtime_vars, only: logdev, LOG_MESSAGE
+      Use utilio_defn, only: index1, xstat3, m3exit
+      Use runtime_vars, only: logdev, LOG_MESSAGE, LOG_WARNING
 
       Implicit None
 
@@ -183,7 +183,7 @@ C Build mapping to CGRID for each precursor species
                   Precursor_eflag = .True.
                   xmsg = 'FATAL: Simulation requires a species in GC or NR namelist ' //
      &                   'to have its G2AE or N2AE value set to ' // Trim( precursor( spc )%name )
-                  Call m3warn( 'map_precursor', 0, 0, xmsg )
+                  Call LOG_WARNING( 'map_precursor', logdev, xmsg )
                 Else
                   write(logdev,99902)Trim( precursor( spc )%name )
                 End If 
@@ -206,12 +206,12 @@ C Find indices of required species
          If(   precursor_map( PHGRXN_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_PHGRXN )
      &         // ' not found -> NO gas production of APHG species'
-           Call m3warn( 'map_precursor', 0, 0, xmsg )
+           Call LOG_WARNING( 'map_precursor', logdev, xmsg )
          End If 
 #ifdef verbose_aero
       Else 
          xmsg = ' NO particulate mercury in model.'
-         Call m3warn( 'map_precursor', 0, 0, xmsg )
+         Call LOG_WARNING( 'map_precursor', logdev, xmsg )
          PHGRXN_idx = 0
 #endif
       end if
@@ -423,6 +423,7 @@ C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
 C-----------------------------------------------------------------------
 
       use utilio_defn
+      use logdev_mod
 
       Implicit None
 
@@ -448,7 +449,7 @@ C Local Variables:
       xmsg = 'FATAL: ' // Trim( vname )
      &    // ' is not found in the G2AE or N2AE values of GC or NR namelists'
       Precursor_eflag  = .True.
-      Call m3warn( pname, 0, 0, xmsg )
+      CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 
       Return
       End Function findPrecursor

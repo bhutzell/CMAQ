@@ -292,7 +292,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
          IF ( .NOT. CFRAC_3D_AVAIL ) THEN
             XMSG = 'Variable CFRAC_3D (cloud fraction) not found in ' // MET_CRO_3D
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             WRITE( LOGDEV, * )
             WRITE( XMSG, '(4A)' )
      &           'Model will diagnose layer cloud fraction using Randall (1995) ',

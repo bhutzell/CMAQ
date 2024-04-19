@@ -44,7 +44,7 @@ C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE DESID_VARS
       USE biog_emis_param_module
-
+      
       IMPLICIT NONE
 
       INTEGER, SAVE                      :: MSPCS         ! no. of emitted species
@@ -191,10 +191,7 @@ C-----------------------------------------------------------------------
          SUCCESS = .TRUE.
 
 C Open speciation profiles file
-         RDEV = PROMPTFFILE(
-     &            'Enter logical name for Speciation Profiles file',
-     &            .TRUE., .TRUE., 'GSPRO', PNAME )
-
+         RDEV = GETEFILE( 'GSPRO', .TRUE., .TRUE., PNAME )
          IF ( SPPRO .EQ. 'DEFAULT' ) THEN 
             INDX = INDEX1( MECHNAME, NMECHS, BIOG_MECH_MAP%CHEMMECH )
             SPPRO = BIOG_MECH_MAP( INDX )%BIOGMECH
@@ -231,7 +228,7 @@ C species names, and to store the units for mass-based and mole-based conversion
                WRITE( MESG, 94010 )
      &               'I/O error', IOS, 'reading speciation profile ' //
      &               'file at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -250,7 +247,7 @@ C Check for header start
             ELSE IF ( NDX .GT. 0 ) THEN
                WRITE( MESG,94010 ) 'Header end found before header ' //
      &                             'started at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -279,7 +276,7 @@ C Check width of character fields of fixed length
             IF ( N .GT. 16 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Speciation profile code ' //
      &                'exceeds max width of 16 characters at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -287,7 +284,7 @@ C Check width of character fields of fixed length
             IF ( N .GT. 16 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Pollutant name ' //
      &                'exceeds max characters of 16 at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -295,14 +292,14 @@ C Check width of character fields of fixed length
             IF ( N .GT. 16 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Species name ' //
      &                 'exceeds max characters of 16 at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
 C Make sure divisor factor is not zero
             IF ( SDIV .EQ. 0.0 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Zero divisor found at line ', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -318,9 +315,9 @@ C none found (skip entry).  Record number and position of all matches.
                   ELSE      ! Max of 10 profile pollutant names per biotype
                      MESG = 'ERROR: Exceeded max pollutant names' //
      &                      'per biotype in ' // PNAME
-                     CALL M3MSG2( MESG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MESG )
                      MESG = 'Quitting'
-                     CALL M3MESG( MESG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MESG )
                      SUCCESS = .FALSE.; RETURN
                   END IF
                END IF
@@ -354,18 +351,14 @@ C Check if species is already stored for current pollutant, and if not, incremen
 C species-per-pollutant counter and add species to list.
             DO M = 1, NIPOS
                K   = NSPECA( IPOS( M ) )
-#ifdef mpas
                NDX = INDEX1( SPECNM, K, TMPNAMES( :,IPOS( M ) ) )
-#else
-               NDX = INDEX1( SPECNM, K, TMPNAMES( 1,IPOS( M ) ) )
-#endif
                IF ( NDX .LE. 0 ) THEN
                   K = K + 1
                   IF ( K .LE. MXSPPOL ) THEN
                      TMPNAMES( K,IPOS( M ) ) = SPECNM
                   ELSE
                      MESG = 'ERROR: Exceeded TMPNAMES dimension'
-                     CALL M3MESG( MESG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MESG )
                      SUCCESS = .FALSE.; RETURN
                   END IF
                   NSPECA( IPOS( M ) ) = K
@@ -379,13 +372,13 @@ C species-per-pollutant counter and add species to list.
          IF ( POL .EQ. 0 ) THEN
             MESG = 'ERROR: No pollutants found in speciation ' //
      &             'profiles that match the inventory!'
-            CALL M3MESG( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
             SUCCESS = .FALSE.; RETURN
          END IF
 
          IF ( ISP .EQ. 0 ) THEN
             MESG = 'ERROR: No species found in speciation profile!'
-            CALL M3MESG( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -414,11 +407,7 @@ C and if so, store in the output species name list.
 C Process species in sorted order
                K = INDX1A( J )
 C Find species in list of valid species per pollutant
-#ifdef mpas
                NDX = INDEX1( SPECNMA( K ), NSPECA( I ), TMPNAMES( :,I ) )
-#else
-               NDX = INDEX1( SPECNMA( K ), NSPECA( I ), TMPNAMES( 1,I ) )
-#endif
                IF ( NDX .GT. 0 ) THEN
                   ICOUNT = ICOUNT + 1
                   SPCNAMES( ICOUNT, I ) = SPECNMA( K )
@@ -529,7 +518,7 @@ C conversions
                WRITE( MESG, 94010 )
      &              'I/O error', IOS, 'reading speciation profile ' //
      &              'file at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 

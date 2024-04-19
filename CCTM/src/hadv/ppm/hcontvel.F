@@ -168,7 +168,7 @@ C-----------------------------------------------------------------------
          VNAME = 'UWINDC'
          IF ( INDEX1( VNAME, NVARS3D, VNAME3D ) .LE. 0 ) THEN
             XMSG = 'Could not find ' // VNAME // ' in ' // MET_DOT_3D
-            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             CSTAGUV = .FALSE.
          END IF
 
@@ -224,10 +224,10 @@ C-----------------------------------------------------------------------
      &        // TRIM( MET_CRO_3D ) // ', '
      &        // TRIM( MET_BDY_3D ) // ' and '
      &        // TRIM( MET_DOT_3D )
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          WRITE( AMSG,'( 2I8 )' ) LDATE( 1 ), LTIME( 1 )
          XMSG = 'Using data for last file step: ' // AMSG
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          MDATE = LDATE( 1 )
          MTIME = LTIME( 1 )
       END IF

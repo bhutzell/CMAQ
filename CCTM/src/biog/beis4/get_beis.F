@@ -94,7 +94,8 @@ C-----------------------------------------------------------------------
 #endif
 
       IMPLICIT NONE
-
+      INCLUDE SUBST_FILES_ID
+      
 C Includes:
         
 C Arguments:
@@ -261,13 +262,13 @@ C calculate fseas based on deep soil temperature following WRF 3.8.1 PX
       END IF   ! if new day
 
       WRITE( MESG,94030 ) HHMMSS( JTIME )
-      CALL M3MSG2( MESG )
+      CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
 #ifndef mpas
 C repopulate the met_cro_2d variable attributes
-      IF ( .NOT. DESC3( MNAME ) ) THEN
+      IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
          MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
+     &           // TRIM( MET_CRO_2D ) // '"'
          CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
       END IF
 #endif

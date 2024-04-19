@@ -110,7 +110,7 @@ C Try to open existing file for update
 
             XMSG = 'Could not open ' // TRIM( CTM_SENS_1 )
      &           // ' file for update - try to open new'
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 c           IF ( MYPE .EQ. 0 ) THEN
             IF ( IO_PE_INCLUSIVE ) THEN

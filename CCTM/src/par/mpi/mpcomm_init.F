@@ -54,6 +54,7 @@ C Calls: M3WARN, MPI_INIT, MPI_COMM_RANK, MPI_COMM_SIZE, MPI_WTIME
 C........................................................................
 
       USE UTILIO_DEFN
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_WARNING
 
       IMPLICIT  NONE
 
@@ -85,7 +86,7 @@ C Start up MPI
       CALL MPI_INIT( FLAG )
       IF ( FLAG .NE. 0 ) THEN
          WRITE( XMSG,'(I6, A)' ) FLAG, 'Error in MPI_INIT.'
-         CALL M3WARN ( PNAME, 0, 0, XMSG )
+         CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
          IERR = 1; RETURN
       END IF
 #endif
@@ -97,7 +98,7 @@ C Get number of processors
       CALL MPI_COMM_SIZE( MPI_COMM_WORLD, NPROCS, FLAG )
       IF ( FLAG .NE. 0 ) THEN
          WRITE( XMSG,'(I6, A)' ) FLAG, 'Error in MPI_COMM_SIZE.'
-         CALL M3WARN ( PNAME, 0, 0, XMSG )
+         CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
          IERR = 1; RETURN
       END IF
 
@@ -105,7 +106,7 @@ C Get my processor rank (i.e., get ID of this processor)
       CALL MPI_COMM_RANK( MPI_COMM_WORLD, MYPE, FLAG )
       IF ( FLAG .NE. 0 ) THEN
          WRITE( XMSG,'(I6, A)' ) FLAG, 'Error in MPI_COMM_RANK.'
-         CALL M3WARN ( PNAME, 0, 0, XMSG )
+         CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
          IERR = 1; RETURN
       END IF
 

@@ -150,7 +150,7 @@ C the grid description file pointed to by the GRIDDESC env var:
      &                           XORIG_GD, YORIG_GD, XCELL_GD, YCELL_GD,
      &                           GL_NCOLS, GL_NROWS, NTHIK ) ) THEN
                XMSG = 'Failure retrieving horizontal grid parameters'
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 #endif
@@ -162,7 +162,7 @@ C Check NPROCS against NPCOL*NPROW
                WRITE( LOGDEV,* ) ' --- Nprocs, NProw, NPcol ',
      &                                 NPROCS, NPROW, NPCOL
                XMSG = 'NPROCS is not equal to NPCOL*NPROW'
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -179,7 +179,7 @@ C Check NPROCS against NPCOL*NPROW
                IF ( MYPE .EQ. 0 ) THEN
                   WRITE(OUTDEV,'(A)')TRIM( XMSG )
                END IF 
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
 
                XMSG = 'Change NPROCS, NPCOL, NPROW in runscript to fit TOTAL_NCOLS and TOTAL_NROWS'
                IF ( MYPE .EQ. 0 ) THEN
@@ -195,7 +195,7 @@ C Check NPROCS against NPCOL*NPROW
      &                 ROWSX_PE( 2,NPROCS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** COLSX_PE or ROWSX_PE Memory allocation failed'
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -203,7 +203,7 @@ C Check NPROCS against NPCOL*NPROW
      &                 ROWSD_PE( 2,NPROCS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** COLSD_PE or ROWSD_PE  Memory allocation failed'
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -211,7 +211,7 @@ C Check NPROCS against NPCOL*NPROW
      &                 NROWS_PE( NPROCS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** NCOLS_PE or NROWS_PE Memory allocation failed'
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -252,7 +252,7 @@ C Get corresponding dot file map
 
          ELSE
             XMSG = 'Horizontal domain decomposition already defined'
-            CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+            CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
             SUCCESS = .FALSE.; RETURN
 
          END IF   ! FIRSTIME

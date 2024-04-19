@@ -728,7 +728,7 @@ C=======================================================
                  MSG = 'ISAM SPECIES: ' 
      &              // TRIM( FIND_IN_ISAM( S ) ) 
      &              // ' not found in  REACT array  '
-!                CALL M3WARN( PNAME, 0, 0, MSG )
+!                CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                  CYCLE
               END IF
               IF( RXTANT_MAP( R ) .LT. 1 )CYCLE
@@ -773,7 +773,7 @@ C..Save pointer for isam species found in chemistry species
                END IF
            ELSE
                MSG = 'NO ISAM species are degraded '
-               CALL M3WARN ( PNAME, 0, 0, MSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
            END IF
            L = 0
            DO S = 1, NSPC_SA

@@ -76,7 +76,7 @@ C Try to open existing file for update
       
          XMSG = 'Could not open ' // CTM_DRY_DEP_1 // ' file for update - '
      &        // 'try to open new'
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 C Set output file characteristics based on COORD.EXT and open the dry dep file
 
@@ -212,7 +212,7 @@ C...check for existing file
       IF ( .NOT. OPEN3( CTM_SDRYDEP_1, FSRDWR3, PNAME ) ) THEN
          XMSG = 'Could not open ' // CTM_SDRYDEP_1 // ' file for update - '
      &        // 'try to open new'
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 C...set output file variables 
          NVARS3D = N_SPC_DDEP * NPMAX

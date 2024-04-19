@@ -470,11 +470,11 @@ c  If delt < hmin, decrease ylowa and re-start the time-interval
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
               IF( DELT .LT. HMIN ) THEN
                  WRITE( MSG, 94000 ) DELT, XELAPS, TIMREMAIN, MAXVAL(YLOWA), EPS
-                 CALL M3MESG( MSG )  
+                 CALL LOG_MESSAGE( LOGDEV ,  MSG )  
                  WRITE( MSG, 94010 ) NSTEPS, BLKID, IRUN, NQQ
-                 CALL M3MESG( MSG )  
+                 CALL LOG_MESSAGE( LOGDEV ,  MSG )  
                  WRITE( MSG, 94015 ) RDELT, DER2MAX, ENQQ
-                 CALL M3MESG( MSG )  
+                 CALL LOG_MESSAGE( LOGDEV ,  MSG )  
                  YLOWA     =  YLOWA * 0.1 
                  NYLOWRED  =  NYLOWRED + 1
                  IF( NYLOWRED .LT. MXLOWRED ) THEN

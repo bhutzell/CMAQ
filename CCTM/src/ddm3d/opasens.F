@@ -108,7 +108,7 @@ C   S.Napelenok 26 Nov 2019 - create from opaconc.f for cmaq-ddm3d-v5.3.1
 #endif
          XMSG = 'Could not open ' // TRIM( A_SENS_1 )
      &        // ' file for update - try to open new'
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
          IF ( IO_PE_INCLUSIVE ) THEN
 

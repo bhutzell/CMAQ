@@ -157,7 +157,8 @@ C-----------------------------------------------------------------------
       IMPLICIT NONE
         
 C Includes:
-
+      INCLUDE SUBST_FILES_ID
+      
 C Arguments:
       INTEGER, INTENT( IN )  :: JDATE         ! current simulation date (YYYYDDD)
       INTEGER, INTENT( IN )  :: JTIME         ! current simulation time (HHMMSS)
@@ -180,7 +181,6 @@ C See Jacquemin B. and Noilhan J. (1990), Bound.-Layer Meteorol., 52, 93-134.
 
 C Local Variables:
 
-      CHARACTER( 16 ), SAVE :: MNAME   ! logical name for MET_CRO_2D
       CHARACTER( 16 ), SAVE :: SOILINP ! logical name for input NO soil data
       CHARACTER( 16 ), SAVE :: SOILOUT = 'BEIS_SOILOUT' ! logical name for output NO soil data
       CHARACTER( 33 ), SAVE :: DESCSTR = 'hrly cnv. & non-cnv. rainfall for'
@@ -271,26 +271,21 @@ C Determine last timestamp
          METSTEP = tstep(3)
 #else
 
-C Open met file
-         MNAME = PROMPTMFILE(
-     &           'Enter name for gridded met input file',
-     &           FSREAD3, 'MET_CRO_2D', PNAME )
-
 C Get description of met file
-         IF ( .NOT. DESC3( MNAME ) ) THEN
+         IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
             MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
+     &           // TRIM( MET_CRO_2D ) // '"'
             CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
          END IF
 
          METSTEP = TSTEP3D
 
 C Check that grid description matches MET_CRO_2D file
-         IF ( .NOT. CHKGRID( MNAME ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MNAME )
-     &           // '" does not match grid in file ' // TRIM( MNAME ) // '"'
+         IF ( .NOT. CHKGRID( MET_CRO_2D ) ) THEN
+            MESG = 'Grid in file "' // TRIM( MET_CRO_2D )
+     &           // '" does not match grid in file ' // TRIM( MET_CRO_2D ) // '"'
 #ifdef twoway
-            CALL M3WARN( PNAME, 0, 0, MESG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 #else
             CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
 #endif
@@ -491,13 +486,13 @@ C Check min bounds for temperature and limit to 303 deg K
                IF ( TAIR .LT. 200.0 ) THEN
                   WRITE( MESG, 94010 ) 'TAIR=', TAIR,
      &                 'out of range at (C,R)=', C, R
-                  CALL M3MESG( MESG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MESG )
                   Write( MESG,94010 ) 'Max TAIR: ', Maxval( MET_DATA%TEMP2 ),
      &                 'at (C,R)', Maxloc( MET_DATA%TEMP2 )
-                  CALL M3MESG( MESG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MESG )
                   Write( MESG,94010 ) 'Min TAIR: ', Minval( MET_DATA%TEMP2 ),
      &                 'at (C,R)', Minloc( MET_DATA%TEMP2 )
-                  CALL M3MESG( MESG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MESG )
                   CALL M3EXIT( PNAME, JDATE, JTIME, '*** ABORT', 2 )
                END IF
                TAIR = MIN( TAIR, 303.0 )

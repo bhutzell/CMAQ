@@ -214,7 +214,7 @@ C Check max/min bounds of PAR and calculate biogenic ISOP
      &              'PSFC   = ', PSFC,
      &              'ZEN    = ', ZEN
     
-                CALL M3MSG2( MESG )
+                CALL LOG_MESSAGE( LOGDEV ,  MESG )
             END IF
             TLAI = MET_DATA%LAI( C,R )
 C Compute ISOP and MBO and METH emissions first

@@ -93,7 +93,7 @@ C and define vertical layer structure (in module GRID_CONF)
 
       IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
          MSG = '*** Failure defining domain configuration'
-         CALL M3WARN ( 'PAR_INIT', 0, 0, MSG )
+         CALL LOG_WARNING( 'PAR_INIT', LOGDEV, MSG )
          IERROR = 1
          RETURN
       END IF
@@ -104,7 +104,7 @@ C process analysis, if required
       IF ( LIPR .OR. LIRR ) THEN
          IF ( .NOT. PAGRD_INIT( MYPE ) ) THEN
             MSG = '*** Failure defining PA domain configuration'
-            CALL M3WARN ( 'PAR_INIT', 0, 0, MSG )
+            CALL LOG_WARNING( 'PAR_INIT', LOGDEV, MSG )
             IERROR = 1
             RETURN
          END IF

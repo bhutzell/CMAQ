@@ -64,7 +64,7 @@ C This function is expected to be called only once - at startup
 C Set up horizontal domain and calculate processor-to-subdomain maps
             IF ( .NOT. HGRD_INIT ( NPROCS, MYID ) ) THEN
                MSG = '*** Failure defining horizontal domain'
-               CALL M3WARN ( 'GRID_INIT', 0, 0, MSG )
+               CALL LOG_WARNING( 'GRID_INIT', LOGDEV, MSG )
                SUCCESS = .FALSE.
                RETURN
                END IF
@@ -72,7 +72,7 @@ C Set up horizontal domain and calculate processor-to-subdomain maps
 C define vertical layer structure
             IF ( .NOT. VGRD_INIT() ) THEN
                MSG = '*** Failure defining vertical structure'
-               CALL M3WARN ( 'GRID_INIT', 0, 0, MSG )
+               CALL LOG_WARNING( 'GRID_INIT', LOGDEV, MSG )
                SUCCESS = .FALSE.
                RETURN
                END IF
@@ -82,7 +82,7 @@ C define vertical layer structure
 
             ELSE
             MSG = 'Domain configuration already defined'
-            CALL M3WARN ( 'GRID_INIT', 0, 0, MSG )
+            CALL LOG_WARNING( 'GRID_INIT', LOGDEV, MSG )
             SUCCESS = .FALSE.; RETURN
 #endif
             END IF   ! FIRSTIME

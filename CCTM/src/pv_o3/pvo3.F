@@ -124,7 +124,7 @@ C Get number of species, and starting indices for CGRID array.
          VO3T = INDEX1( 'O3PV', N_TR_SPC, TR_SPC )
          IF ( VO3T .GT. 0 ) then
             XMSG = '     Option used: a tracer Namelist file with species O3PV'
-            CALL M3MESG ( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
             VO3T = TR_STRT - 1 + VO3T
             WRITE( LOGDEV,92001 ) TR_STRT-1, N_TR_SPC, VO3T
          END IF

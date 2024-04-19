@@ -963,10 +963,10 @@ C Build mapping to CGRID for each species in the master AeroList
                   xmsg = 'The molecular weight of ' // Trim( sn )
      &                  // ' is different from that of the same species'
      &                  // ' in the same or another mode.'
-                  Call m3warn( pname, 0, 0, xmsg )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   Write( xmsg,* ) 'New Value(', n, ') = ', ae_molwt( n ),
      &                            'Expected value(', spc, ')= ', mole_weight( spc )
-                  Call m3warn( pname, 0, 0, xmsg )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   AE_eflag  = .True.
                Else If ( replace_optics_surr ) Then 
                   If ( refractive_index( spc ) .Ne. ae_optics( n ) ) Then
@@ -977,7 +977,7 @@ C Build mapping to CGRID for each species in the master AeroList
                      xmsg = 'FATAL ERROR: In AErosol namelist, OPTICS value ' 
      &                    // 'for bulk ' // Trim( aerolist( spc )%bulkname )
      &                    // ' is inconsistent across modes. CORRECT the AE namelist'
-                     Call m3mesg( xmsg )
+                     CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                      If( Len_Trim( ae_optics( n ) ) .lt. 1 ) Then
                         xmsg2 = 'blank'
                      Else
@@ -985,7 +985,7 @@ C Build mapping to CGRID for each species in the master AeroList
                      End If
                      Write( xmsg,* ) 'Bad Value is ', Trim( xmsg2 ),
      &               '; Expected value is ', Trim( refractive_index( spc ) )
-                     Call m3mesg( xmsg )
+                     CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                      AE_eflag  = .True.
                   End If   
                End If
@@ -1097,7 +1097,7 @@ C Build mapping to CGRID for aero # and surf area variables
             xmsg = 'Species ' // Trim( aeromode( m )%num_name )
      &           //' is not in AE namelist'
             AE_eflag  = .True.
-            Call m3warn( pname, 0, 0, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 !            Call m3exit( pname, 0, 0, xmsg, xstat3 )
          Else
             aeronum_map( m ) = ae_strt - 1 + n
@@ -1116,7 +1116,7 @@ C Build mapping to CGRID for aero # and surf area variables
             xmsg = 'species ' // Trim( aeromode( m )%srf_name )
      &           // ' is not in AE namelist'
             AE_eflag  = .True.
-            Call m3warn( pname, 0, 0, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 !            Call m3exit( pname, 0, 0, xmsg, xstat3 )
          Else
             aerosrf_map( m ) = ae_strt - 1 + n
@@ -1559,7 +1559,7 @@ C Find the substring vname in aerospc( spc )%name( n )
       xmsg = 'Required Species ' // Trim( vname ) // 
      &       ' Not found in AE namelist'
       AE_eflag  = .True.
-      Call m3warn( pname, 0, 0, xmsg )
+      CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 
       Return
       End Function findAero
@@ -1620,14 +1620,14 @@ C     moment [ m**2/m**3 ]
             If ( initialM2 .Eq. 0.0 ) Then
                 write( xmsg,'(A32,I1,A42)') "Warning: Second Moment for Mode ",
      &                 n," is 0.0. This will cause numerical issues."
-                Call m3warn( pname_loc, 0, 0, xmsg )
+                CALL LOG_WARNING( PNAME_LOC, LOGDEV , XMSG)
             End If
 
             initialM3 = max( moment3_conc( n ), aeromode( n )%min_m3conc )
             If ( initialM3 .Eq. 0.0 ) Then
                 write( xmsg,'(A31,I1,A42)') "Warning: Third Moment for Mode ",
      &                 n," is 0.0. This will cause numerical issues."
-                call m3warn( pname_loc, 0, 0, xmsg )
+                CALL LOG_WARNING( PNAME_LOC, LOGDEV , XMSG)
             End If
 
             wetsumM3 = 0.0d0
@@ -1656,14 +1656,14 @@ C     moment [ m**2/m**3 ]
             If ( initialM2 .Eq. 0.0 )  Then
                 write( xmsg,'(A32,I1,A42)') "Warning: Second Moment for Mode ",
      &                 n," is 0.0. This will cause numerical issues."
-                Call m3warn( pname_loc, 0, 0, xmsg )
+                CALL LOG_WARNING( PNAME_LOC, LOGDEV , XMSG)
             End If
 
             initialM3 = max( moment3_conc( n ), aeromode( n )%min_m3conc )
             If ( initialM3 .Eq. 0.0 )  Then
                 write( xmsg,'(A31,I1,A42)') "Warning: Third Moment for Mode ",
      &                 n," is 0.0. This will cause numerical issues."
-                Call m3warn( pname_loc, 0, 0, xmsg )
+                CALL LOG_WARNING( PNAME_LOC, LOGDEV , XMSG)
             End If
 
             drysumM3 = 0.0d0

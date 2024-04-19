@@ -89,7 +89,7 @@ C sedi sub-timestep counter
      &                found( n_vsed ), stat = ios )
             if ( ios .ne. 0 ) then
                xmsg = "ERROR allocating nlp_'s or cnvct"
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
             vsed_name = ( / 'VNUMACC', 'VNUMCOR', 'VSRFACC',
@@ -138,7 +138,7 @@ C get CONC file header description
             ok = desc3( ctm_conc_1 )
             if ( .not. ok ) then
                xmsg = 'could not read '// trim( ctm_conc_1 )
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
 
@@ -176,7 +176,7 @@ C get CONC file header description
                ok = open3( ctm_vsed_diag, fsnew3, pname )
                if ( .not. ok ) then
                   xmsg = 'could not create '// trim( ctm_vsed_diag ) // ' file'
-                  call m3warn( 'vdiff_diag', jdate, jtime, xmsg )
+                  call LOG_WARNING( 'vdiff_diag', logdev, xmsg )
                   success = .false.; return
                end if
 
@@ -250,7 +250,7 @@ C get CONC file header description
             ok = open3( ctm_vdiff_diag, fsnew3, pname )
             if ( .not. ok ) then
                xmsg = 'could not create '// trim( ctm_vdiff_diag ) // ' file'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
 
@@ -263,7 +263,7 @@ C get CONC file header description
      &              cnvct( ncols,nrows ), stat = ios )
          if ( ios .ne. 0 ) then
             xmsg = "ERROR allocating nlp_'s or cnvct"
-            call m3warn( pname, jdate, jtime, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             success = .false.; return
          end if
          nlpcr_max = 0.0      ! array assignment
@@ -275,7 +275,7 @@ C get CONC file header description
             allocate ( vsed_buf( ncols,nrows,nlays,n_vsed ), stat = ios )
             if ( ios .ne. 0 ) then
                xmsg = 'ERROR allocating vsed_buf'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
 
@@ -285,7 +285,7 @@ C get CONC file header description
      &                 dtccr_sum( ncols,nrows ), stat = ios )
             if ( ios .ne. 0 ) then
                xmsg = "ERROR allocating , sedi dtc's"
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
             dtccr_max = 0.0      ! array assignment

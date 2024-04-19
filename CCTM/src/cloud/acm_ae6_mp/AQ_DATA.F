@@ -484,7 +484,7 @@ C...Add missing optional aerosol surrogate species
          If ( var .Eq. ah2o_idx .Or. var .Eq. ah3op_idx ) Then
               write(xmsg,'(4(A,1x))')'Skipping AQ surrogate for AEROSPC ',
      &                               aerospc( spc )%name( 1:n_mode )
-              Call m3warn( 'aq_data_init', 0, 0, xmsg )
+              Call LOG_WARNING( 'aq_data_init', logdev, xmsg )
               Cycle
          End if
 !        If ( var .Eq. asoil_idx ) Cycle ! SLN 16March2011
@@ -602,7 +602,7 @@ C...Create the pointers from CGRID to the gaseous species needed by AQCHEM
             xmsg = trim( srggas( igas )%name )
      &           // ' is not in GC or NR namelist so using background value of '
      &           // trim( bkground )
-            Call m3mesg( xmsg )
+            CALL LOG_MESSAGE( LOGDEV ,  xmsg )
          Else
             Do isrg = 1, nsrggas( igas )
                lsrggas( igas,isrg ) = lsrg( isrg )
@@ -628,7 +628,7 @@ C...Create the pointers from CGRID to the aerosol species needed by AQCHEM
                   xmsg = trim( srgaer( iaer )%name( n ) )
      &           // ' is not in AE namelist so using background value of '
      &           // trim( bkground )
-                  Call m3mesg( xmsg )
+                  CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                Else
                   Do isrg = 1, nsrgaer( iaer,n )
                      If ( isrg .Gt. mxsrg ) Then
