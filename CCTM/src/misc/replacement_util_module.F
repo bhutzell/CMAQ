@@ -27,7 +27,10 @@
 !          David Wong, 04/15/2024
 !            -- modified quicksort subroutine by adding min function to avoid
 !               array index out of bounds with Nvidia compiler in debug mode
-! -----------------------------------------------------------------------------
+!          David Wong, 04/17/2024
+!            -- fixed NEXTIME subroutine when the third argument is a negative
+!               number
+!-----------------------------------------------------------------------------
 
         module replacement_util_module
 
@@ -415,7 +418,6 @@
           subroutine nextime (jdate, jtime, dtime)
 
 ! adjust given jdate and jtime w.r.t dtime which is in hhmmss format
-! TO DO: crashes if dtime is negative and crosses year, e.g., 2024001, 0, -10000
 
             integer, intent(inout) :: jdate, jtime
             integer, intent(in)    :: dtime
@@ -489,22 +491,18 @@
                end if
  
                do while (day .le. 0)
-                  if (day .eq. 0) then
-                     day = ndays
+                  yr = yr - 1
+
+                  if (leap_year(yr)) then
+                     ndays = 366
                   else
-                     yr = yr - 1
+                     ndays = 365
+                  end if 
 
-                     if (leap_year(yr)) then
-                        ndays = 366
-                     else
-                        ndays = 365
-                     end if 
-
-                     if (day .gt. ndays) then
-                        day = day + ndays
-                     else
-                        day = ndays + day
-                     end if   
+                  if (day .gt. ndays) then
+                     day = day + ndays
+                  else
+                     day = ndays + day
                   end if   
                end do     
             end if

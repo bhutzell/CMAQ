@@ -773,7 +773,7 @@ C..Save pointer for isam species found in chemistry species
                END IF
            ELSE
                MSG = 'NO ISAM species are degraded '
-               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
+               CALL LOG_WARNING( PNAME, LOGDEV , MSG)
            END IF
            L = 0
            DO S = 1, NSPC_SA
