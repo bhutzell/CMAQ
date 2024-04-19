@@ -94,7 +94,7 @@ C PCGRID extents
 
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating PCGRID'
-               CALL M3WARN ( 'PCGRID_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'PCGRID_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
                END IF
 
@@ -103,7 +103,7 @@ C PCGRID extents
 
             ELSE
             XMSG = 'PCGRID already ALLOCATED'
-            CALL M3WARN ( 'PCGRID_INIT', 0, 0, XMSG )
+            CALL LOG_WARNING( 'PCGRID_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 

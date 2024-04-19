@@ -55,7 +55,7 @@ C   10 Sep 14 D. Wong: Removed redundant INCLUDE NETCDF.EXT statement
 C-----------------------------------------------------------------------
 
       USE M3UTILIO              ! i/o api
-      USE RUNTIME_VARS, ONLY : PWRTFLAG
+      USE RUNTIME_VARS, ONLY : PWRTFLAG, LOG_WARNING
       USE PIOMAPS_MODULE
 
       IMPLICIT NONE
@@ -184,7 +184,7 @@ C Get file description.
          IF ( .NOT. DESC3( FNAME ) ) THEN
              MSG = 'Could not get '// TRIM( FNAME )
      &           // ' file description'
-             CALL M3WARN( 'PTRWRITE3', JDATE, JTIME, MSG )
+             CALL LOG_WARNING( 'PTRWRITE3', LOGDEV, MSG )
          END IF
 
       END IF
@@ -204,7 +204,7 @@ C Operation valid only for gridded files.
                   MSG = 'WRITE3 failed writing variable '
      &                // TRIM( VNAME )
      &                // ' to file '// TRIM( FNAME )
-                  CALL M3WARN( 'PTRWRITE3', JDATE, JTIME, MSG )
+                  CALL LOG_WARNING( 'PTRWRITE3',LOGDEV, MSG )
                   PTRWRITE3 = .FALSE.
                END IF
             END IF

@@ -65,6 +65,7 @@
 
       MODULE RUNTIME_VARS
 
+      use logdev_mod
       use get_env_module
 #ifdef mpas
       use universal_data_module, only : logdev
@@ -77,14 +78,12 @@
 
       PUBLIC
 
-      INTEGER :: OUTDEV = 6   ! File Unit for Standard Output
-#ifndef mpas
-      INTEGER :: LOGDEV = -1  ! File Unit for Ascii Log File
-#endif
-      INTEGER :: TOTPE  = 1   ! Number of Total Processors
+
+
+
       INTEGER :: NPROCS = 1   ! Number of Total Processors
-      INTEGER :: MYPE   = -1  ! Processor Number
-      CHARACTER( 3 ) :: CMYPE  = ""  ! Processor Number
+
+
 
       !-----------------------------------------------------------------------------------
       !>> Parameters for formatting output log files
@@ -92,10 +91,7 @@
 
       INTEGER, PARAMETER :: CTM_DIAG_LVL = 0
       
-      INTEGER :: LOG_LINE_LENGTH = 80  ! Cut the log offs at this character if possible
-      INTEGER :: LOG_MAJOR_TAB   = 5   ! Left tab for all text including headings
-      INTEGER :: LOG_MINOR_TAB   = 2   ! Tab for indenting subsequent lines of text in
-                                       ! a paragraph for instance.
+
 
       CHARACTER( 10 ) :: WEEKDAY( 7 ) = (/'Monday   ','Tuesday  ','Wednesday',
      &                        'Thursday ','Friday   ','Saturday ','Sunday   ' /)
@@ -133,7 +129,6 @@
       INTEGER :: MINSYNC         = 60       ! force min TSTEP(2) (sec)
 
       INTEGER, PARAMETER :: MAXLEN_CCTM_APPL     = 200    ! Length of Logfile Names
-      CHARACTER( MAXLEN_CCTM_APPL ) :: APPL_NAME = 'APPL' ! Logfile Names
       CHARACTER( MAXLEN_CCTM_APPL ) :: BLDFOLD   = ''     ! Build Directory
       CHARACTER( MAXLEN_CCTM_APPL ) :: OUTDIR    = ''     ! Output Directory
 
@@ -311,6 +306,7 @@
 !  CMAQ. 
 !.........................................................................
 
+      USE LOGDEV_MOD
       USE RXNS_DATA, ONLY : MECHNAME
 #ifdef mpas
       use utilio_defn
@@ -337,7 +333,7 @@
       CHARACTER( 400 ) :: STRTEMP
       CHARACTER( 80 )  :: PBASE     
       INTEGER, PARAMETER :: EXIT_STATUS = 1
-      INTEGER          :: ERROR
+
       INTEGER          :: VARDEV = -1
 
       LOGICAL          :: FOUND
@@ -350,27 +346,9 @@
       !-------------------------------------------------------------------------------------------------------
       !>> Grid and High-Level Model Parameters
       !-------------------------------------------------------------------------------------------------------
-#ifdef parallel
-      CALL MPI_COMM_RANK ( MPI_COMM_WORLD, MYPE, ERROR )
-      CALL MPI_COMM_SIZE ( MPI_COMM_WORLD, TOTPE, ERROR )
-#else
-      MYPE = 0
-      TOTPE = 0
-#endif
+
  
       IF ( MYPE .EQ. 0 ) VARDEV = OUTDEV
-
-      ! Get Simulation Scenario Name to Label Log Files, etc
-      CALL GET_ENV( APPL_NAME, 'CTM_APPL', APPL_NAME, VARDEV )
-      
-      ! Start I/O-API and set up log file(s)
-      CALL SETUP_LOGDEV()
-      IF ( MYPE .EQ. 0 ) THEN 
-         CALL LOG_HEADING( OUTDEV, "Environment Variable Report" )
-         CALL LOG_SUBHEADING( OUTDEV, "Grid and High-Level Model Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
-      END IF
 
        ! Get Logfile Directory
       CALL GET_ENV ( BLDFOLD, 'BLD', BLDFOLD, VARDEV ) 
@@ -415,7 +393,7 @@
          IF ( NV .NE. 2 ) THEN
             XMSG = 'Environment variable problem for NPCOL_NPROW'
      &           // ' using default 1X1'
-            CALL M3WARN ( 'INIT_ENV_VARS', 0, 0, XMSG )
+            CALL LOG_WARNING( 'INIT_ENV_VARS',LOGDEV , XMSG )
             NV = 2
             V_LIST2( 1 ) = '1'
             V_LIST2( 2 ) = '1'
@@ -505,9 +483,9 @@
 #else
       IF( LVEXT ) THEN
           LVEXT = .FALSE.
-          WRITE( OUTDEV,'(A)')'Option to extract a Vertical Column of Ouptut Data set to YES'
+          WRITE( OUTDEV,'(A)')'Option to extract a Vertical Column of Output Data set to YES'
           WRITE( OUTDEV,'(A)')'However, the serial version cannot execute the option'
-          WRITE( LOGDEV,'(A)')'Option to extract a Vertical Column of Ouptut Data set to YES'
+          WRITE( LOGDEV,'(A)')'Option to extract a Vertical Column of Output Data set to YES'
           WRITE( LOGDEV,'(A)')'However, the serial version cannot execute the option'
       END IF
 #endif
@@ -1099,59 +1077,59 @@
 
       END SUBROUTINE LOG_SUBHEADING
       
-!.........................................................................
-      SUBROUTINE LOG_MESSAGE( FUNIT, CMSG_IN )
-
-!  Formats and writes a user-supplied message to a specific log file.
-!  This approach is intended to standardize the log files that are
-!  created by CMAQ.
-!.........................................................................
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT( IN ) :: FUNIT
-      CHARACTER( * ), INTENT( IN ) :: CMSG_IN
-      CHARACTER( len=: ), ALLOCATABLE :: CMSG
-      CHARACTER( 20 )       :: FMT
-
-      CHARACTER( LOG_LINE_LENGTH ) :: CTEMP
-      INTEGER :: MSG_SIZE
-      INTEGER :: NLINE1, NLINE2, NLINE, NTAB, LAST_SPACE
-
-      CMSG = CMSG_IN
-
-      ! Write the message to the log file, while trimming to 80
-      ! characters (while accounting for tab-length)
-      NLINE1 = LOG_LINE_LENGTH - LOG_MAJOR_TAB
-      NLINE2 = LOG_LINE_LENGTH - LOG_MAJOR_TAB - LOG_MINOR_TAB
-      NLINE  = NLINE1
-      NTAB   = LOG_MAJOR_TAB
-      
-      ! Determine Length of Total Message
-      MSG_SIZE = LEN_TRIM( CMSG )
-      
-      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH )
-         ! Isolate One Line of Text
-         LAST_SPACE = INDEX( CMSG( 1:NLINE+1 ), " ", BACK=.TRUE. )
-     
-         CTEMP = CMSG( 1:LAST_SPACE-1 )
-
-         WRITE( FMT, '("(", I0, "x,A)")' ) NTAB
-         WRITE( FUNIT, FMT ), CTEMP
-
-         CMSG = CMSG( LAST_SPACE+1:LEN( CMSG ) )
-         MSG_SIZE = LEN_TRIM( CMSG )
-
-         IF ( NTAB .EQ. LOG_MAJOR_TAB ) NTAB = NTAB + LOG_MINOR_TAB
-         IF ( NLINE.EQ. NLINE1 ) NLINE = NLINE2
-      END DO
-
-      ! Write Last Line
-      WRITE( FMT, '("(", I0, "x,A)")' ) NTAB
-      WRITE( FUNIT, FMT ), TRIM( CMSG )
-
-
-      END SUBROUTINE LOG_MESSAGE
+!!.........................................................................
+!      SUBROUTINE LOG_MESSAGE( FUNIT, CMSG_IN )
+!
+!!  Formats and writes a user-supplied message to a specific log file.
+!!  This approach is intended to standardize the log files that are
+!!  created by CMAQ.
+!!.........................................................................
+!
+!      IMPLICIT NONE
+!
+!      INTEGER, INTENT( IN ) :: FUNIT
+!      CHARACTER( * ), INTENT( IN ) :: CMSG_IN
+!      CHARACTER( len=: ), ALLOCATABLE :: CMSG
+!      CHARACTER( 20 )       :: FMT
+!
+!      CHARACTER( LOG_LINE_LENGTH ) :: CTEMP
+!      INTEGER :: MSG_SIZE
+!      INTEGER :: NLINE1, NLINE2, NLINE, NTAB, LAST_SPACE
+!
+!      CMSG = CMSG_IN
+!
+!      ! Write the message to the log file, while trimming to 80
+!      ! characters (while accounting for tab-length)
+!      NLINE1 = LOG_LINE_LENGTH - LOG_MAJOR_TAB
+!      NLINE2 = LOG_LINE_LENGTH - LOG_MAJOR_TAB - LOG_MINOR_TAB
+!      NLINE  = NLINE1
+!      NTAB   = LOG_MAJOR_TAB
+!      
+!      ! Determine Length of Total Message
+!      MSG_SIZE = LEN_TRIM( CMSG )
+!      
+!      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH )
+!         ! Isolate One Line of Text
+!         LAST_SPACE = INDEX( CMSG( 1:NLINE+1 ), " ", BACK=.TRUE. )
+!     
+!         CTEMP = CMSG( 1:LAST_SPACE-1 )
+!
+!         WRITE( FMT, '("(", I0, "x,A)")' ) NTAB
+!         WRITE( FUNIT, FMT ), CTEMP
+!
+!         CMSG = CMSG( LAST_SPACE+1:LEN( CMSG ) )
+!         MSG_SIZE = LEN_TRIM( CMSG )
+!
+!         IF ( NTAB .EQ. LOG_MAJOR_TAB ) NTAB = NTAB + LOG_MINOR_TAB
+!         IF ( NLINE.EQ. NLINE1 ) NLINE = NLINE2
+!      END DO
+!
+!      ! Write Last Line
+!      WRITE( FMT, '("(", I0, "x,A)")' ) NTAB
+!      WRITE( FUNIT, FMT ), TRIM( CMSG )
+!
+!
+!      END SUBROUTINE LOG_MESSAGE
 
 !.........................................................................
       SUBROUTINE TIMING_SPLIT( CPU_TIME_START, IMSG, CPROCIN )

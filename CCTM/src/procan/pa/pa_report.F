@@ -139,7 +139,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Get the time and date to be used as the time stamp for all outputs;
 c  Convert from GMT to EDT or EST
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      CALL GETDTTIME( IDATE, ITIME )
+      CALL GETCDTTIME( IDATE, ITIME )
 
       IF ( ISDSTIME( IDATE ) ) THEN
          CALL NEXTIME( IDATE, ITIME, -40000 )

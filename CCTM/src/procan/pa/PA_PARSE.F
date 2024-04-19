@@ -65,6 +65,7 @@ C           column are skipped. The line count is stored in LINNUM.
 C......................................................................
 
          USE UTILIO_DEFN
+         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
          IMPLICIT NONE
 C.......................................................................
@@ -89,9 +90,9 @@ c..in that line
 999      CONTINUE
 c..eof file encountered -- exit program
          WRITE( MSG, 94000 )
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94020 )
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'RDLINE', IZERO, IZERO, ' ', XSTAT2 )
 
 94000    FORMAT( 'ERROR: End of file reached on the Process Analysis',
@@ -146,6 +147,7 @@ C Key Subroutines/Functions Called: EATCOM, GETCHR, RDLINE
 C......................................................................
 
          USE UTILIO_DEFN
+         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
          IMPLICIT NONE
 
@@ -163,11 +165,11 @@ c..Setup and make sure the first character is alphabetic
          IF ( ( CHR .LT. 'A' .OR. CHR .GT. 'Z' ) .AND.
      &        ( CHR .LT. 'a' .OR. CHR .GT. 'z' ) ) THEN
             WRITE( MSG, 94000 )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94020 ) LINNUM, INBUF
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94040 ) CHR
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             CALL M3EXIT( 'GETWORD', IZERO, IZERO, ' ', XSTAT2 )
          END IF
 
@@ -185,7 +187,7 @@ c..Get the next line if necessary (word wrap not allowed)
      &          ( CHR .GE. 'a' .AND. CHR .LE. 'z' ) .OR.
      &          ( CHR .EQ. ':' ) .OR. ( CHR .EQ. '_' ) )THEN
                WRITE( MSG, 94060 )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94020 ) LINNUM, SAVBUF
                CALL M3EXIT( 'GETWORD', IZERO, IZERO, ' ', XSTAT2 )
             ELSE
@@ -260,6 +262,7 @@ C              but only the first sixteen characters are retained.  The
 C              first character must be alphabetic.
 C.......................................................................
          USE UTILIO_DEFN
+         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
          IMPLICIT NONE
          
@@ -303,11 +306,11 @@ c..Check for decimal point
                GO TO 10
             ELSE
                WRITE( MSG, 94000 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94500 ) LINNUM, INBUF
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94520 ) INBUF( START:LPOINT )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                CALL M3EXIT( 'GETREAL', IZERO, IZERO,' ', XSTAT2 )
             END IF        
          END IF   
@@ -322,11 +325,11 @@ c..Check for exponent term
                GO TO 10
             ELSE
                WRITE( MSG, 94020 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94500 ) LINNUM, INBUF
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94520 ) INBUF( START:LPOINT )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                CALL M3EXIT( 'GETREAL', IZERO, IZERO, ' ', XSTAT2 )
             END IF
          END IF
@@ -338,11 +341,11 @@ c..check for sign
                GO TO 10
             ELSE
                WRITE( MSG, 94040 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94500 ) LINNUM, INBUF
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94520 ) INBUF( START:LPOINT )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                CALL M3EXIT( 'GETREAL', IZERO, IZERO, ' ', XSTAT2 )
             END IF
          END IF
@@ -364,11 +367,11 @@ c..End of the numeric string; convert to real number
 c..Error converting numeric string to real number
 999      CONTINUE
          WRITE( MSG, 94060 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) INBUF( START:LPOINT )
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETREAL', IZERO, IZERO, ' ', XSTAT2 )
          
 94000    FORMAT( 'ERROR: Two decimal points found in a numeric field' )
@@ -392,6 +395,7 @@ C Key Subroutines/Functions Called: EATCOM, GETCHR
 C.......................................................................
  
          USE UTILIO_DEFN
+         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
          IMPLICIT NONE
          
@@ -423,11 +427,11 @@ c..if the end of the label has not been reached, store the character
             LENGTH = LENGTH + 1 
             IF ( LENGTH .GT. 16 ) THEN
                WRITE( MSG, 94000 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94020 ) LINNUM, INBUF
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94040 ) BEGCHR, LABEL
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                CALL M3EXIT( 'PA_GETLABEL', IZERO, IZERO, ' ', XSTAT2 )
             END IF
             LABEL( LENGTH : LENGTH ) = CHR
@@ -457,6 +461,7 @@ C Key Subroutines/Functions Called: RDLINE, GETCHR
 C.......................................................................
  
          USE UTILIO_DEFN
+         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
          IMPLICIT NONE
          
@@ -511,9 +516,9 @@ c..length is OK
             LENGTH = LENGTH + 1
             IF ( LENGTH .GT. 132 ) THEN
                WRITE( MSG, 94000 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94020 ) LINNUM, INBUF
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                CALL M3EXIT( 'PA_GETQUOTE', IZERO, IZERO, ' ', XSTAT2 )
             END IF
 
@@ -543,6 +548,7 @@ C.......................................................................
 C Function: Concatenate a series of strings, eliminating trailing
 C           blanks, but leaving a space between each string 
 C.......................................................................
+         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
          IMPLICIT NONE
          
@@ -568,7 +574,7 @@ C.......................................................................
             IF ( ( LPOS + NEWLEN ) .GE. MAXLEN ) THEN
                NEWLEN = MAXLEN - LPOS
                WRITE( MSG, 94000 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                LRETURN = .TRUE.
             END IF
             STROUT = STROUT( 1:LPOS ) // STRING( N )( 1:NEWLEN )

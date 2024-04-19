@@ -95,7 +95,8 @@ C-----------------------------------------------------------------------
 #endif
 
       IMPLICIT NONE
-
+      INCLUDE SUBST_FILES_ID
+      
 C Includes:
         
 C Arguments:
@@ -138,7 +139,6 @@ C Logical names and unit numbers:
       CHARACTER( 16 ), SAVE :: NNAME   ! logical name for normalized-emissions input
       CHARACTER( 16 ), SAVE :: GNAME   ! logical name for GRID_CRO_2D
       CHARACTER( 16 ), SAVE :: BNAME   ! logical name for frost switch input
-      CHARACTER( 16 ), SAVE :: MNAME   ! logical name for MET_CRO_2D
 
 C Other variables:
       INTEGER, SAVE :: IHR        ! current simulation hour
@@ -199,22 +199,19 @@ C Allocate seasonality array
 
 #ifndef mpas
 C Ensure met data time and grid for this run match beis emissions data files
-         MNAME = PROMPTMFILE( 
-     &           'Enter name for gridded met input file',
-     &           FSREAD3, 'MET_CRO_2D', PNAME )
 
 C Get description of met file 
-         IF ( .NOT. DESC3( MNAME ) ) THEN
+         IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
             MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
+     &           // TRIM( MET_CRO_2D ) // '"'
             CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
          END IF
 
 C Check that grid description matches BGRD file
-         IF ( .NOT. CHKGRID( MNAME ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MNAME )
+         IF ( .NOT. CHKGRID( MET_CRO_2D ) ) THEN
+            MESG = 'Grid in file "' // TRIM( MET_CRO_2D )
      &           // '" does not match previously set grid.'
-            CALL M3WARN( PNAME, 0, 0, MESG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MESG)
          END IF
 
          IF ( BEMIS_DIAG ) THEN
@@ -370,13 +367,13 @@ C calculate fseas based on deep soil temperature following WRF 3.8.1 PX
       END IF   ! if new day
 
       WRITE( MESG,94030 ) HHMMSS( JTIME )
-      CALL M3MSG2( MESG )
+      CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
 #ifndef mpas
 C repopulate the met_cro_2d variable attributes
-      IF ( .NOT. DESC3( MNAME ) ) THEN
+      IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
          MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
+     &           // TRIM( MET_CRO_2D ) // '"'
          CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
       END IF
 #endif

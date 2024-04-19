@@ -146,7 +146,8 @@ C                                  |_________|_________|________|________|
 C .......................................................................
 
       USE PIOMAPS_MODULE
-      USE M3UTILIO              ! i/o api
+      !USE M3UTILIO              ! i/o api
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_WARNING
 
       IMPLICIT  NONE
 
@@ -185,7 +186,6 @@ C LOCAL VARIABLES:
       INTEGER POS                ! Index into neighborhood conversion table
       INTEGER CONV( 8 )          ! Processor neighborhood conversion table
       INTEGER IERROR             ! Error code
-      INTEGER LOGDEV             ! FORTRAN unit number for log file
       CHARACTER( 80 ) :: MSG     ! For message issued from M3WARN
       CHARACTER( 16 ), SAVE :: PNAME = 'PIO_INIT'
       LOGICAL, SAVE   :: FIRST_TIME = .TRUE.
@@ -205,7 +205,7 @@ C Initialize return value and error code
          PIO_INIT = .TRUE.
       ELSE
          MSG = 'Argument list must have cols/rows orientation.'
-         CALL M3WARN( PNAME, 0, 0, MSG )
+         CALL LOG_WARNING( PNAME, LOGDEV , MSG)
          PIO_INIT = .FALSE.; RETURN
       END IF
       IERROR = 0
@@ -261,28 +261,28 @@ C Allocate memory for processor-to-subdomain maps
          ALLOCATE ( NCOLS_PE( NUMPROCS ), STAT = IERROR )
          IF ( IERROR .NE. 0 ) THEN
             MSG = 'Error allocating NCOLS_PE.'
-            CALL M3WARN( PNAME, 0, 0, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             PIO_INIT = .FALSE.; RETURN
          END IF
 
          ALLOCATE ( NROWS_PE( NUMPROCS ), STAT = IERROR )
          IF ( IERROR .NE. 0 ) THEN
             MSG = 'Error allocating NROWS_PE.'
-            CALL M3WARN( PNAME, 0, 0, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             PIO_INIT = .FALSE.; RETURN
          END IF
 
          ALLOCATE ( COLSX_PE( 2,NUMPROCS ), STAT = IERROR )
          IF ( IERROR .NE. 0 ) THEN
             MSG = 'Error allocating COLSX_PE.'
-            CALL M3WARN( PNAME, 0, 0, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             PIO_INIT = .FALSE.; RETURN
          END IF
 
          ALLOCATE ( ROWSX_PE( 2,NUMPROCS ), STAT = IERROR )
          IF ( IERROR .NE. 0 ) THEN
             MSG = 'Error allocating ROWSX_PE.'
-            CALL M3WARN( PNAME, 0, 0, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             PIO_INIT = .FALSE.; RETURN
          END IF
 
@@ -291,28 +291,28 @@ C Allocate memory for processor-to-subdomain write maps
          ALLOCATE ( WR_NCOLS_PE( NUMPROCS ), STAT = IERROR )
          IF ( IERROR .NE. 0 ) THEN
             MSG = 'Error allocating WR_NCOLS_PE.'
-            CALL M3WARN( PNAME, 0, 0, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             PIO_INIT = .FALSE.; RETURN
          END IF
 
          ALLOCATE ( WR_NROWS_PE( NUMPROCS ), STAT = IERROR )
          IF ( IERROR .NE. 0 ) THEN
             MSG = 'Error allocating WR_NROWS_PE.'
-            CALL M3WARN( PNAME, 0, 0, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             PIO_INIT = .FALSE.; RETURN
          END IF
 
          ALLOCATE ( WR_COLSX_PE( 2,NUMPROCS ), STAT = IERROR )
          IF ( IERROR .NE. 0 ) THEN
             MSG = 'Error allocating WR_COLSX_PE.'
-            CALL M3WARN( PNAME, 0, 0, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             PIO_INIT = .FALSE.; RETURN
          END IF
 
          ALLOCATE ( WR_ROWSX_PE( 2,NUMPROCS ), STAT = IERROR )
          IF ( IERROR .NE. 0 ) THEN
             MSG = 'Error allocating WR_ROWSX_PE.'
-            CALL M3WARN( PNAME, 0, 0, MSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , MSG)
             PIO_INIT = .FALSE.; RETURN
          END IF
 
@@ -325,7 +325,7 @@ C Calculate processor-to-subdomain maps
      &               MAXCELLS, IERROR )
       IF ( IERROR .NE. 0 ) THEN
          MSG = 'Error in SUBDMAP'
-         CALL M3WARN( PNAME, 0, 0, MSG )
+         CALL LOG_WARNING( PNAME, LOGDEV , MSG)
          PIO_INIT = .FALSE.; RETURN
       END IF
 

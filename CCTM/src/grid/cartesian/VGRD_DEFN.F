@@ -112,13 +112,13 @@ C get vert layer definition from LAYER_FILE
                CALL LOG_HEADING( LOGDEV, "Retrieve Vertical Grid" )
                IF ( .NOT. OPEN3( LAYER_FILE, FSREAD3, 'VGRD_INIT' ) ) THEN
                   XMSG = 'Could not open '// LAYER_FILE
-                  CALL M3WARN ( 'VGRD_INIT', 0, 0, XMSG )
+                  CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
                   SUCCESS = .FALSE.; RETURN
                   END IF
 
                IF ( .NOT. DESC3( LAYER_FILE ) ) THEN
                   XMSG = 'Could not get ' // LAYER_FILE // ' file description'
-                  CALL M3WARN ( 'VGRD_INIT', 0, 0, XMSG )
+                  CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
                   SUCCESS = .FALSE.; RETURN
                   END IF
 
@@ -135,7 +135,7 @@ C get vert layer definition from LAYER_FILE
                ALLOCATE ( X3FACE_GD( 0:NLAYS ), STAT = ALLOCSTAT )
                IF ( ALLOCSTAT .NE. 0 ) THEN
                   XMSG = 'Failure allocating VGLVS_GD, X3FACE_GD'
-                  CALL M3WARN ( 'VGRD_INIT', 0, 0, XMSG )
+                  CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
                   SUCCESS = .FALSE.; RETURN
                   END IF
 
@@ -151,7 +151,7 @@ C set layer layer thickenesses
 
             ELSE
             XMSG = 'Vertical layer structure already defined'
-            CALL M3WARN ( 'VGRD_INIT', 0, 0, XMSG )
+            CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
             SUCCESS = .FALSE.; RETURN
 
 #endif

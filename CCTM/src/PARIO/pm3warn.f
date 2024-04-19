@@ -52,6 +52,7 @@ C
 C***********************************************************************
 
       USE M3UTILIO              ! i/o api
+      USE LOGDEV_MOD, ONLY : LOGDEV,LOG_WARNING
 
       IMPLICIT NONE
 
@@ -91,7 +92,7 @@ C.......  Construct new CALLER string.
       PCALLER = CALL16(1:LENSTR)//PE_STR//CMYPE
 
 C.......  Pass the new sting to M3WARN.
-      CALL M3WARN( PCALLER, JDATE, JTIME, ERRTXT )
+      CALL LOG_WARNING( PCALLER, LOGDEV, ERRTXT )
 
       RETURN
       END

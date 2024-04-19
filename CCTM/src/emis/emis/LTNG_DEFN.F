@@ -196,7 +196,7 @@
          CALL UPCASE(LTNG_FNAME)
          IF ( LTNG_FNAME .EQ. "INLINE" ) THEN  ! inline lightning NO production
             XMSG = 'Using in-line lightning NO production'
-            CALL M3MSG2( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 #ifdef twoway
            IF (wrf_lightning_assim) THEN
@@ -210,7 +210,7 @@
            END IF
            IF ( NLDNSTRIKE ) THEN
                   XMSG = 'Using hourly NLDN Strike data'
-                  CALL M3MSG2( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
                LT_TSTEP = TIME2SEC ( FILE_TSTEP(F_LTNG)  )
                LT_TSTEP_F = FILE_TSTEP(F_LTNG) 
@@ -219,7 +219,7 @@
                  LT_TSTEP = TIME2SEC ( TSTEP )
                  LT_TSTEP_F = TSTEP 
                  XMSG = 'Using derived parameters for KF scheme '
-                 CALL M3MSG2( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
             END IF  !END if NLDNSTRIKE
 
 !            LT_TSTEP_F = SEC2TIME (LT_TSTEP)
@@ -236,7 +236,7 @@
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'ICCG, OCEAN_MASK, LTNG_Parameters'
      &                 // '  memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
                IF ( CJDATE .GT. 90 .AND. CJDATE .LT. 274 ) THEN
@@ -341,14 +341,14 @@
                ALLOCATE( VDEMIS_LTDIAG( NCOLS,NROWS,DESID_LAYS ), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'VDEMIS_LTDIAG memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
                VDEMIS_LTDIAG = 0.0   ! array assignment
                ALLOCATE( COLUMN_DIAG( NCOLS,NROWS), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'COLUMN_DIAG memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
                COLUMN_DIAG = 0.0   ! array assignment
@@ -356,7 +356,7 @@
          ELSE   ! lightning emissions off line
 
 !C Lightning NO production from an input file
-            CALL M3MSG2( 'Using lightning NO production from a file' )
+            CALL LOG_MESSAGE( LOGDEV ,  'Using lightning NO production from a file' )
 
 !C Check grid definition (intialize, if first call)
             OK = CHKGRID( LTNG_FNAME )
@@ -371,7 +371,7 @@
          ALLOCATE( VDEMIS_LT( NCOLS,NROWS,LTLYRS ), STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'VDEMIS_LT memory allocation failed'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
  

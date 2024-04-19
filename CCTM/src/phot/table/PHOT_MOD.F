@@ -123,25 +123,25 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
            
 !           IF ( LNO2   .EQ. 0 ) THEN
 !              XMSG = 'NO2 photolysis not found in the mechanism! '
-!              CALL M3WARN ( 'INIT_PHOT_SHARED', 0, 0, XMSG )
+!              CALL LOG_WARNING( 'INIT_PHOT_SHARED', 0, 0, XMSG )
 !           END IF
 !           IF ( LO3O1D .EQ. 0 ) THEN
 !              XMSG = 'O(1D) production by photolysis not found in the mechanism! '
-!              CALL M3WARN ( 'INIT_PHOT_SHARED', 0, 0, XMSG )
+!              CALL LOG_WARNING( 'INIT_PHOT_SHARED', 0, 0, XMSG )
 !           END IF
 !           IF ( LO3O3P .EQ. 0 ) THEN
 !              MSG = 'O(3P) production by photolysis not found in the mechanism! '
-!              CALL M3WARN ( 'INIT_PHOT_SHARED', 0, 0, XMSG )
+!              CALL LOG_WARNING( 'INIT_PHOT_SHARED', 0, 0, XMSG )
 !           END IF
            IF ( LH2O2 .EQ. 0 ) THEN
               XMSG = 'H2O2 photolysis not found in the mechanism! '
               ERROR_FLAG = .TRUE.
-              CALL M3WARN ( 'INIT_PHOT_SHARED', 0, 0, XMSG )
+              CALL LOG_WARNING( 'INIT_PHOT_SHARED', LOGDEV, XMSG )
            END IF
            IF ( LHNO3 .EQ. 0 ) THEN
               XMSG = 'HNO3 photolysis not found in the mechanism! '
               ERROR_FLAG = .TRUE.
-              CALL M3WARN ( 'INIT_PHOT_SHARED', 0, 0, XMSG )
+              CALL LOG_WARNING( 'INIT_PHOT_SHARED', LOGDEV, XMSG )
            END IF
 
           IF( ERROR_FLAG )THEN
@@ -153,5 +153,4 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
           
       END SUBROUTINE INIT_PHOT_SHARED
       
-
-      END MODULE PHOT_MOD
+END MODULE PHOT_MOD
