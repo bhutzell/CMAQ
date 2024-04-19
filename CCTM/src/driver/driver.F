@@ -735,6 +735,8 @@ C Main processing loop:
 #endif if
          END DO
 #ifdef isam
+            IF ( AISAM_ELEV .EQ. -1 ) AISAM_ELEV = NLAYS
+
             DO ITAG = 1, NTAG_SA ! average isam
                DO V = 1, NSPC_SA
                   L = 0
