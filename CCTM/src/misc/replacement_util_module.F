@@ -23,7 +23,10 @@
 !         leap_year  quicksort_partition  quicksort  date_time_minus_sec
 
 ! History: David Wong, 04/2024 created
-!          Bill Hutzell, 04/2024 added implementation of GETDTTIME, named GETCDTTIME      
+!          Bill Hutzell, 04/2024 added implementation of GETDTTIME, named GETCDTTIME
+!          David Wong, 04/15/2024
+!            -- modified quicksort subroutine by adding min function to avoid
+!               array index out of bounds with Nvidia compiler in debug mode
 ! -----------------------------------------------------------------------------
 
         module replacement_util_module
@@ -978,7 +981,7 @@
                pindex = quicksort_partition (n, name, index)
 
                call quicksort (pindex-1, name, index(1:pindex-1))
-               call quicksort (n-pindex, name, index(pindex+1:n))
+               call quicksort (n-pindex, name, index(min(pindex+1,n):n))
             end if
 
           end subroutine quicksort
