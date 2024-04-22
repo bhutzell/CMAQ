@@ -3335,6 +3335,7 @@
 !-------------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
+      USE MIO_ASCII
 
       IMPLICIT NONE
 
@@ -3403,7 +3404,22 @@
             DO L = 2, MXDESC3
                FDESC3D( L ) = ' '
             END DO
-         
+
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_ELMO_1', NLAYS3D, INST_LAYER_BOT, INST_LAYER_TOP,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+ 
+
             ! Open the Instantaneous aerosol diagnostic file
             IF ( .NOT. OPEN3( CTM_ELMO_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create '// CTM_ELMO_1 // ' file'
@@ -3447,6 +3463,21 @@
                FDESC3D( L ) = ' '
             END DO
          
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_AELMO_1', NLAYS3D, AVRG_LAYER_BOT, AVRG_LAYER_TOP,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+
+
             ! Open the Instantaneous aerosol diagnostic file
             IF ( .NOT. OPEN3( CTM_AELMO_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create '// CTM_AELMO_1 // ' file'

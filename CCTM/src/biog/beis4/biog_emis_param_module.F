@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------!
-! This module contains key component from BIOG_EMIS.F to facilitate 
+! This module contains key component from BEIS_DEFN.F to facilitate 
 ! centralized I/O implementation by avoiding cyclic data dependence
 
 ! Revision History:

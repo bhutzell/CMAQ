@@ -38,6 +38,7 @@ C-----------------------------------------------------------------------
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE MIO_ASCII
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -187,6 +188,20 @@ C pick up transported RHOJ
      &                   SPC, VNAME3D( SPC )
                END DO
 
+               ! Store MIO Metadata
+               NDIMS3D( 1:NVARS3D ) = 4
+               L_TSTEP( 1:NVARS3D ) = .True.
+               L_LAY  ( 1:NVARS3D ) = .True.
+               L_COL  ( 1:NVARS3D ) = .True.
+               L_ROW  ( 1:NVARS3D ) = .True.
+               L_VEXT ( 1:NVARS3D ) = .False.
+           
+               CALL LOAD_MIO_FILE ( 'S_CGRID', NLAYS3D, 1, NLAYS3D,
+     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &              L_VEXT(1:NVARS3D) )
+
                IF ( .NOT. OPEN3( S_CGRID, FSNEW3, PNAME ) ) THEN
                   XMSG = 'Could not open '
      &                 // TRIM( S_CGRID ) // ' file'
@@ -274,6 +289,8 @@ C proc 0 has CTM_CONC_1 open
             END IF   ! IO_PE_INCLUSIVE
 
          END IF   ! .NOT. OPEN S_CGRID
+
+         RETURN
 
       END IF   ! FIRSTIME
 

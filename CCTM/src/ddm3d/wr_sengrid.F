@@ -49,6 +49,7 @@ C-----------------------------------------------------------------------
 #endif
 
       USE DDM3D_DEFN
+      USE MIO_ASCII
 
       IMPLICIT NONE
 
@@ -157,7 +158,7 @@ C Gas species
                      VTYPE3D( VAR ) = M3REAL
                      VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                      UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
 
@@ -169,7 +170,7 @@ C RHOJ - should be zero
                   VTYPE3D( VAR ) = M3REAL
                   VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                   UNITS3D( VAR ) = 'm*Kg/m**3'
-                  VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
+                  VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
                END DO
 
 C Aerosol species
@@ -187,7 +188,7 @@ C Aerosol species
                      ELSE
                         UNITS3D( VAR ) = 'micrograms/m**3'
                      END IF
-                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
 
@@ -200,7 +201,7 @@ C NR species
                      VTYPE3D( VAR ) = M3REAL
                      VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                      UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
 
@@ -213,9 +214,23 @@ c TR species
                      VTYPE3D( VAR ) = M3REAL
                      VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                      UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
+
+               ! Store MIO Metadata
+               NDIMS3D( 1:NVARS3D ) = 4
+               L_TSTEP( 1:NVARS3D ) = .True.
+               L_LAY  ( 1:NVARS3D ) = .True.
+               L_COL  ( 1:NVARS3D ) = .True.
+               L_ROW  ( 1:NVARS3D ) = .True.
+               L_VEXT ( 1:NVARS3D ) = .False.
+
+               CALL LOAD_MIO_FILE ( 'CTM_SENS_1', NLAYS3D, 1, NLAYS3D,
+     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &              L_VEXT(1:NVARS3D) )
 
 c open the file
 
@@ -309,6 +324,8 @@ c           IF ( MYPE .EQ. 0 ) THEN
          END IF   ! .NOT. OPEN CTM_SENS_1
 
 c         CALL SUBST_BARRIER
+
+         RETURN   ! MIO Initialization
 
       END IF   ! FIRSTIME
 

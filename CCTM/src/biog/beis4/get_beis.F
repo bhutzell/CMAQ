@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE TMPBEIS( JDATE, JTIME, TSTEP, BEIS_MAP, EMISL, L_DESID_DIAG )
+      SUBROUTINE GET_BEIS( JDATE, JTIME, TSTEP, L_DESID_DIAG )
 
 C-----------------------------------------------------------------------
  
@@ -73,15 +73,15 @@ C University of North Carolina at Chapel Hill
 C 137 E. Franklin St., CB# 6116
 C Chapel Hill, NC 27599-6116
 C smoke@unc.edu
-C Pathname: $Source: /project/yoj/arc/CCTM/src/biog/beis3/tmpbeis.F,v $
 C Last updated: $Date: 2011/10/21 16:10:18 $ 
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE UTILIO_DEFN
-      USE BIOG_EMIS             ! beis
+      USE BEIS_DEFN             ! beis
       USE centralized_io_module, only : AVGEMIS, interpolate_var
       Use ASX_DATA_MOD, only: MET_DATA
+      USE MIO_ASCII
 
 #ifdef mpas
       USE util_module, only : hhmmss, time2sec
@@ -101,14 +101,8 @@ C Arguments:
       INTEGER, INTENT(  IN ) :: JDATE   ! current simulation date (YYYYDDD)
       INTEGER, INTENT(  IN ) :: JTIME   ! current simulation time (HHMMSS)
       INTEGER, INTENT(  IN ) :: TSTEP( 3 )      ! timestep vector
-      INTEGER, INTENT(  IN ) :: BEIS_MAP( : )   ! mapping from beis3 to model species
-      REAL,    INTENT( OUT ) :: EMISL( :,:,: )  ! emissions in moles/sec
       LOGICAL, INTENT(  IN ) :: L_DESID_DIAG ! flag determining whether or not DESID
                                              !   is in diagnostic mode              
-
-
-C External Functions
-      LOGICAL,         EXTERNAL :: CHKGRID
 
 C Parameters:
       REAL,    PARAMETER :: HR2SEC = 1.0 / 3600.0
@@ -133,18 +127,14 @@ C BEIS3 internal, output species:
 
 C Logical names and unit numbers:
             
-      CHARACTER( 16 ), SAVE :: SNAME   ! logical name for diagnostic emis output (mass)
       CHARACTER( 16 ), SAVE :: NNAME   ! logical name for normalized-emissions input
       CHARACTER( 16 ), SAVE :: GNAME   ! logical name for GRID_CRO_2D
       CHARACTER( 16 ), SAVE :: BNAME   ! logical name for frost switch input
-      CHARACTER( 16 ), SAVE :: MNAME   ! logical name for MET_CRO_2D
 
 C Other variables:
       INTEGER, SAVE :: IHR        ! current simulation hour
       INTEGER          IOS        ! IO or memory allocation status
       INTEGER, SAVE :: LDATE      ! previous simulation date
-      INTEGER, SAVE :: MDATE      ! test date to update beis diag avg
-      INTEGER, SAVE :: MTIME      ! test time to update beis diag avg
       INTEGER, SAVE :: NSTEPS     ! run duration
       INTEGER, SAVE :: WSTEP  = 0 ! local write counter
       INTEGER          PARTYPE    ! method number to calculate PAR
@@ -157,9 +147,9 @@ C Other variables:
       CHARACTER( 256 ) :: MESG       ! message buffer
       CHARACTER( 256 ) :: EQNAME     ! equivalent filename
       CHARACTER(  16 ) :: VAR        ! variable name
-      CHARACTER(  16 ) :: PNAME = 'TMPBEIS'   ! prodedure name
+      CHARACTER(  16 ) :: PNAME = 'GET_BEIS'   ! prodedure name
 
-#ifdef verbose_tmpbeis
+#ifdef verbose_getbeis
       REAL,    ALLOCATABLE, SAVE :: EMISX( : )
       INTEGER, ALLOCATABLE, SAVE :: CX( : ), RX( : )
 #endif
@@ -196,89 +186,6 @@ C Allocate seasonality array
          CALL CHECKMEM( IOS, 'FSEAS', PNAME )
          FSEAS = 0   ! array
 
-#ifndef mpas
-C Ensure met data time and grid for this run match beis emissions data files
-         MNAME = PROMPTMFILE( 
-     &           'Enter name for gridded met input file',
-     &           FSREAD3, 'MET_CRO_2D', PNAME )
-
-C Get description of met file 
-         IF ( .NOT. DESC3( MNAME ) ) THEN
-            MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-
-C Check that grid description matches BGRD file
-         IF ( .NOT. CHKGRID( MNAME ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MNAME )
-     &           // '" does not match previously set grid.'
-            CALL M3WARN( PNAME, 0, 0, MESG )
-         END IF
-
-         IF ( BEMIS_DIAG ) THEN
-C Build description for, and open beis diagnostic file
-            MDATE = STDATE; MTIME = STTIME
-            CALL NEXTIME( MDATE, MTIME, TSTEP( 1 ) )
-
-            GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-            SDATE3D = MDATE
-            STIME3D = MTIME
-            TSTEP3D = TSTEP( 1 )
-            NCOLS3D = GL_NCOLS
-            NROWS3D = GL_NROWS
-            NLAYS3D =     1
-            NTHIK3D =     1
-            GDTYP3D = GDTYP_GD
-            P_ALP3D = P_ALP_GD
-            P_BET3D = P_BET_GD
-            P_GAM3D = P_GAM_GD
-            XORIG3D = XORIG_GD
-            YORIG3D = YORIG_GD
-            XCENT3D = XCENT_GD
-            YCENT3D = YCENT_GD
-            XCELL3D = XCELL_GD
-            YCELL3D = YCELL_GD
-            VGTYP3D = VGTYP_GD
-            VGTOP3D = VGTOP_GD
-
-            DO I = 1, NLAYS3D + 1
-               VGLVS3D( I ) = VGLVS_GD( I )
-            END DO
-  
-
-            J = 0
-            DO I = 1, MSPCS
-               IF ( BEIS_MAP( I ) .GT. 0 ) THEN
-                  J = J + 1
-                  VNAME3D( J ) = EMSPC( I )
-                  VDESC3D( J ) = 'biogenic emissions of the indicated species'
-                  VTYPE3D( J ) = M3REAL
-                  UNITS3D( J ) = 'gm s-1'
-               END IF
-            END DO
-
-            NVARS3D = J
-            FDESC3D = ' '   ! array
-
-            FDESC3D( 1 ) = 'Gridded biogenic emissions from CMAQ-BEIS3'
-            FDESC3D( 2 ) = '/from/ ' // PNAME
-            FDESC3D( 3 ) = '/Version/ CMAQ'
-
-C Open mass output file (tons/hour)
-
-            SNAME = 'B3GTS_S'
-            CALL SUBST_BARRIER
-            IF ( IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( SNAME, FSNEW3, PNAME ) ) THEN
-                  MESG = 'Could not open "' // TRIM( SNAME ) // '" file'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
-               END IF
-            END IF
-
-         END IF
-#endif
-
 C Allocate memory for arrays
          
          ALLOCATE( EMPOL( NCOLS,NROWS,NSEF ), STAT=IOS )
@@ -300,7 +207,7 @@ C Allocate memory for arrays
 
          LDATE = 0
 
-#ifdef verbose_tmpbeis
+#ifdef verbose_getbeis
          ALLOCATE( EMISX( MSPCS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'EMISX', PNAME )
          ALLOCATE( CX( MSPCS ), STAT=IOS )
@@ -327,9 +234,9 @@ C Allocate memory for arrays
 
 C Loop thru the number of time steps (hourly)
 
-      EMISL = 0.0   ! array
+      VDEMIS_BI = 0.0   ! array
       EMPOL = 0.0   ! array
-#ifdef verbose_tmpbeis
+#ifdef verbose_getbeis
       EMISX = 0.0   ! array
 #endif
 
@@ -380,35 +287,33 @@ C Speciate emissions
             DO C = 1, NCOLS
                EMPL = EMPOL( C,R,K ) * HR2SEC
                IF ( EMPL .GT. 0.0 ) 
-     &            EMISL( :,C,R ) = EMISL( :,C,R ) + EMPL * MLFAC( :,K )
+     &            VDEMIS_BI( :,C,R ) = VDEMIS_BI( :,C,R ) + EMPL * MLFAC( :,K )
             END DO
          END DO
       END DO
 
-#ifdef verbose_tmpbeis
+#ifdef verbose_getbeis
       WRITE( LOGDEV,* ) ' '
-      WRITE( LOGDEV,* ) '       from TMPBEIS'
-      WRITE( LOGDEV,* ) '    Spc   EMISL  MaxC MaxR'
+      WRITE( LOGDEV,* ) '       from GET_BEIS'
+      WRITE( LOGDEV,* ) '    Spc   VDEMIS_BI  MaxC MaxR'
       DO S = 1, MSPCS
          WRITE( LOGDEV,'( 4X, I3, F10.5, 2I4 )' ) S, EMISX( S ), CX( S ), RX( S )
       END DO
 
       EMISX = 0.0    ! array
       WRITE( LOGDEV,* ) ' '
-      WRITE( LOGDEV,* ) '                   from TMPBEIS'
-      WRITE( LOGDEV,* ) '    Spc SpcName  Pol  MLFAC     EMPOL     EMISL( Spc,32,7 )'
+      WRITE( LOGDEV,* ) '                   from GET_BEIS'
+      WRITE( LOGDEV,* ) '    Spc SpcName  Pol  MLFAC     EMPOL     VDEMIS_BI( Spc,32,7 )'
       C = 32; R = 7
       DO K = 1, NSEF
          EMPL = EMPOL( C,R,K ) * HR2SEC
          IF ( EMPL .LE. 0.0 ) CYCLE
          DO S = 1, MSPCS
-            IF ( BEIS_MAP( S ) .GT. 0 ) THEN
-               MLFC = MLFAC( S,K )
-               EMISX( S ) = EMISX( S ) + EMPL * MLFC
-               IF ( MLFC .NE. 0.0 )
-     &            WRITE( LOGDEV,'( 4X, I3, 2X, A6, 2X, I3, 1X, 3( 1PE10.3 ) )' )
-     &                              S, EMSPC( S ), K,  MLFC, EMPL, EMISX( S )
-            END IF
+            MLFC = MLFAC( S,K )
+            EMISX( S ) = EMISX( S ) + EMPL * MLFC
+            IF ( MLFC .NE. 0.0 )
+     &         WRITE( LOGDEV,'( 4X, I3, 2X, A6, 2X, I3, 1X, 3( 1PE10.3 ) )' )
+     &                           S, EMSPC( S ), K,  MLFC, EMPL, EMISX( S )
          END DO
       END DO
 #endif
@@ -429,11 +334,9 @@ C Speciate emissions
          IF ( LASTTIC ) THEN
             EMISS = EMISS * HR2SEC   ! convert from gm/h to gm/s
             DO S = 1,MSPCS
-               IF ( BEIS_MAP( S ) .GT. 0 ) THEN
-                  IF ( .NOT. WRITE3( SNAME, EMSPC( S ), MDATE, MTIME, EMISS(:,:,S) ) ) THEN
-                     MESG = 'Could not write to output file "' // TRIM( SNAME ) // '"'
-                     CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-                  END IF
+               IF ( .NOT. WRITE3( SNAME, EMSPC( S ), MDATE, MTIME, EMISS(:,:,S) ) ) THEN
+                  MESG = 'Could not write to output file "' // TRIM( SNAME ) // '"'
+                  CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
                END IF
             END DO
             WRITE( LOGDEV,94040 )
@@ -458,5 +361,5 @@ C------------------  FORMAT  STATEMENTS   ------------------------------
 94030 FORMAT( 5X, 'Temporal BEIS at time ', A8 )
 94040 FORMAT( /5X, 3( A, :, 1X ), I8, ":", I6.6 )
 
-      END SUBROUTINE TMPBEIS  
+      END SUBROUTINE GET_BEIS  
 

@@ -138,9 +138,10 @@ C Last updated: $Date: 2011/10/21 16:10:18 $
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE HGRD_DEFN             ! horizontal domain specifications
-      USE BIOG_EMIS, ONLY: NSEF ! beis
+      USE BEIS_DEFN, ONLY: NSEF ! beis
       USE ASX_DATA_MOD
       USE UTILIO_DEFN
+      USE MIO_ASCII
 #ifdef mpas
       use mio_module
       USE util_module, only : NEXTIME, TIME2SEC, SECSDIFF, CURRSTEP, julian
@@ -221,6 +222,7 @@ C Local Variables:
       LOGICAL, SAVE :: USE_SOILT = .TRUE. ! use soil temperature in PX version
                                           ! rather than estimate as in BEIS2
 
+      LOGICAL, SAVE :: INITTIME = .TRUE.
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL, SAVE :: FIRSTHR  = .TRUE.
       LOGICAL, SAVE :: FIRST_WRITE = .TRUE.
@@ -247,8 +249,8 @@ C for INTERPX
 #endif
 C-----------------------------------------------------------------------
 
-      IF ( FIRSTIME ) THEN
-!        FIRSTIME = .FALSE.
+      IF ( INITTIME ) THEN
+        INITTIME = .FALSE.
 
 #ifdef mpas
          if (ncd_64bit_offset) then
@@ -295,6 +297,10 @@ C Check that grid description matches MET_CRO_2D file
          END IF
 #endif
 
+         WRITE( MESG, '(A,I0,A,I0)' ),
+     &     'NCOLS = ',NCOLS,': NROWS = ',NROWS
+         CALL M3MESG( MESG )
+
          ALLOCATE( RNTOT( NCOLS,NROWS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'RNTOT', PNAME )
 
@@ -320,7 +326,98 @@ C If initial run, initialize some variables, otherwise get them from file
 !        IHR = 0
          EFAC = EXP( -0.103 * 30.0 )
 
-      END IF   ! FIRSTIME
+         ! Create rain data file for soil NO
+         ! Final timestamp
+         NDATE = EDATE; NTIME = ETIME
+
+         ! Build description for, and create/open soil NO emissions output file
+         FTYPE3D = GRDDED3
+         SDATE3D = NDATE
+         STIME3D = NTIME
+         TSTEP3D = 0   ! make it a time-independent file
+         NCOLS3D = GL_NCOLS
+         NROWS3D = GL_NROWS
+         NLAYS3D = 1
+         NVARS3D = 3 + RHOURS
+         MXREC3D = 1
+         NTHIK3D = 1
+         GDTYP3D = GDTYP_GD
+         P_ALP3D = P_ALP_GD
+         P_BET3D = P_BET_GD
+         P_GAM3D = P_GAM_GD
+         XORIG3D = XORIG_GD
+         YORIG3D = YORIG_GD
+         XCENT3D = XCENT_GD
+         YCENT3D = YCENT_GD
+         XCELL3D = XCELL_GD
+         YCELL3D = YCELL_GD
+         VGTYP3D = VGTYP_GD
+         VGTOP3D = VGTOP_GD
+         DO L = 1, NLAYS3D + 1
+            VGLVS3D( L ) = VGLVS_GD( L )
+         END DO
+         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
+        
+         VNAME3D = ' '
+         VNAME3D( 1 ) = 'PTYPE'
+         VNAME3D( 2 ) = 'PULSEDATE'
+         VNAME3D( 3 ) = 'PULSETIME'
+        
+         DO I = 1, RHOURS
+            WRITE( VAR, '(A8,I2.2)' ) 'RAINFALL', I
+            VNAME3D( I+3 ) = VAR
+         END DO
+        
+         UNITS3D = ' '
+         UNITS3D( 1 ) = 'INTEGER'
+         UNITS3D( 2 ) = 'YYYYDDD'
+         UNITS3D( 3 ) = 'HHMMSS'
+         UNITS3D( 4:RHOURS+3 ) = 'cm'
+        
+         VDESC3D( 1 ) = 'NO emission pulse type'
+         VDESC3D( 2 ) = 'CMAQ starting date for NO emission pulse'
+         VDESC3D( 3 ) = 'CMAQ starting time for NO emission pulse'
+!        VDESC3D( 4:RHOURS+3 ) = 'hourly convective and non-convective rainfall'
+         DO I = 1, RHOURS
+            VDESC3D( I+3 ) = DESCSTR // DDTTM( I )
+         END DO
+        
+         VTYPE3D = 0
+         VTYPE3D( 1 ) = M3INT
+         VTYPE3D( 2 ) = M3INT
+         VTYPE3D( 3 ) = M3INT
+         VTYPE3D( 4:RHOURS+3 ) = M3REAL
+        
+         FDESC3D = ' '
+         FDESC3D( 1 ) = 'Gridded rainfall data for soil NO emissions'
+         FDESC3D( 2 ) = '/From/ ' // PNAME
+         FDESC3D( 3 ) = '/Version/ CMAQ'
+        
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+        
+         CALL LOAD_MIO_FILE ( 'SOILOUT', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+
+         ! Open NO rain data save file
+         IF ( IO_PE_INCLUSIVE ) THEN
+            IF ( .NOT. OPEN3( SOILOUT, FSNEW3, PNAME ) ) THEN
+               MESG = 'Could not open "' // TRIM( SOILOUT ) // '" file'
+               CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
+            END IF
+         END IF
+
+         RETURN
+
+      END IF   ! INITTIME
 
 C Non-convective (RN) and convective (RC) rain is the total amount for the met
 C preprocessor's (typically MCIP) output timestep (typically one hour). It doesn't
@@ -577,77 +674,6 @@ C Create rain data file for soil NO
 
 C Final timestamp
       NDATE = EDATE; NTIME = ETIME
-
-C Build description for, and create/open soil NO emissions output file
-      FTYPE3D = GRDDED3
-      SDATE3D = NDATE
-      STIME3D = NTIME
-      TSTEP3D = 0   ! make it a time-independent file
-      NCOLS3D = GL_NCOLS
-      NROWS3D = GL_NROWS
-      NLAYS3D = 1
-      NVARS3D = 3 + RHOURS
-      MXREC3D = 1
-      NTHIK3D = 1
-      GDTYP3D = GDTYP_GD
-      P_ALP3D = P_ALP_GD
-      P_BET3D = P_BET_GD
-      P_GAM3D = P_GAM_GD
-      XORIG3D = XORIG_GD
-      YORIG3D = YORIG_GD
-      XCENT3D = XCENT_GD
-      YCENT3D = YCENT_GD
-      XCELL3D = XCELL_GD
-      YCELL3D = YCELL_GD
-      VGTYP3D = VGTYP_GD
-      VGTOP3D = VGTOP_GD
-      DO L = 1, NLAYS3D + 1
-         VGLVS3D( L ) = VGLVS_GD( L )
-      END DO
-      GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-      VNAME3D = ' '
-      VNAME3D( 1 ) = 'PTYPE'
-      VNAME3D( 2 ) = 'PULSEDATE'
-      VNAME3D( 3 ) = 'PULSETIME'
-
-      DO I = 1, RHOURS
-         WRITE( VAR, '(A8,I2.2)' ) 'RAINFALL', I
-         VNAME3D( I+3 ) = VAR
-      END DO
-
-      UNITS3D = ' '
-      UNITS3D( 1 ) = 'INTEGER'
-      UNITS3D( 2 ) = 'YYYYDDD'
-      UNITS3D( 3 ) = 'HHMMSS'
-      UNITS3D( 4:RHOURS+3 ) = 'cm'
-
-      VDESC3D( 1 ) = 'NO emission pulse type'
-      VDESC3D( 2 ) = 'CMAQ starting date for NO emission pulse'
-      VDESC3D( 3 ) = 'CMAQ starting time for NO emission pulse'
-!     VDESC3D( 4:RHOURS+3 ) = 'hourly convective and non-convective rainfall'
-      DO I = 1, RHOURS
-         VDESC3D( I+3 ) = DESCSTR // DDTTM( I )
-      END DO
-
-      VTYPE3D = 0
-      VTYPE3D( 1 ) = M3INT
-      VTYPE3D( 2 ) = M3INT
-      VTYPE3D( 3 ) = M3INT
-      VTYPE3D( 4:RHOURS+3 ) = M3REAL
-
-      FDESC3D = ' '
-      FDESC3D( 1 ) = 'Gridded rainfall data for soil NO emissions'
-      FDESC3D( 2 ) = '/From/ ' // PNAME
-      FDESC3D( 3 ) = '/Version/ CMAQ'
-
-C Open NO rain data save file
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( SOILOUT, FSNEW3, PNAME ) ) THEN
-            MESG = 'Could not open "' // TRIM( SOILOUT ) // '" file'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
-         END IF
-      END IF
 
 #ifdef parallel_io
       IF ( IO_PE_INCLUSIVE ) THEN

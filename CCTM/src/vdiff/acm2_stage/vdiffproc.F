@@ -329,6 +329,7 @@ C Set up for grav. settling
             END IF
          END DO
 
+         RETURN ! Added for MIO implementation
       END IF   !  if Firstime
 
       MDATE = JDATE

@@ -444,6 +444,7 @@ C Set up for grav. settling
          end if
 #endif
 
+         RETURN  ! Added for MIO implementation
       END IF   !  if Firstime
 
       MDATE = JDATE
