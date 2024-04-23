@@ -93,7 +93,7 @@ C Subroutine arguments:
 C Arguments:
       INTEGER, INTENT(  IN ) :: JDATE   ! current simulation date (YYYYDDD)
       INTEGER, INTENT(  IN ) :: JTIME   ! current simulation time (HHMMSS)
-      INTEGER, INTENT(  IN ) :: TSTEP   ! timestep scalar (output time step)
+      INTEGER, INTENT(  IN ) :: TSTEP(3)! timestep vector (output time step)
 
 C Parameters:
 C (A line from the profile file is a record.)
@@ -186,6 +186,16 @@ C Local variables
          CHARACTER( 16 )  :: PNAME = 'BEIS_INIT'
          CHARACTER( 120 ) :: XMSG = ' '
 
+      INTERFACE
+         SUBROUTINE HRNO( JDATE, JTIME, TSTEP, NOPOL, L_DESID_DIAG )
+            INTEGER, INTENT( IN )  :: JDATE
+            INTEGER, INTENT( IN )  :: JTIME
+            INTEGER, INTENT( IN )  :: TSTEP( 3 )
+            REAL,    INTENT( OUT ) :: NOPOL( :,: )
+            LOGICAL, INTENT( IN )  :: L_DESID_DIAG
+         END SUBROUTINE HRNO
+      END INTERFACE
+ 
 C-----------------------------------------------------------------------
 
          SUCCESS = .TRUE.
@@ -593,12 +603,12 @@ C Check that grid description matches BGRD file
          IF ( BEMIS_DIAG ) THEN
 C Build description for, and open beis diagnostic file
             MDATE = STDATE; MTIME = STTIME
-            CALL NEXTIME( MDATE, MTIME, TSTEP )
+            CALL NEXTIME( MDATE, MTIME, TSTEP(1) )
 
             GDNAM3D = GRID_NAME  ! from HGRD_DEFN
             SDATE3D = MDATE
             STIME3D = MTIME
-            TSTEP3D = TSTEP
+            TSTEP3D = TSTEP(1)
             NCOLS3D = GL_NCOLS
             NROWS3D = GL_NROWS
             NLAYS3D =     1
@@ -676,7 +686,6 @@ C Initialize temporal non-speciated soil NO emissions
          CALL CHECKMEM( IOS, 'NOPOL', PNAME )
          NOPOL(:,:) = 0.0
          CALL HRNO( JDATE, JTIME, TSTEP, NOPOL, .FALSE. )
-         DEALLOCATE( NOPOL )
 
          SUCCESS = .TRUE.
 

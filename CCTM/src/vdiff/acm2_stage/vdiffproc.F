@@ -258,7 +258,7 @@ C Allocate and initialize dry deposition array
 
          CALL LOG_HEADING( LOGDEV, "Initialize Emissions Module" )
 
-         IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP( 1 ) ) ) THEN
+         IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP ) ) THEN
             XMSG = 'Failure initializing emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF

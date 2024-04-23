@@ -162,7 +162,7 @@ C Arguments:
       INTEGER, INTENT( IN )  :: JDATE         ! current simulation date (YYYYDDD)
       INTEGER, INTENT( IN )  :: JTIME         ! current simulation time (HHMMSS)
       INTEGER, INTENT( IN )  :: TSTEP( 3 )    ! time step vector (HHMMSS)
-      REAL,    INTENT( OUT ) :: NOPOL( :,: )  ! output NO emissions
+      REAL,    INTENT( OUT)  :: NOPOL( :,: )  ! output NO emissions
       LOGICAL, INTENT( IN )  :: L_DESID_DIAG  ! flag determining whether or not DESID
                                               !   is in diagnostic mode              
 C External Functions

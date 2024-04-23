@@ -105,7 +105,7 @@ C Includes:
          INCLUDE SUBST_CONST     ! constants
 
 C Arguments:
-         INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP   ! TSTEP is output time step (HHMMSS)
+         INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP( 3 )   ! TSTEP is output time step (HHMMSS)
          LOGICAL :: SUCCESS
 
 C Local Variables:
@@ -193,7 +193,7 @@ C Get number of emissions layers
 
 C Initialize 3D Point Source Emissions 
          CALL LOG_SUBHEADING( LOGDEV, 'Initialize Point Emissions' )
-         IF ( .NOT. PT3D_INIT( JDATE, JTIME, TSTEP ) ) THEN
+         IF ( .NOT. PT3D_INIT( JDATE, JTIME, TSTEP(1) ) ) THEN
             XMSG = 'Failure initializing plume rise emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
@@ -201,7 +201,7 @@ C Initialize 3D Point Source Emissions
          IF ( BIOGEMIS_MEGAN ) THEN
 C Initialize Online Biogenic Emissions, MEGAN
           CALL LOG_SUBHEADING( LOGDEV, 'Initialize MEGAN Biogenic Emissions' )
-          IF ( .NOT. MEGAN_INIT( JDATE, JTIME, TSTEP ) ) THEN
+          IF ( .NOT. MEGAN_INIT( JDATE, JTIME, TSTEP(1) ) ) THEN
              XMSG = 'Failure initializing biogenics emissions module'
              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
           END IF
@@ -216,21 +216,21 @@ C Initialize Online Biogenic Emissions, BEIS
          END IF
 C Initialize Online Marine Gas Emissions
          CALL LOG_SUBHEADING( LOGDEV, 'Initialize Marine Gas Emissions' )
-         IF ( .NOT. MGEMIS_INIT( JDATE, JTIME, TSTEP ) ) THEN
+         IF ( .NOT. MGEMIS_INIT( JDATE, JTIME, TSTEP(1) ) ) THEN
             XMSG = 'Failure initializing marine gas emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
 C Initialize Online Lightning NOx Emissions
          CALL LOG_SUBHEADING( LOGDEV, 'Initialize Lightning NO Emissions' )
-         IF ( .NOT. LTNG_INIT( JDATE, JTIME, TSTEP ) ) THEN
+         IF ( .NOT. LTNG_INIT( JDATE, JTIME, TSTEP(1) ) ) THEN
             XMSG = 'Failure initializing lightning emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
 C Initialize Aerosol Emissions         
          CALL LOG_SUBHEADING( LOGDEV,'Process Aerosol Emissions' )
-         IF ( .NOT. AERO_EMIS_INIT( JDATE, JTIME, TSTEP ) ) THEN
+         IF ( .NOT. AERO_EMIS_INIT( JDATE, JTIME, TSTEP(1) ) ) THEN
             XMSG = 'Failure initializing aerosol emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
@@ -242,9 +242,9 @@ C or Print Warnings if Mistakes Are Made.
          CALL DESID_PROCESS_RULES( JDATE, JTIME )
          CALL DESID_INIT_DIAG
 #ifndef mpas
-         IF ( IO_PE_INCLUSIVE ) CALL DESID_OPEN_DIAG( JDATE, JTIME, TSTEP )
+         IF ( IO_PE_INCLUSIVE ) CALL DESID_OPEN_DIAG( JDATE, JTIME, TSTEP(1) )
 #else
-         CALL DESID_OPEN_DIAG( JDATE, JTIME, TSTEP )
+         CALL DESID_OPEN_DIAG( JDATE, JTIME, TSTEP(1) )
 #endif
 
 C Allocate Space for Master Emissions Computation
