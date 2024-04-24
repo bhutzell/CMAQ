@@ -51,12 +51,8 @@ C=======================================================================
 
          IMPLICIT NONE
 
-         INCLUDE SUBST_CONST     ! constants
-
          INTEGER JDATE, JTIME, TSTEP
          LOGICAL SUCCESS
-
-         REAL, PARAMETER :: CMLMR = 1.0E+06       ! ppmV/Molar Mixing Ratio
 
          CHARACTER( 16 )       :: PNAME = 'BEIS_INIT'
          CHARACTER( 80 )       :: VARDESC   ! env variable description

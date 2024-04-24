@@ -127,13 +127,11 @@ C   03 Nov 15: B. Gantt and G. Sarwar: created the initial version for marine ga
             USE CENTRALIZED_IO_MODULE, only : chlr, dmsl
 
             IMPLICIT NONE
-            INCLUDE SUBST_CONST                                     ! constants
             INCLUDE SUBST_FILES_ID                                  ! file name parameters
 
 C Arguments:
             INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP
             LOGICAL :: SUCCESS
-
 
             CHARACTER( 80 )       :: VARDESC                        ! env variable description
 

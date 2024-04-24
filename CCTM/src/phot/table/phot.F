@@ -74,13 +74,13 @@ C----------------------------------------------------------------------
 #else
       USE NOOP_MODULES         ! stenex (using NOOP_UTIL_MODULE)
 #endif
+      USE CONST, ONLY: MWAIR, MWWAT, PI180
 
       IMPLICIT NONE
 
 C include files:
 
       INCLUDE SUBST_FILES_ID   ! file name parameters
-      INCLUDE SUBST_CONST      ! physical constants
 
 C arguments:
       REAL,    POINTER      :: CGRID( :,:,:,: )  ! Species concentrations

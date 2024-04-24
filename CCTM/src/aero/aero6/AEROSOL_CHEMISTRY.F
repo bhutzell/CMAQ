@@ -407,10 +407,9 @@ C-----------------------------------------------------------------------
       USE ELMO_DATA
       !USE ELMO_PROC
       USE CENTRALIZED_IO_MODULE
+      USE CONST
 
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST       ! CMAQ constants
 
 C *** Arguments
       REAL,           POINTER       :: CGRID ( :,:,:,: )  ! pointer of model concentrations
@@ -618,9 +617,6 @@ C *** variables for getting aerosol diagnostic file flag
       
       CHARACTER( 132 )  :: XMSG
       
-C *** Statement Function **************
-      REAL( 8 )            :: INV_ESATL ! arithmetic statement function for reciprocal vapor pressure [Pa]
-      REAL( 8 )            :: TT
 
 C *** parameters for calculating GAMMA of HBR ---> ABR, Sherwen et al., ACP, 2016 and IUPAC
       REAL( 8 ) :: GAMMA_HBR                             ! uptake coefficient of HBR  
@@ -643,17 +639,6 @@ C *** parameters for calculating GAMMA of HBR ---> ABR, Sherwen et al., ACP, 201
       REAL( 8 ), PARAMETER :: INV_GAMMA_INO3  = 1.0D0 / 0.01D0                     ! Saiz-Lopez et al. 2014
       REAL( 8 ), PARAMETER :: INV_GAMMA_INO2  = 1.0D0 / 0.02D0                     ! Saiz-Lopez et al. 2014
 
-C *** Coefficients for the equation, ESATL defining saturation vapor pressure
-C *** values of AL, BL, and CL are from:
-C     Alduchov and Eskridge, "Improved Magnus Form Approximations of
-C                            Saturation Vapor Pressure,"
-C                            Jour. of Applied Meteorology, vol. 35,
-C                            pp 601-609, April, 1996.
-      REAL( 8 ), PARAMETER :: AL = 610.94D0 
-      REAL( 8 ), PARAMETER :: BL = 17.625D0
-      REAL( 8 ), PARAMETER :: CL = 243.04D0
-      REAL( 8 ), PARAMETER :: DL = 1.0D0 / AL
-
 
 #ifdef verbose_aerosol_chemistry
        LOGICAL              :: DUMP_CELL
@@ -672,7 +657,6 @@ C                            pp 601-609, April, 1996.
          End Subroutine Hetchem_Extract_Aero
       END INTERFACE 
   
-      INV_ESATL( TT ) = DL * DEXP( BL * ( 273.15D0 - TT ) / ( TT - 273.15D0 + CL ) )
       
 C-----------------------------------------------------------------------
 

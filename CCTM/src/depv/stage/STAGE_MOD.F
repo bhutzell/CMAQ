@@ -96,11 +96,11 @@ C  and aerosol exchange subroutines.
 C-----------------------------------------------------------------------
          USE NH3_BIDI_MOD
          USE MOSAIC_MOD, Only: Tile_Data
+         USE CONST
 
          Implicit None        
  
          Include SUBST_FILES_ID  ! file name parameters
-         Include SUBST_CONST     ! constants
 
 C Arguments:
          Integer, Intent( IN ) :: JDATE, JTIME      ! internal simulation date&time
@@ -881,7 +881,7 @@ C *** calculate inverses:
             ESM20 = 1.0 / ES20
             ESM32 = 1.0 / ES32
 
-            DCONST  = BOLTZMANN * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU )
+            DCONST  = DKB * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU )
             DCONST1 = DCONST / DG( IM )
 
             DCONST2 = GRAV / ( 18.0 * AMU )

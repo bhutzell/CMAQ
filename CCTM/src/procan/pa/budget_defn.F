@@ -83,9 +83,6 @@ C-----------------------------------------------------------------------
  
       IMPLICIT NONE 
 
-      ! Includes:
-      INCLUDE SUBST_CONST       ! Constants
-      
       REAL, POINTER :: CGRID(:,:,:,:)
       INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP(3)
 
@@ -276,10 +273,9 @@ C-----------------------------------------------------------------------
       SUBROUTINE STORE_BUDGET( IPR_ID, CONC, JDATE, JTIME, LCOUPLE )
 
       USE CENTRALIZED_IO_MODULE, ONLY : MSFX2
+      USE CONST, ONLY : MWAIR
 
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST       ! Constants
 
       REAL                  :: CONC( :,:,:,: )
       INTEGER, INTENT( IN ) :: IPR_ID            ! Process ID

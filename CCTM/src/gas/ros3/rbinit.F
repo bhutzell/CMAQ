@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/gas/ros3/rbinit.F,v 1.4 2011/10/21 16:11:10 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
       SUBROUTINE RBINIT
 C***********************************************************************
 C
@@ -56,18 +50,12 @@ C***********************************************************************
       USE CGRID_SPCS               ! CGRID mechanism species
       USE UTILIO_DEFN
       USE RXNS_FUNCTION
+      USE CONST
 
       IMPLICIT NONE
 
-C.....Includes:
-      Include SUBST_CONST          ! common constants
-
-C.....Arguments: NONE
-
 C.....Parameters:
       CHARACTER( 16 ), PARAMETER   :: PNAME = 'RBINIT'    ! Procedure name
-
-C.....External Functions:
 
 C.....Local Variables: 
       CHARACTER( 132 ) :: XMSG     ! Log error message

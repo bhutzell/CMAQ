@@ -2478,11 +2478,10 @@ C   aw  = RH * exp( ---------------)
 C                     R*T*dens*D
 C
 C The diameter is the wet, volume equivalent, diameter of the particle.
+      USE CONST, ONLY : rgasuniv
 
       Implicit None
                                        
-      Include SUBST_CONST    ! common constants
-
 C     Function arguments
       Real rh      ! RH between 0.005, 0.99 [fraction]
       Real temp    ! temperature [K]

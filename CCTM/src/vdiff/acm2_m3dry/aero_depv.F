@@ -18,14 +18,7 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero5/aero_depv.F,v 1.12 2012/01/19 13:12:14 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C @(#)aero_depv.F       1.3 /project/mod3/CMAQ/src/ae_depv/aero_depv/SCCS/s.aero_depv.F 18 Jun 1997 12:55:48
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-!      SUBROUTINE AERO_DEPV ( CGRID, JDATE, JTIME, TSTEP, MOSAIC, VDEP_AE )
       SUBROUTINE AERO_DEPV ( CGRID, JDATE, JTIME, TSTEP, VDEP_AE )
 
 C-----------------------------------------------------------------------
@@ -328,7 +321,7 @@ C                     Note that this version only works for NLCD40, MODIS20 or U
 C-----------------------------------------------------------------------
 
       USE GRID_CONF, Only: ncols, nrows
-      USE AEROMET_DATA   ! Includes CONST.EXT
+      USE AEROMET_DATA   ! Includes CONST module
       USE ASX_DATA_MOD, Only: Met_Data, Grid_Data !, Mosaic_Data
       USE AERO_DATA, Only: N_MODE
       Use LSM_Mod, Only: N_LUFRAC
@@ -505,7 +498,7 @@ C *** calculate inverses:
             ESM20 = 1.0 / ES20
             ESM32 = 1.0 / ES32
 
-            DCONST  = BOLTZMANN * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU( C,R ) )
+            DCONST  = DKB * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU( C,R ) )
             DCONST1 = DCONST / DG( C,R,IM )
 
             DCONST2 = GRAV / ( 18.0 * AMU( C,R ) )

@@ -46,7 +46,6 @@
 
 !...........INCLUDES
 
-      INCLUDE SUBST_CONST            ! constants
       INCLUDE SUBST_FILES_ID         ! file name parameters
 
       CHARACTER( 120 ) :: XMSG = ' ' ! exit message string
