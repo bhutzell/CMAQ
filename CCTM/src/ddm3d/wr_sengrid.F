@@ -41,6 +41,7 @@ C-----------------------------------------------------------------------
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE CGRID_SPCS            ! CGRID species number and offsets
       USE UTILIO_DEFN
+      USE RUNTIME_VARS, ONLY : RUNLEN
 
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -74,7 +75,8 @@ C Local variables:
       REAL( 8 ) :: XCENT_RF, YCENT_RF
       REAL( 8 ) :: XORIG_RF, YORIG_RF
       REAL( 8 ) :: XCELL_RF, YCELL_RF
-      INTEGER VGTYP_RF 
+      INTEGER VGTYP_RF
+      INTEGER, SAVE :: EDATE, ETIME
       REAL VGTOP_RF
 
 c     INTEGER, SAVE :: LOGDEV       ! FORTRAN unit number for log file
@@ -124,8 +126,12 @@ C Get default file header attibutes from CONC file (assumes file already open)
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
 
-               SDATE3D = JDATE
-               STIME3D = JTIME
+               EDATE = JDATE
+               ETIME = JTIME
+               CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
+
+               SDATE3D = EDATE
+               STIME3D = ETIME
 
 C Get SENGRID nvars
 

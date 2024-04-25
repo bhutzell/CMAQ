@@ -315,6 +315,8 @@ C Check other header data with CONC file as reference
 
 c        CALL SUBST_BARRIER
 
+         RETURN    ! Initializeation of MIO File
+
       END IF   ! FIRSTIME
     
       IF ( .NOT. ALLOCATED( BUF4 ) ) ALLOCATE( BUF4( NCOLS, NROWS, A_NLYS, N_SPCTAG ) )

@@ -39,6 +39,7 @@ C-----------------------------------------------------------------------
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
       USE MIO_ASCII
+      USE RUNTIME_VARS, ONLY : RUNLEN
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -73,6 +74,7 @@ C Local variables:
       REAL( 8 ) :: XCELL_RF, YCELL_RF
       INTEGER VGTYP_RF
       REAL VGTOP_RF
+      INTEGER, SAVE :: EDATE, ETIME
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL OK
@@ -110,10 +112,14 @@ C Get default file header attibutes from CONC file (assumes file already open)
                END IF
 
 C Set tstep negative to create "circular buffer" type file
-
 !              TSTEP3D = -TSTEP
-               SDATE3D = JDATE
-               STIME3D = JTIME
+
+               EDATE = JDATE
+               ETIME = JTIME
+               CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
+
+               SDATE3D = EDATE
+               STIME3D = ETIME
 
 C Get CGRID nvars
 

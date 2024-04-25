@@ -118,9 +118,19 @@ C Arguments:
 
       ! Write CGRID state file for subsequent runs
       CALL WR_CGRID ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
+#ifdef isam
+      CALL WR_SA_CGRID ( JDATE, JTIME, TSTEP( 1 ) )
+#endif
 #ifdef sens
       CALL WR_SENGRID ( JDATE, JTIME, TSTEP( 1 )  )
 #endif
+
+      ! Open ISAM and DDM Concentration Files
+#ifdef isam
+      ! Write out ISAM source-resolved concentrations
+      CALL WR_AVG_SA ( JDATE, JTIME, TSTEP( 1 ) )
+#endif
+
 
       END SUBROUTINE INIT_CCTM_MODULES
 

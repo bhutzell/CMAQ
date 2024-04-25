@@ -38,6 +38,7 @@ C          Called by driver.F
 c     USE SUBST_MODULES         ! stenex
       USE SA_DEFN               ! Mc06
       USE MIO_ASCII
+      USE RUNTIME_VARS, ONLY : RUNLEN
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
@@ -69,6 +70,7 @@ c     INTEGER          ALLOCSTAT, LOGDEV
       
 c     INTEGER   C,R,S,K,N, L, ITAG, JSPC    ! loop induction variables
       INTEGER   C,R,S,K,N, L, JSPC    ! loop induction variables
+      INTEGER, SAVE :: EDATE, ETIME
 
       REAL, ALLOCATABLE :: ISAM_BUFF ( :,:,:,: )
 !20140519
@@ -114,8 +116,12 @@ C-----------------------------------------------------------------------
               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             ENDIF ! sa_conc_1 description obtained ?
 
-            SDATE3D = JDATE
-            STIME3D = JTIME
+            EDATE = JDATE
+            ETIME = JTIME
+            CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
+
+            SDATE3D = EDATE
+            STIME3D = ETIME
             NLAYS3D = NLAYS
 
             ! Store MIO Metadata
@@ -223,6 +229,8 @@ C-----------------------------------------------------------------------
           XMSG = 'Failure allocating ISAM_BUFF'
           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         ENDIF
+
+        RETURN   ! Initialization of MIO File
 
       ENDIF  !firstime
 
