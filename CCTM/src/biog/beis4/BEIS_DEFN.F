@@ -85,15 +85,15 @@ C-----------------------------------------------------------------------
          IMPLICIT NONE
 
 C External Functions
-      LOGICAL,         EXTERNAL :: CHKGRID
+         LOGICAL,         EXTERNAL :: CHKGRID
 
 C Subroutine arguments:
          LOGICAL SUCCESS
 
 C Arguments:
-      INTEGER, INTENT(  IN ) :: JDATE   ! current simulation date (YYYYDDD)
-      INTEGER, INTENT(  IN ) :: JTIME   ! current simulation time (HHMMSS)
-      INTEGER, INTENT(  IN ) :: TSTEP(3)! timestep vector (output time step)
+         INTEGER, INTENT(  IN ) :: JDATE   ! current simulation date (YYYYDDD)
+         INTEGER, INTENT(  IN ) :: JTIME   ! current simulation time (HHMMSS)
+         INTEGER, INTENT(  IN ) :: TSTEP(3)! timestep vector (output time step)
 
 C Parameters:
 C (A line from the profile file is a record.)
@@ -186,15 +186,15 @@ C Local variables
          CHARACTER( 16 )  :: PNAME = 'BEIS_INIT'
          CHARACTER( 120 ) :: XMSG = ' '
 
-      INTERFACE
-         SUBROUTINE HRNO( JDATE, JTIME, TSTEP, NOPOL, L_DESID_DIAG )
-            INTEGER, INTENT( IN )  :: JDATE
-            INTEGER, INTENT( IN )  :: JTIME
-            INTEGER, INTENT( IN )  :: TSTEP( 3 )
-            REAL,    INTENT( OUT ) :: NOPOL( :,: )
-            LOGICAL, INTENT( IN )  :: L_DESID_DIAG
-         END SUBROUTINE HRNO
-      END INTERFACE
+         INTERFACE
+            SUBROUTINE HRNO( JDATE, JTIME, TSTEP, NOPOL, L_DESID_DIAG )
+               INTEGER, INTENT( IN )  :: JDATE
+               INTEGER, INTENT( IN )  :: JTIME
+               INTEGER, INTENT( IN )  :: TSTEP( 3 )
+               REAL,    INTENT( OUT ) :: NOPOL( :,: )
+               LOGICAL, INTENT( IN )  :: L_DESID_DIAG
+            END SUBROUTINE HRNO
+         END INTERFACE
  
 C-----------------------------------------------------------------------
 
@@ -630,6 +630,9 @@ C Build description for, and open beis diagnostic file
                VGLVS3D( I ) = VGLVS_GD( I )
             END DO
 
+            VNAME3D = ''
+            VDESC3D = ''
+            UNITS3D = ''
             DO J = 1, MSPCS
                VNAME3D( J ) = EMSPC( J )
                VDESC3D( J ) = 'biogenic emissions of the indicated species'
@@ -637,7 +640,7 @@ C Build description for, and open beis diagnostic file
                UNITS3D( J ) = 'gm s-1'
             END DO
 
-            NVARS3D = J
+            NVARS3D = MSPCS
             FDESC3D = ' '   ! array
 
             FDESC3D( 1 ) = 'Gridded biogenic emissions from CMAQ-BEIS3'
