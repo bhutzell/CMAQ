@@ -434,7 +434,6 @@ C-------------------------------------------
 C Gridded meteorology data: Golam Sarwar, July 1, 2011 
 C Latitude and longitude for zenith angle calculation:     
       REAL             COSZ                        ! local cosine of zenith angle
-      LOGICAL          DARK                        ! DARK = TRUE is night,  DARK = FALSE is day
 
       CHARACTER( 120 ) :: XMSG = ' '   ! Exit status message
 
@@ -447,10 +446,6 @@ C...........Statement Functions
       REAL             T               ! temperature dummy arg
       REAL             E               ! sat vapor pressure dummy arg
       REAL             P               ! pressure dummy arg
-
-      ESAT( T ) = VP0PA * EXP( C303 - ( C302 / T ) )
-
-      QSAT( E, P ) = MVOMA * ( E / ( P - E ) )
 
 #ifdef isam
       REAL, ALLOCATABLE, SAVE :: SA_BASE0  ( :,: )
@@ -509,17 +504,20 @@ C...........Statement Functions
 
         SUBROUTINE AQ_MAP( JDATE, JTIME, WTBAR, WCBAR, TBARC, PBARC,
      &                     CTHK1, AIRM, PRATE1, TAUCLD, POLC, CEND,
-     &                     REMOV, REMOVAC, ALFA0, ALFA2, ALFA3, DARK )
+     &                     REMOV, REMOVAC, ALFA0, ALFA2, ALFA3, COSZ )
           INTEGER, INTENT( IN )    :: JDATE, JTIME
           REAL,    INTENT( IN )    :: WTBAR, WCBAR, TBARC, PBARC,
      &                                CTHK1, AIRM, PRATE1, TAUCLD
           REAL,    INTENT( IN )    :: POLC ( : )
           REAL,    INTENT( INOUT ) :: CEND( : ), REMOV( : )
           REAL,    INTENT( INOUT ) :: REMOVAC
-          REAL,    INTENT( IN )    :: ALFA0, ALFA2, ALFA3
-          LOGICAL, INTENT( IN )    :: DARK            
+          REAL,    INTENT( IN )    :: ALFA0, ALFA2, ALFA3, COSZ
         END SUBROUTINE AQ_MAP
       END INTERFACE
+
+      ESAT( T ) = VP0PA * EXP( C303 - ( C302 / T ) )
+
+      QSAT( E, P ) = MVOMA * ( E / ( P - E ) )
 
 C-----------------------------------------------------------------------
 C  begin body of subroutine CONVCLD_ACM
@@ -1973,15 +1971,19 @@ C...Finally, get in cloud pollutant concentrations in mol sp per mol air
 #ifdef isam
           DO SPC = 1, NSPC_SA
              CSPC = MAP_SAtoCGR(SPC)
+             SA_SUM = SUM ( SA_POLC( SPC,: ) )
 c            IF ( POLC( CSPC ) .GT. 1.0E-30 .AND. CEND( CSPC ) .GT. 1.0E-09 ) THEN
-             IF ( POLC( CSPC ) .GT. 1.0E-30 ) THEN 
+c            IF ( POLC( CSPC ) .GT. 1.0E-30 ) THEN 
+             IF ( SA_SUM .GT. 1.0E-25 ) THEN
                 DO ITAG = 1, NTAG_SA
                    SA_CEND( SPC, ITAG ) = SA_POLC( SPC, ITAG )
      &                                  * ( CEND( CSPC )
-     &                                    / POLC( CSPC ) )
+c    &                                    / POLC( CSPC ) )
+     &                                    / SA_SUM )
                    SA_REMOV( SPC, ITAG ) = SA_POLC( SPC, ITAG )
      &                                   * ( REMOV( CSPC )
-     &                                     / POLC( CSPC ) )
+c    &                                     / POLC( CSPC ) )
+     &                                     / SA_SUM )
                 END DO
              ELSE 
                 DO ITAG = 1, NTAG_SA
@@ -2004,12 +2006,10 @@ C...  determine day or night from cosine of zenith angle for the cell; Golam Sar
             COSZ = MET_DATA%COSZEN( COL,ROW )
 
             IF ( COSZ .LE. 0.0 ) THEN
-              DARK = .TRUE.   ! night
 C...set mean photolysis rates to zero
               JH2O2_HYDROMETEORS = 0.0D0 
               JHNO3_HYDROMETEORS = 0.0D0
             ELSE
-              DARK = .FALSE.  ! day
 C...convert mean photolysis rates to 1/sec
               JH2O2_HYDROMETEORS = REAL( JH2O2_BAR * MINPERSEC, 8 ) 
               JHNO3_HYDROMETEORS = REAL( JHNO3_BAR * MINPERSEC, 8 )
@@ -2025,20 +2025,24 @@ C...  mimic this for the ASO4GASJ tracking species
 
             CALL AQ_MAP ( JDATE, JTIME, WTBAR, WCBAR, TBARC, PBARC,
      &                    CTHK1, AIRM, PRATE1, DTCLD, POLC, CEND,
-     &                    REMOV, REMOVAC, ALFA0, ALFA2, ALFA3, DARK )
+     &                    REMOV, REMOVAC, ALFA0, ALFA2, ALFA3, COSZ )
 
 
 #ifdef isam
             DO SPC = 1, NSPC_SA ! general case
               CSPC = MAP_SAtoCGR(SPC)
+              SA_SUM = SUM ( SA_POLC( SPC,: ) )
               DO ITAG = 1, NTAG_SA
-                IF ( POLC( CSPC ) .GT. 1.0E-30 ) THEN
+c               IF ( POLC( CSPC ) .GT. 1.0E-30 ) THEN
+                IF ( SA_SUM .GT. 1.0E-25 ) THEN
                   SA_CEND( SPC,ITAG ) = SA_POLC( SPC,ITAG )
      &                                * ( CEND( CSPC )
-     &                                  / MAX( 1.0E-26,POLC( CSPC ) ) )
+c    &                                  / MAX( 1.0E-26,POLC( CSPC ) ) )
+     &                                  / SA_SUM )
                   SA_REMOV( SPC,ITAG ) = SA_POLC( SPC, ITAG )
      &                                 * ( REMOV( CSPC )
-     &                                   / MAX( 1.0E-25, POLC( CSPC ) ))
+c    &                                   / MAX( 1.0E-25, POLC( CSPC ) ))
+     &                                   / SA_SUM )
                 ELSE
                   SA_CEND( SPC,ITAG )  = 0.0
                   SA_REMOV( SPC,ITAG ) = 0.0
