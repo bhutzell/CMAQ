@@ -296,6 +296,8 @@ C...Zero out concentrations
 
       ! Now Calculate Surrogate Fractions
       DO ISPC = 1,N_CGRID_SPC
+
+        ! First determine if this species is mapped to a gas surrogate
         IAQ = MAP_CGRIDtoAQGAS( ISPC ) 
         IF ( IAQ .GT. 0 ) THEN 
            IF ( GAS( IAQ ) .GT. 0.0D0 ) THEN
@@ -319,10 +321,11 @@ C...Zero out concentrations
            END IF
         END IF
 
-        IAQ = MAP_CGRIDtoAQGAS( ISPC ) 
-        IF ( CGRID_MASK_AERO( ISPC ) ) THEN
+        ! Next try aerosol surrogates
+        IAQ = MAP_CGRIDtoAQAERO( ISPC ) 
+        IF ( IAQ .GT. 0 ) THEN
            IM = MAP_CGRIDtoAQMODE( ISPC )
-           IF ( AEROSOL( IAER, IM ) .GT. 0.0D0 ) THEN
+           IF ( AEROSOL( IAQ, IM ) .GT. 0.0D0 ) THEN
               WSRGAQ( ISPC ) = REAL( POLC( ISPC ), 8 )
      &                       / REAL( AEROSOL( IAQ, IM ), 8 )
 #ifdef sens
