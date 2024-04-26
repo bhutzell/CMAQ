@@ -129,7 +129,7 @@ c control species
       INTEGER, ALLOCATABLE, SAVE :: MAP_DEPVtoCGRID( : )
       INTEGER, ALLOCATABLE, SAVE :: MAP_WDEPtoCGRID( : )
       INTEGER, ALLOCATABLE, SAVE :: MAP_AQtoCGRID( : )
-      CHARACTER( 16 ), ALLOCATABLE, SAVE :: AQ_SPC     ( : )
+      CHARACTER( 32 ), ALLOCATABLE, SAVE :: AQ_SPC     ( : )
 
 #ifdef mpas
       character( 16 ), allocatable, save :: all_spc( : )
@@ -1057,7 +1057,7 @@ c-------------------------------------------------------------------------------
                 IF ( GC_G2AQ_MAP( ISPC ) .NE. 0 ) THEN
                     IAQ = IAQ + 1
                     MAP_AQtoCGRID( IAQ ) = IGRID
-                    AQ_SPC( IAQ ) = GC_G2AQ( ISPC )
+                    AQ_SPC( IAQ ) = GC_G2AQ( GC_G2AQ_MAP( ISPC ) )
                 END IF
             END DO
 
@@ -1109,7 +1109,7 @@ c-------------------------------------------------------------------------------
                 IF ( AE_A2AQ_MAP( ISPC ) .NE. 0 ) THEN
                     IAQ = IAQ + 1
                     MAP_AQtoCGRID( IAQ ) = IGRID
-                    AQ_SPC( IAQ ) = AE_A2AQ( ISPC )
+                    AQ_SPC( IAQ ) = AE_A2AQ( AE_A2AQ_MAP( ISPC ) )
                 END IF
             END DO
             
@@ -1138,7 +1138,7 @@ c-------------------------------------------------------------------------------
                 IF ( NR_N2AQ_MAP( ISPC ) .NE. 0 ) THEN
                     IAQ = IAQ + 1
                     MAP_AQtoCGRID( IAQ ) = IGRID
-                    AQ_SPC( IAQ ) = NR_N2AQ( ISPC )
+                    AQ_SPC( IAQ ) = NR_N2AQ( NR_N2AQ_MAP( ISPC ) )
                 END IF
             END DO
 
@@ -1167,7 +1167,7 @@ c-------------------------------------------------------------------------------
                 IF ( TR_T2AQ_MAP( ISPC ) .NE. 0 ) THEN
                     IAQ = IAQ + 1
                     MAP_AQtoCGRID( IAQ ) = IGRID
-                    AQ_SPC( IAQ ) = TR_T2AQ( ISPC )
+                    AQ_SPC( IAQ ) = TR_T2AQ( TR_T2AQ_MAP( ISPC ) )
                 END IF
             END DO
 

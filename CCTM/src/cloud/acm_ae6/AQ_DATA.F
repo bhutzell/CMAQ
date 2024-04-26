@@ -101,7 +101,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C...Aerosol surrogates species 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-      Character(16) :: srgaer_name( n_aq_aer,n_mode )
+      Character(32) :: srgaer_name( n_aq_aer,n_mode )
       Type sur_aer_type
          Character( 16 ) :: name     ! bulk surrogate name
          Real            :: backgnd  ! background value [ug m-3]
@@ -350,7 +350,7 @@ C...Map aero species
 C...Initialize aerosol surrogate species names 
       Do spc = 1, n_aq_aer
         Do im = 1,n_mode
-          srgaer_name( spc,im ) = srgaer( spc )%name // '_' // modename( im )
+          srgaer_name( spc,im ) = trim(srgaer( spc )%name) // '_' // trim(modename( im ))
         End Do
       End Do
 
@@ -365,6 +365,7 @@ C...Create Map Directly from CGRID to the gas and aerosol species in AQCHEM
          SPC = MAP_AQtoCGRID( I ) 
          IF ( CGRID_MASK_GAS( SPC ) .OR. CGRID_MASK_NR( SPC ) .OR.
      &        CGRID_MASK_TRAC( SPC ) ) THEN
+           ! Map Gas-Phase Species
            igas = index1( aq_spc( I ), n_aq_gas, SRGGAS(:)%name )
            if ( igas .eq. 0 ) then
              Write ( xmsg, '(A,A,A,A,A,A)' ),'Aqueous Chem Surrogate ',trim( aq_spc(I) ),
@@ -376,6 +377,11 @@ C...Create Map Directly from CGRID to the gas and aerosol species in AQCHEM
              N_AQSRG_GAS( IGAS ) = N_AQSRG_GAS( IGAS ) + 1
            end if
          ELSEIF ( CGRID_MASK_AERO( SPC ) ) THEN
+           ! Map Aerosol Species
+           ! Loop over modes; find the AE surrogate name on the local
+           ! mode-dependent cloud chemistry list; there will only be one
+           ! match across all modes.
+           iaero = 0
            do im0 = 1,n_mode
              iaero0 = index1( aq_spc( I ), n_aq_aer, SRGAER_name(:,im0) )
              if ( iaero0 .ne. 0 ) then
@@ -406,14 +412,15 @@ C...Match Accumulation mode surrogate indices to their Aitken mode counterparts
          JAIT = AEROSPC_MAP( IAERO, IAIT )
 
          ! Determine if these species have aqueous chemistry surrogates
-         JAQ_ACC = MAP_CGRIDtoAQAERO( JACC )
-         JAQ_AIT = MAP_CGRIDtoAQAERO( JAIT )
+         IF ( JACC .GT. 0 .AND. JAIT .GT. 0 ) THEN 
+            JAQ_ACC = MAP_CGRIDtoAQAERO( JACC )
+            JAQ_AIT = MAP_CGRIDtoAQAERO( JAIT )
 
-         ! If both species are mapped and both have aqueous-chemistry
-         ! surrogates that are the same, then link them.
-         IF ( JACC .GT. 0 .AND. JAIT .GT. 0 .AND. 
-     &        JAQ_ACC .GT. 0 .AND. JAQ_ACC .EQ. JAQ_AIT ) 
-     &       MAP_ACCtoAIT( JACC ) = JAIT
+            ! If both species are mapped and both have aqueous-chemistry
+            ! surrogates that are the same, then link them.
+            IF ( JAQ_ACC .GT. 0 .AND. JAQ_ACC .EQ. JAQ_AIT ) 
+     &         MAP_ACCtoAIT( JACC ) = JAIT
+         END IF
       END DO
 
       Write( logdev,'( / 5x, a / )' ) ' --- AQCHEM Gas and Aerosol Species Mapped ---'

@@ -173,7 +173,6 @@ C External Functions:
            REAL( 8 ), INTENT( INOUT ) :: AEROSOL( :,: ) ! aerosol concentrations (mol/molV)
            REAL( 8 ), INTENT( INOUT ) :: GASWDEP( : )   ! gas phase wet deposition array (mm mol/liter)
            REAL( 8 ), INTENT( INOUT ) :: AERWDEP( :,: ) ! aerosol wet deposition array (mm mol/liter)
-           LOGICAL,   INTENT( IN )    :: DARK           ! DARK = TRUE is night,  DARK = FALSE is day
 	       REAL,      INTENT( IN )  :: COSZ      ! cosine solar zenith angle
         END SUBROUTINE AQCHEM
       END INTERFACE      
@@ -256,7 +255,7 @@ C...Zero out concentrations
      &                                        * CTHK1 / AIRM, 8 ) ! [mol/molV]
             ELSE
                AEROSOL( IAER,: ) = REAL( SRGAER( IAER )%BACKGND * 1.0E-6 * CTHK1, 8 )
-     &                           / REAL( CGRID_MW( ISPC ) * AIRM, 8 )  ! [molmolV]
+     &                           / REAL( SRGAER( IAER )%MOLWT * AIRM, 8 )  ! [molmolV]
 
             END IF
           END IF
