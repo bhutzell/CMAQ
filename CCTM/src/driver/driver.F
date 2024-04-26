@@ -787,7 +787,7 @@ C Initialize Modules
       IF ( L_INIT ) THEN
           L_INIT = .FALSE.
           call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
-          if ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_file_input' )
+          if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
 
 C Initialize MIO - placeholder
 !         call mio_init
@@ -979,6 +979,6 @@ C Shut down IOAPI
       END IF
 
       ! Output Verification of MIO Input File
-      IF ( MYPE .EQ. 0 ) call write_mio_ascii( 'mio_file_input_check' )
+      IF ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input_check' )
 
       END SUBROUTINE CMAQ_DRIVER        

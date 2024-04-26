@@ -121,6 +121,8 @@ setenv PRINT_PROC_TIME Y           #> Print timing for all science subprocesses 
                                    #>   [ default: TRUE or Y ]
 setenv STDOUT T                    #> Override I/O-API trying to write information to both the processor 
                                    #>   logs and STDOUT [ options: T | F ]
+setenv CTM_MIO_FILE F              #> Print mio_file_input.txt which summarize metadata for initializing MIO
+                                   #>   [ default: FALSE or N ]
 
 setenv GRID_NAME 12US1     #> check GRIDDESC file for GRID_NAME options
 setenv GRIDDESC ${INPDIR}/GRIDDESC   #> grid description file
