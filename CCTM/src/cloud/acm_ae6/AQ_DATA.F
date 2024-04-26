@@ -405,6 +405,7 @@ C...Create Map Directly from CGRID to the gas and aerosol species in AQCHEM
       mapped = .True.
       
 C...Match Accumulation mode surrogate indices to their Aitken mode counterparts
+      MAP_ACCtoAIT = 0
       DO IAERO = 1,N_AEROSPC
          ! Find the CGRID Indeces for the Accumulation and Aitken 
          ! mode species
