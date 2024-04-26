@@ -16,7 +16,7 @@
 #> the repository. The user may also set their own preferred 
 #> directory.
 
- set CMAQ_HOME = /work/MAQSEA/cnolte/cmaq/2024-04-23-const
+ set CMAQ_HOME = /home/username/path
 
 #> This section allows users to choose explicitly which tools
 #> to make available from the repo. For each selected tool,
