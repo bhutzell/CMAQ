@@ -85,7 +85,7 @@ c     INTEGER, SAVE :: LOGDEV       ! FORTRAN unit number for log file
 
 c     CHARACTER( 8 )  :: SPCNAME
 
-      REAL, POINTER :: WRBUFF(:,:,:,:)
+      REAL, SAVE, ALLOCATABLE :: WRBUFF(:,:,:,:)
       INTEGER :: c, r, s, d, i
 
       LOGICAL, EXTERNAL :: FLUSH3
@@ -371,17 +371,10 @@ c         CALL SUBST_BARRIER
       END IF
 #else
 
-#ifdef parallel
-      IF ( .NOT. PTRWRITE3( CTM_SENS_1, ALLVAR3, JDATE, JTIME, WRBUFF ) ) THEN
-         XMSG = 'Could not write SENGRID'
-         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
-#else
       IF ( .NOT. WRITE3( CTM_SENS_1, ALLVAR3, JDATE, JTIME, WRBUFF ) ) THEN
          XMSG = 'Could not write SENGRID'
          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
       END IF
-#endif
 
 #endif
 
