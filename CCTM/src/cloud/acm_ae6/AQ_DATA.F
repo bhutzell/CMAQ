@@ -254,7 +254,7 @@ C for sulfur tracking model
       Integer, Allocatable, Save :: MAP_CGRIDtoAQAERO( : ) ! Map from CGRID to Surrogates
       Integer, Allocatable, Save :: MAP_CGRIDtoAQMODE( : ) ! Map from CGRID to Surrogates
       Integer, Allocatable, Save :: MAP_ACCtoAIT( : )      ! Map Accumulation to Aitken Mode Species
-      Real,    Save              :: FRACAIT( N_AQ_AER )    ! Store fraction of Aitken mode in each aerosol surrogate
+      Real( 8 ),    Save         :: FRACAIT( N_AQ_AER )    ! Store fraction of Aitken mode in each aerosol surrogate
 
       Real( 8 )   :: jh2o2_hydrometeors    ! H2O2 photolysis rate in condensed water [sec-1]
       Real( 8 )   :: jhno3_hydrometeors    ! HNO3 photolysis rate in condensed water [sec-1]

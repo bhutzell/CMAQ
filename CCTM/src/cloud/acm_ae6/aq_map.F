@@ -398,6 +398,7 @@ C...store the amount of hydrogen deposition
 #endif
 
 C...Now, re-apportion mass back into cend/remov (cgrid-type) array
+      ! Gases
       DO ISPC = 1,N_CGRID_SPC
         IAQ = MAP_CGRIDtoAQGAS( ISPC )
         IF ( IAQ .GT. 0 ) THEN 
@@ -412,38 +413,50 @@ C...Now, re-apportion mass back into cend/remov (cgrid-type) array
 #endif
         END IF 
  
+        ! Particles
         IAQ = MAP_CGRIDtoAQAERO( ISPC )
         IF ( IAQ .GT. 0 ) THEN
              IM = MAP_CGRIDtoAQMODE( ISPC )
-             JSPC = MAP_ACCtoAIT( ISPC )  ! JSPC will have a value if ISPC is an 
-                                          ! accumulation-mode species and it connects 
-                                          ! to an Aitken mode species
-             IF ( JSPC .GT. 0 ) THEN
-                ! Transfer Accumulation-Mode Mass, including Aitken-mode
-                ! mass that was scavenged and combined with the accumulation mode
-                CEND ( ISPC ) = (1.d0 - FRACAIT(IAQ)) * AEROSOL( IAQ,IM ) * WSRGAQ( ISPC )
-     &                                + FRACAIT(IAQ)  * AEROSOL( IAQ,IM ) * WSRGAQ( JSPC )
-                REMOV( ISPC ) = (1.d0 - FRACAIT(IAQ)) * AERWDEP( IAQ,IM ) * WSRGAQ( ISPC )
-     &                                + FRACAIT(IAQ)  * AERWDEP( IAQ,IM ) * WSRGAQ( JSPC )
+             ! Transfer Aitken and Coarse Mode Mass
+             CEND ( ISPC ) = AEROSOL( IAQ, IM ) * WSRGAQ( ISPC )
+             REMOV( ISPC ) = AERWDEP( IAQ, IM ) * WSRGAQ( ISPC )
 #ifdef sens
-                DO NP = 1, NPMAX
-                   S_CEND ( NP,ISPC ) = (1.d0 - FRACAIT(IAQ)) * S_AEROSOL(NP,IAQ,IM) * WSRGAQ( ISPC )
-     &                                        + FRACAIT(IAQ)  * S_AEROSOL(NP,IAQ,IM) * WSRGAQ( JSPC )
-                   S_REMOV( NP,ISPC ) = (1.d0 - FRACAIT(IAQ)) * S_AERWDEP(NP,IAQ,IM) * WSRGAQ( ISPC )
-     &                                        + FRACAIT(IAQ)  * S_AERWDEP(NP,IAQ,IM) * WSRGAQ( JSPC )
-                ENDDO
-#endif
+             DO NP = 1, NPMAX
+                S_CEND ( NP,ISPC ) = S_AEROSOL( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
+                S_REMOV( NP,ISPC ) = S_AERWDEP( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
+             ENDDO
+#endif 
+             IF ( IM .EQ. IACC ) THEN
+                JSPC = MAP_ACCtoAIT( ISPC )  ! JSPC will have a value if ISPC is an 
+                                             ! accumulation-mode species and it connects 
+                                             ! to an Aitken mode species
 
-             ELSE
-                ! Transfer Aitken and Coarse Mode Mass
-                CEND ( ISPC ) = AEROSOL( IAQ, IM ) * WSRGAQ( ISPC )
-                REMOV( ISPC ) = AERWDEP( IAQ, IM ) * WSRGAQ( ISPC )
-#ifdef sens
-                DO NP = 1, NPMAX
-                   S_CEND ( NP,ISPC ) = S_AEROSOL( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
-                   S_REMOV( NP,ISPC ) = S_AERWDEP( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
-                ENDDO
-#endif
+                IF ( JSPC .GT. 0 ) THEN
+                   ! Transfer Accumulation-Mode Mass, including Aitken-mode
+                   ! mass that was scavenged and combined with the accumulation mode
+                   CEND ( ISPC ) = (1.d0 - FRACAIT(IAQ)) * AEROSOL( IAQ,IM ) * WSRGAQ( ISPC )
+     &                                   + FRACAIT(IAQ)  * AEROSOL( IAQ,IM ) * WSRGAQ( JSPC )
+                   REMOV( ISPC ) = (1.d0 - FRACAIT(IAQ)) * AERWDEP( IAQ,IM ) * WSRGAQ( ISPC )
+     &                                   + FRACAIT(IAQ)  * AERWDEP( IAQ,IM ) * WSRGAQ( JSPC )
+#ifdef sens      
+                   DO NP = 1, NPMAX
+                      S_CEND ( NP,ISPC ) = (1.d0 - FRACAIT(IAQ)) * S_AEROSOL(NP,IAQ,IM) * WSRGAQ( ISPC )
+     &                                           + FRACAIT(IAQ)  * S_AEROSOL(NP,IAQ,IM) * WSRGAQ( JSPC )
+                      S_REMOV( NP,ISPC ) = (1.d0 - FRACAIT(IAQ)) * S_AERWDEP(NP,IAQ,IM) * WSRGAQ( ISPC )
+     &                                           + FRACAIT(IAQ)  * S_AERWDEP(NP,IAQ,IM) * WSRGAQ( JSPC )
+                   ENDDO
+#endif           
+                ELSE
+                   ! Transfer Accumulation-Mode Mass without an Aitken mode counterpart
+                   CEND ( ISPC ) = (1.d0 - FRACAIT(IAQ)) * AEROSOL( IAQ,IM ) * WSRGAQ( ISPC )
+                   REMOV( ISPC ) = (1.d0 - FRACAIT(IAQ)) * AERWDEP( IAQ,IM ) * WSRGAQ( ISPC )
+#ifdef sens        
+                   DO NP = 1, NPMAX
+                      S_CEND ( NP,ISPC ) = (1.d0 - FRACAIT(IAQ) * S_AEROSOL( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
+                      S_REMOV( NP,ISPC ) = (1.d0 - FRACAIT(IAQ) * S_AERWDEP( NP,IAQ,IM ) * S_WSRGAQ( NP, ISPC )
+                   ENDDO
+#endif             
+                END IF
              END IF
         END IF
       END DO

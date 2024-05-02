@@ -2473,7 +2473,7 @@ C...Compute for Aerosol species in  TXHG Version
      
 C...Store the fraction of aitken-mode associated mass in the 
 C   bulk aerosol aqueous chemistry tracer
-      FRACAIT( : ) = 0.0
+      FRACAIT( : ) = 0.d0
       IF( AEROSOL(LTRACER, IACC) .GT. 0.d0 ) 
      &   FRACAIT( LTRACER )  = MIN((TRACI  * XL * RECIPAP1) / 
      &                         AEROSOL(LTRACER, IACC), 1.0D0) 
