@@ -150,6 +150,14 @@ C.. Cloud chemistry related
       END TYPE
       TYPE(KPP_SPC), DIMENSION(NSPEC), SAVE :: MECH_SPC
 
+#ifdef mchem_stats
+      CHARACTER( 16 ), SAVE              :: CTM_MCHEMSTATS_1 = 'CTM_MCHEMSTATS_1'
+      CHARACTER( 16 ), ALLOCATABLE, SAVE :: VSTATS( : )
+
+      INTEGER, SAVE                      :: WSTEP = 0
+      INTEGER  EDATE, ETIME
+#endif
+
       INTERFACE
          SUBROUTINE HETCHEM_UPDATE_AERO( CGRID )
            REAL, POINTER :: CGRID( :,:,:,: )    !  species concentration in cell
@@ -255,6 +263,40 @@ C.. Alternative KPP options
 
 C..Initialize shared photolysis data
          CALL INIT_PHOT_SHARED()
+
+c..Open file for mchem stats if requested
+#ifdef mchem_stats
+         ALLOCATE( VSTATS( 2 ) )
+         VSTATS( 1 ) = 'LWC_RS'
+         VSTATS( 2 ) = 'LWC_CV'
+
+         IF ( MYPE .EQ. 0 ) THEN
+
+            EDATE = JDATE
+            ETIME = JTIME
+            CALL NEXTIME( EDATE, ETIME, TSTEP( 1 ) )
+
+            SDATE3D = EDATE
+            STIME3D = ETIME
+            NVARS3D = 2
+            NCOLS3D = GL_NCOLS
+            NROWS3D = GL_NROWS
+            NLAYS3D = NLAYS
+            VNAME3D( 1 ) = 'LWC_RS'
+            VNAME3D( 2 ) = 'LWC_CV'
+            VDESC3D( 1 ) = 'Liquid water content for resolved clouds'
+            VDESC3D( 2 ) = 'Liquid water content for convective clouds'
+            UNITS3D( 1 ) = 'kg/m3'
+            UNITS3D( 2 ) = 'kg/m3'
+            VTYPE3D( 1 ) = M3REAL
+            VTYPE3D( 2 ) = M3REAL
+            IF ( .NOT. OPEN3( CTM_MCHEMSTATS_1, FSNEW3, PNAME ) ) THEN
+               XMSG = 'Could not create '// TRIM( CTM_MCHEMSTATS_1 ) // ' file'
+               CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT2 )
+            END IF
+
+         END IF
+#endif
 
       END IF      ! First call
 
@@ -464,5 +506,33 @@ C.. Convert CGRID to ppmV (gas) and ug m-3 (aerosol)
 
       !Update Aerosol Surface Area
       CALL HETCHEM_UPDATE_AERO( CGRID )
+
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+C  Output statistics if required and return
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+#ifdef mchem_stats
+      WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )
+      EDATE = JDATE
+      ETIME = JTIME
+      CALL NEXTIME( EDATE, ETIME, TSTEP( 2 ) )
+      IF ( WSTEP .GE. TIME2SEC( TSTEP( 1 ) ) ) THEN
+
+         WSTEP = 0
+
+         IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 1 ),
+     &         EDATE, ETIME, REAL( WCBAR_RS, 4) ) ) THEN
+            XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+
+         IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 2 ),
+     &         EDATE, ETIME, REAL( WCBAR_CV, 4 ) ) ) THEN
+            XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+
+      END IF
+#endif
 
       END

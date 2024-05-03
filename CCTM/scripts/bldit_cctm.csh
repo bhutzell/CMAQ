@@ -207,7 +207,7 @@ set make_options = "-j"                #> additional options for make command if
  set F90_FLAGS  = "${myFRFLAGS}"           #> F90 flags
 
  if ( $ChemSolver == mchem ) then
-    set CPP_FLAGS  = "-Dkpp_cloud"   #> Fortran preprocessor flags
+    set CPP_FLAGS  = "-Dkpp_cloud -Dmchem_stats"   #> Fortran preprocessor flags
  else
     set CPP_FLAGS  = ""              #> Fortran preprocessor flags
  endif
