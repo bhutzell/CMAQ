@@ -105,6 +105,9 @@ C..Local Variables:
       INTEGER NRX             ! Index for number of reactions
       INTEGER SPC             ! Species loop index
       INTEGER CSPC            ! RXNS Species loop index
+      INTEGER STRT
+      INTEGER FINI
+      INTEGER IVAR
 
       INTEGER COL             ! Column index
       INTEGER LEV             ! Layer index
@@ -135,7 +138,6 @@ C.. Cloud chemistry related
       CHARACTER( 200 )        :: FMT                  ! Format for log-file output
       REAL                    :: CONVERT_VALUE
       LOGICAL                 :: LCL_RS, LCL_CV, LCL
-      REAL                    :: CONC( NCOLS, NROWS, NLAYS, N_CGRID_SPC )  ! Concentrations [moelc/cm3]
 
       TYPE :: KPP_SPC
         CHARACTER(16) :: NAME         = ''
@@ -264,6 +266,9 @@ C.. Alternative KPP options
 C..Initialize shared photolysis data
          CALL INIT_PHOT_SHARED()
 
+C..Allocate AE related pointers
+         CALL ALLOC_AE_DATA()
+
 c..Open file for mchem stats if requested
 #ifdef mchem_stats
          ALLOCATE( VSTATS( 2 ) )
@@ -330,6 +335,49 @@ C   a snapshot of the aerosol surface area so that it can be
 C   appropriately updated after the solver finds a solution.
 
       CALL HETCHEM_RATES( TA, PRES, QV, CGRID, DENS )
+
+C.. Convert CGRID species
+C..  gas, non-reactive, and tracer to molar mixing ratio (by volume)
+C..  aerosol mass concentration to moles of aerosol per mole of air by volume
+C..  aerosol number concentration to # per mole of air by volume
+C..  aerosol surface area to m2 per mole of air by volume
+      CALL CONVERT_FORWARD( CGRID, DENS )
+
+C.. Convert to molecules/cm3
+      DO LEV = 1, NLAYS
+        DO ROW = 1, NROWS
+          DO COL = 1, NCOLS
+            TEMP  = REAL( TA( COL,ROW,LEV ), dp )
+            PRESS = REAL( PA2ATM * PRES( COL,ROW,LEV ), dp )
+            CAIR  = ( PRESS/PA2ATM ) / ( TEMP * 8.314510 ) * 6.0221413D17
+            ! Reactive gases
+            STRT = GC_STRT
+            FINI = GC_STRT + N_GC_SPC - 1
+            DO SPC = STRT, FINI
+              CGRID( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) * CAIR
+            END DO
+            ! Aerosols
+            STRT = 1
+            FINI = NQAE
+            DO IVAR = STRT, FINI
+              SPC = QAE( IVAR )
+              CGRID( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) * CAIR
+            END DO
+            ! Non-reactive gases
+            STRT = NR_STRT
+            FINI = NR_STRT + N_NR_SPC - 1
+            DO SPC = STRT, FINI
+              CGRID( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) * CAIR
+            END DO
+            ! Trace gases
+            STRT = TR_STRT
+            FINI = TR_STRT + N_TR_SPC - 1
+            DO SPC = STRT, FINI
+              CGRID( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) * CAIR
+            END DO
+          END DO
+        END DO
+      END DO
 
       DO LEV = 1, NLAYS
          DO COL = 1, NCOLS
@@ -410,28 +458,15 @@ C.. Fill aqueous related data
                H_PAA  = 8.4D+02  * EXP( 5.3D+03 * TFAC );
 C.. End filling aqueous related data
 
-C.. Convert CGRID to molec/cm^3
-               DO SPC = 1,N_CGRID_SPC
-                  ! If tracer is aerosol -> convert from ug m-3 to ppmV
-                  IF ( CGRID_MASK_AERO( SPC ) ) THEN
-                     CONVERT_VALUE = 1.0E-3 * MWAIR / CGRID_MW( SPC ) * VOL             ! ug m-3 to ppmV
-                     CONVERT_VALUE = CONVERT_VALUE * CAIR * 1.D-6                       ! ppmV to molecules/cm3
-                     CONC( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) * CONVERT_VALUE
-                  ELSE
-                     CONVERT_VALUE = CAIR * 1.D-6 ! ppmV to molecules/cm3
-                     CONC( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) * CONVERT_VALUE
-                  END IF
-               END DO
-
                ! Fill CONC gas and aerosols
                C(:) = 0.0D0
                ! Init cloud concentrations first, since it impacts aerosol and gas phase concentrations
-               IF ( LCL ) CALL INIT_CLOUDS ( CONC( COL,ROW,LEV,: ), LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
+               IF ( LCL ) CALL INIT_CLOUDS ( CGRID( COL,ROW,LEV,: ), LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
                DO SPC = 1, NSPEC
                   IF ( MECH_SPC(SPC)%CGRID_INDEX /= 0 ) THEN
                      ICGSPC = MECH_SPC(SPC)%CGRID_INDEX
                      ICSPC  = MECH_SPC(SPC)%CONC_INDEX
-                     C( ICSPC ) = REAL( MAX( CONC( COL,ROW,LEV,ICGSPC ), CONCMIN), dp )
+                     C( ICSPC ) = REAL( MAX( CGRID( COL,ROW,LEV,ICGSPC ), CONCMIN), dp )
                   END IF
                END DO
 
@@ -481,28 +516,54 @@ C.. Convert CGRID to molec/cm^3
                   IF ( MECH_SPC(SPC)%CGRID_INDEX /= 0 ) THEN
                      ICGSPC = MECH_SPC(SPC)%CGRID_INDEX
                      ICSPC  = MECH_SPC(SPC)%CONC_INDEX
-                     CONC( COL,ROW,LEV,ICGSPC ) = REAL( C( ICSPC ), 4 )
+                     CGRID( COL,ROW,LEV,ICGSPC ) = REAL( C( ICSPC ), 4 )
                   END IF
                END DO
 
-               IF ( LCL ) CALL EVAP_CLOUDS ( CONC( COL,ROW,LEV,: ), WFAC_RS, WFAC_CV, DT )
-
-C.. Convert CGRID to ppmV (gas) and ug m-3 (aerosol)
-               DO SPC = 1,N_CGRID_SPC
-                  ! If tracer is aerosol -> convert to ug m-3
-                  IF ( CGRID_MASK_AERO( SPC ) ) THEN
-                     CONVERT_VALUE = 1.0E+3 / MWAIR * CGRID_MW( SPC ) * DENSI           ! ug m-3 to ppmV
-                     CONVERT_VALUE = CONVERT_VALUE / ( CAIR * 1.D-6 )                   ! ppmV to molecules/cm3
-                     CGRID( COL,ROW,LEV,SPC ) = CONC( COL,ROW,LEV,SPC ) * CONVERT_VALUE
-                  ELSE
-                     CONVERT_VALUE = 1.0 / ( CAIR * 1.D-6 ) ! molecules/cm3 to ppmV
-                     CGRID( COL,ROW,LEV,SPC ) = CONC( COL,ROW,LEV,SPC ) * CONVERT_VALUE
-                  END IF
-               END DO
+               IF ( LCL ) CALL EVAP_CLOUDS ( CGRID( COL,ROW,LEV,: ), WFAC_RS, WFAC_CV, DT )
 
             END DO ! ROW
          END DO ! COL
       END DO ! LEV
+
+C.. Convert to molar mixing ratio (by volume)
+      DO LEV = 1, NLAYS
+        DO ROW = 1, NROWS
+          DO COL = 1, NCOLS
+            TEMP  = REAL( TA( COL,ROW,LEV ), dp )
+            PRESS = REAL( PA2ATM * PRES( COL,ROW,LEV ), dp )
+            CAIR  = ( PRESS/PA2ATM ) / ( TEMP * 8.314510 ) * 6.0221413D17
+            ! Reactive gases
+            STRT = GC_STRT
+            FINI = GC_STRT + N_GC_SPC - 1
+            DO SPC = STRT, FINI
+              CGRID( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) / CAIR
+            END DO
+            ! Aerosols
+            STRT = 1
+            FINI = NQAE
+            DO IVAR = STRT, FINI
+              SPC = QAE( IVAR )
+              CGRID( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) / CAIR
+            END DO
+            ! Non-reactive gases
+            STRT = NR_STRT
+            FINI = NR_STRT + N_NR_SPC - 1
+            DO SPC = STRT, FINI
+              CGRID( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) / CAIR
+            END DO
+            ! Trace gases
+            STRT = TR_STRT
+            FINI = TR_STRT + N_TR_SPC - 1
+            DO SPC = STRT, FINI
+              CGRID( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) / CAIR
+            END DO
+          END DO
+        END DO
+      END DO
+
+C.. Convert CGRID back to original unit
+      CALL CONVERT_BACKWARD( CGRID, DENS )
 
       !Update Aerosol Surface Area
       CALL HETCHEM_UPDATE_AERO( CGRID )

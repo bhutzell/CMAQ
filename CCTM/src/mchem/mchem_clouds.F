@@ -74,7 +74,50 @@
 
       TYPE (MECH_SPECIES_CLOUDS), ALLOCATABLE, SAVE :: MECH_SPC_CL(:)
 
+C...Variables related to CGRID conversion
+      INTEGER, ALLOCATABLE, SAVE :: QAE( : ) ! CGRID pointer to ug/m3 species
+      INTEGER, ALLOCATABLE, SAVE :: NAE( : ) ! CGRID pointer to #/m3 species
+      INTEGER, ALLOCATABLE, SAVE :: SAE( : ) ! CGRID pointer to m2/m3 species
+      INTEGER, SAVE :: NNAE          ! number of #/m3 species
+      INTEGER, SAVE :: NQAE          ! number of ug/m3 species
+      INTEGER, SAVE :: NSAE          ! number of m2/m3 species
+
       CONTAINS
+
+      SUBROUTINE ALLOC_AE_DATA ( )
+
+        IMPLICIT NONE
+
+        INTEGER       VAR              ! variable subscript indices
+
+        IF ( N_AE_SPC .GT. 0 ) THEN
+C...create aerosol species pointers to distinguish micro-grams / m**3
+C...  # / m**3 (number density), and m**2 / m**3 (surface area) units
+
+          ALLOCATE ( QAE( N_AE_SPC ),
+     &               NAE( N_AE_SPC ),
+     &               SAE( N_AE_SPC ) )
+
+          NQAE = 0       ! number of ug/m3 species
+          NNAE = 0       ! number of #/m3 species
+          NSAE = 0       ! number of m2/m3 species
+
+          DO VAR = 1, N_AE_SPC
+            IF ( AE_SPC( VAR )( 1:3 ) .EQ. 'NUM' ) THEN
+              NNAE = NNAE + 1
+              NAE( NNAE ) = AE_STRT - 1 + VAR
+            ELSE IF ( AE_SPC( VAR )( 1:3 ) .EQ. 'SRF' ) THEN
+              NSAE = NSAE + 1
+              SAE( NSAE ) = AE_STRT - 1 + VAR
+            ELSE
+              NQAE = NQAE + 1
+              QAE( NQAE ) = AE_STRT - 1 + VAR
+            END IF
+          END DO
+
+        END IF
+
+      END SUBROUTINE ALLOC_AE_DATA
 
       SUBROUTINE CL_SPCS_DEF ( )
 
@@ -306,6 +349,255 @@ C.. The code above needs modifications once we take scavenging into account
         END DO
 
       END SUBROUTINE EVAP_CLOUDS
+
+      SUBROUTINE CONVERT_FORWARD ( CGRID, DENS )
+
+        USE GRID_CONF             ! horizontal & vertical domain specifications
+
+        IMPLICIT NONE
+        REAL,  INTENT( INOUT ) :: CGRID( :,:,:,: ) ! concentrations
+        REAL,  INTENT( IN )    :: DENS( :,:,: )    ! density
+
+        INTEGER       LAY              ! layer subscript indices
+        INTEGER       COL              ! column subscript indices
+        INTEGER       ROW              ! row subscript indices
+        INTEGER       SPC              ! species subscript indices
+        INTEGER       STRT             ! starting position
+        INTEGER       FINI             ! ending position
+        INTEGER       VAR              ! variable subscript indices
+        REAL FAC                       ! temp conversion factor
+        REAL CCMIN
+        REAL, PARAMETER :: MWAIR = 28.9628
+        REAL, PARAMETER :: CNV1 = MWAIR * 1.0E-9
+        REAL, PARAMETER :: CNV1I = 1.0 / CNV1
+        REAL, PARAMETER :: CNV2 = MWAIR * 1.0E-3
+        REAL, PARAMETER :: CNV2I = 1.0 / CNV2
+        REAL, PARAMETER :: CNV3 = CNV2                  ! -> #/mol
+        REAL, PARAMETER :: CNV3I = 1.0 / CNV3
+
+C...convert units on cgrid to molar mixing ratio (by volume)
+C...  determine no. of moles of gas per moles of air by volume
+
+        STRT = GC_STRT
+        FINI = GC_STRT + N_GC_SPC - 1
+        DO SPC = STRT, FINI
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                CGRID( COL, ROW, LAY, SPC ) = MAX( CGRID( COL, ROW, LAY, SPC )
+     &                                      * 1.0E-6,  1.0E-36 )
+              END DO
+            END DO
+          END DO
+        END DO
+
+C...for aerosol mass concentration
+C...  convert to moles of aerosol per mole of air by volume
+
+        STRT = 1
+        FINI = NQAE
+        DO VAR = STRT, FINI
+          SPC = QAE( VAR )
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                FAC = CNV1 / DENS( COL, ROW, LAY ) / AE_MOLWT( SPC - AE_STRT + 1 )
+                CCMIN = MAX( CGRID( COL, ROW, LAY, SPC ), 1.0E-30/FAC )
+                CGRID( COL, ROW, LAY, SPC ) = FAC * CCMIN
+              END DO
+            END DO
+          END DO
+        END DO
+
+C...for aerosol number concentration
+C...    convert to # per mole of air by volume
+
+        STRT = 1
+        FINI = NNAE
+        DO VAR = STRT, FINI
+          SPC = NAE( VAR )
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                FAC = CNV3 / DENS( COL, ROW, LAY )
+                CCMIN = MAX( CGRID( COL, ROW, LAY, SPC ), 1.0E-30/FAC )
+                CGRID( COL, ROW, LAY, SPC ) = FAC * CCMIN
+              END DO
+            END DO
+          END DO
+        END DO
+
+C...for aerosol surface area
+C...    convert to m2 per mole of air by volume
+
+        STRT = 1
+        FINI = NSAE
+        DO VAR = STRT, FINI
+          SPC = SAE( VAR )
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                FAC = CNV2 / DENS( COL, ROW, LAY )
+                CCMIN = MAX( CGRID( COL, ROW, LAY, SPC ), 1.0E-30/FAC )
+                CGRID( COL, ROW, LAY, SPC ) = FAC * CCMIN
+              END DO
+            END DO
+          END DO
+        END DO
+
+C...determine no. of moles of non-reactive gas per moles of air by volume
+
+        STRT = NR_STRT
+        FINI = NR_STRT + N_NR_SPC - 1
+        DO SPC = STRT, FINI
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                CGRID( COL, ROW, LAY, SPC ) = MAX( CGRID( COL, ROW, LAY, SPC )
+     &                                      * 1.0E-6, 1.0E-36 )
+              END DO
+            END DO
+          END DO
+        END DO
+
+C...determine no. of moles of tracer gas per moles of air by volume
+
+        STRT = TR_STRT
+        FINI = TR_STRT + N_TR_SPC - 1
+        DO SPC = STRT, FINI
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                CGRID( COL, ROW, LAY, SPC ) = MAX( CGRID( COL, ROW, LAY, SPC )
+     &                                      * 1.0E-6, 1.0E-36 )
+              END DO
+            END DO
+          END DO
+        END DO
+
+      END SUBROUTINE CONVERT_FORWARD
+
+      SUBROUTINE CONVERT_BACKWARD ( CGRID, DENS )
+
+        USE GRID_CONF             ! horizontal & vertical domain specifications
+
+        IMPLICIT NONE
+        REAL,  INTENT( INOUT ) :: CGRID( :,:,:,: ) ! concentrations
+        REAL,  INTENT( IN )    :: DENS( :,:,: )    ! density
+
+        INTEGER       LAY              ! layer subscript indices
+        INTEGER       COL              ! column subscript indices
+        INTEGER       ROW              ! row subscript indices
+        INTEGER       SPC              ! species subscript indices
+        INTEGER       STRT             ! starting position
+        INTEGER       FINI             ! ending position
+        INTEGER       VAR              ! variable subscript indices
+        REAL FAC                       ! temp conversion factor
+        REAL CCMIN
+        REAL, PARAMETER :: MWAIR = 28.9628
+        REAL, PARAMETER :: CNV1 = MWAIR * 1.0E-9
+        REAL, PARAMETER :: CNV1I = 1.0 / CNV1
+        REAL, PARAMETER :: CNV2 = MWAIR * 1.0E-3
+        REAL, PARAMETER :: CNV2I = 1.0 / CNV2
+        REAL, PARAMETER :: CNV3 = CNV2                  ! -> #/mol
+        REAL, PARAMETER :: CNV3I = 1.0 / CNV3
+
+C...convert units on cgrid back to original units
+C...  convert to ppmV gas
+
+        STRT = GC_STRT
+        FINI = GC_STRT + N_GC_SPC - 1
+        DO SPC = STRT, FINI
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                CGRID( COL, ROW, LAY, SPC ) = CGRID( COL, ROW, LAY, SPC )
+     &                                      * 1.0E+6
+              END DO
+            END DO
+          END DO
+        END DO
+
+C...convert to ug/m3 of aerosol mass
+
+        STRT = 1
+        FINI = NQAE
+        DO VAR = STRT, FINI
+          SPC = QAE( VAR )
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                FAC = CNV1I * DENS( COL, ROW, LAY )
+                CGRID( COL, ROW, LAY, SPC ) = FAC * CGRID( COL, ROW, LAY, SPC )
+     &                                      * AE_MOLWT( SPC - AE_STRT + 1 )
+              END DO
+            END DO
+          END DO
+        END DO
+
+C...convert to #/m3 of aerosol number
+
+        STRT = 1
+        FINI = NNAE
+        DO VAR = STRT, FINI
+          SPC = NAE( VAR )
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                FAC = CNV3I * DENS( COL, ROW, LAY )
+                CGRID( COL, ROW, LAY, SPC ) = FAC * CGRID( COL, ROW, LAY, SPC )
+              END DO
+            END DO
+          END DO
+        END DO
+
+C...convert to m2/m3 of aerosol surface area
+
+        STRT = 1
+        FINI = NSAE
+        DO VAR = STRT, FINI
+          SPC = SAE( VAR )
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                FAC = CNV2I * DENS( COL, ROW, LAY )
+                CGRID( COL, ROW, LAY, SPC ) = FAC * CGRID( COL, ROW, LAY, SPC )
+              END DO
+            END DO
+          END DO
+        END DO
+
+C...convert to ppmV non-reactive gas
+
+        STRT = NR_STRT
+        FINI = NR_STRT + N_NR_SPC - 1
+        DO SPC = STRT, FINI
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                CGRID( COL, ROW, LAY, SPC ) = CGRID( COL, ROW, LAY, SPC )
+     &                                      * 1.0E+6
+              END DO
+            END DO
+          END DO
+        END DO
+
+C...convert to ppmV tracer gas
+
+        STRT = TR_STRT
+        FINI = TR_STRT + N_TR_SPC - 1
+        DO SPC = STRT, FINI
+          DO LAY = 1, NLAYS
+            DO ROW = 1, NROWS
+              DO COL = 1, NCOLS
+                CGRID( COL, ROW, LAY, SPC ) = CGRID( COL, ROW, LAY, SPC )
+     &                                      * 1.0E+6
+              END DO
+            END DO
+          END DO
+        END DO
+
+      END SUBROUTINE CONVERT_BACKWARD
 
       INTEGER FUNCTION INDEX_KPP( NAME )
 
