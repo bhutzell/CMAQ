@@ -204,10 +204,10 @@ c     REAL( 8 ) :: S_FE_III( NPMAX )          ! Fractional Fe(III) partitioning,
 c     REAL( 8 ) :: S_MN_II( NPMAX )           ! Fractional Mn(II) partitioning, GS - July 1, 2011
 c     REAL( 8 ) :: S_FE_SOL( NPMAX )          ! Fractional Fe solubility, GS - July 1, 2011
 c     REAL( 8 ) :: S_MN_SOL( NPMAX )          ! Fractional Mn solubility, GS - July 1, 2011
-      REAL( 8 ) :: S_LIQUID( NPMAX, NLIQS ) ! wet deposition array (mm mol/liter)
-      REAL( 8 ) :: S_WETDEP( NPMAX, NLIQS ) ! wet deposition array (mm mol/liter)
-      REAL( 8 ) :: S_LOADING( NPMAX, NAER, NMODES ) ! aerosol loading (mol/liter)
-      REAL( 8 ) :: S_INITGAS( NPMAX, NGAS ) ! initial gas partial pressure (atm)      
+      REAL( 8 ) :: S_LIQUID( NPMAX, N_AQ_LIQS ) ! wet deposition array (mm mol/liter)
+      REAL( 8 ) :: S_WETDEP( NPMAX, N_AQ_LIQS ) ! wet deposition array (mm mol/liter)
+      REAL( 8 ) :: S_LOADING( NPMAX, N_AQ_AER, N_MODE ) ! aerosol loading (mol/liter)
+      REAL( 8 ) :: S_INITGAS( NPMAX, N_AQ_GAS ) ! initial gas partial pressure (atm)      
       REAL( 8 ) :: S_DSIVDT( NPMAX, 0:NUMOX ) ! rate of so2 oxid incloud (mol/liter/sec)
       REAL( 8 ) :: S_DS4   ( NPMAX, 0:NUMOX ) ! S(IV) oxidized over timestep DTW(0)
 c     REAL( 8 ) :: S_DTW   ( NPMAX, 0:NUMOX ) ! cloud chemistry timestep (sec)
