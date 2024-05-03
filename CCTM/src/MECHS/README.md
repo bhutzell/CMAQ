@@ -26,6 +26,7 @@ Table 1.  CMAQv5.4 Chemical Mechanisms
 | cracmm1_aq | [Community Regional Atmospheric Chemistry Multiphase Mechanism version 1.0](mechanism_information/cracmm1_aq/mech_cracmm1_aq.md)  | [species table](mechanism_information/cracmm1_aq/cracmm1_aq_species_table.md)                   | acm     |       
 | cracmm1amore_aq | [Community Regional Atmospheric Chemistry Multiphase Mechanism version 1.0 with AMORE isoprene condensation](mechanism_information/cracmm1amore_aq/mech_cracmm1amore_aq.md)  | [species table](mechanism_information/cracmm1amore_aq/cracmm1amore_aq_species_table.md)                   | acm     |       
 | cracmm2 | [Community Regional Atmospheric Chemistry Multiphase Mechanism version 2](mechanism_information/cracmm2/mech_cracmm2.md)  | [species table](mechanism_information/cracmm2/cracmm2_species_table.md)                   | acm     |
+| cracmm3 | [Community Regional Atmospheric Chemistry Multiphase Mechanism version 2](mechanism_information/cracmm3/mech_cracmm3.md)  | [species table](mechanism_information/cracmm3/cracmm3_species_table.md)                   | acm     |
 
 1. mechanisms can share the same model species but differ cloud chemistry
 2. species tables define model species in a mechanism's GC, AE, and NR namelists.
