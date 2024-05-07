@@ -82,6 +82,22 @@ C...Variables related to CGRID conversion
       INTEGER, SAVE :: NQAE          ! number of ug/m3 species
       INTEGER, SAVE :: NSAE          ! number of m2/m3 species
 
+C...Variables related to scavenging
+      INTEGER, ALLOCATABLE, SAVE :: WDEP_MAP( : ) ! wet deposition map to CGRID
+      INTEGER, SAVE :: N_SPC_WDEP                 ! # of wet deposition species
+      REAL( 8 ), ALLOCATABLE   :: WCBAR_RS  ( :,:,: ) ! liq water content of resolved cloud (kg/m3)
+      REAL( 8 ), ALLOCATABLE   :: WETFAC_RS ( :,:,: ) ! wet deposition rate coefficient resolved cloud
+      REAL( 8 ), ALLOCATABLE   :: ALFA0_RS  ( :,:,: ) ! aitken mode number scavenging coef resolved cloud
+      REAL( 8 ), ALLOCATABLE   :: ALFA3_RS  ( :,:,: ) ! aitken mode mass scavenging coef resolved cloud
+      REAL( 8 ), ALLOCATABLE   :: WCBAR_CV  ( :,:,: ) ! liq water content of convective cloud (kg/m3)
+      REAL( 8 ), ALLOCATABLE   :: WETFAC_CV ( :,:,: ) ! wet deposition rate coefficient convective cloud
+      REAL( 8 ), ALLOCATABLE   :: ALFA0_CV  ( :,:,: ) ! aitken mode number scavenging coef convective cloud
+      REAL( 8 ), ALLOCATABLE   :: ALFA3_CV  ( :,:,: ) ! aitken mode mass scavenging coef convective cloud
+
+C.. Cloud properties
+      REAL, ALLOCATABLE, SAVE  :: RESTRANS( :,: )   ! resolved cloud transmissivity
+      REAL, ALLOCATABLE, SAVE  :: SUBTRANS( :,:,: ) ! subgrid cloud transmissivity
+
       CONTAINS
 
       SUBROUTINE ALLOC_AE_DATA ( )
@@ -118,6 +134,122 @@ C...  # / m**3 (number density), and m**2 / m**3 (surface area) units
         END IF
 
       END SUBROUTINE ALLOC_AE_DATA
+
+      SUBROUTINE ALLOC_WDEP_DATA ( JDATE, JTIME )
+
+        USE GRID_CONF             ! horizontal & vertical domain specifications
+
+        IMPLICIT NONE
+
+        INTEGER, INTENT( IN )    :: JDATE            ! current model date, coded YYYYDDD
+        INTEGER, INTENT( IN )    :: JTIME            ! current model time, coded HHMMSS
+
+        INTEGER ALLOCSTAT       ! Allocate status code
+        INTEGER       VAR       ! variable subscript indices
+        INTEGER       SPC       ! species subscript indices
+        INTEGER      STRT       ! starting position
+        INTEGER      FINI       ! ending position
+
+        CHARACTER(  16 ) :: PNAME = 'MCHEM_WDEP' ! Procedure name
+        CHARACTER( 144 ) :: XMSG                 ! Message text
+
+
+C...first check to make sure that some species in CGRID were specified
+C...for output in the wet deposition array, otherwise notify the user
+C...and return
+
+        N_SPC_WDEP = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP
+        ALLOCATE ( WDEP_MAP( N_SPC_WDEP ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating WDEP_MAP'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+        IF ( N_SPC_WDEP .LE. 0 ) THEN
+
+          XMSG = 'No species were specified for wet deposition ' //
+     &           'tracking'
+          CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+
+          XMSG = 'ONLY CLOUD DIAGNOSTICS WILL BE WRITTEN TO THE ' //
+     &           'WETDEP OUTPUT FILE!'
+          CALL M3MESG ( XMSG )
+
+        END IF
+
+C...check to see if user wants to output extra diagnostic files
+
+        SPC = 0
+        STRT = 1
+        FINI = N_GC_WDEP
+        DO VAR = STRT, FINI
+          SPC = SPC + 1
+          WDEP_MAP( VAR ) = GC_STRT - 1 + GC_WDEP_MAP( SPC )
+        END DO
+
+        SPC = 0
+        STRT = N_GC_WDEP + 1
+        FINI = N_GC_WDEP + N_AE_WDEP
+        DO VAR = STRT, FINI
+          SPC = SPC + 1
+          WDEP_MAP( VAR ) = AE_STRT - 1 + AE_WDEP_MAP( SPC )
+        END DO
+
+        SPC = 0
+        STRT = N_GC_WDEP + N_AE_WDEP + 1
+        FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP
+        DO VAR = STRT, FINI
+          SPC = SPC + 1
+          WDEP_MAP( VAR ) = NR_STRT - 1 + NR_WDEP_MAP( SPC )
+        END DO
+
+        SPC = 0
+        STRT = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + 1
+        FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP
+        DO VAR = STRT, FINI
+          SPC = SPC + 1
+          WDEP_MAP( VAR ) = TR_STRT - 1 + TR_WDEP_MAP( SPC )
+        END DO
+
+C.. Allocate wet deposition arrays
+        ALLOCATE ( WCBAR_RS ( NCOLS, NROWS, NLAYS ),
+     &             WETFAC_RS( NCOLS, NROWS, NLAYS ),
+     &             ALFA0_RS ( NCOLS, NROWS, NLAYS ),
+     &             ALFA3_RS ( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = '*** Error allocating WCBAR_RS, WETFAC_RS, ALFA0_RS, and ALFA3_RS'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+        ALLOCATE ( WCBAR_CV ( NCOLS, NROWS, NLAYS ),
+     &             WETFAC_CV( NCOLS, NROWS, NLAYS ),
+     &             ALFA0_CV ( NCOLS, NROWS, NLAYS ),
+     &             ALFA3_CV ( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = '*** Error allocating WCBAR_CV, WETFAC_CV, ALFA0_CV, and ALFA3_CV'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+        WCBAR_CV  = 0.
+        WETFAC_CV = 0.
+        ALFA0_CV  = 0.
+        ALFA3_CV  = 0.
+
+C..Allocate cloud properties
+         ALLOCATE ( RESTRANS ( NCOLS,NROWS ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+           XMSG = 'Failure allocating RESTRANS'
+           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         RESTRANS = 1.0   ! array assignment
+
+         ALLOCATE ( SUBTRANS ( NCOLS,NROWS,2 ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+           XMSG = 'Failure allocating SUBTRANS'
+           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         SUBTRANS = 1.0   ! array assignment
+
+      END SUBROUTINE ALLOC_WDEP_DATA
 
       SUBROUTINE CL_SPCS_DEF ( )
 
@@ -355,7 +487,7 @@ C.. The code above needs modifications once we take scavenging into account
         USE GRID_CONF             ! horizontal & vertical domain specifications
 
         IMPLICIT NONE
-        REAL,  INTENT( INOUT ) :: CGRID( :,:,:,: ) ! concentrations
+        REAL,  POINTER         :: CGRID( :,:,:,: ) ! concentrations
         REAL,  INTENT( IN )    :: DENS( :,:,: )    ! density
 
         INTEGER       LAY              ! layer subscript indices
@@ -482,7 +614,7 @@ C...determine no. of moles of tracer gas per moles of air by volume
         USE GRID_CONF             ! horizontal & vertical domain specifications
 
         IMPLICIT NONE
-        REAL,  INTENT( INOUT ) :: CGRID( :,:,:,: ) ! concentrations
+        REAL,  POINTER         :: CGRID( :,:,:,: ) ! concentrations
         REAL,  INTENT( IN )    :: DENS( :,:,: )    ! density
 
         INTEGER       LAY              ! layer subscript indices

@@ -44,8 +44,6 @@ C..   KPP related
 
 C.. Cloud data
       USE MCHEM_CLOUDS
-      USE AQ_DATA, Only: WCBAR_RS, WCBAR_CV, WETFAC_RS, WETFAC_CV,
-     &                   ALFA0_RS, ALFA0_CV, ALFA3_RS, ALFA3_CV
 
       IMPLICIT NONE
 
@@ -164,6 +162,23 @@ C.. Cloud chemistry related
          SUBROUTINE HETCHEM_UPDATE_AERO( CGRID )
            REAL, POINTER :: CGRID( :,:,:,: )    !  species concentration in cell
          END SUBROUTINE HETCHEM_UPDATE_AERO      
+
+         SUBROUTINE RESCLD ( CGRID, JDATE, JTIME, TSTEP,
+     &                       N_SPC_WDEP, WDEP_MAP, RESTRANS,
+     &                       WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS )
+           IMPLICIT NONE
+           REAL, POINTER            :: CGRID( :,:,:,: )
+           INTEGER, INTENT( IN )    :: JDATE
+           INTEGER, INTENT( IN )    :: JTIME
+           INTEGER, INTENT( IN )    :: TSTEP( 3 )
+           INTEGER, INTENT( IN )    :: N_SPC_WDEP
+           INTEGER, INTENT( IN )    :: WDEP_MAP( : )
+           REAL,    INTENT( OUT )   :: RESTRANS( :,: )
+           REAL(8), INTENT( OUT )   :: WCBAR_RS( :,:,: )
+           REAL(8), INTENT( OUT )   :: WETFAC_RS( :,:,: )
+           REAL(8), INTENT( OUT )   :: ALFA0_RS( :,:,: )
+           REAL(8), INTENT( OUT )   :: ALFA3_RS( :,:,: )
+         END SUBROUTINE RESCLD
       END INTERFACE
 
 C**********************************************************************
@@ -269,6 +284,9 @@ C..Initialize shared photolysis data
 C..Allocate AE related pointers
          CALL ALLOC_AE_DATA()
 
+C..Allocate wet deposition data
+         CALL ALLOC_WDEP_DATA( JDATE, JTIME )
+
 c..Open file for mchem stats if requested
 #ifdef mchem_stats
          ALLOCATE( VSTATS( 2 ) )
@@ -342,6 +360,17 @@ C..  aerosol mass concentration to moles of aerosol per mole of air by volume
 C..  aerosol number concentration to # per mole of air by volume
 C..  aerosol surface area to m2 per mole of air by volume
       CALL CONVERT_FORWARD( CGRID, DENS )
+
+C.. Obtain wet deposition related data
+C..  Resolved clouds
+      CALL RESCLD ( CGRID, JDATE, JTIME, TSTEP,
+     &              N_SPC_WDEP, WDEP_MAP, RESTRANS,
+     &              WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS )
+C..  Convective clouds
+      WCBAR_CV  = 0.
+      WETFAC_CV = 0.
+      ALFA0_CV  = 0.
+      ALFA3_CV  = 0.
 
 C.. Convert to molecules/cm3
       DO LEV = 1, NLAYS
@@ -567,6 +596,10 @@ C.. Convert CGRID back to original unit
 
       !Update Aerosol Surface Area
       CALL HETCHEM_UPDATE_AERO( CGRID )
+
+C.. Reset transmissivity arrays
+      RESTRANS = 1.0
+      SUBTRANS = 1.0
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C  Output statistics if required and return
