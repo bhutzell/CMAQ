@@ -301,6 +301,7 @@ c..Open file for mchem stats if requested
 
             SDATE3D = EDATE
             STIME3D = ETIME
+            TSTEP3D = TSTEP( 1 )
             NVARS3D = 2
             NCOLS3D = GL_NCOLS
             NROWS3D = GL_NROWS
@@ -617,14 +618,18 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 1 ),
      &         EDATE, ETIME, REAL( WCBAR_RS, 4) ) ) THEN
             XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
          END IF
 
          IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 2 ),
      &         EDATE, ETIME, REAL( WCBAR_CV, 4 ) ) ) THEN
             XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
          END IF
+
+         WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
+     &          'Timestep written to', CTM_MCHEMSTATS_1,
+     &          'for date and time', EDATE, ETIME
 
       END IF
 #endif
