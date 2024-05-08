@@ -179,6 +179,23 @@ C.. Cloud chemistry related
            REAL(8), INTENT( OUT )   :: ALFA0_RS( :,:,: )
            REAL(8), INTENT( OUT )   :: ALFA3_RS( :,:,: )
          END SUBROUTINE RESCLD
+
+         SUBROUTINE CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
+     &                            N_SPC_WDEP, WDEP_MAP, SUBTRANS,
+     &                            WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV )
+           IMPLICIT NONE
+           REAL, POINTER            :: CGRID( :,:,:,: )
+           INTEGER, INTENT( IN )    :: JDATE
+           INTEGER, INTENT( IN )    :: JTIME
+           INTEGER, INTENT( IN )    :: TSTEP( 3 )
+           INTEGER, INTENT( IN )    :: N_SPC_WDEP
+           INTEGER, INTENT( IN )    :: WDEP_MAP( : )
+           REAL,    INTENT( OUT )   :: SUBTRANS( :,:,: )
+           REAL(8), INTENT( OUT )   :: WCBAR_CV( :,:,: )
+           REAL(8), INTENT( OUT )   :: WETFAC_CV( :,:,: )
+           REAL(8), INTENT( OUT )   :: ALFA0_CV( :,:,: )
+           REAL(8), INTENT( OUT )   :: ALFA3_CV( :,:,: )
+         END SUBROUTINE CONVCLD_ACM
       END INTERFACE
 
 C**********************************************************************
@@ -368,10 +385,9 @@ C..  Resolved clouds
      &              N_SPC_WDEP, WDEP_MAP, RESTRANS,
      &              WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS )
 C..  Convective clouds
-      WCBAR_CV  = 0.
-      WETFAC_CV = 0.
-      ALFA0_CV  = 0.
-      ALFA3_CV  = 0.
+      CALL CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
+     &                   N_SPC_WDEP, WDEP_MAP, SUBTRANS,
+     &                   WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV )
 
 C.. Convert to molecules/cm3
       DO LEV = 1, NLAYS

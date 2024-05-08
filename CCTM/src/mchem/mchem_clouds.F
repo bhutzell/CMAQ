@@ -731,6 +731,69 @@ C...convert to ppmV tracer gas
 
       END SUBROUTINE CONVERT_BACKWARD
 
+      Subroutine set_aeconcmin( aeconcmin )
+C-----------------------------------------------------------------------
+C
+C  Function:
+C       set minimum concentrations for aerosol species
+C       routine called from convcld_acm
+C
+C  Preconditions:
+C       Dates and times represented YYYYDDD:HHMMSS.
+C
+C  Revision History:
+C       5/05 copied code from aero_depv to begin subroutine
+C       4/08 J.Kelly: added code to set min for coarse surface area
+C       21 Jun 10 J.Young: convert for Namelist redesign
+C-----------------------------------------------------------------------
+
+      Use cgrid_spcs            ! CGRID mechanism species
+      Use aero_data
+      Use utilio_defn
+
+      Implicit None
+
+C..Includes:
+      Include SUBST_CONST               ! constants
+
+C..Functions:
+
+C..Parameters:
+
+C..Arguments:
+      Real, Intent( Out ) :: aeconcmin( : ) ! array of minimum concentrations
+
+C..Local Variables:
+      !Character( 16 ) :: pname = 'SET_AECONCMIN'   ! program name
+
+      Integer m        ! mode loop counter
+      Integer n        ! aerospc loop counter
+      Integer spc      ! species loop counter
+
+      ! compute minimums for numbers and surfaces
+      Do m = 1, n_mode
+         spc = index1( aeromode( m )%num_name, n_ae_spc, ae_spc )
+         aeconcmin( spc ) = aeromode_minNum( m ) * mwair * 1.0E-3
+
+         spc = index1( aeromode( m )%srf_name, n_ae_spc, ae_spc )
+         aeconcmin( spc ) = aeromode_minM2( m ) * pi * mwair * 1.0E-3
+      End Do
+
+      ! compute minimums for aerosol species
+      Do m = 1, n_mode
+         Do n = 1, n_aerospc
+            If ( .NOT. aero_missing(n,m) ) Then
+               spc = index1( aerospc( n )%name( m ), n_ae_spc, ae_spc )
+               If ( spc .Ne. 0 ) Then
+                  aeconcmin( spc ) = aerospc( n )%min_conc( m ) * mwair * 1.0E-9 / ae_molwt( spc )
+               End If
+            End If
+         End Do
+      End Do
+
+      Return
+      End Subroutine set_aeconcmin
+
       INTEGER FUNCTION INDEX_KPP( NAME )
 
         IMPLICIT NONE
