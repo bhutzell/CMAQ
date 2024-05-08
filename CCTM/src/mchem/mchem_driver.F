@@ -165,7 +165,8 @@ C.. Cloud chemistry related
 
          SUBROUTINE RESCLD ( CGRID, JDATE, JTIME, TSTEP,
      &                       N_SPC_WDEP, WDEP_MAP, RESTRANS,
-     &                       WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS )
+     &                       WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS,
+     &                       PRATE1_RS )
            IMPLICIT NONE
            REAL, POINTER            :: CGRID( :,:,:,: )
            INTEGER, INTENT( IN )    :: JDATE
@@ -178,11 +179,13 @@ C.. Cloud chemistry related
            REAL(8), INTENT( OUT )   :: WETFAC_RS( :,:,: )
            REAL(8), INTENT( OUT )   :: ALFA0_RS( :,:,: )
            REAL(8), INTENT( OUT )   :: ALFA3_RS( :,:,: )
+           REAL(8), INTENT( OUT )   :: PRATE1_RS( :,:,: )
          END SUBROUTINE RESCLD
 
          SUBROUTINE CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                            N_SPC_WDEP, WDEP_MAP, SUBTRANS,
-     &                            WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV )
+     &                            WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV,
+     &                            PRATE1_CV )
            IMPLICIT NONE
            REAL, POINTER            :: CGRID( :,:,:,: )
            INTEGER, INTENT( IN )    :: JDATE
@@ -195,6 +198,7 @@ C.. Cloud chemistry related
            REAL(8), INTENT( OUT )   :: WETFAC_CV( :,:,: )
            REAL(8), INTENT( OUT )   :: ALFA0_CV( :,:,: )
            REAL(8), INTENT( OUT )   :: ALFA3_CV( :,:,: )
+           REAL(8), INTENT( OUT )   :: PRATE1_CV( :,:,: )
          END SUBROUTINE CONVCLD_ACM
       END INTERFACE
 
@@ -306,9 +310,11 @@ C..Allocate wet deposition data
 
 c..Open file for mchem stats if requested
 #ifdef mchem_stats
-         ALLOCATE( VSTATS( 2 ) )
+         ALLOCATE( VSTATS( 4 ) )
          VSTATS( 1 ) = 'LWC_RS'
          VSTATS( 2 ) = 'LWC_CV'
+         VSTATS( 3 ) = 'PRATE1_RS'
+         VSTATS( 4 ) = 'PRATE1_CV'
 
          IF ( MYPE .EQ. 0 ) THEN
 
@@ -319,18 +325,26 @@ c..Open file for mchem stats if requested
             SDATE3D = EDATE
             STIME3D = ETIME
             TSTEP3D = TSTEP( 1 )
-            NVARS3D = 2
+            NVARS3D = 4
             NCOLS3D = GL_NCOLS
             NROWS3D = GL_NROWS
             NLAYS3D = NLAYS
             VNAME3D( 1 ) = 'LWC_RS'
             VNAME3D( 2 ) = 'LWC_CV'
-            VDESC3D( 1 ) = 'Liquid water content for resolved clouds'
-            VDESC3D( 2 ) = 'Liquid water content for convective clouds'
+            VNAME3D( 3 ) = 'PRATE1_RS'
+            VNAME3D( 4 ) = 'PRATE1_CV'
+            VDESC3D( 1 ) = 'Liquid water content of resolved clouds'
+            VDESC3D( 2 ) = 'Liquid water content of convective clouds'
+            VDESC3D( 3 ) = 'Precipitation rate of resolved clouds'
+            VDESC3D( 4 ) = 'Precipitation rate of convective clouds'
             UNITS3D( 1 ) = 'kg/m3'
             UNITS3D( 2 ) = 'kg/m3'
+            UNITS3D( 3 ) = 'mm/hr'
+            UNITS3D( 4 ) = 'mm/hr'
             VTYPE3D( 1 ) = M3REAL
             VTYPE3D( 2 ) = M3REAL
+            VTYPE3D( 3 ) = M3REAL
+            VTYPE3D( 4 ) = M3REAL
             IF ( .NOT. OPEN3( CTM_MCHEMSTATS_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create '// TRIM( CTM_MCHEMSTATS_1 ) // ' file'
                CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT2 )
@@ -383,11 +397,13 @@ C.. Obtain wet deposition related data
 C..  Resolved clouds
       CALL RESCLD ( CGRID, JDATE, JTIME, TSTEP,
      &              N_SPC_WDEP, WDEP_MAP, RESTRANS,
-     &              WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS )
+     &              WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS,
+     &              PRATE1_RS )
 C..  Convective clouds
       CALL CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                   N_SPC_WDEP, WDEP_MAP, SUBTRANS,
-     &                   WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV )
+     &                   WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV,
+     &                   PRATE1_CV )
 
 C.. Convert to molecules/cm3
       DO LEV = 1, NLAYS
@@ -639,6 +655,18 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 2 ),
      &         EDATE, ETIME, REAL( WCBAR_CV, 4 ) ) ) THEN
+            XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
+            CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
+         END IF
+
+         IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 3 ),
+     &         EDATE, ETIME, REAL( PRATE1_RS, 4 ) ) ) THEN
+            XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
+            CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
+         END IF
+
+         IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 4 ),
+     &         EDATE, ETIME, REAL( PRATE1_CV, 4 ) ) ) THEN
             XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
             CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
          END IF

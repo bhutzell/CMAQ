@@ -89,10 +89,12 @@ C...Variables related to scavenging
       REAL( 8 ), ALLOCATABLE   :: WETFAC_RS ( :,:,: ) ! wet deposition rate coefficient resolved cloud
       REAL( 8 ), ALLOCATABLE   :: ALFA0_RS  ( :,:,: ) ! aitken mode number scavenging coef resolved cloud
       REAL( 8 ), ALLOCATABLE   :: ALFA3_RS  ( :,:,: ) ! aitken mode mass scavenging coef resolved cloud
+      REAL( 8 ), ALLOCATABLE   :: PRATE1_RS ( :,:,: ) ! precipitation rate (mm/hr) resolved cloud
       REAL( 8 ), ALLOCATABLE   :: WCBAR_CV  ( :,:,: ) ! liq water content of convective cloud (kg/m3)
       REAL( 8 ), ALLOCATABLE   :: WETFAC_CV ( :,:,: ) ! wet deposition rate coefficient convective cloud
       REAL( 8 ), ALLOCATABLE   :: ALFA0_CV  ( :,:,: ) ! aitken mode number scavenging coef convective cloud
       REAL( 8 ), ALLOCATABLE   :: ALFA3_CV  ( :,:,: ) ! aitken mode mass scavenging coef convective cloud
+      REAL( 8 ), ALLOCATABLE   :: PRATE1_CV ( :,:,: ) ! precipitation rate (mm/hr) convective cloud
 
 C.. Cloud properties
       REAL, ALLOCATABLE, SAVE  :: RESTRANS( :,: )   ! resolved cloud transmissivity
@@ -214,25 +216,22 @@ C.. Allocate wet deposition arrays
         ALLOCATE ( WCBAR_RS ( NCOLS, NROWS, NLAYS ),
      &             WETFAC_RS( NCOLS, NROWS, NLAYS ),
      &             ALFA0_RS ( NCOLS, NROWS, NLAYS ),
-     &             ALFA3_RS ( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
+     &             ALFA3_RS ( NCOLS, NROWS, NLAYS ),
+     &             PRATE1_RS( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
-          XMSG = '*** Error allocating WCBAR_RS, WETFAC_RS, ALFA0_RS, and ALFA3_RS'
+          XMSG = '*** Error allocating WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS, and PRATE1_RS'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
         ALLOCATE ( WCBAR_CV ( NCOLS, NROWS, NLAYS ),
      &             WETFAC_CV( NCOLS, NROWS, NLAYS ),
      &             ALFA0_CV ( NCOLS, NROWS, NLAYS ),
-     &             ALFA3_CV ( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
+     &             ALFA3_CV ( NCOLS, NROWS, NLAYS ),
+     &             PRATE1_CV( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
-          XMSG = '*** Error allocating WCBAR_CV, WETFAC_CV, ALFA0_CV, and ALFA3_CV'
+          XMSG = '*** Error allocating WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV, and PRATE1_CV'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
-
-        WCBAR_CV  = 0.
-        WETFAC_CV = 0.
-        ALFA0_CV  = 0.
-        ALFA3_CV  = 0.
 
 C..Allocate cloud properties
          ALLOCATE ( RESTRANS ( NCOLS,NROWS ), STAT = ALLOCSTAT )

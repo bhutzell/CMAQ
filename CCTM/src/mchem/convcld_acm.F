@@ -20,7 +20,8 @@
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
        SUBROUTINE CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                          N_SPC_WDEP, WDEP_MAP, SUBTRANS,
-     &                          WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV )
+     &                          WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV,
+     &                          PRATE1_CV )
 
 C-----------------------------------------------------------------------
 C
@@ -72,6 +73,7 @@ C...........Arguments
       REAL(8), INTENT( OUT )   :: WETFAC_CV( :,:,: ) ! wet deposition rate coefficient
       REAL(8), INTENT( OUT )   :: ALFA0_CV( :,:,: )  ! aitken mode number scavenging coef
       REAL(8), INTENT( OUT )   :: ALFA3_CV( :,:,: )  ! aitken mode mass scavenging coef
+      REAL(8), INTENT( OUT )   :: PRATE1_CV( :,:,: ) ! precipitation rate (mm/hr)
 
 C.....Logical switches
       LOGICAL  :: UPDATE_CGRID_CONV = .FALSE. ! logical if CGRID should be updated due to convective
@@ -1448,12 +1450,13 @@ C...Do not get variables based on average column
      &                          DTCLD, POLC, CEND, REMOV, REMOVAC,
      &                          ALFA0, ALFA2, ALFA3 )
 
-                WCBAR_CV  ( COL, ROW, LAY ) = WCBARL( LAY )
+                WCBAR_CV  ( COL, ROW, LAY ) = REAL( WCBARL( LAY ), 8 )
                 WETFAC_CV ( COL, ROW, LAY ) = REAL( WTBARL( LAY ) * 1000.0D0 * DZZL( LAY ) * 3600.0D0 /
      &                                       ( 1000.0D0 * MAX( 1.0D-20, PRATE1L( LAY ) ) ), 8 )
                 WETFAC_CV ( COL, ROW, LAY ) = 1.0D0 /  WETFAC_CV ( COL, ROW, LAY )
-                ALFA0_CV  ( COL, ROW, LAY ) = ALFA0
-                ALFA3_CV  ( COL, ROW, LAY ) = ALFA3
+                ALFA0_CV  ( COL, ROW, LAY ) = REAL( ALFA0, 8 )
+                ALFA3_CV  ( COL, ROW, LAY ) = REAL( ALFA3, 8 )
+                PRATE1_CV ( COL, ROW, LAY ) = REAL( PRATE1L( LAY ), 8 )
               END IF
             END DO
           END IF

@@ -20,7 +20,8 @@
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE RESCLD ( CGRID, JDATE, JTIME, TSTEP,
      &                    N_SPC_WDEP, WDEP_MAP, RESTRANS,
-     &                    WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS )
+     &                    WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS,
+     &                    PRATE1_RS )
 
 C-----------------------------------------------------------------------
 C  FUNCTION: Resolved-scale CLOUD processor Models-3 science process:
@@ -55,6 +56,7 @@ C...........Arguments:
       REAL(8), INTENT( OUT )   :: WETFAC_RS( :,:,: ) ! wet deposition rate coefficient
       REAL(8), INTENT( OUT )   :: ALFA0_RS( :,:,: )  ! aitken mode number scavenging coef
       REAL(8), INTENT( OUT )   :: ALFA3_RS( :,:,: )  ! aitken mode mass scavenging coef
+      REAL(8), INTENT( OUT )   :: PRATE1_RS( :,:,: ) ! precipitation rate (mm/hr)
 
       CHARACTER( 120 ) :: XMSG  = ' '    ! Exit status message
 
@@ -459,6 +461,7 @@ C.. Save output
                 WETFAC_RS ( COL, ROW, LAY ) = 1.0D0 /  WETFAC_RS ( COL, ROW, LAY )
                 ALFA0_RS  ( COL, ROW, LAY ) = REAL( ALFA0, 8 )
                 ALFA3_RS  ( COL, ROW, LAY ) = REAL( ALFA3, 8 )
+                PRATE1_RS ( COL, ROW, LAY ) = REAL( PRATE1, 8 )
 
               END IF        ! Sum( QC,QR,QG ) > 0.00005 ?
             END DO       ! lay
