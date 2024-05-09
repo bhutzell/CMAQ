@@ -443,6 +443,7 @@ c-------------------------------------------------------------------------------
                If ( ( Index( mechname, 'SAPRC07TIC_AE6I' ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CRACMM1_'        ) .Gt. 0 ) .OR.
+     &              ( Index( mechname, 'CRACMM2'         ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CRACMM1AMORE_'   ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CB6R3_AE7'       ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CB6R5_AE7'       ) .Gt. 0 ) .OR.
@@ -1102,6 +1103,7 @@ c-------------------------------------------------------------------------------
                 CGRID_MW( IGRID )   = NR_MOLWT( ISPC )
                 CGRID_MASK_NR( IGRID )   = .TRUE.
                 CGRID_CONC_UNIT( IGRID )  = 'ppmV'
+                CGRID_UNITS( IGRID ) = 'ppmV'
                 CGRID_CONC_DESC( IGRID )  = 'Molar Mixing Ratio of ' // CGRID_NAME(IGRID)
                 DO JSPC = 1,N_NR_DEPV
                   IF ( NR_DEPV_MAP( JSPC ) .EQ. ISPC ) THEN
@@ -1125,6 +1127,7 @@ c-------------------------------------------------------------------------------
                 CGRID_MW( IGRID )   = TR_MOLWT( ISPC )
                 CGRID_MASK_TRAC( IGRID )   = .TRUE.
                 CGRID_CONC_UNIT( IGRID )  = 'ppmV'
+                CGRID_UNITS( IGRID ) = 'ppmV'
                 CGRID_CONC_DESC( IGRID )  = 'Molar Mixing Ratio of ' // CGRID_NAME(IGRID)
                 DO JSPC = 1,N_TR_DEPV
                   IF ( TR_DEPV_MAP( JSPC ) .EQ. ISPC ) THEN

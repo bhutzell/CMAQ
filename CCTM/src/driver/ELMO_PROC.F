@@ -63,7 +63,6 @@
 
       CONTAINS
 
-
 !-------------------------------------------------------------------------
       SUBROUTINE ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME )
 !     This subroutine maps the PM diagnostic variables that the user has
