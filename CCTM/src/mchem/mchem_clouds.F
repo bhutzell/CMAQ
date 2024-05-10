@@ -369,10 +369,11 @@ C..   Report cloud species definitions to log-file
 
       END SUBROUTINE CL_SPCS_DEF
 
-      SUBROUTINE INIT_CLOUDS ( CONC, LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
+      SUBROUTINE INIT_CLOUDS ( CONC, C, LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
 
         IMPLICIT NONE
-        REAL, INTENT ( INOUT ) :: CONC( N_CGRID_SPC )    !  species concentration in cell
+        REAL,     INTENT ( INOUT ) :: CONC( N_CGRID_SPC )    !  species concentration in cell
+        REAL(dp), INTENT ( INOUT ) :: C( N_CGRID_SPC )       !  KPP species concentration in cell
         REAL(dp), INTENT( IN ) :: LWC_RS, LWC_CV, PHI2_RS, PHI2_CV
         INTEGER                :: ICL, ICLT, ICGRID, IKPP_RS, IKPP_CV
         REAL(dp)               :: FRAC_RS, FRAC_CV, LWC_SUM, SCAL
@@ -399,12 +400,13 @@ C.. Initialise cloud tracer
               DO ICLT = 1,N_IC
                  ICGRID  = MECH_SPC_CL( ICL )%IC_CGRID_INDEX( ICLT )
                  IF ( ICGRID .NE. 0 ) THEN
-                    SCAL = MECH_SPC_CL( ICL )%IC_FAC( ICLT ) ! Scale by IC fraction
-                    SCAL = SCAL * ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%IC_MW( ICLT ) ) ! Scale by molar weight
+                    SCAL = REAL( MECH_SPC_CL( ICL )%IC_FAC( ICLT ), dp ) ! Scale by IC fraction
+                    !SCAL = SCAL * ( REAL( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%IC_MW( ICLT ), dp ) ) ! Scale by molar weight
+                    SCAL = SCAL * ( REAL( MECH_SPC_CL( ICL )%IC_MW( ICLT ) / MECH_SPC_CL( ICL )%MOLWT, dp ) ) ! Scale by molar weight
                     IF ( FRAC_RS .GT. 0.0 ) C( IKPP_RS ) = C( IKPP_RS ) +
-     &                       ( CONC( ICGRID ) * FRAC_RS * SCAL )
+     &                       ( REAL( CONC( ICGRID ), dp ) * FRAC_RS * SCAL )
                     IF ( FRAC_CV .GT. 0.0 ) C( IKPP_CV ) = C( IKPP_CV ) +
-     &                       ( CONC( ICGRID ) * FRAC_CV * SCAL )
+     &                       ( REAL( CONC( ICGRID ), dp ) * FRAC_CV * SCAL )
                     IF ( MECH_SPC_CL( ICL )%IC_RESET ( ICLT ) )
      &                   CONC( ICGRID ) = MAX( CONC( ICGRID ) -
      &                 ( CONC( ICGRID ) * MECH_SPC_CL( ICL )%IC_FAC ( ICLT ) ), ZERO ) ! In this scaling molar weight does not need to be taken into account
@@ -422,7 +424,7 @@ C.. Initialise Hp and OHm
            DO ICL = 1,N_CL_SPC
               IF ( MECH_SPC_CL( ICL )%CHARGE .NE. 0.0 ) THEN
                  IKPP = MECH_SPC_CL( ICL )%KPP_INDEX( ICLT )
-                 SUM_CHARGE = SUM_CHARGE + C( IKPP ) * MECH_SPC_CL( ICL )%CHARGE
+                 SUM_CHARGE = SUM_CHARGE + C( IKPP ) * REAL( MECH_SPC_CL( ICL )%CHARGE, dp )
               END IF
            END DO ! N_CL_SPC
            DELINVT = ( 298.D0 - TEMP ) / ( 298.D0 * TEMP )
@@ -431,8 +433,8 @@ C.. Initialise Hp and OHm
            C( IOHm( ICLT ) ) = ( CHGBAL + SQRT( CHGBAL * CHGBAL + 4.D0 * Kw ) ) * 0.5D0
            C( IHp ( ICLT ) ) = Kw / C( IOHm( ICLT ) )
            IF ( -LOG10( C( IHp ( ICLT ) ) ) .LT. .0 ) WRITE(*,*) -LOG10( C( IHp ( ICLT ) ) )
-           C( IOHm( ICLT ) ) = MAX( C( IOHm( ICLT ) ) / PHI2( ICLT ), ZERO ) !Convert to molec/cm3
-           C( IHp ( ICLT ) ) = MAX( C( IHp ( ICLT ) ) / PHI2( ICLT ), ZERO ) !Convert to molec/cm3
+           C( IOHm( ICLT ) ) = MAX( C( IOHm( ICLT ) ) / PHI2( ICLT ), REAL( ZERO, dp ) ) !Convert to molec/cm3
+           C( IHp ( ICLT ) ) = MAX( C( IHp ( ICLT ) ) / PHI2( ICLT ), REAL( ZERO, dp ) ) !Convert to molec/cm3
            C( IND_O2_RS ) = ( 0.21 * PRESS * 1.3D-3 * EXP( 1500.D0 * DELINVT ) ) / PHI2( ICLT )
            C( IND_O2_CV ) = ( 0.21 * PRESS * 1.3D-3 * EXP( 1500.D0 * DELINVT ) ) / PHI2( ICLT )
            END IF
@@ -440,10 +442,11 @@ C.. Initialise Hp and OHm
 
       END SUBROUTINE INIT_CLOUDS
 
-      SUBROUTINE EVAP_CLOUDS ( CONC, WFAC_RS, WFAC_CV, TSTEP )
+      SUBROUTINE EVAP_CLOUDS ( CONC, C, WFAC_RS, WFAC_CV, TSTEP )
 
         IMPLICIT NONE
-        REAL, INTENT ( INOUT ) :: CONC( N_CGRID_SPC )    !  species concentration in cell
+        REAL, INTENT ( INOUT )     :: CONC( N_CGRID_SPC )    !  species concentration in cell
+        REAL(dp), INTENT ( INOUT ) :: C( N_CGRID_SPC )       !  KPP species concentration in cell
         REAL(dp), INTENT( IN ) :: WFAC_RS, WFAC_CV, TSTEP
         INTEGER                :: ICL, ICLW, ICGRID, IKPP_RS, IKPP_CV
         REAL, PARAMETER        :: ZERO = 1.0E-30
@@ -456,13 +459,13 @@ C.. Evaporate cloud tracer
               IKPP_RS = MECH_SPC_CL( ICL )%KPP_INDEX( IRS )
               IKPP_CV = MECH_SPC_CL( ICL )%KPP_INDEX( ICV )
               ICGRID  = MECH_SPC_CL( ICL )%EV_CGRID_INDEX
-              SCAL = MECH_SPC_CL( ICL )%EV_FAC
-              SCAL = SCAL * ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%EV_MW ) ! Scale by molar weight
-              CONC_TEMP = C( IKPP_RS ) + C( IKPP_CV )
+              SCAL = REAL( MECH_SPC_CL( ICL )%EV_FAC, dp )
+              SCAL = SCAL * REAL( ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%EV_MW ), dp ) ! Scale by molar weight
+              CONC_TEMP = ( C( IKPP_RS ) + C( IKPP_CV ) ) * SCAL
               CONC( ICGRID ) = MAX( CONC( ICGRID ) +
-     &                 ( MECH_SPC_CL( ICL )%EV_FAC * CONC_TEMP ), ZERO )
-              C( IKPP_RS ) = ZERO ! reseting these fields should not be necessary
-              C( IKPP_CV ) = ZERO ! reseting these fields should not be necessary
+     &                 ( REAL( CONC_TEMP, 4 ) ), ZERO )
+              C( IKPP_RS ) = REAL( ZERO, dp ) ! reseting these fields should not be necessary
+              C( IKPP_CV ) = REAL( ZERO, dp ) ! reseting these fields should not be necessary
            END IF
         END DO
 
@@ -473,7 +476,7 @@ C.. This code needs modifications once we take scavenging into account
                  ICLW = MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX
                  ICGRID  = MECH_SPC_CL( ICL )%EV_CGRID_INDEX
                  EXPWDEP = DEXP( - ( WFAC_RS + WFAC_CV ) * TSTEP )
-                 CONC( ICLW ) = CONC( ICLW ) * EXPWDEP
+                 CONC( ICLW ) = CONC( ICLW ) * REAL( EXPWDEP, 4 )
                  CONC( ICGRID ) = MAX( CONC( ICGRID ) - CONC( ICLW ), ZERO )
               END IF
 C.. The code above needs modifications once we take scavenging into account

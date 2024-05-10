@@ -523,7 +523,7 @@ C.. End filling aqueous related data
                ! Fill CONC gas and aerosols
                C(:) = 0.0D0
                ! Init cloud concentrations first, since it impacts aerosol and gas phase concentrations
-               IF ( LCL ) CALL INIT_CLOUDS ( CGRID( COL,ROW,LEV,: ), LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
+               IF ( LCL ) CALL INIT_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
                DO SPC = 1, NSPEC
                   IF ( MECH_SPC(SPC)%CGRID_INDEX /= 0 ) THEN
                      ICGSPC = MECH_SPC(SPC)%CGRID_INDEX
@@ -582,7 +582,7 @@ C.. End filling aqueous related data
                   END IF
                END DO
 
-               IF ( LCL ) CALL EVAP_CLOUDS ( CGRID( COL,ROW,LEV,: ), WFAC_RS, WFAC_CV, DT )
+               IF ( LCL ) CALL EVAP_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), WFAC_RS, WFAC_CV, DT )
 
             END DO ! ROW
          END DO ! COL
