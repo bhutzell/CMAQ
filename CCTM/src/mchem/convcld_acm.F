@@ -76,14 +76,14 @@ C...........Arguments
       REAL(8), INTENT( OUT )   :: PRATE1_CV( :,:,: ) ! precipitation rate (mm/hr)
 
 C.....Logical switches
-      LOGICAL  :: UPDATE_CGRID_CONV = .FALSE. ! logical if CGRID should be updated due to convective
-                                              ! mixing in the CBL
-                                              !  .FALSE. = CGRID is not updated (default)
-                                              !  .TRUE.  = CGRID is updated
-      LOGICAL  :: UPDATE_CGRID_RAIN = .FALSE. ! logical if CGRID should be updated due to precipitation
-                                              ! (average trace gas mixing ratio below cloud level)
-                                              !  .FALSE. = CGRID is not updated (default)
-                                              !  .TRUE.  = CGRID is updated
+      LOGICAL  :: UPDATE_CGRID_CONV  = .FALSE. ! logical if CGRID should be updated due to convective
+                                               ! mixing in the CBL
+                                               !  .FALSE. = CGRID is not updated (default)
+                                               !  .TRUE.  = CGRID is updated
+      LOGICAL  :: UPDATE_CGRID_BELOW = .FALSE. ! logical if CGRID should be updated below cloud base
+                                               ! (weighted trace gas mixing ratio below cloud base)
+                                               !  .FALSE. = CGRID is not updated (default)
+                                               !  .TRUE.  = CGRID is updated
 
 C.....Temporary data arrays
 C      REAL, ALLOCATABLE, SAVE :: CONV_DEP( :,:,: ) ! convective wdep only
@@ -1362,8 +1362,8 @@ C...  below cloud concentrations in mol sp/mol air
                 IF ( ICLDTYPE .EQ. 1 ) THEN
                   POLC( SPC ) = POLC( SPC ) + PCLD( SPC, LAY ) * RHOM2( LAY )
 C...Update CGRID if requested by user
-                  IF ( UPDATE_CGRID_RAIN ) THEN
-                    CGRID( COL,ROW,LAY,SPC ) = MAX( CBASE0( SPC ), 1.0E-30 )
+                  IF ( UPDATE_CGRID_BELOW ) THEN
+                    CGRID( COL,ROW,LAY,SPC ) = MAX( PCLD( SPC,LAY ), 1.0E-30 )
                   END IF
                 END IF
               END DO
