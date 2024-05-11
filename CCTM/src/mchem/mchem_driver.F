@@ -45,6 +45,9 @@ C..   KPP related
 C.. Cloud data
       USE MCHEM_CLOUDS
 
+C.. MCHEM Data
+      USE MCHEM_DATA, ONLY: MECH_SPC, ALLOC_KPP_SPC
+
       IMPLICIT NONE
 
 C..Includes:
@@ -136,19 +139,6 @@ C.. Cloud chemistry related
       CHARACTER( 200 )        :: FMT                  ! Format for log-file output
       REAL                    :: CONVERT_VALUE
       LOGICAL                 :: LCL_RS, LCL_CV, LCL
-
-      TYPE :: KPP_SPC
-        CHARACTER(16) :: NAME         = ''
-        CHARACTER(2)  :: SPC_TYPE     = ''
-        INTEGER       :: RXNS_INDEX   = 0        ! Index used in RXNS data arrays
-        INTEGER       :: CGRID_INDEX  = 0        ! Index used in CGRID
-        INTEGER       :: CONC_INDEX   = 0        ! Index used in KPP arrays
-        LOGICAL       :: CONVERT      = .FALSE.
-        REAL(8)       :: FORWARD_CONV = 1.0      ! Conversion factor cgrid to conc
-        REAL(8)       :: REVERSE_CONV = 1.0      ! Conversion factor conc to cgrid
-        REAL(8)       :: MOLWT        = 0.0      ! Molecular Weight of species (gm/mole)
-      END TYPE
-      TYPE(KPP_SPC), DIMENSION(NSPEC), SAVE :: MECH_SPC
 
 #ifdef mchem_stats
       CHARACTER( 16 ), SAVE              :: CTM_MCHEMSTATS_1 = 'CTM_MCHEMSTATS_1'
@@ -248,42 +238,7 @@ C.. Get fractional seawater coverage from the OCEAN file.
             CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
          END IF
 
-C.. Set up KPP species information
-         DO SPC = 1, NSPEC
-            MECH_SPC(SPC)%NAME       = SPC_NAMES(SPC)
-            MECH_SPC(SPC)%CONC_INDEX = SPC
-            ! Get RXNS index
-            DO CSPC = 1, NUMB_MECH_SPC
-               IF ( TRIM(MECH_SPC(SPC)%NAME) == TRIM(CHEMISTRY_SPC(CSPC)) ) THEN
-                  MECH_SPC(SPC)%RXNS_INDEX = CSPC
-               END IF
-            END DO
-            ! Get additional information if species is in CGRID
-            IF ( MECH_SPC(SPC)%RXNS_INDEX /= 0 ) THEN
-               IRXNS = MECH_SPC(SPC)%RXNS_INDEX
-               MECH_SPC(SPC)%SPC_TYPE     = SPECIES_TYPE(  IRXNS )
-               MECH_SPC(SPC)%CGRID_INDEX  = CGRID_INDEX(   IRXNS )
-               MECH_SPC(SPC)%CONVERT      = CONVERT_CONC(  IRXNS )
-               MECH_SPC(SPC)%MOLWT        = REAL( SPECIES_MOLWT( IRXNS ), 8 )
-               IF ( ( MECH_SPC(SPC)%MOLWT > 0.0 ) .AND. ( MECH_SPC(SPC)%CONVERT ) ) THEN
-                  MECH_SPC(SPC)%FORWARD_CONV = REAL( 1.0E-3 * MWAIR / MECH_SPC(SPC)%MOLWT, 8 )
-                  MECH_SPC(SPC)%REVERSE_CONV = REAL( 1.0E+3 / MWAIR * MECH_SPC(SPC)%MOLWT, 8 )
-               END IF
-            END IF
-         END DO
-C.. Report species setup
-         WRITE(LOGDEV,"(A)") 'CGRID gas- and aerosol-species references in MCHEM:'
-         FMT = "(A16,A6,  X,A4,X,A10,X,A11,X,A9,X,A7)"
-         WRITE(LOGDEV,FMT) 'NAME            ','MOLWT','TYPE','RXNS_INDEX','CGRID_INDEX',
-     &                     'KPP_INDEX','CONVERT'
-         FMT = "(A16,F6.1,X,A4,X,I10,X,I11,X,I9,X,L7)"
-         DO SPC = 1, NSPEC
-            IF ( MECH_SPC(SPC)%RXNS_INDEX /= 0 ) THEN
-               WRITE(LOGDEV,FMT) MECH_SPC(SPC)%NAME,MECH_SPC(SPC)%MOLWT,MECH_SPC(SPC)%SPC_TYPE,
-     &                           MECH_SPC(SPC)%RXNS_INDEX,MECH_SPC(SPC)%CGRID_INDEX,
-     &                           MECH_SPC(SPC)%CONC_INDEX,MECH_SPC(SPC)%CONVERT
-            END IF
-         END DO
+        CALL ALLOC_KPP_SPC()
 
         CALL CL_SPCS_DEF()
 
