@@ -21,9 +21,13 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE MCHEM_DATA
 
       USE RXNS_DATA
-      USE MCHEM_PARAMETERS, ONLY: NSPEC
-      USE MCHEM_MONITOR,    ONLY: SPC_NAMES
       Use RUNTIME_VARS,     ONLY: LOGDEV
+C..MCHEM related species data
+      USE MCHEM_PARAMETERS, ONLY: NSPEC_MCHEM => NSPEC
+      USE MCHEM_MONITOR,    ONLY: SPC_NAMES_MCHEM => SPC_NAMES
+C..GAS related species data
+      USE GAS_PARAMETERS,   ONLY: NSPEC_GAS => NSPEC
+      USE GAS_MONITOR,      ONLY: SPC_NAMES_GAS => SPC_NAMES
 
       IMPLICIT NONE
 
@@ -38,7 +42,8 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         REAL(8)       :: REVERSE_CONV = 1.0      ! Conversion factor conc to cgrid
         REAL(8)       :: MOLWT        = 0.0      ! Molecular Weight of species (gm/mole)
       END TYPE
-      TYPE(KPP_SPC), DIMENSION(NSPEC), SAVE :: MECH_SPC
+      TYPE(KPP_SPC), DIMENSION(NSPEC_MCHEM), SAVE :: MECH_SPC
+      TYPE(KPP_SPC), DIMENSION(NSPEC_GAS),   SAVE :: MECH_SPC_GAS
 
       CHARACTER( 200 )        :: FMT                  ! Format for log-file output
 
@@ -59,8 +64,8 @@ C..Includes:
       INTEGER CSPC            ! RXNS Species loop index
 
 C.. Set up KPP species information
-         DO SPC = 1, NSPEC
-            MECH_SPC(SPC)%NAME       = SPC_NAMES(SPC)
+         DO SPC = 1, NSPEC_MCHEM
+            MECH_SPC(SPC)%NAME       = SPC_NAMES_MCHEM(SPC)
             MECH_SPC(SPC)%CONC_INDEX = SPC
             ! Get RXNS index
             DO CSPC = 1, NUMB_MECH_SPC
@@ -82,16 +87,53 @@ C.. Set up KPP species information
             END IF
          END DO
 C.. Report species setup
-         WRITE(LOGDEV,"(A)") 'CGRID gas- and aerosol-species references in MCHEM:'
+         WRITE(LOGDEV,"(A)") 'CGRID gas- and aerosol-species references in MCHEM mechanism:'
          FMT = "(A16,A6,  X,A4,X,A10,X,A11,X,A9,X,A7)"
          WRITE(LOGDEV,FMT) 'NAME            ','MOLWT','TYPE','RXNS_INDEX','CGRID_INDEX',
      &                     'KPP_INDEX','CONVERT'
          FMT = "(A16,F6.1,X,A4,X,I10,X,I11,X,I9,X,L7)"
-         DO SPC = 1, NSPEC
+         DO SPC = 1, NSPEC_MCHEM
             IF ( MECH_SPC(SPC)%RXNS_INDEX /= 0 ) THEN
                WRITE(LOGDEV,FMT) MECH_SPC(SPC)%NAME,MECH_SPC(SPC)%MOLWT,MECH_SPC(SPC)%SPC_TYPE,
      &                           MECH_SPC(SPC)%RXNS_INDEX,MECH_SPC(SPC)%CGRID_INDEX,
      &                           MECH_SPC(SPC)%CONC_INDEX,MECH_SPC(SPC)%CONVERT
+            END IF
+         END DO
+
+C.. Set up KPP species information
+         DO SPC = 1, NSPEC_GAS
+            MECH_SPC_GAS(SPC)%NAME       = SPC_NAMES_GAS(SPC)
+            MECH_SPC_GAS(SPC)%CONC_INDEX = SPC
+            ! Get RXNS index
+            DO CSPC = 1, NUMB_MECH_SPC
+               IF ( TRIM(MECH_SPC_GAS(SPC)%NAME) == TRIM(CHEMISTRY_SPC(CSPC)) ) THEN
+                  MECH_SPC_GAS(SPC)%RXNS_INDEX = CSPC
+               END IF
+            END DO
+            ! Get additional information if species is in CGRID
+            IF ( MECH_SPC_GAS(SPC)%RXNS_INDEX /= 0 ) THEN
+               IRXNS = MECH_SPC_GAS(SPC)%RXNS_INDEX
+               MECH_SPC_GAS(SPC)%SPC_TYPE     = SPECIES_TYPE(  IRXNS )
+               MECH_SPC_GAS(SPC)%CGRID_INDEX  = CGRID_INDEX(   IRXNS )
+               MECH_SPC_GAS(SPC)%CONVERT      = CONVERT_CONC(  IRXNS )
+               MECH_SPC_GAS(SPC)%MOLWT        = REAL( SPECIES_MOLWT( IRXNS ), 8 )
+               IF ( ( MECH_SPC_GAS(SPC)%MOLWT > 0.0 ) .AND. ( MECH_SPC_GAS(SPC)%CONVERT ) ) THEN
+                  MECH_SPC_GAS(SPC)%FORWARD_CONV = REAL( 1.0E-3 * MWAIR / MECH_SPC_GAS(SPC)%MOLWT, 8 )
+                  MECH_SPC_GAS(SPC)%REVERSE_CONV = REAL( 1.0E+3 / MWAIR * MECH_SPC_GAS(SPC)%MOLWT, 8 )
+               END IF
+            END IF
+         END DO
+C.. Report species setup
+         WRITE(LOGDEV,"(A)") 'CGRID gas- and aerosol-species references in GAS/HETERO mechanism:'
+         FMT = "(A16,A6,  X,A4,X,A10,X,A11,X,A9,X,A7)"
+         WRITE(LOGDEV,FMT) 'NAME            ','MOLWT','TYPE','RXNS_INDEX','CGRID_INDEX',
+     &                     'KPP_INDEX','CONVERT'
+         FMT = "(A16,F6.1,X,A4,X,I10,X,I11,X,I9,X,L7)"
+         DO SPC = 1, NSPEC_GAS
+            IF ( MECH_SPC_GAS(SPC)%RXNS_INDEX /= 0 ) THEN
+               WRITE(LOGDEV,FMT) MECH_SPC_GAS(SPC)%NAME,MECH_SPC_GAS(SPC)%MOLWT,MECH_SPC_GAS(SPC)%SPC_TYPE,
+     &                           MECH_SPC_GAS(SPC)%RXNS_INDEX,MECH_SPC_GAS(SPC)%CGRID_INDEX,
+     &                           MECH_SPC_GAS(SPC)%CONC_INDEX,MECH_SPC_GAS(SPC)%CONVERT
             END IF
          END DO
 

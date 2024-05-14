@@ -34,7 +34,7 @@
       CHARACTER( 2 ), DIMENSION( CL_TYPES ) :: CL_NAMES = ['RS','CV'] ! Name of cloud type (RS=Resolved, CV=Convective)
       INTEGER, PARAMETER                    :: IRS = 1                ! Index for resolved clouds
       INTEGER, PARAMETER                    :: ICV = 2                ! Index for convective clouds
-      REAL,    PARAMETER                    :: LWC_LIMIT = 0.00001    ! LWC limit used for cloud chemistry
+      REAL(dp),PARAMETER                    :: LWC_LIMIT = 0.00001    ! LWC limit used for cloud chemistry
 
       TYPE SPECIES_DATA_CLOUDS
           CHARACTER( 16 ) :: SPECIES_NAME  ! CMAQ Species Name

@@ -203,6 +203,24 @@ C.. KPP related variables
            INTEGER, INTENT( IN )    :: COL
            INTEGER, INTENT( IN )    :: ROW
          END SUBROUTINE
+
+         SUBROUTINE GAS_CHEM ( CGRID, TA, PRES, DENSI, OPEN_WATER_IN,
+     &                         SEAWATER_IN, CAIR_IN, QV,
+     &                         CHEMSTEP, LEV, COL, ROW )
+           IMPLICIT NONE
+           REAL, POINTER            :: CGRID( :,:,:,: )
+           REAL(8), INTENT( IN )    :: TA
+           REAL(8), INTENT( IN )    :: PRES
+           REAL(8), INTENT( IN )    :: DENSI
+           LOGICAL, INTENT( IN )    :: OPEN_WATER_IN
+           REAL(8), INTENT( IN )    :: SEAWATER_IN
+           REAL(8), INTENT( IN )    :: CAIR_IN
+           REAL,    INTENT( IN )    :: QV
+           REAL(8), INTENT( IN )    :: CHEMSTEP
+           INTEGER, INTENT( IN )    :: LEV
+           INTEGER, INTENT( IN )    :: COL
+           INTEGER, INTENT( IN )    :: ROW
+         END SUBROUTINE
       END INTERFACE
 
 C**********************************************************************
@@ -411,9 +429,23 @@ C.. Convert to molecules/cm3
                DENSI    = REAL( DENS( COL,ROW,LEV ), 8 )
                CAIR     = REAL( ( PRESS/PA2ATM ) / ( TEMP * 8.314510 ) * 6.0221413D17, 8 )
 
-               CALL MCHEM_CHEM ( CGRID, TEMP, PRESS, DENSI, OPEN_WATER,
-     &                           SEAWATER, CAIR, QV( COL,ROW,LEV),
-     &                           CHEMSTEP, LEV, COL, ROW )
+C.. Check if any cloud is present in grid box. If any resolved or
+C   convective cloud is present, run full multiphase mechanism.
+C   Else only calculate gas/hetero chemistry.
+               IF ( ( WCBAR_RS( COL,ROW,LEV ) .GT. LWC_LIMIT ) .OR.
+     &              ( WCBAR_CV( COL,ROW,LEV ) .GT. LWC_LIMIT ) ) THEN
+
+                  CALL MCHEM_CHEM ( CGRID, TEMP, PRESS, DENSI, OPEN_WATER,
+     &                              SEAWATER, CAIR, QV( COL,ROW,LEV),
+     &                              CHEMSTEP, LEV, COL, ROW )
+
+               ELSE
+
+                  CALL GAS_CHEM   ( CGRID, TEMP, PRESS, DENSI, OPEN_WATER,
+     &                              SEAWATER, CAIR, QV( COL,ROW,LEV),
+     &                              CHEMSTEP, LEV, COL, ROW )
+
+               END IF
 
             END DO ! LEV
          END DO ! ROW
