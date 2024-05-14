@@ -38,15 +38,11 @@ C**********************************************************************
       USE AEROSOL_CHEMISTRY
       USE CENTRALIZED_IO_MODULE, ONLY : INTERPOLATE_VAR, OCEAN, SZONE
 
-C..   KPP related
-      USE mchem_Model
-      USE mchem_Initialize, ONLY: Initialize
-
 C.. Cloud data
       USE MCHEM_CLOUDS
 
 C.. MCHEM Data
-      USE MCHEM_DATA, ONLY: MECH_SPC, ALLOC_KPP_SPC
+      USE MCHEM_DATA, ONLY: ALLOC_KPP_SPC
 
       IMPLICIT NONE
 
@@ -132,13 +128,12 @@ C.. Cloud chemistry related
       REAL( 8 )               :: DENSI                ! Cell ambient MASS DENSITY in Kg/m^3
       REAL( 8 )               :: NA = 6.02214076D23   ! Avogadro constant [mol^-1]
 
-      REAL(kind=dp)           :: RSTATE(20)           ! KPP integrator variables
-      INTEGER                 :: ICNTRL(20) = 0       ! KPP integrator variables
-      INTEGER                 :: IERR                 ! KPP integrator variables
-      INTEGER                 :: ISTATUS(20)          ! KPP integrator variables
-      CHARACTER( 200 )        :: FMT                  ! Format for log-file output
-      REAL                    :: CONVERT_VALUE
-      LOGICAL                 :: LCL_RS, LCL_CV, LCL
+C.. KPP related variables
+      REAL( 8 )               :: TEMP
+      REAL( 8 )               :: PRESS
+      REAL( 8 )               :: CAIR
+      REAL( 8 )               :: SEAWATER
+      LOGICAL                 :: OPEN_WATER
 
 #ifdef mchem_stats
       CHARACTER( 16 ), SAVE              :: CTM_MCHEMSTATS_1 = 'CTM_MCHEMSTATS_1'
@@ -190,6 +185,24 @@ C.. Cloud chemistry related
            REAL(8), INTENT( OUT )   :: ALFA3_CV( :,:,: )
            REAL(8), INTENT( OUT )   :: PRATE1_CV( :,:,: )
          END SUBROUTINE CONVCLD_ACM
+
+         SUBROUTINE MCHEM_CHEM ( CGRID, TA, PRES, DENSI, OPEN_WATER_IN,
+     &                           SEAWATER_IN, CAIR_IN, QV,
+     &                           CHEMSTEP, LEV, COL, ROW )
+           IMPLICIT NONE
+           REAL, POINTER            :: CGRID( :,:,:,: )
+           REAL(8), INTENT( IN )    :: TA
+           REAL(8), INTENT( IN )    :: PRES
+           REAL(8), INTENT( IN )    :: DENSI
+           LOGICAL, INTENT( IN )    :: OPEN_WATER_IN
+           REAL(8), INTENT( IN )    :: SEAWATER_IN
+           REAL(8), INTENT( IN )    :: CAIR_IN
+           REAL,    INTENT( IN )    :: QV
+           REAL(8), INTENT( IN )    :: CHEMSTEP
+           INTEGER, INTENT( IN )    :: LEV
+           INTEGER, INTENT( IN )    :: COL
+           INTEGER, INTENT( IN )    :: ROW
+         END SUBROUTINE
       END INTERFACE
 
 C**********************************************************************
@@ -238,21 +251,9 @@ C.. Get fractional seawater coverage from the OCEAN file.
             CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
          END IF
 
-        CALL ALLOC_KPP_SPC()
+         CALL ALLOC_KPP_SPC()
 
-        CALL CL_SPCS_DEF()
-
-C.. Set KPP specific values
-        DO SPC = 1, NVAR
-           ATOL(SPC) = 1.0D1
-           RTOL(SPC) = 1.0D-2
-        END DO
-
-C.. Set KPP options
-        ICNTRL(1) = 1 ! 0 - non-autonomous, 1 - autonomous
-        ICNTRL(3) = 4 ! Rodas3
-C.. Alternative KPP options
-        !ICNTRL(3) = 2 ! Ros3
+         CALL CL_SPCS_DEF()
 
 C..Initialize shared photolysis data
          CALL INIT_PHOT_SHARED()
@@ -396,152 +397,27 @@ C.. Convert to molecules/cm3
         END DO
       END DO
 
-      DO LEV = 1, NLAYS
-         DO COL = 1, NCOLS
-            DO ROW = 1, NROWS
+      DO COL = 1, NCOLS
+         DO ROW = 1, NROWS
 
-               CALL Initialize()
+            OPEN_WATER = .FALSE.
+            SEAWATER = REAL(MAX ( 0.0, ( SEAWATER_ZONE( COL,ROW ) - SEAICE (COL,ROW) ) ), dp )
+            IF ( SEAWATER .GT. 0.001D0 ) OPEN_WATER = .TRUE.
 
-               TEMP     = REAL( TA( COL,ROW,LEV ), dp )
-               PRESS    = REAL( PA2ATM * PRES( COL,ROW,LEV ), dp )
-               DENSI    = REAL( DENS( COL,ROW,LEV ), dp )
-               VOL      = REAL( 1.0 / DENSI, dp )
-               OPEN_WATER = .FALSE.
-               SEAWATER = REAL(MAX ( 0.0, ( SEAWATER_ZONE( COL,ROW ) - SEAICE (COL,ROW) ) ), dp )
-               IF ( SEAWATER .GT. 0.001D0 ) OPEN_WATER = .TRUE.
-               CAIR     = ( PRESS/PA2ATM ) / ( TEMP * 8.314510 ) * 6.0221413D17
+            DO LEV = 1, NLAYS
 
-C.. Fill aqueous related data
-               LWC_RS = REAL( WCBAR_RS ( COL,ROW,LEV ), dp)
-               LWC_CV = REAL( WCBAR_CV ( COL,ROW,LEV ), dp)
-               LCL_RS = .FALSE.
-               LCL_CV = .FALSE.
-               LCL    = .FALSE.
-               IF ( LWC_RS .GT. LWC_LIMIT ) LCL_RS = .TRUE.
-               IF ( LWC_CV .GT. LWC_LIMIT ) LCL_CV = .TRUE.
-               IF ( LCL_RS .OR. LCL_CV )    LCL    = .TRUE.
-               IF ( LCL_RS ) THEN
-                  XCL_RS = 1.0D0
-                  GM1_RS = 1.0D0
-                  GM2_RS = 1.0D0
-                  PHI2_RS = 1000.0D0 / 6.022d23 / (LWC_RS * 1.D-3)
-                  WFAC_RS = WETFAC_RS ( COL,ROW,LEV )
-               ELSE
-                  XCL_RS = 0.0D0
-                  GM1_RS = 0.0D0
-                  GM2_RS = 0.0D0
-                  PHI2_RS = 0.0D0
-                  WFAC_RS = 0.0D0
-                  LWC_RS = 0.0D0 ! Reset lwc if below limit
-               END IF
-               IF ( LCL_CV ) THEN
-                  XCL_CV = 1.0D0
-                  GM1_CV = 1.0D0
-                  GM2_CV = 1.0D0
-                  PHI2_CV = 1000.0D0 / 6.022d23 / (LWC_CV * 1.D-3)
-                  WFAC_CV = WETFAC_CV ( COL,ROW,LEV )
-               ELSE
-                  XCL_CV = 0.0D0
-                  GM1_CV = 0.0D0
-                  GM2_CV = 0.0D0
-                  PHI2_CV = 0.0D0
-                  WFAC_CV = 0.0D0
-                  LWC_CV = 0.0D0 ! Reset lwc if below limit
-               END IF
-               TFAC      = ( 298.0D0 - TEMP) / ( 298.0D0 * TEMP );
-               ! Calculate Henry's law coefficients
-               H_SO2  = 1.4D+00  * EXP( 2.9D+03 * TFAC );
-               H_HNO3 = 2.1D+05  * EXP( 8.7D+03 * TFAC );
-               H_CO2  = 3.6D-02  * EXP( 2.2D+03 * TFAC );
-               H_NH3  = 6.1D+01  * EXP( 4.2D+03 * TFAC );
-               H_H2O2 = 8.3D+04  * EXP( 7.4D+03 * TFAC );
-               H_O3   = 1.14D-02 * EXP( 2.3D+03 * TFAC );
-               H_FACD = 8.9D+03  * EXP( 6.1D+03 * TFAC );
-               H_HCL  = 1.9D+01  * EXP( 6.0D+02 * TFAC );
-               H_GLY  = 3.6D+05  * EXP( 0.0D+00 * TFAC );
-               H_MGLY = 3.2D+04  * EXP( 0.0D+00 * TFAC );
-               H_OH   = 3.0D+01  * EXP( 4.5D+03 * TFAC );
-               H_HO2  = 4.0D+03  * EXP( 5.9D+03 * TFAC );
-               H_NO2  = 1.2D-02  * EXP( 2.5D+03 * TFAC );
-               H_HONO = 5.0D+01  * EXP( 4.9D+03 * TFAC );
-               H_HNO4 = 1.2D+04  * EXP( 6.9D+03 * TFAC );
-               H_GLYD = 4.1D+04  * EXP( 4.6D+03 * TFAC );
-               H_AACD = 4.1D+03  * EXP( 6.3D+03 * TFAC );
-               H_FORM = 2.5D0;
-               H_NO3  = 0.6D0;
-               H_CH3O2 = 2.7D0   * EXP( 2.03D+03 * TFAC );
-               H_IEPOX = 3.0D7;
-               H_MHP  = 3.1D+02  * EXP( 5.2D+03 * TFAC );
-               H_PAA  = 8.4D+02  * EXP( 5.3D+03 * TFAC );
-C.. End filling aqueous related data
+               TEMP     = REAL( TA( COL,ROW,LEV ), 8 )
+               PRESS    = REAL( PA2ATM * PRES( COL,ROW,LEV ), 8 )
+               DENSI    = REAL( DENS( COL,ROW,LEV ), 8 )
+               CAIR     = REAL( ( PRESS/PA2ATM ) / ( TEMP * 8.314510 ) * 6.0221413D17, 8 )
 
-               ! Fill CONC gas and aerosols
-               C(:) = 0.0D0
-               ! Init cloud concentrations first, since it impacts aerosol and gas phase concentrations
-               IF ( LCL ) CALL INIT_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
-               DO SPC = 1, NSPEC
-                  IF ( MECH_SPC(SPC)%CGRID_INDEX /= 0 ) THEN
-                     ICGSPC = MECH_SPC(SPC)%CGRID_INDEX
-                     ICSPC  = MECH_SPC(SPC)%CONC_INDEX
-                     C( ICSPC ) = REAL( MAX( CGRID( COL,ROW,LEV,ICGSPC ), CONCMIN), dp )
-                  END IF
-               END DO
+               CALL MCHEM_CHEM ( CGRID, TEMP, PRESS, DENSI, OPEN_WATER,
+     &                           SEAWATER, CAIR, QV( COL,ROW,LEV),
+     &                           CHEMSTEP, LEV, COL, ROW )
 
-               ! Set constant species concentrations
-               C(IND_M)   = 1.0E+06    * CAIR * 1.D-6
-               C(IND_H2)  = 0.56       * CAIR * 1.D-6
-               C(IND_O2)  = 0.2095E+06 * CAIR * 1.D-6
-               C(IND_CH4) = 1.85       * CAIR * 1.D-6
-               C(IND_CO2) = 350.0D0    * CAIR * 1.D-6
-
-               ! Set cloud water
-               IF ( LCL_RS ) C(IND_H2O_RS) = LWC_RS / DENSI * QV_TO_PPM * CAIR * 1.D-6
-               IF ( LCL_CV ) C(IND_H2O_CV) = LWC_CV / DENSI * QV_TO_PPM * CAIR * 1.D-6
-
-               ! Fill water
-               C(IND_H2O) = REAL( MAX( QV_TO_PPM * QV( COL,ROW,LEV ) *CAIR*1.D-6, 0.0 ), dp)
-
-               COEFF_FALLOFF = C(IND_M)
-
-               ! Fill photolysis & heterogeneous rates
-               ! provided in 1/min. here converted to 1/s.
-               DO NPH = 1, KPP_NHETERO
-                  KHETCELL( NPH ) = REAL( KHETERO( NPH, COL, ROW, LEV ) , dp ) / 60.0_dp
-               END DO
-               DO NPH = 1, KPP_NPHOTAB
-                  RJCELL( NPH )   = REAL( RJ( COL,ROW,LEV,NPH ), dp ) / 60.0_dp
-                  IF ( RJCELL( NPH ) .GT. 0.0D0 ) LSUNLIGHT = .TRUE.
-               END DO                         
-
-               ! Perform integration
-               !~~~> Time loop
-               TSTART = 0.0_dp
-               DT     = CHEMSTEP
-               TEND   = TSTART + DT
-
-               CALL Update_RCONST()
-
-               CALL INTEGRATE( TIN = TSTART, TOUT = TSTART+DT, RSTATUS_U = RSTATE,
-     &                         ICNTRL_U = ICNTRL, IERR_U = IERR, ISTATUS_U = ISTATUS )
-
-               !~~~> End Time loop
-               C(:) = MAX(C(:),CONCMIN)
-               ! END integration
-
-               ! Fill CGRID
-               DO SPC = 1, NSPEC
-                  IF ( MECH_SPC(SPC)%CGRID_INDEX /= 0 ) THEN
-                     ICGSPC = MECH_SPC(SPC)%CGRID_INDEX
-                     ICSPC  = MECH_SPC(SPC)%CONC_INDEX
-                     CGRID( COL,ROW,LEV,ICGSPC ) = REAL( C( ICSPC ), 4 )
-                  END IF
-               END DO
-
-               IF ( LCL ) CALL EVAP_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), WFAC_RS, WFAC_CV, DT )
-
-            END DO ! ROW
-         END DO ! COL
-      END DO ! LEV
+            END DO ! LEV
+         END DO ! ROW
+      END DO ! COL
 
 C.. Convert to molar mixing ratio (by volume)
       DO LEV = 1, NLAYS

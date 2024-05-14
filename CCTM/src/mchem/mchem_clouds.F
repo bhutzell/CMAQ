@@ -22,7 +22,7 @@
 
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
-      USE mchem_Model
+      USE mchem_Precision, ONLY: dp
 
       IMPLICIT NONE
 
@@ -370,6 +370,10 @@ C..   Report cloud species definitions to log-file
       END SUBROUTINE CL_SPCS_DEF
 
       SUBROUTINE INIT_CLOUDS ( CONC, C, LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
+
+        USE mchem_Parameters, ONLY: IND_Hp_RS, IND_OHm_RS, IND_O2_RS,
+     &                              IND_Hp_CV, IND_OHm_CV, IND_O2_CV
+        USE mchem_Global,     ONLY: TEMP, PRESS
 
         IMPLICIT NONE
         REAL,     INTENT ( INOUT ) :: CONC( N_CGRID_SPC )    !  species concentration in cell
@@ -797,6 +801,9 @@ C..Local Variables:
       End Subroutine set_aeconcmin
 
       INTEGER FUNCTION INDEX_KPP( NAME )
+
+        USE MCHEM_PARAMETERS, ONLY: NSPEC
+        USE MCHEM_MONITOR,    ONLY: SPC_NAMES
 
         IMPLICIT NONE
 
