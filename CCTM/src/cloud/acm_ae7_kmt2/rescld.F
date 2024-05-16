@@ -77,10 +77,6 @@ C-----------------------------------------------------------------------
       USE PHOT_MOD,      ONLY: RJ, RJ_RES, RJ_SUB, LH2O2, LHNO3
       USE CENTRALIZED_IO_MODULE
 
-#ifdef kpp_cloud
-      USE AQ_DATA,       ONLY: WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS
-#endif
-
       IMPLICIT NONE
 
 C...........Includes:
@@ -266,26 +262,7 @@ C...  the met timestep in hours
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
-#ifdef kpp_cloud
-        ALLOCATE ( WCBAR_RS ( NCOLS, NROWS, NLAYS ),
-     &             WETFAC_RS( NCOLS, NROWS, NLAYS ),
-     &             ALFA0_RS ( NCOLS, NROWS, NLAYS ),
-     &             ALFA3_RS ( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
-        IF ( ALLOCSTAT .NE. 0 ) THEN
-          XMSG = '*** Error allocating WCBAR_RS, WETFAC_RS, ALFA0_RS, and ALFA3_RS'
-          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-        END IF
-#endif
-
       END IF  ! FIRSTIME
-
-#ifdef kpp_cloud
-      ! reset resolved cloud lwc, wet deposition rate & ALFA3
-      WCBAR_RS  = 0.0D0
-      WETFAC_RS = 0.0D0
-      ALFA0_RS  = 0.0D0
-      ALFA3_RS  = 0.0D0
-#endif
 
       MDATE = JDATE
       MTIME = JTIME
@@ -523,21 +500,6 @@ C...  then perform the aqueous chemistry within the cloud and
 C...  re-adjust the ending and removed amounts for those species
 C...  that participated in cloud chemistry
 
-#ifdef kpp_cloud
-                IF ( WCBAR .GT. 0.00001 ) THEN
-                   WCBAR_RS  ( COL, ROW, LAY ) = WCBAR
-                   WETFAC_RS ( COL, ROW, LAY ) = REAL( WTBAR * 1000.0D0 * CTHK1 * 3600.0D0 /
-     &                                           ( 1000.0D0 * MAX( 1.0D-20, PRATE1 ) ), 8 )
-                   WETFAC_RS ( COL, ROW, LAY ) = 1.0D0 /  WETFAC_RS ( COL, ROW, LAY )
-                   ALFA0_RS  ( COL, ROW, LAY ) = ALFA0
-                   ALFA3_RS  ( COL, ROW, LAY ) = ALFA3
-                ELSE
-                   WCBAR_RS  ( COL, ROW, LAY ) = 0.0D0
-                   WETFAC_RS ( COL, ROW, LAY ) = 0.0D0
-                   ALFA0_RS  ( COL, ROW, LAY ) = 0.0D0
-                   ALFA3_RS  ( COL, ROW, LAY ) = 0.0D0
-                END IF
-#else
                 IF ( WCBAR .GT. 0.00001 ) THEN
 
 C...  calculate cosine of zenith angle for the cell and determine day or night; Golam Sarwar 
@@ -561,7 +523,6 @@ C...  calculate cosine of zenith angle for the cell and determine day or night; 
      &                          ALFA2, ALFA3, COSZ )
 
                 END IF
-#endif
 
 C...convert from moles/m**2 to kg/m**2 and kg/m**2 to kg/hectare
 

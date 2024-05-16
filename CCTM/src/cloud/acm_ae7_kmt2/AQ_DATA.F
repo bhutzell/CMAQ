@@ -375,17 +375,6 @@ C for TX version
 
       Logical, Private, Save :: mapped = .False.
 
-#ifdef kpp_cloud
-      Real( 8 ), Allocatable   :: WCBAR_RS ( :,:,: )
-      Real( 8 ), Allocatable   :: WCBAR_CV ( :,:,: )
-      Real( 8 ), Allocatable   :: WETFAC_RS ( :,:,: )
-      Real( 8 ), Allocatable   :: WETFAC_CV ( :,:,: )
-      Real( 8 ), Allocatable   :: ALFA0_RS ( :,:,: )
-      Real( 8 ), Allocatable   :: ALFA0_CV ( :,:,: )
-      Real( 8 ), Allocatable   :: ALFA3_RS ( :,:,: )
-      Real( 8 ), Allocatable   :: ALFA3_CV ( :,:,: )
-#endif
-
       Contains
  
 C------------------------------------------------------------------------
