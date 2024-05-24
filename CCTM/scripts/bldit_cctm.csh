@@ -160,13 +160,12 @@ set make_options = "-j"                #> additional options for make command if
  endif
 
  # Uncomment if mchem is used
- #setenv ChemSolver mchem
+ setenv ChemSolver mchem
                                          
  if ( $ChemSolver == ebi ) then             
     set ModGas    = gas/${ChemSolver}_${Mechanism}
  else if ( $ChemSolver == mchem ) then
     set ModGas    = mchem
-    set ModCloud  = cloud/acm_ae7_kmt2
     set ModAero   = aero/aero7
  else
     set ModGas    = gas/${ChemSolver}
@@ -207,7 +206,7 @@ set make_options = "-j"                #> additional options for make command if
  set F90_FLAGS  = "${myFRFLAGS}"           #> F90 flags
 
  if ( $ChemSolver == mchem ) then
-    set CPP_FLAGS  = "-Dkpp_cloud -Dmchem_stats"   #> Fortran preprocessor flags
+    set CPP_FLAGS  = "-Dmchem_opt -Dmchem_stats"   #> Fortran preprocessor flags
  else
     set CPP_FLAGS  = ""              #> Fortran preprocessor flags
  endif
@@ -673,10 +672,12 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "Module ${ModAero};"                                         >> $Cfile
  echo                                                              >> $Cfile
 
- set text = "acm_ae6, acm_ae6_kmt, acm_ae7_kmt2, acm_ae6_mp, acm_ae7"
- echo "// options are" $text                                       >> $Cfile
- echo "Module ${ModCloud};"                                        >> $Cfile
- echo                                                              >> $Cfile
+ if ( $ChemSolver != mchem ) then
+    set text = "acm_ae6, acm_ae6_kmt, acm_ae7_kmt2, acm_ae6_mp, acm_ae7"
+    echo "// options are" $text                                    >> $Cfile
+    echo "Module ${ModCloud};"                                     >> $Cfile
+    echo                                                           >> $Cfile
+ endif
 
  set text = "// compile for inline process analysis"
  echo $text                                                        >> $Cfile

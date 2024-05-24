@@ -156,7 +156,7 @@ C Local Variables:
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( : )
          END SUBROUTINE PHOT
-#ifndef kpp_cloud
+#ifndef mchem_opt
          SUBROUTINE CLDPROC ( CGRID, JDATE, JTIME, TSTEP )
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
@@ -278,7 +278,7 @@ C decouple CGRID for cloud and chemistry
       IF ( CKSUM ) CALL CKSUMMER ( 'PHOT', CGRID, JDATE, JTIME )
       IF ( PRINT_PROC_TIME ) CALL TIMING_SPLIT ( CPU_TIME_START, 1, 'PHOT' )
 
-#ifndef kpp_cloud
+#ifndef mchem_opt
       CALL CLDPROC ( CGRID, JDATE, JTIME, TSTEP )
       IF ( CKSUM ) CALL CKSUMMER ( 'CLDPROC', CGRID, JDATE, JTIME )
       IF ( BUDGET_DIAG .OR. LIPR ) CALL PA_UPDATE_PROC ( IPR_CLDS, CGRID, SDATE, STIME, TSTEP, .FALSE. )
