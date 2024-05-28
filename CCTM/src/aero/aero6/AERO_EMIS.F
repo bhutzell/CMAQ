@@ -173,8 +173,8 @@ C-----------------------------------------------------------------------
          USE SSEMIS, ONLY:    SSEMIS_INIT
          USE UTILIO_DEFN
          USE VDIFF_MAP, ONLY : N_SPC_DIFF, DIFF_SPC
-     
-         INCLUDE SUBST_CONST     ! physical and mathematical constants
+         USE CONST
+
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments:

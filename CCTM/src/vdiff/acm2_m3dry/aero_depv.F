@@ -505,7 +505,7 @@ C *** calculate inverses:
             ESM20 = 1.0 / ES20
             ESM32 = 1.0 / ES32
 
-            DCONST  = BOLTZMANN * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU( C,R ) )
+            DCONST  = DKBOLTZ * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU( C,R ) )
             DCONST1 = DCONST / DG( C,R,IM )
 
             DCONST2 = GRAV / ( 18.0 * AMU( C,R ) )

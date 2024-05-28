@@ -242,12 +242,12 @@ C *** local variables
       REAL( 8 ) :: CGR( N_MODE-1 ) ! Aitken & Accum. modes
 
       REAL( 8 ) :: LAMDA      ! mean free path [ m ]
-      REAL( 8 ) :: KNC        ! KNC = TWO3 * BOLTZMANN *  AIRTEMP / AMU
+      REAL( 8 ) :: KNC        ! KNC = TWO3 * DKBOLTZ *  AIRTEMP / AMU
 
 C *** Free Molecular regime (depends upon modal density)
-      REAL( 8 ) :: KFMAT      ! = SQRT( 3.0*BOLTZMANN * AIRTEMP / PDENSAT )
-      REAL( 8 ) :: KFMAC      ! = SQRT( 3.0*BOLTZMANN * AIRTEMP / PDENSAC )
-      REAL( 8 ) :: KFMATAC    ! = SQRT( 6.0*BOLTZMANN * AIRTEMP / ( PDENSAT + PDENSAC ) )
+      REAL( 8 ) :: KFMAT      ! = SQRT( 3.0*DKBOLTZ * AIRTEMP / PDENSAT )
+      REAL( 8 ) :: KFMAC      ! = SQRT( 3.0*DKBOLTZ * AIRTEMP / PDENSAC )
+      REAL( 8 ) :: KFMATAC    ! = SQRT( 6.0*DKBOLTZ * AIRTEMP / ( PDENSAT + PDENSAC ) )
 
 C *** Intermodal coagulation rates [ m**3/s ] ( 0th & 2nd moments )
       REAL( 8 ) :: BATAC( 2 ) ! Aitken to accumulation
@@ -276,13 +276,13 @@ C *** variables for advancing concentrations one time step
       REAL( 8 ) :: LOSS, PROD, POL
       REAL         TMASS
       REAL         FACTRANS ! special factor to compute mass transfer
-      REAL         M30(3), M20(3), M00(3)      ! for initial condidtions in time stepping
+      REAL         M30(3), M20(3), M00(3)      ! for initial conditions in time stepping
 
 C *** Variables for mode merging
       REAL         GETAF
       REAL         AAA, XNUM, XM2, XM3,XXM2, XXM3
       REAL         FNUM, FM2, FM3, PHNUM, PHM2, PHM3
-      REAL         ERF, ERFC    ! Error and complementary error function
+!      REAL         ERFC    ! Error and complementary error function
 
 C *** local variables
       INTEGER      SPC        ! loop counter
@@ -359,12 +359,12 @@ C *** Update size parameters (distribution is wet from ORGAER)
       LAMDA    = XLM
 
 ! *** calculate term used in Equation A6 of Binkowski & Shankar (1995)
-      KNC      = TWOTHIRDS * BOLTZMANN *  AIRTEMP / AMU
+      KNC      = TWOTHIRDS * DKBOLTZ *  AIRTEMP / AMU
 
 ! *** calculate terms used in Equation A5 of Binkowski & Shankar (1995)
-      KFMAT    = SQRT( 3.0 * BOLTZMANN * AIRTEMP / AEROMODE_DENS( 1 ) )
-      KFMAC    = SQRT( 3.0 * BOLTZMANN * AIRTEMP / AEROMODE_DENS( 2 ) )
-      KFMATAC  = SQRT( 6.0 * BOLTZMANN * AIRTEMP
+      KFMAT    = SQRT( 3.0 * DKBOLTZ * AIRTEMP / AEROMODE_DENS( 1 ) )
+      KFMAC    = SQRT( 3.0 * DKBOLTZ * AIRTEMP / AEROMODE_DENS( 2 ) )
+      KFMATAC  = SQRT( 6.0 * DKBOLTZ * AIRTEMP
      &         / ( AEROMODE_DENS( 1 ) + AEROMODE_DENS( 2 ) ) )
 
 ! *** transfer of number to accumulation mode from Aitken mode is zero
@@ -1744,11 +1744,8 @@ C   1. Binkowski, F.S. and U. Shankar, The regional particulate matter
 C      model 1. Model description and preliminary results, J. Geophys.
 C      Res., Vol 100, No D12, 26101-26209, 1995.
 
+      USE CONST
       IMPLICIT NONE
-
-C *** Includes:
-
-      INCLUDE SUBST_CONST     ! physical and mathematical constants
 
 C *** Arguments:
 
@@ -2805,9 +2802,8 @@ C   Technology, 20:253-265, 1994.
  
 C-----------------------------------------------------------------------
 
+      USE CONST, ONLY : PI
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST    ! for PI
 
 C    Input variables
       REAL, INTENT( IN ) :: DGN     ! geometric mean Stokes diameter by number [ m ]
@@ -2926,12 +2922,11 @@ C   Angeles Basin during CalNex, Journ. Geophys. Res., 2013.
 
 C-----------------------------------------------------------------------
 
-      USE AERO_DATA, ONLY : MIN_SIGMA_G, MAX_SIGMA_G
+      USE AERO_DATA, ONLY    : MIN_SIGMA_G, MAX_SIGMA_G
+      USE CONST, ONLY        : PI
       USE AEROMET_DATA, ONLY : F6PI, PI6
 
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST    ! for PI
 
 C    Input variables
       REAL, INTENT( IN ) :: M3_WET  ! Third Moment of Wet Distribution (m3/m3)
@@ -3392,9 +3387,8 @@ C          Feb 2020 B.Murphy: Created this number synthesizer
 C 
 C-----------------------------------------------------------------------
 
+      USE CONST, ONLY : PI
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST    ! for PI
 
 C    Input variables
       REAL, INTENT( IN ) :: DGN     ! geometric mean Stokes diameter by NUMBER [ m ]
@@ -3413,11 +3407,6 @@ C    Internal variables
       REAL ERF1, ERF2 ! argument of ERF, from Step#6 of Jiang et al. (2006)
       REAL ERFARG
       REAL DG         ! Internal units for median diameter
-
-C *** Error function approximation, from Meng & Seinfeld (1994)
-      REAL ERF        ! Error function
-      REAL XX         ! dummy argument for ERF
-      ERF( XX )  = SIGN( 1.0, XX ) * SQRT( 1.0 - EXP( -4.0 * XX * XX / PI ) )
 
 C ----------------------- Begin solution -------------------------------
 

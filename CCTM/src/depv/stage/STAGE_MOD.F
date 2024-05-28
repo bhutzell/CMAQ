@@ -881,7 +881,7 @@ C *** calculate inverses:
             ESM20 = 1.0 / ES20
             ESM32 = 1.0 / ES32
 
-            DCONST  = BOLTZMANN * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU )
+            DCONST  = DKBOLTZ * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU )
             DCONST1 = DCONST / DG( IM )
 
             DCONST2 = GRAV / ( 18.0 * AMU )
