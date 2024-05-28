@@ -242,12 +242,12 @@ C *** local variables
       REAL( 8 ) :: CGR( N_MODE-1 ) ! Aitken & Accum. modes
 
       REAL( 8 ) :: LAMDA      ! mean free path [ m ]
-      REAL( 8 ) :: KNC        ! KNC = TWO3 * DKB *  AIRTEMP / AMU
+      REAL( 8 ) :: KNC        ! KNC = TWO3 * DKBOLTZ *  AIRTEMP / AMU
 
 C *** Free Molecular regime (depends upon modal density)
-      REAL( 8 ) :: KFMAT      ! = SQRT( 3.0*DKB * AIRTEMP / PDENSAT )
-      REAL( 8 ) :: KFMAC      ! = SQRT( 3.0*DKB * AIRTEMP / PDENSAC )
-      REAL( 8 ) :: KFMATAC    ! = SQRT( 6.0*DKB * AIRTEMP / ( PDENSAT + PDENSAC ) )
+      REAL( 8 ) :: KFMAT      ! = SQRT( 3.0*DKBOLTZ * AIRTEMP / PDENSAT )
+      REAL( 8 ) :: KFMAC      ! = SQRT( 3.0*DKBOLTZ * AIRTEMP / PDENSAC )
+      REAL( 8 ) :: KFMATAC    ! = SQRT( 6.0*DKBOLTZ * AIRTEMP / ( PDENSAT + PDENSAC ) )
 
 C *** Intermodal coagulation rates [ m**3/s ] ( 0th & 2nd moments )
       REAL( 8 ) :: BATAC( 2 ) ! Aitken to accumulation
@@ -359,12 +359,12 @@ C *** Update size parameters (distribution is wet from ORGAER)
       LAMDA    = XLM
 
 ! *** calculate term used in Equation A6 of Binkowski & Shankar (1995)
-      KNC      = TWOTHIRDS * DKB *  AIRTEMP / AMU
+      KNC      = TWOTHIRDS * DKBOLTZ *  AIRTEMP / AMU
 
 ! *** calculate terms used in Equation A5 of Binkowski & Shankar (1995)
-      KFMAT    = SQRT( 3.0 * DKB * AIRTEMP / AEROMODE_DENS( 1 ) )
-      KFMAC    = SQRT( 3.0 * DKB * AIRTEMP / AEROMODE_DENS( 2 ) )
-      KFMATAC  = SQRT( 6.0 * DKB * AIRTEMP
+      KFMAT    = SQRT( 3.0 * DKBOLTZ * AIRTEMP / AEROMODE_DENS( 1 ) )
+      KFMAC    = SQRT( 3.0 * DKBOLTZ * AIRTEMP / AEROMODE_DENS( 2 ) )
+      KFMATAC  = SQRT( 6.0 * DKBOLTZ * AIRTEMP
      &         / ( AEROMODE_DENS( 1 ) + AEROMODE_DENS( 2 ) ) )
 
 ! *** transfer of number to accumulation mode from Aitken mode is zero

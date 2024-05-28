@@ -102,8 +102,8 @@ MODULE const
   !REAL( 8 ), PARAMETER :: DKBOLTZ  = 1.380649D-23 
 
   ! Exact definition. Source: NIST 2019
-  !REAL,      PARAMETER :: RGASUNIV  = AVO  * KB
-  !REAL( 8 ), PARAMETER :: DRGASUNIV = DAVO * DKB
+  !REAL,      PARAMETER ::  RGASUNIV =  AVO * KBOLTZ
+  !REAL( 8 ), PARAMETER :: DRGASUNIV = DAVO * DKBOLTZ
 
   ! standard atmosphere  [ Pa ]
   REAL,      PARAMETER :: STDATMPA = 101325.0

@@ -696,11 +696,8 @@ C Variables for calculating dry surface-area emission rate for accum mode
 
             LOGICAL, SAVE :: FIRSTIME      = .TRUE.
 
-C Mathematical constants; statement function for ERF approximation
+C Mathematical constants
             REAL, PARAMETER      :: TWO3 = 2.0 / 3.0
-            REAL                 :: ERF        ! ERF approx. statement function
-            REAL                 :: X          ! dummy argument for ERF
-            ERF( X ) = SIGN( 1.0, X ) * SQRT( 1.0 - EXP( -4.0 * X * X / PI ) )
 
 C----------------------------- Begin calc ------------------------------
 
