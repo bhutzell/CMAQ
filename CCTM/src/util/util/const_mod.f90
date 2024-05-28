@@ -81,25 +81,29 @@ MODULE const
   ! The NIST Reference on Constants, Units, and Uncertainty. US National
   ! Institute of Standards and Technology. June 2015. Retrieved 2017-04-21.
 
+  ! universal gas constant [ J/mol-K ]
+ REAL, PARAMETER :: RGASUNIV = 8.314510
+ ! The NIST Reference on Constants, Units, and Uncertainty. US National
+ ! Institute of Standards and Technology. June 2015. Retrieved 2017-04-21.
+ ! http://physics.nist.gov/cgi-bin/cuu/Value?r
+ REAL( 8 ), PARAMETER :: DRGASUNIV = 8.314459848D0
+
+  ! Boltzmann Constant [ J K-1 ]
+ REAL,     PARAMETER ::  KBOLTZ =  RGASUNIV / AVO
+ REAL( 8), PARAMETER :: DKBOLTZ = DRGASUNIV / DAVO
+
   ! Exact definition. Source: NIST 2019 
   !REAL,      PARAMETER :: AVO  = 6.02214076E23 
   !REAL( 8 ), PARAMETER :: DAVO = 6.02214076D23
 
   ! Boltzmann Constant [ J K-1 ]
   ! Exact definition. Source: NIST 2019
-  REAL,      PARAMETER :: KBOLTZ   = 1.380649E-23 
-  REAL( 8 ), PARAMETER :: DKBOLTZ  = 1.380649D-23 
-
-  ! universal gas constant [ J/mol-K ]
- !REAL, PARAMETER :: RGASUNIV = 8.314510
- ! The NIST Reference on Constants, Units, and Uncertainty. US National
- ! Institute of Standards and Technology. June 2015. Retrieved 2017-04-21.
- ! http://physics.nist.gov/cgi-bin/cuu/Value?r
- !REAL( 8 ), PARAMETER :: DRGASUNIV = 8.314459848D0
+  !REAL,      PARAMETER :: KBOLTZ   = 1.380649E-23 
+  !REAL( 8 ), PARAMETER :: DKBOLTZ  = 1.380649D-23 
 
   ! Exact definition. Source: NIST 2019
-  REAL,      PARAMETER :: RGASUNIV  = AVO  * KB
-  REAL( 8 ), PARAMETER :: DRGASUNIV = DAVO * DKB
+  !REAL,      PARAMETER :: RGASUNIV  = AVO  * KB
+  !REAL( 8 ), PARAMETER :: DRGASUNIV = DAVO * DKB
 
   ! standard atmosphere  [ Pa ]
   REAL,      PARAMETER :: STDATMPA = 101325.0
