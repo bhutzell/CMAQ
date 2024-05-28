@@ -579,7 +579,7 @@ C-----------------------------------------------------------------------
 
             USE UTILIO_DEFN
             USE AERO_DATA
-            USE AEROMET_DATA   ! Includes CONST.EXT
+            USE AEROMET_DATA   ! Includes CONST module
             USE ASX_DATA_MOD, ONLY: MET_DATA, GRID_DATA, svp2, svp3
 #ifdef mpas
             use coupler_module, only : cell_vol, cell_thickness
