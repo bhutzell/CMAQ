@@ -30,14 +30,15 @@ C
 C SH  03/10/11 renamed file and module from MET_DATA to AEROMET_DATA
 C----------------------------------------------------------------------
 
+      Use const
       Implicit None
-      INCLUDE SUBST_CONST
+!     INCLUDE SUBST_CONST
 
       Real( 8 ), Parameter :: f6dpi = 6.0D0 / dpi
       Real,      Parameter :: f6pi = 6.0 / pi
       Real( 8 ), Parameter :: dpi6 = dpi / 6.0D0
       Real,      Parameter :: pi6 = pi / 6.0
-      Real( 8 ), Parameter :: dkboltz = drgasuniv / davo   ! [J/K ] 
+!     Real( 8 ), Parameter :: dkboltz = drgasuniv / davo   ! [J/K ] 
 
 C Concentration lower limit used for gas species
       Real,      Parameter :: min_gasconc = 1.0E-30        ! [ ug/m^3 ]

@@ -211,10 +211,10 @@ MODULE const
          ERF = SIGN( 1.0, X ) * SQRT( 1.0 - EXP( -4.0 * X * X / PI ) )
       END FUNCTION ERF
 !
-      REAL FUNCTION ERFC( X )
-         REAL, INTENT( IN ) :: X
-         ERFC = 1.0 - ERF( X )
-      END FUNCTION ERFC
+!      REAL FUNCTION ERFC( X )
+!         REAL, INTENT( IN ) :: X
+!         ERFC = 1.0 - ERF( X )
+!      END FUNCTION ERFC
 
 END MODULE const
 
