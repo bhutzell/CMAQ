@@ -17,13 +17,6 @@
 !  subject to their copyright restrictions.                             !
 !-----------------------------------------------------------------------!
 
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/JPROC/src/driver/jproc_table/calczen.F,v 1.5 2011/10/29 01:03:52 sjr Exp $ 
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C @(#)calczen.F	1.2 /project/mod3/JPROC/src/driver/jproc_table/SCCS/s.calczen.F 04 Jun 1997 10:48:01
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE CALCZEN ( LAT, LONG, IDATE, GMT, ZENITH )
         
@@ -43,9 +36,8 @@ C       Zenith
 C
 C*********************************************************************
 
+      USE CONST, ONLY: PI180
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST        ! commonly used constants
 
 C...........ARGUMENTS and their descriptions:
 
