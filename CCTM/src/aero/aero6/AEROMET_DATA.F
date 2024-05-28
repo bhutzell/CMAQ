@@ -30,8 +30,8 @@ C
 C SH  03/10/11 renamed file and module from MET_DATA to AEROMET_DATA
 C----------------------------------------------------------------------
 
-      Use const
       Implicit None
+      include subst_const
 
       Real( 8 ), Parameter :: f6dpi = 6.0D0 / dpi
       Real,      Parameter :: f6pi = 6.0 / pi
