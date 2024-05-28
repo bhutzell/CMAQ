@@ -33,7 +33,7 @@ MODULE const
 !   Snyder, J.P., Map Projections-A Working Manual, U.S. Geological Survey
 !     Paper 1395 U.S.GPO, Washington, DC, 1987.
 !
-!   Stull, R.B., An Introduction to Bounday Layer Meteorology, Kluwer, 
+!   Stull, R.B., An Introduction to Boundary Layer Meteorology, Kluwer, 
 !     Dordrecht, 1988
 !
 !   NIST, The International System of Units (SI). Newell, D.B. and 
@@ -76,19 +76,19 @@ MODULE const
 !                         specified otherwise)
 
   ! Avogadro's Constant [ number/mol ] 
- !REAL,      PARAMETER :: AVO  = 6.0221367E23
- !REAL( 8 ), PARAMETER :: DAVO = 6.02214085774D23
+  REAL,      PARAMETER :: AVO  = 6.0221367E23
+  REAL( 8 ), PARAMETER :: DAVO = 6.02214085774D23
   ! The NIST Reference on Constants, Units, and Uncertainty. US National
   ! Institute of Standards and Technology. June 2015. Retrieved 2017-04-21.
 
   ! Exact definition. Source: NIST 2019 
-  REAL,      PARAMETER :: AVO  = 6.02214076E23 
-  REAL( 8 ), PARAMETER :: DAVO = 6.02214076D23
+  !REAL,      PARAMETER :: AVO  = 6.02214076E23 
+  !REAL( 8 ), PARAMETER :: DAVO = 6.02214076D23
 
   ! Boltzmann Constant [ J K-1 ]
   ! Exact definition. Source: NIST 2019
-  REAL,      PARAMETER :: KB   = 1.380649E-23 
-  REAL( 8 ), PARAMETER :: DKB  = 1.380649D-23 
+  REAL,      PARAMETER :: KBOLTZ   = 1.380649E-23 
+  REAL( 8 ), PARAMETER :: DKBOLTZ  = 1.380649D-23 
 
   ! universal gas constant [ J/mol-K ]
  !REAL, PARAMETER :: RGASUNIV = 8.314510
@@ -202,15 +202,15 @@ MODULE const
 
 ! ERF and ERFC are intrinsic functions as of Fortran 2008. 
 ! Approximation for error function, from Meng & Seinfeld (1994)
-!      REAL FUNCTION ERF( X )
-!         REAL, INTENT( IN )  :: X                
-!         ERF = SIGN( 1.0, X ) * SQRT( 1.0 - EXP( -4.0 * X * X / PI ) )
-!      END FUNCTION ERF
+      REAL FUNCTION ERF( X )
+         REAL, INTENT( IN )  :: X                
+         ERF = SIGN( 1.0, X ) * SQRT( 1.0 - EXP( -4.0 * X * X / PI ) )
+      END FUNCTION ERF
 !
-!      REAL FUNCTION ERFC( X )
-!         REAL, INTENT( IN ) :: X
-!         ERFC = 1.0 - ERF( X )
-!      END FUNCTION ERFC
+      REAL FUNCTION ERFC( X )
+         REAL, INTENT( IN ) :: X
+         ERFC = 1.0 - ERF( X )
+      END FUNCTION ERFC
 
 END MODULE const
 
