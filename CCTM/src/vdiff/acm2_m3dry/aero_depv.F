@@ -321,7 +321,7 @@ C                     Note that this version only works for NLCD40, MODIS20 or U
 C-----------------------------------------------------------------------
 
       USE GRID_CONF, Only: ncols, nrows
-      USE AEROMET_DATA   ! Includes CONST.EXT
+      USE AEROMET_DATA   ! Includes CONST module
       USE ASX_DATA_MOD, Only: Met_Data, Grid_Data !, Mosaic_Data
       USE AERO_DATA, Only: N_MODE
       Use LSM_Mod, Only: N_LUFRAC

@@ -1036,9 +1036,8 @@ C     multmodal atmospheric particle size distributions, Atmospheric
 C     Environment, vol. 11, pp 95-999, 1977.
 C-----------------------------------------------------------------------
 
+      USE CONST, ONLY: PI, PI180
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST      ! physical constants
 
 C***arguments
 
@@ -1177,7 +1176,7 @@ C***FSB start calculation
 C FSB check range of SIGMA_G
 C *** Maximum value of SIGMA_G allowed is 2.0
       SIGMA_G = MIN( 2.0, SIGMA_G )
-C *** Minimum allowed value fo SIGMA_F is 1.05
+C *** Minimum allowed value of SIGMA_G is 1.05
       SIGMA_G = MAX( 1.05, SIGMA_G )
 
       XLNSIG2 = XLNSIG * XLNSIG
@@ -1188,7 +1187,7 @@ C *** Minimum allowed value fo SIGMA_F is 1.05
 
 C***evaluate polynomials
 C***  optimize for piplined microprocessor
-C***  appproach recommended by Dr. Carlie Coats
+C***  approach recommended by Dr. Carlie Coats
 
       NN = NR1 * NR1
 
@@ -1230,7 +1229,7 @@ C     1.0 / 0.95 = 1.052632.  1.0 / 0.95 * 0.13 = 0.136842
 
 C***evaluate more polynomials
 C***  optimize for piplined microprocessor
-C***  appproach recommended by Dr. Carlie Coats
+C***  approach recommended by Dr. Carlie Coats
 
          TT = TAU * TAU
          T1G1 = G1A0 + G1A1 * TAU
@@ -1513,18 +1512,15 @@ C     multmodal atmospheric particle size distributions, Atmospheric
 C     Environment, vol. 11, pp 95-999, 1977.
 C-----------------------------------------------------------------------
 
+      USE CONST, ONLY: PI, PI180
       IMPLICIT NONE
-
-C***include files
-
-      INCLUDE SUBST_CONST      ! physical constants
 
 C***arguments
 
       REAL, INTENT( IN )     :: NR, NI     ! indices of refraction
       REAL, INTENT( IN )     :: LAMBDA     ! wavelength, nm
       REAL, INTENT( IN )     :: DGN        ! geometric mean diameter, m
-      REAL, INTENT( INOUT )  :: SIGMA_G     ! geometric standard deviation
+      REAL, INTENT( INOUT )  :: SIGMA_G    ! geometric standard deviation
 
       REAL, INTENT( OUT )    :: BETA_EXT   ! normalized extinction coefficient
       REAL, INTENT( OUT )    :: BETA_SCAT  ! normalized scattering coefficient
@@ -1676,7 +1672,7 @@ C***FSB start calculation
 
 C***evaluate polynomials
 C***  optimize for piplined microprocessor
-C***  appproach recommended by Dr. Carlie Coats
+C***  approach recommended by Dr. Carlie Coats
 
       NN = NR1 * NR1
 

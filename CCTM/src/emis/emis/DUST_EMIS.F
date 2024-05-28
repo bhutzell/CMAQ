@@ -1228,9 +1228,8 @@ C                           ustr( c,r,m ),
 C                           sd_ep( c,r ),
 C                           dens( c,r ) )
 
+            use const, only: grav
             implicit none
-
-            include SUBST_CONST   ! for grav
 
             integer, intent( in ) :: ndp
             real,    intent( in ) :: dp( ndp )

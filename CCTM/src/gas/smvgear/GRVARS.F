@@ -17,17 +17,12 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/gas/smvgear/GRVARS.F,v 1.3 2011/10/21 16:11:12 yoj Exp $
-
       MODULE GRVARS
 
 !     USE GRID_CONF, ONLY: BLKSIZE  ! horizontal & vertical domain specifications
       USE GRID_CONF                 ! horizontal & vertical domain specifications
 
       IMPLICIT NONE
-
 
 C......................................................................
 C  INCLUDE FILE: GRPARMS.EXT
@@ -371,11 +366,9 @@ C Estimated stiffness of each cell
             USE RXNS_DATA
             USE UTILIO_DEFN
             USE RXNS_FUNCTION
+            USE CONST
 
             IMPLICIT NONE
-
-C.....Includes:
-            INCLUDE SUBST_CONST          ! common constants
 
             INTEGER, INTENT( IN ) :: JDATE, JTIME
             INTEGER :: IOS, N

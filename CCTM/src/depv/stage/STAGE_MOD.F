@@ -96,11 +96,11 @@ C  and aerosol exchange subroutines.
 C-----------------------------------------------------------------------
          USE NH3_BIDI_MOD
          USE MOSAIC_MOD, Only: Tile_Data
+         USE CONST
 
          Implicit None        
  
          Include SUBST_FILES_ID  ! file name parameters
-         Include SUBST_CONST     ! constants
 
 C Arguments:
          Integer, Intent( IN ) :: JDATE, JTIME      ! internal simulation date&time

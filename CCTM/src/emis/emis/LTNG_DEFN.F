@@ -132,7 +132,6 @@
          IMPLICIT NONE
 
 !C Includes:
-         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 !C Arguments:
@@ -378,7 +377,6 @@
 #endif
          IMPLICIT NONE
 
-         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
          INTEGER JDATE, JTIME, TSTEP( 3 )
@@ -430,10 +428,6 @@
 
          REAL :: LOC_VGTOP_GD
 
-C statement function for ERF approximation
-         REAL              :: ERF                ! ERF approx. statement function
-         REAL              :: X                  ! dummy argument for ERF
-         ERF( X ) = SIGN( 1.0, X ) * SQRT( 1.0 - EXP( -4.0 * X * X / PI ) )
 !-----------------------------------------------------------------------
          
          CALL UPCASE(LTNG_FNAME)

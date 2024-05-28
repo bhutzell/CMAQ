@@ -989,15 +989,9 @@ C-----------------------------------------------------------------------
       Use cgrid_spcs            ! CGRID mechanism species
       Use aero_data
       Use utilio_defn
+      Use const
 
       Implicit None
-
-C..Includes:
-      Include SUBST_CONST               ! constants
-
-C..Functions:
-
-C..Parameters:
 
 C..Arguments:
       Real, Intent( Out ) :: aeconcmin( : ) ! array of minimum concentrations
