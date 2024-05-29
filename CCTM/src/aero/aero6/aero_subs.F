@@ -282,7 +282,6 @@ C *** Variables for mode merging
       REAL         GETAF
       REAL         AAA, XNUM, XM2, XM3,XXM2, XXM3
       REAL         FNUM, FM2, FM3, PHNUM, PHM2, PHM3
-!      REAL         ERFC    ! Error and complementary error function
 
 C *** local variables
       INTEGER      SPC        ! loop counter
@@ -2802,7 +2801,7 @@ C   Technology, 20:253-265, 1994.
  
 C-----------------------------------------------------------------------
 
-      USE CONST, ONLY : PI
+      USE CONST
       IMPLICIT NONE
 
 C    Input variables
@@ -2824,11 +2823,6 @@ C    Internal variables
       REAL D_ST1, D_ST2              ! Stokes diameter equivalent of DCA..
       REAL DG                        ! DGN converted to [ um ]
       REAL ERF1, ERF2, ERFARG        ! argument of ERF, from Step#6 of Jiang et al. (2006)
-
-C *** Error function approximation, from Meng & Seinfeld (1994)
-      REAL ERF        ! Error function
-      REAL XX         ! dummy argument for ERF
-      ERF( XX )  = SIGN( 1.0, XX ) * SQRT( 1.0 - EXP( -4.0 * XX * XX / PI ) )
 
 C ----------------------- Begin solution -------------------------------
 
@@ -2923,7 +2917,7 @@ C   Angeles Basin during CalNex, Journ. Geophys. Res., 2013.
 C-----------------------------------------------------------------------
 
       USE AERO_DATA, ONLY    : MIN_SIGMA_G, MAX_SIGMA_G
-      USE CONST, ONLY        : PI
+      USE CONST
       USE AEROMET_DATA, ONLY : F6PI, PI6
 
       IMPLICIT NONE
@@ -2952,11 +2946,6 @@ C    Internal variables
       REAL XFSUM, LXFM2, L2SG, ES36
       REAL DBlo_st, DBhi_st, LOG_HILO, LOG_LOHI, LOG_HI, LOG_LO
       REAL SQRT2LSG, TERM1, TERM2, TERM3, TERM4, TERM5
-
-C *** Error function approximation, from Meng & Seinfeld (1994)
-      REAL ERF        ! Error function
-      REAL XX         ! dummy argument for ERF
-      ERF( XX )  = SIGN( 1.0, XX ) * SQRT( 1.0 - EXP( -4.0 * XX * XX / PI ) )
 
 C ----------------------- Begin solution -------------------------------
 
@@ -3387,7 +3376,7 @@ C          Feb 2020 B.Murphy: Created this number synthesizer
 C 
 C-----------------------------------------------------------------------
 
-      USE CONST, ONLY : PI
+      USE CONST
       IMPLICIT NONE
 
 C    Input variables

@@ -204,13 +204,22 @@ MODULE const
         INV_ESATL = DL * DEXP( BL * ( 273.15D0 - TT ) / ( TT - 273.15D0 + CL ) )
       END FUNCTION INV_ESATL
 
-! ERF and ERFC are intrinsic functions as of Fortran 2008. 
-! Approximation for error function, from Meng & Seinfeld (1994)
+! CMAQ previously used this approximation for error function, from 
+! Meng & Seinfeld (1994)
+!   Meng, Z., Seinfeld, J.H., On the source of the submicrometer
+!   droplet mode of urban and regional aerosols, Aerosol Sci. and
+!   Technology, 20:253-265, 1994.
+! ERF and ERFC are intrinsic functions as of Fortran 2008, so this
+! approximation is no longer necessary. 
       REAL FUNCTION ERF( X )
          REAL, INTENT( IN )  :: X                
          ERF = SIGN( 1.0, X ) * SQRT( 1.0 - EXP( -4.0 * X * X / PI ) )
       END FUNCTION ERF
-!
+
+! CMAQ also previously used this approximation for the error function 
+! complement ERFC. However, at least since CMAQv5.0, CMAQ has used the 
+! Fortran intrinsics for ERF and ERFC in AEROPROC and the approximation 
+! for ERF elsewhere (AERO_INLET, AERO_AMS).
 !      REAL FUNCTION ERFC( X )
 !         REAL, INTENT( IN ) :: X
 !         ERFC = 1.0 - ERF( X )
