@@ -42,6 +42,7 @@ C   12 Dec 19 S.L.Napelenok: ddm-3d implementation for version 5.3.1
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE MIO_ASCII
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY: NP, NPMAX, SENNUM, SPCNAME, SEN_PAR
@@ -179,6 +180,21 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             FDESC3D( L ) = ' '
          END DO
 
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_1', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+
+
 C    Open dry deposition file
 
          IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSNEW3, PNAME ) ) THEN
@@ -271,6 +287,21 @@ C...define dry deposition output descriptors for tracer species
                VDESC3D( SENNUM ) = 'sensitivity of hourly dry deposition values'
             END DO
          END DO
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'CTM_SDRYDEP_1', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+
 
 C...create a new file
          IF ( .NOT. OPEN3( CTM_SDRYDEP_1, FSNEW3, PNAME ) ) THEN
