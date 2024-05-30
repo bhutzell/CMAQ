@@ -538,8 +538,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             INTEGER              :: SOURCE      ! Source Number for ISAM or DDM3D Variables
             CHARACTER (LEN = 16) :: CUNIT       ! Units in Character Format
             INTEGER              :: IUNIT       ! Units in Integer Format:
-                                                !   0 = 'ug m-3';  1 = 'ppmv'   ;  2 = 'ugC m-3'; 
-                                                !   3 = 'ppmC'  ;  4 = 'ugN m-3';  5 = 'ppmN'
+                                                !   0 = unspecified;  1 = 'ug m-3';  2 = 'ppmV' 
             CHARACTER (LEN = 80) :: DESC        ! Description for Output File
                                                 
             REAL                 :: MW          ! Species molecular weight, if defined
@@ -550,14 +549,14 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             LOGICAL              :: L_COMP      ! Is this variable a linear combination of other variables
         END TYPE ELMO_TABLE_TYPE
 
-        TYPE ELMO_TABLE_COMP
+        TYPE ELMO_COMP_TYPE
             INTEGER              :: N_VARS      ! Some variables are linear combinations of other variables.
                                                 !   N_VARS is the number of components within such a combination. 
                                                 !   This should not account for modes. For example, 
                                                 !   to sum ASO4IJK, N_VARS would be 1 since only 
                                                 !   ASO4 is being used.
             INTEGER, ALLOCATABLE :: TABID(:)    ! ID Number in ELMO_TABLE
-            INTEGER, ALLOCATABLE :: ID(:)       ! Is this component another ELMO aggregate variable?
+            INTEGER, ALLOCATABLE :: ID(:)       ! Index in native array (e.g. CGRID, AEROSPC, SA_ACONC, etc.)
             INTEGER, ALLOCATABLE :: VAR_TYPE(:) ! ELMO Variable Type (ELMO, CGRID, AEROBULK, FAM, WDEP, DDEP)
             REAL,    ALLOCATABLE :: MW(:)       ! Species molecular weight, if defined
             INTEGER              :: SPC_UNIT(:) ! Indicates whether this variables units are mass-based(1), 
@@ -565,20 +564,22 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             REAL,    ALLOCATABLE :: COEFF(:)    ! Coefficient for each variable
             LOGICAL, ALLOCATABLE :: L_MODE(:)   ! For which modes does this aggregate apply
             LOGICAL, ALLOCATABLE :: L_SOURCE(:) ! For Which sources does this component apply
-        END TYPE ELMO_TABLE_COMP
+        END TYPE ELMO_COMP_TYPE
 
         TYPE (ELMO_TABLE_TYPE), ALLOCATABLE, SAVE :: ELMO_TABLE( : ) 
-        TYPE (ELMO_TABLE_COMP), ALLOCATABLE, SAVE :: ELMO_COMP( : ) 
+        TYPE (ELMO_COMP_TYPE ), ALLOCATABLE, SAVE :: ELMO_COMP( : ) 
 
         ! Define Parameters indicating what kind of variable each ELMO
         ! output is
         INTEGER, PARAMETER :: ETYPE_ELMO = 1, ETYPE_CGRID = 2,
      &                        ETYPE_AEROBULK = 3, ETYPE_FAM = 4, 
      &                        ETYPE_WDEP = 5, ETYPE_DDEP = 6,
-     &                        ETYPE_ELMO_ISAM = 7, ETYPE_ISAM = 8, 
-     &                        ETYPE_ISAM_WDEP = 9, ETYPE_ISAM_DDEP = 10,
-     &                        ETYPE_ELMO_DDM = 11, ETYPE_DDM = 12, 
-     &                        ETYPE_DDM_WDEP = 13, ETYPE_DDM_DDEP = 14
+     &                        ETYPE_ISAM_ELMO = 7, ETYPE_ISAM = 8, 
+     &                        ETYPE_ISAM_AEROBULK = 9, ETYPE_ISAM_FAM = 10,
+     &                        ETYPE_ISAM_WDEP = 11, ETYPE_ISAM_DDEP = 12,
+     &                        ETYPE_DDM_ELMO = 13, ETYPE_DDM = 14, 
+     &                        ETYPE_DDM_AEROBULK = 15, ETYPE_DDM_FAM = 16,
+     &                        ETYPE_DDM_WDEP = 17, ETYPE_DDM_DDEP = 18
 
         TYPE ELMO_INLET_TYPE
             CHARACTER( 16 ) CINLET            ! Inlet Name
@@ -748,25 +749,33 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                 IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_DDM_DDEP
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
-          
-         ELSE IF ( I1 .GT. 0 ) THEN
+         
+         ELSEIF ( I1 .GT. 0 ) THEN
             ! Expand Matched Keyword
             VARS_NML( N_END+1:N_END+ELMO_KEY( I1 )%N ) =
      &                              ELMO_KEY( I1 )%LIST
             N_END = N_END + ELMO_KEY( I1 )%N
 
          ELSE IF ( I2 .GT. 0 ) THEN
-            ! Expand the chemical family if the * was used
-            IF ( EXPAND_NML .AND. ELMO_TABLE( I2 )%VAR_TYPE .EQ. ETYPE_FAM ) THEN
-              IFAM = INDEX1( VARS_NML(1), N_Chem_Fams, ChemFamilyName )
-              VARS_NML( N_END+1:N_END+CHEM_FAMILY_NUM( IFAM ) ) =
-     &                                CHEMFAMILYMEMBERS( IFAM,: )
-              N_END = N_END + CHEM_FAMILY_NUM( IFAM )
+            ! First check for chemical families
+            IF ( ELMO_TABLE( I2 )%VAR_TYPE .EQ. ETYPE_FAM ) THEN
+              IF ( EXPAND_NML ) THEN
+                 ! Expand the chemical family if the * was used
+                 IFAM = INDEX1( VARS_NML(1), N_Chem_Fams, ChemFamilyName )
+                 VARS_NML( N_END+1:N_END+CHEM_FAMILY_NUM( IFAM ) ) =
+     &                                   CHEMFAMILYMEMBERS( IFAM,: )
+                 N_END = N_END + CHEM_FAMILY_NUM( IFAM )
+              ELSE
+                 ! Activate this family if no * was used
+                 L_ELMO_TABLE( I2 ) = .TRUE.
+              END IF
+                
             ELSE 
               ! Entry Matches the NAME of a variable on the ELMO Table.
-              ! But this could be an ISAM or DDM variable so all of the ELMO
-              ! Table entries that match this name but correspond to
-              ! different sources should be activated.
+              ! But this could be a mode-dependent or source-dependent 
+              ! variable so all of the ELMO Table entries that match 
+              ! this name but correspond to different modes or sources 
+              ! should be activated.
               DO IT = 1,N_ELMO_TABLE
                   IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ELMO_TABLE( I2 )%VAR_TYPE .AND.
      &                 ELMO_TABLE( IT )%NAME .EQ. ELMO_TABLE( I2 )%NAME ) THEN
@@ -776,15 +785,14 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             END IF
 
          ELSE IF ( I3 .GT. 0 ) THEN
-              ! Entry Matches the OUT_NAME of a variable on the ELMO
-              ! Table. The OUT_NAMEs are very specific. They will always
-              ! equal the unique identifier for an ELMO Variable, a
-              ! raw concentration, deposition flux, mode-dependent
-              ! variable (STDEV_AIT) or source-dependent variable 
-              ! (e.g. PM25_ONROAD).
-              L_ELMO_TABLE( I3 ) = .TRUE.
-            END IF
-
+            ! Entry Matches the OUT_NAME of a variable on the ELMO
+            ! Table. The OUT_NAMEs are very specific. They will always
+            ! equal the unique identifier for an ELMO Variable, a
+            ! raw concentration, deposition flux, mode-dependent
+            ! variable (STDEV_AIT) or source-dependent variable 
+            ! (e.g. PM25_ONROAD).
+            L_ELMO_TABLE( I3 ) = .TRUE.
+          
          ELSE
             ! Entry Doesn't Match any variable on the ELMO table. Crash the
             ! model.
@@ -1023,7 +1031,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       END SUBROUTINE MAP_ELMO_UNITS
  
 !------------------------------------------------------------------------------------------            
-      SUBROUTINE COMP_UNIT_CONVERSION( J, OUT_UNIT, FAC )
+      SUBROUTINE ELMO_UNIT_CONVERSION( J, OUT_UNIT, FAC )
 !     This subroutine calculates the conversion factor from a component
 !     variable to an output variable.
 !-------------------------------------------------------------------------
@@ -1063,7 +1071,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &          / MWAIR * AIRDENS * 1000.0 ! to mass concentration
       END SELECT 
  
-      END SUBROUTINE COMP_UNIT_CONVERSION
+      END SUBROUTINE ELMO_UNIT_CONVERSION
 
 !----------------------------------------------------------------------------      
       FUNCTION FIND_ELMO_TABLE( IDG, IM, IV, ISRC )

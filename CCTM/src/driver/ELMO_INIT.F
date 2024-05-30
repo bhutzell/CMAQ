@@ -37,7 +37,8 @@
       CALL READ_ELMO_NML()
       IF ( .NOT. L_ELMO ) RETURN
       
-      ! Initialize AOD and Extinction Global Variables
+      ! Initialize Shared Output Variables like AOD, Extinction, and
+      ! other Global Variables
       CALL ELMO_INIT_SHARED()
 
       ! Initialize Main Table for all possible output variables
@@ -420,8 +421,8 @@
       ! Load ISAM Bulk Aerosols
       DO IAERO = 1,N_AEROSPC
          N = N + 1
-         ELMO_TABLE( N )%NAME = 'ISAM_' // TRIM( AEROSPC( IAERO )%BULKNAME)
-         ELMO_TABLE( N )%OUT_NAME = 'ISAM_'//TRIM(AEROSPC( IAERO )%BULKNAME) //'_BULK'
+         ELMO_TABLE( N )%NAME = TRIM( AEROSPC( IAERO )%BULKNAME) // '_ISAM'
+         ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_TAGS'
 
          ELMO_TABLE( N )%OUT_TYPE = M3REAL
          ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_AEROBULK
@@ -437,8 +438,8 @@
          DO ITAG = 1,NTAG_SA
            N = N + 1
            ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-           ELMO_TABLE( N )%NAME = 'ISAM_' // TRIM(AEROSPC( IAERO )%BULKNAME)
-           ELMO_TABLE( N )%OUT_NAME = 'ISAM_'//TRIM(AEROSPC( IAERO )%BULKNAME)
+           ELMO_TABLE( N )%NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_ISAM' 
+           ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
      &                            // '_' // TRIM(TAGNAME( ITAG )) 
            ELMO_TABLE( N )%SOURCE = ITAG
            ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
@@ -452,8 +453,8 @@
          S = ( CHEMFAMILYNAME( IFAM ), N_AEROSPC, AEROSPC( : )%BULKNAME )
          IF ( S .EQ. 0 ) THEN
            N = N + 1
-           ELMO_TABLE( N )%NAME = 'ISAM_' // TRIM( CHEMFAMILYNAME( IFAM ))
-           ELMO_TABLE( N )%OUT_NAME = 'ISAM_'//TRIM(CHEMFAMILYNAME(IFAM)) //'_BULK'
+           ELMO_TABLE( N )%NAME = TRIM( CHEMFAMILYNAME( IFAM )) // '_ISAM'
+           ELMO_TABLE( N )%OUT_NAME = TRIM(CHEMFAMILYNAME(IFAM)) //'_TAGS'
           
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
            ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_FAM
@@ -470,8 +471,9 @@
            DO ITAG = 1,NTAG_SA
              N = N + 1
              ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-             ELMO_TABLE( N )%NAME = 'ISAM_' // TRIM(CHEMFAMILYNAME( IFAM ))
-             ELMO_TABLE( N )%OUT_NAME = 'ISAM'//TRIM(CHEMFAMILYNAME( IFAM ))
+             ELMO_TABLE( N )%NAME = TRIM(CHEMFAMILYNAME( IFAM ))
+     &                              // '_ISAM'
+             ELMO_TABLE( N )%OUT_NAME = TRIM(CHEMFAMILYNAME( IFAM ))
      &                              // '_' // TRIM(TAGNAME( ITAG )) 
              ELMO_TABLE( N )%SOURCE = ITAG
              ELMO_TABLE( N )%DESC = 'Concentration of Chemical Family '//
@@ -488,8 +490,9 @@
       DO IAERO = 1,N_AEROSPC
          DO NP = 1,NPMAX
             N = N + 1
-            ELMO_TABLE( N )%NAME = 'DDM_' // TRIM(AEROSPC( IAERO )%BULKNAME)
-            ELMO_TABLE( N )%OUT_NAME = 'DDM_'//TRIM(AEROSPC( IAERO )%BULKNAME)
+            ELMO_TABLE( N )%NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
+     &                               // '_DDM' 
+            ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
      &                               // '_' // TRIM(SEN_PAR( NP )) 
           
             ELMO_TABLE( N )%OUT_TYPE = M3REAL
@@ -512,8 +515,9 @@
          IF ( S .EQ. 0 ) THEN
            DO NP = 1,NPMAX
               N = N + 1
-              ELMO_TABLE( N )%NAME = 'DDM_' // TRIM( CHEMFAMILYNAME( IFAM ))
-              ELMO_TABLE( N )%OUT_NAME = 'DDM_'//TRIM(CHEMFAMILYNAME( IFAM ))
+              ELMO_TABLE( N )%NAME = TRIM( CHEMFAMILYNAME( IFAM ))
+     &                               // '_DDM'
+              ELMO_TABLE( N )%OUT_NAME = TRIM(CHEMFAMILYNAME( IFAM ))
      &                               // '_' // TRIM(TAGNAME( ITAG )) 
               
               ELMO_TABLE( N )%OUT_TYPE = M3REAL
@@ -569,10 +573,11 @@
 #ifdef isam
          IF ( ELMO_LIST( ILIST )%L_ISAM ) THEN
            ! Set Source-Dependent Properties for the first ISAM source
-           ELMO_TABLE( N )%NAME = 'ISAM_' // ELMO_LIST( ILIST )%NAME
-           ELMO_TABLE( N )%OUT_NAME = ELMO_LIST( ILIST )%NAME // '_BULK'
+           ELMO_TABLE( N )%NAME = ELMO_LIST( ILIST )%NAME // '_ISAM'
+           ELMO_TABLE( N )%OUT_NAME = ELMO_LIST( ILIST )%NAME // '_TAGS'
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ETYPE_ELMO_ISAM
+           ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_ELMO
+           ELMO_TABLE( N )%ID = ELMO_LIST( ILIST )%ID
            ELMO_TABLE( N )%SOURCE = 0
            ELMO_TABLE( N )%DESC = ELMO_LIST( ILIST )%DESC // 
      &           ' for the sum of all sources.'
@@ -584,10 +589,10 @@
            DO ITAG = 1,NTAG_SA
              N = N + 1
              ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-             ELMO_TABLE( N )%NAME = 'ISAM_' // ELMO_LIST( ILIST )%NAME
-             ELMO_TABLE( N )%OUT_NAME = ELMO_LIST( ILIST )%NAME // '_'
-     &                              TRIM(TAGNAME( ITAG ))
-             ELMO_TABLE( N )%VAR_TYPE = ETYPE_ELMO_ISAM
+             ELMO_TABLE( N )%NAME = ELMO_LIST( ILIST )%NAME
+     &                              // '_ISAM'
+             ELMO_TABLE( N )%OUT_NAME = ELMO_LIST( ILIST )%NAME 
+     &                              // '_' // TRIM(TAGNAME( ITAG ))
              ELMO_TABLE( N )%SOURCE = ITAG
              ELMO_TABLE( N )%DESC = ELMO_LIST( ILIST )%DESC // 
      &             ' for source ' // TRIM(TAGNAME( ITAG ))
@@ -597,30 +602,24 @@
 
 #ifdef sens
          IF ( ELMO_LIST( ILIST )%L_DDM3D ) THEN
-           ! Set Source-Dependent Properties for the first DDM3D source
-           ELMO_TABLE( N )%SOURCE = 1
-           ELMO_TABLE( N )%NAME = 'DDM_' // ELMO_LIST( ILIST )%NAME
-           ELMO_TABLE( N )%OUT_NAME = ELMO_LIST( ILIST )%NAME // '_'
-     &                            TRIM( SEN_PAR( 1 ) )
-           ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ETYPE_ELMO_DDM
-           ELMO_TABLE( N )%DESC = 'Sensitivity of ' // ELMO_LIST( ILIST )%DESC // 
-     &           ' to ' // TRIM( SEN_PAR( 1 ) )
-           ELMO_TABLE( N )%CUNIT =  ELMO_LIST( ILIST )%UNIT
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
-           ELMO_TABLE( N )%IUNIT = IUNIT
            
            ! Define ELMO Variables for all remaining DDM3D sources
-           DO NP = 2,NPMAX
+           DO NP = 1,NPMAX
              N = N + 1
              ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
              ELMO_TABLE( N )%SOURCE = NP
-             ELMO_TABLE( N )%NAME = 'DDM_' // ELMO_LIST( ILIST )%NAME
-             ELMO_TABLE( N )%OUT_NAME = ELMO_LIST( ILIST )%NAME // '_'
-     &                              TRIM( SEN_PAR( NP ) )
-             ELMO_TABLE( N )%VAR_TYPE = ETYPE_ELMO_DDM
+             ELMO_TABLE( N )%NAME = ELMO_LIST( ILIST )%NAME
+     &                              // '_DDM'
+             ELMO_TABLE( N )%OUT_NAME = ELMO_LIST( ILIST )%NAME 
+     &                              // '_' // TRIM( SEN_PAR( NP ) )
+             ELMO_TABLE( N )%OUT_TYPE = M3REAL
+             ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM_ELMO
+             ELMO_TABLE( N )%ID = ELMO_LIST( ILIST )%ID
              ELMO_TABLE( N )%DESC = 'Sensitivity of ' // ELMO_LIST( ILIST )%DESC // 
      &             ' to ' // TRIM( SEN_PAR( NP ) )
+             ELMO_TABLE( N )%CUNIT =  ELMO_LIST( ILIST )%UNIT
+             CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+             ELMO_TABLE( N )%IUNIT = IUNIT
            END DO
          END IF
 #endif         
@@ -699,8 +698,8 @@
       ! Load ISAM CGRID Variables to ELMO Table
       DO ISPEC = 1,NSPC_SA
         N = N + 1
-        ELMO_TABLE( N )%NAME = 'ISAM_' // TRIM(ISAM_SPEC( ISPEC,ITAG ))
-        ELMO_TABLE( N )%OUT_NAME = 'ISAM_'//TRIM(ISAM_SPEC( ISPEC,ITAG )) //'_BULK'
+        ELMO_TABLE( N )%NAME = TRIM(ISAM_SPEC( ISPEC,ITAG )) // '_ISAM'
+        ELMO_TABLE( N )%OUT_NAME = TRIM(ISAM_SPEC( ISPEC,ITAG )) //'_TAGS'
         ELMO_TABLE( N )%OUT_TYPE = M3REAL
         ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM
         ELMO_TABLE( N )%ID = ISPEC
@@ -722,8 +721,9 @@
         DO ITAG = 1,NTAG_SA
            N = N + 1
            ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-           ELMO_TABLE( N )%NAME = 'ISAM_' // TRIM(ISAM_SPEC( ISPEC,ITAG ))
-           ELMO_TABLE( N )%OUT_NAME = 'ISAM_'//TRIM(ISAM_SPEC( ISPEC,ITAG ))
+           ELMO_TABLE( N )%NAME = TRIM(ISAM_SPEC( ISPEC,ITAG ))
+     &                            // '_ISAM'
+           ELMO_TABLE( N )%OUT_NAME = TRIM(ISAM_SPEC( ISPEC,ITAG ))
      &                            // '_' // TRIM(TAGNAME( ITAG )) 
            ELMO_TABLE( N )%SOURCE = ITAG
            ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
@@ -737,8 +737,8 @@
       IF ( L_ELMO_WDEP ) THEN
       DO IWDEP = 1,N_SPC_WDEP
         N = N + 1
-        ELMO_TABLE( N )%NAME = 'ISAM_WD_' //TRIM( WDEP_SPC( IWDEP ) )
-        ELMO_TABLE( N )%OUT_NAME = 'ISAM_WD_' // TRIM( WDEP_SPC( IWDEP ) ) // '_BULK'
+        ELMO_TABLE( N )%NAME = 'WD_' //TRIM( WDEP_SPC( IWDEP ) ) // '_ISAM'
+        ELMO_TABLE( N )%OUT_NAME = 'WD_' // TRIM( WDEP_SPC( IWDEP ) ) // '_TAGS'
         ELMO_TABLE( N )%OUT_TYPE = M3REAL
         ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_WDEP
         ELMO_TABLE( N )%ID = IWDEP
@@ -761,8 +761,9 @@
         DO ITAG = 1,NTAG_SA
            N = N + 1
            ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-           ELMO_TABLE( N )%NAME = 'ISAM_WD_' //TRIM( WDEP_SPC( IWDEP ) )
-           ELMO_TABLE( N )%OUT_NAME = 'ISAM_WD_' // TRIM( WDEP_SPC( IWDEP ) )
+           ELMO_TABLE( N )%NAME = 'WD_' //TRIM( WDEP_SPC( IWDEP ) )
+     &                            // '_ISAM'
+           ELMO_TABLE( N )%OUT_NAME = 'WD_' // TRIM( WDEP_SPC( IWDEP ) )
      &                            // '_' // TRIM(TAGNAME( ITAG )) 
            ELMO_TABLE( N )%SOURCE = ITAG
            ELMO_TABLE( N )%DESC = 'Tagged Wet Deposition Flux of '//
@@ -775,8 +776,8 @@
       IF ( L_ELMO_DDEP ) THEN
       DO IDDEP = 1,N_SPC_DDEP
         N = N + 1
-        ELMO_TABLE( N )%NAME = 'ISAM_DD_' //TRIM(DDEP_SPC( IDDEP ))
-        ELMO_TABLE( N )%OUT_NAME = 'ISAM_DD_' // TRIM(DDEP_SPC( IDDEP ))//'_BULK'
+        ELMO_TABLE( N )%NAME = 'DD_' //TRIM(DDEP_SPC( IDDEP )) // '_ISAM'
+        ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))//'_TAGS'
         ELMO_TABLE( N )%OUT_TYPE = M3REAL
         ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_DDEP
         ELMO_TABLE( N )%ID = IDDEP
@@ -799,8 +800,9 @@
         DO ITAG = 1,NTAG_SA
            N = N + 1
            ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-           ELMO_TABLE( N )%NAME = 'ISAM_DD_' //TRIM(DDEP_SPC( IDDEP ))
-           ELMO_TABLE( N )%OUT_NAME = 'ISAM_DD_' // TRIM(DDEP_SPC( IDDEP ))
+           ELMO_TABLE( N )%NAME = 'DD_' //TRIM(DDEP_SPC( IDDEP ))
+     &                            // '_ISAM'
+           ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))
      &                            // '_' // TRIM(TAGNAME( ITAG )) 
            ELMO_TABLE( N )%SOURCE = ITAG
            ELMO_TABLE( N )%DESC = 'Tagged Dry Deposition Flux of '//
@@ -818,8 +820,9 @@
            N = N + 1
            ICGRID = MAP_SAtoCGR( ISPEC )
 
-           ELMO_TABLE( N )%NAME = 'DDM_' // TRIM( CGRID_NAME(ICGRID) ) 
-           ELMO_TABLE( N )%OUT_NAME = 'DDM_'//TRIM( CGRID_NAME(ICGRID) ) 
+           ELMO_TABLE( N )%NAME = TRIM( CGRID_NAME(ICGRID) ) 
+     &                                // '_DDM'
+           ELMO_TABLE( N )%OUT_NAME = TRIM( CGRID_NAME(ICGRID) ) 
      &                                // '_' // TRIM( SEN_PAR(NP) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
            ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM
@@ -850,9 +853,10 @@
       DO IWDEP = 1,N_SPC_WDEP
         DO NP = 1,NPMAX
            N = N + 1
-           ELMO_TABLE( N )%NAME = 'DDM_WD_' // TRIM( WDEP_SPC( IWDEP ) )
-           ELMO_TABLE( N )%OUT_NAME = 'DDM_WD_' // WDEP_SPC( IWDEP ) // '_' //
-     &                                TRIM( SEN_PAR(NP) )
+           ELMO_TABLE( N )%NAME = 'WD_' // TRIM( WDEP_SPC( IWDEP ) )
+     &                     // '_DDM' 
+           ELMO_TABLE( N )%OUT_NAME = 'WD_' // WDEP_SPC( IWDEP ) 
+     &                     // '_' // TRIM( SEN_PAR(NP) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
            ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM_WDEP
            ELMO_TABLE( N )%ID = IWDEP
@@ -881,9 +885,10 @@
       DO IDDEP = 1,N_SPC_DDEP
         DO NP = 1,NPMAX
            N = N + 1
-           ELMO_TABLE( N )%NAME = 'DDM_DD_' // TRIM(DDEP_SPC( IDDEP ))
-           ELMO_TABLE( N )%OUT_NAME = 'DDM_DD_' // DDEP_SPC( IDDEP ) // '_' //
-     &                                TRIM( SEN_PAR(NP) )
+           ELMO_TABLE( N )%NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))
+     &                                // '_DDM'
+           ELMO_TABLE( N )%OUT_NAME = 'DD_' // DDEP_SPC( IDDEP ) 
+     &                                // '_' // TRIM( SEN_PAR(NP) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
            ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM_DDEP
            ELMO_TABLE( N )%ID = IDDEP
@@ -945,20 +950,50 @@
       ! on knowing what type of variable it is
       VAR_TYPE = ELMO_TABLE( J )%VAR_TYPE
 
-      ! For ISAM ELMO Variables, we need to make sure the components
-      ! match the source number, or apply to all sources (i.e. ISAM
-      ! Bulk)
-      IF ( VAR_TYPE .EQ. ETYPE_ELMO_ISAM ) THEN
-         DO K = 1,N_ELMO_TABLE
-            CSPEC = 'ISAM_' // CSPEC // 
-
-
-
       ! Find this component in the ELMO_TABLE
       I1 = INDEX( CSPEC, N_ELMO_TABLE, ELMO_TABLE%OUT_NAME )
       I2 = INDEX( CSPEC, N_ELMO_TABLE, ELMO_TABLE%NAME )
 
-      IF ( I1 .GT. 0 ) THEN
+      ! For ISAM ELMO Variables, we need to make sure the components
+      ! match the source number, or apply to all sources (i.e. ISAM
+      ! Bulk)
+      IF ( VAR_TYPE .EQ. ETYPE_ELMO_ISAM ) THEN
+         CSPEC = // CSPEC // '_ISAM'
+         ISRC = ELMO_TABLE( J )%SOURCE
+         DO K = 1,N_ELMO_TABLE
+           IF ( ELMO_TABLE( K )%NAME .EQ. CSPEC .AND.
+     &          ELMO_TABLE( K )%SOURCE .EQ. ISRC     ) THEN
+              ! This component matches an ELMO Table Output Name
+              ELMO_COMP( J )%TABID( IVAR )    = K
+              ELMO_COMP( J )%ID( IVAR )       = ELMO_TABLE( K )%ID
+              ELMO_COMP( J )%VAR_TYPE( IVAR ) = VAR_TYPE
+              ELMO_COMP( J )%MW( IVAR )       = ELMO_TABLE( K )%MW
+              CALL MAP_ELMO_UNITS( ELMO_TABLE( K )%CUNIT,
+     &                       ELMO_COMP( J )%SPC_UNIT( IVAR ),
+     &                       ELMO_TABLE( K )%NAME )
+              ELMO_COMP( J )%COEFF( IVAR )    = COEFF
+           END IF
+         END DO
+
+      ELSE IF  ( VAR_TYPE .EQ. ETYPE_ELMO_DDM ) THEN
+         CSPEC = // CSPEC // '_DDM'
+         ISRC = ELMO_TABLE( J )%SOURCE
+         DO K = 1,N_ELMO_TABLE
+           IF ( ELMO_TABLE( K )%NAME .EQ. CSPEC .AND.
+     &          ELMO_TABLE( K )%SOURCE .EQ. ISRC     ) THEN
+              ! This component matches an ELMO Table Output Name
+              ELMO_COMP( J )%TABID( IVAR )    = K
+              ELMO_COMP( J )%ID( IVAR )       = ELMO_TABLE( K )%ID
+              ELMO_COMP( J )%VAR_TYPE( IVAR ) = VAR_TYPE
+              ELMO_COMP( J )%MW( IVAR )       = ELMO_TABLE( K )%MW
+              CALL MAP_ELMO_UNITS( ELMO_TABLE( K )%CUNIT,
+     &                       ELMO_COMP( J )%SPC_UNIT( IVAR ),
+     &                       ELMO_TABLE( K )%NAME )
+              ELMO_COMP( J )%COEFF( IVAR )    = COEFF
+           END IF
+         END DO 
+
+      ELSE IF ( I1 .GT. 0 ) THEN
         ! This component matches an ELMO Table Output Name
         ELMO_COMP( J )%TABID( IVAR )    = I1
         ELMO_COMP( J )%ID( IVAR )       = ELMO_TABLE( I1 )%ID
@@ -1037,21 +1072,6 @@
       ! Open Instantaneous ELMO File
       IF ( INST_ACTIVE ) THEN
 
-         ! Populate MIO Structure
-         N_MIO_FILE = N_MIO_FILE + 1
-         MIO_FILE( N_MIO_FILE )%FUNIT = CTM_ELMO_1
-         MIO_FILE( N_MIO_FILE )%NVARS = N_ELMO_INST
-         ALLOCATE( MIO_FILE( N_MIO_FILE )%VARS( N_ELMO_INST ),
-     &             MIO_FILE( N_MIO_FILE )%TYPE( N_ELMO_INST ),
-     &             MIO_FILE( N_MIO_FILE )%UNIT( N_ELMO_INST ),
-     &             MIO_FILE( N_MIO_FILE )%DESC( N_ELMO_INST ) )
-
-         MIO_FILE( N_MIO_FILE )%VARS(:) = ELMO_INST_PARS(:)%OUT_NAME
-         MIO_FILE( N_MIO_FILE )%TYPE(:) = ELMO_INST_PARS(:)%OUT_TYPE
-         MIO_FILE( N_MIO_FILE )%UNIT(:) = ELMO_INST_PARS(:)%CUNIT
-         MIO_FILE( N_MIO_FILE )%DESC(:) = ELMO_INST_PARS(:)%DESC
-
-
 #ifndef mpas
          ! Try to open existing file for update
          IF ( .NOT. OPEN3( CTM_ELMO_1, FSRDWR3, PNAME ) ) THEN
@@ -1068,15 +1088,29 @@
             END DO
          
             NVARS3D = N_ELMO_INST 
-            VTYPE3D(1:NVARS3D) = INST_TYPE_OUT( 1:NVARS3D )
-            VNAME3D(1:NVARS3D) = INST_PARS_OUT( 1:NVARS3D )
-            UNITS3D(1:NVARS3D) = INST_UNIT_OUT( 1:NVARS3D )
-            VDESC3D(1:NVARS3D) = INST_DESC_OUT( 1:NVARS3D )
+            VTYPE3D(1:NVARS3D) = ELMO_INST_PARS%OUT_TYPE( 1:NVARS3D )
+            VNAME3D(1:NVARS3D) = ELMO_INST_PARS%OUT_NAME( 1:NVARS3D )
+            UNITS3D(1:NVARS3D) = ELMO_INST_PARS%CUNIT( 1:NVARS3D )
+            VDESC3D(1:NVARS3D) = ELMO_INST_PARS%DESC( 1:NVARS3D )
          
             FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
             DO L = 2, MXDESC3
                FDESC3D( L ) = ' '
             END DO
+ 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+           
+            CALL LOAD_MIO_FILE ( 'CTM_ELMO_1', NLAYS3D, INST_LAYER_BOT, INST_LAYER_TOP,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D), L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
          
             ! Open the Instantaneous ELMO File
             IF ( .NOT. OPEN3( CTM_ELMO_1, FSNEW3, PNAME ) ) THEN
@@ -1092,19 +1126,6 @@
       ! Open Average ELMO File
       IF ( AVRG_ACTIVE ) THEN
       
-         ! Populate MIO Structure
-         N_MIO_FILE = N_MIO_FILE + 1
-         MIO_FILE( N_MIO_FILE )%FUNIT = CTM_AELMO_1
-         MIO_FILE( N_MIO_FILE )%NVARS = N_ELMO_AVRG
-         ALLOCATE( MIO_FILE( N_MIO_FILE )%VARS( N_ELMO_AVRG ),
-     &             MIO_FILE( N_MIO_FILE )%TYPE( N_ELMO_AVRG ),
-     &             MIO_FILE( N_MIO_FILE )%UNIT( N_ELMO_AVRG ),
-     &             MIO_FILE( N_MIO_FILE )%DESC( N_ELMO_AVRG ) )
-
-         MIO_FILE( N_MIO_FILE )%VARS(:) = ELMO_AVRG_PARS(:)%OUT_NAME
-         MIO_FILE( N_MIO_FILE )%TYPE(:) = ELMO_AVRG_PARS(:)%OUT_TYPE
-         MIO_FILE( N_MIO_FILE )%UNIT(:) = ELMO_AVRG_PARS(:)%CUNIT
-         MIO_FILE( N_MIO_FILE )%DESC(:) = ELMO_AVRG_PARS(:)%DESC
 
 #ifndef mpas
          ! Try to open existing file for update
@@ -1125,15 +1146,29 @@
             END DO
          
             NVARS3D = N_ELMO_AVRG_OUT 
-            VTYPE3D(1:NVARS3D) = AVRG_TYPE_OUT( 1:NVARS3D )
-            VNAME3D(1:NVARS3D) = AVRG_PARS_OUT( 1:NVARS3D )
-            UNITS3D(1:NVARS3D) = AVRG_UNIT_OUT( 1:NVARS3D )
-            VDESC3D(1:NVARS3D) = AVRG_DESC_OUT( 1:NVARS3D )
+            VTYPE3D(1:NVARS3D) = ELMO_AVRG_PARS%OUT_TYPE( 1:NVARS3D )
+            VNAME3D(1:NVARS3D) = ELMO_AVRG_PARS%OUT_NAME( 1:NVARS3D )
+            UNITS3D(1:NVARS3D) = ELMO_AVRG_PARS%CUNIT( 1:NVARS3D )
+            VDESC3D(1:NVARS3D) = ELMO_AVRG_PARS%DESC( 1:NVARS3D )
          
             FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
             DO L = 2, MXDESC3
                FDESC3D( L ) = ' '
             END DO
+ 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+           
+            CALL LOAD_MIO_FILE ( 'CTM_AELMO_1', NLAYS3D, AVRG_LAYER_BOT, AVRG_LAYER_TOP,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D), L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
          
             ! Open the Average ELMO File
             IF ( .NOT. OPEN3( CTM_AELMO_1, FSNEW3, PNAME ) ) THEN
@@ -1154,6 +1189,97 @@
       IMPLICIT NONE
 
 
+      ! Write out all ELMO variables organized by output file
+      WRITE( LOGDEV, '(/,/,5x,A)' ),'|> ELMO OUTPUT VARIABLE REPORT:'
+      WRITE( LOGDEV, '(5x,A)'   ),'+=================================='
+      WRITE( LOGDEV,'(7x,A,8(/,13x,A))' ),
+     &                              'Note: these are populated using rules from the',
+     &                              'Miscellaneous Control File supplied by the User. ',
+     &                              'When variables are indented, they are components ',
+     &                              'of the most recent non-indented variable. Becuase ',
+     &                              'their output units should either match the output ',
+     &                              'variable or be converted to its units, the third ',
+     &                              'column reports any coefficients used when applying ',
+     &                              'these components to the sum, excluding molecular ',
+     &                              'weight, air density, etc.'
 
+
+      !-------------------------------------------------------------------------
+      ! Instantaneous File
+      !--------------------------------------------------------------------------
+      ! Header and File Metadata
+      WRITE( LOGDEV, '(/,5x,A,A)'   ),'>',REPEAT('-',80 )
+      WRITE( LOGDEV,'(5x,A,A,A,A,/,5x,A,A,/,8x,A,I2,A,I2)' ),
+     &       'Output File Num: "','1','" | Temporality: ','Instantaneous',
+     &       'Output Filename: ','CTM_ELMO_1',
+     &       ' Bottom Layer: ',INST_LAYER_BOT,
+     &       ' Top Layer: ',INST_LAYER_TOP 
+
+      ! Print all variables on the file and their contents if they have
+      ! components 
+      WRITE( LOGDEV, '(/,8x,A,15x,A,2x,A,9x,A,/,15x,A,30x,A)' ),
+     &       'Variable','Type','Unit','Description','Component','Coeff'
+      WRITE( LOGDEV, '(8x,A,5x,A,2x,A,9x,A)' ),
+     &       '-----------------','-----------','--------','-----------'
+
+      DO IINST = 1,N_ELMO_INST 
+         WRITE ( LOGDEV,'(10x,A16,2x,A,2x,A,2x,A)'),
+     &           ELMO_INST_PARS( IINST )%OUT_NAME,
+     &           ELMO_INST_PARS( IINST )%VAR_TYPE,
+     &           ELMO_INST_PARS( IINST )%CUNIT,
+     &           ELMO_INST_PARS( IINST )%DESC
+
+         IF ( ELMO_INST_PARS( IINST )%LCOMP ) THEN
+             J = ELMO_INSTtoTABLE( IINST )
+             DO ICOMP = 1,ELMO_COMP( J )
+                TABID = ELMO_COMP( J )%TABID( ICOMP )
+
+                WRITE( LOGDEV, '(12x,A14,2x,A14,2x,A8,2x,A)'),
+     &                 ELMO_TABLE( TABID )%OUT_NAME,
+     &                 ELMO_TABLE( TABID )%VAR_TYPE,
+     &                 ELMO_COMP( J )%COEFF( ICOMP ),
+     &                 ELMO_TABLE( TABID )%DESC
+             END DO
+         END IF
+      END DO
+
+      !-------------------------------------------------------------------------
+      ! Average File
+      !--------------------------------------------------------------------------
+      ! Header and File Metadata
+      WRITE( LOGDEV, '(/,5x,A,A)'   ),'>',REPEAT('-',80 )
+      WRITE( LOGDEV,'(5x,A,A,A,A,/,5x,A,A,/,8x,A,I2,A,I2)' ),
+     &       'Output File Num: "','1','" | Temporality: ','Instantaneous',
+     &       'Output Filename: ','CTM_AELMO_1',
+     &       ' Bottom Layer: ',AVRG_LAYER_BOT,
+     &       ' Top Layer: ',AVRG_LAYER_TOP 
+
+      ! Print all variables on the file and their contents if they have
+      ! components 
+      WRITE( LOGDEV, '(/,8x,A,15x,A,2x,A,9x,A,/,15x,A,30x,A)' ),
+     &       'Variable','Type','Unit','Description','Component','Coeff'
+      WRITE( LOGDEV, '(8x,A,5x,A,2x,A,9x,A)' ),
+     &       '-----------------','-----------','--------','-----------'
+
+      DO IAVRG = 1,N_ELMO_AVRG 
+         WRITE ( LOGDEV,'(10x,A16,2x,A,2x,A,2x,A)'),
+     &           ELMO_AVRG_PARS( IAVRG )%OUT_NAME,
+     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE,
+     &           ELMO_AVRG_PARS( IAVRG )%CUNIT,
+     &           ELMO_AVRG_PARS( IAVRG )%DESC
+
+         IF ( ELMO_AVRG_PARS( IAVRG )%LCOMP ) THEN
+             J = ELMO_AVRGtoTABLE( IAVRG )
+             DO ICOMP = 1,ELMO_COMP( J )
+                TABID = ELMO_COMP( J )%TABID( ICOMP )
+
+                WRITE( LOGDEV, '(12x,A14,2x,A14,2x,A8,2x,A)'),
+     &                 ELMO_TABLE( TABID )%OUT_NAME,
+     &                 ELMO_TABLE( TABID )%VAR_TYPE,
+     &                 ELMO_COMP( J )%COEFF( ICOMP ),
+     &                 ELMO_TABLE( TABID )%DESC
+             END DO
+         END IF
+      END DO
 
       END SUBROUTINE ELMO_WRITE_LOG

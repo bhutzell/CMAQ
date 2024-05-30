@@ -99,7 +99,7 @@
                   
                   'ALL_ISAM','NO2_EGU','NOX_FIRES','NOX_ISAM','NOX_PTEGU','NO2_EGU','PMF_BULK','DD_NO2_EGU'
                                                                        
-                  'NOX_ISAM' =  'NOX_EGU','NOX_FIRES','NOX_BCO','NOX_ICO','NOX_OTH','NOX_SUMTAG','NOX_','
+                  'NOX_ISAM' =  'NOX_EGU','NOX_FIRES','NOX_BCO','NOX_ICO','NOX_OTH','NOX_SUMTAG'
                                                                        
                   'DD_NO2_PTEGU','DD_NO2','WD_NO2_ISAM',
                  

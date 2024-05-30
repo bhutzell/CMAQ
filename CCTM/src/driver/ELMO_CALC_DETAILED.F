@@ -683,6 +683,8 @@
       INTEGER :: IM
       REAL    :: OUTVAL
 
+      OUTVAL = 0.0
+
       ! Determine Which Type of ELMO Variable is Requested
       SELECT CASE ( IV )
          CASE ( ETYPE_ELMO )
@@ -700,11 +702,37 @@
 
          CASE ( ETYPE_ELMO_ISAM )
            ! ISAM PM Sum
-
+           DO IM = 1,N_MODE
+              IF ( MODE_MASK(IM) ) THEN
+                DO IAER = 1,N_AEROSPC                  
+                  IF ( .NOT. AEROSPC(IAER)%TRACER .AND.
+     &                 IAER .NE. AH2O_IDX .AND. IAER .NE. AORGH2O_IDX ) THEN
+                    ! Add up PM for this source
+                    ISA = MAP_AEROtoSA( IAER, IM )
+                    IF ( ISRC .EQ. 0 ) THEN
+                       OUTVAL = OUTVAL + SUM(ISAM_VEC( ISA,:) ) 
+                    ELSE
+                       OUTVAL = OUTVAL + ISAM_VEC(ISA,ISRC) 
+                    END IF
+                  END IF
+                END DO
+              END IF
+           END DO
 
          CASE ( ETYPE_ELMO_DDM )
            ! DDM PM Sum
-
+           DO IM = 1,N_MODE
+              IF ( MODE_MASK(IM) ) THEN
+                DO IAER = 1,N_AEROSPC                  
+                  IF ( .NOT. AEROSPC(IAER)%TRACER .AND.
+     &                 IAER .NE. AH2O_IDX .AND. IAER .NE. AORGH2O_IDX ) THEN
+                    ! Add up PM for this source
+                    OUTVAL = OUTVAL + S_AEROSPC_CONC(IAER,IM,ISRC) 
+                  END IF
+                END DO
+              END IF
+           END DO
+ 
 
       END SELECT
  
