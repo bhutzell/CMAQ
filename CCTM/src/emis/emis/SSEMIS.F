@@ -580,7 +580,7 @@ C-----------------------------------------------------------------------
             USE UTILIO_DEFN
             USE AERO_DATA
             USE AEROMET_DATA   
-            USE CONST, ONLY: PI, F6PI, STDTEMP, MWWAT, MWAIR, VP0
+            USE CONST, ONLY: PI, F6PI, STDTEMP, MWWAT, MWAIR, VP0, ERF
             USE ASX_DATA_MOD, ONLY: MET_DATA, GRID_DATA, svp2, svp3
 #ifdef mpas
             use coupler_module, only : cell_vol, cell_thickness
