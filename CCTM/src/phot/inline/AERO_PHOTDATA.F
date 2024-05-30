@@ -82,8 +82,8 @@ C Allocate and define arrays used to calculate aerosol optical properties
       
          USE AERO_DATA           ! aero variable data
          USE SOA_DEFN            ! gas soa data
-         USE AEROMET_DATA        ! constants and met data
-      
+         USE AEROMET_DATA        
+         USE CONST      
          USE CSQY_DATA, ONLY : NWL => NWL_REF, NUM_REFRACTIVE, REFRACTIVE_INDEX,
      &                         WAVELENGTH => EFFWL_REF !!! , FIRST_DAY => NEW_START
 
@@ -437,8 +437,8 @@ C-----------------------------------------------------------------------
 
       USE AERO_DATA           ! aero variable data
       USE SOA_DEFN            ! gas soa data
-      USE AEROMET_DATA        ! constants and met data
-      
+      USE AEROMET_DATA        ! met data
+      USE CONST      
       USE CSQY_DATA,  ONLY : NWL => NWL_REF, NUM_REFRACTIVE, REFRACTIVE_INDEX,
      &                       WAVELENGTH => EFFWL_REF
 
@@ -462,7 +462,6 @@ C Parameters:
 
       REAL( 8 ), PARAMETER :: NEGLECT_FRAC = 1.0D-9      ! skip if below this volume fraction
       REAL( 8 ), PARAMETER :: ONE_THIRD    = 1.0D0/3.0D0 
-      REAL,      PARAMETER :: ONE_OVER_PI  = 1.0 / PI
 
 C Local saved variables:
 

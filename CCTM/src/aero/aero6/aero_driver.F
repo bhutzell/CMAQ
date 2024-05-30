@@ -130,9 +130,9 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                          EXTRACT_PRECURSOR, UPDATE_PRECURSOR
       USE SOA_DEFN, ONLY: EXTRACT_SOA, UPDATE_ORGVAPOR
       USE AEROMET_DATA, ONLY: AIRTEMP, AIRPRES, AIRQV, AIRDENS, AIRRH, 
-     &                        H2OSATVP, H2OVP, MWWAT, MWAIR, SRFTEMP
+     &                        H2OSATVP, H2OVP, SRFTEMP
       USE UTILIO_DEFN, ONLY: XSTAT1, TIME2SEC, SEC2TIME, index1, nextime
-      USE CONST, ONLY: ESATL
+      USE CONST, ONLY: ESATL, MWWAT, MWAIR
 #ifdef twoway
      &                       , INDEX1, XSTAT3
 #endif

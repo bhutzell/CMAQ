@@ -2309,8 +2309,9 @@
      &                     MOMENT3_CONC, WET_AERO_DENS, AEROSPC_CONC,
      &                     AH2O_IDX, AORGH2O_IDX, AEROSPC, CALC_AERODIST_PARAMS,
      &                     AEROMODE, DRY_AERO_DENS, APOC_IDX, APNCOM_IDX
-      USE AEROMET_DATA, ONLY: AIRRH, PI, AIRTEMP, SRFTEMP, AIRPRES, DZ, CFRAC, PV, ZH
+      USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, SRFTEMP, AIRPRES, DZ, CFRAC, PV, ZH
       USE CGRID_SPCS, ONLY : RHOJ_LOC
+      USE CONST, ONLY : PI
       USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, OASPC, MAP_OAtoAERO
       USE RUNTIME_VARS, ONLY : PHOTDIAG
       USE ASX_DATA_MOD, ONLY : MET_DATA
@@ -3145,12 +3146,12 @@
       USE SOA_DEFN, ONLY : Extract_Soa
       USE AEROSOL_CHEMISTRY, ONLY: HETCHEM_RATES
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, AIRQV, AIRDENS, AIRPRES,
-     &                        SRFTEMP, H2OVP, H2OSATVP, MWWAT, MWAIR,
+     &                        SRFTEMP, H2OVP, H2OSATVP, 
      &                        CFRAC, DZ, PV, ZH
       use centralized_io_module, only : interpolate_var, pv_avail
       use RUNTIME_VARS
       Use phot_mod, Only: init_phot_shared 
-      use const, only: ESATL
+      use const, only: ESATL, MWWAT, MWAIR
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY : SENGRID

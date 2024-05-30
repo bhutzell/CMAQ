@@ -569,6 +569,7 @@ C=======================================================================
          use grid_conf        ! horizontal & vertical domain specifications
          use asx_data_mod     ! meteorology data
          use aero_data
+         use const, only: f6pi
          use utilio_defn
          use lus_data_module
          use centralized_io_module
@@ -601,8 +602,6 @@ C Parameters:
                                            !  2  Fine-medium sand
                                            !  3  Silt
                                            !  4  Clay
-
-         real, parameter :: f6dpi = 6.0 / pi
 
          real, parameter :: mv    = 0.16
          real, parameter :: sigv  = 1.45
@@ -1046,8 +1045,8 @@ C J/K mass emis rate [g/m3/s]  (edust( 1 ) not used)
             end do
 
 C J/K 3rd moment emis rate [m3/m3/s] (needed for number and surface)
-            m3j = edust( 1 ) * f6dpi / ( gpkg * dust_dens( 1 ) ) + TINY(0.0)
-            m3k = edust( 2 ) * f6dpi / ( gpkg * dust_dens( 2 ) ) + TINY(0.0)
+            m3j = edust( 1 ) * f6pi / ( gpkg * dust_dens( 1 ) ) + TINY(0.0)
+            m3k = edust( 2 ) * f6pi / ( gpkg * dust_dens( 2 ) ) + TINY(0.0)
 
 C Mode-specific emission rates of particle number [1/m3/s]
             dustoutn( 1,c,r ) = m3j * factnumj

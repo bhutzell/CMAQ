@@ -401,7 +401,7 @@ C-----------------------------------------------------------------------
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE RXNS_DATA
       USE AERO_DATA
-      USE AEROMET_DATA, ONLY: f6dpi, airdens
+      USE AEROMET_DATA, ONLY: airdens
       USE PRECURSOR_DATA
       USE SOA_DEFN
       USE ELMO_DATA
@@ -1717,7 +1717,7 @@ C      particle liquid water, nitrate, and chloride, ACP, 9, 8351-8363, 2009.
 C-----------------------------------------------------------------------
 
       USE AERO_DATA
-      USE AEROMET_DATA   ! Includes CONST.EXT
+      USE CONST, ONLY: F6PI
 
       IMPLICIT NONE
 
@@ -1786,9 +1786,9 @@ C *** variables for parameterization based on Bertram and Thornton (2009)
       REAL      AH2OM     ! water,    [moles / liter of particles] 
       REAL      ANO3M     ! nitrate,  [moles / liter of particles] 
    
-      REAL DEN1           ! local varible
-      REAL DEN2           ! local varible
-      REAL DEN            ! local varible
+      REAL DEN1           ! local variable
+      REAL DEN2           ! local variable
+      REAL DEN            ! local variable
       REAL INV_VOL        ! local variable 
       
       REAL, PARAMETER :: A = 3.2E-08       ! Unit [s] - Table 2       
@@ -1796,7 +1796,7 @@ C *** variables for parameterization based on Bertram and Thornton (2009)
       REAL, PARAMETER :: DELTA = 1.3E-01   ! Unit [1/M] - Table 2  
       REAL, PARAMETER :: K3OK2B = 6.0E-02  ! Unit [ ] - Table 2  
       REAL, PARAMETER :: K4OK2B = 29.0     ! Unit [ ] - Table 2  
-      REAL K2FP                            ! varible in eqn 10
+      REAL K2FP                            ! variable in eqn 10
                  
 C *** statement function for inverting the logit transformation given
 C     in Eq 7 by Davis et al (2008)
@@ -1946,7 +1946,7 @@ C     It calculates N2O5_GAMMA based on Bertran and Thornton, 2009
          CASE DEFAULT
       
 C *** Default setting in current version of CMAQ:
-C     This code implements the paramaterization given in Eq 15 by Davis
+C     This code implements the parameterization given in Eq 15 by Davis
 C     et al (2008), in which N2O5_GAMMA is a function of RH, TEMP,
 C     particle composition, and phase state.  Note: In this function, RH
 C     is in fractional units whereas the published equations refer to RH
@@ -2312,7 +2312,7 @@ C-----------------------------------------------------------------------
 
       Use aero_data
       Use precursor_data
-      Use aeromet_data   ! Includes CONST.EXT (pi) and airtemp
+      Use aeromet_data   ! airtemp
       Use utilio_defn    ! error message and abort
 
       Implicit None

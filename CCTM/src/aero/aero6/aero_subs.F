@@ -207,6 +207,7 @@ C-----------------------------------------------------------------------
       USE PRECURSOR_DATA      ! gas phase aero precursor data
       USE SOA_DEFN
       USE AEROMET_DATA
+      USE CONST
       USE UTILIO_DEFN
       USE AERO_BUDGET
 
@@ -763,6 +764,7 @@ C    aerosols. ATMOSPHERIC CHEMISTRY AND PHYSICS. 7, 4639-4659
       USE PRECURSOR_DATA
       USE SOA_DEFN
       USE AEROMET_DATA
+      USE CONST
       USE UTILIO_DEFN
 
 #ifdef sens
@@ -1796,7 +1798,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE NEWPART3 ( RH, T, XH2SO4, SO4RATE, DNDT, DMDT_so4, DM2DT )
 
       USE AERO_DATA
-      USE AEROMET_DATA   ! Includes CONST.EXT
+      USE CONST
       USE PRECURSOR_DATA, ONLY: PRECURSOR_MW, SULF_IDX
       USE UTILIO_DEFN
       
@@ -2015,7 +2017,7 @@ C-----------------------------------------------------------------------
 
       USE AERO_DATA
       USE PRECURSOR_DATA
-      USE AEROMET_DATA
+!     USE AEROMET_DATA
 
       IMPLICIT NONE
 
@@ -2918,7 +2920,7 @@ C-----------------------------------------------------------------------
 
       USE AERO_DATA, ONLY    : MIN_SIGMA_G, MAX_SIGMA_G
       USE CONST
-      USE AEROMET_DATA, ONLY : F6PI, PI6
+!     USE AEROMET_DATA, ONLY : F6PI, PI6
 
       IMPLICIT NONE
 
@@ -3048,7 +3050,7 @@ C  Called by: Gas-Phase Chemistry Driver
       USE AERO_DATA, ONLY: EXTRACT_AERO, CALCMOMENTS, N_MODE, MOMENT2_CONC,
      &                     MOMENT3_CONC, AEROMODE_DIAM, AEROMODE_LNSG,
      &                     CHEM_M2DRY_INIT, CHEM_M3DRY_INIT, FIXED_SG
-      USE AEROMET_DATA, ONLY: pi
+      USE CONST, ONLY: pi
       USE GRID_CONF, ONLY: NLAYS, NCOLS, NROWS
       USE PRECURSOR_DATA, ONLY: EXTRACT_PRECURSOR
 
@@ -3132,7 +3134,7 @@ C  Key Subroutines Called: none
 C
 C  Called by: Gas-Phase Chemistry Driver
       USE AERO_DATA
-      USE AEROMET_DATA, ONLY: pi
+      USE CONST, ONLY: pi
       USE GRID_CONF, ONLY: NLAYS, NROWS, NCOLS
 
       IMPLICIT NONE

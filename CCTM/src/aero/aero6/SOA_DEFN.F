@@ -276,7 +276,8 @@ C-----------------------------------------------------------------------
 
       Use rxns_data, only: mechname
       Use aero_data, only: AE_eflag, findAero, aerospc_mw, n_aerospc, aerospc
-      Use aeromet_data, only: airdens, inv_mwair, min_gasconc
+      Use aeromet_data, only: airdens, min_gasconc
+      Use const, only: inv_mwair
       Use cgrid_spcs, only: n_gc_spc, gc_spc, n_gc_g2ae, gc_g2ae, gc_strt, gc_molwt, gc_g2ae_map, 
      &                      n_nr_spc, nr_spc, n_nr_n2ae, nr_n2ae, nr_strt, nr_molwt, nr_n2ae_map,
      &                      n_ae_spc, ae_spc
@@ -525,7 +526,8 @@ C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
 C-----------------------------------------------------------------------
 
       Use aero_data, only : cond_budget, npf_budget
-      Use aeromet_data, only: airdens, inv_mwair, min_gasconc
+      Use aeromet_data, only: airdens, min_gasconc
+      Use const, only: inv_mwair
       Use utilio_defn, only: xstat3, m3exit
 
       Implicit None
@@ -915,6 +917,7 @@ C Key Subroutines/Functions called:  newt, soabisection
 
       Use aero_data
       Use aeromet_data
+      Use const
       Use utilio_defn
 
       Implicit None

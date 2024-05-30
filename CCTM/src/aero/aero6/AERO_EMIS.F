@@ -467,7 +467,7 @@ C
 C ----------------------------------------------------------------------
 
          USE AERO_DATA, ONLY: AEROSPC, N_AEROSPC, AEROSPC_MWINV 
-         USE AEROMET_DATA, ONLY: F6DPI
+         USE CONST, ONLY: F6DPI
          USE ASX_DATA_MOD, ONLY: MET_DATA
          USE DESID_VARS, ONLY: DESID_N_ISTR, IDUSTSRM, ISEASRM
          USE GRID_CONF, ONLY: NCOLS, NROWS

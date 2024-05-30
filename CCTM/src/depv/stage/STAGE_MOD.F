@@ -717,7 +717,7 @@ C                     standardized names of all coarse-mode variables
 C-----------------------------------------------------------------------
 
          USE AERO_DATA           ! aero variable data   
-         USE AEROMET_DATA        ! Includes CONST.EXT
+         USE AEROMET_DATA        ! Includes CONST module
          USE GRID_CONF           ! horizontal & vertical domain specifications
          USE RXNS_DATA           ! chemical mechanism data
          Use MOSAIC_MOD, Only: Tile_Data 

@@ -46,7 +46,11 @@ MODULE const
 ! Geometric Constants:
   REAL,      PARAMETER :: PI = 3.14159265
   REAL( 8 ), PARAMETER :: DPI = 3.14159265358979324D0
- 
+  Real( 8 ), Parameter :: f6dpi = 6.0D0 / dpi
+  Real,      Parameter :: f6pi = 6.0 / pi
+  Real( 8 ), Parameter :: dpi6 = dpi / 6.0D0
+  Real,      Parameter :: pi6 = pi / 6.0
+
 ! pi/180 [ rad/deg ]
   REAL,      PARAMETER :: PI180  = PI / 180.0
 
@@ -126,6 +130,7 @@ MODULE const
 ! FSB: 78.06% N2, 21% O2, and 0.943% Ar on a mole 
 ! fraction basis (Source: Hobbs, pp. 69-70)
    REAL,     PARAMETER :: MWAIR = 28.9628
+   Real,     Parameter :: inv_mwair   = 1.0E3 / mwair  ! [ 1/g ]
 
 ! dry-air gas constant [ J / kg-K ]
    REAL,     PARAMETER :: RDGAS = 1.0E3 * RGASUNIV / MWAIR   ! 287.07548994
