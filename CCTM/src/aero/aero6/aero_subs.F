@@ -207,7 +207,7 @@ C-----------------------------------------------------------------------
       USE PRECURSOR_DATA      ! gas phase aero precursor data
       USE SOA_DEFN
       USE AEROMET_DATA
-      USE CONST, only: PI, STDATMPA, DKBOLTZ ! for now do not use module version of ERF
+      USE CONST, EXCLUDE_ERF => ERF  ! for maintaining consistency with research branch
       USE UTILIO_DEFN
       USE AERO_BUDGET
 
