@@ -1041,9 +1041,6 @@
 
 #endif
 
-      ! Allocate Structure for Passing MIO Parameters
-      ALLOCATE( MIO_FILE( 100 ) )
-
       END SUBROUTINE INIT_ENV_VARS
 
 !.........................................................................

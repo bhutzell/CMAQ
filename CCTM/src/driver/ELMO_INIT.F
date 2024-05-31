@@ -204,28 +204,28 @@
           IF ( MAP_ELMOTABLE( IDG,IV ).EQ.0 ) THEN
              N1 = N1 + 1
              MAP_ELMOTABLE( IDG,IV ) = N1
-             ALLOCATE( MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%(NM,NS) )
-             MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%(:,:) = 0
+             ALLOCATE( MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%IND(NM,NS) )
+             MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%IND(:,:) = 0
           END IF  
-          MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%(IM,IS) = IT
+          MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%IND(IM,IS) = IT
         ELSE IF ( NM.GT.0 ) THEN
           ! Multiple Modes
           IF ( MAP_ELMOTABLE( IDG,IV ).EQ.0 ) THEN
              N2 = N2 + 1
              MAP_ELMOTABLE( IDG,IV ) = N2
-             ALLOCATE( MAP_ELMO_IDtoTABLE_MODE( N2 )%(NM) )
-             MAP_ELMO_IDtoTABLE_MODE( N2 )%(:) = 0
+             ALLOCATE( MAP_ELMO_IDtoTABLE_MODE( N2 )%IND(NM) )
+             MAP_ELMO_IDtoTABLE_MODE( N2 )%IND(:) = 0
           END IF
-          MAP_ELMO_IDtoTABLE_MODE( N2 )%(IM) = IT
+          MAP_ELMO_IDtoTABLE_MODE( N2 )%IND(IM) = IT
         ELSE IF ( NS.GT.0 ) THEN
           ! Multiple Sources
           IF ( MAP_ELMOTABLE( IDG,IV ).EQ.0 ) THEN
              N3 = N3 + 1
              MAP_ELMOTABLE( IDG,IV ) = N3
-             ALLOCATE( MAP_ELMO_IDtoTABLE_SOURCE( N3 )%(NS) )
-             MAP_ELMO_IDtoTABLE_SOURCE( N3 )%(:) = 0
+             ALLOCATE( MAP_ELMO_IDtoTABLE_SOURCE( N3 )%IND(NS) )
+             MAP_ELMO_IDtoTABLE_SOURCE( N3 )%IND(:) = 0
           END IF
-          MAP_ELMO_IDtoTABLE_SOURCE( N3 )%(IS) = IT
+          MAP_ELMO_IDtoTABLE_SOURCE( N3 )%IND(IS) = IT
         END IF
       END DO
 

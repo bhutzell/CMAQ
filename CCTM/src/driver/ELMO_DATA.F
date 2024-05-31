@@ -211,44 +211,45 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_GAS_BENAPY  =163
       INTEGER, PARAMETER :: ID_BENAPY_FAERO=164
       INTEGER, PARAMETER :: ID_TNO3 =       165                     
-      INTEGER, PARAMETER :: ID_TNO3TOT =    166                     
-      INTEGER, PARAMETER :: ID_PM25_FRM =   167                     
-      INTEGER, PARAMETER :: ID_PMF_FRM =    168                     
-      INTEGER, PARAMETER :: ID_AOD550 =     169                     
-      INTEGER, PARAMETER :: ID_PMEXT550 =   170
-      INTEGER, PARAMETER :: ID_RH =         171
-      INTEGER, PARAMETER :: ID_TEMP =       172
-      INTEGER, PARAMETER :: ID_SRFTEMP =    173
-      INTEGER, PARAMETER :: ID_PRES =       174
-      INTEGER, PARAMETER :: ID_GN2O5F =     175
-      INTEGER, PARAMETER :: ID_GN2O5C =     176
-      INTEGER, PARAMETER :: ID_YCLNO2F =    177
-      INTEGER, PARAMETER :: ID_YCLNO2C =    178
-      INTEGER, PARAMETER :: ID_GIEPOX =     179
-      INTEGER, PARAMETER :: ID_KIEPOX =     180
-      INTEGER, PARAMETER :: ID_GIMAE =      181
-      INTEGER, PARAMETER :: ID_DZ    =      182
-      INTEGER, PARAMETER :: ID_ZH    =      183
-      INTEGER, PARAMETER :: ID_CFRAC =      184
-      INTEGER, PARAMETER :: ID_PV    =      185
-      INTEGER, PARAMETER :: ID_DENS  =      186
-      INTEGER, PARAMETER :: ID_RHOJ  =      187
-      INTEGER, PARAMETER :: ID_GAS_HNO3 =   188
-      INTEGER, PARAMETER :: ID_GAS_NH3  =   189
-      INTEGER, PARAMETER :: ID_DD_OXN_NOX = 190
-      INTEGER, PARAMETER :: ID_WD_OXN_NOX = 191
-      INTEGER, PARAMETER :: ID_DD_OXN_TNO3= 192
-      INTEGER, PARAMETER :: ID_WD_OXN_TNO3= 193
-      INTEGER, PARAMETER :: ID_DD_OXN_PANT= 194
-      INTEGER, PARAMETER :: ID_WD_OXN_PANT= 195
-      INTEGER, PARAMETER :: ID_DD_OXN_ORGN= 196
-      INTEGER, PARAMETER :: ID_WD_OXN_ORGN= 197
-      INTEGER, PARAMETER :: ID_DD_OXN_OTHR= 198
-      INTEGER, PARAMETER :: ID_WD_OXN_OTHR= 199
-      INTEGER, PARAMETER :: ID_DD_OXN_TOT = 200
-      INTEGER, PARAMETER :: ID_WD_OXN_TOT = 201
-      INTEGER, PARAMETER :: ID_TD_OXN_TOT = 202
-      INTEGER, PARAMETER :: ID_NOX        = 203
+      INTEGER, PARAMETER :: ID_TNO3_MOL =   166                     
+      INTEGER, PARAMETER :: ID_TNO3TOT =    167                     
+      INTEGER, PARAMETER :: ID_PM25_FRM =   168                     
+      INTEGER, PARAMETER :: ID_PMF_FRM =    169                     
+      INTEGER, PARAMETER :: ID_AOD550 =     160                     
+      INTEGER, PARAMETER :: ID_PMEXT550 =   171
+      INTEGER, PARAMETER :: ID_RH =         172
+      INTEGER, PARAMETER :: ID_TEMP =       173
+      INTEGER, PARAMETER :: ID_SRFTEMP =    174
+      INTEGER, PARAMETER :: ID_PRES =       175
+      INTEGER, PARAMETER :: ID_GN2O5F =     176
+      INTEGER, PARAMETER :: ID_GN2O5C =     177
+      INTEGER, PARAMETER :: ID_YCLNO2F =    178
+      INTEGER, PARAMETER :: ID_YCLNO2C =    179
+      INTEGER, PARAMETER :: ID_GIEPOX =     170
+      INTEGER, PARAMETER :: ID_KIEPOX =     181
+      INTEGER, PARAMETER :: ID_GIMAE =      182
+      INTEGER, PARAMETER :: ID_DZ    =      183
+      INTEGER, PARAMETER :: ID_ZH    =      184
+      INTEGER, PARAMETER :: ID_CFRAC =      185
+      INTEGER, PARAMETER :: ID_PV    =      186
+      INTEGER, PARAMETER :: ID_DENS  =      187
+      INTEGER, PARAMETER :: ID_RHOJ  =      188
+      INTEGER, PARAMETER :: ID_GAS_HNO3 =   189
+      INTEGER, PARAMETER :: ID_GAS_NH3  =   180
+      INTEGER, PARAMETER :: ID_DD_OXN_NOX = 191
+      INTEGER, PARAMETER :: ID_WD_OXN_NOX = 192
+      INTEGER, PARAMETER :: ID_DD_OXN_TNO3= 193
+      INTEGER, PARAMETER :: ID_WD_OXN_TNO3= 194
+      INTEGER, PARAMETER :: ID_DD_OXN_PANT= 195
+      INTEGER, PARAMETER :: ID_WD_OXN_PANT= 196
+      INTEGER, PARAMETER :: ID_DD_OXN_ORGN= 197
+      INTEGER, PARAMETER :: ID_WD_OXN_ORGN= 198
+      INTEGER, PARAMETER :: ID_DD_OXN_OTHR= 199
+      INTEGER, PARAMETER :: ID_WD_OXN_OTHR= 200
+      INTEGER, PARAMETER :: ID_DD_OXN_TOT = 201
+      INTEGER, PARAMETER :: ID_WD_OXN_TOT = 202
+      INTEGER, PARAMETER :: ID_TD_OXN_TOT = 203
+      INTEGER, PARAMETER :: ID_NOX        = 204
 
 
       TYPE ELDTP
@@ -262,7 +263,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
 
-      INTEGER, PARAMETER :: N_ELMO_LIST = 203
+      INTEGER, PARAMETER :: N_ELMO_LIST = 204
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
       ! Gas-Phase Variables
@@ -514,6 +515,19 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         REAL, ALLOCATABLE, SAVE :: CONC_VEC( : )
         INTEGER, SAVE           :: C1, R1, L1
 
+        ! Arrays for Mapping Output variables to ELMO Table IDs
+        TYPE ELMO_MAP_1D
+            INTEGER, ALLOCATABLE       :: IND( : )
+        END TYPE ELMO_MAP_1D
+        TYPE ELMO_MAP_2D
+            INTEGER, ALLOCATABLE       :: IND( :,: )
+        END TYPE ELMO_MAP_2D
+
+        TYPE( ELMO_MAP_1D ), ALLOCATABLE, SAVE :: 
+     &        MAP_ELMO_IDtoTABLE_MODE, MAP_ELMO_IDtoTABLE_SOURCE
+        TYPE( ELMO_MAP_2D ), ALLOCATABLE, SAVE :: 
+     &        MAP_ELMO_IDtoTABLE_MODEi_SOURCE
+
         ! Variables for Aerosol Chemistry
         REAL, SAVE, ALLOCATABLE :: GAMMA_N2O5IJ( :,:,:  ) ! Fine modes N2O5 rx effic.
         REAL, SAVE, ALLOCATABLE :: GAMMA_N2O5K(  :,:,:  ) ! Coarse mode N2O5 rx effic.
@@ -559,7 +573,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             INTEGER, ALLOCATABLE :: ID(:)       ! Index in native array (e.g. CGRID, AEROSPC, SA_ACONC, etc.)
             INTEGER, ALLOCATABLE :: VAR_TYPE(:) ! ELMO Variable Type (ELMO, CGRID, AEROBULK, FAM, WDEP, DDEP)
             REAL,    ALLOCATABLE :: MW(:)       ! Species molecular weight, if defined
-            INTEGER              :: SPC_UNIT(:) ! Indicates whether this variables units are mass-based(1), 
+            INTEGER, ALLOCATABLE :: SPC_UNIT(:) ! Indicates whether this variables units are mass-based(1), 
                                                 !   mole-based(2), or neither(0).
             REAL,    ALLOCATABLE :: COEFF(:)    ! Coefficient for each variable
             LOGICAL, ALLOCATABLE :: L_MODE(:)   ! For which modes does this aggregate apply
@@ -648,6 +662,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !     front of the family name).
 !-------------------------------------------------------------------------
 
+      USE util_Family_module
+
       IMPLICIT NONE
 
       CHARACTER(16), INTENT( IN ) :: VARS_NML_IN( : )
@@ -655,11 +671,20 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       CHARACTER(100), INTENT( IN ) :: CFILE
       INTEGER, INTENT( OUT ) :: LERROR
       CHARACTER, ALLOCATABLE :: VARS_NML( : )
+
+      INTEGER N_END, N_NML
+      LOGICAL EXPAND_NML
+      INTEGER I1, I2, I3, IT, IFAM
+      
+      
+      CHARACTER( 250 ) :: XMSG
+      CHARACTER, PARAMETER :: PNAME = 'MAP_ELMO_NML'
+
              
       ! Diagnose VARS_NML_IN Size
       N_END = INDEX1( '', N_NML, VARS_NML_IN ) - 1
       IF ( N_END .LE. 0 ) THEN
-          WRITE( XMSG, '(A)' ),'ERROR: Undefined variables requested ',
+          WRITE( XMSG, '(A)' ),'ERROR: Undefined variables requested for ELMO output'
           CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
       END IF
       
@@ -690,63 +715,63 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_CONC' ) THEN
             ! Activate all CGRID species
             DO IT = 1,N_ELMO_TABLE
-                IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_CGRID )
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ETYPE_CGRID )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_WDEP' ) THEN
             ! Activate all Wet Deposition Fluxes
             DO IT = 1,N_ELMO_TABLE
-                IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_WDEP 
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ETYPE_WDEP )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_DDEP' ) THEN
             ! Activate all Dry Deposition FLuxes
             DO IT = 1,N_ELMO_TABLE
-                IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_DDEP 
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ETYPE_DDEP )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_ISAM' ) THEN
             ! Activate all ISAM Species
             DO IT = 1,N_ELMO_TABLE
-                IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_ISAM
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ETYPE_ISAM )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_ISAM_WDEP' ) THEN
             ! Activate all ISAM Wet Deposition Fluxes
             DO IT = 1,N_ELMO_TABLE
-                IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_ISAM_WDEP
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ETYPE_ISAM_WDEP )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_ISAM_DDEP' ) THEN
             ! Activate all ISAM Dry Deposition Fluxes
             DO IT = 1,N_ELMO_TABLE
-                IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_ISAM_DDEP
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ETYPE_ISAM_DDEP )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_DDM' ) THEN
             ! Activate all DDM3D Species
             DO IT = 1,N_ELMO_TABLE
-                IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_DDM
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ETYPE_DDM )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_DDM_WDEP' ) THEN
             ! Activate all DDM Wet Deposition Fluxes
             DO IT = 1,N_ELMO_TABLE
-                IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_DDM_WDEP
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ETYPE_DDM_WDEP )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_DDM_DDEP' ) THEN
             ! Activate all DDM Dry Depostion Fluxes
             DO IT = 1,N_ELMO_TABLE
-                IF ( ELMO_TABLE( IT )%VAR_TYPE = ETYPE_DDM_DDEP
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ETYPE_DDM_DDEP )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
          
@@ -1021,10 +1046,10 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CASE DEFAULT
            IUNIT = 0
            XMSG = 'A unit (' // trim(UNIT_TMP) // ') has been given ' //
-       &          'for the mapping of an ELMO aggregate variable, that '//
-       &          'is not consistent with a concentration or deposition '//
-       &          'flux. Confirm that this is correct for variable '//
-       &          trim(VARNAME) //'.'
+     &          'for the mapping of an ELMO aggregate variable, that '//
+     &          'is not consistent with a concentration or deposition '//
+     &          'flux. Confirm that this is correct for variable '//
+     &          trim(VARNAME) //'.'
            CALL M3WARN( 'MAP_ELMO_UNITS', 0, 0, XMSG, XSTAT1 )
       END SELECT
  
@@ -1039,7 +1064,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       IMPLICIT NONE
  
       INTEGER, INTENT( IN )  :: J
-      INTEGER, INTENT( IN )  :: IVAR
+      INTEGER, INTENT( IN )  :: OUT_UNIT
       REAL,    INTENT( OUT ) :: FAC 
 
       INTEGER :: SPC_UNIT
@@ -1056,8 +1081,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       ! for any unit conversions.
       IF ( ELMO_TABLE( J )%MW .EQ. 0.0 ) THEN
         XMSG = 'ELMO is attempting to convert variable ' // 
-       &       TRIM( ELMO_TABLE( J )%NAME // ' to mole- or mass-based '//
-       &       'units but the MW is equal to 0.0'
+     &       TRIM( ELMO_TABLE( J )%NAME ) // ' to mole- or mass-based '//
+     &       'units but the MW is equal to 0.0'
         CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, XSTAT1 )
       END IF
 
@@ -1074,7 +1099,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       END SUBROUTINE ELMO_UNIT_CONVERSION
 
 !----------------------------------------------------------------------------      
-      FUNCTION FIND_ELMO_TABLE( IDG, IM, IV, ISRC )
+      INTEGER FUNCTION FIND_ELMO_TABLE( IDG, IM, IV, ISRC )
 !----------------------------------------------------------------------------      
 !     Look up the index in the ELMO Table given the calculation ID,
 !     variable type, mode number, and source number.
@@ -1105,7 +1130,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
              CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
           END IF
           I = MAP_ELMOTABLE( IDG,IV )
-          J = MAP_ELMO_IDtoTABLE_MODE_SOURCE( I )%( IM,ISRC )
+          J = MAP_ELMO_IDtoTABLE_MODE_SOURCE( I )%IND( IM,ISRC )
 
       ELSE IF ( N_ELMOTABLE_MODE( IDG,IV ).GT.0 ) THEN
           ! Look up Table ID on multiple mode map
@@ -1116,7 +1141,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
              CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
           END IF
           I = MAP_ELMOTABLE( IDG,IV )
-          J = MAP_ELMO_IDtoTABLE_MODE( I )%( IM )
+          J = MAP_ELMO_IDtoTABLE_MODE( I )%IND( IM )
 
       ELSE IF ( N_ELMOTABLE_SOURCE( IDG,IV ).GT.0 ) THEN
           ! Look up Table ID on multiple source map
@@ -1127,7 +1152,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
              CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
           END IF
           I = MAP_ELMOTABLE( IDG,IV )
-          J = MAP_ELMO_IDtoTABLE_SOURCE( I )%( ISRC )
+          J = MAP_ELMO_IDtoTABLE_SOURCE( I )%IND( ISRC )
 
       ELSE
           ! Look up Table ID on default map
