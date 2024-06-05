@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, May  3, 2024
+C  REVISION HISTORY: Created by EBI solver program, Jun  5, 2024
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -162,7 +162,8 @@ c..Loss frequency of NO3 ( except NO3 + NO3 if present )
      &    +                 RKI(   492 ) * YC ( VROCP6AROP  )   ! NO3+VROCP6AROP=...
      &    +                 RKI(   498 ) * YC ( VROCP5AROP  )   ! NO3+VROCP5AROP=...
      &    +                 RKI(   504 ) * YC ( NAPHP       )   ! NO3+NAPHP=NO2+...
-     &    +                 RKI(   529 ) * YC ( STYP        )   ! NO3+STYP=NO2+HO2+...
+     &    +                 RKI(   528 ) * YC ( STY         )   ! NO3+STY=NO2+STYP
+     &    +                 RKI(   531 ) * YC ( STYP        )   ! NO3+STYP=NO2+HO2+...
 
 c..Loss frequency of N2O5
       L16 =                 RKI(    71 )                        ! N2O5=NO2+NO3

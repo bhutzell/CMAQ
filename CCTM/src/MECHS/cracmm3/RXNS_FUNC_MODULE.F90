@@ -1398,16 +1398,20 @@
              RKI( NCELL,  525) =   9.2600D-05 * SFACT 
 !  Reaction Label ROCARO71        
              RKI( NCELL,  526) =   5.8000D-11 * CFACT 
+!  Reaction Label ROCARO71a       
+             RKI( NCELL,  527) =   1.7000D-17 * CFACT 
+!  Reaction Label ROCARO71b       
+             RKI( NCELL,  528) =   1.5000D-12 * CFACT 
 !  Reaction Label ROCARO72        
-             RKI( NCELL,  527) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.9100D-12,   1.3000D+03 )
+             RKI( NCELL,  529) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.9100D-12,   1.3000D+03 )
 !  Reaction Label ROCARO73        
-             RKI( NCELL,  528) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.7000D-12,   3.6000D+02 )
+             RKI( NCELL,  530) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.7000D-12,   3.6000D+02 )
 !  Reaction Label ROCARO74        
-             RKI( NCELL,  529) =   2.3000D-12 * CFACT 
+             RKI( NCELL,  531) =   2.3000D-12 * CFACT 
 !  Reaction Label ROCARO75        
-             RKI( NCELL,  530) =   2.5000D-13 * CFACT 
+             RKI( NCELL,  532) =   2.5000D-13 * CFACT 
 !  Reaction Label ROCARO76        
-             RKI( NCELL,  531) =   2.5000D-13 * CFACT 
+             RKI( NCELL,  533) =   2.5000D-13 * CFACT 
 
         END DO  
 !  Multiply rate constants by [M], [O2], [N2], [H2O], [H2], or [CH4]

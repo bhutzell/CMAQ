@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, May  3, 2024
+C  REVISION HISTORY: Created by EBI solver program, Jun  5, 2024
 C
 C***********************************************************************
       USE HRDATA
@@ -580,11 +580,13 @@ C..NOTE: RXRAT commented out are not referenced by any routine
       RXRAT(    524 ) = RKI(   524 ) * YC(  ATRPNJ )
       RXRAT(    525 ) = RKI(   525 ) * YC(  AHONITJ )
       RXRAT(    526 ) = RKI(   526 ) * YC(  STY ) * YC(  HO )
-      RXRAT(    527 ) = RKI(   527 ) * YC(  STYP ) * YC(  HO2 )
-      RXRAT(    528 ) = RKI(   528 ) * YC(  STYP ) * YC(  NO )
-      RXRAT(    529 ) = RKI(   529 ) * YC(  STYP ) * YC(  NO3 )
-      RXRAT(    530 ) = RKI(   530 ) * YC(  STYP ) * YC(  MO2 )
-      RXRAT(    531 ) = RKI(   531 ) * YC(  STYP ) * YC(  ACO3 )
+      RXRAT(    527 ) = RKI(   527 ) * YC(  STY ) * YC(  O3 )
+      RXRAT(    528 ) = RKI(   528 ) * YC(  STY ) * YC(  NO3 )
+      RXRAT(    529 ) = RKI(   529 ) * YC(  STYP ) * YC(  HO2 )
+      RXRAT(    530 ) = RKI(   530 ) * YC(  STYP ) * YC(  NO )
+      RXRAT(    531 ) = RKI(   531 ) * YC(  STYP ) * YC(  NO3 )
+      RXRAT(    532 ) = RKI(   532 ) * YC(  STYP ) * YC(  MO2 )
+      RXRAT(    533 ) = RKI(   533 ) * YC(  STYP ) * YC(  ACO3 )
 
 
       RETURN
