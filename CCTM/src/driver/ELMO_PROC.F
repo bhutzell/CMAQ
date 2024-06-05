@@ -433,15 +433,19 @@
       VAR_TYPE  = ELMO_TABLE( J )%VAR_TYPE ! Specify Variable Type (e.g. CGRID, FAM, 
                                            !   ISAM)
       
-      ! Retrieve size cutoff if necessary
-      INLET = ELMO_TABLE( J )%INLET
-      WETNESS = ELMO_TABLE( J )%WETNESS 
-      FRAC( : ) = 1.0
-      IF ( INLET .NE. 0 ) THEN
-        DO IMODE = 1,N_MODE
-           CALL GET_AERO_INLET( INLET, IMODE, WETNESS, FRAC( IMODE ) )
-        END DO
-      END IF
+      ! Compute mode-dependent fraction from size cutoff if applicable
+      INLET = ELMO_COMP( J )%INLET
+      WETNESS = ELMO_COMP( J )%WETNESS 
+      FRAC( : ) = 0.0
+      DO IMODE = 1,N_MODE
+        IF ( ELMO_COMP( J )%L_MODE( IMODE ) ) THEN
+           IF ( INLET .EQ. 0 ) THEN
+              CALL GET_AERO_INLET( INLET, IMODE, WETNESS, FRAC( IMODE ) )
+           ELSE
+              FRAC = 1.0
+           END IF
+        END IF
+      END DO
  
       ! Calculate conversion factor for transforming between units. For
       ! example, ppbC or kgN ha-1 can be calculated using this routine.
@@ -464,10 +468,9 @@
             DO IMODE = 1,N_MODE
               ! If this mode is supposed to be added (LMODE) and the
               ! species is not missing, then add it up
-              LMODE = ELMO_COMP( J )%L_MODE( IMODE )
-              IF ( LMODE .AND. ( .NOT. AERO_MISSING( ID,IMODE ) ) ) 
+              IF ( .NOT. AERO_MISSING( ID,IMODE ) )  
      &            OUTVAL = OUTVAL + AEROSPC_CONC( ID, IMODE ) * 
-     &                        FRAC( IMODE )* FAC
+     &                              FRAC( IMODE )* FAC
             END DO
                 
          CASE ( ETYPE_FAM, ETYPE_ISAM_FAM, ETYPE_DDM_FAM )
@@ -516,8 +519,7 @@
             DO IMODE = 1,N_MODE
               ! If this mode is supposed to be added (LMODE) and the
               ! species is not missing, then add it up
-              LMODE = ELMO_COMP( J )%L_MODE( IMODE )
-              IF ( LMODE .AND. ( .NOT. AERO_MISSING( ID,IMODE ) ) ) THEN
+              IF ( ( .NOT. AERO_MISSING( ID,IMODE ) )  THEN
                   ISA = MAP_AEROtoSA( ID, IMODE )
                   IF ( ISRC .EQ. 0 ) THEN
                      OUTVAL = OUTVAL + SUM(ISAM_VEC( ISA,:) ) * FRAC( IMODE )

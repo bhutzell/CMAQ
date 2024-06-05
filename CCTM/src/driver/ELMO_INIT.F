@@ -26,6 +26,8 @@
       ! vectors.
 !-------------------------------------------------------------------------
       
+      USE ELMO_DATA
+
       IMPLICIT NONE
 
       INTEGER N, M, P, J, IM, ILIST, S, F

@@ -526,7 +526,12 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         TYPE( ELMO_MAP_1D ), ALLOCATABLE, SAVE :: 
      &        MAP_ELMO_IDtoTABLE_MODE, MAP_ELMO_IDtoTABLE_SOURCE
         TYPE( ELMO_MAP_2D ), ALLOCATABLE, SAVE :: 
-     &        MAP_ELMO_IDtoTABLE_MODEi_SOURCE
+     &        MAP_ELMO_IDtoTABLE_MODE_SOURCE
+
+        INTEGER, ALLOCATABLE, SAVE :: N_ELMOTABLE_MODE(:,:),
+     &                                N_ELMOTABLE_SOURCE(:,:)
+     &                                
+
 
         ! Variables for Aerosol Chemistry
         REAL, SAVE, ALLOCATABLE :: GAMMA_N2O5IJ( :,:,:  ) ! Fine modes N2O5 rx effic.
@@ -556,10 +561,6 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             CHARACTER (LEN = 80) :: DESC        ! Description for Output File
                                                 
             REAL                 :: MW          ! Species molecular weight, if defined
-            INTEGER              :: INLET       ! Integer pointing to the corresponding inlet of choice 
-                                                !   in the ELMO_INLET structure
-            INTEGER              :: WETNESS     ! Integer prescribing wet or dry aerosol (1 = wet, 2 = dry)
-                                                !   Default is wet
             LOGICAL              :: L_COMP      ! Is this variable a linear combination of other variables
         END TYPE ELMO_TABLE_TYPE
 
@@ -578,10 +579,16 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             REAL,    ALLOCATABLE :: COEFF(:)    ! Coefficient for each variable
             LOGICAL, ALLOCATABLE :: L_MODE(:)   ! For which modes does this aggregate apply
             LOGICAL, ALLOCATABLE :: L_SOURCE(:) ! For Which sources does this component apply
+            INTEGER              :: INLET       ! Integer pointing to the corresponding inlet of choice 
+                                                !   in the ELMO_INLET structure
+            INTEGER              :: WETNESS     ! Integer prescribing wet or dry aerosol (1 = wet, 2 = dry)
+                                                !   Default is wet
         END TYPE ELMO_COMP_TYPE
 
         TYPE (ELMO_TABLE_TYPE), ALLOCATABLE, SAVE :: ELMO_TABLE( : ) 
         TYPE (ELMO_COMP_TYPE ), ALLOCATABLE, SAVE :: ELMO_COMP( : ) 
+
+        INTEGER, SAVE :: N_ELMO_TABLE
 
         ! Define Parameters indicating what kind of variable each ELMO
         ! output is
@@ -706,7 +713,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          ! or Keyword List
          I1 = INDEX1( VARS_NML(1), N_KEY, ELMO_KEY%WORD )
          I2 = INDEX1( VARS_NML(1), N_ELMO_TABLE, ELMO_TABLE%NAME )
-         I3 = INDEX1( VARS_NML(1), N_ELMO_TABLE, ELMO_TABLE%OUT_NNAME )
+         I3 = INDEX1( VARS_NML(1), N_ELMO_TABLE, ELMO_TABLE%OUT_NAME )
 
          IF ( VARS_NML(1) .EQ. 'ALL' ) THEN
             ! Add All ELMO_TABLE variables to the Instaneous File
@@ -787,9 +794,9 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
               IF ( EXPAND_NML ) THEN
                  ! Expand the chemical family if the * was used
                  IFAM = INDEX1( VARS_NML(1), N_Chem_Fams, ChemFamilyName )
-                 VARS_NML( N_END+1:N_END+CHEM_FAMILY_NUM( IFAM ) ) =
-     &                                   CHEMFAMILYMEMBERS( IFAM,: )
-                 N_END = N_END + CHEM_FAMILY_NUM( IFAM )
+                 VARS_NML( N_END+1:N_END+ChemFamilyNum( IFAM ) ) =
+     &                                   ChemFamilyMembers( IFAM,: )
+                 N_END = N_END + ChemFamilyNum( IFAM )
               ELSE
                  ! Activate this family if no * was used
                  L_ELMO_TABLE( I2 ) = .TRUE.
@@ -804,7 +811,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
               DO IT = 1,N_ELMO_TABLE
                   IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ELMO_TABLE( I2 )%VAR_TYPE .AND.
      &                 ELMO_TABLE( IT )%NAME .EQ. ELMO_TABLE( I2 )%NAME ) THEN
-                  L_ELMO_TABLE( IT ) = .TRUE.
+                     L_ELMO_TABLE( IT ) = .TRUE.
+                  END IF
               END DO
 
             END IF
@@ -829,7 +837,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          ! Remove Family name after expansion
          VARS_NML( 1:N_END-1 ) = VARS_NML( 2:N_END )
          VARS_NML( N_END ) = ''
-         N_END = NEND - 1
+         N_END = N_END - 1
       END DO
 
       END SUBROUTINE MAP_ELMO_NML    
@@ -840,13 +848,17 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !     are allowed.
 !-------------------------------------------------------------------------
 
+      USE GRID_CONF, ONLY : NLAYS
+
       IMPLICIT NONE
 
       INTEGER, INTENT( INOUT )    :: LAYER_TOP
       INTEGER, INTENT( IN )       :: LAYER_BOT
       CHARACTER(16), INTENT( IN ) :: FNAME
+      CHARACTER(250)              :: XMSG
+      CHARACTER, PARAMETER        :: PNAME = 'ELMO_CHECK_LAYERS'
 
-      IF ( INST_LAYER_TOP .EQ. -1 ) INST_LAYER_TOP = NLAYS
+      IF ( LAYER_TOP .EQ. -1 ) LAYER_TOP = NLAYS
       IF ( LAYER_TOP .LE. 0 .OR. LAYER_TOP .GT. NLAYS ) THEN
            XMSG = TRIM( FNAME ) // '_LAYER_TOP must be prescribed between '//
      &            '1 and NLAYS, or set to -1 to automatically choose NLAYS.'
@@ -858,8 +870,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
       IF ( LAYER_BOT .GT. LAYER_TOP ) THEN
-           XMSG = TRIM(FNAME) // 'INST_LAYER_BOT must be less than or equal '// 
-     &            'to ' // TRIM(FNAME) // '_LAYER_TOP.'
+           XMSG = TRIM(FNAME) // ' LAYER_BOT must be less than or equal '// 
+     &            'to ' // TRIM(FNAME) // ' LAYER_TOP.'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
@@ -891,6 +903,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, INTENT( IN ) :: N_VARS
       CHARACTER( * ), INTENT( IN ) ::  AEROTYPE_TMP
       CHARACTER( 20 ) AEROTYPE
+      INTEGER VAR_TYPE, ISRC
+
       CHARACTER( 200 ) XMSG
       CHARACTER(16), SAVE :: PNAME = 'INIT_ELMO_COEF'
       INTEGER ALLOCSTAT
@@ -898,27 +912,28 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       ! Initialize All Components of ELMO_COEFFS
       ELMO_TABLE( J )%L_COMP = .TRUE.
       ELMO_COMP( J )%N_VARS = N_VARS
-      ALLOCATE( ELMO_COMP( J )%L_MODE( N_MODE ),
+      ALLOCATE( ELMO_COMP( J )%L_MODE  ( N_MODE ),
      &          ELMO_COMP( J )%L_SOURCE( N_VARS ),
-     &          ELMO_COMP( J )%MW    ( N_VARS ),
-     &          ELMO_COMP( J )%UNIT_SP( N_VARS ),
-     &          ELMO_COMP( J )%I_SPEC( N_VARS ),
-     &          ELMO_COMP( J )%COEFF ( N_VARS ),
+     &          ELMO_COMP( J )%MW      ( N_VARS ),
+     &          ELMO_COMP( J )%SPC_UNIT( N_VARS ),
+     &          ELMO_COMP( J )%ID      ( N_VARS ),
+     &          ELMO_COMP( J )%TABID   ( N_VARS ),
+     &          ELMO_COMP( J )%COEFF   ( N_VARS ),
      &          STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_COMP' 
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
-      ELMO_COMP( J )%L_MODE ( : )   = .FALSE.
+      ELMO_COMP( J )%L_MODE  ( : )  = .FALSE.
       ELMO_COMP( J )%L_SOURCE( : )  = .FALSE.
-      ELMO_COMP( J )%MW     ( : )   = 0.
-      ELMO_COMP( J )%UNIT_SP( : )   = 0
-      ELMO_COMP( J )%I_SPEC ( : )   = 0
-      ELMO_COMP( J )%COEFF  ( : )   = 0.
+      ELMO_COMP( J )%MW      ( : )  = 0.
+      ELMO_COMP( J )%SPC_UNIT( : )  = 0
+      ELMO_COMP( J )%ID      ( : )  = 0
+      ELMO_COMP( J )%TABID   ( : )  = 0
+      ELMO_COMP( J )%COEFF   ( : )  = 0.
       ELMO_COMP( J )%INLET          = 0
       ELMO_COMP( J )%WETNESS        = IWET
-      ELMO_COMP( J )%UNIT           = 0       ! 0 = ug m-3
 
       ! Specify the Aerosol Modes Needed and Inlet Type based on User
       ! Input through the AEROTYPE variable.
@@ -979,9 +994,9 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       
       ! If this variable is an ISAM or DDM variable, set the Source Mask 
       ! for this Component
-      IF ( VAR_TYPE .EQ. ETYPE_ELMO_ISAM .OR. VAR_TYPE .EQ. ETYPE_ISAM 
+      IF ( VAR_TYPE .EQ. ETYPE_ISAM_ELMO .OR. VAR_TYPE .EQ. ETYPE_ISAM 
      & .OR.VAR_TYPE .EQ. ETYPE_ISAM_WDEP .OR. VAR_TYPE .EQ. ETYPE_ISAM_DDEP
-     & .OR.VAR_TYPE .EQ. ETYPE_ELMO_DDM  .OR. VAR_TYPE .EQ. ETYPE_DDM
+     & .OR.VAR_TYPE .EQ. ETYPE_DDM_ELMO  .OR. VAR_TYPE .EQ. ETYPE_DDM
      & .OR.VAR_TYPE .EQ. ETYPE_DDM_WDEP  .OR. VAR_TYPE .EQ. ETYPE_DDM_DDEP 
      & .OR.VAR_TYPE .EQ. ETYPE_ISAM_FAM  .OR. VAR_TYPE .EQ. ETYPE_DDM_FAM
      &        ) THEN
@@ -1050,7 +1065,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &          'is not consistent with a concentration or deposition '//
      &          'flux. Confirm that this is correct for variable '//
      &          trim(VARNAME) //'.'
-           CALL M3WARN( 'MAP_ELMO_UNITS', 0, 0, XMSG, XSTAT1 )
+           CALL M3WARN( 'MAP_ELMO_UNITS', 0, 0, XMSG )
       END SELECT
  
       END SUBROUTINE MAP_ELMO_UNITS
@@ -1068,6 +1083,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       REAL,    INTENT( OUT ) :: FAC 
 
       INTEGER :: SPC_UNIT
+      CHARACTER(200) :: XMSG
 
       ! Determine Unit Conversion Factors
       SPC_UNIT = ELMO_TABLE( J )%IUNIT
@@ -1083,7 +1099,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         XMSG = 'ELMO is attempting to convert variable ' // 
      &       TRIM( ELMO_TABLE( J )%NAME ) // ' to mole- or mass-based '//
      &       'units but the MW is equal to 0.0'
-        CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, XSTAT1 )
+        CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
       END IF
 
       ! Calculate Unit Conversions
@@ -1114,7 +1130,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &          'calculation ID ' // IDG // ' and variable type ' // IV // '. ' //
      &          'Neither of these indices are allowed to be zero.'
          CALL LOG_MESSAGE( LOGDEV, XMSG )
-         CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+         CALL M3EXIT( 'FIND_ELMO_TABLE', 0, 0, '', XSTAT1 )
       END IF
 
 
