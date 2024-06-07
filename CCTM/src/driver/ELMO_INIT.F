@@ -97,32 +97,32 @@
       END DO
 
       ! Map All ELMO_TABLE Variables, Identify which are Used and
-      ! allocate/map ELMO_LOCAL vector
+      ! allocate/map ELMO_USED vector
       ALLOCATE( L_ELMO_TABLE_USED( N_ELMO_TABLE ), STAT=IOS )
       CALL CHECKMEM( IOS, 'L_ELMO_TABLE_USED',PNAME ) 
       L_ELMO_TABLE_USED(:) = L_ELMO_TABLE_INST .OR. L_ELMO_TABLE_AVRG
 
       CALL ELMO_MAP_VARIABLES()
 
-      N_ELMO_LOCAL = COUNT( L_ELMO_TABLE_USED )
-      ALLOCATE( ELMO_LOCAL( N_ELMO_LOCAL ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'ELMO_LOCAL',PNAME ) 
-      ELMO_LOCAL = 0.0
-      ALLOCATE( ELMO_LOCAL_ID( N_ELMO_LOCAL ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'ELMO_LOCAL_ID',PNAME ) 
-      ELMO_LOCAL_ID = 0
-      ALLOCATE( ELMO_LOCAL_IM( N_ELMO_LOCAL ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'ELMO_LOCAL_IM',PNAME ) 
-      ELMO_LOCAL_IM = 0
-      ALLOCATE( ELMO_LOCAL_IV( N_ELMO_LOCAL ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'ELMO_LOCAL_IV',PNAME ) 
-      ELMO_LOCAL_IV = 0
-      ALLOCATE( ELMO_LOCAL_ISRC( N_ELMO_LOCAL ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'ELMO_LOCAL_ISRC',PNAME ) 
-      ELMO_LOCAL_ISRC = 0
-      ALLOCATE( ELMO_TABLEtoLOCAL( N_ELMO_TABLE ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'ELMO_TABLEtoLOCAL',PNAME ) 
-      ELMO_TABLEtoLOCAL = 0
+      N_ELMO_USED = COUNT( L_ELMO_TABLE_USED )
+      ALLOCATE( ELMO_USED( N_ELMO_USED ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'ELMO_USED',PNAME ) 
+      ELMO_USED = 0.0
+      ALLOCATE( ELMO_USED_ID( N_ELMO_USED ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'ELMO_USED_ID',PNAME ) 
+      ELMO_USED_ID = 0
+      ALLOCATE( ELMO_USED_IM( N_ELMO_USED ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'ELMO_USED_IM',PNAME ) 
+      ELMO_USED_IM = 0
+      ALLOCATE( ELMO_USED_IV( N_ELMO_USED ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'ELMO_USED_IV',PNAME ) 
+      ELMO_USED_IV = 0
+      ALLOCATE( ELMO_USED_ISRC( N_ELMO_USED ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'ELMO_USED_ISRC',PNAME ) 
+      ELMO_USED_ISRC = 0
+      ALLOCATE( ELMO_TABLEtoUSED( N_ELMO_TABLE ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'ELMO_TABLEtoUSED',PNAME ) 
+      ELMO_TABLEtoUSED = 0
 
       ALLOCATE( N_ELMOTABLE_MODE( MAX( ELMO_TABLE(:)%ID),
      &                            MAX( ELMO_TABLE(:)%VAR_TYPE) ), STAT=IOS )
@@ -138,36 +138,33 @@
       DO J = 1,N_ELMO_TABLE
           IF ( L_ELMO_TABLE_USED( J ) ) THEN
               N = N + 1
-              ELMO_LOCALtoTABLE( N ) = J
-              ELMO_LOCAL_ID( N )   = ELMO_TABLE(J)%ID
-              ELMO_LOCAL_IM( N )   = ELMO_TABLE(J)%IM
-              ELMO_LOCAL_IV( N )   = ELMO_TABLE(J)%VAR_TYPE
-              ELMO_LOCAL_ISRC( N ) = ELMO_TABLE(J)%SOURCE
+              ELMO_TABLEtoUSED( J ) = N
+              ELMO_USEDtoTABLE( N ) = J
+
+              ID   = ELMO_TABLE(J)%ID
+              IM   = ELMO_TABLE(J)%IM
+              IV   = ELMO_TABLE(J)%VAR_TYPE
+              ISRC = ELMO_TABLE(J)%SOURCE
+
+              ELMO_USED_ID( N )   = ID
+              ELMO_USED_IM( N )   = IM
+              ELMO_USED_IV( N )   = IV
+              ELMO_USED_ISRC( N ) = ISRC
 
               IF ( ELMO_TABLEtoINST( J ) .GT. 0 ) 
-     &           ELMO_INSTtoLOCAL( ELMO_TABLEtoINST( J ) ) = N
+     &           ELMO_INSTtoUSED( ELMO_TABLEtoINST( J ) ) = N
               IF ( ELMO_TABLEtoAVRG( J ) .GT. 0 ) 
-     &           ELMO_AVRGtoLOCAL( ELMO_TABLEtoAVRG( J ) ) = N
-
-              ELMO_TABLEtoLOCAL( J ) = N
-
-              ! Assign Table ID for variables that do not have multiple
-              ! modes or sources
-              IF ( ELMO_LOCAL_IM( N ).EQ.0 .AND. ELMO_LOCAL_ISRC( N ).EQ.0 ) THEN
-                MAP_ELMOTABLE( ELMO_LOCAL_ID(N), ELMO_LOCAL_IV(N) ) = J
-              END IF
+     &           ELMO_AVRGtoUSED( ELMO_TABLEtoAVRG( J ) ) = N
 
               ! Count number of modes for variables with multiple modes
-              IF ( ELMO_LOCAL_IM( N ).GT.0 ) THEN
-                N_ELMOTABLE_MODE( ELMO_LOCAL_ID(N), ELMO_LOCAL_IV(N) ) =
-     &          N_ELMOTABLE_MODE( ELMO_LOCAL_ID(N), ELMO_LOCAL_IV(N) ) + 1
+              IF ( IM .GT. 0 ) THEN
+                N_ELMOTABLE_MODE( IV, ID ) = N_ELMOTABLE_MODE( IV, ID ) + 1
               END IF
 
               ! Count number of sources for variables with multiple
               ! sources
-              IF ( ELMO_LOCAL_ISRC( N ).GT.0 ) THEN
-                N_ELMOTABLE_SOURCE( ELMO_LOCAL_ID(N), ELMO_LOCAL_IV(N) ) =
-     &          N_ELMOTABLE_SOURCE( ELMO_LOCAL_ID(N), ELMO_LOCAL_IV(N) ) + 1
+              IF ( ISRC .GT. 0 ) THEN
+                N_ELMOTABLE_SOURCE( IV, ID ) = N_ELMOTABLE_SOURCE( IV, ID ) + 1
               END IF
 
           END IF    
@@ -190,51 +187,59 @@
       N2 = 0
       N3 = 0
 
-      DO N = 1,N_ELMO_LOCAL
-        IT = ELMO_LOCALtoTABLE( N )
+      DO N = 1,N_ELMO_USED
+        IT = ELMO_USEDtoTABLE( N )
 
-        IDG = ELMO_LOCAL_ID(N)
-        IV  = ELMO_LOCAL_IV(N)
-        IM =  ELMO_LOCAL_IM(N)
-        IS =  ELMO_LOCAL_ISRC(N)
+        ID = ELMO_USED_ID(N)
+        IV = ELMO_USED_IV(N)
+        IM =  ELMO_USED_IM(N)
+        IS =  ELMO_USED_ISRC(N)
 
-        NM = N_ELMOTABLE_MODE( IDG,IV )
-        NS = N_ELMOTABLE_SOURCE( IDG,IV )
-
-        IF ( NM.GT.0 .AND. NS.gt.0    ) THEN
+        NM = N_ELMOTABLE_MODE( IV,ID )
+        NS = N_ELMOTABLE_SOURCE( IV,ID )
+        
+        IF ( NM .GT. 0 .AND. NS .gt. 0    ) THEN
           ! Multiple Modes and Sources
-          IF ( MAP_ELMOTABLE( IDG,IV ).EQ.0 ) THEN
+          IF ( MAP_ELMOTABLE( IV,ID ).EQ.0 ) THEN
              N1 = N1 + 1
-             MAP_ELMOTABLE( IDG,IV ) = N1
+             MAP_ELMOTABLE( IV,ID ) = N1
              ALLOCATE( MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%IND(NM,NS) )
              MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%IND(:,:) = 0
           END IF  
-          MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%IND(IM,IS) = IT
-        ELSE IF ( NM.GT.0 ) THEN
+          MAP_ELMO_IDtoTABLE_MODE_SOURCE( MAP_ELMOTABLE(IV,ID) )%IND(IM,IS) = IT
+
+        ELSE IF ( NM .GT. 0 ) THEN
           ! Multiple Modes
-          IF ( MAP_ELMOTABLE( IDG,IV ).EQ.0 ) THEN
+          IF ( MAP_ELMOTABLE( IV,ID ).EQ.0 ) THEN
              N2 = N2 + 1
-             MAP_ELMOTABLE( IDG,IV ) = N2
+             MAP_ELMOTABLE( IV,ID ) = N2
              ALLOCATE( MAP_ELMO_IDtoTABLE_MODE( N2 )%IND(NM) )
              MAP_ELMO_IDtoTABLE_MODE( N2 )%IND(:) = 0
           END IF
-          MAP_ELMO_IDtoTABLE_MODE( N2 )%IND(IM) = IT
-        ELSE IF ( NS.GT.0 ) THEN
+          MAP_ELMO_IDtoTABLE_MODE( MAP_ELMOTABLE(IV,ID) )%IND(IM) = IT
+
+        ELSE IF ( NS .GT. 0 ) THEN
           ! Multiple Sources
-          IF ( MAP_ELMOTABLE( IDG,IV ).EQ.0 ) THEN
+          IF ( MAP_ELMOTABLE( IV,ID ).EQ.0 ) THEN
              N3 = N3 + 1
-             MAP_ELMOTABLE( IDG,IV ) = N3
+             MAP_ELMOTABLE( IV,ID ) = N3
              ALLOCATE( MAP_ELMO_IDtoTABLE_SOURCE( N3 )%IND(NS) )
              MAP_ELMO_IDtoTABLE_SOURCE( N3 )%IND(:) = 0
           END IF
-          MAP_ELMO_IDtoTABLE_SOURCE( N3 )%IND(IS) = IT
+          MAP_ELMO_IDtoTABLE_SOURCE( MAP_ELMOTABLE(IV,ID) )%IND(IS) = IT
+
+        ELSE IF
+          ! Assign Table ID for variables that do not have multiple
+          ! modes or sources
+          MAP_ELMOTABLE( IV,ID ) = IT
+
         END IF
       END DO
 
 
       ! Allocate array for tracking whether or not a variable has been
       ! calculated each time step.
-      ALLOCATE( L_CALCULATED( N_ELMO_LOCAL ), STAT=IOS )
+      ALLOCATE( L_CALCULATED( N_ELMO_USED ), STAT=IOS )
       CALL CHECKMEM( IOS, 'L_CALCULATED',PNAME )
       L_CALCULATED = .FALSE.
 

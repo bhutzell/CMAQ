@@ -81,7 +81,8 @@
      &                        CFRAC, DZ, PV, ZH
       use centralized_io_module, only : interpolate_var, pv_avail
       use RUNTIME_VARS
-      Use phot_mod, Only: init_phot_shared 
+      Use phot_mod, Only: init_phot_shared
+      USE 
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY : SENGRID
@@ -237,18 +238,18 @@
          CONC_VEC(:) = CGRID(C,R,L,:)
 
          IF ( L.EQ.1 .AND. L_ELMO_WDEP )
-     &        WDEP_VEC(:) = TOT_DEP(C,R,:)
+     &        WDEP_VEC(:) = ELMO_WDEP(C,R,:)
          IF ( L.EQ.1 .AND. L_ELMO_DDEP )
-     &        DDEP_VEC(:) = DDEP(:,C,R)  ! N_SPC_DDEP --> DD2DV
+     &        DDEP_VEC(:) = ELMO_DDEP(:,C,R)  ! N_SPC_DDEP --> DD2DV
 
-#ifdef isam
+#ifdef isam                        
          ! Load All Raw Concentrations and Fluxes
          ISAM_VEC(:,:) = ISAM(C,R,L,:,:)
 
          IF ( L.EQ.1 .AND. L_ELMO_WDEP )
-     &        ISAM_WDEP_VEC(:,:) = TOT_SADEP(C,R,:,:) ! N_ISAM_SPEC, NTAG_SA
+     &        ISAM_WDEP_VEC(:,:) = ELMO_ISAM_WDEP(C,R,:,:) ! N_ISAM_SPEC, NTAG_SA
          IF ( L.EQ.1 .AND. L_ELMO_DDEP )
-     &        ISAM_DDEP_VEC(:) = SA_DDEP(C,R,:)   ! N_SPCTAG
+     &        ISAM_DDEP_VEC(:,:) = ELMO_ISAM_DDEP(C,R,:)   ! N_SPCTAG
 #endif
 
 #ifdef sens
@@ -256,9 +257,9 @@
          DDM_VEC(:,:) = SENGRID(C,R,L,:,:)  ! NPMAX, N_SPCS
 
          IF ( L.EQ.1 .AND. L_ELMO_WDEP )
-     &        DDM_WDEP_VEC(:,:) = S_TOTDEP(C,R,:,:) !NPMAX, N_SPC_WDEP
+     &        DDM_WDEP_VEC(:,:) = ELMO_DDM_WDEP(C,R,:,:) !N_SPC_WDEP, NPMAX
          IF ( L.EQ.1 .AND. L_ELMO_DDEP )
-     &        DDM_DDEP_VEC(:,:) = S_DDEP(:,C,R,:)  ! N_SPC_DDEP --> DD2DV, NPMAX
+     &        DDM_DDEP_VEC(:,:) = ELMO_DDM_DDEP(C,R,:,:)  ! N_SPC_DDEP --> DD2DV, NPMAX
 #endif
 
          ! Populate Diagnostic Arrays
@@ -302,7 +303,7 @@
       C1                = C
       R1                = R
       L1                = L
-      ELMO_LOCAL( : )   = 0.0
+      ELMO_USED( : )   = 0.0
       INLET_FRAC(:,:,:) = -1.
       L_CALCULATED      = .FALSE.
 
@@ -318,8 +319,8 @@
         ! to fill in Local Array. ELMO_LOCAL is the same length as the
         ! ELMO_LIST and is ordered by the ELMO ID numbers so that it
         ! can be used seamlessly with the CALC_ELMO internal order.
-        DO ILOC = 1,N_ELMO_LOCAL
-           CALL CALC_ELMO( OUTVAL=ELMO_LOCAL( ILOC ), J=ELMO_LOCALtoTABLE( ILOC ) )
+        DO ILOC = 1,N_ELMO_USED
+           CALL CALC_ELMO( OUTVAL=ELMO_USED( ILOC ), J=ELMO_USEDtoTABLE( ILOC ) )
         END DO
 
         ! *** Aggregate Diagnostic Variables in Average Array
@@ -328,8 +329,8 @@
      &       L.GE.AVRG_LAYER_BOT .AND. L.LE.AVRG_LAYER_TOP ) THEN
            AL = L - AVRG_LAYER_BOT + 1
            DO  IAVRG = 1,N_ELMO_AVRG
-              IF ( ELMO_LOCAL_ID( ELMO_AVRGtoTABLE( IAVRG )) .EQ. ID_PMF_PH
-     &             .AND. ELMO_LOCAL( ELMO_AVRGtoTABLE( IAVRG ) ) .LT. -100. ) THEN
+              IF ( ELMO_USED_ID( ELMO_AVRGtoUSED( IAVRG )) .EQ. ID_PMF_PH
+     &             .AND. ELMO_USED( ELMO_AVRGtoUSED( IAVRG ) ) .LT. -100. ) THEN
                  ! Special Averaging for Particle pH
                  ! Add whatever the current average is right now.
                  ! Certainly this is problematic, particularly
@@ -346,13 +347,13 @@
               ELSE
                  ! For all other variables, apply trapezoidal rule for averaging.
                  IF ( INIT_STEP ) THEN
-                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_LOCAL( ELMO_AVRGtoTABLE( IAVRG ) ) 
+                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( ELMO_AVRGtoUSED( IAVRG ) ) 
                  ELSE IF ( WRITE_STEP ) THEN
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                                        + ELMO_LOCAL( ELMO_AVRGtoTABLE( IAVRG ) )
+     &                                        + ELMO_USED( ELMO_AVRGtoUSED( IAVRG ) )
                  ELSE
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                      + 2.0 * ELMO_LOCAL( ELMO_AVRGtoTABLE( IAVRG ) )
+     &                      + 2.0 * ELMO_USED( ELMO_AVRGtoUSED( IAVRG ) )
                  END IF 
               END IF
            END DO
@@ -363,7 +364,7 @@
      &       L.GE.INST_LAYER_BOT .AND. L.LE.INST_LAYER_TOP ) THEN
            IL = L - INST_LAYER_BOT + 1
            DO IINST = 1,N_ELMO_INST
-              ELMO_INST( C,R,IL,IINST ) = ELMO_LOCAL( ELMO_INSTtoTABLE( IINST ) )
+              ELMO_INST( C,R,IL,IINST ) = ELMO_USED( ELMO_INSTtoUSED( IINST ) )
            END DO
         END IF
  
@@ -393,7 +394,7 @@
       REAL VAL2
       INTEGER IVAR, ILIST
       LOGICAL L_CALC( N_ELMO )
-      INTEGER IM, WETNESS, ISPEC, INLET
+      INTEGER WETNESS, ISPEC, INLET
       LOGICAL LMODE
       REAL    FRAC( N_MODE )
 
@@ -413,10 +414,10 @@
 
       ! Determine if this variable has been mapped already. If it
       ! has, send it back
-      ILOC = ELMO_TABLEtoLOCAL( J )
+      ILOC = ELMO_TABLEtoUSED( J )
       IF ( ILOC .GT. 0 ) THEN
         IF ( L_CALCULATED( ILOC ) ) THEN
-           OUTVAL = ELMO_LOCAL( ILOC )
+           OUTVAL = ELMO_USED( ILOC )
            RETURN
         END IF
       END IF
@@ -519,7 +520,7 @@
             DO IMODE = 1,N_MODE
               ! If this mode is supposed to be added (LMODE) and the
               ! species is not missing, then add it up
-              IF ( ( .NOT. AERO_MISSING( ID,IMODE ) )  THEN
+              IF ( .NOT. AERO_MISSING( ID,IMODE ) )  THEN
                   ISA = MAP_AEROtoSA( ID, IMODE )
                   IF ( ISRC .EQ. 0 ) THEN
                      OUTVAL = OUTVAL + SUM(ISAM_VEC( ISA,:) ) * FRAC( IMODE )
@@ -562,7 +563,7 @@
               LMODE = ELMO_COMP( J )%L_MODE( IMODE )
               IF ( LMODE .AND. ( .NOT. AERO_MISSING( ID,IMODE ) ) ) THEN
                   DSA = MAP_AEROtoSA( ID, IMODE )
-     &            OUTVAL = OUTVAL + DDM_VEC( ISRC,DSA ) * FRAC( IMODE )* FAC
+                  OUTVAL = OUTVAL + DDM_VEC( ISRC,DSA ) * FRAC( IMODE )* FAC
               END IF
             END DO
  

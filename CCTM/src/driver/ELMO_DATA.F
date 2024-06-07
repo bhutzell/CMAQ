@@ -510,9 +510,21 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         ! Variables for Storing Values of ELMO Output      
         REAL, ALLOCATABLE, SAVE :: ELMO_INST( :,:,:,: )
         REAL, ALLOCATABLE, SAVE :: ELMO_AVRG( :,:,:,: )
-        REAL, ALLOCATABLE, SAVE :: ELMO_LOCAL( : )
+        REAL, ALLOCATABLE, SAVE :: ELMO_USED( : )
         LOGICAL, ALLOCATABLE, SAVE :: L_CALC( : )
         REAL, ALLOCATABLE, SAVE :: CONC_VEC( : )
+        REAL, ALLOCATABLE, SAVE :: WDEP_VEC( : )
+        REAL, ALLOCATABLE, SAVE :: DDEP_VEC( : )
+#ifdef isam
+        REAL, ALLOCATABLE, SAVE :: ISAM_WDEP_VEC( : )
+        REAL, ALLOCATABLE, SAVE :: ISAM_DDEP_VEC( : )
+#endif
+#ifdef sens
+        REAL, ALLOCATABLE, SAVE :: DDM_WDEP_VEC( : )
+        REAL, ALLOCATABLE, SAVE :: DDM_DDEP_VEC( : )
+#endif
+        
+        
         INTEGER, SAVE           :: C1, R1, L1
 
         ! Arrays for Mapping Output variables to ELMO Table IDs
@@ -524,14 +536,14 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         END TYPE ELMO_MAP_2D
 
         TYPE( ELMO_MAP_1D ), ALLOCATABLE, SAVE :: 
-     &        MAP_ELMO_IDtoTABLE_MODE, MAP_ELMO_IDtoTABLE_SOURCE
+     &        MAP_ELMO_IDtoTABLE_MODE(:), MAP_ELMO_IDtoTABLE_SOURCE(:)
         TYPE( ELMO_MAP_2D ), ALLOCATABLE, SAVE :: 
-     &        MAP_ELMO_IDtoTABLE_MODE_SOURCE
+     &        MAP_ELMO_IDtoTABLE_MODE_SOURCE(:)
 
         INTEGER, ALLOCATABLE, SAVE :: N_ELMOTABLE_MODE(:,:),
      &                                N_ELMOTABLE_SOURCE(:,:)
      &                                
-
+        INTEGER, ALLOCATABLE, SAVE :: MAP_ELMOTABLE(:,:)
 
         ! Variables for Aerosol Chemistry
         REAL, SAVE, ALLOCATABLE :: GAMMA_N2O5IJ( :,:,:  ) ! Fine modes N2O5 rx effic.
@@ -602,6 +614,9 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                        ETYPE_DDM_AEROBULK = 15, ETYPE_DDM_FAM = 16,
      &                        ETYPE_DDM_WDEP = 17, ETYPE_DDM_DDEP = 18
 
+        ! Define Logical flags for turning on output categories
+        LOGICAL, SAVE :: L_ELMO_WDEP, L_ELMO_DDEP
+
         TYPE ELMO_INLET_TYPE
             CHARACTER( 16 ) CINLET            ! Inlet Name
             REAL            DIAM_LO           ! Lower Diameter of this Inlet [um]
@@ -657,6 +672,32 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         call checkmem( ios, 'ELMO_EXT_550',pname )
         elmo_ext_550 = 0.0
 
+        allocate( elmo_wdep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+        call checkmem( ios, 'ELMO_WDEP',pname )
+        elmo_wdep = 0.0
+
+        allocate( elmo_ddep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+        call checkmem( ios, 'ELMO_DDEP',pname )
+        elmo_ddep = 0.0
+
+        allocate( elmo_isam_wdep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+        call checkmem( ios, 'ELMO_ISAM_WDEP',pname )
+        elmo_isam_wdep = 0.0
+
+        allocate( elmo_isam_ddep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+        call checkmem( ios, 'ELMO_ISAM_DDEP',pname )
+        elmo_isam_ddep = 0.0
+
+        allocate( elmo_ddm_wdep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+        call checkmem( ios, 'ELMO_DDM_WDEP',pname )
+        elmo_ddm_wdep = 0.0
+
+        allocate( elmo_ddm_ddep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+        call checkmem( ios, 'ELMO_DDM_DDEP',pname )
+        elmo_ddm_ddep = 0.0
+
+
+
         end subroutine elmo_init_shared
 
 
@@ -677,7 +718,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       LOGICAL, INTENT( OUT ) :: L_ELMO_TABLE( N_ELMO_TABLE )
       CHARACTER(100), INTENT( IN ) :: CFILE
       INTEGER, INTENT( OUT ) :: LERROR
-      CHARACTER, ALLOCATABLE :: VARS_NML( : )
+      CHARACTER(16), ALLOCATABLE :: VARS_NML( : )
 
       INTEGER N_END, N_NML
       LOGICAL EXPAND_NML
@@ -687,7 +728,9 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       CHARACTER( 250 ) :: XMSG
       CHARACTER, PARAMETER :: PNAME = 'MAP_ELMO_NML'
 
-             
+      
+      LERROR = 0
+
       ! Diagnose VARS_NML_IN Size
       N_END = INDEX1( '', N_NML, VARS_NML_IN ) - 1
       IF ( N_END .LE. 0 ) THEN
@@ -706,7 +749,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          EXPAND_NML = .FALSE.
          IF ( VARS_NML(1)(1:1) .EQ. '*' ) THEN
             EXPAND_NML = .TRUE.
-            VARS_NML(1) = VARS_NML( 1 )(2:16)//' '
+            VARS_NML(1)(1:16) = VARS_NML( 1 )(2:16)//' '
          END IF
 
          ! Detect location of VARS_NML( INUM ) in the ELMO_TABLE
@@ -1076,6 +1119,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !     variable to an output variable.
 !-------------------------------------------------------------------------
  
+      USE AEROMET_DATA, ONLY : MWAIR, AIRDENS
+
       IMPLICIT NONE
  
       INTEGER, INTENT( IN )  :: J
@@ -1121,59 +1166,70 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !     variable type, mode number, and source number.
 !----------------------------------------------------------------------------      
 
+      USE RUNTIME_VARS, ONLY : LOGDEV
+
       IMPLICIT NONE
 
       INTEGER :: IDG, IM, IV, ISRC
+      INTEGER :: I, J, NM, NS
+
+      CHARACTER( 200 ) :: XMSG
 
       IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
-         XMSG = 'ELMO is searching for a variable on the ELMO Table with ' //
-     &          'calculation ID ' // IDG // ' and variable type ' // IV // '. ' //
+             WRITE( XMSG, '(A,A,I4,A,I2,A,A)' )
+     &          'ELMO is searching for a variable on the ELMO Table with ', 
+     &          'calculation ID ', IDG, ' and variable type ', IV, '. ',
      &          'Neither of these indices are allowed to be zero.'
          CALL LOG_MESSAGE( LOGDEV, XMSG )
          CALL M3EXIT( 'FIND_ELMO_TABLE', 0, 0, '', XSTAT1 )
       END IF
 
+      NM = N_ELMOTABLE_MODE( IV,IDG )
+      NS = N_ELMOTABLE_SOURCE( IV,IDG )
 
       ! Check if this combination of IDG and IV have multiple modes
       ! and/or sources. If so, look up Table ID on alternate maps.
-      IF ( N_ELMOTABLE_MODE( IDG,IV ).GT.0 .AND. N_ELMOTABLE_SOURCE( IDG,IV ).GT.0 ) THEN
+      IF ( NM .GT. 0 .AND. NS .GT. 0 ) THEN
           ! Look up Table ID on multiple mode and source map
           IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
-             XMSG = 'ELMO is searching for a variable on the ELMO Table with ' //
-     &              'mode number ' // IM // ' and source number ' // ISRC // '. ' //
+             WRITE( XMSG, '(A,A,I2,A,I2,A,A)' )
+     &              'ELMO is searching for a variable on the ELMO Table with ',
+     &              'mode number ', IM, ' and source number ', ISRC, '. ',
      &              'Neither of these indices are allowed to be zero.'
              CALL LOG_MESSAGE( LOGDEV, XMSG )
-             CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+             CALL M3EXIT( 'FIND_ELMO_TABLE', 0, 0, '', XSTAT1 )
           END IF
-          I = MAP_ELMOTABLE( IDG,IV )
+          I = MAP_ELMOTABLE( IV,IDG )
           J = MAP_ELMO_IDtoTABLE_MODE_SOURCE( I )%IND( IM,ISRC )
 
-      ELSE IF ( N_ELMOTABLE_MODE( IDG,IV ).GT.0 ) THEN
+      ELSE IF ( NM .GT. 0 ) THEN
           ! Look up Table ID on multiple mode map
           IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
-             XMSG = 'ELMO is searching for a variable on the ELMO Table with ' //
-     &              'mode number ' // IM // '. This index is not allowed to be zero.'
+             WRITE( XMSG, '(A,A,I2,A)' )
+     &              'ELMO is searching for a variable on the ELMO Table with ',
+     &              'mode number ', IM, '. This index is not allowed to be zero.'
              CALL LOG_MESSAGE( LOGDEV, XMSG )
-             CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+             CALL M3EXIT( 'FIND_ELMO_TABLE', 0, 0, '', XSTAT1 )
           END IF
-          I = MAP_ELMOTABLE( IDG,IV )
+          I = MAP_ELMOTABLE( IV,IDG )
           J = MAP_ELMO_IDtoTABLE_MODE( I )%IND( IM )
 
-      ELSE IF ( N_ELMOTABLE_SOURCE( IDG,IV ).GT.0 ) THEN
+      ELSE IF ( NS .GT. 0 ) THEN
           ! Look up Table ID on multiple source map
           IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
-             XMSG = 'ELMO is searching for a variable on the ELMO Table with ' //
-     &              'source number ' // ISRC // ' This index is not allowed to be zero.'
+             WRITE( XMSG, '(A,A,I2,A)' )
+     &              'ELMO is searching for a variable on the ELMO Table with ',
+     &              'source number ', ISRC, ' This index is not allowed to be zero.'
              CALL LOG_MESSAGE( LOGDEV, XMSG )
-             CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
+             CALL M3EXIT( 'FIND_ELMO_TABLE', 0, 0, '', XSTAT1 )
           END IF
-          I = MAP_ELMOTABLE( IDG,IV )
+          I = MAP_ELMOTABLE( IV,IDG )
           J = MAP_ELMO_IDtoTABLE_SOURCE( I )%IND( ISRC )
 
       ELSE
           ! Look up Table ID on default map
-          I = MAP_ELMOTABLE( IDG,IV )
-          J = MAP_ELMO_IDtoTABLE( I )
+          J = MAP_ELMOTABLE( IV,IDG )
+
       END IF
 
       FIND_ELMO_TABLE = J

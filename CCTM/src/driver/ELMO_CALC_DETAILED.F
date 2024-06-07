@@ -49,10 +49,10 @@
 
       ! First determine if this variable has been mapped already. If it
       ! has, send it back
-      ILOC = ELMO_TABLEtoLOCAL( J )
+      ILOC = ELMO_TABLEtoUSED( J )
       IF ( ILOC .GT. 0 ) THEN
         IF ( L_CALCULATED( ILOC ) ) THEN
-           OUTVAL = ELMO_LOCAL( ILOC )
+           OUTVAL = ELMO_USED( ILOC )
            RETURN
         END IF
       END IF
@@ -656,7 +656,7 @@
          ! Save the fact that this variable has been calculated
          IF ( ILOC .GT. 0 ) THEN
            L_CALCULATED( ILOC ) = .TRUE.
-           ELMO_LOCAL( ILOC ) = OUTVAL
+           ELMO_USED( ILOC ) = OUTVAL
          END IF
 
       END SUBROUTINE ELMO_CALC_DETAILED

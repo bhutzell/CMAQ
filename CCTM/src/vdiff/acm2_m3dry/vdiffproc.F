@@ -540,7 +540,7 @@ C EDDYV returned = Kz, where Kz is in m**2/sec
 C Store Deposition Change in Budget and Process Analysis Arrays
 
 #ifndef mpas
-      IF ( BUDGET_DIAG .OR. LIPR ) DDEP0 = DDEP
+      IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO) DDEP0 = DDEP
 #endif
 
 C Calculate the change in concentration and dry dep from vertical diffusion and vsed
@@ -569,7 +569,7 @@ C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual 
  
 C Store Deposition Change in Budget and Process Analysis Arrays
 #ifndef mpas
-      IF ( BUDGET_DIAG .OR. LIPR ) THEN
+      IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) THEN
          DDEP_PA = 0.0
          DO V = 1, N_SPC_DEPV
             IF ( ABFLUX .AND. V .EQ. DD2DV(NH3_HIT) ) THEN 
@@ -589,9 +589,17 @@ C Store Deposition Change in Budget and Process Analysis Arrays
                   END DO
                END DO
             END IF
+
+            ! Pass Dry Deposition Rates to ELMO
+            IF ( L_ELMO ) THEN
+               ELMO_DDEP(:,:,MAP_DEPVtoCGRID(V)) = DDEP_PA(:,:,MAP_DEPVtoCGRID(V))
+            END IF
+
          END DO
          CALL PA_UPDATE_DDEP ( DDEP_PA, JDATE, JTIME, TSTEP )
       END IF
+      
+
 #endif
  
 C Revert non-molar mixing ratio species and re-order CGRID
@@ -848,12 +856,19 @@ C Write other diagnostics
                   WRDD( C,R ) = SA_DDEP( C,R,ITAG )
                END DO
             END DO
+            
+            IF ( L_ELMO ) THEN
+               ELMO_ISAM_DDEP( :,:,S_SPCTAG(ITAG),T_SPCTAG(ITAG) ) = 
+     &                SA_DDEP( :,:,ITAG )
+            END IF
+              
 
             IF ( .NOT. WRITE3( SA_DD_1, VNAM_SPCTAG( ITAG ),
      &                         MDATE, MTIME, WRDD ) ) THEN
                XMSG = 'Could not write ' // SA_DD_1 // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+
          END DO
          SA_DDEP = 0.0
 #endif
@@ -884,6 +899,9 @@ C WT - write out dry deposition sensitivities
                   CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
                END IF
 
+               IF ( L_ELMO ) THEN
+                  ELMO_DDM(:,:,MAP_DEPVtoCGRID(S),NP) = S_DDEP(S,:,:,,NP)
+               END IF
             ENDDO
          ENDDO
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )

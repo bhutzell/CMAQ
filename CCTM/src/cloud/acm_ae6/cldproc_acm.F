@@ -601,6 +601,12 @@ C...write data to the normal wet deposition file
      &         'Timestep written to', CTM_WET_DEP_1,
      &         'for date and time', NDATE, NTIME
 
+        IF ( L_ELMO ) THEN
+            DO VAR = 1,N_SPC_WDEP + 1
+                ELMO_WDEP( :,:,VAR ) = TOT_DEP( :,:,VAR )
+            END DO
+        END IF
+
 #ifdef sens
 C...write data to the sensitivity wet deposition file
 c gas species
@@ -608,6 +614,10 @@ c gas species
           DO SPC = 1, ( N_SPC_WDEP + 1 ) 
             SENNUM = ( SPC - 1 ) * NPMAX + NP
             S_DEPWRT(:,:,SENNUM) = S_TOTDEP( :,:,NP,SPC )
+
+            IF ( L_ELMO ) THEN
+               ELMO_DDM_WDEP(:,:,SPC,NP) = S_TOTDEP(:,:,NP,SPC)
+            END IF
           END DO
         END DO
 
@@ -669,6 +679,12 @@ C...reinitialize deposition array
               BUFF2( COL,ROW ) = TOT_SADEP( COL,ROW,S_SPCTAG( SPC ),T_SPCTAG( SPC ) )
             END DO ! col
           END DO ! row
+
+          IF ( L_ELMO ) THEN
+              ELMO_ISAM_WDEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) ) = 
+     &             TOT_SADEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
+          END IF
+
           IF ( .NOT. WRITE3( SA_WD_1, VNAM_SPCTAG( SPC ),
      &                       NDATE, NTIME, BUFF2 ) ) THEN
             XMSG = 'Could not write ' // SA_WD_1 // ' file'
