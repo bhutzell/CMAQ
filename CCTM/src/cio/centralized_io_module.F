@@ -145,6 +145,9 @@
         CHARACTER( 40 ), parameter :: ICFILE       = 'INIT_CONC_1'
         CHARACTER( 40 ), parameter :: BCFILE       = 'BNDY_CONC_1'
         CHARACTER( 40 ), parameter :: ISAM_PREVDAY = 'ISAM_PREVDAY'
+        CHARACTER( 16 )            :: UNITS_SNOWAGE
+
+        INTEGER :: INDEX_SNOWAGE = 0
 
 ! time independent data
         real, allocatable :: MSFX2(:,:),         ! from GRID_CRO_2D data
@@ -287,6 +290,8 @@
      &             LH_AVAIL,                 ! flag for LH, two meter mixing ratio available in MET_CRO_2D
      &             HAS_SEAICE,               ! flag for SEAICE in MET_CRO_2D
      &             HAS_SNOWN      = .false., ! flag for snow and ice fall in MET_CRO_2D
+     &             HAS_SNOWAGE    = .false., ! flag for snowage in MET_CRO_2D
+     &             HAS_SNOTIME    = .false., ! flag for snotime in MET_CRO_2D
      &             WR_AVAIL       = .true.,  ! flag for WR, canopy wetness available in MET_CRO_2D
      &             MEDC_AVAIL     = .true.,  ! file INIT_MEDC_1 is available
      &             E2C_CHEM_AVAIL = .true.,  ! file E2C_CHEM is available
@@ -747,8 +752,22 @@
              adj = 1
           end if
 
-          HAS_SEAICE = (INDEX1( 'SEAICE', NVARS3D, VNAME3D ) .gt. 0)
-          HAS_SNOWN  = (INDEX1( 'SNOWN',  NVARS3D, VNAME3D ) .gt. 0)
+          INDEX_SNOWAGE = INDEX1( 'SNOWAGE',  NVARS3D, VNAME3D )
+          IF ( INDEX_SNOWAGE .gt. 0 ) Then
+               HAS_SNOWAGE = .True.
+               UNITS_SNOWAGE = TRIM( UNITS3D(  INDEX_SNOWAGE ) )
+          Else 
+            INDEX_SNOWAGE = INDEX1( 'SNOTIME',  NVARS3D, VNAME3D )
+            If ( INDEX_SNOWAGE .gt. 0 ) Then
+               HAS_SNOTIME = .True.
+               UNITS_SNOWAGE = TRIM( UNITS3D(  INDEX_SNOWAGE ) )
+            End If
+          End If
+
+          HAS_SEAICE  = (INDEX1( 'SEAICE', NVARS3D, VNAME3D ) .gt. 0)
+
+          HAS_SNOWN   = (INDEX1( 'SNOWN',  NVARS3D, VNAME3D ) .gt. 0)
+          
 
 ! include an additional variable TSEASFC when MET_CRO_2D does not have it and CMAQ code is looking for it
           n_c2d = nvars3d + adj

@@ -110,9 +110,6 @@ C-------------------------------------------------------------------------------
          Real,    Allocatable :: HFX      ( :,: )  ! Sensible heat flux [W/m**2]
          Real,    Allocatable :: LH       ( :,: )  ! Latent heat flux [W/m**2]
          Real,    Allocatable :: SNOCOV   ( :,: )  ! Snow cover [1=yes, 0=no]
-         Real,    Allocatable :: SNOWH    ( :,: )  ! actual snow height [m]
-         Real,    Allocatable :: SNOWN    ( :,: )  ! Snow and ice fall, water equivalent [cm]
-         Real,    Allocatable :: SNOWAGE  ( :,: )  ! time since last snow fall greater than 1 cm [days]
          Real,    Allocatable :: TEMP2    ( :,: )  ! two meter temperature [K]
          Real,    Allocatable :: TEMPG    ( :,: )  ! skin temperature [K]
          Real,    Allocatable :: TSEASFC  ( :,: )  ! SST [K]
@@ -221,11 +218,10 @@ C Land use information:
       Real, Parameter :: pr0        = 0.95
       Real, Parameter :: karman     = 0.40
       Real, Parameter :: f3min      = 0.25
-      Real, Parameter :: ftmin      = 0.0000001   ! m/s
+      Real, Parameter :: ftmin      = 0.0000001  ! m/s
       Real, Parameter :: nscat      = 16.0
-      Real, Parameter :: rsmax      = 5000.0      ! s/m
-      Real, Parameter :: secs2day   = 1.0/86400.0 ! seconds per day
-      
+      Real, Parameter :: rsmax      = 5000.0     ! s/m
+
       Real            :: ar       ( ltotg )        ! reactivity relative to HNO3
       Real            :: dif0     ( ltotg )        ! molecular diffusivity [cm2/s]
       Real            :: lebas    ( ltotg )        ! Le Bas molar volume [cm3/mol ]
@@ -244,9 +240,6 @@ C Land use information:
       Integer,         Private :: SPC
       Character( 16 ), Private, Save :: vname_rc, vname_rn, vname_uc, vname_vc
 
-      Real,            Private :: TSTEP_MET_DATA = 0.0
-      Real,            Private :: FREQU_MET_DATA = 0.0
-      
       Real, allocatable, private :: BUFF1D( : )     ! 1D temp var number of layers
       Real, allocatable, private :: BUFF2D( :,: )   ! 2D temp var
       Real, allocatable, private :: BUFF3D( :,:,: ) ! 3D temp var
@@ -539,7 +532,6 @@ C-----------------------------------------------------------------------
 
          Use UTILIO_DEFN
          Use LSM_Mod, only : N_SOIL_TYPE
-         Use BiDi_mod, only : N_TOT, MEDIA_NAMES, CMEDIA
 
          Implicit None
  
@@ -591,9 +583,6 @@ C-----------------------------------------------------------------------
      &             Met_Data%HFX      ( NCOLS,NROWS ),
      &             Met_Data%LH       ( NCOLS,NROWS ),
      &             Met_Data%SNOCOV   ( NCOLS,NROWS ),
-     &             Met_Data%SNOWH    ( NCOLS,NROWS ),
-     &             Met_Data%SNOWN    ( NCOLS,NROWS ),
-     &             Met_Data%SNOWAGE  ( NCOLS,NROWS ),
      &             Met_Data%TEMP2    ( NCOLS,NROWS ),
      &             Met_Data%TEMPG    ( NCOLS,NROWS ),
      &             Met_Data%TSEASFC  ( NCOLS,NROWS ),
@@ -638,22 +627,6 @@ C-----------------------------------------------------------------------
             XMSG = 'Failure allocating met vars'
             Call M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          End If
-         Met_Data%SNOWN = 0.0
-         
-         IF ( MEDC_AVAIL ) THEN ! Implied: NEW_START is false
-            V = INDEX1( 'SNOWAGE',N_TOT,MEDIA_NAMES )
-            IF ( V .LT. 1 ) THEN
-               XMSG = 'Could not find SNOWAGE in MEDIA_NAMES ' 
-     &              // 'in BIDI_MOD module. Check version of BIDI_MOD.F '
-     &              // 'being using. ' 
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-            Met_Data%SNOWAGE( 1:NCOLS,1:NROWS ) = CMEDIA( 1:NCOLS,1:NROWS,V )
-         ELSE
-! Implied: NEW_START is true; set snowage to zero ; NOTE if set to 2.86 days, inital max albedo 
-! for snowy surfaces approximately equals 0.83       
-            Met_Data%SNOWAGE = 0.0
-         END IF
 
          ALLOCATE( Grid_Data%DX3F    ( NLAYS ),
      &             Grid_Data%RDX3F   ( NLAYS ),
@@ -827,9 +800,6 @@ C-----------------------------------------------------------------------
 
          Grid_Data%SZONE = szone
          
-         TSTEP_MET_DATA = 3600.0/REAL( TIME2SEC( file_tstep(F_MET) ) )
-         FREQU_MET_DATA = 1.0 / TSTEP_MET_DATA
-         
          MET_INITIALIZED = .true.
 
          Return
@@ -966,12 +936,6 @@ C met vars
          Where( Met_Data%SNOCOV .Lt. 0.0 )
             Met_Data%SNOCOV = 0.0
          End Where
-
-         call interpolate_var ('SNOWH', jdate, jtime, Met_Data%SNOWH)
-
-         If ( HAS_SNOWN ) THEN
-           call interpolate_var ('SNOWN', jdate, jtime, Met_Data%SNOWN)
-         End If
 
          call interpolate_var ('TEMP2', jdate, jtime, Met_Data%TEMP2)
 
@@ -1183,38 +1147,6 @@ C------
 
 !        Calculate the cosine of the zenith angle 
          CALL CZANGLE(JDATE, JTIME, NCOLS, NROWS )
-
-         If ( HAS_SNOWN .AND. TSTEP .Gt. 0.0 ) Then
-!-------------------------------------------------------------------------------
-! Compute age of snow surface or coverage
-!-------------------------------------------------------------------------------
-            DO C = 1, NCOLS
-               DO R = 1, NROWS
-
-                   If(  ( Met_Data%SNOWN(C,R) .GT. 0.50*( Met_Data%RN(C,R)+Met_Data%SNOWN(C,R)+EPS ) ) .OR. 
-     &                     ( Met_Data%TEMPG(C,R) .LT. 273.15 ) ) Then
-! snow (frozen) precipitation at surface
-!                     If (  FREQU_MET_DATA*Met_Data%SNOWN(C,R) .Gt. 0.1 .OR. Met_Data%SNOCOV(C,R) .Lt. EPS ) Then
-                      If (  Met_Data%SNOWN(C,R) .Gt. EPS ) Then
-! snow and ice (water equivalent) greater than 1 mm/hr or no snow cover so reset snowage
-                         Met_Data%SNOWAGE(C,R) = 0.0
-                      Else
-                         Met_Data%SNOWAGE(C,R) = Met_Data%SNOWAGE(C,R) + TSTEP*SECS2DAY
-                      End If
-                   Else If ( Met_Data%SNOCOV(C,R) .GT. EPS ) Then
-! age snow covered cells where is not snowing
-                        Met_Data%SNOWAGE(C,R) = Met_Data%SNOWAGE(C,R) + TSTEP*SECS2DAY
-                   Else
-! set snowage to zero with zero snow cover                     
-                        Met_Data%SNOWAGE(C,R) = 0.0
-                   End If
-            
-               END DO
-            END DO
-         
-         End If
-         
-             
 
          Return
          End Subroutine GET_MET

@@ -46,6 +46,7 @@ C-----------------------------------------------------------------------
          REAL, ALLOCATABLE :: WATER_FRACTION( :,: )    ! cell fraction covered by water or ocean
          REAL, ALLOCATABLE :: SEAICE        ( :,: )    ! sea ice cover (fraction)
          REAL, ALLOCATABLE :: SNOCOV        ( :,: )    ! snow cover (fractional)
+         REAL, ALLOCATABLE :: SNOWAGE       ( :,: )    ! snow days (days)
          REAL, ALLOCATABLE :: SNOW_DEPTH    ( :,: )    ! actual snow depth (m)
          REAL, ALLOCATABLE :: SNOW_DEPTHO   ( :,: )    ! actual snow depth for previous timestep(m)
          REAL, ALLOCATABLE :: CALCULATED_SNOCOV( :,: ) ! grid cell snow cover based on landuse fractions (fractional)
@@ -135,7 +136,7 @@ C           use in radiative transfer calculation for actinic fluxes
             USE LSM_MOD, ONLY: N_LUFRAC, LSM_SCHEME => LAND_SCHEME
 
             USE CENTRALIZED_IO_MODULE, only : interpolate_var, LWMASK, LUFRAC, HAS_SEAICE,
-     &                                        HAS_SNOWN, 
+     &                                        HAS_SNOWN, HAS_SNOWAGE, HAS_SNOTIME, UNITS_SNOWAGE,
      &                                        MODEL_STDATE => STDATE, MODEL_STTIME => STTIME           
 
             IMPLICIT NONE
@@ -400,6 +401,15 @@ C...compute start time data and frequency of annual cycle considering leap year
                SUCCESS = .FALSE.
                RETURN
             END IF
+
+            ALLOCATE ( SNOWAGE( NCOLS,NROWS ), STAT = ALLOCSTAT )
+            IF ( ALLOCSTAT .NE. 0 ) THEN
+               XMSG = 'Failure allocating SNOWAGE array'
+               WRITE(LOGDEV,'( A )')TRIM( PNAME ) // ' : ' // XMSG
+               SUCCESS = .FALSE.
+               RETURN
+            END IF
+            SNOWAGE = 2.5 ! days
 
             ALLOCATE ( TERRIAN_SNOCOV(  N_LAND_CLASSES,NCOLS,NROWS ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -731,7 +741,9 @@ C    latitudes and longitudes
 
             USE LSM_MOD, ONLY: N_LUFRAC, LSM_SCHEME => LAND_SCHEME
 
-            USE CENTRALIZED_IO_MODULE, only : interpolate_var, HAS_SEAICE, HAS_SNOWN, LUFRAC
+            USE CENTRALIZED_IO_MODULE, only : interpolate_var, HAS_SEAICE, HAS_SNOWN, 
+     &                                                         HAS_SNOWAGE, HAS_SNOTIME,
+     &                                                         LUFRAC, UNITS_SNOWAGE
 
             USE ASX_DATA_MOD, Only: Met_Data
 
@@ -752,6 +764,7 @@ C local:
             REAL, PARAMETER             :: SNOW_SHAPE       =  2.6 ! Snow Shape Distribution Parameter 
             REAL, PARAMETER             :: HOURS2DAYS       =  1.0/24.0
             REAL, PARAMETER             :: SECS2HOURS       =  1.0/3600.0
+            REAL, PARAMETER             :: SECS2DAYS        =  HOURS2DAYS*SECS2HOURS
             
 ! SNOW_SHAPE value from 
 ! Koren, V., Schaake, J., Mitchell, K., Duan, Q.-Y., Chen, F., and Baker, J. M. (1999),
@@ -809,7 +822,12 @@ C...Read & Interpolate SNOCOV and SNOW_DEPTH
             call interpolate_var ('SEAICE', mdate, mtime, SEAICE)
 
             call interpolate_var ('TEMPG', mdate, mtime, TEMPG)
-
+ 
+            IF( HAS_SNOWAGE )THEN
+                call interpolate_var ('SNOWAGE', mdate, mtime, SNOWAGE)
+            ELSE IF( HAS_SNOTIME )THEN
+                call interpolate_var ('SNOTIME', mdate, mtime, SNOWAGE)
+            END IF
 
 C...Calculate current hour in GMT and julian day
 
@@ -851,19 +869,19 @@ C...this convention on longititude should be reexamined for different domains
                      END IF
                   END IF
 
-                 IF ( .NOT. HAS_SNOWN ) THEN
+                 IF ( .NOT. HAS_SNOWAGE .AND. .NOT. HAS_SNOTIME ) THEN
 
                      IF( FREQUENCY*( SNOW_DEPTH( COL,ROW )-SNOW_DEPTHO( COL,ROW ) ) .GT. 0.01 
      &                     .OR. SNOCOV( COL,ROW ) .LT. 1.0E-25 ) THEN
 !   A new or renewed snow cover                         
-                        MET_DATA%SNOWAGE( COL,ROW ) = 0.0
+                        SNOWAGE( COL,ROW ) = 0.0
                      ELSE IF ( SNOCOV( COL,ROW ) .GT. 1.0E-25 ) THEN
 !   Aging snow cover                     
-                        MET_DATA%SNOWAGE( COL,ROW ) = MET_DATA%SNOWAGE( COL,ROW ) 
+                        SNOWAGE( COL,ROW ) = SNOWAGE( COL,ROW ) 
      &                                              + CALL_DTIME*HOURS2DAYS
                      ELSE
 !   No snow falling or existing snow cover                     
-                        MET_DATA%SNOWAGE( COL,ROW ) = 0.0
+                        SNOWAGE( COL,ROW ) = 0.0
                      END IF 
                      SNOW_DEPTHO( COL,ROW ) = SNOW_DEPTH( COL,ROW )
                      
@@ -875,25 +893,29 @@ C...this convention on longititude should be reexamined for different domains
                  ELSE IF ( SEAICE( COL,ROW ) .GT. 1.0E-6 .AND. SNOCOV( COL,ROW ) .LE. 1.0E-6 ) THEN
                     SNOWAGE_FACTOR = 0.0
                     MAX_FACTOR     = 1.0
-                 ELSE
+                 ELSE IF( .NOT. HAS_SNOWAGE .AND. .NOT. HAS_SNOTIME ) THEN
 C...compute correction factor for snow aging from 
 C...Livneh et al. (2010), J. Hydromet., vol 11(3), pp 721-738,
 C...DOI: https://doi.org/10.1175/2009JHM1174.1                  
                     IF (   MET_DATA%TEMPG( COL,ROW ) .LT. 272.0 ) THEN ! accumulation phase
-                        SNOWAGE_FACTOR = 0.94**MET_DATA%SNOWAGE( COL,ROW )**0.58
+                        SNOWAGE_FACTOR = 0.94**SNOWAGE( COL,ROW )**0.58
                     ELSE ! ablation phase 
-                        SNOWAGE_FACTOR = 0.82**MET_DATA%SNOWAGE( COL,ROW )**0.46                                     
+                        SNOWAGE_FACTOR = 0.82**SNOWAGE( COL,ROW )**0.46                                     
                     END IF
                     SNOWAGE_FACTOR = MAX( 0.43,SNOWAGE_FACTOR )
+                    MAX_FACTOR     = SNOWAGE_FACTOR
+                 ELSE ! set snow age to 2.5 days so aging factor is approximately 0.8
+!                   SNOWAGE_FACTOR = 0.82**2.5**0.46
+                    SNOWAGE_FACTOR = 0.79595 ! MAX( 0.43,SNOWAGE_FACTOR )
                     MAX_FACTOR     = SNOWAGE_FACTOR
                  END IF
 
 !                 IF ( SNOW_DEPTH( COL,ROW ) .GT. 1.0E-6 .AND. SEAICE( COL,ROW ) .LE. 1.0E-6 )THEN
 !                    WRITE(6,'(A,2(I4,1X),6(F7.3,1X))')'COL,ROW,SNOWAGE,SNOWAGE_FACTOR = ',COL,ROW,
-!     &              MET_DATA%SNOWAGE(COL,ROW),SNOWAGE_FACTOR
+!     &              SNOWAGE(COL,ROW),SNOWAGE_FACTOR
 !                 ELSE IF ( SEAICE( COL,ROW ) .GT. 1.0E-6 .AND. SNOCOV( COL,ROW ) .GT. 1.0E-6 )THEN
 !                    WRITE(6,'(A,2(I4,1X),6(F7.3,1X))')'COL,ROW,SEAICE,SNOWAGE,SNOWAGE_FACTOR = ',COL,ROW,
-!     &              SEAICE( COL,ROW ),MET_DATA%SNOWAGE(COL,ROW),SNOWAGE_FACTOR                 
+!     &              SEAICE( COL,ROW ),SNOWAGE(COL,ROW),SNOWAGE_FACTOR                 
 !                 END IF 
 
 C...determine seasonal and snow corrections to surface albedo
@@ -976,7 +998,7 @@ C...First, test whether zenith angle is greater than 90 degrees.
                      SNOCOV_SEAICE = SNOCOV( COL,ROW )
                      CALCULATED_SNOCOV( COL,ROW ) = SFACTOR_SEAICE * SNOCOV_SEAICE
                   END IF
-                  IF ( MET_DATA%SNOWH( COL,ROW ) .GT. 1.0E-6 ) THEN
+                  IF ( SNOW_DEPTH( COL,ROW ) .GT. 1.0E-6 ) THEN
 ! 2) add land classes based on surface type
                      DO NL = 1, N_LAND_CLASSES
                         IF (  TERRAIN_FRACTION( NL,COL,ROW ) .GT. 1.0E-25 ) THEN
