@@ -83,6 +83,7 @@ C-----------------------------------------------------------------------
       USE GRID_CONF
       USE DESID_VARS, ONLY : VDEMIS_DIFF, DESID_LAYS
       USE DESID_MODULE, ONLY : DESID_INIT, DESID_DRIVER
+      USE ELMO_DATA, ONLY : L_ELMO, ELMO_DDEP
       USE DEPV_DEFN
       USE ASX_DATA_MOD
 !      USE MPAS_DATA_MOD
@@ -592,7 +593,7 @@ C Store Deposition Change in Budget and Process Analysis Arrays
 
             ! Pass Dry Deposition Rates to ELMO
             IF ( L_ELMO ) THEN
-               ELMO_DDEP(:,:,MAP_DEPVtoCGRID(V)) = DDEP_PA(:,:,MAP_DEPVtoCGRID(V))
+               ELMO_DDEP(:,:,V) = DDEP_PA(:,:,MAP_DEPVtoCGRID(V))
             END IF
 
          END DO
@@ -857,8 +858,8 @@ C Write other diagnostics
                END DO
             END DO
             
-            IF ( L_ELMO ) THEN
-               ELMO_ISAM_DDEP( :,:,S_SPCTAG(ITAG),T_SPCTAG(ITAG) ) = 
+            IF ( L_ELMO .AND. ISAM_DEPV(ITAG) .GT. 0 ) THEN
+               ELMO_ISAM_DDEP( :,:,ISAM_DEPV(ITAG),T_SPCTAG(ITAG) ) = 
      &                SA_DDEP( :,:,ITAG )
             END IF
               
@@ -900,7 +901,7 @@ C WT - write out dry deposition sensitivities
                END IF
 
                IF ( L_ELMO ) THEN
-                  ELMO_DDM(:,:,MAP_DEPVtoCGRID(S),NP) = S_DDEP(S,:,:,,NP)
+                  ELMO_DDM_DDEP(:,:,S,NP) = S_DDEP(S,:,:,,NP)
                END IF
             ENDDO
          ENDDO

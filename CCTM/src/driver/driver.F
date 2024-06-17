@@ -111,7 +111,8 @@ C-----------------------------------------------------------------------
       USE BUDGET_DEFN
       USE AERO_DATA
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP
-      USE ELMO_PROC, ONLY : ELMO_DRIVER, WRITE_ELMO, ELMO_INIT
+      USE ELMO_PROC, ONLY : ELMO_DRIVER
+      USE ELMO_INIT_DEFN, ONLY : ELMO_INIT
       USE UTILIO_DEFN
       USE util_Family_module
       USE RUNTIME_VARS
@@ -771,7 +772,7 @@ C Main processing loop:
              ! Average parameters
              CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.TRUE.)
              ! Print Instantaneous Values at first time step
-             CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.TRUE. )
+             CALL WRITE_ELMO( JDATE, JTIME, TSTEP, .TRUE. )
 
         ELSE IF ( ELMO_NSTEP .LT. 1.0 ) THEN
              ! Calculate all ELMO Variables for averaging but do not output them
@@ -927,7 +928,7 @@ C Write Data to Output Files
          CALL WR_ASENS ( JDATE, JTIME, TSTEP( 1 ) )
 #endif
          ! Write output generated from ELMO module
-         IF ( L_ELMO ) CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
+         IF ( L_ELMO ) CALL WRITE_ELMO( JDATE, JTIME, TSTEP, .FALSE. )
 
          ! Write out process analysis and budget diagnostics
          IF ( LIPR .OR. LIRR ) CALL PA_OUTPUT ( CGRID, JDATE, JTIME )

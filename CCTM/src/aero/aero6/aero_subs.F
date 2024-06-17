@@ -3249,7 +3249,8 @@ C ----------------------- Begin solution -------------------------------
       USE ELMO_DATA
       USE AERO_DATA, ONLY : WET_AERO_DIAM, AEROMODE_LNSG, WET_AERO_DENS,
      &                      DRY_AERO_DIAM, DRY_AERO_DENS, AH2O_IDX,
-     &                      MOMENT0_CONC, AEROSPC, AEROSPC_CONC
+     &                      MOMENT0_CONC, AEROSPC, AEROSPC_CONC,
+     &                      WET_AERO_M3, WET_AERO_M2
 
       IMPLICIT NONE
 

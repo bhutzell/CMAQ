@@ -22,6 +22,8 @@
 !     This subroutine maps the ELMO variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
+      USE ELMO_DATA
+      USE ELMO_INIT_DEFN, ONLY : SET_ELMO_COMP
       USE CGRID_SPCS, ONLY : CGRID_NAME
       USE UTIL_FAMILY_MODULE, ONLY : CHEMFAMILYNUM, CHEMFAMILYMEMBERS
       USE AERO_DATA, ONLY : ascat_na_fac, asoil_na_fac, acors_na_fac,
@@ -33,15 +35,15 @@
 
       IMPLICIT NONE
 
-      INTEGER IDG, N_VARS, IELMO, S, F, IV
+      INTEGER IDG, N_VARS, IELMO, S, F, IV, J, ID, K
 
       ! Loop through all available ELMO_TABLE Variables
       DO J = 1,N_ELMO_TABLE
           ID = ELMO_TABLE( J )%ID
 
           IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ELMO .OR.
-               ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ELMO_ISAM .OR.
-               ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ELMO_DDM ) THEN
+     &         ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_ISAM_ELMO .OR.
+     &         ELMO_TABLE( J )%VAR_TYPE .EQ. ETYPE_DDM_ELMO ) THEN
            SELECT CASE ( ID )
              
              !!!! Gas-Phase Variables !!!!
@@ -82,33 +84,33 @@
              CASE ( ID_PMC_NA ) 
                N_VARS = 3
                CALL INIT_ELMO_COMP( J, N_VARS, 'COARSE' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ASEACAT', real(ascat_na_fac) )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASOIL',   real(asoil_na_fac) )
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ACORS',   real(acors_na_fac) )
+               CALL SET_ELMO_COMP( J, 1, 'ASEACAT', real(ascat_na_fac) )
+               CALL SET_ELMO_COMP( J, 2, 'ASOIL',   real(asoil_na_fac) )
+               CALL SET_ELMO_COMP( J, 3, 'ACORS',   real(acors_na_fac) )
  
              ! Map PMC_MG - Coarse-Mode Magnesium
              CASE ( ID_PMC_MG ) 
                N_VARS = 3
                CALL INIT_ELMO_COMP( J, N_VARS, 'COARSE' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ASEACAT', real(ascat_mg_fac) )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASOIL',   real(asoil_mg_fac) )
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ACORS',   real(acors_mg_fac) )
+               CALL SET_ELMO_COMP( J, 1, 'ASEACAT', real(ascat_mg_fac) )
+               CALL SET_ELMO_COMP( J, 2, 'ASOIL',   real(asoil_mg_fac) )
+               CALL SET_ELMO_COMP( J, 3, 'ACORS',   real(acors_mg_fac) )
  
              ! Map PMC_K - Coarse-Mode Potassium
              CASE ( ID_PMC_K ) 
                N_VARS = 3
                CALL INIT_ELMO_COMP( J, N_VARS, 'COARSE' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ASEACAT', real(ascat_k_fac) )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASOIL',   real(asoil_k_fac) )
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ACORS',   real(acors_k_fac) )
+               CALL SET_ELMO_COMP( J, 1, 'ASEACAT', real(ascat_k_fac) )
+               CALL SET_ELMO_COMP( J, 2, 'ASOIL',   real(asoil_k_fac) )
+               CALL SET_ELMO_COMP( J, 3, 'ACORS',   real(acors_k_fac) )
 
              ! Map PMC_CA - Coarse-Mode Calcium
              CASE ( ID_PMC_CA ) 
                N_VARS = 3
                CALL INIT_ELMO_COMP( J, N_VARS, 'COARSE' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ASEACAT', real(ascat_ca_fac) )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASOIL',   real(asoil_ca_fac) )
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ACORS',   real(acors_ca_fac) )
+               CALL SET_ELMO_COMP( J, 1, 'ASEACAT', real(ascat_ca_fac) )
+               CALL SET_ELMO_COMP( J, 2, 'ASOIL',   real(asoil_ca_fac) )
+               CALL SET_ELMO_COMP( J, 3, 'ACORS',   real(acors_ca_fac) )
 
              
              !!!! Fine-Mode Variables !!!!  
@@ -219,7 +221,7 @@
              CASE ( ID_PMF_UNSP1 )
                N_VARS = 9
                CALL INIT_ELMO_COMP( J, N_VARS, 'FINE' )
-               CALL SET_ELMO_COMP( J, 1, 'AGG',  'PMF_MASS', 1.0 )
+               CALL SET_ELMO_COMP( J, 1, 'PMF_MASS', 1.0 )
                CALL SET_ELMO_COMP( J, 2, 'ASO4', -1.0 )
                CALL SET_ELMO_COMP( J, 3, 'ANO3', -1.0 )
                CALL SET_ELMO_COMP( J, 4, 'ANH4', -1.0 )
@@ -235,7 +237,7 @@
              CASE ( ID_PMF_UNSP2 )
                N_VARS = 9
                CALL INIT_ELMO_COMP( J, N_VARS, 'FINE' )
-               CALL SET_ELMO_COMP( J, 1, 'AGG',  'PMF_MASS', 1.0 )
+               CALL SET_ELMO_COMP( J, 1, 'PMF_MASS', 1.0 )
                CALL SET_ELMO_COMP( J, 2, 'ASO4', -1.0 )
                CALL SET_ELMO_COMP( J, 3, 'ANO3', -1.0 )
                CALL SET_ELMO_COMP( J, 4, 'ANH4', -1.0 )
@@ -379,10 +381,10 @@
              CASE ( ID_PM1_NA ) 
                N_VARS = 4
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM1' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ANA', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASEACAT', real(ascat_na_fac) )
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ASOIL',   real(asoil_na_fac) )
-               CALL SET_ELMO_COMP( J, 4, 'AERO', 'ACORS',   real(acors_na_fac) )
+               CALL SET_ELMO_COMP( J, 1, 'ANA', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASEACAT', real(ascat_na_fac) )
+               CALL SET_ELMO_COMP( J, 3, 'ASOIL',   real(asoil_na_fac) )
+               CALL SET_ELMO_COMP( J, 4, 'ACORS',   real(acors_na_fac) )
  
              ! Map PM1_EC - PM1 Elemental Carbon
              CASE ( ID_PM1_EC ) 
@@ -394,28 +396,28 @@
              CASE ( ID_PM1_MG ) 
                N_VARS = 4
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM1' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'AMG', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASEACAT', real(ascat_mg_fac) )
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ASOIL',   real(asoil_mg_fac) )
-               CALL SET_ELMO_COMP( J, 4, 'AERO', 'ACORS',   real(acors_mg_fac) )
+               CALL SET_ELMO_COMP( J, 1, 'AMG', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASEACAT', real(ascat_mg_fac) )
+               CALL SET_ELMO_COMP( J, 3, 'ASOIL',   real(asoil_mg_fac) )
+               CALL SET_ELMO_COMP( J, 4, 'ACORS',   real(acors_mg_fac) )
  
              ! Map PM1_K - PM1 Potassium
              CASE ( ID_PM1_K ) 
                N_VARS = 4
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM1' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'AK', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASEACAT', real(ascat_k_fac) )
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ASOIL',   real(asoil_k_fac) )
-               CALL SET_ELMO_COMP( J, 4, 'AERO', 'ACORS',   real(acors_k_fac) )
+               CALL SET_ELMO_COMP( J, 1, 'AK', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASEACAT', real(ascat_k_fac) )
+               CALL SET_ELMO_COMP( J, 3, 'ASOIL',   real(asoil_k_fac) )
+               CALL SET_ELMO_COMP( J, 4, 'ACORS',   real(acors_k_fac) )
  
              ! Map PM1_CA - PM1 Calcium
              CASE ( ID_PM1_CA ) 
                N_VARS = 4
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM1' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ACA', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASEACAT', real(ascat_ca_fac ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ASOIL',   real(asoil_ca_fac ))
-               CALL SET_ELMO_COMP( J, 4, 'AERO', 'ACORS',   real(acors_ca_fac ))
+               CALL SET_ELMO_COMP( J, 1, 'ACA', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASEACAT', real(ascat_ca_fac ))
+               CALL SET_ELMO_COMP( J, 3, 'ASOIL',   real(asoil_ca_fac ))
+               CALL SET_ELMO_COMP( J, 4, 'ACORS',   real(acors_ca_fac ))
  
              ! Map PM1_Other - PM1 Other 
              CASE ( ID_PM1_OT ) 
@@ -427,9 +429,9 @@
              CASE ( ID_PM1_FE ) 
                N_VARS = 3
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM1' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'AFE', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASOIL',   real(asoil_fe_fac ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ACORS',   real(acors_fe_fac ))
+               CALL SET_ELMO_COMP( J, 1, 'AFE', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASOIL',   real(asoil_fe_fac ))
+               CALL SET_ELMO_COMP( J, 3, 'ACORS',   real(acors_fe_fac ))
  
              ! Map PM1_SI - PM1 Silicon
              CASE ( ID_PM1_SI ) 
@@ -447,9 +449,9 @@
              CASE ( ID_PM1_MN ) 
                N_VARS = 3
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM1' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'AMN', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASOIL',   real(asoil_mn_fac ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ACORS',   real(acors_mn_fac ))
+               CALL SET_ELMO_COMP( J, 1, 'AMN', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASOIL',   real(asoil_mn_fac ))
+               CALL SET_ELMO_COMP( J, 3, 'ACORS',   real(acors_mn_fac ))
  
              ! Map PM1_AL - PM1 Aluminum
              CASE ( ID_PM1_AL ) 
@@ -489,14 +491,14 @@
              CASE ( ID_PM1_UN ) 
                N_VARS = 3
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM1' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ASEACAT', 1.0 - real( ascat_na_fac + ascat_mg_fac +  
-     &                                                                  ascat_k_fac  + ascat_ca_fac  )) 
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASOIL',   1.0 - real( asoil_na_fac + asoil_mg_fac +
-     &                                                                  asoil_k_fac  + asoil_ca_fac +
-     &                                                                  asoil_mn_fac + asoil_fe_fac  ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ACORS',   1.0 - real( acors_na_fac + acors_mg_fac +
-     &                                                                  acors_k_fac  + acors_ca_fac +
-     &                                                                  acors_mn_fac + acors_fe_fac  ))
+               CALL SET_ELMO_COMP( J, 1, 'ASEACAT', 1.0 - real( ascat_na_fac + ascat_mg_fac +  
+     &                                                          ascat_k_fac  + ascat_ca_fac  )) 
+               CALL SET_ELMO_COMP( J, 2, 'ASOIL',   1.0 - real( asoil_na_fac + asoil_mg_fac +
+     &                                                          asoil_k_fac  + asoil_ca_fac +
+     &                                                          asoil_mn_fac + asoil_fe_fac  ))
+               CALL SET_ELMO_COMP( J, 3, 'ACORS',   1.0 - real( acors_na_fac + acors_mg_fac +
+     &                                                          acors_k_fac  + acors_ca_fac +
+     &                                                          acors_mn_fac + acors_fe_fac  ))
               
              ! Map PM1_HP - PM1.0 Hydronium Ion
              CASE ( ID_PM1_HP ) 
@@ -534,10 +536,10 @@
              CASE ( ID_PM25_NA ) 
                N_VARS = 4
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ANA', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASEACAT', real(ascat_na_fac ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ASOIL',   real(asoil_na_fac ))
-               CALL SET_ELMO_COMP( J, 4, 'AERO', 'ACORS',   real(acors_na_fac ))
+               CALL SET_ELMO_COMP( J, 1, 'ANA', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASEACAT', real(ascat_na_fac ))
+               CALL SET_ELMO_COMP( J, 3, 'ASOIL',   real(asoil_na_fac ))
+               CALL SET_ELMO_COMP( J, 4, 'ACORS',   real(acors_na_fac ))
  
              ! Map PM25_EC - PM2.5 Elemental Carbon
              CASE ( ID_PM25_EC ) 
@@ -549,28 +551,28 @@
              CASE ( ID_PM25_MG ) 
                N_VARS = 4
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'AMG', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASEACAT', real(ascat_mg_fac ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ASOIL',   real(asoil_mg_fac ))
-               CALL SET_ELMO_COMP( J, 4, 'AERO', 'ACORS',   real(acors_mg_fac ))
+               CALL SET_ELMO_COMP( J, 1, 'AMG', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASEACAT', real(ascat_mg_fac ))
+               CALL SET_ELMO_COMP( J, 3, 'ASOIL',   real(asoil_mg_fac ))
+               CALL SET_ELMO_COMP( J, 4, 'ACORS',   real(acors_mg_fac ))
  
              ! Map PM25_K - PM2.5 Potassium
              CASE ( ID_PM25_K ) 
                N_VARS = 4
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'AK', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASEACAT', real(ascat_k_fac ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ASOIL',   real(asoil_k_fac ))
-               CALL SET_ELMO_COMP( J, 4, 'AERO', 'ACORS',   real(acors_k_fac ))
+               CALL SET_ELMO_COMP( J, 1, 'AK', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASEACAT', real(ascat_k_fac ))
+               CALL SET_ELMO_COMP( J, 3, 'ASOIL',   real(asoil_k_fac ))
+               CALL SET_ELMO_COMP( J, 4, 'ACORS',   real(acors_k_fac ))
  
              ! Map PM25_CA - PM2.5 Calcium
              CASE ( ID_PM25_CA ) 
                N_VARS = 4
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ACA', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASEACAT', real(ascat_ca_fac ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ASOIL', real(asoil_ca_fac ))
-               CALL SET_ELMO_COMP( J, 4, 'AERO', 'ACORS', real(acors_ca_fac ))
+               CALL SET_ELMO_COMP( J, 1, 'ACA', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASEACAT', real(ascat_ca_fac ))
+               CALL SET_ELMO_COMP( J, 3, 'ASOIL', real(asoil_ca_fac ))
+               CALL SET_ELMO_COMP( J, 4, 'ACORS', real(acors_ca_fac ))
  
              ! Map PM25_Other - PM25 Other 
              CASE ( ID_PM25_OT ) 
@@ -582,9 +584,9 @@
              CASE ( ID_PM25_FE ) 
                N_VARS = 3
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'AFE', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASOIL', real(asoil_fe_fac ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ACORS', real(acors_fe_fac ))
+               CALL SET_ELMO_COMP( J, 1, 'AFE', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASOIL', real(asoil_fe_fac ))
+               CALL SET_ELMO_COMP( J, 3, 'ACORS', real(acors_fe_fac ))
  
              ! Map PM25_SI - PM2.5 Silicon
              CASE ( ID_PM25_SI ) 
@@ -602,9 +604,9 @@
              CASE ( ID_PM25_MN ) 
                N_VARS = 3
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'AMN', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASOIL', real(asoil_mn_fac ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ACORS', real(acors_mn_fac ))
+               CALL SET_ELMO_COMP( J, 1, 'AMN', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASOIL', real(asoil_mn_fac ))
+               CALL SET_ELMO_COMP( J, 3, 'ACORS', real(acors_mn_fac ))
  
              ! Map PM25_AL - PM2.5 Aluminum
              CASE ( ID_PM25_AL ) 
@@ -690,168 +692,216 @@
              CASE ( ID_PM25to10_NA ) 
                N_VARS = 4
                CALL INIT_ELMO_COMP( J, N_VARS, 'PM25TO10' )
-               CALL SET_ELMO_COMP( J, 1, 'AERO', 'ANA', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'AERO', 'ASEACAT', real(ascat_na_fac ))
-               CALL SET_ELMO_COMP( J, 3, 'AERO', 'ASOIL',   real(asoil_na_fac ))
-               CALL SET_ELMO_COMP( J, 4, 'AERO', 'ACORS',   real(acors_na_fac ))
+               CALL SET_ELMO_COMP( J, 1, 'ANA', 1.0 )
+               CALL SET_ELMO_COMP( J, 2, 'ASEACAT', real(ascat_na_fac ))
+               CALL SET_ELMO_COMP( J, 3, 'ASOIL',   real(asoil_na_fac ))
+               CALL SET_ELMO_COMP( J, 4, 'ACORS',   real(acors_na_fac ))
  
              !!!! Toxics !!!!  
  
              ! Map PM25_HDSL - HAP inventory PM2.5 diesel mass
              CASE ( ID_PM25_HDSL ) 
-               N_VARS = 6
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'ADE_OTHR', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'ADE_EC', 1.0 )
-               CALL SET_ELMO_COMP( J, 3, 'ADE_OC', 1.0 )
-               CALL SET_ELMO_COMP( J, 4, 'ADE_SO4', 1.0 )
-               CALL SET_ELMO_COMP( J, 5, 'ADE_NO3', 1.0 )
-               CALL SET_ELMO_COMP( J, 6, 'ADE_CORS', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 6
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'ADE_OTHR', 1.0 )
+                  CALL SET_ELMO_COMP( J, 2, 'ADE_EC', 1.0 )
+                  CALL SET_ELMO_COMP( J, 3, 'ADE_OC', 1.0 )
+                  CALL SET_ELMO_COMP( J, 4, 'ADE_SO4', 1.0 )
+                  CALL SET_ELMO_COMP( J, 5, 'ADE_NO3', 1.0 )
+                  CALL SET_ELMO_COMP( J, 6, 'ADE_CORS', 1.0 )
+               END IF
  
              ! Map PM25_HBE - HAP inventory Beryllium
              CASE ( ID_PM25_HBE ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'ABE', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'ABE', 1.0 )
+               END IF
  
              ! Map PM25_HCD - HAP inventory Cadmium
              CASE ( ID_PM25_HCD ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'ACD', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'ACD', 1.0 )
+               END IF
  
              ! Map PM25_HCR3 - HAP inventory Chromium III
              CASE ( ID_PM25_HCR3 ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'ACR_III', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'ACR_III', 1.0 )
+               END IF
  
              ! Map PM25_HCR6 - HAP inventory Chromium VI
              CASE ( ID_PM25_HCR6 ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'ACR_VI', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'ACR_VI', 1.0 )
+               END IF
  
              ! Map PM25_HCR - HAP inventory Total Chromium
              CASE ( ID_PM25_HCR ) 
-               N_VARS = 2
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'PM25_HCR3', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'PM25_HCR6', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 2
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'PM25_HCR3', 1.0 )
+                  CALL SET_ELMO_COMP( J, 2, 'PM25_HCR6', 1.0 )
+               END IF
  
              ! Map PM25_HPB - HAP inventory Lead
              CASE ( ID_PM25_HPB ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'APB', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'APB', 1.0 )
+               END IF
  
              ! Map PM25_HMN - HAP inventory Manganese
              CASE ( ID_PM25_HMN ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'AMN_HAPS', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'AMN_HAPS', 1.0 )
+               END IF
  
              ! Map PM25_HNI - HAP inventory Nickel
              CASE ( ID_PM25_HNI ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'ANI', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'ANI', 1.0 )
+               END IF
  
              ! Map PM25_HAS - HAP inventory Arsenic
              CASE ( ID_PM25_HAS ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'AAS', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'AAS', 1.0 )
+               END IF
  
              ! Map PM25_HG - Mercury
              CASE ( ID_PM25_HG ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'APHG', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'APHG', 1.0 )
+               END IF
  
              ! Map PM25_BENAPY - Benzo-a-Pyrene
              CASE ( ID_PM25_BENAPY ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
-               CALL SET_ELMO_COMP( J, 1, 'ABENAPY', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM25' )
+                  CALL SET_ELMO_COMP( J, 1, 'ABENAPY', 1.0 )
+               END IF
  
              ! Map PM10_HDSL - HAP inventory PM2.5 diesel mass
              CASE ( ID_PM10_HDSL ) 
-               N_VARS = 6
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'ADE_OTHR', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'ADE_EC', 1.0 )
-               CALL SET_ELMO_COMP( J, 3, 'ADE_OC', 1.0 )
-               CALL SET_ELMO_COMP( J, 4, 'ADE_SO4', 1.0 )
-               CALL SET_ELMO_COMP( J, 5, 'ADE_NO3', 1.0 )
-               CALL SET_ELMO_COMP( J, 6, 'ADE_CORS', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 6
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'ADE_OTHR', 1.0 )
+                  CALL SET_ELMO_COMP( J, 2, 'ADE_EC', 1.0 )
+                  CALL SET_ELMO_COMP( J, 3, 'ADE_OC', 1.0 )
+                  CALL SET_ELMO_COMP( J, 4, 'ADE_SO4', 1.0 )
+                  CALL SET_ELMO_COMP( J, 5, 'ADE_NO3', 1.0 )
+                  CALL SET_ELMO_COMP( J, 6, 'ADE_CORS', 1.0 )
+               END IF
  
              ! Map PM10_HBE - HAP inventory Beryllium
              CASE ( ID_PM10_HBE ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'ABE', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'ABE', 1.0 )
+               END IF
  
              ! Map PM10_HCD - HAP inventory Cadmium
              CASE ( ID_PM10_HCD ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'ACD', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'ACD', 1.0 )
+               END IF
  
              ! Map PM10_HCR3 - HAP inventory Chromium III
              CASE ( ID_PM10_HCR3 ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'ACR_III', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'ACR_III', 1.0 )
+               END IF
  
              ! Map PM10_HCR6 - HAP inventory Chromium VI
              CASE ( ID_PM10_HCR6 ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'ACR_VI', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'ACR_VI', 1.0 )
+               END IF
  
              ! Map PM10_HCR - HAP inventory Total Chromium
              CASE ( ID_PM10_HCR ) 
-               N_VARS = 2
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'PM10_HCR3', 1.0 )
-               CALL SET_ELMO_COMP( J, 2, 'PM10_HCR6', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 2
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'PM10_HCR3', 1.0 )
+                  CALL SET_ELMO_COMP( J, 2, 'PM10_HCR6', 1.0 )
+               END IF
  
              ! Map PM10_HPB - HAP inventory Lead
              CASE ( ID_PM10_HPB ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'APB', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'APB', 1.0 )
+               END IF
  
              ! Map PM10_HMN - HAP inventory Manganese
              CASE ( ID_PM10_HMN ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'AMN_HAPS', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'AMN_HAPS', 1.0 )
+               END IF
  
              ! Map PM10_HNI - HAP inventory Nickel
              CASE ( ID_PM10_HNI ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'ANI', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'ANI', 1.0 )
+               END IF
  
              ! Map PM10_HAS - HAP inventory Arsenic
              CASE ( ID_PM10_HAS ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'AAS', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'AAS', 1.0 )
+               END IF
  
              ! Map PM10_HG - Mercury
              CASE ( ID_PM10_HG ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'APHG', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'APHG', 1.0 )
+               END IF
  
              ! Map PM10_BENAPY - Benzo-a-Pyrene
              CASE ( ID_PM10_BENAPY ) 
-               N_VARS = 1
-               CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
-               CALL SET_ELMO_COMP( J, 1, 'ABENAPY', 1.0 )
+               IF ( L_ELMO_TABLE_USED( J ) ) THEN
+                  N_VARS = 1
+                  CALL INIT_ELMO_COMP( J, N_VARS, 'PM10' )
+                  CALL SET_ELMO_COMP( J, 1, 'ABENAPY', 1.0 )
+               END IF
  
              !!!! Other Variables !!!!  
 
@@ -1009,5 +1059,5 @@
 
 
       END DO
-      END SUBROUTINE MAP_ELMO_VARIABLES
+      END SUBROUTINE ELMO_MAP_VARIABLES
  

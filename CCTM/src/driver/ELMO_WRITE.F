@@ -24,6 +24,9 @@
 !-------------------------------------------------------------------------
 
       USE RUNTIME_VARS
+      USE ELMO_DATA, ONLY : INST_ACTIVE, AVRG_ACTIVE, ELMO_NSTEP,
+     &                      ELMO_INST, ELMO_AVRG
+      USE UTILIO_DEFN
 
       IMPLICIT NONE 
 

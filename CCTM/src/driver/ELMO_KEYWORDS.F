@@ -301,7 +301,7 @@
            XMSG = 'Failure allocating ELMO_KEY(25)'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
-      ELMO_KEY( 25 )%LIST = (/'O3  ','NO2 ','NO  ','SO2  ','CO  ',
+      ELMO_KEY( 25 )%LIST = (/'O3  ','NO2 ','NO  ','SO2 ','CO  ',
      &                        'NH3 ','HNO3'/)
  
       ! All Deposition Variables
@@ -322,14 +322,23 @@
            XMSG = 'Failure allocating ELMO_KEY(26)'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
-      ELMO_KEY( 27 )%LIST = (/'PFOA','APFOA','HFPODA','AHFPODA','HFPODAF','AHFPODAF',
-     &  'TFE','ATFE','HFPO','AHFPO','HFP','AHFP','E2','AE2','PSEPVE','APSEPVE',
-     &  'PAF','APAF','CH3F','ACH3F','PPVE','APPVE','PMVE','APMVE','PEVE','APEVE',
-     &  'PFB','APFB','PMPF','APMPF','TAF2','ATAF2','EVE','AEVE','COF2','ACOF2',
-     &  'E1','AE1','PEPF','APEPF','DA','ADA','HFPOTA','AHFPOTA','TAF','ATAF','MA',
-     &  'AMA','F113','AF113','CF3H','ACF3H','TFF4','ATFF4','AHF','PFASOTHER',
-     &  'APFASOTHER','PFASGP','APFASGP','PFASGAS','APFASAERO','APFAS_EXPTDAERO','PFASGASOTHER',
-     &  'PFAS_TGAS','PFAS_TVAP','PFAS_TAER','PFAS_TOT' /)
+      ELMO_KEY( 27 )%LIST = (/'PFOA           ','APFOA          ','HFPODA         ',
+     &      'AHFPODA        ','HFPODAF        ','AHFPODAF       ','TFE            ',
+     &      'ATFE           ','HFPO           ','AHFPO          ','HFP            ',
+     &      'AHFP           ','E2             ','AE2            ','PSEPVE         ',
+     &      'APSEPVE        ','PAF            ','APAF           ','CH3F           ',
+     &      'ACH3F          ','PPVE           ','APPVE          ','PMVE           ',
+     &      'APMVE          ','PEVE           ','APEVE          ','PFB            ',
+     &      'APFB           ','PMPF           ','APMPF          ','TAF2           ',
+     &      'ATAF2          ','EVE            ','AEVE           ','COF2           ',
+     &      'ACOF2          ','E1             ','AE1            ','PEPF           ',
+     &      'APEPF          ','DA             ','ADA            ','HFPOTA         ',
+     &      'AHFPOTA        ','TAF            ','ATAF           ','MA             ',
+     &      'AMA            ','F113           ','AF113          ','CF3H           ',
+     &      'ACF3H          ','TFF4           ','ATFF4          ','AHF            ',
+     &      'PFASOTHER      ','APFASOTHER     ','PFASGP         ','APFASGP        ',
+     &      'PFASGAS        ','APFASAERO      ','APFAS_EXPTDAERO','PFASGASOTHER   ',
+     &      'PFAS_TGAS      ','PFAS_TVAP      ','PFAS_TAER      ','PFAS_TOT       ' /)
 
 
       END SUBROUTINE ELMO_KEYWORDS

@@ -73,7 +73,7 @@ C-----------------------------------------------------------------------
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP 
-      USE ELMO_PROC, ONLY : OPEN_ELMO
+      USE ELMO_INIT_DEFN, ONLY : OPEN_ELMO
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)

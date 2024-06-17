@@ -35,8 +35,6 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       LOGICAL, SAVE :: L_ELMO
       REAL,    SAVE :: ELMO_NSTEP = 0.
-      INTEGER, SAVE :: NLAY_ELMO_INST
-      INTEGER, SAVE :: NLAY_ELMO_AVRG
 
       ! Define Indices for All ELMO Parameters
       ! The idea here is that parameters will be organized and
@@ -496,140 +494,167 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'RHOJ         ',ID_RHOJ,       M3REAL, F,F,F, 'kg m-3', 'Advected Density x Jacobian/MSFX^2' ) /)
      
 
-        TYPE ELMO_KEY_TYPE
-            CHARACTER( 24 )             :: WORD    ! Keyword for selecting mulitple ELMO parameters
-            INTEGER                     :: N       ! Number of Parameters associated with the Keyword
-            CHARACTER( 16 ),ALLOCATABLE :: LIST(:) ! List of parameters
-        END TYPE ELMO_KEY_TYPE
+      TYPE ELMO_KEY_TYPE
+          CHARACTER( 24 )             :: WORD    ! Keyword for selecting mulitple ELMO parameters
+          INTEGER                     :: N       ! Number of Parameters associated with the Keyword
+          CHARACTER( 16 ),ALLOCATABLE :: LIST(:) ! List of parameters
+      END TYPE ELMO_KEY_TYPE
 
-        TYPE (ELMO_KEY_TYPE), ALLOCATABLE, SAVE :: ELMO_KEY( : )
-        INTEGER, SAVE :: N_KEY
+      TYPE (ELMO_KEY_TYPE), ALLOCATABLE, SAVE :: ELMO_KEY( : )
+      INTEGER, SAVE :: N_KEY
 
-        INTEGER, SAVE :: MAP_ID2LIST( N_ELMO_LIST ) 
+      CHARACTER(32), ALLOCATABLE, SAVE :: INST_VARS_NML( : )
+      CHARACTER(32), ALLOCATABLE, SAVE :: AVRG_VARS_NML( : )
+      INTEGER, SAVE :: N_ELMO_INST, N_ELMO_AVRG
 
-        ! Variables for Storing Values of ELMO Output      
-        REAL, ALLOCATABLE, SAVE :: ELMO_INST( :,:,:,: )
-        REAL, ALLOCATABLE, SAVE :: ELMO_AVRG( :,:,:,: )
-        REAL, ALLOCATABLE, SAVE :: ELMO_USED( : )
-        LOGICAL, ALLOCATABLE, SAVE :: L_CALC( : )
-        REAL, ALLOCATABLE, SAVE :: CONC_VEC( : )
-        REAL, ALLOCATABLE, SAVE :: WDEP_VEC( : )
-        REAL, ALLOCATABLE, SAVE :: DDEP_VEC( : )
+      LOGICAL, SAVE :: INST_ACTIVE, AVRG_ACTIVE
+      INTEGER, SAVE :: INST_LAYER_TOP, INST_LAYER_BOT,
+     &                 AVRG_LAYER_TOP, AVRG_LAYER_BOT
+      
+      INTEGER, SAVE :: NLAY_ELMO_INST
+      INTEGER, SAVE :: NLAY_ELMO_AVRG
+
+      LOGICAL, ALLOCATABLE, SAVE :: L_ELMO_TABLE_INST(:), L_ELMO_TABLE_AVRG(:),
+     &                              L_ELMO_TABLE_USED(:)
+
+      INTEGER, ALLOCATABLE, SAVE :: MAP_USEDtoTABLE( : ), MAP_TABLEtoUSED( : )
+      INTEGER, ALLOCATABLE, SAVE :: MAP_AVRGtoUSED( : ), MAP_INSTtoUSED( : )
+      INTEGER, ALLOCATABLE, SAVE :: MAP_TABLEtoAVRG( : ), MAP_TABLEtoINST( : )
+      INTEGER, ALLOCATABLE, SAVE :: MAP_AVRGtoTABLE( : ), MAP_INSTtoTABLE( : )
+      LOGICAL, ALLOCATABLE, SAVE :: L_CALCULATED( : )
+      INTEGER, SAVE :: N_ELMO_USED
+
+      INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_IV( : )
+      INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_ID( : )
+      INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_IM( : )
+      INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_ISRC( : )
+
+      ! Variables for Storing Values of ELMO Output      
+      REAL, ALLOCATABLE, SAVE :: ELMO_INST( :,:,:,: )
+      REAL, ALLOCATABLE, SAVE :: ELMO_AVRG( :,:,:,: )
+      REAL, ALLOCATABLE, SAVE :: ELMO_USED( : )
+      LOGICAL, ALLOCATABLE, SAVE :: L_CALC( : )
+      REAL, ALLOCATABLE, SAVE :: CONC_VEC( : )
+      REAL, ALLOCATABLE, SAVE :: WDEP_VEC( : )
+      REAL, ALLOCATABLE, SAVE :: DDEP_VEC( : )
 #ifdef isam
-        REAL, ALLOCATABLE, SAVE :: ISAM_WDEP_VEC( : )
-        REAL, ALLOCATABLE, SAVE :: ISAM_DDEP_VEC( : )
+      REAL, ALLOCATABLE, SAVE :: ISAM_WDEP_VEC( : )
+      REAL, ALLOCATABLE, SAVE :: ISAM_DDEP_VEC( : )
 #endif
 #ifdef sens
-        REAL, ALLOCATABLE, SAVE :: DDM_WDEP_VEC( : )
-        REAL, ALLOCATABLE, SAVE :: DDM_DDEP_VEC( : )
+      REAL, ALLOCATABLE, SAVE :: DDM_WDEP_VEC( : )
+      REAL, ALLOCATABLE, SAVE :: DDM_DDEP_VEC( : )
 #endif
-        
-        
-        INTEGER, SAVE           :: C1, R1, L1
+      
+      
+      INTEGER, SAVE           :: C1, R1, L1
 
-        ! Arrays for Mapping Output variables to ELMO Table IDs
-        TYPE ELMO_MAP_1D
-            INTEGER, ALLOCATABLE       :: IND( : )
-        END TYPE ELMO_MAP_1D
-        TYPE ELMO_MAP_2D
-            INTEGER, ALLOCATABLE       :: IND( :,: )
-        END TYPE ELMO_MAP_2D
+      ! Arrays for Mapping Output variables to ELMO Table IDs
+      TYPE ELMO_MAP_1D
+          INTEGER, ALLOCATABLE       :: IND( : )
+      END TYPE ELMO_MAP_1D
+      TYPE ELMO_MAP_2D
+          INTEGER, ALLOCATABLE       :: IND( :,: )
+      END TYPE ELMO_MAP_2D
 
-        TYPE( ELMO_MAP_1D ), ALLOCATABLE, SAVE :: 
-     &        MAP_ELMO_IDtoTABLE_MODE(:), MAP_ELMO_IDtoTABLE_SOURCE(:)
-        TYPE( ELMO_MAP_2D ), ALLOCATABLE, SAVE :: 
-     &        MAP_ELMO_IDtoTABLE_MODE_SOURCE(:)
+      TYPE( ELMO_MAP_1D ), ALLOCATABLE, SAVE :: 
+     &      MAP_ELMO_IDtoTABLE_MODE(:), MAP_ELMO_IDtoTABLE_SOURCE(:)
+      TYPE( ELMO_MAP_2D ), ALLOCATABLE, SAVE :: 
+     &      MAP_ELMO_IDtoTABLE_MODE_SOURCE(:)
 
-        INTEGER, ALLOCATABLE, SAVE :: N_ELMOTABLE_MODE(:,:),
-     &                                N_ELMOTABLE_SOURCE(:,:)
-     &                                
-        INTEGER, ALLOCATABLE, SAVE :: MAP_ELMOTABLE(:,:)
+      INTEGER, ALLOCATABLE, SAVE :: N_ELMOTABLE_MODE(:,:),
+     &                              N_ELMOTABLE_SOURCE(:,:)
+     &                              
+      INTEGER, ALLOCATABLE, SAVE :: MAP_ELMOTABLE(:,:)
 
-        ! Variables for Aerosol Chemistry
-        REAL, SAVE, ALLOCATABLE :: GAMMA_N2O5IJ( :,:,:  ) ! Fine modes N2O5 rx effic.
-        REAL, SAVE, ALLOCATABLE :: GAMMA_N2O5K(  :,:,:  ) ! Coarse mode N2O5 rx effic.
-        REAL, SAVE, ALLOCATABLE :: KPARTIEPOX (  :,:,:  ) ! IEPOX particle-phase reaction rate constant (sec-1)
-        REAL, SAVE, ALLOCATABLE :: GAMMA_IEPOX(  :,:,:  ) ! IEPOX uptake coeff
-        REAL, SAVE, ALLOCATABLE :: GAMMA_IMAE (  :,:,:  ) ! IMAE uptake coeff
-        REAL, SAVE, ALLOCATABLE :: YCLNO2IJ   (  :,:,:  ) ! Yield CLNO2 in Fine modes 
-        REAL, SAVE, ALLOCATABLE :: YCLNO2K    (  :,:,:  ) ! Yield CLNO2 in coarse mode 
+      ! Variables for Aerosol Chemistry
+      REAL, SAVE, ALLOCATABLE :: GAMMA_N2O5IJ( :,:,:  ) ! Fine modes N2O5 rx effic.
+      REAL, SAVE, ALLOCATABLE :: GAMMA_N2O5K(  :,:,:  ) ! Coarse mode N2O5 rx effic.
+      REAL, SAVE, ALLOCATABLE :: KPARTIEPOX (  :,:,:  ) ! IEPOX particle-phase reaction rate constant (sec-1)
+      REAL, SAVE, ALLOCATABLE :: GAMMA_IEPOX(  :,:,:  ) ! IEPOX uptake coeff
+      REAL, SAVE, ALLOCATABLE :: GAMMA_IMAE (  :,:,:  ) ! IMAE uptake coeff
+      REAL, SAVE, ALLOCATABLE :: YCLNO2IJ   (  :,:,:  ) ! Yield CLNO2 in Fine modes 
+      REAL, SAVE, ALLOCATABLE :: YCLNO2K    (  :,:,:  ) ! Yield CLNO2 in coarse mode 
   
-        LOGICAL, SAVE           :: AERO_CHEM_SET = .FALSE.
+      LOGICAL, SAVE           :: AERO_CHEM_SET = .FALSE.
  
-        ! Define type for storing names, properties, and components of
-        ! all ELMO variables 
-        TYPE ELMO_TABLE_TYPE
-            CHARACTER (LEN = 16) :: NAME        ! Variable Name ( as it appears on the ELMO_LIST, in CGRID, etc.)
-            CHARACTER (LEN = 16) :: OUT_NAME    ! Variable Name that will be written to the output file
-            INTEGER              :: OUT_TYPE    ! IOAPI Variable Type
-            INTEGER              :: ID          ! ID Number mapping to specific calculation, CGRID index, AERO 
-                                                !   index, Family, etc.
-            INTEGER              :: VAR_TYPE    ! ELMO Variable Type (ELMO, CGRID, AEROBULK, FAM, WDEP, DDEP)
-            INTEGER              :: IM          ! Mode of interest if mode-dependent
-            INTEGER              :: SOURCE      ! Source Number for ISAM or DDM3D Variables
-            CHARACTER (LEN = 16) :: CUNIT       ! Units in Character Format
-            INTEGER              :: IUNIT       ! Units in Integer Format:
-                                                !   0 = unspecified;  1 = 'ug m-3';  2 = 'ppmV' 
-            CHARACTER (LEN = 80) :: DESC        ! Description for Output File
-                                                
-            REAL                 :: MW          ! Species molecular weight, if defined
-            LOGICAL              :: L_COMP      ! Is this variable a linear combination of other variables
-        END TYPE ELMO_TABLE_TYPE
+      ! Define type for storing names, properties, and components of
+      ! all ELMO variables 
+      TYPE ELMO_TABLE_TYPE
+          CHARACTER (LEN = 16) :: NAME        ! Variable Name ( as it appears on the ELMO_LIST, in CGRID, etc.)
+          CHARACTER (LEN = 16) :: OUT_NAME    ! Variable Name that will be written to the output file
+          INTEGER              :: OUT_TYPE    ! IOAPI Variable Type
+          INTEGER              :: ID          ! ID Number mapping to specific calculation, CGRID index, AERO 
+                                              !   index, Family, etc.
+          INTEGER              :: VAR_TYPE    ! ELMO Variable Type (ELMO, CGRID, AEROBULK, FAM, WDEP, DDEP)
+          INTEGER              :: IM          ! Mode of interest if mode-dependent
+          INTEGER              :: SOURCE      ! Source Number for ISAM or DDM3D Variables
+          CHARACTER (LEN = 16) :: CUNIT       ! Units in Character Format
+          INTEGER              :: IUNIT       ! Units in Integer Format:
+                                              !   0 = unspecified;  1 = 'ug m-3';  2 = 'ppmV' 
+          CHARACTER (LEN = 80) :: DESC        ! Description for Output File
+                                              
+          REAL                 :: MW          ! Species molecular weight, if defined
+          LOGICAL              :: L_COMP      ! Is this variable a linear combination of other variables
+      END TYPE ELMO_TABLE_TYPE
 
-        TYPE ELMO_COMP_TYPE
-            INTEGER              :: N_VARS      ! Some variables are linear combinations of other variables.
-                                                !   N_VARS is the number of components within such a combination. 
-                                                !   This should not account for modes. For example, 
-                                                !   to sum ASO4IJK, N_VARS would be 1 since only 
-                                                !   ASO4 is being used.
-            INTEGER, ALLOCATABLE :: TABID(:)    ! ID Number in ELMO_TABLE
-            INTEGER, ALLOCATABLE :: ID(:)       ! Index in native array (e.g. CGRID, AEROSPC, SA_ACONC, etc.)
-            INTEGER, ALLOCATABLE :: VAR_TYPE(:) ! ELMO Variable Type (ELMO, CGRID, AEROBULK, FAM, WDEP, DDEP)
-            REAL,    ALLOCATABLE :: MW(:)       ! Species molecular weight, if defined
-            INTEGER, ALLOCATABLE :: SPC_UNIT(:) ! Indicates whether this variables units are mass-based(1), 
-                                                !   mole-based(2), or neither(0).
-            REAL,    ALLOCATABLE :: COEFF(:)    ! Coefficient for each variable
-            LOGICAL, ALLOCATABLE :: L_MODE(:)   ! For which modes does this aggregate apply
-            LOGICAL, ALLOCATABLE :: L_SOURCE(:) ! For Which sources does this component apply
-            INTEGER              :: INLET       ! Integer pointing to the corresponding inlet of choice 
-                                                !   in the ELMO_INLET structure
-            INTEGER              :: WETNESS     ! Integer prescribing wet or dry aerosol (1 = wet, 2 = dry)
-                                                !   Default is wet
-        END TYPE ELMO_COMP_TYPE
+      TYPE ELMO_COMP_TYPE
+          LOGICAL              :: L_VALID     ! True (Default) if all components exist in simulation. 
+                                              !   False if any components cannot be found
+          INTEGER              :: N_VARS      ! Some variables are linear combinations of other variables.
+                                              !   N_VARS is the number of components within such a combination. 
+                                              !   This should not account for modes. For example, 
+                                              !   to sum ASO4IJK, N_VARS would be 1 since only 
+                                              !   ASO4 is being used.
+          INTEGER, ALLOCATABLE :: TABID(:)    ! ID Number in ELMO_TABLE
+          INTEGER, ALLOCATABLE :: ID(:)       ! Index in native array (e.g. CGRID, AEROSPC, SA_ACONC, etc.)
+          INTEGER, ALLOCATABLE :: VAR_TYPE(:) ! ELMO Variable Type (ELMO, CGRID, AEROBULK, FAM, WDEP, DDEP)
+          REAL,    ALLOCATABLE :: MW(:)       ! Species molecular weight, if defined
+          INTEGER, ALLOCATABLE :: SPC_UNIT(:) ! Indicates whether this variables units are mass-based(1), 
+                                              !   mole-based(2), or neither(0).
+          REAL,    ALLOCATABLE :: COEFF(:)    ! Coefficient for each variable
+          LOGICAL, ALLOCATABLE :: L_MODE(:)   ! For which modes does this aggregate apply
+          LOGICAL, ALLOCATABLE :: L_SOURCE(:) ! For Which sources does this component apply
+          INTEGER              :: INLET       ! Integer pointing to the corresponding inlet of choice 
+                                              !   in the ELMO_INLET structure
+          INTEGER              :: WETNESS     ! Integer prescribing wet or dry aerosol (1 = wet, 2 = dry)
+                                              !   Default is wet
+      END TYPE ELMO_COMP_TYPE
 
-        TYPE (ELMO_TABLE_TYPE), ALLOCATABLE, SAVE :: ELMO_TABLE( : ) 
-        TYPE (ELMO_COMP_TYPE ), ALLOCATABLE, SAVE :: ELMO_COMP( : ) 
+      TYPE (ELMO_TABLE_TYPE), ALLOCATABLE, SAVE :: ELMO_TABLE( : ),
+     &                          ELMO_INST_PARS(:), ELMO_AVRG_PARS(:)
+      TYPE (ELMO_COMP_TYPE ), ALLOCATABLE, SAVE :: ELMO_COMP( : ) 
 
-        INTEGER, SAVE :: N_ELMO_TABLE
+      INTEGER, SAVE :: N_ELMO_TABLE
 
-        ! Define Parameters indicating what kind of variable each ELMO
-        ! output is
-        INTEGER, PARAMETER :: ETYPE_ELMO = 1, ETYPE_CGRID = 2,
-     &                        ETYPE_AEROBULK = 3, ETYPE_FAM = 4, 
-     &                        ETYPE_WDEP = 5, ETYPE_DDEP = 6,
-     &                        ETYPE_ISAM_ELMO = 7, ETYPE_ISAM = 8, 
-     &                        ETYPE_ISAM_AEROBULK = 9, ETYPE_ISAM_FAM = 10,
-     &                        ETYPE_ISAM_WDEP = 11, ETYPE_ISAM_DDEP = 12,
-     &                        ETYPE_DDM_ELMO = 13, ETYPE_DDM = 14, 
-     &                        ETYPE_DDM_AEROBULK = 15, ETYPE_DDM_FAM = 16,
-     &                        ETYPE_DDM_WDEP = 17, ETYPE_DDM_DDEP = 18
+      ! Define Parameters indicating what kind of variable each ELMO
+      ! output is
+      INTEGER, PARAMETER :: ETYPE_ELMO = 1, ETYPE_CGRID = 2,
+     &                      ETYPE_AEROBULK = 3, ETYPE_FAM = 4, 
+     &                      ETYPE_WDEP = 5, ETYPE_DDEP = 6,
+     &                      ETYPE_ISAM_ELMO = 7, ETYPE_ISAM = 8, 
+     &                      ETYPE_ISAM_AEROBULK = 9, ETYPE_ISAM_FAM = 10,
+     &                      ETYPE_ISAM_WDEP = 11, ETYPE_ISAM_DDEP = 12,
+     &                      ETYPE_DDM_ELMO = 13, ETYPE_DDM = 14, 
+     &                      ETYPE_DDM_AEROBULK = 15, ETYPE_DDM_FAM = 16,
+     &                      ETYPE_DDM_WDEP = 17, ETYPE_DDM_DDEP = 18
 
-        ! Define Logical flags for turning on output categories
-        LOGICAL, SAVE :: L_ELMO_WDEP, L_ELMO_DDEP
+      ! Define Logical flags for turning on output categories
+      LOGICAL, SAVE :: L_ELMO_WDEP, L_ELMO_DDEP
 
-        TYPE ELMO_INLET_TYPE
-            CHARACTER( 16 ) CINLET            ! Inlet Name
-            REAL            DIAM_LO           ! Lower Diameter of this Inlet [um]
-            REAL            DIAM_HI           ! Upper Diameter of this inlet [um]
-        END TYPE ELMO_INLET_TYPE
+      TYPE ELMO_INLET_TYPE
+          CHARACTER( 16 ) CINLET            ! Inlet Name
+          REAL            DIAM_LO           ! Lower Diameter of this Inlet [um]
+          REAL            DIAM_HI           ! Upper Diameter of this inlet [um]
+      END TYPE ELMO_INLET_TYPE
 
-        INTEGER, PARAMETER :: N_INLET = 10
-        INTEGER, PARAMETER :: IPM01 = 1, IPM1 = 2, IPM25 = 3, IPM10 = 4, 
-     &                        IPM25to10 = 5, IPMAMS = 6, INUM10 = 7,
-     &                        INUM20 = 8, INUM40 = 9, INUM100 = 10
-        INTEGER, PARAMETER :: IWET = 1, IDRY = 2
+      INTEGER, PARAMETER :: N_INLET = 10
+      INTEGER, PARAMETER :: IPM01 = 1, IPM1 = 2, IPM25 = 3, IPM10 = 4, 
+     &                      IPM25to10 = 5, IPMAMS = 6, INUM10 = 7,
+     &                      INUM20 = 8, INUM40 = 9, INUM100 = 10
+      INTEGER, PARAMETER :: IWET = 1, IDRY = 2
 
-        TYPE (ELMO_INLET_TYPE), PARAMETER :: ELMO_INLET( N_INLET ) = (/
+      TYPE (ELMO_INLET_TYPE), PARAMETER :: ELMO_INLET( N_INLET ) = (/
        !                          Inlet Name D_Lo  D_Hi
        !                          ---------- ----  ----
      &        ELMO_INLET_TYPE( 'PM01    ', 0.0,  0.1 ),
@@ -651,13 +676,26 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         REAL, ALLOCATABLE, SAVE :: ELMO_AOD_550(:,:), ! total aerosol optical depth at 
                                                       !   550 nm (Angstrom Interpolation) 
      &                             ELMO_EXT_550(:,:,:)! aerosol extinction at 550 nm for layer [1/m]
+        REAL, ALLOCATABLE, SAVE :: ELMO_WDEP(:,:,:) ! wet deposition accumulated per time step
+        REAL, ALLOCATABLE, SAVE :: ELMO_DDEP(:,:,:) ! dry deposition accumulated per time step
+        REAL, ALLOCATABLE, SAVE :: ELMO_ISAM_WDEP(:,:,:,:) ! wet deposition accumulated per time step
+        REAL, ALLOCATABLE, SAVE :: ELMO_ISAM_DDEP(:,:,:,:) ! dry deposition accumulated per time step
+        REAL, ALLOCATABLE, SAVE :: ELMO_DDM_WDEP(:,:,:,:) ! wet deposition accumulated per time step
+        REAL, ALLOCATABLE, SAVE :: ELMO_DDM_DDEP(:,:,:,:) ! dry deposition accumulated per time step
 
         CONTAINS
 
 !------------------------------------------------------------------------------------------            
         subroutine elmo_init_shared
 !------------------------------------------------------------------------------------------            
-        use grid_conf, only : ncols, nrows, nlays
+        use grid_conf,  only : ncols, nrows, nlays
+        use cgrid_spcs, only : N_SPC_WDEP, N_SPC_DEPV
+#ifdef isam
+        use sa_defn,    only : nspc_sa, ntag_sa
+#endif
+#ifdef sens
+        use ddm3d_defn, only : npmax
+#endif
 
         implicit none
 
@@ -676,33 +714,34 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         call checkmem( ios, 'ELMO_WDEP',pname )
         elmo_wdep = 0.0
 
-        allocate( elmo_ddep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+        allocate( elmo_ddep(ncols, nrows, n_spc_depv ), stat=ios)
         call checkmem( ios, 'ELMO_DDEP',pname )
         elmo_ddep = 0.0
 
-        allocate( elmo_isam_wdep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+#ifdef isam
+        allocate( elmo_isam_wdep(ncols, nrows, nspc_sa, ntag_sa ), stat=ios)
         call checkmem( ios, 'ELMO_ISAM_WDEP',pname )
         elmo_isam_wdep = 0.0
 
-        allocate( elmo_isam_ddep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+        allocate( elmo_isam_ddep(ncols, nrows, n_spc_depv, ntag_sa ), stat=ios)
         call checkmem( ios, 'ELMO_ISAM_DDEP',pname )
         elmo_isam_ddep = 0.0
-
-        allocate( elmo_ddm_wdep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+#endif
+#ifdef sens
+        allocate( elmo_ddm_wdep(ncols, nrows, n_spc_wdep+1, npmax ), stat=ios)
         call checkmem( ios, 'ELMO_DDM_WDEP',pname )
         elmo_ddm_wdep = 0.0
 
-        allocate( elmo_ddm_ddep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+        allocate( elmo_ddm_ddep(ncols, nrows, n_spc_depv, npmax ), stat=ios)
         call checkmem( ios, 'ELMO_DDM_DDEP',pname )
         elmo_ddm_ddep = 0.0
-
-
+#endif
 
         end subroutine elmo_init_shared
 
 
 !------------------------------------------------------------------------------------------            
-      SUBROUTINE MAP_ELMO_NML( VARS_NML_IN, L_ELMO_TABLE, CFILE, LERROR )
+      SUBROUTINE MAP_ELMO_NML( VARS_NML_IN, L_ELMO_TABLE, CFILE, IERROR )
 !     This subroutine maps user input from the CMAQ_Control namelist to
 !     the ELMO_TABLE to define which variables should be output. It
 !     expands Keywords, maps to concentrations, deposition fluxes, and
@@ -714,11 +753,11 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       IMPLICIT NONE
 
-      CHARACTER(16), INTENT( IN ) :: VARS_NML_IN( : )
+      CHARACTER(32), INTENT( IN ) :: VARS_NML_IN( : )
       LOGICAL, INTENT( OUT ) :: L_ELMO_TABLE( N_ELMO_TABLE )
-      CHARACTER(100), INTENT( IN ) :: CFILE
-      INTEGER, INTENT( OUT ) :: LERROR
-      CHARACTER(16), ALLOCATABLE :: VARS_NML( : )
+      CHARACTER(*), INTENT(IN) :: CFILE
+      INTEGER, INTENT( OUT ) :: IERROR
+      CHARACTER(32), ALLOCATABLE :: VARS_NML( : )
 
       INTEGER N_END, N_NML
       LOGICAL EXPAND_NML
@@ -729,9 +768,10 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       CHARACTER, PARAMETER :: PNAME = 'MAP_ELMO_NML'
 
       
-      LERROR = 0
+      IERROR = 0
 
       ! Diagnose VARS_NML_IN Size
+      N_NML = SIZE( VARS_NML_IN )
       N_END = INDEX1( '', N_NML, VARS_NML_IN ) - 1
       IF ( N_END .LE. 0 ) THEN
           WRITE( XMSG, '(A)' ),'ERROR: Undefined variables requested for ELMO output'
@@ -741,7 +781,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       ! Initialize VARS_NML
       ALLOCATE( VARS_NML( 1000 ) )
       VARS_NML = ''
-      VARS_NML( 1:N_END ) = VARS_NML_IN
+      VARS_NML( 1:N_END ) = VARS_NML_IN( 1:N_END )
 
       ! Loop through VARS_NML and Activate ELMO Variables
       DO WHILE ( N_END .GT. 0 )
@@ -749,7 +789,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          EXPAND_NML = .FALSE.
          IF ( VARS_NML(1)(1:1) .EQ. '*' ) THEN
             EXPAND_NML = .TRUE.
-            VARS_NML(1)(1:16) = VARS_NML( 1 )(2:16)//' '
+            VARS_NML(1)(1:32) = VARS_NML( 1 )(2:32)//' '
          END IF
 
          ! Detect location of VARS_NML( INUM ) in the ELMO_TABLE
@@ -897,7 +937,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       INTEGER, INTENT( INOUT )    :: LAYER_TOP
       INTEGER, INTENT( IN )       :: LAYER_BOT
-      CHARACTER(16), INTENT( IN ) :: FNAME
+      CHARACTER(4), INTENT( IN )  :: FNAME
       CHARACTER(250)              :: XMSG
       CHARACTER, PARAMETER        :: PNAME = 'ELMO_CHECK_LAYERS'
 
@@ -961,6 +1001,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &          ELMO_COMP( J )%SPC_UNIT( N_VARS ),
      &          ELMO_COMP( J )%ID      ( N_VARS ),
      &          ELMO_COMP( J )%TABID   ( N_VARS ),
+     &          ELMO_COMP( J )%VAR_TYPE( N_VARS ),
      &          ELMO_COMP( J )%COEFF   ( N_VARS ),
      &          STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -968,12 +1009,14 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
+      ELMO_COMP( J )%L_VALID        = .TRUE.
       ELMO_COMP( J )%L_MODE  ( : )  = .FALSE.
       ELMO_COMP( J )%L_SOURCE( : )  = .FALSE.
       ELMO_COMP( J )%MW      ( : )  = 0.
       ELMO_COMP( J )%SPC_UNIT( : )  = 0
       ELMO_COMP( J )%ID      ( : )  = 0
       ELMO_COMP( J )%TABID   ( : )  = 0
+      ELMO_COMP( J )%VAR_TYPE( : )  = 0
       ELMO_COMP( J )%COEFF   ( : )  = 0.
       ELMO_COMP( J )%INLET          = 0
       ELMO_COMP( J )%WETNESS        = IWET
@@ -1166,7 +1209,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !     variable type, mode number, and source number.
 !----------------------------------------------------------------------------      
 
-      USE RUNTIME_VARS, ONLY : LOGDEV
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
       IMPLICIT NONE
 

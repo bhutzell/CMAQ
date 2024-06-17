@@ -34,7 +34,7 @@
 !                         aggregates variables, all raw concentrations         !
 !                         variables, and all family variables. By default, bulk!
 !                         aerosols are preloaded as families.                  !
-!                 'ALLCONC' - all raw concentration variables                  !
+!                 'ALL_CONC' - all raw concentration variables                  !
 !                 'DEFAULT' - parameters typically supported by COMBINE        !
 !                             post-processing in the past.                     !
 !                 'AMET' - parameters used for evaluation against AMET database!
@@ -80,39 +80,39 @@
   average = .TRUE.
 /
 
-&elmo_inst
-  Inst_Layer_Top = 1
+&elmo_inst_nml
   Inst_Layer_Bot = 1
+  Inst_Layer_Top = 1
   Inst_Vars_Nml  = 'DEFAULT'
   
 ! Example for limited output
 ! Inst_Vars_Nml = 'NO2', 'FORM', 'SO2', 'O3', 'PM25', 'PM10', 'DENS', 'NOX', 'AOD_550'
 /
 
-&elmo_avrg
-  Avrg_Layer_Top = 1
+&elmo_avrg_nml
   Avrg_Layer_Bot = 1
+  Avrg_Layer_Top = 1
   Avrg_Vars_Nml  = 'DEFAULT'
 
 ! Example for limited output
   Avrg_Vars_Nml = 'NO2', 'FORM', 'SO2', 'O3', 'PM25', 'PM10', 'DENS', 'NOX', 'AOD_550','PMF'
                   
-                  'ALL_ISAM','NO2_EGU','NOX_FIRES','NOX_ISAM','NOX_PTEGU','NO2_EGU','PMF_BULK','DD_NO2_EGU'
+                  'ALL_ISAM','NO2_EGU','NOX_FIRES','NOX_ISAM','NOX_PTEGU','NO2_EGU','PMF_TAGS','DD_NO2_EGU'
                                                                        
-                  'NOX_ISAM' =  'NOX_EGU','NOX_FIRES','NOX_BCO','NOX_ICO','NOX_OTH','NOX_SUMTAG'
+                  'NOX_ISAM' =  'NOX_EGU','NOX_FIRES','NOX_BCO','NOX_ICO','NOX_OTH','NOX_TAGS'
                                                                        
                   'DD_NO2_PTEGU','DD_NO2','WD_NO2_ISAM',
                  
-                  'NO2_ISAM','NO2_BULK','ASO4_ISAM','ASO4_BULK','ASO4*'
+                  'NO2_ISAM','NO2_BULK','ASO4_ISAM','ASO4_TAGS','ASO4*'
 
   Avrg_Vars_Nml = 'NO2','ALL_NO2',
                         'ASO4_ISAM'     = 'ASO4_EGU','ASO4_MOB','ASO4_ICO','ASO4_ISUM'
 
                         'WD_PMF_SO4_ISAM' 
 
-                        'ASO4*_ISAM'    = 'ASO4I_EGU','ASO4I_MOB','ASO4I_ICO','ASO4I_ISUM',
-                                          'ASO4J_EGU','ASO4J_MOB','ASO4J_ICO','ASO4J_ISUM',
-                                          'ASO4K_EGU','ASO4K_MOB','ASO4K_ICO','ASO4K_ISUM'
+                        'ASO4*_ISAM'    = 'ASO4I_EGU','ASO4I_MOB','ASO4I_ICO','ASO4I_TAGS',
+                                          'ASO4J_EGU','ASO4J_MOB','ASO4J_ICO','ASO4J_TAGS',
+                                          'ASO4K_EGU','ASO4K_MOB','ASO4K_ICO','ASO4K_TAGS'
                         'WD_ASO4J_ISAM'  = 'WD_ASO4J_EGU'...
 
                         'ASO4_DDM'      = 

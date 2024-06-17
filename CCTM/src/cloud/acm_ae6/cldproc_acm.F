@@ -64,6 +64,7 @@ C-----------------------------------------------------------------------
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
       use CENTRALIZED_IO_MODULE, only : interpolate_var
+      USE ELMO_DATA, ONLY : L_ELMO, ELMO_WDEP
 
 #ifdef isam
       USE SA_DEFN, ONLY: ISAM, NSPC_SA, N_SPCTAG, TOT_SADEP, CONV_SADEP,
@@ -261,6 +262,7 @@ C...initialize the deposition array before processing clouds
 Ckrt deposition arrays for tagged species.....
         ALLOCATE ( TOT_SADEP ( NCOLS,NROWS,NSPC_SA,NTAG_SA ),
      &            CONV_SADEP ( NCOLS,NROWS,NSPC_SA,NTAG_SA ),
+     &            ISAM_WDEP  ( NSPC_SA ),
      &             STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
           XMSG = 'Failure allocating TOT_ or CONV_SADEP'
@@ -273,6 +275,17 @@ Ckrt deposition arrays for tagged species.....
           XMSG = 'Failure allocating BUFF2'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
+        
+        ISAM_WDEP = 0
+        DO ITAG = 1, N_SPCTAG
+          DO W = 1, N_SPC_WDEP
+            ISAM_SPECIES =  ISAM_SPEC( S_SPCTAG(ITAG),1 )
+            IF ( TRIM( ISAM_SPECIES ) .EQ. CGRID_NAME( MAP_WDEPtoCGRID(W) ) ) THEN
+              ISAM_WDEP( ITAG ) = W
+            END IF
+          END DO
+        END DO
+
 #endif
 
 #ifdef sens
@@ -680,16 +693,17 @@ C...reinitialize deposition array
             END DO ! col
           END DO ! row
 
-          IF ( L_ELMO ) THEN
-              ELMO_ISAM_WDEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) ) = 
-     &             TOT_SADEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
-          END IF
-
           IF ( .NOT. WRITE3( SA_WD_1, VNAM_SPCTAG( SPC ),
      &                       NDATE, NTIME, BUFF2 ) ) THEN
             XMSG = 'Could not write ' // SA_WD_1 // ' file'
             CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
           END IF
+          
+          IF ( L_ELMO .AND. ISAM_WDEP(SPC) .GT. 0 ) THEN
+              ELMO_ISAM_WDEP( :,:,ISAM_WDEP(SPC),T_SPCTAG(SPC) ) = 
+     &             TOT_SADEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
+          END IF
+
        END DO ! n_spctag
 
        TOT_SADEP  = 0.0

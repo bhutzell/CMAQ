@@ -16,7 +16,11 @@
 !  General Public License or the GNU Lesser General Public License is    !
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
- 
+      MODULE ELMO_INIT_DEFN
+
+      USE ELMO_DATA
+
+      CONTAINS
 !-------------------------------------------------------------------------
       SUBROUTINE ELMO_INIT
       ! This subroutine calls subroutines that read user input and build
@@ -26,14 +30,17 @@
       ! vectors.
 !-------------------------------------------------------------------------
       
-      USE ELMO_DATA
+      USE GRID_CONF, ONLY : NCOLS, NROWS
 
       IMPLICIT NONE
 
       INTEGER N, M, P, J, IM, ILIST, S, F
+      INTEGER ID, IV, ISRC, IT, IS, NM, NS
+      INTEGER N1, N2, N3
       CHARACTER( 16 ), SAVE :: PNAME = 'ELMO_INIT'
       CHARACTER( 300 ) :: XMSG
-      INTEGER ALLOCSTAT, IOS
+      INTEGER ALLOCSTAT, IOS, IERROR
+      INTEGER :: N_MAP_MODE_SOURCE, N_MAP_MODE, N_MAP_SOURCE
 
       ! Read User-Input from Namelist input file (Miscellaneous Control File)
       CALL READ_ELMO_NML()
@@ -49,52 +56,84 @@
       ! Map ELMO User Input to ELMO_TABLE
       CALL ELMO_KEYWORDS
 
+      ! INSTANTANEOUS FILE INITIALIZATION
       ! Determine which ELMO_TABLE variables belong on the Instantaneous
       ! file
+      ALLOCATE( L_ELMO_TABLE_INST( N_ELMO_TABLE ),
+     &          MAP_TABLEtoINST( N_ELMO_TABLE ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'L_ELMO_TABLE_INST',PNAME ) 
       L_ELMO_TABLE_INST( : ) = .FALSE.
-      CALL MAP_ELMO_NML( INST_VARS_NML, L_ELMO_TABLE_INST, 'Instantaneous', LERROR )
-      IF ( LERROR .GT. 0 ) THEN
-         ! Entry Doesn't Match any variable on the ELMO table. Crash the model.
-         XMSG = 'An Instantaneous ELMO variable has been requested that does not exist.'
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
+      MAP_TABLEtoINST = 0
 
-      N_ELMO_INST = COUNT( L_ELMO_TABLE_INST )
-      ALLOCATE( ELMO_INSTtoTABLE( N_ELMO_INST ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'ELMO_INSTtoTABLE',PNAME ) 
+      IF ( INST_ACTIVE ) THEN
+        CALL MAP_ELMO_NML( INST_VARS_NML, L_ELMO_TABLE_INST, 'Instantaneous', IERROR )
+        IF ( IERROR .GT. 0 ) THEN
+           ! Entry Doesn't Match any variable on the ELMO table. Crash the model.
+           XMSG = 'An Instantaneous ELMO variable has been requested that does not exist.'
+           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+        END IF
 
-      N = 0
-      DO J = 1,N_ELMO_TABLE
+        N_ELMO_INST = COUNT( L_ELMO_TABLE_INST )
+        ALLOCATE( MAP_INSTtoTABLE( N_ELMO_INST ),
+     &            MAP_INSTtoUSED( N_ELMO_AVRG ),
+     &            ELMO_INST_PARS( N_ELMO_INST ), STAT=IOS )
+        CALL CHECKMEM( IOS, 'MAP_INSTtoTABLE',PNAME ) 
+        MAP_INSTtoTABLE = 0
+
+        N = 0
+        DO J = 1,N_ELMO_TABLE
           IF ( L_ELMO_TABLE_INST( J ) ) THEN 
               N = N + 1
-              ELMO_INSTtoTABLE( N ) = J
-              ELMO_TABLEtoINST( J ) = N
+              MAP_INSTtoTABLE( N ) = J
+              MAP_TABLEtoINST( J ) = N
               ELMO_INST_PARS( N ) = ELMO_TABLE( J )
           END IF
-      END DO
-
-      ! Determine which ELMO_TABLE variables belong on the Average file
-      L_ELMO_TABLE_AVRG( : ) = .FALSE.
-      CALL MAP_ELMO_NML( AVRG_VARS_NML, L_ELMO_TABLE_AVRG, 'Average', LERROR )
-      IF ( LERROR .GT. 0 ) THEN
-         ! Entry Doesn't Match any variable on the ELMO table. Crash the model.
-         XMSG = 'An Average ELMO variable has been requested that does not exist.'
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+        END DO
+        
+        ALLOCATE( ELMO_INST( NCOLS,NROWS,NLAY_ELMO_INST,
+     &                       N_ELMO_INST ), STAT=IOS )
+        CALL CHECKMEM( IOS, 'ELMO_INST', PNAME )
+        ELMO_INST = 0.0
       END IF
 
-      N_ELMO_AVRG = COUNT( L_ELMO_TABLE_AVRG )
-      ALLOCATE( ELMO_AVRGtoTABLE( N_ELMO_AVRG ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'ELMO_AVRGtoTABLE',PNAME ) 
+      ! AVERAGE FILE INITIALIZATION
+      ! Determine which ELMO_TABLE variables belong on the Average file
+      ALLOCATE( L_ELMO_TABLE_AVRG( N_ELMO_TABLE ),
+     &          MAP_TABLEtoAVRG( N_ELMO_TABLE ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'L_ELMO_TABLE_AVRG',PNAME ) 
+      L_ELMO_TABLE_AVRG( : ) = .FALSE.
+      MAP_TABLEtoAVRG = 0
 
-      N = 0
-      DO J = 1,N_ELMO_TABLE
-          IF ( L_ELMO_TABLE_AVRG( J ) ) THEN 
-              N = N + 1
-              ELMO_AVRGtoTABLE( N ) = J
-              ELMO_TABLEtoAVRG( J ) = N
-              ELMO_AVRG_PARS( N ) = ELMO_TABLE( J )
-          END IF
-      END DO
+      IF ( AVRG_ACTIVE ) THEN
+        CALL MAP_ELMO_NML( AVRG_VARS_NML, L_ELMO_TABLE_AVRG, 'Average', IERROR )
+        IF ( IERROR .GT. 0 ) THEN
+           ! Entry Doesn't Match any variable on the ELMO table. Crash the model.
+           XMSG = 'An Average ELMO variable has been requested that does not exist.'
+           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+        END IF
+     
+        N_ELMO_AVRG = COUNT( L_ELMO_TABLE_AVRG )
+        ALLOCATE( MAP_AVRGtoTABLE( N_ELMO_AVRG ),
+     &            MAP_AVRGtoUSED( N_ELMO_AVRG ),
+     &            ELMO_AVRG_PARS( N_ELMO_AVRG ), STAT=IOS )
+        CALL CHECKMEM( IOS, 'ELMO_AVRGtoTABLE',PNAME ) 
+        MAP_AVRGtoTABLE = 0
+     
+        N = 0
+        DO J = 1,N_ELMO_TABLE
+            IF ( L_ELMO_TABLE_AVRG( J ) ) THEN 
+                N = N + 1
+                MAP_AVRGtoTABLE( N ) = J
+                MAP_TABLEtoAVRG( J ) = N
+                ELMO_AVRG_PARS( N ) = ELMO_TABLE( J )
+            END IF
+        END DO
+
+        ALLOCATE( ELMO_AVRG( NCOLS,NROWS,NLAY_ELMO_AVRG,
+     &                       N_ELMO_AVRG ), STAT=IOS )
+        CALL CHECKMEM( IOS, 'ELMO_AVRG', PNAME )
+        ELMO_AVRG = 0.0
+      END IF
 
       ! Map All ELMO_TABLE Variables, Identify which are Used and
       ! allocate/map ELMO_USED vector
@@ -120,16 +159,23 @@
       ALLOCATE( ELMO_USED_ISRC( N_ELMO_USED ), STAT=IOS )
       CALL CHECKMEM( IOS, 'ELMO_USED_ISRC',PNAME ) 
       ELMO_USED_ISRC = 0
-      ALLOCATE( ELMO_TABLEtoUSED( N_ELMO_TABLE ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'ELMO_TABLEtoUSED',PNAME ) 
-      ELMO_TABLEtoUSED = 0
+      ALLOCATE( MAP_USEDtoTABLE( N_ELMO_USED ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'MAP_USEDtoTABLE',PNAME ) 
+      MAP_USEDtoTABLE = 0
+      ALLOCATE( MAP_TABLEtoUSED( N_ELMO_TABLE ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'MAP_TABLEtoUSED',PNAME ) 
+      MAP_TABLEtoUSED = 0
 
-      ALLOCATE( N_ELMOTABLE_MODE( MAX( ELMO_TABLE(:)%ID),
-     &                            MAX( ELMO_TABLE(:)%VAR_TYPE) ), STAT=IOS )
+      ALLOCATE( MAP_ELMOTABLE( MAXVAL( ELMO_TABLE(:)%VAR_TYPE),
+     &                         MAXVAL( ELMO_TABLE(:)%ID) ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'MAP_ELMOTABLE',PNAME ) 
+      MAP_ELMOTABLE = 0
+      ALLOCATE( N_ELMOTABLE_MODE( MAXVAL( ELMO_TABLE(:)%VAR_TYPE),
+     &                            MAXVAL( ELMO_TABLE(:)%ID) ), STAT=IOS )
       CALL CHECKMEM( IOS, 'N_ELMOTABLE_MODE',PNAME ) 
       N_ELMOTABLE_MODE = 0
-      ALLOCATE( N_ELMOTABLE_SOURCE( MAX( ELMO_TABLE(:)%ID),
-     &                              MAX( ELMO_TABLE(:)%SOURCE) ), STAT=IOS )
+      ALLOCATE( N_ELMOTABLE_SOURCE( MAXVAL( ELMO_TABLE(:)%VAR_TYPE),
+     &                              MAXVAL( ELMO_TABLE(:)%ID) ), STAT=IOS )
       CALL CHECKMEM( IOS, 'N_ELMOTABLE_SOURCE',PNAME ) 
       N_ELMOTABLE_SOURCE = 0
 
@@ -138,8 +184,8 @@
       DO J = 1,N_ELMO_TABLE
           IF ( L_ELMO_TABLE_USED( J ) ) THEN
               N = N + 1
-              ELMO_TABLEtoUSED( J ) = N
-              ELMO_USEDtoTABLE( N ) = J
+              MAP_TABLEtoUSED( J ) = N
+              MAP_USEDtoTABLE( N ) = J
 
               ID   = ELMO_TABLE(J)%ID
               IM   = ELMO_TABLE(J)%IM
@@ -151,10 +197,10 @@
               ELMO_USED_IV( N )   = IV
               ELMO_USED_ISRC( N ) = ISRC
 
-              IF ( ELMO_TABLEtoINST( J ) .GT. 0 ) 
-     &           ELMO_INSTtoUSED( ELMO_TABLEtoINST( J ) ) = N
-              IF ( ELMO_TABLEtoAVRG( J ) .GT. 0 ) 
-     &           ELMO_AVRGtoUSED( ELMO_TABLEtoAVRG( J ) ) = N
+              IF ( MAP_TABLEtoINST( J ) .GT. 0 ) 
+     &           MAP_INSTtoUSED( MAP_TABLEtoINST( J ) ) = N
+              IF ( MAP_TABLEtoAVRG( J ) .GT. 0 ) 
+     &           MAP_AVRGtoUSED( MAP_TABLEtoAVRG( J ) ) = N
 
               ! Count number of modes for variables with multiple modes
               IF ( IM .GT. 0 ) THEN
@@ -188,7 +234,7 @@
       N3 = 0
 
       DO N = 1,N_ELMO_USED
-        IT = ELMO_USEDtoTABLE( N )
+        IT = MAP_USEDtoTABLE( N )
 
         ID = ELMO_USED_ID(N)
         IV = ELMO_USED_IV(N)
@@ -228,7 +274,7 @@
           END IF
           MAP_ELMO_IDtoTABLE_SOURCE( MAP_ELMOTABLE(IV,ID) )%IND(IS) = IT
 
-        ELSE IF
+        ELSE 
           ! Assign Table ID for variables that do not have multiple
           ! modes or sources
           MAP_ELMOTABLE( IV,ID ) = IT
@@ -254,7 +300,7 @@
 !     This subroutine maps the ELMO variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
-         
+      
       USE RUNTIME_VARS, ONLY: MISC_CTRL, LOGDEV
       
       IMPLICIT NONE
@@ -270,10 +316,10 @@
       INTEGER IOS
 
       NAMELIST / elmo_activate / instant, average 
-      NAMELIST / elmo_inst / inst_layer_top, 
-     &                       inst_layer_bot, inst_vars_nml
-      NAMELIST / elmo_avrg / avrg_layer_top, 
-     &                       avrg_layer_bot, avrg_vars_nml
+      NAMELIST / elmo_inst_nml / inst_layer_top, 
+     &                           inst_layer_bot, inst_vars_nml
+      NAMELIST / elmo_avrg_nml / avrg_layer_top, 
+     &                           avrg_layer_bot, avrg_vars_nml
 
       ALLOCATE( INST_VARS_NML( N_NML ), STAT = IOS )
       CALL CHECKMEM( IOS, 'INST_VARS_NML',PNAME )
@@ -334,11 +380,11 @@
 
       ! Read Desired ELMO_INST variables from input namelist
       REWIND( FUNIT )
-      READ( NML = elmo_inst, UNIT = FUNIT, IOSTAT=STAT )
+      READ( NML = elmo_inst_nml, UNIT = FUNIT, IOSTAT=STAT )
       IF ( STAT .NE. 0 ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
      &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_INST section of the CMAQ Miscellaneous Control ',
+     &           'ELMO_INST_NML section of the CMAQ Miscellaneous Control ',
      &           'Namelist. Default values for this section will be ',
      &           'assumed.'
       END IF
@@ -349,17 +395,17 @@
 
       ! Read Desired ELMO_AVRG variables from input namelist
       REWIND( FUNIT )
-      READ( NML = elmo_avrg, UNIT = FUNIT, IOSTAT=STAT )
+      READ( NML = elmo_avrg_nml, UNIT = FUNIT, IOSTAT=STAT )
       IF ( STAT .NE. 0 ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
      &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_AVRG section of the CMAQ Miscellaneous Control ',
+     &           'ELMO_AVRG_NML section of the CMAQ Miscellaneous Control ',
      &           'Namelist. Default values for this section will be ',
      &           'assumed.'
       END IF
      
       ! Check Top-Layer Specification
-      CALL ELMO_CHECK_LAYERS( AVRG_LAYER_TOP, AVRG_LAYER_BOT, 'INST' )
+      CALL ELMO_CHECK_LAYERS( AVRG_LAYER_TOP, AVRG_LAYER_BOT, 'AVRG' )
       NLAY_ELMO_AVRG = AVRG_LAYER_TOP - AVRG_LAYER_BOT + 1
       
       END SUBROUTINE READ_ELMO_NML
@@ -371,15 +417,25 @@
 !     species, and chemical families
 !-------------------------------------------------------------------------
 
-      USE AERO_DATA, ONLY: N_MODE, AEROMODE
-      USE CGRID_SPCS, ONLY : N_CGRID_SPC, CGRID_NAME, 
-     &                       CGRID_UNITS, CGRID_CONC_DESC
-      USE UTIL_FAMILY_MODULE, ONLY: N_Chem_Fams,ChemFamilyName
+      USE AERO_DATA, ONLY: N_MODE, AEROMODE, N_AEROSPC, AEROSPC,
+     &                     AEROSPC_MW
+      USE CGRID_SPCS, ONLY : N_CGRID_SPC, CGRID_NAME, CGRID_MW,
+     &                       CGRID_UNITS, CGRID_CONC_DESC,
+     &                       CGRID_MASK_NUM, CGRID_MASK_SRF,
+     &                       WDEP_SPC, N_SPC_WDEP, MAP_WDEPtoCGRID,
+     &                       N_SPC_DEPV, MAP_DEPVtoCGRID
+      USE VDIFF_MAP, ONLY : DDEP_SPC
+      USE UTIL_FAMILY_MODULE, ONLY: N_Chem_Fams,ChemFamilyName,
+     &                              ChemFamilyUnits
       USE GRID_CONF, ONLY : MYPE
+      USE UTILIO_DEFN
 
       IMPLICIT NONE
 
-      INTEGER       :: ILIST
+      INTEGER       :: ILIST, IUNIT, IFAM, S, IM, ICGRID,
+     &                 IWDEP, IDDEP
+      INTEGER       :: VAR_TYPE
+      INTEGER       :: N, IAERO, IOS
       CHARACTER(32) :: PNAME = 'BUILD_ELMO_TABLE'
 
       N = 0
@@ -398,7 +454,7 @@
          ELMO_TABLE( N )%VAR_TYPE = ETYPE_AEROBULK
          ELMO_TABLE( N )%ID = IAERO
          ELMO_TABLE( N )%CUNIT = 'ug m-3'
-         CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+         CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
          ELMO_TABLE( N )%IUNIT = IUNIT
          ELMO_TABLE( N )%DESC = 'Total Aerosol Mass for '//
      &                          TRIM(AEROSPC(IAERO)%BULKNAME)
@@ -407,7 +463,7 @@
  
       ! Load Chemical Families that are not Aerosol Bulk Species into ELMO_Table
       DO IFAM = 1,N_CHEM_FAMS
-         S = ( CHEMFAMILYNAME( IFAM ), N_AEROSPC, AEROSPC( : )%BULKNAME )
+         S = INDEX1( CHEMFAMILYNAME( IFAM ), N_AEROSPC, AEROSPC( : )%BULKNAME )
          IF ( S .EQ. 0 ) THEN
            N = N + 1
            ELMO_TABLE( N )%NAME = CHEMFAMILYNAME( IFAM ) 
@@ -416,7 +472,7 @@
            ELMO_TABLE( N )%VAR_TYPE = ETYPE_FAM
            ELMO_TABLE( N )%ID = IFAM
            ELMO_TABLE( N )%CUNIT = CHEMFAMILYUNITS( IFAM )
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
            ELMO_TABLE( N )%IUNIT = IUNIT
            ELMO_TABLE( N )%DESC = 'Mass for Chemical Family '//
      &                            TRIM( CHEMFAMILYNAME( IFAM ))
@@ -436,7 +492,7 @@
          ELMO_TABLE( N )%ID = IAERO
          ELMO_TABLE( N )%SOURCE = 0
          ELMO_TABLE( N )%CUNIT = 'ug m-3'
-         CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+         CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
          ELMO_TABLE( N )%IUNIT = IUNIT
          ELMO_TABLE( N )%DESC = 'Total Aerosol Mass for '//
      &        TRIM(AEROSPC(IAERO)%BULKNAME)//' across all sources.'
@@ -468,7 +524,7 @@
            ELMO_TABLE( N )%ID = IFAM
            ELMO_TABLE( N )%SOURCE = 0
            ELMO_TABLE( N )%CUNIT = CHEMFAMILYUNITS( IFAM )
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
            ELMO_TABLE( N )%IUNIT = IUNIT
            ELMO_TABLE( N )%DESC = 'Concentration of Chemical Family '//
      &                            TRIM( CHEMFAMILYNAME( IFAM ))
@@ -507,7 +563,7 @@
             ELMO_TABLE( N )%ID = IAERO
             ELMO_TABLE( N )%SOURCE = NP
             ELMO_TABLE( N )%CUNIT = 'ug m-3'
-            CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+            CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
             ELMO_TABLE( N )%IUNIT = IUNIT
             ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
             ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
@@ -532,7 +588,7 @@
               ELMO_TABLE( N )%ID = IFAM
               ELMO_TABLE( N )%SOURCE = NP
               ELMO_TABLE( N )%CUNIT = CHEMFAMILYUNITS( IFAM )
-              CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+              CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
               ELMO_TABLE( N )%IUNIT = IUNIT
               ELMO_TABLE( N )%MW   = 0.0
               ELMO_TABLE( N )%DESC = 'Concentration of Chemical Family '//
@@ -553,7 +609,7 @@
          ELMO_TABLE( N )%VAR_TYPE = ETYPE_ELMO
          ELMO_TABLE( N )%ID = ELMO_LIST( ILIST )%ID
          ELMO_TABLE( N )%CUNIT = ELMO_LIST( ILIST )%UNIT
-         CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+         CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
          ELMO_TABLE( N )%IUNIT = IUNIT
          ELMO_TABLE( N )%DESC = ELMO_LIST( ILIST )%DESC
          ELMO_TABLE( N )%MW   = 0.0
@@ -589,7 +645,7 @@
            ELMO_TABLE( N )%DESC = ELMO_LIST( ILIST )%DESC // 
      &           ' for the sum of all sources.'
            ELMO_TABLE( N )%CUNIT =  ELMO_LIST( ILIST )%UNIT
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
            ELMO_TABLE( N )%IUNIT = IUNIT
            
            ! Define ELMO Variables for all remaining ISAM sources
@@ -625,7 +681,7 @@
              ELMO_TABLE( N )%DESC = 'Sensitivity of ' // ELMO_LIST( ILIST )%DESC // 
      &             ' to ' // TRIM( SEN_PAR( NP ) )
              ELMO_TABLE( N )%CUNIT =  ELMO_LIST( ILIST )%UNIT
-             CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+             CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
              ELMO_TABLE( N )%IUNIT = IUNIT
            END DO
          END IF
@@ -642,7 +698,7 @@
          ELMO_TABLE( N )%VAR_TYPE = ETYPE_CGRID
          ELMO_TABLE( N )%ID = ICGRID
          ELMO_TABLE( N )%CUNIT = CGRID_UNITS( ICGRID )
-         CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+         CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
          ELMO_TABLE( N )%IUNIT = IUNIT
          ELMO_TABLE( N )%DESC = CGRID_CONC_DESC(S)
          ELMO_TABLE( N )%MW   = CGRID_MW( ICGRID )
@@ -668,7 +724,7 @@
         ELSE
            ELMO_TABLE( N )%CUNIT = 'kg ha-1'
         END IF
-        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
         ELMO_TABLE( N )%IUNIT = IUNIT
         ELMO_TABLE( N )%DESC = 'Wet Deposition for Species '//
      &                         TRIM( WDEP_SPC( IWDEP ) )
@@ -694,7 +750,7 @@
         ELSE
            ELMO_TABLE( N )%CUNIT = 'kg ha-1'
         END IF
-        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
         ELMO_TABLE( N )%IUNIT = IUNIT
         ELMO_TABLE( N )%DESC = 'Dry Deposition Flux for Species '//
      &                         TRIM( DDEP_SPC( IDDEP ) )
@@ -719,7 +775,7 @@
         ELSE
            ELMO_TABLE( N )%CUNIT = 'ppmV'
         END IF
-        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
         ELMO_TABLE( N )%IUNIT = IUNIT
         ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
      &                  TRIM( ISAM_SPEC( ISPEC,ITAG ) ) //
@@ -760,7 +816,7 @@
         ELSE
            ELMO_TABLE( N )%CUNIT = 'kg ha-1'
         END IF
-        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
         ELMO_TABLE( N )%IUNIT = IUNIT
         ELMO_TABLE( N )%DESC = 'Tagged Wet Deposition Flux of '//
      &     TRIM( WDEP_SPC( IWDEP ) ) //' from all sources.'
@@ -799,7 +855,7 @@
         ELSE
            ELMO_TABLE( N )%CUNIT = 'kg ha-1'
         END IF
-        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
         ELMO_TABLE( N )%IUNIT = IUNIT
         ELMO_TABLE( N )%DESC = 'Tagged Dry Deposition Flux of '//
      &     TRIM( DDEP_SPC( IDDEP ) ) //' from all sources.'
@@ -846,7 +902,7 @@
            ELSE
               ELMO_TABLE( N )%CUNIT = 'ppmV'
            END IF
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
            ELMO_TABLE( N )%IUNIT = IUNIT
            ELMO_TABLE( N )%DESC = 'Sensitivity of '//
      &        TRIM( CGRID_NAME( ICGRID ) ) //' to '//
@@ -878,7 +934,7 @@
            ELSE
               ELMO_TABLE( N )%CUNIT = 'kg ha-1'
            END IF
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
            ELMO_TABLE( N )%IUNIT = IUNIT
            ELMO_TABLE( N )%DESC = 'Sensitivity of '//
      &        TRIM( WDEP_SPC( IWDEP ) ) //' wet deposition to '//
@@ -910,7 +966,7 @@
            ELSE
               ELMO_TABLE( N )%CUNIT = 'kg ha-1'
            END IF
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT )
+           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, ELMO_TABLE( N )%NAME )
            ELMO_TABLE( N )%IUNIT = IUNIT
            ELMO_TABLE( N )%DESC = 'Sensitivity of '//
      &        TRIM( DDEP_SPC( IDDEP ) ) //' dry deposition to '//
@@ -950,6 +1006,7 @@
       CHARACTER( * ), INTENT( IN ) :: CSPEC
       REAL, INTENT( IN ) :: COEFF
       INTEGER  ISPEC, IUSED, JSPEC, IAERO, ICGRID, IELMO
+      INTEGER  I1, I2, VAR_TYPE
       LOGICAL  USED
       CHARACTER( 1000 ) :: XMSG
 
@@ -958,14 +1015,15 @@
       VAR_TYPE = ELMO_TABLE( J )%VAR_TYPE
 
       ! Find this component in the ELMO_TABLE
-      I1 = INDEX( CSPEC, N_ELMO_TABLE, ELMO_TABLE%OUT_NAME )
-      I2 = INDEX( CSPEC, N_ELMO_TABLE, ELMO_TABLE%NAME )
+      I1 = INDEX1( CSPEC, N_ELMO_TABLE, ELMO_TABLE(:)%OUT_NAME )
+      I2 = INDEX1( CSPEC, N_ELMO_TABLE, ELMO_TABLE(:)%NAME )
 
       ! For ISAM ELMO Variables, we need to make sure the components
       ! match the source number, or apply to all sources (i.e. ISAM
       ! Bulk)
-      IF ( VAR_TYPE .EQ. ETYPE_ELMO_ISAM ) THEN
-         CSPEC = // CSPEC // '_ISAM'
+      IF ( VAR_TYPE .EQ. ETYPE_ISAM_ELMO ) THEN
+#ifdef isam      
+         CSPEC = CSPEC // '_ISAM'
          ISRC = ELMO_TABLE( J )%SOURCE
          DO K = 1,N_ELMO_TABLE
            IF ( ELMO_TABLE( K )%NAME .EQ. CSPEC .AND.
@@ -981,9 +1039,11 @@
               ELMO_COMP( J )%COEFF( IVAR )    = COEFF
            END IF
          END DO
+#endif
 
-      ELSE IF  ( VAR_TYPE .EQ. ETYPE_ELMO_DDM ) THEN
-         CSPEC = // CSPEC // '_DDM'
+      ELSE IF  ( VAR_TYPE .EQ. ETYPE_DDM_ELMO ) THEN
+#ifdef sens
+         CSPEC = CSPEC // '_DDM'
          ISRC = ELMO_TABLE( J )%SOURCE
          DO K = 1,N_ELMO_TABLE
            IF ( ELMO_TABLE( K )%NAME .EQ. CSPEC .AND.
@@ -999,6 +1059,7 @@
               ELMO_COMP( J )%COEFF( IVAR )    = COEFF
            END IF
          END DO 
+#endif
 
       ELSE IF ( I1 .GT. 0 ) THEN
         ! This component matches an ELMO Table Output Name
@@ -1023,10 +1084,10 @@
         ELMO_COMP( J )%COEFF( IVAR )    = COEFF
         
       ELSE
+        ELMO_COMP( J )%L_VALID = .FALSE.  
         XMSG = 'Error: Component ' // TRIM( CSPEC ) // ' of ELMO variable '// 
      &         TRIM(ELMO_TABLE(J)%NAME) // ' was not found on ELMO_TABLE.'
-        CALL LOG_MESSAGE( LOGDEV, XMSG )
-        CALL M3EXIT( 'SET_ELMO_COMP', 0, 0, '', XSTAT1 )
+        CALL M3WARN( 'SET_ELMO_COMP', 0, 0, XMSG )
       END IF
 
       END SUBROUTINE SET_ELMO_COMP
@@ -1036,7 +1097,7 @@
 !-------------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
-      USE RUNTIME_VARS, ONLY : MIO_FILE
+      USE MIO_ASCII
       IMPLICIT NONE
 
       INCLUDE SUBST_FILES_ID  ! file name parameters
@@ -1053,7 +1114,7 @@
         CHARACTER( 96 ) :: XMSG = ' '
 
         INTEGER :: L          ! loop induction variables
-        INTEGER :: MDATE, MTIME
+        INTEGER :: MDATE, MTIME, IINST, IAVRG, J, ICOMP
 
 #ifndef mpas
       ! Define General Output File Parameters
@@ -1095,10 +1156,10 @@
             END DO
          
             NVARS3D = N_ELMO_INST 
-            VTYPE3D(1:NVARS3D) = ELMO_INST_PARS%OUT_TYPE( 1:NVARS3D )
-            VNAME3D(1:NVARS3D) = ELMO_INST_PARS%OUT_NAME( 1:NVARS3D )
-            UNITS3D(1:NVARS3D) = ELMO_INST_PARS%CUNIT( 1:NVARS3D )
-            VDESC3D(1:NVARS3D) = ELMO_INST_PARS%DESC( 1:NVARS3D )
+            VTYPE3D(1:NVARS3D) = ELMO_INST_PARS( 1:NVARS3D )%OUT_TYPE
+            VNAME3D(1:NVARS3D) = ELMO_INST_PARS( 1:NVARS3D )%OUT_NAME
+            UNITS3D(1:NVARS3D) = ELMO_INST_PARS( 1:NVARS3D )%CUNIT
+            VDESC3D(1:NVARS3D) = ELMO_INST_PARS( 1:NVARS3D )%DESC
          
             FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
             DO L = 2, MXDESC3
@@ -1152,11 +1213,11 @@
                VGLVS3D( L ) = VGLVS_GD( L )
             END DO
          
-            NVARS3D = N_ELMO_AVRG_OUT 
-            VTYPE3D(1:NVARS3D) = ELMO_AVRG_PARS%OUT_TYPE( 1:NVARS3D )
-            VNAME3D(1:NVARS3D) = ELMO_AVRG_PARS%OUT_NAME( 1:NVARS3D )
-            UNITS3D(1:NVARS3D) = ELMO_AVRG_PARS%CUNIT( 1:NVARS3D )
-            VDESC3D(1:NVARS3D) = ELMO_AVRG_PARS%DESC( 1:NVARS3D )
+            NVARS3D = N_ELMO_AVRG
+            VTYPE3D(1:NVARS3D) = ELMO_AVRG_PARS( 1:NVARS3D )%OUT_TYPE
+            VNAME3D(1:NVARS3D) = ELMO_AVRG_PARS( 1:NVARS3D )%OUT_NAME
+            UNITS3D(1:NVARS3D) = ELMO_AVRG_PARS( 1:NVARS3D )%CUNIT
+            VDESC3D(1:NVARS3D) = ELMO_AVRG_PARS( 1:NVARS3D )%DESC
          
             FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
             DO L = 2, MXDESC3
@@ -1193,8 +1254,11 @@
       SUBROUTINE ELMO_WRITE_LOG ( )
 !-------------------------------------------------------------------------
     
+      USE RUNTIME_VARS, ONLY : LOGDEV
+
       IMPLICIT NONE
 
+      INTEGER IINST, IAVRG, ICOMP, J, TABID
 
       ! Write out all ELMO variables organized by output file
       WRITE( LOGDEV, '(/,/,5x,A)' ),'|> ELMO OUTPUT VARIABLE REPORT:'
@@ -1236,9 +1300,9 @@
      &           ELMO_INST_PARS( IINST )%CUNIT,
      &           ELMO_INST_PARS( IINST )%DESC
 
-         IF ( ELMO_INST_PARS( IINST )%LCOMP ) THEN
-             J = ELMO_INSTtoTABLE( IINST )
-             DO ICOMP = 1,ELMO_COMP( J )
+         IF ( ELMO_INST_PARS( IINST )%L_COMP ) THEN
+             J = MAP_INSTtoTABLE( IINST )
+             DO ICOMP = 1,ELMO_COMP( J )%N_VARS
                 TABID = ELMO_COMP( J )%TABID( ICOMP )
 
                 WRITE( LOGDEV, '(12x,A14,2x,A14,2x,A8,2x,A)'),
@@ -1275,9 +1339,9 @@
      &           ELMO_AVRG_PARS( IAVRG )%CUNIT,
      &           ELMO_AVRG_PARS( IAVRG )%DESC
 
-         IF ( ELMO_AVRG_PARS( IAVRG )%LCOMP ) THEN
-             J = ELMO_AVRGtoTABLE( IAVRG )
-             DO ICOMP = 1,ELMO_COMP( J )
+         IF ( ELMO_AVRG_PARS( IAVRG )%L_COMP ) THEN
+             J = MAP_AVRGtoTABLE( IAVRG )
+             DO ICOMP = 1,ELMO_COMP( J )%N_VARS
                 TABID = ELMO_COMP( J )%TABID( ICOMP )
 
                 WRITE( LOGDEV, '(12x,A14,2x,A14,2x,A8,2x,A)'),
@@ -1290,3 +1354,5 @@
       END DO
 
       END SUBROUTINE ELMO_WRITE_LOG
+
+      END MODULE ELMO_INIT_DEFN

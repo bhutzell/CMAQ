@@ -22,7 +22,8 @@
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
-
+      USE ELMO_DATA
+      USE ELMO_PROC, ONLY : CALC_ELMO
       USE AERO_DATA, ONLY: AEROMODE_LNSG, DRY_AERO_DIAM, WET_AERO_DIAM,
      &                     DRY_AERO_M2, WET_AERO_M2, DRY_AERO_M3, 
      &                     WET_AERO_M3, N_MODE, MOMENT0_CONC, MOMENT2_CONC,
@@ -39,23 +40,15 @@
 
       INTEGER, INTENT( IN ) :: J
       REAL, INTENT( INOUT ) :: OUTVAL
-      INTEGER ILOC, IMODE, IVAR, IOA, IM, IV, ISRC
+      INTEGER ILOC, IMODE, IVAR, IOA, IM, IV, ISRC, IDG, IUNIT
       REAL VAL4, VAL3, VAL2, VAL, FRAC( N_MODE )
       REAL PM01, PM1, PM25, PM10, PMAMS, PM25to10, POM, POC, OtoC
       REAL K, P1, P2, P3, a, K2, PMF_NO3, PMF_NO3_LOSS,
      &     PMF_NH4_LOSS, PMF_NH4, PMF_SO4, PMF_MASS,
      &     PM25_NH4, PM25_NO3, PM25_SO4, PM25_NO3_LOSS,
      &     PM25_NH4_LOSS
+      REAL SUM_PM_MODES
 
-      ! First determine if this variable has been mapped already. If it
-      ! has, send it back
-      ILOC = ELMO_TABLEtoUSED( J )
-      IF ( ILOC .GT. 0 ) THEN
-        IF ( L_CALCULATED( ILOC ) ) THEN
-           OUTVAL = ELMO_USED( ILOC )
-           RETURN
-        END IF
-      END IF
 
       OUTVAL = 0.0
 
@@ -653,16 +646,10 @@
 
          END SELECT 
  
-         ! Save the fact that this variable has been calculated
-         IF ( ILOC .GT. 0 ) THEN
-           L_CALCULATED( ILOC ) = .TRUE.
-           ELMO_USED( ILOC ) = OUTVAL
-         END IF
-
       END SUBROUTINE ELMO_CALC_DETAILED
  
 !----------------------------------------------------------------------
-      FUNCTION SUM_PM_MODES( MODE_MASK, IV, ISRC )
+      REAL FUNCTION SUM_PM_MODES( MODE_MASK, IV, ISRC )
 !----------------------------------------------------------------------
 !     SUM_PM_MODES returns the sum of total PM Mass ignoring water,
 !     organic water, and mass of all aerosol tracer species. It uses the
@@ -675,6 +662,14 @@
 !----------------------------------------------------------------------
 
       USE AERO_DATA, ONLY: N_MODE, AEROSPC_CONC, AH2O_IDX, AORGH2O_IDX, AEROSPC
+      USE ELMO_DATA, ONLY : ETYPE_ELMO
+#ifdef isam      
+      USE ELMO_DATA, ONLY : ETYPE_ELMO_ISAM
+#endif
+#ifdef sens
+      USE ELMO_DATA, ONLY : ETYPE_ELMO_DDM
+#endif
+
 
       IMPLICIT NONE
 
@@ -700,6 +695,7 @@
                END IF
             END DO
 
+#ifdef isam            
          CASE ( ETYPE_ELMO_ISAM )
            ! ISAM PM Sum
            DO IM = 1,N_MODE
@@ -718,7 +714,9 @@
                 END DO
               END IF
            END DO
+#endif
 
+#ifdef sens
          CASE ( ETYPE_ELMO_DDM )
            ! DDM PM Sum
            DO IM = 1,N_MODE
@@ -732,6 +730,7 @@
                 END DO
               END IF
            END DO
+#endif          
  
 
       END SELECT

@@ -37,29 +37,6 @@
 
       IMPLICIT NONE
 
-      LOGICAL, SAVE :: INST_ACTIVE, AVRG_ACTIVE
-      INTEGER, SAVE :: INST_LAYER_TOP, INST_LAYER_BOT,
-     &                 AVRG_LAYER_TOP, AVRG_LAYER_BOT
-
-      CHARACTER(16), ALLOCATABLE, SAVE :: 
-     &               INST_VARS_NML( : ), AVRG_VARS_NML( : ),
-     &               INST_PARS( : ),     AVRG_PARS( : ),
-     &               INST_PARS_OUT(:),   AVRG_PARS_OUT(:),
-     &               INST_UNIT_OUT(:),   AVRG_UNIT_OUT(:)
-
-      CHARACTER(80), ALLOCATABLE, SAVE :: 
-     &               INST_DESC_OUT( : ), AVRG_DESC_OUT( : )
-
-      INTEGER, SAVE :: N_ELMO, N_ELMO_OUT, NTOT_ELMO_IDS, 
-     &                 N_ELMO_INST, N_ELMO_AVRG
-
-      INTEGER, ALLOCATABLE, SAVE :: 
-     &        MAP_INST2USED( : ), MAP_AVRG2USED( : ), 
-     &        USED_ELMO_ID( : ), USED_ELMO_MODE( : ),
-     &        INST_TYPE_OUT( : ), AVRG_TYPE_OUT( : ),
-     &        MAP_ID2USED( :,: ),
-     &        USED_CGRID_ID(:), USED_FAM_ID(:)
-
       CONTAINS
 
 !-------------------------------------------------------------------------
@@ -79,10 +56,10 @@
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, AIRQV, AIRDENS, AIRPRES,
      &                        SRFTEMP, H2OVP, H2OSATVP, MWWAT, MWAIR,
      &                        CFRAC, DZ, PV, ZH
+      USE CGRID_SPCS, ONLY : N_CGRID_SPC, N_SPC_WDEP, N_SPC_DEPV
       use centralized_io_module, only : interpolate_var, pv_avail
       use RUNTIME_VARS
       Use phot_mod, Only: init_phot_shared
-      USE 
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY : SENGRID
@@ -114,7 +91,8 @@
       REAL, PARAMETER :: BL = 17.625
       REAL, PARAMETER :: CL = 243.04
 
-      INTEGER C, R, L
+      INTEGER C, R, L, IOS
+      CHARACTER(16) :: PNAME = 'ELMO_DRIVER'
 
       REAL, ALLOCATABLE, SAVE :: PRES(:,:,:), TA(:,:,:), TEMP2(:,:),
      &                           QV(:,:,:), DENS(:,:,:), CFRACS(:,:),
@@ -127,7 +105,6 @@
       !                       pp 601-609, April, 1996.
       ESATL( TT ) = AL * EXP( BL * ( TT - 273.15 ) / ( TT - 273.15 + CL ) )
  
-
       IF ( FIRSTIME ) THEN
           FIRSTIME = .FALSE.
           ! Initialize Number of Steps Used for Calculating Average
@@ -142,6 +119,28 @@
      &              ZHS( NCOLS, NROWS, NLAYS ),
      &              PVS( NCOLS, NROWS, NLAYS ),
      &              TEMP2( NCOLS, NROWS ) )
+         
+         ! Allocate local image of CGRID so it can be used each time step
+         ALLOCATE( CONC_VEC( N_CGRID_SPC ), 
+     &             WDEP_VEC( N_SPC_WDEP+1 ),
+     &             DDEP_VEC( N_SPC_DEPV ),
+     &             STAT=IOS )
+         CALL CHECKMEM( IOS, 'ELMOS_VECTORS',PNAME )
+
+#ifdef isam
+         ALLOCATE( ISAM_WDEP_VEC( N_SPC_WDEP+1,NTAG_SA ), 
+     &             ISAM_DDEP_VEC( N_SPC_DEPV,NTAG_SA ),
+     &             STAT=IOS )
+         CALL CHECKMEM( IOS, 'ISAM_ELMO_VECTORS',PNAME )
+#endif
+
+#ifdef sens
+         ALLOCATE( DDM_WDEP_VEC( N_SPC_WDEP+1,NPMAX ), 
+     &             DDM_DDEP_VEC( N_SPC_DEPV,NPMAX ),
+     &             STAT=IOS )
+         CALL CHECKMEM( IOS, 'ISAM_ELMO_VECTORS',PNAME )
+#endif
+
       END IF
 
       ! Determine if this is a write step
@@ -247,9 +246,9 @@
          ISAM_VEC(:,:) = ISAM(C,R,L,:,:)
 
          IF ( L.EQ.1 .AND. L_ELMO_WDEP )
-     &        ISAM_WDEP_VEC(:,:) = ELMO_ISAM_WDEP(C,R,:,:) ! N_ISAM_SPEC, NTAG_SA
+     &        ISAM_WDEP_VEC(:,:) = ELMO_ISAM_WDEP(C,R,:,:) ! N_SPEC_WDEP+1, NTAG_SA
          IF ( L.EQ.1 .AND. L_ELMO_DDEP )
-     &        ISAM_DDEP_VEC(:,:) = ELMO_ISAM_DDEP(C,R,:)   ! N_SPCTAG
+     &        ISAM_DDEP_VEC(:,:) = ELMO_ISAM_DDEP(C,R,:,:) ! N_SPEC_DEPV, NTAG_SA
 #endif
 
 #ifdef sens
@@ -257,9 +256,9 @@
          DDM_VEC(:,:) = SENGRID(C,R,L,:,:)  ! NPMAX, N_SPCS
 
          IF ( L.EQ.1 .AND. L_ELMO_WDEP )
-     &        DDM_WDEP_VEC(:,:) = ELMO_DDM_WDEP(C,R,:,:) !N_SPC_WDEP, NPMAX
+     &        DDM_WDEP_VEC(:,:) = ELMO_DDM_WDEP(C,R,:,:) ! N_SPC_WDEP+1, NPMAX
          IF ( L.EQ.1 .AND. L_ELMO_DDEP )
-     &        DDM_DDEP_VEC(:,:) = ELMO_DDM_DDEP(C,R,:,:)  ! N_SPC_DDEP --> DD2DV, NPMAX
+     &        DDM_DDEP_VEC(:,:) = ELMO_DDM_DDEP(C,R,:,:) ! N_SPC_DEPV, NPMAX
 #endif
 
          ! Populate Diagnostic Arrays
@@ -287,17 +286,11 @@
       IMPLICIT NONE
 
       INTEGER, INTENT( IN ) :: C, R, L
-      INTEGER IDG, IM, AL, IL, IUSED, IAVRG, IINST
+      INTEGER IDG, IM, AL, IL, IUSED, IAVRG, IINST, ILOC, J
 
       LOGICAL, INTENT( IN ) :: WRITE_STEP
       LOGICAL, INTENT( IN ) :: INIT_STEP
       LOGICAL, INTENT( IN ) :: INIT_TIME
-
-      IF ( FIRST_TIME ) THEN
-         ! Allocate local image of CGRID so it can be used each time step
-         ALLOCATE( CONC_VEC( N_CGRID_SPC ), STAT=IOS )
-         CALL CHECKMEM( IOS, 'CONC_VEC',PNAME )
-      END IF
 
       ! Initalize Local Parameters
       C1                = C
@@ -320,7 +313,9 @@
         ! ELMO_LIST and is ordered by the ELMO ID numbers so that it
         ! can be used seamlessly with the CALC_ELMO internal order.
         DO ILOC = 1,N_ELMO_USED
-           CALL CALC_ELMO( OUTVAL=ELMO_USED( ILOC ), J=ELMO_USEDtoTABLE( ILOC ) )
+           J = MAP_USEDtoTABLE( ILOC ) 
+           CALL CALC_ELMO( OUTVAL=ELMO_USED( ILOC ), J=J,
+     &                     OUT_UNIT=ELMO_TABLE( J )%IUNIT )
         END DO
 
         ! *** Aggregate Diagnostic Variables in Average Array
@@ -329,8 +324,8 @@
      &       L.GE.AVRG_LAYER_BOT .AND. L.LE.AVRG_LAYER_TOP ) THEN
            AL = L - AVRG_LAYER_BOT + 1
            DO  IAVRG = 1,N_ELMO_AVRG
-              IF ( ELMO_USED_ID( ELMO_AVRGtoUSED( IAVRG )) .EQ. ID_PMF_PH
-     &             .AND. ELMO_USED( ELMO_AVRGtoUSED( IAVRG ) ) .LT. -100. ) THEN
+              IF ( ELMO_USED_ID( MAP_AVRGtoUSED( IAVRG )) .EQ. ID_PMF_PH
+     &             .AND. ELMO_USED( MAP_AVRGtoUSED( IAVRG ) ) .LT. -100. ) THEN
                  ! Special Averaging for Particle pH
                  ! Add whatever the current average is right now.
                  ! Certainly this is problematic, particularly
@@ -347,13 +342,13 @@
               ELSE
                  ! For all other variables, apply trapezoidal rule for averaging.
                  IF ( INIT_STEP ) THEN
-                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( ELMO_AVRGtoUSED( IAVRG ) ) 
+                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( MAP_AVRGtoUSED( IAVRG ) ) 
                  ELSE IF ( WRITE_STEP ) THEN
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                                        + ELMO_USED( ELMO_AVRGtoUSED( IAVRG ) )
+     &                                        + ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
                  ELSE
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                      + 2.0 * ELMO_USED( ELMO_AVRGtoUSED( IAVRG ) )
+     &                      + 2.0 * ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
                  END IF 
               END IF
            END DO
@@ -364,7 +359,7 @@
      &       L.GE.INST_LAYER_BOT .AND. L.LE.INST_LAYER_TOP ) THEN
            IL = L - INST_LAYER_BOT + 1
            DO IINST = 1,N_ELMO_INST
-              ELMO_INST( C,R,IL,IINST ) = ELMO_USED( ELMO_INSTtoUSED( IINST ) )
+              ELMO_INST( C,R,IL,IINST ) = ELMO_USED( MAP_INSTtoUSED( IINST ) )
            END DO
         END IF
  
@@ -387,16 +382,16 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT( IN ), OPTIONAL :: J, IDG, IM, IV, ISRC ! Table Index
+      INTEGER, OPTIONAL :: J, IDG, IM, IV, ISRC ! Table Index
       REAL, INTENT( INOUT ) :: OUTVAL   ! Output Value
       INTEGER, INTENT( IN ) :: OUT_UNIT ! The desired output unit
       INTEGER ID, VAR_TYPE
       REAL VAL2
-      INTEGER IVAR, ILIST
-      LOGICAL L_CALC( N_ELMO )
-      INTEGER WETNESS, ISPEC, INLET
+      INTEGER IVAR, ILIST, ILOC
+      INTEGER WETNESS, ISPEC, INLET, IMODE
+      INTEGER ISA, DSA
       LOGICAL LMODE
-      REAL    FRAC( N_MODE )
+      REAL    FRAC( N_MODE ), FAC
 
       CHARACTER( 500 ) :: XMSG
   
@@ -414,7 +409,7 @@
 
       ! Determine if this variable has been mapped already. If it
       ! has, send it back
-      ILOC = ELMO_TABLEtoUSED( J )
+      ILOC = MAP_TABLEtoUSED( J )
       IF ( ILOC .GT. 0 ) THEN
         IF ( L_CALCULATED( ILOC ) ) THEN
            OUTVAL = ELMO_USED( ILOC )
@@ -435,18 +430,20 @@
                                            !   ISAM)
       
       ! Compute mode-dependent fraction from size cutoff if applicable
-      INLET = ELMO_COMP( J )%INLET
-      WETNESS = ELMO_COMP( J )%WETNESS 
-      FRAC( : ) = 0.0
-      DO IMODE = 1,N_MODE
-        IF ( ELMO_COMP( J )%L_MODE( IMODE ) ) THEN
-           IF ( INLET .EQ. 0 ) THEN
-              CALL GET_AERO_INLET( INLET, IMODE, WETNESS, FRAC( IMODE ) )
-           ELSE
-              FRAC = 1.0
+      IF ( ELMO_TABLE( J )%L_COMP ) THEN
+         INLET = ELMO_COMP( J )%INLET
+         WETNESS = ELMO_COMP( J )%WETNESS 
+         FRAC( : ) = 0.0
+         DO IMODE = 1,N_MODE
+           IF ( ELMO_COMP( J )%L_MODE( IMODE ) ) THEN
+              IF ( INLET .EQ. 0 ) THEN
+                 CALL GET_AERO_INLET( INLET, IMODE, WETNESS, FRAC( IMODE ) )
+              ELSE
+                 FRAC = 1.0
+              END IF
            END IF
-        END IF
-      END DO
+         END DO
+      END IF
  
       ! Calculate conversion factor for transforming between units. For
       ! example, ppbC or kgN ha-1 can be calculated using this routine.
@@ -485,6 +482,15 @@
          CASE ( ETYPE_ELMO, ETYPE_ISAM_ELMO, ETYPE_DDM_ELMO )   
             ! Variable is an ELMO Variable
             IF ( ELMO_TABLE( J )%L_COMP ) THEN
+               ! Check that all components were found in CMAQ
+               IF ( .NOT. ELMO_COMP( J )%L_VALID ) THEN
+                  XMSG = 'ELMO variable ' // TRIM( ELMO_TABLE( J )%NAME ) //
+     &                   ' has a component that cannot be found in CMAQ. ' //
+     &                   'Check that it has been mapped correctly in '   //
+     &                   'ELMO_MAP_VARIABLES.'
+                  CALL M3EXIT( 'CALC_ELMO', 0, 0, XMSG, XSTAT1 ) 
+               END IF
+
                ! Sum up Linear Combination Variable
                DO IVAR = 1,ELMO_COMP( J )%N_VARS
                  CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, 
@@ -504,7 +510,8 @@
          CASE ( ETYPE_DDEP )
             ! Variable is a Dry Deposition Flux
             OUTVAL = DDEP_VEC( ID ) * FAC
- 
+
+#ifdef isam
          CASE ( ETYPE_ISAM )
             ! Variable is in the ISAM Array
             ISRC = ELMO_TABLE( J )%SOURCE
@@ -548,7 +555,8 @@
             ELSE
               OUTVAL = ISAM_DDEP_VEC( ID,ISRC ) * FAC
             END IF
-
+#endif
+#ifdef sens
          CASE ( ETYPE_DDM )
             ! Variable is in the DDM3D Array
             ISRC = ELMO_TABLE( J )%SOURCE
@@ -576,6 +584,7 @@
             ! Variable is in the DDM3D DryDep Array
             ISRC = ELMO_TABLE( J )%SOURCE
             OUTVAL = DDM_DDEP_VEC( ID,ISRC ) * FAC
+#endif
 
          CASE DEFAULT
 
@@ -584,10 +593,16 @@
      &             ' has an invalid variable type. Please check that it is '//
      &             'mapped correctly.'
             CALL LOG_MESSAGE( LOGDEV, XMSG )
-            CALL M3EXIT( PNAME, 0, 0, '', XSTAT1 )
-         END SELECT
-         
-      END DO 
+            CALL M3EXIT( 'CALC_ELMO', 0, 0, '', XSTAT1 )
+      END SELECT
+      
+      ! Save the fact that this variable has been calculated
+      IF ( ILOC .GT. 0 ) THEN
+        L_CALCULATED( ILOC ) = .TRUE.
+        ELMO_USED( ILOC ) = OUTVAL
+      END IF
+
+
  
       END SUBROUTINE CALC_ELMO
  
