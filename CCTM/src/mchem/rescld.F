@@ -21,7 +21,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE RESCLD ( CGRID, JDATE, JTIME, TSTEP,
      &                    N_SPC_WDEP, WDEP_MAP, RESTRANS,
      &                    WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS,
-     &                    PRATE1_RS )
+     &                    PRATE1_RS, RSCAV_RS, AIRMASS )
 
 C-----------------------------------------------------------------------
 C  FUNCTION: Resolved-scale CLOUD processor Models-3 science process:
@@ -57,6 +57,8 @@ C...........Arguments:
       REAL(8), INTENT( OUT )   :: ALFA0_RS( :,:,: )  ! aitken mode number scavenging coef
       REAL(8), INTENT( OUT )   :: ALFA3_RS( :,:,: )  ! aitken mode mass scavenging coef
       REAL(8), INTENT( OUT )   :: PRATE1_RS( :,:,: ) ! precipitation rate (mm/hr)
+      REAL(8), INTENT( OUT )   :: RSCAV_RS( :,:,:,: )! scavenging coefficient (1/s)
+      REAL(8), INTENT( OUT )   :: AIRMASS ( :,:,: )  ! total airmass (mol/m2) in cloudy air
 
       CHARACTER( 120 ) :: XMSG  = ' '    ! Exit status message
 
@@ -142,7 +144,7 @@ C...........External Functions:
       INTERFACE
         SUBROUTINE SCAVWDEP ( JDATE, JTIME, WTBAR, WCBAR, TBARC, PBARC,
      &                        CTHK1, AIRM, PRATE1, TAUCLD, POLC, CEND,
-     &                        REMOV, REMOVAC, ALFA0, ALFA2, ALFA3 )
+     &                        REMOV, REMOVAC, ALFA0, ALFA2, ALFA3, RSCAV )
            INTEGER, INTENT( IN )  :: JDATE, JTIME
            REAL,    INTENT( IN )  :: WTBAR, WCBAR, TBARC, PBARC,
      &                               CTHK1, AIRM, PRATE1, TAUCLD
@@ -150,6 +152,7 @@ C...........External Functions:
            REAL,    INTENT( OUT ) :: REMOVAC
            REAL,    INTENT( OUT ) :: CEND( : ), REMOV( : )
            REAL,    INTENT( OUT ) :: ALFA0, ALFA2, ALFA3
+           REAL(8), INTENT( OUT ) :: RSCAV( : )
         END SUBROUTINE SCAVWDEP
       END INTERFACE
 C-----------------------------------------------------------------------
@@ -325,10 +328,12 @@ C...Get nonconvective precipitation amount (cm)
       call interpolate_var (VNAME_RN, MDATE, MTIME, RN )
 
 C.. Initialize output arrays
-      WCBAR_RS  = 0.
-      WETFAC_RS = 0.
-      ALFA0     = 0.
-      ALFA3     = 0.
+      WCBAR_RS  = 0.0D0
+      WETFAC_RS = 0.0D0
+      ALFA0_RS  = 0.0D0
+      ALFA3_RS  = 0.0D0
+      PRATE1_RS = 0.0D0
+      RSCAV_RS  = 0.0D0
 
 C...Loop through all grid cells
 
@@ -399,6 +404,15 @@ C...  (i.e. don't do anything)
               
           END IF
 
+C...save air mass for scavenging in MCHEM
+          DO LAY = 1, NLAYS
+             TBARC = TA( COL, ROW, LAY )
+             PBARC = PRES( COL, ROW, LAY )
+             CTHK1 = DZZ( COL, ROW, LAY )
+             AIRM  = PBARC * CTHK1 * 1.0E3 / ( RDGAS * MWAIR * TBARC )
+             AIRMASS( COL, ROW, LAY ) = REAL( AIRM, 8 )
+          END DO
+
 C...loop through layers
 
           IF ( QCRGCOL .GT. 0.0 ) THEN
@@ -452,7 +466,7 @@ C...  needed for mchem
                 CALL SCAVWDEP ( JDATE, JTIME, WTBAR, WCBAR, TBARC,
      &                          PBARC, CTHK1, AIRM, PRATE1, TAUCLD,
      &                          POLC, CEND, REMOV, REMOVAC, ALFA0,
-     &                          ALFA2, ALFA3 )
+     &                          ALFA2, ALFA3, RSCAV_RS( COL, ROW, LAY, : ) )
 
 C.. Save output
                 WCBAR_RS  ( COL, ROW, LAY ) = REAL( WCBAR, 8 )

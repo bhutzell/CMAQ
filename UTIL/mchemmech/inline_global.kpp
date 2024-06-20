@@ -30,3 +30,4 @@ REAL(dp)            :: H_O3, H_FACD, H_HCL, H_GLY, H_MGLY
 REAL(dp)            :: H_OH, H_HO2, H_NO2, H_HONO, H_HNO4
 REAL(dp)            :: H_GLYD, H_AACD, H_FORM, H_NO3, H_CH3O2
 REAL(dp)            :: H_IEPOX, H_MHP, H_PAA
+REAL(dp)            :: KPP_RSCAV(NSPEC)

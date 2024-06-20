@@ -21,7 +21,7 @@
        SUBROUTINE CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                          N_SPC_WDEP, WDEP_MAP, SUBTRANS,
      &                          WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV,
-     &                          PRATE1_CV )
+     &                          PRATE1_CV, RSCAV_CV )
 
 C-----------------------------------------------------------------------
 C
@@ -74,6 +74,7 @@ C...........Arguments
       REAL(8), INTENT( OUT )   :: ALFA0_CV( :,:,: )  ! aitken mode number scavenging coef
       REAL(8), INTENT( OUT )   :: ALFA3_CV( :,:,: )  ! aitken mode mass scavenging coef
       REAL(8), INTENT( OUT )   :: PRATE1_CV( :,:,: ) ! precipitation rate (mm/hr)
+      REAL(8), INTENT( OUT )   :: RSCAV_CV( :,:,:,: )! scavenging coefficient (1/s)
 
 C.....Logical switches
       LOGICAL  :: UPDATE_CGRID_CONV  = .FALSE. ! logical if CGRID should be updated due to convective
@@ -365,7 +366,7 @@ C...........Statement Functions
 
         SUBROUTINE SCAVWDEP ( JDATE, JTIME, WTBAR, WCBAR, TBARC, PBARC,
      &                        CTHK1, AIRM, PRATE1, TAUCLD, POLC, CEND,
-     &                        REMOV, REMOVAC, ALFA0, ALFA2, ALFA3 )
+     &                        REMOV, REMOVAC, ALFA0, ALFA2, ALFA3, RSCAV )
           INTEGER, INTENT( IN )  :: JDATE, JTIME
           REAL,    INTENT( IN )  :: WTBAR, WCBAR, TBARC, PBARC,
      &                              CTHK1, AIRM, PRATE1, TAUCLD
@@ -373,6 +374,7 @@ C...........Statement Functions
           REAL,    INTENT( OUT ) :: CEND( : ), REMOV( : )
           REAL,    INTENT( OUT ) :: REMOVAC
           REAL,    INTENT( OUT ) :: ALFA0, ALFA2, ALFA3
+          REAL(8), INTENT( OUT ) :: RSCAV( : )
         END SUBROUTINE SCAVWDEP
       END INTERFACE
 
@@ -536,6 +538,8 @@ C...reset convective cloud lwc, wet deposition rate, and ALFA3
       WETFAC_CV = 0.0D0
       ALFA0_CV  = 0.0D0
       ALFA3_CV  = 0.0D0
+      PRATE1_CV = 0.0D0
+      RSCAV_CV  = 0.0D0
 C...reset temporary arrays
 C      CONV_DEP  = 0.0
 
@@ -1448,7 +1452,7 @@ C...Do not get variables based on average column
      &                          WCBARL( LAY ), TCLD( LAY ), PRESL( LAY ),
      &                          DZZL( LAY ), RHOM2( LAY ), PRATE1L( LAY ),
      &                          DTCLD, POLC, CEND, REMOV, REMOVAC,
-     &                          ALFA0, ALFA2, ALFA3 )
+     &                          ALFA0, ALFA2, ALFA3, RSCAV_CV( COL, ROW, LAY, : ) )
 
                 WCBAR_CV  ( COL, ROW, LAY ) = REAL( WCBARL( LAY ), 8 )
                 WETFAC_CV ( COL, ROW, LAY ) = REAL( WTBARL( LAY ) * 1000.0D0 * DZZL( LAY ) * 3600.0D0 /

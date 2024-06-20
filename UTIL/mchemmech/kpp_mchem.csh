@@ -6,6 +6,9 @@ python mech-to-kpp.py
 # Merge gas- and aqueous-phase mechanisms
 python mech-merge.py
 
+# Add wet scavenging for gas phase species
+python add_wdep.py
+
 # Run kpp
 kpp mchem.kpp
 

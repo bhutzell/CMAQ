@@ -25,9 +25,15 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#ifdef mchem_opt
+      SUBROUTINE SCAVWDEP ( JDATE, JTIME, WTBAR, WCBAR, TBARC, PBARC,
+     &                      CTHK1, AIRM, PRATE1, TAUCLD, POLC, CEND,
+     &                      REMOV, REMOVAC, ALFA0, ALFA2, ALFA3, RSCAV )
+#else
       SUBROUTINE SCAVWDEP ( JDATE, JTIME, WTBAR, WCBAR, TBARC, PBARC,
      &                      CTHK1, AIRM, PRATE1, TAUCLD, POLC, CEND,
      &                      REMOV, REMOVAC, ALFA0, ALFA2, ALFA3 )
+#endif
 C-----------------------------------------------------------------------
 C  Description: Compute simplistic incloud scavenging and wet removal
  
@@ -70,6 +76,7 @@ C    REMOVAC    real    output  variable storing H+ deposition
 C    ALFA0      real    output  scav coef for aitken aerosol number
 C    ALFA2      real    output  scav coef for aitken mode sfc area
 C    ALFA3      real    output  scav coef for aitken aerosol mass
+C    RSCAV      real    output  scavenging coefficient (1/s)
  
 C-----------------------------------------------------------------------
 
@@ -122,6 +129,9 @@ C...........Arguments:
       REAL,    INTENT(  IN ) :: POLC ( : )  ! avg vert conc incloud (moles/mole)
       REAL,    INTENT( OUT ) :: CEND ( : )  ! ending incloud conc (moles/mole)
       REAL,    INTENT( OUT ) :: REMOV( : )  ! moles/m2 or mm*mol/lit scavenged
+#ifdef mchem_opt
+      REAL(8), INTENT( OUT ) :: RSCAV( : )  ! scavenging coefficient (1/s)
+#endif
 
 C...........Local Variables:
 
@@ -346,6 +356,12 @@ C...gas scavenging and wet deposition
           END DO
 #endif
         END IF
+
+#ifdef mchem_opt
+C...save scavenging coefficient
+        RSCAV( PNTR ) = REAL( ALFA, 8 )
+#endif
+
       END DO
 
 C...aerosol scavenging and wet deposition
@@ -381,6 +397,11 @@ csjr          END IF
         ENDDO
 #endif
 
+#ifdef mchem_opt
+C...save scavenging coefficient
+        RSCAV( PNTR )  = REAL( ALFA, 8 )
+#endif
+
       END DO
 
 C...non-reactive scavenging and wet deposition
@@ -410,6 +431,12 @@ C...non-reactive scavenging and wet deposition
           END DO
 #endif
         END IF
+
+#ifdef mchem_opt
+C...save scavenging coefficient
+        RSCAV( PNTR ) = REAL( ALFA, 8 )
+#endif
+
       END DO
 
 C...tracer scavenging and wet deposition
@@ -439,6 +466,12 @@ C...tracer scavenging and wet deposition
           END DO
 #endif
         END IF
+
+#ifdef mchem_opt
+C...save scavenging coefficient
+        RSCAV( PNTR ) = REAL( ALFA, 8 )
+#endif
+
       END DO
 
       RETURN

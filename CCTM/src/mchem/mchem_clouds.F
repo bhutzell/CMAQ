@@ -85,16 +85,27 @@ C...Variables related to CGRID conversion
 C...Variables related to scavenging
       INTEGER, ALLOCATABLE, SAVE :: WDEP_MAP( : ) ! wet deposition map to CGRID
       INTEGER, SAVE :: N_SPC_WDEP                 ! # of wet deposition species
-      REAL( 8 ), ALLOCATABLE   :: WCBAR_RS  ( :,:,: ) ! liq water content of resolved cloud (kg/m3)
-      REAL( 8 ), ALLOCATABLE   :: WETFAC_RS ( :,:,: ) ! wet deposition rate coefficient resolved cloud
-      REAL( 8 ), ALLOCATABLE   :: ALFA0_RS  ( :,:,: ) ! aitken mode number scavenging coef resolved cloud
-      REAL( 8 ), ALLOCATABLE   :: ALFA3_RS  ( :,:,: ) ! aitken mode mass scavenging coef resolved cloud
-      REAL( 8 ), ALLOCATABLE   :: PRATE1_RS ( :,:,: ) ! precipitation rate (mm/hr) resolved cloud
-      REAL( 8 ), ALLOCATABLE   :: WCBAR_CV  ( :,:,: ) ! liq water content of convective cloud (kg/m3)
-      REAL( 8 ), ALLOCATABLE   :: WETFAC_CV ( :,:,: ) ! wet deposition rate coefficient convective cloud
-      REAL( 8 ), ALLOCATABLE   :: ALFA0_CV  ( :,:,: ) ! aitken mode number scavenging coef convective cloud
-      REAL( 8 ), ALLOCATABLE   :: ALFA3_CV  ( :,:,: ) ! aitken mode mass scavenging coef convective cloud
-      REAL( 8 ), ALLOCATABLE   :: PRATE1_CV ( :,:,: ) ! precipitation rate (mm/hr) convective cloud
+      INTEGER, SAVE :: N_CGRID_SCAV               ! # of species scavenged
+      REAL( 8 ), ALLOCATABLE   :: WCBAR_RS  ( :,:,: )   ! liq water content of resolved cloud (kg/m3)
+      REAL( 8 ), ALLOCATABLE   :: WETFAC_RS ( :,:,: )   ! wet deposition rate coefficient resolved cloud
+      REAL( 8 ), ALLOCATABLE   :: ALFA0_RS  ( :,:,: )   ! aitken mode number scavenging coef resolved cloud
+      REAL( 8 ), ALLOCATABLE   :: ALFA3_RS  ( :,:,: )   ! aitken mode mass scavenging coef resolved cloud
+      REAL( 8 ), ALLOCATABLE   :: PRATE1_RS ( :,:,: )   ! precipitation rate (mm/hr) resolved cloud
+      REAL( 8 ), ALLOCATABLE   :: RSCAV_RS  ( :,:,:,: ) ! scavenging coefficient(1/s) resolved cloud
+      REAL( 8 ), ALLOCATABLE   :: WCBAR_CV  ( :,:,: )   ! liq water content of convective cloud (kg/m3)
+      REAL( 8 ), ALLOCATABLE   :: WETFAC_CV ( :,:,: )   ! wet deposition rate coefficient convective cloud
+      REAL( 8 ), ALLOCATABLE   :: ALFA0_CV  ( :,:,: )   ! aitken mode number scavenging coef convective cloud
+      REAL( 8 ), ALLOCATABLE   :: ALFA3_CV  ( :,:,: )   ! aitken mode mass scavenging coef convective cloud
+      REAL( 8 ), ALLOCATABLE   :: PRATE1_CV ( :,:,: )   ! precipitation rate (mm/hr) convective cloud
+      REAL( 8 ), ALLOCATABLE   :: RSCAV_CV  ( :,:,:,: ) ! scavenging coefficient(1/s) convective cloud
+      REAL( 8 ), ALLOCATABLE   :: WET_DEP   ( :,:,:,: ) ! wet deposition of current time step
+      REAL( 8 ), ALLOCATABLE   :: AIRMASS   ( :,:,: )   ! total airmass (mol/m2) in cloudy air
+      REAL( 8 ), ALLOCATABLE   :: WDEP_Hp   ( :,:,: )   ! wet deposition of H+
+      REAL,    ALLOCATABLE, SAVE :: TWET_DEP( :,:,: )   ! total wet deposition for output
+      LOGICAL, ALLOCATABLE, SAVE :: KPP_SCAV( : )       ! true if scavenging is performed in KPP
+      LOGICAL, ALLOCATABLE, SAVE :: LSCAV( : )          ! scavenging logical for all CGRID species
+      INTEGER, ALLOCATABLE, SAVE :: I_KPP_SCAV( : )     ! index for scavenging species
+      LOGICAL, SAVE              :: LHp = .TRUE.        ! if H+ is in mechanism
 
 C.. Cloud properties
       REAL, ALLOCATABLE, SAVE  :: RESTRANS( :,: )   ! resolved cloud transmissivity
@@ -151,9 +162,13 @@ C...  # / m**3 (number density), and m**2 / m**3 (surface area) units
         INTEGER       SPC       ! species subscript indices
         INTEGER      STRT       ! starting position
         INTEGER      FINI       ! ending position
+        INTEGER     INDXC       ! index cgrid
+        INTEGER     INDXV       ! index var
+        INTEGER     SHIFT
 
         CHARACTER(  16 ) :: PNAME = 'MCHEM_WDEP' ! Procedure name
         CHARACTER( 144 ) :: XMSG                 ! Message text
+        CHARACTER( 200 ) :: FMT                  ! Format for log-file output
 
 
 C...first check to make sure that some species in CGRID were specified
@@ -213,13 +228,16 @@ C...check to see if user wants to output extra diagnostic files
         END DO
 
 C.. Allocate wet deposition arrays
+        N_CGRID_SCAV = N_GC_SCAV + N_AE_SCAV + N_NR_SCAV + N_TR_SCAV
+
         ALLOCATE ( WCBAR_RS ( NCOLS, NROWS, NLAYS ),
      &             WETFAC_RS( NCOLS, NROWS, NLAYS ),
      &             ALFA0_RS ( NCOLS, NROWS, NLAYS ),
      &             ALFA3_RS ( NCOLS, NROWS, NLAYS ),
-     &             PRATE1_RS( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
+     &             PRATE1_RS( NCOLS, NROWS, NLAYS ),
+     &             RSCAV_RS ( NCOLS, NROWS, NLAYS, N_CGRID_SPC ), STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
-          XMSG = '*** Error allocating WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS, and PRATE1_RS'
+          XMSG = '*** Error allocating WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS, PRATE1_RS, and RSCAV_RS'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
@@ -227,11 +245,102 @@ C.. Allocate wet deposition arrays
      &             WETFAC_CV( NCOLS, NROWS, NLAYS ),
      &             ALFA0_CV ( NCOLS, NROWS, NLAYS ),
      &             ALFA3_CV ( NCOLS, NROWS, NLAYS ),
-     &             PRATE1_CV( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
+     &             PRATE1_CV( NCOLS, NROWS, NLAYS ),
+     &             RSCAV_CV ( NCOLS, NROWS, NLAYS, N_CGRID_SPC ), STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
-          XMSG = '*** Error allocating WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV, and PRATE1_CV'
+          XMSG = '*** Error allocating WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV, PRATE1_CV, and RSCAV_CV'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
+
+        ALLOCATE ( KPP_SCAV( N_CGRID_SPC ),
+     &             LSCAV   ( N_CGRID_SPC ),
+     &             I_KPP_SCAV( N_CGRID_SPC ),
+     &             WET_DEP ( NCOLS, NROWS, NLAYS, N_CGRID_SPC ),
+     &             WDEP_Hp ( NCOLS, NROWS, NLAYS ),
+     &             TWET_DEP( NCOLS, NROWS, N_SPC_WDEP + 1 ),
+     &             AIRMASS ( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = '*** Error allocating KPP_SCAV, LSCAV, I_SCAV_KPP, WET_DEP, WDEP_Hp, TWET_DEP, and AIRMASS'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+C...  initialize arrays
+        KPP_SCAV   = .FALSE.
+        LSCAV      = .FALSE.
+        I_KPP_SCAV = 0
+        TWET_DEP   = 0.0
+
+        WRITE(LOGDEV,"(A)") 'Cloud species scavenging used in MCHEM:'
+        FMT = "(A16,I12,X,L5,X,L8,X,I12)"
+        WRITE(LOGDEV,"(A)") 'NAME             CGRID_INDEX LSCAV KPP_SCAV WD-KPP_INDEX'
+
+C...  load the CGRID to scavenged species pointers for the gases
+        SPC = 0
+        SHIFT = 0
+        DO VAR=1, N_GC_SCAV
+          SPC = SPC + 1
+          INDXV = GC_SCAV_MAP( VAR )
+          INDXC = INDXV + SHIFT
+          LSCAV( INDXC ) = .TRUE.
+          IF ( INDEX_KPP ( GC_SPC( INDXV ) ) .NE. 0 ) THEN
+            KPP_SCAV( INDXC )   = .TRUE.
+            I_KPP_SCAV( INDXC ) = INDEX_KPP ( 'WD_'//TRIM( GC_SPC( INDXV ) ) )
+          END IF
+          WRITE(LOGDEV,FMT) GC_SPC( INDXV ), INDXC, LSCAV( INDXC ), KPP_SCAV( INDXC ), I_KPP_SCAV( INDXC )
+        END DO
+
+C...  load the CGRID to scavenged species pointers for the aerosols
+        SHIFT = N_GC_SPCD
+        DO VAR=1, N_AE_SCAV
+          SPC = SPC + 1
+          INDXV = AE_SCAV_MAP( VAR )
+          INDXC = INDXV + SHIFT
+          LSCAV( INDXC ) = .TRUE.
+          IF ( INDEX_KPP ( AE_SPC( INDXV ) ) .NE. 0 ) THEN
+            KPP_SCAV( INDXC )   = .TRUE.
+            I_KPP_SCAV( INDXC ) = INDEX_KPP ( 'WD_'//TRIM( AE_SPC( INDXV ) ) )
+          END IF
+          WRITE(LOGDEV,FMT) AE_SPC( INDXV ), INDXC, LSCAV( INDXC ), KPP_SCAV( INDXC ), I_KPP_SCAV( INDXC )
+        END DO
+
+C...  load the CGRID to scavenged species pointers for the non-reactives
+        SHIFT = N_GC_SPCD + N_AE_SPC
+        DO VAR=1, N_NR_SCAV
+          SPC = SPC + 1
+          INDXV = NR_SCAV_MAP( VAR )
+          INDXC = INDXV + SHIFT
+          LSCAV( INDXC ) = .TRUE.
+          IF ( INDEX_KPP ( NR_SPC( INDXV ) ) .NE. 0 ) THEN
+            KPP_SCAV( INDXC )   = .TRUE.
+            I_KPP_SCAV( INDXC ) = INDEX_KPP ( 'WD_'//TRIM( NR_SPC( INDXV ) ) )
+          END IF
+          WRITE(LOGDEV,FMT) NR_SPC( INDXV ), INDXC, LSCAV( INDXC ), KPP_SCAV( INDXC ), I_KPP_SCAV( INDXC )
+        END DO
+
+C...  load the CGRID to scavenged species pointers for the tracers
+        SHIFT = N_GC_SPCD + N_AE_SPC + N_NR_SPC
+        DO VAR=1, N_TR_SCAV
+          SPC = SPC + 1
+          INDXV = TR_SCAV_MAP( VAR )
+          INDXC = INDXV + SHIFT
+          LSCAV( INDXC ) = .TRUE.
+          IF ( INDEX_KPP ( TR_SPC( INDXV ) ) .NE. 0 ) THEN
+            KPP_SCAV( INDXC )   = .TRUE.
+            I_KPP_SCAV( INDXC ) = INDEX_KPP ( 'WD_'//TRIM( TR_SPC( INDXV ) ) )
+          END IF
+          WRITE(LOGDEV,FMT) TR_SPC( INDXV ), INDXC, LSCAV( INDXC ), KPP_SCAV( INDXC ), I_KPP_SCAV( INDXC )
+        END DO
+
+C...  check if H+ is part of the mechanism
+         IF ( ( INDEX_KPP ( 'WD_Hp' ) == 0 ) .AND. ( INDEX_KPP ( 'WD_HP' ) == 0 ) ) LHp = .FALSE.
+         IF ( ( INDEX_KPP ( 'Hp_RS' ) == 0 ) .AND. ( INDEX_KPP ( 'HP_RS' ) == 0 ) ) LHp = .FALSE.
+         IF ( ( INDEX_KPP ( 'Hp_CV' ) == 0 ) .AND. ( INDEX_KPP ( 'HP_CV' ) == 0 ) ) LHp = .FALSE.
+
+         IF ( .NOT. LHp ) THEN
+           XMSG = 'H+ is not part of the mechanism - ' //
+     &            'scavenging rates will not be reported'
+           CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+         END IF
 
 C..Allocate cloud properties
          ALLOCATE ( RESTRANS ( NCOLS,NROWS ), STAT = ALLOCSTAT )
@@ -249,6 +358,80 @@ C..Allocate cloud properties
          SUBTRANS = 1.0   ! array assignment
 
       END SUBROUTINE ALLOC_WDEP_DATA
+
+      SUBROUTINE CONVERT_WDEP ( REMOV, REMOV_Hp, AIRMASS )
+
+        USE GRID_CONF             ! horizontal & vertical domain specifications
+
+        IMPLICIT NONE
+        REAL(8), INTENT(INOUT)  :: REMOV( : ) ! wet deposition array
+        REAL(8), INTENT(INOUT)  :: REMOV_Hp   ! wet deposition of H+
+        REAL(8), INTENT(IN)     :: AIRMASS    ! air mass
+
+        INTEGER       VAR       ! variable subscript indices
+        INTEGER       SPC       ! species subscript indices
+        INTEGER      STRT       ! starting position
+        INTEGER      FINI       ! ending position
+
+        REAL(8), PARAMETER :: GPKG = 1.0E+03  ! g/kg
+        REAL(8), PARAMETER :: M2PHA = 1.0E+04 ! 1 hectare = 1.0e4 m**2
+        REAL(8), PARAMETER :: M2PHA_OVER_GPKG = M2PHA / GPKG
+
+C...convert from moles/m**2 to kg/m**2 and kg/m**2 to kg/hectare
+C...  for gases
+         SPC = 0
+         STRT = GC_STRT
+         FINI = GC_STRT - 1 + N_GC_SPC
+         DO VAR = STRT, FINI
+            SPC = SPC + 1
+            REMOV( VAR ) = REMOV( VAR ) * GC_MOLWT( SPC )
+     &                   * M2PHA_OVER_GPKG
+     &                   * AIRMASS
+         END DO
+
+C...  for aerosols
+         SPC = 0
+         STRT = AE_STRT
+         FINI = AE_STRT - 1 + N_AE_SPC
+         DO VAR = STRT, FINI
+            SPC = SPC + 1
+            IF (( INDEX( AE_SPC( SPC ), 'NUM' ) .EQ. 0 ) .AND.
+     &          ( INDEX( AE_SPC( SPC ), 'SRF' ) .EQ. 0 )) THEN
+               REMOV( VAR ) = REMOV( VAR ) * AE_MOLWT( SPC )
+     &                      * M2PHA_OVER_GPKG
+     &                      * AIRMASS
+            ELSE
+               REMOV( VAR ) = REMOV( VAR ) * M2PHA
+     &                      * AIRMASS
+            END IF
+         END DO
+
+C...  for non-reactives
+         SPC = 0
+         STRT = NR_STRT
+         FINI = NR_STRT - 1 + N_NR_SPC
+         DO VAR = STRT, FINI
+            SPC = SPC + 1
+            REMOV( VAR ) = REMOV( VAR ) * NR_MOLWT( SPC )
+     &                   * M2PHA_OVER_GPKG
+     &                   * AIRMASS
+         END DO
+
+C...  for tracers
+         SPC = 0
+         STRT = TR_STRT
+         FINI = TR_STRT - 1 + N_TR_SPC
+         DO VAR = STRT, FINI
+            SPC = SPC + 1
+            REMOV( VAR ) = REMOV( VAR ) * TR_MOLWT( SPC )
+     &                   * M2PHA_OVER_GPKG
+     &                   * AIRMASS
+         END DO
+
+C...  for H+
+         REMOV_Hp = REMOV_Hp * 1.0_dp * M2PHA_OVER_GPKG * AIRMASS
+
+      END SUBROUTINE CONVERT_WDEP
 
       SUBROUTINE CL_SPCS_DEF ( )
 
@@ -446,11 +629,12 @@ C.. Initialise Hp and OHm
 
       END SUBROUTINE INIT_CLOUDS
 
-      SUBROUTINE EVAP_CLOUDS ( CONC, C, WFAC_RS, WFAC_CV, TSTEP )
+      SUBROUTINE EVAP_CLOUDS ( CONC, C, DEP, WFAC_RS, WFAC_CV, TSTEP )
 
         IMPLICIT NONE
         REAL, INTENT ( INOUT )     :: CONC( N_CGRID_SPC )    !  species concentration in cell
-        REAL(dp), INTENT ( INOUT ) :: C( N_CGRID_SPC )       !  KPP species concentration in cell
+        REAL(dp), INTENT ( INOUT ) :: C( : )                 !  KPP species concentration in cell
+        REAL(8),  INTENT ( INOUT ) :: DEP( N_CGRID_SPC )     !  wet deposition in cell
         REAL(dp), INTENT( IN ) :: WFAC_RS, WFAC_CV, TSTEP
         INTEGER                :: ICL, ICLW, ICGRID, IKPP_RS, IKPP_CV
         REAL, PARAMETER        :: ZERO = 1.0E-30
@@ -480,7 +664,8 @@ C.. This code needs modifications once we take scavenging into account
                  ICLW = MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX
                  ICGRID  = MECH_SPC_CL( ICL )%EV_CGRID_INDEX
                  EXPWDEP = DEXP( - ( WFAC_RS + WFAC_CV ) * TSTEP )
-                 CONC( ICLW ) = CONC( ICLW ) * REAL( EXPWDEP, 4 )
+                 DEP ( ICLW ) = REAL( CONC( ICLW ) * ( 1.0 - EXPWDEP ), 8 )
+                 CONC( ICLW ) = CONC( ICLW ) - REAL( DEP( ICLW ), 4 )
                  CONC( ICGRID ) = MAX( CONC( ICGRID ) - CONC( ICLW ), ZERO )
               END IF
 C.. The code above needs modifications once we take scavenging into account
@@ -807,8 +992,10 @@ C..Local Variables:
 
         IMPLICIT NONE
 
-        CHARACTER( 16 ), INTENT( IN ) :: NAME
+        CHARACTER( * ), INTENT( IN ) :: NAME
         INTEGER :: SPC
+
+        INDEX_KPP = 0
 
         DO SPC = 1, NSPEC
            IF ( TRIM(NAME) == TRIM(SPC_NAMES(SPC)) ) THEN

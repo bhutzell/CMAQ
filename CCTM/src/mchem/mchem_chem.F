@@ -76,6 +76,7 @@ C...........Local Variables:
       INTEGER ICGSPC          ! Index of species in CGRID
       INTEGER ICSPC           ! Index of species in CONC
       INTEGER NPH             ! Index for number of phot. rxns in PHOT
+      REAL(8)                 :: ALFA                 ! total (RS + CV) scavenging rate coefficient (1/s)
 
 C-----------------------------------------------------------------------
 
@@ -207,7 +208,23 @@ C.. Alternative KPP options
       DO NPH = 1, KPP_NPHOTAB
          RJCELL( NPH )   = REAL( RJ( COL,ROW,LEV,NPH ), dp ) / 60.0_dp
          IF ( RJCELL( NPH ) .GT. 0.0D0 ) LSUNLIGHT = .TRUE.
-      END DO                         
+      END DO
+
+      ! Fill scavenging rates
+      DO SPC = 1, NSPEC
+         IF ( MECH_SPC(SPC)%CGRID_INDEX /= 0 ) THEN
+            ICGSPC = MECH_SPC(SPC)%CGRID_INDEX
+            ICSPC  = MECH_SPC(SPC)%CONC_INDEX
+            IF ( LSCAV( ICGSPC ) .AND. KPP_SCAV( ICGSPC ) ) THEN
+               ALFA = RSCAV_RS( COL, ROW, LEV, ICGSPC ) +
+     &                RSCAV_CV( COL, ROW, LEV, ICGSPC )
+               ALFA = MAX( ALFA, 0.0 )
+            ELSE
+               ALFA = 0.0
+            END IF
+            KPP_RSCAV( ICSPC ) = REAL( ALFA, dp )
+         END IF
+      END DO
 
       ! Perform integration
       !~~~> Time loop
@@ -233,7 +250,32 @@ C.. Alternative KPP options
          END IF
       END DO
 
-      IF ( LCL ) CALL EVAP_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), WFAC_RS, WFAC_CV, DT )
+C...transfer scavenging information from KPP to scavenging array
+      DO SPC = 1, NSPCSD
+         IF ( LSCAV( SPC ) .AND. KPP_SCAV( SPC ) ) THEN
+            WET_DEP( COL, ROW, LEV, SPC ) = REAL( C( I_KPP_SCAV ( SPC ) ), 8 )
+         END IF
+      END DO
+
+      IF ( LHp ) WDEP_Hp( COL, ROW, LEV ) = REAL( C( IND_WD_HP ), 8 )
+
+C...perform scavenging if tracer is not part of KPP
+      DO SPC = 1, NSPCSD
+         IF ( LSCAV( SPC ) .AND.
+     &      ( .NOT. KPP_SCAV( SPC ) ) .AND.
+     &      ( WET_DEP( COL, ROW, LEV, SPC ) == 0.0 ) ) THEN
+            ALFA = RSCAV_RS( COL, ROW, LEV, SPC ) +
+     &             RSCAV_CV( COL, ROW, LEV, SPC )
+            WET_DEP( COL, ROW, LEV, SPC ) = REAL( CGRID( COL, ROW, LEV, SPC ), 8 ) *
+     &                                      ( 1.0 - EXP( -ALFA * CHEMSTEP ) )
+            CGRID( COL, ROW, LEV, SPC )   = CGRID( COL, ROW, LEV, SPC ) -
+     &                                      REAL( WET_DEP( COL, ROW, LEV, SPC ), 4 )
+         END IF
+      END DO
+
+C...evaporate clouds back to gas/aerosol phase
+      IF ( LCL ) CALL EVAP_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), WET_DEP( COL,ROW,LEV,: ),
+     &                              WFAC_RS, WFAC_CV, DT )
 
       RETURN
 

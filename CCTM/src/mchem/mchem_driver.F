@@ -135,6 +135,9 @@ C.. KPP related variables
       REAL( 8 )               :: SEAWATER
       LOGICAL                 :: OPEN_WATER
 
+C.. Scavenging related variables
+      REAL(8)                 :: ALFA                 ! total (RS + CV) scavenging rate coefficient (1/s)
+
 #ifdef mchem_stats
       CHARACTER( 16 ), SAVE              :: CTM_MCHEMSTATS_1 = 'CTM_MCHEMSTATS_1'
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: VSTATS( : )
@@ -151,7 +154,7 @@ C.. KPP related variables
          SUBROUTINE RESCLD ( CGRID, JDATE, JTIME, TSTEP,
      &                       N_SPC_WDEP, WDEP_MAP, RESTRANS,
      &                       WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS,
-     &                       PRATE1_RS )
+     &                       PRATE1_RS, RSCAV_RS, AIRMASS )
            IMPLICIT NONE
            REAL, POINTER            :: CGRID( :,:,:,: )
            INTEGER, INTENT( IN )    :: JDATE
@@ -165,12 +168,14 @@ C.. KPP related variables
            REAL(8), INTENT( OUT )   :: ALFA0_RS( :,:,: )
            REAL(8), INTENT( OUT )   :: ALFA3_RS( :,:,: )
            REAL(8), INTENT( OUT )   :: PRATE1_RS( :,:,: )
+           REAL(8), INTENT( OUT )   :: RSCAV_RS( :,:,:,: )
+           REAL(8), INTENT( OUT )   :: AIRMASS( :,:,: )
          END SUBROUTINE RESCLD
 
          SUBROUTINE CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                            N_SPC_WDEP, WDEP_MAP, SUBTRANS,
      &                            WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV,
-     &                            PRATE1_CV )
+     &                            PRATE1_CV, RSCAV_CV )
            IMPLICIT NONE
            REAL, POINTER            :: CGRID( :,:,:,: )
            INTEGER, INTENT( IN )    :: JDATE
@@ -184,6 +189,7 @@ C.. KPP related variables
            REAL(8), INTENT( OUT )   :: ALFA0_CV( :,:,: )
            REAL(8), INTENT( OUT )   :: ALFA3_CV( :,:,: )
            REAL(8), INTENT( OUT )   :: PRATE1_CV( :,:,: )
+           REAL(8), INTENT( OUT )   :: RSCAV_CV( :,:,:,: )
          END SUBROUTINE CONVCLD_ACM
 
          SUBROUTINE MCHEM_CHEM ( CGRID, TA, PRES, DENSI, OPEN_WATER_IN,
@@ -360,6 +366,9 @@ C   appropriately updated after the solver finds a solution.
 
       CALL HETCHEM_RATES( TA, PRES, QV, CGRID, DENS )
 
+C.. Reset wet deposition array for current time step
+      WET_DEP = 0.0D0
+
 C.. Convert CGRID species
 C..  gas, non-reactive, and tracer to molar mixing ratio (by volume)
 C..  aerosol mass concentration to moles of aerosol per mole of air by volume
@@ -372,12 +381,13 @@ C..  Resolved clouds
       CALL RESCLD ( CGRID, JDATE, JTIME, TSTEP,
      &              N_SPC_WDEP, WDEP_MAP, RESTRANS,
      &              WCBAR_RS, WETFAC_RS, ALFA0_RS, ALFA3_RS,
-     &              PRATE1_RS )
+     &              PRATE1_RS, RSCAV_RS, AIRMASS )
 C..  Convective clouds
       CALL CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                   N_SPC_WDEP, WDEP_MAP, SUBTRANS,
      &                   WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV,
-     &                   PRATE1_CV )
+     &                   PRATE1_CV, RSCAV_CV )
+
 
 C.. Convert to molecules/cm3
       DO LEV = 1, NLAYS
@@ -435,15 +445,33 @@ C   Else only calculate gas/hetero chemistry.
                IF ( ( WCBAR_RS( COL,ROW,LEV ) .GT. LWC_LIMIT ) .OR.
      &              ( WCBAR_CV( COL,ROW,LEV ) .GT. LWC_LIMIT ) ) THEN
 
+C.. Perform multiphase chemistry via KPP (includes scavenging)
                   CALL MCHEM_CHEM ( CGRID, TEMP, PRESS, DENSI, OPEN_WATER,
      &                              SEAWATER, CAIR, QV( COL,ROW,LEV),
      &                              CHEMSTEP, LEV, COL, ROW )
 
                ELSE
 
+C.. Perform gas and heterogeneous chemistry only via KPP
                   CALL GAS_CHEM   ( CGRID, TEMP, PRESS, DENSI, OPEN_WATER,
      &                              SEAWATER, CAIR, QV( COL,ROW,LEV),
      &                              CHEMSTEP, LEV, COL, ROW )
+
+C.. Perform scavenging if lwc limit is not exceeded to be consistent with
+C   earlier implementations
+                  DO SPC = 1, NSPCSD
+                    IF ( LSCAV( SPC ) ) THEN
+                       ALFA = RSCAV_RS( COL, ROW, LEV, SPC ) +
+     &                        RSCAV_CV( COL, ROW, LEV, SPC )
+                       ALFA = MAX( ALFA, 0.0 )
+                       IF ( ALFA .GT. 0.0 ) THEN
+                         WET_DEP( COL, ROW, LEV, SPC ) = REAL( CGRID( COL, ROW, LEV, SPC ), 8 ) *
+     &                                                   ( 1.0 - EXP( -ALFA * CHEMSTEP ) )
+                         CGRID( COL, ROW, LEV, SPC )   = CGRID( COL, ROW, LEV, SPC ) -
+     &                                                   REAL( WET_DEP( COL, ROW, LEV, SPC ), 4 )
+                       END IF
+                    END IF
+                  END DO
 
                END IF
 
@@ -483,6 +511,36 @@ C.. Convert to molar mixing ratio (by volume)
             DO SPC = STRT, FINI
               CGRID( COL,ROW,LEV,SPC ) = CGRID( COL,ROW,LEV,SPC ) / CAIR
             END DO
+            ! Wet deposition
+            DO SPC = 1, NSPCSD
+              WET_DEP( COL,ROW,LEV,SPC ) = WET_DEP( COL,ROW,LEV,SPC ) / CAIR
+            END DO
+            ! Wet deposition of H+
+            WDEP_Hp( COL,ROW,LEV ) = WDEP_Hp( COL,ROW,LEV ) / CAIR
+          END DO
+        END DO
+      END DO
+
+C.. Convert wet deposition
+      DO ROW = 1, NROWS
+        DO COL = 1, NCOLS
+          DO LEV = 1, NLAYS
+             CALL CONVERT_WDEP( WET_DEP( COL, ROW, LEV, : ), WDEP_Hp( COL, ROW, LEV ),
+     &                          AIRMASS( COL, ROW, LEV ) )
+          END DO
+        END DO
+      END DO
+
+C.. Add wet deposition for output
+      DO ROW = 1, NROWS
+        DO COL = 1, NCOLS
+          DO LEV = 1, NLAYS
+            DO SPC = 1, N_SPC_WDEP
+              TWET_DEP( COL, ROW, SPC ) = TWET_DEP ( COL, ROW, SPC )
+     &                  + REAL( WET_DEP ( COL, ROW, LEV, WDEP_MAP( SPC ) ), 4 )
+            END DO
+            TWET_DEP( COL, ROW, N_SPC_WDEP+1 ) = TWET_DEP( COL, ROW, N_SPC_WDEP+1 )
+     &                  + REAL( WDEP_Hp ( COL, ROW, LEV ), 4 )
           END DO
         END DO
       END DO
@@ -490,7 +548,7 @@ C.. Convert to molar mixing ratio (by volume)
 C.. Convert CGRID back to original unit
       CALL CONVERT_BACKWARD( CGRID, DENS )
 
-      !Update Aerosol Surface Area
+C.. Update Aerosol Surface Area
       CALL HETCHEM_UPDATE_AERO( CGRID )
 
 C.. Reset transmissivity arrays
@@ -501,7 +559,6 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C  Output statistics if required and return
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-#ifdef mchem_stats
       WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )
       EDATE = JDATE
       ETIME = JTIME
@@ -510,6 +567,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          WSTEP = 0
 
+#ifdef mchem_stats
          IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 1 ),
      &         EDATE, ETIME, REAL( WCBAR_RS, 4) ) ) THEN
             XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
@@ -537,8 +595,22 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &          'Timestep written to', CTM_MCHEMSTATS_1,
      &          'for date and time', EDATE, ETIME
-
-      END IF
 #endif
+
+C...write data to the normal wet deposition file
+         IF ( .NOT. WRITE3( CTM_WET_DEP_1, ALLVAR3, EDATE,
+     &                      ETIME, TWET_DEP ) ) THEN
+           XMSG = 'Could not write ' // CTM_WET_DEP_1 // ' file'
+           CALL M3EXIT ( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
+         END IF
+
+         WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
+     &          'Timestep written to', CTM_WET_DEP_1,
+     &          'for date and time', EDATE, ETIME
+
+C...reinitialize deposition array
+         TWET_DEP  = 0.0
+
+      END IF   ! time to write
 
       END
