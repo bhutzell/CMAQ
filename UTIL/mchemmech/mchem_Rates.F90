@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : mchem_Rates.f90
-! Time                 : Thu Jun 20 15:54:12 2024
+! Time                 : Fri Jun 21 11:41:44 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : mchem.kpp
 ! Output root filename : mchem
@@ -358,6 +358,8 @@ SUBROUTINE Update_RCONST ( )
 ! Begin INLINED RCONST
 
 
+  USE MCHEM_CLOUDS, ONLY: UPDATE_GM1_GM2
+
 REAL(dp)  :: FALLOFF_T10_R4
 REAL(dp)  :: FALLOFF_T10_R6
 REAL(dp)  :: FALLOFF_T10_R17
@@ -459,6 +461,10 @@ FALLOFF_T10_DMS2 = FALLOFF_T10( 1.9900D-39,5.2700D+03, &
 -3.4000D+02,1.0000D+00, &
 1.0000D+00,1.0000D+00)
 
+
+  ! Update aqueous diffusion correction (GM1 & GM2)
+  IF ( LCL_RS ) CALL UPDATE_GM1_GM2( GM1_RS, GM2_RS, PHI2_RS, VAR, 1 )
+  IF ( LCL_CV ) CALL UPDATE_GM1_GM2( GM1_CV, GM2_CV, PHI2_CV, VAR, 2 )
 
 ! End INLINED RCONST
 

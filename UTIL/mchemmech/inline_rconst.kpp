@@ -1,0 +1,5 @@
+#INLINE F90_RCONST
+  ! Update aqueous diffusion correction (GM1 & GM2)
+  IF ( LCL_RS ) CALL UPDATE_GM1_GM2( GM1_RS, GM2_RS, PHI2_RS, VAR, 1 )
+  IF ( LCL_CV ) CALL UPDATE_GM1_GM2( GM1_CV, GM2_CV, PHI2_CV, VAR, 2 )
+#ENDINLINE

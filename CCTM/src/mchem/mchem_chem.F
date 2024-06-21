@@ -70,7 +70,6 @@ C...........Local Variables:
       INTEGER, SAVE           :: ICNTRL(20) = 0       ! KPP integrator variables
       INTEGER                 :: IERR                 ! KPP integrator variables
       INTEGER                 :: ISTATUS(20)          ! KPP integrator variables
-      LOGICAL                 :: LCL_RS, LCL_CV, LCL
 
       INTEGER SPC             ! Species loop index
       INTEGER ICGSPC          ! Index of species in CGRID

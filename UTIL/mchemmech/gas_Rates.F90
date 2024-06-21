@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : gas_Rates.f90
-! Time                 : Thu Jun 20 15:54:13 2024
+! Time                 : Fri Jun 21 11:41:45 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : gas.kpp
 ! Output root filename : gas
@@ -357,6 +357,8 @@ SUBROUTINE Update_RCONST ( )
 
 ! Begin INLINED RCONST
 
+
+  USE MCHEM_CLOUDS, ONLY: UPDATE_GM1_GM2
 
 REAL(dp)  :: FALLOFF_T10_R4
 REAL(dp)  :: FALLOFF_T10_R6

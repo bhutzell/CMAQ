@@ -28,6 +28,7 @@
 
       INTEGER, PARAMETER  :: SPC_DIM = 1000
       INTEGER, SAVE                         :: N_CL_SPC               ! Number of cloud species per cloud
+      INTEGER, SAVE                         :: N_CL_SPC_CHARGED       ! Number of charged cloud species per cloud
       INTEGER, PARAMETER                    :: N_IC = 2               ! Number of possible surrogate species.
                                                                       !   Currently this is limited to two species.
       INTEGER, PARAMETER                    :: CL_TYPES = 2           ! Number of cloud types
@@ -73,6 +74,14 @@
       END TYPE MECH_SPECIES_CLOUDS
 
       TYPE (MECH_SPECIES_CLOUDS), ALLOCATABLE, SAVE :: MECH_SPC_CL(:)
+
+      TYPE CHARGED_SPECIES_CLOUDS
+          CHARACTER( 19 ), DIMENSION( CL_TYPES ) :: NAME      ! MECH Species Name
+          INTEGER        , DIMENSION( CL_TYPES ) :: KPP_INDEX ! MECH Species Index
+          REAL                                   :: CHARGE    ! Charge of species
+      END TYPE CHARGED_SPECIES_CLOUDS
+
+      TYPE (CHARGED_SPECIES_CLOUDS), ALLOCATABLE, SAVE :: CHARGED_SPC_CL(:)
 
 C...Variables related to CGRID conversion
       INTEGER, ALLOCATABLE, SAVE :: QAE( : ) ! CGRID pointer to ug/m3 species
@@ -438,7 +447,7 @@ C...  for H+
         IMPLICIT NONE
 
         INTEGER, SAVE       :: DEV_CL_NML
-        INTEGER             :: ICL, ICLT                   ! Loop indices
+        INTEGER             :: ICL, ICLT, ICLC             ! Loop indices
         CHARACTER( 200 )    :: FMT                         ! Format for log-file output
         CHARACTER( 16 )     :: CL_NML_NAME = 'CL_spec.nml' ! Name of cloud-nml file
 
@@ -548,6 +557,28 @@ C..   Report cloud species definitions to log-file
      &                          MECH_SPC_CL( ICL )%EV_TYPE, MECH_SPC_CL( ICL )%EV_FAC,
      &                          MECH_SPC_CL( ICL )%WETSUB, MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX
            END DO
+        END DO
+
+C..   Find all charged species and allocate array
+        N_CL_SPC_CHARGED = 0
+        DO ICL = 1,N_CL_SPC
+           IF ( MECH_SPC_CL( ICL )%CHARGE .NE. 0. ) THEN
+             N_CL_SPC_CHARGED = N_CL_SPC_CHARGED + 1
+           END IF
+        END DO
+        ALLOCATE( CHARGED_SPC_CL( N_CL_SPC_CHARGED ) )
+
+C..   Fill charged species array
+        ICLC = 0
+        DO ICL = 1,N_CL_SPC
+           IF ( MECH_SPC_CL( ICL )%CHARGE .NE. 0. ) THEN
+              ICLC = ICLC + 1
+              DO ICLT = 1,CL_TYPES
+                 CHARGED_SPC_CL( ICLC )%NAME( ICLT )      = MECH_SPC_CL( ICL )%NAME( ICLT )
+                 CHARGED_SPC_CL( ICLC )%KPP_INDEX( ICLT ) = MECH_SPC_CL( ICL )%KPP_INDEX( ICLT )
+              END DO
+              CHARGED_SPC_CL( ICLC )%CHARGE = MECH_SPC_CL( ICL )%CHARGE
+           END IF
         END DO
 
       END SUBROUTINE CL_SPCS_DEF
@@ -1038,5 +1069,34 @@ C..Local Variables:
         IF ( ( IND .GT. INR ) .AND. ( IND .LE. ITR ) ) SPC_TYPE = 'TR'
 
       END FUNCTION SPC_TYPE
+
+      SUBROUTINE UPDATE_GM1_GM2 ( GM1,GM2,PHI2,VAR,CL_TYPE )
+
+        IMPLICIT NONE
+
+        REAL( dp ), INTENT( INOUT ) :: GM1
+        REAL( dp ), INTENT( INOUT ) :: GM2
+        REAL( dp ), INTENT( IN )    :: PHI2
+        REAL( dp ), INTENT( IN )    :: VAR( : )
+        INTEGER,    INTENT( IN )    :: CL_TYPE
+
+        INTEGER                     :: ICL
+        REAL( dp )                  :: STION
+        REAL( dp )                  :: GM1LOG
+        REAL( dp )                  :: GM2LOG
+
+        STION = 0.0D0
+        DO ICL = 1,N_CL_SPC_CHARGED
+          STION = STION + ( ( REAL( CHARGED_SPC_CL( ICL )%CHARGE, dp ) ) ** 2.0D0 *
+     &            VAR( CHARGED_SPC_CL( ICL )%KPP_INDEX( CL_TYPE ) ) )
+        END DO
+        STION  = 0.5D0 * STION * PHI2
+
+        GM1LOG = -0.509D0 * ( SQRT( STION ) / ( 1.0D0 + SQRT( STION ) ) - 0.2D0 * STION )
+        GM2LOG = GM1LOG * 4.0D0
+        GM1    = 10.0D0**GM1LOG
+        GM2    = MAX( 10.0D0**GM2LOG, 1.0D-30 )
+
+      END SUBROUTINE UPDATE_GM1_GM2
 
       END MODULE MCHEM_CLOUDS
