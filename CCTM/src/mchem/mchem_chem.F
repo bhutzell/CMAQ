@@ -33,7 +33,8 @@ C-----------------------------------------------------------------------
       USE mchem_Model
       USE mchem_Initialize, ONLY: Initialize
       USE mchem_clouds
-      USE mchem_DATA,       ONLY: MECH_SPC
+      USE mchem_DATA,       ONLY: MECH_SPC, NSTEPS, NFAILS,
+     &                            pH_RS, pH_CV
       USE PHOT_MOD,         ONLY: RJ     ! photolysis rate
       USE AEROSOL_CHEMISTRY,ONLY: KHETERO
 
@@ -243,6 +244,16 @@ C.. Alternative KPP options
       !~~~> End Time loop
       !C(:) = MAX(C(:),CONCMIN)
       ! END integration
+
+C...save KPP diagnostics
+      NSTEPS( COL,ROW,LEV ) = REAL( ISTATUS( 3 ), 8 )
+      NFAILS( COL,ROW,LEV ) = REAL( ISTATUS( 5 ), 8 )
+
+C...calculate cloud pH as diagnostic
+      IF ( ( LCL_RS ) .AND. ( C( ind_Hp_RS ) .GT. 0. ) )
+     &     pH_RS( COL,ROW,LEV ) = - LOG10( C( ind_Hp_RS ) * PHI2_RS )
+      IF ( ( LCL_CV ) .AND. ( C( ind_Hp_CV ) .GT. 0. ) )
+     &     pH_CV( COL,ROW,LEV ) = - LOG10( C( ind_Hp_CV ) * PHI2_CV )
 
       ! Fill CGRID
       DO SPC = 1, NSPEC

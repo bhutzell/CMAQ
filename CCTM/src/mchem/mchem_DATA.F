@@ -48,6 +48,12 @@ C..SPC type
 
       CHARACTER( 200 )        :: FMT                  ! Format for log-file output
 
+C..KPP and cloud diagnostics
+      REAL( 8 ), ALLOCATABLE   :: pH_RS     ( :,:,: )   ! pH of resolved clouds
+      REAL( 8 ), ALLOCATABLE   :: pH_CV     ( :,:,: )   ! pH of convective clouds
+      REAL( 8 ), ALLOCATABLE   :: NSTEPS    ( :,:,: )   ! number of steps in KPP
+      REAL( 8 ), ALLOCATABLE   :: NFAILS    ( :,:,: )   ! number of rejected steps in KPP
+
       CONTAINS
  
 C------------------------------------------------------------------------
@@ -147,5 +153,30 @@ C.. Report species setup
          END DO
 
       END SUBROUTINE ALLOC_KPP_SPC
+
+      SUBROUTINE ALLOC_DIAGNOSTICS ( JDATE, JTIME )
+
+        USE UTILIO_DEFN
+        USE GRID_CONF             ! horizontal & vertical domain specifications
+
+        IMPLICIT NONE
+
+        INTEGER, INTENT( IN )    :: JDATE        ! current model date, coded YYYYDDD
+        INTEGER, INTENT( IN )    :: JTIME        ! current model time, coded HHMMSS
+
+        INTEGER ALLOCSTAT                        ! Allocate status code
+        CHARACTER(  16 ) :: PNAME = 'MCHEM_DIAG' ! Procedure name
+        CHARACTER( 144 ) :: XMSG                 ! Message text
+
+        ALLOCATE ( pH_RS ( NCOLS, NROWS, NLAYS ),
+     &             pH_CV ( NCOLS, NROWS, NLAYS ),
+     &             NSTEPS( NCOLS, NROWS, NLAYS ),
+     &             NFAILS( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = '*** Error allocating pH_RS, pH_CV, NSTEPS, and NFAILS'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+
+      END SUBROUTINE ALLOC_DIAGNOSTICS
 
       END MODULE MCHEM_DATA

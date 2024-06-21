@@ -40,7 +40,8 @@ C.. Cloud data
       USE MCHEM_CLOUDS
 
 C.. MCHEM Data
-      USE MCHEM_DATA, ONLY: ALLOC_KPP_SPC
+      USE MCHEM_DATA, ONLY: ALLOC_KPP_SPC, ALLOC_DIAGNOSTICS,
+     &                      NSTEPS, NFAILS, pH_RS, pH_CV
       USE MCHEM_PARAMETERS, ONLY: NREACT_MCHEM => NREACT
       USE GAS_PARAMETERS, ONLY: NREACT_GAS => NREACT
 
@@ -283,13 +284,20 @@ C..Allocate AE related pointers
 C..Allocate wet deposition data
          CALL ALLOC_WDEP_DATA( JDATE, JTIME )
 
-c..Open file for mchem stats if requested
+C..Allocate diagnostics
+         CALL ALLOC_DIAGNOSTICS( JDATE, JTIME )
+
+C..Open file for mchem stats if requested
 #ifdef mchem_stats
-         ALLOCATE( VSTATS( 4 ) )
+         ALLOCATE( VSTATS( 8 ) )
          VSTATS( 1 ) = 'LWC_RS'
          VSTATS( 2 ) = 'LWC_CV'
          VSTATS( 3 ) = 'PRATE1_RS'
          VSTATS( 4 ) = 'PRATE1_CV'
+         VSTATS( 5 ) = 'pH_RS'
+         VSTATS( 6 ) = 'pH_CV'
+         VSTATS( 7 ) = 'N_STEPS'
+         VSTATS( 8 ) = 'N_FAILS'
 
          IF ( MYPE .EQ. 0 ) THEN
 
@@ -300,7 +308,7 @@ c..Open file for mchem stats if requested
             SDATE3D = EDATE
             STIME3D = ETIME
             TSTEP3D = TSTEP( 1 )
-            NVARS3D = 4
+            NVARS3D = 8
             NCOLS3D = GL_NCOLS
             NROWS3D = GL_NROWS
             NLAYS3D = NLAYS
@@ -308,18 +316,34 @@ c..Open file for mchem stats if requested
             VNAME3D( 2 ) = 'LWC_CV'
             VNAME3D( 3 ) = 'PRATE1_RS'
             VNAME3D( 4 ) = 'PRATE1_CV'
+            VNAME3D( 5 ) = 'pH_RS'
+            VNAME3D( 6 ) = 'pH_CV'
+            VNAME3D( 7 ) = 'N_STEPS'
+            VNAME3D( 8 ) = 'N_FAILS'
             VDESC3D( 1 ) = 'Liquid water content of resolved clouds'
             VDESC3D( 2 ) = 'Liquid water content of convective clouds'
             VDESC3D( 3 ) = 'Precipitation rate of resolved clouds'
             VDESC3D( 4 ) = 'Precipitation rate of convective clouds'
+            VDESC3D( 5 ) = 'pH of resolved clouds'
+            VDESC3D( 6 ) = 'pH of convective clouds'
+            VDESC3D( 7 ) = 'Number of steps in KPP'
+            VDESC3D( 8 ) = 'Number of rejected steps in KPP'
             UNITS3D( 1 ) = 'kg/m3'
             UNITS3D( 2 ) = 'kg/m3'
             UNITS3D( 3 ) = 'mm/hr'
             UNITS3D( 4 ) = 'mm/hr'
+            UNITS3D( 5 ) = '-'
+            UNITS3D( 6 ) = '-'
+            UNITS3D( 7 ) = '-'
+            UNITS3D( 8 ) = '-'
             VTYPE3D( 1 ) = M3REAL
             VTYPE3D( 2 ) = M3REAL
             VTYPE3D( 3 ) = M3REAL
             VTYPE3D( 4 ) = M3REAL
+            VTYPE3D( 5 ) = M3REAL
+            VTYPE3D( 6 ) = M3REAL
+            VTYPE3D( 7 ) = M3REAL
+            VTYPE3D( 8 ) = M3REAL
             IF ( .NOT. OPEN3( CTM_MCHEMSTATS_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create '// TRIM( CTM_MCHEMSTATS_1 ) // ' file'
                CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT2 )
@@ -361,8 +385,12 @@ C   appropriately updated after the solver finds a solution.
 
       CALL HETCHEM_RATES( TA, PRES, QV, CGRID, DENS )
 
-C.. Reset wet deposition array for current time step
+C.. Reset wet deposition and pH array for current time step
       WET_DEP = 0.0D0
+      pH_RS   = -9999.9D0
+      pH_CV   = -9999.9D0
+      NSTEPS  = 0.0D0
+      NFAILS  = 0.0D0
 
 C.. Convert CGRID species
 C..  gas, non-reactive, and tracer to molar mixing ratio (by volume)
@@ -583,6 +611,30 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 4 ),
      &         EDATE, ETIME, REAL( PRATE1_CV, 4 ) ) ) THEN
+            XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
+            CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
+         END IF
+
+         IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 5 ),
+     &         EDATE, ETIME, REAL( pH_RS, 4 ) ) ) THEN
+            XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
+            CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
+         END IF
+
+         IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 6 ),
+     &         EDATE, ETIME, REAL( pH_CV, 4 ) ) ) THEN
+            XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
+            CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
+         END IF
+
+         IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 7 ),
+     &         EDATE, ETIME, REAL( NSTEPS, 4 ) ) ) THEN
+            XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
+            CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
+         END IF
+
+         IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 8 ),
+     &         EDATE, ETIME, REAL( NFAILS, 4 ) ) ) THEN
             XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
             CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
          END IF

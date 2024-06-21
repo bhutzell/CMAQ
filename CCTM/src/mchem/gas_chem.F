@@ -32,7 +32,8 @@ C-----------------------------------------------------------------------
 
       USE gas_Model
       USE gas_Initialize,   ONLY: Initialize
-      USE mchem_DATA,       ONLY: MECH_SPC_GAS
+      USE mchem_DATA,       ONLY: MECH_SPC_GAS, NSTEPS, NFAILS,
+     &                            pH_RS, pH_CV
       USE PHOT_MOD,         ONLY: RJ     ! photolysis rate
       USE AEROSOL_CHEMISTRY,ONLY: KHETERO
 
@@ -151,6 +152,10 @@ C.. Alternative KPP options
       !~~~> End Time loop
       !C(:) = MAX(C(:),CONCMIN)
       ! END integration
+
+C...save KPP diagnostics
+      NSTEPS( COL,ROW,LEV ) = REAL( ISTATUS( 3 ), 8 )
+      NFAILS( COL,ROW,LEV ) = REAL( ISTATUS( 5 ), 8 )
 
       ! Fill CGRID
       DO SPC = 1, NSPEC
