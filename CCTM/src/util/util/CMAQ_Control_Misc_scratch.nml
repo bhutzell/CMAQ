@@ -94,6 +94,38 @@
   Avrg_Layer_Top = 1
   Avrg_Vars_Nml  = 'DEFAULT'
 
+! Example for limited output
+  Avrg_Vars_Nml = 'NO2', 'FORM', 'SO2', 'O3', 'PM25', 'PM10', 'DENS', 'NOX', 'AOD_550','PMF'
+                  
+                  'ALL_ISAM','NO2_EGU','NOX_FIRES','NOX_ISAM','NOX_PTEGU','NO2_EGU','PMF_TAGS','DD_NO2_EGU'
+                                                                       
+                  'NOX_ISAM' =  'NOX_EGU','NOX_FIRES','NOX_BCO','NOX_ICO','NOX_OTH','NOX_TAGS'
+                                                                       
+                  'DD_NO2_PTEGU','DD_NO2','WD_NO2_ISAM',
+                 
+                  'NO2_ISAM','NO2_BULK','ASO4_ISAM','ASO4_TAGS','ASO4*'
+
+  Avrg_Vars_Nml = 'NO2','ALL_NO2',
+                        'ASO4_ISAM'     = 'ASO4_EGU','ASO4_MOB','ASO4_ICO','ASO4_ISUM'
+
+                        'WD_PMF_SO4_ISAM' 
+
+                        'ASO4*_ISAM'    = 'ASO4I_EGU','ASO4I_MOB','ASO4I_ICO','ASO4I_TAGS',
+                                          'ASO4J_EGU','ASO4J_MOB','ASO4J_ICO','ASO4J_TAGS',
+                                          'ASO4K_EGU','ASO4K_MOB','ASO4K_ICO','ASO4K_TAGS'
+                        'WD_ASO4J_ISAM'  = 'WD_ASO4J_EGU'...
+
+                        'ASO4_DDM'      = 
+
+                        'WD_NO2_EGU'
+
+
+                  'ASO4*' = 'ASO4I','ASO4J','ASO4K'
+                  'ASO4' = 'ASO4I+ASO4J+ASO4K'
+                  
+                  'ASO4'     = 'ASO4I','ASO4J','ASO4K'
+                  'ASO4_SUM' = 'ASO4I+ASO4J+ASO4K'
+
 /                                                               
 
 
