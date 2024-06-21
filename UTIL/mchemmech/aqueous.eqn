@@ -174,6 +174,12 @@
 !<AQIEP2_a##> IEPOX_a## + SO4mm_a## = ISO3_a##                                   : XCL_a##*KIEPOX(8.83D-3,2.92D-6,0);
 !<AQIEP3_a##> IEPOX_a## + NO3m_a##  = ISO3_a##                                   : XCL_a##*KIEPOX(2.0D-4,2.92D-6,0);
 
+! Aitken aerosol scavenging
+<AKN01_a##>  ANO3I = NO3m_a##    + WD_ANO3I   : XCL_a##*KPP_ALFA3_a##;
+<AKN02_a##>  ANH4I = NH4p_a##    + WD_ANH4I   : XCL_a##*KPP_ALFA3_a##;
+<AKN03_a##>  ACLI  = CLm_a##     + WD_ACLI    : XCL_a##*KPP_ALFA3_a##;
+<AKN04_a##>  ASO4I = SO4mm_a##   + WD_ASO4I   : XCL_a##*KPP_ALFA3_a##;
+
 ! Wet deposition
 <AQWD01_a##> Hp_a##       = WD_Hp         : XCL_a##*WFAC_a##;
 <AQWD02_a##> OHm_a##      = WD_OHm        : XCL_a##*WFAC_a##;

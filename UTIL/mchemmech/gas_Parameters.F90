@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : gas_Parameters.f90
-! Time                 : Thu May  9 20:59:05 2024
+! Time                 : Thu Jun 20 15:54:13 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : gas.kpp
 ! Output root filename : gas

@@ -123,6 +123,7 @@ C.. Alternative KPP options
          GM2_RS  = 1.0D0
          PHI2_RS = 1000.0D0 / 6.022d23 / (LWC_RS * 1.D-3)
          WFAC_RS = REAL( WETFAC_RS( COL,ROW,LEV ), dp )
+         KPP_ALFA3_RS = REAL( ALFA3_RS( COL,ROW,LEV ), dp )
       ELSE
          XCL_RS  = 0.0D0
          GM1_RS  = 0.0D0
@@ -130,6 +131,7 @@ C.. Alternative KPP options
          PHI2_RS = 0.0D0
          WFAC_RS = 0.0D0
          LWC_RS  = 0.0D0 ! Reset lwc if below limit
+         KPP_ALFA3_RS = 0.0D0
       END IF
       IF ( LCL_CV ) THEN
          XCL_CV  = 1.0D0
@@ -137,6 +139,7 @@ C.. Alternative KPP options
          GM2_CV  = 1.0D0
          PHI2_CV = 1000.0D0 / 6.022d23 / (LWC_CV * 1.D-3)
          WFAC_CV = REAL( WETFAC_CV( COL,ROW,LEV ), dp )
+         KPP_ALFA3_CV = REAL( ALFA3_CV( COL,ROW,LEV ), dp )
       ELSE
          XCL_CV  = 0.0D0
          GM1_CV  = 0.0D0
@@ -144,6 +147,7 @@ C.. Alternative KPP options
          PHI2_CV = 0.0D0
          WFAC_CV = 0.0D0
          LWC_CV  = 0.0D0 ! Reset lwc if below limit
+         KPP_ALFA3_CV = 0.0D0
       END IF
       TFAC      = ( 298.0D0 - TEMP) / ( 298.0D0 * TEMP );
       ! Calculate Henry's law coefficients

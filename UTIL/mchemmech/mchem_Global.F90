@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : mchem_Global.f90
-! Time                 : Mon Jun 17 13:22:51 2024
+! Time                 : Thu Jun 20 15:54:12 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : mchem.kpp
 ! Output root filename : mchem
@@ -39,7 +39,7 @@ MODULE mchem_Global
   REAL(kind=dp) :: FIX(NFIX)
 ! VAR, FIX are chunks of array C
       EQUIVALENCE( C(1),VAR(1) )
-      EQUIVALENCE( C(393),FIX(1) )
+      EQUIVALENCE( C(399),FIX(1) )
 ! RCONST - Rate constants (global)
   REAL(kind=dp) :: RCONST(NREACT)
 ! TIME - Current integration time
@@ -95,12 +95,15 @@ REAL(dp)            :: GM2_RS        !
 REAL(dp)            :: GM2_CV        !
 REAL(dp)            :: WFAC_RS       !
 REAL(dp)            :: WFAC_CV       !
+REAL(dp)            :: KPP_ALFA3_RS  !
+REAL(dp)            :: KPP_ALFA3_CV  !
 ! Henry's law constants. Just temporary
 REAL(dp)            :: H_SO2, H_HNO3, H_CO2, H_NH3, H_H2O2
 REAL(dp)            :: H_O3, H_FACD, H_HCL, H_GLY, H_MGLY
 REAL(dp)            :: H_OH, H_HO2, H_NO2, H_HONO, H_HNO4
 REAL(dp)            :: H_GLYD, H_AACD, H_FORM, H_NO3, H_CH3O2
 REAL(dp)            :: H_IEPOX, H_MHP, H_PAA
+! Scavenging rates
 REAL(dp)            :: KPP_RSCAV(NSPEC)
 
 INTEGER, PARAMETER  :: KPP_NPHOTAB  =  32     ! number of photolysis rates
