@@ -75,7 +75,7 @@ C...........Local Variables:
       INTEGER SPC             ! Species loop index
       INTEGER ICGSPC          ! Index of species in CGRID
       INTEGER ICSPC           ! Index of species in CONC
-      INTEGER NPH             ! Index for number of phot. rxns in PHOT
+      INTEGER NPH             ! Index for number of photolysis reaction in PHOT
       REAL(8)                 :: ALFA                 ! total (RS + CV) scavenging rate coefficient (1/s)
 
 C-----------------------------------------------------------------------

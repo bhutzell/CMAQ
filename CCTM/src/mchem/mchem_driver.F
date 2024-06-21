@@ -29,8 +29,6 @@ C  Preconditions: None
 C
 C**********************************************************************
 
-      USE RXNS_DATA
-      USE RXNS_FUNCTION
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
@@ -43,6 +41,8 @@ C.. Cloud data
 
 C.. MCHEM Data
       USE MCHEM_DATA, ONLY: ALLOC_KPP_SPC
+      USE MCHEM_PARAMETERS, ONLY: NREACT_MCHEM => NREACT
+      USE GAS_PARAMETERS, ONLY: NREACT_GAS => NREACT
 
       IMPLICIT NONE
 
@@ -98,10 +98,8 @@ C..Local Variables:
       INTEGER MIDDATE         ! Date at time step midpoint
       INTEGER MIDTIME         ! Time at time step midpoint
       INTEGER NCELL           ! Index for number of cells
-      INTEGER NPH             ! Index for number of phot. rxns in PHOT
       INTEGER NRX             ! Index for number of reactions
       INTEGER SPC             ! Species loop index
-      INTEGER CSPC            ! RXNS Species loop index
       INTEGER STRT
       INTEGER FINI
       INTEGER IVAR
@@ -109,9 +107,6 @@ C..Local Variables:
       INTEGER COL             ! Column index
       INTEGER LEV             ! Layer index
       INTEGER ROW             ! Row index
-      INTEGER IRXNS           ! Index used in RXNS data
-      INTEGER ICGSPC          ! Index of species in CGRID
-      INTEGER ICSPC           ! Index of species in CONC
 
       REAL, ALLOCATABLE, SAVE :: SEAICE ( :, : )         ! fractional seaice cover, [-]
 
@@ -240,7 +235,7 @@ C**********************************************************************
 #endif
 
 
-      IF ( NUMB_MECH_SPC .EQ. 0 ) THEN
+      IF ( ( NREACT_MCHEM .EQ. 0 ) .OR. ( NREACT_GAS .EQ. 0 ) ) THEN
          CALL M3MESG( '*** WARNING: Gas-Chemistry processing bypassed!' )
          RETURN
       END IF
