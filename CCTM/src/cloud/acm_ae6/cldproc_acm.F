@@ -69,12 +69,14 @@ C-----------------------------------------------------------------------
 #ifdef isam
       USE SA_DEFN, ONLY: ISAM, NSPC_SA, N_SPCTAG, TOT_SADEP, CONV_SADEP,
      &                   MAP_SAtoCGR, VNAM_SPCTAG, NTAG_SA, S_SPCTAG, 
-     &                   ITAG, T_SPCTAG
+     &                   ITAG, T_SPCTAG, ISAM_SPEC
+      USE ELMO_DATA, ONLY : ELMO_ISAM_WDEP
 #endif
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY: NP, NPMAX, SENGRID, SENNUM, 
      &                      S_TOTDEP, S_CONDEP, S_DEPWRT, SEN_PAR
+      USE ELMO_DATA, ONLY : ELMO_DDM_WDEP
 #endif
 
 #ifdef mpas
@@ -162,6 +164,9 @@ C...........Local Variables
 
 #ifdef isam
       REAL, ALLOCATABLE, SAVE :: BUFF2 ( :,: )
+      INTEGER, ALLOCATABLE, SAVE :: ISAM_WDEP( : )
+      INTEGER :: W
+      CHARACTER( 16 ) :: ISAM_SPECIES
 #endif
 
 C...........EXTERNAL FUNCTIONS
@@ -262,7 +267,7 @@ C...initialize the deposition array before processing clouds
 Ckrt deposition arrays for tagged species.....
         ALLOCATE ( TOT_SADEP ( NCOLS,NROWS,NSPC_SA,NTAG_SA ),
      &            CONV_SADEP ( NCOLS,NROWS,NSPC_SA,NTAG_SA ),
-     &            ISAM_WDEP  ( NSPC_SA ),
+     &            ISAM_WDEP  ( N_SPCTAG ),
      &             STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
           XMSG = 'Failure allocating TOT_ or CONV_SADEP'

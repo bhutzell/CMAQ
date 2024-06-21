@@ -213,7 +213,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_TNO3TOT =    167                     
       INTEGER, PARAMETER :: ID_PM25_FRM =   168                     
       INTEGER, PARAMETER :: ID_PMF_FRM =    169                     
-      INTEGER, PARAMETER :: ID_AOD550 =     160                     
+      INTEGER, PARAMETER :: ID_AOD550 =     170                     
       INTEGER, PARAMETER :: ID_PMEXT550 =   171
       INTEGER, PARAMETER :: ID_RH =         172
       INTEGER, PARAMETER :: ID_TEMP =       173
@@ -223,7 +223,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_GN2O5C =     177
       INTEGER, PARAMETER :: ID_YCLNO2F =    178
       INTEGER, PARAMETER :: ID_YCLNO2C =    179
-      INTEGER, PARAMETER :: ID_GIEPOX =     170
+      INTEGER, PARAMETER :: ID_GIEPOX =     180
       INTEGER, PARAMETER :: ID_KIEPOX =     181
       INTEGER, PARAMETER :: ID_GIMAE =      182
       INTEGER, PARAMETER :: ID_DZ    =      183
@@ -233,7 +233,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_DENS  =      187
       INTEGER, PARAMETER :: ID_RHOJ  =      188
       INTEGER, PARAMETER :: ID_GAS_HNO3 =   189
-      INTEGER, PARAMETER :: ID_GAS_NH3  =   180
+      INTEGER, PARAMETER :: ID_GAS_NH3  =   190
       INTEGER, PARAMETER :: ID_DD_OXN_NOX = 191
       INTEGER, PARAMETER :: ID_WD_OXN_NOX = 192
       INTEGER, PARAMETER :: ID_DD_OXN_TNO3= 193
@@ -538,12 +538,14 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       REAL, ALLOCATABLE, SAVE :: WDEP_VEC( : )
       REAL, ALLOCATABLE, SAVE :: DDEP_VEC( : )
 #ifdef isam
-      REAL, ALLOCATABLE, SAVE :: ISAM_WDEP_VEC( : )
-      REAL, ALLOCATABLE, SAVE :: ISAM_DDEP_VEC( : )
+      REAL, ALLOCATABLE, SAVE :: ISAM_VEC( :,: )
+      REAL, ALLOCATABLE, SAVE :: ISAM_WDEP_VEC( :,: )
+      REAL, ALLOCATABLE, SAVE :: ISAM_DDEP_VEC( :,: )
 #endif
 #ifdef sens
-      REAL, ALLOCATABLE, SAVE :: DDM_WDEP_VEC( : )
-      REAL, ALLOCATABLE, SAVE :: DDM_DDEP_VEC( : )
+      REAL, ALLOCATABLE, SAVE :: DDM_VEC( :,: )
+      REAL, ALLOCATABLE, SAVE :: DDM_WDEP_VEC( :,: )
+      REAL, ALLOCATABLE, SAVE :: DDM_DDEP_VEC( :,: )
 #endif
       
       
@@ -639,6 +641,52 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                      ETYPE_DDM_AEROBULK = 15, ETYPE_DDM_FAM = 16,
      &                      ETYPE_DDM_WDEP = 17, ETYPE_DDM_DDEP = 18
 
+      CHARACTER( 14 ), PARAMETER :: CETYPE(18) = 
+     &    (/'ELMO          ','CGRID         ','BULK_AERO     ',
+     &      'FAMILY        ','WETDEP        ','DRYDEP        ',
+     &      'ISAM_ELMO     ','ISAM_CGRID    ','ISAM_BULK_AERO',
+     &      'ISAM_FAMILY   ','ISAM_WETDEP   ','ISAM_DRYDEP   ',
+     &      'DDM_ELMO      ','DDM_CGRID     ','DDM_BULK_AERO ',
+     &      'DDM_FAMILY    ','DDM_WETDEP    ','DDM_DRYDEP    ' /)
+
+      ! Define List of Possible Units for Output
+      INTEGER, PARAMETER :: N_UNIT = 25
+      CHARACTER( 10 ), PARAMETER :: CUNIT( N_UNIT ) = 
+     &    (/'UG M-3    ','PPMV      ','UGC M-3   ','PPMC      ',
+     &      'UGN M-3   ','PPMN      ','M-3       ','M2 M-3    ',
+     &      'HA-1      ','M2 HA-1   ','KG HA-1   ','1         ',
+     &      '          ','UM        ','M3 M-3    ','N M-3     ',
+     &      'KG M-3    ','UMOL M-3  ','MOL L-1   ','UG UG-1   ',
+     &      'K         ','PA        ','S-1       ','M         ',
+     &      'MM-1      ' /)
+      
+      INTEGER, PARAMETER :: IU_UNSP    = 0   ! Unspecified Units
+      INTEGER, PARAMETER :: IU_UGpM3   = 1   ! ug m-3
+      INTEGER, PARAMETER :: IU_PPMV    = 2   ! ppmV
+      INTEGER, PARAMETER :: IU_UGCpM3  = 3   ! ugC m-3
+      INTEGER, PARAMETER :: IU_PPMC    = 4   ! ppmC
+      INTEGER, PARAMETER :: IU_UGNpM3  = 5   ! ugN m-3
+      INTEGER, PARAMETER :: IU_PPMN    = 6   ! ppmN
+      INTEGER, PARAMETER :: IU_pM3     = 7   ! m-3
+      INTEGER, PARAMETER :: IU_M2pM3   = 8   ! m2 m-3
+      INTEGER, PARAMETER :: IU_pHA     = 9   ! ha-1
+      INTEGER, PARAMETER :: IU_M2pHA   = 10  ! m2 ha-1
+      INTEGER, PARAMETER :: IU_KGpHA   = 11  ! kg ha-1
+      INTEGER, PARAMETER :: IU_1       = 12  ! 1
+      INTEGER, PARAMETER :: IU_NONE    = 13  ! dimensionless
+      INTEGER, PARAMETER :: IU_UM      = 14  ! um
+      INTEGER, PARAMETER :: IU_M3pM3   = 15  ! m3 m-3
+      INTEGER, PARAMETER :: IU_NpM3    = 16  ! N m-3
+      INTEGER, PARAMETER :: IU_KGpM3   = 17  ! kg m-3
+      INTEGER, PARAMETER :: IU_UMOLpM3 = 18  ! umol m-3
+      INTEGER, PARAMETER :: IU_MOLpL   = 19  ! mol L-1
+      INTEGER, PARAMETER :: IU_UGpUG   = 20  ! ug ug-1
+      INTEGER, PARAMETER :: IU_K       = 21  ! K
+      INTEGER, PARAMETER :: IU_PA      = 22  ! Pa
+      INTEGER, PARAMETER :: IU_pS      = 23  ! s-1
+      INTEGER, PARAMETER :: IU_M       = 24  ! m
+      INTEGER, PARAMETER :: IU_pMM     = 25  ! Mm-1
+
       ! Define Logical flags for turning on output categories
       LOGICAL, SAVE :: L_ELMO_WDEP, L_ELMO_DDEP
 
@@ -719,7 +767,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         elmo_ddep = 0.0
 
 #ifdef isam
-        allocate( elmo_isam_wdep(ncols, nrows, nspc_sa, ntag_sa ), stat=ios)
+        allocate( elmo_isam_wdep(ncols, nrows, n_spc_wdep, ntag_sa ), stat=ios)
         call checkmem( ios, 'ELMO_ISAM_WDEP',pname )
         elmo_isam_wdep = 0.0
 
@@ -961,148 +1009,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       END SUBROUTINE ELMO_CHECK_LAYERS
 
 !-------------------------------------------------------------------------
-      SUBROUTINE INIT_ELMO_COMP( J, N_VARS, AEROTYPE_TMP )
-!     This subroutine allocates and initalizes all of the elements of an 
-!        index IDG within the ELMO_COEFFS structure
-!
-!     IDG - the index of this ELMO variable in the space defined
-!           by the integer index variables like ID_PMF_POC, etc.
-!     N_VARS - Number of variables used to create this aggregate variable. 
-!           Does not include the number of modes. For example, ASO4I+ASO4J 
-!           counts as 1 variable (ASO4). It will be expanded to modes later.
-!     AEROTYPE - Aerosol size range or mode to be calculated. This defines 
-!           the modes considered and the inlet type if any. Options
-!           include:
-!             ALL, NONE, ULTRAFINE, FINE, COARSE, NUCLEATION, AITKEN,
-!             ACCUMULATION, PM01, PM1, PM25, PM10, PM25to10 and PMAMS
-!     
-!-------------------------------------------------------------------------
-
-      USE AERO_DATA, ONLY : N_MODE, AEROMODE
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT( IN ) :: J 
-      INTEGER, INTENT( IN ) :: N_VARS
-      CHARACTER( * ), INTENT( IN ) ::  AEROTYPE_TMP
-      CHARACTER( 20 ) AEROTYPE
-      INTEGER VAR_TYPE, ISRC
-
-      CHARACTER( 200 ) XMSG
-      CHARACTER(16), SAVE :: PNAME = 'INIT_ELMO_COEF'
-      INTEGER ALLOCSTAT
-
-      ! Initialize All Components of ELMO_COEFFS
-      ELMO_TABLE( J )%L_COMP = .TRUE.
-      ELMO_COMP( J )%N_VARS = N_VARS
-      ALLOCATE( ELMO_COMP( J )%L_MODE  ( N_MODE ),
-     &          ELMO_COMP( J )%L_SOURCE( N_VARS ),
-     &          ELMO_COMP( J )%MW      ( N_VARS ),
-     &          ELMO_COMP( J )%SPC_UNIT( N_VARS ),
-     &          ELMO_COMP( J )%ID      ( N_VARS ),
-     &          ELMO_COMP( J )%TABID   ( N_VARS ),
-     &          ELMO_COMP( J )%VAR_TYPE( N_VARS ),
-     &          ELMO_COMP( J )%COEFF   ( N_VARS ),
-     &          STAT=ALLOCSTAT )
-      IF ( ALLOCSTAT .NE. 0 ) THEN
-           XMSG = 'Failure allocating ELMO_COMP' 
-           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
-
-      ELMO_COMP( J )%L_VALID        = .TRUE.
-      ELMO_COMP( J )%L_MODE  ( : )  = .FALSE.
-      ELMO_COMP( J )%L_SOURCE( : )  = .FALSE.
-      ELMO_COMP( J )%MW      ( : )  = 0.
-      ELMO_COMP( J )%SPC_UNIT( : )  = 0
-      ELMO_COMP( J )%ID      ( : )  = 0
-      ELMO_COMP( J )%TABID   ( : )  = 0
-      ELMO_COMP( J )%VAR_TYPE( : )  = 0
-      ELMO_COMP( J )%COEFF   ( : )  = 0.
-      ELMO_COMP( J )%INLET          = 0
-      ELMO_COMP( J )%WETNESS        = IWET
-
-      ! Specify the Aerosol Modes Needed and Inlet Type based on User
-      ! Input through the AEROTYPE variable.
-      AEROTYPE = AEROTYPE_TMP
-      CALL UPCASE( AEROTYPE )
-      SELECT CASE ( AEROTYPE )
-         CASE ( 'ALL' )
-             ELMO_COMP( J )%L_MODE( : ) = .TRUE.
-         CASE ('NONE' )
-             ELMO_COMP( J )%L_MODE( : ) = .FALSE.
-         CASE ('ULTRAFINE' )
-             ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%ULTRAFINE_MASK
-         CASE ('FINE' )
-             ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%FINE_MASK
-         CASE ('COARSE' )
-             ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%COARSE_MASK
-         CASE ('NUCLEATION' )
-             ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%NUC_MASK
-         CASE ('AITKEN' )
-             ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%AITKEN_MASK
-         CASE ('ACCUMULATION' )
-             ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%ACCUM_MASK
-         CASE ('PM01' )
-             ELMO_COMP( J )%L_MODE( : ) = .TRUE.
-             ELMO_COMP( J )%INLET = IPM01
-             ELMO_COMP( J )%WETNESS = IWET
-         CASE ('PM1' )
-             ELMO_COMP( J )%L_MODE( : ) = .TRUE.
-             ELMO_COMP( J )%INLET = IPM1
-             ELMO_COMP( J )%WETNESS = IWET
-         CASE ('PM25' )
-             ELMO_COMP( J )%L_MODE( : ) = .TRUE.
-             ELMO_COMP( J )%INLET = IPM25
-             ELMO_COMP( J )%WETNESS = IWET
-         CASE ('PM10' )
-             ELMO_COMP( J )%L_MODE( : ) = .TRUE.
-             ELMO_COMP( J )%INLET = IPM10
-             ELMO_COMP( J )%WETNESS = IWET
-         CASE ('PM25TO10' )
-             ELMO_COMP( J )%L_MODE( : ) = .TRUE.
-             ELMO_COMP( J )%INLET = IPM25to10
-             ELMO_COMP( J )%WETNESS = IWET
-         CASE ('PMAMS' )
-             ELMO_COMP( J )%L_MODE( : ) = .TRUE.
-             ELMO_COMP( J )%INLET = IPMAMS
-             ELMO_COMP( J )%WETNESS = IWET
-         CASE ('GAS')
-             ! No Aerosol Parameters need to be set since
-             ! this aggregate will be all gas.
-         CASE DEFAULT
-             XMSG = 'An aerosol descriptor (' // trim(AEROTYPE) // ') has been given ' //
-     &              'for the mapping of an ELMO variable. It is not recognized.'
-             CALL M3EXIT( 'INIT_ELMO_COMP', 0, 0, XMSG, XSTAT1 )
-      END SELECT
-
-      ! Determine the Variable Type
-      VAR_TYPE = ELMO_TABLE( J )%VAR_TYPE
-      
-      ! If this variable is an ISAM or DDM variable, set the Source Mask 
-      ! for this Component
-      IF ( VAR_TYPE .EQ. ETYPE_ISAM_ELMO .OR. VAR_TYPE .EQ. ETYPE_ISAM 
-     & .OR.VAR_TYPE .EQ. ETYPE_ISAM_WDEP .OR. VAR_TYPE .EQ. ETYPE_ISAM_DDEP
-     & .OR.VAR_TYPE .EQ. ETYPE_DDM_ELMO  .OR. VAR_TYPE .EQ. ETYPE_DDM
-     & .OR.VAR_TYPE .EQ. ETYPE_DDM_WDEP  .OR. VAR_TYPE .EQ. ETYPE_DDM_DDEP 
-     & .OR.VAR_TYPE .EQ. ETYPE_ISAM_FAM  .OR. VAR_TYPE .EQ. ETYPE_DDM_FAM
-     &        ) THEN
-            
-         ! The only options are one source or all sources summed
-         ! together (SOURCE from the ELMO Table variable = 0). 
-         ! Future versions may expand the feature to allow subsets 
-         ! of sources to be summed together.
-         ISRC = ELMO_TABLE( J )%SOURCE
-         IF ( ISRC .EQ. 0 ) THEN
-            ELMO_COMP( J )%L_SOURCE(:) = .TRUE.
-         ELSE
-            ELMO_COMP( J )%L_SOURCE( ISRC ) = .TRUE.
-         END IF
-      END IF                                                                                                
-                                                                                                
-      END SUBROUTINE INIT_ELMO_COMP                                                             
-                                                                                                
-!------------------------------------------------------------------------------------------            
-      SUBROUTINE MAP_ELMO_UNITS( UNIT_TMP, IUNIT, VARNAME )
+      SUBROUTINE MAP_ELMO_UNITS( UNIT_TMP, IUNIT, VARNAME, VARTYPE )
 !     This subroutine maps units in character strings to a standard
 !     vector of ELMO units that are available for output. This integer
 !     vector distinguishes mass-based units from mole-based units so
@@ -1114,45 +1021,32 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       CHARACTER( * ), INTENT( IN ) :: UNIT_TMP 
       INTEGER, INTENT( OUT )       :: IUNIT
       CHARACTER( 16 ), INTENT( IN ):: VARNAME
-      CHARACTER(  4 ) UNITTYPE
+      INTEGER, INTENT( IN )        :: VARTYPE
+      CHARACTER(  16 ) UNITTYPE
       CHARACTER( 200 ) XMSG
+      INTEGER IT
  
 
       ! Assign Unit to Aggregate Variable
       UNITTYPE = UNIT_TMP
       CALL UPCASE( UNITTYPE )
-      SELECT CASE ( UNITTYPE )
-        CASE ( 'UG M-3' )
-           IUNIT = 1
-        CASE ( 'PPMV' )
-           IUNIT = 2
-        CASE ( 'UGC M-3' )
-           IUNIT = 1
-        CASE ( 'PPMC' )
-           IUNIT = 2
-        CASE ( 'UGN M-3' )
-           IUNIT = 1
-        CASE ( 'PPMN' )
-           IUNIT = 2
-        CASE ( 'M-3' )
-           IUNIT = 0
-        CASE ( 'M2 M-3' )
-           IUNIT = 0
-        CASE ( 'HA-1' )
-           IUNIT = 0
-        CASE ( 'M2 HA-1' )
-           IUNIT = 0
-        CASE ( 'KG HA-1' )
-           IUNIT = 1
-        CASE DEFAULT
-           IUNIT = 0
-           XMSG = 'A unit (' // trim(UNIT_TMP) // ') has been given ' //
-     &          'for the mapping of an ELMO aggregate variable, that '//
-     &          'is not consistent with a concentration or deposition '//
-     &          'flux. Confirm that this is correct for variable '//
-     &          trim(VARNAME) //'.'
-           CALL M3WARN( 'MAP_ELMO_UNITS', 0, 0, XMSG )
-      END SELECT
+      
+      IUNIT = 0
+      DO IT = 1,N_UNIT
+         IF ( UNITTYPE .EQ. CUNIT( IT ) ) THEN
+            IUNIT = IT
+         END IF
+      END DO
+
+      IF ( IUNIT .EQ. 0 ) THEN
+         IUNIT = 0
+         XMSG = 'A unit (' // trim(UNIT_TMP) // ') has been given ' //
+     &        'for the mapping of a variable of type ' // 
+     &        TRIM(CETYPE(VARTYPE)) // ' that is unknown to ELMO. ' //
+     &        'Confirm that this is correct for variable ' // trim(VARNAME) //
+     &        '.  ' // TRIM( UNITTYPE)
+         CALL M3WARN( 'MAP_ELMO_UNITS', 0, 0, XMSG )
+      END IF
  
       END SUBROUTINE MAP_ELMO_UNITS
  

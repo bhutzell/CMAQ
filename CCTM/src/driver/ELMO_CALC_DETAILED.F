@@ -661,21 +661,24 @@
 !     source to sum.          
 !----------------------------------------------------------------------
 
-      USE AERO_DATA, ONLY: N_MODE, AEROSPC_CONC, AH2O_IDX, AORGH2O_IDX, AEROSPC
+      USE AERO_DATA, ONLY: N_MODE, AEROSPC_CONC, AH2O_IDX, AORGH2O_IDX, 
+     &                     AEROSPC, N_AEROSPC
       USE ELMO_DATA, ONLY : ETYPE_ELMO
 #ifdef isam      
-      USE ELMO_DATA, ONLY : ETYPE_ELMO_ISAM
+      USE ELMO_DATA, ONLY : ETYPE_ISAM_ELMO, ISAM_VEC
+      USE SA_DEFN, ONLY : MAP_AEROtoSA
 #endif
 #ifdef sens
-      USE ELMO_DATA, ONLY : ETYPE_ELMO_DDM
+      USE ELMO_DATA, ONLY : ETYPE_DDM_ELMO, DDM_VEC
+      USE AERO_DDM3D, ONLY : S_AEROSPC_CONC
 #endif
 
 
       IMPLICIT NONE
 
-      LOGICAL :: MODE_MASK
+      LOGICAL :: MODE_MASK( N_MODE )
       INTEGER :: IV, ISRC
-      INTEGER :: IM
+      INTEGER :: IM, IAER, ISA
       REAL    :: OUTVAL
 
       OUTVAL = 0.0
@@ -696,7 +699,7 @@
             END DO
 
 #ifdef isam            
-         CASE ( ETYPE_ELMO_ISAM )
+         CASE ( ETYPE_ISAM_ELMO )
            ! ISAM PM Sum
            DO IM = 1,N_MODE
               IF ( MODE_MASK(IM) ) THEN
@@ -717,7 +720,7 @@
 #endif
 
 #ifdef sens
-         CASE ( ETYPE_ELMO_DDM )
+         CASE ( ETYPE_DDM_ELMO )
            ! DDM PM Sum
            DO IM = 1,N_MODE
               IF ( MODE_MASK(IM) ) THEN

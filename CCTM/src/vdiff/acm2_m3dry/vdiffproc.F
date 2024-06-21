@@ -106,11 +106,13 @@ C-----------------------------------------------------------------------
 
 #ifdef isam
       USE SA_DEFN, Only: ITAG, N_SPCTAG, VNAM_SPCTAG, SA_DDEP, SA_BIDI, ISAM, NTAG_SA, 
-     &                   S_SPCTAG, NSPC_SA, ISAM_SPEC, OTHRTAG
+     &                   S_SPCTAG, T_SPCTAG, NSPC_SA, ISAM_SPEC, OTHRTAG
+      USE ELMO_DATA, ONLY : ELMO_ISAM_DDEP
 #endif
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY: NP, NPMAX, SENGRID, SPCNAME, S_DDEP, SNGRD, SENGRID_TEMP, SEN_PAR
+      USE ELMO_DATA, ONLY : ELMO_DDM_DDEP
 #endif 
 
       IMPLICIT NONE
@@ -382,23 +384,28 @@ C Set up for grav. settling
 #endif
 
 #ifdef isam
+        ALLOCATE ( ISAM_DEPV( N_SPCTAG ), STAT = ASTAT )
+        IF ( ASTAT .NE. 0 ) THEN
+          XMSG = 'Failure Allocating ISAM variables in VDIFF'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+        ISAM_DEPV     = 0
+        DO ITAG = 1, N_SPCTAG
+          DO V = 1, N_SPC_DEPV
+            ISAM_SPECIES =  ISAM_SPEC( S_SPCTAG(ITAG),1 )
+            IF ( TRIM( ISAM_SPECIES ) .EQ. DV2DF_SPC( V ) ) THEN
+              ISAM_DEPV( ITAG ) = V
+            END IF
+          END DO
+        END DO
+ 
         IF ( SA_BIDI ) THEN
           NH3_ISAM_IDX  = INDEX1( 'NH3', NSPC_SA, ISAM_SPEC(:,OTHRTAG) )
-          ALLOCATE ( ISAM_DEPV( N_SPCTAG ), 
-     &               NH3_TAG_FRACTION( NTAG_SA ), STAT = ASTAT )
+          ALLOCATE ( NH3_TAG_FRACTION( NTAG_SA ), STAT = ASTAT )
           IF ( ASTAT .NE. 0 ) THEN
             XMSG = 'Failure Allocating ISAM variables in VDIFF'
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
           END IF
-          ISAM_DEPV     = 0
-          DO ITAG = 1, N_SPCTAG
-            DO V = 1, N_SPC_DEPV
-              ISAM_SPECIES =  ISAM_SPEC( S_SPCTAG(ITAG),1 )
-              IF ( TRIM( ISAM_SPECIES ) .EQ. DV2DF_SPC( V ) ) THEN
-                ISAM_DEPV( ITAG ) = V
-              END IF
-            END DO
-          END DO
 
           DO V = 1, N_SPC_DEPV
             IF ( DV2DF_SPC( V ) .EQ.'NH3' ) THEN
@@ -901,7 +908,7 @@ C WT - write out dry deposition sensitivities
                END IF
 
                IF ( L_ELMO ) THEN
-                  ELMO_DDM_DDEP(:,:,S,NP) = S_DDEP(S,:,:,,NP)
+                  ELMO_DDM_DDEP(:,:,S,NP) = S_DDEP(S,:,:,NP)
                END IF
             ENDDO
          ENDDO

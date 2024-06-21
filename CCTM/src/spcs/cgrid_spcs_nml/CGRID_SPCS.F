@@ -1152,6 +1152,8 @@ c-------------------------------------------------------------------------------
 
             N_SPC_WDEP = IWDEP
             N_SPC_DEPV = IDEPV
+            MAP_WDEPtoCGRID = MAP_WDEPtoCGRID(1:N_SPC_WDEP)
+            MAP_DEPVtoCGRID = MAP_DEPVtoCGRID(1:N_SPC_DEPV)
 
          return
 
