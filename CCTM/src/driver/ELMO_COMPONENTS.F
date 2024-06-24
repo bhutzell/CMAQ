@@ -941,7 +941,7 @@
              
              ! Map Dry Deposition of Oxidized Nitrogen from ORGN
              CASE ( ID_DD_OXN_ORGN )
-               N_VARS = 6
+               N_VARS = 7
                CALL ELMO_INIT_COMPONENTS( J, N_VARS, 'ALL' )
                CALL ELMO_SET_COMPONENTS( J, 1, 'DD_ONIT', 0.10770 )
                CALL ELMO_SET_COMPONENTS( J, 2, 'DD_ISON', 0.10770 )
@@ -949,10 +949,11 @@
                CALL ELMO_SET_COMPONENTS( J, 4, 'DD_NALD', 0.10770 )
                CALL ELMO_SET_COMPONENTS( J, 5, 'DD_IPN' , 0.10770 )
                CALL ELMO_SET_COMPONENTS( J, 6, 'DD_IPC' , 0.10770 )
+               CALL ELMO_SET_COMPONENTS( J, 7, 'DD_HONIT',0.10770 )
              
              ! Map Wet Deposition of Oxidized Nitrogen from ORGN
              CASE ( ID_WD_OXN_ORGN )
-               N_VARS = 6
+               N_VARS = 7
                CALL ELMO_INIT_COMPONENTS( J, N_VARS, 'ALL' )
                CALL ELMO_SET_COMPONENTS( J, 1, 'WD_ONIT', 0.10770 )
                CALL ELMO_SET_COMPONENTS( J, 2, 'WD_ISON', 0.10770 )
@@ -960,6 +961,7 @@
                CALL ELMO_SET_COMPONENTS( J, 4, 'WD_NALD', 0.10770 )
                CALL ELMO_SET_COMPONENTS( J, 5, 'WD_IPN' , 0.10770 )
                CALL ELMO_SET_COMPONENTS( J, 6, 'WD_IPC' , 0.10770 )
+               CALL ELMO_SET_COMPONENTS( J, 7, 'WD_HONIT',0.10770 )
              
              ! Map Dry Deposition of Oxidized Nitrogen from Other
              CASE ( ID_DD_OXN_OTHR )
