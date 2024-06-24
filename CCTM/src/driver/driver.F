@@ -557,9 +557,6 @@ C Initiliaze IO Arrays and Open Files
          call centralized_io_init
 #endif
 
-C Initialize ELMO Arrays and Maps
-         call elmo_init
-
 C Initialize conc field: Copy IC's to CONC file as step 0
 C Convention: the input file concentration units are always ppmV.
 
@@ -764,34 +761,16 @@ C Main processing loop:
       END IF
 #endif
 
-      ! Compute ELMO Values at Beginning of Main Time Step
-      IF ( L_ELMO ) THEN
-        IF ( JDATE .EQ. STDATE .AND. JTIME .EQ. STTIME ) THEN
-
-             ! Calculate all ELMO variables for both Instantaneous and
-             ! Average parameters
-             CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.TRUE.)
-             ! Print Instantaneous Values at first time step
-             CALL WRITE_ELMO( JDATE, JTIME, TSTEP, .TRUE. )
-
-        ELSE IF ( ELMO_NSTEP .LT. 1.0 ) THEN
-             ! Calculate all ELMO Variables for averaging but do not output them
-             CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
-        END IF
-      END IF
-
-      ! Initialize Budget Output File and Concentration Array
-      IF ( BUDGET_DIAG ) CALL BUDGET_INIT( CGRID, JDATE, JTIME, TSTEP )
-
-
 C Initialize Modules
       IF ( L_INIT ) THEN
           L_INIT = .FALSE.
           call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
           if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
 
-C Initialize MIO - placeholder
-!         call mio_init
+      ELSE IF ( L_ELMO .AND. ELMO_NSTEP .LT. 1.0 ) THEN
+          ! Calculate all ELMO Variables for averaging but do not output them
+          CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
+
       END IF
 
       ! science process sequence:

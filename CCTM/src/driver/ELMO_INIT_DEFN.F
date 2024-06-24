@@ -438,7 +438,7 @@
      &                       CGRID_MASK_AERO,
      &                       WDEP_SPC, N_SPC_WDEP, MAP_WDEPtoCGRID,
      &                       N_SPC_DEPV, MAP_DEPVtoCGRID
-      USE VDIFF_MAP, ONLY : DDEP_SPC
+      USE VDIFF_MAP, ONLY : DEPV_SPC, N_SPC_DDEP
       USE UTIL_FAMILY_MODULE, ONLY: N_Chem_Fams,ChemFamilyName,
      &                              ChemFamilyUnits
       USE GRID_CONF, ONLY : MYPE
@@ -462,13 +462,19 @@
       CHARACTER(32) :: PNAME = 'BUILD_ELMO_TABLE'
 
       N = 0
-#ifdef isam | sens
+#ifdef isam 
+      ALLOCATE( ELMO_TABLE( 10000 ), STAT=IOS )
+#elif defined( sens )
       ALLOCATE( ELMO_TABLE( 10000 ), STAT=IOS )
 #else
       ALLOCATE( ELMO_TABLE( 2000 ), STAT=IOS )
 #endif
       CALL CHECKMEM( IOS, 'ELMO_TABLE',PNAME ) 
-       
+
+      ! Initialize Mode and Source Attributes
+      ELMO_TABLE(:)%IM = 0
+      ELMO_TABLE(:)%SOURCE = 0
+
       ! Load Bulk Aerosol Species into ELMO_Table
       ! Because the family names are loaded first in the ELMO Table, any
       ! request for a chemical family name that matches an ELMO variable
@@ -776,8 +782,8 @@
       IF ( L_ELMO_DDEP ) THEN
       DO IDDEP = 1,N_SPC_DEPV
         N = N + 1
-        ELMO_TABLE( N )%NAME = 'DD_' // DDEP_SPC( IDDEP )
-        ELMO_TABLE( N )%OUT_NAME = 'DD_' // DDEP_SPC( IDDEP )
+        ELMO_TABLE( N )%NAME = 'DD_' // DEPV_SPC( IDDEP )
+        ELMO_TABLE( N )%OUT_NAME = 'DD_' // DEPV_SPC( IDDEP )
         ELMO_TABLE( N )%OUT_TYPE = M3REAL
         ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDEP
         ELMO_TABLE( N )%ID = IDDEP
@@ -795,7 +801,7 @@
      &                       ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
         ELMO_TABLE( N )%IUNIT = IUNIT
         ELMO_TABLE( N )%DESC = 'Dry Deposition Flux for Species '//
-     &                         TRIM( DDEP_SPC( IDDEP ) )
+     &                         TRIM( DEPV_SPC( IDDEP ) )
       END DO
       END IF
 
@@ -883,8 +889,8 @@
       IF ( L_ELMO_DDEP ) THEN
       DO IDDEP = 1,N_SPC_DEPV
         N = N + 1
-        ELMO_TABLE( N )%NAME = 'DD_' //TRIM(DDEP_SPC( IDDEP )) // '_ISAM'
-        ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))//'_TAGS'
+        ELMO_TABLE( N )%NAME = 'DD_' //TRIM(DEPV_SPC( IDDEP )) // '_ISAM'
+        ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))//'_TAGS'
         ELMO_TABLE( N )%OUT_TYPE = M3REAL
         ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_DDEP
         ELMO_TABLE( N )%ID = IDDEP
@@ -903,18 +909,18 @@
      &                       ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
         ELMO_TABLE( N )%IUNIT = IUNIT
         ELMO_TABLE( N )%DESC = 'Tagged Dry Deposition Flux of '//
-     &     TRIM( DDEP_SPC( IDDEP ) ) //' from all sources.'
+     &     TRIM( DEPV_SPC( IDDEP ) ) //' from all sources.'
 
         DO ITAG = 1,NTAG_SA
            N = N + 1
            ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-           ELMO_TABLE( N )%NAME = 'DD_' //TRIM(DDEP_SPC( IDDEP ))
+           ELMO_TABLE( N )%NAME = 'DD_' //TRIM(DEPV_SPC( IDDEP ))
      &                            // '_ISAM'
-           ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))
+           ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))
      &                            // '_' // TRIM(TAGNAME( ITAG )) 
            ELMO_TABLE( N )%SOURCE = ITAG
            ELMO_TABLE( N )%DESC = 'Tagged Dry Deposition Flux of '//
-     &        TRIM( DDEP_SPC( IDDEP ) ) //' from '//
+     &        TRIM( DEPV_SPC( IDDEP ) ) //' from '//
      &        TRIM( TAGNAME( ITAG ) ) 
         END DO
       END DO
@@ -993,9 +999,9 @@
       DO IDDEP = 1,N_SPC_DEPV
         DO NP = 1,NPMAX
            N = N + 1
-           ELMO_TABLE( N )%NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))
+           ELMO_TABLE( N )%NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))
      &                                // '_DDM'
-           ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))
+           ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))
      &                                // '_' // TRIM( SEN_PAR(NP) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
            ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM_DDEP
@@ -1015,7 +1021,7 @@
      &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
            ELMO_TABLE( N )%IUNIT = IUNIT
            ELMO_TABLE( N )%DESC = 'Sensitivity of '//
-     &        TRIM( DDEP_SPC( IDDEP ) ) //' dry deposition to '//
+     &        TRIM( DEPV_SPC( IDDEP ) ) //' dry deposition to '//
      &        TRIM( SEN_PAR(NP) ) // ' from all cloud types'
         END DO
       END DO
@@ -1198,10 +1204,11 @@
 !-------------------------------------------------------------------------
     
       USE RUNTIME_VARS, ONLY : LOGDEV
+      USE AERO_DATA, ONLY : N_MODE, AEROSPC, AERO_MISSING
 
       IMPLICIT NONE
 
-      INTEGER IINST, IAVRG, ICOMP, J, TABID, IFILE
+      INTEGER IINST, IAVRG, ICOMP, J, TABID, IFILE, AERO_ID, IMODE
 
       ! Write out all ELMO variables organized by output file
       WRITE( LOGDEV, '(/,/,5x,A)' ),'|> ELMO OUTPUT VARIABLE REPORT:'
@@ -1252,11 +1259,24 @@
                DO ICOMP = 1,ELMO_COMP( J )%N_VARS
                   TABID = ELMO_COMP( J )%TABID( ICOMP )
 
-                  WRITE( LOGDEV, '(8x,A2,A16,4x,A14,2x,ES9.2,4x,A)'),
-     &                   '->',ELMO_TABLE( TABID )%OUT_NAME,
-     &                   CETYPE(ELMO_TABLE( TABID )%VAR_TYPE),
-     &                   ELMO_COMP( J )%COEFF( ICOMP ),
-     &                   TRIM(ELMO_TABLE( TABID )%DESC)
+                  IF ( ELMO_TABLE( TABID )%VAR_TYPE .NE. ETYPE_AEROBULK ) THEN
+                     WRITE( LOGDEV, '(8x,A2,A16,4x,A14,2x,ES9.2,4x,A)'),
+     &                      '->',ELMO_TABLE( TABID )%OUT_NAME,
+     &                      CETYPE(ELMO_TABLE( TABID )%VAR_TYPE),
+     &                      ELMO_COMP( J )%COEFF( ICOMP ),
+     &                      TRIM(ELMO_TABLE( TABID )%DESC)
+                  ELSE
+                     AERO_ID = ELMO_TABLE( TABID )%ID
+                     DO IMODE = 1,N_MODE
+                        IF ( .NOT. AERO_MISSING( AERO_ID,IMODE ) ) THEN
+                           WRITE( LOGDEV, '(8x,A2,A16,4x,A14,2x,ES9.2,4x,A,A,A,I1)'),
+     &                       '->',AEROSPC( AERO_ID )%NAME( IMODE ),
+     &                       'AEROSOL', ELMO_COMP( J )%COEFF( ICOMP ),
+     &                       'Aerosol Mass for ',TRIM(AEROSPC(AERO_ID)%NAME(IMODE)),
+     &                       ' in mode ',IMODE
+                        END IF    
+                     END DO
+                  END IF
                END DO
             END IF
             WRITE( LOGDEV, '')

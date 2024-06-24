@@ -231,10 +231,10 @@ C Test opening existing conc file for update
       CALL LOG_HEADING( LOGDEV, "Open or Create Concentration File" )
 
 C *** Open the aerosol parameters file (diameters and standard deviations).
-      IF ( L_ELMO .AND. IO_PE_INCLUSIVE ) THEN
-           CALL OPEN_ELMO ( STDATE, STTIME, TSTEP( 1 ) )
-           ELMO_NSTEP = 0.0
-      END IF
+      !IF ( L_ELMO .AND. IO_PE_INCLUSIVE ) THEN
+      !     CALL OPEN_ELMO ( STDATE, STTIME, TSTEP( 1 ) )
+      !     ELMO_NSTEP = 0.0
+      !END IF
 
 #ifndef mpas
       IF ( .NOT. OPEN3( CTM_CONC_1, FSRDWR3, PNAME ) ) THEN

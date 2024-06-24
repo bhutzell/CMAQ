@@ -243,7 +243,7 @@
          IF ( L.EQ.1 .AND. L_ELMO_WDEP )
      &        WDEP_VEC(:) = ELMO_WDEP(C,R,:)
          IF ( L.EQ.1 .AND. L_ELMO_DDEP )
-     &        DDEP_VEC(:) = ELMO_DDEP(:,C,R)  ! N_SPC_DDEP --> DD2DV
+     &        DDEP_VEC(:) = ELMO_DDEP(C,R,:)  ! N_SPC_DDEP --> DD2DV
 
 #ifdef isam                        
          ! Load All Raw Concentrations and Fluxes
@@ -394,7 +394,7 @@
       INTEGER, INTENT( IN ) :: OUT_UNIT ! The desired output unit
       INTEGER ID, VAR_TYPE
       REAL VAL2
-      INTEGER IVAR, ILIST, ILOC
+      INTEGER IVAR, ILIST, ILOC, IX1, IX2
       INTEGER WETNESS, ISPEC, INLET, IMODE, ISC
       INTEGER ISA, DSA
       LOGICAL LMODE
@@ -508,9 +508,22 @@
 
                ! Sum up Linear Combination Variable
                DO IVAR = 1,ELMO_COMP( J_ )%N_VARS
-                 CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, 
-     &                           J=ELMO_COMP( J_ )%TABID(IVAR) )
-                 OUTVAL = OUTVAL + VAL2 * ELMO_COMP( J_ )%COEFF(IVAR) * FAC
+                 IX1 = ELMO_COMP( J_ )%TABID(IVAR)
+
+                 IF ( ELMO_TABLE( IX1 )%VAR_TYPE .EQ. ETYPE_AEROBULK ) THEN
+                    IX2 = ELMO_TABLE( IX1 )%ID
+                    DO IMODE = 1,N_MODE
+                      ! If this mode is supposed to be added (LMODE) and the
+                      ! species is not missing, then add it up
+                      IF ( .NOT. AERO_MISSING( IX2,IMODE ) )  
+     &                  OUTVAL = OUTVAL + AEROSPC_CONC( IX2, IMODE ) * 
+     &                           FRAC( IMODE )* FAC
+                    END DO
+
+                 ELSE
+                    CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, J=IX1 )
+                    OUTVAL = OUTVAL + VAL2 * ELMO_COMP( J_ )%COEFF(IVAR) * FAC
+                 END IF
                END DO 
             ELSE
                ! Retrieve Detailed ELMO Variable

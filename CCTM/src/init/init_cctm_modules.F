@@ -21,6 +21,12 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE INIT_CCTM_MODULES ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
 
       USE RUNTIME_VARS, ONLY : COLUMN_MODEL
+      USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP
+      USE ELMO_PROC, ONLY : ELMO_DRIVER  
+      USE ELMO_INIT_DEFN, ONLY : ELMO_INIT, OPEN_ELMO
+      USE PA_DEFN, ONLY : BUDGET_DIAG
+      USE BUDGET_DEFN, ONLY : BUDGET_INIT
+      USE GRID_CONF, ONLY: IO_PE_INCLUSIVE
 
       IMPLICIT NONE
 
@@ -131,6 +137,30 @@ C Arguments:
       CALL WR_AVG_SA ( JDATE, JTIME, TSTEP( 1 ) )
 #endif
 
+      ! Initialize ELMO Arrays and Maps
+      CALL ELMO_INIT
+      
+      ! Compute ELMO Values at Beginning of Main Time Step
+      IF ( L_ELMO ) THEN
+
+        ! Open the aerosol parameters file (diameters and standard deviations).
+        IF ( IO_PE_INCLUSIVE ) THEN
+           CALL OPEN_ELMO ( JDATE, JTIME, TSTEP( 1 ) )
+           ELMO_NSTEP = 0.0
+        END IF
+
+        ! Calculate all ELMO variables for both Instantaneous and
+        ! Average parameters
+        CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.TRUE.)
+        
+        ! Print Instantaneous Values at first time step
+        CALL WRITE_ELMO( JDATE, JTIME, TSTEP, .TRUE. )
+
+      END IF
+
+      ! Initialize Budget Output File and Concentration Array
+      IF ( BUDGET_DIAG ) CALL BUDGET_INIT( CGRID, JDATE, JTIME, TSTEP )
+ 
 
       END SUBROUTINE INIT_CCTM_MODULES
 
