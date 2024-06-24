@@ -314,6 +314,7 @@
       INTEGER            :: STAT
       LOGICAL, SAVE      :: INSTANT  =.TRUE., 
      &                      AVERAGE  =.TRUE.
+      INTEGER IVAR
 
       CHARACTER( 16 ), SAVE :: PNAME = 'READ_ELMO_NML'
       CHARACTER( 200 )   :: XMSG
@@ -396,6 +397,10 @@
       ! Check Top-Layer Specification
       CALL ELMO_CHECK_LAYERS( INST_LAYER_TOP, INST_LAYER_BOT, 'INST' )
       NLAY_ELMO_INST = INST_LAYER_TOP - INST_LAYER_BOT + 1
+      DO IVAR = 1,N_NML
+         IF ( INST_VARS_NML( IVAR )(1:3) .EQ. 'DD_' ) L_ELMO_DDEP = .TRUE.
+         IF ( INST_VARS_NML( IVAR )(1:3) .EQ. 'WD_' ) L_ELMO_WDEP = .TRUE.
+      END DO
 
       ! Read Desired ELMO_AVRG variables from input namelist
       REWIND( FUNIT )
@@ -411,6 +416,10 @@
       ! Check Top-Layer Specification
       CALL ELMO_CHECK_LAYERS( AVRG_LAYER_TOP, AVRG_LAYER_BOT, 'AVRG' )
       NLAY_ELMO_AVRG = AVRG_LAYER_TOP - AVRG_LAYER_BOT + 1
+      DO IVAR = 1,N_NML
+         IF ( AVRG_VARS_NML( IVAR )(1:3) .EQ. 'DD_' ) L_ELMO_DDEP = .TRUE.
+         IF ( AVRG_VARS_NML( IVAR )(1:3) .EQ. 'WD_' ) L_ELMO_WDEP = .TRUE.
+      END DO
       
       END SUBROUTINE READ_ELMO_NML
 
