@@ -32,12 +32,19 @@
       
       USE GRID_CONF, ONLY : NCOLS, NROWS
       USE ELMO_COMPONENTS, ONLY : ELMO_MAP_COMPONENTS
+      USE AERO_DATA, ONLY : N_MODE
+#ifdef isam
+      USE SA_DEFN, ONLY : NTAG_SA
+#endif
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NPMAX
+#endif
 
       IMPLICIT NONE
 
       INTEGER N, M, P, J, IM, ILIST, S, F
       INTEGER ID, IV, ISRC, IT, IS, NM, NS
-      INTEGER N1, N2, N3
+      INTEGER N1, N2, N3, MX_SRC
       CHARACTER( 16 ), SAVE :: PNAME = 'ELMO_INIT'
       CHARACTER( 300 ) :: XMSG
       INTEGER ALLOCSTAT, IOS, IERROR
@@ -236,6 +243,13 @@
       N1 = 0
       N2 = 0
       N3 = 0
+      MX_SRC = 0
+#ifdef isam
+      MX_SRC = NTAG_SA + 1
+#endif
+#ifdef sens
+      MX_SRC = NPMAX
+#endif
 
       DO N = 1,N_ELMO_USED
         IT = MAP_USEDtoTABLE( N )
@@ -247,13 +261,13 @@
 
         NM = N_ELMOTABLE_MODE( IV,ID )
         NS = N_ELMOTABLE_SOURCE( IV,ID )
-        
+
         IF ( NM .GT. 0 .AND. NS .gt. 0    ) THEN
           ! Multiple Modes and Sources
           IF ( MAP_ELMOTABLE( IV,ID ).EQ.0 ) THEN
              N1 = N1 + 1
              MAP_ELMOTABLE( IV,ID ) = N1
-             ALLOCATE( MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%IND(NM,NS) )
+             ALLOCATE( MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%IND(N_MODE,MX_SRC) )
              MAP_ELMO_IDtoTABLE_MODE_SOURCE( N1 )%IND(:,:) = 0
           END IF  
           MAP_ELMO_IDtoTABLE_MODE_SOURCE( MAP_ELMOTABLE(IV,ID) )%IND(IM,IS) = IT
@@ -263,7 +277,7 @@
           IF ( MAP_ELMOTABLE( IV,ID ).EQ.0 ) THEN
              N2 = N2 + 1
              MAP_ELMOTABLE( IV,ID ) = N2
-             ALLOCATE( MAP_ELMO_IDtoTABLE_MODE( N2 )%IND(NM) )
+             ALLOCATE( MAP_ELMO_IDtoTABLE_MODE( N2 )%IND(N_MODE) )
              MAP_ELMO_IDtoTABLE_MODE( N2 )%IND(:) = 0
           END IF
           MAP_ELMO_IDtoTABLE_MODE( MAP_ELMOTABLE(IV,ID) )%IND(IM) = IT
@@ -273,7 +287,7 @@
           IF ( MAP_ELMOTABLE( IV,ID ).EQ.0 ) THEN
              N3 = N3 + 1
              MAP_ELMOTABLE( IV,ID ) = N3
-             ALLOCATE( MAP_ELMO_IDtoTABLE_SOURCE( N3 )%IND(NS) )
+             ALLOCATE( MAP_ELMO_IDtoTABLE_SOURCE( N3 )%IND(MX_SRC) )
              MAP_ELMO_IDtoTABLE_SOURCE( N3 )%IND(:) = 0
           END IF
           MAP_ELMO_IDtoTABLE_SOURCE( MAP_ELMOTABLE(IV,ID) )%IND(IS) = IT
