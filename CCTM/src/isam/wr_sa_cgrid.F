@@ -72,7 +72,7 @@ c     INTEGER   C,R,S,K,N, L, ITAG, JSPC    ! loop induction variables
       INTEGER   C,R,S,K,N, L, JSPC    ! loop induction variables
       INTEGER, SAVE :: EDATE, ETIME
 
-      REAL, ALLOCATABLE :: ISAM_BUFF ( :,:,:,: )
+      REAL, ALLOCATABLE, SAVE :: ISAM_BUFF ( :,:,:,: )
 !20140519
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL OK
