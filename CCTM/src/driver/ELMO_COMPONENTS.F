@@ -1071,7 +1071,7 @@
       ELMO_COMP( J )%N_VARS = N_VARS
       ALLOCATE( ELMO_COMP( J )%L_MODE  ( N_MODE ),
 #ifdef isam    
-     &          ELMO_COMP( J )%L_SOURCE( NTAG_SA ),
+     &          ELMO_COMP( J )%L_SOURCE( NTAG_SA+1 ),
 #elif sens
      &          ELMO_COMP( J )%L_SOURCE( NPMAX ),
 #else

@@ -384,7 +384,7 @@
       USE AEROMET_DATA, ONLY : AIRDENS
       USE RUNTIME_VARS
 #ifdef isam
-      USE SA_DEFN, ONLY : MAP_AEROtoSA
+      USE SA_DEFN, ONLY : MAP_AEROtoSA, NTAG_SA
 #endif
 
       IMPLICIT NONE
@@ -510,7 +510,9 @@
                DO IVAR = 1,ELMO_COMP( J_ )%N_VARS
                  IX1 = ELMO_COMP( J_ )%TABID(IVAR)
 
-                 IF ( ELMO_TABLE( IX1 )%VAR_TYPE .EQ. ETYPE_AEROBULK ) THEN
+                 IF ( ELMO_TABLE( IX1 )%VAR_TYPE .EQ. ETYPE_AEROBULK .OR.
+     &                ELMO_TABLE( IX1 )%VAR_TYPE .EQ. ETYPE_ISAM_AEROBULK .OR. 
+     &                ELMO_TABLE( IX1 )%VAR_TYPE .EQ. ETYPE_DDM_AEROBULK ) THEN
                     IX2 = ELMO_TABLE( IX1 )%ID
                     DO IMODE = 1,N_MODE
                       ! If this mode is supposed to be added (LMODE) and the
@@ -557,10 +559,10 @@
               ! species is not missing, then add it up
               IF ( .NOT. AERO_MISSING( ID,IMODE ) )  THEN
                   ISA = MAP_AEROtoSA( ID, IMODE )
-                  IF ( ISC .EQ. 0 ) THEN
-                     OUTVAL = OUTVAL + SUM(ISAM_VEC( ISA,:) ) * FRAC( IMODE )
-                  ELSE
+                  IF ( ISC .LE. NTAG_SA ) THEN
                      OUTVAL = OUTVAL + ISAM_VEC(ISA,ISC) * FRAC( IMODE )
+                  ELSE
+                     OUTVAL = OUTVAL + SUM(ISAM_VEC( ISA,:) ) * FRAC( IMODE )
                   END IF
               END IF
             END DO
@@ -569,19 +571,19 @@
          CASE ( ETYPE_ISAM_WDEP )
             ! Variable is in the ISAM WetDep Array
             ISC = ELMO_TABLE( J_ )%SOURCE
-            IF ( ISC .EQ. 0 ) THEN
-              OUTVAL = SUM( ISAM_WDEP_VEC( ID,:) ) * FAC
-            ELSE
+            IF ( ISC .LE. NTAG_SA ) THEN
               OUTVAL = ISAM_WDEP_VEC( ID,ISC ) * FAC
+            ELSE
+              OUTVAL = SUM( ISAM_WDEP_VEC( ID,:) ) * FAC
             END IF
          
          CASE ( ETYPE_ISAM_DDEP )
             ! Variable is in the ISAM DryDep Array
             ISC = ELMO_TABLE( J_ )%SOURCE
-            IF ( ISC .EQ. 0 ) THEN
-              OUTVAL = SUM( ISAM_DDEP_VEC( ID,: )) * FAC
-            ELSE
+            IF ( ISC .LE. NTAG_SA ) THEN
               OUTVAL = ISAM_DDEP_VEC( ID,ISC ) * FAC
+            ELSE
+              OUTVAL = SUM( ISAM_DDEP_VEC( ID,: )) * FAC
             END IF
 #endif
 #ifdef sens
