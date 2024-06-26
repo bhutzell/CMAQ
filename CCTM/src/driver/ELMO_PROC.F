@@ -56,7 +56,7 @@
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, AIRQV, AIRDENS, AIRPRES,
      &                        SRFTEMP, H2OVP, H2OSATVP, MWWAT, MWAIR,
      &                        CFRAC, DZ, PV, ZH
-      USE CGRID_SPCS, ONLY : N_CGRID_SPC, N_SPC_WDEP, N_SPC_DEPV
+      USE CGRID_SPCS, ONLY : N_CGRID_SPC, N_SPC_WDEP, N_SPC_DEPV, NSPCSD
       use centralized_io_module, only : interpolate_var, pv_avail
       use RUNTIME_VARS
       Use phot_mod, Only: init_phot_shared
