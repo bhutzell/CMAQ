@@ -570,10 +570,12 @@
               ! species is not missing, then add it up
               IF ( .NOT. AERO_MISSING( ID,IMODE ) )  THEN
                   ISA = MAP_AEROtoSA( ID, IMODE )
-                  IF ( ISC .LE. NTAG_SA ) THEN
-                     OUTVAL = OUTVAL + ISAM_VEC(ISA,ISC) * FRAC( IMODE )
-                  ELSE
-                     OUTVAL = OUTVAL + SUM(ISAM_VEC( ISA,:) ) * FRAC( IMODE )
+                  IF ( ISA .NE. 0 ) THEN
+                    IF ( ISC .LE. NTAG_SA ) THEN
+                       OUTVAL = OUTVAL + ISAM_VEC(ISA,ISC) * FRAC( IMODE )
+                    ELSE
+                       OUTVAL = OUTVAL + SUM(ISAM_VEC( ISA,:) ) * FRAC( IMODE )
+                    END IF
                   END IF
               END IF
             END DO
@@ -612,7 +614,8 @@
               LMODE = ELMO_COMP( J_ )%L_MODE( IMODE )
               IF ( LMODE .AND. ( .NOT. AERO_MISSING( ID,IMODE ) ) ) THEN
                   DSA = AEROSPC_MAP( ID, IMODE )
-                  OUTVAL = OUTVAL + DDM_VEC( ISC,DSA ) * FRAC( IMODE )* FAC
+                  IF ( DSA .NE. 0 ) 
+     &               OUTVAL = OUTVAL + DDM_VEC( ISC,DSA ) * FRAC( IMODE )* FAC
               END IF
             END DO
  

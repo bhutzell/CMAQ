@@ -414,6 +414,12 @@
       DO IVAR = 1,N_NML
          IF ( INST_VARS_NML( IVAR )(1:3) .EQ. 'DD_' ) L_ELMO_DDEP = .TRUE.
          IF ( INST_VARS_NML( IVAR )(1:3) .EQ. 'WD_' ) L_ELMO_WDEP = .TRUE.
+         IF ( INST_VARS_NML( IVAR )(1:8) .EQ. 'ALL_DDEP' ) L_ELMO_DDEP = .TRUE.
+         IF ( INST_VARS_NML( IVAR )(1:8) .EQ. 'ALL_WDEP' ) L_ELMO_WDEP = .TRUE.
+         IF ( INST_VARS_NML( IVAR )(1:7) .EQ. 'ALL_DEP' ) THEN
+             L_ELMO_DDEP = .TRUE.
+             L_ELMO_WDEP = .TRUE.
+         ENDIF
       END DO
 
       ! Read Desired ELMO_AVRG variables from input namelist
@@ -433,6 +439,12 @@
       DO IVAR = 1,N_NML
          IF ( AVRG_VARS_NML( IVAR )(1:3) .EQ. 'DD_' ) L_ELMO_DDEP = .TRUE.
          IF ( AVRG_VARS_NML( IVAR )(1:3) .EQ. 'WD_' ) L_ELMO_WDEP = .TRUE.
+         IF ( AVRG_VARS_NML( IVAR )(1:8) .EQ. 'ALL_DDEP' ) L_ELMO_DDEP = .TRUE.
+         IF ( AVRG_VARS_NML( IVAR )(1:8) .EQ. 'ALL_WDEP' ) L_ELMO_WDEP = .TRUE.
+         IF ( AVRG_VARS_NML( IVAR )(1:7) .EQ. 'ALL_DEP' ) THEN
+             L_ELMO_DDEP = .TRUE.
+             L_ELMO_WDEP = .TRUE.
+         ENDIF
       END DO
       
       END SUBROUTINE READ_ELMO_NML
@@ -460,7 +472,7 @@
 
 #ifdef isam
       USE SA_DEFN, ONLY : TAGNAME, NSPC_SA, NTAG_SA, ISAM_SPEC,
-     &                    MAP_SAtoCGR
+     &                    MAP_SAtoCGR, MAP_AEROtoSA
 #endif
 
 #ifdef sens
@@ -532,33 +544,34 @@
 #ifdef isam
       ! Load ISAM Bulk Aerosols
       DO IAERO = 1,N_AEROSPC
+         IF ( ANY( MAP_AEROtoSA( IAERO,: ) .NE. 0 ) ) THEN
 
-         DO ITAG = 1,NTAG_SA
-           N = N + 1
-           ELMO_TABLE( N )%NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_ISAM' 
-           ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
-     &                            // '_' // TRIM(TAGNAME( ITAG )) 
-           ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_AEROBULK
-           ELMO_TABLE( N )%ID = IAERO
-           ELMO_TABLE( N )%SOURCE = ITAG
-           ELMO_TABLE( N )%CUNIT = 'ug m-3'
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-     &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-           ELMO_TABLE( N )%IUNIT = IUNIT
-           ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
-     &                     TRIM( AEROSPC( IAERO )%BULKNAME ) //
-     &                     ' from source ' // TRIM(TAGNAME( ITAG ))
-           ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
-         END DO  
-
-         N = N + 1
-         ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-         ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_TAGS'
-         ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
-         ELMO_TABLE( N )%DESC = 'Total Aerosol Mass for '//
-     &          TRIM(AEROSPC(IAERO)%BULKNAME)//' across all sources.'
-
+           DO ITAG = 1,NTAG_SA
+              N = N + 1
+              ELMO_TABLE( N )%NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_ISAM' 
+              ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
+     &                               // '_' // TRIM(TAGNAME( ITAG )) 
+              ELMO_TABLE( N )%OUT_TYPE = M3REAL
+              ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_AEROBULK
+              ELMO_TABLE( N )%ID = IAERO
+              ELMO_TABLE( N )%SOURCE = ITAG
+              ELMO_TABLE( N )%CUNIT = 'ug m-3'
+              CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
+     &                             ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
+              ELMO_TABLE( N )%IUNIT = IUNIT
+              ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
+     &                        TRIM( AEROSPC( IAERO )%BULKNAME ) //
+     &                        ' from source ' // TRIM(TAGNAME( ITAG ))
+              ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
+           END DO  
+           
+            N = N + 1
+            ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
+            ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_TAGS'
+            ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
+            ELMO_TABLE( N )%DESC = 'Total Aerosol Mass for '//
+     &             TRIM(AEROSPC(IAERO)%BULKNAME)//' across all sources.'
+         END IF
       END DO
 
       ! Load ISAM Families
