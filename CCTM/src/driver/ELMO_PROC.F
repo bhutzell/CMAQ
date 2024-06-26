@@ -62,7 +62,7 @@
       Use phot_mod, Only: init_phot_shared
 
 #ifdef isam
-      USE SA_DEFN, ONLY : NTAG_SA, ISAM
+      USE SA_DEFN, ONLY : NTAG_SA, ISAM, NSPC_SA
 #endif
 
 #ifdef sens
@@ -132,14 +132,16 @@
          CALL CHECKMEM( IOS, 'ELMOS_VECTORS',PNAME )
 
 #ifdef isam
-         ALLOCATE( ISAM_WDEP_VEC( N_SPC_WDEP+1,NTAG_SA ), 
+         ALLOCATE( ISAM_VEC( NSPC_SA,NTAG_SA ),
+     &             ISAM_WDEP_VEC( N_SPC_WDEP+1,NTAG_SA), 
      &             ISAM_DDEP_VEC( N_SPC_DEPV,NTAG_SA ),
      &             STAT=IOS )
          CALL CHECKMEM( IOS, 'ISAM_ELMO_VECTORS',PNAME )
 #endif
 
 #ifdef sens
-         ALLOCATE( DDM_WDEP_VEC( N_SPC_WDEP+1,NPMAX ), 
+         ALLOCATE( DDM_VEC( NPMAX,NSPCSD ),
+     &             DDM_WDEP_VEC( N_SPC_WDEP+1,NPMAX ), 
      &             DDM_DDEP_VEC( N_SPC_DEPV,NPMAX ),
      &             STAT=IOS )
          CALL CHECKMEM( IOS, 'ISAM_ELMO_VECTORS',PNAME )
@@ -257,7 +259,7 @@
 
 #ifdef sens
          ! Load All Raw Concentrations and Fluxes
-         DDM_VEC(:,:) = SENGRID(C,R,L,:,:)  ! NPMAX, N_SPCS
+         DDM_VEC(:,:) = SENGRID(C,R,L,:,:)  ! NPMAX, NSPCSD
 
          IF ( L.EQ.1 .AND. L_ELMO_WDEP )
      &        DDM_WDEP_VEC(:,:) = ELMO_DDM_WDEP(C,R,:,:) ! N_SPC_WDEP+1, NPMAX
@@ -290,7 +292,7 @@
       IMPLICIT NONE
 
       INTEGER, INTENT( IN ) :: C, R, L
-      INTEGER IDG, IM, AL, IL, IUSED, IAVRG, IINST, ILOC, J
+      INTEGER IDG, IM, AL, IL, IUSED, IAVRG, IINST, ILOC, J, IV
 
       LOGICAL, INTENT( IN ) :: WRITE_STEP
       LOGICAL, INTENT( IN ) :: INIT_STEP
@@ -328,6 +330,8 @@
      &       L.GE.AVRG_LAYER_BOT .AND. L.LE.AVRG_LAYER_TOP ) THEN
            AL = L - AVRG_LAYER_BOT + 1
            DO  IAVRG = 1,N_ELMO_AVRG
+              IV = ELMO_TABLE( MAP_AVRGtoTABLE( IAVRG ) )%VAR_TYPE
+
               IF ( ELMO_USED_ID( MAP_AVRGtoUSED( IAVRG )) .EQ. ID_PMF_PH
      &             .AND. ELMO_USED( MAP_AVRGtoUSED( IAVRG ) ) .LT. -100. ) THEN
                  ! Special Averaging for Particle pH
@@ -343,6 +347,13 @@
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
      &                                  + 2.0 * ELMO_AVRG( C,R,AL,IAVRG )
                  END IF
+              ELSE IF ( IV .EQ. ETYPE_WDEP .OR. IV .EQ. ETYPE_DDEP .OR.
+     &                  IV .EQ. ETYPE_ISAM_WDEP .OR. IV .EQ. ETYPE_ISAM_DDEP .OR.
+     &                  IV .EQ. ETYPE_DDM_WDEP .OR. IV .EQ. ETYPE_DDM_DDEP ) THEN
+                 ! This is a deposition species so we should be
+                 ! computing a cumulative sum, not an average by default
+                 ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
+     &                                     + ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
               ELSE
                  ! For all other variables, apply trapezoidal rule for averaging.
                  IF ( INIT_STEP ) THEN
@@ -545,10 +556,10 @@
          CASE ( ETYPE_ISAM )
             ! Variable is in the ISAM Array
             ISC = ELMO_TABLE( J_ )%SOURCE
-            IF ( ISC .EQ. 0 ) THEN
-                OUTVAL = SUM( ISAM_VEC( ID,: ) ) * FAC
-            ELSE
+            IF ( ISC .LE. NTAG_SA ) THEN
                 OUTVAL = ISAM_VEC( ID,ISC ) * FAC
+            ELSE
+                OUTVAL = SUM( ISAM_VEC( ID,: ) ) * FAC
             END IF
          
          CASE ( ETYPE_ISAM_AEROBULK )

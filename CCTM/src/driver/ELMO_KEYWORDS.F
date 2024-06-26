@@ -305,14 +305,14 @@
      &                        'NH3 ','HNO3'/)
  
       ! All Deposition Variables
-      ELMO_KEY( 26 )%WORD = 'ALLDEP'
+      ELMO_KEY( 26 )%WORD = 'ALL_DEP'
       ELMO_KEY( 26 )%N = 2
       ALLOCATE( ELMO_KEY( 26 )%LIST( 2 ), STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_KEY(26)'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
-      ELMO_KEY( 26 )%LIST = (/'ALLWDEP','ALLDDEP'/)
+      ELMO_KEY( 26 )%LIST = (/'ALL_WDEP','ALL_DDEP'/)
  
       ! PFAS Species
       ELMO_KEY( 27 )%WORD = 'PFAS'
