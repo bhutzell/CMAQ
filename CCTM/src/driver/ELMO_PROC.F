@@ -347,13 +347,27 @@
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
      &                                  + 2.0 * ELMO_AVRG( C,R,AL,IAVRG )
                  END IF
-              ELSE IF ( IV .EQ. ETYPE_WDEP .OR. IV .EQ. ETYPE_DDEP .OR.
-     &                  IV .EQ. ETYPE_ISAM_WDEP .OR. IV .EQ. ETYPE_ISAM_DDEP .OR.
-     &                  IV .EQ. ETYPE_DDM_WDEP .OR. IV .EQ. ETYPE_DDM_DDEP ) THEN
+              ELSE IF ( IV .EQ. ETYPE_WDEP .OR. 
+     &                  IV .EQ. ETYPE_ISAM_WDEP .OR. 
+     &                  IV .EQ. ETYPE_DDM_WDEP  ) THEN
                  ! This is a deposition species so we should be
                  ! computing a cumulative sum, not an average by default
-                 ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                                     + ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
+		 ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )  ! Already summed in cldproc -- may need to change approach if outputting coarser timestep in ELMO file 
+                 IF ( WRITE_STEP ) ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) * 2.0 * (ELMO_NSTEP-1.0) !To counteract division for avrg species in elmo_write
+
+              ELSE IF ( IV .EQ. ETYPE_DDEP .OR.
+     &                  IV .EQ. ETYPE_ISAM_DDEP .OR.
+     &                  IV .EQ. ETYPE_DDM_DDEP ) THEN
+                 ! This is a deposition species so we should be
+                 ! computing a cumulative sum, not an average by default
+		 IF ( INIT_STEP ) THEN
+                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
+		 ELSE   
+                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
+     &                      + ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
+                 END IF
+		 IF ( WRITE_STEP ) ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) * 2.0 * (ELMO_NSTEP-1.0) !To counteract division for avrg species in elmo_write
+
               ELSE
                  ! For all other variables, apply trapezoidal rule for averaging.
                  IF ( INIT_STEP ) THEN
