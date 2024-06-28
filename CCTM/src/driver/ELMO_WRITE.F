@@ -25,7 +25,10 @@
 
       USE RUNTIME_VARS
       USE ELMO_DATA, ONLY : INST_ACTIVE, AVRG_ACTIVE, ELMO_NSTEP,
-     &                      ELMO_INST, ELMO_AVRG
+     &                      ELMO_INST, ELMO_AVRG, ELMO_TABLE, N_ELMO_AVRG,
+     &                      ETYPE_WDEP, ETYPE_DDEP, ETYPE_ISAM_WDEP,
+     &                      ETYPE_DDM_WDEP, ETYPE_ISAM_DDEP, ETYPE_DDM_DDEP,
+     &                      MAP_AVRGtoTABLE
       USE UTILIO_DEFN
 
       IMPLICIT NONE 
@@ -35,6 +38,7 @@
       INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP(3)
       LOGICAL, INTENT( IN ) :: INIT_TIME
       INTEGER MDATE, MTIME
+      INTEGER IAVRG, IV
       CHARACTER( 300 ) XMSG
 
       CHARACTER( 16 ), SAVE :: PNAME = 'WRITE_ELMO'
@@ -68,10 +72,20 @@ C *** Write data to the average aerosol diagnostic file.
                CALL NEXTIME ( MDATE, MTIME, -TSTEP(1) )
             END IF
           
-            IF ( .NOT. WRITE3( CTM_AELMO_1, 
-     &             ALLVAR3, MDATE, MTIME, 
-     &             ELMO_AVRG(:,:,:,:) / 2.0 / 
-     &             (ELMO_NSTEP-1.0) ) ) THEN
+            ! Finalize Values for Averaged Variables
+            DO IAVRG = 1,N_ELMO_AVRG
+                IV = ELMO_TABLE( MAP_AVRGtoTABLE( IAVRG ) )%VAR_TYPE
+                IF ( IV .NE. ETYPE_WDEP .AND. IV .NE. ETYPE_DDEP .AND.
+     &               IV .NE. ETYPE_ISAM_WDEP .AND. IV .NE. ETYPE_ISAM_DDEP .AND.
+     &               IV .NE. ETYPE_DDM_WDEP .AND. IV .NE. ETYPE_DDM_DDEP ) THEN
+                   ELMO_AVRG( :,:,:,IAVRG ) = ELMO_AVRG( :,:,:,IAVRG )
+     &                                        / 2.0 / (ELMO_NSTEP - 1.0)
+                END IF
+            END DO
+
+            ! Write Data
+            IF ( .NOT. WRITE3( CTM_AELMO_1, ALLVAR3, MDATE, MTIME, 
+     &             ELMO_AVRG(:,:,:,:) ) ) THEN
                XMSG = 'Could not write ' // CTM_AELMO_1 // ' file'
                CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF

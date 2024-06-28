@@ -352,21 +352,19 @@
      &                  IV .EQ. ETYPE_DDM_WDEP  ) THEN
                  ! This is a deposition species so we should be
                  ! computing a cumulative sum, not an average by default
-		 ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )  ! Already summed in cldproc -- may need to change approach if outputting coarser timestep in ELMO file 
-                 IF ( WRITE_STEP ) ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) * 2.0 * (ELMO_NSTEP-1.0) !To counteract division for avrg species in elmo_write
+		         ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )  
 
               ELSE IF ( IV .EQ. ETYPE_DDEP .OR.
      &                  IV .EQ. ETYPE_ISAM_DDEP .OR.
      &                  IV .EQ. ETYPE_DDM_DDEP ) THEN
                  ! This is a deposition species so we should be
                  ! computing a cumulative sum, not an average by default
-		 IF ( INIT_STEP ) THEN
+                 IF ( INIT_STEP ) THEN
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
-		 ELSE   
+                 ELSE   
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
      &                      + ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
                  END IF
-		 IF ( WRITE_STEP ) ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) * 2.0 * (ELMO_NSTEP-1.0) !To counteract division for avrg species in elmo_write
 
               ELSE
                  ! For all other variables, apply trapezoidal rule for averaging.
@@ -470,6 +468,7 @@
                                            !   ISAM)
       
       ! Compute mode-dependent fraction from size cutoff if applicable
+      FRAC( : ) = 1.0
       IF ( ELMO_TABLE( J_ )%L_COMP ) THEN
          INLET = ELMO_COMP( J_ )%INLET
          WETNESS = ELMO_COMP( J_ )%WETNESS 
