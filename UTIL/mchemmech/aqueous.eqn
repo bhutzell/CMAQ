@@ -98,10 +98,12 @@
 <AQEQ20b_a##> AACDm_a##   + Hp_a##      = AACD_a##   : XCL_a##*5.D10*PHI2_a##*GM1_a##*GM1_a##;
 
 ! Redox
+! SIV H2O2
+<AQ00_a##> H2O2_a## + HSO3m_a## + Hp_a## = SO4mm_a## + 2.0*Hp_a##               : XCL_a##*KRXN( 7.45D+7, -4756.08D0, 1, 0, 0, 'a##' );
 ! SIV O3
-<AQ01_a##> SO2_a##    + O3_a##  = SO4mm_a## + 2 Hp_a##                          : XCL_a##*2.4D4*PHI2_a##;
-<AQ02_a##> HSO3m_a##  + O3_a##  = SO4mm_a## + Hp_a##                            : XCL_a##*3.7D5*EXP(-5.53D3*TFAC)*PHI2_a##;
-<AQ03_a##> SO3mm_a##  + O3_a##  = SO4mm_a##                                     : XCL_a##*1.5D9*EXP(-5.28D3*TFAC)*PHI2_a##;
+<AQ01_a##> SO2_a##    + O3_a##  = SO4mm_a## + 2 Hp_a##                          : XCL_a##*KRXN( 2.4D+4,       0.0D0, 0, 1, 0, 'a##' );
+<AQ02_a##> HSO3m_a##  + O3_a##  = SO4mm_a## + Hp_a##                            : XCL_a##*KRXN( 3.7D+5,  -5530.88D0, 0, 2, 0, 'a##' );
+<AQ03_a##> SO3mm_a##  + O3_a##  = SO4mm_a##                                     : XCL_a##*KRXN( 1.5D+9,  -5280.56D0, 0, 3, 0, 'a##' );
 ! HO2 chemistry
 <AQ04_a##> HO2_a##    + HO2_a## = H2O2_a##                                      : XCL_a##*8.3D5*EXP(-2.7D3*TFAC)*PHI2_a##;
 <AQ05_a##> HO2_a##    + O2m_a## = H2O2_a## + OHm_a##                            : XCL_a##*9.6D7*EXP(-9.1D2*TFAC)*PHI2_a##;

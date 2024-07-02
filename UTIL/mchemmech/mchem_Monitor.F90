@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : mchem_Monitor.f90
-! Time                 : Fri Jun 21 11:41:45 2024
+! Time                 : Tue Jul  2 13:22:39 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : mchem.kpp
 ! Output root filename : mchem
@@ -108,61 +108,61 @@ MODULE mchem_Monitor
      'OXLAC_RS       ','OXLAC_CV       ','OXLACmm_RS     ', &
      'OXLACm_RS      ','OXLACmm_CV     ','OXLACm_CV      ', &
      'XPRP           ','CH3O2_RS       ','CLNO3          ', &
-     'H2O2_RS        ','NO4m_CV        ','CH3O2_CV       ', &
-     'HNO3_RS        ','HNO3_CV        ','H2O2_CV        ', &
-     'GLY_RS         ','GLY_CV         ','NO4m_RS        ', &
-     'ETHA           ','HSO4m_RS       ','HSO4m_CV       ', &
+     'NO4m_CV        ','CH3O2_CV       ','HNO3_RS        ', &
+     'HNO3_CV        ','GLY_RS         ','GLY_CV         ', &
+     'NO4m_RS        ','ETHA           ','HSO4m_RS       ', &
+     'HSO4m_CV       ','GCOLACm_RS     ','GCOLAC_RS      ', &
      'GCOLACm_CV     ','GCOLAC_CV      ','PAA_RS         ', &
      'PAA_CV         ','HCOOm_RS       ','PYRAC_RS       ', &
-     'PYRAC_CV       ','PYRACm_RS      ','PYRACm_CV      ', &
-     'HCOOm_CV       ','GCOLACm_RS     ','GCOLAC_RS      ', &
-     'NTR2           ','ETOH           ','PRPA           ', &
-     'ISPX           ','NO3m_CV        ','N2O5           ' /)
+     'PYRAC_CV       ','PYRACm_CV      ','HCOOm_CV       ', &
+     'PYRACm_RS      ','NTR2           ','ETOH           ', &
+     'PRPA           ','ISPX           ','NO3m_CV        ', &
+     'N2O5           ','TOL            ','XYLMN          ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: SPC_NAMES_3 = (/ &
-     'TOL            ','XYLMN          ','NAPH           ', &
-     'CAT1           ','OPAN           ','NO3_CV         ', &
-     'NO3_RS         ','NO3m_RS        ','AACDm_RS       ', &
-     'SO5m_CV        ','MHP_CV         ','MHP_RS         ', &
-     'AACDm_CV       ','VSVPO2         ','VSVPO3         ', &
-     'VSVPO1         ','VLVPO1         ','VLVOO2         ', &
-     'VSVOO2         ','VSVOO3         ','VLVOO1         ', &
-     'VSVOO1         ','HONO_RS        ','HONO_CV        ', &
-     'SO5m_RS        ','PANX           ','HCO3           ', &
-     'XPAR           ','CRO            ','FMCL           ', &
-     'AACD_RS        ','AACD_CV        ','FACD_RS        ', &
-     'MEOH           ','FACD_CV        ','ROOH           ', &
-     'NTR1           ','DMS            ','GLYACm_RS      ', &
-     'GLYAC_RS       ','PNA            ','GLYACm_CV      ', &
-     'GLYAC_CV       ','ACET           ','SO2_CV         ', &
-     'SO2_RS         ','HCHO_RS        ','HCHO_CV        ', &
+     'NAPH           ','CAT1           ','OPAN           ', &
+     'NO3_CV         ','NO3_RS         ','NO3m_RS        ', &
+     'SO5m_CV        ','AACDm_CV       ','MHP_CV         ', &
+     'MHP_RS         ','AACDm_RS       ','VSVPO2         ', &
+     'VSVPO3         ','VSVPO1         ','VLVPO1         ', &
+     'VLVOO2         ','VSVOO2         ','VSVOO3         ', &
+     'VLVOO1         ','VSVOO1         ','HONO_RS        ', &
+     'HONO_CV        ','SO5m_RS        ','PANX           ', &
+     'HCO3           ','XPAR           ','CRO            ', &
+     'FMCL           ','AACD_RS        ','AACD_CV        ', &
+     'FACD_RS        ','FACD_CV        ','MEOH           ', &
+     'ROOH           ','NTR1           ','DMS            ', &
+     'GLYACm_RS      ','GLYAC_RS       ','PNA            ', &
+     'GLYACm_CV      ','GLYAC_CV       ','ACET           ', &
+     'SO2_CV         ','SO2_RS         ','H2O2_RS        ', &
+     'H2O2_CV        ','HCHO_RS        ','HCHO_CV        ', &
      'INTR           ','CRON           ','BZO2           ', &
      'O2m_RS         ','O2m_CV         ','HCL            ', &
-     'CO             ','APIN           ','ROR            ', &
-     'TERP           ','HMSm_RS        ','HMSm_CV        ', &
-     'TO2            ','XLO2           ','SO4mm_RS       ', &
-     'SO4mm_CV       ','NO2m_RS        ','NO2m_CV        ', &
-     'ETH            ','CLO            ','CH2OHYD_CV     ', &
-     'CH2OHYD_RS     ','CRES           ','EPX2           ', &
-     'ISOP           ','PACD           ','H2O2           ', &
-     'OHm_CV         ','OHm_RS         ','XOPN           ', &
-     'OPEN           ','MEPX           ','XO2N           ', &
-     'HNO4_RS        ','ALD2           ','SO3mm_CV       ', &
-     'XO2            ','IOLE           ','XO2H           ', &
-     'HNO3           ','ALDX           ','PAR            ' /)
+     'CO             ','TERP           ','APIN           ', &
+     'ROR            ','HMSm_RS        ','HMSm_CV        ', &
+     'TO2            ','XLO2           ','NO2m_CV        ', &
+     'NO2m_RS        ','ETH            ','CH2OHYD_CV     ', &
+     'CH2OHYD_RS     ','CLO            ','SO4mm_RS       ', &
+     'SO4mm_CV       ','CRES           ','EPX2           ', &
+     'ISOP           ','PACD           ','OHm_RS         ', &
+     'OHm_CV         ','XOPN           ','OPEN           ', &
+     'MEPX           ','O3_CV          ','NO2_RS         ', &
+     'NO2_CV         ','O3_RS          ','XO2N           ', &
+     'IOLE           ','ALDX           ','XO2H           ', &
+     'XO2            ','ALD2           ','HNO3           ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(48) :: SPC_NAMES_4 = (/ &
-     'OLE            ','OPO3           ','SO2            ', &
-     'ISO2           ','CXO3           ','ISPD           ', &
-     'GLYD           ','GLY            ','MGLY           ', &
-     'AACD           ','O3             ','HNO4_CV        ', &
-     'SO3mm_RS       ','NO             ','CL             ', &
-     'C2O3           ','MEO2           ','RO2            ', &
-     'O              ','NO2_RS         ','HSO3m_CV       ', &
-     'FORM           ','O3_RS          ','OH_RS          ', &
-     'OH_CV          ','HSO3m_RS       ','OH             ', &
-     'HO2_RS         ','HO2_CV         ','NO2_CV         ', &
-     'HONO           ','NO3            ','O3_CV          ', &
-     'NO2            ','HO2            ','Hp_CV          ', &
-     'Hp_RS          ','FACD           ','M              ', &
+     'OLE            ','PAR            ','ISO2           ', &
+     'ISPD           ','HNO4_RS        ','CXO3           ', &
+     'OPO3           ','SO3mm_CV       ','O              ', &
+     'HO2_CV         ','SO3mm_RS       ','HO2_RS         ', &
+     'MGLY           ','GLY            ','GLYD           ', &
+     'AACD           ','NO             ','CL             ', &
+     'SO2            ','FACD           ','HNO4_CV        ', &
+     'HONO           ','MEO2           ','OH_RS          ', &
+     'OH_CV          ','HSO3m_RS       ','RO2            ', &
+     'H2O2           ','OH             ','O3             ', &
+     'FORM           ','HSO3m_CV       ','NO2            ', &
+     'HO2            ','NO3            ','Hp_CV          ', &
+     'Hp_RS          ','C2O3           ','M              ', &
      'H2             ','O2             ','CH4            ', &
      'H2O            ','CO2            ','H2O_RS         ', &
      'H2O_CV         ','O2_RS          ','O2_CV          ' /)
@@ -173,18 +173,18 @@ MODULE mchem_Monitor
   INTEGER, DIMENSION(1) :: MONITOR
   CHARACTER(LEN=32), DIMENSION(1) :: SMASS
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_0 = (/ &
-     '                        NO2 --> NO + O                                                              ', &
+     '                        NO2 --> O + NO                                                              ', &
      '                 O + M + O2 --> O3 + M                                                              ', &
-     '                    O3 + NO --> NO2                                                                 ', &
-     '                     NO + O --> NO2                                                                 ', &
+     '                    NO + O3 --> NO2                                                                 ', &
+     '                     O + NO --> NO2                                                                 ', &
      '                    O + NO2 --> NO                                                                  ', &
      '                    O + NO2 --> NO3                                                                 ', &
-     '                     O3 + O --> DUMMY                                                               ', &
+     '                     O + O3 --> DUMMY                                                               ', &
      '                         O3 --> O                                                                   ', &
      '                         O3 --> O1D                                                                 ', &
      '                    O1D + M --> O + M                                                               ', &
      '                  O1D + H2O --> 2 OH                                                                ', &
-     '                    O3 + OH --> HO2                                                                 ', &
+     '                    OH + O3 --> HO2                                                                 ', &
      '                   O3 + HO2 --> OH                                                                  ', &
      '                     O + OH --> HO2                                                                 ', &
      '                    O + HO2 --> OH                                                                  ', &
@@ -195,51 +195,51 @@ MODULE mchem_Monitor
      '                2 HO2 + H2O --> H2O2                                                                ', &
      '                       H2O2 --> 2 OH                                                                ', &
      '                  H2O2 + OH --> HO2                                                                 ', &
-     '                   H2O2 + O --> OH + HO2                                                            ', &
+     '                   O + H2O2 --> OH + HO2                                                            ', &
      '                  2 NO + O2 --> 2 NO2                                                               ', &
      '                   NO + HO2 --> OH + NO2                                                            ', &
      '                   O3 + NO2 --> NO3                                                                 ', &
      '                        NO3 --> O + NO2                                                             ', &
      '                        NO3 --> NO                                                                  ', &
      '                   NO + NO3 --> 2 NO2                                                               ', &
-     '                  NO3 + NO2 --> NO + NO2                                                            ' /)
+     '                  NO2 + NO3 --> NO + NO2                                                            ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_1 = (/ &
      '                    O + NO3 --> NO2                                                                 ', &
      '                   OH + NO3 --> NO2 + HO2                                                           ', &
-     '                  NO3 + HO2 --> OH + NO2                                                            ', &
+     '                  HO2 + NO3 --> OH + NO2                                                            ', &
      '                   O3 + NO3 --> NO2                                                                 ', &
      '                      2 NO3 --> 2 NO2                                                               ', &
-     '                  NO3 + NO2 --> N2O5                                                                ', &
-     '                       N2O5 --> NO3 + NO2                                                           ', &
-     '                       N2O5 --> DUMMY + NO3 + NO2                                                   ', &
+     '                  NO2 + NO3 --> N2O5                                                                ', &
+     '                       N2O5 --> NO2 + NO3                                                           ', &
+     '                       N2O5 --> DUMMY + NO2 + NO3                                                   ', &
      '                 N2O5 + H2O --> 2 HNO3                                                              ', &
      '                    NO + OH --> HONO                                                                ', &
      '             NO + NO2 + H2O --> 2 HONO                                                              ', &
      '                     2 HONO --> NO + NO2                                                            ', &
      '                       HONO --> NO + OH                                                             ', &
-     '                  OH + HONO --> NO2                                                                 ', &
+     '                  HONO + OH --> NO2                                                                 ', &
      '                   OH + NO2 --> HNO3                                                                ', &
      '                  HNO3 + OH --> NO3                                                                 ', &
      '                       HNO3 --> OH + NO2                                                            ', &
      '                  NO2 + HO2 --> PNA                                                                 ', &
      '                        PNA --> NO2 + HO2                                                           ', &
-     '                        PNA --> 0.41 OH + 0.41 NO3 + 0.59 NO2 + 0.59 HO2                            ', &
+     '                        PNA --> 0.41 OH + 0.59 NO2 + 0.59 HO2 + 0.41 NO3                            ', &
      '                   PNA + OH --> NO2                                                                 ', &
      '                   SO2 + OH --> SULRXN + SULF + HO2                                                 ', &
      '                  NO + C2O3 --> MEO2 + RO2 + NO2                                                    ', &
-     '                 C2O3 + NO2 --> PAN                                                                 ', &
-     '                        PAN --> C2O3 + NO2                                                          ', &
-     '                        PAN --> 0.6 C2O3 + 0.4 MEO2 + 0.4 RO2 + 0.4 NO3 + 0.6 NO2                   ', &
-     '                 C2O3 + HO2 --> 0.37 PACD + 0.13 AACD + 0.13 O3 + 0.5 MEO2 + 0.5 RO2 ... etc.       ', &
-     '                 C2O3 + RO2 --> MEO2                                                                ', &
+     '                 NO2 + C2O3 --> PAN                                                                 ', &
+     '                        PAN --> NO2 + C2O3                                                          ', &
+     '                        PAN --> 0.4 MEO2 + 0.4 RO2 + 0.6 NO2 + 0.4 NO3 + 0.6 C2O3                   ', &
+     '                 HO2 + C2O3 --> 0.37 PACD + 0.13 AACD + 0.5 MEO2 + 0.5 RO2 + 0.5 OH ... etc.        ', &
+     '                 RO2 + C2O3 --> MEO2                                                                ', &
      '                     2 C2O3 --> 2 MEO2 + 2 RO2                                                      ', &
-     '                CXO3 + C2O3 --> ALD2 + XO2H + MEO2 + 2 RO2                                          ' /)
+     '                CXO3 + C2O3 --> XO2H + ALD2 + MEO2 + 2 RO2                                          ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_2 = (/ &
-     '                  CXO3 + NO --> ALD2 + XO2H + RO2 + NO2                                             ', &
+     '                  CXO3 + NO --> XO2H + ALD2 + RO2 + NO2                                             ', &
      '                 CXO3 + NO2 --> PANX                                                                ', &
      '                       PANX --> CXO3 + NO2                                                          ', &
-     '                       PANX --> 0.4 ALD2 + 0.4 XO2H + 0.6 CXO3 + 0.4 RO2 + 0.4 NO3 + 0.6 NO2 ... etc', &
-     '                 CXO3 + HO2 --> 0.37 PACD + 0.13 AACD + 0.13 O3 + 0.5 MEO2 + 0.5 RO2 ... etc.       ', &
+     '                       PANX --> 0.4 XO2H + 0.4 ALD2 + 0.6 CXO3 + 0.4 RO2 + 0.6 NO2 + 0.4 NO3 ... etc', &
+     '                 CXO3 + HO2 --> 0.37 PACD + 0.13 AACD + 0.5 MEO2 + 0.5 RO2 + 0.5 OH ... etc.        ', &
      '                 CXO3 + RO2 --> MEO2                                                                ', &
      '                     2 CXO3 --> 2 MEO2 + 2 RO2                                                      ', &
      '                   NO + RO2 --> NO                                                                  ', &
@@ -247,7 +247,7 @@ MODULE mchem_Monitor
      '                      2 RO2 --> DUMMY                                                               ', &
      '                  NO + MEO2 --> FORM + NO2 + HO2                                                    ', &
      '                 MEO2 + HO2 --> 0.9 MEPX + 0.1 FORM                                                 ', &
-     '                C2O3 + MEO2 --> 0.1 AACD + 0.9 MEO2 + 0.9 RO2 + FORM + 0.9 HO2                      ', &
+     '                MEO2 + C2O3 --> 0.1 AACD + 0.9 MEO2 + 0.9 RO2 + FORM + 0.9 HO2                      ', &
      '                 MEO2 + RO2 --> 0.315 MEOH + RO2 + 0.685 FORM + 0.37 HO2                            ', &
      '                  XO2H + NO --> NO2 + HO2                                                           ', &
      '                 XO2H + HO2 --> ROOH                                                                ', &
@@ -261,101 +261,101 @@ MODULE mchem_Monitor
      '                 XO2N + HO2 --> ROOH                                                                ', &
      '                XO2N + C2O3 --> 0.2 AACD + 0.8 MEO2 + 0.8 RO2 + 0.8 HO2                             ', &
      '                 XO2N + RO2 --> RO2                                                                 ', &
-     '                  MEPX + OH --> 0.6 MEO2 + 0.6 RO2 + 0.4 FORM + 0.4 OH                              ', &
+     '                  MEPX + OH --> 0.6 MEO2 + 0.6 RO2 + 0.4 OH + 0.4 FORM                              ', &
      '                       MEPX --> MEO2 + RO2 + OH                                                     ', &
      '                  ROOH + OH --> 0.06 XO2N + 0.54 XO2H + 0.6 RO2 + 0.4 OH                            ', &
      '                       ROOH --> OH + HO2                                                            ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_3 = (/ &
      '                  NTR1 + OH --> NTR2                                                                ', &
      '                       NTR1 --> NO2                                                                 ', &
-     '                  OH + FACD --> HO2                                                                 ', &
+     '                  FACD + OH --> HO2                                                                 ', &
      '                  AACD + OH --> MEO2 + RO2                                                          ', &
      '                  PACD + OH --> C2O3                                                                ', &
-     '                  FORM + OH --> CO + HO2                                                            ', &
+     '                  OH + FORM --> CO + HO2                                                            ', &
      '                       FORM --> CO + 2 HO2                                                          ', &
      '                       FORM --> CO                                                                  ', &
      '                   O + FORM --> CO + OH + HO2                                                       ', &
      '                 FORM + NO3 --> CO + HNO3 + HO2                                                     ', &
      '                 FORM + HO2 --> HCO3                                                                ', &
      '                       HCO3 --> FORM + HO2                                                          ', &
-     '                  HCO3 + NO --> NO2 + HO2 + FACD                                                    ', &
-     '                 HCO3 + HO2 --> 0.5 MEPX + 0.2 OH + 0.2 HO2 + 0.5 FACD                              ', &
-     '                   ALD2 + O --> C2O3 + OH                                                           ', &
+     '                  HCO3 + NO --> FACD + NO2 + HO2                                                    ', &
+     '                 HCO3 + HO2 --> 0.5 MEPX + 0.5 FACD + 0.2 OH + 0.2 HO2                              ', &
+     '                   ALD2 + O --> OH + C2O3                                                           ', &
      '                  ALD2 + OH --> C2O3                                                                ', &
      '                 ALD2 + NO3 --> HNO3 + C2O3                                                         ', &
      '                       ALD2 --> CO + MEO2 + RO2 + HO2                                               ', &
      '                   ALDX + O --> CXO3 + OH                                                           ', &
      '                  ALDX + OH --> CXO3                                                                ', &
      '                 ALDX + NO3 --> HNO3 + CXO3                                                         ', &
-     '                       ALDX --> CO + ALD2 + XO2H + RO2 + HO2                                        ', &
-     '                  GLYD + OH --> 0.2 GLY + 0.8 C2O3 + 0.2 HO2                                        ', &
+     '                       ALDX --> CO + XO2H + ALD2 + RO2 + HO2                                        ', &
+     '                  GLYD + OH --> 0.2 GLY + 0.2 HO2 + 0.8 C2O3                                        ', &
      '                       GLYD --> 0.15 MEOH + 0.89 CO + 0.11 XO2H + 0.11 GLY + 0.11 RO2 ... etc.      ', &
      '                 GLYD + NO3 --> HNO3 + C2O3                                                         ', &
      '                   GLY + OH --> 1.8 CO + 0.2 XO2 + 0.2 RO2 + HO2                                    ', &
      '                        GLY --> 2 CO + 2 HO2                                                        ', &
      '                  GLY + NO3 --> 1.5 CO + 0.5 XO2 + HNO3 + 0.5 RO2 + HO2                             ', &
-     '                       MGLY --> CO + C2O3 + HO2                                                     ', &
-     '                 MGLY + NO3 --> XO2 + HNO3 + C2O3 + RO2                                             ' /)
+     '                       MGLY --> CO + HO2 + C2O3                                                     ', &
+     '                 MGLY + NO3 --> XO2 + HNO3 + RO2 + C2O3                                             ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_4 = (/ &
      '                  MGLY + OH --> CO + C2O3                                                           ', &
      '                    OH + H2 --> HO2                                                                 ', &
      '                    CO + OH --> HO2                                                                 ', &
      '                   OH + CH4 --> MEO2 + RO2                                                          ', &
-     '                  ETHA + OH --> 0.009 XO2N + 0.991 ALD2 + 0.991 XO2H + RO2                          ', &
+     '                  ETHA + OH --> 0.009 XO2N + 0.991 XO2H + 0.991 ALD2 + RO2                          ', &
      '                  MEOH + OH --> FORM + HO2                                                          ', &
-     '                  ETOH + OH --> 0.95 ALD2 + 0.1 XO2H + 0.011 GLYD + 0.1 RO2 + 0.078 FORM ... etc.   ', &
-     '                        KET --> 0.5 ALD2 + 0.5 XO2H - -2.5 PAR + 0.5 CXO3 + 0.5 C2O3 ... etc.       ', &
-     '                       ACET --> 0.38 CO + 0.62 C2O3 + 1.38 MEO2 + 1.38 RO2                          ', &
-     '                  ACET + OH --> XO2 + C2O3 + RO2 + FORM                                             ', &
+     '                  ETOH + OH --> 0.1 XO2H + 0.95 ALD2 + 0.011 GLYD + 0.1 RO2 + 0.078 FORM ... etc.   ', &
+     '                        KET --> 0.5 XO2H + 0.5 ALD2 - -2.5 PAR + 0.5 CXO3 + 0.5 MEO2 ... etc.       ', &
+     '                       ACET --> 0.38 CO + 1.38 MEO2 + 1.38 RO2 + 0.62 C2O3                          ', &
+     '                  ACET + OH --> XO2 + RO2 + FORM + C2O3                                             ', &
      '                  PRPA + OH --> XPRP                                                                ', &
      '                   PAR + OH --> XPAR                                                                ', &
-     '                        ROR --> 0.2 KET + 0.42 ACET + 0.02 ROR + 0.04 XO2N + 0.74 ALD2 ... etc.     ', &
+     '                        ROR --> 0.2 KET + 0.42 ACET + 0.02 ROR + 0.04 XO2N + 0.37 ALDX ... etc.     ', &
      '                   ROR + O2 --> KET + HO2                                                           ', &
      '                  ROR + NO2 --> NTR1                                                                ', &
-     '                  ETHY + OH --> 0.3 CO + 0.7 GLY + 0.7 OH + 0.3 HO2 + 0.3 FACD                      ', &
-     '                    ETH + O --> CO + 0.7 XO2H + 0.7 RO2 + FORM + 0.3 OH + HO2                       ', &
+     '                  ETHY + OH --> 0.3 CO + 0.7 GLY + 0.3 FACD + 0.7 OH + 0.3 HO2                      ', &
+     '                    ETH + O --> CO + 0.7 XO2H + 0.7 RO2 + 0.3 OH + FORM + HO2                       ', &
      '                   ETH + OH --> XO2H + 0.22 GLYD + RO2 + 1.56 FORM                                  ', &
-     '                   ETH + O3 --> 0.35 CO + FORM + 0.17 OH + 0.27 HO2 + 0.42 FACD                     ', &
-     '                  ETH + NO3 --> 0.5 NTR1 + 0.5 XO2 + 0.5 XO2H + RO2 + 1.125 FORM + 0.5 NO2 ... etc. ', &
-     '                    OLE + O --> 0.2 CO + 0.01 XO2N + 0.2 ALD2 + 0.2 XO2H + 0.3 ALDX ... etc.        ', &
-     '                   OLE + OH --> 0.024 XO2N + 0.488 ALD2 + 0.195 XO2 + 0.976 XO2H + 0.488 ALDX ... et', &
-     '                   OLE + O3 --> 0.378 CO + 0.04 H2O2 + 0.295 ALD2 + 0.15 XO2H + 0.27 ALDX ... etc.  ', &
-     '                  OLE + NO3 --> 0.5 NTR1 + 0.04 XO2N + 0.25 ALD2 + 0.48 XO2 + 0.48 XO2H ... etc.    ', &
-     '                   IOLE + O --> 0.1 CO + 1.24 ALD2 + 0.1 XO2H + 0.66 ALDX + 0.1 PAR ... etc.        ', &
-     '                  IOLE + OH --> 1.3 ALD2 + XO2H + 0.7 ALDX + RO2                                    ', &
-     '                  IOLE + O3 --> 0.245 CO + 0.08 H2O2 + 0.732 ALD2 + 0.3 XO2H + 0.442 ALDX ... etc.  ', &
-     '                 IOLE + NO3 --> 0.5 NTR1 + 0.04 XO2N + 0.5 ALD2 + 0.48 XO2 + 0.48 XO2H ... etc.     ', &
+     '                   ETH + O3 --> 0.35 CO + 0.42 FACD + 0.17 OH + FORM + 0.27 HO2                     ', &
+     '                  ETH + NO3 --> 0.5 NTR1 + 0.5 XO2H + 0.5 XO2 + RO2 + 1.125 FORM + 0.5 NO2 ... etc. ', &
+     '                    OLE + O --> 0.2 CO + 0.01 XO2N + 0.3 ALDX + 0.2 XO2H + 0.2 ALD2 ... etc.        ', &
+     '                   OLE + OH --> 0.024 XO2N + 0.488 ALDX + 0.976 XO2H + 0.195 XO2 + 0.488 ALD2 ... et', &
+     '                   OLE + O3 --> 0.378 CO + 0.27 ALDX + 0.15 XO2H + 0.295 ALD2 - -0.79 PAR ... etc.  ', &
+     '                  OLE + NO3 --> 0.5 NTR1 + 0.04 XO2N + 0.375 ALDX + 0.48 XO2H + 0.48 XO2 ... etc.   ', &
+     '                   IOLE + O --> 0.1 CO + 0.66 ALDX + 0.1 XO2H + 1.24 ALD2 + 0.1 PAR ... etc.        ', &
+     '                  IOLE + OH --> 0.7 ALDX + XO2H + 1.3 ALD2 + RO2                                    ', &
+     '                  IOLE + O3 --> 0.245 CO + 0.442 ALDX + 0.3 XO2H + 0.732 ALD2 + 0.29 PAR ... etc.   ', &
+     '                 IOLE + NO3 --> 0.5 NTR1 + 0.04 XO2N + 0.625 ALDX + 0.48 XO2H + 0.48 XO2 ... etc.   ', &
      '                  ISOP + OH --> ISOPRXN + ISO2 + RO2                                                ', &
-     '                   ISOP + O --> 0.25 XO2 + 0.25 PAR + 0.25 CXO3 + 0.75 ISPD + 0.25 RO2 ... etc.     ' /)
+     '                   ISOP + O --> 0.25 XO2 + 0.25 PAR + 0.75 ISPD + 0.25 CXO3 + 0.25 RO2 ... etc.     ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_5 = (/ &
      '                  ISO2 + NO --> 0.1 INTR + 0.082 XO2H + 0.9 ISPD + 0.082 RO2 + 0.673 FORM ... etc.  ', &
-     '                 ISO2 + HO2 --> 0.88 ISPX + 0.12 ISPD + 0.12 FORM + 0.12 OH + 0.12 HO2 ... etc.     ', &
+     '                 ISO2 + HO2 --> 0.88 ISPX + 0.12 ISPD + 0.12 OH + 0.12 FORM + 0.12 HO2 ... etc.     ', &
      '                ISO2 + C2O3 --> 0.072 XO2H + ISPD + 0.2 AACD + 0.8 MEO2 + 0.872 RO2 ... etc.        ', &
      '                 ISO2 + RO2 --> 0.072 XO2H + ISPD + 1.072 RO2 + 0.598 FORM + 0.728 HO2 ... etc.     ', &
      '                       ISO2 --> HPLD + HO2                                                          ', &
-     '                  ISOP + O3 --> 0.066 CO + 0.2 XO2 + 0.15 ALDX + 0.35 PAR + 0.2 CXO3 ... etc.       ', &
-     '                 ISOP + NO3 --> ISOPRXN + 0.65 NTR2 + 0.03 XO2N + 0.33 XO2 + 0.64 XO2H ... etc.     ', &
+     '                  ISOP + O3 --> 0.066 CO + 0.15 ALDX + 0.2 XO2 + 0.35 PAR + 0.65 ISPD ... etc.      ', &
+     '                 ISOP + NO3 --> ISOPRXN + 0.65 NTR2 + 0.03 XO2N + 0.64 XO2H + 0.33 XO2 ... etc.     ', &
      '                  ISPD + OH --> 0.137 ACET + 0.137 CO + 0.022 XO2N + 0.521 XO2 + 0.117 PAR ... etc. ', &
-     '                  ISPD + O3 --> 0.17 ACET + 0.543 CO + 0.04 ALD2 + 0.17 GLY + 0.531 MGLY ... etc.   ', &
-     '                 ISPD + NO3 --> 0.142 NTR2 + 0.142 XO2 + 0.142 XO2H + 0.717 HNO3 + 0.717 PAR ... etc', &
-     '                       ISPD --> 0.17 ACET + 0.16 XO2 + 0.34 XO2H + 0.24 PAR + 0.24 OLE ... etc.     ', &
+     '                  ISPD + O3 --> 0.17 ACET + 0.543 CO + 0.04 ALD2 + 0.531 MGLY + 0.17 GLY ... etc.   ', &
+     '                 ISPD + NO3 --> 0.142 NTR2 + 0.142 XO2H + 0.142 XO2 + 0.717 HNO3 + 0.717 PAR ... etc', &
+     '                       ISPD --> 0.17 ACET + 0.34 XO2H + 0.16 XO2 + 0.24 OLE + 0.24 PAR ... etc.     ', &
      '                  ISPX + OH --> 0.904 EPOX + 0.029 IOLE + 0.029 ALDX + 0.067 ISO2 + 0.067 RO2 ... et', &
      '                       HPLD --> ISPD + OH                                                           ', &
      '                 HPLD + NO3 --> HNO3 + ISPD                                                         ', &
      '                  EPOX + OH --> EPX2 + RO2                                                          ', &
-     '                 EPX2 + HO2 --> 0.251 CO + 2.175 PAR + 0.275 GLYD + 0.275 GLY + 0.275 MGLY ... etc. ', &
-     '                  EPX2 + NO --> 0.251 CO + 2.175 PAR + 0.275 GLYD + 0.275 GLY + 0.275 MGLY ... etc. ', &
-     '                EPX2 + C2O3 --> 0.2 CO + 1.74 PAR + 0.22 GLYD + 0.22 GLY + 0.22 MGLY ... etc.       ', &
-     '                 EPX2 + RO2 --> 0.251 CO + 2.175 PAR + 0.275 GLYD + 0.275 GLY + 0.275 MGLY ... etc. ', &
-     '                  INTR + OH --> 0.266 NTR2 + 0.104 INTR + 0.63 XO2 + 0.37 XO2H + 0.078 ALDX ... etc.', &
+     '                 EPX2 + HO2 --> 0.251 CO + 2.175 PAR + 0.275 MGLY + 0.275 GLY + 0.275 GLYD ... etc. ', &
+     '                  EPX2 + NO --> 0.251 CO + 2.175 PAR + 0.275 MGLY + 0.275 GLY + 0.275 GLYD ... etc. ', &
+     '                EPX2 + C2O3 --> 0.2 CO + 1.74 PAR + 0.22 MGLY + 0.22 GLY + 0.22 GLYD ... etc.       ', &
+     '                 EPX2 + RO2 --> 0.251 CO + 2.175 PAR + 0.275 MGLY + 0.275 GLY + 0.275 GLYD ... etc. ', &
+     '                  INTR + OH --> 0.266 NTR2 + 0.104 INTR + 0.078 ALDX + 0.37 XO2H + 0.63 XO2 ... etc.', &
      '                   TERP + O --> TRPRXN + 0.15 ALDX + 5.12 PAR                                       ', &
-     '                  TERP + OH --> TRPRXN + 0.25 XO2N + 0.5 XO2 + 0.75 XO2H + 0.47 ALDX ... etc.       ', &
-     '                  TERP + O3 --> TRPRXN + 0.001 CO + 0.18 XO2N + 0.69 XO2 + 0.07 XO2H ... etc.       ', &
-     '                 TERP + NO3 --> TERPNRO2 + 0.53 NTR2 + 0.25 XO2N + 0.75 XO2 + 0.28 XO2H ... etc.    ', &
+     '                  TERP + OH --> TRPRXN + 0.25 XO2N + 0.47 ALDX + 0.75 XO2H + 0.5 XO2 ... etc.       ', &
+     '                  TERP + O3 --> TRPRXN + 0.001 CO + 0.18 XO2N + 0.21 ALDX + 0.07 XO2H ... etc.      ', &
+     '                 TERP + NO3 --> TERPNRO2 + 0.53 NTR2 + 0.25 XO2N + 0.47 ALDX + 0.28 XO2H ... etc.   ', &
      '                   APIN + O --> TRPRXN + 0.15 ALDX + 5.12 PAR                                       ', &
-     '                  APIN + OH --> TRPRXN + 0.25 XO2N + 0.5 XO2 + 0.75 XO2H + 0.47 ALDX ... etc.       ', &
-     '                  APIN + O3 --> TRPRXN + 0.001 CO + 0.18 XO2N + 0.69 XO2 + 0.07 XO2H ... etc.       ', &
-     '                 APIN + NO3 --> 0.53 NTR2 + 0.25 XO2N + 0.75 XO2 + 0.28 XO2H + 0.47 ALDX ... etc.   ', &
+     '                  APIN + OH --> TRPRXN + 0.25 XO2N + 0.47 ALDX + 0.75 XO2H + 0.5 XO2 ... etc.       ', &
+     '                  APIN + O3 --> TRPRXN + 0.001 CO + 0.18 XO2N + 0.21 ALDX + 0.07 XO2H ... etc.      ', &
+     '                 APIN + NO3 --> 0.53 NTR2 + 0.25 XO2N + 0.47 ALDX + 0.28 XO2H + 0.75 XO2 ... etc.   ', &
      '               BENZENE + OH --> BENZRO2 + 0.352 BZO2 + 0.53 CRES + 0.118 OPEN + 0.352 RO2 ... etc.  ', &
      '                  BZO2 + NO --> 0.082 NTR2 + 0.918 OPEN + 0.918 GLY + 0.918 NO2 + 0.918 HO2 ... etc.' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_6 = (/ &
@@ -363,30 +363,30 @@ MODULE mchem_Monitor
      '                 BZO2 + HO2 --> DUMMY                                                               ', &
      '                 BZO2 + RO2 --> OPEN + GLY + RO2 + HO2                                              ', &
      '                   TOL + OH --> TOLRO2 + 0.65 TO2 + 0.18 CRES + 0.1 OPEN + 0.07 XO2H ... etc.       ', &
-     '                   TO2 + NO --> 0.14 NTR2 + 0.2 XOPN + 0.66 OPEN + 0.417 GLY + 0.443 MGLY ... etc.  ', &
-     '                 TO2 + C2O3 --> 0.23 XOPN + 0.77 OPEN + 0.48 GLY + 0.52 MGLY + MEO2 ... etc.        ', &
+     '                   TO2 + NO --> 0.14 NTR2 + 0.2 XOPN + 0.66 OPEN + 0.443 MGLY + 0.417 GLY ... etc.  ', &
+     '                 TO2 + C2O3 --> 0.23 XOPN + 0.77 OPEN + 0.52 MGLY + 0.48 GLY + MEO2 ... etc.        ', &
      '                  TO2 + HO2 --> DUMMY                                                               ', &
-     '                  TO2 + RO2 --> 0.23 XOPN + 0.77 OPEN + 0.48 GLY + 0.52 MGLY + RO2 + HO2 ... etc.   ', &
+     '                  TO2 + RO2 --> 0.23 XOPN + 0.77 OPEN + 0.52 MGLY + 0.48 GLY + RO2 + HO2 ... etc.   ', &
      '                 XYLMN + OH --> XYLRO2 + 0.544 XLO2 + 0.155 CRES + 0.244 XOPN + 0.058 XO2H ... etc. ', &
      '                  NAPH + OH --> PAHRO2 + 0.544 XLO2 + 0.155 CRES + 0.244 XOPN + 0.058 XO2H ... etc. ', &
-     '                  XLO2 + NO --> 0.14 NTR2 + 0.56 XOPN + 0.3 OPEN + 0.221 GLY + 0.675 MGLY ... etc.  ', &
+     '                  XLO2 + NO --> 0.14 NTR2 + 0.56 XOPN + 0.3 OPEN + 0.675 MGLY + 0.221 GLY ... etc.  ', &
      '                 XLO2 + HO2 --> DUMMY                                                               ', &
-     '                XLO2 + C2O3 --> 0.65 XOPN + 0.35 OPEN + 0.26 GLY + 0.77 MGLY + MEO2 ... etc.        ', &
-     '                 XLO2 + RO2 --> 0.65 XOPN + 0.35 OPEN + 0.26 GLY + 0.77 MGLY + RO2 + HO2 ... etc.   ', &
+     '                XLO2 + C2O3 --> 0.65 XOPN + 0.35 OPEN + 0.77 MGLY + 0.26 GLY + MEO2 ... etc.        ', &
+     '                 XLO2 + RO2 --> 0.65 XOPN + 0.35 OPEN + 0.77 MGLY + 0.26 GLY + RO2 + HO2 ... etc.   ', &
      '                  CRES + OH --> 0.732 CAT1 + 0.2 CRO + 0.025 OPEN + 0.02 XO2N + 0.025 GLY ... etc.  ', &
-     '                 CRES + NO3 --> 0.3 CRO + 0.1 XO2N + 0.48 XO2 + 0.12 XO2H + HNO3 + 0.48 OPO3 ... etc', &
+     '                 CRES + NO3 --> 0.3 CRO + 0.1 XO2N + 0.12 XO2H + 0.48 XO2 + HNO3 + 0.48 OPO3 ... etc', &
      '                  CRO + NO2 --> CRON                                                                ', &
      '                  CRO + HO2 --> CRES                                                                ', &
      '                  CRON + OH --> NTR2 + 0.5 CRO                                                      ', &
      '                 CRON + NO3 --> NTR2 + 0.5 CRO + HNO3                                               ', &
-     '                       CRON --> OPEN + FORM + HONO + HO2                                            ', &
-     '                       XOPN --> 0.7 CO + XO2H + 0.4 GLY + 0.3 C2O3 + 0.7 HO2                        ', &
-     '                  XOPN + OH --> 2 XO2H + 0.4 GLY + MGLY + 2 RO2                                     ', &
-     '                  XOPN + O3 --> 0.5 CO + 0.1 ALD2 + 0.3 XO2H + 1.2 MGLY + 0.6 C2O3 + 0.3 RO2 ... etc', &
-     '                 XOPN + NO3 --> 0.5 NTR2 + 0.25 OPEN + 0.1 XO2N + 0.45 XO2 + 0.45 XO2H ... etc.     ', &
+     '                       CRON --> OPEN + HONO + FORM + HO2                                            ', &
+     '                       XOPN --> 0.7 CO + XO2H + 0.4 GLY + 0.7 HO2 + 0.3 C2O3                        ', &
+     '                  XOPN + OH --> 2 XO2H + MGLY + 0.4 GLY + 2 RO2                                     ', &
+     '                  XOPN + O3 --> 0.5 CO + 0.3 XO2H + 0.1 ALD2 + 1.2 MGLY + 0.3 RO2 + 0.5 OH ... etc. ', &
+     '                 XOPN + NO3 --> 0.5 NTR2 + 0.25 OPEN + 0.1 XO2N + 0.45 XO2H + 0.45 XO2 ... etc.     ', &
      '                       OPEN --> CO + OPO3 + HO2                                                     ', &
      '                  OPEN + OH --> 0.4 XO2H + 0.6 OPO3 + 0.4 GLY + 0.4 RO2                             ', &
-     '                  OPEN + O3 --> 1.98 CO + 0.02 ALD2 + 1.4 GLY + 0.24 MGLY + 0.12 C2O3 ... etc.      ', &
+     '                  OPEN + O3 --> 1.98 CO + 0.02 ALD2 + 0.24 MGLY + 1.4 GLY + 0.5 OH + 0.08 FORM ... e', &
      '                 OPEN + NO3 --> HNO3 + OPO3                                                         ', &
      '                  CAT1 + OH --> 0.5 CRO + 0.14 FORM + 0.2 HO2                                       ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_7 = (/ &
@@ -394,20 +394,20 @@ MODULE mchem_Monitor
      '                  OPO3 + NO --> 0.5 CO + 0.2 CXO3 + 0.5 GLY + NO2 + 0.8 HO2                         ', &
      '                 OPO3 + NO2 --> OPAN                                                                ', &
      '                       OPAN --> OPO3 + NO2                                                          ', &
-     '                 OPO3 + HO2 --> 0.37 PACD + 0.13 AACD + 0.13 O3 + 0.5 MEO2 + 0.5 RO2 ... etc.       ', &
-     '                OPO3 + C2O3 --> XO2 + ALDX + MEO2 + 2 RO2                                           ', &
-     '                 OPO3 + RO2 --> 0.8 XO2H + 0.8 ALDX + 0.2 AACD + 1.8 RO2                            ', &
+     '                 OPO3 + HO2 --> 0.37 PACD + 0.13 AACD + 0.5 MEO2 + 0.5 RO2 + 0.5 OH ... etc.        ', &
+     '                OPO3 + C2O3 --> ALDX + XO2 + MEO2 + 2 RO2                                           ', &
+     '                 OPO3 + RO2 --> 0.8 ALDX + 0.8 XO2H + 0.2 AACD + 1.8 RO2                            ', &
      '                  OPAN + OH --> 0.5 NTR2 + CO + 0.5 GLY + 0.5 NO2                                   ', &
      '                  PANX + OH --> ALD2 + NO2                                                          ', &
      '                  ECH4 + OH --> MEO2 + RO2                                                          ', &
      '                       XPRP --> XO2N + RO2                                                          ', &
-     '                       XPRP --> 0.732 ACET + XO2H + 0.268 ALDX + 0.268 PAR + RO2                    ', &
+     '                       XPRP --> 0.732 ACET + 0.268 ALDX + XO2H + 0.268 PAR + RO2                    ', &
      '                       XPAR --> XO2N + RO2                                                          ', &
-     '                       XPAR --> 0.874 ROR + 0.874 XO2 + 0.126 XO2H + 0.126 ALDX - -0.126 PAR ... etc', &
+     '                       XPAR --> 0.874 ROR + 0.126 ALDX + 0.126 XO2H + 0.874 XO2 - -0.126 PAR ... etc', &
      '             OH + NO2 + H2O --> HNO3                                                                ', &
      '                        CL2 --> 2 CL                                                                ', &
      '                       HOCL --> CL + OH                                                             ', &
-     '                    O3 + CL --> CLO                                                                 ', &
+     '                    CL + O3 --> CLO                                                                 ', &
      '                      2 CLO --> 0.3 CL2 + 1.4 CL                                                    ', &
      '                   CLO + NO --> CL + NO2                                                            ', &
      '                  CLO + HO2 --> HOCL                                                                ', &
@@ -417,11 +417,11 @@ MODULE mchem_Monitor
      '                   CL + CH4 --> HCL + MEO2 + RO2                                                    ', &
      '                   PAR + CL --> XPAR + HCL                                                          ', &
      '                  PRPA + CL --> ACET + HCL + 0.03 XO2N + 0.97 XO2H + RO2                            ', &
-     '                  ETHA + CL --> HCL + 0.009 XO2N + 0.991 ALD2 + 0.991 XO2H + RO2                    ', &
+     '                  ETHA + CL --> HCL + 0.009 XO2N + 0.991 XO2H + 0.991 ALD2 + RO2                    ', &
      '                   ETH + CL --> FMCL + 2 XO2 + FORM + HO2                                           ', &
-     '                   OLE + CL --> FMCL + 0.33 ALD2 + 2 XO2 + 0.67 ALDX - PAR + HO2                    ' /)
+     '                   OLE + CL --> FMCL + 0.67 ALDX + 2 XO2 + 0.33 ALD2 - PAR + HO2                    ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_8 = (/ &
-     '                  IOLE + CL --> 0.7 FMCL + 0.3 HCL + 0.45 ALD2 + 1.7 XO2 + 0.55 ALDX ... etc.       ', &
+     '                  IOLE + CL --> 0.7 FMCL + 0.3 HCL + 0.55 ALDX + 1.7 XO2 + 0.45 ALD2 ... etc.       ', &
      '                  ISOP + CL --> FMCL + 0.04 XO2N + 0.96 XO2H + ISPD + RO2                           ', &
      '                  CL + FORM --> HCL + CO + HO2                                                      ', &
      '                  ALD2 + CL --> HCL + C2O3                                                          ', &
@@ -626,23 +626,24 @@ MODULE mchem_Monitor
      '         GCOLACm_RS + Hp_RS --> GCOLAC_RS                                                           ', &
      '                    AACD_RS --> AACDm_RS + Hp_RS                                                    ', &
      '           AACDm_RS + Hp_RS --> AACD_RS                                                             ', &
+     ' H2O2_RS + HSO3m_RS + Hp_RS --> SO4mm_RS + 2 Hp_RS                                                  ', &
      '             SO2_RS + O3_RS --> SO4mm_RS + 2 Hp_RS                                                  ', &
      '           O3_RS + HSO3m_RS --> SO4mm_RS + Hp_RS                                                    ', &
-     '           SO3mm_RS + O3_RS --> SO4mm_RS                                                            ', &
+     '           O3_RS + SO3mm_RS --> SO4mm_RS                                                            ', &
      '                   2 HO2_RS --> H2O2_RS                                                             ', &
      '            O2m_RS + HO2_RS --> H2O2_RS + OHm_RS                                                    ', &
      '             O2m_RS + O3_RS --> OHm_RS + OH_RS                                                      ', &
-     '            SO2_RS + NO2_RS --> SO4mm_RS + 2 NO2m_RS - NO2_RS + 4 Hp_RS                             ', &
-     '          NO2_RS + HSO3m_RS --> SO4mm_RS + 2 NO2m_RS - NO2_RS + 3 Hp_RS                             ', &
-     '          SO3mm_RS + NO2_RS --> SO4mm_RS + 2 NO2m_RS - NO2_RS + 2 Hp_RS                             ', &
-     '         HNO4_RS + HSO3m_RS --> NO3m_RS + SO4mm_RS + 2 Hp_RS                                        ', &
-     '                    NO4m_RS --> NO2m_RS                                                             ' /)
+     '            SO2_RS + NO2_RS --> 2 NO2m_RS + SO4mm_RS - NO2_RS + 4 Hp_RS                             ', &
+     '          NO2_RS + HSO3m_RS --> 2 NO2m_RS + SO4mm_RS - NO2_RS + 3 Hp_RS                             ', &
+     '          NO2_RS + SO3mm_RS --> 2 NO2m_RS + SO4mm_RS - NO2_RS + 2 Hp_RS                             ', &
+     '         HNO4_RS + HSO3m_RS --> NO3m_RS + SO4mm_RS + 2 Hp_RS                                        ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_15 = (/ &
+     '                    NO4m_RS --> NO2m_RS                                                             ', &
      '            NO2m_RS + O3_RS --> NO3m_RS                                                             ', &
      '            NO2m_RS + OH_RS --> OHm_RS + NO2_RS                                                     ', &
      '            HONO_RS + OH_RS --> NO2_RS                                                              ', &
      '                    2 OH_RS --> H2O2_RS                                                             ', &
-     '             OH_RS + HO2_RS --> DUMMY_RS                                                            ', &
+     '             HO2_RS + OH_RS --> DUMMY_RS                                                            ', &
      '             O2m_RS + OH_RS --> OHm_RS                                                              ', &
      '            H2O2_RS + OH_RS --> HO2_RS                                                              ', &
      '           OH_RS + HSO3m_RS --> SO3m_RS                                                             ', &
@@ -662,13 +663,13 @@ MODULE mchem_Monitor
      '         HCHO_RS + SO3mm_RS --> HMSm_RS + OHm_RS                                                    ', &
      '                    HMSm_RS --> HCHO_RS + HSO3m_RS                                                  ', &
      '           HMSm_RS + OHm_RS --> CH2OHYD_RS + SO3mm_RS                                               ', &
-     '            HMSm_RS + OH_RS --> FACD_RS + HSO3m_RS + HO2_RS                                         ', &
+     '            HMSm_RS + OH_RS --> FACD_RS + HO2_RS + HSO3m_RS                                         ', &
      '  MHP_RS + HSO3m_RS + Hp_RS --> MHP_RS + SO4mm_RS + 2 Hp_RS                                         ', &
      '  PAA_RS + HSO3m_RS + Hp_RS --> MHP_RS + SO4mm_RS + 2 Hp_RS                                         ', &
      '          PAA_RS + HSO3m_RS --> SO4mm_RS + Hp_RS                                                    ', &
-     '           HCOOm_RS + OH_RS --> H2CO3_RS + OHm_RS + HO2_RS                                          ', &
-     '            GLYD_RS + OH_RS --> GCOLAC_RS + HO2_RS                                                  ' /)
+     '           HCOOm_RS + OH_RS --> H2CO3_RS + OHm_RS + HO2_RS                                          ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_16 = (/ &
+     '            GLYD_RS + OH_RS --> GCOLAC_RS + HO2_RS                                                  ', &
      '            GLYD_RS + OH_RS --> GLY_RS + HO2_RS                                                     ', &
      '          GCOLAC_RS + OH_RS --> GLYACm_RS + HO2_RS + Hp_RS                                          ', &
      '         GCOLACm_RS + OH_RS --> GLYACm_RS + HO2_RS                                                  ', &
@@ -697,9 +698,9 @@ MODULE mchem_Monitor
      '                    FACD_RS --> WD_FACD                                                             ', &
      '                    HNO3_RS --> WD_HNO3                                                             ', &
      '                   H2CO3_RS --> WD_CO2                                                              ', &
-     '                   HCO3m_RS --> WD_CO2                                                              ', &
-     '                   CO3mm_RS --> WD_CO2                                                              ' /)
+     '                   HCO3m_RS --> WD_CO2                                                              ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_17 = (/ &
+     '                   CO3mm_RS --> WD_CO2                                                              ', &
      '                    H2O2_RS --> WD_H2O2                                                             ', &
      '                      O3_RS --> WD_O3                                                               ', &
      '                     HCL_RS --> WD_HCL                                                              ', &
@@ -728,9 +729,9 @@ MODULE mchem_Monitor
      '                 GCOLACm_RS --> WD_AORGCJ                                                           ', &
      '                   GLYAC_RS --> WD_AORGCJ                                                           ', &
      '                  GLYACm_RS --> WD_AORGCJ                                                           ', &
-     '                   OXLAC_RS --> WD_AORGCJ                                                           ', &
-     '                  OXLACm_RS --> WD_AORGCJ                                                           ' /)
+     '                   OXLAC_RS --> WD_AORGCJ                                                           ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_18 = (/ &
+     '                  OXLACm_RS --> WD_AORGCJ                                                           ', &
      '                 OXLACmm_RS --> WD_AORGCJ                                                           ', &
      '                   AACDm_RS --> WD_AACD                                                             ', &
      '                    CO2m_RS --> WD_CO2                                                              ', &
@@ -759,9 +760,9 @@ MODULE mchem_Monitor
      '                   H2CO3_CV --> CO2                                                                 ', &
      '                        NH3 --> NH3_CV                                                              ', &
      '                     NH3_CV --> NH3                                                                 ', &
-     '                       H2O2 --> H2O2_CV                                                             ', &
-     '                    H2O2_CV --> H2O2                                                                ' /)
+     '                       H2O2 --> H2O2_CV                                                             ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_19 = (/ &
+     '                    H2O2_CV --> H2O2                                                                ', &
      '                         O3 --> O3_CV                                                               ', &
      '                      O3_CV --> O3                                                                  ', &
      '                       FACD --> FACD_CV                                                             ', &
@@ -790,9 +791,9 @@ MODULE mchem_Monitor
      '                    AACD_CV --> AACD                                                                ', &
      '                       FORM --> HCHO_CV                                                             ', &
      '                    HCHO_CV --> FORM                                                                ', &
-     '                        NO3 --> NO3_CV                                                              ', &
-     '                     NO3_CV --> NO3                                                                 ' /)
+     '                        NO3 --> NO3_CV                                                              ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_20 = (/ &
+     '                     NO3_CV --> NO3                                                                 ', &
      '                       MEO2 --> CH3O2_CV                                                            ', &
      '                   CH3O2_CV --> MEO2                                                                ', &
      '                       EPOX --> IEPOX_CV                                                            ', &
@@ -821,9 +822,9 @@ MODULE mchem_Monitor
      '             Clm_CV + Hp_CV --> HCL_CV                                                              ', &
      '                    SULF_CV --> HSO4m_CV + Hp_CV                                                    ', &
      '           HSO4m_CV + Hp_CV --> SULF_CV                                                             ', &
-     '                   HSO4m_CV --> SO4mm_CV + Hp_CV                                                    ', &
-     '           SO4mm_CV + Hp_CV --> HSO4m_CV                                                            ' /)
+     '                   HSO4m_CV --> SO4mm_CV + Hp_CV                                                    ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_21 = (/ &
+     '           SO4mm_CV + Hp_CV --> HSO4m_CV                                                            ', &
      '                    FACD_CV --> HCOOm_CV + Hp_CV                                                    ', &
      '           HCOOm_CV + Hp_CV --> FACD_CV                                                             ', &
      '                     HO2_CV --> O2m_CV + Hp_CV                                                      ', &
@@ -844,29 +845,30 @@ MODULE mchem_Monitor
      '         GCOLACm_CV + Hp_CV --> GCOLAC_CV                                                           ', &
      '                    AACD_CV --> AACDm_CV + Hp_CV                                                    ', &
      '           AACDm_CV + Hp_CV --> AACD_CV                                                             ', &
+     ' H2O2_CV + HSO3m_CV + Hp_CV --> SO4mm_CV + 2 Hp_CV                                                  ', &
      '             SO2_CV + O3_CV --> SO4mm_CV + 2 Hp_CV                                                  ', &
-     '           HSO3m_CV + O3_CV --> SO4mm_CV + Hp_CV                                                    ', &
-     '           SO3mm_CV + O3_CV --> SO4mm_CV                                                            ', &
+     '           O3_CV + HSO3m_CV --> SO4mm_CV + Hp_CV                                                    ', &
+     '           O3_CV + SO3mm_CV --> SO4mm_CV                                                            ', &
      '                   2 HO2_CV --> H2O2_CV                                                             ', &
      '            O2m_CV + HO2_CV --> H2O2_CV + OHm_CV                                                    ', &
      '             O2m_CV + O3_CV --> OHm_CV + OH_CV                                                      ', &
-     '            SO2_CV + NO2_CV --> SO4mm_CV + 2 NO2m_CV - NO2_CV + 4 Hp_CV                             ', &
-     '          HSO3m_CV + NO2_CV --> SO4mm_CV + 2 NO2m_CV - NO2_CV + 3 Hp_CV                             ', &
-     '          SO3mm_CV + NO2_CV --> SO4mm_CV + 2 NO2m_CV - NO2_CV + 2 Hp_CV                             ', &
-     '         HNO4_CV + HSO3m_CV --> NO3m_CV + SO4mm_CV + 2 Hp_CV                                        ' /)
+     '            SO2_CV + NO2_CV --> 2 NO2m_CV + SO4mm_CV - NO2_CV + 4 Hp_CV                             ', &
+     '          NO2_CV + HSO3m_CV --> 2 NO2m_CV + SO4mm_CV - NO2_CV + 3 Hp_CV                             ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_22 = (/ &
+     '          NO2_CV + SO3mm_CV --> 2 NO2m_CV + SO4mm_CV - NO2_CV + 2 Hp_CV                             ', &
+     '         HNO4_CV + HSO3m_CV --> NO3m_CV + SO4mm_CV + 2 Hp_CV                                        ', &
      '                    NO4m_CV --> NO2m_CV                                                             ', &
      '            NO2m_CV + O3_CV --> NO3m_CV                                                             ', &
      '            NO2m_CV + OH_CV --> OHm_CV + NO2_CV                                                     ', &
      '            HONO_CV + OH_CV --> NO2_CV                                                              ', &
      '                    2 OH_CV --> H2O2_CV                                                             ', &
-     '             OH_CV + HO2_CV --> DUMMY_CV                                                            ', &
+     '             HO2_CV + OH_CV --> DUMMY_CV                                                            ', &
      '             O2m_CV + OH_CV --> OHm_CV                                                              ', &
      '            H2O2_CV + OH_CV --> HO2_CV                                                              ', &
-     '           HSO3m_CV + OH_CV --> SO3m_CV                                                             ', &
-     '            HO2_CV + NO2_CV --> HNO4_CV                                                             ', &
+     '           OH_CV + HSO3m_CV --> SO3m_CV                                                             ', &
+     '            NO2_CV + HO2_CV --> HNO4_CV                                                             ', &
      '            O2m_CV + NO2_CV --> NO4m_CV                                                             ', &
-     '                    HNO4_CV --> HO2_CV + NO2_CV                                                     ', &
+     '                    HNO4_CV --> NO2_CV + HO2_CV                                                     ', &
      '          NO3_CV + SO4mm_CV --> SO4m_CV + NO3m_CV                                                   ', &
      '          NO3_CV + HSO3m_CV --> SO4m_CV + NO3m_CV + Hp_CV                                           ', &
      '            SO3m_CV + O2_CV --> SO5m_CV                                                             ', &
@@ -880,12 +882,12 @@ MODULE mchem_Monitor
      '         HCHO_CV + SO3mm_CV --> HMSm_CV + OHm_CV                                                    ', &
      '                    HMSm_CV --> HCHO_CV + HSO3m_CV                                                  ', &
      '           HMSm_CV + OHm_CV --> CH2OHYD_CV + SO3mm_CV                                               ', &
-     '            HMSm_CV + OH_CV --> FACD_CV + HSO3m_CV + HO2_CV                                         ', &
+     '            HMSm_CV + OH_CV --> FACD_CV + HO2_CV + HSO3m_CV                                         ', &
      '  MHP_CV + HSO3m_CV + Hp_CV --> MHP_CV + SO4mm_CV + 2 Hp_CV                                         ', &
-     '  PAA_CV + HSO3m_CV + Hp_CV --> MHP_CV + SO4mm_CV + 2 Hp_CV                                         ', &
-     '          PAA_CV + HSO3m_CV --> SO4mm_CV + Hp_CV                                                    ', &
-     '           HCOOm_CV + OH_CV --> H2CO3_CV + OHm_CV + HO2_CV                                          ' /)
+     '  PAA_CV + HSO3m_CV + Hp_CV --> MHP_CV + SO4mm_CV + 2 Hp_CV                                         ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_23 = (/ &
+     '          PAA_CV + HSO3m_CV --> SO4mm_CV + Hp_CV                                                    ', &
+     '           HCOOm_CV + OH_CV --> H2CO3_CV + OHm_CV + HO2_CV                                          ', &
      '            GLYD_CV + OH_CV --> GCOLAC_CV + HO2_CV                                                  ', &
      '            GLYD_CV + OH_CV --> GLY_CV + HO2_CV                                                     ', &
      '          GCOLAC_CV + OH_CV --> GLYACm_CV + HO2_CV + Hp_CV                                          ', &
@@ -913,10 +915,10 @@ MODULE mchem_Monitor
      '                     OHm_CV --> WD_OHm                                                              ', &
      '                     SO2_CV --> WD_SO2                                                              ', &
      '                    FACD_CV --> WD_FACD                                                             ', &
-     '                    HNO3_CV --> WD_HNO3                                                             ', &
-     '                   H2CO3_CV --> WD_CO2                                                              ', &
-     '                   HCO3m_CV --> WD_CO2                                                              ' /)
+     '                    HNO3_CV --> WD_HNO3                                                             ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_24 = (/ &
+     '                   H2CO3_CV --> WD_CO2                                                              ', &
+     '                   HCO3m_CV --> WD_CO2                                                              ', &
      '                   CO3mm_CV --> WD_CO2                                                              ', &
      '                    H2O2_CV --> WD_H2O2                                                             ', &
      '                      O3_CV --> WD_O3                                                               ', &
@@ -944,10 +946,10 @@ MODULE mchem_Monitor
      '                 CH2OHYD_CV --> WD_FORM                                                             ', &
      '                  GCOLAC_CV --> WD_AORGCJ                                                           ', &
      '                 GCOLACm_CV --> WD_AORGCJ                                                           ', &
-     '                   GLYAC_CV --> WD_AORGCJ                                                           ', &
-     '                  GLYACm_CV --> WD_AORGCJ                                                           ', &
-     '                   OXLAC_CV --> WD_AORGCJ                                                           ' /)
+     '                   GLYAC_CV --> WD_AORGCJ                                                           ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_25 = (/ &
+     '                  GLYACm_CV --> WD_AORGCJ                                                           ', &
+     '                   OXLAC_CV --> WD_AORGCJ                                                           ', &
      '                  OXLACm_CV --> WD_AORGCJ                                                           ', &
      '                 OXLACmm_CV --> WD_AORGCJ                                                           ', &
      '                   AACDm_CV --> WD_AACD                                                             ', &
@@ -975,10 +977,10 @@ MODULE mchem_Monitor
      '                        NO3 --> WD_NO3                                                              ', &
      '                       H2O2 --> WD_H2O2                                                             ', &
      '                       N2O5 --> WD_N2O5                                                             ', &
-     '                       HNO3 --> WD_HNO3                                                             ', &
-     '                       HONO --> WD_HONO                                                             ', &
-     '                        PNA --> WD_PNA                                                              ' /)
+     '                       HNO3 --> WD_HNO3                                                             ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_26 = (/ &
+     '                       HONO --> WD_HONO                                                             ', &
+     '                        PNA --> WD_PNA                                                              ', &
      '                        SO2 --> WD_SO2                                                              ', &
      '                       SULF --> WD_SULF                                                             ', &
      '                        PAN --> WD_PAN                                                              ', &
@@ -1006,10 +1008,10 @@ MODULE mchem_Monitor
      '                       PRPA --> WD_PRPA                                                             ', &
      '                       ETHY --> WD_ETHY                                                             ', &
      '                        ETH --> WD_ETH                                                              ', &
-     '                        OLE --> WD_OLE                                                              ', &
-     '                       IOLE --> WD_IOLE                                                             ', &
-     '                       ISOP --> WD_ISOP                                                             ' /)
+     '                        OLE --> WD_OLE                                                              ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_27 = (/ &
+     '                       IOLE --> WD_IOLE                                                             ', &
+     '                       ISOP --> WD_ISOP                                                             ', &
      '                       ISPD --> WD_ISPD                                                             ', &
      '                       INTR --> WD_INTR                                                             ', &
      '                       ISPX --> WD_ISPX                                                             ', &
@@ -1037,10 +1039,10 @@ MODULE mchem_Monitor
      '                      CLNO3 --> WD_CLNO3                                                            ', &
      '                       SESQ --> WD_SESQ                                                             ', &
      '                     SOAALK --> WD_SOAALK                                                           ', &
-     '                     VLVPO1 --> WD_VLVPO1                                                           ', &
-     '                     VSVPO1 --> WD_VSVPO1                                                           ', &
-     '                     VSVPO2 --> WD_VSVPO2                                                           ' /)
+     '                     VLVPO1 --> WD_VLVPO1                                                           ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_28 = (/ &
+     '                     VSVPO1 --> WD_VSVPO1                                                           ', &
+     '                     VSVPO2 --> WD_VSVPO2                                                           ', &
      '                     VSVPO3 --> WD_VSVPO3                                                           ', &
      '                     VIVPO1 --> WD_VIVPO1                                                           ', &
      '                     VLVOO1 --> WD_VLVOO1                                                           ', &
@@ -1068,10 +1070,10 @@ MODULE mchem_Monitor
      '                      ANH4I --> WD_ANH4I                                                            ', &
      '                      ANO3I --> WD_ANO3I                                                            ', &
      '                       ACLI --> WD_ACLI                                                             ', &
-     '                       ACLJ --> WD_ACLJ                                                             ', &
+     '                       ACLJ --> WD_ACLJ                                                             ' /)
+  CHARACTER(LEN=100), PARAMETER, DIMENSION(18) :: EQN_NAMES_29 = (/ &
      '                       ACLK --> WD_ACLK                                                             ', &
-     '                     AISO1J --> WD_AISO1J                                                           ' /)
-  CHARACTER(LEN=100), PARAMETER, DIMENSION(16) :: EQN_NAMES_29 = (/ &
+     '                     AISO1J --> WD_AISO1J                                                           ', &
      '                     AISO2J --> WD_AISO2J                                                           ', &
      '                      ASQTJ --> WD_ASQTJ                                                            ', &
      '                     AISO3J --> WD_AISO3J                                                           ', &
@@ -1088,7 +1090,7 @@ MODULE mchem_Monitor
      '                     AAVB3J --> WD_AAVB3J                                                           ', &
      '                     AAVB4J --> WD_AAVB4J                                                           ', &
      '                        NH3 --> WD_NH3                                                              ' /)
-  CHARACTER(LEN=100), PARAMETER, DIMENSION(886) :: EQN_NAMES = (/&
+  CHARACTER(LEN=100), PARAMETER, DIMENSION(888) :: EQN_NAMES = (/&
     EQN_NAMES_0, EQN_NAMES_1, EQN_NAMES_2, EQN_NAMES_3, EQN_NAMES_4, &
     EQN_NAMES_5, EQN_NAMES_6, EQN_NAMES_7, EQN_NAMES_8, EQN_NAMES_9, &
     EQN_NAMES_10, EQN_NAMES_11, EQN_NAMES_12, EQN_NAMES_13, EQN_NAMES_14, &
@@ -1247,162 +1249,162 @@ MODULE mchem_Monitor
      'AQEQ16f_RS     ','AQEQ16b_RS     ','AQEQ17f_RS     ', &
      'AQEQ17b_RS     ','AQEQ18f_RS     ','AQEQ18b_RS     ', &
      'AQEQ19f_RS     ','AQEQ19b_RS     ','AQEQ20f_RS     ', &
-     'AQEQ20b_RS     ','AQ01_RS        ','AQ02_RS        ', &
-     'AQ03_RS        ','AQ04_RS        ','AQ05_RS        ', &
-     'AQ06_RS        ','AQ07_RS        ','AQ08_RS        ', &
-     'AQ09_RS        ','AQ10_RS        ','AQ11_RS        ' /)
+     'AQEQ20b_RS     ','AQ00_RS        ','AQ01_RS        ', &
+     'AQ02_RS        ','AQ03_RS        ','AQ04_RS        ', &
+     'AQ05_RS        ','AQ06_RS        ','AQ07_RS        ', &
+     'AQ08_RS        ','AQ09_RS        ','AQ10_RS        ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: EQN_TAGS_5 = (/ &
-     'AQ12_RS        ','AQ13_RS        ','AQ14_RS        ', &
-     'AQ16_RS        ','AQ17_RS        ','AQ18_RS        ', &
-     'AQ19_RS        ','AQ20_RS        ','AQ21_RS        ', &
-     'AQ22_RS        ','AQ23_RS        ','AQ24_RS        ', &
-     'AQ25_RS        ','AQ26_RS        ','AQ27_RS        ', &
-     'AQ28_RS        ','AQ29_RS        ','AQ30_RS        ', &
-     'AQ31_RS        ','AQ32_RS        ','AQ34_RS        ', &
-     'AQ35_RS        ','AQ36_RS        ','AQ37_RS        ', &
-     'AQ38_RS        ','AQ39_RS        ','AQ40_RS        ', &
-     'AQ41_RS        ','AQ70_RS        ','AQ71_RS        ', &
-     'AQ72_RS        ','AQ73_RS        ','AQ74_RS        ', &
-     'AQ75_RS        ','AQ76_RS        ','AQ77_RS        ', &
-     'AQ78_RS        ','AQ79_RS        ','AQ80_RS        ', &
-     'AQ81_RS        ','AQ82_RS        ','AQ83_RS        ', &
-     'AQ84_RS        ','AQ85_RS        ','AQ86_RS        ', &
-     'AQ87_RS        ','AQJ01_RS       ','AQIEP0_RS      ', &
-     'AKN01_RS       ','AKN02_RS       ','AKN03_RS       ', &
-     'AKN04_RS       ','AQWD01_RS      ','AQWD02_RS      ', &
-     'AQWD03_RS      ','AQWD04_RS      ','AQWD05_RS      ', &
-     'AQWD06_RS      ','AQWD07_RS      ','AQWD08_RS      ', &
-     'AQWD10_RS      ','AQWD11_RS      ','AQWD12_RS      ', &
-     'AQWD13_RS      ','AQWD14_RS      ','AQWD15_RS      ', &
-     'AQWD16_RS      ','AQWD17_RS      ','AQWD18_RS      ', &
-     'AQWD19_RS      ','AQWD20_RS      ','AQWD21_RS      ', &
-     'AQWD22_RS      ','AQWD23_RS      ','AQWD24_RS      ', &
-     'AQWD25_RS      ','AQWD26_RS      ','AQWD27_RS      ', &
-     'AQWD28_RS      ','AQWD29_RS      ','AQWD30_RS      ', &
-     'AQWD31_RS      ','AQWD32_RS      ','AQWD33_RS      ', &
-     'AQWD34_RS      ','AQWD35_RS      ','AQWD36_RS      ', &
-     'AQWD37_RS      ','AQWD38_RS      ','AQWD39_RS      ' /)
+     'AQ11_RS        ','AQ12_RS        ','AQ13_RS        ', &
+     'AQ14_RS        ','AQ16_RS        ','AQ17_RS        ', &
+     'AQ18_RS        ','AQ19_RS        ','AQ20_RS        ', &
+     'AQ21_RS        ','AQ22_RS        ','AQ23_RS        ', &
+     'AQ24_RS        ','AQ25_RS        ','AQ26_RS        ', &
+     'AQ27_RS        ','AQ28_RS        ','AQ29_RS        ', &
+     'AQ30_RS        ','AQ31_RS        ','AQ32_RS        ', &
+     'AQ34_RS        ','AQ35_RS        ','AQ36_RS        ', &
+     'AQ37_RS        ','AQ38_RS        ','AQ39_RS        ', &
+     'AQ40_RS        ','AQ41_RS        ','AQ70_RS        ', &
+     'AQ71_RS        ','AQ72_RS        ','AQ73_RS        ', &
+     'AQ74_RS        ','AQ75_RS        ','AQ76_RS        ', &
+     'AQ77_RS        ','AQ78_RS        ','AQ79_RS        ', &
+     'AQ80_RS        ','AQ81_RS        ','AQ82_RS        ', &
+     'AQ83_RS        ','AQ84_RS        ','AQ85_RS        ', &
+     'AQ86_RS        ','AQ87_RS        ','AQJ01_RS       ', &
+     'AQIEP0_RS      ','AKN01_RS       ','AKN02_RS       ', &
+     'AKN03_RS       ','AKN04_RS       ','AQWD01_RS      ', &
+     'AQWD02_RS      ','AQWD03_RS      ','AQWD04_RS      ', &
+     'AQWD05_RS      ','AQWD06_RS      ','AQWD07_RS      ', &
+     'AQWD08_RS      ','AQWD10_RS      ','AQWD11_RS      ', &
+     'AQWD12_RS      ','AQWD13_RS      ','AQWD14_RS      ', &
+     'AQWD15_RS      ','AQWD16_RS      ','AQWD17_RS      ', &
+     'AQWD18_RS      ','AQWD19_RS      ','AQWD20_RS      ', &
+     'AQWD21_RS      ','AQWD22_RS      ','AQWD23_RS      ', &
+     'AQWD24_RS      ','AQWD25_RS      ','AQWD26_RS      ', &
+     'AQWD27_RS      ','AQWD28_RS      ','AQWD29_RS      ', &
+     'AQWD30_RS      ','AQWD31_RS      ','AQWD32_RS      ', &
+     'AQWD33_RS      ','AQWD34_RS      ','AQWD35_RS      ', &
+     'AQWD36_RS      ','AQWD37_RS      ','AQWD38_RS      ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: EQN_TAGS_6 = (/ &
-     'AQWD40_RS      ','AQWD41_RS      ','AQWD42_RS      ', &
-     'AQWD43_RS      ','AQWD44_RS      ','AQWD45_RS      ', &
-     'AQWD46_RS      ','AQWD47_RS      ','AQWD48_RS      ', &
-     'AQWD49_RS      ','AQWD50_RS      ','AQWD51_RS      ', &
-     'AQWD52_RS      ','AQWD53_RS      ','AQWD54_RS      ', &
-     'AQWD55_RS      ','AQWD56_RS      ','AQWD57_RS      ', &
-     'AQWD58_RS      ','AQWD59_RS      ','AQUP01f_CV     ', &
-     'AQUP01b_CV     ','AQUP02f_CV     ','AQUP02b_CV     ', &
-     'AQUP03f_CV     ','AQUP03b_CV     ','AQUP04f_CV     ', &
-     'AQUP04b_CV     ','AQUP05f_CV     ','AQUP05b_CV     ', &
-     'AQUP06f_CV     ','AQUP06b_CV     ','AQUP07f_CV     ', &
-     'AQUP07b_CV     ','AQUP08f_CV     ','AQUP08b_CV     ', &
-     'AQUP09f_CV     ','AQUP09b_CV     ','AQUP10f_CV     ', &
-     'AQUP10b_CV     ','AQUP11f_CV     ','AQUP11b_CV     ', &
-     'AQUP12_CV      ','AQUP13_CV      ','AQUP14f_CV     ', &
-     'AQUP14b_CV     ','AQUP15f_CV     ','AQUP15b_CV     ', &
-     'AQUP16f_CV     ','AQUP16b_CV     ','AQUP17f_CV     ', &
-     'AQUP17b_CV     ','AQUP18f_CV     ','AQUP18b_CV     ', &
-     'AQUP19f_CV     ','AQUP19b_CV     ','AQUP20f_CV     ', &
-     'AQUP20b_CV     ','AQUP21f_CV     ','AQUP21b_CV     ', &
-     'AQUP22f_CV     ','AQUP22b_CV     ','AQUP23f_CV     ', &
-     'AQUP23b_CV     ','AQUP24f_CV     ','AQUP24b_CV     ', &
-     'AQUP25f_CV     ','AQUP25b_CV     ','AQHY01f_CV     ', &
-     'AQHY01b_CV     ','AQEQ01f_CV     ','AQEQ01b_CV     ', &
-     'AQEQ02f_CV     ','AQEQ02b_CV     ','AQEQ03f_CV     ', &
-     'AQEQ03b_CV     ','AQEQ04f_CV     ','AQEQ04b_CV     ', &
-     'AQEQ05f_CV     ','AQEQ05b_CV     ','AQEQ06f_CV     ', &
-     'AQEQ06b_CV     ','AQEQ07f_CV     ','AQEQ07b_CV     ', &
-     'AQEQ08f_CV     ','AQEQ08b_CV     ','AQEQ09f_CV     ', &
-     'AQEQ09b_CV     ','AQEQ10f_CV     ','AQEQ10b_CV     ' /)
+     'AQWD39_RS      ','AQWD40_RS      ','AQWD41_RS      ', &
+     'AQWD42_RS      ','AQWD43_RS      ','AQWD44_RS      ', &
+     'AQWD45_RS      ','AQWD46_RS      ','AQWD47_RS      ', &
+     'AQWD48_RS      ','AQWD49_RS      ','AQWD50_RS      ', &
+     'AQWD51_RS      ','AQWD52_RS      ','AQWD53_RS      ', &
+     'AQWD54_RS      ','AQWD55_RS      ','AQWD56_RS      ', &
+     'AQWD57_RS      ','AQWD58_RS      ','AQWD59_RS      ', &
+     'AQUP01f_CV     ','AQUP01b_CV     ','AQUP02f_CV     ', &
+     'AQUP02b_CV     ','AQUP03f_CV     ','AQUP03b_CV     ', &
+     'AQUP04f_CV     ','AQUP04b_CV     ','AQUP05f_CV     ', &
+     'AQUP05b_CV     ','AQUP06f_CV     ','AQUP06b_CV     ', &
+     'AQUP07f_CV     ','AQUP07b_CV     ','AQUP08f_CV     ', &
+     'AQUP08b_CV     ','AQUP09f_CV     ','AQUP09b_CV     ', &
+     'AQUP10f_CV     ','AQUP10b_CV     ','AQUP11f_CV     ', &
+     'AQUP11b_CV     ','AQUP12_CV      ','AQUP13_CV      ', &
+     'AQUP14f_CV     ','AQUP14b_CV     ','AQUP15f_CV     ', &
+     'AQUP15b_CV     ','AQUP16f_CV     ','AQUP16b_CV     ', &
+     'AQUP17f_CV     ','AQUP17b_CV     ','AQUP18f_CV     ', &
+     'AQUP18b_CV     ','AQUP19f_CV     ','AQUP19b_CV     ', &
+     'AQUP20f_CV     ','AQUP20b_CV     ','AQUP21f_CV     ', &
+     'AQUP21b_CV     ','AQUP22f_CV     ','AQUP22b_CV     ', &
+     'AQUP23f_CV     ','AQUP23b_CV     ','AQUP24f_CV     ', &
+     'AQUP24b_CV     ','AQUP25f_CV     ','AQUP25b_CV     ', &
+     'AQHY01f_CV     ','AQHY01b_CV     ','AQEQ01f_CV     ', &
+     'AQEQ01b_CV     ','AQEQ02f_CV     ','AQEQ02b_CV     ', &
+     'AQEQ03f_CV     ','AQEQ03b_CV     ','AQEQ04f_CV     ', &
+     'AQEQ04b_CV     ','AQEQ05f_CV     ','AQEQ05b_CV     ', &
+     'AQEQ06f_CV     ','AQEQ06b_CV     ','AQEQ07f_CV     ', &
+     'AQEQ07b_CV     ','AQEQ08f_CV     ','AQEQ08b_CV     ', &
+     'AQEQ09f_CV     ','AQEQ09b_CV     ','AQEQ10f_CV     ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: EQN_TAGS_7 = (/ &
-     'AQEQ11f_CV     ','AQEQ11b_CV     ','AQEQ12f_CV     ', &
-     'AQEQ12b_CV     ','AQEQ13f_CV     ','AQEQ13b_CV     ', &
-     'AQEQ14f_CV     ','AQEQ14b_CV     ','AQEQ15f_CV     ', &
-     'AQEQ15b_CV     ','AQEQ16f_CV     ','AQEQ16b_CV     ', &
-     'AQEQ17f_CV     ','AQEQ17b_CV     ','AQEQ18f_CV     ', &
-     'AQEQ18b_CV     ','AQEQ19f_CV     ','AQEQ19b_CV     ', &
-     'AQEQ20f_CV     ','AQEQ20b_CV     ','AQ01_CV        ', &
-     'AQ02_CV        ','AQ03_CV        ','AQ04_CV        ', &
-     'AQ05_CV        ','AQ06_CV        ','AQ07_CV        ', &
-     'AQ08_CV        ','AQ09_CV        ','AQ10_CV        ', &
-     'AQ11_CV        ','AQ12_CV        ','AQ13_CV        ', &
-     'AQ14_CV        ','AQ16_CV        ','AQ17_CV        ', &
-     'AQ18_CV        ','AQ19_CV        ','AQ20_CV        ', &
-     'AQ21_CV        ','AQ22_CV        ','AQ23_CV        ', &
-     'AQ24_CV        ','AQ25_CV        ','AQ26_CV        ', &
-     'AQ27_CV        ','AQ28_CV        ','AQ29_CV        ', &
-     'AQ30_CV        ','AQ31_CV        ','AQ32_CV        ', &
-     'AQ34_CV        ','AQ35_CV        ','AQ36_CV        ', &
-     'AQ37_CV        ','AQ38_CV        ','AQ39_CV        ', &
-     'AQ40_CV        ','AQ41_CV        ','AQ70_CV        ', &
-     'AQ71_CV        ','AQ72_CV        ','AQ73_CV        ', &
-     'AQ74_CV        ','AQ75_CV        ','AQ76_CV        ', &
-     'AQ77_CV        ','AQ78_CV        ','AQ79_CV        ', &
-     'AQ80_CV        ','AQ81_CV        ','AQ82_CV        ', &
-     'AQ83_CV        ','AQ84_CV        ','AQ85_CV        ', &
-     'AQ86_CV        ','AQ87_CV        ','AQJ01_CV       ', &
-     'AQIEP0_CV      ','AKN01_CV       ','AKN02_CV       ', &
-     'AKN03_CV       ','AKN04_CV       ','AQWD01_CV      ', &
-     'AQWD02_CV      ','AQWD03_CV      ','AQWD04_CV      ', &
-     'AQWD05_CV      ','AQWD06_CV      ','AQWD07_CV      ' /)
+     'AQEQ10b_CV     ','AQEQ11f_CV     ','AQEQ11b_CV     ', &
+     'AQEQ12f_CV     ','AQEQ12b_CV     ','AQEQ13f_CV     ', &
+     'AQEQ13b_CV     ','AQEQ14f_CV     ','AQEQ14b_CV     ', &
+     'AQEQ15f_CV     ','AQEQ15b_CV     ','AQEQ16f_CV     ', &
+     'AQEQ16b_CV     ','AQEQ17f_CV     ','AQEQ17b_CV     ', &
+     'AQEQ18f_CV     ','AQEQ18b_CV     ','AQEQ19f_CV     ', &
+     'AQEQ19b_CV     ','AQEQ20f_CV     ','AQEQ20b_CV     ', &
+     'AQ00_CV        ','AQ01_CV        ','AQ02_CV        ', &
+     'AQ03_CV        ','AQ04_CV        ','AQ05_CV        ', &
+     'AQ06_CV        ','AQ07_CV        ','AQ08_CV        ', &
+     'AQ09_CV        ','AQ10_CV        ','AQ11_CV        ', &
+     'AQ12_CV        ','AQ13_CV        ','AQ14_CV        ', &
+     'AQ16_CV        ','AQ17_CV        ','AQ18_CV        ', &
+     'AQ19_CV        ','AQ20_CV        ','AQ21_CV        ', &
+     'AQ22_CV        ','AQ23_CV        ','AQ24_CV        ', &
+     'AQ25_CV        ','AQ26_CV        ','AQ27_CV        ', &
+     'AQ28_CV        ','AQ29_CV        ','AQ30_CV        ', &
+     'AQ31_CV        ','AQ32_CV        ','AQ34_CV        ', &
+     'AQ35_CV        ','AQ36_CV        ','AQ37_CV        ', &
+     'AQ38_CV        ','AQ39_CV        ','AQ40_CV        ', &
+     'AQ41_CV        ','AQ70_CV        ','AQ71_CV        ', &
+     'AQ72_CV        ','AQ73_CV        ','AQ74_CV        ', &
+     'AQ75_CV        ','AQ76_CV        ','AQ77_CV        ', &
+     'AQ78_CV        ','AQ79_CV        ','AQ80_CV        ', &
+     'AQ81_CV        ','AQ82_CV        ','AQ83_CV        ', &
+     'AQ84_CV        ','AQ85_CV        ','AQ86_CV        ', &
+     'AQ87_CV        ','AQJ01_CV       ','AQIEP0_CV      ', &
+     'AKN01_CV       ','AKN02_CV       ','AKN03_CV       ', &
+     'AKN04_CV       ','AQWD01_CV      ','AQWD02_CV      ', &
+     'AQWD03_CV      ','AQWD04_CV      ','AQWD05_CV      ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: EQN_TAGS_8 = (/ &
-     'AQWD08_CV      ','AQWD10_CV      ','AQWD11_CV      ', &
-     'AQWD12_CV      ','AQWD13_CV      ','AQWD14_CV      ', &
-     'AQWD15_CV      ','AQWD16_CV      ','AQWD17_CV      ', &
-     'AQWD18_CV      ','AQWD19_CV      ','AQWD20_CV      ', &
-     'AQWD21_CV      ','AQWD22_CV      ','AQWD23_CV      ', &
-     'AQWD24_CV      ','AQWD25_CV      ','AQWD26_CV      ', &
-     'AQWD27_CV      ','AQWD28_CV      ','AQWD29_CV      ', &
-     'AQWD30_CV      ','AQWD31_CV      ','AQWD32_CV      ', &
-     'AQWD33_CV      ','AQWD34_CV      ','AQWD35_CV      ', &
-     'AQWD36_CV      ','AQWD37_CV      ','AQWD38_CV      ', &
-     'AQWD39_CV      ','AQWD40_CV      ','AQWD41_CV      ', &
-     'AQWD42_CV      ','AQWD43_CV      ','AQWD44_CV      ', &
-     'AQWD45_CV      ','AQWD46_CV      ','AQWD47_CV      ', &
-     'AQWD48_CV      ','AQWD49_CV      ','AQWD50_CV      ', &
-     'AQWD51_CV      ','AQWD52_CV      ','AQWD53_CV      ', &
-     'AQWD54_CV      ','AQWD55_CV      ','AQWD56_CV      ', &
-     'AQWD57_CV      ','AQWD58_CV      ','AQWD59_CV      ', &
-     'GASWD01        ','GASWD02        ','GASWD03        ', &
-     'GASWD04        ','GASWD05        ','GASWD06        ', &
-     'GASWD07        ','GASWD08        ','GASWD09        ', &
-     'GASWD10        ','GASWD11        ','GASWD12        ', &
-     'GASWD13        ','GASWD14        ','GASWD15        ', &
-     'GASWD16        ','GASWD17        ','GASWD18        ', &
-     'GASWD19        ','GASWD20        ','GASWD21        ', &
-     'GASWD22        ','GASWD23        ','GASWD24        ', &
-     'GASWD25        ','GASWD26        ','GASWD27        ', &
-     'GASWD28        ','GASWD29        ','GASWD30        ', &
-     'GASWD31        ','GASWD32        ','GASWD33        ', &
-     'GASWD34        ','GASWD35        ','GASWD36        ', &
-     'GASWD37        ','GASWD38        ','GASWD39        ' /)
-  CHARACTER(LEN=32), PARAMETER, DIMENSION(76) :: EQN_TAGS_9 = (/ &
-     'GASWD40        ','GASWD41        ','GASWD42        ', &
-     'GASWD43        ','GASWD44        ','GASWD45        ', &
-     'GASWD46        ','GASWD47        ','GASWD48        ', &
-     'GASWD49        ','GASWD50        ','GASWD51        ', &
-     'GASWD52        ','GASWD53        ','GASWD54        ', &
-     'GASWD55        ','GASWD56        ','GASWD57        ', &
-     'GASWD58        ','GASWD59        ','GASWD60        ', &
-     'GASWD61        ','GASWD62        ','GASWD63        ', &
-     'GASWD64        ','GASWD65        ','GASWD66        ', &
-     'GASWD67        ','GASWD68        ','GASWD69        ', &
-     'GASWD70        ','GASWD71        ','GASWD72        ', &
-     'GASWD73        ','GASWD74        ','GASWD75        ', &
-     'GASWD76        ','GASWD77        ','GASWD78        ', &
-     'GASWD79        ','GASWD80        ','GASWD81        ', &
-     'GASWD82        ','GASWD83        ','GASWD84        ', &
-     'GASWD85        ','GASWD86        ','GASWD87        ', &
-     'GASWD88        ','GASWD89        ','GASWD90        ', &
-     'GASWD91        ','GASWD92        ','GASWD93        ', &
-     'GASWD94        ','GASWD95        ','GASWD96        ', &
-     'GASWD97        ','GASWD98        ','GASWD99        ', &
-     'GASWD100       ','GASWD101       ','GASWD102       ', &
-     'GASWD103       ','GASWD104       ','GASWD105       ', &
-     'GASWD106       ','GASWD107       ','GASWD108       ', &
-     'GASWD109       ','GASWD110       ','GASWD111       ', &
-     'GASWD112       ','GASWD113       ','GASWD114       ', &
-     'GASWD115       ' /)
-  CHARACTER(LEN=32), PARAMETER, DIMENSION(886) :: EQN_TAGS = (/&
+     'AQWD06_CV      ','AQWD07_CV      ','AQWD08_CV      ', &
+     'AQWD10_CV      ','AQWD11_CV      ','AQWD12_CV      ', &
+     'AQWD13_CV      ','AQWD14_CV      ','AQWD15_CV      ', &
+     'AQWD16_CV      ','AQWD17_CV      ','AQWD18_CV      ', &
+     'AQWD19_CV      ','AQWD20_CV      ','AQWD21_CV      ', &
+     'AQWD22_CV      ','AQWD23_CV      ','AQWD24_CV      ', &
+     'AQWD25_CV      ','AQWD26_CV      ','AQWD27_CV      ', &
+     'AQWD28_CV      ','AQWD29_CV      ','AQWD30_CV      ', &
+     'AQWD31_CV      ','AQWD32_CV      ','AQWD33_CV      ', &
+     'AQWD34_CV      ','AQWD35_CV      ','AQWD36_CV      ', &
+     'AQWD37_CV      ','AQWD38_CV      ','AQWD39_CV      ', &
+     'AQWD40_CV      ','AQWD41_CV      ','AQWD42_CV      ', &
+     'AQWD43_CV      ','AQWD44_CV      ','AQWD45_CV      ', &
+     'AQWD46_CV      ','AQWD47_CV      ','AQWD48_CV      ', &
+     'AQWD49_CV      ','AQWD50_CV      ','AQWD51_CV      ', &
+     'AQWD52_CV      ','AQWD53_CV      ','AQWD54_CV      ', &
+     'AQWD55_CV      ','AQWD56_CV      ','AQWD57_CV      ', &
+     'AQWD58_CV      ','AQWD59_CV      ','GASWD01        ', &
+     'GASWD02        ','GASWD03        ','GASWD04        ', &
+     'GASWD05        ','GASWD06        ','GASWD07        ', &
+     'GASWD08        ','GASWD09        ','GASWD10        ', &
+     'GASWD11        ','GASWD12        ','GASWD13        ', &
+     'GASWD14        ','GASWD15        ','GASWD16        ', &
+     'GASWD17        ','GASWD18        ','GASWD19        ', &
+     'GASWD20        ','GASWD21        ','GASWD22        ', &
+     'GASWD23        ','GASWD24        ','GASWD25        ', &
+     'GASWD26        ','GASWD27        ','GASWD28        ', &
+     'GASWD29        ','GASWD30        ','GASWD31        ', &
+     'GASWD32        ','GASWD33        ','GASWD34        ', &
+     'GASWD35        ','GASWD36        ','GASWD37        ' /)
+  CHARACTER(LEN=32), PARAMETER, DIMENSION(78) :: EQN_TAGS_9 = (/ &
+     'GASWD38        ','GASWD39        ','GASWD40        ', &
+     'GASWD41        ','GASWD42        ','GASWD43        ', &
+     'GASWD44        ','GASWD45        ','GASWD46        ', &
+     'GASWD47        ','GASWD48        ','GASWD49        ', &
+     'GASWD50        ','GASWD51        ','GASWD52        ', &
+     'GASWD53        ','GASWD54        ','GASWD55        ', &
+     'GASWD56        ','GASWD57        ','GASWD58        ', &
+     'GASWD59        ','GASWD60        ','GASWD61        ', &
+     'GASWD62        ','GASWD63        ','GASWD64        ', &
+     'GASWD65        ','GASWD66        ','GASWD67        ', &
+     'GASWD68        ','GASWD69        ','GASWD70        ', &
+     'GASWD71        ','GASWD72        ','GASWD73        ', &
+     'GASWD74        ','GASWD75        ','GASWD76        ', &
+     'GASWD77        ','GASWD78        ','GASWD79        ', &
+     'GASWD80        ','GASWD81        ','GASWD82        ', &
+     'GASWD83        ','GASWD84        ','GASWD85        ', &
+     'GASWD86        ','GASWD87        ','GASWD88        ', &
+     'GASWD89        ','GASWD90        ','GASWD91        ', &
+     'GASWD92        ','GASWD93        ','GASWD94        ', &
+     'GASWD95        ','GASWD96        ','GASWD97        ', &
+     'GASWD98        ','GASWD99        ','GASWD100       ', &
+     'GASWD101       ','GASWD102       ','GASWD103       ', &
+     'GASWD104       ','GASWD105       ','GASWD106       ', &
+     'GASWD107       ','GASWD108       ','GASWD109       ', &
+     'GASWD110       ','GASWD111       ','GASWD112       ', &
+     'GASWD113       ','GASWD114       ','GASWD115       ' /)
+  CHARACTER(LEN=32), PARAMETER, DIMENSION(888) :: EQN_TAGS = (/&
     EQN_TAGS_0, EQN_TAGS_1, EQN_TAGS_2, EQN_TAGS_3, EQN_TAGS_4, &
     EQN_TAGS_5, EQN_TAGS_6, EQN_TAGS_7, EQN_TAGS_8, EQN_TAGS_9 /)
 

@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : gas_Rates.f90
-! Time                 : Fri Jun 21 11:41:45 2024
+! Time                 : Tue Jul  2 13:22:39 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : gas.kpp
 ! Output root filename : gas
@@ -285,7 +285,7 @@ END FUNCTION HALOGEN_FALLOFF
          REAL( dp )               :: V_mean
          INTRINSIC DEXP
 
-         RAD    = 0.8D-5
+         RAD    = DDIAM * 0.5D0
          R_KMT  = 8.3145D0
          R2_KMT = 0.08206D0
          PI_KMT = 3.1415926536D0
@@ -299,6 +299,109 @@ END FUNCTION HALOGEN_FALLOFF
          END IF
          RETURN
        END FUNCTION KMT
+
+       REAL( kind=dp )FUNCTION KRXN ( KR, DH, RTYPE, QY, METAL, CLTYPE )
+
+            IMPLICIT NONE
+
+            ! Input
+            REAL( kind=dp )     , INTENT( IN ) :: KR, DH
+            INTEGER             , INTENT( IN ) :: QY, RTYPE, METAL
+            CHARACTER( LEN = 2 ), INTENT( IN ) :: CLTYPE
+
+            ! Local variables
+            REAL( kind=dp )      :: Q, q1, COTHq, SVIinh
+            REAL( kind=dp )      :: kO31, kO32, kO33, kO3T
+            INTEGER              :: ind_L_H2SO4, ind_L_HSO4MIN, ind_L_SO4MIN2
+            INTEGER              :: ind_L_HPLUS
+            INTEGER              :: ind_L_SO2, ind_L_HSO3MIN, ind_L_SO3MIN2
+            REAL( kind=dp )      :: PHI2
+
+            ! Select cloud indices and properties
+            IF ( CLTYPE .EQ. 'RS' ) THEN
+              IND_L_HPLUS   = ind_Hp_RS
+              IND_L_H2SO4   = ind_SULF_RS
+              IND_L_HSO4MIN = ind_HSO4m_RS
+              IND_L_SO4MIN2 = ind_SO4mm_RS
+              IND_L_SO2     = ind_SO2_RS
+              IND_L_HSO3MIN = ind_HSO3m_RS
+              IND_L_SO3MIN2 = ind_SO3mm_RS
+              PHI2          = PHI2_RS
+            ELSE IF ( CLTYPE .EQ. 'CV' ) THEN
+              IND_L_HPLUS   = ind_Hp_CV
+              IND_L_H2SO4   = ind_SULF_CV
+              IND_L_HSO4MIN = ind_HSO4m_CV
+              IND_L_SO4MIN2 = ind_SO4mm_CV
+              IND_L_SO2     = ind_SO2_CV
+              IND_L_HSO3MIN = ind_HSO3m_CV
+              IND_L_SO3MIN2 = ind_SO3mm_CV
+              PHI2          = PHI2_CV
+            END IF
+
+
+            KRXN = KR * EXP( DH * TFAC )
+
+            IF ( RTYPE .EQ. 1 ) THEN   ! SO2 - H2O2 OXIDATION
+               KRXN = ( KRXN / ( 1.0D0 + 13.0D0 * VAR( ind_L_HPLUS ) * PHI2 ) ) 
+!           ELSE IF ( RTYPE .EQ. 2 ) then   ! SO2 - PAA OXIDATION
+!              KRXN = KRXN * (VAR(ind_L_HPLUS) * PHI2) + 7.00D2  
+            ELSE IF ( RTYPE .EQ. 3 ) then   ! SO2 - Fe3/Mn2 synergism and 
+               KRXN = KRXN * PHI2           ! MHP and PAA reaction
+            ELSE IF ( RTYPE .EQ. 4 ) then   ! only one reactant
+               KRXN = KRXN / PHI2     
+            END IF
+
+            ! SO4 inhibition only for metal-catalyzed oxidation
+            IF (METAL .GT. 0) THEN
+               ! SO4 inhibition of metal catalysis
+               SVIinh = 1.0D0 + 75.0D0 * ( ( VAR( ind_L_H2SO4 )     &
+                        +                    VAR( ind_L_HSO4MIN )   &
+                        +                    VAR( ind_L_SO4MIN2 ) ) &
+                        * PHI2 )**0.67D0
+               KRXN = KRXN / SVIinh
+            END IF
+
+!           Ionic strength impact on SIV-O3 reaction rate
+!                 IF (QY .GT. 0) THEN
+!                    KRXN = KRXN * (1.0D0 + 2.5 * STION)
+!                 END IF       
+
+!           Aqueous diffusion limitation for O3
+
+            q1 = 0.0D0
+            Q = 1.0D0
+
+            IF( QY .GE. 1 ) THEN
+
+               kO31 = 2.4D+4 * EXP( 0.0D0 * TFAC )
+               kO32 = 3.7D+5 * EXP( -5530.88D0 * TFAC )
+               kO33 = 1.5D+9 * EXP( -5280.56D0 * TFAC )
+               kO3T = ( kO31 * VAR( ind_L_SO2 ) + kO32 &
+                    * VAR( ind_L_HSO3MIN ) &
+                    + kO33 * VAR( ind_L_SO3MIN2 ) ) * PHI2
+
+               q1 = DDIAM / 2.0D0 * SQRT( kO3T / DAQ )  ! diffuso-reactive param
+
+               IF ( q1 .GT. 1.0D-3 ) THEN
+                  IF ( q1 .LE. 100.0D0 ) THEN
+                     COTHq = ( EXP( 2 * q1 ) + 1 ) / ( EXP( 2 * q1 ) - 1 )
+                     Q = 3 * ( ( COTHq / q1 ) - ( 1 / ( q1 * q1 ) ) )
+                     IF ( Q .GT. 1.0D0 ) Q = 1.0D0
+                  ELSE
+                     Q = 3.d0/q1
+                  END IF
+               ELSE
+                  Q = 1.0D0
+               END IF
+
+               KRXN = KRXN * Q
+
+            END IF
+
+            KRXN = KRXN * PHI2
+
+            RETURN
+       END FUNCTION KRXN
 
 ! End INLINED Rate Law Functions
 

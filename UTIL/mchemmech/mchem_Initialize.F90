@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : mchem_Initialize.f90
-! Time                 : Fri Jun 21 11:41:44 2024
+! Time                 : Tue Jul  2 13:22:38 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : mchem.kpp
 ! Output root filename : mchem
@@ -156,8 +156,8 @@ SUBROUTINE Initialize ( )
   RCONST(342) = 2.6e-18
   RCONST(343) = 8.5e-19
   RCONST(344) = 7.7e-14
-  RCONST(498) = 1
-  RCONST(709) = 1
+  RCONST(499) = 1
+  RCONST(711) = 1
 ! END constant rate coefficients
 
 ! INLINED initializations

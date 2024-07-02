@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : gas_Global.f90
-! Time                 : Fri Jun 21 11:41:45 2024
+! Time                 : Tue Jul  2 13:22:39 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : gas.kpp
 ! Output root filename : gas
@@ -74,6 +74,8 @@ CHARACTER(32), PARAMETER :: MECHNAME = 'MCHEM'
 !
 !
 REAL(dp), PARAMETER :: INV_T300 = 1.0D0 / 300.0D0 ! reciprocal 300K
+REAL(dp), PARAMETER :: DDIAM = 1.6D-5 ! Droplet Diameter (m)
+REAL(dp), PARAMETER :: DAQ = 1.0D-9   ! Aqueous phase diffusion coefficient (m2/
 REAL(dp)            :: CAIR          ! air number density (wet) [molec/cm^3]
 REAL(dp)            :: INV_TEMP      ! reciprocal of air temperature, K-1
 REAL(dp)            :: PRESS         ! pressure [Atm]
