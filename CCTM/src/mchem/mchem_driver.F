@@ -171,7 +171,7 @@ C.. Scavenging related variables
          SUBROUTINE CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                            N_SPC_WDEP, WDEP_MAP, SUBTRANS,
      &                            WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV,
-     &                            PRATE1_CV, RSCAV_CV )
+     &                            PRATE1_CV, RSCAV_CV, FRAC_CV )
            IMPLICIT NONE
            REAL, POINTER            :: CGRID( :,:,:,: )
            INTEGER, INTENT( IN )    :: JDATE
@@ -186,6 +186,7 @@ C.. Scavenging related variables
            REAL(8), INTENT( OUT )   :: ALFA3_CV( :,:,: )
            REAL(8), INTENT( OUT )   :: PRATE1_CV( :,:,: )
            REAL(8), INTENT( OUT )   :: RSCAV_CV( :,:,:,: )
+           REAL(8), INTENT( OUT )   :: FRAC_CV( :,:,: )
          END SUBROUTINE CONVCLD_ACM
 
          SUBROUTINE MCHEM_CHEM ( CGRID, TA, PRES, DENSI, OPEN_WATER_IN,
@@ -289,7 +290,7 @@ C..Allocate diagnostics
 
 C..Open file for mchem stats if requested
 #ifdef mchem_stats
-         ALLOCATE( VSTATS( 8 ) )
+         ALLOCATE( VSTATS( 9 ) )
          VSTATS( 1 ) = 'LWC_RS'
          VSTATS( 2 ) = 'LWC_CV'
          VSTATS( 3 ) = 'PRATE1_RS'
@@ -298,6 +299,7 @@ C..Open file for mchem stats if requested
          VSTATS( 6 ) = 'pH_CV'
          VSTATS( 7 ) = 'N_STEPS'
          VSTATS( 8 ) = 'N_FAILS'
+         VSTATS( 9 ) = 'FRAC_CV'
 
          IF ( MYPE .EQ. 0 ) THEN
 
@@ -308,7 +310,7 @@ C..Open file for mchem stats if requested
             SDATE3D = EDATE
             STIME3D = ETIME
             TSTEP3D = TSTEP( 1 )
-            NVARS3D = 8
+            NVARS3D = 9
             NCOLS3D = GL_NCOLS
             NROWS3D = GL_NROWS
             NLAYS3D = NLAYS
@@ -320,6 +322,7 @@ C..Open file for mchem stats if requested
             VNAME3D( 6 ) = 'pH_CV'
             VNAME3D( 7 ) = 'N_STEPS'
             VNAME3D( 8 ) = 'N_FAILS'
+            VNAME3D( 9 ) = 'FRAC_CV'
             VDESC3D( 1 ) = 'Liquid water content of resolved clouds'
             VDESC3D( 2 ) = 'Liquid water content of convective clouds'
             VDESC3D( 3 ) = 'Precipitation rate of resolved clouds'
@@ -328,6 +331,7 @@ C..Open file for mchem stats if requested
             VDESC3D( 6 ) = 'pH of convective clouds'
             VDESC3D( 7 ) = 'Number of steps in KPP'
             VDESC3D( 8 ) = 'Number of rejected steps in KPP'
+            VDESC3D( 9 ) = 'Convective cloud fraction'
             UNITS3D( 1 ) = 'kg/m3'
             UNITS3D( 2 ) = 'kg/m3'
             UNITS3D( 3 ) = 'mm/hr'
@@ -336,6 +340,7 @@ C..Open file for mchem stats if requested
             UNITS3D( 6 ) = '-'
             UNITS3D( 7 ) = '-'
             UNITS3D( 8 ) = '-'
+            UNITS3D( 9 ) = '1'
             VTYPE3D( 1 ) = M3REAL
             VTYPE3D( 2 ) = M3REAL
             VTYPE3D( 3 ) = M3REAL
@@ -344,6 +349,7 @@ C..Open file for mchem stats if requested
             VTYPE3D( 6 ) = M3REAL
             VTYPE3D( 7 ) = M3REAL
             VTYPE3D( 8 ) = M3REAL
+            VTYPE3D( 9 ) = M3REAL
             IF ( .NOT. OPEN3( CTM_MCHEMSTATS_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create '// TRIM( CTM_MCHEMSTATS_1 ) // ' file'
                CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT2 )
@@ -409,7 +415,7 @@ C..  Convective clouds
       CALL CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                   N_SPC_WDEP, WDEP_MAP, SUBTRANS,
      &                   WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV,
-     &                   PRATE1_CV, RSCAV_CV )
+     &                   PRATE1_CV, RSCAV_CV, FRAC_CV )
 
 
 C.. Convert to molecules/cm3
@@ -485,7 +491,7 @@ C   earlier implementations
                   DO SPC = 1, NSPCSD
                     IF ( LSCAV( SPC ) ) THEN
                        ALFA = RSCAV_RS( COL, ROW, LEV, SPC ) +
-     &                        RSCAV_CV( COL, ROW, LEV, SPC )
+     &                        RSCAV_CV( COL, ROW, LEV, SPC ) * FRAC_CV( COL, ROW, LEV )
                        ALFA = MAX( ALFA, 0.0 )
                        IF ( ALFA .GT. 0.0 ) THEN
                          WET_DEP( COL, ROW, LEV, SPC ) = REAL( CGRID( COL, ROW, LEV, SPC ), 8 ) *
@@ -635,6 +641,12 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 8 ),
      &         EDATE, ETIME, REAL( NFAILS, 4 ) ) ) THEN
+            XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
+            CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
+         END IF
+
+         IF ( .NOT. WRITE3( CTM_MCHEMSTATS_1, VSTATS( 9 ),
+     &         EDATE, ETIME, REAL( FRAC_CV, 4 ) ) ) THEN
             XMSG = 'Could not write ' // CTM_MCHEMSTATS_1 // ' file'
             CALL M3EXIT( PNAME, EDATE, ETIME, XMSG, XSTAT1 )
          END IF

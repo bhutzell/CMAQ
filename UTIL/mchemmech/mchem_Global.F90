@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : mchem_Global.f90
-! Time                 : Tue Jul  2 13:22:39 2024
+! Time                 : Wed Jul  3 11:52:28 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : mchem.kpp
 ! Output root filename : mchem
@@ -102,6 +102,8 @@ REAL(dp)            :: KPP_ALFA3_CV  !
 LOGICAL             :: LCL_RS = .FALSE.
 LOGICAL             :: LCL_CV = .FALSE.
 LOGICAL             :: LCL    = .FALSE.
+REAL(dp), PARAMETER :: CFRAC_RS = 1.0D0
+REAL(dp)            :: CFRAC_CV
 ! Henry's law constants. Just temporary
 REAL(dp)            :: H_SO2, H_HNO3, H_CO2, H_NH3, H_H2O2
 REAL(dp)            :: H_O3, H_FACD, H_HCL, H_GLY, H_MGLY

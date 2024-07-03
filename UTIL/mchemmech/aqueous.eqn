@@ -2,53 +2,53 @@
 
 #EQUATIONS
 ! Uptake
-<AQUP01f_a##> SO2       = SO2_a##       : XCL_a##*KMT(TEMP,LWC_a##,64.0D0,1.28D-5,H_SO2,0.11D0,0);
+<AQUP01f_a##> SO2       = SO2_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,64.0D0,1.28D-5,H_SO2,0.11D0,0);
 <AQUP01b_a##> SO2_a##   = SO2           : XCL_a##*KMT(TEMP,LWC_a##,64.0D0,1.28D-5,H_SO2,0.11D0,1);
-<AQUP02f_a##> HNO3      = HNO3_a##      : XCL_a##*KMT(TEMP,LWC_a##,63.0D0,1.32D-5,H_HNO3,0.09D0,0);
+<AQUP02f_a##> HNO3      = HNO3_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,63.0D0,1.32D-5,H_HNO3,0.09D0,0);
 <AQUP02b_a##> HNO3_a##  = HNO3          : XCL_a##*KMT(TEMP,LWC_a##,63.0D0,1.32D-5,H_HNO3,0.09D0,1);
-<AQUP03f_a##> CO2       = H2CO3_a##     : XCL_a##*KMT(TEMP,LWC_a##,44.0D0,1.55D-5,H_CO2,0.00015D0,0);
+<AQUP03f_a##> CO2       = H2CO3_a##     : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,44.0D0,1.55D-5,H_CO2,0.00015D0,0);
 <AQUP03b_a##> H2CO3_a## = CO2           : XCL_a##*KMT(TEMP,LWC_a##,44.0D0,1.55D-5,H_CO2,0.00015D0,1);
-<AQUP04f_a##> NH3       = NH3_a##       : XCL_a##*KMT(TEMP,LWC_a##,17.0D0,2.30D-5,H_NH3,0.091D0,0);
+<AQUP04f_a##> NH3       = NH3_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,17.0D0,2.30D-5,H_NH3,0.091D0,0);
 <AQUP04b_a##> NH3_a##   = NH3           : XCL_a##*KMT(TEMP,LWC_a##,17.0D0,2.30D-5,H_NH3,0.091D0,1);
-<AQUP05f_a##> H2O2      = H2O2_a##      : XCL_a##*KMT(TEMP,LWC_a##,34.0D0,1.46D-5,H_H2O2,0.15D0,0);
+<AQUP05f_a##> H2O2      = H2O2_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,34.0D0,1.46D-5,H_H2O2,0.15D0,0);
 <AQUP05b_a##> H2O2_a##  = H2O2          : XCL_a##*KMT(TEMP,LWC_a##,34.0D0,1.46D-5,H_H2O2,0.15D0,1);
-<AQUP06f_a##> O3        = O3_a##        : XCL_a##*KMT(TEMP,LWC_a##,48.0D0,1.48D-5,H_O3,0.1D0,0);
+<AQUP06f_a##> O3        = O3_a##        : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,48.0D0,1.48D-5,H_O3,0.1D0,0);
 <AQUP06b_a##> O3_a##    = O3            : XCL_a##*KMT(TEMP,LWC_a##,48.0D0,1.48D-5,H_O3,0.1D0,1);
-<AQUP07f_a##> FACD      = FACD_a##      : XCL_a##*KMT(TEMP,LWC_a##,46.0D0,1.53D-5,H_FACD,0.0229D0,0);
+<AQUP07f_a##> FACD      = FACD_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,46.0D0,1.53D-5,H_FACD,0.0229D0,0);
 <AQUP07b_a##> FACD_a##  = FACD          : XCL_a##*KMT(TEMP,LWC_a##,46.0D0,1.53D-5,H_FACD,0.0229D0,1);
-<AQUP08f_a##> HCL       = HCL_a##       : XCL_a##*KMT(TEMP,LWC_a##,36.5D0,1.89D-5,H_HCL,0.116D0,0);
+<AQUP08f_a##> HCL       = HCL_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,36.5D0,1.89D-5,H_HCL,0.116D0,0);
 <AQUP08b_a##> HCL_a##   = HCL           : XCL_a##*KMT(TEMP,LWC_a##,36.5D0,1.89D-5,H_HCL,0.116D0,1);
-<AQUP09f_a##> GLY       = GLY_a##       : XCL_a##*KMT(TEMP,LWC_a##,58.0D0,1.15D-5,H_GLY,0.023D0,0);
+<AQUP09f_a##> GLY       = GLY_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,58.0D0,1.15D-5,H_GLY,0.023D0,0);
 <AQUP09b_a##> GLY_a##   = GLY           : XCL_a##*KMT(TEMP,LWC_a##,58.0D0,1.15D-5,H_GLY,0.023D0,1);
-<AQUP10f_a##> MGLY      = MGLY_a##      : XCL_a##*KMT(TEMP,LWC_a##,72.0D0,1.15D-5,H_MGLY,0.023D0,0);
+<AQUP10f_a##> MGLY      = MGLY_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,72.0D0,1.15D-5,H_MGLY,0.023D0,0);
 <AQUP10b_a##> MGLY_a##  = MGLY          : XCL_a##*KMT(TEMP,LWC_a##,72.0D0,1.15D-5,H_MGLY,0.023D0,1);
-<AQUP11f_a##> OH        = OH_a##        : XCL_a##*KMT(TEMP,LWC_a##,17.0D0,1.48D-5,H_OH,0.1D0,0);
+<AQUP11f_a##> OH        = OH_a##        : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,17.0D0,1.48D-5,H_OH,0.1D0,0);
 <AQUP11b_a##> OH_a##    = OH            : XCL_a##*KMT(TEMP,LWC_a##,17.0D0,1.48D-5,H_OH,0.1D0,1);
-<AQUP12_a##>  SULF      = SULF_a##      : XCL_a##*KMT(TEMP,LWC_a##,97.0D0,1.48D-5,0.0D0,0.1D0,0);
-<AQUP13_a##>  N2O5      = 2 * HNO3_a##  : XCL_a##*KMT(TEMP,LWC_a##,108.0D0,1.48D-5,0.0D0,0.1D0,0);
-<AQUP14f_a##> HO2       = HO2_a##       : XCL_a##*KMT(TEMP,LWC_a##,33.0D0,1.04D-5,H_HO2,0.01D0,0);
+<AQUP12_a##>  SULF      = SULF_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,97.0D0,1.48D-5,0.0D0,0.1D0,0);
+<AQUP13_a##>  N2O5      = 2 * HNO3_a##  : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,108.0D0,1.48D-5,0.0D0,0.1D0,0);
+<AQUP14f_a##> HO2       = HO2_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,33.0D0,1.04D-5,H_HO2,0.01D0,0);
 <AQUP14b_a##> HO2_a##   = HO2           : XCL_a##*KMT(TEMP,LWC_a##,33.0D0,1.04D-5,H_HO2,0.01D0,1);
-<AQUP15f_a##> NO2       = NO2_a##       : XCL_a##*KMT(TEMP,LWC_a##,46.0D0,1.92D-5,H_NO2,0.0015D0,0);
+<AQUP15f_a##> NO2       = NO2_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,46.0D0,1.92D-5,H_NO2,0.0015D0,0);
 <AQUP15b_a##> NO2_a##   = NO2           : XCL_a##*KMT(TEMP,LWC_a##,46.0D0,1.92D-5,H_NO2,0.0015D0,1);
-<AQUP16f_a##> HONO      = HONO_a##      : XCL_a##*KMT(TEMP,LWC_a##,47.0D0,1.30D-5,H_HONO,0.5D0,0);
+<AQUP16f_a##> HONO      = HONO_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,47.0D0,1.30D-5,H_HONO,0.5D0,0);
 <AQUP16b_a##> HONO_a##  = HONO          : XCL_a##*KMT(TEMP,LWC_a##,47.0D0,1.30D-5,H_HONO,0.5D0,1);
-<AQUP17f_a##> PNA       = HNO4_a##      : XCL_a##*KMT(TEMP,LWC_a##,79.0D0,1.30D-5,H_HNO4,0.1D0,0);
+<AQUP17f_a##> PNA       = HNO4_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,79.0D0,1.30D-5,H_HNO4,0.1D0,0);
 <AQUP17b_a##> HNO4_a##  = PNA           : XCL_a##*KMT(TEMP,LWC_a##,79.0D0,1.30D-5,H_HNO4,0.1D0,1);
-<AQUP18f_a##> GLYD      = GLYD_a##      : XCL_a##*KMT(TEMP,LWC_a##,60.052D0,1.15D-5,H_GLYD,0.023D0,0);
+<AQUP18f_a##> GLYD      = GLYD_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,60.052D0,1.15D-5,H_GLYD,0.023D0,0);
 <AQUP18b_a##> GLYD_a##  = GLYD          : XCL_a##*KMT(TEMP,LWC_a##,60.052D0,1.15D-5,H_GLYD,0.023D0,1);
-<AQUP19f_a##> AACD      = AACD_a##      : XCL_a##*KMT(TEMP,LWC_a##,60.052D0,1.24D-5,H_AACD,0.0322D0,0);
+<AQUP19f_a##> AACD      = AACD_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,60.052D0,1.24D-5,H_AACD,0.0322D0,0);
 <AQUP19b_a##> AACD_a##  = AACD          : XCL_a##*KMT(TEMP,LWC_a##,60.052D0,1.24D-5,H_AACD,0.0322D0,1);
-<AQUP20f_a##> FORM      = HCHO_a##      : XCL_a##*KMT(TEMP,LWC_a##,30.0D0,1.64D-5,H_FORM,0.02D0,0);
+<AQUP20f_a##> FORM      = HCHO_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,30.0D0,1.64D-5,H_FORM,0.02D0,0);
 <AQUP20b_a##> HCHO_a##  = FORM          : XCL_a##*KMT(TEMP,LWC_a##,30.0D0,1.64D-5,H_FORM,0.02D0,1);
-<AQUP21f_a##> NO3       = NO3_a##       : XCL_a##*KMT(TEMP,LWC_a##,62.0D0,1.00D-5,H_NO3,0.05D0,0);
+<AQUP21f_a##> NO3       = NO3_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,62.0D0,1.00D-5,H_NO3,0.05D0,0);
 <AQUP21b_a##> NO3_a##   = NO3           : XCL_a##*KMT(TEMP,LWC_a##,62.0D0,1.00D-5,H_NO3,0.05D0,1);
-<AQUP22f_a##> MEO2      = CH3O2_a##     : XCL_a##*KMT(TEMP,LWC_a##,49.0D0,1.35D-5,H_CH3O2,0.05D0,0);
+<AQUP22f_a##> MEO2      = CH3O2_a##     : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,49.0D0,1.35D-5,H_CH3O2,0.05D0,0);
 <AQUP22b_a##> CH3O2_a## = MEO2          : XCL_a##*KMT(TEMP,LWC_a##,49.0D0,1.35D-5,H_CH3O2,0.05D0,1);
-<AQUP23f_a##> EPOX      = IEPOX_a##     : XCL_a##*KMT(TEMP,LWC_a##,118.13D0,1.00D-5,H_IEPOX,0.02D0,0);
+<AQUP23f_a##> EPOX      = IEPOX_a##     : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,118.13D0,1.00D-5,H_IEPOX,0.02D0,0);
 <AQUP23b_a##> IEPOX_a## = EPOX          : XCL_a##*KMT(TEMP,LWC_a##,118.13D0,1.00D-5,H_IEPOX,0.02D0,1);
-<AQUP24f_a##> MEPX      = MHP_a##       : XCL_a##*KMT(TEMP,LWC_a##,48.04D0,1.31D-5,H_MHP,0.006758D0,0);
+<AQUP24f_a##> MEPX      = MHP_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,48.04D0,1.31D-5,H_MHP,0.006758D0,0);
 <AQUP24b_a##> MHP_a##   = MEPX          : XCL_a##*KMT(TEMP,LWC_a##,48.04D0,1.31D-5,H_MHP,0.006758D0,1);
-<AQUP25f_a##> PACD      = PAA_a##       : XCL_a##*KMT(TEMP,LWC_a##,76.05D0,1.02D-5,H_PAA,0.019D0,0);
+<AQUP25f_a##> PACD      = PAA_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,76.05D0,1.02D-5,H_PAA,0.019D0,0);
 <AQUP25b_a##> PAA_a##   = PACD          : XCL_a##*KMT(TEMP,LWC_a##,76.05D0,1.02D-5,H_PAA,0.019D0,1);
 
 ! Hydration
@@ -177,10 +177,10 @@
 !<AQIEP3_a##> IEPOX_a## + NO3m_a##  = ISO3_a##                                   : XCL_a##*KIEPOX(2.0D-4,2.92D-6,0);
 
 ! Aitken aerosol scavenging
-<AKN01_a##>  ANO3I = NO3m_a##    + WD_ANO3I   : XCL_a##*KPP_ALFA3_a##;
-<AKN02_a##>  ANH4I = NH4p_a##    + WD_ANH4I   : XCL_a##*KPP_ALFA3_a##;
-<AKN03_a##>  ACLI  = CLm_a##     + WD_ACLI    : XCL_a##*KPP_ALFA3_a##;
-<AKN04_a##>  ASO4I = SO4mm_a##   + WD_ASO4I   : XCL_a##*KPP_ALFA3_a##;
+<AKN01_a##>  ANO3I = NO3m_a##    + WD_ANO3I   : XCL_a##*CFRAC_a##*KPP_ALFA3_a##;
+<AKN02_a##>  ANH4I = NH4p_a##    + WD_ANH4I   : XCL_a##*CFRAC_a##*KPP_ALFA3_a##;
+<AKN03_a##>  ACLI  = CLm_a##     + WD_ACLI    : XCL_a##*CFRAC_a##*KPP_ALFA3_a##;
+<AKN04_a##>  ASO4I = SO4mm_a##   + WD_ASO4I   : XCL_a##*CFRAC_a##*KPP_ALFA3_a##;
 
 ! Wet deposition
 <AQWD01_a##> Hp_a##       = WD_Hp         : XCL_a##*WFAC_a##;

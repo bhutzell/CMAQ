@@ -107,6 +107,7 @@ C...Variables related to scavenging
       REAL( 8 ), ALLOCATABLE   :: ALFA3_CV  ( :,:,: )   ! aitken mode mass scavenging coef convective cloud
       REAL( 8 ), ALLOCATABLE   :: PRATE1_CV ( :,:,: )   ! precipitation rate (mm/hr) convective cloud
       REAL( 8 ), ALLOCATABLE   :: RSCAV_CV  ( :,:,:,: ) ! scavenging coefficient(1/s) convective cloud
+      REAL( 8 ), ALLOCATABLE   :: FRAC_CV   ( :,:,: )   ! convective cloud grid box fraction
       REAL( 8 ), ALLOCATABLE   :: WET_DEP   ( :,:,:,: ) ! wet deposition of current time step
       REAL( 8 ), ALLOCATABLE   :: AIRMASS   ( :,:,: )   ! total airmass (mol/m2) in cloudy air
       REAL( 8 ), ALLOCATABLE   :: WDEP_Hp   ( :,:,: )   ! wet deposition of H+
@@ -255,9 +256,10 @@ C.. Allocate wet deposition arrays
      &             ALFA0_CV ( NCOLS, NROWS, NLAYS ),
      &             ALFA3_CV ( NCOLS, NROWS, NLAYS ),
      &             PRATE1_CV( NCOLS, NROWS, NLAYS ),
-     &             RSCAV_CV ( NCOLS, NROWS, NLAYS, N_CGRID_SPC ), STAT = ALLOCSTAT )
+     &             RSCAV_CV ( NCOLS, NROWS, NLAYS, N_CGRID_SPC ),
+     &             FRAC_CV  ( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
-          XMSG = '*** Error allocating WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV, PRATE1_CV, and RSCAV_CV'
+          XMSG = '*** Error allocating WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV, PRATE1_CV, RSCAV_CV, and FRAC_CV'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
@@ -583,7 +585,7 @@ C..   Fill charged species array
 
       END SUBROUTINE CL_SPCS_DEF
 
-      SUBROUTINE INIT_CLOUDS ( CONC, C, LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
+      SUBROUTINE INIT_CLOUDS ( CONC, C, LWC_RS, LWC_CV, PHI2_RS, PHI2_CV, FRAC_CV_IN )
 
         USE mchem_Parameters, ONLY: IND_Hp_RS, IND_OHm_RS, IND_O2_RS,
      &                              IND_Hp_CV, IND_OHm_CV, IND_O2_CV
@@ -592,9 +594,9 @@ C..   Fill charged species array
         IMPLICIT NONE
         REAL,     INTENT ( INOUT ) :: CONC( N_CGRID_SPC )    !  species concentration in cell
         REAL(dp), INTENT ( INOUT ) :: C( N_CGRID_SPC )       !  KPP species concentration in cell
-        REAL(dp), INTENT( IN ) :: LWC_RS, LWC_CV, PHI2_RS, PHI2_CV
+        REAL(dp), INTENT( IN ) :: LWC_RS, LWC_CV, PHI2_RS, PHI2_CV, FRAC_CV_IN
         INTEGER                :: ICL, ICLT, ICGRID, IKPP_RS, IKPP_CV
-        REAL(dp)               :: FRAC_RS, FRAC_CV, LWC_SUM, SCAL
+        REAL(dp)               :: FRAC_RS, FRAC_CV, LWC_SUM, SCAL, SMW, TCLC
         REAL, PARAMETER        :: ZERO = 1.0E-30
 
         REAL(dp)               :: SUM_CHARGE, DELINVT, Kw, CHGBAL
@@ -603,12 +605,11 @@ C..   Fill charged species array
         REAL(dp), DIMENSION( CL_TYPES ) :: PHI2
         INTEGER                :: IKPP
 
-C.. Initialise cloud tracer
-        LWC_SUM = LWC_RS + LWC_CV
-        FRAC_RS = 0.0
-        IF ( LWC_RS .GT. LWC_LIMIT ) FRAC_RS = LWC_RS / LWC_SUM
-        FRAC_CV = 0.0
-        IF ( LWC_CV .GT. LWC_LIMIT ) FRAC_CV = LWC_CV / LWC_SUM
+C.. Initialise cloud tracer based on convective fraction
+        FRAC_RS = 0.0D0
+        FRAC_CV = 0.0D0
+        IF ( LWC_CV .GT. LWC_LIMIT ) FRAC_CV = FRAC_CV_IN
+        IF ( LWC_RS .GT. LWC_LIMIT ) FRAC_RS = 1.0D0 - FRAC_CV
 
         DO ICL = 1,N_CL_SPC
            IF ( ( TRIM(MECH_SPC_CL( ICL )%IC_NAME( 1 )) .NE. '' ) .OR.
@@ -618,16 +619,14 @@ C.. Initialise cloud tracer
               DO ICLT = 1,N_IC
                  ICGRID  = MECH_SPC_CL( ICL )%IC_CGRID_INDEX( ICLT )
                  IF ( ICGRID .NE. 0 ) THEN
-                    SCAL = REAL( MECH_SPC_CL( ICL )%IC_FAC( ICLT ), dp ) ! Scale by IC fraction
-                    !SCAL = SCAL * ( REAL( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%IC_MW( ICLT ), dp ) ) ! Scale by molar weight
-                    SCAL = SCAL * ( REAL( MECH_SPC_CL( ICL )%IC_MW( ICLT ) / MECH_SPC_CL( ICL )%MOLWT, dp ) ) ! Scale by molar weight
-                    IF ( FRAC_RS .GT. 0.0 ) C( IKPP_RS ) = C( IKPP_RS ) +
-     &                       ( REAL( CONC( ICGRID ), dp ) * FRAC_RS * SCAL )
-                    IF ( FRAC_CV .GT. 0.0 ) C( IKPP_CV ) = C( IKPP_CV ) +
-     &                       ( REAL( CONC( ICGRID ), dp ) * FRAC_CV * SCAL )
+                    SCAL = REAL( MECH_SPC_CL( ICL )%IC_FAC( ICLT ), dp )                           ! Scale by IC fraction
+                    SMW  = REAL( MECH_SPC_CL( ICL )%IC_MW( ICLT ) / MECH_SPC_CL( ICL )%MOLWT, dp ) ! Scale by molar weight
+                    TCLC = REAL( CONC( ICGRID ), dp ) * SCAL                                       ! Total concentration that can partition into clouds
+                    IF ( FRAC_RS .GT. 0.0 ) C( IKPP_RS ) = C( IKPP_RS ) + TCLC * FRAC_RS * SMW
+                    IF ( FRAC_CV .GT. 0.0 ) C( IKPP_CV ) = C( IKPP_CV ) + TCLC * FRAC_CV * SMW
                     IF ( MECH_SPC_CL( ICL )%IC_RESET ( ICLT ) )
      &                   CONC( ICGRID ) = MAX( CONC( ICGRID ) -
-     &                 ( CONC( ICGRID ) * MECH_SPC_CL( ICL )%IC_FAC ( ICLT ) ), ZERO ) ! In this scaling molar weight does not need to be taken into account
+     &                   REAL( TCLC * ( FRAC_RS  + FRAC_CV ), 4 ), ZERO ) ! In this scaling molar weight does not need to be taken into account
                  END IF
               END DO
            END IF

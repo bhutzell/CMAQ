@@ -21,7 +21,7 @@
        SUBROUTINE CONVCLD_ACM ( CGRID, JDATE, JTIME, TSTEP,
      &                          N_SPC_WDEP, WDEP_MAP, SUBTRANS,
      &                          WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV,
-     &                          PRATE1_CV, RSCAV_CV )
+     &                          PRATE1_CV, RSCAV_CV, FRAC_CV )
 
 C-----------------------------------------------------------------------
 C
@@ -75,6 +75,7 @@ C...........Arguments
       REAL(8), INTENT( OUT )   :: ALFA3_CV( :,:,: )  ! aitken mode mass scavenging coef
       REAL(8), INTENT( OUT )   :: PRATE1_CV( :,:,: ) ! precipitation rate (mm/hr)
       REAL(8), INTENT( OUT )   :: RSCAV_CV( :,:,:,: )! scavenging coefficient (1/s)
+      REAL(8), INTENT( OUT )   :: FRAC_CV( :,:,: )   ! cloud fraction
 
 C.....Logical switches
       LOGICAL  :: UPDATE_CGRID_CONV  = .FALSE. ! logical if CGRID should be updated due to convective
@@ -540,6 +541,7 @@ C...reset convective cloud lwc, wet deposition rate, and ALFA3
       ALFA3_CV  = 0.0D0
       PRATE1_CV = 0.0D0
       RSCAV_CV  = 0.0D0
+      FRAC_CV   = 0.0D0
 C...reset temporary arrays
 C      CONV_DEP  = 0.0
 
@@ -1461,6 +1463,7 @@ C...Do not get variables based on average column
                 ALFA0_CV  ( COL, ROW, LAY ) = REAL( ALFA0, 8 )
                 ALFA3_CV  ( COL, ROW, LAY ) = REAL( ALFA3, 8 )
                 PRATE1_CV ( COL, ROW, LAY ) = REAL( PRATE1L( LAY ), 8 )
+                FRAC_CV   ( COL, ROW, LAY ) = REAL( FRAC, 8 )
               END IF
             END DO
           END IF

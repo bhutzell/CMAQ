@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : gas_Rates.f90
-! Time                 : Tue Jul  2 13:22:39 2024
+! Time                 : Wed Jul  3 11:52:29 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : gas.kpp
 ! Output root filename : gas
@@ -344,11 +344,11 @@ END FUNCTION HALOGEN_FALLOFF
             IF ( RTYPE .EQ. 1 ) THEN   ! SO2 - H2O2 OXIDATION
                KRXN = ( KRXN / ( 1.0D0 + 13.0D0 * VAR( ind_L_HPLUS ) * PHI2 ) ) 
 !           ELSE IF ( RTYPE .EQ. 2 ) then   ! SO2 - PAA OXIDATION
-!              KRXN = KRXN * (VAR(ind_L_HPLUS) * PHI2) + 7.00D2  
-            ELSE IF ( RTYPE .EQ. 3 ) then   ! SO2 - Fe3/Mn2 synergism and 
+!              KRXN = KRXN * (VAR(ind_L_HPLUS) * PHI2) + 7.00D2
+            ELSE IF ( RTYPE .EQ. 3 ) then   ! SO2 - Fe3/Mn2 synergism and
                KRXN = KRXN * PHI2           ! MHP and PAA reaction
             ELSE IF ( RTYPE .EQ. 4 ) then   ! only one reactant
-               KRXN = KRXN / PHI2     
+               KRXN = KRXN / PHI2
             END IF
 
             ! SO4 inhibition only for metal-catalyzed oxidation
@@ -364,7 +364,7 @@ END FUNCTION HALOGEN_FALLOFF
 !           Ionic strength impact on SIV-O3 reaction rate
 !                 IF (QY .GT. 0) THEN
 !                    KRXN = KRXN * (1.0D0 + 2.5 * STION)
-!                 END IF       
+!                 END IF
 
 !           Aqueous diffusion limitation for O3
 

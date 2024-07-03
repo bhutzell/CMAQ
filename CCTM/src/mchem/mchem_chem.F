@@ -140,6 +140,7 @@ C.. Alternative KPP options
          PHI2_CV = 1000.0D0 / 6.022d23 / (LWC_CV * 1.D-3)
          WFAC_CV = REAL( WETFAC_CV( COL,ROW,LEV ), dp )
          KPP_ALFA3_CV = REAL( ALFA3_CV( COL,ROW,LEV ), dp )
+         CFRAC_CV = REAL( FRAC_CV( COL,ROW,LEV ), dp )
       ELSE
          XCL_CV  = 0.0D0
          GM1_CV  = 0.0D0
@@ -148,6 +149,7 @@ C.. Alternative KPP options
          WFAC_CV = 0.0D0
          LWC_CV  = 0.0D0 ! Reset lwc if below limit
          KPP_ALFA3_CV = 0.0D0
+         CFRAC_CV = 0.0D0
       END IF
       TFAC      = ( 298.0D0 - TEMP) / ( 298.0D0 * TEMP );
       ! Calculate Henry's law coefficients
@@ -179,7 +181,7 @@ C.. Alternative KPP options
       ! Fill CONC gas and aerosols
       C(:) = 0.0D0
       ! Init cloud concentrations first, since it impacts aerosol and gas phase concentrations
-      IF ( LCL ) CALL INIT_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), LWC_RS, LWC_CV, PHI2_RS, PHI2_CV )
+      IF ( LCL ) CALL INIT_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), LWC_RS, LWC_CV, PHI2_RS, PHI2_CV, CFRAC_CV )
       DO SPC = 1, NSPEC
          IF ( MECH_SPC(SPC)%CGRID_INDEX /= 0 ) THEN
             ICGSPC = MECH_SPC(SPC)%CGRID_INDEX
@@ -221,7 +223,7 @@ C.. Alternative KPP options
             ICSPC  = MECH_SPC(SPC)%CONC_INDEX
             IF ( LSCAV( ICGSPC ) .AND. KPP_SCAV( ICGSPC ) ) THEN
                ALFA = RSCAV_RS( COL, ROW, LEV, ICGSPC ) +
-     &                RSCAV_CV( COL, ROW, LEV, ICGSPC )
+     &                RSCAV_CV( COL, ROW, LEV, ICGSPC ) * CFRAC_CV
                ALFA = MAX( ALFA, 0.0 )
             ELSE
                ALFA = 0.0
