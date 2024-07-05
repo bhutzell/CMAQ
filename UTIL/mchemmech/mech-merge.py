@@ -72,7 +72,7 @@ outfile = open('mchem.eqn','w')
 with open('gas.eqn') as infile:
     for line in infile:
         if '#EQUATIONS' in line:
-            with open('inline_rconst.kpp') as infile_rconst:
+            with open('inline_clouds.kpp') as infile_rconst:
                 for line_rconst in infile_rconst:
                     outfile.write(line_rconst)
         outfile.write(line)

@@ -1,5 +1,5 @@
 // define chemical species
-#INCLUDE mchem.spc
+#INCLUDE gas.spc
 
 // define chemical equations
 #INCLUDE gas.eqn

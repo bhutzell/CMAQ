@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : gas_Global.f90
-! Time                 : Wed Jul  3 11:52:29 2024
+! Time                 : Fri Jul  5 12:12:56 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : gas.kpp
 ! Output root filename : gas
@@ -74,8 +74,6 @@ CHARACTER(32), PARAMETER :: MECHNAME = 'MCHEM'
 !
 !
 REAL(dp), PARAMETER :: INV_T300 = 1.0D0 / 300.0D0 ! reciprocal 300K
-REAL(dp), PARAMETER :: DDIAM = 1.6D-5 ! Droplet Diameter (m)
-REAL(dp), PARAMETER :: DAQ = 1.0D-9   ! Aqueous phase diffusion coefficient (m2/
 REAL(dp)            :: CAIR          ! air number density (wet) [molec/cm^3]
 REAL(dp)            :: INV_TEMP      ! reciprocal of air temperature, K-1
 REAL(dp)            :: PRESS         ! pressure [Atm]
@@ -84,34 +82,6 @@ REAL(dp)            :: SEAWATER      ! Fraction of seawater in grid box
 LOGICAL             :: OPEN_WATER    ! Is land category ice free open water?
 LOGICAL             :: LSUNLIGHT     ! Logical that is true if photolysis rates 
 REAL(dp)            :: TFAC
-! Related to cloud chemistry
-REAL(dp)            :: LWC_RS        ! Resolved cloud lwc (kg/m3)
-REAL(dp)            :: LWC_CV        ! Convective cloud lwc (kg/m3)
-REAL(dp)            :: XCL_RS        ! Calculated resolved cloud chemistry (1=ye
-REAL(dp)            :: XCL_CV        ! Calculated convective cloud chemistry (1=
-REAL(dp)            :: PHI2_RS       !
-REAL(dp)            :: PHI2_CV       !
-REAL(dp)            :: GM1_RS        !
-REAL(dp)            :: GM1_CV        !
-REAL(dp)            :: GM2_RS        !
-REAL(dp)            :: GM2_CV        !
-REAL(dp)            :: WFAC_RS       !
-REAL(dp)            :: WFAC_CV       !
-REAL(dp)            :: KPP_ALFA3_RS  !
-REAL(dp)            :: KPP_ALFA3_CV  !
-LOGICAL             :: LCL_RS = .FALSE.
-LOGICAL             :: LCL_CV = .FALSE.
-LOGICAL             :: LCL    = .FALSE.
-REAL(dp), PARAMETER :: CFRAC_RS = 1.0D0
-REAL(dp)            :: CFRAC_CV
-! Henry's law constants. Just temporary
-REAL(dp)            :: H_SO2, H_HNO3, H_CO2, H_NH3, H_H2O2
-REAL(dp)            :: H_O3, H_FACD, H_HCL, H_GLY, H_MGLY
-REAL(dp)            :: H_OH, H_HO2, H_NO2, H_HONO, H_HNO4
-REAL(dp)            :: H_GLYD, H_AACD, H_FORM, H_NO3, H_CH3O2
-REAL(dp)            :: H_IEPOX, H_MHP, H_PAA
-! Scavenging rates
-REAL(dp)            :: KPP_RSCAV(NSPEC)
 
 INTEGER, PARAMETER  :: KPP_NPHOTAB  =  32     ! number of photolysis rates
 CHARACTER(16), SAVE :: KPP_PHOTAB( KPP_NPHOTAB )  ! Names of  photolysis
