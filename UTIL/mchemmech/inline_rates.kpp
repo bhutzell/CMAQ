@@ -271,4 +271,132 @@ END FUNCTION HALOGEN_FALLOFF
 
             RETURN
        END FUNCTION KRXN
+
+       REAL( kind=dp )FUNCTION KIEPOX ( KH, KHSO4, TYPE, CLTYPE )
+
+            IMPLICIT NONE
+
+            ! Input
+            REAL( kind=dp ),      INTENT( IN ) :: KH, KHSO4
+            INTEGER,              INTENT( IN ) :: TYPE
+            CHARACTER( LEN = 2 ), INTENT( IN ) :: CLTYPE
+
+            ! Local variables
+            REAL( kind=dp )      :: K1, K2
+            REAL( kind=dp )      :: KIEPOXT, KMAET
+            REAL( kind=dp )      :: Q, q1, COTHq
+            INTEGER              :: ind_L_HPLUS
+            INTEGER              :: indf_L_H2O, ind_L_HSO4MIN, ind_L_SO4MIN2
+            INTEGER              :: ind_L_NO3MIN, ind_L_IETET, ind_L_IEOS
+            REAL( kind=dp )      :: PHI2
+
+            ! Select cloud indices and properties
+            IF ( CLTYPE .EQ. 'RS' ) THEN
+              IND_L_HPLUS   = ind_Hp_RS
+              INDF_L_H2O    = indf_H2O_RS
+              IND_L_HSO4MIN = ind_HSO4m_RS
+              IND_L_SO4MIN2 = ind_SO4mm_RS
+              IND_L_NO3MIN  = ind_NO3m_RS
+              IND_L_IETET   = ind_IETET_RS
+              IND_L_IEOS    = ind_IEOS_RS
+              PHI2          = PHI2_RS
+            ELSE IF ( CLTYPE .EQ. 'CV' ) THEN
+              IND_L_HPLUS   = ind_Hp_CV
+              INDF_L_H2O    = indf_H2O_CV
+              IND_L_HSO4MIN = ind_HSO4m_CV
+              IND_L_SO4MIN2 = ind_SO4mm_CV
+              IND_L_NO3MIN  = ind_NO3m_CV
+              IND_L_IETET   = ind_IETET_CV
+              IND_L_IEOS    = ind_IEOS_CV
+              PHI2          = PHI2_CV
+            END IF
+
+            K1 = KH * VAR( ind_L_HPLUS ) * PHI2
+            K2 = KHSO4 * VAR( ind_L_HSO4MIN ) * PHI2
+
+            KIEPOX = K1 + K2
+!
+! Aqueous diffusion limitation for IEPOX and MAE
+!
+!
+            q1 = 0.0D0
+            Q = 1.0D0
+
+            IF( TYPE .le. 1 ) THEN   ! FOR IEPOX
+
+               K1 = 9.0D-4 * VAR( ind_L_HPLUS ) * PHI2
+               K2 = 1.31D-5 * VAR( ind_L_HSO4MIN ) * PHI2
+               KIEPOXT = (K1 + K2) * FIX( indf_L_H2O ) * PHI2  ! IEPOX + H2O
+
+               K1 = 8.83D-3 * VAR( ind_L_HPLUS ) * PHI2
+               K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2
+               KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_SO4MIN2 ) &
+                       * PHI2  ! IEPOX + SO4
+
+               K1 = 2.0D-4 * VAR( ind_L_HPLUS ) * PHI2
+               K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2
+
+               IF( ISPC8 .LE. 0 ) THEN
+                  KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_NO3MIN ) * PHI2    ! IEPOX + NO3
+               ELSE
+                  KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_IETET ) &
+                          * PHI2    ! IEPOX + IETET
+                  KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_IEOS ) &
+                          * PHI2     ! IEPOX + IEOS
+               ENDIF
+
+               q1 = DDIAM/2.0D0 * SQRT( KIEPOXT / DAQ )
+
+               IF ( q1 .GT. 1.0D-3 ) THEN
+                  IF ( q1 .LE. 100.0D0 ) THEN
+                     COTHq = ( EXP( 2 * q1 ) + 1 ) / ( EXP( 2 * q1 ) - 1 )
+                     Q = 3 * ( ( COTHq / q1 ) - ( 1 / ( q1 * q1 ) ) )
+                     IF ( Q .GT. 1.0D0 ) Q = 1.0D0
+                  ELSE
+                     Q = 3.d0/q1
+                  END IF
+               ELSE
+                  Q = 1.0D0
+               END IF
+
+            ELSE   ! FOR MAE OR HMML
+
+               K1 = 9.0D-4 * VAR( ind_L_HPLUS ) * PHI2
+               K2 = 1.31D-5 * VAR( ind_L_HSO4MIN ) * PHI2
+               KMAET = (K1 + K2) * FIX( indf_L_H2O ) &
+                     * PHI2  ! MAE/HMML + H2O
+
+               K1 = 2.0D-4 * VAR( ind_L_HPLUS ) * PHI2
+               K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2
+               KMAET = KMAET + (K1 + K2) * VAR( ind_L_SO4MIN2 ) &
+                     * PHI2  ! MAE/HMML + SO4
+
+               q1 = DDIAM/2.0D0 * SQRT( KMAET / DAQ )
+
+               IF ( q1 .GT. 1.0D-3 ) THEN
+                  IF ( q1 .LE. 100.0D0 ) THEN
+                     COTHq = ( EXP( 2 * q1 ) + 1 ) / ( EXP( 2 * q1 ) - 1 )
+                     Q = 3 * ( ( COTHq / q1 ) - ( 1 / ( q1 * q1 ) ) )
+                     IF ( Q .GT. 1.0D0 ) Q = 1.0D0
+                  ELSE
+                     Q = 3.d0/q1
+                  END IF
+               ELSE
+                  Q = 1.0D0
+               END IF
+            END IF
+
+            KIEPOX = KIEPOX * Q
+
+            KIEPOX = KIEPOX * PHI2
+
+            IF( ISPC8 .LE. 0 ) THEN
+               IF( TYPE .GT. 0 ) KIEPOX = 0.d0
+            ELSE
+               IF( TYPE .LT. 1 ) KIEPOX = 0.d0
+            END IF
+
+            RETURN
+
+       END FUNCTION KIEPOX
 #ENDINLINE

@@ -44,12 +44,19 @@
 <AQUP21b_a##> NO3_a##   = NO3           : XCL_a##*KMT(TEMP,LWC_a##,62.0D0,1.00D-5,H_NO3,0.05D0,1);
 <AQUP22f_a##> MEO2      = CH3O2_a##     : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,49.0D0,1.35D-5,H_CH3O2,0.05D0,0);
 <AQUP22b_a##> CH3O2_a## = MEO2          : XCL_a##*KMT(TEMP,LWC_a##,49.0D0,1.35D-5,H_CH3O2,0.05D0,1);
-<AQUP23f_a##> EPOX      = IEPOX_a##     : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,118.13D0,1.00D-5,H_IEPOX,0.02D0,0);
-<AQUP23b_a##> IEPOX_a## = EPOX          : XCL_a##*KMT(TEMP,LWC_a##,118.13D0,1.00D-5,H_IEPOX,0.02D0,1);
-<AQUP24f_a##> MEPX      = MHP_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,48.04D0,1.31D-5,H_MHP,0.006758D0,0);
-<AQUP24b_a##> MHP_a##   = MEPX          : XCL_a##*KMT(TEMP,LWC_a##,48.04D0,1.31D-5,H_MHP,0.006758D0,1);
-<AQUP25f_a##> PACD      = PAA_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,76.05D0,1.02D-5,H_PAA,0.019D0,0);
-<AQUP25b_a##> PAA_a##   = PACD          : XCL_a##*KMT(TEMP,LWC_a##,76.05D0,1.02D-5,H_PAA,0.019D0,1);
+<AQUP23f_a##> MEPX      = MHP_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,48.04D0,1.31D-5,H_MHP,0.006758D0,0);
+<AQUP23b_a##> MHP_a##   = MEPX          : XCL_a##*KMT(TEMP,LWC_a##,48.04D0,1.31D-5,H_MHP,0.006758D0,1);
+<AQUP24f_a##> PACD      = PAA_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,76.05D0,1.02D-5,H_PAA,0.019D0,0);
+<AQUP24b_a##> PAA_a##   = PACD          : XCL_a##*KMT(TEMP,LWC_a##,76.05D0,1.02D-5,H_PAA,0.019D0,1);
+! IEOPOX
+! CB6 chemistry
+<AQUP25f_a##> EPOX      = IEPOX_a##     : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,118.13D0,1.00D-5,H_IEPOX,0.02D0,0);
+<AQUP25b_a##> IEPOX_a## = EPOX          : XCL_a##*KMT(TEMP,LWC_a##,118.13D0,1.00D-5,H_IEPOX,0.02D0,1);
+! AE6I and AE7I chemistry
+!<AQUP26f_a##> IMAE      = IMAE_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,102.00D0,1.00D-5,H_IMAE,0.02D0,0);
+!<AQUP26b_a##> IMAE_a##  = IMAE          : XCL_a##*KMT(TEMP,LWC_a##,102.00D0,1.00D-5,H_IMAE,0.02D0,1);
+!<AQUP27f_a##> IHMML     = IHMML_a##     : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,102.00D0,1.00D-5,H_IHMML,0.02D0,0);
+!<AQUP27b_a##> IHMML_a## = IHMML         : XCL_a##*KMT(TEMP,LWC_a##,102.00D0,1.00D-5,H_IHMML,0.02D0,1);
 
 ! Hydration
 <AQHY01f_a##> HCHO_a## + H2O_a## = CH2OHYD_a##       : XCL_a##*1.8D-1*EXP(4.03D+3*TFAC)*PHI2_a##;
@@ -170,11 +177,21 @@
 ! Photolysis
 <AQJ01_a##> H2O2_a##            = 2 OH_a##                                      : XCL_a##*1.0*RJCELL( IJ_H2O2_IUPAC10 );
 
-! IEPOX
-<AQIEP0_a##>  ISO3_a##              = ISO3_a##                                   : 1.0;
-!<AQIEP1_a##> IEPOX_a## + H2O_a##   = ISO3_a##                                   : XCL_a##*KIEPOX(9.0D-4,1.31D-5,0);
-!<AQIEP2_a##> IEPOX_a## + SO4mm_a## = ISO3_a##                                   : XCL_a##*KIEPOX(8.83D-3,2.92D-6,0);
-!<AQIEP3_a##> IEPOX_a## + NO3m_a##  = ISO3_a##                                   : XCL_a##*KIEPOX(2.0D-4,2.92D-6,0);
+! IEPOX chemistry (mechanism dependent)
+! CB6 chemistry
+<AQIEP01_a##> IEPOX_a## + H2O_a##   = ISO3_a##                                  : XCL_a##*KIEPOX( 9.0D-4,  1.31D-5, 0, 'a##' );
+<AQIEP02_a##> IEPOX_a## + SO4mm_a## = ISO3_a##                                  : XCL_a##*KIEPOX( 8.83D-3, 2.92D-6, 0, 'a##' );
+<AQIEP03_a##> IEPOX_a## + NO3m_a##  = ISO3_a##                                  : XCL_a##*KIEPOX( 2.0D-4,  2.92D-6, 0, 'a##' );
+! AE6I and AE7I chemistry
+!<AQIEP04_a##> IEPOX_a## + H2O_a##   = IETET_a##                                 : XCL_a##*KIEPOX( 9.0D-4,  1.31D-5, 1, 'a##' );
+!<AQIEP05_a##> IEPOX_a## + SO4mm_a## = IEOS_a##                                  : XCL_a##*KIEPOX( 8.83D-3, 2.92D-6, 1, 'a##' );
+!<AQIEP06_a##> IEPOX_a## + IETET_a## = DIMER_a##                                 : XCL_a##*KIEPOX( 2.0D-4,  2.92D-6, 1, 'a##' );
+!<AQIEP07_a##> IEPOX_a## + IEOS_a##  = DIMER_a##                                 : XCL_a##*KIEPOX( 2.0D-4,  2.92D-6, 1, 'a##' );
+!<AQIEP08_a##> IMAE_a##  + H2O_a##   = IMGA_a##                                  : XCL_a##*KIEPOX( 9.0D-4,  1.31D-5, 2, 'a##' );
+!<AQIEP09_a##> IMAE_a##  + SO4mm_a## = IMOS_a##                                  : XCL_a##*KIEPOX( 2.0D-4,  2.92D-6, 2, 'a##' );
+!<AQIEP10_a##> IHMML_a## + H2O_a##   = IMGA_a##                                  : XCL_a##*KIEPOX( 9.0D-4,  1.31D-5, 2, 'a##' );
+!<AQIEP11_a##> IHMML_a## + SO4mm_a## = IMOS_a##                                  : XCL_a##*KIEPOX( 2.0D-4,  2.92D-6, 2, 'a##' );
+
 
 ! Aitken aerosol scavenging
 <AKN01_a##>  ANO3I = NO3m_a##    + WD_ANO3I   : XCL_a##*CFRAC_a##*KPP_ALFA3_a##;
@@ -238,7 +255,21 @@
 <AQWD53_a##> SO5m_a##     = WD_SO2        : XCL_a##*WFAC_a##;
 <AQWD54_a##> HSO5m_a##    = WD_SO2        : XCL_a##*WFAC_a##;
 <AQWD55_a##> HMSm_a##     = WD_SO2        : XCL_a##*WFAC_a##;
-<AQWD56_a##> IEPOX_a##    = WD_EPOX       : XCL_a##*WFAC_a##;
-<AQWD57_a##> ISO3_a##     = WD_AISO3J     : XCL_a##*WFAC_a##;
-<AQWD58_a##> MHP_a##      = WD_MHP        : XCL_a##*WFAC_a##;
-<AQWD59_a##> PAA_a##      = WD_PACD       : XCL_a##*WFAC_a##;
+<AQWD56_a##> MHP_a##      = WD_MHP        : XCL_a##*WFAC_a##;
+<AQWD57_a##> PAA_a##      = WD_PACD       : XCL_a##*WFAC_a##;
+! Wet deposition IEPOX
+! CB6 chemistry (always needed)
+<AQWDIEP01_a##> IEPOX_a## = WD_EPOX       : XCL_a##*WFAC_a##;
+! AQWDIEP02 for CB6 chemistry
+<AQWDIEP02_a##> ISO3_a##  = WD_AISO3J     : XCL_a##*WFAC_a##;
+! AQWDIEP02 for AE6I and AE7I chemistry
+!<AQWDIEP02_a##> ISO3_a##  = WD_IETET      : XCL_a##*WFAC_a##;
+! AE6I and AE7I chemistry
+!<AQWDIEP03_a##> IETET_a## = WD_IETET      : XCL_a##*WFAC_a##;
+!<AQWDIEP04_a##> IEOS_a##  = WD_IEOS       : XCL_a##*WFAC_a##;
+!<AQWDIEP05_a##> DIMER_a## = WD_DIMER      : XCL_a##*WFAC_a##;
+!<AQWDIEP06_a##> IMAE_a##  = WD_IMAE       : XCL_a##*WFAC_a##;
+!<AQWDIEP07_a##> IHMML_a## = WD_IHMML      : XCL_a##*WFAC_a##;
+!<AQWDIEP08_a##> IMGA_a##  = WD_IMGA       : XCL_a##*WFAC_a##;
+!<AQWDIEP09_a##> IMOS_a##  = WD_IMOS       : XCL_a##*WFAC_a##;
+

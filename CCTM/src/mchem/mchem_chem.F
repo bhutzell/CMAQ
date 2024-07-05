@@ -176,6 +176,9 @@ C.. Alternative KPP options
       H_IEPOX = 3.0D7;
       H_MHP  = 3.1D+02  * EXP( 5.2D+03 * TFAC );
       H_PAA  = 8.4D+02  * EXP( 5.3D+03 * TFAC );
+      ! IEPOX for AE6I and AE7I
+      H_IMAE  = 1.2E+05 * EXP( 0.0E+00 * TFAC )
+      H_IHMML = H_IMAE
       ! End filling aqueous related data
 
       ! Fill CONC gas and aerosols

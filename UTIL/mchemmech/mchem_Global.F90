@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : mchem_Global.f90
-! Time                 : Wed Jul  3 11:52:28 2024
+! Time                 : Fri Jul  5 11:45:31 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : mchem.kpp
 ! Output root filename : mchem
@@ -110,8 +110,12 @@ REAL(dp)            :: H_O3, H_FACD, H_HCL, H_GLY, H_MGLY
 REAL(dp)            :: H_OH, H_HO2, H_NO2, H_HONO, H_HNO4
 REAL(dp)            :: H_GLYD, H_AACD, H_FORM, H_NO3, H_CH3O2
 REAL(dp)            :: H_IEPOX, H_MHP, H_PAA
+REAL(dp)            :: H_IMAE, H_IHMML
 ! Scavenging rates
 REAL(dp)            :: KPP_RSCAV(NSPEC)
+! IEPOX related
+INTEGER, PARAMETER  :: ISPC8 = 0     ! = 0 if aerosol module is not AE6I or AE7I
+                                     ! = 1 if aerosol module is AE6I or AE7I
 
 INTEGER, PARAMETER  :: KPP_NPHOTAB  =  32     ! number of photolysis rates
 CHARACTER(16), SAVE :: KPP_PHOTAB( KPP_NPHOTAB )  ! Names of  photolysis
