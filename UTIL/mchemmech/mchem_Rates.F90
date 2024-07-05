@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : mchem_Rates.f90
-! Time                 : Fri Jul  5 12:12:56 2024
+! Time                 : Fri Jul  5 14:05:29 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : mchem.kpp
 ! Output root filename : mchem
@@ -269,267 +269,267 @@ END FUNCTION HALOGEN_FALLOFF
          RETURN
        END FUNCTION FALLOFF_T10
 
-       REAL( dp ) FUNCTION KMT(TEMP,LWC,MMASS,DG,HENRY,ACOM,FB)
-         IMPLICIT NONE
-         REAL( dp ), INTENT( IN ) :: TEMP
-         REAL( dp ), INTENT( IN ) :: LWC
-         REAL( dp ), INTENT( IN ) :: MMASS
-         REAL( dp ), INTENT( IN ) :: DG
-         REAL( dp ), INTENT( IN ) :: HENRY
-         REAL( dp ), INTENT( IN ) :: ACOM
-         INTEGER,   INTENT( IN ) :: FB ! logical (forward/backward)
-         REAL( dp )               :: RAD
-         REAL( dp )               :: R_KMT
-         REAL( dp )               :: R2_KMT
-         REAL( dp )               :: PI_KMT
-         REAL( dp )               :: V_mean
-         INTRINSIC DEXP
+REAL( dp ) FUNCTION KMT(TEMP,LWC,MMASS,DG,HENRY,ACOM,FB)
+  IMPLICIT NONE
+  REAL( dp ), INTENT( IN ) :: TEMP
+  REAL( dp ), INTENT( IN ) :: LWC
+  REAL( dp ), INTENT( IN ) :: MMASS
+  REAL( dp ), INTENT( IN ) :: DG
+  REAL( dp ), INTENT( IN ) :: HENRY
+  REAL( dp ), INTENT( IN ) :: ACOM
+  INTEGER,   INTENT( IN ) :: FB ! logical (forward/backward)
+  REAL( dp )               :: RAD
+  REAL( dp )               :: R_KMT
+  REAL( dp )               :: R2_KMT
+  REAL( dp )               :: PI_KMT
+  REAL( dp )               :: V_mean
+  INTRINSIC DEXP
 
-         RAD    = DDIAM * 0.5D0
-         R_KMT  = 8.3145D0
-         R2_KMT = 0.08206D0
-         PI_KMT = 3.1415926536D0
+  RAD    = DDIAM * 0.5D0
+  R_KMT  = 8.3145D0
+  R2_KMT = 0.08206D0
+  PI_KMT = 3.1415926536D0
 
-         V_mean = SQRT( 8D0 * R_KMT * TEMP * 1000.0D0 / PI_KMT / MMASS )
-         KMT    = 1.0D0/((RAD*RAD)/(3D0*DG)+(4D0*RAD/(3D0*V_mean*ACOM)))
-         IF ( FB .EQ. 0 ) THEN
-            KMT = KMT * LWC / 1000.0D0
-         ELSE
-            KMT   = KMT  / ( R2_KMT * TEMP * HENRY )
-         END IF
-         RETURN
-       END FUNCTION KMT
+  V_mean = SQRT( 8D0 * R_KMT * TEMP * 1000.0D0 / PI_KMT / MMASS )
+  KMT    = 1.0D0/((RAD*RAD)/(3D0*DG)+(4D0*RAD/(3D0*V_mean*ACOM)))
+  IF ( FB .EQ. 0 ) THEN
+     KMT = KMT * LWC / 1000.0D0
+  ELSE
+     KMT   = KMT  / ( R2_KMT * TEMP * HENRY )
+  END IF
+  RETURN
+END FUNCTION KMT
 
-       REAL( kind=dp )FUNCTION KRXN ( KR, DH, RTYPE, QY, METAL, CLTYPE )
+REAL( kind=dp )FUNCTION KRXN ( KR, DH, RTYPE, QY, METAL, CLTYPE )
 
-            IMPLICIT NONE
+     IMPLICIT NONE
 
-            ! Input
-            REAL( kind=dp )     , INTENT( IN ) :: KR, DH
-            INTEGER             , INTENT( IN ) :: QY, RTYPE, METAL
-            CHARACTER( LEN = 2 ), INTENT( IN ) :: CLTYPE
+     ! Input
+     REAL( kind=dp )     , INTENT( IN ) :: KR, DH
+     INTEGER             , INTENT( IN ) :: QY, RTYPE, METAL
+     CHARACTER( LEN = 2 ), INTENT( IN ) :: CLTYPE
 
-            ! Local variables
-            REAL( kind=dp )      :: Q, q1, COTHq, SVIinh
-            REAL( kind=dp )      :: kO31, kO32, kO33, kO3T
-            INTEGER              :: ind_L_H2SO4, ind_L_HSO4MIN, ind_L_SO4MIN2
-            INTEGER              :: ind_L_HPLUS
-            INTEGER              :: ind_L_SO2, ind_L_HSO3MIN, ind_L_SO3MIN2
-            REAL( kind=dp )      :: PHI2
+     ! Local variables
+     REAL( kind=dp )      :: Q, q1, COTHq, SVIinh
+     REAL( kind=dp )      :: kO31, kO32, kO33, kO3T
+     INTEGER              :: ind_L_H2SO4, ind_L_HSO4MIN, ind_L_SO4MIN2
+     INTEGER              :: ind_L_HPLUS
+     INTEGER              :: ind_L_SO2, ind_L_HSO3MIN, ind_L_SO3MIN2
+     REAL( kind=dp )      :: PHI2
 
-            ! Select cloud indices and properties
-            IF ( CLTYPE .EQ. 'RS' ) THEN
-              IND_L_HPLUS   = ind_Hp_RS
-              IND_L_H2SO4   = ind_SULF_RS
-              IND_L_HSO4MIN = ind_HSO4m_RS
-              IND_L_SO4MIN2 = ind_SO4mm_RS
-              IND_L_SO2     = ind_SO2_RS
-              IND_L_HSO3MIN = ind_HSO3m_RS
-              IND_L_SO3MIN2 = ind_SO3mm_RS
-              PHI2          = PHI2_RS
-            ELSE IF ( CLTYPE .EQ. 'CV' ) THEN
-              IND_L_HPLUS   = ind_Hp_CV
-              IND_L_H2SO4   = ind_SULF_CV
-              IND_L_HSO4MIN = ind_HSO4m_CV
-              IND_L_SO4MIN2 = ind_SO4mm_CV
-              IND_L_SO2     = ind_SO2_CV
-              IND_L_HSO3MIN = ind_HSO3m_CV
-              IND_L_SO3MIN2 = ind_SO3mm_CV
-              PHI2          = PHI2_CV
-            END IF
+     ! Select cloud indices and properties
+     IF ( CLTYPE .EQ. 'RS' ) THEN
+       IND_L_HPLUS   = ind_Hp_RS
+       IND_L_H2SO4   = ind_SULF_RS
+       IND_L_HSO4MIN = ind_HSO4m_RS
+       IND_L_SO4MIN2 = ind_SO4mm_RS
+       IND_L_SO2     = ind_SO2_RS
+       IND_L_HSO3MIN = ind_HSO3m_RS
+       IND_L_SO3MIN2 = ind_SO3mm_RS
+       PHI2          = PHI2_RS
+     ELSE IF ( CLTYPE .EQ. 'CV' ) THEN
+       IND_L_HPLUS   = ind_Hp_CV
+       IND_L_H2SO4   = ind_SULF_CV
+       IND_L_HSO4MIN = ind_HSO4m_CV
+       IND_L_SO4MIN2 = ind_SO4mm_CV
+       IND_L_SO2     = ind_SO2_CV
+       IND_L_HSO3MIN = ind_HSO3m_CV
+       IND_L_SO3MIN2 = ind_SO3mm_CV
+       PHI2          = PHI2_CV
+     END IF
 
 
-            KRXN = KR * EXP( DH * TFAC )
+     KRXN = KR * EXP( DH * TFAC )
 
-            IF ( RTYPE .EQ. 1 ) THEN   ! SO2 - H2O2 OXIDATION
-               KRXN = ( KRXN / ( 1.0D0 + 13.0D0 * VAR( ind_L_HPLUS ) * PHI2 ) ) 
-!           ELSE IF ( RTYPE .EQ. 2 ) then   ! SO2 - PAA OXIDATION
-!              KRXN = KRXN * (VAR(ind_L_HPLUS) * PHI2) + 7.00D2
-            ELSE IF ( RTYPE .EQ. 3 ) then   ! SO2 - Fe3/Mn2 synergism and
-               KRXN = KRXN * PHI2           ! MHP and PAA reaction
-            ELSE IF ( RTYPE .EQ. 4 ) then   ! only one reactant
-               KRXN = KRXN / PHI2
-            END IF
+     IF ( RTYPE .EQ. 1 ) THEN   ! SO2 - H2O2 OXIDATION
+        KRXN = ( KRXN / ( 1.0D0 + 13.0D0 * VAR( ind_L_HPLUS ) * PHI2 ) ) * PHI2
+!    ELSE IF ( RTYPE .EQ. 2 ) then   ! SO2 - PAA OXIDATION
+!       KRXN = KRXN * (VAR(ind_L_HPLUS) * PHI2) + 7.00D2
+     ELSE IF ( RTYPE .EQ. 3 ) then   ! SO2 - Fe3/Mn2 synergism and
+        KRXN = KRXN * PHI2           ! MHP and PAA reaction
+     ELSE IF ( RTYPE .EQ. 4 ) then   ! only one reactant
+        KRXN = KRXN / PHI2
+     END IF
 
-            ! SO4 inhibition only for metal-catalyzed oxidation
-            IF (METAL .GT. 0) THEN
-               ! SO4 inhibition of metal catalysis
-               SVIinh = 1.0D0 + 75.0D0 * ( ( VAR( ind_L_H2SO4 )     &
-                        +                    VAR( ind_L_HSO4MIN )   &
-                        +                    VAR( ind_L_SO4MIN2 ) ) &
-                        * PHI2 )**0.67D0
-               KRXN = KRXN / SVIinh
-            END IF
+     ! SO4 inhibition only for metal-catalyzed oxidation
+     IF (METAL .GT. 0) THEN
+        ! SO4 inhibition of metal catalysis
+        SVIinh = 1.0D0 + 75.0D0 * ( ( VAR( ind_L_H2SO4 )     &
+                 +                    VAR( ind_L_HSO4MIN )   &
+                 +                    VAR( ind_L_SO4MIN2 ) ) &
+                 * PHI2 )**0.67D0
+        KRXN = KRXN / SVIinh
+     END IF
 
-!           Ionic strength impact on SIV-O3 reaction rate
-!                 IF (QY .GT. 0) THEN
-!                    KRXN = KRXN * (1.0D0 + 2.5 * STION)
-!                 END IF
+!    Ionic strength impact on SIV-O3 reaction rate
+!          IF (QY .GT. 0) THEN
+!             KRXN = KRXN * (1.0D0 + 2.5 * STION)
+!          END IF
 
-!           Aqueous diffusion limitation for O3
+!    Aqueous diffusion limitation for O3
 
-            q1 = 0.0D0
-            Q = 1.0D0
+     q1 = 0.0D0
+     Q = 1.0D0
 
-            IF( QY .GE. 1 ) THEN
+     IF( QY .GE. 1 ) THEN
 
-               kO31 = 2.4D+4 * EXP( 0.0D0 * TFAC )
-               kO32 = 3.7D+5 * EXP( -5530.88D0 * TFAC )
-               kO33 = 1.5D+9 * EXP( -5280.56D0 * TFAC )
-               kO3T = ( kO31 * VAR( ind_L_SO2 ) + kO32 &
-                    * VAR( ind_L_HSO3MIN ) &
-                    + kO33 * VAR( ind_L_SO3MIN2 ) ) * PHI2
+        kO31 = 2.4D+4 * EXP( 0.0D0 * TFAC )
+        kO32 = 3.7D+5 * EXP( -5530.88D0 * TFAC )
+        kO33 = 1.5D+9 * EXP( -5280.56D0 * TFAC )
+        kO3T = ( kO31 * VAR( ind_L_SO2 ) + kO32 &
+             * VAR( ind_L_HSO3MIN ) &
+             + kO33 * VAR( ind_L_SO3MIN2 ) ) * PHI2
 
-               q1 = DDIAM / 2.0D0 * SQRT( kO3T / DAQ )  ! diffuso-reactive param
+        q1 = DDIAM / 2.0D0 * SQRT( kO3T / DAQ )  ! diffuso-reactive param
 
-               IF ( q1 .GT. 1.0D-3 ) THEN
-                  IF ( q1 .LE. 100.0D0 ) THEN
-                     COTHq = ( EXP( 2 * q1 ) + 1 ) / ( EXP( 2 * q1 ) - 1 )
-                     Q = 3 * ( ( COTHq / q1 ) - ( 1 / ( q1 * q1 ) ) )
-                     IF ( Q .GT. 1.0D0 ) Q = 1.0D0
-                  ELSE
-                     Q = 3.d0/q1
-                  END IF
-               ELSE
-                  Q = 1.0D0
-               END IF
+        IF ( q1 .GT. 1.0D-3 ) THEN
+           IF ( q1 .LE. 100.0D0 ) THEN
+              COTHq = ( EXP( 2 * q1 ) + 1 ) / ( EXP( 2 * q1 ) - 1 )
+              Q = 3 * ( ( COTHq / q1 ) - ( 1 / ( q1 * q1 ) ) )
+              IF ( Q .GT. 1.0D0 ) Q = 1.0D0
+           ELSE
+              Q = 3.d0/q1
+           END IF
+        ELSE
+           Q = 1.0D0
+        END IF
 
-               KRXN = KRXN * Q
+        KRXN = KRXN * Q
 
-            END IF
+     END IF
 
-            KRXN = KRXN * PHI2
+     KRXN = KRXN * PHI2
 
-            RETURN
-       END FUNCTION KRXN
+     RETURN
+END FUNCTION KRXN
 
-       REAL( kind=dp )FUNCTION KIEPOX ( KH, KHSO4, TYPE, CLTYPE )
+REAL( kind=dp )FUNCTION KIEPOX ( KH, KHSO4, TYPE, CLTYPE )
 
-            IMPLICIT NONE
+     IMPLICIT NONE
 
-            ! Input
-            REAL( kind=dp ),      INTENT( IN ) :: KH, KHSO4
-            INTEGER,              INTENT( IN ) :: TYPE
-            CHARACTER( LEN = 2 ), INTENT( IN ) :: CLTYPE
+     ! Input
+     REAL( kind=dp ),      INTENT( IN ) :: KH, KHSO4
+     INTEGER,              INTENT( IN ) :: TYPE
+     CHARACTER( LEN = 2 ), INTENT( IN ) :: CLTYPE
 
-            ! Local variables
-            REAL( kind=dp )      :: K1, K2
-            REAL( kind=dp )      :: KIEPOXT, KMAET
-            REAL( kind=dp )      :: Q, q1, COTHq
-            INTEGER              :: ind_L_HPLUS
-            INTEGER              :: indf_L_H2O, ind_L_HSO4MIN, ind_L_SO4MIN2
-            INTEGER              :: ind_L_NO3MIN, ind_L_IETET, ind_L_IEOS
-            REAL( kind=dp )      :: PHI2
+     ! Local variables
+     REAL( kind=dp )      :: K1, K2
+     REAL( kind=dp )      :: KIEPOXT, KMAET
+     REAL( kind=dp )      :: Q, q1, COTHq
+     INTEGER              :: ind_L_HPLUS
+     INTEGER              :: indf_L_H2O, ind_L_HSO4MIN, ind_L_SO4MIN2
+     INTEGER              :: ind_L_NO3MIN, ind_L_IETET, ind_L_IEOS
+     REAL( kind=dp )      :: PHI2
 
-            ! Select cloud indices and properties
-            IF ( CLTYPE .EQ. 'RS' ) THEN
-              IND_L_HPLUS   = ind_Hp_RS
-              INDF_L_H2O    = indf_H2O_RS
-              IND_L_HSO4MIN = ind_HSO4m_RS
-              IND_L_SO4MIN2 = ind_SO4mm_RS
-              IND_L_NO3MIN  = ind_NO3m_RS
-              IND_L_IETET   = ind_IETET_RS
-              IND_L_IEOS    = ind_IEOS_RS
-              PHI2          = PHI2_RS
-            ELSE IF ( CLTYPE .EQ. 'CV' ) THEN
-              IND_L_HPLUS   = ind_Hp_CV
-              INDF_L_H2O    = indf_H2O_CV
-              IND_L_HSO4MIN = ind_HSO4m_CV
-              IND_L_SO4MIN2 = ind_SO4mm_CV
-              IND_L_NO3MIN  = ind_NO3m_CV
-              IND_L_IETET   = ind_IETET_CV
-              IND_L_IEOS    = ind_IEOS_CV
-              PHI2          = PHI2_CV
-            END IF
+     ! Select cloud indices and properties
+     IF ( CLTYPE .EQ. 'RS' ) THEN
+       IND_L_HPLUS   = ind_Hp_RS
+       INDF_L_H2O    = indf_H2O_RS
+       IND_L_HSO4MIN = ind_HSO4m_RS
+       IND_L_SO4MIN2 = ind_SO4mm_RS
+       IND_L_NO3MIN  = ind_NO3m_RS
+       IND_L_IETET   = ind_IETET_RS
+       IND_L_IEOS    = ind_IEOS_RS
+       PHI2          = PHI2_RS
+     ELSE IF ( CLTYPE .EQ. 'CV' ) THEN
+       IND_L_HPLUS   = ind_Hp_CV
+       INDF_L_H2O    = indf_H2O_CV
+       IND_L_HSO4MIN = ind_HSO4m_CV
+       IND_L_SO4MIN2 = ind_SO4mm_CV
+       IND_L_NO3MIN  = ind_NO3m_CV
+       IND_L_IETET   = ind_IETET_CV
+       IND_L_IEOS    = ind_IEOS_CV
+       PHI2          = PHI2_CV
+     END IF
 
-            K1 = KH * VAR( ind_L_HPLUS ) * PHI2
-            K2 = KHSO4 * VAR( ind_L_HSO4MIN ) * PHI2
+     K1 = KH * VAR( ind_L_HPLUS ) * PHI2
+     K2 = KHSO4 * VAR( ind_L_HSO4MIN ) * PHI2
 
-            KIEPOX = K1 + K2
+     KIEPOX = K1 + K2
 !
 ! Aqueous diffusion limitation for IEPOX and MAE
 !
 !
-            q1 = 0.0D0
-            Q = 1.0D0
+     q1 = 0.0D0
+     Q = 1.0D0
 
-            IF( TYPE .le. 1 ) THEN   ! FOR IEPOX
+     IF( TYPE .le. 1 ) THEN   ! FOR IEPOX
 
-               K1 = 9.0D-4 * VAR( ind_L_HPLUS ) * PHI2
-               K2 = 1.31D-5 * VAR( ind_L_HSO4MIN ) * PHI2
-               KIEPOXT = (K1 + K2) * FIX( indf_L_H2O ) * PHI2  ! IEPOX + H2O
+        K1 = 9.0D-4 * VAR( ind_L_HPLUS ) * PHI2
+        K2 = 1.31D-5 * VAR( ind_L_HSO4MIN ) * PHI2
+        KIEPOXT = (K1 + K2) * FIX( indf_L_H2O ) * PHI2  ! IEPOX + H2O
 
-               K1 = 8.83D-3 * VAR( ind_L_HPLUS ) * PHI2
-               K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2
-               KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_SO4MIN2 ) &
-                       * PHI2  ! IEPOX + SO4
+        K1 = 8.83D-3 * VAR( ind_L_HPLUS ) * PHI2
+        K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2
+        KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_SO4MIN2 ) &
+                * PHI2  ! IEPOX + SO4
 
-               K1 = 2.0D-4 * VAR( ind_L_HPLUS ) * PHI2
-               K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2
+        K1 = 2.0D-4 * VAR( ind_L_HPLUS ) * PHI2
+        K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2
 
-               IF( ISPC8 .LE. 0 ) THEN
-                  KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_NO3MIN ) * PHI2    
-               ELSE
-                  KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_IETET ) &
-                          * PHI2    ! IEPOX + IETET
-                  KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_IEOS ) &
-                          * PHI2     ! IEPOX + IEOS
-               ENDIF
+        IF( ISPC8 .LE. 0 ) THEN
+           KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_NO3MIN ) * PHI2    ! IEPOX
+        ELSE
+           KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_IETET ) &
+                   * PHI2    ! IEPOX + IETET
+           KIEPOXT = KIEPOXT + (K1 + K2) * VAR( ind_L_IEOS ) &
+                   * PHI2     ! IEPOX + IEOS
+        ENDIF
 
-               q1 = DDIAM/2.0D0 * SQRT( KIEPOXT / DAQ )
+        q1 = DDIAM/2.0D0 * SQRT( KIEPOXT / DAQ )
 
-               IF ( q1 .GT. 1.0D-3 ) THEN
-                  IF ( q1 .LE. 100.0D0 ) THEN
-                     COTHq = ( EXP( 2 * q1 ) + 1 ) / ( EXP( 2 * q1 ) - 1 )
-                     Q = 3 * ( ( COTHq / q1 ) - ( 1 / ( q1 * q1 ) ) )
-                     IF ( Q .GT. 1.0D0 ) Q = 1.0D0
-                  ELSE
-                     Q = 3.d0/q1
-                  END IF
-               ELSE
-                  Q = 1.0D0
-               END IF
+        IF ( q1 .GT. 1.0D-3 ) THEN
+           IF ( q1 .LE. 100.0D0 ) THEN
+              COTHq = ( EXP( 2 * q1 ) + 1 ) / ( EXP( 2 * q1 ) - 1 )
+              Q = 3 * ( ( COTHq / q1 ) - ( 1 / ( q1 * q1 ) ) )
+              IF ( Q .GT. 1.0D0 ) Q = 1.0D0
+           ELSE
+              Q = 3.d0/q1
+           END IF
+        ELSE
+           Q = 1.0D0
+        END IF
 
-            ELSE   ! FOR MAE OR HMML
+     ELSE   ! FOR MAE OR HMML
 
-               K1 = 9.0D-4 * VAR( ind_L_HPLUS ) * PHI2
-               K2 = 1.31D-5 * VAR( ind_L_HSO4MIN ) * PHI2
-               KMAET = (K1 + K2) * FIX( indf_L_H2O ) &
-                     * PHI2  ! MAE/HMML + H2O
+        K1 = 9.0D-4 * VAR( ind_L_HPLUS ) * PHI2
+        K2 = 1.31D-5 * VAR( ind_L_HSO4MIN ) * PHI2
+        KMAET = (K1 + K2) * FIX( indf_L_H2O ) &
+              * PHI2  ! MAE/HMML + H2O
 
-               K1 = 2.0D-4 * VAR( ind_L_HPLUS ) * PHI2
-               K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2
-               KMAET = KMAET + (K1 + K2) * VAR( ind_L_SO4MIN2 ) &
-                     * PHI2  ! MAE/HMML + SO4
+        K1 = 2.0D-4 * VAR( ind_L_HPLUS ) * PHI2
+        K2 = 2.92D-6 * VAR( ind_L_HSO4MIN ) * PHI2
+        KMAET = KMAET + (K1 + K2) * VAR( ind_L_SO4MIN2 ) &
+              * PHI2  ! MAE/HMML + SO4
 
-               q1 = DDIAM/2.0D0 * SQRT( KMAET / DAQ )
+        q1 = DDIAM/2.0D0 * SQRT( KMAET / DAQ )
 
-               IF ( q1 .GT. 1.0D-3 ) THEN
-                  IF ( q1 .LE. 100.0D0 ) THEN
-                     COTHq = ( EXP( 2 * q1 ) + 1 ) / ( EXP( 2 * q1 ) - 1 )
-                     Q = 3 * ( ( COTHq / q1 ) - ( 1 / ( q1 * q1 ) ) )
-                     IF ( Q .GT. 1.0D0 ) Q = 1.0D0
-                  ELSE
-                     Q = 3.d0/q1
-                  END IF
-               ELSE
-                  Q = 1.0D0
-               END IF
-            END IF
+        IF ( q1 .GT. 1.0D-3 ) THEN
+           IF ( q1 .LE. 100.0D0 ) THEN
+              COTHq = ( EXP( 2 * q1 ) + 1 ) / ( EXP( 2 * q1 ) - 1 )
+              Q = 3 * ( ( COTHq / q1 ) - ( 1 / ( q1 * q1 ) ) )
+              IF ( Q .GT. 1.0D0 ) Q = 1.0D0
+           ELSE
+              Q = 3.d0/q1
+           END IF
+        ELSE
+           Q = 1.0D0
+        END IF
+     END IF
 
-            KIEPOX = KIEPOX * Q
+     KIEPOX = KIEPOX * Q
 
-            KIEPOX = KIEPOX * PHI2
+     KIEPOX = KIEPOX * PHI2
 
-            IF( ISPC8 .LE. 0 ) THEN
-               IF( TYPE .GT. 0 ) KIEPOX = 0.d0
-            ELSE
-               IF( TYPE .LT. 1 ) KIEPOX = 0.d0
-            END IF
+     IF( ISPC8 .LE. 0 ) THEN
+        IF( TYPE .GT. 0 ) KIEPOX = 0.d0
+     ELSE
+        IF( TYPE .LT. 1 ) KIEPOX = 0.d0
+     END IF
 
-            RETURN
+     RETURN
 
-       END FUNCTION KIEPOX
+END FUNCTION KIEPOX
 
 ! End INLINED Rate Law Functions
 
@@ -1106,8 +1106,8 @@ FALLOFF_T10_DMS2 = FALLOFF_T10( 1.9900D-39,5.2700D+03, &
   RCONST(405) = (XCL_RS*5.D10*PHI2_RS*GM1_RS*GM2_RS)
   RCONST(406) = (XCL_RS*5.D10*1.70D1)
   RCONST(407) = (XCL_RS*5.D10*PHI2_RS*GM1_RS*GM1_RS)
-  RCONST(408) = (XCL_RS*3.4D10*PHI2_RS*GM1_RS*GM1_RS)
-  RCONST(409) = (XCL_RS*3.4D10*5.88D-10*EXP(-2.391D2*TFAC))
+  RCONST(408) = (XCL_RS*3.4D10*5.87647D-7*EXP(-2.391D2*TFAC))
+  RCONST(409) = (XCL_RS*3.4D10*1.D3*PHI2_RS*GM1_RS*GM1_RS)
   RCONST(410) = (XCL_RS*6.4D4*4.3D-7*EXP(-9.95D2*TFAC))
   RCONST(411) = (XCL_RS*6.4D4*PHI2_RS*GM1_RS*GM1_RS)
   RCONST(412) = (XCL_RS*5.D10*4.68D-11*EXP(-1.79D3*TFAC)*GM1_RS)
@@ -1138,72 +1138,72 @@ FALLOFF_T10_DMS2 = FALLOFF_T10( 1.9900D-39,5.2700D+03, &
   RCONST(437) = (XCL_RS*2.D10*PHI2_RS*GM1_RS*GM1_RS)
   RCONST(438) = (XCL_RS*5.D10*1.75D-5)
   RCONST(439) = (XCL_RS*5.D10*PHI2_RS*GM1_RS*GM1_RS)
-  RCONST(440) = (XCL_RS*KRXN(2.4D+4,0.0D0,0,1,0,'RS'))
-  RCONST(441) = (XCL_RS*KRXN(3.7D+5,-5530.88D0,0,2,0,'RS'))
-  RCONST(442) = (XCL_RS*KRXN(1.5D+9,-5280.56D0,0,3,0,'RS'))
-  RCONST(443) = (XCL_RS*8.3D5*EXP(-2.7D3*TFAC)*PHI2_RS)
-  RCONST(444) = (XCL_RS*9.6D7*EXP(-9.1D2*TFAC)*PHI2_RS)
-  RCONST(445) = (XCL_RS*1.5D9*EXP(-1.5D3*TFAC)*PHI2_RS)
-  RCONST(446) = (XCL_RS*2.0D6*PHI2_RS)
+  RCONST(440) = (XCL_RS*KRXN(7.45D+7,-4756.08D0,1,0,0,'RS'))
+  RCONST(441) = (XCL_RS*KRXN(2.4D+4,0.0D0,0,1,0,'RS'))
+  RCONST(442) = (XCL_RS*KRXN(3.7D+5,-5530.88D0,0,2,0,'RS'))
+  RCONST(443) = (XCL_RS*KRXN(1.5D+9,-5280.56D0,0,3,0,'RS'))
+  RCONST(444) = (XCL_RS*8.3D5*EXP(-2.7D3*TFAC)*PHI2_RS)
+  RCONST(445) = (XCL_RS*9.6D7*EXP(-9.1D2*TFAC)*PHI2_RS)
+  RCONST(446) = (XCL_RS*1.5D9*EXP(-1.5D3*TFAC)*PHI2_RS)
   RCONST(447) = (XCL_RS*2.0D6*PHI2_RS)
   RCONST(448) = (XCL_RS*2.0D6*PHI2_RS)
-  RCONST(449) = (XCL_RS*3.3D5*PHI2_RS)
-  RCONST(450) = (XCL_RS*1.1D0*PHI2_RS)
-  RCONST(451) = (XCL_RS*5.0D5*EXP(-7.0D3*TFAC)*PHI2_RS)
-  RCONST(452) = (XCL_RS*1.0D10*PHI2_RS)
+  RCONST(449) = (XCL_RS*2.0D6*PHI2_RS)
+  RCONST(450) = (XCL_RS*3.3D5*PHI2_RS)
+  RCONST(451) = (XCL_RS*1.1D0*PHI2_RS)
+  RCONST(452) = (XCL_RS*5.0D5*EXP(-7.0D3*TFAC)*PHI2_RS)
   RCONST(453) = (XCL_RS*1.0D10*PHI2_RS)
-  RCONST(454) = (XCL_RS*3.6D9*EXP(-9.3D2*TFAC)*PHI2_RS)
-  RCONST(455) = (XCL_RS*2.8D10*PHI2_RS)
-  RCONST(456) = (XCL_RS*3.5D10*EXP(-7.2D2*TFAC)*PHI2_RS)
-  RCONST(457) = (XCL_RS*3.2D7*EXP(-1.7D3*TFAC)*PHI2_RS)
-  RCONST(458) = (XCL_RS*2.7D9*PHI2_RS)
-  RCONST(459) = (XCL_RS*1.8D9*PHI2_RS)
-  RCONST(460) = (XCL_RS*4.5D9*PHI2_RS)
-  RCONST(461) = (XCL_RS*2.6D-2)
-  RCONST(462) = (XCL_RS*1.0D5*PHI2_RS)
-  RCONST(463) = (XCL_RS*1.3D9*EXP(-2.2D3*TFAC)*PHI2_RS)
-  RCONST(464) = (XCL_RS*1.1D9*PHI2_RS)
-  RCONST(465) = (XCL_RS*1.7D9*PHI2_RS)
-  RCONST(466) = (XCL_RS*2.2D8*EXP(-2.6D3*TFAC)*PHI2_RS)
-  RCONST(467) = (XCL_RS*7.1D6*PHI2_RS*PHI2_RS)
-  RCONST(468) = (XCL_RS*4.6D2*EXP(-1.1D3*TFAC)*PHI2_RS)
+  RCONST(454) = (XCL_RS*1.0D10*PHI2_RS)
+  RCONST(455) = (XCL_RS*3.6D9*EXP(-9.3D2*TFAC)*PHI2_RS)
+  RCONST(456) = (XCL_RS*2.8D10*PHI2_RS)
+  RCONST(457) = (XCL_RS*3.5D10*EXP(-7.2D2*TFAC)*PHI2_RS)
+  RCONST(458) = (XCL_RS*3.2D7*EXP(-1.7D3*TFAC)*PHI2_RS)
+  RCONST(459) = (XCL_RS*2.7D9*PHI2_RS)
+  RCONST(460) = (XCL_RS*1.8D9*PHI2_RS)
+  RCONST(461) = (XCL_RS*4.5D9*PHI2_RS)
+  RCONST(462) = (XCL_RS*2.6D-2)
+  RCONST(463) = (XCL_RS*1.0D5*PHI2_RS)
+  RCONST(464) = (XCL_RS*1.3D9*EXP(-2.2D3*TFAC)*PHI2_RS)
+  RCONST(465) = (XCL_RS*1.1D9*PHI2_RS)
+  RCONST(466) = (XCL_RS*1.7D9*PHI2_RS)
+  RCONST(467) = (XCL_RS*2.2D8*EXP(-2.6D3*TFAC)*PHI2_RS)
+  RCONST(468) = (XCL_RS*7.1D6*PHI2_RS*PHI2_RS)
   RCONST(469) = (XCL_RS*4.6D2*EXP(-1.1D3*TFAC)*PHI2_RS)
-  RCONST(470) = (XCL_RS*5.0D5*PHI2_RS)
-  RCONST(471) = (XCL_RS*7.9D2*EXP(-2.9D3*TFAC)*PHI2_RS)
-  RCONST(472) = (XCL_RS*2.5D7*EXP(-2.45D3*TFAC)*PHI2_RS)
-  RCONST(473) = (XCL_RS*7.7D-3*EXP(-9.2E3*TFAC))
-  RCONST(474) = (XCL_RS*3.7D3*PHI2_RS)
-  RCONST(475) = (XCL_RS*3.0D8*PHI2_RS)
-  RCONST(476) = (XCL_RS*1.9D7*EXP(-3.8E3*TFAC)*PHI2_RS*PHI2_RS)
-  RCONST(477) = (XCL_RS*3.6D7*EXP(-4.0E3*TFAC)*PHI2_RS*PHI2_RS)
-  RCONST(478) = (XCL_RS*7.0D2*PHI2_RS)
-  RCONST(479) = (XCL_RS*3.4D9*EXP(-1.2D3*TFAC)*PHI2_RS)
-  RCONST(480) = (XCL_RS*5.0D8*PHI2_RS)
-  RCONST(481) = (XCL_RS*1.0D9*PHI2_RS)
-  RCONST(482) = (XCL_RS*6.0D8*PHI2_RS)
-  RCONST(483) = (XCL_RS*8.6D8*PHI2_RS)
-  RCONST(484) = (XCL_RS*1.1D9*EXP(-1.516D3*TFAC)*PHI2_RS)
-  RCONST(485) = (XCL_RS*1.5D8*PHI2_RS)
-  RCONST(486) = (XCL_RS*1.2D9*PHI2_RS)
-  RCONST(487) = (XCL_RS*1.4D6*PHI2_RS)
-  RCONST(488) = (XCL_RS*4.7D7*PHI2_RS)
-  RCONST(489) = (XCL_RS*7.7D6*PHI2_RS)
-  RCONST(490) = (XCL_RS*7.0D8*PHI2_RS)
-  RCONST(491) = (XCL_RS*6.0D7*PHI2_RS)
+  RCONST(470) = (XCL_RS*4.6D2*EXP(-1.1D3*TFAC)*PHI2_RS)
+  RCONST(471) = (XCL_RS*5.0D5*PHI2_RS)
+  RCONST(472) = (XCL_RS*7.9D2*EXP(-2.9D3*TFAC)*PHI2_RS)
+  RCONST(473) = (XCL_RS*2.5D7*EXP(-2.45D3*TFAC)*PHI2_RS)
+  RCONST(474) = (XCL_RS*7.7D-3*EXP(-9.2E3*TFAC))
+  RCONST(475) = (XCL_RS*3.7D3*PHI2_RS)
+  RCONST(476) = (XCL_RS*3.0D8*PHI2_RS)
+  RCONST(477) = (XCL_RS*1.9D7*EXP(-3.8E3*TFAC)*PHI2_RS*PHI2_RS)
+  RCONST(478) = (XCL_RS*3.6D7*EXP(-4.0E3*TFAC)*PHI2_RS*PHI2_RS)
+  RCONST(479) = (XCL_RS*7.0D2*PHI2_RS)
+  RCONST(480) = (XCL_RS*3.4D9*EXP(-1.2D3*TFAC)*PHI2_RS)
+  RCONST(481) = (XCL_RS*5.0D8*PHI2_RS)
+  RCONST(482) = (XCL_RS*1.0D9*PHI2_RS)
+  RCONST(483) = (XCL_RS*6.0D8*PHI2_RS)
+  RCONST(484) = (XCL_RS*8.6D8*PHI2_RS)
+  RCONST(485) = (XCL_RS*1.1D9*EXP(-1.516D3*TFAC)*PHI2_RS)
+  RCONST(486) = (XCL_RS*1.5D8*PHI2_RS)
+  RCONST(487) = (XCL_RS*1.2D9*PHI2_RS)
+  RCONST(488) = (XCL_RS*1.4D6*PHI2_RS)
+  RCONST(489) = (XCL_RS*4.7D7*PHI2_RS)
+  RCONST(490) = (XCL_RS*7.7D6*PHI2_RS)
+  RCONST(491) = (XCL_RS*7.0D8*PHI2_RS)
   RCONST(492) = (XCL_RS*6.0D7*PHI2_RS)
-  RCONST(493) = (XCL_RS*1.6D7*PHI2_RS)
-  RCONST(494) = (XCL_RS*8.5D7*PHI2_RS)
-  RCONST(495) = (XCL_RS*1.1D9*EXP(-1.02D3*TFAC)*PHI2_RS)
-  RCONST(496) = (XCL_RS*1.2D8*EXP(-9.9D2*TFAC)*PHI2_RS)
-  RCONST(497) = (XCL_RS*1.0*RJCELL(IJ_H2O2_IUPAC10))
-  RCONST(498) = (XCL_RS*KIEPOX(9.0D-4,1.31D-5,0,'RS'))
-  RCONST(499) = (XCL_RS*KIEPOX(8.83D-3,2.92D-6,0,'RS'))
-  RCONST(500) = (XCL_RS*KIEPOX(2.0D-4,2.92D-6,0,'RS'))
-  RCONST(501) = (XCL_RS*CFRAC_RS*KPP_ALFA3_RS)
+  RCONST(493) = (XCL_RS*6.0D7*PHI2_RS)
+  RCONST(494) = (XCL_RS*1.6D7*PHI2_RS)
+  RCONST(495) = (XCL_RS*8.5D7*PHI2_RS)
+  RCONST(496) = (XCL_RS*1.1D9*EXP(-1.02D3*TFAC)*PHI2_RS)
+  RCONST(497) = (XCL_RS*1.2D8*EXP(-9.9D2*TFAC)*PHI2_RS)
+  RCONST(498) = (XCL_RS*1.0*RJCELL(IJ_H2O2_IUPAC10))
+  RCONST(499) = (XCL_RS*KIEPOX(9.0D-4,1.31D-5,0,'RS'))
+  RCONST(500) = (XCL_RS*KIEPOX(8.83D-3,2.92D-6,0,'RS'))
+  RCONST(501) = (XCL_RS*KIEPOX(2.0D-4,2.92D-6,0,'RS'))
   RCONST(502) = (XCL_RS*CFRAC_RS*KPP_ALFA3_RS)
   RCONST(503) = (XCL_RS*CFRAC_RS*KPP_ALFA3_RS)
   RCONST(504) = (XCL_RS*CFRAC_RS*KPP_ALFA3_RS)
-  RCONST(505) = (XCL_RS*WFAC_RS)
+  RCONST(505) = (XCL_RS*CFRAC_RS*KPP_ALFA3_RS)
   RCONST(506) = (XCL_RS*WFAC_RS)
   RCONST(507) = (XCL_RS*WFAC_RS)
   RCONST(508) = (XCL_RS*WFAC_RS)
@@ -1261,163 +1261,163 @@ FALLOFF_T10_DMS2 = FALLOFF_T10( 1.9900D-39,5.2700D+03, &
   RCONST(560) = (XCL_RS*WFAC_RS)
   RCONST(561) = (XCL_RS*WFAC_RS)
   RCONST(562) = (XCL_RS*WFAC_RS)
-  RCONST(563) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,64.0D0,1.28D-5,H_SO2,0.11D0,0))
-  RCONST(564) = (XCL_CV*KMT(TEMP,LWC_CV,64.0D0,1.28D-5,H_SO2,0.11D0,1))
-  RCONST(565) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,63.0D0,1.32D-5,H_HNO3,0.09D0,0))
-  RCONST(566) = (XCL_CV*KMT(TEMP,LWC_CV,63.0D0,1.32D-5,H_HNO3,0.09D0,1))
-  RCONST(567) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,44.0D0,1.55D-5,H_CO2,0.00015D0,0))
-  RCONST(568) = (XCL_CV*KMT(TEMP,LWC_CV,44.0D0,1.55D-5,H_CO2,0.00015D0,1))
-  RCONST(569) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,17.0D0,2.30D-5,H_NH3,0.091D0,0))
-  RCONST(570) = (XCL_CV*KMT(TEMP,LWC_CV,17.0D0,2.30D-5,H_NH3,0.091D0,1))
-  RCONST(571) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,34.0D0,1.46D-5,H_H2O2,0.15D0,0))
-  RCONST(572) = (XCL_CV*KMT(TEMP,LWC_CV,34.0D0,1.46D-5,H_H2O2,0.15D0,1))
-  RCONST(573) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,48.0D0,1.48D-5,H_O3,0.1D0,0))
-  RCONST(574) = (XCL_CV*KMT(TEMP,LWC_CV,48.0D0,1.48D-5,H_O3,0.1D0,1))
-  RCONST(575) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,46.0D0,1.53D-5,H_FACD,0.0229D0,0))
-  RCONST(576) = (XCL_CV*KMT(TEMP,LWC_CV,46.0D0,1.53D-5,H_FACD,0.0229D0,1))
-  RCONST(577) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,36.5D0,1.89D-5,H_HCL,0.116D0,0))
-  RCONST(578) = (XCL_CV*KMT(TEMP,LWC_CV,36.5D0,1.89D-5,H_HCL,0.116D0,1))
-  RCONST(579) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,58.0D0,1.15D-5,H_GLY,0.023D0,0))
-  RCONST(580) = (XCL_CV*KMT(TEMP,LWC_CV,58.0D0,1.15D-5,H_GLY,0.023D0,1))
-  RCONST(581) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,72.0D0,1.15D-5,H_MGLY,0.023D0,0))
-  RCONST(582) = (XCL_CV*KMT(TEMP,LWC_CV,72.0D0,1.15D-5,H_MGLY,0.023D0,1))
-  RCONST(583) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,17.0D0,1.48D-5,H_OH,0.1D0,0))
-  RCONST(584) = (XCL_CV*KMT(TEMP,LWC_CV,17.0D0,1.48D-5,H_OH,0.1D0,1))
-  RCONST(585) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,97.0D0,1.48D-5,0.0D0,0.1D0,0))
-  RCONST(586) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,108.0D0,1.48D-5,0.0D0,0.1D0,0))
-  RCONST(587) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,33.0D0,1.04D-5,H_HO2,0.01D0,0))
-  RCONST(588) = (XCL_CV*KMT(TEMP,LWC_CV,33.0D0,1.04D-5,H_HO2,0.01D0,1))
-  RCONST(589) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,46.0D0,1.92D-5,H_NO2,0.0015D0,0))
-  RCONST(590) = (XCL_CV*KMT(TEMP,LWC_CV,46.0D0,1.92D-5,H_NO2,0.0015D0,1))
-  RCONST(591) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,47.0D0,1.30D-5,H_HONO,0.5D0,0))
-  RCONST(592) = (XCL_CV*KMT(TEMP,LWC_CV,47.0D0,1.30D-5,H_HONO,0.5D0,1))
-  RCONST(593) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,79.0D0,1.30D-5,H_HNO4,0.1D0,0))
-  RCONST(594) = (XCL_CV*KMT(TEMP,LWC_CV,79.0D0,1.30D-5,H_HNO4,0.1D0,1))
-  RCONST(595) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,60.052D0,1.15D-5,H_GLYD,0.023D0,0))
-  RCONST(596) = (XCL_CV*KMT(TEMP,LWC_CV,60.052D0,1.15D-5,H_GLYD,0.023D0,1))
-  RCONST(597) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,60.052D0,1.24D-5,H_AACD,0.0322D0,0))
-  RCONST(598) = (XCL_CV*KMT(TEMP,LWC_CV,60.052D0,1.24D-5,H_AACD,0.0322D0,1))
-  RCONST(599) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,30.0D0,1.64D-5,H_FORM,0.02D0,0))
-  RCONST(600) = (XCL_CV*KMT(TEMP,LWC_CV,30.0D0,1.64D-5,H_FORM,0.02D0,1))
-  RCONST(601) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,62.0D0,1.00D-5,H_NO3,0.05D0,0))
-  RCONST(602) = (XCL_CV*KMT(TEMP,LWC_CV,62.0D0,1.00D-5,H_NO3,0.05D0,1))
-  RCONST(603) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,49.0D0,1.35D-5,H_CH3O2,0.05D0,0))
-  RCONST(604) = (XCL_CV*KMT(TEMP,LWC_CV,49.0D0,1.35D-5,H_CH3O2,0.05D0,1))
-  RCONST(605) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,48.04D0,1.31D-5,H_MHP,0.006758D0,0))
-  RCONST(606) = (XCL_CV*KMT(TEMP,LWC_CV,48.04D0,1.31D-5,H_MHP,0.006758D0,1))
-  RCONST(607) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,76.05D0,1.02D-5,H_PAA,0.019D0,0))
-  RCONST(608) = (XCL_CV*KMT(TEMP,LWC_CV,76.05D0,1.02D-5,H_PAA,0.019D0,1))
-  RCONST(609) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,118.13D0,1.00D-5,H_IEPOX,0.02D0,0))
-  RCONST(610) = (XCL_CV*KMT(TEMP,LWC_CV,118.13D0,1.00D-5,H_IEPOX,0.02D0,1))
-  RCONST(611) = (XCL_CV*1.8D-1*EXP(4.03D+3*TFAC)*PHI2_CV)
-  RCONST(612) = (XCL_CV*5.1D-3)
-  RCONST(613) = (XCL_CV*1.4D10*1.8D-16*EXP(-6.95D3*TFAC))
-  RCONST(614) = (XCL_CV*1.4D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(615) = (XCL_CV*2.0D8*1.39D-2*EXP(1.87D3*TFAC))
-  RCONST(616) = (XCL_CV*2.0D8*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(617) = (XCL_CV*5.D10*6.72D-8*EXP(3.55D2*TFAC)*GM1_CV)
-  RCONST(618) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM2_CV)
-  RCONST(619) = (XCL_CV*5.D10*1.70D1)
-  RCONST(620) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(621) = (XCL_CV*3.4D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(622) = (XCL_CV*3.4D10*5.88D-10*EXP(-2.391D2*TFAC))
-  RCONST(623) = (XCL_CV*6.4D4*4.3D-7*EXP(-9.95D2*TFAC))
-  RCONST(624) = (XCL_CV*6.4D4*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(625) = (XCL_CV*5.D10*4.68D-11*EXP(-1.79D3*TFAC)*GM1_CV)
-  RCONST(626) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM2_CV)
-  RCONST(627) = (XCL_CV*5.D10*1.74D6*EXP(6.90D3*TFAC))
-  RCONST(628) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(629) = (XCL_CV*5.D10*1.0D3)
-  RCONST(630) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(631) = (XCL_CV*1.D11*1.02D-2*EXP(2.45D3*TFAC)*GM1_CV)
-  RCONST(632) = (XCL_CV*1.D11*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(633) = (XCL_CV*5.0D10*(1.8D-4*EXP(-2.00D1*TFAC)))
-  RCONST(634) = (XCL_CV*5.0D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(635) = (XCL_CV*5.D10*1.6D-5)
-  RCONST(636) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(637) = (XCL_CV*5.D10*1.0D-5)
-  RCONST(638) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(639) = (XCL_CV*5.D10*(5.3D-4*EXP(-1.76D3*TFAC)))
-  RCONST(640) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(641) = (XCL_CV*2.D10*3.47D-4*EXP(-2.67D2*TFAC))
-  RCONST(642) = (XCL_CV*2.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(643) = (XCL_CV*5.D10*5.6D-2)
-  RCONST(644) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(645) = (XCL_CV*5.D10*5.4D-5*GM1_CV)
-  RCONST(646) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM2_CV)
-  RCONST(647) = (XCL_CV*2.D10*3.2D-3)
-  RCONST(648) = (XCL_CV*2.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(649) = (XCL_CV*2.D10*1.48D-4*EXP(-8.05D1*TFAC))
-  RCONST(650) = (XCL_CV*2.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(651) = (XCL_CV*5.D10*1.75D-5)
-  RCONST(652) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
-  RCONST(653) = (XCL_CV*KRXN(2.4D+4,0.0D0,0,1,0,'CV'))
-  RCONST(654) = (XCL_CV*KRXN(3.7D+5,-5530.88D0,0,2,0,'CV'))
-  RCONST(655) = (XCL_CV*KRXN(1.5D+9,-5280.56D0,0,3,0,'CV'))
-  RCONST(656) = (XCL_CV*8.3D5*EXP(-2.7D3*TFAC)*PHI2_CV)
-  RCONST(657) = (XCL_CV*9.6D7*EXP(-9.1D2*TFAC)*PHI2_CV)
-  RCONST(658) = (XCL_CV*1.5D9*EXP(-1.5D3*TFAC)*PHI2_CV)
-  RCONST(659) = (XCL_CV*2.0D6*PHI2_CV)
-  RCONST(660) = (XCL_CV*2.0D6*PHI2_CV)
+  RCONST(563) = (XCL_RS*WFAC_RS)
+  RCONST(564) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,64.0D0,1.28D-5,H_SO2,0.11D0,0))
+  RCONST(565) = (XCL_CV*KMT(TEMP,LWC_CV,64.0D0,1.28D-5,H_SO2,0.11D0,1))
+  RCONST(566) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,63.0D0,1.32D-5,H_HNO3,0.09D0,0))
+  RCONST(567) = (XCL_CV*KMT(TEMP,LWC_CV,63.0D0,1.32D-5,H_HNO3,0.09D0,1))
+  RCONST(568) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,44.0D0,1.55D-5,H_CO2,0.00015D0,0))
+  RCONST(569) = (XCL_CV*KMT(TEMP,LWC_CV,44.0D0,1.55D-5,H_CO2,0.00015D0,1))
+  RCONST(570) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,17.0D0,2.30D-5,H_NH3,0.091D0,0))
+  RCONST(571) = (XCL_CV*KMT(TEMP,LWC_CV,17.0D0,2.30D-5,H_NH3,0.091D0,1))
+  RCONST(572) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,34.0D0,1.46D-5,H_H2O2,0.15D0,0))
+  RCONST(573) = (XCL_CV*KMT(TEMP,LWC_CV,34.0D0,1.46D-5,H_H2O2,0.15D0,1))
+  RCONST(574) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,48.0D0,1.48D-5,H_O3,0.1D0,0))
+  RCONST(575) = (XCL_CV*KMT(TEMP,LWC_CV,48.0D0,1.48D-5,H_O3,0.1D0,1))
+  RCONST(576) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,46.0D0,1.53D-5,H_FACD,0.0229D0,0))
+  RCONST(577) = (XCL_CV*KMT(TEMP,LWC_CV,46.0D0,1.53D-5,H_FACD,0.0229D0,1))
+  RCONST(578) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,36.5D0,1.89D-5,H_HCL,0.116D0,0))
+  RCONST(579) = (XCL_CV*KMT(TEMP,LWC_CV,36.5D0,1.89D-5,H_HCL,0.116D0,1))
+  RCONST(580) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,58.0D0,1.15D-5,H_GLY,0.023D0,0))
+  RCONST(581) = (XCL_CV*KMT(TEMP,LWC_CV,58.0D0,1.15D-5,H_GLY,0.023D0,1))
+  RCONST(582) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,72.0D0,1.15D-5,H_MGLY,0.023D0,0))
+  RCONST(583) = (XCL_CV*KMT(TEMP,LWC_CV,72.0D0,1.15D-5,H_MGLY,0.023D0,1))
+  RCONST(584) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,17.0D0,1.48D-5,H_OH,0.1D0,0))
+  RCONST(585) = (XCL_CV*KMT(TEMP,LWC_CV,17.0D0,1.48D-5,H_OH,0.1D0,1))
+  RCONST(586) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,97.0D0,1.48D-5,0.0D0,0.1D0,0))
+  RCONST(587) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,108.0D0,1.48D-5,0.0D0,0.1D0,0))
+  RCONST(588) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,33.0D0,1.04D-5,H_HO2,0.01D0,0))
+  RCONST(589) = (XCL_CV*KMT(TEMP,LWC_CV,33.0D0,1.04D-5,H_HO2,0.01D0,1))
+  RCONST(590) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,46.0D0,1.92D-5,H_NO2,0.0015D0,0))
+  RCONST(591) = (XCL_CV*KMT(TEMP,LWC_CV,46.0D0,1.92D-5,H_NO2,0.0015D0,1))
+  RCONST(592) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,47.0D0,1.30D-5,H_HONO,0.5D0,0))
+  RCONST(593) = (XCL_CV*KMT(TEMP,LWC_CV,47.0D0,1.30D-5,H_HONO,0.5D0,1))
+  RCONST(594) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,79.0D0,1.30D-5,H_HNO4,0.1D0,0))
+  RCONST(595) = (XCL_CV*KMT(TEMP,LWC_CV,79.0D0,1.30D-5,H_HNO4,0.1D0,1))
+  RCONST(596) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,60.052D0,1.15D-5,H_GLYD,0.023D0,0))
+  RCONST(597) = (XCL_CV*KMT(TEMP,LWC_CV,60.052D0,1.15D-5,H_GLYD,0.023D0,1))
+  RCONST(598) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,60.052D0,1.24D-5,H_AACD,0.0322D0,0))
+  RCONST(599) = (XCL_CV*KMT(TEMP,LWC_CV,60.052D0,1.24D-5,H_AACD,0.0322D0,1))
+  RCONST(600) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,30.0D0,1.64D-5,H_FORM,0.02D0,0))
+  RCONST(601) = (XCL_CV*KMT(TEMP,LWC_CV,30.0D0,1.64D-5,H_FORM,0.02D0,1))
+  RCONST(602) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,62.0D0,1.00D-5,H_NO3,0.05D0,0))
+  RCONST(603) = (XCL_CV*KMT(TEMP,LWC_CV,62.0D0,1.00D-5,H_NO3,0.05D0,1))
+  RCONST(604) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,49.0D0,1.35D-5,H_CH3O2,0.05D0,0))
+  RCONST(605) = (XCL_CV*KMT(TEMP,LWC_CV,49.0D0,1.35D-5,H_CH3O2,0.05D0,1))
+  RCONST(606) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,48.04D0,1.31D-5,H_MHP,0.006758D0,0))
+  RCONST(607) = (XCL_CV*KMT(TEMP,LWC_CV,48.04D0,1.31D-5,H_MHP,0.006758D0,1))
+  RCONST(608) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,76.05D0,1.02D-5,H_PAA,0.019D0,0))
+  RCONST(609) = (XCL_CV*KMT(TEMP,LWC_CV,76.05D0,1.02D-5,H_PAA,0.019D0,1))
+  RCONST(610) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,118.13D0,1.00D-5,H_IEPOX,0.02D0,0))
+  RCONST(611) = (XCL_CV*KMT(TEMP,LWC_CV,118.13D0,1.00D-5,H_IEPOX,0.02D0,1))
+  RCONST(612) = (XCL_CV*1.8D-1*EXP(4.03D+3*TFAC)*PHI2_CV)
+  RCONST(613) = (XCL_CV*5.1D-3)
+  RCONST(614) = (XCL_CV*1.4D10*1.8D-16*EXP(-6.95D3*TFAC))
+  RCONST(615) = (XCL_CV*1.4D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(616) = (XCL_CV*2.0D8*1.39D-2*EXP(1.87D3*TFAC))
+  RCONST(617) = (XCL_CV*2.0D8*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(618) = (XCL_CV*5.D10*6.72D-8*EXP(3.55D2*TFAC)*GM1_CV)
+  RCONST(619) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM2_CV)
+  RCONST(620) = (XCL_CV*5.D10*1.70D1)
+  RCONST(621) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(622) = (XCL_CV*3.4D10*5.87647D-7*EXP(-2.391D2*TFAC))
+  RCONST(623) = (XCL_CV*3.4D10*1.D3*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(624) = (XCL_CV*6.4D4*4.3D-7*EXP(-9.95D2*TFAC))
+  RCONST(625) = (XCL_CV*6.4D4*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(626) = (XCL_CV*5.D10*4.68D-11*EXP(-1.79D3*TFAC)*GM1_CV)
+  RCONST(627) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM2_CV)
+  RCONST(628) = (XCL_CV*5.D10*1.74D6*EXP(6.90D3*TFAC))
+  RCONST(629) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(630) = (XCL_CV*5.D10*1.0D3)
+  RCONST(631) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(632) = (XCL_CV*1.D11*1.02D-2*EXP(2.45D3*TFAC)*GM1_CV)
+  RCONST(633) = (XCL_CV*1.D11*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(634) = (XCL_CV*5.0D10*(1.8D-4*EXP(-2.00D1*TFAC)))
+  RCONST(635) = (XCL_CV*5.0D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(636) = (XCL_CV*5.D10*1.6D-5)
+  RCONST(637) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(638) = (XCL_CV*5.D10*1.0D-5)
+  RCONST(639) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(640) = (XCL_CV*5.D10*(5.3D-4*EXP(-1.76D3*TFAC)))
+  RCONST(641) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(642) = (XCL_CV*2.D10*3.47D-4*EXP(-2.67D2*TFAC))
+  RCONST(643) = (XCL_CV*2.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(644) = (XCL_CV*5.D10*5.6D-2)
+  RCONST(645) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(646) = (XCL_CV*5.D10*5.4D-5*GM1_CV)
+  RCONST(647) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM2_CV)
+  RCONST(648) = (XCL_CV*2.D10*3.2D-3)
+  RCONST(649) = (XCL_CV*2.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(650) = (XCL_CV*2.D10*1.48D-4*EXP(-8.05D1*TFAC))
+  RCONST(651) = (XCL_CV*2.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(652) = (XCL_CV*5.D10*1.75D-5)
+  RCONST(653) = (XCL_CV*5.D10*PHI2_CV*GM1_CV*GM1_CV)
+  RCONST(654) = (XCL_CV*KRXN(7.45D+7,-4756.08D0,1,0,0,'CV'))
+  RCONST(655) = (XCL_CV*KRXN(2.4D+4,0.0D0,0,1,0,'CV'))
+  RCONST(656) = (XCL_CV*KRXN(3.7D+5,-5530.88D0,0,2,0,'CV'))
+  RCONST(657) = (XCL_CV*KRXN(1.5D+9,-5280.56D0,0,3,0,'CV'))
+  RCONST(658) = (XCL_CV*8.3D5*EXP(-2.7D3*TFAC)*PHI2_CV)
+  RCONST(659) = (XCL_CV*9.6D7*EXP(-9.1D2*TFAC)*PHI2_CV)
+  RCONST(660) = (XCL_CV*1.5D9*EXP(-1.5D3*TFAC)*PHI2_CV)
   RCONST(661) = (XCL_CV*2.0D6*PHI2_CV)
-  RCONST(662) = (XCL_CV*3.3D5*PHI2_CV)
-  RCONST(663) = (XCL_CV*1.1D0*PHI2_CV)
-  RCONST(664) = (XCL_CV*5.0D5*EXP(-7.0D3*TFAC)*PHI2_CV)
-  RCONST(665) = (XCL_CV*1.0D10*PHI2_CV)
-  RCONST(666) = (XCL_CV*1.0D10*PHI2_CV)
-  RCONST(667) = (XCL_CV*3.6D9*EXP(-9.3D2*TFAC)*PHI2_CV)
-  RCONST(668) = (XCL_CV*2.8D10*PHI2_CV)
-  RCONST(669) = (XCL_CV*3.5D10*EXP(-7.2D2*TFAC)*PHI2_CV)
-  RCONST(670) = (XCL_CV*3.2D7*EXP(-1.7D3*TFAC)*PHI2_CV)
-  RCONST(671) = (XCL_CV*2.7D9*PHI2_CV)
-  RCONST(672) = (XCL_CV*1.8D9*PHI2_CV)
-  RCONST(673) = (XCL_CV*4.5D9*PHI2_CV)
-  RCONST(674) = (XCL_CV*2.6D-2)
-  RCONST(675) = (XCL_CV*1.0D5*PHI2_CV)
-  RCONST(676) = (XCL_CV*1.3D9*EXP(-2.2D3*TFAC)*PHI2_CV)
-  RCONST(677) = (XCL_CV*1.1D9*PHI2_CV)
-  RCONST(678) = (XCL_CV*1.7D9*PHI2_CV)
-  RCONST(679) = (XCL_CV*2.2D8*EXP(-2.6D3*TFAC)*PHI2_CV)
-  RCONST(680) = (XCL_CV*7.1D6*PHI2_CV*PHI2_CV)
-  RCONST(681) = (XCL_CV*4.6D2*EXP(-1.1D3*TFAC)*PHI2_CV)
-  RCONST(682) = (XCL_CV*4.6D2*EXP(-1.1D3*TFAC)*PHI2_CV)
-  RCONST(683) = (XCL_CV*5.0D5*PHI2_CV)
-  RCONST(684) = (XCL_CV*7.9D2*EXP(-2.9D3*TFAC)*PHI2_CV)
-  RCONST(685) = (XCL_CV*2.5D7*EXP(-2.45D3*TFAC)*PHI2_CV)
-  RCONST(686) = (XCL_CV*7.7D-3*EXP(-9.2E3*TFAC))
-  RCONST(687) = (XCL_CV*3.7D3*PHI2_CV)
-  RCONST(688) = (XCL_CV*3.0D8*PHI2_CV)
-  RCONST(689) = (XCL_CV*1.9D7*EXP(-3.8E3*TFAC)*PHI2_CV*PHI2_CV)
-  RCONST(690) = (XCL_CV*3.6D7*EXP(-4.0E3*TFAC)*PHI2_CV*PHI2_CV)
-  RCONST(691) = (XCL_CV*7.0D2*PHI2_CV)
-  RCONST(692) = (XCL_CV*3.4D9*EXP(-1.2D3*TFAC)*PHI2_CV)
-  RCONST(693) = (XCL_CV*5.0D8*PHI2_CV)
-  RCONST(694) = (XCL_CV*1.0D9*PHI2_CV)
-  RCONST(695) = (XCL_CV*6.0D8*PHI2_CV)
-  RCONST(696) = (XCL_CV*8.6D8*PHI2_CV)
-  RCONST(697) = (XCL_CV*1.1D9*EXP(-1.516D3*TFAC)*PHI2_CV)
-  RCONST(698) = (XCL_CV*1.5D8*PHI2_CV)
-  RCONST(699) = (XCL_CV*1.2D9*PHI2_CV)
-  RCONST(700) = (XCL_CV*1.4D6*PHI2_CV)
-  RCONST(701) = (XCL_CV*4.7D7*PHI2_CV)
-  RCONST(702) = (XCL_CV*7.7D6*PHI2_CV)
-  RCONST(703) = (XCL_CV*7.0D8*PHI2_CV)
-  RCONST(704) = (XCL_CV*6.0D7*PHI2_CV)
-  RCONST(705) = (XCL_CV*6.0D7*PHI2_CV)
-  RCONST(706) = (XCL_CV*1.6D7*PHI2_CV)
-  RCONST(707) = (XCL_CV*8.5D7*PHI2_CV)
-  RCONST(708) = (XCL_CV*1.1D9*EXP(-1.02D3*TFAC)*PHI2_CV)
-  RCONST(709) = (XCL_CV*1.2D8*EXP(-9.9D2*TFAC)*PHI2_CV)
-  RCONST(710) = (XCL_CV*1.0*RJCELL(IJ_H2O2_IUPAC10))
-  RCONST(711) = (XCL_CV*KIEPOX(9.0D-4,1.31D-5,0,'CV'))
-  RCONST(712) = (XCL_CV*KIEPOX(8.83D-3,2.92D-6,0,'CV'))
-  RCONST(713) = (XCL_CV*KIEPOX(2.0D-4,2.92D-6,0,'CV'))
-  RCONST(714) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
-  RCONST(715) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
+  RCONST(662) = (XCL_CV*2.0D6*PHI2_CV)
+  RCONST(663) = (XCL_CV*2.0D6*PHI2_CV)
+  RCONST(664) = (XCL_CV*3.3D5*PHI2_CV)
+  RCONST(665) = (XCL_CV*1.1D0*PHI2_CV)
+  RCONST(666) = (XCL_CV*5.0D5*EXP(-7.0D3*TFAC)*PHI2_CV)
+  RCONST(667) = (XCL_CV*1.0D10*PHI2_CV)
+  RCONST(668) = (XCL_CV*1.0D10*PHI2_CV)
+  RCONST(669) = (XCL_CV*3.6D9*EXP(-9.3D2*TFAC)*PHI2_CV)
+  RCONST(670) = (XCL_CV*2.8D10*PHI2_CV)
+  RCONST(671) = (XCL_CV*3.5D10*EXP(-7.2D2*TFAC)*PHI2_CV)
+  RCONST(672) = (XCL_CV*3.2D7*EXP(-1.7D3*TFAC)*PHI2_CV)
+  RCONST(673) = (XCL_CV*2.7D9*PHI2_CV)
+  RCONST(674) = (XCL_CV*1.8D9*PHI2_CV)
+  RCONST(675) = (XCL_CV*4.5D9*PHI2_CV)
+  RCONST(676) = (XCL_CV*2.6D-2)
+  RCONST(677) = (XCL_CV*1.0D5*PHI2_CV)
+  RCONST(678) = (XCL_CV*1.3D9*EXP(-2.2D3*TFAC)*PHI2_CV)
+  RCONST(679) = (XCL_CV*1.1D9*PHI2_CV)
+  RCONST(680) = (XCL_CV*1.7D9*PHI2_CV)
+  RCONST(681) = (XCL_CV*2.2D8*EXP(-2.6D3*TFAC)*PHI2_CV)
+  RCONST(682) = (XCL_CV*7.1D6*PHI2_CV*PHI2_CV)
+  RCONST(683) = (XCL_CV*4.6D2*EXP(-1.1D3*TFAC)*PHI2_CV)
+  RCONST(684) = (XCL_CV*4.6D2*EXP(-1.1D3*TFAC)*PHI2_CV)
+  RCONST(685) = (XCL_CV*5.0D5*PHI2_CV)
+  RCONST(686) = (XCL_CV*7.9D2*EXP(-2.9D3*TFAC)*PHI2_CV)
+  RCONST(687) = (XCL_CV*2.5D7*EXP(-2.45D3*TFAC)*PHI2_CV)
+  RCONST(688) = (XCL_CV*7.7D-3*EXP(-9.2E3*TFAC))
+  RCONST(689) = (XCL_CV*3.7D3*PHI2_CV)
+  RCONST(690) = (XCL_CV*3.0D8*PHI2_CV)
+  RCONST(691) = (XCL_CV*1.9D7*EXP(-3.8E3*TFAC)*PHI2_CV*PHI2_CV)
+  RCONST(692) = (XCL_CV*3.6D7*EXP(-4.0E3*TFAC)*PHI2_CV*PHI2_CV)
+  RCONST(693) = (XCL_CV*7.0D2*PHI2_CV)
+  RCONST(694) = (XCL_CV*3.4D9*EXP(-1.2D3*TFAC)*PHI2_CV)
+  RCONST(695) = (XCL_CV*5.0D8*PHI2_CV)
+  RCONST(696) = (XCL_CV*1.0D9*PHI2_CV)
+  RCONST(697) = (XCL_CV*6.0D8*PHI2_CV)
+  RCONST(698) = (XCL_CV*8.6D8*PHI2_CV)
+  RCONST(699) = (XCL_CV*1.1D9*EXP(-1.516D3*TFAC)*PHI2_CV)
+  RCONST(700) = (XCL_CV*1.5D8*PHI2_CV)
+  RCONST(701) = (XCL_CV*1.2D9*PHI2_CV)
+  RCONST(702) = (XCL_CV*1.4D6*PHI2_CV)
+  RCONST(703) = (XCL_CV*4.7D7*PHI2_CV)
+  RCONST(704) = (XCL_CV*7.7D6*PHI2_CV)
+  RCONST(705) = (XCL_CV*7.0D8*PHI2_CV)
+  RCONST(706) = (XCL_CV*6.0D7*PHI2_CV)
+  RCONST(707) = (XCL_CV*6.0D7*PHI2_CV)
+  RCONST(708) = (XCL_CV*1.6D7*PHI2_CV)
+  RCONST(709) = (XCL_CV*8.5D7*PHI2_CV)
+  RCONST(710) = (XCL_CV*1.1D9*EXP(-1.02D3*TFAC)*PHI2_CV)
+  RCONST(711) = (XCL_CV*1.2D8*EXP(-9.9D2*TFAC)*PHI2_CV)
+  RCONST(712) = (XCL_CV*1.0*RJCELL(IJ_H2O2_IUPAC10))
+  RCONST(713) = (XCL_CV*KIEPOX(9.0D-4,1.31D-5,0,'CV'))
+  RCONST(714) = (XCL_CV*KIEPOX(8.83D-3,2.92D-6,0,'CV'))
+  RCONST(715) = (XCL_CV*KIEPOX(2.0D-4,2.92D-6,0,'CV'))
   RCONST(716) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
   RCONST(717) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
-  RCONST(718) = (XCL_CV*WFAC_CV)
-  RCONST(719) = (XCL_CV*WFAC_CV)
+  RCONST(718) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
+  RCONST(719) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
   RCONST(720) = (XCL_CV*WFAC_CV)
   RCONST(721) = (XCL_CV*WFAC_CV)
   RCONST(722) = (XCL_CV*WFAC_CV)
@@ -1474,121 +1474,123 @@ FALLOFF_T10_DMS2 = FALLOFF_T10( 1.9900D-39,5.2700D+03, &
   RCONST(773) = (XCL_CV*WFAC_CV)
   RCONST(774) = (XCL_CV*WFAC_CV)
   RCONST(775) = (XCL_CV*WFAC_CV)
-  RCONST(776) = (KPP_RSCAV(IND_NO2))
-  RCONST(777) = (KPP_RSCAV(IND_NO))
-  RCONST(778) = (KPP_RSCAV(IND_O3))
-  RCONST(779) = (KPP_RSCAV(IND_NO3))
-  RCONST(780) = (KPP_RSCAV(IND_H2O2))
-  RCONST(781) = (KPP_RSCAV(IND_N2O5))
-  RCONST(782) = (KPP_RSCAV(IND_HNO3))
-  RCONST(783) = (KPP_RSCAV(IND_HONO))
-  RCONST(784) = (KPP_RSCAV(IND_PNA))
-  RCONST(785) = (KPP_RSCAV(IND_SO2))
-  RCONST(786) = (KPP_RSCAV(IND_SULF))
-  RCONST(787) = (KPP_RSCAV(IND_PAN))
-  RCONST(788) = (KPP_RSCAV(IND_PACD))
-  RCONST(789) = (KPP_RSCAV(IND_AACD))
-  RCONST(790) = (KPP_RSCAV(IND_ALD2))
-  RCONST(791) = (KPP_RSCAV(IND_PANX))
-  RCONST(792) = (KPP_RSCAV(IND_FORM))
-  RCONST(793) = (KPP_RSCAV(IND_MEPX))
-  RCONST(794) = (KPP_RSCAV(IND_MEOH))
-  RCONST(795) = (KPP_RSCAV(IND_ROOH))
-  RCONST(796) = (KPP_RSCAV(IND_NTR1))
-  RCONST(797) = (KPP_RSCAV(IND_NTR2))
-  RCONST(798) = (KPP_RSCAV(IND_FACD))
-  RCONST(799) = (KPP_RSCAV(IND_CO))
-  RCONST(800) = (KPP_RSCAV(IND_ALDX))
-  RCONST(801) = (KPP_RSCAV(IND_GLYD))
-  RCONST(802) = (KPP_RSCAV(IND_GLY))
-  RCONST(803) = (KPP_RSCAV(IND_MGLY))
-  RCONST(804) = (KPP_RSCAV(IND_ETHA))
-  RCONST(805) = (KPP_RSCAV(IND_ETOH))
-  RCONST(806) = (KPP_RSCAV(IND_KET))
-  RCONST(807) = (KPP_RSCAV(IND_PAR))
-  RCONST(808) = (KPP_RSCAV(IND_ACET))
-  RCONST(809) = (KPP_RSCAV(IND_PRPA))
-  RCONST(810) = (KPP_RSCAV(IND_ETHY))
-  RCONST(811) = (KPP_RSCAV(IND_ETH))
-  RCONST(812) = (KPP_RSCAV(IND_OLE))
-  RCONST(813) = (KPP_RSCAV(IND_IOLE))
-  RCONST(814) = (KPP_RSCAV(IND_ISOP))
-  RCONST(815) = (KPP_RSCAV(IND_ISPD))
-  RCONST(816) = (KPP_RSCAV(IND_INTR))
-  RCONST(817) = (KPP_RSCAV(IND_ISPX))
-  RCONST(818) = (KPP_RSCAV(IND_EPOX))
-  RCONST(819) = (KPP_RSCAV(IND_TERP))
-  RCONST(820) = (KPP_RSCAV(IND_APIN))
-  RCONST(821) = (KPP_RSCAV(IND_MTNO3))
-  RCONST(822) = (KPP_RSCAV(IND_BENZENE))
-  RCONST(823) = (KPP_RSCAV(IND_CRES))
-  RCONST(824) = (KPP_RSCAV(IND_OPEN))
-  RCONST(825) = (KPP_RSCAV(IND_TOL))
-  RCONST(826) = (KPP_RSCAV(IND_XOPN))
-  RCONST(827) = (KPP_RSCAV(IND_XYLMN))
-  RCONST(828) = (KPP_RSCAV(IND_NAPH))
-  RCONST(829) = (KPP_RSCAV(IND_CAT1))
-  RCONST(830) = (KPP_RSCAV(IND_CRON))
-  RCONST(831) = (KPP_RSCAV(IND_OPAN))
-  RCONST(832) = (KPP_RSCAV(IND_ECH4))
-  RCONST(833) = (KPP_RSCAV(IND_CL2))
-  RCONST(834) = (KPP_RSCAV(IND_HOCL))
-  RCONST(835) = (KPP_RSCAV(IND_CLO))
-  RCONST(836) = (KPP_RSCAV(IND_FMCL))
-  RCONST(837) = (KPP_RSCAV(IND_HCL))
-  RCONST(838) = (KPP_RSCAV(IND_CLNO2))
-  RCONST(839) = (KPP_RSCAV(IND_CLNO3))
-  RCONST(840) = (KPP_RSCAV(IND_SESQ))
-  RCONST(841) = (KPP_RSCAV(IND_SOAALK))
-  RCONST(842) = (KPP_RSCAV(IND_VLVPO1))
-  RCONST(843) = (KPP_RSCAV(IND_VSVPO1))
-  RCONST(844) = (KPP_RSCAV(IND_VSVPO2))
-  RCONST(845) = (KPP_RSCAV(IND_VSVPO3))
-  RCONST(846) = (KPP_RSCAV(IND_VIVPO1))
-  RCONST(847) = (KPP_RSCAV(IND_VLVOO1))
-  RCONST(848) = (KPP_RSCAV(IND_VLVOO2))
-  RCONST(849) = (KPP_RSCAV(IND_VSVOO1))
-  RCONST(850) = (KPP_RSCAV(IND_VSVOO2))
-  RCONST(851) = (KPP_RSCAV(IND_VSVOO3))
-  RCONST(852) = (KPP_RSCAV(IND_PCVOC))
-  RCONST(853) = (KPP_RSCAV(IND_FORM_PRIMARY))
-  RCONST(854) = (KPP_RSCAV(IND_ALD2_PRIMARY))
-  RCONST(855) = (KPP_RSCAV(IND_BUTADIENE13))
-  RCONST(856) = (KPP_RSCAV(IND_ACROLEIN))
-  RCONST(857) = (KPP_RSCAV(IND_ACRO_PRIMARY))
-  RCONST(858) = (KPP_RSCAV(IND_TOLU))
-  RCONST(859) = (KPP_RSCAV(IND_HG))
-  RCONST(860) = (KPP_RSCAV(IND_HGIIGAS))
-  RCONST(861) = (KPP_RSCAV(IND_SVAVB1))
-  RCONST(862) = (KPP_RSCAV(IND_SVAVB2))
-  RCONST(863) = (KPP_RSCAV(IND_SVAVB3))
-  RCONST(864) = (KPP_RSCAV(IND_SVAVB4))
-  RCONST(865) = (KPP_RSCAV(IND_DMS))
-  RCONST(866) = (KPP_RSCAV(IND_MSA))
-  RCONST(867) = (KPP_RSCAV(IND_ASO4I))
-  RCONST(868) = (KPP_RSCAV(IND_ASO4J))
-  RCONST(869) = (KPP_RSCAV(IND_ANH4I))
-  RCONST(870) = (KPP_RSCAV(IND_ANO3I))
-  RCONST(871) = (KPP_RSCAV(IND_ACLI))
-  RCONST(872) = (KPP_RSCAV(IND_ACLJ))
-  RCONST(873) = (KPP_RSCAV(IND_ACLK))
-  RCONST(874) = (KPP_RSCAV(IND_AISO1J))
-  RCONST(875) = (KPP_RSCAV(IND_AISO2J))
-  RCONST(876) = (KPP_RSCAV(IND_ASQTJ))
-  RCONST(877) = (KPP_RSCAV(IND_AISO3J))
-  RCONST(878) = (KPP_RSCAV(IND_AOLGAJ))
-  RCONST(879) = (KPP_RSCAV(IND_AOLGBJ))
-  RCONST(880) = (KPP_RSCAV(IND_AGLYJ))
-  RCONST(881) = (KPP_RSCAV(IND_AMTNO3J))
-  RCONST(882) = (KPP_RSCAV(IND_AMTHYDJ))
-  RCONST(883) = (KPP_RSCAV(IND_APOCI))
-  RCONST(884) = (KPP_RSCAV(IND_APOCJ))
-  RCONST(885) = (KPP_RSCAV(IND_APNCOMI))
-  RCONST(886) = (KPP_RSCAV(IND_APNCOMJ))
-  RCONST(887) = (KPP_RSCAV(IND_AAVB2J))
-  RCONST(888) = (KPP_RSCAV(IND_AAVB3J))
-  RCONST(889) = (KPP_RSCAV(IND_AAVB4J))
-  RCONST(890) = (KPP_RSCAV(IND_NH3))
+  RCONST(776) = (XCL_CV*WFAC_CV)
+  RCONST(777) = (XCL_CV*WFAC_CV)
+  RCONST(778) = (KPP_RSCAV(IND_NO2))
+  RCONST(779) = (KPP_RSCAV(IND_NO))
+  RCONST(780) = (KPP_RSCAV(IND_O3))
+  RCONST(781) = (KPP_RSCAV(IND_NO3))
+  RCONST(782) = (KPP_RSCAV(IND_H2O2))
+  RCONST(783) = (KPP_RSCAV(IND_N2O5))
+  RCONST(784) = (KPP_RSCAV(IND_HNO3))
+  RCONST(785) = (KPP_RSCAV(IND_HONO))
+  RCONST(786) = (KPP_RSCAV(IND_PNA))
+  RCONST(787) = (KPP_RSCAV(IND_SO2))
+  RCONST(788) = (KPP_RSCAV(IND_SULF))
+  RCONST(789) = (KPP_RSCAV(IND_PAN))
+  RCONST(790) = (KPP_RSCAV(IND_PACD))
+  RCONST(791) = (KPP_RSCAV(IND_AACD))
+  RCONST(792) = (KPP_RSCAV(IND_ALD2))
+  RCONST(793) = (KPP_RSCAV(IND_PANX))
+  RCONST(794) = (KPP_RSCAV(IND_FORM))
+  RCONST(795) = (KPP_RSCAV(IND_MEPX))
+  RCONST(796) = (KPP_RSCAV(IND_MEOH))
+  RCONST(797) = (KPP_RSCAV(IND_ROOH))
+  RCONST(798) = (KPP_RSCAV(IND_NTR1))
+  RCONST(799) = (KPP_RSCAV(IND_NTR2))
+  RCONST(800) = (KPP_RSCAV(IND_FACD))
+  RCONST(801) = (KPP_RSCAV(IND_CO))
+  RCONST(802) = (KPP_RSCAV(IND_ALDX))
+  RCONST(803) = (KPP_RSCAV(IND_GLYD))
+  RCONST(804) = (KPP_RSCAV(IND_GLY))
+  RCONST(805) = (KPP_RSCAV(IND_MGLY))
+  RCONST(806) = (KPP_RSCAV(IND_ETHA))
+  RCONST(807) = (KPP_RSCAV(IND_ETOH))
+  RCONST(808) = (KPP_RSCAV(IND_KET))
+  RCONST(809) = (KPP_RSCAV(IND_PAR))
+  RCONST(810) = (KPP_RSCAV(IND_ACET))
+  RCONST(811) = (KPP_RSCAV(IND_PRPA))
+  RCONST(812) = (KPP_RSCAV(IND_ETHY))
+  RCONST(813) = (KPP_RSCAV(IND_ETH))
+  RCONST(814) = (KPP_RSCAV(IND_OLE))
+  RCONST(815) = (KPP_RSCAV(IND_IOLE))
+  RCONST(816) = (KPP_RSCAV(IND_ISOP))
+  RCONST(817) = (KPP_RSCAV(IND_ISPD))
+  RCONST(818) = (KPP_RSCAV(IND_INTR))
+  RCONST(819) = (KPP_RSCAV(IND_ISPX))
+  RCONST(820) = (KPP_RSCAV(IND_EPOX))
+  RCONST(821) = (KPP_RSCAV(IND_TERP))
+  RCONST(822) = (KPP_RSCAV(IND_APIN))
+  RCONST(823) = (KPP_RSCAV(IND_MTNO3))
+  RCONST(824) = (KPP_RSCAV(IND_BENZENE))
+  RCONST(825) = (KPP_RSCAV(IND_CRES))
+  RCONST(826) = (KPP_RSCAV(IND_OPEN))
+  RCONST(827) = (KPP_RSCAV(IND_TOL))
+  RCONST(828) = (KPP_RSCAV(IND_XOPN))
+  RCONST(829) = (KPP_RSCAV(IND_XYLMN))
+  RCONST(830) = (KPP_RSCAV(IND_NAPH))
+  RCONST(831) = (KPP_RSCAV(IND_CAT1))
+  RCONST(832) = (KPP_RSCAV(IND_CRON))
+  RCONST(833) = (KPP_RSCAV(IND_OPAN))
+  RCONST(834) = (KPP_RSCAV(IND_ECH4))
+  RCONST(835) = (KPP_RSCAV(IND_CL2))
+  RCONST(836) = (KPP_RSCAV(IND_HOCL))
+  RCONST(837) = (KPP_RSCAV(IND_CLO))
+  RCONST(838) = (KPP_RSCAV(IND_FMCL))
+  RCONST(839) = (KPP_RSCAV(IND_HCL))
+  RCONST(840) = (KPP_RSCAV(IND_CLNO2))
+  RCONST(841) = (KPP_RSCAV(IND_CLNO3))
+  RCONST(842) = (KPP_RSCAV(IND_SESQ))
+  RCONST(843) = (KPP_RSCAV(IND_SOAALK))
+  RCONST(844) = (KPP_RSCAV(IND_VLVPO1))
+  RCONST(845) = (KPP_RSCAV(IND_VSVPO1))
+  RCONST(846) = (KPP_RSCAV(IND_VSVPO2))
+  RCONST(847) = (KPP_RSCAV(IND_VSVPO3))
+  RCONST(848) = (KPP_RSCAV(IND_VIVPO1))
+  RCONST(849) = (KPP_RSCAV(IND_VLVOO1))
+  RCONST(850) = (KPP_RSCAV(IND_VLVOO2))
+  RCONST(851) = (KPP_RSCAV(IND_VSVOO1))
+  RCONST(852) = (KPP_RSCAV(IND_VSVOO2))
+  RCONST(853) = (KPP_RSCAV(IND_VSVOO3))
+  RCONST(854) = (KPP_RSCAV(IND_PCVOC))
+  RCONST(855) = (KPP_RSCAV(IND_FORM_PRIMARY))
+  RCONST(856) = (KPP_RSCAV(IND_ALD2_PRIMARY))
+  RCONST(857) = (KPP_RSCAV(IND_BUTADIENE13))
+  RCONST(858) = (KPP_RSCAV(IND_ACROLEIN))
+  RCONST(859) = (KPP_RSCAV(IND_ACRO_PRIMARY))
+  RCONST(860) = (KPP_RSCAV(IND_TOLU))
+  RCONST(861) = (KPP_RSCAV(IND_HG))
+  RCONST(862) = (KPP_RSCAV(IND_HGIIGAS))
+  RCONST(863) = (KPP_RSCAV(IND_SVAVB1))
+  RCONST(864) = (KPP_RSCAV(IND_SVAVB2))
+  RCONST(865) = (KPP_RSCAV(IND_SVAVB3))
+  RCONST(866) = (KPP_RSCAV(IND_SVAVB4))
+  RCONST(867) = (KPP_RSCAV(IND_DMS))
+  RCONST(868) = (KPP_RSCAV(IND_MSA))
+  RCONST(869) = (KPP_RSCAV(IND_ASO4I))
+  RCONST(870) = (KPP_RSCAV(IND_ASO4J))
+  RCONST(871) = (KPP_RSCAV(IND_ANH4I))
+  RCONST(872) = (KPP_RSCAV(IND_ANO3I))
+  RCONST(873) = (KPP_RSCAV(IND_ACLI))
+  RCONST(874) = (KPP_RSCAV(IND_ACLJ))
+  RCONST(875) = (KPP_RSCAV(IND_ACLK))
+  RCONST(876) = (KPP_RSCAV(IND_AISO1J))
+  RCONST(877) = (KPP_RSCAV(IND_AISO2J))
+  RCONST(878) = (KPP_RSCAV(IND_ASQTJ))
+  RCONST(879) = (KPP_RSCAV(IND_AISO3J))
+  RCONST(880) = (KPP_RSCAV(IND_AOLGAJ))
+  RCONST(881) = (KPP_RSCAV(IND_AOLGBJ))
+  RCONST(882) = (KPP_RSCAV(IND_AGLYJ))
+  RCONST(883) = (KPP_RSCAV(IND_AMTNO3J))
+  RCONST(884) = (KPP_RSCAV(IND_AMTHYDJ))
+  RCONST(885) = (KPP_RSCAV(IND_APOCI))
+  RCONST(886) = (KPP_RSCAV(IND_APOCJ))
+  RCONST(887) = (KPP_RSCAV(IND_APNCOMI))
+  RCONST(888) = (KPP_RSCAV(IND_APNCOMJ))
+  RCONST(889) = (KPP_RSCAV(IND_AAVB2J))
+  RCONST(890) = (KPP_RSCAV(IND_AAVB3J))
+  RCONST(891) = (KPP_RSCAV(IND_AAVB4J))
+  RCONST(892) = (KPP_RSCAV(IND_NH3))
       
 END SUBROUTINE Update_RCONST
 

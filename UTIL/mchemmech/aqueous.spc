@@ -3,6 +3,7 @@
  SO2_a##   = IGNORE;
  HNO3_a##  = IGNORE;
  H2CO3_a## = IGNORE;
+ NH4OH_a## = IGNORE;
  NH3_a##   = IGNORE;
  H2O2_a##  = IGNORE;
  O3_a##    = IGNORE;
