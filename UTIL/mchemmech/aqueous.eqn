@@ -177,6 +177,18 @@
 <AQ85_a##> AACDm_a##   + OH_a## = 0.85 GLYACm_a## + 0.15 CH2OHYD_a##            : XCL_a##*8.5D7 * PHI2_a##;
 <AQ86_a##> CH2OHYD_a## + OH_a## = FACD_a##        + HO2_a##                     : XCL_a##*1.1D9*EXP(-1.02D3*TFAC) * PHI2_a##;
 <AQ87_a##> FACD_a##    + OH_a## = H2CO3_a##       + HO2_a##                     : XCL_a##*1.2D8*EXP(-9.9D2*TFAC) * PHI2_a##;
+! Fe3+/Mn2+ metal catalyzed SIV oxidation, part 1
+<AQ88_a##> MNpp_a##    + SO2_a##   = SO4mm_a##    + MNpp_a##         + 2 Hp_a## : XCL_a##*KRXN(750.D0,  0.0D0, 0, 0, 1, 'a##' );
+<AQ89_a##> MNpp_a##    + HSO3m_a## = SO4mm_a##    + MNpp_a##         + Hp_a##   : XCL_a##*KRXN(750.D0,  0.0D0, 0, 0, 1, 'a##' );
+<AQ90_a##> MNpp_a##    + SO3mm_a## = SO4mm_a##    + MNpp_a##                    : XCL_a##*KRXN(750.D0,  0.0D0, 0, 0, 1, 'a##' );
+! Fe3+/Mn2+ metal catalyzed SIV oxidation, part 2
+<AQ91_a##> FEppp_a##   + SO2_a##   = SO4mm_a##    + FEppp_a##        + 2 Hp_a## : XCL_a##*KRXN(2600.D0, 0.0D0, 0, 0, 1, 'a##' );
+<AQ92_a##> FEppp_a##   + HSO3m_a## = SO4mm_a##    + FEppp_a##        + Hp_a##   : XCL_a##*KRXN(2600.D0, 0.0D0, 0, 0, 1, 'a##' );
+<AQ93_a##> FEppp_a##   + SO3mm_a## = SO4mm_a##    + FEppp_a##                   : XCL_a##*KRXN(2600.D0, 0.0D0, 0, 0, 1, 'a##' );
+! Fe3+/Mn2+ metal catalyzed SIV oxidation, part 3
+<AQ94_a##> MNpp_a## + FEppp_a## + SO2_a##   = SO4mm_a## + MNpp_a## + FEppp_a## + 2 Hp_a## : XCL_a##*KRXN( 1.0D10, 0.0D0, 3, 0, 1, 'a##' );
+<AQ95_a##> MNpp_a## + FEppp_a## + HSO3m_a## = SO4mm_a## + MNpp_a## + FEppp_a## + Hp_a##   : XCL_a##*KRXN( 1.0D10, 0.0D0, 3, 0, 1, 'a##' );
+<AQ96_a##> MNpp_a## + FEppp_a## + SO3mm_a## = SO4mm_a## + MNpp_a## + FEppp_a##            : XCL_a##*KRXN( 1.0D10, 0.0D0, 3, 0, 1, 'a##' );
 
 ! Photolysis
 <AQJ01_a##> H2O2_a##            = 2 OH_a##                                      : XCL_a##*1.0*RJCELL( IJ_H2O2_IUPAC10 );
@@ -202,6 +214,7 @@
 <AKN02_a##>  ANH4I = NH4p_a##    + WD_ANH4I   : XCL_a##*CFRAC_a##*KPP_ALFA3_a##;
 <AKN03_a##>  ACLI  = CLm_a##     + WD_ACLI    : XCL_a##*CFRAC_a##*KPP_ALFA3_a##;
 <AKN04_a##>  ASO4I = SO4mm_a##   + WD_ASO4I   : XCL_a##*CFRAC_a##*KPP_ALFA3_a##;
+<AKN05_a##>  ANAI  = NAp_a##     + WD_ANAI    : XCL_a##*CFRAC_a##*KPP_ALFA3_a##;
 
 ! Wet deposition
 <AQWD01_a##> Hp_a##       = WD_Hp         : XCL_a##*WFAC_a##;
@@ -276,4 +289,11 @@
 !<AQWDIEP07_a##> IHMML_a## = WD_IHMML      : XCL_a##*WFAC_a##;
 !<AQWDIEP08_a##> IMGA_a##  = WD_IMGA       : XCL_a##*WFAC_a##;
 !<AQWDIEP09_a##> IMOS_a##  = WD_IMOS       : XCL_a##*WFAC_a##;
+! Wet deposition metals
+<AQWDMET01_a##> FEppp_a##  = WD_FEppp      : XCL_a##*WFAC_a##;
+<AQWDMET02_a##> MNpp_a##   = WD_MNpp       : XCL_a##*WFAC_a##;
+<AQWDMET03_a##> NAp_a##    = WD_NAp        : XCL_a##*WFAC_a##;
+<AQWDMET04_a##> MGpp_a##   = WD_MGpp       : XCL_a##*WFAC_a##;
+<AQWDMET05_a##> CApp_a##   = WD_CApp       : XCL_a##*WFAC_a##;
+<AQWDMET06_a##> Kp_a##     = WD_Kp         : XCL_a##*WFAC_a##;
 

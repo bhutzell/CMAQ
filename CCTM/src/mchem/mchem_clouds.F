@@ -32,7 +32,7 @@
       INTEGER, PARAMETER                    :: N_IC = 2               ! Number of possible surrogate species.
                                                                       !   Currently this is limited to two species.
       INTEGER, PARAMETER                    :: CL_TYPES = 2           ! Number of cloud types
-      CHARACTER( 2 ), DIMENSION( CL_TYPES ) :: CL_NAMES = ['RS','CV'] ! Name of cloud type (RS=Resolved, CV=Convective)
+      CHARACTER( 2 ), DIMENSION( CL_TYPES ), SAVE :: CL_NAMES = ['RS','CV'] ! Name of cloud type (RS=Resolved, CV=Convective)
       INTEGER, PARAMETER                    :: IRS = 1                ! Index for resolved clouds
       INTEGER, PARAMETER                    :: ICV = 2                ! Index for convective clouds
       REAL(dp),PARAMETER                    :: LWC_LIMIT = 0.00001    ! LWC limit used for cloud chemistry
@@ -121,7 +121,207 @@ C.. Cloud properties
       REAL, ALLOCATABLE, SAVE  :: RESTRANS( :,: )   ! resolved cloud transmissivity
       REAL, ALLOCATABLE, SAVE  :: SUBTRANS( :,:,: ) ! subgrid cloud transmissivity
 
+C.. Related to metals
+      REAL( 8 ), SAVE          :: SOIL_FE_FAC           ! Fe molar fraction of ASOIL
+      REAL( 8 ), SAVE          :: CORS_FE_FAC           ! Fe molar fraction of ACORS
+      REAL( 8 ), SAVE          :: SOIL_MN_FAC           ! Mn molar fraction of ASOIL
+      REAL( 8 ), SAVE          :: CORS_MN_FAC           ! Fe molar fraction of ACORS
+      REAL( 8 ), SAVE          :: SEAS_NA_FAC           ! Na molar fraction of ASEACAT
+      REAL( 8 ), SAVE          :: SOIL_NA_FAC           ! Fe molar fraction of ASOIL
+      REAL( 8 ), SAVE          :: CORS_NA_FAC           ! Fe molar fraction of ACORS
+      REAL( 8 ), SAVE          :: SEAS_MG_FAC           ! Na molar fraction of ASEACAT
+      REAL( 8 ), SAVE          :: SOIL_MG_FAC           ! Fe molar fraction of ASOIL
+      REAL( 8 ), SAVE          :: CORS_MG_FAC           ! Fe molar fraction of ACORS
+      REAL( 8 ), SAVE          :: SEAS_CA_FAC           ! Na molar fraction of ASEACAT
+      REAL( 8 ), SAVE          :: SOIL_CA_FAC           ! Fe molar fraction of ASOIL
+      REAL( 8 ), SAVE          :: CORS_CA_FAC           ! Fe molar fraction of ACORS
+      REAL( 8 ), SAVE          :: SEAS_K_FAC            ! Na molar fraction of ASEACAT
+      REAL( 8 ), SAVE          :: SOIL_K_FAC            ! Fe molar fraction of ASOIL
+      REAL( 8 ), SAVE          :: CORS_K_FAC            ! Fe molar fraction of ACORS
+      INTEGER, PARAMETER       :: INDEX_FE         = 1  ! Index FE
+      INTEGER, PARAMETER       :: INDEX_MN         = 2  ! Index MN
+      INTEGER, PARAMETER       :: INDEX_NA         = 3  ! Index NA
+      INTEGER, PARAMETER       :: INDEX_MG         = 4  ! Index MG
+      INTEGER, PARAMETER       :: INDEX_CA         = 5  ! Index CA
+      INTEGER, PARAMETER       :: INDEX_K          = 6  ! Index K
+      INTEGER, PARAMETER       :: INDEX_MAX_METALS = 6  ! Maximum number of indices for metals
+      INTEGER, PARAMETER       :: METALS_NUM_IC    = 4  ! Maximum number metal IC surrogates
+
+      TYPE MECH_SPECIES_METALS
+          CHARACTER( 19 )                             :: NAME      ! MECH Species Name
+          CHARACTER( 11 ), DIMENSION( CL_TYPES )      :: KPP_NAME  ! MECH Species Name
+          INTEGER        , DIMENSION( CL_TYPES )      :: KPP_INDEX ! MECH Species Index
+          CHARACTER( 16 ), DIMENSION( METALS_NUM_IC ) :: IC_NAME   ! IC Surrogate Name
+          INTEGER        , DIMENSION( METALS_NUM_IC ) :: IC_CGRID_INDEX  ! IC Surrogate Index
+          REAL( 8 )      , DIMENSION( METALS_NUM_IC ) :: IC_FAC    ! IC Scale Factor
+      END TYPE MECH_SPECIES_METALS
+
+      TYPE (MECH_SPECIES_METALS), SAVE :: MECH_METALS( INDEX_MAX_METALS )
+
+      REAL( dp )               :: FE_III          ! Fe(3+) fraction of Fe total
+      REAL( dp ), PARAMETER    :: MN_II  = 1.0D0  ! Mn(2+) fraction of Mn total
+      REAL( dp ), PARAMETER    :: FE_SOL = 0.1D0  ! Fraction of soluble Fe
+      REAL( dp ), PARAMETER    :: MN_SOL = 0.5D0  ! Fraction of soluble Mn
+
       CONTAINS
+
+      SUBROUTINE ALLOC_METAL_DATA ( )
+
+        USE AERO_DATA
+
+        IMPLICIT NONE
+
+!... Local variables
+        INTEGER             :: I, J
+        CHARACTER( 200 )    :: FMT      ! Format for log-file output
+
+!... set MW ratios and speciation factors for molar concentrations of coarse
+!... soluble aerosols
+        SOIL_FE_FAC = ASOIL_FE_FAC * REAL( AEROSPC_MW( ASOIL_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( AFE_IDX ), 8 ) / ASOIL_RENORM
+        CORS_FE_FAC = ACORS_FE_FAC * REAL( AEROSPC_MW( ACORS_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( AFE_IDX ), 8 ) / ACORSEM_RENORM
+
+        SOIL_MN_FAC = ASOIL_MN_FAC * REAL( AEROSPC_MW( ASOIL_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( AMN_IDX ), 8 ) / ASOIL_RENORM
+        CORS_MN_FAC = ACORS_MN_FAC * REAL( AEROSPC_MW( ACORS_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( AMN_IDX ), 8 ) / ACORSEM_RENORM
+
+        SEAS_NA_FAC = ASCAT_NA_FAC * REAL( AEROSPC_MW( ASEACAT_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( ANA_IDX ), 8 )
+        SOIL_NA_FAC = ASOIL_NA_FAC * REAL( AEROSPC_MW( ASOIL_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( ANA_IDX ), 8 ) / ASOIL_RENORM
+        CORS_NA_FAC = ACORS_NA_FAC * REAL( AEROSPC_MW( ACORS_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( ANA_IDX ), 8 ) / ACORSEM_RENORM
+
+        SEAS_MG_FAC = ASCAT_MG_FAC * REAL( AEROSPC_MW( ASEACAT_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( AMG_IDX ), 8 )
+        SOIL_MG_FAC = ASOIL_MG_FAC * REAL( AEROSPC_MW( ASOIL_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( AMG_IDX ), 8 ) / ASOIL_RENORM
+        CORS_MG_FAC = ACORS_MG_FAC * REAL( AEROSPC_MW( ACORS_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( AMG_IDX ), 8 ) / ACORSEM_RENORM
+
+        SEAS_CA_FAC = ASCAT_CA_FAC * REAL( AEROSPC_MW( ASEACAT_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( ACA_IDX ), 8 )
+        SOIL_CA_FAC = ASOIL_CA_FAC * REAL( AEROSPC_MW( ASOIL_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( ACA_IDX ), 8 ) / ASOIL_RENORM
+        CORS_CA_FAC = ACORS_CA_FAC * REAL( AEROSPC_MW( ACORS_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( ACA_IDX ), 8 ) / ACORSEM_RENORM
+
+        SEAS_K_FAC = ASCAT_K_FAC * REAL( AEROSPC_MW( ASEACAT_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( AK_IDX ), 8 )
+        SOIL_K_FAC = ASOIL_K_FAC * REAL( AEROSPC_MW( ASOIL_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( AK_IDX ), 8 ) / ASOIL_RENORM
+        CORS_K_FAC = ACORS_K_FAC * REAL( AEROSPC_MW( ACORS_IDX ), 8 )
+     &                / REAL( AEROSPC_MW( AK_IDX ), 8 ) / ACORSEM_RENORM
+
+C... Allocate metal info
+        DO I = 1, INDEX_MAX_METALS
+          MECH_METALS( I )%NAME      = ''
+          DO J = 1, CL_TYPES
+            MECH_METALS( I )%KPP_NAME( J )  = ''
+            MECH_METALS( I )%KPP_INDEX( J ) = 0
+          END DO
+          DO J = 1, METALS_NUM_IC
+            MECH_METALS( I )%IC_NAME( J )        = ''
+            MECH_METALS( I )%IC_CGRID_INDEX( J ) = 0
+            MECH_METALS( I )%IC_FAC( J )         = 1.
+          END DO
+        END DO
+
+C... Allocate FE details
+        I = INDEX_FE
+        MECH_METALS( I )%NAME         = 'FEppp'
+        MECH_METALS( I )%IC_NAME( 1 ) = 'AFEJ'
+        MECH_METALS( I )%IC_NAME( 2 ) = 'ASOIL'
+        MECH_METALS( I )%IC_FAC ( 2 ) = SOIL_FE_FAC
+        MECH_METALS( I )%IC_NAME( 3 ) = 'ACORS'
+        MECH_METALS( I )%IC_FAC ( 3 ) = CORS_FE_FAC
+
+C... Allocate MN details
+        I = INDEX_MN
+        MECH_METALS( I )%NAME         = 'MNpp'
+        MECH_METALS( I )%IC_NAME( 1 ) = 'AMNJ'
+        MECH_METALS( I )%IC_NAME( 2 ) = 'ASOIL'
+        MECH_METALS( I )%IC_FAC ( 2 ) = SOIL_MN_FAC
+        MECH_METALS( I )%IC_NAME( 3 ) = 'ACORS'
+        MECH_METALS( I )%IC_FAC ( 3 ) = CORS_MN_FAC
+
+C... Allocate NA details
+        I = INDEX_NA
+        MECH_METALS( I )%NAME         = 'NAp'
+        MECH_METALS( I )%IC_NAME( 1 ) = 'ANAJ'
+        MECH_METALS( I )%IC_NAME( 2 ) = 'ASEACAT'
+        MECH_METALS( I )%IC_FAC ( 2 ) = SEAS_NA_FAC
+        MECH_METALS( I )%IC_NAME( 3 ) = 'ASOIL'
+        MECH_METALS( I )%IC_FAC ( 3 ) = SOIL_NA_FAC
+        MECH_METALS( I )%IC_NAME( 4 ) = 'ACORS'
+        MECH_METALS( I )%IC_FAC ( 4 ) = CORS_NA_FAC
+
+C... Allocate MG details
+        I = INDEX_MG
+        MECH_METALS( I )%NAME         = 'MGpp'
+        MECH_METALS( I )%IC_NAME( 1 ) = 'AMGJ'
+        MECH_METALS( I )%IC_NAME( 2 ) = 'ASEACAT'
+        MECH_METALS( I )%IC_FAC ( 2 ) = SEAS_MG_FAC
+        MECH_METALS( I )%IC_NAME( 3 ) = 'ASOIL'
+        MECH_METALS( I )%IC_FAC ( 3 ) = SOIL_MG_FAC
+        MECH_METALS( I )%IC_NAME( 4 ) = 'ACORS'
+        MECH_METALS( I )%IC_FAC ( 4 ) = CORS_MG_FAC
+
+C... Allocate CA details
+        I = INDEX_CA
+        MECH_METALS( I )%NAME         = 'CApp'
+        MECH_METALS( I )%IC_NAME( 1 ) = 'ACAJ'
+        MECH_METALS( I )%IC_NAME( 2 ) = 'ASEACAT'
+        MECH_METALS( I )%IC_FAC ( 2 ) = SEAS_CA_FAC
+        MECH_METALS( I )%IC_NAME( 3 ) = 'ASOIL'
+        MECH_METALS( I )%IC_FAC ( 3 ) = SOIL_CA_FAC
+        MECH_METALS( I )%IC_NAME( 4 ) = 'ACORS'
+        MECH_METALS( I )%IC_FAC ( 4 ) = CORS_CA_FAC
+
+C... Allocate K details
+        I = INDEX_K
+        MECH_METALS( I )%NAME         = 'Kp'
+        MECH_METALS( I )%IC_NAME( 1 ) = 'AKJ'
+        MECH_METALS( I )%IC_NAME( 2 ) = 'ASEACAT'
+        MECH_METALS( I )%IC_FAC ( 2 ) = SEAS_K_FAC
+        MECH_METALS( I )%IC_NAME( 3 ) = 'ASOIL'
+        MECH_METALS( I )%IC_FAC ( 3 ) = SOIL_K_FAC
+        MECH_METALS( I )%IC_NAME( 4 ) = 'ACORS'
+        MECH_METALS( I )%IC_FAC ( 4 ) = CORS_K_FAC
+
+C... Get KPP and CGRID index
+        DO I = 1, INDEX_MAX_METALS
+          DO J = 1, CL_TYPES
+            MECH_METALS( I )%KPP_NAME( J )  = TRIM( MECH_METALS( I )%NAME ) // '_' // CL_NAMES( J )
+            MECH_METALS( I )%KPP_INDEX( J ) = INDEX_KPP( MECH_METALS( I )%KPP_NAME( J ) )
+          END DO
+          DO J = 1, METALS_NUM_IC
+            MECH_METALS( I )%IC_CGRID_INDEX( J ) = INDEX_CGRID( MECH_METALS( I )%IC_NAME( J ) )
+          END DO
+        END DO
+
+C..   Report metal information to log-file
+        WRITE(LOGDEV,"(A)") 'Metal species used in MCHEM:'
+        FMT = "(A16,A11,X,A12,X,A11,X,A12,X,A8,X,A9,X,A7,X,A8,X,A9,X,A7,X,A8,X,A9,X,A7,X,A8,X,A9,X,A7)"
+        WRITE(LOGDEV,FMT)   'NAME            ','KPP_NAME RS','KPP_INDEX RS','KPP_NAME CV','KPP_INDEX CV',
+     &                      'IC1_NAME','IC1_INDEX','IC1_FAC',
+     &                      'IC2_NAME','IC2_INDEX','IC2_FAC',
+     &                      'IC3_NAME','IC3_INDEX','IC3_FAC',
+     &                      'IC4_NAME','IC4_INDEX','IC4_FAC'
+        FMT = "(A16,A11,X,I12,X,A11,X,I12,X,A8,X,I9,X,F7.4,X,A8,X,I9,X,F7.4,X,A8,X,I9,X,F7.4,X,A8,X,I9,X,F7.4)"
+        DO I = 1, INDEX_MAX_METALS
+          WRITE(LOGDEV,FMT) MECH_METALS( I )%NAME,
+     &        MECH_METALS( I )%KPP_NAME( 1 ), MECH_METALS( I )%KPP_INDEX( 1 ),
+     &        MECH_METALS( I )%KPP_NAME( 2 ), MECH_METALS( I )%KPP_INDEX( 2 ),
+     &        MECH_METALS( I )%IC_NAME( 1 ), MECH_METALS( I )%IC_CGRID_INDEX( 1 ), MECH_METALS( I )%IC_FAC( 1 ),
+     &        MECH_METALS( I )%IC_NAME( 2 ), MECH_METALS( I )%IC_CGRID_INDEX( 2 ), MECH_METALS( I )%IC_FAC( 2 ),
+     &        MECH_METALS( I )%IC_NAME( 3 ), MECH_METALS( I )%IC_CGRID_INDEX( 3 ), MECH_METALS( I )%IC_FAC( 3 ),
+     &        MECH_METALS( I )%IC_NAME( 4 ), MECH_METALS( I )%IC_CGRID_INDEX( 4 ), MECH_METALS( I )%IC_FAC( 4 )
+        END DO
+
+      END SUBROUTINE ALLOC_METAL_DATA
 
       SUBROUTINE ALLOC_AE_DATA ( )
 
@@ -588,14 +788,17 @@ C..   Fill charged species array
       SUBROUTINE INIT_CLOUDS ( CONC, C, LWC_RS, LWC_CV, PHI2_RS, PHI2_CV, FRAC_CV_IN )
 
         USE mchem_Parameters, ONLY: IND_Hp_RS, IND_OHm_RS, IND_O2_RS,
-     &                              IND_Hp_CV, IND_OHm_CV, IND_O2_CV
-        USE mchem_Global,     ONLY: TEMP, PRESS
+     &                              IND_Hp_CV, IND_OHm_CV, IND_O2_CV,
+     &                              IND_FEppp_RS, IND_FEppp_CV,
+     &                              IND_MNpp_RS, IND_MNpp_CV
+        USE mchem_Global,     ONLY: TEMP, PRESS, LSUNLIGHT
 
         IMPLICIT NONE
         REAL,     INTENT ( INOUT ) :: CONC( N_CGRID_SPC )    !  species concentration in cell
         REAL(dp), INTENT ( INOUT ) :: C( N_CGRID_SPC )       !  KPP species concentration in cell
         REAL(dp), INTENT( IN ) :: LWC_RS, LWC_CV, PHI2_RS, PHI2_CV, FRAC_CV_IN
         INTEGER                :: ICL, ICLT, ICGRID, IKPP_RS, IKPP_CV
+        INTEGER                :: I_METAL, I_IC_METAL
         REAL(dp)               :: FRAC_RS, FRAC_CV, LWC_SUM, SCAL, SMW, TCLC
         REAL, PARAMETER        :: ZERO = 1.0E-30
 
@@ -631,6 +834,36 @@ C.. Initialise cloud tracer based on convective fraction
               END DO
            END IF
         END DO
+
+C.. Initialise metals
+        DO I_METAL = 1, INDEX_MAX_METALS
+          DO ICL  = 1, CL_TYPES
+            IKPP = MECH_METALS( I_METAL )%KPP_INDEX( ICL )
+            IF ( ICL .EQ. 1 ) SCAL = FRAC_RS
+            IF ( ICL .EQ. 2 ) SCAL = FRAC_CV
+            IF ( SCAL .NE. 0. ) THEN
+              DO I_IC_METAL = 1, METALS_NUM_IC
+                IF ( MECH_METALS( I_METAL )%IC_CGRID_INDEX( I_IC_METAL ) .NE. 0 ) THEN
+                  ICGRID = MECH_METALS( I_METAL )%IC_CGRID_INDEX( I_IC_METAL )
+                  SMW    = REAL( MECH_METALS( I_METAL )%IC_FAC( I_IC_METAL ), dp )
+                  C( IKPP ) = C( IKPP ) + REAL( CONC( ICGRID ) , dp )
+     &                                  * SMW
+     &                                  * SCAL
+                END IF
+              END DO
+            END IF
+          END DO
+        END DO
+C.. Scale metals (FE & MN)
+        IF ( LSUNLIGHT ) THEN
+          FE_III = 0.1D0  ! Day time, GS 01July2011
+        ELSE
+          FE_III = 0.9D0  ! Night time, GS 01July2011
+        END IF
+        C( IND_FEppp_RS ) = C( IND_FEppp_RS ) * FE_SOL * FE_III
+        C( IND_FEppp_CV ) = C( IND_FEppp_CV ) * FE_SOL * FE_III
+        C( IND_MNpp_RS )  = C( IND_MNpp_RS )  * MN_SOL * MN_II
+        C( IND_MNpp_CV )  = C( IND_MNpp_CV )  * MN_SOL * MN_II
 
 C.. Initialise Hp and OHm
         PHI2( 1 ) = PHI2_RS
@@ -1041,6 +1274,8 @@ C..Local Variables:
 
         CHARACTER( 16 ), INTENT( IN ) :: NAME
         INTEGER :: SPC
+
+        INDEX_CGRID = 0
 
         DO SPC = 1, N_CGRID_SPC
            IF ( TRIM(NAME) == TRIM(CGRID_NAME(SPC)) ) THEN

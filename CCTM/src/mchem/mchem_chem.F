@@ -71,10 +71,13 @@ C...........Local Variables:
       INTEGER, SAVE           :: ICNTRL(20) = 0       ! KPP integrator variables
       INTEGER                 :: IERR                 ! KPP integrator variables
       INTEGER                 :: ISTATUS(20)          ! KPP integrator variables
+      LOGICAL, PARAMETER      :: LCL_TOL = .TRUE.     ! flag if alternative tolerances should
+                                                      ! be used for charged cloud species
 
       INTEGER SPC             ! Species loop index
       INTEGER ICGSPC          ! Index of species in CGRID
       INTEGER ICSPC           ! Index of species in CONC
+      INTEGER ICLT            ! Index of cloud type
       INTEGER NPH             ! Index for number of photolysis reaction in PHOT
       REAL(8)                 :: ALFA                 ! total (RS + CV) scavenging rate coefficient (1/s)
 
@@ -86,11 +89,24 @@ C...Initialization
 
         FIRSTIME = .FALSE.
 
-C.. Set KPP specific values
+C.. Set KPP tolerances
         DO SPC = 1, NVAR
            ATOL(SPC) = 1.0D1
            RTOL(SPC) = 1.0D-2
         END DO
+
+C.. Set different KPP tolerances for cloud species if requested by user
+        IF ( LCL_TOL ) THEN
+           DO SPC = 1, N_CL_SPC
+              DO ICLT = 1, CL_TYPES
+                 IF ( MECH_SPC_CL( SPC )%CHARGE .NE. 0. ) THEN
+                    ICSPC = MECH_SPC_CL( SPC )%KPP_INDEX( ICLT )
+                    ATOL(ICSPC) = 1.0D0
+                    RTOL(ICSPC) = 1.0D-3
+                 END IF
+              END DO
+           END DO
+        END IF
 
 C.. Set KPP options
         ICNTRL(1) = 1 ! 0 - non-autonomous, 1 - autonomous
@@ -181,6 +197,17 @@ C.. Alternative KPP options
       H_IHMML = H_IMAE
       ! End filling aqueous related data
 
+      ! Fill photolysis & heterogeneous rates
+      ! provided in 1/min. here converted to 1/s.
+      DO NPH = 1, KPP_NHETERO
+         KHETCELL( NPH ) = REAL( KHETERO( NPH, COL, ROW, LEV ) , dp ) / 60.0_dp
+      END DO
+      LSUNLIGHT = .FALSE.
+      DO NPH = 1, KPP_NPHOTAB
+         RJCELL( NPH )   = REAL( RJ( COL,ROW,LEV,NPH ), dp ) / 60.0_dp
+         IF ( RJCELL( NPH ) .GT. 0.0D0 ) LSUNLIGHT = .TRUE.
+      END DO
+
       ! Fill CONC gas and aerosols
       C(:) = 0.0D0
       ! Init cloud concentrations first, since it impacts aerosol and gas phase concentrations
@@ -208,16 +235,6 @@ C.. Alternative KPP options
       C(IND_H2O) = REAL( MAX( REAL( QV_TO_PPM * QV, dp ) *CAIR*1.D-6, 0.0 ), dp)
 
       COEFF_FALLOFF = C(IND_M)
-
-      ! Fill photolysis & heterogeneous rates
-      ! provided in 1/min. here converted to 1/s.
-      DO NPH = 1, KPP_NHETERO
-         KHETCELL( NPH ) = REAL( KHETERO( NPH, COL, ROW, LEV ) , dp ) / 60.0_dp
-      END DO
-      DO NPH = 1, KPP_NPHOTAB
-         RJCELL( NPH )   = REAL( RJ( COL,ROW,LEV,NPH ), dp ) / 60.0_dp
-         IF ( RJCELL( NPH ) .GT. 0.0D0 ) LSUNLIGHT = .TRUE.
-      END DO
 
       ! Fill scavenging rates
       DO SPC = 1, NSPEC

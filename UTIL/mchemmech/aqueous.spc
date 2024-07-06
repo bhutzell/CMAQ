@@ -67,6 +67,12 @@
  IHMML_a## = IGNORE;
  IMGA_a## = IGNORE;
  IMOS_a## = IGNORE;
+ FEppp_a## = IGNORE;
+ MNpp_a## = IGNORE;
+ NAp_a## = IGNORE;
+ MGpp_a## = IGNORE;
+ CApp_a## = IGNORE;
+ Kp_a## = IGNORE;
  WD_Hp  = IGNORE;
  WD_OHm = IGNORE;
  WD_SO2 = IGNORE;
@@ -110,9 +116,17 @@
  WD_IHMML = IGNORE;
  WD_IMGA = IGNORE;
  WD_IMOS = IGNORE;
+ WD_FEppp = IGNORE;
+ WD_MNpp = IGNORE;
+ WD_NAp = IGNORE;
+ WD_MGpp = IGNORE;
+ WD_CApp = IGNORE;
+ WD_Kp = IGNORE;
+ WD_ANAI = IGNORE;
  ASO4I = IGNORE;
  ANH4I = IGNORE;
  ANO3I = IGNORE;
+ ANAI = IGNORE;
 #DEFFIX
  CO2       = IGNORE;
  H2O_a##   = IGNORE;

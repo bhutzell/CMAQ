@@ -282,6 +282,9 @@ C..Initialize shared photolysis data
 C..Allocate AE related pointers
          CALL ALLOC_AE_DATA()
 
+C..Allocate metal related factors
+         CALL ALLOC_METAL_DATA ()
+
 C..Allocate wet deposition data
          CALL ALLOC_WDEP_DATA( JDATE, JTIME )
 

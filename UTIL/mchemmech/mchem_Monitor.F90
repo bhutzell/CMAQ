@@ -13,7 +13,7 @@
 !        R. Sander, Max-Planck Institute for Chemistry, Mainz, Germany
 ! 
 ! File                 : mchem_Monitor.f90
-! Time                 : Fri Jul  5 14:05:29 2024
+! Time                 : Fri Jul  5 18:39:20 2024
 ! Working directory    : /DFS-L/DATA/carlton/srosanka/code/CMAQ_MCHEM/UTIL/mchemmech
 ! Equation file        : mchem.kpp
 ! Output root filename : mchem
@@ -30,1077 +30,1119 @@ MODULE mchem_Monitor
      'AAVB3J         ','AAVB4J         ','AOLGAJ         ', &
      'AISO1J         ','AISO2J         ','ASQTJ          ', &
      'AOLGBJ         ','APOCI          ','APOCJ          ', &
-     'ORGC_RS        ','ORGC_CV        ','ASO4I          ', &
-     'ANH4I          ','ANO3I          ','DUMMY          ', &
-     'SULRXN         ','ISOPRXN        ','TRPRXN         ', &
-     'SESQRXN        ','PCSOARXN       ','HGIIAER        ', &
-     'DUMMY_RS       ','DUMMY_CV       ','WD_Hp          ', &
-     'WD_OHm         ','WD_SO2         ','WD_FACD        ', &
-     'WD_HNO3        ','WD_CO2         ','CO2m_RS        ', &
-     'CO2m_CV        ','WD_H2O2        ','WD_O3          ', &
-     'WD_HCL         ','WD_GLY         ','WD_MGLY        ', &
-     'WD_OH          ','WD_ASO4J       ','WD_AORGCJ      ', &
-     'WD_ANO3J       ','WD_ANH4J       ','WD_ACLJ        ', &
-     'WD_NH3         ','WD_NO2         ','WD_HONO        ', &
-     'WD_PNA         ','WD_GLYD        ','WD_AACD        ', &
-     'WD_FORM        ','WD_HO2         ','WD_O2m         ', &
-     'WD_NO3         ','WD_MEO2        ','WD_EPOX        ', &
-     'WD_AISO3J      ','AISO3J         ','ISO3_RS        ', &
-     'ISO3_CV        ','WD_MHP         ','WD_PACD        ', &
-     'WD_ASO4I       ','WD_ANH4I       ','WD_ANO3I       ', &
-     'WD_ACLI        ','WD_NO          ','WD_N2O5        ', &
-     'WD_SULF        ','WD_PAN         ','WD_ALD2        ', &
-     'WD_PANX        ','WD_MEPX        ','WD_MEOH        ', &
-     'WD_ROOH        ','WD_NTR1        ','WD_NTR2        ', &
-     'WD_CO          ','WD_ALDX        ','WD_ETHA        ', &
-     'WD_ETOH        ','WD_KET         ','WD_PAR         ', &
-     'WD_ACET        ','WD_PRPA        ','WD_ETHY        ', &
-     'WD_ETH         ','WD_OLE         ','WD_IOLE        ' /)
+     'ORGC_RS        ','ORGC_CV        ','FEppp_RS       ', &
+     'FEppp_CV       ','MNpp_RS        ','MNpp_CV        ', &
+     'MGpp_RS        ','MGpp_CV        ','CApp_RS        ', &
+     'CApp_CV        ','Kp_RS          ','Kp_CV          ', &
+     'ASO4I          ','ANH4I          ','ANO3I          ', &
+     'ANAI           ','NAp_RS         ','NAp_CV         ', &
+     'DUMMY          ','SULRXN         ','ISOPRXN        ', &
+     'TRPRXN         ','SESQRXN        ','PCSOARXN       ', &
+     'HGIIAER        ','DUMMY_RS       ','DUMMY_CV       ', &
+     'WD_Hp          ','WD_OHm         ','WD_SO2         ', &
+     'WD_FACD        ','WD_HNO3        ','WD_CO2         ', &
+     'CO2m_RS        ','CO2m_CV        ','WD_H2O2        ', &
+     'WD_O3          ','WD_HCL         ','WD_GLY         ', &
+     'WD_MGLY        ','WD_OH          ','WD_ASO4J       ', &
+     'WD_AORGCJ      ','WD_ANO3J       ','WD_ANH4J       ', &
+     'WD_ACLJ        ','WD_NH3         ','WD_NO2         ', &
+     'WD_HONO        ','WD_PNA         ','WD_GLYD        ', &
+     'WD_AACD        ','WD_FORM        ','WD_HO2         ', &
+     'WD_O2m         ','WD_NO3         ','WD_MEO2        ', &
+     'WD_EPOX        ','WD_AISO3J      ','AISO3J         ', &
+     'ISO3_RS        ','ISO3_CV        ','WD_MHP         ', &
+     'WD_PACD        ','WD_ASO4I       ','WD_ANH4I       ', &
+     'WD_ANO3I       ','WD_ACLI        ','WD_FEppp       ', &
+     'WD_MNpp        ','WD_NAp         ','WD_MGpp        ', &
+     'WD_CApp        ','WD_Kp          ','WD_ANAI        ', &
+     'WD_NO          ','WD_N2O5        ','WD_SULF        ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: SPC_NAMES_1 = (/ &
-     'WD_ISOP        ','WD_ISPD        ','WD_INTR        ', &
-     'WD_ISPX        ','WD_TERP        ','WD_APIN        ', &
-     'WD_MTNO3       ','MTNO3          ','TERPNRO2       ', &
-     'WD_BENZENE     ','WD_CRES        ','WD_OPEN        ', &
-     'WD_TOL         ','WD_XOPN        ','WD_XYLMN       ', &
-     'WD_NAPH        ','WD_CAT1        ','WD_CRON        ', &
-     'WD_OPAN        ','WD_ECH4        ','WD_CL2         ', &
-     'WD_HOCL        ','WD_CLO         ','WD_FMCL        ', &
-     'WD_CLNO2       ','WD_CLNO3       ','WD_SESQ        ', &
-     'SESQ           ','WD_SOAALK      ','WD_VLVPO1      ', &
-     'WD_VSVPO1      ','WD_VSVPO2      ','WD_VSVPO3      ', &
-     'WD_VIVPO1      ','WD_VLVOO1      ','WD_VLVOO2      ', &
-     'WD_VSVOO1      ','WD_VSVOO2      ','WD_VSVOO3      ', &
-     'WD_PCVOC       ','PCVOC          ','WD_FORM_PRIMARY', &
-     'FORM_PRIMARY   ','WD_ALD2_PRIMARY','ALD2_PRIMARY   ', &
-     'WD_BUTADIENE13 ','WD_ACROLEIN    ','ACROLEIN       ', &
-     'BUTADIENE13    ','WD_ACRO_PRIMARY','ACRO_PRIMARY   ', &
-     'WD_TOLU        ','TOLU           ','WD_HG          ', &
-     'WD_HGIIGAS     ','HGIIGAS        ','HG             ', &
-     'WD_SVAVB1      ','SVAVB1         ','WD_SVAVB2      ', &
-     'SVAVB2         ','WD_SVAVB3      ','SVAVB3         ', &
-     'WD_SVAVB4      ','SVAVB4         ','BENZRO2        ', &
-     'TOLRO2         ','XYLRO2         ','PAHRO2         ', &
-     'SOAALK         ','WD_DMS         ','WD_MSA         ', &
-     'MSA            ','WD_ACLK        ','WD_AISO1J      ', &
-     'WD_AISO2J      ','WD_ASQTJ       ','WD_AOLGAJ      ', &
-     'WD_AOLGBJ      ','WD_AGLYJ       ','AGLYJ          ', &
-     'WD_AMTNO3J     ','WD_AMTHYDJ     ','WD_APOCI       ', &
-     'WD_APOCJ       ','WD_APNCOMI     ','APNCOMI        ', &
-     'WD_APNCOMJ     ','APNCOMJ        ','WD_AAVB2J      ' /)
+     'WD_PAN         ','WD_ALD2        ','WD_PANX        ', &
+     'WD_MEPX        ','WD_MEOH        ','WD_ROOH        ', &
+     'WD_NTR1        ','WD_NTR2        ','WD_CO          ', &
+     'WD_ALDX        ','WD_ETHA        ','WD_ETOH        ', &
+     'WD_KET         ','WD_PAR         ','WD_ACET        ', &
+     'WD_PRPA        ','WD_ETHY        ','WD_ETH         ', &
+     'WD_OLE         ','WD_IOLE        ','WD_ISOP        ', &
+     'WD_ISPD        ','WD_INTR        ','WD_ISPX        ', &
+     'WD_TERP        ','WD_APIN        ','WD_MTNO3       ', &
+     'MTNO3          ','TERPNRO2       ','WD_BENZENE     ', &
+     'WD_CRES        ','WD_OPEN        ','WD_TOL         ', &
+     'WD_XOPN        ','WD_XYLMN       ','WD_NAPH        ', &
+     'WD_CAT1        ','WD_CRON        ','WD_OPAN        ', &
+     'WD_ECH4        ','WD_CL2         ','WD_HOCL        ', &
+     'WD_CLO         ','WD_FMCL        ','WD_CLNO2       ', &
+     'WD_CLNO3       ','WD_SESQ        ','SESQ           ', &
+     'WD_SOAALK      ','WD_VLVPO1      ','WD_VSVPO1      ', &
+     'WD_VSVPO2      ','WD_VSVPO3      ','WD_VIVPO1      ', &
+     'WD_VLVOO1      ','WD_VLVOO2      ','WD_VSVOO1      ', &
+     'WD_VSVOO2      ','WD_VSVOO3      ','WD_PCVOC       ', &
+     'PCVOC          ','WD_FORM_PRIMARY','FORM_PRIMARY   ', &
+     'WD_ALD2_PRIMARY','ALD2_PRIMARY   ','WD_BUTADIENE13 ', &
+     'WD_ACROLEIN    ','ACROLEIN       ','BUTADIENE13    ', &
+     'WD_ACRO_PRIMARY','ACRO_PRIMARY   ','WD_TOLU        ', &
+     'TOLU           ','WD_HG          ','WD_HGIIGAS     ', &
+     'HGIIGAS        ','HG             ','WD_SVAVB1      ', &
+     'SVAVB1         ','WD_SVAVB2      ','SVAVB2         ', &
+     'WD_SVAVB3      ','SVAVB3         ','WD_SVAVB4      ', &
+     'SVAVB4         ','TOLRO2         ','BENZRO2        ', &
+     'XYLRO2         ','PAHRO2         ','SOAALK         ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: SPC_NAMES_2 = (/ &
-     'WD_AAVB3J      ','WD_AAVB4J      ','CL2            ', &
-     'ASO4J          ','IEPOXP         ','ACLJ           ', &
-     'ACLK           ','H2NO3PK        ','O1D            ', &
-     'SO3m_RS        ','SO3m_CV        ','ECH4           ', &
-     'NH4p_RS        ','NH4p_CV        ','CO3mm_RS       ', &
-     'HCO3m_RS       ','CO3mm_CV       ','HCO3m_CV       ', &
-     'SULF           ','NH3_RS         ','ACLI           ', &
-     'H2NO3PIJ       ','CLNO2          ','NH3            ', &
-     'NH3_CV         ','ETHY           ','Clm_RS         ', &
-     'Clm_CV         ','BENZENE        ','HCL_RS         ', &
-     'HOCL           ','HCL_CV         ','KET            ', &
-     'SO4m_RS        ','SO4m_CV        ','HPLD           ', &
-     'SULF_RS        ','SULF_CV        ','H2CO3_RS       ', &
-     'IEPOX_CV       ','IEPOX_RS       ','H2CO3_CV       ', &
-     'PAN            ','GLYD_RS        ','VIVPO1         ', &
-     'MGLY_RS        ','MGLY_CV        ','GLYD_CV        ', &
-     'HSO5m_RS       ','HSO5m_CV       ','OXLAC_RS       ', &
-     'OXLAC_CV       ','OXLACmm_RS     ','OXLACm_RS      ', &
-     'OXLACmm_CV     ','OXLACm_CV      ','XPRP           ', &
-     'PAA_CV         ','CLNO3          ','CH3O2_CV       ', &
-     'NO4m_RS        ','CH3O2_RS       ','PAA_RS         ', &
-     'HNO3_RS        ','HNO3_CV        ','NO4m_CV        ', &
-     'GLY_RS         ','GLY_CV         ','ETHA           ', &
-     'HSO4m_RS       ','HSO4m_CV       ','GCOLACm_RS     ', &
-     'GCOLAC_RS      ','GCOLACm_CV     ','GCOLAC_CV      ', &
-     'PYRAC_RS       ','PYRAC_CV       ','PYRACm_RS      ', &
-     'PYRACm_CV      ','HCOOm_RS       ','HCOOm_CV       ', &
-     'NTR2           ','MHP_RS         ','MHP_CV         ', &
-     'ETOH           ','PRPA           ','ISPX           ', &
-     'TOL            ','XYLMN          ','NAPH           ' /)
+     'WD_DMS         ','WD_MSA         ','MSA            ', &
+     'WD_ACLK        ','WD_AISO1J      ','WD_AISO2J      ', &
+     'WD_ASQTJ       ','WD_AOLGAJ      ','WD_AOLGBJ      ', &
+     'WD_AGLYJ       ','AGLYJ          ','WD_AMTNO3J     ', &
+     'WD_AMTHYDJ     ','WD_APOCI       ','WD_APOCJ       ', &
+     'WD_APNCOMI     ','APNCOMI        ','WD_APNCOMJ     ', &
+     'APNCOMJ        ','WD_AAVB2J      ','WD_AAVB3J      ', &
+     'WD_AAVB4J      ','CL2            ','ASO4J          ', &
+     'IEPOXP         ','ACLJ           ','ACLK           ', &
+     'H2NO3PK        ','O1D            ','SO3m_RS        ', &
+     'SO3m_CV        ','ECH4           ','CO3mm_CV       ', &
+     'SULF           ','HCO3m_CV       ','ACLI           ', &
+     'CLNO2          ','NH4p_CV        ','NH4p_RS        ', &
+     'CO3mm_RS       ','HCO3m_RS       ','NH3_RS         ', &
+     'NH3            ','NH3_CV         ','ETHY           ', &
+     'H2NO3PIJ       ','BENZENE        ','Clm_CV         ', &
+     'HOCL           ','Clm_RS         ','HCL_RS         ', &
+     'HCL_CV         ','KET            ','HPLD           ', &
+     'SO4m_RS        ','SO4m_CV        ','SULF_RS        ', &
+     'SULF_CV        ','H2CO3_RS       ','H2CO3_CV       ', &
+     'IEPOX_RS       ','IEPOX_CV       ','PAN            ', &
+     'GLYD_RS        ','GLYD_CV        ','VIVPO1         ', &
+     'MGLY_RS        ','MGLY_CV        ','XPRP           ', &
+     'OXLACmm_RS     ','OXLACmm_CV     ','CLNO3          ', &
+     'GLY_RS         ','NO4m_RS        ','PAA_RS         ', &
+     'NO4m_CV        ','HSO5m_RS       ','HNO3_RS        ', &
+     'HNO3_CV        ','OXLAC_RS       ','OXLAC_CV       ', &
+     'HSO5m_CV       ','GLY_CV         ','CH3O2_RS       ', &
+     'CH3O2_CV       ','OXLACm_RS      ','OXLACm_CV      ', &
+     'PAA_CV         ','ETHA           ','HSO4m_RS       ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: SPC_NAMES_3 = (/ &
-     'CAT1           ','OPAN           ','NO3_RS         ', &
-     'NO3_CV         ','N2O5           ','AACDm_CV       ', &
-     'SO5m_RS        ','SO5m_CV        ','VSVPO2         ', &
-     'VSVPO3         ','VSVPO1         ','VLVPO1         ', &
-     'VLVOO2         ','VSVOO2         ','VSVOO3         ', &
-     'VLVOO1         ','VSVOO1         ','AACDm_RS       ', &
-     'HONO_RS        ','HONO_CV        ','XPAR           ', &
-     'PANX           ','HCO3           ','CRO            ', &
-     'FMCL           ','AACD_RS        ','AACD_CV        ', &
-     'FACD_RS        ','FACD_CV        ','MEOH           ', &
-     'ROOH           ','NTR1           ','DMS            ', &
-     'GLYACm_CV      ','GLYAC_CV       ','GLYACm_RS      ', &
-     'GLYAC_RS       ','PNA            ','SO2_CV         ', &
-     'SO2_RS         ','ACET           ','H2O2_RS        ', &
-     'H2O2_CV        ','HCHO_RS        ','HCHO_CV        ', &
-     'INTR           ','NO3m_RS        ','NO3m_CV        ', &
-     'CRON           ','BZO2           ','O2m_RS         ', &
-     'O2m_CV         ','HCL            ','CO             ', &
-     'TERP           ','ROR            ','APIN           ', &
-     'HMSm_CV        ','HMSm_RS        ','XLO2           ', &
-     'TO2            ','ETH            ','CH2OHYD_CV     ', &
-     'PACD           ','CLO            ','CH2OHYD_RS     ', &
-     'CRES           ','EPX2           ','NO2m_CV        ', &
-     'MEPX           ','NO2m_RS        ','ISOP           ', &
-     'OHm_CV         ','OHm_RS         ','XOPN           ', &
-     'OPEN           ','SO4mm_RS       ','SO4mm_CV       ', &
-     'O3_RS          ','XO2N           ','NO2_RS         ', &
-     'NO2_CV         ','O3_CV          ','IOLE           ', &
-     'ALDX           ','XO2H           ','XO2            ', &
-     'ALD2           ','OLE            ','PAR            ' /)
-  CHARACTER(LEN=32), PARAMETER, DIMENSION(48) :: SPC_NAMES_4 = (/ &
-     'ISO2           ','ISPD           ','HNO4_RS        ', &
-     'OPO3           ','CXO3           ','SO3mm_CV       ', &
-     'HO2_CV         ','HNO3           ','O              ', &
-     'SO3mm_RS       ','HO2_RS         ','MGLY           ', &
-     'GLY            ','GLYD           ','AACD           ', &
-     'NO             ','CL             ','RO2            ', &
-     'C2O3           ','MEO2           ','EPOX           ', &
-     'HO2            ','HONO           ','OH_RS          ', &
-     'OH_CV          ','SO2            ','HSO3m_RS       ', &
-     'HSO3m_CV       ','Hp_RS          ','O3             ', &
-     'NO3            ','FACD           ','H2O2           ', &
-     'HNO4_CV        ','FORM           ','OH             ', &
-     'Hp_CV          ','NO2            ','M              ', &
-     'H2             ','O2             ','CH4            ', &
-     'H2O            ','CO2            ','H2O_RS         ', &
-     'H2O_CV         ','O2_RS          ','O2_CV          ' /)
-  CHARACTER(LEN=32), PARAMETER, DIMENSION(408) :: SPC_NAMES = (/&
+     'HSO4m_CV       ','PYRAC_RS       ','HCOOm_RS       ', &
+     'HCOOm_CV       ','GCOLACm_RS     ','GCOLAC_RS      ', &
+     'PYRAC_CV       ','PYRACm_RS      ','PYRACm_CV      ', &
+     'GCOLACm_CV     ','GCOLAC_CV      ','NTR2           ', &
+     'MHP_RS         ','MHP_CV         ','ETOH           ', &
+     'ISPX           ','TOL            ','XYLMN          ', &
+     'NAPH           ','CAT1           ','OPAN           ', &
+     'PRPA           ','N2O5           ','NO3_RS         ', &
+     'NO3_CV         ','SO5m_RS        ','HONO_RS        ', &
+     'AACDm_RS       ','SO5m_CV        ','AACDm_CV       ', &
+     'VSVPO2         ','VSVPO3         ','VSVPO1         ', &
+     'VLVPO1         ','VSVOO2         ','VSVOO3         ', &
+     'VLVOO2         ','VLVOO1         ','VSVOO1         ', &
+     'HONO_CV        ','PANX           ','XPAR           ', &
+     'HCO3           ','AACD_RS        ','CRO            ', &
+     'FMCL           ','AACD_CV        ','MEOH           ', &
+     'FACD_CV        ','FACD_RS        ','ROOH           ', &
+     'NTR1           ','DMS            ','GLYACm_CV      ', &
+     'GLYAC_CV       ','PNA            ','GLYACm_RS      ', &
+     'GLYAC_RS       ','SO2_RS         ','SO2_CV         ', &
+     'ACET           ','H2O2_RS        ','H2O2_CV        ', &
+     'HCHO_RS        ','HCHO_CV        ','INTR           ', &
+     'NO3m_CV        ','NO3m_RS        ','BZO2           ', &
+     'CRON           ','O2m_RS         ','O2m_CV         ', &
+     'CO             ','HCL            ','ROR            ', &
+     'TERP           ','APIN           ','HMSm_CV        ', &
+     'HMSm_RS        ','XLO2           ','TO2            ', &
+     'ETH            ','CLO            ','PACD           ', &
+     'CH2OHYD_RS     ','CH2OHYD_CV     ','CRES           ', &
+     'EPX2           ','MEPX           ','NO2m_RS        ' /)
+  CHARACTER(LEN=32), PARAMETER, DIMENSION(68) :: SPC_NAMES_4 = (/ &
+     'ISOP           ','NO2m_CV        ','OHm_RS         ', &
+     'OHm_CV         ','XOPN           ','OPEN           ', &
+     'SO4mm_CV       ','SO4mm_RS       ','O3_RS          ', &
+     'XO2N           ','O3_CV          ','NO2_CV         ', &
+     'NO2_RS         ','IOLE           ','ALDX           ', &
+     'XO2H           ','XO2            ','ALD2           ', &
+     'OLE            ','PAR            ','HNO4_RS        ', &
+     'ISO2           ','ISPD           ','OPO3           ', &
+     'CXO3           ','SO3mm_CV       ','HO2_CV         ', &
+     'HNO3           ','O              ','SO3mm_RS       ', &
+     'HO2_RS         ','MGLY           ','GLY            ', &
+     'GLYD           ','AACD           ','NO             ', &
+     'CL             ','SO2            ','FACD           ', &
+     'HNO4_CV        ','HO2            ','OH_CV          ', &
+     'C2O3           ','RO2            ','O3             ', &
+     'HONO           ','OH_RS          ','NO2            ', &
+     'MEO2           ','H2O2           ','NO3            ', &
+     'OH             ','Hp_RS          ','Hp_CV          ', &
+     'EPOX           ','HSO3m_CV       ','FORM           ', &
+     'HSO3m_RS       ','M              ','H2             ', &
+     'O2             ','CH4            ','H2O            ', &
+     'CO2            ','H2O_RS         ','H2O_CV         ', &
+     'O2_RS          ','O2_CV          ' /)
+  CHARACTER(LEN=32), PARAMETER, DIMENSION(428) :: SPC_NAMES = (/&
     SPC_NAMES_0, SPC_NAMES_1, SPC_NAMES_2, SPC_NAMES_3, SPC_NAMES_4 /)
 
   INTEGER, DIMENSION(1) :: LOOKAT
   INTEGER, DIMENSION(1) :: MONITOR
   CHARACTER(LEN=32), DIMENSION(1) :: SMASS
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_0 = (/ &
-     '                        NO2 --> O + NO                                                              ', &
-     '                 O + M + O2 --> O3 + M                                                              ', &
-     '                    NO + O3 --> NO2                                                                 ', &
-     '                     O + NO --> NO2                                                                 ', &
-     '                    O + NO2 --> NO                                                                  ', &
-     '                    O + NO2 --> NO3                                                                 ', &
-     '                     O + O3 --> DUMMY                                                               ', &
-     '                         O3 --> O                                                                   ', &
-     '                         O3 --> O1D                                                                 ', &
-     '                    O1D + M --> O + M                                                               ', &
-     '                  O1D + H2O --> 2 OH                                                                ', &
-     '                    O3 + OH --> HO2                                                                 ', &
-     '                   HO2 + O3 --> OH                                                                  ', &
-     '                     O + OH --> HO2                                                                 ', &
-     '                    O + HO2 --> OH                                                                  ', &
-     '                       2 OH --> O                                                                   ', &
-     '                       2 OH --> H2O2                                                                ', &
-     '                   HO2 + OH --> DUMMY                                                               ', &
-     '                      2 HO2 --> H2O2                                                                ', &
-     '                2 HO2 + H2O --> H2O2                                                                ', &
-     '                       H2O2 --> 2 OH                                                                ', &
-     '                  H2O2 + OH --> HO2                                                                 ', &
-     '                   O + H2O2 --> HO2 + OH                                                            ', &
-     '                  2 NO + O2 --> 2 NO2                                                               ', &
-     '                   NO + HO2 --> OH + NO2                                                            ', &
-     '                   O3 + NO2 --> NO3                                                                 ', &
-     '                        NO3 --> O + NO2                                                             ', &
-     '                        NO3 --> NO                                                                  ', &
-     '                   NO + NO3 --> 2 NO2                                                               ', &
-     '                  NO3 + NO2 --> NO + NO2                                                            ' /)
+     '                          NO2 --> O + NO                                                            ', &
+     '                   O + M + O2 --> O3 + M                                                            ', &
+     '                      NO + O3 --> NO2                                                               ', &
+     '                       O + NO --> NO2                                                               ', &
+     '                      O + NO2 --> NO                                                                ', &
+     '                      O + NO2 --> NO3                                                               ', &
+     '                       O + O3 --> DUMMY                                                             ', &
+     '                           O3 --> O                                                                 ', &
+     '                           O3 --> O1D                                                               ', &
+     '                      O1D + M --> O + M                                                             ', &
+     '                    O1D + H2O --> 2 OH                                                              ', &
+     '                      O3 + OH --> HO2                                                               ', &
+     '                     HO2 + O3 --> OH                                                                ', &
+     '                       O + OH --> HO2                                                               ', &
+     '                      O + HO2 --> OH                                                                ', &
+     '                         2 OH --> O                                                                 ', &
+     '                         2 OH --> H2O2                                                              ', &
+     '                     HO2 + OH --> DUMMY                                                             ', &
+     '                        2 HO2 --> H2O2                                                              ', &
+     '                  2 HO2 + H2O --> H2O2                                                              ', &
+     '                         H2O2 --> 2 OH                                                              ', &
+     '                    H2O2 + OH --> HO2                                                               ', &
+     '                     O + H2O2 --> HO2 + OH                                                          ', &
+     '                    2 NO + O2 --> 2 NO2                                                             ', &
+     '                     NO + HO2 --> NO2 + OH                                                          ', &
+     '                     O3 + NO2 --> NO3                                                               ', &
+     '                          NO3 --> O + NO2                                                           ', &
+     '                          NO3 --> NO                                                                ', &
+     '                     NO + NO3 --> 2 NO2                                                             ', &
+     '                    NO2 + NO3 --> NO + NO2                                                          ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_1 = (/ &
-     '                    O + NO3 --> NO2                                                                 ', &
-     '                   NO3 + OH --> HO2 + NO2                                                           ', &
-     '                  HO2 + NO3 --> OH + NO2                                                            ', &
-     '                   O3 + NO3 --> NO2                                                                 ', &
-     '                      2 NO3 --> 2 NO2                                                               ', &
-     '                  NO3 + NO2 --> N2O5                                                                ', &
-     '                       N2O5 --> NO3 + NO2                                                           ', &
-     '                       N2O5 --> DUMMY + NO3 + NO2                                                   ', &
-     '                 N2O5 + H2O --> 2 HNO3                                                              ', &
-     '                    NO + OH --> HONO                                                                ', &
-     '             NO + NO2 + H2O --> 2 HONO                                                              ', &
-     '                     2 HONO --> NO + NO2                                                            ', &
-     '                       HONO --> NO + OH                                                             ', &
-     '                  HONO + OH --> NO2                                                                 ', &
-     '                   OH + NO2 --> HNO3                                                                ', &
-     '                  HNO3 + OH --> NO3                                                                 ', &
-     '                       HNO3 --> OH + NO2                                                            ', &
-     '                  HO2 + NO2 --> PNA                                                                 ', &
-     '                        PNA --> HO2 + NO2                                                           ', &
-     '                        PNA --> 0.59 HO2 + 0.41 NO3 + 0.41 OH + 0.59 NO2                            ', &
-     '                   PNA + OH --> NO2                                                                 ', &
-     '                   SO2 + OH --> SULRXN + SULF + HO2                                                 ', &
-     '                  NO + C2O3 --> RO2 + MEO2 + NO2                                                    ', &
-     '                 C2O3 + NO2 --> PAN                                                                 ', &
-     '                        PAN --> C2O3 + NO2                                                          ', &
-     '                        PAN --> 0.4 RO2 + 0.6 C2O3 + 0.4 MEO2 + 0.4 NO3 + 0.6 NO2                   ', &
-     '                 C2O3 + HO2 --> 0.37 PACD + 0.13 AACD + 0.5 RO2 + 0.5 MEO2 + 0.13 O3 ... etc.       ', &
-     '                 RO2 + C2O3 --> MEO2                                                                ', &
-     '                     2 C2O3 --> 2 RO2 + 2 MEO2                                                      ', &
-     '                CXO3 + C2O3 --> XO2H + ALD2 + 2 RO2 + MEO2                                          ' /)
+     '                      O + NO3 --> NO2                                                               ', &
+     '                     NO3 + OH --> HO2 + NO2                                                         ', &
+     '                    HO2 + NO3 --> NO2 + OH                                                          ', &
+     '                     O3 + NO3 --> NO2                                                               ', &
+     '                        2 NO3 --> 2 NO2                                                             ', &
+     '                    NO2 + NO3 --> N2O5                                                              ', &
+     '                         N2O5 --> NO2 + NO3                                                         ', &
+     '                         N2O5 --> DUMMY + NO2 + NO3                                                 ', &
+     '                   N2O5 + H2O --> 2 HNO3                                                            ', &
+     '                      NO + OH --> HONO                                                              ', &
+     '               NO + NO2 + H2O --> 2 HONO                                                            ', &
+     '                       2 HONO --> NO + NO2                                                          ', &
+     '                         HONO --> NO + OH                                                           ', &
+     '                    HONO + OH --> NO2                                                               ', &
+     '                     NO2 + OH --> HNO3                                                              ', &
+     '                    HNO3 + OH --> NO3                                                               ', &
+     '                         HNO3 --> NO2 + OH                                                          ', &
+     '                    HO2 + NO2 --> PNA                                                               ', &
+     '                          PNA --> HO2 + NO2                                                         ', &
+     '                          PNA --> 0.59 HO2 + 0.59 NO2 + 0.41 NO3 + 0.41 OH                          ', &
+     '                     PNA + OH --> NO2                                                               ', &
+     '                     SO2 + OH --> SULRXN + SULF + HO2                                               ', &
+     '                    NO + C2O3 --> RO2 + NO2 + MEO2                                                  ', &
+     '                   C2O3 + NO2 --> PAN                                                               ', &
+     '                          PAN --> C2O3 + NO2                                                        ', &
+     '                          PAN --> 0.6 C2O3 + 0.4 RO2 + 0.6 NO2 + 0.4 MEO2 + 0.4 NO3                 ', &
+     '                   HO2 + C2O3 --> 0.37 PACD + 0.13 AACD + 0.5 RO2 + 0.13 O3 + 0.5 MEO2 ... etc.     ', &
+     '                   C2O3 + RO2 --> MEO2                                                              ', &
+     '                       2 C2O3 --> 2 RO2 + 2 MEO2                                                    ', &
+     '                  CXO3 + C2O3 --> XO2H + ALD2 + 2 RO2 + MEO2                                        ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_2 = (/ &
-     '                  CXO3 + NO --> XO2H + ALD2 + RO2 + NO2                                             ', &
-     '                 CXO3 + NO2 --> PANX                                                                ', &
-     '                       PANX --> CXO3 + NO2                                                          ', &
-     '                       PANX --> 0.4 XO2H + 0.4 ALD2 + 0.6 CXO3 + 0.4 RO2 + 0.4 NO3 + 0.6 NO2 ... etc', &
-     '                 CXO3 + HO2 --> 0.37 PACD + 0.13 AACD + 0.5 RO2 + 0.5 MEO2 + 0.13 O3 ... etc.       ', &
-     '                 CXO3 + RO2 --> MEO2                                                                ', &
-     '                     2 CXO3 --> 2 RO2 + 2 MEO2                                                      ', &
-     '                   NO + RO2 --> NO                                                                  ', &
-     '                  RO2 + HO2 --> HO2                                                                 ', &
-     '                      2 RO2 --> DUMMY                                                               ', &
-     '                  NO + MEO2 --> HO2 + FORM + NO2                                                    ', &
-     '                 MEO2 + HO2 --> 0.9 MEPX + 0.1 FORM                                                 ', &
-     '                C2O3 + MEO2 --> 0.1 AACD + 0.9 RO2 + 0.9 MEO2 + 0.9 HO2 + FORM                      ', &
-     '                 RO2 + MEO2 --> 0.315 MEOH + RO2 + 0.37 HO2 + 0.685 FORM                            ', &
-     '                  XO2H + NO --> HO2 + NO2                                                           ', &
-     '                 XO2H + HO2 --> ROOH                                                                ', &
-     '                XO2H + C2O3 --> 0.2 AACD + 0.8 RO2 + 0.8 MEO2 + 0.8 HO2                             ', &
-     '                 XO2H + RO2 --> RO2 + 0.6 HO2                                                       ', &
-     '                   XO2 + NO --> NO2                                                                 ', &
-     '                  XO2 + HO2 --> ROOH                                                                ', &
-     '                 XO2 + C2O3 --> 0.2 AACD + 0.8 RO2 + 0.8 MEO2                                       ', &
-     '                  XO2 + RO2 --> RO2                                                                 ', &
-     '                  XO2N + NO --> 0.5 NTR2 + 0.5 NTR1                                                 ', &
-     '                 XO2N + HO2 --> ROOH                                                                ', &
-     '                XO2N + C2O3 --> 0.2 AACD + 0.8 RO2 + 0.8 MEO2 + 0.8 HO2                             ', &
-     '                 XO2N + RO2 --> RO2                                                                 ', &
-     '                  MEPX + OH --> 0.6 RO2 + 0.6 MEO2 + 0.4 FORM + 0.4 OH                              ', &
-     '                       MEPX --> RO2 + MEO2 + OH                                                     ', &
-     '                  ROOH + OH --> 0.06 XO2N + 0.54 XO2H + 0.6 RO2 + 0.4 OH                            ', &
-     '                       ROOH --> HO2 + OH                                                            ' /)
+     '                    CXO3 + NO --> XO2H + ALD2 + RO2 + NO2                                           ', &
+     '                   CXO3 + NO2 --> PANX                                                              ', &
+     '                         PANX --> CXO3 + NO2                                                        ', &
+     '                         PANX --> 0.4 XO2H + 0.4 ALD2 + 0.6 CXO3 + 0.4 RO2 + 0.6 NO2 + 0.4 NO3 ... e', &
+     '                   CXO3 + HO2 --> 0.37 PACD + 0.13 AACD + 0.5 RO2 + 0.13 O3 + 0.5 MEO2 ... etc.     ', &
+     '                   CXO3 + RO2 --> MEO2                                                              ', &
+     '                       2 CXO3 --> 2 RO2 + 2 MEO2                                                    ', &
+     '                     NO + RO2 --> NO                                                                ', &
+     '                    HO2 + RO2 --> HO2                                                               ', &
+     '                        2 RO2 --> DUMMY                                                             ', &
+     '                    NO + MEO2 --> HO2 + NO2 + FORM                                                  ', &
+     '                   HO2 + MEO2 --> 0.9 MEPX + 0.1 FORM                                               ', &
+     '                  C2O3 + MEO2 --> 0.1 AACD + 0.9 HO2 + 0.9 RO2 + 0.9 MEO2 + FORM                    ', &
+     '                   RO2 + MEO2 --> 0.315 MEOH + 0.37 HO2 + RO2 + 0.685 FORM                          ', &
+     '                    XO2H + NO --> HO2 + NO2                                                         ', &
+     '                   XO2H + HO2 --> ROOH                                                              ', &
+     '                  XO2H + C2O3 --> 0.2 AACD + 0.8 HO2 + 0.8 RO2 + 0.8 MEO2                           ', &
+     '                   XO2H + RO2 --> 0.6 HO2 + RO2                                                     ', &
+     '                     XO2 + NO --> NO2                                                               ', &
+     '                    XO2 + HO2 --> ROOH                                                              ', &
+     '                   XO2 + C2O3 --> 0.2 AACD + 0.8 RO2 + 0.8 MEO2                                     ', &
+     '                    XO2 + RO2 --> RO2                                                               ', &
+     '                    XO2N + NO --> 0.5 NTR2 + 0.5 NTR1                                               ', &
+     '                   XO2N + HO2 --> ROOH                                                              ', &
+     '                  XO2N + C2O3 --> 0.2 AACD + 0.8 HO2 + 0.8 RO2 + 0.8 MEO2                           ', &
+     '                   XO2N + RO2 --> RO2                                                               ', &
+     '                    MEPX + OH --> 0.6 RO2 + 0.6 MEO2 + 0.4 OH + 0.4 FORM                            ', &
+     '                         MEPX --> RO2 + MEO2 + OH                                                   ', &
+     '                    ROOH + OH --> 0.06 XO2N + 0.54 XO2H + 0.6 RO2 + 0.4 OH                          ', &
+     '                         ROOH --> HO2 + OH                                                          ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_3 = (/ &
-     '                  NTR1 + OH --> NTR2                                                                ', &
-     '                       NTR1 --> NO2                                                                 ', &
-     '                  FACD + OH --> HO2                                                                 ', &
-     '                  AACD + OH --> RO2 + MEO2                                                          ', &
-     '                  PACD + OH --> C2O3                                                                ', &
-     '                  FORM + OH --> CO + HO2                                                            ', &
-     '                       FORM --> CO + 2 HO2                                                          ', &
-     '                       FORM --> CO                                                                  ', &
-     '                   O + FORM --> CO + HO2 + OH                                                       ', &
-     '                 NO3 + FORM --> CO + HNO3 + HO2                                                     ', &
-     '                 HO2 + FORM --> HCO3                                                                ', &
-     '                       HCO3 --> HO2 + FORM                                                          ', &
-     '                  HCO3 + NO --> HO2 + FACD + NO2                                                    ', &
-     '                 HCO3 + HO2 --> 0.5 MEPX + 0.2 HO2 + 0.5 FACD + 0.2 OH                              ', &
-     '                   ALD2 + O --> C2O3 + OH                                                           ', &
-     '                  ALD2 + OH --> C2O3                                                                ', &
-     '                 ALD2 + NO3 --> HNO3 + C2O3                                                         ', &
-     '                       ALD2 --> CO + RO2 + MEO2 + HO2                                               ', &
-     '                   ALDX + O --> CXO3 + OH                                                           ', &
-     '                  ALDX + OH --> CXO3                                                                ', &
-     '                 ALDX + NO3 --> CXO3 + HNO3                                                         ', &
-     '                       ALDX --> CO + XO2H + ALD2 + RO2 + HO2                                        ', &
-     '                  GLYD + OH --> 0.2 GLY + 0.8 C2O3 + 0.2 HO2                                        ', &
-     '                       GLYD --> 0.15 MEOH + 0.89 CO + 0.11 XO2H + 0.11 GLY + 0.11 RO2 ... etc.      ', &
-     '                 GLYD + NO3 --> HNO3 + C2O3                                                         ', &
-     '                   GLY + OH --> 1.8 CO + 0.2 XO2 + 0.2 RO2 + HO2                                    ', &
-     '                        GLY --> 2 CO + 2 HO2                                                        ', &
-     '                  GLY + NO3 --> 1.5 CO + 0.5 XO2 + HNO3 + 0.5 RO2 + HO2                             ', &
-     '                       MGLY --> CO + C2O3 + HO2                                                     ', &
-     '                 MGLY + NO3 --> XO2 + HNO3 + RO2 + C2O3                                             ' /)
+     '                    NTR1 + OH --> NTR2                                                              ', &
+     '                         NTR1 --> NO2                                                               ', &
+     '                    FACD + OH --> HO2                                                               ', &
+     '                    AACD + OH --> RO2 + MEO2                                                        ', &
+     '                    PACD + OH --> C2O3                                                              ', &
+     '                    OH + FORM --> CO + HO2                                                          ', &
+     '                         FORM --> CO + 2 HO2                                                        ', &
+     '                         FORM --> CO                                                                ', &
+     '                     O + FORM --> CO + HO2 + OH                                                     ', &
+     '                   NO3 + FORM --> CO + HNO3 + HO2                                                   ', &
+     '                   HO2 + FORM --> HCO3                                                              ', &
+     '                         HCO3 --> HO2 + FORM                                                        ', &
+     '                    HCO3 + NO --> FACD + HO2 + NO2                                                  ', &
+     '                   HCO3 + HO2 --> 0.5 MEPX + 0.5 FACD + 0.2 HO2 + 0.2 OH                            ', &
+     '                     ALD2 + O --> C2O3 + OH                                                         ', &
+     '                    ALD2 + OH --> C2O3                                                              ', &
+     '                   ALD2 + NO3 --> HNO3 + C2O3                                                       ', &
+     '                         ALD2 --> CO + HO2 + RO2 + MEO2                                             ', &
+     '                     ALDX + O --> CXO3 + OH                                                         ', &
+     '                    ALDX + OH --> CXO3                                                              ', &
+     '                   ALDX + NO3 --> CXO3 + HNO3                                                       ', &
+     '                         ALDX --> CO + XO2H + ALD2 + HO2 + RO2                                      ', &
+     '                    GLYD + OH --> 0.2 GLY + 0.2 HO2 + 0.8 C2O3                                      ', &
+     '                         GLYD --> 0.15 MEOH + 0.89 CO + 0.11 XO2H + 0.11 GLY + 1.4 HO2 ... etc.     ', &
+     '                   GLYD + NO3 --> HNO3 + C2O3                                                       ', &
+     '                     GLY + OH --> 1.8 CO + 0.2 XO2 + HO2 + 0.2 RO2                                  ', &
+     '                          GLY --> 2 CO + 2 HO2                                                      ', &
+     '                    GLY + NO3 --> 1.5 CO + 0.5 XO2 + HNO3 + HO2 + 0.5 RO2                           ', &
+     '                         MGLY --> CO + HO2 + C2O3                                                   ', &
+     '                   MGLY + NO3 --> XO2 + HNO3 + C2O3 + RO2                                           ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_4 = (/ &
-     '                  MGLY + OH --> CO + C2O3                                                           ', &
-     '                    OH + H2 --> HO2                                                                 ', &
-     '                    CO + OH --> HO2                                                                 ', &
-     '                   OH + CH4 --> RO2 + MEO2                                                          ', &
-     '                  ETHA + OH --> 0.009 XO2N + 0.991 XO2H + 0.991 ALD2 + RO2                          ', &
-     '                  MEOH + OH --> HO2 + FORM                                                          ', &
-     '                  ETOH + OH --> 0.1 XO2H + 0.95 ALD2 + 0.011 GLYD + 0.1 RO2 + 0.9 HO2 ... etc.      ', &
-     '                        KET --> 0.5 XO2H + 0.5 ALD2 - -2.5 PAR + 0.5 CXO3 + RO2 + 0.5 C2O3 ... etc. ', &
-     '                       ACET --> 0.38 CO + 1.38 RO2 + 0.62 C2O3 + 1.38 MEO2                          ', &
-     '                  ACET + OH --> XO2 + RO2 + C2O3 + FORM                                             ', &
-     '                  PRPA + OH --> XPRP                                                                ', &
-     '                   PAR + OH --> XPAR                                                                ', &
-     '                        ROR --> 0.2 KET + 0.42 ACET + 0.02 ROR + 0.04 XO2N + 0.37 ALDX ... etc.     ', &
-     '                   ROR + O2 --> KET + HO2                                                           ', &
-     '                  ROR + NO2 --> NTR1                                                                ', &
-     '                  ETHY + OH --> 0.3 CO + 0.7 GLY + 0.3 HO2 + 0.3 FACD + 0.7 OH                      ', &
-     '                    ETH + O --> CO + 0.7 XO2H + 0.7 RO2 + HO2 + FORM + 0.3 OH                       ', &
-     '                   ETH + OH --> XO2H + 0.22 GLYD + RO2 + 1.56 FORM                                  ', &
-     '                   ETH + O3 --> 0.35 CO + 0.27 HO2 + 0.42 FACD + FORM + 0.17 OH                     ', &
-     '                  ETH + NO3 --> 0.5 NTR1 + 0.5 XO2H + 0.5 XO2 + RO2 + 1.125 FORM + 0.5 NO2 ... etc. ', &
-     '                    OLE + O --> 0.2 CO + 0.01 XO2N + 0.3 ALDX + 0.2 XO2H + 0.2 ALD2 ... etc.        ', &
-     '                   OLE + OH --> 0.024 XO2N + 0.488 ALDX + 0.976 XO2H + 0.195 XO2 + 0.488 ALD2 ... et', &
-     '                   OLE + O3 --> 0.378 CO + 0.27 ALDX + 0.15 XO2H + 0.295 ALD2 - -0.79 PAR ... etc.  ', &
-     '                  OLE + NO3 --> 0.5 NTR1 + 0.04 XO2N + 0.375 ALDX + 0.48 XO2H + 0.48 XO2 ... etc.   ', &
-     '                   IOLE + O --> 0.1 CO + 0.66 ALDX + 0.1 XO2H + 1.24 ALD2 + 0.1 PAR ... etc.        ', &
-     '                  IOLE + OH --> 0.7 ALDX + XO2H + 1.3 ALD2 + RO2                                    ', &
-     '                  IOLE + O3 --> 0.245 CO + 0.442 ALDX + 0.3 XO2H + 0.732 ALD2 + 0.29 PAR ... etc.   ', &
-     '                 IOLE + NO3 --> 0.5 NTR1 + 0.04 XO2N + 0.625 ALDX + 0.48 XO2H + 0.48 XO2 ... etc.   ', &
-     '                  ISOP + OH --> ISOPRXN + ISO2 + RO2                                                ', &
-     '                   ISOP + O --> 0.25 XO2 + 0.25 PAR + 0.75 ISPD + 0.25 CXO3 + 0.25 RO2 ... etc.     ' /)
+     '                    MGLY + OH --> CO + C2O3                                                         ', &
+     '                      OH + H2 --> HO2                                                               ', &
+     '                      CO + OH --> HO2                                                               ', &
+     '                     OH + CH4 --> RO2 + MEO2                                                        ', &
+     '                    ETHA + OH --> 0.009 XO2N + 0.991 XO2H + 0.991 ALD2 + RO2                        ', &
+     '                    MEOH + OH --> HO2 + FORM                                                        ', &
+     '                    ETOH + OH --> 0.1 XO2H + 0.95 ALD2 + 0.011 GLYD + 0.9 HO2 + 0.1 RO2 ... etc.    ', &
+     '                          KET --> 0.5 XO2H + 0.5 ALD2 - -2.5 PAR + 0.5 CXO3 + 0.5 C2O3 ... etc.     ', &
+     '                         ACET --> 0.38 CO + 0.62 C2O3 + 1.38 RO2 + 1.38 MEO2                        ', &
+     '                    ACET + OH --> XO2 + C2O3 + RO2 + FORM                                           ', &
+     '                    PRPA + OH --> XPRP                                                              ', &
+     '                     PAR + OH --> XPAR                                                              ', &
+     '                          ROR --> 0.2 KET + 0.42 ACET + 0.02 ROR + 0.04 XO2N + 0.37 ALDX ... etc.   ', &
+     '                     ROR + O2 --> KET + HO2                                                         ', &
+     '                    ROR + NO2 --> NTR1                                                              ', &
+     '                    ETHY + OH --> 0.3 CO + 0.7 GLY + 0.3 FACD + 0.3 HO2 + 0.7 OH                    ', &
+     '                      ETH + O --> CO + 0.7 XO2H + HO2 + 0.7 RO2 + 0.3 OH + FORM                     ', &
+     '                     ETH + OH --> XO2H + 0.22 GLYD + RO2 + 1.56 FORM                                ', &
+     '                     ETH + O3 --> 0.35 CO + 0.42 FACD + 0.27 HO2 + 0.17 OH + FORM                   ', &
+     '                    ETH + NO3 --> 0.5 NTR1 + 0.5 XO2H + 0.5 XO2 + RO2 + 0.5 NO2 + 1.125 FORM ... etc', &
+     '                      OLE + O --> 0.2 CO + 0.01 XO2N + 0.3 ALDX + 0.2 XO2H + 0.2 ALD2 ... etc.      ', &
+     '                     OLE + OH --> 0.024 XO2N + 0.488 ALDX + 0.976 XO2H + 0.195 XO2 + 0.488 ALD2 ... ', &
+     '                     OLE + O3 --> 0.378 CO + 0.27 ALDX + 0.15 XO2H + 0.295 ALD2 - -0.79 PAR ... etc.', &
+     '                    OLE + NO3 --> 0.5 NTR1 + 0.04 XO2N + 0.375 ALDX + 0.48 XO2H + 0.48 XO2 ... etc. ', &
+     '                     IOLE + O --> 0.1 CO + 0.66 ALDX + 0.1 XO2H + 1.24 ALD2 + 0.1 PAR ... etc.      ', &
+     '                    IOLE + OH --> 0.7 ALDX + XO2H + 1.3 ALD2 + RO2                                  ', &
+     '                    IOLE + O3 --> 0.245 CO + 0.442 ALDX + 0.3 XO2H + 0.732 ALD2 + 0.29 PAR ... etc. ', &
+     '                   IOLE + NO3 --> 0.5 NTR1 + 0.04 XO2N + 0.625 ALDX + 0.48 XO2H + 0.48 XO2 ... etc. ', &
+     '                    ISOP + OH --> ISOPRXN + ISO2 + RO2                                              ', &
+     '                     ISOP + O --> 0.25 XO2 + 0.25 PAR + 0.75 ISPD + 0.25 CXO3 + 0.25 HO2 ... etc.   ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_5 = (/ &
-     '                  ISO2 + NO --> 0.1 INTR + 0.082 XO2H + 0.9 ISPD + 0.082 RO2 + 0.818 HO2 ... etc.   ', &
-     '                 ISO2 + HO2 --> 0.88 ISPX + 0.12 ISPD + 0.12 HO2 + 0.12 FORM + 0.12 OH ... etc.     ', &
-     '                ISO2 + C2O3 --> 0.072 XO2H + ISPD + 0.2 AACD + 0.872 RO2 + 0.8 MEO2 ... etc.        ', &
-     '                 ISO2 + RO2 --> 0.072 XO2H + ISPD + 1.072 RO2 + 0.728 HO2 + 0.598 FORM ... etc.     ', &
-     '                       ISO2 --> HPLD + HO2                                                          ', &
-     '                  ISOP + O3 --> 0.066 CO + 0.15 ALDX + 0.2 XO2 + 0.35 PAR + 0.65 ISPD ... etc.      ', &
-     '                 ISOP + NO3 --> ISOPRXN + 0.65 NTR2 + 0.03 XO2N + 0.64 XO2H + 0.33 XO2 ... etc.     ', &
-     '                  ISPD + OH --> 0.137 ACET + 0.137 CO + 0.022 XO2N + 0.521 XO2 + 0.117 PAR ... etc. ', &
-     '                  ISPD + O3 --> 0.17 ACET + 0.543 CO + 0.04 ALD2 + 0.531 MGLY + 0.17 GLY ... etc.   ', &
-     '                 ISPD + NO3 --> 0.142 NTR2 + 0.142 XO2H + 0.142 XO2 + 0.717 PAR + 0.717 CXO3 ... etc', &
-     '                       ISPD --> 0.17 ACET + 0.34 XO2H + 0.16 XO2 + 0.24 OLE + 0.24 PAR ... etc.     ', &
-     '                  ISPX + OH --> 0.029 IOLE + 0.029 ALDX + 0.067 ISO2 + 0.067 RO2 + 0.904 EPOX ... et', &
-     '                       HPLD --> ISPD + OH                                                           ', &
-     '                 HPLD + NO3 --> ISPD + HNO3                                                         ', &
-     '                  EPOX + OH --> EPX2 + RO2                                                          ', &
-     '                 EPX2 + HO2 --> 0.251 CO + 2.175 PAR + 0.275 MGLY + 0.275 GLY + 0.275 GLYD ... etc. ', &
-     '                  EPX2 + NO --> 0.251 CO + 2.175 PAR + 0.275 MGLY + 0.275 GLY + 0.275 GLYD ... etc. ', &
-     '                EPX2 + C2O3 --> 0.2 CO + 1.74 PAR + 0.22 MGLY + 0.22 GLY + 0.22 GLYD ... etc.       ', &
-     '                 EPX2 + RO2 --> 0.251 CO + 2.175 PAR + 0.275 MGLY + 0.275 GLY + 0.275 GLYD ... etc. ', &
-     '                  INTR + OH --> 0.266 NTR2 + 0.104 INTR + 0.078 ALDX + 0.37 XO2H + 0.63 XO2 ... etc.', &
-     '                   TERP + O --> TRPRXN + 0.15 ALDX + 5.12 PAR                                       ', &
-     '                  TERP + OH --> TRPRXN + 0.25 XO2N + 0.47 ALDX + 0.75 XO2H + 0.5 XO2 ... etc.       ', &
-     '                  TERP + O3 --> TRPRXN + 0.001 CO + 0.18 XO2N + 0.21 ALDX + 0.07 XO2H ... etc.      ', &
-     '                 TERP + NO3 --> TERPNRO2 + 0.53 NTR2 + 0.25 XO2N + 0.47 ALDX + 0.28 XO2H ... etc.   ', &
-     '                   APIN + O --> TRPRXN + 0.15 ALDX + 5.12 PAR                                       ', &
-     '                  APIN + OH --> TRPRXN + 0.25 XO2N + 0.47 ALDX + 0.75 XO2H + 0.5 XO2 ... etc.       ', &
-     '                  APIN + O3 --> TRPRXN + 0.001 CO + 0.18 XO2N + 0.21 ALDX + 0.07 XO2H ... etc.      ', &
-     '                 APIN + NO3 --> 0.53 NTR2 + 0.25 XO2N + 0.47 ALDX + 0.28 XO2H + 0.75 XO2 ... etc.   ', &
-     '               BENZENE + OH --> BENZRO2 + 0.352 BZO2 + 0.53 CRES + 0.118 OPEN + 0.352 RO2 ... etc.  ', &
-     '                  BZO2 + NO --> 0.082 NTR2 + 0.918 OPEN + 0.918 GLY + 0.918 HO2 + 0.918 NO2 ... etc.' /)
+     '                    ISO2 + NO --> 0.1 INTR + 0.082 XO2H + 0.9 ISPD + 0.818 HO2 + 0.082 RO2 ... etc. ', &
+     '                   ISO2 + HO2 --> 0.88 ISPX + 0.12 ISPD + 0.12 HO2 + 0.12 OH + 0.12 FORM ... etc.   ', &
+     '                  ISO2 + C2O3 --> 0.072 XO2H + ISPD + 0.2 AACD + 0.728 HO2 + 0.872 RO2 ... etc.     ', &
+     '                   ISO2 + RO2 --> 0.072 XO2H + ISPD + 0.728 HO2 + 1.072 RO2 + 0.598 FORM ... etc.   ', &
+     '                         ISO2 --> HPLD + HO2                                                        ', &
+     '                    ISOP + O3 --> 0.066 CO + 0.15 ALDX + 0.2 XO2 + 0.35 PAR + 0.65 ISPD ... etc.    ', &
+     '                   ISOP + NO3 --> ISOPRXN + 0.65 NTR2 + 0.03 XO2N + 0.64 XO2H + 0.33 XO2 ... etc.   ', &
+     '                    ISPD + OH --> 0.137 ACET + 0.137 CO + 0.022 XO2N + 0.521 XO2 + 0.117 PAR ... etc', &
+     '                    ISPD + O3 --> 0.17 ACET + 0.543 CO + 0.04 ALD2 + 0.531 MGLY + 0.17 GLY ... etc. ', &
+     '                   ISPD + NO3 --> 0.142 NTR2 + 0.142 XO2H + 0.142 XO2 + 0.717 PAR + 0.717 CXO3 ... e', &
+     '                         ISPD --> 0.17 ACET + 0.34 XO2H + 0.16 XO2 + 0.24 OLE + 0.24 PAR ... etc.   ', &
+     '                    ISPX + OH --> 0.029 IOLE + 0.029 ALDX + 0.067 ISO2 + 0.067 RO2 + 0.933 OH ... et', &
+     '                         HPLD --> ISPD + OH                                                         ', &
+     '                   HPLD + NO3 --> ISPD + HNO3                                                       ', &
+     '                    OH + EPOX --> EPX2 + RO2                                                        ', &
+     '                   EPX2 + HO2 --> 0.251 CO + 2.175 PAR + 0.275 MGLY + 0.275 GLY + 0.275 GLYD ... etc', &
+     '                    EPX2 + NO --> 0.251 CO + 2.175 PAR + 0.275 MGLY + 0.275 GLY + 0.275 GLYD ... etc', &
+     '                  EPX2 + C2O3 --> 0.2 CO + 1.74 PAR + 0.22 MGLY + 0.22 GLY + 0.22 GLYD ... etc.     ', &
+     '                   EPX2 + RO2 --> 0.251 CO + 2.175 PAR + 0.275 MGLY + 0.275 GLY + 0.275 GLYD ... etc', &
+     '                    INTR + OH --> 0.266 NTR2 + 0.104 INTR + 0.078 ALDX + 0.37 XO2H + 0.63 XO2 ... et', &
+     '                     TERP + O --> TRPRXN + 0.15 ALDX + 5.12 PAR                                     ', &
+     '                    TERP + OH --> TRPRXN + 0.25 XO2N + 0.47 ALDX + 0.75 XO2H + 0.5 XO2 ... etc.     ', &
+     '                    TERP + O3 --> TRPRXN + 0.001 CO + 0.18 XO2N + 0.21 ALDX + 0.07 XO2H ... etc.    ', &
+     '                   TERP + NO3 --> TERPNRO2 + 0.53 NTR2 + 0.25 XO2N + 0.47 ALDX + 0.28 XO2H ... etc. ', &
+     '                     APIN + O --> TRPRXN + 0.15 ALDX + 5.12 PAR                                     ', &
+     '                    APIN + OH --> TRPRXN + 0.25 XO2N + 0.47 ALDX + 0.75 XO2H + 0.5 XO2 ... etc.     ', &
+     '                    APIN + O3 --> TRPRXN + 0.001 CO + 0.18 XO2N + 0.21 ALDX + 0.07 XO2H ... etc.    ', &
+     '                   APIN + NO3 --> 0.53 NTR2 + 0.25 XO2N + 0.47 ALDX + 0.28 XO2H + 0.75 XO2 ... etc. ', &
+     '                 BENZENE + OH --> BENZRO2 + 0.352 BZO2 + 0.53 CRES + 0.118 OPEN + 0.53 HO2 ... etc. ', &
+     '                    BZO2 + NO --> 0.082 NTR2 + 0.918 OPEN + 0.918 GLY + 0.918 HO2 + 0.918 NO2 ... et' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_6 = (/ &
-     '                BZO2 + C2O3 --> OPEN + GLY + RO2 + MEO2 + HO2                                       ', &
-     '                 BZO2 + HO2 --> DUMMY                                                               ', &
-     '                 BZO2 + RO2 --> OPEN + GLY + RO2 + HO2                                              ', &
-     '                   TOL + OH --> TOLRO2 + 0.65 TO2 + 0.18 CRES + 0.1 OPEN + 0.07 XO2H ... etc.       ', &
-     '                   TO2 + NO --> 0.14 NTR2 + 0.2 XOPN + 0.66 OPEN + 0.443 MGLY + 0.417 GLY ... etc.  ', &
-     '                 TO2 + C2O3 --> 0.23 XOPN + 0.77 OPEN + 0.52 MGLY + 0.48 GLY + RO2 + MEO2 ... etc.  ', &
-     '                  TO2 + HO2 --> DUMMY                                                               ', &
-     '                  TO2 + RO2 --> 0.23 XOPN + 0.77 OPEN + 0.52 MGLY + 0.48 GLY + RO2 + HO2 ... etc.   ', &
-     '                 XYLMN + OH --> XYLRO2 + 0.544 XLO2 + 0.155 CRES + 0.244 XOPN + 0.058 XO2H ... etc. ', &
-     '                  NAPH + OH --> PAHRO2 + 0.544 XLO2 + 0.155 CRES + 0.244 XOPN + 0.058 XO2H ... etc. ', &
-     '                  XLO2 + NO --> 0.14 NTR2 + 0.56 XOPN + 0.3 OPEN + 0.675 MGLY + 0.221 GLY ... etc.  ', &
-     '                 XLO2 + HO2 --> DUMMY                                                               ', &
-     '                XLO2 + C2O3 --> 0.65 XOPN + 0.35 OPEN + 0.77 MGLY + 0.26 GLY + RO2 + MEO2 ... etc.  ', &
-     '                 XLO2 + RO2 --> 0.65 XOPN + 0.35 OPEN + 0.77 MGLY + 0.26 GLY + RO2 + HO2 ... etc.   ', &
-     '                  CRES + OH --> 0.732 CAT1 + 0.2 CRO + 0.025 OPEN + 0.02 XO2N + 0.025 GLY ... etc.  ', &
-     '                 CRES + NO3 --> 0.3 CRO + 0.1 XO2N + 0.12 XO2H + 0.48 XO2 + 0.48 OPO3 ... etc.      ', &
-     '                  CRO + NO2 --> CRON                                                                ', &
-     '                  CRO + HO2 --> CRES                                                                ', &
-     '                  CRON + OH --> NTR2 + 0.5 CRO                                                      ', &
-     '                 CRON + NO3 --> NTR2 + 0.5 CRO + HNO3                                               ', &
-     '                       CRON --> OPEN + HO2 + HONO + FORM                                            ', &
-     '                       XOPN --> 0.7 CO + XO2H + 0.4 GLY + 0.3 C2O3 + 0.7 HO2                        ', &
-     '                  XOPN + OH --> 2 XO2H + MGLY + 0.4 GLY + 2 RO2                                     ', &
-     '                  XOPN + O3 --> 0.5 CO + 0.3 XO2H + 0.1 ALD2 + 1.2 MGLY + 0.3 RO2 + 0.6 C2O3 ... etc', &
-     '                 XOPN + NO3 --> 0.5 NTR2 + 0.25 OPEN + 0.1 XO2N + 0.45 XO2H + 0.45 XO2 ... etc.     ', &
-     '                       OPEN --> CO + OPO3 + HO2                                                     ', &
-     '                  OPEN + OH --> 0.4 XO2H + 0.6 OPO3 + 0.4 GLY + 0.4 RO2                             ', &
-     '                  OPEN + O3 --> 1.98 CO + 0.02 ALD2 + 0.24 MGLY + 1.4 GLY + 0.12 C2O3 ... etc.      ', &
-     '                 OPEN + NO3 --> OPO3 + HNO3                                                         ', &
-     '                  CAT1 + OH --> 0.5 CRO + 0.2 HO2 + 0.14 FORM                                       ' /)
+     '                  BZO2 + C2O3 --> OPEN + GLY + HO2 + RO2 + MEO2                                     ', &
+     '                   BZO2 + HO2 --> DUMMY                                                             ', &
+     '                   BZO2 + RO2 --> OPEN + GLY + HO2 + RO2                                            ', &
+     '                     TOL + OH --> TOLRO2 + 0.65 TO2 + 0.18 CRES + 0.1 OPEN + 0.07 XO2H ... etc.     ', &
+     '                     TO2 + NO --> 0.14 NTR2 + 0.2 XOPN + 0.66 OPEN + 0.443 MGLY + 0.417 GLY ... etc.', &
+     '                   TO2 + C2O3 --> 0.23 XOPN + 0.77 OPEN + 0.52 MGLY + 0.48 GLY + HO2 + RO2 ... etc. ', &
+     '                    TO2 + HO2 --> DUMMY                                                             ', &
+     '                    TO2 + RO2 --> 0.23 XOPN + 0.77 OPEN + 0.52 MGLY + 0.48 GLY + HO2 + RO2 ... etc. ', &
+     '                   XYLMN + OH --> XYLRO2 + 0.544 XLO2 + 0.155 CRES + 0.244 XOPN + 0.058 XO2H ... etc', &
+     '                    NAPH + OH --> PAHRO2 + 0.544 XLO2 + 0.155 CRES + 0.244 XOPN + 0.058 XO2H ... etc', &
+     '                    XLO2 + NO --> 0.14 NTR2 + 0.56 XOPN + 0.3 OPEN + 0.675 MGLY + 0.221 GLY ... etc.', &
+     '                   XLO2 + HO2 --> DUMMY                                                             ', &
+     '                  XLO2 + C2O3 --> 0.65 XOPN + 0.35 OPEN + 0.77 MGLY + 0.26 GLY + HO2 + RO2 ... etc. ', &
+     '                   XLO2 + RO2 --> 0.65 XOPN + 0.35 OPEN + 0.77 MGLY + 0.26 GLY + HO2 + RO2 ... etc. ', &
+     '                    CRES + OH --> 0.732 CAT1 + 0.2 CRO + 0.025 OPEN + 0.02 XO2N + 0.025 GLY ... etc.', &
+     '                   CRES + NO3 --> 0.3 CRO + 0.1 XO2N + 0.12 XO2H + 0.48 XO2 + 0.48 OPO3 ... etc.    ', &
+     '                    CRO + NO2 --> CRON                                                              ', &
+     '                    CRO + HO2 --> CRES                                                              ', &
+     '                    CRON + OH --> NTR2 + 0.5 CRO                                                    ', &
+     '                   CRON + NO3 --> NTR2 + 0.5 CRO + HNO3                                             ', &
+     '                         CRON --> OPEN + HO2 + HONO + FORM                                          ', &
+     '                         XOPN --> 0.7 CO + XO2H + 0.4 GLY + 0.7 HO2 + 0.3 C2O3                      ', &
+     '                    XOPN + OH --> 2 XO2H + MGLY + 0.4 GLY + 2 RO2                                   ', &
+     '                    XOPN + O3 --> 0.5 CO + 0.3 XO2H + 0.1 ALD2 + 1.2 MGLY + 0.6 C2O3 + 0.3 RO2 ... e', &
+     '                   XOPN + NO3 --> 0.5 NTR2 + 0.25 OPEN + 0.1 XO2N + 0.45 XO2H + 0.45 XO2 ... etc.   ', &
+     '                         OPEN --> CO + OPO3 + HO2                                                   ', &
+     '                    OPEN + OH --> 0.4 XO2H + 0.6 OPO3 + 0.4 GLY + 0.4 RO2                           ', &
+     '                    OPEN + O3 --> 1.98 CO + 0.02 ALD2 + 0.24 MGLY + 1.4 GLY + 0.56 HO2 ... etc.     ', &
+     '                   OPEN + NO3 --> OPO3 + HNO3                                                       ', &
+     '                    CAT1 + OH --> 0.5 CRO + 0.2 HO2 + 0.14 FORM                                     ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_7 = (/ &
-     '                 CAT1 + NO3 --> CRO + HNO3                                                          ', &
-     '                  OPO3 + NO --> 0.5 CO + 0.2 CXO3 + 0.5 GLY + 0.8 HO2 + NO2                         ', &
-     '                 OPO3 + NO2 --> OPAN                                                                ', &
-     '                       OPAN --> OPO3 + NO2                                                          ', &
-     '                 OPO3 + HO2 --> 0.37 PACD + 0.13 AACD + 0.5 RO2 + 0.5 MEO2 + 0.13 O3 ... etc.       ', &
-     '                OPO3 + C2O3 --> ALDX + XO2 + 2 RO2 + MEO2                                           ', &
-     '                 OPO3 + RO2 --> 0.8 ALDX + 0.8 XO2H + 0.2 AACD + 1.8 RO2                            ', &
-     '                  OPAN + OH --> 0.5 NTR2 + CO + 0.5 GLY + 0.5 NO2                                   ', &
-     '                  PANX + OH --> ALD2 + NO2                                                          ', &
-     '                  ECH4 + OH --> RO2 + MEO2                                                          ', &
-     '                       XPRP --> XO2N + RO2                                                          ', &
-     '                       XPRP --> 0.732 ACET + 0.268 ALDX + XO2H + 0.268 PAR + RO2                    ', &
-     '                       XPAR --> XO2N + RO2                                                          ', &
-     '                       XPAR --> 0.874 ROR + 0.126 ALDX + 0.126 XO2H + 0.874 XO2 - -0.126 PAR ... etc', &
-     '             OH + NO2 + H2O --> HNO3                                                                ', &
-     '                        CL2 --> 2 CL                                                                ', &
-     '                       HOCL --> CL + OH                                                             ', &
-     '                    CL + O3 --> CLO                                                                 ', &
-     '                      2 CLO --> 0.3 CL2 + 1.4 CL                                                    ', &
-     '                   CLO + NO --> CL + NO2                                                            ', &
-     '                  CLO + HO2 --> HOCL                                                                ', &
-     '                 CLO + MEO2 --> CL + HO2 + FORM                                                     ', &
-     '                  FMCL + OH --> CO + CL                                                             ', &
-     '                       FMCL --> CO + CL + HO2                                                       ', &
-     '                   CL + CH4 --> HCL + RO2 + MEO2                                                    ', &
-     '                   PAR + CL --> XPAR + HCL                                                          ', &
-     '                  PRPA + CL --> ACET + HCL + 0.03 XO2N + 0.97 XO2H + RO2                            ', &
-     '                  ETHA + CL --> HCL + 0.009 XO2N + 0.991 XO2H + 0.991 ALD2 + RO2                    ', &
-     '                   ETH + CL --> FMCL + 2 XO2 + HO2 + FORM                                           ', &
-     '                   OLE + CL --> FMCL + 0.67 ALDX + 2 XO2 + 0.33 ALD2 - PAR + HO2                    ' /)
+     '                   CAT1 + NO3 --> CRO + HNO3                                                        ', &
+     '                    OPO3 + NO --> 0.5 CO + 0.2 CXO3 + 0.5 GLY + 0.8 HO2 + NO2                       ', &
+     '                   OPO3 + NO2 --> OPAN                                                              ', &
+     '                         OPAN --> OPO3 + NO2                                                        ', &
+     '                   OPO3 + HO2 --> 0.37 PACD + 0.13 AACD + 0.5 RO2 + 0.13 O3 + 0.5 MEO2 ... etc.     ', &
+     '                  OPO3 + C2O3 --> ALDX + XO2 + 2 RO2 + MEO2                                         ', &
+     '                   OPO3 + RO2 --> 0.8 ALDX + 0.8 XO2H + 0.2 AACD + 1.8 RO2                          ', &
+     '                    OPAN + OH --> 0.5 NTR2 + CO + 0.5 GLY + 0.5 NO2                                 ', &
+     '                    PANX + OH --> ALD2 + NO2                                                        ', &
+     '                    ECH4 + OH --> RO2 + MEO2                                                        ', &
+     '                         XPRP --> XO2N + RO2                                                        ', &
+     '                         XPRP --> 0.732 ACET + 0.268 ALDX + XO2H + 0.268 PAR + RO2                  ', &
+     '                         XPAR --> XO2N + RO2                                                        ', &
+     '                         XPAR --> 0.874 ROR + 0.126 ALDX + 0.126 XO2H + 0.874 XO2 - -0.126 PAR ... e', &
+     '               NO2 + OH + H2O --> HNO3                                                              ', &
+     '                          CL2 --> 2 CL                                                              ', &
+     '                         HOCL --> CL + OH                                                           ', &
+     '                      CL + O3 --> CLO                                                               ', &
+     '                        2 CLO --> 0.3 CL2 + 1.4 CL                                                  ', &
+     '                     CLO + NO --> CL + NO2                                                          ', &
+     '                    CLO + HO2 --> HOCL                                                              ', &
+     '                   CLO + MEO2 --> CL + HO2 + FORM                                                   ', &
+     '                    FMCL + OH --> CO + CL                                                           ', &
+     '                         FMCL --> CO + CL + HO2                                                     ', &
+     '                     CL + CH4 --> HCL + RO2 + MEO2                                                  ', &
+     '                     PAR + CL --> XPAR + HCL                                                        ', &
+     '                    PRPA + CL --> ACET + HCL + 0.03 XO2N + 0.97 XO2H + RO2                          ', &
+     '                    ETHA + CL --> HCL + 0.009 XO2N + 0.991 XO2H + 0.991 ALD2 + RO2                  ', &
+     '                     ETH + CL --> FMCL + 2 XO2 + HO2 + FORM                                         ', &
+     '                     OLE + CL --> FMCL + 0.67 ALDX + 2 XO2 + 0.33 ALD2 - PAR + HO2                  ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_8 = (/ &
-     '                  IOLE + CL --> 0.7 FMCL + 0.3 HCL + 0.55 ALDX + 1.7 XO2 + 0.45 ALD2 ... etc.       ', &
-     '                  ISOP + CL --> FMCL + 0.04 XO2N + 0.96 XO2H + ISPD + RO2                           ', &
-     '                  CL + FORM --> HCL + CO + HO2                                                      ', &
-     '                  ALD2 + CL --> HCL + C2O3                                                          ', &
-     '                  ALDX + CL --> HCL + CXO3                                                          ', &
-     '                  MEOH + CL --> HCL + HO2 + FORM                                                    ', &
-     '                  ETOH + CL --> HCL + ALD2 + HO2                                                    ', &
-     '                   HCL + OH --> CL                                                                  ', &
-     '                   TOL + CL --> TOLRO2 + HCL + 0.65 TO2 + 0.18 CRES + 0.1 OPEN + 0.07 XO2H ... etc. ', &
-     '                 XYLMN + CL --> XYLRO2 + HCL + 0.544 XLO2 + 0.155 CRES + 0.244 XOPN ... etc.        ', &
-     '                  NAPH + CL --> PAHRO2 + HCL + 0.544 XLO2 + 0.155 CRES + 0.244 XOPN ... etc.        ', &
-     '                      CLNO2 --> CL + NO2                                                            ', &
-     '                  CLO + NO2 --> CLNO3                                                               ', &
-     '                      CLNO3 --> CLO + NO2                                                           ', &
-     '                      CLNO3 --> CL + NO3                                                            ', &
-     '                      CLNO3 --> HOCL + HNO3                                                         ', &
-     '                      CLNO3 --> DUMMY + HOCL + HNO3                                                 ', &
-     '                TOLRO2 + NO --> 0.016 SVAVB2 + 0.051 SVAVB3 + 0.047 SVAVB4 + NO                     ', &
-     '               TOLRO2 + HO2 --> 0.14 SVAVB1 + HO2                                                   ', &
-     '                XYLRO2 + NO --> 0.015 SVAVB2 + 0.023 SVAVB3 + 0.06 SVAVB4 + NO                      ', &
-     '               XYLRO2 + HO2 --> 0.193 SVAVB1 + HO2                                                  ', &
-     '               BENZRO2 + NO --> 0.034 SVAVB2 + 0.392 SVAVB4 + NO                                    ', &
-     '              BENZRO2 + HO2 --> 0.146 SVAVB1 + HO2                                                  ', &
-     '                  SESQ + O3 --> SESQRXN + O3                                                        ', &
-     '                  SESQ + OH --> SESQRXN + OH                                                        ', &
-     '                 SESQ + NO3 --> SESQRXN + NO3                                                       ', &
-     '                PAHRO2 + NO --> 0.028 SVAVB2 + 0.225 SVAVB3 + 0.191 SVAVB4 + NO                     ', &
-     '               PAHRO2 + HO2 --> 0.473 SVAVB1 + HO2                                                  ', &
-     '                SOAALK + OH --> 0.006 SVAVB2 + 0.052 SVAVB3 + 0.081 SVAVB4 + OH                     ', &
-     '                       NTR2 --> HNO3                                                                ' /)
+     '                    IOLE + CL --> 0.7 FMCL + 0.3 HCL + 0.55 ALDX + 1.7 XO2 + 0.45 ALD2 ... etc.     ', &
+     '                    ISOP + CL --> FMCL + 0.04 XO2N + 0.96 XO2H + ISPD + RO2                         ', &
+     '                    CL + FORM --> CO + HCL + HO2                                                    ', &
+     '                    ALD2 + CL --> HCL + C2O3                                                        ', &
+     '                    ALDX + CL --> HCL + CXO3                                                        ', &
+     '                    MEOH + CL --> HCL + HO2 + FORM                                                  ', &
+     '                    ETOH + CL --> HCL + ALD2 + HO2                                                  ', &
+     '                     HCL + OH --> CL                                                                ', &
+     '                     TOL + CL --> TOLRO2 + HCL + 0.65 TO2 + 0.18 CRES + 0.1 OPEN + 0.07 XO2H ... etc', &
+     '                   XYLMN + CL --> XYLRO2 + HCL + 0.544 XLO2 + 0.155 CRES + 0.244 XOPN ... etc.      ', &
+     '                    NAPH + CL --> PAHRO2 + HCL + 0.544 XLO2 + 0.155 CRES + 0.244 XOPN ... etc.      ', &
+     '                        CLNO2 --> CL + NO2                                                          ', &
+     '                    CLO + NO2 --> CLNO3                                                             ', &
+     '                        CLNO3 --> CLO + NO2                                                         ', &
+     '                        CLNO3 --> CL + NO3                                                          ', &
+     '                        CLNO3 --> HOCL + HNO3                                                       ', &
+     '                        CLNO3 --> DUMMY + HOCL + HNO3                                               ', &
+     '                  TOLRO2 + NO --> 0.016 SVAVB2 + 0.051 SVAVB3 + 0.047 SVAVB4 + NO                   ', &
+     '                 TOLRO2 + HO2 --> 0.14 SVAVB1 + HO2                                                 ', &
+     '                  XYLRO2 + NO --> 0.015 SVAVB2 + 0.023 SVAVB3 + 0.06 SVAVB4 + NO                    ', &
+     '                 XYLRO2 + HO2 --> 0.193 SVAVB1 + HO2                                                ', &
+     '                 BENZRO2 + NO --> 0.034 SVAVB2 + 0.392 SVAVB4 + NO                                  ', &
+     '                BENZRO2 + HO2 --> 0.146 SVAVB1 + HO2                                                ', &
+     '                    SESQ + O3 --> SESQRXN + O3                                                      ', &
+     '                    SESQ + OH --> SESQRXN + OH                                                      ', &
+     '                   SESQ + NO3 --> SESQRXN + NO3                                                     ', &
+     '                  PAHRO2 + NO --> 0.028 SVAVB2 + 0.225 SVAVB3 + 0.191 SVAVB4 + NO                   ', &
+     '                 PAHRO2 + HO2 --> 0.473 SVAVB1 + HO2                                                ', &
+     '                  SOAALK + OH --> 0.006 SVAVB2 + 0.052 SVAVB3 + 0.081 SVAVB4 + OH                   ', &
+     '                         NTR2 --> HNO3                                                              ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_9 = (/ &
-     '                       N2O5 --> H2NO3PIJ + HNO3                                                     ', &
-     '                       N2O5 --> H2NO3PK + HNO3                                                      ', &
-     '                   H2NO3PIJ --> HNO3                                                                ', &
-     '                    H2NO3PK --> HNO3                                                                ', &
-     '            ACLI + H2NO3PIJ --> CLNO2                                                               ', &
-     '            ACLJ + H2NO3PIJ --> CLNO2                                                               ', &
-     '             ACLK + H2NO3PK --> CLNO2                                                               ', &
-     '                        NO2 --> 0.5 HNO3 + 0.5 HONO                                                 ', &
-     '                         O3 --> DUMMY                                                               ', &
-     '                       EPOX --> IEPOXP                                                              ', &
-     '             ASO4J + IEPOXP --> AISO3J                                                              ', &
-     '                     IEPOXP --> AISO3J                                                              ', &
-     '                        GLY --> AGLYJ                                                               ', &
-     '                       MGLY --> AGLYJ                                                               ', &
-     '              TERPNRO2 + NO --> 0.688 MTNO3 + NO                                                    ', &
-     '             TERPNRO2 + HO2 --> MTNO3 + HO2                                                         ', &
-     '             TERPNRO2 + NO3 --> 0.422 MTNO3 + NO3                                                   ', &
-     '             TERPNRO2 + RO2 --> 0.711 MTNO3 + RO2                                                   ', &
-     '                 MTNO3 + CL --> 0.37 MTNO3 + CL                                                     ', &
-     '                 MTNO3 + OH --> 0.24 MTNO3 + OH                                                     ', &
-     '                      MTNO3 --> DUMMY                                                               ', &
-     '                    AMTNO3J --> AMTHYDJ                                                             ', &
-     '                     AAVB2J --> 0.907 AOLGAJ                                                        ', &
-     '                     AAVB3J --> 0.925 AOLGAJ                                                        ', &
-     '                     AAVB4J --> 0.943 AOLGAJ                                                        ', &
-     '                     AISO1J --> 0.5 AOLGBJ                                                          ', &
-     '                     AISO2J --> 0.5 AOLGBJ                                                          ', &
-     '                      ASQTJ --> 1.5 AOLGBJ                                                          ', &
-     '                 APOCI + OH --> APOCI + 1.25 APNCOMI + OH                                           ', &
-     '               APNCOMI + OH --> OH                                                                  ' /)
+     '                         N2O5 --> H2NO3PIJ + HNO3                                                   ', &
+     '                         N2O5 --> H2NO3PK + HNO3                                                    ', &
+     '                     H2NO3PIJ --> HNO3                                                              ', &
+     '                      H2NO3PK --> HNO3                                                              ', &
+     '              ACLI + H2NO3PIJ --> CLNO2                                                             ', &
+     '              ACLJ + H2NO3PIJ --> CLNO2                                                             ', &
+     '               ACLK + H2NO3PK --> CLNO2                                                             ', &
+     '                          NO2 --> 0.5 HNO3 + 0.5 HONO                                               ', &
+     '                           O3 --> DUMMY                                                             ', &
+     '                         EPOX --> IEPOXP                                                            ', &
+     '               ASO4J + IEPOXP --> AISO3J                                                            ', &
+     '                       IEPOXP --> AISO3J                                                            ', &
+     '                          GLY --> AGLYJ                                                             ', &
+     '                         MGLY --> AGLYJ                                                             ', &
+     '                TERPNRO2 + NO --> 0.688 MTNO3 + NO                                                  ', &
+     '               TERPNRO2 + HO2 --> MTNO3 + HO2                                                       ', &
+     '               TERPNRO2 + NO3 --> 0.422 MTNO3 + NO3                                                 ', &
+     '               TERPNRO2 + RO2 --> 0.711 MTNO3 + RO2                                                 ', &
+     '                   MTNO3 + CL --> 0.37 MTNO3 + CL                                                   ', &
+     '                   MTNO3 + OH --> 0.24 MTNO3 + OH                                                   ', &
+     '                        MTNO3 --> DUMMY                                                             ', &
+     '                      AMTNO3J --> AMTHYDJ                                                           ', &
+     '                       AAVB2J --> 0.907 AOLGAJ                                                      ', &
+     '                       AAVB3J --> 0.925 AOLGAJ                                                      ', &
+     '                       AAVB4J --> 0.943 AOLGAJ                                                      ', &
+     '                       AISO1J --> 0.5 AOLGBJ                                                        ', &
+     '                       AISO2J --> 0.5 AOLGBJ                                                        ', &
+     '                        ASQTJ --> 1.5 AOLGBJ                                                        ', &
+     '                   APOCI + OH --> APOCI + 1.25 APNCOMI + OH                                         ', &
+     '                 APNCOMI + OH --> OH                                                                ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_10 = (/ &
-     '                 APOCJ + OH --> APOCJ + 1.25 APNCOMJ + OH                                           ', &
-     '               APNCOMJ + OH --> OH                                                                  ', &
-     '                 PCVOC + OH --> PCSOARXN + OH                                                       ', &
-     '                VLVPO1 + OH --> 0.0023 VIVPO1 + 0.0025 VSVPO2 + 0.0026 VSVPO3 + 0.0062 VSVPO1 ... et', &
-     '                VSVPO1 + OH --> 0.0041 VSVPO2 + 0.0035 VSVPO3 + 0.2862 VSVPO1 + 0.3003 VLVPO1 ... et', &
-     '                VSVPO2 + OH --> 0.1373 VSVPO2 + 0.0005 VSVPO3 + 0.095 VSVPO1 + 0.3856 VLVPO1 ... etc', &
-     '                VSVPO3 + OH --> 0.0153 VSVPO2 + 0.1043 VSVPO3 + 0.3063 VSVPO1 + 0.2181 VLVPO1 ... et', &
-     '                VIVPO1 + OH --> 0.3 VSVPO2 + 0.2089 VSVPO1 + 0.2412 VLVPO1 + 0.0471 VLVOO2 ... etc. ', &
-     '                VLVOO1 + OH --> 0.0143 VLVOO2 + 0.1239 VSVOO2 + 0.1831 VSVOO3 + 0.6664 VLVOO1 ... et', &
-     '                VLVOO2 + OH --> 0.3931 VLVOO2 + 0.1027 VSVOO2 + 0.2045 VSVOO3 + 0.2858 VLVOO1 ... et', &
-     '                VSVOO1 + OH --> 0.2272 VLVOO2 + 0.0702 VSVOO2 + 0.1116 VSVOO3 + 0.3303 VLVOO1 ... et', &
-     '                VSVOO2 + OH --> 0.2749 VLVOO2 + 0.2577 VSVOO2 + 0.0739 VSVOO3 + 0.3444 VLVOO1 ... et', &
-     '                VSVOO3 + OH --> 0.2421 VLVOO2 + 0.0385 VSVOO2 + 0.2667 VSVOO3 + 0.3886 VLVOO1 ... et', &
-     '          FORM_PRIMARY + OH --> OH                                                                  ', &
-     '         FORM_PRIMARY + NO3 --> NO3                                                                 ', &
-     '           FORM_PRIMARY + O --> O                                                                   ', &
-     '               FORM_PRIMARY --> DUMMY                                                               ', &
-     '               FORM_PRIMARY --> 2 DUMMY                                                             ', &
-     '          FORM_PRIMARY + CL --> CL                                                                  ', &
-     '          ALD2_PRIMARY + OH --> OH                                                                  ', &
-     '         ALD2_PRIMARY + NO3 --> NO3                                                                 ', &
-     '           ALD2_PRIMARY + O --> O                                                                   ', &
-     '               ALD2_PRIMARY --> DUMMY                                                               ', &
-     '          ALD2_PRIMARY + CL --> CL                                                                  ', &
-     '           BUTADIENE13 + OH --> 0.58 ACROLEIN + OH                                                  ', &
-     '           BUTADIENE13 + O3 --> 0.52 ACROLEIN + O3                                                  ', &
-     '          BUTADIENE13 + NO3 --> 0.045 ACROLEIN + NO3                                                ', &
-     '           BUTADIENE13 + CL --> 0.58 ACROLEIN + CL                                                  ', &
-     '          ACRO_PRIMARY + OH --> OH                                                                  ', &
-     '          ACRO_PRIMARY + O3 --> O3                                                                  ' /)
+     '                   APOCJ + OH --> APOCJ + 1.25 APNCOMJ + OH                                         ', &
+     '                 APNCOMJ + OH --> OH                                                                ', &
+     '                   PCVOC + OH --> PCSOARXN + OH                                                     ', &
+     '                  VLVPO1 + OH --> 0.0023 VIVPO1 + 0.0025 VSVPO2 + 0.0026 VSVPO3 + 0.0062 VSVPO1 ... ', &
+     '                  VSVPO1 + OH --> 0.0041 VSVPO2 + 0.0035 VSVPO3 + 0.2862 VSVPO1 + 0.3003 VLVPO1 ... ', &
+     '                  VSVPO2 + OH --> 0.1373 VSVPO2 + 0.0005 VSVPO3 + 0.095 VSVPO1 + 0.3856 VLVPO1 ... e', &
+     '                  VSVPO3 + OH --> 0.0153 VSVPO2 + 0.1043 VSVPO3 + 0.3063 VSVPO1 + 0.2181 VLVPO1 ... ', &
+     '                  VIVPO1 + OH --> 0.3 VSVPO2 + 0.2089 VSVPO1 + 0.2412 VLVPO1 + 0.0471 VLVOO2 ... etc', &
+     '                  VLVOO1 + OH --> 0.1239 VSVOO2 + 0.1831 VSVOO3 + 0.0143 VLVOO2 + 0.6664 VLVOO1 ... ', &
+     '                  VLVOO2 + OH --> 0.1027 VSVOO2 + 0.2045 VSVOO3 + 0.3931 VLVOO2 + 0.2858 VLVOO1 ... ', &
+     '                  VSVOO1 + OH --> 0.0702 VSVOO2 + 0.1116 VSVOO3 + 0.2272 VLVOO2 + 0.3303 VLVOO1 ... ', &
+     '                  VSVOO2 + OH --> 0.2577 VSVOO2 + 0.0739 VSVOO3 + 0.2749 VLVOO2 + 0.3444 VLVOO1 ... ', &
+     '                  VSVOO3 + OH --> 0.0385 VSVOO2 + 0.2667 VSVOO3 + 0.2421 VLVOO2 + 0.3886 VLVOO1 ... ', &
+     '            FORM_PRIMARY + OH --> OH                                                                ', &
+     '           FORM_PRIMARY + NO3 --> NO3                                                               ', &
+     '             FORM_PRIMARY + O --> O                                                                 ', &
+     '                 FORM_PRIMARY --> DUMMY                                                             ', &
+     '                 FORM_PRIMARY --> 2 DUMMY                                                           ', &
+     '            FORM_PRIMARY + CL --> CL                                                                ', &
+     '            ALD2_PRIMARY + OH --> OH                                                                ', &
+     '           ALD2_PRIMARY + NO3 --> NO3                                                               ', &
+     '             ALD2_PRIMARY + O --> O                                                                 ', &
+     '                 ALD2_PRIMARY --> DUMMY                                                             ', &
+     '            ALD2_PRIMARY + CL --> CL                                                                ', &
+     '             BUTADIENE13 + OH --> 0.58 ACROLEIN + OH                                                ', &
+     '             BUTADIENE13 + O3 --> 0.52 ACROLEIN + O3                                                ', &
+     '            BUTADIENE13 + NO3 --> 0.045 ACROLEIN + NO3                                              ', &
+     '             BUTADIENE13 + CL --> 0.58 ACROLEIN + CL                                                ', &
+     '            ACRO_PRIMARY + OH --> OH                                                                ', &
+     '            ACRO_PRIMARY + O3 --> O3                                                                ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_11 = (/ &
-     '         ACRO_PRIMARY + NO3 --> NO3                                                                 ', &
-     '               ACRO_PRIMARY --> DUMMY                                                               ', &
-     '          ACRO_PRIMARY + CL --> CL                                                                  ', &
-     '              ACROLEIN + OH --> OH                                                                  ', &
-     '              ACROLEIN + O3 --> O3                                                                  ', &
-     '             ACROLEIN + NO3 --> NO3                                                                 ', &
-     '                   ACROLEIN --> DUMMY                                                               ', &
-     '              ACROLEIN + CL --> CL                                                                  ', &
-     '                  TOLU + OH --> OH                                                                  ', &
-     '                  TOLU + CL --> CL                                                                  ', &
-     '                    HG + O3 --> 0.5 HGIIAER + 0.5 HGIIGAS + O3                                      ', &
-     '                   HG + CL2 --> HGIIGAS + CL2                                                       ', &
-     '                  HG + H2O2 --> HGIIGAS + H2O2                                                      ', &
-     '                    HG + OH --> 0.5 HGIIAER + 0.5 HGIIGAS + OH                                      ', &
-     '                HG + CL + M --> 0.5 HGIIGAS + 0.5 HG + CL + M                                       ', &
-     '                   DMS + OH --> MEO2 + SO2 + FORM                                                   ', &
-     '                   DMS + OH --> 0.25 MSA + MEO2 + 0.75 SO2                                          ', &
-     '                  DMS + NO3 --> HNO3 + MEO2 + SO2 + FORM                                            ', &
-     '                   DMS + CL --> 0.14 MSA + 0.45 HCL + 0.55 CLO + MEO2 + 0.86 SO2 + 0.45 FORM ... etc', &
-     '                        SO2 --> SO2_RS                                                              ', &
-     '                     SO2_RS --> SO2                                                                 ', &
-     '                       HNO3 --> HNO3_RS                                                             ', &
-     '                    HNO3_RS --> HNO3                                                                ', &
-     '                        CO2 --> H2CO3_RS                                                            ', &
-     '                   H2CO3_RS --> CO2                                                                 ', &
-     '                        NH3 --> NH3_RS                                                              ', &
-     '                     NH3_RS --> NH3                                                                 ', &
-     '                       H2O2 --> H2O2_RS                                                             ', &
-     '                    H2O2_RS --> H2O2                                                                ', &
-     '                         O3 --> O3_RS                                                               ' /)
+     '           ACRO_PRIMARY + NO3 --> NO3                                                               ', &
+     '                 ACRO_PRIMARY --> DUMMY                                                             ', &
+     '            ACRO_PRIMARY + CL --> CL                                                                ', &
+     '                ACROLEIN + OH --> OH                                                                ', &
+     '                ACROLEIN + O3 --> O3                                                                ', &
+     '               ACROLEIN + NO3 --> NO3                                                               ', &
+     '                     ACROLEIN --> DUMMY                                                             ', &
+     '                ACROLEIN + CL --> CL                                                                ', &
+     '                    TOLU + OH --> OH                                                                ', &
+     '                    TOLU + CL --> CL                                                                ', &
+     '                      HG + O3 --> 0.5 HGIIAER + 0.5 HGIIGAS + O3                                    ', &
+     '                     HG + CL2 --> HGIIGAS + CL2                                                     ', &
+     '                    HG + H2O2 --> HGIIGAS + H2O2                                                    ', &
+     '                      HG + OH --> 0.5 HGIIAER + 0.5 HGIIGAS + OH                                    ', &
+     '                  HG + CL + M --> 0.5 HGIIGAS + 0.5 HG + CL + M                                     ', &
+     '                     DMS + OH --> SO2 + MEO2 + FORM                                                 ', &
+     '                     DMS + OH --> 0.25 MSA + 0.75 SO2 + MEO2                                        ', &
+     '                    DMS + NO3 --> HNO3 + SO2 + MEO2 + FORM                                          ', &
+     '                     DMS + CL --> 0.14 MSA + 0.45 HCL + 0.55 CLO + 0.86 SO2 + MEO2 + 0.45 FORM ... e', &
+     '                          SO2 --> SO2_RS                                                            ', &
+     '                       SO2_RS --> SO2                                                               ', &
+     '                         HNO3 --> HNO3_RS                                                           ', &
+     '                      HNO3_RS --> HNO3                                                              ', &
+     '                          CO2 --> H2CO3_RS                                                          ', &
+     '                     H2CO3_RS --> CO2                                                               ', &
+     '                          NH3 --> NH3_RS                                                            ', &
+     '                       NH3_RS --> NH3                                                               ', &
+     '                         H2O2 --> H2O2_RS                                                           ', &
+     '                      H2O2_RS --> H2O2                                                              ', &
+     '                           O3 --> O3_RS                                                             ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_12 = (/ &
-     '                      O3_RS --> O3                                                                  ', &
-     '                       FACD --> FACD_RS                                                             ', &
-     '                    FACD_RS --> FACD                                                                ', &
-     '                        HCL --> HCL_RS                                                              ', &
-     '                     HCL_RS --> HCL                                                                 ', &
-     '                        GLY --> GLY_RS                                                              ', &
-     '                     GLY_RS --> GLY                                                                 ', &
-     '                       MGLY --> MGLY_RS                                                             ', &
-     '                    MGLY_RS --> MGLY                                                                ', &
-     '                         OH --> OH_RS                                                               ', &
-     '                      OH_RS --> OH                                                                  ', &
-     '                       SULF --> SULF_RS                                                             ', &
-     '                       N2O5 --> 2 HNO3_RS                                                           ', &
-     '                        HO2 --> HO2_RS                                                              ', &
-     '                     HO2_RS --> HO2                                                                 ', &
-     '                        NO2 --> NO2_RS                                                              ', &
-     '                     NO2_RS --> NO2                                                                 ', &
-     '                       HONO --> HONO_RS                                                             ', &
-     '                    HONO_RS --> HONO                                                                ', &
-     '                        PNA --> HNO4_RS                                                             ', &
-     '                    HNO4_RS --> PNA                                                                 ', &
-     '                       GLYD --> GLYD_RS                                                             ', &
-     '                    GLYD_RS --> GLYD                                                                ', &
-     '                       AACD --> AACD_RS                                                             ', &
-     '                    AACD_RS --> AACD                                                                ', &
-     '                       FORM --> HCHO_RS                                                             ', &
-     '                    HCHO_RS --> FORM                                                                ', &
-     '                        NO3 --> NO3_RS                                                              ', &
-     '                     NO3_RS --> NO3                                                                 ', &
-     '                       MEO2 --> CH3O2_RS                                                            ' /)
+     '                        O3_RS --> O3                                                                ', &
+     '                         FACD --> FACD_RS                                                           ', &
+     '                      FACD_RS --> FACD                                                              ', &
+     '                          HCL --> HCL_RS                                                            ', &
+     '                       HCL_RS --> HCL                                                               ', &
+     '                          GLY --> GLY_RS                                                            ', &
+     '                       GLY_RS --> GLY                                                               ', &
+     '                         MGLY --> MGLY_RS                                                           ', &
+     '                      MGLY_RS --> MGLY                                                              ', &
+     '                           OH --> OH_RS                                                             ', &
+     '                        OH_RS --> OH                                                                ', &
+     '                         SULF --> SULF_RS                                                           ', &
+     '                         N2O5 --> 2 HNO3_RS                                                         ', &
+     '                          HO2 --> HO2_RS                                                            ', &
+     '                       HO2_RS --> HO2                                                               ', &
+     '                          NO2 --> NO2_RS                                                            ', &
+     '                       NO2_RS --> NO2                                                               ', &
+     '                         HONO --> HONO_RS                                                           ', &
+     '                      HONO_RS --> HONO                                                              ', &
+     '                          PNA --> HNO4_RS                                                           ', &
+     '                      HNO4_RS --> PNA                                                               ', &
+     '                         GLYD --> GLYD_RS                                                           ', &
+     '                      GLYD_RS --> GLYD                                                              ', &
+     '                         AACD --> AACD_RS                                                           ', &
+     '                      AACD_RS --> AACD                                                              ', &
+     '                         FORM --> HCHO_RS                                                           ', &
+     '                      HCHO_RS --> FORM                                                              ', &
+     '                          NO3 --> NO3_RS                                                            ', &
+     '                       NO3_RS --> NO3                                                               ', &
+     '                         MEO2 --> CH3O2_RS                                                          ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_13 = (/ &
-     '                   CH3O2_RS --> MEO2                                                                ', &
-     '                       MEPX --> MHP_RS                                                              ', &
-     '                     MHP_RS --> MEPX                                                                ', &
-     '                       PACD --> PAA_RS                                                              ', &
-     '                     PAA_RS --> PACD                                                                ', &
-     '                       EPOX --> IEPOX_RS                                                            ', &
-     '                   IEPOX_RS --> EPOX                                                                ', &
-     '           HCHO_RS + H2O_RS --> CH2OHYD_RS                                                          ', &
-     '                 CH2OHYD_RS --> HCHO_RS                                                             ', &
-     '                     H2O_RS --> OHm_RS + Hp_RS                                                      ', &
-     '             OHm_RS + Hp_RS --> H2O_RS                                                              ', &
-     '                     SO2_RS --> HSO3m_RS + Hp_RS                                                    ', &
-     '           HSO3m_RS + Hp_RS --> SO2_RS                                                              ', &
-     '                   HSO3m_RS --> SO3mm_RS + Hp_RS                                                    ', &
-     '           SO3mm_RS + Hp_RS --> HSO3m_RS                                                            ', &
-     '                    HNO3_RS --> NO3m_RS + Hp_RS                                                     ', &
-     '            NO3m_RS + Hp_RS --> HNO3_RS                                                             ', &
-     '                    NH4p_RS --> NH3_RS + Hp_RS                                                      ', &
-     '             NH3_RS + Hp_RS --> NH4p_RS                                                             ', &
-     '                   H2CO3_RS --> HCO3m_RS + Hp_RS                                                    ', &
-     '           HCO3m_RS + Hp_RS --> H2CO3_RS                                                            ', &
-     '                   HCO3m_RS --> CO3mm_RS + Hp_RS                                                    ', &
-     '           CO3mm_RS + Hp_RS --> HCO3m_RS                                                            ', &
-     '                     HCL_RS --> Clm_RS + Hp_RS                                                      ', &
-     '             Clm_RS + Hp_RS --> HCL_RS                                                              ', &
-     '                    SULF_RS --> HSO4m_RS + Hp_RS                                                    ', &
-     '           HSO4m_RS + Hp_RS --> SULF_RS                                                             ', &
-     '                   HSO4m_RS --> SO4mm_RS + Hp_RS                                                    ', &
-     '           SO4mm_RS + Hp_RS --> HSO4m_RS                                                            ', &
-     '                    FACD_RS --> HCOOm_RS + Hp_RS                                                    ' /)
+     '                     CH3O2_RS --> MEO2                                                              ', &
+     '                         MEPX --> MHP_RS                                                            ', &
+     '                       MHP_RS --> MEPX                                                              ', &
+     '                         PACD --> PAA_RS                                                            ', &
+     '                       PAA_RS --> PACD                                                              ', &
+     '                         EPOX --> IEPOX_RS                                                          ', &
+     '                     IEPOX_RS --> EPOX                                                              ', &
+     '             HCHO_RS + H2O_RS --> CH2OHYD_RS                                                        ', &
+     '                   CH2OHYD_RS --> HCHO_RS                                                           ', &
+     '                       H2O_RS --> OHm_RS + Hp_RS                                                    ', &
+     '               OHm_RS + Hp_RS --> H2O_RS                                                            ', &
+     '                       SO2_RS --> Hp_RS + HSO3m_RS                                                  ', &
+     '             Hp_RS + HSO3m_RS --> SO2_RS                                                            ', &
+     '                     HSO3m_RS --> SO3mm_RS + Hp_RS                                                  ', &
+     '             SO3mm_RS + Hp_RS --> HSO3m_RS                                                          ', &
+     '                      HNO3_RS --> NO3m_RS + Hp_RS                                                   ', &
+     '              NO3m_RS + Hp_RS --> HNO3_RS                                                           ', &
+     '                      NH4p_RS --> NH3_RS + Hp_RS                                                    ', &
+     '               NH3_RS + Hp_RS --> NH4p_RS                                                           ', &
+     '                     H2CO3_RS --> HCO3m_RS + Hp_RS                                                  ', &
+     '             HCO3m_RS + Hp_RS --> H2CO3_RS                                                          ', &
+     '                     HCO3m_RS --> CO3mm_RS + Hp_RS                                                  ', &
+     '             CO3mm_RS + Hp_RS --> HCO3m_RS                                                          ', &
+     '                       HCL_RS --> Clm_RS + Hp_RS                                                    ', &
+     '               Clm_RS + Hp_RS --> HCL_RS                                                            ', &
+     '                      SULF_RS --> HSO4m_RS + Hp_RS                                                  ', &
+     '             HSO4m_RS + Hp_RS --> SULF_RS                                                           ', &
+     '                     HSO4m_RS --> SO4mm_RS + Hp_RS                                                  ', &
+     '             SO4mm_RS + Hp_RS --> HSO4m_RS                                                          ', &
+     '                      FACD_RS --> HCOOm_RS + Hp_RS                                                  ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_14 = (/ &
-     '           HCOOm_RS + Hp_RS --> FACD_RS                                                             ', &
-     '                     HO2_RS --> O2m_RS + Hp_RS                                                      ', &
-     '             O2m_RS + Hp_RS --> HO2_RS                                                              ', &
-     '                    HNO4_RS --> NO4m_RS + Hp_RS                                                     ', &
-     '            NO4m_RS + Hp_RS --> HNO4_RS                                                             ', &
-     '                    HONO_RS --> NO2m_RS + Hp_RS                                                     ', &
-     '            NO2m_RS + Hp_RS --> HONO_RS                                                             ', &
-     '                   GLYAC_RS --> GLYACm_RS + Hp_RS                                                   ', &
-     '          GLYACm_RS + Hp_RS --> GLYAC_RS                                                            ', &
-     '                   OXLAC_RS --> OXLACm_RS + Hp_RS                                                   ', &
-     '          OXLACm_RS + Hp_RS --> OXLAC_RS                                                            ', &
-     '                  OXLACm_RS --> OXLACmm_RS + Hp_RS                                                  ', &
-     '         OXLACmm_RS + Hp_RS --> OXLACm_RS                                                           ', &
-     '                   PYRAC_RS --> PYRACm_RS + Hp_RS                                                   ', &
-     '          PYRACm_RS + Hp_RS --> PYRAC_RS                                                            ', &
-     '                  GCOLAC_RS --> GCOLACm_RS + Hp_RS                                                  ', &
-     '         GCOLACm_RS + Hp_RS --> GCOLAC_RS                                                           ', &
-     '                    AACD_RS --> AACDm_RS + Hp_RS                                                    ', &
-     '           AACDm_RS + Hp_RS --> AACD_RS                                                             ', &
-     ' H2O2_RS + HSO3m_RS + Hp_RS --> SO4mm_RS + 2 Hp_RS                                                  ', &
-     '             SO2_RS + O3_RS --> SO4mm_RS + 2 Hp_RS                                                  ', &
-     '           O3_RS + HSO3m_RS --> SO4mm_RS + Hp_RS                                                    ', &
-     '           O3_RS + SO3mm_RS --> SO4mm_RS                                                            ', &
-     '                   2 HO2_RS --> H2O2_RS                                                             ', &
-     '            O2m_RS + HO2_RS --> H2O2_RS + OHm_RS                                                    ', &
-     '             O2m_RS + O3_RS --> OHm_RS + OH_RS                                                      ', &
-     '            SO2_RS + NO2_RS --> 2 NO2m_RS + SO4mm_RS - NO2_RS + 4 Hp_RS                             ', &
-     '          NO2_RS + HSO3m_RS --> 2 NO2m_RS + SO4mm_RS - NO2_RS + 3 Hp_RS                             ', &
-     '          NO2_RS + SO3mm_RS --> 2 NO2m_RS + SO4mm_RS - NO2_RS + 2 Hp_RS                             ', &
-     '         HNO4_RS + HSO3m_RS --> NO3m_RS + SO4mm_RS + 2 Hp_RS                                        ' /)
+     '             HCOOm_RS + Hp_RS --> FACD_RS                                                           ', &
+     '                       HO2_RS --> O2m_RS + Hp_RS                                                    ', &
+     '               O2m_RS + Hp_RS --> HO2_RS                                                            ', &
+     '                      HNO4_RS --> NO4m_RS + Hp_RS                                                   ', &
+     '              NO4m_RS + Hp_RS --> HNO4_RS                                                           ', &
+     '                      HONO_RS --> NO2m_RS + Hp_RS                                                   ', &
+     '              NO2m_RS + Hp_RS --> HONO_RS                                                           ', &
+     '                     GLYAC_RS --> GLYACm_RS + Hp_RS                                                 ', &
+     '            GLYACm_RS + Hp_RS --> GLYAC_RS                                                          ', &
+     '                     OXLAC_RS --> OXLACm_RS + Hp_RS                                                 ', &
+     '            OXLACm_RS + Hp_RS --> OXLAC_RS                                                          ', &
+     '                    OXLACm_RS --> OXLACmm_RS + Hp_RS                                                ', &
+     '           OXLACmm_RS + Hp_RS --> OXLACm_RS                                                         ', &
+     '                     PYRAC_RS --> PYRACm_RS + Hp_RS                                                 ', &
+     '            PYRACm_RS + Hp_RS --> PYRAC_RS                                                          ', &
+     '                    GCOLAC_RS --> GCOLACm_RS + Hp_RS                                                ', &
+     '           GCOLACm_RS + Hp_RS --> GCOLAC_RS                                                         ', &
+     '                      AACD_RS --> AACDm_RS + Hp_RS                                                  ', &
+     '             AACDm_RS + Hp_RS --> AACD_RS                                                           ', &
+     '   H2O2_RS + Hp_RS + HSO3m_RS --> SO4mm_RS + 2 Hp_RS                                                ', &
+     '               SO2_RS + O3_RS --> SO4mm_RS + 2 Hp_RS                                                ', &
+     '             O3_RS + HSO3m_RS --> SO4mm_RS + Hp_RS                                                  ', &
+     '             O3_RS + SO3mm_RS --> SO4mm_RS                                                          ', &
+     '                     2 HO2_RS --> H2O2_RS                                                           ', &
+     '              O2m_RS + HO2_RS --> H2O2_RS + OHm_RS                                                  ', &
+     '               O2m_RS + O3_RS --> OHm_RS + OH_RS                                                    ', &
+     '              SO2_RS + NO2_RS --> 2 NO2m_RS + SO4mm_RS - NO2_RS + 4 Hp_RS                           ', &
+     '            NO2_RS + HSO3m_RS --> 2 NO2m_RS + SO4mm_RS - NO2_RS + 3 Hp_RS                           ', &
+     '            NO2_RS + SO3mm_RS --> 2 NO2m_RS + SO4mm_RS - NO2_RS + 2 Hp_RS                           ', &
+     '           HNO4_RS + HSO3m_RS --> NO3m_RS + SO4mm_RS + 2 Hp_RS                                      ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_15 = (/ &
-     '                    NO4m_RS --> NO2m_RS                                                             ', &
-     '            NO2m_RS + O3_RS --> NO3m_RS                                                             ', &
-     '            NO2m_RS + OH_RS --> OHm_RS + NO2_RS                                                     ', &
-     '            HONO_RS + OH_RS --> NO2_RS                                                              ', &
-     '                    2 OH_RS --> H2O2_RS                                                             ', &
-     '             HO2_RS + OH_RS --> DUMMY_RS                                                            ', &
-     '             O2m_RS + OH_RS --> OHm_RS                                                              ', &
-     '            H2O2_RS + OH_RS --> HO2_RS                                                              ', &
-     '           OH_RS + HSO3m_RS --> SO3m_RS                                                             ', &
-     '            NO2_RS + HO2_RS --> HNO4_RS                                                             ', &
-     '            O2m_RS + NO2_RS --> NO4m_RS                                                             ', &
-     '                    HNO4_RS --> NO2_RS + HO2_RS                                                     ', &
-     '          NO3_RS + SO4mm_RS --> SO4m_RS + NO3m_RS                                                   ', &
-     '          NO3_RS + HSO3m_RS --> SO4m_RS + NO3m_RS + Hp_RS                                           ', &
-     '            SO3m_RS + O2_RS --> SO5m_RS                                                             ', &
-     '           SO5m_RS + HO2_RS --> HSO5m_RS                                                            ', &
-     '                  2 SO5m_RS --> 2 SO4m_RS                                                           ', &
-     'HSO5m_RS + HSO3m_RS + Hp_RS --> 2 SO4mm_RS + 3 Hp_RS                                                ', &
-     '           SO4m_RS + H2O_RS --> HSO4m_RS + OH_RS + H2O_RS                                           ', &
-     '                 2 CH3O2_RS --> 2 HCHO_RS + 2 HO2_RS                                                ', &
-     '        CH3O2_RS + HSO3m_RS --> SO3m_RS + MHP_RS                                                    ', &
-     '         HCHO_RS + HSO3m_RS --> HMSm_RS                                                             ', &
-     '         HCHO_RS + SO3mm_RS --> HMSm_RS + OHm_RS                                                    ', &
-     '                    HMSm_RS --> HCHO_RS + HSO3m_RS                                                  ', &
-     '           HMSm_RS + OHm_RS --> CH2OHYD_RS + SO3mm_RS                                               ', &
-     '            HMSm_RS + OH_RS --> FACD_RS + HO2_RS + HSO3m_RS                                         ', &
-     '  MHP_RS + HSO3m_RS + Hp_RS --> SO4mm_RS + 2 Hp_RS                                                  ', &
-     '  PAA_RS + HSO3m_RS + Hp_RS --> SO4mm_RS + 2 Hp_RS                                                  ', &
-     '          PAA_RS + HSO3m_RS --> SO4mm_RS + Hp_RS                                                    ', &
-     '           HCOOm_RS + OH_RS --> H2CO3_RS + OHm_RS + HO2_RS                                          ' /)
+     '                      NO4m_RS --> NO2m_RS                                                           ', &
+     '              NO2m_RS + O3_RS --> NO3m_RS                                                           ', &
+     '              NO2m_RS + OH_RS --> OHm_RS + NO2_RS                                                   ', &
+     '              HONO_RS + OH_RS --> NO2_RS                                                            ', &
+     '                      2 OH_RS --> H2O2_RS                                                           ', &
+     '               HO2_RS + OH_RS --> DUMMY_RS                                                          ', &
+     '               O2m_RS + OH_RS --> OHm_RS                                                            ', &
+     '              H2O2_RS + OH_RS --> HO2_RS                                                            ', &
+     '             OH_RS + HSO3m_RS --> SO3m_RS                                                           ', &
+     '              NO2_RS + HO2_RS --> HNO4_RS                                                           ', &
+     '              O2m_RS + NO2_RS --> NO4m_RS                                                           ', &
+     '                      HNO4_RS --> NO2_RS + HO2_RS                                                   ', &
+     '            NO3_RS + SO4mm_RS --> SO4m_RS + NO3m_RS                                                 ', &
+     '            NO3_RS + HSO3m_RS --> SO4m_RS + NO3m_RS + Hp_RS                                         ', &
+     '              SO3m_RS + O2_RS --> SO5m_RS                                                           ', &
+     '             SO5m_RS + HO2_RS --> HSO5m_RS                                                          ', &
+     '                    2 SO5m_RS --> 2 SO4m_RS                                                         ', &
+     '  HSO5m_RS + Hp_RS + HSO3m_RS --> 2 SO4mm_RS + 3 Hp_RS                                              ', &
+     '             SO4m_RS + H2O_RS --> HSO4m_RS + OH_RS + H2O_RS                                         ', &
+     '                   2 CH3O2_RS --> 2 HCHO_RS + 2 HO2_RS                                              ', &
+     '          CH3O2_RS + HSO3m_RS --> SO3m_RS + MHP_RS                                                  ', &
+     '           HCHO_RS + HSO3m_RS --> HMSm_RS                                                           ', &
+     '           HCHO_RS + SO3mm_RS --> HMSm_RS + OHm_RS                                                  ', &
+     '                      HMSm_RS --> HCHO_RS + HSO3m_RS                                                ', &
+     '             HMSm_RS + OHm_RS --> CH2OHYD_RS + SO3mm_RS                                             ', &
+     '              HMSm_RS + OH_RS --> FACD_RS + HO2_RS + HSO3m_RS                                       ', &
+     '    MHP_RS + Hp_RS + HSO3m_RS --> SO4mm_RS + 2 Hp_RS                                                ', &
+     '    PAA_RS + Hp_RS + HSO3m_RS --> SO4mm_RS + 2 Hp_RS                                                ', &
+     '            PAA_RS + HSO3m_RS --> SO4mm_RS + Hp_RS                                                  ', &
+     '             HCOOm_RS + OH_RS --> H2CO3_RS + OHm_RS + HO2_RS                                        ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_16 = (/ &
-     '            GLYD_RS + OH_RS --> GCOLAC_RS + HO2_RS                                                  ', &
-     '            GLYD_RS + OH_RS --> GLY_RS + HO2_RS                                                     ', &
-     '          GCOLAC_RS + OH_RS --> GLYACm_RS + HO2_RS + Hp_RS                                          ', &
-     '         GCOLACm_RS + OH_RS --> GLYACm_RS + HO2_RS                                                  ', &
-     '             GLY_RS + OH_RS --> GLYAC_RS + HO2_RS                                                   ', &
-     '           GLYAC_RS + OH_RS --> OXLAC_RS + HO2_RS                                                   ', &
-     '          GLYACm_RS + OH_RS --> OXLACm_RS + HO2_RS                                                  ', &
-     '           OXLAC_RS + OH_RS --> 2 H2CO3_RS - OH_RS                                                  ', &
-     '          OXLACm_RS + OH_RS --> CO2m_RS + H2CO3_RS                                                  ', &
-     '         OXLACmm_RS + OH_RS --> CO2m_RS + H2CO3_RS + OHm_RS                                         ', &
-     '            MGLY_RS + OH_RS --> 0.92 PYRACm_RS + 0.08 GLYACm_RS + HO2_RS                            ', &
-     '           PYRAC_RS + OH_RS --> H2CO3_RS + AACD_RS + HO2_RS                                         ', &
-     '          PYRACm_RS + OH_RS --> H2CO3_RS + AACDm_RS + HO2_RS                                        ', &
-     '            AACD_RS + OH_RS --> 0.85 GLYAC_RS + 0.15 CH2OHYD_RS                                     ', &
-     '           AACDm_RS + OH_RS --> 0.85 GLYACm_RS + 0.15 CH2OHYD_RS                                    ', &
-     '         CH2OHYD_RS + OH_RS --> FACD_RS + HO2_RS                                                    ', &
-     '            FACD_RS + OH_RS --> H2CO3_RS + HO2_RS                                                   ', &
-     '                    H2O2_RS --> 2 OH_RS                                                             ', &
-     '          IEPOX_RS + H2O_RS --> ISO3_RS                                                             ', &
-     '        IEPOX_RS + SO4mm_RS --> ISO3_RS                                                             ', &
-     '         IEPOX_RS + NO3m_RS --> ISO3_RS                                                             ', &
-     '                      ANO3I --> WD_ANO3I + NO3m_RS                                                  ', &
-     '                      ANH4I --> WD_ANH4I + NH4p_RS                                                  ', &
-     '                       ACLI --> WD_ACLI + Clm_RS                                                    ', &
-     '                      ASO4I --> WD_ASO4I + SO4mm_RS                                                 ', &
-     '                      Hp_RS --> WD_Hp                                                               ', &
-     '                     OHm_RS --> WD_OHm                                                              ', &
-     '                     SO2_RS --> WD_SO2                                                              ', &
-     '                    FACD_RS --> WD_FACD                                                             ', &
-     '                    HNO3_RS --> WD_HNO3                                                             ' /)
+     '              GLYD_RS + OH_RS --> GCOLAC_RS + HO2_RS                                                ', &
+     '              GLYD_RS + OH_RS --> GLY_RS + HO2_RS                                                   ', &
+     '            GCOLAC_RS + OH_RS --> GLYACm_RS + HO2_RS + Hp_RS                                        ', &
+     '           GCOLACm_RS + OH_RS --> GLYACm_RS + HO2_RS                                                ', &
+     '               GLY_RS + OH_RS --> GLYAC_RS + HO2_RS                                                 ', &
+     '             GLYAC_RS + OH_RS --> OXLAC_RS + HO2_RS                                                 ', &
+     '            GLYACm_RS + OH_RS --> OXLACm_RS + HO2_RS                                                ', &
+     '             OXLAC_RS + OH_RS --> 2 H2CO3_RS - OH_RS                                                ', &
+     '            OXLACm_RS + OH_RS --> CO2m_RS + H2CO3_RS                                                ', &
+     '           OXLACmm_RS + OH_RS --> CO2m_RS + H2CO3_RS + OHm_RS                                       ', &
+     '              MGLY_RS + OH_RS --> 0.92 PYRACm_RS + 0.08 GLYACm_RS + HO2_RS                          ', &
+     '             PYRAC_RS + OH_RS --> H2CO3_RS + AACD_RS + HO2_RS                                       ', &
+     '            PYRACm_RS + OH_RS --> H2CO3_RS + AACDm_RS + HO2_RS                                      ', &
+     '              AACD_RS + OH_RS --> 0.85 GLYAC_RS + 0.15 CH2OHYD_RS                                   ', &
+     '             AACDm_RS + OH_RS --> 0.85 GLYACm_RS + 0.15 CH2OHYD_RS                                  ', &
+     '           CH2OHYD_RS + OH_RS --> FACD_RS + HO2_RS                                                  ', &
+     '              FACD_RS + OH_RS --> H2CO3_RS + HO2_RS                                                 ', &
+     '             MNpp_RS + SO2_RS --> MNpp_RS + SO4mm_RS + 2 Hp_RS                                      ', &
+     '           MNpp_RS + HSO3m_RS --> MNpp_RS + SO4mm_RS + Hp_RS                                        ', &
+     '           MNpp_RS + SO3mm_RS --> MNpp_RS + SO4mm_RS                                                ', &
+     '            FEppp_RS + SO2_RS --> FEppp_RS + SO4mm_RS + 2 Hp_RS                                     ', &
+     '          FEppp_RS + HSO3m_RS --> FEppp_RS + SO4mm_RS + Hp_RS                                       ', &
+     '          FEppp_RS + SO3mm_RS --> FEppp_RS + SO4mm_RS                                               ', &
+     '  FEppp_RS + MNpp_RS + SO2_RS --> FEppp_RS + MNpp_RS + SO4mm_RS + 2 Hp_RS                           ', &
+     'FEppp_RS + MNpp_RS + HSO3m_RS --> FEppp_RS + MNpp_RS + SO4mm_RS + Hp_RS                             ', &
+     'FEppp_RS + MNpp_RS + SO3mm_RS --> FEppp_RS + MNpp_RS + SO4mm_RS                                     ', &
+     '                      H2O2_RS --> 2 OH_RS                                                           ', &
+     '            IEPOX_RS + H2O_RS --> ISO3_RS                                                           ', &
+     '          IEPOX_RS + SO4mm_RS --> ISO3_RS                                                           ', &
+     '           IEPOX_RS + NO3m_RS --> ISO3_RS                                                           ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_17 = (/ &
-     '                   H2CO3_RS --> WD_CO2                                                              ', &
-     '                   HCO3m_RS --> WD_CO2                                                              ', &
-     '                   CO3mm_RS --> WD_CO2                                                              ', &
-     '                     NH3_RS --> WD_NH3                                                              ', &
-     '                    H2O2_RS --> WD_H2O2                                                             ', &
-     '                      O3_RS --> WD_O3                                                               ', &
-     '                     HCL_RS --> WD_HCL                                                              ', &
-     '                     GLY_RS --> WD_GLY                                                              ', &
-     '                    MGLY_RS --> WD_MGLY                                                             ', &
-     '                      OH_RS --> WD_OH                                                               ', &
-     '                   HSO3m_RS --> WD_SO2                                                              ', &
-     '                   HCOOm_RS --> WD_FACD                                                             ', &
-     '                   SO4mm_RS --> WD_ASO4J                                                            ', &
-     '                    ORGC_RS --> WD_AORGCJ                                                           ', &
-     '                   SO3mm_RS --> WD_SO2                                                              ', &
-     '                    NO3m_RS --> WD_ANO3J                                                            ', &
-     '                    NH4p_RS --> WD_ANH4J                                                            ', &
-     '                     Clm_RS --> WD_ACLJ                                                             ', &
-     '                    SULF_RS --> WD_ASO4J                                                            ', &
-     '                   HSO4m_RS --> WD_ASO4J                                                            ', &
-     '                     NO2_RS --> WD_NO2                                                              ', &
-     '                    HONO_RS --> WD_HONO                                                             ', &
-     '                    HNO4_RS --> WD_PNA                                                              ', &
-     '                    GLYD_RS --> WD_GLYD                                                             ', &
-     '                    AACD_RS --> WD_AACD                                                             ', &
-     '                    HCHO_RS --> WD_FORM                                                             ', &
-     '                 CH2OHYD_RS --> WD_FORM                                                             ', &
-     '                  GCOLAC_RS --> WD_AORGCJ                                                           ', &
-     '                 GCOLACm_RS --> WD_AORGCJ                                                           ', &
-     '                   GLYAC_RS --> WD_AORGCJ                                                           ' /)
+     '                        ANO3I --> WD_ANO3I + NO3m_RS                                                ', &
+     '                        ANH4I --> WD_ANH4I + NH4p_RS                                                ', &
+     '                         ACLI --> WD_ACLI + Clm_RS                                                  ', &
+     '                        ASO4I --> WD_ASO4I + SO4mm_RS                                               ', &
+     '                         ANAI --> NAp_RS + WD_ANAI                                                  ', &
+     '                        Hp_RS --> WD_Hp                                                             ', &
+     '                       OHm_RS --> WD_OHm                                                            ', &
+     '                       SO2_RS --> WD_SO2                                                            ', &
+     '                      FACD_RS --> WD_FACD                                                           ', &
+     '                      HNO3_RS --> WD_HNO3                                                           ', &
+     '                     H2CO3_RS --> WD_CO2                                                            ', &
+     '                     HCO3m_RS --> WD_CO2                                                            ', &
+     '                     CO3mm_RS --> WD_CO2                                                            ', &
+     '                       NH3_RS --> WD_NH3                                                            ', &
+     '                      H2O2_RS --> WD_H2O2                                                           ', &
+     '                        O3_RS --> WD_O3                                                             ', &
+     '                       HCL_RS --> WD_HCL                                                            ', &
+     '                       GLY_RS --> WD_GLY                                                            ', &
+     '                      MGLY_RS --> WD_MGLY                                                           ', &
+     '                        OH_RS --> WD_OH                                                             ', &
+     '                     HSO3m_RS --> WD_SO2                                                            ', &
+     '                     HCOOm_RS --> WD_FACD                                                           ', &
+     '                     SO4mm_RS --> WD_ASO4J                                                          ', &
+     '                      ORGC_RS --> WD_AORGCJ                                                         ', &
+     '                     SO3mm_RS --> WD_SO2                                                            ', &
+     '                      NO3m_RS --> WD_ANO3J                                                          ', &
+     '                      NH4p_RS --> WD_ANH4J                                                          ', &
+     '                       Clm_RS --> WD_ACLJ                                                           ', &
+     '                      SULF_RS --> WD_ASO4J                                                          ', &
+     '                     HSO4m_RS --> WD_ASO4J                                                          ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_18 = (/ &
-     '                  GLYACm_RS --> WD_AORGCJ                                                           ', &
-     '                   OXLAC_RS --> WD_AORGCJ                                                           ', &
-     '                  OXLACm_RS --> WD_AORGCJ                                                           ', &
-     '                 OXLACmm_RS --> WD_AORGCJ                                                           ', &
-     '                   AACDm_RS --> WD_AACD                                                             ', &
-     '                    CO2m_RS --> WD_CO2                                                              ', &
-     '                   PYRAC_RS --> WD_AORGCJ                                                           ', &
-     '                  PYRACm_RS --> WD_AORGCJ                                                           ', &
-     '                     HO2_RS --> WD_HO2                                                              ', &
-     '                     O2m_RS --> WD_O2m                                                              ', &
-     '                    NO2m_RS --> WD_HONO                                                             ', &
-     '                    NO4m_RS --> WD_PNA                                                              ', &
-     '                     NO3_RS --> WD_NO3                                                              ', &
-     '                   CH3O2_RS --> WD_MEO2                                                             ', &
-     '                    SO3m_RS --> WD_SO2                                                              ', &
-     '                    SO4m_RS --> WD_SO2                                                              ', &
-     '                    SO5m_RS --> WD_SO2                                                              ', &
-     '                   HSO5m_RS --> WD_SO2                                                              ', &
-     '                    HMSm_RS --> WD_SO2                                                              ', &
-     '                     MHP_RS --> WD_MHP                                                              ', &
-     '                     PAA_RS --> WD_PACD                                                             ', &
-     '                   IEPOX_RS --> WD_EPOX                                                             ', &
-     '                    ISO3_RS --> WD_AISO3J                                                           ', &
-     '                        SO2 --> SO2_CV                                                              ', &
-     '                     SO2_CV --> SO2                                                                 ', &
-     '                       HNO3 --> HNO3_CV                                                             ', &
-     '                    HNO3_CV --> HNO3                                                                ', &
-     '                        CO2 --> H2CO3_CV                                                            ', &
-     '                   H2CO3_CV --> CO2                                                                 ', &
-     '                        NH3 --> NH3_CV                                                              ' /)
+     '                       NO2_RS --> WD_NO2                                                            ', &
+     '                      HONO_RS --> WD_HONO                                                           ', &
+     '                      HNO4_RS --> WD_PNA                                                            ', &
+     '                      GLYD_RS --> WD_GLYD                                                           ', &
+     '                      AACD_RS --> WD_AACD                                                           ', &
+     '                      HCHO_RS --> WD_FORM                                                           ', &
+     '                   CH2OHYD_RS --> WD_FORM                                                           ', &
+     '                    GCOLAC_RS --> WD_AORGCJ                                                         ', &
+     '                   GCOLACm_RS --> WD_AORGCJ                                                         ', &
+     '                     GLYAC_RS --> WD_AORGCJ                                                         ', &
+     '                    GLYACm_RS --> WD_AORGCJ                                                         ', &
+     '                     OXLAC_RS --> WD_AORGCJ                                                         ', &
+     '                    OXLACm_RS --> WD_AORGCJ                                                         ', &
+     '                   OXLACmm_RS --> WD_AORGCJ                                                         ', &
+     '                     AACDm_RS --> WD_AACD                                                           ', &
+     '                      CO2m_RS --> WD_CO2                                                            ', &
+     '                     PYRAC_RS --> WD_AORGCJ                                                         ', &
+     '                    PYRACm_RS --> WD_AORGCJ                                                         ', &
+     '                       HO2_RS --> WD_HO2                                                            ', &
+     '                       O2m_RS --> WD_O2m                                                            ', &
+     '                      NO2m_RS --> WD_HONO                                                           ', &
+     '                      NO4m_RS --> WD_PNA                                                            ', &
+     '                       NO3_RS --> WD_NO3                                                            ', &
+     '                     CH3O2_RS --> WD_MEO2                                                           ', &
+     '                      SO3m_RS --> WD_SO2                                                            ', &
+     '                      SO4m_RS --> WD_SO2                                                            ', &
+     '                      SO5m_RS --> WD_SO2                                                            ', &
+     '                     HSO5m_RS --> WD_SO2                                                            ', &
+     '                      HMSm_RS --> WD_SO2                                                            ', &
+     '                       MHP_RS --> WD_MHP                                                            ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_19 = (/ &
-     '                     NH3_CV --> NH3                                                                 ', &
-     '                       H2O2 --> H2O2_CV                                                             ', &
-     '                    H2O2_CV --> H2O2                                                                ', &
-     '                         O3 --> O3_CV                                                               ', &
-     '                      O3_CV --> O3                                                                  ', &
-     '                       FACD --> FACD_CV                                                             ', &
-     '                    FACD_CV --> FACD                                                                ', &
-     '                        HCL --> HCL_CV                                                              ', &
-     '                     HCL_CV --> HCL                                                                 ', &
-     '                        GLY --> GLY_CV                                                              ', &
-     '                     GLY_CV --> GLY                                                                 ', &
-     '                       MGLY --> MGLY_CV                                                             ', &
-     '                    MGLY_CV --> MGLY                                                                ', &
-     '                         OH --> OH_CV                                                               ', &
-     '                      OH_CV --> OH                                                                  ', &
-     '                       SULF --> SULF_CV                                                             ', &
-     '                       N2O5 --> 2 HNO3_CV                                                           ', &
-     '                        HO2 --> HO2_CV                                                              ', &
-     '                     HO2_CV --> HO2                                                                 ', &
-     '                        NO2 --> NO2_CV                                                              ', &
-     '                     NO2_CV --> NO2                                                                 ', &
-     '                       HONO --> HONO_CV                                                             ', &
-     '                    HONO_CV --> HONO                                                                ', &
-     '                        PNA --> HNO4_CV                                                             ', &
-     '                    HNO4_CV --> PNA                                                                 ', &
-     '                       GLYD --> GLYD_CV                                                             ', &
-     '                    GLYD_CV --> GLYD                                                                ', &
-     '                       AACD --> AACD_CV                                                             ', &
-     '                    AACD_CV --> AACD                                                                ', &
-     '                       FORM --> HCHO_CV                                                             ' /)
+     '                       PAA_RS --> WD_PACD                                                           ', &
+     '                     IEPOX_RS --> WD_EPOX                                                           ', &
+     '                      ISO3_RS --> WD_AISO3J                                                         ', &
+     '                     FEppp_RS --> WD_FEppp                                                          ', &
+     '                      MNpp_RS --> WD_MNpp                                                           ', &
+     '                       NAp_RS --> WD_NAp                                                            ', &
+     '                      MGpp_RS --> WD_MGpp                                                           ', &
+     '                      CApp_RS --> WD_CApp                                                           ', &
+     '                        Kp_RS --> WD_Kp                                                             ', &
+     '                          SO2 --> SO2_CV                                                            ', &
+     '                       SO2_CV --> SO2                                                               ', &
+     '                         HNO3 --> HNO3_CV                                                           ', &
+     '                      HNO3_CV --> HNO3                                                              ', &
+     '                          CO2 --> H2CO3_CV                                                          ', &
+     '                     H2CO3_CV --> CO2                                                               ', &
+     '                          NH3 --> NH3_CV                                                            ', &
+     '                       NH3_CV --> NH3                                                               ', &
+     '                         H2O2 --> H2O2_CV                                                           ', &
+     '                      H2O2_CV --> H2O2                                                              ', &
+     '                           O3 --> O3_CV                                                             ', &
+     '                        O3_CV --> O3                                                                ', &
+     '                         FACD --> FACD_CV                                                           ', &
+     '                      FACD_CV --> FACD                                                              ', &
+     '                          HCL --> HCL_CV                                                            ', &
+     '                       HCL_CV --> HCL                                                               ', &
+     '                          GLY --> GLY_CV                                                            ', &
+     '                       GLY_CV --> GLY                                                               ', &
+     '                         MGLY --> MGLY_CV                                                           ', &
+     '                      MGLY_CV --> MGLY                                                              ', &
+     '                           OH --> OH_CV                                                             ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_20 = (/ &
-     '                    HCHO_CV --> FORM                                                                ', &
-     '                        NO3 --> NO3_CV                                                              ', &
-     '                     NO3_CV --> NO3                                                                 ', &
-     '                       MEO2 --> CH3O2_CV                                                            ', &
-     '                   CH3O2_CV --> MEO2                                                                ', &
-     '                       MEPX --> MHP_CV                                                              ', &
-     '                     MHP_CV --> MEPX                                                                ', &
-     '                       PACD --> PAA_CV                                                              ', &
-     '                     PAA_CV --> PACD                                                                ', &
-     '                       EPOX --> IEPOX_CV                                                            ', &
-     '                   IEPOX_CV --> EPOX                                                                ', &
-     '           HCHO_CV + H2O_CV --> CH2OHYD_CV                                                          ', &
-     '                 CH2OHYD_CV --> HCHO_CV                                                             ', &
-     '                     H2O_CV --> OHm_CV + Hp_CV                                                      ', &
-     '             OHm_CV + Hp_CV --> H2O_CV                                                              ', &
-     '                     SO2_CV --> HSO3m_CV + Hp_CV                                                    ', &
-     '           HSO3m_CV + Hp_CV --> SO2_CV                                                              ', &
-     '                   HSO3m_CV --> SO3mm_CV + Hp_CV                                                    ', &
-     '           SO3mm_CV + Hp_CV --> HSO3m_CV                                                            ', &
-     '                    HNO3_CV --> NO3m_CV + Hp_CV                                                     ', &
-     '            NO3m_CV + Hp_CV --> HNO3_CV                                                             ', &
-     '                    NH4p_CV --> NH3_CV + Hp_CV                                                      ', &
-     '             NH3_CV + Hp_CV --> NH4p_CV                                                             ', &
-     '                   H2CO3_CV --> HCO3m_CV + Hp_CV                                                    ', &
-     '           HCO3m_CV + Hp_CV --> H2CO3_CV                                                            ', &
-     '                   HCO3m_CV --> CO3mm_CV + Hp_CV                                                    ', &
-     '           CO3mm_CV + Hp_CV --> HCO3m_CV                                                            ', &
-     '                     HCL_CV --> Clm_CV + Hp_CV                                                      ', &
-     '             Clm_CV + Hp_CV --> HCL_CV                                                              ', &
-     '                    SULF_CV --> HSO4m_CV + Hp_CV                                                    ' /)
+     '                        OH_CV --> OH                                                                ', &
+     '                         SULF --> SULF_CV                                                           ', &
+     '                         N2O5 --> 2 HNO3_CV                                                         ', &
+     '                          HO2 --> HO2_CV                                                            ', &
+     '                       HO2_CV --> HO2                                                               ', &
+     '                          NO2 --> NO2_CV                                                            ', &
+     '                       NO2_CV --> NO2                                                               ', &
+     '                         HONO --> HONO_CV                                                           ', &
+     '                      HONO_CV --> HONO                                                              ', &
+     '                          PNA --> HNO4_CV                                                           ', &
+     '                      HNO4_CV --> PNA                                                               ', &
+     '                         GLYD --> GLYD_CV                                                           ', &
+     '                      GLYD_CV --> GLYD                                                              ', &
+     '                         AACD --> AACD_CV                                                           ', &
+     '                      AACD_CV --> AACD                                                              ', &
+     '                         FORM --> HCHO_CV                                                           ', &
+     '                      HCHO_CV --> FORM                                                              ', &
+     '                          NO3 --> NO3_CV                                                            ', &
+     '                       NO3_CV --> NO3                                                               ', &
+     '                         MEO2 --> CH3O2_CV                                                          ', &
+     '                     CH3O2_CV --> MEO2                                                              ', &
+     '                         MEPX --> MHP_CV                                                            ', &
+     '                       MHP_CV --> MEPX                                                              ', &
+     '                         PACD --> PAA_CV                                                            ', &
+     '                       PAA_CV --> PACD                                                              ', &
+     '                         EPOX --> IEPOX_CV                                                          ', &
+     '                     IEPOX_CV --> EPOX                                                              ', &
+     '             HCHO_CV + H2O_CV --> CH2OHYD_CV                                                        ', &
+     '                   CH2OHYD_CV --> HCHO_CV                                                           ', &
+     '                       H2O_CV --> OHm_CV + Hp_CV                                                    ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_21 = (/ &
-     '           HSO4m_CV + Hp_CV --> SULF_CV                                                             ', &
-     '                   HSO4m_CV --> SO4mm_CV + Hp_CV                                                    ', &
-     '           SO4mm_CV + Hp_CV --> HSO4m_CV                                                            ', &
-     '                    FACD_CV --> HCOOm_CV + Hp_CV                                                    ', &
-     '           HCOOm_CV + Hp_CV --> FACD_CV                                                             ', &
-     '                     HO2_CV --> O2m_CV + Hp_CV                                                      ', &
-     '             O2m_CV + Hp_CV --> HO2_CV                                                              ', &
-     '                    HNO4_CV --> NO4m_CV + Hp_CV                                                     ', &
-     '            NO4m_CV + Hp_CV --> HNO4_CV                                                             ', &
-     '                    HONO_CV --> NO2m_CV + Hp_CV                                                     ', &
-     '            NO2m_CV + Hp_CV --> HONO_CV                                                             ', &
-     '                   GLYAC_CV --> GLYACm_CV + Hp_CV                                                   ', &
-     '          GLYACm_CV + Hp_CV --> GLYAC_CV                                                            ', &
-     '                   OXLAC_CV --> OXLACm_CV + Hp_CV                                                   ', &
-     '          OXLACm_CV + Hp_CV --> OXLAC_CV                                                            ', &
-     '                  OXLACm_CV --> OXLACmm_CV + Hp_CV                                                  ', &
-     '         OXLACmm_CV + Hp_CV --> OXLACm_CV                                                           ', &
-     '                   PYRAC_CV --> PYRACm_CV + Hp_CV                                                   ', &
-     '          PYRACm_CV + Hp_CV --> PYRAC_CV                                                            ', &
-     '                  GCOLAC_CV --> GCOLACm_CV + Hp_CV                                                  ', &
-     '         GCOLACm_CV + Hp_CV --> GCOLAC_CV                                                           ', &
-     '                    AACD_CV --> AACDm_CV + Hp_CV                                                    ', &
-     '           AACDm_CV + Hp_CV --> AACD_CV                                                             ', &
-     ' H2O2_CV + HSO3m_CV + Hp_CV --> SO4mm_CV + 2 Hp_CV                                                  ', &
-     '             SO2_CV + O3_CV --> SO4mm_CV + 2 Hp_CV                                                  ', &
-     '           O3_CV + HSO3m_CV --> SO4mm_CV + Hp_CV                                                    ', &
-     '           O3_CV + SO3mm_CV --> SO4mm_CV                                                            ', &
-     '                   2 HO2_CV --> H2O2_CV                                                             ', &
-     '            O2m_CV + HO2_CV --> H2O2_CV + OHm_CV                                                    ', &
-     '             O2m_CV + O3_CV --> OHm_CV + OH_CV                                                      ' /)
+     '               OHm_CV + Hp_CV --> H2O_CV                                                            ', &
+     '                       SO2_CV --> Hp_CV + HSO3m_CV                                                  ', &
+     '             Hp_CV + HSO3m_CV --> SO2_CV                                                            ', &
+     '                     HSO3m_CV --> SO3mm_CV + Hp_CV                                                  ', &
+     '             SO3mm_CV + Hp_CV --> HSO3m_CV                                                          ', &
+     '                      HNO3_CV --> NO3m_CV + Hp_CV                                                   ', &
+     '              NO3m_CV + Hp_CV --> HNO3_CV                                                           ', &
+     '                      NH4p_CV --> NH3_CV + Hp_CV                                                    ', &
+     '               NH3_CV + Hp_CV --> NH4p_CV                                                           ', &
+     '                     H2CO3_CV --> HCO3m_CV + Hp_CV                                                  ', &
+     '             HCO3m_CV + Hp_CV --> H2CO3_CV                                                          ', &
+     '                     HCO3m_CV --> CO3mm_CV + Hp_CV                                                  ', &
+     '             CO3mm_CV + Hp_CV --> HCO3m_CV                                                          ', &
+     '                       HCL_CV --> Clm_CV + Hp_CV                                                    ', &
+     '               Clm_CV + Hp_CV --> HCL_CV                                                            ', &
+     '                      SULF_CV --> HSO4m_CV + Hp_CV                                                  ', &
+     '             HSO4m_CV + Hp_CV --> SULF_CV                                                           ', &
+     '                     HSO4m_CV --> SO4mm_CV + Hp_CV                                                  ', &
+     '             SO4mm_CV + Hp_CV --> HSO4m_CV                                                          ', &
+     '                      FACD_CV --> HCOOm_CV + Hp_CV                                                  ', &
+     '             HCOOm_CV + Hp_CV --> FACD_CV                                                           ', &
+     '                       HO2_CV --> O2m_CV + Hp_CV                                                    ', &
+     '               O2m_CV + Hp_CV --> HO2_CV                                                            ', &
+     '                      HNO4_CV --> NO4m_CV + Hp_CV                                                   ', &
+     '              NO4m_CV + Hp_CV --> HNO4_CV                                                           ', &
+     '                      HONO_CV --> NO2m_CV + Hp_CV                                                   ', &
+     '              NO2m_CV + Hp_CV --> HONO_CV                                                           ', &
+     '                     GLYAC_CV --> GLYACm_CV + Hp_CV                                                 ', &
+     '            GLYACm_CV + Hp_CV --> GLYAC_CV                                                          ', &
+     '                     OXLAC_CV --> OXLACm_CV + Hp_CV                                                 ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_22 = (/ &
-     '            SO2_CV + NO2_CV --> 2 NO2m_CV + SO4mm_CV - NO2_CV + 4 Hp_CV                             ', &
-     '          NO2_CV + HSO3m_CV --> 2 NO2m_CV + SO4mm_CV - NO2_CV + 3 Hp_CV                             ', &
-     '          NO2_CV + SO3mm_CV --> 2 NO2m_CV + SO4mm_CV - NO2_CV + 2 Hp_CV                             ', &
-     '         HSO3m_CV + HNO4_CV --> NO3m_CV + SO4mm_CV + 2 Hp_CV                                        ', &
-     '                    NO4m_CV --> NO2m_CV                                                             ', &
-     '            NO2m_CV + O3_CV --> NO3m_CV                                                             ', &
-     '            NO2m_CV + OH_CV --> OHm_CV + NO2_CV                                                     ', &
-     '            HONO_CV + OH_CV --> NO2_CV                                                              ', &
-     '                    2 OH_CV --> H2O2_CV                                                             ', &
-     '             HO2_CV + OH_CV --> DUMMY_CV                                                            ', &
-     '             O2m_CV + OH_CV --> OHm_CV                                                              ', &
-     '            H2O2_CV + OH_CV --> HO2_CV                                                              ', &
-     '           OH_CV + HSO3m_CV --> SO3m_CV                                                             ', &
-     '            NO2_CV + HO2_CV --> HNO4_CV                                                             ', &
-     '            O2m_CV + NO2_CV --> NO4m_CV                                                             ', &
-     '                    HNO4_CV --> NO2_CV + HO2_CV                                                     ', &
-     '          NO3_CV + SO4mm_CV --> SO4m_CV + NO3m_CV                                                   ', &
-     '          NO3_CV + HSO3m_CV --> SO4m_CV + NO3m_CV + Hp_CV                                           ', &
-     '            SO3m_CV + O2_CV --> SO5m_CV                                                             ', &
-     '           SO5m_CV + HO2_CV --> HSO5m_CV                                                            ', &
-     '                  2 SO5m_CV --> 2 SO4m_CV                                                           ', &
-     'HSO5m_CV + HSO3m_CV + Hp_CV --> 2 SO4mm_CV + 3 Hp_CV                                                ', &
-     '           SO4m_CV + H2O_CV --> HSO4m_CV + OH_CV + H2O_CV                                           ', &
-     '                 2 CH3O2_CV --> 2 HCHO_CV + 2 HO2_CV                                                ', &
-     '        CH3O2_CV + HSO3m_CV --> SO3m_CV + MHP_CV                                                    ', &
-     '         HCHO_CV + HSO3m_CV --> HMSm_CV                                                             ', &
-     '         HCHO_CV + SO3mm_CV --> HMSm_CV + OHm_CV                                                    ', &
-     '                    HMSm_CV --> HCHO_CV + HSO3m_CV                                                  ', &
-     '           HMSm_CV + OHm_CV --> CH2OHYD_CV + SO3mm_CV                                               ', &
-     '            HMSm_CV + OH_CV --> FACD_CV + HO2_CV + HSO3m_CV                                         ' /)
+     '            OXLACm_CV + Hp_CV --> OXLAC_CV                                                          ', &
+     '                    OXLACm_CV --> OXLACmm_CV + Hp_CV                                                ', &
+     '           OXLACmm_CV + Hp_CV --> OXLACm_CV                                                         ', &
+     '                     PYRAC_CV --> PYRACm_CV + Hp_CV                                                 ', &
+     '            PYRACm_CV + Hp_CV --> PYRAC_CV                                                          ', &
+     '                    GCOLAC_CV --> GCOLACm_CV + Hp_CV                                                ', &
+     '           GCOLACm_CV + Hp_CV --> GCOLAC_CV                                                         ', &
+     '                      AACD_CV --> AACDm_CV + Hp_CV                                                  ', &
+     '             AACDm_CV + Hp_CV --> AACD_CV                                                           ', &
+     '   H2O2_CV + Hp_CV + HSO3m_CV --> SO4mm_CV + 2 Hp_CV                                                ', &
+     '               SO2_CV + O3_CV --> SO4mm_CV + 2 Hp_CV                                                ', &
+     '             O3_CV + HSO3m_CV --> SO4mm_CV + Hp_CV                                                  ', &
+     '             O3_CV + SO3mm_CV --> SO4mm_CV                                                          ', &
+     '                     2 HO2_CV --> H2O2_CV                                                           ', &
+     '              O2m_CV + HO2_CV --> H2O2_CV + OHm_CV                                                  ', &
+     '               O2m_CV + O3_CV --> OHm_CV + OH_CV                                                    ', &
+     '              SO2_CV + NO2_CV --> 2 NO2m_CV + SO4mm_CV - NO2_CV + 4 Hp_CV                           ', &
+     '            NO2_CV + HSO3m_CV --> 2 NO2m_CV + SO4mm_CV - NO2_CV + 3 Hp_CV                           ', &
+     '            NO2_CV + SO3mm_CV --> 2 NO2m_CV + SO4mm_CV - NO2_CV + 2 Hp_CV                           ', &
+     '           HNO4_CV + HSO3m_CV --> NO3m_CV + SO4mm_CV + 2 Hp_CV                                      ', &
+     '                      NO4m_CV --> NO2m_CV                                                           ', &
+     '              NO2m_CV + O3_CV --> NO3m_CV                                                           ', &
+     '              NO2m_CV + OH_CV --> OHm_CV + NO2_CV                                                   ', &
+     '              HONO_CV + OH_CV --> NO2_CV                                                            ', &
+     '                      2 OH_CV --> H2O2_CV                                                           ', &
+     '               HO2_CV + OH_CV --> DUMMY_CV                                                          ', &
+     '               O2m_CV + OH_CV --> OHm_CV                                                            ', &
+     '              H2O2_CV + OH_CV --> HO2_CV                                                            ', &
+     '             OH_CV + HSO3m_CV --> SO3m_CV                                                           ', &
+     '              NO2_CV + HO2_CV --> HNO4_CV                                                           ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_23 = (/ &
-     '  MHP_CV + HSO3m_CV + Hp_CV --> SO4mm_CV + 2 Hp_CV                                                  ', &
-     '  PAA_CV + HSO3m_CV + Hp_CV --> SO4mm_CV + 2 Hp_CV                                                  ', &
-     '          PAA_CV + HSO3m_CV --> SO4mm_CV + Hp_CV                                                    ', &
-     '           HCOOm_CV + OH_CV --> H2CO3_CV + OHm_CV + HO2_CV                                          ', &
-     '            GLYD_CV + OH_CV --> GCOLAC_CV + HO2_CV                                                  ', &
-     '            GLYD_CV + OH_CV --> GLY_CV + HO2_CV                                                     ', &
-     '          GCOLAC_CV + OH_CV --> GLYACm_CV + HO2_CV + Hp_CV                                          ', &
-     '         GCOLACm_CV + OH_CV --> GLYACm_CV + HO2_CV                                                  ', &
-     '             GLY_CV + OH_CV --> GLYAC_CV + HO2_CV                                                   ', &
-     '           GLYAC_CV + OH_CV --> OXLAC_CV + HO2_CV                                                   ', &
-     '          GLYACm_CV + OH_CV --> OXLACm_CV + HO2_CV                                                  ', &
-     '           OXLAC_CV + OH_CV --> 2 H2CO3_CV - OH_CV                                                  ', &
-     '          OXLACm_CV + OH_CV --> CO2m_CV + H2CO3_CV                                                  ', &
-     '         OXLACmm_CV + OH_CV --> CO2m_CV + H2CO3_CV + OHm_CV                                         ', &
-     '            MGLY_CV + OH_CV --> 0.92 PYRACm_CV + 0.08 GLYACm_CV + HO2_CV                            ', &
-     '           PYRAC_CV + OH_CV --> H2CO3_CV + AACD_CV + HO2_CV                                         ', &
-     '          PYRACm_CV + OH_CV --> H2CO3_CV + AACDm_CV + HO2_CV                                        ', &
-     '            AACD_CV + OH_CV --> 0.85 GLYAC_CV + 0.15 CH2OHYD_CV                                     ', &
-     '           AACDm_CV + OH_CV --> 0.85 GLYACm_CV + 0.15 CH2OHYD_CV                                    ', &
-     '         CH2OHYD_CV + OH_CV --> FACD_CV + HO2_CV                                                    ', &
-     '            FACD_CV + OH_CV --> H2CO3_CV + HO2_CV                                                   ', &
-     '                    H2O2_CV --> 2 OH_CV                                                             ', &
-     '          IEPOX_CV + H2O_CV --> ISO3_CV                                                             ', &
-     '        IEPOX_CV + SO4mm_CV --> ISO3_CV                                                             ', &
-     '         IEPOX_CV + NO3m_CV --> ISO3_CV                                                             ', &
-     '                      ANO3I --> WD_ANO3I + NO3m_CV                                                  ', &
-     '                      ANH4I --> WD_ANH4I + NH4p_CV                                                  ', &
-     '                       ACLI --> WD_ACLI + Clm_CV                                                    ', &
-     '                      ASO4I --> WD_ASO4I + SO4mm_CV                                                 ', &
-     '                      Hp_CV --> WD_Hp                                                               ' /)
+     '              O2m_CV + NO2_CV --> NO4m_CV                                                           ', &
+     '                      HNO4_CV --> NO2_CV + HO2_CV                                                   ', &
+     '            NO3_CV + SO4mm_CV --> SO4m_CV + NO3m_CV                                                 ', &
+     '            NO3_CV + HSO3m_CV --> SO4m_CV + NO3m_CV + Hp_CV                                         ', &
+     '              SO3m_CV + O2_CV --> SO5m_CV                                                           ', &
+     '             SO5m_CV + HO2_CV --> HSO5m_CV                                                          ', &
+     '                    2 SO5m_CV --> 2 SO4m_CV                                                         ', &
+     '  HSO5m_CV + Hp_CV + HSO3m_CV --> 2 SO4mm_CV + 3 Hp_CV                                              ', &
+     '             SO4m_CV + H2O_CV --> HSO4m_CV + OH_CV + H2O_CV                                         ', &
+     '                   2 CH3O2_CV --> 2 HCHO_CV + 2 HO2_CV                                              ', &
+     '          CH3O2_CV + HSO3m_CV --> SO3m_CV + MHP_CV                                                  ', &
+     '           HCHO_CV + HSO3m_CV --> HMSm_CV                                                           ', &
+     '           HCHO_CV + SO3mm_CV --> HMSm_CV + OHm_CV                                                  ', &
+     '                      HMSm_CV --> HCHO_CV + HSO3m_CV                                                ', &
+     '             HMSm_CV + OHm_CV --> CH2OHYD_CV + SO3mm_CV                                             ', &
+     '              HMSm_CV + OH_CV --> FACD_CV + HO2_CV + HSO3m_CV                                       ', &
+     '    MHP_CV + Hp_CV + HSO3m_CV --> SO4mm_CV + 2 Hp_CV                                                ', &
+     '    PAA_CV + Hp_CV + HSO3m_CV --> SO4mm_CV + 2 Hp_CV                                                ', &
+     '            PAA_CV + HSO3m_CV --> SO4mm_CV + Hp_CV                                                  ', &
+     '             HCOOm_CV + OH_CV --> H2CO3_CV + OHm_CV + HO2_CV                                        ', &
+     '              GLYD_CV + OH_CV --> GCOLAC_CV + HO2_CV                                                ', &
+     '              GLYD_CV + OH_CV --> GLY_CV + HO2_CV                                                   ', &
+     '            GCOLAC_CV + OH_CV --> GLYACm_CV + HO2_CV + Hp_CV                                        ', &
+     '           GCOLACm_CV + OH_CV --> GLYACm_CV + HO2_CV                                                ', &
+     '               GLY_CV + OH_CV --> GLYAC_CV + HO2_CV                                                 ', &
+     '             GLYAC_CV + OH_CV --> OXLAC_CV + HO2_CV                                                 ', &
+     '            GLYACm_CV + OH_CV --> OXLACm_CV + HO2_CV                                                ', &
+     '             OXLAC_CV + OH_CV --> 2 H2CO3_CV - OH_CV                                                ', &
+     '            OXLACm_CV + OH_CV --> CO2m_CV + H2CO3_CV                                                ', &
+     '           OXLACmm_CV + OH_CV --> CO2m_CV + H2CO3_CV + OHm_CV                                       ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_24 = (/ &
-     '                     OHm_CV --> WD_OHm                                                              ', &
-     '                     SO2_CV --> WD_SO2                                                              ', &
-     '                    FACD_CV --> WD_FACD                                                             ', &
-     '                    HNO3_CV --> WD_HNO3                                                             ', &
-     '                   H2CO3_CV --> WD_CO2                                                              ', &
-     '                   HCO3m_CV --> WD_CO2                                                              ', &
-     '                   CO3mm_CV --> WD_CO2                                                              ', &
-     '                     NH3_CV --> WD_NH3                                                              ', &
-     '                    H2O2_CV --> WD_H2O2                                                             ', &
-     '                      O3_CV --> WD_O3                                                               ', &
-     '                     HCL_CV --> WD_HCL                                                              ', &
-     '                     GLY_CV --> WD_GLY                                                              ', &
-     '                    MGLY_CV --> WD_MGLY                                                             ', &
-     '                      OH_CV --> WD_OH                                                               ', &
-     '                   HSO3m_CV --> WD_SO2                                                              ', &
-     '                   HCOOm_CV --> WD_FACD                                                             ', &
-     '                   SO4mm_CV --> WD_ASO4J                                                            ', &
-     '                    ORGC_CV --> WD_AORGCJ                                                           ', &
-     '                   SO3mm_CV --> WD_SO2                                                              ', &
-     '                    NO3m_CV --> WD_ANO3J                                                            ', &
-     '                    NH4p_CV --> WD_ANH4J                                                            ', &
-     '                     Clm_CV --> WD_ACLJ                                                             ', &
-     '                    SULF_CV --> WD_ASO4J                                                            ', &
-     '                   HSO4m_CV --> WD_ASO4J                                                            ', &
-     '                     NO2_CV --> WD_NO2                                                              ', &
-     '                    HONO_CV --> WD_HONO                                                             ', &
-     '                    HNO4_CV --> WD_PNA                                                              ', &
-     '                    GLYD_CV --> WD_GLYD                                                             ', &
-     '                    AACD_CV --> WD_AACD                                                             ', &
-     '                    HCHO_CV --> WD_FORM                                                             ' /)
+     '              MGLY_CV + OH_CV --> 0.92 PYRACm_CV + 0.08 GLYACm_CV + HO2_CV                          ', &
+     '             PYRAC_CV + OH_CV --> H2CO3_CV + AACD_CV + HO2_CV                                       ', &
+     '            PYRACm_CV + OH_CV --> H2CO3_CV + AACDm_CV + HO2_CV                                      ', &
+     '              AACD_CV + OH_CV --> 0.85 GLYAC_CV + 0.15 CH2OHYD_CV                                   ', &
+     '             AACDm_CV + OH_CV --> 0.85 GLYACm_CV + 0.15 CH2OHYD_CV                                  ', &
+     '           CH2OHYD_CV + OH_CV --> FACD_CV + HO2_CV                                                  ', &
+     '              FACD_CV + OH_CV --> H2CO3_CV + HO2_CV                                                 ', &
+     '             MNpp_CV + SO2_CV --> MNpp_CV + SO4mm_CV + 2 Hp_CV                                      ', &
+     '           MNpp_CV + HSO3m_CV --> MNpp_CV + SO4mm_CV + Hp_CV                                        ', &
+     '           MNpp_CV + SO3mm_CV --> MNpp_CV + SO4mm_CV                                                ', &
+     '            FEppp_CV + SO2_CV --> FEppp_CV + SO4mm_CV + 2 Hp_CV                                     ', &
+     '          FEppp_CV + HSO3m_CV --> FEppp_CV + SO4mm_CV + Hp_CV                                       ', &
+     '          FEppp_CV + SO3mm_CV --> FEppp_CV + SO4mm_CV                                               ', &
+     '  FEppp_CV + MNpp_CV + SO2_CV --> FEppp_CV + MNpp_CV + SO4mm_CV + 2 Hp_CV                           ', &
+     'FEppp_CV + MNpp_CV + HSO3m_CV --> FEppp_CV + MNpp_CV + SO4mm_CV + Hp_CV                             ', &
+     'FEppp_CV + MNpp_CV + SO3mm_CV --> FEppp_CV + MNpp_CV + SO4mm_CV                                     ', &
+     '                      H2O2_CV --> 2 OH_CV                                                           ', &
+     '            IEPOX_CV + H2O_CV --> ISO3_CV                                                           ', &
+     '          IEPOX_CV + SO4mm_CV --> ISO3_CV                                                           ', &
+     '           IEPOX_CV + NO3m_CV --> ISO3_CV                                                           ', &
+     '                        ANO3I --> WD_ANO3I + NO3m_CV                                                ', &
+     '                        ANH4I --> WD_ANH4I + NH4p_CV                                                ', &
+     '                         ACLI --> WD_ACLI + Clm_CV                                                  ', &
+     '                        ASO4I --> WD_ASO4I + SO4mm_CV                                               ', &
+     '                         ANAI --> NAp_CV + WD_ANAI                                                  ', &
+     '                        Hp_CV --> WD_Hp                                                             ', &
+     '                       OHm_CV --> WD_OHm                                                            ', &
+     '                       SO2_CV --> WD_SO2                                                            ', &
+     '                      FACD_CV --> WD_FACD                                                           ', &
+     '                      HNO3_CV --> WD_HNO3                                                           ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_25 = (/ &
-     '                 CH2OHYD_CV --> WD_FORM                                                             ', &
-     '                  GCOLAC_CV --> WD_AORGCJ                                                           ', &
-     '                 GCOLACm_CV --> WD_AORGCJ                                                           ', &
-     '                   GLYAC_CV --> WD_AORGCJ                                                           ', &
-     '                  GLYACm_CV --> WD_AORGCJ                                                           ', &
-     '                   OXLAC_CV --> WD_AORGCJ                                                           ', &
-     '                  OXLACm_CV --> WD_AORGCJ                                                           ', &
-     '                 OXLACmm_CV --> WD_AORGCJ                                                           ', &
-     '                   AACDm_CV --> WD_AACD                                                             ', &
-     '                    CO2m_CV --> WD_CO2                                                              ', &
-     '                   PYRAC_CV --> WD_AORGCJ                                                           ', &
-     '                  PYRACm_CV --> WD_AORGCJ                                                           ', &
-     '                     HO2_CV --> WD_HO2                                                              ', &
-     '                     O2m_CV --> WD_O2m                                                              ', &
-     '                    NO2m_CV --> WD_HONO                                                             ', &
-     '                    NO4m_CV --> WD_PNA                                                              ', &
-     '                     NO3_CV --> WD_NO3                                                              ', &
-     '                   CH3O2_CV --> WD_MEO2                                                             ', &
-     '                    SO3m_CV --> WD_SO2                                                              ', &
-     '                    SO4m_CV --> WD_SO2                                                              ', &
-     '                    SO5m_CV --> WD_SO2                                                              ', &
-     '                   HSO5m_CV --> WD_SO2                                                              ', &
-     '                    HMSm_CV --> WD_SO2                                                              ', &
-     '                     MHP_CV --> WD_MHP                                                              ', &
-     '                     PAA_CV --> WD_PACD                                                             ', &
-     '                   IEPOX_CV --> WD_EPOX                                                             ', &
-     '                    ISO3_CV --> WD_AISO3J                                                           ', &
-     '                        NO2 --> WD_NO2                                                              ', &
-     '                         NO --> WD_NO                                                               ', &
-     '                         O3 --> WD_O3                                                               ' /)
+     '                     H2CO3_CV --> WD_CO2                                                            ', &
+     '                     HCO3m_CV --> WD_CO2                                                            ', &
+     '                     CO3mm_CV --> WD_CO2                                                            ', &
+     '                       NH3_CV --> WD_NH3                                                            ', &
+     '                      H2O2_CV --> WD_H2O2                                                           ', &
+     '                        O3_CV --> WD_O3                                                             ', &
+     '                       HCL_CV --> WD_HCL                                                            ', &
+     '                       GLY_CV --> WD_GLY                                                            ', &
+     '                      MGLY_CV --> WD_MGLY                                                           ', &
+     '                        OH_CV --> WD_OH                                                             ', &
+     '                     HSO3m_CV --> WD_SO2                                                            ', &
+     '                     HCOOm_CV --> WD_FACD                                                           ', &
+     '                     SO4mm_CV --> WD_ASO4J                                                          ', &
+     '                      ORGC_CV --> WD_AORGCJ                                                         ', &
+     '                     SO3mm_CV --> WD_SO2                                                            ', &
+     '                      NO3m_CV --> WD_ANO3J                                                          ', &
+     '                      NH4p_CV --> WD_ANH4J                                                          ', &
+     '                       Clm_CV --> WD_ACLJ                                                           ', &
+     '                      SULF_CV --> WD_ASO4J                                                          ', &
+     '                     HSO4m_CV --> WD_ASO4J                                                          ', &
+     '                       NO2_CV --> WD_NO2                                                            ', &
+     '                      HONO_CV --> WD_HONO                                                           ', &
+     '                      HNO4_CV --> WD_PNA                                                            ', &
+     '                      GLYD_CV --> WD_GLYD                                                           ', &
+     '                      AACD_CV --> WD_AACD                                                           ', &
+     '                      HCHO_CV --> WD_FORM                                                           ', &
+     '                   CH2OHYD_CV --> WD_FORM                                                           ', &
+     '                    GCOLAC_CV --> WD_AORGCJ                                                         ', &
+     '                   GCOLACm_CV --> WD_AORGCJ                                                         ', &
+     '                     GLYAC_CV --> WD_AORGCJ                                                         ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_26 = (/ &
-     '                        NO3 --> WD_NO3                                                              ', &
-     '                       H2O2 --> WD_H2O2                                                             ', &
-     '                       N2O5 --> WD_N2O5                                                             ', &
-     '                       HNO3 --> WD_HNO3                                                             ', &
-     '                       HONO --> WD_HONO                                                             ', &
-     '                        PNA --> WD_PNA                                                              ', &
-     '                        SO2 --> WD_SO2                                                              ', &
-     '                       SULF --> WD_SULF                                                             ', &
-     '                        PAN --> WD_PAN                                                              ', &
-     '                       PACD --> WD_PACD                                                             ', &
-     '                       AACD --> WD_AACD                                                             ', &
-     '                       ALD2 --> WD_ALD2                                                             ', &
-     '                       PANX --> WD_PANX                                                             ', &
-     '                       FORM --> WD_FORM                                                             ', &
-     '                       MEPX --> WD_MEPX                                                             ', &
-     '                       MEOH --> WD_MEOH                                                             ', &
-     '                       ROOH --> WD_ROOH                                                             ', &
-     '                       NTR1 --> WD_NTR1                                                             ', &
-     '                       NTR2 --> WD_NTR2                                                             ', &
-     '                       FACD --> WD_FACD                                                             ', &
-     '                         CO --> WD_CO                                                               ', &
-     '                       ALDX --> WD_ALDX                                                             ', &
-     '                       GLYD --> WD_GLYD                                                             ', &
-     '                        GLY --> WD_GLY                                                              ', &
-     '                       MGLY --> WD_MGLY                                                             ', &
-     '                       ETHA --> WD_ETHA                                                             ', &
-     '                       ETOH --> WD_ETOH                                                             ', &
-     '                        KET --> WD_KET                                                              ', &
-     '                        PAR --> WD_PAR                                                              ', &
-     '                       ACET --> WD_ACET                                                             ' /)
+     '                    GLYACm_CV --> WD_AORGCJ                                                         ', &
+     '                     OXLAC_CV --> WD_AORGCJ                                                         ', &
+     '                    OXLACm_CV --> WD_AORGCJ                                                         ', &
+     '                   OXLACmm_CV --> WD_AORGCJ                                                         ', &
+     '                     AACDm_CV --> WD_AACD                                                           ', &
+     '                      CO2m_CV --> WD_CO2                                                            ', &
+     '                     PYRAC_CV --> WD_AORGCJ                                                         ', &
+     '                    PYRACm_CV --> WD_AORGCJ                                                         ', &
+     '                       HO2_CV --> WD_HO2                                                            ', &
+     '                       O2m_CV --> WD_O2m                                                            ', &
+     '                      NO2m_CV --> WD_HONO                                                           ', &
+     '                      NO4m_CV --> WD_PNA                                                            ', &
+     '                       NO3_CV --> WD_NO3                                                            ', &
+     '                     CH3O2_CV --> WD_MEO2                                                           ', &
+     '                      SO3m_CV --> WD_SO2                                                            ', &
+     '                      SO4m_CV --> WD_SO2                                                            ', &
+     '                      SO5m_CV --> WD_SO2                                                            ', &
+     '                     HSO5m_CV --> WD_SO2                                                            ', &
+     '                      HMSm_CV --> WD_SO2                                                            ', &
+     '                       MHP_CV --> WD_MHP                                                            ', &
+     '                       PAA_CV --> WD_PACD                                                           ', &
+     '                     IEPOX_CV --> WD_EPOX                                                           ', &
+     '                      ISO3_CV --> WD_AISO3J                                                         ', &
+     '                     FEppp_CV --> WD_FEppp                                                          ', &
+     '                      MNpp_CV --> WD_MNpp                                                           ', &
+     '                       NAp_CV --> WD_NAp                                                            ', &
+     '                      MGpp_CV --> WD_MGpp                                                           ', &
+     '                      CApp_CV --> WD_CApp                                                           ', &
+     '                        Kp_CV --> WD_Kp                                                             ', &
+     '                          NO2 --> WD_NO2                                                            ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_27 = (/ &
-     '                       PRPA --> WD_PRPA                                                             ', &
-     '                       ETHY --> WD_ETHY                                                             ', &
-     '                        ETH --> WD_ETH                                                              ', &
-     '                        OLE --> WD_OLE                                                              ', &
-     '                       IOLE --> WD_IOLE                                                             ', &
-     '                       ISOP --> WD_ISOP                                                             ', &
-     '                       ISPD --> WD_ISPD                                                             ', &
-     '                       INTR --> WD_INTR                                                             ', &
-     '                       ISPX --> WD_ISPX                                                             ', &
-     '                       EPOX --> WD_EPOX                                                             ', &
-     '                       TERP --> WD_TERP                                                             ', &
-     '                       APIN --> WD_APIN                                                             ', &
-     '                      MTNO3 --> WD_MTNO3                                                            ', &
-     '                    BENZENE --> WD_BENZENE                                                          ', &
-     '                       CRES --> WD_CRES                                                             ', &
-     '                       OPEN --> WD_OPEN                                                             ', &
-     '                        TOL --> WD_TOL                                                              ', &
-     '                       XOPN --> WD_XOPN                                                             ', &
-     '                      XYLMN --> WD_XYLMN                                                            ', &
-     '                       NAPH --> WD_NAPH                                                             ', &
-     '                       CAT1 --> WD_CAT1                                                             ', &
-     '                       CRON --> WD_CRON                                                             ', &
-     '                       OPAN --> WD_OPAN                                                             ', &
-     '                       ECH4 --> WD_ECH4                                                             ', &
-     '                        CL2 --> WD_CL2                                                              ', &
-     '                       HOCL --> WD_HOCL                                                             ', &
-     '                        CLO --> WD_CLO                                                              ', &
-     '                       FMCL --> WD_FMCL                                                             ', &
-     '                        HCL --> WD_HCL                                                              ', &
-     '                      CLNO2 --> WD_CLNO2                                                            ' /)
+     '                           NO --> WD_NO                                                             ', &
+     '                           O3 --> WD_O3                                                             ', &
+     '                          NO3 --> WD_NO3                                                            ', &
+     '                         H2O2 --> WD_H2O2                                                           ', &
+     '                         N2O5 --> WD_N2O5                                                           ', &
+     '                         HNO3 --> WD_HNO3                                                           ', &
+     '                         HONO --> WD_HONO                                                           ', &
+     '                          PNA --> WD_PNA                                                            ', &
+     '                          SO2 --> WD_SO2                                                            ', &
+     '                         SULF --> WD_SULF                                                           ', &
+     '                          PAN --> WD_PAN                                                            ', &
+     '                         PACD --> WD_PACD                                                           ', &
+     '                         AACD --> WD_AACD                                                           ', &
+     '                         ALD2 --> WD_ALD2                                                           ', &
+     '                         PANX --> WD_PANX                                                           ', &
+     '                         FORM --> WD_FORM                                                           ', &
+     '                         MEPX --> WD_MEPX                                                           ', &
+     '                         MEOH --> WD_MEOH                                                           ', &
+     '                         ROOH --> WD_ROOH                                                           ', &
+     '                         NTR1 --> WD_NTR1                                                           ', &
+     '                         NTR2 --> WD_NTR2                                                           ', &
+     '                         FACD --> WD_FACD                                                           ', &
+     '                           CO --> WD_CO                                                             ', &
+     '                         ALDX --> WD_ALDX                                                           ', &
+     '                         GLYD --> WD_GLYD                                                           ', &
+     '                          GLY --> WD_GLY                                                            ', &
+     '                         MGLY --> WD_MGLY                                                           ', &
+     '                         ETHA --> WD_ETHA                                                           ', &
+     '                         ETOH --> WD_ETOH                                                           ', &
+     '                          KET --> WD_KET                                                            ' /)
   CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_28 = (/ &
-     '                      CLNO3 --> WD_CLNO3                                                            ', &
-     '                       SESQ --> WD_SESQ                                                             ', &
-     '                     SOAALK --> WD_SOAALK                                                           ', &
-     '                     VLVPO1 --> WD_VLVPO1                                                           ', &
-     '                     VSVPO1 --> WD_VSVPO1                                                           ', &
-     '                     VSVPO2 --> WD_VSVPO2                                                           ', &
-     '                     VSVPO3 --> WD_VSVPO3                                                           ', &
-     '                     VIVPO1 --> WD_VIVPO1                                                           ', &
-     '                     VLVOO1 --> WD_VLVOO1                                                           ', &
-     '                     VLVOO2 --> WD_VLVOO2                                                           ', &
-     '                     VSVOO1 --> WD_VSVOO1                                                           ', &
-     '                     VSVOO2 --> WD_VSVOO2                                                           ', &
-     '                     VSVOO3 --> WD_VSVOO3                                                           ', &
-     '                      PCVOC --> WD_PCVOC                                                            ', &
-     '               FORM_PRIMARY --> WD_FORM_PRIMARY                                                     ', &
-     '               ALD2_PRIMARY --> WD_ALD2_PRIMARY                                                     ', &
-     '                BUTADIENE13 --> WD_BUTADIENE13                                                      ', &
-     '                   ACROLEIN --> WD_ACROLEIN                                                         ', &
-     '               ACRO_PRIMARY --> WD_ACRO_PRIMARY                                                     ', &
-     '                       TOLU --> WD_TOLU                                                             ', &
-     '                         HG --> WD_HG                                                               ', &
-     '                    HGIIGAS --> WD_HGIIGAS                                                          ', &
-     '                     SVAVB1 --> WD_SVAVB1                                                           ', &
-     '                     SVAVB2 --> WD_SVAVB2                                                           ', &
-     '                     SVAVB3 --> WD_SVAVB3                                                           ', &
-     '                     SVAVB4 --> WD_SVAVB4                                                           ', &
-     '                        DMS --> WD_DMS                                                              ', &
-     '                        MSA --> WD_MSA                                                              ', &
-     '                      ASO4I --> WD_ASO4I                                                            ', &
-     '                      ASO4J --> WD_ASO4J                                                            ' /)
-  CHARACTER(LEN=100), PARAMETER, DIMENSION(22) :: EQN_NAMES_29 = (/ &
-     '                      ANH4I --> WD_ANH4I                                                            ', &
-     '                      ANO3I --> WD_ANO3I                                                            ', &
-     '                       ACLI --> WD_ACLI                                                             ', &
-     '                       ACLJ --> WD_ACLJ                                                             ', &
-     '                       ACLK --> WD_ACLK                                                             ', &
-     '                     AISO1J --> WD_AISO1J                                                           ', &
-     '                     AISO2J --> WD_AISO2J                                                           ', &
-     '                      ASQTJ --> WD_ASQTJ                                                            ', &
-     '                     AISO3J --> WD_AISO3J                                                           ', &
-     '                     AOLGAJ --> WD_AOLGAJ                                                           ', &
-     '                     AOLGBJ --> WD_AOLGBJ                                                           ', &
-     '                      AGLYJ --> WD_AGLYJ                                                            ', &
-     '                    AMTNO3J --> WD_AMTNO3J                                                          ', &
-     '                    AMTHYDJ --> WD_AMTHYDJ                                                          ', &
-     '                      APOCI --> WD_APOCI                                                            ', &
-     '                      APOCJ --> WD_APOCJ                                                            ', &
-     '                    APNCOMI --> WD_APNCOMI                                                          ', &
-     '                    APNCOMJ --> WD_APNCOMJ                                                          ', &
-     '                     AAVB2J --> WD_AAVB2J                                                           ', &
-     '                     AAVB3J --> WD_AAVB3J                                                           ', &
-     '                     AAVB4J --> WD_AAVB4J                                                           ', &
-     '                        NH3 --> WD_NH3                                                              ' /)
-  CHARACTER(LEN=100), PARAMETER, DIMENSION(892) :: EQN_NAMES = (/&
+     '                          PAR --> WD_PAR                                                            ', &
+     '                         ACET --> WD_ACET                                                           ', &
+     '                         PRPA --> WD_PRPA                                                           ', &
+     '                         ETHY --> WD_ETHY                                                           ', &
+     '                          ETH --> WD_ETH                                                            ', &
+     '                          OLE --> WD_OLE                                                            ', &
+     '                         IOLE --> WD_IOLE                                                           ', &
+     '                         ISOP --> WD_ISOP                                                           ', &
+     '                         ISPD --> WD_ISPD                                                           ', &
+     '                         INTR --> WD_INTR                                                           ', &
+     '                         ISPX --> WD_ISPX                                                           ', &
+     '                         EPOX --> WD_EPOX                                                           ', &
+     '                         TERP --> WD_TERP                                                           ', &
+     '                         APIN --> WD_APIN                                                           ', &
+     '                        MTNO3 --> WD_MTNO3                                                          ', &
+     '                      BENZENE --> WD_BENZENE                                                        ', &
+     '                         CRES --> WD_CRES                                                           ', &
+     '                         OPEN --> WD_OPEN                                                           ', &
+     '                          TOL --> WD_TOL                                                            ', &
+     '                         XOPN --> WD_XOPN                                                           ', &
+     '                        XYLMN --> WD_XYLMN                                                          ', &
+     '                         NAPH --> WD_NAPH                                                           ', &
+     '                         CAT1 --> WD_CAT1                                                           ', &
+     '                         CRON --> WD_CRON                                                           ', &
+     '                         OPAN --> WD_OPAN                                                           ', &
+     '                         ECH4 --> WD_ECH4                                                           ', &
+     '                          CL2 --> WD_CL2                                                            ', &
+     '                         HOCL --> WD_HOCL                                                           ', &
+     '                          CLO --> WD_CLO                                                            ', &
+     '                         FMCL --> WD_FMCL                                                           ' /)
+  CHARACTER(LEN=100), PARAMETER, DIMENSION(30) :: EQN_NAMES_29 = (/ &
+     '                          HCL --> WD_HCL                                                            ', &
+     '                        CLNO2 --> WD_CLNO2                                                          ', &
+     '                        CLNO3 --> WD_CLNO3                                                          ', &
+     '                         SESQ --> WD_SESQ                                                           ', &
+     '                       SOAALK --> WD_SOAALK                                                         ', &
+     '                       VLVPO1 --> WD_VLVPO1                                                         ', &
+     '                       VSVPO1 --> WD_VSVPO1                                                         ', &
+     '                       VSVPO2 --> WD_VSVPO2                                                         ', &
+     '                       VSVPO3 --> WD_VSVPO3                                                         ', &
+     '                       VIVPO1 --> WD_VIVPO1                                                         ', &
+     '                       VLVOO1 --> WD_VLVOO1                                                         ', &
+     '                       VLVOO2 --> WD_VLVOO2                                                         ', &
+     '                       VSVOO1 --> WD_VSVOO1                                                         ', &
+     '                       VSVOO2 --> WD_VSVOO2                                                         ', &
+     '                       VSVOO3 --> WD_VSVOO3                                                         ', &
+     '                        PCVOC --> WD_PCVOC                                                          ', &
+     '                 FORM_PRIMARY --> WD_FORM_PRIMARY                                                   ', &
+     '                 ALD2_PRIMARY --> WD_ALD2_PRIMARY                                                   ', &
+     '                  BUTADIENE13 --> WD_BUTADIENE13                                                    ', &
+     '                     ACROLEIN --> WD_ACROLEIN                                                       ', &
+     '                 ACRO_PRIMARY --> WD_ACRO_PRIMARY                                                   ', &
+     '                         TOLU --> WD_TOLU                                                           ', &
+     '                           HG --> WD_HG                                                             ', &
+     '                      HGIIGAS --> WD_HGIIGAS                                                        ', &
+     '                       SVAVB1 --> WD_SVAVB1                                                         ', &
+     '                       SVAVB2 --> WD_SVAVB2                                                         ', &
+     '                       SVAVB3 --> WD_SVAVB3                                                         ', &
+     '                       SVAVB4 --> WD_SVAVB4                                                         ', &
+     '                          DMS --> WD_DMS                                                            ', &
+     '                          MSA --> WD_MSA                                                            ' /)
+  CHARACTER(LEN=100), PARAMETER, DIMENSION(25) :: EQN_NAMES_30 = (/ &
+     '                        ASO4I --> WD_ASO4I                                                          ', &
+     '                        ASO4J --> WD_ASO4J                                                          ', &
+     '                        ANH4I --> WD_ANH4I                                                          ', &
+     '                        ANO3I --> WD_ANO3I                                                          ', &
+     '                         ANAI --> WD_ANAI                                                           ', &
+     '                         ACLI --> WD_ACLI                                                           ', &
+     '                         ACLJ --> WD_ACLJ                                                           ', &
+     '                         ACLK --> WD_ACLK                                                           ', &
+     '                       AISO1J --> WD_AISO1J                                                         ', &
+     '                       AISO2J --> WD_AISO2J                                                         ', &
+     '                        ASQTJ --> WD_ASQTJ                                                          ', &
+     '                       AISO3J --> WD_AISO3J                                                         ', &
+     '                       AOLGAJ --> WD_AOLGAJ                                                         ', &
+     '                       AOLGBJ --> WD_AOLGBJ                                                         ', &
+     '                        AGLYJ --> WD_AGLYJ                                                          ', &
+     '                      AMTNO3J --> WD_AMTNO3J                                                        ', &
+     '                      AMTHYDJ --> WD_AMTHYDJ                                                        ', &
+     '                        APOCI --> WD_APOCI                                                          ', &
+     '                        APOCJ --> WD_APOCJ                                                          ', &
+     '                      APNCOMI --> WD_APNCOMI                                                        ', &
+     '                      APNCOMJ --> WD_APNCOMJ                                                        ', &
+     '                       AAVB2J --> WD_AAVB2J                                                         ', &
+     '                       AAVB3J --> WD_AAVB3J                                                         ', &
+     '                       AAVB4J --> WD_AAVB4J                                                         ', &
+     '                          NH3 --> WD_NH3                                                            ' /)
+  CHARACTER(LEN=100), PARAMETER, DIMENSION(925) :: EQN_NAMES = (/&
     EQN_NAMES_0, EQN_NAMES_1, EQN_NAMES_2, EQN_NAMES_3, EQN_NAMES_4, &
     EQN_NAMES_5, EQN_NAMES_6, EQN_NAMES_7, EQN_NAMES_8, EQN_NAMES_9, &
     EQN_NAMES_10, EQN_NAMES_11, EQN_NAMES_12, EQN_NAMES_13, EQN_NAMES_14, &
     EQN_NAMES_15, EQN_NAMES_16, EQN_NAMES_17, EQN_NAMES_18, EQN_NAMES_19, &
     EQN_NAMES_20, EQN_NAMES_21, EQN_NAMES_22, EQN_NAMES_23, EQN_NAMES_24, &
-    EQN_NAMES_25, EQN_NAMES_26, EQN_NAMES_27, EQN_NAMES_28, EQN_NAMES_29 /)
+    EQN_NAMES_25, EQN_NAMES_26, EQN_NAMES_27, EQN_NAMES_28, EQN_NAMES_29, &
+    EQN_NAMES_30 /)
 
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: EQN_TAGS_0 = (/ &
      'R1             ','R2             ','R3             ', &
@@ -1273,146 +1315,159 @@ MODULE mchem_Monitor
      'AQ77_RS        ','AQ78_RS        ','AQ79_RS        ', &
      'AQ80_RS        ','AQ81_RS        ','AQ82_RS        ', &
      'AQ83_RS        ','AQ84_RS        ','AQ85_RS        ', &
-     'AQ86_RS        ','AQ87_RS        ','AQJ01_RS       ', &
+     'AQ86_RS        ','AQ87_RS        ','AQ88_RS        ', &
+     'AQ89_RS        ','AQ90_RS        ','AQ91_RS        ', &
+     'AQ92_RS        ','AQ93_RS        ','AQ94_RS        ', &
+     'AQ95_RS        ','AQ96_RS        ','AQJ01_RS       ', &
      'AQIEP01_RS     ','AQIEP02_RS     ','AQIEP03_RS     ', &
      'AKN01_RS       ','AKN02_RS       ','AKN03_RS       ', &
-     'AKN04_RS       ','AQWD01_RS      ','AQWD02_RS      ', &
-     'AQWD03_RS      ','AQWD04_RS      ','AQWD05_RS      ', &
-     'AQWD06_RS      ','AQWD07_RS      ','AQWD08_RS      ', &
-     'AQWD09_RS      ','AQWD10_RS      ','AQWD11_RS      ', &
-     'AQWD12_RS      ','AQWD13_RS      ','AQWD14_RS      ', &
-     'AQWD15_RS      ','AQWD16_RS      ','AQWD17_RS      ', &
-     'AQWD18_RS      ','AQWD19_RS      ','AQWD20_RS      ', &
-     'AQWD21_RS      ','AQWD22_RS      ','AQWD23_RS      ', &
-     'AQWD24_RS      ','AQWD25_RS      ','AQWD26_RS      ', &
-     'AQWD27_RS      ','AQWD28_RS      ','AQWD29_RS      ', &
-     'AQWD30_RS      ','AQWD31_RS      ','AQWD32_RS      ', &
-     'AQWD33_RS      ','AQWD34_RS      ','AQWD35_RS      ' /)
+     'AKN04_RS       ','AKN05_RS       ','AQWD01_RS      ', &
+     'AQWD02_RS      ','AQWD03_RS      ','AQWD04_RS      ', &
+     'AQWD05_RS      ','AQWD06_RS      ','AQWD07_RS      ', &
+     'AQWD08_RS      ','AQWD09_RS      ','AQWD10_RS      ', &
+     'AQWD11_RS      ','AQWD12_RS      ','AQWD13_RS      ', &
+     'AQWD14_RS      ','AQWD15_RS      ','AQWD16_RS      ', &
+     'AQWD17_RS      ','AQWD18_RS      ','AQWD19_RS      ', &
+     'AQWD20_RS      ','AQWD21_RS      ','AQWD22_RS      ', &
+     'AQWD23_RS      ','AQWD24_RS      ','AQWD25_RS      ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: EQN_TAGS_6 = (/ &
-     'AQWD36_RS      ','AQWD37_RS      ','AQWD38_RS      ', &
-     'AQWD39_RS      ','AQWD40_RS      ','AQWD41_RS      ', &
-     'AQWD42_RS      ','AQWD43_RS      ','AQWD44_RS      ', &
-     'AQWD45_RS      ','AQWD46_RS      ','AQWD47_RS      ', &
-     'AQWD48_RS      ','AQWD49_RS      ','AQWD50_RS      ', &
-     'AQWD51_RS      ','AQWD52_RS      ','AQWD53_RS      ', &
-     'AQWD54_RS      ','AQWD55_RS      ','AQWD56_RS      ', &
-     'AQWDIEP01_RS  ','AQWDIEP02_RS  ','AQUP01f_CV     ', &
-     'AQUP01b_CV     ','AQUP02f_CV     ','AQUP02b_CV     ', &
-     'AQUP03f_CV     ','AQUP03b_CV     ','AQUP04f_CV     ', &
-     'AQUP04b_CV     ','AQUP05f_CV     ','AQUP05b_CV     ', &
-     'AQUP06f_CV     ','AQUP06b_CV     ','AQUP07f_CV     ', &
-     'AQUP07b_CV     ','AQUP08f_CV     ','AQUP08b_CV     ', &
-     'AQUP09f_CV     ','AQUP09b_CV     ','AQUP10f_CV     ', &
-     'AQUP10b_CV     ','AQUP11f_CV     ','AQUP11b_CV     ', &
-     'AQUP12_CV      ','AQUP13_CV      ','AQUP14f_CV     ', &
-     'AQUP14b_CV     ','AQUP15f_CV     ','AQUP15b_CV     ', &
-     'AQUP16f_CV     ','AQUP16b_CV     ','AQUP17f_CV     ', &
-     'AQUP17b_CV     ','AQUP18f_CV     ','AQUP18b_CV     ', &
-     'AQUP19f_CV     ','AQUP19b_CV     ','AQUP20f_CV     ', &
-     'AQUP20b_CV     ','AQUP21f_CV     ','AQUP21b_CV     ', &
-     'AQUP22f_CV     ','AQUP22b_CV     ','AQUP23f_CV     ', &
-     'AQUP23b_CV     ','AQUP24f_CV     ','AQUP24b_CV     ', &
-     'AQUP25f_CV     ','AQUP25b_CV     ','AQHY01f_CV     ', &
-     'AQHY01b_CV     ','AQEQ01f_CV     ','AQEQ01b_CV     ', &
-     'AQEQ02f_CV     ','AQEQ02b_CV     ','AQEQ03f_CV     ', &
-     'AQEQ03b_CV     ','AQEQ04f_CV     ','AQEQ04b_CV     ', &
-     'AQEQ05f_CV     ','AQEQ05b_CV     ','AQEQ06f_CV     ', &
-     'AQEQ06b_CV     ','AQEQ07f_CV     ','AQEQ07b_CV     ', &
-     'AQEQ08f_CV     ','AQEQ08b_CV     ','AQEQ09f_CV     ' /)
+     'AQWD26_RS      ','AQWD27_RS      ','AQWD28_RS      ', &
+     'AQWD29_RS      ','AQWD30_RS      ','AQWD31_RS      ', &
+     'AQWD32_RS      ','AQWD33_RS      ','AQWD34_RS      ', &
+     'AQWD35_RS      ','AQWD36_RS      ','AQWD37_RS      ', &
+     'AQWD38_RS      ','AQWD39_RS      ','AQWD40_RS      ', &
+     'AQWD41_RS      ','AQWD42_RS      ','AQWD43_RS      ', &
+     'AQWD44_RS      ','AQWD45_RS      ','AQWD46_RS      ', &
+     'AQWD47_RS      ','AQWD48_RS      ','AQWD49_RS      ', &
+     'AQWD50_RS      ','AQWD51_RS      ','AQWD52_RS      ', &
+     'AQWD53_RS      ','AQWD54_RS      ','AQWD55_RS      ', &
+     'AQWD56_RS      ','AQWDIEP01_RS  ','AQWDIEP02_RS  ', &
+     'AQWDMET01_RS  ','AQWDMET02_RS  ','AQWDMET03_RS  ', &
+     'AQWDMET04_RS  ','AQWDMET05_RS  ','AQWDMET06_RS  ', &
+     'AQUP01f_CV     ','AQUP01b_CV     ','AQUP02f_CV     ', &
+     'AQUP02b_CV     ','AQUP03f_CV     ','AQUP03b_CV     ', &
+     'AQUP04f_CV     ','AQUP04b_CV     ','AQUP05f_CV     ', &
+     'AQUP05b_CV     ','AQUP06f_CV     ','AQUP06b_CV     ', &
+     'AQUP07f_CV     ','AQUP07b_CV     ','AQUP08f_CV     ', &
+     'AQUP08b_CV     ','AQUP09f_CV     ','AQUP09b_CV     ', &
+     'AQUP10f_CV     ','AQUP10b_CV     ','AQUP11f_CV     ', &
+     'AQUP11b_CV     ','AQUP12_CV      ','AQUP13_CV      ', &
+     'AQUP14f_CV     ','AQUP14b_CV     ','AQUP15f_CV     ', &
+     'AQUP15b_CV     ','AQUP16f_CV     ','AQUP16b_CV     ', &
+     'AQUP17f_CV     ','AQUP17b_CV     ','AQUP18f_CV     ', &
+     'AQUP18b_CV     ','AQUP19f_CV     ','AQUP19b_CV     ', &
+     'AQUP20f_CV     ','AQUP20b_CV     ','AQUP21f_CV     ', &
+     'AQUP21b_CV     ','AQUP22f_CV     ','AQUP22b_CV     ', &
+     'AQUP23f_CV     ','AQUP23b_CV     ','AQUP24f_CV     ', &
+     'AQUP24b_CV     ','AQUP25f_CV     ','AQUP25b_CV     ', &
+     'AQHY01f_CV     ','AQHY01b_CV     ','AQEQ01f_CV     ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: EQN_TAGS_7 = (/ &
-     'AQEQ09b_CV     ','AQEQ10f_CV     ','AQEQ10b_CV     ', &
-     'AQEQ11f_CV     ','AQEQ11b_CV     ','AQEQ12f_CV     ', &
-     'AQEQ12b_CV     ','AQEQ13f_CV     ','AQEQ13b_CV     ', &
-     'AQEQ14f_CV     ','AQEQ14b_CV     ','AQEQ15f_CV     ', &
-     'AQEQ15b_CV     ','AQEQ16f_CV     ','AQEQ16b_CV     ', &
-     'AQEQ17f_CV     ','AQEQ17b_CV     ','AQEQ18f_CV     ', &
-     'AQEQ18b_CV     ','AQEQ19f_CV     ','AQEQ19b_CV     ', &
-     'AQEQ20f_CV     ','AQEQ20b_CV     ','AQ00_CV        ', &
-     'AQ01_CV        ','AQ02_CV        ','AQ03_CV        ', &
-     'AQ04_CV        ','AQ05_CV        ','AQ06_CV        ', &
-     'AQ07_CV        ','AQ08_CV        ','AQ09_CV        ', &
-     'AQ10_CV        ','AQ11_CV        ','AQ12_CV        ', &
-     'AQ13_CV        ','AQ14_CV        ','AQ16_CV        ', &
-     'AQ17_CV        ','AQ18_CV        ','AQ19_CV        ', &
-     'AQ20_CV        ','AQ21_CV        ','AQ22_CV        ', &
-     'AQ23_CV        ','AQ24_CV        ','AQ25_CV        ', &
-     'AQ26_CV        ','AQ27_CV        ','AQ28_CV        ', &
-     'AQ29_CV        ','AQ30_CV        ','AQ31_CV        ', &
-     'AQ32_CV        ','AQ34_CV        ','AQ35_CV        ', &
-     'AQ36_CV        ','AQ37_CV        ','AQ38_CV        ', &
-     'AQ39_CV        ','AQ40_CV        ','AQ41_CV        ', &
-     'AQ70_CV        ','AQ71_CV        ','AQ72_CV        ', &
-     'AQ73_CV        ','AQ74_CV        ','AQ75_CV        ', &
-     'AQ76_CV        ','AQ77_CV        ','AQ78_CV        ', &
-     'AQ79_CV        ','AQ80_CV        ','AQ81_CV        ', &
-     'AQ82_CV        ','AQ83_CV        ','AQ84_CV        ', &
-     'AQ85_CV        ','AQ86_CV        ','AQ87_CV        ', &
-     'AQJ01_CV       ','AQIEP01_CV     ','AQIEP02_CV     ', &
-     'AQIEP03_CV     ','AKN01_CV       ','AKN02_CV       ', &
-     'AKN03_CV       ','AKN04_CV       ','AQWD01_CV      ' /)
+     'AQEQ01b_CV     ','AQEQ02f_CV     ','AQEQ02b_CV     ', &
+     'AQEQ03f_CV     ','AQEQ03b_CV     ','AQEQ04f_CV     ', &
+     'AQEQ04b_CV     ','AQEQ05f_CV     ','AQEQ05b_CV     ', &
+     'AQEQ06f_CV     ','AQEQ06b_CV     ','AQEQ07f_CV     ', &
+     'AQEQ07b_CV     ','AQEQ08f_CV     ','AQEQ08b_CV     ', &
+     'AQEQ09f_CV     ','AQEQ09b_CV     ','AQEQ10f_CV     ', &
+     'AQEQ10b_CV     ','AQEQ11f_CV     ','AQEQ11b_CV     ', &
+     'AQEQ12f_CV     ','AQEQ12b_CV     ','AQEQ13f_CV     ', &
+     'AQEQ13b_CV     ','AQEQ14f_CV     ','AQEQ14b_CV     ', &
+     'AQEQ15f_CV     ','AQEQ15b_CV     ','AQEQ16f_CV     ', &
+     'AQEQ16b_CV     ','AQEQ17f_CV     ','AQEQ17b_CV     ', &
+     'AQEQ18f_CV     ','AQEQ18b_CV     ','AQEQ19f_CV     ', &
+     'AQEQ19b_CV     ','AQEQ20f_CV     ','AQEQ20b_CV     ', &
+     'AQ00_CV        ','AQ01_CV        ','AQ02_CV        ', &
+     'AQ03_CV        ','AQ04_CV        ','AQ05_CV        ', &
+     'AQ06_CV        ','AQ07_CV        ','AQ08_CV        ', &
+     'AQ09_CV        ','AQ10_CV        ','AQ11_CV        ', &
+     'AQ12_CV        ','AQ13_CV        ','AQ14_CV        ', &
+     'AQ16_CV        ','AQ17_CV        ','AQ18_CV        ', &
+     'AQ19_CV        ','AQ20_CV        ','AQ21_CV        ', &
+     'AQ22_CV        ','AQ23_CV        ','AQ24_CV        ', &
+     'AQ25_CV        ','AQ26_CV        ','AQ27_CV        ', &
+     'AQ28_CV        ','AQ29_CV        ','AQ30_CV        ', &
+     'AQ31_CV        ','AQ32_CV        ','AQ34_CV        ', &
+     'AQ35_CV        ','AQ36_CV        ','AQ37_CV        ', &
+     'AQ38_CV        ','AQ39_CV        ','AQ40_CV        ', &
+     'AQ41_CV        ','AQ70_CV        ','AQ71_CV        ', &
+     'AQ72_CV        ','AQ73_CV        ','AQ74_CV        ', &
+     'AQ75_CV        ','AQ76_CV        ','AQ77_CV        ', &
+     'AQ78_CV        ','AQ79_CV        ','AQ80_CV        ' /)
   CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: EQN_TAGS_8 = (/ &
-     'AQWD02_CV      ','AQWD03_CV      ','AQWD04_CV      ', &
-     'AQWD05_CV      ','AQWD06_CV      ','AQWD07_CV      ', &
-     'AQWD08_CV      ','AQWD09_CV      ','AQWD10_CV      ', &
-     'AQWD11_CV      ','AQWD12_CV      ','AQWD13_CV      ', &
-     'AQWD14_CV      ','AQWD15_CV      ','AQWD16_CV      ', &
-     'AQWD17_CV      ','AQWD18_CV      ','AQWD19_CV      ', &
-     'AQWD20_CV      ','AQWD21_CV      ','AQWD22_CV      ', &
-     'AQWD23_CV      ','AQWD24_CV      ','AQWD25_CV      ', &
-     'AQWD26_CV      ','AQWD27_CV      ','AQWD28_CV      ', &
-     'AQWD29_CV      ','AQWD30_CV      ','AQWD31_CV      ', &
-     'AQWD32_CV      ','AQWD33_CV      ','AQWD34_CV      ', &
-     'AQWD35_CV      ','AQWD36_CV      ','AQWD37_CV      ', &
-     'AQWD38_CV      ','AQWD39_CV      ','AQWD40_CV      ', &
-     'AQWD41_CV      ','AQWD42_CV      ','AQWD43_CV      ', &
-     'AQWD44_CV      ','AQWD45_CV      ','AQWD46_CV      ', &
-     'AQWD47_CV      ','AQWD48_CV      ','AQWD49_CV      ', &
-     'AQWD50_CV      ','AQWD51_CV      ','AQWD52_CV      ', &
-     'AQWD53_CV      ','AQWD54_CV      ','AQWD55_CV      ', &
-     'AQWD56_CV      ','AQWDIEP01_CV  ','AQWDIEP02_CV  ', &
-     'GASWD01        ','GASWD02        ','GASWD03        ', &
-     'GASWD04        ','GASWD05        ','GASWD06        ', &
-     'GASWD07        ','GASWD08        ','GASWD09        ', &
-     'GASWD10        ','GASWD11        ','GASWD12        ', &
-     'GASWD13        ','GASWD14        ','GASWD15        ', &
-     'GASWD16        ','GASWD17        ','GASWD18        ', &
-     'GASWD19        ','GASWD20        ','GASWD21        ', &
-     'GASWD22        ','GASWD23        ','GASWD24        ', &
-     'GASWD25        ','GASWD26        ','GASWD27        ', &
-     'GASWD28        ','GASWD29        ','GASWD30        ', &
-     'GASWD31        ','GASWD32        ','GASWD33        ' /)
-  CHARACTER(LEN=32), PARAMETER, DIMENSION(82) :: EQN_TAGS_9 = (/ &
-     'GASWD34        ','GASWD35        ','GASWD36        ', &
-     'GASWD37        ','GASWD38        ','GASWD39        ', &
-     'GASWD40        ','GASWD41        ','GASWD42        ', &
-     'GASWD43        ','GASWD44        ','GASWD45        ', &
-     'GASWD46        ','GASWD47        ','GASWD48        ', &
-     'GASWD49        ','GASWD50        ','GASWD51        ', &
-     'GASWD52        ','GASWD53        ','GASWD54        ', &
-     'GASWD55        ','GASWD56        ','GASWD57        ', &
-     'GASWD58        ','GASWD59        ','GASWD60        ', &
-     'GASWD61        ','GASWD62        ','GASWD63        ', &
-     'GASWD64        ','GASWD65        ','GASWD66        ', &
-     'GASWD67        ','GASWD68        ','GASWD69        ', &
-     'GASWD70        ','GASWD71        ','GASWD72        ', &
-     'GASWD73        ','GASWD74        ','GASWD75        ', &
-     'GASWD76        ','GASWD77        ','GASWD78        ', &
-     'GASWD79        ','GASWD80        ','GASWD81        ', &
-     'GASWD82        ','GASWD83        ','GASWD84        ', &
-     'GASWD85        ','GASWD86        ','GASWD87        ', &
-     'GASWD88        ','GASWD89        ','GASWD90        ', &
-     'GASWD91        ','GASWD92        ','GASWD93        ', &
-     'GASWD94        ','GASWD95        ','GASWD96        ', &
-     'GASWD97        ','GASWD98        ','GASWD99        ', &
-     'GASWD100       ','GASWD101       ','GASWD102       ', &
-     'GASWD103       ','GASWD104       ','GASWD105       ', &
-     'GASWD106       ','GASWD107       ','GASWD108       ', &
-     'GASWD109       ','GASWD110       ','GASWD111       ', &
-     'GASWD112       ','GASWD113       ','GASWD114       ', &
-     'GASWD115       ' /)
-  CHARACTER(LEN=32), PARAMETER, DIMENSION(892) :: EQN_TAGS = (/&
+     'AQ81_CV        ','AQ82_CV        ','AQ83_CV        ', &
+     'AQ84_CV        ','AQ85_CV        ','AQ86_CV        ', &
+     'AQ87_CV        ','AQ88_CV        ','AQ89_CV        ', &
+     'AQ90_CV        ','AQ91_CV        ','AQ92_CV        ', &
+     'AQ93_CV        ','AQ94_CV        ','AQ95_CV        ', &
+     'AQ96_CV        ','AQJ01_CV       ','AQIEP01_CV     ', &
+     'AQIEP02_CV     ','AQIEP03_CV     ','AKN01_CV       ', &
+     'AKN02_CV       ','AKN03_CV       ','AKN04_CV       ', &
+     'AKN05_CV       ','AQWD01_CV      ','AQWD02_CV      ', &
+     'AQWD03_CV      ','AQWD04_CV      ','AQWD05_CV      ', &
+     'AQWD06_CV      ','AQWD07_CV      ','AQWD08_CV      ', &
+     'AQWD09_CV      ','AQWD10_CV      ','AQWD11_CV      ', &
+     'AQWD12_CV      ','AQWD13_CV      ','AQWD14_CV      ', &
+     'AQWD15_CV      ','AQWD16_CV      ','AQWD17_CV      ', &
+     'AQWD18_CV      ','AQWD19_CV      ','AQWD20_CV      ', &
+     'AQWD21_CV      ','AQWD22_CV      ','AQWD23_CV      ', &
+     'AQWD24_CV      ','AQWD25_CV      ','AQWD26_CV      ', &
+     'AQWD27_CV      ','AQWD28_CV      ','AQWD29_CV      ', &
+     'AQWD30_CV      ','AQWD31_CV      ','AQWD32_CV      ', &
+     'AQWD33_CV      ','AQWD34_CV      ','AQWD35_CV      ', &
+     'AQWD36_CV      ','AQWD37_CV      ','AQWD38_CV      ', &
+     'AQWD39_CV      ','AQWD40_CV      ','AQWD41_CV      ', &
+     'AQWD42_CV      ','AQWD43_CV      ','AQWD44_CV      ', &
+     'AQWD45_CV      ','AQWD46_CV      ','AQWD47_CV      ', &
+     'AQWD48_CV      ','AQWD49_CV      ','AQWD50_CV      ', &
+     'AQWD51_CV      ','AQWD52_CV      ','AQWD53_CV      ', &
+     'AQWD54_CV      ','AQWD55_CV      ','AQWD56_CV      ', &
+     'AQWDIEP01_CV  ','AQWDIEP02_CV  ','AQWDMET01_CV  ', &
+     'AQWDMET02_CV  ','AQWDMET03_CV  ','AQWDMET04_CV  ', &
+     'AQWDMET05_CV  ','AQWDMET06_CV  ','GASWD01        ' /)
+  CHARACTER(LEN=32), PARAMETER, DIMENSION(90) :: EQN_TAGS_9 = (/ &
+     'GASWD02        ','GASWD03        ','GASWD04        ', &
+     'GASWD05        ','GASWD06        ','GASWD07        ', &
+     'GASWD08        ','GASWD09        ','GASWD10        ', &
+     'GASWD11        ','GASWD12        ','GASWD13        ', &
+     'GASWD14        ','GASWD15        ','GASWD16        ', &
+     'GASWD17        ','GASWD18        ','GASWD19        ', &
+     'GASWD20        ','GASWD21        ','GASWD22        ', &
+     'GASWD23        ','GASWD24        ','GASWD25        ', &
+     'GASWD26        ','GASWD27        ','GASWD28        ', &
+     'GASWD29        ','GASWD30        ','GASWD31        ', &
+     'GASWD32        ','GASWD33        ','GASWD34        ', &
+     'GASWD35        ','GASWD36        ','GASWD37        ', &
+     'GASWD38        ','GASWD39        ','GASWD40        ', &
+     'GASWD41        ','GASWD42        ','GASWD43        ', &
+     'GASWD44        ','GASWD45        ','GASWD46        ', &
+     'GASWD47        ','GASWD48        ','GASWD49        ', &
+     'GASWD50        ','GASWD51        ','GASWD52        ', &
+     'GASWD53        ','GASWD54        ','GASWD55        ', &
+     'GASWD56        ','GASWD57        ','GASWD58        ', &
+     'GASWD59        ','GASWD60        ','GASWD61        ', &
+     'GASWD62        ','GASWD63        ','GASWD64        ', &
+     'GASWD65        ','GASWD66        ','GASWD67        ', &
+     'GASWD68        ','GASWD69        ','GASWD70        ', &
+     'GASWD71        ','GASWD72        ','GASWD73        ', &
+     'GASWD74        ','GASWD75        ','GASWD76        ', &
+     'GASWD77        ','GASWD78        ','GASWD79        ', &
+     'GASWD80        ','GASWD81        ','GASWD82        ', &
+     'GASWD83        ','GASWD84        ','GASWD85        ', &
+     'GASWD86        ','GASWD87        ','GASWD88        ', &
+     'GASWD89        ','GASWD90        ','GASWD91        ' /)
+  CHARACTER(LEN=32), PARAMETER, DIMENSION(25) :: EQN_TAGS_10 = (/ &
+     'GASWD92        ','GASWD93        ','GASWD94        ', &
+     'GASWD95        ','GASWD96        ','GASWD97        ', &
+     'GASWD98        ','GASWD99        ','GASWD100       ', &
+     'GASWD101       ','GASWD102       ','GASWD103       ', &
+     'GASWD104       ','GASWD105       ','GASWD106       ', &
+     'GASWD107       ','GASWD108       ','GASWD109       ', &
+     'GASWD110       ','GASWD111       ','GASWD112       ', &
+     'GASWD113       ','GASWD114       ','GASWD115       ', &
+     'GASWD116       ' /)
+  CHARACTER(LEN=32), PARAMETER, DIMENSION(925) :: EQN_TAGS = (/&
     EQN_TAGS_0, EQN_TAGS_1, EQN_TAGS_2, EQN_TAGS_3, EQN_TAGS_4, &
-    EQN_TAGS_5, EQN_TAGS_6, EQN_TAGS_7, EQN_TAGS_8, EQN_TAGS_9 /)
+    EQN_TAGS_5, EQN_TAGS_6, EQN_TAGS_7, EQN_TAGS_8, EQN_TAGS_9, &
+    EQN_TAGS_10 /)
 
 ! INLINED global variables
 
