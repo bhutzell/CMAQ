@@ -98,14 +98,25 @@ C.. Alternative KPP options
 
       END IF  ! FIRSTIME
 
-      CALL Initialize()
-
       TEMP       = REAL( TA, dp )
       PRESS      = REAL( PRES, dp )
       SEAWATER   = REAL( SEAWATER_IN, dp )
       OPEN_WATER = OPEN_WATER_IN
       CAIR       = REAL( CAIR_IN, dp )
       TFAC      = ( 298.0D0 - TEMP) / ( 298.0D0 * TEMP );
+
+      ! Fill photolysis & heterogeneous rates
+      ! provided in 1/min. here converted to 1/s.
+      DO NPH = 1, KPP_NHETERO
+         KHETCELL( NPH ) = REAL( KHETERO( NPH, COL, ROW, LEV ) , dp ) / 60.0_dp
+      END DO
+      DO NPH = 1, KPP_NPHOTAB
+         RJCELL( NPH )   = REAL( RJ( COL,ROW,LEV,NPH ), dp ) / 60.0_dp
+         IF ( RJCELL( NPH ) .GT. 0.0D0 ) LSUNLIGHT = .TRUE.
+      END DO
+
+      ! Initialize before filling C array
+      CALL Initialize()
 
       ! Fill CONC gas and aerosols
       C(:) = 0.0D0
@@ -127,16 +138,6 @@ C.. Alternative KPP options
       C(IND_H2O) = REAL( MAX( REAL( QV_TO_PPM * QV, dp ) *CAIR*1.D-6, 0.0 ), dp)
 
       COEFF_FALLOFF = C(IND_M)
-
-      ! Fill photolysis & heterogeneous rates
-      ! provided in 1/min. here converted to 1/s.
-      DO NPH = 1, KPP_NHETERO
-         KHETCELL( NPH ) = REAL( KHETERO( NPH, COL, ROW, LEV ) , dp ) / 60.0_dp
-      END DO
-      DO NPH = 1, KPP_NPHOTAB
-         RJCELL( NPH )   = REAL( RJ( COL,ROW,LEV,NPH ), dp ) / 60.0_dp
-         IF ( RJCELL( NPH ) .GT. 0.0D0 ) LSUNLIGHT = .TRUE.
-      END DO                         
 
       ! Perform integration
       !~~~> Time loop

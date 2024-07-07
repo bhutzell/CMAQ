@@ -23,6 +23,9 @@ rm mchem_Main.F90
 rm mchem_Util.F90
 rm mchem.map
 
+# Optimize for constant rate constants
+python optimize_RCONST.py mchem
+
 # Run kpp
 kpp gas.kpp
 
@@ -36,3 +39,6 @@ rm Makefile_*
 rm gas_Main.F90
 rm gas_Util.F90
 rm gas.map
+
+# Optimize for constant rate constants
+python optimize_RCONST.py gas

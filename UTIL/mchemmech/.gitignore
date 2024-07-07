@@ -6,3 +6,5 @@ mchem.spc
 
 # Ignore all files created by KPP
 # mchem_*.F90
+mchem_*.F90.original
+gas_*.F90.original

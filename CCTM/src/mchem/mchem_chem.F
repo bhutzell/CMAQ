@@ -116,8 +116,6 @@ C.. Alternative KPP options
 
       END IF  ! FIRSTIME
 
-      CALL Initialize()
-
       TEMP       = REAL( TA, dp )
       PRESS      = REAL( PRES, dp )
       SEAWATER   = REAL( SEAWATER_IN, dp )
@@ -207,6 +205,9 @@ C.. Alternative KPP options
          RJCELL( NPH )   = REAL( RJ( COL,ROW,LEV,NPH ), dp ) / 60.0_dp
          IF ( RJCELL( NPH ) .GT. 0.0D0 ) LSUNLIGHT = .TRUE.
       END DO
+
+      ! Initialize before filling C array
+      CALL Initialize()
 
       ! Fill CONC gas and aerosols
       C(:) = 0.0D0
