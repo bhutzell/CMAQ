@@ -26,8 +26,8 @@
       USE RUNTIME_VARS
       USE ELMO_DATA, ONLY : INST_ACTIVE, AVRG_ACTIVE, ELMO_NSTEP,
      &                      ELMO_INST, ELMO_AVRG, ELMO_TABLE, N_ELMO_AVRG,
-     &                      ETYPE_WDEP, ETYPE_DDEP, ETYPE_ISAM_WDEP,
-     &                      ETYPE_DDM_WDEP, ETYPE_ISAM_DDEP, ETYPE_DDM_DDEP,
+     &                      ET_WDEP, ET_DDEP, ET_ISAM_WDEP,
+     &                      ET_DDM_WDEP, ET_ISAM_DDEP, ET_DDM_DDEP,
      &                      MAP_AVRGtoTABLE
       USE UTILIO_DEFN
 
@@ -75,9 +75,9 @@ C *** Write data to the average aerosol diagnostic file.
             ! Finalize Values for Averaged Variables
             DO IAVRG = 1,N_ELMO_AVRG
                 IV = ELMO_TABLE( MAP_AVRGtoTABLE( IAVRG ) )%VAR_TYPE
-                IF ( IV .NE. ETYPE_WDEP .AND. IV .NE. ETYPE_DDEP .AND.
-     &               IV .NE. ETYPE_ISAM_WDEP .AND. IV .NE. ETYPE_ISAM_DDEP .AND.
-     &               IV .NE. ETYPE_DDM_WDEP .AND. IV .NE. ETYPE_DDM_DDEP ) THEN
+                IF ( IV .NE. ET_WDEP .AND. IV .NE. ET_DDEP .AND.
+     &               IV .NE. ET_ISAM_WDEP .AND. IV .NE. ET_ISAM_DDEP .AND.
+     &               IV .NE. ET_DDM_WDEP .AND. IV .NE. ET_DDM_DDEP ) THEN
                    ELMO_AVRG( :,:,:,IAVRG ) = ELMO_AVRG( :,:,:,IAVRG )
      &                                        / 2.0 / (ELMO_NSTEP - 1.0)
                 END IF

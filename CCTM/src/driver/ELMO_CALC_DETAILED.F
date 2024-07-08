@@ -239,18 +239,18 @@
          ! Particle Water
          CASE ( ID_PMF_HPM )
             ! Retrieve AHPLUSIJ
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_HP,  IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_HP, IV=ET_CMPST )
             ! Retrieve AH2OIJ
-            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, IDG=ID_PMF_H2O, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, IDG=ID_PMF_H2O, IV=ET_CMPST )
             ! HPMOLAL = AHPLUSIJ / AH2OIJ * 1000.0 [mol L-1]
             OUTVAL = VAL / VAL2 * 1000.0
 
          ! Calculate PMF_PH - Fine-Mode pH
          CASE ( ID_PMF_PH )
             ! Retrieve HPMOLAL
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_HPM, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_HPM, IV=ET_CMPST )
             ! Retrieve AH2OIJ
-            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, IDG=ID_PMF_H2O, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, IDG=ID_PMF_H2O, IV=ET_CMPST )
 
 #ifdef mpas
             OUTVAL = -9.999E36
@@ -368,13 +368,13 @@
          CASE ( ID_PMF_OMOC )
             VAL  = 0.0
             VAL2 = 0.0
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_OA, IV=ETYPE_ELMO )
-            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, IDG=ID_PMF_OC, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_OA, IV=ET_CMPST )
+            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, IDG=ID_PMF_OC, IV=ET_CMPST )
             OUTVAL = VAL / ( VAL2 + TINY( 0.0 ) )
             
          ! Calculate PMF_OtoC - Fine-Mode O:C 
          CASE ( ID_PMF_OtoC )
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_OA, IV=ETYPE_ELMO  )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_OA, IV=ET_CMPST  )
 
             VAL2 = 0.0
             DO IOA = 1,N_OA_NotTracers
@@ -469,7 +469,7 @@
               
          ! Calculate O:C relevant for AMS observations
          CASE ( ID_AMS_OtoC )
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_AMS_OA, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_AMS_OA, IV=ET_CMPST )
 
             ! Save AMS Fraction for each mode
             DO IMODE = 1,N_MODE
@@ -502,8 +502,8 @@
  
          ! Calculate Aerosol Fraction of Benzo-a-Pyrene
          CASE ( ID_BENAPY_FAERO )
-            CALL CALC_ELMO( OUTVAL=VAL,  OUT_UNIT=IUNIT, IDG=ID_PMF_BENAPY, IV=ETYPE_ELMO )
-            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, IDG=ID_GAS_BENAPY, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=VAL,  OUT_UNIT=IUNIT, IDG=ID_PMF_BENAPY, IV=ET_CMPST )
+            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, IDG=ID_GAS_BENAPY, IV=ET_CMPST )
             OUTVAL = VAL / ( VAL + VAL2 + TINY( 0.0 ) )
 
          ! Retrieve Fine-Mode Particle Mass Collected by the Federal
@@ -520,14 +520,14 @@
                 K2 = ( K * ( P1 - P2*a + P3*a*a ) * ( a**1.75 ) ) ** 0.5
             END IF
 
-            CALL CALC_ELMO( OUTVAL=PMF_NO3, OUT_UNIT=IUNIT, IDG=ID_PMF_NO3, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=PMF_NO3, OUT_UNIT=IUNIT, IDG=ID_PMF_NO3, IV=ET_CMPST )
             PMF_NO3_LOSS = MIN( 745.7/SRFTEMP * K2, PMF_NO3 )
 
             PMF_NH4_LOSS = PMF_NO3_LOSS * 18.0 / 62.0
 
-            CALL CALC_ELMO( OUTVAL=PMF_NH4,  OUT_UNIT=IUNIT, IDG=ID_PMF_NH4, IV=ETYPE_ELMO )
-            CALL CALC_ELMO( OUTVAL=PMF_SO4,  OUT_UNIT=IUNIT, IDG=ID_PMF_SO4, IV=ETYPE_ELMO ) 
-            CALL CALC_ELMO( OUTVAL=PMF_MASS, OUT_UNIT=IUNIT, IDG=ID_PMF_MASS,IV=ETYPE_ELMO ) 
+            CALL CALC_ELMO( OUTVAL=PMF_NH4,  OUT_UNIT=IUNIT, IDG=ID_PMF_NH4, IV=ET_CMPST )
+            CALL CALC_ELMO( OUTVAL=PMF_SO4,  OUT_UNIT=IUNIT, IDG=ID_PMF_SO4, IV=ET_CMPST ) 
+            CALL CALC_ELMO( OUTVAL=PMF_MASS, OUT_UNIT=IUNIT, IDG=ID_PMF_MASS,IV=ET_CMPST ) 
 
             OUTVAL = PMF_MASS - PMF_NO3_LOSS - PMF_NH4_LOSS
      &                      +0.24 * ( PMF_SO4 + PMF_NH4 - PMF_NH4_LOSS ) + 0.5
@@ -546,13 +546,13 @@
                 K2 = ( K * ( P1 - P2*a + P3*a*a ) * ( a**1.75 ) ) ** 0.5
             END IF
 
-            CALL CALC_ELMO( OUTVAL=PM25_NO3, OUT_UNIT=IUNIT, IDG=ID_PM25_NO3, IV=ETYPE_ELMO )
+            CALL CALC_ELMO( OUTVAL=PM25_NO3, OUT_UNIT=IUNIT, IDG=ID_PM25_NO3, IV=ET_CMPST )
             PM25_NO3_LOSS = MIN( 745.7/SRFTEMP * K2, PM25_NO3 )
 
             PM25_NH4_LOSS = PM25_NO3_LOSS * 18.0 / 62.0
 
-            CALL CALC_ELMO( OUTVAL=PM25_NH4, OUT_UNIT=IUNIT, IDG=ID_PM25_NH4, IV=ETYPE_ELMO )
-            CALL CALC_ELMO( OUTVAL=PM25_SO4, OUT_UNIT=IUNIT, IDG=ID_PM25_SO4, IV=ETYPE_ELMO ) 
+            CALL CALC_ELMO( OUTVAL=PM25_NH4, OUT_UNIT=IUNIT, IDG=ID_PM25_NH4, IV=ET_CMPST )
+            CALL CALC_ELMO( OUTVAL=PM25_SO4, OUT_UNIT=IUNIT, IDG=ID_PM25_SO4, IV=ET_CMPST ) 
             CALL SUM_INLET_PM( IPM25, IWET, PM25 )
 
             OUTVAL = PM25 - PM25_NO3_LOSS - PM25_NH4_LOSS
@@ -663,13 +663,13 @@
 
       USE AERO_DATA, ONLY: N_MODE, AEROSPC_CONC, AH2O_IDX, AORGH2O_IDX, 
      &                     AEROSPC, N_AEROSPC
-      USE ELMO_DATA, ONLY : ETYPE_ELMO
+      USE ELMO_DATA, ONLY : ET_CMPST
 #ifdef isam      
-      USE ELMO_DATA, ONLY : ETYPE_ISAM_ELMO, ISAM_VEC
+      USE ELMO_DATA, ONLY : ET_ISAM_CMPST, ISAM_VEC
       USE SA_DEFN, ONLY : MAP_AEROtoSA
 #endif
 #ifdef sens
-      USE ELMO_DATA, ONLY : ETYPE_DDM_ELMO, DDM_VEC
+      USE ELMO_DATA, ONLY : ET_DDM_CMPST, DDM_VEC
       USE AERO_DDM3D, ONLY : S_AEROSPC_CONC
 #endif
 
@@ -685,7 +685,7 @@
 
       ! Determine Which Type of ELMO Variable is Requested
       SELECT CASE ( IV )
-         CASE ( ETYPE_ELMO )
+         CASE ( ET_CMPST )
             ! Standard ELMO PM Sum
             DO IM = 1,N_MODE
                IF ( MODE_MASK( IM ) ) THEN
@@ -699,7 +699,7 @@
             END DO
 
 #ifdef isam            
-         CASE ( ETYPE_ISAM_ELMO )
+         CASE ( ET_ISAM_CMPST )
            ! ISAM PM Sum
            DO IM = 1,N_MODE
               IF ( MODE_MASK(IM) ) THEN
@@ -720,7 +720,7 @@
 #endif
 
 #ifdef sens
-         CASE ( ETYPE_DDM_ELMO )
+         CASE ( ET_DDM_CMPST )
            ! DDM PM Sum
            DO IM = 1,N_MODE
               IF ( MODE_MASK(IM) ) THEN

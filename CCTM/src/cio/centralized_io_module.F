@@ -2247,7 +2247,7 @@
 
       use desid_param_module
       use util_family_module
-      use RUNTIME_VARS, only: MISC_CTRL, DESID_CTRL, DESID_CHEM_CTRL,
+      use RUNTIME_VARS, only: CMAQ_CTRL, CMAQ_CHEM_CTRL,
      &                        logdev, log_message, log_subheading
       use PA_DEFN, ONLY : BudgetVariables, MAX_BUDGET_VARS_NML, BUDGET_DIAG
 #ifdef mpas
@@ -2303,22 +2303,22 @@
            BudgetVariables = ''
           
            ! Retrieve the Name of the Emission Control File
-           IF ( MISC_CTRL .EQ. "MISC_CTRL_NML" ) THEN
+           IF ( CMAQ_CTRL .EQ. "CMAQ_CTRL_NML" ) THEN
                XMSG = 'You have chosen not to indicate the location of an' //
      &                'CMAQ Control namelist file. You must give a value ' //
-     &                'for the MISC_CTRL variable in the CMAQ runscript.'
+     &                'for the CMAQ_CTRL variable in the CMAQ runscript.'
                CALL M3EXIT( 'DESID_READ_NAMELIST',0,0,XMSG,1 )
            END IF
           
            ! Open Emission Control Namelist File
            FUNIT = JUNIT()
-           OPEN( FILE = MISC_CTRL, UNIT = FUNIT, STATUS = 'OLD',
+           OPEN( FILE = CMAQ_CTRL, UNIT = FUNIT, STATUS = 'OLD',
      &           POSITION = 'REWIND', FORM='FORMATTED', IOSTAT = IOST )
           
            ! Check for Error in File Open Process
            IF ( IOST .NE. 0 ) THEN
                WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
-     &                'CMAQ control namelist file: ',TRIM( MISC_CTRL )
+     &                'CMAQ control namelist file: ',TRIM( CMAQ_CTRL )
                CALL M3EXIT( 'DESID_READ_NAMELIST',0,0,XMSG,1 )
            END IF
           
@@ -2355,22 +2355,22 @@
          !----------------------------!
          !!! DESID Chemical Mapping !!!
            ! Retrieve the Name of the Emission Control File
-           IF ( DESID_CHEM_CTRL .EQ. "DESID_CHEM_CTRL_NML" ) THEN
+           IF ( CMAQ_CHEM_CTRL .EQ. "CMAQ_CHEM_CTRL_NML" ) THEN
                XMSG = 'You have chosen not to indicate the location of an' //
      &                'Emission Control namelist file. You must give a value ' //
-     &                'for the DESID_CHEM_CTRL variable in the CMAQ runscript.'
+     &                'for the CMAQ_CHEM_CTRL variable in the CMAQ runscript.'
                CALL M3EXIT( 'DESID_READ_NAMELIST',0,0,XMSG,1 )
            END IF
            
            ! Open Emission Control Namelist File
            FUNIT = JUNIT()
-           OPEN( FILE = DESID_CHEM_CTRL, UNIT = FUNIT, STATUS = 'OLD',
+           OPEN( FILE = CMAQ_CHEM_CTRL, UNIT = FUNIT, STATUS = 'OLD',
      &           POSITION = 'REWIND', FORM='FORMATTED', IOSTAT = IOST )
            
            ! Check for Error in File Open Process
            IF ( IOST .NE. 0 ) THEN
                WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
-     &                'emissions control namelist file: ',TRIM( DESID_CHEM_CTRL )
+     &                'emissions control namelist file: ',TRIM( CMAQ_CHEM_CTRL )
                CALL M3EXIT( 'DESID_READ_NAMELIST',0,0,XMSG,1 )
            END IF
            
@@ -2380,7 +2380,8 @@
            IF ( IOST .EQ. -1 ) THEN
                ! The DESID_Max_Rules Variable was completely missing
                XMSG = 'WARNING: Maximum Number of DESID Scaling Rules was not specified. '//
-     &                'If you intended to specify Desid_Max_Rules, check the DESID_CHEM_CTRL file.'
+     &                'If you intended to specify Desid_Max_Rules, check
+     the CMAQ_CHEM_CTRL file.'
                CALL LOG_MESSAGE( LOGDEV, ' ')
                CALL LOG_MESSAGE( LOGDEV, XMSG )
                DESID_MAX_RULES = 500
@@ -2420,7 +2421,7 @@
                XMSG = 'WARNING: There were no valid Emission Scaling Rules specified '//
      &                'for use by the DESID module. If you intended to specify '//
      &                'rules in the emission control file, check the file you have '//
-     &                'provided for DESID_CHEM_CTRL.' 
+     &                'provided for CMAQ_CHEM_CTRL.' 
                CALL LOG_MESSAGE( LOGDEV, ' ')
                CALL LOG_MESSAGE( LOGDEV, XMSG )
                DESID_RULES_NML%REGION = ''
@@ -2468,22 +2469,22 @@
          !!! Open DESID Control File !!!
          !-----------------------------!
          ! Retrieve the Name of the Emission Control File
-         IF ( DESID_CTRL .EQ. "DESID_CTRL_NML" ) THEN
+         IF ( CMAQ_CTRL .EQ. "CMAQ_CTRL_NML" ) THEN
              XMSG = 'You have chosen not to indicate the location of an' //
      &              'Emission Control namelist file. You must give a value ' //
-     &              'for the DESID_CTRL variable in the CMAQ runscript.'
+     &              'for the CMAQ_CTRL variable in the CMAQ runscript.'
              CALL M3EXIT( 'DESID_READ_NAMELIST',0,0,XMSG,1 )
          END IF
 
          ! Open Emission Control Namelist File
          FUNIT = JUNIT()
-         OPEN( FILE = DESID_CTRL, UNIT = FUNIT, STATUS = 'OLD',
+         OPEN( FILE = CMAQ_CTRL, UNIT = FUNIT, STATUS = 'OLD',
      &         POSITION = 'REWIND', FORM='FORMATTED', IOSTAT = IOST )
 
          ! Check for Error in File Open Process
          IF ( IOST .NE. 0 ) THEN
              WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
-     &              'emissions control namelist file: ',TRIM( DESID_CTRL )
+     &              'emissions control namelist file: ',TRIM( CMAQ_CTRL )
              CALL M3EXIT( 'DESID_READ_NAMELIST',0,0,XMSG,1 )
          END IF
  
@@ -2495,7 +2496,7 @@
            IF ( IOST .EQ. -1 ) THEN
                ! The Desid_Max_Lays Variable was completely missing
                XMSG = 'WARNING: Maximum Layer for emissions input was not specified. '//
-     &                'If you intended to specify Desid_Max_Lays, check the DESID_CTRL file.'
+     &                'If you intended to specify Desid_Max_Lays, check the CMAQ_CTRL file.'
                CALL LOG_MESSAGE( LOGDEV, ' ')
                CALL LOG_MESSAGE( LOGDEV, XMSG )
                Desid_MaxLays = 0
@@ -2523,7 +2524,7 @@
            IF ( IOST .EQ. -1 ) THEN
                ! The DESID_Max_Rules Variable was completely missing
                XMSG = 'WARNING: Maximum Number of DESID Area Normalization Rules was not specified. '//
-     &                'If you intended to specify Desid_Max_Area, check the DESID_CTRL file.'
+     &                'If you intended to specify Desid_Max_Area, check the CMAQ_CTRL file.'
                CALL LOG_MESSAGE( LOGDEV, ' ')
                CALL LOG_MESSAGE( LOGDEV, XMSG )
                DESID_MAX_AREA = 30
@@ -2584,7 +2585,7 @@
            IF ( IOST .EQ. -1 ) THEN
                ! The DESID_Max_Rules Variable was completely missing
                XMSG = 'WARNING: Maximum Number of DESID Region Def Variables was not specified. '//
-     &                'If you intended to specify Desid_Max_Reg, check the DESID_CTRL file.'
+     &                'If you intended to specify Desid_Max_Reg, check the CMAQ_CTRL file.'
                CALL LOG_MESSAGE( LOGDEV, ' ')
                CALL LOG_MESSAGE( LOGDEV, XMSG )
                DESID_MAX_REG = 30
@@ -2646,7 +2647,7 @@
            IF ( IOST .EQ. -1 ) THEN
                ! The DESID_Max_Sd Variable was completely missing
                XMSG = 'WARNING: Maximum Number of DESID Size Dist Rules was not specified. '//
-     &                'If you intended to specify Desid_Max_Sd, check the DESID_CTRL file.'
+     &                'If you intended to specify Desid_Max_Sd, check the CMAQ_CTRL file.'
                CALL LOG_MESSAGE( LOGDEV, ' ')
                CALL LOG_MESSAGE( LOGDEV, XMSG )
                DESID_MAX_SD = 10
@@ -2707,7 +2708,7 @@
            IF ( IOST .EQ. -1 ) THEN
                ! The DESID_N_Diag_Rules Variable was completely missing
                XMSG = 'WARNING: Number of DESID Diagnostic Rules was not specified. '//
-     &                'If you intended to specify Desid_N_Diag_Rules, check the DESID_CTRL file.'
+     &                'If you intended to specify Desid_N_Diag_Rules, check the CMAQ_CTRL file.'
                CALL LOG_MESSAGE( LOGDEV, ' ')
                CALL LOG_MESSAGE( LOGDEV, XMSG )
                DESID_N_DIAG_RULES = 0
@@ -2747,7 +2748,7 @@
                XMSG = 'WARNING: There were no valid Emission Diagnostic Values specified '//
      &                'for use by the DESID module. If you intended to specify '//
      &                'diagnostic output in the emission control interface, check the '//
-     &                'file you have provided for DESID_CTRL_NML.' 
+     &                'file you have provided for CMAQ_CTRL_NML.' 
                CALL LOG_MESSAGE( LOGDEV, ' ')
                CALL LOG_MESSAGE( LOGDEV, XMSG )
                Desid_Diag_Streams_Nml = ''

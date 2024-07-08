@@ -31,7 +31,7 @@
 !-------------------------------------------------------------------------
       
       USE GRID_CONF, ONLY : NCOLS, NROWS
-      USE ELMO_COMPONENTS, ONLY : ELMO_MAP_COMPONENTS
+      USE ELMO_COMPOSITES, ONLY : ELMO_MAP_COMPOSITES, ELMO_READ_COMPOSITES
       USE AERO_DATA, ONLY : N_MODE
 #ifdef isam
       USE SA_DEFN, ONLY : NTAG_SA
@@ -50,7 +50,7 @@
       INTEGER ALLOCSTAT, IOS, IERROR
       INTEGER :: N_MAP_MODE_SOURCE, N_MAP_MODE, N_MAP_SOURCE
 
-      ! Read User-Input from Namelist input file (Miscellaneous Control File)
+      ! Read User-Input from Namelist input file (CMAQ Control File)
       CALL READ_ELMO_NML()
       IF ( .NOT. L_ELMO ) RETURN
       
@@ -58,11 +58,15 @@
       ! other Global Variables
       CALL ELMO_INIT_SHARED()
 
-      ! Initialize Main Table for all possible output variables
+      ! Read Mechanism-Specific Composite Variables so they may be added
+      ! to the ELMO Table next
+      CALL ELMO_READ_COMPOSITES()
+
+      ! Initialize ELMO Table for all possible output variables
       CALL BUILD_ELMO_TABLE()
 
       ! Map All Table Variables to their components, if applicable
-      CALL ELMO_MAP_COMPONENTS()
+      CALL ELMO_MAP_COMPOSITES()
 
       ! Map ELMO User Input to ELMO_TABLE
       CALL ELMO_KEYWORDS
@@ -319,7 +323,7 @@
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
       
-      USE RUNTIME_VARS, ONLY: MISC_CTRL, LOGDEV
+      USE RUNTIME_VARS, ONLY: CMAQ_CTRL, LOGDEV
       
       IMPLICIT NONE
 
@@ -355,8 +359,8 @@
       AVRG_LAYER_BOT   = 1
       AVRG_VARS_NML(:) = ''
 
-      ! Retrieve the Name of the CMAQ Miscellaneous Control File
-      IF ( MISC_CTRL .EQ. "MISC_CTRL_NML" ) THEN
+      ! Retrieve the Name of the CMAQ Control File
+      IF ( CMAQ_CTRL .EQ. "CMAQ_CTRL_NML" ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A)"),
      &           'You have chosen not to indicate the location of an',
      &           'CMAQ_Control_Misc.nml namelist file. Default settings ',
@@ -364,15 +368,15 @@
           RETURN
       END IF
 
-      ! Open Miscellaneous Control Namelist File
+      ! Open CMAQ Control Namelist File
       FUNIT = JUNIT()
-      OPEN( FILE = MISC_CTRL, UNIT = FUNIT, STATUS = 'OLD',
+      OPEN( FILE = CMAQ_CTRL, UNIT = FUNIT, STATUS = 'OLD',
      &      POSITION = 'REWIND', FORM='FORMATTED', IOSTAT = STAT )
 
       ! Check for Error in File Open Process
       IF ( STAT .NE. 0 ) THEN
           WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
-     &           'CMAQ miscellaneous control namelist file: ',TRIM( MISC_CTRL )
+     &           'CMAQ Control namelist file: ',TRIM( CMAQ_CTRL )
           CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
       END IF
  
@@ -382,7 +386,7 @@
       IF ( STAT .NE. 0 ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
      &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_ACTIVATE section of the CMAQ Miscellaneous Control ',
+     &           'ELMO_ACTIVATE section of the CMAQ Control ',
      &           'Namelist. Default values for this section will be ',
      &           'assumed.'
       END IF
@@ -403,7 +407,7 @@
       IF ( STAT .NE. 0 ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
      &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_INST_NML section of the CMAQ Miscellaneous Control ',
+     &           'ELMO_INST_NML section of the CMAQ Control ',
      &           'Namelist. Default values for this section will be ',
      &           'assumed.'
       END IF
@@ -428,7 +432,7 @@
       IF ( STAT .NE. 0 ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
      &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_AVRG_NML section of the CMAQ Miscellaneous Control ',
+     &           'ELMO_AVRG_NML section of the CMAQ Control ',
      &           'Namelist. Default values for this section will be ',
      &           'assumed.'
       END IF
@@ -465,8 +469,7 @@
      &                       WDEP_SPC, N_SPC_WDEP, MAP_WDEPtoCGRID,
      &                       N_SPC_DEPV, MAP_DEPVtoCGRID
       USE VDIFF_MAP, ONLY : DEPV_SPC, N_SPC_DDEP
-      USE UTIL_FAMILY_MODULE, ONLY: N_Chem_Fams,ChemFamilyName,
-     &                              ChemFamilyUnits
+      USE ELMO_COMPOSITES, ONLY : N_COMPOSITES, CMPST_NML
       USE GRID_CONF, ONLY : MYPE
       USE UTILIO_DEFN
 
@@ -501,176 +504,95 @@
       ELMO_TABLE(:)%IM = 0
       ELMO_TABLE(:)%SOURCE = 0
 
-      ! Load Bulk Aerosol Species into ELMO_Table
-      ! Because the family names are loaded first in the ELMO Table, any
-      ! request for a chemical family name that matches an ELMO variable
-      ! name will default to outputting the chemical family.
-      DO IAERO = 1,N_AEROSPC
-         N = N + 1
-         ELMO_TABLE( N )%NAME = AEROSPC( IAERO )%BULKNAME
-         ELMO_TABLE( N )%OUT_NAME = AEROSPC( IAERO )%BULKNAME
-         ELMO_TABLE( N )%OUT_TYPE = M3REAL
-         ELMO_TABLE( N )%VAR_TYPE = ETYPE_AEROBULK
-         ELMO_TABLE( N )%ID = IAERO
-         ELMO_TABLE( N )%CUNIT = 'ug m-3'
-         CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-     &                        ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-         ELMO_TABLE( N )%IUNIT = IUNIT
-         ELMO_TABLE( N )%DESC = 'Total Aerosol Mass for '//
-     &                          TRIM(AEROSPC(IAERO)%BULKNAME)
-         ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
-      END DO
- 
-      ! Load Chemical Families that are not Aerosol Bulk Species into ELMO_Table
-      DO IFAM = 1,N_CHEM_FAMS
-         S = INDEX1( CHEMFAMILYNAME( IFAM ), N_AEROSPC, AEROSPC( : )%BULKNAME )
-         IF ( S .EQ. 0 ) THEN
-           N = N + 1
-           ELMO_TABLE( N )%NAME = CHEMFAMILYNAME( IFAM ) 
-           ELMO_TABLE( N )%OUT_NAME = CHEMFAMILYNAME( IFAM )
-           ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ETYPE_FAM
-           ELMO_TABLE( N )%ID = IFAM
-           ELMO_TABLE( N )%CUNIT = CHEMFAMILYUNITS( IFAM )
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-     &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-           ELMO_TABLE( N )%IUNIT = IUNIT
-           ELMO_TABLE( N )%DESC = 'Mass for Chemical Family '//
-     &                            TRIM( CHEMFAMILYNAME( IFAM ))
-           ELMO_TABLE( N )%MW   = 0.0
-         END IF
-      END DO
+        !    ! Load Bulk Aerosol Species into ELMO_Table
+        !    ! Because the family names are loaded first in the ELMO Table, any
+        !    ! request for a chemical family name that matches an ELMO variable
+        !    ! name will default to outputting the chemical family.
+        !    DO IAERO = 1,N_AEROSPC
+        !       N = N + 1
+        !       ELMO_TABLE( N )%NAME = AEROSPC( IAERO )%BULKNAME
+        !       ELMO_TABLE( N )%OUT_NAME = AEROSPC( IAERO )%BULKNAME
+        !       ELMO_TABLE( N )%OUT_TYPE = M3REAL
+        !       ELMO_TABLE( N )%VAR_TYPE = ET_AEROBULK
+        !       ELMO_TABLE( N )%ID = IAERO
+        !       ELMO_TABLE( N )%CUNIT = 'ug m-3'
+        !       CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
+        !   &                        ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
+        !       ELMO_TABLE( N )%IUNIT = IUNIT
+        !       ELMO_TABLE( N )%DESC = 'Total Aerosol Mass for '//
+        !   &                          TRIM(AEROSPC(IAERO)%BULKNAME)
+        !       ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
+        !    END DO
  
 #ifdef isam
-      ! Load ISAM Bulk Aerosols
-      DO IAERO = 1,N_AEROSPC
-         IF ( ANY( MAP_AEROtoSA( IAERO,: ) .NE. 0 ) ) THEN
+        !  ! Load ISAM Bulk Aerosols
+        !  DO IAERO = 1,N_AEROSPC
+        !     IF ( ANY( MAP_AEROtoSA( IAERO,: ) .NE. 0 ) ) THEN
+        !
+        !       DO ITAG = 1,NTAG_SA
+        !          N = N + 1
+        !          ELMO_TABLE( N )%NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_ISAM' 
+        !          ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
+        ! &                               // '_' // TRIM(TAGNAME( ITAG )) 
+        !          ELMO_TABLE( N )%OUT_TYPE = M3REAL
+        !          ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_AEROBULK
+        !          ELMO_TABLE( N )%ID = IAERO
+        !          ELMO_TABLE( N )%SOURCE = ITAG
+        !          ELMO_TABLE( N )%CUNIT = 'ug m-3'
+        !          CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
+        ! &                             ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
+        !          ELMO_TABLE( N )%IUNIT = IUNIT
+        !          ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
+        ! &                        TRIM( AEROSPC( IAERO )%BULKNAME ) //
+        ! &                        ' from source ' // TRIM(TAGNAME( ITAG ))
+        !          ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
+        !       END DO  
+        !       
+        !        N = N + 1
+        !        ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
+        !        ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_TAGS'
+        !        ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
+        !        ELMO_TABLE( N )%DESC = 'Total Aerosol Mass for '//
+        ! &             TRIM(AEROSPC(IAERO)%BULKNAME)//' across all sources.'
+        !     END IF
+        !  END DO
 
-           DO ITAG = 1,NTAG_SA
-              N = N + 1
-              ELMO_TABLE( N )%NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_ISAM' 
-              ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
-     &                               // '_' // TRIM(TAGNAME( ITAG )) 
-              ELMO_TABLE( N )%OUT_TYPE = M3REAL
-              ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_AEROBULK
-              ELMO_TABLE( N )%ID = IAERO
-              ELMO_TABLE( N )%SOURCE = ITAG
-              ELMO_TABLE( N )%CUNIT = 'ug m-3'
-              CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-     &                             ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-              ELMO_TABLE( N )%IUNIT = IUNIT
-              ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
-     &                        TRIM( AEROSPC( IAERO )%BULKNAME ) //
-     &                        ' from source ' // TRIM(TAGNAME( ITAG ))
-              ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
-           END DO  
-           
-            N = N + 1
-            ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-            ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_TAGS'
-            ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
-            ELMO_TABLE( N )%DESC = 'Total Aerosol Mass for '//
-     &             TRIM(AEROSPC(IAERO)%BULKNAME)//' across all sources.'
-         END IF
-      END DO
-
-      ! Load ISAM Families
-      DO IFAM = 1,N_CHEM_FAMS
-         S = INDEX1( CHEMFAMILYNAME( IFAM ), N_AEROSPC, AEROSPC( : )%BULKNAME )
-         IF ( S .EQ. 0 ) THEN
-           DO ITAG = 1,NTAG_SA
-             N = N + 1
-             ELMO_TABLE( N )%NAME = TRIM(CHEMFAMILYNAME( IFAM ))
-     &                              // '_ISAM'
-             ELMO_TABLE( N )%OUT_NAME = TRIM(CHEMFAMILYNAME( IFAM ))
-     &                              // '_' // TRIM(TAGNAME( ITAG )) 
-             ELMO_TABLE( N )%OUT_TYPE = M3REAL
-             ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_FAM
-             ELMO_TABLE( N )%ID = IFAM
-             ELMO_TABLE( N )%SOURCE = ITAG
-             ELMO_TABLE( N )%CUNIT = CHEMFAMILYUNITS( IFAM )
-             CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-     &                            ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-             ELMO_TABLE( N )%IUNIT = IUNIT
-             ELMO_TABLE( N )%DESC = 'Concentration of Chemical Family '//
-     &                       TRIM( CHEMFAMILYNAME( IFAM ) ) //
-     &                       ' from source ' // TRIM(TAGNAME( ITAG )) 
-             ELMO_TABLE( N )%MW   = 0.0
-           END DO 
-           
-           N = N + 1
-           ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-           ELMO_TABLE( N )%OUT_NAME = TRIM(CHEMFAMILYNAME(IFAM)) //'_TAGS'
-           ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
-           ELMO_TABLE( N )%DESC = 'Concentration of Chemical Family '//
-     &                            TRIM( CHEMFAMILYNAME( IFAM )) //
-     &                            ' across all sources.'
-        END IF
-      END DO
-      
 #endif
 
 #ifdef sens
-      ! Load DDM Bulk Aerosols
-      DO IAERO = 1,N_AEROSPC
-         DO NP = 1,NPMAX
-            N = N + 1
-            ELMO_TABLE( N )%NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
-     &                               // '_DDM' 
-            ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
-     &                               // '_' // TRIM(SEN_PAR( NP )) 
-          
-            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-            ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM_AEROBULK
-            ELMO_TABLE( N )%ID = IAERO
-            ELMO_TABLE( N )%SOURCE = NP
-            ELMO_TABLE( N )%CUNIT = 'ug m-3'
-            CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-     &                           ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-            ELMO_TABLE( N )%IUNIT = IUNIT
-            ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
-            ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
-     &                      TRIM( AEROSPC( IAERO )%BULKNAME ) //
-     &                      ' from source ' // TRIM(SEN_PAR( NP ))
-        END DO  
-      END DO
- 
-      ! Load DDM Families
-      DO IFAM = 1,N_CHEM_FAMS
-         S = INDEX1( CHEMFAMILYNAME( IFAM ), N_AEROSPC, AEROSPC( : )%BULKNAME )
-         IF ( S .EQ. 0 ) THEN
-           DO NP = 1,NPMAX
-              N = N + 1
-              ELMO_TABLE( N )%NAME = TRIM( CHEMFAMILYNAME( IFAM ))
-     &                               // '_DDM'
-              ELMO_TABLE( N )%OUT_NAME = TRIM(CHEMFAMILYNAME( IFAM ))
-     &                               // '_' // TRIM(SEN_PAR( NP )) 
-              
-              ELMO_TABLE( N )%OUT_TYPE = M3REAL
-              ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM_FAM
-              ELMO_TABLE( N )%ID = IFAM
-              ELMO_TABLE( N )%SOURCE = NP
-              ELMO_TABLE( N )%CUNIT = CHEMFAMILYUNITS( IFAM )
-              CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-     &                             ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-              ELMO_TABLE( N )%IUNIT = IUNIT
-              ELMO_TABLE( N )%MW   = 0.0
-              ELMO_TABLE( N )%DESC = 'Concentration of Chemical Family '//
-     &                        TRIM( CHEMFAMILYNAME( IFAM ) ) //
-     &                        ' from source ' // TRIM(SEN_PAR( NP )) 
-           END DO
-         END IF
-      END DO
+       !  ! Load DDM Bulk Aerosols
+       !  DO IAERO = 1,N_AEROSPC
+       !     DO NP = 1,NPMAX
+       !        N = N + 1
+       !        ELMO_TABLE( N )%NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
+       ! &                               // '_DDM' 
+       !        ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
+       ! &                               // '_' // TRIM(SEN_PAR( NP )) 
+       !      
+       !        ELMO_TABLE( N )%OUT_TYPE = M3REAL
+       !        ELMO_TABLE( N )%VAR_TYPE = ET_DDM_AEROBULK
+       !        ELMO_TABLE( N )%ID = IAERO
+       !        ELMO_TABLE( N )%SOURCE = NP
+       !        ELMO_TABLE( N )%CUNIT = 'ug m-3'
+       !        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
+       ! &                           ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
+       !        ELMO_TABLE( N )%IUNIT = IUNIT
+       !        ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
+       !        ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
+       ! &                      TRIM( AEROSPC( IAERO )%BULKNAME ) //
+       ! &                      ' from source ' // TRIM(SEN_PAR( NP ))
+       !    END DO  
+       !  END DO
  
 #endif
 
-      ! Load ELMO Variables into ELMO_Table
+      ! Load The ELMO List into ELMO_Table
       DO ILIST = 1,N_ELMO_LIST
          N = N + 1
          ELMO_TABLE( N )%NAME = ELMO_LIST( ILIST )%NAME
          ELMO_TABLE( N )%OUT_NAME = ELMO_LIST( ILIST )%NAME
-         ELMO_TABLE( N )%OUT_TYPE = ELMO_LIST( ILIST )%OUT_TYPE
-         ELMO_TABLE( N )%VAR_TYPE = ETYPE_ELMO
+         ELMO_TABLE( N )%OUT_TYPE = M3REAL
+         ELMO_TABLE( N )%VAR_TYPE = ELMO_LIST( ILIST )%VAR_TYPE
          ELMO_TABLE( N )%ID = ELMO_LIST( ILIST )%ID
          ELMO_TABLE( N )%CUNIT = ELMO_LIST( ILIST )%UNIT
          CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
@@ -693,7 +615,6 @@
              ELMO_TABLE( N )%IM = IM
              ELMO_TABLE( N )%OUT_NAME = TRIM(ELMO_LIST( ILIST )%NAME)//
      &                                      '_' // aeromode( IM )%suff
-             ELMO_TABLE( N )%VAR_TYPE = ETYPE_ELMO
              ELMO_TABLE( N )%DESC = TRIM(ELMO_LIST( ILIST )%DESC) // ' for mode ' //
      &                              aeromode(IM)%suff
            END DO
@@ -711,7 +632,7 @@
              ELMO_TABLE( N )%OUT_NAME = TRIM(ELMO_LIST( ILIST )%NAME) 
      &                              // '_' // TRIM(TAGNAME( ITAG ))
              ELMO_TABLE( N )%OUT_TYPE = M3REAL
-             ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_ELMO
+             ELMO_TABLE( N )%VAR_TYPE = ELMO_LIST( ILIST )%VAR_TYPE + 10
              ELMO_TABLE( N )%ID = ELMO_LIST( ILIST )%ID
              ELMO_TABLE( N )%CUNIT =  ELMO_LIST( ILIST )%UNIT
              CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
@@ -744,10 +665,10 @@
              N = N + 1
              ELMO_TABLE( N )%NAME = TRIM(ELMO_LIST( ILIST )%NAME)
      &                              // '_DDM'
-             ELMO_TABLE( N )%OUT_NAME = TRIm(ELMO_LIST( ILIST )%NAME)
+             ELMO_TABLE( N )%OUT_NAME = TRIM(ELMO_LIST( ILIST )%NAME)
      &                              // '_' // TRIM( SEN_PAR( NP ) )
              ELMO_TABLE( N )%OUT_TYPE = M3REAL
-             ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM_ELMO
+             ELMO_TABLE( N )%VAR_TYPE = ELMO_LIST( ILIST )%VAR_TYPE + 20
              ELMO_TABLE( N )%ID = ELMO_LIST( ILIST )%ID
              ELMO_TABLE( N )%SOURCE = NP
              ELMO_TABLE( N )%CUNIT =  ELMO_LIST( ILIST )%UNIT
@@ -762,20 +683,106 @@
       END DO
 #endif         
  
+      ! Load The Composite List into the ELMO Table
+      DO ICMPST = 1,N_COMPOSITES
+         N = N + 1
+         ELMO_TABLE( N )%NAME = CMPST_NML( ICMPST )%NAME
+         ELMO_TABLE( N )%OUT_NAME = CMPST_NML( ICMPST )%NAME
+         ELMO_TABLE( N )%OUT_TYPE = M3REAL
 
+         IF ( CMPST_NML( ICMPST )%CMPST_TYPE .EQ. 'DEP' ) THEN
+             ELMO_TABLE( N )%VAR_TYPE = ET_CMPST_DEP
+         ELSE
+             ELMO_TABLE( N )%VAR_TYPE = ET_CMPST
+         END IF
+         ELMO_TABLE( N )%ID = ICMPST
+         ELMO_TABLE( N )%CUNIT = CMPST_NML( ICMPST )%CUNIT
+         CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
+     &                        ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
+         ELMO_TABLE( N )%IUNIT = IUNIT
+         ELMO_TABLE( N )%DESC = CMPST_NML( ICMPST )%DESC
+         ELMO_TABLE( N )%MW   = 0.0
+      END DO
+ 
+#ifdef isam
+      DO ICMPST = 1,N_COMPOSITES
+         ! Define ELMO Variables for all ISAM sources
+         DO ITAG = 1,NTAG_SA
+           N = N + 1
+           ELMO_TABLE( N )%NAME = TRIM(CMPST_NML( ICMPST )%NAME)
+     &                            // '_ISAM'
+           ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST_NML( ICMPST )%NAME) 
+     &                            // '_' // TRIM(TAGNAME( ITAG ))
+           ELMO_TABLE( N )%OUT_TYPE = M3REAL
+           ELMO_TABLE( N )%VAR_TYPE = CMPST_NML( ICMPST )%VAR_TYPE + 10
+           ELMO_TABLE( N )%ID = ICMPST
+           ELMO_TABLE( N )%CUNIT =  CMPST_NML( ICMPST )%CUNIT
+           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
+     &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
+           ELMO_TABLE( N )%IUNIT = IUNIT
+
+           ELMO_TABLE( N )%SOURCE = ITAG
+           ELMO_TABLE( N )%DESC = CMPST_NML( ICMPST )%DESC // 
+     &           ' for source ' // TRIM(TAGNAME( ITAG ))
+           ELMO_TABLE( N )%MW   = 0.0
+         END DO 
+         
+         ! Set Source-Dependent Properties for the sum of sources
+         N = N + 1
+         ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
+         ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST_NML( ICMPST )%NAME) // '_TAGS'
+         ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
+         ELMO_TABLE( N )%DESC = CMPST_NML( ICMPST )%DESC // 
+     &         ' for the sum of all sources.'
+      END DO
+#endif         
+
+#ifdef sens
+      DO ICMPST = 1,N_COMPOSITES
+         ! Define ELMO Variables for all remaining DDM3D sources
+         DO NP = 1,NPMAX
+           N = N + 1
+           ELMO_TABLE( N )%NAME = TRIM(CMPST_NML( ICMPST )%NAME)
+     &                            // '_DDM'
+           ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST_NML( ICMPST )%NAME)
+     &                            // '_' // TRIM( SEN_PAR( NP ) )
+           ELMO_TABLE( N )%OUT_TYPE = M3REAL
+           ELMO_TABLE( N )%VAR_TYPE = CMPST_NML( ICMPST )%VAR_TYPE + 20
+           ELMO_TABLE( N )%ID = ICMPST
+           ELMO_TABLE( N )%SOURCE = NP
+           ELMO_TABLE( N )%CUNIT =  CMPST_NML( ICMPST )%CUNIT
+           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
+     &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
+           ELMO_TABLE( N )%IUNIT = IUNIT
+           ELMO_TABLE( N )%DESC = 'Sensitivity of ' // CMPST_NML( ICMPST )%DESC // 
+     &           ' to ' // TRIM( SEN_PAR( NP ) )
+           ELMO_TABLE( N )%MW   = 0.0
+         END DO
+      END DO
+#endif         
+ 
       ! Load CGRID Species into ELMO_Table
       DO ICGRID = 1,N_CGRID_SPC
          N = N + 1
          ELMO_TABLE( N )%NAME = CGRID_NAME( ICGRID )
          ELMO_TABLE( N )%OUT_NAME = CGRID_NAME( ICGRID )
          ELMO_TABLE( N )%OUT_TYPE = M3REAL
-         ELMO_TABLE( N )%VAR_TYPE = ETYPE_CGRID
+         ELMO_TABLE( N )%VAR_TYPE = ET_CONC
          ELMO_TABLE( N )%ID = ICGRID
+
+         DO IMODE = 1,N_MODE
+           DO ISPC = 1,N_AEROSPC
+             IF ( CGRID_NAME( ICGRID ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &          ELMO_TABLE( N )%IM = IMODE
+             END IF
+           END DO
+         END DO
+
          ELMO_TABLE( N )%CUNIT = CGRID_UNITS( ICGRID )
          CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
      &                        ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
          ELMO_TABLE( N )%IUNIT = IUNIT
-         ELMO_TABLE( N )%DESC = CGRID_CONC_DESC(S)
+         ELMO_TABLE( N )%DESC = CGRID_CONC_DESC( ICGRID )
          ELMO_TABLE( N )%MW   = CGRID_MW( ICGRID )
       END DO    
 
@@ -787,8 +794,16 @@
         ELMO_TABLE( N )%NAME = 'WD_' // WDEP_SPC( IWDEP )
         ELMO_TABLE( N )%OUT_NAME = 'WD_' // WDEP_SPC( IWDEP )
         ELMO_TABLE( N )%OUT_TYPE = M3REAL
-        ELMO_TABLE( N )%VAR_TYPE = ETYPE_WDEP
+        ELMO_TABLE( N )%VAR_TYPE = ET_WDEP
         ELMO_TABLE( N )%ID = IWDEP
+
+        DO IMODE = 1,N_MODE
+          DO ISPC = 1,N_AEROSPC
+            IF ( WDEP_SPC( IWDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &         ELMO_TABLE( N )%IM = IMODE
+            END IF
+          END DO
+        END DO
 
         ICGRID = MAP_WDEPtoCGRID( IWDEP )
         ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
@@ -805,7 +820,6 @@
         ELMO_TABLE( N )%DESC = 'Wet Deposition for Species '//
      &                         TRIM( WDEP_SPC( IWDEP ) )
       END DO
-      END IF
 
       ! Load Dry Deposition Fluxes
       IF ( L_ELMO_DDEP ) THEN
@@ -814,8 +828,16 @@
         ELMO_TABLE( N )%NAME = 'DD_' // DEPV_SPC( IDDEP )
         ELMO_TABLE( N )%OUT_NAME = 'DD_' // DEPV_SPC( IDDEP )
         ELMO_TABLE( N )%OUT_TYPE = M3REAL
-        ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDEP
+        ELMO_TABLE( N )%VAR_TYPE = ET_DDEP
         ELMO_TABLE( N )%ID = IDDEP
+
+        DO IMODE = 1,N_MODE
+          DO ISPC = 1,N_AEROSPC
+            IF ( DEPV_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &         ELMO_TABLE( N )%IM = IMODE
+            END IF
+          END DO
+        END DO
 
         ICGRID = MAP_DEPVtoCGRID( IDDEP )
         ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
@@ -833,7 +855,7 @@
      &                         TRIM( DEPV_SPC( IDDEP ) )
       END DO
       END IF
-
+ 
 #ifdef isam
       ! Load ISAM CGRID Variables to ELMO Table
       DO ISPEC = 1,NSPC_SA
@@ -844,7 +866,7 @@
            ELMO_TABLE( N )%OUT_NAME = TRIM(ISAM_SPEC( ISPEC,ITAG ))
      &                            // '_' // TRIM(TAGNAME( ITAG )) 
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM
+           ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_CONC
            ELMO_TABLE( N )%ID = ISPEC
            ELMO_TABLE( N )%SOURCE = ITAG
            ICGRID = MAP_SAtoCGR( ISPEC )
@@ -853,6 +875,15 @@
            ELSE
               ELMO_TABLE( N )%CUNIT = 'ppmV'
            END IF
+        
+           DO IMODE = 1,N_MODE
+             DO ISPC = 1,N_AEROSPC
+               IF ( ISAM_SPEC( ISPEC,ITAG ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &            ELMO_TABLE( N )%IM = IMODE
+               END IF
+             END DO
+           END DO
+
            CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
      &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
            ELMO_TABLE( N )%IUNIT = IUNIT
@@ -882,7 +913,7 @@
            ELMO_TABLE( N )%OUT_NAME = 'WD_' // TRIM( WDEP_SPC( IWDEP ) )
      &                            // '_' // TRIM(TAGNAME( ITAG )) 
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_WDEP
+           ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_WDEP
            ELMO_TABLE( N )%ID = IWDEP
            ELMO_TABLE( N )%SOURCE = ITAG
            ICGRID = MAP_WDEPtoCGRID( IWDEP )
@@ -893,6 +924,15 @@
            ELSE
               ELMO_TABLE( N )%CUNIT = 'kg ha-1'
            END IF
+           
+           DO IMODE = 1,N_MODE
+             DO ISPC = 1,N_AEROSPC
+               IF ( WDEP_SPEC( IWDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &            ELMO_TABLE( N )%IM = IMODE
+               END IF
+             END DO
+           END DO
+
            CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
      &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
            ELMO_TABLE( N )%IUNIT = IUNIT
@@ -919,7 +959,7 @@
            ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))
      &                            // '_' // TRIM(TAGNAME( ITAG )) 
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ETYPE_ISAM_DDEP
+           ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_DDEP
            ELMO_TABLE( N )%ID = IDDEP
            ELMO_TABLE( N )%SOURCE = ITAG
            ICGRID = MAP_DEPVtoCGRID( IDDEP )
@@ -930,6 +970,15 @@
            ELSE
               ELMO_TABLE( N )%CUNIT = 'kg ha-1'
            END IF
+           
+           DO IMODE = 1,N_MODE
+             DO ISPC = 1,N_AEROSPC
+               IF ( DEPV_SPEC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &            ELMO_TABLE( N )%IM = IMODE
+               END IF
+             END DO
+           END DO
+
            CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
      &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
            ELMO_TABLE( N )%IUNIT = IUNIT
@@ -960,10 +1009,18 @@
            ELMO_TABLE( N )%OUT_NAME = TRIM( CGRID_NAME(ICGRID) ) 
      &                                // '_' // TRIM( SEN_PAR(NP) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM
+           ELMO_TABLE( N )%VAR_TYPE = ET_DDM_CONC
            ELMO_TABLE( N )%ID = ICGRID
            ELMO_TABLE( N )%SOURCE = NP
            ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
+
+           DO IMODE = 1,N_MODE
+             DO ISPC = 1,N_AEROSPC
+               IF ( CGRID_NAME( ICGRID ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &            ELMO_TABLE( N )%IM = IMODE
+               END IF
+             END DO
+           END DO
 
            IF ( CGRID_MASK_NUM( ICGRID ) ) THEN
               ELMO_TABLE( N )%CUNIT = 'm-3'
@@ -994,9 +1051,17 @@
            ELMO_TABLE( N )%OUT_NAME = 'WD_' // TRIM(WDEP_SPC( IWDEP ))
      &                     // '_' // TRIM( SEN_PAR(NP) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM_WDEP
+           ELMO_TABLE( N )%VAR_TYPE = ET_DDM_WDEP
            ELMO_TABLE( N )%ID = IWDEP
            ELMO_TABLE( N )%SOURCE = NP
+
+           DO IMODE = 1,N_MODE
+             DO ISPC = 1,N_AEROSPC
+               IF ( WDEP_SPC( IWDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &            ELMO_TABLE( N )%IM = IMODE
+               END IF
+             END DO
+           END DO
 
            ICGRID = MAP_WDEPtoCGRID( IWDEP )
            ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
@@ -1027,9 +1092,17 @@
            ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))
      &                                // '_' // TRIM( SEN_PAR(NP) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ETYPE_DDM_DDEP
+           ELMO_TABLE( N )%VAR_TYPE = ET_DDM_DDEP
            ELMO_TABLE( N )%ID = IDDEP
            ELMO_TABLE( N )%SOURCE = NP
+
+           DO IMODE = 1,N_MODE
+             DO ISPC = 1,N_AEROSPC
+               IF ( DEPV_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &            ELMO_TABLE( N )%IM = IMODE
+               END IF
+             END DO
+           END DO
 
            ICGRID = MAP_DEPVtoCGRID( IDDEP )
            ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
@@ -1238,7 +1311,7 @@
       WRITE( LOGDEV, '(5x,A)'   ),'+=================================='
       WRITE( LOGDEV,'(7x,A,8(/,13x,A))' ),
      &                              'Note: these are populated using rules from the',
-     &                              'Miscellaneous Control File supplied by the User. ',
+     &                              'CMAQ Control File supplied by the User. ',
      &                              'When variables are indented, they are components ',
      &                              'of the most recent non-indented variable. Becuase ',
      &                              'their output units should either match the output ',
@@ -1282,7 +1355,7 @@
                DO ICOMP = 1,ELMO_COMP( J )%N_VARS
                   TABID = ELMO_COMP( J )%TABID( ICOMP )
 
-                  IF ( ELMO_TABLE( TABID )%VAR_TYPE .NE. ETYPE_AEROBULK ) THEN
+                  IF ( ELMO_TABLE( TABID )%VAR_TYPE .NE. ET_AEROBULK ) THEN
                      WRITE( LOGDEV, '(8x,A2,A16,4x,A14,2x,ES9.2,4x,A)'),
      &                      '->',ELMO_TABLE( TABID )%OUT_NAME,
      &                      CETYPE(ELMO_TABLE( TABID )%VAR_TYPE),
