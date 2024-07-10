@@ -466,8 +466,6 @@
       ID  = ELMO_TABLE( J_ )%ID             ! Map to ELMO Variable ID numbers
       VAR_TYPE  = ELMO_TABLE( J_ )%VAR_TYPE ! Specify Variable Type (e.g. CGRID, FAM, 
                                             !   ISAM)
-      
-
  
       ! Calculate conversion factor for transforming between units. For
       ! example, ppbC or kgN ha-1 can be calculated using this routine.
@@ -533,13 +531,13 @@
               !ELSE
               !   CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, J=IX1 )
               !   OUTVAL = OUTVAL + VAL2 * ELMO_COMP( J_ )%COEFF(IVAR) * FAC
-              !END IF
+              END IF
             END DO
 
          CASE ( ET_DRVD, ET_ISAM_DRVD, ET_DDM_DRVD,
      &          ET_AEROPROP, ET_CHEM, ET_MET, ET_PHOT )
             ! Retrieve Detailed ELMO Variable
-            CALL ELMO_CALC_DETAILED( VAL2, J_ )
+            CALL ELMO_CALC_DERIVED( VAL2, J_ )
             OUTVAL = OUTVAL + VAL2 * FAC
 
          CASE ( ET_WDEP )

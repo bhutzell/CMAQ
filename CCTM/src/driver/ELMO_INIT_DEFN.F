@@ -469,7 +469,7 @@
      &                       WDEP_SPC, N_SPC_WDEP, MAP_WDEPtoCGRID,
      &                       N_SPC_DEPV, MAP_DEPVtoCGRID
       USE VDIFF_MAP, ONLY : DEPV_SPC, N_SPC_DDEP
-      USE ELMO_COMPOSITES, ONLY : N_COMPOSITES, CMPST_NML
+      USE ELMO_COMPOSITES, ONLY : N_COMPOSITES, CMPST
       USE GRID_CONF, ONLY : MYPE
       USE UTILIO_DEFN
 
@@ -485,7 +485,7 @@
       IMPLICIT NONE
 
       INTEGER       :: ILIST, IUNIT, IFAM, S, IM, ICGRID,
-     &                 IWDEP, IDDEP
+     &                 IWDEP, IDDEP, ICMPST, IMODE, ISPC
       INTEGER       :: VAR_TYPE
       INTEGER       :: N, IAERO, IOS, ITAG, ISPEC, NP
       CHARACTER(32) :: PNAME = 'BUILD_ELMO_TABLE'
@@ -686,22 +686,46 @@
       ! Load The Composite List into the ELMO Table
       DO ICMPST = 1,N_COMPOSITES
          N = N + 1
-         ELMO_TABLE( N )%NAME = CMPST_NML( ICMPST )%NAME
-         ELMO_TABLE( N )%OUT_NAME = CMPST_NML( ICMPST )%NAME
+         ELMO_TABLE( N )%NAME = CMPST( ICMPST )%NAME
+         ELMO_TABLE( N )%OUT_NAME = CMPST( ICMPST )%NAME
          ELMO_TABLE( N )%OUT_TYPE = M3REAL
 
-         IF ( CMPST_NML( ICMPST )%CMPST_TYPE .EQ. 'DEP' ) THEN
+         IF ( CMPST( ICMPST )%CMPST_TYPE .EQ. 'DEP' ) THEN
              ELMO_TABLE( N )%VAR_TYPE = ET_CMPST_DEP
          ELSE
              ELMO_TABLE( N )%VAR_TYPE = ET_CMPST
          END IF
          ELMO_TABLE( N )%ID = ICMPST
-         ELMO_TABLE( N )%CUNIT = CMPST_NML( ICMPST )%CUNIT
+         ELMO_TABLE( N )%CUNIT = CMPST( ICMPST )%CUNIT
          CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
      &                        ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
          ELMO_TABLE( N )%IUNIT = IUNIT
-         ELMO_TABLE( N )%DESC = CMPST_NML( ICMPST )%DESC
+         ELMO_TABLE( N )%DESC = CMPST( ICMPST )%DESC
          ELMO_TABLE( N )%MW   = 0.0
+
+         ! Check Special Composite IDs that are dependencies for ELMO
+         ! Derived variables
+         IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_SO4' ) THEN
+             ID_PMF_SO4 = ICMPST
+         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_NO3' ) THEN
+             ID_PMF_NO3 = ICMPST
+         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_NH4' ) THEN
+             ID_PMF_NH4 = ICMPST
+         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PM25_SO4' ) THEN
+             ID_PM25_SO4 = ICMPST
+         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PM25_NO3' ) THEN
+             ID_PM25_NO3 = ICMPST
+         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PM25_NH4' ) THEN
+             ID_PM25_NH4 = ICMPST
+         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_HP' ) THEN
+             ID_PMF_HP = ICMPST
+         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_H2O' ) THEN
+             ID_PMF_H2O = ICMPST
+         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_BENAPY' ) THEN
+             ID_PMF_BENAPY = ICMPST
+         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'GAS_BENAPY' ) THEN
+             ID_GAS_BENAPY = ICMPST
+         END IF
       END DO
  
 #ifdef isam
@@ -709,20 +733,20 @@
          ! Define ELMO Variables for all ISAM sources
          DO ITAG = 1,NTAG_SA
            N = N + 1
-           ELMO_TABLE( N )%NAME = TRIM(CMPST_NML( ICMPST )%NAME)
+           ELMO_TABLE( N )%NAME = TRIM(CMPST( ICMPST )%NAME)
      &                            // '_ISAM'
-           ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST_NML( ICMPST )%NAME) 
+           ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST( ICMPST )%NAME) 
      &                            // '_' // TRIM(TAGNAME( ITAG ))
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = CMPST_NML( ICMPST )%VAR_TYPE + 10
+           ELMO_TABLE( N )%VAR_TYPE = CMPST( ICMPST )%VAR_TYPE + 10
            ELMO_TABLE( N )%ID = ICMPST
-           ELMO_TABLE( N )%CUNIT =  CMPST_NML( ICMPST )%CUNIT
+           ELMO_TABLE( N )%CUNIT =  CMPST( ICMPST )%CUNIT
            CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
      &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
            ELMO_TABLE( N )%IUNIT = IUNIT
 
            ELMO_TABLE( N )%SOURCE = ITAG
-           ELMO_TABLE( N )%DESC = CMPST_NML( ICMPST )%DESC // 
+           ELMO_TABLE( N )%DESC = CMPST( ICMPST )%DESC // 
      &           ' for source ' // TRIM(TAGNAME( ITAG ))
            ELMO_TABLE( N )%MW   = 0.0
          END DO 
@@ -730,9 +754,9 @@
          ! Set Source-Dependent Properties for the sum of sources
          N = N + 1
          ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-         ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST_NML( ICMPST )%NAME) // '_TAGS'
+         ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST( ICMPST )%NAME) // '_TAGS'
          ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
-         ELMO_TABLE( N )%DESC = CMPST_NML( ICMPST )%DESC // 
+         ELMO_TABLE( N )%DESC = CMPST( ICMPST )%DESC // 
      &         ' for the sum of all sources.'
       END DO
 #endif         
@@ -742,19 +766,19 @@
          ! Define ELMO Variables for all remaining DDM3D sources
          DO NP = 1,NPMAX
            N = N + 1
-           ELMO_TABLE( N )%NAME = TRIM(CMPST_NML( ICMPST )%NAME)
+           ELMO_TABLE( N )%NAME = TRIM(CMPST( ICMPST )%NAME)
      &                            // '_DDM'
-           ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST_NML( ICMPST )%NAME)
+           ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST( ICMPST )%NAME)
      &                            // '_' // TRIM( SEN_PAR( NP ) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = CMPST_NML( ICMPST )%VAR_TYPE + 20
+           ELMO_TABLE( N )%VAR_TYPE = CMPST( ICMPST )%VAR_TYPE + 20
            ELMO_TABLE( N )%ID = ICMPST
            ELMO_TABLE( N )%SOURCE = NP
-           ELMO_TABLE( N )%CUNIT =  CMPST_NML( ICMPST )%CUNIT
+           ELMO_TABLE( N )%CUNIT =  CMPST( ICMPST )%CUNIT
            CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
      &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
            ELMO_TABLE( N )%IUNIT = IUNIT
-           ELMO_TABLE( N )%DESC = 'Sensitivity of ' // CMPST_NML( ICMPST )%DESC // 
+           ELMO_TABLE( N )%DESC = 'Sensitivity of ' // CMPST( ICMPST )%DESC // 
      &           ' to ' // TRIM( SEN_PAR( NP ) )
            ELMO_TABLE( N )%MW   = 0.0
          END DO
@@ -774,7 +798,6 @@
            DO ISPC = 1,N_AEROSPC
              IF ( CGRID_NAME( ICGRID ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &          ELMO_TABLE( N )%IM = IMODE
-             END IF
            END DO
          END DO
 
@@ -801,7 +824,6 @@
           DO ISPC = 1,N_AEROSPC
             IF ( WDEP_SPC( IWDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &         ELMO_TABLE( N )%IM = IMODE
-            END IF
           END DO
         END DO
 
@@ -820,6 +842,7 @@
         ELMO_TABLE( N )%DESC = 'Wet Deposition for Species '//
      &                         TRIM( WDEP_SPC( IWDEP ) )
       END DO
+      ENDIF 
 
       ! Load Dry Deposition Fluxes
       IF ( L_ELMO_DDEP ) THEN
@@ -835,7 +858,6 @@
           DO ISPC = 1,N_AEROSPC
             IF ( DEPV_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &         ELMO_TABLE( N )%IM = IMODE
-            END IF
           END DO
         END DO
 

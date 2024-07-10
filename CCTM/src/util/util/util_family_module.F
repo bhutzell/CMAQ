@@ -99,10 +99,10 @@
       CALL LOG_SUBHEADING( LOGDEV, "Reading Family Definitions from Control File" )
 
       ! Retrieve the Name of the CMAQ Chemical Control File
-      IF ( CHEM_CHEM_CTRL .EQ. "CMAQ_CHEM_CTRL_NML" ) THEN
+      IF ( CMAQ_CHEM_CTRL .EQ. "CMAQ_CH_CTRL_NML" ) THEN
           XMSG = 'You have chosen not to indicate the location of a' //
      &              'Misc. Control namelist file. You must give a value ' //
-     &              'for the CMAQ_CHEM_CTRL_NML variable in the CMAQ runscript.'
+     &              'for the CMAQ_CH_CTRL_NML variable in the CMAQ runscript.'
           CALL M3EXIT( 'READ_FAMILIES',0,0,XMSG,1 )
       END IF
  
@@ -220,7 +220,7 @@
              WRITE( XMSG, '(A,I3,A,A,A)' ),'ERROR: The number of Chemical Families ',
      &              N_Chem_Fams, ' is larger than the number of fields ',
      &              'provided in the ChemFamilyName array. Reduce N_Chem_Fams ',
-     &              'in the CMAQ_CHEM_CTRL_NML file or provide more Chemical Families.'
+     &              'in the CMAQ_CH_CTRL_NML file or provide more Chemical Families.'
              CALL M3EXIT( 'Read_Families',0,0,XMSG,1 )
           END IF
           CALL UPCASE( ChemFamilyName( IFAM ) )

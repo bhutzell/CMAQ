@@ -51,7 +51,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                      ET_AEROPROP = 30, ET_CHEM = 31, ET_MET = 32,
      &                      ET_PHOT = 33
 
-      CHARACTER( 14 ), PARAMETER :: CETYPE(18) = 
+      CHARACTER( 14 ), PARAMETER :: CETYPE(33) = 
      &    (/'CONC          ','BULK AERO     ','WET DEP       ',
      &      'DRY DEP       ','COMPOSITE CONC','COMPOSITE DEP ',
      &      'DERIVED CONC  ','BULK AERO DEP ','              ',
@@ -151,7 +151,19 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_PV    =       77
       INTEGER, PARAMETER :: ID_DENS  =       78
       INTEGER, PARAMETER :: ID_RHOJ  =       79
-                                              
+      
+      ! Define Key IDs for special composites that are dependencies for
+      ! existing derived variables.
+      INTEGER, SAVE :: ID_PMF_SO4 = 0
+      INTEGER, SAVE :: ID_PMF_NO3 = 0
+      INTEGER, SAVE :: ID_PMF_NH4 = 0
+      INTEGER, SAVE :: ID_PM25_SO4 = 0
+      INTEGER, SAVE :: ID_PM25_NO3 = 0
+      INTEGER, SAVE :: ID_PM25_NH4 = 0
+      INTEGER, SAVE :: ID_PMF_HP = 0
+      INTEGER, SAVE :: ID_PMF_H2O = 0
+      INTEGER, SAVE :: ID_PMF_BENAPY = 0
+      INTEGER, SAVE :: ID_GAS_BENAPY = 0
 
       TYPE ELDTP
         CHARACTER (LEN = 16) :: NAME      !Parameter Name

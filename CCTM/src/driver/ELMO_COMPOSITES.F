@@ -33,10 +33,10 @@
           CHARACTER(LEN = 16) :: CUNIT
           CHARACTER(LEN = 16) :: CMPST_TYPE
           CHARACTER(LEN = 100) :: DESC
-          CHARACTER(LEN = N_MAX_FORMAULA) :: FORMULA
+          CHARACTER(LEN = 300) :: FORMULA
       END TYPE COMPOSITE_NML
 
-      TYPE( COMPOSITE_NML ), ALLOCATABLE, SAVE :: CMPST_NML( : )
+      TYPE( COMPOSITE_NML ), ALLOCATABLE, SAVE :: CMPST( : )
  
       CONTAINS
 
@@ -51,11 +51,12 @@
 !     so that they may be added to the ELMO_TABLE.
 !-------------------------------------------------------------------------
 
+      USE RUNTIME_VARS, ONLY : LOG_MESSAGE, LOG_SUBHEADING
+
       IMPLICIT NONE
 
       CHARACTER( 300 ) :: XMSG
 
-      CHARACTER
       INTEGER FUNIT
       INTEGER IOST
       CHARACTER( 200 ) :: TMPLINE
@@ -63,17 +64,17 @@
 
       ! Define Namelist Input from Mechanism-Specific Control File
       Namelist / COMPOSITE_INIT / N_COMPOSITES, N_MAX_COMPONENTS
-      Namelist / ELMO_COMPOSITES / CMPST_NML
+      Namelist / ELMO_COMPOSITES / CMPST
 
       CALL LOG_MESSAGE( LOGDEV, ' ' )
       CALL LOG_SUBHEADING( LOGDEV, 'Reading ELMO Composites '//
      &                             'from Mechanism-Spcific Namelist')
 
       ! Retrieve the Name of the Mechanism-Specific Control File
-      IF ( CMAQ_CHEM_CTRL .EQ. "CMAQ_CHEM_CTRL_NML" ) THEN
+      IF ( CMAQ_CHEM_CTRL .EQ. "CMAQ_CH_CTRL_NML" ) THEN
           XMSG = 'You have chosen not to indicate the location of a ' //
      &           'mechanism-specific control namelist file for ELMO '//
-     &           'and DESID. You must give a value for the CMAQ_CHEM_CTRL_NML '//
+     &           'and DESID. You must give a value for the CMAQ_CH_CTRL_NML '//
      &           'variable in the CMAQ runscript.'
           CALL M3EXIT( PNAME,0,0,XMSG,1 )
       END IF
@@ -131,7 +132,7 @@
           XMSG = 'WARNING: There were no valid composite variables specified '//
      &           'for use by the ELMO module. If you intended to specify '//
      &           'diagnostic output in the emission control interface, check the '//
-     &           'file you have provided for CMAQ_CHEM_CTRL_NML.'
+     &           'file you have provided for CMAQ_CH_CTRL_NML.'
           CALL LOG_MESSAGE( LOGDEV, ' ')
           CALL LOG_MESSAGE( LOGDEV, XMSG )
           CMPST%NAME       = ''
@@ -154,6 +155,8 @@
       END IF
 
       CLOSE( UNIT = FUNIT )
+
+      END SUBROUTINE ELMO_READ_COMPOSITES
 
 !-------------------------------------------------------------------------
       SUBROUTINE ELMO_MAP_COMPOSITES()
@@ -194,7 +197,7 @@
             CALL ELMO_EXPAND_AERO( N_VARS, COMPS, COEFFS )
 
             ! Map Composite
-            CALL ELMO_INIT_COMPONENTS( J, N_VARS, CMPST( ID )%CMPST_TYPE )
+            CALL ELMO_INIT_COMPOSITE( J, N_VARS, CMPST( ID )%CMPST_TYPE )
             DO IVAR = 1,N_VARS
               CALL ELMO_SET_COMPONENTS( J, N_VARS, IVAR, COMPS( IVAR ), COEFFS( IVAR ) )
             END DO
@@ -264,7 +267,6 @@
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
-      ELMO_COMP( J )%L_VALID        = .TRUE.
       ELMO_COMP( J )%L_MODE  ( : )  = .FALSE.
       ELMO_COMP( J )%L_SOURCE( : )  = .FALSE.
       ELMO_COMP( J )%MW      ( : )  = 0.
@@ -375,6 +377,7 @@
       INTEGER  ISPEC, JSPEC, IAERO, ICGRID, IELMO
       INTEGER  I0, I1, I2, VAR_TYPE, ISRC, K
       CHARACTER( 1000 ) :: XMSG
+      CHARACTER( 30 ),PARAMETER :: PNAME = 'ELMO_SET_COMPONENTS'
 
       ! Details in the processing of the components of variable J rely
       ! on knowing what type of variable it is
@@ -479,8 +482,11 @@
       CHARACTER( 32 )  :: COMPS( N_MAX_COMPONENTS )
       REAL             :: COEFFS( N_MAX_COMPONENTS )
       CHARACTER( N_MAX_FORMULA ) :: FORMULA
-      INTEGER          :: IX
+      INTEGER          :: IX, IY, IVAR, LENGTH
       LOGICAL          :: LNEG
+      CHARACTER( 1 )   :: CHR, CHR2
+      CHARACTER( 1000 ) :: XMSG
+      CHARACTER( 30 ),PARAMETER :: PNAME = 'ELMO_PARSE_FORMULA'
 
       FORMULA = CMPST( ICMP )%FORMULA
 
@@ -490,7 +496,7 @@
       LNEG = .FALSE.
       IX = 1
       DO WHILE ( IX .LT. N_MAX_FORMULA )
-         CHR = FORMULA( IX ) 
+         CHR = FORMULA( IX:IX ) 
 
          IF ( CHR .NE. ' ' ) THEN
             N_VARS = N_VARS + 1
@@ -511,13 +517,13 @@
             LENGTH = 0
             IY = IX
             DO WHILE ( IY .LT. N_MAX_FORMULA )
-               CHR2 = FORMULA( IY )
+               CHR2 = FORMULA( IY:IY )
 
                ! Check if this character is not a space or a sign
                IF ( CHR2 .NE. ' ' .AND. CHR2 .NE. '+' .AND. 
      &              CHR2 .NE. '-' ) THEN
                   LENGTH = LENGTH + 1
-                  COMPS( IVAR )( LENGTH ) = CHR
+                  COMPS( IVAR )( LENGTH:LENGTH ) = CHR
                   IY = IY + 1
                END IF
             END DO
@@ -530,8 +536,8 @@
          ! No variables found in this formula
          XMSG = 'A formula for an ELMO composite has an error or has '//
      &          'exceeded the allowed length specified by N_MAX_FORMULA. '//
-     &          'The formula is: ',TRIM(FORMULA)
-         CALL M3EXIT( 'ELMO_PARSE_FORMULA',0,0,XMSG,XSTAT1 ) 
+     &          'The formula is: '//TRIM(FORMULA)
+         CALL M3EXIT( PNAME,0,0,XMSG,XSTAT1 ) 
       END IF
 
       END SUBROUTINE ELMO_PARSE_FORMULA
@@ -546,7 +552,7 @@
       IMPLICIT NONE
 
       INTEGER MX, IX
-      CHARACTER F( MX )
+      CHARACTER( LEN=MX ) :: F
       LOGICAL LNEG
       REAL COEF
       CHARACTER( 300 ) XMSG
@@ -555,20 +561,22 @@
       LOGICAL LDECIMAL, LEXP
       CHARACTER( 20 ) :: NUMSTRING
       CHARACTER(  1 ) :: CHR
+      LOGICAL LSIGN
 
       LENGTH    = 0
       LDECIMAL  = .FALSE.
       LEXP      = .FALSE.
       NUMSTRING = ''
+      LSIGN = .FALSE.
 
       DO WHILE ( IX .LT. MX )
-        CHR = F( IX )
+        CHR = F( IX:IX )
         ICHR = ICHAR( CHR )
 
         ! Check if this character is a number
         IF ( ICHR .GE. 48 .AND. ICHR .LE. 57 ) THEN
            LENGTH = LENGTH + 1 
-           NUMSTRING( LENGTH ) = ICHR
+           NUMSTRING( LENGTH:LENGTH ) = CHR
 
         ! Check if this character is a decimal
         ELSE IF ( CHR .EQ. '.' ) THEN
@@ -581,7 +589,7 @@
            ELSE
               LDECIMAL = .TRUE.
               LENGTH = LENGTH + 1 
-              NUMSTRING( LENGTH ) = '.'
+              NUMSTRING( LENGTH:LENGTH ) = '.'
            END IF
               
         ! Check if this is an exponent
@@ -595,11 +603,11 @@
            ELSE
               LEXP = .TRUE.
               LENGTH = LENGTH + 1 
-              NUMSTRING( LENGTH ) = 'e'
+              NUMSTRING( LENGTH:LENGTH ) = 'e'
            END IF
 
         ! Check for sign
-        ELSE IF ( CHR .EQ. '+' .OR. CHR .EQ. '-'
+        ELSE IF ( CHR .EQ. '+' .OR. CHR .EQ. '-' ) THEN
            IF ( LSIGN ) THEN
               ! Too many signs
               XMSG = 'Too many sings have been used to specify '//
@@ -609,19 +617,20 @@
            ELSE
               LSIGN = .TRUE.
               LENGTH = LENGTH + 1 
-              NUMSTRING( LENGTH ) = CHR
+              NUMSTRING( LENGTH:LENGTH ) = CHR
+           END IF
 
         ! If None of these, then we have reached the end of the
         ! coefficient
         ELSE
            IF ( ( .NOT. LEXP ) .AND. ( .NOT. LDECIMAL ) ) THEN
               LENGTH = LENGTH + 1
-              NUMSTRING( LENGTH ) = '.'
+              NUMSTRING( LENGTH:LENGTH ) = '.'
            END IF
         
            ! Convert number string to real and resolve possible negative
            ! sign
-           READ( NUMSTRING, '(E20.6'), ERR=999 ) COEF
+           READ( NUMSTRING, '(E20.6)' ) COEF
            IF ( LNEG ) THEN
                COEF = COEF * -1.0
                LNEG = .FALSE.
@@ -638,7 +647,7 @@
       ! allowed formula length. CMAQ should crash
       XMSG = 'A formula for an ELMO composite has an error or has '//
      &       'exceeded the allowed length specified by N_MAX_FORMULA. '//
-     &       'The formula is: ',TRIM(F)
+     &       'The formula is: '//TRIM(F)
 
       CALL M3EXIT( 'ELMO_GETREAL',0,0,XMSG,XSTAT1 )
 
@@ -651,7 +660,8 @@
 !     coefficient is of a particular component.
 !-------------------------------------------------------------------------
 
-      USE AERO_DATA, ONLY : N_AEROSPC, AEROSPC, N_MODE, AERO_MISSING
+      USE AERO_DATA, ONLY : N_AEROSPC, AEROSPC, N_MODE, AERO_MISSING,
+     &                      AEROMODE
 
       IMPLICIT NONE
       

@@ -818,7 +818,7 @@
 
       ! Get Name of Emission Control File
       CALL GET_ENV ( CMAQ_CTRL, 'CMAQ_CTRL_NML', CMAQ_CTRL, VARDEV )
-      CALL GET_ENV ( CMAQ_CHEM_CTRL,'CMAQ_CHEM_CTRL_NML', CMAQ_CHEM_CTRL, VARDEV )
+      CALL GET_ENV ( CMAQ_CHEM_CTRL,'CMAQ_CH_CTRL_NML', CMAQ_CHEM_CTRL, VARDEV )
 
       ! Get number of different Gridded File Emissions Streams
       CALL GET_ENV ( N_FILE_GR, 'N_EMIS_GR', N_FILE_GR, VARDEV )
