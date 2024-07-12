@@ -78,14 +78,18 @@ C...........Arguments
       REAL(8), INTENT( OUT )   :: FRAC_CV( :,:,: )   ! cloud fraction
 
 C.....Logical switches
-      LOGICAL  :: UPDATE_CGRID_CONV  = .FALSE. ! logical if CGRID should be updated due to convective
+      LOGICAL  :: UPDATE_CGRID_CONV  = .TRUE.  ! logical if CGRID should be updated due to convective
                                                ! mixing in the CBL
-                                               !  .FALSE. = CGRID is not updated (default)
-                                               !  .TRUE.  = CGRID is updated
-      LOGICAL  :: UPDATE_CGRID_BELOW = .FALSE. ! logical if CGRID should be updated below cloud base
+                                               !  .TRUE.  = CGRID is updated (default)
+                                               !  .FALSE. = CGRID is not updated
+      LOGICAL  :: UPDATE_CGRID_BELOW = .TRUE.  ! logical if CGRID should be updated below cloud base
                                                ! (weighted trace gas mixing ratio below cloud base)
-                                               !  .FALSE. = CGRID is not updated (default)
-                                               !  .TRUE.  = CGRID is updated
+                                               !  .TRUE.  = CGRID is updated (default)
+                                               !  .FALSE. = CGRID is not updated
+      LOGICAL  :: AVERAGE_CLOUD      = .FALSE. ! logical if cloud properties should be averaged over
+                                               ! the vertical column (similar to KMT version)
+                                               !  .TRUE.  = cloud properties are averaged
+                                               !  .FALSE. = cloud properties are not averaged (default)
 
 C.....Temporary data arrays
 C      REAL, ALLOCATABLE, SAVE :: CONV_DEP( :,:,: ) ! convective wdep only
@@ -1199,7 +1203,7 @@ C...  integrated through cloud depth
      &          + ( QWAT( LAY ) + QVC( LAY ) - QVL( LAY ) )
      &          * RHOAIR * DZZL( LAY )
             QXSL( LAY ) = ( QWAT( LAY ) + QVC( LAY ) - QVL( LAY ) )
-     &          * RHOAIR
+     &          * RHOAIR * DZZL( LAY )
 
 C...get total air mass in cloudy layers:
 
@@ -1271,7 +1275,7 @@ C...again partition into ice and liquid
 C...excess water is all rain
 
             QXS = QXS + QWAT( LAY ) * RHOAIR * DZZL( LAY )
-            QXSL( LAY ) = QWAT( LAY ) * RHOAIR
+            QXSL( LAY ) = QWAT( LAY ) * RHOAIR * DZZL( LAY )
             
           END DO
 
@@ -1288,7 +1292,7 @@ C...Final calc of storm rainfall rate and frac area (raining clds)
           DO LAY = 1, CLBASE - 1
             PRATE1L( LAY ) =  STORME * QXSL( LAY ) * 3600.0 / TCLIFE
             IF ( PRATE1 .LE. 1.001 * PRATE ) THEN
-              PRATE1L( LAY ) = PRATE1L( LAY ) / 0.999
+              PRATE1L( LAY ) = PRATE / FRAC
             END IF
           END DO
           IF ( FRAC .LT. 0.01 ) GO TO 299
@@ -1320,15 +1324,6 @@ C...  using direct exchange mixing mechanism by McHenry.
 
           CALL ACMCLD ( NSPCSD, NLAYS, F, CCR, DZH, CBELOW, CLBASE, CLTOP,
      &                  FRAC, TCLIFE, DTCLD )
-
-C...Update CGRID if requested by user
-          IF ( UPDATE_CGRID_CONV ) THEN
-            DO LAY = CLTOP, CLBASE, -1
-              DO SPC = 1, MXSPCS
-                CGRID( COL,ROW,LAY,SPC ) = CCR( SPC, LAY )
-              END DO
-            END DO
-          END IF
 
           DO SPC = 1, MXSPCS
             CBASEF( SPC ) =  CBELOW( SPC ) 
@@ -1367,10 +1362,6 @@ C...  below cloud concentrations in mol sp/mol air
 
                 IF ( ICLDTYPE .EQ. 1 ) THEN
                   POLC( SPC ) = POLC( SPC ) + PCLD( SPC, LAY ) * RHOM2( LAY )
-C...Update CGRID if requested by user
-                  IF ( UPDATE_CGRID_BELOW ) THEN
-                    CGRID( COL,ROW,LAY,SPC ) = MAX( PCLD( SPC,LAY ), 1.0E-30 )
-                  END IF
                 END IF
               END DO
             END DO
@@ -1437,36 +1428,68 @@ C...Finally, get in cloud pollutant concentrations in mol sp per mol air
           RTCH = ( MOLVOL / STDTEMP ) * TBARC
           CTHK1 = AIRM * RTCH / ( ARPRES * 1000.0 )
 
+          IF ( AVERAGE_CLOUD ) THEN
 C...Do not get variables based on average column
-!          CALL SCAVWDEP ( JDATE, JTIME, WTBAR,
-!     &                    WCBAR, TBARC, PBARC,
-!     &                    CTHK1, AIRM, PRATE1, DTCLD, POLC, CEND,
-!     &                    REMOV, REMOVAC, ALFA0, ALFA2, ALFA3 )
-          IF ( WCBAR .GT. 0.0 ) THEN
-            DO LAY = 1, NLAYS
-              IF ( WCBARL( LAY ) / DENSL( LAY ) .GT. 0.00005 ) THEN
-                DO SPC = 1, NSPCSD
-                  POLC ( SPC ) = CGRID( COL,ROW,LAY,SPC )
-                  CEND ( SPC ) = POLC( SPC )
-                  REMOV( SPC ) = 0.0
-                END DO
-                CALL SCAVWDEP ( JDATE, JTIME, WTBARL( LAY ),
-     &                          WCBARL( LAY ), TCLD( LAY ), PRESL( LAY ),
-     &                          DZZL( LAY ), RHOM2( LAY ), PRATE1L( LAY ),
-     &                          DTCLD, POLC, CEND, REMOV, REMOVAC,
-     &                          ALFA0, ALFA2, ALFA3, RSCAV_CV( COL, ROW, LAY, : ) )
+             CALL SCAVWDEP ( JDATE, JTIME, WTBAR,
+     &                       WCBAR, TBARC, PBARC,
+     &                       CTHK1, AIRM, PRATE1,
+     &                       DTCLD, POLC, CEND,
+     &                       REMOV, REMOVAC, ALFA0,
+     &                       ALFA2, ALFA3, RSCAV_CV( COL, ROW, CLBASE, : ))
 
-                WCBAR_CV  ( COL, ROW, LAY ) = REAL( WCBARL( LAY ), 8 )
-                WETFAC_CV ( COL, ROW, LAY ) = REAL( WTBARL( LAY ) * 1000.0D0 * DZZL( LAY ) * 3600.0D0 /
-     &                                       ( 1000.0D0 * MAX( 1.0D-20, PRATE1L( LAY ) ) ), 8 )
-                WETFAC_CV ( COL, ROW, LAY ) = 1.0D0 /  WETFAC_CV ( COL, ROW, LAY )
-                ALFA0_CV  ( COL, ROW, LAY ) = REAL( ALFA0, 8 )
-                ALFA3_CV  ( COL, ROW, LAY ) = REAL( ALFA3, 8 )
-                PRATE1_CV ( COL, ROW, LAY ) = REAL( PRATE1L( LAY ), 8 )
-                FRAC_CV   ( COL, ROW, LAY ) = REAL( FRAC, 8 )
-              END IF
-            END DO
-          END IF
+             IF ( WCBAR .GT. 0.00005 ) THEN
+               DO LAY = CLBASE, CLTOP
+                 WCBAR_CV  ( COL, ROW, LAY ) = REAL( WCBAR, 8 )
+                 WETFAC_CV ( COL, ROW, LAY ) = REAL( WTBAR * 1000.0D0 * CTHK1 * 3600.0D0 /
+     &                                        ( 1000.0D0 * MAX( 1.0D-20, PRATE1 ) ), 8 )
+                 WETFAC_CV ( COL, ROW, LAY ) = 1.0D0 /  WETFAC_CV ( COL, ROW, LAY )
+                 ALFA0_CV  ( COL, ROW, LAY ) = REAL( ALFA0, 8 )
+                 ALFA3_CV  ( COL, ROW, LAY ) = REAL( ALFA3, 8 )
+                 PRATE1_CV ( COL, ROW, LAY ) = REAL( PRATE1, 8 )
+                 FRAC_CV   ( COL, ROW, LAY ) = REAL( FRAC, 8 )
+                 RSCAV_CV  ( COL, ROW, LAY, : ) = RSCAV_CV( COL, ROW, CLBASE, : )
+               END DO ! LAY
+               IF ( ICLDTYPE .EQ. 1 ) THEN   ! raining cloud
+                 DO LAY = 1, CLBASE - 1
+                   WCBAR_CV  ( COL, ROW, LAY ) = REAL( WCBAR, 8 )
+                   WETFAC_CV ( COL, ROW, LAY ) = REAL( WTBAR * 1000.0D0 * CTHK1 * 3600.0D0 /
+     &                                          ( 1000.0D0 * MAX( 1.0D-20, PRATE1 ) ), 8 )
+                   WETFAC_CV ( COL, ROW, LAY ) = 1.0D0 /  WETFAC_CV ( COL, ROW, LAY )
+                   ALFA0_CV  ( COL, ROW, LAY ) = REAL( ALFA0, 8 )
+                   ALFA3_CV  ( COL, ROW, LAY ) = REAL( ALFA3, 8 )
+                   PRATE1_CV ( COL, ROW, LAY ) = REAL( PRATE1, 8 )
+                   FRAC_CV   ( COL, ROW, LAY ) = REAL( FRAC, 8 )
+                   RSCAV_CV  ( COL, ROW, LAY, : ) = RSCAV_CV( COL, ROW, CLBASE, : )
+                 END DO ! LAY
+               END IF ! ICLDTYPE
+             END IF ! WCBAR
+          ELSE
+             IF ( WCBAR .GT. 0.0 ) THEN
+               DO LAY = 1, NLAYS
+                 IF ( WCBARL( LAY ) / DENSL( LAY ) .GT. 0.00005 ) THEN
+                   DO SPC = 1, NSPCSD
+                     POLC ( SPC ) = CGRID( COL,ROW,LAY,SPC )
+                     CEND ( SPC ) = POLC( SPC )
+                     REMOV( SPC ) = 0.0
+                   END DO ! SPC
+                   CALL SCAVWDEP ( JDATE, JTIME, WTBARL( LAY ),
+     &                             WCBARL( LAY ), TCLD( LAY ), PRESL( LAY ),
+     &                             DZZL( LAY ), RHOM2( LAY ), PRATE1L( LAY ),
+     &                             DTCLD, POLC, CEND, REMOV, REMOVAC,
+     &                             ALFA0, ALFA2, ALFA3, RSCAV_CV( COL, ROW, LAY, : ) )
+
+                   WCBAR_CV  ( COL, ROW, LAY ) = REAL( WCBARL( LAY ), 8 )
+                   WETFAC_CV ( COL, ROW, LAY ) = REAL( WTBARL( LAY ) * 1000.0D0 * DZZL( LAY ) * 3600.0D0 /
+     &                                          ( 1000.0D0 * MAX( 1.0D-20, PRATE1L( LAY ) ) ), 8 )
+                   WETFAC_CV ( COL, ROW, LAY ) = 1.0D0 /  WETFAC_CV ( COL, ROW, LAY )
+                   ALFA0_CV  ( COL, ROW, LAY ) = REAL( ALFA0, 8 )
+                   ALFA3_CV  ( COL, ROW, LAY ) = REAL( ALFA3, 8 )
+                   PRATE1_CV ( COL, ROW, LAY ) = REAL( PRATE1L( LAY ), 8 )
+                   FRAC_CV   ( COL, ROW, LAY ) = REAL( FRAC, 8 )
+                 END IF ! WCBARL( LAY ) / DENSL( LAY )
+               END DO ! LAY
+             END IF ! WCBAR
+          END IF ! AVERAGE_CLOUD
 
 !          DO SPC = 1, NSPCSD
 !            IF ( CEND( SPC ) .LT. 0.0 ) WRITE( LOGDEV,* ) ' CEND,R,C,SP=',
@@ -1537,47 +1560,59 @@ C...Do not get variables based on average column
 !          CONV_DEP( COL,ROW,N_SPC_WDEP+1 ) = CONV_DEP( COL,ROW,N_SPC_WDEP+1 )
 !     &                                     + REMOVAC
 !
-!C...Compute concentration changes in the grid column resulting
-!C...  from subgrid scale vertical mixing:
-!
-!C...first, below cloud base,
-!C...   include raining region below cld base
-!
-!          IF ( ICLDTYPE .EQ. 1 ) THEN   ! raining cloud
-!            DO LAY = 1, CLBASE - 1
-!              DO SPC = 1, NSPCSD
-!                IF ( SPC .NE. N_GC_SPCD ) THEN
-!                  INCLOUD = PCLD( SPC,LAY ) * CEND( SPC )
-!     &                    / MAX( POLC( SPC ), CONCMINL( SPC,LAY ) )
-!                  OUTCLOUD = PCLD( SPC,LAY )
-!                  CGRID( COL,ROW,LAY,SPC ) = FRAC * INCLOUD
-!     &                                     + ( 1.0 - FRAC ) * OUTCLOUD
-!                END IF
-!              END DO
-!            END DO
-!          ELSE
-!            DO LAY = 1, CLBASE - 1
-!              DO SPC = 1, NSPCSD
-!                CGRID( COL,ROW,LAY,SPC ) = PCLD( SPC,LAY )
-!              END DO
-!            END DO
-!          END IF
-!
-!C...Now do changes in cloudy layers:
-!
-!          DO LAY = CLBASE, CLTOP
-!            DO SPC = 1, NSPCSD
-!              IF ( SPC .NE. N_GC_SPCD ) THEN
-!                INCLOUD = PCLD( SPC,LAY ) * CEND( SPC )
-!     &                  / MAX( POLC( SPC ), CONCMINL( SPC,LAY ) )
-!                OUTCLOUD = ( CCR( SPC,LAY ) - FRAC * PCLD( SPC,LAY ) )
-!     &                   / ( 1.0 - FRAC )
-!                OUTCLOUD = MAX( OUTCLOUD, CONCMINL( SPC,LAY ) )
-!                CGRID( COL,ROW,LAY,SPC ) = FRAC * INCLOUD 
-!     &                                   + ( 1.0 - FRAC ) * OUTCLOUD
-!              END IF
-!            END DO
-!          END DO
+C...Compute concentration changes in the grid column resulting
+C...  from subgrid scale vertical mixing:
+
+C... Set final concentrations to initial concentrations necessary for MCHEM
+          CEND ( SPC ) = POLC( SPC )
+
+C...first, below cloud base,
+C...   include raining region below cld base
+
+          IF ( UPDATE_CGRID_BELOW ) THEN
+
+          IF ( ICLDTYPE .EQ. 1 ) THEN   ! raining cloud
+            DO LAY = 1, CLBASE - 1
+              DO SPC = 1, NSPCSD
+                IF ( SPC .NE. N_GC_SPCD ) THEN
+                  INCLOUD = PCLD( SPC,LAY ) * CEND( SPC )
+     &                    / MAX( POLC( SPC ), CONCMINL( SPC,LAY ) )
+                  OUTCLOUD = PCLD( SPC,LAY )
+                  CGRID( COL,ROW,LAY,SPC ) = FRAC * INCLOUD
+     &                                     + ( 1.0 - FRAC ) * OUTCLOUD
+                END IF
+              END DO
+            END DO
+          ELSE
+            DO LAY = 1, CLBASE - 1
+              DO SPC = 1, NSPCSD
+                CGRID( COL,ROW,LAY,SPC ) = PCLD( SPC,LAY )
+              END DO
+            END DO
+          END IF
+
+          END IF ! UPDATE_CGRID_BELOW
+
+C...Now do changes in cloudy layers:
+
+          IF ( UPDATE_CGRID_CONV ) THEN
+
+          DO LAY = CLBASE, CLTOP
+            DO SPC = 1, NSPCSD
+              IF ( SPC .NE. N_GC_SPCD ) THEN
+                INCLOUD = PCLD( SPC,LAY ) * CEND( SPC )
+     &                  / MAX( POLC( SPC ), CONCMINL( SPC,LAY ) )
+                OUTCLOUD = ( CCR( SPC,LAY ) - FRAC * PCLD( SPC,LAY ) )
+     &                   / ( 1.0 - FRAC )
+                OUTCLOUD = MAX( OUTCLOUD, CONCMINL( SPC,LAY ) )
+                CGRID( COL,ROW,LAY,SPC ) = FRAC * INCLOUD
+     &                                   + ( 1.0 - FRAC ) * OUTCLOUD
+              END IF
+            END DO
+          END DO
+
+          END IF ! UPDATE_CGRID_CONV
+
         GO TO 301
 
 299     CONTINUE
