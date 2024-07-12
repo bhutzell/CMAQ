@@ -827,9 +827,10 @@ C.. Initialise cloud tracer based on convective fraction
                     TCLC = REAL( CONC( ICGRID ), dp ) * SCAL                                       ! Total concentration that can partition into clouds
                     IF ( FRAC_RS .GT. 0.0 ) C( IKPP_RS ) = C( IKPP_RS ) + TCLC * FRAC_RS * SMW
                     IF ( FRAC_CV .GT. 0.0 ) C( IKPP_CV ) = C( IKPP_CV ) + TCLC * FRAC_CV * SMW
-                    IF ( MECH_SPC_CL( ICL )%IC_RESET ( ICLT ) )
-     &                   CONC( ICGRID ) = MAX( CONC( ICGRID ) -
+                    IF ( MECH_SPC_CL( ICL )%IC_RESET ( ICLT ) ) THEN
+                       CONC( ICGRID ) = MAX( CONC( ICGRID ) -
      &                   REAL( TCLC * ( FRAC_RS  + FRAC_CV ), 4 ), ZERO ) ! In this scaling molar weight does not need to be taken into account
+                    END IF
                  END IF
               END DO
            END IF
@@ -897,7 +898,7 @@ C.. Initialise Hp and OHm
         IMPLICIT NONE
         REAL, INTENT ( INOUT )     :: CONC( N_CGRID_SPC )    !  species concentration in cell
         REAL(dp), INTENT ( INOUT ) :: C( : )                 !  KPP species concentration in cell
-        REAL(8),  INTENT ( INOUT ) :: DEP( N_CGRID_SPC )     !  wet deposition in cell
+        REAL(8),  INTENT ( IN )    :: DEP( N_CGRID_SPC )     !  wet deposition in cell
         REAL(dp), INTENT( IN ) :: WFAC_RS, WFAC_CV, TSTEP
         INTEGER                :: ICL, ICLW, ICGRID, IKPP_RS, IKPP_CV
         REAL, PARAMETER        :: ZERO = 1.0E-30
@@ -927,9 +928,7 @@ C.. This code needs modifications once we take scavenging into account
                  ICLW = MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX
                  ICGRID  = MECH_SPC_CL( ICL )%EV_CGRID_INDEX
                  EXPWDEP = DEXP( - ( WFAC_RS + WFAC_CV ) * TSTEP )
-                 DEP ( ICLW ) = REAL( CONC( ICLW ) * ( 1.0 - EXPWDEP ), 8 )
-                 CONC( ICLW ) = CONC( ICLW ) - REAL( DEP( ICLW ), 4 )
-                 CONC( ICGRID ) = MAX( CONC( ICGRID ) - CONC( ICLW ), ZERO )
+                 CONC( ICGRID ) = CONC( ICGRID ) - REAL( DEP ( ICLW ), dp )
               END IF
 C.. The code above needs modifications once we take scavenging into account
         END DO

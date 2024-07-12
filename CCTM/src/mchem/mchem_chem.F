@@ -244,7 +244,7 @@ C.. Alternative KPP options
             ICSPC  = MECH_SPC(SPC)%CONC_INDEX
             IF ( LSCAV( ICGSPC ) .AND. KPP_SCAV( ICGSPC ) ) THEN
                ALFA = RSCAV_RS( COL, ROW, LEV, ICGSPC ) +
-     &                RSCAV_CV( COL, ROW, LEV, ICGSPC ) * CFRAC_CV
+     &                RSCAV_CV( COL, ROW, LEV, ICGSPC )
                ALFA = MAX( ALFA, 0.0 )
             ELSE
                ALFA = 0.0

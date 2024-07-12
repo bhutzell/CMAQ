@@ -420,6 +420,16 @@ C..  Convective clouds
      &                   WCBAR_CV, WETFAC_CV, ALFA0_CV, ALFA3_CV,
      &                   PRATE1_CV, RSCAV_CV, FRAC_CV )
 
+C..  Update convective cloud scavenging rates by cloud fraction
+      DO LEV = 1, NLAYS
+        DO ROW = 1, NROWS
+          DO COL = 1, NCOLS
+            RSCAV_CV( COL,ROW,LEV,: ) = RSCAV_CV( COL,ROW,LEV,: ) *
+     &                                  FRAC_CV( COL,ROW,LEV )
+          END DO
+        END DO
+      END DO
+
 
 C.. Convert to molecules/cm3
       DO LEV = 1, NLAYS
