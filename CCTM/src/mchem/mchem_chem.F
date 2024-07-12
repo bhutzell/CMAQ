@@ -72,7 +72,7 @@ C...........Local Variables:
       INTEGER                 :: IERR                 ! KPP integrator variables
       INTEGER                 :: ISTATUS(20)          ! KPP integrator variables
       LOGICAL, PARAMETER      :: LCL_TOL = .TRUE.     ! flag if alternative tolerances should
-                                                      ! be used for charged cloud species
+                                                      ! be used for cloud species
 
       INTEGER SPC             ! Species loop index
       INTEGER ICGSPC          ! Index of species in CGRID
@@ -99,11 +99,9 @@ C.. Set different KPP tolerances for cloud species if requested by user
         IF ( LCL_TOL ) THEN
            DO SPC = 1, N_CL_SPC
               DO ICLT = 1, CL_TYPES
-                 IF ( MECH_SPC_CL( SPC )%CHARGE .NE. 0. ) THEN
-                    ICSPC = MECH_SPC_CL( SPC )%KPP_INDEX( ICLT )
-                    ATOL(ICSPC) = 1.0D0
-                    RTOL(ICSPC) = 1.0D-3
-                 END IF
+                 ICSPC = MECH_SPC_CL( SPC )%KPP_INDEX( ICLT )
+                 ATOL(ICSPC) = 1.0D0
+                 RTOL(ICSPC) = 1.0D-3
               END DO
            END DO
         END IF
