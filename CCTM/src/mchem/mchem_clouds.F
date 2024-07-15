@@ -785,7 +785,7 @@ C..   Fill charged species array
 
       END SUBROUTINE CL_SPCS_DEF
 
-      SUBROUTINE INIT_CLOUDS ( CONC, C, LWC_RS, LWC_CV, PHI2_RS, PHI2_CV, FRAC_CV_IN )
+      SUBROUTINE INIT_CLOUDS ( CONC, C, CLIN, LWC_RS, LWC_CV, PHI2_RS, PHI2_CV, FRAC_CV_IN )
 
         USE mchem_Parameters, ONLY: IND_Hp_RS, IND_OHm_RS, IND_O2_RS,
      &                              IND_Hp_CV, IND_OHm_CV, IND_O2_CV,
@@ -795,7 +795,10 @@ C..   Fill charged species array
 
         IMPLICIT NONE
         REAL,     INTENT ( INOUT ) :: CONC( N_CGRID_SPC )    !  species concentration in cell
-        REAL(dp), INTENT ( INOUT ) :: C( N_CGRID_SPC )       !  KPP species concentration in cell
+        REAL(dp), INTENT ( INOUT ) :: C( : )                 !  KPP species concentration in cell
+        REAL(dp), INTENT ( OUT )   :: CLIN( N_CGRID_SPC )    !  Initial CGRID cloud species concentration in cell
+                                                             !  for species which are not reseted (coarse aerosols
+                                                             !  that are only affected by scavenging)
         REAL(dp), INTENT( IN ) :: LWC_RS, LWC_CV, PHI2_RS, PHI2_CV, FRAC_CV_IN
         INTEGER                :: ICL, ICLT, ICGRID, IKPP_RS, IKPP_CV
         INTEGER                :: I_METAL, I_IC_METAL
@@ -807,6 +810,9 @@ C..   Fill charged species array
         INTEGER, DIMENSION( CL_TYPES )  :: IOHm = [IND_OHm_RS,IND_OHm_CV]
         REAL(dp), DIMENSION( CL_TYPES ) :: PHI2
         INTEGER                :: IKPP
+
+C.. Reset initial cloud concentration
+        CLIN( : ) = 0.0D0
 
 C.. Initialise cloud tracer based on convective fraction
         FRAC_RS = 0.0D0
@@ -830,6 +836,9 @@ C.. Initialise cloud tracer based on convective fraction
                     IF ( MECH_SPC_CL( ICL )%IC_RESET ( ICLT ) ) THEN
                        CONC( ICGRID ) = MAX( CONC( ICGRID ) -
      &                   REAL( TCLC * ( FRAC_RS  + FRAC_CV ), 4 ), ZERO ) ! In this scaling molar weight does not need to be taken into account
+                    ELSE
+                       CLIN( ICGRID ) = CLIN( ICGRID ) + REAL( TCLC *
+     &                                  ( FRAC_RS  + FRAC_CV ), dp )
                     END IF
                  END IF
               END DO
@@ -893,19 +902,24 @@ C.. Initialise Hp and OHm
 
       END SUBROUTINE INIT_CLOUDS
 
-      SUBROUTINE EVAP_CLOUDS ( CONC, C, DEP, WFAC_RS, WFAC_CV, TSTEP )
+      SUBROUTINE EVAP_CLOUDS ( CONC, C, CLIN, DEP, WFAC_RS, WFAC_CV, TSTEP )
 
         IMPLICIT NONE
         REAL, INTENT ( INOUT )     :: CONC( N_CGRID_SPC )    !  species concentration in cell
         REAL(dp), INTENT ( INOUT ) :: C( : )                 !  KPP species concentration in cell
+        REAL(dp), INTENT ( IN )    :: CLIN( N_CGRID_SPC )    !  initial cloud concentration of corase aerosols
         REAL(8),  INTENT ( IN )    :: DEP( N_CGRID_SPC )     !  wet deposition in cell
         REAL(dp), INTENT( IN ) :: WFAC_RS, WFAC_CV, TSTEP
         INTEGER                :: ICL, ICLW, ICGRID, IKPP_RS, IKPP_CV
-        REAL, PARAMETER        :: ZERO = 1.0E-30
-        REAL(dp)               :: SCAL, CONC_TEMP, EXPWDEP
+        REAL(dp), PARAMETER    :: ZERO = 1.0E-30
+        REAL(dp)               :: SCAL, CONC_TEMP, EXPWDEP, REMOVE
+        REAL(dp)               :: CL_CGRID( N_CGRID_SPC )    ! Cloud species concentration transfered to CGRID array
         INTRINSIC DEXP
 
-C.. Evaporate cloud tracer
+C.. Ensure zeroed CL_CGRID array
+        CL_CGRID( : ) = 0.0D0
+
+C.. Sum up all cloud tracer that are evaporated for CGRID array
         DO ICL = 1,N_CL_SPC
            IF ( TRIM(MECH_SPC_CL( ICL )%EV_NAME) .NE. '' ) THEN
               IKPP_RS = MECH_SPC_CL( ICL )%KPP_INDEX( IRS )
@@ -914,23 +928,33 @@ C.. Evaporate cloud tracer
               SCAL = REAL( MECH_SPC_CL( ICL )%EV_FAC, dp )
               SCAL = SCAL * REAL( ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%EV_MW ), dp ) ! Scale by molar weight
               CONC_TEMP = ( C( IKPP_RS ) + C( IKPP_CV ) ) * SCAL
-              CONC( ICGRID ) = MAX( CONC( ICGRID ) +
-     &                 ( REAL( CONC_TEMP, 4 ) ), ZERO )
-              C( IKPP_RS ) = REAL( ZERO, dp ) ! reseting these fields should not be necessary
-              C( IKPP_CV ) = REAL( ZERO, dp ) ! reseting these fields should not be necessary
+              CL_CGRID( ICGRID ) = MAX( CL_CGRID( ICGRID ) +
+     &                                  CONC_TEMP, ZERO )
+              C( IKPP_RS ) = ZERO ! reseting these fields should not be necessary
+              C( IKPP_CV ) = ZERO ! reseting these fields should not be necessary
            END IF
         END DO
 
+
+C.. Coarse species are only affected by scavenging. Thus subtract
+C.. initial coarse aerosol concentration (affected by scavenging)
+C.. from accumulation mode
         DO ICL = 1,N_CL_SPC
-C.. Coarse species are only affected by scavenging. Thus subtract coarse aerosol for now
-C.. This code needs modifications once we take scavenging into account
-              IF ( TRIM(MECH_SPC_CL( ICL )%WETSUB) .NE. '' ) THEN
-                 ICLW = MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX
-                 ICGRID  = MECH_SPC_CL( ICL )%EV_CGRID_INDEX
-                 EXPWDEP = DEXP( - ( WFAC_RS + WFAC_CV ) * TSTEP )
-                 CONC( ICGRID ) = CONC( ICGRID ) - REAL( DEP ( ICLW ), dp )
-              END IF
-C.. The code above needs modifications once we take scavenging into account
+           IF ( TRIM(MECH_SPC_CL( ICL )%WETSUB) .NE. '' ) THEN
+              ICLW      = MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX
+              ICGRID    = MECH_SPC_CL( ICL )%EV_CGRID_INDEX
+              EXPWDEP   = DEXP( - ( WFAC_RS + WFAC_CV ) * TSTEP )
+              REMOVE    = CLIN( ICLW ) * EXPWDEP
+              CL_CGRID( ICGRID ) = CL_CGRID( ICGRID ) - REMOVE
+           END IF
+        END DO
+
+C.. Evaporate cloud to CGRID
+        DO ICGRID = 1,N_CGRID_SPC
+           IF ( CL_CGRID( ICGRID ) .GT. 0.0D0 ) THEN
+              CONC( ICGRID ) = CONC( ICGRID ) +
+     &                         REAL( CL_CGRID( ICGRID), 4 )
+           END IF
         END DO
 
       END SUBROUTINE EVAP_CLOUDS
@@ -1271,7 +1295,7 @@ C..Local Variables:
 
         IMPLICIT NONE
 
-        CHARACTER( 16 ), INTENT( IN ) :: NAME
+        CHARACTER( * ), INTENT( IN ) :: NAME
         INTEGER :: SPC
 
         INDEX_CGRID = 0

@@ -80,6 +80,9 @@ C...........Local Variables:
       INTEGER ICLT            ! Index of cloud type
       INTEGER NPH             ! Index for number of photolysis reaction in PHOT
       REAL(8)                 :: ALFA                 ! total (RS + CV) scavenging rate coefficient (1/s)
+      REAL(dp)                :: CLIN( N_CGRID_SPC )   !  Initial CGRID cloud species concentration in cell
+                                                       !  for species which are not reseted (coarse aerosols
+                                                       !  that are only affected by scavenging)
 
 C-----------------------------------------------------------------------
 
@@ -210,7 +213,8 @@ C.. Alternative KPP options
       ! Fill CONC gas and aerosols
       C(:) = 0.0D0
       ! Init cloud concentrations first, since it impacts aerosol and gas phase concentrations
-      IF ( LCL ) CALL INIT_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), LWC_RS, LWC_CV, PHI2_RS, PHI2_CV, CFRAC_CV )
+      IF ( LCL ) CALL INIT_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), CLIN(:),
+     &                              LWC_RS, LWC_CV, PHI2_RS, PHI2_CV, CFRAC_CV )
       DO SPC = 1, NSPEC
          IF ( MECH_SPC(SPC)%CGRID_INDEX /= 0 ) THEN
             ICGSPC = MECH_SPC(SPC)%CGRID_INDEX
@@ -309,8 +313,8 @@ C...perform scavenging if tracer is not part of KPP
       END DO
 
 C...evaporate clouds back to gas/aerosol phase
-      IF ( LCL ) CALL EVAP_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), WET_DEP( COL,ROW,LEV,: ),
-     &                              WFAC_RS, WFAC_CV, DT )
+      IF ( LCL ) CALL EVAP_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), CLIN(:),
+     &                              WET_DEP( COL,ROW,LEV,: ), WFAC_RS, WFAC_CV, DT )
 
       RETURN
 
