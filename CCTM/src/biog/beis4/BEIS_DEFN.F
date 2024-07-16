@@ -83,15 +83,16 @@ C-----------------------------------------------------------------------
          USE MIO_ASCII
 
          IMPLICIT NONE
+         INCLUDE SUBST_FILES_ID
 
 C External Functions
          LOGICAL,         EXTERNAL :: CHKGRID
 
 C Arguments:
+         LOGICAL :: SUCCESS
          INTEGER, INTENT(  IN ) :: JDATE   ! current simulation date (YYYYDDD)
          INTEGER, INTENT(  IN ) :: JTIME   ! current simulation time (HHMMSS)
          INTEGER, INTENT(  IN ) :: TSTEP(3)! timestep vector (output time step)
-         LOGICAL, INTENT( OUT ) :: SUCCESS
 
 C Parameters:
 C (A line from the profile file is a record.)
@@ -617,18 +618,15 @@ C Build description for, and open beis diagnostic file
             VNAME3D = ''
             VDESC3D = ''
             UNITS3D = ''
-            J = 0
-            DO I = 1, MSPCS
-               IF ( BEIS_MAP( I ) .GT. 0 ) THEN 
-                  J = J + 1
-                  VNAME3D( J ) = EMSPC( I )
-                  VDESC3D( J ) = 'biogenic emissions of the indicated species'
-                  VTYPE3D( J ) = M3REAL
-                  UNITS3D( J ) = 'gm s-1'
-               END IF
+
+            DO J = 1, MSPCS
+               VNAME3D( J ) = EMSPC( J )
+               VDESC3D( J ) = 'biogenic emissions of the indicated species'
+               VTYPE3D( J ) = M3REAL
+               UNITS3D( J ) = 'gm s-1'
             END DO
 
-            NVARS3D = J
+            NVARS3D = MSPCS
             FDESC3D = ' '   ! array
 
             FDESC3D( 1 ) = 'Gridded biogenic emissions from CMAQ-BEIS3'

@@ -276,23 +276,20 @@ C ***    Create map for refactive index for each species
          write( logdev, 5001)(lambda_list( v ), v = 1, nwl)
 #endif 
 
-         IF ( MIE_CALC .AND. .NOT. CORE_SHELL ) THEN
-            CALL LOG_MESSAGE( LOGDEV , 'For optics of internally mixed aerosol, Mie calculation used')
+         XMSG = 'METHOD FOR AEROSOL OPTICAL PROPERTIES'
+         CALL LOG_MESSAGE( LOGDEV, XMSG )
+         IF ( .NOT. CORE_SHELL ) THEN
             CALL LOG_MESSAGE( LOGDEV , 'Core-shell mixing model option is set to off')
-         ELSE IF ( MIE_CALC .AND. CORE_SHELL ) THEN
+            CALL LOG_MESSAGE( LOGDEV , 'For optics of internally mixed aerosol, Mie calculation used')
+         ELSE 
             CALL LOG_MESSAGE( LOGDEV , 'For AERO mixing models, core-shell model is possible')
             CALL LOG_MESSAGE( LOGDEV , 'For optics of aerosols with no core, Mie calculation used')
-         ELSE IF ( .NOT. MIE_CALC .AND. CORE_SHELL ) THEN
-            CALL LOG_MESSAGE( LOGDEV , 'For AERO mixing models, core-shell model is possible')
-            CALL LOG_MESSAGE( LOGDEV , 'For optics of aerosols with no core, FASTER_OPTICS used')
-         ELSE
-            CALL LOG_MESSAGE( LOGDEV , 'Using internal mixing model for aerosol and FASTER_OPTICS')
          END IF
 
          SELECT CASE ( AEROSOL_OPTICS )
            CASE( 1 )
              XMSG = 'VOLUME MIXING model and Tabular Mie Method used'
-             WRITE(LOGDEV,'(A)')TRIM( XMSG )
+             CALL LOG_MESSAGE( LOGDEV, XMSG )
              CALL FAST_MIEAER_MODAL( MIE_PARAMETER,REFINDX,EXTAER,SCATAER,GAER,BSCOEF )
              IF ( EFLAG_WRF_FAST_MIE ) THEN
                 XMSG = 'Above Failure Initializing Tabular Mie Method for aerosol optics'
@@ -300,12 +297,12 @@ C ***    Create map for refactive index for each species
              END IF
            CASE( 2 )
              XMSG = 'VOLUME MIXING model and Mie calculation used'
-             WRITE(LOGDEV,'(A)')TRIM( XMSG )
+             CALL LOG_MESSAGE( LOGDEV, XMSG )
            CASE( 3 )
              XMSG = 'VOLUME MIXING model and FAST_OPTICS used'
-             WRITE(LOGDEV,'(A)')TRIM( XMSG )
-             XMSG = '-Approximations to Mie Theory based on Mie paramter and refractive index '
-             WRITE(LOGDEV,'(A)')TRIM( XMSG )
+             CALL LOG_MESSAGE( LOGDEV, XMSG ) 
+             XMSG = '-Approximations to Mie Theory based on Mie parameter and refractive index '
+             CALL LOG_MESSAGE( LOGDEV, XMSG )
          END SELECT
          WRITE(LOGDEV,*)
 
