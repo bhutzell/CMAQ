@@ -37,6 +37,8 @@ C          Called by driver.F
       USE UTILIO_DEFN           ! 20120615
 c     USE SUBST_MODULES         ! stenex
       USE SA_DEFN               ! Mc06
+      USE MIO_ASCII
+      USE RUNTIME_VARS, ONLY : RUNLEN
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
@@ -68,8 +70,9 @@ c     INTEGER          ALLOCSTAT, LOGDEV
       
 c     INTEGER   C,R,S,K,N, L, ITAG, JSPC    ! loop induction variables
       INTEGER   C,R,S,K,N, L, JSPC    ! loop induction variables
+      INTEGER, SAVE :: EDATE, ETIME
 
-      REAL, ALLOCATABLE :: ISAM_BUFF ( :,:,:,: )
+      REAL, ALLOCATABLE, SAVE :: ISAM_BUFF ( :,:,:,: )
 !20140519
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL OK
@@ -113,9 +116,28 @@ C-----------------------------------------------------------------------
               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             ENDIF ! sa_conc_1 description obtained ?
 
-            SDATE3D = JDATE
-            STIME3D = JTIME
+            EDATE = JDATE
+            ETIME = JTIME
+            CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
+
+            SDATE3D = EDATE
+            STIME3D = ETIME
             NLAYS3D = NLAYS
+
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+            
+            CALL LOAD_MIO_FILE ( SA_CGRID_1, NLAYS3D, 1, NLAYS3D,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+
 
             ! Create sa_cgrid_1
             IF ( .NOT. OPEN3( SA_CGRID_1, FSNEW3, PNAME ) ) THEN
@@ -207,6 +229,8 @@ C-----------------------------------------------------------------------
           XMSG = 'Failure allocating ISAM_BUFF'
           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         ENDIF
+
+        RETURN   ! Initialization of MIO File
 
       ENDIF  !firstime
 

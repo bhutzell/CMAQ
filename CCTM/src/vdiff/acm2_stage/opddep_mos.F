@@ -39,6 +39,7 @@ C   20 May 11 D.Schwede: modified to include mosaic output file
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
       USE MOSAIC_MOD, Only: Tile_Data
+      USE MIO_ASCII
 
       IMPLICIT NONE
  
@@ -155,7 +156,22 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          FDESC3D( 1 ) = 'hourly 1-layer cross-point STAGE dry deposition data'
          DO L = 2, MXDESC3
             FDESC3D( L ) = ' '
-            END DO
+         END DO
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_MOS', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+          
 
 C    Open dry deposition file
 

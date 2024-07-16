@@ -135,9 +135,11 @@
       ! General; Multiprocess control, output and error checking
       LOGICAL :: PRINT_PROC_TIME = .FALSE. ! Flag to print elapsed time for all 
                                            ! science submodules
-      LOGICAL :: FL_ERR_STOP=.TRUE.  ! Flag to stop run if errors are found.
-      LOGICAL :: CKSUM     = .TRUE.  ! flag for cksum on, default = [T]
-      LOGICAL :: END_TIME  = .FALSE. ! Override default beginning ACON timestamp
+      LOGICAL :: FL_ERR_STOP=.TRUE.        ! Flag to stop run if errors are found.
+      LOGICAL :: CKSUM     = .TRUE.        ! flag for cksum on, default = [T]
+      LOGICAL :: END_TIME  = .FALSE.       ! Override default beginning ACON timestamp
+      LOGICAL :: CTM_MIO_FILE = .FALSE.    ! Flag to write out ascii file that informs MIO 
+                                           !   about output file metadata
       
       INTEGER :: N_ACONC_VARS = 0    ! Number of species saved to avg conc file
       INTEGER :: N_CONC_VARS  = 0    ! Number of species saved to conc file
@@ -164,7 +166,7 @@
       INTEGER :: NWAVE = 0                 ! Number of Diagnostic Wavelengths
       CHARACTER(16) :: WAVE_ENV(100)       ! Targeted wavelengths for diagnostic output
       LOGICAL :: CORE_SHELL= .FALSE.       ! flag for using core-shell mixing model for aerosol optics
-      LOGICAL :: MIE_CALC  = .FALSE.       ! flag for using Mie Theory in aerosol optics calculation
+      INTEGER :: AEROSOL_OPTICS = 3        ! optics calculation method of volume mixture aerosols
       REAL    :: GEAR_RTOL = 1.0E-3        ! Relative Tolerance for Gear Solver
       REAL    :: GEAR_MAX_ATOL = 1.0E-7    ! Upper Bound for Absolute Tolerance in Gear Solver (ppmV)
       REAL    :: GEAR_MIN_ATOL = 1.0E-9    ! Lower Bound for Absolute Tolerance in Gear Solver (ppmV)
@@ -427,6 +429,9 @@
       ! FL_ERR_STOP
       CALL GET_ENV ( FL_ERR_STOP, 'FL_ERR_STOP', FL_ERR_STOP, VARDEV )  
 
+      ! PRINT MIO INPUT FILE
+      CALL GET_ENV ( CTM_MIO_FILE, 'CTM_MIO_FILE', CTM_MIO_FILE, VARDEV )  
+
       ! CKSUM
       CALL GET_ENV ( CKSUM, 'CTM_CKSUM', CKSUM, VARDEV )
 
@@ -604,11 +609,17 @@
         CALL GET_ENVLIST( 'NWAVE_PHOTDIAG', NWAVE, WAVE_ENV, VARDEV )
       END IF  
 
-      ! Get flag to use core-shell mixing model for aerosol optical properties
-      CALL GET_ENV ( CORE_SHELL, 'CORE_SHELL_OPTICS', CORE_SHELL, VARDEV )
+      CALL GET_ENV ( AEROSOL_OPTICS, 'AEROSOL_OPTICS', AEROSOL_OPTICS, VARDEV )
+      IF ( AEROSOL_OPTICS .GT. 3 ) THEN ! core-shell mixing model possible
+          CORE_SHELL = .TRUE.
+          AEROSOL_OPTICS = AEROSOL_OPTICS - 3
+      END IF
 
-      ! Get flag to use fast optics for volume mixing model for aerosol optical properties
-      CALL GET_ENV ( MIE_CALC, 'OPTICS_MIE_CALC', MIE_CALC, VARDEV )
+      IF ( AEROSOL_OPTICS .LT. 1 .OR. AEROSOL_OPTICS .GT. 3 ) THEN
+         XMSG = 'AEROSOL_OPTICS option must equal 1 to 6'
+         WRITE( OUTDEV, '(A)' )TRIM( XMSG )
+         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+      END IF
 
       IF ( MYPE .EQ. 0 ) THEN
          WRITE( OUTDEV, '(/,6x,A,/)' )'--ATOL settings are in ppmV.--'
@@ -1010,211 +1021,4 @@
 
       END SUBROUTINE INIT_ENV_VARS
 
-!.........................................................................
-      SUBROUTINE LOG_HEADING( FUNIT, CHEAD_IN )
-
-!  Formats and writes a user-supplied heading to a specific log file.
-!  This approach is intended to standardize the log files that are
-!  created by CMAQ. The length of the input array is set at 80 because
-!  we would like to try limiting lines to 80 characters and a heading
-!  should probably just be one line.
-!.........................................................................
-
-#ifdef mpas
-      use util_module
-#endif
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT( IN )           :: FUNIT
-      CHARACTER( * ), INTENT( IN )    :: CHEAD_IN
-      CHARACTER( len=: ), ALLOCATABLE :: CHEAD
-      CHARACTER( 20 )                 :: FMT
-      CHARACTER( 20 )                 :: FMT2
-      INTEGER                         :: LDASH
-
-      ! Capitalize the heading
-      CHEAD = CHEAD_IN
-      CALL UPCASE( CHEAD )
-
-      ! Write the heading to the log file
-      WRITE( FUNIT, * )
-      WRITE( FMT, '("(", I0, "x,A,A,A)")' ) LOG_MAJOR_TAB
-      WRITE( FMT2,'("(", I0, "x,A,)")' ) LOG_MAJOR_TAB
-
-      LDASH = 2*8 + LEN_TRIM( CHEAD )
-      WRITE( FUNIT, FMT2 ), REPEAT( '=', LDASH )
-      WRITE( FUNIT, FMT ),
-     &       '|>---   ',TRIM( CHEAD ),'   ---<|'
-      WRITE( FUNIT, FMT2 ), REPEAT( '=', LDASH )
-
-      END SUBROUTINE LOG_HEADING
-      
-!.........................................................................
-      SUBROUTINE LOG_SUBHEADING( FUNIT, CHEAD )
-
-!  Formats and writes a user-supplied sub-heading to a specific log file.
-!  This approach is intended to standardize the log files that are
-!  created by CMAQ. The length of the input array is set at 80 because
-!  we would like to try limiting lines to 80 characters and a sub-heading
-!  should probably just be one line.
-!.........................................................................
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT( IN ) :: FUNIT
-      CHARACTER( * ), INTENT( IN ) :: CHEAD
-      CHARACTER( 20 )       :: FMT
-      INTEGER                         :: LDASH
-
-      ! Write the sub-heading to the log file
-      WRITE( FMT, '("(/,", I0, "x,A,A,A)")' ) LOG_MAJOR_TAB
-      WRITE( FUNIT, FMT ),'|> ',TRIM( CHEAD ),':'
-      LDASH = 2*3 - 1 + LEN_TRIM( CHEAD )
-
-      WRITE( FMT, '("(", I0, "x,A,A)")' ) LOG_MAJOR_TAB
-      WRITE( FUNIT, FMT ) '+',REPEAT( '=', LDASH )
-
-      END SUBROUTINE LOG_SUBHEADING
-      
-!!.........................................................................
-!      SUBROUTINE LOG_MESSAGE( FUNIT, CMSG_IN )
-!
-!!  Formats and writes a user-supplied message to a specific log file.
-!!  This approach is intended to standardize the log files that are
-!!  created by CMAQ.
-!!.........................................................................
-!
-!      IMPLICIT NONE
-!
-!      INTEGER, INTENT( IN ) :: FUNIT
-!      CHARACTER( * ), INTENT( IN ) :: CMSG_IN
-!      CHARACTER( len=: ), ALLOCATABLE :: CMSG
-!      CHARACTER( 20 )       :: FMT
-!
-!      CHARACTER( LOG_LINE_LENGTH ) :: CTEMP
-!      INTEGER :: MSG_SIZE
-!      INTEGER :: NLINE1, NLINE2, NLINE, NTAB, LAST_SPACE
-!
-!      CMSG = CMSG_IN
-!
-!      ! Write the message to the log file, while trimming to 80
-!      ! characters (while accounting for tab-length)
-!      NLINE1 = LOG_LINE_LENGTH - LOG_MAJOR_TAB
-!      NLINE2 = LOG_LINE_LENGTH - LOG_MAJOR_TAB - LOG_MINOR_TAB
-!      NLINE  = NLINE1
-!      NTAB   = LOG_MAJOR_TAB
-!      
-!      ! Determine Length of Total Message
-!      MSG_SIZE = LEN_TRIM( CMSG )
-!      
-!      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH )
-!         ! Isolate One Line of Text
-!         LAST_SPACE = INDEX( CMSG( 1:NLINE+1 ), " ", BACK=.TRUE. )
-!     
-!         CTEMP = CMSG( 1:LAST_SPACE-1 )
-!
-!         WRITE( FMT, '("(", I0, "x,A)")' ) NTAB
-!         WRITE( FUNIT, FMT ), CTEMP
-!
-!         CMSG = CMSG( LAST_SPACE+1:LEN( CMSG ) )
-!         MSG_SIZE = LEN_TRIM( CMSG )
-!
-!         IF ( NTAB .EQ. LOG_MAJOR_TAB ) NTAB = NTAB + LOG_MINOR_TAB
-!         IF ( NLINE.EQ. NLINE1 ) NLINE = NLINE2
-!      END DO
-!
-!      ! Write Last Line
-!      WRITE( FMT, '("(", I0, "x,A)")' ) NTAB
-!      WRITE( FUNIT, FMT ), TRIM( CMSG )
-!
-!
-!      END SUBROUTINE LOG_MESSAGE
-
-!.........................................................................
-      SUBROUTINE TIMING_SPLIT( CPU_TIME_START, IMSG, CPROCIN )
-
-!  This subroutine provides a split for the MPI timing functions and
-!  then prints out a message for how much time has passed using a
-!  character string input for customizing that message. 
-!.........................................................................
- 
-      IMPLICIT NONE
-
-#ifdef parallel
-      INCLUDE 'mpif.h'
-#endif
-      REAL( 8 )        :: CPU_TIME_START
-      REAL( 8 )        :: CPU_TIME_FINISH
-      INTEGER          :: IMSG   ! What kind of checkpoint this is
-                                 !  1 = 'PROCESS'
-                                 !  2 = 'MASTER TIME STEP'
-                                 !  3 = 'OUTPUT'
-      CHARACTER( * ), INTENT(IN), OPTIONAL :: CPROCIN
-      CHARACTER( len=: ), ALLOCATABLE :: CPROC
-      CHARACTER( 250 ) :: XMSG
-
-#ifndef parallel
-      REAL :: REAL_TIME
-#endif
-
-
-      IF ( PRESENT( CPROCIN ) ) THEN
-         CPROC = CPROCIN
-      ELSE
-         CPROC = ' '
-      END IF
- 
-      ! Record Time at this Checkpoint
-#ifdef parallel
-      CPU_TIME_FINISH = MPI_WTIME()
-#else
-      CALL CPU_TIME( REAL_TIME )
-      CPU_TIME_FINISH = REAL( REAL_TIME,8 )
-#endif
-
-
-      ! Assemble the statement requested by the calling program
-      SELECT CASE ( IMSG )
-      CASE ( 1 )
-          ! Write Out The Time to Complete Each Sub-Process
-          WRITE( XMSG, 1002 ),TRIM( CPROC ), CPU_TIME_FINISH-CPU_TIME_START
-1002      FORMAT ( 2x, A15, ' completed... ', F12.4, ' seconds' )
-
-      CASE ( 2 ) 
-          ! Write out the time to complete the entire master time step
-          WRITE( XMSG, '(7x,A16)' ),'Master Time Step'
-          CALL LOG_MESSAGE( LOGDEV, XMSG )
-#ifndef twoway
-          IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
-#endif
-          WRITE( XMSG, '(7x,A24,F12.4,A8)' ),'Processing completed... ',
-     &                     (CPU_TIME_FINISH-CPU_TIME_START),' seconds'
-          CALL LOG_MESSAGE( LOGDEV, XMSG )
-          WRITE( LOGDEV, * )
-
-      CASE ( 3 ) 
-          ! Write out the time to complete the output procedure
-          WRITE( XMSG, '(1x,A32,F10.4,A)' ), '=--> Data Output completed...   ',
-     &                     (CPU_TIME_FINISH-CPU_TIME_START),' seconds'
-          CALL LOG_MESSAGE( LOGDEV, XMSG )
-          WRITE( LOGDEV, * )
-#ifndef twoway
-          IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
-#endif
- 
-      END SELECT 
-
-      ! Write out the timing statement
-#ifndef twoway
-      IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
-#endif
-#ifdef parallel      
-      CPU_TIME_START = MPI_WTIME()
-#else
-      CALL CPU_TIME( REAL_TIME )
-      CPU_TIME_START = REAL( REAL_TIME,8 )
-#endif
-      END SUBROUTINE TIMING_SPLIT    
- 
       END MODULE RUNTIME_VARS
