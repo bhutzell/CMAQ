@@ -479,6 +479,7 @@ C   27 Dec 10 J.Young: initial
 
          use grid_conf           ! horizontal & vertical domain specifications
          use utilio_defn
+         use mio_ascii
 
          implicit none
 
@@ -549,6 +550,20 @@ C Set output file characteristics based on COORD.EXT and open diagnostic file
                fdesc3d( l ) = ' '
             end do
 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_DUST_EMIS_1', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+            
 C Open windblown dust emissions diagnostic file
             if ( .not. open3( ctm_dust_emis_1, fsnew3, pname ) ) then
                xmsg = 'Could not create the CTM_DUST_EMIS_1 file'
@@ -1034,7 +1049,7 @@ C --------- ###### End Main Loop ##### ---------
          do r = 1, nrows
          do c = 1, ncols
 
-C J/K mass emis rate [g/s]  (edust( 1 ) not used)
+C J/K mass emis rate [g/m3/s]  (edust( 1 ) not used)
             edust( 1 ) = fracmj * dust_em( c,r )
             edust( 2 ) = fracmk * dust_em( c,r )
 
@@ -1045,15 +1060,15 @@ C J/K mass emis rate [g/s]  (edust( 1 ) not used)
                end do
             end do
 
-C J/K 3rd moment emis rate [m3/s] (needed for number and surface)
+C J/K 3rd moment emis rate [m3/m3/s] (needed for number and surface)
             m3j = edust( 1 ) * f6dpi / ( gpkg * dust_dens( 1 ) ) + TINY(0.0)
             m3k = edust( 2 ) * f6dpi / ( gpkg * dust_dens( 2 ) ) + TINY(0.0)
 
-C Mode-specific emission rates of particle number [1/s]
+C Mode-specific emission rates of particle number [1/m3/s]
             dustoutn( 1,c,r ) = m3j * factnumj
             dustoutn( 2,c,r ) = m3k * factnumk
 
-C Mode-specific dry surface area emission rates [m**2/s].
+C Mode-specific dry surface area emission rates [m**2/m3/s].
 C 2nd moment multiplied by PI to obtain the surface area emissions rate.
             dustouts( 1,c,r ) = m3j * factsrfj
             dustouts( 2,c,r ) = m3k * factsrfk
