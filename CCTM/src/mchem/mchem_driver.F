@@ -116,6 +116,9 @@ C..Local Variables:
       REAL, ALLOCATABLE, SAVE :: QV     ( :, :, : )      ! Cell water vapor (Kg/Kg air)
       REAL, ALLOCATABLE, SAVE :: TA     ( :, :, : )      ! Cell temperature (K)
 
+      REAL, ALLOCATABLE, SAVE :: ZF     ( :, :, : )      ! level/layer-face height (m)
+      REAL, ALLOCATABLE, SAVE :: DZZ    ( :, :, : )      ! layer thickness (m)
+
       REAL, ALLOCATABLE, SAVE :: SEAWATER_ZONE   ( :,: )          ! fractional area of OPEN+SURF
 
 C.. Cloud chemistry related
@@ -266,9 +269,10 @@ C.. Get fractional seawater coverage from the OCEAN file.
 
          ALLOCATE( DENS( NCOLS, NROWS, NLAYS ), PRES( NCOLS, NROWS, NLAYS ),
      &             QV  ( NCOLS, NROWS, NLAYS ), TA  ( NCOLS, NROWS, NLAYS ),
-     &             SEAICE( NCOLS, NROWS ) )
+     &             SEAICE( NCOLS, NROWS ),      ZF  ( NCOLS, NROWS, NLAYS ),
+     &             DZZ ( NCOLS, NROWS, NLAYS ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
-            XMSG = 'ERROR allocating DENS, PRES, QV, TA, SEAICE'
+            XMSG = 'ERROR allocating DENS, PRES, QV, TA, SEAICE, ZF, DZZ'
             CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
          END IF
 
@@ -388,6 +392,21 @@ C.. Get ambient MASS DENSITY in Kg/m^3
 C.. Get pressure in Pascals
       CALL INTERPOLATE_VAR ('PRES', MIDDATE, MIDTIME, PRES)
 
+C...Get level heights / layer faces (m)
+
+      CALL INTERPOLATE_VAR ('ZF', MIDDATE, MIDTIME, ZF )
+
+C...Compute layer thicknesses (m)
+      DO ROW = 1, NROWS
+        DO COL = 1, NCOLS
+          DZZ( COL, ROW, 1 ) = ZF( COL, ROW, 1 )
+          DO LEV = 2, NLAYS
+            DZZ( COL, ROW, LEV ) = ZF( COL, ROW, LEV )
+     &                           - ZF( COL, ROW, LEV - 1 )
+          END DO
+        END DO
+      END DO
+
 C.. Get Heterogeneous Rates using Aerosol Surface Area. Also Store
 C   a snapshot of the aerosol surface area so that it can be
 C   appropriately updated after the solver finds a solution.
@@ -430,6 +449,21 @@ C..  Update convective cloud scavenging rates by cloud fraction
         END DO
       END DO
 
+C.. Obtain aerosol density
+      DO LEV = 1, NLAYS
+        DO ROW = 1, NROWS
+          DO COL = 1, NCOLS
+            IF ( ( WCBAR_RS( COL,ROW,LEV ) .GT. LWC_LIMIT ) .OR.
+     &           ( WCBAR_CV( COL,ROW,LEV ) .GT. LWC_LIMIT ) ) THEN
+              CALL ADJUST_AERO_OLD ( CGRID( COL,ROW,LEV,: ),
+     &                               DENS_VMEAN_OLD( COL,ROW,LEV,: ),
+     &                               M3OLD( COL,ROW,LEV,: ),
+     &                               AESURF( COL,ROW,LEV,: ),
+     &                               AENUM( COL,ROW,LEV,: ) )
+            END IF
+          END DO
+        END DO
+      END DO
 
 C.. Convert to molecules/cm3
       DO LEV = 1, NLAYS
@@ -559,6 +593,26 @@ C.. Convert to molar mixing ratio (by volume)
             END DO
             ! Wet deposition of H+
             WDEP_Hp( COL,ROW,LEV ) = WDEP_Hp( COL,ROW,LEV ) / CAIR
+          END DO
+        END DO
+      END DO
+
+C.. Adjust aerosol surface and number concentration
+      DO LEV = 1, NLAYS
+        DO ROW = 1, NROWS
+          DO COL = 1, NCOLS
+            IF ( ( WCBAR_RS( COL,ROW,LEV ) .GT. LWC_LIMIT ) .OR.
+     &           ( WCBAR_CV( COL,ROW,LEV ) .GT. LWC_LIMIT ) ) THEN
+              CALL ADJUST_AERO_NEW ( CGRID( COL,ROW,LEV,: ),
+     &                               DENS_VMEAN_OLD( COL,ROW,LEV,: ),
+     &                               M3OLD( COL,ROW,LEV,: ),
+     &                               AESURF( COL,ROW,LEV,: ),
+     &                               AENUM( COL,ROW,LEV,: ),
+     &                               REAL( WET_DEP( COL, ROW, LEV, : ), 4 ),
+     &                               REAL( AIRMASS( COL, ROW, LEV ), 4 ),
+     &                               DZZ( COL, ROW, LEV ),
+     &                               REAL( CHEMSTEP, 4 ) )
+            END IF
           END DO
         END DO
       END DO

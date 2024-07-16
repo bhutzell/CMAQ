@@ -163,6 +163,12 @@ C.. Related to metals
       REAL( dp ), PARAMETER    :: FE_SOL = 0.1D0  ! Fraction of soluble Fe
       REAL( dp ), PARAMETER    :: MN_SOL = 0.5D0  ! Fraction of soluble Mn
 
+      INTEGER, PARAMETER       :: NMODES = 3      ! number of aerosol modes
+      REAL, ALLOCATABLE        :: DENS_VMEAN_OLD( :,:,:,: )
+      REAL, ALLOCATABLE        :: AESURF( :,:,:,: )
+      REAL, ALLOCATABLE        :: AENUM( :,:,:,: )
+      REAL, ALLOCATABLE        :: M3OLD( :,:,:,: )
+
       CONTAINS
 
       SUBROUTINE ALLOC_METAL_DATA ( )
@@ -325,6 +331,8 @@ C..   Report metal information to log-file
 
       SUBROUTINE ALLOC_AE_DATA ( )
 
+        USE GRID_CONF             ! horizontal & vertical domain specifications
+
         IMPLICIT NONE
 
         INTEGER       VAR              ! variable subscript indices
@@ -355,6 +363,11 @@ C...  # / m**3 (number density), and m**2 / m**3 (surface area) units
           END DO
 
         END IF
+
+        ALLOCATE ( DENS_VMEAN_OLD( NCOLS, NROWS, NLAYS, NMODES ),
+     &             AESURF        ( NCOLS, NROWS, NLAYS, NMODES ),
+     &             AENUM         ( NCOLS, NROWS, NLAYS, NMODES ),
+     &             M3OLD         ( NCOLS, NROWS, NLAYS, NMODES ) )
 
       END SUBROUTINE ALLOC_AE_DATA
 
@@ -1207,6 +1220,163 @@ C...convert to ppmV tracer gas
         END DO
 
       END SUBROUTINE CONVERT_BACKWARD
+
+      SUBROUTINE ADJUST_AERO_OLD ( POLC, DENS_WMEAN_OLD, M3OLD, AESURF,
+     &                             AENUM )
+
+!        USE GRID_CONF      ! horizontal & vertical domain specifications
+        USE AERO_DATA      ! aerosol shared parameters
+
+        IMPLICIT NONE
+
+        REAL, INTENT( IN )   :: POLC( : )
+        REAL, INTENT( OUT )  :: DENS_WMEAN_OLD( NMODES ) ! concentration weighted molecular weight g/mol
+        REAL, INTENT( OUT )  :: M3OLD( NMODES )          ! modal mass at time 0
+        REAL, INTENT( OUT )  :: AESURF( NMODES )
+        REAL, INTENT( OUT )  :: AENUM( NMODES )
+
+        INTEGER              :: IMODE                    ! aerosol mode loop counter
+        INTEGER              :: SPC                      ! liquid species loop counter
+
+C *** extract grid cell concentrations of aero species from CGRID
+C     into aerospc_conc in aero_data module
+
+        CALL EXTRACT_AERO ( POLC, .FALSE. )
+
+C *** Calculate pseudo aerosol 3rd moment (ignore factors that cancel in the division)
+C ... M3OLD is in units of m3/kmol_air
+
+        M3OLD = 0.0
+        Dens_wmean_old = 0.0
+        DO IMODE = 2, N_MODE
+
+          DO SPC = 1, N_AEROSPC
+            IF (  AEROSPC( SPC )%TRACER ) CYCLE
+            IF ( ( AEROSPC( SPC )%NAME( IMODE ) .NE. ' ' ) .AND.
+     &           ( .NOT. AEROSPC( SPC )%NO_M2WET ) ) THEN
+               M3OLD( IMODE ) = M3OLD( IMODE )
+     &                        + ( AEROSPC_CONC( SPC,IMODE ) * AEROSPC_MW( SPC )
+     &                        / AEROSPC( SPC )%DENSITY )
+               Dens_wmean_old( IMODE ) = Dens_wmean_old( IMODE )
+     &                        + AEROSPC_CONC( SPC,IMODE ) * AEROSPC_MW( SPC )
+            END IF
+          END DO
+        END DO
+        Dens_wmean_old(2:N_MODE) = Dens_wmean_old(2:N_MODE) / M3OLD(2:N_MODE)
+
+        DO IMODE = 1, N_MODE
+          AESURF( IMODE ) = AEROSRF_MAP( IMODE )
+          AENUM( IMODE )  = AERONUM_MAP( IMODE )
+        END DO
+
+      END SUBROUTINE ADJUST_AERO_OLD
+
+      SUBROUTINE ADJUST_AERO_NEW ( CEND, DENS_WMEAN_OLD, M3OLD,
+     &                             AESURF, AENUM, DEP,
+     &                             AIRM, CTHK1, TAUCLD )
+
+!        USE GRID_CONF      ! horizontal & vertical domain specifications
+        USE AERO_DATA      ! aerosol shared parameters
+
+        IMPLICIT NONE
+
+        INCLUDE SUBST_CONST   ! for DPI
+
+        REAL, INTENT( INOUT ) :: CEND( : )
+        REAL, INTENT( IN )    :: DENS_WMEAN_OLD( NMODES ) ! concentration weighted molecular weight g/mol
+        REAL, INTENT( INOUT ) :: M3OLD( NMODES )          ! modal mass at time 0
+        REAL, INTENT( IN )    :: AESURF( NMODES )         ! Aerosol surface before KPP integration
+        REAL, INTENT( IN )    :: AENUM( NMODES )          ! Aerosol number concentration before KPP integration
+        REAL, INTENT( IN )    :: DEP( : )                 ! Deposition
+        REAL, INTENT( IN )    :: AIRM
+        REAL, INTENT( IN )    :: CTHK1
+        REAL, INTENT( IN )    :: TAUCLD
+
+        INTEGER               :: IMODE                    ! aerosol mode loop counter
+        INTEGER               :: SPC                      ! liquid species loop counter
+        INTEGER, SAVE         :: IND_ASO4J
+
+        REAL, PARAMETER       :: ONETHIRD  = 1.0 / 3.0
+        REAL, PARAMETER       :: TWOTHIRDS = 2.0 / 3.0
+
+        LOGICAL, SAVE         :: FIRSTTIME = .TRUE.
+
+        REAL                  :: BETASO4
+        REAL                  :: DEPSUM
+
+        REAL                  :: M3NEW( NMODES )
+        REAL                  :: DENS_WMEAN_NEW( NMODES )
+
+        IF ( FIRSTTIME ) THEN
+
+          FIRSTTIME = .FALSE.
+
+          IND_ASO4J = INDEX_CGRID( 'ASO4J' )
+
+        END IF
+
+        DEPSUM  = DEP( IND_ASO4J )
+        BETASO4 = 0.D0
+        IF ( CEND( IND_ASO4J ) + DEPSUM .GT. 0.0D0 ) THEN
+          BETASO4 = DEPSUM / ( CEND( IND_ASO4J ) + DEPSUM ) /
+     &              TAUCLD
+        END IF
+
+C *** extract grid cell concentrations of aero species from CGRID
+C     into aerospc_conc in aero_data module
+
+        CALL EXTRACT_AERO ( CEND, .FALSE. )
+
+C *** Calculate pseudo aerosol 3rd moment (ignore factors that cancel in the division)
+C ... M3NEW is in units of m3/kmol_air
+        M3NEW = 0.0
+        Dens_wmean_new = 0.0
+        DO IMODE = 2, N_MODE
+
+          DO SPC = 1, N_AEROSPC
+            IF (  AEROSPC( SPC )%TRACER ) CYCLE
+            IF ( ( AEROSPC( SPC )%NAME( IMODE ) .NE. ' ' ) .AND.
+     &           ( .NOT. AEROSPC( SPC )%NO_M2WET ) ) THEN
+               M3NEW( IMODE ) = M3NEW( IMODE )
+     &                        + ( AEROSPC_CONC( SPC,IMODE ) * AEROSPC_MW( SPC )
+     &                        / AEROSPC( SPC )%DENSITY )
+               Dens_wmean_new( IMODE ) = Dens_wmean_new( IMODE )
+     &                        + AEROSPC_CONC( SPC,IMODE ) * AEROSPC_MW( SPC )
+            END IF
+          END DO
+        END DO
+
+C...Update aerosol number
+        CEND( AERONUM_MAP( 1 ) ) = MAX( CEND( AERONUM_MAP( 1 ) ), aeromode_minNum( 1 )/ (AIRM/CTHK1) )
+        CEND( AERONUM_MAP( 2 ) ) = MAX( CEND( AERONUM_MAP( 2 ) ), aeromode_minNum( 2 )/ (AIRM/CTHK1) )
+        CEND( AERONUM_MAP( 3 ) ) = MAX( CEND( AERONUM_MAP( 3 ) ), aeromode_minNum( 3 )/ (AIRM/CTHK1) )
+
+C...check for minimums
+C...ug/m3*m3/mol_air*1e3 mol_air/kmol_air*1e-9kg/ug*m3/kg=> m3/kmol_air
+        DO IMODE = 2, N_MODE
+          IF ( M3NEW( IMODE ) .GT. 0.0D0 ) THEN  ! Dens_wmean_new will be .GT. 0 also
+             Dens_wmean_new( IMODE ) = Dens_wmean_new( IMODE ) / M3NEW( IMODE )
+             M3OLD( IMODE ) = MAX( M3OLD( IMODE ), CONMIND * 1.0d-6 / ( Dens_wmean_old( IMODE ) * AIRM / CTHK1 ) )
+             M3NEW( IMODE ) = MAX( M3NEW( IMODE ), CONMIND * 1.0d-6 / ( Dens_wmean_new( IMODE ) * AIRM / CTHK1 ) )
+          END IF
+        END DO
+
+C...Update surface area
+! Already taken account due to DEP:  CEND( AEROSRF_MAP( 1 ) ) = AESURF( 1 ) * EALFA2T
+        CEND( AEROSRF_MAP( 1 ) ) = MAX( CEND( AEROSRF_MAP( 1 ) ), aeromode_minM2( 1 ) * DPI / (AIRM/CTHK1) )
+
+        CEND( AEROSRF_MAP( 2 ) ) = AESURF( 2 )
+     &                           * EXP( -BETASO4 * TAUCLD * ONETHIRD )
+     &                           * ( M3NEW( 2 ) / M3OLD( 2 ) ) ** TWOTHIRDS
+        CEND( AEROSRF_MAP( 2 ) ) = MAX( CEND( AEROSRF_MAP( 2 ) ), aeromode_minM2( 2 ) * DPI / (AIRM/CTHK1) )
+
+        CEND( AEROSRF_MAP( 3 ) ) = AESURF( 3 )
+     &                           * ( CEND( AERONUM_MAP( 3 ) )
+     &                           / AENUM( 3 ) ) ** ONETHIRD
+     &                           * ( M3NEW( 3 ) / M3OLD( 3 ) ) ** TWOTHIRDS
+        CEND( AEROSRF_MAP( 3 ) ) = MAX( CEND( AEROSRF_MAP( 3 ) ), aeromode_minM2( 3 ) * DPI / (AIRM/CTHK1) )
+
+      END SUBROUTINE ADJUST_AERO_NEW
 
       Subroutine set_aeconcmin( aeconcmin )
 C-----------------------------------------------------------------------
