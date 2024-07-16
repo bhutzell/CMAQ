@@ -79,7 +79,22 @@ C...........Local Variables:
       INTEGER ICSPC           ! Index of species in CONC
       INTEGER ICLT            ! Index of cloud type
       INTEGER NPH             ! Index for number of photolysis reaction in PHOT
-      REAL(8)                 :: ALFA                 ! total (RS + CV) scavenging rate coefficient (1/s)
+      REAL(8)                 :: ALFA                  ! total (RS + CV) scavenging rate coefficient (1/s)
+
+C...Aerosol partitioning
+      REAL                    :: TOTAMM, TOTNIT, TOTCL        ! Total nitrate, ammonium, and chloride (excluding coarse mode)
+      REAL                    :: FNH3,   FHNO3,  FHCL         ! Initial fraction NH3 gas of TOTAMM
+                                                              ! Initial fraction HNO3 gas of TOTNIT
+                                                              ! Initial fraction HCl gas of TOTCL
+      INTEGER, SAVE           :: ICGRID_NH3,  ICGRID_ANH4J    ! CGRID index for NH3 and ANH4J
+      INTEGER, SAVE           :: ICGRID_HNO3, ICGRID_ANO3J    ! CGRID index for HNO3 and ANO3J
+      INTEGER, SAVE           :: ICGRID_HCL,  ICGRID_ACLJ     ! CGRID index for HCL and ACLJ
+      LOGICAL, SAVE           :: LKEEP_PARTITIONING = .FALSE. ! Keep aerosol paritioning between gas & accumulation mode for
+                                                              ! nitrate ammonium, and chloride:
+                                                              ! TRUE  = initial partitioning between gas & accumulation mode
+                                                              !         is applied to final concentrations
+                                                              ! FALSE = gas & accumulation mode partitioning is taken from KPP (default)
+
       REAL(dp)                :: CLIN( N_CGRID_SPC )   !  Initial CGRID cloud species concentration in cell
                                                        !  for species which are not reseted (coarse aerosols
                                                        !  that are only affected by scavenging)
@@ -114,6 +129,19 @@ C.. Set KPP options
         ICNTRL(3) = 4 ! Rodas3
 C.. Alternative KPP options
         !ICNTRL(3) = 2 ! Ros3
+
+C.. Obtain indexes for gas & accumulation mode partitioning for nitrate, ammonium, and chloride
+        IF ( LKEEP_PARTITIONING ) THEN
+           ! ammonium
+           ICGRID_NH3   = INDEX_CGRID( 'NH3' )
+           ICGRID_ANH4J = INDEX_CGRID( 'ANH4J' )
+           ! nitrate
+           ICGRID_HNO3  = INDEX_CGRID( 'HNO3' )
+           ICGRID_ANO3J = INDEX_CGRID( 'ANO3J' )
+           ! chloride
+           ICGRID_HCL   = INDEX_CGRID( 'HCL' )
+           ICGRID_ACLJ  = INDEX_CGRID( 'ACLJ' )
+        END IF
 
       END IF  ! FIRSTIME
 
@@ -206,6 +234,24 @@ C.. Alternative KPP options
          RJCELL( NPH )   = REAL( RJ( COL,ROW,LEV,NPH ), dp ) / 60.0_dp
          IF ( RJCELL( NPH ) .GT. 0.0D0 ) LSUNLIGHT = .TRUE.
       END DO
+
+      ! Get initial partitioning between gas & accumulation mode for nitrate, ammonium, and chloride
+      IF ( LKEEP_PARTITIONING ) THEN
+         ! ammonium
+         FHNO3  = 1.0D0
+         TOTNIT = CGRID( COL,ROW,LEV,ICGRID_HNO3 ) + CGRID( COL,ROW,LEV,ICGRID_ANO3J )
+         IF ( TOTNIT .GT. 0.0D0 ) FHNO3 = CGRID( COL,ROW,LEV,ICGRID_HNO3 ) / TOTNIT
+
+         ! nitrate
+         FNH3   = 1.0D0
+         TOTAMM = CGRID( COL,ROW,LEV,ICGRID_NH3 )  + CGRID( COL,ROW,LEV,ICGRID_ANH4J )
+         IF ( TOTAMM .GT. 0.0D0 ) FNH3  = CGRID( COL,ROW,LEV,ICGRID_NH3 )  / TOTAMM
+
+         ! chloride
+         FHCL   = 1.0D0
+         TOTCL  = CGRID( COL,ROW,LEV,ICGRID_HCL )  + CGRID( COL,ROW,LEV,ICGRID_ACLJ )
+         IF ( TOTCL  .GT. 0.0D0 ) FHCL  = CGRID( COL,ROW,LEV,ICGRID_HCL )  / TOTCL
+      END IF
 
       ! Initialize before filling C array
       CALL Initialize()
@@ -315,6 +361,24 @@ C...perform scavenging if tracer is not part of KPP
 C...evaporate clouds back to gas/aerosol phase
       IF ( LCL ) CALL EVAP_CLOUDS ( CGRID( COL,ROW,LEV,: ), C(:), CLIN(:),
      &                              WET_DEP( COL,ROW,LEV,: ), WFAC_RS, WFAC_CV, DT )
+
+C...redistribute gas & accumulation mode partitioning for nitrate, ammonium, and chloride
+      IF ( LKEEP_PARTITIONING ) THEN
+         ! ammonium
+         TOTAMM = CGRID( COL,ROW,LEV,ICGRID_NH3 )  + CGRID( COL,ROW,LEV,ICGRID_ANH4J )
+         CGRID( COL,ROW,LEV,ICGRID_ANO3J ) = ( 1.0D0 - FHNO3 ) * TOTNIT
+         CGRID( COL,ROW,LEV,ICGRID_HNO3 )  = FHNO3 * TOTNIT
+
+         ! nitrate
+         TOTNIT = CGRID( COL,ROW,LEV,ICGRID_HNO3 ) + CGRID( COL,ROW,LEV,ICGRID_ANO3J )
+         CGRID( COL,ROW,LEV,ICGRID_ANH4J ) = ( 1.0D0 - FNH3 )  * TOTAMM
+         CGRID( COL,ROW,LEV,ICGRID_NH3 )   = FNH3 * TOTAMM
+
+         ! chloride
+         TOTCL  = CGRID( COL,ROW,LEV,ICGRID_HCL )  + CGRID( COL,ROW,LEV,ICGRID_ACLJ )
+         CGRID( COL,ROW,LEV,ICGRID_ACLJ )  = ( 1.0D0 - FHCL )  * TOTCL
+         CGRID( COL,ROW,LEV,ICGRID_HCL )   = FHCL * TOTCL
+      END IF
 
       RETURN
 
