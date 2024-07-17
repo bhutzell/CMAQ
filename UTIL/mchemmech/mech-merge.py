@@ -71,6 +71,9 @@ for rx in mechin:
 outfile = open('mchem.eqn','w')
 with open('gas.eqn') as infile:
     for line in infile:
+        if '#INLINE F90_RCONST' in line:
+            line = line + 'USE MCHEM_CLOUDS, ONLY: UPDATE_GM1_GM2\n\n'
+            line = line + 'REAL(dp)  :: Y(NSPEC)\n\n'
         if '#EQUATIONS' in line:
             with open('inline_clouds.kpp') as infile_rconst:
                 for line_rconst in infile_rconst:

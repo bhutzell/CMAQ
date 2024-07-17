@@ -7,9 +7,6 @@
 // select programming language
 #LANGUAGE Fortran90
 
-// choose an integrator and define substeps
-#INCLUDE integr.kpp
-
 // set indices of unused species to ind_*=0
 #DUMMYINDEX ON
 
@@ -29,8 +26,14 @@
 // equation tags
 #EQNTAGS ON
 
-// show kpp-options in output
-//#WRITE_OPT
-// produce driver routine for solver
-#DRIVER general
+// do not produce driver routine for solver
+#DRIVER none
 
+// create KPP files with .F90 file endings
+#UPPERCASEF90 ON
+
+// require KPP version 3 or above
+#MINVERSION 3.1.0
+
+// choose an integrator
+#INTEGRATOR rosenbrock_autoreduce

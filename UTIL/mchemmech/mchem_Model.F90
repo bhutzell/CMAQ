@@ -14,7 +14,7 @@ MODULE mchem_Model
   USE mchem_Jacobian
   USE mchem_LinearAlgebra
   USE mchem_Monitor
-!  USE mchem_Util
+  USE mchem_Util
 
 END MODULE mchem_Model
 

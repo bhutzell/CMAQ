@@ -68,6 +68,7 @@ C...........Local Variables:
 
       REAL(kind=dp)           :: RSTATE(20)           ! KPP integrator variables
       INTEGER, SAVE           :: ICNTRL(20) = 0       ! KPP integrator variables
+      REAL(kind=dp), SAVE     :: RCNTRL(20) = 0.0     ! KPP integrator variables
       INTEGER                 :: IERR                 ! KPP integrator variables
       INTEGER                 :: ISTATUS(20)          ! KPP integrator variables
 
@@ -95,6 +96,17 @@ C.. Set KPP options
         ICNTRL(3) = 4 ! Rodas3
 C.. Alternative KPP options
         !ICNTRL(3) = 2 ! Ros3
+
+C.. Set calling of Update_RCONST
+        ICNTRL(15) = -1   ! = -1 :  Do not call Update_* functions within the integrator
+                          ! =  0 :  Status quo
+                          ! =  1 :  Call Update_RCONST from within the integrator
+
+C.. Set autoreduce options
+        ICNTRL(12) = 1    ! = 1 use auto-reduce solver. set threshold in RCNTRL(12).
+                          ! = 0 do not use use auto-reduce solver
+        ICNTRL(13) = 0    ! = 1 append slow species when auto-reducing
+                          ! = 0 do not append slow species when auto-reducing
 
       END IF  ! FIRSTIME
 
@@ -148,7 +160,8 @@ C.. Alternative KPP options
       CALL Update_RCONST()
 
       CALL INTEGRATE( TIN = TSTART, TOUT = TSTART+DT, RSTATUS_U = RSTATE,
-     &                ICNTRL_U = ICNTRL, IERR_U = IERR, ISTATUS_U = ISTATUS )
+     &                ICNTRL_U = ICNTRL, RCNTRL_U = RCNTRL, IERR_U = IERR,
+     &                ISTATUS_U = ISTATUS )
 
       !~~~> End Time loop
       !C(:) = MAX(C(:),CONCMIN)

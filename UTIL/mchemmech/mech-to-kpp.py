@@ -423,8 +423,6 @@ outfile.write('\n')
 outfile.write('#ENDINLINE\n')
 
 outfile.write('#INLINE F90_RCONST\n')
-outfile.write('  USE MCHEM_CLOUDS, ONLY: UPDATE_GM1_GM2\n')
-outfile.write('\n')
 for falloff in rxfalloff:
     outfile.write('REAL(dp)  :: '+falloff+'\n')
 outfile.write('\n')

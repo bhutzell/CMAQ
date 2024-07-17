@@ -14,7 +14,7 @@ MODULE gas_Model
   USE gas_Jacobian
   USE gas_LinearAlgebra
   USE gas_Monitor
-!  USE gas_Util
+  USE gas_Util
 
 END MODULE gas_Model
 
