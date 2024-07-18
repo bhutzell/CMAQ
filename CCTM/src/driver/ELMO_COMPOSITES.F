@@ -20,7 +20,8 @@
       MODULE ELMO_COMPOSITES
 
       USE ELMO_DATA
-      USE RUNTIME_VARS, ONLY : LOGDEV, CMAQ_CHEM_CTRL
+      USE RUNTIME_VARS, ONLY : LOGDEV, CMAQ_CHEM_CTRL, 
+     &                         LOG_MESSAGE, LOG_SUBHEADING
 
       IMPLICIT NONE
  
@@ -50,8 +51,6 @@
 !     These data are checked for basic errors and compiled into a list
 !     so that they may be added to the ELMO_TABLE.
 !-------------------------------------------------------------------------
-
-      USE RUNTIME_VARS, ONLY : LOG_MESSAGE, LOG_SUBHEADING
 
       IMPLICIT NONE
 
@@ -154,6 +153,10 @@
      &                  'fix the Composite Variable Specification.', 1 )
       END IF
 
+
+      CALL LOG_MESSAGE( LOGDEV, 'Completed Reading ELMO Composites '//
+     &                             'from Mechanism-Spcific Namelist')
+
       CLOSE( UNIT = FUNIT )
 
       END SUBROUTINE ELMO_READ_COMPOSITES
@@ -188,7 +191,10 @@
      &         ELMO_TABLE( J )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
      &         ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
      &         ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
-             
+            
+            CALL LOG_MESSAGE( LOGDEV, '   Reading Composite: '//
+     &           TRIM( ELMO_TABLE( J )%OUT_NAME ) )
+
             ! Parse Formula from CMAQ Chemical Control Namelist
             CALL ELMO_PARSE_FORMULA( ID, N_VARS, COMPS, COEFFS )
 
@@ -482,8 +488,8 @@
       CHARACTER( 32 )  :: COMPS( N_MAX_COMPONENTS )
       REAL             :: COEFFS( N_MAX_COMPONENTS )
       CHARACTER( N_MAX_FORMULA ) :: FORMULA
-      INTEGER          :: IX, IY, IVAR, LENGTH
-      LOGICAL          :: LNEG
+      INTEGER          :: IX, IY, LENGTH
+      LOGICAL          :: LNEG, LEND
       CHARACTER( 1 )   :: CHR, CHR2
       CHARACTER( 1000 ) :: XMSG
       CHARACTER( 30 ),PARAMETER :: PNAME = 'ELMO_PARSE_FORMULA'
@@ -511,24 +517,28 @@
 
             ! Determine the coefficient of this component
             CALL ELMO_GETREAL( FORMULA, N_MAX_FORMULA, IX, LNEG,
-     &                         COEFFS( IVAR ) )
+     &                         COEFFS( ICMP ) )
 
             ! Determine the component name
             LENGTH = 0
+            LEND = .FALSE.
             IY = IX
-            DO WHILE ( IY .LT. N_MAX_FORMULA )
+            DO WHILE ( IY .LT. N_MAX_FORMULA .AND. .NOT.LEND )
                CHR2 = FORMULA( IY:IY )
 
                ! Check if this character is not a space or a sign
                IF ( CHR2 .NE. ' ' .AND. CHR2 .NE. '+' .AND. 
      &              CHR2 .NE. '-' ) THEN
                   LENGTH = LENGTH + 1
-                  COMPS( IVAR )( LENGTH:LENGTH ) = CHR
-                  IY = IY + 1
+                  COMPS( ICMP )( LENGTH:LENGTH ) = CHR
+               ELSE
+                  LEND = .TRUE.
                END IF
+               IY = IY + 1
             END DO
             IX = IY
- 
+         ELSE
+
          END IF
       END DO    
 

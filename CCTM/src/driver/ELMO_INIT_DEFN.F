@@ -29,7 +29,8 @@
       ! ELMO results, with maps to the calculation IDs and output file
       ! vectors.
 !-------------------------------------------------------------------------
-      
+   
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
       USE GRID_CONF, ONLY : NCOLS, NROWS
       USE ELMO_COMPOSITES, ONLY : ELMO_MAP_COMPOSITES, ELMO_READ_COMPOSITES
       USE AERO_DATA, ONLY : N_MODE
@@ -63,12 +64,15 @@
       CALL ELMO_READ_COMPOSITES()
 
       ! Initialize ELMO Table for all possible output variables
+      CALL LOG_MESSAGE( LOGDEV, 'Building ELMO Table' )
       CALL BUILD_ELMO_TABLE()
 
       ! Map All Table Variables to their components, if applicable
+      CALL LOG_MESSAGE( LOGDEV, 'Mapping ELMO Composites' )
       CALL ELMO_MAP_COMPOSITES()
 
       ! Map ELMO User Input to ELMO_TABLE
+      CALL LOG_MESSAGE( LOGDEV, 'Resolving ELMO Keyword Input' )
       CALL ELMO_KEYWORDS
 
       ! INSTANTANEOUS FILE INITIALIZATION
