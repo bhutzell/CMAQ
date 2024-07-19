@@ -504,7 +504,9 @@
       DO WHILE ( IX .LT. N_MAX_FORMULA )
          CHR = FORMULA( IX:IX ) 
 
-         IF ( CHR .NE. ' ' ) THEN
+         IF ( CHR .EQ. ' ' ) THEN
+            
+         ELSE
             N_VARS = N_VARS + 1
          
             ! Determine the sign of the coefficient 
