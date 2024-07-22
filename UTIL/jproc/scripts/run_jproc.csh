@@ -59,7 +59,7 @@
  set PROFpath   = $CMAQ_DATA # PROF input data
  set ETpath     = $CMAQ_DATA # ET input data
  set TOMSpath   = $CMAQ_DATA # TOMS input data
- set OUTDIR     = $BASE/jtable_${APPL}_${MECH}   # Output directory
+ set OUTDIR     = $BASE/jtable_${APPL}         # Output directory
 
 # =====================================================================
 #> Input Files
