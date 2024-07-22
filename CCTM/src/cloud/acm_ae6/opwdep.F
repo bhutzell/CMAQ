@@ -37,6 +37,7 @@
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE MIO_ASCII
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY : NP, NPMAX, SEN_PAR, SENNUM, S_WETDEPSPC
@@ -208,7 +209,21 @@ C Try to open existing wet deposition file for update
               END DO
 
               GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
+ 
+!...Store MIO Metadata
+              NDIMS3D( 1:NVARS3D ) = 3
+              L_TSTEP( 1:NVARS3D ) = .True.
+              L_LAY  ( 1:NVARS3D ) = .False.
+              L_COL  ( 1:NVARS3D ) = .True.
+              L_ROW  ( 1:NVARS3D ) = .True.
+              L_VEXT ( 1:NVARS3D ) = .False.
+              
+              CALL LOAD_MIO_FILE ( 'CTM_WET_DEP_1', 0, 0, 0,
+     &             VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &             VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &             L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &             L_VEXT(1:NVARS3D) )
+ 
 !...try to open the output file new
 
               IF ( .NOT. OPEN3( CTM_WET_DEP_1, FSNEW3, PNAME ) ) THEN
@@ -309,6 +324,21 @@ C...initialize the file descriptors
                FDESC3D( 1 ) = 'Sensitivity of hourly 1-layer '
      &                        // 'cross-point wet deposition '
      &                        // 'from all cloud types'
+
+               ! Store MIO Metadata
+               NDIMS3D( 1:NVARS3D ) = 3
+               L_TSTEP( 1:NVARS3D ) = .True.
+               L_LAY  ( 1:NVARS3D ) = .False.
+               L_COL  ( 1:NVARS3D ) = .True.
+               L_ROW  ( 1:NVARS3D ) = .True.
+               L_VEXT ( 1:NVARS3D ) = .False.
+
+               CALL LOAD_MIO_FILE ( 'CTM_SWETDEP_1', 0, 0, 0,
+     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &              L_VEXT(1:NVARS3D) )
+
 C...try to open the output file new
                IF ( .NOT. OPEN3( CTM_SWETDEP_1, FSNEW3, PNAME ) ) THEN
                   XMSG = 'Could not create '// CTM_SWETDEP_1 // ' file'
@@ -446,6 +476,20 @@ C...try to open the output file new
                  DO L = 2 , MXDESC3
                     FDESC3D( L ) = ' '
                  END DO
+
+!...Store MIO Metadata
+                 NDIMS3D( 1:NVARS3D ) = 3
+                 L_TSTEP( 1:NVARS3D ) = .True.
+                 L_LAY  ( 1:NVARS3D ) = .False.
+                 L_COL  ( 1:NVARS3D ) = .True.
+                 L_ROW  ( 1:NVARS3D ) = .True.
+                 L_VEXT ( 1:NVARS3D ) = .False.
+                 
+                 CALL LOAD_MIO_FILE ( 'CTM_WET_DEP_2', 0, 0, 0,
+     &                VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &                VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &                L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &                L_VEXT(1:NVARS3D) )
 
 !...try to open the diagnostic output file
 
