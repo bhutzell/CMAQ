@@ -50,6 +50,7 @@ C-----------------------------------------------------------------------
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE RXNS_DATA           ! chemical mechanism data
       USE UTILIO_DEFN
+      USE MIO_ASCII
 
       IMPLICIT NONE
 
