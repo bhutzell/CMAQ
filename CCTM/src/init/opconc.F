@@ -63,8 +63,6 @@ C-----------------------------------------------------------------------
       USE WVEL_DEFN             ! derived vertical velocity component
       USE STD_CONC              ! standard CONC
       USE UTILIO_DEFN
-      USE MIO_ASCII
-      USE RUNTIME_VARS, ONLY : CONC_BLEV, CONC_ELEV
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -240,20 +238,6 @@ C Set output file characteristics based on COORD.EXT and open it
          UNITS3D( VAR ) = 'Pa'
          VDESC3D( VAR ) = 'Air Pressure'
       END IF
-
-      ! Store MIO Metadata
-      NDIMS3D( 1:NVARS3D ) = 4
-      L_TSTEP( 1:NVARS3D ) = .True.
-      L_LAY  ( 1:NVARS3D ) = .True.
-      L_COL  ( 1:NVARS3D ) = .True.
-      L_ROW  ( 1:NVARS3D ) = .True.
-      L_VEXT ( 1:NVARS3D ) = .False.
-
-      CALL LOAD_MIO_FILE ( 'CTM_CONC_1', NLAYS3D, CONC_BLEV, CONC_ELEV,
-     &     VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D), 
-     &     VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D), 
-     &     L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &     L_VEXT(1:NVARS3D) )
 
 C create header
 

@@ -65,7 +65,6 @@ C sedi sub-timestep counter
          use noop_modules          ! stenex (using NOOP_UTIL_MODULE)
 #endif
 #endif
-         USE MIO_ASCII
 
          implicit none
          include SUBST_FILES_ID  ! file name parameters
@@ -158,21 +157,6 @@ C get CONC file header description
                   vdesc3d( v ) = 'gravitational settling velocity'
                end do
 
-               ! Store MIO Metadata
-               NDIMS3D( 1:NVARS3D ) = 4
-               L_TSTEP( 1:NVARS3D ) = .True.
-               L_LAY  ( 1:NVARS3D ) = .True.
-               L_COL  ( 1:NVARS3D ) = .True.
-               L_ROW  ( 1:NVARS3D ) = .True.
-               L_VEXT ( 1:NVARS3D ) = .False.
-
-               CALL LOAD_MIO_FILE ( 'CTM_VSED_DIAG', NLAYS3D, 1, NLAYS3D,
-     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &              L_VEXT(1:NVARS3D) )
-
-
                ok = open3( ctm_vsed_diag, fsnew3, pname )
                if ( .not. ok ) then
                   xmsg = 'could not create '// trim( ctm_vsed_diag ) // ' file'
@@ -231,21 +215,6 @@ C get CONC file header description
             units3d( v ) = ''
             vname3d( v ) = 'LPBL'
             vdesc3d( v ) = 'PBL top sigma layer'
-
-            ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 3
-            L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .True.
-            L_COL  ( 1:NVARS3D ) = .True.
-            L_ROW  ( 1:NVARS3D ) = .True.
-            L_VEXT ( 1:NVARS3D ) = .False.
-
-            CALL LOAD_MIO_FILE ( 'CTM_VDIFF_DIAG', NLAYS3D, 1, NLAYS3D,
-     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &           L_VEXT(1:NVARS3D) )
-
 
             ok = open3( ctm_vdiff_diag, fsnew3, pname )
             if ( .not. ok ) then

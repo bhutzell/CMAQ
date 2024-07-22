@@ -392,7 +392,6 @@ Ckrt deposition arrays for tagged species.....
             wdep_spc ( VAR ) = TR_WDEP( SPC )
          END DO
 #endif
-         RETURN ! Added for MIO Implementation
       END IF   ! FIRSTIME
 
       MDATE = JDATE

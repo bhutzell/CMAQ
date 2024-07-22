@@ -19,6 +19,12 @@
 !------------------------------------------------------------------------!
 
 
+C RCS file, release, date & time of last delta, author, state, [and locker]
+C $Header: /project/yoj/arc/CCTM/src/driver/yamo/wr_aconc.F,v 1.6 2011/10/21 16:10:43 yoj Exp $
+
+C what(1) key, module and SID; SCCS file; date and time of last delta:
+C %W% %P% %G% %U%
+
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE WR_ASENS ( JDATE, JTIME, TSTEP )
 

@@ -131,8 +131,7 @@ Ckrt Identify species index in ISAM array
       ppm2mole( :,:,: ) = DBLE( MAX( DENS( :,:,: ) * 1000. / MWAIR, 1e-10 ) )
       
       ! Sum up pre-process tags for each species at each grid cell
-c     ISAM0(:,:,:,:,:) = MAX( DBLE( ISAM(:,:,:,:,:) ), MIN_VAL )
-      ISAM0(:,:,:,:,:) = DBLE( ISAM(:,:,:,:,:) ) 
+      ISAM0(:,:,:,:,:) = MAX( DBLE( ISAM(:,:,:,:,:) ), MIN_VAL )
       ISAM1(:,:,:,:,:) = ISAM0(:,:,:,:,:)
       BULK0( :,:,:,: ) = SUM( ISAM0( :,:,:,:,: ),5 )
 
@@ -170,8 +169,7 @@ c     ISAM0(:,:,:,:,:) = MAX( DBLE( ISAM(:,:,:,:,:) ), MIN_VAL )
                      IF ( AERO_COND( C,R,L,CAER(3) ) .GT. 0.0 ) THEN 
                         ! Condensation - Gas-phase drives attribution
                         TAG_FRAC( C,R,L ) = MIN( TAG_FRAC( C,R,L ), 
-c    &                                           ISAM1( C,R,L,JGAS,K )-MIN_VAL )
-     &                                           ISAM1( C,R,L,JGAS,K ) )
+     &                                           ISAM1( C,R,L,JGAS,K )-MIN_VAL )
                         ISAM1( C,R,L,JAER(3),K ) = 
      &                         ISAM1( C,R,L,JAER(3),K ) + TAG_FRAC( C,R,L ) 
                         ISAM1( C,R,L,JGAS,K ) = 
@@ -179,8 +177,7 @@ c    &                                           ISAM1( C,R,L,JGAS,K )-MIN_VAL )
                      ELSE   
                         ! Evaporation - Aerosol drives attribution
                         TAG_FRAC2( C,R,L ) = MIN( TAG_FRAC2( C,R,L ), 
-c    &                                           ISAM1( C,R,L,JAER(3),K )-MIN_VAL )
-     &                                           ISAM1( C,R,L,JAER(3),K ) )
+     &                                           ISAM1( C,R,L,JAER(3),K )-MIN_VAL )
                         ISAM1( C,R,L,JAER(3),K ) = 
      &                         ISAM1( C,R,L,JAER(3),K ) - TAG_FRAC2( C,R,L )
                         ISAM1( C,R,L,JGAS,K ) = 

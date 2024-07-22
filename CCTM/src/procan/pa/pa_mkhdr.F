@@ -30,7 +30,6 @@ C   16 Sep 16 J.Young: update for inline procan
       USE UTILIO_DEFN
       USE PA_DEFN               ! Process Anaylsis control and data variables
       USE PAGRD_DEFN            ! PA horiz domain specs
-      USE MIO_ASCII
 
       IMPLICIT NONE
 
@@ -149,22 +148,6 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &        'Incorrect process analysis type specified', 2 )
 
       END IF
-
-      ! Store MIO Metadata
-      NDIMS3D( 1:NVARS3D ) = 4
-      L_TSTEP( 1:NVARS3D ) = .True.
-      L_LAY  ( 1:NVARS3D ) = .True.
-      L_COL  ( 1:NVARS3D ) = .True.
-      L_ROW  ( 1:NVARS3D ) = .True.
-      L_VEXT ( 1:NVARS3D ) = .False.
-
-      CALL LOAD_MIO_FILE ( OUTFNAME, NLAYS3D, PA_BEGLEV, PA_ENDLEV,
-     &     VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &     VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &     L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &     L_VEXT(1:NVARS3D) )
-
-
 #endif
 
       RETURN

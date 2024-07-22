@@ -41,7 +41,6 @@ C-----------------------------------------------------------------------
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE CGRID_SPCS            ! CGRID species number and offsets
       USE UTILIO_DEFN
-      USE RUNTIME_VARS, ONLY : RUNLEN
 
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -50,7 +49,6 @@ C-----------------------------------------------------------------------
 #endif
 
       USE DDM3D_DEFN
-      USE MIO_ASCII
 
       IMPLICIT NONE
 
@@ -75,8 +73,7 @@ C Local variables:
       REAL( 8 ) :: XCENT_RF, YCENT_RF
       REAL( 8 ) :: XORIG_RF, YORIG_RF
       REAL( 8 ) :: XCELL_RF, YCELL_RF
-      INTEGER VGTYP_RF
-      INTEGER, SAVE :: EDATE, ETIME
+      INTEGER VGTYP_RF 
       REAL VGTOP_RF
 
 c     INTEGER, SAVE :: LOGDEV       ! FORTRAN unit number for log file
@@ -85,7 +82,7 @@ c     INTEGER, SAVE :: LOGDEV       ! FORTRAN unit number for log file
 
 c     CHARACTER( 8 )  :: SPCNAME
 
-      REAL, SAVE, ALLOCATABLE :: WRBUFF(:,:,:,:)
+      REAL, POINTER :: WRBUFF(:,:,:,:)
       INTEGER :: c, r, s, d, i
 
       LOGICAL, EXTERNAL :: FLUSH3
@@ -126,12 +123,8 @@ C Get default file header attibutes from CONC file (assumes file already open)
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
 
-               EDATE = JDATE
-               ETIME = JTIME
-               CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
-
-               SDATE3D = EDATE
-               STIME3D = ETIME
+               SDATE3D = JDATE
+               STIME3D = JTIME
 
 C Get SENGRID nvars
 
@@ -164,7 +157,7 @@ C Gas species
                      VTYPE3D( VAR ) = M3REAL
                      VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                      UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
 
@@ -176,7 +169,7 @@ C RHOJ - should be zero
                   VTYPE3D( VAR ) = M3REAL
                   VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                   UNITS3D( VAR ) = 'm*Kg/m**3'
-                  VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
+                  VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
                END DO
 
 C Aerosol species
@@ -194,7 +187,7 @@ C Aerosol species
                      ELSE
                         UNITS3D( VAR ) = 'micrograms/m**3'
                      END IF
-                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
 
@@ -207,7 +200,7 @@ C NR species
                      VTYPE3D( VAR ) = M3REAL
                      VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                      UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
 
@@ -220,23 +213,9 @@ c TR species
                      VTYPE3D( VAR ) = M3REAL
                      VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
                      UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
+                     VDESC3D( VAR ) = 'Sens of ' // SPCNAME // ' to ' // SEN_PAR( NP )
                   END DO
                END DO
-
-               ! Store MIO Metadata
-               NDIMS3D( 1:NVARS3D ) = 4
-               L_TSTEP( 1:NVARS3D ) = .True.
-               L_LAY  ( 1:NVARS3D ) = .True.
-               L_COL  ( 1:NVARS3D ) = .True.
-               L_ROW  ( 1:NVARS3D ) = .True.
-               L_VEXT ( 1:NVARS3D ) = .False.
-
-               CALL LOAD_MIO_FILE ( 'CTM_SENS_1', NLAYS3D, 1, NLAYS3D,
-     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &              L_VEXT(1:NVARS3D) )
 
 c open the file
 
@@ -331,8 +310,6 @@ c           IF ( MYPE .EQ. 0 ) THEN
 
 c         CALL SUBST_BARRIER
 
-         RETURN   ! MIO Initialization
-
       END IF   ! FIRSTIME
 
 
@@ -371,10 +348,17 @@ c         CALL SUBST_BARRIER
       END IF
 #else
 
+#ifdef parallel
+      IF ( .NOT. PTRWRITE3( CTM_SENS_1, ALLVAR3, JDATE, JTIME, WRBUFF ) ) THEN
+         XMSG = 'Could not write SENGRID'
+         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+      END IF
+#else
       IF ( .NOT. WRITE3( CTM_SENS_1, ALLVAR3, JDATE, JTIME, WRBUFF ) ) THEN
          XMSG = 'Could not write SENGRID'
          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
       END IF
+#endif
 
 #endif
 

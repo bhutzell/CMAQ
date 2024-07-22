@@ -258,7 +258,7 @@ C Allocate and initialize dry deposition array
 
          CALL LOG_HEADING( LOGDEV, "Initialize Emissions Module" )
 
-         IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP ) ) THEN
+         IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP( 1 ) ) ) THEN
             XMSG = 'Failure initializing emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
@@ -329,7 +329,6 @@ C Set up for grav. settling
             END IF
          END DO
 
-         RETURN ! Added for MIO implementation
       END IF   !  if Firstime
 
       MDATE = JDATE

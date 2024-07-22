@@ -29,9 +29,8 @@
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE AVG_CONC              ! integral average CONC
       USE UTILIO_DEFN
-      USE MIO_ASCII
 #ifndef mpas
-#ifdef parallel    
+#ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
@@ -224,21 +223,6 @@
      &                SPC, VNAME3D( SPC )
             END DO
 
-            ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 4
-            L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .True.
-            L_COL  ( 1:NVARS3D ) = .True.
-            L_ROW  ( 1:NVARS3D ) = .True.
-            L_VEXT ( 1:NVARS3D ) = .False.
-            
-            CALL LOAD_MIO_FILE ( 'A_CONC_1', NLAYS3D, ACONC_BLEV, ACONC_ELEV,
-     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D), 
-     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D), 
-     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D), L_ROW(1:NVARS3D),
-     &           L_VEXT(1:NVARS3D) )
-
-            ! Open Output File
             IF ( .NOT. OPEN3( A_CONC_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not open '
      &              // TRIM( A_CONC_1 ) // ' file'

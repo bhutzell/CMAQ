@@ -50,7 +50,6 @@ C-----------------------------------------------------------------------
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE UTILIO_DEFN
       USE DESID_VARS, ONLY : DESID_LAYS
-      USE MIO_ASCII
 
       IMPLICIT NONE
  
@@ -128,21 +127,6 @@ C Set output file characteristics based on GRID_CONF module and open the 3D emis
       FDESC3D( 1 ) = 'gridded hourly point source layered emissions'
       FDESC3D( 2 ) = '/From/ ' // PNAME
       FDESC3D( 3 ) = '/Version/ Inline'
-
-      ! Store MIO Metadata
-      NDIMS3D( 1:NVARS3D ) = 4
-      L_TSTEP( 1:NVARS3D ) = .True.
-      L_LAY  ( 1:NVARS3D ) = .True.
-      L_COL  ( 1:NVARS3D ) = .True.
-      L_ROW  ( 1:NVARS3D ) = .True.
-      L_VEXT ( 1:NVARS3D ) = .False.
-
-      CALL LOAD_MIO_FILE ( PT3DNAME, NLAYS3D, 1, NLAYS3D,
-     &     VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &     VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &     L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &     L_VEXT(1:NVARS3D) )
-
 
 C create header
 

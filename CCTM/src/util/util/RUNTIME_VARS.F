@@ -140,11 +140,9 @@
       ! General; Multiprocess control, output and error checking
       LOGICAL :: PRINT_PROC_TIME = .FALSE. ! Flag to print elapsed time for all 
                                            ! science submodules
-      LOGICAL :: FL_ERR_STOP=.TRUE.        ! Flag to stop run if errors are found.
-      LOGICAL :: CKSUM     = .TRUE.        ! flag for cksum on, default = [T]
-      LOGICAL :: END_TIME  = .FALSE.       ! Override default beginning ACON timestamp
-      LOGICAL :: CTM_MIO_FILE = .FALSE.    ! Flag to write out ascii file that informs MIO 
-                                           !   about output file metadata
+      LOGICAL :: FL_ERR_STOP=.TRUE.  ! Flag to stop run if errors are found.
+      LOGICAL :: CKSUM     = .TRUE.  ! flag for cksum on, default = [T]
+      LOGICAL :: END_TIME  = .FALSE. ! Override default beginning ACON timestamp
       
       INTEGER :: N_ACONC_VARS = 0    ! Number of species saved to avg conc file
       INTEGER :: N_CONC_VARS  = 0    ! Number of species saved to conc file
@@ -450,9 +448,6 @@
 
       ! FL_ERR_STOP
       CALL GET_ENV ( FL_ERR_STOP, 'FL_ERR_STOP', FL_ERR_STOP, VARDEV )  
-
-      ! PRINT MIO INPUT FILE
-      CALL GET_ENV ( CTM_MIO_FILE, 'CTM_MIO_FILE', CTM_MIO_FILE, VARDEV )  
 
       ! CKSUM
       CALL GET_ENV ( CKSUM, 'CTM_CKSUM', CKSUM, VARDEV )

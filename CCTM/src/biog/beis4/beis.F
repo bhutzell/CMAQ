@@ -65,7 +65,7 @@ C Pathname: $Source: /project/yoj/arc/CCTM/src/biog/beis3/beis3.f,v $
 C Last updated: $Date: 2011/10/21 16:10:17 $
 C-----------------------------------------------------------------------
 
-      USE BEIS_DEFN, ONLY: NSEF, NLAI, LAITYPES
+      USE BIOG_EMIS, ONLY: NSEF, NLAI, LAITYPES
       Use ASX_DATA_MOD
 
       IMPLICIT NONE

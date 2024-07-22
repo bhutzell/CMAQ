@@ -124,7 +124,6 @@
          USE CENTRALIZED_IO_MODULE, only : RCA_AVAIL, ICCG_SUM, ICCG_WIN,
      &                                     FILE_TSTEP, F_MET, F_LTNG,
      &                                     LT_NAME, FILE_XCELL, FILE_YCELL
-         USE MIO_ASCII
 
 #ifdef twoway
          USE twoway_data_module
@@ -298,34 +297,6 @@
                FDESC3D( 2 ) = '/from/ ' // PNAME
                FDESC3D( 3 ) = '/Version/ CMAQ'
 
-               ! Store MIO Metadata
-               NDIMS3D( 1:NVARS3D ) = 4
-               L_TSTEP( 1:NVARS3D ) = .True.
-               L_LAY  ( 1:NVARS3D ) = .True.
-               L_COL  ( 1:NVARS3D ) = .True.
-               L_ROW  ( 1:NVARS3D ) = .True.
-               L_VEXT ( 1:NVARS3D ) = .False.
-          
-               CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_1', NLAYS3D, 1, NLAYS3D,
-     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &              L_VEXT(1:NVARS3D) )
-               
-               ! Store MIO Metadata
-               NDIMS3D( 1:NVARS3D ) = 3
-               L_TSTEP( 1:NVARS3D ) = .True.
-               L_LAY  ( 1:NVARS3D ) = .False.
-               L_COL  ( 1:NVARS3D ) = .True.
-               L_ROW  ( 1:NVARS3D ) = .True.
-               L_VEXT ( 1:NVARS3D ) = .False.
-               
-               CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_2', 0, 0, 0,
-     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &              L_VEXT(1:NVARS3D) )
-               
 !C Open output file (mol s-1)
                IF ( IO_PE_INCLUSIVE ) THEN
                   IF ( .NOT. OPEN3( CTM_LTNGDIAG_1, FSUNKN3, PNAME ) ) THEN
