@@ -39,7 +39,7 @@ C=======================================================================
 
          USE HGRD_DEFN
          USE CGRID_SPCS          ! CGRID mechanism species
-         USE BIOG_EMIS           ! from beis
+         USE BEIS_DEFN           ! from beis
          USE centralized_io_module, only : soilinp_setup
          USE MEGAN_GSPRO
 #ifdef mpas
