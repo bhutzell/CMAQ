@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /work/MOD3DEV/tskipper/cracmm3/20240605_styO3NO3/add_rxns/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
+! Source file: /work/MOD3DEV/tskipper/cracmm3/20240724_styO3NO3/add_CO2/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
 ! for Mechanism Name: CRACMM3                         
 
 ! This file is used to create mechanism data and functions
@@ -86,8 +86,8 @@
 
       CHARACTER( 32 ), PARAMETER :: MECHNAME = 'CRACMM3'
 
-      INTEGER, PARAMETER :: N_GAS_CHEM_SPC = 179
-      INTEGER, PARAMETER :: NUMB_MECH_SPC  = 189
+      INTEGER, PARAMETER :: N_GAS_CHEM_SPC = 180
+      INTEGER, PARAMETER :: NUMB_MECH_SPC  = 190
 
       CHARACTER( 16 ) :: GAS_CHEM_SPC( N_GAS_CHEM_SPC )
       CHARACTER( 16 ) :: CHEMISTRY_SPC( NUMB_MECH_SPC )
@@ -281,6 +281,7 @@
       DATA GAS_CHEM_SPC( 177 ) / 'ECH4            ' /
       DATA GAS_CHEM_SPC( 178 ) / 'STY             ' /
       DATA GAS_CHEM_SPC( 179 ) / 'STYP            ' /
+      DATA GAS_CHEM_SPC( 180 ) / 'CO2             ' /
 
 
 
@@ -363,7 +364,7 @@
       & MEMBER("ETH             ",   46, "GC",   30.10D0, F), &
       & MEMBER("HC3             ",   47, "GC",   44.10D0, F), &
       & MEMBER("HC3P            ",   48, "GC",   75.00D0, F), &
-      & MEMBER("ASOATJ          ",  193, "AE",  200.00D0, T), &
+      & MEMBER("ASOATJ          ",  194, "AE",  200.00D0, T), &
       & MEMBER("HC5             ",   49, "GC",   72.10D0, F), &
       & MEMBER("HC5P            ",   50, "GC",  103.00D0, F), &
       & MEMBER("ETE             ",   54, "GC",   28.10D0, F), &
@@ -452,13 +453,13 @@
       & MEMBER("SESQRO2         ",  138, "GC",  253.40D0, F), &
       & MEMBER("VROCP0OXY2      ",  173, "GC",  242.40D0, F), &
       & MEMBER("VROCP1OXY3      ",  176, "GC",  202.30D0, F), &
-      & MEMBER("AGLYJ           ",  194, "AE",   66.40D0, T), &
+      & MEMBER("AGLYJ           ",  195, "AE",   66.40D0, T), &
       & MEMBER("IEPOXP          ",  110, "GC",  118.10D0, F), &
-      & MEMBER("AISO3NOSJ       ",  268, "AE",  136.20D0, T), &
-      & MEMBER("ASO4J           ",  185, "AE",   96.00D0, T), &
-      & MEMBER("AISO3OSJ        ",  269, "AE",  216.20D0, T), &
-      & MEMBER("AISO4J          ",  270, "AE",  168.10D0, T), &
-      & MEMBER("AISO5J          ",  271, "AE",  150.10D0, T), &
+      & MEMBER("AISO3NOSJ       ",  269, "AE",  136.20D0, T), &
+      & MEMBER("ASO4J           ",  186, "AE",   96.00D0, T), &
+      & MEMBER("AISO3OSJ        ",  270, "AE",  216.20D0, T), &
+      & MEMBER("AISO4J          ",  271, "AE",  168.10D0, T), &
+      & MEMBER("AISO5J          ",  272, "AE",  150.10D0, T), &
       & MEMBER("VROCP6ALK       ",  154, "GC",  184.37D0, F), &
       & MEMBER("VROCP6ALKP      ",  160, "GC",  215.36D0, F), &
       & MEMBER("VROCP5ALK       ",  153, "GC",  198.39D0, F), &
@@ -494,11 +495,12 @@
       & MEMBER("VROCP5OXY1      ",  180, "GC",  170.30D0, F), &
       & MEMBER("VROCP6OXY1      ",  181, "GC",  142.20D0, F), &
       & MEMBER("ECH4            ",  182, "GC",   16.00D0, F), &
-      & MEMBER("ATRPNJ          ",  272, "AE",  215.00D0, T), &
-      & MEMBER("AHOMJ           ",  195, "AE",  250.00D0, T), &
-      & MEMBER("AHONITJ         ",  273, "AE",  265.00D0, T), &
+      & MEMBER("ATRPNJ          ",  273, "AE",  215.00D0, T), &
+      & MEMBER("AHOMJ           ",  196, "AE",  250.00D0, T), &
+      & MEMBER("AHONITJ         ",  274, "AE",  265.00D0, T), &
       & MEMBER("STY             ",   69, "GC",  104.00D0, F), &
-      & MEMBER("STYP            ",   73, "GC",  153.00D0, F) /)
+      & MEMBER("STYP            ",   73, "GC",  153.00D0, F), &
+      & MEMBER("CO2             ",  183, "GC",   44.00D0, F) /)
 
       DATA CHEMISTRY_SPC(   1 ), SPECIES_MOLWT(   1 ) / 'O3              ',   48.00D0 /
       DATA CHEMISTRY_SPC(   2 ), SPECIES_MOLWT(   2 ) / 'O3P             ',   16.00D0 /
@@ -689,6 +691,7 @@
       DATA CHEMISTRY_SPC( 187 ), SPECIES_MOLWT( 187 ) / 'AHONITJ         ',  265.00D0 /
       DATA CHEMISTRY_SPC( 188 ), SPECIES_MOLWT( 188 ) / 'STY             ',  104.00D0 /
       DATA CHEMISTRY_SPC( 189 ), SPECIES_MOLWT( 189 ) / 'STYP            ',  153.00D0 /
+      DATA CHEMISTRY_SPC( 190 ), SPECIES_MOLWT( 190 ) / 'CO2             ',   44.00D0 /
 
 
       DATA CGRID_INDEX(   1 ), SPECIES_TYPE(   1 ), CONVERT_CONC(   1 ) /    1, 'GC', F /  ! O3
@@ -744,7 +747,7 @@
       DATA CGRID_INDEX(  51 ), SPECIES_TYPE(  51 ), CONVERT_CONC(  51 ) /   46, 'GC', F /  ! ETH
       DATA CGRID_INDEX(  52 ), SPECIES_TYPE(  52 ), CONVERT_CONC(  52 ) /   47, 'GC', F /  ! HC3
       DATA CGRID_INDEX(  53 ), SPECIES_TYPE(  53 ), CONVERT_CONC(  53 ) /   48, 'GC', F /  ! HC3P
-      DATA CGRID_INDEX(  54 ), SPECIES_TYPE(  54 ), CONVERT_CONC(  54 ) /  193, 'AE', T /  ! ASOATJ
+      DATA CGRID_INDEX(  54 ), SPECIES_TYPE(  54 ), CONVERT_CONC(  54 ) /  194, 'AE', T /  ! ASOATJ
       DATA CGRID_INDEX(  55 ), SPECIES_TYPE(  55 ), CONVERT_CONC(  55 ) /   49, 'GC', F /  ! HC5
       DATA CGRID_INDEX(  56 ), SPECIES_TYPE(  56 ), CONVERT_CONC(  56 ) /   50, 'GC', F /  ! HC5P
       DATA CGRID_INDEX(  57 ), SPECIES_TYPE(  57 ), CONVERT_CONC(  57 ) /   54, 'GC', F /  ! ETE
@@ -833,13 +836,13 @@
       DATA CGRID_INDEX( 140 ), SPECIES_TYPE( 140 ), CONVERT_CONC( 140 ) /  138, 'GC', F /  ! SESQRO2
       DATA CGRID_INDEX( 141 ), SPECIES_TYPE( 141 ), CONVERT_CONC( 141 ) /  173, 'GC', F /  ! VROCP0OXY2
       DATA CGRID_INDEX( 142 ), SPECIES_TYPE( 142 ), CONVERT_CONC( 142 ) /  176, 'GC', F /  ! VROCP1OXY3
-      DATA CGRID_INDEX( 143 ), SPECIES_TYPE( 143 ), CONVERT_CONC( 143 ) /  194, 'AE', T /  ! AGLYJ
+      DATA CGRID_INDEX( 143 ), SPECIES_TYPE( 143 ), CONVERT_CONC( 143 ) /  195, 'AE', T /  ! AGLYJ
       DATA CGRID_INDEX( 144 ), SPECIES_TYPE( 144 ), CONVERT_CONC( 144 ) /  110, 'GC', F /  ! IEPOXP
-      DATA CGRID_INDEX( 145 ), SPECIES_TYPE( 145 ), CONVERT_CONC( 145 ) /  268, 'AE', T /  ! AISO3NOSJ
-      DATA CGRID_INDEX( 146 ), SPECIES_TYPE( 146 ), CONVERT_CONC( 146 ) /  185, 'AE', T /  ! ASO4J
-      DATA CGRID_INDEX( 147 ), SPECIES_TYPE( 147 ), CONVERT_CONC( 147 ) /  269, 'AE', T /  ! AISO3OSJ
-      DATA CGRID_INDEX( 148 ), SPECIES_TYPE( 148 ), CONVERT_CONC( 148 ) /  270, 'AE', T /  ! AISO4J
-      DATA CGRID_INDEX( 149 ), SPECIES_TYPE( 149 ), CONVERT_CONC( 149 ) /  271, 'AE', T /  ! AISO5J
+      DATA CGRID_INDEX( 145 ), SPECIES_TYPE( 145 ), CONVERT_CONC( 145 ) /  269, 'AE', T /  ! AISO3NOSJ
+      DATA CGRID_INDEX( 146 ), SPECIES_TYPE( 146 ), CONVERT_CONC( 146 ) /  186, 'AE', T /  ! ASO4J
+      DATA CGRID_INDEX( 147 ), SPECIES_TYPE( 147 ), CONVERT_CONC( 147 ) /  270, 'AE', T /  ! AISO3OSJ
+      DATA CGRID_INDEX( 148 ), SPECIES_TYPE( 148 ), CONVERT_CONC( 148 ) /  271, 'AE', T /  ! AISO4J
+      DATA CGRID_INDEX( 149 ), SPECIES_TYPE( 149 ), CONVERT_CONC( 149 ) /  272, 'AE', T /  ! AISO5J
       DATA CGRID_INDEX( 150 ), SPECIES_TYPE( 150 ), CONVERT_CONC( 150 ) /  154, 'GC', F /  ! VROCP6ALK
       DATA CGRID_INDEX( 151 ), SPECIES_TYPE( 151 ), CONVERT_CONC( 151 ) /  160, 'GC', F /  ! VROCP6ALKP
       DATA CGRID_INDEX( 152 ), SPECIES_TYPE( 152 ), CONVERT_CONC( 152 ) /  153, 'GC', F /  ! VROCP5ALK
@@ -875,11 +878,12 @@
       DATA CGRID_INDEX( 182 ), SPECIES_TYPE( 182 ), CONVERT_CONC( 182 ) /  180, 'GC', F /  ! VROCP5OXY1
       DATA CGRID_INDEX( 183 ), SPECIES_TYPE( 183 ), CONVERT_CONC( 183 ) /  181, 'GC', F /  ! VROCP6OXY1
       DATA CGRID_INDEX( 184 ), SPECIES_TYPE( 184 ), CONVERT_CONC( 184 ) /  182, 'GC', F /  ! ECH4
-      DATA CGRID_INDEX( 185 ), SPECIES_TYPE( 185 ), CONVERT_CONC( 185 ) /  272, 'AE', T /  ! ATRPNJ
-      DATA CGRID_INDEX( 186 ), SPECIES_TYPE( 186 ), CONVERT_CONC( 186 ) /  195, 'AE', T /  ! AHOMJ
-      DATA CGRID_INDEX( 187 ), SPECIES_TYPE( 187 ), CONVERT_CONC( 187 ) /  273, 'AE', T /  ! AHONITJ
+      DATA CGRID_INDEX( 185 ), SPECIES_TYPE( 185 ), CONVERT_CONC( 185 ) /  273, 'AE', T /  ! ATRPNJ
+      DATA CGRID_INDEX( 186 ), SPECIES_TYPE( 186 ), CONVERT_CONC( 186 ) /  196, 'AE', T /  ! AHOMJ
+      DATA CGRID_INDEX( 187 ), SPECIES_TYPE( 187 ), CONVERT_CONC( 187 ) /  274, 'AE', T /  ! AHONITJ
       DATA CGRID_INDEX( 188 ), SPECIES_TYPE( 188 ), CONVERT_CONC( 188 ) /   69, 'GC', F /  ! STY
       DATA CGRID_INDEX( 189 ), SPECIES_TYPE( 189 ), CONVERT_CONC( 189 ) /   73, 'GC', F /  ! STYP
+      DATA CGRID_INDEX( 190 ), SPECIES_TYPE( 190 ), CONVERT_CONC( 190 ) /  183, 'GC', F /  ! CO2
 
 ! The below integers define the locations of mechanism species in the solver
 ! concentration array.
@@ -1073,8 +1077,9 @@
       INTEGER :: INDEX_AHONITJ     =  187
       INTEGER :: INDEX_STY         =  188
       INTEGER :: INDEX_STYP        =  189
+      INTEGER :: INDEX_CO2         =  190
 
-      INTEGER, PARAMETER :: N_ACT_SP = 189
+      INTEGER, PARAMETER :: N_ACT_SP = 190
 
       INTEGER, PARAMETER :: NRXNS = 533
 
@@ -1263,7 +1268,7 @@
      &      0,    0,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
      &      0,    0,    0/     !  3   
 
-      INTEGER, PARAMETER :: NTERMS_JACOB =    35721
+      INTEGER, PARAMETER :: NTERMS_JACOB =    36100
 
       INTEGER, PARAMETER :: NSTEPS_JACOB =     1066
 
@@ -2066,7 +2071,7 @@
      &     33,    0,   35,   35,    0,    0,   33,    0,   35,   35, & ! 9   
      &      0,    0,  123,    0,   35,   35,   18,  166,  125,   17, & ! O   
      &    141,  125,  124,  125,  141,  125,  125,  141,  168,  142, & ! 1   
-     &    124,   15,    0,    0,    0,    0,    0,    0,    0,    0, & ! 2   
+     &    124,   15,    0,    0,    0,    0,  190,    0,    0,    0, & ! 2   
      &      0,    0,    0/     !  3   
 
       DATA ( IRR( IRXXN, 12 ), IRXXN = 1, NRXNS ) / & 
@@ -4422,7 +4427,7 @@
      &     1.0400D-02, 2.9100D-02, 5.3500D-02, 3.0700D-02, 7.0000D-04, & ! 1   
      &     2.9200D-02, 1.3370D-01, 1.5500D-02, 7.3000D-03, 1.0380D-01, & ! +   
      &     1.3840D-01, 2.2660D-01, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 2   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
+     &     0.0000D+00, 2.0000D-01, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00/           !        3   
 
       DATA ( SC( IRXXN,  9 ), IRXXN = 1, NRXNS ) / & 
@@ -6717,7 +6722,7 @@
      &     10,    7,    8,    8,    3,    3,   10,    7,    8,    8, & ! 9   
      &      3,    3,    9,    7,    8,    8,   10,   23,   27,   13, & ! O   
      &     25,   28,   21,   27,   25,   28,   28,   27,   25,   26, & ! 1   
-     &     23,   13,    1,    2,    2,    1,    7,    2,    1,    4, & ! 2   
+     &     23,   13,    1,    2,    2,    1,    8,    2,    1,    4, & ! 2   
      &      4,    4,    5/     !  3   
 
       INTEGER, PARAMETER :: MHETERO =  11

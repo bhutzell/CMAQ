@@ -156,6 +156,8 @@ END ELIMINATE
 
 
 
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -1373,8 +1375,8 @@ REACTIONS[CM] =
 ! MCM-based styrene chemistry
 <ROCARO71> STY + HO = STYP # 5.8E-11;
 <ROCARO71a> STY + O3 = 0.620*BALD + 0.620*HCHO + 0.560*CO + 0.280*HO2 
-                     + 0.360*HO + 0.280*BAL2 + 0.100*BEN  
-                     + 0.2000*DELTA_C # 1.7E-17;                     
+                     + 0.360*HO + 0.280*BAL2 + 0.100*BEN + 0.200*CO2  
+                     + 0.0000*DELTA_C # 1.7E-17;                     
 <ROCARO71b> STY + NO3 = NO2 + STYP # 1.5E-12;
 <ROCARO72> STYP + HO2 = VROCP3OXY2  - 3.0000*DELTA_C # 2.91E-12 @ -1300;
 <ROCARO73> STYP + NO = NO2 + HO2 + HCHO + BALD # 2.70E-12 @ -360;

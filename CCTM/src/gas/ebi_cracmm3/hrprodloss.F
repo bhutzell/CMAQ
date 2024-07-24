@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Jun  5, 2024
+C  REVISION HISTORY: Created by EBI solver program, Jul 24, 2024
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 
@@ -2480,6 +2480,9 @@ C***********************************************************************
      &                     +                 RXRAT(   531 )      ! STYP+NO3=NO2+HO2+HCHO+BALD
      &                     +                 RXRAT(   532 )      ! STYP+MO2=0.1370D+01*HO2+...
      &                     +                 RXRAT(   533 )      ! STYP+ACO3=HO2+HCHO+BALD+...
+
+      PROD(  CO2         ) =    2.0000D-01 * RXRAT(   527 )      ! STY+O3=0.2000D+00*CO2+...
+      LOSS(  CO2         ) =   0.0D0
 
       RETURN
 

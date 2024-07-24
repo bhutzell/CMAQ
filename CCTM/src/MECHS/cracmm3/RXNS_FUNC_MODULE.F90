@@ -1870,5 +1870,6 @@
              INDEX_AHONITJ     = IOLD2NEW( INDEX_AHONITJ    , 1 )
              INDEX_STY         = IOLD2NEW( INDEX_STY        , 1 )
              INDEX_STYP        = IOLD2NEW( INDEX_STYP       , 1 )
+             INDEX_CO2         = IOLD2NEW( INDEX_CO2        , 1 )
           END SUBROUTINE RESET_SPECIES_POINTERS
        END MODULE RXNS_FUNCTION
