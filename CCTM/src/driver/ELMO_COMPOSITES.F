@@ -91,6 +91,8 @@
       END IF
 
       ! Read the number of ELMO Composite Variables
+      N_COMPOSITES = 0
+      N_MAX_COMPONENTS = 1
       REWIND( FUNIT )
       READ( NML = COMPOSITE_INIT, UNIT = FUNIT, IOSTAT=IOST )
       IF ( IOST .EQ. -1 ) THEN
@@ -100,8 +102,6 @@
      &           'check the CMAQ Chemical Control Namelist file.'
           CALL LOG_MESSAGE( LOGDEV, ' ')
           CALL LOG_MESSAGE( LOGDEV, XMSG )
-          N_COMPOSITES = 0
-          N_MAX_COMPONENTS = 1
 
       ELSE IF ( IOST .NE. 0 ) THEN
           ! Read Error detected for COMPOSITES_INIT
@@ -488,60 +488,77 @@
       CHARACTER( 32 )  :: COMPS( N_MAX_COMPONENTS )
       REAL             :: COEFFS( N_MAX_COMPONENTS )
       CHARACTER( N_MAX_FORMULA ) :: FORMULA
-      INTEGER          :: IX, IY, LENGTH
-      LOGICAL          :: LNEG, LEND
+      INTEGER          :: IX, IY, LENGTH, ICHR, ICHR2
+      LOGICAL          :: LNEG, LEND, LCOEFF
       CHARACTER( 1 )   :: CHR, CHR2
       CHARACTER( 1000 ) :: XMSG
       CHARACTER( 30 ),PARAMETER :: PNAME = 'ELMO_PARSE_FORMULA'
 
       FORMULA = CMPST( ICMP )%FORMULA
 
-      COMPS( : ) = ''
-      COEFFS( : ) = 1.0
+      COMPS( 1:N_MAX_COMPONENTS ) = ''
+      COEFFS( 1:N_MAX_COMPONENTS ) = 1.0
       N_VARS = 0
       LNEG = .FALSE.
+      LCOEFF = .FALSE.
       IX = 1
       DO WHILE ( IX .LT. N_MAX_FORMULA )
          CHR = FORMULA( IX:IX ) 
+         ICHR = ICHAR( CHR )
 
          IF ( CHR .EQ. ' ' ) THEN
-            
-         ELSE
-            N_VARS = N_VARS + 1
+            ! This is a space so proceed to the next character
+
+         ELSE IF ( CHR .EQ. '-' ) THEN
+            ! The next variable should be negative 
+            LNEG = .TRUE.
          
-            ! Determine the sign of the coefficient 
-            IF ( CHR .EQ. '-' ) THEN
-               LNEG = .TRUE.
-               IX = IX + 1
-            ELSE IF ( CHR .EQ. '+' ) THEN
-               IX = IX + 1
+         ELSE IF ( CHR .EQ. '+' ) THEN
+            ! The next variable should be positive. 
+            ! Proceed on.
+
+         ELSE IF ( ICHR .GE. 48 .AND. ICHR .LE. 57 ) THEN
+            ! This is a number. Find out what it is.
+            ! Determine the coefficient of this component.
+            N_VARS = N_VARS + 1
+            LCOEFF = .TRUE.
+            CALL ELMO_GETREAL( FORMULA, N_MAX_FORMULA, IX, LNEG,
+     &                         COEFFS( N_VARS ) )
+         ELSE
+            ! This is a letter. Determine the component name
+            IF ( LCOEFF ) THEN
+               LCOEFF = .FALSE.
+            ELSE
+               N_VARS = N_VARS + 1
             END IF
 
-            ! Determine the coefficient of this component
-            CALL ELMO_GETREAL( FORMULA, N_MAX_FORMULA, IX, LNEG,
-     &                         COEFFS( ICMP ) )
-
-            ! Determine the component name
             LENGTH = 0
             LEND = .FALSE.
             IY = IX
             DO WHILE ( IY .LT. N_MAX_FORMULA .AND. .NOT.LEND )
                CHR2 = FORMULA( IY:IY )
+               ICHR2 = ICHAR( CHR2 )
 
-               ! Check if this character is not a space or a sign
-               IF ( CHR2 .NE. ' ' .AND. CHR2 .NE. '+' .AND. 
-     &              CHR2 .NE. '-' ) THEN
+               ! Check if this character is not a space or a
+               ! special character
+               IF ( ( ICHR2 .GE. 65 .AND. ICHR2 .LE. 90 ) .OR. 
+     &              ( ICHR2 .GE. 97 .AND. ICHR2 .LE. 122 ) .OR.
+     &              ( ICHR2 .GE. 48 .AND. ICHR2 .LE. 57 ) .OR.
+     &              ( ICHR2 .EQ. 95 ) ) THEN
                   LENGTH = LENGTH + 1
-                  COMPS( ICMP )( LENGTH:LENGTH ) = CHR
+                  COMPS( N_VARS )( LENGTH:LENGTH ) = CHR2
                ELSE
                   LEND = .TRUE.
                END IF
                IY = IY + 1
             END DO
-            IX = IY
-         ELSE
-
+            IX = IY - 2
+            
          END IF
+
+         ! Go to the next character
+         IX = IX + 1
+
       END DO    
 
       IF ( N_VARS .EQ. 0 ) THEN
@@ -673,7 +690,7 @@
 !-------------------------------------------------------------------------
 
       USE AERO_DATA, ONLY : N_AEROSPC, AEROSPC, N_MODE, AERO_MISSING,
-     &                      AEROMODE
+     &                      MODESUFF
 
       IMPLICIT NONE
       
@@ -711,7 +728,7 @@
                IF ( .NOT. AERO_MISSING( I0,IM ) ) THEN
                   O_VARS = O_VARS + 1
                   JVAR = JVAR + 1
-                  COMPS_OUT( JVAR ) = TRIM( COMPS( IVAR ) ) // AEROMODE( IM )%SUFF
+                  COMPS_OUT( JVAR ) = TRIM( COMPS( IVAR ) ) // MODESUFF( IM )
                   COEFFS_OUT( JVAR ) = COEFFS( IVAR )
                END IF
             END DO
