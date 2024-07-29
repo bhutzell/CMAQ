@@ -292,3 +292,21 @@
 <AQWDMET05_a##> CApp_a##   = WD_CApp       : XCL_a##*WFAC_a##;
 <AQWDMET06_a##> Kp_a##     = WD_Kp         : XCL_a##*WFAC_a##;
 
+! Primary formaldehyde
+! Phase transfer
+<AQPUP01f_a##> FORM_PRIMARY          = HCHOP_a##                : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,30.0D0,1.64D-5,H_FORM,0.02D0,0);
+<AQPUP01b_a##> HCHOP_a##             = FORM_PRIMARY             : XCL_a##*KMT(TEMP,LWC_a##,30.0D0,1.64D-5,H_FORM,0.02D0,1);
+! Hydration
+<AQPHY01f_a##> HCHOP_a## + H2O_a##   = CH2OHYDP_a##             : XCL_a##*1.8D-1*EXP(4.03D+3*TFAC)*PHI2_a##;
+<AQPHY01b_a##> CH2OHYDP_a##          = HCHOP_a##                : XCL_a##*5.1D-3;
+! Redox
+<AQP01_a##>    CH2OHYDP_a## + OH_a## = OH_a##                   : XCL_a##*1.1D9*EXP(-1.02D3*TFAC)*PHI2_a##;
+<AQP02_a##>    HSO3m_a## + HCHOP_a## = HMSmP_a## + HSO3m_a##    : XCL_a##*7.9D2*EXP(-2.9D3*TFAC)*PHI2_a##;
+<AQP03_a##>    SO3mm_a## + HCHOP_a## = HMSmP_a## + SO3mm_a##    : XCL_a##*2.5D7*EXP(-2.45D3*TFAC)*PHI2_a##;
+<AQP04_a##>    HMSmP_a##             = HCHOP_a##                : XCL_a##*7.7D-3*EXP(-9.2E3*TFAC);
+<AQP05_a##>    HMSmP_a## + OHm_a##   = OHm_a##   + CH2OHYDP_a## : XCL_a##*3.7D3*PHI2_a##;
+<AQP06_a##>    HMSmP_a## + OH_a##    = OH_a##                   : XCL_a##*3.0D8*PHI2_a##;
+! Wet deposition
+<AQPWD01_a##>  HCHOP_a##             = WD_FORM_PRIMARY          : XCL_a##*WFAC_a##;
+<AQPWD02_a##>  CH2OHYDP_a##          = WD_FORM_PRIMARY          : XCL_a##*WFAC_a##;
+<AQPWD03_a##>  HMSmP_a##             = WD_FORM_PRIMARY          : XCL_a##*WFAC_a##;

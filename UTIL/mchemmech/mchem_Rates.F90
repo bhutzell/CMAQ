@@ -2154,700 +2154,752 @@ FALLOFF_T10_DMS2 = FALLOFF_T10( 1.9900D-39,5.2700D+03, &
 ! Constant rate moved to initialize :   RCONST(579) = (XCL_RS*WFAC_RS)
 ! <AQWDMET06_RS>:
 ! Constant rate moved to initialize :   RCONST(580) = (XCL_RS*WFAC_RS)
+! <AQPUP01f_RS>:
+! Constant rate moved to initialize :   RCONST(581) = (XCL_RS*CFRAC_RS*KMT(TEMP,LWC_RS,30.0D0,1.64D-5,H_FORM,0.02D0,0))
+! <AQPUP01b_RS>:
+! Constant rate moved to initialize :   RCONST(582) = (XCL_RS*KMT(TEMP,LWC_RS,30.0D0,1.64D-5,H_FORM,0.02D0,1))
+! <AQPHY01f_RS>:
+! Constant rate moved to initialize :   RCONST(583) = (XCL_RS*1.8D-1*EXP(4.03D+3*TFAC)*PHI2_RS)
+! <AQPHY01b_RS>:
+! Constant rate moved to initialize :   RCONST(584) = (XCL_RS*5.1D-3)
+! <AQP01_RS>:
+! Constant rate moved to initialize :   RCONST(585) = (XCL_RS*1.1D9*EXP(-1.02D3*TFAC)*PHI2_RS)
+! <AQP02_RS>:
+! Constant rate moved to initialize :   RCONST(586) = (XCL_RS*7.9D2*EXP(-2.9D3*TFAC)*PHI2_RS)
+! <AQP03_RS>:
+! Constant rate moved to initialize :   RCONST(587) = (XCL_RS*2.5D7*EXP(-2.45D3*TFAC)*PHI2_RS)
+! <AQP04_RS>:
+! Constant rate moved to initialize :   RCONST(588) = (XCL_RS*7.7D-3*EXP(-9.2E3*TFAC))
+! <AQP05_RS>:
+! Constant rate moved to initialize :   RCONST(589) = (XCL_RS*3.7D3*PHI2_RS)
+! <AQP06_RS>:
+! Constant rate moved to initialize :   RCONST(590) = (XCL_RS*3.0D8*PHI2_RS)
+! <AQPWD01_RS>:
+! Constant rate moved to initialize :   RCONST(591) = (XCL_RS*WFAC_RS)
+! <AQPWD02_RS>:
+! Constant rate moved to initialize :   RCONST(592) = (XCL_RS*WFAC_RS)
+! <AQPWD03_RS>:
+! Constant rate moved to initialize :   RCONST(593) = (XCL_RS*WFAC_RS)
 ! <AQUP01f_CV>:
-! Constant rate moved to initialize :   RCONST(581) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,64.0D0,1.28D-5,H_SO2,0.11D0,0))
+! Constant rate moved to initialize :   RCONST(594) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,64.0D0,1.28D-5,H_SO2,0.11D0,0))
 ! <AQUP01b_CV>:
-! Constant rate moved to initialize :   RCONST(582) = (XCL_CV*KMT(TEMP,LWC_CV,64.0D0,1.28D-5,H_SO2,0.11D0,1))
+! Constant rate moved to initialize :   RCONST(595) = (XCL_CV*KMT(TEMP,LWC_CV,64.0D0,1.28D-5,H_SO2,0.11D0,1))
 ! <AQUP02f_CV>:
-! Constant rate moved to initialize :   RCONST(583) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,63.0D0,1.32D-5,H_HNO3,0.09D0,0))
+! Constant rate moved to initialize :   RCONST(596) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,63.0D0,1.32D-5,H_HNO3,0.09D0,0))
 ! <AQUP02b_CV>:
-! Constant rate moved to initialize :   RCONST(584) = (XCL_CV*KMT(TEMP,LWC_CV,63.0D0,1.32D-5,H_HNO3,0.09D0,1))
+! Constant rate moved to initialize :   RCONST(597) = (XCL_CV*KMT(TEMP,LWC_CV,63.0D0,1.32D-5,H_HNO3,0.09D0,1))
 ! <AQUP03f_CV>:
-! Constant rate moved to initialize :   RCONST(585) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,44.0D0,1.55D-5,H_CO2,0.00015D0,0))
+! Constant rate moved to initialize :   RCONST(598) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,44.0D0,1.55D-5,H_CO2,0.00015D0,0))
 ! <AQUP03b_CV>:
-! Constant rate moved to initialize :   RCONST(586) = (XCL_CV*KMT(TEMP,LWC_CV,44.0D0,1.55D-5,H_CO2,0.00015D0,1))
+! Constant rate moved to initialize :   RCONST(599) = (XCL_CV*KMT(TEMP,LWC_CV,44.0D0,1.55D-5,H_CO2,0.00015D0,1))
 ! <AQUP04f_CV>:
-! Constant rate moved to initialize :   RCONST(587) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,17.0D0,2.30D-5,H_NH3,0.091D0,0))
+! Constant rate moved to initialize :   RCONST(600) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,17.0D0,2.30D-5,H_NH3,0.091D0,0))
 ! <AQUP04b_CV>:
-! Constant rate moved to initialize :   RCONST(588) = (XCL_CV*KMT(TEMP,LWC_CV,17.0D0,2.30D-5,H_NH3,0.091D0,1))
+! Constant rate moved to initialize :   RCONST(601) = (XCL_CV*KMT(TEMP,LWC_CV,17.0D0,2.30D-5,H_NH3,0.091D0,1))
 ! <AQUP05f_CV>:
-! Constant rate moved to initialize :   RCONST(589) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,34.0D0,1.46D-5,H_H2O2,0.15D0,0))
+! Constant rate moved to initialize :   RCONST(602) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,34.0D0,1.46D-5,H_H2O2,0.15D0,0))
 ! <AQUP05b_CV>:
-! Constant rate moved to initialize :   RCONST(590) = (XCL_CV*KMT(TEMP,LWC_CV,34.0D0,1.46D-5,H_H2O2,0.15D0,1))
+! Constant rate moved to initialize :   RCONST(603) = (XCL_CV*KMT(TEMP,LWC_CV,34.0D0,1.46D-5,H_H2O2,0.15D0,1))
 ! <AQUP06f_CV>:
-! Constant rate moved to initialize :   RCONST(591) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,48.0D0,1.48D-5,H_O3,0.1D0,0))
+! Constant rate moved to initialize :   RCONST(604) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,48.0D0,1.48D-5,H_O3,0.1D0,0))
 ! <AQUP06b_CV>:
-! Constant rate moved to initialize :   RCONST(592) = (XCL_CV*KMT(TEMP,LWC_CV,48.0D0,1.48D-5,H_O3,0.1D0,1))
+! Constant rate moved to initialize :   RCONST(605) = (XCL_CV*KMT(TEMP,LWC_CV,48.0D0,1.48D-5,H_O3,0.1D0,1))
 ! <AQUP07f_CV>:
-! Constant rate moved to initialize :   RCONST(593) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,46.0D0,1.53D-5,H_FACD,0.0229D0,0))
+! Constant rate moved to initialize :   RCONST(606) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,46.0D0,1.53D-5,H_FACD,0.0229D0,0))
 ! <AQUP07b_CV>:
-! Constant rate moved to initialize :   RCONST(594) = (XCL_CV*KMT(TEMP,LWC_CV,46.0D0,1.53D-5,H_FACD,0.0229D0,1))
+! Constant rate moved to initialize :   RCONST(607) = (XCL_CV*KMT(TEMP,LWC_CV,46.0D0,1.53D-5,H_FACD,0.0229D0,1))
 ! <AQUP08f_CV>:
-! Constant rate moved to initialize :   RCONST(595) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,36.5D0,1.89D-5,H_HCL,0.116D0,0))
+! Constant rate moved to initialize :   RCONST(608) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,36.5D0,1.89D-5,H_HCL,0.116D0,0))
 ! <AQUP08b_CV>:
-! Constant rate moved to initialize :   RCONST(596) = (XCL_CV*KMT(TEMP,LWC_CV,36.5D0,1.89D-5,H_HCL,0.116D0,1))
+! Constant rate moved to initialize :   RCONST(609) = (XCL_CV*KMT(TEMP,LWC_CV,36.5D0,1.89D-5,H_HCL,0.116D0,1))
 ! <AQUP09f_CV>:
-! Constant rate moved to initialize :   RCONST(597) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,58.0D0,1.15D-5,H_GLY,0.023D0,0))
+! Constant rate moved to initialize :   RCONST(610) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,58.0D0,1.15D-5,H_GLY,0.023D0,0))
 ! <AQUP09b_CV>:
-! Constant rate moved to initialize :   RCONST(598) = (XCL_CV*KMT(TEMP,LWC_CV,58.0D0,1.15D-5,H_GLY,0.023D0,1))
+! Constant rate moved to initialize :   RCONST(611) = (XCL_CV*KMT(TEMP,LWC_CV,58.0D0,1.15D-5,H_GLY,0.023D0,1))
 ! <AQUP10f_CV>:
-! Constant rate moved to initialize :   RCONST(599) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,72.0D0,1.15D-5,H_MGLY,0.023D0,0))
+! Constant rate moved to initialize :   RCONST(612) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,72.0D0,1.15D-5,H_MGLY,0.023D0,0))
 ! <AQUP10b_CV>:
-! Constant rate moved to initialize :   RCONST(600) = (XCL_CV*KMT(TEMP,LWC_CV,72.0D0,1.15D-5,H_MGLY,0.023D0,1))
+! Constant rate moved to initialize :   RCONST(613) = (XCL_CV*KMT(TEMP,LWC_CV,72.0D0,1.15D-5,H_MGLY,0.023D0,1))
 ! <AQUP11f_CV>:
-! Constant rate moved to initialize :   RCONST(601) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,17.0D0,1.48D-5,H_OH,0.1D0,0))
+! Constant rate moved to initialize :   RCONST(614) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,17.0D0,1.48D-5,H_OH,0.1D0,0))
 ! <AQUP11b_CV>:
-! Constant rate moved to initialize :   RCONST(602) = (XCL_CV*KMT(TEMP,LWC_CV,17.0D0,1.48D-5,H_OH,0.1D0,1))
+! Constant rate moved to initialize :   RCONST(615) = (XCL_CV*KMT(TEMP,LWC_CV,17.0D0,1.48D-5,H_OH,0.1D0,1))
 ! <AQUP12_CV>:
-! Constant rate moved to initialize :   RCONST(603) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,97.0D0,1.48D-5,0.0D0,0.1D0,0))
+! Constant rate moved to initialize :   RCONST(616) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,97.0D0,1.48D-5,0.0D0,0.1D0,0))
 ! <AQUP13_CV>:
-! Constant rate moved to initialize :   RCONST(604) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,108.0D0,1.48D-5,0.0D0,0.1D0,0))
+! Constant rate moved to initialize :   RCONST(617) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,108.0D0,1.48D-5,0.0D0,0.1D0,0))
 ! <AQUP14f_CV>:
-! Constant rate moved to initialize :   RCONST(605) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,33.0D0,1.04D-5,H_HO2,0.01D0,0))
+! Constant rate moved to initialize :   RCONST(618) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,33.0D0,1.04D-5,H_HO2,0.01D0,0))
 ! <AQUP14b_CV>:
-! Constant rate moved to initialize :   RCONST(606) = (XCL_CV*KMT(TEMP,LWC_CV,33.0D0,1.04D-5,H_HO2,0.01D0,1))
+! Constant rate moved to initialize :   RCONST(619) = (XCL_CV*KMT(TEMP,LWC_CV,33.0D0,1.04D-5,H_HO2,0.01D0,1))
 ! <AQUP15f_CV>:
-! Constant rate moved to initialize :   RCONST(607) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,46.0D0,1.92D-5,H_NO2,0.0015D0,0))
+! Constant rate moved to initialize :   RCONST(620) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,46.0D0,1.92D-5,H_NO2,0.0015D0,0))
 ! <AQUP15b_CV>:
-! Constant rate moved to initialize :   RCONST(608) = (XCL_CV*KMT(TEMP,LWC_CV,46.0D0,1.92D-5,H_NO2,0.0015D0,1))
+! Constant rate moved to initialize :   RCONST(621) = (XCL_CV*KMT(TEMP,LWC_CV,46.0D0,1.92D-5,H_NO2,0.0015D0,1))
 ! <AQUP16f_CV>:
-! Constant rate moved to initialize :   RCONST(609) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,47.0D0,1.30D-5,H_HONO,0.5D0,0))
+! Constant rate moved to initialize :   RCONST(622) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,47.0D0,1.30D-5,H_HONO,0.5D0,0))
 ! <AQUP16b_CV>:
-! Constant rate moved to initialize :   RCONST(610) = (XCL_CV*KMT(TEMP,LWC_CV,47.0D0,1.30D-5,H_HONO,0.5D0,1))
+! Constant rate moved to initialize :   RCONST(623) = (XCL_CV*KMT(TEMP,LWC_CV,47.0D0,1.30D-5,H_HONO,0.5D0,1))
 ! <AQUP17f_CV>:
-! Constant rate moved to initialize :   RCONST(611) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,79.0D0,1.30D-5,H_HNO4,0.1D0,0))
+! Constant rate moved to initialize :   RCONST(624) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,79.0D0,1.30D-5,H_HNO4,0.1D0,0))
 ! <AQUP17b_CV>:
-! Constant rate moved to initialize :   RCONST(612) = (XCL_CV*KMT(TEMP,LWC_CV,79.0D0,1.30D-5,H_HNO4,0.1D0,1))
+! Constant rate moved to initialize :   RCONST(625) = (XCL_CV*KMT(TEMP,LWC_CV,79.0D0,1.30D-5,H_HNO4,0.1D0,1))
 ! <AQUP18f_CV>:
-! Constant rate moved to initialize :   RCONST(613) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,60.052D0,1.15D-5,H_GLYD,0.023D0,0))
+! Constant rate moved to initialize :   RCONST(626) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,60.052D0,1.15D-5,H_GLYD,0.023D0,0))
 ! <AQUP18b_CV>:
-! Constant rate moved to initialize :   RCONST(614) = (XCL_CV*KMT(TEMP,LWC_CV,60.052D0,1.15D-5,H_GLYD,0.023D0,1))
+! Constant rate moved to initialize :   RCONST(627) = (XCL_CV*KMT(TEMP,LWC_CV,60.052D0,1.15D-5,H_GLYD,0.023D0,1))
 ! <AQUP19f_CV>:
-! Constant rate moved to initialize :   RCONST(615) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,60.052D0,1.24D-5,H_AACD,0.0322D0,0))
+! Constant rate moved to initialize :   RCONST(628) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,60.052D0,1.24D-5,H_AACD,0.0322D0,0))
 ! <AQUP19b_CV>:
-! Constant rate moved to initialize :   RCONST(616) = (XCL_CV*KMT(TEMP,LWC_CV,60.052D0,1.24D-5,H_AACD,0.0322D0,1))
+! Constant rate moved to initialize :   RCONST(629) = (XCL_CV*KMT(TEMP,LWC_CV,60.052D0,1.24D-5,H_AACD,0.0322D0,1))
 ! <AQUP20f_CV>:
-! Constant rate moved to initialize :   RCONST(617) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,30.0D0,1.64D-5,H_FORM,0.02D0,0))
+! Constant rate moved to initialize :   RCONST(630) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,30.0D0,1.64D-5,H_FORM,0.02D0,0))
 ! <AQUP20b_CV>:
-! Constant rate moved to initialize :   RCONST(618) = (XCL_CV*KMT(TEMP,LWC_CV,30.0D0,1.64D-5,H_FORM,0.02D0,1))
+! Constant rate moved to initialize :   RCONST(631) = (XCL_CV*KMT(TEMP,LWC_CV,30.0D0,1.64D-5,H_FORM,0.02D0,1))
 ! <AQUP21f_CV>:
-! Constant rate moved to initialize :   RCONST(619) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,62.0D0,1.00D-5,H_NO3,0.05D0,0))
+! Constant rate moved to initialize :   RCONST(632) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,62.0D0,1.00D-5,H_NO3,0.05D0,0))
 ! <AQUP21b_CV>:
-! Constant rate moved to initialize :   RCONST(620) = (XCL_CV*KMT(TEMP,LWC_CV,62.0D0,1.00D-5,H_NO3,0.05D0,1))
+! Constant rate moved to initialize :   RCONST(633) = (XCL_CV*KMT(TEMP,LWC_CV,62.0D0,1.00D-5,H_NO3,0.05D0,1))
 ! <AQUP22f_CV>:
-! Constant rate moved to initialize :   RCONST(621) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,49.0D0,1.35D-5,H_CH3O2,0.05D0,0))
+! Constant rate moved to initialize :   RCONST(634) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,49.0D0,1.35D-5,H_CH3O2,0.05D0,0))
 ! <AQUP22b_CV>:
-! Constant rate moved to initialize :   RCONST(622) = (XCL_CV*KMT(TEMP,LWC_CV,49.0D0,1.35D-5,H_CH3O2,0.05D0,1))
+! Constant rate moved to initialize :   RCONST(635) = (XCL_CV*KMT(TEMP,LWC_CV,49.0D0,1.35D-5,H_CH3O2,0.05D0,1))
 ! <AQUP23f_CV>:
-! Constant rate moved to initialize :   RCONST(623) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,48.04D0,1.31D-5,H_MHP,0.006758D0,0))
+! Constant rate moved to initialize :   RCONST(636) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,48.04D0,1.31D-5,H_MHP,0.006758D0,0))
 ! <AQUP23b_CV>:
-! Constant rate moved to initialize :   RCONST(624) = (XCL_CV*KMT(TEMP,LWC_CV,48.04D0,1.31D-5,H_MHP,0.006758D0,1))
+! Constant rate moved to initialize :   RCONST(637) = (XCL_CV*KMT(TEMP,LWC_CV,48.04D0,1.31D-5,H_MHP,0.006758D0,1))
 ! <AQUP24f_CV>:
-! Constant rate moved to initialize :   RCONST(625) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,76.05D0,1.02D-5,H_PAA,0.019D0,0))
+! Constant rate moved to initialize :   RCONST(638) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,76.05D0,1.02D-5,H_PAA,0.019D0,0))
 ! <AQUP24b_CV>:
-! Constant rate moved to initialize :   RCONST(626) = (XCL_CV*KMT(TEMP,LWC_CV,76.05D0,1.02D-5,H_PAA,0.019D0,1))
+! Constant rate moved to initialize :   RCONST(639) = (XCL_CV*KMT(TEMP,LWC_CV,76.05D0,1.02D-5,H_PAA,0.019D0,1))
 ! <AQUP25f_CV>:
-! Constant rate moved to initialize :   RCONST(627) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,118.13D0,1.00D-5,H_IEPOX,0.02D0,0))
+! Constant rate moved to initialize :   RCONST(640) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,118.13D0,1.00D-5,H_IEPOX,0.02D0,0))
 ! <AQUP25b_CV>:
-! Constant rate moved to initialize :   RCONST(628) = (XCL_CV*KMT(TEMP,LWC_CV,118.13D0,1.00D-5,H_IEPOX,0.02D0,1))
+! Constant rate moved to initialize :   RCONST(641) = (XCL_CV*KMT(TEMP,LWC_CV,118.13D0,1.00D-5,H_IEPOX,0.02D0,1))
 ! <AQHY01f_CV>:
-! Constant rate moved to initialize :   RCONST(629) = (XCL_CV*1.8D-1*EXP(4.03D+3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(642) = (XCL_CV*1.8D-1*EXP(4.03D+3*TFAC)*PHI2_CV)
 ! <AQHY01b_CV>:
-! Constant rate moved to initialize :   RCONST(630) = (XCL_CV*5.1D-3)
+! Constant rate moved to initialize :   RCONST(643) = (XCL_CV*5.1D-3)
 ! <AQEQ01f_CV>:
-  RCONST(631) = (XCL_CV*DISF(1.80D-16,-6.955D+03,1.4D11,0,'CV'))
+  RCONST(644) = (XCL_CV*DISF(1.80D-16,-6.955D+03,1.4D11,0,'CV'))
 ! <AQEQ01b_CV>:
-  RCONST(632) = (XCL_CV*DISB(1.4D11,2,'CV'))
+  RCONST(645) = (XCL_CV*DISB(1.4D11,2,'CV'))
 ! <AQEQ02f_CV>:
-  RCONST(633) = (XCL_CV*DISF(1.39D-02,1.87D+03,2.0D8,0,'CV'))
+  RCONST(646) = (XCL_CV*DISF(1.39D-02,1.87D+03,2.0D8,0,'CV'))
 ! <AQEQ02b_CV>:
-  RCONST(634) = (XCL_CV*DISB(2.0D8,2,'CV'))
+  RCONST(647) = (XCL_CV*DISB(2.0D8,2,'CV'))
 ! <AQEQ03f_CV>:
-  RCONST(635) = (XCL_CV*DISF(6.72D-08,3.55D+02,5.0D10,1,'CV'))
+  RCONST(648) = (XCL_CV*DISF(6.72D-08,3.55D+02,5.0D10,1,'CV'))
 ! <AQEQ03b_CV>:
-  RCONST(636) = (XCL_CV*DISB(5.0D10,1,'CV'))
+  RCONST(649) = (XCL_CV*DISB(5.0D10,1,'CV'))
 ! <AQEQ04f_CV>:
-  RCONST(637) = (XCL_CV*DISF(1.7D+01,0.0D0,5.0D10,0,'CV'))
+  RCONST(650) = (XCL_CV*DISF(1.7D+01,0.0D0,5.0D10,0,'CV'))
 ! <AQEQ04b_CV>:
-  RCONST(638) = (XCL_CV*DISB(5.0D10,2,'CV'))
+  RCONST(651) = (XCL_CV*DISB(5.0D10,2,'CV'))
 ! <AQEQ05f_CV>:
-  RCONST(639) = (XCL_CV*DISF(1.77D-5,-7.10D+02,3.4D10,0,'CV'))
+  RCONST(652) = (XCL_CV*DISF(1.77D-5,-7.10D+02,3.4D10,0,'CV'))
 ! <AQEQ05b_CV>:
-  RCONST(640) = (XCL_CV*DISB(3.4D10,2,'CV'))
+  RCONST(653) = (XCL_CV*DISB(3.4D10,2,'CV'))
 ! <AQEQ06f_CV>:
-  RCONST(641) = (XCL_CV*DISF(4.30D-07,-9.95D+02,6.4D4,0,'CV'))
+  RCONST(654) = (XCL_CV*DISF(4.30D-07,-9.95D+02,6.4D4,0,'CV'))
 ! <AQEQ06b_CV>:
-  RCONST(642) = (XCL_CV*DISB(6.4D4,2,'CV'))
+  RCONST(655) = (XCL_CV*DISB(6.4D4,2,'CV'))
 ! <AQEQ07f_CV>:
-  RCONST(643) = (XCL_CV*DISF(4.68D-11,-1.785D+03,5.0D10,1,'CV'))
+  RCONST(656) = (XCL_CV*DISF(4.68D-11,-1.785D+03,5.0D10,1,'CV'))
 ! <AQEQ07b_CV>:
-  RCONST(644) = (XCL_CV*DISB(5.0D10,1,'CV'))
+  RCONST(657) = (XCL_CV*DISB(5.0D10,1,'CV'))
 ! <AQEQ08f_CV>:
-  RCONST(645) = (XCL_CV*DISF(1.74D+06,6.89D+03,5.0D10,0,'CV'))
+  RCONST(658) = (XCL_CV*DISF(1.74D+06,6.89D+03,5.0D10,0,'CV'))
 ! <AQEQ08b_CV>:
-  RCONST(646) = (XCL_CV*DISB(5.0D10,2,'CV'))
+  RCONST(659) = (XCL_CV*DISB(5.0D10,2,'CV'))
 ! <AQEQ09f_CV>:
-  RCONST(647) = (XCL_CV*DISF(1000.0D0,0.0D0,5.0D10,0,'CV'))
+  RCONST(660) = (XCL_CV*DISF(1000.0D0,0.0D0,5.0D10,0,'CV'))
 ! <AQEQ09b_CV>:
-  RCONST(648) = (XCL_CV*DISB(5.0D10,2,'CV'))
+  RCONST(661) = (XCL_CV*DISB(5.0D10,2,'CV'))
 ! <AQEQ10f_CV>:
-  RCONST(649) = (XCL_CV*DISF(1.02D-2,2.445D+03,1.0D11,1,'CV'))
+  RCONST(662) = (XCL_CV*DISF(1.02D-2,2.445D+03,1.0D11,1,'CV'))
 ! <AQEQ10b_CV>:
-  RCONST(650) = (XCL_CV*DISB(1.0D11,1,'CV'))
+  RCONST(663) = (XCL_CV*DISB(1.0D11,1,'CV'))
 ! <AQEQ11f_CV>:
-  RCONST(651) = (XCL_CV*DISF(1.80D-4,-2.00D+01,5.0D10,0,'CV'))
+  RCONST(664) = (XCL_CV*DISF(1.80D-4,-2.00D+01,5.0D10,0,'CV'))
 ! <AQEQ11b_CV>:
-  RCONST(652) = (XCL_CV*DISB(5.0D10,2,'CV'))
+  RCONST(665) = (XCL_CV*DISB(5.0D10,2,'CV'))
 ! <AQEQ12f_CV>:
-  RCONST(653) = (XCL_CV*DISF(1.6D-5,0.0D0,5.0D10,0,'CV'))
+  RCONST(666) = (XCL_CV*DISF(1.6D-5,0.0D0,5.0D10,0,'CV'))
 ! <AQEQ12b_CV>:
-  RCONST(654) = (XCL_CV*DISB(5.0D10,2,'CV'))
+  RCONST(667) = (XCL_CV*DISB(5.0D10,2,'CV'))
 ! <AQEQ13f_CV>:
-  RCONST(655) = (XCL_CV*DISF(1.0D-5,0.D0,5.0D10,0,'CV'))
+  RCONST(668) = (XCL_CV*DISF(1.0D-5,0.D0,5.0D10,0,'CV'))
 ! <AQEQ13b_CV>:
-  RCONST(656) = (XCL_CV*DISB(5.0D10,2,'CV'))
+  RCONST(669) = (XCL_CV*DISB(5.0D10,2,'CV'))
 ! <AQEQ14f_CV>:
-  RCONST(657) = (XCL_CV*DISF(5.3D-4,-1760.D0,5.0D10,0,'CV'))
+  RCONST(670) = (XCL_CV*DISF(5.3D-4,-1760.D0,5.0D10,0,'CV'))
 ! <AQEQ14b_CV>:
-  RCONST(658) = (XCL_CV*DISB(5.0D10,2,'CV'))
+  RCONST(671) = (XCL_CV*DISB(5.0D10,2,'CV'))
 ! <AQEQ15f_CV>:
-  RCONST(659) = (XCL_CV*DISF(3.47D-4,-2.67D+2,2.D+10,0,'CV'))
+  RCONST(672) = (XCL_CV*DISF(3.47D-4,-2.67D+2,2.D+10,0,'CV'))
 ! <AQEQ15b_CV>:
-  RCONST(660) = (XCL_CV*DISB(2.D10,2,'CV'))
+  RCONST(673) = (XCL_CV*DISB(2.D10,2,'CV'))
 ! <AQEQ16f_CV>:
-  RCONST(661) = (XCL_CV*DISF(5.6D-2,-4.53D+2,5.D+10,0,'CV'))
+  RCONST(674) = (XCL_CV*DISF(5.6D-2,-4.53D+2,5.D+10,0,'CV'))
 ! <AQEQ16b_CV>:
-  RCONST(662) = (XCL_CV*DISB(5.D10,2,'CV'))
+  RCONST(675) = (XCL_CV*DISB(5.D10,2,'CV'))
 ! <AQEQ17f_CV>:
-  RCONST(663) = (XCL_CV*DISF(5.42D-5,-8.05D+2,5.D+10,1,'CV'))
+  RCONST(676) = (XCL_CV*DISF(5.42D-5,-8.05D+2,5.D+10,1,'CV'))
 ! <AQEQ17b_CV>:
-  RCONST(664) = (XCL_CV*DISB(5.D10,1,'CV'))
+  RCONST(677) = (XCL_CV*DISB(5.D10,1,'CV'))
 ! <AQEQ18f_CV>:
-  RCONST(665) = (XCL_CV*DISF(3.2D-3,0.D0,2.D+10,0,'CV'))
+  RCONST(678) = (XCL_CV*DISF(3.2D-3,0.D0,2.D+10,0,'CV'))
 ! <AQEQ18b_CV>:
-  RCONST(666) = (XCL_CV*DISB(2.D10,2,'CV'))
+  RCONST(679) = (XCL_CV*DISB(2.D10,2,'CV'))
 ! <AQEQ19f_CV>:
-  RCONST(667) = (XCL_CV*DISF(1.48D-4,-8.05D+1,2.D+10,0,'CV'))
+  RCONST(680) = (XCL_CV*DISF(1.48D-4,-8.05D+1,2.D+10,0,'CV'))
 ! <AQEQ19b_CV>:
-  RCONST(668) = (XCL_CV*DISB(2.D10,2,'CV'))
+  RCONST(681) = (XCL_CV*DISB(2.D10,2,'CV'))
 ! <AQEQ20f_CV>:
-  RCONST(669) = (XCL_CV*DISF(1.75D-5,4.6D+1,5.D+10,0,'CV'))
+  RCONST(682) = (XCL_CV*DISF(1.75D-5,4.6D+1,5.D+10,0,'CV'))
 ! <AQEQ20b_CV>:
-  RCONST(670) = (XCL_CV*DISB(5.D10,2,'CV'))
+  RCONST(683) = (XCL_CV*DISB(5.D10,2,'CV'))
 ! <AQ00_CV>:
-  RCONST(671) = (XCL_CV*KRXN(7.45D+7,-4756.08D0,1,0,0,'CV',Y))
+  RCONST(684) = (XCL_CV*KRXN(7.45D+7,-4756.08D0,1,0,0,'CV',Y))
 ! <AQ01_CV>:
-  RCONST(672) = (XCL_CV*KRXN(2.4D+4,0.0D0,0,1,0,'CV',Y))
+  RCONST(685) = (XCL_CV*KRXN(2.4D+4,0.0D0,0,1,0,'CV',Y))
 ! <AQ02_CV>:
-  RCONST(673) = (XCL_CV*KRXN(3.7D+5,-5530.88D0,0,2,0,'CV',Y))
+  RCONST(686) = (XCL_CV*KRXN(3.7D+5,-5530.88D0,0,2,0,'CV',Y))
 ! <AQ03_CV>:
-  RCONST(674) = (XCL_CV*KRXN(1.5D+9,-5280.56D0,0,3,0,'CV',Y))
+  RCONST(687) = (XCL_CV*KRXN(1.5D+9,-5280.56D0,0,3,0,'CV',Y))
 ! <AQ04_CV>:
-! Constant rate moved to initialize :   RCONST(675) = (XCL_CV*8.3D5*EXP(-2.7D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(688) = (XCL_CV*8.3D5*EXP(-2.7D3*TFAC)*PHI2_CV)
 ! <AQ05_CV>:
-! Constant rate moved to initialize :   RCONST(676) = (XCL_CV*9.6D7*EXP(-9.1D2*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(689) = (XCL_CV*9.6D7*EXP(-9.1D2*TFAC)*PHI2_CV)
 ! <AQ06_CV>:
-! Constant rate moved to initialize :   RCONST(677) = (XCL_CV*1.5D9*EXP(-1.5D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(690) = (XCL_CV*1.5D9*EXP(-1.5D3*TFAC)*PHI2_CV)
 ! <AQ07_CV>:
-! Constant rate moved to initialize :   RCONST(678) = (XCL_CV*2.0D6*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(691) = (XCL_CV*2.0D6*PHI2_CV)
 ! <AQ08_CV>:
-! Constant rate moved to initialize :   RCONST(679) = (XCL_CV*2.0D6*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(692) = (XCL_CV*2.0D6*PHI2_CV)
 ! <AQ09_CV>:
-! Constant rate moved to initialize :   RCONST(680) = (XCL_CV*2.0D6*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(693) = (XCL_CV*2.0D6*PHI2_CV)
 ! <AQ10_CV>:
-! Constant rate moved to initialize :   RCONST(681) = (XCL_CV*3.3D5*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(694) = (XCL_CV*3.3D5*PHI2_CV)
 ! <AQ11_CV>:
-! Constant rate moved to initialize :   RCONST(682) = (XCL_CV*1.1D0)
+! Constant rate moved to initialize :   RCONST(695) = (XCL_CV*1.1D0)
 ! <AQ12_CV>:
-! Constant rate moved to initialize :   RCONST(683) = (XCL_CV*5.0D5*EXP(-7.0D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(696) = (XCL_CV*5.0D5*EXP(-7.0D3*TFAC)*PHI2_CV)
 ! <AQ13_CV>:
-! Constant rate moved to initialize :   RCONST(684) = (XCL_CV*1.0D10*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(697) = (XCL_CV*1.0D10*PHI2_CV)
 ! <AQ14_CV>:
-! Constant rate moved to initialize :   RCONST(685) = (XCL_CV*1.0D10*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(698) = (XCL_CV*1.0D10*PHI2_CV)
 ! <AQ16_CV>:
-! Constant rate moved to initialize :   RCONST(686) = (XCL_CV*3.6D9*EXP(-9.3D2*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(699) = (XCL_CV*3.6D9*EXP(-9.3D2*TFAC)*PHI2_CV)
 ! <AQ17_CV>:
-! Constant rate moved to initialize :   RCONST(687) = (XCL_CV*2.8D10*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(700) = (XCL_CV*2.8D10*PHI2_CV)
 ! <AQ18_CV>:
-! Constant rate moved to initialize :   RCONST(688) = (XCL_CV*3.5D10*EXP(-7.2D2*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(701) = (XCL_CV*3.5D10*EXP(-7.2D2*TFAC)*PHI2_CV)
 ! <AQ19_CV>:
-! Constant rate moved to initialize :   RCONST(689) = (XCL_CV*3.2D7*EXP(-1.7D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(702) = (XCL_CV*3.2D7*EXP(-1.7D3*TFAC)*PHI2_CV)
 ! <AQ20_CV>:
-! Constant rate moved to initialize :   RCONST(690) = (XCL_CV*2.7D9*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(703) = (XCL_CV*2.7D9*PHI2_CV)
 ! <AQ21_CV>:
-! Constant rate moved to initialize :   RCONST(691) = (XCL_CV*1.8D9*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(704) = (XCL_CV*1.8D9*PHI2_CV)
 ! <AQ22_CV>:
-! Constant rate moved to initialize :   RCONST(692) = (XCL_CV*4.5D9*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(705) = (XCL_CV*4.5D9*PHI2_CV)
 ! <AQ23_CV>:
-! Constant rate moved to initialize :   RCONST(693) = (XCL_CV*2.6D-2)
+! Constant rate moved to initialize :   RCONST(706) = (XCL_CV*2.6D-2)
 ! <AQ24_CV>:
-! Constant rate moved to initialize :   RCONST(694) = (XCL_CV*1.0D5*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(707) = (XCL_CV*1.0D5*PHI2_CV)
 ! <AQ25_CV>:
-! Constant rate moved to initialize :   RCONST(695) = (XCL_CV*1.3D9*EXP(-2.2D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(708) = (XCL_CV*1.3D9*EXP(-2.2D3*TFAC)*PHI2_CV)
 ! <AQ26_CV>:
-! Constant rate moved to initialize :   RCONST(696) = (XCL_CV*1.1D9*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(709) = (XCL_CV*1.1D9*PHI2_CV)
 ! <AQ27_CV>:
-! Constant rate moved to initialize :   RCONST(697) = (XCL_CV*1.7D9*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(710) = (XCL_CV*1.7D9*PHI2_CV)
 ! <AQ28_CV>:
-! Constant rate moved to initialize :   RCONST(698) = (XCL_CV*2.2D8*EXP(-2.6D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(711) = (XCL_CV*2.2D8*EXP(-2.6D3*TFAC)*PHI2_CV)
 ! <AQ29_CV>:
-! Constant rate moved to initialize :   RCONST(699) = (XCL_CV*7.1D6*PHI2_CV*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(712) = (XCL_CV*7.1D6*PHI2_CV*PHI2_CV)
 ! <AQ30_CV>:
-! Constant rate moved to initialize :   RCONST(700) = (XCL_CV*4.6D2*EXP(-1.1D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(713) = (XCL_CV*4.6D2*EXP(-1.1D3*TFAC)*PHI2_CV)
 ! <AQ31_CV>:
-! Constant rate moved to initialize :   RCONST(701) = (XCL_CV*4.6D2*EXP(-1.1D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(714) = (XCL_CV*4.6D2*EXP(-1.1D3*TFAC)*PHI2_CV)
 ! <AQ32_CV>:
-! Constant rate moved to initialize :   RCONST(702) = (XCL_CV*5.0D5*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(715) = (XCL_CV*5.0D5*PHI2_CV)
 ! <AQ34_CV>:
-! Constant rate moved to initialize :   RCONST(703) = (XCL_CV*7.9D2*EXP(-2.9D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(716) = (XCL_CV*7.9D2*EXP(-2.9D3*TFAC)*PHI2_CV)
 ! <AQ35_CV>:
-! Constant rate moved to initialize :   RCONST(704) = (XCL_CV*2.5D7*EXP(-2.45D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(717) = (XCL_CV*2.5D7*EXP(-2.45D3*TFAC)*PHI2_CV)
 ! <AQ36_CV>:
-! Constant rate moved to initialize :   RCONST(705) = (XCL_CV*7.7D-3*EXP(-9.2E3*TFAC))
+! Constant rate moved to initialize :   RCONST(718) = (XCL_CV*7.7D-3*EXP(-9.2E3*TFAC))
 ! <AQ37_CV>:
-! Constant rate moved to initialize :   RCONST(706) = (XCL_CV*3.7D3*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(719) = (XCL_CV*3.7D3*PHI2_CV)
 ! <AQ38_CV>:
-! Constant rate moved to initialize :   RCONST(707) = (XCL_CV*3.0D8*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(720) = (XCL_CV*3.0D8*PHI2_CV)
 ! <AQ39_CV>:
-! Constant rate moved to initialize :   RCONST(708) = (XCL_CV*1.9D7*EXP(-3.8E3*TFAC)*PHI2_CV*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(721) = (XCL_CV*1.9D7*EXP(-3.8E3*TFAC)*PHI2_CV*PHI2_CV)
 ! <AQ40_CV>:
-! Constant rate moved to initialize :   RCONST(709) = (XCL_CV*3.6D7*EXP(-4.0E3*TFAC)*PHI2_CV*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(722) = (XCL_CV*3.6D7*EXP(-4.0E3*TFAC)*PHI2_CV*PHI2_CV)
 ! <AQ41_CV>:
-! Constant rate moved to initialize :   RCONST(710) = (XCL_CV*7.0D2*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(723) = (XCL_CV*7.0D2*PHI2_CV)
 ! <AQ70_CV>:
-! Constant rate moved to initialize :   RCONST(711) = (XCL_CV*3.4D9*EXP(-1.2D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(724) = (XCL_CV*3.4D9*EXP(-1.2D3*TFAC)*PHI2_CV)
 ! <AQ71_CV>:
-! Constant rate moved to initialize :   RCONST(712) = (XCL_CV*5.0D8*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(725) = (XCL_CV*5.0D8*PHI2_CV)
 ! <AQ72_CV>:
-! Constant rate moved to initialize :   RCONST(713) = (XCL_CV*1.0D9*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(726) = (XCL_CV*1.0D9*PHI2_CV)
 ! <AQ73_CV>:
-! Constant rate moved to initialize :   RCONST(714) = (XCL_CV*6.0D8*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(727) = (XCL_CV*6.0D8*PHI2_CV)
 ! <AQ74_CV>:
-! Constant rate moved to initialize :   RCONST(715) = (XCL_CV*8.6D8*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(728) = (XCL_CV*8.6D8*PHI2_CV)
 ! <AQ75_CV>:
-! Constant rate moved to initialize :   RCONST(716) = (XCL_CV*1.1D9*EXP(-1.516D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(729) = (XCL_CV*1.1D9*EXP(-1.516D3*TFAC)*PHI2_CV)
 ! <AQ76_CV>:
-! Constant rate moved to initialize :   RCONST(717) = (XCL_CV*1.5D8*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(730) = (XCL_CV*1.5D8*PHI2_CV)
 ! <AQ77_CV>:
-! Constant rate moved to initialize :   RCONST(718) = (XCL_CV*1.2D9*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(731) = (XCL_CV*1.2D9*PHI2_CV)
 ! <AQ78_CV>:
-! Constant rate moved to initialize :   RCONST(719) = (XCL_CV*1.4D6*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(732) = (XCL_CV*1.4D6*PHI2_CV)
 ! <AQ79_CV>:
-! Constant rate moved to initialize :   RCONST(720) = (XCL_CV*4.7D7*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(733) = (XCL_CV*4.7D7*PHI2_CV)
 ! <AQ80_CV>:
-! Constant rate moved to initialize :   RCONST(721) = (XCL_CV*7.7D6*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(734) = (XCL_CV*7.7D6*PHI2_CV)
 ! <AQ81_CV>:
-! Constant rate moved to initialize :   RCONST(722) = (XCL_CV*7.0D8*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(735) = (XCL_CV*7.0D8*PHI2_CV)
 ! <AQ82_CV>:
-! Constant rate moved to initialize :   RCONST(723) = (XCL_CV*6.0D7*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(736) = (XCL_CV*6.0D7*PHI2_CV)
 ! <AQ83_CV>:
-! Constant rate moved to initialize :   RCONST(724) = (XCL_CV*6.0D7*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(737) = (XCL_CV*6.0D7*PHI2_CV)
 ! <AQ84_CV>:
-! Constant rate moved to initialize :   RCONST(725) = (XCL_CV*1.6D7*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(738) = (XCL_CV*1.6D7*PHI2_CV)
 ! <AQ85_CV>:
-! Constant rate moved to initialize :   RCONST(726) = (XCL_CV*8.5D7*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(739) = (XCL_CV*8.5D7*PHI2_CV)
 ! <AQ86_CV>:
-! Constant rate moved to initialize :   RCONST(727) = (XCL_CV*1.1D9*EXP(-1.02D3*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(740) = (XCL_CV*1.1D9*EXP(-1.02D3*TFAC)*PHI2_CV)
 ! <AQ87_CV>:
-! Constant rate moved to initialize :   RCONST(728) = (XCL_CV*1.2D8*EXP(-9.9D2*TFAC)*PHI2_CV)
+! Constant rate moved to initialize :   RCONST(741) = (XCL_CV*1.2D8*EXP(-9.9D2*TFAC)*PHI2_CV)
 ! <AQ88_CV>:
-  RCONST(729) = (XCL_CV*KRXN(750.D0,0.0D0,0,0,1,'CV',Y))
+  RCONST(742) = (XCL_CV*KRXN(750.D0,0.0D0,0,0,1,'CV',Y))
 ! <AQ89_CV>:
-  RCONST(730) = (XCL_CV*KRXN(750.D0,0.0D0,0,0,1,'CV',Y))
+  RCONST(743) = (XCL_CV*KRXN(750.D0,0.0D0,0,0,1,'CV',Y))
 ! <AQ90_CV>:
-  RCONST(731) = (XCL_CV*KRXN(750.D0,0.0D0,0,0,1,'CV',Y))
+  RCONST(744) = (XCL_CV*KRXN(750.D0,0.0D0,0,0,1,'CV',Y))
 ! <AQ91_CV>:
-  RCONST(732) = (XCL_CV*KRXN(2600.D0,0.0D0,0,0,1,'CV',Y))
+  RCONST(745) = (XCL_CV*KRXN(2600.D0,0.0D0,0,0,1,'CV',Y))
 ! <AQ92_CV>:
-  RCONST(733) = (XCL_CV*KRXN(2600.D0,0.0D0,0,0,1,'CV',Y))
+  RCONST(746) = (XCL_CV*KRXN(2600.D0,0.0D0,0,0,1,'CV',Y))
 ! <AQ93_CV>:
-  RCONST(734) = (XCL_CV*KRXN(2600.D0,0.0D0,0,0,1,'CV',Y))
+  RCONST(747) = (XCL_CV*KRXN(2600.D0,0.0D0,0,0,1,'CV',Y))
 ! <AQ94_CV>:
-  RCONST(735) = (XCL_CV*KRXN(1.0D10,0.0D0,3,0,1,'CV',Y))
+  RCONST(748) = (XCL_CV*KRXN(1.0D10,0.0D0,3,0,1,'CV',Y))
 ! <AQ95_CV>:
-  RCONST(736) = (XCL_CV*KRXN(1.0D10,0.0D0,3,0,1,'CV',Y))
+  RCONST(749) = (XCL_CV*KRXN(1.0D10,0.0D0,3,0,1,'CV',Y))
 ! <AQ96_CV>:
-  RCONST(737) = (XCL_CV*KRXN(1.0D10,0.0D0,3,0,1,'CV',Y))
+  RCONST(750) = (XCL_CV*KRXN(1.0D10,0.0D0,3,0,1,'CV',Y))
 ! <AQJ01_CV>:
-! Constant rate moved to initialize :   RCONST(738) = (XCL_CV*1.0*RJCELL(IJ_H2O2_IUPAC10))
+! Constant rate moved to initialize :   RCONST(751) = (XCL_CV*1.0*RJCELL(IJ_H2O2_IUPAC10))
 ! <AQJ02_CV>:
-! Constant rate moved to initialize :   RCONST(739) = (XCL_CV*1.0*RJCELL(IJ_HNO3_IUPAC10))
+! Constant rate moved to initialize :   RCONST(752) = (XCL_CV*1.0*RJCELL(IJ_HNO3_IUPAC10))
 ! <AQIEP01_CV>:
-  RCONST(740) = (XCL_CV*KIEPOX(9.0D-4,1.31D-5,0,'CV',Y))
+  RCONST(753) = (XCL_CV*KIEPOX(9.0D-4,1.31D-5,0,'CV',Y))
 ! <AQIEP02_CV>:
-  RCONST(741) = (XCL_CV*KIEPOX(8.83D-3,2.92D-6,0,'CV',Y))
+  RCONST(754) = (XCL_CV*KIEPOX(8.83D-3,2.92D-6,0,'CV',Y))
 ! <AQIEP03_CV>:
-  RCONST(742) = (XCL_CV*KIEPOX(2.0D-4,2.92D-6,0,'CV',Y))
+  RCONST(755) = (XCL_CV*KIEPOX(2.0D-4,2.92D-6,0,'CV',Y))
 ! <AKN01_CV>:
-! Constant rate moved to initialize :   RCONST(743) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
+! Constant rate moved to initialize :   RCONST(756) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
 ! <AKN02_CV>:
-! Constant rate moved to initialize :   RCONST(744) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
+! Constant rate moved to initialize :   RCONST(757) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
 ! <AKN03_CV>:
-! Constant rate moved to initialize :   RCONST(745) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
+! Constant rate moved to initialize :   RCONST(758) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
 ! <AKN04_CV>:
-! Constant rate moved to initialize :   RCONST(746) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
+! Constant rate moved to initialize :   RCONST(759) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
 ! <AKN05_CV>:
-! Constant rate moved to initialize :   RCONST(747) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
+! Constant rate moved to initialize :   RCONST(760) = (XCL_CV*CFRAC_CV*KPP_ALFA3_CV)
 ! <AQWD01_CV>:
-! Constant rate moved to initialize :   RCONST(748) = (XCL_CV*WFAC_CV)
-! <AQWD02_CV>:
-! Constant rate moved to initialize :   RCONST(749) = (XCL_CV*WFAC_CV)
-! <AQWD03_CV>:
-! Constant rate moved to initialize :   RCONST(750) = (XCL_CV*WFAC_CV)
-! <AQWD04_CV>:
-! Constant rate moved to initialize :   RCONST(751) = (XCL_CV*WFAC_CV)
-! <AQWD05_CV>:
-! Constant rate moved to initialize :   RCONST(752) = (XCL_CV*WFAC_CV)
-! <AQWD06_CV>:
-! Constant rate moved to initialize :   RCONST(753) = (XCL_CV*WFAC_CV)
-! <AQWD07_CV>:
-! Constant rate moved to initialize :   RCONST(754) = (XCL_CV*WFAC_CV)
-! <AQWD08_CV>:
-! Constant rate moved to initialize :   RCONST(755) = (XCL_CV*WFAC_CV)
-! <AQWD09_CV>:
-! Constant rate moved to initialize :   RCONST(756) = (XCL_CV*WFAC_CV)
-! <AQWD10_CV>:
-! Constant rate moved to initialize :   RCONST(757) = (XCL_CV*WFAC_CV)
-! <AQWD11_CV>:
-! Constant rate moved to initialize :   RCONST(758) = (XCL_CV*WFAC_CV)
-! <AQWD12_CV>:
-! Constant rate moved to initialize :   RCONST(759) = (XCL_CV*WFAC_CV)
-! <AQWD13_CV>:
-! Constant rate moved to initialize :   RCONST(760) = (XCL_CV*WFAC_CV)
-! <AQWD14_CV>:
 ! Constant rate moved to initialize :   RCONST(761) = (XCL_CV*WFAC_CV)
-! <AQWD15_CV>:
+! <AQWD02_CV>:
 ! Constant rate moved to initialize :   RCONST(762) = (XCL_CV*WFAC_CV)
-! <AQWD16_CV>:
+! <AQWD03_CV>:
 ! Constant rate moved to initialize :   RCONST(763) = (XCL_CV*WFAC_CV)
-! <AQWD17_CV>:
+! <AQWD04_CV>:
 ! Constant rate moved to initialize :   RCONST(764) = (XCL_CV*WFAC_CV)
-! <AQWD18_CV>:
+! <AQWD05_CV>:
 ! Constant rate moved to initialize :   RCONST(765) = (XCL_CV*WFAC_CV)
-! <AQWD19_CV>:
+! <AQWD06_CV>:
 ! Constant rate moved to initialize :   RCONST(766) = (XCL_CV*WFAC_CV)
-! <AQWD20_CV>:
+! <AQWD07_CV>:
 ! Constant rate moved to initialize :   RCONST(767) = (XCL_CV*WFAC_CV)
-! <AQWD21_CV>:
+! <AQWD08_CV>:
 ! Constant rate moved to initialize :   RCONST(768) = (XCL_CV*WFAC_CV)
-! <AQWD22_CV>:
+! <AQWD09_CV>:
 ! Constant rate moved to initialize :   RCONST(769) = (XCL_CV*WFAC_CV)
-! <AQWD23_CV>:
+! <AQWD10_CV>:
 ! Constant rate moved to initialize :   RCONST(770) = (XCL_CV*WFAC_CV)
-! <AQWD24_CV>:
+! <AQWD11_CV>:
 ! Constant rate moved to initialize :   RCONST(771) = (XCL_CV*WFAC_CV)
-! <AQWD25_CV>:
+! <AQWD12_CV>:
 ! Constant rate moved to initialize :   RCONST(772) = (XCL_CV*WFAC_CV)
-! <AQWD26_CV>:
+! <AQWD13_CV>:
 ! Constant rate moved to initialize :   RCONST(773) = (XCL_CV*WFAC_CV)
-! <AQWD27_CV>:
+! <AQWD14_CV>:
 ! Constant rate moved to initialize :   RCONST(774) = (XCL_CV*WFAC_CV)
-! <AQWD28_CV>:
+! <AQWD15_CV>:
 ! Constant rate moved to initialize :   RCONST(775) = (XCL_CV*WFAC_CV)
-! <AQWD29_CV>:
+! <AQWD16_CV>:
 ! Constant rate moved to initialize :   RCONST(776) = (XCL_CV*WFAC_CV)
-! <AQWD30_CV>:
+! <AQWD17_CV>:
 ! Constant rate moved to initialize :   RCONST(777) = (XCL_CV*WFAC_CV)
-! <AQWD31_CV>:
+! <AQWD18_CV>:
 ! Constant rate moved to initialize :   RCONST(778) = (XCL_CV*WFAC_CV)
-! <AQWD32_CV>:
+! <AQWD19_CV>:
 ! Constant rate moved to initialize :   RCONST(779) = (XCL_CV*WFAC_CV)
-! <AQWD33_CV>:
+! <AQWD20_CV>:
 ! Constant rate moved to initialize :   RCONST(780) = (XCL_CV*WFAC_CV)
-! <AQWD34_CV>:
+! <AQWD21_CV>:
 ! Constant rate moved to initialize :   RCONST(781) = (XCL_CV*WFAC_CV)
-! <AQWD35_CV>:
+! <AQWD22_CV>:
 ! Constant rate moved to initialize :   RCONST(782) = (XCL_CV*WFAC_CV)
-! <AQWD36_CV>:
+! <AQWD23_CV>:
 ! Constant rate moved to initialize :   RCONST(783) = (XCL_CV*WFAC_CV)
-! <AQWD37_CV>:
+! <AQWD24_CV>:
 ! Constant rate moved to initialize :   RCONST(784) = (XCL_CV*WFAC_CV)
-! <AQWD38_CV>:
+! <AQWD25_CV>:
 ! Constant rate moved to initialize :   RCONST(785) = (XCL_CV*WFAC_CV)
-! <AQWD39_CV>:
+! <AQWD26_CV>:
 ! Constant rate moved to initialize :   RCONST(786) = (XCL_CV*WFAC_CV)
-! <AQWD40_CV>:
+! <AQWD27_CV>:
 ! Constant rate moved to initialize :   RCONST(787) = (XCL_CV*WFAC_CV)
-! <AQWD41_CV>:
+! <AQWD28_CV>:
 ! Constant rate moved to initialize :   RCONST(788) = (XCL_CV*WFAC_CV)
-! <AQWD42_CV>:
+! <AQWD29_CV>:
 ! Constant rate moved to initialize :   RCONST(789) = (XCL_CV*WFAC_CV)
-! <AQWD43_CV>:
+! <AQWD30_CV>:
 ! Constant rate moved to initialize :   RCONST(790) = (XCL_CV*WFAC_CV)
-! <AQWD44_CV>:
+! <AQWD31_CV>:
 ! Constant rate moved to initialize :   RCONST(791) = (XCL_CV*WFAC_CV)
-! <AQWD45_CV>:
+! <AQWD32_CV>:
 ! Constant rate moved to initialize :   RCONST(792) = (XCL_CV*WFAC_CV)
-! <AQWD46_CV>:
+! <AQWD33_CV>:
 ! Constant rate moved to initialize :   RCONST(793) = (XCL_CV*WFAC_CV)
-! <AQWD47_CV>:
+! <AQWD34_CV>:
 ! Constant rate moved to initialize :   RCONST(794) = (XCL_CV*WFAC_CV)
-! <AQWD48_CV>:
+! <AQWD35_CV>:
 ! Constant rate moved to initialize :   RCONST(795) = (XCL_CV*WFAC_CV)
-! <AQWD49_CV>:
+! <AQWD36_CV>:
 ! Constant rate moved to initialize :   RCONST(796) = (XCL_CV*WFAC_CV)
-! <AQWD50_CV>:
+! <AQWD37_CV>:
 ! Constant rate moved to initialize :   RCONST(797) = (XCL_CV*WFAC_CV)
-! <AQWD51_CV>:
+! <AQWD38_CV>:
 ! Constant rate moved to initialize :   RCONST(798) = (XCL_CV*WFAC_CV)
-! <AQWD52_CV>:
+! <AQWD39_CV>:
 ! Constant rate moved to initialize :   RCONST(799) = (XCL_CV*WFAC_CV)
-! <AQWD53_CV>:
+! <AQWD40_CV>:
 ! Constant rate moved to initialize :   RCONST(800) = (XCL_CV*WFAC_CV)
-! <AQWD54_CV>:
+! <AQWD41_CV>:
 ! Constant rate moved to initialize :   RCONST(801) = (XCL_CV*WFAC_CV)
-! <AQWD55_CV>:
+! <AQWD42_CV>:
 ! Constant rate moved to initialize :   RCONST(802) = (XCL_CV*WFAC_CV)
-! <AQWD56_CV>:
+! <AQWD43_CV>:
 ! Constant rate moved to initialize :   RCONST(803) = (XCL_CV*WFAC_CV)
-! <AQWDIEP01_CV>:
+! <AQWD44_CV>:
 ! Constant rate moved to initialize :   RCONST(804) = (XCL_CV*WFAC_CV)
-! <AQWDIEP02_CV>:
+! <AQWD45_CV>:
 ! Constant rate moved to initialize :   RCONST(805) = (XCL_CV*WFAC_CV)
-! <AQWDMET01_CV>:
+! <AQWD46_CV>:
 ! Constant rate moved to initialize :   RCONST(806) = (XCL_CV*WFAC_CV)
-! <AQWDMET02_CV>:
+! <AQWD47_CV>:
 ! Constant rate moved to initialize :   RCONST(807) = (XCL_CV*WFAC_CV)
-! <AQWDMET03_CV>:
+! <AQWD48_CV>:
 ! Constant rate moved to initialize :   RCONST(808) = (XCL_CV*WFAC_CV)
-! <AQWDMET04_CV>:
+! <AQWD49_CV>:
 ! Constant rate moved to initialize :   RCONST(809) = (XCL_CV*WFAC_CV)
-! <AQWDMET05_CV>:
+! <AQWD50_CV>:
 ! Constant rate moved to initialize :   RCONST(810) = (XCL_CV*WFAC_CV)
-! <AQWDMET06_CV>:
+! <AQWD51_CV>:
 ! Constant rate moved to initialize :   RCONST(811) = (XCL_CV*WFAC_CV)
+! <AQWD52_CV>:
+! Constant rate moved to initialize :   RCONST(812) = (XCL_CV*WFAC_CV)
+! <AQWD53_CV>:
+! Constant rate moved to initialize :   RCONST(813) = (XCL_CV*WFAC_CV)
+! <AQWD54_CV>:
+! Constant rate moved to initialize :   RCONST(814) = (XCL_CV*WFAC_CV)
+! <AQWD55_CV>:
+! Constant rate moved to initialize :   RCONST(815) = (XCL_CV*WFAC_CV)
+! <AQWD56_CV>:
+! Constant rate moved to initialize :   RCONST(816) = (XCL_CV*WFAC_CV)
+! <AQWDIEP01_CV>:
+! Constant rate moved to initialize :   RCONST(817) = (XCL_CV*WFAC_CV)
+! <AQWDIEP02_CV>:
+! Constant rate moved to initialize :   RCONST(818) = (XCL_CV*WFAC_CV)
+! <AQWDMET01_CV>:
+! Constant rate moved to initialize :   RCONST(819) = (XCL_CV*WFAC_CV)
+! <AQWDMET02_CV>:
+! Constant rate moved to initialize :   RCONST(820) = (XCL_CV*WFAC_CV)
+! <AQWDMET03_CV>:
+! Constant rate moved to initialize :   RCONST(821) = (XCL_CV*WFAC_CV)
+! <AQWDMET04_CV>:
+! Constant rate moved to initialize :   RCONST(822) = (XCL_CV*WFAC_CV)
+! <AQWDMET05_CV>:
+! Constant rate moved to initialize :   RCONST(823) = (XCL_CV*WFAC_CV)
+! <AQWDMET06_CV>:
+! Constant rate moved to initialize :   RCONST(824) = (XCL_CV*WFAC_CV)
+! <AQPUP01f_CV>:
+! Constant rate moved to initialize :   RCONST(825) = (XCL_CV*CFRAC_CV*KMT(TEMP,LWC_CV,30.0D0,1.64D-5,H_FORM,0.02D0,0))
+! <AQPUP01b_CV>:
+! Constant rate moved to initialize :   RCONST(826) = (XCL_CV*KMT(TEMP,LWC_CV,30.0D0,1.64D-5,H_FORM,0.02D0,1))
+! <AQPHY01f_CV>:
+! Constant rate moved to initialize :   RCONST(827) = (XCL_CV*1.8D-1*EXP(4.03D+3*TFAC)*PHI2_CV)
+! <AQPHY01b_CV>:
+! Constant rate moved to initialize :   RCONST(828) = (XCL_CV*5.1D-3)
+! <AQP01_CV>:
+! Constant rate moved to initialize :   RCONST(829) = (XCL_CV*1.1D9*EXP(-1.02D3*TFAC)*PHI2_CV)
+! <AQP02_CV>:
+! Constant rate moved to initialize :   RCONST(830) = (XCL_CV*7.9D2*EXP(-2.9D3*TFAC)*PHI2_CV)
+! <AQP03_CV>:
+! Constant rate moved to initialize :   RCONST(831) = (XCL_CV*2.5D7*EXP(-2.45D3*TFAC)*PHI2_CV)
+! <AQP04_CV>:
+! Constant rate moved to initialize :   RCONST(832) = (XCL_CV*7.7D-3*EXP(-9.2E3*TFAC))
+! <AQP05_CV>:
+! Constant rate moved to initialize :   RCONST(833) = (XCL_CV*3.7D3*PHI2_CV)
+! <AQP06_CV>:
+! Constant rate moved to initialize :   RCONST(834) = (XCL_CV*3.0D8*PHI2_CV)
+! <AQPWD01_CV>:
+! Constant rate moved to initialize :   RCONST(835) = (XCL_CV*WFAC_CV)
+! <AQPWD02_CV>:
+! Constant rate moved to initialize :   RCONST(836) = (XCL_CV*WFAC_CV)
+! <AQPWD03_CV>:
+! Constant rate moved to initialize :   RCONST(837) = (XCL_CV*WFAC_CV)
 ! <GASWD01>:
-! Constant rate moved to initialize :   RCONST(812) = (KPP_RSCAV(IND_NO2))
+! Constant rate moved to initialize :   RCONST(838) = (KPP_RSCAV(IND_NO2))
 ! <GASWD02>:
-! Constant rate moved to initialize :   RCONST(813) = (KPP_RSCAV(IND_NO))
+! Constant rate moved to initialize :   RCONST(839) = (KPP_RSCAV(IND_NO))
 ! <GASWD03>:
-! Constant rate moved to initialize :   RCONST(814) = (KPP_RSCAV(IND_O3))
+! Constant rate moved to initialize :   RCONST(840) = (KPP_RSCAV(IND_O3))
 ! <GASWD04>:
-! Constant rate moved to initialize :   RCONST(815) = (KPP_RSCAV(IND_NO3))
+! Constant rate moved to initialize :   RCONST(841) = (KPP_RSCAV(IND_NO3))
 ! <GASWD05>:
-! Constant rate moved to initialize :   RCONST(816) = (KPP_RSCAV(IND_H2O2))
+! Constant rate moved to initialize :   RCONST(842) = (KPP_RSCAV(IND_H2O2))
 ! <GASWD06>:
-! Constant rate moved to initialize :   RCONST(817) = (KPP_RSCAV(IND_N2O5))
+! Constant rate moved to initialize :   RCONST(843) = (KPP_RSCAV(IND_N2O5))
 ! <GASWD07>:
-! Constant rate moved to initialize :   RCONST(818) = (KPP_RSCAV(IND_HNO3))
+! Constant rate moved to initialize :   RCONST(844) = (KPP_RSCAV(IND_HNO3))
 ! <GASWD08>:
-! Constant rate moved to initialize :   RCONST(819) = (KPP_RSCAV(IND_HONO))
+! Constant rate moved to initialize :   RCONST(845) = (KPP_RSCAV(IND_HONO))
 ! <GASWD09>:
-! Constant rate moved to initialize :   RCONST(820) = (KPP_RSCAV(IND_PNA))
+! Constant rate moved to initialize :   RCONST(846) = (KPP_RSCAV(IND_PNA))
 ! <GASWD10>:
-! Constant rate moved to initialize :   RCONST(821) = (KPP_RSCAV(IND_SO2))
+! Constant rate moved to initialize :   RCONST(847) = (KPP_RSCAV(IND_SO2))
 ! <GASWD11>:
-! Constant rate moved to initialize :   RCONST(822) = (KPP_RSCAV(IND_SULF))
+! Constant rate moved to initialize :   RCONST(848) = (KPP_RSCAV(IND_SULF))
 ! <GASWD12>:
-! Constant rate moved to initialize :   RCONST(823) = (KPP_RSCAV(IND_PAN))
+! Constant rate moved to initialize :   RCONST(849) = (KPP_RSCAV(IND_PAN))
 ! <GASWD13>:
-! Constant rate moved to initialize :   RCONST(824) = (KPP_RSCAV(IND_PACD))
+! Constant rate moved to initialize :   RCONST(850) = (KPP_RSCAV(IND_PACD))
 ! <GASWD14>:
-! Constant rate moved to initialize :   RCONST(825) = (KPP_RSCAV(IND_AACD))
+! Constant rate moved to initialize :   RCONST(851) = (KPP_RSCAV(IND_AACD))
 ! <GASWD15>:
-! Constant rate moved to initialize :   RCONST(826) = (KPP_RSCAV(IND_ALD2))
+! Constant rate moved to initialize :   RCONST(852) = (KPP_RSCAV(IND_ALD2))
 ! <GASWD16>:
-! Constant rate moved to initialize :   RCONST(827) = (KPP_RSCAV(IND_PANX))
+! Constant rate moved to initialize :   RCONST(853) = (KPP_RSCAV(IND_PANX))
 ! <GASWD17>:
-! Constant rate moved to initialize :   RCONST(828) = (KPP_RSCAV(IND_FORM))
+! Constant rate moved to initialize :   RCONST(854) = (KPP_RSCAV(IND_FORM))
 ! <GASWD18>:
-! Constant rate moved to initialize :   RCONST(829) = (KPP_RSCAV(IND_MEPX))
+! Constant rate moved to initialize :   RCONST(855) = (KPP_RSCAV(IND_MEPX))
 ! <GASWD19>:
-! Constant rate moved to initialize :   RCONST(830) = (KPP_RSCAV(IND_MEOH))
+! Constant rate moved to initialize :   RCONST(856) = (KPP_RSCAV(IND_MEOH))
 ! <GASWD20>:
-! Constant rate moved to initialize :   RCONST(831) = (KPP_RSCAV(IND_ROOH))
+! Constant rate moved to initialize :   RCONST(857) = (KPP_RSCAV(IND_ROOH))
 ! <GASWD21>:
-! Constant rate moved to initialize :   RCONST(832) = (KPP_RSCAV(IND_NTR1))
+! Constant rate moved to initialize :   RCONST(858) = (KPP_RSCAV(IND_NTR1))
 ! <GASWD22>:
-! Constant rate moved to initialize :   RCONST(833) = (KPP_RSCAV(IND_NTR2))
+! Constant rate moved to initialize :   RCONST(859) = (KPP_RSCAV(IND_NTR2))
 ! <GASWD23>:
-! Constant rate moved to initialize :   RCONST(834) = (KPP_RSCAV(IND_FACD))
+! Constant rate moved to initialize :   RCONST(860) = (KPP_RSCAV(IND_FACD))
 ! <GASWD24>:
-! Constant rate moved to initialize :   RCONST(835) = (KPP_RSCAV(IND_CO))
+! Constant rate moved to initialize :   RCONST(861) = (KPP_RSCAV(IND_CO))
 ! <GASWD25>:
-! Constant rate moved to initialize :   RCONST(836) = (KPP_RSCAV(IND_ALDX))
+! Constant rate moved to initialize :   RCONST(862) = (KPP_RSCAV(IND_ALDX))
 ! <GASWD26>:
-! Constant rate moved to initialize :   RCONST(837) = (KPP_RSCAV(IND_GLYD))
+! Constant rate moved to initialize :   RCONST(863) = (KPP_RSCAV(IND_GLYD))
 ! <GASWD27>:
-! Constant rate moved to initialize :   RCONST(838) = (KPP_RSCAV(IND_GLY))
+! Constant rate moved to initialize :   RCONST(864) = (KPP_RSCAV(IND_GLY))
 ! <GASWD28>:
-! Constant rate moved to initialize :   RCONST(839) = (KPP_RSCAV(IND_MGLY))
+! Constant rate moved to initialize :   RCONST(865) = (KPP_RSCAV(IND_MGLY))
 ! <GASWD29>:
-! Constant rate moved to initialize :   RCONST(840) = (KPP_RSCAV(IND_ETHA))
+! Constant rate moved to initialize :   RCONST(866) = (KPP_RSCAV(IND_ETHA))
 ! <GASWD30>:
-! Constant rate moved to initialize :   RCONST(841) = (KPP_RSCAV(IND_ETOH))
+! Constant rate moved to initialize :   RCONST(867) = (KPP_RSCAV(IND_ETOH))
 ! <GASWD31>:
-! Constant rate moved to initialize :   RCONST(842) = (KPP_RSCAV(IND_KET))
+! Constant rate moved to initialize :   RCONST(868) = (KPP_RSCAV(IND_KET))
 ! <GASWD32>:
-! Constant rate moved to initialize :   RCONST(843) = (KPP_RSCAV(IND_PAR))
+! Constant rate moved to initialize :   RCONST(869) = (KPP_RSCAV(IND_PAR))
 ! <GASWD33>:
-! Constant rate moved to initialize :   RCONST(844) = (KPP_RSCAV(IND_ACET))
+! Constant rate moved to initialize :   RCONST(870) = (KPP_RSCAV(IND_ACET))
 ! <GASWD34>:
-! Constant rate moved to initialize :   RCONST(845) = (KPP_RSCAV(IND_PRPA))
+! Constant rate moved to initialize :   RCONST(871) = (KPP_RSCAV(IND_PRPA))
 ! <GASWD35>:
-! Constant rate moved to initialize :   RCONST(846) = (KPP_RSCAV(IND_ETHY))
+! Constant rate moved to initialize :   RCONST(872) = (KPP_RSCAV(IND_ETHY))
 ! <GASWD36>:
-! Constant rate moved to initialize :   RCONST(847) = (KPP_RSCAV(IND_ETH))
+! Constant rate moved to initialize :   RCONST(873) = (KPP_RSCAV(IND_ETH))
 ! <GASWD37>:
-! Constant rate moved to initialize :   RCONST(848) = (KPP_RSCAV(IND_OLE))
+! Constant rate moved to initialize :   RCONST(874) = (KPP_RSCAV(IND_OLE))
 ! <GASWD38>:
-! Constant rate moved to initialize :   RCONST(849) = (KPP_RSCAV(IND_IOLE))
+! Constant rate moved to initialize :   RCONST(875) = (KPP_RSCAV(IND_IOLE))
 ! <GASWD39>:
-! Constant rate moved to initialize :   RCONST(850) = (KPP_RSCAV(IND_ISOP))
+! Constant rate moved to initialize :   RCONST(876) = (KPP_RSCAV(IND_ISOP))
 ! <GASWD40>:
-! Constant rate moved to initialize :   RCONST(851) = (KPP_RSCAV(IND_ISPD))
+! Constant rate moved to initialize :   RCONST(877) = (KPP_RSCAV(IND_ISPD))
 ! <GASWD41>:
-! Constant rate moved to initialize :   RCONST(852) = (KPP_RSCAV(IND_INTR))
+! Constant rate moved to initialize :   RCONST(878) = (KPP_RSCAV(IND_INTR))
 ! <GASWD42>:
-! Constant rate moved to initialize :   RCONST(853) = (KPP_RSCAV(IND_ISPX))
+! Constant rate moved to initialize :   RCONST(879) = (KPP_RSCAV(IND_ISPX))
 ! <GASWD43>:
-! Constant rate moved to initialize :   RCONST(854) = (KPP_RSCAV(IND_EPOX))
+! Constant rate moved to initialize :   RCONST(880) = (KPP_RSCAV(IND_EPOX))
 ! <GASWD44>:
-! Constant rate moved to initialize :   RCONST(855) = (KPP_RSCAV(IND_TERP))
+! Constant rate moved to initialize :   RCONST(881) = (KPP_RSCAV(IND_TERP))
 ! <GASWD45>:
-! Constant rate moved to initialize :   RCONST(856) = (KPP_RSCAV(IND_APIN))
+! Constant rate moved to initialize :   RCONST(882) = (KPP_RSCAV(IND_APIN))
 ! <GASWD46>:
-! Constant rate moved to initialize :   RCONST(857) = (KPP_RSCAV(IND_MTNO3))
+! Constant rate moved to initialize :   RCONST(883) = (KPP_RSCAV(IND_MTNO3))
 ! <GASWD47>:
-! Constant rate moved to initialize :   RCONST(858) = (KPP_RSCAV(IND_BENZENE))
+! Constant rate moved to initialize :   RCONST(884) = (KPP_RSCAV(IND_BENZENE))
 ! <GASWD48>:
-! Constant rate moved to initialize :   RCONST(859) = (KPP_RSCAV(IND_CRES))
+! Constant rate moved to initialize :   RCONST(885) = (KPP_RSCAV(IND_CRES))
 ! <GASWD49>:
-! Constant rate moved to initialize :   RCONST(860) = (KPP_RSCAV(IND_OPEN))
+! Constant rate moved to initialize :   RCONST(886) = (KPP_RSCAV(IND_OPEN))
 ! <GASWD50>:
-! Constant rate moved to initialize :   RCONST(861) = (KPP_RSCAV(IND_TOL))
+! Constant rate moved to initialize :   RCONST(887) = (KPP_RSCAV(IND_TOL))
 ! <GASWD51>:
-! Constant rate moved to initialize :   RCONST(862) = (KPP_RSCAV(IND_XOPN))
+! Constant rate moved to initialize :   RCONST(888) = (KPP_RSCAV(IND_XOPN))
 ! <GASWD52>:
-! Constant rate moved to initialize :   RCONST(863) = (KPP_RSCAV(IND_XYLMN))
+! Constant rate moved to initialize :   RCONST(889) = (KPP_RSCAV(IND_XYLMN))
 ! <GASWD53>:
-! Constant rate moved to initialize :   RCONST(864) = (KPP_RSCAV(IND_NAPH))
+! Constant rate moved to initialize :   RCONST(890) = (KPP_RSCAV(IND_NAPH))
 ! <GASWD54>:
-! Constant rate moved to initialize :   RCONST(865) = (KPP_RSCAV(IND_CAT1))
+! Constant rate moved to initialize :   RCONST(891) = (KPP_RSCAV(IND_CAT1))
 ! <GASWD55>:
-! Constant rate moved to initialize :   RCONST(866) = (KPP_RSCAV(IND_CRON))
+! Constant rate moved to initialize :   RCONST(892) = (KPP_RSCAV(IND_CRON))
 ! <GASWD56>:
-! Constant rate moved to initialize :   RCONST(867) = (KPP_RSCAV(IND_OPAN))
+! Constant rate moved to initialize :   RCONST(893) = (KPP_RSCAV(IND_OPAN))
 ! <GASWD57>:
-! Constant rate moved to initialize :   RCONST(868) = (KPP_RSCAV(IND_ECH4))
+! Constant rate moved to initialize :   RCONST(894) = (KPP_RSCAV(IND_ECH4))
 ! <GASWD58>:
-! Constant rate moved to initialize :   RCONST(869) = (KPP_RSCAV(IND_CL2))
+! Constant rate moved to initialize :   RCONST(895) = (KPP_RSCAV(IND_CL2))
 ! <GASWD59>:
-! Constant rate moved to initialize :   RCONST(870) = (KPP_RSCAV(IND_HOCL))
+! Constant rate moved to initialize :   RCONST(896) = (KPP_RSCAV(IND_HOCL))
 ! <GASWD60>:
-! Constant rate moved to initialize :   RCONST(871) = (KPP_RSCAV(IND_CLO))
+! Constant rate moved to initialize :   RCONST(897) = (KPP_RSCAV(IND_CLO))
 ! <GASWD61>:
-! Constant rate moved to initialize :   RCONST(872) = (KPP_RSCAV(IND_FMCL))
+! Constant rate moved to initialize :   RCONST(898) = (KPP_RSCAV(IND_FMCL))
 ! <GASWD62>:
-! Constant rate moved to initialize :   RCONST(873) = (KPP_RSCAV(IND_HCL))
+! Constant rate moved to initialize :   RCONST(899) = (KPP_RSCAV(IND_HCL))
 ! <GASWD63>:
-! Constant rate moved to initialize :   RCONST(874) = (KPP_RSCAV(IND_CLNO2))
+! Constant rate moved to initialize :   RCONST(900) = (KPP_RSCAV(IND_CLNO2))
 ! <GASWD64>:
-! Constant rate moved to initialize :   RCONST(875) = (KPP_RSCAV(IND_CLNO3))
+! Constant rate moved to initialize :   RCONST(901) = (KPP_RSCAV(IND_CLNO3))
 ! <GASWD65>:
-! Constant rate moved to initialize :   RCONST(876) = (KPP_RSCAV(IND_SESQ))
+! Constant rate moved to initialize :   RCONST(902) = (KPP_RSCAV(IND_SESQ))
 ! <GASWD66>:
-! Constant rate moved to initialize :   RCONST(877) = (KPP_RSCAV(IND_SOAALK))
+! Constant rate moved to initialize :   RCONST(903) = (KPP_RSCAV(IND_SOAALK))
 ! <GASWD67>:
-! Constant rate moved to initialize :   RCONST(878) = (KPP_RSCAV(IND_VLVPO1))
+! Constant rate moved to initialize :   RCONST(904) = (KPP_RSCAV(IND_VLVPO1))
 ! <GASWD68>:
-! Constant rate moved to initialize :   RCONST(879) = (KPP_RSCAV(IND_VSVPO1))
+! Constant rate moved to initialize :   RCONST(905) = (KPP_RSCAV(IND_VSVPO1))
 ! <GASWD69>:
-! Constant rate moved to initialize :   RCONST(880) = (KPP_RSCAV(IND_VSVPO2))
+! Constant rate moved to initialize :   RCONST(906) = (KPP_RSCAV(IND_VSVPO2))
 ! <GASWD70>:
-! Constant rate moved to initialize :   RCONST(881) = (KPP_RSCAV(IND_VSVPO3))
+! Constant rate moved to initialize :   RCONST(907) = (KPP_RSCAV(IND_VSVPO3))
 ! <GASWD71>:
-! Constant rate moved to initialize :   RCONST(882) = (KPP_RSCAV(IND_VIVPO1))
+! Constant rate moved to initialize :   RCONST(908) = (KPP_RSCAV(IND_VIVPO1))
 ! <GASWD72>:
-! Constant rate moved to initialize :   RCONST(883) = (KPP_RSCAV(IND_VLVOO1))
+! Constant rate moved to initialize :   RCONST(909) = (KPP_RSCAV(IND_VLVOO1))
 ! <GASWD73>:
-! Constant rate moved to initialize :   RCONST(884) = (KPP_RSCAV(IND_VLVOO2))
+! Constant rate moved to initialize :   RCONST(910) = (KPP_RSCAV(IND_VLVOO2))
 ! <GASWD74>:
-! Constant rate moved to initialize :   RCONST(885) = (KPP_RSCAV(IND_VSVOO1))
+! Constant rate moved to initialize :   RCONST(911) = (KPP_RSCAV(IND_VSVOO1))
 ! <GASWD75>:
-! Constant rate moved to initialize :   RCONST(886) = (KPP_RSCAV(IND_VSVOO2))
+! Constant rate moved to initialize :   RCONST(912) = (KPP_RSCAV(IND_VSVOO2))
 ! <GASWD76>:
-! Constant rate moved to initialize :   RCONST(887) = (KPP_RSCAV(IND_VSVOO3))
+! Constant rate moved to initialize :   RCONST(913) = (KPP_RSCAV(IND_VSVOO3))
 ! <GASWD77>:
-! Constant rate moved to initialize :   RCONST(888) = (KPP_RSCAV(IND_PCVOC))
+! Constant rate moved to initialize :   RCONST(914) = (KPP_RSCAV(IND_PCVOC))
 ! <GASWD78>:
-! Constant rate moved to initialize :   RCONST(889) = (KPP_RSCAV(IND_FORM_PRIMARY))
+! Constant rate moved to initialize :   RCONST(915) = (KPP_RSCAV(IND_FORM_PRIMARY))
 ! <GASWD79>:
-! Constant rate moved to initialize :   RCONST(890) = (KPP_RSCAV(IND_ALD2_PRIMARY))
+! Constant rate moved to initialize :   RCONST(916) = (KPP_RSCAV(IND_ALD2_PRIMARY))
 ! <GASWD80>:
-! Constant rate moved to initialize :   RCONST(891) = (KPP_RSCAV(IND_BUTADIENE13))
+! Constant rate moved to initialize :   RCONST(917) = (KPP_RSCAV(IND_BUTADIENE13))
 ! <GASWD81>:
-! Constant rate moved to initialize :   RCONST(892) = (KPP_RSCAV(IND_ACROLEIN))
+! Constant rate moved to initialize :   RCONST(918) = (KPP_RSCAV(IND_ACROLEIN))
 ! <GASWD82>:
-! Constant rate moved to initialize :   RCONST(893) = (KPP_RSCAV(IND_ACRO_PRIMARY))
+! Constant rate moved to initialize :   RCONST(919) = (KPP_RSCAV(IND_ACRO_PRIMARY))
 ! <GASWD83>:
-! Constant rate moved to initialize :   RCONST(894) = (KPP_RSCAV(IND_TOLU))
+! Constant rate moved to initialize :   RCONST(920) = (KPP_RSCAV(IND_TOLU))
 ! <GASWD84>:
-! Constant rate moved to initialize :   RCONST(895) = (KPP_RSCAV(IND_HG))
+! Constant rate moved to initialize :   RCONST(921) = (KPP_RSCAV(IND_HG))
 ! <GASWD85>:
-! Constant rate moved to initialize :   RCONST(896) = (KPP_RSCAV(IND_HGIIGAS))
+! Constant rate moved to initialize :   RCONST(922) = (KPP_RSCAV(IND_HGIIGAS))
 ! <GASWD86>:
-! Constant rate moved to initialize :   RCONST(897) = (KPP_RSCAV(IND_SVAVB1))
+! Constant rate moved to initialize :   RCONST(923) = (KPP_RSCAV(IND_SVAVB1))
 ! <GASWD87>:
-! Constant rate moved to initialize :   RCONST(898) = (KPP_RSCAV(IND_SVAVB2))
+! Constant rate moved to initialize :   RCONST(924) = (KPP_RSCAV(IND_SVAVB2))
 ! <GASWD88>:
-! Constant rate moved to initialize :   RCONST(899) = (KPP_RSCAV(IND_SVAVB3))
+! Constant rate moved to initialize :   RCONST(925) = (KPP_RSCAV(IND_SVAVB3))
 ! <GASWD89>:
-! Constant rate moved to initialize :   RCONST(900) = (KPP_RSCAV(IND_SVAVB4))
+! Constant rate moved to initialize :   RCONST(926) = (KPP_RSCAV(IND_SVAVB4))
 ! <GASWD90>:
-! Constant rate moved to initialize :   RCONST(901) = (KPP_RSCAV(IND_DMS))
+! Constant rate moved to initialize :   RCONST(927) = (KPP_RSCAV(IND_DMS))
 ! <GASWD91>:
-! Constant rate moved to initialize :   RCONST(902) = (KPP_RSCAV(IND_MSA))
+! Constant rate moved to initialize :   RCONST(928) = (KPP_RSCAV(IND_MSA))
 ! <GASWD92>:
-! Constant rate moved to initialize :   RCONST(903) = (KPP_RSCAV(IND_ASO4I))
+! Constant rate moved to initialize :   RCONST(929) = (KPP_RSCAV(IND_ASO4I))
 ! <GASWD93>:
-! Constant rate moved to initialize :   RCONST(904) = (KPP_RSCAV(IND_ASO4J))
+! Constant rate moved to initialize :   RCONST(930) = (KPP_RSCAV(IND_ASO4J))
 ! <GASWD94>:
-! Constant rate moved to initialize :   RCONST(905) = (KPP_RSCAV(IND_ANH4I))
+! Constant rate moved to initialize :   RCONST(931) = (KPP_RSCAV(IND_ANH4I))
 ! <GASWD95>:
-! Constant rate moved to initialize :   RCONST(906) = (KPP_RSCAV(IND_ANO3I))
+! Constant rate moved to initialize :   RCONST(932) = (KPP_RSCAV(IND_ANO3I))
 ! <GASWD96>:
-! Constant rate moved to initialize :   RCONST(907) = (KPP_RSCAV(IND_ANAI))
+! Constant rate moved to initialize :   RCONST(933) = (KPP_RSCAV(IND_ANAI))
 ! <GASWD97>:
-! Constant rate moved to initialize :   RCONST(908) = (KPP_RSCAV(IND_ACLI))
+! Constant rate moved to initialize :   RCONST(934) = (KPP_RSCAV(IND_ACLI))
 ! <GASWD98>:
-! Constant rate moved to initialize :   RCONST(909) = (KPP_RSCAV(IND_ACLJ))
+! Constant rate moved to initialize :   RCONST(935) = (KPP_RSCAV(IND_ACLJ))
 ! <GASWD99>:
-! Constant rate moved to initialize :   RCONST(910) = (KPP_RSCAV(IND_ACLK))
+! Constant rate moved to initialize :   RCONST(936) = (KPP_RSCAV(IND_ACLK))
 ! <GASWD100>:
-! Constant rate moved to initialize :   RCONST(911) = (KPP_RSCAV(IND_AISO1J))
+! Constant rate moved to initialize :   RCONST(937) = (KPP_RSCAV(IND_AISO1J))
 ! <GASWD101>:
-! Constant rate moved to initialize :   RCONST(912) = (KPP_RSCAV(IND_AISO2J))
+! Constant rate moved to initialize :   RCONST(938) = (KPP_RSCAV(IND_AISO2J))
 ! <GASWD102>:
-! Constant rate moved to initialize :   RCONST(913) = (KPP_RSCAV(IND_ASQTJ))
+! Constant rate moved to initialize :   RCONST(939) = (KPP_RSCAV(IND_ASQTJ))
 ! <GASWD103>:
-! Constant rate moved to initialize :   RCONST(914) = (KPP_RSCAV(IND_AISO3J))
+! Constant rate moved to initialize :   RCONST(940) = (KPP_RSCAV(IND_AISO3J))
 ! <GASWD104>:
-! Constant rate moved to initialize :   RCONST(915) = (KPP_RSCAV(IND_AOLGAJ))
+! Constant rate moved to initialize :   RCONST(941) = (KPP_RSCAV(IND_AOLGAJ))
 ! <GASWD105>:
-! Constant rate moved to initialize :   RCONST(916) = (KPP_RSCAV(IND_AOLGBJ))
+! Constant rate moved to initialize :   RCONST(942) = (KPP_RSCAV(IND_AOLGBJ))
 ! <GASWD106>:
-! Constant rate moved to initialize :   RCONST(917) = (KPP_RSCAV(IND_AGLYJ))
+! Constant rate moved to initialize :   RCONST(943) = (KPP_RSCAV(IND_AGLYJ))
 ! <GASWD107>:
-! Constant rate moved to initialize :   RCONST(918) = (KPP_RSCAV(IND_AMTNO3J))
+! Constant rate moved to initialize :   RCONST(944) = (KPP_RSCAV(IND_AMTNO3J))
 ! <GASWD108>:
-! Constant rate moved to initialize :   RCONST(919) = (KPP_RSCAV(IND_AMTHYDJ))
+! Constant rate moved to initialize :   RCONST(945) = (KPP_RSCAV(IND_AMTHYDJ))
 ! <GASWD109>:
-! Constant rate moved to initialize :   RCONST(920) = (KPP_RSCAV(IND_APOCI))
+! Constant rate moved to initialize :   RCONST(946) = (KPP_RSCAV(IND_APOCI))
 ! <GASWD110>:
-! Constant rate moved to initialize :   RCONST(921) = (KPP_RSCAV(IND_APOCJ))
+! Constant rate moved to initialize :   RCONST(947) = (KPP_RSCAV(IND_APOCJ))
 ! <GASWD111>:
-! Constant rate moved to initialize :   RCONST(922) = (KPP_RSCAV(IND_APNCOMI))
+! Constant rate moved to initialize :   RCONST(948) = (KPP_RSCAV(IND_APNCOMI))
 ! <GASWD112>:
-! Constant rate moved to initialize :   RCONST(923) = (KPP_RSCAV(IND_APNCOMJ))
+! Constant rate moved to initialize :   RCONST(949) = (KPP_RSCAV(IND_APNCOMJ))
 ! <GASWD113>:
-! Constant rate moved to initialize :   RCONST(924) = (KPP_RSCAV(IND_AAVB2J))
+! Constant rate moved to initialize :   RCONST(950) = (KPP_RSCAV(IND_AAVB2J))
 ! <GASWD114>:
-! Constant rate moved to initialize :   RCONST(925) = (KPP_RSCAV(IND_AAVB3J))
+! Constant rate moved to initialize :   RCONST(951) = (KPP_RSCAV(IND_AAVB3J))
 ! <GASWD115>:
-! Constant rate moved to initialize :   RCONST(926) = (KPP_RSCAV(IND_AAVB4J))
+! Constant rate moved to initialize :   RCONST(952) = (KPP_RSCAV(IND_AAVB4J))
 ! <GASWD116>:
-! Constant rate moved to initialize :   RCONST(927) = (KPP_RSCAV(IND_NH3))
+! Constant rate moved to initialize :   RCONST(953) = (KPP_RSCAV(IND_NH3))
       
 END SUBROUTINE Update_RCONST
 
