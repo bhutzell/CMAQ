@@ -10,8 +10,6 @@
 <AQUP03b_a##> H2CO3_a## = CO2           : XCL_a##*KMT(TEMP,LWC_a##,44.0D0,1.55D-5,H_CO2,0.00015D0,1);
 <AQUP04f_a##> NH3       = NH3_a##       : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,17.0D0,2.30D-5,H_NH3,0.091D0,0);
 <AQUP04b_a##> NH3_a##   = NH3           : XCL_a##*KMT(TEMP,LWC_a##,17.0D0,2.30D-5,H_NH3,0.091D0,1);
-!<AQUP04f_a##> NH3       = NH4OH_a##     : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,17.0D0,2.30D-5,H_NH3,0.091D0,0);
-!<AQUP04b_a##> NH4OH_a## = NH3           : XCL_a##*KMT(TEMP,LWC_a##,17.0D0,2.30D-5,H_NH3,0.091D0,1);
 <AQUP05f_a##> H2O2      = H2O2_a##      : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,34.0D0,1.46D-5,H_H2O2,0.15D0,0);
 <AQUP05b_a##> H2O2_a##  = H2O2          : XCL_a##*KMT(TEMP,LWC_a##,34.0D0,1.46D-5,H_H2O2,0.15D0,1);
 <AQUP06f_a##> O3        = O3_a##        : XCL_a##*CFRAC_a##*KMT(TEMP,LWC_a##,48.0D0,1.48D-5,H_O3,0.1D0,0);
@@ -73,10 +71,8 @@
 <AQEQ03b_a##> SO3mm_a##   + Hp_a##      = HSO3m_a##  : XCL_a##*DISB(5.0D10,1,'a##');
 <AQEQ04f_a##> HNO3_a##    = NO3m_a##    + Hp_a##     : XCL_a##*DISF(1.7D+01,0.0D0,5.0D10,0,'a##');
 <AQEQ04b_a##> NO3m_a##    + Hp_a##      = HNO3_a##   : XCL_a##*DISB(5.0D10,2,'a##');
-<AQEQ05f_a##> NH4p_a##    = NH3_a##     + Hp_a##     : XCL_a##*DISF(5.87647D-7,-2.391D2,3.4D10,0,'a##');
-<AQEQ05b_a##> NH3_a##     + Hp_a##      = NH4p_a##   : XCL_a##*DISB(3.4D10,2,'a##');
-!<AQEQ05f_a##> NH4OH_a##   = NH4p_a##    + OHm_a##    : XCL_a##*DISF(1.77D-5,-7.10D+02,3.4D10,0,'a##');
-!<AQEQ05b_a##> NH4p_a##    + OHm_a##     = NH4OH_a##  : XCL_a##*DISB(3.4D10,2,'a##');
+<AQEQ05f_a##> NH3_a##     = NH4p_a##    + OHm_a##    : XCL_a##*DISF(1.77D-5,-7.10D+02,3.4D10,0,'a##');
+<AQEQ05b_a##> NH4p_a##    + OHm_a##     = NH3_a##    : XCL_a##*DISB(3.4D10,2,'a##');
 <AQEQ06f_a##> H2CO3_a##   = HCO3m_a##   + Hp_a##     : XCL_a##*DISF(4.30D-07,-9.95D+02,6.4D4,0,'a##');
 <AQEQ06b_a##> HCO3m_a##   + Hp_a##      = H2CO3_a##  : XCL_a##*DISB(6.4D4,2,'a##');
 <AQEQ07f_a##> HCO3m_a##   = CO3mm_a##   + Hp_a##     : XCL_a##*DISF(4.68D-11,-1.785D+03,5.0D10,1,'a##');
@@ -226,7 +222,6 @@
 <AQWD07_a##> HCO3m_a##    = WD_CO2        : XCL_a##*WFAC_a##;
 <AQWD08_a##> CO3mm_a##    = WD_CO2        : XCL_a##*WFAC_a##;
 <AQWD09_a##> NH3_a##      = WD_NH3        : XCL_a##*WFAC_a##;
-!<AQWD09_a##> NH4OH_a##    = WD_NH3        : XCL_a##*WFAC_a##;
 <AQWD10_a##> H2O2_a##     = WD_H2O2       : XCL_a##*WFAC_a##;
 <AQWD11_a##> O3_a##       = WD_O3         : XCL_a##*WFAC_a##;
 <AQWD12_a##> HCL_a##      = WD_HCL        : XCL_a##*WFAC_a##;
