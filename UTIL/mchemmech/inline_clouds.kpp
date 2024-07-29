@@ -77,6 +77,64 @@ REAL( dp ) FUNCTION KMT(TEMP,LWC,MMASS,DG,HENRY,ACOM,FB)
   RETURN
 END FUNCTION KMT
 
+
+REAL( kind=dp ) FUNCTION DISF ( KEQ, DH, KB, G1, CLTYPE )
+
+  IMPLICIT NONE
+
+  REAL( kind=dp ),      INTENT( IN ) :: DH, KEQ, KB
+  INTEGER,              INTENT( IN ) :: G1
+  CHARACTER( LEN = 2 ), INTENT( IN ) :: CLTYPE
+
+  REAL( kind=dp ) :: GM1
+
+  ! Select cloud indices and properties
+  IF ( CLTYPE .EQ. 'RS' ) THEN
+     GM1 = GM1_RS
+  ELSE IF ( CLTYPE .EQ. 'CV' ) THEN
+     GM1 = GM1_CV
+  END IF
+
+  DISF = KB * ( KEQ * EXP( DH * TFAC ) )
+
+  IF( G1 .eq. 1 ) DISF = DISF * ( GM1 )
+
+  RETURN
+
+END FUNCTION DISF
+
+REAL( kind=dp ) FUNCTION DISB ( KB, G1, CLTYPE )
+
+  IMPLICIT NONE
+
+  REAL( kind=dp ),      INTENT( IN ) :: KB
+  INTEGER,              INTENT( IN ) :: G1
+  CHARACTER( LEN = 2 ), INTENT( IN ) :: CLTYPE
+
+  REAL( kind=dp ) :: GM1, GM2, PHI2
+
+  ! Select cloud indices and properties
+  IF ( CLTYPE .EQ. 'RS' ) THEN
+     GM1  = GM1_RS
+     GM2  = GM2_RS
+     PHI2 = PHI2_RS
+  ELSE IF ( CLTYPE .EQ. 'CV' ) THEN
+     GM1  = GM1_CV
+     GM2  = GM2_CV
+     PHI2 = PHI2_CV
+  END IF
+
+  DISB = KB
+
+  IF( G1 .eq. 1 ) DISB   = DISB * GM1 * GM2
+  IF( G1 .eq. 2 ) DISB   = DISB * GM1 * GM1
+
+  DISB = DISB * PHI2
+
+  RETURN
+
+END FUNCTION DISB
+
 REAL( kind=dp )FUNCTION KRXN ( KR, DH, RTYPE, QY, METAL, CLTYPE, VAR )
 
      IMPLICIT NONE

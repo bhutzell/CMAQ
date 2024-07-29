@@ -24,7 +24,7 @@ def write_file(filename, lines):
 
 # declare local variables
 mech = sys.argv[1]
-variable_rconsts = ['GM1','GM2','KRXN','KIEPOX','FALLOFF','RCONST']
+variable_rconsts = ['GM1','GM2','KRXN','KIEPOX','FALLOFF','RCONST','DISF','DISB']
 constRCONST = []
 
 # define file names
