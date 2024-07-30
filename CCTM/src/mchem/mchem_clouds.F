@@ -49,6 +49,8 @@
           CHARACTER( 16 ) :: IC2_RESET     ! IC2 reset needed?
           CHARACTER( 16 ) :: EV_SURR       ! EV Surrogate
           REAL            :: EV_FAC        ! EV Scale Factor
+          CHARACTER( 16 ) :: EV2_SURR      ! EV Surrogate
+          REAL            :: EV2_FAC       ! EV Scale Factor
           CHARACTER( 16 ) :: WETSUB        ! If coarse mode aerosols will be affected by scavenging only
       END TYPE SPECIES_DATA_CLOUDS
 
@@ -69,6 +71,11 @@
           INTEGER                                :: EV_CGRID_INDEX  ! EV Surrogate Index
           REAL                                   :: EV_FAC    ! EV Scale Factor
           REAL                                   :: EV_MW     ! EV molar weight
+          CHARACTER( 2 )                         :: EV2_TYPE  ! Evaporation species type
+          CHARACTER( 16 )                        :: EV2_NAME  ! EV Surrogate Name
+          INTEGER                                :: EV2_CGRID_INDEX ! EV Surrogate Index
+          REAL                                   :: EV2_FAC   ! EV Scale Factor
+          REAL                                   :: EV2_MW    ! EV molar weight
           CHARACTER( 16 )                        :: WETSUB    ! If coarse mode aerosols will be affected by scavenging only
           INTEGER                                :: WETSUB_CGRID_INDEX  ! WETSUB Surrogate Index
       END TYPE MECH_SPECIES_CLOUDS
@@ -677,6 +684,8 @@ C...  for H+
         CL_SPECIES_DATA%IC2_RESET    = ''
         CL_SPECIES_DATA%EV_SURR      = ''
         CL_SPECIES_DATA%EV_FAC       = 1.
+        CL_SPECIES_DATA%EV2_SURR     = ''
+        CL_SPECIES_DATA%EV2_FAC      = 1.
         CL_SPECIES_DATA%WETSUB       = ''
 
         NAMELIST / CL_NML / CL_SPECIES_DATA
@@ -702,6 +711,11 @@ C...  for H+
            MECH_SPC_CL( ICL )%EV_CGRID_INDEX = 0
            MECH_SPC_CL( ICL )%EV_FAC  = 0.
            MECH_SPC_CL( ICL )%EV_MW   = 0.
+           MECH_SPC_CL( ICL )%EV2_TYPE = ''
+           MECH_SPC_CL( ICL )%EV2_NAME = ''
+           MECH_SPC_CL( ICL )%EV2_CGRID_INDEX = 0
+           MECH_SPC_CL( ICL )%EV2_FAC = 0.
+           MECH_SPC_CL( ICL )%EV2_MW  = 0.
            MECH_SPC_CL( ICL )%WETSUB  = ''
            MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX = 0
            DO ICLT = 1,CL_TYPES
@@ -745,6 +759,13 @@ C...  for H+
               MECH_SPC_CL( ICL )%EV_FAC         = CL_SPECIES_DATA( ICL )%EV_FAC
               MECH_SPC_CL( ICL )%EV_MW          = CGRID_MW( MECH_SPC_CL( ICL )%EV_CGRID_INDEX )
            END IF
+           IF ( TRIM(CL_SPECIES_DATA( ICL )%EV2_SURR) .NE. '' ) THEN
+              MECH_SPC_CL( ICL )%EV2_NAME        = CL_SPECIES_DATA( ICL )%EV2_SURR
+              MECH_SPC_CL( ICL )%EV2_CGRID_INDEX = INDEX_CGRID( MECH_SPC_CL( ICL )%EV2_NAME )
+              MECH_SPC_CL( ICL )%EV2_TYPE        = SPC_TYPE( MECH_SPC_CL( ICL )%EV2_CGRID_INDEX )
+              MECH_SPC_CL( ICL )%EV2_FAC         = CL_SPECIES_DATA( ICL )%EV2_FAC
+              MECH_SPC_CL( ICL )%EV2_MW          = CGRID_MW( MECH_SPC_CL( ICL )%EV2_CGRID_INDEX )
+           END IF
            IF ( TRIM(CL_SPECIES_DATA( ICL )%WETSUB) .NE. '' ) THEN
               MECH_SPC_CL( ICL )%WETSUB             = CL_SPECIES_DATA( ICL )%WETSUB
               MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX = INDEX_CGRID( MECH_SPC_CL( ICL )%WETSUB )
@@ -753,13 +774,16 @@ C...  for H+
 
 C..   Report cloud species definitions to log-file
         WRITE(LOGDEV,"(A)") 'Cloud species definition used in MCHEM:'
-        FMT = "(A16,A6,X,A6,X,A9,X,A8,X,A9,X,A7,X,A9,X,A8,X,A9,X,A7,X,A9,X,A8,X,A8,X,A7,X,A6,X,A8,X,A12)"
+        FMT = "(A16,A6,X,A6,X,A9,X,A8,X,A9,X,A7,X,A9,X,A8,X,A9,X,A7,X,A9,X,A12,X,A8,X,
+     &          A7,X,A6,X,A12,X,A9,X,A8,X,A7,X,A8,X,A12)"
         WRITE(LOGDEV,FMT)   'NAME            ','MOLWT','CHARGE','KPP_INDEX',
      &                      'IC1_NAME','IC1_INDEX','IC1_FAC','IC1_RESET',
      &                      'IC2_NAME','IC2_INDEX','IC2_FAC','IC2_RESET',
-     &                      'EV_NAME ','EV_INDEX','EV_TYPE','EV_FAC',
+     &                      'EV_NAME     ','EV_INDEX','EV_TYPE','EV_FAC',
+     &                      'EV2_NAME    ','EV2_INDEX','EV2_TYPE','EV2_FAC',
      &                      'WETSUB  ','WETSUB_INDEX'
-        FMT = "(A16,F6.1,X,F6.1,X,I9,X,A8,X,I9,X,F7.1,X,L9,X,A8,X,I9,X,F7.1,X,L9,X,A8,X,I8,X,A7,X,F6.1,X,A8,X,I12)"
+        FMT = "(A16,F6.1,X,F6.1,X,I9,X,A8,X,I9,X,F7.1,X,L9,X,A8,X,I9,X,F7.1,X,L9,X,
+     &          A12,X,I8,X,A7,X,F6.1,X,A12,X,I9,X,A8,X,F7.1,X,A8,X,I12)"
         DO ICL = 1,N_CL_SPC
            DO ICLT = 1,CL_TYPES
               WRITE(LOGDEV,FMT) MECH_SPC_CL( ICL )%NAME( ICLT ), MECH_SPC_CL( ICL )%MOLWT,
@@ -770,6 +794,8 @@ C..   Report cloud species definitions to log-file
      &                          MECH_SPC_CL( ICL )%IC_FAC ( 2 ), MECH_SPC_CL( ICL )%IC_RESET ( 2 ),
      &                          MECH_SPC_CL( ICL )%EV_NAME, MECH_SPC_CL( ICL )%EV_CGRID_INDEX,
      &                          MECH_SPC_CL( ICL )%EV_TYPE, MECH_SPC_CL( ICL )%EV_FAC,
+     &                          MECH_SPC_CL( ICL )%EV2_NAME, MECH_SPC_CL( ICL )%EV2_CGRID_INDEX,
+     &                          MECH_SPC_CL( ICL )%EV2_TYPE, MECH_SPC_CL( ICL )%EV2_FAC,
      &                          MECH_SPC_CL( ICL )%WETSUB, MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX
            END DO
         END DO
@@ -927,6 +953,7 @@ C.. Initialise Hp and OHm
         REAL(dp), PARAMETER    :: ZERO = 1.0E-30
         REAL(dp)               :: SCAL, CONC_TEMP, EXPWDEP, REMOVE
         REAL(dp)               :: CL_CGRID( N_CGRID_SPC )    ! Cloud species concentration transfered to CGRID array
+        LOGICAL                :: LEVAP
         INTRINSIC DEXP
 
 C.. Ensure zeroed CL_CGRID array
@@ -934,7 +961,9 @@ C.. Ensure zeroed CL_CGRID array
 
 C.. Sum up all cloud tracer that are evaporated for CGRID array
         DO ICL = 1,N_CL_SPC
+           LEVAP = .FALSE.
            IF ( TRIM(MECH_SPC_CL( ICL )%EV_NAME) .NE. '' ) THEN
+              LEVAP = .TRUE.
               IKPP_RS = MECH_SPC_CL( ICL )%KPP_INDEX( IRS )
               IKPP_CV = MECH_SPC_CL( ICL )%KPP_INDEX( ICV )
               ICGRID  = MECH_SPC_CL( ICL )%EV_CGRID_INDEX
@@ -943,6 +972,19 @@ C.. Sum up all cloud tracer that are evaporated for CGRID array
               CONC_TEMP = ( C( IKPP_RS ) + C( IKPP_CV ) ) * SCAL
               CL_CGRID( ICGRID ) = MAX( CL_CGRID( ICGRID ) +
      &                                  CONC_TEMP, ZERO )
+           END IF
+           IF ( TRIM(MECH_SPC_CL( ICL )%EV2_NAME) .NE. '' ) THEN
+              LEVAP = .TRUE.
+              IKPP_RS = MECH_SPC_CL( ICL )%KPP_INDEX( IRS )
+              IKPP_CV = MECH_SPC_CL( ICL )%KPP_INDEX( ICV )
+              ICGRID  = MECH_SPC_CL( ICL )%EV2_CGRID_INDEX
+              SCAL = REAL( MECH_SPC_CL( ICL )%EV2_FAC, dp )
+              SCAL = SCAL * REAL( ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%EV2_MW ), dp ) ! Scale by molar weight
+              CONC_TEMP = ( C( IKPP_RS ) + C( IKPP_CV ) ) * SCAL
+              CL_CGRID( ICGRID ) = MAX( CL_CGRID( ICGRID ) +
+     &                                     CONC_TEMP, ZERO )
+           END IF
+           IF ( LEVAP ) THEN
               C( IKPP_RS ) = ZERO ! reseting these fields should not be necessary
               C( IKPP_CV ) = ZERO ! reseting these fields should not be necessary
            END IF
