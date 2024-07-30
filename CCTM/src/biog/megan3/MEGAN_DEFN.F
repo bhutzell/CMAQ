@@ -130,7 +130,7 @@ C=======================================================================
          LOGICAL, INTENT( IN ) :: L_DESID_DIAG
 
          CHARACTER (20) :: TIME_STAMP
-         INTEGER JDATE, JTIME, TSTEP( 3 ), ISTR, io_mode, LAYERS
+         INTEGER JDATE, JTIME, TSTEP( 3 ), ISTR, LAYERS
          INTEGER I, J,MXLAI, LAIp_I,LAIc_i
          REAL JDAY, JYEAR, ZTIME
          REAL            :: CURRHR                          ! current GMT hour

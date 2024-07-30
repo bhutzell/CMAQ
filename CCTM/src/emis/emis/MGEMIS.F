@@ -271,19 +271,9 @@ C Local variables:
 
          INTEGER      V, L       ! loop induction variables
          
-#ifdef mpas
-         integer :: io_mode
-#endif
-
 C-----------------------------------------------------------------------
 
 #ifdef mpas
-         if (ncd_64bit_offset) then
-            io_mode = ior (nf90_noclobber, nf90_64bit_offset)
-         else
-            io_mode = nf90_noclobber
-         end if
-
          call mio_fcreate (CTM_MGEM_1, io_mode)
 
 #else

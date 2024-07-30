@@ -122,10 +122,7 @@ C Local Variables:
       CHARACTER( 256 ) :: MESG            ! message buffer
       CHARACTER( 16 )  :: PNAME = 'MEG_HRNO'  ! procedure name
 
-#ifdef mpas
-      integer :: io_mode
       CHARACTER( 20 ) :: time_stamp
-#endif
 
       LOGICAL, EXTERNAL :: FLUSH3
 
@@ -145,12 +142,6 @@ C Determine last timestamp
          MSTEPS = TIME2SEC( RUNLEN ) / TIME2SEC( TSTEP( 1 ) )
 
 #ifdef mpas
-         if (ncd_64bit_offset) then
-            io_mode = ior (nf90_noclobber, nf90_64bit_offset)
-         else
-            io_mode = nf90_noclobber
-         end if
-
          call mio_fcreate (SOILOUT, io_mode)
          METSTEP = TSTEP(3)
 

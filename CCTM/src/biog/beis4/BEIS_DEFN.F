@@ -499,7 +499,7 @@ C Save Species names in global array for mapping emissions
                  DESID_EMVAR( IBIOSRM )%MW( ISP ) = CGRID_MW( INDX )
              ELSE
                  WRITE( MESG, '(A,A,A,A)' ) 'WARNING: BEIS emission species ',
-     &               EMSPC( ISP ),' is not found in the Gas-Phase Mechanism. ',
+     &               TRIM(EMSPC( ISP )),' is not found in the Gas-Phase Mechanism. ',
      &               'The emission variable molecular weight will be set to 1.0'
                  CALL LOG_MESSAGE( LOGDEV, MESG )
                  DESID_EMVAR( IBIOSRM )%MW( ISP ) = 1.0

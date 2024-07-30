@@ -117,6 +117,7 @@ C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE STD_CONC              ! standard CONC
       USE CGRID_SPCS            ! CGRID mechanism species
+      use mio_module
 #ifdef mpas
       USE HGRD_DEFN, ONLY: MYPE
       use coupler_module
@@ -126,7 +127,6 @@ C-----------------------------------------------------------------------
       use mydata_module
       use get_env_module
       use lus_defn
-      use mio_module
 #else
       USE PCGRID_DEFN           ! inherits GRID_CONF
       USE AVG_CONC              ! integral average CONC
@@ -228,8 +228,6 @@ C Local variables:
       INTEGER       :: STATUS
 
 #ifdef mpas
-
-      integer :: io_mode
 
       INTEGER      SPC_STRT, SPC_FINI, J
       LOGICAL      LSTAT
@@ -549,7 +547,7 @@ C Initialize Global Arrays for Storing Chemical, Regional, Process,
 C and Emission Stream Families
          call read_families
 
-C Initiliaze IO Arrays and Open Files
+C Initialize IO Arrays and Open Files
 #ifdef mpas
          call centralized_io_init (NCOLS_IN)
 #else
@@ -611,12 +609,6 @@ C Convention: the input file concentration units are always ppmV.
 !       if (.not. lus_init (mminlu_mpas, lufrac_data(:,:,1)) ) then
 !          CALL M3EXIT( 'DRIVER',JDATE,JTIME,'ERROR: Cannot initialize Land Use Category', 2)
 !       end if
-
-        if (ncd_64bit_offset) then
-            io_mode = ior (nf90_noclobber, nf90_64bit_offset)
-         else
-            io_mode = nf90_noclobber
-         end if
 
         call mio_setfile ('GR_EMIS_001')
 
@@ -790,7 +782,7 @@ C Initialize Modules
           if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
 
 C Initialize MIO - placeholder
-!         call mio_init
+          call mio_init( npcol, nprow, ncols, nrows, logdev )
       END IF
 
       ! science process sequence:
@@ -949,9 +941,6 @@ C Write Data to Output Files
 #endif
 
       IF ( LAST_STEP ) THEN
-#ifdef mpas
-         call mio_shutdown()
-#else
 C write CGRID state file for subsequent runs
          CALL WR_CGRID ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
 #ifdef isam
@@ -975,7 +964,6 @@ C Shut down IOAPI
          ELSE
             CALL LOG_MESSAGE( LOGDEV, ' *** FATAL ERROR shutting down Models-3 I/O *** ' )
          END IF
-#endif
       END IF
 
       ! Output Verification of MIO Input File

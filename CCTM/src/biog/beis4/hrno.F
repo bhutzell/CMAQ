@@ -236,10 +236,6 @@ C for INTERPX
       CHARACTER( 16 ), SAVE :: VNAME_RC, VNAME_RN
       INTEGER :: SPC
 
-#ifdef mpas
-      integer :: io_mode
-#endif
-
       LOGICAL, EXTERNAL :: FLUSH3
 
 #ifdef verbose_hrno
@@ -253,12 +249,6 @@ C-----------------------------------------------------------------------
         INITTIME = .FALSE.
 
 #ifdef mpas
-         if (ncd_64bit_offset) then
-            io_mode = ior (nf90_noclobber, nf90_64bit_offset)
-         else
-            io_mode = nf90_noclobber
-         end if
-
          call mio_fcreate ('SOILOUT', io_mode)
 #endif
 

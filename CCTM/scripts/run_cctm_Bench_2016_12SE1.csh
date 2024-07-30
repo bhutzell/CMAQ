@@ -17,6 +17,8 @@ echo 'Start Model Run At ' `date`
 #> Toggle Diagnostic Mode which will print verbose information to 
 #> standard output
  setenv CTM_DIAG_LVL 0
+ setenv CTM_MIO_FILE Y # turn on generation of MIO_ASCII file
+#setenv mio_file_info /work/MAQSEA/cnolte/cmaq/2024-07-29-xioapi/CCTM/scripts/mio_file_input.txt  
 
 #> Choose compiler and set up CMAQ environment with correct 
 #> libraries using config.cmaq. Options: intel | gcc | pgi
@@ -573,6 +575,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_DRY_DEP_1   "$OUTDIR/CCTM_DRYDEP_${CTM_APPL}.nc -v"     #> Hourly Dry Deposition
   setenv CTM_DEPV_DIAG   "$OUTDIR/CCTM_DEPV_${CTM_APPL}.nc -v"       #> Dry Deposition Velocities
   setenv B3GTS_S         "$OUTDIR/CCTM_B3GTS_S_${CTM_APPL}.nc -v"    #> Biogenic Emissions
+  setenv B3GTS_MIO       $OUTDIR/CCTM_B3GTS_S_${CTM_APPL}.nc         #> Biogenic Emissions
   setenv BEIS_SOILOUT    "$OUTDIR/CCTM_BSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
   setenv MEGAN_SOILOUT   "$OUTDIR/CCTM_MSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
   setenv BDSNPOUT        "$OUTDIR/CCTM_BDSNPOUT_${CTM_APPL}.nc"      #> Soil Emissions
@@ -609,7 +612,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set log_test = `cat buff.txt`; rm -f buff.txt
 
   set OUT_FILES = (${FLOOR_FILE} ${S_CGRID} ${CTM_CONC_1} ${A_CONC_1} ${MEDIA_CONC}         \
-             ${CTM_DRY_DEP_1} $CTM_DEPV_DIAG $B3GTS_S $MEGAN_SOILOUT $BEIS_SOILOUT $BDSNPOUT \
+             ${CTM_DRY_DEP_1} $CTM_DEPV_DIAG $B3GTS_S $B3GTS_MIO $MEGAN_SOILOUT $BEIS_SOILOUT $BDSNPOUT \
              $CTM_WET_DEP_1 $CTM_WET_DEP_2 $CTM_ELMO_1 $CTM_AELMO_1             \
              $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 $CTM_SSEMIS_1 $CTM_DUST_EMIS_1 $CTM_IPR_1 $CTM_IPR_2       \
              $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_DRY_DEP_MOS                 \

@@ -82,6 +82,7 @@ C-----------------------------------------------------------------------
       USE centralized_io_module, only : AVGEMIS, interpolate_var
       Use ASX_DATA_MOD, only: MET_DATA
       USE MIO_ASCII
+      use mio_module
 
 #ifdef mpas
       USE util_module, only : hhmmss, time2sec
@@ -149,6 +150,7 @@ C Other variables:
       CHARACTER( 256 ) :: EQNAME     ! equivalent filename
       CHARACTER(  16 ) :: VAR        ! variable name
       CHARACTER(  16 ) :: PNAME = 'GET_BEIS'   ! prodedure name
+      CHARACTER(  20 ) :: TIME_STAMP
 
 #ifdef verbose_getbeis
       REAL,    ALLOCATABLE, SAVE :: EMISX( : )
@@ -178,6 +180,11 @@ C-----------------------------------------------------------------------
 
       IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
+! mio_fcreate has barrier calls, so do not put file creation inside
+! an IF (IO_PE_INCLUSIVE) block
+         call mio_setfile( 'MET_CRO_2D' )
+         call mio_fcreate( 'B3GTS_MIO', io_mode )
+!         call mio_fcreate( 'B3GTS_MIO', 512 )
 
 C Determine last timestamp
          NSTEPS = RUNLEN / TSTEP( 1 )           ! initscen guarantees divisibility
@@ -339,6 +346,9 @@ C Speciate emissions
                   MESG = 'Could not write to output file "' // TRIM( SNAME ) // '"'
                   CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
                END IF
+               call mio_setfile( 'B3GTS_MIO' )
+               call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+               call mio_fwrite( 'B3GTS_MIO', EMSPC( S ), pname, EMISS(:,:,S), TIME_STAMP )
             END DO
             WRITE( LOGDEV,94040 )
      &            'Timestep written to', SNAME,
