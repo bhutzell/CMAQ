@@ -51,6 +51,7 @@
           REAL            :: EV_FAC        ! EV Scale Factor
           CHARACTER( 16 ) :: EV2_SURR      ! EV Surrogate
           REAL            :: EV2_FAC       ! EV Scale Factor
+          CHARACTER( 16 ) :: SC_IC_EV      ! Scale IC and EV by molar mass?
           CHARACTER( 16 ) :: WETSUB        ! If coarse mode aerosols will be affected by scavenging only
       END TYPE SPECIES_DATA_CLOUDS
 
@@ -76,6 +77,7 @@
           INTEGER                                :: EV2_CGRID_INDEX ! EV Surrogate Index
           REAL                                   :: EV2_FAC   ! EV Scale Factor
           REAL                                   :: EV2_MW    ! EV molar weight
+          LOGICAL                                :: SC_IC_EV  ! Scale IC and EV by molar mass?
           CHARACTER( 16 )                        :: WETSUB    ! If coarse mode aerosols will be affected by scavenging only
           INTEGER                                :: WETSUB_CGRID_INDEX  ! WETSUB Surrogate Index
       END TYPE MECH_SPECIES_CLOUDS
@@ -686,6 +688,7 @@ C...  for H+
         CL_SPECIES_DATA%EV_FAC       = 1.
         CL_SPECIES_DATA%EV2_SURR     = ''
         CL_SPECIES_DATA%EV2_FAC      = 1.
+        CL_SPECIES_DATA%SC_IC_EV     = ''
         CL_SPECIES_DATA%WETSUB       = ''
 
         NAMELIST / CL_NML / CL_SPECIES_DATA
@@ -766,6 +769,7 @@ C...  for H+
               MECH_SPC_CL( ICL )%EV2_FAC         = CL_SPECIES_DATA( ICL )%EV2_FAC
               MECH_SPC_CL( ICL )%EV2_MW          = CGRID_MW( MECH_SPC_CL( ICL )%EV2_CGRID_INDEX )
            END IF
+           MECH_SPC_CL( ICL )%SC_IC_EV = GET_LOGICAL_NML( CL_SPECIES_DATA( ICL )%SC_IC_EV )
            IF ( TRIM(CL_SPECIES_DATA( ICL )%WETSUB) .NE. '' ) THEN
               MECH_SPC_CL( ICL )%WETSUB             = CL_SPECIES_DATA( ICL )%WETSUB
               MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX = INDEX_CGRID( MECH_SPC_CL( ICL )%WETSUB )
@@ -775,15 +779,15 @@ C...  for H+
 C..   Report cloud species definitions to log-file
         WRITE(LOGDEV,"(A)") 'Cloud species definition used in MCHEM:'
         FMT = "(A16,A6,X,A6,X,A9,X,A8,X,A9,X,A7,X,A9,X,A8,X,A9,X,A7,X,A9,X,A12,X,A8,X,
-     &          A7,X,A6,X,A12,X,A9,X,A8,X,A7,X,A8,X,A12)"
+     &          A7,X,A6,X,A12,X,A9,X,A8,X,A7,X,A8,X,A8,X,A12)"
         WRITE(LOGDEV,FMT)   'NAME            ','MOLWT','CHARGE','KPP_INDEX',
      &                      'IC1_NAME','IC1_INDEX','IC1_FAC','IC1_RESET',
      &                      'IC2_NAME','IC2_INDEX','IC2_FAC','IC2_RESET',
      &                      'EV_NAME     ','EV_INDEX','EV_TYPE','EV_FAC',
      &                      'EV2_NAME    ','EV2_INDEX','EV2_TYPE','EV2_FAC',
-     &                      'WETSUB  ','WETSUB_INDEX'
+     &                      'SC_IC_EV','WETSUB  ','WETSUB_INDEX'
         FMT = "(A16,F6.1,X,F6.1,X,I9,X,A8,X,I9,X,F7.1,X,L9,X,A8,X,I9,X,F7.1,X,L9,X,
-     &          A12,X,I8,X,A7,X,F6.1,X,A12,X,I9,X,A8,X,F7.1,X,A8,X,I12)"
+     &          A12,X,I8,X,A7,X,F6.1,X,A12,X,I9,X,A8,X,F7.1,X,L8,X,A8,X,I12)"
         DO ICL = 1,N_CL_SPC
            DO ICLT = 1,CL_TYPES
               WRITE(LOGDEV,FMT) MECH_SPC_CL( ICL )%NAME( ICLT ), MECH_SPC_CL( ICL )%MOLWT,
@@ -796,6 +800,7 @@ C..   Report cloud species definitions to log-file
      &                          MECH_SPC_CL( ICL )%EV_TYPE, MECH_SPC_CL( ICL )%EV_FAC,
      &                          MECH_SPC_CL( ICL )%EV2_NAME, MECH_SPC_CL( ICL )%EV2_CGRID_INDEX,
      &                          MECH_SPC_CL( ICL )%EV2_TYPE, MECH_SPC_CL( ICL )%EV2_FAC,
+     &                          MECH_SPC_CL( ICL )%SC_IC_EV,
      &                          MECH_SPC_CL( ICL )%WETSUB, MECH_SPC_CL( ICL )%WETSUB_CGRID_INDEX
            END DO
         END DO
@@ -868,7 +873,12 @@ C.. Initialise cloud tracer based on convective fraction
                  ICGRID  = MECH_SPC_CL( ICL )%IC_CGRID_INDEX( ICLT )
                  IF ( ICGRID .NE. 0 ) THEN
                     SCAL = REAL( MECH_SPC_CL( ICL )%IC_FAC( ICLT ), dp )                           ! Scale by IC fraction
-                    SMW  = REAL( MECH_SPC_CL( ICL )%IC_MW( ICLT ) / MECH_SPC_CL( ICL )%MOLWT, dp ) ! Scale by molar weight
+                    ! Scale by molar weight if requested by user
+                    IF ( MECH_SPC_CL( ICL )%SC_IC_EV ) THEN
+                       SMW  = REAL( MECH_SPC_CL( ICL )%IC_MW( ICLT ) / MECH_SPC_CL( ICL )%MOLWT, dp )
+                    ELSE
+                       SMW  = 1.0D0
+                    END IF
                     TCLC = REAL( CONC( ICGRID ), dp ) * SCAL                                       ! Total concentration that can partition into clouds
                     IF ( FRAC_RS .GT. 0.0 ) C( IKPP_RS ) = C( IKPP_RS ) + TCLC * FRAC_RS * SMW
                     IF ( FRAC_CV .GT. 0.0 ) C( IKPP_CV ) = C( IKPP_CV ) + TCLC * FRAC_CV * SMW
@@ -962,24 +972,28 @@ C.. Ensure zeroed CL_CGRID array
 C.. Sum up all cloud tracer that are evaporated for CGRID array
         DO ICL = 1,N_CL_SPC
            LEVAP = .FALSE.
+           IKPP_RS = MECH_SPC_CL( ICL )%KPP_INDEX( IRS )
+           IKPP_CV = MECH_SPC_CL( ICL )%KPP_INDEX( ICV )
            IF ( TRIM(MECH_SPC_CL( ICL )%EV_NAME) .NE. '' ) THEN
               LEVAP = .TRUE.
-              IKPP_RS = MECH_SPC_CL( ICL )%KPP_INDEX( IRS )
-              IKPP_CV = MECH_SPC_CL( ICL )%KPP_INDEX( ICV )
               ICGRID  = MECH_SPC_CL( ICL )%EV_CGRID_INDEX
               SCAL = REAL( MECH_SPC_CL( ICL )%EV_FAC, dp )
-              SCAL = SCAL * REAL( ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%EV_MW ), dp ) ! Scale by molar weight
+              ! Scale by molar weight
+              IF ( MECH_SPC_CL( ICL )%SC_IC_EV ) THEN
+                 SCAL = SCAL * REAL( ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%EV_MW ), dp )
+              END IF
               CONC_TEMP = ( C( IKPP_RS ) + C( IKPP_CV ) ) * SCAL
               CL_CGRID( ICGRID ) = MAX( CL_CGRID( ICGRID ) +
      &                                  CONC_TEMP, ZERO )
            END IF
            IF ( TRIM(MECH_SPC_CL( ICL )%EV2_NAME) .NE. '' ) THEN
               LEVAP = .TRUE.
-              IKPP_RS = MECH_SPC_CL( ICL )%KPP_INDEX( IRS )
-              IKPP_CV = MECH_SPC_CL( ICL )%KPP_INDEX( ICV )
               ICGRID  = MECH_SPC_CL( ICL )%EV2_CGRID_INDEX
               SCAL = REAL( MECH_SPC_CL( ICL )%EV2_FAC, dp )
-              SCAL = SCAL * REAL( ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%EV2_MW ), dp ) ! Scale by molar weight
+              ! Scale by molar weight
+              IF ( MECH_SPC_CL( ICL )%SC_IC_EV ) THEN
+                 SCAL = SCAL * REAL( ( MECH_SPC_CL( ICL )%MOLWT / MECH_SPC_CL( ICL )%EV2_MW ), dp )
+              END IF
               CONC_TEMP = ( C( IKPP_RS ) + C( IKPP_CV ) ) * SCAL
               CL_CGRID( ICGRID ) = MAX( CL_CGRID( ICGRID ) +
      &                                     CONC_TEMP, ZERO )
