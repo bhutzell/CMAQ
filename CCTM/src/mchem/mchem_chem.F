@@ -72,7 +72,7 @@ C...........Local Variables:
       REAL(kind=dp), SAVE     :: RCNTRL(20) = 0.0     ! KPP integrator variables
       INTEGER                 :: IERR                 ! KPP integrator variables
       INTEGER                 :: ISTATUS(20)          ! KPP integrator variables
-      LOGICAL, PARAMETER      :: LCL_TOL = .TRUE.     ! flag if alternative tolerances should
+      LOGICAL, PARAMETER      :: LCL_TOL = .FALSE.    ! flag if alternative tolerances should
                                                       ! be used for cloud species
 
       INTEGER SPC             ! Species loop index
@@ -282,18 +282,18 @@ C.. Obtain indexes for gas & accumulation mode partitioning for nitrate, ammoniu
       END DO
 
       ! Set constant species concentrations
-      C(IND_M)   = 1.0E+06    * CAIR * 1.D-6
-      C(IND_H2)  = 0.56       * CAIR * 1.D-6
-      C(IND_O2)  = 0.2095E+06 * CAIR * 1.D-6
-      C(IND_CH4) = 1.85       * CAIR * 1.D-6
+      C(IND_M)   = 1.0D+06    * CAIR * 1.D-6
+      C(IND_H2)  = 0.56D0     * CAIR * 1.D-6
+      C(IND_O2)  = 0.2095D+06 * CAIR * 1.D-6
+      C(IND_CH4) = 1.85D0     * CAIR * 1.D-6
       C(IND_CO2) = 350.0D0    * CAIR * 1.D-6
 
       ! Set cloud water
-      IF ( LCL_RS ) C(IND_H2O_RS) = LWC_RS / REAL( DENSI * QV_TO_PPM, dp ) * CAIR * 1.D-6
-      IF ( LCL_CV ) C(IND_H2O_CV) = LWC_CV / REAL( DENSI * QV_TO_PPM, dp ) * CAIR * 1.D-6
+      IF ( LCL_RS ) C(IND_H2O_RS) = LWC_RS / REAL( DENSI, dp ) * REAL( QV_TO_PPM, dp ) * CAIR * 1.D-6
+      IF ( LCL_CV ) C(IND_H2O_CV) = LWC_CV / REAL( DENSI, dp ) * REAL( QV_TO_PPM, dp ) * CAIR * 1.D-6
 
       ! Fill water
-      C(IND_H2O) = REAL( MAX( REAL( QV_TO_PPM * QV, dp ) *CAIR*1.D-6, 0.0 ), dp)
+      C(IND_H2O) = REAL( MAX( REAL( QV_TO_PPM, dp ) * REAL( QV, dp ) *CAIR*1.D-6, 0.0 ), dp)
 
       COEFF_FALLOFF = C(IND_M)
 

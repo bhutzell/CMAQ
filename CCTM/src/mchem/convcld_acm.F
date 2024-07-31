@@ -1464,7 +1464,7 @@ C...Do not get variables based on average column
                END IF ! ICLDTYPE
              END IF ! WCBAR
           ELSE
-             IF ( WCBAR .GT. 0.0 ) THEN
+             IF ( WCBAR .GT. 0.00005 ) THEN
                DO LAY = 1, NLAYS
                  IF ( WCBARL( LAY ) / DENSL( LAY ) .GT. 0.00005 ) THEN
                    DO SPC = 1, NSPCSD

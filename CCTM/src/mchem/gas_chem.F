@@ -93,9 +93,9 @@ C.. Set KPP specific values
 
 C.. Set KPP options
         ICNTRL(1) = 1 ! 0 - non-autonomous, 1 - autonomous
-        ICNTRL(3) = 4 ! Rodas3
+        ICNTRL(3) = 2 ! Ros3
 C.. Alternative KPP options
-        !ICNTRL(3) = 2 ! Ros3
+        !ICNTRL(3) = 4 ! Rodas3
 
 C.. Set calling of Update_RCONST
         ICNTRL(15) = -1   ! = -1 :  Do not call Update_* functions within the integrator
@@ -103,7 +103,7 @@ C.. Set calling of Update_RCONST
                           ! =  1 :  Call Update_RCONST from within the integrator
 
 C.. Set autoreduce options
-        ICNTRL(12) = 1    ! = 1 use auto-reduce solver. set threshold in RCNTRL(12).
+        ICNTRL(12) = 0    ! = 1 use auto-reduce solver. set threshold in RCNTRL(12).
                           ! = 0 do not use use auto-reduce solver
         ICNTRL(13) = 0    ! = 1 append slow species when auto-reducing
                           ! = 0 do not append slow species when auto-reducing
@@ -122,6 +122,7 @@ C.. Set autoreduce options
       DO NPH = 1, KPP_NHETERO
          KHETCELL( NPH ) = REAL( KHETERO( NPH, COL, ROW, LEV ) , dp ) / 60.0_dp
       END DO
+      LSUNLIGHT = .FALSE.
       DO NPH = 1, KPP_NPHOTAB
          RJCELL( NPH )   = REAL( RJ( COL,ROW,LEV,NPH ), dp ) / 60.0_dp
          IF ( RJCELL( NPH ) .GT. 0.0D0 ) LSUNLIGHT = .TRUE.
@@ -141,13 +142,13 @@ C.. Set autoreduce options
       END DO
 
       ! Set constant species concentrations
-      C(IND_M)   = 1.0E+06    * CAIR * 1.D-6
-      C(IND_H2)  = 0.56       * CAIR * 1.D-6
-      C(IND_O2)  = 0.2095E+06 * CAIR * 1.D-6
-      C(IND_CH4) = 1.85       * CAIR * 1.D-6
+      C(IND_M)   = 1.0D+06    * CAIR * 1.D-6
+      C(IND_H2)  = 0.56D0     * CAIR * 1.D-6
+      C(IND_O2)  = 0.2095D+06 * CAIR * 1.D-6
+      C(IND_CH4) = 1.85D0     * CAIR * 1.D-6
 
       ! Fill water
-      C(IND_H2O) = REAL( MAX( REAL( QV_TO_PPM * QV, dp ) *CAIR*1.D-6, 0.0 ), dp)
+      C(IND_H2O) = REAL( MAX( REAL( QV_TO_PPM, dp ) * REAL( QV, dp ) *CAIR*1.D-6, 0.0 ), dp)
 
       COEFF_FALLOFF = C(IND_M)
 
