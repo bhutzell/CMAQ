@@ -809,7 +809,8 @@ C ***  Map to acids/nucleophiles for epoxide uptake
              ALLOCATE ( ACID_NUC_PAIRS( N_NUCPAIRS ) )
              ACID_NUC_PAIRS = ACID_NUC_PAIRS_AEI
           Else If ( (INDEX( MECHNAME, 'CRACMM1') .GT. 0)
-     &      .OR.    (INDEX( MECHNAME, 'CRACMM2') .GT. 0) ) then
+     &      .OR.    (INDEX( MECHNAME, 'CRACMM2') .GT. 0)
+     &      .OR.    (INDEX( MECHNAME, 'CRACMM3') .GT. 0) ) then
              NUMVOC         = 1
              N_NUCPAIRS     = N_NUCPAIRS_CRCM
              ALLOCATE ( ACID_NUC_PAIRS( N_NUCPAIRS ) )
