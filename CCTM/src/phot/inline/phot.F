@@ -697,7 +697,7 @@ C...modules
          end if
 #endif
 
-
+         RETURN ! Added for MIO Implementation
       END IF  ! firstime
 
       IF ( INT ( JD_STRAT_O3MIN ) .NE. JDATE ) THEN
