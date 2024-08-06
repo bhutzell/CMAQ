@@ -1210,6 +1210,7 @@ C AORGH2O is not required, but highly recommended for aero7
          If ( ( ae6isoa ) .OR.
      &        ( Index( mechname, 'CRACMM1_'        ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM2'         ) .Gt. 0 ) .OR.
+     &        ( Index( mechname, 'CRACMM3'         ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM1AMORE_'   ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R3_AE7'       ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R5_AE7'       ) .Gt. 0 ) .OR.
