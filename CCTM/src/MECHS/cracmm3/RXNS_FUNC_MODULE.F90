@@ -1397,11 +1397,11 @@
 !  Reaction Label TRP59           
              RKI( NCELL,  525) =   9.2600D-05 * SFACT 
 !  Reaction Label ROCARO71        
-             RKI( NCELL,  526) =   5.8000D-11 * CFACT 
+             RKI( NCELL,  526) =  CFACT * ARRHENUIS_T03( INV_TEMP,  1.0200D-11,   5.3200D+02 )
 !  Reaction Label ROCARO71a       
-             RKI( NCELL,  527) =   1.7000D-17 * CFACT 
+             RKI( NCELL,  527) =   1.4000D-17 * CFACT 
 !  Reaction Label ROCARO71b       
-             RKI( NCELL,  528) =   1.5000D-12 * CFACT 
+             RKI( NCELL,  528) =   1.5100D-13 * CFACT 
 !  Reaction Label ROCARO72        
              RKI( NCELL,  529) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.9100D-12,   1.3000D+03 )
 !  Reaction Label ROCARO73        
