@@ -599,14 +599,14 @@
      &             DENOM .EQ. 'HOUR'.OR.DENOM .EQ. 'HOUR-1' .OR.
      &             DENOM .EQ. 'HOURS'.OR.DENOM .EQ. 'HOURS-1' ) THEN
             ! Convert hours -> seconds
-            CONV = CONV * 3600.0
+            CONV = CONV / 3600.0
             LTIME = .TRUE.
          ELSE IF ( DENOM .EQ. 'M' .OR. DENOM .EQ. 'M-1' .OR.
      &             DENOM .EQ. 'MIN'.OR.DENOM .EQ. 'MIN-1' .OR.
      &             DENOM .EQ. 'MINUTE'.OR.DENOM .EQ. 'MINUTE-1' .OR.
      &             DENOM .EQ. 'MINUTES'.OR.DENOM .EQ. 'MINUTES-1' ) THEN
             ! Convert minutes -> seconds
-            CONV = CONV * 60.0
+            CONV = CONV / 60.0
             LTIME = .TRUE.
          ELSE IF ( DENOM .EQ. 'M2' .OR. DENOM .EQ. 'M-2' .OR.
      &             DENOM .EQ. 'M^2'.OR.DENOM .EQ. 'METER-2' .OR.
@@ -615,7 +615,7 @@
      &             DENOM .EQ. 'METERS^2'.OR.DENOM .EQ. 'METERS^-2' .OR.
      &             DENOM .EQ. 'METERS2'.OR.DENOM .EQ. 'METERS-2' ) THEN
             ! No conversion necessary for meters^2 -> meters^2
-            CONV = CONV * 1.0
+            CONV = CONV / 1.0
             LAREA = .TRUE. 
          ELSE IF ( DENOM .EQ. 'KM2' .OR. DENOM .EQ. 'KM-2' .OR.
      &             DENOM .EQ. 'KM^2'.OR.DENOM .EQ. 'KM^-2' .OR.
@@ -624,7 +624,7 @@
      &             DENOM .EQ. 'KILOMETERS2'.OR.DENOM .EQ. 'KILOMETERS-2' .OR.
      &             DENOM .EQ. 'KILOMETERS^2'.OR.DENOM .EQ. 'KILOMETERS-2' ) THEN
             ! Convert kilometers^2 -> meters^2
-            CONV = CONV * 1.0E6
+            CONV = CONV / 1.0E6
             LAREA = .TRUE. 
          ELSE IF ( DENOM .EQ. 'MI2' .OR. DENOM .EQ. 'MI-2' .OR.
      &             DENOM .EQ. 'MI^2'.OR.DENOM .EQ. 'MI^-2' .OR.
@@ -633,7 +633,7 @@
      &             DENOM .EQ. 'MILES2'.OR.DENOM .EQ. 'MILES-2' .OR.
      &             DENOM .EQ. 'MILES^2'.OR.DENOM .EQ. 'MILES-2' ) THEN
             ! Convert mile^2 -> meters^2
-            CONV = CONV * 2.59E6
+            CONV = CONV / 2.59E6
             LAREA = .TRUE.  
          ELSE IF ( DENOM .EQ. 'HA' .OR. DENOM .EQ. 'HA-1' .OR.
      &             DENOM .EQ. 'HA^1'.OR.DENOM .EQ. 'HA^-1' .OR.
@@ -642,16 +642,13 @@
      &             DENOM .EQ. 'HECTARES'.OR.DENOM .EQ. 'HECTARES-1' .OR.
      &             DENOM .EQ. 'HECTARES^1'.OR.DENOM .EQ. 'HECTARES^-1' ) THEN
             ! Convert hectares -> meters^2
-            CONV = CONV * 10000.0
+            CONV = CONV / 10000.0
             LAREA = .TRUE.   
          ELSE
             ! No Conversion and and Unknown Basis
             CONV = CONV * 1.0e0
             BASIS = 'UNKNOWN'
          END IF
-
-         ! Take reciprocal of conversion factor since it applies to the denominator
-         CONV = 1.0e0 / CONV
 
       END SUBROUTINE CHECK_UNIT_DENOMINATOR
  
