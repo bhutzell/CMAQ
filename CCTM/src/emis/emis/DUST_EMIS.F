@@ -588,6 +588,7 @@ C=======================================================================
          use lus_data_module
          use centralized_io_module
          use RUNTIME_VARS, only: WRF_V4P
+         use mio_module
 #ifdef mpas
          use util_module, only : index1, time2sec
 #endif
@@ -633,11 +634,13 @@ C Parameters:
          character( 16 ) :: pname = 'GET_DUST_EMIS'
          character( 16 ) :: vname
          character( 96 ) :: xmsg
+         character( 20 ) :: TIME_STAMP
          integer status
          integer c, r, j, m, n, v, isd
 
          integer, save   :: wstep = 0      ! local write counter
          integer         :: mdate, mtime   ! diagnostic file write date&time
+         logical, save   :: firstwrite = .true.
 
                        ! automatic arrays
          real       :: fmoit  ( ncols,nrows )      ! factor of soil moisture on u*t
@@ -1200,6 +1203,15 @@ C Then reset the emissions array and local write counter.
                end do
                sdiagv = 0.0   ! array assignment
 #endif
+               if ( firstwrite ) then
+                  call mio_setfile( MET_CRO_2D )
+                  call mio_fcreate( 'CTM_DUST_MIO', io_mode )
+                  firstwrite = .false.
+               end if
+
+               call mio_setfile( 'CTM_DUST_MIO' )
+               call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+
                do v = 1, ndust_diag
                   do r = 1, nrows
                      do c = 1, ncols
@@ -1213,6 +1225,8 @@ C Then reset the emissions array and local write counter.
      &                    // ' to CTM_DUST_EMIS_1'
                      call m3exit( pname, mdate, mtime, xmsg, xstat1 )
                   end if
+                  call mio_fwrite( 'CTM_DUST_MIO', diagnm( v )%var,
+     &                             pname, wrbuf, time_stamp )
                end do
                write( logdev,'( /5x, 2( a, 1x ), i8, ":", i6.6 )' )
      &               'Timestep written to CTM_DUST_EMIS_1',

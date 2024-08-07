@@ -93,8 +93,8 @@ C-----------------------------------------------------------------------
 !      USE LSM_MOD, Only: n_lufrac
       USE SEDIMENTATION
       USE VDIFF_DIAG
-#ifdef mpas
       use mio_module
+#ifdef mpas
       use coupler_module
       USE util_module, only : sec2time, time2sec, nextime, index1
       USE centralized_io_module
@@ -139,6 +139,7 @@ C Local Variables:
       CHARACTER( 80 ) :: VARDESC                ! env variable description
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL, SAVE :: WRITE_FIRSTIME = .TRUE.
+      LOGICAL, SAVE :: WRITE_FIRSTIME_MIO = .TRUE.
       INTEGER, SAVE :: WSTEP  = 0               ! local write counter
       INTEGER  STATUS                           ! ENV... status
 
@@ -166,10 +167,7 @@ C Local Variables:
       INTEGER, SAVE :: NH3_HIT
 
 C Local Variables
-#ifdef mpas
       CHARACTER (20) :: TIME_STAMP
-#endif
-
 
 ! this is for creating the output name list
       character (512) :: fname
@@ -644,7 +642,7 @@ C If last call this hour:  write accumulated depositions:
 #endif
 #endif
          IF ( ABFLUX ) THEN
-           DO R = 1, NROWS
+            DO R = 1, NROWS
                DO C = 1, NCOLS
                   NH3_FLUX(C,R) = DDEP( DD2DV(NH3_HIT),C,R )
                   DDEP( DD2DV(NH3_HIT),C,R ) = NH3_DDEP(C,R)
@@ -681,9 +679,9 @@ C If last call this hour:  write accumulated depositions:
 #endif
          ENDIF
 
-#ifdef mpas
          call mio_time_format_conversion (mdate, mtime, time_stamp)
 
+#ifdef mpas
          ctm_out_clock = time_stamp
 #endif
 
@@ -711,6 +709,14 @@ C If last call this hour:  write accumulated depositions:
                XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+
+            if ( write_firstime_mio ) then
+               call mio_setfile( MET_CRO_2D )
+               call mio_fcreate( 'CTM_DRY_DEP_MIO', io_mode )
+               write_firstime_mio = .false.
+            end if
+            call mio_fwrite( 'CTM_DRY_DEP_MIO', DDEP_SPC( V ),
+     &         PNAME, WRDD, TIME_STAMP )
 #endif
          END DO 
 
@@ -728,6 +734,11 @@ C Write extra arrays for NH3 emission and net flux for bidi
                XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+            call mio_fwrite( 'CTM_DRY_DEP_MIO', NAME_NH3_FLUX,
+     &           PNAME, NH3_FLUX, TIME_STAMP )
+            call mio_fwrite( 'CTM_DRY_DEP_MIO', NAME_NH3_EMIS,
+     &           PNAME, NH3_EMIS, TIME_STAMP )
+
 ! must ensure the col/row being written to log is not larger than 
 ! the subdomain size for this PE. 
 !          WRITE( LOGDEV,*) ' NH3emis, drydep, flux=',NH3_EMIS(27,18),

@@ -282,6 +282,10 @@ C Local variables:
             REAL, POINTER            :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )    :: JDATE, JTIME
          END SUBROUTINE PA_OUTPUT
+         subroutine wr_init ( cgrid, jdate, jtime, tstep )
+            real, pointer            :: cgrid( :,:,:,: )
+            integer, intent( in )    :: jdate, jtime, tstep
+         end subroutine wr_init
 #ifdef isam
          SUBROUTINE WR_SA ( JDATE, JTIME, TSTEP, NSTEPS )
             IMPLICIT NONE
@@ -715,7 +719,7 @@ C Main processing loop:
       CALL ADVSTEP ( JDATE, JTIME, TSTEP, ASTEP, NREPS )
 
       ! Initialize arrays for storing output data averaged across the
-      ! synchornization time step
+      ! synchronization time step
       IF ( MOD( TIME2SEC( JTIME ), TIME2SEC( TSTEP( 1 ) ) ) .EQ. 0 ) THEN
          DO V = 1, N_ASPCS
             S = AVG_CONC_MAP( V )
@@ -762,9 +766,6 @@ C Main processing loop:
              ! Calculate all ELMO variables for both Instantaneous and
              ! Average parameters
              CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.TRUE.)
-             ! Print Instantaneous Values at first time step
-             CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.TRUE. )
-
         ELSE IF ( ELMO_NSTEP .LT. 1.0 ) THEN
              ! Calculate all ELMO Variables for averaging but do not output them
              CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
@@ -783,6 +784,14 @@ C Initialize Modules
 
 C Initialize MIO - placeholder
           call mio_init( npcol, nprow, ncols, nrows, logdev )
+      END IF
+
+! Output Instantaneous Values at first time step
+      IF ( JDATE .EQ. STDATE .AND. JTIME .EQ. STTIME ) THEN
+         CALL WR_INIT ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
+         IF ( L_ELMO ) THEN
+            CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.TRUE. )
+        END IF
       END IF
 
       ! science process sequence:

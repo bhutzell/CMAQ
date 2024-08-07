@@ -182,7 +182,7 @@ C-----------------------------------------------------------------------
          FIRSTIME = .FALSE.
 ! mio_fcreate has barrier calls, so do not put file creation inside
 ! an IF (IO_PE_INCLUSIVE) block
-         call mio_setfile( 'MET_CRO_2D' )
+         call mio_setfile( MET_CRO_2D )
          call mio_fcreate( 'B3GTS_MIO', io_mode )
 !         call mio_fcreate( 'B3GTS_MIO', 512 )
 
@@ -347,7 +347,7 @@ C Speciate emissions
                   CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
                END IF
                call mio_setfile( 'B3GTS_MIO' )
-               call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+               call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
                call mio_fwrite( 'B3GTS_MIO', EMSPC( S ), pname, EMISS(:,:,S), TIME_STAMP )
             END DO
             WRITE( LOGDEV,94040 )

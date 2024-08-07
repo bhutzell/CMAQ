@@ -137,12 +137,6 @@ C Local Variables
             REAL,    INTENT( IN )         :: CMIN
             REAL, POINTER                 :: CGRID( :,:,:,: )
          END SUBROUTINE LOAD_CGRID
-         SUBROUTINE WR_INIT ( CGRID, JDATE, JTIME, TSTEP )
-            REAL, POINTER                 :: CGRID(:,:,:,:)
-            INTEGER, INTENT( IN )         :: JDATE
-            INTEGER, INTENT( IN )         :: JTIME
-            INTEGER, INTENT( IN )         :: TSTEP
-         END SUBROUTINE WR_INIT
 #ifdef isam
          SUBROUTINE SA_ARRAY_INIT ( CGRID )
             IMPLICIT NONE
@@ -253,8 +247,6 @@ C *** Open the aerosol parameters file (diameters and standard deviations).
 #endif
       END IF
 
-      CALL WR_INIT ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
-      
       CALL LOG_HEADING( LOGDEV, "Open or Create Average Concentration File" )
       CALL OPACONC ( STDATE, STTIME, TSTEP( 1 ) )
       

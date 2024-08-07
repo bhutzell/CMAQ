@@ -18,7 +18,7 @@ echo 'Start Model Run At ' `date`
 #> standard output
  setenv CTM_DIAG_LVL 0
  setenv CTM_MIO_FILE Y # turn on generation of MIO_ASCII file
-#setenv mio_file_info /work/MAQSEA/cnolte/cmaq/2024-07-29-xioapi/CCTM/scripts/mio_file_input.txt  
+#setenv mio_file_info mio_file_input.txt  
 
 #> Choose compiler and set up CMAQ environment with correct 
 #> libraries using config.cmaq. Options: intel | gcc | pgi
@@ -132,12 +132,12 @@ set NCELLS = `echo "${NX} * ${NY} * ${NZ}" | bc -l`
 #> Output Species and Layer Options
    #> CONC file species; comment or set to "ALL" to write all species to CONC
    setenv CONC_SPCS "O3 NO ANO3I ANO3J NO2 FORM ISOP NH3 ANH4I ANH4J ASO4I ASO4J" 
-   setenv CONC_BLEV_ELEV " 1 1" #> CONC file layer range; comment to write all layers to CONC
+#  setenv CONC_BLEV_ELEV " 1 1" #> CONC file layer range; comment to write all layers to CONC
 
    #> ACONC file species; comment or set to "ALL" to write all species to ACONC
    #setenv AVG_CONC_SPCS "O3 NO CO NO2 ASO4I ASO4J NH3" 
    setenv AVG_CONC_SPCS "ALL" 
-   setenv ACONC_BLEV_ELEV " 1 1" #> ACONC file layer range; comment to write all layers to ACONC
+#  setenv ACONC_BLEV_ELEV " 1 1" #> ACONC file layer range; comment to write all layers to ACONC
    setenv AVG_FILE_ENDTIME N     #> override default beginning ACONC timestamp [ default: N ]
 
 #> Synchronization Time Step and Tolerance Options
@@ -569,25 +569,38 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> set output file names
   setenv S_CGRID         "$OUTDIR/CCTM_CGRID_${CTM_APPL}.nc"         #> 3D Inst. Concentrations
+  setenv S_CGRID_MIO     $OUTDIR/CCTM_CGRID_MIO_${CTM_APPL}.nc       #> 3D Inst. Concentrations
   setenv CTM_CONC_1      "$OUTDIR/CCTM_CONC_${CTM_APPL}.nc -v"       #> On-Hour Concentrations
+  setenv CTM_CONC_MIO    $OUTDIR/CCTM_CONC_MIO_${CTM_APPL}.nc        #> On-Hour Concentrations
   setenv A_CONC_1        "$OUTDIR/CCTM_ACONC_${CTM_APPL}.nc -v"      #> Hourly Avg. Concentrations
+  setenv A_CONC_MIO      $OUTDIR/CCTM_ACONC_MIO_${CTM_APPL}.nc       #> Hourly Avg. Concentrations
   setenv MEDIA_CONC      "$OUTDIR/CCTM_MEDIA_CONC_${CTM_APPL}.nc -v" #> NH3 Conc. in Media
+  setenv MEDIA_CONC_MIO  $OUTDIR/CCTM_MEDIA_CONC_MIO_${CTM_APPL}.nc  #> NH3 Conc. in Media
   setenv CTM_DRY_DEP_1   "$OUTDIR/CCTM_DRYDEP_${CTM_APPL}.nc -v"     #> Hourly Dry Deposition
+  setenv CTM_DRY_DEP_MIO $OUTDIR/CCTM_DRYDEP_MIO_${CTM_APPL}.nc      #> Hourly Dry Deposition
   setenv CTM_DEPV_DIAG   "$OUTDIR/CCTM_DEPV_${CTM_APPL}.nc -v"       #> Dry Deposition Velocities
+  setenv CTM_DEPV_MIO    $OUTDIR/CCTM_DEPV_MIO_${CTM_APPL}.nc        #> Dry Deposition Velocities
   setenv B3GTS_S         "$OUTDIR/CCTM_B3GTS_S_${CTM_APPL}.nc -v"    #> Biogenic Emissions
-  setenv B3GTS_MIO       $OUTDIR/CCTM_B3GTS_S_${CTM_APPL}.nc         #> Biogenic Emissions
+  setenv B3GTS_MIO       $OUTDIR/CCTM_B3GTS_MIO_${CTM_APPL}.nc       #> Biogenic Emissions
   setenv BEIS_SOILOUT    "$OUTDIR/CCTM_BSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
+  setenv BEIS_SOIL_MIO   $OUTDIR/CCTM_BSOILOUT_MIO_${CTM_APPL}.nc    #> Soil Emissions
   setenv MEGAN_SOILOUT   "$OUTDIR/CCTM_MSOILOUT_${CTM_APPL}.nc"      #> Soil Emissions
   setenv BDSNPOUT        "$OUTDIR/CCTM_BDSNPOUT_${CTM_APPL}.nc"      #> Soil Emissions
   setenv CTM_WET_DEP_1   "$OUTDIR/CCTM_WETDEP1_${CTM_APPL}.nc -v"    #> Wet Dep From All Clouds
+  setenv CTM_WET_DEP1_MIO $OUTDIR/CCTM_WETDEP1_MIO_${CTM_APPL}.nc    #> Wet Dep From All Clouds
   setenv CTM_WET_DEP_2   "$OUTDIR/CCTM_WETDEP2_${CTM_APPL}.nc -v"    #> Wet Dep From SubGrid Clouds
+  setenv CTM_WET_DEP2_MIO $OUTDIR/CCTM_WETDEP2_MIO_${CTM_APPL}.nc    #> Wet Dep From SubGrid Clouds
   setenv CTM_ELMO_1      "$OUTDIR/CCTM_ELMO_${CTM_APPL}.nc -v"       #> On-Hour Particle Diagnostics
+  setenv CTM_ELMO_MIO    $OUTDIR/CCTM_ELMO_MIO_${CTM_APPL}.nc        #> On-Hour Particle Diagnostics
   setenv CTM_AELMO_1     "$OUTDIR/CCTM_AELMO_${CTM_APPL}.nc -v"      #> Hourly Avg. Particle Diagnostics
+  setenv CTM_AELMO_MIO   $OUTDIR/CCTM_AELMO_MIO_${CTM_APPL}.nc       #> Hourly Avg. Particle Diagnostics
   setenv CTM_RJ_1        "$OUTDIR/CCTM_PHOTDIAG1_${CTM_APPL}.nc -v"  #> 2D Surface Summary from Inline Photolysis
   setenv CTM_RJ_2        "$OUTDIR/CCTM_PHOTDIAG2_${CTM_APPL}.nc -v"  #> 3D Photolysis Rates 
   setenv CTM_RJ_3        "$OUTDIR/CCTM_PHOTDIAG3_${CTM_APPL}.nc -v"  #> 3D Optical and Radiative Results from Photolysis
   setenv CTM_SSEMIS_1    "$OUTDIR/CCTM_SSEMIS_${CTM_APPL}.nc -v"     #> Sea Spray Emissions
+  setenv CTM_SSEMIS_MIO  $OUTDIR/CCTM_SSEMIS_MIO_${CTM_APPL}.nc      #> Sea Spray Emissions
   setenv CTM_DUST_EMIS_1 "$OUTDIR/CCTM_DUSTEMIS_${CTM_APPL}.nc -v"   #> Dust Emissions
+  setenv CTM_DUST_MIO    $OUTDIR/CCTM_DUSTEMIS_MIO_${CTM_APPL}.nc    #> Dust Emissions
   setenv CTM_BUDGET      "$OUTDIR/CCTM_BUDGET_${CTM_APPL}.txt -v"    #> Budget [Default Off]
   setenv CTM_IPR_1       "$OUTDIR/CCTM_PA_1_${CTM_APPL}.nc -v"       #> Process Analysis
   setenv CTM_IPR_2       "$OUTDIR/CCTM_PA_2_${CTM_APPL}.nc -v"       #> Process Analysis
@@ -598,9 +611,13 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_DRY_DEP_MOS "$OUTDIR/CCTM_DDMOS_${CTM_APPL}.nc -v"      #> Dry Dep
   setenv CTM_DEPV_MOS    "$OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc -v"    #> Dry Dep Velocity
   setenv CTM_VDIFF_DIAG  "$OUTDIR/CCTM_VDIFF_DIAG_${CTM_APPL}.nc -v" #> Vertical Dispersion Diagnostic
+  setenv CTM_VDIFF_MIO   $OUTDIR/CCTM_VDIFF_DIAG_MIO_${CTM_APPL}.nc  #> Vertical Dispersion Diagnostic
   setenv CTM_VSED_DIAG   "$OUTDIR/CCTM_VSED_DIAG_${CTM_APPL}.nc -v"  #> Particle Grav. Settling Velocity
+  setenv CTM_VSED_MIO    $OUTDIR/CCTM_VSED_DIAG_MIO_${CTM_APPL}.nc   #> Particle Grav. Settling Velocity
   setenv CTM_LTNGDIAG_1  "$OUTDIR/CCTM_LTNGHRLY_${CTM_APPL}.nc -v"   #> Hourly Avg Lightning NO
+  setenv CTM_LTNG1_MIO   $OUTDIR/CCTM_LTNGHRLY_MIO_${CTM_APPL}.nc    #> Hourly Avg Lightning NO
   setenv CTM_LTNGDIAG_2  "$OUTDIR/CCTM_LTNGCOL_${CTM_APPL}.nc -v"    #> Column Total Lightning NO
+  setenv CTM_LTNG2_MIO   $OUTDIR/CCTM_LTNGCOL_MIO_${CTM_APPL}.nc     #> Column Total Lightning NO
   setenv CTM_VEXT_1      "$OUTDIR/CCTM_VEXT_${CTM_APPL}.nc -v"       #> On-Hour 3D Concs at select sites
 
   #> set floor file (neg concs)
@@ -611,12 +628,12 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   ( ls ${LOGDIR}/CTM_LOG_???.${CTM_APPL} >> buff.txt ) >& /dev/null
   set log_test = `cat buff.txt`; rm -f buff.txt
 
-  set OUT_FILES = (${FLOOR_FILE} ${S_CGRID} ${CTM_CONC_1} ${A_CONC_1} ${MEDIA_CONC}         \
-             ${CTM_DRY_DEP_1} $CTM_DEPV_DIAG $B3GTS_S $B3GTS_MIO $MEGAN_SOILOUT $BEIS_SOILOUT $BDSNPOUT \
-             $CTM_WET_DEP_1 $CTM_WET_DEP_2 $CTM_ELMO_1 $CTM_AELMO_1             \
-             $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 $CTM_SSEMIS_1 $CTM_DUST_EMIS_1 $CTM_IPR_1 $CTM_IPR_2       \
+  set OUT_FILES = (${FLOOR_FILE} ${S_CGRID} ${S_CGRID_MIO} ${CTM_CONC_1} ${CTM_CONC_MIO} ${A_CONC_1} ${A_CONC_MIO} ${MEDIA_CONC} ${MEDIA_CONC_MIO}         \
+             ${CTM_DRY_DEP_1} ${CTM_DRY_DEP_MIO} $CTM_DEPV_DIAG ${CTM_DEPV_MIO} $B3GTS_S $B3GTS_MIO $MEGAN_SOILOUT $BEIS_SOILOUT ${BEIS_SOIL_MIO} $BDSNPOUT \
+             $CTM_WET_DEP_1 ${CTM_WET_DEP1_MIO} $CTM_WET_DEP_2 ${CTM_WET_DEP2_MIO} $CTM_ELMO_1 ${CTM_ELMO_MIO} $CTM_AELMO_1 $CTM_AELMO_MIO             \
+             $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 $CTM_SSEMIS_1 $CTM_SSEMIS_MIO $CTM_DUST_EMIS_1 $CTM_DUST_MIO $CTM_IPR_1 $CTM_IPR_2       \
              $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_DRY_DEP_MOS                 \
-             $CTM_DEPV_MOS $CTM_VDIFF_DIAG $CTM_VSED_DIAG $CTM_LTNGDIAG_1 $CTM_LTNGDIAG_2 $CTM_VEXT_1 )
+             $CTM_DEPV_MOS $CTM_VDIFF_DIAG $CTM_VDIFF_MIO $CTM_VSED_DIAG $CTM_VSED_MIO $CTM_LTNGDIAG_1 $CTM_LTNG1_MIO $CTM_LTNGDIAG_2 $CTM_LTNG2_MIO $CTM_VEXT_1 )
   if ( $?CTM_ISAM ) then
      if ( $CTM_ISAM == 'Y' || $CTM_ISAM == 'T' ) then
         set OUT_FILES = (${OUT_FILES} ${SA_ACONC_1} ${SA_CONC_1} ${SA_DD_1} ${SA_WD_1}      \

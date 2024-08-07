@@ -964,7 +964,6 @@
       else
          io_mode = nf90_noclobber
       end if
-      write(vardev, *) 'io_mode: ', io_mode
 #ifdef mpas
       call get_env( cell_num, 'cell_num', 1, vardev)
 #else
