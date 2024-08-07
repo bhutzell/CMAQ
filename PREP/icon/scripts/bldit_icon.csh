@@ -149,6 +149,8 @@
  set text = "$quote$CPP_FLAGS$quote;"
  echo "cpp_flags   $text"                                          >> $Cfile
  echo                                                              >> $Cfile
+ echo "c_compiler  $CC;"                                           >> $Cfile
+ echo                                                              >> $Cfile
  echo "f_compiler  $FC;"                                           >> $Cfile
  echo                                                              >> $Cfile
  echo "fstd        $quote$FSTD$quote;"                             >> $Cfile
