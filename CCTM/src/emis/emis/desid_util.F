@@ -650,6 +650,9 @@
             BASIS = 'UNKNOWN'
          END IF
 
+         ! Take reciprocal of conversion factor since it applies to the denominator
+         CONV = 1.0e0 / CONV
+
       END SUBROUTINE CHECK_UNIT_DENOMINATOR
  
 !-----------------------------------------------------------------------
