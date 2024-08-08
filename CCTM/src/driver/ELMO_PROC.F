@@ -3237,7 +3237,7 @@
       ! air density [kg/m3]
       call interpolate_var ('DENS', jdate, jtime, DENS)
       
-      ! get cloud fraction if photolysis hasn not been called yet
+      ! get cloud fraction if photolysis has not been called yet
       call interpolate_var ('CFRAC', jdate, jtime, CFRACS)
 
       ! retrieve all layer heights. This is the height of the top of the
@@ -3481,7 +3481,7 @@
                XMSG = 'Could not create '// CTM_AELMO_1 // ' file'
                CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
             END IF
- 
+
          END IF
 #endif
       END IF
@@ -3495,6 +3495,7 @@
 !-------------------------------------------------------------------------
 
       USE RUNTIME_VARS
+      use mio_module
 
       IMPLICIT NONE 
 
@@ -3502,17 +3503,22 @@
 
       INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP(3)
       LOGICAL, INTENT( IN ) :: INIT_TIME
-      INTEGER MDATE, MTIME
+      INTEGER MDATE, MTIME, ISPC
       CHARACTER( 300 ) XMSG
-
       CHARACTER( 16 ), SAVE :: PNAME = 'WRITE_ELMO'
+      CHARACTER( 20 ) :: TIME_STAMP
+      logical, save :: firstavg = .true.
 
-C *** If IO Proceesor, then Write Data
          MDATE = JDATE
          MTIME = JTIME
 
 C *** Write data to the scalar output file.
          IF ( INST_ACTIVE ) THEN
+            if ( init_time ) then
+               call mio_setfile( MET_CRO_3D )
+               call mio_fcreate( 'CTM_ELMO_MIO', io_mode)
+            end if
+
 #ifndef mpas
             IF ( .NOT. WRITE3( CTM_ELMO_1, 
      &           ALLVAR3, MDATE, MTIME,
@@ -3520,6 +3526,12 @@ C *** Write data to the scalar output file.
                XMSG = 'Could not write ' // CTM_ELMO_1 // ' file'
                CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+   
+            call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+            do ispc = 1, n_elmo_inst_out
+               call mio_fwrite( 'CTM_ELMO_MIO', INST_PARS_OUT( ispc ), PNAME, 
+     &               ELMO_INST(:,:,:,ispc), TIME_STAMP )
+            end do
 
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &                     'Timestep written to', CTM_ELMO_1,
@@ -3529,7 +3541,7 @@ C *** Write data to the scalar output file.
          END IF
      
 C *** Write data to the average aerosol diagnostic file.
-         IF ( .NOT.INIT_TIME ) THEN
+         IF ( .NOT. INIT_TIME ) THEN
 #ifndef mpas
            IF ( AVRG_ACTIVE ) THEN
             IF ( .NOT. END_TIME ) THEN   ! ending time timestamp
@@ -3543,7 +3555,20 @@ C *** Write data to the average aerosol diagnostic file.
                XMSG = 'Could not write ' // CTM_AELMO_1 // ' file'
                CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
-          
+
+            if ( firstavg ) then
+               call mio_setfile( MET_CRO_3D )
+               call mio_fcreate( 'CTM_AELMO_MIO', io_mode)
+               firstavg = .false.
+            end if
+            call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+            call mio_setfile( 'CTM_AELMO_MIO')
+            do ispc = 1, n_elmo_avrg_out
+               call mio_fwrite( 'CTM_AELMO_MIO', AVRG_PARS_OUT( ispc ), PNAME, 
+     &               ELMO_AVRG(:,:,:,ispc) / (2.0 * ( ELMO_NSTEP - 1.0 ) ), 
+     &               TIME_STAMP )
+            end do
+
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &                       'Timestep written to', CTM_AELMO_1,
      &                       'for date and time', MDATE, MTIME

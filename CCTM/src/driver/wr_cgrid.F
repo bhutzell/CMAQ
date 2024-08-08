@@ -40,6 +40,7 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE MIO_ASCII
       USE RUNTIME_VARS, ONLY : RUNLEN
+      use mio_module
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -63,6 +64,7 @@ C Local variables:
 
       CHARACTER( 16 ) :: PNAME = 'WR_CGRID'
       CHARACTER( 96 ) :: XMSG = ' '
+      character( 20 ) :: TIME_STAMP
 
       INTEGER K, MXK, SPC, VAR
       INTEGER ALLOCSTAT
@@ -332,7 +334,13 @@ C proc 0 has CTM_CONC_1 open
          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
       END IF
 #endif
-
+      call mio_setfile( MET_CRO_3D )
+      call mio_fcreate( 'S_CGRID_MIO', io_mode)
+      call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+      do spc = 1,n_cgrid_spc
+         call mio_fwrite( 'S_CGRID_MIO', CGRID_NAME( SPC ),
+     &            PNAME, CGRID(:,:,:,SPC), TIME_STAMP )
+      end do
 #endif
 
       WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )

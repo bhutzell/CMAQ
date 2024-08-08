@@ -64,6 +64,7 @@ C-----------------------------------------------------------------------
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
       use CENTRALIZED_IO_MODULE, only : interpolate_var
+      use mio_module
 
 #ifdef isam
       USE SA_DEFN, ONLY: ISAM, NSPC_SA, N_SPCTAG, TOT_SADEP, CONV_SADEP,
@@ -78,7 +79,6 @@ C-----------------------------------------------------------------------
 
 #ifdef mpas
       use util_module, only : nextime, index1, time2sec
-      use mio_module
       use coupler_module
 #endif
 
@@ -113,6 +113,7 @@ C...........ARGUMENTS
 C...........Local Variables
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE. ! flag for first pass thru
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
 
       CHARACTER( 16 ), SAVE :: PNAME = 'CLDPROC' ! driver program name
       CHARACTER( 16 ) :: VNAME            ! input variable name list
@@ -144,8 +145,9 @@ C...........Local Variables
       REAL, ALLOCATABLE, SAVE :: SUBTRANS( :,:,: ) ! subgrid cloud transmissivity
 
       REAL CCMIN
+      character (16), ALLOCATABLE, SAVE :: wdep_spc( : )
+      CHARACTER (20) :: TIME_STAMP               ! this is for mio
 #ifdef mpas
-      CHARACTER (20) :: TIME_STAMP               ! this is for mpas
       integer :: year, month, day, hour, minute  ! this is for mpas
 
 ! this is for creating the output name list
@@ -156,7 +158,6 @@ C...........Local Variables
       integer, save :: loc_n
       integer :: loc_nvars, stat, n, k, fnum
       logical :: found
-      character (16) :: wdep_spc(300)
 #endif
 
 #ifdef isam
@@ -206,6 +207,47 @@ C...and return
           CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
         END IF
+
+        allocate ( wdep_spc (N_SPC_WDEP+1), stat = allocstat )
+        IF ( ALLOCSTAT .NE. 0 ) THEN
+          XMSG = 'Failure allocating WDEP_SPC'
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+        END IF
+        WDEP_SPC = ' '
+
+        SPC = 0
+        STRT = 1
+        FINI = N_GC_WDEP
+        DO VAR = STRT, FINI
+           SPC = SPC + 1
+           wdep_spc( VAR ) = GC_WDEP( SPC )
+        END DO
+
+        SPC = 0
+        STRT = N_GC_WDEP + 1
+        FINI = N_GC_WDEP + N_AE_WDEP
+        DO VAR = STRT, FINI
+           SPC = SPC + 1
+           wdep_spc ( VAR ) = AE_WDEP( SPC )
+        END DO
+
+        SPC = 0
+        STRT = N_GC_WDEP + N_AE_WDEP + 1
+        FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP
+        DO VAR = STRT, FINI
+           SPC = SPC + 1
+           wdep_spc ( VAR ) = NR_WDEP( SPC )
+        END DO
+
+        SPC = 0
+        STRT = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + 1
+        FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP
+        DO VAR = STRT, FINI
+           SPC = SPC + 1
+           wdep_spc ( VAR ) = TR_WDEP( SPC )
+        END DO
+        
+        wdep_spc( N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP + 1 ) = 'HPLUS'
 
 C...initialize the deposition array before processing clouds
 
@@ -357,40 +399,6 @@ Ckrt deposition arrays for tagged species.....
                end if
             end do
          end if
-
-
-         wdep_spc = ' '
-         SPC = 0
-         STRT = 1
-         FINI = N_GC_WDEP
-         DO VAR = STRT, FINI
-            SPC = SPC + 1
-            wdep_spc( VAR ) = GC_WDEP( SPC )
-         END DO
-
-         SPC = 0
-         STRT = N_GC_WDEP + 1
-         FINI = N_GC_WDEP + N_AE_WDEP
-         DO VAR = STRT, FINI
-            SPC = SPC + 1
-            wdep_spc ( VAR ) = AE_WDEP( SPC )
-         END DO
-
-         SPC = 0
-         STRT = N_GC_WDEP + N_AE_WDEP + 1
-         FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP
-         DO VAR = STRT, FINI
-            SPC = SPC + 1
-            wdep_spc ( VAR ) = NR_WDEP( SPC )
-         END DO
-
-         SPC = 0
-         STRT = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + 1
-         FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP
-         DO VAR = STRT, FINI
-            SPC = SPC + 1
-            wdep_spc ( VAR ) = TR_WDEP( SPC )
-         END DO
 #endif
          RETURN ! Added for MIO Implementation
       END IF   ! FIRSTIME
@@ -595,6 +603,20 @@ C...write data to the normal wet deposition file
           XMSG = 'Could not write ' // CTM_WET_DEP_1 // ' file'
           CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
         END IF
+        
+        if ( FIRSTWRITE ) then
+           FIRSTWRITE = .FALSE.
+           call mio_setfile( MET_CRO_2D )
+           call mio_fcreate( 'CTM_WET_DEP1_MIO', io_mode )
+        end if
+
+        call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
+
+        DO VAR = 1, N_SPC_WDEP + 1
+           call mio_fwrite( 'CTM_WET_DEP1_MIO', WDEP_SPC( VAR ),
+     &                      PNAME, TOT_DEP(:,:,VAR), TIME_STAMP )
+        END DO
+
 #endif
 
         WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
@@ -629,7 +651,6 @@ C...write data to the diagnostic file if requested by the user
         IF ( CLD_DIAG ) THEN
 #ifdef mpas
            if ((loc_n > 0) .and. mpas_diag) then
-              call mio_setfile (CTM_WET_DEP_2)
 
               do spc = 1, mio_file_data(mio_cfile)%nvars
                  VNAME = mio_file_data(mio_cfile)%var_name(spc)
