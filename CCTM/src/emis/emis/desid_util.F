@@ -405,6 +405,9 @@
          CHARACTER( 16 ) :: DENOM2
          LOGICAL         :: LTIME_UNIT
 
+         REAL, PARAMETER  :: AVO  = 6.0221367E23
+         REAL, PARAMETER  :: RAVO = 1.0 / AVO
+
          ! The Default Finding is an unknown Basis unit and conversion
          ! equal to 1.0
          CONV = 1.0
@@ -429,8 +432,18 @@
          ! If there are no slashes or spaces, then exit
          IF ( SLASH_IND .EQ. 0 ) RETURN
 
+         ! Check numerator for molecule units
+         ! This has to come before the check for molar units since the
+         !   check for mole, moles, or mol will also match molecule
+         IF ( NUMER(1:8) .EQ. 'MOLECULE'  .OR.
+     &        NUMER(1:9) .EQ. 'MOLECULES' .OR.
+     &        NUMER(1:5) .EQ. 'MOLEC'     .OR.
+     &        NUMER(1:6) .EQ. 'MOLECS' ) THEN
+            ! Convert molecules -> mol
+            CONV = RAVO
+            BASIS = 'MOLE'
          ! Check Numerator for Molar or Mass Units
-         IF ( NUMER(1:4) .EQ. 'MOLE' .OR. NUMER(1:5) .EQ. 'MOLES' .OR.
+         ELSE IF ( NUMER(1:4) .EQ. 'MOLE' .OR. NUMER(1:5) .EQ. 'MOLES' .OR.
      &        NUMER(1:3) .EQ. 'MOL' ) THEN
             ! No Conversion Needed for Moles to Moles
             CONV = 1.0 
@@ -625,7 +638,16 @@
      &             DENOM .EQ. 'KILOMETERS^2'.OR.DENOM .EQ. 'KILOMETERS-2' ) THEN
             ! Convert kilometers^2 -> meters^2
             CONV = CONV / 1.0E6
-            LAREA = .TRUE. 
+            LAREA = .TRUE.
+         ELSE IF ( DENOM .EQ. 'CM2' .OR. DENOM .EQ. 'CM-2' .OR.
+     &             DENOM .EQ. 'CM^2'.OR.DENOM .EQ. 'CM^-2' .OR.
+     &             DENOM .EQ. 'CENTIMETER2'.OR.DENOM .EQ. 'CENTIMETER-2' .OR.
+     &             DENOM .EQ. 'CENTIMETER^2'.OR.DENOM .EQ. 'CENTIMETER^-2' .OR.
+     &             DENOM .EQ. 'CENTIMETERS2'.OR.DENOM .EQ. 'CENTIMETERS-2' .OR.
+     &             DENOM .EQ. 'CENTIMETERS^2'.OR.DENOM .EQ. 'CENTIMETERS-2' ) THEN
+            ! Convert centimeters^2 -> meters^2
+            CONV = CONV / 1.0E-4
+            LAREA = .TRUE.
          ELSE IF ( DENOM .EQ. 'MI2' .OR. DENOM .EQ. 'MI-2' .OR.
      &             DENOM .EQ. 'MI^2'.OR.DENOM .EQ. 'MI^-2' .OR.
      &             DENOM .EQ. 'MILE2'.OR.DENOM .EQ. 'MILE-2' .OR.
