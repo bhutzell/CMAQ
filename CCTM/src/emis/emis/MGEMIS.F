@@ -127,13 +127,11 @@ C   03 Nov 15: B. Gantt and G. Sarwar: created the initial version for marine ga
             USE CENTRALIZED_IO_MODULE, only : chlr, dmsl
 
             IMPLICIT NONE
-            INCLUDE SUBST_CONST                                     ! constants
             INCLUDE SUBST_FILES_ID                                  ! file name parameters
 
 C Arguments:
             INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP
             LOGICAL :: SUCCESS
-
 
             CHARACTER( 80 )       :: VARDESC                        ! env variable description
 
@@ -391,7 +389,7 @@ C Iodine's impact on tropospheric oxidants: a global model study in GEOS-Chem. A
 
 C-----------------------------------------------------------------------
             USE UTILIO_DEFN
-            USE AEROMET_DATA   ! Includes CONST.EXT
+            USE CONST, ONLY: PI180, DG2M, DKBOLTZ, GRAV
             USE ASX_DATA_MOD, ONLY: MET_DATA                 ! added by Sarwar
             USE CGRID_SPCS     ! CGRID mechanism species
             USE PCGRID_DEFN    ! get cgrid
@@ -441,7 +439,7 @@ C Local Variables:
             REAL    :: SST            
             REAL    :: DMS_L              ! DMS in ocean water - nM  
             REAL    :: DMS                ! DMS in atmosphere                        
-            REAL    :: SICE               ! SEAICE in a gird-cell
+            REAL    :: SICE               ! SEAICE in a grid cell
 
             REAL    :: SCN
             REAL    :: K600

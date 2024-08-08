@@ -17,13 +17,6 @@
 !  subject to their copyright restrictions.                             !
 !-----------------------------------------------------------------------!
 
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/JPROC/src/driver/jproc_table/jproc.F,v 1.8 2011/10/29 01:03:53 sjr Exp $ 
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C @(#)jproc.F 1.3 /project/mod3/JPROC/src/driver/jproc_table/SCCS/s.jproc.F 04 Jul 1997 09:39:12
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       PROGRAM JPROC
            
@@ -101,10 +94,9 @@ C*********************************************************************
 
       USE GET_ENV_VARS, FILE_UNIT => JUNIT
       USE RXNS_DATA
+      USE CONST
 
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST        ! commonly used constants
 
       INCLUDE 'JVALPARMS.EXT'    ! jproc parameters
 

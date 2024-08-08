@@ -85,6 +85,7 @@ C-----------------------------------------------------------------------
          !USE AERO_DATA           ! access subroutine map_pmemis
          USE CENTRALIZED_IO_MODULE, only : interpolate_var
          USE ASX_DATA_MOD, only: MET_DATA
+         USE CONST, only: DG2M, PI180
          USE BEIS_DEFN
 
 #ifdef isam
@@ -100,9 +101,6 @@ C-----------------------------------------------------------------------
         USE COUPLER_MODULE, ONLY : cell_thickness, cell_vol, MPAS_CELL_AREA => CELL_AREA
 #endif
          IMPLICIT NONE
-
-C Includes:
-         INCLUDE SUBST_CONST     ! constants
 
 C Arguments:
          INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP( 3 )   ! TSTEP is output time step (HHMMSS)
@@ -1358,14 +1356,13 @@ C-----------------------------------------------------------------------
      &                      DIFF_MASK_NUM, DIFF_MASK_SRF, DIFF_MW, DIFF_SPC,
      &                      DIFF_MASK_NR, DIFF_MASK_TRAC
       USE AERO_DATA, ONLY : GPKG
+      USE CONST, ONLY: AVO, MWAIR
 #ifdef mpas
       USE coupler_module, ONLY: inv_cell_vol
 #endif
 
       IMPLICIT NONE
          
-      INCLUDE SUBST_CONST     ! constants
-
       INTEGER, INTENT( IN ) :: JDATE, JTIME, ISRM
       REAL, INTENT( In )    :: VDEMIS0( :,:,:,: )
       REAL, ALLOCATABLE, SAVE :: VDEMIS ( :,:,:,: )

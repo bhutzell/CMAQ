@@ -87,10 +87,8 @@ C-----------------------------------------------------------------------
 C External Functions
          LOGICAL,         EXTERNAL :: CHKGRID
 
-C Subroutine arguments:
-         LOGICAL SUCCESS
-
 C Arguments:
+         LOGICAL :: SUCCESS
          INTEGER, INTENT(  IN ) :: JDATE   ! current simulation date (YYYYDDD)
          INTEGER, INTENT(  IN ) :: JTIME   ! current simulation time (HHMMSS)
          INTEGER, INTENT(  IN ) :: TSTEP(3)! timestep vector (output time step)

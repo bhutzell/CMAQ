@@ -130,8 +130,9 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                          EXTRACT_PRECURSOR, UPDATE_PRECURSOR
       USE SOA_DEFN, ONLY: EXTRACT_SOA, UPDATE_ORGVAPOR
       USE AEROMET_DATA, ONLY: AIRTEMP, AIRPRES, AIRQV, AIRDENS, AIRRH, 
-     &                        H2OSATVP, H2OVP, MWWAT, MWAIR, SRFTEMP
+     &                        H2OSATVP, H2OVP, SRFTEMP
       USE UTILIO_DEFN, ONLY: XSTAT1, TIME2SEC, SEC2TIME, index1, nextime
+      USE CONST, ONLY: ESATL, MWWAT, MWAIR
 #ifdef twoway
      &                       , INDEX1, XSTAT3
 #endif
@@ -245,26 +246,7 @@ C *** dry moment factor
       REAL, PARAMETER :: TWOTHIRDS = 2.0 / 3.0
 
       LOGICAL :: TIME_TO_CALL_FEEDBACK_WRITE
-
-C *** Statement Function **************
-      REAL ESATL ! arithmetic statement function for vapor pressure [Pa]
-      REAL TT
-C *** Coefficients for the equation, ESATL defining saturation vapor pressure
-      REAL, PARAMETER :: AL = 610.94
-      REAL, PARAMETER :: BL = 17.625
-      REAL, PARAMETER :: CL = 243.04
-
       INTEGER, SAVE :: O3
-
-C *** values of AL, BL, and CL are from:
-C     Alduchov and Eskridge, "Improved Magnus Form Approximations of
-C                            Saturation Vapor Pressure,"
-C                            Jour. of Applied Meteorology, vol. 35,
-C                            pp 601-609, April, 1996.
-
-      ESATL( TT ) = AL * EXP( BL * ( TT - 273.15 ) / ( TT - 273.15 + CL ) )
-
-C *** End Statement Function  ********
 
 #ifdef twoway
       INTERFACE

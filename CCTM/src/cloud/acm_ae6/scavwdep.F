@@ -17,13 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/cloud/cloud_acm_ae5/scavwdep.F,v 1.7 2011/10/21 16:10:28 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE SCAVWDEP ( JDATE, JTIME, WTBAR, WCBAR, TBARC, PBARC,
      &                      CTHK1, AIRM, PRATE1, TAUCLD, POLC, CEND,
@@ -75,16 +68,12 @@ C-----------------------------------------------------------------------
 
       USE CGRID_SPCS                    ! CGRID mechanism species
       USE UTILIO_DEFN
-
+      USE CONST
 #ifdef sens
       USE DDM3D_DEFN, ONLY : NP, NPMAX, S_POLC, S_CEND, S_REMOV, S_REMOVAC
 #endif 
 
       IMPLICIT NONE
-
-C...........Includes:
-
-      INCLUDE SUBST_CONST               ! constants
 
       CHARACTER( 120 ) :: XMSG = ' '    ! Exit status message
 

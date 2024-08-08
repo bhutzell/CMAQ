@@ -63,10 +63,10 @@ C-----------------------------------------------------------------------
 #ifdef mpas
       USE coupler_module
 #endif
+      USE CONST, ONLY: MWAIR
 
       IMPLICIT NONE
 
-      INCLUDE SUBST_CONST       ! constants
       INCLUDE SUBST_FILES_ID    ! file name parameters
 
 C Arguments:
