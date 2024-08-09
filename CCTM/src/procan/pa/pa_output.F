@@ -76,6 +76,7 @@ C-----------------------------------------------------------------------
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE PAGRD_DEFN            ! PA horiz domain specs
       USE UTILIO_DEFN           ! inherits PARUTILIO
+      use mio_module
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE, SE_DATA_COPY_MODULE)
@@ -106,8 +107,11 @@ C Local Variables:
       INTEGER, SAVE :: NIPRFLS          ! Number of IPR output files
       INTEGER, SAVE :: NIRRFLS          ! Number of IRR output files
       LOGICAL, SAVE :: LFIRST = .TRUE.  ! Flag for first call
+      LOGICAL, SAVE :: FIRSTIPR = .TRUE.
+      LOGICAL, SAVE :: FIRSTIRR = .TRUE.
 
       CHARACTER( 80 ) ::  XMSG = ' '    ! Error message buffer
+      CHARACTER( 20 ) :: TIME_STAMP
 
       INTEGER C         ! Loop index for columns
       INTEGER ICG       ! Index for species in cgrid array
@@ -237,6 +241,9 @@ C Reset decomposition map
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C  Output Process analysis data and re-initialize arrays
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+
       IF ( LIPR ) THEN
 
          DO NFL = 1, NIPRFLS
@@ -252,6 +259,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
 
+               IF ( FIRSTIPR ) THEN
+                  FIRSTIPR = .FALSE.
+                  call mio_setfile( MET_CRO_3D )
+                  call mio_fcreate( 'CTM_IPR_MIO', io_mode )
+               END IF
+   
+               call mio_fwrite( 'CTM_IPR_MIO', IPRNAME( VARINDX ),
+     &                          PNAME, DELC( :,:,:,VARINDX ), TIME_STAMP )
             END DO
 
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
@@ -300,6 +315,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
 
+               IF ( FIRSTIRR ) THEN
+                  FIRSTIRR = .FALSE.
+                  call mio_setfile( MET_CRO_3D )
+                  call mio_fcreate( 'CTM_IRR_MIO', io_mode )
+               END IF
+
+               call mio_fwrite( 'CTM_IRR_MIO', IRRNAME( VARINDX ),
+     &                          PNAME, DBUFF, TIME_STAMP )
             END DO
 
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )

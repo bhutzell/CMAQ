@@ -37,6 +37,7 @@ C-----------------------------------------------------------------------
       USE HGRD_DEFN
       USE AERO_DATA, ONLY: N_MODE
       USE DESID_VARS
+      use mio_module
 
       IMPLICIT NONE
 
@@ -625,6 +626,7 @@ C Local Variables:
 
             CHARACTER( 16 ), SAVE :: PNAME = 'GET_SSEMIS'
             CHARACTER( 96 ) :: XMSG = ' '
+            character( 20 ) :: TIME_STAMP
             INTEGER C, R, L, N, V, S         ! loop indices
 
 C Variables for calculating ambient RH as done in the aerosol module
@@ -711,6 +713,7 @@ C Variables for calculating dry surface-area emission rate for accum mode
             INTEGER           :: MDATE, MTIME  ! SSEMIS write date&time
 
             LOGICAL, SAVE :: FIRSTIME      = .TRUE.
+            LOGICAL, SAVE :: FIRSTWRITE    = .TRUE.
 
 C Mathematical constants; statement function for ERF approximation
             REAL, PARAMETER      :: TWO3 = 2.0 / 3.0
@@ -986,6 +989,12 @@ C Then reset the sea-salt emissions array and local write counter.
                END IF
 #endif
 
+               if ( firstwrite ) then
+                  firstwrite = .false.
+                  call mio_setfile( MET_CRO_2D )
+                  call mio_fcreate( 'CTM_SSEMIS_MIO', io_mode )
+               end if
+
                WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )
 
                IF ( WSTEP .GE. TIME2SEC( TSTEP( 1 ) ) ) THEN
@@ -995,6 +1004,9 @@ C Then reset the sea-salt emissions array and local write counter.
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                   END IF
                   CALL NEXTIME( MDATE, MTIME, TSTEP( 1 ) )
+                  call mio_setfile( 'CTM_CONC_MIO')
+                  call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+                  
                   DO V = 1, NSSDIAG
                      DO R = 1, NROWS
                         DO C = 1, NCOLS
@@ -1006,6 +1018,8 @@ C Then reset the sea-salt emissions array and local write counter.
                         XMSG = 'Could not write ' // CTM_SSEMIS_1 // ' file'
                         CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
                      END IF
+                     call mio_fwrite( 'CTM_SSEMIS_MIO', WRSS_SPC( V ),
+     &                                PNAME, WRSS, TIME_STAMP )
                   END DO
                   WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &                  'Timestep written to', CTM_SSEMIS_1,

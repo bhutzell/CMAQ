@@ -67,6 +67,7 @@
 
       use logdev_mod
       use get_env_module
+      use netcdf, only: nf90_noclobber, nf90_64bit_offset
 #ifdef mpas
       use universal_data_module, only : logdev
       use mydata_module
@@ -97,8 +98,9 @@
      &                        'Thursday ','Friday   ','Saturday ','Sunday   ' /)
 
 
-! this is for MPAS
+! this is for MPAS and xioapi
       LOGICAL :: ncd_64bit_offset = .FALSE.
+      integer :: io_mode
 
       !-----------------------------------------------------------------------------------
       !>> Define Environment Variables for Controlling CMAQ Processes
@@ -956,9 +958,13 @@
        ENDIF
       ENDIF
 
-! for MPAS
-#ifdef mpas
       call get_env (ncd_64bit_offset, 'ncd_64bit_offset', .false., vardev)
+      if (ncd_64bit_offset) then
+         io_mode = ior( nf90_noclobber, nf90_64bit_offset)
+      else
+         io_mode = nf90_noclobber
+      end if
+#ifdef mpas
       call get_env( cell_num, 'cell_num', 1, vardev)
 #else
 

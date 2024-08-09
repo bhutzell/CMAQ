@@ -471,6 +471,7 @@ C--------------------------------------------------------------------------
 
          Use GRID_CONF           ! horizontal grid specifications
          Use UTILIO_DEFN
+         use mio_module
 
          Implicit None
 
@@ -480,12 +481,14 @@ C--------------------------------------------------------------------------
          Integer, Intent( In )    :: MTIME
 
          Logical, Save :: FIRSTIME = .TRUE.
+         Logical, Save :: FIRSTWRITE = .TRUE.
 
          Real          WRMC( NCols,NRows )         ! media write buffer
          Integer V, R, C
 
          Character( 16 ) :: PNAME = 'WRASX_MEDIA     '
-         
+         Character( 20 ) :: TIME_STAMP
+
 !*****************************************************************************         
          
          If ( HGBIDI ) Then
@@ -516,12 +519,22 @@ C--------------------------------------------------------------------------
          End If
 #endif
          
+         call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+
          Do V = 1, N_TOT ! species/media loop
             Do R = 1, NRows ! row loop
                Do C = 1,NCols  ! column loop
                   WRMC( C, R ) = CMEDIA( C,R,V  )
                End Do
             End Do
+
+            If ( FIRSTWRITE ) Then
+               FIRSTWRITE = .FALSE.
+               call mio_setfile( MET_CRO_2D )
+               call mio_fcreate( 'MEDIA_CONC_MIO', io_mode )
+            End If
+            call mio_fwrite( 'MEDIA_CONC_MIO', MEDIA_NAMES( V ), 
+     &                       PNAME, WRMC, TIME_STAMP )
 
             If ( .Not. WRITE3( MEDIA_CONC, MEDIA_NAMES( V ), MDATE, MTIME,
      &                WRMC ) ) Then

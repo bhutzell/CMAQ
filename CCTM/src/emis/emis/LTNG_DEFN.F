@@ -398,6 +398,7 @@
      &                                     ICCG_SUM,
      &                                     ICCG_WIN,
      &                                     LT_NAME
+         use mio_module
 #ifdef mpas
          use util_module, only : time2sec, nextime, upcase
 #else
@@ -446,6 +447,8 @@
          CHARACTER( 16 )   :: MNAME
          CHARACTER( 16 )   :: PNAME = 'GET_LTNG'
          CHARACTER( 120 )  :: XMSG = ' '
+         CHARACTER( 20 )   :: TIME_STAMP
+
          REAL, ALLOCATABLE :: COLUMN_LTNG_NO ( :,: ) ! column total NO
          
          INTEGER           :: cjdate
@@ -456,6 +459,7 @@
          LOGICAL,     SAVE :: wrf_assim = .FALSE.
          INTEGER,     SAVE :: TOT_TSTEP
          LOGICAL,     SAVE :: FIRSTIME = .TRUE.
+         LOGICAL,     SAVE :: FIRSTWRITE = .TRUE.
 
          REAL :: LOC_VGTOP_GD
 
@@ -664,6 +668,14 @@ C statement function for ERF approximation
                   DIVFAC = 1.0 / REAL( MTICS, 4 )
                   VDEMIS_LTDIAG = VDEMIS_LTDIAG * DIVFAC   ! array assignment
                   COLUMN_DIAG = COLUMN_DIAG*DIVFAC
+                  if ( firstwrite ) then
+                     call mio_setfile( MET_CRO_3D )
+                     call mio_fcreate( 'CTM_LTNG1_MIO', io_mode )
+                     call mio_fcreate( 'CTM_LTNG2_MIO', io_mode )
+                     firstwrite = .false.
+                  end if
+
+                  call mio_time_format_conversion( LDATE, LTIME, TIME_STAMP )
                   IF ( .NOT. WRITE3( CTM_LTNGDIAG_1, LTSPC, LDATE, LTIME, VDEMIS_LTDIAG ) )  THEN
                      XMSG = 'Could not write to ' // TRIM( CTM_LTNGDIAG_1 )
                      CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
@@ -672,6 +684,8 @@ C statement function for ERF approximation
      &                    'Timestep written to', TRIM( CTM_LTNGDIAG_1 ),
      &                    'for date and time', LDATE, LTIME
                   END IF
+                  call mio_fwrite( 'CTM_LTNG1_MIO', LTSPC, PNAME, VDEMIS_LTDIAG, TIME_STAMP )
+
                   IF ( .NOT. WRITE3( CTM_LTNGDIAG_2, LTSPC, LDATE, LTIME, COLUMN_DIAG ) )  THEN
                      XMSG = 'Could not write to ' // TRIM( CTM_LTNGDIAG_2 )
                      CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
@@ -680,6 +694,7 @@ C statement function for ERF approximation
      &                    'Timestep written to', TRIM( CTM_LTNGDIAG_2 ),
      &                    'for date and time', LDATE, LTIME
                   END IF
+                  call mio_fwrite( 'CTM_LTNG2_MIO', LTSPC, PNAME, COLUMN_DIAG, TIME_STAMP )
 
                   VDEMIS_LTDIAG = 0.0   ! array assignment
                   COLUMN_DIAG = 0.0

@@ -235,7 +235,7 @@ C get CONC file header description
             ! Store MIO Metadata
             NDIMS3D( 1:NVARS3D ) = 3
             L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
             L_COL  ( 1:NVARS3D ) = .True.
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.

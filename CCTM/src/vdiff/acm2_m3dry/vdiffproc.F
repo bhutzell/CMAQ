@@ -93,8 +93,8 @@ C-----------------------------------------------------------------------
 !      USE LSM_MOD, Only: n_lufrac
       USE SEDIMENTATION
       USE VDIFF_DIAG
-#ifdef mpas
       use mio_module
+#ifdef mpas
       use coupler_module
       USE util_module, only : sec2time, time2sec, nextime, index1
       USE centralized_io_module
@@ -139,6 +139,8 @@ C Local Variables:
       CHARACTER( 80 ) :: VARDESC                ! env variable description
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL, SAVE :: WRITE_FIRSTIME = .TRUE.
+      LOGICAL, SAVE :: WRITE_FIRSTIME_MIO = .TRUE.
+      LOGICAL, SAVE :: FIRST_DIAG_WRITE = .TRUE.
       INTEGER, SAVE :: WSTEP  = 0               ! local write counter
       INTEGER  STATUS                           ! ENV... status
 
@@ -166,10 +168,7 @@ C Local Variables:
       INTEGER, SAVE :: NH3_HIT
 
 C Local Variables
-#ifdef mpas
       CHARACTER (20) :: TIME_STAMP
-#endif
-
 
 ! this is for creating the output name list
       character (512) :: fname
@@ -644,7 +643,7 @@ C If last call this hour:  write accumulated depositions:
 #endif
 #endif
          IF ( ABFLUX ) THEN
-           DO R = 1, NROWS
+            DO R = 1, NROWS
                DO C = 1, NCOLS
                   NH3_FLUX(C,R) = DDEP( DD2DV(NH3_HIT),C,R )
                   DDEP( DD2DV(NH3_HIT),C,R ) = NH3_DDEP(C,R)
@@ -681,9 +680,9 @@ C If last call this hour:  write accumulated depositions:
 #endif
          ENDIF
 
-#ifdef mpas
          call mio_time_format_conversion (mdate, mtime, time_stamp)
 
+#ifdef mpas
          ctm_out_clock = time_stamp
 #endif
 
@@ -711,6 +710,14 @@ C If last call this hour:  write accumulated depositions:
                XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+
+            if ( write_firstime_mio ) then
+               call mio_setfile( MET_CRO_2D )
+               call mio_fcreate( 'CTM_DRY_DEP_MIO', io_mode )
+               write_firstime_mio = .false.
+            end if
+            call mio_fwrite( 'CTM_DRY_DEP_MIO', DDEP_SPC( V ),
+     &         PNAME, WRDD, TIME_STAMP )
 #endif
          END DO 
 
@@ -728,6 +735,11 @@ C Write extra arrays for NH3 emission and net flux for bidi
                XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+            call mio_fwrite( 'CTM_DRY_DEP_MIO', NAME_NH3_FLUX,
+     &           PNAME, NH3_FLUX, TIME_STAMP )
+            call mio_fwrite( 'CTM_DRY_DEP_MIO', NAME_NH3_EMIS,
+     &           PNAME, NH3_EMIS, TIME_STAMP )
+
 ! must ensure the col/row being written to log is not larger than 
 ! the subdomain size for this PE. 
 !          WRITE( LOGDEV,*) ' NH3emis, drydep, flux=',NH3_EMIS(27,18),
@@ -741,8 +753,18 @@ C Write extra arrays for NH3 emission and net flux for bidi
          
 C Write vdiff diagnostics
          IF ( VDIFFDIAG ) THEN
-            IF ( GRAV_SETL ) THEN   ! Write vsed diagnostics
 
+            if ( first_diag_write ) then
+               call mio_setfile( MET_CRO_2D )
+               call mio_fcreate( 'CTM_VDIFF_MIO', io_mode )
+               if ( GRAV_SETL ) then
+                  call mio_setfile( MET_CRO_3D )
+                  call mio_fcreate( 'CTM_VSED_MIO', io_mode )
+               end if
+               first_diag_write = .false.
+            end if
+  
+            IF ( GRAV_SETL ) THEN   ! Write vsed diagnostics
                DO V = 1, N_VSED
                   S = VSED_MAP( V )
                   DO L = 1, NLAYS
@@ -758,6 +780,8 @@ C Write vdiff diagnostics
      &                    // ' to ' // CTM_VSED_DIAG
                      CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
                   END IF
+                  call mio_fwrite( 'CTM_VSED_MIO', VSED_NAME( V ),
+     &                             PNAME, VSED_BUF( :,:,:,V ), TIME_STAMP )
                END DO
 
                WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
@@ -783,6 +807,13 @@ C Write other diagnostics
                XMSG = 'Could not write ' //  'NLP_MIN to ' // CTM_VDIFF_DIAG
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+
+            call mio_fwrite( 'CTM_VDIFF_MIO', 'NLP_MEAN', 
+     &                        PNAME, NLPCR_MEAN, TIME_STAMP )
+            call mio_fwrite( 'CTM_VDIFF_MIO', 'NLP_MAX', 
+     &                        PNAME, NLPCR_MAX, TIME_STAMP )
+            call mio_fwrite( 'CTM_VDIFF_MIO', 'NLP_MIN', 
+     &                        PNAME, NLPCR_MIN, TIME_STAMP )
             NLPCR_MAX = 0.0      ! array assignment
             NLPCR_MIN = 9.9E30   ! array assignment
             NLPCR_SUM = 0.0      ! array assignment
@@ -804,6 +835,12 @@ C Write other diagnostics
                   XMSG = 'Could not write ' //  'SEDI_DTC_MIN to ' // CTM_VDIFF_DIAG
                   CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
                END IF
+               call mio_fwrite( 'CTM_VDIFF_MIO', 'SEDI_DTC_MEAN',
+     &                          PNAME, DTCCR_MEAN, TIME_STAMP )
+               call mio_fwrite( 'CTM_VDIFF_MIO', 'SEDI_DTC_MAX',
+     &                          PNAME, DTCCR_MAX, TIME_STAMP )
+               call mio_fwrite( 'CTM_VDIFF_MIO', 'SEDI_DTC_MIN',
+     &                          PNAME, DTCCR_MIN, TIME_STAMP )
                DTCCR_MAX = 0.0      ! array assignment
                DTCCR_MIN = 9.9E30   ! array assignment
                DTCCR_SUM = 0.0      ! array assignment
@@ -826,6 +863,9 @@ C Write other diagnostics
                XMSG = 'Could not write ' //  'lpbl to ' // CTM_VDIFF_DIAG
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+            call mio_fwrite( 'CTM_VDIFF_MIO', 'CONVCT', PNAME, CNVCT, TIME_STAMP )
+            call mio_fwrite( 'CTM_VDIFF_MIO', 'LPBL', 
+     &                       PNAME, REAL( Met_Data%LPBL ), TIME_STAMP )
 
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6, I6 )' )
      &            'Timestep written to', CTM_VDIFF_DIAG,

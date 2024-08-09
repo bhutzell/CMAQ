@@ -111,17 +111,10 @@ C flag for diagnostic DEPV file
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: UNIQUE_ADEPV( : )
       INTEGER, ALLOCATABLE, SAVE         :: AER_DEPV_SUR( : )
 
-      INTEGER, SAVE :: NR_OFFSET            ! Offset to NR start in CGRID
-
       REAL,    ALLOCATABLE, SAVE :: ADEPV( :,:,: )    ! Aerosol dep vel from
                                                                ! subroutine AERO_DEPV
       REAL,    ALLOCATABLE, SAVE :: DBUFF( :,: )      ! diagnostic output buffer
-      REAL,    ALLOCATABLE, SAVE :: DBUFF3( :,:,: )   ! diagnostic output buffer with 3 dimensions
 
-      REAL,    ALLOCATABLE, SAVE :: UCROSS( :,:,:)
-      REAL,    ALLOCATABLE, SAVE :: VCROSS( :,:,:)
-      REAL,    ALLOCATABLE, SAVE :: DLUSE( :,: )
-      
       CONTAINS
 
 C-----------------------------------------------------------------------
@@ -459,9 +452,9 @@ C-----------------------------------------------------------------------
          USE DEPVVARS
          USE UTILIO_DEFN
          USE ASX_DATA_MOD, Only: GRID_DATA !, MOSAIC_DATA
+         use mio_module
 #ifdef mpas
          Use util_module, only : time2sec, nextime, currstep
-         use mio_module
 #endif
 
          IMPLICIT NONE
@@ -500,6 +493,7 @@ C Local variables:
          INTEGER C, R, N, V, NDX, J
 
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
+         LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
 
          CHARACTER (20) :: TIME_STAMP
          integer :: year, month, day, hour, minute
@@ -671,10 +665,14 @@ C-----------------------------------------------------------------------
             END IF
 
             IF ( WRITE_TIME ) THEN
+              IF ( FIRSTWRITE ) THEN
+                 FIRSTWRITE = .FALSE.
+                 call mio_setfile( MET_CRO_2D )
+                 call mio_fcreate( 'CTM_DEPV_MIO', io_mode )
+              END IF            
 
-#ifdef mpas
-               call mio_time_format_conversion (wdate, wtime, time_stamp)
-#else
+              call mio_time_format_conversion (wdate, wtime, time_stamp)
+#ifndef mpas
 #ifdef parallel_io
                IF ( FIRSTIME ) THEN
                   FIRSTIME = .FALSE.
@@ -708,6 +706,8 @@ C-----------------------------------------------------------------------
                      call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
      &                                real(DBUFF(:,1), 4), TIME_STAMP)
 #else
+                     call mio_fwrite ('CTM_DEPV_MIO', UNIQUE_GDEPV( NDX), pname,
+     &                                DBUFF, TIME_STAMP)
 
                      IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX ),
      &                                  WDATE, WTIME, DBUFF ) ) THEN
@@ -734,6 +734,8 @@ C-----------------------------------------------------------------------
                      call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
      &                                real(DBUFF(:,1), 4), TIME_STAMP)
 #else
+                     call mio_fwrite ('CTM_DEPV_MIO', UNIQUE_GDEPV( NDX), pname,
+     &                                DBUFF, TIME_STAMP)
                      IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX ),
      &                                  WDATE, WTIME, DBUFF ) ) THEN
                          XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
@@ -758,6 +760,8 @@ C-----------------------------------------------------------------------
                   call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_ADEPV( N ), pname,
      &                             real(DBUFF(:,1), 4), TIME_STAMP)
 #else
+                  call mio_fwrite ('CTM_DEPV_MIO', UNIQUE_ADEPV( N ), pname,
+     &                             DBUFF, TIME_STAMP)
                   IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_ADEPV( N ),
      &                               WDATE, WTIME, DBUFF ) ) THEN
                       XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'

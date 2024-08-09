@@ -37,6 +37,9 @@ C-----------------------------------------------------------------------
       USE WVEL_DEFN             ! derived vertical velocity component
       USE STD_CONC              ! standard CONC
       USE UTILIO_DEFN
+      use mio_module
+      USE RUNTIME_VARS, only: io_mode
+
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -66,12 +69,7 @@ C Local Variables:
       CHARACTER( 16 ) :: PNAME = 'OPCONC'
       CHARACTER( 96 ) :: XMSG = ' '
       CHARACTER( 28 ) :: SSTR = ' species saved to CONC file:'
-
-C environment variable for no. of layers from bottom to save on CONC file
-      CHARACTER( 16 ) :: NLAYS_CONC = 'NLAYS_CONC'
-
-C  environment variable description
-      CHARACTER( 80 ) :: VARDESC
+      character( 20 ) :: time_stamp
 
       INTEGER      K, KD, L, SPC, V   ! loop counters
       INTEGER      STRT, FINI         ! loop counters
@@ -93,7 +91,7 @@ C-----------------------------------------------------------------------
 #endif
 
 C write the initial concentrations as step 0 on the conc file
-C (inital data assumed to be in correct output units)
+C (initial data assumed to be in correct output units)
 
       ALLOCATE ( DBUFF( NCOLS,NROWS,C_NLAYS ), DBUFFP( NCOLS, NROWS,
      &           C_NLAYS), DBUFFTA( NCOLS, NROWS, C_NLAYS), 
@@ -104,6 +102,9 @@ C (inital data assumed to be in correct output units)
       END IF
 
       WRITE( LOGDEV,* ) ' '
+      call mio_setfile( MET_CRO_3D )
+      call mio_fcreate( 'CTM_CONC_MIO', io_mode )
+      call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
 
       V = 0
 
@@ -122,6 +123,8 @@ C (inital data assumed to be in correct output units)
      &             ' to ' // CTM_CONC_1
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_CONC_MIO', C_GC_SPC( SPC ),
+     &                    PNAME, DBUFF, TIME_STAMP )
 
          WRITE( LOGDEV,'( 5X, I4, " (", I3, ") ", A )' )
      &                SPC, V, TRIM( C_GC_SPC( SPC ) )
@@ -143,6 +146,8 @@ C (inital data assumed to be in correct output units)
      &             ' to ' // CTM_CONC_1
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_CONC_MIO', C_AE_SPC( SPC ),
+     &                    PNAME, DBUFF, TIME_STAMP )
 
          WRITE( LOGDEV,'( 5X, I4, " (", I3, ") ", A )' )
      &                SPC, V, TRIM( C_AE_SPC( SPC ) )
@@ -164,6 +169,8 @@ C (inital data assumed to be in correct output units)
      &             ' to ' // CTM_CONC_1
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_CONC_MIO', C_NR_SPC( SPC ),
+     &                    PNAME, DBUFF, TIME_STAMP )
 
          WRITE( LOGDEV,'( 5X, I4, " (", I3, ") ", A )' )
      &                SPC, V, TRIM( C_NR_SPC( SPC ) )
@@ -184,6 +191,8 @@ C (inital data assumed to be in correct output units)
      &             ' to ' // CTM_CONC_1
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_CONC_MIO', C_TR_SPC( SPC ),
+     &                    PNAME, DBUFF, TIME_STAMP )
 
          WRITE( LOGDEV,'( 5X, I4, " (", I3, ") ", A )' )
      &                SPC, V, TRIM( C_TR_SPC( SPC ) )
@@ -199,6 +208,8 @@ C (inital data assumed to be in correct output units)
             XMSG = 'Could not write Vertical Velocity (W_VEL) to ' // CTM_CONC_1
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_CONC_MIO', 'W_VEL', PNAME, 
+     &                    DBUFF, TIME_STAMP )
       END IF
  
        IF ( L_CONC_TA ) THEN   ! for Temperature
@@ -210,6 +221,8 @@ C (inital data assumed to be in correct output units)
             XMSG = 'Could not write Temperature to ' // CTM_CONC_1
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_CONC_MIO', 'TA', PNAME, 
+     &                    DBUFF, TIME_STAMP )
       END IF
 
       IF ( L_CONC_PRES ) THEN   ! for Pressure
@@ -221,8 +234,9 @@ C (inital data assumed to be in correct output units)
             XMSG = 'Could not write Pressure to ' // CTM_CONC_1
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_CONC_MIO', 'PRES', PNAME, 
+     &                    DBUFF, TIME_STAMP )
       END IF
-
 
       IF ( L_CONC_RH ) THEN   ! for Relative Humidity
 
@@ -239,6 +253,8 @@ C (inital data assumed to be in correct output units)
 
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_CONC_MIO', 'RH', PNAME, 
+     &                    DBUFF, TIME_STAMP )
       END IF
 
 

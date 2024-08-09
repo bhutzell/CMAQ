@@ -117,6 +117,7 @@ C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE STD_CONC              ! standard CONC
       USE CGRID_SPCS            ! CGRID mechanism species
+      use mio_module
 #ifdef mpas
       USE HGRD_DEFN, ONLY: MYPE
       use coupler_module
@@ -126,7 +127,6 @@ C-----------------------------------------------------------------------
       use mydata_module
       use get_env_module
       use lus_defn
-      use mio_module
 #else
       USE PCGRID_DEFN           ! inherits GRID_CONF
       USE AVG_CONC              ! integral average CONC
@@ -229,8 +229,6 @@ C Local variables:
 
 #ifdef mpas
 
-      integer :: io_mode
-
       INTEGER      SPC_STRT, SPC_FINI, J
       LOGICAL      LSTAT
       INTEGER      STAT                       ! Status reported by Aerosol Dist Checker
@@ -284,6 +282,10 @@ C Local variables:
             REAL, POINTER            :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )    :: JDATE, JTIME
          END SUBROUTINE PA_OUTPUT
+         subroutine wr_init ( cgrid, jdate, jtime, tstep )
+            real, pointer            :: cgrid( :,:,:,: )
+            integer, intent( in )    :: jdate, jtime, tstep
+         end subroutine wr_init
 #ifdef isam
          SUBROUTINE WR_SA ( JDATE, JTIME, TSTEP, NSTEPS )
             IMPLICIT NONE
@@ -549,7 +551,7 @@ C Initialize Global Arrays for Storing Chemical, Regional, Process,
 C and Emission Stream Families
          call read_families
 
-C Initiliaze IO Arrays and Open Files
+C Initialize IO Arrays and Open Files
 #ifdef mpas
          call centralized_io_init (NCOLS_IN)
 #else
@@ -611,12 +613,6 @@ C Convention: the input file concentration units are always ppmV.
 !       if (.not. lus_init (mminlu_mpas, lufrac_data(:,:,1)) ) then
 !          CALL M3EXIT( 'DRIVER',JDATE,JTIME,'ERROR: Cannot initialize Land Use Category', 2)
 !       end if
-
-        if (ncd_64bit_offset) then
-            io_mode = ior (nf90_noclobber, nf90_64bit_offset)
-         else
-            io_mode = nf90_noclobber
-         end if
 
         call mio_setfile ('GR_EMIS_001')
 
@@ -723,7 +719,7 @@ C Main processing loop:
       CALL ADVSTEP ( JDATE, JTIME, TSTEP, ASTEP, NREPS )
 
       ! Initialize arrays for storing output data averaged across the
-      ! synchornization time step
+      ! synchronization time step
       IF ( MOD( TIME2SEC( JTIME ), TIME2SEC( TSTEP( 1 ) ) ) .EQ. 0 ) THEN
          DO V = 1, N_ASPCS
             S = AVG_CONC_MAP( V )
@@ -770,9 +766,6 @@ C Main processing loop:
              ! Calculate all ELMO variables for both Instantaneous and
              ! Average parameters
              CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.TRUE.)
-             ! Print Instantaneous Values at first time step
-             CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.TRUE. )
-
         ELSE IF ( ELMO_NSTEP .LT. 1.0 ) THEN
              ! Calculate all ELMO Variables for averaging but do not output them
              CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
@@ -790,7 +783,15 @@ C Initialize Modules
           if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
 
 C Initialize MIO - placeholder
-!         call mio_init
+          call mio_init( npcol, nprow, ncols, nrows, logdev )
+      END IF
+
+! Output Instantaneous Values at first time step
+      IF ( JDATE .EQ. STDATE .AND. JTIME .EQ. STTIME ) THEN
+         CALL WR_INIT ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
+         IF ( L_ELMO ) THEN
+            CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.TRUE. )
+        END IF
       END IF
 
       ! science process sequence:
@@ -949,9 +950,6 @@ C Write Data to Output Files
 #endif
 
       IF ( LAST_STEP ) THEN
-#ifdef mpas
-         call mio_shutdown()
-#else
 C write CGRID state file for subsequent runs
          CALL WR_CGRID ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
 #ifdef isam
@@ -975,7 +973,6 @@ C Shut down IOAPI
          ELSE
             CALL LOG_MESSAGE( LOGDEV, ' *** FATAL ERROR shutting down Models-3 I/O *** ' )
          END IF
-#endif
       END IF
 
       ! Output Verification of MIO Input File

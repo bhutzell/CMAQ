@@ -82,6 +82,7 @@ C-----------------------------------------------------------------------
       USE centralized_io_module, only : AVGEMIS, interpolate_var
       Use ASX_DATA_MOD, only: MET_DATA
       USE MIO_ASCII
+      use mio_module
 
 #ifdef mpas
       USE util_module, only : hhmmss, time2sec
@@ -144,11 +145,13 @@ C Other variables:
       LOGICAL          OK        ! check flag
       LOGICAL, SAVE :: LASTTIC                ! true: last sync step this output tstep
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
 
       CHARACTER( 256 ) :: MESG       ! message buffer
       CHARACTER( 256 ) :: EQNAME     ! equivalent filename
       CHARACTER(  16 ) :: VAR        ! variable name
       CHARACTER(  16 ) :: PNAME = 'GET_BEIS'   ! prodedure name
+      CHARACTER(  20 ) :: TIME_STAMP
 
 #ifdef verbose_getbeis
       REAL,    ALLOCATABLE, SAVE :: EMISX( : )
@@ -333,12 +336,21 @@ C Speciate emissions
             END DO
          END DO
          IF ( LASTTIC ) THEN
+            if ( firstwrite ) then 
+               call mio_setfile( MET_CRO_2D )
+               call mio_fcreate( 'B3GTS_MIO', io_mode )
+               firstwrite = .false.
+            end if
+
             EMISS = EMISS * HR2SEC   ! convert from gm/h to gm/s
             DO S = 1,MSPCS
                IF ( .NOT. WRITE3( SNAME, EMSPC( S ), MDATE, MTIME, EMISS(:,:,S) ) ) THEN
                   MESG = 'Could not write to output file "' // TRIM( SNAME ) // '"'
                   CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
                END IF
+               call mio_setfile( 'B3GTS_MIO' )
+               call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+               call mio_fwrite( 'B3GTS_MIO', EMSPC( S ), pname, EMISS(:,:,S), TIME_STAMP )
             END DO
             WRITE( LOGDEV,94040 )
      &            'Timestep written to', SNAME,

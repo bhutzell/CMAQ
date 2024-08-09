@@ -43,6 +43,7 @@ C-----------------------------------------------------------------------
       USE AVG_CONC              ! integral average CONC
       USE UTILIO_DEFN
       USE RUNTIME_VARS
+      USE MIO_MODULE
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -69,6 +70,7 @@ C Local variables:
 
       CHARACTER( 16 ) :: PNAME = 'WR_ACONC'
       CHARACTER( 96 ) :: XMSG = ' '
+      CHARACTER( 20 ) :: TIME_STAMP
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL OK
@@ -92,7 +94,8 @@ C Override default beginning time timestamp for ACONC?
                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
          END IF
-
+         call mio_setfile( MET_CRO_3D )
+         call mio_fcreate( 'A_CONC_MIO', io_mode )
       END IF
 
       IF ( END_TIME ) THEN   ! ending time timestamp
@@ -101,6 +104,9 @@ C Override default beginning time timestamp for ACONC?
          MDATE = JDATE; MTIME = JTIME
          CALL NEXTIME ( MDATE, MTIME, -TSTEP )
       END IF
+
+      call mio_setfile( 'A_CONC_MIO')
+      call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
 
       VAR = 0
     
@@ -114,6 +120,8 @@ C Override default beginning time timestamp for ACONC?
      &           // ' to ' // A_CONC_1
             CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'A_CONC_MIO', A_GC_SPC( SPC ), PNAME, 
+     &                    AGRID( :,:,:,VAR ), TIME_STAMP )       
       END DO
  
       DO SPC = 1, N_A_AE_SPC
@@ -125,6 +133,8 @@ C Override default beginning time timestamp for ACONC?
      &           // ' to ' // A_CONC_1
             CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'A_CONC_MIO', A_AE_SPC( SPC ), PNAME, 
+     &                    AGRID( :,:,:,VAR ), TIME_STAMP )       
       END DO
  
       DO SPC = 1, N_A_NR_SPC
@@ -136,6 +146,8 @@ C Override default beginning time timestamp for ACONC?
      &           // ' to ' // A_CONC_1
             CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'A_CONC_MIO', A_NR_SPC( SPC ), PNAME, 
+     &                    AGRID( :,:,:,VAR ), TIME_STAMP )       
       END DO
  
       ! Write Tracer Species Concentrations to Average Concentration File
@@ -148,6 +160,8 @@ C Override default beginning time timestamp for ACONC?
      &           // ' to ' // A_CONC_1
             CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'A_CONC_MIO', A_TR_SPC( SPC ), PNAME, 
+     &                    AGRID( :,:,:,VAR ), TIME_STAMP )       
       END DO
  
       ! Write Vertical Velocity to Average Concentration File
@@ -158,6 +172,8 @@ C Override default beginning time timestamp for ACONC?
      &             // ' to ' // A_CONC_1
               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
         END IF 
+         call mio_fwrite( 'A_CONC_MIO', 'W_VEL', PNAME, 
+     &                    AVG_WVEL, TIME_STAMP )       
       END IF
  
       ! Write Relative Humidity to Average Concentration File
@@ -168,6 +184,8 @@ C Override default beginning time timestamp for ACONC?
      &             // ' to ' // A_CONC_1
               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
         END IF 
+         call mio_fwrite( 'A_CONC_MIO', 'RH', PNAME, 
+     &                    AVG_RH, TIME_STAMP )       
       END IF
       
       ! Write Temperature to Average Concentration File
@@ -178,6 +196,8 @@ C Override default beginning time timestamp for ACONC?
      &             // ' to ' // A_CONC_1
               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
         END IF 
+         call mio_fwrite( 'A_CONC_MIO', 'TA', PNAME, 
+     &                    AVG_TA, TIME_STAMP )       
       END IF
  
 
@@ -189,6 +209,8 @@ C Override default beginning time timestamp for ACONC?
      &             // ' to ' // A_CONC_1
               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
         END IF 
+         call mio_fwrite( 'A_CONC_MIO', 'PRES', PNAME, 
+     &                    AVG_PRES, TIME_STAMP )       
       END IF
  
 

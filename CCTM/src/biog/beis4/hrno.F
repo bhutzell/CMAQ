@@ -142,8 +142,8 @@ C-----------------------------------------------------------------------
       USE ASX_DATA_MOD
       USE UTILIO_DEFN
       USE MIO_ASCII
-#ifdef mpas
       use mio_module
+#ifdef mpas
       USE util_module, only : NEXTIME, TIME2SEC, SECSDIFF, CURRSTEP, julian
 #else
 #ifdef parallel
@@ -225,7 +225,7 @@ C Local Variables:
       LOGICAL, SAVE :: INITTIME = .TRUE.
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL, SAVE :: FIRSTHR  = .TRUE.
-      LOGICAL, SAVE :: FIRST_WRITE = .TRUE.
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
       CHARACTER( 256 ) :: MESG            ! message buffer
       CHARACTER( 16 )  :: PNAME = 'HRNO'  ! procedure name
 
@@ -235,10 +235,6 @@ C for INTERPX
 
       CHARACTER( 16 ), SAVE :: VNAME_RC, VNAME_RN
       INTEGER :: SPC
-
-#ifdef mpas
-      integer :: io_mode
-#endif
 
       LOGICAL, EXTERNAL :: FLUSH3
 
@@ -253,12 +249,6 @@ C-----------------------------------------------------------------------
         INITTIME = .FALSE.
 
 #ifdef mpas
-         if (ncd_64bit_offset) then
-            io_mode = ior (nf90_noclobber, nf90_64bit_offset)
-         else
-            io_mode = nf90_noclobber
-         end if
-
          call mio_fcreate ('SOILOUT', io_mode)
 #endif
 
@@ -687,6 +677,11 @@ C Final timestamp
 #endif
 
 C Write soil NO rain data file
+      if ( FIRSTWRITE ) then
+         call mio_setfile( MET_CRO_2D )
+         call mio_fcreate( 'BEIS_SOIL_MIO', io_mode )
+         FIRSTWRITE = .FALSE.
+      end if
 
       VAR = 'PTYPE'
       IF ( .NOT. WRITE3( SOILOUT, VAR, NDATE, NTIME, PTYPE ) ) THEN
@@ -694,6 +689,7 @@ C Write soil NO rain data file
      &          '" to file "' // TRIM( SOILOUT ) // '"'
          CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
       END IF
+      call mio_fwrite( 'BEIS_SOIL_MIO', VAR, PNAME, PTYPE )
 
       VAR = 'PULSEDATE'
       IF ( .NOT. WRITE3( SOILOUT, VAR, NDATE, NTIME, PULSEDATE ) ) THEN
@@ -701,6 +697,7 @@ C Write soil NO rain data file
      &          '" to file "' // TRIM( SOILOUT ) // '"'
          CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
       END IF
+      call mio_fwrite( 'BEIS_SOIL_MIO', VAR, PNAME, PULSEDATE )
 
       VAR = 'PULSETIME'
       IF ( .NOT. WRITE3( SOILOUT, VAR, NDATE, NTIME, PULSETIME ) ) THEN
@@ -708,6 +705,7 @@ C Write soil NO rain data file
      &          '" to file "' // TRIM( SOILOUT ) // '"'
          CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
       END IF
+      call mio_fwrite( 'BEIS_SOIL_MIO', VAR, PNAME, PULSETIME )
 
       NDX = 1 + MOD( IHR, MXRHRS )
       RAINFALL( :,:,NDX ) = C_RAINFALL
@@ -718,6 +716,7 @@ C Write soil NO rain data file
      &             '" to file "' // TRIM( SOILOUT ) // '"'
             CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
          END IF
+         call mio_fwrite( 'BEIS_SOIL_MIO', VAR, PNAME, RAINFALL( :,:,I ) )
       END DO
 
       WRITE( LOGDEV,94040 )
