@@ -240,7 +240,7 @@
          CASE ( ID_PMF_HPM )
             ! Retrieve AHPLUSIJ
             IF ( ID_PMF_HP .NE. 0 ) THEN
-               CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_HP, IV=ET_CMPST )
+               CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG_=ID_PMF_HP, IV_=ET_CMPST )
             ELSE
                XMSG = 'ID_PMF_HP has not been defined in CMAQ_CH_CTRL_NML '//
      &                 'so PMF_HPM cannot be calculated. Please define PMF_HP.'
@@ -248,7 +248,7 @@
             END IF
             ! Retrieve AH2OIJ
             IF ( ID_PMF_H2O .NE. 0 ) THEN
-               CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, IDG=ID_PMF_H2O, IV=ET_CMPST )
+               CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, IDG_=ID_PMF_H2O, IV_=ET_CMPST )
             ELSE
                XMSG = 'ID_PMF_H2O has not been defined in CMAQ_CH_CTRL_NML '//
      &                 'so PMF_HPM cannot be calculated. Please define PMF_H2O.'
@@ -260,9 +260,9 @@
          ! Calculate PMF_PH - Fine-Mode pH
          CASE ( ID_PMF_PH )
             ! Retrieve HPMOLAL
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_HPM, IV=ET_CMPST )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG_=ID_PMF_HPM, IV_=ET_CMPST )
             ! Retrieve AH2OIJ
-            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, IDG=ID_PMF_H2O, IV=ET_CMPST )
+            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, IDG_=ID_PMF_H2O, IV_=ET_CMPST )
 
 #ifdef mpas
             OUTVAL = -9.999E36
@@ -380,13 +380,13 @@
          CASE ( ID_PMF_OMOC )
             VAL  = 0.0
             VAL2 = 0.0
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_OA, IV=ET_CMPST )
-            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, IDG=ID_PMF_OC, IV=ET_CMPST )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG_=ID_PMF_OA, IV_=ET_CMPST )
+            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, IDG_=ID_PMF_OC, IV_=ET_CMPST )
             OUTVAL = VAL / ( VAL2 + TINY( 0.0 ) )
             
          ! Calculate PMF_OtoC - Fine-Mode O:C 
          CASE ( ID_PMF_OtoC )
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_PMF_OA, IV=ET_CMPST  )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG_=ID_PMF_OA, IV_=ET_CMPST  )
 
             VAL2 = 0.0
             DO IOA = 1,N_OA_NotTracers
@@ -481,7 +481,7 @@
               
          ! Calculate O:C relevant for AMS observations
          CASE ( ID_AMS_OtoC )
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG=ID_AMS_OA, IV=ET_CMPST )
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, IDG_=ID_AMS_OA, IV_=ET_CMPST )
 
             ! Save AMS Fraction for each mode
             DO IMODE = 1,N_MODE
@@ -515,7 +515,7 @@
          ! Calculate Aerosol Fraction of Benzo-a-Pyrene
          CASE ( ID_BENAPY_FAERO )
             IF ( ID_PMF_BENAPY .NE. 0 ) THEN
-               CALL CALC_ELMO( OUTVAL=VAL,  OUT_UNIT=IUNIT, IDG=ID_PMF_BENAPY, IV=ET_CMPST )
+               CALL CALC_ELMO( OUTVAL=VAL,  OUT_UNIT=IUNIT, IDG_=ID_PMF_BENAPY, IV_=ET_CMPST )
             ELSE
                XMSG = 'ID_PMF_BENAPY has not been defined in CMAQ_CH_CTRL_NML '//
      &                 'so BENAP_FAERO cannot be calculated. Please define '//
@@ -523,7 +523,7 @@
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
             IF ( ID_GAS_BENAPY .NE. 0 ) THEN
-               CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, IDG=ID_GAS_BENAPY, IV=ET_CMPST )
+               CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, IDG_=ID_GAS_BENAPY, IV_=ET_CMPST )
             ELSE
                XMSG = 'ID_GAS_BENAPY has not been defined in CMAQ_CH_CTRL_NML '//
      &                 'so BENAPY_FAERO cannot be calculated. Please define '//
@@ -547,7 +547,7 @@
             END IF
 
             IF ( ID_PMF_NO3 .NE. 0 ) THEN
-               CALL CALC_ELMO( OUTVAL=PMF_NO3, OUT_UNIT=IUNIT, IDG=ID_PMF_NO3, IV=ET_CMPST )
+               CALL CALC_ELMO( OUTVAL=PMF_NO3, OUT_UNIT=IUNIT, IDG_=ID_PMF_NO3, IV_=ET_CMPST )
             ELSE
                XMSG = 'ID_PMF_NO3 has not been defined in CMAQ_CH_CTRL_NML '//
      &                'so PMF_FRM cannot be calculated. Please define PMF_NO3.'
@@ -558,21 +558,21 @@
             PMF_NH4_LOSS = PMF_NO3_LOSS * 18.0 / 62.0
 
             IF ( ID_PMF_NH4 .NE. 0 ) THEN
-               CALL CALC_ELMO( OUTVAL=PMF_NH4,  OUT_UNIT=IUNIT, IDG=ID_PMF_NH4, IV=ET_CMPST )
+               CALL CALC_ELMO( OUTVAL=PMF_NH4,  OUT_UNIT=IUNIT, IDG_=ID_PMF_NH4, IV_=ET_CMPST )
             ELSE
                XMSG = 'ID_PMF_NH4 has not been defined in CMAQ_CH_CTRL_NML '//
      &                 'so PMF_FRM cannot be calculated. Please define PMF_NH4.'
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
             IF ( ID_PMF_SO4 .NE. 0 ) THEN
-               CALL CALC_ELMO( OUTVAL=PMF_SO4,  OUT_UNIT=IUNIT, IDG=ID_PMF_SO4, IV=ET_CMPST ) 
+               CALL CALC_ELMO( OUTVAL=PMF_SO4,  OUT_UNIT=IUNIT, IDG_=ID_PMF_SO4, IV_=ET_CMPST ) 
             ELSE
                XMSG = 'ID_PMF_SO4 has not been defined in CMAQ_CH_CTRL_NML '//
      &                 'so PMF_FRM cannot be calculated. Please define PMF_SO4.'
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
 
-            CALL CALC_ELMO( OUTVAL=PMF_MASS, OUT_UNIT=IUNIT, IDG=ID_PMF_MASS,IV=ET_CMPST ) 
+            CALL CALC_ELMO( OUTVAL=PMF_MASS, OUT_UNIT=IUNIT, IDG_=ID_PMF_MASS, IV_=ET_CMPST ) 
 
             OUTVAL = PMF_MASS - PMF_NO3_LOSS - PMF_NH4_LOSS
      &                      +0.24 * ( PMF_SO4 + PMF_NH4 - PMF_NH4_LOSS ) + 0.5
@@ -592,7 +592,7 @@
             END IF
 
             IF ( ID_PM25_NO3 .NE. 0 ) THEN
-               CALL CALC_ELMO( OUTVAL=PM25_NO3, OUT_UNIT=IUNIT, IDG=ID_PM25_NO3, IV=ET_CMPST )
+               CALL CALC_ELMO( OUTVAL=PM25_NO3, OUT_UNIT=IUNIT, IDG_=ID_PM25_NO3, IV_=ET_CMPST )
             ELSE
                XMSG = 'ID_PM25_NO3 has not been defined in CMAQ_CH_CTRL_NML '//
      &                 'so PMF_FRM cannot be calculated. Please define PM25_NO3.'
@@ -603,14 +603,14 @@
             PM25_NH4_LOSS = PM25_NO3_LOSS * 18.0 / 62.0
 
             IF ( ID_PM25_NH4 .NE. 0 ) THEN
-               CALL CALC_ELMO( OUTVAL=PM25_NH4, OUT_UNIT=IUNIT, IDG=ID_PM25_NH4, IV=ET_CMPST )
+               CALL CALC_ELMO( OUTVAL=PM25_NH4, OUT_UNIT=IUNIT, IDG_=ID_PM25_NH4, IV_=ET_CMPST )
             ELSE
                XMSG = 'ID_PM25_NH4 has not been defined in CMAQ_CH_CTRL_NML '//
      &                 'so PM25_FRM cannot be calculated. Please define PM25_NH4.'
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
             IF ( ID_PM25_SO4 .NE. 0 ) THEN
-               CALL CALC_ELMO( OUTVAL=PM25_SO4, OUT_UNIT=IUNIT, IDG=ID_PM25_SO4, IV=ET_CMPST ) 
+               CALL CALC_ELMO( OUTVAL=PM25_SO4, OUT_UNIT=IUNIT, IDG_=ID_PM25_SO4, IV_=ET_CMPST ) 
             ELSE
                XMSG = 'ID_PM25_SO4 has not been defined in CMAQ_CH_CTRL_NML '//
      &                 'so PM25_FRM cannot be calculated. Please define PM25_SO4.'

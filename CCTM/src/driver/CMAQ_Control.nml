@@ -92,7 +92,10 @@
 &elmo_avrg_nml
   Avrg_Layer_Bot = 1
   Avrg_Layer_Top = 1
-  Avrg_Vars_Nml  = 'DEFAULT'
+  !Avrg_Vars_Nml  = 'DEFAULT'
+  Avrg_Vars_Nml  = 'NO','NO2','PM1_NA','PMF_SO4','ASO4J','ANO3','PMAMS_OA','PMAMS_CL',
+                   'O3','HNO3','PMF_UN_IMPV1','PMF_SOILIMPV','WD_ASO4','DD_ANO3','NOY',
+                   'DD_OXN_NOX','WD_OXN_TOT','TD_OXN_TOT','NH3','GAS_HNO3','GAS_NH3'
 
 /                                                               
 

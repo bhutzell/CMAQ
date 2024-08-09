@@ -52,14 +52,19 @@
 !     so that they may be added to the ELMO_TABLE.
 !-------------------------------------------------------------------------
 
+      USE AERO_DATA, ONLY : AEROSPC, N_AEROSPC, N_MODE, AERO_MISSING
+      USE CGRID_SPCS, ONLY : WDEP_SPC, N_SPC_WDEP
+      USE VDIFF_MAP, ONLY : DDEP_SPC, N_SPC_DDEP
+
       IMPLICIT NONE
 
       CHARACTER( 300 ) :: XMSG
 
       INTEGER FUNIT
-      INTEGER IOST
+      INTEGER IOST, IW, ID
       CHARACTER( 200 ) :: TMPLINE
       CHARACTER( 40 )  :: PNAME = 'ELMO_READ_COMPOSITES'
+      INTEGER IAERO, IAER, ICOMP, IM
 
       ! Define Namelist Input from Mechanism-Specific Control File
       Namelist / COMPOSITE_INIT / N_COMPOSITES, N_MAX_COMPONENTS
@@ -119,11 +124,17 @@
       END IF
 
       ! Allocate and Initialize Namelist Variables
-      ALLOCATE( CMPST( N_COMPOSITES ),
+      ALLOCATE( CMPST( N_COMPOSITES + N_AEROSPC*3 ),
      &          STAT=IOST )
       CALL CHECKMEM( IOST, 'CMPST',PNAME)
 
       ! Read the Composite Definition Section
+      CMPST%NAME       = ''
+      CMPST%CUNIT      = ''
+      CMPST%CMPST_TYPE = ''
+      CMPST%DESC       = ''
+      CMPST%FORMULA    = ''
+
       REWIND( FUNIT )
       READ( NML = ELMO_COMPOSITES, UNIT = FUNIT, IOSTAT=IOST )
       IF ( IOST .EQ. -1 ) THEN
@@ -134,11 +145,6 @@
      &           'file you have provided for CMAQ_CH_CTRL_NML.'
           CALL LOG_MESSAGE( LOGDEV, ' ')
           CALL LOG_MESSAGE( LOGDEV, XMSG )
-          CMPST%NAME       = ''
-          CMPST%CUNIT      = ''
-          CMPST%CMPST_TYPE = ''
-          CMPST%DESC       = ''
-          CMPST%FORMULA    = ''
       ELSE IF ( IOST .NE. 0 ) THEN
           ! Read Error for Composite Variables
           backspace( FUNIT )
@@ -153,9 +159,85 @@
      &                  'fix the Composite Variable Specification.', 1 )
       END IF
 
+      ! Check that all user-defined Composites are populated
+      DO ICOMP = 1,N_COMPOSITES
+         IF ( CMPST(ICOMP)%NAME .EQ. '' ) THEN
+            CALL M3EXIT ( 'DESID_READ_NAMELIST', 0, 0, 'One or more of the '//
+     &                    'user-defined ELMO composites are undefined in the '//
+     &                    'Chem_Control namelist file.', 1 )
+         END IF
+      END DO
 
       CALL LOG_MESSAGE( LOGDEV, 'Completed Reading ELMO Composites '//
      &                             'from Mechanism-Spcific Namelist')
+
+      ! Add Bulk Aerosols to Composite List
+      DO IAERO = 1,N_AEROSPC
+
+         ! Add this Aerosol Concentration to the Composite List
+         IAER = INDEX1( AEROSPC(IAERO)%BULKNAME, N_COMPOSITES, CMPST%NAME )
+         IF ( IAER .EQ. 0 ) THEN
+            N_COMPOSITES = N_COMPOSITES + 1
+            CMPST( N_COMPOSITES )%NAME = AEROSPC(IAERO)%BULKNAME
+            CMPST( N_COMPOSITES )%CUNIT = 'ug m-3'
+            CMPST( N_COMPOSITES )%CMPST_TYPE = 'ALL'
+            CMPST( N_COMPOSITES )%DESC = 'Total ' // TRIM(AEROSPC(IAERO)%BULKNAME) //
+     &           ' across all modes.'
+            DO IM = 1,N_MODE
+              IF ( .NOT. AERO_MISSING( IAERO, IM ) .AND. 
+     &             AEROSPC( IAERO )%NAME(IM) .NE. AEROSPC(IAERO)%BULKNAME ) THEN
+                CMPST( N_COMPOSITES )%FORMULA = 
+     &                 TRIM( CMPST( N_COMPOSITES )%FORMULA ) //
+     &                 ' + ' // TRIM(AEROSPC( IAERO )%NAME( IM ))
+              END IF
+            END DO
+            IF ( CMPST( N_COMPOSITES )%FORMULA .EQ. '' ) N_COMPOSITES = N_COMPOSITES - 1
+         END IF
+
+         ! Add this Aerosol Wet Dep to the Composite List
+         IAER = INDEX1( 'WD_'//AEROSPC(IAERO)%BULKNAME, N_COMPOSITES, CMPST%NAME )
+         IF ( IAER .EQ. 0 .AND. L_ELMO_WDEP ) THEN
+            N_COMPOSITES = N_COMPOSITES + 1
+            CMPST( N_COMPOSITES )%NAME = 'WD_' // AEROSPC(IAERO)%BULKNAME
+            CMPST( N_COMPOSITES )%CUNIT = 'kg ha-1'
+            CMPST( N_COMPOSITES )%CMPST_TYPE = 'DEP'
+            CMPST( N_COMPOSITES )%DESC = 'Total ' // TRIM(AEROSPC(IAERO)%BULKNAME) //
+     &           ' wet deposition across all modes.'
+            DO IM = 1,N_MODE
+              IF ( .NOT. AERO_MISSING( IAERO, IM ) .AND.
+     &             AEROSPC( IAERO )%NAME(IM) .NE. AEROSPC(IAERO)%BULKNAME ) THEN
+                IW = INDEX1( TRIM(AEROSPC( IAERO )%NAME( IM )), N_SPC_WDEP, WDEP_SPC )
+                IF ( IW .NE. 0 ) 
+     &               CMPST( N_COMPOSITES )%FORMULA = 
+     &                    TRIM( CMPST( N_COMPOSITES )%FORMULA ) //
+     &                    ' + ' // 'WD_' // TRIM(AEROSPC( IAERO )%NAME( IM ))
+              END IF
+            END DO
+            IF ( CMPST( N_COMPOSITES )%FORMULA .EQ. '' ) N_COMPOSITES = N_COMPOSITES - 1
+         END IF
+         
+         ! Add this Aerosol Dry Deposition to the Composite List
+         IAER = INDEX1( 'DD_'//AEROSPC(IAERO)%BULKNAME, N_COMPOSITES, CMPST%NAME )
+         IF ( IAER .EQ. 0 .AND. L_ELMO_DDEP ) THEN
+            N_COMPOSITES = N_COMPOSITES + 1
+            CMPST( N_COMPOSITES )%NAME = 'DD_' // AEROSPC(IAERO)%BULKNAME
+            CMPST( N_COMPOSITES )%CUNIT = 'kg ha-1'
+            CMPST( N_COMPOSITES )%CMPST_TYPE = 'DEP'
+            CMPST( N_COMPOSITES )%DESC = 'Total ' // TRIM(AEROSPC(IAERO)%BULKNAME) //
+     &           ' dry deposition across all modes.'
+            DO IM = 1,N_MODE
+              IF ( .NOT. AERO_MISSING( IAERO, IM ) .AND.
+     &             AEROSPC( IAERO )%NAME(IM) .NE. AEROSPC(IAERO)%BULKNAME ) THEN
+                ID = INDEX1( TRIM(AEROSPC( IAERO )%NAME( IM )), N_SPC_DDEP+1, DDEP_SPC )
+                IF ( ID .NE. 0 ) 
+     &               CMPST( N_COMPOSITES )%FORMULA = 
+     &                    TRIM( CMPST( N_COMPOSITES )%FORMULA ) //
+     &                    ' + ' // 'DD_' // TRIM(AEROSPC( IAERO )%NAME( IM ))
+              END IF
+            END DO
+            IF ( CMPST( N_COMPOSITES )%FORMULA .EQ. '' ) N_COMPOSITES = N_COMPOSITES - 1
+         END IF
+      END DO
 
       CLOSE( UNIT = FUNIT )
 
@@ -192,8 +274,9 @@
      &         ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
      &         ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
             
-            CALL LOG_MESSAGE( LOGDEV, '   Reading Composite: '//
+            CALL LOG_MESSAGE( LOGDEV, '   Reading Formula for Composite: '//
      &           TRIM( ELMO_TABLE( J )%OUT_NAME ) )
+
 
             ! Parse Formula from CMAQ Chemical Control Namelist
             CALL ELMO_PARSE_FORMULA( ID, N_VARS, COMPS, COEFFS )
@@ -325,12 +408,16 @@
              ELMO_COMP( J )%L_MODE( : ) = .TRUE.
              ELMO_COMP( J )%INLET = IPMAMS
              ELMO_COMP( J )%WETNESS = IWET
+         CASE ('ALL' )
+             ! This is a bulk quantity. All modes are selected.
+             ELMO_COMP( J )%L_MODE( : ) = .TRUE.
          CASE ('GAS')
              ! No Aerosol Parameters need to be set since
              ! this aggregate will be all gas.
          CASE ('DEP')
-             ! No Aerosol Parameters need to be set since
-             ! this aggregate will be a deposited value.
+             ! Deposition will consist of particles from 
+             ! the entire size range
+             ELMO_COMP( J )%L_MODE( : ) = .TRUE.
          CASE DEFAULT
              XMSG = 'An aerosol descriptor (' // trim(AEROTYPE) // ') has been given ' //
      &              'for the mapping of an ELMO composite variable. It is not recognized.'
@@ -343,10 +430,10 @@
       ! If this variable is an ISAM or DDM variable, inherit the Source 
       ! for this Component from the Composite
       IF ( VAR_TYPE .EQ. ET_ISAM_CMPST    .OR. VAR_TYPE .EQ. ET_ISAM_CONC 
-     & .OR.VAR_TYPE .EQ. ET_ISAM_AEROBULK .OR. VAR_TYPE .EQ. ET_ISAM_CMPST_DEP
+     & .OR. VAR_TYPE .EQ. ET_ISAM_CMPST_DEP
      & .OR.VAR_TYPE .EQ. ET_ISAM_WDEP     .OR. VAR_TYPE .EQ. ET_ISAM_DDEP
      & .OR.VAR_TYPE .EQ. ET_DDM_CMPST     .OR. VAR_TYPE .EQ. ET_DDM_CONC
-     & .OR.VAR_TYPE .EQ. ET_DDM_AEROBULK  .OR. VAR_TYPE .EQ. ET_DDM_CMPST_DEP 
+     & .OR. VAR_TYPE .EQ. ET_DDM_CMPST_DEP 
      & .OR.VAR_TYPE .EQ. ET_DDM_WDEP      .OR. VAR_TYPE .EQ. ET_DDM_DDEP 
      &        ) THEN
             
@@ -377,8 +464,8 @@
 
       INTEGER, INTENT( IN ) ::  J, IVAR
       INTEGER, INTENT( INOUT ) :: N_VARS
-      CHARACTER( * ), INTENT( IN ) :: CSPEC_IN
-      CHARACTER( 32 ) CSPEC, CSPEC_TMP
+      CHARACTER( 32 ), INTENT( IN ) :: CSPEC_IN
+      CHARACTER( 32 ) CSPEC
       REAL, INTENT( IN ) :: COEFF
       INTEGER  ISPEC, JSPEC, IAERO, ICGRID, IELMO
       INTEGER  I0, I1, I2, VAR_TYPE, ISRC, K
@@ -398,7 +485,8 @@
       ! For ISAM ELMO Variables, we need to make sure the components
       ! match the source number, or apply to all sources (i.e. ISAM
       ! Bulk)
-      IF ( VAR_TYPE .EQ. ET_ISAM_CMPST ) THEN
+      IF ( VAR_TYPE .EQ. ET_ISAM_CMPST .OR. 
+     &     VAR_TYPE .EQ. ET_ISAM_CMPST_DEP ) THEN
 #ifdef isam      
          CSPEC = CSPEC // '_ISAM'
          ISRC = ELMO_TABLE( J )%SOURCE
@@ -419,7 +507,8 @@
          END DO
 #endif
 
-      ELSE IF  ( VAR_TYPE .EQ. ET_DDM_CMPST ) THEN
+      ELSE IF  ( VAR_TYPE .EQ. ET_DDM_CMPST .OR. 
+     &           VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
 #ifdef sens
          CSPEC = CSPEC // '_DDM'
          ISRC = ELMO_TABLE( J )%SOURCE
@@ -473,6 +562,8 @@
           CALL M3EXIT( PNAME,0,0,XMSG,1 )
       END IF
  
+      CALL LOG_MESSAGE( LOGDEV, '      Component: '//CSPEC )
+
       END SUBROUTINE ELMO_SET_COMPONENTS
 
 !-------------------------------------------------------------------------
@@ -496,6 +587,8 @@
 
       FORMULA = CMPST( ICMP )%FORMULA
 
+      CALL LOG_MESSAGE( LOGDEV, '      Formula: '//FORMULA)
+
       COMPS( 1:N_MAX_COMPONENTS ) = ''
       COEFFS( 1:N_MAX_COMPONENTS ) = 1.0
       N_VARS = 0
@@ -506,17 +599,14 @@
          CHR = FORMULA( IX:IX ) 
          ICHR = ICHAR( CHR )
 
-         IF ( CHR .EQ. ' ' ) THEN
-            ! This is a space so proceed to the next character
+         IF ( CHR .EQ. ' ' .OR. CHR .EQ. '+' .or. CHR .EQ. '*' ) THEN
+            ! This is a space, plus, or multiplication
+            ! so proceed to the next character
 
          ELSE IF ( CHR .EQ. '-' ) THEN
             ! The next variable should be negative 
             LNEG = .TRUE.
          
-         ELSE IF ( CHR .EQ. '+' ) THEN
-            ! The next variable should be positive. 
-            ! Proceed on.
-
          ELSE IF ( ICHR .GE. 48 .AND. ICHR .LE. 57 ) THEN
             ! This is a number. Find out what it is.
             ! Determine the coefficient of this component.
@@ -530,6 +620,10 @@
                LCOEFF = .FALSE.
             ELSE
                N_VARS = N_VARS + 1
+               IF ( LNEG ) THEN
+                  COEFFS( N_VARS ) = -1.0
+                  LNEG = .FALSE.
+               END IF
             END IF
 
             LENGTH = 0
@@ -728,12 +822,24 @@
                IF ( .NOT. AERO_MISSING( I0,IM ) ) THEN
                   O_VARS = O_VARS + 1
                   JVAR = JVAR + 1
-                  COMPS_OUT( JVAR ) = TRIM( COMPS( IVAR ) ) // MODESUFF( IM )
+                  IF ( CSPEC .EQ. 'ASEACAT' .OR. CSPEC .EQ. 'ASOIL'
+     &             .OR.CSPEC .EQ. 'ACORS' ) THEN
+                     COMPS_OUT( JVAR ) = COMPS( IVAR )
+                  ELSE
+                     COMPS_OUT( JVAR ) = TRIM( COMPS( IVAR ) ) // MODESUFF( IM )
+                  END IF
                   COEFFS_OUT( JVAR ) = COEFFS( IVAR )
                END IF
             END DO
+         ELSE 
+            ! This is not a Bulk Aerosol Species.
+            ! Just pass it through.
+            COMPS_OUT( JVAR )  = COMPS( IVAR )
+            COEFFS_OUT( JVAR ) = COEFFS( IVAR )
+
          END IF
          IVAR = IVAR + 1
+         JVAR = JVAR + 1
       END DO
 
       N_VARS = O_VARS

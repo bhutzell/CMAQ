@@ -305,6 +305,7 @@
       ELMO_USED( : )   = 0.0
       INLET_FRAC(:,:,:) = -1.
       L_CALCULATED      = .FALSE.
+      ELMO_USED_UNIT    = 0
 
       ! Check to make sure the current layer is requested for diagnostic
       ! output.
@@ -320,7 +321,7 @@
         ! can be used seamlessly with the CALC_ELMO internal order.
         DO ILOC = 1,N_ELMO_USED
            J = MAP_USEDtoTABLE( ILOC ) 
-           CALL CALC_ELMO( OUTVAL=ELMO_USED( ILOC ), J=J,
+           CALL CALC_ELMO( OUTVAL=ELMO_USED( ILOC ), J_=J,
      &                     OUT_UNIT=ELMO_TABLE( J )%IUNIT )
         END DO
 
@@ -394,7 +395,8 @@
       END SUBROUTINE LOAD_ELMO
  
 !-------------------------------------------------------------------------
-      RECURSIVE SUBROUTINE CALC_ELMO( OUTVAL, OUT_UNIT, J, IDG, IM, IV, ISRC )
+      RECURSIVE SUBROUTINE CALC_ELMO( OUTVAL, OUT_UNIT, J_, IDG_, IM_,
+     &                                IV_, ISRC_ )
 !     This subroutine sums aggregate PM diagnostic parameters using the
 !         ELMO_COEFFS structure as a guide for summing aerosol
 !         components.          
@@ -412,7 +414,7 @@
 
       IMPLICIT NONE
 
-      INTEGER, OPTIONAL :: J, IDG, IM, IV, ISRC ! Table Index
+      INTEGER, OPTIONAL :: J_, IDG_, IM_, IV_, ISRC_ ! Table Index
       REAL, INTENT( INOUT ) :: OUTVAL   ! Output Value
       INTEGER, INTENT( IN ) :: OUT_UNIT ! The desired output unit
       INTEGER ID, VAR_TYPE
@@ -421,35 +423,36 @@
       INTEGER WETNESS, ISPEC, INLET, IMODE, ISC
       INTEGER ISA, DSA
       LOGICAL LMODE
-      REAL    FRAC( N_MODE ), FAC
-      INTEGER :: J_, IDG_, IM_, IV_, ISRC_ ! Table Index
+      REAL    FRAC( N_MODE ), FRAC1, FAC
+      INTEGER :: J, IDG, IM, IV, ISRC ! Table Index
 
       CHARACTER( 500 ) :: XMSG
   
       ! If the Table Index (J) is not provided, then look it up using
       ! other identifiers like the variable ID, variable type, source
       ! number, and/or mode number
-      IF ( PRESENT( J ) ) THEN
-        J_ = J
+      IF ( PRESENT( J_ ) ) THEN
+        J = J_
       ELSE
         ! Set Defaults for Missing Input Parameters
-        IDG_ = 0
-        IF ( PRESENT(IDG) )  IDG_ = IDG
-        IM_ = 0
-        IF ( PRESENT(IM) )   IM_ = IM
-        IV_ = 0             
-        IF ( PRESENT(IV) )   IV_ = IV
-        ISRC_ = 0
-        IF ( PRESENT(ISRC) ) ISRC_ = ISRC
+        IDG = 0
+        IF ( PRESENT(IDG_) )  IDG = IDG_
+        IM = 0
+        IF ( PRESENT(IM_) )   IM = IM_
+        IV = 0             
+        IF ( PRESENT(IV_) )   IV = IV_
+        ISRC = 0
+        IF ( PRESENT(ISRC_) ) ISRC = ISRC_
 
-        J_ = FIND_ELMO_TABLE( IDG_, IM_, IV_, ISRC_ )
+        J = FIND_ELMO_TABLE( IDG, IM, IV, ISRC )
       END IF
 
       ! Determine if this variable has been mapped already. If it
       ! has, send it back
-      ILOC = MAP_TABLEtoUSED( J_ )
+      ILOC = MAP_TABLEtoUSED( J )
       IF ( ILOC .GT. 0 ) THEN
-        IF ( L_CALCULATED( ILOC ) ) THEN
+        IF ( L_CALCULATED( ILOC ) .AND. 
+     &       ELMO_USED_UNIT( ILOC ) .EQ. OUT_UNIT ) THEN
            OUTVAL = ELMO_USED( ILOC )
            RETURN
         END IF
@@ -463,182 +466,113 @@
  
       ! Initialize value of aggregate variable
       OUTVAL = 0.0
-      ID  = ELMO_TABLE( J_ )%ID             ! Map to ELMO Variable ID numbers
-      VAR_TYPE  = ELMO_TABLE( J_ )%VAR_TYPE ! Specify Variable Type (e.g. CGRID, FAM, 
-                                            !   ISAM)
+      ID  = ELMO_TABLE( J )%ID             ! Map to ELMO Variable ID numbers
+      VAR_TYPE  = ELMO_TABLE( J )%VAR_TYPE ! Specify Variable Type (e.g. CGRID, FAM, 
+                                           !   ISAM)
  
-      ! Calculate conversion factor for transforming between units. For
-      ! example, ppbC or kgN ha-1 can be calculated using this routine.
-      ! The inputs are the current variable being calculated and the
-      ! desired output units. The output units are most often equivalent
-      ! to those of the variable being calculated.
-      FAC = 1.0
-      CALL ELMO_UNIT_CONVERSION( J_, OUT_UNIT, FAC )
-
       ! Retrieve value from corresponding array. These can come from
       ! CGRID, the Detailed ELMO variables, linear combinations of CGRID
       ! variables, deposition arrays, ISAM arrays, or DDM3D arrays.
       SELECT CASE ( VAR_TYPE ) 
          CASE ( ET_CONC )
-            ! Variable is in CGRID
-            OUTVAL = CONC_VEC( ID ) * FAC 
+            ! Variable is in CGRID - look up value in CONC_VEC
+            OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, CONC_VEC( ID ) )
          
-         !CASE ( ET_AEROBULK )
-         !   ! Variable is a Bulk Aerosol
-         !   DO IMODE = 1,N_MODE
-         !     ! If this mode is supposed to be added (LMODE) and the
-         !     ! species is not missing, then add it up
-         !     IF ( .NOT. AERO_MISSING( ID,IMODE ) )  
-         !&            OUTVAL = OUTVAL + AEROSPC_CONC( ID, IMODE ) * 
-         !&                              FRAC( IMODE )* FAC
-         !   END DO
-                
          CASE ( ET_CMPST, ET_ISAM_CMPST, ET_DDM_CMPST,
      &          ET_CMPST_DEP, ET_ISAM_CMPST_DEP, ET_DDM_CMPST_DEP )      
             ! Sum up Composite Variable
             ! Compute mode-dependent fraction from size cutoff if applicable
             FRAC = 1.0
-            INLET = ELMO_COMP( J_ )%INLET
-            WETNESS = ELMO_COMP( J_ )%WETNESS
-            DO IM = 1,N_MODE
+            INLET = ELMO_COMP( J )%INLET
+            WETNESS = ELMO_COMP( J )%WETNESS
+            DO IMODE = 1,N_MODE
               IF ( INLET .NE. 0 ) THEN
-                 CALL GET_AERO_INLET( INLET, IM, WETNESS, FRAC( IM ) )
+                 CALL GET_AERO_INLET( INLET, IMODE, WETNESS, FRAC( IMODE ) )
               END IF
             END DO
 
-            DO IVAR = 1,ELMO_COMP( J_ )%N_VARS
-              IX1 = ELMO_COMP( J_ )%TABID(IVAR)
-              IM = ELMO_TABLE( IX1 )%IM
+            DO IVAR = 1,ELMO_COMP( J )%N_VARS
+              IX1 = ELMO_COMP( J )%TABID(IVAR)
+              IMODE = ELMO_TABLE( IX1 )%IM
+              FRAC1 = 1.0
+              LMODE = .FALSE.
+              IF ( IMODE .NE. 0 ) THEN
+                  FRAC1 = FRAC( IMODE )
+                  LMODE = ELMO_COMP( J )%L_MODE( IMODE )
+              END IF
 
-              IF ( IM .EQ. 0 .OR. ELMO_COMP( J_ )%L_MODE( IM ) ) THEN
+              IF ( IMODE .EQ. 0 .OR. LMODE ) THEN
 
-                CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, J=IX1 )
+                CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, J_=IX1 )
                 OUTVAL = OUTVAL + VAL2 * 
-     &                   ELMO_COMP( J_ )%COEFF(IVAR) * FAC * FRAC( IM )
+     &                   ELMO_COMP( J )%COEFF(IVAR) * FRAC1
 
-              !IF ( ELMO_TABLE( IX1 )%VAR_TYPE .EQ. ET_AEROBULK .OR.
-              !&        !     ELMO_TABLE( IX1 )%VAR_TYPE .EQ. ET_ISAM_AEROBULK .OR. 
-              !&        !     ELMO_TABLE( IX1 )%VAR_TYPE .EQ. ET_DDM_AEROBULK ) THEN
-              !   IX2 = ELMO_TABLE( IX1 )%ID
-              !   DO IMODE = 1,N_MODE
-              !     ! If this mode is supposed to be added (LMODE) and the
-              !     ! species is not missing, then add it up
-              !     IF ( .NOT. AERO_MISSING( IX2,IMODE ) )  
-              !&        !       OUTVAL = OUTVAL + AEROSPC_CONC( IX2, IMODE ) * 
-              !&        !                FRAC( IMODE )* FAC
-              !   END DO
-              !
-              !ELSE
-              !   CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, J=IX1 )
-              !   OUTVAL = OUTVAL + VAL2 * ELMO_COMP( J_ )%COEFF(IVAR) * FAC
               END IF
             END DO
 
          CASE ( ET_DRVD, ET_ISAM_DRVD, ET_DDM_DRVD,
      &          ET_AEROPROP, ET_CHEM, ET_MET, ET_PHOT )
             ! Retrieve Detailed ELMO Variable
-            CALL ELMO_CALC_DERIVED( VAL2, J_ )
-            OUTVAL = OUTVAL + VAL2 * FAC
+            CALL ELMO_CALC_DERIVED( VAL2, J )
+            OUTVAL = OUTVAL + ELMO_UNIT_CONV( J, OUT_UNIT, VAL2 )
 
          CASE ( ET_WDEP )
             ! Variable is a Wet Deposition Flux
-            OUTVAL = WDEP_VEC( ID ) * FAC 
+            OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, WDEP_VEC( ID ) ) 
          
          CASE ( ET_DDEP )
             ! Variable is a Dry Deposition Flux
-            OUTVAL = DDEP_VEC( ID ) * FAC 
-
-         !CASE ( ET_CMPST_DEP, ET_ISAM_CMPST_DEP, ET_DDM_CMPST_DEP )   
-         !   ! Sum up Composite Deposition Variable
-         !   DO IVAR = 1,ELMO_COMP( J_ )%N_VARS
-         !     IX1 = ELMO_COMP( J_ )%TABID(IVAR)
-         !
-         !     CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, J=IX1 )
-         !     OUTVAL = OUTVAL + VAL2 * ELMO_COMP( J_ )%COEFF(IVAR) * FAC
-         !   END DO
+            OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, DDEP_VEC( ID ) ) 
 
 #ifdef isam
-         CASE ( ET_ISAM )
+         CASE ( ET_ISAM_CONC )
             ! Variable is in the ISAM Array
-            ISC = ELMO_TABLE( J_ )%SOURCE
+            ISC = ELMO_TABLE( J )%SOURCE
             IF ( ISC .LE. NTAG_SA ) THEN
-                OUTVAL = ISAM_VEC( ID,ISC ) * FAC 
+                OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, ISAM_VEC( ID,ISC ) ) 
             ELSE
-                OUTVAL = SUM( ISAM_VEC( ID,: ) ) * FAC 
+                OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, SUM(ISAM_VEC( ID,: )) ) 
             END IF
-         
-         !CASE ( ET_ISAM_AEROBULK )
-         !   ! Variable is an ISAM source-resolved Bulk Aerosol
-         !   ISC = ELMO_TABLE( J_ )%SOURCE
-         !   DO IMODE = 1,N_MODE
-         !     ! If this mode is supposed to be added (LMODE) and the
-         !     ! species is not missing, then add it up
-         !     IF ( .NOT. AERO_MISSING( ID,IMODE ) )  THEN
-         !         ISA = MAP_AEROtoSA( ID, IMODE )
-         !         IF ( ISA .NE. 0 ) THEN
-         !           IF ( ISC .LE. NTAG_SA ) THEN
-         !              OUTVAL = OUTVAL + ISAM_VEC(ISA,ISC) * FRAC( IMODE )
-         !           ELSE
-         !              OUTVAL = OUTVAL + SUM(ISAM_VEC( ISA,:) ) * FRAC( IMODE )
-         !           END IF
-         !         END IF
-         !     END IF
-         !   END DO
-         !   OUTVAL = OUTVAL * FAC
          
          CASE ( ET_ISAM_WDEP )
             ! Variable is in the ISAM WetDep Array
-            ISC = ELMO_TABLE( J_ )%SOURCE
+            ISC = ELMO_TABLE( J )%SOURCE
             IF ( ISC .LE. NTAG_SA ) THEN
-              OUTVAL = ISAM_WDEP_VEC( ID,ISC ) * FAC 
+              OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, ISAM_WDEP_VEC( ID,ISC ) ) 
             ELSE
-              OUTVAL = SUM( ISAM_WDEP_VEC( ID,:) ) * FAC 
+              OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, SUM( ISAM_WDEP_VEC( ID,: )) ) 
             END IF
          
          CASE ( ET_ISAM_DDEP )
             ! Variable is in the ISAM DryDep Array
-            ISC = ELMO_TABLE( J_ )%SOURCE
+            ISC = ELMO_TABLE( J )%SOURCE
             IF ( ISC .LE. NTAG_SA ) THEN
-              OUTVAL = ISAM_DDEP_VEC( ID,ISC ) * FAC 
+              OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, ISAM_DDEP_VEC( ID,ISC ) ) 
             ELSE
-              OUTVAL = SUM( ISAM_DDEP_VEC( ID,: )) * FAC 
+              OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, SUM( ISAM_DDEP_VEC( ID,: )) ) 
             END IF
 #endif
 #ifdef sens
          CASE ( ET_DDM_CONC )
             ! Variable is in the DDM3D Array
-            ISC = ELMO_TABLE( J_ )%SOURCE
-            OUTVAL = DDM_VEC( ISC,ID ) * FAC 
+            ISC = ELMO_TABLE( J )%SOURCE
+            OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, DDM_VEC( ISC,ID ) ) 
 
-         !CASE ( ET_DDM_AEROBULK )
-         !   ! Variable is a DDM3D source-resolved Bulk Aerosol
-         !   ISC = ELMO_TABLE( J_ )%SOURCE
-         !   DO IMODE = 1,N_MODE
-         !     ! If this mode is supposed to be added (LMODE) and the
-         !     ! species is not missing, then add it up
-         !     LMODE = ELMO_COMP( J_ )%L_MODE( IMODE )
-         !     IF ( LMODE .AND. ( .NOT. AERO_MISSING( ID,IMODE ) ) ) THEN
-         !         DSA = AEROSPC_MAP( ID, IMODE )
-         !         IF ( DSA .NE. 0 ) 
-         !&               OUTVAL = OUTVAL + DDM_VEC( ISC,DSA ) * FRAC( IMODE )* FAC
-         !     END IF
-         !   END DO
- 
          CASE ( ET_DDM_WDEP )
             ! Variable is in the DDM3D WetDep Array
-            ISC = ELMO_TABLE( J_ )%SOURCE
-            OUTVAL = DDM_WDEP_VEC( ISC,ID ) * FAC 
+            ISC = ELMO_TABLE( J )%SOURCE
+            OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, DDM_WDEP_VEC( ISC,ID ) ) 
 
          CASE ( ET_DDM_DDEP )
             ! Variable is in the DDM3D DryDep Array
-            ISC = ELMO_TABLE( J_ )%SOURCE
-            OUTVAL = DDM_DDEP_VEC( ID,ISC ) * FAC 
+            ISC = ELMO_TABLE( J )%SOURCE
+            OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, DDM_DDEP_VEC( ISC,ID ) ) 
 #endif
 
          CASE DEFAULT
 
             ! Invalid Variable Type
-            XMSG = 'ELMO variable ' // TRIM( ELMO_TABLE( J_ )%NAME ) //
+            XMSG = 'ELMO variable ' // TRIM( ELMO_TABLE( J )%NAME ) //
      &             ' has an invalid variable type. Please check that it is '//
      &             'mapped correctly.'
             CALL LOG_MESSAGE( LOGDEV, XMSG )
@@ -648,6 +582,7 @@
       ! Save the fact that this variable has been calculated
       IF ( ILOC .GT. 0 ) THEN
         L_CALCULATED( ILOC ) = .TRUE.
+        ELMO_USED_UNIT( ILOC ) = OUT_UNIT
         ELMO_USED( ILOC ) = OUTVAL
       END IF
 

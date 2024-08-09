@@ -37,31 +37,28 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       REAL,    SAVE :: ELMO_NSTEP = 0.
  
       ! Define ELMO Variable Types
-      INTEGER, PARAMETER :: ET_CONC = 1, ET_AEROBULK = 2, ET_WDEP = 3, 
-     &                      ET_DDEP = 4, ET_CMPST = 5, ET_CMPST_DEP = 6, 
-     &                      ET_DRVD = 7, ET_AEROBULK_DEP = 8,
-     &                      ET_ISAM_CONC = 11, ET_ISAM_AEROBULK = 12,
-     &                      ET_ISAM_WDEP = 13, ET_ISAM_DDEP = 14,
-     &                      ET_ISAM_CMPST= 15, ET_ISAM_CMPST_DEP = 16,
-     &                      ET_ISAM_DRVD = 17, ET_ISAM_AEROBULK_DEP = 18,
-     &                      ET_DDM_CONC = 21, ET_DDM_AEROBULK = 22,
-     &                      ET_DDM_WDEP = 23, ET_DDM_DDEP = 24,
-     &                      ET_DDM_CMPST= 25, ET_DDM_CMPST_DEP = 26,
-     &                      ET_DDM_DRVD = 27, ET_DDM_AEROBULK_DEP = 28,
+      INTEGER, PARAMETER :: ET_CONC  = 1, ET_WDEP      = 2, ET_DDEP = 3, 
+     &                      ET_CMPST = 4, ET_CMPST_DEP = 5, ET_DRVD = 6,
+     &                      ET_ISAM_CONC = 11, ET_ISAM_WDEP = 12, 
+     &                      ET_ISAM_DDEP = 13, ET_ISAM_CMPST= 14, 
+     &                      ET_ISAM_CMPST_DEP = 15, ET_ISAM_DRVD = 16, 
+     &                      ET_DDM_CONC = 21, ET_DDM_WDEP = 22, 
+     &                      ET_DDM_DDEP = 23, ET_DDM_CMPST= 24, 
+     &                      ET_DDM_CMPST_DEP = 25, ET_DDM_DRVD = 26, 
      &                      ET_AEROPROP = 30, ET_CHEM = 31, ET_MET = 32,
      &                      ET_PHOT = 33
 
       CHARACTER( 14 ), PARAMETER :: CETYPE(33) = 
-     &    (/'CONC          ','BULK AERO     ','WET DEP       ',
-     &      'DRY DEP       ','COMPOSITE CONC','COMPOSITE DEP ',
-     &      'DERIVED CONC  ','BULK AERO DEP ','              ',
-     &      '              ','ISAM CONC     ','ISAM BULK AERO',
-     &      'ISAM WETDEP   ','ISAM DRY DEP  ','ISAM COMP CONC',
-     &      'ISAM COMP DEP ','ISAM DERIVED  ','ISAM AERO DEP ',
+     &    (/'CONC          ','WET DEP       ','DRY DEP       ',
+     &      'COMPOSITE CONC','COMPOSITE DEP ','DERIVED CONC  ',
+     &      '              ','              ','              ',
+     &      '              ','ISAM CONC     ','ISAM WETDEP   ',
+     &      'ISAM DRY DEP  ','ISAM COMP CONC','ISAM COMP DEP ',
+     &      'ISAM DERIVED  ','              ','              ',
      &      '              ','              ','DDM CONC      ',
-     &      'DDM BULK AERO ','DDM WET DEP   ','DDM DRY DEP   ',
-     &      'DDM COMP CONC ','DDM COMP DEP  ','DDM DERIVED   ',
-     &      'DDM AERO DEP  ','              ','AERO PROPERTY ',
+     &      'DDM WET DEP   ','DDM DRY DEP   ','DDM COMP CONC ',
+     &      'DDM COMP DEP  ','DDM DERIVED   ','              ',
+     &      '              ','              ','AERO PROPERTY ',
      &      'CHEMISTRY     ','METEOROLOGY   ','PHOT          '/) 
 
       ! Define Indices for All Variables on the ELMO List
@@ -220,18 +217,18 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'PMAMS        ',ID_PMAMS,      ET_DRVD,     F, 'ug m-3', 'Bulk PM Concentration in AMS' ),
                                                           
       ! Fine-Mode PM Species                         
-     &ELDTP( 'PMF_OC       ',ID_PMF_OC,     ET_DRVD,     F, 'ugC m-3','Fine-Mode Organic Carbon' ),
+     &ELDTP( 'PMF_OC       ',ID_PMF_OC,     ET_DRVD,     F, 'ug m-3', 'Fine-Mode Organic Carbon (excludes non-carbon atoms)' ),
      &ELDTP( 'PMF_OA       ',ID_PMF_OA,     ET_DRVD,     F, 'ug m-3', 'Fine-Mode Organic Aerosol' ),
      &ELDTP( 'PMF_HPMOLAL  ',ID_PMF_HPM,    ET_DRVD,     F, 'mol L-1','Fine-Mode Concentration of H+ in Particle Water' ),
      &ELDTP( 'PMF_PH       ',ID_PMF_PH,     ET_AEROPROP, F, '1'     , 'Fine-Mode pH' ),
                                                   
       ! Organic Aerosol Relevant Aggregates          
-     &ELDTP( 'PMF_POC      ',ID_PMF_POC,    ET_DRVD,     F, 'ugC m-3','Fine-Mode Primary Organic Carbon' ),
-     &ELDTP( 'PMF_SOC      ',ID_PMF_SOC,    ET_DRVD,     F, 'ugC m-3','Fine-Mode Secondary Organic Carbon' ),
+     &ELDTP( 'PMF_POC      ',ID_PMF_POC,    ET_DRVD,     F, 'ug m-3', 'Fine-Mode Primary Organic Carbon (excluding non-carbon)' ),
+     &ELDTP( 'PMF_SOC      ',ID_PMF_SOC,    ET_DRVD,     F, 'ug m-3', 'Fine-Mode Secondary Organic Carbon (excluding non-carbon)' ),
      &ELDTP( 'PMF_POA      ',ID_PMF_POA,    ET_DRVD,     F, 'ug m-3', 'Fine-Mode Primary Organic Aerosol' ),
      &ELDTP( 'PMF_SOA      ',ID_PMF_SOA,    ET_DRVD,     F, 'ug m-3', 'Fine-Mode Secondary Organic Aerosol' ),
-     &ELDTP( 'PMF_OMOC     ',ID_PMF_OMOC,   ET_AEROPROP, F, '1     ','Fine-Mode OM/OC' ),
-     &ELDTP( 'PMF_OTOC     ',ID_PMF_OtoC,   ET_AEROPROP, F, '1     ','Fine-Mode O:C' ),
+     &ELDTP( 'PMF_OMOC     ',ID_PMF_OMOC,   ET_AEROPROP, F, '1     ', 'Fine-Mode OM/OC' ),
+     &ELDTP( 'PMF_OTOC     ',ID_PMF_OtoC,   ET_AEROPROP, F, '1     ', 'Fine-Mode O:C' ),
      &ELDTP( 'PMF_ASOA     ',ID_PMF_ASOA,   ET_DRVD,     F, 'ug m-3', 'Fine-Mode Anthropogenic-VOC Derived OA' ),
      &ELDTP( 'PMF_BSOA     ',ID_PMF_BSOA,   ET_DRVD,     F, 'ug m-3', 'Fine-Mode Biogenic-VOC Derived OA' ),
                                                   
@@ -240,11 +237,11 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'PMAMS_OTOC   ',ID_AMS_OTOC,   ET_DRVD,     F, 'ug ug-1','O:C Collected and Measured by the AMS' ),
                                                   
       ! PM1 Speciation                            
-     &ELDTP( 'PM1_OC       ',ID_PM1_OC,     ET_DRVD,     F, 'ugC m-3','PM1 Organic Carbon' ),
+     &ELDTP( 'PM1_OC       ',ID_PM1_OC,     ET_DRVD,     F, 'ug m-3', 'PM1 Organic Carbon (excluding non-carbon atoms)' ),
      &ELDTP( 'PM1_OA       ',ID_PM1_OA,     ET_DRVD,     F, 'ug m-3', 'PM1 Organic Aerosol' ),
                                                   
       ! PM2.5 Speciation                          
-     &ELDTP( 'PM25_OC      ',ID_PM25_OC,    ET_DRVD,     F, 'ugC m-3','PM2.5 Organic Carbon' ),
+     &ELDTP( 'PM25_OC      ',ID_PM25_OC,    ET_DRVD,     F, 'ug m-3', 'PM2.5 Organic Carbon (excluding non-carbon atoms)' ),
      &ELDTP( 'PM25_OA      ',ID_PM25_OA,    ET_DRVD,     F, 'ug m-3', 'PM2.5 Organic Aerosol' ),
      &ELDTP( 'BENAPY_FAERO ',ID_BENAPY_FAERO,ET_AEROPROP,F, '',       'Benzo-a-Pyrene Aerosol-Phase Fraction' ),
                                                           
@@ -300,6 +297,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, ALLOCATABLE, SAVE :: MAP_TABLEtoAVRG( : ), MAP_TABLEtoINST( : )
       INTEGER, ALLOCATABLE, SAVE :: MAP_AVRGtoTABLE( : ), MAP_INSTtoTABLE( : )
       LOGICAL, ALLOCATABLE, SAVE :: L_CALCULATED( : )
+      INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_UNIT( : )
       INTEGER, SAVE :: N_ELMO_USED
 
       INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_IV( : )
@@ -366,7 +364,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
           INTEGER              :: OUT_TYPE    ! IOAPI Variable Type
           INTEGER              :: ID          ! ID Number mapping to specific calculation, CGRID index, AERO 
                                               !   index, Family, etc.
-          INTEGER              :: VAR_TYPE    ! ELMO Variable Type (ELMO, CGRID, AEROBULK, FAM, WDEP, DDEP)
+          INTEGER              :: VAR_TYPE    ! ELMO Variable Type (Derived, Composite, CGRID, WDEP, DDEP)
           INTEGER              :: IM          ! Mode of interest if mode-dependent
           INTEGER              :: SOURCE      ! Source Number for ISAM or DDM3D Variables
           CHARACTER (LEN = 16) :: CUNIT       ! Units in Character Format
@@ -386,7 +384,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                                               !   ASO4 is being used.
           INTEGER, ALLOCATABLE :: TABID(:)    ! ID Number in ELMO_TABLE
           INTEGER, ALLOCATABLE :: ID(:)       ! Index in native array (e.g. CGRID, AEROSPC, SA_ACONC, etc.)
-          INTEGER, ALLOCATABLE :: VAR_TYPE(:) ! ELMO Variable Type (ELMO, CGRID, AEROBULK, FAM, WDEP, DDEP)
+          INTEGER, ALLOCATABLE :: VAR_TYPE(:) ! ELMO Variable Type (Derived, CGRID, COMPOSITE, WDEP, DDEP)
           REAL,    ALLOCATABLE :: MW(:)       ! Species molecular weight, if defined
           INTEGER, ALLOCATABLE :: SPC_UNIT(:) ! Indicates whether this variables units are mass-based(1), 
                                               !   mole-based(2), or neither(0).
@@ -809,7 +807,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       END SUBROUTINE MAP_ELMO_UNITS
  
 !------------------------------------------------------------------------------------------            
-      SUBROUTINE ELMO_UNIT_CONVERSION( J, OUT_UNIT, FAC )
+      REAL FUNCTION ELMO_UNIT_CONV( J, OUT_UNIT, D )
 !     This subroutine calculates the conversion factor from a component
 !     variable to an output variable.
 !-------------------------------------------------------------------------
@@ -818,9 +816,9 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       IMPLICIT NONE
  
-      INTEGER, INTENT( IN )  :: J
-      INTEGER, INTENT( IN )  :: OUT_UNIT
-      REAL,    INTENT( OUT ) :: FAC 
+      INTEGER, INTENT( IN )  :: J         ! Table ID of Data
+      INTEGER, INTENT( IN )  :: OUT_UNIT  ! Output unit
+      REAL,    INTENT( IN )  :: D         ! Data to be converted 
 
       INTEGER :: SPC_UNIT
       CHARACTER(200) :: XMSG
@@ -829,7 +827,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SPC_UNIT = ELMO_TABLE( J )%IUNIT
       
       IF ( SPC_UNIT .EQ. OUT_UNIT .OR. OUT_UNIT .EQ. 0 ) THEN
-          FAC = 1.0
+          ELMO_UNIT_CONV = D
           RETURN
       END IF
 
@@ -837,7 +835,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       ! for any unit conversions.
       IF ( ELMO_TABLE( J )%MW .EQ. 0.0 ) THEN
         XMSG = 'ELMO is attempting to convert variable ' // 
-     &       TRIM( ELMO_TABLE( J )%NAME ) // ' to mole- or mass-based '//
+     &       TRIM( ELMO_TABLE( J )%NAME ) // ' from '//
      &       'units but the MW is equal to 0.0'
         CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
       END IF
@@ -845,14 +843,16 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       ! Calculate Unit Conversions
       SELECT CASE ( SPC_UNIT )
         CASE ( 1 ) ! mass-based
-          FAC = FAC / ELMO_TABLE( J )%MW 
+          ELMO_UNIT_CONV = D / ELMO_TABLE( J )%MW 
      &          * MWAIR / AIRDENS / 1000.0 ! to mole mixing ratio
         CASE ( 2 ) ! mole-based
-          FAC = FAC * ELMO_TABLE( J )%MW
+          ELMO_UNIT_CONV = D * ELMO_TABLE( J )%MW
      &          / MWAIR * AIRDENS * 1000.0 ! to mass concentration
       END SELECT 
  
-      END SUBROUTINE ELMO_UNIT_CONVERSION
+      RETURN
+
+      END FUNCTION ELMO_UNIT_CONV
 
 !----------------------------------------------------------------------------      
       INTEGER FUNCTION FIND_ELMO_TABLE( IDG, IM, IV, ISRC )

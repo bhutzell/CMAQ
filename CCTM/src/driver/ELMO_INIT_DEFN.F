@@ -311,9 +311,11 @@
 
       ! Allocate array for tracking whether or not a variable has been
       ! calculated each time step.
-      ALLOCATE( L_CALCULATED( N_ELMO_USED ), STAT=IOS )
+      ALLOCATE( L_CALCULATED( N_ELMO_USED ), 
+     &          ELMO_USED_UNIT( N_ELMO_USED ), STAT=IOS )
       CALL CHECKMEM( IOS, 'L_CALCULATED',PNAME )
       L_CALCULATED = .FALSE.
+      ELMO_USED_UNIT = 0
 
 
       ! Write Output Variable Information to Log File
@@ -508,89 +510,7 @@
       ELMO_TABLE(:)%IM = 0
       ELMO_TABLE(:)%SOURCE = 0
 
-        !    ! Load Bulk Aerosol Species into ELMO_Table
-        !    ! Because the family names are loaded first in the ELMO Table, any
-        !    ! request for a chemical family name that matches an ELMO variable
-        !    ! name will default to outputting the chemical family.
-        !    DO IAERO = 1,N_AEROSPC
-        !       N = N + 1
-        !       ELMO_TABLE( N )%NAME = AEROSPC( IAERO )%BULKNAME
-        !       ELMO_TABLE( N )%OUT_NAME = AEROSPC( IAERO )%BULKNAME
-        !       ELMO_TABLE( N )%OUT_TYPE = M3REAL
-        !       ELMO_TABLE( N )%VAR_TYPE = ET_AEROBULK
-        !       ELMO_TABLE( N )%ID = IAERO
-        !       ELMO_TABLE( N )%CUNIT = 'ug m-3'
-        !       CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-        !   &                        ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-        !       ELMO_TABLE( N )%IUNIT = IUNIT
-        !       ELMO_TABLE( N )%DESC = 'Total Aerosol Mass for '//
-        !   &                          TRIM(AEROSPC(IAERO)%BULKNAME)
-        !       ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
-        !    END DO
- 
-#ifdef isam
-        !  ! Load ISAM Bulk Aerosols
-        !  DO IAERO = 1,N_AEROSPC
-        !     IF ( ANY( MAP_AEROtoSA( IAERO,: ) .NE. 0 ) ) THEN
-        !
-        !       DO ITAG = 1,NTAG_SA
-        !          N = N + 1
-        !          ELMO_TABLE( N )%NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_ISAM' 
-        !          ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
-        ! &                               // '_' // TRIM(TAGNAME( ITAG )) 
-        !          ELMO_TABLE( N )%OUT_TYPE = M3REAL
-        !          ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_AEROBULK
-        !          ELMO_TABLE( N )%ID = IAERO
-        !          ELMO_TABLE( N )%SOURCE = ITAG
-        !          ELMO_TABLE( N )%CUNIT = 'ug m-3'
-        !          CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-        ! &                             ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-        !          ELMO_TABLE( N )%IUNIT = IUNIT
-        !          ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
-        ! &                        TRIM( AEROSPC( IAERO )%BULKNAME ) //
-        ! &                        ' from source ' // TRIM(TAGNAME( ITAG ))
-        !          ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
-        !       END DO  
-        !       
-        !        N = N + 1
-        !        ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-        !        ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME) //'_TAGS'
-        !        ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
-        !        ELMO_TABLE( N )%DESC = 'Total Aerosol Mass for '//
-        ! &             TRIM(AEROSPC(IAERO)%BULKNAME)//' across all sources.'
-        !     END IF
-        !  END DO
-
-#endif
-
-#ifdef sens
-       !  ! Load DDM Bulk Aerosols
-       !  DO IAERO = 1,N_AEROSPC
-       !     DO NP = 1,NPMAX
-       !        N = N + 1
-       !        ELMO_TABLE( N )%NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
-       ! &                               // '_DDM' 
-       !        ELMO_TABLE( N )%OUT_NAME = TRIM(AEROSPC( IAERO )%BULKNAME)
-       ! &                               // '_' // TRIM(SEN_PAR( NP )) 
-       !      
-       !        ELMO_TABLE( N )%OUT_TYPE = M3REAL
-       !        ELMO_TABLE( N )%VAR_TYPE = ET_DDM_AEROBULK
-       !        ELMO_TABLE( N )%ID = IAERO
-       !        ELMO_TABLE( N )%SOURCE = NP
-       !        ELMO_TABLE( N )%CUNIT = 'ug m-3'
-       !        CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-       ! &                           ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-       !        ELMO_TABLE( N )%IUNIT = IUNIT
-       !        ELMO_TABLE( N )%MW   = AEROSPC_MW( IAERO )
-       !        ELMO_TABLE( N )%DESC = 'ISAM Concentration of Species '//
-       ! &                      TRIM( AEROSPC( IAERO )%BULKNAME ) //
-       ! &                      ' from source ' // TRIM(SEN_PAR( NP ))
-       !    END DO  
-       !  END DO
- 
-#endif
-
-      ! Load The ELMO List into ELMO_Table
+      ! Load the ELMO Derived Variables into the ELMO_Table
       DO ILIST = 1,N_ELMO_LIST
          N = N + 1
          ELMO_TABLE( N )%NAME = ELMO_LIST( ILIST )%NAME
@@ -625,9 +545,11 @@
          END IF
       END DO
 
-#ifdef isam
+#ifdef isam                     
+      ! Load the source-resolvable Derived variables into the ELMO Table
+      ! to enable ISAM output.
       DO ILIST = 1,N_ELMO_LIST
-        IF ( ELMO_LIST( ILIST )%L_ISAM ) THEN
+        IF ( ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD ) THEN
            ! Define ELMO Variables for all ISAM sources
            DO ITAG = 1,NTAG_SA
              N = N + 1
@@ -661,8 +583,10 @@
 #endif         
 
 #ifdef sens
+      ! Load the source-resolvable Derived variables into the ELMO Table
+      ! to enable ISAM output.
       DO ILIST = 1,N_ELMO_LIST
-         IF ( ELMO_LIST( ILIST )%L_DDM3D ) THEN
+         IF ( ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD ) THEN
            
            ! Define ELMO Variables for all remaining DDM3D sources
            DO NP = 1,NPMAX
@@ -707,7 +631,7 @@
          ELMO_TABLE( N )%DESC = CMPST( ICMPST )%DESC
          ELMO_TABLE( N )%MW   = 0.0
 
-         ! Check Special Composite IDs that are dependencies for ELMO
+         ! Assign Special Composite IDs that are dependencies for ELMO
          ! Derived variables
          IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_SO4' ) THEN
              ID_PMF_SO4 = ICMPST
@@ -733,6 +657,7 @@
       END DO
  
 #ifdef isam
+      ! Apply Composites to ISAM source resolution and add to ELMO Table
       DO ICMPST = 1,N_COMPOSITES
          ! Define ELMO Variables for all ISAM sources
          DO ITAG = 1,NTAG_SA
@@ -742,7 +667,12 @@
            ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST( ICMPST )%NAME) 
      &                            // '_' // TRIM(TAGNAME( ITAG ))
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = CMPST( ICMPST )%VAR_TYPE + 10
+         
+           IF ( CMPST( ICMPST )%CMPST_TYPE .EQ. 'DEP' ) THEN
+               ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_CMPST_DEP
+           ELSE
+               ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_CMPST
+           END IF
            ELMO_TABLE( N )%ID = ICMPST
            ELMO_TABLE( N )%CUNIT =  CMPST( ICMPST )%CUNIT
            CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
@@ -766,6 +696,7 @@
 #endif         
 
 #ifdef sens
+      ! Apply Composites to DDM3D source resolution and add to ELMO Table
       DO ICMPST = 1,N_COMPOSITES
          ! Define ELMO Variables for all remaining DDM3D sources
          DO NP = 1,NPMAX
@@ -775,7 +706,12 @@
            ELMO_TABLE( N )%OUT_NAME = TRIM(CMPST( ICMPST )%NAME)
      &                            // '_' // TRIM( SEN_PAR( NP ) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = CMPST( ICMPST )%VAR_TYPE + 20
+           
+           IF ( CMPST( ICMPST )%CMPST_TYPE .EQ. 'DEP' ) THEN
+               ELMO_TABLE( N )%VAR_TYPE = ET_DDM_CMPST_DEP
+           ELSE
+               ELMO_TABLE( N )%VAR_TYPE = ET_DDM_CMPST
+           END IF
            ELMO_TABLE( N )%ID = ICMPST
            ELMO_TABLE( N )%SOURCE = NP
            ELMO_TABLE( N )%CUNIT =  CMPST( ICMPST )%CUNIT
@@ -883,7 +819,7 @@
       END IF
  
 #ifdef isam
-      ! Load ISAM CGRID Variables to ELMO Table
+      ! Load ISAM CGRID Variables into ELMO Table
       DO ISPEC = 1,NSPC_SA
         DO ITAG = 1,NTAG_SA
            N = N + 1
@@ -906,7 +842,6 @@
              DO ISPC = 1,N_AEROSPC
                IF ( ISAM_SPEC( ISPEC,ITAG ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &            ELMO_TABLE( N )%IM = IMODE
-               END IF
              END DO
            END DO
 
@@ -953,9 +888,8 @@
            
            DO IMODE = 1,N_MODE
              DO ISPC = 1,N_AEROSPC
-               IF ( WDEP_SPEC( IWDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+               IF ( WDEP_SPC( IWDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &            ELMO_TABLE( N )%IM = IMODE
-               END IF
              END DO
            END DO
 
@@ -999,9 +933,8 @@
            
            DO IMODE = 1,N_MODE
              DO ISPC = 1,N_AEROSPC
-               IF ( DEPV_SPEC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+               IF ( DEPV_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &            ELMO_TABLE( N )%IM = IMODE
-               END IF
              END DO
            END DO
 
@@ -1026,7 +959,7 @@
 #endif 
 
 #ifdef sens
-      ! Load DDM Variables to ELMO Table
+      ! Load DDM Variables into ELMO Table
       DO ICGRID = 1,N_CGRID_SPC
         DO NP = 1,NPMAX
            N = N + 1
@@ -1326,11 +1259,16 @@
 !-------------------------------------------------------------------------
     
       USE RUNTIME_VARS, ONLY : LOGDEV
-      USE AERO_DATA, ONLY : N_MODE, AEROSPC, AERO_MISSING
+      USE AERO_DATA, ONLY : N_MODE, AEROSPC, AERO_MISSING, AEROMODE
 
       IMPLICIT NONE
 
-      INTEGER IINST, IAVRG, ICOMP, J, TABID, IFILE, AERO_ID, IMODE
+      INTEGER IINST, IAVRG, ICOMP, J, TABID, IFILE, AERO_ID, IMODE, INLET
+      CHARACTER( 1000 ) :: FORMULA
+      CHARACTER(    2 ) :: CSIGN
+      CHARACTER(   70 ) :: FTEMP
+      INTEGER FORM_SIZE, LAST_SPACE
+      LOGICAL L_MODE
 
       ! Write out all ELMO variables organized by output file
       WRITE( LOGDEV, '(/,/,5x,A)' ),'|> ELMO OUTPUT VARIABLE REPORT:'
@@ -1381,7 +1319,7 @@
                DO ICOMP = 1,ELMO_COMP( J )%N_VARS
                   TABID = ELMO_COMP( J )%TABID( ICOMP )
 
-                  IF ( ELMO_TABLE( TABID )%VAR_TYPE .NE. ET_AEROBULK ) THEN
+                  IF ( ELMO_TABLE( TABID )%VAR_TYPE ) THEN
                      WRITE( LOGDEV, '(8x,A2,A16,4x,A14,2x,ES9.2,4x,A)'),
      &                      '->',ELMO_TABLE( TABID )%OUT_NAME,
      &                      CETYPE(ELMO_TABLE( TABID )%VAR_TYPE),
@@ -1420,8 +1358,8 @@
 
          ! Print all variables on the file and their contents if they have
          ! components 
-         WRITE( LOGDEV, '(/,8x,A,12x,A,12x,A,8x,A,/,10x,A,39x,A)' ),
-     &       'Variable','Type','Unit','Description','Component','Coeff'
+         WRITE( LOGDEV, '(/,8x,A,12x,A,12x,A,8x,A)' ),
+     &       'Variable','Type','Unit','Description'
          WRITE( LOGDEV, '(8x,A,3x,A,2x,A,4x,A)' ),
      &       '-----------------','--------------','--------','--------------'
 
@@ -1432,17 +1370,65 @@
      &              ELMO_AVRG_PARS( IAVRG )%CUNIT,
      &              TRIM(ELMO_AVRG_PARS( IAVRG )%DESC)
 
-            IF ( ELMO_AVRG_PARS( IAVRG )%L_COMP ) THEN
+            FORMULA = ''
+            ! Make Output Formula for Composites
+            IF ( ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_CMPST .OR.
+     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
+     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
+     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
+     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
+     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
+
+               ! Make Formula from Components
                J = MAP_AVRGtoTABLE( IAVRG )
                DO ICOMP = 1,ELMO_COMP( J )%N_VARS
                   TABID = ELMO_COMP( J )%TABID( ICOMP )
+                  IMODE = ELMO_TABLE( TABID )%IM
+                  INLET = ELMO_COMP( J )%INLET
 
-                  WRITE( LOGDEV, '(8x,A2,A16,4x,A14,2x,ES9.2,4x,A)'),
-     &                   '->',ELMO_TABLE( TABID )%OUT_NAME,
-     &                   CETYPE(ELMO_TABLE( TABID )%VAR_TYPE),
-     &                   ELMO_COMP( J )%COEFF( ICOMP ),
-     &                   TRIM(ELMO_TABLE( TABID )%DESC)
+                  L_MODE = .TRUE.
+                  IF ( IMODE .NE. 0 ) L_MODE = ELMO_COMP( J )%L_MODE( IMODE )
+
+                  IF ( L_MODE ) THEN
+                     IF ( ELMO_TABLE( TABID )%VAR_TYPE .EQ. ET_CONC .AND.
+     &                    IMODE .NE. 0 .AND.INLET .NE. 0 ) THEN
+
+                        ! This is an aerosol with a size cutoff. Make sure
+                        ! to add the FPM[dp]_[mode] to the formula
+                        WRITE( FORMULA, '(A,A1,SPES9.2,A1,A,A2,A,A1,A)' ),TRIM(FORMULA),
+     &                     ' ',ELMO_COMP( J )%COEFF(ICOMP),'*',
+     &                     TRIM( ELMO_TABLE( TABID )%OUT_NAME ),'*F',
+     &                     TRIM( ELMO_INLET(INLET)%CINLET ),'_',TRIM(AEROMODE( IMODE )%SUFF)
+                     ELSE
+                        ! This is not an aerosol concentration or does not
+                        ! have a size cutoff.
+                        WRITE( FORMULA, '(A,A1,SPES9.2,A1,A)' ),TRIM(FORMULA),
+     &                     ' ',ELMO_COMP( J )%COEFF(ICOMP),'*',
+     &                     TRIM( ELMO_TABLE( TABID )%OUT_NAME )
+                     END IF
+                  END IF
+
                END DO
+            END IF  
+ 
+            IF ( FORMULA .NE. '' ) THEN   
+               ! Parse Formula so that it prints correctly to screen
+               FORMULA = '='//FORMULA( 1:LEN(FORMULA) )
+               FORM_SIZE = LEN_TRIM( FORMULA )
+               DO WHILE ( FORM_SIZE .GT. 70 )
+                  ! Isolate a line of text before a + or - sign
+                  LAST_SPACE = INDEX( FORMULA( 1:70 )," ", BACK=.TRUE. )
+
+                  FTEMP = FORMULA( 1:LAST_SPACE )
+
+                  WRITE( LOGDEV, '(10x,A)'), FTEMP
+                  FORMULA = '  '//FORMULA( LAST_SPACE+1:LEN(FORMULA) )
+                  FORM_SIZE = LEN_TRIM( FORMULA )
+               
+               END DO
+
+               ! Write Last Line
+               WRITE( LOGDEV, '(10x,A)' ), FORMULA(1:FORM_SIZE)
             END IF
             WRITE( LOGDEV, '')
          END DO
