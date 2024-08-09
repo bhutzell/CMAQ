@@ -114,6 +114,7 @@ C...........Local Variables
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE. ! flag for first pass thru
       LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
+      LOGICAL, SAVE :: FIRSTDIAG = .TRUE.
 
       CHARACTER( 16 ), SAVE :: PNAME = 'CLDPROC' ! driver program name
       CHARACTER( 16 ) :: VNAME            ! input variable name list
@@ -208,7 +209,7 @@ C...and return
 
         END IF
 
-        allocate ( wdep_spc (N_SPC_WDEP+1), stat = allocstat )
+        allocate ( wdep_spc (N_SPC_WDEP+1+11), stat = allocstat )
         IF ( ALLOCSTAT .NE. 0 ) THEN
           XMSG = 'Failure allocating WDEP_SPC'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -247,8 +248,31 @@ C...and return
            wdep_spc ( VAR ) = TR_WDEP( SPC )
         END DO
         
-        wdep_spc( N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP + 1 ) = 'HPLUS'
-
+        SPC = FINI + 1
+        wdep_spc( SPC ) = 'HPLUS'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'PLCL'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'CLOUD_BOTTOM'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'PR_CLOUDTOP'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'NP_CLOUDTOP'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'RAIN_FLAG'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'PR_CLDFRAC'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'NP_CLDFRAC'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'PR_TRANS'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'NP_TRANS'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'RES_TRANS'
+        SPC = SPC + 1
+        wdep_spc( SPC ) = 'CLD_TRANS'
+ 
 C...initialize the deposition array before processing clouds
 
         ALLOCATE ( TOT_DEP ( NCOLS,NROWS,N_SPC_WDEP+1 ),
@@ -658,12 +682,23 @@ C...write data to the diagnostic file if requested by the user
               end do
            end if
 #else
-
+          IF ( FIRSTDIAG ) THEN
+             FIRSTDIAG = .FALSE.
+             call mio_setfile( MET_CRO_2D )
+             call mio_fcreate( 'CTM_WET_DEP2_MIO', io_mode )
+          END IF
+       
           IF ( .NOT. WRITE3( CTM_WET_DEP_2, ALLVAR3, NDATE,
      &                       NTIME, CONV_DEP ) ) THEN
           XMSG = 'Could not write ' // CTM_WET_DEP_2 // ' file'
             CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
           END IF
+
+          DO VAR = 1, N_SPC_WDEP + 1 + 11
+             call mio_fwrite( 'CTM_WET_DEP2_MIO', WDEP_SPC( VAR ),
+     &                      PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+          END DO
+
 #endif
 
           WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
