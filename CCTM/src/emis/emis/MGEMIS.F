@@ -39,6 +39,7 @@ C   03 Mar 22: D. Wong and G. Sarwar* updated for DMS emissions with cb6r5
       USE RUNTIME_VARS
       USE HGRD_DEFN
       USE DESID_VARS
+      use mio_module
 #ifdef mpas
       use util_module
 #endif
@@ -471,9 +472,9 @@ C Local Variables:
             REAL, PARAMETER :: ONESIXHUNDREDS = 1.0 / 600.0    ! 1.0 / 600.0
 
             LOGICAL, SAVE   :: FIRST_TIME = .TRUE.
-#ifdef mpas
+            LOGICAL, SAVE   :: FIRSTWRITE = .TRUE.
+
             CHARACTER( 20 ) :: time_stamp
-#endif
 
 C----------------------------- Begin calc ------------------------------
 
@@ -659,9 +660,6 @@ C Then reset the MG emissions array and local write counter.
 
              IF ( WSTEP .GE. TIME2SEC( TSTEP( 1 ) ) ) THEN
                 IWSTEP = 1.0 / REAL( WSTEP )
-#ifdef mpas
-                call mio_time_format_conversion (jdate, jtime, time_stamp)
-#else
 
                 IF ( .NOT. CURRSTEP( JDATE, JTIME, STDATE, STTIME, TSTEP( 1 ),
      &                                MDATE, MTIME ) ) THEN
@@ -669,6 +667,8 @@ C Then reset the MG emissions array and local write counter.
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                 END IF
                 CALL NEXTIME( MDATE, MTIME, TSTEP( 1 ) )
+                call mio_time_format_conversion (mdate, mtime, time_stamp)
+
 #ifdef parallel_io
                 IF ( .NOT. IO_PE_INCLUSIVE ) THEN
                   IF ( .NOT. OPEN3( CTM_MGEM_1, FSREAD3, PNAME ) ) THEN
@@ -676,7 +676,6 @@ C Then reset the MG emissions array and local write counter.
                        CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
                   END IF
                 END IF
-#endif
 #endif
                 DO V = 1, NMGDIAG
                    DO R = 1, NROWS
@@ -689,9 +688,18 @@ C Then reset the MG emissions array and local write counter.
 #else
                    IF ( .NOT. WRITE3( CTM_MGEM_1, WRMG_SPC( V ),
      &                        MDATE, MTIME, WRMG ) ) THEN
-                     XMSG = 'Couldnt write ' // CTM_MGEM_1 // 'file'
+                     XMSG = 'Could not write ' // TRIM(CTM_MGEM_1) // ' file'
                      CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
                    END IF
+
+                   if ( firstwrite ) then
+                      firstwrite = .false.
+                      call mio_setfile( MET_CRO_2D )
+                      call mio_fcreate( 'CTM_MGEM_MIO', io_mode )
+                   end if
+
+                   call mio_fwrite( 'CTM_MGEM_MIO', WRMG_SPC( V ),
+     &                              pname, WRMG, time_stamp )
 #endif
                END DO
 #ifdef mpas

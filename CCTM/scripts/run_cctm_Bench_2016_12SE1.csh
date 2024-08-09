@@ -609,7 +609,9 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_IRR_2       "$OUTDIR/CCTM_IRR_2_${CTM_APPL}.nc -v"      #> Chem Process Analysis
   setenv CTM_IRR_3       "$OUTDIR/CCTM_IRR_3_${CTM_APPL}.nc -v"      #> Chem Process Analysis
   setenv CTM_DRY_DEP_MOS "$OUTDIR/CCTM_DDMOS_${CTM_APPL}.nc -v"      #> Dry Dep
+  setenv CTM_DDEP_MOS_MIO $OUTDIR/CCTM_DDMOS_MIO_${CTM_APPL}.nc      #> Dry Dep
   setenv CTM_DEPV_MOS    "$OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc -v"    #> Dry Dep Velocity
+  setenv CTM_DEPV_MOS_MIO $OUTDIR/CCTM_DEPVMOS_MIO_${CTM_APPL}.nc    #> Dry Dep Velocity
   setenv CTM_VDIFF_DIAG  "$OUTDIR/CCTM_VDIFF_DIAG_${CTM_APPL}.nc -v" #> Vertical Dispersion Diagnostic
   setenv CTM_VDIFF_MIO   $OUTDIR/CCTM_VDIFF_DIAG_MIO_${CTM_APPL}.nc  #> Vertical Dispersion Diagnostic
   setenv CTM_VSED_DIAG   "$OUTDIR/CCTM_VSED_DIAG_${CTM_APPL}.nc -v"  #> Particle Grav. Settling Velocity
@@ -632,8 +634,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
              ${CTM_DRY_DEP_1} ${CTM_DRY_DEP_MIO} $CTM_DEPV_DIAG ${CTM_DEPV_MIO} $B3GTS_S $B3GTS_MIO $MEGAN_SOILOUT $BEIS_SOILOUT ${BEIS_SOIL_MIO} $BDSNPOUT \
              $CTM_WET_DEP_1 ${CTM_WET_DEP1_MIO} $CTM_WET_DEP_2 ${CTM_WET_DEP2_MIO} $CTM_ELMO_1 ${CTM_ELMO_MIO} $CTM_AELMO_1 $CTM_AELMO_MIO             \
              $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 $CTM_SSEMIS_1 $CTM_SSEMIS_MIO $CTM_DUST_EMIS_1 $CTM_DUST_MIO $CTM_IPR_1 $CTM_IPR_2       \
-             $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_DRY_DEP_MOS                 \
-             $CTM_DEPV_MOS $CTM_VDIFF_DIAG $CTM_VDIFF_MIO $CTM_VSED_DIAG $CTM_VSED_MIO $CTM_LTNGDIAG_1 $CTM_LTNG1_MIO $CTM_LTNGDIAG_2 $CTM_LTNG2_MIO $CTM_VEXT_1 )
+             $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_DRY_DEP_MOS $CTM_DDEP_MOS_MIO                \
+             $CTM_DEPV_MOS $CTM_DEPV_MOS_MIO $CTM_VDIFF_DIAG $CTM_VDIFF_MIO $CTM_VSED_DIAG $CTM_VSED_MIO $CTM_LTNGDIAG_1 $CTM_LTNG1_MIO $CTM_LTNGDIAG_2 $CTM_LTNG2_MIO $CTM_VEXT_1 )
   if ( $?CTM_ISAM ) then
      if ( $CTM_ISAM == 'Y' || $CTM_ISAM == 'T' ) then
         set OUT_FILES = (${OUT_FILES} ${SA_ACONC_1} ${SA_CONC_1} ${SA_DD_1} ${SA_WD_1}      \

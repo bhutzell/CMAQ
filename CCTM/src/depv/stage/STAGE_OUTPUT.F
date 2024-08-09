@@ -220,9 +220,9 @@ C Set output file characteristics based on GRIDDESC and open the dep velocity di
             END DO
  
             ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 3
+            NDIMS3D( 1:NVARS3D ) = 4
             L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .False.
+            L_LAY  ( 1:NVARS3D ) = .True.
             L_COL  ( 1:NVARS3D ) = .True.
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
@@ -251,6 +251,8 @@ C Open diagnostic file
          USE UTILIO_DEFN
          USE MOSAIC_MOD,   Only: Tile_Data
          USE ASX_DATA_MOD, Only: MOSAIC_DATA
+         use runtime_vars, only: io_mode
+         use mio_module
 
          Implicit None    
 
@@ -262,8 +264,21 @@ C Open diagnostic file
 
          CHARACTER( 16 )  :: PNAME = 'WRITE_DEPV'
          CHARACTER( 120 ) :: XMSG = ' '
+         character( 20 )  :: time_stamp
+         logical, save    :: firstime = .true.
          
          INCLUDE SUBST_FILES_ID  ! file name parameters
+
+         if ( firstime ) then
+            firstime = .false.
+            call mio_setfile( MET_CRO_3D )
+            call mio_fcreate( 'CTM_DEPV_MIO', io_mode )
+            if ( MOSAIC ) then
+               call mio_fcreate( 'CTM_DEPV_MOS_MIO', io_mode )
+            end if
+         end if
+
+         call mio_time_format_conversion( date, time, time_stamp )
 
          DO N = 1, N_SPC_DEPV
             If( Tile_Data%Vd_Out( N ) ) Then
@@ -272,6 +287,8 @@ C Open diagnostic file
                   XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
+               call mio_fwrite( 'CTM_DEPV_MIO', Tile_Data%Vd_Name( N ),
+     &                          PNAME, Tile_Data%Grd_Vd(:,:,N)*100.0, TIME_STAMP )
             End If
          END DO
 
@@ -287,43 +304,56 @@ C Open diagnostic file
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
-
+               call mio_fwrite( 'CTM_DEPV_MOS_MIO', 'LUFRAC', PNAME, 
+     &                          Tile_Data%LUFRAC, TIME_STAMP )
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'RA',
      &                            DATE, TIME, MOSAIC_DATA%RA ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
+               call mio_fwrite( 'CTM_DEPV_MOS_MIO', 'RA', PNAME, 
+     &                          MOSAIC_DATA%RA, TIME_STAMP )
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'RST',
      &                            DATE, TIME, Mosaic_Data%RSTW ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
+               call mio_fwrite( 'CTM_DEPV_MOS_MIO', 'RST', PNAME, 
+     &                          Mosaic_Data%RSTW, TIME_STAMP )
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'LAI',
      &                            DATE, TIME, MOSAIC_DATA%LAI ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
+               call mio_fwrite( 'CTM_DEPV_MOS_MIO', 'LAI', PNAME, 
+     &                          MOSAIC_Data%LAI, TIME_STAMP )
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'USTAR',
      &                            DATE, TIME, MOSAIC_DATA%USTAR ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
+               call mio_fwrite( 'CTM_DEPV_MOS_MIO', 'USTAR', PNAME, 
+     &                          MOSAIC_Data%USTAR, TIME_STAMP )
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'Z0',
      &                            DATE, TIME, MOSAIC_DATA%Z0 ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
+               call mio_fwrite( 'CTM_DEPV_MOS_MIO', 'Z0', PNAME, 
+     &                          MOSAIC_Data%Z0, TIME_STAMP )
 
                IF ( .NOT. WRITE3( CTM_DEPV_MOS, 'VEG',
      &                            DATE, TIME, MOSAIC_DATA%VEG ) ) THEN
                    XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                   CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                END IF
+               call mio_fwrite( 'CTM_DEPV_MOS_MIO', 'VEG', PNAME, 
+     &                          MOSAIC_Data%VEG, TIME_STAMP )
 
                DO N = 1, N_SPC_DEPV
                   If( Tile_Data%Vd_Out( N ) ) Then
@@ -333,6 +363,8 @@ C Open diagnostic file
                          XMSG = 'Could not write ' // CTM_DEPV_MOS // ' file'
                         CALL M3EXIT ( PNAME, DATE, TIME, XMSG, XSTAT1 )
                      End If
+                     call mio_fwrite( 'CTM_DEPV_MOS_MIO', Tile_Data%Vd_Name( N ), 
+     &                                 PNAME, Tile_Data%Lu_Vd(:,:,N,:)*100.0, TIME_STAMP )
                   End If
                END DO
          End If

@@ -145,6 +145,7 @@ C Other variables:
       LOGICAL          OK        ! check flag
       LOGICAL, SAVE :: LASTTIC                ! true: last sync step this output tstep
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
 
       CHARACTER( 256 ) :: MESG       ! message buffer
       CHARACTER( 256 ) :: EQNAME     ! equivalent filename
@@ -180,11 +181,6 @@ C-----------------------------------------------------------------------
 
       IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
-! mio_fcreate has barrier calls, so do not put file creation inside
-! an IF (IO_PE_INCLUSIVE) block
-         call mio_setfile( MET_CRO_2D )
-         call mio_fcreate( 'B3GTS_MIO', io_mode )
-!         call mio_fcreate( 'B3GTS_MIO', 512 )
 
 C Determine last timestamp
          NSTEPS = RUNLEN / TSTEP( 1 )           ! initscen guarantees divisibility
@@ -340,6 +336,12 @@ C Speciate emissions
             END DO
          END DO
          IF ( LASTTIC ) THEN
+            if ( firstwrite ) then 
+               call mio_setfile( MET_CRO_2D )
+               call mio_fcreate( 'B3GTS_MIO', io_mode )
+               firstwrite = .false.
+            end if
+
             EMISS = EMISS * HR2SEC   ! convert from gm/h to gm/s
             DO S = 1,MSPCS
                IF ( .NOT. WRITE3( SNAME, EMSPC( S ), MDATE, MTIME, EMISS(:,:,S) ) ) THEN
