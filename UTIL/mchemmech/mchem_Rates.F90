@@ -2669,237 +2669,183 @@ FALLOFF_T10_DMS2 = FALLOFF_T10( 1.9900D-39,5.2700D+03, &
 ! <AQPWD03_CV>:
 ! Constant rate moved to initialize :   RCONST(837) = (XCL_CV*WFAC_CV)
 ! <GASWD01>:
-! Constant rate moved to initialize :   RCONST(838) = (KPP_RSCAV(IND_NO2))
+! Constant rate moved to initialize :   RCONST(838) = (KPP_RSCAV(IND_NO))
 ! <GASWD02>:
-! Constant rate moved to initialize :   RCONST(839) = (KPP_RSCAV(IND_NO))
+! Constant rate moved to initialize :   RCONST(839) = (KPP_RSCAV(IND_PAN))
 ! <GASWD03>:
-! Constant rate moved to initialize :   RCONST(840) = (KPP_RSCAV(IND_O3))
+! Constant rate moved to initialize :   RCONST(840) = (KPP_RSCAV(IND_ALD2))
 ! <GASWD04>:
-! Constant rate moved to initialize :   RCONST(841) = (KPP_RSCAV(IND_NO3))
+! Constant rate moved to initialize :   RCONST(841) = (KPP_RSCAV(IND_PANX))
 ! <GASWD05>:
-! Constant rate moved to initialize :   RCONST(842) = (KPP_RSCAV(IND_H2O2))
+! Constant rate moved to initialize :   RCONST(842) = (KPP_RSCAV(IND_MEOH))
 ! <GASWD06>:
-! Constant rate moved to initialize :   RCONST(843) = (KPP_RSCAV(IND_N2O5))
+! Constant rate moved to initialize :   RCONST(843) = (KPP_RSCAV(IND_ROOH))
 ! <GASWD07>:
-! Constant rate moved to initialize :   RCONST(844) = (KPP_RSCAV(IND_HNO3))
+! Constant rate moved to initialize :   RCONST(844) = (KPP_RSCAV(IND_NTR1))
 ! <GASWD08>:
-! Constant rate moved to initialize :   RCONST(845) = (KPP_RSCAV(IND_HONO))
+! Constant rate moved to initialize :   RCONST(845) = (KPP_RSCAV(IND_NTR2))
 ! <GASWD09>:
-! Constant rate moved to initialize :   RCONST(846) = (KPP_RSCAV(IND_PNA))
+! Constant rate moved to initialize :   RCONST(846) = (KPP_RSCAV(IND_CO))
 ! <GASWD10>:
-! Constant rate moved to initialize :   RCONST(847) = (KPP_RSCAV(IND_SO2))
+! Constant rate moved to initialize :   RCONST(847) = (KPP_RSCAV(IND_ALDX))
 ! <GASWD11>:
-! Constant rate moved to initialize :   RCONST(848) = (KPP_RSCAV(IND_SULF))
+! Constant rate moved to initialize :   RCONST(848) = (KPP_RSCAV(IND_ETHA))
 ! <GASWD12>:
-! Constant rate moved to initialize :   RCONST(849) = (KPP_RSCAV(IND_PAN))
+! Constant rate moved to initialize :   RCONST(849) = (KPP_RSCAV(IND_ETOH))
 ! <GASWD13>:
-! Constant rate moved to initialize :   RCONST(850) = (KPP_RSCAV(IND_PACD))
+! Constant rate moved to initialize :   RCONST(850) = (KPP_RSCAV(IND_KET))
 ! <GASWD14>:
-! Constant rate moved to initialize :   RCONST(851) = (KPP_RSCAV(IND_AACD))
+! Constant rate moved to initialize :   RCONST(851) = (KPP_RSCAV(IND_PAR))
 ! <GASWD15>:
-! Constant rate moved to initialize :   RCONST(852) = (KPP_RSCAV(IND_ALD2))
+! Constant rate moved to initialize :   RCONST(852) = (KPP_RSCAV(IND_ACET))
 ! <GASWD16>:
-! Constant rate moved to initialize :   RCONST(853) = (KPP_RSCAV(IND_PANX))
+! Constant rate moved to initialize :   RCONST(853) = (KPP_RSCAV(IND_PRPA))
 ! <GASWD17>:
-! Constant rate moved to initialize :   RCONST(854) = (KPP_RSCAV(IND_FORM))
+! Constant rate moved to initialize :   RCONST(854) = (KPP_RSCAV(IND_ETHY))
 ! <GASWD18>:
-! Constant rate moved to initialize :   RCONST(855) = (KPP_RSCAV(IND_MEPX))
+! Constant rate moved to initialize :   RCONST(855) = (KPP_RSCAV(IND_ETH))
 ! <GASWD19>:
-! Constant rate moved to initialize :   RCONST(856) = (KPP_RSCAV(IND_MEOH))
+! Constant rate moved to initialize :   RCONST(856) = (KPP_RSCAV(IND_OLE))
 ! <GASWD20>:
-! Constant rate moved to initialize :   RCONST(857) = (KPP_RSCAV(IND_ROOH))
+! Constant rate moved to initialize :   RCONST(857) = (KPP_RSCAV(IND_IOLE))
 ! <GASWD21>:
-! Constant rate moved to initialize :   RCONST(858) = (KPP_RSCAV(IND_NTR1))
+! Constant rate moved to initialize :   RCONST(858) = (KPP_RSCAV(IND_ISOP))
 ! <GASWD22>:
-! Constant rate moved to initialize :   RCONST(859) = (KPP_RSCAV(IND_NTR2))
+! Constant rate moved to initialize :   RCONST(859) = (KPP_RSCAV(IND_ISPD))
 ! <GASWD23>:
-! Constant rate moved to initialize :   RCONST(860) = (KPP_RSCAV(IND_FACD))
+! Constant rate moved to initialize :   RCONST(860) = (KPP_RSCAV(IND_INTR))
 ! <GASWD24>:
-! Constant rate moved to initialize :   RCONST(861) = (KPP_RSCAV(IND_CO))
+! Constant rate moved to initialize :   RCONST(861) = (KPP_RSCAV(IND_ISPX))
 ! <GASWD25>:
-! Constant rate moved to initialize :   RCONST(862) = (KPP_RSCAV(IND_ALDX))
+! Constant rate moved to initialize :   RCONST(862) = (KPP_RSCAV(IND_TERP))
 ! <GASWD26>:
-! Constant rate moved to initialize :   RCONST(863) = (KPP_RSCAV(IND_GLYD))
+! Constant rate moved to initialize :   RCONST(863) = (KPP_RSCAV(IND_APIN))
 ! <GASWD27>:
-! Constant rate moved to initialize :   RCONST(864) = (KPP_RSCAV(IND_GLY))
+! Constant rate moved to initialize :   RCONST(864) = (KPP_RSCAV(IND_MTNO3))
 ! <GASWD28>:
-! Constant rate moved to initialize :   RCONST(865) = (KPP_RSCAV(IND_MGLY))
+! Constant rate moved to initialize :   RCONST(865) = (KPP_RSCAV(IND_BENZENE))
 ! <GASWD29>:
-! Constant rate moved to initialize :   RCONST(866) = (KPP_RSCAV(IND_ETHA))
+! Constant rate moved to initialize :   RCONST(866) = (KPP_RSCAV(IND_CRES))
 ! <GASWD30>:
-! Constant rate moved to initialize :   RCONST(867) = (KPP_RSCAV(IND_ETOH))
+! Constant rate moved to initialize :   RCONST(867) = (KPP_RSCAV(IND_OPEN))
 ! <GASWD31>:
-! Constant rate moved to initialize :   RCONST(868) = (KPP_RSCAV(IND_KET))
+! Constant rate moved to initialize :   RCONST(868) = (KPP_RSCAV(IND_TOL))
 ! <GASWD32>:
-! Constant rate moved to initialize :   RCONST(869) = (KPP_RSCAV(IND_PAR))
+! Constant rate moved to initialize :   RCONST(869) = (KPP_RSCAV(IND_XOPN))
 ! <GASWD33>:
-! Constant rate moved to initialize :   RCONST(870) = (KPP_RSCAV(IND_ACET))
+! Constant rate moved to initialize :   RCONST(870) = (KPP_RSCAV(IND_XYLMN))
 ! <GASWD34>:
-! Constant rate moved to initialize :   RCONST(871) = (KPP_RSCAV(IND_PRPA))
+! Constant rate moved to initialize :   RCONST(871) = (KPP_RSCAV(IND_NAPH))
 ! <GASWD35>:
-! Constant rate moved to initialize :   RCONST(872) = (KPP_RSCAV(IND_ETHY))
+! Constant rate moved to initialize :   RCONST(872) = (KPP_RSCAV(IND_CAT1))
 ! <GASWD36>:
-! Constant rate moved to initialize :   RCONST(873) = (KPP_RSCAV(IND_ETH))
+! Constant rate moved to initialize :   RCONST(873) = (KPP_RSCAV(IND_CRON))
 ! <GASWD37>:
-! Constant rate moved to initialize :   RCONST(874) = (KPP_RSCAV(IND_OLE))
+! Constant rate moved to initialize :   RCONST(874) = (KPP_RSCAV(IND_OPAN))
 ! <GASWD38>:
-! Constant rate moved to initialize :   RCONST(875) = (KPP_RSCAV(IND_IOLE))
+! Constant rate moved to initialize :   RCONST(875) = (KPP_RSCAV(IND_ECH4))
 ! <GASWD39>:
-! Constant rate moved to initialize :   RCONST(876) = (KPP_RSCAV(IND_ISOP))
+! Constant rate moved to initialize :   RCONST(876) = (KPP_RSCAV(IND_CL2))
 ! <GASWD40>:
-! Constant rate moved to initialize :   RCONST(877) = (KPP_RSCAV(IND_ISPD))
+! Constant rate moved to initialize :   RCONST(877) = (KPP_RSCAV(IND_HOCL))
 ! <GASWD41>:
-! Constant rate moved to initialize :   RCONST(878) = (KPP_RSCAV(IND_INTR))
+! Constant rate moved to initialize :   RCONST(878) = (KPP_RSCAV(IND_CLO))
 ! <GASWD42>:
-! Constant rate moved to initialize :   RCONST(879) = (KPP_RSCAV(IND_ISPX))
+! Constant rate moved to initialize :   RCONST(879) = (KPP_RSCAV(IND_FMCL))
 ! <GASWD43>:
-! Constant rate moved to initialize :   RCONST(880) = (KPP_RSCAV(IND_EPOX))
+! Constant rate moved to initialize :   RCONST(880) = (KPP_RSCAV(IND_CLNO2))
 ! <GASWD44>:
-! Constant rate moved to initialize :   RCONST(881) = (KPP_RSCAV(IND_TERP))
+! Constant rate moved to initialize :   RCONST(881) = (KPP_RSCAV(IND_CLNO3))
 ! <GASWD45>:
-! Constant rate moved to initialize :   RCONST(882) = (KPP_RSCAV(IND_APIN))
+! Constant rate moved to initialize :   RCONST(882) = (KPP_RSCAV(IND_SESQ))
 ! <GASWD46>:
-! Constant rate moved to initialize :   RCONST(883) = (KPP_RSCAV(IND_MTNO3))
+! Constant rate moved to initialize :   RCONST(883) = (KPP_RSCAV(IND_SOAALK))
 ! <GASWD47>:
-! Constant rate moved to initialize :   RCONST(884) = (KPP_RSCAV(IND_BENZENE))
+! Constant rate moved to initialize :   RCONST(884) = (KPP_RSCAV(IND_VLVPO1))
 ! <GASWD48>:
-! Constant rate moved to initialize :   RCONST(885) = (KPP_RSCAV(IND_CRES))
+! Constant rate moved to initialize :   RCONST(885) = (KPP_RSCAV(IND_VSVPO1))
 ! <GASWD49>:
-! Constant rate moved to initialize :   RCONST(886) = (KPP_RSCAV(IND_OPEN))
+! Constant rate moved to initialize :   RCONST(886) = (KPP_RSCAV(IND_VSVPO2))
 ! <GASWD50>:
-! Constant rate moved to initialize :   RCONST(887) = (KPP_RSCAV(IND_TOL))
+! Constant rate moved to initialize :   RCONST(887) = (KPP_RSCAV(IND_VSVPO3))
 ! <GASWD51>:
-! Constant rate moved to initialize :   RCONST(888) = (KPP_RSCAV(IND_XOPN))
+! Constant rate moved to initialize :   RCONST(888) = (KPP_RSCAV(IND_VIVPO1))
 ! <GASWD52>:
-! Constant rate moved to initialize :   RCONST(889) = (KPP_RSCAV(IND_XYLMN))
+! Constant rate moved to initialize :   RCONST(889) = (KPP_RSCAV(IND_VLVOO1))
 ! <GASWD53>:
-! Constant rate moved to initialize :   RCONST(890) = (KPP_RSCAV(IND_NAPH))
+! Constant rate moved to initialize :   RCONST(890) = (KPP_RSCAV(IND_VLVOO2))
 ! <GASWD54>:
-! Constant rate moved to initialize :   RCONST(891) = (KPP_RSCAV(IND_CAT1))
+! Constant rate moved to initialize :   RCONST(891) = (KPP_RSCAV(IND_VSVOO1))
 ! <GASWD55>:
-! Constant rate moved to initialize :   RCONST(892) = (KPP_RSCAV(IND_CRON))
+! Constant rate moved to initialize :   RCONST(892) = (KPP_RSCAV(IND_VSVOO2))
 ! <GASWD56>:
-! Constant rate moved to initialize :   RCONST(893) = (KPP_RSCAV(IND_OPAN))
+! Constant rate moved to initialize :   RCONST(893) = (KPP_RSCAV(IND_VSVOO3))
 ! <GASWD57>:
-! Constant rate moved to initialize :   RCONST(894) = (KPP_RSCAV(IND_ECH4))
+! Constant rate moved to initialize :   RCONST(894) = (KPP_RSCAV(IND_PCVOC))
 ! <GASWD58>:
-! Constant rate moved to initialize :   RCONST(895) = (KPP_RSCAV(IND_CL2))
+! Constant rate moved to initialize :   RCONST(895) = (KPP_RSCAV(IND_ALD2_PRIMARY))
 ! <GASWD59>:
-! Constant rate moved to initialize :   RCONST(896) = (KPP_RSCAV(IND_HOCL))
+! Constant rate moved to initialize :   RCONST(896) = (KPP_RSCAV(IND_BUTADIENE13))
 ! <GASWD60>:
-! Constant rate moved to initialize :   RCONST(897) = (KPP_RSCAV(IND_CLO))
+! Constant rate moved to initialize :   RCONST(897) = (KPP_RSCAV(IND_ACROLEIN))
 ! <GASWD61>:
-! Constant rate moved to initialize :   RCONST(898) = (KPP_RSCAV(IND_FMCL))
+! Constant rate moved to initialize :   RCONST(898) = (KPP_RSCAV(IND_ACRO_PRIMARY))
 ! <GASWD62>:
-! Constant rate moved to initialize :   RCONST(899) = (KPP_RSCAV(IND_HCL))
+! Constant rate moved to initialize :   RCONST(899) = (KPP_RSCAV(IND_TOLU))
 ! <GASWD63>:
-! Constant rate moved to initialize :   RCONST(900) = (KPP_RSCAV(IND_CLNO2))
+! Constant rate moved to initialize :   RCONST(900) = (KPP_RSCAV(IND_HG))
 ! <GASWD64>:
-! Constant rate moved to initialize :   RCONST(901) = (KPP_RSCAV(IND_CLNO3))
+! Constant rate moved to initialize :   RCONST(901) = (KPP_RSCAV(IND_HGIIGAS))
 ! <GASWD65>:
-! Constant rate moved to initialize :   RCONST(902) = (KPP_RSCAV(IND_SESQ))
+! Constant rate moved to initialize :   RCONST(902) = (KPP_RSCAV(IND_SVAVB1))
 ! <GASWD66>:
-! Constant rate moved to initialize :   RCONST(903) = (KPP_RSCAV(IND_SOAALK))
+! Constant rate moved to initialize :   RCONST(903) = (KPP_RSCAV(IND_SVAVB2))
 ! <GASWD67>:
-! Constant rate moved to initialize :   RCONST(904) = (KPP_RSCAV(IND_VLVPO1))
+! Constant rate moved to initialize :   RCONST(904) = (KPP_RSCAV(IND_SVAVB3))
 ! <GASWD68>:
-! Constant rate moved to initialize :   RCONST(905) = (KPP_RSCAV(IND_VSVPO1))
+! Constant rate moved to initialize :   RCONST(905) = (KPP_RSCAV(IND_SVAVB4))
 ! <GASWD69>:
-! Constant rate moved to initialize :   RCONST(906) = (KPP_RSCAV(IND_VSVPO2))
+! Constant rate moved to initialize :   RCONST(906) = (KPP_RSCAV(IND_DMS))
 ! <GASWD70>:
-! Constant rate moved to initialize :   RCONST(907) = (KPP_RSCAV(IND_VSVPO3))
+! Constant rate moved to initialize :   RCONST(907) = (KPP_RSCAV(IND_MSA))
 ! <GASWD71>:
-! Constant rate moved to initialize :   RCONST(908) = (KPP_RSCAV(IND_VIVPO1))
+! Constant rate moved to initialize :   RCONST(908) = (KPP_RSCAV(IND_ASO4J))
 ! <GASWD72>:
-! Constant rate moved to initialize :   RCONST(909) = (KPP_RSCAV(IND_VLVOO1))
+! Constant rate moved to initialize :   RCONST(909) = (KPP_RSCAV(IND_ACLJ))
 ! <GASWD73>:
-! Constant rate moved to initialize :   RCONST(910) = (KPP_RSCAV(IND_VLVOO2))
+! Constant rate moved to initialize :   RCONST(910) = (KPP_RSCAV(IND_ACLK))
 ! <GASWD74>:
-! Constant rate moved to initialize :   RCONST(911) = (KPP_RSCAV(IND_VSVOO1))
+! Constant rate moved to initialize :   RCONST(911) = (KPP_RSCAV(IND_AISO1J))
 ! <GASWD75>:
-! Constant rate moved to initialize :   RCONST(912) = (KPP_RSCAV(IND_VSVOO2))
+! Constant rate moved to initialize :   RCONST(912) = (KPP_RSCAV(IND_AISO2J))
 ! <GASWD76>:
-! Constant rate moved to initialize :   RCONST(913) = (KPP_RSCAV(IND_VSVOO3))
+! Constant rate moved to initialize :   RCONST(913) = (KPP_RSCAV(IND_ASQTJ))
 ! <GASWD77>:
-! Constant rate moved to initialize :   RCONST(914) = (KPP_RSCAV(IND_PCVOC))
+! Constant rate moved to initialize :   RCONST(914) = (KPP_RSCAV(IND_AISO3J))
 ! <GASWD78>:
-! Constant rate moved to initialize :   RCONST(915) = (KPP_RSCAV(IND_FORM_PRIMARY))
+! Constant rate moved to initialize :   RCONST(915) = (KPP_RSCAV(IND_AOLGAJ))
 ! <GASWD79>:
-! Constant rate moved to initialize :   RCONST(916) = (KPP_RSCAV(IND_ALD2_PRIMARY))
+! Constant rate moved to initialize :   RCONST(916) = (KPP_RSCAV(IND_AOLGBJ))
 ! <GASWD80>:
-! Constant rate moved to initialize :   RCONST(917) = (KPP_RSCAV(IND_BUTADIENE13))
+! Constant rate moved to initialize :   RCONST(917) = (KPP_RSCAV(IND_AGLYJ))
 ! <GASWD81>:
-! Constant rate moved to initialize :   RCONST(918) = (KPP_RSCAV(IND_ACROLEIN))
+! Constant rate moved to initialize :   RCONST(918) = (KPP_RSCAV(IND_AMTNO3J))
 ! <GASWD82>:
-! Constant rate moved to initialize :   RCONST(919) = (KPP_RSCAV(IND_ACRO_PRIMARY))
+! Constant rate moved to initialize :   RCONST(919) = (KPP_RSCAV(IND_AMTHYDJ))
 ! <GASWD83>:
-! Constant rate moved to initialize :   RCONST(920) = (KPP_RSCAV(IND_TOLU))
+! Constant rate moved to initialize :   RCONST(920) = (KPP_RSCAV(IND_APOCI))
 ! <GASWD84>:
-! Constant rate moved to initialize :   RCONST(921) = (KPP_RSCAV(IND_HG))
+! Constant rate moved to initialize :   RCONST(921) = (KPP_RSCAV(IND_APOCJ))
 ! <GASWD85>:
-! Constant rate moved to initialize :   RCONST(922) = (KPP_RSCAV(IND_HGIIGAS))
+! Constant rate moved to initialize :   RCONST(922) = (KPP_RSCAV(IND_APNCOMI))
 ! <GASWD86>:
-! Constant rate moved to initialize :   RCONST(923) = (KPP_RSCAV(IND_SVAVB1))
+! Constant rate moved to initialize :   RCONST(923) = (KPP_RSCAV(IND_APNCOMJ))
 ! <GASWD87>:
-! Constant rate moved to initialize :   RCONST(924) = (KPP_RSCAV(IND_SVAVB2))
+! Constant rate moved to initialize :   RCONST(924) = (KPP_RSCAV(IND_AAVB2J))
 ! <GASWD88>:
-! Constant rate moved to initialize :   RCONST(925) = (KPP_RSCAV(IND_SVAVB3))
+! Constant rate moved to initialize :   RCONST(925) = (KPP_RSCAV(IND_AAVB3J))
 ! <GASWD89>:
-! Constant rate moved to initialize :   RCONST(926) = (KPP_RSCAV(IND_SVAVB4))
-! <GASWD90>:
-! Constant rate moved to initialize :   RCONST(927) = (KPP_RSCAV(IND_DMS))
-! <GASWD91>:
-! Constant rate moved to initialize :   RCONST(928) = (KPP_RSCAV(IND_MSA))
-! <GASWD92>:
-! Constant rate moved to initialize :   RCONST(929) = (KPP_RSCAV(IND_ASO4I))
-! <GASWD93>:
-! Constant rate moved to initialize :   RCONST(930) = (KPP_RSCAV(IND_ASO4J))
-! <GASWD94>:
-! Constant rate moved to initialize :   RCONST(931) = (KPP_RSCAV(IND_ANH4I))
-! <GASWD95>:
-! Constant rate moved to initialize :   RCONST(932) = (KPP_RSCAV(IND_ANO3I))
-! <GASWD96>:
-! Constant rate moved to initialize :   RCONST(933) = (KPP_RSCAV(IND_ANAI))
-! <GASWD97>:
-! Constant rate moved to initialize :   RCONST(934) = (KPP_RSCAV(IND_ACLI))
-! <GASWD98>:
-! Constant rate moved to initialize :   RCONST(935) = (KPP_RSCAV(IND_ACLJ))
-! <GASWD99>:
-! Constant rate moved to initialize :   RCONST(936) = (KPP_RSCAV(IND_ACLK))
-! <GASWD100>:
-! Constant rate moved to initialize :   RCONST(937) = (KPP_RSCAV(IND_AISO1J))
-! <GASWD101>:
-! Constant rate moved to initialize :   RCONST(938) = (KPP_RSCAV(IND_AISO2J))
-! <GASWD102>:
-! Constant rate moved to initialize :   RCONST(939) = (KPP_RSCAV(IND_ASQTJ))
-! <GASWD103>:
-! Constant rate moved to initialize :   RCONST(940) = (KPP_RSCAV(IND_AISO3J))
-! <GASWD104>:
-! Constant rate moved to initialize :   RCONST(941) = (KPP_RSCAV(IND_AOLGAJ))
-! <GASWD105>:
-! Constant rate moved to initialize :   RCONST(942) = (KPP_RSCAV(IND_AOLGBJ))
-! <GASWD106>:
-! Constant rate moved to initialize :   RCONST(943) = (KPP_RSCAV(IND_AGLYJ))
-! <GASWD107>:
-! Constant rate moved to initialize :   RCONST(944) = (KPP_RSCAV(IND_AMTNO3J))
-! <GASWD108>:
-! Constant rate moved to initialize :   RCONST(945) = (KPP_RSCAV(IND_AMTHYDJ))
-! <GASWD109>:
-! Constant rate moved to initialize :   RCONST(946) = (KPP_RSCAV(IND_APOCI))
-! <GASWD110>:
-! Constant rate moved to initialize :   RCONST(947) = (KPP_RSCAV(IND_APOCJ))
-! <GASWD111>:
-! Constant rate moved to initialize :   RCONST(948) = (KPP_RSCAV(IND_APNCOMI))
-! <GASWD112>:
-! Constant rate moved to initialize :   RCONST(949) = (KPP_RSCAV(IND_APNCOMJ))
-! <GASWD113>:
-! Constant rate moved to initialize :   RCONST(950) = (KPP_RSCAV(IND_AAVB2J))
-! <GASWD114>:
-! Constant rate moved to initialize :   RCONST(951) = (KPP_RSCAV(IND_AAVB3J))
-! <GASWD115>:
-! Constant rate moved to initialize :   RCONST(952) = (KPP_RSCAV(IND_AAVB4J))
-! <GASWD116>:
-! Constant rate moved to initialize :   RCONST(953) = (KPP_RSCAV(IND_NH3))
+! Constant rate moved to initialize :   RCONST(926) = (KPP_RSCAV(IND_AAVB4J))
       
 END SUBROUTINE Update_RCONST
 

@@ -1,10 +1,15 @@
 import pandas as pd
 import os
 
-def check_spc(var, spc):
+def check_spc(var, spc, spc_aq=None):
     check = False
     for i in spc:
         if i == var: check = True
+    # do not perform scavenging if part of aq. mechanism
+    if spc_aq is not None:
+        if check:
+            for i in spc_aq:
+                if i == var: check = False
     return check
 
 def adjust_AE(wdep, species):
@@ -56,10 +61,23 @@ def load_wdep(filename,AE=False):
     print(wdep)
     return wdep, species
 
+def read_mech_gas_prod(filename):
+    spc = []
+    with open(filename) as file:
+        for line in file:
+            if '=' in line:
+                string  = line.split('=')[0].split('>')[1]
+                strings = string.split('+')
+                for react in strings:
+                    if '_a##' not in react: spc.append(react.strip())
+    return spc
+
 # load mchem species
 data = pd.read_csv('mchem.spc', sep='=', comment='#', names=['Species','Formula'])
 spc  = data['Species']
 spc  = [x.strip(' ') for x in spc]
+# load aq species
+spc_aq = read_mech_gas_prod('aqueous.eqn')
 
 # load species information
 wdep_GC, species_GC = load_wdep('../../CCTM/src/MECHS/cb6r5_ae7_aqkmt2/GC_cb6r5_ae7_aq.nml')
@@ -73,7 +91,7 @@ lines_eqn = []
 lines_spc = []
 for i in range(len(wdep)):
     if wdep[i].strip() != '':
-        if check_spc(species[i], spc):
+        if check_spc(species[i], spc, spc_aq=spc_aq):
             line = '<GASWD'+str(j).rjust(2,'0')+'> '+species[i].ljust(12,' ')+'   = WD_'+species[i].ljust(12,' ')+' : KPP_RSCAV( IND_'+species[i]+' );'
             lines_eqn.append(line)
             if not check_spc('WD_'+species[i], spc):
