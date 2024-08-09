@@ -81,7 +81,8 @@
           new_file_dim_name_index = 0
 
           if (dest .gt. 0) then
-             write (mio_logdev, *) ' Abort in routine mio_fcreate due to output file is already existed'
+             write (mio_logdev, *) ' Abort in mio_fcreate: output file ' &
+                                  // trim(fname) // ' already exists'
              stop
           else
 
