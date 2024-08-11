@@ -332,6 +332,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 # =====================================================================
 
   #> MIO input control
+  setenv ncd_64bit_offset Y
   setenv mio_file_info $OUTDIR/mio_file_input_${CTM_APPL}.txt
   setenv CTM_MIO_INPUT "GRID_CRO_2D GRID_DOT_2D MET_CRO_2D MET_CRO_3D MET_DOT_3D MET_BDY_3D"
 

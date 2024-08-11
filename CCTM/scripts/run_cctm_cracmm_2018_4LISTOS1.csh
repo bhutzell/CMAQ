@@ -303,6 +303,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 #> Input Files (Some are Day-Dependent)
 # =====================================================================
 
+  #> MIO input control
+  setenv ncd_64bit_offset Y
+  setenv mio_file_info $OUTDIR/mio_file_input_${CTM_APPL}.txt
+  setenv CTM_MIO_INPUT "GRID_CRO_2D GRID_DOT_2D MET_CRO_2D MET_CRO_3D MET_DOT_3D MET_BDY_3D"
+
   #> Initial conditions
   if ($NEW_START == true || $NEW_START == TRUE ) then
      setenv ICFILE ICON_v532_LISTOS4_cracmm_20180502_NO_IEPOXP.ncf

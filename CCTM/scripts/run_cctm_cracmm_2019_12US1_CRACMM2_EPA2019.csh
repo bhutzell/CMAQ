@@ -331,6 +331,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 #> Input Files (Some are Day-Dependent)
 # =====================================================================
 
+  #> MIO input control
+  setenv ncd_64bit_offset Y
+  setenv mio_file_info $OUTDIR/mio_file_input_${CTM_APPL}.txt
+  setenv CTM_MIO_INPUT "GRID_CRO_2D GRID_DOT_2D MET_CRO_2D MET_CRO_3D MET_DOT_3D MET_BDY_3D"
+
   #> Initial conditions
   if ($NEW_START == true || $NEW_START == TRUE ) then
  #    setenv ICFILE ICON_CGRID_12US1_v532_cracmm1_aq_WR413_MYR_STAGE_2019_12US1_${YESTERDAY}.nc
