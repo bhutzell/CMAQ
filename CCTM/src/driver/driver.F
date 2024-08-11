@@ -783,7 +783,7 @@ C Initialize Modules
 
       CALL SUBST_BARRIER ! ensure mio_ascii file written
 
-C Initialize MIO - placeholder
+C Initialize MIO
           call mio_init( npcol, nprow, ncols, nrows, logdev )
       END IF
 
