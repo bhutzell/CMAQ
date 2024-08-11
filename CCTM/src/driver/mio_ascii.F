@@ -55,7 +55,8 @@
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE INIT_MIO_FILE_DATA
 
-          N_MIO_IN  = 0
+          USE RUNTIME_VARS, ONLY: N_MIO_INPUTS
+          N_MIO_IN  = N_MIO_INPUTS
           N_MIO_OUT = 0
 
       END SUBROUTINE INIT_MIO_FILE_DATA
@@ -138,7 +139,7 @@ C   used in default operations of CMAQ.
 C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN 
-      USE RUNTIME_VARS, ONLY : OUTDIR, APPL_NAME
+      USE RUNTIME_VARS, ONLY : OUTDIR, APPL_NAME, MIO_INPUTS
 
       IMPLICIT NONE
 
@@ -159,14 +160,18 @@ C-----------------------------------------------------------------------
       WRITE ( IOUT, '(A3, I0, A5, I0)' ) 'in ' , N_MIO_IN, 
      &                                  ' out ', N_MIO_OUT
 
+      ! Write Input Filenames
+      Do IFILE = 1,N_MIO_IN
+         WRITE ( IOUT, '(A)' ) MIO_INPUTS( IFILE )
+      END DO
+
       ! Write Output File Metadata
       DO IFILE = 1,N_MIO_OUT
-         WRITE ( IOUT,* ) 
          WRITE ( IOUT, '(A)' ) MIO_TXT_FILE_DATA( IFILE )%FILE_LOGICAL
          WRITE ( IOUT, '(I0)' ) MIO_TXT_FILE_DATA( IFILE )%NVARS
 
          DO IVAR = 1,MIO_TXT_FILE_DATA( IFILE )%NVARS 
-           ! Find string for vairbale type
+           ! Find string for variable type
 #ifndef mpas
              IF ( MIO_TXT_FILE_DATA( IFILE )%VARTYPES( IVAR ) .EQ. M3REAL ) VT = 'real'
 #else 

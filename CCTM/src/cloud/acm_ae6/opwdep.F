@@ -218,7 +218,8 @@ C Try to open existing wet deposition file for update
               L_ROW  ( 1:NVARS3D ) = .True.
               L_VEXT ( 1:NVARS3D ) = .False.
               
-              CALL LOAD_MIO_FILE ( 'CTM_WET_DEP_1', 0, 0, 0,
+!             CALL LOAD_MIO_FILE ( 'CTM_WET_DEP_1', 0, 0, 0,
+              CALL LOAD_MIO_FILE ( 'CTM_WET_DEP1_MIO', 0, 0, 0,
      &             VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &             VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &             L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -333,7 +334,8 @@ C...initialize the file descriptors
                L_ROW  ( 1:NVARS3D ) = .True.
                L_VEXT ( 1:NVARS3D ) = .False.
 
-               CALL LOAD_MIO_FILE ( 'CTM_SWETDEP_1', 0, 0, 0,
+!              CALL LOAD_MIO_FILE ( 'CTM_SWETDEP_1', 0, 0, 0,
+               CALL LOAD_MIO_FILE ( 'CTM_SWETDEP1_MIO', 0, 0, 0,
      &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -485,7 +487,8 @@ C...try to open the output file new
                  L_ROW  ( 1:NVARS3D ) = .True.
                  L_VEXT ( 1:NVARS3D ) = .False.
                  
-                 CALL LOAD_MIO_FILE ( 'CTM_WET_DEP_2', 0, 0, 0,
+!                CALL LOAD_MIO_FILE ( 'CTM_WET_DEP_2', 0, 0, 0,
+                 CALL LOAD_MIO_FILE ( 'CTM_WET_DEP2_MIO', 0, 0, 0,
      &                VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &                VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &                L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),

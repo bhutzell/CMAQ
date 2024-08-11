@@ -81,7 +81,7 @@
 /
 
 &elmo_inst
-  Inst_Layer_Top = 1
+  Inst_Layer_Top = -1
   Inst_Layer_Bot = 1
   Inst_Vars_Nml  = 'DEFAULT'
   
@@ -90,7 +90,7 @@
 /
 
 &elmo_avrg
-  Avrg_Layer_Top = 1
+  Avrg_Layer_Top = -1
   Avrg_Layer_Bot = 1
   Avrg_Vars_Nml  = 'DEFAULT'
 

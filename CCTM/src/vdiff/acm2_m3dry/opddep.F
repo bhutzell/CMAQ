@@ -18,12 +18,6 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/vdiff/acm2/opddep.F,v 1.6 2012/01/19 14:40:52 yoj Exp $
- 
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
- 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPDDEP ( JDATE, JTIME, TSTEP, N_SPC_DDEP )
 
@@ -188,7 +182,8 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
 
-         CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_1', 0, 0, 0,
+!        CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_1', 0, 0, 0,
+         CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_MIO', 0, 0, 0,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -296,7 +291,8 @@ C...define dry deposition output descriptors for tracer species
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
 
-         CALL LOAD_MIO_FILE ( 'CTM_SDRYDEP_1', 0, 0, 0,
+!        CALL LOAD_MIO_FILE ( 'CTM_SDRYDEP_1', 0, 0, 0,
+         CALL LOAD_MIO_FILE ( 'CTM_SDRYDEP_MIO', 0, 0, 0,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),

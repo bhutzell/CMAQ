@@ -328,7 +328,8 @@ C Set output file characteristics from GRID_CONF and open
          L_ROW  ( 1:NVARS3D ) = .False.
          L_VEXT ( 1:NVARS3D ) = .True.
 
-         CALL LOAD_MIO_FILE ( 'CTM_VEXT_1', NLAYS3D, 1, NLAYS3D,
+!        CALL LOAD_MIO_FILE ( 'CTM_VEXT_1', NLAYS3D, 1, NLAYS3D,
+         CALL LOAD_MIO_FILE ( 'CTM_VEXT_MIO', NLAYS3D, 1, NLAYS3D,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),

@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /amber/home/krt/cmq471/models/CCTM/src/vdiff/acm2_inline/opddep.F,v 1.1.1.1 2010/06/14 16:03:07 sjr Exp $
- 
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
- 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE SA_OPWDDEP ( SADEPFILE, JDATE, JTIME, TSTEP )
 
@@ -133,7 +127,8 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
          
-         CALL LOAD_MIO_FILE ( SADEPFILE, 0, 0, 0,
+!        CALL LOAD_MIO_FILE ( SADEPFILE, 0, 0, 0,
+         CALL LOAD_MIO_FILE ( SADEPFILE // "_MIO", 0, 0, 0,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),

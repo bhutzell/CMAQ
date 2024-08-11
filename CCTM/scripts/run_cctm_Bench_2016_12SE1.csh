@@ -18,7 +18,6 @@ echo 'Start Model Run At ' `date`
 #> standard output
  setenv CTM_DIAG_LVL 0
  setenv CTM_MIO_FILE Y # turn on generation of MIO_ASCII file
-#setenv mio_file_info mio_file_input.txt  
 
 #> Choose compiler and set up CMAQ environment with correct 
 #> libraries using config.cmaq. Options: intel | gcc | pgi
@@ -292,6 +291,10 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 # =====================================================================
 #> Input Files (Some are Day-Dependent)
 # =====================================================================
+
+  #> MIO input control
+  setenv mio_file_info $OUTDIR/mio_file_input_${CTM_APPL}.txt
+  setenv CTM_MIO_INPUT "GRID_CRO_2D GRID_DOT_2D MET_CRO_2D MET_CRO_3D MET_DOT_3D MET_BDY_3D"
 
   #> Initial conditions
   if ($NEW_START == true || $NEW_START == TRUE ) then

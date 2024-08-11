@@ -515,7 +515,8 @@ C Set output file characteristics based on COORD.EXT and open diagnostic file
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
           
-            CALL LOAD_MIO_FILE ( 'CTM_SSEMIS_1', 0, 0, 0,
+!           CALL LOAD_MIO_FILE ( 'CTM_SSEMIS_1', 0, 0, 0,
+            CALL LOAD_MIO_FILE ( 'CTM_SSEMIS_MIO', 0, 0, 0,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
