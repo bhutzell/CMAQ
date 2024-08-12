@@ -67,7 +67,6 @@ C-----------------------------------------------------------------------
       IMPLICIT NONE
  
 C Includes:
-      INCLUDE SUBST_CONST      ! constants
       INCLUDE SUBST_FILES_ID   ! file name parameters
 
 C Arguments:

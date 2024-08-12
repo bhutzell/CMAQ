@@ -86,13 +86,12 @@ C-------------------------------------------------------------------------------
       Use LSM_MOD             ! Land surface data
       Use DEPVVARS, Only: ltotg
       Use CENTRALIZED_IO_MODULE
+      Use CONST
 #ifdef mpas
       use coupler_module
 #endif
 
       Implicit None
-
-      Include SUBST_CONST     ! constants
 
       Type :: MET_Type
 !> 2-D meteorological fields:
