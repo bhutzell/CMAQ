@@ -947,9 +947,8 @@ c----------------------------------------------------------
         ALLOCATE( ISAM_SPEC_HAPAERO%LIST( 14 ) )
         ISAM_SPEC_HAPAERO%LIST = (/'ANI     ','ACR_VI  ','ACR_III ','ABE     ',
      &                             'APB     ','ADE_OTHR','ADE_EC  ','ADE_OC  ',
-     &                             'ADE_NO3 ','ADE_SO4 ','ADE_CORS','ACD     ',
+     &                             'ADE_NO3 ','ADE_SO4 ','ADE_CORS','ACADMIUM',
      &                             'AMN_HAPS','AAS     ' /)
-
 
         !NONREACTIVE TEQ TRACERS for Polycylic Aromatic Hydrocarbons
         ALLOCATE( ISAM_SPEC_PAHTEQ%LIST( 9 ) )
