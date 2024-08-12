@@ -160,6 +160,8 @@ END ELIMINATE
 
 
 
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -274,7 +276,8 @@ REACTIONS[CM] =
 <ROCARO51> XYL + HO = 0.830*XYLP + 0.170*CSL + 0.170*HO2  
                     - 0.1700*DELTA_C # 2.33E-11;                    
 <ROCARO61> EBZ + HO = 0.820*EBZP + 0.180*CSL + 0.180*HO2  
-                    - 0.1800*DELTA_C #7.16E-12;                    
+                    - 0.1800*DELTA_C # 7.00E-12;                    
+<ROCARO61a> EBZ + NO3 = EBZP + HNO3 # 5.70E-16;
 !Isoprene AMORE mechanism
 <RAM01> ISO + O3 = 0.250*HO + 0.250*HO2 + 0.400*MO2 + 0.018*ACO3 
                  + 0.100*MACP + 0.090*H2O2 + 0.220*CO + HCHO 
