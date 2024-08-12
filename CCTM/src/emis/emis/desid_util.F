@@ -446,7 +446,6 @@
          ELSE IF ( NUMER(1:4) .EQ. 'MOLE' .OR. NUMER(1:5) .EQ. 'MOLES' .OR.
      &        NUMER(1:3) .EQ. 'MOL' ) THEN
             ! No Conversion Needed for Moles to Moles
-            CONV = 1.0 
             BASIS = 'MOLE'
          ELSE IF ( NUMER(1:5) .EQ. 'KMOLE' .OR. NUMER(1:6) .EQ. 'KMOLES' .OR.
      &             NUMER(1:4) .EQ. 'KMOL' ) THEN
@@ -467,7 +466,6 @@
      &             NUMER(1:1) .EQ. 'G'    .OR. NUMER(1:2) .EQ. 'GM'    .OR.
      &             NUMER(1:3) .EQ. 'GMS'  .OR. NUMER(1:2) .EQ. 'GS'  ) THEN
             ! No Conversion Needed for Grams to Grams
-            CONV = 1.0
             BASIS = 'MASS'
          ELSE IF ( NUMER(1:5) .EQ. 'KGRAM' .OR. NUMER(1:6) .EQ. 'KGRAMS' .OR.
      &             NUMER(1:2) .EQ. 'KG'    .OR. NUMER(1:3) .EQ. 'KGM'    .OR.
@@ -501,7 +499,6 @@
      &              'emissions, please correct the units (e.g. g/s or moles/s).'
             CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
             ! No Conversion and and Unknown Basis
-            CONV = 1.0e0
             BASIS = 'UNKNOWN'
          END IF
          
@@ -517,7 +514,6 @@
      &              'g/m2/s, or g/s/m2, etc.).'
             CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
             ! No Conversion and and Unknown Basis
-            CONV = CONV * 1.0e0
             BASIS = 'UNKNOWN' 
             RETURN
          END IF
@@ -628,7 +624,6 @@
      &             DENOM .EQ. 'METERS^2'.OR.DENOM .EQ. 'METERS^-2' .OR.
      &             DENOM .EQ. 'METERS2'.OR.DENOM .EQ. 'METERS-2' ) THEN
             ! No conversion necessary for meters^2 -> meters^2
-            CONV = CONV / 1.0
             LAREA = .TRUE. 
          ELSE IF ( DENOM .EQ. 'KM2' .OR. DENOM .EQ. 'KM-2' .OR.
      &             DENOM .EQ. 'KM^2'.OR.DENOM .EQ. 'KM^-2' .OR.
