@@ -158,7 +158,8 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       L_ROW  ( 1:NVARS3D ) = .True.
       L_VEXT ( 1:NVARS3D ) = .False.
 
-      CALL LOAD_MIO_FILE ( OUTFNAME, NLAYS3D, PA_BEGLEV, PA_ENDLEV,
+!     CALL LOAD_MIO_FILE ( OUTFNAME, NLAYS3D, PA_BEGLEV, PA_ENDLEV,
+      CALL LOAD_MIO_FILE ( OUTFNAME // "_MIO", NLAYS3D, PA_BEGLEV, PA_ENDLEV,
      &     VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &     VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &     L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),

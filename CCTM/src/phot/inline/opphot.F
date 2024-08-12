@@ -17,13 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/phot/phot_inline/opphot.F,v 1.3 2011/10/21 16:11:28 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPPHOT ( JDATE, JTIME, TSTEP )
 
@@ -357,7 +350,8 @@ C...assumes that lamba in nanometers is on order of 100 or less
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
        
-         CALL LOAD_MIO_FILE ( 'CTM_RJ_1', NLAYS3D, 1, NLAYS3D,
+!        CALL LOAD_MIO_FILE ( 'CTM_RJ_1', NLAYS3D, 1, NLAYS3D,
+         CALL LOAD_MIO_FILE ( 'CTM_RJ_1_MIO', NLAYS3D, 1, NLAYS3D,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -450,7 +444,8 @@ C...load data from photolysis reaction list
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
        
-         CALL LOAD_MIO_FILE ( 'CTM_RJ_2', NLAYS3D, 1, NLAYS3D,
+!        CALL LOAD_MIO_FILE ( 'CTM_RJ_2', NLAYS3D, 1, NLAYS3D,
+         CALL LOAD_MIO_FILE ( 'CTM_RJ_2_MIO', NLAYS3D, 1, NLAYS3D,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -598,7 +593,8 @@ C...assumes that lamba in nanometers is on order of 100 or less
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
        
-         CALL LOAD_MIO_FILE ( 'CTM_RJ_3', NLAYS3D, 1, NLAYS3D,
+!        CALL LOAD_MIO_FILE ( 'CTM_RJ_3', NLAYS3D, 1, NLAYS3D,
+         CALL LOAD_MIO_FILE ( 'CTM_RJ_3_MIO', NLAYS3D, 1, NLAYS3D,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),

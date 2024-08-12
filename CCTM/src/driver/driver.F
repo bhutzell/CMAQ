@@ -370,7 +370,6 @@ C-----------------------------------------------------------------------
          IO_PE_INCLUSIVE = .TRUE.
 
          call mpi_allreduce (ncols, ncols_gl, 1, mpi_int, mpi_sum, mpi_comm_world, status)
-
          call mio_init (NPROCS, 1, ncols_gl, nrows, logdev=logdev)
 
 C Set CGRID mechanism
@@ -782,7 +781,9 @@ C Initialize Modules
           call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
           if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
 
-C Initialize MIO - placeholder
+      CALL SUBST_BARRIER ! ensure mio_ascii file written
+
+C Initialize MIO
           call mio_init( npcol, nprow, ncols, nrows, logdev )
       END IF
 

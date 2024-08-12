@@ -133,7 +133,7 @@
       INTEGER, PARAMETER :: MAXLEN_CCTM_APPL     = 200    ! Length of Logfile Names
       CHARACTER( MAXLEN_CCTM_APPL ) :: BLDFOLD   = ''     ! Build Directory
       CHARACTER( MAXLEN_CCTM_APPL ) :: OUTDIR    = ''     ! Output Directory
-
+  
       ! General; Multiprocess control, output and error checking
       LOGICAL :: PRINT_PROC_TIME = .FALSE. ! Flag to print elapsed time for all 
                                            ! science submodules
@@ -141,6 +141,8 @@
       LOGICAL :: CKSUM     = .TRUE.        ! flag for cksum on, default = [T]
       LOGICAL :: END_TIME  = .FALSE.       ! Override default beginning ACON timestamp
       LOGICAL :: CTM_MIO_FILE = .FALSE.    ! Flag to write out ascii file that informs MIO 
+      CHARACTER( 16 ) :: MIO_INPUTS( 20 )  ! environment variable fnames
+      INTEGER :: N_MIO_INPUTS = 0
                                            !   about output file metadata
       
       INTEGER :: N_ACONC_VARS = 0    ! Number of species saved to avg conc file
@@ -433,6 +435,9 @@
 
       ! PRINT MIO INPUT FILE
       CALL GET_ENV ( CTM_MIO_FILE, 'CTM_MIO_FILE', CTM_MIO_FILE, VARDEV )  
+
+      ! MIO input variable list
+      CALL GET_ENVLIST ( 'CTM_MIO_INPUT', N_MIO_INPUTS, MIO_INPUTS, VARDEV )
 
       ! CKSUM
       CALL GET_ENV ( CKSUM, 'CTM_CKSUM', CKSUM, VARDEV )
