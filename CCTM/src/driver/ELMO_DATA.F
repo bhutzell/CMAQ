@@ -300,11 +300,6 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_UNIT( : )
       INTEGER, SAVE :: N_ELMO_USED
 
-      INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_IV( : )
-      INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_ID( : )
-      INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_IM( : )
-      INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_ISRC( : )
-
       ! Variables for Storing Values of ELMO Output      
       REAL, ALLOCATABLE, SAVE :: ELMO_INST( :,:,:,: )
       REAL, ALLOCATABLE, SAVE :: ELMO_AVRG( :,:,:,: )
@@ -326,24 +321,6 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       
       
       INTEGER, SAVE           :: C1, R1, L1
-
-      ! Arrays for Mapping Output variables to ELMO Table IDs
-      TYPE ELMO_MAP_1D
-          INTEGER, ALLOCATABLE       :: IND( : )
-      END TYPE ELMO_MAP_1D
-      TYPE ELMO_MAP_2D
-          INTEGER, ALLOCATABLE       :: IND( :,: )
-      END TYPE ELMO_MAP_2D
-
-      TYPE( ELMO_MAP_1D ), ALLOCATABLE, SAVE :: 
-     &      MAP_ELMO_IDtoTABLE_MODE(:), MAP_ELMO_IDtoTABLE_SOURCE(:)
-      TYPE( ELMO_MAP_2D ), ALLOCATABLE, SAVE :: 
-     &      MAP_ELMO_IDtoTABLE_MODE_SOURCE(:)
-
-      INTEGER, ALLOCATABLE, SAVE :: N_ELMOTABLE_MODE(:,:),
-     &                              N_ELMOTABLE_SOURCE(:,:)
-     &                              
-      INTEGER, ALLOCATABLE, SAVE :: MAP_ELMOTABLE(:,:)
 
       ! Variables for Aerosol Chemistry
       REAL, SAVE, ALLOCATABLE :: GAMMA_N2O5IJ( :,:,:  ) ! Fine modes N2O5 rx effic.
@@ -853,82 +830,5 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       RETURN
 
       END FUNCTION ELMO_UNIT_CONV
-
-!----------------------------------------------------------------------------      
-      INTEGER FUNCTION FIND_ELMO_TABLE( IDG, IM, IV, ISRC )
-!----------------------------------------------------------------------------      
-!     Look up the index in the ELMO Table given the calculation ID,
-!     variable type, mode number, and source number.
-!----------------------------------------------------------------------------      
-
-      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
-
-      IMPLICIT NONE
-
-      INTEGER :: IDG, IM, IV, ISRC
-      INTEGER :: I, J, NM, NS
-
-      CHARACTER( 200 ) :: XMSG
-
-      IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
-             WRITE( XMSG, '(A,A,I4,A,I2,A,A)' )
-     &          'ELMO is searching for a variable on the ELMO Table with ', 
-     &          'calculation ID ', IDG, ' and variable type ', IV, '. ',
-     &          'Neither of these indices are allowed to be zero.'
-         CALL LOG_MESSAGE( LOGDEV, XMSG )
-         CALL M3EXIT( 'FIND_ELMO_TABLE', 0, 0, '', XSTAT1 )
-      END IF
-
-      NM = N_ELMOTABLE_MODE( IV,IDG )
-      NS = N_ELMOTABLE_SOURCE( IV,IDG )
-
-      ! Check if this combination of IDG and IV have multiple modes
-      ! and/or sources. If so, look up Table ID on alternate maps.
-      IF ( NM .GT. 0 .AND. NS .GT. 0 ) THEN
-          ! Look up Table ID on multiple mode and source map
-          IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
-             WRITE( XMSG, '(A,A,I2,A,I2,A,A)' )
-     &              'ELMO is searching for a variable on the ELMO Table with ',
-     &              'mode number ', IM, ' and source number ', ISRC, '. ',
-     &              'Neither of these indices are allowed to be zero.'
-             CALL LOG_MESSAGE( LOGDEV, XMSG )
-             CALL M3EXIT( 'FIND_ELMO_TABLE', 0, 0, '', XSTAT1 )
-          END IF
-          I = MAP_ELMOTABLE( IV,IDG )
-          J = MAP_ELMO_IDtoTABLE_MODE_SOURCE( I )%IND( IM,ISRC )
-
-      ELSE IF ( NM .GT. 0 ) THEN
-          ! Look up Table ID on multiple mode map
-          IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
-             WRITE( XMSG, '(A,A,I2,A)' )
-     &              'ELMO is searching for a variable on the ELMO Table with ',
-     &              'mode number ', IM, '. This index is not allowed to be zero.'
-             CALL LOG_MESSAGE( LOGDEV, XMSG )
-             CALL M3EXIT( 'FIND_ELMO_TABLE', 0, 0, '', XSTAT1 )
-          END IF
-          I = MAP_ELMOTABLE( IV,IDG )
-          J = MAP_ELMO_IDtoTABLE_MODE( I )%IND( IM )
-
-      ELSE IF ( NS .GT. 0 ) THEN
-          ! Look up Table ID on multiple source map
-          IF ( IDG.EQ.0 .OR. IV.EQ.0 ) THEN
-             WRITE( XMSG, '(A,A,I2,A)' )
-     &              'ELMO is searching for a variable on the ELMO Table with ',
-     &              'source number ', ISRC, ' This index is not allowed to be zero.'
-             CALL LOG_MESSAGE( LOGDEV, XMSG )
-             CALL M3EXIT( 'FIND_ELMO_TABLE', 0, 0, '', XSTAT1 )
-          END IF
-          I = MAP_ELMOTABLE( IV,IDG )
-          J = MAP_ELMO_IDtoTABLE_SOURCE( I )%IND( ISRC )
-
-      ELSE
-          ! Look up Table ID on default map
-          J = MAP_ELMOTABLE( IV,IDG )
-
-      END IF
-
-      FIND_ELMO_TABLE = J
-      
-      END FUNCTION FIND_ELMO_TABLE
 
       END MODULE ELMO_DATA

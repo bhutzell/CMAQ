@@ -34,6 +34,7 @@
       USE UTILIO_DEFN
       USE ELMO_DATA
       USE GRID_CONF, ONLY: NCOLS, NROWS, NLAYS, IO_PE_INCLUSIVE
+      USE RUNTIME_VARS
 
       IMPLICIT NONE
 
@@ -58,7 +59,6 @@
      &                        CFRAC, DZ, PV, ZH
       USE CGRID_SPCS, ONLY : N_CGRID_SPC, N_SPC_WDEP, N_SPC_DEPV, NSPCSD
       use centralized_io_module, only : interpolate_var, pv_avail
-      use RUNTIME_VARS
       Use phot_mod, Only: init_phot_shared
 
 #ifdef isam
@@ -292,11 +292,14 @@
       IMPLICIT NONE
 
       INTEGER, INTENT( IN ) :: C, R, L
-      INTEGER IDG, IM, AL, IL, IUSED, IAVRG, IINST, ILOC, J, IV
+      INTEGER IDG, IM, AL, IL, IUSED, IAVRG, IINST, ILOC, J, IV, IERR
 
       LOGICAL, INTENT( IN ) :: WRITE_STEP
       LOGICAL, INTENT( IN ) :: INIT_STEP
       LOGICAL, INTENT( IN ) :: INIT_TIME
+
+      CHARACTER(250) :: XMSG
+      INTEGER        :: XSTAT1
 
       ! Initalize Local Parameters
       C1                = C
@@ -321,8 +324,17 @@
         ! can be used seamlessly with the CALC_ELMO internal order.
         DO ILOC = 1,N_ELMO_USED
            J = MAP_USEDtoTABLE( ILOC ) 
-           CALL CALC_ELMO( OUTVAL=ELMO_USED( ILOC ), J_=J,
-     &                     OUT_UNIT=ELMO_TABLE( J )%IUNIT )
+           CALL CALC_ELMO( OUTVAL=ELMO_USED( ILOC ), J=J,
+     &                     OUT_UNIT=ELMO_TABLE( J )%IUNIT,IERR=IERR )
+           IF ( IERR .EQ. 1 ) THEN
+              ! Invalid Variable Type
+              WRITE ( XMSG, '(A,I3,A)'),'A user-requested variable for ',
+     &                'ELMO cannot be found. Please check that it is ',
+     &                'defined correctly. It is number ',J,' on the used ',
+     &                'variable list.'
+              CALL LOG_MESSAGE( LOGDEV, XMSG )
+              CALL M3EXIT( 'LOAD_ELMO', 0, 0, '', XSTAT1 ) 
+           END IF
         END DO
 
         ! *** Aggregate Diagnostic Variables in Average Array
@@ -331,10 +343,13 @@
      &       L.GE.AVRG_LAYER_BOT .AND. L.LE.AVRG_LAYER_TOP ) THEN
            AL = L - AVRG_LAYER_BOT + 1
            DO  IAVRG = 1,N_ELMO_AVRG
-              IV = ELMO_TABLE( MAP_AVRGtoTABLE( IAVRG ) )%VAR_TYPE
+              IV  = ELMO_TABLE( MAP_AVRGtoTABLE( IAVRG ) )%VAR_TYPE
+              IDG = ELMO_TABLE( MAP_AVRGtoTABLE( IAVRG ) )%ID
 
-              IF ( ELMO_USED_ID( MAP_AVRGtoUSED( IAVRG )) .EQ. ID_PMF_PH
-     &             .AND. ELMO_USED( MAP_AVRGtoUSED( IAVRG ) ) .LT. -100. ) THEN
+              IF ( (IV .EQ. ET_DRVD .OR. IV .EQ. ET_ISAM_DRVD 
+     &                              .OR. IV .EQ. ET_DDM_DRVD ) .AND.
+     &             IDG .EQ. ID_PMF_PH .AND.
+     &             ELMO_USED( MAP_AVRGtoUSED( IAVRG ) ) .LT. -100. ) THEN
                  ! Special Averaging for Particle pH
                  ! Add whatever the current average is right now.
                  ! Certainly this is problematic, particularly
@@ -395,8 +410,7 @@
       END SUBROUTINE LOAD_ELMO
  
 !-------------------------------------------------------------------------
-      RECURSIVE SUBROUTINE CALC_ELMO( OUTVAL, OUT_UNIT, J_, IDG_, IM_,
-     &                                IV_, ISRC_ )
+      RECURSIVE SUBROUTINE CALC_ELMO( OUTVAL, OUT_UNIT, J, IERR )
 !     This subroutine sums aggregate PM diagnostic parameters using the
 !         ELMO_COEFFS structure as a guide for summing aerosol
 !         components.          
@@ -407,14 +421,14 @@
      &                      AEROMODE, AEROSPC_MAP
       USE PRECURSOR_DATA, ONLY : PRECURSOR_CONC
       USE AEROMET_DATA, ONLY : AIRDENS
-      USE RUNTIME_VARS
 #ifdef isam
       USE SA_DEFN, ONLY : MAP_AEROtoSA, NTAG_SA
 #endif
 
       IMPLICIT NONE
 
-      INTEGER, OPTIONAL :: J_, IDG_, IM_, IV_, ISRC_ ! Table Index
+      INTEGER, INTENT( IN ) :: J        ! Table Index
+      INTEGER               :: IERR     ! Error Code
       REAL, INTENT( INOUT ) :: OUTVAL   ! Output Value
       INTEGER, INTENT( IN ) :: OUT_UNIT ! The desired output unit
       INTEGER ID, VAR_TYPE
@@ -424,27 +438,16 @@
       INTEGER ISA, DSA
       LOGICAL LMODE
       REAL    FRAC( N_MODE ), FRAC1, FAC
-      INTEGER :: J, IDG, IM, IV, ISRC ! Table Index
+      INTEGER :: IDG, IM, IV, ISRC ! ELMO Table Entry Properties
 
       CHARACTER( 500 ) :: XMSG
   
-      ! If the Table Index (J) is not provided, then look it up using
-      ! other identifiers like the variable ID, variable type, source
-      ! number, and/or mode number
-      IF ( PRESENT( J_ ) ) THEN
-        J = J_
-      ELSE
-        ! Set Defaults for Missing Input Parameters
-        IDG = 0
-        IF ( PRESENT(IDG_) )  IDG = IDG_
-        IM = 0
-        IF ( PRESENT(IM_) )   IM = IM_
-        IV = 0             
-        IF ( PRESENT(IV_) )   IV = IV_
-        ISRC = 0
-        IF ( PRESENT(ISRC_) ) ISRC = ISRC_
-
-        J = FIND_ELMO_TABLE( IDG, IM, IV, ISRC )
+      ! Stop CALC_ELMO and return an error code if the Table Index
+      ! is equal to or less than zero.
+      IERR = 0
+      IF ( J .LE. 0 ) THEN
+         IERR = 1
+         RETURN
       END IF
 
       ! Determine if this variable has been mapped already. If it
@@ -503,7 +506,17 @@
 
               IF ( IMODE .EQ. 0 .OR. LMODE ) THEN
 
-                CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, J_=IX1 )
+                CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=OUT_UNIT, J=IX1, IERR=IERR )
+                IF ( IERR .EQ. 1 ) THEN
+                   ! Invalid Variable Type
+                   WRITE ( XMSG, '(2A,I3,4A)'),'There was an error processing ', 
+     &                     'component number ',IX1,' of the composite ',
+     &                     TRIM(ELMO_TABLE( J )%NAME),'. Please check ',
+     &                     'its definition.'
+                   CALL LOG_MESSAGE( LOGDEV, XMSG )
+                   CALL M3EXIT( 'CALC_ELMO', 0, 0, '', XSTAT1 ) 
+                END IF 
+
                 OUTVAL = OUTVAL + VAL2 * 
      &                   ELMO_COMP( J )%COEFF(IVAR) * FRAC1
 
