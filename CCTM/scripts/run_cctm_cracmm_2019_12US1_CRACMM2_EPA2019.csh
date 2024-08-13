@@ -419,7 +419,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv GR_EMIS_005 ${EMISpath}/${sector}/${EMISfile}
   setenv GR_EMIS_LAB_005 G_${sector}
   setenv GR_EM_SYM_DATE_005 T # To change default behaviour please see Users Guide for EMIS_SYM_DATE
-   ${aveday_N}
 
   set sector = np_other
   set EMISfile  = emis_mole_${sector}_${YYYYMMDD}_12US1_cmaq_cracmmv1_WR624_EQ2019_CRACMM.ncf
