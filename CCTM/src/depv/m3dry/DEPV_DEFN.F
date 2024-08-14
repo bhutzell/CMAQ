@@ -135,11 +135,11 @@ C-----------------------------------------------------------------------
 !         USE MOSAIC_MOD, Only: Init_Mosaic
          USE LSM_MOD, Only: Init_LSM !, n_lufrac
          USE BIDI_MOD, Only: Init_Bidi, HgBidi
+         USE CONST
 
          IMPLICIT NONE
 
 C Includes:
-         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments:
@@ -458,6 +458,7 @@ C-----------------------------------------------------------------------
          USE CGRID_SPCS          ! CGRID mechanism species
          USE DEPVVARS
          USE UTILIO_DEFN
+         USE CONST
          USE ASX_DATA_MOD, Only: GRID_DATA !, MOSAIC_DATA
 #ifdef mpas
          Use util_module, only : time2sec, nextime, currstep
@@ -476,7 +477,6 @@ C Arguments:
 
          REAL, POINTER         :: CGRID( :,:,:,: ) ! concentrations
 
-         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Parameters:

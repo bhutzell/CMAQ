@@ -159,10 +159,9 @@ C-----------------------------------------------------------------------
       USE AERO_DATA
       USE HG_AQCHEM_DATA
       USE UTILIO_DEFN
+      USE CONST
 
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST          ! constants
 
       CHARACTER( 120 ) :: XMSG = ' '  ! Exit status message
 
