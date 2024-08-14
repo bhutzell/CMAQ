@@ -472,6 +472,9 @@
       CHARACTER( 1000 ) :: XMSG
       CHARACTER( 30 ),PARAMETER :: PNAME = 'ELMO_SET_COMPONENTS'
 
+      ! Initialize Index for this COMPOSITE Component
+      ELMO_COMP( J )%TABID( IVAR ) = 0
+
       ! Details in the processing of the components of variable J rely
       ! on knowing what type of variable it is
       VAR_TYPE = ELMO_TABLE( J )%VAR_TYPE
@@ -488,7 +491,7 @@
       IF ( VAR_TYPE .EQ. ET_ISAM_CMPST .OR. 
      &     VAR_TYPE .EQ. ET_ISAM_CMPST_DEP ) THEN
 #ifdef isam      
-         CSPEC = CSPEC // '_ISAM'
+         CSPEC = TRIM(CSPEC) // '_ISAM'
          ISRC = ELMO_TABLE( J )%SOURCE
          DO K = 1,N_ELMO_TABLE
            IF ( ELMO_TABLE( K )%NAME .EQ. CSPEC .AND.
@@ -510,7 +513,7 @@
       ELSE IF  ( VAR_TYPE .EQ. ET_DDM_CMPST .OR. 
      &           VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
 #ifdef sens
-         CSPEC = CSPEC // '_DDM'
+         CSPEC = TRIM(CSPEC) // '_DDM'
          ISRC = ELMO_TABLE( J )%SOURCE
          DO K = 1,N_ELMO_TABLE
            IF ( ELMO_TABLE( K )%NAME .EQ. CSPEC .AND.

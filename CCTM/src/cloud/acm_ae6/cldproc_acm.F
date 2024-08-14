@@ -67,15 +67,16 @@ C-----------------------------------------------------------------------
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_WDEP
 
 #ifdef isam
-      USE SA_DEFN, ONLY: ISAM, NSPC_SA, N_SPCTAG, TOT_SADEP, CONV_SADEP,
-     &                   MAP_SAtoCGR, VNAM_SPCTAG, NTAG_SA, S_SPCTAG, 
-     &                   ITAG, T_SPCTAG, ISAM_SPEC
+      USE SA_DEFN, ONLY: ISAM, NSPC_SA, N_SPCTAG, TOT_SADEP, TOT_SADEP0, 
+     &                   CONV_SADEP, MAP_SAtoCGR, VNAM_SPCTAG, NTAG_SA, 
+     &                   S_SPCTAG, ITAG, T_SPCTAG, ISAM_SPEC
       USE ELMO_DATA, ONLY : ELMO_ISAM_WDEP
 #endif
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY: NP, NPMAX, SENGRID, SENNUM, 
-     &                      S_TOTDEP, S_CONDEP, S_DEPWRT, SEN_PAR
+     &                      S_TOTDEP, S_TOTDEP0, S_CONDEP, S_DEPWRT, 
+     &                      SEN_PAR
       USE ELMO_DATA, ONLY : ELMO_DDM_WDEP
 #endif
 
@@ -143,6 +144,7 @@ C...........Local Variables
       REAL, ALLOCATABLE, SAVE :: FAC     ( :,:,: ) ! conversion factor
       REAL, ALLOCATABLE, SAVE :: CONV_DEP( :,:,: ) ! convective wdep only
       REAL, ALLOCATABLE, SAVE :: TOT_DEP ( :,:,: ) ! total wdep
+      REAL, ALLOCATABLE, SAVE :: TOT_DEP0( :,:,: ) ! total wdep
       REAL, ALLOCATABLE, SAVE :: RESTRANS( :,: )   ! resolved cloud transmissivity
       REAL, ALLOCATABLE, SAVE :: SUBTRANS( :,:,: ) ! subgrid cloud transmissivity
 
@@ -216,6 +218,7 @@ C...and return
 C...initialize the deposition array before processing clouds
 
         ALLOCATE ( TOT_DEP ( NCOLS,NROWS,N_SPC_WDEP+1 ),
+     &             TOT_DEP0( NCOLS,NROWS,N_SPC_WDEP+1 ),
      &             STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
           XMSG = 'Failure allocating TOT_DEP'
@@ -267,6 +270,7 @@ C...initialize the deposition array before processing clouds
 Ckrt deposition arrays for tagged species.....
         ALLOCATE ( TOT_SADEP ( NCOLS,NROWS,NSPC_SA,NTAG_SA ),
      &            CONV_SADEP ( NCOLS,NROWS,NSPC_SA,NTAG_SA ),
+     &             TOT_SADEP0( NCOLS,NROWS,NSPC_SA,NTAG_SA ),
      &            ISAM_WDEP  ( N_SPCTAG ),
      &             STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -295,7 +299,8 @@ Ckrt deposition arrays for tagged species.....
 
 #ifdef sens
          ALLOCATE ( S_TOTDEP ( NCOLS,NROWS,NPMAX,N_SPC_WDEP+1 ),
-     &             STAT = ALLOCSTAT )
+     &              S_TOTDEP0( NCOLS,NROWS,NPMAX,N_SPC_WDEP+1 ),
+     &              STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating S_TOTDEP'
            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -419,6 +424,7 @@ Ckrt deposition arrays for tagged species.....
       call interpolate_var ('DENS', mdate, mtime, DENS)  ! kg m-3
       CGRD = CGRID
 
+
 C...convert units on cgrid and pass data to local cgrd array
       DO LAY = 1, NLAYS
         DO I = 1, N_CGRID_SPC
@@ -524,6 +530,17 @@ c                 ENDIF
       END DO
 #endif
 
+      ! Store Deposition Accumulation so it can be subtracted out to
+      ! inform ELMO
+      TOT_DEP0 = TOT_DEP
+#ifdef isam
+      TOT_SADEP0 = TOT_SADEP
+#endif
+#ifdef sens
+      S_TOTDEP0 = S_TOTDEP
+#endif
+
+
 C...compute cloud effects for the resolved clouds and resolved rainwater
 
       CALL RESCLD ( CGRD, JDATE, JTIME, TSTEP,
@@ -621,7 +638,8 @@ C...write data to the normal wet deposition file
 
         IF ( L_ELMO ) THEN
             DO VAR = 1,N_SPC_WDEP + 1
-                ELMO_WDEP( :,:,VAR ) = TOT_DEP( :,:,VAR )
+                ELMO_WDEP( :,:,VAR ) = TOT_DEP( :,:,VAR ) 
+     &                               - TOT_DEP0(:,:,VAR )
             END DO
         END IF
 
@@ -635,6 +653,7 @@ c gas species
 
             IF ( L_ELMO ) THEN
                ELMO_DDM_WDEP(:,:,SPC,NP) = S_TOTDEP(:,:,NP,SPC)
+     &                                   - S_TOTDEP0(:,:,NP,SPC)
             END IF
           END DO
         END DO
@@ -707,6 +726,7 @@ C...reinitialize deposition array
           IF ( L_ELMO .AND. ISAM_WDEP(SPC) .GT. 0 ) THEN
               ELMO_ISAM_WDEP( :,:,ISAM_WDEP(SPC),T_SPCTAG(SPC) ) = 
      &             TOT_SADEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
+     &           - TOT_SADEP0(:,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
           END IF
 
        END DO ! n_spctag

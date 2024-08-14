@@ -73,6 +73,7 @@ c...Define Allocatable Apportionment Arrays
       REAL, POINTER :: ISAM  ( :,:,:,:,: )
       REAL, ALLOCATABLE :: AISAM ( :,:,:,:,: )
       REAL, ALLOCATABLE :: TOT_SADEP ( :,:,:,: )
+      REAL, ALLOCATABLE :: TOT_SADEP0( :,:,:,: )
       REAL, ALLOCATABLE :: CONV_SADEP ( :,:,:,: )
       REAL, ALLOCATABLE :: SA_VDEMIS_CONV( :,:,:,:,: ) ! full emissions array mapped to diffused species
       REAL, ALLOCATABLE :: SA_VDEMIS_CONV_OTHER( :,:,:,: ) ! emissions left for 'OTHRTAG'

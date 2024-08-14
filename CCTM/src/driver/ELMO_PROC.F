@@ -133,7 +133,7 @@
 
 #ifdef isam
          ALLOCATE( ISAM_VEC( NSPC_SA,NTAG_SA ),
-     &             ISAM_WDEP_VEC( N_SPC_WDEP+1,NTAG_SA), 
+     &             ISAM_WDEP_VEC( N_SPC_WDEP,NTAG_SA), 
      &             ISAM_DDEP_VEC( N_SPC_DEPV,NTAG_SA ),
      &             STAT=IOS )
          CALL CHECKMEM( IOS, 'ISAM_ELMO_VECTORS',PNAME )
@@ -363,16 +363,16 @@
                     ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
      &                                  + 2.0 * ELMO_AVRG( C,R,AL,IAVRG )
                  END IF
-              ELSE IF ( IV .EQ. ET_WDEP .OR. 
-     &                  IV .EQ. ET_ISAM_WDEP .OR. 
-     &                  IV .EQ. ET_DDM_WDEP  ) THEN
-                 ! This is a deposition species so we should be
-                 ! computing a cumulative sum, not an average by default
-		         ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )  
 
               ELSE IF ( IV .EQ. ET_DDEP .OR.
      &                  IV .EQ. ET_ISAM_DDEP .OR.
-     &                  IV .EQ. ET_DDM_DDEP ) THEN
+     &                  IV .EQ. ET_DDM_DDEP .OR.
+     &                  IV .EQ. ET_WDEP .OR. 
+     &                  IV .EQ. ET_ISAM_WDEP .OR. 
+     &                  IV .EQ. ET_DDM_WDEP .OR.
+     &                  IV .EQ. ET_CMPST_DEP .OR.
+     &                  IV .EQ. ET_ISAM_CMPST_DEP .OR.
+     &                  IV .EQ. ET_DDM_CMPST_DEP ) THEN
                  ! This is a deposition species so we should be
                  ! computing a cumulative sum, not an average by default
                  IF ( INIT_STEP ) THEN

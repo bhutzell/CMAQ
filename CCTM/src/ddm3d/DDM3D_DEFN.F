@@ -102,6 +102,7 @@ c     Logical, Save           :: ES   ! Flag for pre-merged emissions
 c Cloud module variables
       REAL( 8 ), ALLOCATABLE, SAVE       :: S_CONDEP( :,:,:,: )  ! sens of conv wdep
       REAL( 8 ), ALLOCATABLE, SAVE       :: S_TOTDEP( :,:,:,: )  ! sens of tot dep
+      REAL( 8 ), ALLOCATABLE, SAVE       :: S_TOTDEP0( :,:,:,: )  ! sens of tot dep
       REAL( 4 ), ALLOCATABLE, SAVE       :: S_DEPWRT( :,:,: )    ! wdep write array
 
       REAL( 8 ), ALLOCATABLE, SAVE       :: S_POLC ( :,: )       ! sens of incloud conc (mol/mol) 

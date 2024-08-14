@@ -542,7 +542,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       INTEGER N_END, N_NML
       LOGICAL EXPAND_NML
-      INTEGER I1, I2, I3, IT, IFAM
+      INTEGER I1, I2, I3, IT, IVAR, J
       
       
       CHARACTER( 250 ) :: XMSG
@@ -653,14 +653,15 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             N_END = N_END + ELMO_KEY( I1 )%N
 
          ELSE IF ( I2 .GT. 0 ) THEN
-            ! First check for chemical families
+            ! First check for COMPOSITES
             IF ( ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_CMPST ) THEN
               IF ( EXPAND_NML ) THEN
-                 ! Expand the chemical family if the * was used
-                 IFAM = INDEX1( VARS_NML(1), N_Chem_Fams, ChemFamilyName )
-                 VARS_NML( N_END+1:N_END+ChemFamilyNum( IFAM ) ) =
-     &                                   ChemFamilyMembers( IFAM,: )
-                 N_END = N_END + ChemFamilyNum( IFAM )
+                 ! Expand the COMPOSITE if the * was used
+                 DO IVAR = 1,ELMO_COMP( I2 )%N_VARS
+                   J = ELMO_COMP( I2 )%TABID( IVAR )
+                   VARS_NML( N_END+IVAR ) = ELMO_TABLE( J )%NAME 
+                 END DO
+                 N_END = N_END + ELMO_COMP( I2 )%N_VARS
               ELSE
                  ! Activate this family if no * was used
                  L_ELMO_TABLE( I2 ) = .TRUE.

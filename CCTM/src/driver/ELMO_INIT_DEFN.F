@@ -30,6 +30,7 @@
       ! vectors.
 !-------------------------------------------------------------------------
    
+      USE ELMO_DERIVED, ONLY : ELMO_MAP_DERIVED
       USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
       USE GRID_CONF, ONLY : NCOLS, NROWS
       USE ELMO_COMPOSITES, ONLY : ELMO_MAP_COMPOSITES, ELMO_READ_COMPOSITES
@@ -44,10 +45,10 @@
       IMPLICIT NONE
 
       INTEGER N, M, P, J, IM, ILIST, S, F
-      INTEGER ID, IV, ISRC, IT, IS, NM, NS
+      INTEGER ID, IV, ISRC, IT, IS, NM, NS, IVAR
       INTEGER N1, N2, N3, MX_SRC
       CHARACTER( 16 ), SAVE :: PNAME = 'ELMO_INIT'
-      CHARACTER( 300 ) :: XMSG
+      CHARACTER( 500 ) :: XMSG
       INTEGER ALLOCSTAT, IOS, IERROR
       INTEGER :: N_MAP_MODE_SOURCE, N_MAP_MODE, N_MAP_SOURCE
 
@@ -66,6 +67,10 @@
       ! Initialize ELMO Table for all possible output variables
       CALL LOG_MESSAGE( LOGDEV, 'Building ELMO Table' )
       CALL BUILD_ELMO_TABLE()
+
+      ! Map Special Indices for ELMO Derived Variable components
+      CALL LOG_MESSAGE( LOGDEV, 'Mapping ELMO Derived Variable Components' )
+      CALL ELMO_MAP_DERIVED()
 
       ! Map All Table Variables to their components, if applicable
       CALL LOG_MESSAGE( LOGDEV, 'Mapping ELMO Composites' )
@@ -147,6 +152,28 @@
                 MAP_AVRGtoTABLE( N ) = J
                 MAP_TABLEtoAVRG( J ) = N
                 ELMO_AVRG_PARS( N ) = ELMO_TABLE( J )
+
+                ! Check that all components are defined
+                IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_CMPST .OR.
+     &               ELMO_TABLE( J )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
+     &               ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
+     &               ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
+     &               ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
+     &               ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
+                   DO IVAR = 1,ELMO_COMP( J )%N_VARS
+                      IF ( ELMO_COMP( J )%TABID( IVAR ) .EQ. 0 ) THEN
+                         WRITE( XMSG, '(3A,I2,6A)' ),'The ELMO COMPOSITE variable ',
+     &                        TRIM( ELMO_TABLE( J )%NAME ),' has a component (#',
+     &                        IVAR,') that is not available on the comprehensive ', 
+     &                        'ELMO Table. If this is a source-resolved ISAM COMPOSITE, ',
+     &                        'then it is recommended to check that the components ',
+     &                        'of this COMPOSITE are activated in the ISAM control ', 
+     &                        'file. If this is not an ISAM simulation, check to ', 
+     &                        'make sure all components are defined.'
+                         CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
+                      END IF
+                   END DO
+                END IF
             END IF
         END DO
 
@@ -781,6 +808,7 @@
         END DO 
 
         N = N + 1
+        ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
         ELMO_TABLE( N )%OUT_NAME = 'WD_' // TRIM( WDEP_SPC( IWDEP ) ) // '_TAGS'
         ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
         ELMO_TABLE( N )%DESC = 'Tagged Wet Deposition Flux of '//
@@ -827,6 +855,7 @@
         END DO
 
         N = N + 1
+        ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
         ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))//'_TAGS'
         ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
         ELMO_TABLE( N )%DESC = 'Tagged Dry Deposition Flux of '//
