@@ -125,7 +125,7 @@ C...modules
       USE CLOUD_OPTICS         ! data and routines for optics of cloud hydrometeors
       USE SEAS_STRAT_O3_MIN    ! monthly minimum fraction of ozone column density above Pressure TOP
       USE CENTRALIZED_IO_MODULE, ONLY : LAT, LON, HT
-      USE ELMO_DATA, ONLY : ELMO_AOD_550, ELMO_EXT_550
+      USE ELMO_DATA, ONLY : ELMO_AOD_550, ELMO_EXT_550, ELMO_NO2COL,ELMO_SO2COL, ELMO_HCHOCOL, ELMO_COCOL
 
 #ifdef mpas
       use mio_module

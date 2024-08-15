@@ -1075,8 +1075,8 @@ C-------------------------------- Calculated Variables -------------------------
             Met_Data%KZMIN = KZ0UT
          END IF
 
-         ELMO_KZ(:,:,:) = Met_Data%KZ(:,:,:)
-         ELMO_KZMIN(:,:,:) = Met_Data%KZMIN(:,:,:)
+         ELMO_KZ(:,:,:) = Met_Data%KZ(:,:,:)         ! store for elmo
+         ELMO_KZMIN(:,:,:) = Met_Data%KZMIN(:,:,:)   ! store for elmo
 
 
          BUFF3D = Met_Data%TA * ( 1.0 + 0.608 * Met_Data%QV )

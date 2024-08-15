@@ -536,30 +536,6 @@
          ELMO_TABLE( N )%IUNIT = IUNIT
          ELMO_TABLE( N )%DESC = CMPST( ICMPST )%DESC
          ELMO_TABLE( N )%MW   = 0.0
-
-         ! Assign Special Composite IDs that are dependencies for ELMO
-         ! Derived variables
-         IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_SO4' ) THEN
-             ID_PMF_SO4 = ICMPST
-         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_NO3' ) THEN
-             ID_PMF_NO3 = ICMPST
-         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_NH4' ) THEN
-             ID_PMF_NH4 = ICMPST
-         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PM25_SO4' ) THEN
-             ID_PM25_SO4 = ICMPST
-         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PM25_NO3' ) THEN
-             ID_PM25_NO3 = ICMPST
-         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PM25_NH4' ) THEN
-             ID_PM25_NH4 = ICMPST
-         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_HP' ) THEN
-             ID_PMF_HP = ICMPST
-         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_H2O' ) THEN
-             ID_PMF_H2O = ICMPST
-         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'PMF_BENAPY' ) THEN
-             ID_PMF_BENAPY = ICMPST
-         ELSE IF ( CMPST( ICMPST )%NAME .EQ. 'GAS_BENAPY' ) THEN
-             ID_GAS_BENAPY = ICMPST
-         END IF
       END DO
  
 #ifdef isam

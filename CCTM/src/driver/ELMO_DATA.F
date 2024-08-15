@@ -129,38 +129,31 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_BENAPY_FAERO= 58
       INTEGER, PARAMETER :: ID_PM25_FRM =    59                   
       INTEGER, PARAMETER :: ID_PMF_FRM =     60                   
-      INTEGER, PARAMETER :: ID_AOD550 =      61                   
-      INTEGER, PARAMETER :: ID_PMEXT550 =    62
-      INTEGER, PARAMETER :: ID_RH =          63
-      INTEGER, PARAMETER :: ID_TEMP =        64
-      INTEGER, PARAMETER :: ID_SRFTEMP =     65
-      INTEGER, PARAMETER :: ID_PRES =        66
-      INTEGER, PARAMETER :: ID_GN2O5F =      67
-      INTEGER, PARAMETER :: ID_GN2O5C =      68
-      INTEGER, PARAMETER :: ID_YCLNO2F =     69
-      INTEGER, PARAMETER :: ID_YCLNO2C =     70
-      INTEGER, PARAMETER :: ID_GIEPOX =      71
-      INTEGER, PARAMETER :: ID_KIEPOX =      72
-      INTEGER, PARAMETER :: ID_GIMAE =       73
-      INTEGER, PARAMETER :: ID_DZ    =       74
-      INTEGER, PARAMETER :: ID_ZH    =       75
-      INTEGER, PARAMETER :: ID_CFRAC =       76
-      INTEGER, PARAMETER :: ID_PV    =       77
-      INTEGER, PARAMETER :: ID_DENS  =       78
-      INTEGER, PARAMETER :: ID_RHOJ  =       79
-      
-      ! Define Key IDs for special composites that are dependencies for
-      ! existing derived variables.
-      INTEGER, SAVE :: ID_PMF_SO4 = 0
-      INTEGER, SAVE :: ID_PMF_NO3 = 0
-      INTEGER, SAVE :: ID_PMF_NH4 = 0
-      INTEGER, SAVE :: ID_PM25_SO4 = 0
-      INTEGER, SAVE :: ID_PM25_NO3 = 0
-      INTEGER, SAVE :: ID_PM25_NH4 = 0
-      INTEGER, SAVE :: ID_PMF_HP = 0
-      INTEGER, SAVE :: ID_PMF_H2O = 0
-      INTEGER, SAVE :: ID_PMF_BENAPY = 0
-      INTEGER, SAVE :: ID_GAS_BENAPY = 0
+      INTEGER, PARAMETER :: ID_RH =          61
+      INTEGER, PARAMETER :: ID_TEMP =        62
+      INTEGER, PARAMETER :: ID_SRFTEMP =     63
+      INTEGER, PARAMETER :: ID_PRES =        64
+      INTEGER, PARAMETER :: ID_GN2O5F =      65
+      INTEGER, PARAMETER :: ID_GN2O5C =      66
+      INTEGER, PARAMETER :: ID_YCLNO2F =     67
+      INTEGER, PARAMETER :: ID_YCLNO2C =     78
+      INTEGER, PARAMETER :: ID_GIEPOX =      79
+      INTEGER, PARAMETER :: ID_KIEPOX =      70
+      INTEGER, PARAMETER :: ID_GIMAE =       71
+      INTEGER, PARAMETER :: ID_DZ    =       72
+      INTEGER, PARAMETER :: ID_ZH    =       73
+      INTEGER, PARAMETER :: ID_CFRAC =       74
+      INTEGER, PARAMETER :: ID_PV    =       75
+      INTEGER, PARAMETER :: ID_DENS  =       76
+      INTEGER, PARAMETER :: ID_RHOJ  =       77
+      INTEGER, PARAMETER :: ID_NO2COL  =     88
+      INTEGER, PARAMETER :: ID_SO2COL  =     89
+      INTEGER, PARAMETER :: ID_HCHOCOL  =    80
+      INTEGER, PARAMETER :: ID_COCOL  =      81
+      INTEGER, PARAMETER :: ID_KZ     =      82
+      INTEGER, PARAMETER :: ID_KZMIN  =      83
+      INTEGER, PARAMETER :: ID_AOD550 =      84
+      INTEGER, PARAMETER :: ID_PMEXT550 =    85
 
       TYPE ELDTP
         CHARACTER (LEN = 16) :: NAME      !Parameter Name
@@ -171,7 +164,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
 
-      INTEGER, PARAMETER :: N_ELMO_LIST = 79
+      INTEGER, PARAMETER :: N_ELMO_LIST = 85
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
 
@@ -244,12 +237,18 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'PM25_OC      ',ID_PM25_OC,    ET_DRVD,     F, 'ug m-3', 'PM2.5 Organic Carbon (excluding non-carbon atoms)' ),
      &ELDTP( 'PM25_OA      ',ID_PM25_OA,    ET_DRVD,     F, 'ug m-3', 'PM2.5 Organic Aerosol' ),
      &ELDTP( 'BENAPY_FAERO ',ID_BENAPY_FAERO,ET_AEROPROP,F, '',       'Benzo-a-Pyrene Aerosol-Phase Fraction' ),
-                                                          
+         
+      ! Spectral Variables and diagnostics
+     &ELDTP( 'AOD_550      ',ID_AOD550,     ET_PHOT,     F, '1     ', 'Aerosol Optical Depth at 550 nm -Angstrom interp' ),
+     &ELDTP( 'PM_EXT_550   ',ID_PMEXT550,   ET_PHOT,     F, 'Mm-1  ', 'Aerosol Extinction at 550 nm -Angstrom interp' ),
+     &ELDTP( 'NO2_COLUMN   ',ID_NO2COL,     ET_PHOT,     F, 'petamolec cm-2', 'NO2 column density' ),
+     &ELDTP( 'SO2_COLUMN   ',ID_SO2COL,     ET_PHOT,     F, 'petamolec cm-2', 'SO2 column density' ),
+     &ELDTP( 'HCHO_COLUMN  ',ID_HCHOCOL,    ET_PHOT,     F, 'petamolec cm-2', 'HCHO column density' ),
+     &ELDTP( 'CO_COLUMN    ',ID_COCOL,      ET_PHOT,     F, 'petamolec cm-2', 'CO column density' ),
+
       ! Other Special Variables and Properties            
      &ELDTP( 'PM25_FRM     ',ID_PM25_FRM,   ET_DRVD,     F, 'ug m-3', 'Federal Reference Method PM2.5' ),
      &ELDTP( 'PMF_FRM      ',ID_PMF_FRM,    ET_DRVD,     F, 'ug m-3', 'Federal Reference Method PMIJ' ),
-     &ELDTP( 'AOD_550      ',ID_AOD550,     ET_PHOT,     F, '1     ', 'Aerosol Optical Depth at 550 nm -Angstrom interp' ),
-     &ELDTP( 'PM_EXT_550   ',ID_PMEXT550,   ET_PHOT,     F, 'Mm-1  ', 'Aerosol Extinction at 550 nm -Angstrom interp' ),
      &ELDTP( 'RH           ',ID_RH,         ET_MET,      F, '1     ', 'Relative humidity' ),
      &ELDTP( 'TA           ',ID_TEMP,       ET_MET,      F, 'K     ', 'Temperature' ),
      &ELDTP( 'TSURF        ',ID_SRFTEMP,    ET_MET,      F, 'K     ', '2-meter Surface Temperature' ),
@@ -266,6 +265,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'CFRAC        ',ID_CFRAC,      ET_MET,      F, '      ', 'Cloud Fraction' ),
      &ELDTP( 'PV           ',ID_PV,         ET_MET,      F, '      ', 'Potential Vorticity' ),
      &ELDTP( 'DENS         ',ID_DENS,       ET_MET,      F, 'kg m-3', 'Advected Density' ),
+     &ELDTP( 'KZ           ',ID_KZ,         ET_MET,      F, 'm2 s-1', 'Vertical diffusivity coefficients' ),
+     &ELDTP( 'KZMIN        ',ID_KZMIN,      ET_MET,      F, 'm2 s-1', 'Vertical diffusivity coefficients' ),
      &ELDTP( 'RHOJ         ',ID_RHOJ,       ET_MET,      F, 'kg m-3', 'Advected Density x Jacobian/MSFX^2' ) /)
      
 
@@ -682,6 +683,34 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             ! Activate all DDM Dry Depostion Fluxes
             DO IT = 1,N_ELMO_TABLE
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_DDM_DDEP )
+     &                  L_ELMO_TABLE( IT ) = .TRUE.
+            END DO
+         
+         ELSE IF ( VARS_NML(1) .EQ. 'ALL_AEROPROP' ) THEN
+            ! Activate all DDM Dry Depostion Fluxes
+            DO IT = 1,N_ELMO_TABLE
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_AEROPROP )
+     &                  L_ELMO_TABLE( IT ) = .TRUE.
+            END DO
+         
+         ELSE IF ( VARS_NML(1) .EQ. 'ALL_CHEM' ) THEN
+            ! Activate all DDM Dry Depostion Fluxes
+            DO IT = 1,N_ELMO_TABLE
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_CHEM )
+     &                  L_ELMO_TABLE( IT ) = .TRUE.
+            END DO
+         
+         ELSE IF ( VARS_NML(1) .EQ. 'ALL_MET' ) THEN
+            ! Activate all DDM Dry Depostion Fluxes
+            DO IT = 1,N_ELMO_TABLE
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_MET )
+     &                  L_ELMO_TABLE( IT ) = .TRUE.
+            END DO
+         
+         ELSE IF ( VARS_NML(1) .EQ. 'ALL_PHOT' ) THEN
+            ! Activate all DDM Dry Depostion Fluxes
+            DO IT = 1,N_ELMO_TABLE
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_PHOT )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
          

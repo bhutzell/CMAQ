@@ -714,6 +714,42 @@
          CASE ( ID_PMEXT550 )
             OUTVAL = ELMO_EXT_550( C1,R1,L1 )
 
+         ! Retrieve column density variables
+         CASE ( ID_NO2COL )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = ELMO_NO2COL( C1,R1 )
+             ELSE
+             OUTVAL = AMISS3
+             END IF
+
+         CASE ( ID_SO2COL )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = ELMO_SO2COL( C1,R1 )
+             ELSE
+             OUTVAL = AMISS3
+             END IF
+
+         CASE ( ID_HCHOCOL )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = ELMO_HCHOCOL( C1,R1 )
+             ELSE
+             OUTVAL = AMISS3
+             END IF
+
+         CASE ( ID_COCOL )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = ELMO_COCOL( C1,R1 )
+             ELSE
+             OUTVAL = AMISS3
+             END IF
+
+         ! Vertical diffusivity coefficients
+         CASE ( ID_KZ )
+            OUTVAL = ELMO_KZ( C1,R1,L1 )
+
+         CASE ( ID_KZMIN )
+            OUTVAL = ELMO_KZMIN( C1,R1,L1 )
+
          ! Retrieve Relative Humidity
          CASE ( ID_RH )
             OUTVAL = AIRRH
