@@ -142,6 +142,7 @@ C-------------------------------------------------------------------------------
          Real,    Allocatable :: UWIND    ( :,:,: )  ! [m/s]
          Real,    Allocatable :: VWIND    ( :,:,: )  ! [m/s]                    
 !> 3-D meteorological fields:
+         Real,    Allocatable :: KZ       ( :,:,: )  ! Kz [m**2/s]
          Real,    Allocatable :: KZMIN    ( :,:,: )  ! minimum Kz [m**2/s]
          Real,    Allocatable :: PRES     ( :,:,: )  ! pressure [Pa]
          Real,    Allocatable :: QV       ( :,:,: )  ! water vapor mixing ratio

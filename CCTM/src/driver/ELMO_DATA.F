@@ -454,9 +454,18 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                                                       !   Third dimension is 1
                                                       !     for wet and 2 for dry
 
-        REAL, ALLOCATABLE, SAVE :: ELMO_AOD_550(:,:), ! total aerosol optical depth at 
-                                                      !   550 nm (Angstrom Interpolation) 
-     &                             ELMO_EXT_550(:,:,:)! aerosol extinction at 550 nm for layer [1/m]
+        REAL, ALLOCATABLE, SAVE, PUBLIC :: 
+     &                             ELMO_AOD_550(:,:),  ! total aerosol optical depth at 
+                                                       !   550 nm (Angstrom Interpolation) 
+     &                             ELMO_EXT_550(:,:,:),! aerosol extinction at 550 nm for layer [1/m]
+     &                             ELMO_NO2COL(:,:), ! NO2 Column
+     &                             ELMO_SO2COL(:,:), ! SO2 Column
+     &                             ELMO_HCHOCOL(:,:),! Formaldehyde Column
+     &                             ELMO_COCOL(:,:),  ! CO Column
+     &                             ELMO_KZ(:,:,:),     ! Kz output
+     &                             ELMO_KZMIN(:,:,:)   ! Kz minimum output
+
+
         REAL, ALLOCATABLE, SAVE :: ELMO_WDEP(:,:,:) ! wet deposition accumulated per time step
         REAL, ALLOCATABLE, SAVE :: ELMO_DDEP(:,:,:) ! dry deposition accumulated per time step
         REAL, ALLOCATABLE, SAVE :: ELMO_ISAM_WDEP(:,:,:,:) ! wet deposition accumulated per time step
@@ -485,7 +494,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         logical, save :: firstime = .True.
 
         if (firstime ) then
-            firsitme = .false.
+            firstime = .false.
 
             allocate( elmo_aod_550(ncols, nrows ), stat=ios)
             call checkmem( ios, 'ELMO_AOD_550',pname )
