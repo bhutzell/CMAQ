@@ -196,7 +196,7 @@
 
          ! Add this Aerosol Wet Dep to the Composite List
          IAER = INDEX1( 'WD_'//AEROSPC(IAERO)%BULKNAME, N_COMPOSITES, CMPST%NAME )
-         IF ( IAER .EQ. 0 .AND. L_ELMO_WDEP ) THEN
+         IF ( IAER .EQ. 0 ) THEN
             N_COMPOSITES = N_COMPOSITES + 1
             CMPST( N_COMPOSITES )%NAME = 'WD_' // AEROSPC(IAERO)%BULKNAME
             CMPST( N_COMPOSITES )%CUNIT = 'kg ha-1'
@@ -218,7 +218,7 @@
          
          ! Add this Aerosol Dry Deposition to the Composite List
          IAER = INDEX1( 'DD_'//AEROSPC(IAERO)%BULKNAME, N_COMPOSITES, CMPST%NAME )
-         IF ( IAER .EQ. 0 .AND. L_ELMO_DDEP ) THEN
+         IF ( IAER .EQ. 0 ) THEN
             N_COMPOSITES = N_COMPOSITES + 1
             CMPST( N_COMPOSITES )%NAME = 'DD_' // AEROSPC(IAERO)%BULKNAME
             CMPST( N_COMPOSITES )%CUNIT = 'kg ha-1'
@@ -565,7 +565,7 @@
           CALL M3EXIT( PNAME,0,0,XMSG,1 )
       END IF
  
-      CALL LOG_MESSAGE( LOGDEV, '      Component: '//CSPEC )
+      !CALL LOG_MESSAGE( LOGDEV, '      Component: '//CSPEC )
 
       END SUBROUTINE ELMO_SET_COMPONENTS
 
@@ -590,7 +590,7 @@
 
       FORMULA = CMPST( ICMP )%FORMULA
 
-      CALL LOG_MESSAGE( LOGDEV, '      Formula: '//FORMULA)
+      !CALL LOG_MESSAGE( LOGDEV, '      Formula: '//FORMULA)
 
       COMPS( 1:N_MAX_COMPONENTS ) = ''
       COEFFS( 1:N_MAX_COMPONENTS ) = 1.0

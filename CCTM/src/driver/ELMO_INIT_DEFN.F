@@ -657,7 +657,6 @@
 
       ! Load Deposition Variables into ELMO_Table
       ! Load Wet Deposition Fluxes
-      IF ( L_ELMO_WDEP ) THEN
       DO IWDEP = 1,N_SPC_WDEP
         N = N + 1
         ELMO_TABLE( N )%NAME = 'WD_' // WDEP_SPC( IWDEP )
@@ -688,10 +687,8 @@
         ELMO_TABLE( N )%DESC = 'Wet Deposition for Species '//
      &                         TRIM( WDEP_SPC( IWDEP ) )
       END DO
-      ENDIF 
 
       ! Load Dry Deposition Fluxes
-      IF ( L_ELMO_DDEP ) THEN
       DO IDDEP = 1,N_SPC_DEPV
         N = N + 1
         ELMO_TABLE( N )%NAME = 'DD_' // DEPV_SPC( IDDEP )
@@ -722,7 +719,6 @@
         ELMO_TABLE( N )%DESC = 'Dry Deposition Flux for Species '//
      &                         TRIM( DEPV_SPC( IDDEP ) )
       END DO
-      END IF
  
 #ifdef isam
       ! Load ISAM CGRID Variables into ELMO Table
@@ -771,7 +767,6 @@
 
 
       ! Load ISAM Wet Deposition Fluxes into ELMO Table
-      IF ( L_ELMO_WDEP ) THEN
       DO IWDEP = 1,N_SPC_WDEP
         DO ITAG = 1,NTAG_SA
            N = N + 1
@@ -814,10 +809,8 @@
         ELMO_TABLE( N )%DESC = 'Tagged Wet Deposition Flux of '//
      &     TRIM( WDEP_SPC( IWDEP ) ) //' from all sources.'
       END DO
-      END IF
 
       ! Load ISAM Dry Deposition Fluxes into ELMO Table
-      IF ( L_ELMO_DDEP ) THEN
       DO IDDEP = 1,N_SPC_DEPV
         DO ITAG = 1,NTAG_SA
            N = N + 1
@@ -863,7 +856,6 @@
 
 
       END DO
-      END IF
 #endif 
 
 #ifdef sens
@@ -909,7 +901,6 @@
       END DO
 
       ! Load DDM3D Wet Deposition Fluxes into ELMO Table
-      IF ( L_ELMO_WDEP ) THEN
       DO IWDEP = 1,N_SPC_WDEP
         DO NP = 1,NPMAX
            N = N + 1
@@ -947,10 +938,8 @@
      &        TRIM( SEN_PAR(NP) ) // ' from all cloud types'
         END DO
       END DO
-      END IF
 
       ! Load DDM3D Dry Deposition Fluxes into ELMO Table
-      IF ( L_ELMO_DDEP ) THEN
       DO IDDEP = 1,N_SPC_DEPV
         DO NP = 1,NPMAX
            N = N + 1
@@ -988,7 +977,6 @@
      &        TRIM( SEN_PAR(NP) ) // ' from all cloud types'
         END DO
       END DO
-      END IF
 #endif
 
       ! Summarize Total number of ELMO Table entries and subset Table to

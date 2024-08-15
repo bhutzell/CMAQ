@@ -1251,6 +1251,13 @@ C...modules
       ELMO_AOD_550 = TAU_AERO_550
       ELMO_EXT_550 = AERO_EXT_550
 
+      IF ( PHOTDIAG ) THEN
+          ELMO_NO2COL  = NO2_COLUMN
+          ELMO_SO2COL  = SO2_COLUMN
+          ELMO_HCHOCOL = HCHO_COLUMN
+          ELMO_COCOL   = CO_COLUMN
+      END IF
+
 !...report on whether stratospheric ozone column satisfies climatological minimums
       IF( N_TROPO_O3_TOGGLE .GT. 0 )THEN
          O3_TOGGLE_AVE = O3_TOGGLE_AVE / REAL( N_TROPO_O3_TOGGLE )

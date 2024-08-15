@@ -482,41 +482,71 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         integer ios
         character(32) :: pname = 'ELMO_INIT_SHARED'
+        logical, save :: firstime = .True.
 
-        allocate( elmo_aod_550(ncols, nrows ), stat=ios)
-        call checkmem( ios, 'ELMO_AOD_550',pname )
-        elmo_aod_550 = 0.0
+        if (firstime ) then
+            firsitme = .false.
 
-        allocate( elmo_ext_550(ncols, nrows, nlays ), stat=ios)
-        call checkmem( ios, 'ELMO_EXT_550',pname )
-        elmo_ext_550 = 0.0
-
-        allocate( elmo_wdep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
-        call checkmem( ios, 'ELMO_WDEP',pname )
-        elmo_wdep = 0.0
-
-        allocate( elmo_ddep(ncols, nrows, n_spc_depv ), stat=ios)
-        call checkmem( ios, 'ELMO_DDEP',pname )
-        elmo_ddep = 0.0
+            allocate( elmo_aod_550(ncols, nrows ), stat=ios)
+            call checkmem( ios, 'ELMO_AOD_550',pname )
+            elmo_aod_550 = 0.0
+     
+            allocate( elmo_ext_550(ncols, nrows, nlays ), stat=ios)
+            call checkmem( ios, 'ELMO_EXT_550',pname )
+            elmo_ext_550 = 0.0
+     
+            allocate( elmo_no2col(ncols, nrows ), stat=ios)
+            call checkmem( ios, 'ELMO_NO2COL',pname )
+            elmo_no2col = 0.0
+     
+            allocate( elmo_so2col(ncols, nrows ), stat=ios)
+            call checkmem( ios, 'ELMO_SO2COL',pname )
+            elmo_so2col = 0.0
+     
+            allocate( elmo_hchocol(ncols, nrows ), stat=ios)
+            call checkmem( ios, 'ELMO_HCHOCOL',pname )
+            elmo_hchocol = 0.0
+     
+            allocate( elmo_cocol(ncols, nrows ), stat=ios)
+            call checkmem( ios, 'ELMO_COCOL',pname )
+            elmo_cocol = 0.0
+     
+            allocate( elmo_kz(ncols, nrows, nlays ), stat=ios)
+            call checkmem( ios, 'ELMO_KZ',pname )
+            elmo_kz = 0.0
+     
+            allocate( elmo_kzmin(ncols, nrows, nlays ), stat=ios)
+            call checkmem( ios, 'ELMO_KZMIN',pname )
+            elmo_kzmin = 0.0
+     
+            allocate( elmo_wdep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+            call checkmem( ios, 'ELMO_WDEP',pname )
+            elmo_wdep = 0.0
+     
+            allocate( elmo_ddep(ncols, nrows, n_spc_depv ), stat=ios)
+            call checkmem( ios, 'ELMO_DDEP',pname )
+            elmo_ddep = 0.0
 
 #ifdef isam
-        allocate( elmo_isam_wdep(ncols, nrows, n_spc_wdep, ntag_sa ), stat=ios)
-        call checkmem( ios, 'ELMO_ISAM_WDEP',pname )
-        elmo_isam_wdep = 0.0
-
-        allocate( elmo_isam_ddep(ncols, nrows, n_spc_depv, ntag_sa ), stat=ios)
-        call checkmem( ios, 'ELMO_ISAM_DDEP',pname )
-        elmo_isam_ddep = 0.0
+            allocate( elmo_isam_wdep(ncols, nrows, n_spc_wdep, ntag_sa ), stat=ios)
+            call checkmem( ios, 'ELMO_ISAM_WDEP',pname )
+            elmo_isam_wdep = 0.0
+         
+            allocate( elmo_isam_ddep(ncols, nrows, n_spc_depv, ntag_sa ), stat=ios)
+            call checkmem( ios, 'ELMO_ISAM_DDEP',pname )
+            elmo_isam_ddep = 0.0
 #endif
 #ifdef sens
-        allocate( elmo_ddm_wdep(ncols, nrows, n_spc_wdep+1, npmax ), stat=ios)
-        call checkmem( ios, 'ELMO_DDM_WDEP',pname )
-        elmo_ddm_wdep = 0.0
-
-        allocate( elmo_ddm_ddep(ncols, nrows, n_spc_depv, npmax ), stat=ios)
-        call checkmem( ios, 'ELMO_DDM_DDEP',pname )
-        elmo_ddm_ddep = 0.0
+            allocate( elmo_ddm_wdep(ncols, nrows, n_spc_wdep+1, npmax ), stat=ios)
+            call checkmem( ios, 'ELMO_DDM_WDEP',pname )
+            elmo_ddm_wdep = 0.0
+            
+            allocate( elmo_ddm_ddep(ncols, nrows, n_spc_depv, npmax ), stat=ios)
+            call checkmem( ios, 'ELMO_DDM_DDEP',pname )
+            elmo_ddm_ddep = 0.0
 #endif
+        end if
+
 
         end subroutine elmo_init_shared
 
@@ -654,7 +684,12 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
          ELSE IF ( I2 .GT. 0 ) THEN
             ! First check for COMPOSITES
-            IF ( ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_CMPST ) THEN
+            IF ( ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_CMPST .OR.
+     &           ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
+     &           ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
+     &           ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
+     &           ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
+     &           ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
               IF ( EXPAND_NML ) THEN
                  ! Expand the COMPOSITE if the * was used
                  DO IVAR = 1,ELMO_COMP( I2 )%N_VARS

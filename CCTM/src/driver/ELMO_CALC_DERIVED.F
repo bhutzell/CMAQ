@@ -142,31 +142,31 @@
 
          ! Retrieve Total Particle Mass
          CASE ( ID_PM_MASS )
-            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, IV, ISRC ) 
+            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, 0, 0, IV, ISRC ) 
 
          ! Retrieve Ultrafine Particle Mass
          CASE ( ID_PMU_MASS )
-            OUTVAL = SUM_PM_MODES( AEROMODE%ULTRAFINE_MASK, IV, ISRC ) 
+            OUTVAL = SUM_PM_MODES( AEROMODE%ULTRAFINE_MASK, 0, 0, IV, ISRC ) 
 
          ! Retrieve Fine Particle Mass
          CASE ( ID_PMF_MASS )
-            OUTVAL = SUM_PM_MODES( AEROMODE%FINE_MASK, IV, ISRC ) 
+            OUTVAL = SUM_PM_MODES( AEROMODE%FINE_MASK, 0, 0, IV, ISRC ) 
 
          ! Retrieve Coarse Particle Mass
          CASE ( ID_PMC_MASS )
-            OUTVAL = SUM_PM_MODES( AEROMODE%COARSE_MASK, IV, ISRC ) 
+            OUTVAL = SUM_PM_MODES( AEROMODE%COARSE_MASK, 0, 0, IV, ISRC ) 
 
          ! Retrieve Nucleation-Mode Particle Mass
          CASE ( ID_PMNUC_MASS )
-            OUTVAL = SUM_PM_MODES( AEROMODE%NUC_MASK, IV, ISRC ) 
+            OUTVAL = SUM_PM_MODES( AEROMODE%NUC_MASK, 0, 0, IV, ISRC ) 
 
          ! Retrieve Aitken-Mode Particle Mass
          CASE ( ID_PMAIT_MASS )
-            OUTVAL = SUM_PM_MODES( AEROMODE%AITKEN_MASK, IV, ISRC ) 
+            OUTVAL = SUM_PM_MODES( AEROMODE%AITKEN_MASK, 0, 0, IV, ISRC ) 
 
          ! Retrieve Accumution-Mode Particle Mass
          CASE ( ID_PMACC_MASS )
-            OUTVAL = SUM_PM_MODES( AEROMODE%ACCUM_MASK, IV, ISRC ) 
+            OUTVAL = SUM_PM_MODES( AEROMODE%ACCUM_MASK, 0, 0, IV, ISRC ) 
 
          ! Retrieve Dry Mode Density [kg m-3]
          CASE ( ID_DRY_DENS )
@@ -208,33 +208,27 @@
  
          ! Retrieve Bulk PM0.1 Concentration
          CASE ( ID_PM01 )
-            CALL SUM_INLET_PM( IPM01, IWET, PM01 )
-            OUTVAL = PM01
+            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, IPM01, IWET, IV, ISRC ) 
 
          ! Retrieve Bulk PM1.0 Concentration
          CASE ( ID_PM1 )
-            CALL SUM_INLET_PM( IPM1, IWET, PM1 )
-            OUTVAL = PM1
+            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, IPM1, IWET, IV, ISRC ) 
 
          ! Retrieve Bulk PM2.5 Concentration
          CASE ( ID_PM25 )
-            CALL SUM_INLET_PM( IPM25, IWET, PM25 )
-            OUTVAL = PM25 
+            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, IPM25, IWET, IV, ISRC ) 
 
          ! Retrieve Bulk PM10.0 Concentration
          CASE ( ID_PM10 )
-            CALL SUM_INLET_PM( IPM10, IWET, PM10 )
-            OUTVAL = PM10
+            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, IPM10, IWET, IV, ISRC ) 
          
          ! Retrieve Bulk PM2.5-10.0 Concentration
          CASE ( ID_PM25to10 )
-            CALL SUM_INLET_PM( IPM25to10, IWET, PM25to10 )
-            OUTVAL = PM25to10
+            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, IPM25to10, IWET, IV, ISRC ) 
 
          ! Retrieve Bulk PM Concentration Relevant for the AMS
          CASE ( ID_PMAMS )
-            CALL SUM_INLET_PM( IPMAMS, IWET, PMAMS )
-            OUTVAL = PMAMS
+            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, IPMAMS, IWET, IV, ISRC ) 
          
          ! Calculate AHPMOLAL - Fine Mode Concentration of H+ in
          ! Particle Water
@@ -671,7 +665,7 @@
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
             
-            CALL SUM_INLET_PM( IPM25, IWET, PM25 )
+            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, IPM25, IWET, IV, ISRC ) 
 
             OUTVAL = PM25 - PM25_NO3_LOSS - PM25_NH4_LOSS
      &                      +0.24 * ( PM25_SO4 + PM25_NH4 - PM25_NH4_LOSS ) + 0.5
@@ -767,7 +761,7 @@
       END SUBROUTINE ELMO_CALC_DERIVED
  
 !----------------------------------------------------------------------
-      REAL FUNCTION SUM_PM_MODES( MODE_MASK, IV, ISRC )
+      REAL FUNCTION SUM_PM_MODES( MODE_MASK, INLET, WETNESS, IV, ISRC )
 !----------------------------------------------------------------------
 !     SUM_PM_MODES returns the sum of total PM Mass ignoring water,
 !     organic water, and mass of all aerosol tracer species. It uses the
@@ -784,7 +778,7 @@
       USE ELMO_DATA, ONLY : ET_CMPST, ET_DRVD
 #ifdef isam      
       USE ELMO_DATA, ONLY : ET_ISAM_CMPST, ET_ISAM_DRVD, ISAM_VEC
-      USE SA_DEFN, ONLY : MAP_AEROtoSA
+      USE SA_DEFN, ONLY : MAP_AEROtoSA, NTAG_SA
 #endif
 #ifdef sens
       USE ELMO_DATA, ONLY : ET_DDM_CMPST, ET_DDM_DRVD, DDM_VEC
@@ -794,11 +788,15 @@
 
       IMPLICIT NONE
 
-      LOGICAL :: MODE_MASK( N_MODE )
-      INTEGER :: IV, ISRC
+      LOGICAL :: MODE_MASK( N_MODE )  ! Mask Indicating which modes to sum
+      INTEGER :: IV, ISRC             ! ELMO Variable type, Source number
+      INTEGER :: INLET                ! Integer prescribing the inlet type
+      INTEGER :: WETNESS              ! 1 = Wet Aerosol; 2 = Dry Aerosol
+                                      !   (see ELMO_INLET table in ELMO_DATA module)
       INTEGER :: IM, IAER, ISA
+      REAL    :: FRAC
       REAL    :: OUTVAL
-
+                                        
       OUTVAL = 0.0
 
       ! Determine Which Type of ELMO Variable is Requested
@@ -807,12 +805,13 @@
             ! Standard ELMO PM Sum
             DO IM = 1,N_MODE
                IF ( MODE_MASK( IM ) ) THEN
-                 OUTVAL = OUTVAL +
+                 CALL GET_AERO_INLET( INLET, IM, WETNESS, FRAC )
+                 OUTVAL = OUTVAL + FRAC * 
      &                    SUM( AEROSPC_CONC( :,IM ),
-     &                    MASK=.NOT.AEROSPC(:)%TRACER ) ! ug m-3
-     &                    - AEROSPC_CONC( AH2O_IDX,IM )
+     &                         MASK=.NOT.AEROSPC(:)%TRACER ) ! ug m-3
+     &                    - FRAC * AEROSPC_CONC( AH2O_IDX,IM )
                  IF ( AORGH2O_IDX .GT. 0 ) OUTVAL = OUTVAL
-     &                - AEROSPC_CONC( AORGH2O_IDX,IM ) ! ug m-3 
+     &                - FRAC * AEROSPC_CONC( AORGH2O_IDX,IM ) ! ug m-3 
                END IF
             END DO
 
@@ -821,15 +820,16 @@
            ! ISAM PM Sum
            DO IM = 1,N_MODE
               IF ( MODE_MASK(IM) ) THEN
+                CALL GET_AERO_INLET( INLET, IM, WETNESS, FRAC )
                 DO IAER = 1,N_AEROSPC                  
                   IF ( .NOT. AEROSPC(IAER)%TRACER .AND.
      &                 IAER .NE. AH2O_IDX .AND. IAER .NE. AORGH2O_IDX ) THEN
                     ! Add up PM for this source
                     ISA = MAP_AEROtoSA( IAER, IM )
-                    IF ( ISRC .EQ. 0 ) THEN
-                       OUTVAL = OUTVAL + SUM(ISAM_VEC( ISA,:) ) 
+                    IF ( ISRC .LE. NTAG_SA ) THEN
+                       OUTVAL = OUTVAL + FRAC * ISAM_VEC(ISA,ISRC) 
                     ELSE
-                       OUTVAL = OUTVAL + ISAM_VEC(ISA,ISRC) 
+                       OUTVAL = OUTVAL + FRAC * SUM(ISAM_VEC( ISA,:) ) 
                     END IF
                   END IF
                 END DO
@@ -842,11 +842,12 @@
            ! DDM PM Sum
            DO IM = 1,N_MODE
               IF ( MODE_MASK(IM) ) THEN
+                CALL GET_AERO_INLET( INLET, IM, WETNESS, FRAC )
                 DO IAER = 1,N_AEROSPC                  
                   IF ( .NOT. AEROSPC(IAER)%TRACER .AND.
      &                 IAER .NE. AH2O_IDX .AND. IAER .NE. AORGH2O_IDX ) THEN
                     ! Add up PM for this source
-                    OUTVAL = OUTVAL + S_AEROSPC_CONC(IAER,IM,ISRC) 
+                    OUTVAL = OUTVAL + FRAC * S_AEROSPC_CONC(IAER,IM,ISRC) 
                   END IF
                 END DO
               END IF

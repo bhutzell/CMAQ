@@ -86,6 +86,8 @@ C-------------------------------------------------------------------------------
       Use LSM_MOD             ! Land surface data
       Use DEPVVARS, Only: ltotg
       Use CENTRALIZED_IO_MODULE
+      Use ELMO_DATA, ONLY : ELMO_KZ, ELMO_KZMIN
+
 #ifdef mpas
       use coupler_module
 #endif
@@ -608,6 +610,7 @@ C-----------------------------------------------------------------------
      &             Met_Data%CFRAC    ( NCOLS,NROWS ),
      &             Met_Data%UWIND    ( NCOLS+1,NROWS+1,NLAYS ),
      &             Met_Data%VWIND    ( NCOLS+1,NROWS+1,NLAYS ),
+     &             Met_Data%KZ       ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%KZMIN    ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%PRES     ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%QV       ( NCOLS,NROWS,NLAYS ),
@@ -1070,6 +1073,10 @@ C-------------------------------- Calculated Variables -------------------------
          ELSE
             Met_Data%KZMIN = KZ0UT
          END IF
+
+         ELMO_KZ(:,:,:) = Met_Data%KZ(:,:,:)
+         ELMO_KZMIN(:,:,:) = Met_Data%KZMIN(:,:,:)
+
 
          BUFF3D = Met_Data%TA * ( 1.0 + 0.608 * Met_Data%QV )
          Met_Data%THETAV = BUFF3D * ( P0 / Met_Data%PRES ) ** 0.286

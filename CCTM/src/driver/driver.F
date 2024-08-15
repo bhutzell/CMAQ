@@ -110,7 +110,7 @@ C-----------------------------------------------------------------------
       USE WVEL_DEFN             ! derived vertical velocity component
       USE BUDGET_DEFN
       USE AERO_DATA
-      USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP
+      USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP, ELMO_INIT_SHARED
       USE ELMO_PROC, ONLY : ELMO_DRIVER
       USE ELMO_INIT_DEFN, ONLY : ELMO_INIT
       USE UTILIO_DEFN
@@ -646,6 +646,10 @@ C Convention: the input file concentration units are always ppmV.
 !       end if
 
 #endif
+
+C Initialize Shared Global Output Variables used for 
+C ELMO (e.g. AOD, extinction, Kz, etc.)
+         CALL ELMO_INIT_SHARED()
 
 C Initialize Meteorology Structures
          CALL INIT_LSM( JDATE, JTIME )
