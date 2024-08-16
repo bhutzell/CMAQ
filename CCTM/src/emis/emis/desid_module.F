@@ -1358,6 +1358,7 @@ C-----------------------------------------------------------------------
      &                      DIFF_MASK_NUM, DIFF_MASK_SRF, DIFF_MW, DIFF_SPC,
      &                      DIFF_MASK_NR, DIFF_MASK_TRAC
       USE AERO_DATA, ONLY : GPKG
+      USE MIO_MODULE
 #ifdef mpas
       USE coupler_module, ONLY: inv_cell_vol
 #endif
@@ -1365,6 +1366,7 @@ C-----------------------------------------------------------------------
       IMPLICIT NONE
          
       INCLUDE SUBST_CONST     ! constants
+      INCLUDE SUBST_FILES_ID
 
       INTEGER, INTENT( IN ) :: JDATE, JTIME, ISRM
       REAL, INTENT( In )    :: VDEMIS0( :,:,:,: )
@@ -1382,9 +1384,13 @@ C-----------------------------------------------------------------------
  
       INTEGER       :: LAYS, L, C, R, IVAR, NL, I
       INTEGER       :: ISPEC, IDIAG, IP, JSPEC, JDIAG, KSPEC
+      INTEGER       :: ALLOCSTAT
 
       LOGICAL :: FIRST_TIME = .TRUE.
+      LOGICAL :: subset_layer
       CHARACTER( 586 ) :: XMSG
+      CHARACTER( 20 ) :: TIME_STAMP
+      CHARACTER( 16 ) :: PNAME = 'DESID_CALC_DIAG'
 
       ! Get pressure info from ASX_DATA_MOD
       IF ( FIRST_TIME ) THEN
@@ -1400,9 +1406,16 @@ C-----------------------------------------------------------------------
 #endif
      &             CONVN( DESID_LAYS,NCOLS,NROWS ),
      &             VDEMIS( N_SPC_DIFF,DESID_LAYS,NCOLS,NROWS ),
-     &             VDEMIS_OUT( NCOLS,NROWS,DESID_LAYS ) )
+     &             VDEMIS_OUT( NCOLS,NROWS,DESID_LAYS ),
+     &             DESID_DIAG_CREATE( DESID_N_DIAG), STAT=ALLOCSTAT )
+
+          if ( ALLOCSTAT .NE. 0 ) then
+             XMSG = 'Memory allocation error in ' // PNAME
+             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+          end if
+          DESID_DIAG_CREATE = .TRUE.
       END IF    !FirstTime
-      
+     
       VDEMIS     = 0.0
       VDEMIS_OUT = 0.0
 
@@ -1442,6 +1455,8 @@ C-----------------------------------------------------------------------
       FORALL ( I = 1:N_SPC_DIFF, DIFF_MASK_NUM( I ) )
      &    VDEMIS( I,1:NL,:,: ) = CONVN( 1:NL,:,: ) * VDEMIS0( I,1:NL,:,:)
 
+      call mio_time_format_conversion (jdate, jtime, time_stamp)
+
       ! Write out this stream to its diagnostic file or sum emissions
       ! for an aggregate diagnostic
       DO IDIAG = 1,DESID_N_DIAG
@@ -1478,6 +1493,29 @@ C-----------------------------------------------------------------------
                    XMSG = 'Could not write ' // TRIM( DESID_DIAG_FILENAME(IDIAG) ) // ' file'
                    CALL M3EXIT( 'WRITE_EMISS_DIAG', JDATE, JTIME, XMSG, XSTAT1 )
                 END IF
+
+                if ( DESID_DIAG_CREATE( IDIAG ) ) then
+                   DESID_DIAG_CREATE( IDIAG ) = .FALSE.
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
+                   call mio_setfile( MET_CRO_3D )
+                   subset_layer = ( mio_nlays .ne. LAYS )
+                   if ( subset_layer ) mio_nlays = LAYS
+
+                   call mio_fcreate( DESID_DIAG_LOGICAL_MIO(IDIAG), io_mode )
+
+                   if (subset_layer) then
+                      if (mype == 0) then
+                         call mio_set_global_attr ( DESID_DIAG_LOGICAL_MIO(IDIAG), 'NLAYS', LAYS )
+                         ! not sure what to do here regarding vglvls
+                         call mio_set_global_attr ( DESID_DIAG_LOGICAL_MIO(IDIAG), 'VGLVLS', MET_CRO_3D, 1, LAYS+1 )
+                      end if
+                   end if
+                END IF
+
+                call mio_fwrite( DESID_DIAG_LOGICAL_MIO(IDIAG), DESID_DIAG_SPEC( IDIAG )%SPEC(ISPEC),
+     &                             pname, VDEMIS_OUT( :,:,1:LAYS ), time_stamp )
+
 #endif
               ELSE
                 ! Other streams contribute as well. Sum these emission
@@ -1497,21 +1535,23 @@ C-----------------------------------------------------------------------
 
 !     Write out emissions diagnostic file
 !-----------------------------------------------------------------------
-          
+          use mio_module
+
           IMPLICIT NONE
+          INCLUDE SUBST_FILES_ID
 
-          INTEGER IDIAG, ISPEC, JSPEC
-          INTEGER LAYS
-          INTEGER JDATE, JTIME
+          INTEGER :: IDIAG, ISPEC, JSPEC
+          INTEGER :: LAYS
+          INTEGER :: JDATE, JTIME
           CHARACTER(200) :: XMSG
+          LOGICAL        :: subset_layer
 
-#ifdef mpas
-          CHARACTER (20) :: TIME_STAMP
+          CHARACTER (20 ) :: time_stamp
+          character( 16 ), save :: pname = 'DESID_WRITE_DIAG'
+
           call mio_time_format_conversion (jdate, jtime, time_stamp)
-#endif
-
+          
           DO IDIAG = 1,DESID_N_DIAG
-
             IF ( DESID_DIAG_N_STREAM( IDIAG ) .GT. 1 ) THEN
                LAYS = DESID_DIAG_LAYS( IDIAG )
 
@@ -1526,6 +1566,29 @@ C-----------------------------------------------------------------------
                     XMSG = 'Could not write ' // TRIM( DESID_DIAG_FILENAME(IDIAG) ) // ' file'
                     CALL M3EXIT( 'WRITE_EMISS_DIAG', JDATE, JTIME, XMSG, XSTAT1 )
                   END IF
+
+                  IF ( DESID_DIAG_CREATE( IDIAG ) ) THEN
+                     DESID_DIAG_CREATE( IDIAG ) = .FALSE.
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
+                     call mio_setfile( MET_CRO_3D )
+                     subset_layer = ( mio_nlays .ne. LAYS )
+                     if ( subset_layer ) mio_nlays = LAYS
+
+                     call mio_fcreate( DESID_DIAG_LOGICAL_MIO(IDIAG), io_mode )
+
+                     if (subset_layer) then
+                        if (mype == 0) then
+                           call mio_set_global_attr ( DESID_DIAG_LOGICAL_MIO(IDIAG), 'NLAYS', LAYS )
+                           ! not sure what to do here regarding vglvls
+                           call mio_set_global_attr ( DESID_DIAG_LOGICAL_MIO(IDIAG), 'VGLVLS', MET_CRO_3D, 1, LAYS+1 )
+                        end if
+                     end if
+                  END IF
+
+                  call mio_fwrite( DESID_DIAG_LOGICAL_MIO(IDIAG), DESID_DIAG_SPEC( IDIAG )%SPEC(ISPEC),
+     &                             pname, VDEMIS_DIAG( JSPEC,:,:,1:LAYS ), time_stamp )
+     
 #else
              call mio_fwrite('EMIS_DIAG',DESID_DIAG_SPEC( IDIAG )%SPEC(ISPEC ), "write_emis",
      &                             VDEMIS_DIAG( JSPEC,:,1,1 ) ,time_stamp)
@@ -3187,6 +3250,7 @@ C stkemis_init.
         ALLOCATE( DESID_DIAG_N_STREAM ( N_Buff ) )
         ALLOCATE( DESID_DIAG_FORMAT ( N_Buff ) )
         ALLOCATE( DESID_DIAG_FILENAME ( N_Buff ) )
+        ALLOCATE( DESID_DIAG_FILENAME_MIO ( N_Buff ) )
         ALLOCATE( DESID_DIAG_LAB ( N_Buff ) )
         ALLOCATE( DESID_DIAG_SUM( N_Buff ) )
         ALLOCATE( DESID_DIAG_LAYS( N_Buff ) )
@@ -3281,6 +3345,8 @@ C stkemis_init.
                         WRITE( CDIAG, '(I0)' ), IDIAG
                         DESID_DIAG_FILENAME( JDIAG ) = TRIM( PREFIX ) // TRIM(CDIAG) //
      &                        '_' // TRIM( DESID_DIAG_LAB( JDIAG ) ) // TRIM( SUFFIX )
+                        DESID_DIAG_FILENAME_MIO( JDIAG ) = TRIM( PREFIX ) // TRIM(CDIAG) //
+     &                        '_' // TRIM( DESID_DIAG_LAB( JDIAG ) ) // '_MIO' // TRIM( SUFFIX )
                         DESID_DIAG_SUM( JDIAG ) = 0
             
                         ! Build Species Selection Array
@@ -3311,6 +3377,8 @@ C stkemis_init.
                  WRITE( CDIAG, '(I0)' ), IDIAG
                  DESID_DIAG_FILENAME( JDIAG ) = TRIM( PREFIX ) // TRIM(CDIAG) //
      &                 '_' // TRIM( DESID_DIAG_LAB( JDIAG ) ) // TRIM( SUFFIX )
+                 DESID_DIAG_FILENAME_MIO( JDIAG ) = TRIM( PREFIX ) // TRIM(CDIAG) //
+     &                 '_' // TRIM( DESID_DIAG_LAB( JDIAG ) ) // '_MIO' // TRIM( SUFFIX )
    
                  ! Build Species Selection Array
                  SPEC_VECTOR = .FALSE.
@@ -3330,6 +3398,7 @@ C stkemis_init.
         DESID_DIAG_STREAM_MASK = DESID_DIAG_STREAM_MASK( :,1:DESID_N_DIAG )
         DESID_DIAG_FORMAT      = DESID_DIAG_FORMAT( 1:DESID_N_DIAG )
         DESID_DIAG_FILENAME    = DESID_DIAG_FILENAME( 1:DESID_N_DIAG )
+        DESID_DIAG_FILENAME_MIO    = DESID_DIAG_FILENAME_MIO( 1:DESID_N_DIAG )
         DESID_DIAG_LAB         = DESID_DIAG_LAB( 1:DESID_N_DIAG )
         DESID_DIAG_LAYS        = DESID_DIAG_LAYS( 1:DESID_N_DIAG )
         DESID_DIAG_SUM         = DESID_DIAG_SUM( 1:DESID_N_DIAG )
@@ -3375,13 +3444,17 @@ C stkemis_init.
         
         ! Create I/O Logicals and Populate with full Filepaths
         ALLOCATE( DESID_DIAG_LOGICAL( DESID_N_DIAG ) )
+        ALLOCATE( DESID_DIAG_LOGICAL_MIO( DESID_N_DIAG ) )
         DO IDIAG = 1,DESID_N_DIAG
            IF ( OUTDIR .NE. '' ) THEN
              DESID_DIAG_FILENAME(IDIAG) = TRIM( OUTDIR ) // '/' // DESID_DIAG_FILENAME(IDIAG)
+             DESID_DIAG_FILENAME_MIO(IDIAG) = TRIM( OUTDIR ) // '/' // DESID_DIAG_FILENAME_MIO(IDIAG) 
            END IF
            WRITE( DESID_DIAG_LOGICAL( IDIAG ),'( "DESID_",I3.3 )' ) IDIAG
+           WRITE( DESID_DIAG_LOGICAL_MIO( IDIAG ),'( "DESID_",I3.3,A4 )' ) IDIAG, '_MIO'
 #ifndef mpas
            VALUE = SETENVVAR( DESID_DIAG_LOGICAL( IDIAG ), DESID_DIAG_FILENAME( IDIAG ) )
+           VALUE = SETENVVAR( DESID_DIAG_LOGICAL_MIO( IDIAG ), DESID_DIAG_FILENAME_MIO( IDIAG ) )
 #endif
         END DO
    
@@ -3607,7 +3680,7 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
   
       INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP
   
-      CHARACTER( 16 ) :: PNAME = 'OPEN_EMISS_DIAG'
+      CHARACTER( 16 ) :: PNAME = 'DESID_OPEN_DIAG'
       CHARACTER( 200 ) :: XMSG
   
       INTEGER :: IDIAG, IVAR, NLAYERS, V, ISPEC
@@ -3672,7 +3745,8 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
           L_ROW  ( 1:NVARS3D ) = .True.
           L_VEXT ( 1:NVARS3D ) = .False.
 
-          CALL LOAD_MIO_FILE ( DESID_DIAG_LOGICAL( IDIAG ), NLAYS3D, 1, NLAYS3D,
+!         CALL LOAD_MIO_FILE ( DESID_DIAG_LOGICAL_MIO( IDIAG ), NLAYS3D, 1, NLAYS3D,
+          CALL LOAD_MIO_FILE ( DESID_DIAG_LOGICAL_MIO( IDIAG ), NLAYS3D, 1, NLAYS3D,
      &         VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &         VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &         L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -3696,48 +3770,3 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
   
 C-----------------------------------------------------------------------
        END MODULE DESID_MODULE
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   

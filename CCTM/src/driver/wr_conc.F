@@ -108,10 +108,9 @@ C open conc file for update
 
       END IF   ! firstime
 
-      VAR = 0
-
-      call mio_setfile( 'CTM_CONC_MIO')
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+
+      VAR = 0
 
       ! Write Gas-Phase Species to CONC File
       DO SPC = 1, N_C_GC_SPC

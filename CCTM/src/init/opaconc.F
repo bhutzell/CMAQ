@@ -113,7 +113,7 @@
             STIME3D = MTIME
             TSTEP3D = TSTEP
             NVARS3D = N_ACONC_VARS
-            NLAYS3D = A_NLYS
+            NLAYS3D = A_NLAYS
 
             L = 0
             DO K = ACONC_BLEV, ACONC_ELEV + 1
@@ -130,7 +130,7 @@
             KD = 4
             VAR = ACONC_BLEV
             L = 0
-            DO K = KD + 1, MIN ( A_NLYS + KD, MXDESC3 )
+            DO K = KD + 1, MIN ( A_NLAYS + KD, MXDESC3 )
                L = L + 1
                WRITE( FDESC3D( K ),'( "Layer", I3, " to", I3, " " )' )
      &         VAR + L - 1, L
@@ -298,9 +298,9 @@
 101         CONTINUE
          END DO
 
-         IF ( A_NLYS .NE. NLAYS3D ) THEN
+         IF ( A_NLAYS .NE. NLAYS3D ) THEN
             WRITE( XMSG, '( A, 2I6 )' )
-     &      'Number of layers don''t match file: ', A_NLYS, NLAYS3D
+     &      'Number of layers don''t match file: ', A_NLAYS, NLAYS3D
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
          END IF
 

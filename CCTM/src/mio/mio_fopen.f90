@@ -247,6 +247,7 @@
                               mio_file_data(floc)%ndims)
 
               mio_file_data(floc)%gl_ncols = mio_file_data(floc)%dim_value(i)
+              mio_file_data(floc)%gl_nrows = 1
 
               if (mio_parallelism .eq. mio_serial) then
                  mio_file_data(floc)%ncols = mio_file_data(floc)%gl_ncols

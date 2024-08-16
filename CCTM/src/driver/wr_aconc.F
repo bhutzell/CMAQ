@@ -87,17 +87,29 @@ C represents data computed from time 1995196:090000 to 1995196:100000
       IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
 
-C Override default beginning time timestamp for ACONC?
          IF ( .NOT. IO_PE_INCLUSIVE ) THEN
             IF ( .NOT. OPEN3( A_CONC_1, FSREAD3, PNAME ) ) THEN
                XMSG = 'Could not open ' // A_CONC_1 // ' file for update'
                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
          END IF
+
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
          call mio_setfile( MET_CRO_3D )
+         if (aconc_subset_layer) mio_nlays = A_NLAYS
+
          call mio_fcreate( 'A_CONC_MIO', io_mode )
+
+         if (aconc_subset_layer) then
+            if (mype == 0) then
+               call mio_set_global_attr ( 'A_CONC_MIO', 'NLAYS', A_NLAYS )
+               call mio_set_global_attr ( 'A_CONC_MIO', 'VGLVLS', MET_CRO_3D, ACONC_BLEV, ACONC_ELEV+1 )
+            end if
+         end if
       END IF
 
+C Override default beginning time timestamp for ACONC?
       IF ( END_TIME ) THEN   ! ending time timestamp
          MDATE = JDATE; MTIME = JTIME
       ELSE                   ! beginning time timestamp
