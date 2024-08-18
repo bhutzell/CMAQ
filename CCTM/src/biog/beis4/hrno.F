@@ -380,9 +380,9 @@ C If initial run, initialize some variables, otherwise get them from file
          FDESC3D( 3 ) = '/Version/ CMAQ'
         
          ! Store MIO Metadata
-         NDIMS3D( 1:NVARS3D ) = 3
+         NDIMS3D( 1:NVARS3D ) = 4
          L_TSTEP( 1:NVARS3D ) = .True.
-         L_LAY  ( 1:NVARS3D ) = .False.
+         L_LAY  ( 1:NVARS3D ) = .True. ! even if 2-d
          L_COL  ( 1:NVARS3D ) = .True.
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.

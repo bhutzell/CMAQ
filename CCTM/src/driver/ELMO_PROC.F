@@ -3563,9 +3563,8 @@ C *** Write data to the average aerosol diagnostic file.
             END IF
           
             IF ( .NOT. WRITE3( CTM_AELMO_1, 
-     &             ALLVAR3, MDATE, MTIME, 
-     &             ELMO_AVRG(:,:,:,:) / 2.0 / 
-     &             (ELMO_NSTEP-1.0) ) ) THEN
+     &          ALLVAR3, MDATE, MTIME, 
+     &          ELMO_AVRG(:,:,:,:) / ( 2.0 * ( ELMO_NSTEP -1.0 ) ) ) ) THEN
                XMSG = 'Could not write ' // CTM_AELMO_1 // ' file'
                CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF

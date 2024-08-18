@@ -45,16 +45,25 @@
         mio_npcol    = npcol
         mio_nprow    = nprow
 
+        mio_io_pe_inclusive = .false.
+
         if (mio_nprocs .eq. 1) then
-           mio_parallelism = mio_serial              ! serial I/O
-           mio_mype = 0
+           mio_parallelism     = mio_serial          ! serial I/O
+           mio_mype            = 0
+           mio_io_pe_inclusive = .true.
         else
+           call mio_setup_rank (mio_mype)
            if (present(ptype)) then
               mio_parallelism = mio_true_parallel    ! true paralle using pnetCDF or netCDF-4
+              if (mod(mio_mype, npcol) == 0) then
+                 mio_io_pe_inclusive = .true.
+              end if
            else
               mio_parallelism = mio_pseudo           ! pseudo parallel
+              if (mio_mype == 0) then
+                 mio_io_pe_inclusive = .true.
+              end if
            end if
-           call mio_setup_rank (mio_mype)
         end if
         mio_mype_p1 = mio_mype + 1
 
