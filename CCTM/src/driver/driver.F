@@ -533,7 +533,7 @@ C Initialize ddm3d calculations
          SENGRID => S_PCGRID(1:NCOLS,1:NROWS,:,:,:)
          SENGRID_TEMP => S_PCGRID_TEMP(1:NCOLS,1:NROWS,:,:)
 
-         ALLOCATE ( SAGRID( NCOLS,NROWS,A_NLYS,NPMAX,N_ASPCS ), STAT = STATUS)
+         ALLOCATE ( SAGRID( NCOLS,NROWS,A_NLAYS,NPMAX,N_ASPCS ), STAT = STATUS)
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'SAGRID memory allocation failed'
             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
@@ -575,7 +575,7 @@ C Convention: the input file concentration units are always ppmV.
 
          IF ( LIPR .OR. LIRR ) CALL PA_INIT ( CGRID, JDATE, JTIME, TSTEP )
 
-         ALLOCATE ( AGRID( NCOLS,NROWS,A_NLYS,N_ASPCS ), STAT = ALLOCSTAT )
+         ALLOCATE ( AGRID( NCOLS,NROWS,A_NLAYS,N_ASPCS ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'AGRID memory allocation failed'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -790,6 +790,7 @@ C Initialize MIO
 ! Output Instantaneous Values at first time step
       IF ( JDATE .EQ. STDATE .AND. JTIME .EQ. STTIME ) THEN
          CALL WR_INIT ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
+!        CALL WR_CONC ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
          IF ( L_ELMO ) THEN
             CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.TRUE. )
         END IF

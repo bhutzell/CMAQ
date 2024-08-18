@@ -8,12 +8,13 @@
          implicit none
 
          interface mio_set_global_attr
-           module procedure mio_set_global_attr_int,         &  ! an integer type
-                            mio_set_global_attr_int_array,   &  ! an integer array
-                            mio_set_global_attr_real,        &  ! a real type
-                            mio_set_global_attr_real_array,  &  ! a real array
-                            mio_set_global_attr_double,      &  ! a double precision type
-                            mio_set_global_attr_char            ! a character type
+           module procedure mio_set_global_attr_int,                &  ! an integer type
+                            mio_set_global_attr_int_array,          &  ! an integer array
+                            mio_set_global_attr_real,               &  ! a real type
+                            mio_set_global_attr_real_array,         &  ! a real array
+                            mio_set_global_attr_real_array_subset,  &  ! a subset from a source file
+                            mio_set_global_attr_double,             &  ! a double precision type
+                            mio_set_global_attr_char                   ! a character type
          end interface
 
          contains
@@ -235,6 +236,92 @@
            end if
 
          end subroutine mio_set_global_attr_real_array
+
+! ---------------------------------------------------------------------------
+         subroutine mio_set_global_attr_real_array_subset (infile, attr_name, source_file, begin, end)
+
+           character (*), intent(in) :: infile, source_file
+           character (*), intent(in) :: attr_name
+           integer, intent(in)       :: begin, end
+
+           integer :: m, s, e, c, stat, size, fnum, sfnum
+           logical :: lerror = .false.
+           real, allocatable :: value(:)
+
+           fnum  = mio_search (infile)
+
+           if (fnum < 0) then
+              write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name)
+              write (mio_logdev, *) ' due to file, ', trim(infile), ' does not exist'
+              lerror = .true.
+           else
+              sfnum  = mio_search (source_file)
+              if (sfnum < 0) then
+                 write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name)
+                 write (mio_logdev, *) ' due to file, ', trim(source_file), ' does not exist'
+                 lerror = .true.
+              else
+
+                 m = mio_search (attr_name,                              &
+                                 mio_file_data(fnum)%glo_att_name,       &
+                                 mio_file_data(fnum)%n_global_atts) 
+
+                 if (m .gt. 0) then
+                    if (mio_file_data(fnum)%glo_att_type(m) .eq. nf90_float) then
+                       s = mio_file_data(fnum)%glo_att_rrange(2*m-1)
+                       e = mio_file_data(fnum)%glo_att_rrange(2*m)
+
+                       allocate (value(e-s+1), stat=stat)
+
+                       stat = nf90_get_att (mio_file_data(sfnum)%fileid,          &
+                                            nf90_global,                          &
+                                            mio_file_data(sfnum)%glo_att_name(m), &
+                                            value)
+
+                       if (stat .ne. 0) then
+                          write (mio_logdev, *) ' Failed to get global attribute ', trim(attr_name)
+                          write (mio_logdev, *) ' due to ', trim(nf90_strerror(stat))
+                          lerror = .true.
+                       end if
+
+                       stat = nf90_put_att (mio_file_data(fnum)%fileid,           &
+                                            nf90_global,                          &
+                                            mio_file_data(fnum)%glo_att_name(m),  &
+                                            value(begin:end+1))
+
+                       size = end - begin + 1
+
+                       mio_file_data(fnum)%glo_att_rval(s:s+size) = value(begin:end+1)
+                       mio_file_data(fnum)%glo_att_rrange(2*m-1)  = s
+                       mio_file_data(fnum)%glo_att_rrange(2*m)    = s + size
+                       
+                       deallocate (value)
+
+                       if (stat .ne. 0) then
+                          write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name)
+                          write (mio_logdev, *) ' due to ', trim(nf90_strerror(stat))
+                          lerror = .true.
+                       end if
+
+                    else
+                       write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name)
+                       write (mio_logdev, *) ' due to mismatch global attribute data type'
+                       lerror = .true.
+                    end if
+                 else
+                    write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name)
+                    write (mio_logdev, *) ' due to non existence'
+                    lerror = .true.
+                 end if
+              end if
+           end if
+
+           if (lerror) then
+              write (mio_logdev, *) ' Abort in routine mio_set_global_attr_real_array due to error stated above'
+              stop
+           end if
+
+         end subroutine mio_set_global_attr_real_array_subset
 
 ! ---------------------------------------------------------------------------
          subroutine mio_set_global_attr_double (infile, attr_name, value)

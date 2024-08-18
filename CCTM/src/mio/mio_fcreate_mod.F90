@@ -11,14 +11,17 @@
 
         implicit none
 
-        private :: mio_output_mpas_basic_var,           &
-                   mio_process_wrf_var_att,             &
-                   mio_process_ioapi3_var_att,          &
-                   mio_transfer_global_attribute_info,  &
-                   mio_transfer_base_variable_info,     &
-                   mio_extract_wrf_var_info,            &
-                   mio_extract_mpas_var_info,           &
-                   extraction
+        logical :: subset_layer
+
+        private :: mio_output_mpas_basic_var,             &
+                   mio_process_wrf_var_att,               &
+                   mio_process_ioapi3_var_att,            &
+                   mio_transfer_global_attribute_info,    &
+                   mio_transfer_mpas_base_variable_info,  &
+                   mio_extract_wrf_var_info,              &
+                   mio_extract_mpas_var_info,             &
+                   extraction,                            &
+                   subset_layer
 
         contains
 
@@ -35,7 +38,7 @@
                      n_att, t_type, count, fnum, nlines, dim_loc,    &
                      new_file_dim_name_index(n_dim_names), ind, loc, &
                      index_mapping(n_dim_names), ind_count,          &
-                     n_replacements, dim_value
+                     n_replacements, dim_value, layer_id1, layer_id2
           character (mio_max_varname_len) :: tvname, tdim_name(6), tunit_name
           character (500)                 :: t_type_str
           character (500)                 :: str
@@ -68,6 +71,7 @@
 
           entire_file  = .false.
           partial_file = .false.
+          subset_layer = .false.
 
           if (present(replacement)) then
              call extraction (replacement, loc_replacement, n_replacements)
@@ -81,8 +85,7 @@
           new_file_dim_name_index = 0
 
           if (dest .gt. 0) then
-             write (mio_logdev, *) ' Abort in mio_fcreate: output file ' &
-                                  // trim(fname) // ' already exists'
+             write (mio_logdev, *) ' Abort in mio_fcreate: file ' // trim(fname) // ' already exists'
              stop
           else
 
@@ -115,6 +118,20 @@
                    else
                       source = mio_search(mio_file_data(mio_cfile)%filename)
                    end if
+
+                   if (mio_file_data(source)%file_format .eq. mio_ioapi3_format) then
+                      if (mio_nlays .ne. mio_file_data(source)%nlays) then
+                         subset_layer = .true.
+                      end if
+                      layer_id1 = mio_search ('LAY', mio_file_data(source)%dim_name, mio_file_data(source)%ndims)
+                   else if (mio_file_data(source)%file_format .eq.  mio_wrf_format) then
+                      layer_id1 = mio_search ('bottom_top', mio_file_data(source)%dim_name, mio_file_data(source)%ndims)
+                      layer_id2 = mio_search ('bottom_top_stag', mio_file_data(source)%dim_name, mio_file_data(source)%ndims)
+                   else if (mio_file_data(source)%file_format .eq.  mio_mpas_format) then
+                      layer_id1 = mio_search ('nVertLevels', mio_file_data(source)%dim_name, mio_file_data(source)%ndims)
+                      layer_id2 = mio_search ('nVertLevelsP1', mio_file_data(source)%dim_name, mio_file_data(source)%ndims)
+                   end if
+
                 end if
 
                 cfile_is_an_input_file = ((source <= mio_n_infiles) .and. (source > 0))
@@ -418,6 +435,12 @@
                             mio_file_data(dest)%var_dimsize(tndims-n+1,vdest) = mio_file_data(dest)%dim_value(dim_loc)
                          end do
 
+                         ! make adjustment for layer subsetting case. Currently only for IOAPI3 file type
+                         if (subset_layer .and. (mio_ioapi3_format == mio_file_data(source)%file_format)) then
+                            mio_file_data(dest)%var_dimsize(3,vdest) = mio_nlays
+                            mio_file_data(dest)%dim_value(layer_id1) = mio_nlays
+                         end if
+
                          if ((vdest == fnvars) .and. (source == 0)) then   ! for time variable from file template
                             mio_file_data(dest)%var_name(vdest)      = 'timestamp'
                             mio_file_data(dest)%var_type(vdest)      = mio_char
@@ -524,7 +547,7 @@
                    end do
 
                    if (mio_file_data(source)%file_format .eq. mio_mpas_format) then
-                      call mio_transfer_base_variable_info (source, dest)
+                      call mio_transfer_mpas_base_variable_info (source, dest)
                    end if
 
 !                  if (source > 0) then
@@ -910,7 +933,7 @@
         end subroutine mio_process_ioapi3_var_att 
 
 ! ---------------------------------------------------------------------------------------------
-        subroutine mio_transfer_base_variable_info (source, dest)
+        subroutine mio_transfer_mpas_base_variable_info (source, dest)
 
           integer, intent(in) :: source, dest
 
@@ -937,7 +960,7 @@
 
           end do
 
-        end subroutine  mio_transfer_base_variable_info 
+        end subroutine  mio_transfer_mpas_base_variable_info 
 
 ! ---------------------------------------------------------------------------------------------
         subroutine mio_transfer_global_attribute_info (source, dest)
@@ -997,7 +1020,12 @@
 
              mio_file_data(dest)%gl_ncols = mio_file_data(dest)%dim_value(6)
              mio_file_data(dest)%gl_nrows = mio_file_data(dest)%dim_value(5)
-             mio_file_data(dest)%nlays    = mio_file_data(dest)%dim_value(3)
+
+             if (subset_layer) then
+                mio_file_data(dest)%nlays = mio_nlays
+             else
+                mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(3)
+             end if
 
           else if ((mio_file_data(source)%file_format .eq. mio_wrf_format) .or.   &
                    (mio_file_data(source)%file_format .eq. mio_mpas_format) .or.  &
@@ -1013,10 +1041,18 @@
                    if (n < 0) then
                       mio_file_data(dest)%nlays = 1
                    else
-                      mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n) - 1
+                      if (subset_layer) then
+                         mio_file_data(dest)%nlays = mio_nlays
+                      else
+                         mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n) - 1
+                      end if
                    end if
                 else
-                   mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n)
+                   if (subset_layer) then
+                      mio_file_data(dest)%nlays = mio_nlays
+                   else
+                      mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n)
+                   end if
                 end if
                 mio_file_data(dest)%gl_nrows = 1
              else if (mio_file_data(source)%file_format .eq. mio_wrf_format) then
@@ -1024,7 +1060,11 @@
                 mio_file_data(dest)%gl_ncols = mio_file_data(dest)%dim_value(n)
                 n = mio_search ('bottom_top', mio_file_data(dest)%dim_name, mio_file_data(dest)%ndims)
                 if (n > 0) then
-                   mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n)
+                   if (subset_layer) then
+                      mio_file_data(dest)%nlays = mio_nlays
+                   else
+                      mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n)
+                   end if
                 else
                    mio_file_data(dest)%nlays = 1
                 end if
@@ -1035,7 +1075,11 @@
                 mio_file_data(dest)%gl_ncols = mio_file_data(dest)%dim_value(n)
                 n = mio_search ('dimz', mio_file_data(dest)%dim_name, mio_file_data(dest)%ndims)
                 if (n > 0) then
-                   mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n)
+                   if (subset_layer) then
+                      mio_file_data(dest)%nlays = mio_nlays
+                   else
+                      mio_file_data(dest)%nlays = mio_file_data(dest)%dim_value(n)
+                   end if
                 else
                    mio_file_data(dest)%nlays = 1
                 end if

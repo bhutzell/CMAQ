@@ -3510,15 +3510,28 @@
       CHARACTER( 16 ), SAVE :: PNAME = 'WRITE_ELMO'
       CHARACTER( 20 ) :: TIME_STAMP
       logical, save :: firstavg = .true.
-
+      logical, save :: INST_SUBSET_LAY, AVRG_SUBSET_LAY
          MDATE = JDATE
          MTIME = JTIME
 
 C *** Write data to the scalar output file.
          IF ( INST_ACTIVE ) THEN
+            call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
             if ( init_time ) then
                call mio_setfile( MET_CRO_3D )
-               call mio_fcreate( 'CTM_ELMO_MIO', io_mode)
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attributes NLAYS and VGLVS to match
+               INST_SUBSET_LAY = ( NLAY_ELMO_INST .NE. mio_nlays ) 
+               if ( INST_SUBSET_LAY ) mio_nlays = NLAY_ELMO_INST
+
+               call mio_fcreate( 'CTM_ELMO_MIO', io_mode )
+
+               if ( INST_SUBSET_LAY ) then
+                  if (mype == 0) then
+                     call mio_set_global_attr ( 'CTM_ELMO_MIO', 'NLAYS', NLAY_ELMO_INST )
+                     call mio_set_global_attr ( 'CTM_ELMO_MIO', 'VGLVLS', MET_CRO_3D, INST_LAYER_TOP, INST_LAYER_BOT+1 )
+                  end if
+               end if
             end if
 
 #ifndef mpas
@@ -3529,7 +3542,6 @@ C *** Write data to the scalar output file.
                CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
    
-            call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
             do ispc = 1, n_elmo_inst_out
                call mio_fwrite( 'CTM_ELMO_MIO', INST_PARS_OUT( ispc ), PNAME, 
      &               ELMO_INST(:,:,:,ispc), TIME_STAMP )
@@ -3558,13 +3570,25 @@ C *** Write data to the average aerosol diagnostic file.
                CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
 
-            if ( firstavg ) then
-               call mio_setfile( MET_CRO_3D )
-               call mio_fcreate( 'CTM_AELMO_MIO', io_mode)
-               firstavg = .false.
-            end if
             call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
-            call mio_setfile( 'CTM_AELMO_MIO')
+            if ( firstavg ) then
+               firstavg = .false.
+               call mio_setfile( MET_CRO_3D )
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attributes NLAYS and VGLVS to match
+               AVRG_SUBSET_LAY = ( NLAY_ELMO_AVRG .NE. mio_nlays ) 
+               if ( AVRG_SUBSET_LAY ) mio_nlays = NLAY_ELMO_AVRG
+  
+               call mio_fcreate( 'CTM_AELMO_MIO', io_mode )
+
+               if ( AVRG_SUBSET_LAY ) then
+                  if (mype == 0) then
+                     call mio_set_global_attr ( 'CTM_AELMO_MIO', 'NLAYS', NLAY_ELMO_AVRG )
+                     call mio_set_global_attr ( 'CTM_AELMO_MIO', 'VGLVLS', MET_CRO_3D, AVRG_LAYER_TOP, AVRG_LAYER_BOT+1 )
+                  end if
+               end if
+            end if
+
             do ispc = 1, n_elmo_avrg_out
                call mio_fwrite( 'CTM_AELMO_MIO', AVRG_PARS_OUT( ispc ), PNAME, 
      &               ELMO_AVRG(:,:,:,ispc) / (2.0 * ( ELMO_NSTEP - 1.0 ) ), 

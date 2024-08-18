@@ -57,7 +57,7 @@ C species classes configuration for average CONC
       INTEGER, SAVE :: N_A_AE_SPCD
                                 
 C Number of Average Concentration Layers                                
-      INTEGER, SAVE :: A_NLYS = 1
+      INTEGER, SAVE :: A_NLAYS = 1
 
 C Average Arrays for Met variables
       REAL, SAVE, ALLOCATABLE :: AVG_WVEL( :,:,: )
@@ -69,6 +69,8 @@ C Logical to test whether met variables are included
       LOGICAL, SAVE :: L_ACONC_RH = .FALSE.
       LOGICAL, SAVE :: L_ACONC_TA = .FALSE.
       LOGICAL, SAVE :: L_ACONC_PRES = .FALSE.
+
+      LOGICAL :: ACONC_SUBSET_LAYER = .FALSE.
 
       CONTAINS
 
@@ -134,6 +136,7 @@ C  Retrieve CTM_WVEL environmental variable to see if user wants diagnosed verti
          END IF
 C Retrieve the layer range used in integral average concentration file
          IF ( ACONC_ELEV .EQ. -1 ) ACONC_ELEV = NLAYS
+         IF ( ( ACONC_BLEV .NE. 1 ) .OR. ( ACONC_ELEV .NE. NLAYS ) ) ACONC_SUBSET_LAYER = .TRUE.
 
          IF ( ACONC_BLEV .LE. 0 .OR. ACONC_ELEV .GT. NLAYS ) THEN
             WRITE( XMSG,'( "Layer range", 2I4, " invalid for this model" )' )
@@ -141,7 +144,7 @@ C Retrieve the layer range used in integral average concentration file
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
          END IF
 
-         A_NLYS = ACONC_ELEV - ACONC_BLEV + 1
+         A_NLAYS = ACONC_ELEV - ACONC_BLEV + 1
 
 C Check species names against include files and create AVG_CONC_MAP, and
 C get starting index in AGRID and total count for each species class
@@ -202,16 +205,16 @@ C and the classes must be in the sequence: GC, AE, NR, TR
                         A_TR_SPC( N_A_TR_SPC ) = ACONC_FILE_SPCS( VAR )
                         TR_MAP( N_A_TR_SPC ) = V + OFF
                      ELSE IF ( ACONC_FILE_SPCS( VAR ) .EQ. 'WVEL' ) THEN
-                        ALLOCATE( AVG_WVEL( NCOLS,NROWS,A_NLYS ) )
+                        ALLOCATE( AVG_WVEL( NCOLS,NROWS,A_NLAYS ) )
                      ELSE IF ( ACONC_FILE_SPCS( VAR ) .EQ. 'RH' ) THEN
                         L_ACONC_RH = .TRUE.
-                        ALLOCATE( AVG_RH( NCOLS,NROWS,A_NLYS ) )
+                        ALLOCATE( AVG_RH( NCOLS,NROWS,A_NLAYS ) )
                      ELSE IF ( ACONC_FILE_SPCS( VAR ) .EQ. 'TA' ) THEN
                         L_ACONC_TA = .TRUE.
-                        ALLOCATE( AVG_TA( NCOLS,NROWS,A_NLYS ) )
+                        ALLOCATE( AVG_TA( NCOLS,NROWS,A_NLAYS ) )
                      ELSE IF ( ACONC_FILE_SPCS( VAR ) .EQ. 'PRES' ) THEN
                         L_ACONC_PRES = .TRUE.
-                        ALLOCATE( AVG_PRES( NCOLS,NROWS,A_NLYS ) )
+                        ALLOCATE( AVG_PRES( NCOLS,NROWS,A_NLAYS ) )
                      ELSE
                         XMSG = 'Variable ' // ACONC_FILE_SPCS( VAR )
      &                  // ' was requested for average concentration '

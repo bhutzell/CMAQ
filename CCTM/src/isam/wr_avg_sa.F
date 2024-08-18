@@ -69,7 +69,7 @@ C Local variables:
       INTEGER      L, K, KD, VAR, SPC ! loop counters
       INTEGER      STATUS
 
-      INTEGER, SAVE :: A_NLYS
+      INTEGER, SAVE :: A_NLAYS
 
       INTEGER TSTEP_RF, NTHIK_RF, NCOLS_RF, NROWS_RF, GDTYP_RF
       REAL( 8 ) :: P_ALP_RF, P_BET_RF, P_GAM_RF
@@ -92,7 +92,7 @@ C Try to open existing file for update
 
          IF ( AISAM_ELEV .EQ. -1 ) AISAM_ELEV = NLAYS
 
-         A_NLYS = AISAM_ELEV - AISAM_BLEV + 1
+         A_NLAYS = AISAM_ELEV - AISAM_BLEV + 1
 
          OK = OPEN3( SA_ACONC_1, FSRDWR3, PNAME )
          CALL SUBST_GLOBAL_LOGICAL( OK, 'AND' )
@@ -118,7 +118,7 @@ C Set file header attributes that differ from CONC and open the file
                SDATE3D = MDATE
                STIME3D = MTIME
                TSTEP3D = TSTEP
-               NLAYS3D = A_NLYS
+               NLAYS3D = A_NLAYS
 
                L = 0
                DO K = AISAM_BLEV, AISAM_ELEV
@@ -136,7 +136,7 @@ C Set file header attributes that differ from CONC and open the file
                KD = 4
                VAR = AISAM_BLEV
                L = 0
-               DO K = KD + 1, MIN ( A_NLYS + KD, MXDESC3 )
+               DO K = KD + 1, MIN ( A_NLAYS + KD, MXDESC3 )
                   L = L + 1
                   WRITE( FDESC3D( K ),'( "Layer", I3, " to", I3, " " )' )
      &            VAR + L - 1, L
@@ -163,8 +163,8 @@ C Set file header attributes that differ from CONC and open the file
                L_ROW  ( 1:NVARS3D ) = .True.
                L_VEXT ( 1:NVARS3D ) = .False.
               
-!              CALL LOAD_MIO_FILE ( 'SA_ACONC_1', A_NLYS, AISAM_BLEV, AISAM_ELEV,
-               CALL LOAD_MIO_FILE ( 'SA_ACONC_MIO', A_NLYS, AISAM_BLEV, AISAM_ELEV,
+!              CALL LOAD_MIO_FILE ( 'SA_ACONC_1', A_NLAYS, AISAM_BLEV, AISAM_ELEV,
+               CALL LOAD_MIO_FILE ( 'SA_ACONC_MIO', A_NLAYS, AISAM_BLEV, AISAM_ELEV,
      &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -229,9 +229,9 @@ C File exists. Make sure it matches requested output.
 101            CONTINUE
             END DO
 
-            IF ( A_NLYS .NE. NLAYS3D ) THEN
+            IF ( A_NLAYS .NE. NLAYS3D ) THEN
                WRITE( XMSG, '( A, 2I6 )' )
-     &         'Number of layers don''t match file: ', A_NLYS, NLAYS3D
+     &         'Number of layers don''t match file: ', A_NLAYS, NLAYS3D
                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
             END IF
 
@@ -285,7 +285,7 @@ C Check other header data with CONC file as reference
       IF ( .NOT. END_TIME ) THEN
          CALL NEXTIME( MDATE, MTIME, -TSTEP)
       END IF
-      IF ( .NOT. ALLOCATED( BUF4 ) ) ALLOCATE( BUF4( NCOLS, NROWS, A_NLYS, N_SPCTAG ) )
+      IF ( .NOT. ALLOCATED( BUF4 ) ) ALLOCATE( BUF4( NCOLS, NROWS, A_NLAYS, N_SPCTAG ) )
 
     
       DO SPC = 1, N_SPCTAG

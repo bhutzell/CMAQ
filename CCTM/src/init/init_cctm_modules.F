@@ -97,7 +97,11 @@ C Arguments:
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
          END SUBROUTINE AERO
-
+         SUBROUTINE WR_CGRID( CGRID, JDATE, JTIME, OUTSTEP )
+            REAL, POINTER             :: CGRID( :,:,:,: )
+            INTEGER, INTENT( IN )     :: JDATE, JTIME
+            INTEGER, INTENT( IN )     :: OUTSTEP
+         END SUBROUTINE WR_CGRID
       END INTERFACE
 
       ! Calculate Vertical Diffusion, Dry Deposition, and Emissions

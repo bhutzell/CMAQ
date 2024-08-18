@@ -101,11 +101,22 @@ C (initial data assumed to be in correct output units)
          CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
       END IF
 
-      WRITE( LOGDEV,* ) ' '
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
       call mio_setfile( MET_CRO_3D )
+      if (conc_subset_layer) mio_nlays = C_NLAYS
+
       call mio_fcreate( 'CTM_CONC_MIO', io_mode )
+
+      if (conc_subset_layer) then
+         if (mype == 0) then
+            call mio_set_global_attr ( 'CTM_CONC_MIO', 'NLAYS', C_NLAYS )
+            call mio_set_global_attr ( 'CTM_CONC_MIO', 'VGLVLS', MET_CRO_3D, CONC_BLEV, CONC_ELEV+1 )
+         end if
+      end if
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
 
+      WRITE( LOGDEV,* ) ' '
       V = 0
 
       IF ( N_C_GC_SPC .NE. 0 ) WRITE( LOGDEV,'( /5X, "Gas Chem", A )' ) SSTR
