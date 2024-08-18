@@ -245,97 +245,81 @@
 
           character (20), parameter :: pname = 'mio_fwrite_2d_real'
           integer :: t, v, first_dim, mystart(5),    &
-                     mycount(5), floc, stat
+                     mycount(5), floc, stat, s1, s2
           real, allocatable :: recv_buf(:,:) 
           character (mio_max_time_length) :: t_timestamp
           logical :: lerror = .false.
           real, allocatable :: mio_mpas_output_2d_data(:,:)
+          real, allocatable :: mio_output_3d_data(:,:,:)
 
           floc = mio_search (fname)
 
-!     write (6, *) ' ==d== write 2d a '
-          if (floc < 0) then
-             write (mio_logdev, *) ' Error: in routine ', trim(pname)
-             write (mio_logdev, *) '        cannot find file ', trim(fname)
-             lerror = .true.
+          if (mio_file_data(floc)%file_format == mio_ioapi3_format) then
+             s1 = size(data,1)
+             s2 = size(data,2)
+             allocate (mio_output_3d_data(s1,s2,1), stat=stat)
+             mio_output_3d_data (:,:,1) = data
+             call mio_fwrite_3d_real (fname, vname, caller, mio_output_3d_data, timestamp)
+             deallocate (mio_output_3d_data)
           else
 
-             if (mio_file_data(floc)%mode == mio_read_only) then
-                write (mio_logdev, *) ' Calling from: ', trim(caller)
-                write (mio_logdev, *) ' Abort in routine ', trim(pname),                        &
-                                      ' due to writing data to a read-only file ', trim(fname)
-                stop
-             end if
-
-             v = mio_search (vname, mio_file_data(floc)%var_name, mio_file_data(floc)%fnvars)
-
-             if (v < 0) then
+!     write (6, *) ' ==d== write 2d a ', mio_file_data(floc)%file_format
+             if (floc < 0) then
                 write (mio_logdev, *) ' Error: in routine ', trim(pname)
-                write (mio_logdev, *) '        cannot find variable ', trim(vname)
+                write (mio_logdev, *) '        cannot find file ', trim(fname)
                 lerror = .true.
              else
-                if (present(timestamp)) then
-                   t = mio_search (timestamp, mio_file_data(floc)%timestamp, mio_file_data(floc)%nsteps)
-!     write (6, *) ' ==d== write 2d b ', t
-                   ! when t < 0 means current time step data has not been written out
-                   if ((t < 0) .or. (mio_file_data(floc)%file_format .eq. mio_ioapi3_format)) then
-                      if (t < 0) then
-                         t = mio_file_data(floc)%nsteps + 1
-                         mio_file_data(floc)%nsteps = t
-                      end if
-!     write (6, *) ' ==d== write 2d c ', t, floc, t
-                      call mio_write_timestamp (floc, timestamp, v, t, pname)
-                   end if
-                else
-                   t = 1
-                   if (mio_file_data(floc)%file_format .eq. mio_ioapi3_format) then
-                      ! special treatment for IOAPI time independent data
-                      t_timestamp = '0'
-                      call mio_write_timestamp (floc, t_timestamp, v, t, pname)
-                   end if
+
+                if (mio_file_data(floc)%mode == mio_read_only) then
+                   write (mio_logdev, *) ' Calling from: ', trim(caller)
+                   write (mio_logdev, *) ' Abort in routine ', trim(pname),                        &
+                                         ' due to writing data to a read-only file ', trim(fname)
+                   stop
                 end if
 
-                if (.not. lerror) then
-                   mystart = 1
-                   mycount = 1
-                   mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
-                   mystart(3) = t
+                v = mio_search (vname, mio_file_data(floc)%var_name, mio_file_data(floc)%fnvars)
 
-                   if (mio_file_data(floc)%file_format .eq. mio_mpas_format) then
-
-                      first_dim = size(data,1)
-
-                      if (mio_parallelism .eq. mio_serial) then
-                         if (.not. mio_put_data (mio_file_data(floc)%fileid,    &
-                                                 mio_file_data(floc)%var_id(v), &
-                                                 mystart, mycount,              &
-                                                 data) ) then
-                            lerror = .true.
-                         else
-                            if (nf90_sync (mio_file_data(floc)%fileid) .ne. nf90_noerr) then
-                               write (mio_logdev, *) ' Error: in routine ', trim(pname)
-                               write (mio_logdev, *) '        cannot sync ', trim(vname), ' to file ', trim(fname)
-                               lerror = .true.
-                            end if
+                if (v < 0) then
+                   write (mio_logdev, *) ' Error: in routine ', trim(pname)
+                   write (mio_logdev, *) '        cannot find variable ', trim(vname)
+                   lerror = .true.
+                else
+                   if (present(timestamp)) then
+                      t = mio_search (timestamp, mio_file_data(floc)%timestamp, mio_file_data(floc)%nsteps)
+!     write (6, *) ' ==d== write 2d b ', t
+                      ! when t < 0 means current time step data has not been written out
+                      if ((t < 0) .or. (mio_file_data(floc)%file_format .eq. mio_ioapi3_format)) then
+                         if (t < 0) then
+                            t = mio_file_data(floc)%nsteps + 1
+                            mio_file_data(floc)%nsteps = t
                          end if
+!     write (6, *) ' ==d== write 2d c ', t, floc, t
+                         call mio_write_timestamp (floc, timestamp, v, t, pname)
+                      end if
+                   else
+                      t = 1
+                      if (mio_file_data(floc)%file_format .eq. mio_ioapi3_format) then
+                         ! special treatment for IOAPI time independent data
+                         t_timestamp = '0'
+                         call mio_write_timestamp (floc, t_timestamp, v, t, pname)
+                      end if
+                   end if
 
-                      else if (mio_parallelism .eq. mio_pseudo) then
-                         allocate (mio_mpas_output_2d_data(mycount(1), mycount(2)), stat=stat)
+                   if (.not. lerror) then
+                      mystart = 1
+                      mycount = 1
+                      mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
+                      mystart(3) = t
 
-                         call mio_gather_data (data,                               &
-                                               mio_file_data(floc)%file_format,    &
-                                               mio_file_data(floc)%grid_type,      &
-                                               mio_file_data(floc)%colde_pe,       &
-                                               mio_file_data(floc)%rowde_pe,       &
-                                               mio_file_data(floc)%ncols_pe,       &
-                                               mio_file_data(floc)%nrows_pe,       &
-                                               mio_mpas_output_2d_data             )
+                      if (mio_file_data(floc)%file_format .eq. mio_mpas_format) then
 
-                         if (mio_mype .eq. 0) then
+                         first_dim = size(data,1)
+
+                         if (mio_parallelism .eq. mio_serial) then
                             if (.not. mio_put_data (mio_file_data(floc)%fileid,    &
                                                     mio_file_data(floc)%var_id(v), &
                                                     mystart, mycount,              &
-                                                    mio_mpas_output_2d_data) ) then
+                                                    data) ) then
                                lerror = .true.
                             else
                                if (nf90_sync (mio_file_data(floc)%fileid) .ne. nf90_noerr) then
@@ -344,44 +328,42 @@
                                   lerror = .true.
                                end if
                             end if
-                         end if
-                         deallocate (mio_mpas_output_2d_data)
-                      end if
 
-                   else   ! non-MPAS case
+                         else if (mio_parallelism .eq. mio_pseudo) then
+                            allocate (mio_mpas_output_2d_data(mycount(1), mycount(2)), stat=stat)
 
-                      if (mio_parallelism .eq. mio_serial) then
-                         if (.not. mio_put_data (mio_file_data(floc)%fileid,    &
-                                                 mio_file_data(floc)%var_id(v), &
-                                                 mystart, mycount, data) ) then
-                            lerror = .true.
-                         else
-                            if (nf90_sync (mio_file_data(floc)%fileid) .ne. nf90_noerr) then
-                               write (mio_logdev, *) ' Error: in routine ', trim(pname)
-                               write (mio_logdev, *) '        cannot sync ', trim(vname), ' to file ', trim(fname)
-                               lerror = .true.
+                            call mio_gather_data (data,                               &
+                                                  mio_file_data(floc)%file_format,    &
+                                                  mio_file_data(floc)%grid_type,      &
+                                                  mio_file_data(floc)%colde_pe,       &
+                                                  mio_file_data(floc)%rowde_pe,       &
+                                                  mio_file_data(floc)%ncols_pe,       &
+                                                  mio_file_data(floc)%nrows_pe,       &
+                                                  mio_mpas_output_2d_data             )
+
+                            if (mio_mype .eq. 0) then
+                               if (.not. mio_put_data (mio_file_data(floc)%fileid,    &
+                                                       mio_file_data(floc)%var_id(v), &
+                                                       mystart, mycount,              &
+                                                       mio_mpas_output_2d_data) ) then
+                                  lerror = .true.
+                               else
+                                  if (nf90_sync (mio_file_data(floc)%fileid) .ne. nf90_noerr) then
+                                     write (mio_logdev, *) ' Error: in routine ', trim(pname)
+                                     write (mio_logdev, *) '        cannot sync ', trim(vname), ' to file ', trim(fname)
+                                     lerror = .true.
+                                  end if
+                               end if
                             end if
-                         end if
-                      else if (mio_parallelism .eq. mio_pseudo) then
-                         if (mio_mype .eq. 0) then
-                            allocate (recv_buf(mio_file_data(floc)%gl_ncols,  &
-                                               mio_file_data(floc)%gl_nrows), &
-                                               stat=stat)
+                            deallocate (mio_mpas_output_2d_data)
                          end if
 
-                         call mio_gather_data (data,                               &
-                                               mio_file_data(floc)%file_format,    &
-                                               mio_file_data(floc)%grid_type,      &
-                                               mio_file_data(floc)%colde_pe,       &
-                                               mio_file_data(floc)%rowde_pe,       &
-                                               mio_file_data(floc)%ncols_pe,       &
-                                               mio_file_data(floc)%nrows_pe,       &
-                                               recv_buf                        )
+                      else   ! non-MPAS case
 
-                         if (mio_mype .eq. 0) then
+                         if (mio_parallelism .eq. mio_serial) then
                             if (.not. mio_put_data (mio_file_data(floc)%fileid,    &
                                                     mio_file_data(floc)%var_id(v), &
-                                                    mystart, mycount, recv_buf) ) then
+                                                    mystart, mycount, data) ) then
                                lerror = .true.
                             else
                                if (nf90_sync (mio_file_data(floc)%fileid) .ne. nf90_noerr) then
@@ -390,14 +372,42 @@
                                   lerror = .true.
                                end if
                             end if
-                            deallocate (recv_buf)
+                         else if (mio_parallelism .eq. mio_pseudo) then
+                            if (mio_mype .eq. 0) then
+                               allocate (recv_buf(mio_file_data(floc)%gl_ncols,  &
+                                                  mio_file_data(floc)%gl_nrows), &
+                                                  stat=stat)
+                            end if
+
+                            call mio_gather_data (data,                               &
+                                                  mio_file_data(floc)%file_format,    &
+                                                  mio_file_data(floc)%grid_type,      &
+                                                  mio_file_data(floc)%colde_pe,       &
+                                                  mio_file_data(floc)%rowde_pe,       &
+                                                  mio_file_data(floc)%ncols_pe,       &
+                                                  mio_file_data(floc)%nrows_pe,       &
+                                                  recv_buf                        )
+
+                            if (mio_mype .eq. 0) then
+                               if (.not. mio_put_data (mio_file_data(floc)%fileid,    &
+                                                       mio_file_data(floc)%var_id(v), &
+                                                       mystart, mycount, recv_buf) ) then
+                                  lerror = .true.
+                               else
+                                  if (nf90_sync (mio_file_data(floc)%fileid) .ne. nf90_noerr) then
+                                     write (mio_logdev, *) ' Error: in routine ', trim(pname)
+                                     write (mio_logdev, *) '        cannot sync ', trim(vname), ' to file ', trim(fname)
+                                     lerror = .true.
+                                  end if
+                               end if
+                               deallocate (recv_buf)
+                            end if
                          end if
                       end if
                    end if
                 end if
              end if
           end if
-
           if (lerror) then
              write (mio_logdev, *) ' Calling from: ', trim(caller)
              write (mio_logdev, *) ' Abort in routine ', trim(pname), ' due to an error in writing ',  &

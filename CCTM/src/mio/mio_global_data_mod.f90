@@ -6,31 +6,32 @@
 
         implicit none
 
-        integer :: mio_nfiles         ! total number of files
-        integer :: mio_n_infiles      ! total number of input files
-        integer :: mio_n_outfiles     ! total number of output files
-        integer :: mio_cfile          ! current file pointer
+        integer :: mio_nfiles           ! total number of files
+        integer :: mio_n_infiles        ! total number of input files
+        integer :: mio_n_outfiles       ! total number of output files
+        integer :: mio_cfile            ! current file pointer
 
-        integer :: mio_mype           ! mype
-        integer :: mio_mype_p1        ! mype + 1
+        integer :: mio_mype             ! mype
+        integer :: mio_mype_p1          ! mype + 1
+        logical :: mio_io_pe_inclusive  ! indicator whether this PE handles output
 
-        integer :: mio_logdev         ! log device number
+        integer :: mio_logdev           ! log device number
 
-        integer :: mio_parallelism    ! indicate I/O parallelism implemmentation
+        integer :: mio_parallelism      ! indicator for I/O parallelism implementation
 
         integer :: mio_base_ncols   
-        integer :: mio_base_nrows     ! # of columns and rows in base domain
+        integer :: mio_base_nrows       ! # of columns and rows in base domain
 
-        integer :: mio_nprocs         ! total # allocated processors
-        integer :: mio_npcol          ! # allocated processor along column dimension
-        integer :: mio_nprow          ! # allocated processor along row dimension
+        integer :: mio_nprocs           ! total # allocated processors
+        integer :: mio_npcol            ! # allocated processor along column dimension
+        integer :: mio_nprow            ! # allocated processor along row dimension
 
-! mio_file_data will be allocated based on number of pre-defined number
-! of input and output files. It also assumes that once a file open, it
+! mio_file_data will be allocated based on pre-defined number of
+! input and output files. It also assumes that once a file is opened, it
 ! won't be closed until the very end.
         type(mio_file_record), allocatable :: mio_file_data(:)
 
-! to store output file variable information defined in file_input.txt
+! to store output file variable information defined in mio_file_input
         type(mio_outfile_def_record) :: mio_outfile_def_info
 
 ! for mpas
@@ -45,7 +46,7 @@
                                                 ! time variable and variable in MPAS that 
                                                 ! defines a mesh
         integer :: mio_nlays                    ! # of layers
-        integer :: mio_nvars                    ! # of varibles exclude time and basic MPAS variables 
+        integer :: mio_nvars                    ! # of variables excluding time and basic MPAS variables 
         integer :: mio_time_var_ind             ! time dimension variable index
         integer :: mio_bndy_var_ind             ! boundary dimension variable index
 
