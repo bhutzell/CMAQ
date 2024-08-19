@@ -241,10 +241,10 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       ! Spectral Variables and diagnostics
      &ELDTP( 'AOD_550      ',ID_AOD550,     ET_PHOT,     F, '1     ', 'Aerosol Optical Depth at 550 nm -Angstrom interp' ),
      &ELDTP( 'PM_EXT_550   ',ID_PMEXT550,   ET_PHOT,     F, 'Mm-1  ', 'Aerosol Extinction at 550 nm -Angstrom interp' ),
-     &ELDTP( 'NO2_COLUMN   ',ID_NO2COL,     ET_PHOT,     F, 'petamolec cm-2', 'NO2 column density' ),
-     &ELDTP( 'SO2_COLUMN   ',ID_SO2COL,     ET_PHOT,     F, 'petamolec cm-2', 'SO2 column density' ),
-     &ELDTP( 'HCHO_COLUMN  ',ID_HCHOCOL,    ET_PHOT,     F, 'petamolec cm-2', 'HCHO column density' ),
-     &ELDTP( 'CO_COLUMN    ',ID_COCOL,      ET_PHOT,     F, 'petamolec cm-2', 'CO column density' ),
+     &ELDTP( 'NO2_COLUMN   ',ID_NO2COL,     ET_PHOT,     F, 'Pmolec cm-2', 'NO2 column density' ),
+     &ELDTP( 'SO2_COLUMN   ',ID_SO2COL,     ET_PHOT,     F, 'Pmolec cm-2', 'SO2 column density' ),
+     &ELDTP( 'HCHO_COLUMN  ',ID_HCHOCOL,    ET_PHOT,     F, 'Pmolec cm-2', 'HCHO column density' ),
+     &ELDTP( 'CO_COLUMN    ',ID_COCOL,      ET_PHOT,     F, 'Pmolec cm-2', 'CO column density' ),
 
       ! Other Special Variables and Properties            
      &ELDTP( 'PM25_FRM     ',ID_PM25_FRM,   ET_DRVD,     F, 'ug m-3', 'Federal Reference Method PM2.5' ),
@@ -279,31 +279,42 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       TYPE (ELMO_KEY_TYPE), ALLOCATABLE, SAVE :: ELMO_KEY( : )
       INTEGER, SAVE :: N_KEY
 
-      CHARACTER(32), ALLOCATABLE, SAVE :: INST_VARS_NML( : )
-      CHARACTER(32), ALLOCATABLE, SAVE :: AVRG_VARS_NML( : )
-      INTEGER, SAVE :: N_ELMO_INST, N_ELMO_AVRG
+      INTEGER, SAVE :: N_ELMO_FILES
 
-      LOGICAL, SAVE :: INST_ACTIVE, AVRG_ACTIVE
-      INTEGER, SAVE :: INST_LAYER_TOP, INST_LAYER_BOT,
-     &                 AVRG_LAYER_TOP, AVRG_LAYER_BOT
-      
-      INTEGER, SAVE :: NLAY_ELMO_INST
-      INTEGER, SAVE :: NLAY_ELMO_AVRG
+      TYPE ELMO_FILE_TYPE
+          CHARACTER(300)              :: FILENAME     ! Filename with full path
+          INTEGER                     :: STRUCT       ! 0 = gridded, 1 = unstrcutured
+          CHARACTER( 16)              :: FLOGICAL     ! I/O Logical Name for each output file
+          INTEGER                     :: TSTEP        ! Output Time Step (HHMMSS)
+          INTEGER                     :: TMODE        ! 0 = Instantaneous, 1 = Average/Cumulative
+          INTEGER                     :: LAY_BOT      ! Bottom Layer
+          INTEGER                     :: LAY_TOP      ! Top Layer
+          INTEGER                     :: NLAYS        ! Number of Layers
+          INTEGER                     :: N_VARS_IN    ! Number of variables for this file 
+                                                      !   specified thorugh the interface
+          CHARACTER(32), ALLOCATABLE  :: VARS_IN(:)   ! Variables on each output file
+          INTEGER                     :: N_VARS       ! Number of Variables after processing
+          INTEGER, ALLOCATABLE        :: TABID(:)     ! ID of Variable on ELMO_TABLE
+          INTEGER, ALLOCATABLE        :: USEDID(:)    ! ID of Variable in ELMO_USED array
+      END TYPE ELMO_FILE_TYPE
 
-      LOGICAL, ALLOCATABLE, SAVE :: L_ELMO_TABLE_INST(:), L_ELMO_TABLE_AVRG(:),
-     &                              L_ELMO_TABLE_USED(:)
+      TYPE ( ELMO_FILE_TYPE ), ALLOCATABLE, SAVE :: ELMO_FILE( : )
+
+      LOGICAL, ALLOCATABLE, SAVE :: L_ELMO_TABLE_OUT(:), L_ELMO_TABLE_USED(:)
+
+      TYPE ELMO_CONC_TYPE
+          REAL, ALLOCATABLE           :: DATA(:,:,:,:)
+      END TYPE ELMO_CONC_TYPE
+
+      TYPE ( ELMO_CONC_TYPE ), ALLOCATABLE, SAVE :: ELMO_CONC( : )
 
       INTEGER, ALLOCATABLE, SAVE :: MAP_USEDtoTABLE( : ), MAP_TABLEtoUSED( : )
-      INTEGER, ALLOCATABLE, SAVE :: MAP_AVRGtoUSED( : ), MAP_INSTtoUSED( : )
-      INTEGER, ALLOCATABLE, SAVE :: MAP_TABLEtoAVRG( : ), MAP_TABLEtoINST( : )
-      INTEGER, ALLOCATABLE, SAVE :: MAP_AVRGtoTABLE( : ), MAP_INSTtoTABLE( : )
       LOGICAL, ALLOCATABLE, SAVE :: L_CALCULATED( : )
       INTEGER, ALLOCATABLE, SAVE :: ELMO_USED_UNIT( : )
       INTEGER, SAVE :: N_ELMO_USED
+      INTEGER, SAVE :: LAY_TOP_MAX, LAY_BOT_MIN
 
       ! Variables for Storing Values of ELMO Output      
-      REAL, ALLOCATABLE, SAVE :: ELMO_INST( :,:,:,: )
-      REAL, ALLOCATABLE, SAVE :: ELMO_AVRG( :,:,:,: )
       REAL, ALLOCATABLE, SAVE :: ELMO_USED( : )
       LOGICAL, ALLOCATABLE, SAVE :: L_CALC( : )
       REAL, ALLOCATABLE, SAVE :: CONC_VEC( : )
@@ -375,8 +386,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                                               !   Default is wet
       END TYPE ELMO_COMP_TYPE
 
-      TYPE (ELMO_TABLE_TYPE), ALLOCATABLE, SAVE :: ELMO_TABLE( : ),
-     &                          ELMO_INST_PARS(:), ELMO_AVRG_PARS(:)
+      TYPE (ELMO_TABLE_TYPE), ALLOCATABLE, SAVE :: ELMO_TABLE( : )
       TYPE (ELMO_COMP_TYPE ), ALLOCATABLE, SAVE :: ELMO_COMP( : ) 
 
       INTEGER, SAVE :: N_ELMO_TABLE
@@ -384,15 +394,15 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
       ! Define List of Possible Units for Output
-      INTEGER, PARAMETER :: N_UNIT = 25
-      CHARACTER( 10 ), PARAMETER :: CUNIT( N_UNIT ) = 
-     &    (/'UG M-3    ','PPMV      ','UGC M-3   ','PPMC      ',
-     &      'UGN M-3   ','PPMN      ','M-3       ','M2 M-3    ',
-     &      'HA-1      ','M2 HA-1   ','KG HA-1   ','1         ',
-     &      '          ','UM        ','M3 M-3    ','N M-3     ',
-     &      'KG M-3    ','UMOL M-3  ','MOL L-1   ','UG UG-1   ',
-     &      'K         ','PA        ','S-1       ','M         ',
-     &      'MM-1      ' /)
+      INTEGER, PARAMETER :: N_UNIT = 27
+      CHARACTER( 11 ), PARAMETER :: CUNIT( N_UNIT ) = 
+     &    (/'UG M-3     ','PPMV       ','UGC M-3    ','PPMC       ',
+     &      'UGN M-3    ','PPMN       ','M-3        ','M2 M-3     ',
+     &      'HA-1       ','M2 HA-1    ','KG HA-1    ','1          ',
+     &      '           ','UM         ','M3 M-3     ','N M-3      ',
+     &      'KG M-3     ','UMOL M-3   ','MOL L-1    ','UG UG-1    ',
+     &      'K          ','PA         ','S-1        ','M          ',
+     &      'MM-1       ','M2 S-1     ','PMOLEC CM-2' /)
       
       INTEGER, PARAMETER :: IU_UNSP    = 0   ! Unspecified Units
       INTEGER, PARAMETER :: IU_UGpM3   = 1   ! ug m-3
@@ -562,7 +572,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 !------------------------------------------------------------------------------------------            
-      SUBROUTINE MAP_ELMO_NML( VARS_NML_IN, L_ELMO_TABLE, CFILE, IERROR )
+      SUBROUTINE MAP_ELMO_NML( IFL, L_ELMO_TABLE, IERROR )
 !     This subroutine maps user input from the CMAQ_Control namelist to
 !     the ELMO_TABLE to define which variables should be output. It
 !     expands Keywords, maps to concentrations, deposition fluxes, and
@@ -574,9 +584,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       IMPLICIT NONE
 
-      CHARACTER(32), INTENT( IN ) :: VARS_NML_IN( : )
+      INTEGER, INTENT( IN )  :: IFL
       LOGICAL, INTENT( OUT ) :: L_ELMO_TABLE( N_ELMO_TABLE )
-      CHARACTER(*), INTENT(IN) :: CFILE
       INTEGER, INTENT( OUT ) :: IERROR
       CHARACTER(32), ALLOCATABLE :: VARS_NML( : )
 
@@ -592,17 +601,17 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       IERROR = 0
 
       ! Diagnose VARS_NML_IN Size
-      N_NML = SIZE( VARS_NML_IN )
-      N_END = INDEX1( '', N_NML, VARS_NML_IN ) - 1
+      N_NML = ELMO_FILE( IFL )%N_VARS_IN
+      N_END = INDEX1( '', N_NML, ELMO_FILE( IFL )%VARS_IN(:) ) - 1
       IF ( N_END .LE. 0 ) THEN
-          WRITE( XMSG, '(A)' ),'ERROR: Undefined variables requested for ELMO output'
+          WRITE( XMSG, '(A)' ),'ERROR: Unreadable variables requested for ELMO output'
           CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
       END IF
       
       ! Initialize VARS_NML
       ALLOCATE( VARS_NML( 1000 ) )
       VARS_NML = ''
-      VARS_NML( 1:N_END ) = VARS_NML_IN( 1:N_END )
+      VARS_NML( 1:N_END ) = ELMO_FILE( IFL )%VARS_IN( 1:N_END )
 
       ! Loop through VARS_NML and Activate ELMO Variables
       DO WHILE ( N_END .GT. 0 )
@@ -767,8 +776,9 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          ELSE
             ! Entry Doesn't Match any variable on the ELMO table. Crash the
             ! model.
-            XMSG = 'An '//TRIM(CFILE)// ' ELMO variable ' // TRIM(VARS_NML(1)) //
-     &             ' has been requested that does not exist.'
+            XMSG = 'An ELMO variable ' // TRIM(VARS_NML(1)) //
+     &             ' has been requested that does not exist. It is on ' //
+     &             ' file: ' // TRIM( ELMO_FILE( IFL )%FLOGICAL )
             CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
          END IF
 
@@ -781,7 +791,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       END SUBROUTINE MAP_ELMO_NML    
 
 !------------------------------------------------------------------------------------------            
-      SUBROUTINE ELMO_CHECK_LAYERS( LAYER_TOP, LAYER_BOT, FNAME )
+      SUBROUTINE ELMO_CHECK_LAYERS( LAYER_TOP, LAYER_BOT, IFILE )
 !     This subroutine checks that the layers specified for an ELMO file
 !     are allowed.
 !-------------------------------------------------------------------------
@@ -792,24 +802,27 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       INTEGER, INTENT( INOUT )    :: LAYER_TOP
       INTEGER, INTENT( IN )       :: LAYER_BOT
-      CHARACTER(4), INTENT( IN )  :: FNAME
+      INTEGER, INTENT( IN )       :: IFILE
       CHARACTER(250)              :: XMSG
       CHARACTER, PARAMETER        :: PNAME = 'ELMO_CHECK_LAYERS'
+      CHARACTER( 13 )             :: FNAME
+
+      WRITE( FNAME, '("ELMO FILE ",I3.3)' ) IFILE
 
       IF ( LAYER_TOP .EQ. -1 ) LAYER_TOP = NLAYS
       IF ( LAYER_TOP .LE. 0 .OR. LAYER_TOP .GT. NLAYS ) THEN
-           XMSG = TRIM( FNAME ) // '_LAYER_TOP must be prescribed between '//
+           XMSG = TRIM( FNAME ) // '_LAY_TOP must be prescribed between '//
      &            '1 and NLAYS, or set to -1 to automatically choose NLAYS.'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
       IF ( LAYER_BOT .LE. 0 .OR. LAYER_BOT .GT. NLAYS ) THEN
-           XMSG = TRIM(FNAME) // '_LAYER_BOT must be prescribed between '// 
+           XMSG = TRIM(FNAME) // '_LAY_BOT must be prescribed between '// 
      &            '1 and NLAYS.'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
       IF ( LAYER_BOT .GT. LAYER_TOP ) THEN
-           XMSG = TRIM(FNAME) // ' LAYER_BOT must be less than or equal '// 
-     &            'to ' // TRIM(FNAME) // ' LAYER_TOP.'
+           XMSG = TRIM(FNAME) // ' LAY_BOT must be less than or equal '// 
+     &            'to ' // TRIM(FNAME) // ' LAY_TOP.'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 

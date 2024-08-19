@@ -292,7 +292,7 @@
       IMPLICIT NONE
 
       INTEGER, INTENT( IN ) :: C, R, L
-      INTEGER IDG, IM, AL, IL, IUSED, IAVRG, IINST, ILOC, J, IV, IERR
+      INTEGER IDG, IM, OL, IUSED, ILOC, J, IV, IVAR, IERR, IFL, U
 
       LOGICAL, INTENT( IN ) :: WRITE_STEP
       LOGICAL, INTENT( IN ) :: INIT_STEP
@@ -312,8 +312,7 @@
 
       ! Check to make sure the current layer is requested for diagnostic
       ! output.
-      IF ( ( L.GE.INST_LAYER_BOT .OR. L.GE.AVRG_LAYER_BOT ) .AND.
-     &     ( L.LE.INST_LAYER_TOP .OR. L.LE.AVRG_LAYER_TOP ) ) THEN
+      IF ( L .GE. LAY_BOT_MIN .AND. L .LE. LAY_TOP_MAX ) THEN
        
         ! Calculate All Aerosol Size Distribution Parameters
         CALL CALC_AERODIST_PARAMS( INIT_TIME )
@@ -337,76 +336,90 @@
            END IF
         END DO
 
-        ! *** Aggregate Diagnostic Variables in Average Array
-        !     using trapezoidal rule
-        IF ( AVRG_ACTIVE .AND. 
-     &       L.GE.AVRG_LAYER_BOT .AND. L.LE.AVRG_LAYER_TOP ) THEN
-           AL = L - AVRG_LAYER_BOT + 1
-           DO  IAVRG = 1,N_ELMO_AVRG
-              IV  = ELMO_TABLE( MAP_AVRGtoTABLE( IAVRG ) )%VAR_TYPE
-              IDG = ELMO_TABLE( MAP_AVRGtoTABLE( IAVRG ) )%ID
-
-              IF ( (IV .EQ. ET_DRVD .OR. IV .EQ. ET_ISAM_DRVD 
-     &                              .OR. IV .EQ. ET_DDM_DRVD ) .AND.
-     &             IDG .EQ. ID_PMF_PH .AND.
-     &             ELMO_USED( MAP_AVRGtoUSED( IAVRG ) ) .LT. -100. ) THEN
-                 ! Special Averaging for Particle pH
-                 ! Add whatever the current average is right now.
-                 ! Certainly this is problematic, particularly
-                 ! at the beginning of an hour where ELMO_AVRG =
-                 ! 0. It's best to either use the instantaneous
-                 ! value or recalculate the average fine particle acidity
-                 ! offline.
-                 IF ( INIT_STEP ) THEN
-                    ELMO_AVRG( C,R,AL,IAVRG ) = 3.5  ! Assume relatively acidic particles
-                 ELSE IF ( .NOT. WRITE_STEP ) THEN
-                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                                  + 2.0 * ELMO_AVRG( C,R,AL,IAVRG )
-                 END IF
-
-              ELSE IF ( IV .EQ. ET_DDEP .OR.
-     &                  IV .EQ. ET_ISAM_DDEP .OR.
-     &                  IV .EQ. ET_DDM_DDEP .OR.
-     &                  IV .EQ. ET_WDEP .OR. 
-     &                  IV .EQ. ET_ISAM_WDEP .OR. 
-     &                  IV .EQ. ET_DDM_WDEP .OR.
-     &                  IV .EQ. ET_CMPST_DEP .OR.
-     &                  IV .EQ. ET_ISAM_CMPST_DEP .OR.
-     &                  IV .EQ. ET_DDM_CMPST_DEP ) THEN
-                 ! This is a deposition species so we should be
-                 ! computing a cumulative sum, not an average by default
-                 IF ( INIT_STEP ) THEN
-                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
-                 ELSE   
-                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                      + ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
-                 END IF
-
-              ELSE
-                 ! For all other variables, apply trapezoidal rule for averaging.
-                 IF ( INIT_STEP ) THEN
-                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_USED( MAP_AVRGtoUSED( IAVRG ) ) 
-                 ELSE IF ( WRITE_STEP ) THEN
-                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                                        + ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
-                 ELSE
-                    ELMO_AVRG( C,R,AL,IAVRG ) = ELMO_AVRG( C,R,AL,IAVRG ) 
-     &                      + 2.0 * ELMO_USED( MAP_AVRGtoUSED( IAVRG ) )
-                 END IF 
-              END IF
-           END DO
-        END IF
-       
-        ! *** Populate Diagnostic Variables to Instantaneous Array if this is a write step
-        IF ( INST_ACTIVE .AND. ( INIT_TIME .OR. WRITE_STEP ) .AND.
-     &       L.GE.INST_LAYER_BOT .AND. L.LE.INST_LAYER_TOP ) THEN
-           IL = L - INST_LAYER_BOT + 1
-           DO IINST = 1,N_ELMO_INST
-              ELMO_INST( C,R,IL,IINST ) = ELMO_USED( MAP_INSTtoUSED( IINST ) )
-           END DO
-        END IF
- 
+      ELSE
+        ! This grid layer is not requested for output
+        RETURN
       END IF
+
+      DO IFL = 1,N_ELMO_FILES
+        IF ( L .GE. ELMO_FILE( IFL )%LAY_BOT .AND.
+     &       L .LE. ELMO_FILE( IFL )%LAY_TOP ) THEN
+
+          SELECT CASE ( ELMO_FILE( IFL )%TMODE )
+          CASE( 0 ) 
+             ! *** Populate Diagnostic Variables to Instantaneous 
+             !     Array if this is a write step
+             IF ( INIT_TIME .OR. WRITE_STEP ) THEN
+               OL = L - ELMO_FILE( IFL )%LAY_BOT + 1
+               DO IVAR = 1,ELMO_FILE( IFL )%N_VARS
+                   ELMO_CONC( IFL )%DATA( C,R,OL,IVAR ) = ELMO_USED( ELMO_FILE(IFL)%USEDID( IVAR ) )
+               END DO
+             END IF
+ 
+          CASE ( 1 )
+             ! *** Aggregate Diagnostic Variables in Average Array
+             !     using trapezoidal rule
+             OL = L - ELMO_FILE( IFL )%LAY_BOT + 1
+             DO  IVAR = 1,ELMO_FILE( IFL )%N_VARS
+                J   = ELMO_FILE( IFL )%TABID( IVAR )
+                U   = ELMO_FILE( IFL )%USEDID( IVAR )
+                IV  = ELMO_TABLE( J )%VAR_TYPE
+                IDG = ELMO_TABLE( J )%ID
+              
+                IF ( (IV .EQ. ET_DRVD .OR. IV .EQ. ET_ISAM_DRVD 
+     &                                .OR. IV .EQ. ET_DDM_DRVD ) .AND.
+     &               IDG .EQ. ID_PMF_PH .AND.
+     &               ELMO_USED( U ) .LT. -100. ) THEN
+                   ! Special Averaging for Particle pH
+                   ! Add whatever the current average is right now.
+                   ! Certainly this is problematic, particularly
+                   ! at the beginning of an hour where ELMO_AVRG =
+                   ! 0. It's best to either use the instantaneous
+                   ! value or recalculate the average fine particle acidity
+                   ! offline.
+                   IF ( INIT_STEP ) THEN
+                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
+                   ELSE IF ( .NOT. WRITE_STEP ) THEN
+                       ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) =
+     &                          ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) 
+     &                        + 2.0 * ELMO_CONC(IFL)%DATA( C,R,OL,IVAR )
+                   END IF
+              
+                ELSE IF ( IV .EQ. ET_DDEP .OR.
+     &                    IV .EQ. ET_ISAM_DDEP .OR.
+     &                    IV .EQ. ET_DDM_DDEP .OR.
+     &                    IV .EQ. ET_WDEP .OR. 
+     &                    IV .EQ. ET_ISAM_WDEP .OR. 
+     &                    IV .EQ. ET_DDM_WDEP .OR.
+     &                    IV .EQ. ET_CMPST_DEP .OR.
+     &                    IV .EQ. ET_ISAM_CMPST_DEP .OR.
+     &                    IV .EQ. ET_DDM_CMPST_DEP ) THEN
+                   ! This is a deposition species so we should be
+                   ! computing a cumulative sum, not an average by default
+                   IF ( INIT_STEP ) THEN
+                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = ELMO_USED( U )
+                   ELSE   
+                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = 
+     &                     ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) + ELMO_USED( U )
+                   END IF
+              
+                ELSE
+                   ! For all other variables, apply trapezoidal rule for averaging.
+                   IF ( INIT_STEP ) THEN
+                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = ELMO_USED( U ) 
+                   ELSE IF ( WRITE_STEP ) THEN
+                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = 
+     &                     ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) + ELMO_USED( U )
+                   ELSE
+                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = 
+     &                     ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) + 2.0 * ELMO_USED(U)
+                   END IF 
+                END IF
+             END DO
+          END SELECT
+        END IF
+      END DO
+
       END SUBROUTINE LOAD_ELMO
  
 !-------------------------------------------------------------------------
@@ -438,7 +451,6 @@
       INTEGER ISA, DSA
       LOGICAL LMODE
       REAL    FRAC( N_MODE ), FRAC1, FAC
-      INTEGER :: IDG, IM, IV, ISRC ! ELMO Table Entry Properties
 
       CHARACTER( 500 ) :: XMSG
   
@@ -599,8 +611,6 @@
         ELMO_USED( ILOC ) = OUTVAL
       END IF
 
-
- 
       END SUBROUTINE CALC_ELMO
  
       END MODULE ELMO_PROC

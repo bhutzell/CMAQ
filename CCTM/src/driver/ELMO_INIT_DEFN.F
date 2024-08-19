@@ -44,8 +44,8 @@
 
       IMPLICIT NONE
 
-      INTEGER N, M, P, J, IM, ILIST, S, F
-      INTEGER ID, IV, ISRC, IT, IS, NM, NS, IVAR
+      INTEGER N, M, P, J, IM, ILIST, S, F, NLAYS, N_VARS
+      INTEGER ID, IV, ISRC, IT, IS, NM, NS, IVAR, IFL
       INTEGER N1, N2, N3, MX_SRC
       CHARACTER( 16 ), SAVE :: PNAME = 'ELMO_INIT'
       CHARACTER( 500 ) :: XMSG
@@ -80,114 +80,81 @@
       CALL LOG_MESSAGE( LOGDEV, 'Resolving ELMO Keyword Input' )
       CALL ELMO_KEYWORDS
 
-      ! INSTANTANEOUS FILE INITIALIZATION
-      ! Determine which ELMO_TABLE variables belong on the Instantaneous
-      ! file
-      ALLOCATE( L_ELMO_TABLE_INST( N_ELMO_TABLE ),
-     &          MAP_TABLEtoINST( N_ELMO_TABLE ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'L_ELMO_TABLE_INST',PNAME ) 
-      L_ELMO_TABLE_INST( : ) = .FALSE.
-      MAP_TABLEtoINST = 0
-
-      IF ( INST_ACTIVE ) THEN
-        CALL MAP_ELMO_NML( INST_VARS_NML, L_ELMO_TABLE_INST, 'Instantaneous', IERROR )
-        IF ( IERROR .GT. 0 ) THEN
-           ! Entry Doesn't Match any variable on the ELMO table. Crash the model.
-           XMSG = 'An Instantaneous ELMO variable has been requested that does not exist.'
-           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-        END IF
-
-        N_ELMO_INST = COUNT( L_ELMO_TABLE_INST )
-        ALLOCATE( MAP_INSTtoTABLE( N_ELMO_INST ),
-     &            MAP_INSTtoUSED( N_ELMO_INST ),
-     &            ELMO_INST_PARS( N_ELMO_INST ), STAT=IOS )
-        CALL CHECKMEM( IOS, 'MAP_INSTtoTABLE',PNAME ) 
-        MAP_INSTtoTABLE = 0
-        MAP_INSTtoUSED  = 0
-
-        N = 0
-        DO J = 1,N_ELMO_TABLE
-          IF ( L_ELMO_TABLE_INST( J ) ) THEN 
-              N = N + 1
-              MAP_INSTtoTABLE( N ) = J
-              MAP_TABLEtoINST( J ) = N
-              ELMO_INST_PARS( N ) = ELMO_TABLE( J )
-          END IF
-        END DO
-        
-        ALLOCATE( ELMO_INST( NCOLS,NROWS,NLAY_ELMO_INST,
-     &                       N_ELMO_INST ), STAT=IOS )
-        CALL CHECKMEM( IOS, 'ELMO_INST', PNAME )
-        ELMO_INST = 0.0
-      END IF
-
-      ! AVERAGE FILE INITIALIZATION
-      ! Determine which ELMO_TABLE variables belong on the Average file
-      ALLOCATE( L_ELMO_TABLE_AVRG( N_ELMO_TABLE ),
-     &          MAP_TABLEtoAVRG( N_ELMO_TABLE ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'L_ELMO_TABLE_AVRG',PNAME ) 
-      L_ELMO_TABLE_AVRG( : ) = .FALSE.
-      MAP_TABLEtoAVRG = 0
-
-      IF ( AVRG_ACTIVE ) THEN
-        CALL MAP_ELMO_NML( AVRG_VARS_NML, L_ELMO_TABLE_AVRG, 'Average', IERROR )
-        IF ( IERROR .GT. 0 ) THEN
-           ! Entry Doesn't Match any variable on the ELMO table. Crash the model.
-           XMSG = 'An Average ELMO variable has been requested that does not exist.'
-           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-        END IF
-     
-        N_ELMO_AVRG = COUNT( L_ELMO_TABLE_AVRG )
-        ALLOCATE( MAP_AVRGtoTABLE( N_ELMO_AVRG ),
-     &            MAP_AVRGtoUSED( N_ELMO_AVRG ),
-     &            ELMO_AVRG_PARS( N_ELMO_AVRG ), STAT=IOS )
-        CALL CHECKMEM( IOS, 'ELMO_AVRGtoTABLE',PNAME ) 
-        MAP_AVRGtoTABLE = 0
-        MAP_AVRGtoUSED  = 0
-     
-        N = 0
-        DO J = 1,N_ELMO_TABLE
-            IF ( L_ELMO_TABLE_AVRG( J ) ) THEN 
-                N = N + 1
-                MAP_AVRGtoTABLE( N ) = J
-                MAP_TABLEtoAVRG( J ) = N
-                ELMO_AVRG_PARS( N ) = ELMO_TABLE( J )
-
-                ! Check that all components are defined
-                IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_CMPST .OR.
-     &               ELMO_TABLE( J )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
-     &               ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
-     &               ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
-     &               ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
-     &               ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
-                   DO IVAR = 1,ELMO_COMP( J )%N_VARS
-                      IF ( ELMO_COMP( J )%TABID( IVAR ) .EQ. 0 ) THEN
-                         WRITE( XMSG, '(3A,I2,6A)' ),'The ELMO COMPOSITE variable ',
-     &                        TRIM( ELMO_TABLE( J )%NAME ),' has a component (#',
-     &                        IVAR,') that is not available on the comprehensive ', 
-     &                        'ELMO Table. If this is a source-resolved ISAM COMPOSITE, ',
-     &                        'then it is recommended to check that the components ',
-     &                        'of this COMPOSITE are activated in the ISAM control ', 
-     &                        'file. If this is not an ISAM simulation, check to ', 
-     &                        'make sure all components are defined.'
-                         CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
-                      END IF
-                   END DO
-                END IF
-            END IF
-        END DO
-
-        ALLOCATE( ELMO_AVRG( NCOLS,NROWS,NLAY_ELMO_AVRG,
-     &                       N_ELMO_AVRG ), STAT=IOS )
-        CALL CHECKMEM( IOS, 'ELMO_AVRG', PNAME )
-        ELMO_AVRG = 0.0
-      END IF
-
-      ! Identify which ELMO_TABLE variables are Used and
-      ! allocate/map ELMO_USED vector
+      ! ELMO FILE INITIALIZATION
+      ! Determine which ELMO_TABLE variables belong on each output file
       ALLOCATE( L_ELMO_TABLE_USED( N_ELMO_TABLE ), STAT=IOS )
       CALL CHECKMEM( IOS, 'L_ELMO_TABLE_USED',PNAME ) 
-      L_ELMO_TABLE_USED(:) = L_ELMO_TABLE_INST .OR. L_ELMO_TABLE_AVRG
+      L_ELMO_TABLE_USED(:) = .FALSE.
+
+      ALLOCATE( L_ELMO_TABLE_OUT( N_ELMO_TABLE ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'L_ELMO_TABLE_OUT',PNAME ) 
+
+      ALLOCATE( ELMO_CONC( N_ELMO_FILES ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'ELMO_CONC',PNAME ) 
+
+      DO IFL = 1,N_ELMO_FILES
+         L_ELMO_TABLE_OUT = .FALSE.
+         CALL MAP_ELMO_NML( IFL, L_ELMO_TABLE_OUT, IERROR )
+         IF ( IERROR .GT. 0 ) THEN
+            ! Entry Doesn't Match any variable on the ELMO table. Crash the model.
+            XMSG = 'An ELMO variable has been requested that does not exist.'
+            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+         END IF
+         
+         ! Identify which ELMO_TABLE variables are Used and
+         ! allocate/map ELMO_USED vector
+         L_ELMO_TABLE_USED(:) = L_ELMO_TABLE_USED .OR. L_ELMO_TABLE_OUT
+
+         ! Populate ELMO FILE Mapping Indices
+         ELMO_FILE(IFL)%N_VARS = COUNT( L_ELMO_TABLE_OUT(:) )
+         N_VARS = ELMO_FILE(IFL)%N_VARS
+         ALLOCATE( ELMO_FILE(IFL)%TABID( N_VARS ),
+     &             ELMO_FILE(IFL)%USEDID( N_VARS ), STAT=IOS )
+         CALL CHECKMEM( IOS, 'ELMO_FILE IDs',PNAME ) 
+         ELMO_FILE( IFL )%TABID = 0
+         ELMO_FILE( IFL )%USEDID = 0
+
+         N = 0
+         DO J = 1,N_ELMO_TABLE
+             IF ( L_ELMO_TABLE_OUT( J ) ) THEN 
+                 N = N + 1
+                 ELMO_FILE( IFL )%TABID( N ) = J
+         
+                 ! Check that all components are defined
+                 IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_CMPST .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
+                    DO IVAR = 1,ELMO_COMP( J )%N_VARS
+                       IF ( ELMO_COMP( J )%TABID( IVAR ) .EQ. 0 ) THEN
+                          WRITE( XMSG, '(3A,I2,6A)' ),'The ELMO COMPOSITE variable ',
+     &                         TRIM( ELMO_TABLE( J )%NAME ),' has a component (#',
+     &                         IVAR,') that is not available on the comprehensive ', 
+     &                         'ELMO Table. If this is a source-resolved ISAM COMPOSITE, ',
+     &                         'then it is recommended to check that the components ',
+     &                         'of this COMPOSITE are activated in the ISAM control ', 
+     &                         'file. If this is not an ISAM simulation, check to ', 
+     &                         'make sure all components are defined.'
+                          CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
+                       END IF
+                    END DO
+                 END IF
+             END IF
+         END DO
+         
+         ! Allocate space for this file's data array
+         NLAYS = ELMO_FILE( IFL )%NLAYS
+         N_VARS = ELMO_FILE( IFL )%N_VARS
+         ALLOCATE( ELMO_CONC( IFL )%DATA( 
+     &               NCOLS,NROWS,NLAYS,N_VARS ), STAT=IOS )
+         CALL CHECKMEM( IOS, 'ELMO_CONC', PNAME )
+         ELMO_CONC( IFL )%DATA(:,:,:,:) = 0.0
+      END DO
+
+      LAY_TOP_MAX = MAXVAL( ELMO_FILE( : )%LAY_TOP )
+      LAY_BOT_MIN = MINVAL( ELMO_FILE( : )%LAY_BOT )
 
       N_ELMO_USED = COUNT( L_ELMO_TABLE_USED )
       ALLOCATE( ELMO_USED( N_ELMO_USED ), STAT=IOS )
@@ -207,11 +174,12 @@
               MAP_TABLEtoUSED( J ) = N
               MAP_USEDtoTABLE( N ) = J
 
-              IF ( MAP_TABLEtoINST( J ) .GT. 0 ) 
-     &           MAP_INSTtoUSED( MAP_TABLEtoINST( J ) ) = N
-              IF ( MAP_TABLEtoAVRG( J ) .GT. 0 ) 
-     &           MAP_AVRGtoUSED( MAP_TABLEtoAVRG( J ) ) = N
-
+              DO IFL = 1,N_ELMO_FILES
+                DO IVAR = 1,ELMO_FILE( IFL )%N_VARS
+                  IF ( ELMO_FILE( IFL )%TABID( IVAR ) .EQ. J ) 
+     &               ELMO_FILE( IFL )%USEDID( IVAR ) = N 
+                END DO
+              END DO
           END IF    
       END DO
 
@@ -235,52 +203,55 @@
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
       
-      USE RUNTIME_VARS, ONLY: CMAQ_CTRL, LOGDEV
+      USE RUNTIME_VARS, ONLY: CMAQ_CTRL, LOGDEV, LOG_MESSAGE,
+     &                        LOG_SUBHEADING, APPL_NAME, OUTDIR
       
       IMPLICIT NONE
 
-      INTEGER, PARAMETER :: N_NML = 1000
       INTEGER            :: FUNIT
       INTEGER            :: STAT
-      LOGICAL, SAVE      :: INSTANT  =.TRUE., 
-     &                      AVERAGE  =.TRUE.
-      INTEGER IVAR
 
+      INTEGER IVAR, N_MX_VARS, N_FILES, N_MAX_OUTPUT_VARIABLES
+      CHARACTER(30), ALLOCATABLE :: FLABEL( : )
+      CHARACTER(16), ALLOCATABLE :: FTYPE( : )
+      INTEGER, ALLOCATABLE       :: TSTEP( : )
+      CHARACTER(10), ALLOCATABLE :: TMODE( : )
+      INTEGER, ALLOCATABLE       :: LAY_BOT( : )
+      INTEGER, ALLOCATABLE       :: LAY_TOP( : )
+      CHARACTER(32), ALLOCATABLE :: FILE_VARS(:,:)
+                       
+      CHARACTER( 200 ) :: SUFFIX = '.nc'
       CHARACTER( 16 ), SAVE :: PNAME = 'READ_ELMO_NML'
       CHARACTER( 200 )   :: XMSG
-      INTEGER IOS
+      CHARACTER( 200 )   :: TMPLINE
+      INTEGER IOS, IFL, N_VARS, VALUE
+      CHARACTER( 5 )     :: CFIL
 
-      NAMELIST / elmo_activate / instant, average 
-      NAMELIST / elmo_inst_nml / inst_layer_top, 
-     &                           inst_layer_bot, inst_vars_nml
-      NAMELIST / elmo_avrg_nml / avrg_layer_top, 
-     &                           avrg_layer_bot, avrg_vars_nml
+      NAMELIST / ELMO_INIT  / N_Files, N_Max_Output_Variables
+      NAMELIST / ELMO_FILES / Flabel, Ftype, Tstep, Tmode, 
+     &                       Lay_Bot, Lay_Top, File_Vars
 
-      ALLOCATE( INST_VARS_NML( N_NML ), STAT = IOS )
-      CALL CHECKMEM( IOS, 'INST_VARS_NML',PNAME )
-      ALLOCATE( AVRG_VARS_NML( N_NML ), STAT = IOS )
-      CALL CHECKMEM( IOS, 'AVRG_VARS_NML',PNAME )
+      L_ELMO = .TRUE.
+
+      CALL LOG_MESSAGE( LOGDEV, ' ' )
+      CALL LOG_SUBHEADING( LOGDEV, 'Reading ELMO File Specifications '//
+     &                             'from CMAQ Control Namelist')
  
-
-      INST_ACTIVE      = .TRUE.
-      INST_LAYER_TOP   = 1
-      INST_LAYER_BOT   = 1
-      INST_VARS_NML(:) = ''
-      AVRG_ACTIVE      = .TRUE.
-      AVRG_LAYER_TOP   = 1
-      AVRG_LAYER_BOT   = 1
-      AVRG_VARS_NML(:) = ''
-
+      ! Set the standard suffix for all ELMO Output Files
+      IF ( APPL_NAME(1:8 ) .NE. 'CTM_APPL' ) SUFFIX = '_' // TRIM(APPL_NAME) // SUFFIX
+        
       ! Retrieve the Name of the CMAQ Control File
       IF ( CMAQ_CTRL .EQ. "CMAQ_CTRL_NML" ) THEN
           WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A)"),
-     &           'You have chosen not to indicate the location of an',
-     &           'CMAQ_Control_Misc.nml namelist file. Default settings ',
-     &           'will be assumed.'
+     &           'You have chosen not to indicate the location of a',
+     &           'CMAQ_Control.nml namelist file. No ELMO output files ',
+     &           'will be created.'
+          N_ELMO_FILES = 0
+          L_ELMO = .FALSE.
           RETURN
       END IF
-
-      ! Open CMAQ Control Namelist File
+ 
+      ! Open Mechanism-Specific Control File
       FUNIT = JUNIT()
       OPEN( FILE = CMAQ_CTRL, UNIT = FUNIT, STATUS = 'OLD',
      &      POSITION = 'REWIND', FORM='FORMATTED', IOSTAT = STAT )
@@ -289,78 +260,144 @@
       IF ( STAT .NE. 0 ) THEN
           WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
      &           'CMAQ Control namelist file: ',TRIM( CMAQ_CTRL )
-          CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
+          CALL M3EXIT( PNAME,0,0,XMSG,1 )
       END IF
- 
-      ! Read Toggles for Turning Instantaneous and Average Files On/Off
+
+      ! Read the number of ELMO Composite Variables
+      N_FILES = 0
+      N_MAX_OUTPUT_VARIABLES = 40
+
       REWIND( FUNIT )
-      READ( NML = elmo_activate, UNIT = FUNIT, IOSTAT=STAT )
-      IF ( STAT .NE. 0 ) THEN
-          WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
-     &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_ACTIVATE section of the CMAQ Control ',
-     &           'Namelist. Default values for this section will be ',
-     &           'assumed.'
+      READ( NML = ELMO_INIT, UNIT = FUNIT, IOSTAT=STAT )
+      IF ( STAT .EQ. -1 ) THEN
+          ! The Number of Files was completely missing
+          XMSG = 'WARNING: Number of ELMO Files was not specified. '//
+     &           'If you intended to specify composite variables for ELMO, '//
+     &           'check the CMAQ Control Namelist file. CMAQ will not '//
+     &           'write any ELMO output files.'
+          CALL LOG_MESSAGE( LOGDEV, ' ')
+          CALL LOG_MESSAGE( LOGDEV, XMSG )
+          N_ELMO_FILES = 0
+          L_ELMO = .FALSE.
+          RETURN
+
+      ELSE IF ( STAT .NE. 0 ) THEN
+          ! Read Error detected for ELMO_INIT
+          backspace( FUNIT )
+          read( FUNIT, fmt='(A)' ) tmpline
+          XMSG = 'ERROR: There was a syntax error reading the number of '//
+     &           'ELMO Files. Please '//
+     &           'check the format of each line for syntax errors. The '//
+     &           'invalid line was likely: '
+          CALL LOG_MESSAGE( LOGDEV, ' ')
+          CALL LOG_MESSAGE( LOGDEV, XMSG )
+          WRITE( LOGDEV, '(8x,A)' ) TMPLINE
+          CALL M3EXIT ( PNAME, 0, 0, 'CMAQ must Crash until you '//
+     &                  'fix the specification.', 1 )
       END IF
-      INST_ACTIVE = INSTANT
-      AVRG_ACTIVE = AVERAGE
-      L_ELMO = ( INST_ACTIVE .OR. AVRG_ACTIVE )
-#ifdef mpas
-      L_ELMO = .false.
-#endif
-      
-      IF ( .NOT. L_ELMO ) THEN
+
+      ! If there are no files, then just return
+      N_ELMO_FILES = N_FILES
+      N_MX_VARS = N_MAX_OUTPUT_VARIABLES
+      IF ( N_ELMO_FILES .LE. 0 ) THEN
+          L_ELMO = .FALSE.
           RETURN
       END IF
 
-      ! Read Desired ELMO_INST variables from input namelist
+      ! Allocate and Initialize Namelist Variables
+      ALLOCATE( FLABEL( N_FILES ), FTYPE( N_FILES ), TSTEP( N_FILES ),
+     &          TMODE( N_FILES ), LAY_BOT( N_FILES ),
+     &          LAY_TOP( N_FILES ), FILE_VARS( N_FILES, N_MX_VARS ),
+     &          STAT=STAT )
+      CALL CHECKMEM( STAT, 'ELMO_FILE_NML',PNAME)
+      FILE_VARS = ''
+
+      ! Read User-Specified ELMO file data from input namelist
       REWIND( FUNIT )
-      READ( NML = elmo_inst_nml, UNIT = FUNIT, IOSTAT=STAT )
+      READ( NML = ELMO_FILES, UNIT = FUNIT, IOSTAT=STAT )
       IF ( STAT .NE. 0 ) THEN
-          WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
-     &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_INST_NML section of the CMAQ Control ',
-     &           'Namelist. Default values for this section will be ',
-     &           'assumed.'
+          ! Read Error detected for ELMO_INIT
+          backspace( FUNIT )
+          read( FUNIT, fmt='(A)' ) tmpline
+          XMSG = 'ERROR: There was a syntax error reading the  '//
+     &           'ELMO File Data. Please check the format of each '//
+     &           'line for syntax errors. The invalid line was likely: '
+          CALL LOG_MESSAGE( LOGDEV, ' ')
+          CALL LOG_MESSAGE( LOGDEV, XMSG )
+          WRITE( LOGDEV, '(8x,A)' ) TMPLINE
+          CALL M3EXIT ( PNAME, 0, 0, 'CMAQ must Crash until you '//
+     &                  'fix the specification.', 1 ) 
       END IF
 
-      ! Check Top-Layer Specification
-      CALL ELMO_CHECK_LAYERS( INST_LAYER_TOP, INST_LAYER_BOT, 'INST' )
-      NLAY_ELMO_INST = INST_LAYER_TOP - INST_LAYER_BOT + 1
-      DO IVAR = 1,N_NML
-         IF ( INST_VARS_NML( IVAR )(1:3) .EQ. 'DD_' ) L_ELMO_DDEP = .TRUE.
-         IF ( INST_VARS_NML( IVAR )(1:3) .EQ. 'WD_' ) L_ELMO_WDEP = .TRUE.
-         IF ( INST_VARS_NML( IVAR )(1:8) .EQ. 'ALL_DDEP' ) L_ELMO_DDEP = .TRUE.
-         IF ( INST_VARS_NML( IVAR )(1:8) .EQ. 'ALL_WDEP' ) L_ELMO_WDEP = .TRUE.
-         IF ( INST_VARS_NML( IVAR )(1:7) .EQ. 'ALL_DEP' ) THEN
-             L_ELMO_DDEP = .TRUE.
-             L_ELMO_WDEP = .TRUE.
-         ENDIF
-      END DO
+      ! Populate ELMO_FILE Structure
+      ALLOCATE( ELMO_FILE( N_ELMO_FILES ), STAT=STAT )
+      CALL CHECKMEM( STAT, 'ELMO_FILE',PNAME)
 
-      ! Read Desired ELMO_AVRG variables from input namelist
-      REWIND( FUNIT )
-      READ( NML = elmo_avrg_nml, UNIT = FUNIT, IOSTAT=STAT )
-      IF ( STAT .NE. 0 ) THEN
-          WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
-     &           'Warning! Something went wrong while reading the ',
-     &           'ELMO_AVRG_NML section of the CMAQ Control ',
-     &           'Namelist. Default values for this section will be ',
-     &           'assumed.'
-      END IF
-     
-      ! Check Top-Layer Specification
-      CALL ELMO_CHECK_LAYERS( AVRG_LAYER_TOP, AVRG_LAYER_BOT, 'AVRG' )
-      NLAY_ELMO_AVRG = AVRG_LAYER_TOP - AVRG_LAYER_BOT + 1
-      DO IVAR = 1,N_NML
-         IF ( AVRG_VARS_NML( IVAR )(1:3) .EQ. 'DD_' ) L_ELMO_DDEP = .TRUE.
-         IF ( AVRG_VARS_NML( IVAR )(1:3) .EQ. 'WD_' ) L_ELMO_WDEP = .TRUE.
-         IF ( AVRG_VARS_NML( IVAR )(1:8) .EQ. 'ALL_DDEP' ) L_ELMO_DDEP = .TRUE.
-         IF ( AVRG_VARS_NML( IVAR )(1:8) .EQ. 'ALL_WDEP' ) L_ELMO_WDEP = .TRUE.
-         IF ( AVRG_VARS_NML( IVAR )(1:7) .EQ. 'ALL_DEP' ) THEN
-             L_ELMO_DDEP = .TRUE.
-             L_ELMO_WDEP = .TRUE.
-         ENDIF
+      DO IFL = 1,N_ELMO_FILES
+        ! Type of Grid
+        CALL UPCASE( FTYPE( IFL ) )
+        IF ( FTYPE( IFL ) .EQ. 'GRIDDED' ) THEN
+            ELMO_FILE( IFL )%STRUCT     = 0
+        ELSE IF ( FTYPE( IFL ) .EQ. 'UNSTRUCTURED' ) THEN
+            ELMO_FILE( IFL )%STRUCT     = 1
+        ELSE
+            WRITE( XMSG, "(A,I3.3,A)"),
+     &             'An ELMO file may only be gridded or unsctructured.  '//
+     &             'Please revise the value of Ftype(',IFL,') in ELMO_FILE.'
+            CALL M3EXIT ( PNAME, 0, 0, XMSG, 1 ) 
+        END IF
+
+        ! Set ELMO Output File Name with Path and File Logical      
+        WRITE( CFIL, '(I0)' ), IFL
+        ELMO_FILE( IFL )%FILENAME = 'CCTM_ELMO' // TRIM(CFIL) // '_' //
+     &                              TRIM( FLABEL(IFL) ) // TRIM( SUFFIX )
+        WRITE( ELMO_FILE( IFL )%FLOGICAL, '( "ELMO_",I3.3 )' ) IFL
+        IF ( OUTDIR .NE. '' ) THEN
+            ELMO_FILE( IFL )%FILENAME = TRIM( OUTDIR ) // '/' // 
+     &                                  TRIM( ELMO_FILE( IFL )%FILENAME )
+        END IF
+#ifndef mpas
+        VALUE = SETENVVAR( ELMO_FILE( IFL )%FLOGICAL, ELMO_FILE( IFL )%FILENAME )
+#endif
+
+        ! Output Time Step
+        ELMO_FILE( IFL )%TSTEP = TSTEP( IFL )
+        CALL UPCASE( TMODE( IFL ) )
+        IF ( TMODE( IFL ) .EQ. 'INSTANT' ) THEN
+           ELMO_FILE( IFL )%TMODE = 0
+        ELSE IF ( TMODE( IFL ) .EQ. 'AVERAGE' ) THEN
+           ELMO_FILE( IFL )%TMODE = 1
+        ELSE
+            WRITE( XMSG, "(A,I3.3,A)"),
+     &             'An ELMO file may only be average or instantaneous.  '//
+     &             'Please revise the value of Tmode(',IFL,') in ELMO_FILE.'
+            CALL M3EXIT ( PNAME, 0, 0, XMSG, 1 ) 
+        END IF
+
+        ! Layers
+        CALL ELMO_CHECK_LAYERS( LAY_TOP( IFL ), LAY_BOT( IFL ), IFL )
+        ELMO_FILE( IFL )%LAY_BOT = LAY_BOT( IFL )
+        ELMO_FILE( IFL )%LAY_TOP = LAY_TOP( IFL )
+        ELMO_FILE( IFL )%NLAYS   = LAY_TOP( IFL ) - LAY_BOT( IFL ) + 1
+
+        ! Allocate Field for Input Variables
+        ELMO_FILE( IFL )%N_VARS     = 0 
+        ELMO_FILE( IFL )%N_VARS_IN = N_MX_VARS
+        ALLOCATE( ELMO_FILE( IFL )%VARS_IN( N_MX_VARS ), STAT = IOS )
+        CALL CHECKMEM( IOS, 'ELMO_FILE%VARS_IN',PNAME ) 
+        ELMO_FILE( IFL )%VARS_IN(1:N_MX_VARS) = 
+     &       FILE_VARS( IFL,1:N_MX_VARS )
+
+        DO IVAR = 1,N_MX_VARS
+           IF ( FILE_VARS( IFL,IVAR )(1:3) .EQ. 'DD_' ) L_ELMO_DDEP = .TRUE.
+           IF ( FILE_VARS( IFL,IVAR )(1:3) .EQ. 'WD_' ) L_ELMO_WDEP = .TRUE.
+           IF ( FILE_VARS( IFL,IVAR )(1:8) .EQ. 'ALL_DDEP' ) L_ELMO_DDEP = .TRUE.
+           IF ( FILE_VARS( IFL,IVAR )(1:8) .EQ. 'ALL_WDEP' ) L_ELMO_WDEP = .TRUE.
+           IF ( FILE_VARS( IFL,IVAR )(1:7) .EQ. 'ALL_DEP' ) THEN
+               L_ELMO_DDEP = .TRUE.
+               L_ELMO_WDEP = .TRUE.
+           ENDIF
+        END DO
       END DO
       
       END SUBROUTINE READ_ELMO_NML
@@ -990,7 +1027,8 @@
         CHARACTER( 96 ) :: XMSG = ' '
 
         INTEGER :: L          ! loop induction variables
-        INTEGER :: MDATE, MTIME, IINST, IAVRG, J, ICOMP
+        INTEGER :: MDATE, MTIME, IFL, IVAR, J, ICOMP
+        INTEGER :: LAY_BOT, LAY_TOP
 
 #ifndef mpas
       ! Define General Output File Parameters
@@ -1013,35 +1051,48 @@
       VGTOP3D = VGTOP_GD
       NTHIK3D =     1
 #endif
-      ! Open Instantaneous ELMO File
-      IF ( INST_ACTIVE ) THEN
-
+      DO IFL = 1,N_ELMO_FILES
 #ifndef mpas
          ! Try to open existing file for update
-         IF ( .NOT. OPEN3( CTM_ELMO_1, FSRDWR3, PNAME ) ) THEN
-
+         IF ( .NOT. OPEN3( ELMO_FILE(IFL)%FLOGICAL, FSRDWR3, PNAME ) ) THEN
+            
             ! Set output file characteristics based on COORD.EXT and 
             ! open the ELMO file
             SDATE3D = JDATE
             STIME3D = JTIME
-            !CALL NEXTIME ( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
-         
-            NLAYS3D = INST_LAYER_TOP - INST_LAYER_BOT + 1
-            DO L = INST_LAYER_BOT, INST_LAYER_TOP + 1
+            
+            IF ( ELMO_FILE( IFL )%TMODE .EQ. 1 ) THEN
+              ! Recalculate Date/Time Applicable for an Average file
+              MDATE = JDATE; MTIME = JTIME
+              IF ( END_TIME ) CALL NEXTIME ( MDATE, MTIME, TSTEP )
+            
+              SDATE3D = MDATE
+              STIME3D = MTIME
+            END IF
+            
+            ! Specify Layers
+            NLAYS3D = ELMO_FILE(IFL)%NLAYS
+            LAY_BOT = ELMO_FILE( IFL )%LAY_BOT
+            LAY_TOP = ELMO_FILE( IFL )%LAY_TOP
+            DO L = LAY_BOT, LAY_TOP + 1
                VGLVS3D( L ) = VGLVS_GD( L )
             END DO
-         
-            NVARS3D = N_ELMO_INST 
-            VTYPE3D(1:NVARS3D) = ELMO_INST_PARS( 1:NVARS3D )%OUT_TYPE
-            VNAME3D(1:NVARS3D) = ELMO_INST_PARS( 1:NVARS3D )%OUT_NAME
-            UNITS3D(1:NVARS3D) = ELMO_INST_PARS( 1:NVARS3D )%CUNIT
-            VDESC3D(1:NVARS3D) = ELMO_INST_PARS( 1:NVARS3D )%DESC
-         
+            
+            ! Specify Variables and their Properties
+            NVARS3D = ELMO_FILE( IFL )%N_VARS 
+            DO IVAR = 1,NVARS3D
+              J = ELMO_FILE( IFL )%TABID( IVAR )
+              VTYPE3D( IVAR ) = ELMO_TABLE( J )%OUT_TYPE
+              VNAME3D( IVAR ) = ELMO_TABLE( J )%OUT_NAME
+              UNITS3D( IVAR ) = ELMO_TABLE( J )%CUNIT
+              VDESC3D( IVAR ) = ELMO_TABLE( J )%DESC
+            END DO
+            
             FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
             DO L = 2, MXDESC3
                FDESC3D( L ) = ' '
             END DO
- 
+            
             ! Store MIO Metadata
             NDIMS3D( 1:NVARS3D ) = 4
             L_TSTEP( 1:NVARS3D ) = .True.
@@ -1049,80 +1100,24 @@
             L_COL  ( 1:NVARS3D ) = .True.
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
-           
-            CALL LOAD_MIO_FILE ( 'CTM_ELMO_1', NLAYS3D, INST_LAYER_BOT, INST_LAYER_TOP,
+            
+            CALL LOAD_MIO_FILE ( ELMO_FILE( IFL )%FLOGICAL, NLAYS3D, 
+     &           LAY_BOT, LAY_TOP,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D), L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
-         
+            
             ! Open the Instantaneous ELMO File
-            IF ( .NOT. OPEN3( CTM_ELMO_1, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not create '// CTM_ELMO_1 // ' file'
+            IF ( .NOT. OPEN3( ELMO_FILE(IFL)%FLOGICAL, FSNEW3, PNAME ) ) THEN
+                XMSG = 'Could not create '// 
+     &                 ELMO_FILE( IFL )%FLOGICAL // ' file'
                CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
             END IF
-
+            
          END IF 
 #endif
-      END IF
- 
-
-      ! Open Average ELMO File
-      IF ( AVRG_ACTIVE ) THEN
-      
-
-#ifndef mpas
-         ! Try to open existing file for update
-         IF ( .NOT. OPEN3( CTM_AELMO_1, FSRDWR3, PNAME ) ) THEN
-
-            ! Get end time information from environment variable AVG_FILE_ENDTIME
-            MDATE = JDATE; MTIME = JTIME
-            IF ( END_TIME ) CALL NEXTIME ( MDATE, MTIME, TSTEP )
-
-            ! Set output file characteristics based on COORD.EXT and 
-            ! open the Average ELMO File
-            SDATE3D = MDATE
-            STIME3D = MTIME
-         
-            NLAYS3D = AVRG_LAYER_TOP - AVRG_LAYER_BOT + 1
-            DO L = AVRG_LAYER_BOT, AVRG_LAYER_TOP + 1
-               VGLVS3D( L ) = VGLVS_GD( L )
-            END DO
-         
-            NVARS3D = N_ELMO_AVRG
-            VTYPE3D(1:NVARS3D) = ELMO_AVRG_PARS( 1:NVARS3D )%OUT_TYPE
-            VNAME3D(1:NVARS3D) = ELMO_AVRG_PARS( 1:NVARS3D )%OUT_NAME
-            UNITS3D(1:NVARS3D) = ELMO_AVRG_PARS( 1:NVARS3D )%CUNIT
-            VDESC3D(1:NVARS3D) = ELMO_AVRG_PARS( 1:NVARS3D )%DESC
-         
-            FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
-            DO L = 2, MXDESC3
-               FDESC3D( L ) = ' '
-            END DO
- 
-            ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 4
-            L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .True.
-            L_COL  ( 1:NVARS3D ) = .True.
-            L_ROW  ( 1:NVARS3D ) = .True.
-            L_VEXT ( 1:NVARS3D ) = .False.
-           
-            CALL LOAD_MIO_FILE ( 'CTM_AELMO_1', NLAYS3D, AVRG_LAYER_BOT, AVRG_LAYER_TOP,
-     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D), L_ROW(1:NVARS3D),
-     &           L_VEXT(1:NVARS3D) )
-         
-            ! Open the Average ELMO File
-            IF ( .NOT. OPEN3( CTM_AELMO_1, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not create '// CTM_AELMO_1 // ' file'
-               CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-            END IF
- 
-         END IF
-#endif
-      END IF
+      END DO
  
       END SUBROUTINE OPEN_ELMO 
 
@@ -1135,7 +1130,7 @@
 
       IMPLICIT NONE
 
-      INTEGER IINST, IAVRG, ICOMP, J, TABID, IFILE, AERO_ID, IMODE, INLET
+      INTEGER IFL, IVAR, ICOMP, J, TABID, IFILE, AERO_ID, IMODE, INLET
       CHARACTER( 1000 ) :: FORMULA
       CHARACTER(    2 ) :: CSIGN
       CHARACTER(   70 ) :: FTEMP
@@ -1144,7 +1139,7 @@
 
       ! Write out all ELMO variables organized by output file
       WRITE( LOGDEV, '(/,/,5x,A)' ),'|> ELMO OUTPUT VARIABLE REPORT:'
-      WRITE( LOGDEV, '(5x,A)'   ),'+=================================='
+      WRITE( LOGDEV, '(5x,A)' ),'+========================================'
       WRITE( LOGDEV,'(7x,A,8(/,13x,A))' ),
      &                              'Note: these are populated using rules from the',
      &                              'CMAQ Control File supplied by the User. ',
@@ -1157,76 +1152,15 @@
      &                              'weight, air density, etc.'
 
 
-      ifile = 0
-
-      !-------------------------------------------------------------------------
-      ! Instantaneous File
-      !--------------------------------------------------------------------------
-      ! Header and File Metadata
-      IF ( INST_ACTIVE ) THEN
-         ifile = ifile + 1
+      DO IFL = 1,N_ELMO_FILES
+         
+         ! Header and File Metadata
          WRITE( LOGDEV, '(/,5x,A,A)'   ),'>',REPEAT('-',80 )
          WRITE( LOGDEV,'(5x,A,I2,A,A,/,5x,A,A,/,8x,A,I2,A,I2)' ),
-     &       'Output File Num: "',ifile,'" | Temporality: ','Instantaneous',
-     &       'Output Filename: ','CTM_ELMO_1',
-     &       ' Bottom Layer: ',INST_LAYER_BOT,
-     &       ' Top Layer: ',INST_LAYER_TOP 
-
-         ! Print all variables on the file and their contents if they have
-         ! components 
-         WRITE( LOGDEV, '(/,8x,A,12x,A,12x,A,8x,A,/,10x,A,39x,A)' ),
-     &       'Variable','Type','Unit','Description','Component','Coeff'
-         WRITE( LOGDEV, '(8x,A,3x,A,2x,A,4x,A)' ),
-     &       '-----------------','--------------','--------','--------------'
-
-         DO IINST = 1,N_ELMO_INST 
-            WRITE ( LOGDEV,'(8x,A16,4x,A14,2x,A8,4x,A)'),
-     &           ELMO_INST_PARS( IINST )%OUT_NAME,
-     &           CETYPE(ELMO_INST_PARS( IINST )%VAR_TYPE),
-     &           ELMO_INST_PARS( IINST )%CUNIT,
-     &           TRIM(ELMO_INST_PARS( IINST )%DESC)
-
-            IF ( ELMO_INST_PARS( IINST )%L_COMP ) THEN
-               J = MAP_INSTtoTABLE( IINST )
-               DO ICOMP = 1,ELMO_COMP( J )%N_VARS
-                  TABID = ELMO_COMP( J )%TABID( ICOMP )
-
-                  IF ( ELMO_TABLE( TABID )%VAR_TYPE ) THEN
-                     WRITE( LOGDEV, '(8x,A2,A16,4x,A14,2x,ES9.2,4x,A)'),
-     &                      '->',ELMO_TABLE( TABID )%OUT_NAME,
-     &                      CETYPE(ELMO_TABLE( TABID )%VAR_TYPE),
-     &                      ELMO_COMP( J )%COEFF( ICOMP ),
-     &                      TRIM(ELMO_TABLE( TABID )%DESC)
-                  ELSE
-                     AERO_ID = ELMO_TABLE( TABID )%ID
-                     DO IMODE = 1,N_MODE
-                        IF ( .NOT. AERO_MISSING( AERO_ID,IMODE ) ) THEN
-                           WRITE( LOGDEV, '(8x,A2,A16,4x,A14,2x,ES9.2,4x,A,A,A,I1)'),
-     &                       '->',AEROSPC( AERO_ID )%NAME( IMODE ),
-     &                       'AEROSOL', ELMO_COMP( J )%COEFF( ICOMP ),
-     &                       'Aerosol Mass for ',TRIM(AEROSPC(AERO_ID)%NAME(IMODE)),
-     &                       ' in mode ',IMODE
-                        END IF    
-                     END DO
-                  END IF
-               END DO
-            END IF
-            WRITE( LOGDEV, '')
-         END DO
-      END IF
-
-      !-------------------------------------------------------------------------
-      ! Average File
-      !--------------------------------------------------------------------------
-      ! Header and File Metadata
-      IF ( AVRG_ACTIVE ) THEN
-         IFILE = IFILE + 1
-         WRITE( LOGDEV, '(/,5x,A,A)'   ),'>',REPEAT('-',80 )
-         WRITE( LOGDEV,'(5x,A,I2,A,A,/,5x,A,A,/,8x,A,I2,A,I2)' ),
-     &       'Output File Num: "',IFILE,'" | Temporality: ','Average',
-     &       'Output Filename: ','CTM_AELMO_1',
-     &       ' Bottom Layer: ',AVRG_LAYER_BOT,
-     &       ' Top Layer: ',AVRG_LAYER_TOP 
+     &       'Output File Num: "',IFL,'" | Temporality: ','Average',
+     &       'Output Filename: ',TRIM(ELMO_FILE(IFL)%FLOGICAL),
+     &       ' Bottom Layer: ',ELMO_FILE( IFL )%LAY_BOT,
+     &       ' Top Layer: ',ELMO_FILE( IFL )%LAY_TOP 
 
          ! Print all variables on the file and their contents if they have
          ! components 
@@ -1235,24 +1169,24 @@
          WRITE( LOGDEV, '(8x,A,3x,A,2x,A,4x,A)' ),
      &       '-----------------','--------------','--------','--------------'
 
-         DO IAVRG = 1,N_ELMO_AVRG 
+         DO IVAR = 1,ELMO_FILE( IFL )%N_VARS 
+            J = ELMO_FILE( IFL )%TABID( IVAR )
             WRITE ( LOGDEV,'(8x,A16,4x,A14,2x,A8,4x,A)'),
-     &              ELMO_AVRG_PARS( IAVRG )%OUT_NAME,
-     &              CETYPE(ELMO_AVRG_PARS( IAVRG )%VAR_TYPE),
-     &              ELMO_AVRG_PARS( IAVRG )%CUNIT,
-     &              TRIM(ELMO_AVRG_PARS( IAVRG )%DESC)
+     &              ELMO_TABLE( J )%OUT_NAME,
+     &              CETYPE( ELMO_TABLE( J )%VAR_TYPE ),
+     &              ELMO_TABLE( J )%CUNIT,
+     &              TRIM( ELMO_TABLE( J )%DESC )
 
             FORMULA = ''
             ! Make Output Formula for Composites
-            IF ( ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_CMPST .OR.
-     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
-     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
-     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
-     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
-     &           ELMO_AVRG_PARS( IAVRG )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
+            IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_CMPST .OR.
+     &           ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
+     &           ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
+     &           ELMO_TABLE( J )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
+     &           ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
+     &           ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
 
                ! Make Formula from Components
-               J = MAP_AVRGtoTABLE( IAVRG )
                DO ICOMP = 1,ELMO_COMP( J )%N_VARS
                   TABID = ELMO_COMP( J )%TABID( ICOMP )
                   IMODE = ELMO_TABLE( TABID )%IM
@@ -1304,7 +1238,13 @@
             END IF
             WRITE( LOGDEV, '')
          END DO
-      END IF
+      END DO
+
+      WRITE( LOGDEV, '' )
+      WRITE( LOGDEV, '(/,/,5x,A)' ),'|> ELMO OUTPUT VARIABLE REPORT COMPLETE'
+      WRITE( LOGDEV, '(5x,A)' ),'+========================================='
+      WRITE( LOGDEV, '' )
+      WRITE( LOGDEV, '' )
 
       END SUBROUTINE ELMO_WRITE_LOG
 
