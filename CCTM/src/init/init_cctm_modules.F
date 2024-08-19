@@ -161,6 +161,5 @@ C Arguments:
       ! Initialize Budget Output File and Concentration Array
       IF ( BUDGET_DIAG ) CALL BUDGET_INIT( CGRID, JDATE, JTIME, TSTEP )
  
-
       END SUBROUTINE INIT_CCTM_MODULES
 

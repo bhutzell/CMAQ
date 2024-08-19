@@ -1011,6 +1011,7 @@
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE MIO_ASCII
+
       IMPLICIT NONE
 
       INCLUDE SUBST_FILES_ID  ! file name parameters

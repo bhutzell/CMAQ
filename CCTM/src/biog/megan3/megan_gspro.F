@@ -41,6 +41,7 @@
             INCLUDE 'SPC_RACM2.EXT'        ! new in MEGAN3
             INCLUDE 'SPC_CRACMM1.EXT'        ! new in CMAQ 5.4
             INCLUDE 'SPC_CRACMM2.EXT'        ! new in CMAQ 5.5
+            INCLUDE 'SPC_CRACMM3.EXT'        ! new in CMAQ 6.0
             INCLUDE 'MAP_CV2CB05.EXT'
             INCLUDE 'SPC_SAPRC07.EXT'      ! new in MEGAN3
             INCLUDE 'SPC_SAPRC07T.EXT'    ! new in MEGAN3
@@ -49,6 +50,7 @@
             INCLUDE 'MAP_CV2RACM2.EXT'
             INCLUDE 'MAP_CV2CRACMM1.EXT'
             INCLUDE 'MAP_CV2CRACMM2.EXT'
+            INCLUDE 'MAP_CV2CRACMM3.EXT'
             INCLUDE 'MAP_CV2SAPRC07.EXT'
             INCLUDE 'MAP_CV2SAPRC07T.EXT'
 
@@ -64,7 +66,7 @@
 
            CHARACTER( 16 ) :: MECHANISM              ! Mechanism name
            INTEGER ios,INDX
-         INTEGER,        PARAMETER :: NMECHS = 17   ! dimension for number of mechanisms considered
+         INTEGER,        PARAMETER :: NMECHS = 18   ! dimension for number of mechanisms considered
 
          INTEGER I
 
@@ -89,10 +91,11 @@
      &         MIOG_MECH_TYPE( 'RACM2_AE6_AQ           ','RACM2   '),
      &         MIOG_MECH_TYPE( 'SAPRC07TC_AE6_AQ       ','SAPRC07T'),
      &         MIOG_MECH_TYPE( 'SAPRC07TIC_AE7I_AQ     ','SAPRC07T'),
-     &         MIOG_MECH_TYPE( 'SAPRC07TIC_AE7I_AQKMT2 ','SAPRC07T'),     
+     &         MIOG_MECH_TYPE( 'SAPRC07TIC_AE7I_AQKMT2 ','SAPRC07T'),
      &         MIOG_MECH_TYPE( 'CRACMM1_AQ             ','CRACMM1 '),
      &         MIOG_MECH_TYPE( 'CRACMM1AMORE_AQ        ','CRACMM1 '),
-     &         MIOG_MECH_TYPE( 'CRACMM2                ','CRACMM2 ') /)
+     &         MIOG_MECH_TYPE( 'CRACMM2                ','CRACMM2 '),
+     &         MIOG_MECH_TYPE( 'CRACMM3                ','CRACMM3 ') /)
 
             INDX = INDEX1( MECHNAME, NMECHS, MIOG_MECH_MAP%CHEMMECH )
             MECHANISM = MIOG_MECH_MAP( INDX )%MIOGMECH
@@ -123,6 +126,9 @@
             CASE ('CRACMM2')
               n_scon_spc = n_cracmm2
               NMGNSPC = n_cracmm2_spc
+            CASE ('CRACMM3')
+              n_scon_spc = n_cracmm3
+              NMGNSPC = n_cracmm3_spc
             CASE DEFAULT
               EFLAG = .TRUE.
               XMSG = "Mechanism," // TRIM( MECHNAME ) 
@@ -194,6 +200,13 @@
               conv_fac(1:n_scon_spc) = conv_fac_cracmm2(1:n_scon_spc)
               mech_spc(1:NMGNSPC)    = mech_spc_cracmm2(1:NMGNSPC)
               mech_mwt(1:NMGNSPC)    = mech_mwt_cracmm2(1:NMGNSPC)
+              MEGAN_NAMES(1:NMGNSPC)     = mech_spc(1:NMGNSPC)
+            CASE ('CRACMM3')
+              spmh_map(1:n_scon_spc) = spmh_map_cracmm3(1:n_scon_spc)
+              mech_map(1:n_scon_spc) = mech_map_cracmm3(1:n_scon_spc)
+              conv_fac(1:n_scon_spc) = conv_fac_cracmm3(1:n_scon_spc)
+              mech_spc(1:NMGNSPC)    = mech_spc_cracmm3(1:NMGNSPC)
+              mech_mwt(1:NMGNSPC)    = mech_mwt_cracmm3(1:NMGNSPC)
               MEGAN_NAMES(1:NMGNSPC)     = mech_spc(1:NMGNSPC)
             CASE DEFAULT 
               EFLAG = .TRUE.

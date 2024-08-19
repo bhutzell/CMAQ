@@ -55,7 +55,7 @@
       USE SOA_DEFN, ONLY : Extract_Soa
       USE AEROSOL_CHEMISTRY, ONLY: HETCHEM_RATES
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, AIRQV, AIRDENS, AIRPRES,
-     &                        SRFTEMP, H2OVP, H2OSATVP, MWWAT, MWAIR,
+     &                        SRFTEMP, H2OVP, H2OSATVP, 
      &                        CFRAC, DZ, PV, ZH
       USE CGRID_SPCS, ONLY : N_CGRID_SPC, N_SPC_WDEP, N_SPC_DEPV, NSPCSD
       use centralized_io_module, only : interpolate_var, pv_avail
@@ -68,6 +68,8 @@
 #ifdef sens
       USE DDM3D_DEFN, ONLY : SENGRID, NPMAX
 #endif 
+      USE CONST, ONLY : ESATL, MWWAT, MWAIR
+
 
       IMPLICIT NONE
 
@@ -437,6 +439,7 @@
 #ifdef isam
       USE SA_DEFN, ONLY : MAP_AEROtoSA, NTAG_SA
 #endif
+      USE CONST, ONLY : PI
 
       IMPLICIT NONE
 

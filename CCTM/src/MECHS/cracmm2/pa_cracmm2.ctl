@@ -1,4 +1,4 @@
-! for cracmm1_aq
+! for cracmm2
 !
 IRRTYPE = PARTIAL;
 DEFINE FAMILY NOX = NO + NO2;

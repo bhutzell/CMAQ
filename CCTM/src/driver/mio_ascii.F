@@ -41,7 +41,7 @@
           LOGICAL,       ALLOCATABLE :: L_VEXT(:)
       END TYPE MIO_FILE_DATA_TYPE
 
-      TYPE( MIO_FILE_DATA_TYPE ) :: MIO_FILE_DATA( 200 )
+      TYPE( MIO_FILE_DATA_TYPE ) :: MIO_TXT_FILE_DATA( 200 )
 
       INTEGER :: NDIMS3D(2048)
       LOGICAL :: L_TSTEP(2048)
@@ -88,37 +88,37 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       ! Set high-level parameters for this output file in the MIO file
       ! structure
-      MIO_FILE_DATA( N_MIO_OUT )%FILE_LOGICAL = FILE_LOGICAL
-      MIO_FILE_DATA( N_MIO_OUT )%NLAYS = NLAYS
-      MIO_FILE_DATA( N_MIO_OUT )%BLEV  = BLEV
-      MIO_FILE_DATA( N_MIO_OUT )%ELEV  = ELEV
-      MIO_FILE_DATA( N_MIO_OUT )%NVARS = NVARS
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%FILE_LOGICAL = FILE_LOGICAL
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%NLAYS = NLAYS
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%BLEV  = BLEV
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%ELEV  = ELEV
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%NVARS = NVARS
 
       ! Allocate MIO File Structure for this Output File
-      ALLOCATE( MIO_FILE_DATA( N_MIO_OUT )%VARNAMES( NVARS ) ,
-     &          MIO_FILE_DATA( N_MIO_OUT )%VARTYPES( NVARS ) ,
-     &          MIO_FILE_DATA( N_MIO_OUT )%VARUNITS( NVARS ) ,
-     &          MIO_FILE_DATA( N_MIO_OUT )%VARDESC ( NVARS ) ,
-     &          MIO_FILE_DATA( N_MIO_OUT )%NDIMS   ( NVARS ) ,
-     &          MIO_FILE_DATA( N_MIO_OUT )%L_TSTEP ( NVARS ) ,
-     &          MIO_FILE_DATA( N_MIO_OUT )%L_LAY   ( NVARS ) ,
-     &          MIO_FILE_DATA( N_MIO_OUT )%L_COL   ( NVARS ) ,
-     &          MIO_FILE_DATA( N_MIO_OUT )%L_ROW   ( NVARS ) ,
-     &          MIO_FILE_DATA( N_MIO_OUT )%L_VEXT  ( NVARS ) ,
+      ALLOCATE( MIO_TXT_FILE_DATA( N_MIO_OUT )%VARNAMES( NVARS ) ,
+     &          MIO_TXT_FILE_DATA( N_MIO_OUT )%VARTYPES( NVARS ) ,
+     &          MIO_TXT_FILE_DATA( N_MIO_OUT )%VARUNITS( NVARS ) ,
+     &          MIO_TXT_FILE_DATA( N_MIO_OUT )%VARDESC ( NVARS ) ,
+     &          MIO_TXT_FILE_DATA( N_MIO_OUT )%NDIMS   ( NVARS ) ,
+     &          MIO_TXT_FILE_DATA( N_MIO_OUT )%L_TSTEP ( NVARS ) ,
+     &          MIO_TXT_FILE_DATA( N_MIO_OUT )%L_LAY   ( NVARS ) ,
+     &          MIO_TXT_FILE_DATA( N_MIO_OUT )%L_COL   ( NVARS ) ,
+     &          MIO_TXT_FILE_DATA( N_MIO_OUT )%L_ROW   ( NVARS ) ,
+     &          MIO_TXT_FILE_DATA( N_MIO_OUT )%L_VEXT  ( NVARS ) ,
      &          STAT = IOS )
-      CALL CHECKMEM( IOS, 'MIO_FILE_DATA','LOAD_MIO_FILE' )
+      CALL CHECKMEM( IOS, 'MIO_TXT_FILE_DATA','LOAD_MIO_FILE' )
 
       ! Populate MIO File Structure
-      MIO_FILE_DATA( N_MIO_OUT )%VARNAMES = VARNAMES
-      MIO_FILE_DATA( N_MIO_OUT )%VARTYPES = VARTYPES
-      MIO_FILE_DATA( N_MIO_OUT )%VARUNITS = VARUNITS
-      MIO_FILE_DATA( N_MIO_OUT )%VARDESC  = VARDESC
-      MIO_FILE_DATA( N_MIO_OUT )%NDIMS    = NDIMS
-      MIO_FILE_DATA( N_MIO_OUT )%L_TSTEP  = L_TSTEP
-      MIO_FILE_DATA( N_MIO_OUT )%L_LAY    = L_LAY
-      MIO_FILE_DATA( N_MIO_OUT )%L_COL    = L_COL
-      MIO_FILE_DATA( N_MIO_OUT )%L_ROW    = L_ROW
-      MIO_FILE_DATA( N_MIO_OUT )%L_VEXT   = L_VEXT
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%VARNAMES = VARNAMES
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%VARTYPES = VARTYPES
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%VARUNITS = VARUNITS
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%VARDESC  = VARDESC
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%NDIMS    = NDIMS
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%L_TSTEP  = L_TSTEP
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%L_LAY    = L_LAY
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%L_COL    = L_COL
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%L_ROW    = L_ROW
+      MIO_TXT_FILE_DATA( N_MIO_OUT )%L_VEXT   = L_VEXT
 
       END SUBROUTINE LOAD_MIO_FILE
 
@@ -162,26 +162,31 @@ C-----------------------------------------------------------------------
       ! Write Output File Metadata
       DO IFILE = 1,N_MIO_OUT
          WRITE ( IOUT,* ) 
-         WRITE ( IOUT, '(A)' ) MIO_FILE_DATA( IFILE )%FILE_LOGICAL
-         WRITE ( IOUT, '(I0)' ) MIO_FILE_DATA( IFILE )%NVARS
+         WRITE ( IOUT, '(A)' ) MIO_TXT_FILE_DATA( IFILE )%FILE_LOGICAL
+         WRITE ( IOUT, '(I0)' ) MIO_TXT_FILE_DATA( IFILE )%NVARS
 
-         DO IVAR = 1,MIO_FILE_DATA( IFILE )%NVARS 
+         DO IVAR = 1,MIO_TXT_FILE_DATA( IFILE )%NVARS 
            ! Find string for vairbale type
-           IF ( MIO_FILE_DATA( IFILE )%VARTYPES( IVAR ) .EQ. M3REAL ) VT = 'real'
+#ifndef mpas
+             IF ( MIO_TXT_FILE_DATA( IFILE )%VARTYPES( IVAR ) .EQ. M3REAL ) VT = 'real'
+#else 
+           ! Assume real
+             VT = 'real'
+#endif
 
            ! Make string for dimensions
            DIMSTRING = ''
-           IF ( MIO_FILE_DATA( IFILE )%L_TSTEP(IVAR) ) DIMSTRING = TRIM(DIMSTRING) // ' TSTEP'
-           IF ( MIO_FILE_DATA( IFILE )%L_LAY(IVAR) )   DIMSTRING = TRIM(DIMSTRING) // ' LAY'
-           IF ( MIO_FILE_DATA( IFILE )%L_ROW(IVAR) )   DIMSTRING = TRIM(DIMSTRING) // ' ROW'
-           IF ( MIO_FILE_DATA( IFILE )%L_COL(IVAR) )   DIMSTRING = TRIM(DIMSTRING) // ' COL'
-           IF ( MIO_FILE_DATA( IFILE )%L_VEXT(IVAR) )  DIMSTRING = TRIM(DIMSTRING) // ' VEXT'
+           IF ( MIO_TXT_FILE_DATA( IFILE )%L_TSTEP(IVAR) ) DIMSTRING = TRIM(DIMSTRING) // ' TSTEP'
+           IF ( MIO_TXT_FILE_DATA( IFILE )%L_LAY(IVAR) )   DIMSTRING = TRIM(DIMSTRING) // ' LAY'
+           IF ( MIO_TXT_FILE_DATA( IFILE )%L_ROW(IVAR) )   DIMSTRING = TRIM(DIMSTRING) // ' ROW'
+           IF ( MIO_TXT_FILE_DATA( IFILE )%L_COL(IVAR) )   DIMSTRING = TRIM(DIMSTRING) // ' COL'
+           IF ( MIO_TXT_FILE_DATA( IFILE )%L_VEXT(IVAR) )  DIMSTRING = TRIM(DIMSTRING) // ' VEXT'
 
            WRITE ( IOUT, '(A,1x,A,1x,I0,A,1x,A1,A,A1,1x,A1,A,A1)' ) 
-     &             TRIM( MIO_FILE_DATA( IFILE )%VARNAMES( IVAR ) ), TRIM(VT),
-     &             MIO_FILE_DATA( IFILE )%NDIMS( IVAR ),TRIM(DIMSTRING),
-     &             '"',TRIM(MIO_FILE_DATA( IFILE )%VARUNITS( IVAR )),'"',
-     &             '"',TRIM(MIO_FILE_DATA( IFILE )%VARDESC ( IVAR )),'"'
+     &             TRIM( MIO_TXT_FILE_DATA( IFILE )%VARNAMES( IVAR ) ), TRIM(VT),
+     &             MIO_TXT_FILE_DATA( IFILE )%NDIMS( IVAR ),TRIM(DIMSTRING),
+     &             '"',TRIM(MIO_TXT_FILE_DATA( IFILE )%VARUNITS( IVAR )),'"',
+     &             '"',TRIM(MIO_TXT_FILE_DATA( IFILE )%VARDESC ( IVAR )),'"'
          END DO
       END DO
 

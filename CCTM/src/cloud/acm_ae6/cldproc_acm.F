@@ -65,6 +65,7 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       use CENTRALIZED_IO_MODULE, only : interpolate_var
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_WDEP
+      USE CONST
 
 #ifdef isam
       USE SA_DEFN, ONLY: ISAM, NSPC_SA, N_SPCTAG, TOT_SADEP, TOT_SADEP0, 
@@ -90,7 +91,6 @@ C-----------------------------------------------------------------------
 
 C...........INCLUDES
 
-      INCLUDE SUBST_CONST            ! constants
       INCLUDE SUBST_FILES_ID         ! file name parameters
 
       CHARACTER( 120 ) :: XMSG = ' ' ! exit message string
