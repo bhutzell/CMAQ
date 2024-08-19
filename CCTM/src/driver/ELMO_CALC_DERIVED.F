@@ -22,6 +22,7 @@
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
+      USE CONST
       USE ELMO_DATA
       USE ELMO_DERIVED
       USE ELMO_PROC, ONLY : CALC_ELMO
@@ -31,7 +32,7 @@
      &                     MOMENT3_CONC, WET_AERO_DENS, AEROSPC_CONC,
      &                     AH2O_IDX, AORGH2O_IDX, AEROSPC, CALC_AERODIST_PARAMS,
      &                     AEROMODE, DRY_AERO_DENS, APOC_IDX, APNCOM_IDX
-      USE AEROMET_DATA, ONLY: AIRRH, PI, AIRTEMP, SRFTEMP, AIRPRES, DZ, CFRAC, PV, ZH
+      USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, SRFTEMP, AIRPRES, DZ, CFRAC, PV, ZH
       USE CGRID_SPCS, ONLY : RHOJ_LOC
       USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, OASPC, MAP_OAtoAERO
       USE RUNTIME_VARS, ONLY : PHOTDIAG

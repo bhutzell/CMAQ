@@ -876,7 +876,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !     variable to an output variable.
 !-------------------------------------------------------------------------
  
-      USE AEROMET_DATA, ONLY : MWAIR, AIRDENS
+      USE AEROMET_DATA, ONLY : AIRDENS
+      USE CONST, ONLY : MWAIR
 
       IMPLICIT NONE
  
