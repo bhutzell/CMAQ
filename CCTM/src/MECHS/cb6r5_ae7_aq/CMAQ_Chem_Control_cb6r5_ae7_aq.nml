@@ -213,7 +213,7 @@
  
 
 &COMPOSITE_INIT
-  N_COMPOSITES = 55
+  N_COMPOSITES = 57
   N_MAX_COMPONENTS = 50
 /
 
@@ -389,5 +389,12 @@
 
    CMPST(55) = 'TD_OXN_TOT', 'kg ha-1', 'DEP', 'Total Dep of Oxidized Nitrogen', 
                 'DD_OXN_TOT + WD_OXN_TOT'
+   
+   CMPST(56) = 'PM25_SO4', 'ug m-3', 'PM25', 'PM2.5 Sulfate',
+                 'ASO4'
+
+   CMPST(57) = 'PM25_NH4', 'ug m-3', 'PM25', 'PM2.5 Ammonium',
+                 'ANH4'
+
 /
  

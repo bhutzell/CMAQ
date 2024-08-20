@@ -74,6 +74,25 @@
 !                          Options are equivalent to those for INST_VARS_NML   !
 !                                                                              !
 !------------------------------------------------------------------------------!
+&ELMO_INIT
+  N_Files = 3
+  N_Max_Output_Variables = 40
+/
+
+
+&ELMO_Files
+
+  Flabel= 'FileA','MoreVars','HasKz'
+  Ftype = 'gridded', 'gridded', 'gridded'
+  Tstep = 10000, 10000, 10000
+  Tmode = 'average', 'average', 'instant'
+  Lay_Bot = 1, 1, 1
+  Lay_Top = 1, 5, 35
+  File_Vars(1,:) = 'NOY','PM1','ASO4','*ANO3','PMF_CLDGLY','PM25_SO4','PM25_NH4'
+  File_Vars(2,:) = 'NO2', 'FORM', 'SO2', 'O3', 'PM25', 'PM10', 'DENS', 'NOX', 'AOD_550','PM_EXT_550'
+  File_Vars(3,:) = 'AEC','KZ','ANH4J','PMAMS_SO4'
+/
+
 
 &elmo_activate
   instant = .FALSE.
@@ -93,9 +112,12 @@
   Avrg_Layer_Bot = 1
   Avrg_Layer_Top = 1
   !Avrg_Vars_Nml  = 'DEFAULT'
-  Avrg_Vars_Nml  = 'NO','NO2','PM1_NA','PMF_SO4','ASO4J','ANO3','PMAMS_OA','PMAMS_CL',
-                   'O3','HNO3','PMF_UN_IMPV1','PMF_SOILIMPV','WD_ASO4','DD_ANO3','NOY',
-                   'DD_OXN_NOX','WD_OXN_TOT','TD_OXN_TOT','NH3','GAS_HNO3','GAS_NH3'
+  Avrg_Vars_Nml  = '*ASO4','*PMF_SOILIMPV','PMF_SOILIMPV','*NOY',
+                   '*ANO3_ISAM','O3','O3_TAGS','PM25','PM25_TAGS',
+                   'PMF_ASOA','PMF_ASOA_TAGS','WD_NO','DD_ASO4','DD_OXN_TNO3',
+                   'AOD_550','PMF_FRM','PM_EXT_550','NO2_COLUMN','SO2_COLUMN',
+                   'HCHO_COLUMN','CO_COLUMN','KZ','KZMIN','ALL_MET','ALL_PHOT',
+                   'ALL_CHEM'
 
 /                                                               
 
@@ -253,7 +275,7 @@
                'EVERYWHERE'  ,'N/A'        ,'N/A',
  !<Example>    'WATER'       ,'CMAQ_MASKS' ,'OPEN',
  !<Example>    'ALL'         ,'CMAQ_MASKS' ,'ALL',
- !<Example>    'ALL'         ,'ISAM_REGIONS','ALL',
+               'ALL'         ,'ISAM_REGIONS','ALL',
 /
 
 &Desid_RegionFam
