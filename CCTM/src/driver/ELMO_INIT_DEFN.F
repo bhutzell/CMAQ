@@ -890,7 +890,6 @@
              DO ISPC = 1,N_AEROSPC
                IF ( CGRID_NAME( ICGRID ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &            ELMO_TABLE( N )%IM = IMODE
-               END IF
              END DO
            END DO
 
@@ -930,7 +929,6 @@
              DO ISPC = 1,N_AEROSPC
                IF ( WDEP_SPC( IWDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &            ELMO_TABLE( N )%IM = IMODE
-               END IF
              END DO
            END DO
 
@@ -969,7 +967,6 @@
              DO ISPC = 1,N_AEROSPC
                IF ( DEPV_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &            ELMO_TABLE( N )%IM = IMODE
-               END IF
              END DO
            END DO
 

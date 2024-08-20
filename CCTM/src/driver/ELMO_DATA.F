@@ -731,23 +731,20 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
          ELSE IF ( I2 .GT. 0 ) THEN
             ! First check for COMPOSITES
-            IF ( ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_CMPST .OR.
-     &           ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
-     &           ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
-     &           ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
-     &           ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
-     &           ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
-              IF ( EXPAND_NML ) THEN
+            IF ( (ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_CMPST .OR.
+     &            ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
+     &            ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
+     &            ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
+     &            ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
+     &            ELMO_TABLE( I2 )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) 
+     &          .AND. EXPAND_NML ) THEN
+
                  ! Expand the COMPOSITE if the * was used
                  DO IVAR = 1,ELMO_COMP( I2 )%N_VARS
                    J = ELMO_COMP( I2 )%TABID( IVAR )
                    VARS_NML( N_END+IVAR ) = ELMO_TABLE( J )%NAME 
                  END DO
                  N_END = N_END + ELMO_COMP( I2 )%N_VARS
-              ELSE
-                 ! Activate this family if no * was used
-                 L_ELMO_TABLE( I2 ) = .TRUE.
-              END IF
                 
             ELSE 
               ! Entry Matches the NAME of a variable on the ELMO Table.
