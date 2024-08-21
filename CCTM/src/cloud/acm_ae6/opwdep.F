@@ -31,7 +31,7 @@
 !      Date   Who             What
 !    -------- ---             -----------------------------------------
 !     07/17/15 D. Wong        initial version
-!     12/30/19 S. Napelenok   ddm-3d implemenation for v5.3.1
+!     12/30/19 S. Napelenok   ddm-3d implementation for v5.3.1
 !-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -56,9 +56,9 @@
 
 !...........ARGUMENTS
 
-      INTEGER, INTENT (IN) :: JDATE            ! current model date, coded YYYYDDD
-      INTEGER, INTENT (IN) :: JTIME            ! current model time, coded HHMMSS
-      INTEGER, INTENT (IN) :: TSTEP            ! model time step, coded HHMMSS
+      INTEGER, INTENT (IN) :: JDATE  ! current model date, coded YYYYDDD
+      INTEGER, INTENT (IN) :: JTIME  ! current model time, coded HHMMSS
+      INTEGER, INTENT (IN) :: TSTEP  ! model time step, coded HHMMSS
 
 !...........Local Variables
 
@@ -335,7 +335,7 @@ C...initialize the file descriptors
                L_VEXT ( 1:NVARS3D ) = .False.
 
 !              CALL LOAD_MIO_FILE ( 'CTM_SWETDEP_1', 0, 0, 0,
-               CALL LOAD_MIO_FILE ( 'CTM_SWETDEP1_MIO', 0, 0, 0,
+               CALL LOAD_MIO_FILE ( 'CTM_SWETDEP_MIO', 0, 0, 0,
      &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),

@@ -284,9 +284,9 @@ C...define dry deposition output descriptors for tracer species
          END DO
 
          ! Store MIO Metadata
-         NDIMS3D( 1:NVARS3D ) = 3
+         NDIMS3D( 1:NVARS3D ) = 4
          L_TSTEP( 1:NVARS3D ) = .True.
-         L_LAY  ( 1:NVARS3D ) = .False.
+         L_LAY  ( 1:NVARS3D ) = .True.
          L_COL  ( 1:NVARS3D ) = .True.
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.

@@ -141,6 +141,9 @@ C Local Variables:
       LOGICAL, SAVE :: WRITE_FIRSTIME = .TRUE.
       LOGICAL, SAVE :: WRITE_FIRSTIME_MIO = .TRUE.
       LOGICAL, SAVE :: FIRST_DIAG_WRITE = .TRUE.
+#ifdef sens
+      LOGICAL, SAVE :: FIRST_SENS_WRITE = .TRUE.
+#endif
       INTEGER, SAVE :: WSTEP  = 0               ! local write counter
       INTEGER  STATUS                           ! ENV... status
 
@@ -905,6 +908,13 @@ C re-set dry deposition array to zero
 
 #ifdef sens
 C WT - write out dry deposition sensitivities
+
+         IF ( FIRST_SENS_WRITE ) THEN
+            FIRST_SENS_WRITE = .FALSE.
+            call mio_setfile( MET_CRO_2D )
+            call mio_fcreate( 'CTM_SDRYDEP_MIO', io_mode )
+         END IF
+
          DO V = 1, N_SPC_DDEP
             S = DD2DV( V )
             SPCBASE = DDEP_SPC( V )( 1:12 )                       ! <- these lines have to
@@ -916,14 +926,15 @@ C WT - write out dry deposition sensitivities
                      WRDD( C,R ) = S_DDEP( S, C, R, NP )
                   ENDDO
                ENDDO
-!           WRITE( LOGDEV,'(A)')'WRITE3D for ' // TRIM( SPCNAME )
+            WRITE( LOGDEV,'(A)')'SDRYDEP: WRITE3D for ' // TRIM( SPCNAME )
 
                IF ( .NOT. WRITE3( CTM_SDRYDEP_1, SPCNAME,
      &                 MDATE, MTIME, WRDD ) ) THEN
                   XMSG = 'Could not write ' // CTM_SDRYDEP_1 // ' file'
                   CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
                END IF
-
+               call mio_fwrite( 'CTM_SDRYDEP_MIO', SPCNAME, 
+     &                          PNAME, WRDD, TIME_STAMP )
             ENDDO
          ENDDO
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
