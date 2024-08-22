@@ -210,7 +210,51 @@
 ! ChemFamilyUnits(1)    = 'PPMV'
 ! ChemFamilyMembers(1,:)= 'VSVOC1','ASVOA1J','ASVOA1I'
 /
- 
+
+
+
+!------------------------------------------------------------------------------!
+! ELMO COMPOSITE Variable Definitions                                          !
+!    This section defines numerous COMPOSITE variables that are of common      !
+!    interest for air quality analysis of the output from the CMAQ model.      !
+!    COMPOSITES may include components from only the gas or particle phase, or !
+!    they may include components from both phases (e.g. total nitrate, ANO3 +  !
+!    HNO3). This interface supports definition of COMPOSITES for concentration !
+!    as well as for deposition. Each COMPOSITE is strictly defined as a linear !
+!    combination of CMAQ species, diagnostic variables, or other COMPOSITES. In!
+!    order to use a COMPOSITE in the definition of another COMPOSITE, the      !
+!    component COMPOSITE must be defined earlier in the list below.            !
+!                                                                              !
+!    The input format is meant to be transparent and readable. Each line       !
+!    beginning with CMPST defines one COMPOSITE variable. The elements of each !
+!    COMPOSITE definition include:                                             !
+!      CMPST( X ) = 'Name', 'Unit', 'Phase/Mode', 'Description',               !
+!                   'Formula'                                                  !
+!                                                                              !
+!    X - The index of each CMPST line, X, must increase by 1 in order.         !
+!    Name - is case insensitive, and may include numbers and underscores. Do   !
+!           not include hyphens (-), pluses (+) or other mathematics characters!
+!    Unit - currently only 'ppmV', 'ppbV', 'ug m-3', and 'ng m-3' are supported!
+!           for concentration. Only 'kg ha-1' is supported for deposition flux.!
+!    Phase/Mode - if the COMPOSITE applies to deposition, regardless of phase, !
+!                 enter 'DEP'. If the COMPOSITE only includes gas-phase        !
+!                 components, enter 'GAS'.                                     !
+!                                                                              !
+!                 If the COMPOSITE includes any particle-phase concentrations, !
+!                 then enter a descriptor of the particle size regime to be    !
+!                 considered. The following options are supported:             !
+!                   'ALL','PM25','PM10','PM1','PM01','PM25to10','FINE',        !
+!                   'COARSE','UlTRAFINE','AITKEN','ACCUMULATION','PMAMS'       !
+!    Description - a brief description of the variable                         !
+!    Formula - a linear combination of components. Refrain from using          !
+!              parentheses or division.                                        !
+!                                                                              !
+!    In the COMPOSITE_INIT section, two critical variables must be specified.  !
+!    N_COMPOSITES - must equal the total number of COMPOSITES defined.         !
+!    N_MAX_COMPONENTS - must be equal to or larger than the largest number of  !
+!                       components of any COMPOSITE definition.                !
+!------------------------------------------------------------------------------!
+    
 
 &COMPOSITE_INIT
   N_COMPOSITES = 57
