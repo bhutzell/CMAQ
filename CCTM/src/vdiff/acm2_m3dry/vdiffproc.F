@@ -17,7 +17,7 @@
 !------------------------------------------------------------------------!
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+      SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP )   ! m3dry
 
 C-----------------------------------------------------------------------
 C Asymmetric Convective Model v2 (ACM2) -- Pleim(2006)
@@ -140,9 +140,12 @@ C Local Variables:
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL, SAVE :: WRITE_FIRSTIME = .TRUE.
       LOGICAL, SAVE :: WRITE_FIRSTIME_MIO = .TRUE.
-      LOGICAL, SAVE :: FIRST_DIAG_WRITE = .TRUE.
+      LOGICAL, SAVE :: FIRST_WRITE_DIAG = .TRUE.
 #ifdef sens
-      LOGICAL, SAVE :: FIRST_SENS_WRITE = .TRUE.
+      LOGICAL, SAVE :: FIRST_WRITE_SENS = .TRUE.
+#endif
+#ifdef isam
+      LOGICAL, SAVE :: FIRST_WRITE_ISAM = .TRUE.
 #endif
       INTEGER, SAVE :: WSTEP  = 0               ! local write counter
       INTEGER  STATUS                           ! ENV... status
@@ -757,14 +760,14 @@ C Write extra arrays for NH3 emission and net flux for bidi
 C Write vdiff diagnostics
          IF ( VDIFFDIAG ) THEN
 
-            if ( first_diag_write ) then
+            if ( first_write_diag ) then
                call mio_setfile( MET_CRO_2D )
                call mio_fcreate( 'CTM_VDIFF_MIO', io_mode )
                if ( GRAV_SETL ) then
                   call mio_setfile( MET_CRO_3D )
                   call mio_fcreate( 'CTM_VSED_MIO', io_mode )
                end if
-               first_diag_write = .false.
+               first_write_diag = .false.
             end if
   
             IF ( GRAV_SETL ) THEN   ! Write vsed diagnostics
@@ -885,6 +888,11 @@ C Write other diagnostics
 
 #ifdef isam
          WRDD = 0.0
+         IF ( FIRST_WRITE_ISAM ) THEN
+            FIRST_WRITE_ISAM = .FALSE.
+            call mio_setfile( MET_CRO_2D )
+            call mio_fcreate( 'SA_DD_1_MIO', io_mode )
+         END IF
          DO ITAG = 1, N_SPCTAG
             DO R = 1, NROWS
                DO C = 1, NCOLS
@@ -897,6 +905,8 @@ C Write other diagnostics
                XMSG = 'Could not write ' // SA_DD_1 // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+            call mio_fwrite( 'SA_DD_1_MIO', VNAM_SPCTAG( ITAG ),
+     &                       PNAME, WRDD, TIME_STAMP )
          END DO
          SA_DDEP = 0.0
 #endif
@@ -909,8 +919,8 @@ C re-set dry deposition array to zero
 #ifdef sens
 C WT - write out dry deposition sensitivities
 
-         IF ( FIRST_SENS_WRITE ) THEN
-            FIRST_SENS_WRITE = .FALSE.
+         IF ( FIRST_WRITE_SENS ) THEN
+            FIRST_WRITE_SENS = .FALSE.
             call mio_setfile( MET_CRO_2D )
             call mio_fcreate( 'CTM_SDRYDEP_MIO', io_mode )
          END IF

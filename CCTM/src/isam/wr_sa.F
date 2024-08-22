@@ -18,9 +18,11 @@
 !------------------------------------------------------------------------!
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     
-c      [2] write tssa concentration data 
-c     
+C     
+C Writes ISAM values to SA_CONC_1 file
+C
+C          Called by driver.F
+C     
 C     Revision history
 C     01 Nov 2018: S.Napelenok Updates for cmaq5.3 release 
 C     09 May 2019: D.Wong Removed all MY_ clauses
@@ -28,18 +30,11 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       SUBROUTINE WR_SA ( JDATE, JTIME, TSTEP, NSTEPS )
 
-C20140428  Writes ISAM values to SA_CONC_1 file
-C
-C          Called by driver.F
-
-!      USE HGRD_DEFN             ! horizontal domain specifications
       USE GRID_CONF
-      USE UTILIO_DEFN           ! 20120615
-c     USE SA_LAYERS
-      USE SA_DEFN               ! Mc06
-c     USE SUBST_MODULES         ! stenex
+      USE UTILIO_DEFN
+      USE SA_DEFN    
       USE RUNTIME_VARS
-
+      USE MIO_MODULE
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
@@ -56,104 +51,90 @@ C...Arguments Declaration
       INTEGER    JDATE          ! current model date, coded YYYYDDD
       INTEGER    JTIME          ! current model time, coded HHMMSS
       INTEGER    TSTEP(3)       ! format 10000, 0, 0
-cyqw
-      INTEGER    NSTEPS         ! Number of time steps of 3D output
-cyqw
-!0711 CHARACTER( 16 )       :: FILE_NAME
 
-C...End of argument declaration
+      INTEGER    NSTEPS         ! Number of time steps of 3D output
 
 C Local variables:
       
-c     INTEGER          ALLOCSTAT, LOGDEV
-      INTEGER          ALLOCSTAT
-      LOGICAL, SAVE :: FIRSTIME = .TRUE.    !20140228
-
+      INTEGER         ::   ALLOCSTAT
+      LOGICAL, SAVE   ::   FIRSTIME = .TRUE.
+      LOGICAL, SAVE   ::   FIRSTWRITE = .TRUE.
       CHARACTER( 16 ) :: PNAME = 'WR_SA'
       CHARACTER( 96 ) :: XMSG = ' '
+      CHARACTER( 20 ) :: TIME_STAMP
       
-      INTEGER   C,R,S,K,N, L, JSPC    ! loop induction variables
+      INTEGER   C,R,S,K,L    ! loop induction variables
 
-      REAL, ALLOCATABLE, SAVE :: ISAM_BUFF ( :,:,:,: )  ! save added on 20140306
+      REAL, ALLOCATABLE, SAVE :: ISAM_BUFF ( :,:,:,: )
 
 C-----------------------------------------------------------------------
 
-
       CALL SUBST_BARRIER
 
+      IF ( FIRSTIME ) THEN
 
-Ckrt     print*,'N_SPCTAG, JDATE, JTIME '
-Ckrt     print*, N_SPCTAG, JDATE, JTIME  
+         FIRSTIME = .FALSE.
 
-!0710    IF ( .NOT. OPEN3( FILE_NAME, FSRDWR3, PNAME ) ) THEN
-!0710       XMSG = 'Could not open ' // FILE_NAME // ' file for update'
-!0710       CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-!0710    END IF
+         IF ( MYPE .NE. 0 ) THEN
+           IF ( .NOT. OPEN3( SA_CONC_1, FSREAD3, PNAME ) ) THEN
+             XMSG = 'Could not open ' // SA_CONC_1 // 'file for update'
+             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+           END IF !open3
+         END IF ! mype nonzero
 
-!0711    IF ( .NOT. DESC3( FILE_NAME ) ) THEN
-!0711       XMSG = 'Could not get file description from ' // FILE_NAME
-!0711       CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-!0711    END IF
+         IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
+           XMSG = 'Could not get file description from ' // SA_CONC_1
+           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
 
-      IF ( FIRSTIME ) THEN  ! 20140228
+         IF ( ISAM_ELEV .EQ. -1 ) ISAM_ELEV = NLAYS
+         SA_NLAYS = ISAM_ELEV - ISAM_BLEV + 1
 
-        FIRSTIME = .FALSE.
-        LOGDEV = INIT3 ()
-
-        IF ( MYPE .NE. 0 ) THEN
-          IF ( .NOT. OPEN3( SA_CONC_1, FSREAD3, PNAME ) ) THEN
-            XMSG = 'Could not open ' // SA_CONC_1 // 'file for update'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-          END IF !open3
-        END IF ! mype nonzero
-
-        IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
-          XMSG = 'Could not get file description from ' // SA_CONC_1
-          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-        END IF
-
-        IF ( ISAM_ELEV .EQ. -1 ) ISAM_ELEV = NLAYS
-        SA_NLAYS = ISAM_ELEV - ISAM_BLEV + 1
-
-!20140306 relocated here the following five lines
          ALLOCATE ( ISAM_BUFF( NCOLS, NROWS, SA_NLAYS, N_SPCTAG ),
-     &     STAT = ALLOCSTAT )
+     &              STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
-           XMSG = 'Failure allocating ISAM_BUFF'
-           CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            XMSG = 'Failure allocating ISAM_BUFF'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          ENDIF
-
-      IF ( ISAM_ELEV .EQ. -1 ) ISAM_ELEV = NLAYS
 
       END IF ! firstime
 
-      ISAM_BUFF = 0.0
-!Ckrt  print*,'S,VNAME3D(S),S_SPCTAG(S),T_SPCTAG(S)'
-      DO S = 1, N_SPCTAG
-       K = 0
-       DO L = ISAM_BLEV, ISAM_ELEV
-        K = K + 1
-        DO R = 1, NROWS
-         DO C = 1, NCOLS
-          ISAM_BUFF( C,R,K,S ) = ISAM( C,R,L,S_SPCTAG(S),T_SPCTAG(S) )
-         ENDDO
-        ENDDO
-       ENDDO
+      IF ( FIRSTWRITE ) THEN
+         FIRSTWRITE = .FALSE.
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
+         call mio_setfile( MET_CRO_3D )
+         if ( SA_NLAYS .lt. NLAYS ) mio_nlays = SA_NLAYS
+         call mio_fcreate( 'SA_CONC_1_MIO', io_mode )
+         if ( mype == 0 ) then
+            call mio_set_global_attr( 'SA_CONC_1_MIO', 'NLAYS', SA_NLAYS )
+            call mio_set_global_attr( 'SA_CONC_1_MIO', 'VGLVLS', MET_CRO_3D, AISAM_BLEV, AISAM_ELEV+1 )
+         end if
+      END IF
 
-
-!20140306 Mentioning of vname3d is dangerous. Use vnam_spctag instead
-!20140306       IF ( .NOT. WRITE3( SA_CONC_1, VNAME3D(S), JDATE, JTIME,
-       IF ( .NOT. WRITE3( SA_CONC_1, VNAM_SPCTAG(S), JDATE, JTIME,
-     &    ISAM_BUFF(:,:,:,S)) ) THEN
-         XMSG = 'Could not write to ' 
-!0711&        // FILE_NAME 
-     &        // SA_CONC_1 
-         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-       END IF
-      END DO
-!20140306         IF ( ALLOCATED(ISAM_BUFF) ) DEALLOCATE( ISAM_BUFF )
+      call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
       
-c.....couple ISAM after writing
+      ISAM_BUFF = 0.0
+
+      DO S = 1, N_SPCTAG
+         K = 0
+         DO L = ISAM_BLEV, ISAM_ELEV
+            K = K + 1
+            DO R = 1, NROWS
+               DO C = 1, NCOLS
+                  ISAM_BUFF( C,R,K,S ) = ISAM( C,R,L,S_SPCTAG(S),T_SPCTAG(S) )
+               ENDDO
+            ENDDO
+         ENDDO
+
+         IF ( .NOT. WRITE3( SA_CONC_1, VNAM_SPCTAG(S), JDATE, JTIME,
+     &        ISAM_BUFF(:,:,:,S)) ) THEN
+            XMSG = 'Could not write to ' // trim( SA_CONC_1 )
+            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+         call mio_fwrite( 'SA_CONC_1_MIO', VNAM_SPCTAG( S ),
+     &                    PNAME, ISAM_BUFF( :,:,:,S ), TIME_STAMP )
+      END DO
 
       return
       end

@@ -261,7 +261,7 @@ C *** Open the aerosol parameters file (diameters and standard deviations).
 C Initialize ISAM array
       CALL SA_ARRAY_INIT ( CGRID )
 
-C Open SA_CONC_1 and SA_CGRID_1
+C Open SA_CONC_1 and SA_WD_1
       CALL OP_SA ( STDATE, STTIME, TSTEP, 1, SA_CONC_1 )
       IF ( MYPE .EQ. 0 ) CALL SA_OPWDDEP ( SA_WD_1, STDATE, STTIME, TSTEP( 1 ) )
 #endif

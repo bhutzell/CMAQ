@@ -116,7 +116,10 @@ C...........Local Variables
       LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
       LOGICAL, SAVE :: FIRSTDIAG = .TRUE.
 #ifdef sens
-      LOGICAL, SAVE :: FIRSTWRITE_SENS = .TRUE.
+      LOGICAL, SAVE :: FIRST_WRITE_SENS = .TRUE.
+#endif
+#ifdef isam
+      LOGICAL, SAVE :: FIRST_WRITE_ISAM = .TRUE.
 #endif
       CHARACTER( 16 ), SAVE :: PNAME = 'CLDPROC' ! driver program name
       CHARACTER( 16 ) :: VNAME            ! input variable name list
@@ -691,8 +694,8 @@ C...write data to the normal wet deposition file
 #ifdef sens
 C...write data to the sensitivity wet deposition file
 c gas species
-        IF ( FIRSTWRITE_SENS ) THEN
-           FIRSTWRITE_SENS = .FALSE.
+        IF ( FIRST_WRITE_SENS ) THEN
+           FIRST_WRITE_SENS = .FALSE.
            call mio_setfile( MET_CRO_2D )
            call mio_fcreate( 'CTM_SWETDEP_MIO', io_mode )
         END IF
@@ -772,6 +775,13 @@ C...reinitialize deposition array
 #endif
 
 #ifdef isam
+        IF ( FIRST_WRITE_ISAM ) THEN
+           FIRST_WRITE_ISAM = .FALSE.
+           call mio_setfile( MET_CRO_2D )
+           call mio_fcreate( 'SA_WD_1_MIO', io_mode )   
+        END IF
+        call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
+
         BUFF2 = 0.0
         DO SPC = 1, N_SPCTAG
           DO ROW = 1, NROWS
@@ -784,6 +794,8 @@ C...reinitialize deposition array
             XMSG = 'Could not write ' // SA_WD_1 // ' file'
             CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
           END IF
+          call mio_fwrite( 'SA_WD_1_MIO', VNAM_SPCTAG( SPC ),
+     &                     PNAME, BUFF2, TIME_STAMP )
        END DO ! n_spctag
 
        TOT_SADEP  = 0.0
