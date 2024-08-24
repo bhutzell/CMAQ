@@ -63,7 +63,7 @@ C...Local variables
       
       CHARACTER( 16 ), ALLOCATABLE :: VNAME( : )
       CHARACTER( 16 ), ALLOCATABLE :: UNITS( : )
-      CHARACTER( 80 ), ALLOCATABLE :: VDESC( : )
+      CHARACTER( 256), ALLOCATABLE :: VDESC( : )
       INTEGER,         ALLOCATABLE :: VTYPE( : )
       INTEGER,         ALLOCATABLE :: NDIMS( : )
       
@@ -242,7 +242,7 @@ C...CSA Variables, Units and Descriptions for RJ_FILE
          N = N + 1
          VNAME( N ) = 'N_EXCEED_TROPO3'
          UNITS( N ) = ''
-         VDESC( N ) = '# of times predicted tropospheric ozone column exceeds observed total column '
+         VDESC( N ) = 'occurances predicted tropospheric ozone column exceeds observed total column '
      &               // 'per file time step'          
          VTYPE( N ) = M3REAL
 
@@ -349,8 +349,7 @@ C...assumes that lamba in nanometers is on order of 100 or less
 !         END DO
 
          ! Store MIO Metadata
-         NDIMS( 1:NVARS_RJ_1 ) = 3
-!        NDIMS( 1:NVARS_RJ_1 ) = 4
+         NDIMS( 1:NVARS_RJ_1 ) = 4
          L_TSTEP( 1:NVARS_RJ_1 ) = .True.
          L_LAY  ( 1:NVARS_RJ_1 ) = .True.
          L_COL  ( 1:NVARS_RJ_1 ) = .True.
@@ -444,11 +443,7 @@ C...load data from photolysis reaction list
 !         END DO
  
          ! Store MIO Metadata
-!        IF ( NLAYS_DIAG .GT. 1 ) THEN
-           NDIMS( 1:NVARS_RJ_2 ) = 4
-!        ELSE
-!          NDIMS( 1:NVARS_RJ_2 ) = 3
-!        END IF
+         NDIMS( 1:NVARS_RJ_2 ) = 4
          L_TSTEP( 1:NVARS_RJ_2 ) = .True.
          L_LAY  ( 1:NVARS_RJ_2 ) = .True.
          L_COL  ( 1:NVARS_RJ_2 ) = .True.
@@ -608,11 +603,7 @@ C...assumes that lamba in nanometers is on order of 100 or less
 !         END DO
 
          ! Store MIO Metadata
-!        IF ( NLAYS_DIAG .GT. 1 ) THEN
-           NDIMS( 1:NVARS_RJ_3 ) = 4
-!        ELSE
-!          NDIMS( 1:NVARS_RJ_3 ) = 3
-!        END IF
+         NDIMS( 1:NVARS_RJ_3 ) = 4
          L_TSTEP( 1:NVARS_RJ_3 ) = .True.
          L_LAY  ( 1:NVARS_RJ_3 ) = .True.
          L_COL  ( 1:NVARS_RJ_3 ) = .True.

@@ -599,8 +599,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_AELMO_1     "$OUTDIR/CCTM_AELMO_${CTM_APPL}.nc -v"      #> Hourly Avg. Particle Diagnostics
   setenv CTM_AELMO_MIO   $OUTDIR/CCTM_AELMO_MIO_${CTM_APPL}.nc       #> Hourly Avg. Particle Diagnostics
   setenv CTM_RJ_1        "$OUTDIR/CCTM_PHOTDIAG1_${CTM_APPL}.nc -v"  #> 2D Surface Summary from Inline Photolysis
+  setenv CTM_RJ_1_MIO    "$OUTDIR/CCTM_PHOTDIAG1_MIO_${CTM_APPL}.nc" #> 2D Surface Summary from Inline Photolysis
   setenv CTM_RJ_2        "$OUTDIR/CCTM_PHOTDIAG2_${CTM_APPL}.nc -v"  #> 3D Photolysis Rates 
+  setenv CTM_RJ_2_MIO    "$OUTDIR/CCTM_PHOTDIAG2_MIO_${CTM_APPL}.nc" #> 3D Photolysis Rates 
   setenv CTM_RJ_3        "$OUTDIR/CCTM_PHOTDIAG3_${CTM_APPL}.nc -v"  #> 3D Optical and Radiative Results from Photolysis
+  setenv CTM_RJ_3_MIO    "$OUTDIR/CCTM_PHOTDIAG3_MIO_${CTM_APPL}.nc" #> 3D Optical and Radiative Results from Photolysis
   setenv CTM_SSEMIS_1    "$OUTDIR/CCTM_SSEMIS_${CTM_APPL}.nc -v"     #> Sea Spray Emissions
   setenv CTM_SSEMIS_MIO  $OUTDIR/CCTM_SSEMIS_MIO_${CTM_APPL}.nc      #> Sea Spray Emissions
   setenv CTM_DUST_EMIS_1 "$OUTDIR/CCTM_DUSTEMIS_${CTM_APPL}.nc -v"   #> Dust Emissions
@@ -638,7 +641,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
              ${CTM_DRY_DEP_1} ${CTM_DRY_DEP_MIO} $CTM_DEPV_DIAG ${CTM_DEPV_MIO} $B3GTS_S $B3GTS_MIO $MEGAN_SOILOUT $BEIS_SOILOUT ${BEIS_SOIL_MIO} $BDSNPOUT \
              $CTM_WET_DEP_1 ${CTM_WET_DEP1_MIO} $CTM_WET_DEP_2 ${CTM_WET_DEP2_MIO} $CTM_ELMO_1 ${CTM_ELMO_MIO} $CTM_AELMO_1 $CTM_AELMO_MIO             \
              $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 $CTM_SSEMIS_1 $CTM_SSEMIS_MIO $CTM_DUST_EMIS_1 $CTM_DUST_MIO $CTM_IPR_1 $CTM_IPR_2       \
-             $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_DRY_DEP_MOS $CTM_DDEP_MOS_MIO                \
+             $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_IRR_1_MIO $CTM_IRR_2_MIO $CTM_IRR_3_MIO $CTM_DRY_DEP_MOS $CTM_DDEP_MOS_MIO                \
              $CTM_DEPV_MOS $CTM_DEPV_MOS_MIO $CTM_VDIFF_DIAG $CTM_VDIFF_MIO $CTM_VSED_DIAG $CTM_VSED_MIO $CTM_LTNGDIAG_1 $CTM_LTNG1_MIO $CTM_LTNGDIAG_2 $CTM_LTNG2_MIO $CTM_VEXT_1 )
   if ( $?CTM_ISAM ) then
      if ( $CTM_ISAM == 'Y' || $CTM_ISAM == 'T' ) then

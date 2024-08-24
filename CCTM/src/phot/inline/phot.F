@@ -707,25 +707,29 @@ C...modules
 
       IF ( PHOTDIAG .AND. CREATE_MIO_OUTS ) THEN ! create MIO diagnostics
             CREATE_MIO_OUTS = .FALSE.
-!            CALL NEXTIME ( ODATE, OTIME, DTSTEP( 1 ) )  ! output timestamp ending time
-            V = 1
+! Create PHOTDIAG1_MIO file
             CALL MIO_SETFILE( MET_CRO_2D )
             CALL MIO_FCREATE( FNAME='CTM_RJ_1_MIO', MODE=IO_MODE )
-            WRITE(XMSG,'(A,"LAY",I2,A)')'"',NLAYS_DIAG,'"'
-            CALL MIO_SETFILE( MET_CRO_3D )
-            IF ( MYPE .EQ. 0 ) print*,TRIM( XMSG )
-            IF ( MYPE .EQ. 0 ) WRITE(LOGDEV,'(A)')TRIM( XMSG )
-            CALL MIO_FCREATE( FNAME='CTM_RJ_2_MIO', MODE=IO_MODE,REPLACEMENT=TRIM(XMSG) )
-            CALL MIO_FCREATE( FNAME='CTM_RJ_3_MIO', MODE=IO_MODE,REPLACEMENT=TRIM(XMSG) )
-!           CALL MIO_FCREATE( FNAME='CTM_RJ_2_MIO', MODE=IO_MODE )
-!           CALL MIO_FCREATE( FNAME='CTM_RJ_3_MIO', MODE=IO_MODE )
-            IF ( MYPE .EQ. 0 ) THEN
+! Create PHOTDIAG2_MIO file
+            IF (  NLAYS_DIAG .NE. 1 ) THEN
+                CALL MIO_SETFILE( MET_CRO_3D )
+                MIO_NLAYS = NLAYS_DIAG
+            END IF
+            CALL MIO_FCREATE( FNAME='CTM_RJ_2_MIO', MODE=IO_MODE )
+            IF ( MYPE .EQ. 0 .AND. NLAYS_DIAG .NE. 1 ) THEN
               CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_2_MIO', 'NLAYS', NLAYS_DIAG )
               CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_2_MIO', 'VGLVLS', MET_CRO_3D, 1, NLAYS_DIAG )
+            END IF
+! Create PHOTDIAG3_MIO file
+            IF (  NLAYS_DIAG .NE. 1 ) THEN
+                CALL MIO_SETFILE( MET_CRO_3D )
+                MIO_NLAYS = NLAYS_DIAG
+            END IF
+            CALL MIO_FCREATE( FNAME='CTM_RJ_3_MIO', MODE=IO_MODE )
+            IF ( MYPE .EQ. 0 .AND. NLAYS_DIAG .NE. 1 ) THEN
               CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_3_MIO', 'NLAYS', NLAYS_DIAG )
               CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_3_MIO', 'VGLVLS', MET_CRO_3D, 1, NLAYS_DIAG )
             END IF
-!            ODATE = START_DATE; OTIME = START_TIME
       END IF
 
 
@@ -1315,7 +1319,7 @@ C...modules
          END IF
 #else
         call mio_setfile( 'CTM_RJ_1_MIO')
-        call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+        call mio_time_format_conversion( ODATE, OTIME, TIME_STAMP )
 
          VARNM = 'COSZENS'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME,
