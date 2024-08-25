@@ -1318,7 +1318,6 @@ C...modules
             CALL MIO_FWRITE ('CTM_OUT', ONAME, PNAME, SO2_COLUMN(:,1), TIME_STAMP)
          END IF
 #else
-        call mio_setfile( 'CTM_RJ_1_MIO')
         call mio_time_format_conversion( ODATE, OTIME, TIME_STAMP )
 
          VARNM = 'COSZENS'
@@ -1486,15 +1485,14 @@ C...modules
                 XMSG = 'Error writing variable ' // VARNM
                 CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
              END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        ACM_CLOUDS, TIME_STAMP )       
+
              VARNM = 'SUBGRID_WBAR'
              IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, ACM_AVE_H2O ) ) THEN
                 XMSG = 'Error writing variable ' // VARNM
                 CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
              END IF
-             VARNM = 'SUBGRID_WBAR'
-             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
-     &                        ACM_CLOUDS, TIME_STAMP )       
-             VARNM = 'SUBGRID_WBAR'
              call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
      &                        ACM_AVE_H2O, TIME_STAMP )       
          END IF
@@ -1606,7 +1604,6 @@ C...modules
      &          'Photolysis Surface Summary written to', CTM_RJ_1,
      &          'for date and time', ODATE, OTIME
 
-         call mio_setfile( 'CTM_RJ_2_MIO')
          DO IPHOT = 1, NPHOTAB
             OUTPUT_BUFF( 1:NCOLS,1:NROWS,1:NLAYS_DIAG ) = RJ( 1:NCOLS,1:NROWS,1:NLAYS_DIAG,IPHOT )
             IF ( .NOT. WRITE3( CTM_RJ_2, PHOTAB( IPHOT ), ODATE,
@@ -1622,7 +1619,6 @@ C...modules
      &          'Photolysis Rates written to', CTM_RJ_2,
      &          'for date and time', ODATE, OTIME
 
-         call mio_setfile( 'CTM_RJ_3_MIO')
          VARNM = 'CFRAC_3D'
          OUTPUT_BUFF( 1:NCOLS,1:NROWS,1:NLAYS_DIAG ) = CFRAC_3D( 1:NCOLS,1:NROWS,1:NLAYS_DIAG )
          IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, OUTPUT_BUFF ) ) THEN

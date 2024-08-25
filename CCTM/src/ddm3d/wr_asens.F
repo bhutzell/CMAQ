@@ -51,6 +51,7 @@ C-----------------------------------------------------------------------
 #endif
 
       USE DDM3D_DEFN, ONLY: NP, NPMAX, SPCNAME, SEN_PAR, SAGRID
+      USE MIO_MODULE
 
       IMPLICIT NONE
 
@@ -71,11 +72,11 @@ C Local variables:
       CHARACTER( 16 ) :: AVG_FILE_ENDTIME = 'AVG_FILE_ENDTIME'
       CHARACTER( 80 ) :: VARDESC = ' '
       CHARACTER( 96 ) :: XMSG = ' '
+      CHARACTER( 20 ) :: TIME_STAMP
 
-c     INTEGER, SAVE :: LOGDEV       ! FORTRAN unit number for log file
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
       LOGICAL OK
-c     LOGICAL, SAVE :: END_TIME = .FALSE.
 
       INTEGER      L, K, VAR, SPC ! loop counters
       INTEGER      STATUS
@@ -152,6 +153,20 @@ c Create a species name list of ASENS file
 
          END DO
 
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
+         call mio_setfile( MET_CRO_3D )
+         if (aconc_subset_layer) mio_nlays = A_NLAYS
+
+         call mio_fcreate( 'A_SENS_MIO', io_mode )
+
+         if (aconc_subset_layer) then
+            if (mype == 0) then
+               call mio_set_global_attr ( 'A_SENS_MIO', 'NLAYS', A_NLAYS )
+               call mio_set_global_attr ( 'A_SENS_MIO', 'VGLVLS', MET_CRO_3D, ACONC_BLEV, ACONC_ELEV+1 )
+            end if
+         end if
+
       END IF ! FIRSTIME
 
 
@@ -162,6 +177,8 @@ c Create a species name list of ASENS file
          CALL NEXTIME ( MDATE, MTIME, -TSTEP )
       END IF
 
+      call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+
       DO SPC = 1, N_ASENS_SPC
         DO NP = 1, NPMAX
           IF ( .NOT. WRITE3( A_SENS_1, VARNAME_ASENS( NP, SPC ),
@@ -170,6 +187,8 @@ c Create a species name list of ASENS file
      &              // ' to ' // A_SENS_1
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+          call mio_fwrite( 'A_SENS_MIO', VARNAME_ASENS( NP, SPC ),
+     &                     PNAME, SAGRID( :,:,:,NP,SPC ), TIME_STAMP )
          END DO
       END DO
 

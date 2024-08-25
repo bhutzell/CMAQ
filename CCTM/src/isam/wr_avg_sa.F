@@ -34,6 +34,7 @@ C-----------------------------------------------------------------------
       USE SA_DEFN
       USE RUNTIME_VARS
       USE MIO_ASCII
+      USE MIO_MODULE
 
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -62,8 +63,10 @@ C Local variables:
       CHARACTER( 16 ) :: ACONC_END_TIME = 'ACONC_END_TIME'
       CHARACTER( 80 ) :: VARDESC = ' '
       CHARACTER( 96 ) :: XMSG = ' '
+      CHARACTER( 20 ) :: TIME_STAMP
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
       LOGICAL OK
 
       INTEGER      L, K, KD, VAR, SPC ! loop counters
@@ -164,7 +167,7 @@ C Set file header attributes that differ from CONC and open the file
                L_VEXT ( 1:NVARS3D ) = .False.
               
 !              CALL LOAD_MIO_FILE ( 'SA_ACONC_1', A_NLAYS, AISAM_BLEV, AISAM_ELEV,
-               CALL LOAD_MIO_FILE ( 'SA_ACONC_MIO', A_NLAYS, AISAM_BLEV, AISAM_ELEV,
+               CALL LOAD_MIO_FILE ( 'SA_ACONC_1_MIO', A_NLAYS, AISAM_BLEV, AISAM_ELEV,
      &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -285,8 +288,22 @@ C Check other header data with CONC file as reference
       IF ( .NOT. END_TIME ) THEN
          CALL NEXTIME( MDATE, MTIME, -TSTEP)
       END IF
-      IF ( .NOT. ALLOCATED( BUF4 ) ) ALLOCATE( BUF4( NCOLS, NROWS, A_NLAYS, N_SPCTAG ) )
+      call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
 
+      IF ( FIRSTWRITE ) THEN
+         FIRSTWRITE = .FALSE.
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
+         call mio_setfile( MET_CRO_3D )
+         if ( A_NLAYS .lt. NLAYS ) mio_nlays = A_NLAYS
+         call mio_fcreate( 'SA_ACONC_1_MIO', io_mode )
+         if ( mype == 0 ) then
+            call mio_set_global_attr( 'SA_ACONC_1_MIO', 'NLAYS', A_NLAYS )
+            call mio_set_global_attr( 'SA_ACONC_1_MIO', 'VGLVLS', MET_CRO_3D, AISAM_BLEV, AISAM_ELEV+1 )
+         end if
+      END IF
+
+      IF ( .NOT. ALLOCATED( BUF4 ) ) ALLOCATE( BUF4( NCOLS, NROWS, A_NLAYS, N_SPCTAG ) )
     
       DO SPC = 1, N_SPCTAG
          L = 0
@@ -302,6 +319,8 @@ C Check other header data with CONC file as reference
             CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
          END IF
 !     write( logdev,* ) ' <>var, A_GC_SPC: ', VAR, A_GC_SPC( SPC )
+         call mio_fwrite( 'SA_ACONC_1_MIO', VNAM_SPCTAG( SPC ),
+     &                    PNAME, BUF4( :,:,:,SPC ), TIME_STAMP )
       END DO
  
       WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )

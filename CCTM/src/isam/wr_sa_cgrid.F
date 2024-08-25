@@ -18,9 +18,11 @@
 !------------------------------------------------------------------------!
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     
-c      [2] write tssa concentration data 
-c     
+C     
+C  Writes full ISAM values to a restart file SA_CGRID_1 which would serve as
+C          initial conditions for next day's run
+C
+C  Called by driver.F
 C     Revision history
 C     01 Nov 2018: S.Napelenok Updates for cmaq5.3 release 
 C     09 May 2019: D.Wong Removed all MY_ clauses
@@ -28,23 +30,17 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       SUBROUTINE WR_SA_CGRID ( JDATE, JTIME, TSTEP )
 
-C20140428  Writes full ISAM values to a restart file SA_CGRID_1 which would serve as
-C          initial conditions for next day's run
-C
-C          Called by driver.F
-
       USE GRID_CONF
-      USE UTILIO_DEFN           ! 20120615
-c     USE SUBST_MODULES         ! stenex
-      USE SA_DEFN               ! Mc06
+      USE UTILIO_DEFN
+      USE SA_DEFN
       USE MIO_ASCII
       USE RUNTIME_VARS, ONLY : RUNLEN
+      USE MIO_MODULE
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
 #endif
-
 
       IMPLICIT NONE
 
@@ -55,35 +51,22 @@ C Include Files:
 C...Arguments Declaration
       INTEGER    JDATE          ! current model date, coded YYYYDDD
       INTEGER    JTIME          ! current model time, coded HHMMSS
-      !INTEGER    TSTEP(2)       ! format 10000, 0, 0
       INTEGER    TSTEP          ! format 10000
-
-C...End of argument declaration
 
 C Local variables:
       
-c     INTEGER          ALLOCSTAT, LOGDEV
       INTEGER          ALLOCSTAT
 
       CHARACTER( 16 ) :: PNAME = 'WR_SA_CGRID'
       CHARACTER( 96 ) :: XMSG = ' '
-      
-c     INTEGER   C,R,S,K,N, L, ITAG, JSPC    ! loop induction variables
+      CHARACTER( 20 ) :: TIME_STAMP
+
       INTEGER   C,R,S,K,N, L, JSPC    ! loop induction variables
       INTEGER, SAVE :: EDATE, ETIME
 
       REAL, ALLOCATABLE, SAVE :: ISAM_BUFF ( :,:,:,: )
-!20140519
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
-      LOGICAL OK
-
-      INTEGER TSTEP_RF, NTHIK_RF, NCOLS_RF, NROWS_RF, GDTYP_RF
-      REAL( 8 ) :: P_ALP_RF, P_BET_RF, P_GAM_RF
-      REAL( 8 ) :: XCENT_RF, YCENT_RF
-      REAL( 8 ) :: XORIG_RF, YORIG_RF
-      REAL( 8 ) :: XCELL_RF, YCELL_RF
-      INTEGER VGTYP_RF
-      REAL VGTOP_RF
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
 
 C-----------------------------------------------------------------------
 
@@ -91,30 +74,17 @@ C-----------------------------------------------------------------------
         
         FIRSTIME = .FALSE.
 
-        CALL SUBST_BARRIER
+        IF ( IO_PE_INCLUSIVE ) THEN
+           IF ( .NOT. OPEN3( SA_CONC_1, FSRDWR3, PNAME ) ) THEN
+             XMSG = 'Could not open ' // trim(SA_CONC_1) //
+     &              ' file for update '
+             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+           END IF
 
-!20140519 add subst_global_logical call as done in wr_cgrid
-        OK = OPEN3( SA_CGRID_1, FSRDWR3, PNAME )
-        CALL SUBST_GLOBAL_LOGICAL( OK, 'AND' )
-
-        IF ( .NOT. OK ) THEN
-          XMSG = 'Could not open ' // SA_CGRID_1 // 
-     & ' file for update - try to open new'
-          CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-
-          IF ( MYPE .EQ. 0 ) THEN
-            ! open sa_conc_1
-            IF ( .NOT. OPEN3( SA_CONC_1, FSRDWR3, PNAME ) ) THEN
-              XMSG = 'Could not open ' // SA_CONC_1 // 
-     & ' file for update '
-              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            ENDIF ! sa_conc_1 opened ?
-      
-            ! Get description of sa_conc_1
-            IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
-              XMSG = 'Could not get file description from ' // SA_CONC_1
-              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            ENDIF ! sa_conc_1 description obtained ?
+           IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
+             XMSG = 'Could not get file description from ' // SA_CONC_1
+             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+           END IF
 
             EDATE = JDATE
             ETIME = JTIME
@@ -124,6 +94,10 @@ C-----------------------------------------------------------------------
             STIME3D = ETIME
             NLAYS3D = NLAYS
 
+            FDESC3D = ' '
+            FDESC3D( 1 ) = 'Instantaneous ISAM values on computational grid'
+            FDESC3D( 2 ) = '- for scenario continuation.'
+
             ! Store MIO Metadata
             NDIMS3D( 1:NVARS3D ) = 4
             L_TSTEP( 1:NVARS3D ) = .True.
@@ -131,96 +105,20 @@ C-----------------------------------------------------------------------
             L_COL  ( 1:NVARS3D ) = .True.
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
-            
+      
+      
 !           CALL LOAD_MIO_FILE ( SA_CGRID_1, NLAYS3D, 1, NLAYS3D,
-            CALL LOAD_MIO_FILE ( 'SA_CGRID_MIO', NLAYS3D, 1, NLAYS3D,
+            CALL LOAD_MIO_FILE ( 'SA_CGRID_1_MIO', NLAYS3D, 1, NLAYS3D,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
 
-
-            ! Create sa_cgrid_1
             IF ( .NOT. OPEN3( SA_CGRID_1, FSNEW3, PNAME ) ) THEN
-              XMSG = 'Could not open' // SA_CGRID_1 
+              XMSG = 'Could not create' // SA_CGRID_1 
               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            ENDIF !
-          ENDIF ! mype0 ?
-
-        ELSE ! 20140519 sa_cgrid already opened by any processor
-
-          IF ( MYPE .EQ. 0 ) THEN
-
-            IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
-              XMSG = 'Could not get' // TRIM(SA_CONC_1) //
-     &  'file description'
-              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            ENDIF
-
-            TSTEP_RF = TSTEP3D
-            NTHIK_RF = NTHIK3D
-            NCOLS_RF = NCOLS3D
-            NROWS_RF = NROWS3D
-            GDTYP_RF = GDTYP3D
-            P_ALP_RF = P_ALP3D
-            P_BET_RF = P_BET3D
-            P_GAM_RF = P_GAM3D
-            XCENT_RF = XCENT3D
-            YCENT_RF = YCENT3D
-            XORIG_RF = XORIG3D
-            YORIG_RF = YORIG3D
-            XCELL_RF = XCELL3D
-            YCELL_RF = YCELL3D
-            VGTYP_RF = VGTYP3D
-            VGTOP_RF = VGTOP3D
-
-            IF ( .NOT. DESC3( SA_CGRID_1 ) ) THEN
-              XMSG = 'Could not get' // TRIM(SA_CGRID_1) // 
-     &  'file description'
-              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            ENDIF
-
-            IF ( TSTEP_RF .NE. ABS( TSTEP3D ) .OR.
-     &           NTHIK_RF .NE. NTHIK3D .OR.
-     &           NCOLS_RF .NE. NCOLS3D .OR.
-     &           NROWS_RF .NE. NROWS3D .OR.
-     &           GDTYP_RF .NE. GDTYP3D ) THEN
-                 XMSG = 'Header inconsistent on existing SA_CGRID_1'
-                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( P_ALP_RF .NE. P_ALP3D .OR.
-     &           P_BET_RF .NE. P_BET3D .OR.
-     &           P_GAM_RF .NE. P_GAM3D ) THEN
-                 XMSG = 'Header inconsistent on existing SA_CGRID_1'
-                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( XCENT_RF .NE. XCENT3D .OR.
-     &           YCENT_RF .NE. YCENT3D ) THEN
-                 XMSG = 'Header inconsistent on existing SA_CGRID_1'
-                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( XORIG_RF .NE. XORIG3D .OR.
-     &           YORIG_RF .NE. YORIG3D ) THEN
-                 XMSG = 'Header inconsistent on existing SA_CGRID_1'
-                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( XCELL_RF .NE. XCELL3D .OR.
-     &           YCELL_RF .NE. YCELL3D ) THEN
-                 XMSG = 'Header inconsistent on existing SA_CGRID_1'
-                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( VGTYP_RF .NE. VGTYP3D ) THEN
-                 XMSG = 'Header inconsistent on existing SA_CGRID_1'
-                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( VGTOP_RF .NE. VGTOP3D ) THEN
-                 XMSG = 'Header inconsistent on existing SA_CGRID_1'
-                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-
-          ENDIF  ! mype 0
-
-        END IF ! sa_cgrid_1 opened ?
+            ENDIF 
+          ENDIF ! IO_PE_INCLUSIVE
 
         CALL SUBST_BARRIER
 
@@ -235,19 +133,27 @@ C-----------------------------------------------------------------------
 
       ENDIF  !firstime
 
+      IF ( FIRSTWRITE ) THEN
+         FIRSTWRITE = .FALSE.
+         call mio_setfile( MET_CRO_3D )
+         call mio_fcreate( 'SA_CGRID_1_MIO', io_mode )
+      END IF
+
+      call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+
       ISAM_BUFF = 0.0
-    
+
       DO S = 1, N_SPCTAG
         ISAM_BUFF( :,:,:,S ) = ISAM( :,:,:,S_SPCTAG(S),T_SPCTAG(S) )
-!20140319        IF ( .NOT. WRITE3( SA_CGRID_1, VNAME3D(S), JDATE, JTIME,
         IF ( .NOT. WRITE3( SA_CGRID_1, VNAM_SPCTAG(S), JDATE, JTIME,
      &          ISAM_BUFF(:,:,:,S)) ) THEN
            XMSG = 'Could not write to ' 
      &           // SA_CGRID_1 
            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
+        call mio_fwrite( 'SA_CGRID_1_MIO', VNAM_SPCTAG(S),
+     &                   PNAME, ISAM_BUFF( :,:,:,S ), TIME_STAMP )
       END DO ! S
-!      DEALLOCATE( ISAM_BUFF )
       
       return
       end

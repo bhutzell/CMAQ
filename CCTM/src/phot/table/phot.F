@@ -544,7 +544,6 @@ C...  (assumes sun below horizon at *all* levels!)
      &           'RJ Values written to', CTM_RJ_2,
      &           'for date and time', JDATE, JTIME
 
-          call mio_setfile( 'CTM_RJ_2_MIO')
           call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
 
            DO JP = 1, NPHOTAB
@@ -776,8 +775,7 @@ C...  in cloud - linearly interpolate between base and top value
      &         'RJ Values written to', CTM_RJ_2,
      &         'for date and time', JDATE, JTIME
 
-        call mio_setfile( 'CTM_RJ_2_MIO')
-        call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+        call mio_time_format_conversion( ODATE, OTIME, TIME_STAMP )
 
          DO JP = 1, NPHOTAB
             CALL MIO_FWRITE( 'CTM_RJ_2_MIO', PHOTAB( JP ), PNAME,

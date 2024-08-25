@@ -506,6 +506,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
        setenv SA_DD_1         "$OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc -v"
        setenv SA_WD_1         "$OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc -v"
        setenv SA_CGRID_1      "$OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc -v"
+       setenv SA_ACONC_1_MIO  $OUTDIR/CCTM_SA_ACONC_${CTM_APPL}.nc
+       setenv SA_CONC_1_MIO   $OUTDIR/CCTM_SA_CONC_${CTM_APPL}.nc
+       setenv SA_DD_1_MIO     $OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc
+       setenv SA_WD_1_MIO     $OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc
+       setenv SA_CGRID_1_MIO  $OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc
 
        #> Set optional ISAM regions files
        #setenv ISAM_REGIONS $INPDIR/GRIDMASK_STATES_12SE1.nc
@@ -564,6 +569,10 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  setenv A_SENS_1        "$OUTDIR/CCTM_ASENS_${CTM_APPL}.nc -v"
  setenv CTM_SWETDEP_1   "$OUTDIR/CCTM_SENWDEP_${CTM_APPL}.nc -v"
  setenv CTM_SDRYDEP_1   "$OUTDIR/CCTM_SENDDEP_${CTM_APPL}.nc -v"
+ setenv CTM_SENS_MIO    $OUTDIR/CCTM_SENGRID_${CTM_APPL}.nc
+ setenv A_SENS_MIO      $OUTDIR/CCTM_ASENS_${CTM_APPL}.nc
+ setenv CTM_SWETDEP_MIO $OUTDIR/CCTM_SENWDEP_${CTM_APPL}.nc
+ setenv CTM_SDRYDEP_MIO $OUTDIR/CCTM_SENDDEP_${CTM_APPL}.nc
  setenv INIT_SENS_1     $S_ICpath/$S_ICfile
  
  
@@ -615,6 +624,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_IRR_1       "$OUTDIR/CCTM_IRR_1_${CTM_APPL}.nc -v"      #> Chem Process Analysis
   setenv CTM_IRR_2       "$OUTDIR/CCTM_IRR_2_${CTM_APPL}.nc -v"      #> Chem Process Analysis
   setenv CTM_IRR_3       "$OUTDIR/CCTM_IRR_3_${CTM_APPL}.nc -v"      #> Chem Process Analysis
+  setenv CTM_IPR_1_MIO   $OUTDIR/CCTM_PA_MIO_${CTM_APPL}.nc          # Process Analysis
+  setenv CTM_IRR_1_MIO   $OUTDIR/CCTM_IRR_MIO_${CTM_APPL}.nc         # Chem Process Analysis
   setenv CTM_DRY_DEP_MOS "$OUTDIR/CCTM_DDMOS_${CTM_APPL}.nc -v"      #> Dry Dep
   setenv CTM_DDEP_MOS_MIO $OUTDIR/CCTM_DDMOS_MIO_${CTM_APPL}.nc      #> Dry Dep
   setenv CTM_DEPV_MOS    "$OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc -v"    #> Dry Dep Velocity
@@ -637,21 +648,37 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   ( ls ${LOGDIR}/CTM_LOG_???.${CTM_APPL} >> buff.txt ) >& /dev/null
   set log_test = `cat buff.txt`; rm -f buff.txt
 
-  set OUT_FILES = (${FLOOR_FILE} ${S_CGRID} ${S_CGRID_MIO} ${CTM_CONC_1} ${CTM_CONC_MIO} ${A_CONC_1} ${A_CONC_MIO} ${MEDIA_CONC} ${MEDIA_CONC_MIO}         \
-             ${CTM_DRY_DEP_1} ${CTM_DRY_DEP_MIO} $CTM_DEPV_DIAG ${CTM_DEPV_MIO} $B3GTS_S $B3GTS_MIO $MEGAN_SOILOUT $BEIS_SOILOUT ${BEIS_SOIL_MIO} $BDSNPOUT \
-             $CTM_WET_DEP_1 ${CTM_WET_DEP1_MIO} $CTM_WET_DEP_2 ${CTM_WET_DEP2_MIO} $CTM_ELMO_1 ${CTM_ELMO_MIO} $CTM_AELMO_1 $CTM_AELMO_MIO             \
-             $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 $CTM_SSEMIS_1 $CTM_SSEMIS_MIO $CTM_DUST_EMIS_1 $CTM_DUST_MIO $CTM_IPR_1 $CTM_IPR_2       \
-             $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_IRR_1_MIO $CTM_IRR_2_MIO $CTM_IRR_3_MIO $CTM_DRY_DEP_MOS $CTM_DDEP_MOS_MIO                \
-             $CTM_DEPV_MOS $CTM_DEPV_MOS_MIO $CTM_VDIFF_DIAG $CTM_VDIFF_MIO $CTM_VSED_DIAG $CTM_VSED_MIO $CTM_LTNGDIAG_1 $CTM_LTNG1_MIO $CTM_LTNGDIAG_2 $CTM_LTNG2_MIO $CTM_VEXT_1 )
+  set OUT_FILES = (${FLOOR_FILE} \
+     ${S_CGRID} ${CTM_CONC_1} ${A_CONC_1} ${MEDIA_CONC} \
+     ${CTM_DRY_DEP_1} $CTM_DEPV_DIAG $B3GTS_S $BEIS_SOILOUT $MEGAN_SOILOUT $BDSNPOUT \
+     $CTM_WET_DEP_1 $CTM_WET_DEP_2 $CTM_ELMO_1 $CTM_AELMO_1 \
+     $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 \
+     $CTM_SSEMIS_1 $CTM_DUST_EMIS_1 $CTM_IPR_1 $CTM_IPR_2 $CTM_IPR_3  $CTM_BUDGET \
+     $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_IRR_1_MIO \
+     $CTM_DRY_DEP_MOS $CTM_DEPV_MOS $CTM_VDIFF_DIAG $CTM_VSED_DIAG \
+     $CTM_LTNGDIAG_1 $CTM_LTNGDIAG_2 $CTM_VEXT_1 )
+
+  set OUT_FILES = ( $OUT_FILES \
+     ${S_CGRID_MIO} ${CTM_CONC_MIO} ${A_CONC_MIO} ${MEDIA_CONC_MIO}  \
+     ${CTM_DRY_DEP_MIO} ${CTM_DEPV_MIO} $B3GTS_MIO ${BEIS_SOIL_MIO} \
+     ${CTM_WET_DEP1_MIO} ${CTM_WET_DEP2_MIO} ${CTM_ELMO_MIO} $CTM_AELMO_MIO  \
+     $CTM_RJ_1_MIO $CTM_RJ_2_MIO $CTM_RJ_3_MIO \
+     $CTM_SSEMIS_MIO $CTM_DUST_MIO $CTM_IPR_1_MIO \
+     $CTM_DDEP_MOS_MIO $CTM_DEPV_MOS_MIO $CTM_VDIFF_MIO $CTM_VSED_MIO \
+     $CTM_LTNG1_MIO $CTM_LTNG2_MIO )
+
   if ( $?CTM_ISAM ) then
      if ( $CTM_ISAM == 'Y' || $CTM_ISAM == 'T' ) then
-        set OUT_FILES = (${OUT_FILES} ${SA_ACONC_1} ${SA_CONC_1} ${SA_DD_1} ${SA_WD_1}      \
-                         ${SA_CGRID_1} )
+        set OUT_FILES = (${OUT_FILES} \
+  ${SA_ACONC_1} ${SA_CONC_1} ${SA_DD_1} ${SA_WD_1} ${SA_CGRID_1} \
+  ${SA_ACONC_1_MIO} ${SA_CONC_1_MIO} ${SA_DD_1_MIO} ${SA_WD_1_MIO} ${SA_CGRID_1_MIO} )
      endif
   endif
   if ( $?CTM_DDM3D ) then
      if ( $CTM_DDM3D == 'Y' || $CTM_DDM3D == 'T' ) then
-        set OUT_FILES = (${OUT_FILES} ${CTM_SENS_1} ${A_SENS_1} ${CTM_SWETDEP_1} ${CTM_SDRYDEP_1} )
+        set OUT_FILES = (${OUT_FILES} \
+          ${CTM_SENS_1} ${A_SENS_1} ${CTM_SWETDEP_1} ${CTM_SDRYDEP_1} \
+          $CTM_SENS_MIO $A_SENS_MIO $CTM_SWETDEP_MIO $CTM_SDRYDEP_MIO )
      endif
   endif
   set OUT_FILES = `echo $OUT_FILES | sed "s; -v;;g" | sed "s;MPI:;;g" `

@@ -17,7 +17,7 @@
 !------------------------------------------------------------------------!
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+      SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP )   ! stage
 
 C-----------------------------------------------------------------------
 C Asymmetric Convective Model v2 (ACM2) -- Pleim(2006)
@@ -127,7 +127,10 @@ C Local Variables:
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL, SAVE :: WRITE_FIRSTIME = .TRUE.
       LOGICAL, SAVE :: WRITE_FIRSTIME_MIO = .TRUE.
-      LOGICAL, SAVE :: first_diag_write = .TRUE.
+      LOGICAL, SAVE :: FIRST_WRITE_DIAG = .TRUE.
+#ifdef isam
+      LOGICAL, SAVE :: FIRST_WRITE_ISAM = .TRUE.
+#endif
       INTEGER, SAVE :: WSTEP  = 0               ! local write counter
       INTEGER  STATUS                           ! ENV... status
 
@@ -531,7 +534,8 @@ C If last call this hour:  write accumulated depositions:
          
 C Write vdiff diagnostics
          IF ( VDIFFDIAG ) THEN
-            if ( first_diag_write ) then
+            if ( FIRST_WRITE_DIAG ) then
+               FIRST_WRITE_DIAG = .FALSE.
                call mio_setfile( MET_CRO_2D )
                call mio_fcreate( 'CTM_VDIFF_MIO', io_mode )
                if ( GRAV_SETL ) then
@@ -541,7 +545,6 @@ C Write vdiff diagnostics
                if ( MOSAIC ) then
                   call mio_fcreate( 'CTM_DDEP_MOS_MIO', io_mode )
                end if
-               first_diag_write = .false.
             end if
 
             IF ( GRAV_SETL ) THEN   ! Write vsed diagnostics
@@ -668,7 +671,8 @@ C Write other diagnostics
                         WRDD( C,R ) = WRDD( C,R ) + DDEPJ( J,S,C,R ) * Tile_Data%LUFRAC( C,R,J )
                         WRDDJ( C,R,J ) = DDEPJ( J,S,C,R )
                      END DO
-                     WRDDJ( C,R,Tile_Data%N_LUFRAC+1 ) = WRDD( C,R )  ! last array element is total across all land use categories
+                     WRDDJ( C,R,Tile_Data%N_LUFRAC+1 ) = WRDD( C,R )  ! last array element is total 
+                                                                      ! across all land use categories
                   END DO
                END DO
 
@@ -702,6 +706,11 @@ C re-set dry deposition array to zero
 
 #ifdef isam
          WRDD = 0.0
+         IF ( FIRST_WRITE_ISAM ) THEN
+            FIRST_WRITE_ISAM = .FALSE.
+            call mio_setfile( MET_CRO_2D )
+            call mio_fcreate( 'SA_DD_1_MIO', io_mode )
+         END IF
          DO ITAG = 1, N_SPCTAG
             DO R = 1, NROWS
                DO C = 1, NCOLS
@@ -714,6 +723,8 @@ C re-set dry deposition array to zero
                XMSG = 'Could not write ' // SA_DD_1 // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+            call mio_fwrite( 'SA_DD_1_MIO', VNAM_SPCTAG( ITAG ),
+     &                       PNAME, WRDD, TIME_STAMP )
          END DO
 
          SA_DDEP = 0.0
