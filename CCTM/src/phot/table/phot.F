@@ -68,11 +68,15 @@ C----------------------------------------------------------------------
       
       USE CENTRALIZED_IO_MODULE, ONLY : INTERPOLATE_VAR, LAT, LON, HT
       USE RUNTIME_VARS,          ONLY : PHOTDIAG, START_DATE => STDATE, START_TIME => STTIME
-
+      USE MIO_MODULE
+#ifdef mpas
+      USE COUPLER_MODULE
+#else
 #ifdef parallel
       USE SE_MODULES           ! stenex (using SE_UTIL_MODULE)
 #else
       USE NOOP_MODULES         ! stenex (using NOOP_UTIL_MODULE)
+#endif
 #endif
 
       IMPLICIT NONE
@@ -132,6 +136,8 @@ C scratch local variables:
       CHARACTER(  16 ) :: VARNM
       CHARACTER(  80 ) :: VARDESC      ! env var description
       CHARACTER( 120 ) :: XMSG    = ' '
+      CHARACTER(  20 ) :: TIME_STAMP
+
 
 
       INTEGER      JVUNIT
@@ -198,7 +204,8 @@ C scratch local variables:
 
 ! variables determining whether to write output diagnostics
 
-      LOGICAL :: JTIME_CHK   ! To check for JTIME to write RJ values
+      LOGICAL, SAVE :: CREATE_MIO_OUTS = .TRUE.  ! Flag for creating MIO diagnostic output files
+      LOGICAL       :: JTIME_CHK   ! To check for JTIME to write RJ values
       INTEGER, SAVE :: ODATE ! output date
       INTEGER, SAVE :: OTIME ! output time
       INTEGER, SAVE :: OSTEP ! time since last write diagnostics  
@@ -469,6 +476,13 @@ C...open the photolysis rate diagnostic files
 
       END IF  ! FIRSTIME
 
+      IF ( PHOTDIAG .AND. CREATE_MIO_OUTS ) THEN ! create MIO diagnostics
+            CREATE_MIO_OUTS = .FALSE.
+! Create PHOTDIAG1_MIO file
+            CALL MIO_SETFILE( MET_CRO_3D )
+            CALL MIO_FCREATE( FNAME='CTM_RJ_2_MIO', MODE=IO_MODE )
+      END IF
+
 C...compute XLHA (local hr angle) deviation from noon
 C...  correct for current *positive* West longitude convention
 
@@ -530,7 +544,20 @@ C...  (assumes sun below horizon at *all* levels!)
      &           'RJ Values written to', CTM_RJ_2,
      &           'for date and time', JDATE, JTIME
 
+          call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+
+           DO JP = 1, NPHOTAB
+              CALL MIO_FWRITE( 'CTM_RJ_2_MIO', PHOTAB( JP ), PNAME,
+     &                          RJ( :,:,:,JP ), TIME_STAMP )
+           END DO
+
+           WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
+     &           'RJ Values written to', 'CTM_RJ_2_MIO',
+     &           'for date and time', JDATE, JTIME
+
+
         END IF ! if photdiag .and. jtime_chk .eq. 0
+
 
         RETURN
       END IF
@@ -747,6 +774,18 @@ C...  in cloud - linearly interpolate between base and top value
         WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &         'RJ Values written to', CTM_RJ_2,
      &         'for date and time', JDATE, JTIME
+
+        call mio_time_format_conversion( ODATE, OTIME, TIME_STAMP )
+
+         DO JP = 1, NPHOTAB
+            CALL MIO_FWRITE( 'CTM_RJ_2_MIO', PHOTAB( JP ), PNAME,
+     &                        RJ( :,:,:,JP ), TIME_STAMP )
+         END DO
+
+        WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
+     &         'RJ Values written to', 'CTM_RJ_2_MIO',
+     &         'for date and time', JDATE, JTIME
+
 
       END IF ! if photdiag .and. jtime_chk .eq. 0
 
