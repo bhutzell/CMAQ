@@ -791,7 +791,9 @@ C Initialize MIO
       IF ( JDATE .EQ. STDATE .AND. JTIME .EQ. STTIME ) THEN
          CALL WR_INIT ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
 !        CALL WR_CONC ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
+#ifdef isam
          CALL WR_SA     ( JDATE, JTIME, TSTEP, 1 )
+#endif
          IF ( L_ELMO ) THEN
             CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.TRUE. )
         END IF
