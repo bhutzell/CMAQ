@@ -506,6 +506,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
        setenv SA_DD_1         "$OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc -v"
        setenv SA_WD_1         "$OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc -v"
        setenv SA_CGRID_1      "$OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc -v"
+       setenv SA_ACONC_1_MIO  $OUTDIR/CCTM_SA_ACONC_${CTM_APPL}.nc
+       setenv SA_CONC_1_MIO   $OUTDIR/CCTM_SA_CONC_${CTM_APPL}.nc
+       setenv SA_DD_1_MIO     $OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc
+       setenv SA_WD_1_MIO     $OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc
+       setenv SA_CGRID_1_MIO  $OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc
 
        #> Set optional ISAM regions files
        #setenv ISAM_REGIONS $INPDIR/GRIDMASK_STATES_12SE1.nc
@@ -564,6 +569,10 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  setenv A_SENS_1        "$OUTDIR/CCTM_ASENS_${CTM_APPL}.nc -v"
  setenv CTM_SWETDEP_1   "$OUTDIR/CCTM_SENWDEP_${CTM_APPL}.nc -v"
  setenv CTM_SDRYDEP_1   "$OUTDIR/CCTM_SENDDEP_${CTM_APPL}.nc -v"
+ setenv CTM_SENS_MIO    $OUTDIR/CCTM_SENGRID_${CTM_APPL}.nc
+ setenv A_SENS_MIO      $OUTDIR/CCTM_ASENS_${CTM_APPL}.nc
+ setenv CTM_SWETDEP_MIO $OUTDIR/CCTM_SENWDEP_${CTM_APPL}.nc
+ setenv CTM_SDRYDEP_MIO $OUTDIR/CCTM_SENDDEP_${CTM_APPL}.nc
  setenv INIT_SENS_1     $S_ICpath/$S_ICfile
  
  
@@ -642,13 +651,14 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
              $CTM_DEPV_MOS $CTM_DEPV_MOS_MIO $CTM_VDIFF_DIAG $CTM_VDIFF_MIO $CTM_VSED_DIAG $CTM_VSED_MIO $CTM_LTNGDIAG_1 $CTM_LTNG1_MIO $CTM_LTNGDIAG_2 $CTM_LTNG2_MIO $CTM_VEXT_1 )
   if ( $?CTM_ISAM ) then
      if ( $CTM_ISAM == 'Y' || $CTM_ISAM == 'T' ) then
-        set OUT_FILES = (${OUT_FILES} ${SA_ACONC_1} ${SA_CONC_1} ${SA_DD_1} ${SA_WD_1}      \
-                         ${SA_CGRID_1} )
+        set OUT_FILES = (${OUT_FILES} \
+  ${SA_ACONC_1} ${SA_CONC_1} ${SA_DD_1} ${SA_WD_1} ${SA_CGRID_1} \
+  ${SA_ACONC_1_MIO} ${SA_CONC_1_MIO} ${SA_DD_1_MIO} ${SA_WD_1_MIO} ${SA_CGRID_1_MIO} )
      endif
   endif
   if ( $?CTM_DDM3D ) then
      if ( $CTM_DDM3D == 'Y' || $CTM_DDM3D == 'T' ) then
-        set OUT_FILES = (${OUT_FILES} ${CTM_SENS_1} ${A_SENS_1} ${CTM_SWETDEP_1} ${CTM_SDRYDEP_1} )
+        set OUT_FILES = (${OUT_FILES} ${CTM_SENS_1} ${A_SENS_1} ${CTM_SWETDEP_1} ${CTM_SDRYDEP_1} $CTM_SENS_MIO $A_SENS_MIO $CTM_SWETDEP_MIO $CTM_SDRYDEP_MIO )
      endif
   endif
   set OUT_FILES = `echo $OUT_FILES | sed "s; -v;;g" | sed "s;MPI:;;g" `

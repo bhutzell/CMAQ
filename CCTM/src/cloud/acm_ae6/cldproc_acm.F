@@ -73,7 +73,7 @@ C-----------------------------------------------------------------------
 #endif
 
 #ifdef sens
-      USE DDM3D_DEFN, ONLY: NP, NPMAX, SENGRID, SENNUM, 
+      USE DDM3D_DEFN, ONLY: NP, NPMAX, SENGRID, SENNUM,
      &                      S_TOTDEP, S_CONDEP, S_DEPWRT, SEN_PAR
 #endif
 
@@ -115,7 +115,12 @@ C...........Local Variables
       LOGICAL, SAVE :: FIRSTIME = .TRUE. ! flag for first pass thru
       LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
       LOGICAL, SAVE :: FIRSTDIAG = .TRUE.
-
+#ifdef sens
+      LOGICAL, SAVE :: FIRST_WRITE_SENS = .TRUE.
+#endif
+#ifdef isam
+      LOGICAL, SAVE :: FIRST_WRITE_ISAM = .TRUE.
+#endif
       CHARACTER( 16 ), SAVE :: PNAME = 'CLDPROC' ! driver program name
       CHARACTER( 16 ) :: VNAME            ! input variable name list
 
@@ -147,6 +152,9 @@ C...........Local Variables
 
       REAL CCMIN
       character (16), ALLOCATABLE, SAVE :: wdep_spc( : )
+#ifdef sens
+      character (16), ALLOCATABLE, SAVE :: swdep_spc( : )
+#endif
       CHARACTER (20) :: TIME_STAMP               ! this is for mio
 #ifdef mpas
       integer :: year, month, day, hour, minute  ! this is for mpas
@@ -209,9 +217,13 @@ C...and return
 
         END IF
 
-        allocate ( wdep_spc (N_SPC_WDEP+1+11), stat = allocstat )
+        allocate ( wdep_spc ( N_SPC_WDEP+1+11 ), 
+#ifdef sens
+     &             swdep_spc( NPMAX * (N_SPC_WDEP+1) ),
+#endif
+     &             stat = allocstat )
         IF ( ALLOCSTAT .NE. 0 ) THEN
-          XMSG = 'Failure allocating WDEP_SPC'
+          XMSG = 'Failure allocating WDEP_SPC and/or SWDEP_SPC'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
         WDEP_SPC = ' '
@@ -222,6 +234,12 @@ C...and return
         DO VAR = STRT, FINI
            SPC = SPC + 1
            wdep_spc( VAR ) = GC_WDEP( SPC )
+#ifdef sens
+           DO NP = 1, NPMAX
+              SENNUM = ( SPC - 1 ) * NPMAX + NP
+              swdep_spc( SENNUM ) = TRIM( GC_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
+           END DO
+#endif
         END DO
 
         SPC = 0
@@ -230,6 +248,12 @@ C...and return
         DO VAR = STRT, FINI
            SPC = SPC + 1
            wdep_spc ( VAR ) = AE_WDEP( SPC )
+#ifdef sens
+           DO NP = 1, NPMAX
+              SENNUM = ( NPMAX * N_GC_WDEP ) + ( SPC - 1 ) *NPMAX + NP
+              swdep_spc( SENNUM ) = TRIM( AE_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
+           END DO
+#endif
         END DO
 
         SPC = 0
@@ -238,6 +262,12 @@ C...and return
         DO VAR = STRT, FINI
            SPC = SPC + 1
            wdep_spc ( VAR ) = NR_WDEP( SPC )
+#ifdef sens
+           DO NP = 1, NPMAX
+              SENNUM = NPMAX * ( N_GC_WDEP + N_AE_WDEP ) + ( SPC - 1 ) * NPMAX + NP
+              swdep_spc( SENNUM ) = TRIM( NR_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
+           END DO
+#endif
         END DO
 
         SPC = 0
@@ -246,10 +276,22 @@ C...and return
         DO VAR = STRT, FINI
            SPC = SPC + 1
            wdep_spc ( VAR ) = TR_WDEP( SPC )
+#ifdef sens
+           DO NP = 1, NPMAX
+              SENNUM = NPMAX * ( N_GC_WDEP + N_AE_WDEP + N_NR_WDEP ) + ( SPC - 1 ) * NPMAX + NP
+              swdep_spc( SENNUM ) = TRIM( TR_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
+           END DO
+#endif
         END DO
         
         SPC = FINI + 1
         wdep_spc( SPC ) = 'HPLUS'
+#ifdef sens
+        DO NP = 1, NPMAX
+           SENNUM = NPMAX * ( N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP ) + NP
+           swdep_spc( SENNUM ) = 'HPLUS_' // SEN_PAR( NP )
+        END DO
+#endif
         SPC = SPC + 1
         wdep_spc( SPC ) = 'PLCL'
         SPC = SPC + 1
@@ -272,6 +314,8 @@ C...and return
         wdep_spc( SPC ) = 'RES_TRANS'
         SPC = SPC + 1
         wdep_spc( SPC ) = 'CLD_TRANS'
+
+
  
 C...initialize the deposition array before processing clouds
 
@@ -650,6 +694,13 @@ C...write data to the normal wet deposition file
 #ifdef sens
 C...write data to the sensitivity wet deposition file
 c gas species
+        IF ( FIRST_WRITE_SENS ) THEN
+           FIRST_WRITE_SENS = .FALSE.
+           call mio_setfile( MET_CRO_2D )
+           call mio_fcreate( 'CTM_SWETDEP_MIO', io_mode )
+        END IF
+        call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
+
         DO NP = 1, NPMAX
           DO SPC = 1, ( N_SPC_WDEP + 1 ) 
             SENNUM = ( SPC - 1 ) * NPMAX + NP
@@ -662,6 +713,12 @@ c gas species
           XMSG = 'Could not write ' // CTM_SWETDEP_1 // ' file'
           CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
         END IF
+
+        DO SPC = 1, NPMAX * ( N_SPC_WDEP + 1 )
+           write(logdev,*) 'SWETDEP: spc, name', spc, swdep_spc(spc)
+           call mio_fwrite( 'CTM_SWETDEP_MIO', swdep_spc( SPC ),
+     &                      PNAME, S_DEPWRT( :,:,SPC ), TIME_STAMP )
+        END DO
 
         WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6)' )
      &         'Timestep written to', CTM_SWETDEP_1,
@@ -718,6 +775,13 @@ C...reinitialize deposition array
 #endif
 
 #ifdef isam
+        IF ( FIRST_WRITE_ISAM ) THEN
+           FIRST_WRITE_ISAM = .FALSE.
+           call mio_setfile( MET_CRO_2D )
+           call mio_fcreate( 'SA_WD_1_MIO', io_mode )   
+        END IF
+        call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
+
         BUFF2 = 0.0
         DO SPC = 1, N_SPCTAG
           DO ROW = 1, NROWS
@@ -730,6 +794,8 @@ C...reinitialize deposition array
             XMSG = 'Could not write ' // SA_WD_1 // ' file'
             CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
           END IF
+          call mio_fwrite( 'SA_WD_1_MIO', VNAM_SPCTAG( SPC ),
+     &                     PNAME, BUFF2, TIME_STAMP )
        END DO ! n_spctag
 
        TOT_SADEP  = 0.0
