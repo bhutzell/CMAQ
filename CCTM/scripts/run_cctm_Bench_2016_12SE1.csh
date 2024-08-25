@@ -624,6 +624,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_IRR_1       "$OUTDIR/CCTM_IRR_1_${CTM_APPL}.nc -v"      #> Chem Process Analysis
   setenv CTM_IRR_2       "$OUTDIR/CCTM_IRR_2_${CTM_APPL}.nc -v"      #> Chem Process Analysis
   setenv CTM_IRR_3       "$OUTDIR/CCTM_IRR_3_${CTM_APPL}.nc -v"      #> Chem Process Analysis
+  setenv CTM_IPR_1_MIO   $OUTDIR/CCTM_PA_MIO_${CTM_APPL}.nc          # Process Analysis
+  setenv CTM_IRR_1_MIO   $OUTDIR/CCTM_IRR_MIO_${CTM_APPL}.nc         # Chem Process Analysis
   setenv CTM_DRY_DEP_MOS "$OUTDIR/CCTM_DDMOS_${CTM_APPL}.nc -v"      #> Dry Dep
   setenv CTM_DDEP_MOS_MIO $OUTDIR/CCTM_DDMOS_MIO_${CTM_APPL}.nc      #> Dry Dep
   setenv CTM_DEPV_MOS    "$OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc -v"    #> Dry Dep Velocity
@@ -649,8 +651,9 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set OUT_FILES = (${FLOOR_FILE} ${S_CGRID} ${S_CGRID_MIO} ${CTM_CONC_1} ${CTM_CONC_MIO} ${A_CONC_1} ${A_CONC_MIO} ${MEDIA_CONC} ${MEDIA_CONC_MIO}         \
              ${CTM_DRY_DEP_1} ${CTM_DRY_DEP_MIO} $CTM_DEPV_DIAG ${CTM_DEPV_MIO} $B3GTS_S $B3GTS_MIO $MEGAN_SOILOUT $BEIS_SOILOUT ${BEIS_SOIL_MIO} $BDSNPOUT \
              $CTM_WET_DEP_1 ${CTM_WET_DEP1_MIO} $CTM_WET_DEP_2 ${CTM_WET_DEP2_MIO} $CTM_ELMO_1 ${CTM_ELMO_MIO} $CTM_AELMO_1 $CTM_AELMO_MIO             \
-             $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 $CTM_SSEMIS_1 $CTM_SSEMIS_MIO $CTM_DUST_EMIS_1 $CTM_DUST_MIO $CTM_IPR_1 $CTM_IPR_2       \
-             $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_IRR_1_MIO $CTM_IRR_2_MIO $CTM_IRR_3_MIO $CTM_DRY_DEP_MOS $CTM_DDEP_MOS_MIO                \
+  $CTM_RJ_1 $CTM_RJ_2 $CTM_RJ_3 $CTM_RJ_1_MIO $CTM_RJ_2_MIO $CTM_RJ_3_MIO \ 
+  $CTM_SSEMIS_1 $CTM_SSEMIS_MIO $CTM_DUST_EMIS_1 $CTM_DUST_MIO $CTM_IPR_1 $CTM_IPR_2       \
+  $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_IRR_1_MIO $CTM_IPR_1_MIO $CTM_DRY_DEP_MOS $CTM_DDEP_MOS_MIO                \
              $CTM_DEPV_MOS $CTM_DEPV_MOS_MIO $CTM_VDIFF_DIAG $CTM_VDIFF_MIO $CTM_VSED_DIAG $CTM_VSED_MIO $CTM_LTNGDIAG_1 $CTM_LTNG1_MIO $CTM_LTNGDIAG_2 $CTM_LTNG2_MIO $CTM_VEXT_1 )
   if ( $?CTM_ISAM ) then
      if ( $CTM_ISAM == 'Y' || $CTM_ISAM == 'T' ) then
