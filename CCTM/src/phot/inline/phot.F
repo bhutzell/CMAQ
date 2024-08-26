@@ -126,10 +126,9 @@ C...modules
       USE SEAS_STRAT_O3_MIN    ! monthly minimum fraction of ozone column density above Pressure TOP
       USE CENTRALIZED_IO_MODULE, ONLY : LAT, LON, HT
       USE ELMO_DATA, ONLY : ELMO_AOD_550, ELMO_EXT_550
-
+      USE MIO_MODULE
 #ifdef mpas
-      use mio_module
-      use coupler_module
+      USE COUPLER_MODULE
 #else
 #ifdef parallel
       USE SE_MODULES           ! stenex (using SE_UTIL_MODULE)
@@ -169,6 +168,7 @@ C...modules
 !...local variables
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.  ! Flag for first call to PHOT
+      LOGICAL, SAVE :: CREATE_MIO_OUTS = .TRUE.  ! Flag for creating MIO diagnostic output files
 
       LOGICAL, SAVE :: CALL_INIT_ALBEDO = .TRUE.
       LOGICAL, SAVE :: CALL_GET_ALBEDO  = .TRUE.
@@ -184,6 +184,7 @@ C...modules
 
       CHARACTER(  80 ) :: VARDESC  ! environment variable description
       CHARACTER( 240 ) :: XMSG = ' '
+      CHARACTER(  20 )                    :: TIME_STAMP
 
       INTEGER,    SAVE :: LGC_O3   = 0 ! pointer to O3 in CGRID
       INTEGER,    SAVE :: LGC_NO2  = 0 ! pointer to NO2 in CGRID
@@ -349,6 +350,9 @@ C...modules
             INTEGER, INTENT( IN )    :: JTIME
             INTEGER, INTENT( IN )    :: TSTEP( 3 )
          END SUBROUTINE CONVCLD_PROP_ACM
+         SUBROUTINE MIO_SETFILE (FNAME)
+           CHARACTER (*), INTENT(IN) :: FNAME
+         END SUBROUTINE MIO_SETFILE
       END INTERFACE
 
 ! ----------------------------------------------------------------------
@@ -627,6 +631,7 @@ C...modules
 #else
             CALL NEXTIME ( ODATE, OTIME, DTSTEP( 1 ) )  ! output timestamp ending time
             IF ( IO_PE_INCLUSIVE ) CALL OPPHOT ( ODATE, OTIME, DTSTEP( 1 ) )
+            WRITE(XMSG,'(A,"LAY",I2,A)')'"',NLAYS_DIAG,'"'
 ! reset ODATE and OTIME for counting 
             ODATE = START_DATE; OTIME = START_TIME
 #endif
@@ -699,6 +704,34 @@ C...modules
 
          RETURN ! Added for MIO Implementation
       END IF  ! firstime
+
+      IF ( PHOTDIAG .AND. CREATE_MIO_OUTS ) THEN ! create MIO diagnostics
+            CREATE_MIO_OUTS = .FALSE.
+! Create PHOTDIAG1_MIO file
+            CALL MIO_SETFILE( MET_CRO_2D )
+            CALL MIO_FCREATE( FNAME='CTM_RJ_1_MIO', MODE=IO_MODE )
+! Create PHOTDIAG2_MIO file
+            IF (  NLAYS_DIAG .NE. 1 ) THEN
+                CALL MIO_SETFILE( MET_CRO_3D )
+                MIO_NLAYS = NLAYS_DIAG
+            END IF
+            CALL MIO_FCREATE( FNAME='CTM_RJ_2_MIO', MODE=IO_MODE )
+            IF ( MYPE .EQ. 0 .AND. NLAYS_DIAG .NE. 1 ) THEN
+              CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_2_MIO', 'NLAYS', NLAYS_DIAG )
+              CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_2_MIO', 'VGLVLS', MET_CRO_3D, 1, NLAYS_DIAG )
+            END IF
+! Create PHOTDIAG3_MIO file
+            IF (  NLAYS_DIAG .NE. 1 ) THEN
+                CALL MIO_SETFILE( MET_CRO_3D )
+                MIO_NLAYS = NLAYS_DIAG
+            END IF
+            CALL MIO_FCREATE( FNAME='CTM_RJ_3_MIO', MODE=IO_MODE )
+            IF ( MYPE .EQ. 0 .AND. NLAYS_DIAG .NE. 1 ) THEN
+              CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_3_MIO', 'NLAYS', NLAYS_DIAG )
+              CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_3_MIO', 'VGLVLS', MET_CRO_3D, 1, NLAYS_DIAG )
+            END IF
+      END IF
+
 
       IF ( INT ( JD_STRAT_O3MIN ) .NE. JDATE ) THEN
 !...set minimum fraction of ozone column above PTOP
@@ -1266,25 +1299,26 @@ C...modules
         IF ( PHOTDIAG ) THEN
 
 #ifdef mpas
-         if ((loc_n > 0) .and. mpas_diag) then
-            time_stamp = ctm_out_clock
+         IF ((LOC_N .GT. 0) .AND. MPAS_DIAG) THEN
+            TIME_STAMP = CTM_OUT_CLOCK
 
-            oname = 'PD_AOD_W550_ANGST'
-            gcount = gcount + 1
-            call mio_fwrite ('CTM_OUT', oname, pname, TAU_AERO_550(:,1), TIME_STAMP)
+            ONAME = 'PD_AOD_W550_ANGST'
+            GCOUNT = GCOUNT + 1
+            CALL MIO_FWRITE ('CTM_OUT', ONAME, PNAME, TAU_AERO_550(:,1), TIME_STAMP)
             TAU_AERO_550 = 0.0
-            oname = 'PD_TROP_O3_COLUMN'
-            call mio_fwrite ('CTM_OUT', oname, pname, TROPO_OC(:,1), TIME_STAMP)
-            oname = 'PD_CO_COLUMN'
-            call mio_fwrite ('CTM_OUT', oname, pname, CO_COLUMN(:,1), TIME_STAMP)
-            oname = 'PD_NO2_COLUMN'
-            call mio_fwrite ('CTM_OUT', oname, pname, NO2_COLUMN(:,1), TIME_STAMP)
-            oname = 'PD_HCHO_COLUMN'
-            call mio_fwrite ('CTM_OUT', oname, pname, HCHO_COLUMN(:,1), TIME_STAMP)
-            oname = 'PD_SO2_COLUMN'
-            call mio_fwrite ('CTM_OUT', oname, pname, SO2_COLUMN(:,1), TIME_STAMP)
-         end if
+            ONAME = 'PD_TROP_O3_COLUMN'
+            CALL MIO_FWRITE ('CTM_OUT', ONAME, PNAME, TROPO_OC(:,1), TIME_STAMP)
+            ONAME = 'PD_CO_COLUMN'
+            CALL MIO_FWRITE ('CTM_OUT', ONAME, PNAME, CO_COLUMN(:,1), TIME_STAMP)
+            ONAME = 'PD_NO2_COLUMN'
+            CALL MIO_FWRITE ('CTM_OUT', ONAME, PNAME, NO2_COLUMN(:,1), TIME_STAMP)
+            ONAME = 'PD_HCHO_COLUMN'
+            CALL MIO_FWRITE ('CTM_OUT', ONAME, PNAME, HCHO_COLUMN(:,1), TIME_STAMP)
+            ONAME = 'PD_SO2_COLUMN'
+            CALL MIO_FWRITE ('CTM_OUT', ONAME, PNAME, SO2_COLUMN(:,1), TIME_STAMP)
+         END IF
 #else
+        call mio_time_format_conversion( ODATE, OTIME, TIME_STAMP )
 
          VARNM = 'COSZENS'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME,
@@ -1292,12 +1326,16 @@ C...modules
              XMSG = 'Error writing variable ' // VARNM
              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    COSINE_ZENITH, TIME_STAMP )       
 
          VARNM = 'OZONE_COLUMN'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, TOTAL_OC ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    TOTAL_OC, TIME_STAMP )       
 
          VARNM = 'CO_COLUMN'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, CO_COLUMN ) ) THEN
@@ -1319,12 +1357,26 @@ C...modules
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         VARNM = 'CO_COLUMN'
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    CO_COLUMN, TIME_STAMP )       
+         VARNM = 'SO2_COLUMN'
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    SO2_COLUMN, TIME_STAMP )       
+         VARNM = 'NO2_COLUMN'
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    NO2_COLUMN, TIME_STAMP )       
+         VARNM = 'HCHO_COLUMN'
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    HCHO_COLUMN, TIME_STAMP )       
 
          VARNM = 'TROPO_O3_COLUMN'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, TROPO_OC ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    TROPO_OC, TIME_STAMP )       
 
 
          VARNM = 'TRANS_DIFFUSE'
@@ -1332,36 +1384,48 @@ C...modules
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    TRANSMIS_DIFFUSE, TIME_STAMP )       
 
          VARNM = 'TRANS_DIRECT'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, TRANSMIS_DIRECT ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    TRANSMIS_DIRECT, TIME_STAMP )       
 
          VARNM = 'REFLECTION'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, REFLECT_COEFF ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    REFLECT_COEFF, TIME_STAMP )       
 
          VARNM = 'CLR_TRANS_DIF'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, CLR_TRANSMISSION ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    CLR_TRANSMISSION, TIME_STAMP )       
 
          VARNM = 'CLR_TRANS_DIR'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, CLR_TRANS_DIRECT ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    CLR_TRANS_DIRECT, TIME_STAMP )       
 
          VARNM = 'CLR_REFLECTION'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, CLR_REFLECTION ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    CLR_REFLECTION, TIME_STAMP )       
 
          VARNM = 'TROPO_O3_EXCEED'
          TROPO_O3_EXCEED = TROPO_O3_EXCEED / REAL( MAX(1, TSTEP_COUNT) )
@@ -1371,6 +1435,8 @@ C...modules
          END IF
          TROPO_O3_EXCEED = 0.0 ! reset sum and counter
          TSTEP_COUNT     = 0
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    TROPO_O3_EXCEED, TIME_STAMP )       
 
          VARNM = 'N_EXCEED_TROPO3'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, N_EXCEED_TROPO3 ) ) THEN
@@ -1378,30 +1444,40 @@ C...modules
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
          N_EXCEED_TROPO3 = 0.0 ! reset counter
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    N_EXCEED_TROPO3, TIME_STAMP )       
 
          VARNM = 'JNO2'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, RJ( :,:,1, LNO2 ) ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                     RJ( :,:,1, LNO2 ), TIME_STAMP )       
 
          VARNM = 'JO3O1D'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, RJ( :,:,1,LO3O1D ) ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    RJ( :,:,1,LO3O1D ), TIME_STAMP )       
 
          VARNM = 'RESOLVED_CFRAC'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, CFRAC_2D ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                    CFRAC_2D, TIME_STAMP )       
 
          VARNM = 'RESOLVED_WBAR'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, AVE_HYDROMETEORS ) ) THEN
              XMSG = 'Error writing variable ' // VARNM
              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                   AVE_HYDROMETEORS, TIME_STAMP ) 
 
          IF ( USE_ACM_CLOUD ) THEN
              VARNM = 'SUBGRID_CFRAC'
@@ -1409,11 +1485,16 @@ C...modules
                 XMSG = 'Error writing variable ' // VARNM
                 CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
              END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        ACM_CLOUDS, TIME_STAMP )       
+
              VARNM = 'SUBGRID_WBAR'
              IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, ACM_AVE_H2O ) ) THEN
                 XMSG = 'Error writing variable ' // VARNM
                 CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
              END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        ACM_AVE_H2O, TIME_STAMP )       
          END IF
 
          DO IWL = 1, NWL
@@ -1424,6 +1505,8 @@ C...modules
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, ODATE, OTIME, XMSG, XSTAT1 )
             END IF
+            call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        ETOT_SFC_WL( :,:,IWL ), TIME_STAMP )       
 
             VARNM = 'AOD_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE,
@@ -1431,6 +1514,8 @@ C...modules
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        TAU_AERO_WL( :,:,IWL ), TIME_STAMP )       
 
             VARNM = 'AOD_ABS_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE,
@@ -1438,6 +1523,8 @@ C...modules
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        TAU_ABS_AERO( :,:,IWL ), TIME_STAMP )       
 
             VARNM = 'TAU_CLOUD_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE,
@@ -1445,6 +1532,8 @@ C...modules
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        TAU_CLOUD_WL( :,:,IWL ), TIME_STAMP )       
 
 #ifdef phot_debug
             VARNM = 'SSA_CLOUD_W' // WLTXT( IWL )
@@ -1453,6 +1542,8 @@ C...modules
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        SSA_CLOUD_WL( :,:,IWL ), TIME_STAMP )       
 
             VARNM = 'ASY_CLOUD_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE,
@@ -1460,6 +1551,8 @@ C...modules
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        ASY_CLOUD_WL( :,:,IWL ), TIME_STAMP )       
 #endif
 
             VARNM = 'TAU_TOT_W' // WLTXT( IWL )
@@ -1468,6 +1561,8 @@ C...modules
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        TAU_TOT_WL( :,:,IWL ), TIME_STAMP )       
 
             VARNM = 'TAUO3_TOP_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE,
@@ -1475,6 +1570,8 @@ C...modules
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        TAUO3_TOP_WL( :,:,IWL ), TIME_STAMP )       
 
             VARNM = 'ALBEDO_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME,
@@ -1482,6 +1579,8 @@ C...modules
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        SURFACE_ALBEDO( IWL,:,: ), TIME_STAMP )       
 
          END DO  ! iwl
 
@@ -1490,12 +1589,16 @@ C...modules
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        TAU_AERO_550, TIME_STAMP )       
 
          VARNM = 'AAOD_W550_ANGST'
          IF ( .NOT. WRITE3( CTM_RJ_1, VARNM, ODATE, OTIME, TAU_ABS_AERO_550 ) ) THEN
             XMSG = 'Error writing variable ' // VARNM
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+             call mio_fwrite( 'CTM_RJ_1_MIO', VARNM, PNAME, 
+     &                        TAU_ABS_AERO_550, TIME_STAMP )       
 
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &          'Photolysis Surface Summary written to', CTM_RJ_1,
@@ -1508,6 +1611,8 @@ C...modules
                XMSG = 'Could not write ' // CTM_RJ_2 // ' file'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+             call mio_fwrite( 'CTM_RJ_2_MIO', PHOTAB( IPHOT ), PNAME, 
+     &                        OUTPUT_BUFF, TIME_STAMP )       
          END DO
 
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
@@ -1520,6 +1625,7 @@ C...modules
               XMSG = 'Could not write ' // TRIM( VARNM ) // ' to ' // CTM_RJ_3 // ' file'
               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_3_MIO',VARNM,PNAME,OUTPUT_BUFF,TIME_STAMP )       
 
          DO L = 1, N_DIAG_WVL
             IWL = DIAG_WVL( L )
@@ -1529,43 +1635,50 @@ C...modules
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+           call mio_fwrite( 'CTM_RJ_3_MIO',VARNM,PNAME,ACTINIC_FX( :,:,:,L ),TIME_STAMP )       
 
             VARNM = 'AERO_SCAT_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, AERO_SCAT( :,:,:,L ) ) ) THEN
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+            call mio_fwrite( 'CTM_RJ_3_MIO',VARNM,PNAME,AERO_SCAT( :,:,:,L ),TIME_STAMP )       
 
             VARNM = 'AERO_ASYM_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, AERO_ASYM( :,:,:,L ) ) ) THEN
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+           call mio_fwrite( 'CTM_RJ_3_MIO',VARNM,PNAME,AERO_ASYM( :,:,:,L ),TIME_STAMP )       
 
             VARNM = 'EXT_AERO_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, AERO_EXT( :,:,:,L ) ) ) THEN
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+           call mio_fwrite( 'CTM_RJ_3_MIO',VARNM,PNAME,AERO_EXT( :,:,:,L ),TIME_STAMP )       
 
             VARNM = 'EXT_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, TOT_EXT( :,:,:,L ) ) ) THEN
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
+           call mio_fwrite( 'CTM_RJ_3_MIO',VARNM,PNAME,TOT_EXT( :,:,:,L ),TIME_STAMP )       
 
             VARNM = 'GAS_EXT_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, GAS_EXT( :,:,:,L ) ) ) THEN
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
-         END DO
+            call mio_fwrite( 'CTM_RJ_3_MIO',VARNM,PNAME,GAS_EXT( :,:,:,L ),TIME_STAMP )       
+       END DO
 
          VARNM = 'EXT_AERO_W550'
          IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, AERO_EXT_550( :,:,: ) ) ) THEN
              XMSG = 'Error writing variable ' // VARNM
              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
+         call mio_fwrite( 'CTM_RJ_3_MIO',VARNM,PNAME,AERO_EXT_550( :,:,: ),TIME_STAMP )       
 
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &          'Radiative and Optical Data written to', CTM_RJ_3,

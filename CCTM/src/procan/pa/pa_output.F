@@ -262,10 +262,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                IF ( FIRSTIPR ) THEN
                   FIRSTIPR = .FALSE.
                   call mio_setfile( MET_CRO_3D )
-                  call mio_fcreate( 'CTM_IPR_MIO', io_mode )
+                  IF ( PALEVS .NE. NLAYS ) mio_nlays = PALEVS
+                  call mio_fcreate( 'CTM_IPR_1_MIO', io_mode )
+                  IF ( MYPE .EQ. 0 .AND. PALEVS .NE. NLAYS ) THEN
+                     CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IPR_1_MIO', 'NLAYS', PALEVS )
+                     CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IPR_1_MIO', 'VGLVLS', MET_CRO_3D, 1, PALEVS+1 )
+                  END IF
                END IF
    
-               call mio_fwrite( 'CTM_IPR_MIO', IPRNAME( VARINDX ),
+               call mio_fwrite( 'CTM_IPR_1_MIO', IPRNAME( VARINDX ),
      &                          PNAME, DELC( :,:,:,VARINDX ), TIME_STAMP )
             END DO
 
@@ -318,10 +323,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                IF ( FIRSTIRR ) THEN
                   FIRSTIRR = .FALSE.
                   call mio_setfile( MET_CRO_3D )
-                  call mio_fcreate( 'CTM_IRR_MIO', io_mode )
+                  IF ( PALEVS .NE. NLAYS ) mio_nlays = PALEVS
+                  call mio_fcreate( 'CTM_IRR_1_MIO', io_mode )
+                  IF ( MYPE .EQ. 0 .AND. PALEVS .NE. NLAYS ) THEN
+                     CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IRR_1_MIO', 'NLAYS', PALEVS )
+                     CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IRR_1_MIO', 'VGLVLS', MET_CRO_3D, 1, PALEVS+1 )
+                  END IF
                END IF
 
-               call mio_fwrite( 'CTM_IRR_MIO', IRRNAME( VARINDX ),
+               call mio_fwrite( 'CTM_IRR_1_MIO', IRRNAME( VARINDX ),
      &                          PNAME, DBUFF, TIME_STAMP )
             END DO
 
