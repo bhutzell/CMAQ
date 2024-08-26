@@ -784,7 +784,7 @@ C Initialize Modules
       CALL SUBST_BARRIER ! ensure mio_ascii file written
 
 C Initialize MIO
-          call mio_init( npcol, nprow, ncols, nrows, logdev )
+          call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
       END IF
 
 ! Output Instantaneous Values at first time step
