@@ -2310,8 +2310,9 @@
      &                     MOMENT3_CONC, WET_AERO_DENS, AEROSPC_CONC,
      &                     AH2O_IDX, AORGH2O_IDX, AEROSPC, CALC_AERODIST_PARAMS,
      &                     AEROMODE, DRY_AERO_DENS, APOC_IDX, APNCOM_IDX
-      USE AEROMET_DATA, ONLY: AIRRH, PI, AIRTEMP, SRFTEMP, AIRPRES, DZ, CFRAC, PV, ZH
+      USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, SRFTEMP, AIRPRES, DZ, CFRAC, PV, ZH
       USE CGRID_SPCS, ONLY : RHOJ_LOC
+      USE CONST, ONLY : PI
       USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, OASPC, MAP_OAtoAERO
       USE RUNTIME_VARS, ONLY : PHOTDIAG
       USE ASX_DATA_MOD, ONLY : MET_DATA
@@ -3146,11 +3147,12 @@
       USE SOA_DEFN, ONLY : Extract_Soa
       USE AEROSOL_CHEMISTRY, ONLY: HETCHEM_RATES
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, AIRQV, AIRDENS, AIRPRES,
-     &                        SRFTEMP, H2OVP, H2OSATVP, MWWAT, MWAIR,
+     &                        SRFTEMP, H2OVP, H2OSATVP, 
      &                        CFRAC, DZ, PV, ZH
       use centralized_io_module, only : interpolate_var, pv_avail
       use RUNTIME_VARS
       Use phot_mod, Only: init_phot_shared 
+      use const, only: ESATL, MWWAT, MWAIR
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY : SENGRID
@@ -3175,26 +3177,12 @@
     
       ! Statement Function **************
       REAL, PARAMETER :: EPSWATER = MWWAT / MWAIR
-      REAL ESATL ! arithmetic statement function for vapor pressure [Pa]
-      REAL TT
-      ! Coefficients for the equation, ESATL defining saturation vapor pressure
-      REAL, PARAMETER :: AL = 610.94
-      REAL, PARAMETER :: BL = 17.625
-      REAL, PARAMETER :: CL = 243.04
 
       INTEGER C, R, L
 
       REAL, ALLOCATABLE, SAVE :: PRES(:,:,:), TA(:,:,:), TEMP2(:,:),
      &                           QV(:,:,:), DENS(:,:,:), CFRACS(:,:),
      &                           ZF(:,:,:), PVS(:,:,:), ZHS(:,:,:)
-
-      ! values of AL, BL, and CL are from:
-      ! Alduchov and Eskridge, "Improved Magnus Form Approximations of
-      !                       Saturation Vapor Pressure,"
-      !                       Jour. of Applied Meteorology, vol. 35,
-      !                       pp 601-609, April, 1996.
-      ESATL( TT ) = AL * EXP( BL * ( TT - 273.15 ) / ( TT - 273.15 + CL ) )
- 
 
       IF ( FIRSTIME ) THEN
           FIRSTIME = .FALSE.

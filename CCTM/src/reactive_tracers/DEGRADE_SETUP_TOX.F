@@ -34,12 +34,9 @@ C**********************************************************************
       USE CGRID_SPCS               ! CGRID species number and offsets
       USE UTILIO_DEFN              ! IOAPI declarations and definitions
       USE DEGRADE_PARAMETERS
+      USE CONST
 
       IMPLICIT NONE
-
-C.....INCLUDES:
-
-      INCLUDE SUBST_CONST         ! constants
 
       REAL(8)              :: EFFECTIVE_ZERO
       REAL(8)              :: LOG_EFFECTIVE_ZERO
@@ -247,7 +244,7 @@ C..Quality control on pairs of Reactant and Products
                      WRITE( XMSG,* ) 'ERROR: ',
      &                 TRIM( VNAME( 1 ) ), ' is a destroyed  and produced.'
      &                 // ' The property is not allowed because it'
-     &                 // ' brakes linear assumptions used.'
+     &                 // ' breaks linear assumptions used.'
                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                   END IF
                END DO    
@@ -681,7 +678,7 @@ C         Called by DEGRADE_MAP
 
 C..Includes: None
  
-           CHARACTER( 16 ), PARAMETER :: PNAME = 'SA_DEGRAGE_INIT'     ! Program name
+           CHARACTER( 16 ), PARAMETER :: PNAME = 'SA_DEGRADE_INIT'     ! Program name
  
            INTEGER :: I, J, RXN, IP, IL 
            INTEGER :: IOSTAT
