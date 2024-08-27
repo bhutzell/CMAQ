@@ -255,7 +255,6 @@
 !                       components of any COMPOSITE definition.                !
 !------------------------------------------------------------------------------!
     
-
 &COMPOSITE_INIT
   N_COMPOSITES = 57
   N_MAX_COMPONENTS = 50
@@ -265,6 +264,9 @@
 
    CMPST(1) = 'NOX', 'ppmV', 'GAS', 'NOx Concentration', 
                 'NO + NO2'
+
+   CMPST(46) = 'NOY', 'ppmV', 'FINE', 'NOy Concentration', 
+                'NO + NO2 + N2O5 + HONO + HNO3 + ANO3'
 
    CMPST(2) = 'PMC_SO4', 'ug m-3', 'COARSE', 'Coarse-Mode Sulfate', 
                 'ASO4' 
@@ -365,12 +367,6 @@
    CMPST(34) = 'PMF_MTSOA', 'ug m-3', 'FINE', 'Fine-Mode Monoterpene SOA excl Nitrates',
                  'AMT1 + AMT2 + AMT3 + AMT4 + AMT5 + AMT6'
 
-   !CMPST(35) = 'PMF_BENAPY', 'ug m-3', 'FINE', 'Fine-Mode Benzo-a-Pyrene',
-   !              'ABENAPY'
-
-   !CMPST(36) = 'GAS_BENAPY', 'ug m-3', 'GAS', 'Gas-Phase Benzo-a-Pyrene',
-   !              'BENAPY'
-
    CMPST(35) = 'GAS_NH3', 'ug m-3', 'GAS', 'Gas-Phase Ammonia',
                  'NH3'
 
@@ -404,13 +400,129 @@
    CMPST(45) = 'PM1_NA', 'ug m-3', 'PM1', 'PM1 Sodium',
                  'ANA + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
 
-   CMPST(46) = 'NOY', 'ppmV', 'FINE', 'NOy Concentration', 
-                'NO + NO2 + N2O5 + HONO + HNO3 + ANO3'
+   CMPST(45) = 'PM1_EC', 'ug m-3', 'PM1', 'PM1 Elemental Carbon',
+                 'AEC'
 
-   CMPST(47) = 'TNO3', 'ug m-3', 'ALL', 'Total Nitrate', 
+   CMPST(45) = 'PM1_MG', 'ug m-3', 'PM1', 'PM1 Magnesium',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_K', 'ug m-3', 'PM1', 'PM1 Potassium',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_CA', 'ug m-3', 'PM1', 'PM1 Calcium',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_OTHER', 'ug m-3', 'PM1', 'PM1 Other Mass',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_FE', 'ug m-3', 'PM1', 'PM1 Iron',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_SI', 'ug m-3', 'PM1', 'PM1 Silicon',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_TI', 'ug m-3', 'PM1', 'PM1 Titanium',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_MN', 'ug m-3', 'PM1', 'PM1 Manganese',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_AL', 'ug m-3', 'PM1', 'PM1 Aluminum',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_SOIL', 'ug m-3', 'PM1', 'PM1 Recon Soil (Fine)',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_UNSP1', 'ug m-3', 'PM1', 'PM1 Unspeciated Coarse Mass for the IMPROVE Method',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_UNSPCRS', 'ug m-3', 'PM1', 'PM1 Unspeciated Coarse Mass',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM1_HP', 'ug m-3', 'PM1', 'PM1 H+ Ion',
+                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(45) = 'PM25_SO4', 'ug m-3', 'PM25', 'PM2.5 Sulfate',
+                 'ASO4'
+
+   CMPST(45) = 'PM25_NO3', 'ug m-3', 'PM25', 'PM2.5 Nitrate',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_NH4', 'ug m-3', 'PM25', 'PM2.5 Ammonium',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_CL', 'ug m-3', 'PM25', 'PM2.5 Chloride',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_NA', 'ug m-3', 'PM25', 'PM2.5 Sodium',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_EC', 'ug m-3', 'PM25', 'PM2.5 Elemental Carbon',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_MG', 'ug m-3', 'PM25', 'PM2.5 Magnesium',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_K', 'ug m-3', 'PM25', 'PM2.5 Potassium',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_CA', 'ug m-3', 'PM25', 'PM2.5 Calcium',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_OTHER', 'ug m-3', 'PM25', 'PM2.5 Other',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_FE', 'ug m-3', 'PM25', 'PM2.5 Iron',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_SI', 'ug m-3', 'PM25', 'PM2.5 Silicon',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_TI', 'ug m-3', 'PM25', 'PM2.5 Titanium',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_MN', 'ug m-3', 'PM25', 'PM2.5 Manganese',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_AL', 'ug m-3', 'PM25', 'PM2.5 Aluminum',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_SOIL', 'ug m-3', 'PM25', 'PM2.5 Recon Soil (Fine) and Explicit (Coarse)',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_UNSP1', 'ug m-3', 'PM25', 'PM2.5 Unspeciasted Coarse Mass for the IMPROVE Method',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_UNSPCRS', 'ug m-3', 'PM25', 'PM2.5 Unspeciated Coarse Mass',
+                 'ANO3'
+
+   CMPST(45) = 'PM25_HP', 'ug m-3', 'PM25', 'PM2.5 H+ Ion',
+                 'ANO3'
+
+   CMPST(45) = 'PM25TO10_SO4', 'ug m-3', 'PM25TO10', 'Coarse-Mode Sulfate',
+                 'ASO4'
+
+   CMPST(45) = 'PM25TO10_NO3', 'ug m-3', 'PM25TO10', 'Coarse-Mode Nitrate',
+                 'ASO4'
+
+   CMPST(45) = 'PM25TO10_NH4', 'ug m-3', 'PM25TO10', 'Coarse-Mode Ammonium',
+                 'ASO4'
+
+   CMPST(45) = 'PM25TO10_CL', 'ug m-3', 'PM25TO10', 'Coarse-Mode Chloride',
+                 'ASO4'
+
+   CMPST(45) = 'PM25TO10_NA', 'ug m-3', 'PM25TO10', 'Coarse-Mode Sodium',
+                 'ASO4'
+
+
+
+   CMPST(47) = 'TNO3', 'ug m-3', 'ALL', 'Total Nitrate only including Inorganics', 
                 'ANO3 + HNO3'
 
-   CMPST(48) = 'TNO3_MOL', 'umol m-3', 'ALL', 'Total Nitrate', 
+   CMPST(48) = 'TNO3_MOL', 'umol m-3', 'ALL', 'Total Nitrate only including Inorganics', 
+                'ANO3 + HNO3'
+
+   CMPST(48) = 'TNO3TOT', 'umol m-3', 'ALL', 'Total Nitrate only including Inorganics', 
                 'ANO3 + HNO3'
 
    CMPST(49) = 'DD_OXN_NOX', 'kg ha-1', 'DEP', 'Dry Dep of Oxidized Nitrogen from NOx', 
@@ -434,11 +546,5 @@
    CMPST(55) = 'TD_OXN_TOT', 'kg ha-1', 'DEP', 'Total Dep of Oxidized Nitrogen', 
                 'DD_OXN_TOT + WD_OXN_TOT'
    
-   CMPST(56) = 'PM25_SO4', 'ug m-3', 'PM25', 'PM2.5 Sulfate',
-                 'ASO4'
-
-   CMPST(57) = 'PM25_NH4', 'ug m-3', 'PM25', 'PM2.5 Ammonium',
-                 'ANH4'
-
 /
  
