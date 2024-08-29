@@ -189,14 +189,10 @@ setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affec
                              #>      model where optics determined by
                              #>      (4-Tabular Mie; 5-Mie Calculation; 6-Case Approx to Mie Theory)
 
-setenv IC_AERO_M2WET F       #> Specify whether or not initial condition aerosol size distribution
-                            #>    is wet or dry [ default: F = dry ]
 setenv BC_AERO_M2WET F       #> Specify whether or not boundary condition aerosol size distribution
-                            #>    is wet or dry [ default: F = dry ]
-setenv IC_AERO_M2USE T       #> Specify whether or not to use aerosol surface area from initial
-                            #>    conditions [ default: T = use aerosol surface area  ]
+                             #>    is wet or dry [ default: F = dry ]
 setenv BC_AERO_M2USE T       #> Specify whether or not to use aerosol surface area from boundary
-                            #>    conditions [ default: T = use aerosol surface area  ]
+                             #>    conditions [ default: T = use aerosol surface area  ]
 
 
 #> Surface Tiled Aerosol and Gaseous Exchange Options
