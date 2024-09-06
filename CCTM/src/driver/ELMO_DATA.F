@@ -394,7 +394,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
       ! Define List of Possible Units for Output
-      INTEGER, PARAMETER :: N_UNIT = 27
+      INTEGER, PARAMETER :: N_UNIT = 29
       CHARACTER( 11 ), PARAMETER :: CUNIT( N_UNIT ) = 
      &    (/'UG M-3     ','PPMV       ','UGC M-3    ','PPMC       ',
      &      'UGN M-3    ','PPMN       ','M-3        ','M2 M-3     ',
@@ -402,34 +402,40 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &      '           ','UM         ','M3 M-3     ','N M-3      ',
      &      'KG M-3     ','UMOL M-3   ','MOL L-1    ','UG UG-1    ',
      &      'K          ','PA         ','S-1        ','M          ',
-     &      'MM-1       ','M2 S-1     ','PMOLEC CM-2' /)
+     &      'MM-1       ','M2 S-1     ','PMOLEC CM-2','NG M-3     ',
+     &      'PPBV       '/)
       
-      INTEGER, PARAMETER :: IU_UNSP    = 0   ! Unspecified Units
-      INTEGER, PARAMETER :: IU_UGpM3   = 1   ! ug m-3
-      INTEGER, PARAMETER :: IU_PPMV    = 2   ! ppmV
-      INTEGER, PARAMETER :: IU_UGCpM3  = 3   ! ugC m-3
-      INTEGER, PARAMETER :: IU_PPMC    = 4   ! ppmC
-      INTEGER, PARAMETER :: IU_UGNpM3  = 5   ! ugN m-3
-      INTEGER, PARAMETER :: IU_PPMN    = 6   ! ppmN
-      INTEGER, PARAMETER :: IU_pM3     = 7   ! m-3
-      INTEGER, PARAMETER :: IU_M2pM3   = 8   ! m2 m-3
-      INTEGER, PARAMETER :: IU_pHA     = 9   ! ha-1
-      INTEGER, PARAMETER :: IU_M2pHA   = 10  ! m2 ha-1
-      INTEGER, PARAMETER :: IU_KGpHA   = 11  ! kg ha-1
-      INTEGER, PARAMETER :: IU_1       = 12  ! 1
-      INTEGER, PARAMETER :: IU_NONE    = 13  ! dimensionless
-      INTEGER, PARAMETER :: IU_UM      = 14  ! um
-      INTEGER, PARAMETER :: IU_M3pM3   = 15  ! m3 m-3
-      INTEGER, PARAMETER :: IU_NpM3    = 16  ! N m-3
-      INTEGER, PARAMETER :: IU_KGpM3   = 17  ! kg m-3
-      INTEGER, PARAMETER :: IU_UMOLpM3 = 18  ! umol m-3
-      INTEGER, PARAMETER :: IU_MOLpL   = 19  ! mol L-1
-      INTEGER, PARAMETER :: IU_UGpUG   = 20  ! ug ug-1
-      INTEGER, PARAMETER :: IU_K       = 21  ! K
-      INTEGER, PARAMETER :: IU_PA      = 22  ! Pa
-      INTEGER, PARAMETER :: IU_pS      = 23  ! s-1
-      INTEGER, PARAMETER :: IU_M       = 24  ! m
-      INTEGER, PARAMETER :: IU_pMM     = 25  ! Mm-1
+      INTEGER, PARAMETER :: IU_UNSP       = 0   ! Unspecified Units
+      INTEGER, PARAMETER :: IU_UGpM3      = 1   ! ug m-3
+      INTEGER, PARAMETER :: IU_PPMV       = 2   ! ppmV
+      INTEGER, PARAMETER :: IU_UGCpM3     = 3   ! ugC m-3
+      INTEGER, PARAMETER :: IU_PPMC       = 4   ! ppmC
+      INTEGER, PARAMETER :: IU_UGNpM3     = 5   ! ugN m-3
+      INTEGER, PARAMETER :: IU_PPMN       = 6   ! ppmN
+      INTEGER, PARAMETER :: IU_pM3        = 7   ! m-3
+      INTEGER, PARAMETER :: IU_M2pM3      = 8   ! m2 m-3
+      INTEGER, PARAMETER :: IU_pHA        = 9   ! ha-1
+      INTEGER, PARAMETER :: IU_M2pHA      = 10  ! m2 ha-1
+      INTEGER, PARAMETER :: IU_KGpHA      = 11  ! kg ha-1
+      INTEGER, PARAMETER :: IU_1          = 12  ! 1
+      INTEGER, PARAMETER :: IU_NONE       = 13  ! dimensionless
+      INTEGER, PARAMETER :: IU_UM         = 14  ! um
+      INTEGER, PARAMETER :: IU_M3pM3      = 15  ! m3 m-3
+      INTEGER, PARAMETER :: IU_NpM3       = 16  ! N m-3
+      INTEGER, PARAMETER :: IU_KGpM3      = 17  ! kg m-3
+      INTEGER, PARAMETER :: IU_UMOLpM3    = 18  ! umol m-3
+      INTEGER, PARAMETER :: IU_MOLpL      = 19  ! mol L-1
+      INTEGER, PARAMETER :: IU_UGpUG      = 20  ! ug ug-1
+      INTEGER, PARAMETER :: IU_K          = 21  ! K
+      INTEGER, PARAMETER :: IU_PA         = 22  ! Pa
+      INTEGER, PARAMETER :: IU_pS         = 23  ! s-1
+      INTEGER, PARAMETER :: IU_M          = 24  ! m
+      INTEGER, PARAMETER :: IU_pMM        = 25  ! Mm-1
+      INTEGER, PARAMETER :: IU_M2pS       = 26  ! m2 s-1
+      INTEGER, PARAMETER :: IU_PMOLECpCM2 = 27  ! Petamolecule cm-2
+      INTEGER, PARAMETER :: IU_NGpM3      = 28  ! ng m-3
+      INTEGER, PARAMETER :: IU_PPBV       = 29  ! ppbV
+
 
       ! Define Logical flags for turning on output categories
       LOGICAL, SAVE :: L_ELMO_WDEP, L_ELMO_DDEP
@@ -903,13 +909,69 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       END IF
 
       ! Calculate Unit Conversions
-      SELECT CASE ( SPC_UNIT )
-        CASE ( 1 ) ! mass-based
-          ELMO_UNIT_CONV = D / ELMO_TABLE( J )%MW 
-     &          * MWAIR / AIRDENS / 1000.0 ! to mole mixing ratio
-        CASE ( 2 ) ! mole-based
-          ELMO_UNIT_CONV = D * ELMO_TABLE( J )%MW
-     &          / MWAIR * AIRDENS * 1000.0 ! to mass concentration
+      SELECT CASE ( OUT_UNIT )
+        CASE ( 1 ) ! ug m-3 out
+          SELECT CASE ( SPC_UNIT )
+            CASE ( 1 ) ! mass-based
+              ELMO_UNIT_CONV = D
+            CASE ( 2 ) ! mole-based
+              ELMO_UNIT_CONV = D * ELMO_TABLE( J )%MW
+     &            / MWAIR * AIRDENS * 1000.0 ! to mass concentration
+            CASE DEFAULT
+              XMSG = 'ELMO is attempting to convert variable ' // 
+     &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
+     &           CUNIT( SPC_UNIT ) // ' to ' // CUNIT( OUT_UNIT ) //
+     &           ' but it does not know to do it. No conversion is applied.'
+              CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
+          END SELECT 
+
+
+        CASE ( 2 ) ! ppmv out
+            CASE ( 1 ) ! mass-based
+              ELMO_UNIT_CONV = D / ELMO_TABLE( J )%MW 
+     &             * MWAIR / AIRDENS / 1000.0 ! to mole mixing ratio
+            CASE ( 2 ) ! mole-based
+              ELMO_UNIT_CONV = D
+            CASE DEFAULT
+              XMSG = 'ELMO is attempting to convert variable ' // 
+     &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
+     &           CUNIT( SPC_UNIT ) // ' to ' // CUNIT( OUT_UNIT ) //
+     &           ' but it does not know to do it. No conversion is applied.'
+              CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
+          END SELECT 
+
+           
+        CASE ( 28 ) ! ng m-3 out
+          SELECT CASE ( SPC_UNIT )
+            CASE ( 1 ) ! mass-based
+              ELMO_UNIT_CONV = D * 1000.0
+            CASE ( 2 ) ! mole-based
+              ELMO_UNIT_CONV = D * ELMO_TABLE( J )%MW
+     &            / MWAIR * AIRDENS * 1.0E6 ! to mass concentration
+            CASE DEFAULT
+              XMSG = 'ELMO is attempting to convert variable ' // 
+     &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
+     &           CUNIT( SPC_UNIT ) // ' to ' // CUNIT( OUT_UNIT ) //
+     &           ' but it does not know to do it. No conversion is applied.'
+              CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
+          END SELECT 
+
+
+        CASE ( 29 ) ! ppbV out
+          SELECT CASE ( SPC_UNIT )
+            CASE ( 1 ) ! mass-based
+              ELMO_UNIT_CONV = D / ELMO_TABLE( J )%MW 
+     &             * MWAIR / AIRDENS ! to mole mixing ratio
+            CASE ( 2 ) ! mole-based
+              ELMO_UNIT_CONV = D * 1000.0
+            CASE DEFAULT
+              XMSG = 'ELMO is attempting to convert variable ' // 
+     &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
+     &           CUNIT( SPC_UNIT ) // ' to ' // CUNIT( OUT_UNIT ) //
+     &           ' but it does not know to do it. No conversion is applied.'
+              CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
+          END SELECT 
+
       END SELECT 
  
       RETURN

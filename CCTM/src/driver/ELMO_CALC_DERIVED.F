@@ -666,8 +666,6 @@
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
             
-            OUTVAL = SUM_PM_MODES( AEROMODE%ALL_MASK, IPM25, IWET, IV, ISRC ) 
-
             OUTVAL = PM25 - PM25_NO3_LOSS - PM25_NH4_LOSS
      &                      +0.24 * ( PM25_SO4 + PM25_NH4 - PM25_NH4_LOSS ) + 0.5
           
