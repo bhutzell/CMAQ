@@ -274,9 +274,9 @@ c    &                                           ISAM1( C,R,L,JAER(3),K )-MIN_VA
                ! Find Source Apportionment of the low volatility vapor species
                ! or, if it doesn't exist, the reaction counter
                IF ( JGAS .GT. 0 ) THEN
-                  TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JGAS,K ) / BULK0( :,:,:,JGAS )
+                  TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JGAS,K ) / ( BULK0( :,:,:,JGAS ) + MIN_VAL )
                ELSE  IF ( JCTR .GT. 0 ) THEN
-                  TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JCTR,K ) / BULK0( :,:,:,JCTR )
+                  TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JCTR,K ) / ( BULK0( :,:,:,JCTR ) + MIN_VAL )
                ELSE
                   XMSG = 'Either a Low-Volatility Gas or a Reaction Counter ' //
      &                   'must be defined for Irreversible Aerosol Species '// 
