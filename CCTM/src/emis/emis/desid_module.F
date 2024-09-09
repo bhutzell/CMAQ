@@ -734,7 +734,7 @@ C Retrieve Emissions from All Stream Types
              CASE ( 8 )
                NL = 1
                CALL GET_DUST_EMIS ( JDATE, JTIME, TSTEP, Met_data%RJACM( :,:,1 ), 
-     &                              CELLHGT( :,:,1 ), L_DESID_DIAG ) ! g/m3/s
+     &                              CELLVOL( :,:,1 ), CELLHGT( :,:,1 ), L_DESID_DIAG ) ! g/m3/s
                FORALL( ISTR = 1:DESID_N_ISTR, MAP_ISTRtoEMVAR( ISTR,ISRM ) .GT. 0 )
                   VDEMIS_READ( ISTR,1,:,: ) = DUSTOUTM( MAP_ISTRtoEMVAR( ISTR,ISRM ),:,: ) 
                END FORALL

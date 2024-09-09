@@ -47,6 +47,10 @@ C Sea-Salt Emissions Rates
       PUBLIC NSSSPC, SSEMIS_INIT, GET_SSEMIS, SEA_FACTNUM, SEA_FACTSRF, SSOUTM
       PRIVATE
 
+C Variable for converting from volume-normalized emissions to total
+C emission rate
+      REAL, ALLOCATABLE :: GSFAC( :,: )  ! [m3]
+
 C Position of H2O in sea-salt emission arrays
       INTEGER :: KH2O
 
@@ -338,7 +342,8 @@ C Allocate SS arrays using NSSSPC value
      &                 SSOUTN( 2,NCOLS,NROWS ),
      &                 SSOUTS( 2,NCOLS,NROWS ), 
      &                 SEA_FACTNUM( N_MODE,NCOLS,NROWS ),
-     &                 SEA_FACTSRF( N_MODE,NCOLS,NROWS ), STAT = STATUS )
+     &                 SEA_FACTSRF( N_MODE,NCOLS,NROWS ), 
+     &                 GSFAC( NCOLS,NROWS ), STAT = STATUS )
             IF ( STATUS .NE. 0 ) THEN
                XMSG = '*** SSOUTM, SSOUTN or SSOUTS memory allocation failed'
                CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
@@ -717,6 +722,10 @@ C Initialize sea-salt output buffer
             SEA_FACTNUM = 0.0
             SEA_FACTSRF = 0.0
 
+            ! Calculate conversion factor from volume-based to total emission rate
+            GSFAC( :,: )  = CELLVOL( :,: ) / MET_DATA%RJACM( :,:,1 ) ! [g/m3/s] to [g/s]
+
+            ! Begin Main Loop over Grid Cells
             DO R = 1, NROWS
                DO C = 1, NCOLS
                   IF ( Grid_Data%OCEAN( C,R ) + Grid_Data%SZONE( C,R ) .GT. 0.0 ) THEN
@@ -957,6 +966,17 @@ C Update the SSBF array, for writing the diagnostic sea-salt-emission file.
 #endif
 
                   END IF  ! SSEMDIAG
+
+                  ! Convert from volume-normalized to total Emission
+                  ! rate [e.g. g/m3/s to g/s]
+                  DO N = 1,2
+                      DO S = 1,NSSSPC
+                        SSOUTM( (N-1)*NSSSPC+S,C,R ) = 
+     &                     SSOUTM( (N-1)*NSSSPC+S,C,R ) * GSFAC( C,R ) ! g/s
+                      END DO
+                      SSOUTN( N,C,R ) = SSOUTN( N,C,R ) * GSFAC( C,R ) ! N/s
+                      SSOUTS( N,C,R ) = SSOUTS( N,C,R ) * GSFAC( C,R ) ! m2/s
+                  END DO
 
                END DO   ! C
             END DO   ! R
