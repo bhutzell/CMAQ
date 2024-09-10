@@ -1230,9 +1230,9 @@ C-----------------------------------------------------------------------
 
       DO L = 1,NL
 #ifdef mpas
-        CNVTC( L,:,: ) = (MWAIR * GPKG) * inv_cell_vol(:,1,L) * Met_Data%RRHOJ( :,:,L )  ! 1/mol
+        CNVTC( L,:,: ) = (MWAIR * KGPG) * inv_cell_vol(:,1,L) * Met_Data%RRHOJ( :,:,L )  ! 1/mol
 #else
-        CNVTC( L,:,: ) = (MWAIR * GPKG) / CELLVOL( :,:,L ) * Met_Data%RRHOJ( :,:,L )     ! 1/mol
+        CNVTC( L,:,: ) = (MWAIR * KGPG) / CELLVOL( :,:,L ) * Met_Data%RRHOJ( :,:,L )     ! 1/mol
 #endif
       END DO                                                                  
 
