@@ -1239,50 +1239,50 @@
 ! lightning file
           n_l2d = 0
 #ifndef mpas
-          if (LTNGON_DATA) then
-             IF ( .NOT. OPEN3( LTNGFILE, FSREAD3, PNAME ) ) THEN
-                XMSG = 'Open failure for ' // LTNGFILE
-                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-             END IF
-             n_opened_file = n_opened_file + 1
-             f_ltng = n_opened_file
-             IF ( .NOT. DESC3( LTNGFILE ) ) THEN
-                XMSG = 'Could not get description of file  '// LTNGFILE
-                CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-             END IF
-             call subhfile ( LTNGFILE, gxoff, gyoff,
-     &                       STRTCOLLNT, ENDCOLLNT, STRTROWLNT, ENDROWLNT)
+!         if (LTNGON_DATA) then
+!            IF ( .NOT. OPEN3( LTNGFILE, FSREAD3, PNAME ) ) THEN
+!               XMSG = 'Open failure for ' // LTNGFILE
+!               Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!            END IF
+!            n_opened_file = n_opened_file + 1
+!            f_ltng = n_opened_file
+!            IF ( .NOT. DESC3( LTNGFILE ) ) THEN
+!               XMSG = 'Could not get description of file  '// LTNGFILE
+!               CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+!            END IF
+!            call subhfile ( LTNGFILE, gxoff, gyoff,
+!    &                       STRTCOLLNT, ENDCOLLNT, STRTROWLNT, ENDROWLNT)
 
-             file_sdate(f_ltng) = sdate3d
-             file_stime(f_ltng) = stime3d
-             file_tstep(f_ltng) = tstep3d
-             file_xcell(f_ltng) = xcell3d
-             file_ycell(f_ltng) = ycell3d
+!            file_sdate(f_ltng) = sdate3d
+!            file_stime(f_ltng) = stime3d
+!            file_tstep(f_ltng) = tstep3d
+!            file_xcell(f_ltng) = xcell3d
+!            file_ycell(f_ltng) = ycell3d
 
-             n_l2d = nvars3d
-             LT_VARS = n_l2d
-             cio_LTLYRS = nlays3d
-             allocate (l2d_name(n_l2d, 3), stat=stat)
-             allocate (lt_name(n_l2d), stat=stat)
-             if (stat .ne. 0) then
-                xmsg = 'Failure allocating l2d_name '
-                call m3exit (pname, 0, 0, xmsg, xstat1 )
-             end if
-             l2d_name(:,1) = vname3d(1:n_l2d) 
-             l2d_name(:,2) = 'lnt'   ! denote lightning variable
-             l2d_name(:,3) = ' '     ! denote non met variable
-             ! Check to see what the lightning variable name is called
-             ! backwards (LTNGstrk) & forwards compatible (LNT)  
-             do v = 1, n_l2d 
-                lt_name(v) = trim(vname3d(v)) 
-             end do
+!            n_l2d = nvars3d
+!            LT_VARS = n_l2d
+!            cio_LTLYRS = nlays3d
+!            allocate (l2d_name(n_l2d, 3), stat=stat)
+!            allocate (lt_name(n_l2d), stat=stat)
+!            if (stat .ne. 0) then
+!               xmsg = 'Failure allocating l2d_name '
+!               call m3exit (pname, 0, 0, xmsg, xstat1 )
+!            end if
+!            l2d_name(:,1) = vname3d(1:n_l2d) 
+!            l2d_name(:,2) = 'lnt'   ! denote lightning variable
+!            l2d_name(:,3) = ' '     ! denote non met variable
+!            ! Check to see what the lightning variable name is called
+!            ! backwards (LTNGstrk) & forwards compatible (LNT)  
+!            do v = 1, n_l2d 
+!               lt_name(v) = trim(vname3d(v)) 
+!            end do
 !             if ( index1('LTNGstrk', n_l2d ,l2d_name(:,1)) .gt. 0 ) the
 !                lt_name = 'LTNGstrk'
 !             else
 !                lt_name = 'LNT'
 !             end if
 
-          end if
+!         end if
 #endif
 
 ! combining all files
@@ -1819,17 +1819,17 @@
 
                 else if (cio_grid_var_name(v,2) == 'lnt') then
 
-#ifndef mpas
-                   data_jdate = loc_jdate(f_ltng)
-                   data_jtime = loc_jtime(f_ltng)
+!#ifndef mpas
+!                  data_jdate = loc_jdate(f_ltng)
+!                  data_jtime = loc_jtime(f_ltng)
 
-                   IF ( .NOT. XTRACT3( LTNGFILE, cio_grid_var_name(v,1), 
-     &                                 1, cio_LTLYRS, STRTROWLNT, ENDROWLNT, STRTCOLLNT, ENDCOLLNT, 
-     &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
-                      XMSG = 'Could not extract ' // LTNGFILE // ' file'
-                      CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
-                   END IF
-#endif
+!                  IF ( .NOT. XTRACT3( LTNGFILE, cio_grid_var_name(v,1), 
+!    &                                 1, cio_LTLYRS, STRTROWLNT, ENDROWLNT, STRTCOLLNT, ENDCOLLNT, 
+!    &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
+!                     XMSG = 'Could not extract ' // LTNGFILE // ' file'
+!                     CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
+!                  END IF
+!#endif
 
                 else
                    CALL M3EXIT( 'Centralized I/O',0,0,' ==d== UNKOWN Type of File',1 )
@@ -6064,6 +6064,7 @@ C Read the various categories of normalized emissions
                   XMSG = 'Could not interpolate OPEN from ' // LTNGFILE
                   Call M3EXIT( PNAME, jdate, jtime, XMSG, XSTAT1 )
                End If
+               CALL nextime (jdate, jtime, tstep)
             ENDDO
           ENDDO
              

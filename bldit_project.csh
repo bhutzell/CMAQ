@@ -17,7 +17,7 @@
 #> directory.
 
 # set CMAQ_HOME = /home/username/path
- set CMAQ_HOME = /work/MOD3DEV/dkj/github_CMAQ/CMAQ_LTNG/CMAQ_Dev/Bld_LTNG
+ set CMAQ_HOME = /work/MOD3DEV/dkj/github_CMAQ/CMAQ_LTNG/Bld_LTNG
 
 #> This section allows users to choose explicitly which tools
 #> to make available from the repo. For each selected tool,
