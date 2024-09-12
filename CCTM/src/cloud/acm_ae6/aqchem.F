@@ -160,6 +160,7 @@ C-----------------------------------------------------------------------
       USE AERO_DATA
       USE UTILIO_DEFN
       USE CONST
+      USE HLCONST_MOD
 #ifdef isam
       USE SA_DEFN, ONLY: DEPSUM_SAVE, DS4_SAVE, REMOV_SAVE,
      &                   DEPSUM_AORGC_SAVE, DGLY1_SAVE, DMGLY1_SAVE,
@@ -482,11 +483,7 @@ C...........Local Variables (arrays):
 
       REAL( 8 ) :: ONE_OVER_TEMP     ! 1.0 / TEMP
 
-C...........External Functions:
-
-      REAL, EXTERNAL :: HLCONST
-
-!For Varaible used by TXHG Version
+!For Variable used by TXHG Version
       !LOGICAL, SAVE :: TRUST_TXHG_CHEM = .TRUE.  ! allow effects for TXHG version on ion and ph
       REAL( 8 ) :: TRACER           ! TRACER acc+akn aerosol in cloudwater (mol/liter)
       REAL( 8 ) :: TRACERCOR        ! TRACER coarse aerosol in cloudwater (mol/liter)
@@ -548,6 +545,7 @@ C... soluble aerosols
         CORS_K_FAC = ACORS_K_FAC * REAL( AEROSPC_MW( ACORS_IDX ), 8 )
      &                             / REAL( AEROSPC_MW( AK_IDX ), 8 ) / ACORSEM_RENORM
 
+        
       END IF    ! FIRSTIME
 
       ONE_OVER_TEMP = 1.0D0 / TEMP
@@ -594,19 +592,19 @@ C...initialize counters and compute several conversion factors
 C...set equilibrium constants as a function of temperature
 C...   Henry`s law constants
 
-      SO2H  = HLCONST( 'SO2             ', TEMP, .FALSE., 0.0 )
-      CO2H  = HLCONST( 'CO2             ', TEMP, .FALSE., 0.0 )
-      NH3H  = HLCONST( 'NH3             ', TEMP, .FALSE., 0.0 )
-      H2O2H = HLCONST( 'H2O2            ', TEMP, .FALSE., 0.0 )
-      O3H   = HLCONST( 'O3              ', TEMP, .FALSE., 0.0 )
-      HCLH  = HLCONST( 'HCL             ', TEMP, .FALSE., 0.0 )
-      HNO3H = HLCONST( 'HNO3            ', TEMP, .FALSE., 0.0 )
-      MHPH  = HLCONST( 'METHYLHYDROPEROX', TEMP, .FALSE., 0.0 )
-      PAAH  = HLCONST( 'PEROXYACETIC_ACI', TEMP, .FALSE., 0.0 )
-      FOAH  = HLCONST( 'FORMIC_ACID     ', TEMP, .FALSE., 0.0 )
-      GLYH  = HLCONST( 'GLYOXAL         ', TEMP, .FALSE., 0.0 )
-      MGLYH = HLCONST( MGLYSUR,            TEMP, .FALSE., 0.0 )
-      HOH   = HLCONST( 'OH              ', TEMP, .FALSE., 0.0 )
+      SO2H  = HLCONST( JSO2       , TEMP, .FALSE., 0.0 )
+      CO2H  = HLCONST( JCO2       , TEMP, .FALSE., 0.0 )
+      NH3H  = HLCONST( JNH3       , TEMP, .FALSE., 0.0 )
+      H2O2H = HLCONST( JH2O2      , TEMP, .FALSE., 0.0 )
+      O3H   = HLCONST( JO3        , TEMP, .FALSE., 0.0 )
+      HCLH  = HLCONST( JHCL       , TEMP, .FALSE., 0.0 )
+      HNO3H = HLCONST( JHNO3      , TEMP, .FALSE., 0.0 )
+      MHPH  = HLCONST( JMHYDPOX   , TEMP, .FALSE., 0.0 )
+      PAAH  = HLCONST( JPEROXYACET, TEMP, .FALSE., 0.0 )
+      FOAH  = HLCONST( JHCOOH     , TEMP, .FALSE., 0.0 )
+      GLYH  = HLCONST( JGLY       , TEMP, .FALSE., 0.0 )
+      MGLYH = HLCONST( JMGLY      , TEMP, .FALSE., 0.0 )
+      HOH   = HLCONST( JOH        , TEMP, .FALSE., 0.0 )
 
       TEMP1 = ONE_OVER_TEMP - 1.0D0 / 298.0D0
 
@@ -628,11 +626,8 @@ C...Kinetic oxidation rates
 C...   From Jacobson  (1997)
 
       RH2O2 = 7.45D+07 * EXP( -15.96D0 * ( ( 298.0D0 / TEMP )  - 1.0D0 ) )
-
-C...   From Jacobson, 1997
-
-      RMHP = 1.90D+07 * EXP( -12.75D0 * ( ( 298.0D0 / TEMP )  - 1.0D0 ) )
-      RPAA = 3.60D+07 * EXP( -13.42D0 * ( ( 298.0D0 / TEMP )  - 1.0D0 ) )
+      RMHP  = 1.90D+07 * EXP( -12.75D0 * ( ( 298.0D0 / TEMP )  - 1.0D0 ) )
+      RPAA  = 3.60D+07 * EXP( -13.42D0 * ( ( 298.0D0 / TEMP )  - 1.0D0 ) )
 
 C...From Carlton et al. (2007)
 
