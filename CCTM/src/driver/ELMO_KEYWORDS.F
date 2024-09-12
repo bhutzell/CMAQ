@@ -25,7 +25,7 @@
       CALL CHECKMEM( IOS, 'ELMO_KEY(1)%LIST',PNAME )
 
       ELMO_KEY( 1 )%LIST = (/'AMET            ','CUTOFF_FRACTIONS',
-     &      'MASS            ','PM_NUM          ','PMF_NUM         ',
+     &      'MASS            ','TSP_NUM         ','PMF_NUM         ',
      &      'PMC_NUM         ','MET             ','CHEM            ', 
      &      'FINE_SPECIES    ','COARSE_SPECIES  ','PM25_SPECIES    ',
      &      'SIZE            ','AMS             ','PM25TO10_SPECIES' /)
@@ -35,25 +35,25 @@
       ALLOCATE( ELMO_KEY( 2 )%LIST( 36 ), STAT=IOS )
       CALL CHECKMEM( IOS, 'ELMO_KEY(2)%LIST',PNAME )
 
-      ELMO_KEY( 2 )%LIST = (/'PMF_MASS    ','PMF_FRM     ','PMC_MASS    ',
-     &          'PMF_OC      ','PMF_EC      ','PMF_NA      ','PMF_CL      ',
-     &          'PMF_SO4     ','PMF_NO3     ','PMF_NH4     ','PM25        ',
-     &          'PM25_FRM    ','PM25_SO4    ','PM25_NO3    ','PM25_NH4    ',
-     &          'PM25_OC     ','PM25_EC     ','PMF_FE      ','PMF_AL      ',
-     &          'PMF_SI      ','PMF_TI      ','PMF_CA      ','PMF_MG      ',
-     &          'PMF_K       ','PMF_MN      ','PMF_SOILIMPV','PMF_UN_IMPV1',
-     &          'PMF_NCOM    ','PMF_UN_IMPV2','TNO3        ','PM_MASS     ',
-     &          'PMC_MASS    ','MET         ','Tsurf       ','AOD_550     ',
-     &          'GAS_CONC    ' /)
+      ELMO_KEY( 2 )%LIST = (/'PMF         ','PMF_FRM      ','PMC_MASS     ',
+     &       'PMF_OC       ','PMF_EC      ','PMF_NA       ','PMF_CL       ',
+     &       'PMF_SO4      ','PMF_NO3     ','PMF_NH4      ','PM25         ',
+     &       'PM25_FRM     ','PM25_SO4    ','PM25_NO3     ','PM25_NH4     ',
+     &       'PM25_OC      ','PM25_EC     ','PMF_FE       ','PMF_AL       ',
+     &       'PMF_SI       ','PMF_TI      ','PMF_CA       ','PMF_MG       ',
+     &       'PMF_K        ','PMF_MN      ','PMF_RECONSOIL','PMF_OTHWNC   ',
+     &       'PMF_NC       ','PMF_OTH     ','TNO3         ','PM_MASS      ',
+     &       'PMC_MASS     ','MET         ','Tsurf        ','AOD_550      ',
+     &       'GAS_CONC     ' /)
 
       ELMO_KEY( 3 )%WORD = 'MASS'
       ELMO_KEY( 3 )%N = 11
       ALLOCATE( ELMO_KEY( 3 )%LIST( 11 ), STAT=IOS )
       CALL CHECKMEM( IOS, 'ELMO_KEY(3)%LIST',PNAME )
 
-      ELMO_KEY( 3 )%LIST = (/'PMF_MASS  ','PMC_MASS  ','PM01      ','PM1       ',
-     &            'PM25      ','PM10      ','PM25TO10  ','PMU_MASS  ','PMAMS     ',
-     &            'PMAIT_MASS','PMACC_MASS' /)
+      ELMO_KEY( 3 )%LIST = (/'PMF     ','PMC     ','PM01    ','PM1     ',
+     &            'PM25    ','PM10    ','PM25TO10','PMU     ','PMAMS   ',
+     &            'PMAIT   ','PMACC   ' /)
      
       ELMO_KEY( 4 )%WORD = 'NUMBER'
       ELMO_KEY( 4 )%N = 7
@@ -121,11 +121,11 @@
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
-      ELMO_KEY( 10 )%LIST = (/'PMF_SO4     ','PMF_NO3     ','PMF_NH4     ',
-     &           'PMF_CL      ','PMF_NA      ','PMF_EC      ','PMF_OC      ',
-     &           'PMF_OA      ','PMF_H2O     ','PMF_SOILIMPV','PMF_UN_IMPV1',
-     &           'PMF_UN_IMPV2','PMF_HP      ','PMF_HPMOLAL ','PMF_PH      ',
-     &           'FINE_ORG    ','PMF_MASS    ' /)
+      ELMO_KEY( 10 )%LIST = (/'PMF_SO4      ','PMF_NO3      ','PMF_NH4      ',
+     &        'PMF_CL       ','PMF_NA       ','PMF_EC       ','PMF_OC       ',
+     &        'PMF_OA       ','PMF_H2O      ','PMF_RECONSOIL','PMF_OTHWNC   ',
+     &        'PMF_OTH      ','PMF_HP       ','PMF_HPMOLAL  ','PMF_PH       ',
+     &        'FINE_ORG     ','PMF          ' /)
 
       ELMO_KEY( 11 )%WORD = 'COARSE_SPECIES'
       ELMO_KEY( 11 )%N = 8
@@ -135,8 +135,8 @@
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
-      ELMO_KEY( 11 )%LIST = (/'PMC_MASS','PMC_SO4 ','PMC_NO3 ','PMC_NH4 ',
-     &                          'PMC_NA  ','PMC_MG  ','PMC_K   ','PMC_CA  ' /)
+      ELMO_KEY( 11 )%LIST = (/'PMC     ','PMC_SO4 ','PMC_NO3 ','PMC_NH4 ',
+     &                        'PMC_NA  ','PMC_MG  ','PMC_K   ','PMC_CA  ' /)
 
       ELMO_KEY( 12 )%WORD = 'AMS_SPECIES'
       ELMO_KEY( 12 )%N = 7
@@ -157,12 +157,12 @@
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
-      ELMO_KEY( 13 )%LIST = (/'PM1        ','PM1_SO4    ','PM1_NO3    ',
-     &            'PM1_NH4    ','PM1_CL     ','PM1_NA     ','PM1_EC     ',
-     &            'PM1_OC     ','PM1_OA     ','PM1_MG     ','PM1_K      ',
-     &            'PM1_CA     ','PM1_OTHER  ','PM1_FE     ','PM1_SI     ',
-     &            'PM1_TI     ','PM1_MN     ','PM1_AL     ','PM1_SOIL   ',
-     &            'PM1_UNSP1  ','PM1_UNSPCRS' /)
+      ELMO_KEY( 13 )%LIST = (/'PM1          ','PM1_SO4      ','PM1_NO3      ',
+     &        'PM1_NH4      ','PM1_CL       ','PM1_NA       ','PM1_EC       ',
+     &        'PM1_OC       ','PM1_OA       ','PM1_MG       ','PM1_K        ',
+     &        'PM1_CA       ','PM1_OTHER    ','PM1_FE       ','PM1_SI       ',
+     &        'PM1_TI       ','PM1_MN       ','PM1_AL       ','PM1_RECONSOIL',
+     &        'PM1_OTHWNC   ','PM1_UNSPCRS  ' /)
 
       ELMO_KEY( 14 )%WORD = 'PM25_SPECIES'
       ELMO_KEY( 14 )%N = 22
@@ -172,12 +172,12 @@
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
-      ELMO_KEY( 14 )%LIST = (/'PM25        ','PM25_SO4    ','PM25_NO3    ',
-     &           'PM25_NH4    ','PM25_CL     ','PM25_NA     ','PM25_EC     ',
-     &           'PM25_OC     ','PM25_OA     ','PM25_MG     ','PM25_K      ',
-     &           'PM25_CA     ','PM25_OTHER  ','PM25_FE     ','PM25_SI     ',
-     &           'PM25_TI     ','PM25_MN     ','PM25_AL     ','PM25_SOIL   ',
-     &           'PM25_UNSP1  ','PM25_UNSPCRS','PM25_HP     ' /)
+      ELMO_KEY( 14 )%LIST = (/'PM25          ','PM25_SO4      ','PM25_NO3      ',
+     &       'PM25_NH4      ','PM25_CL       ','PM25_NA       ','PM25_EC       ',
+     &       'PM25_OC       ','PM25_OA       ','PM25_MG       ','PM25_K        ',
+     &       'PM25_CA       ','PM25_OTHER    ','PM25_FE       ','PM25_SI       ',
+     &       'PM25_TI       ','PM25_MN       ','PM25_AL       ','PM25_RECONSOIL',
+     &       'PM25_OTHWNC   ','PM25_UNSPCRS  ','PM25_HP       ' /)
 
       ELMO_KEY( 15 )%WORD = 'PM25TO10_SPECIES'
       ELMO_KEY( 15 )%N = 6
@@ -188,7 +188,7 @@
       END IF
 
       ELMO_KEY( 15 )%LIST = (/'PM25TO10    ','PM25TO10_SO4','PM25TO10_NO3',
-     &                          'PM25TO10_NH4','PM25TO10_CL ','PM25TO10_NA ' /)
+     &                        'PM25TO10_NH4','PM25TO10_CL ','PM25TO10_NA ' /)
 
       ELMO_KEY( 16 )%WORD = 'OPTICAL'
       ELMO_KEY( 16 )%N = 2
@@ -209,10 +209,10 @@
       END IF
 
       ELMO_KEY( 17 )%LIST = (/'PMF_POC     ','PMF_SOC     ','PMF_POA     ',
-     &           'PMF_SOA     ','PMF_NCOM    ','PMF_OMOC    ','PMF_OTOC    ',
-     &           'PMF_ASOA    ','PMF_BSOA    ','PMF_CLDGLY  ','PMF_ISOPSOA ',
-     &           'PMF_IEPOXSOA','PMF_MTNSOA  ','PMF_MTSOA   ','PMF_OC      ',
-     &           'PMF_OA      ' /)
+     &         'PMF_SOA     ','PMF_NC      ','PMF_OMOC    ','PMF_OTOC    ',
+     &         'PMF_ASOA    ','PMF_BSOA    ','PMF_CLDGLY  ','PMF_ISOPSOA ',
+     &         'PMF_IEPOXSOA','PMF_MTNSOA  ','PMF_MTSOA   ','PMF_OC      ',
+     &         'PMF_OA      ' /)
 
       ELMO_KEY( 18 )%WORD = 'CUTOFF_FRACTIONS'
       ELMO_KEY( 18 )%N = 6
@@ -223,32 +223,33 @@
       END IF
 
       ELMO_KEY( 18 )%LIST = (/'FPM01    ','FPM1     ','FPM25    ',
-     &                          'FPM10    ','FPM25TO10','FAMS     ' /)
+     &                        'FPM10    ','FPM25TO10','FAMS     ' /)
 
       ELMO_KEY( 19 )%WORD = 'TOXICS'
-      ELMO_KEY( 19 )%N = 21
-      ALLOCATE( ELMO_KEY( 19 )%LIST( 21 ), STAT=ALLOCSTAT )
+      ELMO_KEY( 19 )%N = 22
+      ALLOCATE( ELMO_KEY( 19 )%LIST( 22 ), STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_KEY(19)'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
       ELMO_KEY( 19 )%LIST = (/'PM25_HDIESEL','PM25_HBE    ','PM25_HCD    ',
-     &           'PM25_HCR3   ','PM25_HCR6   ','PM25_HCR    ','PM25_HPB    ',
-     &           'PM25_HMN    ','PM25_HNI    ','PM25_HAS    ','PM25_HG     ',
-     &           'PM10_HDIESEL','PM10_HBE    ','PM10_HCD    ','PM10_HCR3   ',
-     &           'PM10_HCR6   ','PM10_HCR    ','PM10_HPB    ','PM10_HMN    ',
-     &           'PM10_HAS    ','PM10_HG     '  /)
+     &         'PM25_HCR3   ','PM25_HCR6   ','PM25_HCR    ','PM25_HPB    ',
+     &         'PM25_HMN    ','PM25_HNI    ','PM25_HAS    ','PM25_HG     ',
+     &         'PM10_HDIESEL','PM10_HBE    ','PM10_HCD    ','PM10_HCR3   ',
+     &         'PM10_HCR6   ','PM10_HCR    ','PM10_HPB    ','PM10_HMN    ',
+     &         'PM10_HNI    ','PM10_HAS    ','PM10_HG     '  /)
 
       ELMO_KEY( 20 )%WORD = 'SIMPLE'
-      ELMO_KEY( 20 )%N = 2
-      ALLOCATE( ELMO_KEY( 20 )%LIST( 2 ), STAT=ALLOCSTAT )
+      ELMO_KEY( 20 )%N = 9
+      ALLOCATE( ELMO_KEY( 20 )%LIST( 9 ), STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_KEY(20)'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
 
-      ELMO_KEY( 20 )%LIST = (/'PM25','PM10'/)
+      ELMO_KEY( 20 )%LIST = (/'PM25    ','PM10    ','O3      ','SO2      ',
+     &                 'CO  ','NOX     ','NH3     ','ISOPRENE','FORMALD  '/)
  
       ELMO_KEY( 21 )%WORD = 'AMS'
       ELMO_KEY( 21 )%N = 5
@@ -259,7 +260,7 @@
       END IF
 
       ELMO_KEY( 21 )%LIST = (/'PMAMS_CL ','PMAMS_NH4','PMAMS_NO3',
-     &                          'PMAMS_OA ','PMAMS_SO4'/)
+     &                        'PMAMS_OA ','PMAMS_SO4'/)
  
       ! Satellite Retrieval products
       ELMO_KEY( 22 )%WORD = 'SAT'
@@ -291,18 +292,43 @@
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
       ELMO_KEY( 24 )%LIST = (/'NO2    ','SO2    ','O3     ','CO     ',
-     &                        'FORM   ','NH3    ','AOD_550'/)
- 
-      ! All Concentrations
-      ELMO_KEY( 25 )%WORD = 'GAS_CONC'
-      ELMO_KEY( 25 )%N = 7
-      ALLOCATE( ELMO_KEY( 25 )%LIST( 7 ), STAT=ALLOCSTAT )
+     &                        'FORMALD','NH3    ','AOD_550'/)
+      
+      ! Gas Toxics Concentrations
+      ELMO_KEY( 25 )%WORD = 'GAS_TOXICS'
+      ELMO_KEY( 25 )%N = 8
+      ALLOCATE( ELMO_KEY( 25 )%LIST( 8 ), STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_KEY(25)'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
       END IF
-      ELMO_KEY( 25 )%LIST = (/'O3  ','NO2 ','NO  ','SO2 ','CO  ',
-     &                        'NH3 ','HNO3'/)
+      ELMO_KEY( 25 )%LIST = (/'FORMALD  ','ACETALD  ','BENZENE  ','ACETYLENE',
+     &            'ETHANE   ','ETHENE   ','TOLUENE  ','XYLENES  '/)
+      
+      ! AMET Gas Concentrations
+      ELMO_KEY( 25 )%WORD = 'AMET_GAS'
+      ELMO_KEY( 25 )%N = 13
+      ALLOCATE( ELMO_KEY( 25 )%LIST( 13 ), STAT=ALLOCSTAT )
+      IF ( ALLOCSTAT .NE. 0 ) THEN
+           XMSG = 'Failure allocating ELMO_KEY(25)'
+           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+      END IF
+      ELMO_KEY( 25 )%LIST = (/'O3        ','NO2       ','NO        ',
+     &           'SO2       ','CO        ','NH3       ','HNO3      ',
+     &           'GAS_TOXICS','NOX       ','NOY       ','HNO3_UGM3 ',
+     &           'SO2_UGM3  ','NH3_UGM3  '/)
+ 
+      ! Default Gas Concentrations
+      ELMO_KEY( 25 )%WORD = 'DEFAULT_GAS'
+      ELMO_KEY( 25 )%N = 10
+      ALLOCATE( ELMO_KEY( 25 )%LIST( 10 ), STAT=ALLOCSTAT )
+      IF ( ALLOCSTAT .NE. 0 ) THEN
+           XMSG = 'Failure allocating ELMO_KEY(25)'
+           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+      END IF
+      ELMO_KEY( 25 )%LIST = (/'AMET_GAS','H2O2    ','HONO    ',
+     &  'HOX     ','ISOPRENE','N2O5    ','NTR     ','PANS    ',
+     &  'TERP    ','VOC     '/)
  
       ! All Deposition Variables
       ELMO_KEY( 26 )%WORD = 'ALL_DEP'

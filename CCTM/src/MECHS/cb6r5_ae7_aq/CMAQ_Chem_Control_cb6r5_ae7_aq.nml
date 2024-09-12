@@ -256,295 +256,953 @@
 !------------------------------------------------------------------------------!
     
 &COMPOSITE_INIT
-  N_COMPOSITES = 57
+  N_COMPOSITES = 184
   N_MAX_COMPONENTS = 50
 /
 
 &ELMO_COMPOSITES
 
-   CMPST(1) = 'NOX', 'ppmV', 'GAS', 'NOx Concentration', 
-                'NO + NO2'
-
-   CMPST(46) = 'NOY', 'ppmV', 'FINE', 'NOy Concentration', 
-                'NO + NO2 + N2O5 + HONO + HNO3 + ANO3'
-
-   CMPST(2) = 'PMC_SO4', 'ug m-3', 'COARSE', 'Coarse-Mode Sulfate', 
-                'ASO4' 
-
-   CMPST(3) = 'PMC_NO3', 'ug m-3', 'COARSE', 'Coarse-Mode Nitrate', 
-                'ANO3'
-
-   CMPST(4) = 'PMC_NH4', 'ug m-3', 'COARSE', 'Coarse-Mode Ammonium', 
-                'ANH4'
-
-   CMPST(5) = 'PMC_CL', 'ug m-3', 'COARSE', 'Coarse-Mode Chlorine', 
-                'ACL'
-
-   CMPST(6) = 'PMC_NA', 'ug m-3', 'COARSE', 'Recon Crs Sodium', 
-                '0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(7) = 'PMC_MG', 'ug m-3', 'COARSE', 'Recon Crs Magnesium', 
-                '0.0997 * ASEACAT + 0.0170 * ASOIL + 0.0032 * ACORS'
-
-   CMPST(8) = 'PMC_K', 'ug m-3', 'COARSE', 'Recon Crs Potasium', 
-                '0.0310 * ASEACAT + 0.0242 * ASOIL + 0.0176 * ACORS'
-
-   CMPST(9) = 'PMC_CA', 'ug m-3', 'COARSE', 'Recon Crs Calcium', 
-                '0.0320 * ASEACAT + 0.0838 * ASOIL + 0.0562 * ACORS'
-
-   CMPST(10) = 'PMF_SO4', 'ug m-3',  'FINE', 'Fine-Mode Sulfate', 
-                 'ASO4'
-
-   CMPST(11) = 'PMF_NO3',  'ug m-3',  'FINE', 'Fine-Mode Nitrate', 
-                 'ANO3'
-
-   CMPST(12) = 'PMF_NH4', 'ug m-3', 'FINE', 'Fine-Mode Ammonium', 
-                 'ANH4'
-
-   CMPST(13) = 'PMF_CL', 'ug m-3', 'FINE', 'Fine-Mode Chloride', 
-                 'ACL'
-
-   CMPST(14) = 'PMF_NA', 'ug m-3', 'FINE', 'Fine-Mode Sodium', 
-                 'ANA'
-
-   CMPST(15) = 'PMF_EC', 'ug m-3', 'FINE', 'Fine-Mode Black Carbon', 
-                 'AEC'
-
-   CMPST(16) = 'PMF_FE', 'ug m-3', 'FINE', 'Fine-Mode Iron', 
-                 'AFE'
-
-   CMPST(17) = 'PMF_AL', 'ug m-3', 'FINE', 'Fine-Mode Aluminum', 
-                 'AAL'
-
-   CMPST(18) = 'PMF_SI', 'ug m-3', 'FINE', 'Fine-Mode Silicon', 
-                 'ASI' 
-
-   CMPST(19) = 'PMF_TI', 'ug m-3', 'FINE', 'Fine-Mode Titanium', 
-                 'ATI'
-
-   CMPST(20) = 'PMF_CA', 'ug m-3', 'FINE', 'Fine-Mode Calcium', 
-                 'ACA'
-
-   CMPST(21) = 'PMF_MG', 'ug m-3', 'FINE', 'Fine-Mode Magnesium', 
-                 'AMG'
-
-   CMPST(22) = 'PMF_K', 'ug m-3', 'FINE', 'Fine-Mode Potassium',
-                 'AK'
-
-   CMPST(23) = 'PMF_MN', 'ug m-3', 'FINE', 'Fine-Mode Manganese',
-                 'AMN'
-
-   CMPST(24) = 'PMF_H2O', 'ug m-3', 'FINE', 'Fine-ModeParticle Water',
-                 'AH2O'
-                                               
-   CMPST(25) = 'PMF_SOILIMPV', 'ug m-3', 'ACCUMULATION', 'Recon of Soil PM from correlations at IMPROVE sites',
-                 '2.20 * AAL + 2.49 * ASI + 1.63 * ACA + 2.42 * AFE + 1.94 * ATI'
-
-   CMPST(26) = 'PMF_UN_IMPV1', 'ug m-3', 'FINE', 'Unspeciated PM including non-carbon organic mass',
-                 'PMF_MASS -1.0 * ASO4 -1.0 * ANO3 -1.0 * ANH4 -1.0 * ACL -1.0 * ANA + -1.0 * AEC -1.0 * PMF_OC -1.0 * PMF_SOILIMPV'
-
-   CMPST(27) = 'PMF_UN_IMPV2', 'ug m-3', 'FINE', 'Unspeciated PM excluding non-carbon organic mass',
-                 'PMF_MASS -1.0 * ASO4 -1.0 * ANO3 -1.0 * ANH4 -1.0 * ACL -1.0 * ANA -1.0 * AEC -1.0 * PMF_OA -1.0 * PMF_SOILIMPV'
-
-   CMPST(28) = 'PMF_HP', 'umol m-3', 'FINE', 'Fine-Mode H+ Ion',
-                 'AH3OP'
-
-   CMPST(29) = 'PMF_NCOM', 'ug m-3', 'FINE', 'Fine-Mode Non-Carbon Organic Matter in POA',
-                 'PMF_OA -1.0 * PMF_OC'
-
-   CMPST(30) = 'PMF_CLDGLY', 'ug m-3', 'FINE', 'Fine-Mode SOA from glyoxal and methylglyoxal',
-                 'AORGC + AGLY'
-
-   CMPST(31) = 'PMF_ISOPSOA', 'ug m-3', 'FINE', 'Fine-Mode Isoprene SOA excl IEPOX SOA',
-                 'AISO1 + AISO2'
-
-   CMPST(32) = 'PMF_IEPOXSOA', 'ug m-3', 'FINE', 'Fine-Mode IEPOX SOA',
-                 'AISO3'
-
-   CMPST(33) = 'PMF_MTNSOA', 'ug m-3', 'FINE', 'Fine-Mode Monoterpene Nitrate SOA',
-                 'AMTNO3 + AMTHYD'
-
-   CMPST(34) = 'PMF_MTSOA', 'ug m-3', 'FINE', 'Fine-Mode Monoterpene SOA excl Nitrates',
-                 'AMT1 + AMT2 + AMT3 + AMT4 + AMT5 + AMT6'
-
-   CMPST(35) = 'GAS_NH3', 'ug m-3', 'GAS', 'Gas-Phase Ammonia',
-                 'NH3'
-
-   CMPST(36) = 'GAS_HNO3', 'ug m-3', 'GAS', 'Gas-Phase Nitric Acid',
-                 'HNO3'
-
-   CMPST(37) = 'PMAMS_SO4', 'ug m-3', 'PMAMS', 'Sulfate Collected by the AMS',
-                 'ASO4'
-
-   CMPST(38) = 'PMAMS_NO3', 'ug m-3', 'PMAMS', 'Nitrate Collected by the AMS',
-                 'ANO3'
-
-   CMPST(39) = 'PMAMS_NH4', 'ug m-3', 'PMAMS', 'Ammonium Collected by the AMS',
-                 'ANH4'
-
-   CMPST(40) = 'PMAMS_CL', 'ug m-3', 'PMAMS', 'Chloride Collected by the AMS',
-                 'ACL'
-
-   CMPST(41) = 'PM1_SO4', 'ug m-3', 'PM1', 'PM1 Sulfate',
-                 'ASO4'
-
-   CMPST(42) = 'PM1_NO3', 'ug m-3', 'PM1', 'PM1 Nitrate',
-                 'ANO3'
-
-   CMPST(43) = 'PM1_NH4', 'ug m-3', 'PM1', 'PM1 Ammonium',
-                 'ANH4'
-
-   CMPST(44) = 'PM1_CL', 'ug m-3', 'PM1', 'PM1 Chloride',
-                 'ACL'
-
-   CMPST(45) = 'PM1_NA', 'ug m-3', 'PM1', 'PM1 Sodium',
-                 'ANA + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_EC', 'ug m-3', 'PM1', 'PM1 Elemental Carbon',
-                 'AEC'
-
-   CMPST(45) = 'PM1_MG', 'ug m-3', 'PM1', 'PM1 Magnesium',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_K', 'ug m-3', 'PM1', 'PM1 Potassium',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_CA', 'ug m-3', 'PM1', 'PM1 Calcium',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_OTHER', 'ug m-3', 'PM1', 'PM1 Other Mass',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_FE', 'ug m-3', 'PM1', 'PM1 Iron',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_SI', 'ug m-3', 'PM1', 'PM1 Silicon',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_TI', 'ug m-3', 'PM1', 'PM1 Titanium',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_MN', 'ug m-3', 'PM1', 'PM1 Manganese',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_AL', 'ug m-3', 'PM1', 'PM1 Aluminum',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_SOIL', 'ug m-3', 'PM1', 'PM1 Recon Soil (Fine)',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_UNSP1', 'ug m-3', 'PM1', 'PM1 Unspeciated Coarse Mass for the IMPROVE Method',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_UNSPCRS', 'ug m-3', 'PM1', 'PM1 Unspeciated Coarse Mass',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM1_HP', 'ug m-3', 'PM1', 'PM1 H+ Ion',
-                 'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
-
-   CMPST(45) = 'PM25_SO4', 'ug m-3', 'PM25', 'PM2.5 Sulfate',
-                 'ASO4'
-
-   CMPST(45) = 'PM25_NO3', 'ug m-3', 'PM25', 'PM2.5 Nitrate',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_NH4', 'ug m-3', 'PM25', 'PM2.5 Ammonium',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_CL', 'ug m-3', 'PM25', 'PM2.5 Chloride',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_NA', 'ug m-3', 'PM25', 'PM2.5 Sodium',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_EC', 'ug m-3', 'PM25', 'PM2.5 Elemental Carbon',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_MG', 'ug m-3', 'PM25', 'PM2.5 Magnesium',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_K', 'ug m-3', 'PM25', 'PM2.5 Potassium',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_CA', 'ug m-3', 'PM25', 'PM2.5 Calcium',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_OTHER', 'ug m-3', 'PM25', 'PM2.5 Other',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_FE', 'ug m-3', 'PM25', 'PM2.5 Iron',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_SI', 'ug m-3', 'PM25', 'PM2.5 Silicon',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_TI', 'ug m-3', 'PM25', 'PM2.5 Titanium',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_MN', 'ug m-3', 'PM25', 'PM2.5 Manganese',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_AL', 'ug m-3', 'PM25', 'PM2.5 Aluminum',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_SOIL', 'ug m-3', 'PM25', 'PM2.5 Recon Soil (Fine) and Explicit (Coarse)',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_UNSP1', 'ug m-3', 'PM25', 'PM2.5 Unspeciasted Coarse Mass for the IMPROVE Method',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_UNSPCRS', 'ug m-3', 'PM25', 'PM2.5 Unspeciated Coarse Mass',
-                 'ANO3'
-
-   CMPST(45) = 'PM25_HP', 'ug m-3', 'PM25', 'PM2.5 H+ Ion',
-                 'ANO3'
-
-   CMPST(45) = 'PM25TO10_SO4', 'ug m-3', 'PM25TO10', 'Coarse-Mode Sulfate',
-                 'ASO4'
-
-   CMPST(45) = 'PM25TO10_NO3', 'ug m-3', 'PM25TO10', 'Coarse-Mode Nitrate',
-                 'ASO4'
-
-   CMPST(45) = 'PM25TO10_NH4', 'ug m-3', 'PM25TO10', 'Coarse-Mode Ammonium',
-                 'ASO4'
-
-   CMPST(45) = 'PM25TO10_CL', 'ug m-3', 'PM25TO10', 'Coarse-Mode Chloride',
-                 'ASO4'
-
-   CMPST(45) = 'PM25TO10_NA', 'ug m-3', 'PM25TO10', 'Coarse-Mode Sodium',
-                 'ASO4'
-
-
-
-   CMPST(47) = 'TNO3', 'ug m-3', 'ALL', 'Total Nitrate only including Inorganics', 
-                'ANO3 + HNO3'
-
-   CMPST(48) = 'TNO3_MOL', 'umol m-3', 'ALL', 'Total Nitrate only including Inorganics', 
-                'ANO3 + HNO3'
-
-   CMPST(48) = 'TNO3TOT', 'umol m-3', 'ALL', 'Total Nitrate only including Inorganics', 
-                'ANO3 + HNO3'
-
-   CMPST(49) = 'DD_OXN_NOX', 'kg ha-1', 'DEP', 'Dry Dep of Oxidized Nitrogen from NOx', 
-                '0.30435*DD_NO2 + 0.46667*DD_NO'
-
-   CMPST(50) = 'WD_OXN_NOX', 'kg ha-1', 'DEP', 'Wet Dep of Oxidized Nitrogen from NOx', 
-                '0.30435*WD_NO2 + 0.46667*WD_NO'
-
-   CMPST(51) = 'DD_OXN_TNO3', 'kg ha-1', 'DEP', 'Dry Dep of Oxidized Nitrogen from Nitrate', 
-                '0.22222*DD_HNO3 + 0.22581*DD_ANO3'
-
-   CMPST(52) = 'WD_OXN_TNO3', 'kg ha-1', 'DEP', 'Wet Dep of Oxidized Nitrogen from Nitrate', 
-                '0.22222*WD_HNO3 + 0.22581*WD_ANO3'
-
-   CMPST(53) = 'DD_OXN_TOT', 'kg ha-1', 'DEP', 'Dry Dep of Oxidized Nitrogen', 
-                'DD_OXN_NOX + DD_OXN_TNO3'
-
-   CMPST(54) = 'WD_OXN_TOT', 'kg ha-1', 'DEP', 'Wet Dep of Oxidized Nitrogen', 
-                'WD_OXN_NOX + WD_OXN_TNO3'
-
-   CMPST(55) = 'TD_OXN_TOT', 'kg ha-1', 'DEP', 'Total Dep of Oxidized Nitrogen', 
-                'DD_OXN_TOT + WD_OXN_TOT'
+CMPST =
+
+!----------------------------!
+!**** Gas Concentrations ****!
+!----------------------------!
+
+!-- Inorganic Composites --!
+'FORMALD'     , 'Formaldehyde Concentration', 
+                'ppmV', 'GAS', 
+                'FORM', 
+
+'ISOPRENE'    , 'Isoprene Concentration', 
+                'ppmV', 'GAS', 
+                'ISOP', 
+
+'ACETALD'     , 'Acetaldehyde Concentration', 
+                'ppmV', 'GAS', 
+                'ALD2', 
+
+'BENZENE'     , 'Benzene Concentration', 
+                'ppmV', 'GAS', 
+                'BENZENE', 
+
+'ACETYLENE'   , 'Acetylene Concentration', 
+                'ppmV', 'GAS', 
+                'ETHY', 
+
+'ETHANE'      , 'Ethane Concentration', 
+                'ppmV', 'GAS', 
+                'ETHA', 
+
+'ETHENE'      , 'Ethene Concentration', 
+                'ppmV', 'GAS', 
+                'ETH', 
+
+'TOLUENE'     , 'Toluene Concentration', 
+                'ppmV', 'GAS', 
+                'TOL', 
+
+'HOX'         , 'HOx Concentration', 
+                'ppmV', 'GAS', 
+                'OH + HO2', 
+
+'NOX'         , 'NOx Concentration', 
+                'ppmV', 'GAS', 
+                'NO + NO2', 
+
+'NTR'         , 'Organic Nitrates', 
+                'ppmV', 'GAS', 
+                'NTR1 + NTR2 + INTR', 
+
+'PANS'        , 'Peroxy-Acetyl Nitrates', 
+                'ppmV', 'GAS', 
+                'PAN + PANX + OPAN', 
+
+'HNO3_UGM3'   , 'Gas-Phase Nitric Acid',
+                'ug m-3', 'GAS', 
+                'HNO3',
+
+'NH3_UGM3'    , 'Gas-Phase Ammonia',
+                'ug m-3', 'GAS', 
+                'NH3',
+
+'SO2_UGM3'    , 'Gas-Phase Sulfur Dioxide',
+                'ug m-3', 'GAS', 
+                'SO2',
+
+!-- Organic Composites --!
+'VOC'         , 'Volatile Organic Compound (VOC) Concentration',
+                'ppbC', 'GAS',
+                'PAR + 2.0*ETHA + 3.0*PRPA + MEOH + 2.0*ETH + 2.0*ETOH + 2.0*OLE + 3.0*ACET + 7.0*TOL + 8.0*XYLMN + 6.0*BENZENE + FORM + 3.0*GLY + 4.0*KET + 2.0*ETHY + 2.0*ALD2 + 4.0*IOLE + 2.0*ALDX + 5.0*ISOP + 10.0*TERP + 10.0*NAPH + 10.0*APIN'
+
+!---------------------------------!
+!**** Particle Concentrations ****!
+!---------------------------------!
+
+!-- Coarse-Mode Particle Composites --!             
+'PMC_SO4'     , 'Coarse-Mode Sulfate', 
+                'ug m-3', 'COARSE', 
+                'ASO4', 
+
+'PMC_NO3'     , 'Coarse-Mode Nitrate', 
+                'ug m-3', 'COARSE', 
+                'ANO3', 
+
+'PMC_NH4'     , 'Coarse-Mode Ammonium',
+                'ug m-3', 'COARSE', 
+                'ANH4',
+
+'PMC_CL'      , 'Coarse-Mode Chlorine', 
+                'ug m-3', 'COARSE', 
+                'ACL',
+
+'PMC_NA'      , 'Reconstructed Coarse Sodium', 
+                'ug m-3', 'COARSE', 
+                '0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS',
+
+'PMC_MG'      , 'Reconstructed Coarse Magnesium', 
+                'ug m-3', 'COARSE', 
+                '0.0997 * ASEACAT + 0.0170 * ASOIL + 0.0032 * ACORS',
+
+'PMC_K'       , 'Reconstructed Coarse Potasium', 
+                'ug m-3', 'COARSE', 
+                '0.0310 * ASEACAT + 0.0242 * ASOIL + 0.0176 * ACORS',
+
+'PMC_CA'      , 'Recon Crs Calcium', 
+                'ug m-3', 'COARSE', 
+                '0.0320 * ASEACAT + 0.0838 * ASOIL + 0.0562 * ACORS',
+
+!-- Fine-Mode Particle Composites --!
+'PMF_SO4'     , 'Fine-Mode Sulfate', 
+                'ug m-3',  'FINE', 
+                'ASO4',
+
+'PMF_NO3'     ,  'Fine-Mode Nitrate', 
+                 'ug m-3',  'FINE', 
+                 'ANO3',
+                       
+'PMF_NH4'     , 'Fine-Mode Ammonium', 
+                'ug m-3', 'FINE', 
+                'ANH4',
+
+'PMF_CL'      , 'Fine-Mode Chloride', 
+                'ug m-3', 'FINE', 
+                'ACL',
+
+'PMF_NA'      , 'Fine-Mode Sodium', 
+                'ug m-3', 'FINE', 
+                'ANA',
+
+'PMF_EC'      , 'Fine-Mode Black Carbon', 
+                'ug m-3', 'FINE', 
+                'AEC',
+
+'PMF_FE'      , 'Fine-Mode Iron', 
+                'ug m-3', 'FINE', 
+                'AFE',
+
+'PMF_AL'      , 'Fine-Mode Aluminum', 
+                'ug m-3', 'FINE', 
+                'AAL',
+
+'PMF_SI'      , 'Fine-Mode Silicon', 
+                'ug m-3', 'FINE', 
+                'ASI',
+
+'PMF_TI'      , 'Fine-Mode Titanium', 
+                'ug m-3', 'FINE', 
+                'ATI',
+
+'PMF_CA'      , 'Fine-Mode Calcium', 
+                'ug m-3', 'FINE', 
+                'ACA',
+
+'PMF_MG'      , 'Fine-Mode Magnesium', 
+                'ug m-3', 'FINE', 
+                'AMG',
+
+'PMF_K'       , 'Fine-Mode Potassium',
+                'ug m-3', 'FINE', 
+                'AK',
+
+'PMF_MN'      , 'Fine-Mode Manganese',
+                'ug m-3', 'FINE', 
+                'AMN',
+
+'PMF_H2O'     , 'Fine-ModeParticle Water',
+                'ug m-3', 'FINE', 
+                'AH2O',
+                                
+'PMF_RECONSOIL','Recon of Soil PM from correlations at IMPROVE sites',
+                'ug m-3' , 'ACCUMULATION', 
+                '2.20 * AAL + 2.49 * ASI + 1.63 * ACA + 2.42 * AFE + 1.94 * ATI', 
+                
+'PMF_OTHWNC'  , 'Unspeciated PM including non-carbon organic mass',
+                'ug m-3', 'FINE', 
+                'PMF_MASS -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OC -1.0*RECON_SOIL',
+
+'PMF_OTH'     , 'Unspeciated PM excluding non-carbon organic mass',
+                'ug m-3', 'FINE', 
+                'PMF_MASS -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OA -1.0*PMF_SOILIMPV',
+
+'PMF_HP'      , 'Fine-Mode H+ Ion',
+                'umol m-3', 'FINE', 
+                'AH3OP',
+
+'PMF_NC'      , 'Fine-Mode Non-Carbon Organic Matter in POA',
+                'ug m-3', 'FINE', 
+                'PMF_OA -1.0 * PMF_OC',
+
+'PMF_CLDGLY'  , 'Fine-Mode SOA from glyoxal and methylglyoxal',
+                'ug m-3', 'FINE', 
+                'AORGC + AGLY',
+
+'PMF_ISOPSOA' , 'Fine-Mode Isoprene SOA excl IEPOX SOA',
+                'ug m-3', 'FINE', 
+                'AISO1 + AISO2',
+
+'PMF_IEPOXSOA', 'Fine-Mode IEPOX SOA',
+                'ug m-3', 'FINE', 
+                'AISO3',
+
+'PMF_MTNSOA'  , 'Fine-Mode Monoterpene Nitrate SOA',
+                'ug m-3', 'FINE', 
+                'AMTNO3 + AMTHYD',
+
+'PMF_MTSOA'   , 'Fine-Mode Monoterpene SOA excl Nitrates',
+                'ug m-3', 'FINE', 
+                'AMT1 + AMT2 + AMT3 + AMT4 + AMT5 + AMT6',
+
+'PMF_TC'      , 'Total Carbon (OC + EC)'
+                'ug m-3', 'FINE', 
+                'PMF_OC + PMF_EC',
+
+!-- Particle Composites Projected to Aerosol Mass Spectrometer --!
+'PMAMS_SO4'   , 'Sulfate Collected by the AMS',
+                'ug m-3', 'PMAMS', 
+                'ASO4',
+
+'PMAMS_NO3'   , 'Nitrate Collected by the AMS',
+                'ug m-3', 'PMAMS', 
+                'ANO3',
+
+'PMAMS_NH4'   , 'Ammonium Collected by the AMS',
+                'ug m-3', 'PMAMS', 
+                'ANH4',
+
+'PMAMS_CL'    , 'Chloride Collected by the AMS',
+                'ug m-3', 'PMAMS', 
+                'ACL',
+
+!-- Particle Composites (Dp < 1 um) --!
+'PM1_SO4'     , 'PM1 Sulfate',
+                'ug m-3', 'PM1', 
+                'ASO4',
+
+'PM1_NO3'     , 'PM1 Nitrate',
+                'ug m-3', 'PM1', 
+                'ANO3',
+
+'PM1_NH4'     , 'PM1 Ammonium',
+                'ug m-3', 'PM1', 
+                'ANH4',
+
+'PM1_CL'      , 'PM1 Chloride',
+                'ug m-3', 'PM1', 
+                'ACL',
+
+'PM1_NA'      , 'PM1 Sodium',
+                'ug m-3', 'PM1', 
+                'ANA + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS',
+
+'PM1_EC'      , 'PM1 Elemental Carbon',
+                'ug m-3', 'PM1', 
+                'AEC',
+
+'PM1_MG'      , 'PM1 Magnesium',
+                'ug m-3', 'PM1', 
+                'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS',
+
+'PM1_K'       , 'PM1 Potassium',
+                'ug m-3', 'PM1', 
+                'AK  + 0.0310 * ASEACAT + 0.0170 * ASOIL + 0.0032 * ACORS',
+
+'PM1_CA'      , 'PM1 Calcium',
+                'ug m-3', 'PM1', 
+                'ACA + 0.0320 * ASEACAT + 0.0838 * ASOIL + 0.0562 * ACORS',
+
+'PM1_OTHER'   , 'PM1 Other Mass',
+                'ug m-3', 'PM1', 
+                'AOTHR',
+
+'PM1_FE'      , 'PM1 Iron',
+                'ug m-3', 'PM1', 
+                'AFE + 0.02695 * ASOIL + 0.0467 * ACORS',
+
+'PM1_SI'      , 'PM1 Silicon',
+                'ug m-3', 'PM1', 
+                'ASI',
+
+'PM1_TI'      , 'PM1 Titanium',
+                'ug m-3', 'PM1', 
+                'ATI',
+
+'PM1_MN'      , 'PM1 Manganese',
+                'ug m-3', 'PM1', 
+                'AMN + 0.00075 * ASOIL + 0.0011 * ACORS',
+
+'PM1_AL'      , 'PM1 Aluminum',
+                'ug m-3', 'PM1', 
+                'AAL',
+
+'PM1_RECONSOIL','PM1 Recon Soil (Fine)',
+                'ug m-3', 'PM1', 
+                'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
+
+'PM1_OTHWNC'  , 'PM1 Unspeciated Coarse Mass for the IMPROVE Method',
+                'ug m-3', 'PM1', 
+                'PM1 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM1_OC - PM1_RECONSOIL',
+
+'PM1_UNSPCRS' , 'PM1 Unspeciated Coarse-Mode Mass',
+                'ug m-3', 'PM1', 
+                '0.7847 * ASOIL + 0.8729 * ACORS',
+
+'PM1_HP'      , 'PM1 H+ Ion',
+                'ug m-3', 'PM1', 
+                '0.05263 * AH3OP',
+
+!-- Particle Composites (Dp < 2.5 um) --!
+'PM25_SO4'    , 'PM2.5 Sulfate',
+                'ug m-3', 'PM25', 
+                'ASO4',
+
+'PM25_NO3'    , 'PM2.5 Nitrate',
+                'ug m-3', 'PM25', 
+                'ANO3',
+
+'PM25_NH4'    , 'PM2.5 Ammonium',
+                'ug m-3', 'PM25', 
+                'ANH4',
+
+'PM25_CL'     , 'PM2.5 Chloride',
+                'ug m-3', 'PM25', 
+                'ACL',
+
+'PM25_NA'     , 'PM2.5 Sodium',
+                'ug m-3', 'PM25', 
+                'ANA + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS',
+
+'PM25_EC'     , 'PM2.5 Elemental Carbon',
+                'ug m-3', 'PM25', 
+                'AEC',
+
+'PM25_MG'     , 'PM2.5 Magnesium',
+                'ug m-3', 'PM25', 
+                'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS',
+
+'PM25_K'      , 'PM2.5 Potassium',
+                'ug m-3', 'PM25', 
+                'AK  + 0.0310 * ASEACAT + 0.0170 * ASOIL + 0.0032 * ACORS',
+
+'PM25_CA'     , 'PM2.5 Calcium',
+                'ug m-3', 'PM25', 
+                'ACA + 0.0320 * ASEACAT + 0.0838 * ASOIL + 0.0562 * ACORS',
+
+'PM25_OTHER'  , 'PM2.5 Other',
+                'ug m-3', 'PM25', 
+                'AOTHR',
+
+'PM25_FE'     , 'PM2.5 Iron',
+                'ug m-3', 'PM25', 
+                'AFE + 0.02695 * ASOIL + 0.0467 * ACORS',
+
+'PM25_SI'     , 'PM2.5 Silicon',
+                'ug m-3', 'PM25', 
+                'ASI',
+
+'PM25_TI'     , 'PM2.5 Titanium',
+                'ug m-3', 'PM25', 
+                'ATI',
+
+'PM25_MN'     , 'PM2.5 Manganese',
+                'ug m-3', 'PM25', 
+                'AMN + 0.00075 * ASOIL + 0.0011 * ACORS',
+
+'PM25_AL'     , 'PM2.5 Aluminum',
+                'ug m-3', 'PM25', 
+                'AAL',
+
+'PM25_RECONSOIL','PM2.5 Recon Soil (Fine) and Explicit (Coarse)',
+                'ug m-3', 'PM25', 
+                'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
+
+'PM25_OTHWNC'   , 'PM2.5 Unspeciasted Coarse Mass for the IMPROVE Method',
+                'ug m-3', 'PM25', 
+                'PM25 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM25_OC - PM25_SOIL',
+
+'PM25_UNSPCRS', 'PM2.5 Unspeciated Coarse Mass',
+                'ug m-3', 'PM25', 
+                '0.7847 * ASOIL + 0.8729 * ACORS',
+
+'PM25_HP'     , 'PM2.5 H+ Ion', 
+                'ug m-3', 'PM25', 
+                '0.05263 * AH3OP',
+
+'PM25_TC'     , 'PM2.5 Total Carbon (OC + EC)'
+                'ug m-3', 'PM25', 
+                'PM25_OC + PM25_EC',
+
+!-- Particle Composites (2.5 um < Dp < 10 um) --!
+'PM25TO10_SO4', 'Coarse-Mode Sulfate',
+                'ug m-3', 'PM25TO10', 
+                'ASO4',
+
+'PM25TO10_NO3', 'Coarse-Mode Nitrate',
+                'ug m-3', 'PM25TO10', 
+                'ANO3',
+
+'PM25TO10_NH4', 'Coarse-Mode Ammonium',
+                'ug m-3', 'PM25TO10', 
+                'ANH4',
+
+'PM25TO10_CL' , 'Coarse-Mode Chloride',
+                'ug m-3', 'PM25TO10', 
+                'ACL',
+
+'PM25TO10_NA' , 'Coarse-Mode Sodium',
+                'ug m-3', 'PM25TO10', 
+                'ANA + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS',
+
+!-- Particle Composites Across All Sizes --!
+'TSP_SO4'     , 'Total Particulate Sulfate',
+                'ug m-3', 'ALL',
+                'ASO4',
+
+'TSP_NO3'     , 'Total Particulate Nitrate',
+                'ug m-3', 'ALL',
+                'ANO3',
+
+'TSP_NH4'     , 'Total Particulate Ammonium',
+                'ug m-3', 'ALL',
+                'ANH4',
+
+'TSP_MG'      , 'Total Particulate Magnesium',
+                'ug m-3', 'ALL',
+                'AMG',
+
+'TSP_CA'      , 'Total Particulate Calcium',
+                'ug m-3', 'ALL',
+                'ACA',
+
+'TSP_K'       , 'Total Particulate Potassium',
+                'ug m-3', 'ALL',
+                'AK',
+
+'TSP_NA'      , 'Total Particulate Sodium',
+                'ug m-3', 'ALL',
+                'ANA',
+
+'TSP_CL'      , 'Total Particulate Chloride',
+                'ug m-3', 'ALL',
+                'ACL',
+
+!-------------------------------------!
+!**** Gas+Particle Concentrations ****!
+!-------------------------------------!
+
+!-- Total Ammonia --!
+'NHX'         , 'Total Gas+Particle Ammonia', 
+                'ug m-3', 'ALL', 
+                'ANH4 + NH3',
+
+!-- Nitrate --!
+'NOY'         , 'NOy Concentration', 
+                'ppmV', 'ALL', 
+                'NO + NO2 + NO3 + N2O5 + HONO + HNO3 + ANO3 + PNA + CRON + CLNO2 + CLNO3 + PANS + NTR', 
+             
+'PMF_TNO3'    , 'Fine-Mode Nitrate plus Nitric Acid', 
+                'ug m-3', 'FINE', 
+                'ANO3 + HNO3',
+
+'PM25_TNO3'   , 'PM2.5 Nitrate plus Nitric Acid', 
+                'ug m-3', 'PM25', 
+                'ANO3 + HNO3',
+
+'TNO3'        , 'Total Nitrate only including Inorganics', 
+                'ug m-3', 'ALL', 
+                'ANO3 + HNO3',
+
+'TNO3_MOL'    , 'Total Nitrate only including Inorganics', 
+                'umol m-3', 'ALL', 
+                'ANO3 + HNO3',
+
+'TNO3TOT'     , 'Total Nitrate only including Organics', 
+                'umol m-3', 'ALL', 
+                'ANO3 + HNO3 + AISOPNN + AMTNO3',
+
+
+!------------------------!
+!**** Gas Deposition ****!
+!------------------------!
+
+!-- Organic Nitrates --!
+'DD_NTR'      , 'Dry Dep of Organic Nitrates', 
+                'kg ha-1', 'DEP', 
+                'DD_NTR1 + DD_NTR2 + DD_INTR',
+
+'WD_NTR'      , 'Wet Dep of Organic Nitrates', 
+                'kg ha-1', 'DEP', 
+                'WD_NTR1 + WD_NTR2 + WD_INTR',
+
+!-- PAN --!
+'DD_PANT'     , 'Dry Dep of Total PAN', 
+                'kg ha-1', 'DEP', 
+                'DD_PAN + DD_PANX + DD_OPAN',
+
+'WD_PANT'     , 'Wet Dep of Total PAN', 
+                'kg ha-1', 'DEP', 
+                'WD_PAN + WD_PANX + WD_OPAN',
+
+
+!-----------------------------!
+!**** Particle Deposition ****!
+!-----------------------------!
+
+!-- Nitrate --!
+'DD_PMF_NO3'  , 'Dry Dep of Fine-Mode Nitrate', 
+                'kg ha-1', 'DEP', 
+                'DD_ANO3I + DD_ANO3J',
+
+'DD_PMC_NO3'  , 'Dry Dep of Coarse-Mode Nitrate', 
+                'kg ha-1', 'DEP', 
+                'DD_ANO3K',
+
+'WD_TSP_NO3'  , 'Wet Dep of Particulate Nitrate', 
+                'kg ha-1', 'DEP', 
+                'WD_ANO3',
+
+!-- Ammonium --!
+'DD_PMF_NH4'  , 'Dry Dep of Fine-Mode Ammonium', 
+                'kg ha-1', 'DEP', 
+                'DD_ANH4I + DD_ANH4J',
+
+'DD_PMC_NH4'  , 'Dry Dep of Coarse-Mode Ammonium', 
+                'kg ha-1', 'DEP', 
+                'DD_ANH4K',
+
+'WD_TSP_NH4'  , 'Wet Dep of Particulate Ammonium', 
+                'kg ha-1', 'DEP', 
+                'WD_ANH4',
+
+!-- Sulfate --!
+'DD_PMF_SO4'  , 'Dry Dep of Fine-Mode Sulfate', 
+                'kg ha-1', 'DEP', 
+                'DD_ASO4I + DD_ASO4J',
+
+'DD_PMC_SO4'  , 'Dry Dep of Coarse-Mode Sulfate', 
+                'kg ha-1', 'DEP', 
+                'DD_ASO4K',
+
+'WD_TSP_SO4'  , 'Wet Dep of Particulate Sulfate', 
+                'kg ha-1', 'DEP', 
+                'WD_ASO4',
+
+!-- Monoterpene Nitrate --!
+'DD_PMF_MTNO3', 'Dry Dep of Fine-Mode Monoterpene Nitrate', 
+                'kg ha-1', 'DEP', 
+                'DD_AMTNO3',
+
+'WD_PMF_MTNO3', 'Wet Dep of Fine-Mode Monoterpene Nitrate', 
+                'kg ha-1', 'DEP', 
+                'WD_AMTNO3',
+
+!-- Elemental Carbon --!
+'DD_PMF_EC'   , 'Dry Dep of Fine-Mode Elemental Carbon', 
+                'kg ha-1', 'DEP', 
+                'DD_AECI + DD_AECJ',
+
+!-- Sodium --!
+'DD_PMF_NA'   , 'Dry Dep of Fine-Mode Sodium', 
+                'kg ha-1', 'DEP', 
+                'DD_ANAJ',
+
+'DD_PMC_NA'   , 'Dry Dep of Coarse-Mode Sodium', 
+                'kg ha-1', 'DEP', 
+                '0.8373*DD_ASEACAT + 0.0626*ASOIL + 0.0023*ACORS',
+
+'DD_TSP_NA'   , 'Dry Dep of Particulate Sodium', 
+                'kg ha-1', 'DEP', 
+                'DD_PMF_NA + DD_PMC_NA',
+
+'WD_PMC_NA'   , 'Wet Dep of Coarse-Mode Sodium', 
+                'kg ha-1', 'DEP', 
+                '0.8373*DD_ASEACAT + 0.0626*ASOIL + 0.0023*ACORS',
+
+'WD_TSP_NA'   , 'Wet Dep of Particulate Sodium', 
+                'kg ha-1', 'DEP', 
+                'WD_ANAJ + WD_PMC_NA',
+
+'TD_TSP_NA'   , 'Total Dep of Particulate Sodium', 
+                'kg ha-1', 'DEP', 
+                'DD_TSP_NA + WD_TSP_NA',
+
+!-- Chloride --!
+'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
+                'kg ha-1', 'DEP', 
+                'DD_ACLJ',
+
+'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride', 
+                'kg ha-1', 'DEP', 
+                'DD_ACLK',
+
+'DD_TSP_CL'   , 'Dry Dep of Particulate Chloride', 
+                'kg ha-1', 'DEP', 
+                'DD_PMF_CL + DD_PMC_CL',
+
+!-- Calcium --!
+'DD_PMF_CA'   , 'Dry Dep of Fine-Mode Calcium', 
+                'kg ha-1', 'DEP', 
+                'DD_ACAJ',
+
+'DD_PMC_CA'   , 'kg ha-1', 'DEP', 
+                'Dry Dep of Coarse-Mode Calcium', 
+                '0.032*DD_ASEACAT + 0.0838*DD_ASOIL + 0.0562*DD_ACORS',
+
+'DD_TSP_CA'   , 'Dry Dep of Particulate Calcium', 
+                'kg ha-1', 'DEP', 
+                'DD_PMF_CA + DD_PMC_CA',
+
+'WD_PMF_CA'   , 'Wet Dep of Fine-Mode Calcium', 
+                'kg ha-1', 'DEP', 
+                'WD_ACAJ',
+
+'WD_PMC_CA'   , 'Wet Dep of Coarse-Mode Calcium', 
+                'kg ha-1', 'DEP', 
+                '0.032*WD_ASEACAT + 0.0838*WD_ASOIL + 0.0562*WD_ACORS',
+
+'WD_TSP_CA'    , 'Wet Dep of Particulate Calcium', 
+                'kg ha-1', 'DEP', 
+                'WD_PMF_CA + WD_PMC_CA',
+
+!-- Iron --!
+'DD_PMF_FE'   , 'Dry Dep of Fine-Mode Iron', 
+                'kg ha-1', 'DEP', 
+                'DD_AFEJ',
+
+'WD_PMF_FE'   , 'Wet Dep of Fine-Mode Iron', 
+                'kg ha-1', 'DEP', 
+                'WD_AFEJ',
+
+!-- Aluminum --!
+'DD_PMF_AL'   , 'Dry Dep of Fine-Mode Aluminum', 
+                'kg ha-1', 'DEP', 
+                'DD_AALJ',
+
+'WD_PMF_AL'   , 'Wet Dep of Fine-Mode Aluminum', 
+                'kg ha-1', 'DEP', 
+                'WD_AALJ',
+
+!-- Silicon --!
+'DD_PMF_SI'   , 'Dry Dep of Fine-Mode Silicon', 
+                'kg ha-1', 'DEP', 
+                'DD_ASIJ',
+
+'WD_PMF_SI'   , 'Wet Dep of Fine-Mode Silicon', 
+                'kg ha-1', 'DEP', 
+                'WD_ASIJ',
+
+!-- Titanium --!
+'DD_PMF_TI'   , 'Dry Dep of Fine-Mode Titanium', 
+                'kg ha-1', 'DEP', 
+                'DD_ATIJ',
+
+'WD_PMF_TI'   , 'Wet Dep of Fine-Mode Titanium', 
+                'kg ha-1', 'DEP', 
+                'WD_ATIJ',
+
+! Manganese
+'DD_PMF_MN'   , 'Dry Dep of Fine-Mode Manganese', 
+                'kg ha-1', 'DEP', 
+                'DD_AMNJ',
+
+'WD_PMF_MN'   , 'Wet Dep of Fine-Mode Manganese', 
+                'kg ha-1', 'DEP', 
+                'WD_AMNJ',
+
+!-- Magnesium --!
+'DD_PMF_MG'   , 'Dry Dep of Fine-Mode Magnesium', 
+                'kg ha-1', 'DEP', 
+                'DD_AMGJ',
+
+'DD_PMC_MG'   , 'Dry Dep of Coarse-Mode Magnesium', 
+                'kg ha-1', 'DEP', 
+                '0.0997*DD_ASEACAT + 0.0170*DD_ASOIL + 0.0032*DD_ACORS',
+
+'DD_TSP_MG'   , 'Dry Dep of Particulate Magnesium', 
+                'kg ha-1', 'DEP', 
+                'DD_PMF_MG + DD_PMC_MG',
+
+'WD_PMF_MG'   , 'Wet Dep of Fine-Mode Magnesium', 
+                'kg ha-1', 'DEP', 
+                'WD_AMGJ',
+
+'WD_PMC_MG'   , 'Wet Dep of Coarse-Mode Magnesium', 
+                'kg ha-1', 'DEP', 
+                '0.0997*WD_ASEACAT + 0.0170*WD_ASOIL + 0.0032*WD_ACORS',
+
+'WD_TSP_MG'   , 'Wet Dep of Particulate Magnesium', 
+                'kg ha-1', 'DEP', 
+                'WD_PMF_MG + WD_PMC_MG',
+
+!-- Potassium --!
+'DD_PMF_K'    , 'Dry Dep of Fine-Mode Potassium', 
+                'kg ha-1', 'DEP', 
+                'DD_AKJ',
+
+'DD_PMC_K'    , 'Dry Dep of Coarse-Mode Potassium', 
+                'kg ha-1', 'DEP', 
+                '0.0310*DD_ASEACAT + 0.0242*DD_ASOIL + 0.0176*DD_ACORS',
+
+'DD_TSP_K'    , 'Dry Dep of Particulate Potassium', 
+                'kg ha-1', 'DEP', 
+                'DD_PMF_K + DD_PMC_K',
+
+'WD_PMF_K'    , 'Wet Dep of Fine-Mode Potassium', 
+                'kg ha-1', 'DEP', 
+                'WD_AKJ',
+
+'WD_PMC_K'    , 'Wet Dep of Coarse-Mode Potassium', 
+                'kg ha-1', 'DEP', 
+                '0.0310*WD_ASEACAT + 0.0242*WD_ASOIL + 0.0176*WD_ACORS',
+
+'WD_TSP_K'    , 'Wet Dep of Particulate Potassium', 
+                'kg ha-1', 'DEP', 
+                'WD_PMF_K + WD_PMC_K',
+
+!-- Sea Spray Sulfate --!
+'DD_PMF_SSSO4', 'Dry Dep of Fine-Mode Sea Spray Sulfate', 
+                'kg ha-1', 'DEP', 
+                '0.2514 * DD_ANAJ',
+
+'DD_PMC_SSSO4', 'Dry Dep of Coarse-Mode Sea Spray Sulfate', 
+                'kg ha-1', 'DEP', 
+                '0.2514 * DD_ANAK',
+
+'WD_TSP_SSSO4', 'Wet Dep of Particulate Sea Spray Sulfate', 
+                'kg ha-1', 'DEP', 
+                '0.2514 * WD_ANAJ + 0.2514 * WD_ANAK',
+
+
+!---------------------------------------!
+!**** Total Particle+Gas Deposition ****!
+!---------------------------------------!
+
+!-- Total Nitrate --!
+'DD_TNO3'     , 'Dry Dep of Total Nitrate', 
+                'kg ha-1', 'DEP', 
+                'DD_ANO3 + 0.984*DD_HNO3 + DD_NO3',
+
+'WD_TNO3'     , 'Wet Dep of Total Nitrate', 
+                'kg ha-1', 'DEP', 
+                'WD_ANO3 + 0.984*WD_HNO3 + WD_NO3',
+
+!-- Total Ammonia --!
+'DD_NHX'      , 'Dry Dep of Total Ammonia', 
+                'kg ha-1', 'DEP', 
+                'DD_ANH4 + 1.059*DD_NH3',
+
+'WD_NHX'      , 'Wet Dep of Total Ammonia', 
+                'kg ha-1', 'DEP', 
+                'WD_ANH4 + 1.059*WD_NH3',
+
+!-- Total Sulfate --!
+'WD_SOX'      , 'Wet Dep of Total Sulfate', 
+                'kg ha-1', 'DEP', 
+                'WD_ASO4 + 1.5*WD_SO2',
+
+!-- Total Chloride --!
+'WD_TCL'      , 'Wet Dep of Total Chloride', 
+                'kg ha-1', 'DEP', 
+                '0.972*WD_HCL + WD_CL2 + WD_ACL + 0.6758*WD_HOCL',
+
+'TD_TCL'      , 'Total Dep of Total Chloride', 
+                'kg ha-1', 'DEP', 
+                'WD_TCL + DD_TSP_CL',
+
+
+!-----------------------------!
+!**** Nitrogen Deposition ****!
+!-----------------------------!
+
+!-- Oxidized Nitrogen --!
+'DD_OXN_NOX'  , 'Dry Dep of Oxidized Nitrogen from NOx', 
+                'kgN ha-1', 'DEP', 
+                '0.30435*DD_NO2 + 0.46667*DD_NO',
+
+'WD_OXN_NOX'  , 'Wet Dep of Oxidized Nitrogen from NOx', 
+                'kgN ha-1', 'DEP', 
+                '0.30435*WD_NO2 + 0.46667*WD_NO',
+
+'DD_OXN_TNO3' , 'Dry Dep of Oxidized Nitrogen from Nitrate', 
+                'kgN ha-1', 'DEP', 
+                '0.22222*DD_HNO3 + 0.22581*DD_ANO3',
+
+'WD_OXN_TNO3' , 'Wet Dep of Oxidized Nitrogen from Nitrate', 
+                'kgN ha-1', 'DEP', 
+                '0.22222*WD_HNO3 + 0.22581*WD_ANO3',
+
+'DD_OXN_PANT' , 'Dry Dep of Oxidized Nitrogen from PAN', 
+                'kgN ha-1', 'DEP', 
+                '0.11570*DD_PAN + 0.11570*DD_PANX + 0.11570*DD_OPAN',
+
+'WD_OXN_PANT' , 'Wet Dep of Oxidized Nitrogen from PAN', 
+                'kgN ha-1', 'DEP', 
+                '0.11570*WD_PAN + 0.11570*WD_PANX + 0.11570*WD_OPAN',
+
+'DD_OXN_ORGN' , 'Dry Dep of Oxidized Nitrogen from Organic Nitrate', 
+                'kgN ha-1', 'DEP', 
+                '0.10770*DD_NTR1 + 0.10770*DD_NTR2 + 0.10770*DD_INTR + 0.06061*DD_AMTNO3 + DD_OXN_PANT', 
+
+'WD_OXN_ORGN' , 'Wet Dep of Oxidized Nitrogen from Organic Nitrate', 
+                'kgN ha-1', 'DEP', 
+                '0.10770*WD_NTR1 + 0.10770*WD_NTR2 + 0.10770*WD_INTR + 0.06061*WD_AMTNO3 + WD_OXN_PANT',
+
+'DD_OXN_OTHR' , 'Dry Dep of Oxidized Nitrogen from Other Components', 
+                'kgN ha-1', 'DEP', 
+                '0.25926*DD_N2O5 + 0.29787*DD_HONO + 0.17720*DD_PNA + 0.1717*DD_CLNO2 + 0.1436*DD_CLNO3',
+
+'WD_OXN_OTHR' , 'Wet Dep of Oxidized Nitrogen from Other Components', 
+                'kgN ha-1', 'DEP', 
+                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.17720*WD_PNA + 0.1717*WD_CLNO2 + 0.1436*WD_CLNO3',
+
+'DD_OXN_TOT'  , 'Dry Dep of Total Oxidized Nitrogen', 
+                'kgN ha-1', 'DEP', 
+                'DD_OXN_NOX + DD_OXN_TNO3 + DD_OXN_ORGN + DD_OXN_OTHR',
+
+'WD_OXN_TOT'  , 'Wet Dep of Total Oxidized Nitrogen', 
+                'kgN ha-1', 'DEP', 
+                'WD_OXN_NOX + WD_OXN_TNO3 + WD_OXN_ORGN + WD_OXN_OTHR',
+
+'TD_OXN_TOT'  , 'Total Dep of Total Oxidized Nitrogen', 
+                'kgN ha-1', 'DEP', 
+                'DD_OXN_TOT + WD_OXN_TOT',
+
+!-- Reduced Nitrogen --!
+'DD_REDN_TOT' , 'Dry Dep of Reduced Nitrogen', 
+                'kgN ha-1', 'DEP', 
+                '0.7777*DD_NHX',
+
+'WD_REDN_TOT' , 'Wet Dep of Reduced Nitrogen', 
+                'kgN ha-1', 'DEP', 
+                '0.7777*WD_NHX',
+
+'TD_REDN_TOT' , 'Total Dep of Reduced Nitrogen', 
+                'kgN ha-1', 'DEP', 
+                'DD_REDN_TOT + WD_REDN_TOT',
+
+!-- Total Nitrogen --!
+'DD_N_TOT'    , 'Dry Dep of Total Nitrogen', 
+                'kgN ha-1', 'DEP', 
+                'DD_OXN_TOT + DD_REDN_TOT',
+
+'WD_N_TOT'    , 'Wet Dep of Total Nitrogen', 
+                'kgN ha-1', 'DEP', 
+                'WD_OXN_TOT + WD_REDN_TOT',
+
+'TD_N_TOT'    , 'Total Dep of Total Nitrogen', 
+                'kgN ha-1', 'DEP', 
+                'DD_N_TOT + WD_N_TOT',
+
+!-- Nitrogen Deposition in milliequivalents Nitrogen --!
+'DD_OXN_TOTMEQ' , 'Dry Dep of Total Oxidized Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*DD_OXN_TOT',
+
+'WD_OXN_TOTMEQ' , 'Wet Dep of Total Oxidized Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*WD_OXN_TOT',
+
+'TD_OXN_TOTMEQ' , 'Total Dep of Total Oxidized Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  'DD_OXN_TOTMEQ + WD_OXN_TOTMEQ',
+
+'DD_REDN_TOTMEQ', 'Dry Dep of Total Reduced Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*DD_REDN_TOT',
+
+'WD_REDN_TOTMEQ', 'Wet Dep of Total Reduced Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*WD_REDN_TOT',
+
+'TD_REDN_TOTMEQ', 'Total Dep of Total Reduced Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  'DD_REDN_TOTMEQ + WD_REDN_TOTMEQ',
+
+'DD_N_TOTMEQ'   , 'Dry Dep of Total Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*DD_N_TOT',
+
+'WD_N_TOTMEQ'   , 'Wet Dep of Total Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*WD_N_TOT',
+
+'TD_N_TOTMEQ'   , 'Total Dep of Total Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  'DD_N_TOTMEQ + WD_N_TOTMEQ',
+
+
+!---------------------------!
+!**** Sulfur Deposition ****!
+!---------------------------!
    
-/
- 
+!-- Total Sulfur --!
+'DD_S_TOT'      , 'Dry Dep of Total Sulfur', 
+                  'kgS ha-1', 'DEP', 
+                  '0.5*DD_SO2 + 0.33333*DD_ASO4',
+
+'WD_S_TOT'      , 'Wet Dep of Total Sulfur', 
+                  'kgS ha-1', 'DEP', 
+                  '0.33333*WD_ASO4',
+
+'TD_S_TOT'      , 'Total Dep of Total Sulfur', 
+                  'kgS ha-1', 'DEP', 
+                  'DD_S_TOT + WD_S_TOT',
+
+!-- Sea Spray Sulfur --!
+'DD_S_SEA'      , 'Dry Dep of Sea Spray Sulfur', 
+                  'kgS ha-1', 'DEP', 
+                  '0.33333*DD_PMF_SSSO4 + 0.33333*DD_PMC_SSSO4',
+
+'WD_S_SEA'      , 'Wet Dep of Sea Spray Sulfur', 
+                  'kgS ha-1', 'DEP', 
+                  '0.33333*WD_PMF_SSSO4 + 0.33333*WD_PMC_SSSO4',
+
+'TD_S_SEA'      , 'Total Dep of Sea Spray Sulfur', 
+                  'kgS ha-1', 'DEP', 
+                  'DD_S_SEA + WD_S_SEA',
+
+!-- Sulfur Deposition in milliequivalents Sulfur --!
+'DD_S_TOTMEQ'   , 'Dry Dep of Total Sulfur', 
+                  'meqS m-2', 'DEP', 
+                  '6.24*DD_S_TOT',
+
+'WD_S_TOTMEQ'   , 'Wet Dep of Total Sulfur', 
+                  'meqS m-2', 'DEP', 
+                  '6.24*WD_S_TOT',
+
+'TD_S_TOTMEQ'   , 'Total Dep of Total Sulfur', 
+                  'meqS m-2', 'DEP', 
+                  'DD_S_TOTMEQ + WD_S_TOTMEQ',
+
+'DD_S_SEAMEQ'   , 'Dry Dep of Sea Spray Sulfur', 
+                  'meqS m-2', 'DEP', 
+                   '6.24*DD_S_SEA',
+
+'WD_S_SEAMEQ'   , 'Wet Dep of Sea Spray Sulfur', 
+                  'meqS m-2', 'DEP', 
+                  '6.24*WD_S_SEA',
+
+'TD_S_SEAMEQ'   , 'Total Dep of Sea Spray Sulfur', 
+                  'meqS m-2', 'DEP', 
+                  'DD_S_SEAMEQ + WD_S_SEAMEQ',
+                
+/        
