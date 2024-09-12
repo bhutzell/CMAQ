@@ -441,8 +441,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Inline lightning NOx configuration
   if ( $CTM_LNO_ONLINE == 'Y' ) then
   #> In-line lightning NOx options
-     setenv USE_LTNG_DATA_DATA  Y        #> use hourly lightning data input file [ default: Y ]
-     if ( $USE_LTNG_DATA_DATA == Y ) then
+     setenv USE_LTNG_DATA  Y        #> use hourly lightning data input file [ default: Y ]
+     if ( $USE_LTNG_DATA == Y ) then
         setenv LTNG_DATA ${IN_LTpath}/NLDN.12US1.${YYYYMMDD}.ioapi
 	setenv LNO_OPTION 1 # default, use lightning strikes such as NLDN, WWLLNs
         # LNO_OPTION 2:  use GLM flashes
