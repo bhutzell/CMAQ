@@ -90,7 +90,7 @@
   Lay_Top = 1, 5, 35
   File_Vars(1,:) = 'NOY','PM1','ASO4','*ANO3','PMF_CLDGLY','PM25_SO4','PM25_NH4'
   File_Vars(2,:) = 'NO2', 'FORM', 'SO2', 'O3', 'PM25', 'PM10', 'DENS', 'NOX', 'AOD_550','PM_EXT_550'
-  File_Vars(3,:) = 'AEC','KZ','ANH4J','PMAMS_SO4'
+  File_Vars(3,:) = 'AEC','KZ','ANH4J','PMAMS_SO4','AMET_GAS','AMET_ISAM'
 /
 
 
