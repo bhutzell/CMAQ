@@ -224,12 +224,14 @@
       CHARACTER( 16 ), SAVE :: PNAME = 'READ_ELMO_NML'
       CHARACTER( 200 )   :: XMSG
       CHARACTER( 200 )   :: TMPLINE
-      INTEGER IOS, IFL, N_VARS, VALUE
+      INTEGER IOS, IFL, N_VARS, VALUE, N
       CHARACTER( 5 )     :: CFIL
 
-      NAMELIST / ELMO_INIT  / N_Files, N_Max_Output_Variables
-      NAMELIST / ELMO_FILES / Flabel, Ftype, Tstep, Tmode, 
-     &                       Lay_Bot, Lay_Top, File_Vars
+      NAMELIST / ELMO_INIT  / N_Files, N_Max_Output_Variables,
+     &                        N_Keywords, N_Max_Keyword_Variables
+      NAMELIST / ELMO_FILES / Flabel, Tstep, Tmode, 
+     &                       Lay_Bot, Lay_Top, File_Vars,
+     &                       Keywd_name, Keywd
 
       L_ELMO = .TRUE.
 
@@ -266,6 +268,8 @@
       ! Read the number of ELMO Composite Variables
       N_FILES = 0
       N_MAX_OUTPUT_VARIABLES = 40
+      N_KEYWORDS = 0
+      N_MAX_KEYWORD_VARIABLES = 40
 
       REWIND( FUNIT )
       READ( NML = ELMO_INIT, UNIT = FUNIT, IOSTAT=STAT )
@@ -278,6 +282,7 @@
           CALL LOG_MESSAGE( LOGDEV, ' ')
           CALL LOG_MESSAGE( LOGDEV, XMSG )
           N_ELMO_FILES = 0
+          N_KEY = 0
           L_ELMO = .FALSE.
           RETURN
 
@@ -299,6 +304,8 @@
       ! If there are no files, then just return
       N_ELMO_FILES = N_FILES
       N_MX_VARS = N_MAX_OUTPUT_VARIABLES
+      N_KEY = N_KEYWORDS
+      N_MX_KEYVARS = N_MAX_KEYWORD_VARIABLES
       IF ( N_ELMO_FILES .LE. 0 ) THEN
           L_ELMO = .FALSE.
           RETURN
@@ -308,6 +315,7 @@
       ALLOCATE( FLABEL( N_FILES ), FTYPE( N_FILES ), TSTEP( N_FILES ),
      &          TMODE( N_FILES ), LAY_BOT( N_FILES ),
      &          LAY_TOP( N_FILES ), FILE_VARS( N_FILES, N_MX_VARS ),
+     &          KEYWD_NAME( N_KEY ), KEYWD( N_KEY,N_MX_KEYVARS ),
      &          STAT=STAT )
       CALL CHECKMEM( STAT, 'ELMO_FILE_NML',PNAME)
       FILE_VARS = ''
@@ -335,6 +343,7 @@
 
       DO IFL = 1,N_ELMO_FILES
         ! Type of Grid
+        FTYPE(:) = 'GRIDDED'
         CALL UPCASE( FTYPE( IFL ) )
         IF ( FTYPE( IFL ) .EQ. 'GRIDDED' ) THEN
             ELMO_FILE( IFL )%STRUCT     = 0
@@ -400,6 +409,23 @@
         END DO
       END DO
       
+      ! Populate KeyWords and Contents
+      ALLOCATE( ELMO_KEY( N_KEY ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'ELMO_KEY',PNAME )
+
+      DO IKEY = 1,N_KEY
+         ELMO_KEY( IKEY )%WORD = KEYWD_NAME( IKEY )
+
+         N = 0
+         DO IVAR = 1,N_MX_KEYVARS
+            IF ( KEYWD( IKEY,IVAR ) .NE. '' ) THEN
+               N = N + 1
+               ELMO_KEY( IKEY )%LIST( IVAR ) = KEYWD( IKEY,IVAR )
+            END IF
+         END DO
+         ELMO_KEY( IKEY )%N = N
+      END DO
+
       END SUBROUTINE READ_ELMO_NML
 
 !-------------------------------------------------------------------------

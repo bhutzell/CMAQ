@@ -256,7 +256,7 @@
 !------------------------------------------------------------------------------!
     
 &COMPOSITE_INIT
-  N_COMPOSITES = 184
+  N_MAX_COMPOSITES = 300
   N_MAX_COMPONENTS = 50
 /
 

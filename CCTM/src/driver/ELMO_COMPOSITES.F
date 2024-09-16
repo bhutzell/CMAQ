@@ -67,7 +67,7 @@
       INTEGER IAERO, IAER, ICOMP, IM
 
       ! Define Namelist Input from Mechanism-Specific Control File
-      Namelist / COMPOSITE_INIT / N_COMPOSITES, N_MAX_COMPONENTS
+      Namelist / COMPOSITE_INIT / N_MAX_COMPOSITES, N_MAX_COMPONENTS
       Namelist / ELMO_COMPOSITES / CMPST
 
       CALL LOG_MESSAGE( LOGDEV, ' ' )
@@ -96,7 +96,7 @@
       END IF
 
       ! Read the number of ELMO Composite Variables
-      N_COMPOSITES = 0
+      N_MAX_COMPOSITES = 0
       N_MAX_COMPONENTS = 1
       REWIND( FUNIT )
       READ( NML = COMPOSITE_INIT, UNIT = FUNIT, IOSTAT=IOST )
@@ -124,7 +124,7 @@
       END IF
 
       ! Allocate and Initialize Namelist Variables
-      ALLOCATE( CMPST( N_COMPOSITES + N_AEROSPC*3 ),
+      ALLOCATE( CMPST( N_MAX_COMPOSITES + N_AEROSPC*3 ),
      &          STAT=IOST )
       CALL CHECKMEM( IOST, 'CMPST',PNAME)
 
@@ -160,11 +160,9 @@
       END IF
 
       ! Check that all user-defined Composites are populated
-      DO ICOMP = 1,N_COMPOSITES
+      DO ICOMP = 1,N_MAX_COMPOSITES
          IF ( CMPST(ICOMP)%NAME .EQ. '' ) THEN
-            CALL M3EXIT ( 'DESID_READ_NAMELIST', 0, 0, 'One or more of the '//
-     &                    'user-defined ELMO composites are undefined in the '//
-     &                    'Chem_Control namelist file.', 1 )
+            N_COMPOSITES = ICOMP - 1
          END IF
       END DO
 
@@ -240,6 +238,9 @@
       END DO
 
       CLOSE( UNIT = FUNIT )
+
+      ! Reduce the size of CMPST from N_MAX_COMPOSITES to N_COMPOSITES
+      CMPST = CMPST( 1:N_COMPOSITES )
 
       END SUBROUTINE ELMO_READ_COMPOSITES
 
