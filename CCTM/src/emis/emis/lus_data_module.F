@@ -27,6 +27,9 @@
 !                     to map dust categories from LUFRAC. **NOTE land use type
 !                     with no mapped index has a dummy -999 value.** 
 !  31 Mar 2022 J. Willison Removed BELD as wbdust input 
+!  18 Sep 2024 C. Hogrefe Corrected erroneous mapping of NLCD40 and NLCD50
+!                         shrub/scrub and dwarf scrub to BELD3 barren rather
+!                         then BELD3 shrubland 
 !------------------------------------------------------------------------!
 
           module lus_data_module
