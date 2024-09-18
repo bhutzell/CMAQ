@@ -31,12 +31,17 @@
      &                     WET_AERO_M3, N_MODE, MOMENT0_CONC, MOMENT2_CONC,
      &                     MOMENT3_CONC, WET_AERO_DENS, AEROSPC_CONC,
      &                     AH2O_IDX, AORGH2O_IDX, AEROSPC, CALC_AERODIST_PARAMS,
-     &                     AEROMODE, DRY_AERO_DENS, APOC_IDX, APNCOM_IDX
+     &                     AEROMODE, DRY_AERO_DENS, APOC_IDX, APNCOM_IDX,
+     &                     AEROSPC_MAP
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, SRFTEMP, AIRPRES, DZ, CFRAC, PV, ZH
       USE CGRID_SPCS, ONLY : RHOJ_LOC
       USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, OASPC, MAP_OAtoAERO
       USE RUNTIME_VARS, ONLY : PHOTDIAG
       USE ASX_DATA_MOD, ONLY : MET_DATA
+
+#ifdef isam
+      USE SA_DEFN, ONLY : MAP_AEROtoSA,NTAG_SA
+#endif
 
       IMPLICIT NONE
 
@@ -46,10 +51,11 @@
       REAL VAL4, VAL3, VAL2, VAL, FRAC( N_MODE )
       REAL PM01, PM1, PM25, PM10, PMAMS, PM25to10, POM, POC, OtoC
       REAL K, P1, P2, P3, a, K2, PMF_NO3, PMF_NO3_LOSS,
-     &     PMF_NH4_LOSS, PMF_NH4, PMF_SO4, PMF_MASS,
+     &     PMF_NH4_LOSS, PMF_NH4, PMF_SO4, PMF,
      &     PM25_NH4, PM25_NO3, PM25_SO4, PM25_NO3_LOSS,
      &     PM25_NH4_LOSS
-      REAL SUM_PM_MODES
+      REAL SUM_PM_MODES, SUM_ORGS
+      LOGICAL ORG_MASK( N_OA )
       CHARACTER( 300 ) :: XMSG
 
       OUTVAL = 0.0
@@ -234,8 +240,8 @@
          ! Calculate AHPMOLAL - Fine Mode Concentration of H+ in
          ! Particle Water
          CASE ( ID_PMF_HPM )
-            ! Retrieve AHPLUSIJ
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, 
+            ! Retrieve AHPLUSIJ (umol m-3)
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IU_UMOLpM3, 
      &                      J=J_PMF_HP( ISRC+1 ), IERR=IERR )
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_HP has not been defined in the chem control namelist '//
@@ -243,31 +249,31 @@
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF 
 
-            ! Retrieve AH2OIJ
-            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, 
+            ! Retrieve AH2OIJ (ug m-3)
+            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IU_UGpM3, 
      &                      J=J_PMF_H2O( ISRC+1 ), IERR=IERR )
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_H2O has not been defined in the chem control namelist'//
-     &                'so PMF_HPM cannot be calculated. Please define PMF_H2O.'
+     &                'so PMF_HPMOLAL cannot be calculated. Please define PMF_H2O.'
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
             
-            ! HPMOLAL = AHPLUSIJ / AH2OIJ * 1000.0 [mol L-1]
+            ! HPMOLAL = AHPLUSIJ / AH2OIJ * 1000.0 [mol kg-1]
             OUTVAL = VAL / VAL2 * 1000.0
 
          ! Calculate PMF_PH - Fine-Mode pH
          CASE ( ID_PMF_PH )
-            ! Retrieve HPMOLAL
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, 
-     &                      J=J_PMF_HPM( ISRC+1 ), IERR=IERR )
+            ! Retrieve HPMOLAL (mol kg-1)
+            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IU_MOLpKG, 
+     &                      J=J_PMF_HPMOLAL( ISRC+1 ), IERR=IERR )
             IF ( IERR .EQ. 1 ) THEN
-               XMSG = 'PMF_HPM has not been defined in the chem control namelist'//
-     &                'so PMF_PH cannot be calculated. Please define PMF_HPM.'
+               XMSG = 'PMF_HPMOLAL has not been defined in the chem control namelist'//
+     &                'so PMF_PH cannot be calculated. Please define PMF_HPMOLAL.'
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
 
-            ! Retrieve AH2OIJ
-            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, 
+            ! Retrieve AH2OIJ (ug m-3)
+            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IU_UGpM3, 
      &                      J=J_PMF_H2O( ISRC+1 ), IERR=IERR )
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_H2O has not been defined in the chem control namelist'//
@@ -275,284 +281,186 @@
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
 
-#ifdef mpas
-            OUTVAL = -9.999E36
-#else
-            OUTVAL = BADVAL3
-#endif
+            OUTVAL = ELMO_BLANK
+
             IF ( VAL2 .GT. 0.01 )
      &           OUTVAL = -1.0 * LOG10( VAL )
 
-         ! Calculate POCIJ - Fine-Mode Primary Organic Carbon Mass
-         CASE ( ID_PMF_POC )
-            ! Sum up primary organic aerosol species normalized to
-            ! just carbon mass
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-                ! Just Select Primary Species
-                IF ( OASPC( IOA )%PRIMARY ) THEN  
-                   IF ( OASPC( IOA )%OMtoOC .gt. 0.0 ) 
-     &                VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ),
-     &                            MASK = AEROMODE(:)%FINE_MASK ) 
-     &                          / OASPC( IOA )%OMtoOC
-                END IF
-            END DO
-            OUTVAL = VAL
-      
-         ! Calculate SOCIJ - Fine-Mode Secondary Organic Carbon Mass
-         CASE ( ID_PMF_SOC )
-            ! Sum up primary organic aerosol species normalized to
-            ! just carbon mass
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-                ! Just Select Secondary Species
-                IF ( OASPC( IOA )%OMtoOC .GT. 0.0 .AND. .NOT. OASPC( IOA )%PRIMARY ) THEN  
-                      VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ),
-     &                            MASK = AEROMODE(:)%FINE_MASK ) 
-     &                          / OASPC( IOA )%OMtoOC
-                END IF
-            END DO
-            OUTVAL = VAL 
-       
-         ! Calculate OCIJ - Fine-Mode Organic Carbon Mass
-         CASE ( ID_PMF_OC )
-            ! Sum up primary organic aerosol species normalized to
-            ! just carbon mass
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-               ! Skip species with negative OM:OC
-               IF ( OASPC( IOA )%OMtoOC .GT. 0.0 ) THEN
-                  VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ),
-     &                        MASK = AEROMODE(:)%FINE_MASK ) 
-     &                      / OASPC( IOA )%OMtoOC
-               END IF
-            END DO
-            OUTVAL = VAL  
+         ! Calculate PMF_OA - Fine-Mode Organic Aerosol Mass
+         CASE ( ID_PMF_OA )
+            ORG_MASK = .TRUE.
+            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, 0, 0, IV, ISRC )
 
          ! Calculate PMF_POA - Fine-Mode Primary Organic Aerosol Mass
          CASE ( ID_PMF_POA )
-            ! Sum up primary organic aerosol species 
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-                ! Just Select Primary Species
-                IF ( OASPC( IOA )%PRIMARY ) 
-     &             VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ),
-     &                         MASK = AEROMODE(:)%FINE_MASK ) 
-            END DO
-            OUTVAL = VAL
- 
+            ORG_MASK = OASPC(:)%PRIMARY
+            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, 0, 0, IV, ISRC )
+
          ! Calculate PMF_SOA - Fine-Mode Secondary Organic Aerosol Mass
          CASE ( ID_PMF_SOA )
-            ! Sum up primary organic aerosol species 
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-                ! Just Select Secondary Species
-                IF ( .NOT.OASPC( IOA )%PRIMARY ) 
-     &             VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ),
-     &                         MASK = AEROMODE(:)%FINE_MASK ) 
-            END DO
-            OUTVAL = VAL
- 
-         ! Calculate PMF_OA - Fine-Mode Organic Aerosol Mass
-         CASE ( ID_PMF_OA )
-            ! Sum up primary organic aerosol species 
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-                VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ),
-     &                      MASK = AEROMODE(:)%FINE_MASK ) 
-            END DO
-            OUTVAL = VAL    
-         
+            ORG_MASK = .NOT. OASPC(:)%PRIMARY
+            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Fine-Mode Organic Carbon Mass
+         CASE ( ID_PMF_OC )
+            ORG_MASK = OASPC( : )%OMtoOC .GT. 0.0
+            OUTVAL = SUM_ORGS( OT_OC, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Fine-Particle Primary Organic Carbon Mass
+         CASE ( ID_PMF_POC )
+            ORG_MASK = ( OASPC(:)%OMtoOC .GT. 0.0 ) .AND.
+     &                 ( OASPC(:)%PRIMARY )
+            OUTVAL = SUM_ORGS( OT_OC, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Fine-Particle Secondary Organic Carbon Mass
+         CASE ( ID_PMF_SOC )
+            ORG_MASK = ( OASPC(:)%OMtoOC .GT. 0.0 ) .AND.
+     &                 ( .NOT. OASPC(:)%PRIMARY )
+            OUTVAL = SUM_ORGS( OT_OC, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, 0, 0, IV, ISRC )
+
          ! Calculate PMF_ASOA - Fine-Mode Anthropogenic OA Mass
          CASE ( ID_PMF_ASOA )
-            ! Sum up anthropogenic oa species 
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-                ! Just Select Anthropogenic Species
-                IF ( .NOT.OASPC( IOA )%PRIMARY .AND. OASPC( IOA )%ANTHRO  ) 
-     &             VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ),
-     &                         MASK = AEROMODE(:)%FINE_MASK ) 
-            END DO
-            OUTVAL = VAL
-          
+            ORG_MASK = ( .NOT. OASPC(:)%PRIMARY ) .AND.
+     &                 ( OASPC(:)%ANTHRO )
+            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, 0, 0, IV, ISRC )
+
          ! Calculate PMF_BSOA - Fine-Mode Biogenic SOA Mass
          CASE ( ID_PMF_BSOA )
-            ! Sum up biogenic soa species 
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers 
-                ! Just Select Biogenic Secondary Species
-                IF ( .NOT.OASPC( IOA )%PRIMARY .AND. OASPC( IOA )%BIOG  ) 
-     &             VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ),
-     &                         MASK = AEROMODE(:)%FINE_MASK ) 
-            END DO
-            OUTVAL = VAL
- 
+            ORG_MASK = ( .NOT. OASPC(:)%PRIMARY ) .AND.
+     &                 ( OASPC(:)%BIOG )
+            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, 0, 0, IV, ISRC )
+
          ! Calculate PMF_OMOC - Fine-Mode OM:OC 
          CASE ( ID_PMF_OMOC )
-            VAL  = 0.0
-            VAL2 = 0.0
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, 
-     &                      J=J_PMF_OA( ISRC+1 ), IERR=IERR )
-            IF ( IERR .EQ. 1 ) THEN
-               XMSG = 'PMF_OA has not been defined in the chem control namelist'//
-     &                'so PMF_OMOC cannot be calculated. Please define PMF_OA.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
-            END IF
+            ORG_MASK = ( OASPC(:)%OMtoOC .GT. 0.0 ) 
+            OUTVAL = SUM_ORGS( OT_OMOC, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, 0, 0, IV, ISRC )
 
-            CALL CALC_ELMO( OUTVAL=VAL2,OUT_UNIT=IUNIT, 
-     &                      J=J_PMF_OC( ISRC+1 ), IERR=IERR )
-            IF ( IERR .EQ. 1 ) THEN
-               XMSG = 'PMF_OC has not been defined in the chem control namelist'//
-     &                'so PMF_OMOC cannot be calculated. Please define PMF_OC.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
-            END IF
-
-            OUTVAL = VAL / ( VAL2 + TINY( 0.0 ) )
-            
          ! Calculate PMF_OtoC - Fine-Mode O:C 
          CASE ( ID_PMF_OtoC )
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT, 
-     &                      J=J_PMF_OA( ISRC+1 ), IERR=IERR  )
-            IF ( IERR .EQ. 1 ) THEN
-               XMSG = 'PMF_OA has not been defined in the chem control namelist'//
-     &                'so PMF_OtoC cannot be calculated. Please define PMF_OA.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
-            END IF
+            ORG_MASK = .TRUE.
+            OUTVAL = SUM_ORGS( OT_OTOC, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, 0, 0, IV, ISRC )
 
-            VAL2 = 0.0
-            DO IOA = 1,N_OA_NotTracers
-               IF ( MAP_OAtoAERO(IOA) .NE. APOC_IDX .AND.
-     &              MAP_OAtoAERO(IOA) .NE. APNCOM_IDX ) THEN
-                  ! Weight OA Sum by O:C
-                  VAL2 = VAL2 + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ), 
-     &                               MASK = AEROMODE(:)%FINE_MASK )        
-     &                          * OASPC(IOA)%OtoC                    
-               END IF
-            END DO
-            ! Add POC/PNCOM Contribution to Weighted O:C
-            POC = SUM( AEROSPC_CONC(APOC_IDX,:),MASK = AEROMODE(:)%FINE_MASK )
-            POM = POC + SUM( AEROSPC_CONC(APNCOM_IDX,:), MASK = AEROMODE(:)%FINE_MASK )
-
-            ! Calculate O:C from OM:OC using the relationship from Aiken
-            ! et al. ES&T (2008), Fig. 4A. The best-fit line is rearranged to
-            ! solve for O:C as a function of OM:OC.
-            OtoC = 12./15. * ( POM / ( POC + TINY(0.0) ) )- 14./15.  
-            
-            OUTVAL = ( VAL2 + OtoC*POM ) / ( VAL + TINY(0.0))
+         ! Calculate PM1_OM - PM1.0 Organic Aerosol Mass
+         CASE ( ID_PM1_OA )
+            ORG_MASK = .TRUE.
+            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, IPM1, IWET, IV, ISRC )
 
          ! Calculate PM1_OC - PM1.0 Organic Carbon Mass
          CASE ( ID_PM1_OC )
-            ! Save PM1 Fraction for each mode
-            DO IMODE = 1,N_MODE
-                CALL GET_AERO_INLET( IPM1, IMODE, IWET, FRAC( IMODE ) ) 
-            END DO
-            ! Sum up primary organic aerosol species normalized to
-            ! just carbon mass
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-               IF ( OASPC( IOA )%OMtoOC .GE. 0.0 ) 
-     &              VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ) * FRAC(:))
-     &                         / OASPC( IOA )%OMtoOC
-            END DO
-            OUTVAL = VAL  
- 
-         ! Calculate PM1_OM - PM1.0 Organic Aerosol Mass
-         CASE ( ID_PM1_OA )
-            ! Save PM1 Fraction for each mode
-            DO IMODE = 1,N_MODE
-                CALL GET_AERO_INLET( IPM1, IMODE, IWET, FRAC( IMODE ) ) 
-            END DO
-            ! Sum up primary organic aerosol species
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-               VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ) * FRAC(:))
-            END DO
-            OUTVAL = VAL  
- 
-         ! Calculate PM25_OC - PM2.5 Organic Carbon Mass
-         CASE ( ID_PM25_OC )
-            ! Save PM2.5 Fraction for each mode
-            DO IMODE = 1,N_MODE
-                CALL GET_AERO_INLET( IPM25, IMODE, IWET, FRAC( IMODE ) ) 
-            END DO
-            ! Sum up primary organic aerosol species normalized to
-            ! just carbon mass
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-               IF ( OASPC( IOA )%OMtoOC .GE. 0.0 ) 
-     &              VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ) * FRAC(:) )
-     &                        / OASPC( IOA )%OMtoOC
-            END DO
-            OUTVAL = VAL  
- 
+            ORG_MASK = OASPC( : )%OMtoOC .GT. 0.0
+            OUTVAL = SUM_ORGS( OT_OC, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, IPM1, IWET, IV, ISRC )
+
          ! Calculate PM25_OM - PM2.5 Organic Aerosol Mass
          CASE ( ID_PM25_OA )
-            ! Save PM2.5 Fraction for each mode
-            DO IMODE = 1,N_MODE
-                CALL GET_AERO_INLET( IPM25, IMODE, IWET, FRAC( IMODE ) ) 
-            END DO
-            ! Sum up primary organic aerosol species
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-               VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ) * FRAC(:) )
-            END DO
-            OUTVAL = VAL  
- 
+            ORG_MASK = .TRUE.
+            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, IPM25, IWET, IV, ISRC )
+
+         ! Calculate PM25_OC - PM2.5 Organic Carbon Mass
+         CASE ( ID_PM25_OC )
+            ORG_MASK = OASPC( : )%OMtoOC .GT. 0.0
+            OUTVAL = SUM_ORGS( OT_OC, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, IPM25, IWET, IV, ISRC )
+
          ! Retrieve OA Concentration Relevant for the AMS
          CASE ( ID_AMS_OA )
-            ! Save AMS Fraction for each mode
-            DO IMODE = 1,N_MODE
-                CALL GET_AERO_INLET( IPMAMS, IMODE, IWET, FRAC( IMODE ) ) 
-            END DO
-            ! Sum up OA AMS mass
-            VAL = 0.0
-            DO IOA = 1,N_OA_NotTracers
-               VAL = VAL + SUM( AEROSPC_CONC( MAP_OAtoAERO(IOA),: ) * FRAC(:) )
-            END DO
-            OUTVAL = VAL
-              
+            ORG_MASK = .TRUE.
+            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, IPMAMS, IWET, IV, ISRC )
+
          ! Calculate O:C relevant for AMS observations
          CASE ( ID_AMS_OtoC )
-            CALL CALC_ELMO( OUTVAL=VAL, OUT_UNIT=IUNIT,
-     &                      J=J_AMS_OA( ISRC+1 ), IERR=IERR )
-            IF ( IERR .EQ. 1 ) THEN
-               XMSG = 'AMS_OA has not been defined in the chem control namelist'//
-     &                'so AMS_OtoC cannot be calculated. Please define AMS_OA.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
-            END IF
+            ORG_MASK = .TRUE.
+            OUTVAL = SUM_ORGS( OT_OTOC, ORG_MASK, 
+     &                         AEROMODE(:)%FINE_MASK, IPMAMS, IWET, IV, ISRC )
 
-            ! Save AMS Fraction for each mode
-            DO IMODE = 1,N_MODE
-                CALL GET_AERO_INLET( IPMAMS, IMODE, IWET, FRAC( IMODE ) ) 
-            END DO
+         ! Calculate Dry Deposition of Total OA
+         CASE ( ID_DD_OA )
+            ORG_MASK = .TRUE.
+            OUTVAL = SUM_ORGS( OT_DD_OA, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
 
-            VAL2 = 0.0
-            VAL4 = 0.0
-            DO IMODE = 1,N_MODE
-               DO IOA = 1,N_OA_NotTracers
-                  IF ( MAP_OAtoAERO(IOA) .NE. APOC_IDX .AND.
-     &                 MAP_OAtoAERO(IOA) .NE. APNCOM_IDX ) THEN
-                     ! Weight OA Sum by O:C
-                     VAL2 = VAL2 + AEROSPC_CONC( MAP_OAtoAERO(IOA),IMODE )        
-     &                         * OASPC(IOA)%OtoC * FRAC( IMODE )
-                  END IF
-               END DO
-               ! Add POC/PNCOM Contribution to Weighted O:C
-               ! Calculate O:C from OM:OC using the relationship from Aiken
-               ! et al. ES&T (2008), Fig. 4A. The best-fit line is rearranged to
-               ! solve for O:C as a function of OM:OC.
-               VAL3 = ( AEROSPC_CONC(APOC_IDX,IMODE) 
-     &                + AEROSPC_CONC(APNCOM_IDX,IMODE) ) * FRAC( IMODE )
-               VAL3 = ( 12./15. * ( VAL3 / ( AEROSPC_CONC(APOC_IDX,IMODE)
-     &                                      *FRAC(IMODE) 
-     &                           + TINY(0.0) ) ) - 14./15. ) * VAL3
-               VAL4 = VAL4 + VAL3
-            END DO
-            OUTVAL = ( VAL2 + VAL4 ) / ( VAL + TINY(0.0))
- 
+         ! Calculate Wet Deposition of Total OA
+         CASE ( ID_WD_OA )
+            ORG_MASK = .TRUE.
+            OUTVAL = SUM_ORGS( OT_WD_OA, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Dry Deposition of Total OC
+         CASE ( ID_DD_OC )
+            ORG_MASK = .TRUE.
+            OUTVAL = SUM_ORGS( OT_DD_OC, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Wet Deposition of Total OC
+         CASE ( ID_WD_OC )
+            ORG_MASK = .TRUE.
+            OUTVAL = SUM_ORGS( OT_WD_OC, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Dry Deposition of Primary OA
+         CASE ( ID_DD_POA )
+            ORG_MASK = OASPC(:)%PRIMARY
+            OUTVAL = SUM_ORGS( OT_DD_OA, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Wet Deposition of Primary OA
+         CASE ( ID_WD_POA )
+            ORG_MASK = OASPC(:)%PRIMARY
+            OUTVAL = SUM_ORGS( OT_WD_OA, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Dry Deposition of Primary OC
+         CASE ( ID_DD_POC )
+            ORG_MASK = OASPC(:)%PRIMARY
+            OUTVAL = SUM_ORGS( OT_DD_OC, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Wet Deposition of Primary OC
+         CASE ( ID_WD_POC )
+            ORG_MASK = OASPC(:)%PRIMARY
+            OUTVAL = SUM_ORGS( OT_WD_OC, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Dry Deposition of Secondary OA
+         CASE ( ID_DD_SOA )
+            ORG_MASK = .NOT. OASPC(:)%PRIMARY
+            OUTVAL = SUM_ORGS( OT_DD_OA, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Wet Deposition of Secondary OA
+         CASE ( ID_WD_SOA )
+            ORG_MASK = .NOT. OASPC(:)%PRIMARY
+            OUTVAL = SUM_ORGS( OT_WD_OA, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Dry Deposition of Secondary OC
+         CASE ( ID_DD_SOC )
+            ORG_MASK = .NOT. OASPC(:)%PRIMARY
+            OUTVAL = SUM_ORGS( OT_DD_OC, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
+         ! Calculate Wet Deposition of Secondary OC
+         CASE ( ID_WD_SOC )
+            ORG_MASK = .NOT. OASPC(:)%PRIMARY
+            OUTVAL = SUM_ORGS( OT_WD_OC, ORG_MASK, 
+     &                         AEROMODE(:)%ALL_MASK, 0, 0, IV, ISRC )
+
          ! Calculate Aerosol Fraction of Benzo-a-Pyrene
          CASE ( ID_BENAPY_FAERO )
-            CALL CALC_ELMO( OUTVAL=VAL,  OUT_UNIT=IUNIT, 
+            CALL CALC_ELMO( OUTVAL=VAL,  OUT_UNIT=IU_UGpM3, 
      &                      J=J_PMF_BENAPY( ISRC+1 ), IERR=IERR )
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_BENAPY has not been defined in the chem control namelist'//
@@ -560,7 +468,7 @@
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
             
-            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IUNIT, 
+            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IU_UGpM3, 
      &                      J=J_GAS_BENAPY( ISRC+1 ), IERR=IERR )
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'GAS_BENAPY has not been defined in the chem control namelist'//
@@ -612,16 +520,9 @@
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
             
-            CALL CALC_ELMO( OUTVAL=PMF_MASS, OUT_UNIT=IUNIT, 
-     &                      J=J_PMF_MASS( ISRC+1 ), IERR=IERR ) 
-            IF ( IERR .EQ. 1 ) THEN
-               XMSG = 'PMF_MASS has not been defined in the chem control namelist'//
-     &                'so PMF_FRM cannot be calculated. Please define PMF_MASS.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
-            END IF
-            
+            PMF = SUM_PM_MODES( AEROMODE%FINE_MASK, 0, 0, IV, ISRC ) 
 
-            OUTVAL = PMF_MASS - PMF_NO3_LOSS - PMF_NH4_LOSS
+            OUTVAL = PMF - PMF_NO3_LOSS - PMF_NH4_LOSS
      &                      +0.24 * ( PMF_SO4 + PMF_NH4 - PMF_NH4_LOSS ) + 0.5
           
          ! Retrieve PM2.5 Particle Mass Collected by the Federal
@@ -637,7 +538,7 @@
             ELSE
                 K2 = ( K * ( P1 - P2*a + P3*a*a ) * ( a**1.75 ) ) ** 0.5
             END IF
-
+            
             CALL CALC_ELMO( OUTVAL=PM25_NO3, OUT_UNIT=IUNIT, 
      &                      J=J_PM25_NO3( ISRC+1 ), IERR=IERR )
             IF ( IERR .EQ. 1 ) THEN
@@ -666,6 +567,8 @@
                CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
             END IF
             
+            PM25 = SUM_PM_MODES( AEROMODE%ALL_MASK, IPM25, IWET, IV, ISRC ) 
+
             OUTVAL = PM25 - PM25_NO3_LOSS - PM25_NH4_LOSS
      &                      +0.24 * ( PM25_SO4 + PM25_NH4 - PM25_NH4_LOSS ) + 0.5
           
@@ -702,11 +605,7 @@
              IF ( L1 .EQ. 1 ) THEN
                  OUTVAL = ELMO_AOD_550( C1,R1 )
              ELSE
-#ifdef mpas
-                 OUTVAL = -9.000E36
-#else
-                 OUTVAL = AMISS3
-#endif
+                 OUTVAL = ELMO_BLANK
              END IF
 
          ! Retrieve Aerosol Extinction at 550 nm
@@ -718,28 +617,28 @@
              IF ( L1 .EQ. 1 ) THEN
              OUTVAL = ELMO_NO2COL( C1,R1 )
              ELSE
-             OUTVAL = AMISS3
+             OUTVAL = ELMO_BLANK
              END IF
 
          CASE ( ID_SO2COL )
              IF ( L1 .EQ. 1 ) THEN
              OUTVAL = ELMO_SO2COL( C1,R1 )
              ELSE
-             OUTVAL = AMISS3
+             OUTVAL = ELMO_BLANK
              END IF
 
          CASE ( ID_HCHOCOL )
              IF ( L1 .EQ. 1 ) THEN
              OUTVAL = ELMO_HCHOCOL( C1,R1 )
              ELSE
-             OUTVAL = AMISS3
+             OUTVAL = ELMO_BLANK
              END IF
 
          CASE ( ID_COCOL )
              IF ( L1 .EQ. 1 ) THEN
              OUTVAL = ELMO_COCOL( C1,R1 )
              ELSE
-             OUTVAL = AMISS3
+             OUTVAL = ELMO_BLANK
              END IF
 
          ! Vertical diffusivity coefficients
@@ -764,6 +663,30 @@
          ! Retrieve Air Pressure
          CASE ( ID_PRES )
             OUTVAL = AIRPRES
+
+         ! Retrieve PBL Height
+         CASE ( ID_PBL )
+            OUTVAL = PBL
+
+         ! Retrieve Solar Radiation at Ground
+         CASE ( ID_RGRND )
+            OUTVAL = RGRND
+
+         ! Retrieve Precipitation
+         CASE ( ID_PRECIP )
+            IF ( RC .GE. 0.0 ) THEN
+              OUTVAL = RN + RC
+            ELSE
+              OUTVAL = RN
+            END IF
+
+         ! Retrieve Wind Speed at 10 m
+         CASE ( ID_WSPD10 )
+            OUTVAL = WSPD10
+
+         ! Retrieve Wind Direction at 10 m
+         CASE ( ID_WDIR10 )
+            OUTVAL = WDIR10
 
          ! Retrieve DZ
          CASE ( ID_DZ )
@@ -896,3 +819,418 @@
 
       END FUNCTION SUM_PM_MODES
 
+!----------------------------------------------------------------------
+      RECURSIVE FUNCTION SUM_ORGS( ORG_TYPE, ORG_MASK, MODE_MASK, INLET, 
+     &                        WETNESS, IV, ISRC ) RESULT( OUTVAL )
+!----------------------------------------------------------------------
+!     SUM_ORGS returns the sum of total Organic species given a mask
+!     of which species to add. This mask should be of the same length
+!     as those in the OASPC table. That length of ORG_MASK is 
+!     N_OA_NotTracers. The input variable ORG_TYPE specifies which 
+!     organic aerosol metric to calcualte (e.g. mass, carbon, OM:OC,
+!     or O:C).
+!
+!     Size specifications are communicated via the MODE_MASK and INLET 
+!     parameters.
+!
+!     The input variable IV instructs the function to sum for ISAM or
+!     DDM variables instead, and the variable ISRC identifies which
+!     source to sum.          
+!----------------------------------------------------------------------
+
+      USE AERO_DATA, ONLY: N_MODE, AEROSPC_CONC, AH2O_IDX, AORGH2O_IDX, 
+     &                     AEROSPC, N_AEROSPC, AEROSPC_MAP, 
+     &                     AEROMODE, APOC_IDX, APNCOM_IDX, AERO_MISSING
+      USE CGRID_SPCS, ONLY : MAP_CGRIDtoWDEP
+      USE VDIFF_MAP, ONLY : DEPV_MAP
+      USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, MAP_OAtoAERO, OASPC
+      USE ELMO_DATA, ONLY : ET_CMPST, ET_DRVD, OT_OA, OT_OC, OT_OMOC, 
+     &                      OT_OTOC, OT_DD_OA, OT_DD_OC, OT_WD_OA, 
+     &                      OT_DD_OC, OT_WD_OC, ET_DRVD_DDEP, ET_DRVD_WDEP,
+     &                      ET_ISAM_DRVD, ET_ISAM_DRVD_DDEP, ET_ISAM_DRVD_WDEP,
+     &                      ET_DDM_DRVD, ET_DDM_DRVD_DDEP, ET_DDM_DRVD_WDEP,
+     &                      DDEP_VEC, WDEP_VEC
+#ifdef isam      
+      USE ELMO_DATA, ONLY : ISAM_VEC
+      USE SA_DEFN, ONLY : MAP_AEROtoSA, NTAG_SA
+#endif
+#ifdef sens
+      USE ELMO_DATA, ONLY : ET_DDM_CMPST, ET_DDM_DRVD, DDM_VEC
+      USE AERO_DDM3D, ONLY : S_AEROSPC_CONC
+#endif
+
+
+      IMPLICIT NONE
+
+      INTEGER :: ORG_TYPE
+      LOGICAL :: ORG_MASK( N_OA )
+      LOGICAL :: MODE_MASK( N_MODE )  ! Mask Indicating which modes to sum
+      INTEGER :: IV, ISRC             ! ELMO Variable type, Source number
+      INTEGER :: INLET                ! Integer prescribing the inlet type
+      INTEGER :: WETNESS              ! 1 = Wet Aerosol; 2 = Dry Aerosol
+                                      !   (see ELMO_INLET table in ELMO_DATA module)
+      INTEGER :: IM, IAER, ISA, IOA, IVAR
+      REAL    :: FRAC( N_MODE ), VAL, VAL2,
+     &           POC, POM, OtoC
+      REAL    :: OUTVAL
+                                        
+      ! Loop through modes and calculate inlet fraction     
+      IF ( ORG_TYPE .NE. OT_OMOC ) THEN
+        DO IM = 1,N_MODE
+           CALL GET_AERO_INLET( INLET, IM, WETNESS, FRAC(IM) )
+        END DO
+      END IF
+
+      ! Calculate Organic Aerosol Metric
+      OUTVAL = 0.0
+ 
+      SELECT CASE ( ORG_TYPE )
+        CASE ( OT_OA )
+          ! Sum up organic aerosol mass
+          DO IOA = 1,N_OA_NotTracers
+             DO IM = 1,N_MODE
+                ! Just Select Species from the Org_Mask
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
+                    
+                   IF ( IV .EQ. ET_DRVD ) THEN  ! Core Model
+                     OUTVAL = OUTVAL + FRAC( IM ) 
+     &                        * AEROSPC_CONC( MAP_OAtoAERO(IOA),IM )
+
+                   ELSE IF ( IV .EQ. ET_ISAM_DRVD ) THEN  ! ISAM
+#ifdef isam      
+                     IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IMODE )
+                     IF ( ISRC .LE. NTAG_SA ) THEN
+                       OUTVAL = OUTVAL + FRAC( IM ) * ISAM_VEC( IVAR,ISRC ) 
+                     ELSE
+                       OUTVAL = OUTVAL + FRAC( IM ) * SUM(ISAM_VEC( IVAR,: )) 
+                     END IF
+#endif
+                   ELSE IF ( IV .EQ. ET_DDM_DRVD ) THEN  ! DDM
+#ifdef sens      
+                     IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IMODE )
+                     OUTVAL = OUTVAL + FRAC( IM ) * DDM_VEC( ISRC,IVAR ) 
+#endif
+                   END IF 
+                END IF
+             END DO
+          END DO
+ 
+        CASE ( OT_OC )
+          ! Sum up organic carbon mass
+          DO IOA = 1,N_OA_NotTracers
+             DO IM = 1,N_MODE 
+                ! Just Select Species from the Org_Mask
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
+
+                   IF ( IV .EQ. ET_DRVD ) THEN  ! Core Model
+                     OUTVAL = OUTVAL + FRAC( IM )
+     &                        * AEROSPC_CONC( MAP_OAtoAERO(IOA),IM )
+     &                        / OASPC( IOA )%OMtoOC
+
+                   ELSE IF ( IV .EQ. ET_ISAM_DRVD ) THEN  ! ISAM
+#ifdef isam      
+                     IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IMODE )
+                     IF ( ISRC .LE. NTAG_SA ) THEN
+                       OUTVAL = OUTVAL + FRAC( IM )
+     &                          * ISAM_VEC( IVAR,ISRC ) 
+     &                          / OASPC( IOA )%OMtoOC
+                     ELSE
+                       OUTVAL = OUTVAL + FRAC( IM )
+     &                          * SUM(ISAM_VEC( IVAR,: )) 
+     &                          / OASPC( IOA )%OMtoOC
+                     END IF
+#endif
+
+                   ELSE IF ( IV .EQ. ET_DDM_DRVD ) THEN  ! DDM
+#ifdef sens      
+                     IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IMODE )
+                     OUTVAL = OUTVAL + FRAC( IM )
+     &                        * DDM_VEC( ISRC,IVAR ) 
+     &                        / OASPC( IOA )%OMtoOC
+#endif
+
+                   END IF
+                END IF
+             END DO
+          END DO
+
+        CASE ( OT_OMOC )
+          ! Calculate OM:OC of Species selected by ORG_MASK
+          VAL = SUM_ORGS( OT_OA, ORG_MASK, MODE_MASK, INLET, 
+     &                    WETNESS, IV, ISRC )
+          VAL2= SUM_ORGS( OT_OC, ORG_MASK, MODE_MASK, INLET, 
+     &                    WETNESS, IV, ISRC )
+
+          OUTVAL = VAL / ( VAL2 + TINY( 0.0 ) )
+        
+        CASE ( OT_OTOC )
+          ! Calculate O:C of Species selected by ORG_MASK
+          ! First retrieve OM of this selection
+          VAL = SUM_ORGS( OT_OA, ORG_MASK, MODE_MASK, INLET, 
+     &                    WETNESS, IV, ISRC )
+        
+          ! Now Calculate Weighted O:C
+          VAL2 = 0.0
+          DO IOA = 1,N_OA_NotTracers
+             DO IM = 1,N_MODE
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) .AND.
+     &               MAP_OAtoAERO(IOA) .NE. APOC_IDX .AND.
+     &               MAP_OAtoAERO(IOA) .NE. APNCOM_IDX ) THEN
+                
+                   IF ( IV .EQ. ET_DRVD ) THEN   ! Core Model
+                      ! Weight OA Sum by O:C
+                      VAL2 = VAL2 + FRAC( IM )
+     &                       * AEROSPC_CONC( MAP_OAtoAERO(IOA),IM )
+     &                       * OASPC(IOA)%OtoC
+
+                   ELSE IF ( IV .EQ. ET_ISAM_DRVD ) THEN  ! ISAM
+#ifdef isam      
+                     IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IM )
+                     IF ( ISRC .LE. NTAG_SA ) THEN
+                       VAL2 = VAL2 + FRAC( IM )
+     &                        * ISAM_VEC( IVAR,ISRC ) 
+     &                        * OASPC( IOA )%OtoC
+                     ELSE
+                       VAL2 = VAL2 + FRAC( IM )
+     &                        * SUM(ISAM_VEC( IVAR,: )) 
+     &                        * OASPC( IOA )%OtoC
+                     END IF
+#endif
+
+                   ELSE IF ( IV .EQ. ET_DDM_DRVD ) THEN  ! DDM
+#ifdef sens      
+                     IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IM )
+                     VAL2 = VAL2 + FRAC( IM )
+     &                      * DDM_VEC( ISRC,IVAR ) 
+     &                      * OASPC( IOA )%OtoC
+#endif
+
+                   END IF
+                   
+                END IF
+             END DO  
+          END DO
+
+          ! Add POC/PNCOM Contribution to Weighted O:C
+          POC = 0.0
+          POM = 0.0
+          DO IM = 1,N_MODE
+            IF ( MODE_MASK( IM ) ) THEN
+               
+               IF ( IV .EQ. ET_DRVD ) THEN  ! Core Model
+                  IF ( APOC_IDX .NE. 0 ) 
+     &               POC = POC + AEROSPC_CONC(APOC_IDX,IM) * FRAC(IM)
+                  IF ( APNCOM_IDX .NE. 0 ) 
+     &               POM = POM + AEROSPC_CONC(APNCOM_IDX,IM) * FRAC(IM)
+
+               ELSE IF ( IV .EQ. ET_ISAM_DRVD ) THEN  ! ISAM
+#ifdef isam      
+                  IF ( APOC_IDX .NE. 0 ) THEN
+                     IVAR = MAP_AEROtoSA( APOC_IDX,IM )
+                     IF ( ISRC .LE. NTAG_SA ) THEN
+                        POC = POC + FRAC(IM) 
+     &                    * ISAM_VEC( IVAR,ISRC ) 
+                     ELSE
+                        POC = POC + FRAC(IM) 
+     &                    * SUM(ISAM_VEC( IVAR,: ))
+                  END IF
+                  IF ( APNCOM_IDX .NE. 0 ) THEN
+                     IVAR = MAP_AEROtoSA( APNCOM_IDX,IM )
+                     IF ( ISRC .LE. NTAG_SA ) THEN
+                        POM = POM + FRAC(IM) 
+     &                    * ISAM_VEC( IVAR,ISRC ) 
+                     ELSE
+                        POM = POM + FRAC(IM) 
+     &                    * SUM(ISAM_VEC( IVAR,: ))
+                  END IF 
+#endif
+
+               ELSE IF ( IV .EQ. ET_DDM_DRVD ) THEN  ! DDM
+#ifdef sens      
+                  IF ( APOC_IDX .NE. 0 ) THEN
+                     IVAR = AEROSPC_MAP( APOC_IDX,IM )
+                     POC = POC + FRAC(IM) * DDM_VEC( ISRC,IVAR ) 
+                  END IF
+                  IF ( APNCOM_IDX .NE. 0 ) THEN
+                     IVAR = AEROSPC_MAP( APNCOM_IDX,IM )
+                     POM = POM + FRAC(IM) * DDM_VEC( ISRC,IVAR ) 
+                  END IF
+#endif
+               END IF
+ 
+            END IF
+          END DO
+          POM = POM + POC
+
+          ! Calculate O:C from OM:OC using the relationship from Aiken
+          ! et al. ES&T (2008), Fig. 4A. The best-fit line is rearranged to
+          ! solve for O:C as a function of OM:OC.
+          OtoC = 12./15. * ( POM / ( POC + TINY(0.0) ) )- 14./15.  
+            
+          OUTVAL = ( VAL2 + OtoC*POM ) / ( VAL + TINY(0.0))
+ 
+        CASE ( OT_WD_OA )
+          ! Sum up wet deposition of organic aerosol mass
+          DO IOA = 1,N_OA_NotTracers
+             DO IM = 1,N_MODE
+                ! Just Select Species from the Org_Mask
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
+                   IVAR = MAP_CGRIDtoWDEP( AEROSPC_MAP( MAP_OAtoAERO(IOA),IM ))
+                   IF ( IVAR .GT. 0 ) THEN
+                    
+                     IF ( IV .EQ. ET_DRVD_DDEP ) THEN  ! Core Model
+                       OUTVAL = OUTVAL + FRAC( IM ) * WDEP_VEC( IVAR )
+
+                     ELSE IF ( IV .EQ. ET_ISAM_DRVD_DDEP ) THEN  ! ISAM
+#ifdef isam      
+                       IF ( ISRC .LE. NTAG_SA ) THEN
+                         ! Just one source (ISRC)
+                         OUTVAL = OUTVAL + FRAC( IM ) 
+     &                            * ISAM_WDEP_VEC( IVAR,ISRC ) 
+                       ELSE
+                         ! Sum All Sources
+                         OUTVAL = OUTVAL + FRAC( IM ) 
+     &                            * SUM(ISAM_WDEP_VEC( IVAR,: )) 
+                       END IF
+#endif
+
+                     ELSE IF ( IV .EQ. ET_DDM_DRVD_DDEP ) THEN  ! DDM
+#ifdef sens      
+                       ! Just one source (ISRC)
+                       OUTVAL = OUTVAL + FRAC( IM ) 
+     &                          * DDM_WDEP_VEC( IVAR,ISRC ) 
+#endif
+
+                     END IF
+                   END IF 
+                END IF
+             END DO
+          END DO
+ 
+        CASE ( OT_WD_OC )
+          ! Sum up wet deposition of organic carbon mass
+          DO IOA = 1,N_OA_NotTracers
+             DO IM = 1,N_MODE 
+                ! Just Select Species from the Org_Mask
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
+                   IVAR = MAP_CGRIDtoWDEP( AEROSPC_MAP( MAP_OAtoAERO(IOA),IM ))
+                   IF ( IVAR .GT. 0 ) THEN
+
+                     IF ( IV .EQ. ET_DRVD_DDEP ) THEN  ! Core Model
+                       OUTVAL = OUTVAL + FRAC( IM ) * WDEP_VEC( IVAR )
+     &                          / OASPC( IOA )%OMtoOC
+                    
+                     ELSE IF ( IV .EQ. ET_ISAM_DRVD_DDEP ) THEN  ! ISAM
+#ifdef isam      
+                       IF ( ISRC .LE. NTAG_SA ) THEN
+                         ! Just one source (ISRC)
+                         OUTVAL = OUTVAL + FRAC( IM )
+     &                            * ISAM_WDEP_VEC( IVAR,ISRC ) 
+     &                            / OASPC( IOA )%OMtoOC
+                       ELSE
+                         ! Sum All Sources
+                         OUTVAL = OUTVAL + FRAC( IM )
+     &                            * SUM(ISAM_WDEP_VEC( IVAR,: )) 
+     &                            / OASPC( IOA )%OMtoOC
+                       END IF
+#endif
+                    
+                     ELSE IF ( IV .EQ. ET_DDM_DRVD_DDEP ) THEN  ! DDM
+#ifdef sens      
+                       ! Just one source (ISRC)
+                       OUTVAL = OUTVAL + FRAC( IM )
+     &                          * DDM_WDEP_VEC( IVAR,ISRC ) 
+     &                          / OASPC( IOA )%OMtoOC
+#endif
+                    
+                     END IF
+                   END IF
+                END IF
+             END DO
+          END DO
+ 
+        CASE ( OT_DD_OA )
+          ! Sum up dry deposition of organic aerosol mass
+          DO IOA = 1,N_OA_NotTracers
+             DO IM = 1,N_MODE
+                ! Just Select Species from the Org_Mask
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
+                   IVAR = DEPV_MAP( AEROSPC_MAP( MAP_OAtoAERO(IOA),IM ))
+                   IF ( IVAR .GT. 0 ) THEN
+                    
+                     IF ( IV .EQ. ET_DRVD_DDEP ) THEN  ! Core Model
+                       OUTVAL = OUTVAL + FRAC( IM ) * DDEP_VEC( IVAR )
+
+                     ELSE IF ( IV .EQ. ET_ISAM_DRVD_DDEP ) THEN  ! ISAM
+#ifdef isam      
+                       IF ( ISRC .LE. NTAG_SA ) THEN
+                         ! Just one source (ISRC)
+                         OUTVAL = OUTVAL + FRAC( IM ) 
+     &                            * ISAM_DDEP_VEC( IVAR,ISRC ) 
+                       ELSE
+                         ! Sum All Sources
+                         OUTVAL = OUTVAL + FRAC( IM ) 
+     &                            * SUM(ISAM_DDEP_VEC( IVAR,: )) 
+                       END IF
+#endif
+
+                     ELSE IF ( IV .EQ. ET_DDM_DRVD_DDEP ) THEN  ! DDM
+#ifdef sens      
+                       ! Just one source (ISRC)
+                       OUTVAL = OUTVAL + FRAC( IM ) 
+     &                          * DDM_DDEP_VEC( IVAR,ISRC ) 
+#endif
+
+                     END IF
+                   END IF 
+                END IF
+             END DO
+          END DO
+ 
+        CASE ( OT_DD_OC )
+          ! Sum up dry deposition of organic carbon mass
+          DO IOA = 1,N_OA_NotTracers
+             DO IM = 1,N_MODE 
+                ! Just Select Species from the Org_Mask
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
+                   IVAR = DEPV_MAP( AEROSPC_MAP( MAP_OAtoAERO(IOA),IM ))
+                   IF ( IVAR .GT. 0 ) THEN
+
+                     IF ( IV .EQ. ET_DRVD_DDEP ) THEN  ! Core Model
+                       OUTVAL = OUTVAL + FRAC( IM ) * DDEP_VEC( IVAR )
+     &                          / OASPC( IOA )%OMtoOC
+                    
+                     ELSE IF ( IV .EQ. ET_ISAM_DRVD_DDEP ) THEN  ! ISAM
+#ifdef isam      
+                       IF ( ISRC .LE. NTAG_SA ) THEN
+                         ! Just one source (ISRC)
+                         OUTVAL = OUTVAL + FRAC( IM )
+     &                            * ISAM_DDEP_VEC( IVAR,ISRC ) 
+     &                            / OASPC( IOA )%OMtoOC
+                       ELSE
+                         ! Sum All Sources
+                         OUTVAL = OUTVAL + FRAC( IM )
+     &                            * SUM(ISAM_DDEP_VEC( IVAR,: )) 
+     &                            / OASPC( IOA )%OMtoOC
+                       END IF
+#endif
+                    
+                     ELSE IF ( IV .EQ. ET_DDM_DRVD_DDEP ) THEN  ! DDM
+#ifdef sens      
+                       ! Just one source (ISRC)
+                       OUTVAL = OUTVAL + FRAC( IM )
+     &                          * DDM_DDEP_VEC( IVAR,ISRC ) 
+     &                          / OASPC( IOA )%OMtoOC
+#endif
+                    
+                     END IF
+                   END IF
+                END IF
+             END DO
+          END DO
+ 
+        
+      END SELECT
+
+      END FUNCTION SUM_ORGS
+ 

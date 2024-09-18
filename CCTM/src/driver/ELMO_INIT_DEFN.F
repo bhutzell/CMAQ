@@ -76,10 +76,6 @@
       CALL LOG_MESSAGE( LOGDEV, 'Mapping ELMO Composites' )
       CALL ELMO_MAP_COMPOSITES()
 
-      ! Map ELMO User Input to ELMO_TABLE
-      CALL LOG_MESSAGE( LOGDEV, 'Resolving ELMO Keyword Input' )
-      CALL ELMO_KEYWORDS
-
       ! ELMO FILE INITIALIZATION
       ! Determine which ELMO_TABLE variables belong on each output file
       ALLOCATE( L_ELMO_TABLE_USED( N_ELMO_TABLE ), STAT=IOS )
@@ -211,7 +207,8 @@
       INTEGER            :: FUNIT
       INTEGER            :: STAT
 
-      INTEGER IVAR, N_MX_VARS, N_FILES, N_MAX_OUTPUT_VARIABLES
+      INTEGER IVAR, N_MX_VARS, N_FILES, N_MAX_OUTPUT_VARIABLES,
+     &        N_KEYWORDS, N_MAX_KEYWORD_VARIABLES, N_MX_KEYVARS
       CHARACTER(30), ALLOCATABLE :: FLABEL( : )
       CHARACTER(16), ALLOCATABLE :: FTYPE( : )
       INTEGER, ALLOCATABLE       :: TSTEP( : )
@@ -219,12 +216,14 @@
       INTEGER, ALLOCATABLE       :: LAY_BOT( : )
       INTEGER, ALLOCATABLE       :: LAY_TOP( : )
       CHARACTER(32), ALLOCATABLE :: FILE_VARS(:,:)
+      CHARACTER(30), ALLOCATABLE :: KEYWD_NAME( : )
+      CHARACTER(32), ALLOCATABLE :: KEYWD(:,:)
                        
       CHARACTER( 200 ) :: SUFFIX = '.nc'
       CHARACTER( 16 ), SAVE :: PNAME = 'READ_ELMO_NML'
       CHARACTER( 200 )   :: XMSG
       CHARACTER( 200 )   :: TMPLINE
-      INTEGER IOS, IFL, N_VARS, VALUE, N
+      INTEGER IOS, IFL, N_VARS, VALUE, N, IKEY
       CHARACTER( 5 )     :: CFIL
 
       NAMELIST / ELMO_INIT  / N_Files, N_Max_Output_Variables,
@@ -319,6 +318,7 @@
      &          STAT=STAT )
       CALL CHECKMEM( STAT, 'ELMO_FILE_NML',PNAME)
       FILE_VARS = ''
+      KEYWD = ''
 
       ! Read User-Specified ELMO file data from input namelist
       REWIND( FUNIT )
@@ -358,6 +358,8 @@
 
         ! Set ELMO Output File Name with Path and File Logical      
         WRITE( CFIL, '(I0)' ), IFL
+        ELMO_FILE( IFL )%SHORTNAME = 'ELMO' // TRIM(CFIL) // '_' //
+     &                              TRIM( FLABEL(IFL) ) 
         ELMO_FILE( IFL )%FILENAME = 'CCTM_ELMO' // TRIM(CFIL) // '_' //
      &                              TRIM( FLABEL(IFL) ) // TRIM( SUFFIX )
         WRITE( ELMO_FILE( IFL )%FLOGICAL, '( "ELMO_",I3.3 )' ) IFL
@@ -418,12 +420,15 @@
 
          N = 0
          DO IVAR = 1,N_MX_KEYVARS
-            IF ( KEYWD( IKEY,IVAR ) .NE. '' ) THEN
-               N = N + 1
-               ELMO_KEY( IKEY )%LIST( IVAR ) = KEYWD( IKEY,IVAR )
-            END IF
+            IF ( KEYWD( IKEY,IVAR ) .NE. '' ) N = N + 1
          END DO
+
          ELMO_KEY( IKEY )%N = N
+         ALLOCATE( ELMO_KEY( IKEY )%LIST( N ), STAT=IOS )
+         CALL CHECKMEM( IOS, 'ELMO_KEY%LIST',PNAME )
+         DO IVAR = 1,N
+            ELMO_KEY( IKEY )%LIST( IVAR ) = KEYWD( IKEY,IVAR )
+         END DO
       END DO
 
       END SUBROUTINE READ_ELMO_NML
@@ -518,7 +523,9 @@
       ! Load the source-resolvable Derived variables into the ELMO Table
       ! to enable ISAM output.
       DO ILIST = 1,N_ELMO_LIST
-        IF ( ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD ) THEN
+        IF ( ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD .OR.
+     &       ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD_DDEP .OR.
+     &       ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD_WDEP ) THEN
            ! Define ELMO Variables for all ISAM sources
            DO ITAG = 1,NTAG_SA
              N = N + 1
@@ -555,7 +562,9 @@
       ! Load the source-resolvable Derived variables into the ELMO Table
       ! to enable ISAM output.
       DO ILIST = 1,N_ELMO_LIST
-         IF ( ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD ) THEN
+        IF ( ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD .OR.
+     &       ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD_DDEP .OR.
+     &       ELMO_LIST( ILIST )%VAR_TYPE .EQ. ET_DRVD_WDEP ) THEN
            
            ! Define ELMO Variables for all remaining DDM3D sources
            DO NP = 1,NPMAX
@@ -587,7 +596,7 @@
          ELMO_TABLE( N )%OUT_NAME = CMPST( ICMPST )%NAME
          ELMO_TABLE( N )%OUT_TYPE = M3REAL
 
-         IF ( CMPST( ICMPST )%CMPST_TYPE .EQ. 'DEP' ) THEN
+         IF ( CMPST( ICMPST )%CMPST_TYPE(1:3) .EQ. 'DEP' ) THEN
              ELMO_TABLE( N )%VAR_TYPE = ET_CMPST_DEP
          ELSE
              ELMO_TABLE( N )%VAR_TYPE = ET_CMPST
@@ -613,7 +622,7 @@
      &                            // '_' // TRIM(TAGNAME( ITAG ))
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
          
-           IF ( CMPST( ICMPST )%CMPST_TYPE .EQ. 'DEP' ) THEN
+           IF ( CMPST( ICMPST )%CMPST_TYPE(1:3) .EQ. 'DEP' ) THEN
                ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_CMPST_DEP
            ELSE
                ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_CMPST
@@ -652,7 +661,7 @@
      &                            // '_' // TRIM( SEN_PAR( NP ) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
            
-           IF ( CMPST( ICMPST )%CMPST_TYPE .EQ. 'DEP' ) THEN
+           IF ( CMPST( ICMPST )%CMPST_TYPE(1:3) .EQ. 'DEP' ) THEN
                ELMO_TABLE( N )%VAR_TYPE = ET_DDM_CMPST_DEP
            ELSE
                ELMO_TABLE( N )%VAR_TYPE = ET_DDM_CMPST
@@ -1182,7 +1191,7 @@
          WRITE( LOGDEV, '(/,5x,A,A)'   ),'>',REPEAT('-',80 )
          WRITE( LOGDEV,'(5x,A,I2,A,A,/,5x,A,A,/,8x,A,I2,A,I2)' ),
      &       'Output File Num: "',IFL,'" | Temporality: ','Average',
-     &       'Output Filename: ',TRIM(ELMO_FILE(IFL)%FLOGICAL),
+     &       'Output Filename: ',TRIM(ELMO_FILE(IFL)%SHORTNAME),
      &       ' Bottom Layer: ',ELMO_FILE( IFL )%LAY_BOT,
      &       ' Top Layer: ',ELMO_FILE( IFL )%LAY_TOP 
 

@@ -281,10 +281,6 @@ CMPST =
                 'ppmV', 'GAS', 
                 'ALD2', 
 
-'BENZENE'     , 'Benzene Concentration', 
-                'ppmV', 'GAS', 
-                'BENZENE', 
-
 'ACETYLENE'   , 'Acetylene Concentration', 
                 'ppmV', 'GAS', 
                 'ETHY', 
@@ -300,6 +296,18 @@ CMPST =
 'TOLUENE'     , 'Toluene Concentration', 
                 'ppmV', 'GAS', 
                 'TOL', 
+
+'XYLENES'     , 'Xylenes Concentration', 
+                'ppmV', 'GAS', 
+                'XYLMN', 
+
+'NAPHTHAL'    , 'Naphthalene Concentration', 
+                'ppmV', 'GAS', 
+                'NAPH', 
+
+'TERPENES'    , 'Monoterpene Concentration', 
+                'ppmV', 'GAS', 
+                'TERP', 
 
 'HOX'         , 'HOx Concentration', 
                 'ppmV', 'GAS', 
@@ -438,11 +446,11 @@ CMPST =
                 
 'PMF_OTHWNC'  , 'Unspeciated PM including non-carbon organic mass',
                 'ug m-3', 'FINE', 
-                'PMF_MASS -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OC -1.0*RECON_SOIL',
+                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OC -1.0*PMF_RECONSOIL',
 
 'PMF_OTH'     , 'Unspeciated PM excluding non-carbon organic mass',
                 'ug m-3', 'FINE', 
-                'PMF_MASS -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OA -1.0*PMF_SOILIMPV',
+                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OA -1.0*PMF_RECONSOIL',
 
 'PMF_HP'      , 'Fine-Mode H+ Ion',
                 'umol m-3', 'FINE', 
@@ -637,7 +645,7 @@ CMPST =
 
 'PM25_OTHWNC'   , 'PM2.5 Unspeciasted Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM25', 
-                'PM25 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM25_OC - PM25_SOIL',
+                'PM25 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM25_OC - PM25_RECONSOIL',
 
 'PM25_UNSPCRS', 'PM2.5 Unspeciated Coarse Mass',
                 'ug m-3', 'PM25', 
@@ -679,6 +687,10 @@ CMPST =
 
 'TSP_NO3'     , 'Total Particulate Nitrate',
                 'ug m-3', 'ALL',
+                'ANO3',
+
+'TSP_NO3_PPM'  , 'Total Particulate Nitrate',
+                'ppmV', 'ALL',
                 'ANO3',
 
 'TSP_NH4'     , 'Total Particulate Ammonium',
@@ -737,12 +749,30 @@ CMPST =
 
 'TNO3TOT'     , 'Total Nitrate only including Organics', 
                 'umol m-3', 'ALL', 
-                'ANO3 + HNO3 + AISOPNN + AMTNO3',
+                'ANO3 + HNO3 + AMTNO3',
 
 
 !------------------------!
 !**** Gas Deposition ****!
 !------------------------!
+
+!-- Formaldehyde --!
+'DD_FORMALD'  , 'Dry Dep of Formaldehyde', 
+                'kg ha-1', 'DEP', 
+                'DD_FORM',
+
+'WD_FORMALD'  , 'Wet Dep of Formaldehyde', 
+                'kg ha-1', 'DEP', 
+                'WD_FORM',
+
+!-- Pernitric Acid --!
+'DD_HNO4'     , 'Dry Dep of Pernitric Acid', 
+                'kg ha-1', 'DEP', 
+                'DD_PNA',
+
+'WD_HNO4'  , 'Wet Dep of Pernitric Acid', 
+                'kg ha-1', 'DEP', 
+                'WD_PNA',
 
 !-- Organic Nitrates --!
 'DD_NTR'      , 'Dry Dep of Organic Nitrates', 
@@ -769,12 +799,12 @@ CMPST =
 
 !-- Nitrate --!
 'DD_PMF_NO3'  , 'Dry Dep of Fine-Mode Nitrate', 
-                'kg ha-1', 'DEP', 
-                'DD_ANO3I + DD_ANO3J',
+                'kg ha-1', 'DEP_FINE', 
+                'DD_ANO3',
 
 'DD_PMC_NO3'  , 'Dry Dep of Coarse-Mode Nitrate', 
-                'kg ha-1', 'DEP', 
-                'DD_ANO3K',
+                'kg ha-1', 'DEP_COARSE', 
+                'DD_ANO3',
 
 'WD_TSP_NO3'  , 'Wet Dep of Particulate Nitrate', 
                 'kg ha-1', 'DEP', 
@@ -782,12 +812,12 @@ CMPST =
 
 !-- Ammonium --!
 'DD_PMF_NH4'  , 'Dry Dep of Fine-Mode Ammonium', 
-                'kg ha-1', 'DEP', 
-                'DD_ANH4I + DD_ANH4J',
+                'kg ha-1', 'DEP_FINE', 
+                'DD_ANH4',
 
 'DD_PMC_NH4'  , 'Dry Dep of Coarse-Mode Ammonium', 
-                'kg ha-1', 'DEP', 
-                'DD_ANH4K',
+                'kg ha-1', 'DEP_COARSE', 
+                'DD_ANH4',
 
 'WD_TSP_NH4'  , 'Wet Dep of Particulate Ammonium', 
                 'kg ha-1', 'DEP', 
@@ -795,12 +825,12 @@ CMPST =
 
 !-- Sulfate --!
 'DD_PMF_SO4'  , 'Dry Dep of Fine-Mode Sulfate', 
-                'kg ha-1', 'DEP', 
-                'DD_ASO4I + DD_ASO4J',
+                'kg ha-1', 'DEP_FINE', 
+                'DD_ASO4',
 
 'DD_PMC_SO4'  , 'Dry Dep of Coarse-Mode Sulfate', 
-                'kg ha-1', 'DEP', 
-                'DD_ASO4K',
+                'kg ha-1', 'DEP_COARSE', 
+                'DD_ASO4',
 
 'WD_TSP_SO4'  , 'Wet Dep of Particulate Sulfate', 
                 'kg ha-1', 'DEP', 
@@ -811,23 +841,23 @@ CMPST =
                 'kg ha-1', 'DEP', 
                 'DD_AMTNO3',
 
-'WD_PMF_MTNO3', 'Wet Dep of Fine-Mode Monoterpene Nitrate', 
+'WD_TSP_MTNO3', 'Wet Dep of Particulate Monoterpene Nitrate', 
                 'kg ha-1', 'DEP', 
                 'WD_AMTNO3',
 
 !-- Elemental Carbon --!
 'DD_PMF_EC'   , 'Dry Dep of Fine-Mode Elemental Carbon', 
-                'kg ha-1', 'DEP', 
-                'DD_AECI + DD_AECJ',
+                'kg ha-1', 'DEP_FINE', 
+                'DD_AEC',
 
 !-- Sodium --!
 'DD_PMF_NA'   , 'Dry Dep of Fine-Mode Sodium', 
-                'kg ha-1', 'DEP', 
-                'DD_ANAJ',
+                'kg ha-1', 'DEP_FINE', 
+                'DD_ANA',
 
 'DD_PMC_NA'   , 'Dry Dep of Coarse-Mode Sodium', 
                 'kg ha-1', 'DEP', 
-                '0.8373*DD_ASEACAT + 0.0626*ASOIL + 0.0023*ACORS',
+                '0.8373*DD_ASEACAT + 0.0626*DD_ASOIL + 0.0023*DD_ACORS',
 
 'DD_TSP_NA'   , 'Dry Dep of Particulate Sodium', 
                 'kg ha-1', 'DEP', 
@@ -835,11 +865,11 @@ CMPST =
 
 'WD_PMC_NA'   , 'Wet Dep of Coarse-Mode Sodium', 
                 'kg ha-1', 'DEP', 
-                '0.8373*DD_ASEACAT + 0.0626*ASOIL + 0.0023*ACORS',
+                '0.8373*WD_ASEACAT + 0.0626*WD_ASOIL + 0.0023*WD_ACORS',
 
 'WD_TSP_NA'   , 'Wet Dep of Particulate Sodium', 
                 'kg ha-1', 'DEP', 
-                'WD_ANAJ + WD_PMC_NA',
+                'WD_ANA + WD_PMC_NA',
 
 'TD_TSP_NA'   , 'Total Dep of Particulate Sodium', 
                 'kg ha-1', 'DEP', 
@@ -847,12 +877,12 @@ CMPST =
 
 !-- Chloride --!
 'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
-                'kg ha-1', 'DEP', 
-                'DD_ACLJ',
+                'kg ha-1', 'DEP_FINE', 
+                'DD_ACL',
 
 'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride', 
-                'kg ha-1', 'DEP', 
-                'DD_ACLK',
+                'kg ha-1', 'DEP_COARSE', 
+                'DD_ACL',
 
 'DD_TSP_CL'   , 'Dry Dep of Particulate Chloride', 
                 'kg ha-1', 'DEP', 
@@ -861,10 +891,10 @@ CMPST =
 !-- Calcium --!
 'DD_PMF_CA'   , 'Dry Dep of Fine-Mode Calcium', 
                 'kg ha-1', 'DEP', 
-                'DD_ACAJ',
+                'DD_ACA',
 
-'DD_PMC_CA'   , 'kg ha-1', 'DEP', 
-                'Dry Dep of Coarse-Mode Calcium', 
+'DD_PMC_CA'   , 'Dry Dep of Coarse-Mode Calcium', 
+                'kg ha-1', 'DEP',                 
                 '0.032*DD_ASEACAT + 0.0838*DD_ASOIL + 0.0562*DD_ACORS',
 
 'DD_TSP_CA'   , 'Dry Dep of Particulate Calcium', 
@@ -873,7 +903,7 @@ CMPST =
 
 'WD_PMF_CA'   , 'Wet Dep of Fine-Mode Calcium', 
                 'kg ha-1', 'DEP', 
-                'WD_ACAJ',
+                'WD_ACA',
 
 'WD_PMC_CA'   , 'Wet Dep of Coarse-Mode Calcium', 
                 'kg ha-1', 'DEP', 
@@ -886,52 +916,52 @@ CMPST =
 !-- Iron --!
 'DD_PMF_FE'   , 'Dry Dep of Fine-Mode Iron', 
                 'kg ha-1', 'DEP', 
-                'DD_AFEJ',
+                'DD_AFE',
 
 'WD_PMF_FE'   , 'Wet Dep of Fine-Mode Iron', 
                 'kg ha-1', 'DEP', 
-                'WD_AFEJ',
+                'WD_AFE',
 
 !-- Aluminum --!
 'DD_PMF_AL'   , 'Dry Dep of Fine-Mode Aluminum', 
                 'kg ha-1', 'DEP', 
-                'DD_AALJ',
+                'DD_AAL',
 
 'WD_PMF_AL'   , 'Wet Dep of Fine-Mode Aluminum', 
                 'kg ha-1', 'DEP', 
-                'WD_AALJ',
+                'WD_AAL',
 
 !-- Silicon --!
 'DD_PMF_SI'   , 'Dry Dep of Fine-Mode Silicon', 
                 'kg ha-1', 'DEP', 
-                'DD_ASIJ',
+                'DD_ASI',
 
 'WD_PMF_SI'   , 'Wet Dep of Fine-Mode Silicon', 
                 'kg ha-1', 'DEP', 
-                'WD_ASIJ',
+                'WD_ASI',
 
 !-- Titanium --!
 'DD_PMF_TI'   , 'Dry Dep of Fine-Mode Titanium', 
                 'kg ha-1', 'DEP', 
-                'DD_ATIJ',
+                'DD_ATI',
 
 'WD_PMF_TI'   , 'Wet Dep of Fine-Mode Titanium', 
                 'kg ha-1', 'DEP', 
-                'WD_ATIJ',
+                'WD_ATI',
 
 ! Manganese
 'DD_PMF_MN'   , 'Dry Dep of Fine-Mode Manganese', 
                 'kg ha-1', 'DEP', 
-                'DD_AMNJ',
+                'DD_AMN',
 
 'WD_PMF_MN'   , 'Wet Dep of Fine-Mode Manganese', 
                 'kg ha-1', 'DEP', 
-                'WD_AMNJ',
+                'WD_AMN',
 
 !-- Magnesium --!
 'DD_PMF_MG'   , 'Dry Dep of Fine-Mode Magnesium', 
                 'kg ha-1', 'DEP', 
-                'DD_AMGJ',
+                'DD_AMG',
 
 'DD_PMC_MG'   , 'Dry Dep of Coarse-Mode Magnesium', 
                 'kg ha-1', 'DEP', 
@@ -943,7 +973,7 @@ CMPST =
 
 'WD_PMF_MG'   , 'Wet Dep of Fine-Mode Magnesium', 
                 'kg ha-1', 'DEP', 
-                'WD_AMGJ',
+                'WD_AMG',
 
 'WD_PMC_MG'   , 'Wet Dep of Coarse-Mode Magnesium', 
                 'kg ha-1', 'DEP', 
@@ -956,7 +986,7 @@ CMPST =
 !-- Potassium --!
 'DD_PMF_K'    , 'Dry Dep of Fine-Mode Potassium', 
                 'kg ha-1', 'DEP', 
-                'DD_AKJ',
+                'DD_AK',
 
 'DD_PMC_K'    , 'Dry Dep of Coarse-Mode Potassium', 
                 'kg ha-1', 'DEP', 
@@ -968,7 +998,7 @@ CMPST =
 
 'WD_PMF_K'    , 'Wet Dep of Fine-Mode Potassium', 
                 'kg ha-1', 'DEP', 
-                'WD_AKJ',
+                'WD_AK',
 
 'WD_PMC_K'    , 'Wet Dep of Coarse-Mode Potassium', 
                 'kg ha-1', 'DEP', 
@@ -981,15 +1011,15 @@ CMPST =
 !-- Sea Spray Sulfate --!
 'DD_PMF_SSSO4', 'Dry Dep of Fine-Mode Sea Spray Sulfate', 
                 'kg ha-1', 'DEP', 
-                '0.2514 * DD_ANAJ',
+                '0.2514 * DD_PMF_NA',
 
 'DD_PMC_SSSO4', 'Dry Dep of Coarse-Mode Sea Spray Sulfate', 
                 'kg ha-1', 'DEP', 
-                '0.2514 * DD_ANAK',
+                '0.2514 * DD_PMC_NA',
 
 'WD_TSP_SSSO4', 'Wet Dep of Particulate Sea Spray Sulfate', 
                 'kg ha-1', 'DEP', 
-                '0.2514 * WD_ANAJ + 0.2514 * WD_ANAK',
+                '0.2514 * WD_ANA + 0.2514 * WD_PMC_NA',
 
 
 !---------------------------------------!
@@ -1174,7 +1204,7 @@ CMPST =
 
 'WD_S_SEA'      , 'Wet Dep of Sea Spray Sulfur', 
                   'kgS ha-1', 'DEP', 
-                  '0.33333*WD_PMF_SSSO4 + 0.33333*WD_PMC_SSSO4',
+                  '0.33333*WD_TSP_SSSO4',
 
 'TD_S_SEA'      , 'Total Dep of Sea Spray Sulfur', 
                   'kgS ha-1', 'DEP', 

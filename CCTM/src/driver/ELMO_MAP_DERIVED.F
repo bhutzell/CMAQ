@@ -34,14 +34,11 @@
       INTEGER,ALLOCATABLE :: J_PMF_SO4(:)
       INTEGER,ALLOCATABLE :: J_PMF_NO3(:)
       INTEGER,ALLOCATABLE :: J_PMF_NH4(:)
-      INTEGER,ALLOCATABLE :: J_AMS_OA(:)
-      INTEGER,ALLOCATABLE :: J_PMF_OA(:)
-      INTEGER,ALLOCATABLE :: J_PMF_OC(:)
       INTEGER,ALLOCATABLE :: J_PM25_SO4(:)
       INTEGER,ALLOCATABLE :: J_PM25_NO3(:)
       INTEGER,ALLOCATABLE :: J_PM25_NH4(:)
       INTEGER,ALLOCATABLE :: J_PMF_HP(:)
-      INTEGER,ALLOCATABLE :: J_PMF_HPM(:)
+      INTEGER,ALLOCATABLE :: J_PMF_HPMOLAL(:)
       INTEGER,ALLOCATABLE :: J_PMF_H2O(:)
       INTEGER,ALLOCATABLE :: J_PMF_BENAPY(:)
       INTEGER,ALLOCATABLE :: J_GAS_BENAPY(:)
@@ -67,20 +64,20 @@
       
       MX_SRC = 0
 #ifdef isam
-      MX_SRC = NTAG_SA + 1
+      MX_SRC = NTAG_SA
 #endif
 #ifdef sens
-      MX_SRC = NPMAX
+      MX_SRC = NPMAX 
 #endif
+      MX_SRC = MX_SRC + 1
 
       ! Allocate indices for saving ELMO TABLE location of DERIVED
       ! variable components
       ALLOCATE( J_PMF_MASS(MX_SRC),  J_PMF_SO4(MX_SRC),
      &          J_PMF_NO3(MX_SRC),   J_PMF_NH4(MX_SRC),
-     &          J_PMF_OA(MX_SRC),    J_PMF_OC(MX_SRC),
      &          J_PM25_SO4(MX_SRC),  J_PM25_NO3(MX_SRC),
      &          J_PM25_NH4(MX_SRC),  J_PMF_HP(MX_SRC),
-     &          J_PMF_HPM(MX_SRC),   J_PMF_H2O(MX_SRC),
+     &          J_PMF_HPMOLAL(MX_SRC),   J_PMF_H2O(MX_SRC),
      &          J_PMF_BENAPY(MX_SRC),J_GAS_BENAPY(MX_SRC),
      &          STAT = IOS )
       CALL CHECKMEM( IOS, 'J DERIVED COMPONENTS','ELMO_MAP_DERIVED' )
@@ -98,12 +95,6 @@
                 J_PMF_NO3( ISRC+1 ) = J
               CASE ( 'PMF_NH4' ) 
                 J_PMF_NH4( ISRC+1 ) = J
-              CASE ( 'AMS_OA' ) 
-                J_AMS_OA( ISRC+1 ) = J
-              CASE ( 'PMF_OA' ) 
-                J_PMF_OA( ISRC+1 ) = J
-              CASE ( 'PMF_OC' ) 
-                J_PMF_OC( ISRC+1 ) = J
               CASE ( 'PM25_SO4' )
                 J_PM25_SO4( ISRC+1 ) = J
               CASE ( 'PM25_NO3' )
@@ -112,8 +103,8 @@
                 J_PM25_NH4( ISRC+1 ) = J
               CASE ( 'PMF_HP' ) 
                 J_PMF_HP( ISRC+1 ) = J
-              CASE ( 'PMF_HPM' ) 
-                J_PMF_HPM( ISRC+1 ) = J
+              CASE ( 'PMF_HPMOLAL' ) 
+                J_PMF_HPMOLAL( ISRC+1 ) = J
               CASE ( 'PMF_H2O' )
                 J_PMF_H2O( ISRC+1 ) = J
               CASE ( 'PMF_BENAPY' ) 

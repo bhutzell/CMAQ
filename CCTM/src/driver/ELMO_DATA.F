@@ -39,26 +39,29 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       ! Define ELMO Variable Types
       INTEGER, PARAMETER :: ET_CONC  = 1, ET_WDEP      = 2, ET_DDEP = 3, 
      &                      ET_CMPST = 4, ET_CMPST_DEP = 5, ET_DRVD = 6,
+     &                      ET_DRVD_DDEP = 7, ET_DRVD_WDEP = 8,
      &                      ET_ISAM_CONC = 11, ET_ISAM_WDEP = 12, 
      &                      ET_ISAM_DDEP = 13, ET_ISAM_CMPST= 14, 
      &                      ET_ISAM_CMPST_DEP = 15, ET_ISAM_DRVD = 16, 
+     &                      ET_ISAM_DRVD_DDEP = 17, ET_ISAM_DRVD_WDEP = 18,
      &                      ET_DDM_CONC = 21, ET_DDM_WDEP = 22, 
      &                      ET_DDM_DDEP = 23, ET_DDM_CMPST= 24, 
      &                      ET_DDM_CMPST_DEP = 25, ET_DDM_DRVD = 26, 
+     &                      ET_DDM_DRVD_DDEP = 27, ET_DDM_DRVD_WDEP = 28,
      &                      ET_AEROPROP = 30, ET_CHEM = 31, ET_MET = 32,
      &                      ET_PHOT = 33
 
       CHARACTER( 14 ), PARAMETER :: CETYPE(33) = 
      &    (/'CONC          ','WET DEP       ','DRY DEP       ',
      &      'COMPOSITE CONC','COMPOSITE DEP ','DERIVED CONC  ',
-     &      '              ','              ','              ',
+     &      'DERIVED DDEP  ','DERIVED WDEP  ','              ',
      &      '              ','ISAM CONC     ','ISAM WETDEP   ',
      &      'ISAM DRY DEP  ','ISAM COMP CONC','ISAM COMP DEP ',
-     &      'ISAM DERIVED  ','              ','              ',
+     &      'ISAM DERIVED  ','ISAM DRVD DDEP','ISAM DRVD WDEP',
      &      '              ','              ','DDM CONC      ',
      &      'DDM WET DEP   ','DDM DRY DEP   ','DDM COMP CONC ',
-     &      'DDM COMP DEP  ','DDM DERIVED   ','              ',
-     &      '              ','              ','AERO PROPERTY ',
+     &      'DDM COMP DEP  ','DDM DERIVED   ','DDM DRVD DDEP ',
+     &      'DDM DRVD WDEP ','              ','AERO PROPERTY ',
      &      'CHEMISTRY     ','METEOROLOGY   ','PHOT          '/) 
 
       ! Define Indices for All Variables on the ELMO List
@@ -136,8 +139,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_GN2O5F =      65
       INTEGER, PARAMETER :: ID_GN2O5C =      66
       INTEGER, PARAMETER :: ID_YCLNO2F =     67
-      INTEGER, PARAMETER :: ID_YCLNO2C =     78
-      INTEGER, PARAMETER :: ID_GIEPOX =      79
+      INTEGER, PARAMETER :: ID_YCLNO2C =     68
+      INTEGER, PARAMETER :: ID_GIEPOX =      69
       INTEGER, PARAMETER :: ID_KIEPOX =      70
       INTEGER, PARAMETER :: ID_GIMAE =       71
       INTEGER, PARAMETER :: ID_DZ    =       72
@@ -146,14 +149,33 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_PV    =       75
       INTEGER, PARAMETER :: ID_DENS  =       76
       INTEGER, PARAMETER :: ID_RHOJ  =       77
-      INTEGER, PARAMETER :: ID_NO2COL  =     88
-      INTEGER, PARAMETER :: ID_SO2COL  =     89
+      INTEGER, PARAMETER :: ID_NO2COL  =     78
+      INTEGER, PARAMETER :: ID_SO2COL  =     79
       INTEGER, PARAMETER :: ID_HCHOCOL  =    80
       INTEGER, PARAMETER :: ID_COCOL  =      81
       INTEGER, PARAMETER :: ID_KZ     =      82
       INTEGER, PARAMETER :: ID_KZMIN  =      83
       INTEGER, PARAMETER :: ID_AOD550 =      84
       INTEGER, PARAMETER :: ID_PMEXT550 =    85
+      INTEGER, PARAMETER :: ID_PBL =         86
+      INTEGER, PARAMETER :: ID_RGRND =       87
+      INTEGER, PARAMETER :: ID_PRECIP =      88
+      INTEGER, PARAMETER :: ID_WSPD10 =      89
+      INTEGER, PARAMETER :: ID_WDIR10 =      90
+      INTEGER, PARAMETER :: ID_DD_OA =       91
+      INTEGER, PARAMETER :: ID_WD_OA =       92
+      INTEGER, PARAMETER :: ID_DD_OC =       93
+      INTEGER, PARAMETER :: ID_WD_OC =       94
+      INTEGER, PARAMETER :: ID_DD_POA =      95
+      INTEGER, PARAMETER :: ID_WD_POA =      96
+      INTEGER, PARAMETER :: ID_DD_POC =      97
+      INTEGER, PARAMETER :: ID_WD_POC =      98
+      INTEGER, PARAMETER :: ID_DD_SOA =      99
+      INTEGER, PARAMETER :: ID_WD_SOA =     100
+      INTEGER, PARAMETER :: ID_DD_SOC =     101
+      INTEGER, PARAMETER :: ID_WD_SOC =     102
+
+
 
       TYPE ELDTP
         CHARACTER (LEN = 16) :: NAME      !Parameter Name
@@ -164,7 +186,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
 
-      INTEGER, PARAMETER :: N_ELMO_LIST = 85
+      INTEGER, PARAMETER :: N_ELMO_LIST = 102
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
 
@@ -175,7 +197,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'WET_M2       ',ID_WET_M2,     ET_AEROPROP, T, 'm2 m-3', 'Mode 2nd moment (wet)' ),
      &ELDTP( 'DRY_M3       ',ID_DRY_M3,     ET_AEROPROP, T, 'm3 m-3', 'Mode 3rd moment (dry)' ),
      &ELDTP( 'WET_M3       ',ID_WET_M3,     ET_AEROPROP, T, 'm3 m-3', 'Mode 3rd moment (wet)' ),
-     &ELDTP( 'PM_NUM       ',ID_PM_NUM,     ET_AEROPROP, F, 'N m-3' , 'Total Particle Number' ),
+     &ELDTP( 'TSP_NUM      ',ID_PM_NUM,     ET_AEROPROP, F, 'N m-3' , 'Total Particle Number' ),
      &ELDTP( 'PMU_NUM      ',ID_PMU_NUM,    ET_AEROPROP, F, 'N m-3' , 'Ultrafine-Mode Particle Number' ),
      &ELDTP( 'PMF_NUM      ',ID_PMF_NUM,    ET_AEROPROP, F, 'N m-3' , 'Fine-Mode Particle Number' ),
      &ELDTP( 'PMC_NUM      ',ID_PMC_NUM,    ET_AEROPROP, F, 'N m-3' , 'Coarse-Mode Particle Number' ),
@@ -210,34 +232,48 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'PMAMS        ',ID_PMAMS,      ET_DRVD,     F, 'ug m-3', 'Bulk PM Concentration in AMS' ),
                                                           
       ! Fine-Mode PM Species                         
-     &ELDTP( 'PMF_OC       ',ID_PMF_OC,     ET_DRVD,     F, 'ug m-3', 'Fine-Mode Organic Carbon (excludes non-carbon atoms)' ),
      &ELDTP( 'PMF_OA       ',ID_PMF_OA,     ET_DRVD,     F, 'ug m-3', 'Fine-Mode Organic Aerosol' ),
-     &ELDTP( 'PMF_HPMOLAL  ',ID_PMF_HPM,    ET_DRVD,     F, 'mol L-1','Fine-Mode Concentration of H+ in Particle Water' ),
+     &ELDTP( 'PMF_OC       ',ID_PMF_OC,     ET_DRVD,     F, 'ug m-3', 'Fine-Mode Organic Carbon (excludes non-carbon atoms)' ),
+     &ELDTP( 'PMF_HPMOLAL  ',ID_PMF_HPM,    ET_DRVD,     F, 'mol kg-1','Fine-Mode Concentration of H+ in Particle Water' ),
      &ELDTP( 'PMF_PH       ',ID_PMF_PH,     ET_AEROPROP, F, '1'     , 'Fine-Mode pH' ),
                                                   
       ! Organic Aerosol Relevant Aggregates          
-     &ELDTP( 'PMF_POC      ',ID_PMF_POC,    ET_DRVD,     F, 'ug m-3', 'Fine-Mode Primary Organic Carbon (excluding non-carbon)' ),
-     &ELDTP( 'PMF_SOC      ',ID_PMF_SOC,    ET_DRVD,     F, 'ug m-3', 'Fine-Mode Secondary Organic Carbon (excluding non-carbon)' ),
      &ELDTP( 'PMF_POA      ',ID_PMF_POA,    ET_DRVD,     F, 'ug m-3', 'Fine-Mode Primary Organic Aerosol' ),
+     &ELDTP( 'PMF_POC      ',ID_PMF_POC,    ET_DRVD,     F, 'ug m-3', 'Fine-Mode Primary Organic Carbon (excluding non-carbon)' ),
      &ELDTP( 'PMF_SOA      ',ID_PMF_SOA,    ET_DRVD,     F, 'ug m-3', 'Fine-Mode Secondary Organic Aerosol' ),
-     &ELDTP( 'PMF_OMOC     ',ID_PMF_OMOC,   ET_AEROPROP, F, '1     ', 'Fine-Mode OM/OC' ),
-     &ELDTP( 'PMF_OTOC     ',ID_PMF_OtoC,   ET_AEROPROP, F, '1     ', 'Fine-Mode O:C' ),
+     &ELDTP( 'PMF_SOC      ',ID_PMF_SOC,    ET_DRVD,     F, 'ug m-3', 'Fine-Mode Secondary Organic Carbon (excluding non-carbon)' ),
      &ELDTP( 'PMF_ASOA     ',ID_PMF_ASOA,   ET_DRVD,     F, 'ug m-3', 'Fine-Mode Anthropogenic-VOC Derived OA' ),
      &ELDTP( 'PMF_BSOA     ',ID_PMF_BSOA,   ET_DRVD,     F, 'ug m-3', 'Fine-Mode Biogenic-VOC Derived OA' ),
+     &ELDTP( 'PMF_OMOC     ',ID_PMF_OMOC,   ET_AEROPROP, F, '1     ', 'Fine-Mode OM/OC' ),
+     &ELDTP( 'PMF_OTOC     ',ID_PMF_OtoC,   ET_AEROPROP, F, '1     ', 'Fine-Mode O:C' ),
                                                   
       ! AMS Speciation                            
      &ELDTP( 'PMAMS_OA     ',ID_AMS_OA,     ET_DRVD,     F, 'ug m-3', 'Organic Aerosol Collected by the AMS' ),
      &ELDTP( 'PMAMS_OTOC   ',ID_AMS_OTOC,   ET_DRVD,     F, 'ug ug-1','O:C Collected and Measured by the AMS' ),
                                                   
       ! PM1 Speciation                            
-     &ELDTP( 'PM1_OC       ',ID_PM1_OC,     ET_DRVD,     F, 'ug m-3', 'PM1 Organic Carbon (excluding non-carbon atoms)' ),
      &ELDTP( 'PM1_OA       ',ID_PM1_OA,     ET_DRVD,     F, 'ug m-3', 'PM1 Organic Aerosol' ),
+     &ELDTP( 'PM1_OC       ',ID_PM1_OC,     ET_DRVD,     F, 'ug m-3', 'PM1 Organic Carbon (excluding non-carbon atoms)' ),
                                                   
       ! PM2.5 Speciation                          
-     &ELDTP( 'PM25_OC      ',ID_PM25_OC,    ET_DRVD,     F, 'ug m-3', 'PM2.5 Organic Carbon (excluding non-carbon atoms)' ),
      &ELDTP( 'PM25_OA      ',ID_PM25_OA,    ET_DRVD,     F, 'ug m-3', 'PM2.5 Organic Aerosol' ),
+     &ELDTP( 'PM25_OC      ',ID_PM25_OC,    ET_DRVD,     F, 'ug m-3', 'PM2.5 Organic Carbon (excluding non-carbon atoms)' ),
      &ELDTP( 'BENAPY_FAERO ',ID_BENAPY_FAERO,ET_AEROPROP,F, '',       'Benzo-a-Pyrene Aerosol-Phase Fraction' ),
-         
+     
+      ! Deposition of Organic Classes
+     &ELDTP( 'DD_OA        ',ID_DD_OA,      ET_DRVD_DDEP,F, 'kg ha-1','Dry Deposition of Organic Aerosol' ),
+     &ELDTP( 'WD_OA        ',ID_WD_OA,      ET_DRVD_WDEP,F, 'kg ha-1','Wet Deposition of Organic Aerosol' ),
+     &ELDTP( 'DD_OC        ',ID_DD_OC,      ET_DRVD_DDEP,F, 'kg ha-1','Dry Deposition of Organic Carbon' ),
+     &ELDTP( 'WD_OC        ',ID_WD_OC,      ET_DRVD_WDEP,F, 'kg ha-1','Wet Deposition of Organic Carbon' ),
+     &ELDTP( 'DD_POA       ',ID_DD_POA,     ET_DRVD_DDEP,F, 'kg ha-1','Dry Deposition of Primary Organic Aerosol' ),
+     &ELDTP( 'WD_POA       ',ID_WD_POA,     ET_DRVD_WDEP,F, 'kg ha-1','Wet Deposition of Primary Organic Aerosol' ),
+     &ELDTP( 'DD_POC       ',ID_DD_POC,     ET_DRVD_DDEP,F, 'kg ha-1','Dry Deposition of Primary Organic Carbon' ),
+     &ELDTP( 'WD_POC       ',ID_WD_POC,     ET_DRVD_WDEP,F, 'kg ha-1','Wet Deposition of Primary Organic Carbon' ),
+     &ELDTP( 'DD_SOA       ',ID_DD_SOA,     ET_DRVD_DDEP,F, 'kg ha-1','Dry Deposition of Secondary Organic Aerosol' ),
+     &ELDTP( 'WD_SOA       ',ID_WD_SOA,     ET_DRVD_WDEP,F, 'kg ha-1','Wet Deposition of Secondary Organic Aerosol' ),
+     &ELDTP( 'DD_SOC       ',ID_DD_SOC,     ET_DRVD_DDEP,F, 'kg ha-1','Dry Deposition of Secondary Organic Carbon' ),
+     &ELDTP( 'WD_SOC       ',ID_WD_SOC,     ET_DRVD_WDEP,F, 'kg ha-1','Wet Deposition of Secondary Organic Carbon' ),
+
       ! Spectral Variables and diagnostics
      &ELDTP( 'AOD_550      ',ID_AOD550,     ET_PHOT,     F, '1     ', 'Aerosol Optical Depth at 550 nm -Angstrom interp' ),
      &ELDTP( 'PM_EXT_550   ',ID_PMEXT550,   ET_PHOT,     F, 'Mm-1  ', 'Aerosol Extinction at 550 nm -Angstrom interp' ),
@@ -253,6 +289,11 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'TA           ',ID_TEMP,       ET_MET,      F, 'K     ', 'Temperature' ),
      &ELDTP( 'TSURF        ',ID_SRFTEMP,    ET_MET,      F, 'K     ', '2-meter Surface Temperature' ),
      &ELDTP( 'PRES         ',ID_PRES,       ET_MET,      F, 'Pa    ', 'Pressure' ),
+     &ELDTP( 'PBL          ',ID_PBL,        ET_MET,      F, 'm     ', 'Planetry Boundary Layer (PBL) Height' ),
+     &ELDTP( 'RGRND        ',ID_RGRND,      ET_MET,      F, 'W m-2 ', 'Solar Radiation at Ground' ),
+     &ELDTP( 'PRECIP       ',ID_PRECIP,     ET_MET,      F, 'cm    ', 'Precipitation' ),
+     &ELDTP( 'WSPD10       ',ID_WSPD10,     ET_MET,      F, 'm s-1 ', 'Wind Speed at 10 m' ),
+     &ELDTP( 'WDIR10       ',ID_WDIR10,     ET_MET,      F, 'deg   ', 'Wind Direction at 10 m' ),
      &ELDTP( 'GAMMA_N2O5   ',ID_GN2O5F,     ET_CHEM,     F, '1     ', 'Fine Mode N2O5 Heterogeneous rxn probability' ),
      &ELDTP( 'GAMMA_N2O5K  ',ID_GN2O5C,     ET_CHEM,     F, '1     ', 'Coarse Mode N2O5 Heterogeneous rxn probability' ),
      &ELDTP( 'YIELD_CLNO2  ',ID_YCLNO2F,    ET_CHEM,     F, '1     ', 'Fine Mode CLNO2 Heterogeneous reaction yield' ),
@@ -283,6 +324,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       TYPE ELMO_FILE_TYPE
           CHARACTER(300)              :: FILENAME     ! Filename with full path
+          CHARACTER(50)               :: SHORTNAME    ! ELMO[N]_[Flabel]
           INTEGER                     :: STRUCT       ! 0 = gridded, 1 = unstrcutured
           CHARACTER( 16)              :: FLOGICAL     ! I/O Logical Name for each output file
           INTEGER                     :: TSTEP        ! Output Time Step (HHMMSS)
@@ -394,7 +436,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
       ! Define List of Possible Units for Output
-      INTEGER, PARAMETER :: N_UNIT = 29
+      INTEGER, PARAMETER :: N_UNIT = 30
       CHARACTER( 11 ), PARAMETER :: CUNIT( N_UNIT ) = 
      &    (/'UG M-3     ','PPMV       ','UGC M-3    ','PPMC       ',
      &      'UGN M-3    ','PPMN       ','M-3        ','M2 M-3     ',
@@ -403,7 +445,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &      'KG M-3     ','UMOL M-3   ','MOL L-1    ','UG UG-1    ',
      &      'K          ','PA         ','S-1        ','M          ',
      &      'MM-1       ','M2 S-1     ','PMOLEC CM-2','NG M-3     ',
-     &      'PPBV       '/)
+     &      'PPBV       ','MOL KG-1   '/)
       
       INTEGER, PARAMETER :: IU_UNSP       = 0   ! Unspecified Units
       INTEGER, PARAMETER :: IU_UGpM3      = 1   ! ug m-3
@@ -435,6 +477,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: IU_PMOLECpCM2 = 27  ! Petamolecule cm-2
       INTEGER, PARAMETER :: IU_NGpM3      = 28  ! ng m-3
       INTEGER, PARAMETER :: IU_PPBV       = 29  ! ppbV
+      INTEGER, PARAMETER :: IU_MOLpKG     = 30  ! mol kg-1
+
 
 
       ! Define Logical flags for turning on output categories
@@ -466,10 +510,16 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &        ELMO_INLET_TYPE( 'INUM40  ', 0.04,1.0e3),
      &        ELMO_INLET_TYPE( 'INUM100 ', 0.1, 1.0e3) /)
 
-        REAL, SAVE :: INLET_FRAC( N_INLET,N_MODE,2 )  ! Fraction of each aerosol mode 
-                                                      !   collected by each inlet
-                                                      !   Third dimension is 1
-                                                      !     for wet and 2 for dry
+      REAL, SAVE :: INLET_FRAC( N_INLET,N_MODE,2 )  ! Fraction of each aerosol mode 
+                                                    !   collected by each inlet
+                                                    !   Third dimension is 1
+                                                    !     for wet and 2 for dry
+
+      ! Integers for specifying the kind of organic aerosol metric
+      ! requested from the function SUM_ORGS in ELMO_CALC_DERIVED.F
+      INTEGER, PARAMETER :: OT_OA = 1, OT_OC = 2, OT_OMOC = 3, 
+     &                      OT_OTOC = 4, OT_DD_OA = 5, OT_WD_OA = 6,
+     &                      OT_DD_OC = 7, OT_WD_OC = 8
 
         REAL, ALLOCATABLE, SAVE, PUBLIC :: 
      &                             ELMO_AOD_550(:,:),  ! total aerosol optical depth at 
@@ -489,7 +539,15 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         REAL, ALLOCATABLE, SAVE :: ELMO_ISAM_DDEP(:,:,:,:) ! dry deposition accumulated per time step
         REAL, ALLOCATABLE, SAVE :: ELMO_DDM_WDEP(:,:,:,:) ! wet deposition accumulated per time step
         REAL, ALLOCATABLE, SAVE :: ELMO_DDM_DDEP(:,:,:,:) ! dry deposition accumulated per time step
+             
+        REAL, SAVE :: PBL, RGRND, RC, RN, WSPD10, WDIR10
 
+        ! Set Value for Missing Variables
+#ifdef mpas
+        REAL, PARAMETER :: ELMO_BLANK = -9.000E36
+#else
+        REAL, PARAMETER :: ELMO_BLANK = AMISS3
+#endif       
         CONTAINS
 
 !------------------------------------------------------------------------------------------            
@@ -512,7 +570,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         if (firstime ) then
             firstime = .false.
-
+            
             allocate( elmo_aod_550(ncols, nrows ), stat=ios)
             call checkmem( ios, 'ELMO_AOD_550',pname )
             elmo_aod_550 = 0.0
@@ -642,6 +700,14 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             ! Activate all CGRID species
             DO IT = 1,N_ELMO_TABLE
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_CONC )
+     &                  L_ELMO_TABLE( IT ) = .TRUE.
+            END DO
+          
+         ELSE IF ( VARS_NML(1) .EQ. 'ALL_DEP' ) THEN
+            ! Activate all Deposition Fluxes
+            DO IT = 1,N_ELMO_TABLE
+                IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_WDEP .OR.
+     &               ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_DDEP )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
@@ -910,68 +976,91 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       ! Calculate Unit Conversions
       SELECT CASE ( OUT_UNIT )
-        CASE ( 1 ) ! ug m-3 out
+        CASE ( IU_UGpM3 ) ! ug m-3 out
           SELECT CASE ( SPC_UNIT )
-            CASE ( 1 ) ! mass-based
+            CASE ( IU_UGpM3 ) ! mass-based
               ELMO_UNIT_CONV = D
-            CASE ( 2 ) ! mole-based
+            CASE ( IU_PPMV ) ! mole-based
               ELMO_UNIT_CONV = D * ELMO_TABLE( J )%MW
      &            / MWAIR * AIRDENS * 1000.0 ! to mass concentration
             CASE DEFAULT
               XMSG = 'ELMO is attempting to convert variable ' // 
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
-     &           CUNIT( SPC_UNIT ) // ' to ' // CUNIT( OUT_UNIT ) //
+     &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
+              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
           END SELECT 
 
 
-        CASE ( 2 ) ! ppmv out
-            CASE ( 1 ) ! mass-based
+        CASE ( IU_PPMV ) ! ppmv out
+          SELECT CASE ( SPC_UNIT )
+            CASE ( IU_UGpM3 ) ! mass-based
               ELMO_UNIT_CONV = D / ELMO_TABLE( J )%MW 
      &             * MWAIR / AIRDENS / 1000.0 ! to mole mixing ratio
-            CASE ( 2 ) ! mole-based
+            CASE ( IU_PPMV ) ! mole-based
               ELMO_UNIT_CONV = D
             CASE DEFAULT
               XMSG = 'ELMO is attempting to convert variable ' // 
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
-     &           CUNIT( SPC_UNIT ) // ' to ' // CUNIT( OUT_UNIT ) //
+     &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
+              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
           END SELECT 
-
-           
-        CASE ( 28 ) ! ng m-3 out
+ 
+        CASE ( IU_UMOLpM3 ) ! umol m-3 out
           SELECT CASE ( SPC_UNIT )
-            CASE ( 1 ) ! mass-based
+            CASE ( IU_UGpM3 ) ! mass-based
+              ELMO_UNIT_CONV = D / ELMO_TABLE( J )%MW
+            CASE ( IU_PPMV ) ! mole-based
+              ELMO_UNIT_CONV = D / MWAIR * AIRDENS * 1000.0 
+            CASE DEFAULT
+              XMSG = 'ELMO is attempting to convert variable ' // 
+     &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
+     &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
+     &           ' but it does not know to do it. No conversion is applied.'
+              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+          END SELECT 
+ 
+        CASE ( IU_NGpM3 ) ! ng m-3 out
+          SELECT CASE ( SPC_UNIT )
+            CASE ( IU_UGpM3 ) ! mass-based
               ELMO_UNIT_CONV = D * 1000.0
-            CASE ( 2 ) ! mole-based
+            CASE ( IU_PPMV ) ! mole-based
               ELMO_UNIT_CONV = D * ELMO_TABLE( J )%MW
      &            / MWAIR * AIRDENS * 1.0E6 ! to mass concentration
             CASE DEFAULT
               XMSG = 'ELMO is attempting to convert variable ' // 
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
-     &           CUNIT( SPC_UNIT ) // ' to ' // CUNIT( OUT_UNIT ) //
+     &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
+              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
           END SELECT 
 
-
-        CASE ( 29 ) ! ppbV out
+        CASE ( IU_PPBV ) ! ppbV out
           SELECT CASE ( SPC_UNIT )
-            CASE ( 1 ) ! mass-based
+            CASE ( IU_UGpM3 ) ! mass-based
               ELMO_UNIT_CONV = D / ELMO_TABLE( J )%MW 
      &             * MWAIR / AIRDENS ! to mole mixing ratio
-            CASE ( 2 ) ! mole-based
+            CASE ( IU_PPMV ) ! mole-based
               ELMO_UNIT_CONV = D * 1000.0
             CASE DEFAULT
               XMSG = 'ELMO is attempting to convert variable ' // 
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
-     &           CUNIT( SPC_UNIT ) // ' to ' // CUNIT( OUT_UNIT ) //
+     &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
+              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
           END SELECT 
 
+
+        CASE DEFAULT
+              XMSG = 'ELMO is attempting to convert variable ' // 
+     &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
+     &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
+     &           ' but cannot complete it because '//TRIM(CUNIT( OUT_UNIT ))//
+     &           ' is not a supported option in ELMO. Please add it to '//
+     &           'COMP_UNIT_CONVERSION.'
+              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+ 
       END SELECT 
  
       RETURN

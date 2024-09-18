@@ -31,9 +31,9 @@
 
       TYPE COMPOSITE_NML
           CHARACTER(LEN = 16) :: NAME
+          CHARACTER(LEN = 100) :: DESC
           CHARACTER(LEN = 16) :: CUNIT
           CHARACTER(LEN = 16) :: CMPST_TYPE
-          CHARACTER(LEN = 100) :: DESC
           CHARACTER(LEN = 300) :: FORMULA
       END TYPE COMPOSITE_NML
 
@@ -53,7 +53,7 @@
 !-------------------------------------------------------------------------
 
       USE AERO_DATA, ONLY : AEROSPC, N_AEROSPC, N_MODE, AERO_MISSING
-      USE CGRID_SPCS, ONLY : WDEP_SPC, N_SPC_WDEP
+      USE CGRID_SPCS, ONLY : WDEP_SPC, N_SPC_WDEP, CGRID_NAME, N_CGRID_SPC
       USE VDIFF_MAP, ONLY : DDEP_SPC, N_SPC_DDEP
 
       IMPLICIT NONE
@@ -64,7 +64,8 @@
       INTEGER IOST, IW, ID
       CHARACTER( 200 ) :: TMPLINE
       CHARACTER( 40 )  :: PNAME = 'ELMO_READ_COMPOSITES'
-      INTEGER IAERO, IAER, ICOMP, IM
+      INTEGER IAERO, IAER, ICOMP, IM, INDX
+      INTEGER N_MAX_COMPOSITES
 
       ! Define Namelist Input from Mechanism-Specific Control File
       Namelist / COMPOSITE_INIT / N_MAX_COMPOSITES, N_MAX_COMPONENTS
@@ -160,14 +161,26 @@
       END IF
 
       ! Check that all user-defined Composites are populated
+      N_COMPOSITES = 0
       DO ICOMP = 1,N_MAX_COMPOSITES
-         IF ( CMPST(ICOMP)%NAME .EQ. '' ) THEN
-            N_COMPOSITES = ICOMP - 1
+         IF ( CMPST(ICOMP)%NAME .NE. '' ) THEN
+            N_COMPOSITES = N_COMPOSITES + 1
          END IF
       END DO
 
       CALL LOG_MESSAGE( LOGDEV, 'Completed Reading ELMO Composites '//
      &                             'from Mechanism-Spcific Namelist')
+
+      ! Check that No Composite names are equal to any CGRID name
+      DO ICOMP = 1,N_COMPOSITES
+         INDX = INDEX1( CMPST(ICOMP)%NAME, N_CGRID_SPC, CGRID_NAME )
+         IF ( INDX .NE. 0 ) THEN
+            XMSG = 'The name of a Composite: ' // TRIM( CMPST(ICOMP)%NAME ) //
+     &             ' is the same as a gas or particle species in CGRID. This is ' //
+     &             'not allowed. Either delte this Composite or rename it.'
+            CALL M3EXIT ( 'DESID_READ_NAMELIST', 0, 0, XMSG, 1 ) 
+         END IF
+      END DO
 
       ! Add Bulk Aerosols to Composite List
       DO IAERO = 1,N_AEROSPC
@@ -419,6 +432,14 @@
              ! Deposition will consist of particles from 
              ! the entire size range
              ELMO_COMP( J )%L_MODE( : ) = .TRUE.
+         CASE ('DEP_FINE')
+             ! Deposition will consist of particles from 
+             ! the fine mode range
+             ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%FINE_MASK
+         CASE ('DEP_COARSE')
+             ! Deposition will consist of particles from 
+             ! the coarse mode range
+             ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%COARSE_MASK
          CASE DEFAULT
              XMSG = 'An aerosol descriptor (' // trim(AEROTYPE) // ') has been given ' //
      &              'for the mapping of an ELMO composite variable. It is not recognized.'

@@ -77,7 +77,7 @@
 &ELMO_INIT
   N_Files = 3
   N_Max_Output_Variables = 40
-  N_Keywords = 27
+  N_Keywords = 40
   N_Max_Keyword_Variables = 40
 /
 
@@ -92,9 +92,9 @@
   Tmode = 'average', 'average', 'instant'
   Lay_Bot = 1, 1, 1
   Lay_Top = 1, 5, 35
-  File_Vars(1,:) = 'NOY','PM1','ASO4','*ANO3','PMF_CLDGLY','PM25_SO4','PM25_NH4'
+  File_Vars(1,:) = 'NOY','PM1','ASO4','*ANO3','PMF_CLDGLY','PM25_SO4','PM25_NH4','DEFAULT'
   File_Vars(2,:) = 'NO2', 'FORM', 'SO2', 'O3', 'PM25', 'PM10', 'DENS', 'NOX', 'AOD_550','PM_EXT_550'
-  File_Vars(3,:) = 'AEC','KZ','ANH4J','PMAMS_SO4','AMET_GAS','AMET_ISAM'
+  File_Vars(3,:) = 'AEC','KZ','ANH4J','PMAMS_SO4','AMET_GAS'
 
 
  !
@@ -105,12 +105,12 @@
 
   Keywd_name(2) = 'DEFAULT'
   Keywd(2,:) = 'AMET','PM_MASS','CHEM','MET','TSP_NUM','PMF_NUM','PMC_NUM',
-               'FINE_SPECIES','COARSE_SPECIES','PM25_SPECIES','SIZE','AMS',
+               'FINE_SPECIES','COARSE_SPECIES','PM25_SPECIES','SIZE','AMS_SPECIES',
                'PM25TO10_SPECIES','CUTOFF_FRACTIONS','DEFAULT_GAS'
 
  !-- Meteorological Variables
   Keywd_name(3) = 'MET'           
-  Keywd(3,:) = 'TA','PRES','RH'
+  Keywd(3,:) = 'TA','PRES','RH','PBL','PRECIP','RGRND','WSPD10','WDIR10'
 
  !-- Routine evaluation variables for the Atmospheric Model Evaluation Tool (AMET)
   Keywd_name(4) = 'AMET'          
@@ -122,7 +122,7 @@
                'PMF_NO3','PMF_NH4','PMF_FE','PMF_AL','PMF_SI','PMF_TI','PMF_CA',
                'PMF_MG','PMF_K','PMF_MN','PMF_RECONSOIL','PMF_OTHWNC','PMF_NC',
                'PMF_OTH',
-               'PM25','PM25_FRM,'PM25_OC','PM25_EC','PM25_SO4','PM25_NO3',
+               'PM25','PM25_FRM','PM25_OC','PM25_EC','PM25_SO4','PM25_NO3',
                'PM25_NH4',
 
   Keywd_name(6) = 'AMET_GAS'
@@ -157,60 +157,114 @@
                'PM1_OA','PM1_MG','PM1_K','PM1_CA','PM1_OTHER','PM1_FE','PM1_SI','PM1_TI',
                'PM1_MN','PM1_AL','PM1_RECONSOIL','PM1_OTHWNC','PM1_UNSPCRS'
 
-  Keywd_name(14) = 'PM25TO10_SPECIES'
-  Keywd(14,:) = 'PM25TO10','PM25TO10_SO4','PM25TO10_NO3','PM25TO10_NH4','PM25TO10_CL',
+  Keywd_name(14) = 'PM25_SPECIES'
+  Keywd(14,:) = 'PM25','PM25_SO4','PM25_NO3','PM25_NH4','PM25_CL','PM25_NA','PM25_EC','PM25_OC',
+               'PM25_OA','PM25_MG','PM25_K','PM25_CA','PM25_OTHER','PM25_FE','PM25_SI','PM25_TI',
+               'PM25_MN','PM25_AL','PM25_RECONSOIL','PM25_OTHWNC','PM25_UNSPCRS','PM25_HP'
+
+  Keywd_name(15) = 'PM25TO10_SPECIES'
+  Keywd(15,:) = 'PM25TO10','PM25TO10_SO4','PM25TO10_NO3','PM25TO10_NH4','PM25TO10_CL',
                'PM25TO10_NA'
 
-  Keywd_name(15) = 'ORGANIC'
-  Keywd(15,:) = 'FINE_ORG','PM1_OC','PM1_OA','PMAMS_OA','PMAMS_OTOC','PM25_OA'
+  Keywd_name(16) = 'ORGANIC'
+  Keywd(16,:) = 'FINE_ORG','PM1_OC','PM1_OA','PMAMS_OA','PMAMS_OTOC','PM25_OA'
 
-  Keywd_name(16) = 'FINE_ORG'
-  Keywd(16,:) = 'PMF_OC','PMF_OA','PMF_POC','PMF_SOC','PMF_POA','PMF_SOA','PMF_NC',
+  Keywd_name(17) = 'FINE_ORG'
+  Keywd(17,:) = 'PMF_OC','PMF_OA','PMF_POC','PMF_SOC','PMF_POA','PMF_SOA','PMF_NC',
                'PMF_OMOC','PMF_OTOC','PMF_ASOA','PMF_BSOA','PMF_CLDGLY',
-               'PMF_ISOPSOA','PMF_IEPIXSOA','PMF_MTNSOA','PMF_MTSOA'
+               'PMF_ISOPSOA','PMF_IEPOXSOA','PMF_MTNSOA','PMF_MTSOA'
  
  !-- Particle Size Distribution Parameters
-  Keywd_name(17) = 'NUMBER'
-  Keywd(17,:) = 'PM_NUM','PMF_NUM','PMC_NUM','N10','N20','N40','N100'
+  Keywd_name(18) = 'NUMBER'
+  Keywd(18,:) = 'TSP_NUM','PMF_NUM','PMC_NUM','N10','N20','N40','N100'
 
-  Keywd_name(18) = 'SURFACE_AREA'
-  Keywd(18,:) = 'PM_SRF','PMU_SRF','PMF_SRF','PMC_SRF','WET_M2'
+  Keywd_name(19) = 'SURFACE_AREA'
+  Keywd(19,:) = 'PM_SRF','PMU_SRF','PMF_SRF','PMC_SRF','WET_M2'
 
-  Keywd_name(19) = 'SIZE'
-  Keywd(19,:) = 'NUMBER','DRY_DG','WET_DG','STDEV','DR_M3','WET_M3','WET_M2','DRY_DENS','WET_DENS'
+  Keywd_name(20) = 'SIZE'
+  Keywd(20,:) = 'NUMBER','DRY_DG','WET_DG','STDEV','DRY_M3','WET_M3','WET_M2','DRY_DENS','WET_DENS'
 
-  Keywd_name(20) = 'CUTOFF_FRACTIONS'
-  Keywd(20,:) = 'FPM01','FPM1','FPM25','FPM10','FPM25TO10','FAMS'
+  Keywd_name(21) = 'CUTOFF_FRACTIONS'
+  Keywd(21,:) = 'FPM01','FPM1','FPM25','FPM10','FPM25TO10','FAMS'
 
  !-- Chemical Reaction Rates and Parameters
-  Keywd_name(21) = 'CHEM'
-  Keywd(21,:) = 'GAMMA_N2O5','GAMMA_N2O5K','YIELD_CLNO2','YIELD_CLNO2K','GAMMA_IEPOX',
+  Keywd_name(22) = 'CHEM'
+  Keywd(22,:) = 'GAMMA_N2O5','GAMMA_N2O5K','YIELD_CLNO2','YIELD_CLNO2K','GAMMA_IEPOX',
                'K_IEPOX','GAMMA_IMAE'
 
  !-- Toxics
-  Keywd_name(22) = 'GAS_TOXICS'
-  Keywd(22,:) = 'FORMALD','ACETALD','BENZENE','ACETYLENE','ETHANE','ETHENE',
-               'TOLUENE','XYLENES'
+  Keywd_name(23) = 'GAS_TOXICS'
+  Keywd(23,:) = 'FORMALD','ACETALD','BENZENE','ACETYLENE','ETHANE','ETHENE',
+               'TOLUENE','XYLENES','NAPHTHAL'
 
-  Keywd_name(23) = 'PM_TOXICS'
-  Keywd(23,:) = 'PM25_HDIESEL','PM25_HBE','PM25_HCD','PM25_HCR3','PM25_HCR6','PM25_HCR',
+  Keywd_name(24) = 'PM_TOXICS'
+  Keywd(24,:) = 'PM25_HDIESEL','PM25_HBE','PM25_HCD','PM25_HCR3','PM25_HCR6','PM25_HCR',
                'PM25_HPB','PM25_HMN','PM25_HNI','PM25_HAS','PM25_HG',
                'PM10_HDIESEL','PM10_HBE','PM10_HCD','PM10_HCR3','PM10_HCR6','PM10_HCR',
                'PM10_HPB','PM10_HMN','PM10_HNI','PM10_HAS','PM10_HG' 
 
  !-- Satellite Retrieval Evaluation
-  Keywd_name(24) = 'SAT'
-  Keywd(24,:) = 'SATMET','SATCONC'
+  Keywd_name(25) = 'SAT'
+  Keywd(25,:) = 'SATMET','SATCONC'
 
-  Keywd_name(25) = 'SATMET'
-  Keywd(25,:) = 'DENS','DZ','ZH','CFRAC','PV','PRES','TA'
+  Keywd_name(26) = 'SATMET'
+  Keywd(26,:) = 'DENS','DZ','ZH','CFRAC','PV','PRES','TA'
 
-  Keywd_name(26) = 'SATCONC'
-  Keywd(26,:) = 'NO2','SO2','O3','CO','FORMALD','NH3','AOD_550'
+  Keywd_name(27) = 'SATCONC'
+  Keywd(27,:) = 'NO2','SO2','O3','CO','FORMALD','NH3','AOD_550'
  
  !-- Deposition
-  Keywd_name(27) = 'ALL_DEP'
-  Keywd(27,:) = 'ALL_WDEP','ALL_DDEP'
+  Keywd_name(28) = 'DEFAULT_DEP'
+  Keywd(28,:) = 'GAS_DEP','PM_DEP','GASPM_DEP','OXIDIZED_NITROGEN_DEP',
+                'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
+                'SEASPRAY_SULFUR_DEP'
+
+  Keywd_name(29) = 'GAS_DEP'
+  Keywd(29,:) = 'DD_FORMALD','WD_FORMALD','DD_HNO4','WD_HNO4','DD_NTR','WD_NTR',
+                'DD_PANT','WD_PANT'
+
+  Keywd_name(30) = 'FINE_DDEP'
+  Keywd(30,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
+                'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL',DD_PMF_SI',
+                'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K','DD_PMF_SSSO4'
+
+  Keywd_name(31) = 'COARSE_DDEP'
+  Keywd(31,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
+                'DD_PMC_CA','DD_PMC_MG','DD_PMC_K','DD_PMC_SSSO4'
+
+  Keywd_name(32) = 'PM_DDEP'
+  Keywd(32,:) = 'DD_TSP_CL','DD_TSP_CA','DD_TSP_MG','DD_TSP_K','DD_TSP_SSSO4'
+
+  Keywd_name(33) = 'PM_WDEP'
+  Keywd(33,:) = 'WD_NO3','WD_NH4','WD_SO4','WD_TSP_MTNO3','WD_TSP_NA','WD_PMC_NA',
+                'WD_TSP_NA','WD_PMF_CA','WD_PMC_CA','WD_TSP_CA','WD_PMF_FE','
+                'WD_PMF_AL','WD_PMF_SI','WD_PMF_TI','WD_PMF_MN','WD_PMF_MG','WD_PMC_MG',
+                'WD_TSP_MG','WD_PMF_K','WD_PMC_K','WD_TSP_K'
+
+  Keywd_name(34) = 'PM_TDEP'
+  Keywd(34,:) = 'TD_TSP_NA'
+
+  Keywd_name(35) = 'GASPM_DEP'
+  Keywd(35,:) = 'DD_TNO3','WD_TNO3','DD_NHX','WD_NHX','WD_SOX','WD_TCL','TD_TCL'
+
+  Keywd_name(36) = 'OXIDIZED_NITROGEN_DEP'
+  Keywd(36,:) = 'DD_OXN_NOX', 'WD_OXN_NOX', 'DD_OXN_TNO3','WD_OXN_TNO3',
+                'DD_OXN_PANT','WD_OXN_PANT','DD_OXN_ORGN','WD_OXN_ORGN',
+                'DD_OXN_OTHR','WD_OXN_OTHR','DD_OXN_TOT', 'WD_OXN_TOT',
+                'TD_OXN_TOT'
+
+  Keywd_name(37) = 'REDUCED_NITROGEN_DEP'
+  Keywd(37,:) = 'DD_REDN_TOT','WD_REDN_TOT','TD_REDN_TOT'
+
+  Keywd_name(38) = 'TOTAL_NITROGEN_DEP'
+  Keywd(38,:) = 'DD_N_TOT','WD_N_TOT','TD_N_TOT'
+
+  Keywd_name(39) = 'TOTAL_SULFUR_DEP'
+  Keywd(39,:) = 'DD_S_TOT','WD_S_TOT','TD_S_TOT'
+
+  Keywd_name(40) = 'SEASPRAY_SULFUR_DEP'
+  Keywd(40,:) = 'DD_S_SEA','WD_S_SEA','TD_S_SEA'
+
 
 /
 

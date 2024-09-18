@@ -127,6 +127,7 @@ c control species
       CHARACTER( 256), ALLOCATABLE, SAVE :: CGRID_CONC_DESC ( : )
       INTEGER, ALLOCATABLE, SAVE :: MAP_DEPVtoCGRID( : )
       INTEGER, ALLOCATABLE, SAVE :: MAP_WDEPtoCGRID( : )
+      INTEGER, ALLOCATABLE, SAVE :: MAP_CGRIDtoWDEP( : )
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: WDEP_SPC( : )
 
 #ifdef mpas
@@ -1010,6 +1011,7 @@ c-------------------------------------------------------------------------------
      &                CGRID_CONC_DESC( N_CGRID_SPC ),
      &                MAP_DEPVtoCGRID( N_CGRID_SPC ),
      &                MAP_WDEPtoCGRID( N_CGRID_SPC ),
+     &                MAP_CGRIDtoWDEP( N_CGRID_SPC ),
      &                WDEP_SPC( N_CGRID_SPC ) )
             CGRID_NAME = ''
             CGRID_MW   = 0.
@@ -1023,6 +1025,7 @@ c-------------------------------------------------------------------------------
             CGRID_CONC_DESC= ''
             MAP_DEPVtoCGRID= 0
             MAP_WDEPtoCGRID= 0
+            MAP_CGRIDtoWDEP= 0
             WDEP_SPC = ''
             CGRID_UNITS = ''
 
@@ -1048,6 +1051,7 @@ c-------------------------------------------------------------------------------
                   IF ( GC_WDEP_MAP( JSPC ) .EQ. ISPC ) THEN
                     IWDEP = IWDEP + 1
                     MAP_WDEPtoCGRID( IWDEP ) = IGRID
+                    MAP_CGRIDtoWDEP( IGRID ) = IWDEP
                     WDEP_SPC( IWDEP ) = GC_WDEP( JSPC )
                   END IF
                 ENDDO
@@ -1087,6 +1091,7 @@ c-------------------------------------------------------------------------------
                   IF ( AE_WDEP_MAP( JSPC ) .EQ. ISPC ) THEN
                     IWDEP = IWDEP + 1
                     MAP_WDEPtoCGRID( IWDEP ) = IGRID
+                    MAP_CGRIDtoWDEP( IGRID ) = IWDEP
                     WDEP_SPC( IWDEP ) = AE_WDEP( JSPC )
                   END IF
                 ENDDO
@@ -1121,6 +1126,7 @@ c-------------------------------------------------------------------------------
                   IF ( NR_WDEP_MAP( JSPC ) .EQ. ISPC ) THEN
                     IWDEP = IWDEP + 1
                     MAP_WDEPtoCGRID( IWDEP ) = IGRID
+                    MAP_CGRIDtoWDEP( IGRID ) = IWDEP
                     WDEP_SPC( IWDEP ) = NR_WDEP( JSPC )
                   END IF
                 ENDDO
@@ -1146,6 +1152,7 @@ c-------------------------------------------------------------------------------
                   IF ( TR_WDEP_MAP( JSPC ) .EQ. ISPC ) THEN
                     IWDEP = IWDEP + 1
                     MAP_WDEPtoCGRID( IWDEP ) = IGRID
+                    MAP_CGRIDtoWDEP( IGRID ) = IWDEP
                     WDEP_SPC( IWDEP ) = TR_WDEP( JSPC )
                   END IF
                 ENDDO

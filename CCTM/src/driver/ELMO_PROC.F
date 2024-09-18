@@ -97,7 +97,9 @@
 
       REAL, ALLOCATABLE, SAVE :: PRES(:,:,:), TA(:,:,:), TEMP2(:,:),
      &                           QV(:,:,:), DENS(:,:,:), CFRACS(:,:),
-     &                           ZF(:,:,:), PVS(:,:,:), ZHS(:,:,:)
+     &                           ZF(:,:,:), PVS(:,:,:), ZHS(:,:,:),
+     &                           PBLS(:,:), RGRNDS(:,:), RCS(:,:),
+     &                           RNS(:,:), WSPD10S(:,:), WDIR10S(:,:)
 
       IF ( FIRSTIME ) THEN
           FIRSTIME = .FALSE.
@@ -112,7 +114,13 @@
      &              ZF( NCOLS, NROWS, NLAYS ),
      &              ZHS( NCOLS, NROWS, NLAYS ),
      &              PVS( NCOLS, NROWS, NLAYS ),
-     &              TEMP2( NCOLS, NROWS ) )
+     &              TEMP2( NCOLS, NROWS ),
+     &              PBLS( NCOLS,NROWS ), 
+     &              RGRNDS( NCOLS,NROWS ), 
+     &              RCS( NCOLS,NROWS ), 
+     &              RNS( NCOLS,NROWS ), 
+     &              WSPD10S( NCOLS,NROWS ), 
+     &              WDIR10S( NCOLS,NROWS ) ) 
          
          ! Allocate local image of CGRID so it can be used each time step
          ALLOCATE( CONC_VEC( N_CGRID_SPC ), 
@@ -170,6 +178,24 @@
       ! get cloud fraction if photolysis hasn not been called yet
       call interpolate_var ('CFRAC', jdate, jtime, CFRACS)
 
+      ! get PBL height (m)
+      call interpolate_var ('PBL', jdate, jtime, PBLS)
+
+      ! get Solar Radiation reaching ground (W m-2)
+      call interpolate_var ('RGRND', jdate, jtime, RGRNDS)
+
+      ! get Convective Rain Rate (cm)
+      call interpolate_var ('RC', jdate, jtime, RCS)
+
+      ! get Non-Convective Rain Rate (cm)
+      call interpolate_var ('RN', jdate, jtime, RNS)
+
+      ! get Wind Speed at 10 m (m s-1)
+      call interpolate_var ('WSPD10', jdate, jtime, WSPD10S)
+
+      ! get Wind Direction at 10 m (degrees)
+      call interpolate_var ('WDIR10', jdate, jtime, WDIR10S)
+
       ! retrieve all layer heights. This is the height of the top of the
       ! layers
       call interpolate_var ('ZF', jdate, jtime, ZF)
@@ -178,11 +204,7 @@
       if ( pv_avail ) then
            call interpolate_var ('PV', jdate, jtime, PVS)
       else
-#ifdef mpas
-            PVS = -9.000E36
-#else
-            PVS = AMISS3
-#endif
+           PVS = ELMO_BLANK
       end if
       
       ! retrieve layer midpoint heights. This is a mass weighted
@@ -210,17 +232,27 @@
          IF ( L .EQ. 1 ) THEN
              DZ   = ZF( C,R,L )
              CFRAC= CFRACS( C,R ) 
+             PBL      = PBLS( C,R )
+             RGRND    = RGRNDS( C,R )
+             RC       = RCS( C,R )
+             RN       = RNS( C,R )
+             WSPD10   = WSPD10S( C,R )
+             WDIR10   = WDIR10S( C,R )
+
          ELSE
-             DZ   = ZF( C,R,L ) - ZF( C,R,L-1 )
-#ifdef mpas
-            CFRAC = -9.000E36
-#else
-            CFRAC = AMISS3
-#endif
+             DZ      = ZF( C,R,L ) - ZF( C,R,L-1 )
+             CFRAC   = ELMO_BLANK
+             PBL     = ELMO_BLANK
+             RGRND   = ELMO_BLANK
+             RC      = ELMO_BLANK
+             RN      = ELMO_BLANK
+             WSPD10  = ELMO_BLANK
+             WDIR10  = ELMO_BLANK
+ 
          END IF
          ZH       = ZHS( C,R,L )
          PV       = PVS( C,R,L )
- 
+
          ! Extract Aerosols
 #ifdef sens
          CALL EXTRACT_AERO( CGRID( C,R,L,: ), .TRUE., SENGRID( C,R,L,:,: ), .TRUE. )
@@ -383,7 +415,13 @@
      &                    IV .EQ. ET_DDM_WDEP .OR.
      &                    IV .EQ. ET_CMPST_DEP .OR.
      &                    IV .EQ. ET_ISAM_CMPST_DEP .OR.
-     &                    IV .EQ. ET_DDM_CMPST_DEP ) THEN
+     &                    IV .EQ. ET_DDM_CMPST_DEP .OR.
+     &                    IV .EQ. ET_DRVD_DDEP .OR.
+     &                    IV .EQ. ET_ISAM_DRVD_DDEP .OR.
+     &                    IV .EQ. ET_DDM_DRVD_DDEP .OR.
+     &                    IV .EQ. ET_DRVD_WDEP .OR.
+     &                    IV .EQ. ET_ISAM_DRVD_WDEP .OR.
+     &                    IV .EQ. ET_DDM_DRVD_WDEP ) THEN
                    ! This is a deposition species so we should be
                    ! computing a cumulative sum, not an average by default
                    IF ( INIT_STEP ) THEN
@@ -527,6 +565,8 @@
             END DO
 
          CASE ( ET_DRVD, ET_ISAM_DRVD, ET_DDM_DRVD,
+     &          ET_DRVD_DDEP, ET_ISAM_DRVD_DDEP, ET_DDM_DRVD_DDEP,
+     &          ET_DRVD_WDEP, ET_ISAM_DRVD_WDEP, ET_DDM_DRVD_WDEP,
      &          ET_AEROPROP, ET_CHEM, ET_MET, ET_PHOT )
             ! Retrieve Detailed ELMO Variable
             CALL ELMO_CALC_DERIVED( VAL2, J )
@@ -577,12 +617,12 @@
          CASE ( ET_DDM_WDEP )
             ! Variable is in the DDM3D WetDep Array
             ISC = ELMO_TABLE( J )%SOURCE
-            OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, DDM_WDEP_VEC( ISC,ID ) ) 
+            OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, DDM_WDEP_VEC( ID,ISC ) ) 
 
          CASE ( ET_DDM_DDEP )
             ! Variable is in the DDM3D DryDep Array
             ISC = ELMO_TABLE( J )%SOURCE
-            OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, DDM_DDEP_VEC( ISC,ID ) ) 
+            OUTVAL = ELMO_UNIT_CONV( J, OUT_UNIT, DDM_DDEP_VEC( ID,ISC ) ) 
 #endif
 
          CASE DEFAULT
