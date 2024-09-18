@@ -71,6 +71,7 @@
 
 #> Set full path of Fortran 90 compiler
  set FC = ${myFC}
+ set CC = ${myCC}
  set FP = $FC
  setenv BLDER ${CMAQ_HOME}/UTIL/bldmake/bldmake_${compilerString}.exe   #> name of model builder executable
 
