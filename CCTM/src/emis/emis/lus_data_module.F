@@ -224,8 +224,8 @@
      &           (/ 1,       ! shrubland
      &              1,       ! shrubland
      &              3,       ! barrenland
-     &              3,       ! barrenland
-     &              3,       ! barrenland
+     &              1,       ! shrubland
+     &              1,       ! shrubland
      &              3,       ! barrenland
      &              3,       ! barrenland
      &              3 /)     ! ag landuse surrogate
@@ -307,8 +307,8 @@
      &           (/ 1,       ! shrubland
      &              1,       ! shrubland
      &              3,       ! barrenland
-     &              3,       ! barrenland
-     &              3,       ! barrenland
+     &              1,       ! shrubland
+     &              1,       ! shrubland
      &              3,       ! barrenland
      &              3 /)     ! ag landuse surrogate
 
