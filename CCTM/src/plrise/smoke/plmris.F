@@ -59,11 +59,9 @@ C Last updated: $Date: 2011/10/21 16:11:31 $
    
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS, ONLY : LOGDEV
+      USE CONST,        ONLY : GRAV
 
       IMPLICIT NONE
-
-C Includes:
-      INCLUDE SUBST_CONST     ! physical and mathematical constants
 
 C Arguments:
       INTEGER, INTENT( IN )  :: EMLAYS          ! no. of emission layers

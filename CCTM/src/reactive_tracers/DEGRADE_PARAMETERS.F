@@ -17,13 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header$
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
-
       MODULE DEGRADE_PARAMETERS
 C**********************************************************************
 C
@@ -409,8 +402,8 @@ C.. XYLENE
 C.. STYRENE
 
             REACT(23)       = 'STYRENE        '
-            BICAUSE(1:4,23) = (/'OH','HO','O3','CL'/)
-            BIRATE(1:4,23)  = (/1.02D-11, 1.02D-11, 1.51D-13, 3.6D-10/)
+            BICAUSE(1:5,23) = (/'OH ','HO ','NO3','O3 ','CL '/)
+            BIRATE(1:5,23)  = (/1.02D-11, 1.02D-11, 1.51D-13, 1.4D-17, 3.6D-10/)
             BI_ACT(1:2,23)  = (/    -532.0D0,   -532.0D0/)
 
 C.. ACETONITRILE

@@ -76,10 +76,9 @@ C-------------------------------------------------------------------------------
       Use GRID_CONF           ! horizontal & vertical domain specifications
       Use LSM_MOD             ! Land surface data
       use centralized_io_module
+      USE CONST
 
       Implicit None
-
-      Include SUBST_CONST     ! constants
 
       Type :: MET_Type
 !> 2-D meteorological fields:

@@ -116,6 +116,7 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE PHOT_MET_DATA, ONLY: USE_ACM_CLOUD, CLEAR_ACM_CLOUD, CAPTURE_ACM_CLOUD
       USE ASX_DATA_MOD,  ONLY: INIT_MET, GRID_DATA
+      USE CONST
       USE CENTRALIZED_IO_MODULE,  ONLY: RCA_AVAIL, cio_model_sdate,
 #ifdef mpas
      &                                  cell_area,
@@ -130,7 +131,6 @@ C-----------------------------------------------------------------------
 
 C...........INCLUDES
 
-      INCLUDE SUBST_CONST               ! constants
       INCLUDE SUBST_FILES_ID            ! file name parameters
 
 C...........Arguments

@@ -25,9 +25,10 @@ C Purpose:  Computes aerosol and gaseous air surface exchange for sub-
 C           grid land use categories. All gaseous species are treated 
 C           as having bidirectional exchange following the two layer 
 C           model from Nemitz et al. 2001 and aerosol species deposition 
-C           follows Binkowski and Shankar 1995. Note that the Nemitz et al.            2001 parameterization reduces to a standard deposition velocity
+C           follows Binkowski and Shankar 1995. Note that the Nemitz et al.            
+C           parameterization reduces to a standard deposition velocity
 C           if the pollutant concentration on the leaf, in the leaf stomata, 
-C           in and the soil are zero.
+C           and in the soil are zero.
 C 
 C References:
 C          Nemitz et al. 2001 Q. J. R. Meteorol. Soc DOI: 10.1002/qj.49712757306
@@ -95,15 +96,15 @@ C  and aerosol exchange subroutines.
 C-----------------------------------------------------------------------
          USE NH3_BIDI_MOD
          USE MOSAIC_MOD, Only: Tile_Data
+         USE CONST
 
          Implicit None        
  
          Include SUBST_FILES_ID  ! file name parameters
-         Include SUBST_CONST     ! constants
 
 C Arguments:
          Integer, Intent( IN ) :: JDATE, JTIME      ! internal simulation date&time
-         integer               :: c, r, l, n, s, v, n_diag_dep
+         integer               :: c, r, l, n, s, n_diag_dep
          CHARACTER( 16 ), PARAMETER :: pname      = 'INIT_STAGE'        
          CHARACTER( 16 )       :: gc_depv_name( dep_gas_all )
          CHARACTER( 16 )       :: gc_scav_name( dep_gas_all )
@@ -172,7 +173,7 @@ C Set the dep vel surrogate pointers
             IF ( N .NE. 0 ) THEN
                DEPV_SUR( S ) = N
             ELSE
-               XMSG = 'Could not find ' // AE_DEPV( V ) // ' in aerosol' //
+               XMSG = 'Could not find ' // AE_DEPV( S ) // ' in aerosol' //
      &                ' surrogate table. >>> Dep vel set to zero <<< '
                CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
                DEPV_SUR( S ) = 0
@@ -521,7 +522,7 @@ C Get Ra
 C Calculate Rst
                   If( lai .Gt. 0.0 ) Then
 !-------------------------------------------------------------------------------------------------
-! Quazi Laminar Resistance to leaf 
+! Quasi Laminar Resistance to leaf 
 !-------------------------------------------------------------------------------------------------
                      Rb_leaf = Calc_Rb_leaf( k_vis, dif_T, ustar, l_leaf, lai )
 !-------------------------------------------------------------------------------------------------
@@ -547,7 +548,7 @@ C Calculate Rst
 ! Resistance to air-base soil exchange
 !-------------------------------------------------------------------------------------------------
                   If( ABFLUX .And. NH3_Hit ) Then
-                     Call Get_NH3_Comp( c_stom, c_ll, c_grnd, dif_T, r, c, l, l_ag )                                                                       ! Qauzi Laminar Boundary Layer resistance
+                     Call Get_NH3_Comp( c_stom, c_ll, c_grnd, dif_T, r, c, l, l_ag )  ! Quasi Laminar Boundary Layer resistance
                   End If ! ABFLUX and NH3
 
                   Rgc = Calc_Rg( dif_T, k_vis, rel_rx( s ), Ra, ustar, lai, temp_g, molwt_all( s ), M_ac( s ), 
@@ -716,7 +717,7 @@ C                     standardized names of all coarse-mode variables
 C-----------------------------------------------------------------------
 
          USE AERO_DATA           ! aero variable data   
-         USE AEROMET_DATA        ! Includes CONST.EXT
+         USE AEROMET_DATA        ! Includes CONST module
          USE GRID_CONF           ! horizontal & vertical domain specifications
          USE RXNS_DATA           ! chemical mechanism data
          Use MOSAIC_MOD, Only: Tile_Data 
@@ -880,7 +881,7 @@ C *** calculate inverses:
             ESM20 = 1.0 / ES20
             ESM32 = 1.0 / ES32
 
-            DCONST  = BOLTZMANN * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU )
+            DCONST  = DKBOLTZ * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU )
             DCONST1 = DCONST / DG( IM )
 
             DCONST2 = GRAV / ( 18.0 * AMU )

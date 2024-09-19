@@ -39,14 +39,13 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE VDIFF_MAP
       use CENTRALIZED_IO_MODULE, only : interpolate_var
-      
+      use CONST
 #ifdef isam
       USE SA_DEFN
 #endif
 
       IMPLICIT NONE
 
-      INCLUDE SUBST_CONST     ! constants
       INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments:

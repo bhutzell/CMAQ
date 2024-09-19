@@ -77,12 +77,12 @@ C-----------------------------------------------------------------------
       USE ASX_DATA_MOD,  ONLY: MET_DATA
       USE PHOT_MOD,      ONLY: RJ, RJ_RES, RJ_SUB, LH2O2, LHNO3
       USE CENTRALIZED_IO_MODULE
+      USE CONST
 
       IMPLICIT NONE
 
 C...........Includes:
 
-      INCLUDE SUBST_CONST                ! constants
       INCLUDE SUBST_FILES_ID             ! file name parameters
 
 C...........Arguments:

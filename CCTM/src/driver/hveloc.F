@@ -73,13 +73,12 @@ C-----------------------------------------------------------------------
 #endif
       USE CENTRALIZED_IO_MODULE, only : interpolate_var, window
 !    &                              STRTCOLMC2,  ENDCOLMC2,  STRTROWMC2,  ENDROWMC2
-
+      USE CONST, only: DG2M, PI180
 
       IMPLICIT NONE
 
 C Includes:
       INCLUDE SUBST_FILES_ID    ! file name parameters
-      INCLUDE SUBST_CONST       ! constants
       INCLUDE SUBST_PE_COMM     ! PE communication displacement and direction
  
 C Parameters

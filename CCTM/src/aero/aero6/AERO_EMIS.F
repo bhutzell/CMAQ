@@ -173,8 +173,8 @@ C-----------------------------------------------------------------------
          USE SSEMIS, ONLY:    SSEMIS_INIT
          USE UTILIO_DEFN
          USE VDIFF_MAP, ONLY : N_SPC_DIFF, DIFF_SPC
-     
-         INCLUDE SUBST_CONST     ! physical and mathematical constants
+         USE CONST
+
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments:
@@ -332,7 +332,7 @@ C-----------------------------------------------------------------------
        CHARACTER( 20 )                  :: DESID_AERO_REF_CAPS( DESID_N_AERO_REF )
 
        INTEGER IRULE, ISUR, N, NLEN, ISD, IM, IEM, NRULE
-       LOGICAL   :: LREMOVE
+       LOGICAL   :: LREMOVE, LERROR
        
        ! Find Total Number of Size Distribution Registries
        N_SD_RULE = 0
@@ -366,7 +366,7 @@ C-----------------------------------------------------------------------
          LREMOVE = .FALSE.
          IF ( DESID_SD_NML( IRULE )%STREAM .EQ. '' ) CYCLE
          CALL DESID_GET_RULE_STREAMS( DESID_SD_NML( IRULE )%STREAM, IRULE, 
-     &                 RULE_STREAM, LREMOVE )
+     &                 RULE_STREAM, LREMOVE, LERROR )
          IF ( LREMOVE ) CYCLE
 
          ! Loop through streams, set defaults, and build map array
@@ -467,7 +467,7 @@ C
 C ----------------------------------------------------------------------
 
          USE AERO_DATA, ONLY: AEROSPC, N_AEROSPC, AEROSPC_MWINV 
-         USE AEROMET_DATA, ONLY: F6DPI
+         USE CONST, ONLY: F6DPI
          USE ASX_DATA_MOD, ONLY: MET_DATA
          USE DESID_VARS, ONLY: DESID_N_ISTR, IDUSTSRM, ISEASRM
          USE GRID_CONF, ONLY: NCOLS, NROWS
@@ -522,10 +522,9 @@ C *** Apply Aerosol Size Distribution
              
              ! Look up Aerosol Species and Mode of Interest
              IAERO = MAP_ISTRtoAERO( ISTR )   !This maps to the CMAQ aerosol
-                                            !  species so we can retrieve density
+                                              !  species so we can retrieve density
              IM    = MAP_ISTRtoMODE( ISTR )   !This maps to the internal CMAQ modes 
-                                            !  (ie. I, J, and K)
-             !DENS_FAC = F6DPIM9 / AEROSPC( IAERO )%DENSITY 
+                                              !  (ie. I, J, and K)
 
              ! Convert Aerosol from [g/s] to [ug/m3/s] for all streams
              ! except Dust and Sea Spray. For those streams, convert

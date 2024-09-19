@@ -68,12 +68,12 @@ C-----------------------------------------------------------------------
 #ifdef sens
       USE DDM3D_DEFN, ONLY:SENGRID, NPMAX, NP, BSEN, BCS, DATENUM, IPT, IDATE, IPARM, IREGION, CKTIME, STARTDATE
 #endif 
+      USE CONST, ONLY: DG2M, PI180
 
       IMPLICIT NONE
 
 C Includes:
 
-      INCLUDE SUBST_CONST       ! constants
       INCLUDE SUBST_PE_COMM     ! PE communication displacement and direction
 
 C Arguments:

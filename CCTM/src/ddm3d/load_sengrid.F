@@ -18,13 +18,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/init/yamo/load_cgrid.F,v 1.9 2012/01/19 14:47:23 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE LOAD_SENGRID ( FNAME, JDATE, JTIME, SPC_CAT )
 
@@ -44,7 +37,6 @@ C-----------------------------------------------------------------------
 
       IMPLICIT NONE
 
-      INCLUDE SUBST_CONST       ! constants
       INCLUDE SUBST_FILES_ID    ! file name parameters
 
 C Arguments:

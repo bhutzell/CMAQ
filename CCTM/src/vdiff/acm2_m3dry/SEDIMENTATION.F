@@ -20,7 +20,9 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       module sedimentation
 
 C Revision History:
-C 03 Jul 15 J.Young: inital
+C 03 Jul 15 J.Young: initial
+
+      use const
 
       implicit none
 
@@ -28,7 +30,6 @@ C 03 Jul 15 J.Young: inital
 
       private
 
-      include SUBST_CONST     ! constants
       include SUBST_FILES_ID  ! file name parameters
 
       real,    allocatable, save :: cgrd( :,: )   ! density units

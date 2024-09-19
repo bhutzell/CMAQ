@@ -573,7 +573,6 @@ C=======================================================================
          IMPLICIT NONE
 
 ! Includes:
-         INCLUDE SUBST_CONST     ! physical and mathematical constants
          INCLUDE SUBST_FILES_ID  ! file name parameters (for CTM_PT3D_DIAG)
 
 ! Arguments:
@@ -887,15 +886,13 @@ C-----------------------------------------------------------------------
       USE RUNTIME_VARS, ONLY : LOGDEV, IPVERT, PT3DFRAC, REP_LAYR, LOG_MESSAGE
       USE UTILIO_DEFN
       USE CENTRALIZED_IO_MODULE, only : interpolate_var
+      USE CONST, only: CPD
 #ifdef mpas
       USE coupler_module
       USE util_module, only : crlf
 #endif
 
       IMPLICIT NONE
-
-C Includes:
-      INCLUDE SUBST_CONST     ! physical and mathematical constants
 
       INTEGER, INTENT( IN ) :: LOC_STKDATE
       INTEGER, INTENT( IN ) :: JDATE, JTIME

@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/biog/beis3/czangle.F,v 1.4 2012/03/28 16:05:37 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE  CZANGLE( JDATE, JTIME, NX, NY )
 
@@ -74,12 +68,9 @@ C----------------------------------------------------------------------
 
       USE UTILIO_DEFN
       USE ASX_DATA_MOD, Only: Grid_Data, Met_Data
+      USE CONST
 
       IMPLICIT NONE
-
-C Includes:
-
-      INCLUDE SUBST_CONST     ! constants
 
 C Arguments:
 

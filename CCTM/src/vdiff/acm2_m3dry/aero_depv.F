@@ -18,14 +18,7 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/aero/aero5/aero_depv.F,v 1.12 2012/01/19 13:12:14 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C @(#)aero_depv.F       1.3 /project/mod3/CMAQ/src/ae_depv/aero_depv/SCCS/s.aero_depv.F 18 Jun 1997 12:55:48
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-!      SUBROUTINE AERO_DEPV ( CGRID, JDATE, JTIME, TSTEP, MOSAIC, VDEP_AE )
       SUBROUTINE AERO_DEPV ( CGRID, JDATE, JTIME, TSTEP, VDEP_AE )
 
 C-----------------------------------------------------------------------
@@ -87,7 +80,8 @@ C-----------------------------------------------------------------------
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN      
       USE AERO_DATA           ! aero variable data
-      USE AEROMET_DATA        ! Includes CONST.EXT
+      USE AEROMET_DATA
+      USE CONST        
 !      USE Mosaic_Mod, Only: ADEPVJ  ! Shared mosaic variables
 !      Use LSM_Mod, Only: N_LUFRAC
       USE ASX_DATA_MOD, Only: Met_Data
@@ -141,8 +135,6 @@ C Meteorological variables
 
       CHARACTER( 16 ), SAVE :: AE_VRSN ! Aerosol version name
 
-      INTEGER, SAVE :: NCELLS              ! number of cells per layer
-
       REAL, ALLOCATABLE, SAVE  :: XXLSG( :,:,: )  ! log of standard deviation
       REAL, ALLOCATABLE, SAVE  :: DG( :,:,: )     ! geometric mean diameter
       REAL, ALLOCATABLE, SAVE  :: PDENS( :,:,: )  ! particle density         
@@ -183,8 +175,6 @@ C-----------------------------------------------------------------------
 
       IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
-
-         NCELLS = NCOLS * NROWS
 
 C  Allocate arrays
          ALLOCATE ( XLM( NCOLS,NROWS ), AMU( NCOLS,NROWS ), 
@@ -328,7 +318,8 @@ C                     Note that this version only works for NLCD40, MODIS20 or U
 C-----------------------------------------------------------------------
 
       USE GRID_CONF, Only: ncols, nrows
-      USE AEROMET_DATA   ! Includes CONST.EXT
+      USE AEROMET_DATA 
+      USE CONST, ONLY: PI, DKBOLTZ, GRAV  
       USE ASX_DATA_MOD, Only: Met_Data, Grid_Data !, Mosaic_Data
       USE AERO_DATA, Only: N_MODE
       Use LSM_Mod, Only: N_LUFRAC
@@ -389,7 +380,7 @@ C modal sedimentation velocities for number, 2nd, and 3rd moment, or mass:
       REAL STOKE2  ! Stokes numbers for each mode squared
       REAL RD0     ! canopy resistance for number
       REAL RD2     ! canopy resistance for 2nd moment
-      REAL RD3     ! canopy resisteance for 3rd moment
+      REAL RD3     ! canopy resistance for 3rd moment
       REAL UTSCALE              ! scratch function of USTAR and WSTAR
       REAL NU                   ! kinematic viscosity [ m2 s-1 ]
       REAL STOKEFAC             ! scratch function of USTAR, NU, and GRAV
@@ -505,7 +496,7 @@ C *** calculate inverses:
             ESM20 = 1.0 / ES20
             ESM32 = 1.0 / ES32
 
-            DCONST  = BOLTZMANN * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU( C,R ) )
+            DCONST  = DKBOLTZ * Met_Data%TEMP2( C,R ) / ( THREEPI * AMU( C,R ) )
             DCONST1 = DCONST / DG( C,R,IM )
 
             DCONST2 = GRAV / ( 18.0 * AMU( C,R ) )

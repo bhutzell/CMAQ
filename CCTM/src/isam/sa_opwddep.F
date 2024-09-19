@@ -34,6 +34,7 @@ C          Called by vdiffproc.F (dry) or initscen.F (wet)
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE UTILIO_DEFN         ! 20120712 replaces ioparms, iofdesc, iodecl
       USE SA_DEFN             ! Mc06
+      USE MIO_ASCII
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
@@ -123,6 +124,20 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          DO L = 2, MXDESC3
            FDESC3D( L ) = ' '
          END DO
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+         
+         CALL LOAD_MIO_FILE ( SADEPFILE, 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
 
 C    Open dry deposition file
 

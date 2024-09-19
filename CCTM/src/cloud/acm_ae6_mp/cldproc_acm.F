@@ -64,12 +64,12 @@ C-----------------------------------------------------------------------
       USE HGSIM,      ONLY: GET_WDEP ! bidirection hg exchange
       USE UTILIO_DEFN
       use CENTRALIZED_IO_MODULE, only : interpolate_var
+      USE CONST
 
       IMPLICIT NONE
 
 C...........INCLUDES
 
-      INCLUDE SUBST_CONST            ! constants
       INCLUDE SUBST_FILES_ID         ! file name parameters
 
       CHARACTER( 120 ) :: XMSG = ' ' ! exit message string

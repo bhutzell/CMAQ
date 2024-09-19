@@ -51,7 +51,7 @@
 #>   source code archive for a list of the possible settings; users may also refer to the CMAQ documentation
 
  set ModCommon = common
- set Mechanism = cb6r3_ae7_aq                                #> chemical mechanism (see $CMAQ_REPO/CCTM/MECHS)
+ set Mechanism = cb6r5_ae7_aq                                #> chemical mechanism (see $CMAQ_REPO/CCTM/MECHS)
 #set Mechanism = saprc07tic_ae7i_aq                          #> chemical mechanism (see $CMAQ_REPO/CCTM/MECHS)
  set Tracer    = trac0                                       #> tracer configuration directory under $CMAQ_REPO/CCTM/MECHS [ default: no tracer species 
  set APPL      = ${VSRN}_${Mechanism}
@@ -111,13 +111,11 @@
        exit 1
     endif
  endif
- \cp -f $GlobInc/fixed/const/CONST.EXT ${Bld}/.
 
  set LIB1 = " " # "$ioapi_lib"
  set LIB2 = " " # "$netcdf_lib"
  set LIB3 = " " # "$netcdff_lib"
 
- set ICL_CONST = $Bld
 
 #> make the config file
 
@@ -167,7 +165,6 @@
  echo "$text ${Mechanism}"                                         >> $Cfile
  echo "// model repository: ${REPOROOT}"                           >> $Cfile
  echo                                                              >> $Cfile
- echo "include SUBST_CONST      CONST.EXT;"                        >> $Cfile
 
  set text = "common"
  echo "// required" $text                                          >> $Cfile

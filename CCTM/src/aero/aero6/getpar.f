@@ -57,7 +57,7 @@ C-----------------------------------------------------------------------
      &                       aeromode_dens, aeromode_lnsg, aeromode_diam, aeromode_mass,
      &                       min_dg_dry, min_dg_wet, min_sigma_g, max_sigma_g, n_mode, 
      &                       aerospc, aero_missing, aerospc_conc, aeromode, n_aerospc
-      Use aeromet_data, only : f6pi   ! Includes CONST.EXT
+      Use const, only : f6pi   
 
       Implicit None
 

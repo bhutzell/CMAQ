@@ -171,10 +171,8 @@ c these vars based on jproc method of zenith calculation
 
 !     USE AQ_DATA,    ONLY : AQCHEM_LAT, AQCHEM_LON
       USE UTILIO_DEFN
-
+      USE CONST, ONLY: MOLVOL, STDTEMP
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST        ! commonly used constants
 
       REAL( 8 ), PARAMETER :: H2ODENS    = 1000.0D+0  ! density of water (kg/m3) at 20 C and 1 ATM
 
@@ -356,7 +354,7 @@ C
 
        IMPLICIT NONE
 
-        INCLUDE SUBST_CONST        ! commonly used constants
+!       INCLUDE SUBST_CONST        ! commonly used constants
 
 
         REAL,      INTENT( IN ) :: WCAVG  ! Liquid water content   (kg/m3)

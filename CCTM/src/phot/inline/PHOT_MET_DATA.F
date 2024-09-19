@@ -118,12 +118,12 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          USE GRID_CONF           ! horizontal & vertical domain specifications
          USE UTILIO_DEFN
          USE CENTRALIZED_IO_MODULE
+         USE CONST, ONLY: PI180
 
          IMPLICIT NONE
 
 !...........Includes:
 
-         INCLUDE SUBST_CONST                ! constants
          INCLUDE SUBST_FILES_ID             ! file name parameters
        
 !...........Inputs:       
@@ -360,7 +360,6 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !             9925-9935 for more information.
 !...........Includes:
 
-         INCLUDE SUBST_CONST                ! constants
          INCLUDE SUBST_FILES_ID             ! file name parameters
 
          INTEGER, INTENT( IN ) :: JDATE     ! current model date, coded YYYYDDD
@@ -593,10 +592,6 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   
          IMPLICIT NONE     
           
-!***include files
-
-         INCLUDE SUBST_CONST      ! physical constants
-           
 ! Inputs:  
          INTEGER, INTENT( IN ) :: JDATE            ! current model date, coded YYYYDDD
          INTEGER, INTENT( IN ) :: JTIME            ! current model time, coded HHMMSS
@@ -707,6 +702,7 @@ C     Washington DC. Page c24 has the algorithm
 C  The stated accuracy is 0.01 degree for the epoch ( 1950 - 2050).
 C-----------------------------------------------------------------------
 
+         USE CONST, ONLY: PI, PI180
          IMPLICIT NONE
 
 !***arugments
@@ -714,15 +710,9 @@ C-----------------------------------------------------------------------
          REAL, INTENT( IN )  :: YEAR, DAY
          REAL, INTENT( OUT ) :: EQT, SINDEC, COSDEC, SOLDIST
 
-!***include files
-
-         INCLUDE SUBST_CONST      ! physical constants
-
 !***parameters
 
-! from SUBST_CONST:   REAL, PARAMETER :: PI = 3.1415927
          REAL, PARAMETER :: TWOPI = 2.0 * PI
-! from SUBST_CONST:   REAL, PARAMETER :: PI180   = PI / 180.0
          REAL, PARAMETER :: RAD   = PI180
          REAL, PARAMETER :: RADM1 = 1.0 / RAD
 
@@ -861,11 +851,8 @@ C     latitude should be calculated once at the beginning of
 C     simulation.
 C-----------------------------------------------------------------------
 
+         USE CONST, ONLY: PI180
          IMPLICIT NONE
-
-!***include files
-
-         INCLUDE SUBST_CONST      ! physical constants
 
 !***arguments
 
@@ -877,8 +864,6 @@ C-----------------------------------------------------------------------
 
          REAL HANGLE          ! local hour angle in degrees
 
-! from SUBST_CONST:  REAL, PARAMETER :: PI = 3.1415927
-! from SUBST_CONST:  REAL, PARAMETER :: PI180 = PI / 180.0
          REAL, PARAMETER :: RAD = PI180
 
          HANGLE = 15.0 * ( TIME - 12.0 )  + EQT
@@ -927,11 +912,9 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          USE GRID_CONF           ! horizontal & vertical domain specifications
          USE UTILIO_DEFN         ! IO routines & utilties
          USE CENTRALIZED_IO_MODULE
+         USE CONST, ONLY: STDTEMP, RDGAS, RWVAP
 
          IMPLICIT NONE
-
-! includes:
-         INCLUDE SUBST_CONST     ! physical and mathematical constants
 
 ! arguments:
 
@@ -945,9 +928,9 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          REAL    :: QVSW       ! water vapor saturation mixing ratio (Kg/Kg)
          REAL    :: QVSI       ! water ice saturation mixing ratio (Kg/Kg) 
          REAL    :: QVS_WEIGHT ! weighted average of liquid and ice mixing ratios
-         REAL    :: DENOM      ! scratch varaible
-         REAL    :: ARG        ! scratch varaible
-         REAL    :: SUBSAT     ! scratch varaible
+         REAL    :: DENOM      ! scratch variable
+         REAL    :: ARG        ! scratch variable
+         REAL    :: SUBSAT     ! scratch variable
          REAL, ALLOCATABLE, SAVE :: QCLD  ( :,:,: ) ! cloud water mixing ratio
          REAL, ALLOCATABLE, SAVE :: WEIGHT( :,:,: ) ! weighting factor between liquid and ice content
          REAL    :: WHT        ! intermediate weighting factor
@@ -970,9 +953,6 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          REAL, PARAMETER :: SVP3  =  35.86
          REAL, PARAMETER :: SVPI2 =  21.8745584
          REAL, PARAMETER :: SVPI3 =   7.66
-!        REAL, PARAMETER :: SVPT0 = 273.15  STDTEMP in CONST.EXT
-!        REAL, PARAMETER :: R_D   = 287.0   RDGAS in CONST.EXT
-!        REAL, PARAMETER :: R_V   = 461.6   RWVAP in CONST.EXT
          REAL, PARAMETER :: SVPT0 = STDTEMP
          REAL, PARAMETER :: R_D   = RDGAS
          REAL, PARAMETER :: R_V   = RWVAP

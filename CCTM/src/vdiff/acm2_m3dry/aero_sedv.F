@@ -35,7 +35,8 @@ C-----------------------------------------------------------------------
       use utilio_defn      
       use asx_data_mod, Only: Met_Data
       use aero_data           ! aero variable data
-      use aeromet_data        ! Includes CONST.EXT
+      use aeromet_data
+      use const, only: stdatmpa, grav        
 
       implicit none
 
@@ -250,7 +251,8 @@ C Calculate settling velocity for Aitken, accumulation, and coarse modes.
 C-----------------------------------------------------------------------
 
       use asx_data_mod, Only: Met_Data
-      use aeromet_data   ! Includes CONST.EXT
+      use aeromet_data   
+      use const, only: grav
 
       implicit none
 

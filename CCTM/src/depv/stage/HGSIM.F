@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/depv/m3dry_mp/HGSIM.F,v 1.3 2012/01/24 21:15:18 sjr Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE HGSIM
 
@@ -499,12 +493,11 @@ C------------------------------------------------------------------------------
 
          SUBROUTINE GET_WDEP( CSE, WDEP, C, R )
 
+         Use Const, Only: MWWAT
          Use ASX_DATA_MOD, Only: Grid_Data
          USE BIDI_MOD, Only: CMedia
 
          IMPLICIT NONE
-
-         INCLUDE SUBST_CONST     ! constants
 
          CHARACTER( 8 ), INTENT( IN ) :: CSE  ! wet dep sepcies
          REAL,      INTENT( IN ) :: WDEP ! wet deposition in kg/ha

@@ -263,7 +263,6 @@ C-------------------------------------------------------------------------------
 
 C Includes:
 
-!         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments passed to and from m3dry
@@ -695,7 +694,6 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 C Includes:
 
-!         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
          INTEGER, INTENT( IN )   :: JDATE
@@ -884,10 +882,9 @@ C------------------------------------------------------------------------------
 
          Use ASX_DATA_MOD, Only: Grid_Data
          USE BIDI_MOD, Only: CMedia
+         USE CONST, ONLY: MWWAT
 
          IMPLICIT NONE
-
-         INCLUDE SUBST_CONST     ! constants
 
          CHARACTER( 8 ), INTENT( IN ) :: CSE  ! wet dep sepcies
          REAL,      INTENT( IN ) :: WDEP ! wet deposition in kg/ha

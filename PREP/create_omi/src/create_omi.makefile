@@ -1,11 +1,11 @@
 # make file to build program
 
-PROGRAM = create_omi_v532.exe
+PROGRAM = create_omi_v54.exe
 
 ifndef compiler
-# compiler = intel
+  compiler = intel
 # compiler = pgi
-  compiler = gcc
+# compiler = gcc
 endif
 
 #Helps diagnose crashes if they occur
@@ -16,10 +16,10 @@ ifeq ($(compiler),intel)
   FC = ifort
   CC = icc
 
-  ioapi  = /usr/local/apps/ioapi-3.2_20181011/intel-19.0/Linux2_x86_64ifort
-  netcdf = /usr/local/apps/netcdf-4.6.3/intel-19.0
+# netcdf = /usr/local/apps/netcdf-4.8.1/intel-21.4
+  netcdf = /usr/local/apps/netcdf-4.9.2/intel-23.1
   
-  include_path = -I $(ioapi) -I $(netcdf)/include -I .
+  include_path = -I $(netcdf)/include -I .
 
 
   WARN = 
@@ -41,10 +41,9 @@ else ifeq ($(compiler),pgi)
   FC = pgf90
   CC = pgcc
  
-  ioapi  = /home/wdx/lib/x86_64/pgi-17.4/ioapi_3.1/Linux2_x86_64pg
-  netcdf = /usr/local/apps/netcdf-4.4.1/pgi-17.4
+  netcdf = /usr/local/apps/netcdf-4.9.2/nvhpc-22.11
   
-  include_path = -I $(ioapi) -I $(netcdf)/include -I .
+  include_path = -I $(netcdf)/include -I .
 
   WARN = 
   FSTD = -O3 -Mextend
@@ -63,10 +62,9 @@ else ifeq ($(compiler),gcc)
  FC = gfortran
  CC = cc
 
- ioapi  = /home/wdx/lib/x86_64/gcc-6.1/ioapi_3.1/Linux2_x86_64gfort
- netcdf = /usr/local/apps/netcdf-4.6.1/gcc-6.1.0
+ netcdf = /usr/local/apps/netcdf-4.9.2/gcc-12.2
  
- include_path = -I $(ioapi) -I $(netcdf)/include -I .
+ include_path = -I $(netcdf)/include -I .
 
  WARN = 
  FSTD = -O2 -funroll-loops -finit-character=32 -Wconversion-extra -Wtabs -Wsurprising
@@ -98,14 +96,14 @@ LINK_FLAGS =
 CPP = $(FC)
 CPP_FLAGS = 
 
-IOAPI  = -L$(ioapi) -lioapi
 NETCDF = -L$(netcdf)/lib -lnetcdf -lnetcdff
-LIBRARIES = $(IOAPI) $(NETCDF)
+LIBRARIES = $(NETCDF)
 
 
 SRC = \
   get_env_vars.o \
   module_envvar.o \
+  outncf_mod.o \
   module_utilities.o \
   create_CMAQ_OMI.o \
   create_ioapi_OMI.o \
@@ -141,5 +139,9 @@ clean:
 
 # dependencies
 
+create_CMAQ_OMI.o:	get_env_vars.o module_utilities.o outncf_mod.o
+create_ioapi_OMI.o:	get_env_vars.o outncf_mod.o
+driver.o:	module_envvar.o module_utilities.o outncf_mod.o
 module_envvar.o:	get_env_vars.o
-driver.o:	module_envvar.o module_utilities.o
+module_utilities.o:	module_envvar.o outncf_mod.o
+
