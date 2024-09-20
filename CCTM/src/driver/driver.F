@@ -773,7 +773,7 @@ C Initialize Modules
 
       ELSE IF ( L_ELMO .AND. ELMO_NSTEP .LT. 1.0 ) THEN
           ! Calculate all ELMO Variables for averaging but do not output them
-          CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
+          CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN=.FALSE. )
 
       END IF
 
@@ -829,7 +829,7 @@ C Initialize Modules
 
 #endif
          ! Output ELMO Diagnostic Information
-         IF ( L_ELMO ) CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
+         IF ( L_ELMO ) CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN=.FALSE. )
 
       END DO
 

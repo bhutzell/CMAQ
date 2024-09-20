@@ -77,7 +77,7 @@
 &ELMO_INIT
   N_Files = 3
   N_Max_Output_Variables = 40
-  N_Keywords = 40
+  N_Keywords = 41
   N_Max_Keyword_Variables = 40
 /
 
@@ -87,13 +87,13 @@
  !
  !-- Set Properties and Contents for each ELMO Output File
  !
-  Flabel= 'FileA','MoreVars','HasKz'
+  Flabel= 'CONCS','Dep','HasKz'
   Tstep = 10000, 10000, 10000
   Tmode = 'average', 'average', 'instant'
   Lay_Bot = 1, 1, 1
   Lay_Top = 1, 5, 35
-  File_Vars(1,:) = 'NOY','PM1','ASO4','*ANO3','PMF_CLDGLY','PM25_SO4','PM25_NH4','DEFAULT'
-  File_Vars(2,:) = 'NO2', 'FORM', 'SO2', 'O3', 'PM25', 'PM10', 'DENS', 'NOX', 'AOD_550','PM_EXT_550'
+  File_Vars(1,:) = 'DEFAULT'
+  File_Vars(2,:) = 'DEFAULT_DEP'
   File_Vars(3,:) = 'AEC','KZ','ANH4J','PMAMS_SO4','AMET_GAS'
 
 
@@ -223,47 +223,50 @@
   Keywd(29,:) = 'DD_FORMALD','WD_FORMALD','DD_HNO4','WD_HNO4','DD_NTR','WD_NTR',
                 'DD_PANT','WD_PANT'
 
-  Keywd_name(30) = 'FINE_DDEP'
-  Keywd(30,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
-                'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL',DD_PMF_SI',
+  Keywd_name(30) = 'PM_DEP'
+  Keywd(30,:) = 'FINE_DDEP','COARSE_DDEP','TSP_DDEP','PM_WDEP'
+  
+  Keywd_name(31) = 'FINE_DDEP'
+  Keywd(31,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
+                'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL','DD_PMF_SI',
                 'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K','DD_PMF_SSSO4'
 
-  Keywd_name(31) = 'COARSE_DDEP'
-  Keywd(31,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
+  Keywd_name(32) = 'COARSE_DDEP'
+  Keywd(32,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
                 'DD_PMC_CA','DD_PMC_MG','DD_PMC_K','DD_PMC_SSSO4'
 
-  Keywd_name(32) = 'PM_DDEP'
-  Keywd(32,:) = 'DD_TSP_CL','DD_TSP_CA','DD_TSP_MG','DD_TSP_K','DD_TSP_SSSO4'
+  Keywd_name(33) = 'TSP_DDEP'
+  Keywd(33,:) = 'DD_CL','DD_CA','DD_MG','DD_K'
 
-  Keywd_name(33) = 'PM_WDEP'
-  Keywd(33,:) = 'WD_NO3','WD_NH4','WD_SO4','WD_TSP_MTNO3','WD_TSP_NA','WD_PMC_NA',
-                'WD_TSP_NA','WD_PMF_CA','WD_PMC_CA','WD_TSP_CA','WD_PMF_FE','
+  Keywd_name(34) = 'PM_WDEP'
+  Keywd(34,:) = 'WD_NO3','WD_NH4','WD_SO4','WD_MTNO3','WD_NA','WD_PMC_NA',
+                'WD_PMF_CA','WD_PMC_CA','WD_CA','WD_PMF_FE',
                 'WD_PMF_AL','WD_PMF_SI','WD_PMF_TI','WD_PMF_MN','WD_PMF_MG','WD_PMC_MG',
-                'WD_TSP_MG','WD_PMF_K','WD_PMC_K','WD_TSP_K'
+                'WD_MG','WD_PMF_K','WD_PMC_K','WD_K','WD_SSSO4'
 
-  Keywd_name(34) = 'PM_TDEP'
-  Keywd(34,:) = 'TD_TSP_NA'
+  Keywd_name(35) = 'PM_TDEP'
+  Keywd(35,:) = 'TD_NA'
 
-  Keywd_name(35) = 'GASPM_DEP'
-  Keywd(35,:) = 'DD_TNO3','WD_TNO3','DD_NHX','WD_NHX','WD_SOX','WD_TCL','TD_TCL'
+  Keywd_name(36) = 'GASPM_DEP'
+  Keywd(36,:) = 'DD_TNO3','WD_TNO3','DD_NHX','WD_NHX','WD_SOX','WD_TCL','TD_TCL'
 
-  Keywd_name(36) = 'OXIDIZED_NITROGEN_DEP'
-  Keywd(36,:) = 'DD_OXN_NOX', 'WD_OXN_NOX', 'DD_OXN_TNO3','WD_OXN_TNO3',
+  Keywd_name(37) = 'OXIDIZED_NITROGEN_DEP'
+  Keywd(37,:) = 'DD_OXN_NOX', 'WD_OXN_NOX', 'DD_OXN_TNO3','WD_OXN_TNO3',
                 'DD_OXN_PANT','WD_OXN_PANT','DD_OXN_ORGN','WD_OXN_ORGN',
                 'DD_OXN_OTHR','WD_OXN_OTHR','DD_OXN_TOT', 'WD_OXN_TOT',
                 'TD_OXN_TOT'
 
-  Keywd_name(37) = 'REDUCED_NITROGEN_DEP'
-  Keywd(37,:) = 'DD_REDN_TOT','WD_REDN_TOT','TD_REDN_TOT'
+  Keywd_name(38) = 'REDUCED_NITROGEN_DEP'
+  Keywd(38,:) = 'DD_REDN_TOT','WD_REDN_TOT','TD_REDN_TOT'
 
-  Keywd_name(38) = 'TOTAL_NITROGEN_DEP'
-  Keywd(38,:) = 'DD_N_TOT','WD_N_TOT','TD_N_TOT'
+  Keywd_name(39) = 'TOTAL_NITROGEN_DEP'
+  Keywd(39,:) = 'DD_N_TOT','WD_N_TOT','TD_N_TOT'
 
-  Keywd_name(39) = 'TOTAL_SULFUR_DEP'
-  Keywd(39,:) = 'DD_S_TOT','WD_S_TOT','TD_S_TOT'
+  Keywd_name(40) = 'TOTAL_SULFUR_DEP'
+  Keywd(40,:) = 'DD_S_TOT','WD_S_TOT','TD_S_TOT'
 
-  Keywd_name(40) = 'SEASPRAY_SULFUR_DEP'
-  Keywd(40,:) = 'DD_S_SEA','WD_S_SEA','TD_S_SEA'
+  Keywd_name(41) = 'SEASPRAY_SULFUR_DEP'
+  Keywd(41,:) = 'DD_S_SEA','WD_S_SEA','TD_S_SEA'
 
 
 /

@@ -312,9 +312,9 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      
 
       TYPE ELMO_KEY_TYPE
-          CHARACTER( 24 )             :: WORD    ! Keyword for selecting mulitple ELMO parameters
+          CHARACTER( 32 )             :: WORD    ! Keyword for selecting mulitple ELMO parameters
           INTEGER                     :: N       ! Number of Parameters associated with the Keyword
-          CHARACTER( 16 ),ALLOCATABLE :: LIST(:) ! List of parameters
+          CHARACTER( 32 ),ALLOCATABLE :: LIST(:) ! List of parameters
       END TYPE ELMO_KEY_TYPE
 
       TYPE (ELMO_KEY_TYPE), ALLOCATABLE, SAVE :: ELMO_KEY( : )
@@ -436,7 +436,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
       ! Define List of Possible Units for Output
-      INTEGER, PARAMETER :: N_UNIT = 30
+      INTEGER, PARAMETER :: N_UNIT = 34
       CHARACTER( 11 ), PARAMETER :: CUNIT( N_UNIT ) = 
      &    (/'UG M-3     ','PPMV       ','UGC M-3    ','PPMC       ',
      &      'UGN M-3    ','PPMN       ','M-3        ','M2 M-3     ',
@@ -445,7 +445,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &      'KG M-3     ','UMOL M-3   ','MOL L-1    ','UG UG-1    ',
      &      'K          ','PA         ','S-1        ','M          ',
      &      'MM-1       ','M2 S-1     ','PMOLEC CM-2','NG M-3     ',
-     &      'PPBV       ','MOL KG-1   '/)
+     &      'PPBV       ','MOL KG-1   ','KGN HA-1   ','KGS HA-1   ',
+     &      'MEQN M-2   ','MEQS M-2   '/)
       
       INTEGER, PARAMETER :: IU_UNSP       = 0   ! Unspecified Units
       INTEGER, PARAMETER :: IU_UGpM3      = 1   ! ug m-3
@@ -478,6 +479,10 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: IU_NGpM3      = 28  ! ng m-3
       INTEGER, PARAMETER :: IU_PPBV       = 29  ! ppbV
       INTEGER, PARAMETER :: IU_MOLpKG     = 30  ! mol kg-1
+      INTEGER, PARAMETER :: IU_KGNpHA     = 31  ! kgN ha-1
+      INTEGER, PARAMETER :: IU_KGSpHA     = 32  ! kgS ha-1
+      INTEGER, PARAMETER :: IU_MEQNpM2    = 33  ! meqN m-2
+      INTEGER, PARAMETER :: IU_MEQSpM2    = 34  ! meqS m-2
 
 
 
@@ -541,6 +546,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         REAL, ALLOCATABLE, SAVE :: ELMO_DDM_DDEP(:,:,:,:) ! dry deposition accumulated per time step
              
         REAL, SAVE :: PBL, RGRND, RC, RN, WSPD10, WDIR10
+
+        LOGICAL, SAVE :: INIT_TIME
 
         ! Set Value for Missing Variables
 #ifdef mpas
@@ -1050,7 +1057,46 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &           ' but it does not know to do it. No conversion is applied.'
               CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
           END SELECT 
-
+ 
+        CASE ( IU_PPMC ) ! ppmC out
+          SELECT CASE ( SPC_UNIT )
+            CASE ( IU_UGpM3 ) ! mass-based
+              ELMO_UNIT_CONV = D / ELMO_TABLE( J )%MW 
+     &             * MWAIR / AIRDENS / 1000.0 ! to mole mixing ratio
+            CASE ( IU_PPMV ) ! mole-based
+              ELMO_UNIT_CONV = D
+            CASE DEFAULT
+              XMSG = 'ELMO is attempting to convert variable ' // 
+     &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
+     &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
+     &           ' but it does not know to do it. No conversion is applied.'
+              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+          END SELECT 
+ 
+        CASE ( IU_KGNpHA ) ! kgN ha-1 out
+          SELECT CASE ( SPC_UNIT )
+            CASE ( IU_KGpHA ) ! deposition output
+              ELMO_UNIT_CONV = D 
+            CASE DEFAULT
+              XMSG = 'ELMO is attempting to convert variable ' // 
+     &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
+     &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
+     &           ' but it does not know to do it. No conversion is applied.'
+              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+          END SELECT 
+ 
+        CASE ( IU_KGSpHA ) ! kgS ha-1 out
+          SELECT CASE ( SPC_UNIT )
+            CASE ( IU_KGpHA ) ! deposition output
+              ELMO_UNIT_CONV = D 
+            CASE DEFAULT
+              XMSG = 'ELMO is attempting to convert variable ' // 
+     &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
+     &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
+     &           ' but it does not know to do it. No conversion is applied.'
+              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+          END SELECT 
+ 
 
         CASE DEFAULT
               XMSG = 'ELMO is attempting to convert variable ' // 

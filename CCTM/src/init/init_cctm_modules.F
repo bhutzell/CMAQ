@@ -151,7 +151,7 @@ C Arguments:
 
         ! Calculate all ELMO variables for both Instantaneous and
         ! Average parameters
-        CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.TRUE.)
+        CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN=.TRUE.)
         
         ! Print Instantaneous Values at first time step
         CALL WRITE_ELMO( JDATE, JTIME, TSTEP, .TRUE. )

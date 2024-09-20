@@ -125,7 +125,7 @@
      &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
                     DO IVAR = 1,ELMO_COMP( J )%N_VARS
                        IF ( ELMO_COMP( J )%TABID( IVAR ) .EQ. 0 ) THEN
-                          WRITE( XMSG, '(3A,I2,6A)' ),'The ELMO COMPOSITE variable ',
+                          WRITE( XMSG, '(3A,I2,6A)' ) 'The ELMO COMPOSITE variable ',
      &                         TRIM( ELMO_TABLE( J )%NAME ),' has a component (#',
      &                         IVAR,') that is not available on the comprehensive ', 
      &                         'ELMO Table. If this is a source-resolved ISAM COMPOSITE, ',
@@ -216,7 +216,7 @@
       INTEGER, ALLOCATABLE       :: LAY_BOT( : )
       INTEGER, ALLOCATABLE       :: LAY_TOP( : )
       CHARACTER(32), ALLOCATABLE :: FILE_VARS(:,:)
-      CHARACTER(30), ALLOCATABLE :: KEYWD_NAME( : )
+      CHARACTER(32), ALLOCATABLE :: KEYWD_NAME( : )
       CHARACTER(32), ALLOCATABLE :: KEYWD(:,:)
                        
       CHARACTER( 200 ) :: SUFFIX = '.nc'
@@ -379,7 +379,7 @@
         ELSE IF ( TMODE( IFL ) .EQ. 'AVERAGE' ) THEN
            ELMO_FILE( IFL )%TMODE = 1
         ELSE
-            WRITE( XMSG, "(A,I3.3,A)"),
+            WRITE( XMSG, "(A,I3.3,A)")
      &             'An ELMO file may only be average or instantaneous.  '//
      &             'Please revise the value of Tmode(',IFL,') in ELMO_FILE.'
             CALL M3EXIT ( PNAME, 0, 0, XMSG, 1 ) 
@@ -1269,15 +1269,15 @@
                ! Write Last Line
                WRITE( LOGDEV, '(10x,A)' ), FORMULA(1:FORM_SIZE)
             END IF
-            WRITE( LOGDEV, '')
+            WRITE( LOGDEV, * )
          END DO
       END DO
 
-      WRITE( LOGDEV, '' )
+      WRITE( LOGDEV, * )
       WRITE( LOGDEV, '(/,/,5x,A)' ),'|> ELMO OUTPUT VARIABLE REPORT COMPLETE'
       WRITE( LOGDEV, '(5x,A)' ),'+========================================='
-      WRITE( LOGDEV, '' )
-      WRITE( LOGDEV, '' )
+      WRITE( LOGDEV, * )
+      WRITE( LOGDEV, * )
 
       END SUBROUTINE ELMO_WRITE_LOG
 

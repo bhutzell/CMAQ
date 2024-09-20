@@ -41,7 +41,7 @@
       CONTAINS
 
 !-------------------------------------------------------------------------
-      SUBROUTINE ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME )
+      SUBROUTINE ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN )
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
@@ -60,6 +60,7 @@
       USE CGRID_SPCS, ONLY : N_CGRID_SPC, N_SPC_WDEP, N_SPC_DEPV, NSPCSD
       use centralized_io_module, only : interpolate_var, pv_avail
       Use phot_mod, Only: init_phot_shared
+      Use ASX_DATA_MOD, Only : GET_MET, MET_DATA
 
 #ifdef isam
       USE SA_DEFN, ONLY : NTAG_SA, ISAM, NSPC_SA
@@ -78,7 +79,7 @@
                                                 ! determine whether to write 
                                                 ! concentrations
       INTEGER, INTENT( IN ) :: TSTEP(3)
-      LOGICAL, INTENT( IN ) :: INIT_TIME        ! Is this the first time step 
+      LOGICAL, INTENT( IN ) :: INIT_TIME_IN     ! Is this the first time step 
                                                 !   of the simulation
       LOGICAL :: INIT_STEP        ! Is the time step beginning
 
@@ -148,6 +149,7 @@
       END IF
 
       ! Determine if this is a write step
+      INIT_TIME = INIT_TIME_IN
       WRITE_STEP = .FALSE.
       INIT_STEP  = .FALSE.
       IF ( ELMO_NSTEP .LT. 1.0 ) THEN
@@ -161,28 +163,29 @@
       ELMO_NSTEP = ELMO_NSTEP + 1.0
 
       ! Get Meteorological Variables
+      CALL GET_MET( JDATE, JTIME, TSTEP(2) )
 
       ! pressure [Pa]
-      call interpolate_var ('PRES', jdate, jtime, PRES)
+      !call interpolate_var ('PRES', jdate, jtime, PRES)
 
       ! temperature [K]
-      call interpolate_var ('TA', jdate, jtime, TA)       ! Grid Cell Temp
-      call interpolate_var ('TEMP2',jdate, jtime, TEMP2 ) ! 2-m Temp
+      !call interpolate_var ('TA', jdate, jtime, TA)       ! Grid Cell Temp
+      !call interpolate_var ('TEMP2',jdate, jtime, TEMP2 ) ! 2-m Temp
 
       ! specific humidity [g H2O/g air]
-      call interpolate_var ('QV', jdate, jtime, QV)
+      !call interpolate_var ('QV', jdate, jtime, QV)
 
       ! air density [kg/m3]
-      call interpolate_var ('DENS', jdate, jtime, DENS)
+      !call interpolate_var ('DENS', jdate, jtime, DENS)
       
       ! get cloud fraction if photolysis hasn not been called yet
-      call interpolate_var ('CFRAC', jdate, jtime, CFRACS)
+      !call interpolate_var ('CFRAC', jdate, jtime, CFRACS)
 
       ! get PBL height (m)
-      call interpolate_var ('PBL', jdate, jtime, PBLS)
+      !call interpolate_var ('PBL', jdate, jtime, PBLS)
 
       ! get Solar Radiation reaching ground (W m-2)
-      call interpolate_var ('RGRND', jdate, jtime, RGRNDS)
+      !call interpolate_var ('RGRND', jdate, jtime, RGRNDS)
 
       ! get Convective Rain Rate (cm)
       call interpolate_var ('RC', jdate, jtime, RCS)
@@ -191,14 +194,14 @@
       call interpolate_var ('RN', jdate, jtime, RNS)
 
       ! get Wind Speed at 10 m (m s-1)
-      call interpolate_var ('WSPD10', jdate, jtime, WSPD10S)
+      !call interpolate_var ('WSPD10', jdate, jtime, WSPD10S)
 
       ! get Wind Direction at 10 m (degrees)
       call interpolate_var ('WDIR10', jdate, jtime, WDIR10S)
 
       ! retrieve all layer heights. This is the height of the top of the
       ! layers
-      call interpolate_var ('ZF', jdate, jtime, ZF)
+      !call interpolate_var ('ZF', jdate, jtime, ZF)
       
       ! retrieve potential vorticity
       if ( pv_avail ) then
@@ -210,37 +213,38 @@
       ! retrieve layer midpoint heights. This is a mass weighted
       ! coordinate so is not necessarily consistent with the distance 
       ! between the heights of the layer bottom and top.
-      call interpolate_var ('ZH', jdate, jtime, ZHS)
+      !call interpolate_var ('ZH', jdate, jtime, ZHS)
 
       ! Calculate Heterogeneous Chemistry Rates
       CALL INIT_PHOT_SHARED()
-      CALL HETCHEM_RATES( TA, PRES, QV, CGRID, DENS )
+      CALL HETCHEM_RATES( MET_DATA%TA, MET_DATA%PRES, MET_DATA%QV,
+     &                    CGRID, MET_DATA%DENS )
 
       ! Process PM Diagnostics for Base Model
       DO C = 1,NCOLS
       DO R = 1,NROWS
       DO L = 1,NLAYS
          ! Grid cell meteorological data.
-         AIRTEMP  = TA   ( C,R,L )
-         SRFTEMP  = TEMP2( C,R )     ! 2-meter temperature (K)
-         AIRPRES  = PRES ( C,R,L )   ! Note pascals
-         AIRQV    = QV   ( C,R,L )
-         AIRDENS  = DENS ( C,R,L )
+         AIRTEMP  = MET_DATA%TA   ( C,R,L )
+         SRFTEMP  = MET_DATA%TEMP2( C,R )     ! 2-meter temperature (K)
+         AIRPRES  = MET_DATA%PRES ( C,R,L )   ! Note pascals
+         AIRQV    = MET_DATA%QV   ( C,R,L )
+         AIRDENS  = MET_DATA%DENS ( C,R,L )
          H2OSATVP = ESATL( AIRTEMP )
          H2OVP    = AIRPRES * AIRQV / ( EPSWATER  + AIRQV )
          AIRRH    = MAX( 0.005, MIN( 0.99, H2OVP / H2OSATVP ) ) ! 0-1
          IF ( L .EQ. 1 ) THEN
              DZ   = ZF( C,R,L )
-             CFRAC= CFRACS( C,R ) 
-             PBL      = PBLS( C,R )
-             RGRND    = RGRNDS( C,R )
+             !CFRAC= CFRACS( C,R ) 
+             !PBL      = PBLS( C,R )
+             !RGRND    = RGRNDS( C,R )
              RC       = RCS( C,R )
              RN       = RNS( C,R )
-             WSPD10   = WSPD10S( C,R )
+             !WSPD10   = WSPD10S( C,R )
              WDIR10   = WDIR10S( C,R )
 
          ELSE
-             DZ      = ZF( C,R,L ) - ZF( C,R,L-1 )
+             DZ      = MET_DATA%ZF( C,R,L ) - MET_DATA%ZF( C,R,L-1 )
              CFRAC   = ELMO_BLANK
              PBL     = ELMO_BLANK
              RGRND   = ELMO_BLANK
@@ -250,7 +254,7 @@
              WDIR10  = ELMO_BLANK
  
          END IF
-         ZH       = ZHS( C,R,L )
+         ZH       = MET_DATA%ZH( C,R,L )
          PV       = PVS( C,R,L )
 
          ! Extract Aerosols
@@ -290,7 +294,7 @@
 #endif
 
          ! Populate Diagnostic Arrays
-         CALL LOAD_ELMO( C,R,L, WRITE_STEP, INIT_STEP, INIT_TIME )
+         CALL LOAD_ELMO( C,R,L, WRITE_STEP, INIT_STEP )
 
       END DO
       END DO
@@ -299,7 +303,7 @@
       END SUBROUTINE ELMO_DRIVER
 
 !-------------------------------------------------------------------------
-      SUBROUTINE LOAD_ELMO( C,R,L,WRITE_STEP, INIT_STEP, INIT_TIME )
+      SUBROUTINE LOAD_ELMO( C,R,L,WRITE_STEP, INIT_STEP )
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
@@ -318,7 +322,6 @@
 
       LOGICAL, INTENT( IN ) :: WRITE_STEP
       LOGICAL, INTENT( IN ) :: INIT_STEP
-      LOGICAL, INTENT( IN ) :: INIT_TIME
 
       CHARACTER(250) :: XMSG
       INTEGER        :: XSTAT1
