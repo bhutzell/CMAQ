@@ -217,6 +217,7 @@ C...prepare indices for scavenged species
         SCAV_MASK_SRF = .FALSE.
         SCAV_MASK_NR = .FALSE.
         SCAV_MASK_TRAC = .FALSE.
+        HLIND = 0
 
 C...  load the CGRID to scavenged species pointers for the gases
         SPC = 0

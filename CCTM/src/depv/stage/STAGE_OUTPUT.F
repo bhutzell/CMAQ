@@ -20,7 +20,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE STAGE_OUTPUT
 
 C-----------------------------------------------------------------------
-C Function: Collection of ouput routines for STAGE deposition velocities
+C Function: Collection of output routines for STAGE deposition velocities
 C           and dry deposition
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS, Only: MOSAIC
