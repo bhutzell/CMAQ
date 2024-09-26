@@ -605,11 +605,11 @@ CMPST =
 
 'PM25_MG'     , 'PM2.5 Magnesium',
                 'ug m-3', 'PM25', 
-                'AMG + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS',
+                'AMG + 0.0997 * ASEACAT + 0.0170 * ASOIL + 0.0032 * ACORS',
 
 'PM25_K'      , 'PM2.5 Potassium',
                 'ug m-3', 'PM25', 
-                'AK  + 0.0310 * ASEACAT + 0.0170 * ASOIL + 0.0032 * ACORS',
+                'AK  + 0.0310 * ASEACAT + 0.0242 * ASOIL + 0.0176 * ACORS',
 
 'PM25_CA'     , 'PM2.5 Calcium',
                 'ug m-3', 'PM25', 
@@ -878,7 +878,7 @@ CMPST =
 !-- Chloride --!
 'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
                 'kg ha-1', 'DEP_FINE', 
-                'DD_ACL',
+                'DD_ACL - DD_ACLI',
 
 'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride', 
                 'kg ha-1', 'DEP_COARSE', 
@@ -1052,7 +1052,7 @@ CMPST =
 !-- Total Chloride --!
 'WD_TCL'      , 'Wet Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
-                '0.972*WD_HCL + WD_CL2 + WD_ACL + 0.6758*WD_HOCL',
+                '0.972*WD_HCL + WD_CL2 + WD_ACL - WD_ACLI + 0.6758*WD_HOCL',
 
 'TD_TCL'      , 'Total Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
@@ -1074,11 +1074,11 @@ CMPST =
 
 'DD_OXN_TNO3' , 'Dry Dep of Oxidized Nitrogen from Nitrate', 
                 'kgN ha-1', 'DEP', 
-                '0.22222*DD_HNO3 + 0.22581*DD_ANO3',
+                '0.22222*DD_HNO3 + 0.22581*DD_ANO3 + 0.22581*DD_NO3',
 
 'WD_OXN_TNO3' , 'Wet Dep of Oxidized Nitrogen from Nitrate', 
                 'kgN ha-1', 'DEP', 
-                '0.22222*WD_HNO3 + 0.22581*WD_ANO3',
+                '0.22222*WD_HNO3 + 0.22581*WD_ANO3 + 0.22581*WD_NO3',
 
 'DD_OXN_PANT' , 'Dry Dep of Oxidized Nitrogen from PAN', 
                 'kgN ha-1', 'DEP', 
@@ -1191,7 +1191,7 @@ CMPST =
 
 'WD_S_TOT'      , 'Wet Dep of Total Sulfur', 
                   'kgS ha-1', 'DEP', 
-                  '0.33333*WD_ASO4',
+                  '0.33333*WD_SOX',
 
 'TD_S_TOT'      , 'Total Dep of Total Sulfur', 
                   'kgS ha-1', 'DEP', 

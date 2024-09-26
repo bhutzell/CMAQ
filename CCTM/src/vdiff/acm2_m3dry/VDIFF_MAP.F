@@ -40,7 +40,7 @@ C global diffusion species
       !INTEGER, SAVE :: N_SPC_DIFF 
      
 C global dry dep species
-      INTEGER, SAVE :: N_SPC_DDEP 
+      !INTEGER, SAVE :: N_SPC_DDEP 
 
       INTEGER, ALLOCATABLE, SAVE :: DIFF_MAP( : ) ! global diff map to CGRID
       INTEGER, ALLOCATABLE, SAVE :: DF2DV   ( : ) ! map from diff spc to depv spc

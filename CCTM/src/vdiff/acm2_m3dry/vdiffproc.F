@@ -150,7 +150,7 @@ C Local Variables:
       REAL, ALLOCATABLE, SAVE :: CNGRD( :,:,:,: )     ! cgrid aero in mixing ratio
       REAL, ALLOCATABLE, SAVE :: DDEP     ( :,:,: )   ! ddep accumulator
       REAL, ALLOCATABLE, SAVE :: DDEP0    ( :,:,: )   ! ddep initial before call to vdiffacmx
-      REAL, ALLOCATABLE, SAVE :: NH3_EMIS0( :,: )     ! NH3_EMIS0 initial before call to get_depv
+      REAL, ALLOCATABLE, SAVE :: NH3_DDEP0( :,: )     ! NH3_DDEP0 initial before call to get_depv
       REAL, ALLOCATABLE, SAVE :: ICMP     ( :,:,: )   ! component flux accumlator 
       REAL     :: WRDD( NCOLS,NROWS )                 ! ddep write buffer
 
@@ -249,8 +249,8 @@ C-----------------------------------------------------------------------
 
 #ifndef mpas
          IF ( BUDGET_DIAG .OR. LIPR ) THEN
-            ALLOCATE( NH3_EMIS0( NCOLS,NROWS), STAT = ASTAT )
-            CALL CHECKMEM( ASTAT,'NH3_EMIS0',PNAME )
+            ALLOCATE( NH3_DDEP0( NCOLS,NROWS), STAT = ASTAT )
+            CALL CHECKMEM( ASTAT,'NH3_DDEP0',PNAME )
          END IF
 #endif
 
@@ -484,7 +484,7 @@ C read & interpolate met data
 
 C read & interpolate deposition velocities
 #ifndef mpas
-      IF ( BUDGET_DIAG .OR. LIPR ) NH3_EMIS0 = NH3_EMIS
+      IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) NH3_DDEP0 = NH3_DDEP
 #endif
       CALL GET_DEPV ( MDATE, MTIME, TSTEP, CGRID )      
 
@@ -579,28 +579,28 @@ C Store Deposition Change in Budget and Process Analysis Arrays
 #ifndef mpas
       IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) THEN
          DDEP_PA = 0.0
-         DO V = 1, N_SPC_DEPV
-            IF ( ABFLUX .AND. V .EQ. DD2DV(NH3_HIT) ) THEN 
+         DO V = 1, N_SPC_DDEP
+            S = DD2DV( V )
+            IF ( ABFLUX .AND. V .EQ. NH3_HIT ) THEN 
                ! For Ammonia, take Bidirectional Flux into account
                ! if those processes are implemented
                DO R = 1, NROWS
                   DO C = 1, NCOLS
-                     DDEP_PA( C,R,MAP_DEPVtoCGRID(V)) = DDEP( V,C,R ) - DDEP0( V,C,R )
-     &                                            + NH3_EMIS( C,R ) - NH3_EMIS0( C,R )
+                     DDEP_PA( C,R,MAP_DDEPtoCGRID(V)) = NH3_DDEP( C,R ) - NH3_DDEP0( C,R )
                   END DO
                END DO
             ELSE
                ! All other species
                DO R = 1, NROWS
                   DO C = 1, NCOLS
-                     DDEP_PA( C,R,MAP_DEPVtoCGRID(V)) = DDEP( V,C,R ) - DDEP0( V,C,R )
+                     DDEP_PA( C,R,MAP_DDEPtoCGRID(V)) = DDEP( S,C,R ) - DDEP0( S,C,R )
                   END DO
                END DO
             END IF
 
             ! Pass Dry Deposition Rates to ELMO
             IF ( L_ELMO ) THEN
-               ELMO_DDEP(:,:,V) = DDEP_PA(:,:,MAP_DEPVtoCGRID(V))
+               ELMO_DDEP(:,:,MAP_DDEPtoCGRID(V)) = DDEP_PA(:,:,MAP_DDEPtoCGRID(V))
             END IF
 
          END DO
@@ -866,7 +866,7 @@ C Write other diagnostics
             END DO
             
             IF ( L_ELMO .AND. ISAM_DEPV(ITAG) .GT. 0 ) THEN
-               ELMO_ISAM_DDEP( :,:,ISAM_DEPV(ITAG),T_SPCTAG(ITAG) ) = 
+               ELMO_ISAM_DDEP( :,:,S_SPCTAG(ITAG),T_SPCTAG(ITAG) ) = 
      &                SA_DDEP( :,:,ITAG )
             END IF
               
@@ -908,7 +908,7 @@ C WT - write out dry deposition sensitivities
                END IF
 
                IF ( L_ELMO ) THEN
-                  ELMO_DDM_DDEP(:,:,S,NP) = S_DDEP(S,:,:,NP)
+                  ELMO_DDM_DDEP(:,:,MAP_DDEPtoCGRID(V),NP) = S_DDEP(S,:,:,NP)
                END IF
             ENDDO
          ENDDO

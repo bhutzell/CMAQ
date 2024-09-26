@@ -151,13 +151,13 @@
      &                      OT_DD_OC, OT_WD_OC, ET_DRVD_DDEP, ET_DRVD_WDEP,
      &                      ET_ISAM_DRVD, ET_ISAM_DRVD_DDEP, ET_ISAM_DRVD_WDEP,
      &                      ET_DDM_DRVD, ET_DDM_DRVD_DDEP, ET_DDM_DRVD_WDEP,
-     &                      DDEP_VEC, WDEP_VEC
+     &                      DDEP_VEC, WDEP_VEC, ET_AEROPROP
 #ifdef isam      
-      USE ELMO_DATA, ONLY : ISAM_VEC
+      USE ELMO_DATA, ONLY : ISAM_VEC, ISAM_WDEP_VEC, ISAM_DDEP_VEC
       USE SA_DEFN, ONLY : MAP_AEROtoSA, NTAG_SA
 #endif
 #ifdef sens
-      USE ELMO_DATA, ONLY : ET_DDM_CMPST, ET_DDM_DRVD, DDM_VEC
+      USE ELMO_DATA, ONLY : DDM_VEC, DDM_WDEP_VEC, DDM_DDEP_VEC
       USE AERO_DDM3D, ONLY : S_AEROSPC_CONC
 #endif
 
@@ -192,7 +192,8 @@
           DO IOA = 1,N_OA_NotTracers
              DO IM = 1,N_MODE
                 ! Just Select Species from the Org_Mask
-                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) 
+     &               .AND. .NOT. AERO_MISSING( MAP_OAtoAERO(IOA),IM) ) THEN
                     
                    IF ( IV .EQ. ET_DRVD ) THEN  ! Core Model
                      OUTVAL = OUTVAL + FRAC( IM ) 
@@ -200,16 +201,18 @@
 
                    ELSE IF ( IV .EQ. ET_ISAM_DRVD ) THEN  ! ISAM
 #ifdef isam      
-                     IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IMODE )
+                     IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IM )
+                     IF ( IVAR .NE. 0 ) THEN
                      IF ( ISRC .LE. NTAG_SA ) THEN
                        OUTVAL = OUTVAL + FRAC( IM ) * ISAM_VEC( IVAR,ISRC ) 
                      ELSE
                        OUTVAL = OUTVAL + FRAC( IM ) * SUM(ISAM_VEC( IVAR,: )) 
                      END IF
+                     END IF
 #endif
                    ELSE IF ( IV .EQ. ET_DDM_DRVD ) THEN  ! DDM
 #ifdef sens      
-                     IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IMODE )
+                     IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IM )
                      OUTVAL = OUTVAL + FRAC( IM ) * DDM_VEC( ISRC,IVAR ) 
 #endif
                    END IF 
@@ -222,7 +225,8 @@
           DO IOA = 1,N_OA_NotTracers
              DO IM = 1,N_MODE 
                 ! Just Select Species from the Org_Mask
-                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) 
+     &               .AND. .NOT. AERO_MISSING( MAP_OAtoAERO(IOA),IM) ) THEN
 
                    IF ( IV .EQ. ET_DRVD ) THEN  ! Core Model
                      OUTVAL = OUTVAL + FRAC( IM )
@@ -231,7 +235,8 @@
 
                    ELSE IF ( IV .EQ. ET_ISAM_DRVD ) THEN  ! ISAM
 #ifdef isam      
-                     IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IMODE )
+                     IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IM ) 
+                     IF ( IVAR .NE. 0 ) THEN
                      IF ( ISRC .LE. NTAG_SA ) THEN
                        OUTVAL = OUTVAL + FRAC( IM )
      &                          * ISAM_VEC( IVAR,ISRC ) 
@@ -241,11 +246,12 @@
      &                          * SUM(ISAM_VEC( IVAR,: )) 
      &                          / OASPC( IOA )%OMtoOC
                      END IF
+                     END IF
 #endif
 
                    ELSE IF ( IV .EQ. ET_DDM_DRVD ) THEN  ! DDM
 #ifdef sens      
-                     IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IMODE )
+                     IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IM )
                      OUTVAL = OUTVAL + FRAC( IM )
      &                        * DDM_VEC( ISRC,IVAR ) 
      &                        / OASPC( IOA )%OMtoOC
@@ -259,9 +265,11 @@
         CASE ( OT_OMOC )
           ! Calculate OM:OC of Species selected by ORG_MASK
           VAL = SUM_ORGS( OT_OA, ORG_MASK, MODE_MASK, INLET, 
-     &                    WETNESS, IV, ISRC )
+     &                    WETNESS, ET_DRVD, 0 )
+
+          ORG_MASK = ORG_MASK .AND. OASPC( : )%OMtoOC .GT. 0.0
           VAL2= SUM_ORGS( OT_OC, ORG_MASK, MODE_MASK, INLET, 
-     &                    WETNESS, IV, ISRC )
+     &                    WETNESS, ET_DRVD, 0 )
 
           OUTVAL = VAL / ( VAL2 + TINY( 0.0 ) )
         
@@ -269,7 +277,7 @@
           ! Calculate O:C of Species selected by ORG_MASK
           ! First retrieve OM of this selection
           VAL = SUM_ORGS( OT_OA, ORG_MASK, MODE_MASK, INLET, 
-     &                    WETNESS, IV, ISRC )
+     &                    WETNESS, ET_DRVD, 0 )
         
           ! Now Calculate Weighted O:C
           VAL2 = 0.0
@@ -277,9 +285,10 @@
              DO IM = 1,N_MODE
                 IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) .AND.
      &               MAP_OAtoAERO(IOA) .NE. APOC_IDX .AND.
-     &               MAP_OAtoAERO(IOA) .NE. APNCOM_IDX ) THEN
+     &               MAP_OAtoAERO(IOA) .NE. APNCOM_IDX 
+     &               .AND. .NOT. AERO_MISSING( MAP_OAtoAERO(IOA),IM) ) THEN
                 
-                   IF ( IV .EQ. ET_DRVD ) THEN   ! Core Model
+                   IF ( IV .EQ. ET_AEROPROP ) THEN   ! Core Model
                       ! Weight OA Sum by O:C
                       VAL2 = VAL2 + FRAC( IM )
      &                       * AEROSPC_CONC( MAP_OAtoAERO(IOA),IM )
@@ -288,6 +297,7 @@
                    ELSE IF ( IV .EQ. ET_ISAM_DRVD ) THEN  ! ISAM
 #ifdef isam      
                      IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IM )
+                     IF ( IVAR .NE. 0 ) THEN
                      IF ( ISRC .LE. NTAG_SA ) THEN
                        VAL2 = VAL2 + FRAC( IM )
      &                        * ISAM_VEC( IVAR,ISRC ) 
@@ -296,6 +306,7 @@
                        VAL2 = VAL2 + FRAC( IM )
      &                        * SUM(ISAM_VEC( IVAR,: )) 
      &                        * OASPC( IOA )%OtoC
+                     END IF
                      END IF
 #endif
 
@@ -320,14 +331,17 @@
             IF ( MODE_MASK( IM ) ) THEN
                
                IF ( IV .EQ. ET_DRVD ) THEN  ! Core Model
-                  IF ( APOC_IDX .NE. 0 ) 
+                  IF ( APOC_IDX .NE. 0  
+     &                 .AND. .NOT. AERO_MISSING( APOC_IDX,IM) ) 
      &               POC = POC + AEROSPC_CONC(APOC_IDX,IM) * FRAC(IM)
-                  IF ( APNCOM_IDX .NE. 0 ) 
+                  IF ( APNCOM_IDX .NE. 0  
+     &                 .AND. .NOT. AERO_MISSING( APNCOM_IDX,IM) ) 
      &               POM = POM + AEROSPC_CONC(APNCOM_IDX,IM) * FRAC(IM)
 
                ELSE IF ( IV .EQ. ET_ISAM_DRVD ) THEN  ! ISAM
 #ifdef isam      
-                  IF ( APOC_IDX .NE. 0 ) THEN
+                  IF ( APOC_IDX .NE. 0 
+     &                 .AND. .NOT. AERO_MISSING( APOC_IDX,IM) ) THEN
                      IVAR = MAP_AEROtoSA( APOC_IDX,IM )
                      IF ( ISRC .LE. NTAG_SA ) THEN
                         POC = POC + FRAC(IM) 
@@ -335,8 +349,10 @@
                      ELSE
                         POC = POC + FRAC(IM) 
      &                    * SUM(ISAM_VEC( IVAR,: ))
+                     END IF
                   END IF
-                  IF ( APNCOM_IDX .NE. 0 ) THEN
+                  IF ( APNCOM_IDX .NE. 0 
+     &                 .AND. .NOT. AERO_MISSING( APNCOM_IDX,IM) ) THEN
                      IVAR = MAP_AEROtoSA( APNCOM_IDX,IM )
                      IF ( ISRC .LE. NTAG_SA ) THEN
                         POM = POM + FRAC(IM) 
@@ -344,16 +360,19 @@
                      ELSE
                         POM = POM + FRAC(IM) 
      &                    * SUM(ISAM_VEC( IVAR,: ))
+                     END IF   
                   END IF 
 #endif
 
                ELSE IF ( IV .EQ. ET_DDM_DRVD ) THEN  ! DDM
 #ifdef sens      
-                  IF ( APOC_IDX .NE. 0 ) THEN
+                  IF ( APOC_IDX .NE. 0 
+     &                 .AND. .NOT. AERO_MISSING( APOC_IDX,IM) ) THEN
                      IVAR = AEROSPC_MAP( APOC_IDX,IM )
                      POC = POC + FRAC(IM) * DDM_VEC( ISRC,IVAR ) 
                   END IF
-                  IF ( APNCOM_IDX .NE. 0 ) THEN
+                  IF ( APNCOM_IDX .NE. 0 
+     &                 .AND. .NOT. AERO_MISSING( APNCOM_IDX,IM) ) THEN
                      IVAR = AEROSPC_MAP( APNCOM_IDX,IM )
                      POM = POM + FRAC(IM) * DDM_VEC( ISRC,IVAR ) 
                   END IF
@@ -376,15 +395,19 @@
           DO IOA = 1,N_OA_NotTracers
              DO IM = 1,N_MODE
                 ! Just Select Species from the Org_Mask
-                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
-                   IVAR = MAP_CGRIDtoWDEP( AEROSPC_MAP( MAP_OAtoAERO(IOA),IM ))
-                   IF ( IVAR .GT. 0 ) THEN
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) 
+     &               .AND. .NOT. AERO_MISSING( MAP_OAtoAERO(IOA),IM) ) THEN
+                
+                   IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IM )
+                   IF ( IVAR .NE. 0 ) THEN
                     
-                     IF ( IV .EQ. ET_DRVD_DDEP ) THEN  ! Core Model
+                     IF ( IV .EQ. ET_DRVD_WDEP ) THEN  ! Core Model
                        OUTVAL = OUTVAL + FRAC( IM ) * WDEP_VEC( IVAR )
 
-                     ELSE IF ( IV .EQ. ET_ISAM_DRVD_DDEP ) THEN  ! ISAM
+                     ELSE IF ( IV .EQ. ET_ISAM_DRVD_WDEP ) THEN  ! ISAM
 #ifdef isam      
+                       IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IM )
+                       IF ( IVAR .NE. 0 ) THEN
                        IF ( ISRC .LE. NTAG_SA ) THEN
                          ! Just one source (ISRC)
                          OUTVAL = OUTVAL + FRAC( IM ) 
@@ -394,9 +417,10 @@
                          OUTVAL = OUTVAL + FRAC( IM ) 
      &                            * SUM(ISAM_WDEP_VEC( IVAR,: )) 
                        END IF
+                       END IF
 #endif
 
-                     ELSE IF ( IV .EQ. ET_DDM_DRVD_DDEP ) THEN  ! DDM
+                     ELSE IF ( IV .EQ. ET_DDM_DRVD_WDEP ) THEN  ! DDM
 #ifdef sens      
                        ! Just one source (ISRC)
                        OUTVAL = OUTVAL + FRAC( IM ) 
@@ -414,16 +438,20 @@
           DO IOA = 1,N_OA_NotTracers
              DO IM = 1,N_MODE 
                 ! Just Select Species from the Org_Mask
-                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
-                   IVAR = MAP_CGRIDtoWDEP( AEROSPC_MAP( MAP_OAtoAERO(IOA),IM ))
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) 
+     &               .AND. .NOT. AERO_MISSING( MAP_OAtoAERO(IOA),IM) ) THEN
+
+                   IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IM )
                    IF ( IVAR .GT. 0 ) THEN
 
-                     IF ( IV .EQ. ET_DRVD_DDEP ) THEN  ! Core Model
+                     IF ( IV .EQ. ET_DRVD_WDEP ) THEN  ! Core Model
                        OUTVAL = OUTVAL + FRAC( IM ) * WDEP_VEC( IVAR )
      &                          / OASPC( IOA )%OMtoOC
                     
-                     ELSE IF ( IV .EQ. ET_ISAM_DRVD_DDEP ) THEN  ! ISAM
+                     ELSE IF ( IV .EQ. ET_ISAM_DRVD_WDEP ) THEN  ! ISAM
 #ifdef isam      
+                       IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IM )
+                       IF ( IVAR .NE. 0 ) THEN
                        IF ( ISRC .LE. NTAG_SA ) THEN
                          ! Just one source (ISRC)
                          OUTVAL = OUTVAL + FRAC( IM )
@@ -435,9 +463,10 @@
      &                            * SUM(ISAM_WDEP_VEC( IVAR,: )) 
      &                            / OASPC( IOA )%OMtoOC
                        END IF
+                       END IF
 #endif
                     
-                     ELSE IF ( IV .EQ. ET_DDM_DRVD_DDEP ) THEN  ! DDM
+                     ELSE IF ( IV .EQ. ET_DDM_DRVD_WDEP ) THEN  ! DDM
 #ifdef sens      
                        ! Just one source (ISRC)
                        OUTVAL = OUTVAL + FRAC( IM )
@@ -456,8 +485,10 @@
           DO IOA = 1,N_OA_NotTracers
              DO IM = 1,N_MODE
                 ! Just Select Species from the Org_Mask
-                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
-                   IVAR = DEPV_MAP( AEROSPC_MAP( MAP_OAtoAERO(IOA),IM ))
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) 
+     &               .AND. .NOT. AERO_MISSING( MAP_OAtoAERO(IOA),IM) ) THEN
+                   
+                   IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IM )
                    IF ( IVAR .GT. 0 ) THEN
                     
                      IF ( IV .EQ. ET_DRVD_DDEP ) THEN  ! Core Model
@@ -465,6 +496,8 @@
 
                      ELSE IF ( IV .EQ. ET_ISAM_DRVD_DDEP ) THEN  ! ISAM
 #ifdef isam      
+                       IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IM )
+                       IF ( IVAR .NE. 0 ) THEN
                        IF ( ISRC .LE. NTAG_SA ) THEN
                          ! Just one source (ISRC)
                          OUTVAL = OUTVAL + FRAC( IM ) 
@@ -473,6 +506,7 @@
                          ! Sum All Sources
                          OUTVAL = OUTVAL + FRAC( IM ) 
      &                            * SUM(ISAM_DDEP_VEC( IVAR,: )) 
+                       END IF
                        END IF
 #endif
 
@@ -484,7 +518,7 @@
 #endif
 
                      END IF
-                   END IF 
+                   END IF
                 END IF
              END DO
           END DO
@@ -494,8 +528,10 @@
           DO IOA = 1,N_OA_NotTracers
              DO IM = 1,N_MODE 
                 ! Just Select Species from the Org_Mask
-                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) ) THEN
-                   IVAR = DEPV_MAP( AEROSPC_MAP( MAP_OAtoAERO(IOA),IM ))
+                IF ( ORG_MASK( IOA ) .AND. MODE_MASK( IM ) 
+     &               .AND. .NOT. AERO_MISSING( MAP_OAtoAERO(IOA),IM) ) THEN
+
+                   IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IM )
                    IF ( IVAR .GT. 0 ) THEN
 
                      IF ( IV .EQ. ET_DRVD_DDEP ) THEN  ! Core Model
@@ -504,6 +540,8 @@
                     
                      ELSE IF ( IV .EQ. ET_ISAM_DRVD_DDEP ) THEN  ! ISAM
 #ifdef isam      
+                       IVAR = MAP_AEROtoSA( MAP_OAtoAERO(IOA),IM )
+                       IF ( IVAR .NE. 0 ) THEN
                        IF ( ISRC .LE. NTAG_SA ) THEN
                          ! Just one source (ISRC)
                          OUTVAL = OUTVAL + FRAC( IM )
@@ -514,6 +552,7 @@
                          OUTVAL = OUTVAL + FRAC( IM )
      &                            * SUM(ISAM_DDEP_VEC( IVAR,: )) 
      &                            / OASPC( IOA )%OMtoOC
+                       END IF
                        END IF
 #endif
                     

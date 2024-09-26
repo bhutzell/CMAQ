@@ -532,12 +532,12 @@ c                 ENDIF
 
       ! Store Deposition Accumulation so it can be subtracted out to
       ! inform ELMO
-      TOT_DEP0 = TOT_DEP
+      TOT_DEP0 = TOT_DEP + CONV_DEP
 #ifdef isam
-      TOT_SADEP0 = TOT_SADEP
+      TOT_SADEP0 = TOT_SADEP + CONV_SADEP
 #endif
 #ifdef sens
-      S_TOTDEP0 = S_TOTDEP
+      S_TOTDEP0 = S_TOTDEP + S_CONDEP
 #endif
 
 
@@ -550,6 +550,37 @@ C...compute cloud effects for convective (subgrid) clouds
 
       CALL CONVCLD_ACM ( CGRD, JDATE, JTIME, TSTEP,
      &                   CONV_DEP, SUBTRANS )
+
+C...pass deposition flux to ELMO        
+      IF ( L_ELMO ) THEN
+          DO VAR = 1,N_SPC_WDEP 
+              ELMO_WDEP( :,:,MAP_WDEPtoCGRID(VAR) ) = TOT_DEP( :,:,VAR ) 
+     &                 + CONV_DEP( :,:,VAR ) - TOT_DEP0(:,:,VAR )
+          END DO
+
+#ifdef isam
+          DO SPC = 1,N_SPCTAG
+            IF ( ISAM_WDEP(SPC) .GT. 0 ) THEN
+              ELMO_ISAM_WDEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) ) = 
+     &             TOT_SADEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
+     &           + CONV_SADEP(:,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
+     &           - TOT_SADEP0(:,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
+            END IF
+          END DO
+#endif          
+#ifdef sens
+          DO NP = 1,NPMAX
+            IF ( L_ELMO ) THEN
+              DO SPC = 1, N_SPC_WDEP
+                 ELMO_DDM_WDEP( :,:,MAP_WDEPtoCGRID(SPC),NP ) = 
+     &                S_TOTDEP(:,:,NP,SPC) + S_CONDEP(:,:,NP,SPC) 
+     &                                     - S_TOTDEP0(:,:,NP,SPC)
+              END DO
+            END IF
+          END DO
+#endif          
+
+      END IF
 
 C...now check to see if it's time to write the deposition file
       WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )
@@ -636,12 +667,6 @@ C...write data to the normal wet deposition file
      &         'Timestep written to', CTM_WET_DEP_1,
      &         'for date and time', NDATE, NTIME
 
-        IF ( L_ELMO ) THEN
-            DO VAR = 1,N_SPC_WDEP + 1
-                ELMO_WDEP( :,:,VAR ) = TOT_DEP( :,:,VAR ) 
-     &                               - TOT_DEP0(:,:,VAR )
-            END DO
-        END IF
 
 #ifdef sens
 C...write data to the sensitivity wet deposition file
@@ -650,12 +675,8 @@ c gas species
           DO SPC = 1, ( N_SPC_WDEP + 1 ) 
             SENNUM = ( SPC - 1 ) * NPMAX + NP
             S_DEPWRT(:,:,SENNUM) = S_TOTDEP( :,:,NP,SPC )
-
-            IF ( L_ELMO ) THEN
-               ELMO_DDM_WDEP(:,:,SPC,NP) = S_TOTDEP(:,:,NP,SPC)
-     &                                   - S_TOTDEP0(:,:,NP,SPC)
-            END IF
           END DO
+
         END DO
 
         IF ( .NOT. WRITE3( CTM_SWETDEP_1, ALLVAR3, NDATE,
@@ -723,12 +744,6 @@ C...reinitialize deposition array
             CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
           END IF
           
-          IF ( L_ELMO .AND. ISAM_WDEP(SPC) .GT. 0 ) THEN
-              ELMO_ISAM_WDEP( :,:,ISAM_WDEP(SPC),T_SPCTAG(SPC) ) = 
-     &             TOT_SADEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
-     &           - TOT_SADEP0(:,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
-          END IF
-
        END DO ! n_spctag
 
        TOT_SADEP  = 0.0

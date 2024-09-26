@@ -361,7 +361,7 @@
 
          ! Calculate PMF_OMOC - Fine-Mode OM:OC 
          CASE ( ID_PMF_OMOC )
-            ORG_MASK = ( OASPC(:)%OMtoOC .GT. 0.0 ) 
+            ORG_MASK = .TRUE.
             MODE_MASK = AEROMODE%FINE_MASK
             OUTVAL = SUM_ORGS( OT_OMOC, ORG_MASK, 
      &                         MODE_MASK, 0, 0, IV, ISRC )

@@ -112,6 +112,7 @@ c control species
 
       INTEGER, SAVE              :: N_CGRID_SPC
       INTEGER, SAVE              :: N_SPC_WDEP
+      INTEGER, SAVE              :: N_SPC_DDEP
       INTEGER, SAVE              :: N_SPC_DEPV
       INTEGER, SAVE              :: RHOJ_LOC
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: CGRID_NAME( : )
@@ -126,6 +127,7 @@ c control species
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: CGRID_CONC_UNIT ( : )
       CHARACTER( 256), ALLOCATABLE, SAVE :: CGRID_CONC_DESC ( : )
       INTEGER, ALLOCATABLE, SAVE :: MAP_DEPVtoCGRID( : )
+      INTEGER, ALLOCATABLE, SAVE :: MAP_DDEPtoCGRID( : )
       INTEGER, ALLOCATABLE, SAVE :: MAP_WDEPtoCGRID( : )
       INTEGER, ALLOCATABLE, SAVE :: MAP_CGRIDtoWDEP( : )
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: WDEP_SPC( : )
@@ -178,7 +180,7 @@ c !! NO   and to populate the allocated arrays from the stnd gc_spc.ext  !!! NO
             integer, parameter :: spc_dim = 1000
             logical :: order = .true., found = .true.
             character( 120 ) :: xmsg
-            INTEGER :: ISPC, JSPC, IGRID, IWDEP, IDEPV
+            INTEGER :: ISPC, JSPC, IGRID, IWDEP, IDEPV, IDDEP
 
 #ifdef mpas
             integer :: i1, i2, i3, i4   
@@ -1010,6 +1012,7 @@ c-------------------------------------------------------------------------------
      &                CGRID_CONC_UNIT( N_CGRID_SPC ),
      &                CGRID_CONC_DESC( N_CGRID_SPC ),
      &                MAP_DEPVtoCGRID( N_CGRID_SPC ),
+     &                MAP_DDEPtoCGRID( N_CGRID_SPC ),
      &                MAP_WDEPtoCGRID( N_CGRID_SPC ),
      &                MAP_CGRIDtoWDEP( N_CGRID_SPC ),
      &                WDEP_SPC( N_CGRID_SPC ) )
@@ -1024,6 +1027,7 @@ c-------------------------------------------------------------------------------
             CGRID_CONC_UNIT= ''
             CGRID_CONC_DESC= ''
             MAP_DEPVtoCGRID= 0
+            MAP_DDEPtoCGRID= 0
             MAP_WDEPtoCGRID= 0
             MAP_CGRIDtoWDEP= 0
             WDEP_SPC = ''
@@ -1032,6 +1036,7 @@ c-------------------------------------------------------------------------------
             IGRID = 0
             IWDEP = 0
             IDEPV = 0
+            IDDEP = 0
             ! Set Masks for Reactive Gases
             DO ISPC = gc_strt,n_gc_spc
                 IGRID = IGRID + 1
@@ -1045,6 +1050,12 @@ c-------------------------------------------------------------------------------
                   IF ( GC_DEPV_MAP( JSPC ) .EQ. ISPC ) THEN
                     IDEPV = IDEPV + 1
                     MAP_DEPVtoCGRID( IDEPV ) = IGRID
+                  END IF
+                END DO
+                DO JSPC = 1,N_GC_DDEP
+                  IF ( GC_DDEP_MAP( JSPC ) .EQ. ISPC ) THEN
+                    IDDEP = IDDEP + 1
+                    MAP_DDEPtoCGRID( IDDEP ) = IGRID
                   END IF
                 END DO
                 DO JSPC = 1,N_GC_WDEP
@@ -1087,6 +1098,12 @@ c-------------------------------------------------------------------------------
                     MAP_DEPVtoCGRID( IDEPV ) = IGRID
                   END IF
                 END DO
+                DO JSPC = 1,N_AE_DDEP
+                  IF ( AE_DDEP_MAP( JSPC ) .EQ. ISPC ) THEN
+                    IDDEP = IDDEP + 1
+                    MAP_DDEPtoCGRID( IDDEP ) = IGRID
+                  END IF
+                END DO
                 DO JSPC = 1,N_AE_WDEP
                   IF ( AE_WDEP_MAP( JSPC ) .EQ. ISPC ) THEN
                     IWDEP = IWDEP + 1
@@ -1122,6 +1139,12 @@ c-------------------------------------------------------------------------------
                     MAP_DEPVtoCGRID( IDEPV ) = IGRID
                   END IF
                 END DO
+                DO JSPC = 1,N_NR_DDEP
+                  IF ( NR_DDEP_MAP( JSPC ) .EQ. ISPC ) THEN
+                    IDDEP = IDDEP + 1
+                    MAP_DDEPtoCGRID( IDDEP ) = IGRID
+                  END IF
+                END DO
                 DO JSPC = 1,N_NR_WDEP
                   IF ( NR_WDEP_MAP( JSPC ) .EQ. ISPC ) THEN
                     IWDEP = IWDEP + 1
@@ -1148,6 +1171,12 @@ c-------------------------------------------------------------------------------
                     MAP_DEPVtoCGRID( IDEPV ) = IGRID
                   END IF
                 END DO
+                DO JSPC = 1,N_TR_DDEP
+                  IF ( TR_DDEP_MAP( JSPC ) .EQ. ISPC ) THEN
+                    IDDEP = IDDEP + 1
+                    MAP_DDEPtoCGRID( IDDEP ) = IGRID
+                  END IF
+                END DO
                 DO JSPC = 1,N_TR_WDEP
                   IF ( TR_WDEP_MAP( JSPC ) .EQ. ISPC ) THEN
                     IWDEP = IWDEP + 1
@@ -1160,8 +1189,10 @@ c-------------------------------------------------------------------------------
 
             N_SPC_WDEP = IWDEP
             N_SPC_DEPV = IDEPV
+            N_SPC_DDEP = IDDEP
             MAP_WDEPtoCGRID = MAP_WDEPtoCGRID(1:N_SPC_WDEP)
             MAP_DEPVtoCGRID = MAP_DEPVtoCGRID(1:N_SPC_DEPV)
+            MAP_DDEPtoCGRID = MAP_DDEPtoCGRID(1:N_SPC_DDEP)
 
          return
 

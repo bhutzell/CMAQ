@@ -236,8 +236,10 @@ C-----------------------------------------------------------------------
 
       ! Variables for mapping OA to aerosol and CGRID arrays
       Integer, Allocatable :: map_OAtoAERO( : )    ! organic aerosol pointers to aerospc
+      Integer, Allocatable :: map_OAtoCGRID( : )   ! organic aerosol pointers to CGRID
       Integer, Allocatable :: map_OGtoCGRID( : )   ! pointers of vapor species to CGRID
       Integer, Allocatable :: map_ROGtoCGRID( : )  ! pointers of SOA parent species to CGRID
+      Integer, Allocatable :: map_OAtoDEPV( : )    ! organic aerosol pointers to DEPV
       Logical, Allocatable :: lnonvol_oa( : )      ! flag identifying non-volatile OA species 
                                                    ! in aerosol array that are not tracers
       Logical, Allocatable :: l_oa( : )            ! flag identifying OA species 

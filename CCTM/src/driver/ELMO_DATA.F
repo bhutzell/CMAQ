@@ -344,11 +344,11 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       LOGICAL, ALLOCATABLE, SAVE :: L_ELMO_TABLE_OUT(:), L_ELMO_TABLE_USED(:)
 
-      TYPE ELMO_CONC_TYPE
+      TYPE ELMO_OUT_TYPE
           REAL, ALLOCATABLE           :: DATA(:,:,:,:)
-      END TYPE ELMO_CONC_TYPE
+      END TYPE ELMO_OUT_TYPE
 
-      TYPE ( ELMO_CONC_TYPE ), ALLOCATABLE, SAVE :: ELMO_CONC( : )
+      TYPE ( ELMO_OUT_TYPE ), ALLOCATABLE, SAVE :: ELMO_OUT( : )
 
       INTEGER, ALLOCATABLE, SAVE :: MAP_USEDtoTABLE( : ), MAP_TABLEtoUSED( : )
       LOGICAL, ALLOCATABLE, SAVE :: L_CALCULATED( : )
@@ -561,7 +561,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         subroutine elmo_init_shared
 !------------------------------------------------------------------------------------------            
         use grid_conf,  only : ncols, nrows, nlays
-        use cgrid_spcs, only : N_SPC_WDEP, N_SPC_DEPV
+        use cgrid_spcs, only : n_cgrid_spc
 #ifdef isam
         use sa_defn,    only : nspc_sa, ntag_sa
 #endif
@@ -610,29 +610,29 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             call checkmem( ios, 'ELMO_KZMIN',pname )
             elmo_kzmin = 0.0
      
-            allocate( elmo_wdep(ncols, nrows, n_spc_wdep+1 ), stat=ios)
+            allocate( elmo_wdep(ncols, nrows, n_cgrid_spc ), stat=ios)
             call checkmem( ios, 'ELMO_WDEP',pname )
             elmo_wdep = 0.0
      
-            allocate( elmo_ddep(ncols, nrows, n_spc_depv ), stat=ios)
+            allocate( elmo_ddep(ncols, nrows, n_cgrid_spc ), stat=ios)
             call checkmem( ios, 'ELMO_DDEP',pname )
             elmo_ddep = 0.0
 
 #ifdef isam
-            allocate( elmo_isam_wdep(ncols, nrows, n_spc_wdep, ntag_sa ), stat=ios)
+            allocate( elmo_isam_wdep(ncols, nrows, nspc_sa, ntag_sa ), stat=ios)
             call checkmem( ios, 'ELMO_ISAM_WDEP',pname )
             elmo_isam_wdep = 0.0
          
-            allocate( elmo_isam_ddep(ncols, nrows, n_spc_depv, ntag_sa ), stat=ios)
+            allocate( elmo_isam_ddep(ncols, nrows, nspc_sa, ntag_sa ), stat=ios)
             call checkmem( ios, 'ELMO_ISAM_DDEP',pname )
             elmo_isam_ddep = 0.0
 #endif
 #ifdef sens
-            allocate( elmo_ddm_wdep(ncols, nrows, n_spc_wdep+1, npmax ), stat=ios)
+            allocate( elmo_ddm_wdep(ncols, nrows, n_cgrid_spc, npmax ), stat=ios)
             call checkmem( ios, 'ELMO_DDM_WDEP',pname )
             elmo_ddm_wdep = 0.0
             
-            allocate( elmo_ddm_ddep(ncols, nrows, n_spc_depv, npmax ), stat=ios)
+            allocate( elmo_ddm_ddep(ncols, nrows, n_cgrid_spc, npmax ), stat=ios)
             call checkmem( ios, 'ELMO_DDM_DDEP',pname )
             elmo_ddm_ddep = 0.0
 #endif
@@ -662,7 +662,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       INTEGER N_END, N_NML
       LOGICAL EXPAND_NML
-      INTEGER I1, I2, I3, IT, IVAR, J
+      INTEGER I1, I2, I3, IT, IVAR, J, IV
       
       
       CHARACTER( 250 ) :: XMSG
@@ -862,6 +862,24 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          VARS_NML( 1:N_END-1 ) = VARS_NML( 2:N_END )
          VARS_NML( N_END ) = ''
          N_END = N_END - 1
+      END DO
+
+      DO IVAR = 1,N_ELMO_TABLE
+         IV = ELMO_TABLE( IVAR )%VAR_TYPE
+         IF ( IV .EQ. ET_DDEP .OR. IV .EQ. ET_ISAM_DDEP .OR.
+     &        IV .EQ. ET_DDM_DDEP .OR. IV .EQ. ET_CMPST_DEP .OR.
+     &        IV .EQ. ET_ISAM_CMPST_DEP .OR. IV .EQ. ET_DDM_CMPST_DEP .OR.
+     &        IV .EQ. ET_DRVD_DDEP .OR. IV .EQ. ET_ISAM_DRVD_DDEP .OR.
+     &        IV .EQ. ET_DDM_DRVD_DDEP ) 
+     &                                    L_ELMO_DDEP = .TRUE.
+
+         IF ( IV .EQ. ET_WDEP .OR. IV .EQ. ET_ISAM_WDEP .OR.
+     &        IV .EQ. ET_DDM_WDEP .OR. IV .EQ. ET_CMPST_DEP .OR.
+     &        IV .EQ. ET_ISAM_CMPST_DEP .OR. IV .EQ. ET_DDM_CMPST_DEP .OR.
+     &        IV .EQ. ET_DRVD_WDEP .OR. IV .EQ. ET_ISAM_DRVD_WDEP .OR.
+     &        IV .EQ. ET_DDM_DRVD_WDEP ) 
+     &                                    L_ELMO_WDEP = .TRUE.
+
       END DO
 
       END SUBROUTINE MAP_ELMO_NML    

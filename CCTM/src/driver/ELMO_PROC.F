@@ -57,7 +57,8 @@
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, AIRQV, AIRDENS, AIRPRES,
      &                        SRFTEMP, H2OVP, H2OSATVP, 
      &                        CFRAC, DZ, PV, ZH
-      USE CGRID_SPCS, ONLY : N_CGRID_SPC, N_SPC_WDEP, N_SPC_DEPV, NSPCSD
+      USE CGRID_SPCS, ONLY : N_CGRID_SPC, N_SPC_WDEP, N_SPC_DDEP
+      !USE VDIFF_MAP, ONLY : N_SPC_DDEP
       use centralized_io_module, only : interpolate_var, pv_avail
       Use phot_mod, Only: init_phot_shared
       Use ASX_DATA_MOD, Only : GET_MET, MET_DATA
@@ -125,23 +126,23 @@
          
          ! Allocate local image of CGRID so it can be used each time step
          ALLOCATE( CONC_VEC( N_CGRID_SPC ), 
-     &             WDEP_VEC( N_SPC_WDEP+1 ),
-     &             DDEP_VEC( N_SPC_DEPV ),
+     &             WDEP_VEC( N_CGRID_SPC ),
+     &             DDEP_VEC( N_CGRID_SPC ),
      &             STAT=IOS )
          CALL CHECKMEM( IOS, 'ELMOS_VECTORS',PNAME )
 
 #ifdef isam
          ALLOCATE( ISAM_VEC( NSPC_SA,NTAG_SA ),
-     &             ISAM_WDEP_VEC( N_SPC_WDEP,NTAG_SA), 
-     &             ISAM_DDEP_VEC( N_SPC_DEPV,NTAG_SA ),
+     &             ISAM_WDEP_VEC( NSPC_SA,NTAG_SA), 
+     &             ISAM_DDEP_VEC( NSPC_SA,NTAG_SA ),
      &             STAT=IOS )
          CALL CHECKMEM( IOS, 'ISAM_ELMO_VECTORS',PNAME )
 #endif
 
 #ifdef sens
-         ALLOCATE( DDM_VEC( NPMAX,NSPCSD ),
-     &             DDM_WDEP_VEC( N_SPC_WDEP+1,NPMAX ), 
-     &             DDM_DDEP_VEC( N_SPC_DEPV,NPMAX ),
+         ALLOCATE( DDM_VEC( NPMAX,N_CGRID_SPC ),
+     &             DDM_WDEP_VEC( N_CGRID_SPC,NPMAX ), 
+     &             DDM_DDEP_VEC( N_CGRID_SPC,NPMAX ),
      &             STAT=IOS )
          CALL CHECKMEM( IOS, 'ISAM_ELMO_VECTORS',PNAME )
 #endif
@@ -165,44 +166,15 @@
       ! Get Meteorological Variables
       CALL GET_MET( JDATE, JTIME, TSTEP(2) )
 
-      ! pressure [Pa]
-      !call interpolate_var ('PRES', jdate, jtime, PRES)
-
-      ! temperature [K]
-      !call interpolate_var ('TA', jdate, jtime, TA)       ! Grid Cell Temp
-      !call interpolate_var ('TEMP2',jdate, jtime, TEMP2 ) ! 2-m Temp
-
-      ! specific humidity [g H2O/g air]
-      !call interpolate_var ('QV', jdate, jtime, QV)
-
-      ! air density [kg/m3]
-      !call interpolate_var ('DENS', jdate, jtime, DENS)
-      
-      ! get cloud fraction if photolysis hasn not been called yet
-      !call interpolate_var ('CFRAC', jdate, jtime, CFRACS)
-
-      ! get PBL height (m)
-      !call interpolate_var ('PBL', jdate, jtime, PBLS)
-
-      ! get Solar Radiation reaching ground (W m-2)
-      !call interpolate_var ('RGRND', jdate, jtime, RGRNDS)
-
       ! get Convective Rain Rate (cm)
       call interpolate_var ('RC', jdate, jtime, RCS)
 
       ! get Non-Convective Rain Rate (cm)
       call interpolate_var ('RN', jdate, jtime, RNS)
 
-      ! get Wind Speed at 10 m (m s-1)
-      !call interpolate_var ('WSPD10', jdate, jtime, WSPD10S)
-
       ! get Wind Direction at 10 m (degrees)
       call interpolate_var ('WDIR10', jdate, jtime, WDIR10S)
 
-      ! retrieve all layer heights. This is the height of the top of the
-      ! layers
-      !call interpolate_var ('ZF', jdate, jtime, ZF)
-      
       ! retrieve potential vorticity
       if ( pv_avail ) then
            call interpolate_var ('PV', jdate, jtime, PVS)
@@ -210,11 +182,6 @@
            PVS = ELMO_BLANK
       end if
       
-      ! retrieve layer midpoint heights. This is a mass weighted
-      ! coordinate so is not necessarily consistent with the distance 
-      ! between the heights of the layer bottom and top.
-      !call interpolate_var ('ZH', jdate, jtime, ZHS)
-
       ! Calculate Heterogeneous Chemistry Rates
       CALL INIT_PHOT_SHARED()
       CALL HETCHEM_RATES( MET_DATA%TA, MET_DATA%PRES, MET_DATA%QV,
@@ -235,12 +202,8 @@
          AIRRH    = MAX( 0.005, MIN( 0.99, H2OVP / H2OSATVP ) ) ! 0-1
          IF ( L .EQ. 1 ) THEN
              DZ   = ZF( C,R,L )
-             !CFRAC= CFRACS( C,R ) 
-             !PBL      = PBLS( C,R )
-             !RGRND    = RGRNDS( C,R )
              RC       = RCS( C,R )
              RN       = RNS( C,R )
-             !WSPD10   = WSPD10S( C,R )
              WDIR10   = WDIR10S( C,R )
 
          ELSE
@@ -268,29 +231,39 @@
          ! Load All Raw Concentrations and Fluxes
          CONC_VEC(:) = CGRID(C,R,L,:)
 
-         IF ( L.EQ.1 .AND. L_ELMO_WDEP )
-     &        WDEP_VEC(:) = ELMO_WDEP(C,R,:)
-         IF ( L.EQ.1 .AND. L_ELMO_DDEP )
-     &        DDEP_VEC(:) = ELMO_DDEP(C,R,:)  ! N_SPC_DDEP --> DD2DV
+         IF ( L_ELMO_WDEP ) THEN
+            IF ( L .EQ. 1 ) THEN
+              WDEP_VEC(:) = ELMO_WDEP(C,R,:)  ! N_CGRID_SPC
+            ELSE
+              WDEP_VEC(:) = 0.0
+            END IF
+         END IF
+         IF ( L_ELMO_DDEP ) THEN
+            IF ( L .EQ. 1 ) THEN
+              DDEP_VEC(:) = ELMO_DDEP(C,R,:)  ! N_CGRID_SPC
+            ELSE
+              DDEP_VEC(:) = 0.0
+            END IF
+         END IF
 
 #ifdef isam                        
          ! Load All Raw Concentrations and Fluxes
          ISAM_VEC(:,:) = ISAM(C,R,L,:,:)
 
          IF ( L.EQ.1 .AND. L_ELMO_WDEP )
-     &        ISAM_WDEP_VEC(:,:) = ELMO_ISAM_WDEP(C,R,:,:) ! N_SPEC_WDEP+1, NTAG_SA
+     &        ISAM_WDEP_VEC(:,:) = ELMO_ISAM_WDEP(C,R,:,:) ! NSPC_SA, NTAG_SA
          IF ( L.EQ.1 .AND. L_ELMO_DDEP )
-     &        ISAM_DDEP_VEC(:,:) = ELMO_ISAM_DDEP(C,R,:,:) ! N_SPEC_DEPV, NTAG_SA
+     &        ISAM_DDEP_VEC(:,:) = ELMO_ISAM_DDEP(C,R,:,:) ! NSPC_SA, NTAG_SA
 #endif
 
 #ifdef sens
          ! Load All Raw Concentrations and Fluxes
-         DDM_VEC(:,:) = SENGRID(C,R,L,:,:)  ! NPMAX, NSPCSD
+         DDM_VEC(:,:) = SENGRID(C,R,L,:,:)  ! NPMAX, N_CGRID_SPC
 
          IF ( L.EQ.1 .AND. L_ELMO_WDEP )
-     &        DDM_WDEP_VEC(:,:) = ELMO_DDM_WDEP(C,R,:,:) ! N_SPC_WDEP+1, NPMAX
+     &        DDM_WDEP_VEC(:,:) = ELMO_DDM_WDEP(C,R,:,:) ! N_CGRID_SPC, NPMAX
          IF ( L.EQ.1 .AND. L_ELMO_DDEP )
-     &        DDM_DDEP_VEC(:,:) = ELMO_DDM_DDEP(C,R,:,:) ! N_SPC_DEPV, NPMAX
+     &        DDM_DDEP_VEC(:,:) = ELMO_DDM_DDEP(C,R,:,:) ! N_CGRID_SPC, NPMAX
 #endif
 
          ! Populate Diagnostic Arrays
@@ -377,7 +350,7 @@
              IF ( INIT_TIME .OR. WRITE_STEP ) THEN
                OL = L - ELMO_FILE( IFL )%LAY_BOT + 1
                DO IVAR = 1,ELMO_FILE( IFL )%N_VARS
-                   ELMO_CONC( IFL )%DATA( C,R,OL,IVAR ) = ELMO_USED( ELMO_FILE(IFL)%USEDID( IVAR ) )
+                   ELMO_OUT( IFL )%DATA( C,R,OL,IVAR ) = ELMO_USED( ELMO_FILE(IFL)%USEDID( IVAR ) )
                END DO
              END IF
  
@@ -403,11 +376,11 @@
                    ! value or recalculate the average fine particle acidity
                    ! offline.
                    IF ( INIT_STEP ) THEN
-                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
+                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
                    ELSE IF ( .NOT. WRITE_STEP ) THEN
-                       ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) =
-     &                          ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) 
-     &                        + 2.0 * ELMO_CONC(IFL)%DATA( C,R,OL,IVAR )
+                       ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) =
+     &                          ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) 
+     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C,R,OL,IVAR )
                    END IF
               
                 ELSE IF ( IV .EQ. ET_DDEP .OR.
@@ -428,22 +401,22 @@
                    ! This is a deposition species so we should be
                    ! computing a cumulative sum, not an average by default
                    IF ( INIT_STEP ) THEN
-                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = ELMO_USED( U )
+                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 0.0 !ELMO_USED( U )
                    ELSE   
-                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = 
-     &                     ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) + ELMO_USED( U )
+                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 
+     &                     ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + ELMO_USED( U )
                    END IF
               
                 ELSE
                    ! For all other variables, apply trapezoidal rule for averaging.
                    IF ( INIT_STEP ) THEN
-                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = ELMO_USED( U ) 
+                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = ELMO_USED( U ) 
                    ELSE IF ( WRITE_STEP ) THEN
-                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = 
-     &                     ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) + ELMO_USED( U )
+                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 
+     &                     ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + ELMO_USED( U )
                    ELSE
-                      ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) = 
-     &                     ELMO_CONC(IFL)%DATA( C,R,OL,IVAR ) + 2.0 * ELMO_USED(U)
+                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 
+     &                     ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + 2.0 * ELMO_USED(U)
                    END IF 
                 END IF
              END DO

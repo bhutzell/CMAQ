@@ -53,8 +53,9 @@
 !-------------------------------------------------------------------------
 
       USE AERO_DATA, ONLY : AEROSPC, N_AEROSPC, N_MODE, AERO_MISSING
-      USE CGRID_SPCS, ONLY : WDEP_SPC, N_SPC_WDEP, CGRID_NAME, N_CGRID_SPC
-      USE VDIFF_MAP, ONLY : DDEP_SPC, N_SPC_DDEP
+      USE CGRID_SPCS, ONLY : WDEP_SPC, N_SPC_WDEP, CGRID_NAME,
+     &                       N_CGRID_SPC, N_SPC_DDEP
+      USE VDIFF_MAP, ONLY : DDEP_SPC
 
       IMPLICIT NONE
 
@@ -184,7 +185,7 @@
 
       ! Add Bulk Aerosols to Composite List
       DO IAERO = 1,N_AEROSPC
-
+      
          ! Add this Aerosol Concentration to the Composite List
          IAER = INDEX1( AEROSPC(IAERO)%BULKNAME, N_COMPOSITES, CMPST%NAME )
          IF ( IAER .EQ. 0 ) THEN
@@ -204,7 +205,7 @@
             END DO
             IF ( CMPST( N_COMPOSITES )%FORMULA .EQ. '' ) N_COMPOSITES = N_COMPOSITES - 1
          END IF
-
+   
          ! Add this Aerosol Wet Dep to the Composite List
          IAER = INDEX1( 'WD_'//AEROSPC(IAERO)%BULKNAME, N_COMPOSITES, CMPST%NAME )
          IF ( IAER .EQ. 0 ) THEN
@@ -505,7 +506,7 @@
       
       ! Find this component in the ELMO_TABLE
       I1 = INDEX1( CSPEC, N_ELMO_TABLE, ELMO_TABLE(:)%OUT_NAME )
-      I2 = INDEX1( CSPEC, N_ELMO_TABLE, ELMO_TABLE(:)%NAME )
+      !I2 = INDEX1( CSPEC, N_ELMO_TABLE, ELMO_TABLE(:)%NAME )
 
       ! For ISAM ELMO Variables, we need to make sure the components
       ! match the source number, or apply to all sources (i.e. ISAM
@@ -516,7 +517,7 @@
          CSPEC = TRIM(CSPEC) // '_ISAM'
          ISRC = ELMO_TABLE( J )%SOURCE
          DO K = 1,N_ELMO_TABLE
-           IF ( ELMO_TABLE( K )%NAME .EQ. CSPEC .AND.
+           IF ( ELMO_TABLE( K )%OUT_NAME .EQ. CSPEC .AND.
      &          ELMO_TABLE( K )%SOURCE .EQ. ISRC     ) THEN
               ! This component matches an ELMO Table Output Name
               ELMO_COMP( J )%TABID( IVAR )    = K
@@ -538,7 +539,7 @@
          CSPEC = TRIM(CSPEC) // '_DDM'
          ISRC = ELMO_TABLE( J )%SOURCE
          DO K = 1,N_ELMO_TABLE
-           IF ( ELMO_TABLE( K )%NAME .EQ. CSPEC .AND.
+           IF ( ELMO_TABLE( K )%OUT_NAME .EQ. CSPEC .AND.
      &          ELMO_TABLE( K )%SOURCE .EQ. ISRC     ) THEN
               ! This component matches an ELMO Table Output Name
               ELMO_COMP( J )%TABID( IVAR )    = K
@@ -566,17 +567,17 @@
      &                       ELMO_TABLE( I1 )%VAR_TYPE )
         ELMO_COMP( J )%COEFF( IVAR )    = COEFF
         
-      ELSE IF ( I2 .GT. 0 ) THEN
-        ! This component matches an ELMO Table Name  
-        ELMO_COMP( J )%TABID( IVAR )    = I2
-        ELMO_COMP( J )%ID( IVAR )       = ELMO_TABLE( I2 )%ID
-        ELMO_COMP( J )%VAR_TYPE( IVAR ) = ELMO_TABLE( I2 )%VAR_TYPE
-        ELMO_COMP( J )%MW( IVAR )       = ELMO_TABLE( I2 )%MW
-        CALL MAP_ELMO_UNITS( ELMO_TABLE( I2 )%CUNIT,
-     &                       ELMO_COMP( J )%SPC_UNIT( IVAR ),
-     &                       ELMO_TABLE( I2 )%NAME,
-     &                       ELMO_TABLE( I2 )%VAR_TYPE )
-        ELMO_COMP( J )%COEFF( IVAR )    = COEFF
+       !ELSE IF ( I2 .GT. 0 ) THEN
+       ! ! This component matches an ELMO Table Name  
+       ! ELMO_COMP( J )%TABID( IVAR )    = I2
+       ! ELMO_COMP( J )%ID( IVAR )       = ELMO_TABLE( I2 )%ID
+       ! ELMO_COMP( J )%VAR_TYPE( IVAR ) = ELMO_TABLE( I2 )%VAR_TYPE
+       ! ELMO_COMP( J )%MW( IVAR )       = ELMO_TABLE( I2 )%MW
+       ! CALL MAP_ELMO_UNITS( ELMO_TABLE( I2 )%CUNIT,
+     & !                      ELMO_COMP( J )%SPC_UNIT( IVAR ),
+     & !                      ELMO_TABLE( I2 )%NAME,
+     & !                      ELMO_TABLE( I2 )%VAR_TYPE )
+       ! ELMO_COMP( J )%COEFF( IVAR )    = COEFF
         
       ELSE
         ! Component Not found on the ELMO_TABLE. Crash CMAQ gracefully.

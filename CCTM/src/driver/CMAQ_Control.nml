@@ -75,7 +75,7 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 &ELMO_INIT
-  N_Files = 3
+  N_Files = 5
   N_Max_Output_Variables = 40
   N_Keywords = 41
   N_Max_Keyword_Variables = 40
@@ -87,14 +87,16 @@
  !
  !-- Set Properties and Contents for each ELMO Output File
  !
-  Flabel= 'CONCS','Dep','HasKz'
-  Tstep = 10000, 10000, 10000
-  Tmode = 'average', 'average', 'instant'
-  Lay_Bot = 1, 1, 1
-  Lay_Top = 1, 5, 35
+  Flabel= 'CONCS','Dep','HasKz','BulkAer','ExpAer'
+  Tstep = 10000, 10000, 10000, 10000, 10000
+  Tmode = 'average', 'average', 'instant','average','average'
+  Lay_Bot = 1, 1, 1, 1, 1
+  Lay_Top = 1, 5, 35, 1, 1
   File_Vars(1,:) = 'DEFAULT'
   File_Vars(2,:) = 'DEFAULT_DEP'
   File_Vars(3,:) = 'AEC','KZ','ANH4J','PMAMS_SO4','AMET_GAS'
+  File_Vars(4,:) = 'ASO4','ANO3','AEC','ACL','AMG','PMF_SOA','PMF_SOC','PMF_POA','PMF_POC'
+  File_Vars(5,:) = '*ASO4','*ACL','*ASEACAT','*ANH4','NO2','NH3'
 
 
  !
@@ -110,7 +112,8 @@
 
  !-- Meteorological Variables
   Keywd_name(3) = 'MET'           
-  Keywd(3,:) = 'TA','PRES','RH','PBL','PRECIP','RGRND','WSPD10','WDIR10'
+  Keywd(3,:) = 'TA','PRES','RH','PBL','PRECIP','RGRND','WSPD10','WDIR10',
+               'DENS','CFRAC'
 
  !-- Routine evaluation variables for the Atmospheric Model Evaluation Tool (AMET)
   Keywd_name(4) = 'AMET'          
@@ -134,7 +137,8 @@
 
  !-- Default Gas Concentration Output
   Keywd_name(8) = 'DEFAULT_GAS'
-  Keywd(8,:) = 'AMET_GAS','H2O2','HONO','HOX','ISOPRENE','N2O5','NTR','PANS','TERP','VOC'
+  Keywd(8,:) = 'AMET_GAS','H2O2','HONO','HOX','ISOPRENE','N2O5','NTR','PANS','TERP','VOC',
+               'OH','NHX','TERPENES','DMS','MSA','TNO3'
 
  !-- Particle Mass across several size bounds
   Keywd_name(9) = 'PM_MASS'
@@ -144,7 +148,7 @@
   Keywd_name(10) = 'FINE_SPECIES'
   Keywd(10,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC','PMF_OC','PMF_OA',
                'PMF_H2O','PMF_RECONSOIL','PMF_OTHWNC','PMF_OTH','PMF_HP','PMF_HPMOLAL',
-               'PMF_PH','FINE_ORG','PMF'
+               'PMF_PH','FINE_ORG','PMF','TSP_NO3_PPM'
 
   Keywd_name(11) = 'COARSE_SPECIES'
   Keywd(11,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA'
@@ -215,13 +219,16 @@
  
  !-- Deposition
   Keywd_name(28) = 'DEFAULT_DEP'
-  Keywd(28,:) = 'GAS_DEP','PM_DEP','GASPM_DEP','OXIDIZED_NITROGEN_DEP',
+  Keywd(28,:) = 'PRECIP','GAS_DEP','PM_DEP','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
                 'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
                 'SEASPRAY_SULFUR_DEP'
 
   Keywd_name(29) = 'GAS_DEP'
   Keywd(29,:) = 'DD_FORMALD','WD_FORMALD','DD_HNO4','WD_HNO4','DD_NTR','WD_NTR',
-                'DD_PANT','WD_PANT'
+                'DD_PANT','WD_PANT','DD_NO2','WD_NO2','DD_NO','WD_NO','DD_H2O2',
+                'WD_H2O2','DD_N2O5','WD_N2O5','DD_HONO','WD_HONO','DD_HNO3','WD_HNO3',
+                'DD_NO3','WD_NO3','DD_CLNO2','WD_CLNO2','DD_NH3','WD_NH3',
+                'DD_SO2','DD_O3','WD_O3','DD_CLNO3','WD_CLNO3'
 
   Keywd_name(30) = 'PM_DEP'
   Keywd(30,:) = 'FINE_DDEP','COARSE_DDEP','TSP_DDEP','PM_WDEP'
@@ -229,14 +236,16 @@
   Keywd_name(31) = 'FINE_DDEP'
   Keywd(31,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
                 'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL','DD_PMF_SI',
-                'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K','DD_PMF_SSSO4'
+                'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K','DD_PMF_SSSO4',
+                'DD_OC','WD_OC','DD_POC','WD_POC','DD_SOC','WD_SOC',
+                'DD_OA','WD_OA','DD_POA','WD_POA','DD_SOA','WD_SOA'
 
   Keywd_name(32) = 'COARSE_DDEP'
   Keywd(32,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
                 'DD_PMC_CA','DD_PMC_MG','DD_PMC_K','DD_PMC_SSSO4'
 
   Keywd_name(33) = 'TSP_DDEP'
-  Keywd(33,:) = 'DD_CL','DD_CA','DD_MG','DD_K'
+  Keywd(33,:) = 'DD_CL','DD_CA','DD_MG','DD_K','DD_NA'
 
   Keywd_name(34) = 'PM_WDEP'
   Keywd(34,:) = 'WD_NO3','WD_NH4','WD_SO4','WD_MTNO3','WD_NA','WD_PMC_NA',

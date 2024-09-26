@@ -25,10 +25,12 @@
 
       USE RUNTIME_VARS
       USE ELMO_DATA, ONLY : N_ELMO_FILES, ELMO_FILE, ELMO_NSTEP,
-     &                      ELMO_CONC, ELMO_TABLE, 
+     &                      ELMO_OUT, ELMO_TABLE, 
      &                      ET_WDEP, ET_DDEP, ET_ISAM_WDEP,
      &                      ET_DDM_WDEP, ET_ISAM_DDEP, ET_DDM_DDEP,
-     &                      ET_CMPST_DEP, ET_ISAM_CMPST_DEP, ET_DDM_CMPST_DEP
+     &                      ET_CMPST_DEP, ET_ISAM_CMPST_DEP, ET_DDM_CMPST_DEP,
+     &                      ET_DRVD_DDEP, ET_ISAM_DRVD_DDEP, ET_DDM_DRVD_DDEP,
+     &                      ET_DRVD_WDEP, ET_ISAM_DRVD_WDEP, ET_DDM_DRVD_WDEP 
       USE UTILIO_DEFN
 
       IMPLICIT NONE 
@@ -55,7 +57,7 @@ C *** If IO Proceesor, then Write Data
 
           IF ( .NOT. WRITE3( ELMO_FILE( IFL )%FLOGICAL, 
      &       ALLVAR3, MDATE, MTIME,
-     &       ELMO_CONC(IFL)%DATA(:,:,:,:) ) ) THEN
+     &       ELMO_OUT(IFL)%DATA(:,:,:,:) ) ) THEN
              XMSG = 'Could not write ' // 
      &              ELMO_FILE(IFL)%FLOGICAL // ' file'
              CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
@@ -84,8 +86,11 @@ C *** If IO Proceesor, then Write Data
      &               IV .NE. ET_ISAM_WDEP .AND. IV .NE. ET_ISAM_DDEP .AND.
      &               IV .NE. ET_DDM_WDEP .AND. IV .NE. ET_DDM_DDEP .AND.
      &               IV .NE. ET_CMPST_DEP .AND. IV .NE. ET_ISAM_CMPST_DEP .AND.
-     &               IV .NE. ET_DDM_CMPST_DEP   ) THEN
-                ELMO_CONC(IFL)%DATA( :,:,:,IVAR ) = ELMO_CONC(IFL)%DATA( :,:,:,IVAR )
+     &               IV .NE. ET_DDM_CMPST_DEP .AND. IV .NE. ET_DRVD_DDEP .AND.
+     &               IV .NE. ET_ISAM_DRVD_DDEP .AND. IV .NE. ET_DDM_DRVD_DDEP .AND.
+     &               IV .NE. ET_DRVD_WDEP .AND. IV .NE. ET_ISAM_DRVD_WDEP .AND. 
+     &               IV .NE. ET_DDM_DRVD_WDEP ) THEN
+                ELMO_OUT(IFL)%DATA( :,:,:,IVAR ) = ELMO_OUT(IFL)%DATA( :,:,:,IVAR )
      &                                        / 2.0 / (ELMO_NSTEP - 1.0)
                 END IF
             END DO
@@ -93,7 +98,7 @@ C *** If IO Proceesor, then Write Data
             ! Write Data
             IF ( .NOT. WRITE3( ELMO_FILE( IFL )%FLOGICAL, 
      &           ALLVAR3, MDATE, MTIME, 
-     &           ELMO_CONC(IFL)%DATA(:,:,:,:) ) ) THEN
+     &           ELMO_OUT(IFL)%DATA(:,:,:,:) ) ) THEN
                XMSG = 'Could not write ' // 
      &                ELMO_FILE( IFL )%FLOGICAL // ' file'
                CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )

@@ -85,8 +85,11 @@
       ALLOCATE( L_ELMO_TABLE_OUT( N_ELMO_TABLE ), STAT=IOS )
       CALL CHECKMEM( IOS, 'L_ELMO_TABLE_OUT',PNAME ) 
 
-      ALLOCATE( ELMO_CONC( N_ELMO_FILES ), STAT=IOS )
-      CALL CHECKMEM( IOS, 'ELMO_CONC',PNAME ) 
+      ALLOCATE( ELMO_OUT( N_ELMO_FILES ), STAT=IOS )
+      CALL CHECKMEM( IOS, 'ELMO_OUT',PNAME ) 
+
+      L_ELMO_DDEP = .FALSE.
+      L_ELMO_WDEP = .FALSE.
 
       DO IFL = 1,N_ELMO_FILES
          L_ELMO_TABLE_OUT = .FALSE.
@@ -143,10 +146,10 @@
          ! Allocate space for this file's data array
          NLAYS = ELMO_FILE( IFL )%NLAYS
          N_VARS = ELMO_FILE( IFL )%N_VARS
-         ALLOCATE( ELMO_CONC( IFL )%DATA( 
+         ALLOCATE( ELMO_OUT( IFL )%DATA( 
      &               NCOLS,NROWS,NLAYS,N_VARS ), STAT=IOS )
-         CALL CHECKMEM( IOS, 'ELMO_CONC', PNAME )
-         ELMO_CONC( IFL )%DATA(:,:,:,:) = 0.0
+         CALL CHECKMEM( IOS, 'ELMO_OUT', PNAME )
+         ELMO_OUT( IFL )%DATA(:,:,:,:) = 0.0
       END DO
 
       LAY_TOP_MAX = MAXVAL( ELMO_FILE( : )%LAY_TOP )
@@ -399,16 +402,6 @@
         ELMO_FILE( IFL )%VARS_IN(1:N_MX_VARS) = 
      &       FILE_VARS( IFL,1:N_MX_VARS )
 
-        DO IVAR = 1,N_MX_VARS
-           IF ( FILE_VARS( IFL,IVAR )(1:3) .EQ. 'DD_' ) L_ELMO_DDEP = .TRUE.
-           IF ( FILE_VARS( IFL,IVAR )(1:3) .EQ. 'WD_' ) L_ELMO_WDEP = .TRUE.
-           IF ( FILE_VARS( IFL,IVAR )(1:8) .EQ. 'ALL_DDEP' ) L_ELMO_DDEP = .TRUE.
-           IF ( FILE_VARS( IFL,IVAR )(1:8) .EQ. 'ALL_WDEP' ) L_ELMO_WDEP = .TRUE.
-           IF ( FILE_VARS( IFL,IVAR )(1:7) .EQ. 'ALL_DEP' ) THEN
-               L_ELMO_DDEP = .TRUE.
-               L_ELMO_WDEP = .TRUE.
-           ENDIF
-        END DO
       END DO
       
       ! Populate KeyWords and Contents
@@ -447,8 +440,8 @@
      &                       CGRID_MASK_NUM, CGRID_MASK_SRF,
      &                       CGRID_MASK_AERO,
      &                       WDEP_SPC, N_SPC_WDEP, MAP_WDEPtoCGRID,
-     &                       N_SPC_DEPV, MAP_DEPVtoCGRID
-      USE VDIFF_MAP, ONLY : DEPV_SPC, N_SPC_DDEP
+     &                       MAP_DDEPtoCGRID, N_SPC_DDEP
+      USE VDIFF_MAP, ONLY : DDEP_SPC
       USE ELMO_COMPOSITES, ONLY : N_COMPOSITES, CMPST
       USE GRID_CONF, ONLY : MYPE
       USE UTILIO_DEFN
@@ -711,7 +704,6 @@
         ELMO_TABLE( N )%OUT_NAME = 'WD_' // WDEP_SPC( IWDEP )
         ELMO_TABLE( N )%OUT_TYPE = M3REAL
         ELMO_TABLE( N )%VAR_TYPE = ET_WDEP
-        ELMO_TABLE( N )%ID = IWDEP
 
         DO IMODE = 1,N_MODE
           DO ISPC = 1,N_AEROSPC
@@ -721,6 +713,7 @@
         END DO
 
         ICGRID = MAP_WDEPtoCGRID( IWDEP )
+        ELMO_TABLE( N )%ID = ICGRID
         ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
         IF ( CGRID_MASK_NUM( ICGRID ) ) THEN
            ELMO_TABLE( N )%CUNIT = 'ha-1'
@@ -737,22 +730,22 @@
       END DO
 
       ! Load Dry Deposition Fluxes
-      DO IDDEP = 1,N_SPC_DEPV
+      DO IDDEP = 1,N_SPC_DDEP
         N = N + 1
-        ELMO_TABLE( N )%NAME = 'DD_' // DEPV_SPC( IDDEP )
-        ELMO_TABLE( N )%OUT_NAME = 'DD_' // DEPV_SPC( IDDEP )
+        ELMO_TABLE( N )%NAME = 'DD_' // DDEP_SPC( IDDEP )
+        ELMO_TABLE( N )%OUT_NAME = 'DD_' // DDEP_SPC( IDDEP )
         ELMO_TABLE( N )%OUT_TYPE = M3REAL
         ELMO_TABLE( N )%VAR_TYPE = ET_DDEP
-        ELMO_TABLE( N )%ID = IDDEP
 
         DO IMODE = 1,N_MODE
           DO ISPC = 1,N_AEROSPC
-            IF ( DEPV_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+            IF ( DDEP_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &         ELMO_TABLE( N )%IM = IMODE
           END DO
         END DO
 
-        ICGRID = MAP_DEPVtoCGRID( IDDEP )
+        ICGRID = MAP_DDEPtoCGRID( IDDEP )
+        ELMO_TABLE( N )%ID = ICGRID
         ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
         IF ( CGRID_MASK_NUM( ICGRID ) ) THEN
            ELMO_TABLE( N )%CUNIT = 'ha-1'
@@ -765,7 +758,7 @@
      &                       ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
         ELMO_TABLE( N )%IUNIT = IUNIT
         ELMO_TABLE( N )%DESC = 'Dry Deposition Flux for Species '//
-     &                         TRIM( DEPV_SPC( IDDEP ) )
+     &                         TRIM( DDEP_SPC( IDDEP ) )
       END DO
  
 #ifdef isam
@@ -816,93 +809,100 @@
 
       ! Load ISAM Wet Deposition Fluxes into ELMO Table
       DO IWDEP = 1,N_SPC_WDEP
-        DO ITAG = 1,NTAG_SA
-           N = N + 1
-           ELMO_TABLE( N )%NAME = 'WD_' //TRIM( WDEP_SPC( IWDEP ) )
-     &                            // '_ISAM'
-           ELMO_TABLE( N )%OUT_NAME = 'WD_' // TRIM( WDEP_SPC( IWDEP ) )
-     &                            // '_' // TRIM(TAGNAME( ITAG )) 
-           ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_WDEP
-           ELMO_TABLE( N )%ID = IWDEP
-           ELMO_TABLE( N )%SOURCE = ITAG
-           ICGRID = MAP_WDEPtoCGRID( IWDEP )
-           IF ( CGRID_MASK_NUM( ICGRID ) ) THEN
-              ELMO_TABLE( N )%CUNIT = 'ha-1'
-           ELSE IF ( CGRID_MASK_SRF( ICGRID ) ) THEN
-              ELMO_TABLE( N )%CUNIT = 'm2 ha-1'
-           ELSE
-              ELMO_TABLE( N )%CUNIT = 'kg ha-1'
-           END IF
-           
-           DO IMODE = 1,N_MODE
-             DO ISPC = 1,N_AEROSPC
-               IF ( WDEP_SPC( IWDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
-     &            ELMO_TABLE( N )%IM = IMODE
+        DO ISPEC = 1,NSPC_SA
+          IF ( ISAM_SPEC( ISPEC,1 ) .EQ. WDEP_SPC( IWDEP ) ) THEN
+          DO ITAG = 1,NTAG_SA
+             N = N + 1
+             ELMO_TABLE( N )%NAME = 'WD_' //TRIM( WDEP_SPC( IWDEP ) )
+     &                              // '_ISAM'
+             ELMO_TABLE( N )%OUT_NAME = 'WD_' // TRIM( WDEP_SPC( IWDEP ) )
+     &                              // '_' // TRIM(TAGNAME( ITAG )) 
+             ELMO_TABLE( N )%OUT_TYPE = M3REAL
+             ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_WDEP
+             ELMO_TABLE( N )%ID = ISPEC
+             ELMO_TABLE( N )%SOURCE = ITAG
+             ICGRID = MAP_WDEPtoCGRID( IWDEP )
+             IF ( CGRID_MASK_NUM( ICGRID ) ) THEN
+                ELMO_TABLE( N )%CUNIT = 'ha-1'
+             ELSE IF ( CGRID_MASK_SRF( ICGRID ) ) THEN
+                ELMO_TABLE( N )%CUNIT = 'm2 ha-1'
+             ELSE
+                ELMO_TABLE( N )%CUNIT = 'kg ha-1'
+             END IF
+             
+             DO IMODE = 1,N_MODE
+               DO ISPC = 1,N_AEROSPC
+                 IF ( WDEP_SPC( IWDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &              ELMO_TABLE( N )%IM = IMODE
+               END DO
              END DO
-           END DO
-
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-     &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-           ELMO_TABLE( N )%IUNIT = IUNIT
-           ELMO_TABLE( N )%DESC = 'Tagged Wet Deposition Flux of '//
-     &        TRIM( WDEP_SPC( IWDEP ) ) //' from '// TRIM( TAGNAME( ITAG ) ) 
-           ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
-        END DO 
-
-        N = N + 1
-        ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-        ELMO_TABLE( N )%OUT_NAME = 'WD_' // TRIM( WDEP_SPC( IWDEP ) ) // '_TAGS'
-        ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
-        ELMO_TABLE( N )%DESC = 'Tagged Wet Deposition Flux of '//
-     &     TRIM( WDEP_SPC( IWDEP ) ) //' from all sources.'
+          
+             CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
+     &                            ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
+             ELMO_TABLE( N )%IUNIT = IUNIT
+             ELMO_TABLE( N )%DESC = 'Tagged Wet Deposition Flux of '//
+     &          TRIM( WDEP_SPC( IWDEP ) ) //' from '// TRIM( TAGNAME( ITAG ) ) 
+             ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
+          END DO 
+          
+          N = N + 1
+          ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
+          ELMO_TABLE( N )%OUT_NAME = 'WD_' // TRIM( WDEP_SPC( IWDEP ) ) // '_TAGS'
+          ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
+          ELMO_TABLE( N )%DESC = 'Tagged Wet Deposition Flux of '//
+     &       TRIM( WDEP_SPC( IWDEP ) ) //' from all sources.'
+          END IF
+        END DO
       END DO
 
       ! Load ISAM Dry Deposition Fluxes into ELMO Table
-      DO IDDEP = 1,N_SPC_DEPV
-        DO ITAG = 1,NTAG_SA
-           N = N + 1
-           ELMO_TABLE( N )%NAME = 'DD_' //TRIM(DEPV_SPC( IDDEP ))
-     &                            // '_ISAM'
-           ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))
-     &                            // '_' // TRIM(TAGNAME( ITAG )) 
-           ELMO_TABLE( N )%OUT_TYPE = M3REAL
-           ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_DDEP
-           ELMO_TABLE( N )%ID = IDDEP
-           ELMO_TABLE( N )%SOURCE = ITAG
-           ICGRID = MAP_DEPVtoCGRID( IDDEP )
-           IF ( CGRID_MASK_NUM( ICGRID ) ) THEN
-              ELMO_TABLE( N )%CUNIT = 'ha-1'
-           ELSE IF ( CGRID_MASK_SRF( ICGRID ) ) THEN
-              ELMO_TABLE( N )%CUNIT = 'm2 ha-1'
-           ELSE
-              ELMO_TABLE( N )%CUNIT = 'kg ha-1'
-           END IF
+      DO IDDEP = 1,N_SPC_DDEP
+        DO ISPEC = 1,NSPC_SA 
+          IF ( ISAM_SPEC( ISPEC,1 ) .EQ. DDEP_SPC( IDDEP ) ) THEN
+          DO ITAG = 1,NTAG_SA
+             N = N + 1
+             ELMO_TABLE( N )%NAME = 'DD_' //TRIM(DDEP_SPC( IDDEP ))
+     &                              // '_ISAM'
+             ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))
+     &                              // '_' // TRIM(TAGNAME( ITAG )) 
+             ELMO_TABLE( N )%OUT_TYPE = M3REAL
+             ELMO_TABLE( N )%VAR_TYPE = ET_ISAM_DDEP
+             ELMO_TABLE( N )%ID = ISPEC
+             ELMO_TABLE( N )%SOURCE = ITAG
+             ICGRID = MAP_DDEPtoCGRID( IDDEP )
+             IF ( CGRID_MASK_NUM( ICGRID ) ) THEN
+                ELMO_TABLE( N )%CUNIT = 'ha-1'
+             ELSE IF ( CGRID_MASK_SRF( ICGRID ) ) THEN
+                ELMO_TABLE( N )%CUNIT = 'm2 ha-1'
+             ELSE
+                ELMO_TABLE( N )%CUNIT = 'kg ha-1'
+             END IF
            
-           DO IMODE = 1,N_MODE
-             DO ISPC = 1,N_AEROSPC
-               IF ( DEPV_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
-     &            ELMO_TABLE( N )%IM = IMODE
+             DO IMODE = 1,N_MODE
+               DO ISPC = 1,N_AEROSPC
+                 IF ( DDEP_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+     &              ELMO_TABLE( N )%IM = IMODE
+               END DO
              END DO
-           END DO
 
-           CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
-     &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
-           ELMO_TABLE( N )%IUNIT = IUNIT
-           ELMO_TABLE( N )%DESC = 'Tagged Dry Deposition Flux of '//
-     &        TRIM( DEPV_SPC( IDDEP ) ) //' from '//
-     &        TRIM( TAGNAME( ITAG ) ) 
-           ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
+             CALL MAP_ELMO_UNITS( ELMO_TABLE(N)%CUNIT, IUNIT, 
+     &                            ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
+             ELMO_TABLE( N )%IUNIT = IUNIT
+             ELMO_TABLE( N )%DESC = 'Tagged Dry Deposition Flux of '//
+     &          TRIM( DDEP_SPC( IDDEP ) ) //' from '//
+     &          TRIM( TAGNAME( ITAG ) ) 
+             ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
+          END DO
+
+          N = N + 1
+          ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
+          ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))//'_TAGS'
+          ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
+          ELMO_TABLE( N )%DESC = 'Tagged Dry Deposition Flux of '//
+     &       TRIM( DDEP_SPC( IDDEP ) ) //' from all sources.'
+
+          END IF
         END DO
-
-        N = N + 1
-        ELMO_TABLE( N ) = ELMO_TABLE( N-1 )
-        ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))//'_TAGS'
-        ELMO_TABLE( N )%SOURCE = NTAG_SA + 1
-        ELMO_TABLE( N )%DESC = 'Tagged Dry Deposition Flux of '//
-     &     TRIM( DEPV_SPC( IDDEP ) ) //' from all sources.'
-
-
       END DO
 #endif 
 
@@ -957,7 +957,6 @@
      &                     // '_' // TRIM( SEN_PAR(NP) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
            ELMO_TABLE( N )%VAR_TYPE = ET_DDM_WDEP
-           ELMO_TABLE( N )%ID = IWDEP
            ELMO_TABLE( N )%SOURCE = NP
 
            DO IMODE = 1,N_MODE
@@ -968,6 +967,7 @@
            END DO
 
            ICGRID = MAP_WDEPtoCGRID( IWDEP )
+           ELMO_TABLE( N )%ID = ICGRID
            ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
            IF ( CGRID_MASK_NUM( ICGRID ) ) THEN
               ELMO_TABLE( N )%CUNIT = 'ha-1'
@@ -986,26 +986,26 @@
       END DO
 
       ! Load DDM3D Dry Deposition Fluxes into ELMO Table
-      DO IDDEP = 1,N_SPC_DEPV
+      DO IDDEP = 1,N_SPC_DDEP
         DO NP = 1,NPMAX
            N = N + 1
-           ELMO_TABLE( N )%NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))
+           ELMO_TABLE( N )%NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))
      &                                // '_DDM'
-           ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DEPV_SPC( IDDEP ))
+           ELMO_TABLE( N )%OUT_NAME = 'DD_' // TRIM(DDEP_SPC( IDDEP ))
      &                                // '_' // TRIM( SEN_PAR(NP) )
            ELMO_TABLE( N )%OUT_TYPE = M3REAL
            ELMO_TABLE( N )%VAR_TYPE = ET_DDM_DDEP
-           ELMO_TABLE( N )%ID = IDDEP
            ELMO_TABLE( N )%SOURCE = NP
 
            DO IMODE = 1,N_MODE
              DO ISPC = 1,N_AEROSPC
-               IF ( DEPV_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
+               IF ( DDEP_SPC( IDDEP ) .EQ. AEROSPC(ISPC)%NAME(IMODE) )
      &            ELMO_TABLE( N )%IM = IMODE
              END DO
            END DO
 
-           ICGRID = MAP_DEPVtoCGRID( IDDEP )
+           ICGRID = MAP_DDEPtoCGRID( IDDEP )
+           ELMO_TABLE( N )%ID = ICGRID
            ELMO_TABLE( N )%MW  = CGRID_MW( ICGRID )
            IF ( CGRID_MASK_NUM( ICGRID ) ) THEN
               ELMO_TABLE( N )%CUNIT = 'ha-1'
@@ -1018,7 +1018,7 @@
      &                          ELMO_TABLE( N )%NAME, ELMO_TABLE( N )%VAR_TYPE )
            ELMO_TABLE( N )%IUNIT = IUNIT
            ELMO_TABLE( N )%DESC = 'Sensitivity of '//
-     &        TRIM( DEPV_SPC( IDDEP ) ) //' dry deposition to '//
+     &        TRIM( DDEP_SPC( IDDEP ) ) //' dry deposition to '//
      &        TRIM( SEN_PAR(NP) ) // ' from all cloud types'
         END DO
       END DO
