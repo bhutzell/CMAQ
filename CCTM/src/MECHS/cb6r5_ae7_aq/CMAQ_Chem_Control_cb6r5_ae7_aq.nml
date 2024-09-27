@@ -215,42 +215,62 @@
 
 !------------------------------------------------------------------------------!
 ! ELMO COMPOSITE Variable Definitions                                          !
-!    This section defines numerous COMPOSITE variables that are of common      !
-!    interest for air quality analysis of the output from the CMAQ model.      !
+!    This section defines COMPOSITE variables that are of common use for       !
+!    typical air quality analysis of the output from the CMAQ model.           !
 !    COMPOSITES may include components from only the gas or particle phase, or !
-!    they may include components from both phases (e.g. total nitrate, ANO3 +  !
+!    they may include components from both phases (e.g. total nitrate = ANO3 + !
 !    HNO3). This interface supports definition of COMPOSITES for concentration !
 !    as well as for deposition. Each COMPOSITE is strictly defined as a linear !
 !    combination of CMAQ species, diagnostic variables, or other COMPOSITES. In!
 !    order to use a COMPOSITE in the definition of another COMPOSITE, the      !
 !    component COMPOSITE must be defined earlier in the list below.            !
 !                                                                              !
-!    The input format is meant to be transparent and readable. Each line       !
-!    beginning with CMPST defines one COMPOSITE variable. The elements of each !
-!    COMPOSITE definition include:                                             !
-!      CMPST( X ) = 'Name', 'Unit', 'Phase/Mode', 'Description',               !
-!                   'Formula'                                                  !
+!    The input format is designed to be transparent and readable. Each entry   !
+!    begins with the COMPOSITE name. The entry is formatted as follows:        !
+!      'Name'    , 'Description',                                              !
+!                  'Units', 'Phase or PM Mode',                                !
+!                  'Formula',                                                  !
 !                                                                              !
-!    X - The index of each CMPST line, X, must increase by 1 in order.         !
 !    Name - is case insensitive, and may include numbers and underscores. Do   !
 !           not include hyphens (-), pluses (+) or other mathematics characters!
 !    Unit - currently only 'ppmV', 'ppbV', 'ug m-3', and 'ng m-3' are supported!
-!           for concentration. Only 'kg ha-1' is supported for deposition flux.!
-!    Phase/Mode - if the COMPOSITE applies to deposition, regardless of phase, !
-!                 enter 'DEP'. If the COMPOSITE only includes gas-phase        !
-!                 components, enter 'GAS'.                                     !
+!           for concentration.                                                 !
+!           For deposition, 'kg ha-1' is supported. For nitrogen or sulfur     !
+!              deposition, 'kgN ha-1' or 'kgS ha-1' may be used, but the       !
+!              conversion from mass to mass of nitrogen or sulfur must be      !
+!              included manually in the COMPOSITE formula. CMAQ does not store !
+!              this information currently.                                     !
+!    Phase or Mode -                                                           !
+!         if the COMPOSITE applies to deposition, the following options apply: !
+!             ->'DEP': gas phase and/or particle phase species across all      !
+!                     sizes. Suffixes for specific PM modes may be used to     !
+!                     target specific sizes                                    !
+!             ->'DEP_FINE': gas phase and/or particle phase for just fine      !
+!                           modes.                                             !
+!             ->'DEP_COARSE': gas phase and/or particle phase for just the     !
+!                         coarse mode.                                         !
+!         if the COMPOSITE applies to concentration the following options      !
+!         apply:                                                               ! 
+!             ->'GAS': only gas phase species involved                         !
+!             ->'TSP','PM25','PM10','PM1','PM01','PM25to10','FINE','COARSE',   !
+!                'ULTRAFINE','AITKEN','ACCUMULATION','PMAMS':                  !
+!                      gas and/or particle concentrations may be used. Particle!
+!                      species are filtered to correspond to the size parameter!
+!                      selected here. Aitken, Accumulation, Ultrafine, and     !
+!                      Coarse select for single modes. Fine selects for        !
+!                      Accumulation and smaller modes. TSP selects all modes.  !
+!                      PM25, PM10, PM1, PM01, and PM25to10 apply a diamter cut-!
+!                      off. PMAMS projects the size distribution to the        !
+!                      quantity sampled by the Aerosol Mass Spectrometer       !
+!                      instrument.                                             !
 !                                                                              !
-!                 If the COMPOSITE includes any particle-phase concentrations, !
-!                 then enter a descriptor of the particle size regime to be    !
-!                 considered. The following options are supported:             !
-!                   'ALL','PM25','PM10','PM1','PM01','PM25to10','FINE',        !
-!                   'COARSE','UlTRAFINE','AITKEN','ACCUMULATION','PMAMS'       !
 !    Description - a brief description of the variable                         !
-!    Formula - a linear combination of components. Refrain from using          !
-!              parentheses or division.                                        !
+!    Formula - a linear combination of components. Do not use parentheses or   !
+!              division.                                                       !
 !                                                                              !
 !    In the COMPOSITE_INIT section, two critical variables must be specified.  !
-!    N_COMPOSITES - must equal the total number of COMPOSITES defined.         !
+!    N_MAX_COMPOSITES - must be equal to or greater than the total number of   !
+!                       COMPOSITES defined.                                    !
 !    N_MAX_COMPONENTS - must be equal to or larger than the largest number of  !
 !                       components of any COMPOSITE definition.                !
 !------------------------------------------------------------------------------!
@@ -682,39 +702,39 @@ CMPST =
 
 !-- Particle Composites Across All Sizes --!
 'TSP_SO4'     , 'Total Particulate Sulfate',
-                'ug m-3', 'ALL',
+                'ug m-3', 'TSP',
                 'ASO4',
 
 'TSP_NO3'     , 'Total Particulate Nitrate',
-                'ug m-3', 'ALL',
+                'ug m-3', 'TSP',
                 'ANO3',
 
 'TSP_NO3_PPM'  , 'Total Particulate Nitrate',
-                'ppmV', 'ALL',
+                'ppmV', 'TSP',
                 'ANO3',
 
 'TSP_NH4'     , 'Total Particulate Ammonium',
-                'ug m-3', 'ALL',
+                'ug m-3', 'TSP',
                 'ANH4',
 
 'TSP_MG'      , 'Total Particulate Magnesium',
-                'ug m-3', 'ALL',
+                'ug m-3', 'TSP',
                 'AMG',
 
 'TSP_CA'      , 'Total Particulate Calcium',
-                'ug m-3', 'ALL',
+                'ug m-3', 'TSP',
                 'ACA',
 
 'TSP_K'       , 'Total Particulate Potassium',
-                'ug m-3', 'ALL',
+                'ug m-3', 'TSP',
                 'AK',
 
 'TSP_NA'      , 'Total Particulate Sodium',
-                'ug m-3', 'ALL',
+                'ug m-3', 'TSP',
                 'ANA',
 
 'TSP_CL'      , 'Total Particulate Chloride',
-                'ug m-3', 'ALL',
+                'ug m-3', 'TSP',
                 'ACL',
 
 !-------------------------------------!
@@ -723,12 +743,12 @@ CMPST =
 
 !-- Total Ammonia --!
 'NHX'         , 'Total Gas+Particle Ammonia', 
-                'ug m-3', 'ALL', 
+                'ug m-3', 'TSP', 
                 'ANH4 + NH3',
 
 !-- Nitrate --!
 'NOY'         , 'NOy Concentration', 
-                'ppmV', 'ALL', 
+                'ppmV', 'TSP', 
                 'NO + NO2 + NO3 + N2O5 + HONO + HNO3 + ANO3 + PNA + CRON + CLNO2 + CLNO3 + PANS + NTR', 
              
 'PMF_TNO3'    , 'Fine-Mode Nitrate plus Nitric Acid', 
@@ -740,15 +760,15 @@ CMPST =
                 'ANO3 + HNO3',
 
 'TNO3'        , 'Total Nitrate only including Inorganics', 
-                'ug m-3', 'ALL', 
+                'ug m-3', 'TSP', 
                 'ANO3 + HNO3',
 
 'TNO3_MOL'    , 'Total Nitrate only including Inorganics', 
-                'umol m-3', 'ALL', 
+                'umol m-3', 'TSP', 
                 'ANO3 + HNO3',
 
 'TNO3TOT'     , 'Total Nitrate only including Organics', 
-                'umol m-3', 'ALL', 
+                'umol m-3', 'TSP', 
                 'ANO3 + HNO3 + AMTNO3',
 
 

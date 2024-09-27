@@ -423,7 +423,7 @@
              ELMO_COMP( J )%L_MODE( : ) = .TRUE.
              ELMO_COMP( J )%INLET = IPMAMS
              ELMO_COMP( J )%WETNESS = IWET
-         CASE ('ALL' )
+         CASE ('TSP' )
              ! This is a bulk quantity. All modes are selected.
              ELMO_COMP( J )%L_MODE( : ) = .TRUE.
          CASE ('GAS')
