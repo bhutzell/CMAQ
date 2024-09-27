@@ -689,7 +689,7 @@
             IF ( INIT_TIME ) THEN
                 OUTVAL = 0.0
             ELSE
-                OUTVAL = ELMO_KZ( C1,R1,L1 )
+                OUTVAL = MET_DATA%KZ( C1,R1,L1 )
             END IF
                  
 
@@ -697,7 +697,7 @@
             IF ( INIT_TIME ) THEN
                 OUTVAL = 0.0
             ELSE
-                OUTVAL = ELMO_KZMIN( C1,R1,L1 )
+                OUTVAL = MET_DATA%KZMIN( C1,R1,L1 )
             END IF
 
          ! Retrieve Relative Humidity

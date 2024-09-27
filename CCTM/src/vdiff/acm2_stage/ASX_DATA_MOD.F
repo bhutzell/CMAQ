@@ -125,6 +125,7 @@ C-------------------------------------------------------------------------------
          Real,    Allocatable :: UWIND    ( :,:,: )  ! [m/s]
          Real,    Allocatable :: VWIND    ( :,:,: )  ! [m/s]                    
 !> 3-D meteorological fields:
+         Real,    Allocatable :: KZ       ( :,:,: )  ! Kz [m**2/s]
          Real,    Allocatable :: KZMIN    ( :,:,: )  ! minimum Kz [m**2/s]
          Real,    Allocatable :: PRES     ( :,:,: )  ! pressure [Pa]
          Real,    Allocatable :: QV       ( :,:,: )  ! water vapor mixing ratio
@@ -331,6 +332,7 @@ C-----------------------------------------------------------------------
      &             Met_Data%CFRAC    ( NCOLS,NROWS ),
      &             Met_Data%UWIND    ( NCOLS+1,NROWS+1,NLAYS ),
      &             Met_Data%VWIND    ( NCOLS+1,NROWS+1,NLAYS ),
+     &             Met_Data%KZ       ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%KZMIN    ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%PRES     ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%QV       ( NCOLS,NROWS,NLAYS ),

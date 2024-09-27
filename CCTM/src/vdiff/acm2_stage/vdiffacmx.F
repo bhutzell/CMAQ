@@ -1041,6 +1041,9 @@ C Update ISAM Dry Deposition
 #ifdef isam
          DO JSPCTAG = 1, N_SPCTAG
             SA_DDEP( C,R,JSPCTAG ) = SA_DDBF( JSPCTAG )
+            IF ( L_ELMO ) 
+     &         ELMO_ISAM_DDEP(C,R,S_SPCTAG(JSPCTAG), T_SPCTAG(JSPCTAG) ) =
+     &            SA_DDEP( C,R,JSPCTAG )
          END DO
 #endif
 

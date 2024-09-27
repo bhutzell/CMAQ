@@ -538,9 +538,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                             ELMO_NO2COL(:,:), ! NO2 Column
      &                             ELMO_SO2COL(:,:), ! SO2 Column
      &                             ELMO_HCHOCOL(:,:),! Formaldehyde Column
-     &                             ELMO_COCOL(:,:),  ! CO Column
-     &                             ELMO_KZ(:,:,:),     ! Kz output
-     &                             ELMO_KZMIN(:,:,:)   ! Kz minimum output
+     &                             ELMO_COCOL(:,:)   ! CO Column
 
 
         REAL, ALLOCATABLE, SAVE :: ELMO_WDEP(:,:,:) ! wet deposition accumulated per time step
@@ -606,14 +604,6 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             allocate( elmo_cocol(ncols, nrows ), stat=ios)
             call checkmem( ios, 'ELMO_COCOL',pname )
             elmo_cocol = 0.0
-     
-            allocate( elmo_kz(ncols, nrows, nlays ), stat=ios)
-            call checkmem( ios, 'ELMO_KZ',pname )
-            elmo_kz = 0.0
-     
-            allocate( elmo_kzmin(ncols, nrows, nlays ), stat=ios)
-            call checkmem( ios, 'ELMO_KZMIN',pname )
-            elmo_kzmin = 0.0
      
             allocate( elmo_wdep(ncols, nrows, n_cgrid_spc ), stat=ios)
             call checkmem( ios, 'ELMO_WDEP',pname )

@@ -81,6 +81,7 @@ C-----------------------------------------------------------------------
       USE GRID_CONF
       USE DESID_VARS, ONLY : VDEMIS_DIFF, DESID_LAYS
       USE DESID_MODULE, ONLY : DESID_INIT, DESID_DRIVER
+      USE ELMO_DATA, ONLY : L_ELMO, ELMO_DDEP
       USE DEPV_DEFN
       USE ASX_DATA_MOD
       USE VDIFF_MAP
@@ -94,7 +95,9 @@ C-----------------------------------------------------------------------
       USE PA_DEFN, ONLY : LIPR, BUDGET_DIAG
 
 #ifdef isam
-      USE SA_DEFN, Only: ITAG, N_SPCTAG, VNAM_SPCTAG, SA_DDEP
+      USE SA_DEFN, Only: ITAG, N_SPCTAG, VNAM_SPCTAG, SA_DDEP,
+     &                   S_SPCTAG, T_SPCTAG, NSPC_SA, ISAM_SPEC
+      USE ELMO_DATA, Only : ELMO_ISAM_DDEP
 #endif
 
       IMPLICIT NONE
@@ -384,7 +387,7 @@ C EDDYV returned = Kz, where Kz is in m**2/sec
       END IF
 
 C Store Deposition Change in Budget and Process Analysis Arrays
-      IF ( BUDGET_DIAG .OR. LIPR ) DDEP0 = DDEP
+      IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) DDEP0 = DDEP
 
 C Calculate the change in concentration and dry dep from vertical diffusion and vsed
 C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual argument
@@ -417,14 +420,16 @@ C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual 
       END IF
  
 C Store Deposition Change in Budget and Process Analysis Arrays
-      IF ( BUDGET_DIAG .OR. LIPR ) THEN
+      IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) THEN
          DDEP_PA = 0.0
-         DO V = 1, N_SPC_DEPV
+         DO V = 1, N_SPC_DDEP
             DO R = 1, NROWS
                DO C = 1, NCOLS
-                  DDEP_PA( C,R,MAP_DEPVtoCGRID(V)) = DDEP( V,C,R ) - DDEP0( V,C,R )
+                  DDEP_PA( C,R,MAP_DDEPtoCGRID(V)) = DDEP( V,C,R ) - DDEP0( V,C,R )
                END DO
             END DO
+            IF ( L_ELMO ) 
+     &         ELMO_DDEP(:,:,MAP_DDEPtoCGRID(V)) = DDEP_PA(:,:,MAP_DDEPtoCGRID(V))
          END DO
          CALL PA_UPDATE_DDEP ( DDEP_PA, JDATE, JTIME, TSTEP )
       END IF
