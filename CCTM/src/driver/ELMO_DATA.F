@@ -436,7 +436,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
       ! Define List of Possible Units for Output
-      INTEGER, PARAMETER :: N_UNIT = 34
+      INTEGER, PARAMETER :: N_UNIT = 39
       CHARACTER( 11 ), PARAMETER :: CUNIT( N_UNIT ) = 
      &    (/'UG M-3     ','PPMV       ','UGC M-3    ','PPMC       ',
      &      'UGN M-3    ','PPMN       ','M-3        ','M2 M-3     ',
@@ -446,7 +446,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &      'K          ','PA         ','S-1        ','M          ',
      &      'MM-1       ','M2 S-1     ','PMOLEC CM-2','NG M-3     ',
      &      'PPBV       ','MOL KG-1   ','KGN HA-1   ','KGS HA-1   ',
-     &      'MEQN M-2   ','MEQS M-2   '/)
+     &      'MEQN M-2   ','MEQS M-2   ','W M-2      ','CM         ',
+     &      'M S-1      ','DEG        ','PPBC       '/)
       
       INTEGER, PARAMETER :: IU_UNSP       = 0   ! Unspecified Units
       INTEGER, PARAMETER :: IU_UGpM3      = 1   ! ug m-3
@@ -483,7 +484,11 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: IU_KGSpHA     = 32  ! kgS ha-1
       INTEGER, PARAMETER :: IU_MEQNpM2    = 33  ! meqN m-2
       INTEGER, PARAMETER :: IU_MEQSpM2    = 34  ! meqS m-2
-
+      INTEGER, PARAMETER :: IU_WpM2       = 35  ! W m-2
+      INTEGER, PARAMETER :: IU_CM         = 36  ! CM
+      INTEGER, PARAMETER :: IU_MpS        = 37  ! m s-1
+      INTEGER, PARAMETER :: IU_DEG        = 38  ! deg
+      INTEGER, PARAMETER :: IU_PPBC       = 39  ! ppbC
 
 
       ! Define Logical flags for turning on output categories
@@ -732,7 +737,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
-         ELSE IF ( VARS_NML(1) .EQ. 'ALL_ISAM' ) THEN
+         ELSE IF ( VARS_NML(1) .EQ. 'ALL_ISAM_CONC' ) THEN
             ! Activate all ISAM Species
             DO IT = 1,N_ELMO_TABLE
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_ISAM_CONC )
@@ -753,7 +758,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
           
-         ELSE IF ( VARS_NML(1) .EQ. 'ALL_DDM' ) THEN
+         ELSE IF ( VARS_NML(1) .EQ. 'ALL_DDM_CONC' ) THEN
             ! Activate all DDM3D Species
             DO IT = 1,N_ELMO_TABLE
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_DDM_CONC )
@@ -842,12 +847,28 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
          ELSE IF ( I3 .GT. 0 ) THEN
             ! Entry Matches the OUT_NAME of a variable on the ELMO
-            ! Table. The OUT_NAMEs are very specific. They will always
-            ! equal the unique identifier for an ELMO Variable, a
-            ! raw concentration, deposition flux, mode-dependent
-            ! variable (STDEV_AIT) or source-dependent variable 
-            ! (e.g. PM25_ONROAD).
-            L_ELMO_TABLE( I3 ) = .TRUE.
+            ! Table.    
+            ! First check for COMPOSITES
+            IF ( (ELMO_TABLE( I3 )%VAR_TYPE .EQ. ET_CMPST .OR.
+     &            ELMO_TABLE( I3 )%VAR_TYPE .EQ. ET_CMPST_DEP .OR.
+     &            ELMO_TABLE( I3 )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
+     &            ELMO_TABLE( I3 )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
+     &            ELMO_TABLE( I3 )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
+     &            ELMO_TABLE( I3 )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) 
+     &          .AND. EXPAND_NML ) THEN
+
+                 ! Expand the COMPOSITE if the * was used
+                 DO IVAR = 1,ELMO_COMP( I3 )%N_VARS
+                   J = ELMO_COMP( I3 )%TABID( IVAR )
+                   VARS_NML( N_END+IVAR ) = ELMO_TABLE( J )%OUT_NAME 
+                 END DO
+                 N_END = N_END + ELMO_COMP( I3 )%N_VARS
+                
+            ELSE 
+                 ! This is a very specific variable. Mode and source
+                 ! dependence are fixed.
+                 L_ELMO_TABLE( I3 ) = .TRUE.
+            END IF
           
          ELSE
             ! Entry Doesn't Match any variable on the ELMO table. Crash the

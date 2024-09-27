@@ -87,10 +87,12 @@
      &                 IAER .NE. AH2O_IDX .AND. IAER .NE. AORGH2O_IDX ) THEN
                     ! Add up PM for this source
                     ISA = MAP_AEROtoSA( IAER, IM )
+                    IF ( ISA .NE. 0 ) THEN
                     IF ( ISRC .LE. NTAG_SA ) THEN
                        OUTVAL = OUTVAL + FRAC * ISAM_VEC(ISA,ISRC) 
                     ELSE
                        OUTVAL = OUTVAL + FRAC * SUM(ISAM_VEC( ISA,:) ) 
+                    END IF
                     END IF
                   END IF
                 END DO

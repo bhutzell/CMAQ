@@ -517,7 +517,7 @@
          CSPEC = TRIM(CSPEC) // '_ISAM'
          ISRC = ELMO_TABLE( J )%SOURCE
          DO K = 1,N_ELMO_TABLE
-           IF ( ELMO_TABLE( K )%OUT_NAME .EQ. CSPEC .AND.
+           IF ( ELMO_TABLE( K )%NAME .EQ. CSPEC .AND.
      &          ELMO_TABLE( K )%SOURCE .EQ. ISRC     ) THEN
               ! This component matches an ELMO Table Output Name
               ELMO_COMP( J )%TABID( IVAR )    = K
@@ -539,7 +539,7 @@
          CSPEC = TRIM(CSPEC) // '_DDM'
          ISRC = ELMO_TABLE( J )%SOURCE
          DO K = 1,N_ELMO_TABLE
-           IF ( ELMO_TABLE( K )%OUT_NAME .EQ. CSPEC .AND.
+           IF ( ELMO_TABLE( K )%NAME .EQ. CSPEC .AND.
      &          ELMO_TABLE( K )%SOURCE .EQ. ISRC     ) THEN
               ! This component matches an ELMO Table Output Name
               ELMO_COMP( J )%TABID( IVAR )    = K

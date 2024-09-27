@@ -339,7 +339,7 @@ CMPST =
 
 !-- Organic Composites --!
 'VOC'         , 'Volatile Organic Compound (VOC) Concentration',
-                'ppbC', 'GAS',
+                'ppmC', 'GAS',
                 'PAR + 2.0*ETHA + 3.0*PRPA + MEOH + 2.0*ETH + 2.0*ETOH + 2.0*OLE + 3.0*ACET + 7.0*TOL + 8.0*XYLMN + 6.0*BENZENE + FORM + 3.0*GLY + 4.0*KET + 2.0*ETHY + 2.0*ALD2 + 4.0*IOLE + 2.0*ALDX + 5.0*ISOP + 10.0*TERP + 10.0*NAPH + 10.0*APIN'
 
 !---------------------------------!

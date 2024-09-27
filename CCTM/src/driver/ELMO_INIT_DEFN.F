@@ -128,8 +128,9 @@
      &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
                     DO IVAR = 1,ELMO_COMP( J )%N_VARS
                        IF ( ELMO_COMP( J )%TABID( IVAR ) .EQ. 0 ) THEN
-                          WRITE( XMSG, '(3A,I2,6A)' ) 'The ELMO COMPOSITE variable ',
-     &                         TRIM( ELMO_TABLE( J )%NAME ),' has a component (#',
+                          WRITE( XMSG, '(3A,I2,A,I2,6A)' ) 'The ELMO COMPOSITE variable ',
+     &                         TRIM( ELMO_TABLE( J )%NAME ),' requested on file ',
+     &                         IFL,' has a component (#',
      &                         IVAR,') that is not available on the comprehensive ', 
      &                         'ELMO Table. If this is a source-resolved ISAM COMPOSITE, ',
      &                         'then it is recommended to check that the components ',
@@ -1189,11 +1190,12 @@
          
          ! Header and File Metadata
          WRITE( LOGDEV, '(/,5x,A,A)'   ),'>',REPEAT('-',80 )
-         WRITE( LOGDEV,'(5x,A,I2,A,A,/,5x,A,A,/,8x,A,I2,A,I2)' ),
+         WRITE( LOGDEV,'(5x,A,I2,A,A,/,5x,A,A,/,8x,A,I2,A,I2,/,8x,A,I5)' ),
      &       'Output File Num: "',IFL,'" | Temporality: ','Average',
      &       'Output Filename: ',TRIM(ELMO_FILE(IFL)%SHORTNAME),
      &       ' Bottom Layer: ',ELMO_FILE( IFL )%LAY_BOT,
-     &       ' Top Layer: ',ELMO_FILE( IFL )%LAY_TOP 
+     &       ' Top Layer: ',ELMO_FILE( IFL )%LAY_TOP,
+     &       ' Number of Variables: ',ELMO_FILE( IFL )%N_VARS
 
          ! Print all variables on the file and their contents if they have
          ! components 
