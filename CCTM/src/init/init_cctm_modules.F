@@ -138,7 +138,7 @@ C Arguments:
 #endif
 
       ! Initialize ELMO Arrays and Maps
-      CALL ELMO_INIT
+      CALL ELMO_INIT( TSTEP(1) )
       
       ! Compute ELMO Values at Beginning of Main Time Step
       IF ( L_ELMO ) THEN

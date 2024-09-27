@@ -22,7 +22,7 @@
       
       CONTAINS
 !-------------------------------------------------------------------------
-      SUBROUTINE ELMO_INIT
+      SUBROUTINE ELMO_INIT( TSTEP )
       ! This subroutine calls subroutines that read user input and build
       ! the ELMO_TABLE. It then maps output file variables to the ELMO
       ! TABLE and creates the ELMO_LOCAL vector for efficient storage of
@@ -44,6 +44,7 @@
 
       IMPLICIT NONE
 
+      INTEGER, INTENT( IN ) :: TSTEP
       INTEGER N, M, P, J, IM, ILIST, S, F, NLAYS, N_VARS
       INTEGER ID, IV, ISRC, IT, IS, NM, NS, IVAR, IFL
       INTEGER N1, N2, N3, MX_SRC
@@ -53,7 +54,7 @@
       INTEGER :: N_MAP_MODE_SOURCE, N_MAP_MODE, N_MAP_SOURCE
 
       ! Read User-Input from Namelist input file (CMAQ Control File)
-      CALL READ_ELMO_NML()
+      CALL READ_ELMO_NML(TSTEP)
       IF ( .NOT. L_ELMO ) RETURN
       
       ! Initialize Shared Output Variables like AOD, Extinction, and
@@ -198,7 +199,7 @@
       END SUBROUTINE ELMO_INIT
  
 !-------------------------------------------------------------------------
-      SUBROUTINE READ_ELMO_NML( )
+      SUBROUTINE READ_ELMO_NML( TSTEP )
 !     This subroutine maps the ELMO variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
@@ -208,14 +209,15 @@
       
       IMPLICIT NONE
 
-      INTEGER            :: FUNIT
-      INTEGER            :: STAT
+      INTEGER, INTENT( IN ) :: TSTEP
+      INTEGER               :: FUNIT
+      INTEGER               :: STAT
 
       INTEGER IVAR, N_MX_VARS, N_FILES, N_MAX_OUTPUT_VARIABLES,
      &        N_KEYWORDS, N_MAX_KEYWORD_VARIABLES, N_MX_KEYVARS
       CHARACTER(30), ALLOCATABLE :: FLABEL( : )
       CHARACTER(16), ALLOCATABLE :: FTYPE( : )
-      INTEGER, ALLOCATABLE       :: TSTEP( : )
+      INTEGER, ALLOCATABLE       :: FTSTEP( : )
       CHARACTER(10), ALLOCATABLE :: TMODE( : )
       INTEGER, ALLOCATABLE       :: LAY_BOT( : )
       INTEGER, ALLOCATABLE       :: LAY_TOP( : )
@@ -232,7 +234,7 @@
 
       NAMELIST / ELMO_INIT  / N_Files, N_Max_Output_Variables,
      &                        N_Keywords, N_Max_Keyword_Variables
-      NAMELIST / ELMO_FILES / Flabel, Tstep, Tmode, 
+      NAMELIST / ELMO_FILES / Flabel, Tmode, 
      &                       Lay_Bot, Lay_Top, File_Vars,
      &                       Keywd_name, Keywd
 
@@ -315,7 +317,7 @@
       END IF
 
       ! Allocate and Initialize Namelist Variables
-      ALLOCATE( FLABEL( N_FILES ), FTYPE( N_FILES ), TSTEP( N_FILES ),
+      ALLOCATE( FLABEL( N_FILES ), FTYPE( N_FILES ), FTSTEP( N_FILES ),
      &          TMODE( N_FILES ), LAY_BOT( N_FILES ),
      &          LAY_TOP( N_FILES ), FILE_VARS( N_FILES, N_MX_VARS ),
      &          KEYWD_NAME( N_KEY ), KEYWD( N_KEY,N_MX_KEYVARS ),
@@ -323,6 +325,7 @@
       CALL CHECKMEM( STAT, 'ELMO_FILE_NML',PNAME)
       FILE_VARS = ''
       KEYWD = ''
+      FTSTEP(:) = TSTEP
 
       ! Read User-Specified ELMO file data from input namelist
       REWIND( FUNIT )
@@ -376,7 +379,7 @@
 #endif
 
         ! Output Time Step
-        ELMO_FILE( IFL )%TSTEP = TSTEP( IFL )
+        ELMO_FILE( IFL )%TSTEP = FTSTEP( IFL )
         CALL UPCASE( TMODE( IFL ) )
         IF ( TMODE( IFL ) .EQ. 'INSTANT' ) THEN
            ELMO_FILE( IFL )%TMODE = 0

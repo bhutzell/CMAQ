@@ -112,7 +112,6 @@ C-----------------------------------------------------------------------
       USE AERO_DATA
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP, ELMO_INIT_SHARED
       USE ELMO_PROC, ONLY : ELMO_DRIVER
-      USE ELMO_INIT_DEFN, ONLY : ELMO_INIT
       USE UTILIO_DEFN
       USE util_Family_module
       USE RUNTIME_VARS
