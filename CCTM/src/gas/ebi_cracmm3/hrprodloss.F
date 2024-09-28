@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Sep 25, 2024
+C  REVISION HISTORY: Created by EBI solver program, Sep 26, 2024
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 
@@ -2486,6 +2486,12 @@ C***********************************************************************
 
       PROD(  CO2         ) =    2.0000D-01 * RXRAT(   528 )      ! STY+O3=0.2000D+00*CO2+...
       LOSS(  CO2         ) =   0.0D0
+
+      PROD(  ANO3I       ) =   0.0D0
+      LOSS(  ANO3I       ) =                 RXRAT(   535 )      ! ANO3I=0.6700D+00*HONO+...
+
+      PROD(  ANO3J       ) =   0.0D0
+      LOSS(  ANO3J       ) =                 RXRAT(   536 )      ! ANO3J=0.6700D+00*HONO+...
 
       RETURN
 

@@ -1414,6 +1414,10 @@
              RKI( NCELL,  533) =   2.5000D-13 * CFACT 
 !  Reaction Label ROCARO76        
              RKI( NCELL,  534) =   2.5000D-13 * CFACT 
+!  Reaction Label HET_ANO3I       
+             RKI( NCELL,  535) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
+!  Reaction Label HET_ANO3J       
+             RKI( NCELL,  536) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
 
         END DO  
 !  Multiply rate constants by [M], [O2], [N2], [H2O], [H2], or [CH4]
@@ -1873,5 +1877,7 @@
              INDEX_STY         = IOLD2NEW( INDEX_STY        , 1 )
              INDEX_STYP        = IOLD2NEW( INDEX_STYP       , 1 )
              INDEX_CO2         = IOLD2NEW( INDEX_CO2        , 1 )
+             INDEX_ANO3I       = IOLD2NEW( INDEX_ANO3I      , 1 )
+             INDEX_ANO3J       = IOLD2NEW( INDEX_ANO3J      , 1 )
           END SUBROUTINE RESET_SPECIES_POINTERS
        END MODULE RXNS_FUNCTION

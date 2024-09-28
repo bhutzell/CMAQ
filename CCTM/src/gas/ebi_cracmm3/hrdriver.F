@@ -27,7 +27,7 @@ C
 C  KEY SUBROUTINES/FUNCTIONS CALLED:  HRINIT, HRCALCKS, HRSOLVER
 C                                     FIND_DEGRADED, INIT_DEGRADE, FINAL_DEGRADE
 C
-C  REVISION HISTORY: Created by EBI solver program, May  3, 2024
+C  REVISION HISTORY: Created by EBI solver program, Sep 26, 2024
 C                       Based on the algorithm in "Test of Two Numerical
 C                       Schemes for Use in Atmospheric Transport-Chemistry
 C                       Models", O. Hertel, R. Berkowicz, J. Christensen,
@@ -91,7 +91,7 @@ C**********************************************************************
 C..Includes:
       INCLUDE SUBST_FILES_ID  ! CMAQ files
       INCLUDE SUBST_CONST     ! CMAQ constants
-
+      
       INCLUDE SUBST_EMISPRM   ! Emissions processing control parameters
 
 C..Arguments:

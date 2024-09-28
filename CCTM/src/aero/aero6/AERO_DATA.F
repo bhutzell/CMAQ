@@ -84,6 +84,7 @@ C     10 Mar 2021 G. Sarwar: Changed CB6R3M_AE7_KMTBR to CB6R3M_AE7_AQ
 C     10 June 2021 G. Sarwar: Added CB6R5M_AE7_AQ
 C 23 Jun 21 G. Sarwar: Replaced CB6R3M with CB6R5M
 C NS 11/28/2023 CRACMM2 updates
+C GS 07/31/2024  Added ASSJ
 
 C References:
 C 1. Eddingsaas, N. C., Vandervelde, D. G., Wennberg, P. O., "Kinetics and
@@ -134,7 +135,7 @@ C Define Logical values as T and F for the aerospc table
 
 C Number of aerosol species and modes
 
-      Integer, Parameter :: n_aerolist = 139    ! number of aero species
+      Integer, Parameter :: n_aerolist = 140    ! number of aero species
       Integer, Parameter :: n_mode = 3          ! number of modes:
       Integer, Parameter :: iait = 1            ! 1 = Aitken       
       Integer, Parameter :: iacc = 2            ! 2 = accumulation 
@@ -286,7 +287,8 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('AORGC   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.12), ! Cloud-Processed SOA
      & spcs_list_type('ASOIL   ',F,F,T, cm_set, 2600.0, '       ','       ',0.0  ,'NVL',F,F,  0,  0.6, 0.6,F, 'DUST  ', 0.00), ! Soil
      & spcs_list_type('ACORS   ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  0,  0.6, 0.6,F, 'DUST  ', 0.00), ! Coarse PM
-     & spcs_list_type('ASEACAT ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! SeaSpray Cations        
+     & spcs_list_type('ASEACAT ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! SeaSpray Cations
+     & spcs_list_type('ASS     ',F,T,F, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T, -1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! seasalt tracer        
                                                                                          
        ! Associated with ae6i                                                                
      & spcs_list_type('AMTNO3  ',F,T,F, cm_set, 1400.0, 'MTNO3  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! Monoterpene Nitrate SOA
@@ -548,7 +550,7 @@ C Sea-Spray Aerosol Speciation factors based on seawater composition:
 ! ISBN 9780080437514, http://dx.doi.org/10.1016/B0-08-043751-6/06105-3.
 
 C number of chemical species in seawater aerosol composition
-      integer, parameter :: nsea_spc = 17
+      integer, parameter :: nsea_spc = 18
 
       Type( emis_table ), Parameter :: sea_spc( nsea_spc ) = (/
 C                     -description--  -- Species -- --MW--  ------ spcfac ------
@@ -568,6 +570,7 @@ C                                                              fine    coarse
      &   emis_table( 'Lead          ',   'PB     ', 207.2, (/ 6.0E-11, 6.0E-11/) ),   ! Lead
      &   emis_table( 'Cadmium       ',   'CD     ', 112.4, (/ 1.93E-9, 1.93E-9/) ),   ! cadmium
      &   emis_table( 'Air Toxics Mn ',   'MN_HAPS',  54.9, (/ 4.7E-11, 4.7E-11/) ),   ! Air toxics Manganese
+     &   emis_table( 'seasalt tracer',   'SS     ',  36.0, (/ 1.00000, 0.00000/) ),   ! seasalt tracer
      &   emis_table( 'Bromine       ',   'BR     ',  79.9, (/ 0.00190, 0.00190/) ),   ! Bromine 
      &   emis_table( 'Water         ',   'H2O    ',  18.0, (/ 0.0    , 0.0    /) ) /) ! Water (uptake is calculated online)
  
@@ -644,6 +647,7 @@ C Required species
       Character( 16 ), Private, Parameter :: req_soil   = 'ASOIL'
       Character( 16 ), Private, Parameter :: req_cors   = 'ACORS'
       Character( 16 ), Private, Parameter :: req_seacat = 'ASEACAT'
+      Character( 16 ), Private, Parameter :: req_ss     = 'ASS'
 
 C Indices of required species
       Integer :: aso4_idx
@@ -663,6 +667,7 @@ C Indices of required species
       Integer :: asoil_idx
       Integer :: acors_idx
       Integer :: aseacat_idx
+      Integer :: ass_idx
 
 C Flag if optional species present
       Logical :: ae6isoa = .False.
@@ -863,7 +868,7 @@ C-----------------------------------------------------------------------
 
       Use rxns_data       ! chemical mechanism data
       Use cgrid_spcs      ! CGRID mechanism species
-      Use const
+      Use aeromet_data
       Use vdiff_data, only : n_spc_diff, diff_spc
       Implicit None
 
@@ -1155,6 +1160,7 @@ C Find indices of required species
       aseacat_idx = findAero( req_seacat, .True. )
       apoc_idx    = findAero( req_poc,    .True. )
       apncom_idx  = findAero( req_ncom,   .True. )
+      ass_idx     = findAero( req_ss,     .True. )
 
       If ( ( Index( mechname, 'SAPRC07TIC_AE6I' ) .Gt. 0 ) .OR.
      &     ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 )  ) Then
@@ -1309,7 +1315,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use const, only : pi, f6pi  
+      Use aeromet_data, only : pi, f6pi  ! fundamental constants, data type definitions, etc.
 
       Implicit None
 
@@ -1438,7 +1444,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use const, only : pi     
+      Use aeromet_data, only : pi     ! fundamental constants, data type definitions, etc.
 
       Implicit None
 
@@ -1595,7 +1601,7 @@ C 4/2016: HOT Pye Created routine
 C
 C-----------------------------------------------------------------------
 
-      Use const, only: f6dpi, f6pi
+      Use aeromet_data, only: f6dpi, f6pi
 
       Implicit None
 
@@ -1727,7 +1733,7 @@ C
 C 11 May 16  B.Murphy  Program Written
 C
 C-----------------------------------------------------------------------
-      Use CONST, only : pi, f6pi
+      Use AEROMET_DATA, only : pi, f6pi
       Use CGRID_SPCS, only : N_AE_TRNS, N_AE_SPC
       Use HGRD_DEFN, ONLY : NROWS, NCOLS
 
