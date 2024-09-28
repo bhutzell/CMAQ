@@ -27,6 +27,7 @@
 !
 ! Revision History:
 ! Ben Murphy 2020 Feb: Created
+! Golam Sarwa 2024 Jul: Added EF_HNO3
 !-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
@@ -556,7 +557,7 @@
       ELMO_KEY( 8 )%LIST = (/'TA  ','PRES','RH  ' /) 
 
       ELMO_KEY( 9 )%WORD = 'CHEM'
-      ELMO_KEY( 9 )%N = 7
+      ELMO_KEY( 9 )%N = 8
       ALLOCATE( ELMO_KEY( 9 )%LIST( 7 ),STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_KEY(9)'
@@ -564,7 +565,8 @@
       END IF
 
       ELMO_KEY( 9 )%LIST = (/'GAMMA_N2O5  ','GAMMA_N2O5K ','YIELD_CLNO2 ',
-     &          'YIELD_CLNO2K','GAMMA_IEPOX ','K_IEPOX     ','GAMMA_IMAE  ' /)
+     &          'YIELD_CLNO2K','GAMMA_IEPOX ','K_IEPOX     ','GAMMA_IMAE', 
+     &          'EF_HNO3 ' /)
 
       ELMO_KEY( 10 )%WORD = 'FINE_SPECIES'
       ELMO_KEY( 10 )%N = 17
@@ -3010,6 +3012,10 @@
          ! Retrieve Air Density
          CASE ( ID_DENS )
             OUTVAL = MET_DATA%DENS( C1,R1,L1 ) ! kg m-3
+	    
+         ! Retrieve EF_HNO3
+          CASE ( ID_EF_HNO3 )
+             IF ( AERO_CHEM_SET ) OUTVAL = EF_HNO3( C1,R1,L1 )
 
          CASE DEFAULT
             ! For most parameters the ELMO_COEFF structure will
@@ -3146,12 +3152,12 @@
       USE SOA_DEFN, ONLY : Extract_Soa
       USE AEROSOL_CHEMISTRY, ONLY: HETCHEM_RATES
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, AIRQV, AIRDENS, AIRPRES,
-     &                        SRFTEMP, H2OVP, H2OSATVP, 
+     &                        SRFTEMP, H2OVP, H2OSATVP,
      &                        CFRAC, DZ, PV, ZH
       use centralized_io_module, only : interpolate_var, pv_avail
       use RUNTIME_VARS
-      Use phot_mod, Only: init_phot_shared 
-      use const, only: ESATL, MWWAT, MWAIR
+      Use phot_mod, Only: init_phot_shared
+      use const, only: ESATL, MWWAT, MWAIR 
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY : SENGRID

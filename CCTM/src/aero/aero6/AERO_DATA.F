@@ -288,7 +288,7 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('ASOIL   ',F,F,T, cm_set, 2600.0, '       ','       ',0.0  ,'NVL',F,F,  0,  0.6, 0.6,F, 'DUST  ', 0.00), ! Soil
      & spcs_list_type('ACORS   ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  0,  0.6, 0.6,F, 'DUST  ', 0.00), ! Coarse PM
      & spcs_list_type('ASEACAT ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! SeaSpray Cations
-     & spcs_list_type('ASS     ',F,T,F, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T, -1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! seasalt tracer        
+     & spcs_list_type('ASS     ',F,T,F, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T, -1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! seasalt tracer                
                                                                                          
        ! Associated with ae6i                                                                
      & spcs_list_type('AMTNO3  ',F,T,F, cm_set, 1400.0, 'MTNO3  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! Monoterpene Nitrate SOA
@@ -868,7 +868,7 @@ C-----------------------------------------------------------------------
 
       Use rxns_data       ! chemical mechanism data
       Use cgrid_spcs      ! CGRID mechanism species
-      Use aeromet_data
+      Use const
       Use vdiff_data, only : n_spc_diff, diff_spc
       Implicit None
 
@@ -1315,7 +1315,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only : pi, f6pi  ! fundamental constants, data type definitions, etc.
+      Use const, only : pi, f6pi  
 
       Implicit None
 
@@ -1444,7 +1444,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only : pi     ! fundamental constants, data type definitions, etc.
+      Use const, only : pi     
 
       Implicit None
 
@@ -1601,7 +1601,7 @@ C 4/2016: HOT Pye Created routine
 C
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only: f6dpi, f6pi
+      Use const, only: f6dpi, f6pi
 
       Implicit None
 
@@ -1733,7 +1733,7 @@ C
 C 11 May 16  B.Murphy  Program Written
 C
 C-----------------------------------------------------------------------
-      Use AEROMET_DATA, only : pi, f6pi
+      Use CONST, only : pi, f6pi
       Use CGRID_SPCS, only : N_AE_TRNS, N_AE_SPC
       Use HGRD_DEFN, ONLY : NROWS, NCOLS
 
