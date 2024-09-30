@@ -2469,8 +2469,8 @@ C *** Calculate gammas for IEPOX and IMAE
 
 C *** Henry's Law coefficients
       temp = real( TEMPERATURE, 4)
-      Heff( 1 ) = REAL(HLCONST( JIEPOX, temp, .False., 0.0 ), 8)
-      Heff( 2 ) = REAL(HLCONST( JIMAE,  temp, .False., 0.0 ), 8)
+      Heff( 1 ) = REAL(HLCONST( HLC_IEPOX, temp, .False., 0.0 ), 8)
+      Heff( 2 ) = REAL(HLCONST( HLC_IMAE,  temp, .False., 0.0 ), 8)
 
 C *** Cfactor
       cfactor_isop( 1 ) = cfactor_iepox

@@ -592,19 +592,19 @@ C...initialize counters and compute several conversion factors
 C...set equilibrium constants as a function of temperature
 C...   Henry`s law constants
 
-      SO2H  = HLCONST( JSO2       , TEMP, .FALSE., 0.0 )
-      CO2H  = HLCONST( JCO2       , TEMP, .FALSE., 0.0 )
-      NH3H  = HLCONST( JNH3       , TEMP, .FALSE., 0.0 )
-      H2O2H = HLCONST( JH2O2      , TEMP, .FALSE., 0.0 )
-      O3H   = HLCONST( JO3        , TEMP, .FALSE., 0.0 )
-      HCLH  = HLCONST( JHCL       , TEMP, .FALSE., 0.0 )
-      HNO3H = HLCONST( JHNO3      , TEMP, .FALSE., 0.0 )
-      MHPH  = HLCONST( JMHYDPOX   , TEMP, .FALSE., 0.0 )
-      PAAH  = HLCONST( JPEROXYACET, TEMP, .FALSE., 0.0 )
-      FOAH  = HLCONST( JHCOOH     , TEMP, .FALSE., 0.0 )
-      GLYH  = HLCONST( JGLY       , TEMP, .FALSE., 0.0 )
-      MGLYH = HLCONST( JMGLY      , TEMP, .FALSE., 0.0 )
-      HOH   = HLCONST( JOH        , TEMP, .FALSE., 0.0 )
+      SO2H  = HLCONST( HLC_SO2       , TEMP, .FALSE., 0.0 )
+      CO2H  = HLCONST( HLC_CO2       , TEMP, .FALSE., 0.0 )
+      NH3H  = HLCONST( HLC_NH3       , TEMP, .FALSE., 0.0 )
+      H2O2H = HLCONST( HLC_H2O2      , TEMP, .FALSE., 0.0 )
+      O3H   = HLCONST( HLC_O3        , TEMP, .FALSE., 0.0 )
+      HCLH  = HLCONST( HLC_HCL       , TEMP, .FALSE., 0.0 )
+      HNO3H = HLCONST( HLC_HNO3      , TEMP, .FALSE., 0.0 )
+      MHPH  = HLCONST( HLC_MHYDPOX   , TEMP, .FALSE., 0.0 )
+      PAAH  = HLCONST( HLC_PEROXYACET, TEMP, .FALSE., 0.0 )
+      FOAH  = HLCONST( HLC_HCOOH     , TEMP, .FALSE., 0.0 )
+      GLYH  = HLCONST( HLC_GLY       , TEMP, .FALSE., 0.0 )
+      MGLYH = HLCONST( HLC_MGLY      , TEMP, .FALSE., 0.0 )
+      HOH   = HLCONST( HLC_OH        , TEMP, .FALSE., 0.0 )
 
       TEMP1 = ONE_OVER_TEMP - 1.0D0 / 298.0D0
 

@@ -20,21 +20,29 @@
       MODULE HLCONST_MOD
          IMPLICIT NONE
 
-C...pointers for dissociating species needed to compute effective Henry's law constants
-         INTEGER  :: JSO2, JHNO2, JHNO3, JCO2, JH2O2, JHCOOH, JHO2, JNH3,
-     &               JHYDRAZINE, JATRA, JDATRA, JCL2, JHCL, JHOCL,
-     &               JHBR, JHI, JACRYACID
+C...pointers for dissociating species needed to compute effective 
+c   Henry's law constants
+         INTEGER, PUBLIC  :: HLC_SO2, HLC_HNO2, HLC_HNO3, HLC_CO2, 
+     &               HLC_H2O2, HLC_HCOOH, HLC_HO2, HLC_NH3,
+     &               HLC_HYDRAZINE, HLC_ATRA, HLC_DATRA, HLC_CL2, 
+     &               HLC_HCL, HLC_HOCL, HLC_HBR, HLC_HI, 
+     &               HLC_ACRYACID
 
 C...pointers for additional Henry's law species needed in AQCHEM
-         INTEGER  :: JO3, JMHYDPOX, JPEROXYACET, JGLY, JMGLY, JOH
+         INTEGER, PUBLIC  :: HLC_O3, HLC_MHYDPOX, HLC_PEROXYACET, 
+     &               HLC_GLY, HLC_MGLY, HLC_OH
 
 C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
-         INTEGER  :: JIEPOX, JIMAE
+         INTEGER, PUBLIC  :: HLC_IEPOX, HLC_IMAE
 
+         PUBLIC :: SUBNAME, HLCONST, HLCONST_INIT
 
 C...........PARAMETERS and their descriptions:
 
-         INTEGER, PARAMETER :: MXSPCS = 277     ! Number of substances
+         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 277     ! Number of substances
+
+         PRIVATE 
+
          INTEGER, PARAMETER :: MXDSPCS = 19     ! Number of dissociating species
 
 C...pointers for the dissociation constants (arrays B and D)
@@ -66,14 +74,14 @@ C...Henry's law constant data taken mostly from Rolf Sanders' Compilation of
 C...  Henry's Law Constants for Inorganic and Organic Species of Potential
 C...  Importance in Environment Chemistry 1999
 
-      REAL, PRIVATE, SAVE :: A( MXSPCS )         ! Henry's law constants at 298.15K (M/atm)
-      REAL, PRIVATE, SAVE :: E( MXSPCS )         ! enthalpy (like activation energy) (K)
+      REAL, SAVE :: A( MXSPCS )         ! Henry's law constants at 298.15K (M/atm)
+      REAL, SAVE :: E( MXSPCS )         ! enthalpy (like activation energy) (K)
 
 C...dissociation constant data taken mostly from 6.A.1 of Seinfeld and Pandis
 C...  Atmospheric Chemistry and Physics, 1997
 
-      REAL, PRIVATE, SAVE :: B( MXDSPCS )        ! dissociation constant at 298.15K (M or M2)
-      REAL, PRIVATE, SAVE :: D( MXDSPCS )        ! -dH/R (K)
+      REAL, SAVE :: B( MXDSPCS )        ! dissociation constant at 298.15K (M or M2)
+      REAL, SAVE :: D( MXDSPCS )        ! -dH/R (K)
 
       DATA SUBNAME(  1), A(  1), E(  1) / 'O3              ', 1.14E-02, 2.3E+03 / ! Kosak 1983
       DATA SUBNAME(  2), A(  2), E(  2) / 'HO2             ', 4.0E+03, 5.9E+03 /  ! Hanson et al. 1992
@@ -422,35 +430,35 @@ C...  Atmospheric Chemistry and Physics, 1997
             CHARACTER( 16 ) :: PNAME = 'HLCONST_INIT'
             LOGICAL         :: LERROR = .FALSE.
 ! species that dissociate, needed for calculating effective Henry's Law coeffs
-            CALL HLINDEX( 'SO2             ', JSO2      , LERROR )
-            CALL HLINDEX( 'HNO2            ', JHNO2     , LERROR ) 
-            CALL HLINDEX( 'HNO3            ', JHNO3     , LERROR ) 
-            CALL HLINDEX( 'CO2             ', JCO2      , LERROR ) 
-            CALL HLINDEX( 'H2O2            ', JH2O2     , LERROR ) 
-            CALL HLINDEX( 'FORMIC_ACID     ', JHCOOH    , LERROR ) 
-            CALL HLINDEX( 'HO2             ', JHO2      , LERROR ) 
-            CALL HLINDEX( 'NH3             ', JNH3      , LERROR ) 
-            CALL HLINDEX( 'HYDRAZINE       ', JHYDRAZINE, LERROR ) 
-            CALL HLINDEX( 'ATRA            ', JATRA     , LERROR ) 
-            CALL HLINDEX( 'DATRA           ', JDATRA    , LERROR ) 
-            CALL HLINDEX( 'CL2             ', JCL2      , LERROR ) 
-            CALL HLINDEX( 'HCL             ', JHCL      , LERROR ) 
-            CALL HLINDEX( 'HOCL            ', JHOCL     , LERROR ) 
-            CALL HLINDEX( 'HBR             ', JHBR      , LERROR ) 
-            CALL HLINDEX( 'HI              ', JHI       , LERROR ) 
-            CALL HLINDEX( 'ACRYACID        ', JACRYACID , LERROR ) 
+            CALL HLINDEX( 'SO2             ', HLC_SO2      , LERROR )
+            CALL HLINDEX( 'HNO2            ', HLC_HNO2     , LERROR ) 
+            CALL HLINDEX( 'HNO3            ', HLC_HNO3     , LERROR ) 
+            CALL HLINDEX( 'CO2             ', HLC_CO2      , LERROR ) 
+            CALL HLINDEX( 'H2O2            ', HLC_H2O2     , LERROR ) 
+            CALL HLINDEX( 'FORMIC_ACID     ', HLC_HCOOH    , LERROR ) 
+            CALL HLINDEX( 'HO2             ', HLC_HO2      , LERROR ) 
+            CALL HLINDEX( 'NH3             ', HLC_NH3      , LERROR ) 
+            CALL HLINDEX( 'HYDRAZINE       ', HLC_HYDRAZINE, LERROR ) 
+            CALL HLINDEX( 'ATRA            ', HLC_ATRA     , LERROR ) 
+            CALL HLINDEX( 'DATRA           ', HLC_DATRA    , LERROR ) 
+            CALL HLINDEX( 'CL2             ', HLC_CL2      , LERROR ) 
+            CALL HLINDEX( 'HCL             ', HLC_HCL      , LERROR ) 
+            CALL HLINDEX( 'HOCL            ', HLC_HOCL     , LERROR ) 
+            CALL HLINDEX( 'HBR             ', HLC_HBR      , LERROR ) 
+            CALL HLINDEX( 'HI              ', HLC_HI       , LERROR ) 
+            CALL HLINDEX( 'ACRYACID        ', HLC_ACRYACID , LERROR ) 
 
 ! additional species needed in AQCHEM
-            CALL HLINDEX( 'O3              ', JO3        , LERROR ) 
-            CALL HLINDEX( 'METHYLHYDROPEROX', JMHYDPOX   , LERROR ) 
-            CALL HLINDEX( 'PEROXYACETIC_ACI', JPEROXYACET, LERROR ) 
-            CALL HLINDEX( 'GLYOXAL         ', JGLY       , LERROR ) 
-            CALL HLINDEX( 'METHYL_GLYOXAL  ', JMGLY      , LERROR ) 
-            CALL HLINDEX( 'OH              ', JOH        , LERROR ) 
+            CALL HLINDEX( 'O3              ', HLC_O3        , LERROR ) 
+            CALL HLINDEX( 'METHYLHYDROPEROX', HLC_MHYDPOX   , LERROR ) 
+            CALL HLINDEX( 'PEROXYACETIC_ACI', HLC_PEROXYACET, LERROR ) 
+            CALL HLINDEX( 'GLYOXAL         ', HLC_GLY       , LERROR ) 
+            CALL HLINDEX( 'METHYL_GLYOXAL  ', HLC_MGLY      , LERROR ) 
+            CALL HLINDEX( 'OH              ', HLC_OH        , LERROR ) 
 
 ! additional species needed in AEROSOL_CHEMISTRY
-            CALL HLINDEX( 'IEPOX           ', JIEPOX     , LERROR )
-            CALL HLINDEX( 'IMAE            ', JIMAE      , LERROR )
+            CALL HLINDEX( 'IEPOX           ', HLC_IEPOX     , LERROR )
+            CALL HLINDEX( 'IMAE            ', HLC_IMAE      , LERROR )
 
             IF ( LERROR ) THEN
                XMSG = ' Missing species required for computing Henry''s law constants'
@@ -598,96 +606,96 @@ C...assign a value for clminus.  use 2.0 mM based on Lin and Pehkonen, 1998, JGR
         CLMINUS   = 2.0E-03                ! chloride ion conc [CL-]
         CLMINUSI  = 1.0 / CLMINUS          ! 1 / CLMINUS
 
-        IF ( ISUB .EQ. JSO2 ) THEN         !   SO2H2O <=> HSO3- + H+
+        IF ( ISUB .EQ. HLC_SO2 ) THEN         !   SO2H2O <=> HSO3- + H+
                                            ! & HSO3- <=> SO3= + H+
 
           AKEQ1 = B( MSO2 )  * EXP( D( MSO2 )  * TFAC )
           AKEQ2 = B( MHSO3 ) * EXP( D( MHSO3 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI + AKEQ1 * AKEQ2 * HPLUS2I )
 
-        ELSE IF ( ISUB .EQ. JHNO2 ) THEN   ! HNO2(aq) <=> NO2- + H+
+        ELSE IF ( ISUB .EQ. HLC_HNO2 ) THEN   ! HNO2(aq) <=> NO2- + H+
 
           AKEQ1 = B( MHNO2 ) * EXP( D( MHNO2 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        ELSE IF ( ISUB .EQ. JHNO3 ) THEN   ! HNO3(aq) <=> NO3- + H+
+        ELSE IF ( ISUB .EQ. HLC_HNO3 ) THEN   ! HNO3(aq) <=> NO3- + H+
 
           AKEQ1 = B( MHNO3 ) * EXP( D( MHNO3 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        ELSE IF ( ISUB .EQ. JCO2 ) THEN     !   CO2H2O <=> HCO3- + H+
-                                            ! & HCO3- <=> CO3= + H+
+        ELSE IF ( ISUB .EQ. HLC_CO2 ) THEN    !   CO2H2O <=> HCO3- + H+
+                                              ! & HCO3- <=> CO3= + H+
 
           AKEQ1 = B( MCO2 )  * EXP( D( MCO2 )  * TFAC )
           AKEQ2 = B( MHCO3 ) * EXP( D( MHCO3 ) * TFAC )
           HLCONST = KH
      &            * ( 1.0 + AKEQ1 * HPLUSI + AKEQ1 * AKEQ2 * HPLUS2I )
 
-        ELSE IF ( ISUB .EQ. JH2O2 ) THEN    ! H2O2(aq) <=> HO2- + H+
+        ELSE IF ( ISUB .EQ. HLC_H2O2 ) THEN   ! H2O2(aq) <=> HO2- + H+
 
           AKEQ1 = B( MH2O2 ) * EXP( D( MH2O2 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        ELSE IF ( ISUB .EQ. JHCOOH ) THEN   ! HCOOH(aq) <=> HCOO- + H+
+        ELSE IF ( ISUB .EQ. HLC_HCOOH ) THEN  ! HCOOH(aq) <=> HCOO- + H+
 
           AKEQ1 = B( MHCOOH ) * EXP( D( MHCOOH ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        ELSE IF ( ISUB .EQ. JHO2 ) THEN     ! HO2(aq) <=> H+ + O2-
+        ELSE IF ( ISUB .EQ. HLC_HO2 ) THEN    ! HO2(aq) <=> H+ + O2-
 
           AKEQ1 = B( MHO2 ) * EXP( D( MHO2 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        ELSE IF ( ISUB .EQ. JNH3 ) THEN     ! NH4OH <=> NH4+ + OH-
+        ELSE IF ( ISUB .EQ. HLC_NH3 ) THEN    ! NH4OH <=> NH4+ + OH-
 
           AKEQ1 = B( MNH4OH ) * EXP( D( MNH4OH ) * TFAC )
           AKEQ2 = B( MH2O ) * EXP( D( MH2O ) * TFAC )
           OHION = AKEQ2 * HPLUSI
           HLCONST = KH * ( 1.0 + AKEQ1 / OHION )
 
-        ELSE IF ( ISUB. EQ. JHYDRAZINE ) THEN  ! HYDRAZINE <=> HYDRAZINE+ + OH-
+        ELSE IF ( ISUB. EQ. HLC_HYDRAZINE ) THEN ! HYDRAZINE <=> HYDRAZINE+ + OH-
 
           AKEQ1 = B( MHYDRAZINE ) * EXP( D( MHYDRAZINE ) * TFAC )
           AKEQ2 = B( MH2O ) * EXP( D( MH2O ) * TFAC )
           OHION = AKEQ2 * HPLUSI
           HLCONST = KH * ( 1.0 + AKEQ1 / OHION )
 
-        ELSE IF ( ISUB. EQ. JATRA .OR. ISUB .EQ. JDATRA ) THEN
-                                !     ATRA(aq)  <=>  ATRA- + H
-                                !  or DATRA(aq) <=> DATRA- + H
+        ELSE IF ( ISUB. EQ. HLC_ATRA .OR. 
+     &            ISUB .EQ. HLC_DATRA ) THEN  !     ATRA(aq)  <=>  ATRA- + H
+                                              !  or DATRA(aq) <=> DATRA- + H
 
           AKEQ1   = B( MATRA ) * EXP( D( MATRA ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        ELSE IF ( ISUB .EQ. JCL2 ) THEN        ! CL2*H2O <=> HOCL + H + CL
-                                               ! HOCL <=>H + OCL
+        ELSE IF ( ISUB .EQ. HLC_CL2 ) THEN    ! CL2*H2O <=> HOCL + H + CL
+                                              ! HOCL <=>H + OCL
 
           AKEQ1   = B( MCL2 )  * EXP( D( MCL2 ) * TFAC )
           AKEQ2   = B( MHOCL ) * EXP( D( MHOCL ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI * CLMINUSI
      &            + AKEQ1 * AKEQ2 * HPLUS2I * CLMINUSI )
 
-        ELSE IF ( ISUB .EQ. JHCL ) THEN       ! HCL <=> H+ + CL-
+        ELSE IF ( ISUB .EQ. HLC_HCL ) THEN    ! HCL <=> H+ + CL-
 
           AKEQ1   = B( MHCL ) * EXP( D( MHCL ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        ELSE IF ( ISUB .EQ. JHOCL ) THEN      ! HOCL <=> H+ + OCL-
+        ELSE IF ( ISUB .EQ. HLC_HOCL ) THEN   ! HOCL <=> H+ + OCL-
 
           AKEQ1   = B( MHOCL ) * EXP( D( MHOCL ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        ELSE IF ( ISUB .EQ. JHBR ) THEN       ! HBR <=> H+ + BR-
+        ELSE IF ( ISUB .EQ. HLC_HBR ) THEN    ! HBR <=> H+ + BR-
 
           AKEQ1   = B( MHBR ) * EXP( D( MHBR ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        ELSE IF ( ISUB .EQ. JHI ) THEN        ! HI <=> H+ + I-
+        ELSE IF ( ISUB .EQ. HLC_HI ) THEN     ! HI <=> H+ + I-
 
           AKEQ1   = B( MHI ) * EXP( D( MHI ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        ELSE IF ( ISUB .EQ. JACRYACID ) THEN   ! CH3C(O)OH <=> H + CH3C(O)O 
+        ELSE IF ( ISUB .EQ. HLC_ACRYACID ) THEN ! CH3C(O)OH <=> H + CH3C(O)O 
 
           AKEQ1   = B( MACRYACID ) * EXP( D( MACRYACID ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
