@@ -784,6 +784,8 @@ C ***  Determine molecular weights
        CFACTOR_HO2 = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTHO2 * DPI ) )
 
 C ***  Map to acids/nucleophiles for epoxide uptake
+       CALL LOG_SUBHEADING( LOGDEV, 'Map Acid-Nuc Pairs for Heterogeneous Chemistry')
+
        INDX =  INDEX1( NAMES_AERO_RATES( IA_IEPOX ), NHETERO, HETERO )   
        IF ( INDX .GT. 0 ) THEN ! Find indices for acid catalyzed species in IEPOX reaction
           If ( ( INDEX( MECHNAME, 'AE6I' ) .GT. 0 ) .OR.
