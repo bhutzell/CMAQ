@@ -276,7 +276,8 @@ C-----------------------------------------------------------------------
 
       Use rxns_data, only: mechname
       Use aero_data, only: AE_eflag, findAero, aerospc_mw, n_aerospc, aerospc
-      Use aeromet_data, only: airdens, inv_mwair, min_gasconc
+      Use aeromet_data, only: airdens, min_gasconc
+      Use const, only: inv_mwair
       Use cgrid_spcs, only: n_gc_spc, gc_spc, n_gc_g2ae, gc_g2ae, gc_strt, gc_molwt, gc_g2ae_map, 
      &                      n_nr_spc, nr_spc, n_nr_n2ae, nr_n2ae, nr_strt, nr_molwt, nr_n2ae_map,
      &                      n_ae_spc, ae_spc
@@ -426,7 +427,8 @@ C-----------------------------------------------------------------------
 
          ! Find indices of required species based on mechname
          If( index( mechname,'CRACMM1_AQ' ) .eq. 0 
-     &          .and. index( mechname,'CRACMM2') .eq. 0 
+     &          .and. index( mechname,'CRACMM2') .eq. 0
+     &          .and. index( mechname,'CRACMM3') .eq. 0
      &          .and. index( mechname,'CRACMM1AMORE_AQ') .eq. 0 ) then
              iso1_idx   = findVapor( req_sviso1, .True. )
              iso2_idx   = findVapor( req_sviso2, .True. )
@@ -525,7 +527,8 @@ C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
 C-----------------------------------------------------------------------
 
       Use aero_data, only : cond_budget, npf_budget
-      Use aeromet_data, only: airdens, inv_mwair, min_gasconc
+      Use aeromet_data, only: airdens, min_gasconc
+      Use const, only: inv_mwair
       Use utilio_defn, only: xstat3, m3exit
 
       Implicit None
@@ -915,6 +918,7 @@ C Key Subroutines/Functions called:  newt, soabisection
 
       Use aero_data
       Use aeromet_data
+      Use const
       Use utilio_defn
 
       Implicit None
@@ -2478,11 +2482,10 @@ C   aw  = RH * exp( ---------------)
 C                     R*T*dens*D
 C
 C The diameter is the wet, volume equivalent, diameter of the particle.
+      USE CONST, ONLY : rgasuniv
 
       Implicit None
                                        
-      Include SUBST_CONST    ! common constants
-
 C     Function arguments
       Real rh      ! RH between 0.005, 0.99 [fraction]
       Real temp    ! temperature [K]

@@ -17,13 +17,10 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/driver/wrf/wr_aconc.F,v 1.6 2011/10/21 16:10:43 yoj Exp $
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE WR_AVG_SA ( JDATE, JTIME, TSTEP )
 
-C20140428  Writes hourly averaged ISAM conc to SA_ACONC_1
+C Writes hourly averaged ISAM conc to SA_ACONC_1
 C
 C          Called by driver.F
 C
@@ -34,12 +31,9 @@ C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE UTILIO_DEFN
-c     USE SA_LAYERS             ! 20140428 for AISAM_BLEV, AISAM_ELEV, SA_NLAYS
       USE SA_DEFN
       USE RUNTIME_VARS
-
-!     USE SUBST_MODULES         ! stenex
-!     USE SUBST_UTIL_MODULE     ! stenex
+      USE MIO_ASCII
 
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -69,10 +63,8 @@ C Local variables:
       CHARACTER( 80 ) :: VARDESC = ' '
       CHARACTER( 96 ) :: XMSG = ' '
 
-c     INTEGER, SAVE :: LOGDEV       ! FORTRAN unit number for log file
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL OK
-c     LOGICAL, SAVE :: END_TIME = .FALSE.
 
       INTEGER      L, K, KD, VAR, SPC ! loop counters
       INTEGER      STATUS
@@ -88,40 +80,15 @@ c     LOGICAL, SAVE :: END_TIME = .FALSE.
       REAL VGTOP_RF
 C-----------------------------------------------------------------------
 
-C Change output date/time to starting date/time - e.g. timestamp 1995196:090000
-C represents data computed from time 1995196:090000 to 1995196:100000
-
       IF ( FIRSTIME ) THEN
-         LOGDEV = INIT3 ()
 
-C Override default beginning time timestamp for ACONC?
-c        VARDESC = 
-c    &     'Flag to Override default beginning time timestamp for ACONC'
-c        END_TIME = ENVYN( ACONC_END_TIME, VARDESC, END_TIME, STATUS )
-c        IF ( STATUS .EQ. 1 ) THEN
-c           XMSG = 'Environment variable improperly formatted'
-c           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-c        ELSE IF ( STATUS .NE. 0 ) THEN
-c           WRITE( LOGDEV, '(5X, A)' ) VARDESC
-c           XMSG = '... Using default:'
-c           WRITE( LOGDEV, '(5X, A, I9)' ) XMSG, JTIME
-c        END IF
-
-      END IF
-
-      IF ( END_TIME ) THEN   ! ending time timestamp
-         MDATE = JDATE; MTIME = JTIME
-      ELSE                   ! beginning time timestamp
-         MDATE = JDATE; MTIME = JTIME
-         CALL NEXTIME ( MDATE, MTIME, -TSTEP )
-      END IF
-
-      IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
+         MDATE = JDATE; MTIME = JTIME
+         IF ( END_TIME ) THEN 
+            CALL NEXTIME ( MDATE, MTIME, TSTEP )
+         END IF
 
 C Try to open existing file for update
-
-c        CALL SUBST_BARRIER
 
          IF ( AISAM_ELEV .EQ. -1 ) AISAM_ELEV = NLAYS
 
@@ -151,7 +118,6 @@ C Set file header attributes that differ from CONC and open the file
                SDATE3D = MDATE
                STIME3D = MTIME
                TSTEP3D = TSTEP
-!0711          NVARS3D = N_SPCTAG
                NLAYS3D = A_NLYS
 
                L = 0
@@ -159,8 +125,6 @@ C Set file header attributes that differ from CONC and open the file
                   L = L + 1
                   VGLVS3D( L ) = VGLVS_GD( K )
                END DO
-!0711          VGLVS3D( A_NLYS + 1 ) = VGLVS_GD( NLAYS + 1 )
-!              GDNAM3D = GDNAME_GD
                GDNAM3D = GRID_NAME  ! from HGRD_DEFN
 
                FDESC3D( 1 ) = 'Src Apportionment file output '
@@ -191,7 +155,21 @@ C Set file header attributes that differ from CONC and open the file
      &            TRIM( FDESC3D( K ) )
                END DO
 
+               ! Store MIO Metadata
+               NDIMS3D( 1:NVARS3D ) = 4
+               L_TSTEP( 1:NVARS3D ) = .True.
+               L_LAY  ( 1:NVARS3D ) = .True.
+               L_COL  ( 1:NVARS3D ) = .True.
+               L_ROW  ( 1:NVARS3D ) = .True.
+               L_VEXT ( 1:NVARS3D ) = .False.
+              
+               CALL LOAD_MIO_FILE ( 'SA_ACONC_1', A_NLYS, AISAM_BLEV, AISAM_ELEV,
+     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &              L_VEXT(1:NVARS3D) )
 
+ 
                IF ( .NOT. OPEN3( SA_ACONC_1, FSNEW3, PNAME ) ) THEN
                   XMSG = 'Could not open '
      &                 // TRIM( SA_ACONC_1 ) // ' file'
@@ -298,10 +276,14 @@ C Check other header data with CONC file as reference
 
          END IF   ! .NOT. OPEN SA_ACONC_1
 
-c        CALL SUBST_BARRIER
+         RETURN    ! Initialization of MIO File
 
       END IF   ! FIRSTIME
     
+      MDATE = JDATE; MTIME = JTIME
+      IF ( .NOT. END_TIME ) THEN
+         CALL NEXTIME( MDATE, MTIME, -TSTEP)
+      END IF
       IF ( .NOT. ALLOCATED( BUF4 ) ) ALLOCATE( BUF4( NCOLS, NROWS, A_NLYS, N_SPCTAG ) )
 
     

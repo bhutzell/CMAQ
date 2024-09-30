@@ -449,19 +449,13 @@ C-----------------------------------------------------------------------
       Use cgrid_spcs            ! CGRID mechanism species
       Use aero_data
       Use utilio_defn
-
+      Use const, only : mwair
       Implicit None
-
-C..Includes:
-      Include SUBST_CONST               ! constants
-
-C..Functions:
 
 C..Arguments:
       Real, Intent( Out ) :: aeconcmin( : ) ! array of minimum concentrations
 
 C..Local Variables:
-      !Character( 16 ) :: pname = 'SET_AECONCMIN'   ! program name
 
       Integer m        ! mode loop counter
       Integer n        ! aerospc loop counter

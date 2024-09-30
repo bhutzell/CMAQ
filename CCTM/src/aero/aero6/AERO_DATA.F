@@ -864,7 +864,7 @@ C-----------------------------------------------------------------------
 
       Use rxns_data       ! chemical mechanism data
       Use cgrid_spcs      ! CGRID mechanism species
-      Use aeromet_data
+      Use const
       Use vdiff_data, only : n_spc_diff, diff_spc
       Implicit None
 
@@ -1211,6 +1211,7 @@ C AORGH2O is not required, but highly recommended for aero7
          If ( ( ae6isoa ) .OR.
      &        ( Index( mechname, 'CRACMM1_'        ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM2'         ) .Gt. 0 ) .OR.
+     &        ( Index( mechname, 'CRACMM3'         ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM1AMORE_'   ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R3_AE7'       ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R5_AE7'       ) .Gt. 0 ) .OR.
@@ -1309,7 +1310,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only : pi, f6pi  ! fundamental constants, data type definitions, etc.
+      Use const, only : pi, f6pi  
 
       Implicit None
 
@@ -1438,7 +1439,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only : pi     ! fundamental constants, data type definitions, etc.
+      Use const, only : pi     
 
       Implicit None
 
@@ -1595,7 +1596,7 @@ C 4/2016: HOT Pye Created routine
 C
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only: f6dpi, f6pi
+      Use const, only: f6dpi, f6pi
 
       Implicit None
 
@@ -1727,7 +1728,7 @@ C
 C 11 May 16  B.Murphy  Program Written
 C
 C-----------------------------------------------------------------------
-      Use AEROMET_DATA, only : pi, f6pi
+      Use CONST, only : pi, f6pi
       Use CGRID_SPCS, only : N_AE_TRNS, N_AE_SPC
       Use HGRD_DEFN, ONLY : NROWS, NCOLS
 

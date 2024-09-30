@@ -164,12 +164,12 @@ C-----------------------------------------------------------------------
 #ifdef mpas
       use util_module, only : nextime, time2sec, sec2time, secsdiff, currstep
 #endif
+      USE CONST
 
       IMPLICIT NONE
 
 C...........INCLUDES
 
-      INCLUDE SUBST_CONST               ! constants
       INCLUDE SUBST_FILES_ID            ! file name parameters
 
 C...........Arguments

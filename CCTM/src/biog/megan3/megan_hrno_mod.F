@@ -39,7 +39,7 @@ C Please see documentation for more information.
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE HGRD_DEFN             ! horizontal domain specifications
-      USE BIOG_EMIS, ONLY: NSEF ! beis
+      USE BEIS_DEFN, ONLY: NSEF ! beis
       USE ASX_DATA_MOD
       USE UTILIO_DEFN
 #ifndef mpas

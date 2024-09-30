@@ -158,6 +158,7 @@ C-----------------------------------------------------------------------
       USE AQ_DATA         ! doesn't inherit; gets only n_aerospc, conmin from AERO_DATA
       USE AERO_DATA
       USE UTILIO_DEFN
+      USE CONST
 #ifdef isam
       USE SA_DEFN, ONLY: DEPSUM_SAVE, DS4_SAVE, REMOV_SAVE,
      &                   DEPSUM_AORGC_SAVE, DGLY1_SAVE, DMGLY1_SAVE,
@@ -171,8 +172,6 @@ C-----------------------------------------------------------------------
 #endif
 
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST          ! constants
 
       CHARACTER( 120 ) :: XMSG = ' '  ! Exit status message
 
