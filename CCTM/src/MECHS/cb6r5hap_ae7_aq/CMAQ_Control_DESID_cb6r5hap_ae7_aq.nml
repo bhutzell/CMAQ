@@ -87,6 +87,10 @@
    'EVERYWHERE', 'ALL'         ,'HGNRVA' ,'HG'          ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'HGIIGAS','HGIIGAS'     ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'SULF'        ,'GAS'  ,0.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'GLY'    ,'GLY'         ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'GLYD'   ,'GLYD'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a', 
+   
 
    ! Marine Halogen Chemistry
    'EVERYWHERE', 'ALL'         ,'DMS'    ,'DMS'         ,'GAS'  ,1.  ,'UNIT','a',
@@ -180,8 +184,8 @@
    'EVERYWHERE', 'ALL'     'DIESEL_PMNO3','ADE_NO3' ,'FINE'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'     'DIESEL_PMSO4','ADE_SO4' ,'FINE'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'       'DIESEL_PMC','ADE_CORS','COARSE',1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'        'CADMIUM_F','ACD'     ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'        'CADMIUM_C','ACD'     ,'COARSE',1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        'CADMIUM_F','ACADMIUM','FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        'CADMIUM_C','ACADMIUM','COARSE',1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'      'MANGANESE_F','AMN_HAPS','FINE'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'      'MANGANESE_C','AMN_HAPS','COARSE',1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'        'ARSENIC_F','AAS'     ,'FINE'  ,1.  ,'UNIT','a',
@@ -250,7 +254,7 @@
    'EVERYWHERE', 'ALL'    ,'PMFINE_BE'      ,'ABE'      ,'FINE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMFINE_PHG'     ,'APHG'     ,'FINE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMFINE_PB'      ,'APB'      ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_CD'      ,'ACD'      ,'FINE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMFINE_CD'      ,'ACADMIUM' ,'FINE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMFINE_MN_HAPS' ,'AMN_HAPS' ,'FINE',1.   ,'UNIT','a', 
 
 
@@ -269,7 +273,7 @@
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_BE'      ,'ABE'      ,'COARSE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_PHG'     ,'APHG'     ,'COARSE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_PB'      ,'APB'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CD'      ,'ACD'      ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CD'      ,'ACADMIUM' ,'COARSE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_MN_HAPS' ,'AMN_HAPS' ,'COARSE',1.   ,'UNIT','a', 
    
 /
