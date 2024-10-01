@@ -556,7 +556,6 @@ C.. Tracer for acrolein emissions
                BICAUSE(1:5,37)  = (/   'OH ',    'O3 ',    'NO3',     'CL ',     'O3P'/)
                BIRATE(1:5,37)   = (/ 2.0D-11, 2.37D-15, 1.18D-15, 2.94D-10, 2.37D-12/)
                BI_ACT(1:5,37)   = (/  0.00D0,  2.528D3,    0.0D0,    0.0D0,    0.0D0/)
-               BIRATE(1:4,37)   = (/ 8.0D-12, 2.90D-19, 3.40D-15, 2.37D-10/)
             ELSE  ! cracmm1 by default
                BICAUSE(1:4,37)  = (/    'HO ',     'O3 ',    'NO3',     'CL '/)
                BIRATE(1:4,37)   = (/ 8.0D-12, 2.90D-19, 3.40D-15, 2.23D-10/)
