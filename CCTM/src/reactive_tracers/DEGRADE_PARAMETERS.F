@@ -465,7 +465,7 @@ C.. BENZO[A]PYRENE, accumulation mode
            REACT(32)       = 'ABENAPYJ       '
            LHCAUSE(1,32) = 'O3 '
 !           LHRATE(1,32)  =  5.40D-02  ! average between 0% and 70%  Rel. Hum. Points in Owususa et al. (2004)
-!           LH_EQU(32)  =  2.00D-15  ! average between 0% and 70%  Rel. Hum. Points in Owususa et al. (2004)
+!           LH_EQU(32)  =  2.00D-15    ! average between 0% and 70%  Rel. Hum. Points in Owususa et al. (2004)
            LHRATE(1,32)  = 3.10D-02   ! average between 50% and 70% Rel. Hum. Points in Zhou et al. (2013) for organic shell around NH4SO4 core
            LH_EQU(1,32)  = 10.1D-15   ! average between 50% and 70% Rel. Hum. Points in Zhou et al. (2013) for organic shell around NH4SO4 core
            LH_TAMIN(1,32)  =  275.15 ! based on New-Shield BaP heteorogeneous oxidation treatment in Shrivastava et al. (2017)
@@ -504,10 +504,16 @@ C.. Tracer for formaldehyde emissions
                BI_ACT(1:3,35)  = (/ -1.35D2, 2.431D3,  3.0D1 /)  
                PHOTO_NAME(1:2,35 ) = (/"HCHOR_06","HCHOM_06" /)
                A_PHOTO(1:2,35)     = 1.0D0
+            ELSE IF( INDEX(MECHNAME,'RACM2') .GT. 0 )THEN
+               BICAUSE(1:3,35) = (/'OH ',      'NO3', 'CL '/)
+               BIRATE(1:3,35)  = (/ 5.5D-12, 2.0D-12, 8.10D-11 /) 
+               BI_ACT(1:3,35)  = (/ -1.25D2, 2.431D3,  3.0D1 /)  
+               PHOTO_NAME(1:2,35 ) = (/"HCHO_MOL_JPL19","HCHO_RAD_JPL19" /)
+               A_PHOTO(1:2,35)     = 1.0D0
             ELSE ! cracmm1 by default
                BICAUSE(1:3,35) = (/'HO ', 'NO3', 'CL '/)
-               BIRATE(1:3,35)  = (/  5.5D-12, 2.0D-12, 8.20D-11 /) 
-               BI_ACT(1:3,35)  = (/  -1.25D2,  2.44D3, 3.4D1 /)   
+               BIRATE(1:3,35)  = (/  5.5D-12, 2.0D-12, 8.10D-11 /) 
+               BI_ACT(1:3,35)  = (/  -1.25D2,  2.44D3, 3.0D1 /)   
                PHOTO_NAME(1:2,35 ) = (/"HCHO_MOL_JPL19","HCHO_RAD_JPL19" /)
                A_PHOTO(1:2,35)     = 1.0D0
             END IF
@@ -525,6 +531,12 @@ C.. Tracer for acetaldehyde emissions
               BIRATE(1:3,36)   = (/ 4.4D-12,     1.4D-12,   8.0D-11 /)
               BI_ACT(1:3,36)   = (/ -3.65D2,      1.86D3,     0.0D0 /)
               PHOTO_NAME(1:1,36 ) = (/"CCHO_R"/)
+              A_PHOTO(1:1,36)     = 1.0D0
+            ELSE IF( INDEX(MECHNAME,'RACM2') .GT. 0 )THEN 
+              BICAUSE(1:3,36)  = (/     'HO ',   'NO3',     'CL ' /)
+              BIRATE(1:3,36)   = (/   4.7D-12, 1.4D-12, 7.90D-11 /)
+              BI_ACT(1:3,36)   = (/   -3.45D2,   1.9D3,    0.0D0 /)
+              PHOTO_NAME(1:1,36 ) = (/"CH3CHO_RACM2"/)
               A_PHOTO(1:1,36)     = 1.0D0
             ELSE ! cracmm1 by default
               BICAUSE(1:3,36)  = (/     'HO ',   'NO3',     'CL ' /)
@@ -544,9 +556,10 @@ C.. Tracer for acrolein emissions
                BICAUSE(1:5,37)  = (/   'OH ',    'O3 ',    'NO3',     'CL ',     'O3P'/)
                BIRATE(1:5,37)   = (/ 2.0D-11, 2.37D-15, 1.18D-15, 2.94D-10, 2.37D-12/)
                BI_ACT(1:5,37)   = (/  0.00D0,  2.528D3,    0.0D0,    0.0D0,    0.0D0/)
+               BIRATE(1:4,37)   = (/ 8.0D-12, 2.90D-19, 3.40D-15, 2.37D-10/)
             ELSE  ! cracmm1 by default
                BICAUSE(1:4,37)  = (/    'HO ',     'O3 ',    'NO3',     'CL '/)
-               BIRATE(1:4,37)   = (/ 8.0D-12, 2.90D-19, 3.40D-15, 2.37D-10/)
+               BIRATE(1:4,37)   = (/ 8.0D-12, 2.90D-19, 3.40D-15, 2.23D-10/)
                BI_ACT(1:4,37)   = (/  -3.8D2,    0.0D0,    0.0D0,    0.0D0/)
             END IF
             PHOTO_NAME(1:1,37 ) = (/"ACRO_09"/)

@@ -541,12 +541,16 @@ C..Loop over each reactant
          LOOP_LIFE: DO I_CELL = 1, NCELLS
             IF ( NET_RATE( I_CELL ) * DT .LE. EFFECTIVE_ZERO .OR. CURR_CONC( I_CELL, I_RXT ) <=  CONMIN ) THEN
                TRANS( I_CELL ) = ZERO
+#ifdef verbose_deg
 !              IF( WRITE_CELL( I_CELL ) )LIFETIME( I ) = INFINITY
                LIFETIME( I ) = INFINITY
+#endif
             ELSE
                NET_LIFE( I_CELL ) = 1.0D0 / NET_RATE( I_CELL )
+#ifdef verbose_deg
 !              IF( WRITE_CELL( I_CELL ) )LIFETIME( I ) = NET_LIFE( I_CELL ) 
                LIFETIME( I ) = NET_LIFE( I_CELL ) 
+#endif
                TRANS( I_CELL ) = CURR_CONC( I_CELL, I_RXT )
      &                         * ( 1.0D0 - DEXP( - NET_RATE( I_CELL )*DT ) )
                DELT_CONC( I_CELL, I_RXT ) = - MAX( TRANS( I_CELL ), ZERO )
@@ -577,13 +581,14 @@ C..update previous concentrations
       ENDDO
 
 C..update current concentrations
-!     IF( WRITE_BLOCK )THEN
-!        DEGRADE_STEP = DEGRADE_STEP + 1
-!        WRITE(LOGDEV,'(/,A,I3)')'DEGRADE_STEP: ',DEGRADE_STEP
-!        WRITE(LOGDEV,'(/A18,7(1X,A18))')'S DEGRADED', 'FACTOR', 
-!    &   'PREV_CONC','CURR_CONC','LIFE (days)','DCONC','LOSS FREQ(1/min)'
-!     END IF
-
+#ifdef verbose_deg
+      IF( WRITE_BLOCK )THEN
+         DEGRADE_STEP = DEGRADE_STEP + 1
+         WRITE(LOGDEV,'(/,A,I3)')'DEGRADE_STEP: ',DEGRADE_STEP
+         WRITE(LOGDEV,'(/A18,7(1X,A18))')'S DEGRADED', 'FACTOR', 
+     &   'PREV_CONC','CURR_CONC','LIFE (days)','DCONC','LOSS FREQ(1/min)'
+      END IF
+#endif
       LOOP_UPDATE1: DO I = 1, N_REACT
       
          I_RXT = RXTANT_MAP( I )
@@ -593,12 +598,14 @@ C..update current concentrations
               CURR_CONC( I_CELL, I_RXT  ) = MAX( (PREV_CONC( I_CELL, I_RXT  ) + DELT_CONC( I_CELL, I_RXT )),
      &                                            CONMIN )
             END IF
-!           IF( WRITE_CELL( I_CELL ) )THEN
-!               FACTOR = 1.0D0 + MIN( -1.0D0,( DELT_CONC( I_CELL,I_RXT )/PREV_CONC( I_CELL,I_RXT ) )  )
-!               WRITE(LOGDEV,'(A2,A16,7(1X,ES18.10))')'S ',REACT( I ), FACTOR, 
-!    &          PREV_CONC( I_CELL,I_RXT ),CURR_CONC( I_CELL,I_RXT ),1.15741D-5*LIFETIME( I ),
-!    &          DELT_CONC( I_CELL,I_RXT ), 60.0D0 / LIFETIME(I)
-!           END IF
+#ifdef verbose_deg
+            IF( WRITE_CELL( I_CELL ) )THEN
+                FACTOR = 1.0D0 + MIN( -1.0D0,( DELT_CONC( I_CELL,I_RXT )/PREV_CONC( I_CELL,I_RXT ) )  )
+                WRITE(LOGDEV,'(A2,A16,7(1X,ES18.10))')'S ',REACT( I ), FACTOR, 
+     &          PREV_CONC( I_CELL,I_RXT ),CURR_CONC( I_CELL,I_RXT ),1.15741D-5*LIFETIME( I ),
+     &          DELT_CONC( I_CELL,I_RXT ), 60.0D0 / LIFETIME(I)
+            END IF
+#endif
          ENDDO
 
          IF( ANY_PRODUCTS( I ) )THEN
@@ -1043,13 +1050,15 @@ C..initialize concentrations and their changes
      &                                    * DEXP( -BI_ACT( J, I )*INV_TAIR )
 
          END DO LOOP_BIRATE
-!           WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL,CONC_AIR,
-!    &      PRESS
-!           WRITE(LOGDEV,*)'BIRATES for ',REACT(I)
-!           DO J = 1, N_BI_LOSS
-!              WRITE(LOGDEV,'(I5,2(1X,ES12.4))')J+UNI_STOP,
-!    &         CELL_RKI( J+UNI_STOP, I  )/FACTOR, FACTOR 
-!           END DO
+#ifdef verbose_deg
+         WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL,CONC_AIR,
+     &   PRESS
+         WRITE(LOGDEV,*)'BIRATES for ',REACT(I)
+         DO J = 1, N_BI_LOSS
+            WRITE(LOGDEV,'(I5,2(1X,ES12.4))')J+UNI_STOP,
+     &      CELL_RKI( J+UNI_STOP, I  )/FACTOR, FACTOR 
+         END DO
+#endif
 
 
          LOOP_TRIRATE: DO J = 1, N_TRI_LOSS
@@ -1315,10 +1324,8 @@ C..initialize concentrations and their changes
          INV_TEMP = 0.0D0
       END WHERE
 
-!     NUMB_DENS = MASS_TO_NUMBER * REAL( DCELL, 8 )
       NUMB_DENS = 1.0E6 * COEF1 * REAL( PRESS_CELL,8 ) * INV_TEMP
       NUMB_H2O  = 1.0D-6 * H2O_CELL * NUMB_DENS
-!     CONV_FACT = CONV_M2N * REAL( DCELL, 8 )
       CONV_FACT = 1.0D-6 * NUMB_DENS
       
       
@@ -1327,7 +1334,9 @@ C..initialize concentrations and their changes
 
          IF( RXTANT_MAP( I ) < 0 )CYCLE LOOP_REACT
 
-!        WRITE(LOGDEV,'(2A)')'DEGRADED SPECIES: ',TRIM( REACT(I) )
+#ifdef verbose_deg
+         WRITE(LOGDEV,'(2A)')'DEGRADED SPECIES: ',TRIM( REACT(I) )
+#endif
 
          LOOP_UNIRATE: DO J = 1, N_UNI_LOSS
             IF( UNIRATE( J, I ) .LT. EFFECTIVE_ZERO )CYCLE
@@ -1337,7 +1346,7 @@ C..initialize concentrations and their changes
      &                                   * DEXP( -UNI_ACT( J, I )*INV_TEMP( ICELL ) )
             END DO LOOP_CELL
          END DO LOOP_UNIRATE
-#ifdef verbose_gas
+#ifdef verbose_deg
          IF( WRITE_BLOCK )THEN
             WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
      &      PRESS(ICELL_WRITE)
@@ -1379,16 +1388,18 @@ C..initialize concentrations and their changes
                 END DO      
              END IF
          END DO LOOP_BIRATE
-!        IF( WRITE_BLOCK )THEN
-!           WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
-!    &      PRESS(ICELL_WRITE)
-!           WRITE(LOGDEV,*)'BIRATES for ',REACT(I)
-!           DO J = 1, N_BI_LOSS
-!              WRITE(LOGDEV,'(I5,2(1X,ES12.4))')J+UNI_STOP,
-!    &         RATE_CONST( ICELL_WRITE, J+UNI_STOP, I  )/( FACTOR * CONV_FACT( ICELL_WRITE ) ),
-!    &         FACTOR * CONV_FACT( ICELL_WRITE )
-!           END DO
-!        END IF
+#ifdef verbose_deg
+         IF( WRITE_BLOCK )THEN
+            WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
+     &      PRESS(ICELL_WRITE)
+            WRITE(LOGDEV,*)'BIRATES for ',REACT(I)
+            DO J = 1, N_BI_LOSS
+               WRITE(LOGDEV,'(I5,2(1X,ES12.4))')J+UNI_STOP,
+     &         RATE_CONST( ICELL_WRITE, J+UNI_STOP, I  )/( FACTOR * CONV_FACT( ICELL_WRITE ) ),
+     &         FACTOR * CONV_FACT( ICELL_WRITE )
+            END DO
+         END IF
+#endif
 
          LOOP_TRIRATE: DO J = 1, N_TRI_LOSS
             IF( TRIRATE( J, I ) .LT. EFFECTIVE_ZERO )CYCLE
@@ -1451,15 +1462,17 @@ C..initialize concentrations and their changes
                 END DO
              END IF
          END DO LOOP_TRIRATE
-!        IF( WRITE_BLOCK )THEN
-!           WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
-!    &      PRESS(ICELL_WRITE)
-!           WRITE(LOGDEV,*)'TRI_RATES for ',REACT(I)
-!           DO J = 1, N_TRI_LOSS
-!              WRITE(LOGDEV,'(I5,1X,ES12.4)')J+BI_STOP,RATE_CONST( ICELL_WRITE, J+BI_STOP, I  )
-!    &         /(FACTOR*CONV_FACT( ICELL_WRITE ))
-!           END DO
-!        END IF
+#ifdef verbose_deg
+         IF( WRITE_BLOCK )THEN
+            WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
+     &      PRESS(ICELL_WRITE)
+            WRITE(LOGDEV,*)'TRI_RATES for ',REACT(I)
+            DO J = 1, N_TRI_LOSS
+               WRITE(LOGDEV,'(I5,1X,ES12.4)')J+BI_STOP,RATE_CONST( ICELL_WRITE, J+BI_STOP, I  )
+     &         /(FACTOR*CONV_FACT( ICELL_WRITE ))
+            END DO
+         END IF
+#endif
 
          LOOP_PHOTORATE: DO J = 1, N_PHOTO_LOSS
 
@@ -1473,14 +1486,16 @@ C..initialize concentrations and their changes
             END DO
 
          END DO LOOP_PHOTORATE
-!        IF( WRITE_BLOCK )THEN
-!           WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
-!    &      PRESS(ICELL_WRITE)
-!           WRITE(LOGDEV,*)'PHOTO_RATES for ',REACT(I)
-!           DO J = 1, N_PHOTO_LOSS
-!              WRITE(LOGDEV,'(I5,1X,ES12.4)')J+TRI_STOP,RATE_CONST( ICELL_WRITE,J+TRI_STOP, I  )
-!           END DO
-!        END IF
+#ifdef verbose_deg
+         IF( WRITE_BLOCK )THEN
+            WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
+     &      PRESS(ICELL_WRITE)
+            WRITE(LOGDEV,*)'PHOTO_RATES for ',REACT(I)
+            DO J = 1, N_PHOTO_LOSS
+               WRITE(LOGDEV,'(I5,1X,ES12.4)')J+TRI_STOP,RATE_CONST( ICELL_WRITE,J+TRI_STOP, I  )
+            END DO
+         END IF
+#endif
 
 
 
@@ -1497,7 +1512,7 @@ C..initialize concentrations and their changes
      &                          MASK=IS_AERO_ORGANIC( : ) )
                 H2O_MOLAR_FRACTION( ICELL ) = ORG_H2O 
      &                                      / MAX( (ORG_H2O + ORG_AERO), EFFECTIVE_ZERO )
-#ifdef verbose_gas
+#ifdef verbose_deg
                 IF( ICELL .EQ. ICELL_WRITE )THEN
                   WRITE(LOGDEV,'(A,6(1X,ES12.4))')'ORG_H2O, ORG_H2O,H2O_MOLAR_FRACTION = ',  
      &            ORG_H2O, ORG_H2O,H2O_MOLAR_FRACTION(ICELL)                    
@@ -1544,15 +1559,17 @@ C..initialize concentrations and their changes
             END IF
 
          END DO LOOP_LHRATE
-!        IF( WRITE_BLOCK )THEN
-!           WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS,H2O = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
-!    &      PRESS(ICELL_WRITE),NUMB_H2O(ICELL_WRITE)
-!           WRITE(LOGDEV,'(2A)')'LH_RATES for ',REACT(I)
-!           DO J = 1, N_LANHIN_LOSS
-!              WRITE(LOGDEV,'(A,1X,I3,6(1X,ES12.4))')'LH_RCONST:', J+PHOTO_STOP,RATE_CONST( ICELL_WRITE, J+PHOTO_STOP, I  )
-!    &         / (FACTOR * CONV_FACT( ICELL_WRITE  ))
-!           END DO
-!        END IF
+#ifdef verbose_deg
+         IF( WRITE_BLOCK )THEN
+            WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS,H2O = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
+     &      PRESS(ICELL_WRITE),NUMB_H2O(ICELL_WRITE)
+            WRITE(LOGDEV,'(2A)')'LH_RATES for ',REACT(I)
+            DO J = 1, N_LANHIN_LOSS
+               WRITE(LOGDEV,'(A,1X,I3,6(1X,ES12.4))')'LH_RCONST:', J+PHOTO_STOP,RATE_CONST( ICELL_WRITE, J+PHOTO_STOP, I  )
+     &         / (FACTOR * CONV_FACT( ICELL_WRITE  ))
+            END DO
+         END IF
+#endif
 
       END DO LOOP_REACT
 

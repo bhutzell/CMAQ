@@ -304,7 +304,7 @@ C..Set up indices that point to concentrations in CGRID.
                         N = INDEX1( WNAME, N_NR_SPC, NR_SPC )
                         MARKER = NR_STRT
                         IF ( N == 0 ) THEN
-#ifdef verbose_gas
+#ifdef verbose_deg
                            WRITE( LOGDEV,'(a)' ) TRIM( WNAME ), ' is not '
      &                          // 'in gas or nonreactive species table.'
      &                          // 'its loss processes not calculated '
