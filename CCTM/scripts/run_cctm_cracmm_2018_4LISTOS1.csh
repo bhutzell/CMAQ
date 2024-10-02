@@ -185,7 +185,7 @@ setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affec
 
 setenv BC_AERO_M2WET F       #> Specify whether or not boundary condition aerosol size distribution 
                              #>    is wet or dry [ default: F = dry ]
-setenv BC_AERO_M2USE T       #> Specify whether or not to use aerosol surface area from boundary 
+setenv BC_AERO_M2USE F       #> Specify whether or not to use aerosol surface area from boundary 
                              #>    conditions [ default: T = use aerosol surface area  ]
                              
 #> Surface Tiled Aerosol and Gaseous Exchange Options
