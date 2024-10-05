@@ -8,6 +8,7 @@
         use mio_get_env_module
         use mio_process_header_info_module
         use mio_file_template_module
+        use mio_fopen_module
 
         implicit none
 
@@ -51,23 +52,6 @@
 #ifdef parallel
           include 'mpif.h'
 #endif
-
-          interface
-            subroutine mio_setup_decomp (nprocs, npcol, nprow, ncols, nrows, &
-                                         op_type, ncols_pe, nrows_pe,        &
-                                         colde_pe, rowde_pe)
-              integer, intent(in)  :: nprocs
-              integer, intent(in)  :: npcol
-              integer, intent(in)  :: nprow
-              integer, intent(in)  :: ncols
-              integer, intent(in)  :: nrows
-              integer, intent(in)  :: op_type
-              integer, intent(out) :: ncols_pe(:,:)
-              integer, intent(out) :: nrows_pe(:,:)
-              integer, intent(out) :: colde_pe(:,:,:)
-              integer, intent(out) :: rowde_pe(:,:,:)
-            end subroutine mio_setup_decomp
-          end interface
 
           entire_file  = .false.
           partial_file = .false.
@@ -156,7 +140,8 @@
 
              mio_file_data(dest)%filename = mio_outfile_def_info%flist(fnum)%fname
 
-             mio_file_data(dest)%mode = mio_new
+!            mio_file_data(dest)%mode = mio_new_file
+             mio_file_data(dest)%mode = mode
 
              call mio_get_env (mio_file_data(dest)%full_filename, mio_file_data(dest)%filename , ' ')
 
@@ -166,7 +151,7 @@
              call mio_set_barrier
 
              if (found) then
-                if (mio_file_data(dest)%mode .eq. mio_new) then
+                if (mio_file_data(dest)%mode .eq. mio_new_file) then
                    print *, ' Abort in routine mio_fcreate due to output file ', trim(fname), ' is already exist '
                    stop
                 end if
@@ -175,7 +160,7 @@
              if ((mio_parallelism .eq. mio_serial) .or.     &
                  (mio_parallelism .eq. mio_pseudo)) then
 
-                if (mio_file_data(dest)%mode .eq. mio_new) then
+                if (mio_file_data(dest)%mode .eq. mio_new_file) then
                    if (mio_mype .eq. 0) then
 
                       stat = nf90_create (mio_file_data(dest)%full_filename, mode, mio_file_data(dest)%fileid)
@@ -190,7 +175,7 @@
                 end if
              end if
 
-             if (mio_file_data(dest)%mode .eq. mio_new) then
+             if (mio_file_data(dest)%mode .eq. mio_new_file) then
 
                 nvars = mio_outfile_def_info%flist(fnum)%nvars
 
@@ -285,9 +270,9 @@
 
 ! setup variable information
                 if (entire_file) then
-                   call mio_duplicate_file (source, dest)
+                   call mio_duplicate_file (mio_file_data(source), mio_file_data(dest))
                 else if (partial_file) then
-                   call mio_duplicate_partial_file (source, dest, nvars)
+                   call mio_duplicate_partial_file (mio_file_data(source), mio_file_data(dest), nvars)
                 else   ! variable information is from file_input.txt
                    count = mio_file_data(source)%nbvars
                    nlines = 0
@@ -556,14 +541,10 @@
 
                 end if
 
-                call mio_setup_decomp (mio_nprocs, mio_npcol, mio_nprow,   &
-                                       mio_file_data(dest)%gl_ncols,       &
-                                       mio_file_data(dest)%gl_nrows,       &
-                                       mio_file_data(dest)%file_format,    &
-                                       mio_file_data(dest)%ncols_pe,       &
-                                       mio_file_data(dest)%nrows_pe,       &
-                                       mio_file_data(dest)%colde_pe,       &
-                                       mio_file_data(dest)%rowde_pe)
+                mio_file_data(dest)%ncols_pe = mio_domain_ncols_pe
+                mio_file_data(dest)%nrows_pe = mio_domain_nrows_pe
+                mio_file_data(dest)%colde_pe = mio_domain_colde_pe
+                mio_file_data(dest)%rowde_pe = mio_domain_rowde_pe
 
                 if (mio_file_data(source)%file_format == mio_mpas_format) then
                    mio_file_data(dest)%ncols    = mio_file_data(dest)%gl_ncols

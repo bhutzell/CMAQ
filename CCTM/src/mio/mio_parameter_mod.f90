@@ -17,7 +17,7 @@
 ! I/O mode
         integer, parameter :: mio_read_only  = 1
         integer, parameter :: mio_read_write = 2
-        integer, parameter :: mio_new        = 3
+        integer, parameter :: mio_new_file   = 3
 
 ! netCDF file format
         integer, parameter :: mio_ioapi3_format = 1
@@ -29,6 +29,9 @@
         integer, parameter :: mio_serial        = 1
         integer, parameter :: mio_pseudo        = 2
         integer, parameter :: mio_true_parallel = 3
+
+! extra storage space for mio_data_file array
+        integer, parameter :: mio_df_add_space = 5
 
 ! character string parameter
         integer, parameter :: mio_max_global_att_extra   = 100

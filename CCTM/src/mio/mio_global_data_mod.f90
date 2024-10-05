@@ -19,8 +19,8 @@
 
         integer :: mio_parallelism      ! indicator for I/O parallelism implementation
 
-        integer :: mio_base_ncols   
-        integer :: mio_base_nrows       ! # of columns and rows in base domain
+        integer :: mio_domain_ncols   
+        integer :: mio_domain_nrows     ! # of columns and rows in simulation domain
 
         integer :: mio_nprocs           ! total # allocated processors
         integer :: mio_npcol            ! # allocated processor along column dimension
@@ -29,10 +29,31 @@
 ! mio_file_data will be allocated based on pre-defined number of
 ! input and output files. It also assumes that once a file is opened, it
 ! won't be closed until the very end.
-        type(mio_file_record), allocatable :: mio_file_data(:)
+        type(mio_file_record), target, allocatable :: mio_file_data0(:)
+        type(mio_file_record), target, allocatable :: mio_file_data1(:)
+
+        type(mio_file_record), pointer :: mio_file_data(:)    !  file_data (fd)
+!       type(mio_file_record), allocatable :: mio_file_data(:)    !  file_data (fd)
+
+        integer :: mio_fd_circular = 0  ! indicates which mio_file_data* (fd) storage to use
+                                        !   0 -- infor_record0
+                                        !   1 -- infor_record1
 
 ! to store output file variable information defined in mio_file_input
         type(mio_outfile_def_record) :: mio_outfile_def_info
+
+! for cmaq
+        real*8 :: mio_domain_alp, mio_domain_bet, mio_domain_gam,  &
+                  mio_domain_xcent, mio_domain_ycent,              &
+                  mio_domain_xorig, mio_domain_yorig,              &
+                  mio_domain_xcell, mio_domain_ycell
+
+        integer :: mio_domain_gdtyp, mio_domain_nthik
+
+        integer, allocatable :: mio_domain_ncols_pe(:,:)     ! # of columns for cross or dot type
+        integer, allocatable :: mio_domain_nrows_pe(:,:)     ! # of rows    for cross or dot type
+        integer, allocatable :: mio_domain_colde_pe(:,:,:)   ! start and end column for cross or dot type
+        integer, allocatable :: mio_domain_rowde_pe(:,:,:)   ! start and end row    for cross or dot type
 
 ! for mpas
         character (len = 1000) :: mio_mpas_dmap_file
@@ -42,6 +63,7 @@
 ! Once mio_setfile is called the following 8 variables w.r.t. the file are available 
         integer :: mio_gl_ncols, mio_gl_nrows   ! # of columns and rows in global domain
         integer :: mio_ncols, mio_nrows         ! # of columns and rows in each processor
+
         integer :: mio_nbase_vars               ! # of base variables, which includes
                                                 ! time variable and variable in MPAS that 
                                                 ! defines a mesh

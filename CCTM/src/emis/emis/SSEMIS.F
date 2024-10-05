@@ -993,7 +993,7 @@ C Then reset the sea-salt emissions array and local write counter.
                if ( firstwrite ) then
                   firstwrite = .false.
                   call mio_setfile( MET_CRO_2D )
-                  call mio_fcreate( 'CTM_SSEMIS_MIO', io_mode )
+                  call mio_fcreate( 'CTM_SSEMIS_MIO', mio_new_file )
                end if
 
                WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )

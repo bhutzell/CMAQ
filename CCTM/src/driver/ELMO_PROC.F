@@ -3524,7 +3524,7 @@ C *** Write data to the scalar output file.
                INST_SUBSET_LAY = ( NLAY_ELMO_INST .NE. mio_nlays ) 
                if ( INST_SUBSET_LAY ) mio_nlays = NLAY_ELMO_INST
 
-               call mio_fcreate( 'CTM_ELMO_MIO', io_mode )
+               call mio_fcreate( 'CTM_ELMO_MIO', mio_new_file )
 
                if ( INST_SUBSET_LAY ) then
                   if (mype == 0) then
@@ -3578,7 +3578,7 @@ C *** Write data to the average aerosol diagnostic file.
                AVRG_SUBSET_LAY = ( NLAY_ELMO_AVRG .NE. mio_nlays ) 
                if ( AVRG_SUBSET_LAY ) mio_nlays = NLAY_ELMO_AVRG
   
-               call mio_fcreate( 'CTM_AELMO_MIO', io_mode )
+               call mio_fcreate( 'CTM_AELMO_MIO', mio_new_file )
 
                if ( AVRG_SUBSET_LAY ) then
                   if (mype == 0) then

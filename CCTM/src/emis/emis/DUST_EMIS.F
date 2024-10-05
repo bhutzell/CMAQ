@@ -1206,7 +1206,7 @@ C Then reset the emissions array and local write counter.
 #endif
                if ( firstwrite ) then
                   call mio_setfile( MET_CRO_2D )
-                  call mio_fcreate( 'CTM_DUST_MIO', io_mode )
+                  call mio_fcreate( 'CTM_DUST_MIO', mio_new_file )
                   firstwrite = .false.
                end if
 

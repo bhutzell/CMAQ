@@ -162,25 +162,14 @@
                       else if (mio_parallelism .eq. mio_pseudo) then
                          allocate (mio_mpas_input_1d_data(mycount(1)), stat=stat)
 
-!       write (mio_logdev, '(a18, a16, 2x, a16, 6i5, i10, 10i5)') ' ==d== stk mio 1d ', trim(fname), trim(vname)
-!       write (mio_logdev, '(a18, 5i5, i10, 10i5)') ' ==d== stk mio 1d ', mystart, mycount
                          if (.not. mio_get_data (mio_file_data(floc)%fileid,                   &
                                                  mio_file_data(floc)%var_id(v),                &
                                                  mystart, mycount, mio_mpas_input_1d_data) ) then
                             lerror = .true.
                          else
-!       write (mio_logdev, '(a20, 5i8, 2e15.8)') ' ==d== stk mio 1d a ', mio_mype, mio_mpas_dmap(0, mio_mype), &
-!        size(mio_mpas_input_1d_data), &
-!        minval(mio_mpas_dmap(1:mio_mpas_dmap(0, mio_mype), mio_mype)), &
-!        maxval(mio_mpas_dmap(1:mio_mpas_dmap(0, mio_mype), mio_mype)), &
-!        minval(mio_mpas_input_1d_data), maxval(mio_mpas_input_1d_data) 
                             do i = 1, mio_mpas_dmap(0, mio_mype)
                                data(i) = mio_mpas_input_1d_data(mio_mpas_dmap(i, mio_mype))
                             end do
-!       write (mio_logdev, '(a20, 8e15.8)') ' ==d== stk mio 1d b ', &
-!         minval(data(1:mio_mpas_dmap(0, mio_mype))), &
-!         maxval(data(1:mio_mpas_dmap(0, mio_mype))), &
-!         sum(data(1:mio_mpas_dmap(0, mio_mype)))
                          end if
                          deallocate (mio_mpas_input_1d_data)
                       end if
@@ -215,7 +204,6 @@
                                               mystart, mycount, data) ) then
                          lerror = .true.
                       end if
-!       write (mio_logdev, '(a20, 20e15.8)') ' ==d== stk mio 1d h ', minval(data), maxval(data), sum(data)
                    end if
                 end if
              end if
@@ -240,7 +228,7 @@
           character (*), intent(in), optional :: timestamp
 
           character (17), parameter :: pname = 'mio_fread_2d_real'
-          integer :: i, t, v, mystart(5), mycount(5), floc, stat
+          integer :: i, t, v, mystart(5), mycount(5), floc, stat, pos
           logical :: lerror = .false.
           real, allocatable :: mio_mpas_input_2d_data (:,:)
 
@@ -306,16 +294,15 @@
                          mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
                       else if (mio_parallelism .eq. mio_pseudo) then
                          if (mio_file_data(floc)%grid_type .eq. 'c') then
-                            mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, 1)
-                            mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, 1)
-                            mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, 1)
-                            mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, 1)
+                            pos = 1
                          else if (mio_file_data(floc)%grid_type .eq. 'd') then
-                            mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, 2)
-                            mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, 2)
-                            mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, 2)
-                            mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, 2)
+                            pos = 2
                          end if
+
+                         mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, pos)
+                         mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, pos)
+                         mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, pos)
+                         mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, pos)
                       end if
 
                       if (.not. mio_get_data (mio_file_data(floc)%fileid,      &
@@ -380,13 +367,10 @@
                    lerror = .true.
                 else
 
-! write (6, *) ' ==d== fread 3d e '
                    mystart = 1
                    mycount = 1
                    mystart(4) = t
 
-!   write (6, '(a18, i3, a16, i6, a16, i6, 3i5, 2a2)') ' ==d== fread 3d m ', v, trim(fname), mio_file_data(floc)%fileid, &
-!    trim(vname), mio_file_data(floc)%var_id(v), mio_parallelism, mio_serial, mio_pseudo, mio_file_data(floc)%grid_type, '=='
                    if (mio_parallelism .eq. mio_serial) then
                       mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
                    else if (mio_parallelism .eq. mio_pseudo) then
@@ -405,19 +389,11 @@
 
                    mycount(3) = mio_file_data(floc)%var_dimsize(3,v)
 
-!   write (6, '(a18, 10i5)') ' ==d== fread 3d r ', size(data,1), size(data,2), size(data,3)
-
                    if (.not. mio_get_data (mio_file_data(floc)%fileid,      &
                                            mio_file_data(floc)%var_id(v),   &
                                            mystart, mycount, data) ) then
                       lerror = .true.
                    end if
-! if (size(data,3) == 1) then
-!   write (6, '(a18, 10e15.8)') ' ==d== fread 3d t ', minval(data(:,:,1)), maxval(data(:,:,1))
-! else
-!   write (6, '(a18, 10e15.8)') ' ==d== fread 3d u ', minval(data(:,:,1)), maxval(data(:,:,1)), &
-! minval(data(:,:,3)), maxval(data(:,:,3)), minval(data(:,:,5)), maxval(data(:,:,5))
-! end if
                 end if
              end if
           end if
@@ -493,17 +469,17 @@
                    if (mio_parallelism .eq. mio_serial) then
                       mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
                    else if (mio_parallelism .eq. mio_pseudo) then
-                      if (mio_file_data(floc)%grid_type .eq. 'c') then
+!                     if (mio_file_data(floc)%grid_type .eq. 'c') then
                          mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, 1)
                          mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, 1)
                          mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, 1)
                          mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, 1)
-                      else if (mio_file_data(floc)%grid_type .eq. 'd') then
-                         mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, 2)
-                         mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, 2)
-                         mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, 2)
-                         mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, 2)
-                      end if
+!                     else if (mio_file_data(floc)%grid_type .eq. 'd') then
+!                        mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, 2)
+!                        mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, 2)
+!                        mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, 2)
+!                        mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, 2)
+!                     end if
                    end if
 
                    mystart(3) = loc_slay

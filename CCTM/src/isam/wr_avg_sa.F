@@ -296,7 +296,7 @@ C Check other header data with CONC file as reference
 ! then change global attribute NLAYS to match
          call mio_setfile( MET_CRO_3D )
          if ( A_NLAYS .lt. NLAYS ) mio_nlays = A_NLAYS
-         call mio_fcreate( 'SA_ACONC_1_MIO', io_mode )
+         call mio_fcreate( 'SA_ACONC_1_MIO', mio_new_file )
          if ( mype == 0 ) then
             call mio_set_global_attr( 'SA_ACONC_1_MIO', 'NLAYS', A_NLAYS )
             call mio_set_global_attr( 'SA_ACONC_1_MIO', 'VGLVLS', MET_CRO_3D, AISAM_BLEV, AISAM_ELEV+1 )

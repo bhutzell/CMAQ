@@ -98,10 +98,10 @@ C biogenics to gas-phase species map
 #ifdef mpas
             call mio_setfile ('GR_EMIS_001')
 
-             call mio_fcreate ('MEGAN_OUTPUT',512 ) ! 512 means clobber+netcdf64
+             call mio_fcreate ('MEGAN_OUTPUT', mio_new_file ) ! 512 means clobber+netcdf64
           if (BDSNP_MEGAN) then
-             call mio_fcreate ('BDSNPOUT',512 ) ! 512 means clobber+netcdf64
-             call mio_fcreate ('BDSNP_DIAG',512 ) ! 512 means clobber+netcdf64
+             call mio_fcreate ('BDSNPOUT', mio_new_file ) ! 512 means clobber+netcdf64
+             call mio_fcreate ('BDSNP_DIAG', mio_new_file ) ! 512 means clobber+netcdf64
           end if
 #endif
          END IF

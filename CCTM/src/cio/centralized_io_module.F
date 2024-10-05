@@ -604,6 +604,7 @@
      &                                           binary_search, quicksort
           use util_module, only : sec2time, nextime, index1, secsdiff
 #endif
+          use mio_module
 
           INCLUDE SUBST_FILES_ID             ! file name parameters
 
@@ -652,38 +653,68 @@
           JACOBF_AVAIL = .false.
 #else
 ! met grid cro 2d file
-          IF ( .NOT. OPEN3( GRID_CRO_2D, FSREAD3, PNAME ) ) THEN
-             XMSG = 'Could not open '// GRID_CRO_2D // ' file'
-             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
-          IF ( .NOT. DESC3( GRID_CRO_2D ) ) THEN
-             XMSG = 'Could not get ' // GRID_CRO_2D //' file description'
-             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!         IF ( .NOT. OPEN3( GRID_CRO_2D, FSREAD3, PNAME ) ) THEN
+!            XMSG = 'Could not open '// GRID_CRO_2D // ' file'
+!            CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+!         END IF
+!         IF ( .NOT. DESC3( GRID_CRO_2D ) ) THEN
+!            XMSG = 'Could not get ' // GRID_CRO_2D //' file description'
+!            CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+!         END IF
 
-          n_grid_cro_data_vars = nvars3d
+          call mio_fopen (GRID_CRO_2D, mio_read_only)
+
+!         n_grid_cro_data_vars = nvars3d
+          n_grid_cro_data_vars = mio_file_data(mio_cfile)%nvars
 
           LAND_SCHEME = 'UNKNOWN'
 
           v = 0
-          DO WHILE ((v .LT. NVARS3D) .and. (.not. done))
+!         DO WHILE ((v .LT. NVARS3D) .and. (.not. done))
+!            v = v + 1
+!            IF ( VNAME3D( v ) .EQ. 'DLUSE' ) THEN
+!               IF ( INDEX( VDESC3D( v ), 'USGS24' ) .NE. 0 ) THEN
+!                  LAND_SCHEME = 'USGS24'
+!                  cio_dust_land_scheme = 'USGS24'
+!               ELSE IF ( INDEX( VDESC3D( v ), 'NLCD40' ) .NE. 0 ) THEN
+!                  LAND_SCHEME = 'NLCD40'
+!                  cio_dust_land_scheme = 'NLCD40'
+!               ELSE IF ( INDEX( VDESC3D( v ), 'NLCD50' ) .NE. 0 ) THEN
+!                  LAND_SCHEME = 'NLCD50'
+!                  cio_dust_land_scheme = 'NLCD50'
+!               ELSE IF ( INDEX( VDESC3D( v ), 'NLCD-MODIS' ) .NE. 0 ) THEN
+!                  LAND_SCHEME = 'NLCD50'
+!                  cio_dust_land_scheme = 'NLCD-MODIS'
+!               ELSE IF ( INDEX( VDESC3D( v ), 'MODIS' ) .NE. 0 ) THEN
+!                  LAND_SCHEME = 'MODIS'
+!                  IF ( INDEX( VDESC3D( v ), 'MODIS NOAH' ) .ne.  0) THEN
+!                     cio_dust_land_scheme = 'MODIS_NOAH'
+!                  ELSE
+!                     cio_dust_land_scheme = 'MODIS'
+!                  END IF
+!               END IF
+!               done = .true.
+!            END IF
+!         END DO
+
+          DO WHILE ((v .LT. mio_file_data(mio_cfile)%nvars) .and. (.not. done))
              v = v + 1
-             IF ( VNAME3D( v ) .EQ. 'DLUSE' ) THEN
-                IF ( INDEX( VDESC3D( v ), 'USGS24' ) .NE. 0 ) THEN
+             IF ( mio_file_data(mio_cfile)%var_name( v ) .EQ. 'DLUSE' ) THEN
+                IF ( INDEX( mio_file_data(mio_cfile)%char_vatt_val( 3, v ), 'USGS24' ) .NE. 0 ) THEN
                    LAND_SCHEME = 'USGS24'
                    cio_dust_land_scheme = 'USGS24'
-                ELSE IF ( INDEX( VDESC3D( v ), 'NLCD40' ) .NE. 0 ) THEN
+                ELSE IF ( INDEX( mio_file_data(mio_cfile)%char_vatt_val( 3, v ), 'NLCD40' ) .NE. 0 ) THEN
                    LAND_SCHEME = 'NLCD40'
                    cio_dust_land_scheme = 'NLCD40'
-                ELSE IF ( INDEX( VDESC3D( v ), 'NLCD50' ) .NE. 0 ) THEN
+                ELSE IF ( INDEX( mio_file_data(mio_cfile)%char_vatt_val( 3, v ), 'NLCD50' ) .NE. 0 ) THEN
                    LAND_SCHEME = 'NLCD50'
                    cio_dust_land_scheme = 'NLCD50'
-                ELSE IF ( INDEX( VDESC3D( v ), 'NLCD-MODIS' ) .NE. 0 ) THEN
+                ELSE IF ( INDEX( mio_file_data(mio_cfile)%char_vatt_val( 3, v ), 'NLCD-MODIS' ) .NE. 0 ) THEN
                    LAND_SCHEME = 'NLCD50'
                    cio_dust_land_scheme = 'NLCD-MODIS'
-                ELSE IF ( INDEX( VDESC3D( v ), 'MODIS' ) .NE. 0 ) THEN
+                ELSE IF ( INDEX( mio_file_data(mio_cfile)%char_vatt_val( 3, v ), 'MODIS' ) .NE. 0 ) THEN
                    LAND_SCHEME = 'MODIS'
-                   IF ( INDEX( VDESC3D( v ), 'MODIS NOAH' ) .ne.  0) THEN
+                   IF ( INDEX( mio_file_data(mio_cfile)%char_vatt_val( 3, v ), 'MODIS NOAH' ) .ne.  0) THEN
                       cio_dust_land_scheme = 'MODIS_NOAH'
                    ELSE
                       cio_dust_land_scheme = 'MODIS'
@@ -693,10 +724,11 @@
              END IF
           END DO
 
-          IF ( .NOT. OPEN3( GRID_DOT_2D, FSREAD3, PNAME ) ) THEN
-             XMSG = 'Could not open '// GRID_DOT_2D // ' file'
-             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!         IF ( .NOT. OPEN3( GRID_DOT_2D, FSREAD3, PNAME ) ) THEN
+!            XMSG = 'Could not open '// GRID_DOT_2D // ' file'
+!            CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+!         END IF
+          call mio_fopen (GRID_DOT_2D, mio_read_only)
 
 ! lufrac cro file
           IF ( .NOT. OPEN3( LUFRAC_CRO, FSREAD3, PNAME ) ) THEN
@@ -5603,6 +5635,7 @@ C Read the various categories of normalized emissions
           USE UTILIO_DEFN
           USE HGRD_DEFN
           USE LSM_Mod, ONLY: n_lufrac, init_lsm
+          USE mio_module
 
           INCLUDE SUBST_FILES_ID             ! file name parameters
 
@@ -5626,8 +5659,8 @@ C Read the various categories of normalized emissions
                CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT3 )
           END IF
 
-          CALL SUBHFILE ( GRID_CRO_2D, GXOFF, GYOFF,
-     &                    STRTCOLGC2, ENDCOLGC2, STRTROWGC2, ENDROWGC2 )
+!         CALL SUBHFILE ( GRID_CRO_2D, GXOFF, GYOFF,
+!    &                    STRTCOLGC2, ENDCOLGC2, STRTROWGC2, ENDROWGC2 )
 
 #ifdef twoway
           IF ( .NOT. INTERPX( GRID_CRO_2D, 'MSFX2', PNAME,
@@ -5699,48 +5732,55 @@ C Read the various categories of normalized emissions
           END IF
 
 #else
-          IF ( .NOT. XTRACT3( GRID_CRO_2D, 'MSFX2',
-     &                        1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
-     &                        0, 0, MSFX2 ) ) THEN
-             XMSG = ' Error interpolating variable MSFX2 from ' // GRID_CRO_2D
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
 
-          IF ( .NOT. XTRACT3( GRID_CRO_2D, 'LWMASK',
-     &                        1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
-     &                        0, 0, LWMASK ) ) THEN
-             XMSG = ' Error interpolating variable LWMASK from ' // GRID_CRO_2D
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!         IF ( .NOT. XTRACT3( GRID_CRO_2D, 'MSFX2',
+!    &                        1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
+!    &                        0, 0, MSFX2 ) ) THEN
+!            XMSG = ' Error interpolating variable MSFX2 from ' // GRID_CRO_2D
+!            Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!         END IF
+          call mio_fread (GRID_CRO_2D, 'MSFX2', pname, MSFX2)
 
-          IF ( .NOT. XTRACT3( GRID_CRO_2D, 'HT',
-     &                        1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
-     &                        0, 0, HT ) ) THEN
-             XMSG = ' Error interpolating variable HT from ' // GRID_CRO_2D
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!         IF ( .NOT. XTRACT3( GRID_CRO_2D, 'LWMASK',
+!    &                        1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
+!    &                        0, 0, LWMASK ) ) THEN
+!            XMSG = ' Error interpolating variable LWMASK from ' // GRID_CRO_2D
+!            Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!         END IF
+          call mio_fread (GRID_CRO_2D, 'LWMASK', pname, LWMASK)
 
-          IF ( .NOT. XTRACT3( GRID_CRO_2D, 'LAT',
-     &                        1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
-     &                        0, 0, LAT ) ) THEN
-             XMSG = ' Error interpolating variable LAT from ' // GRID_CRO_2D
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!         IF ( .NOT. XTRACT3( GRID_CRO_2D, 'HT',
+!    &                        1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
+!    &                        0, 0, HT ) ) THEN
+!            XMSG = ' Error interpolating variable HT from ' // GRID_CRO_2D
+!            Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!         END IF
+          call mio_fread (GRID_CRO_2D, 'HT', pname, HT)
 
-          IF ( .NOT. XTRACT3( GRID_CRO_2D, 'LON',
-     &                        1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
-     &                        0, 0, LON ) ) THEN
-             XMSG = ' Error interpolating variable LON from ' // GRID_CRO_2D
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!         IF ( .NOT. XTRACT3( GRID_CRO_2D, 'LAT',
+!    &                        1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
+!    &                        0, 0, LAT ) ) THEN
+!            XMSG = ' Error interpolating variable LAT from ' // GRID_CRO_2D
+!            Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!         END IF
+          call mio_fread (GRID_CRO_2D, 'LAT', pname, LAT)
+
+!         IF ( .NOT. XTRACT3( GRID_CRO_2D, 'LON',
+!    &                        1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
+!    &                        0, 0, LON ) ) THEN
+!            XMSG = ' Error interpolating variable LON from ' // GRID_CRO_2D
+!            Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!         END IF
+          call mio_fread (GRID_CRO_2D, 'LON', pname, LON)
 
           if (minkz) then
-             IF ( .NOT. XTRACT3( GRID_CRO_2D, 'PURB',
-     &                           1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
-     &                           0, 0, PURB ) ) THEN
-                XMSG = ' Error interpolating variable PURB from ' // GRID_CRO_2D
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-             END IF
+!            IF ( .NOT. XTRACT3( GRID_CRO_2D, 'PURB',
+!    &                           1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
+!    &                           0, 0, PURB ) ) THEN
+!               XMSG = ' Error interpolating variable PURB from ' // GRID_CRO_2D
+!            Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!            END IF
+             call mio_fread (GRID_CRO_2D, 'PURB', pname, PURB)
           else
              purb = 0.0
           end if
@@ -5757,16 +5797,18 @@ C Read the various categories of normalized emissions
 
              DO l = 1, n_lufrac
                 Write( vname,'( "LUFRAC_",I2.2 )' ) l
-                IF ( .Not. XTRACT3( GRID_CRO_2D, VNAME,
-     &                              1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
-     &                              0, 0, LUFRAC( :,:,l ) ) ) THEN
-                   XMSG = 'Error interpolating variable' // TRIM( VNAME ) // ' from ' // GRID_CRO_2D
-                   Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                END IF
+!               IF ( .Not. XTRACT3( GRID_CRO_2D, VNAME,
+!    &                              1, 1, STRTROWGC2, ENDROWGC2, STRTCOLGC2, ENDCOLGC2, 
+!    &                              0, 0, LUFRAC( :,:,l ) ) ) THEN
+!                  XMSG = 'Error interpolating variable' // TRIM( VNAME ) // ' from ' // GRID_CRO_2D
+!                  Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!               END IF
+                call mio_fread (GRID_CRO_2D, vname, pname, LUFRAC( :,:,l ))
              END DO
 
           END IF
 #endif
+
         end subroutine retrieve_grid_cro_2d_data
 
 ! -------------------------------------------------------------------------
@@ -5774,6 +5816,7 @@ C Read the various categories of normalized emissions
 
           USE UTILIO_DEFN
           USE HGRD_DEFN
+          USE mio_module
 
           INCLUDE SUBST_FILES_ID             ! file name parameters
 
@@ -5781,8 +5824,8 @@ C Read the various categories of normalized emissions
 
           INTEGER          :: STAT
           CHARACTER( 120 ) :: XMSG = ' '
-          INTEGER          :: gxoff, gyoff, 
-     &                        STRTCOLGD2, ENDCOLGD2, STRTROWGD2, ENDROWGD2
+!         INTEGER          :: gxoff, gyoff, 
+!    &                        STRTCOLGD2, ENDCOLGD2, STRTROWGD2, ENDROWGD2
 
           ALLOCATE ( MSFD2( NCOLS+1, NROWS+1 ), STAT = STAT )
           IF ( STAT .NE. 0 ) THEN
@@ -5790,8 +5833,8 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT3 )
           END IF
 
-          CALL SUBHFILE ( GRID_DOT_2D, GXOFF, GYOFF,
-     &                    STRTCOLGD2, ENDCOLGD2, STRTROWGD2, ENDROWGD2 )
+!         CALL SUBHFILE ( GRID_DOT_2D, GXOFF, GYOFF,
+!    &                    STRTCOLGD2, ENDCOLGD2, STRTROWGD2, ENDROWGD2 )
 
 #ifdef twoway
           IF ( .NOT. INTERPX( GRID_DOT_2D, 'MSFD2', PNAME, 
@@ -5801,12 +5844,13 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           END IF
 #else
-          IF ( .NOT. XTRACT3( GRID_DOT_2D, 'MSFD2',
-     &                        1, 1, STRTROWGD2, ENDROWGD2, STRTCOLGD2, ENDCOLGD2,
-     &                        0, 0, MSFD2 ) ) THEN
-             XMSG = 'Could not interpolate MSFD2 from ' // GRID_DOT_2D
-             CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!         IF ( .NOT. XTRACT3( GRID_DOT_2D, 'MSFD2',
+!    &                        1, 1, STRTROWGD2, ENDROWGD2, STRTCOLGD2, ENDCOLGD2,
+!    &                        0, 0, MSFD2 ) ) THEN
+!            XMSG = 'Could not interpolate MSFD2 from ' // GRID_DOT_2D
+!            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!         END IF
+          call mio_fread (GRID_DOT_2D, 'MSFD2', pname, MSFD2)
 #endif
 
         end subroutine retrieve_grid_dot_2d_data

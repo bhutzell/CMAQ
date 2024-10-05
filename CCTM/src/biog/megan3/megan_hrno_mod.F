@@ -142,7 +142,7 @@ C Determine last timestamp
          MSTEPS = TIME2SEC( RUNLEN ) / TIME2SEC( TSTEP( 1 ) )
 
 #ifdef mpas
-         call mio_fcreate (SOILOUT, io_mode)
+         call mio_fcreate (SOILOUT, mio_new_file)
          METSTEP = TSTEP(3)
 
          output_step   = time2sec(tstep(1))
