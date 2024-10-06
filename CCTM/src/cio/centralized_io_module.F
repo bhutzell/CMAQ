@@ -768,7 +768,8 @@
           file_xcell(f_met) = xcell3d
           file_ycell(f_met) = ycell3d
 
-          IF (INDEX1( 'TSEASFC', NVARS3D, VNAME3D ) .gt. 0) then
+!         IF (INDEX1( 'TSEASFC', NVARS3D, VNAME3D ) .gt. 0) then
+          IF (INDEX1( 'TSEASFC', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0 ) then
              TSEASFC_AVAIL = .true.
              adj = 0
           else
@@ -776,10 +777,12 @@
              adj = 1
           end if
 
-          HAS_SEAICE = (INDEX1( 'SEAICE', NVARS3D, VNAME3D ) .gt. 0)
+!         HAS_SEAICE = (INDEX1( 'SEAICE', NVARS3D, VNAME3D ) .gt. 0)
+          HAS_SEAICE = (INDEX1( 'SEAICE', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
 
 ! include an additional variable TSEASFC when MET_CRO_2D does not have it and CMAQ code is looking for it
-          n_c2d = nvars3d + adj
+!         n_c2d = nvars3d + adj
+          n_c2d = mio_file_data(mio_cfile)%nvars + adj
           allocate (c2d_name(n_c2d, 3), stat=stat)
           if (stat .ne. 0) then
              xmsg = 'Failure allocating c2d_name '
@@ -789,21 +792,31 @@
 ! only met data has 'm' distinction and since twoway model does not provide 
 ! boundary data, so this distinction only apply to non boundary met data
 
-          c2d_name(1:nvars3d,1) = vname3d(1:nvars3d)
+!         c2d_name(1:nvars3d,1) = vname3d(1:nvars3d)
+          c2d_name(1:mio_file_data(mio_cfile)%nvars,1) = mio_file_data(mio_cfile)%var_name(1:mio_file_data(mio_cfile)%nvars)
           c2d_name(:,2)         = 'mc2'     ! denote 2d variable
           c2d_name(:,3)         = 'm'       ! denote met variable
           if (adj .eq. 1) then
              c2d_name(n_c2d,1) = 'TSEASFC'
           end if
 
-          WSPD10_AVAIL = (INDEX1( 'WSPD10', NVARS3D, VNAME3D ) .gt. 0)
-          RNA_AVAIL    = (INDEX1( 'RNA', NVARS3D, VNAME3D ) .gt. 0)
-          RCA_AVAIL    = (INDEX1( 'RCA', NVARS3D, VNAME3D ) .gt. 0)
-          RA_RS_AVAIL  = (INDEX1( 'RA', NVARS3D, VNAME3D ) .gt. 0)
-          WR_AVAIL     = (INDEX1( 'WR', NVARS3D, VNAME3D ) .gt. 0)
-          Q2_AVAIL     = (INDEX1( 'Q2', NVARS3D, VNAME3D ) .gt. 0)
-          LH_AVAIL     = (INDEX1( 'LH', NVARS3D, VNAME3D ) .gt. 0)
-          PXSOIL_AVAIL = (INDEX1( 'CLAY_PX', NVARS3D, VNAME3D ) .gt. 0)
+!         WSPD10_AVAIL = (INDEX1( 'WSPD10', NVARS3D, VNAME3D ) .gt. 0)
+!         RNA_AVAIL    = (INDEX1( 'RNA', NVARS3D, VNAME3D ) .gt. 0)
+!         RCA_AVAIL    = (INDEX1( 'RCA', NVARS3D, VNAME3D ) .gt. 0)
+!         RA_RS_AVAIL  = (INDEX1( 'RA', NVARS3D, VNAME3D ) .gt. 0)
+!         WR_AVAIL     = (INDEX1( 'WR', NVARS3D, VNAME3D ) .gt. 0)
+!         Q2_AVAIL     = (INDEX1( 'Q2', NVARS3D, VNAME3D ) .gt. 0)
+!         LH_AVAIL     = (INDEX1( 'LH', NVARS3D, VNAME3D ) .gt. 0)
+!         PXSOIL_AVAIL = (INDEX1( 'CLAY_PX', NVARS3D, VNAME3D ) .gt. 0)
+
+          WSPD10_AVAIL = (INDEX1( 'WSPD10', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          RNA_AVAIL    = (INDEX1( 'RNA', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          RCA_AVAIL    = (INDEX1( 'RCA', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          RA_RS_AVAIL  = (INDEX1( 'RA', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          WR_AVAIL     = (INDEX1( 'WR', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          Q2_AVAIL     = (INDEX1( 'Q2', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          LH_AVAIL     = (INDEX1( 'LH', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          PXSOIL_AVAIL = (INDEX1( 'CLAY_PX', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
 
           CALL SUBHFILE ( MET_CRO_2D, GXOFF, GYOFF,
      &                    STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2 )
@@ -842,29 +855,37 @@
           END IF
           call mio_fopen( MET_CRO_3D, mio_read_only )
 
-          n_c3d = nvars3d
+!         n_c3d = nvars3d
+          n_c3d = mio_file_data(mio_cfile)%nvars
           allocate (c3d_name(n_c3d, 3), stat=stat)
           if (stat .ne. 0) then
              xmsg = 'Failure allocating c3d_name '
              call m3exit (pname, 0, 0, xmsg, xstat1 )
           end if
-          c3d_name(:,1) = vname3d(1:n_c3d) 
+!         c3d_name(:,1) = vname3d(1:n_c3d) 
+          c3d_name(:,1) = mio_file_data(mio_cfile)%var_name(1:n_c3d) ! is (1:n_c3d) needed?
           c3d_name(:,2) = 'mc3'  ! denote 3d variable
           c3d_name(:,3) = 'm'    ! denote met variable
 
-          CFRAC_3D_AVAIL = (INDEX1( 'CFRAC_3D', NVARS3D, VNAME3D ) .gt. 0)
+!         CFRAC_3D_AVAIL = (INDEX1( 'CFRAC_3D', NVARS3D, VNAME3D ) .gt. 0)
+          CFRAC_3D_AVAIL = (INDEX1( 'CFRAC_3D', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
 
-          PV_AVAIL       = (INDEX1( 'PV', NVARS3D, VNAME3D ) .gt. 0)
+!         PV_AVAIL       = (INDEX1( 'PV', NVARS3D, VNAME3D ) .gt. 0)
+          PV_AVAIL       = (INDEX1( 'PV', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
           IF ( .NOT. PV_AVAIL .AND. LPVO3 ) THEN
              XMSG = 'PV, potential vorticity, not found in ' // MET_CRO_3D
      &          //  ' but CTM_PVO3 option set to Yes in run-script'
              CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
           END IF
 
-          QI_AVAIL       = (INDEX1( 'QI', NVARS3D, VNAME3D ) .gt. 0)
-          QS_AVAIL       = (INDEX1( 'QS', NVARS3D, VNAME3D ) .gt. 0)
-          QG_AVAIL       = (INDEX1( 'QG', NVARS3D, VNAME3D ) .gt. 0)
-          JACOBF_AVAIL   = (INDEX1( 'JACOBF', NVARS3D, VNAME3D ) .gt. 0)
+!         QI_AVAIL       = (INDEX1( 'QI', NVARS3D, VNAME3D ) .gt. 0)
+!         QS_AVAIL       = (INDEX1( 'QS', NVARS3D, VNAME3D ) .gt. 0)
+!         QG_AVAIL       = (INDEX1( 'QG', NVARS3D, VNAME3D ) .gt. 0)
+!         JACOBF_AVAIL   = (INDEX1( 'JACOBF', NVARS3D, VNAME3D ) .gt. 0)
+          QI_AVAIL       = (INDEX1( 'QI', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          QS_AVAIL       = (INDEX1( 'QS', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          QG_AVAIL       = (INDEX1( 'QG', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          JACOBF_AVAIL   = (INDEX1( 'JACOBF', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
           QC_AVAIL       = .true.
 
           CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
@@ -909,13 +930,15 @@
           END IF
 #endif
 
-          V = INDEX1( 'PRES', NVARS3D, VNAME3D )
+!         V = INDEX1( 'PRES', NVARS3D, VNAME3D )
+          V = INDEX1( 'PRES', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name )
           If ( V .eq. 0 ) Then
              XMSG = 'Could not get variable PRES from ' // MET_CRO_3D
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
-          Select Case (UNITS3D( V ))
+!         Select Case (UNITS3D( V ))
+          Select Case (mio_file_data(mio_cfile)%units( V ))
              Case ( 'PASCAL','pascal','Pascal','PA','pa','Pa' )
                 CONVPA = 1.0
                 P0     = 100000.0
@@ -941,7 +964,8 @@
           END IF
           call mio_fopen( MET_DOT_3D, mio_read_only )
 
-          n_d3d = nvars3d
+!         n_d3d = nvars3d
+          n_d3d = mio_file_data(mio_cfile)%nvars
           allocate (d3d_name(n_d3d, 3), stat=stat)
           if (stat .ne. 0) then
              xmsg = 'Failure allocating d3d_name '
@@ -986,8 +1010,10 @@
           size_d2dx = x_dot_ncols * x_dot_nrows
           size_d3dx = size_d2dx * nlays
 
-          UWINDC_AVAIL = (INDEX1( 'UWINDC', NVARS3D, VNAME3D ) .gt. 0)
-          VWINDC_AVAIL = (INDEX1( 'VWINDC', NVARS3D, VNAME3D ) .gt. 0)
+!         UWINDC_AVAIL = (INDEX1( 'UWINDC', NVARS3D, VNAME3D ) .gt. 0)
+!         VWINDC_AVAIL = (INDEX1( 'VWINDC', NVARS3D, VNAME3D ) .gt. 0)
+          UWINDC_AVAIL = (INDEX1( 'UWINDC', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
+          VWINDC_AVAIL = (INDEX1( 'VWINDC', mio_file_data(mio_cfile)%nvars, mio_file_data(mio_cfile)%var_name ) .gt. 0)
 #endif
 
 ! emission file, could be one or multiple layer
@@ -1562,6 +1588,7 @@
                 XMSG = ' Error interpolating variable SLTYP from ' // MET_CRO_2D
                 Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
              END IF
+!            call mio_fread( MET_CRO_2D, 'SLTYP', pname, SOILCAT_A )
 #endif
 
 #endif
@@ -1612,6 +1639,7 @@
                          XMSG = 'Could not extract ' // MET_CRO_2D // ' file'
                          CALL M3EXIT ( PNAME, DATA_JDATE, DATA_JTIME, XMSG, XSTAT1 )
                       END IF
+!                     call mio_fread( MET_CRO_2D, cio_grid_var_name(v,1), pname, cio_grid_data(begin:end) )
 #endif
                    END IF
 
@@ -1649,6 +1677,7 @@
                       XMSG = 'Could not extract ' // MET_CRO_3D // ' file'
                       CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
                    END IF
+!                  call mio_fread( MET_CRO_3D, cio_grid_var_name(v,1), pname, cio_grid_data(begin:end) )
 #endif
                 else if (cio_grid_var_name(v,2) == 'md3') then
 
@@ -1668,6 +1697,7 @@
                       XMSG = 'Could not extract ' // MET_DOT_3D // ' file'
                       CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
                    END IF
+!                  call mio_fread( MET_DOT_3D, cio_grid_var_name(v,1), pname, cio_grid_data(begin:end) )
 #endif
 #endif
                 else if (cio_grid_var_name(v,2) == 'e2d') then
