@@ -23,14 +23,18 @@
 C...pointers for dissociating species needed to compute effective 
 c   Henry's law constants
          INTEGER, PUBLIC  :: HLC_SO2, HLC_HNO2, HLC_HNO3, HLC_CO2, 
-     &               HLC_H2O2, HLC_HCOOH, HLC_HO2, HLC_NH3,
-     &               HLC_HYDRAZINE, HLC_ATRA, HLC_DATRA, HLC_CL2, 
-     &               HLC_HCL, HLC_HOCL, HLC_HBR, HLC_HI, 
-     &               HLC_ACRYACID
+     &                       HLC_H2O2, HLC_HCOOH, HLC_HO2, HLC_NH3,
+     &                       HLC_HYDRAZINE, HLC_ATRA, HLC_DATRA, HLC_CL2, 
+     &                       HLC_HCL, HLC_HOCL, HLC_HBR, HLC_HI, 
+     &                       HLC_ACRYACID
 
 C...pointers for additional Henry's law species needed in AQCHEM
          INTEGER, PUBLIC  :: HLC_O3, HLC_MHYDPOX, HLC_PEROXYACET, 
-     &               HLC_GLY, HLC_MGLY, HLC_OH
+     &                       HLC_GLY, HLC_MGLY, HLC_OH
+
+C...pointers for additional Henry's law species needed in KMT version of AQCHEM
+         INTEGER, PUBLIC  :: HLC_CH3COOH, HLC_NO2, HLC_HNO4, HLC_NO3, 
+     &                       HLC_PYRUVACID
 
 C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
          INTEGER, PUBLIC  :: HLC_IEPOX, HLC_IMAE
@@ -455,6 +459,13 @@ C...  Atmospheric Chemistry and Physics, 1997
             CALL HLINDEX( 'GLYOXAL         ', HLC_GLY       , LERROR ) 
             CALL HLINDEX( 'METHYL_GLYOXAL  ', HLC_MGLY      , LERROR ) 
             CALL HLINDEX( 'OH              ', HLC_OH        , LERROR ) 
+
+! add'l species needed in KMT version of AQCHEM
+            CALL HLINDEX( 'ACETIC_ACID     ', HLC_CH3OOH    , LERROR ) 
+            CALL HLINDEX( 'NO2             ', HLC_NO2       , LERROR ) 
+            CALL HLINDEX( 'HNO4            ', HLC_HNO4      , LERROR ) 
+            CALL HLINDEX( 'NO3             ', HLC_NO3       , LERROR ) 
+            CALL HLINDEX( 'PYRUVIC_ACID    ', HLC_PYRUVACID , LERROR ) 
 
 ! additional species needed in AEROSOL_CHEMISTRY
             CALL HLINDEX( 'IEPOX           ', HLC_IEPOX     , LERROR )
