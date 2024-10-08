@@ -461,7 +461,7 @@ C...  Atmospheric Chemistry and Physics, 1997
             CALL HLINDEX( 'OH              ', HLC_OH        , LERROR ) 
 
 ! add'l species needed in KMT version of AQCHEM
-            CALL HLINDEX( 'ACETIC_ACID     ', HLC_CH3OOH    , LERROR ) 
+            CALL HLINDEX( 'ACETIC_ACID     ', HLC_CH3COOH   , LERROR ) 
             CALL HLINDEX( 'NO2             ', HLC_NO2       , LERROR ) 
             CALL HLINDEX( 'HNO4            ', HLC_HNO4      , LERROR ) 
             CALL HLINDEX( 'NO3             ', HLC_NO3       , LERROR ) 
