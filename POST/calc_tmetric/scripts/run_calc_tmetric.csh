@@ -56,6 +56,11 @@
  setenv OPERATION AVG
 # setenv OPERATION SUM
 
+#>Number of timesteps used in operation performed 
+#>set to zero or negative value for process all timesteps
+setenv SAMPLE_PERIOD 4
+
+
 #> list of species to output - set to "ALL" to process all species from INFILE, or list species to process
 #> the output variable names will have the ${OPERATION} value (SUM or AVG) appended to the input variable names
 # setenv SPECIES_1 ALL

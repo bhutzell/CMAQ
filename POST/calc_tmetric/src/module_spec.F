@@ -35,6 +35,7 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          SUBROUTINE LoadSpecies
 
          USE M3UTILIO
+         USE GET_ENV_VARS
  
          IMPLICIT NONE
 
@@ -53,7 +54,8 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
            varname = 'SPECIES_' // TRIM(field)
  
            ! get environment variable varname
-           CALL ENVSTR( varname, 'Species Variable definition', 'Not Used', field, status)
+!          CALL ENVSTR( varname, 'Species Variable definition', 'Not Used', field, status)
+           CALL GET_ENV_STRING( VARNAME, 'Species Variable definition', 'Not Used', FIELD, STATUS )
            IF( status .ne. 0 ) EXIT
 
            ! check for SPECIES_1 = 'ALL" for all species

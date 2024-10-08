@@ -31,6 +31,8 @@ C*************************************************************************
       MODULE M3FILES
 
       USE M3UTILIO
+      USE GET_ENV_VARS
+
 
       INTEGER LOGUNIT                       ! Logdevice
 
@@ -103,7 +105,8 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ENDIF
 
             ENV_DFLT = ' '        
-            CALL ENVSTR( FL_NAME, ENV_DESC, ENV_DFLT, RET_VAL, STATUS)
+!           CALL ENVSTR( FL_NAME, ENV_DESC, ENV_DFLT, RET_VAL, STATUS)
+            CALL GET_ENV_STRING( FL_NAME, ENV_DESC, ENV_DFLT, RET_VAL, STATUS )
 
             IF( STATUS .EQ. 0 ) THEN
                If( N_M3FILES .eq. 0) M3FILE = RET_VAL
