@@ -43,11 +43,16 @@ C   19 Oct 2015: Jeff Young: Remove stmnt func to resolve PGI compiler error
 C   29 Nov 17 David Wong: removed all SWAP routines and replaced with SE_COMM
 C   16 NOv 2018 S.Napelenok: ISAM implementation
 C    1 Feb 19 David Wong: removed all MY_N clauses
+C   11 Dec 19 S.L.Napelenok: ddm-3d implementation for version 5.3.1
 C-----------------------------------------------------------------------
 
       USE HGRD_DEFN             ! horizontal domain specifications
+      USE GRID_CONF, ONLY: NLAYS
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE XY_BUDGET, ONLY : F_NORTH_IN, F_NORTH_OUT, F_SOUTH_IN, F_SOUTH_OUT
+      USE PA_DEFN, ONLY : BUDGET_DIAG, BUDGET_HPPM
+      use CENTRALIZED_IO_MODULE, only : interpolate_var, MSFX2
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_COMM_MODULE, SE_UTIL_MODULE)
 #else
@@ -59,11 +64,15 @@ C-----------------------------------------------------------------------
      &                   TRANSPORT_SPC, BCON_SPC, MAP_ADVtoSA
 #endif
 
+#ifdef sens
+      USE DDM3D_DEFN, ONLY:SENGRID, NPMAX, NP, BSEN, BCS, DATENUM, IPT, IDATE, IPARM, IREGION, CKTIME, STARTDATE
+#endif 
+      USE CONST, ONLY: DG2M, PI180
+      
       IMPLICIT NONE
 
 C Includes:
 
-      INCLUDE SUBST_CONST       ! constants
       INCLUDE SUBST_PE_COMM     ! PE communication displacement and direction
 
 C Arguments:
@@ -101,8 +110,7 @@ C Local Variables:
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       CHARACTER( 96 ) :: XMSG = ' '
 
-      REAL,    SAVE :: DX2                      ! dx2 (meters)
-      INTEGER, SAVE :: ASPC                     ! RHOJ index in CGRID
+      REAL,    SAVE :: DX2, DX1, AX             ! dx2 (meters), dx1 (m), ax (m2)
 
       REAL, ALLOCATABLE, SAVE :: VELY( : ),     ! Velocities along a column
      &                           CONY( :,: )    ! Conc's along a column
@@ -117,10 +125,19 @@ C Local Variables:
 
       CHARACTER( 16 ) :: X2VEL = 'X2VEL'
 
-      INTEGER      COL, ROW, SPC, VAR           ! loop counters
+      INTEGER      COL, ROW, SPC, VAR, I           ! loop counters
       INTEGER      A2C
 
+      REAL     :: JACOBM( NCOLS,NROWS,NLAYS )  !"total" Jacobian
+      REAL     :: ZF( NCOLS,NROWS,NLAYS )      !Grid cell height
+      REAL, PARAMETER :: MWAIR_SI = 0.02897    ! kg mol-1
+      REAL     :: VOL, VOL2                    ! Grid Volume
+
       LOGICAL, SAVE :: BNDY_PE_LOY, BNDY_PE_HIY
+      REAL, ALLOCATABLE, SAVE :: F_LO_IN( : )
+      REAL, ALLOCATABLE, SAVE :: F_LO_OUT( : )
+      REAL, ALLOCATABLE, SAVE :: F_HI_IN( : )
+      REAL, ALLOCATABLE, SAVE :: F_HI_OUT( : )
 
 #ifdef parallel
       INTEGER NORTH_ROW
@@ -131,10 +148,25 @@ C Local Variables:
       REAL, ALLOCATABLE, SAVE :: SA_HALO_NORTH( :,:,: )
       REAL, ALLOCATABLE, SAVE :: SA_HALO_SOUTH( :,:,: )
       REAL, ALLOCATABLE, SAVE :: SA_BUF_NS( :,:,: )
+      REAL, ALLOCATABLE, SAVE :: SA_F_LO_IN( : )
+      REAL, ALLOCATABLE, SAVE :: SA_F_LO_OUT( : )
+      REAL, ALLOCATABLE, SAVE :: SA_F_HI_IN( : )
+      REAL, ALLOCATABLE, SAVE :: SA_F_HI_OUT( : )
 #endif
 #endif
       INTEGER, SAVE :: SFX    ! fixed parameter for southern boundary
       INTEGER, SAVE :: NFX    ! fixed parameter for northern boundary
+
+#ifdef sens
+      LOGICAL TIMEFLAG                  ! checks if within desired time
+      REAL, ALLOCATABLE, SAVE :: SENY( :,: )    ! Sens along a col
+      REAL,    EXTERNAL :: S_ZFDBC   ! similar to zfdbc, for sens
+#ifdef parallel
+      REAL, ALLOCATABLE, SAVE :: S_HALO_NORTH( :,:,:,: )
+      REAL, ALLOCATABLE, SAVE :: S_HALO_SOUTH( :,:,:,: )
+      REAL, ALLOCATABLE, SAVE :: S_BUF_NS( :,:,:,: )
+#endif
+#endif
 
 C Required interface for allocatable array dummy arguments
 
@@ -144,7 +176,8 @@ C Required interface for allocatable array dummy arguments
             CHARACTER( 16 ), INTENT( IN )     :: UORV
             REAL,            INTENT( OUT )    :: UHAT( :,: )
          END SUBROUTINE HCONTVEL
-         SUBROUTINE HPPM ( NI, NJ, CON, VEL, DT, DS, ORI )
+         SUBROUTINE HPPM ( NI, NJ, CON, VEL, DT, DS, ORI,
+     &               F_LO_IN, F_LO_OUT, F_HI_IN, F_HI_OUT )
 ! #ifdef parallel
             INTEGER, PARAMETER                :: SWP = 3
 ! #else
@@ -156,6 +189,10 @@ C Required interface for allocatable array dummy arguments
             REAL,            INTENT( IN )     :: DT
             REAL,            INTENT( IN )     :: DS
             CHARACTER,       INTENT( IN )     :: ORI
+            REAL           , INTENT( OUT)     :: F_LO_IN( : )
+            REAL           , INTENT( OUT)     :: F_LO_OUT( : )
+            REAL           , INTENT( OUT)     :: F_HI_IN( : )
+            REAL           , INTENT( OUT)     :: F_HI_OUT( : )
          END SUBROUTINE HPPM
       END INTERFACE
 C-----------------------------------------------------------------------
@@ -169,11 +206,15 @@ C-----------------------------------------------------------------------
 C Get dx2 from HGRD_DEFN module
 
          IF ( GDTYP_GD .EQ. LATGRD3 ) THEN
+            DX1 = DG2M * XCELL_GD
+     &          * COS( PI180*( YORIG_GD + YCELL_GD*FLOAT( GL_NROWS/2 ))) ! in m.
             DX2 = DG2M * YCELL_GD   ! in m.
 
          ELSE
+            DX1 = XCELL_GD          ! in m.
             DX2 = YCELL_GD          ! in m.
          END IF
+         AX = DX1 * DX2
 
          N_SPC_ADV = N_GC_TRNS + N_AE_TRNS + N_NR_TRNS + N_TR_ADV + 1
                                                   ! add 1 for advecting RHOJ
@@ -221,7 +262,26 @@ C Get dx2 from HGRD_DEFN module
 #endif
 #endif
 
-         ASPC = GC_STRT - 1 + N_GC_SPCD
+#ifdef sens
+         ALLOCATE ( SENY( 1-SWP:NROWS+SWP,N_SPC_ADV ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SENY'
+            CALL M3EXIT ( PNAME, FDATE, FTIME, XMSG, XSTAT1 )
+            END IF
+#ifdef parallel
+         ALLOCATE ( S_HALO_NORTH( NCOLS,SWP,N_SPC_ADV,NPMAX ),
+     &              S_HALO_SOUTH( NCOLS,SWP,N_SPC_ADV,NPMAX ),
+     &              S_BUF_NS    ( NCOLS,SWP,N_SPC_ADV,NPMAX ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+           XMSG =
+     &      'Failure allocating S_HALO_NORTH, S_HALO_SOUTH, or S_BUF_NS'
+            CALL M3EXIT ( PNAME, FDATE, FTIME, XMSG, XSTAT1 )
+         END IF
+         S_HALO_NORTH = 0.0   ! array
+         S_HALO_SOUTH = 0.0   ! array
+         S_BUF_NS     = 0.0   ! array
+#endif
+#endif
 
 C Create global map to CGRID
 
@@ -243,13 +303,32 @@ C Create global map to CGRID
             ADV_MAP( SPC ) = TR_STRT - 1 + TR_ADV_MAP( VAR )
          END DO
 
-         ADV_MAP( N_SPC_ADV ) = ASPC
+         ADV_MAP( N_SPC_ADV ) = RHOJ_LOC
 
          CALL SUBST_HI_LO_BND_PE ( 'R', BNDY_PE_LOY, BNDY_PE_HIY )
+
+         ! Allocate FLuxes for Budget Tool
+         ALLOCATE( F_LO_IN(N_SPC_ADV),
+     &             F_LO_OUT(N_SPC_ADV),
+     &             F_HI_IN(N_SPC_ADV),
+     &             F_HI_OUT(N_SPC_ADV) )
+
+#ifdef isam
+         ALLOCATE( SA_F_LO_IN(N_SPCTAG),
+     &             SA_F_LO_OUT(N_SPCTAG),
+     &             SA_F_HI_IN(N_SPCTAG),
+     &             SA_F_HI_OUT(N_SPCTAG) )
+#endif
+
 
          END IF                    ! if firstime
 
       DT = FLOAT ( TIME2SEC ( TSTEP ) )
+
+#ifdef sens
+      ! index that will be used by IDATE
+      DATENUM = 1 + FDATE - STARTDATE
+#endif
 
 C Do the computation for y advection
 
@@ -268,12 +347,28 @@ C Get the contravariant x2 velocity component
                HALO_SOUTH( COL,ROW,SPC ) = CGRID( COL,ROW,LVL,A2C )
                HALO_NORTH( COL,ROW,SPC ) = CGRID( COL,NORTH_ROW+ROW,LVL,A2C )
                BUF_NS( COL,ROW,SPC ) = HALO_NORTH( COL,ROW,SPC )
+#ifdef sens
+               DO NP = 1, NPMAX
+                 S_HALO_SOUTH( COL,ROW,SPC,NP ) = SENGRID( COL,ROW,LVL,NP,A2C )
+                 S_HALO_NORTH( COL,ROW,SPC,NP ) = SENGRID( COL,NORTH_ROW+ROW,LVL,NP,A2C )
+                 S_BUF_NS( COL,ROW,SPC,NP ) = S_HALO_NORTH( COL,ROW,SPC,NP )
+               END DO
+#endif
             END DO
          END DO
       END DO
 
       CALL SUBST_COMM (HALO_SOUTH, HALO_NORTH, DSPL_N1_E0_S0_W0, DRCN_N)
       CALL SUBST_COMM (BUF_NS,     HALO_SOUTH, DSPL_N0_E0_S1_W0, DRCN_S)
+#ifdef sens
+      DO NP = 1, NPMAX
+         CALL SUBST_COMM( S_HALO_SOUTH(:,:,:,NP), S_HALO_NORTH(:,:,:,NP),
+     &                    DSPL_N1_E0_S0_W0, DRCN_N )
+         CALL SUBST_COMM( S_BUF_NS(:,:,:,NP),         S_HALO_SOUTH(:,:,:,NP),
+     &                    DSPL_N0_E0_S1_W0, DRCN_S )
+      END DO
+#endif
+
 
 #ifdef isam
       DO SPC = 1, N_SPCTAG
@@ -392,9 +487,64 @@ C North boundary
 #endif
 
 C PPM scheme
-         CALL HPPM ( NROWS, NCOLS, CONY, VELY, DT, DX2, 'R' )
+         F_LO_IN = 0.
+         F_LO_OUT= 0.
+         F_HI_IN = 0.
+         F_HI_OUT= 0.
+
+         IF ( BUDGET_DIAG ) BUDGET_HPPM = .TRUE.
+         CALL HPPM ( NROWS, NCOLS, CONY, VELY, DT, DX2, 'R',
+     &               F_LO_IN, F_LO_OUT, F_HI_IN, F_HI_OUT )
+ 
+         ! Store Boundary Fluxes for Budget Diagnostic
+         ! Flux units are converted:
+         !     vapors: [Jacobian x rho] x [ppm] --> umol
+         !     aerosol mass: [Jacobian] x [kg m-3] --> kg
+         !     aerosol number: [Jacobian] x [N m-3] --> N
+         !     aerosol surface area: [Jacobian] x [m2 m-3] --> m2
+         IF ( BUDGET_HPPM ) THEN
+            IF ( BNDY_PE_LOY ) THEN
+                call interpolate_var ('JACOBM', fdate, ftime, JACOBM)
+                call interpolate_var ('ZF', fdate, ftime, ZF)
+                IF ( LVL .EQ. 1 ) THEN
+                    VOL = AX * ZF( COL,1,1 ) / MSFX2( COL,1 )
+                ELSE
+                    VOL = AX * ( ZF( COL,1,LVL ) - ZF( COL,1,LVL-1 ) ) / MSFX2(COL,1)
+                END IF
+                DO I = 1,N_SPC_ADV
+                   A2C = ADV_MAP( I )
+                   VOL2 = VOL
+                   IF ( .NOT. CGRID_MASK_AERO( A2C ) ) VOL2 = VOL / MWAIR_SI
+                   F_SOUTH_IN( LVL,A2C )  = F_SOUTH_IN( LVL,A2C ) 
+     &                      + F_LO_IN(I) / JACOBM( COL,1,LVL ) * VOL2
+                   F_SOUTH_OUT( LVL,A2C ) = F_SOUTH_OUT( LVL,A2C ) 
+     &                      + F_LO_OUT(I) / JACOBM( COL,1,LVL ) * VOL2
+                END DO
+            END IF
+            IF ( BNDY_PE_HIY ) THEN
+                call interpolate_var ('JACOBM', fdate, ftime, JACOBM)
+                call interpolate_var ('ZF', fdate, ftime, ZF)
+                IF ( LVL .EQ. 1 ) THEN
+                    VOL = AX * ZF( COL,NROWS,1 ) / MSFX2( COL,NROWS )
+                ELSE
+                    VOL = AX * ( ZF( COL,NROWS,LVL ) - ZF( COL,NROWS,LVL-1 ) ) / MSFX2(COL,NROWS)
+                END IF
+                DO I = 1,N_SPC_ADV
+                   A2C = ADV_MAP( I )
+                   VOL2 = VOL
+                   IF ( .NOT. CGRID_MASK_AERO( A2C ) ) VOL2 = VOL / MWAIR_SI
+                   F_NORTH_IN( LVL,A2C )  = F_NORTH_IN( LVL,A2C ) 
+     &                      + F_HI_IN(I) / JACOBM( COL,NROWS,LVL ) * VOL2
+                   F_NORTH_OUT( LVL,A2C ) = F_NORTH_OUT( LVL,A2C ) 
+     &                      + F_HI_OUT(I) / JACOBM( COL,NROWS,LVL ) * VOL2
+                END DO
+            END IF
+            BUDGET_HPPM = .FALSE.
+         END IF
+         
 #ifdef isam
-         CALL HPPM ( NROWS, NCOLS, SA_CONY, VELY, DT, DX2, 'R' )
+         CALL HPPM ( NROWS, NCOLS, SA_CONY, VELY, DT, DX2, 'R',
+     &               SA_F_LO_IN, SA_F_LO_OUT, SA_F_HI_IN, SA_F_HI_OUT )
 #endif
 
          DO SPC = 1, N_SPC_ADV
@@ -412,6 +562,95 @@ C PPM scheme
               END DO
            END IF   
         END DO
+#endif
+
+
+#ifdef sens
+         DO NP = 1, NPMAX
+
+           CALL CKTIME( FDATE,FTIME,NP,TIMEFLAG) ! Check if the current time is within the time range
+
+           DO SPC = 1, N_SPC_ADV
+             A2C = ADV_MAP( SPC )
+             DO ROW = 1, NROWS
+               SENY( ROW,SPC ) = SENGRID( COL,ROW,LVL,NP,A2C )
+             END DO
+
+#ifdef parallel
+             DO ROW = 1, SWP
+               SENY( ROW-SWP,SPC )   = S_HALO_SOUTH( COL,ROW,SPC,NP )
+               SENY( NROWS+ROW,SPC ) = S_HALO_NORTH( COL,ROW,SPC,NP )
+             END DO
+#endif
+
+C South boundary
+             IF ( BNDY_PE_LOY ) THEN
+               IF ( VELY( 1 ) .LT. 0.0 ) THEN          ! outflow
+                 IF ( CONY( 0, SPC ) .EQ. 0.0 ) THEN
+                   SENY( 1-SWP:0, SPC ) = 0.0
+                 ELSE ! Zero-flux divergence boundary condition for sens
+                   SENY( 1-SWP:0,SPC ) =
+     &               S_ZFDBC ( SENY( 1,SPC ), SENY( 2,SPC ),
+     &                         VELY( 1 ),     VELY( 2 ) )
+                 END IF
+               ELSE    ! inflow
+                 IF ( BCS ) THEN
+                   SENY( 1-SWP:0,SPC ) = BSEN( SFX+COL,SPC,NP )
+                 ELSE IF ( ( IPT( NP ) .EQ. 2 ) .AND. ( TIMEFLAG ) ) THEN
+                 ! Insert boundary condition to SEN iff time, date,
+                 ! species, and region match and senstype is BOUN
+                   SENY( 1-SWP:0,SPC ) = BCON( SFX+COL,SPC )
+     &                                 * IREGION( COL, 1, LVL, NP )
+     &                                 * REAL ( IDATE ( NP, DATENUM ) )
+     &                                 * REAL ( IPARM ( NP, A2C     ) )
+                 ELSE
+                 ! Otherwise, set to 0
+                   SENY( 1-SWP:0, SPC ) = 0.0
+                 END IF
+               END IF
+             END IF
+
+C North boundary
+             IF ( BNDY_PE_HIY ) THEN
+               IF ( VELY( NROWS+1 ) .GT. 0.0 ) THEN     ! outflow
+                 IF ( CONY( NROWS+1, SPC ) .EQ. 0.0 ) THEN
+                   SENY( NROWS+1:NROWS+SWP, SPC ) = 0.0
+                 ELSE
+                 ! Zero-flux divergence boundary condition for sens
+                   SENY( NROWS+1:NROWS+SWP,SPC ) =
+     &               S_ZFDBC ( SENY( NROWS,SPC ), SENY( NROWS-1,SPC ),
+     &                         VELY( NROWS+1 ),   VELY( NROWS ) )
+                 END IF
+               ELSE    ! inflow
+                 IF ( BCS ) THEN
+                   SENY( NROWS+1:NROWS+SWP,SPC ) = BSEN( NFX+COL,SPC,NP )
+                 ELSE IF ( ( IPT( NP ) .EQ. 2 ) .AND. ( TIMEFLAG ) ) THEN
+                 ! Insert boundary condition to SEN iff time, date,
+                 ! species, and region match and senstype is BOUN
+                   SENY( NROWS+1:NROWS+SWP,SPC ) = BCON( NFX+COL,SPC )
+     &                               * IREGION( COL, NROWS, LVL, NP )
+     &                               * REAL ( IDATE ( NP, DATENUM ) )
+     &                               * REAL ( IPARM ( NP, A2C     ) )
+                 ELSE
+                   SENY( NROWS+1:NROWS+SWP,SPC ) = 0.0
+                 END IF
+               END IF
+             END IF
+
+           END DO
+
+C PPM scheme
+           CALL HPPM ( NROWS, NCOLS, SENY, VELY, DT, DX2, 'R',
+     &               F_LO_IN, F_LO_OUT, F_HI_IN, F_HI_OUT )
+
+           DO SPC = 1, N_SPC_ADV
+             A2C = ADV_MAP( SPC )
+             DO ROW = 1, NROWS
+               SENGRID( COL,ROW,LVL,NP,A2C ) = SENY( ROW,SPC )
+             END DO
+           END DO
+
+         END DO   ! NP
 #endif
 
 233   CONTINUE

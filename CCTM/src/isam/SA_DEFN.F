@@ -22,8 +22,13 @@
 ! KWOK: Created Oct 5, 2010
 ! 29 Oct 18 L.Zhou, S.Napelenok: update for cmaq 5.3 release
 ! 35 Mar 19 S.Napelenok: recode REGION handling and clean-up for release
-! 
+! 10 Jun 21 G. Sarwar: Added CB6R3M
+! 23 Jun 21 G. Sarwar: Replaced CB6R3M with CB6R5M
+! 25 June 21 G. Sarwar: Removed CB6R3_AE6_AQ since it is not suported in CMAQ any more
+! 26 Apr 22 G. Sarwar: Added DMS
 
+      USE RUNTIME_VARS, ONLY : VOC_NOX_TRANS, ISAM_NOX_CASE, ISAM_VOC_CASE
+      
       IMPLICIT NONE
 
       SAVE
@@ -33,38 +38,49 @@
       INTEGER ITAG
 
 c...Tagging maps
-      CHARACTER( 16 ), ALLOCATABLE :: SPC_NAME( :,: )
-      INTEGER, ALLOCATABLE, SAVE   :: SPC_INDEX( :,: )
+      CHARACTER( 16 ), ALLOCATABLE :: ISAM_SPEC( :,: )
+      INTEGER, ALLOCATABLE, SAVE   :: MAP_SAtoCGR( : )
       INTEGER, ALLOCATABLE, SAVE   :: MAP_CGRtoSA( : )
+      LOGICAL, ALLOCATABLE, SAVE   :: L_ISAM_AERO( : )
+      INTEGER, ALLOCATABLE, SAVE   :: MAP_ISAMtoAERO( : )
       INTEGER, ALLOCATABLE, SAVE   :: MAP_AEROtoSA( :,: )
+      INTEGER, ALLOCATABLE, SAVE   :: MAP_AEROGAStoSA( : )
+      INTEGER, ALLOCATABLE, SAVE   :: MAP_AEROCTRtoSA( : )
       LOGICAL, ALLOCATABLE, SAVE   :: IS_SPC_AEROSOL( :,: )
       LOGICAL, ALLOCATABLE, SAVE   :: TRANSPORT_SPC ( : )
+      LOGICAL, ALLOCATABLE, SAVE   :: ISAM_SPECIES_BIAS( :,: )
       INTEGER, ALLOCATABLE, SAVE   :: STREAM_TO_TAG ( :,: )
       INTEGER, ALLOCATABLE, SAVE   :: TAGS_PER_STREAM( : )
       INTEGER, ALLOCATABLE, SAVE   :: MAP_DIFFtoSA( : )
       INTEGER, ALLOCATABLE, SAVE   :: MAP_ADVtoSA( : )
+ 
+      INTEGER, ALLOCATABLE, SAVE   :: ISAM_TO_AERO( : )  ! maps tracked species to bulk concentration if aerosol species
+      INTEGER, ALLOCATABLE, SAVE   :: SA_AERO_INDX( : )  ! index of tracked aerosol in ISAM concentration array
 
       INTEGER, ALLOCATABLE, SAVE   :: ISAM_PVO3_MAP( : ) ! potential vorticity map
 
-      INTEGER ::     NSPC_SA
-      INTEGER ::     NTAG_SA
-      INTEGER ::     NSPC_TRANSPORT
+      INTEGER ::     NSPC_SA_AE        ! number of tracked species that are aerosols
+      INTEGER ::     N_SA_AEROSPC      ! number of unique aerospc in all tracked aerosols
+
+      INTEGER, SAVE ::     NSPC_SA
+      INTEGER, SAVE ::     NTAG_SA
+      INTEGER, SAVE ::     NSPC_TRANSPORT
+      INTEGER, PARAMETER :: NBIAS = 4 
+      INTEGER, SAVE ::     N_VOC_BIAS
+      INTEGER, SAVE ::     N_NOY_BIAS
 
 c...Define Allocatable Apportionment Arrays
       REAL, POINTER :: ISAM  ( :,:,:,:,: )
       REAL, ALLOCATABLE :: AISAM ( :,:,:,:,: )
       REAL, ALLOCATABLE :: TOT_SADEP ( :,:,:,: )
       REAL, ALLOCATABLE :: CONV_SADEP ( :,:,:,: )
-c     REAL, ALLOCATABLE :: MAPFRAC( :,:,: )
-c     REAL, ALLOCATABLE :: MFRC_P( :,:,: )
-c     REAL, ALLOCATABLE :: VOC5D ( :,:,:,:,: )
-      REAL, ALLOCATABLE :: SA_VDEMIS_DIFF_ALL( :,:,:,:,: ) ! full emissions array mapped to diffused species
-      REAL, ALLOCATABLE :: SA_VDEMIS_DIFF_OTHER( :,:,:,: ) ! emissions left for 'OTHRTAG'
+      REAL, ALLOCATABLE :: SA_VDEMIS_CONV( :,:,:,:,: ) ! full emissions array mapped to diffused species
+      REAL, ALLOCATABLE :: SA_VDEMIS_CONV_OTHER( :,:,:,: ) ! emissions left for 'OTHRTAG'
       REAL, ALLOCATABLE :: SA_VDEMIS_DIFF( :,:,:,:,: ) 
 
 c...Variables regarding the tag list
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: TAGNAME( : )
-      CHARACTER( 96 )                    :: TAGCLASSES
+      CHARACTER( 96 )                    :: TAGCLASSES = ' '
       CHARACTER( 96 ), ALLOCATABLE, SAVE :: TAGSTREAMS_TEMP( : )
       CHARACTER( 96 ), ALLOCATABLE, SAVE :: TAGSTREAMS( :, : )
       INTEGER, ALLOCATABLE, SAVE         :: TAGSTREAMS_NUM( : )
@@ -75,21 +91,41 @@ c...Variables regarding the tag list
       INTEGER, ALLOCATABLE, SAVE         :: ISAMRGN_MAP( :, : )
 
 c...Logical values for tagging species
-      LOGICAL, SAVE :: L_EC
-      LOGICAL, SAVE :: L_OC
-      LOGICAL, SAVE :: L_SFATE
-      LOGICAL, SAVE :: L_NITRATE
-      LOGICAL, SAVE :: L_NH4
-      LOGICAL, SAVE :: L_PM25
-      LOGICAL, SAVE :: L_CO
-      LOGICAL, SAVE :: L_OZONE
-      LOGICAL, SAVE :: L_VOC
-      LOGICAL, SAVE :: L_CHLORINE
+      LOGICAL, SAVE :: L_EC      = .FALSE.
+      LOGICAL, SAVE :: L_OC      = .FALSE.
+      LOGICAL, SAVE :: L_SO4     = .FALSE.
+      LOGICAL, SAVE :: L_NO3     = .FALSE.
+      LOGICAL, SAVE :: L_NH4     = .FALSE.
+      LOGICAL, SAVE :: L_PM25    = .FALSE.
+      LOGICAL, SAVE :: L_OZONE   = .FALSE.
+      LOGICAL, SAVE :: L_VOC     = .FALSE.
+      LOGICAL, SAVE :: L_CL      = .FALSE.
+      
+      LOGICAL, SAVE :: SA_BIDI = .FALSE.
+
+! Chemical Mechanism Lists for Populating ISAM Species Arrays
+      TYPE ISAM_LIST
+         CHARACTER( 16 ), ALLOCATABLE  :: LIST( : )
+      END TYPE ISAM_LIST
+
+      TYPE( ISAM_LIST ), ALLOCATABLE :: ISAM_SPEC_OZONE( : ),
+     &              ISAM_SPEC_NO3( : ), ISAM_SPEC_VOC( : ),
+     &              ISAM_SPEC_SO4( : ), ISAM_SPEC_HAPGAS( : ),
+     &              ISAM_BIAS_VOC( : ), ISAM_BIAS_NOY( : )
+
+! Full chemistry commented out because it produced floating
+! point error in advection when using debug flags.
+!     LOGICAL, SAVE :: L_CHEMISTRY
 
 ! Cloud Module variables - sln 4 june 2018
       REAL, SAVE :: DEPSUM_SAVE = 0.0
       REAL, SAVE :: DS4_SAVE    = 0.0
       REAL, SAVE :: REMOV_SAVE  = 0.0
+
+      REAL, SAVE :: DEPSUM_AORGC_SAVE = 0.0
+      REAL, SAVE :: DGLY1_SAVE        = 0.0 
+      REAL, SAVE :: DMGLY1_SAVE       = 0.0  
+      REAL, SAVE :: REMOV_AORGC_SAVE  = 0.0
 
 c...Final, combined tags
       INTEGER                      :: N_SPCTAG
@@ -98,9 +134,10 @@ c...Final, combined tags
       CHARACTER( 16 ), ALLOCATABLE :: VNAM_SPCTAG( : )
 
 C ...Tagging indices for bcon, others, icon
-      INTEGER :: BCONTAG
-      INTEGER :: OTHRTAG
-      INTEGER :: ICONTAG
+      INTEGER, SAVE :: BIDITAG = 0
+      INTEGER, SAVE :: BCONTAG = 0
+      INTEGER, SAVE :: OTHRTAG = 0
+      INTEGER, SAVE :: ICONTAG = 0
 
       REAL, PRIVATE, ALLOCATABLE :: BUFF2( :,: )
 
@@ -110,6 +147,32 @@ C ...Tagging indices for bcon, others, icon
 ! Advection module variables
       LOGICAL, ALLOCATABLE, SAVE :: BCON_SPC( : )
 
+        INTEGER, PARAMETER, PRIVATE :: MAX_STRING     = 32  ! max length of tagclass name
+        INTEGER, PARAMETER, PRIVATE :: MAX_TAGCLASSES = 200 ! max number of tagclasses
+        INTEGER, PARAMETER, PRIVATE :: NUMB_CLASSES   = 19  ! number of defined tagclasses
+        
+        CHARACTER( MAX_STRING ), PARAMETER, PRIVATE :: DEFINED_CLASSES( NUMB_CLASSES ) = 
+     & (/ 'AMMONIUM    ',
+     &    'OA_TOT      ',
+     &    'NVPOA       ',
+     &    'CHLORINE    ',
+     &    'EC          ',
+     &    'SULFATE     ',
+     &    'OZONE       ',
+     &    'NITRATE     ',
+     &    'VOC         ',
+     &    'PM_IONS     ',
+     &    'ALL         ',
+     &    'PM_TOT      ',
+     &    'HAP_GAS     ',
+     &    'HAP_AERO    ',
+     &    'HAP_TOT     ',
+     &    'URBAN_TOXICS',
+     &    'PAH_TEQ     ',
+     &    'BENAPYRENE  ',
+     &    'MERCURY     '/)
+        
+      
       CONTAINS
 
 C============================================================
@@ -122,12 +185,10 @@ C
 C
 
         USE UTILIO_DEFN     ! 20120615
-        USE HGRD_DEFN       ! just for mype0 20130702
-
+c       USE HGRD_DEFN    
+        USE RUNTIME_VARS, ONLY: ABFLUX, MYPE, LOGDEV
+                
         IMPLICIT NONE
-
-!0615   INCLUDE SUBST_IOPARMS
-C       INCLUDE SUBST_IODECL 
 
         CHARACTER( 16 ) :: PNAME = 'CNT_SA_IO_LIST'
         CHARACTER( 256 ) :: EQNAME 
@@ -139,21 +200,21 @@ C external functions
 
         INTEGER, INTENT( OUT ) :: NTAGS
         INTEGER ILINE
-        CHARACTER( 21 ) :: TXTLINE
+        CHARACTER( 180 ) :: TXTLINE
         
 C-----------------------------------------------------------
         CALL NAMEVAL( 'SA_IOLIST', EQNAME )
         INPUT_UNIT = JUNIT()
          
         OPEN ( UNIT = INPUT_UNIT, FILE = EQNAME, STATUS = 'OLD', IOSTAT = IOST )
-        XMSG = 'Error Opening SA_IO_LIST file'
+        XMSG = 'Error Opening ' // TRIM( EQNAME ) // ', the SA_IOLIST file'
         IF ( IOST .NE. 0 ) THEN
-          CALL M3EXIT ( 'SA_IOLIST', 0, 0, XMSG, XSTAT1 )
+          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
         ENDIF
 
         IF ( MYPE .EQ. 0 ) THEN        
-          PRINT*, 'SA_IO_LIST Sucessfully Opened'
-          PRINT*, 'Start counting the list...'
+          WRITE(LOGDEV, *) TRIM( EQNAME ) // ': Sucessfully Opened'
+          WRITE(LOGDEV, *) 'Start counting the list...'
         ENDIF
         NTAGS = 0
         COUNTTAG: DO 
@@ -161,9 +222,21 @@ C-----------------------------------------------------------
           IF ( TXTLINE( 1:7 ) .EQ. 'ENDLIST' ) EXIT COUNTTAG
           IF ( TXTLINE( 1:7 ) .EQ. 'TAG NAM' ) THEN
             NTAGS = NTAGS + 1
-            IF ( MYPE .EQ. 0 ) PRINT*, TXTLINE
+            !IF ( MYPE .EQ. 0 ) PRINT*, TXTLINE
           ENDIF ! if tag_name
+c check to see if bidirectional tag is necessary
+          IF ( ABFLUX ) THEN
+            IF ( INDEX( TXTLINE, 'TAG CLASSES') .GT. 0 ) THEN
+              IOST = INDEX( TXTLINE,'AMMONIUM', BACK = .FALSE. )
+              IF ( IOST .NE. 0 ) THEN
+                SA_BIDI = .TRUE.
+                NTAGS   = NTAGS + 1
+              END IF
+            END IF
+          END IF
         ENDDO COUNTTAG
+
+        IF ( SA_BIDI ) BIDITAG = NTAGS ! set to last tag
 
         CLOSE( INPUT_UNIT )
 
@@ -179,44 +252,63 @@ C
 C 05 Nov 2018: L.Zhou, S.Napelenok: Reorganized the control file
 c 
 
-        USE UTILIO_DEFN      ! 20120615
-        USE HGRD_DEFN        ! just for mype
+        USE UTILIO_DEFN 
+        USE RUNTIME_VARS, ONLY: ABFLUX, MYPE, LOGDEV
 
         IMPLICIT NONE
+C arguments
+        INTEGER, INTENT( IN ) :: NTAGS
 
-        CHARACTER( 16 ) :: PNAME = 'RD_SA_IO_LIST'
-        CHARACTER( 256 ) :: EQNAME 
+        CHARACTER( 16 )    :: PNAME = 'RD_SA_IO_LIST'
+        CHARACTER( 256 )   :: EQNAME 
         INTEGER INPUT_UNIT
         INTEGER IOST
-        CHARACTER( 80 ) :: XMSG   
+        CHARACTER( 120 ) :: XMSG   
 C external functions
         INTEGER LEN_TRIM
 
-        INTEGER, INTENT( IN ) :: NTAGS
         INTEGER ILINE
-        INTEGER ITAG
+        INTEGER ITAG, TAGLOOP
         CHARACTER( 128 ) :: TXTLINE
 
 C...multi-sectors-for-a-single-tag 20130702
         INTEGER ISGSTK
         CHARACTER( 2 )  :: CSGSTK
         CHARACTER( 16 ) :: FNAME
-        LOGICAL LBACK
+        INTEGER DELIMINATOR_INDEX 
         INTEGER BGN_SG
+        INTEGER I, J ,k
+        CHARACTER(1) :: CHR
 
 C-----------------------------------------------------------
         CALL NAMEVAL( 'SA_IOLIST', EQNAME )
         INPUT_UNIT = JUNIT()
 
         OPEN ( UNIT = INPUT_UNIT, FILE = EQNAME, STATUS = 'OLD', IOSTAT = IOST )
-        XMSG = 'Error Opening SA_IO_LIST file'
+        XMSG = 'Error Opening ' // TRIM( EQNAME ) // ', the SA_IOLIST file'
         IF ( IOST .NE. 0 ) THEN
-          CALL M3EXIT ( 'SA_IOLIST', 0, 0, XMSG, XSTAT1 )
+          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
         ENDIF
-        
+
+        CHR = CHAR(124)
 101     READ ( INPUT_UNIT, '(A)' ) TXTLINE
         IF ( TXTLINE(1:3) .EQ. '!!!' .OR. TXTLINE(1:3) .EQ. '' ) GOTO 101
-        TAGCLASSES = TXTLINE(18:LEN_TRIM( TXTLINE ) )
+        IF( INDEX( TXTLINE, 'TAG CLASSES' ) .GE. 1 )THEN
+           DELIMINATOR_INDEX = INDEX( TXTLINE, CHAR( 124 ) ) + 1
+           IF(  DELIMINATOR_INDEX .LE. 1 )THEN
+              XMSG = 'ISAM ERROR: TAG CLASSES line missing the "|" deliminator'
+              CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+           END IF 
+           TAGCLASSES = TXTLINE( DELIMINATOR_INDEX:LEN_TRIM( TXTLINE ) )
+           IF( LEN_TRIM( TAGCLASSES ) .LT. 1 )THEN
+              XMSG = "ISAM ERROR: TAGCLASSES in control file is blank. "
+              CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+           END IF
+        ELSE   
+           XMSG = "ISAM ERROR: First Nonblank or Noncomment line "
+     &         // "in control file must define TAG CLASSES. "
+           CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+        END IF
 
         IF ( MYPE .eq. 0 ) then
           WRITE(LOGDEV, *) 'Reading ISAM control file'
@@ -224,19 +316,88 @@ C-----------------------------------------------------------
           WRITE(LOGDEV, *) '  for ', NTAGS, ' tags'
         ENDIF
 
-        DO ITAG = 1, ( NTAGS )
+        IF ( SA_BIDI ) THEN
+          TAGLOOP = NTAGS -1
+        ELSE
+          TAGLOOP = NTAGS
+        ENDIF
+
+        DO ITAG = 1, ( TAGLOOP )
+        
+          TAGNAME( ITAG )         = ' '
+          ISAMRGN_TEMP( ITAG )    = ' '
+          TAGSTREAMS_TEMP( ITAG ) = ' '
+          
 102       READ ( INPUT_UNIT, '(A)' ) TXTLINE
           IF ( TXTLINE(1:3) .EQ. '!!!' .OR. TXTLINE(1:3) .EQ. '' ) GOTO 102
-          TAGNAME( ITAG ) = TXTLINE(18:LEN_TRIM( TXTLINE ) )
+          IF( INDEX( TXTLINE, 'TAG NAME' ) .GE. 1 )THEN
+              DELIMINATOR_INDEX = INDEX( TXTLINE, CHAR( 124 ) ) + 1
+              IF(  DELIMINATOR_INDEX .LE. 1 )THEN
+                 XMSG = 'ISAM ERROR: "TAG NAME" line missing the "|" deliminator'
+                 CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+              END IF 
+              TAGNAME( ITAG ) = TXTLINE( DELIMINATOR_INDEX:LEN_TRIM( TXTLINE ) )
+              IF( LEN_TRIM( TAGNAME( ITAG ) ) .LT. 1 )THEN
+                 XMSG = 'ISAM ERROR: a "TAG NAME" in control file is blank. '
+                 CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+              END IF
+              IF( INDEX( TAGNAME( ITAG ), "_", BACK = .FALSE. ) .GT. 0 )THEN
+                 XMSG = 'ISAM ERROR: TAG NAME: ' // TRIM( TAGNAME( ITAG ) ) 
+     &               // ' cannot use the underscore character.'
+                 CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+              END IF
+          ELSE   
+              XMSG = "ISAM ERROR: First line defining a TAG "
+     &            // 'in control file must contain the "TAG NAME" ' 
+              CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+          END IF
 
 103       READ ( INPUT_UNIT, '(A)' ) TXTLINE
           IF ( TXTLINE(1:3) .EQ. '!!!' .OR. TXTLINE(1:3) .EQ. '' ) GOTO 103
-          ISAMRGN_TEMP( ITAG ) = TXTLINE(18:LEN_TRIM( TXTLINE ) )
+          IF( INDEX( TXTLINE, 'REGION' ) .GE. 1 )THEN
+              DELIMINATOR_INDEX = INDEX( TXTLINE, CHAR( 124 )  ) + 1
+              IF(  DELIMINATOR_INDEX .LE. 1 )THEN
+                 XMSG = 'ISAM ERROR: a "REGION(s)" line missing the "|" deliminator'
+                 CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+              END IF 
+              ISAMRGN_TEMP( ITAG ) = TXTLINE( DELIMINATOR_INDEX:LEN_TRIM( TXTLINE ) )
+              IF( LEN_TRIM( ISAMRGN_TEMP( ITAG ) ) .LT. 1 )THEN
+                 XMSG = 'ISAM ERROR: a "REGION(s)" in control file is blank. '
+                 CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+              END IF
+          ELSE   
+              XMSG = "ISAM ERROR: Second line defining a TAG "
+     &            // 'in control file must contain the "REGION(s)" ' 
+              CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+          END IF
 
 104       READ ( INPUT_UNIT, '(A)' ) TXTLINE
           IF ( TXTLINE(1:3) .EQ. '!!!' .OR. TXTLINE(1:3) .EQ. '' ) GOTO 104
-          TAGSTREAMS_TEMP( ITAG ) = TXTLINE(18:LEN_TRIM( TXTLINE ) )
+          IF( INDEX( TXTLINE, 'EMIS STREAM' ) .GE. 1 )THEN
+              DELIMINATOR_INDEX = INDEX( TXTLINE, CHAR( 124 )  ) + 1
+              IF(  DELIMINATOR_INDEX .LE. 1 )THEN
+                 XMSG = 'ISAM ERROR: a "EMIS STREAM(s)" line missing the "|" deliminator'
+                 CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+              END IF 
+              TAGSTREAMS_TEMP( ITAG ) = TXTLINE( DELIMINATOR_INDEX:LEN_TRIM( TXTLINE ) )
+              IF( LEN_TRIM( TAGSTREAMS_TEMP( ITAG ) ) .LT. 1 )THEN
+                 XMSG = 'ISAM ERROR: a "EMIS STREAM(s)" in control file is blank. '
+                 CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+              END IF
+          ELSE   
+              XMSG = "ISAM ERROR: Third line defining a TAG "
+     &            // 'in control file must contain the "EMIS STREAM(s)" ' 
+              CALL M3EXIT('SA_IOLIST', 0, 0, XMSG, XSTAT2 )
+          END IF
+
         END DO
+        
+c add a bidirectional tag if necesssary
+        IF ( SA_BIDI ) THEN
+          TAGNAME( NTAGS )         = 'BID' 
+          ISAMRGN_TEMP( NTAGS )    = 'EVERYWHERE'
+          TAGSTREAMS_TEMP( NTAGS ) = 'BIDIRECTIONALNH3'
+        ENDIF
 
         END SUBROUTINE RD_SA_IO_LIST
 C============================================================
@@ -248,180 +409,1185 @@ C         Called by sa_dim.F
 C
 
         USE RUNTIME_VARS
-        USE GRID_CONF    ! just for mype 20140327
-        USE RXNS_DATA, ONLY : MECHNAME !Get Chemical Mechanism Name
-        USE UTILIO_DEFN  ! 20130627
+        USE RXNS_DATA,  ONLY : MECHNAME  !Get Chemical Mechanism Name
+        USE CGRID_SPCS, ONLY : NSPCSD, CGRID_NAME, N_AE_SPC, AE_SPC,
+     &                         N_NR_SPC, NR_SPC, CGRID_MASK_GAS,
+     &                         CGRID_MASK_NR 
+
+        USE AERO_DATA
+        USE SOA_DEFN
+        USE UTILIO_DEFN
 
         IMPLICIT NONE
 
-        INTEGER :: ITAG
-        INTEGER :: J
+        INTEGER :: ITAG, IMECH, IAERO, JAERO, ISPEC, IMODE
+        INTEGER :: I, J, K
+        INTEGER :: N_ISAM_MECH, NVL_RESET
 
-        LOGICAL :: LBACK
-        LOGICAL :: DEFINED 
-        INTEGER :: BGN_SP
+        LOGICAL,         ALLOCATABLE  :: MERCURY_MECH ( : )
+        CHARACTER( 32 ), ALLOCATABLE  :: ISAM_MECHLIST( : )
+
+        TYPE( ISAM_LIST ) :: ISAM_SPEC_HAPAERO, ISAM_SPEC_TOXICS,
+     &                       ISAM_SPEC_PAHTEQ,  ISAM_SPEC_MERCURY
+
+        LOGICAL :: EFLAG          = .FALSE. 
+        LOGICAL :: FOUND_SPECIES  = .FALSE.
+        INTEGER :: CLASSES_FOUND  = 0
         
-        CHARACTER( 132 ) :: XMSG
+        CHARACTER( 400 ) :: XMSG
+        CHARACTER( 16 )  :: GASNAME, CTRNAME
 
         INTEGER :: IOST
-
+        CHARACTER( MAX_STRING ), ALLOCATABLE :: CLASS_NAMES( : )
+        INTEGER :: NCLASSES = 0
+        
 c----------------------------------------------------------
 
-        L_EC       = .FALSE. 
-        L_OC       = .FALSE. 
-        L_SFATE    = .FALSE. 
-        L_NITRATE  = .FALSE. 
-        L_NH4      = .FALSE. 
-        L_PM25     = .FALSE.   
-        L_CO       = .FALSE.   
-        L_OZONE    = .FALSE.   
-        L_VOC      = .FALSE.   
-        L_CHLORINE = .FALSE.
+        N_ISAM_MECH = 10
+        ALLOCATE( ISAM_MECHLIST( N_ISAM_MECH ),   MERCURY_MECH ( N_ISAM_MECH ),
+     &            ISAM_SPEC_OZONE( N_ISAM_MECH ), ISAM_SPEC_VOC( N_ISAM_MECH ), 
+     &            ISAM_SPEC_NO3  ( N_ISAM_MECH ), ISAM_SPEC_SO4( N_ISAM_MECH ), 
+     &            ISAM_SPEC_HAPGAS( N_ISAM_MECH ),
+     &            ISAM_BIAS_VOC( N_ISAM_MECH ),   ISAM_BIAS_NOY( N_ISAM_MECH ) )
 
-        NSPC_SA = 0
-
-        LBACK = .FALSE.
-
-        BGN_SP = INDEX( TAGCLASSES,'CHLORINE',LBACK )
-        IF ( BGN_SP .NE. 0 ) THEN
-          NSPC_SA = NSPC_SA + 3  ! ACLI, ACLJ, HCL
-          L_CHLORINE = .TRUE.
-        ENDIF
-
-        BGN_SP = INDEX( TAGCLASSES,'EC',LBACK )
-        IF ( BGN_SP .NE. 0 ) THEN
-          NSPC_SA = NSPC_SA + 2  ! AECJ, AECI
-          L_EC = .TRUE.
-        ENDIF
-
-        BGN_SP = INDEX( TAGCLASSES,'OC',LBACK )
-        IF ( BGN_SP .NE. 0 ) THEN
-c           NSPC_SA = NSPC_SA + 13  ! ALVPO1I,ALVPO1J,ASVPO1I,ASVPO1J,ASVPO2I,ASVPO2J,ASVPO3J,AIVPO1J
-                                    ! VLVPO1,VSVPO1,VSVPO2,VSVO3,VIVPO1
-            NSPC_SA = NSPC_SA + 4   ! APOCJ, APOCI, APNCOMJ, APNCOMI  
-          L_OC = .TRUE.
-        ENDIF
-
-        BGN_SP = INDEX( TAGCLASSES,'SULFATE',LBACK )
-        IF ( BGN_SP .NE. 0 ) THEN
-          NSPC_SA = NSPC_SA + 5  ! ASO4J, ASO4I, SO2, SULF(Fb21), SULRXN(20130529)
-          L_SFATE = .TRUE.
-        ENDIF
-
-        BGN_SP = INDEX( TAGCLASSES,'OZONE',LBACK )
-        IF ( BGN_SP .NE. 0 ) THEN
-          NSPC_SA = NSPC_SA + 4  ! O3, O1D, O or O3P, HO2
-          L_OZONE   = .TRUE.
-          L_NITRATE = .TRUE.
-          L_VOC     = .TRUE.
-        END IF       
-
-        BGN_SP = INDEX( TAGCLASSES,'NITRATE',LBACK )
-        L_NITRATE = ( BGN_SP .NE. 0 .OR. L_NITRATE )
-
-        BGN_SP = INDEX( TAGCLASSES,'VOC',LBACK )
-        L_VOC = ( BGN_SP .NE. 0 .OR. L_VOC )
-
-        DEFINED = .TRUE.
-
-        IF( L_NITRATE .OR. L_VOC .OR. L_OZONE )THEN ! determine if tag species are defined by mechanism's name
-          SELECT CASE( MECHNAME ) 
-             CASE( 'CB6R3_AE6_AQ',     'CB6R3_AE7_AQ',      'CB6R3M_AE7_KMTBR', 
-     &             'SAPRC07TC_AE6_AQ', 'SAPRC07TIC_AE6I_AQ', 'SAPRC07TIC_AE7I_AQ',
-     &             'RACM2_AE6_AQ'                                               ) 
-                DEFINED = .TRUE.
-             CASE DEFAULT 
-                DEFINED = .FALSE.
-          END SELECT
-        END IF
        
-        IF( .NOT. DEFINED )THEN
-            XMSG = "ISAM ERROR: Using L_NITRATE or L_VOC or L_OZONE tag group but their species "
-     &          // "for the " // TRIM( MECHNAME ) // " mechanism not defined. Modify GET_NSPC_SA "
-     &          // "and GET_SPC_INDEX  subroutines to include MECHNAME cases for it."
-            CALL M3EXIT('GET_NSPC_SA', 0, 0, XMSG, XSTAT2 )
+        ISAM_MECHLIST = (/'CB6R3_AE7_AQ      ', 'CB6R5_AE7_AQ      ',
+     &                    'CB6R5M_AE7_AQ     ', 
+     &                    'SAPRC07TC_AE6_AQ  ', 'SAPRC07TIC_AE6I_AQ', 
+     &                    'SAPRC07TIC_AE7I_AQ', 'RACM2_AE6_AQ      ',
+     &                    'CRACMM1_AQ        ', 'CRACMM2           ',
+     &                    'CRACMM3           '/ )  
+
+        MERCURY_MECH = (/  .TRUE.,  .TRUE.,  
+     &                     .TRUE.,  .FALSE., 
+     &                     .FALSE., .FALSE.,
+     &                     .FALSE., .FALSE.,
+     &                     .FALSE., .FALSE. / )  
+
+        ! Detect Mechanism Number
+        IMECH = INDEX1( MECHNAME, N_ISAM_MECH, ISAM_MECHLIST )
+
+        ! When Prescribing Species for Ozone, Nitrate and VOCs, do not
+        ! worry about double-counting. The algorithm will look for each
+        ! species in the ISAM_SPEC array before adding it. Put all of
+        ! the species in each category that you think you will need.
+
+        ! PRESCRIBE OZONE SPECIES
+        DO J = 1,N_ISAM_MECH
+          ALLOCATE( ISAM_SPEC_OZONE( J )%LIST( 4 ) )
+        END DO
+        !CB6R3_AE7_AQ
+        ISAM_SPEC_OZONE( 1 )%LIST = (/'O3 ','O1D','HO2','O  '/)
+        
+        !CB6R5_AE7_AQ
+        ISAM_SPEC_OZONE( 2 )%LIST = (/'O3 ','O1D','HO2','O  '/)
+        
+        !CB6R5M_AE7_AQ
+        ISAM_SPEC_OZONE( 3 )%LIST = (/'O3 ','O1D','HO2','O  '/)
+        
+        !SAPRC07TC_AE6_AQ
+        ISAM_SPEC_OZONE( 4 )%LIST = (/'O3 ','O1D','HO2','O3P'/)
+        
+        !SAPRC07TIC_AE6I_AQ
+        ISAM_SPEC_OZONE( 5 )%LIST = (/'O3 ','O1D','HO2','O3P'/)
+        
+        !SAPRC07TIC_AE7I_AQ
+        ISAM_SPEC_OZONE( 6 )%LIST = (/'O3 ','O1D','HO2','O3P'/)
+        
+        !RACM2_AE6_AQ
+        ISAM_SPEC_OZONE( 7 )%LIST = (/'O3 ','O1D','HO2','O3P'/)
+
+        !CRACMM1_AQ
+        ISAM_SPEC_OZONE( 8 )%LIST = (/'O3 ','O1D','HO2','O3P'/)
+
+        !CRACMM2
+        ISAM_SPEC_OZONE( 9 )%LIST = (/'O3 ','O1D','HO2','O3P'/)
+
+        !CRACMM3
+        ISAM_SPEC_OZONE( 10 )%LIST = (/'O3 ','O1D','HO2','O3P'/)
+
+        ! PRESCRIBE VOC SPECIES
+        !CB6R3_AE7_AQ
+        ALLOCATE( ISAM_SPEC_VOC( 1 )%LIST( 28 ) )
+        ISAM_SPEC_VOC( 1 )%LIST = (/'ALD2   ','ALDX   ','ETH    ',
+     &          'ETHA   ','ETOH   ','FORM   ','IOLE   ','ISOP   ',
+     &          'MEOH   ','OLE    ','PAR    ','TERP   ','TOL    ',
+     &          'XYLMN  ','NAPH   ','ETHY   ','PRPA   ','ACET   ',
+     &          'KET    ','GLY    ','BENZENE','GLYD   ','MEPX   ',
+     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   '/)
+
+        !CB6R5_AE7_AQ
+        ALLOCATE( ISAM_SPEC_VOC( 2 )%LIST( 28 ) )
+        ISAM_SPEC_VOC( 2 )%LIST = (/'ALD2   ','ALDX   ','ETH    ',
+     &          'ETHA   ','ETOH   ','FORM   ','IOLE   ','ISOP   ',
+     &          'MEOH   ','OLE    ','PAR    ','TERP   ','TOL    ',
+     &          'XYLMN  ','NAPH   ','ETHY   ','PRPA   ','ACET   ',
+     &          'KET    ','GLY    ','BENZENE','GLYD   ','MEPX   ',
+     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   '/)
+
+        !CB6R5M_AE7_AQ
+        ALLOCATE( ISAM_SPEC_VOC( 3 )%LIST( 28 ) )
+        ISAM_SPEC_VOC( 3 )%LIST = (/'ALD2   ','ALDX   ','ETH    ',
+     &          'ETHA   ','ETOH   ','FORM   ','IOLE   ','ISOP   ',
+     &          'MEOH   ','OLE    ','PAR    ','TERP   ','TOL    ',
+     &          'XYLMN  ','NAPH   ','ETHY   ','PRPA   ','ACET   ',
+     &          'KET    ','GLY    ','BENZENE','GLYD   ','MEPX   ',
+     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   '/)
+
+        !SAPRC07TC_AE6_AQ
+        ALLOCATE( ISAM_SPEC_VOC( 4 )%LIST( 41 ) )
+        ISAM_SPEC_VOC( 4 )%LIST = (/'HCHO       ','CCHO       ',
+     &  'RCHO       ','xHCHO      ','xCCHO      ','xRCHO      ',
+     &  'ALK1       ','ALK2       ','ALK3       ','ALK4       ',
+     &  'ALK5       ','ETHENE     ','ACETYLENE  ','PROPENE    ',
+     &  'ISOPRENE   ','TERP       ','SESQ       ','APIN       ',
+     &  'OLE1       ','OLE2       ','ETOH       ','MEOH       ',
+     &  'GLY        ','MGLY       ','BENZENE    ','TMBENZ124  ',
+     &  'TOLUENE    ','MXYL       ','OXYL       ','PXYL       ',
+     &  'NAPHTHAL   ','ARO1       ','ARO2MN     ','BUTADIENE13',
+     &  'ACROLEIN   ','ACETONE    ','MEK        ','MVK        ',
+     &  'MACR       ','SOAALK     ','CO         '/ )
+
+        !SAPRC07TIC_AE6I_AQ
+        ALLOCATE( ISAM_SPEC_VOC( 5 )%LIST( 41 ) )
+        ISAM_SPEC_VOC( 5 )%LIST = (/'HCHO       ','CCHO       ',
+     &  'RCHO       ','xHCHO      ','xCCHO      ','xRCHO      ',
+     &  'ALK1       ','ALK2       ','ALK3       ','ALK4       ',
+     &  'ALK5       ','ETHENE     ','ACETYLENE  ','PROPENE    ',
+     &  'ISOPRENE   ','TERP       ','SESQ       ','APIN       ',
+     &  'OLE1       ','OLE2       ','ETOH       ','MEOH       ',
+     &  'GLY        ','MGLY       ','BENZENE    ','TMBENZ124  ',
+     &  'TOLUENE    ','MXYL       ','OXYL       ','PXYL       ',
+     &  'NAPHTHAL   ','ARO1       ','ARO2MN     ','BUTADIENE13',
+     &  'ACROLEIN   ','ACETONE    ','MEK        ','MVK        ',
+     &  'MACR       ','SOAALK     ','CO         '/ )
+
+        !SAPRC07TIC_AE7I_AQ
+        ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 41 ) )
+        ISAM_SPEC_VOC( 6 )%LIST = (/'HCHO       ','CCHO       ',
+     &  'RCHO       ','xHCHO      ','xCCHO      ','xRCHO      ',
+     &  'ALK1       ','ALK2       ','ALK3       ','ALK4       ',
+     &  'ALK5       ','ETHENE     ','ACETYLENE  ','PROPENE    ',
+     &  'ISOPRENE   ','TERP       ','SESQ       ','APIN       ',
+     &  'OLE1       ','OLE2       ','ETOH       ','MEOH       ',
+     &  'GLY        ','MGLY       ','BENZENE    ','TMBENZ124  ',
+     &  'TOLUENE    ','MXYL       ','OXYL       ','PXYL       ',
+     &  'NAPHTHAL   ','ARO1       ','ARO2MN     ','BUTADIENE13',
+     &  'ACROLEIN   ','ACETONE    ','MEK        ','MVK        ',
+     &  'MACR       ','SOAALK     ','CO         '/ )
+
+        !RACM2_AE6_AQ
+        ALLOCATE( ISAM_SPEC_VOC( 7 )%LIST( 38 ) )
+        ISAM_SPEC_VOC( 7 )%LIST = (/'HCHO   ','ACD    ','ALD    ',
+     &          'UALD   ','HC3    ','HC5    ','HC8    ','OLI    ',
+     &          'OLT    ','ETH    ','ETE    ','ACE    ','ISO    ',
+     &          'SESQ   ','LIM    ','API    ','EOH    ','MOH    ',
+     &          'GLY    ','MGLY   ','BENZENE','TOL    ','XYM    ',
+     &          'XYO    ','XYP    ','NAPH   ','DIEN   ','ACT    ',
+     &          'HKET   ','KET    ','MVK    ','MEK    ','MACR   ',
+     &          'DCB1   ','DCB2   ','DCB3   ','SOAALK ','CO     '/ )
+
+        !CRACMM1_AQ
+        ALLOCATE( ISAM_SPEC_VOC( 8 )%LIST( 96 ) )
+        ISAM_SPEC_VOC( 8 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
+     &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
+     &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
+     &    'ELHOM     ','EOH       ','ETE       ','ETEG      ','ETH       ',
+     &    'FURAN     ','FURANONE  ','GLY       ','HOM       ','HC3       ',
+     &    'HC5       ','HC10      ','HCHO      ','HKET      ','IEPOX     ',
+     &    'ISHP      ','IPN       ','IHN       ','IPC       ','ISO       ',
+     &    'KET       ','LIM       ','LIMAL     ','MACR      ','MAHP      ',
+     &    'MCT       ','MEK       ','MGLY      ','MOH       ','MVK       ',
+     &    'NAPH      ','OLI       ','OLT       ','OP1       ','OP2       ',
+     &    'OP3       ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
+     &    'PHEN      ','PROG      ','ROH       ','SESQ      ','SLOWROC   ',
+     &    'TOL       ','UALD      ','XYM       ','XYE       ','PAA       ',
+     &    'PAN       ','PPN       ','MPAN      ','ONIT      ','ISON      ',
+     &    'TRPN      ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
+     &    'VROCN1ALK ','VROCP0ALK ','VROCP1ALK ','VROCP2ALK ','VROCP3ALK ',
+     &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
+     &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
+     &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1'/ )
+
+        !CRACMM2
+        ALLOCATE( ISAM_SPEC_VOC( 9 )%LIST( 97 ) )
+        ISAM_SPEC_VOC( 9 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
+     &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
+     &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
+     &    'EBZ       ','ELHOM     ','EOH       ','ETE       ','ETEG      ',
+     &    'ETH       ','FURAN     ','FURANONE  ','GLY       ','HOM       ',
+     &    'HC3       ','HC5       ','HC10      ','HCHO      ','HKET      ',
+     &    'HONIT     ','IEPOX     ','ISHP      ','IPX       ','ISO       ',
+     &    'KET       ','LIM       ','LIMAL     ','MACR      ','MAHP      ',
+     &    'MCT       ','MEK       ','MGLY      ','MOH       ','MVK       ',
+     &    'NAPH      ','OLI       ','OLT       ','OP1       ','OP2       ',
+     &    'OP3       ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
+     &    'PHEN      ','PROG      ','ROH       ','SESQ      ','SLOWROC   ',
+     &    'STY       ','TOL       ','UALD      ','XYL       ','PAA       ',
+     &    'PAN       ','PPN       ','MPAN      ','ONIT      ','ISON      ',
+     &    'TRPN      ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
+     &    'VROCN1ALK ','VROCP0ALK ','VROCP1ALK ','VROCP2ALK ','VROCP3ALK ',
+     &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
+     &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
+     &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      '/ )
+
+        !CRACMM3
+        ALLOCATE( ISAM_SPEC_VOC( 10 )%LIST( 97 ) )
+        ISAM_SPEC_VOC( 10 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
+     &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
+     &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
+     &    'EBZ       ','ELHOM     ','EOH       ','ETE       ','ETEG      ',
+     &    'ETH       ','FURAN     ','FURANONE  ','GLY       ','HOM       ',
+     &    'HC3       ','HC5       ','HC10      ','HCHO      ','HKET      ',
+     &    'HONIT     ','IEPOX     ','ISHP      ','IPX       ','ISO       ',
+     &    'KET       ','LIM       ','LIMAL     ','MACR      ','MAHP      ',
+     &    'MCT       ','MEK       ','MGLY      ','MOH       ','MVK       ',
+     &    'NAPH      ','OLI       ','OLT       ','OP1       ','OP2       ',
+     &    'OP3       ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
+     &    'PHEN      ','PROG      ','ROH       ','SESQ      ','SLOWROC   ',
+     &    'STY       ','TOL       ','UALD      ','XYL       ','PAA       ',
+     &    'PAN       ','PPN       ','MPAN      ','ONIT      ','ISON      ',
+     &    'TRPN      ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
+     &    'VROCN1ALK ','VROCP0ALK ','VROCP1ALK ','VROCP2ALK ','VROCP3ALK ',
+     &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
+     &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
+     &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      '/ )
+
+        !PRESCRIBE NITRATE SPECIES
+        !CB6R3_AE7_AQ
+        ALLOCATE( ISAM_SPEC_NO3( 1 )%LIST( 22 ) )
+        ISAM_SPEC_NO3( 1 )%LIST = (/'HNO3 ','NO   ','NO2  ','NO3  ',
+     &      'HONO ','N2O5 ','PAN  ','XO2N ','NTR1 ','NTR2 ','INTR ',
+     &      'PNA  ','PANX ','CLNO2','CLNO3','XO2  ','XO2H ','MEO2 ',
+     &      'ISO2 ','C2O3 ','CXO3 ','ROR  '/ )
+        
+        !CB6R5_AE7_AQ
+        ALLOCATE( ISAM_SPEC_NO3( 2 )%LIST( 22 ) )
+        ISAM_SPEC_NO3( 2 )%LIST = (/'HNO3 ','NO   ','NO2  ','NO3  ',
+     &      'HONO ','N2O5 ','PAN  ','XO2N ','NTR1 ','NTR2 ','INTR ',
+     &      'PNA  ','PANX ','CLNO2','CLNO3','XO2  ','XO2H ','MEO2 ',
+     &      'ISO2 ','C2O3 ','CXO3 ','ROR  '/ )
+        
+        !CB6R5M_AE7_AQ
+        ALLOCATE( ISAM_SPEC_NO3( 3 )%LIST( 27 ) )
+        ISAM_SPEC_NO3( 3 )%LIST = (/'HNO3 ','NO   ','NO2  ','NO3  ',
+     &      'HONO ','N2O5 ','PAN  ','XO2N ','NTR1 ','NTR2 ','INTR ',
+     &      'PNA  ','PANX ','CLNO2','CLNO3','BRNO2','BRNO3','INO  ',
+     &      'INO2 ','INO3 ','XO2  ','XO2H ','MEO2 ','ISO2 ','C2O3 ',
+     &      'CXO3 ','ROR  '/ )
+
+        !SAPRC07TC_AE6_AQ
+        ALLOCATE( ISAM_SPEC_NO3( 4 )%LIST( 25 ) )
+        ISAM_SPEC_NO3( 4 )%LIST = (/'HNO3  ','NO    ','NO2   ','NO3   ',
+     &   'HONO  ','N2O5  ','PAN   ','HNO4  ','RNO3  ','PAN2  ','CLNO  ',
+     &   'CLONO ','CLONO2','xNO2  ','MEO2  ','xMEO2 ','RO2C  ','RO2XC ',
+     &   'MECO3 ','xMECO3','RCO3  ','xRCO3 ','BZCO3 ','PBZN  ','MACO3 '/ )
+
+        !SAPRC07TIC_AE6I_AQ
+        ALLOCATE( ISAM_SPEC_NO3( 5 )%LIST( 40 ) )
+        ISAM_SPEC_NO3( 5 )%LIST = (/'HNO3    ','NO      ','NO2     ',
+     &        'NO3     ','HONO    ','N2O5    ','PAN     ','HNO4    ',
+     &        'RNO3    ','PAN2    ','CLNO    ','CLONO   ','CLONO2  ',
+     &        'ETHLN   ','IMAE    ','IMAPAN  ','ISOPNN  ','MACRN   ',
+     &        'NIT1    ','MVKN    ','PROPNN  ','MTNO3   ','xNO2    ',
+     &        'MEO2    ','xMEO2   ','RO2C    ','RO2XC   ','MECO3   ',
+     &        'xMECO3  ','RCO3    ','xRCO3   ','BZCO3   ','PBZN    ',
+     &        'MACO3   ','TERPNRO2','ISOPO2  ','NISOPO2 ','MVKOO   ',
+     &        'MACROO  ','RNO3I   '/)
+        
+        !SAPRC07TIC_AE7I_AQ
+        ALLOCATE( ISAM_SPEC_NO3( 6 )%LIST( 40 ) )
+        ISAM_SPEC_NO3( 6 )%LIST = (/'HNO3    ','NO      ','NO2     ',
+     &        'NO3     ','HONO    ','N2O5    ','PAN     ','HNO4    ',
+     &        'RNO3    ','PAN2    ','CLNO    ','CLONO   ','CLONO2  ',
+     &        'ETHLN   ','IMAE    ','IMAPAN  ','ISOPNN  ','MACRN   ',
+     &        'NIT1    ','MVKN    ','PROPNN  ','MTNO3   ','xNO2    ',
+     &        'MEO2    ','xMEO2   ','RO2C    ','RO2XC   ','MECO3   ',
+     &        'xMECO3  ','RCO3    ','xRCO3   ','BZCO3   ','PBZN    ',
+     &        'MACO3   ','TERPNRO2','ISOPO2  ','NISOPO2 ','MVKOO   ',
+     &        'MACROO  ','RNO3I   '/)
+
+        !RACM2_AE6_AQ
+        ALLOCATE( ISAM_SPEC_NO3( 7 )%LIST( 23 ) )
+        ISAM_SPEC_NO3( 7 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ','HONO',
+     &         'N2O5','PAN ','HNO4','ONIT','MPAN','ACO3','MO2 ','HC3P',
+     &         'HC5P','HC8P','KETP','ISOP','ETHP','RCO3','XYLP','TR2 ',
+     &         'BENP','ETEP'/ )
+
+        !CRACMM1_AQ
+        ALLOCATE( ISAM_SPEC_NO3( 8 )%LIST( 27 ) )
+        ISAM_SPEC_NO3( 8 )%LIST = (/   'HNO3 ','NO   ','NO2  ','NO3  ','HONO ',
+     &         'N2O5 ','PAN  ','HNO4 ','ONIT ','MPAN ','PPN  ','ISON ','TRPN ',
+     &         'NALD ','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
+     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP '/ )
+
+        !CRACMM2
+        ALLOCATE( ISAM_SPEC_NO3( 9 )%LIST( 27 ) )
+        ISAM_SPEC_NO3( 9 )%LIST = (/   'HNO3 ','NO   ','NO2  ','NO3  ','HONO ',
+     &         'N2O5 ','PAN  ','HNO4 ','ONIT ','MPAN ','PPN  ','ISON ','TRPN ',
+     &         'INALD','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
+     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP '/ )
+       
+        !CRACMM3
+        ALLOCATE( ISAM_SPEC_NO3( 10 )%LIST( 27 ) )
+        ISAM_SPEC_NO3( 10 )%LIST = (/   'HNO3 ','NO   ','NO2  ','NO3  ','HONO ',
+     &         'N2O5 ','PAN  ','HNO4 ','ONIT ','MPAN ','PPN  ','ISON ','TRPN ',
+     &         'INALD','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
+     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP '/ )
+ 
+        !PRESCRIBE SPECIES RELEVANT FOR ASSIGNING BIAS TO VOCs
+        !CB6R3_AE7_AQ
+        ALLOCATE( ISAM_BIAS_VOC( 1 )%LIST( 10 ) )
+        ISAM_BIAS_VOC( 1 )%LIST = (/'ALD2','ALDX','FORM','ACET',
+     &                'KET ','XO2 ','XO2H','ISO2','C2O3','CXO3'/ )
+        
+        !CB6R5_AE7_AQ
+        ALLOCATE( ISAM_BIAS_VOC( 2 )%LIST( 10 ) )
+        ISAM_BIAS_VOC( 2 )%LIST = (/'ALD2','ALDX','FORM','ACET',
+     &                'KET ','XO2 ','XO2H','ISO2','C2O3','CXO3'/ )
+        
+        !CB6R5M_AE7_AQ
+        ALLOCATE( ISAM_BIAS_VOC( 3 )%LIST( 10 ) )
+        ISAM_BIAS_VOC( 3 )%LIST = (/'ALD2','ALDX','FORM','ACET',
+     &                'KET ','XO2 ','XO2H','ISO2','C2O3','CXO3'/ )
+
+        !SAPRC07TC_AE6_AQ
+        ALLOCATE( ISAM_BIAS_VOC( 4 )%LIST( 12 ) )
+        ISAM_BIAS_VOC( 4 )%LIST = (/'HCHO    ','CCHO    ','RCHO    ',
+     &        'xHCHO   ','xCCHO   ','xRCHO   ','ACROLEIN','ACETONE ',
+     &        'MECO3   ','xMECO3  ','RCO3    ','xRCO3   '/ )
+
+        !SAPRC07TIC_AE6I_AQ
+        ALLOCATE( ISAM_BIAS_VOC( 5 )%LIST( 14 ) )
+        ISAM_BIAS_VOC( 5 )%LIST = (/'HCHO    ','CCHO    ','RCHO    ',
+     &        'xHCHO   ','xCCHO   ','xRCHO   ','ACROLEIN','ACETONE ',
+     &        'RO2C    ','RO2XC   ','MECO3   ','xMECO3  ','RCO3    ',
+     &        'xRCO3   '/ )
+
+        !SAPRC07TIC_AE7I_AQ
+        ALLOCATE( ISAM_BIAS_VOC( 6 )%LIST( 14 ) )
+        ISAM_BIAS_VOC( 6 )%LIST = (/'HCHO    ','CCHO    ','RCHO    ',
+     &        'xHCHO   ','xCCHO   ','xRCHO   ','ACROLEIN','ACETONE ',
+     &        'RO2C    ','RO2XC   ','MECO3   ','xMECO3  ','RCO3    ',
+     &        'xRCO3   '/ )
+        
+        !RACM2_AE6_AQ
+        ALLOCATE( ISAM_BIAS_VOC( 7 )%LIST( 12 ) )
+        ISAM_BIAS_VOC( 7 )%LIST = (/'HCHO','ACD ','ALD ','UALD',
+     &         'KET ','ACO3','HC3P','HC5P','HC8P','ISOP','RCO3',
+     &         'XYLP'/ )
+
+        !CRACMM1_AQ
+        ALLOCATE( ISAM_BIAS_VOC( 8 )%LIST( 13 ) )
+        ISAM_BIAS_VOC( 8 )%LIST = (/'HCHO ','ACD  ','ALD  ','UALD ',
+     &      'KET  ','ACO3 ','HC3P ','HC5P ','HC10P','ISOP ','RCO3 ',
+     &      'XYEP ', 'XYMP '/ )
+
+        !CRACMM2
+        ALLOCATE( ISAM_BIAS_VOC( 9 )%LIST( 12 ) )
+        ISAM_BIAS_VOC( 9 )%LIST = (/'HCHO ','ACD  ','ALD  ','UALD ',
+     &      'KET  ','ACO3 ','HC3P ','HC5P ','HC10P','ISOP ','RCO3 ',
+     &      'XYLP '/ )
+
+        !CRACMM3
+        ALLOCATE( ISAM_BIAS_VOC( 10 )%LIST( 12 ) )
+        ISAM_BIAS_VOC( 10 )%LIST = (/'HCHO ','ACD  ','ALD  ','UALD ',
+     &      'KET  ','ACO3 ','HC3P ','HC5P ','HC10P','ISOP ','RCO3 ',
+     &      'XYLP '/ )
+
+        !PRESCRIBE SPECIES RELEVANT FOR ASSIGNING BIAS TO NOx EMISSIONS
+        !CB6R3_AE7_AQ
+        ALLOCATE( ISAM_BIAS_NOY( 1 )%LIST( 6 ) )
+        ISAM_BIAS_NOY( 1 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5'/ )
+        
+        !CB6R5_AE7_AQ
+        ALLOCATE( ISAM_BIAS_NOY( 2 )%LIST( 6 ) )
+        ISAM_BIAS_NOY( 2 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5'/ )
+
+        !CB6R5M_AE7_AQ
+        ALLOCATE( ISAM_BIAS_NOY( 3 )%LIST( 6 ) )
+        ISAM_BIAS_NOY( 3 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5'/ )
+
+        !SAPRC07TC_AE6_AQ
+        ALLOCATE( ISAM_BIAS_NOY( 4 )%LIST( 6 ) )
+        ISAM_BIAS_NOY( 4 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5'/ )
+
+        !SAPRC07TIC_AE6I_AQ
+        ALLOCATE( ISAM_BIAS_NOY( 5 )%LIST( 7 ) )
+        ISAM_BIAS_NOY( 5 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5','xNO2'/ )
+
+        !SAPRC07TIC_AE7I_AQ
+        ALLOCATE( ISAM_BIAS_NOY( 6 )%LIST( 7 ) )
+        ISAM_BIAS_NOY( 6 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5','xNO2'/ )
+
+        !RACM2_AE6_AQ
+        ALLOCATE( ISAM_BIAS_NOY( 7 )%LIST( 6 ) )
+        ISAM_BIAS_NOY( 7 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5' / )
+
+        !CRACMM1_AQ
+        ALLOCATE( ISAM_BIAS_NOY( 8 )%LIST( 6 ) )
+        ISAM_BIAS_NOY( 8 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5' / )
+
+        !CRACMM2
+        ALLOCATE( ISAM_BIAS_NOY( 9 )%LIST( 6 ) )
+        ISAM_BIAS_NOY( 9 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5' / )
+
+        !CRACMM3
+        ALLOCATE( ISAM_BIAS_NOY( 10 )%LIST( 6 ) )
+        ISAM_BIAS_NOY( 10 )%LIST = (/'HNO3','NO  ','NO2 ','NO3 ',
+     &                              'HONO','N2O5' / )
+
+        !PRESCRIBE SULFATE SPECIES
+        !CB6R3_AE7_AQ
+        ALLOCATE( ISAM_SPEC_SO4( 1 )%LIST( 1 ) )
+        ISAM_SPEC_SO4( 1 )%LIST = (/'SO2'/ )
+        
+        !CB6R5_AE7_AQ
+        ALLOCATE( ISAM_SPEC_SO4( 2 )%LIST( 1 ) )
+        ISAM_SPEC_SO4( 2 )%LIST = (/'SO2', 'DMS'/ )
+        
+        !CB6R5M_AE7_AQ
+        ALLOCATE( ISAM_SPEC_SO4( 3 )%LIST( 2 ) )
+        ISAM_SPEC_SO4( 3 )%LIST = (/'SO2','DMS'/ )
+
+        !SAPRC07TC_AE6_AQ
+        ALLOCATE( ISAM_SPEC_SO4( 4 )%LIST( 1 ) )
+        ISAM_SPEC_SO4( 4 )%LIST = (/'SO2'/ )
+
+        !SAPRC07TIC_AE6I_AQ
+        ALLOCATE( ISAM_SPEC_SO4( 5 )%LIST( 1 ) )
+        ISAM_SPEC_SO4( 5 )%LIST = (/'SO2'/ )
+        
+        !SAPRC07TIC_AE7I_AQ
+        ALLOCATE( ISAM_SPEC_SO4( 6 )%LIST( 1 ) )
+        ISAM_SPEC_SO4( 6 )%LIST = (/'SO2'/ )
+
+        !RACM2_AE6_AQ
+        ALLOCATE( ISAM_SPEC_SO4( 7 )%LIST( 1 ) )
+        ISAM_SPEC_SO4( 7 )%LIST = (/'SO2'/ )
+
+        !CRACMM1_AQ
+        ALLOCATE( ISAM_SPEC_SO4( 8 )%LIST( 1 ) )
+        ISAM_SPEC_SO4( 8 )%LIST = (/'SO2'/ )
+
+        !CRACMM2
+        ALLOCATE( ISAM_SPEC_SO4( 9 )%LIST( 1 ) )
+        ISAM_SPEC_SO4( 9 )%LIST = (/'SO2'/ )
+
+        !CRACMM3
+        ALLOCATE( ISAM_SPEC_SO4( 10 )%LIST( 1 ) )
+        ISAM_SPEC_SO4( 10 )%LIST = (/'SO2'/ )
+
+        !PRESCRIBE HAP SPECIES
+        !CB6R3_AE7_AQ
+        ALLOCATE( ISAM_SPEC_HAPGAS( 1 )%LIST( 7 ) )
+        ISAM_SPEC_HAPGAS( 1 )%LIST = (/'FORM_PRIMARY','ALD2_PRIMARY',
+     &                  'ACROLEIN    ','BUTADIENE13 ','ACRO_PRIMARY',
+     &                  'TOLU        ','CL2         '/)
+
+        !CB6R5_AE7_AQ
+        ALLOCATE( ISAM_SPEC_HAPGAS( 2 )%LIST( 7 ) )
+        ISAM_SPEC_HAPGAS( 2 )%LIST = (/'FORM_PRIMARY','ALD2_PRIMARY',
+     &                  'ACROLEIN    ','BUTADIENE13 ','ACRO_PRIMARY',
+     &                  'TOLU        ','CL2         '/)
+
+        !CB6R5M_AE7_AQ
+        ALLOCATE( ISAM_SPEC_HAPGAS( 3 )%LIST( 7 ) )
+        ISAM_SPEC_HAPGAS( 3 )%LIST = (/'FORM_PRIMARY','ALD2_PRIMARY',
+     &                  'ACROLEIN    ','BUTADIENE13 ','ACRO_PRIMARY',
+     &                  'TOLU        ','CL2         '/)
+
+        !SAPRC07TC_AE6_AQ
+        ALLOCATE( ISAM_SPEC_HAPGAS( 4 )%LIST( 6 ) )
+        ISAM_SPEC_HAPGAS( 4 )%LIST = (/'HCHO_PRIMARY','CCHO_PRIMARY',
+     &                  'ACROLEIN    ','BUTADIENE13 ','ACRO_PRIMARY',
+     &                  'CL2         '/)
+
+        !SAPRC07TIC_AE6I_AQ
+        ALLOCATE( ISAM_SPEC_HAPGAS( 5 )%LIST( 6 ) )
+        ISAM_SPEC_HAPGAS( 5 )%LIST = (/'HCHO_PRIMARY','CCHO_PRIMARY',
+     &                  'ACROLEIN    ','BUTADIENE13 ','ACRO_PRIMARY',
+     &                  'CL2         '/)
+
+        !SAPRC07TIC_AE7I_AQ
+        ALLOCATE( ISAM_SPEC_HAPGAS( 6 )%LIST( 6 ) )
+        ISAM_SPEC_HAPGAS( 6 )%LIST = (/'HCHO_PRIMARY','CCHO_PRIMARY',
+     &                  'ACROLEIN    ','BUTADIENE13 ','ACRO_PRIMARY',
+     &                  'CL2         '/)
+
+        !RACM2_AE6_AQ
+        ALLOCATE( ISAM_SPEC_HAPGAS( 7 )%LIST( 1 ) )
+        ISAM_SPEC_HAPGAS( 7 )%LIST = (/'DIEN        '/)
+
+        !CRACMM1_AQ
+        ALLOCATE( ISAM_SPEC_HAPGAS( 8 )%LIST( 1 ) )
+        ISAM_SPEC_HAPGAS( 8 )%LIST = (/'HCHO        '/)
+
+        !CRACMM2
+        ALLOCATE( ISAM_SPEC_HAPGAS( 9 )%LIST( 1 ) )
+        ISAM_SPEC_HAPGAS( 9 )%LIST = (/'HCHO        '/)
+
+        !CRACMM3
+        ALLOCATE( ISAM_SPEC_HAPGAS( 10 )%LIST( 1 ) )
+        ISAM_SPEC_HAPGAS( 10 )%LIST = (/'HCHO        '/)
+
+        !AEROSOL HAPS
+        ALLOCATE( ISAM_SPEC_HAPAERO%LIST( 14 ) )
+        ISAM_SPEC_HAPAERO%LIST = (/'ANI     ','ACR_VI  ','ACR_III ','ABE     ',
+     &                             'APB     ','ADE_OTHR','ADE_EC  ','ADE_OC  ',
+     &                             'ADE_NO3 ','ADE_SO4 ','ADE_CORS','ACADMIUM',
+     &                             'AMN_HAPS','AAS     ' /)
+
+        !NONREACTIVE TEQ TRACERS for Polycylic Aromatic Hydrocarbons
+        ALLOCATE( ISAM_SPEC_PAHTEQ%LIST( 9 ) )
+        ISAM_SPEC_PAHTEQ%LIST = ( /'PAH_000E0','PAH_176E5','PAH_880E5','PAH_176E4',
+     &                             'PAH_176E3','PAH_192E3','PAH_101E2','PAH_176E2',
+     &                             'PAH_114E1'/)   
+
+       ALLOCATE( ISAM_SPEC_TOXICS%LIST( 30 ) )
+       ISAM_SPEC_TOXICS%LIST( 1:30 ) = (/'ACRY_NITRILE','CARBONTET   ','PROPYL_DICL ',
+     &     'DICL_PROPENE','CL4_ETHANE  ','CHCL3       ','BR2_C2_12   ','CL2_C2_12   ',
+     &     'ETOX        ','ACET_NITRILE','XYLENE      ','STYRENE     ','ACRYACID    ',
+     &     'HEXANE      ','METHCHLORIDE','CARBSULFIDE ','CHLOROPRENE ','ETHYLBENZENE',
+     &     'HEXMETH_DIS ','HYDRAZINE   ','MAL_ANHYDRID','CL_ETHE     ','NAPHTHALENE ',
+     &     'QUINOLINE   ','TOL_DIIS    ','TRIETHYLAMIN','DICL_BENZENE','CL2_ME      ',
+     &     'CL4_ETHE    ','CL3_ETHE    '/)
+
+
+        ALLOCATE( ISAM_SPEC_MERCURY%LIST( 4 ) )
+        ISAM_SPEC_MERCURY%LIST = ( /'HG       ','HGIIGAS  ', 'HGIIAER  ',
+     &                              'APHG     '/)
+ 
+ 
+        ! Allocate Vecotrs for Species Names and Aerosol Precursors
+        ALLOCATE ( ISAM_SPEC( NSPCSD, NTAG_SA ), STAT = IOST )
+        CALL CHECKMEM( IOST, 'ISAM_SPEC', 'GET_NSPC_SA' )
+        ISAM_SPEC = ''
+
+        ALLOCATE ( MAP_ISAMtoAERO( NSPCSD ), STAT = IOST )
+        CALL CHECKMEM( IOST, 'MAP_ISAMtoAERO', 'GET_NSPC_SA' )
+        MAP_ISAMtoAERO = 0
+
+        ALLOCATE ( MAP_AEROtoSA( N_AEROSPC, N_MODE ), STAT = IOST )
+        CALL CHECKMEM( IOST, 'MAP_AEROtoSA', 'GET_NSPC_SA' )
+        MAP_AEROtoSA = 0
+
+        ALLOCATE ( MAP_AEROGAStoSA( N_AEROSPC ), STAT = IOST )
+        CALL CHECKMEM( IOST, 'MAP_AEROGAStoSA', 'GET_NSPC_SA' )
+        MAP_AEROGAStoSA = 0
+
+        ALLOCATE ( MAP_AEROCTRtoSA( N_AEROSPC ), STAT = IOST )
+        CALL CHECKMEM( IOST, 'MAP_AEROCTRtoSA', 'GET_NSPC_SA' )
+        MAP_AEROCTRtoSA = 0
+
+        ALLOCATE ( L_ISAM_AERO( N_AEROSPC ), STAT = IOST )
+        CALL CHECKMEM( IOST, 'L_ISAM_AERO', 'GET_NSPC_SA' )
+        L_ISAM_AERO = .FALSE.
+ 
+        ! Allocate ISAM_SPECIES_BIAS array
+        ALLOCATE ( ISAM_SPECIES_BIAS( NBIAS,NSPCSD ), STAT = IOST )
+        ISAM_SPECIES_BIAS = .FALSE.
+        IF ( IMECH .GT. 0 ) THEN
+            N_VOC_BIAS = SIZE( ISAM_BIAS_VOC( IMECH )%LIST )
+            N_NOY_BIAS = SIZE( ISAM_BIAS_NOY( IMECH )%LIST )
+        END IF
+
+        ! Retrieve User-Defined Tag-Classes and Print Errors/Crash CMAQ
+        ! if the User is requesting tag-classes that aren't defined
+        ALLOCATE( CLASS_NAMES( MAX_TAGCLASSES ) )
+        CALL CHECKMEM( IOST, 'CLASS_NAMES', 'GET_NSPC_SA' )
+        CALL PARSE_STRING( TAGCLASSES, NCLASSES, CLASS_NAMES )
+                
+        IF( NCLASSES .LT. 1 )THEN
+           XMSG = "ISAM ERROR: TAGCLASSES in control file incorrectly defined. "
+           CALL M3EXIT('GET_NSPC_SA', 0, 0, XMSG, XSTAT2 )
         END IF
         
-        IF ( L_NITRATE ) THEN
-          SELECT CASE( MECHNAME )
-             CASE( 'CB6R3_AE6_AQ', 'CB6R3_AE7_AQ' )
-                NSPC_SA = NSPC_SA + 12  
-!                NSPC_SA = NSPC_SA + 18
-             CASE( 'CB6R3M_AE7_KMTBR' )
-                NSPC_SA = NSPC_SA + 17  
-!                NSPC_SA = NSPC_SA + 23  
-             CASE( 'SAPRC07TC_AE6_AQ' ) 
-                NSPC_SA = NSPC_SA + 16   
-             CASE( 'RACM2_AE6_AQ') 
-                NSPC_SA = NSPC_SA + 14   
-             CASE( 'SAPRC07TIC_AE6I_AQ', 'SAPRC07TIC_AE7I_AQ' ) 
-                NSPC_SA = NSPC_SA + 35  
-          END SELECT
-! specices common to all mechanisms          
-          NSPC_SA = NSPC_SA + 11  ! NO, NO2, NO3, ANO3J, ANO3I, HNO3, HONO, N2O5, PNA or HNO4, PAN, PANX or PAN2 or MPAN
-        ENDIF
+        DO J = 1, NCLASSES
+           K = INDEX1( CLASS_NAMES( J ), NUMB_CLASSES, DEFINED_CLASSES )
+           IF( K .LT. 1 )THEN
+              XMSG = "ISAM ERROR: unknown tagclass: " // TRIM( CLASS_NAMES( J ) )
+              WRITE(LOGDEV,'(A)')TRIM(XMSG )
+              EFLAG = .TRUE. 
+           ELSE
+              CLASSES_FOUND = CLASSES_FOUND + 1   
+           END IF       
+        END DO
+        
+        IF( EFLAG .OR. CLASSES_FOUND .LT. 1 )THEN
+           XMSG = 'ISAM ERROR: problem defining tagclasses'
+           WRITE(LOGDEV,'(A)')TRIM(XMSG )
+           XMSG = 'Permitted TAGCLASSES listed below:'
+           WRITE(LOGDEV,'(A)')TRIM(XMSG )
+           DO J = 1, NUMB_CLASSES
+              WRITE(LOGDEV,'(2X,A)')TRIM( DEFINED_CLASSES( J ) )
+           END DO
+           XMSG = 'Above fatal error(s) in setting up ISAM'
+           CALL M3EXIT('GET_NSPC_SA', 0, 0, XMSG, XSTAT2 )
+        END IF 
 
-        IF ( L_VOC ) THEN
-          SELECT CASE( MECHNAME )
-             CASE( 'CB6R3_AE6_AQ' )
-                NSPC_SA = NSPC_SA + 23
-             CASE( 'CB6R3_AE7_AQ', 'CB6R3M_AE7_KMTBR' )
-                NSPC_SA = NSPC_SA + 24
-             CASE( 'RACM2_AE6_AQ') 
-                NSPC_SA = NSPC_SA + 36
-             CASE( 'SAPRC07TC_AE6_AQ', 'SAPRC07TIC_AE6I_AQ', 'SAPRC07TIC_AE7I_AQ' ) 
-                NSPC_SA = NSPC_SA + 39 
-          END SELECT
-        ENDIF
+        ! Initialize Control Variables
+        L_VOC      = .FALSE.   
+        L_NO3      = .FALSE.
+        L_NH4      = .FALSE.
+        L_OZONE    = .FALSE.
+        L_SO4      = .FALSE.
+        L_CL       = .FALSE.
 
-        LBACK = .FALSE.
-        BGN_SP = INDEX( TAGCLASSES,'AMMONIUM',LBACK )
-        IF ( BGN_SP .NE. 0 ) THEN
-          NSPC_SA = NSPC_SA + 3  ! ANH4J, ANH4I, NH3
-          L_NH4 = .TRUE.
-        ENDIF
 
-        LBACK = .FALSE.
-        BGN_SP = INDEX( TAGCLASSES,'PM25_IONS',LBACK )
-        IF ( BGN_SP .NE. 0 ) THEN
-c         NSPC_SA = NSPC_SA + 14 ! ACLiJ,ANAiJ,AMGJ,AKJ,ACAJ,AFEJ,AALJ,ASIJ,ATIJ,AMNJ,AOTHRiJ(0705) 
-          NSPC_SA = NSPC_SA + 12 ! ANAI/J,AMGJ,AKJ,ACAJ,AFEJ,AALJ,ASI/J,ATIJ,AMNJ,AOTHRI/J
-          L_PM25 = .TRUE.
-        ENDIF
+        ! Initalize Number of ISAM Species
+        NSPC_SA = 0
 
-        LBACK = .FALSE.
-        BGN_SP = INDEX( TAGCLASSES,'CO',LBACK )
-        IF ( BGN_SP .NE. 0 ) THEN
-          NSPC_SA = NSPC_SA + 1  ! CO
-          L_CO = .TRUE.
-        ENDIF
+        ! Activate All Species if Requested
+        IF ( INDEX( TAGCLASSES,'ALL' ) .NE. 0 ) THEN
+          ! Add All Particle Species
+          L_ISAM_AERO = .TRUE. 
 
+          ! Add All Gas Species
+          DO ISPEC = 1,NSPCSD
+             IF ( INDEX1( CGRID_NAME(ISPEC), NSPC_SA, ISAM_SPEC(:,1) ) .EQ. 0
+     &            .AND. ( CGRID_MASK_GAS( ISPEC ) .OR. 
+     &                    CGRID_MASK_NR( ISPEC ) )      ) THEN
+                NSPC_SA = NSPC_SA + 1
+                ISAM_SPEC( NSPC_SA,: ) = CGRID_NAME( ISPEC )
+             END IF
+          END DO  
+        ENDIF
  
+        ! Activate All Particulate Species if Requested
+        IF ( INDEX( TAGCLASSES,'PM_TOT' ) .NE. 0 ) THEN
+          L_ISAM_AERO = .TRUE.
+          L_VOC = .TRUE.
+          L_NO3 = .TRUE.
+          L_NH4 = .TRUE.
+          L_SO4 = .TRUE.
+          L_CL  = .TRUE.
+        ENDIF
+ 
+        ! Activate Particulate Ions if Requested
+        IF ( INDEX( TAGCLASSES,'PM_IONS' ) .NE. 0 ) THEN
+          FOUND_SPECIES = .FALSE.
+          CALL ADD_ISAM_SPEC( 'ANA', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'AMG', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'AK', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'ACA', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'AFE', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'AAL', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'ASI', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'ATI', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'AMN', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'AOTHR', FOUND_SPECIES, IMECH )
+          
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'PM_IONS', FOUND_SPECIES, EFLAG )
+        ENDIF
+ 
+        ! Activate Particulate Chlorine if Requested
+        IF ( INDEX( TAGCLASSES,'CHLORINE' ) .NE. 0 .OR. L_CL ) THEN
+          FOUND_SPECIES = .FALSE.
+          CALL ADD_ISAM_SPEC( 'ACL', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'HCL', FOUND_SPECIES, IMECH )
+          
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'CHLORINE', FOUND_SPECIES, EFLAG )
+        ENDIF
+
+        ! Activate Elemental Carbon if Requested
+        IF ( INDEX( TAGCLASSES,'EC' ) .NE. 0 ) THEN
+          FOUND_SPECIES = .FALSE.
+          CALL ADD_ISAM_SPEC( 'AEC', FOUND_SPECIES, IMECH )
+          
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'EC', FOUND_SPECIES, EFLAG )
+        ENDIF
+ 
+        ! Activate Non-Volatile Primary Organic Aerosol if Requested
+        IF ( INDEX( TAGCLASSES,'NVPOA' ) .NE. 0 ) THEN
+          FOUND_SPECIES = .FALSE.
+
+          CALL ADD_ISAM_SPEC( 'APOC', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'APNCOM', FOUND_SPECIES, IMECH )
+          
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'NVPOA', FOUND_SPECIES, EFLAG )
+        END IF
+ 
+        ! Activate Organic Aerosol if Requested
+        IF ( INDEX( TAGCLASSES,'OA_TOT' ) .NE. 0 ) THEN
+          L_VOC = .TRUE.
+          FOUND_SPECIES = .FALSE.
+
+          DO IAERO = 1,N_AEROSPC
+             IF ( AEROSPC( IAERO )%OM )
+     &          CALL ADD_ISAM_SPEC( AEROSPC(IAERO)%BULKNAME, 
+     &                              FOUND_SPECIES, IMECH )
+          END DO
+          
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'OA_TOT', FOUND_SPECIES, EFLAG )
+        END IF
+
+        ! Activate Particulate Sulfate if Requested
+        IF ( INDEX( TAGCLASSES,'SULFATE' ) .NE. 0 .OR. L_SO4  ) THEN
+          
+          FOUND_SPECIES = .FALSE.
+          
+          CALL ADD_ISAM_SPEC( 'ASO4', FOUND_SPECIES, IMECH )
+          CALL CHECK_MECH( 'SULFATE', IMECH, MECHNAME, EFLAG )
+          DO ISPEC = 1,SIZE( ISAM_SPEC_SO4( IMECH )%LIST )
+            CALL ADD_ISAM_SPEC( ISAM_SPEC_SO4(IMECH)%LIST(ISPEC), 
+     &                          FOUND_SPECIES, IMECH )
+          END DO
+          
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'SULFATE', FOUND_SPECIES, EFLAG )
+        ENDIF
+
+        ! Activate Particulate Ammonium if Requested
+        IF ( INDEX( TAGCLASSES,'AMMONIUM' ) .NE. 0 .OR. L_NH4 ) THEN
+          FOUND_SPECIES = .FALSE.
+          CALL ADD_ISAM_SPEC( 'ANH4', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'NH3', FOUND_SPECIES, IMECH )
+          
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'AMMONIUM', FOUND_SPECIES, EFLAG )
+        ENDIF
+ 
+        ! Add Carbon Monoxide if Requested                       
+        IF ( INDEX( TAGCLASSES,'CO' ) .NE. 0 ) THEN
+          FOUND_SPECIES = .FALSE.
+          CALL ADD_ISAM_SPEC( 'CO', FOUND_SPECIES, IMECH )
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'CO', FOUND_SPECIES, EFLAG )
+        ENDIF
+ 
+
+        ! Add HAP Gases
+        IF ( INDEX( TAGCLASSES,'HAP_GAS' ) .NE. 0 .OR. 
+     &       INDEX( TAGCLASSES,'HAP_TOT' ) .NE. 0  ) THEN
+          ! set ozone tracking to true for accurate tracking secondary production of HCHO and CH3CHO
+          L_OZONE = .TRUE.
+          FOUND_SPECIES = .FALSE.
+          
+          CALL CHECK_MECH( 'GASEOUS HAPS', IMECH, MECHNAME, EFLAG )
+
+          ! Add each VOC Species according to fields ISAM_SPEC_GASHAPS arrays
+          DO ISPEC = 1,SIZE( ISAM_SPEC_HAPGAS( IMECH )%LIST )
+             CALL ADD_ISAM_SPEC( ISAM_SPEC_HAPGAS(IMECH)%LIST(ISPEC), 
+     &                           FOUND_SPECIES, IMECH )
+          END DO 
+
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'GASEOUS HAPS', FOUND_SPECIES, EFLAG )
+        ENDIF
+ 
+
+        ! Add Ozone if Requested
+        IF ( INDEX( TAGCLASSES,'OZONE' ) .NE. 0 .OR. L_OZONE ) THEN
+
+          L_OZONE   = .TRUE.
+          L_NO3     = .TRUE.
+          L_VOC     = .TRUE.
+          FOUND_SPECIES = .FALSE.
+          
+          CALL CHECK_MECH( 'OZONE', IMECH, MECHNAME, EFLAG )
+          
+          ! Add Ozone-Relevant Species
+          DO ISPEC = 1,SIZE( ISAM_SPEC_OZONE( IMECH )%LIST )
+             CALL ADD_ISAM_SPEC( ISAM_SPEC_OZONE(IMECH)%LIST(ISPEC), 
+     &                           FOUND_SPECIES, IMECH )
+          END DO
+
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'OZONE', FOUND_SPECIES, EFLAG )
+        END IF       
+
+        ! Add Nitrate Species
+        IF ( INDEX( TAGCLASSES,'NITRATE' ) .NE. 0 .OR. L_NO3 ) THEN 
+          L_NO3 = .TRUE. 
+          FOUND_SPECIES = .FALSE.
+
+          ! Check that the chemical mechanism name is valid
+          CALL CHECK_MECH( 'NITRATE', IMECH, MECHNAME, EFLAG )
+
+          ! Add Aerosol Species
+          CALL ADD_ISAM_SPEC( 'ANO3', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'AMTNO3', FOUND_SPECIES, IMECH )
+          CALL ADD_ISAM_SPEC( 'AISOPNN', FOUND_SPECIES, IMECH )
+
+          ! Add Nitrate-Relevant Gas Species
+          DO ISPEC = 1,SIZE( ISAM_SPEC_NO3( IMECH )%LIST )
+             CALL ADD_ISAM_SPEC( ISAM_SPEC_NO3(IMECH)%LIST(ISPEC), 
+     &                           FOUND_SPECIES, IMECH )
+          END DO 
+
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'NITRATE', FOUND_SPECIES, EFLAG )
+        ENDIF
+
+
+        ! Add VOC Species for VOC Tag-Class
+        IF ( INDEX( TAGCLASSES,'VOC' ) .NE. 0 .OR. L_VOC ) THEN
+          CALL CHECK_MECH( 'VOC', IMECH, MECHNAME, EFLAG )
+
+          ! Add each VOC Species according to fields ISAM_SPEC_VOC arrays
+          DO ISPEC = 1,SIZE( ISAM_SPEC_VOC( IMECH )%LIST )
+             CALL ADD_ISAM_SPEC( ISAM_SPEC_VOC(IMECH)%LIST(ISPEC), 
+     &                           FOUND_SPECIES, IMECH )
+          END DO 
+          
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'VOC', FOUND_SPECIES, EFLAG )
+        END IF
+ 
+
+        ! Add HAP Aerosols
+        IF ( INDEX( TAGCLASSES,'HAP_AERO') .NE. 0 .OR. 
+     &       INDEX( TAGCLASSES,'HAP_TOT' ) .NE. 0  ) THEN
+
+          FOUND_SPECIES = .FALSE.
+          DO I = 1,SIZE( ISAM_SPEC_HAPAERO%LIST )
+             CALL ADD_ISAM_SPEC( ISAM_SPEC_HAPAERO%LIST(I), 
+     &                           FOUND_SPECIES, IMECH )
+          END DO
+
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'HAP_AERO', FOUND_SPECIES, EFLAG )
+        END IF
+ 
+
+        ! Activate BaP tracking if Requested
+        IF ( INDEX( TAGCLASSES,'BENAPYRENE' ) .NE. 0 .OR. 
+     &       INDEX( TAGCLASSES,'HAP_TOT' ) .NE. 0 ) THEN
+          
+          FOUND_SPECIES = .FALSE.
+
+          ! Find aerosol phase and add if found
+          CALL ADD_ISAM_SPEC( 'ABENAPY', FOUND_SPECIES, IMECH )
+
+          ! Add Vapor-Phase Benzo[a]Pyrene
+          CALL ADD_ISAM_SPEC( 'BENAPY', FOUND_SPECIES, IMECH )
+          
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'BENAPYRENE', FOUND_SPECIES, EFLAG )
+        END IF
+
+
+        ! Activate TEQ PAHs tracking if Requested
+        IF ( INDEX( TAGCLASSES,'PAH_TEQ' ) .NE. 0 .OR. 
+     &       INDEX( TAGCLASSES,'HAP_TOT' ) .NE. 0 ) THEN
+          
+          FOUND_SPECIES = .FALSE.
+
+          ! Scan for NonReactive PAH tracers
+          DO I = 1,SIZE( ISAM_SPEC_PAHTEQ%LIST )
+            CALL ADD_ISAM_SPEC( ISAM_SPEC_PAHTEQ%LIST(I), 
+     &                          FOUND_SPECIES, IMECH )
+          END DO
+
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'PAH TEQ', FOUND_SPECIES, EFLAG )
+        END IF
+        
+        ! Activate Classic Urban Air Toxics tracking if Requested
+        IF ( INDEX( TAGCLASSES,'URBAN_TOXICS' ) .NE. 0 .OR. 
+     &       INDEX( TAGCLASSES,'HAP_TOT' ) .NE. 0 ) THEN
+        
+          FOUND_SPECIES = .FALSE.
+
+          ! Scan for NonReactive PAH tracers
+          DO I = 1,SIZE( ISAM_SPEC_TOXICS%LIST )
+             CALL ADD_ISAM_SPEC( ISAM_SPEC_TOXICS%LIST(I), 
+     &                           FOUND_SPECIES, IMECH )
+          END DO
+
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'URBAN AIR TOXICS', FOUND_SPECIES, EFLAG )
+        END IF
+
+
+        ! Activate Mercury Toxics
+        IF ( INDEX( TAGCLASSES,'MERCURY' ) .NE. 0 .OR. 
+     &       INDEX( TAGCLASSES,'HAP_TOT' ) .NE. 0 ) THEN
+          
+          FOUND_SPECIES = .FALSE.
+
+          ! Find aerosol phase and add if found
+          CALL ADD_ISAM_SPEC( 'APHG', FOUND_SPECIES, IMECH )
+
+          ! Add gas-phase mercury species
+          DO ISPEC = 1,(SIZE( ISAM_SPEC_MERCURY%LIST ) ) 
+            CALL ADD_ISAM_SPEC( ISAM_SPEC_MERCURY%LIST(ISPEC), FOUND_SPECIES, IMECH )
+          END DO 
+
+          ! Warn if all species are missing
+          CALL ISAM_SPECIES_WARN( 'MERCURY', FOUND_SPECIES, EFLAG )
+        END IF
+
+
+        ! Add Requested Aerosol Species as defined in L_ISAM_AERO
+        ! Part of this procedure involves distributing the aerosol bulknames 
+        ! associated with L_ISAM_AERO into mode-dependent names needed
+        ! for ISAM_SPEC. This section will also associate each ISAM
+        ! aerosol species with its volatility type and gas-phase
+        ! counterparts and precursors, if applicable.
+        DO IAERO = 1,N_AEROSPC
+           IF ( L_ISAM_AERO( IAERO ) ) THEN
+              DO IMODE = 1,N_MODE
+                 ! If the aerosol exists in a particular mode, then add
+                 ! its name, the name of its counterpart vapor, any
+                 ! reaction counters and the type of partitioning (i.e.
+                 ! reversible, irreversible, or nonvolatile)
+                 IF ( .NOT.AERO_MISSING( IAERO,IMODE ) ) THEN
+                   MAP_ISAMtoAERO( NSPC_SA ) = IAERO
+
+                   !Add aerosol name
+                   NSPC_SA = NSPC_SA + 1
+                   ISAM_SPEC( NSPC_SA,: ) = AEROSPC( IAERO )%NAME( IMODE )
+                   MAP_AEROtoSA( IAERO,IMODE ) = NSPC_SA
+
+                   !Populate Chemistry Bias Arrays if Applicable
+                   IF ( IMECH .GT. 0 ) THEN
+                     ISPEC = INDEX1( AEROSPC(IAERO)%BULKNAME, N_VOC_BIAS, 
+     &                               ISAM_BIAS_VOC(IMECH)%LIST )
+                     IF ( ISPEC .GT. 0 ) ISAM_SPECIES_BIAS( 3:4,NSPC_SA ) = .TRUE.
+                     ISPEC = INDEX1( AEROSPC(IAERO)%BULKNAME, N_NOY_BIAS, 
+     &                               ISAM_BIAS_NOY(IMECH)%LIST )
+                     IF ( ISPEC .GT. 0 ) ISAM_SPECIES_BIAS( 2:3,NSPC_SA ) = .TRUE.
+                   END IF
+
+                   IF ( AEROSPC( IAERO )%VOLTYPE .NE. 'NVL' ) THEN 
+                      NVL_RESET = 0
+
+                      ! Add condensable vapor species
+                      IF ( AEROSPC(IAERO)%GASNAME .NE. '' ) THEN
+                         IF ( INDEX1( AEROSPC(IAERO)%GASNAME, 
+     &                        NSPCSD, CGRID_NAME ) .GT. 0 ) THEN
+                           IF ( INDEX1( AEROSPC(IAERO)%GASNAME, 
+     &                               NSPC_SA, ISAM_SPEC(:,1) ) .EQ. 0 ) THEN
+                              NSPC_SA = NSPC_SA + 1
+                              ISAM_SPEC( NSPC_SA,:) = AEROSPC( IAERO )%GASNAME
+                              MAP_AEROGAStoSA( IAERO ) = NSPC_SA
+                           ELSE 
+                              MAP_AEROGAStoSA( IAERO ) = 
+     &                           INDEX1( AEROSPC(IAERO)%GASNAME, NSPC_SA, ISAM_SPEC(:,1) )
+                           END IF
+                         ELSE
+                           NVL_RESET = NVL_RESET + 1
+                         END IF
+                      END IF
+                      ! Add reaction counter species
+                      IF ( AEROSPC(IAERO)%CTRNAME .NE. '' ) THEN
+                         IF ( INDEX1( AEROSPC(IAERO)%CTRNAME, 
+     &                             NSPCSD, CGRID_NAME ) .GT. 0 ) THEN
+                           IF ( INDEX1( AEROSPC(IAERO)%CTRNAME, 
+     &                               NSPC_SA, ISAM_SPEC(:,1) ) .EQ. 0 ) THEN
+                              NSPC_SA = NSPC_SA + 1
+                              ISAM_SPEC( NSPC_SA,:) = AEROSPC( IAERO )%CTRNAME
+                              MAP_AEROCTRtoSA( IAERO ) = NSPC_SA
+                           ELSE
+                              MAP_AEROCTRtoSA( IAERO ) =
+     &                          INDEX1( AEROSPC(IAERO)%CTRNAME, NSPC_SA, ISAM_SPEC(:,1) )
+
+                           END IF
+                         ELSE
+                           NVL_RESET = NVL_RESET + 1
+                         END IF
+                      END IF
+
+                      ! If neither the condensable vapor nor the
+                      ! reaction counter are present in the gas species
+                      ! list, then reset the aerosol species to
+                      ! nonvolatile and print a note to the log
+                      IF ( NVL_RESET .EQ. 2 ) THEN
+                        AEROSPC( IAERO )%VOLTYPE = 'NVL'
+                        GASNAME = AEROSPC(IAERO)%GASNAME
+                        CTRNAME = AEROSPC(IAERO)%CTRNAME
+                        IF ( GASNAME .EQ. '' ) GASNAME = 'NONE'
+                        IF ( CTRNAME .EQ. '' ) CTRNAME = 'NONE'
+
+                        XMSG = 'Attention: The ISAM aerosol species ' //
+     &                         TRIM(AEROSPC( IAERO )%NAME( IMODE )) //
+     &                         ' has been defined in AERO_DATA with condensable ' //
+     &                         'vapor species ' // TRIM(GASNAME) // ' and/or '//
+     &                         'reaction counter species ' // TRIM(CTRNAME) //
+     &                         ' but neither of these are activated as ISAM ' //
+     &                         'species (e.g. in the ISAM control file. The aerosol '//
+     &                         'species will be assumed nonvolatile for ISAM.'
+                        CALL LOG_MESSAGE( LOGDEV, XMSG )
+                      END IF
+                   END IF
+
+                 END IF
+              END DO
+           END IF
+        END DO
+        
+        ! Resize ISAM_SPEC to NSPC_SA
+        ISAM_SPEC = ISAM_SPEC( 1:NSPC_SA,: )
+        ISAM_SPECIES_BIAS = ISAM_SPECIES_BIAS( :,1:NSPC_SA )
+
+        ! Exit CMAQ if There has been a fatal ISAM Error
+        IF ( EFLAG ) THEN
+          CALL M3EXIT( 'GET_NSPC_SA', 0, 0, 'Above Fatal ISAM ERROR(s) Encountered', XSTAT2 )
+        END IF 
+
         END SUBROUTINE GET_NSPC_SA
+
+! --------------------------------------------------------------------------------
+        SUBROUTINE PARSE_STRING ( ENV_VAL, NVARS, VAL_LIST, LOGDEV )
+
+! takes a string of items delimited by white space,
+! commas or semi-colons) and parse out the items into variables. Two data
+! types: character strings and integers (still represented as strings in
+! the env var vaules).
+          USE UTILIO_DEFN 
+          
+          IMPLICIT NONE
+
+          CHARACTER( * ), INTENT ( IN )           :: ENV_VAL
+          INTEGER,        INTENT ( OUT )          :: NVARS
+          CHARACTER( * ), INTENT ( OUT )          :: VAL_LIST( : )
+          INTEGER,        INTENT ( IN ), OPTIONAL :: LOGDEV
+
+          INTEGER             :: MAX_LEN
+          INTEGER             :: LEN_EVAL
+          CHARACTER( 16 )     :: PNAME = 'PARSE_STRING'
+          CHARACTER(  1 )     :: CHR
+          CHARACTER( 96 )     :: XMSG
+
+          INTEGER :: JP( MAX_STRING*SIZE( VAL_LIST ) )
+          INTEGER :: KP( MAX_STRING*SIZE( VAL_LIST ) )
+          INTEGER :: STATUS
+          INTEGER :: IP, V
+
+          INTEGER :: LOC_LOGDEV
+ 
+          IF (PRESENT(LOGDEV)) THEN
+             LOC_LOGDEV = LOGDEV
+          ELSE
+             LOC_LOGDEV = 6
+          END IF
+
+          MAX_LEN = MAX_STRING * ( SIZE( VAL_LIST ) + 1 ) ! extra character allows deliminator
+
+C Parse:
+
+           NVARS = 0
+
+C do not count until 1st char in string
+           
+           IP = 0
+           KP = 1
+           JP = 1
+           LEN_EVAL = LEN_TRIM( ENV_VAL ) 
+           IF ( LEN_EVAL .GT. MAX_LEN ) THEN
+              XMSG = TRIM( PNAME ) // ': The Environment variable, '
+     &            // TRIM( ENV_VAL ) // ',  has too long, greater than ' 
+              WRITE(LOGDEV,'(A,I8)')TRIM( XMSG ), MAX_LEN
+              XMSG = 'Above fatal error encountered '
+              CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )                     
+           END IF
+101        LOOP_101: DO  ! read list
+              IP = IP + 1
+              IF ( IP .GT. LEN_EVAL ) EXIT LOOP_101
+              CHR = ENV_VAL( IP:IP )
+              IF ( CHR .EQ. ' ' .OR. ICHAR ( CHR ) .EQ. 09 ) CYCLE LOOP_101
+              IF( NVARS .GT. SIZE( VAL_LIST ) )THEN
+                 XMSG = TRIM( PNAME ) // ':ERROR: Number of values in List, ' 
+     &                //  TRIM( ENV_VAL ) 
+     &                // ', greater than the size of its storage array, '
+                  WRITE(LOGDEV,'(A,I4)')TRIM( XMSG ), SIZE( VAL_LIST )
+                  XMSG = 'Above fatal error encountered '
+                  CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )                     
+              END IF
+              NVARS = NVARS + 1
+              JP( NVARS ) = IP   ! 1st char
+              IF( IP .EQ. LEN_EVAL )THEN ! word one character long          
+                  KP( NVARS ) = IP
+                  V = 1
+                  EXIT LOOP_101
+              END IF     
+201           LOOP_201: DO ! read word
+                 IP = IP + 1
+                 CHR = ENV_VAL( IP:IP )
+                 IF ( CHR .NE. ' ' .AND.
+     &                CHR .NE. ',' .AND.
+     &                CHR .NE. ';' .OR.
+     &                ICHAR ( CHR ) .EQ. 09 ) THEN  ! 09 = horizontal tab
+                    CYCLE LOOP_201
+                 ELSE                               ! last char in word
+                    KP( NVARS ) = IP - 1 
+                    V = JP( NVARS ) - IP
+                    IF( V .GT. MAX_STRING )THEN
+                      XMSG =  'The word, ' // ENV_VAL( JP(NVARS):KP(NVARS) ) 
+     &                     // ', in list, ' // TRIM( ENV_VAL )
+     &                     // ', is too long, '
+                      WRITE(LOGDEV,'(A,1X,I2,A,I2)')TRIM( XMSG ), V, ' max allowed ',
+     &                MAX_STRING
+                      XMSG = 'Above fatal error encountered '
+                      CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )                     
+                    END IF
+                    EXIT LOOP_201
+                 END IF 
+                 IF ( IP .GE. LEN_EVAL ) EXIT LOOP_101
+              END DO LOOP_201
+           END DO LOOP_101
+           
+           IF( NVARS .GT. SIZE( VAL_LIST ) )THEN
+              XMSG = TRIM( PNAME ) // ':ERROR: Number of values in List, ' 
+     &             //  TRIM( ENV_VAL ) // ', greater than '
+              WRITE(LOGDEV,'(A,I4)')TRIM( XMSG ), SIZE( VAL_LIST )
+              XMSG = 'Above fatal error encountered '
+              CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )                     
+           END IF
+           DO V = 1, NVARS
+              VAL_LIST( V ) = ENV_VAL( JP( V ):KP( V ) )
+           END DO
+
+           RETURN
+           
+        END SUBROUTINE PARSE_STRING
 
 c===============================================================
 
-        SUBROUTINE GET_SPC_INDEX ()
+        SUBROUTINE GET_MAP_SAtoCGR ()
 
 C20140428  Map CGRID species index to ISAM tracer species index
 C         Called by driver.F
 C
 
-        USE CGRID_SPCS       ! 20120615
-        USE RXNS_DATA, ONLY : MECHNAME !Get Chemical Mechanism Name
-        USE HGRD_DEFN        ! 20120710 just for print out from single processor
-        USE UTILIO_DEFN      ! 20120725 for external functions such as INDEX1
+        USE CGRID_SPCS     
+        USE RXNS_DATA,    ONLY : MECHNAME, NUMB_MECH_SPC, CHEMISTRY_SPC 
+!        USE DEGRADE_PARAMETERS
+        USE UTILIO_DEFN    
 
         IMPLICIT NONE
       
         INTEGER J_SPC, N, ITAG, I2, ISUM
         INTEGER N_OZN     ! index of ozone in gc_spc list
-        INTEGER ALLOCSTAT
+        INTEGER IOST
 
-        CHARACTER( 16 ), ALLOCATABLE, SAVE :: CMAQ_ADV_NAMES( : )  
+        CHARACTER( 16 ), ALLOCATABLE, SAVE :: CMAQ_ADV_NAMES( : ) 
+        
         INTEGER FRST, LAST, CMAQ_ADV
 
+        INTEGER I_SPC, K_SPC, NLIST
+         
         CHARACTER( 132 ) :: XMSG
+        INTEGER ALLOCSTAT
 
         LOGICAL FOUND
         LOGICAL TRANS_WARN
@@ -429,12 +1595,14 @@ C
 c----------------------------------------------------------
         
 
-        ALLOCATE ( SPC_NAME( NSPC_SA, NTAG_SA ), STAT = ALLOCSTAT )
-        CALL CHECKMEM( ALLOCSTAT, 'SPC_NAME', 'GET_SPC_INDEX' )
-        SPC_NAME = ' '
-        ALLOCATE ( SPC_INDEX( NSPC_SA,20 ), STAT = ALLOCSTAT )
-        CALL CHECKMEM( ALLOCSTAT, 'SPC_INDEX', 'GET_SPC_INDEX' )
-        SPC_INDEX = -1
+        ! Initialize number of tags * species        
+        N_SPCTAG = NSPC_SA * NTAG_SA
+    
+        ! Allocate vectors and arrays for ISAM species names and property
+        ! fields
+        ALLOCATE ( MAP_SAtoCGR( NSPC_SA ), STAT = ALLOCSTAT )
+        CALL CHECKMEM( ALLOCSTAT, 'MAP_SAtoCGR', 'GET_MAP_SAtoCGR' )
+        MAP_SAtoCGR = -1
         ALLOCATE ( IS_SPC_AEROSOL( NSPC_SA,NTAG_SA ), STAT = ALLOCSTAT )
         CALL CHECKMEM( ALLOCSTAT, 'IS_SPC_AEROSOL', 'IS_SPC_AEROSOL' )
         IS_SPC_AEROSOL = .FALSE.
@@ -442,761 +1610,95 @@ c----------------------------------------------------------
         CALL CHECKMEM( ALLOCSTAT, 'TRANSPORT_SPC', 'TRANSPORT_SPC' )
         TRANSPORT_SPC = .TRUE.
 
-        J_SPC = 0
-         
-        EFLAG = .FALSE.
-
-        IF (  L_CHLORINE ) THEN
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ACLJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ACLI'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'HCL'
-        ENDIF
-
-        IF (  L_EC ) THEN
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'AECJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'AECI'   
-        ENDIF
-
-        IF ( L_OC ) THEN
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'ALVPO1J'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'ALVPO1I'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'ASVPO1J'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'ASVPO1I'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'ASVPO2J'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'ASVPO2I'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'ASVPO3J'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'AIVPO1J'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'VLVPO1'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'VSVPO1'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'VSVPO2'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'VSVPO3'
-c           J_SPC = J_SPC + 1
-c           SPC_NAME( J_SPC,: ) = 'VIVPO1'
-            J_SPC = J_SPC + 1
-            SPC_NAME( J_SPC,: ) = 'APOCJ'
-            J_SPC = J_SPC + 1
-            SPC_NAME( J_SPC,: ) = 'APOCI'
-            J_SPC = J_SPC + 1
-            SPC_NAME( J_SPC,: ) = 'APNCOMJ'
-            J_SPC = J_SPC + 1
-            SPC_NAME( J_SPC,: ) = 'APNCOMI'
-        ENDIF
-
-          
-        IF ( L_SFATE ) THEN
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ASO4J'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ASO4I'    
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'SO2'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'SULF'    
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'SULRXN'
-        ENDIF
-
-        IF ( L_NITRATE ) THEN
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ANO3J'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ANO3I'    
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'HNO3'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'NO'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'NO2'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'NO3'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'HONO'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'N2O5'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'PAN'
-          SELECT CASE( MECHNAME )
-             CASE( 'CB6R3_AE6_AQ', 'CB6R3_AE7_AQ' )
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'XO2N' 
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'NTR1' 
-               J_SPC = J_SPC + 1  
-               SPC_NAME( J_SPC,: ) = 'NTR2'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'INTR'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'PNA'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'PANX'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CLNO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CLNO3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'XO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'XO2H'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MEO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'ISO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'C2O3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CXO3'                
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'OPO3'
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'BZO2'
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'TO2'
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'XLO2'
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'EPX2'
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'HCO3'                
-             CASE( 'CB6R3M_AE7_KMTBR' )
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'XO2N' 
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'NTR1' 
-               J_SPC = J_SPC + 1  
-               SPC_NAME( J_SPC,: ) = 'NTR2'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'INTR'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'PNA'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'PANX'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CLNO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CLNO3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'BRNO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'BRNO3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'INO'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'INO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'INO3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'XO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'XO2H'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MEO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'ISO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'C2O3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CXO3'                
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'OPO3'
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'BZO2'
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'TO2'
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'XLO2'
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'EPX2'
-!                J_SPC = J_SPC + 1
-!                SPC_NAME( J_SPC,: ) = 'HCO3'                
-             CASE( 'SAPRC07TC_AE6_AQ' ) 
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'HNO4'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'RNO3'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'PAN2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CLNO'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CLONO'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CLONO2'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'xNO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MEO2'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'xMEO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'RO2C'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'RO2CX'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MECO3'
-               
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'xMECO3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'RCO3'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'xRCO3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'BZCO3'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'PBZN'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MACO3'
-               
-             CASE( 'SAPRC07TIC_AE6I_AQ', 'SAPRC07TIC_AE7I_AQ' ) 
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'HNO4'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'RNO3'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'PAN2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CLNO'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CLONO'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'CLONO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'ETHLN'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'IMAE'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'IMAPAN'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'ISOPNN'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MACRN'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'NIT1'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MVKN'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'PROPNN'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MTNO3'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'AMTNO3J'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'AISOPNNJ'  
-                
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'xNO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MEO2'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'xMEO2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'RO2C'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'RO2CX'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MECO3'
-               
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'xMECO3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'RCO3'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'xRCO3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'BZCO3'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'PBZN'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MACO3'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'TERPNRO2'  
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'ISOPO2'  
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'NISOPO2'  
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MVKOO'  
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MACROO'  
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'RNO3I'  
-
-!               J_SPC = J_SPC + 1
-!               SPC_NAME( J_SPC,: ) = 'DIBOO'  
-!               J_SPC = J_SPC + 1
-!               SPC_NAME( J_SPC,: ) = 'HC5OO'  
-
-!               J_SPC = J_SPC + 1
-!               SPC_NAME( J_SPC,: ) = 'NIT1NO3OOA'  
-!               J_SPC = J_SPC + 1
-!               SPC_NAME( J_SPC,: ) = 'NIT1NO3OOB'  
-
-
-             CASE( 'RACM2_AE6_AQ') 
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'HNO4'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'ONIT'   
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MPAN'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'ACO3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'MO2'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'HC3P'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'HC5P'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'HC8P'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'KETP'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'ISOP'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'ETHP'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'RCO3'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'XYLP'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'TR2'
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'BENP'
-
-               J_SPC = J_SPC + 1
-               SPC_NAME( J_SPC,: ) = 'ETEP'
-
-          END SELECT 
-        ENDIF ! L_NITRATE
-
-        IF ( L_VOC ) THEN
-          SELECT CASE( MECHNAME )
-             CASE( 'CB6R3_AE6_AQ' )
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ALD2'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ALDX'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETHA'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETOH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'FORM'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'IOLE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ISOP'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MEOH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'OLE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'PAR'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'TERP'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'TOL'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'XYLMN'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'NAPH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETHY'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'PRPA'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ACET'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'KET'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'GLY'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'BENZENE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'GLYD'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MEPX'                
-             CASE( 'CB6R3_AE7_AQ', 'CB6R3M_AE7_KMTBR' )
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ALD2'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ALDX'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETHA'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETOH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'FORM'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'IOLE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ISOP'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MEOH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'OLE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'PAR'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'TERP'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'TOL'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'XYLMN'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'NAPH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETHY'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'PRPA'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ACET'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'KET'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'GLY'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'BENZENE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'APIN'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'GLYD'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MEPX'                
-             CASE( 'SAPRC07TC_AE6_AQ', 'SAPRC07TIC_AE6I_AQ', 'SAPRC07TIC_AE7I_AQ' ) 
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'HCHO'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'CCHO'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'RCHO'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'xHCHO'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'xCCHO'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'xRCHO'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ALK1'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ALK2'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ALK3'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ALK4'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ALK5'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETHENE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ACETYLENE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'PROPENE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ISOPRENE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'TERP'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'SESQ'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'APIN'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'OLE1'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'OLE2'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETOH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MEOH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'GLY'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MGLY'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'BENZENE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'TMBENZ124'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'TOLUENE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MXYL'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'OXYL'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'PXYL'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'NAPHTHAL'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ARO1'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ARO2MN'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'BUTADIENE13'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ACROLEIN'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ACETONE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MEK'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MVK'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MACR'
-             CASE( 'RACM2_AE6_AQ') 
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'HCHO'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ACD'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ALD'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'UALD'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'HC3'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'HC5'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'HC8'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'OLI'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'OLT'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ETE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ACE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ISO'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'SESQ'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'LIM'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'API'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'EOH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MOH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'GLY'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MGLY'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'BENZENE'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'TOL'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'XYLM'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'XYLO'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'XYLP'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'NAPH'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'DIEN'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'ACT'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'HKET'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'KET'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MVK'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MEK'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'MACR'
-
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'DCB1'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'DCB2'
-                J_SPC = J_SPC + 1
-                SPC_NAME( J_SPC,: ) = 'DCB3'
-
-          END SELECT
-        ENDIF ! L_VOC
-
-        IF (  L_NH4 ) THEN
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ANH4J'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ANH4I'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'NH3'
-        ENDIF
-
-        IF ( L_PM25 ) THEN
-c         J_SPC = J_SPC + 1
-c         SPC_NAME( J_SPC,: ) = 'ACLJ'
-c         J_SPC = J_SPC + 1
-c         SPC_NAME( J_SPC,: ) = 'ACLI'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ANAJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ANAI' 
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'AMGJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'AKJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ACAJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'AFEJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'AALJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ASIJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'ATIJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'AMNJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'AOTHRJ'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'AOTHRI'
-        ENDIF
-
-        IF ( L_CO ) THEN
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'CO'
-        ENDIF
-
-        IF ( L_OZONE ) THEN
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'O3'
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'O1D'
-          J_SPC = J_SPC + 1
-          SELECT CASE( MECHNAME )
-             CASE( 'CB6R3_AE6_AQ', 'CB6R3_AE7_AQ', 'CB6R3M_AE7_KMTBR')
-                SPC_NAME( J_SPC,: ) = 'O'
-             CASE( 'SAPRC07TC_AE6_AQ', 'RACM2_AE6_AQ', 'SAPRC07TIC_AE6I_AQ', 'SAPRC07TIC_AE7I_AQ' ) 
-                SPC_NAME( J_SPC,: ) = 'O3P'
-          END SELECT
-          J_SPC = J_SPC + 1
-          SPC_NAME( J_SPC,: ) = 'HO2'
-        ENDIF
-
-
-C...Check if the above adds up to number of tagging species
-        IF ( J_SPC .NE. NSPC_SA ) THEN
-          WRITE(LOGDEV,'(A,I4,A,I4,3A)')'Tagged species found, ', J_SPC,  
-     &    ', does not equal expected, ',  NSPC_SA,
-     &    ', for the ', TRIM( MECHNAME ), ' mechanism.'
-          EFLAG = .TRUE.
-        ENDIF
-
-C...Initialize species index
-        SPC_INDEX = -1
-
-C..Determine which ISAM species are aerosols and are transported
+        ! Determine which ISAM species are aerosols and are transported
+        ! set species names
         NSPC_TRANSPORT = 0
         ISUM  = 0
         DO ITAG = 1, NTAG_SA
            DO J_SPC = 1, NSPC_SA
               ISUM = ISUM + 1
               DO N = 1, N_AE_SPC
-                 IF( TRIM( SPC_NAME( J_SPC,ITAG ) ) .EQ. TRIM( AE_SPC( N ) ) )THEN
+                 IF( TRIM( ISAM_SPEC( J_SPC,ITAG ) ) .EQ. TRIM( AE_SPC( N ) ))THEN
+                     IS_SPC_AEROSOL( J_SPC,ITAG ) = .TRUE.
+                     IF ( ITAG .LT. 2 ) NSPC_SA_AE = NSPC_SA_AE + 1
+                 END IF
+              END DO
+              DO N = 1, N_AE_SPC
+                 IF( TRIM( ISAM_SPEC( J_SPC,ITAG ) ) .EQ. TRIM( AE_SPC( N ) ) )THEN
                      IS_SPC_AEROSOL( J_SPC,ITAG ) = .TRUE.
                  END IF
               END DO
               FOUND = .FALSE.        
               DO N = 1, N_GC_TRNS
-                 IF( TRIM( SPC_NAME( J_SPC,ITAG ) ) .EQ. TRIM( GC_TRNS( N ) ) )FOUND = .TRUE.
+                 IF( ISAM_SPEC( J_SPC,ITAG ) .EQ. GC_TRNS( N ) )FOUND = .TRUE.
               END DO
               DO N = 1, N_AE_TRNS
-                 IF( TRIM( SPC_NAME( J_SPC,ITAG ) ) .EQ. TRIM( AE_TRNS( N ) ) )FOUND = .TRUE.
+                 IF( ISAM_SPEC( J_SPC,ITAG ) .EQ. AE_TRNS( N ) )FOUND = .TRUE.
               END DO
               DO N = 1, N_NR_TRNS
-                 IF( TRIM( SPC_NAME( J_SPC,ITAG ) ) .EQ. TRIM( NR_TRNS( N ) ) )FOUND = .TRUE.
+                 IF( ISAM_SPEC( J_SPC,ITAG ) .EQ. NR_TRNS( N ) )FOUND = .TRUE.
               END DO
               DO N = 1, N_TR_ADV
-                 IF( TRIM( SPC_NAME( J_SPC,ITAG ) ) .EQ. TRIM( TR_ADV( N ) ) )FOUND = .TRUE.
+                 IF( ISAM_SPEC( J_SPC,ITAG ) .EQ. TR_ADV( N ) )FOUND = .TRUE.
               END DO
               TRANSPORT_SPC( ISUM ) = FOUND
               IF( FOUND )NSPC_TRANSPORT = NSPC_TRANSPORT + 1
            END DO  
         END DO
 
+        ALLOCATE ( ISAM_TO_AERO( NSPC_SA_AE ), STAT = ALLOCSTAT )
+        CALL CHECKMEM( ALLOCSTAT, 'ISAM_TO_AERO', 'GET_SPC_INDEX' )
+        ISAM_TO_AERO = -1
+        ALLOCATE ( SA_AERO_INDX( NSPC_SA_AE ), STAT = ALLOCSTAT )
+        CALL CHECKMEM( ALLOCSTAT, 'SA_AERO_INDX', 'GET_SPC_INDEX' )
+        SA_AERO_INDX = -1
+
+        ITAG = 1
+        N = 0
+        DO J_SPC = 1, NSPC_SA
+           IF( .NOT. IS_SPC_AEROSOL( J_SPC,ITAG ) )CYCLE
+           N = N + 1
+           DO I_SPC = 1, N_AE_SPC
+               IF( TRIM( ISAM_SPEC( J_SPC,ITAG ) ) .NE. TRIM( AE_SPC( I_SPC ) ) ) CYCLE
+               ISAM_TO_AERO( N ) = I_SPC ! + AE_STRT - 1
+               SA_AERO_INDX( N ) = J_SPC
+               WRITE(LOGDEV,'(A,I4,1X,I5,1X,A16,I3,1X,A16)')
+     &         'ISAM SPECIES, AEROSOL SPECIES = ',N,SA_AERO_INDX( N ),ISAM_SPEC( J_SPC,ITAG ),
+     &         ISAM_TO_AERO( N ),AE_SPC( I_SPC )
+           END DO
+        END DO
+
+
 C...Assign species index with CMAQ species mappings
+        ! Assign species index with CMAQ species mappings
         ALLOCATE( MAP_CGRtoSA( NSPCSD ) )
         MAP_CGRtoSA = 0
 
         DO N = 1, NSPCSD
-          IF ( N .GE. GC_STRT .AND. N .LE. GC_FINI ) THEN
-            DO J_SPC = 1, NSPC_SA
-              IF ( SPC_NAME( J_SPC,ICONTAG ) .EQ. GC_SPC( N ) ) THEN  
-                SPC_INDEX( J_SPC,1 ) = 1
-                SPC_INDEX( J_SPC,2 ) = N
-                MAP_CGRtoSA( N ) = J_SPC
-              END IF ! spc_name and gc_spc match
-            END DO
-          ELSE IF ( N .GE. AE_STRT .AND. N .LT. AE_FINI ) THEN
-            DO J_SPC = 1, NSPC_SA
-              IF ( SPC_NAME( J_SPC,ICONTAG ) .EQ. AE_SPC( N-AE_STRT+1 ) ) THEN
-                SPC_INDEX( J_SPC,1 ) = 1
-                SPC_INDEX( J_SPC,2 ) = N
-                MAP_CGRtoSA( N ) = J_SPC
-              END IF ! spc_name and ae_spc match
-            END DO
-          ELSE IF ( N .GE. NR_STRT .AND. N .LE. NR_FINI ) THEN
-            DO J_SPC = 1, NSPC_SA
-              IF ( SPC_NAME( J_SPC,ICONTAG ) .EQ. NR_SPC( N-NR_STRT+1 ) ) THEN
-                SPC_INDEX( J_SPC,1 ) = 1
-                SPC_INDEX( J_SPC,2 ) = N
-                MAP_CGRtoSA( N ) = J_SPC
-              END IF
-            END DO          
-          END IF          
+           DO J_SPC = 1, NSPC_SA
+             IF ( ISAM_SPEC( J_SPC,ICONTAG ) .EQ. CGRID_NAME( N ) ) THEN  
+               MAP_SAtoCGR( J_SPC ) = N
+               MAP_CGRtoSA( N ) = J_SPC
+             END IF ! ISAM_SPEC and gc_spc match
+           END DO
         END DO ! number of tagging species
+
+        EFLAG = .FALSE.
+        DO J_SPC = 1, NSPC_SA
+          IF ( MAP_SAtoCGR( J_SPC ) .LT. 1 ) THEN
+             write(logdev,'(A,A,A)')'Tracked species '
+     &       // TRIM( ISAM_SPEC( J_SPC,ICONTAG ) ) //
+     &          ' not found among model species '
+             EFLAG = .TRUE.
+          END IF
+        END DO 
+        IF ( EFLAG ) THEN
+          CALL M3EXIT( 'GET_MAP_SAtoCGR', 0, 0, 'Above Fatal Error Encountered', XSTAT2 )
+        END IF 
 
 C...Map SA species for Advection
         ALLOCATE( MAP_ADVtoSA ( N_SPCTAG ) )
- 
+           
         CMAQ_ADV = N_GC_TRNS + N_AE_TRNS + N_NR_TRNS + N_TR_ADV
         ALLOCATE( CMAQ_ADV_NAMES( CMAQ_ADV ) )
 
@@ -1232,28 +1734,175 @@ C...Map SA species for Advection
         DO ITAG = 1, NTAG_SA
            DO J_SPC = 1, NSPC_SA
               N = N + 1
-              MAP_ADVtoSA(N) = INDEX1( SPC_NAME(J_SPC,1), CMAQ_ADV, CMAQ_ADV_NAMES )
+              MAP_ADVtoSA(N) = INDEX1( ISAM_SPEC(J_SPC,1), CMAQ_ADV, CMAQ_ADV_NAMES )
               IF( MAP_ADVtoSA(N) .LT. 1 .AND. ITAG .LT. 2 )THEN
                  TRANS_WARN = .TRUE.
-                 XMSG = 'ISAM WARNING: Tagged Species, ' // TRIM( SPC_NAME(J_SPC,1) ) 
+                 XMSG = 'ISAM WARNING: Tagged Species, ' // TRIM( ISAM_SPEC(J_SPC,1) ) 
      &               // ' not transported. Modify species namelist(s) to include process.'
                  WRITE(LOGDEV,'(A)')TRIM( XMSG )
               END IF
-!              XMSG = 'For ' // SPC_NAME(J_SPC,1) // ' transported, adv_map = '
-!              WRITE(LOGDEV,95000)NSPC_TRANSPORT, J_SPC, TRIM( XMSG ),
-!     &        TRANSPORT_SPC(J_SPC), MAP_ADVtoSA(N)
            END DO
         END DO
         
         IF ( TRANS_WARN ) THEN
-          CALL M3WARN( 'GET_SPC_INDEX', 0, 0, 'Above Problems Encountered' )
+          CALL M3WARN( 'GET_MAP_SAtoCGR', 0, 0, 'Species above are not transported.' )
         END IF
-        IF ( EFLAG ) THEN
-          CALL M3EXIT( 'GET_SPC_INDEX', 0, 0, 'Above Fatal Error Encountered', XSTAT2 )
-        END IF 
 
 95000    FORMAT(2(I3,1X),A,L4,1X,I4)
 
-        END SUBROUTINE GET_SPC_INDEX
+
+C...Map SA species for DEPV
+C
+C...  DO THIS LATER IF NEEDED FOR THE GENERAL CASE - RIGHT NOW ONLY DO AMMONIA
+c       ALLOCATE( MAP_DEPVtoSA ( N_SPCTAG ) )
+
+c       CMAQ_DEPV = N_GC_DEPV + N_AE_DEPV + N_NR_DEPV + N_TR_DEPV
+c       ALLOCATE( CMAQ_DEPV_NAMES( CMAQ_DEPV ) )
+
+c       FRST = 0
+c       LAST = 0
+c       IF ( N_GC_DEPV .NE. 0 ) THEN
+c          FRST = 1
+c          LAST = N_GC_DEPV
+c          CMAQ_DEPV_NAMES( FRST:LAST ) = GC_DEPV(1:N_GC_DEPV)
+c       ENDIF
+
+c       IF ( N_AE_DEPV .NE. 0 ) THEN
+c          FRST = LAST + 1
+c          LAST = LAST + N_AE_DEPV
+c          CMAQ_DEPV_NAMES( FRST:LAST ) = AE_DEPV(1:N_AE_DEPV)
+c       END IF
+
+c       IF ( N_NR_DEPV .NE. 0 ) THEN
+c          FRST = LAST + 1
+c          LAST = LAST + N_NR_DEPV
+c          CMAQ_DEPV_NAMES( FRST:LAST ) = NR_DEPV(1:N_NR_DEPV)
+c       END IF
+
+c       IF ( N_TR_DEPV .NE. 0 ) THEN
+c          FRST = LAST + 1
+c          LAST = LAST + N_TR_DEPV
+c          CMAQ_DEPV_NAMES( FRST:LAST ) = TR_DEPV(1:N_TR_DEPV)
+c       END IF
+
+c       MAP_DEPVtoSA = -1
+c       N = 0
+!       DO ITAG = 1, NTAG_SA
+c          DO J_SPC = 1, NSPC_SA
+c             N = N + 1
+c             MAP_DEPVtoSA(N) = INDEX1( ISAM_SPEC(J_SPC,1), CMAQ_DEPV, CMAQ_DEPV_NAMES )
+c             IF( MAP_DEPVtoSA(N) .LT. 1 )THEN
+c                XMSG = 'ISAM WARNING: Tagged Species, ' // TRIM( ISAM_SPEC(J_SPC,1) )
+c    &               // ' not in DEPV list.'
+c                CALL M3EXIT ( 'MAP_DEPVtoSA', 0, 0, XMSG, XSTAT1 )
+c             END IF
+c          END DO
+!       END DO
+
+        END SUBROUTINE GET_MAP_SAtoCGR
+
+      !-------------------------------------------------------------------------------------------   
+        SUBROUTINE CHECK_MECH( TAG_NAME, IMECH, MECHNAME, EFLAG )
+      !-------------------------------------------------------------------------------------------   
+      !  This subroutine checks whether or not the the chemical mechanism
+      !  that the user has supplied is active for ISAM and reports an
+      !  error if not.
+      !-------------------------------------------------------------------------------------------   
+        USE RUNTIME_VARS
+        
+        IMPLICIT NONE
+
+        INTEGER       :: IMECH
+        CHARACTER(*)  :: TAG_NAME
+        CHARACTER(32) :: MECHNAME
+        LOGICAL       :: EFLAG
+        CHARACTER(400):: XMSG
+
+        IF ( IMECH .EQ. 0 ) THEN
+           XMSG = "ISAM ERROR: The " // TRIM(TAG_NAME) // " tag group has been selected but the species "
+     &         // "for the " // TRIM( MECHNAME ) // " mechanism are not defined. Modify GET_NSPC_SA "
+     &         // "and GET_SPC_INDEX  subroutines to include MECHNAME cases for it."
+                CALL LOG_MESSAGE( LOGDEV, XMSG )  
+           EFLAG = .TRUE.
+        END IF
+        END SUBROUTINE CHECK_MECH
+ 
+      !-------------------------------------------------------------------------------------------   
+        SUBROUTINE ADD_ISAM_SPEC( CHEM_NAME, FOUND_SPECIES, IMECH )
+      !-------------------------------------------------------------------------------------------   
+      !  This subroutine adds an aerosol or gas-phase species to the
+      !  ISAM species array and sends back a TRUE value for
+      !  FOUND_SPECIES if the input CHEM_NAME is a CMAQ modeled
+      !  species.
+      !-------------------------------------------------------------------------------------------   
+        USE CGRID_SPCS
+        USE UTILIO_DEFN 
+        USE AERO_DATA, only : N_AEROSPC, AEROSPC
+        
+        IMPLICIT NONE
+
+        CHARACTER(*)  :: CHEM_NAME
+        LOGICAL       :: FOUND_SPECIES
+
+        INTEGER ISPEC, IAERO, IMECH, J_SPC
+ 
+        ! Find Species Index
+        ISPEC = INDEX1( CHEM_NAME, NSPCSD, CGRID_NAME )
+        IAERO = INDEX1( CHEM_NAME, N_AEROSPC, AEROSPC%BULKNAME )
+ 
+        IF ( IAERO .GT. 0 ) THEN
+           ! Species is an aerosol model species
+           L_ISAM_AERO( IAERO ) = .TRUE.
+           FOUND_SPECIES = .TRUE.
+
+        ELSE IF ( ISPEC .GT. 0 ) THEN
+           IF ( .NOT. CGRID_MASK_AERO( ISPEC ) ) THEN
+              ! Species is a gas model species
+              IF ( INDEX1( CHEM_NAME, NSPC_SA, ISAM_SPEC(:,1) ) .EQ. 0 ) THEN
+                 NSPC_SA = NSPC_SA + 1
+                 ISAM_SPEC( NSPC_SA,: ) = CHEM_NAME
+
+                 ! Populate Chemistry Bias Arrays, if Applicable
+                 IF ( IMECH .NE. 0 ) THEN
+                   J_SPC = INDEX1( CHEM_NAME, N_VOC_BIAS, ISAM_BIAS_VOC(IMECH)%LIST )
+                   IF ( J_SPC .GT. 0 ) ISAM_SPECIES_BIAS( 3:4,NSPC_SA ) = .TRUE.
+                   J_SPC = INDEX1( CHEM_NAME, N_NOY_BIAS, ISAM_BIAS_NOY(IMECH)%LIST )
+                   IF ( J_SPC .GT. 0 ) ISAM_SPECIES_BIAS( 2:3,NSPC_SA ) = .TRUE.
+                 END IF
+
+              END IF 
+              FOUND_SPECIES = .TRUE.
+           END IF
+
+        END IF   
+
+        END SUBROUTINE ADD_ISAM_SPEC
+
+      !-------------------------------------------------------------------------------------------   
+        SUBROUTINE ISAM_SPECIES_WARN( TAG_NAME, FOUND_SPECIES, EFLAG )
+      !-------------------------------------------------------------------------------------------   
+      !  This subroutine prints a warning if no species in a tag class
+      !  are found on CMAQ modeled species list.
+      !-------------------------------------------------------------------------------------------   
+        USE RUNTIME_VARS
+        
+        IMPLICIT NONE
+
+        CHARACTER(*)  :: TAG_NAME
+        LOGICAL       :: FOUND_SPECIES
+        LOGICAL       :: EFLAG
+        CHARACTER(400):: XMSG
+
+
+        IF ( .NOT. FOUND_SPECIES ) THEN
+           EFLAG = .TRUE.
+           XMSG = " ISAM ERROR: No member of "//TRIM(TAG_NAME)//" tag class found "
+     &          // "in species namelists but control file requests the class."
+           CALL LOG_MESSAGE( LOGDEV, XMSG )
+        END IF
+ 
+        END SUBROUTINE ISAM_SPECIES_WARN
+ 
+
 
       END MODULE SA_DEFN

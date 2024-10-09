@@ -79,6 +79,10 @@ C Logical to test whether met variables are included
          USE CGRID_SPCS            ! CGRID mechanism species
          USE UTILIO_DEFN
 
+#ifdef sens
+         Use DDM3D_DEFN, Only: N_ASENS_VARS
+#endif
+
          CHARACTER( 16 ) :: PNAME = 'A_CONC_DEFN'
          CHARACTER(200 ) :: XMSG = ' '
 
@@ -99,17 +103,17 @@ C RETRIEVE THE SPECIES SAVED TO INTEGRAL AVERAGE CONCENTRATION FILE
 
          IF ( N_ACONC_VARS .EQ. 0 .OR. ACONC_FILE_SPCS( 1 ) .EQ. 'ALL' ) THEN
             V = 0
-            DO VAR = 1, N_GC_SPC
+            DO VAR = 1, N_GC_CONC
                V = V + 1
-               ACONC_FILE_SPCS( V ) = GC_SPC( VAR )
+               ACONC_FILE_SPCS( V ) = GC_CONC( VAR )
             END DO
-            DO VAR = 1, N_AE_SPC
+            DO VAR = 1, N_AE_CONC
                V = V + 1
-               ACONC_FILE_SPCS( V ) = AE_SPC( VAR )
+               ACONC_FILE_SPCS( V ) = AE_CONC( VAR )
             END DO
-            DO VAR = 1, N_NR_SPC
+            DO VAR = 1, N_NR_CONC
                V = V + 1
-               ACONC_FILE_SPCS( V ) = NR_SPC( VAR )
+               ACONC_FILE_SPCS( V ) = NR_CONC( VAR )
             END DO
             DO VAR = 1, N_TR_SPC
                V = V + 1
@@ -119,6 +123,9 @@ C RETRIEVE THE SPECIES SAVED TO INTEGRAL AVERAGE CONCENTRATION FILE
             ACONC_FILE_SPCS( V + 2 ) = 'TA'
             ACONC_FILE_SPCS( V + 3 ) = 'PRES'
             N_ACONC_VARS = V + 3
+#ifdef sens
+            N_ASENS_VARS = V
+#endif
          END IF
 C  Retrieve CTM_WVEL environmental variable to see if user wants diagnosed vertical velocity
          IF ( W_VEL ) THEN 

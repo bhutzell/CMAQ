@@ -29,7 +29,6 @@ C*************************************************************************
       INTEGER        END_DATE        ! ending date of period to process
       INTEGER        STARTHR         ! starting hour of the daily time period to process
       INTEGER        ENDHR           ! ending hour of the daily time period to process
-      INTEGER        HROFFSET        ! Hour offset
       INTEGER        HOURS_8HRMAX    ! Number of hours to use for 8HR Max
 
       LOGICAL        PARTDAY         ! Compute partial day for last day
@@ -49,7 +48,7 @@ C
 C        
 C*************************************************************************
          USE M3UTILIO
-	 USE TIME_STEP
+         USE TIME_STEP
 
          IMPLICIT NONE 
 
@@ -108,13 +107,10 @@ C... get use daylight savings time switch id uselocal
         useDST = ENVYN('USEDST',"Use Daylight Savings time", .FALSE., status)
         endif
 
-C... get hour offset
-      hroffset = ENVINT('HROFFSET',"Hour offset", 0, status)
-
 C... Get the HOURS_8HRMAX environment variable (default is 24)                                                          
        HOURS_8HRMAX = ENVINT( 'HOURS_8HRMAX', 
      &  'Number of 8hr values to use when computing DM8HR', 24, STATUS)  
-	 
+
        if ( ( HOURS_8HRMAX .NE. 24) .AND. ( HOURS_8HRMAX .NE. 17) ) THEN                                
 
         MSG = '**Error** Invalid value for HOURS_8HRMAX, use 24 or 17'

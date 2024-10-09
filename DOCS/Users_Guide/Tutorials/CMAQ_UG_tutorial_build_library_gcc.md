@@ -1,82 +1,126 @@
 ## Install netCDF-C
 
-1. Download netCDF-C from the following website https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
+### This tutorial assumes that you are using the C-shell, (csh or tcsh), GCC version 9.1.0, and OpenMPI 4.0.1
+
+1. To enter the csh shell you can type the following at the command line:
 
 ```
-wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-c-4.7.0.tar.gz
+csh
 ```
 
-2. Untar
+2. To verify what shell you are in
 
 ```
-tar -tzvf netcdf-c-4.7.0.tar.gz
+echo $SHELL
 ```
 
-3. Verify that no modules are currently loaded
-
-```
-module list
-```
-
-4. See what modules are available on your compute server
+3. If your compute server uses modules use the following command to see what packages are available
 
 ```
 module avail
 ```
 
-5. Load module environment for a compiler (Intel|GCC|PGI) and mpi package corresponding to that compiler (e.g. openmpi).
+4. Load module environment for a compiler (Intel|GCC|PGI) and mpi package corresponding to that compiler (e.g. openmpi).
 
 ```
 module load gcc9.1.0
 module load openmpi_4.0.1/gcc_9.1.0
 ```
 
-6. Review the installation instructions for netcdf-c-4.7.0 for building Classic netCDF
+5. Create a LIBRARY directory where you would like to install the libraries required for CMAQ
+
+```
+/[your_install_path]/LIBRARIES
+
+```
+
+6. Change directories to the new LIBRARIES Directory
+
+```
+cd /[your_install_path]/LIBRARIES
+```
+
+7. Download netCDF-C from the following website https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
+
+```
+wget https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.8.1.tar.gz
+```
+
+8. Untar the netCDF-C tar.gz file
+
+```
+tar -xzvf v4.8.1.tar.gz
+```
+
+9. Change directories into the extracted directory
+```
+cd netcdf-c-4.8.1
+```
+
+10. Review the installation instructions for netcdf-c-4.7.0 for building netCDF
 
 ```
 more INSTALL.md
 ```
 
-7. Create a target installation directory that includes the loaded module environment name
+11. Create a target installation directory that includes the loaded module environment name
 
 ```
-mkdir /home/netcdf-c-4.7.0-gcc9.1.0
+mkdir ../netcdf
 ```
 
 
-8. Run the configure --help command to see what settings can be used for the build.
+12. Run the configure --help command to see what settings can be used for the build.
 ```
 ./configure --help
 ```
 
-9. Set the Compiler environment variables
+13. Set the Compiler environment variables
 
+Make sure these compilers can be found.
 ```
-which gfort
+which gfortran
 which gcc
-wihch g++
-
-setenv CC /urs/local/apps/gcc/9.1.0/bin/gfortran
-setenv FC /urs/local/apps/gcc/9.1.0/bin/gcc
-setenv CXX /urs/local/apps/gcc/9.1.0/bin/g++
+which g++
+```
+If they are found, proceed to set the environment variables.
+The paths will be dependent on your compute environment
+If they are not found, reload your module (see above), or ask your system administrator for the paths to a compiler
 ```
 
-10. Run the configure command
+setenv FC gfortran
+setenv CC gcc
+setenv CXX g++
+```
+
+14. Run the configure command
 
 ```
-./configure --prefix=/home/netcdf-c-4.7.0-gcc9.1.0 --disable-netcdf-4 --disable-dap
+./configure --prefix=$cwd/../netcdf --disable-dap
+```
+Building netCDF without the compression capabilities of netCDF4 can be done using the command
+
+```
+./configure --prefix=$cwd/../netcdf --disable-netcdf-4 --disable-dap
 ```
 
-11. Check that the configure command worked correctly
+This simpler installation can work for some applications, but the CMAQ ecosystem increasingly includes netCDF4 compression. For example, the cracmm1_aq 2018 benchmark and the MEGAN 3.2 preprocessor both require netCDF4. The error "Attempt to use feature that was not turned on when netCDF was built" suggests that your workflow requires netCDF4. 
+
+15. Check that the configure command worked correctly, then run the install command
 
 ```
 make check install
 ```
 
-12. Verify that the following message is obtained
+16. Verify that the following message is obtained
 
 ```
 | Congratulations! You have successfully installed netCDF!    |
+```
+
+17. Change directories to one level up from your current directory
+```
+cd ..
 ```
 
 ## Install netCDF-Fortran
@@ -84,82 +128,66 @@ make check install
 1. Download netCDF-Fortran from the following website https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
 
 ```
-wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-fortran-4.4.5.tar.gz 
+wget https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.5.4.tar.gz
 ```
 
 2. Untar the tar.gz file
 
 ```
-tar -xzvf netcdf-fortran-4.4.5.tar.gz
+tar -xzvf v4.5.4.tar.gz
 ```
 
-3. Change directories to netcdf-fortran-4.4.5
+3. Change directories to netcdf-fortran-4.5.4
 
 ```
-cd netcdf-fortran-4.4.5
+cd netcdf-fortran-4.5.4
 ```
 
-4. Make an install directory that matches the name of your loaded module environment
+4. Review the installation document http://www.unidata.ucar.edu/software/netcdf/docs/building_netcdf_fortran.html
+
+
+5. Set the CC environment variable to use the gcc and gfortran compilers
 
 ```
-mkdir /home/netcdf-fortran-4.4.5-gcc9.1.0
-```
-
-5. Review the installation document http://www.unidata.ucar.edu/software/netcdf/docs/building_netcdf_fortran.html
-
-6. Set the environment variable NCDIR
-
-```
-setenv NCDIR /home/netcdf-c-4.7.0-gcc9.1.0
-```
-
-7. Set the CC environment variable to use the gcc and gfortran compilers
-
-```
-which gfort
+which gfortran
 which gcc
-wihch g++
+which g++
 
-setenv CC /urs/local/apps/gcc/9.1.0/bin/gfortran
-setenv FC /urs/local/apps/gcc/9.1.0/bin/gcc
-setenv CXX /urs/local/apps/gcc/9.1.0/bin/g++
+setenv FC gfortran
+setenv CC gcc
+setenv CXX g++
 ```
 
-8. Set your LD_LIBRARY_PATH to include the netcdf-C library path for netCDF build
+6. Set your LD_LIBRARY_PATH to include the netcdf-C library path for netCDF build
 
 ```
-setenv NCDIR /home/netcdf-c-4.7.0-gcc9.1.0
+setenv NCDIR $cwd/../netcdf
 setenv LD_LIBRARY_PATH ${NCDIR}/lib:${LD_LIBRARY_PATH}
 ```
 
-9. Check your LD_LIBRARY_PATH
+7. Check your LD_LIBRARY_PATH
 
 ```
 echo $LD_LIBRARY_PATH
 ```
 
-10. Set the install directory for netCDF fortran
+8. Set the install directory for netCDF fortran (note it will be the same location as the install directory for netCDF C libraries)
 
 ```
-setenv NFDIR /home/netcdf-fortran-4.4.5-gcc9.1.0
+setenv NFDIR $cwd/../netcdf
 
 setenv CPPFLAGS -I${NCDIR}/include
 setenv LDFLAGS -L${NCDIR}/lib
+setenv LIBS "-lnetcdf"
 ```
 
-11. Check your LD_LIBRARY_PATH environment variable
+9. Run the configure command
 
 ```
-echo $LD_LIBRARY_PATH
+./configure --disable-shared --prefix=${NFDIR}
 ```
 
-12. Run the configure command
-
-```
-./configure --prefix=${NFDIR}
-```
-
-13. Run the make check command
+10. Run the make check command
 
 ```
 make check
@@ -174,18 +202,19 @@ Testsuite summary for netCDF-Fortran 4.4.5
 # PASS:  6
 ```
 
-14. Run the make install command
+Note, this often fails, even if the library is ok.
+
+11. Run the make install command
 
 ```
 make install
 ```
 
-Output successful if you see:
+Output successful if you see Libraries have been installed in the install directory
 
 ```
-Libraries have been installed in:
-   
-   /home/netcdf-fortran-4.4.5-gcc9.1.0
+ls $cwd/../netcdf
+```
 
 If you ever happen to want to link against installed libraries
 in a given directory, LIBDIR, you must either use libtool, and
@@ -197,15 +226,43 @@ flag during linking and do at least one of the following:
      during linking
    - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
    - have your system administrator add LIBDIR to '/etc/ld.so.conf'
-```
 
-15. set your LD_LIBRARY_PATH to include the netcdf-Fortran library path for netCDF build
+
+12. set your LD_LIBRARY_PATH to include the netcdf-Fortran library path for netCDF build
 
 ```
-setenv NFDIR /home/netcdf-fortran-4.4.5-gcc9.1.0
+setenv NFDIR $cwd/../netcdf
 setenv LD_LIBRARY_PATH ${NFDIR}/lib:${LD_LIBRARY_PATH}
 ```
-(may need to add the NCDIR and NFDIR to .cshrc)
+
+13. Update the library bin directory path and LD_LIBRARY_PATH to use  $NCDIR and $NFDIR to in your .cshrc.
+
+Verify the paths for $NCDIR and $NFDIR
+
+```
+echo $NCDIR
+echo $NFDIR
+```
+
+14. Edit the .cshrc file in your home directory to add the paths to the libraries.
+Note, in this case we installed both NetCDF C and NetCDF Fortran into the same location.
+
+vi ~/.cshrc
+
+```
+# start .cshrc
+set $NCDIR /your_path/netcdf
+set $NFDIR /your_path/netcdf
+set path = ($path $NCDIR\bin $NFDIR\bin )
+setenv LD_LIBRARY_PATH ${NCDIR}/lib:${NFDIR}/lib:${LD_LIBRARY_PATH}
+```
+
+15. Source your updated .cshrc file by restarting the c-shell
+
+```
+csh
+```
+
 
 ## Install I/O API
 Note
@@ -217,52 +274,124 @@ or
 
 https://cjcoats.github.io/ioapi/AVAIL.html
 
-1. Download I/O API
+1. Change directories to one level up from your current location
+```
+cd ../
+```
+
+2. Download I/O API
 
 ```
 git clone https://github.com/cjcoats/ioapi-3.2
 ```
 
-2. Change the BIN setting in the Makefile to include the loaded module name
+3. change directories to the ioapi-3.2 directory
+```
+cd ioapi-3.2
+```
+
+2. Change branches to 20200828 for a tagged stable version
 
 ```
-BIN        = Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
+git checkout -b 20200828
 ```
 
-3. Copy an existing Makeinclude file to have this BIN name at the end
+3. Change directories to the ioapi directory
 
 ```
 cd ioapi
-cp Makeinclude.Linux2_x86_64gfort Makeinclude.Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
 ```
 
-4. Create a BIN directory
+4. copy the Makefile.nocpl file to create a Makefile
 
 ```
-mkdir $BIN
+cp Makefile.nocpl Makefile
 ```
 
-5. Link the netcdf-C and netcdf-Fortran library in the $BIN directory
+
+5. Set the BIN environment variable to specify the compiler version used.
+This will help future users identify what compiler version is compatible with this library.
 
 ```
-cd $BIN
-ln -s /home/netcdf-c-gcc9.1.0/lib/libnetcdff.a
-ln -s /home/netcdf-fortran-4.4.5-gcc9.1.0/lib/libnetcdf.a
+setenv BIN Linux2_x86_64gfort_gcc_9.1.0
 ```
 
-6. Run the make command to compile and link the ioapi library
+6. Copy an existing Makeinclude file to have this BIN name at the end
 
 ```
-make |& tee make.log
-```
-
-7. Change directories to the $BIN dir and verify that both the libioapi.a and the m3tools were successfully built
+cp Makeinclude.Linux2_x86_64gfort Makeinclude.Linux2_x86_64gfort_gcc_9.1.0
 
 ```
-cd $BIN
+
+7. Edit the Makeinclude.Linux2_x86_64gfort_gcc_9.1.0 to comment out OMPFLAG and OMPLIBS 
+settings.  This will remove the need to link the shared memory OPENMP libraries when compiling CMAQ and WRF-CMAQ.
+
+```
+OMPFLAGS  = # -fopenmp
+OMPLIBS   = # -fopenmp
+```
+
+8. Create a BIN directory where the library and m3tools executables will be installed
+
+```
+mkdir ../$BIN
+```
+
+9. Link the BIN directory to a the gfort BIN directory - this step is needed for WRF-CMAQ.
+
+```
+cd ../
+ln -s Linux2_x86_64gfort_gcc_9.1.0 Linux2_x86_64gfort
+```
+
+10. Set the HOME environment variable to be your LIBRARY install directory and run the make command to compile and link the ioapi library
+
+```
+cd ioapi
+make 'HOME=[your_install_path]/LIBRARIES' |& tee make.log
+```
+
+11. Change directories to the $BIN dir and verify that both the libioapi.a library was successfully built
+
+```
+cd ../$BIN
 ls -lrt libioapi.a
+```
+
+12. If you need to do a make clean, to rebuild the I/O API Library, specify the HOME directory at the command line as follows
+
+```
+cd ../ioapi
+make 'HOME=[your_install_path]/LIBRARIES' clean 
+```
+
+12. Change directories to the m3tools directory
+```
+cd ../m3tools
+```
+
+13. Copy the Makefile.nocpl to create a Makefile
+```
+cp Makefile.nocpl Makefile
+```
+
+14. Edit line 65 of the Makefile to use the NCDIR and NFDIR environment variables that you have set in the above steps to locate the netcdf C and netcdf Fortran libraries
+
+```
+ LIBS = -L${OBJDIR} -lioapi -L${NFDIR}/lib -lnetcdff -L${NCDIR}/lib -lnetcdf $(OMPLIBS) $(ARCHLIB) $(ARCHLIBS)
+ ```
+
+15. Run make to compile the m3tools
+```
+make 'HOME=[your_install_path]/LIBRARIES' |& tee make.log
+```
+
+16. Check to see that the m3tools have been installed successfully
+```
+cd ../$BIN
 ls -rlt m3xtract
 ```
 
-8. After successfull completion of this tutorial, the user is now ready to proceed to the [CMAQ Installation & Benchmarking Tutorial](./CMAQ_UG_tutorial_benchmark.md)
+17. After successfull completion of this tutorial, the user is now ready to proceed to the [CMAQ Installation & Benchmarking Tutorial](./CMAQ_UG_tutorial_benchmark.md)
+
 

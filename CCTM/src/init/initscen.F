@@ -66,22 +66,30 @@ C   Dec 15 D.Wong: new routine wr_init to write the initial data to the CONC fil
 C   1 Feb 19 David Wong: Implemented centralized I/O approach, removed
 C                        all MY_N clauses
 C   29 Oct 18 L.Zhou, S.Napelenok: isam implementation
+C   26 Nov 19 S. Napelenok: DDM3D implementation for CMAQ v5.3.1
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE HGRD_DEFN             ! horizontal domain specifications
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP 
+      USE ELMO_PROC, ONLY : OPEN_ELMO
+#ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
+      USE VERTEXT_MODULE
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
 #endif
-#ifdef parallel
-      USE VERTEXT_MODULE
 #endif
 
 #ifdef isam
       USE SA_DEFN
+#endif
+
+#ifdef sens
+      USE DDM3D_DEFN
+      USE VGRD_DEFN, ONLY: NLAYS
 #endif
 
       IMPLICIT NONE
@@ -118,6 +126,10 @@ C Local Variables
       integer c, r, l, s, v
 #endif
 
+#ifdef sens
+      integer COL,ROW,LAY,SPC
+#endif
+
       INTERFACE
          SUBROUTINE LOAD_CGRID ( FNAME, SPC_CAT, CMIN, CGRID )
             CHARACTER( 16 ), INTENT( IN ) :: FNAME
@@ -148,6 +160,14 @@ C Local Variables
             CHARACTER( 16 ) :: SADEPFILE ! Dry or wet dep file for tags
             INTEGER         :: JDATE, JTIME, TSTEP
          END SUBROUTINE SA_OPWDDEP
+#endif
+#ifdef sens
+         SUBROUTINE LOAD_SENGRID ( FNAME, STDATE, STTIME, SPC_CAT )
+            IMPLICIT NONE
+            CHARACTER( 16 ), INTENT( IN ) :: FNAME
+            INTEGER, INTENT( IN )         :: STDATE, STTIME
+            CHARACTER(  2 ), INTENT( IN ) :: SPC_CAT
+         END SUBROUTINE LOAD_SENGRID
 #endif
       END INTERFACE
 
@@ -210,7 +230,15 @@ C Get tracer IC's
 C Test opening existing conc file for update
       CALL LOG_HEADING( LOGDEV, "Open or Create Concentration File" )
 
+C *** Open the aerosol parameters file (diameters and standard deviations).
+      IF ( L_ELMO .AND. IO_PE_INCLUSIVE ) THEN
+           CALL OPEN_ELMO ( STDATE, STTIME, TSTEP( 1 ) )
+           ELMO_NSTEP = 0.0
+      END IF
+
+#ifndef mpas
       IF ( .NOT. OPEN3( CTM_CONC_1, FSRDWR3, PNAME ) ) THEN
+
 #ifndef twoway
          BACKSPACE( LOGDEV )
 #endif
@@ -233,20 +261,81 @@ C Test opening existing conc file for update
       CALL LOG_HEADING( LOGDEV, "Open or Create Wet Deposition File" )
       CALL OPWDEP  ( STDATE, STTIME, TSTEP( 1 ) )
 
-      CALL SUBST_BARRIER
-      
-      CALL LOG_HEADING( LOGDEV, "Check Initial Concentrations" )
+#ifdef sens
+      CALL OPASENS( STDATE, STTIME, TSTEP( 1 ) )
+#endif
 
 #ifdef isam
-C KWOK: initialize ISAM array
+C Initialize ISAM array
       CALL SA_ARRAY_INIT ( CGRID )
 
-C KWOK: open new files SA_CONC_1, SA_CGRID_1 and write data to it
-      CALL SUBST_BARRIER
+C Open SA_CONC_1 and SA_CGRID_1
       CALL OP_SA ( STDATE, STTIME, TSTEP, 1, SA_CONC_1 )
       IF ( MYPE .EQ. 0 ) CALL SA_OPWDDEP ( SA_WD_1, STDATE, STTIME, TSTEP( 1 ) )
 #endif
 
+#ifdef sens
+      IF ( RST ) THEN ! Load SENGRID from a file
+
+         IF ( N_GC_SPC .GT. 0 ) THEN
+            FNAME = INIT_SENS_1
+            CALL LOAD_SENGRID ( FNAME, STDATE, STTIME, 'GC' )
+         END IF  ! N_GC_SPC > 0
+
+         FNAME = MET_CRO_3D
+         CALL LOAD_SENGRID ( FNAME, STDATE, STTIME, 'RJ' )
+
+         IF ( N_AE_SPC .GT. 0 ) THEN
+            FNAME = INIT_SENS_1
+            CALL LOAD_SENGRID ( FNAME, STDATE, STTIME, 'AE')
+         END IF  ! N_AE_SPC > 0
+
+         IF ( N_NR_SPC .GT. 0 ) THEN
+            FNAME = INIT_SENS_1
+            CALL LOAD_SENGRID ( FNAME, STDATE, STTIME, 'NR' )
+         END IF  ! N_NR_SPC > 0
+
+         IF ( N_TR_SPC .GT. 0 ) THEN
+            FNAME = INIT_SENS_1
+            CALL LOAD_SENGRID ( FNAME, STDATE, STTIME, 'TR' )
+         END IF  ! N_TR_SPC > 0
+
+      ELSE  ! Set to initial conditions or 0.0
+
+         DO NP = 1, NPMAX
+            IF ( IPT( NP ) .EQ. 1 ) THEN
+               DO SPC = 1, NSPCSD
+                  DO LAY = 1, NLAYS
+                     DO ROW = 1, NROWS
+                        DO COL = 1, NCOLS
+                           SENGRID( COL, ROW, LAY, NP, SPC) =
+     &                               CGRID( COL, ROW, LAY, SPC )
+     &                             * REAL( IPARM( NP, SPC ) )
+     &                             * IREGION( COL, ROW, LAY, NP )
+                        END DO
+                     END DO
+                  END DO
+               END DO
+            ELSE
+               DO SPC = 1, NSPCSD
+                  DO LAY = 1, NLAYS
+                     DO ROW = 1, NROWS
+                        DO COL = 1, NCOLS
+                           SENGRID( COL, ROW, LAY, NP, SPC) = 0.0
+                        END DO
+                     END DO
+                  END DO
+               END DO
+            END IF
+         END DO
+
+      END IF
+#endif
+
+      CALL SUBST_BARRIER
+
+      CALL LOG_HEADING( LOGDEV, "Check Initial Concentrations" )
+#endif
 
       RETURN
       END

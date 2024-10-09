@@ -177,6 +177,19 @@ SUBROUTINE rdwrfem (mcip_now)
 !                        improve dust simulation in CCTM.  Added optional
 !                        variables from KF convective scheme with radiative
 !                        feedbacks.  (T. Spero)
+!           06 Mar 2020  Removed need to read "F" (Coriolis parameter) from WRF
+!                        output for potential vorticity scaling.  Instead,
+!                        calculate F inside this routine (called "CORIOLIS"
+!                        here) from latitude.  Value of angular momentum of
+!                        earth (omega in new variable TWOOMEGA) is from WRF
+!                        variable "EOMEG" in WRF routine:
+!                        share/module_model_constants.f90.  (T. Spero)
+!           17 Jun 2021  Modified most recent change that calculates Coriolis
+!                        parameter so that it does not rely on a non-standard
+!                        Fortran intrinsic (SIND), which is only available
+!                        for select compilers. (T. Spero)
+!           13 Dec 2023  Removed redundant NF90_OPEN/NF90_CLOSE couplet to
+!                        improve efficiency and memory management. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE date_pack
@@ -191,6 +204,7 @@ SUBROUTINE rdwrfem (mcip_now)
 
   INTEGER, SAVE                     :: cdfid
   INTEGER                           :: cdfidg
+  REAL                              :: deg2rad
   INTEGER                           :: dimids     ( nf90_max_var_dims )
   REAL,    SAVE,      ALLOCATABLE   :: dum2d      ( : , : )
   INTEGER, SAVE,      ALLOCATABLE   :: dum2d_i    ( : , : )
@@ -235,6 +249,7 @@ SUBROUTINE rdwrfem (mcip_now)
   INTEGER                           :: k
   INTEGER                           :: k1
   INTEGER                           :: k2
+  REAL                              :: latrad
   INTEGER                           :: lent
   REAL,               EXTERNAL      :: mapfac_lam
   REAL,               EXTERNAL      :: mapfac_merc
@@ -249,6 +264,7 @@ SUBROUTINE rdwrfem (mcip_now)
   INTEGER                           :: nxm
   INTEGER                           :: nym
   INTEGER                           :: nzp
+  REAL                              :: pi
   CHARACTER(LEN=16),  PARAMETER     :: pname      = 'RDWRFEM'
   INTEGER                           :: rcode
   REAL,               PARAMETER     :: rdovcp     = 2.0 / 7.0
@@ -257,6 +273,7 @@ SUBROUTINE rdwrfem (mcip_now)
   CHARACTER(LEN=2)                  :: str1
   CHARACTER(LEN=2)                  :: str2
   CHARACTER(LEN=19),SAVE,ALLOCATABLE:: times      ( : )
+  REAL,               PARAMETER     :: twoomega   = 2.0 * 7.2921e-5 ! [s-1]
   REAL                              :: xoff
   REAL                              :: xxin
   REAL                              :: yoff
@@ -599,19 +616,8 @@ SUBROUTINE rdwrfem (mcip_now)
 
     fl = file_mm(m1count)
 
-    rcode = nf90_open (fl, nf90_nowrite, cdfid)
-    IF ( rcode /= nf90_noerr ) THEN
-      WRITE (*,f9900) TRIM(pname)
-      CALL graceful_stop (pname)
-    ENDIF
-
     findprev: DO
       IF ( newfilem1 ) THEN
-        rcode = nf90_close (cdfid)
-        IF ( rcode /= nf90_noerr ) THEN
-          WRITE (*,f9950) TRIM(pname)
-          CALL graceful_stop (pname)
-        ENDIF
         rcode = nf90_open (fl, nf90_nowrite, cdfid)
         IF ( rcode /= nf90_noerr ) THEN
           WRITE (*,f9900) TRIM(pname)
@@ -656,6 +662,11 @@ SUBROUTINE rdwrfem (mcip_now)
         ENDIF
       ENDDO
       IF ( i > n_times ) THEN
+        rcode = nf90_close (cdfid)
+        IF ( rcode /= nf90_noerr ) THEN
+          WRITE (*,f9950) TRIM(pname)
+          CALL graceful_stop (pname)
+        ENDIF
         newfilem1 = .TRUE.
         m1count   = m1count + 1
         IF ( m1count > max_mm ) THEN
@@ -725,6 +736,12 @@ SUBROUTINE rdwrfem (mcip_now)
 
     ENDIF  ! tipping bucket
 
+    rcode = nf90_close (cdfid)
+    IF ( rcode /= nf90_noerr ) THEN
+      WRITE (*,f9950) TRIM(pname)
+      CALL graceful_stop (pname)
+    ENDIF
+
   ENDIF
 
 !-------------------------------------------------------------------------------
@@ -733,19 +750,8 @@ SUBROUTINE rdwrfem (mcip_now)
 
   fl = file_mm(mmcount)
 
-  rcode = nf90_open (fl, nf90_nowrite, cdfid)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (*,f9900) TRIM(pname)
-    CALL graceful_stop (pname)
-  ENDIF
-
   findit: DO
     IF ( newfile ) THEN
-      rcode = nf90_close (cdfid)
-      IF ( rcode /= nf90_noerr ) THEN
-        WRITE (*,f9950) TRIM(pname)
-        CALL graceful_stop (pname)
-      ENDIF
       rcode = nf90_open (fl, nf90_nowrite, cdfid)
       IF ( rcode /= nf90_noerr ) THEN
         WRITE (*,f9900) TRIM(pname)
@@ -792,6 +798,11 @@ SUBROUTINE rdwrfem (mcip_now)
       ENDIF
     ENDDO
     IF ( i > n_times ) THEN
+      rcode = nf90_close (cdfid)
+      IF ( rcode /= nf90_noerr ) THEN
+        WRITE (*,f9950) TRIM(pname)
+        CALL graceful_stop (pname)
+      ENDIF
       newfile = .TRUE.
       mmcount = mmcount + 1
       IF ( mmcount > max_mm ) THEN
@@ -1721,18 +1732,6 @@ SUBROUTINE rdwrfem (mcip_now)
         WRITE (*,f9400) TRIM(pname), 'FRC_URB2D', TRIM(nf90_strerror(rcode))
       ENDIF
     ENDIF
-    IF ( lpv > 0 ) THEN
-      CALL get_var_2d_real_cdf (cdfid, 'F', dum2d, it, rcode)
-      IF ( rcode == nf90_noerr ) THEN
-        coriolis(1:nxm,1:nym) = dum2d(:,:)
-        coriolis(met_nx,:) = coriolis(nxm,:)
-        coriolis(:,met_ny) = coriolis(:,nym)
-        WRITE (*,f6000) 'F        ', coriolis(lprt_metx, lprt_mety), 's-1'
-      ELSE
-        WRITE (*,f9400) TRIM(pname), 'F      ', TRIM(nf90_strerror(rcode))
-        CALL graceful_stop (pname)
-      ENDIF
-    ENDIF
   ENDIF
 
   IF ( ifznt ) THEN  ! expecting roughness length in file
@@ -2029,13 +2028,6 @@ SUBROUTINE rdwrfem (mcip_now)
     CALL graceful_stop (pname)
   ENDIF
 
-
-  rcode = nf90_close (cdfid)
-  IF ( rcode /= nf90_noerr ) THEN
-    WRITE (*,f9950) TRIM(pname)
-    CALL graceful_stop (pname)
-  ENDIF
-
 !-------------------------------------------------------------------------------
 ! If this is the first time in this routine, then get latitude, longitude, and
 ! map-scale factors on dot points.
@@ -2242,6 +2234,29 @@ SUBROUTINE rdwrfem (mcip_now)
 
 
     END SELECT
+
+  ENDIF
+
+!-------------------------------------------------------------------------------
+! If this is the first time in this routine and potential vorticity scaling
+! will be used in CMAQ, then calculate the Coriolis parameter.
+!-------------------------------------------------------------------------------
+
+  IF ( first .AND. lpv > 0 ) THEN
+
+    pi = 4.0 * ATAN(1.0)
+    deg2rad = pi / 180.0
+
+    DO j = 1, nym
+      DO i = 1, nxm
+!!!     coriolis(i,j) = twoomega * SIND(latcrs(i,j))
+        latrad = latcrs(i,j) * deg2rad
+        coriolis(i,j) = twoomega * SIN(latrad)
+      ENDDO
+    ENDDO
+
+    coriolis(met_nx,:) = coriolis(nxm,:)
+    coriolis(:,met_ny) = coriolis(:,nym)
 
   ENDIF
 

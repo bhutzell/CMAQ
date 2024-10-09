@@ -92,7 +92,7 @@ C...........   LOCAL VARIABLES
 
 C.............................................................................
 C   begin subroutine PM3EXIT
-
+      errcode = 1               ! arbitrary
 
 C.......  Construct new CALLER string.
       WRITE (PE_STR,'(A7)') ' on PE '
@@ -108,7 +108,10 @@ C.......  Do M3EXIT tasks.
 
       IF ( EXITSTAT .NE. 0 ) THEN     ! Print messages for abnormal abort. 
 
+          WRITE( OUTDEV,91010 ) PCALLER, TRIM( MSGTXT )
+
           WRITE( LOGDEV,91010 ) PCALLER, TRIM( MSGTXT )
+          FLUSH( LOGDEV )
 
           IF ( JDATE .GT. 0  .OR.  JTIME .GT. 0 ) THEN
               DTBUF = DT2STR( JDATE, JTIME )

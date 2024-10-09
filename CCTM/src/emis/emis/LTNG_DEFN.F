@@ -62,9 +62,14 @@
 !C  3 Sep 2019 D. Kang: Added to scale factors for the vertical distribution and to make sure 
 !C                      the profile is similar to those reported in literature and fixed a bug 
 !C                      that was introduced two years ago for generating diagnotic 3D lightning emissions.
+!C 4 Feb 2020 D. Kang: Remove the SATLAM function call that is redundant and clean up the code to comply with 
+!C                      the implementation of CIO.Though there is no effect when run the model over the continental
+!C                      US (Lambert projection), when run over the hemisphere and turning lightning NOx on,
+!C                       the run would crash due to uncompatible projection (polar)
+!C 6 Jan 2020 D. Kang: Correct the time steps in the lightning NOx !diagnostic files from 1:00 - 0:00 to 0:00 to 23:00
 !C----------------------------------------------------------------------
       USE RUNTIME_VARS
-      USE EMIS_VARS
+      USE DESID_VARS
 
       IMPLICIT NONE
 
@@ -81,20 +86,12 @@
       REAL,                 SAVE :: SCL_FACTOR
 
       INTEGER,              SAVE :: LTLYRS     ! no. of emissions layers
-      REAL,    ALLOCATABLE, SAVE :: VDEMIS_DIAG( :,:,: ) ! lightning NO diagnostic
+      REAL,    ALLOCATABLE, SAVE :: VDEMIS_LTDIAG( :,:,: ) ! lightning NO diagnostic
       REAL,    ALLOCATABLE, SAVE :: COLUMN_DIAG( :,: ) ! column total NO
 
-!C file name for off line lightning NO input; set to "InLine" for inline production
-!C file name for inline lightning parameters, (only used if LTNG_FNAME = "InLine")
-      CHARACTER( 16 ),      SAVE :: ANAME
-      CHARACTER( 16 ),      SAVE :: ONAME
-!C file name for met file for inline lightning
-      CHARACTER( 16 ),      SAVE :: MNAME
-      CHARACTER( 16 ),      SAVE :: RNAME
       CHARACTER( 16 ),      SAVE :: RC_NAME       ! RC name: old is RC and CCnew is RCA
-      CHARACTER( 16 ),      SAVE :: LT_NAME       ! LNT name: old is NLDNstrk and new is LNT
 
-!C allocate these if LTNG_FNAME = 'InLine'
+!C allocate these if LTNG_FNAME = 'INLINE'
       REAL,    ALLOCATABLE, SAVE :: LTNG_PRSFC     ( :,: ) ! surface pressure
       REAL,    ALLOCATABLE, SAVE :: LTNG_RC        ( :,: ) ! convective rainfall
 !C allocate these if LPARAM
@@ -108,6 +105,7 @@
       INTEGER,              SAVE :: MTICS = 0 ! temporary sub for NTICS before it set to 0 
       INTEGER,              SAVE :: LDATE     ! test date to update emissions diag avg
       INTEGER,              SAVE :: LTIME     ! test time to update emissions diag avg
+      INTEGER                    :: FDATE     ! Start date to Write to Diagnostic files
       INTEGER                    :: FTIME     ! Start time to Write to Diagnostic files
 
       INTEGER,              SAVE :: LT_TSTEP
@@ -123,7 +121,11 @@
          USE GRID_CONF ! horizontal & vertical domain specifications
          USE CGRID_SPCS         ! CGRID mechanism species
          USE UTILIO_DEFN
-         USE CENTRALIZED_IO_MODULE, only : RCA_AVAIL, ICCG_SUM, ICCG_WIN
+         USE CENTRALIZED_IO_MODULE, only : RCA_AVAIL, ICCG_SUM, ICCG_WIN,
+     &                                     FILE_TSTEP, F_MET, F_LTNG,
+     &                                     LT_NAME, FILE_XCELL, FILE_YCELL
+         USE MIO_ASCII
+
 #ifdef twoway
          USE twoway_data_module
 #endif
@@ -131,7 +133,6 @@
          IMPLICIT NONE
 
 !C Includes:
-         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 !C Arguments:
@@ -152,7 +153,6 @@
          LOGICAL LTNGPARAM           ! env var to use lightning NO parameters file
          INTEGER LSPCS               ! no. of lightning species
          INTEGER               :: I, J, K, L, V, STATUS
-         INTEGER               :: NSTEPS
          INTEGER               :: CJDATE
          CHARACTER( 7 )        :: SJDATE
 
@@ -167,48 +167,34 @@
          IF ( .NOT. LTNG_NO ) RETURN
 
 !C Populate Emissions Species Record
-         EM_FILE_SURR( ILTSRM )%LEN = 1
-         ALLOCATE( EM_FILE_SURR( ILTSRM )%ARRY ( 1 ) )
-         ALLOCATE( EM_FILE_SURR( ILTSRM )%UNITS( 1 ) )
-         ALLOCATE( EM_FILE_SURR( ILTSRM )%MW   ( 1 ) )
-         ALLOCATE( EM_FILE_SURR( ILTSRM )%USED ( 1 ) )
-         ALLOCATE( EM_FILE_SURR( ILTSRM )%CONV ( 1 ) )
-         ALLOCATE( EM_FILE_SURR( ILTSRM )%BASIS( 1 ) )
+         DESID_EMVAR( ILTSRM )%LEN = 1
+         ALLOCATE( DESID_EMVAR( ILTSRM )%ARRY ( 1 ) )
+         ALLOCATE( DESID_EMVAR( ILTSRM )%UNITS( 1 ) )
+         ALLOCATE( DESID_EMVAR( ILTSRM )%MW   ( 1 ) )
+         ALLOCATE( DESID_EMVAR( ILTSRM )%USED ( 1 ) )
+         ALLOCATE( DESID_EMVAR( ILTSRM )%CONV ( 1 ) )
+         ALLOCATE( DESID_EMVAR( ILTSRM )%BASIS( 1 ) )
+         ALLOCATE( DESID_EMVAR( ILTSRM )%LAREA( 1 ) )
+         ALLOCATE( DESID_EMVAR( ILTSRM )%LAREAADJ( 1 ) )
          
-         EM_FILE_SURR( ILTSRM )%ARRY  = "NO"
-         EM_FILE_SURR( ILTSRM )%UNITS = 'MOLES/S'
-         EM_FILE_SURR( ILTSRM )%MW    = 30.0
-         EM_FILE_SURR( ILTSRM )%USED  = .FALSE.
-         EM_FILE_SURR( ILTSRM )%CONV  = 1.0
-         EM_FILE_SURR( ILTSRM )%BASIS = 'MOLE'
+         DESID_EMVAR( ILTSRM )%ARRY  = "NO"
+         DESID_EMVAR( ILTSRM )%UNITS = 'MOLES/S'
+         DESID_EMVAR( ILTSRM )%MW    = 30.0
+         DESID_EMVAR( ILTSRM )%USED  = .FALSE.
+         DESID_EMVAR( ILTSRM )%CONV  = 1.0
+         DESID_EMVAR( ILTSRM )%BASIS = 'MOLE'
+         DESID_EMVAR( ILTSRM )%LAREA = .FALSE.
+         DESID_EMVAR( ILTSRM )%LAREAADJ = .FALSE.
  
 !C Read in scenario time/date
-         NSTEPS = RUNLEN / TSTEP           ! initscen guarantees divisibility
 
          WRITE( SJDATE, '(I7)' ) JDATE
          READ( SJDATE, '(4X, I3)' ) CJDATE
 
-!C Check grid definition (initialize if first call)
-!C Set up domain based on met file
-!C Open met file
-#ifdef twoway
-            IF ( IO_PE_INCLUSIVE ) THEN
-               MNAME = PROMPTMFILE(
-     &                 'Enter name for gridded met input file',
-     &                 FSRDWR3, CTM_CONC_1, PNAME )
-            ELSE
-               MNAME = PROMPTMFILE(
-     &                 'Enter name for gridded met input file',
-     &                 FSREAD3, CTM_CONC_1, PNAME )
-            END IF
-#else
-            MNAME = PROMPTMFILE(
-     &              'Enter name for gridded met input file',
-     &              FSREAD3, 'MET_CRO_3D', PNAME )
-#endif
-
+#ifndef mpas
 !C Is lightning NO production inline, or from a file?
-         IF ( LTNG_FNAME .EQ. "InLine" ) THEN  ! inline lightning NO production
+         CALL UPCASE(LTNG_FNAME)
+         IF ( LTNG_FNAME .EQ. "INLINE" ) THEN  ! inline lightning NO production
             XMSG = 'Using in-line lightning NO production'
             CALL M3MSG2( XMSG )
 
@@ -217,20 +203,6 @@
               NLDNSTRIKE = .FALSE.
            END IF
 #endif
-!C Open lightning parameters file?
-               ONAME = PROMPTMFILE(
-     &                    'Enter name for lightning parameters file',
-     &                    FSREAD3, 'LTNGPARMS_FILE', PNAME )
-               RNAME = PROMPTMFILE(
-     &                    'Enter name for gridded met input file',
-     &                    FSREAD3, 'MET_CRO_2D', PNAME )
-!C Read description of normalized emissions file
-           IF ( .NOT. DESC3( RNAME ) ) THEN
-                  XMSG = 'Could not get description of file "'
-     &                 // TRIM( RNAME ) // '"'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
-                  SUCCESS = .FALSE.; RETURN
-           END IF
            IF ( RCA_AVAIL ) THEN
                RC_NAME = 'RCA'
            ELSE
@@ -239,45 +211,22 @@
            IF ( NLDNSTRIKE ) THEN
                   XMSG = 'Using hourly NLDN Strike data'
                   CALL M3MSG2( XMSG )
-                  ANAME = PROMPTMFILE(
-     &                    'Enter name for NLDN STRIKE Parameters',
-     &                    FSREAD3, 'NLDN_STRIKES', PNAME )
-               IF ( .NOT. DESC3( ANAME ) ) THEN
-                  XMSG = 'Could not get description of file "'
-     &                 // TRIM( ANAME ) // '"'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
-                  SUCCESS = .FALSE.; RETURN
-               END IF
-               SPC = INDEX1( 'NLDNstrk', NVARS3D, VNAME3D )
-               IF ( SPC .GT. 0 ) THEN
-                  LT_NAME = 'NLDNstrk'
-               ELSE
-                  LT_NAME = 'LNT'
-               END IF
 
-               LT_TSTEP = TIME2SEC ( TSTEP3D )
+               LT_TSTEP = TIME2SEC ( FILE_TSTEP(F_LTNG)  )
+               LT_TSTEP_F = FILE_TSTEP(F_LTNG) 
 
             ELSE
                  LT_TSTEP = TIME2SEC ( TSTEP )
+                 LT_TSTEP_F = TSTEP 
                  XMSG = 'Using derived parameters for KF scheme '
                  CALL M3MSG2( XMSG )
             END IF  !END if NLDNSTRIKE
 
-            LT_TSTEP_F = SEC2TIME (LT_TSTEP)
+!            LT_TSTEP_F = SEC2TIME (LT_TSTEP)
 
-!C Set Lambert projection
-            IF ( .NOT. SETLAM( SNGL( P_ALP3D ),
-     &            SNGL( P_BET3D ),
-     &            SNGL( P_GAM3D ),
-     &            SNGL( XCENT3D ),
-     &            SNGL( YCENT3D ) ) ) THEN
-                  CALL M3EXIT( 'CELL_LL', 0, 0,
-     &            'Lambert projection setup error', 2 )
-            END IF
-
-            SQUAREKM = REAL( ( XCELL3D * YCELL3D * 1.0D-6 ), 4 )
+            SQUAREKM = REAL( ( XCELL_GD * YCELL_GD * 1.0D-6 ), 4 )
 !C Set up vertical layers
-            ALLOCATE( VGLVSLT( 0:EMLAYS ), STAT = STATUS )
+            ALLOCATE( VGLVSLT( 0:DESID_LAYS ), STAT = STATUS )
             CALL CHECKMEM( STATUS, 'VGLVSLT', PNAME )
 
             ALLOCATE( ICCG        ( NCOLS,NROWS ),
@@ -297,9 +246,9 @@
                END IF
 !            END IF  !LPARAM
 !C Store local layer information
-            DO L = EMLAYS, 0, -1
-                  VGLVSLT( L ) = VGLVS3D( L+1 )
-                  WRITE( LOGDEV,'(5X, A, I3, A, F11.7)' ) 'VGLVSLT(', L, ' ):', VGLVSLT( L )
+            DO L = DESID_LAYS, 0, -1
+                  VGLVSLT( L ) = VGLVS_GD( L+1 )
+!                  WRITE( LOGDEV,'(5X, A, I3, A, F11.7)' ) 'VGLVSLT(', L, ' ):', VGLVSLT( L )
             END DO
 
 
@@ -307,9 +256,10 @@
             IF ( LTNGDIAG ) THEN
 !C Build description for, and open lightning diagnostic file
 !C (all but variables-table and horizontal domain in description is borrowed from MNAME)
+               FDATE = STDATE
                FTIME = STTIME
-               CALL NEXTIME( LDATE, FTIME, TSTEP )
-               SDATE3D = LDATE
+               CALL NEXTIME( FDATE, FTIME, TSTEP )
+               SDATE3D = FDATE
                STIME3D = FTIME
                TSTEP3D = TSTEP
 
@@ -331,7 +281,7 @@
                VGTOP3D = VGTOP_GD
                GDNAM3D = GRID_NAME  ! from HGRD_DEFN
 
-               NLAYS3D = EMLAYS
+               NLAYS3D = DESID_LAYS
                DO L = 1, NLAYS3D + 1
                   VGLVS3D( L ) = VGLVS_GD( L )
                END DO
@@ -347,6 +297,34 @@
                FDESC3D( 2 ) = '/from/ ' // PNAME
                FDESC3D( 3 ) = '/Version/ CMAQ'
 
+               ! Store MIO Metadata
+               NDIMS3D( 1:NVARS3D ) = 4
+               L_TSTEP( 1:NVARS3D ) = .True.
+               L_LAY  ( 1:NVARS3D ) = .True.
+               L_COL  ( 1:NVARS3D ) = .True.
+               L_ROW  ( 1:NVARS3D ) = .True.
+               L_VEXT ( 1:NVARS3D ) = .False.
+          
+               CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_1', NLAYS3D, 1, NLAYS3D,
+     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &              L_VEXT(1:NVARS3D) )
+               
+               ! Store MIO Metadata
+               NDIMS3D( 1:NVARS3D ) = 3
+               L_TSTEP( 1:NVARS3D ) = .True.
+               L_LAY  ( 1:NVARS3D ) = .False.
+               L_COL  ( 1:NVARS3D ) = .True.
+               L_ROW  ( 1:NVARS3D ) = .True.
+               L_VEXT ( 1:NVARS3D ) = .False.
+               
+               CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_2', 0, 0, 0,
+     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &              L_VEXT(1:NVARS3D) )
+               
 !C Open output file (mol s-1)
                IF ( IO_PE_INCLUSIVE ) THEN
                   IF ( .NOT. OPEN3( CTM_LTNGDIAG_1, FSUNKN3, PNAME ) ) THEN
@@ -362,13 +340,13 @@
 
                END IF
 
-               ALLOCATE( VDEMIS_DIAG( NCOLS,NROWS,EMLAYS ), STAT = STATUS )
+               ALLOCATE( VDEMIS_LTDIAG( NCOLS,NROWS,DESID_LAYS ), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
-                  XMSG = 'VDEMIS_DIAG memory allocation failed'
+                  XMSG = 'VDEMIS_LTDIAG memory allocation failed'
                   CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
                   SUCCESS = .FALSE.; RETURN
                END IF
-               VDEMIS_DIAG = 0.0   ! array assignment
+               VDEMIS_LTDIAG = 0.0   ! array assignment
                ALLOCATE( COLUMN_DIAG( NCOLS,NROWS), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'COLUMN_DIAG memory allocation failed'
@@ -382,26 +360,14 @@
 !C Lightning NO production from an input file
             CALL M3MSG2( 'Using lightning NO production from a file' )
 
-!C Open lightning emissions input file
-            LTNG_FNAME = PROMPTMFILE(
-     &              'Enter name for lightning emissions input file',
-     &              FSREAD3, 'LTNGNO', PNAME )
-
-!C Get description of emissions file
-            IF ( .NOT. DESC3( LTNG_FNAME ) ) THEN
-               XMSG = 'Could not get description of file "'
-     &              // TRIM( LTNG_FNAME ) // '"'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
-               SUCCESS = .FALSE.; RETURN
-            END IF
-
 !C Check grid definition (intialize, if first call)
             OK = CHKGRID( LTNG_FNAME )
 
 
-         END IF   ! IF ( LTNG_FNAME .EQ. "InLine" ) inline or offline lightning NO production
+         END IF   ! IF ( LTNG_FNAME .EQ. "INLINE" ) inline or offline lightning NO production
+#endif
 
-         LTLYRS = EMLAYS
+         LTLYRS = DESID_LAYS
 
 !C Build Emissions Buffer
          ALLOCATE( VDEMIS_LT( NCOLS,NROWS,LTLYRS ), STAT = STATUS )
@@ -411,14 +377,14 @@
             SUCCESS = .FALSE.; RETURN
          END IF
  
-         RETURN
+!         RETURN
 
          END FUNCTION LTNG_INIT
 
 !C======================================================================
 !C Get NO produced from lightning in VDEMIS_LT
 
-         SUBROUTINE GET_LTNG ( JDATE, JTIME, TSTEP )
+         SUBROUTINE GET_LTNG ( JDATE, JTIME, TSTEP, L_DESID_DIAG )
 
          USE GRID_CONF             ! horizontal & vertical domain specifications
          USE UTILIO_DEFN
@@ -429,18 +395,23 @@
      &                                     SLOPE_lg,
      &                                     INTERCEPT_lg,
      &                                     ICCG_SUM,
-     &                                     ICCG_WIN
+     &                                     ICCG_WIN,
+     &                                     LT_NAME
+#ifdef mpas
+         use util_module, only : time2sec, nextime, upcase
+#else
 #ifdef twoway
          USE twoway_data_module
 #endif
+#endif
          IMPLICIT NONE
 
-         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
          INTEGER JDATE, JTIME, TSTEP( 3 )
          INTEGER STATUS
-
+         LOGICAL, INTENT( IN ) :: L_DESID_DIAG ! flag determining whether or not DESID
+                                               !   is in diagnostic mode              
          REAL,   PARAMETER :: CONVPA = 1.0E-2  ! convert Pa to hPa
 !        REAL,   PARAMETER :: WK = 8.0         ! shape parameter for weibull distribution
 !        REAL,   PARAMETER :: WLAMBDA = 700.0  ! scale parameter for weibull distribution
@@ -475,9 +446,6 @@
          CHARACTER( 120 )  :: XMSG = ' '
          REAL, ALLOCATABLE :: COLUMN_LTNG_NO ( :,: ) ! column total NO
          
-         INTEGER,     SAVE :: GXOFF, GYOFF   ! global origin offset from file
-         INTEGER,     SAVE :: STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2
-
          INTEGER           :: cjdate
          INTEGER           :: DTSTEP
          CHARACTER( 7 )    :: SJDATE
@@ -487,13 +455,12 @@
          INTEGER,     SAVE :: TOT_TSTEP
          LOGICAL,     SAVE :: FIRSTIME = .TRUE.
 
-C statement function for ERF approximation
-         REAL              :: ERF                ! ERF approx. statement function
-         REAL              :: X                  ! dummy argument for ERF
-         ERF( X ) = SIGN( 1.0, X ) * SQRT( 1.0 - EXP( -4.0 * X * X / PI ) )
-!-----------------------------------------------------------------------
+         REAL :: LOC_VGTOP_GD
 
-         IF ( LTNG_FNAME .EQ. "InLine" ) THEN
+!-----------------------------------------------------------------------
+         
+         CALL UPCASE(LTNG_FNAME)
+         IF ( LTNG_FNAME .EQ. "INLINE" ) THEN
 !C case of inline lightning NO production
 !C initialize output array
             VDEMIS_LT = 0.0
@@ -502,8 +469,6 @@ C statement function for ERF approximation
             !C Open me filet
 !C Get domain window info for met_cro_2d file
             IF (FIRSTIME) THEN
-                CALL SUBHFILE ( RNAME, GXOFF, GYOFF,
-     &              STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2 )
                 TOT_TSTEP = 0
                 FIRSTIME = .FALSE.
             END IF
@@ -603,17 +568,23 @@ C statement function for ERF approximation
                   SUM_FRAC = 0.0
                   LTEMIS = 0.0   ! array assignment
 
+#ifdef mpas
+                  LOC_VGTOP_GD = 1000.0    ! for simplicity, we have decided to set VGTOP_GD to 1000.0
+#else
+                  LOC_VGTOP_GD = VGTOP_GD
+#endif
+
                   DO LAY = 1, LTLYRS
 
 !C Get pressures: Use SIGMA values and surface pres.
 !p=sigma*(psfc-ptop)+ptop
                      BOTTOM = ( VGLVSLT( LAY-1 )
-     &                      * ( LTNG_PRSFC( COL,ROW ) - VGTOP_GD )
-     &                      + VGTOP_GD ) * CONVPA
+     &                      * ( LTNG_PRSFC( COL,ROW ) - LOC_VGTOP_GD )
+     &                      + LOC_VGTOP_GD ) * CONVPA
 !                           write( logdev,* ) "bottom: ", bottom
                      TOP    = ( VGLVSLT( LAY )
-     &                      * ( LTNG_PRSFC( COL,ROW ) - VGTOP_GD )
-     &                      + VGTOP_GD ) * CONVPA
+     &                      * ( LTNG_PRSFC( COL,ROW ) - LOC_VGTOP_GD )
+     &                      + LOC_VGTOP_GD ) * CONVPA
 
 !C Find the bottom and top of each layer, and calculate the fraction 
 !C of the column emissions for that layer
@@ -664,28 +635,32 @@ C statement function for ERF approximation
             END DO   ! rows
 
 !C Determine the time to read and/or write the hourly files
-            NTICS = NTICS + 1
-            TOT_TSTEP = TOT_TSTEP + TIME2SEC( TSTEP( 2 ) )
-            LASTTIC = TOT_TSTEP .GE. LT_TSTEP
-            IF ( LASTTIC ) THEN
-               MTICS = NTICS
-               NTICS = 0
-               TOT_TSTEP = 0
-               CALL NEXTIME( LDATE, LTIME, LT_TSTEP_F)
-               R_READY = .TRUE.
+            IF ( .NOT. L_DESID_DIAG ) THEN
+              NTICS = NTICS + 1
+              TOT_TSTEP = TOT_TSTEP + TIME2SEC( TSTEP( 2 ) )
+              LASTTIC = TOT_TSTEP .GE. LT_TSTEP
+              IF ( LASTTIC ) THEN
+                 MTICS = NTICS
+                 NTICS = 0
+                 TOT_TSTEP = 0
+                 CALL NEXTIME( LDATE, LTIME, LT_TSTEP_F)
+                 R_READY = .TRUE.
+              END IF
             END IF
 
+#ifdef mpas
+#else
 !C Write lightning NO to the diagnostic file
-            IF ( LTNGDIAG ) THEN 
-               VDEMIS_DIAG = VDEMIS_DIAG + VDEMIS_LT   ! array assignment
+            IF ( LTNGDIAG .AND. .NOT. L_DESID_DIAG ) THEN 
+               VDEMIS_LTDIAG = VDEMIS_LTDIAG + VDEMIS_LT   ! array assignment
                COLUMN_DIAG = COLUMN_DIAG + COLUMN_LTNG_NO
                IF ( LASTTIC ) THEN   ! time to write out
                   DIVFAC = 1.0 / REAL( MTICS, 4 )
-                  VDEMIS_DIAG = VDEMIS_DIAG * DIVFAC   ! array assignment
+                  VDEMIS_LTDIAG = VDEMIS_LTDIAG * DIVFAC   ! array assignment
                   COLUMN_DIAG = COLUMN_DIAG*DIVFAC
-                  IF ( .NOT. WRITE3( CTM_LTNGDIAG_1, LTSPC, LDATE, LTIME, VDEMIS_DIAG ) )  THEN
+                  IF ( .NOT. WRITE3( CTM_LTNGDIAG_1, LTSPC, LDATE, LTIME, VDEMIS_LTDIAG ) )  THEN
                      XMSG = 'Could not write to ' // TRIM( CTM_LTNGDIAG_1 )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+                     CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
                   ELSE
                      WRITE( LOGDEV,94040 )
      &                    'Timestep written to', TRIM( CTM_LTNGDIAG_1 ),
@@ -693,18 +668,19 @@ C statement function for ERF approximation
                   END IF
                   IF ( .NOT. WRITE3( CTM_LTNGDIAG_2, LTSPC, LDATE, LTIME, COLUMN_DIAG ) )  THEN
                      XMSG = 'Could not write to ' // TRIM( CTM_LTNGDIAG_2 )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+                     CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
                   ELSE
                      WRITE( LOGDEV,94040 )
      &                    'Timestep written to', TRIM( CTM_LTNGDIAG_2 ),
      &                    'for date and time', LDATE, LTIME
                   END IF
 
-                  VDEMIS_DIAG = 0.0   ! array assignment
+                  VDEMIS_LTDIAG = 0.0   ! array assignment
                   COLUMN_DIAG = 0.0
                END IF ! LASTTIC
 
             END IF  ! diagnostics turned on
+#endif
 
          ELSE  ! LTNGO is not "InLine", but instead specifies a file
 

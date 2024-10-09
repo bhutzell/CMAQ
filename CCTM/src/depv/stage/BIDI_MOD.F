@@ -71,8 +71,12 @@ C... Local:
  
          Character( 16 ) :: PNAME = 'INIT_BIDI       '
          Integer         :: STATUS
+         Logical, SAVE   :: INITIALIZED = .FALSE.
          
 C--------------------------------------------------------------------------
+C Prevent initializing the code twice 
+         If ( INITIALIZED ) Return 
+         INITIALIZED = .TRUE.
 
          If ( ABFLUX .And. .Not. HGBIDI ) Then
          
@@ -173,6 +177,7 @@ C--------------------------------------------------------------------------
          Use GRID_CONF
          Use CGRID_SPCS          ! CGRID mechanism species
          Use UTILIO_DEFN
+         Use MIO_ASCII
 
          Implicit None
 
@@ -429,7 +434,22 @@ C--------------------------------------------------------------------------
                End Do        
             End If
                                                   
-         End If         
+         End If 
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'MEDIA_CONC', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+         
 ! Open file, then close it for subsequent open by all processors
             
          If ( .Not. OPEN3( MEDIA_CONC, FSNEW3, PNAME ) ) Then

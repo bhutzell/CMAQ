@@ -214,6 +214,10 @@ C--------------------------------------------------------------------------
 !         END SELECT
 
 C **** Read in saved surface layer concentrations
+#ifdef mpas
+         INIT_ASX = .FALSE.
+         INIT_ATX = .FALSE.
+#else
          IF ( .NOT. MEDC_AVAIL ) THEN
             INIT_ASX = .TRUE.
             INIT_ATX = .TRUE.
@@ -224,6 +228,7 @@ C **** Read in saved surface layer concentrations
             INIT_ATX = .FALSE.
 
          END IF ! load surface arrays
+#endif
 
          RETURN
 
@@ -258,7 +263,6 @@ C-------------------------------------------------------------------------------
 
 C Includes:
 
-!         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments passed to and from m3dry
@@ -690,7 +694,6 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 C Includes:
 
-!         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
          INTEGER, INTENT( IN )   :: JDATE
@@ -879,10 +882,9 @@ C------------------------------------------------------------------------------
 
          Use ASX_DATA_MOD, Only: Grid_Data
          USE BIDI_MOD, Only: CMedia
+         USE CONST, ONLY: MWWAT
 
          IMPLICIT NONE
-
-         INCLUDE SUBST_CONST     ! constants
 
          CHARACTER( 8 ), INTENT( IN ) :: CSE  ! wet dep sepcies
          REAL,      INTENT( IN ) :: WDEP ! wet deposition in kg/ha

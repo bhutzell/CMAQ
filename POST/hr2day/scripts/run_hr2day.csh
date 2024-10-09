@@ -1,7 +1,7 @@
 #! /bin/csh -f
 
-# ====================== HR2DAYv5.3.1 Run Script ======================
-# Usage: run.hr2day.csh >&! hr2day_v531.log &
+# ====================== HR2DAYv5.4.X Run Script ======================
+# Usage: run.hr2day.csh >&! hr2day.log &
 #
 # To report problems or request help with this script/program:
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -20,31 +20,31 @@
  source ./config_cmaq.csh
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v531               #> Code Version
+ set VRSN      = v54              #> Code Version
  set PROC      = mpi               #> serial or mpi
  set MECH      = cb6r3_ae7_aq      #> Mechanism ID
- set APPL      = SE531BENCH         #> Application Name (e.g. Gridname)
+ set APPL      = Bench_2016_12SE1        #> Application Name (e.g. Gridname)
                                                       
 #> Define RUNID as any combination of parameters above or others. By default,
 #> this information will be collected into this one string, $RUNID, for easy
 #> referencing in output binaries and log files as well as in other scripts.
- setenv RUNID  ${VRSN}_${compilerString}_${APPL}
+ set RUNID  = ${VRSN}_${compilerString}_${APPL}
  
 #> Set the build directory if this was not set above 
 #> (this is where the executable is located by default).
  if ( ! $?BINDIR ) then
-  setenv BINDIR ${CMAQ_HOME}/POST/hr2day/scripts/BLD_hr2day_${VRSN}_${compilerString}
+  set BINDIR = ${CMAQ_HOME}/POST/hr2day/scripts/BLD_hr2day_${VRSN}_${compilerString}
  endif
 
 #> Set the name of the executable.
- setenv EXEC hr2day_${VRSN}.exe
+ set EXEC = hr2day_${VRSN}.exe
 
 #> Set location of CMAQ repo.  This will be used to point to the time zone file
 #> needed to run bldoverlay.  
- setenv REPO_HOME ${CMAQ_REPO}
+ set REPO_HOME = ${CMAQ_REPO}
 
 #> Set output directory
- setenv POSTDIR    ${CMAQ_DATA}/POST    #> Location where hr2day file will be written
+ set POSTDIR = ${CMAQ_DATA}/POST    #> Location where hr2day file will be written
 
   if ( ! -e $POSTDIR ) then
 	  mkdir $POSTDIR
@@ -63,13 +63,13 @@
 
 #> location of time zone data file, tz.csv (this is a required input file
 #> when using USELOCAL Y to shift from GMT to local time)
- setenv TZFILE ${REPO_HOME}/POST/bldoverlay/inputs/tz.csv
+ setenv TZFILE ${REPO_HOME}/POST/hr2day/inputs/tz.csv
+
+ # You can use the old tz.csv file by uncommenting out this line
+ # setenv TZFILE ${REPO_HOME}/POST/hr2day/inputs/tz_legacy.csv
 
 #> partial day calculation (computes value for last day)
  setenv PARTIAL_DAY Y
-
-#> constant hour offset between desired time zone and GMT (default is 0)
- setenv HROFFSET 0
 
 #> starting hour for daily metrics (default is 0)
  setenv START_HOUR 0
@@ -85,7 +85,8 @@
 # setenv HOURS_8HRMAX 17
 
 #> define species (format: "Name, units, From_species, Operation")
-#>  operations : {SUM, AVG, MIN, MAX, @MAXT, MAXDIF, 8HRMAX, SUM06}
+#>  operations : {SUM, AVG, MIN, MAX, HR@MIN, HR@MAX, @MAXT, MAXDIF, 
+#>                8HRMAX, W126, @8HRMAXO3, HR@8HRMAX, SUM06}
  setenv SPECIES_1 "O3,ppbV,O3,8HRMAX"
  
 #> Optional desired first and last processing date. The program will
@@ -104,6 +105,12 @@
 
 #> Executable call:
  ${BINDIR}/${EXEC}
+
+ set progstat = ${status}
+ if ( ${progstat} ) then
+   echo "ERROR ${progstat} in $BINDIR/$EXEC"
+   exit( ${progstat} )
+ endif
 
  exit()
 

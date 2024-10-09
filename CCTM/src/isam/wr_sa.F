@@ -35,9 +35,10 @@ C          Called by driver.F
 !      USE HGRD_DEFN             ! horizontal domain specifications
       USE GRID_CONF
       USE UTILIO_DEFN           ! 20120615
-      USE SA_LAYERS
+c     USE SA_LAYERS
       USE SA_DEFN               ! Mc06
 c     USE SUBST_MODULES         ! stenex
+      USE RUNTIME_VARS
 
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -111,6 +112,9 @@ Ckrt     print*, N_SPCTAG, JDATE, JTIME
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
+        IF ( ISAM_ELEV .EQ. -1 ) ISAM_ELEV = NLAYS
+        SA_NLAYS = ISAM_ELEV - ISAM_BLEV + 1
+
 !20140306 relocated here the following five lines
          ALLOCATE ( ISAM_BUFF( NCOLS, NROWS, SA_NLAYS, N_SPCTAG ),
      &     STAT = ALLOCSTAT )
@@ -119,15 +123,19 @@ Ckrt     print*, N_SPCTAG, JDATE, JTIME
            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          ENDIF
 
+      IF ( ISAM_ELEV .EQ. -1 ) ISAM_ELEV = NLAYS
+
       END IF ! firstime
 
       ISAM_BUFF = 0.0
 !Ckrt  print*,'S,VNAME3D(S),S_SPCTAG(S),T_SPCTAG(S)'
       DO S = 1, N_SPCTAG
+       K = 0
        DO L = ISAM_BLEV, ISAM_ELEV
+        K = K + 1
         DO R = 1, NROWS
          DO C = 1, NCOLS
-          ISAM_BUFF( C,R,L,S ) = ISAM( C,R,L,S_SPCTAG(S),T_SPCTAG(S) )
+          ISAM_BUFF( C,R,K,S ) = ISAM( C,R,L,S_SPCTAG(S),T_SPCTAG(S) )
          ENDDO
         ENDDO
        ENDDO

@@ -1,7 +1,7 @@
 #! /bin/csh -f
 
-# ==================== WRITESITE_v5.3.1 Run Script ====================
-# Usage: run.writesite.csh >&! writesite_v531.log &
+# ==================== WRITESITE_v5.4.X Run Script ====================
+# Usage: run.writesite.csh >&! writesite.log &
 #
 # To report problems or request help with this script/program:
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -20,31 +20,31 @@
  source ./config_cmaq.csh
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v531               #> Code Version
+ set VRSN      = v54               #> Code Version
  set PROC      = mpi               #> serial or mpi
  set MECH      = cb6r3_ae7_aq      #> Mechanism ID
- set APPL      = SE531BENCH         #> Application Name (e.g. Gridname)
+ set APPL      = Bench_2016_12SE1        #> Application Name (e.g. Gridname)
                                                       
 #> Define RUNID as any combination of parameters above or others. By default,
 #> this information will be collected into this one string, $RUNID, for easy
 #> referencing in output binaries and log files as well as in other scripts.
- setenv RUNID  ${VRSN}_${compilerString}_${APPL}
+ set RUNID = ${VRSN}_${compilerString}_${APPL}
 
 #> Set the build directory if this was not set above 
 #> (this is where the executable is located by default).
  if ( ! $?BINDIR ) then
-  setenv BINDIR ${CMAQ_HOME}/POST/writesite/scripts/BLD_writesite_${VRSN}_${compilerString}
+  set BINDIR = ${CMAQ_HOME}/POST/writesite/scripts/BLD_writesite_${VRSN}_${compilerString}
  endif
 
 #> Set the name of the executable.
- setenv EXEC writesite_${VRSN}.exe
+ set EXEC = writesite_${VRSN}.exe
 
-#> Set location of CMAQ repo.  This will be used to point to the time zone file
-#> needed to run bldoverlay.  The v5.2.1 repo also contains a sample SITE_FILE text file.
- setenv REPO_HOME  ${CMAQ_REPO}
+#> Set location of CMAQ repo.  This will be used to point to the optional time zone file
+#> used by writesite. 
+ set REPO_HOME = ${CMAQ_REPO}
 
 #> Set output directory
- setenv POSTDIR    ${CMAQ_DATA}/POST     #> Location where writesite file will be written
+ set POSTDIR = ${CMAQ_DATA}/POST     #> Location where writesite file will be written
 
   if ( ! -e $POSTDIR ) then
 	  mkdir $POSTDIR
@@ -88,8 +88,8 @@
  setenv PRT_XY   N         
 
 #> define time window
- set START_DATE = "2016-07-1"     #> first date to process (default is starting date of input file)
- set END_DATE   = "2016-07-1"     #> last date to process (default is ending date of input file)
+ set START_DATE = "2016-07-01"     #> first date to process (default is starting date of input file)
+ set END_DATE   = "2016-07-01"     #> last date to process (default is ending date of input file)
 
 #> Convert START_DATE and END_DATE to Julian day.
 #> (required format for writesite STARTDATE and ENDDATE environment variables)
@@ -106,6 +106,12 @@
 
 #> Executable call:
  ${BINDIR}/${EXEC}
+
+ set progstat = ${status}
+ if ( ${progstat} ) then
+   echo "ERROR ${progstat} in $BINDIR/$EXEC"
+   exit( ${progstat} )
+ endif
 
  date
  exit()

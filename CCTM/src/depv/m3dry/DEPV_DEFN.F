@@ -17,10 +17,10 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+!:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE DEPV_DEFN
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 C Function: deposition velocity interface to the chemistry-transport model
 
 C Revision History:
@@ -50,8 +50,15 @@ C                        Added a block of code to let non I/O processors to
 C                          open CTM_DEPV_DIAG in parallel I/O implementation
 C   1 Feb 19 David Wong: Implemented centralized I/O approach, removed all MY_N
 C                        clauses
+C   12 Dec 19 S.L.Napelenok: ddm-3d implementation for version 5.3.1
+C   August 2020 J Pleim: Fixed timestep in call to m3dry. Corrects NH3 bidi emis, dep outputs
 C-------------------------------------------------------------------------------
       USE RUNTIME_VARS
+      USE CGRID_SPCS, ONLY : N_SPC_DEPV
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NP, NPMAX, S_PVD, S_CGRIDL1, S_PLDV
+#endif
 
       IMPLICIT NONE
 
@@ -59,7 +66,6 @@ C model depositon velocites array
       REAL,    ALLOCATABLE, SAVE :: DEPV( :,:,: )
 
 C no. of deposition velocity model species
-      INTEGER, SAVE :: N_SPC_DEPV
       INTEGER, SAVE :: N_GAS_DEPV
 
 C ddep spc conversion factors
@@ -70,19 +76,19 @@ C model-oriented bi-directional production [ppm-m/s]
 
 C  Dry dep flux of NH3 for bidi [kg/ha hr]
       REAL,    ALLOCATABLE, SAVE :: NH3_EMIS( :,: )
-
+      REAL,    ALLOCATABLE, SAVE :: NH3_DDEP( :,: )
 !C flag for mosaic - luc specific deposition - within in-lining depv
 !      LOGICAL, SAVE :: MOSAIC = .FALSE.
 
 !C flag for mosaic - luc specific deposition - stomatal flux only - within in-lining depv
 !      LOGICAL, SAVE :: FST = .FALSE.      
 
-!      PUBLIC DEPV, DEPVJ, DEPVJ_FST, N_SPC_DEPV, DD_CONV, PLDV, CMP,
+!      PUBLIC DEPV, DEPVJ, DEPVJ_FST, DD_CONV, PLDV, CMP,
 !     &             ILDEPV, SFC_HONO, ABFLUX, MOSAIC, FST, N_GAS_DEPV,
 !     &             DEPV_INIT, GET_DEPV
 
       PUBLIC DEPV, N_SPC_DEPV, DD_CONV, PLDV, N_GAS_DEPV,
-     &             DEPV_INIT, GET_DEPV, NH3_EMIS
+     &             DEPV_INIT, GET_DEPV, NH3_EMIS, NH3_DDEP
       
       PRIVATE
 
@@ -129,11 +135,11 @@ C-----------------------------------------------------------------------
 !         USE MOSAIC_MOD, Only: Init_Mosaic
          USE LSM_MOD, Only: Init_LSM !, n_lufrac
          USE BIDI_MOD, Only: Init_Bidi, HgBidi
+         USE CONST
 
          IMPLICIT NONE
 
 C Includes:
-         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments:
@@ -192,7 +198,6 @@ C-----------------------------------------------------------------------
          SUCCESS = .TRUE.
 
          N_GAS_DEPV = N_GC_DEPV + N_NR_DEPV + N_TR_DEPV
-         N_SPC_DEPV = N_GAS_DEPV + N_AE_DEPV
 
          ALLOCATE ( DEPV( N_SPC_DEPV+1,NCOLS,NROWS ),
      &              PLDV( N_SPC_DEPV,NCOLS,NROWS ), STAT = ALLOCSTAT )
@@ -202,7 +207,16 @@ C-----------------------------------------------------------------------
             SUCCESS = .FALSE.; RETURN
          END IF
 
-C DEPVEL_GAS is used also for non-ILDEPV in the sgtot calculation
+#ifdef sens
+         ALLOCATE ( S_PLDV( NPMAX,N_SPC_DEPV,NCOLS,NROWS ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating S_PLDV array'
+            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            SUCCESS = .FALSE.; RETURN
+         END IF
+         S_PLDV = 0.0   ! array assignment
+#endif
+
          ALLOCATE ( DEPVEL_GAS( N_GAS_DEPV,NCOLS,NROWS ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating DEPVEL_GAS array'
@@ -233,7 +247,7 @@ C set dry dep conversion factor (done here so that vdiff doesn`t need the includ
          DO V = 1, N_AE_DEPV
             S = S + 1
             IF ( AE_SPC( AE_DEPV_MAP( V ) )( 1:3 ) .EQ. 'NUM' ) THEN
-               DD_CONV( S ) = CNVTD * AVO * 1.0E+03    ! --> #/Ha
+               DD_CONV( S ) = M2PHA * 1.0E+3 / MWAIR   ! --> #/Ha
             ELSE IF ( AE_SPC( AE_DEPV_MAP( V ) )( 1:3 ) .EQ. 'SRF' ) THEN
                DD_CONV( S ) = M2PHA * 1.0E+03 / MWAIR  ! --> M**2/Ha
             ELSE
@@ -260,12 +274,6 @@ C Initialize
                SUCCESS = .FALSE.; RETURN
             END IF
          END IF
-
-         !IF ( ILDEPV ) THEN
-         !
-         !   CALL INIT_LSM( JDATE, JTIME )
-         !   CALL INIT_BIDI( )
-         !END IF   ! in-line depv
 
          INIT_GAS_DV:
      &   IF ( N_GAS_DEPV .GT. 0 ) THEN
@@ -396,7 +404,8 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
 
             ALLOCATE ( CGRIDL1( N_GAS_DEPV,NCOLS,NROWS ),
      &                 PVD    ( N_GAS_DEPV,NCOLS,NROWS ), 
-     &                 NH3_EMIS( NCOLS,NROWS),STAT = ALLOCSTAT )
+     &                 NH3_EMIS( NCOLS,NROWS),
+     &                 NH3_DDEP(NCOLS,NROWS), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating CGRIDL1, CMP or PVD arrays'
                CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
@@ -404,6 +413,18 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
             END IF
             CGRIDL1 = 0.0   ! array assignment (PVD initalized in m3dry)
             NH3_EMIS = 0.0
+            NH3_DDEP = 0.0
+
+#ifdef sens
+               ALLOCATE ( S_CGRIDL1( NPMAX,N_GAS_DEPV,NCOLS,NROWS ),
+     &                    S_PVD    ( NPMAX,N_GAS_DEPV,NCOLS,NROWS ), STAT = ALLOCSTAT )
+               IF ( ALLOCSTAT .NE. 0 ) THEN
+                  XMSG = 'Failure allocating S_CGRIDL1 or S_PVD arrays'
+                  CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+                  SUCCESS = .FALSE.; RETURN
+               END IF
+               S_CGRIDL1 = 0.0
+#endif
 
          END IF INIT_GAS_DV
 
@@ -437,7 +458,12 @@ C-----------------------------------------------------------------------
          USE CGRID_SPCS          ! CGRID mechanism species
          USE DEPVVARS
          USE UTILIO_DEFN
+         USE CONST
          USE ASX_DATA_MOD, Only: GRID_DATA !, MOSAIC_DATA
+#ifdef mpas
+         Use util_module, only : time2sec, nextime, currstep
+         use mio_module
+#endif
 
          IMPLICIT NONE
 
@@ -451,7 +477,6 @@ C Arguments:
 
          REAL, POINTER         :: CGRID( :,:,:,: ) ! concentrations
 
-         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Parameters:
@@ -468,13 +493,16 @@ C Local variables:
          INTEGER, SAVE :: WSTEP_MOS = 0  ! local write counter [HHMMSS]
          INTEGER       :: CDATE, CTIME   ! step beginning date and time
          INTEGER       :: WDATE, WTIME   ! write date and time
-
+         REAL   DTSEC
          CHARACTER( 16 )  :: PNAME = 'GET_DEPV        '
          CHARACTER( 120 ) :: XMSG = ' '
 
          INTEGER C, R, N, V, NDX, J
 
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
+
+         CHARACTER (20) :: TIME_STAMP
+         integer :: year, month, day, hour, minute
 
 #ifdef Verbose
          integer cw, rw
@@ -491,11 +519,12 @@ C Local variables:
                REAL,    POINTER       :: CGRID( :,:,:,: )
                REAL,    INTENT( OUT ) :: CGRIDL1( :,:,: )
             END SUBROUTINE CGRID_DEPV
-            SUBROUTINE M3DRY ( JDATE, JTIME, TSTEP, 
-     &                         CGRIDL1, DEPVEL_GAS, PVD, NH3_EMIS)
-               INTEGER, INTENT( IN )  :: JDATE, JTIME, TSTEP(3)
+            SUBROUTINE M3DRY ( JDATE, JTIME, DTSEC, 
+     &                         CGRIDL1, DEPVEL_GAS, PVD, NH3_DDEP)
+               INTEGER, INTENT( IN )  :: JDATE, JTIME
+               REAL,    INTENT( IN )  :: dtsec
                REAL,    INTENT( IN )  :: CGRIDL1( :,:,: )
-               REAL,    INTENT( OUT ) :: DEPVEL_GAS( :,:,: ), PVD( :,:,: ),NH3_EMIS(:,:)
+               REAL,    INTENT( OUT ) :: DEPVEL_GAS( :,:,: ), PVD( :,:,: ),NH3_DDEP(:,:)
             END SUBROUTINE M3DRY
             SUBROUTINE AERO_DEPV ( CGRID, JDATE, JTIME, TSTEP, ADEPV )
                REAL, POINTER          :: CGRID( :,:,:,: )
@@ -510,8 +539,9 @@ C-----------------------------------------------------------------------
 ! Made default for Hg bidi JOB 9/12/11
          CALL CGRID_DEPV( GAS_DEPV_FOUND, GAS_DEPV_SUR, CGRID, CGRIDL1 )
 
-         CALL M3DRY ( JDATE, JTIME, TSTEP, 
-     &                CGRIDL1, DEPVEL_GAS, PVD, NH3_EMIS )
+         DTSEC = FLOAT( TIME2SEC( TSTEP( 2 ) ) )
+         CALL M3DRY ( JDATE, JTIME, DTSEC, 
+     &                CGRIDL1, DEPVEL_GAS, PVD, NH3_DDEP )
 
 #ifdef Verbose
          cw = ncols/2; rw = nrows/2
@@ -532,6 +562,11 @@ C-----------------------------------------------------------------------
                DO C = 1, NCOLS
                   DEPV( V,C,R ) = GC_DEPV_FAC( N ) * DEPVEL_GAS( NDX,C,R )
                   PLDV( V,C,R ) = PVD( NDX,C,R )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     S_PLDV( NP,V,C,R ) = S_PVD( NP,NDX,C,R )
+                  END DO
+#endif
 #ifdef Verbose
                   if ( c .eq. cw .and. r .eq. rw ) then
                      write( logdev,1039 ) v, n, gc_depv( n ), ndx,
@@ -555,6 +590,12 @@ C-----------------------------------------------------------------------
                DO C = 1, NCOLS
                   DEPV( V,C,R ) = NR_DEPV_FAC( N ) * DEPVEL_GAS( NDX,C,R )
                   PLDV( V,C,R ) = PVD( NDX,C,R )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     S_PLDV( NP,V,C,R ) = S_PVD( NP,NDX,C,R )
+                  END DO
+#endif
+
 #ifdef Verbose
                   if ( c == cw .and. r == rw ) then
                      write( logdev,1039 ) v, n, nr_depv( n ), ndx,
@@ -577,6 +618,11 @@ C-----------------------------------------------------------------------
                DO C = 1, NCOLS
                   DEPV( V,C,R ) = TR_DEPV_FAC( N ) * DEPVEL_GAS( NDX,C,R )
                   PLDV( V,C,R ) = PVD( NDX,C,R )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     S_PLDV( NP,V,C,R ) = S_PVD( NP,NDX,C,R )
+                  END DO
+#endif
 #ifdef Verbose
                   if ( c == cw .and. r == rw ) then
                      write( logdev,1039 ) v, n, tr_depv( n ), ndx,
@@ -626,6 +672,9 @@ C-----------------------------------------------------------------------
 
             IF ( WRITE_TIME ) THEN
 
+#ifdef mpas
+               call mio_time_format_conversion (wdate, wtime, time_stamp)
+#else
 #ifdef parallel_io
                IF ( FIRSTIME ) THEN
                   FIRSTIME = .FALSE.
@@ -639,6 +688,7 @@ C-----------------------------------------------------------------------
                   END IF
 
                END IF
+#endif
 #endif
 
                N = 0
@@ -654,12 +704,17 @@ C-----------------------------------------------------------------------
                         END DO
                      END DO
                      
+#ifdef mpas
+                     call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
+     &                                real(DBUFF(:,1), 4), TIME_STAMP)
+#else
+
                      IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX ),
      &                                  WDATE, WTIME, DBUFF ) ) THEN
                          XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
                          CALL M3EXIT ( PNAME, WDATE, WTIME, XMSG, XSTAT1 )
                      END IF
-
+#endif
                   END IF
 
                END DO
@@ -675,11 +730,16 @@ C-----------------------------------------------------------------------
                            DBUFF( C,R ) = 100.0 * DEPV( N+N_AE_DEPV,C,R )   ! cm/sec
                         END DO
                      END DO
+#ifdef mpas
+                     call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
+     &                                real(DBUFF(:,1), 4), TIME_STAMP)
+#else
                      IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX ),
      &                                  WDATE, WTIME, DBUFF ) ) THEN
                          XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
                          CALL M3EXIT ( PNAME, WDATE, WTIME, XMSG, XSTAT1 )
                      END IF
+#endif
 
                   END IF
 
@@ -694,11 +754,16 @@ C-----------------------------------------------------------------------
                         DBUFF( C,R ) = 100.0 * ADEPV( NDX,C,R )   ! cm/sec
                      END DO
                   END DO
+#ifdef mpas
+                  call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_ADEPV( N ), pname,
+     &                             real(DBUFF(:,1), 4), TIME_STAMP)
+#else
                   IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_ADEPV( N ),
      &                               WDATE, WTIME, DBUFF ) ) THEN
                       XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
                       CALL M3EXIT ( PNAME, WDATE, WTIME, XMSG, XSTAT1 )
                   END IF
+#endif
 
                END DO
 

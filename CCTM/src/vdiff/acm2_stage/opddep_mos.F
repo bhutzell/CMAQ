@@ -38,7 +38,8 @@ C   20 May 11 D.Schwede: modified to include mosaic output file
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
-      USE LSM_Mod, Only: N_LUFRAC
+      USE MOSAIC_MOD, Only: Tile_Data
+      USE MIO_ASCII
 
       IMPLICIT NONE
  
@@ -80,7 +81,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          NVARS3D = N_SPC_DDEP
          NCOLS3D = GL_NCOLS
          NROWS3D = GL_NROWS
-         NLAYS3D = N_LUFRAC + 1
+         NLAYS3D = Tile_Data%N_LUFRAC + 1
          NTHIK3D =     1
          GDTYP3D = GDTYP_GD
          P_ALP3D = P_ALP_GD
@@ -152,10 +153,25 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
-         FDESC3D( 1 ) = 'hourly 1-layer cross-point RADM dry deposition data'
+         FDESC3D( 1 ) = 'hourly 1-layer cross-point STAGE dry deposition data'
          DO L = 2, MXDESC3
             FDESC3D( L ) = ' '
-            END DO
+         END DO
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_MOS', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+          
 
 C    Open dry deposition file
 

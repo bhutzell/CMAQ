@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/depv/m3dry_mp/HGSIM.F,v 1.3 2012/01/24 21:15:18 sjr Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE HGSIM
 
@@ -80,7 +74,6 @@ C-----------------------------------------------------------------------
 !    Shared variables
 
 !     Private variables used in this routine and
-      REAL, ALLOCATABLE,       PRIVATE :: HgLU_Fac(:)
       REAL, ALLOCATABLE, SAVE, PRIVATE :: fevgrn(:,:)  ! fraction of evergreen land use
       REAL, ALLOCATABLE, SAVE, PRIVATE :: f_wat(:,:)   ! fraction of water land use
 
@@ -140,6 +133,7 @@ C input/output parameters
          USE ASX_DATA_MOD
          USE LSM_MOD
          USE Bidi_Mod
+         Use MOSAIC_MOD, Only: Tile_Data 
 
          IMPLICIT NONE
 
@@ -166,15 +160,16 @@ C--------------------------------------------------------------------------
  
          DO C = 1, NCOLS
             DO R = 1, NROWS
-               DO L = 1, N_LUFRAC
-                  IF(CAT_LU(L) .EQ. 'EVEFOR') THEN
-                     fevgrn(c,r) = fevgrn(c,r) + Grid_Data%lufrac(c,r,l)
+               DO L = 1, Tile_data%N_LUFRAC
+                  IF(Tile_data%CAT_LU(L) .EQ. 'EVEFORN' .Or. 
+     &               Tile_data%CAT_LU(L) .EQ. 'EVEFORB' ) THEN
+                     fevgrn(c,r) = fevgrn(c,r) + Tile_data%lufrac(c,r,l)
                   End IF
-                  IF(CAT_LU(L) .EQ. 'MIXFOR') THEN
-                     fevgrn(c,r) = fevgrn(c,r) + Grid_Data%lufrac(c,r,l)
+                  IF(Tile_data%CAT_LU(L) .EQ. 'MIXFOR') THEN
+                     fevgrn(c,r) = fevgrn(c,r) + Tile_data%lufrac(c,r,l)
                   End IF                                    
-                  IF(CAT_LU(L) .EQ. 'WATER') THEN
-                     f_wat(c,r) = f_wat(c,r) + Grid_Data%lufrac(c,r,l)
+                  IF(Tile_data%CAT_LU(L) .EQ. 'WATER') THEN
+                     f_wat(c,r) = f_wat(c,r) + Tile_data%lufrac(c,r,l)
                   END IF
                END DO
             END DO
@@ -221,7 +216,6 @@ C-------------------------------------------------------------------------------
          REAL :: bc   ! Emprical coefficeint to describe differences in plant lipids
 !************************************************************************
          Real    :: del      
-!         lu_frac = GRID_DATA%LUFRAC( c,r,: )
          If ( Met_Data%WR( c,r ) .LE. 0.0 ) Then
                del = 0.0
          Else 
@@ -287,6 +281,7 @@ C Flux unit conversions
          USE BIDI_MOD
          USE ASX_DATA_MOD
          USE UTILIO_DEFN
+         Use MOSAIC_MOD, Only: Tile_Data 
 
          IMPLICIT NONE
 
@@ -321,8 +316,8 @@ C***** reduction and partioning terms from Whalin et al 2007 ************
          Hg_wat    = CMEDIA( c,r,1 ) ! ppm
          HgII_wat  = CMEDIA( c,r,2 ) ! ppm
          HgII_grnd = 0.0
-         DO i = 1, n_lufrac
-            HgII_grnd = HgII_grnd+hglu_fac(i)*Grid_data%lufrac(c,r,i)
+         DO i = 1, Tile_Data%n_lufrac
+            HgII_grnd = HgII_grnd+Tile_Data%Hg_grnd(i)*Tile_Data%lufrac(c,r,i)
          END DO
 C Set floor to smallest terrestrial value
          HgII_grnd = MAX( HgII_grnd, 1.8e1 )                   
@@ -353,7 +348,7 @@ C Find a simple one box solution for elemental Hg
                   K_loss = -log(1.0 - K_loss )
                   Hg_wat = Hg_wat * exp( -K_loss * dt )
                End If
-            ELSE ! photo-redox reactions
+            ELSE If( CMEDIA( c,r,2 ) .Gt. 0.0 ) Then ! photo-redox reactions
                K_Prod_HgII = -flux_hgII / ( f_wat( c,r ) * CMEDIA( c,r,2 ) )
                K_Prod_HgII = log(1.0+K_Prod_HgII)
                If( flux_wat .le. 0.0 ) Then ! Deposition
@@ -498,12 +493,11 @@ C------------------------------------------------------------------------------
 
          SUBROUTINE GET_WDEP( CSE, WDEP, C, R )
 
+         Use Const, Only: MWWAT
          Use ASX_DATA_MOD, Only: Grid_Data
          USE BIDI_MOD, Only: CMedia
 
          IMPLICIT NONE
-
-         INCLUDE SUBST_CONST     ! constants
 
          CHARACTER( 8 ), INTENT( IN ) :: CSE  ! wet dep sepcies
          REAL,      INTENT( IN ) :: WDEP ! wet deposition in kg/ha

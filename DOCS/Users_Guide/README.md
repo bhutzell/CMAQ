@@ -1,16 +1,13 @@
-# CMAQv5.3 User's Guide
+# CMAQ User's Guide
 
 
-The CMAQ User's Guide is designed to support the installation, configuration, and execution of the [Community Multiscale Air Quality (CMAQ)](http://www.epa.gov/cmaq) model on Linux systems. CMAQ users should be comfortable with Linux scripting conventions and have some familiarity with the Fortran programming language. Users should also have some familiarity with atmospheric structure, and the physical and chemical processes that occur in the atmosphere.
+The CMAQ User's Guide is designed to support the installation, configuration, and execution of the [Community Multiscale Air Quality (CMAQ)](http://www.epa.gov/cmaq) model on Linux systems. CMAQ users should be comfortable with Linux scripting conventions and have some familiarity with the Fortran programming language. Users should also have some familiarity with atmospheric structure, and the physical and chemical processes that occur in the atmosphere. 
+
+Note: While this User's Guide is packaged with the code when it is downloaded or cloned, users are encouraged to go [online](https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/README.md) for the latest version.
 
 # Table of Contents
 
-[CMAQ Tutorials:](Tutorials/README.md) A series of short tutorials provide practical examples of how to set up and run CMAQ. Tutorials include: 
-* Running the CMAQ Test Case
-* Prescribing Emissions Using the DESID Module 
-* Creating an OCEAN File
-* Adding an Inert Tracer Species
-* Creating IC/BCs from Seasonal Average Hemispheric CMAQ Output
+[CMAQ Tutorials:](Tutorials/README.md) A series of short tutorials provide practical examples of how to set up and run CMAQ. 
 
 [Chapter 1 (Overview):](CMAQ_UG_ch01_overview.md) CMAQ background, features, requirements and support resources.
 
@@ -28,7 +25,7 @@ The CMAQ User's Guide is designed to support the installation, configuration, an
 
 [Chapter 8 (Analysis Tools):](CMAQ_UG_ch08_analysis_tools.md) Post-processing, visualization and evaluation tools for CMAQ.
 
-[Chapter 9 (Process Analysis):](CMAQ_UG_ch09_process_analysis.md) Instrumented Models - Integrated Process Rates (IPR) and Integrated Reaction Rates (IRR).
+[Chapter 9 (Process Analysis and Budget):](CMAQ_UG_ch09_process_analysis.md) Instrumented Models - Integrated Process Rates (IPR), Integrated Reaction Rates (IRR), and Budget Tool.
 
 [Chapter 10 (HDDM-3D):](CMAQ_UG_ch10_HDDM-3D.md) Instrumented Models - Decoupled Direct Method in Three Dimensions (DDM-3D).
 
@@ -50,8 +47,8 @@ The CMAQ User's Guide is designed to support the installation, configuration, an
 
 [Appendix E (Configuring WRF):](Appendix/CMAQ_UG_appendixE_configuring_WRF.md) Configuring the Weather Research and Forecasting Model (WRF) for use with CMAQ
 
-[Appendix F (Importing bugfixes):](Appendix/CMAQ_UG_appendixF_importing_bugfixes.md) Directions on importing bugfixes from CMAQ GitHub Issues page
+[Appendix F (ELMO Module):](Appendix/CMAQ_UG_appendixF_elmo_output.md) Description of the Explicit and Lumped CMAQ Model Output Module
 
 ***
 
-CMAQ User's Guide (c) 2019<br>
+CMAQ User's Guide (c) 2022<br>

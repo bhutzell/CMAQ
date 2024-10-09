@@ -36,11 +36,17 @@ C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 C   11 May 11 J.Bash: Modified to output NH3 bidi component fluxes
 C   04 Jan 12 J.Young: Initalize char strings with blank padding
 C   08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC) 4.1.2
+C   12 Dec 19 S.L.Napelenok: ddm-3d implementation for version 5.3.1
 
       USE RUNTIME_VARS, ONLY : ABFLUX
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE MIO_ASCII
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY: NP, NPMAX, SENNUM, SPCNAME, SEN_PAR
+#endif
 
       IMPLICIT NONE
  
@@ -58,28 +64,16 @@ C Local variables:
       CHARACTER( 16 ) :: PNAME = 'OPDDEP'
       CHARACTER( 96 ) :: XMSG = ' '
 
-! component flux varialbes      
-      INTEGER, PARAMETER :: LCMP  = 8
-      CHARACTER( 16 ), SAVE :: CMPSPC( LCMP )
-
       INTEGER      V, N, L     ! loop induction variables
       INTEGER      STRT, FINI  ! loop induction variables
 
 C-----------------------------------------------------------------------
 
+#ifndef mpas
 C Try to open existing file for update
 
       IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSRDWR3, PNAME ) ) THEN
       
-         CMPSPC( 1 ) = 'NH3_Emis'
-         CMPSPC( 2 ) = 'NH3_Dep '
-         CMPSPC( 3 ) = 'NH3_Stom'
-         CMPSPC( 4 ) = 'NH3_Cut '
-         CMPSPC( 5 ) = 'NH3_Soil'
-         CMPSPC( 6 ) = 'NH3_Ag  '
-         CMPSPC( 7 ) = 'NH3_Nat '
-         CMPSPC( 8 ) = 'NH3_Wat '
-
          XMSG = 'Could not open ' // CTM_DRY_DEP_1 // ' file for update - '
      &        // 'try to open new'
          CALL M3MESG( XMSG )
@@ -171,20 +165,35 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
 
          IF ( ABFLUX ) THEN
             VTYPE3D( V ) = M3REAL
-            VNAME3D( V ) = 'NH3_DDEP'
+            VNAME3D( V ) = 'NH3_Flux'
             UNITS3D( V ) = 'kg/hectare'
-            VDESC3D( V ) = 'hourly NH3_DryDep values'
+            VDESC3D( V ) = 'hourly bidi flux values'
   
             VTYPE3D( V+1 ) = M3REAL
-            VNAME3D( V+1 ) = 'NH3_EMIS'
+            VNAME3D( V+1 ) = 'NH3_Emis'
             UNITS3D( V+1 ) = 'kg/hectare'
-            VDESC3D( V+1 ) = 'hourly NH3_EMIS values'
+            VDESC3D( V+1 ) = 'hourly NH3_Emis values'
          END IF
 
-         FDESC3D( 1 ) = 'hourly 1-layer cross-point RADM dry deposition data'
+         FDESC3D( 1 ) = 'hourly 1-layer cross-point M3Dry dry deposition data'
          DO L = 2, MXDESC3
             FDESC3D( L ) = ' '
          END DO
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_1', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+
 
 C    Open dry deposition file
 
@@ -194,6 +203,114 @@ C    Open dry deposition file
          END IF
 
       END IF
+#endif
+
+#ifdef sens
+CC..Create sensitivity dry deposition file
+
+C...check for existing file
+      IF ( .NOT. OPEN3( CTM_SDRYDEP_1, FSRDWR3, PNAME ) ) THEN
+         XMSG = 'Could not open ' // CTM_SDRYDEP_1 // ' file for update - '
+     &        // 'try to open new'
+         CALL M3MESG( XMSG )
+
+C...set output file variables 
+         NVARS3D = N_SPC_DDEP * NPMAX
+         FDESC3D( 1 ) = 'sensitivity of hourly dry deposition'
+
+C...define sens dry deposition output descriptors for gaseous species
+         N = 0
+         STRT = 1
+         FINI = N_GC_DDEP
+         DO V = STRT, FINI
+            N = N + 1
+            SPCNAME = GC_DDEP( N )( 1:12 )
+            DO NP = 1, NPMAX
+               SENNUM = ( V - 1 ) * NPMAX + NP
+               VNAME3D ( SENNUM ) = TRIM( SPCNAME ) //'_' // SEN_PAR( NP )
+               VTYPE3D( SENNUM ) = M3REAL
+               UNITS3D( SENNUM ) = 'kg/hectare'
+               VDESC3D( SENNUM ) = 'sensitivity of hourly dry deposition values'
+            END DO
+         ENDDO
+
+C...define dry deposition output descriptors for aerosol species
+         N = 0
+         STRT = N_GC_DDEP + 1
+         FINI = N_GC_DDEP + N_AE_DDEP
+         DO V = STRT, FINI
+            N = N + 1
+            SPCNAME = AE_DDEP( N )( 1:12 )
+            DO NP = 1, NPMAX
+               SENNUM = ( V - 1 ) * NPMAX + NP
+               VNAME3D ( SENNUM ) = TRIM( SPCNAME ) //'_' // SEN_PAR( NP )
+               VTYPE3D( SENNUM ) = M3REAL
+               IF ( AE_DDEP( N )( 1:3 ) .EQ. 'NUM' ) THEN
+                  UNITS3D( SENNUM ) = 'number/hectare'
+               ELSE IF ( AE_DDEP( N )( 1:3 ) .EQ. 'SRF' ) THEN
+                  UNITS3D( SENNUM ) = 'm**2/hectare'
+               ELSE
+                  UNITS3D( SENNUM ) = 'kg/hectare'
+               END IF
+               VDESC3D( SENNUM ) = 'sensitivity of hourly dry deposition values'
+            END DO
+         ENDDO
+
+C...define dry deposition output descriptors for non-reactive species
+         N = 0
+         STRT = N_GC_DDEP + N_AE_DDEP + 1
+         FINI = N_GC_DDEP + N_AE_DDEP + N_NR_DDEP
+         DO V = STRT, FINI
+            N = N + 1
+            SPCNAME = NR_DDEP( N )( 1:12 )
+            DO NP = 1, NPMAX
+               SENNUM = ( V - 1 ) * NPMAX + NP
+               VNAME3D ( SENNUM ) = TRIM( SPCNAME ) //'_' // SEN_PAR( NP )
+               VTYPE3D( SENNUM ) = M3REAL
+               UNITS3D( SENNUM ) = 'kg/hectare'
+               VDESC3D( SENNUM ) = 'sensitivity of hourly dry deposition values'
+            END DO
+         END DO
+
+C...define dry deposition output descriptors for tracer species
+         N = 0
+         STRT = N_GC_DDEP + N_AE_DDEP + N_NR_DDEP + 1
+         FINI = N_GC_DDEP + N_AE_DDEP + N_NR_DDEP + N_TR_DDEP
+         DO V = STRT, FINI
+            N = N + 1
+            SPCNAME = TR_DDEP( N )( 1:12 )
+            DO NP = 1, NPMAX
+               SENNUM = ( V - 1 ) * NPMAX + NP
+               VNAME3D ( SENNUM ) = TRIM( SPCNAME ) //'_' // SEN_PAR( NP )
+               VTYPE3D( SENNUM ) = M3REAL
+               UNITS3D( SENNUM ) = '----'
+               VDESC3D( SENNUM ) = 'sensitivity of hourly dry deposition values'
+            END DO
+         END DO
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'CTM_SDRYDEP_1', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+
+
+C...create a new file
+         IF ( .NOT. OPEN3( CTM_SDRYDEP_1, FSNEW3, PNAME ) ) THEN
+            XMSG = 'Could not create '// CTM_DRY_DEP_1 // ' file'
+            CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
+         END IF
+
+      END IF
+#endif
 
       RETURN
       END

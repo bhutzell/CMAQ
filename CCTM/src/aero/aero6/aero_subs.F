@@ -185,6 +185,8 @@ C HP/BM  4/16 Removed m3_wet_flag since wet/dry status is now
 C             tracked by AERO_DATA variable. Moments are always wet in AEROPROC
 C             Updated treatment of aerosol moments
 
+C SLN 12/30/19 Update for ddm-3d implementation in version 5.3.1
+
 C  REFERENCES:
 C   1. Binkowski, F.S. and U. Shankar, The regional particulate matter
 C      model 1. Model description and preliminary results, J. Geophys.
@@ -205,8 +207,16 @@ C-----------------------------------------------------------------------
       USE PRECURSOR_DATA      ! gas phase aero precursor data
       USE SOA_DEFN
       USE AEROMET_DATA
+      USE CONST, EXCLUDE_ERF => ERF  ! for maintaining consistency with research branch
       USE UTILIO_DEFN
       USE AERO_BUDGET
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NP, NPMAX
+      USE AERO_DDM3D, ONLY : s_aerospc_conc, s_precursor_conc,
+     &                       s_so4rate
+#endif
+
 
       IMPLICIT NONE
 
@@ -233,12 +243,12 @@ C *** local variables
       REAL( 8 ) :: CGR( N_MODE-1 ) ! Aitken & Accum. modes
 
       REAL( 8 ) :: LAMDA      ! mean free path [ m ]
-      REAL( 8 ) :: KNC        ! KNC = TWO3 * BOLTZMANN *  AIRTEMP / AMU
+      REAL( 8 ) :: KNC        ! KNC = TWO3 * DKBOLTZ *  AIRTEMP / AMU
 
 C *** Free Molecular regime (depends upon modal density)
-      REAL( 8 ) :: KFMAT      ! = SQRT( 3.0*BOLTZMANN * AIRTEMP / PDENSAT )
-      REAL( 8 ) :: KFMAC      ! = SQRT( 3.0*BOLTZMANN * AIRTEMP / PDENSAC )
-      REAL( 8 ) :: KFMATAC    ! = SQRT( 6.0*BOLTZMANN * AIRTEMP / ( PDENSAT + PDENSAC ) )
+      REAL( 8 ) :: KFMAT      ! = SQRT( 3.0*DKBOLTZ * AIRTEMP / PDENSAT )
+      REAL( 8 ) :: KFMAC      ! = SQRT( 3.0*DKBOLTZ * AIRTEMP / PDENSAC )
+      REAL( 8 ) :: KFMATAC    ! = SQRT( 6.0*DKBOLTZ * AIRTEMP / ( PDENSAT + PDENSAC ) )
 
 C *** Intermodal coagulation rates [ m**3/s ] ( 0th & 2nd moments )
       REAL( 8 ) :: BATAC( 2 ) ! Aitken to accumulation
@@ -267,13 +277,12 @@ C *** variables for advancing concentrations one time step
       REAL( 8 ) :: LOSS, PROD, POL
       REAL         TMASS
       REAL         FACTRANS ! special factor to compute mass transfer
-      REAL         M20      ! for initial condidtions in time stepping
+      REAL         M30(3), M20(3), M00(3)      ! for initial conditions in time stepping
 
 C *** Variables for mode merging
       REAL         GETAF
       REAL         AAA, XNUM, XM2, XM3,XXM2, XXM3
       REAL         FNUM, FM2, FM3, PHNUM, PHM2, PHM3
-      REAL         ERF, ERFC    ! Error and complementary error function
 
 C *** local variables
       INTEGER      SPC        ! loop counter
@@ -343,19 +352,19 @@ C *** Update size parameters (distribution is wet from ORGAER)
 !     2.1 of Bhave et al. (2004) for further discussion.
 ! *** Initialize Budget Variables
       CBUDGET0_NUM  = MOMENT0_CONC
-      CBUDGET0_SRF  = MOMENT2_CONC
+      CBUDGET0_SRF  = MOMENT2_CONC * PI
       CBUDGET0_MASS = AEROSPC_CONC
  
 ! *** set atmospheric mean free path in double precision
       LAMDA    = XLM
 
 ! *** calculate term used in Equation A6 of Binkowski & Shankar (1995)
-      KNC      = TWOTHIRDS * BOLTZMANN *  AIRTEMP / AMU
+      KNC      = TWOTHIRDS * DKBOLTZ *  AIRTEMP / AMU
 
 ! *** calculate terms used in Equation A5 of Binkowski & Shankar (1995)
-      KFMAT    = SQRT( 3.0 * BOLTZMANN * AIRTEMP / AEROMODE_DENS( 1 ) )
-      KFMAC    = SQRT( 3.0 * BOLTZMANN * AIRTEMP / AEROMODE_DENS( 2 ) )
-      KFMATAC  = SQRT( 6.0 * BOLTZMANN * AIRTEMP
+      KFMAT    = SQRT( 3.0 * DKBOLTZ * AIRTEMP / AEROMODE_DENS( 1 ) )
+      KFMAC    = SQRT( 3.0 * DKBOLTZ * AIRTEMP / AEROMODE_DENS( 2 ) )
+      KFMATAC  = SQRT( 6.0 * DKBOLTZ * AIRTEMP
      &         / ( AEROMODE_DENS( 1 ) + AEROMODE_DENS( 2 ) ) )
 
 ! *** transfer of number to accumulation mode from Aitken mode is zero
@@ -412,88 +421,17 @@ C     following equations. 2) new particle formation and condensational
 C     growth are now treated in the VOLINORG subroutine, so they do not
 C     appear in the following equations.
  
-C     M2 is updated before M0 because the intermodal transfer rate of
-C     M2 is a function of the number concentrations.  In contrast,
-C     production and loss rates of M0 are independent of M2.  Advancing
-C     M2 before M0 avoids operator splitting within the modal-dynamic-
-C     equation solution.  A similar rearrangement would be necessary
-C     for the M3 update, but the dependence of M3 on number
-C     concentrations already is accounted for in the C30ATAC term.
+      ! Initial Moment Values
+      M00 = MOMENT0_CONC
+      M20 = MOMENT2_CONC
+      M30 = MOMENT3_CONC
 
-C *** UPDATE SECOND MOMENT
-C     For each lognormal mode, solve equations of form:
-C        dM2/dt = P2 - L2*M2   ! if L2 > 0
-C     with solution
-C        M2(t) = P2/L2 + ( M2(t0) - P2/L2 ) * exp( -L2*dt )
-C     or
-C        dM2/dt = P2           ! if L2 = 0
-C     with solution
-C        M2(t) = M2(t0) + P2*dt
-
-C *** Aitken mode: initial value of M2
-      M20 = MOMENT2_CONC( 1 )
-
-C *** Loss of 2nd moment from Aitken mode is due to intermodal
-C     coagulation with accumulation mode and intramodal coagulation.
-C     Production term is removed, because new particle formation
-C     and condensational growth are accounted for in VOLINORG.
-      LOSS = (
-     &        ( BATAT( 2 ) * MOMENT0_CONC( 1 )
-     &        + BATAC( 2 ) * MOMENT0_CONC( 2 ) ) * MOMENT0_CONC( 1 )
-     &       ) / M20
-
-C *** Solve for M2_Aitken based on LOSS during this time step
-C     Note: LOSS is assumed to be non-negative.
-      IF ( LOSS .GT. 0.0 ) THEN
-         Y = M20 * EXP( -LOSS * DT )
-      ELSE
-         Y = M20
-      END IF ! test on loss
-
-C *** Transfer new value of M2_Aitken to the array
-      MOMENT2_CONC( 1 ) = MAX( REAL( AEROMODE_MINM2( 1 ) ), REAL( Y ) )
-
-C *** Accumulation mode: initial value of M2
-      M20 = MOMENT2_CONC( 2 )
-
-C *** Production of 2nd moment in accumulation mode is due to
-C     intermodal coagulation Aitken mode
-      PROD = BACAT( 2 ) * MOMENT0_CONC( 1 ) * MOMENT0_CONC( 2 )
-
-C *** Loss of 2nd moment from accumulation mode is due only to
-C     intramodal coagulation
-      LOSS = ( BACAC( 2 ) * MOMENT0_CONC( 2 ) * MOMENT0_CONC( 2 ) ) / M20
-
-C *** Solve for M2_accum based on PROD and LOSS during this time step
-C     Note: LOSS is assumed to be non-negative.
-      IF ( LOSS .GT. 0.0 ) THEN
-         POL = PROD / LOSS
-         Y = POL + ( M20 - POL ) * EXP( -LOSS * DT )
-      ELSE
-         Y = M20 + PROD * DT
-      END IF ! test on loss
-
-C *** Transfer new value of M2_accum to moment array
-      MOMENT2_CONC( 2 ) = MAX( REAL( AEROMODE_MINM2( 2 ) ), REAL( Y ) )
-
-C *** Coarse mode: no change because coagulation of coarse particles
-C     is neglected in current model version.
-
-! ** Update Budget Variable for Second Moment
-      COAG_BUDGET( AEROSRF_MAP( 1 ),1 ) = MOMENT2_CONC( 1 ) - CBUDGET0_SRF( 1 )
-      COAG_BUDGET( AEROSRF_MAP( 2 ),2 ) = MOMENT2_CONC( 2 ) - CBUDGET0_SRF( 2 )
-
-C *** end of update for second moment
-
-C *** Update Zeroth Moment (i.e. number concentration)
-
-C *** Aitken mode: initial value of M0
-
+! *** Update Zeroth Moment (i.e. number concentration)
+! *** Aitken mode: initial value of M0
       Y0 = MOMENT0_CONC( 1 )
 
-C *** The rate of change for M0_Aitken is described in Equation 8a of
-C     Binkowski & Roselle (2003), with the c_i term equal to 0.
-
+      ! The rate of change for M0_Aitken is described in Equation 8a of
+      ! Binkowski & Roselle (2003), with the c_i term equal to 0.
       A = BATAT( 1 )                      ! intramodal coagulation
       B = BATAC( 1 ) * moment0_conc( 2 )  ! intermodal coagulation
 
@@ -504,30 +442,31 @@ C     Binkowski & Roselle (2003), with the c_i term equal to 0.
          Y = Y0                 ! solution in the limit that B approaches zero
       END IF
 
-C *** Transfer new value of M0_Aitken to the moment array
+      ! Transfer new value of M0_Aitken to the moment array
       MOMENT0_CONC( 1 ) = MAX( AEROMODE_MINNUM( 1 ), REAL( Y ) )
 
-C *** Accumulation mode: initial value of M0
+      ! Accumulation mode: initial value of M0
       Y0 = MOMENT0_CONC( 2 )
 
-C *** The rate of change for M0_accum is described in Equation 8b of
-C     Binkowski & Roselle (2003), except the coefficient C is zero
-C     because emissions are treated outside the CMAQ aerosol module.
-C     The equation reduces to the form: dY/dt = -A * Y**2 , where
+      ! The rate of change for M0_accum is described in Equation 8b of
+      ! Binkowski & Roselle (2003), except the coefficient C is zero
+      ! because emissions are treated outside the CMAQ aerosol module.
+      ! The equation reduces to the form: dY/dt = -A * Y**2 , where
       A = BACAC( 1 )                 ! intramodal coagulation
 
-C *** Solve for M0_accum using Smoluchowski`s solution
+      ! Solve for M0_accum using Smoluchowski`s solution
       Y = Y0 / ( 1.0D0 + A * Y0 * DT )
 
-C *** Transfer new value of M0_accum to the moment array
+      ! Transfer new value of M0_accum to the moment array
       MOMENT0_CONC( 2 ) = MAX( AEROMODE_MINNUM( 2 ), REAL( Y ) )
 
-! ** Update Budget Variable for Second Moment
+      ! ** Update Budget Variable for Zeroth Moment
       COAG_BUDGET( AERONUM_MAP( 1 ),1 ) = MOMENT0_CONC( 1 ) - CBUDGET0_NUM( 1 )
       COAG_BUDGET( AERONUM_MAP( 2 ),2 ) = MOMENT0_CONC( 2 ) - CBUDGET0_NUM( 2 )
 
-C *** end of update for zeroth moment - note that the coarse mode number does
-C     not change because coarse-mode coagulation is neglected in the model
+! *** end of update for zeroth moment - note that the coarse mode number does
+! *** not change because coarse-mode coagulation is neglected in the model
+ 
 
 C *** UPDATE MASS CONCENTRATIONS (for each species)
 C     The following procedure is described in Paragraphs 21-23
@@ -554,19 +493,19 @@ C     concentration.
 
       LOSS = C30ATAC / MOMENT3_CONC( 1 )
 
-C *** Set up extra variables to solve for Aitken mode mass concentrations
+      ! Set up extra variables to solve for Aitken mode mass concentrations
       FACTRANS = REAL( LOSS,4 ) * DT
       EXPDT = EXP( -FACTRANS )
 
-C *** Transfer mass from Aitken to accumulation mode, resulting from 
-C     intermodal coagulation.
+      ! Transfer mass from Aitken to accumulation mode, resulting from 
+      ! intermodal coagulation.
 
       DO SPC = 1, N_AEROSPC
          IF ( AERO_MISSING(SPC,1) ) CYCLE
  
          TMASS = AEROSPC_CONC( SPC,1 ) + AEROSPC_CONC( SPC,2 )
          IF( SPC .EQ. APHGJ_IDX  )THEN 
-! assumes all production adsorb onto accumulation mode
+             ! assumes all production adsorb onto accumulation mode
              TMASS = TMASS + PHG_RATE * DT
          END IF
 
@@ -576,7 +515,7 @@ C     intermodal coagulation.
      &                                TMASS - AEROSPC_CONC( SPC,1 ) )
 
 
-         ! Update Budget Variable for Second Moment
+         ! Update Budget Variable for Speciated Mass
          IF ( AEROSPC_MAP( SPC,1 ) .NE. 0 ) 
      &      COAG_BUDGET( AEROSPC_MAP( SPC,1 ),1 ) = 
      &           AEROSPC_CONC( SPC,1 ) - CBUDGET0_MASS( SPC,1 )
@@ -587,6 +526,75 @@ C     intermodal coagulation.
       END DO
 
 C *** end of update for species mass concentrations
+ 
+! *** UPDATE SECOND MOMENT
+      IF ( COAG_MOMENTS .EQ. 3 ) THEN
+        ! For each lognormal mode, solve equations of form:
+        !    dM2/dt = P2 - L2*M2   ! if L2 > 0
+        ! with solution
+        !    M2(t) = P2/L2 + ( M2(t0) - P2/L2 ) * exp( -L2*dt )
+        ! or
+        !    dM2/dt = P2           ! if L2 = 0
+        ! with solution
+        !    M2(t) = M2(t0) + P2*dt
+
+        ! Loss of 2nd moment from Aitken mode is due to intermodal
+        ! coagulation with accumulation mode and intramodal coagulation.
+        ! Production term is removed, because new particle formation
+        ! and condensational growth are accounted for in VOLINORG.
+        LOSS = (
+     &          ( BATAT( 2 ) * M00( 1 )
+     &          + BATAC( 2 ) * M00( 2 ) ) * M00( 1 )
+     &         ) / M20( 1 )
+
+        ! Solve for M2_Aitken based on LOSS during this time step
+        ! Note: LOSS is assumed to be non-negative.
+        IF ( LOSS .GT. 0.0 ) THEN
+           Y = M20( 1 ) * EXP( -LOSS * DT )
+        ELSE
+           Y = M20( 1 )
+        END IF ! test on loss
+
+        ! Transfer new value of M2_Aitken to the array
+        MOMENT2_CONC( 1 ) = MAX( REAL( AEROMODE_MINM2( 1 ) ), REAL( Y ) )
+
+        ! Production of 2nd moment in accumulation mode is due to
+        ! intermodal coagulation Aitken mode
+        PROD = BACAT( 2 ) * M00( 1 ) * M00( 2 )
+
+        ! Loss of 2nd moment from accumulation mode is due only to
+        ! intramodal coagulation
+        LOSS = ( BACAC( 2 ) * M00( 2 ) * M00( 2 ) ) / M20( 2 )
+
+        ! Solve for M2_accum based on PROD and LOSS during this time step
+        ! Note: LOSS is assumed to be non-negative.
+        IF ( LOSS .GT. 0.0 ) THEN
+           POL = PROD / LOSS
+           Y = POL + ( M20(2) - POL ) * EXP( -LOSS * DT )
+        ELSE
+           Y = M20(2) + PROD * DT
+        END IF ! test on loss
+     
+        ! Transfer new value of M2_accum to moment array
+        MOMENT2_CONC( 2 ) = MAX( REAL( AEROMODE_MINM2( 2 ) ), REAL( Y ) )
+
+        ! Coarse mode: no change because coagulation of coarse particles
+        ! is neglected in current model version.
+
+      ELSE IF ( COAG_MOMENTS .EQ. 2 ) THEN
+        ! Assume constant modal standard deviation and solve for new
+        ! second moment as a function of the change in the third moment.
+        MOMENT2_CONC( 1 ) = M20( 1 )*( MOMENT3_CONC( 1 ) / M30( 1 ) ) ** ( 2.0 / 3.0 )
+        MOMENT2_CONC( 2 ) = M20( 2 )*( MOMENT3_CONC( 2 ) / M30( 2 ) ) ** ( 2.0 / 3.0 )
+
+      END IF
+
+      ! Update Budget Variable for Second Moment
+      COAG_BUDGET( AEROSRF_MAP( 1 ),1 ) = MOMENT2_CONC( 1 ) * PI - CBUDGET0_SRF( 1 )
+      COAG_BUDGET( AEROSRF_MAP( 2 ),2 ) = MOMENT2_CONC( 2 ) * PI - CBUDGET0_SRF( 2 )
+
+C *** end of update for second moment
+ 
 
 C *** Mode Merging
 C     This code implements Section 1.5 of Binkowski and Roselle (2003).
@@ -597,7 +605,7 @@ C     renaming.
 
 ! *** Initialize Budget Variables
       CBUDGET0_NUM  = MOMENT0_CONC
-      CBUDGET0_SRF  = MOMENT2_CONC
+      CBUDGET0_SRF  = MOMENT2_CONC * PI
       CBUDGET0_MASS = AEROSPC_CONC
 
 #ifdef nomm
@@ -687,12 +695,18 @@ C *** Set minimum value for all concentrations in the CBLK array
          DO SPC = 1, N_AEROSPC
             AEROSPC_CONC( SPC,N ) = MAX( AEROSPC_CONC( SPC,N ),
      &                                   AEROSPC( SPC )%MIN_CONC( N ) )
+#ifdef sens
+            IF (AEROSPC_CONC( SPC,N ) .EQ. AEROSPC( SPC )%MIN_CONC( N ) )  THEN
+               S_AEROSPC_CONC( SPC,N,: ) = 0.0
+            ENDIF
+#endif
          END DO
       END DO
 
+
 ! *** Propagate Mode Merging and Minimum value impacts to budget variables
       GROWTH_BUDGET( AERONUM_MAP(:) ) = MOMENT0_CONC(:) - CBUDGET0_NUM(:)
-      GROWTH_BUDGET( AEROSRF_MAP(:) ) = MOMENT0_CONC(:) - CBUDGET0_NUM(:)
+      GROWTH_BUDGET( AEROSRF_MAP(:) ) = MOMENT2_CONC(:) * PI - CBUDGET0_SRF(:)
       DO SPC = 1,N_AEROSPC
          WHERE( AEROSPC_MAP( SPC,: ) .NE. 0 )
      &          GROWTH_BUDGET( AEROSPC_MAP(SPC,:) )=
@@ -750,7 +764,13 @@ C    aerosols. ATMOSPHERIC CHEMISTRY AND PHYSICS. 7, 4639-4659
       USE PRECURSOR_DATA
       USE SOA_DEFN
       USE AEROMET_DATA
+      USE CONST
       USE UTILIO_DEFN
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NP, NPMAX
+      USE AERO_DDM3D, ONLY : S_SO4RATE, S_PRECURSOR_CONC
+#endif
 
       IMPLICIT NONE
 
@@ -768,7 +788,6 @@ C *** Parameters:
       INTEGER, PARAMETER :: NVOLINORG = 3   ! number of volatile inorganic species
 
       ! indices for inorganic species
-!     INTEGER, PARAMETER :: KNH4 = 1, KNO3 = 2, KCL = 3, KSO4 = 4, KNA = 5, KHP = 6, KMG = 7, KK = 8, KCA = 9
       INTEGER, PARAMETER :: KNH4 = 1, KNO3 = 2, KCL = 3, KSO4 = 4, KNA = 5, KMG = 6, KK = 7, KCA = 8, KHP = 9
 
       REAL( 8 ), PARAMETER :: D_TWOTHIRDS = 2.0D0 / 3.0D0
@@ -945,6 +964,15 @@ C *** Local Saved Variables
 
       logical, save :: write1 = .true.
 
+#ifdef sens
+      INTERFACE
+         SUBROUTINE AERO_SENS( SCASI, W )
+           CHARACTER( 15 ), INTENT( IN ) :: SCASI    ! (INPUT) subcase number output
+           REAL(KIND=8),    INTENT( IN ) :: W( : )   ! (INPUT) WI concentrations 
+         END SUBROUTINE AERO_SENS
+      END INTERFACE 
+#endif
+
 C-----------------------------------------------------------------------
  
       IF ( FIRSTIME ) THEN
@@ -1075,6 +1103,7 @@ C *** Initialize Variables
       DM2DT     = 0.0D0
       SCONDRATE = 0.0D0
 
+
 C *** Produce new particles only during time steps when the gas-phase 
 C     production rate of H2SO4 is non-zero
 
@@ -1091,7 +1120,17 @@ C     on Equations A21 and A23 of Binkowski & Shankar (1995).
 
          XH2SO4 = SO4RATE / REAL( TMP,4 )
          XH2SO4 = MAX( XH2SO4, CONMIN )
-         PRECURSOR_CONC( SULF_IDX ) = REAL( XH2SO4, 8 )
+         !PRECURSOR_CONC( SULF_IDX ) = REAL( XH2SO4, 8 )
+
+#ifdef sens
+         DO NP = 1, NPMAX
+            IF ( XH2SO4 .EQ. CONMIN ) THEN
+               S_PRECURSOR_CONC( SULF_IDX, NP ) = 0.D0
+            ELSE
+               S_PRECURSOR_CONC( SULF_IDX, NP ) = S_SO4RATE( NP ) / REAL(TMP,8)
+            ENDIF
+         END DO
+#endif
 
 C *** Calculate new particle production rate for 0th, 2nd, & 3rd moments
          CALL NEWPART3 ( AIRRH, AIRTEMP, XH2SO4, SO4RATE,
@@ -1134,17 +1173,17 @@ C *** Growth values for mode merge condition
       CGR( 2 ) = SO4FAC * SCONDRATE * OMEGA_AC_SO4
 
 ! *** Initialize Budget Counter Variables         
-      CBUDGET0_NUM( : ) = MOMENT0_CONC( : )
+      CBUDGET0_NUM( : ) = REAL( MOMENT0_CONC( : ), 8)
       CBUDGET0_NUM( 1 ) = CBUDGET0_NUM( 1 ) + DNDT * DELT
-      CBUDGET0_SRF( : ) = MOMENT2_CONC( : )
-      CBUDGET0_SRF( 1 ) = CBUDGET0_SRF( 1 ) + DM2DT * DELT
+      CBUDGET0_SRF( : ) = MOMENT2_CONC( : ) * PI
+      CBUDGET0_SRF( 1 ) = CBUDGET0_SRF( 1 ) + DM2DT * DELT * PI
       CBUDGET0_SO4( : ) = AEROSPC_CONC( ASO4_IDX, : )
       CBUDGET0_SO4( 1 ) = CBUDGET0_SO4( 1 ) + DMDT_SO4 * DELT
-      CBUDGET0_NO3( : ) = AEROSPC_CONC( ANO3_IDX, : )
-      CBUDGET0_NH4( : ) = AEROSPC_CONC( ANH4_IDX, : )
-      CBUDGET0_CL ( : ) = AEROSPC_CONC( ACL_IDX , : )
-      CBUDGET0_H2O( : ) = AEROSPC_CONC( AH2O_IDX, : )
-      CBUDGET0_H3OP( : )= AEROSPC_CONC( AH3OP_IDX, : )
+      CBUDGET0_NO3( : ) = REAL( AEROSPC_CONC( ANO3_IDX, : ), 8)
+      CBUDGET0_NH4( : ) = REAL( AEROSPC_CONC( ANH4_IDX, : ), 8)
+      CBUDGET0_CL ( : ) = REAL( AEROSPC_CONC( ACL_IDX , : ), 8)
+      CBUDGET0_H2O( : ) = REAL( AEROSPC_CONC( AH2O_IDX, : ), 8)
+      CBUDGET0_H3OP( : )= REAL( AEROSPC_CONC( AH3OP_IDX, : ), 8)
 
 ! *** Diagnose Condensaiton Sink to Each Mode
       CONDSO4( 1 ) = OMEGA_AT_SO4 * SCONDRATE      
@@ -1460,6 +1499,10 @@ C *** Set flags to account for mass conservation violations in ISRP3F
       CALL ISOROPIA( WI, RHI, TEMPI, CNTRL, WT, GAS, AERLIQ,
      &               AERSLD, SCASI, OTHER )
 
+#ifdef sens
+      CALL AERO_SENS( SCASI, WI )
+#endif
+
 C *** Save H+ concentration information in microgram/m3 for consistency
       EQLBHIJ = AERLIQ(1) * 1.0D6 * AEROSPC_MW( ah3op_idx)
 
@@ -1641,7 +1684,7 @@ C     aerospc_conc variables. This should be for the wet distribution.
 ! *** Propagate Concentration Changes from Coarse-Mode Mass
 ! *** Transfer to Budget Vectors
       DELNUM( : )  = MOMENT0_CONC( : ) - CBUDGET0_NUM( : )
-      DELSRF( : )  = MOMENT2_CONC( : ) - CBUDGET0_SRF( : )
+      DELSRF( : )  = MOMENT2_CONC( : ) * PI - CBUDGET0_SRF( : )
       DELSO4( : )  = AEROSPC_CONC( ASO4_IDX, : ) - CBUDGET0_SO4( : )
       DELNH4( : )  = AEROSPC_CONC( ANH4_IDX, : ) - CBUDGET0_NH4( : )
       DELNO3( : )  = AEROSPC_CONC( ANO3_IDX, : ) - CBUDGET0_NO3( : )
@@ -1665,13 +1708,15 @@ C     aerospc_conc variables. This should be for the wet distribution.
 
  
 C *** Update gas-phase concentrations from Aitken and Accumulation Mode Partitioning
+      PRECURSOR_CONC( SULF_IDX ) = PRECURSOR_CONC( SULF_IDX )
+     &                            +SUM( -DELSO4(:) * H2SO4RAT )
       PRECURSOR_CONC( NH3_IDX )  = GNH3R8 + sum( CINORG( KNH4,1:2 )
      &                            -CFINAL( KNH4,1:2 ) ) * NH3RAT 
       PRECURSOR_CONC( HNO3_IDX ) = GNO3R8 + sum( CINORG( KNO3,1:2 )
      &                            -CFINAL( KNO3,1:2) ) * HNO3RAT  
       PRECURSOR_CONC( HCL_IDX )  = GCLR8 + sum( CINORG( KCL,1:2 )
      &                            -CFINAL( KCL,1:2) ) * HCLRAT 
-         
+
 2023  FORMAT( 1X, 'VOLINORG returning negative gas concentrations from ISOROPIA:'
      &       /10X, 'GAS(1) = NH3, GAS(2) = HNO3, GAS(3) = HCl' )
 2029  FORMAT( 1X, '[see VOLINORG msg]'
@@ -1700,11 +1745,8 @@ C   1. Binkowski, F.S. and U. Shankar, The regional particulate matter
 C      model 1. Model description and preliminary results, J. Geophys.
 C      Res., Vol 100, No D12, 26101-26209, 1995.
 
+      USE CONST
       IMPLICIT NONE
-
-C *** Includes:
-
-      INCLUDE SUBST_CONST     ! physical and mathematical constants
 
 C *** Arguments:
 
@@ -1756,7 +1798,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE NEWPART3 ( RH, T, XH2SO4, SO4RATE, DNDT, DMDT_so4, DM2DT )
 
       USE AERO_DATA
-      USE AEROMET_DATA   ! Includes CONST.EXT
+      USE CONST
       USE PRECURSOR_DATA, ONLY: PRECURSOR_MW, SULF_IDX
       USE UTILIO_DEFN
       
@@ -1975,7 +2017,7 @@ C-----------------------------------------------------------------------
 
       USE AERO_DATA
       USE PRECURSOR_DATA
-      USE AEROMET_DATA
+!     USE AEROMET_DATA
 
       IMPLICIT NONE
 
@@ -2688,15 +2730,17 @@ C     the 2 modes.
 
       RETURN
       END FUNCTION GETAF
-
+ 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE AERO_INLET ( DGN, XXLSG, RHOP, fPM1, fPM25, fPM10 )
+      SUBROUTINE AERO_INLET ( DGN, XXLSG, RHOP, D_AD1, D_AD2, fPM )
 
 C  Calculates the volume fraction of a given aerosol mode that would enter
 C  a sharp-cut inlet, using equations from Jiang et al (2006). The
-C  subroutine calculates transmission factors for PM1, PM2.5 and PM10,
-C  after first converting those cutoffs from Aerodynamic Diameter to
-C  Stokes Diameter (used internally within CMAQ).
+C  parameters D_AD1 and D_AD2 provide the lower and upper cutoff diameters
+C  for the inlet size cut and the routine returns the fraction of the
+C  size distribution that is transmitted through the hypothetical inlet
+C  with the variable fPM. But first, those cutoffs are converted from 
+C  Aerodynamic Diameter to Stokes Diameter (used internally within CMAQ).
  
 C  CMAQ aerosols are represented with Stokes Diameter. There are many
 C  alternate forms of diameter including the following:
@@ -2759,62 +2803,62 @@ C   Technology, 20:253-265, 1994.
  
 C-----------------------------------------------------------------------
 
+      USE CONST
       IMPLICIT NONE
 
-      INCLUDE SUBST_CONST    ! for PI
-
 C    Input variables
-      REAL   DGN     ! geometric mean Stokes diameter by number [ m ]
-      REAL   XXLSG   ! natural log of geometric standard deviation
-      REAL   RHOP    ! average particle density [ kg/m**3 ]
+      REAL, INTENT( IN ) :: DGN     ! geometric mean Stokes diameter by number [ m ]
+      REAL, INTENT( IN ) :: XXLSG   ! natural log of geometric standard deviation
+      REAL, INTENT( IN ) :: RHOP    ! average particle density [ kg/m**3 ]
+      REAL, INTENT( IN ) :: D_AD1   ! Lower aerodynamic diameter cut point [ um ]
+      REAL, INTENT( IN ) :: D_AD2   ! Upper aerodynamic diameter cut point [ um ]
 
 C    Output variable
-      REAL, INTENT( OUT ) :: fPM1   ! fraction of particulate volume transmitted through 1
-      REAL, INTENT( OUT ) :: fPM25  ! fraction of particulate volume transmitted through 2
-      REAL, INTENT( OUT ) :: fPM10  ! fraction of particulate volume transmitted through 10
+      REAL, INTENT( OUT ) :: fPM   ! fraction of particulate volume transmitted through 
+                                   ! hypothetical inlet.
 
 C    Internal variables
       REAL, PARAMETER :: SQRT2 = 1.4142136  !  SQRT( 2 )
-      REAL, PARAMETER :: D_AD1  = 1.0  ! aerodynamic diameter cut point [ um ]
-      REAL, PARAMETER :: D_AD25 = 2.5  ! aerodynamic diameter cut point [ um ]
-      REAL, PARAMETER :: D_AD10 = 10.0 ! aerodynamic diameter cut point [ um ]
       REAL, PARAMETER :: B = 0.21470 ! Cunningham slip-correction approx. param [ um ]
                                      ! This factor works well applied to the entire particle size-range
                                      ! The approximation is: Cc(Dp) = 1 + B/Dp
-      REAL D_ST1, D_ST25, D_ST10     ! Stokes diameter equivalent of DCA..
+      REAL D_ST1, D_ST2              ! Stokes diameter equivalent of DCA..
       REAL DG                        ! DGN converted to [ um ]
-      REAL ERFARG                    ! argument of ERF, from Step#6 of Jiang et al. (2006)
-
-C *** Error function approximation, from Meng & Seinfeld (1994)
-      REAL ERF        ! Error function
-      REAL XX         ! dummy argument for ERF
-      ERF( XX )  = SIGN( 1.0, XX ) * SQRT( 1.0 - EXP( -4.0 * XX * XX / PI ) )
+      REAL ERF1, ERF2, ERFARG        ! argument of ERF, from Step#6 of Jiang et al. (2006)
 
 C ----------------------- Begin solution -------------------------------
 
 C *** Calculate Transmission Fractions for Inlets with Aerodynamic
 C     Cutoffs
-      DG = DGN * 1.0E+06 ! [um] The units need to be equivalent with the B parameter
+      DG = DGN  ! [um] The units need to be equivalent with the B parameter
+
+      ! from Meng & Seinfeld (1994) and modified form of Fk(X) equation
+      ! in Step#6 of Jiang et al. (2006).
+      IF ( D_AD1 .EQ. 0.0 ) THEN
+          ERF1 = -1.0
+      ELSE
+          ! Convert size cut to equivalent Stokes diameter using
+          ! equation 2 of Jiang et al. (2006). Note: the equation in Step 5
+          ! of this paper has a typo (i.e., eq. 2 is correct).
+          D_ST1  = 0.5 * ( SQRT( B ** 2 + 4.0 * D_AD1 *
+     &                        ( D_AD1 + B ) * 1.0E+03 / RHOP ) - B )
+          ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+          ERFARG = ( LOG( D_ST1 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) - 3.0 * XXLSG / SQRT2
+          ERF1 = ERF( ERFARG )
+      END IF
 
       ! Convert size cut to equivalent Stokes diameter using
       ! equation 2 of Jiang et al. (2006). Note: the equation in Step 5
       ! of this paper has a typo (i.e., eq. 2 is correct).
-      D_ST1  = 0.5 * ( SQRT( B ** 2 + 4.0 * D_AD1 *
-     &                     ( D_AD1 + B ) * 1.0E+03 / RHOP ) - B )
-      D_ST25 = 0.5 * ( SQRT( B ** 2 + 4.0 * D_AD25 *
-     &                     ( D_AD25 + B ) * 1.0E+03 / RHOP ) - B )
-      D_ST10 = 0.5 * ( SQRT( B ** 2 + 4.0 * D_AD10 *
-     &                     ( D_AD10 + B ) * 1.0E+03 / RHOP ) - B )
+      D_ST2  = 0.5 * ( SQRT( B ** 2 + 4.0 * D_AD2 *
+     &                     ( D_AD2 + B ) * 1.0E+03 / RHOP ) - B )
 
       ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
-      ! from Meng & Seinfeld (1994) and modified form of Fk(X) equation
-      ! in Step#6 of Jiang et al. (2006).
-      ERFARG = ( LOG( D_ST1 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) - 3.0 * XXLSG / SQRT2
-      fPM1   = 0.5 * ( 1.0 + ERF( ERFARG ) )
-      ERFARG = ( LOG( D_ST25 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) - 3.0 * XXLSG / SQRT2
-      fPM25  = 0.5 * ( 1.0 + ERF( ERFARG ) )
-      ERFARG = ( LOG( D_ST10 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) - 3.0 * XXLSG / SQRT2
-      fPM10  = 0.5 * ( 1.0 + ERF( ERFARG ) )
+      ERFARG = ( LOG( D_ST2 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) - 3.0 * XXLSG / SQRT2
+      ERF2 = ERF( ERFARG )
+
+      ! Calculate fraction between Lower and Upper Cut Points
+      fPM = 0.5 * ( ERF2 - ERF1 )
 
       END SUBROUTINE AERO_INLET
 
@@ -2874,12 +2918,11 @@ C   Angeles Basin during CalNex, Journ. Geophys. Res., 2013.
 
 C-----------------------------------------------------------------------
 
-      USE AERO_DATA, ONLY : MIN_SIGMA_G, MAX_SIGMA_G
-      USE AEROMET_DATA, ONLY : F6PI, PI6
+      USE AERO_DATA, ONLY    : MIN_SIGMA_G, MAX_SIGMA_G
+      USE CONST
+!     USE AEROMET_DATA, ONLY : F6PI, PI6
 
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST    ! for PI
 
 C    Input variables
       REAL, INTENT( IN ) :: M3_WET  ! Third Moment of Wet Distribution (m3/m3)
@@ -2905,11 +2948,6 @@ C    Internal variables
       REAL XFSUM, LXFM2, L2SG, ES36
       REAL DBlo_st, DBhi_st, LOG_HILO, LOG_LOHI, LOG_HI, LOG_LO
       REAL SQRT2LSG, TERM1, TERM2, TERM3, TERM4, TERM5
-
-C *** Error function approximation, from Meng & Seinfeld (1994)
-      REAL ERF        ! Error function
-      REAL XX         ! dummy argument for ERF
-      ERF( XX )  = SIGN( 1.0, XX ) * SQRT( 1.0 - EXP( -4.0 * XX * XX / PI ) )
 
 C ----------------------- Begin solution -------------------------------
 
@@ -3012,10 +3050,14 @@ C  Called by: Gas-Phase Chemistry Driver
       USE AERO_DATA, ONLY: EXTRACT_AERO, CALCMOMENTS, N_MODE, MOMENT2_CONC,
      &                     MOMENT3_CONC, AEROMODE_DIAM, AEROMODE_LNSG,
      &                     CHEM_M2DRY_INIT, CHEM_M3DRY_INIT, FIXED_SG
-      USE AEROMET_DATA, ONLY: pi
+      USE CONST, ONLY: pi
       USE GRID_CONF, ONLY: NLAYS, NCOLS, NROWS
       USE PRECURSOR_DATA, ONLY: EXTRACT_PRECURSOR
 
+#ifdef sens
+      USE DDM3D_DEFN, ONLY: SENGRID
+
+#endif
       IMPLICIT NONE
       
       REAL, INTENT( IN ) :: CONCVEC ( : )  ! pointer to model concentrations
@@ -3036,12 +3078,20 @@ C  Called by: Gas-Phase Chemistry Driver
 C *** extract grid cell concentrations of aero species from CGRID
 C     into aerospc_conc in aero_data module
 C     also converts dry surface area to wet second moment
+#ifdef sens
+               CALL EXTRACT_AERO ( CONCVEC(:), .TRUE., SENGRID(NCOLS,NROWS,NLAYS,:,:), .FALSE. )
+#else
                CALL EXTRACT_AERO ( CONCVEC(:), .TRUE. )
+#endif
 
 C *** extract in inorganic aerosol processors
 
+#ifdef sens
+               CALL EXTRACT_PRECURSOR( CONCVEC(:), SENGRID( NCOLS,NROWS,NLAYS,:,: ) )
+#else
                CALL EXTRACT_PRECURSOR( CONCVEC(:) ) 
- 
+#endif
+
 C *** Update geometric mean diameters, geometric
 C     standard deviations, modal mass totals, and modal particle
 C     densities, based on the concentrations of M2, M0, and speciated
@@ -3084,7 +3134,7 @@ C  Key Subroutines Called: none
 C
 C  Called by: Gas-Phase Chemistry Driver
       USE AERO_DATA
-      USE AEROMET_DATA, ONLY: pi
+      USE CONST, ONLY: pi
       USE GRID_CONF, ONLY: NLAYS, NROWS, NCOLS
 
       IMPLICIT NONE
@@ -3102,7 +3152,11 @@ C  Called by: Gas-Phase Chemistry Driver
                ! Extract grid cell concentrations of aero species from CGRID
                ! into aerospc_conc in aero_data module
                ! also converts dry surface area to wet second moment
+#ifdef sens
+               CALL EXTRACT_AERO ( CGRID( C,R,L,: ), .TRUE., CGRID(C,R,:,: ), .FALSE. )
+#else
                CALL extract_aero ( CGRID( C,R,L,: ), .True. )
+#endif
 
                ! Recalculate Dry 3rd Moment After Chemistry Processes
                ! 2nd moment hasnt been update yet.
@@ -3128,5 +3182,245 @@ C  Called by: Gas-Phase Chemistry Driver
       END DO LOOP_LAY
 
       END SUBROUTINE HETCHEM_UPDATE_AERO
-C
+!
+!:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      SUBROUTINE SUM_INLET_PM ( INLET, WETNESS, PM )
+
+!     Calculates the total PM mass below a user-defined cut point D_AD,
+!     or Aerodynamic Diameter in um.
+!-----------------------------------------------------------------------
+
+      USE AERO_DATA, ONLY : AEROSPC_CONC, AEROSPC, N_MODE, 
+     &                      AH2O_IDX, AORGH2O_IDX
+      USE ELMO_DATA
+
+      IMPLICIT NONE
+
+      ! Input variables
+      INTEGER, INTENT( INOUT ) :: INLET ! Integer prescribing the inlet type
+                                        !   (see ELMO_INLET table in ELMO_DATA module)
+      INTEGER, INTENT( INOUT ) :: WETNESS ! 1 = Wet Aerosol; 2 = Dry Aerosol
+
+      ! Output variable
+      REAL, INTENT( OUT ) :: PM   ! PM Mass below cut point
+
+      INTEGER IM
+      REAL    VAL
+
+C ----------------------- Begin solution -------------------------------
+      PM = 0.0
+      
+      DO IM = 1,N_MODE
+         CALL GET_AERO_INLET( INLET, IM, WETNESS, VAL )
+         PM = PM + VAL * ( SUM( AEROSPC_CONC( :,IM ), 
+     &                  MASK = .NOT.AEROSPC(:)%TRACER )
+     &                  - AEROSPC_CONC( AH2O_IDX,IM ) )
+                    IF ( AORGH2O_IDX .GT. 0 ) PM = PM
+     &                  - VAL * AEROSPC_CONC( AORGH2O_IDX,IM ) ! ug m-3
+      END DO
+ 
+      END SUBROUTINE SUM_INLET_PM
+
+!:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      SUBROUTINE GET_AERO_INLET ( INLET, IMODE, WETNESS, FRAC )
+
+!     Calls the AERO_INLET routine for calculating the fraction of each 
+!       mode collected by inlet prescribed by INLET. This subroutine is
+!       only for PM0.1, PM1, PM2.5, PM10 and PM2.5to10. It is not for
+!       AMS inlet calculation. If the user expands the ELMO_INLET
+!       table to consider more cutoff ranges, this subroutine can be
+!       used to calculate them as well.
+!-----------------------------------------------------------------------
+
+      USE ELMO_DATA
+      USE AERO_DATA, ONLY : WET_AERO_DIAM, AEROMODE_LNSG, WET_AERO_DENS,
+     &                      DRY_AERO_DIAM, DRY_AERO_DENS
+
+      IMPLICIT NONE
+
+      ! Input variables
+      INTEGER, INTENT( INOUT ) :: INLET ! Integer prescribing the inlet type
+                                        !   (see ELMO_INLET table in ELMO_DATA module)
+      INTEGER, INTENT( INOUT ) ::  IMODE   ! Aerosol Mode of interest
+      INTEGER, INTENT( INOUT ) ::  WETNESS ! 1 = Wet Aerosol; 2 = Dry Aerosol
+
+      ! Output variable
+      REAL, INTENT( OUT ) :: FRAC ! Fraction of aerosol mode IM
+                                  !   collected by inlet described by INLET
+
+C ----------------------- Begin solution -------------------------------
+      
+      IF ( INLET_FRAC( INLET,IMODE,WETNESS ) .LT. 0. ) THEN
+         IF ( WETNESS .EQ. IWET ) THEN
+           CALL AERO_INLET( WET_AERO_DIAM( IMODE ), AEROMODE_LNSG( IMODE ),
+     &                      WET_AERO_DENS( IMODE ), 
+     &                      ELMO_INLET( INLET )%DIAM_LO, 
+     &                      ELMO_INLET( INLET )%DIAM_HI, 
+     &                      FRAC )
+         ELSE
+           CALL AERO_INLET( DRY_AERO_DIAM( IMODE ), AEROMODE_LNSG( IMODE ),
+     &                      DRY_AERO_DENS( IMODE ), 
+     &                      ELMO_INLET( INLET )%DIAM_LO, 
+     &                      ELMO_INLET( INLET )%DIAM_HI, 
+     &                      FRAC )
+         END IF
+         
+         INLET_FRAC( INLET,IMODE,WETNESS ) = FRAC 
+      ELSE
+         FRAC = INLET_FRAC( INLET,IMODE,WETNESS )
+      END IF
+ 
+      END SUBROUTINE GET_AERO_INLET
+ 
+!:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      SUBROUTINE SUM_INLET_NUM ( INLET, WETNESS, NUM )
+
+!     Calculates the total particle number within a user-defined range
+!     for each aerosol mode and then sums them up.
+!-----------------------------------------------------------------------
+
+      USE AERO_DATA, ONLY : DRY_AERO_DIAM, WET_AERO_DIAM,
+     &                      AEROMODE_LNSG, MOMENT0_CONC
+      USE ELMO_DATA
+
+      IMPLICIT NONE
+
+      ! Input variables
+      INTEGER, INTENT( INOUT ) :: INLET ! Integer prescribing the inlet type
+                                        !   (see ELMO_INLET table in ELMO_DATA module)
+      INTEGER, INTENT( INOUT ) ::  WETNESS ! 1 = Wet Aerosol; 2 = Dry Aerosol
+
+      ! Output variable
+      REAL, INTENT( OUT ) :: NUM   ! PM Mass below cut point
+
+      INTEGER IM
+      REAL    FRAC
+
+C ----------------------- Begin solution -------------------------------
+      NUM = 0.0
+      
+      DO IM = 1,N_MODE
+         IF ( WETNESS .EQ. IWET ) THEN
+           CALL NUM_INLET( WET_AERO_DIAM( IM ), AEROMODE_LNSG( IM ),
+     &                      ELMO_INLET( INLET )%DIAM_LO, 
+     &                      ELMO_INLET( INLET )%DIAM_HI, 
+     &                      FRAC )
+         ELSE
+           CALL NUM_INLET( DRY_AERO_DIAM( IM ), AEROMODE_LNSG( IM ),
+     &                      ELMO_INLET( INLET )%DIAM_LO, 
+     &                      ELMO_INLET( INLET )%DIAM_HI, 
+     &                      FRAC )
+         END IF
+ 
+         NUM = NUM + MOMENT0_CONC( IM ) * FRAC
+      END DO
+ 
+      END SUBROUTINE SUM_INLET_NUM
+
+C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      SUBROUTINE NUM_INLET ( DGN, XXLSG, D_ST1, D_ST2, fPM )
+
+C  Calculates the number fraction of a given aerosol mode that is between
+C  cutoff diamters D_ST1 and D_ST2. The Stokes diameter used by CMAQ is 
+C  assumed to be equivalent to the electrical mobility diameter, reported 
+C  by typical SMPS datasets. This is true for spherical particles.
+C 
+C  CMAQ aerosols are represented with Stokes Diameter. There are many
+C  alternate forms of diameter including the following:
+C       Volume Equivalent Diameter (D_ve) - the diameter of a sphere with the
+C          same volume as the particle.
+C       Stokes Diameter (D_st) - the diameter of a sphere with the same
+C          terminal velocity as the real particle. If the shape factor
+C          is 1, then the Stokes and Volume Equivalent Diameters are
+C          equal.
+C       Aerodynamic Diameter (D_ad) - the diameter of a sphere with unit
+C          density and the same terminal velocity as the real particle.
+C          If the density is 1, then the Aerodynamic Diameter and Stokes
+C          Diameter are equal.
+C       Vacuum Aerodynamic Diameter (D_va) - the diameter of a sphere with very
+C          high Knudsen number and thus a simplified relationship with
+C          Stokes diameter that is only dependent on density and shape
+C          factor, not Slip Correction. The very high Knudsen number
+C          could be because the particle is very small or because the
+C          system pressure is very low.
+C       Electrical Mobility Diameter (D_em) - the diameter of a sphere with the
+C          same migration velocity as the real particle. Requires a
+C          slip-correction and a shape factor correction when converting
+C          from volume equivalent diameter.
+ 
+C  Conversions:
+C       Parameters
+C         rho  - Density
+C         rho0 - Unit Density (1 g cm-3)
+C         Cc( ) - Cunningham Slip Correction of a particular diameter
+C         X   - Shape factor = (NonSpherical Drag Force)/(Spherical Drag Force)
+C       Aerodynamic -> Stokes
+C         D_st = D_ad * sqrt(rho0/rho) * sqrt( Cc(D_ad) / Cc(D_st) )
+C       Volume Equivalent -> Stokes
+C         D_st = D_ve * sqrt(1/X) * sqrt( Cc(D_ve) / Cc(D_st) )
+C       Electrical Mobility -> Volume Equivalent
+C         D_ve = D_em * [Cc(D_ve) / Cc(D_em)] * 1/X
+C             (If X = 1 (i.e. spherical), then D_st = D_ve = D_em )
+C       Vacuum Aerodynamic -> Volume Equivalent (DeCarlo et al., 2004)
+C         D_ve = D_va * rho0/rho * X
+C             (If X = 1 (i.e. spherical), then D_st = D_ve = D_va * rho0/rho )
+ 
+C  Key Subroutines called: none
+ 
+C  Key Functions called:  ERF
+ 
+C  Revision History:
+C    Coded Jul 2005 by Prakash Bhave
+C          Apr 2008 J.Kelly: corrected equation for Dst25 calculation
+C          Feb 2016 B.Murphy: modified to output PM1 and PM10 mode
+C                             fractions in addition to PM2.5
+C          Feb 2020 B.Murphy: Created this number synthesizer
+C 
+C-----------------------------------------------------------------------
+
+      USE CONST
+      IMPLICIT NONE
+
+C    Input variables
+      REAL, INTENT( IN ) :: DGN     ! geometric mean Stokes diameter by NUMBER [ m ]
+                                    !  Remeber that geometric mean and median are
+                                    !  identical for log-normal distributions.
+      REAL, INTENT( IN ) :: XXLSG   ! natural log of geometric standard deviation
+      REAL, INTENT( IN ) :: D_ST1   ! Lower stokes/electricla mobility diameter cut point [ um ]
+      REAL, INTENT( IN ) :: D_ST2   ! Upper stokes/electrical mobility diameter cut point [ um ]
+
+C    Output variable
+      REAL, INTENT( OUT ) :: fPM   ! fraction of particulate number transmitted 
+                                   ! through size window between D_ST1 and D_ST2
+
+C    Internal variables
+      REAL, PARAMETER :: SQRT2 = 1.4142136  !  SQRT( 2 )
+      REAL ERF1, ERF2 ! argument of ERF, from Step#6 of Jiang et al. (2006)
+      REAL ERFARG
+      REAL DG         ! Internal units for median diameter
+
+C ----------------------- Begin solution -------------------------------
+
+C *** Calculate Transmission Fractions for Inlets with Aerodynamic
+C     Cutoffs
+      DG = DGN  ! [um] The units need to be equivalent with the B parameter
+
+      ! from Meng & Seinfeld (1994) and modified form of Fk(X) equation
+      ! in Step#6 of Jiang et al. (2006).
+      IF ( D_ST1 .EQ. 0.0 ) THEN
+          ERF1 = -1.0
+      ELSE
+          ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+          ERFARG = ( LOG( D_ST1 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) 
+          ERF1 = ERF( ERFARG )
+      END IF
+
+      ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+      ERFARG = ( LOG( D_ST2 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) 
+      ERF2 = ERF( ERFARG )
+
+      ! Calculate fraction between Lower and Upper Cut Points
+      fPM = 0.5 * ( ERF2 - ERF1 )
+
+      END SUBROUTINE NUM_INLET
  

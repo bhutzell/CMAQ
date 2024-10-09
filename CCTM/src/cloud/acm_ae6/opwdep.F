@@ -31,25 +31,27 @@
 !      Date   Who             What
 !    -------- ---             -----------------------------------------
 !     07/17/15 D. Wong        initial version
+!     12/30/19 S. Napelenok   ddm-3d implemenation for v5.3.1
 !-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE MIO_ASCII
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NP, NPMAX, SEN_PAR, SENNUM, S_WETDEPSPC
+#endif
 
       IMPLICIT NONE
 
 !...........INCLUDES
 
-      INCLUDE SUBST_CONST            ! constants
       INCLUDE SUBST_FILES_ID         ! file name parameters
 
       CHARACTER( 120 ) :: XMSG = ' ' ! exit message string
 
 !...........PARAMETERS
-
-! # of wet deposition species
-      INTEGER, SAVE :: N_SPC_WDEP
 
 !...........ARGUMENTS
 
@@ -75,7 +77,6 @@
 !...for output in the wet deposition array, otherwise notify the user
 !...and return
 
-        N_SPC_WDEP = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP
         IF ( N_SPC_WDEP .LE. 0 ) THEN
 
           XMSG = 'No species were specified for wet deposition ' //
@@ -88,6 +89,7 @@
 
         END IF
 
+#ifndef mpas
 C Try to open existing wet deposition file for update
 
         IF ( IO_PE_INCLUSIVE ) THEN
@@ -199,14 +201,28 @@ C Try to open existing wet deposition file for update
 
 !...initialize the file descriptors
 
-              FDESC3D( 1 ) = 'hourly 1-layer cross-point wet deposition '
-     &                       // 'from all cloud types'
+              FDESC3D( 1 ) = 'hourly 1-layer cross-point wet deposition'
+     &                       // ' from all cloud types'
               DO L = 2 , MXDESC3
                  FDESC3D( L ) = ' '
               END DO
 
               GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
+ 
+!...Store MIO Metadata
+              NDIMS3D( 1:NVARS3D ) = 3
+              L_TSTEP( 1:NVARS3D ) = .True.
+              L_LAY  ( 1:NVARS3D ) = .False.
+              L_COL  ( 1:NVARS3D ) = .True.
+              L_ROW  ( 1:NVARS3D ) = .True.
+              L_VEXT ( 1:NVARS3D ) = .False.
+              
+              CALL LOAD_MIO_FILE ( 'CTM_WET_DEP_1', 0, 0, 0,
+     &             VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &             VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &             L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &             L_VEXT(1:NVARS3D) )
+ 
 !...try to open the output file new
 
               IF ( .NOT. OPEN3( CTM_WET_DEP_1, FSNEW3, PNAME ) ) THEN
@@ -215,6 +231,121 @@ C Try to open existing wet deposition file for update
               END IF
 
            END IF   ! open CTM_WET_DEP_1 read/write
+
+#ifdef sens
+           IF ( .NOT. OPEN3( CTM_SWETDEP_1, FSRDWR3, PNAME ) ) THEN
+               XMSG = 'Could not open ' // CTM_SWETDEP_1 //
+     &                ' file for update - try to open new'
+               CALL M3MESG( XMSG )
+
+C...Create sensitivity wet deposition file:
+               NVARS3D = ( N_SPC_WDEP + 1 ) * NPMAX
+
+               ALLOCATE ( S_WETDEPSPC( NVARS3D ) )
+               S_WETDEPSPC = 'blank'
+
+               VTYPE3D = M3REAL
+               VDESC3D = 'Sens of hourly wet dep values'              
+
+C...define sens wet deposition output descriptors for gaseous species
+               SPC = 0
+               STRT = 1
+               FINI = N_GC_WDEP
+               DO VAR = STRT, FINI
+                 SPC = SPC + 1
+                 DO NP = 1, NPMAX
+                   SENNUM = ( SPC - 1 ) * NPMAX + NP
+                   VNAME3D ( SENNUM ) = TRIM( GC_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
+                   UNITS3D ( SENNUM ) = 'kg/hectare'
+                   S_WETDEPSPC ( SENNUM ) = VNAME3D ( SENNUM )
+                 END DO
+               END DO
+
+C...define wet deposition output descriptors for aerosol species
+               SPC = 0
+               STRT = N_GC_WDEP + 1
+               FINI = N_GC_WDEP + N_AE_WDEP
+               DO VAR = STRT, FINI
+                  SPC = SPC + 1
+                  DO NP = 1, NPMAX
+                     SENNUM = ( NPMAX * N_GC_WDEP ) + ( SPC - 1 ) *NPMAX + NP
+                     VNAME3D ( SENNUM ) = TRIM( AE_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
+                     IF ( INDEX( AE_WDEP( SPC ), 'NUM' ) .GT. 0 ) THEN
+                        UNITS3D ( SENNUM ) = 'number/hectare'
+                     ELSE IF ( INDEX( AE_WDEP( SPC ), 'SRF' ) .GT. 0 ) THEN
+                        UNITS3D ( SENNUM ) = 'm2/hectare'
+                     ELSE
+                        UNITS3D ( SENNUM ) = 'kg/hectare'
+                     END IF
+                     S_WETDEPSPC ( SENNUM ) = VNAME3D ( SENNUM )
+                  END DO
+               END DO
+
+C...define wet deposition output descriptors for non-reactive species
+               SPC = 0
+               STRT = N_GC_WDEP + N_AE_WDEP + 1
+               FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP
+               DO VAR = STRT, FINI
+                  SPC = SPC + 1
+                  DO NP = 1, NPMAX
+                     SENNUM = NPMAX * ( N_GC_WDEP + N_AE_WDEP ) + ( SPC - 1 ) * NPMAX + NP
+                     VNAME3D ( SENNUM ) = TRIM( NR_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
+                     UNITS3D ( SENNUM ) = 'kg/hectare'
+                     S_WETDEPSPC ( SENNUM ) = VNAME3D ( SENNUM )
+                  END DO
+               END DO
+
+C...define wet deposition output descriptors for tracer species
+               SPC = 0
+               STRT = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + 1
+               FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP
+               DO VAR = STRT, FINI
+                  SPC = SPC + 1
+                  DO NP = 1, NPMAX
+                     SENNUM = NPMAX * ( N_GC_WDEP + N_AE_WDEP + N_NR_WDEP ) + ( SPC - 1 ) * NPMAX + NP
+                     VNAME3D ( SENNUM ) = TRIM( TR_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
+                     UNITS3D ( SENNUM ) = 'kg/hectare'
+                     S_WETDEPSPC ( SENNUM ) = VNAME3D ( SENNUM )
+                  END DO
+               END DO
+
+C...define output descriptor for hydrogen concentration
+               VAR = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP
+               DO NP = 1, NPMAX
+                  SENNUM = NPMAX * VAR + NP
+                  VNAME3D ( SENNUM ) = 'HPLUS_' // SEN_PAR( NP )
+                  UNITS3D ( SENNUM ) = 'kg/hectare'
+                  S_WETDEPSPC ( SENNUM ) = VNAME3D ( SENNUM )
+               END DO
+
+C...initialize the file descriptors
+               FDESC3D = ' '
+               FDESC3D( 1 ) = 'Sensitivity of hourly 1-layer '
+     &                        // 'cross-point wet deposition '
+     &                        // 'from all cloud types'
+
+               ! Store MIO Metadata
+               NDIMS3D( 1:NVARS3D ) = 3
+               L_TSTEP( 1:NVARS3D ) = .True.
+               L_LAY  ( 1:NVARS3D ) = .False.
+               L_COL  ( 1:NVARS3D ) = .True.
+               L_ROW  ( 1:NVARS3D ) = .True.
+               L_VEXT ( 1:NVARS3D ) = .False.
+
+               CALL LOAD_MIO_FILE ( 'CTM_SWETDEP_1', 0, 0, 0,
+     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &              L_VEXT(1:NVARS3D) )
+
+C...try to open the output file new
+               IF ( .NOT. OPEN3( CTM_SWETDEP_1, FSNEW3, PNAME ) ) THEN
+                  XMSG = 'Could not create '// CTM_SWETDEP_1 // ' file'
+                  CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
+               END IF
+
+           END IF   ! open CTM_SWETDEP_1 read/write
+#endif
 
 !...open the diagnostic file if user asked for it
 
@@ -345,6 +476,20 @@ C Try to open existing wet deposition file for update
                     FDESC3D( L ) = ' '
                  END DO
 
+!...Store MIO Metadata
+                 NDIMS3D( 1:NVARS3D ) = 3
+                 L_TSTEP( 1:NVARS3D ) = .True.
+                 L_LAY  ( 1:NVARS3D ) = .False.
+                 L_COL  ( 1:NVARS3D ) = .True.
+                 L_ROW  ( 1:NVARS3D ) = .True.
+                 L_VEXT ( 1:NVARS3D ) = .False.
+                 
+                 CALL LOAD_MIO_FILE ( 'CTM_WET_DEP_2', 0, 0, 0,
+     &                VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &                VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &                L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &                L_VEXT(1:NVARS3D) )
+
 !...try to open the diagnostic output file
 
                  IF ( .NOT. OPEN3( CTM_WET_DEP_2, FSNEW3, PNAME ) ) THEN
@@ -357,5 +502,6 @@ C Try to open existing wet deposition file for update
            END IF   ! CLD_DIAG
 
         END IF   ! IO_PE_INCLUSIVE
+#endif
 
       END SUBROUTINE OPWDEP

@@ -1,13 +1,13 @@
 #!/bin/csh -f
 
-# ======================= CCTMv5.3.1 Build Script ========================= 
-# Usage: bldit.cctm >&! bldit.cctm.log                                   
+# ======================= CCTMv5.4.X Build Script ========================= 
+# Usage: bldit.cctm.csh <compiler> >&! bldit.cctm.log                          
 # Requirements: I/O API & netCDF libraries, a Fortran compiler,               
 #               and MPI for multiprocessor computing                     
 #
 # To report problems or request help with this script/program:           
 #             http://www.cmascenter.org
-# ======================================================================= 
+# ========================================================================= 
 
 #> Set Compiler Identity by User Input: Options -> intel | pgi | gcc
  if ( $#argv == 1 ) then
@@ -39,11 +39,6 @@
  set Mechs   = $CCTM_SRC/MECHS         #> location of the chemistry mechanism include files
  setenv REPOROOT $CCTM_SRC
 
-#> Working directory and Version IDs
- set VRSN  = v531                       #> model configuration ID
- set EXEC  = CCTM_${VRSN}.exe          #> executable name
- set CFG   = CCTM_${VRSN}.cfg          #> configuration file name
-
 #> Controls for managing the source code and MPI compilation
 set CompileBLDMAKE                     #> Recompile the BLDMAKE utility from source
                                        #>   comment out to use an existing BLDMAKE executable
@@ -51,8 +46,27 @@ set CopySrc                            #> copy the source files into the build d
 #set CopySrcTree                       #> copy the source files and directory tree into the build directory
 #set MakeFileOnly                      #> uncomment to build a Makefile, but do not compile; 
                                        #>   comment out to compile the model (default if not set)
+#set build_mech                        #> uncomment to build mechanism source code files using the 
+                                       #>   chemmech utility.
+
+#> Below are chemmech options for revising the mechanism definitions file. The option needs information on the
+#> composition of each chemistry. See UTIL/chemmech/README.md for more information.
+#> Uncomment to use.
+#>    Rewrite reactions by appending them with changes in tracked atoms or elements from reactants to products
+      #setenv COMPUTE_DELTA_ATOMS F
+#>    The species namelist contains the composition information as comments at the end of lines defining species.
+#>    Note that if a defining line does not have an ending comment, the species is taken to have none of the tacked atoms.
+#>    If NAMELISTS_LIST_ATOMS equals F, an additional ASCII file contains the information.
+      #setenv NAMELISTS_LIST_ATOMS T
+
+#set clobber_mech                      #> when commented, the bldit_mech.csh script will halt if 
+                                       #>   newly created mechanism files are attempting replace
+                                       #>   existing ones. When uncommented, the existing files
+                                       #>   will be overwritten.
 set ParOpt                             #> uncomment to build a multiple processor (MPI) executable; 
                                        #>   comment out for a single processor (serial) executable
+#set DistrEnv                          #> uncomment to distribute environmental variables to multiple machines
+                                       #>   comment out for a single processor (serial) executable (MPI only)
 #set build_parallel_io                 #> uncomment to build with parallel I/O (pnetcdf); 
                                        #>   comment out to use standard netCDF I/O
 #set Debug_CCTM                        #> uncomment to compile CCTM with debug option equal to TRUE
@@ -63,12 +77,28 @@ set make_options = "-j"                #> additional options for make command if
 #> Integrated Source Apportionment Method (ISAM)
 #set ISAM_CCTM                         #> uncomment to compile CCTM with ISAM activated
                                        #>   comment out to use standard process
+
+#set DDM3D_CCTM                        #> uncomment to compile CCTM with DD3D activated
+                                       #>   comment out to use standard process
 #> Two-way WRF-CMAQ 
 #set build_twoway                      #> uncomment to build WRF-CMAQ twoway; 
                                        #>   comment out for off-line chemistry 
 
-#> Potential vorticity free-troposphere O3 scaling
-#set potvortO3
+#> Working directory and Version IDs
+ if ( $?ISAM_CCTM ) then
+     set VRSN  = v54_ISAM             #> model configuration ID for CMAQ_ISAM
+ else if ( $?DDM3D_CCTM ) then
+     set VRSN = v54_DDM3D             #> model configuration ID for CMAQ_DDM
+ else
+     set VRSN = v54                   #> model configuration ID for CMAQ
+ endif
+ 
+ set EXEC  = CCTM_${VRSN}.exe          #> executable name
+ set CFG   = CCTM_${VRSN}.cfg          #> configuration file name
+
+ if ( $?build_twoway ) then            # WRF Version used for WRF-CMAQ Model (must be v4.4+)
+    set WRF_VRSN = v4.4
+ endif   
 
 #========================================================================
 #> CCTM Science Modules
@@ -88,19 +118,51 @@ set make_options = "-j"                #> additional options for make command if
  set ModDepv   = depv/${DepMod}             #> deposition velocity calculation module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/depv)
  set ModEmis   = emis/emis                  #> in-line emissions module
- set ModBiog   = biog/beis3                 #> BEIS3 in-line emissions module 
+ set ModBiog   = biog/beis4                 #> BEIS4 in-line emissions module 
+
+ set ModMegBiog   = biog/megan3                #> MEGAN3 in-line emissions module
+
  set ModPlmrs  = plrise/smoke               #> in-line emissions plume rise
  set ModCgrds  = spcs/cgrid_spcs_nml        #> chemistry species configuration module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/spcs)
  set ModPhot   = phot/inline                #> photolysis calculation module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/phot)
- set Mechanism = cb6r3_ae7_aq               #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS)
- set ModGas    = gas/ebi_${Mechanism}       #> gas-phase chemistry solver (see $CMAQ_MODEL/CCTM/src/gas)
-                                            #> use gas/ros3 or gas/smvgear for a solver independent 
-                                            #  of the photochemical mechanism
- set ModAero   = aero/aero7                 #> aerosol chemistry module (see $CMAQ_MODEL/CCTM/src/aero)
- set ModCloud  = cloud/acm_ae7              #> cloud chemistry module (see $CMAQ_MODEL/CCTM/src/cloud)
-                                            #>   overwritten below if using cb6r3m_ae7_kmtbr mechanism
+
+ setenv Mechanism cb6r5_ae7_aq              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
+ set ModMech   = MECHS/${Mechanism}
+
+ if ( ${Mechanism} =~ *ae7* ) then          #> ae7 family of aero and cloud chem
+     set ModAero   = aero/aero7             # > aerosol chemistry module (see $CMAQ_MODEL/CCTM/src/aero)
+     set ModCloud  = cloud/acm_ae7          # > cloud chemistry module (see $CMAQ_MODEL/CCTM/src/cloud)
+ else if ( ${Mechanism} =~ *ae6* ) then     #> ae6 family of aero and cloud chem
+     set ModAero   = aero/aero6             # > aerosol chemistry module (see $CMAQ_MODEL/CCTM/src/aero)
+     set ModCloud  = cloud/acm_ae6          # > cloud chemistry module (see $CMAQ_MODEL/CCTM/src/cloud)
+ else if ( ${Mechanism} =~ *cracmm* ) then  #> CRACMM family of aero and cloud chem
+     set ModAero    = aero/cracmm           # > aerosol chemistry module (see $CMAQ_MODEL/CCTM/src/aero)
+     set ModCloud   = cloud/acm_cracmm      # > cloud chemistry module (see $CMAQ_MODEL/CCTM/src/cloud)
+ endif
+
+ # Special cloud modules for kmt versions
+ if( ${Mechanism} == cb6r5_ae7_aqkmt2 ) then
+     set ModCloud = cloud/acm_ae7_kmt2
+ else if( ${Mechanism} == saprc07tic_ae7i_aqkmt2 ) then
+     set ModCloud = cloud/acm_ae7_kmt2
+ endif
+
+ # Gas chem solver
+ if ( ${Mechanism} == cb6r5m_ae7_aq ) then  #> Gas-phase chemistry solver options ($CMAQ_MODEL/CCTM/src/gas)
+     setenv ChemSolver ros3                  #> ros3 (or smvgear) are system independent
+ else                                      
+     setenv ChemSolver ebi                   #> [ default for most mechanisms: ebi ]
+ endif
+                                         
+ if ( $ChemSolver == ebi ) then             
+    set ModGas    = gas/${ChemSolver}_${Mechanism}
+                                            
+ else
+    set ModGas    = gas/${ChemSolver}
+ endif
+    
  set ModUtil   = util/util                  #> CCTM utility modules
  set ModDiag   = diag                       #> CCTM diagnostic modules
  set Tracer    = trac0                      #> tracer configuration directory under 
@@ -108,6 +170,8 @@ set make_options = "-j"                #> additional options for make command if
  set ModPa     = procan/pa                  #> CCTM process analysis
  set ModPvO3   = pv_o3                      #> potential vorticity from the free troposphere
  set ModISAM   = isam                       #> CCTM Integrated Source Apportionment Method
+ set ModDDM3D  = ddm3d                      #> Decoupled Direct Method in 3D
+ set ModDegrade = reactive_tracers          #> Linear Chemical Loss for a fixed set of species treated as reactive tracers
 
 #============================================================================================
 #> Computing System Configuration:
@@ -188,6 +252,10 @@ set make_options = "-j"                #> additional options for make command if
     set cpp_depmod = '-Dm3dry_opt'
  else if ($DepMod == stage) then
     set cpp_depmod = '-Dstage_opt'
+    if ( $?DDM3D_CCTM ) then
+       echo "*** DDM3D is not compatible with the STAGE deposition model"
+       exit 1
+    endif
  endif
 
 #> Set variables needed for multiprocessor and serial builds
@@ -208,6 +276,10 @@ set make_options = "-j"                #> additional options for make command if
     set LIB3 = "${mpi_lib} ${extra_lib}"
     set Str1 = (// Parallel / Include message passing definitions)
     set Str2 = (include SUBST_MPI mpif.h;)
+    # Distribute Environment to different machines if not done automatically 
+    if ( $?DistrEnv ) then
+      set PAR = ($PAR -Dcluster) 
+    endif
  else
     #Serial system configuration
     echo "   Not Parallel; set Serial (no-op) flags"
@@ -224,28 +296,62 @@ set make_options = "-j"                #> additional options for make command if
     set Str1 =
     set Str2 =
  endif 
- 
-#> Mechanism location
- set ModMech = MECHS/$Mechanism        #> chemical mechanism module
 
-#> Cloud chemistry options
- if ( $Mechanism == cb6r3m_ae7_kmtbr ) then
-    set ModCloud = cloud/acm_ae7_kmtbr
+#> if DDM-3D is set, add the pre-processor flag for it.
+ if ( $?DDM3D_CCTM ) then
+    set SENS = ( -Dsens )
+ else
+    set SENS = ""
+ endif
+ 
+#> Build Mechanism Files and instruct build-make to look
+#> in the CHEMMECH output folder for the files
+ if ( $?build_mech ) then
+
+    # Note: modifying existing or creating new chemical mechanisms
+    # can lead to unstable or highly inaccurate representations of 
+    # atmospheric chemical predictions when applying the EBI solvers.
+    # EBI solvers are highly characterized and tested before 
+    # application. The CMAQ development team recommends using the 
+    # generalized solvers, Rosenbrock or Gear, with user-defined
+    # mechanisms.
+
+    # Because the bldit_cctm script is executing the bldit_mech
+    # processor, we will assume that the source location for the new 
+    # mechanism files is in the CMAQ repo. There will also be an 
+    # error check for overwriting an existing mechanism that can be
+    # disabled using the mech_clobber variable above.
+    setenv MECH_SRC ${CMAQ_REPO}/CCTM/src/${ModMech}
+    setenv TRAC_NML ${CMAQ_REPO}/CCTM/src/MECHS/trac0/Species_Table_TR_0.nml
+    setenv MECH_OUT ${CMAQ_REPO}/CCTM/src/${ModMech}
+    setenv EBI_SOLVER_OUT ${CMAQ_REPO}/CCTM/src/${ModGas}
+    if ( $?clobber_mech ) then
+      setenv CLOBBER_MECH TRUE
+    else
+      setenv CLOBBER_MECH FALSE
+    endif
+
+    cd ${CMAQ_HOME}/CCTM/scripts
+    ./bldit_mech.csh ${compiler} ${compilerVrsn}
+    if ( $? != 0 ) then
+      echo ""
+      echo "bldit_mech did not finish correctly --> Build Process Halted"
+      exit 1
+    endif
  endif
 
 #> Tracer configuration files
  set ModTrac = MECHS/$Tracer
 
-#> free trop. O3 potential vorticity scaling
- if ( $?potvortO3 ) then 
-    set POT = ( -Dpotvorto3 )
- else
-    set POT = ""
- endif 
-
 #> Set and create the "BLD" directory for checking out and compiling 
 #> source code. Move current directory to that build directory.
- set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
+ if ( $?Debug_CCTM ) then
+    set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_debug
+ else
+    set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
+ endif
+
+
  if ( ! -e "$Bld" ) then
     mkdir $Bld
  else
@@ -300,6 +406,8 @@ set make_options = "-j"                #> additional options for make command if
               -DSUBST_GLOBAL_TO_LOCAL_COORD=${Popt}_GLOBAL_TO_LOCAL_COORD\
               -DSUBST_GLOBAL_SUM=${Popt}_GLOBAL_SUM\
               -DSUBST_GLOBAL_LOGICAL=${Popt}_GLOBAL_LOGICAL\
+              -DSUBST_GLOBAL_GATHER=${Popt}_GLOBAL_GATHER\
+              -DSUBST_GLOBAL_BCAST=${Popt}_GLOBAL_BCAST\
               -DSUBST_LOOP_INDEX=${Popt}_LOOP_INDEX\
               -DSUBST_SUBGRID_INDEX=${Popt}_SUBGRID_INDEX )
  set STX2 = ( -DSUBST_HI_LO_BND_PE=${Popt}_HI_LO_BND_PE\
@@ -327,6 +435,11 @@ set make_options = "-j"                #> additional options for make command if
     set ModVadv = vadv/local_cons              #> Vertical advection module
  endif
 
+ # Retrieve git repository sha ID for this source code version
+ set shaID   = `git --git-dir=${CMAQ_REPO}/.git rev-parse --short=10 HEAD`
+ if ( $? != 0 ) then
+    set shaID   = "not_a_repo"
+ endif
 
 # ============================================================================
 #> Create Config File 
@@ -336,53 +449,55 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  set quote = '"'
 
  echo                                                               > $Cfile
-if ( $?make_options ) then
+ if ( $?make_options ) then
     echo "make_options $quote$make_options$quote;"                 >> $Cfile
     echo                                                           >> $Cfile
-endif
+ endif
  echo "model        $EXEC;"                                        >> $Cfile
  echo                                                              >> $Cfile
- echo "repo         $CCTM_SRC;"                                    >> $Cfile
+ echo "repo        $CCTM_SRC;"                                     >> $Cfile
  echo                                                              >> $Cfile
- echo "mechanism    $Mechanism;"                                   >> $Cfile
+ echo "sha_ID      $shaID;"                                        >> $Cfile
  echo                                                              >> $Cfile
- echo "lib_base     $CMAQ_LIB;"                                    >> $Cfile
+ echo "mechanism   $Mechanism;"                                    >> $Cfile
  echo                                                              >> $Cfile
- echo "lib_1        ioapi/lib;"                                    >> $Cfile
+ echo "lib_base    $CMAQ_LIB;"                                     >> $Cfile
  echo                                                              >> $Cfile
- echo "lib_2        ioapi/include_files;"                          >> $Cfile
+ echo "lib_1       ioapi/lib;"                                     >> $Cfile
+ echo                                                              >> $Cfile
+ echo "lib_2       ioapi/include_files;"                           >> $Cfile
  echo                                                              >> $Cfile
  if ( $?ParOpt ) then
     echo "lib_3       ${quote}mpi -I.$quote;"                      >> $Cfile
     echo                                                           >> $Cfile
  endif
  echo                                                              >> $Cfile
- echo "lib_4        ioapi/lib;"                                    >> $Cfile
+ echo "lib_4       ioapi/lib;"                                     >> $Cfile
  echo                                                              >> $Cfile
- set text = "$quote$CPP_FLAGS $PAR $PIO $cpp_depmod $POT $STX1 $STX2$quote;"
+ set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $cpp_depmod $STX1 $STX2$quote;"
  echo "cpp_flags   $text"                                          >> $Cfile
  echo                                                              >> $Cfile
  echo "f_compiler  $FC;"                                           >> $Cfile
  echo                                                              >> $Cfile
- echo "fstd         $quote$FSTD$quote;"                            >> $Cfile
+ echo "fstd        $quote$FSTD$quote;"                             >> $Cfile
  echo                                                              >> $Cfile
- echo "dbg          $quote$DBG$quote;"                             >> $Cfile
+ echo "dbg         $quote$DBG$quote;"                              >> $Cfile
  echo                                                              >> $Cfile
- echo "f_flags      $quote$F_FLAGS$quote;"                         >> $Cfile
+ echo "f_flags     $quote$F_FLAGS$quote;"                          >> $Cfile
  echo                                                              >> $Cfile
- echo "f90_flags    $quote$F90_FLAGS$quote;"                       >> $Cfile
+ echo "f90_flags   $quote$F90_FLAGS$quote;"                        >> $Cfile
  echo                                                              >> $Cfile
- echo "c_compiler   $CC;"                                          >> $Cfile
+ echo "c_compiler  $CC;"                                           >> $Cfile
  echo                                                              >> $Cfile
- echo "c_flags      $quote$C_FLAGS$quote;"                         >> $Cfile
+ echo "c_flags     $quote$C_FLAGS$quote;"                          >> $Cfile
  echo                                                              >> $Cfile
- echo "link_flags   $quote$LINK_FLAGS$quote;"                      >> $Cfile
+ echo "link_flags  $quote$LINK_FLAGS$quote;"                       >> $Cfile
  echo                                                              >> $Cfile
- echo "ioapi        $quote$LIB2$quote;     "                       >> $Cfile
+ echo "ioapi       $quote$LIB2$quote;     "                        >> $Cfile
  echo                                                              >> $Cfile
- echo "netcdf       $quote$netcdf_lib$quote;"                      >> $Cfile
+ echo "netcdf      $quote$netcdf_lib$quote;"                       >> $Cfile
  echo                                                              >> $Cfile
- echo "netcdff      $quote$netcdff_lib$quote;"                     >> $Cfile
+ echo "netcdff     $quote$netcdff_lib$quote;"                      >> $Cfile
  echo                                                              >> $Cfile
  if ( $?ParOpt ) then
     echo "mpich       $quote$LIB3$quote;"                          >> $Cfile
@@ -476,10 +591,15 @@ endif
  echo "Module ${ModEmis};"                                         >> $Cfile
  echo                                                              >> $Cfile
 
- set text = "beis3"
+ set text = "beis4"
  echo "// options are" $text                                       >> $Cfile
  echo "Module ${ModBiog};"                                         >> $Cfile
  echo                                                              >> $Cfile
+
+ set text = "megan3"
+ echo "// options are" $text                                       >> $Cfile
+ echo "Module ${ModMegBiog};"                                      >> $Cfile
+ echo  
 
  set text = "smoke"
  echo "// options are" $text                                       >> $Cfile
@@ -496,14 +616,20 @@ endif
  echo "Module ${ModPhot};"                                         >> $Cfile
  echo                                                              >> $Cfile
 
+ set text = "degrade"
+ echo "// reactive_tracer options are" $text                       >> $Cfile
+ echo "Module ${ModDegrade};"                                      >> $Cfile
+ echo                                                              >> $Cfile
+
  set text = "gas chemistry solvers"
  echo "// " $text                                                  >> $Cfile
- set text = "smvgear, ros3, and ebi_<mech>; see 'gas chemistry mechanisms' for <mech>"
+ set text = "smvgear, ros3, and ebi; see 'gas chemistry mechanisms' for <mech>"
  echo "// options are" $text                                       >> $Cfile
  echo "Module ${ModGas};"                                          >> $Cfile
  echo                                                              >> $Cfile
 
- set MechList = " cb6mp_ae6_aq, cb6r3_ae6_aq, cb6r3_ae7_aq, cb6r3_ae7_aqkmt2, cb6r3m_ae7_kmtbr, racm2_ae6_aq, saprc07tc_ae6_aq, saprc07tic_ae6i_aq, saprc07tic_ae6i_aqkmti, saprc07tic_ae7i_aq, saprc07tic_ae7i_aqkmt2"
+ set MechList = "cb6r5hap_ae7_aq, cb6r3_ae7_aq, cb6r5_ae7_aq, cb6r5_ae7_aqkmt2, cb6r5m_ae7_aq, racm2_ae6_aq, saprc07tc_ae6_aq, saprc07tic_ae7i_aq, saprc07tic_ae7i_aqkmt2"
+
  set text = "gas chemistry mechanisms"
  echo "// " $text                                                  >> $Cfile
  set text = "$MechList"
@@ -517,12 +643,10 @@ endif
  echo "Module ${ModTrac};"                                         >> $Cfile
  echo 
 
- if ( $?potvortO3 ) then
-    set text = "use potential vorticity free-troposphere O3 scaling"
-    echo "// options are" $text                                    >> $Cfile
-    echo "Module ${ModPvO3};"                                      >> $Cfile
-    echo                                                           >> $Cfile
- endif
+ set text = "use potential vorticity free-troposphere O3 scaling"
+ echo "// options are" $text                                    >> $Cfile
+ echo "Module ${ModPvO3};"                                      >> $Cfile
+ echo                                                           >> $Cfile
 
  set text = "aero6"
  echo "// options are" $text                                       >> $Cfile
@@ -543,6 +667,13 @@ endif
  echo $text                                                        >> $Cfile
  echo "Module ${ModISAM};"                                         >> $Cfile
  echo                                                              >> $Cfile
+
+ if ( $?DDM3D_CCTM ) then
+   set text = "// compile for decoupled direct method in 3d"
+   echo $text                                                        >> $Cfile
+   echo "Module ${ModDDM3D};"                                        >> $Cfile
+   echo                                                              >> $Cfile
+ endif
 
  set text = "util"
  echo "// options are" $text                                       >> $Cfile
@@ -609,17 +740,24 @@ endif
  if ( $?Debug_CCTM ) then
     set bld_flags = "${bld_flags} -debug_cctm"
  endif
+
  if ( $?ISAM_CCTM ) then
     set bld_flags = "${bld_flags} -isam_cctm"
  endif
- 
- # Run BLDMAKE with source code in build directory
+
+ if ( $?build_twoway ) then
+   set bld_flags = "${bld_flags} -twoway"
+ endif
+
+#> Run BLDMAKE with source code in build directory
  $Blder $bld_flags $Cfile   
 
 #> Rename Makefile to specify compiler option and link back to Makefile
- mv Makefile Makefile.$compilerString
- if ( -e Makefile.$compilerString && -e Makefile ) rm Makefile
- ln -s Makefile.$compilerString Makefile
+ if ( ! $?build_twoway ) then
+    mv Makefile Makefile.$compilerString
+    if ( -e Makefile.$compilerString && -e Makefile ) rm Makefile
+    ln -s Makefile.$compilerString Makefile
+ endif
 
 #> Alert user of error in BLDMAKE if it ocurred
  if ( $status != 0 ) then
@@ -635,6 +773,59 @@ endif
  endif
  mv ${CFG}.bld $Bld/${CFG}
 
+#> If a CRACMM mechanism is used and the compiler is gcc, remove trailing
+#>   comments in species namelist files (or else model will not run)
+ if ( ${Mechanism} =~ *cracmm* && ${compiler} == gcc ) then
+    echo "   >>> removing trailing comments from species namelists <<<"
+    sed -i 's/,\!.*/,/' $Bld/GC_${Mechanism}.nml
+    sed -i 's/,\!.*/,/' $Bld/AE_${Mechanism}.nml
+    sed -i 's/,\!.*/,/' $Bld/NR_${Mechanism}.nml
+ endif
 
+#> If Building WRF-CMAQ, download WRF, download auxillary files and build
+#> model
+ if ( $?build_twoway ) then
+
+#> Check if the user has git installed on their system
+  git --version >& /dev/null
+  
+  if ($? == 0) then
+   set git_check
+  endif
+ 
+  if ($?git_check) then
+
+    cd $CMAQ_HOME/CCTM/scripts
+  
+    # Downlad WRF repository from GitHub and put CMAQv5.4 into it
+    set WRF_BLD = BLD_WRF${WRF_VRSN}_CCTM_${VRSN}_${compilerString}
+    setenv wrf_path ${CMAQ_HOME}/CCTM/scripts/${WRF_BLD}
+    setenv WRF_CMAQ 1
+
+    if ( ! -d $WRF_BLD ) then 
+      git clone --branch ${WRF_VRSN} https://github.com/wrf-model/WRF.git ./$WRF_BLD >& /dev/null
+      cd $wrf_path
+      mv $Bld ./cmaq
+  
+      # Configure WRF
+        ./configure <<EOF
+        ${WRF_ARCH}
+        1
+EOF
+
+    else
+      # Clean-up 
+      rm -r $Bld
+      cd $wrf_path
+    endif
+
+     # Compile WRF-CMAQ
+     ./compile em_real |& tee -a wrf-cmaq_buildlog.log
+
+     cd ${CMAQ_HOME}/CCTM/scripts
+
+   endif
+
+ endif 
 
 exit

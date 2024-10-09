@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/gas/ros3/rbinit.F,v 1.4 2011/10/21 16:11:10 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
       SUBROUTINE RBINIT
 C***********************************************************************
 C
@@ -47,6 +41,7 @@ C                   15 Jul 14 B.Hutzell: 1) replaced mechanism include files wit
 C                   RXNS_DATA module, 2) inserted call to function MAP_CHEMISTRY_SPECIES 
 C                   RXNS_FUNCTION module, and 3) inserted do loop that calculates species
 C                   unit conversion factors based on species type
+C                   21 Mar 22 G . Sarwar: changed BLKLAND to BLKSEAWATER
 C                      
 C***********************************************************************
       USE RXNS_DATA
@@ -55,18 +50,12 @@ C***********************************************************************
       USE CGRID_SPCS               ! CGRID mechanism species
       USE UTILIO_DEFN
       USE RXNS_FUNCTION
+      USE CONST
 
       IMPLICIT NONE
 
-C.....Includes:
-      Include SUBST_CONST          ! common constants
-
-C.....Arguments: NONE
-
 C.....Parameters:
       CHARACTER( 16 ), PARAMETER   :: PNAME = 'RBINIT'    ! Procedure name
-
-C.....External Functions:
 
 C.....Local Variables: 
       CHARACTER( 132 ) :: XMSG     ! Log error message
@@ -212,10 +201,10 @@ c..cell & solver data
      &          BLKCH2O( BLKSIZE ),
      &          BLKDENS( BLKSIZE ),
      &          BLKSVOL( BLKSIZE ), 
-     &          BLKLAND( BLKSIZE ), STAT = STATUS )
+     &          BLKSEAWATER( BLKSIZE ), STAT = STATUS )
       IF ( STATUS .NE. 0 ) THEN
          XMSG = 'ERROR allocating BLKTEMP, BLKPRES, BLKCH2O, BLKDENS, '
-     &       // 'BLKSVOL, BLKLAND '
+     &       // 'BLKSVOL, BLKSEAWATER '
          CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
@@ -237,6 +226,13 @@ c..cell & solver data
          CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
+#ifdef sens
+      ALLOCATE( YAVE( BLKSIZE,NUMB_MECH_SPC ), STAT = STATUS )
+      IF ( STATUS .NE. 0 ) THEN
+         XMSG = 'ERROR allocating YAVE'
+         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+      END IF
+#endif
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Set convergence tolerances for each species; currently uses
 c  one set of tolerances for all species

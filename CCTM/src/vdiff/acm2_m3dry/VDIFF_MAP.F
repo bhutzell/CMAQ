@@ -66,7 +66,7 @@ C global dry dep species
 
 C component flux output variables 
       INTEGER, PARAMETER :: LCMP  = 8
-      CHARACTER( 16 ), SAVE :: CMPSPC( LCMP )
+      CHARACTER( 16 ), SAVE :: CMPSPC( LCMP ) = ' '
 
       CONTAINS
 
@@ -75,7 +75,6 @@ C-----------------------------------------------------------------------
 
          USE CGRID_SPCS   ! CGRID species number and offsets
          USE UTILIO_DEFN
-         USE DEPV_DEFN, ONLY : N_SPC_DEPV
 
          IMPLICIT NONE
 
@@ -250,7 +249,7 @@ C Local variables:
          END DO
 
          CMPSPC( 1 ) = 'NH3_Emis'
-         CMPSPC( 2 ) = 'NH3_Dep '
+         CMPSPC( 2 ) = 'NH3_Flux'
          CMPSPC( 3 ) = 'NH3_Stom'
          CMPSPC( 4 ) = 'NH3_Cut '
          CMPSPC( 5 ) = 'NH3_Soil'
@@ -312,8 +311,12 @@ C Local variables:
             DIFF_SPC( S ) = AE_SPC( AE_TRNS_MAP( V ) )
             DIFF_MW ( S ) = AE_MOLWT( AE_TRNS_MAP( V ) )
             DIFF_MASK_AERO( S ) = .TRUE.
-            IF ( INDEX( DIFF_SPC( S ), 'NUM' ) .NE. 0 ) DIFF_MASK_NUM( S ) = .TRUE.
-            IF ( INDEX( DIFF_SPC( S ), 'SRF' ) .NE. 0 ) DIFF_MASK_SRF( S ) = .TRUE.
+            IF ( INDEX( DIFF_SPC( S ), 'NUM' ) .NE. 0 ) THEN
+                DIFF_MASK_NUM( S ) = .TRUE.
+            END IF
+            IF ( INDEX( DIFF_SPC( S ), 'SRF' ) .NE. 0 ) THEN
+                DIFF_MASK_SRF( S ) = .TRUE.
+            END IF
          END DO
          DO V = 1, N_NR_TRNS
             S = S + 1

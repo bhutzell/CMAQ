@@ -47,15 +47,22 @@ C   15 Nov 2018: L.Zhou, S.Napelenok: isam implementation
 C   01 Feb 19 D.Wong: Implemented centralized I/O approach, removed all
 C                     MY_N clauses
 C   10 July 19 F. Sidi: Renamed Subroutine
+C   09 Dec 19 S.L.Napelenok: ddm-3d implementation for cmaq v5.3.1
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
       use CENTRALIZED_IO_MODULE, only : interpolate_var
+      USE PA_DEFN, ONLY : COUPLE_WRF
 #ifdef isam
-      USE SA_DEFN, ONLY: ISAM, NSPC_SA, NTAG_SA, SPC_INDEX, TRANSPORT_SPC, ITAG
+      USE SA_DEFN, ONLY: ISAM, NSPC_SA, NTAG_SA, MAP_SAtoCGR, TRANSPORT_SPC, ITAG
 #endif
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY:SENGRID, NPMAX, NP
+#endif 
+
 
       IMPLICIT NONE   
 
@@ -101,7 +108,6 @@ C Local Variables:
 
       INTEGER     OFF              ! loop offset to CGRID species
       INTEGER     C, R, L, SPC, V  ! loop counters
-      INTEGER     RHOJ_LOC         ! pointer to transported RHOJ (in CGRID)
 
 #ifdef isam
       INTEGER  :: SPC_CGRID
@@ -114,6 +120,7 @@ C If ISPCA .ne. 0, then air is advected and concs. are adjusted
       IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
 
+         COUPLE_WRF = .TRUE.
          IF ( N_AE_SPC .GT. 0 ) THEN
 C create aerosol species pointers to distinguish micro-grams/m**3,
 C #/m**3 (number density), and m**2/m**3 (surface area) species
@@ -165,6 +172,11 @@ C CGRID in mixing ratio [ppmV] -> (air density X "total" Jacobian) X mixing rati
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = CGRID( C,R,L,SPC ) * RHOJ( C,R,L )
+#ifdef sens
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = SENGRID(C,R,L,NP,SPC) * RHOJ( C,R,L )
+                     END DO
+#endif
                   END DO
                END DO
             END DO
@@ -172,11 +184,15 @@ C CGRID in mixing ratio [ppmV] -> (air density X "total" Jacobian) X mixing rati
       END IF
  
 C initialize RhoJ from MCIP - done once per sync step
-      RHOJ_LOC = GC_STRT + N_GC_SPC
       DO L = 1, NLAYS
          DO R = 1, NROWS
             DO C = 1, NCOLS
                CGRID( C,R,L,RHOJ_LOC ) = RHOJ( C,R,L )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     SENGRID( C,R,L,NP,RHOJ_LOC ) = 0.0
+                  END DO
+#endif
             END DO
          END DO
       END DO
@@ -190,6 +206,11 @@ C CGRID in ug/m**3 -> ("total" Jacobian [m]) X [Kg/m**3]
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = JACOBM( C,R,L ) * CGRID( C,R,L,SPC ) / CONV
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = JACOBM( C,R,L ) * SENGRID(C,R,L,NP,SPC)  / CONV
+                     END DO
+#endif
                   END DO
                END DO
             END DO
@@ -204,6 +225,11 @@ C CGRID in #/m**3 -> ("total" Jacobian [m]) X [#/m**3]
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = JACOBM( C,R,L ) * CGRID( C,R,L,SPC )
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = JACOBM( C,R,L ) * SENGRID(C,R,L,NP,SPC)
+                     END DO
+#endif               
                   END DO
                END DO
             END DO
@@ -218,6 +244,11 @@ C CGRID in m**2/m**3 -> ("total" Jacobian [m]) X [m**2/m**3]
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = JACOBM( C,R,L ) * CGRID( C,R,L,SPC )
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = JACOBM( C,R,L ) * SENGRID(C,R,L,NP,SPC)
+                     END DO
+#endif               
                   END DO
                END DO
             END DO
@@ -233,6 +264,11 @@ C CGRID in mixing ratio [ppmV] -> (air density X "total" Jacobian) X mixing rati
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = CGRID( C,R,L,SPC ) * RHOJ( C,R,L )
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = SENGRID(C,R,L,NP,SPC)* RHOJ( C,R,L )
+                     END DO
+#endif               
                   END DO
                END DO
             END DO
@@ -248,6 +284,11 @@ C CGRID in mixing ratio [ppmV] -> (air density X "total" Jacobian) X mixing rati
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = CGRID( C,R,L,SPC ) * RHOJ( C,R,L )
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = SENGRID(C,R,L,NP,SPC) * RHOJ( C,R,L )
+                     END DO
+#endif               
                   END DO
                END DO
             END DO
@@ -257,7 +298,7 @@ C CGRID in mixing ratio [ppmV] -> (air density X "total" Jacobian) X mixing rati
 #ifdef isam
       DO SPC = 1, NSPC_SA
         IF ( TRANSPORT_SPC( SPC ) ) THEN
-          SPC_CGRID = SPC_INDEX(SPC,2)
+          SPC_CGRID = MAP_SAtoCGR(SPC)
           IF ( SPC_CGRID .LE. N_GC_SPC .OR. SPC_CGRID .GE. NR_STRT ) THEN ! this is not an aerosol
             DO ITAG = 1, NTAG_SA
               DO L = 1, NLAYS
@@ -293,7 +334,6 @@ C entry DECOUPLE
       call interpolate_var ('JACOBM', jdate, jtime, JACOBM)
  
 C retrieve transported RhoJ
-      RHOJ_LOC = GC_STRT + N_GC_SPC
       DO L = 1, NLAYS
          DO R = 1, NROWS
             DO C = 1, NCOLS
@@ -301,6 +341,7 @@ C retrieve transported RhoJ
             END DO
          END DO
       END DO
+      !call interpolate_var ('DENSA_J', JDATE, JTIME, RHOJ)
 
 C decouple for chemistry and diffusion
  
@@ -313,6 +354,11 @@ C CGRID in mixing ratio [ppmV] X (air density X "total" Jacobian) -> mixing rati
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = CGRID( C,R,L,SPC ) / RHOJ( C,R,L )
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = SENGRID(C,R,L,NP,SPC) / RHOJ( C,R,L )
+                     END DO
+#endif               
                   END DO
                END DO
             END DO
@@ -328,6 +374,11 @@ C CGRID in Jacobian [m]) X [Kg/m**3] -> [ug/m**3]
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = CONV * CGRID( C,R,L,SPC ) / JACOBM( C,R,L )
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = CONV * SENGRID(C,R,L,NP,SPC) / JACOBM( C,R,L )
+                     END DO
+#endif               
                   END DO
                END DO
             END DO
@@ -342,6 +393,11 @@ C CGRID in Jacobian [m] X [#/m**3] -> #/m**3
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = CGRID( C,R,L,SPC ) / JACOBM( C,R,L )
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = SENGRID(C,R,L,NP,SPC) / JACOBM( C,R,L )
+                     END DO
+#endif               
                   END DO
                END DO
             END DO
@@ -356,6 +412,11 @@ C CGRID in Jacobian [m] X [m**2/m**3] -> m**2/m**3
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = CGRID( C,R,L,SPC ) / JACOBM( C,R,L )
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = SENGRID(C,R,L,NP,SPC) / JACOBM( C,R,L )
+                     END DO
+#endif               
                   END DO
                END DO
             END DO
@@ -371,6 +432,11 @@ C CGRID in mixing ratio [ppmV] X (air density X "total" jacobian) -> mixing rati
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = CGRID( C,R,L,SPC ) / RHOJ( C,R,L )
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = SENGRID(C,R,L,NP,SPC) / RHOJ( C,R,L )
+                     END DO
+#endif               
                   END DO
                END DO
             END DO
@@ -386,6 +452,11 @@ C CGRID in mixing ratio [ppmV] X (air density X "total" jacobian) -> mixing rati
                DO R = 1, NROWS
                   DO C = 1, NCOLS
                      CGRID( C,R,L,SPC ) = CGRID( C,R,L,SPC ) / RHOJ( C,R,L )
+#ifdef sens       
+                     DO NP = 1, NPMAX
+                        SENGRID( C,R,L,NP,SPC ) = SENGRID(C,R,L,NP,SPC) / RHOJ( C,R,L )
+                     END DO
+#endif               
                   END DO
                END DO
             END DO
@@ -395,7 +466,7 @@ C CGRID in mixing ratio [ppmV] X (air density X "total" jacobian) -> mixing rati
 #ifdef isam
       DO SPC = 1, NSPC_SA
         IF ( TRANSPORT_SPC( SPC ) ) THEN
-          SPC_CGRID = SPC_INDEX(SPC,2)
+          SPC_CGRID = MAP_SAtoCGR(SPC)
           IF ( SPC_CGRID .LE. N_GC_SPC .OR. SPC_CGRID .GE. NR_STRT ) THEN ! this is not an aerosol
             DO ITAG = 1, NTAG_SA
               DO L = 1, NLAYS

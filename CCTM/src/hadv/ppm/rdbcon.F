@@ -19,7 +19,8 @@
 
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE RDBCON ( JDATE, JTIME, TSTEP, LVL, BCON, LSTAT )
+      SUBROUTINE RDBCON ( JDATE, JTIME, TSTEP, LVL, BCON,
+     &                    L_WRITE_WARNING )
 
 C-----------------------------------------------------------------------
 C Function:
@@ -49,19 +50,23 @@ C   08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC)
 C   14 Sep 15 J.Young: change Fortran string comparison to logical from advbc_map
 C   01 Feb 19 D.Wong: Implemented centralized I/O approach, removed all MY_N
 C                     clauses
+C   11 Dec 19 S.L.Napelenok: ddm-3d implementation for version 5.3.1
+
 C-----------------------------------------------------------------------
 
       USE GRID_CONF            ! horizontal & vertical domain specifications
       USE CGRID_SPCS           ! CGRID mechanism species
       USE UTILIO_DEFN
-      USE RXNS_DATA, ONLY : MECHNAME
       USE AERO_DATA, only : CHECK_AERO_ICBC, N_MODE
       use CENTRALIZED_IO_MODULE, only : interpolate_var, window
+      use RUNTIME_VARS, only : BC_AERO_M2WET, BC_AERO_M2USE
+#ifdef sens
+      USE DDM3D_DEFN, ONLY:SENGRID, NPMAX, NP, BSEN, SEN_PAR, BCS
+#endif 
 
       IMPLICIT NONE
  
 C Includes:
-      INCLUDE SUBST_CONST      ! constants
       INCLUDE SUBST_FILES_ID   ! file name parameters
 
 C Arguments:
@@ -70,7 +75,7 @@ C Arguments:
       INTEGER, INTENT( IN ) :: TSTEP       ! timestep
       INTEGER, INTENT( IN ) :: LVL         ! layer
       REAL,    INTENT( OUT ) :: BCON( :,: ) ! boundary concentrations
-      LOGICAL, INTENT( INOUT ) :: LSTAT       ! Flag for identifying Aerosol BC flaws
+      LOGICAL, INTENT( INOUT ) :: L_WRITE_WARNING ! Write Aerosol BC Warning
 
 C Parameters:
       REAL, PARAMETER :: KGPMG = 1.0E-09  ! Kg / micro-gram
@@ -104,15 +109,9 @@ C Local variables:
 
       CHARACTER( 96 )  :: XMSG = ' '
       CHARACTER( 199 ) :: XMSG2 = ' '
-      INTEGER          :: STAT
+      INTEGER          :: STAT( N_MODE )
 
       INTEGER, SAVE :: N_SPC_ADV
-      INTEGER       :: LMODE    !Identifies the problematic mode from
-                                !the BC Check routine
-      REAL          :: AER_PAR( 2, N_MODE,5 )  !Modal parameter after the BC 
-                                               !check (N, dg, sg)
-                                               !      (N, M2, M3) - Before
-                                               !      (N, M2, M3) - After
 
       INTEGER   MDATE             ! mid-advection date
       INTEGER   MTIME             ! mid-advection time
@@ -124,6 +123,12 @@ C Local variables:
       INTEGER   ALLOCSTAT
 
       INTEGER   COUNT             ! Counter for constructing boundary arrays
+
+#ifdef sens
+      INTEGER SENNUM
+      CHARACTER(16 ) :: SNAME    ! Name of sens bc parameter
+      CHARACTER( 16 ), ALLOCATABLE, SAVE :: S_BCNAME( :,: )
+#endif
 
       INTERFACE
          SUBROUTINE ADVBC_MAP( CONCMIN, BCNAME, BCFAC, ONFILE )
@@ -197,6 +202,23 @@ C create advected species map to bc`s
             END IF
 
          END IF
+
+#ifdef sens
+         ALLOCATE ( S_BCNAME( N_SPC_ADV,NPMAX ), STAT = ALLOCSTAT )
+         IF ( ALLOCSTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating S_BCNAME'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+
+         IF ( BCS ) THEN
+            DO NP = 1, NPMAX
+               FINI = N_GC_TRNS + N_AE_TRNS + N_NR_TRNS + N_TR_ADV
+               DO VAR = 1, FINI
+                  S_BCNAME( VAR,NP ) = TRIM( BCNAME( VAR ) ) // '_' // SEN_PAR( NP )
+               END DO
+            END DO
+         ENDIF
+#endif
 
       END IF                    ! if FIRSTIME
 
@@ -343,7 +365,7 @@ C Read & interpolate boundary concentrations
                BCON( 1:NBNDY,VAR ) = BCON( 1:NBNDY,VAR ) * KGPMG
             END IF
                 
-         ELSE
+         ELSE                                
             BCON( 1:NBNDY,VAR ) = CMIN
          END IF
 151   CONTINUE
@@ -351,25 +373,13 @@ C Read & interpolate boundary concentrations
       WHERE( BCON .NE. BCON ) BCON = 0.0
 
       !Check Aerosol Size Distributions and Warn 
-      !the User if They Are Not Robust
+      !the User if They Are Not Robust.
+      !This routine outputs aerosol surface area consistent with
+      !the BC_AERO_M2WET specification.
       DO BND = 1,NBNDY
-        CALL CHECK_AERO_ICBC( BCON( BND,STRT:FINI ), .FALSE., STAT, AER_PAR, LMODE )
-        IF ( STAT .GT. 0 ) THEN
-          LSTAT = .TRUE.
-#ifdef verbose_rdbcon
-          WRITE ( LOGDEV,'(7x,A55,I1,/,7x,A20,I1,A42,/,9x,A51,/,9x,A22,I4,2x,I2,/,
-     &                 9x,A19,1x,A3,8x,A2,8x,A2,8x,A2,8x,A2,/,
-     &                 27x,E8.1,1x,E8.1,1x,E8.1,1x,E8.1,4x,F4.1,/,
-     &                 9x,A19,1x,A3,8x,A2,8x,A2,8x,A2,8x,A2,/,
-     &                 27x,E8.1,1x,E8.1,1x,E8.1,1x,E8.1,4x,F4.1)'),
-     &               'Warning: Applying Aerosol Boundary Conditions for mode ',LMODE,
-     &               'The Offending Mode (',LMODE,') had diameter and/or sigma out of bounds.',
-     &               'It was overwritten by changing the Num and SrfArea.',
-     &               'Grid Cell(Horz,Vert): ',BND, LVL,
-     &               'Modal Props Before:','Num','M2','M3','Dg','Sg',(AER_PAR(1,LMODE,j),j=1,5),
-     &               'Modal Props After: ','Num','M2','M3','Dg','Sg',(AER_PAR(2,LMODE,j),j=1,5)
-#endif
-        ENDIF
+        CALL CHECK_AERO_ICBC( BCON( BND,STRT:FINI ), BC_AERO_M2WET,
+     &                        BC_AERO_M2USE, .TRUE., 
+     &                        L_WRITE_WARNING,1,BND,LVL )
       END DO
 
 #ifdef verbose_rdbcon
@@ -457,6 +467,130 @@ C for advecting Air Density X Jacobian
       DO BND = 1, NBNDY
          BCON( BND,N_SPC_ADV ) = RHOJ_BND( BND,LVL )
       END DO
+
+#ifdef sens
+C Initialize BSEN as zero, if flag is set for using bc files, use those,
+C otherwise skip all of this.'
+
+      BSEN = 0.0
+
+c     IF ( BCS ) THEN
+c        DO NP = 1, NPMAX
+
+c           STRT = 1
+c           FINI = N_GC_TRNS
+c           DO 241 VAR = STRT, FINI
+c              IF ( ONFILE( VAR ) ) THEN
+c                 BBUF = 0.0   ! array assignment
+c                 IF ( .NOT. INTERPB( BNDY_SENS_1, S_BCNAME( VAR,NP ), PNAME,
+c    &                                MDATE, MTIME, NBNDY*NLAYS, BBUF ) ) THEN
+c                    XMSG = 'Could not read ' // TRIM( S_BCNAME( VAR,NP ) ) // ' from '
+c    &                    // BNDY_SENS_1
+c                    CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+c                 ELSE   ! found bc's (PPM) on file; convert
+c                    DO BND = 1, NBNDY
+c                       BSEN( BND,VAR,NP ) = BCFAC( VAR ) * BBUF( BND,LVL )
+c    &                                     * RHOJ_BND( BND,LVL )
+c                    END DO
+c                 END IF
+c              ELSE
+c                 DO BND = 1, NBNDY
+c                    BSEN( BND,VAR,NP ) = 0.0
+c                 END DO
+c              END IF
+c241         CONTINUE
+
+c           SPC = 0
+c           STRT = N_GC_TRNS + 1
+c           FINI = N_GC_TRNS + N_AE_TRNS
+c           DO 251 VAR = STRT, FINI
+c              SPC = SPC + 1
+c              IF ( ONFILE( VAR ) ) THEN
+c                 BBUF = 0.0   ! array assignment
+c                 IF ( .NOT. INTERPB ( BNDY_SENS_1, S_BCNAME( VAR,NP ), PNAME,
+c    &                                 MDATE, MTIME, NBNDY*NLAYS, BBUF ) ) THEN
+c                    XMSG = 'Could not read ' // TRIM( S_BCNAME ( VAR,NP ) ) // ' from '
+c    &                    // BNDY_SENS_1
+c                    CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+c                 ELSE   ! found bc's (microgram/m**3, m**2/m**3, or number/m**3)
+c                           ! on file; convert
+c                    IF ( AE_TRNS( SPC )( 1:3 ) .EQ. 'NUM' ) THEN
+c                       DO BND = 1, NBNDY
+c                          BSEN( BND,VAR,NP ) = BCFAC( VAR ) * BBUF( BND,LVL )
+c    &                                        * JACOBM_BND( BND,LVL )
+c                       END DO
+c                    ELSE IF ( AE_TRNS( SPC )( 1:3 ) .EQ. 'SRF' ) THEN
+c                       DO BND = 1, NBNDY
+c                          BSEN( BND,VAR,NP ) = BCFAC( VAR ) * BBUF( BND,LVL )
+c    &                                        * JACOBM_BND( BND,LVL )
+c                       END DO
+c                    ELSE
+c                       DO BND = 1, NBNDY
+c                          BSEN( BND,VAR,NP ) = BCFAC( VAR ) * BBUF( BND,LVL ) * KGPMG
+c    &                                        * JACOBM_BND( BND,LVL )
+c                       END DO
+c                    END IF
+c                 END IF
+c              ELSE
+c                 DO BND = 1, NBNDY
+c                    BSEN( BND,VAR,NP ) = 0.0
+c                 END DO
+c              END IF
+c251         CONTINUE
+
+c           STRT = N_GC_TRNS + N_AE_TRNS + 1
+c           FINI = N_GC_TRNS + N_AE_TRNS + N_NR_TRNS
+c           DO 261 VAR = STRT, FINI
+c              IF ( ONFILE( VAR ) ) THEN
+c                 BBUF = 0.0   ! array assignment
+c                 IF ( .NOT. INTERPB ( BNDY_SENS_1, S_BCNAME( VAR,NP ), PNAME,
+c    &                                 MDATE, MTIME, NBNDY*NLAYS, BBUF ) ) THEN
+c                    XMSG = 'Could not read ' // TRIM( S_BCNAME( VAR,NP ) ) // ' from '
+c    &                    // BNDY_SENS_1
+c                    CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+c                    ELSE   ! found bc's (PPM) on file; convert
+c                    DO BND = 1, NBNDY
+c                       BSEN( BND,VAR,NP ) = BCFAC( VAR ) * BBUF( BND,LVL )
+c    &                                     * RHOJ_BND( BND,LVL )
+c                       END DO
+c                    END IF
+c              ELSE
+c                 DO BND = 1, NBNDY
+c                    BSEN( BND,VAR,NP ) = 0.0
+c                 END DO
+c              END IF
+c261         CONTINUE
+
+c           STRT = N_GC_TRNS + N_AE_TRNS + N_NR_TRNS + 1
+c           FINI = N_GC_TRNS + N_AE_TRNS + N_NR_TRNS + N_TR_ADV
+c           DO 271 VAR = STRT, FINI
+c              IF ( ONFILE( VAR ) ) THEN
+c                 BBUF = 0.0   ! array assignment
+c                 IF ( .NOT. INTERPB ( BNDY_SENS_1, S_BCNAME( VAR,NP ), PNAME,
+c    &                                 MDATE, MTIME, NBNDY*NLAYS, BBUF ) ) THEN
+c                    XMSG = 'Could not read ' // TRIM( S_BCNAME( VAR,NP ) ) // ' from '
+c    &                    // BNDY_SENS_1
+c                    CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+c                 ELSE   ! found bc's (PPM) on file; convert
+c                    DO BND = 1, NBNDY
+c                       BSEN( BND,VAR,NP ) = BCFAC( VAR ) * BBUF( BND,LVL )
+c    &                                     * RHOJ_BND( BND,LVL )
+c                    END DO
+c                 END IF
+c              ELSE
+c                 DO BND = 1, NBNDY
+c                    BSEN( BND,VAR,NP ) = 0.0
+c                 END DO
+c              END IF
+c271         CONTINUE
+
+c           DO BND = 1, NBNDY
+c              BSEN( BND,N_SPC_ADV,NP ) = 0.0
+c           END DO
+
+c        END DO
+c     ENDIF
+#endif
 
       RETURN
       END

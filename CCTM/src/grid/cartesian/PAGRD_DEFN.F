@@ -71,9 +71,6 @@ C column and row range for each processor
 C Conc difference for a science process
       REAL, ALLOCATABLE, SAVE :: DELC( :,:,:,: )
 
-C previous Conc in a science process
-      REAL, ALLOCATABLE, SAVE :: CSAV( :,:,:,: )
-
 C Array for outputting IRR results
       REAL, ALLOCATABLE, SAVE :: IRROUT( :,:,:,: )
 
@@ -85,10 +82,12 @@ C Buffer for writing IRR results
 
          USE GRID_CONF           ! horizontal & vertical domain specifications
          USE UTILIO_DEFN
+#ifndef mpas
 #ifdef parallel
          USE SE_MODULES          ! stenex (using SE_UTIL_MODULE)
 #else
          USE NOOP_MODULES        ! stenex (using NOOP_UTIL_MODULE)
+#endif
 #endif
          USE PA_DEFN             ! Process Anaylsis control and data variables
 
@@ -131,6 +130,7 @@ C Retrieve the process analysis subdomain dimensions:
                   SUCCESS = .FALSE.; RETURN
                END IF
 
+#ifndef mpas
 C Determine IPR subgrid mapping with data redistribution
                CALL SUBST_SUBGRID_INDEX
      &             ( PA_BEGCOL, PA_ENDCOL, PA_BEGROW, PA_ENDROW,
@@ -141,6 +141,7 @@ C Determine IPR subgrid mapping with data redistribution
                PACOLS = PA_ENDCOL - PA_BEGCOL + 1
                PAROWS = PA_ENDROW - PA_BEGROW + 1
                PALEVS = PA_ENDLEV - PA_BEGLEV + 1
+#endif
 
                ALLOCATE ( NCOLS_PE( NPROCS ),
      &                    NROWS_PE( NPROCS ), STAT = ALST )
@@ -175,24 +176,18 @@ C Construct the processor-to-subdomain map for IPR domain
                      SUCCESS = .FALSE.; RETURN
                   END IF
 
-                  ALLOCATE ( CSAV( MY_PACOLS,MY_PAROWS,PALEVS,NCSAVE ),
-     &                       STAT = ALST )
-                  IF ( ALST .NE. 0 ) THEN
-                     XMSG = '*** CSAV Memory allocation failed'
-                     CALL M3WARN ( PNAME, 0, 0, XMSG )
-                     SUCCESS = .FALSE.; RETURN
-                  END IF
-
                END IF
 
                IF ( LIRR ) THEN
 
 C Determine IRR subgrid mapping without data redistribution
+#ifndef mpas
                   CALL SUBST_SUBGRID_INDEX
      &                ( PA_BEGCOL, PA_ENDCOL, PA_BEGROW, PA_ENDROW,
      &                  PA_BEGLEV, PA_ENDLEV,
      &                  MY_IRR_BEGCOL, MY_IRR_ENDCOL, MY_IRR_BEGROW,
      &                  MY_IRR_ENDROW, MY_IRR_BEGLEV, MY_IRR_ENDLEV, 'N' )
+#endif
 
                   X1F0 = ( NCOLS / GL_NCOLS ) * ( NROWS / GL_NROWS )
                   IRCOLS = X1F0 * PACOLS + ( 1 - X1F0 ) * NCOLS

@@ -1,7 +1,7 @@
 #! /bin/csh -f
 
-# ====================== COMBINE_v5.3.1 Run Script =================== 
-# Usage: run.combine.uncoupled.csh >&! combine_v531_uncoupled.log &                                
+# ====================== COMBINE_v5.4.X Run Script =================== 
+# Usage: run.combine.uncoupled.csh >&! combine.log &                                
 #
 # To report problems or request help with this script/program:     
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -21,32 +21,32 @@
  source ./config_cmaq.csh
        
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v531               #> Code Version
+ set VRSN      = v54              #> Code Version
  set PROC      = mpi               #> serial or mpi
  set MECH      = cb6r3_ae7_aq      #> Mechanism ID
- set APPL      = SE531BENCH         #> Application Name (e.g. Gridname)
+ set APPL      = Bench_2016_12SE1        #> Application Name (e.g. Gridname)
                                                       
 #> Define RUNID as any combination of parameters above or others. By default,
 #> this information will be collected into this one string, $RUNID, for easy
 #> referencing in output binaries and log files as well as in other scripts.
- setenv RUNID  ${VRSN}_${compilerString}_${APPL}
+ set RUNID = ${VRSN}_${compilerString}_${APPL}
 
 #> Set the build directory if this was not set above 
 #> (this is where the CMAQ executable is located by default).
  if ( ! $?BINDIR ) then
-  setenv BINDIR $CMAQ_HOME/POST/combine/scripts/BLD_combine_${VRSN}_${compilerString}
+  set BINDIR = $CMAQ_HOME/POST/combine/scripts/BLD_combine_${VRSN}_${compilerString}
  endif
 
 #> Set the name of the executable.
- setenv EXEC combine_${VRSN}.exe
+ set EXEC = combine_${VRSN}.exe
 
 #> Set location of CMAQ repo.  This will be used to point to the correct species definition files.
- setenv REPO_HOME  ${CMAQ_REPO}
+ set REPO_HOME = ${CMAQ_REPO}
 
 #> Set working, input and output directories
- setenv METDIR     ${CMAQ_DATA}/$APPL/met/mcip            #> Met Output Directory
- setenv CCTMOUTDIR ${CMAQ_DATA}/output_CCTM_${RUNID}      #> CCTM Output Directory
- setenv POSTDIR    ${CMAQ_DATA}/POST                      #> Location where combine file will be written
+ set METDIR     = ${CMAQ_DATA}/$APPL/met/mcip            #> Met Output Directory
+ set CCTMOUTDIR = ${CMAQ_DATA}/output_CCTM_${RUNID}      #> CCTM Output Directory
+ set POSTDIR    = ${CMAQ_DATA}/POST                      #> Location where combine file will be written
 
   if ( ! -e $POSTDIR ) then
 	  mkdir $POSTDIR
@@ -63,8 +63,8 @@
  set END_DATE   = "2016-07-14"     #> ending date    (July 14, 2016)
  
 #> Set location of species definition files for concentration and deposition species.
- setenv SPEC_CONC $REPO_HOME/POST/combine/scripts/spec_def_files/SpecDef_${MECH}.txt
- setenv SPEC_DEP  $REPO_HOME/POST/combine/scripts/spec_def_files/SpecDef_Dep_${MECH}.txt
+ setenv SPEC_CONC $CMAQ_HOME/POST/combine/scripts/spec_def_files/SpecDef_${MECH}.txt
+ setenv SPEC_DEP  $CMAQ_HOME/POST/combine/scripts/spec_def_files/SpecDef_Dep_${MECH}.txt
 
 #> Use GENSPEC switch to generate a new specdef file (does not generate output file).
  setenv GENSPEC N
@@ -99,11 +99,11 @@
   #> Define name of input files needed for combine program.
   #> File [1]: CMAQ conc/aconc file
   #> File [2]: MCIP METCRO3D file
-  #> File [3]: CMAQ APMDIAG file
+  #> File [3]: CMAQ AELMO file
   #> File [4]: MCIP METCRO2D file
    setenv INFILE1 $CCTMOUTDIR/CCTM_ACONC_${RUNID}_$YYYY$MM$DD.nc
    setenv INFILE2 $METDIR/METCRO3D_$YY$MM$DD.nc
-   setenv INFILE3 $CCTMOUTDIR/CCTM_APMDIAG_${RUNID}_$YYYY$MM$DD.nc
+   setenv INFILE3 $CCTMOUTDIR/CCTM_AELMO_${RUNID}_$YYYY$MM$DD.nc
    setenv INFILE4 $METDIR/METCRO2D_$YY$MM$DD.nc
 
   #> Executable call:
@@ -154,6 +154,12 @@
 
   #> Executable call:
    ${BINDIR}/${EXEC}
+
+   set progstat = ${status}
+   if ( ${progstat} ) then
+     echo "ERROR ${progstat} in $BINDIR/$EXEC"
+     exit( ${progstat} )
+   endif
 
   #> Increment both Gregorian and Julian Days
    set TODAYG = `date -ud "${TODAYG}+1days" +%Y-%m-%d` #> Add a day for tomorrow

@@ -31,11 +31,14 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 !      USE HGRD_DEFN             ! horizontal domain specifications
       USE GRID_CONF
-      USE SA_LAYERS
+c     USE SA_LAYERS
       USE SA_DEFN               ! Mc06
       USE UTILIO_DEFN           ! replaces ioparms, iofdesc, iodecl
 c     USE SUBST_MODULES         ! stenex
       USE RXNS_DATA, ONLY : MECHNAME !Get Chemical Mechanism Name
+      USE RUNTIME_VARS
+      USE MIO_ASCII
+
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
@@ -92,36 +95,39 @@ Ckrt Create variable names for tag output
 
         LOGDEV = INIT3()
 
+        IF ( ISAM_ELEV .EQ. -1 ) ISAM_ELEV = NLAYS
+        SA_NLAYS = ISAM_ELEV - ISAM_BLEV + 1
+
         ALLOCATE( VNAME(NSPC_SA,NTAG_SA) )
         VNAME = ''
         JSPCTAG = 0
         DO ITAG = 1, NTAG_SA
           DO JSPC = 1, NSPC_SA
             JSPCTAG = JSPCTAG + 1
-            LENGTH = LEN_TRIM( SPC_NAME( JSPC,ITAG ) )
+            LENGTH = LEN_TRIM( ISAM_SPEC( JSPC,ITAG ) )
             IF ( LENGTH .GT. 0 ) THEN
-              TEMP = SPC_NAME( JSPC,ITAG )( 1:LENGTH )
+              TEMP = ISAM_SPEC( JSPC,ITAG )( 1:LENGTH )
               ALLOCATE ( SPECIE_NAME( LENGTH ) )
               DO N = 1, LENGTH
                 SPECIE_NAME(N:N) = TEMP(N:N)
               ENDDO
               IF ( ITAG .EQ. BCONTAG ) THEN
-                CSUFFX = 'BCON            '
+                CSUFFX = 'BCO             '
                 CALL WR_VARNAME( SPECIE_NAME, LENGTH, NTAG_SA, NSPC_SA,
      &             CSUFFX, VNAME( JSPC,ITAG ) )
               ELSEIF ( ITAG .EQ. OTHRTAG ) THEN
-                CSUFFX = 'OTHR            '
+                CSUFFX = 'OTH             '
                 CALL WR_VARNAME( SPECIE_NAME, LENGTH, NTAG_SA, NSPC_SA,
      &             CSUFFX, VNAME( JSPC,ITAG ) )
               ELSEIF ( ITAG .EQ. ICONTAG ) THEN
-                CSUFFX = 'ICON            '
+                CSUFFX = 'ICO             '
                 CALL WR_VARNAME( SPECIE_NAME, LENGTH, NTAG_SA, NSPC_SA,
      &             CSUFFX, VNAME( JSPC,ITAG ) )
               ELSE
                 CALL WR_VARNAME( SPECIE_NAME, LENGTH, NTAG_SA, NSPC_SA,
      &             TAGNAME(ITAG), VNAME( JSPC,ITAG ) )
               ENDIF ! Is itag bcon, othr, icon, or emis ?
-!              WRITE(LOGDEV,'(I3,2(1X,I2),2(1X,A16))')JSPCTAG,JSPC,ITAG,SPC_NAME( JSPC,ITAG ),VNAME( JSPC,ITAG )
+!              WRITE(LOGDEV,'(I3,2(1X,I2),2(1X,A16))')JSPCTAG,JSPC,ITAG,ISAM_SPEC( JSPC,ITAG ),VNAME( JSPC,ITAG )
               DEALLOCATE ( SPECIE_NAME )
             ENDIF ! length > 0?
           ENDDO ! jspc
@@ -180,8 +186,10 @@ cyqw    TSTEP3D = TSTEP(1)
         VGTOP3D = VGTOP_GD
 
 
-        DO L = ISAM_BLEV, ISAM_ELEV !1, NLAYS3D + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
+        K = 0
+        DO L = ISAM_BLEV, ISAM_ELEV
+           K = 1 + K
+           VGLVS3D( K ) = VGLVS_GD( L )
         END DO
 
 !       GDNAM3D = GDNAME_GD
@@ -192,6 +200,19 @@ cyqw    TSTEP3D = TSTEP(1)
             FDESC3D( L ) = ' '
         END DO
    
+        ! Store MIO Metadata
+        NDIMS3D( 1:NVARS3D ) = 4
+        L_TSTEP( 1:NVARS3D ) = .True.
+        L_LAY  ( 1:NVARS3D ) = .True.
+        L_COL  ( 1:NVARS3D ) = .True.
+        L_ROW  ( 1:NVARS3D ) = .True.
+        L_VEXT ( 1:NVARS3D ) = .False.
+
+        CALL LOAD_MIO_FILE ( FILE_NAME, NLAYS3D, ISAM_BLEV, ISAM_ELEV,
+     &       VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &       VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &       L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &       L_VEXT(1:NVARS3D) )
                
         IF ( MYPE .EQ. 0 ) THEN
 !           CALL M3EXIT( 'OP_SA', 0, 0, 'Fatal Error Encountered', XSTAT2 )
@@ -212,8 +233,10 @@ Ckrt...Write initial conditions to sa_conc_1 ( or last hour sa_cgrid_1 )
 C
          ! print *, S, N_SPCTAG,ISAM_BLEV, ISAM_ELEV
           DO S = 1, N_SPCTAG
+            K = 0
             DO L = ISAM_BLEV, ISAM_ELEV
-              ISAM_BUFF( :,:,L,S ) = ISAM( :,:,L,S_SPCTAG(S),T_SPCTAG(S) )
+              K = K + 1
+              ISAM_BUFF( :,:,K,S ) = ISAM( :,:,L,S_SPCTAG(S),T_SPCTAG(S) )
             ENDDO
           END DO ! loop over total tags
           IF ( .NOT. WRITE3( FILE_NAME, ALLVAR3, JDATE, JTIME, 
@@ -223,8 +246,8 @@ C
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
           END IF
           if ( MYPE .eq. 0 ) then
-            print*,'Finished write3 S =',S
-            print*,'While N_SPCTAG =',N_SPCTAG
+            !print*,'Finished write3 S =',S
+            !print*,'While N_SPCTAG =',N_SPCTAG
           endif
           DEALLOCATE( ISAM_BUFF )
 

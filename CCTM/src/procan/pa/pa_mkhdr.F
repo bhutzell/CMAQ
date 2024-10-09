@@ -30,6 +30,7 @@ C   16 Sep 16 J.Young: update for inline procan
       USE UTILIO_DEFN
       USE PA_DEFN               ! Process Anaylsis control and data variables
       USE PAGRD_DEFN            ! PA horiz domain specs
+      USE MIO_ASCII
 
       IMPLICIT NONE
 
@@ -62,6 +63,7 @@ C Local Variables:
 
 C-----------------------------------------------------------------------
 
+#ifndef mpas
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C  Get file header description from GRID_CONF and reconfigure output domain
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -83,8 +85,6 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       FTYPE3D = GRDDED3
       GDNAM3D = GDNAME_GD
       UPNAM3D = PNAME
-!     EXECN3D = '????????'
-!     UPDSC3D =
 
       SDATE3D = SDATE
       STIME3D = STIME
@@ -112,32 +112,22 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             VARINDX = ( NFL - 1 ) * MXVARS3 + NOUT
             VNAME3D( NOUT ) = IPRNAME( VARINDX )
             VTYPE3D( NOUT ) = M3REAL
+            VDESC3D( NOUT ) = IPRDESC( VARINDX )
 
-C..Find the IPR species to set correct units descriptor
-            DO NSP = 1, N_IPR_SPC
-               DO NPR = 1, NPRCS
-                  IF ( VARINDX .EQ. IPROUT( NSP, NPR ) ) THEN
-                     IPRSPC = NSP
-                     EXIT
-                  END IF
-               END DO
-            END DO
+            ! Find the IPR species to set correct units descriptor
+            IPRSPC = MAP_IPRVARtoSPC( VARINDX )
+            ICG = MAP_IPRtoCGRID( IPRSPC, 1 )
 
-            ICG = IPR2GRD( IPRSPC, 1 )
-            UNITS3D( NOUT ) = 'ppmV'
-
-            IF ( ICG .GE. AE_STRT .AND. ICG .LT. NR_STRT ) THEN
-               AE_INDX = ICG - AE_STRT + 1
-               IF ( AE_SPC( AE_INDX ) ( 1 : 3 ) .EQ. 'NUM' ) THEN
-                  UNITS3D( NOUT ) = 'm-3'
-               ELSE IF ( AE_SPC( AE_INDX ) ( 1 : 3 ) .EQ. 'SRF' ) THEN
-                  UNITS3D( NOUT ) = 'm2 m-3'
-               ELSE
-                  UNITS3D( NOUT ) = 'ug m-3'
-               END IF
+            IF ( CGRID_MASK_NUM( ICG ) ) THEN
+               UNITS3D( NOUT ) = 'm-3'
+            ELSE IF ( CGRID_MASK_SRF( ICG ) ) THEN
+               UNITS3D( NOUT ) = 'm2 m-3'
+            ELSE IF ( CGRID_MASK_AERO( ICG ) ) THEN
+               UNITS3D( NOUT ) = 'ug m-3'
+            ELSE 
+               UNITS3D( NOUT ) = 'ppmV'
             END IF
 
-               VDESC3D( NOUT ) = IPRDESC( VARINDX )
          END DO
 
       ELSE IF ( TYPE .EQ. 'IRR' ) THEN
@@ -159,6 +149,23 @@ C..Find the IPR species to set correct units descriptor
      &        'Incorrect process analysis type specified', 2 )
 
       END IF
+
+      ! Store MIO Metadata
+      NDIMS3D( 1:NVARS3D ) = 4
+      L_TSTEP( 1:NVARS3D ) = .True.
+      L_LAY  ( 1:NVARS3D ) = .True.
+      L_COL  ( 1:NVARS3D ) = .True.
+      L_ROW  ( 1:NVARS3D ) = .True.
+      L_VEXT ( 1:NVARS3D ) = .False.
+
+      CALL LOAD_MIO_FILE ( OUTFNAME, NLAYS3D, PA_BEGLEV, PA_ENDLEV,
+     &     VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &     VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &     L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &     L_VEXT(1:NVARS3D) )
+
+
+#endif
 
       RETURN
       END

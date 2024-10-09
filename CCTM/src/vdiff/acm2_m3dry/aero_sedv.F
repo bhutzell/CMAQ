@@ -35,7 +35,8 @@ C-----------------------------------------------------------------------
       use utilio_defn      
       use asx_data_mod, Only: Met_Data
       use aero_data           ! aero variable data
-      use aeromet_data        ! Includes CONST.EXT
+      use aeromet_data
+      use const, only: stdatmpa, grav        
 
       implicit none
 
@@ -184,7 +185,11 @@ C Set meteorological data for the grid cell.
 C extract grid cell concentrations of aero species from CGRID
 C into aerospc_conc in aero_data module
 C Also converts dry surface area to wet 2nd moment
+#ifdef sens
+         call extract_aero( cgrd( l,: ), .true., cgrd( :,: ), .false. )
+#else
          call extract_aero( cgrd( l,: ), .true. )  ! set minimum floor
+#endif
 
 C Get the geometric mean diameters and standard deviations of the
 C "wet" size distribution
@@ -246,7 +251,8 @@ C Calculate settling velocity for Aitken, accumulation, and coarse modes.
 C-----------------------------------------------------------------------
 
       use asx_data_mod, Only: Met_Data
-      use aeromet_data   ! Includes CONST.EXT
+      use aeromet_data   
+      use const, only: grav
 
       implicit none
 

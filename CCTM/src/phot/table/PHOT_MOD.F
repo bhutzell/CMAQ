@@ -29,6 +29,8 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       REAL, ALLOCATABLE  :: RJ    ( :, :, :, : ) ! average grid cell J-values (min-1)
       REAL, ALLOCATABLE  :: RJ_RES( :, :, :, : ) ! resolved cloud J-values (min-1)
       REAL, ALLOCATABLE  :: RJ_SUB( :, :, :, : ) ! subgrid cloud J-values (min-1)
+      REAL, ALLOCATABLE  :: CFRAC_2D_AVE( :,: )  ! layer averaged 3D fractional cloud coverage
+
 
 !      REAL, ALLOCATABLE  :: ETOT_SFC_WL ( :,:,: )  ! total downward irradiance at sfc [ Watts / m**2  ]
       
@@ -47,6 +49,10 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER :: LACETONE_CO     = 0 
       INTEGER :: LACETONE_CH3CO  = 0
       
+      ! Variables passed to the PM diagnostic output module, ELMO
+      REAL, ALLOCATABLE, SAVE :: ELMO_AOD_550( :,: )   ! total aerosol optical depth at 550 nm (Angstrom Interpolation)
+      REAL, ALLOCATABLE, SAVE :: ELMO_EXT_550( :,:,: ) ! aerosol extinction at 550 nm for layer [1/m]
+
       CONTAINS
       
       SUBROUTINE INIT_PHOT_SHARED()

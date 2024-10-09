@@ -32,8 +32,8 @@ git is a version control system that supports distributed workflows.  Every Git 
     1. Create a github account https://github.com/
     2. Go to the EPA github site and Fork your own copy of the EPA CMAQ to your github account
     3. create a directory called CMAQv5.3 on the machine where you would like to obtain a copy of the code
-    4. `git clone -b master https://github.com/<your github name>/CMAQ.git CMAQ_REPO` - Get a clone or copy of the master branch of the CMAQ repository from your github site.
-    5.  This will place a copy of the files from the master branch into the CMAQv5.3/CMAQ_REPO directory
+    4. `git clone -b main https://github.com/<your github name>/CMAQ.git CMAQ_REPO` - Get a clone or copy of the main branch of the CMAQ repository from your github site.
+    5.  This will place a copy of the files from the main branch into the CMAQv5.3/CMAQ_REPO directory
     6.  `cd CMAQv5.3/CMAQ_REPO` go into the CMAQv5.3/CMAQ_REPO directory
     7. `git status`   To confirm the status of the files in the repository and the branch that is currently checked out
     8. `git checkout -b 5.3_update` To copy the 5.3 branch into a new branch called 5.3_update
@@ -944,10 +944,6 @@ setenv CTM_EMISCHK N         #> Abort CMAQ if missing surrogates from emissions 
 
 #> Aerosol Diagnostic Controls
 setenv CTM_AVISDIAG Y        #> Aerovis diagnostic file [ default: N ]
-setenv CTM_PMDIAG Y          #> What is this [ default: Y ]
-setenv CTM_APMDIAG Y         #> What is this [ default: Y ]
-setenv APMDIAG_BLEV_ELEV "1 3" #> layer range for average pmdiag
-setenv APMDIAG_BLEV_ELEV ""  #> layer range for average pmdiag = NLAYS
 setenv AVG_FILE_ENDTIME N    #> What is this [ default: N ]
 
 #> Diagnostic Output Flags
@@ -1012,13 +1008,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Initial conditions
   if ($NEW_START == true || $NEW_START == TRUE ) then
      setenv ICFILE ICON_20110630_bench.nc
-     setenv INITIAL_RUN Y #related to restart soil information file
      rm -rf $LOGDIR/CTM_LOG*${RUNID}*  # Remove all Log Files Since this is a new start
      mkdir -p $OUTDIR
   else
      set ICpath = $OUTDIR
      setenv ICFILE CCTM_CGRID_${RUNID}_${YESTERDAY}.nc
-     setenv INITIAL_RUN N
   endif
 
   #> Boundary conditions
@@ -1100,9 +1094,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      setenv BIOSEASON  $IN_BEISpath/bioseason.12US1.2006.09apr2012_bench.nc #> ignore season switch file if BIOSW_YN = N
      setenv SUMMER_YN  N     #> Use summer normalized emissions? [ default: Y ]
      setenv PX_VERSION Y     #> MCIP is PX version? [ default: N ]
-     setenv INITIAL_RUN Y    #> non-existent or not using SOILINP [ default: N ]; default uses SOILINP
      setenv SOILINP    $OUTDIR/CCTM_SOILOUT_${RUNID}_${YESTERDAY}.nc
-                             #> Biogenic NO soil input file; ignore if INITIAL_RUN = Y
+                             #> Biogenic NO soil input file; ignore if NEW_START = TRUE
   endif
 
   #> Windblown dust emissions configuration
@@ -1151,8 +1144,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_WET_DEP_2   "$OUTDIR/CCTM_WETDEP2_${CTM_APPL}.nc -v"    #> Wet Dep From SubGrid Clouds
   setenv CTM_VIS_1       "$OUTDIR/CCTM_PMVIS_${CTM_APPL}.nc -v"      #> On-Hour Visibility
   setenv CTM_AVIS_1      "$OUTDIR/CCTM_APMVIS_${CTM_APPL}.nc -v"     #> Hourly-Averaged Visibility
-  setenv CTM_PMDIAG_1    "$OUTDIR/CCTM_PMDIAG_${CTM_APPL}.nc -v"     #> On-Hour Particle Diagnostics
-  setenv CTM_APMDIAG_1   "$OUTDIR/CCTM_APMDIAG_${CTM_APPL}.nc -v"    #> Hourly Avg. Particle Diagnostic
+  setenv CTM_ELMO_1      "$OUTDIR/CCTM_ELMO_${CTM_APPL}.nc -v"       #> On-Hour Particle Diagnostics
+  setenv CTM_AELMO_1     "$OUTDIR/CCTM_AELMO_${CTM_APPL}.nc -v"      #> Hourly Avg. Particle Diagnostic
   setenv CTM_RJ_1        "$OUTDIR/CCTM_PHOTDIAG1_${CTM_APPL}.nc -v"  #> Photolysis Rxn Diagnostics
   setenv CTM_RJ_2        "$OUTDIR/CCTM_PHOTDIAG2_${CTM_APPL}.nc -v"  #> Photolysis Rates Output
   setenv CTM_SSEMIS_1    "$OUTDIR/CCTM_SSEMIS.${CTM_APPL}.nc -v"     #> Sea Spray Emissions
@@ -1183,7 +1176,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set log_test = `ls CTM_LOG_???.${CTM_APPL}`
   set OUT_FILES = "${FLOOR_FILE} ${S_CGRID} ${CTM_CONC_1} ${A_CONC_1} ${MEDIA_CONC}         \
              ${CTM_DRY_DEP_1} $CTM_DEPV_DIAG $CTM_PT3D_DIAG $B3GTS_S $SOILOUT $CTM_WET_DEP_1\
-             $CTM_WET_DEP_2 $CTM_VIS_1 $CTM_AVIS_1 $CTM_PMDIAG_1 $CTM_APMDIAG_1             \
+             $CTM_WET_DEP_2 $CTM_VIS_1 $CTM_AVIS_1 $CTM_ELMO_1 $CTM_AELMO_1             \
              $CTM_RJ_1 $CTM_RJ_2 $CTM_SSEMIS_1 $CTM_DUST_EMIS_1 $CTM_IPR_1 $CTM_IPR_2       \
              $CTM_IPR_3 $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_DRY_DEP_MOS                   \
              $CTM_DRY_DEP_FST $CTM_DEPV_MOS $CTM_DEPV_FST $CTM_VDIFF_DIAG $CTM_VSED_DIAG    \

@@ -21,7 +21,7 @@ C RCS file, release, date & time of last delta, author, state, [and locker]
 C $Header: /project/work/rep/arc/CCTM/src/depv/m3dry/m3dry.F,v 1.12 2012/01/19 14:19:43 yoj Exp $
 
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE m3dry ( jdate, jtime, dt, cgridl1, depvel_gas, pvd, nh3_emis)
+      SUBROUTINE m3dry ( jdate, jtime, dtsec, cgridl1, depvel_gas, pvd, nh3_ddep)
 
 C-------------------------------------------------------------------------------
 C Name:     Models-3 Dry Deposition
@@ -145,6 +145,8 @@ C           7 Nov 2014  J. Bash: Modified for the restructuring of vidff. Moved 
 C                       ASX_DATA_MOD.
 C            June 2018  revised for v5.3 - removed mosaic, new epic-bidi - j pleim
 C          01 Feb 2019  D. Wong: Implemented centralized I/O approach, removed all MY_N clauses
+C          12 Dec 2019  S.L.Napelenok: update for cmaq 5.3.1
+C          August 2020  J Pleim: corrected TSTEP to be DTSEC. Corrects NH3 bidi emis, dep outputs
 C-------------------------------------------------------------------------------
 
       USE RUNTIME_VARS
@@ -152,10 +154,14 @@ C-------------------------------------------------------------------------------
       USE DEPVVARS
       USE VGRD_DEFN      ! to get VGTYP_GD
       USE UTILIO_DEFN
+#ifdef mpas
+      Use util_module, only : secsdiff
+#else
 #ifdef parallel
       USE SE_MODULES     ! stenex (using SE_COMM_MODULE)
 #else
       USE NOOP_MODULES   ! stenex (using NOOP_COMM_MODULE)
+#endif     
 #endif     
       Use ABFlux_Mod     ! bidi NH3 exchange routines
       Use ASX_DATA_MOD   ! contains CONSTANTS include
@@ -165,6 +171,10 @@ C-------------------------------------------------------------------------------
       USE twoway_data_module, only : num_land_cat
 #endif
       Use CENTRALIZED_IO_MODULE, only : WR_AVAIL
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NP, NPMAX, S_PVD, S_CGRIDL1
+#endif
 
       IMPLICIT NONE
 C Includes:
@@ -176,16 +186,16 @@ C Arguments:
 
       INTEGER,     INTENT( IN )  :: jdate
       INTEGER,     INTENT( IN )  :: jtime
-      INTEGER,     INTENT( IN )  :: dt( 3 )      ! model time step
+      REAL,        INTENT( IN )  :: dtsec      ! model time step (sec)
       REAL,        INTENT( IN )  :: cgridl1( :,:,: )    ! layer 1 concentrations
       REAL,        INTENT( OUT ) :: depvel_gas( :,:,: )
       REAL,        INTENT( OUT ) :: pvd( :,:,: )
-      REAL,        INTENT( OUT ) :: nh3_emis(:,:)
+      REAL,        INTENT( OUT ) :: nh3_ddep(:,:)
 
 C Local Variables:
 
       INTEGER                    :: c,r,l,n              ! loop variables
-      INTEGER                    :: elapsedsec
+      INTEGER                    :: elapsedsec,idt
       INTEGER                    :: ifsnow               ! 1=snow
       INTEGER, SAVE, ALLOCATABLE :: lstwetdate( :,: )
       INTEGER, SAVE, ALLOCATABLE :: lstwettime( :,: )
@@ -229,7 +239,7 @@ C Local Variables:
       REAL                       :: rh_func              ! Simple RH function for the development of a water film on leaf cuticles 
       Real,            Parameter :: MolNH3   = 17.01     ! g/mol NH3  for NH3 bidi to convert to microg/m3
       Real,            Parameter :: MolAir   = 29.97     ! g/mol dry air
-      Real                       :: cnh3,tpvd,lnh3,femis
+      Real                       :: cnh3,tpvd,lnh3,femis,fdep
 
       REAL,    SAVE, ALLOCATABLE :: delta     ( :,: )
 
@@ -271,6 +281,10 @@ C For heterogenous hono on surfaces
       REAL                       :: kno2                      ! first order rate constant for the heterogenous reaction [1/s]
       REAL                       :: surf_bldg                 ! Surface area of bldgs to volume of air [-]
       REAL                       :: surf_leaf                 ! Surface area of leaves to volume of air [-]
+#ifdef sens
+      REAL                       :: s_conc_no2( NPMAX )
+#endif
+
 C-------------------------------------------------------------------------------
 C For Mercury bidirectional flux
       REAL                       :: chg            ! gem layer one concentration
@@ -295,6 +309,10 @@ C-------------------------------------------------------------------------------
             END IF
          END DO
 
+#ifdef mpas
+         xcent = 0.0
+         ycent = 0.0
+#else
          IF ( .NOT. desc3( met_cro_2d ) ) THEN
             xmsg = 'Could not get  met_cro_2d  file description'
             CALL m3exit( pname, jdate, jtime, xmsg, xstat2 )
@@ -302,6 +320,7 @@ C-------------------------------------------------------------------------------
 
          xcent = real( xcent3d, 4 )
          ycent = real( ycent3d, 4 )
+#endif
 
          IF ( abflux ) THEN
             CALL Init_ABFlux( jdate, jtime )
@@ -374,10 +393,13 @@ C Loop over grid cells and calculate dry deposition.
 C-------------------------------------------------------------------------------
 
       effective = .TRUE.
-
+      idt = nint(dtsec)
       depvel_gas( :,:,: ) = 0.0  ! initialize for this time period
       pvd       ( :,:,: ) = 0.0  !     "       "    "    "    "
 
+#ifdef sens
+      s_pvd     ( :,:,:,: ) = 0.0
+#endif
 
       DO r = 1, nrows
       DO c = 1, ncols
@@ -455,6 +477,9 @@ C-------------------------------------------------------------------------------
       ! Assign a pH for rain water based on longitude if US simulation.
       ! Otherwise use default pH.  Use pH value in HPLUS calculation.
 
+#ifdef mpas
+            hplus = hplus_def
+#else
             IF ( ( ycent .GE.   30.0 ) .AND. ( ycent .LE.  45.0 ) .AND.
      &           ( xcent .GE. -120.0 ) .AND. ( xcent .LE. -70.0 ) ) THEN
                IF ( GRID_DATA%LON( c,r ) .GT. -100.0 ) THEN
@@ -465,6 +490,7 @@ C-------------------------------------------------------------------------------
             ELSE
                hplus = hplus_def
             END IF
+#endif
 
          ELSE   ! water
       ! Calculate the water surface film temperature: wet bulb temperature.
@@ -486,7 +512,8 @@ C-------------------------------------------------------------------------------
 
             n = n + 1
 
-            IF ( ( NINT(GRID_DATA%LWMASK( c,r )) .EQ. 0 ) .OR. ( vegcr .EQ. 0.0 ) ) THEN  ! water
+!            IF ( ( NINT(GRID_DATA%LWMASK( c,r )) .EQ. 0 ) .OR. ( vegcr .EQ. 0.0 ) ) THEN  ! water
+            IF ( NINT(GRID_DATA%LWMASK( c,r )) .EQ. 0 ) THEN  ! water
 
                IF ( l .EQ. l_HG ) THEN  ! elemental mercury gas
 ! calculate and save Henry's constant for use in HGSIM
@@ -590,7 +617,7 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
                   rcut = rcut0 * a0 / ar( l ) * ( 1.0 -rh_func) + rwetsfc * rh_func
                ELSE IF ( l .Eq. l_NH3 ) THEN
          !        rcut = 4000.0 * EXP( -0.054 * MET_DATA%RH( c,r ) )
-                  rcut = rwetsfc + 100.0-max(MET_DATA%RH2( c,r ),60.0) ! consistant with bidi
+                  rcut = rwetsfc + (100.0-max(MET_DATA%RH2( c,r ),60.0))*laicr ! consistant with bidi
                ELSE 
                   rcut = rcut0 * a0 / ar( l )
                END IF
@@ -665,13 +692,14 @@ C--------------------------------------------------------------------------
                IF ( NINT( GRID_DATA%LWMASK( c,r ) ) .NE. 0 .and. ifsnow .EQ. 0 ) THEN  ! land
 
                   CALL Get_Flux( cnh3,rwetsfc,rgw,r,c,l,tpvd,lnh3, rbc, rinc, 
-     >                           rstom, delta(c,r),rgnd,femis )
+     >                           rstom, delta(c,r),rgnd,femis,fdep )
                    pvd( n,c,r ) = tpvd * 0.001 * MolAir / (MolNH3 * Met_Data%DENS1( C,R ))
-                   nh3_emis(c,r) = nh3_emis(c,r) + femis * dt(2) * 1.0e-5  ! convert from microg/m2  to kg/ha
+                   nh3_ddep(c,r) = nh3_ddep(c,r) + fdep * dtsec * 1.0e-5  ! convert from microg/m2  to kg/ha
+!                   nh3_emis(c,r) =  nh3_emis(c,r) + depvel_gas( n,c,r ) * cnh3* dtsec * 1.0e-5
                    depvel_gas( n,c,r ) = lnh3
                ELSE   ! water or snow covered
 !                   ddep_nh3(c,r) = ddep_nh3(c,r) + depvel_gas( n,c,r ) * cnh3 * dt(2) * 1.0e-5
-                   nh3_emis(c,r) = 0.0
+                   nh3_ddep(c,r) = nh3_ddep(c,r) + depvel_gas( n,c,r ) * cnh3* dtsec * 1.0e-5
                END IF
             END IF   ! 'abflux'
 
@@ -720,6 +748,12 @@ C Determine NO2 concentration needed for HONO production term.
                   IF ( l .EQ. l_NO2 ) THEN
                      conc_no2 = cgridl1( n,c,r )
 
+#ifdef sens
+                     DO NP = 1, NPMAX
+                        s_conc_no2( NP ) = s_cgridl1( NP, n,c,r )
+                     END DO
+#endif
+
 C Loss of NO2 via the heterogeneous reaction is accounted as additional
 C depositional loss. Add the loss of NO2 via the heterogeneous reaction
 C to the regular deposition velocity (increased dep. vel.).  This will
@@ -735,6 +769,13 @@ C Calculate production (pvd) for HONO; unit = ppm * m/s
 
                IF ( l .EQ. l_HONO)
      &            pvd( n,c,r ) = kno2 * conc_no2 * MET_DATA%ZF( c,r,1 )
+#ifdef sens
+               IF ( l .EQ. l_HONO) THEN
+                  DO NP = 1, NPMAX
+                     s_pvd( NP,n,c,r ) = kno2 * s_conc_no2( NP ) * MET_DATA%ZF( c,r,1 )
+                  END DO
+               END IF
+#endif
             END IF
 C--------------------------------------------------------------------------
 C Bidirectional mercury flux section
@@ -755,8 +796,8 @@ C--------------------------------------------------------------------------
                   awhg  = hlconst( subname( l ), temp2p0cr, effective, hplus )* 0.08205 * temp2p0cr
 
 C************* Call the Hg air surface exchange subroutine *************************************************
-                  CALL ATX(rbc, rcut, rwetsfc, rinc,rsnow, rgw, ifsnow, xm, dvel, chg, awhg,
-     &                    dpvd, delta( c,r ),dt(2), c, r, l_HG, jdate, jtime )
+                 CALL ATX(rbc, rcut, rwetsfc, rinc,rsnow, rgw, ifsnow, xm, dvel, chg, awhg,
+     &                    dpvd, delta( c,r ),idt, c, r, l_HG, jdate, jtime )
 
                   pvd( n_HG,c,r ) = dpvd
 
@@ -779,7 +820,7 @@ C************* Call the Hg air surface exchange subroutine *********************
             vdhgII   = depvel_gas( n_HGII,c,r )
 
             CALL ASWX( chg, chgIIgas, vdhg, vdhgII, awhg,
-     &                 dpvd, c, r, jdate, jtime, dt(2) )
+     &                 dpvd, c, r, jdate, jtime, idt )
 
             pvd( n_Hg,c,r ) = dpvd
 

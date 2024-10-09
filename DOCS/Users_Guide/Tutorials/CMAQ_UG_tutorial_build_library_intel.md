@@ -36,7 +36,7 @@ module load intel18.2
 module load openmpi_3.1.4/intel_18.2
 ```
 
-6. Review the installation instructions for netcdf-c-4.7.0 for building Classic netCDF
+6. Review the installation instructions for netcdf-c-4.7.0 for building netCDF
 
 ```
 more INSTALL.md
@@ -86,8 +86,15 @@ setenv CXX /urs/local/apps/intel/18.2/bin/icpc
 10. Run the configure command
 
 ```
-./configure --prefix=$cwd/netcdf-c-4.7.0-intel18.2 --disable-netcdf-4 --disable-dap
+./configure --prefix=$cwd/../netcdf --disable-dap
 ```
+Building netCDF without the compression capabilities of netCDF4 can be done using the command
+
+```
+./configure --prefix=$cwd/../netcdf --disable-netcdf-4 --disable-dap
+```
+
+This simpler installation can work for some applications, but the CMAQ ecosystem increasingly includes netCDF4 compression. For example, the cracmm1_aq 2018 benchmark and the MEGAN 3.2 preprocessor both require netCDF4. The error "Attempt to use feature that was not turned on when netCDF was built" suggests that your workflow requires netCDF4. 
 
 11. Check that the configure command worked correctly
 
@@ -257,9 +264,14 @@ https://cjcoats.github.io/ioapi/AVAIL.html
 
 ```
 git clone https://github.com/cjcoats/ioapi-3.2
+cd ioapi-3.2         ! change directory to ioapi-3.2
+git checkout -b 20200828   ! change branch to 20200828 for a tagged release version
 ```
 
 2. Change the BIN setting on line 133 of the Makefile to include the loaded module name
+
+cd ioapi
+gedit Makefile
 
 ```
 BIN        = Linux2_x86_64ifort_openmpi_3.1.4_intel18.2
@@ -278,11 +290,11 @@ cd ioapi
 cp Makeinclude.Linux2_x86_64ifort Makeinclude.Linux2_x86_64ifort_openmpi_3.1.4_intel18.2
 ```
 
-5. Edit the Makeinclude file, lines 27 and 28 to use -qopenmp instead of -openmp
+5. Edit the Makeinclude file, lines 27 and 28 to comment out the openmmp flag
 
 ```
-OMPFLAGS  = -qopenmp
-OMPLIBS   = -qopenmp
+OMPFLAGS  = # -qopenmp
+OMPLIBS   = # -qopenmp
 ```
 
 6. Set the environment variable BIN
@@ -292,13 +304,18 @@ setenv BIN Linux2_x86_64ifort_openmpi_3.1.4_intel18.2
 ```
 
 7. Create a BIN directory under the ioapi-3.2 directory
-
 ```
 cd ..
 mkdir $BIN
 ```
 
-8. Link the netcdf-C and netcdf-Fortran library in the $BIN directory
+8. Create a link to this $BIN directory for WRF-CMAQ
+
+```
+ln -s Linux2_x86_64ifort_openmpi_3.1.4_intel18.2 Linux2_x86_64ifort
+```
+
+9. Link the netcdf-C and netcdf-Fortran library in the $BIN directory
 
 ```
 cd $BIN
@@ -306,13 +323,14 @@ ln -s /home/netcdf-c-4.7.0-intel18.2/libnetcdff.a
 ln -s /home/netcdf-fortran-4.4.5-intel18.2/libnetcdf.a
 ```
 
-9. Run the make command to compile and link the ioapi library
+10. Run the make command, specifying the location of the ioapi-3.2 directory path to compile and link the ioapi library
 
 ```
-make all |& tee make.log
+cd ioapi
+make 'HOME=[your_install_path]/LIBRARIES' |& tee make.log
 ```
 
-10. Change directories to the $BIN dir and verify that both the libioapi.a and the m3tools were successfully built
+11. Change directories to the $BIN dir and verify that both the libioapi.a and the m3tools were successfully built
 
 ```
 cd $BIN
@@ -320,5 +338,12 @@ ls -lrt libioapi.a
 ls -rlt m3xtract
 ```
 
-11. After successfull completion of this tutorial, the user is now ready to proceed to the [CMAQ Installation & Benchmarking Tutorial](./CMAQ_UG_tutorial_benchmark.md). 
+12. If you need to do a make clean, to rebuild the I/O API Library, specify the HOME directory at the command line as follows
+
+```
+cd ../ioapi
+make 'HOME=[your_install_path]/LIBRARIES' clean
+
+
+13. After successfull completion of this tutorial, the user is now ready to proceed to the [CMAQ Installation & Benchmarking Tutorial](./CMAQ_UG_tutorial_benchmark.md). 
 

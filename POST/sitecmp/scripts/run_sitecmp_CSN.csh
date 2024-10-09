@@ -1,7 +1,7 @@
 #! /bin/csh -f
 
-# ===================== SITECMP_v5.3.1 Run Script =====================
-# Usage: run.sitecmp.csh >&! sitecmp_v531.log &
+# ===================== SITECMP_v5.4.X Run Script =====================
+# Usage: run.sitecmp.csh >&! sitecmp.log &
 #
 # To report problems or request help with this script/program:
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -20,31 +20,27 @@
  source ./config_cmaq.csh
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v531               #> Code Version
+ set VRSN      = v54               #> Code Version
  set PROC      = mpi               #> serial or mpi
  set MECH      = cb6r3_ae7_aq      #> Mechanism ID
- set APPL      = SE531BENCH         #> Application Name (e.g. Gridname)
+ set APPL      = Bench_2016_12SE1        #> Application Name (e.g. Gridname)
                                                       
 #> Define RUNID as any combination of parameters above or others. By default,
 #> this information will be collected into this one string, $RUNID, for easy
 #> referencing in output binaries and log files as well as in other scripts.
- setenv RUNID  ${VRSN}_${compilerString}_${APPL}
+ set RUNID = ${VRSN}_${compilerString}_${APPL}
 
 #> Set the build directory if this was not set above 
 #> (this is where the executable is located by default).
  if ( ! $?BINDIR ) then
-  setenv BINDIR ${CMAQ_HOME}/POST/sitecmp/scripts/BLD_sitecmp_${VRSN}_${compilerString}
+  set BINDIR = ${CMAQ_HOME}/POST/sitecmp/scripts/BLD_sitecmp_${VRSN}_${compilerString}
  endif
 
 #> Set the name of the executable.
- setenv EXEC sitecmp_${VRSN}.exe
-
-#> Set location of CMAQ repo.  This will be used to point to the time zone file
-#> needed to run bldoverlay.  
- setenv REPO_HOME ${CMAQ_REPO}
+ set EXEC = sitecmp_${VRSN}.exe
 
 #> Set output directory
- setenv POSTDIR    ${CMAQ_DATA}/POST    #> Location where sitecmp file will be written
+ set POSTDIR = ${CMAQ_DATA}/POST    #> Location where sitecmp file will be written
 
   if ( ! -e $POSTDIR ) then
 	  mkdir $POSTDIR
@@ -82,7 +78,7 @@
  setenv AERO_8 "88320+88321,ug/m3,AOCIJ+AECIJ,,TC"    # Total Carbon
      
  #> PM2.5 Sharp Cutoff Species
- #> Requires preprocessing using setenv CCTM_APMDIAG file
+ #> Requires preprocessing using setenv CCTM_AELMO file
   setenv AERO_9 "SO4,ug/m3, PM25_SO4,,PM25_SO4"                    # sulfate (sharp cutoff)
   setenv AERO_10 "NO3,ug/m3, PM25_NO3,,PM25_NO3"                   # nitrate (sharp cutoff)
   setenv AERO_11 "NH4,ug/m3, PM25_NH4,,PM25_NH4"                   # ammonium (sharp cutoff)
@@ -116,8 +112,8 @@
 # ~~~~~~~~~~~~ END NETWORK SPECIFIC SECTION ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #> define time window
- setenv SDATE "2016-07-01"    #> beginning date (July 1, 2016)
- setenv EDATE "2016-07-14"  #> ending date    (July 14, 2016)
+ set SDATE = "2016-07-01"    #> beginning date (July 1, 2016)
+ set EDATE = "2016-07-14"  #> ending date    (July 14, 2016)
  setenv START_TIME 0      
  setenv END_TIME   230000   
 
@@ -180,5 +176,11 @@
 
 #> Executable call:
  ${BINDIR}/${EXEC}
+
+ set progstat = ${status}
+ if ( ${progstat} ) then
+   echo "ERROR ${progstat} in $BINDIR/$EXEC"
+   exit( ${progstat} )
+ endif
    
  exit()

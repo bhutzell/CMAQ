@@ -20,27 +20,25 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       module sedimentation
 
 C Revision History:
-C 03 Jul 15 J.Young: inital
+C 03 Jul 15 J.Young: initial
+
+      use const
 
       implicit none
 
       public sedi
+
       private
 
-      include SUBST_CONST     ! constants
       include SUBST_FILES_ID  ! file name parameters
-
-      real,    parameter :: gpkg = 1.0e+03        ! g/Kg
-      real,    parameter :: maogpkg = mwair / gpkg
-      real,    parameter :: gpkgoma = 1.0 / maogpkg
-      real,    parameter :: maoavo1000 = 1.0e+03 * mwair / avo
-      real,    parameter :: avooma_001 = 1.0 / maoavo1000
 
       real,    allocatable, save :: cgrd( :,: )   ! density units
       real,    allocatable, save :: conc( :,: )   ! mixing ratio units
+#ifdef isam
+      real(8), allocatable, save :: conc_isam( :,:,: )      ! extracted isam mixing ratio units
+#endif
 
-      real,    allocatable, save :: dens( :,:,: ) ! air density
-      real,    allocatable, save :: ldens( : )    ! time-local
+      real,    allocatable, save :: ldens( : )    ! local density kg m-3
 
       integer, save :: nqae              ! number of micro-grams/m**3 species
       integer, save :: nnae              ! number of #/m**3 species
@@ -57,12 +55,17 @@ C 03 Jul 15 J.Young: inital
       integer gxoff, gyoff         ! global origin offset from file
 C for interpx
       integer, save :: strtcolmc3, endcolmc3, strtrowmc3, endrowmc3
+      integer, allocatable, save :: map_sedi2cgrid( : )
+      integer, save :: n_sedi_map   ! aero species, all modes
+#ifdef isam
+      integer,              save :: n_isam_sedi_map  ! isam aero species, all modes
+      integer, allocatable, save :: isam_sedi_map( : )
+#endif
 
       contains
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       subroutine sedi ( jdate, jtime, dtsec, sedvel, cgrid, cngrd )
-
 C Revision History:
 C           J.Young, J.Pleim: inital
 C 07 Nov 14 J.Bash: Updated for the ASX_DATA_MOD shared data module. 
@@ -78,6 +81,10 @@ C-----------------------------------------------------------------------
       use vdiff_map
       use utilio_defn
       use vdiff_diag, dtccr => dtccr_mean
+#ifdef isam
+      use sa_defn
+#endif
+
       implicit none
 
 C Arguments:
@@ -110,20 +117,16 @@ C Local Variables:
       real,    allocatable, save :: rrhodz  ( : )   ! reciprocal rho * deltaZ
       integer, allocatable, save :: sedi_map( : )
       integer, allocatable, save :: conc_map( : )
+#ifdef isam
+      integer, allocatable, save :: map_sedi_to_isam( : )
+      real,    allocatable, save :: isam_dtsvsed ( : ) ! isam settling vel. factor
+#endif
       real       adts, dts, rdts
       real       ldt, fs
       integer    off, dtc, iter 
-      integer, save :: n_sedi_map   ! aero species, all modes
       integer    c, r, l, n, s, v
       integer    astat
       integer    mdate, mtime
-
-!     logical    chk
-!     logical :: wrt1 = .true.
-!     character( 43 ), save :: dbgstr = "@@c    l   Dzf           vsed          jacf"
-!     character( 75 ), save :: dbgstr1 =
-!    &  "@@1    l    v   srdl          rdl           svsed         vsed         rdts"
-!     real       srdl, svsed
 
       interface   ! for external procedures
          subroutine aero_sedv ( col, row, cgrd, vsed_ae )
@@ -144,26 +147,59 @@ C-----------------------------------------------------------------------
 c sedi_map - from ae_trns to ae_spc (currently, all ae spc`s are transported)
 c conc_map - from cgrid to ae_trns species
          allocate ( sedi_map( n_ae_spc ),
+     &              map_sedi2cgrid( n_cgrid_spc ),
      &              conc_map( n_ae_spc ),  stat = astat )
          if ( astat .ne. 0 ) then
             xmsg = 'Failure allocating VSED_MAP or CONC_MAP'
             call m3exit( pname, mdate, mtime, xmsg, xstat1 )
          end if
-
-         off = n_gc_trns   ! 48
+#ifdef isam
+         allocate ( isam_sedi_map( nspc_sa_ae ),
+     &              map_sedi_to_isam( nspc_sa_ae ),  stat = astat )
+         if ( astat .ne. 0 ) then
+            xmsg = 'Failure allocating map_sedi_to_isam or isam_sedi_map'
+            call m3exit( pname, mdate, mtime, xmsg, xstat1 )
+         end if
+         isam_sedi_map = 0
+         map_sedi_to_isam = 0
+         n_isam_sedi_map = 0
+#endif
+         map_sedi2cgrid = 0
+         off = n_gc_trns   
+         cg_off = ae_strt - 1   
          n_sedi_map = 0
          do v = 1, n_ae_spc
             n = index1( ae_spc( v ), n_ae_trns, ae_trns )
             if ( n .gt. 0 ) then
                n_sedi_map = n_sedi_map + 1
                sedi_map( n_sedi_map ) = n
+               map_sedi2cgrid( n_sedi_map ) = n+cg_off
                conc_map( n_sedi_map ) = diff_map( n + off )
+#ifdef isam
+               do s = 1, nspc_sa_ae
+                  if(  isam_to_aero( s ) .eq. sedi_map( n_sedi_map ) ) then
+                     n_isam_sedi_map =  n_isam_sedi_map + 1
+                     isam_sedi_map(  n_isam_sedi_map ) = sedi_map( n_sedi_map )   
+                     map_sedi_to_isam(  n_isam_sedi_map ) = sa_aero_indx( s )   
+                  end if
+               end do
+#endif
             end if
          end do
          write( logdev,'( 19x, "SEDI_MAP", 4x, "CONC_MAP" )' )
          do v = 1, n_sedi_map
             write( logdev,* ) v, sedi_map( v ), conc_map( v )
          end do
+#if defined(verbose_isam) && defined(isam)
+         write(logdev,'("ISAM Aerosol Sedimentation Mapping")')
+         write( logdev,'( A4,1X,2(A16,1X),3(A8,1x) )' )"  N ","   Bulk AERO   ","    ISAM AERO   ",
+     &   "SEDI_MAP", "CONC_MAP","MOLE_WGT"
+         do v = 1, n_isam_sedi_map
+            write( logdev,'( I4,1X,2(A16,1X),2(I8,1x),F8.2 )' ) v, ae_spc( isam_sedi_map( v ) ),
+     &      isam_spec( map_sedi_to_isam( v ),1 ), isam_sedi_map( v ), map_sedi_to_isam( v ),
+     &      CGRID_MW( MAP_SEDI2CGRID(isam_sedi_map( v )) )
+         end do
+#endif
 
          allocate ( vsed_ae( n_ae_spc,nlays ), stat = astat )
          if ( astat .ne. 0 ) then
@@ -185,6 +221,15 @@ c conc_map - from cgrid to ae_trns species
             xmsg = 'Failure allocating CONC, VSED,  or DTSVSED'
             call m3exit( pname, mdate, mtime, xmsg, xstat1 )
          end if
+#ifdef isam
+         allocate ( conc_isam( n_isam_sedi_map,nlays,ntag_sa ), 
+     &              isam_dtsvsed( nlays ), stat = astat )
+         if ( astat .ne. 0 ) then
+            xmsg = 'Failure allocating CONC0,CONC_ISAM'
+            call m3exit( pname, mdate, mtime, xmsg, xstat1 )
+         end if
+#endif
+
          conc = 0.0  ! array assignment
          vsed = 0.0  ! array assignment
 
@@ -204,37 +249,6 @@ c conc_map - from cgrid to ae_trns species
             end if
          end if
 
-C set up the convert arrays
-c create aerosol species pointers to distinguish micro-grams/m**3,
-C #/m**3 (number density), and m**2/m**3 (surface area) species
-
-         allocate ( qae( n_ae_spc ),
-     &              nae( n_ae_spc ),
-     &              sae( n_ae_spc ),
-     &              molwt( n_ae_spc ), stat = ios )
-         if ( ios .ne. 0 ) then
-            xmsg = 'Failure allocating qae, nae, sae, or molwt'
-            call m3exit( pname, jdate, jtime, xmsg, xstat1 )
-         end if
-         nqae = 0       ! no. of micro-grams/m**3 species
-         nnae = 0       ! no. of  #/m**3 species
-         nsae = 0       ! no. of  m**2/m**3 species
-         cg_off = ae_strt - 1
-         off = 0        ! aero species offset to local conc array
-         do s = 1, n_ae_spc
-            if ( ae_spc( s )( 1:3 ) .eq. 'NUM' ) then
-               nnae = nnae + 1
-               nae( nnae ) = off + s
-            else if ( ae_spc( s )( 1:3 ) .eq. 'SRF' ) then
-               nsae = nsae + 1
-               sae( nsae ) = off + s
-            else
-               nqae = nqae + 1
-               qae( nqae ) = off + s
-               molwt( nqae ) = ae_molwt( s )
-            end if
-         end do
-
       end if   !  if firstime
 
       do 345 r = 1, nrows
@@ -247,9 +261,26 @@ C subset all the layers and species in cgrid for this grid cell
             end do
          end do
 
+#ifdef isam
+         do v = 1,  n_isam_sedi_map
+            n = map_sedi_to_isam( v )
+            do l = 1, nlays
+               do itag = 1,ntag_sa
+! used upper case to not conflict with CCP flag
+                  conc_isam( v,l,itag ) = ISAM( c,r,l,n,itag )
+               end do
+            end do
+         end do
+#endif
          do l = 1, nlays
+#ifdef mpas
+            rdl( l ) = alpha * Met_Data%rjacf( c,r,l ) * inv_cell_thickness(c, r, l)
+            rrhodz( l ) = Met_Data%rrhoj( c,r,l ) * inv_cell_thickness(c, r, l)
+#else
             rdl( l ) = alpha * Met_Data%rjacf( c,r,l ) * Grid_Data%rdx3f( l )
             rrhodz( l ) = Met_Data%rrhoj( c,r,l ) * Grid_Data%rdx3f( l )
+#endif
+
             ldens( l ) = Met_Data%dens( c,r,l )
          end do
 
@@ -310,6 +341,15 @@ C subset all the layers and species in cgrid for this grid cell
                conc( v,l ) = conc( v,l )
      &                     + dtsvsed( v,l+1 ) * conc( v,l+1 ) * rrhodz( l )
             end do
+#ifdef isam
+            do v = 1, n_isam_sedi_map
+               s = isam_sedi_map( v )
+               do itag = 1,ntag_sa
+                  conc_isam( v,l,itag ) = conc_isam( v,l,itag )
+     &                                  + dtsvsed( s,l+1 ) * conc_isam( v,l+1,itag ) * rrhodz( l )
+               end do
+            end do
+#endif
 
             ! Apply production and loss to layers 2 through NZ-1
             do l = 2, nlays-1
@@ -318,6 +358,17 @@ C subset all the layers and species in cgrid for this grid cell
      &                        + ( dtsvsed( v,l+1 ) * conc( v,l+1 )
      &                        -   dtsvsed( v,l )   * conc( v,l ) ) * rrhodz( l )
                end do
+#ifdef isam
+                do v = 1, n_isam_sedi_map
+                   s = isam_sedi_map( v )
+                   do itag = 1,ntag_sa
+                      conc_isam( v,l,itag ) = conc_isam( v,l,itag )
+     &                                      + dtsvsed( s,l+1 ) * conc_isam( v,l+1,itag ) * rrhodz( l )
+     &                                      - dtsvsed( s,l )   * conc_isam( v,l,itag   ) * rrhodz( l )
+
+                   end do
+                end do
+#endif
             end do
 
             ! Apply only loss to layer NZ
@@ -326,6 +377,15 @@ C subset all the layers and species in cgrid for this grid cell
                conc( v,l ) = conc( v,l )
      &                     - dtsvsed( v,l ) * conc( v,l ) * rrhodz( l )
             end do
+#ifdef isam
+             do v = 1, n_isam_sedi_map
+                s = isam_sedi_map( v )
+                do itag = 1,ntag_sa
+                   conc_isam( v,l,itag ) = conc_isam( v,l,itag )
+     &                                   - dtsvsed( s,l ) * conc_isam( v,l,itag ) * rrhodz( l )
+                end do 
+             end do
+#endif
 
             ! conc -> cgrd: from mixing ratio units to density units
             call conv_conc( )
@@ -344,6 +404,31 @@ C subset all the layers and species in cgrid for this grid cell
                cngrd( conc_map( v ),l,c,r ) = conc( v,l )
             end do
          end do
+#ifdef isam
+         do v = 1,  n_isam_sedi_map
+            n = map_sedi_to_isam( v )
+            do l = 1, nlays
+               do itag = 1,ntag_sa
+! used upper case to not conflict with CCP flag
+                  ISAM( c,r,l,n,itag ) = conc_isam( v,l,itag )
+               end do
+            end do
+         end do
+#endif
+#if defined(isam) && defined(verbose_isam)
+         if( c .eq. 1 .and. r .eq. 1 )then
+            write( logdev,'("ISAM Aerosol Sedimentation Results for col and row equal 1")')
+            write( logdev,'( A4,1X,2(A16,1X),2(A12,1x) )' )"  N ","   Bulk AERO ","    ISAM AERO   ",
+     &      "SUM_BULK ", "SUM_ISAM "
+            do v = 1, n_isam_sedi_map
+               write( logdev,'( I4,1X,2(A16,1X),2(ES12.4,1x) )' ) v, ae_spc( isam_sedi_map( v ) ),
+     &         isam_spec( map_sedi_to_isam( v ),1 ), sum( conc( isam_sedi_map( v ),1:nlays ) ), 
+     &         sum(conc_isam( v,1:nlays,1:ntag_sa ))
+            end do
+         end if
+#endif
+
+
 344   continue         !  end loop on col C
 345   continue         !  end loop on row R
 
@@ -353,92 +438,76 @@ C subset all the layers and species in cgrid for this grid cell
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       subroutine conv_cgrd( )
+         use cgrid_spcs          ! cgrd mechanism species
          use grid_conf        ! horizontal & vertical domain specifications
          use utilio_defn
          use asx_data_mod
+         use vdiff_map
+
          implicit none
 
-         integer   l, v            ! loop induction variables
+         integer   i, l, v            ! loop induction variables
+         real FAC1( nlays )
+         real, parameter :: mwair_si = mwair * 1.0e-3
 
 C-----------------------------------------------------------------------
 
-C micro-grams/m**3 aerosol -> ppmv
-C (Don`t divide by MGPG, then multiply by 1.0E+6: 1/MGPG = 1.0E-6 cancels out ppm = 1.0E6)
+      FAC1 = MWAIR_SI / LDENS  ! kg m-3 -> m3 mol-1
 
-         do l = 1, nlays
-            fac = maogpkg / ldens( l )
-            do v = 1, nqae
-               conv = fac / molwt( v )
-               conc( qae( v ),l ) = conv * cgrd( l,cg_off+qae( v ) )
-            end do
-         end do
+      DO I = 1,N_SEDI_MAP
+          ! Aerosol Mass: ug/m3 -> ppmv
+          IF ( CGRID_MASK_AERO( MAP_SEDI2CGRID(I) ) .AND.
+     &         .NOT. CGRID_MASK_NUM( MAP_SEDI2CGRID(I) ) .AND.
+     &         .NOT. CGRID_MASK_SRF( MAP_SEDI2CGRID(I) )  )
+     &       CONC( I,: ) = CGRD( :,MAP_SEDI2CGRID(I) ) 
+     &                    *FAC1( : ) / CGRID_MW( MAP_SEDI2CGRID(I) )
 
-C number/m**3 aerosol -> ppmv
-C (Don`t divide by MGPG, etc. See note above)
+          ! Aerosol Number: N m-3 -> N mol-1
+          ! Aerosol Surface Area: m2/m3 -> m2 / mol air
+          IF ( CGRID_MASK_NUM( MAP_SEDI2CGRID(I) ) .OR.
+     &         CGRID_MASK_SRF( MAP_SEDI2CGRID(I) )      )
+     &       CONC( I,: ) = CGRD( :,MAP_SEDI2CGRID(I) ) * FAC1( : )
 
-         do l = 1, nlays
-            conv = maoavo1000 / ldens( l )
-            do v = 1, nnae
-               conc( nae( v ),l ) = conv * cgrd( l,cg_off+nae( v ) )
-            end do
-         end do
+      END DO
 
-C m**2/m**3 aerosol -> m**2/mol air
-
-         do l = 1, nlays
-            conv = maogpkg / ldens( l )
-            do v = 1, nsae
-               conc( sae( v ),l ) = conv * cgrd( l,cg_off+sae( v ) )
-            end do
-         end do
-
-      return
+      RETURN
 
       end subroutine conv_cgrd
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       subroutine conv_conc ( )
+         use cgrid_spcs          ! cgrd mechanism species
          use grid_conf        ! horizontal & vertical domain specifications
+         use vdiff_map
+
+
          implicit none
 
-         integer   l, v            ! loop induction variables
+         integer   i, l, v            ! loop induction variables
+         real, parameter :: mwair_si = mwair * 1.0e-3
+         real fac1( nlays )
 
 C-----------------------------------------------------------------------
+      FAC1 = LDENS / MWAIR_SI  ! kg m-3 -> mol m-3
 
-C m**2/m**3 aerosol -> m**2/mol air
-C aerosol ppmv -> micro-grams/m**3
-C (Don`t multiply by MGPG, then divide by 1.0E+6: 1/MGPG = 10**-6 cancels out
-C ppm = 10**6)
+      DO I = 1,N_SEDI_MAP
+          ! Aerosol Mass: ug/m3 -> ppmv
+          IF ( CGRID_MASK_AERO( MAP_SEDI2CGRID(I) ) .AND.
+     &         .NOT. CGRID_MASK_NUM( MAP_SEDI2CGRID(I) ) .AND.
+     &         .NOT. CGRID_MASK_SRF( MAP_SEDI2CGRID(I) )  )
+     &      CGRD( :,MAP_SEDI2CGRID(I) ) = CONC( I,: ) * FAC1( : ) 
+     &                                  * CGRID_MW( MAP_SEDI2CGRID(I) )
 
-         do v = 1, nqae
-            fac = gpkgoma * molwt( v )
-            do l = 1, nlays
-               conv = fac * ldens( l )
-               cgrd( l,cg_off+qae( v ) ) = conv * conc( qae( v ),l )
-            end do
-         end do
+          ! Aerosol Number: N m-3 -> N mol-1
+          ! Aerosol Surface Area: m2/m3 -> m2 / mol air
+          IF ( CGRID_MASK_NUM( MAP_SEDI2CGRID(I) ) .OR.
+     &         CGRID_MASK_SRF( MAP_SEDI2CGRID(I) )      ) 
+     &      CGRD( :,MAP_SEDI2CGRID(I) ) = CONC( I,: ) * FAC1( : )
 
-C aerosol ppmv -> number/m**3
-C (Don`t multiply by MGPG, etc. See note above)
-
-         do v = 1, nnae
-            do l = 1, nlays
-               conv = avooma_001 * ldens( l )
-               cgrd( l,cg_off+nae( v ) ) = conv * conc( nae( v ),l )
-            end do
-         end do
-
-C m**2/m**3 aerosol -> m**2/mol air
-
-         do v = 1, nsae
-            do l = 1, nlays
-               conv = gpkgoma * ldens( l )
-               cgrd( l,cg_off+sae( v ) ) = conv * conc( sae( v ),l )
-            end do
-         end do
-
-      return
+      END DO
+ 
+      RETURN
 
       end subroutine conv_conc
 

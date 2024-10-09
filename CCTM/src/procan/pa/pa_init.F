@@ -75,10 +75,12 @@ C-----------------------------------------------------------------------
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE PAGRD_DEFN            ! PA horiz domain specs
       USE UTILIO_DEFN
+#ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE, SE_DATA_COPY_MODULE)
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE, NOOP_DATA_COPY_MODULE)
+#endif
 #endif
       USE PA_DEFN               ! Process Anaylsis control and data variables
 
@@ -121,7 +123,6 @@ C..Local Variables:
       INTEGER NIRR      ! Loop index for IRR outputs
       INTEGER NFL       ! Loop index for no. of files
       INTEGER NOUT      ! Loop index for process monitoring outputs
-      INTEGER NS        ! Loop index for number cgout concs saved
       INTEGER NUMFLS    ! Number of PA or IRR output files needed
       INTEGER STATUS    ! Status Code
 
@@ -129,6 +130,7 @@ C-----------------------------------------------------------------------
 
       LSTOP = .FALSE.         
 
+#ifndef mpas
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C  Open the Integrated Process Rates output file(s) if needed
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -193,16 +195,6 @@ C  Initialize arrays
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          DELC = 0.0
-
-         DO NS = 1, NCSAVE
-            ICG = SAV2GRD( NS )
-#ifdef parallel
-            CALL SUBST_DATA_COPY( CGRID, CSAV, ICG, NS )
-#else
-            CSAV( :,:,:,NS ) = CGRID( MY_BEGCOL:MY_ENDCOL,
-     &            MY_BEGROW:MY_ENDROW,MY_BEGLEV:MY_ENDLEV,ICG )
-#endif
-         END DO
 
       END IF   ! LIPR
 
@@ -272,6 +264,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IRROUT = 0.0
 
       END IF   !   LIRR
+#endif
 
       RETURN
       END

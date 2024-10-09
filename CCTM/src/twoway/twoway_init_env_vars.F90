@@ -32,25 +32,25 @@
           use sd_time_series_module, only : sd_scol, sd_ecol, sd_srow, sd_erow
           use get_env_module
 
-          call get_env (wrf_restart, "WRF_RSTFLAG", .false.)
+!         call get_env (wrf_restart, "WRF_RSTFLAG", .false.)
 
           call get_env (sd_time_series, 'SD_TIME_SERIES', .false.)
 
-          call get_env (create_physical_file, 'CREATE_PHYSICAL_FILE', .false.)
+!         call get_env (create_physical_file, 'CREATE_PHYSICAL_FILE', .false.)
 
-          call get_env (wrf_cmaq_freq, 'WRF_CMAQ_FREQ', 1)
+!         call get_env (wrf_cmaq_freq, 'WRF_CMAQ_FREQ', 1)
 
-          call get_env (run_cmaq_driver, 'RUN_CMAQ_DRIVER', .false.)
+!         call get_env (run_cmaq_driver, 'RUN_CMAQ_DRIVER', .false.)
 
-          call get_env (cmaq_wrf_feedback, 'CMAQ_WRF_FEEDBACK', .false.)
+!         call get_env (cmaq_wrf_feedback, 'CMAQ_WRF_FEEDBACK', .false.)
 
-          call get_env (indirect_effect, 'INDIRECT_EFFECT', .false.)
+!         call get_env (indirect_effect, 'INDIRECT_EFFECT', .false.)
 
           call get_env (cmaq_sdate, 'CTM_STDATE', 0)
 
           call get_env (cmaq_stime, 'CTM_STTIME', 0)
 
-          call get_env (turn_on_pv, 'CTM_TURN_ON_PV', .false.)
+          call get_env (turn_on_pv, 'CTM_PVO3', .false.)
 
           call get_env (wrf_lc_ref_lat, 'WRF_LC_REF_LAT', 0.0)
 

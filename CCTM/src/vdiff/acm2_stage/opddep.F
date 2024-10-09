@@ -40,6 +40,7 @@ C   08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC)
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE MIO_ASCII
 
       IMPLICIT NONE
  
@@ -58,8 +59,10 @@ C Local variables:
       CHARACTER( 96 ) :: XMSG = ' '
 
 ! component flux varialbes      
-      INTEGER, PARAMETER :: LCMP  = 8
-      CHARACTER( 16 ), SAVE :: CMPSPC( LCMP )
+      INTEGER,         SAVE :: N_BD_EMIS 
+      CHARACTER( 16 ), SAVE :: BD_EMIS_SPC( 3 )
+      INTEGER,         SAVE :: N_BD_FLUX 
+      CHARACTER( 16 ), SAVE :: BD_FLUX_SPC( 1 )
 
       INTEGER      V, N, L     ! loop induction variables
       INTEGER      STRT, FINI  ! loop induction variables
@@ -69,15 +72,23 @@ C-----------------------------------------------------------------------
 C Try to open existing file for update
 
       IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSRDWR3, PNAME ) ) THEN
-      
-         CMPSPC( 1 ) = 'NH3_Emis'
-         CMPSPC( 2 ) = 'NH3_Flux '
-         CMPSPC( 3 ) = 'NH3_Stom'
-         CMPSPC( 4 ) = 'NH3_Cut '
-         CMPSPC( 5 ) = 'NH3_Soil'
-         CMPSPC( 6 ) = 'NH3_Ag  '
-         CMPSPC( 7 ) = 'NH3_Nat '
-         CMPSPC( 8 ) = 'NH3_Wat '
+
+         N_BD_EMIS = 0
+         N_BD_FLUX = 0
+         If( ABFLUX ) Then
+            N_BD_EMIS = N_BD_EMIS + 1
+            BD_EMIS_SPC( N_BD_EMIS ) = 'NH3_Emis'
+            N_BD_FLUX = 1
+            BD_FLUX_SPC( 1 ) = 'NH3_Flux'
+         End If 
+         If( HGBIDI ) Then
+            N_BD_EMIS = N_BD_EMIS + 1
+            BD_EMIS_SPC( N_BD_EMIS ) = 'HG_Emis'
+         End If 
+         If( SFC_HONO ) Then 
+            N_BD_EMIS = N_BD_EMIS + 1      
+            BD_EMIS_SPC( N_BD_EMIS ) = 'HONO_Het '
+         End If      
 
          XMSG = 'Could not open ' // CTM_DRY_DEP_1 // ' file for update - '
      &        // 'try to open new'
@@ -90,11 +101,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          STIME3D = JTIME
          TSTEP3D = TSTEP
          CALL NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
-         IF ( ABFLUX ) THEN
-            NVARS3D = N_SPC_DDEP + LCMP
-         ELSE 
-            NVARS3D = N_SPC_DDEP
-         END IF
+         NVARS3D = N_SPC_DDEP + N_BD_EMIS + N_BD_FLUX 
          NCOLS3D = GL_NCOLS
          NROWS3D = GL_NROWS
          NLAYS3D =     1
@@ -111,11 +118,9 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          YCELL3D = YCELL_GD
          VGTYP3D = VGTYP_GD
          VGTOP3D = VGTOP_GD
-!        VGTPUN3D = VGTPUN_GD ! currently, not defined
          DO L = 1, NLAYS3D + 1
             VGLVS3D( L ) = VGLVS_GD( L )
          END DO
-!        GDNAM3D = GDNAME_GD
          GDNAM3D = GRID_NAME  ! from HGRD_DEFN
 
          N = 0
@@ -169,35 +174,67 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          END DO
 
          IF ( ABFLUX ) THEN
-            VTYPE3D( V ) = M3REAL
-            VNAME3D( V ) = 'NH3_DDEP'
-            UNITS3D( V ) = 'kg/hectare'
-            VDESC3D( V ) = 'hourly NH3_DryDep values'
-  
-            VTYPE3D( V+1 ) = M3REAL
-            VNAME3D( V+1 ) = 'NH3_EMIS'
-            UNITS3D( V+1 ) = 'kg/hectare'
-            VDESC3D( V+1 ) = 'hourly NH3_EMIS values'
-         END IF
-
-         IF ( ABFLUX ) THEN
             N = 0   
             STRT = N_GC_DDEP + N_AE_DDEP + N_NR_DDEP + N_TR_DDEP + 1
-            FINI = N_GC_DDEP + N_AE_DDEP + N_NR_DDEP + N_TR_DDEP + LCMP
+            FINI = N_GC_DDEP + N_AE_DDEP + N_NR_DDEP + N_TR_DDEP + 1
             DO V = STRT, FINI
                N = N + 1
                VTYPE3D( V ) = M3REAL
-               VNAME3D( V ) = CMPSPC( N )
+               VNAME3D( V ) = BD_EMIS_SPC( N )
                UNITS3D( V ) = 'kg/hectare'
-               VDESC3D( V ) = 'hourly dry deposition values'
+               VDESC3D( V ) = 'hourly emission values'
+            END DO
+            N = 0   
+            STRT = FINI + 1
+            FINI = FINI + N_BD_FLUX
+            DO V = STRT, FINI
+               N = N + 1
+               VTYPE3D( V ) = M3REAL
+               VNAME3D( V ) = BD_FLUX_SPC( N )
+               UNITS3D( V ) = 'kg/hectare'
+               VDESC3D( V ) = 'hourly flux values'
+            END DO
+         END IF
+         IF ( HGBIDI ) THEN
+            STRT = FINI + 1
+            FINI = FINI + 1
+            DO V = STRT, FINI
+               VTYPE3D( V ) = M3REAL
+               VNAME3D( V ) = 'HG_Emis'
+               UNITS3D( V ) = 'kg/hectare'
+               VDESC3D( V ) = 'hourly emission values'
+            END DO
+         END IF
+         IF ( SFC_HONO ) THEN
+            STRT = FINI + 1
+            FINI = FINI + 1
+            DO V = STRT, FINI
+               VTYPE3D( V ) = M3REAL
+               VNAME3D( V ) = 'HONO_Het '
+               UNITS3D( V ) = 'kg/hectare'
+               VDESC3D( V ) = 'hourly surface heterogenous production values'
             END DO
          END IF
 
-         FDESC3D( 1 ) = 'hourly 1-layer cross-point RADM dry deposition data'
+         FDESC3D( 1 ) = 'hourly 1-layer cross-point STAGE dry deposition data'
          DO L = 2, MXDESC3
             FDESC3D( L ) = ' '
          END DO
 
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_1', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+         
 C    Open dry deposition file
 
          IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSNEW3, PNAME ) ) THEN
