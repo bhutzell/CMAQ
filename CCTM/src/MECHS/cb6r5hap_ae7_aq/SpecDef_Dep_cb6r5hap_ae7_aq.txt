@@ -187,8 +187,8 @@ DDEP_BERYLLIUM     ,kg ha-1   ,ABEI[1] + ABEJ[1] + ABEK[1]
 WDEP_BERYLLIUM     ,kg ha-1   ,ABEI[2] + ABEJ[2] + ABEK[2]
 
 ! CADMIUM
-DDEP_CADMIUM        ,kg ha-1   ,ACDI[1] + ACDJ[1] + ACDK[1]
-WDEP_CADMIUM        ,kg ha-1   ,ACDI[2] + ACDJ[2] + ACDK[2]
+DDEP_CADMIUM        ,kg ha-1   ,ACADMIUMI[1] + ACADMIUMJ[1] + ACADMIUMK[1]
+WDEP_CADMIUM        ,kg ha-1   ,ACADMIUMI[2] + ACADMIUMJ[2] + ACADMIUMK[2]
 
 ! NICKLE
 DDEP_NICKLE        ,kg ha-1   ,ANII[1] + ANIJ[1] + ANIK[1]
