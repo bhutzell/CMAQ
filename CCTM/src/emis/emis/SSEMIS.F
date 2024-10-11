@@ -265,10 +265,12 @@ C   12 Aug 15 D.Wong: added code to handle parallel I/O implementation
             USE UTILIO_DEFN
             USE AERO_DATA
 
+#ifndef mpas
 #ifdef parallel
             USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
             USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
+#endif
 #endif
 
             IMPLICIT NONE
@@ -401,6 +403,7 @@ C Open the sea-salt emission dignostic file
                   SUCCESS = .FALSE.; RETURN
                END IF
 
+#ifndef mpas
 #ifdef parallel_io
                CALL SE_BARRIER
                IF ( .NOT. IO_PE_INCLUSIVE ) THEN
@@ -409,6 +412,7 @@ C Open the sea-salt emission dignostic file
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
                   END IF
                END IF
+#endif
 #endif
 
             END IF
@@ -424,6 +428,7 @@ C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN
 
          USE GRID_CONF           ! horizontal & vertical domain specifications
          USE UTILIO_DEFN
+         USE MIO_ASCII
 
          IMPLICIT NONE
 
@@ -444,6 +449,7 @@ C Local variables:
 
 C-----------------------------------------------------------------------
 
+#ifndef mpas
 C Try to open existing file for update
          IF ( .NOT. OPEN3( CTM_SSEMIS_1, FSRDWR3, PNAME ) ) THEN
             XMSG = 'Could not open CTM_SSEMIS_1 for update - '
@@ -500,6 +506,21 @@ C Set output file characteristics based on COORD.EXT and open diagnostic file
                FDESC3D( L ) = ' '
             END DO
 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+          
+            CALL LOAD_MIO_FILE ( 'CTM_SSEMIS_1', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+
+
 C Open sea-salt emissions diagnostic file
             IF ( .NOT. OPEN3( CTM_SSEMIS_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create the CTM_SSEMIS_1 file'
@@ -507,6 +528,7 @@ C Open sea-salt emissions diagnostic file
             END IF
 
          END IF
+#endif
 
          RETURN
 
@@ -538,9 +560,6 @@ C                      of emissions, and (3) reduction of surf zone
 C                      emisions
  
 C References:
-C    Alduchov and Eskridge, "Improved Magnus Form Approximations of
-C          Saturation Vapor Pressure," Jour. of Applied Meteorology, vol. 35,
-C          pp 601-609, April, 1996.
 C    Binkowski F.S., S.J. Roselle. Models-3 Community Multiscale Air Quality 
 C          (CMAQ) model aerosol component 1: Model Description.  J. Geophys. 
 C          Res., Vol 108, No D6, 4183, doi:10.1029/2001JD001409 (2003).
@@ -573,15 +592,19 @@ C-----------------------------------------------------------------------
 
             USE UTILIO_DEFN
             USE AERO_DATA
-            USE AEROMET_DATA   ! Includes CONST.EXT
+            USE AEROMET_DATA   
+            USE CONST, ONLY: PI, F6PI, STDTEMP, MWWAT, MWAIR, VP0, ERF
             USE ASX_DATA_MOD, ONLY: MET_DATA, GRID_DATA, svp2, svp3
+#ifdef mpas
+            use coupler_module, only : cell_vol, cell_thickness
+#endif
 
             IMPLICIT NONE
 
 C Arguments
             INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP( 3 )
             REAL,    INTENT( IN ) :: CELLVOL(:,:)          ! grid-cell volume [m2*sigma]
-            REAL,    INTENT( IN ) :: CELLHGT      ! grid-cell height [sigma] 
+            REAL,    INTENT( IN ) :: CELLHGT(:,:) ! grid-cell height [sigma] 
             LOGICAL, INTENT( IN ) :: L_DESID_DIAG ! flag for whether or not DESID 
                                                   !     is in diagnostic mode
 C Includes:
@@ -602,10 +625,7 @@ C Local Variables:
             CHARACTER( 96 ) :: XMSG = ' '
             INTEGER C, R, L, N, V, S         ! loop indices
 
-C Variables for calculating ambient RH as done in the aerosol module
-            REAL, PARAMETER :: AA = 610.94      ! coefficients from Alduchov
-            REAL, PARAMETER :: BB = 17.625      !  and Eskridge (1996)
-            REAL, PARAMETER :: CC = 243.04
+C Variables for calculating ambient RH
             REAL, PARAMETER :: EPSWATER = MWWAT / MWAIR
             REAL      :: ESAT             ! saturation vapor pressure
             REAL      :: BLKRH            ! fractional relative humidity
@@ -687,11 +707,8 @@ C Variables for calculating dry surface-area emission rate for accum mode
 
             LOGICAL, SAVE :: FIRSTIME      = .TRUE.
 
-C Mathematical constants; statement function for ERF approximation
+C Mathematical constants
             REAL, PARAMETER      :: TWO3 = 2.0 / 3.0
-            REAL                 :: ERF        ! ERF approx. statement function
-            REAL                 :: X          ! dummy argument for ERF
-            ERF( X ) = SIGN( 1.0, X ) * SQRT( 1.0 - EXP( -4.0 * X * X / PI ) )
 
 C----------------------------- Begin calc ------------------------------
 
@@ -710,7 +727,11 @@ C Initialize sea-salt output buffer
                      BLKQV   = Met_Data%QV         ( C,R,1 )
                      U10     = Met_Data%WSPD10     ( C,R )
                      SST     = max(Met_Data%TSEASFC( C,R ) - 273.15, 0.0 )
-                     RLAY1HT = Met_Data%RJACM ( C,R,1 ) / CELLHGT
+#ifdef mpas
+                     RLAY1HT = Met_Data%RJACM ( C,R,1 ) / cell_thickness(C,1,1)
+#else
+                     RLAY1HT = Met_Data%RJACM ( C,R,1 ) / CELLHGT(c,r)
+#endif
                   ELSE
                      DO N = 1, 2
                         DO S = 1, NSSSPC
@@ -723,7 +744,7 @@ C Initialize sea-salt output buffer
                   END IF
 
 C Calculate fractional relative humidity in the grid cell
-C Follow the same methodology as in other portions of the code just for the 10m RH
+C Follow the same methodology as in WRF and MM5 for the 10m RH
                   If ( BLKTA .Lt. stdtemp ) Then
                      ESAT = vp0 *Exp( 22.514 - ( 6.15e3 / BLKTA ) )
                   Else
@@ -921,12 +942,20 @@ C Update the SSBF array, for writing the diagnostic sea-salt-emission file.
                         SSOUTD( V ) = SSOUTS( N,C,R )
                      END DO
 
+#ifdef mpas
+                     DO S = 1, NSSDIAG
+                        SSBF( S,C,R ) = SSBF( S,C,R ) + SSOUTD( S ) * cell_vol(c,1,1)
+     &                                * FLOAT( TIME2SEC ( TSTEP( 2 ) ) )
+                     END DO
+#else
                      AIRVOL = CELLVOL(C,R) / Met_Data%RJACM( C,R,1 )
 
                      DO S = 1, NSSDIAG
                         SSBF( S,C,R ) = SSBF( S,C,R ) + SSOUTD( S ) * AIRVOL
      &                                * FLOAT( TIME2SEC ( TSTEP( 2 ) ) )
                      END DO
+#endif
+
                   END IF  ! SSEMDIAG
 
                END DO   ! C
@@ -934,6 +963,7 @@ C Update the SSBF array, for writing the diagnostic sea-salt-emission file.
 
 C If last call this hour, write out the total sea-salt emissions [g/s].
 C Then reset the sea-salt emissions array and local write counter.
+#ifndef mpas
             IF ( SSEMDIAG .AND. .NOT. L_DESID_DIAG ) THEN
 
 #ifdef parallel_io
@@ -977,6 +1007,7 @@ C Then reset the sea-salt emissions array and local write counter.
                END IF
 
             END IF  ! SSEMDIAG
+#endif
 
             RETURN
             

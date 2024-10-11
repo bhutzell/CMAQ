@@ -281,11 +281,13 @@ C Allocate private arrays
          wmax   = 0.0   ! array assignment
          sd_ep  = 0.0   ! array assignment
 
+#ifndef mpas
 C Initialize land use/cover variables
          if ( .not. lus_init( jdate, jtime ) ) then
             xmsg = 'Failure initializing land use module'
             call m3exit( pname, jdate, jtime, xmsg, xstat2 )
          end if
+#endif
 
          if ( dustem_diag ) then    ! Open the emissions diagnostic file
 
@@ -477,6 +479,7 @@ C   27 Dec 10 J.Young: initial
 
          use grid_conf           ! horizontal & vertical domain specifications
          use utilio_defn
+         use mio_ascii
 
          implicit none
 
@@ -497,6 +500,7 @@ C Local variables:
 
 C-----------------------------------------------------------------------
 
+#ifndef mpas
 C Try to open existing file for update
          if ( .not. open3( ctm_dust_emis_1, fsrdwr3, pname ) ) then
             xmsg = 'Could not open CTM_DUST_EMIS_1 for update - '
@@ -546,6 +550,20 @@ C Set output file characteristics based on COORD.EXT and open diagnostic file
                fdesc3d( l ) = ' '
             end do
 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_DUST_EMIS_1', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+            
 C Open windblown dust emissions diagnostic file
             if ( .not. open3( ctm_dust_emis_1, fsnew3, pname ) ) then
                xmsg = 'Could not create the CTM_DUST_EMIS_1 file'
@@ -553,6 +571,7 @@ C Open windblown dust emissions diagnostic file
             end if
 
          end if
+#endif
 
          return
 
@@ -565,10 +584,14 @@ C=======================================================================
          use grid_conf        ! horizontal & vertical domain specifications
          use asx_data_mod     ! meteorology data
          use aero_data
+         use const, only: f6pi
          use utilio_defn
          use lus_data_module
          use centralized_io_module
          use RUNTIME_VARS, only: WRF_V4P
+#ifdef mpas
+         use util_module, only : index1, time2sec
+#endif
 
 C       8/18/11 D.Wong: incorporated twoway model implementation and change
 C                       RC -> RCA and RN -> RNA and made it backward compatible
@@ -579,7 +602,7 @@ C Arguments:
          integer, intent( in ) :: jtime        ! current model time, coded HHMMSS
          integer, intent( in ) :: tstep( 3 )   ! output time step, sync step, 2way step
          real,    intent( in ) :: rjacm( ncols,nrows ) ! reciprocal Jacobian [1/m]
-         real,    intent( in ) :: cellhgt      ! grid-cell height [sigma]
+         real,    intent( in ) :: cellhgt(:,:) ! grid-cell height [sigma]
          logical, intent( in ) :: l_desid_diag ! flag determining whether or not DESID 
                                                !   is in diagnostic mode
 
@@ -594,8 +617,6 @@ C Parameters:
                                            !  2  Fine-medium sand
                                            !  3  Silt
                                            !  4  Clay
-
-         real, parameter :: f6dpi = 6.0 / pi
 
          real, parameter :: mv    = 0.16
          real, parameter :: sigv  = 1.45
@@ -811,7 +832,7 @@ C --------- ###### Start Main Loop ###### ---------
                kvh ( c,r,m ) = 0.0
             end do
  
-            rlay1hgt = rjacm ( c,r ) / cellhgt
+            rlay1hgt = rjacm ( c,r ) / cellhgt(c,r)
 
 
 C--- Set Clay, coarse and fine/medium sand fractions.
@@ -1027,7 +1048,7 @@ C --------- ###### End Main Loop ##### ---------
          do r = 1, nrows
          do c = 1, ncols
 
-C J/K mass emis rate [g/s]  (edust( 1 ) not used)
+C J/K mass emis rate [g/m3/s]  (edust( 1 ) not used)
             edust( 1 ) = fracmj * dust_em( c,r )
             edust( 2 ) = fracmk * dust_em( c,r )
 
@@ -1038,15 +1059,15 @@ C J/K mass emis rate [g/s]  (edust( 1 ) not used)
                end do
             end do
 
-C J/K 3rd moment emis rate [m3/s] (needed for number and surface)
-            m3j = edust( 1 ) * f6dpi / ( gpkg * dust_dens( 1 ) ) + TINY(0.0)
-            m3k = edust( 2 ) * f6dpi / ( gpkg * dust_dens( 2 ) ) + TINY(0.0)
+C J/K 3rd moment emis rate [m3/m3/s] (needed for number and surface)
+            m3j = edust( 1 ) * f6pi / ( gpkg * dust_dens( 1 ) ) + TINY(0.0)
+            m3k = edust( 2 ) * f6pi / ( gpkg * dust_dens( 2 ) ) + TINY(0.0)
 
-C Mode-specific emission rates of particle number [1/s]
+C Mode-specific emission rates of particle number [1/m3/s]
             dustoutn( 1,c,r ) = m3j * factnumj
             dustoutn( 2,c,r ) = m3k * factnumk
 
-C Mode-specific dry surface area emission rates [m**2/s].
+C Mode-specific dry surface area emission rates [m**2/m3/s].
 C 2nd moment multiplied by PI to obtain the surface area emissions rate.
             dustouts( 1,c,r ) = m3j * factsrfj
             dustouts( 2,c,r ) = m3k * factsrfk
@@ -1150,6 +1171,7 @@ C to get a timestep average.
      &                                       dusthit, (c-1)*(r-1)
 #endif
 
+#ifndef mpas
          if ( dustem_diag .and. .not. l_desid_diag ) then
 
 C If last call this hour, write out the windblown dust emissions dignostics.
@@ -1198,6 +1220,7 @@ C Then reset the emissions array and local write counter.
                dustbf = 0.0   ! array assignment
             end if   !  time to write
          end if   ! dustem_diag
+#endif
 
 2009     Format( '*** Erodible landuse incorrect ', 1pe13.5, 1x, 'at: ', 3i4 )
 2015     format( /5x, 'Total grid time-avg sum of dust emis variables at:',
@@ -1219,9 +1242,8 @@ C                           ustr( c,r,m ),
 C                           sd_ep( c,r ),
 C                           dens( c,r ) )
 
+            use const, only: grav
             implicit none
-
-            include SUBST_CONST   ! for grav
 
             integer, intent( in ) :: ndp
             real,    intent( in ) :: dp( ndp )

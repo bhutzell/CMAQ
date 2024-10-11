@@ -31,7 +31,7 @@
 
 !-----------------------------------------------------------------------
       SUBROUTINE DESID_GET_RULE_STREAMS( RULE_STREAM_NML0, IRULE, 
-     &              RULE_STREAM, LREMOVE )
+     &              RULE_STREAM, LREMOVE, LERROR )
 !
 ! This subroutine analyzes the part of a rule identifying which streams
 ! to affect and searches for the individual streams, or, if the rule uses
@@ -51,6 +51,7 @@
       INTEGER, INTENT( IN )       :: IRULE
       LOGICAL, INTENT( INOUT )    :: RULE_STREAM( DESID_N_SRM )
       LOGICAL, INTENT( INOUT )    :: LREMOVE
+      LOGICAL, INTENT( INOUT )    :: LERROR
 
       INTEGER ISRM, IDX, NSRM, IFAM
       CHARACTER( 200 ) :: XMSG
@@ -66,6 +67,7 @@
       CALL UPCASE( RULE_STREAM_NML )
 
       LREMOVE = .FALSE.
+      LERROR  = .FALSE.
 
       IF ( RULE_STREAM_NML .EQ. 'ALL' .OR. RULE_STREAM_NML .EQ. 'TOTAL' ) THEN
          ! Special Case Where the Stream Identifier in the rule equals
@@ -108,13 +110,16 @@
              RULE_STREAM( IDX ) = .TRUE.
            ELSE 
              ! Print warning that this stream is being ignored
-             WRITE( LOGDEV, '(/,5x,3A,I3,/,5x,2A,4(/,5x,A))' ),
-     &         'ATTENTION: The Emissions Stream Label (',TRIM( RULE_STREAM_NML ),
-     &         ') applied for Rule ',IRULE,'in the Emissions Control ',
-     &         'Namelist does not match any of the emissions streams ',
-     &         'labels or families provided to CMAQ. Please check the ',
+             WRITE( LOGDEV, '(/,5x,3A,I3,/,5x,A,3(/,5x,A))' ),
+     &         'Warning: The Emissions Stream Label (',TRIM( RULE_STREAM_NML ),
+     &         ') applied for Rule ',IRULE,
+     &         ' does not match any of the emissions stream labels or ',
+     &         'members of stream families provided to CMAQ. Please check the ',
      &         'runscript against your emissions control inputs',
      &         'confirm that this stream should be ignored.'
+
+             ! Confirm an Error
+             LERROR = .TRUE.
 
              ! Remove this rule from the list of rules
              LREMOVE = .TRUE.
@@ -245,27 +250,27 @@
          END IF
       END DO
 
-      DESID_DIAG_SPEC( JDIAG )%NSPEC = NSPEC
-      DESID_DIAG_SPEC( JDIAG )%NPAIRS = NPAIRS 
+      DESID_DIAG_SPEC_BUFF( JDIAG )%NSPEC = NSPEC
+      DESID_DIAG_SPEC_BUFF( JDIAG )%NPAIRS = NPAIRS 
       IF ( NSPEC .GT. 0 ) THEN
-        IF ( ALLOCATED( DESID_DIAG_SPEC( JDIAG )%SPEC ) )
-     &      DEALLOCATE( DESID_DIAG_SPEC( JDIAG )%SPEC )
-        IF ( ALLOCATED( DESID_DIAG_SPEC( JDIAG )%UNITS ) )
-     &      DEALLOCATE( DESID_DIAG_SPEC( JDIAG )%UNITS )
-        IF ( ALLOCATED( DESID_DIAG_SPEC( JDIAG )%MAP_toDIFF ) )
-     &      DEALLOCATE( DESID_DIAG_SPEC( JDIAG )%MAP_toDIFF )
-        IF ( ALLOCATED( DESID_DIAG_SPEC( JDIAG )%MAP_toDIAG ) ) 
-     &      DEALLOCATE( DESID_DIAG_SPEC( JDIAG )%MAP_toDIAG )
+        IF ( ALLOCATED( DESID_DIAG_SPEC_BUFF( JDIAG )%SPEC ) )
+     &      DEALLOCATE( DESID_DIAG_SPEC_BUFF( JDIAG )%SPEC )
+        IF ( ALLOCATED( DESID_DIAG_SPEC_BUFF( JDIAG )%UNITS ) )
+     &      DEALLOCATE( DESID_DIAG_SPEC_BUFF( JDIAG )%UNITS )
+        IF ( ALLOCATED( DESID_DIAG_SPEC_BUFF( JDIAG )%MAP_toDIFF ) )
+     &      DEALLOCATE( DESID_DIAG_SPEC_BUFF( JDIAG )%MAP_toDIFF )
+        IF ( ALLOCATED( DESID_DIAG_SPEC_BUFF( JDIAG )%MAP_toDIAG ) ) 
+     &      DEALLOCATE( DESID_DIAG_SPEC_BUFF( JDIAG )%MAP_toDIAG )
 
-        ALLOCATE( DESID_DIAG_SPEC( JDIAG )%SPEC( NSPEC ) )
-        ALLOCATE( DESID_DIAG_SPEC( JDIAG )%UNITS( NSPEC ) )
-        ALLOCATE( DESID_DIAG_SPEC( JDIAG )%MAP_toDIFF( NPAIRS ) )
-        ALLOCATE( DESID_DIAG_SPEC( JDIAG )%MAP_toDIAG( NPAIRS ) )
+        ALLOCATE( DESID_DIAG_SPEC_BUFF( JDIAG )%SPEC( NSPEC ) )
+        ALLOCATE( DESID_DIAG_SPEC_BUFF( JDIAG )%UNITS( NSPEC ) )
+        ALLOCATE( DESID_DIAG_SPEC_BUFF( JDIAG )%MAP_toDIFF( NPAIRS ) )
+        ALLOCATE( DESID_DIAG_SPEC_BUFF( JDIAG )%MAP_toDIAG( NPAIRS ) )
 
-        DESID_DIAG_SPEC( JDIAG )%SPEC  = DIAGSPEC( 1:NSPEC )
-        DESID_DIAG_SPEC( JDIAG )%UNITS = UNITS( 1:NSPEC )
-        DESID_DIAG_SPEC( JDIAG )%MAP_toDIFF = MAP_toDIFF( 1:NPAIRS )
-        DESID_DIAG_SPEC( JDIAG )%MAP_toDIAG = MAP_toDIAG( 1:NPAIRS )
+        DESID_DIAG_SPEC_BUFF( JDIAG )%SPEC  = DIAGSPEC( 1:NSPEC )
+        DESID_DIAG_SPEC_BUFF( JDIAG )%UNITS = UNITS( 1:NSPEC )
+        DESID_DIAG_SPEC_BUFF( JDIAG )%MAP_toDIFF = MAP_toDIFF( 1:NPAIRS )
+        DESID_DIAG_SPEC_BUFF( JDIAG )%MAP_toDIAG = MAP_toDIAG( 1:NPAIRS )
       END IF
 
       END SUBROUTINE DESID_DIAG_MAP_SPEC
@@ -379,6 +384,9 @@
 ! This subroutine checks for invalid values of the operation parameter 
 ! in the rules from the emission control list
 
+         use utilio_defn
+
+
          IMPLICIT NONE
 
          REAL, INTENT( OUT )              :: CONV
@@ -396,6 +404,9 @@
          CHARACTER( 16 ) :: DENOM1
          CHARACTER( 16 ) :: DENOM2
          LOGICAL         :: LTIME_UNIT
+
+         REAL, PARAMETER  :: AVO  = 6.0221367E23
+         REAL, PARAMETER  :: RAVO = 1.0 / AVO
 
          ! The Default Finding is an unknown Basis unit and conversion
          ! equal to 1.0
@@ -421,11 +432,20 @@
          ! If there are no slashes or spaces, then exit
          IF ( SLASH_IND .EQ. 0 ) RETURN
 
+         ! Check numerator for molecule units
+         ! This has to come before the check for molar units since the
+         !   check for mole, moles, or mol will also match molecule
+         IF ( NUMER(1:8) .EQ. 'MOLECULE'  .OR.
+     &        NUMER(1:9) .EQ. 'MOLECULES' .OR.
+     &        NUMER(1:5) .EQ. 'MOLEC'     .OR.
+     &        NUMER(1:6) .EQ. 'MOLECS' ) THEN
+            ! Convert molecules -> mol
+            CONV = RAVO
+            BASIS = 'MOLE'
          ! Check Numerator for Molar or Mass Units
-         IF ( NUMER(1:4) .EQ. 'MOLE' .OR. NUMER(1:5) .EQ. 'MOLES' .OR.
+         ELSE IF ( NUMER(1:4) .EQ. 'MOLE' .OR. NUMER(1:5) .EQ. 'MOLES' .OR.
      &        NUMER(1:3) .EQ. 'MOL' ) THEN
             ! No Conversion Needed for Moles to Moles
-            CONV = 1.0 
             BASIS = 'MOLE'
          ELSE IF ( NUMER(1:5) .EQ. 'KMOLE' .OR. NUMER(1:6) .EQ. 'KMOLES' .OR.
      &             NUMER(1:4) .EQ. 'KMOL' ) THEN
@@ -446,7 +466,6 @@
      &             NUMER(1:1) .EQ. 'G'    .OR. NUMER(1:2) .EQ. 'GM'    .OR.
      &             NUMER(1:3) .EQ. 'GMS'  .OR. NUMER(1:2) .EQ. 'GS'  ) THEN
             ! No Conversion Needed for Grams to Grams
-            CONV = 1.0
             BASIS = 'MASS'
          ELSE IF ( NUMER(1:5) .EQ. 'KGRAM' .OR. NUMER(1:6) .EQ. 'KGRAMS' .OR.
      &             NUMER(1:2) .EQ. 'KG'    .OR. NUMER(1:3) .EQ. 'KGM'    .OR.
@@ -480,7 +499,6 @@
      &              'emissions, please correct the units (e.g. g/s or moles/s).'
             CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
             ! No Conversion and and Unknown Basis
-            CONV = 1.0e0
             BASIS = 'UNKNOWN'
          END IF
          
@@ -496,7 +514,6 @@
      &              'g/m2/s, or g/s/m2, etc.).'
             CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
             ! No Conversion and and Unknown Basis
-            CONV = CONV * 1.0e0
             BASIS = 'UNKNOWN' 
             RETURN
          END IF
@@ -591,14 +608,14 @@
      &             DENOM .EQ. 'HOUR'.OR.DENOM .EQ. 'HOUR-1' .OR.
      &             DENOM .EQ. 'HOURS'.OR.DENOM .EQ. 'HOURS-1' ) THEN
             ! Convert hours -> seconds
-            CONV = CONV * 3600.0
+            CONV = CONV / 3600.0
             LTIME = .TRUE.
          ELSE IF ( DENOM .EQ. 'M' .OR. DENOM .EQ. 'M-1' .OR.
      &             DENOM .EQ. 'MIN'.OR.DENOM .EQ. 'MIN-1' .OR.
      &             DENOM .EQ. 'MINUTE'.OR.DENOM .EQ. 'MINUTE-1' .OR.
      &             DENOM .EQ. 'MINUTES'.OR.DENOM .EQ. 'MINUTES-1' ) THEN
             ! Convert minutes -> seconds
-            CONV = CONV * 60.0
+            CONV = CONV / 60.0
             LTIME = .TRUE.
          ELSE IF ( DENOM .EQ. 'M2' .OR. DENOM .EQ. 'M-2' .OR.
      &             DENOM .EQ. 'M^2'.OR.DENOM .EQ. 'METER-2' .OR.
@@ -607,7 +624,6 @@
      &             DENOM .EQ. 'METERS^2'.OR.DENOM .EQ. 'METERS^-2' .OR.
      &             DENOM .EQ. 'METERS2'.OR.DENOM .EQ. 'METERS-2' ) THEN
             ! No conversion necessary for meters^2 -> meters^2
-            CONV = CONV * 1.0
             LAREA = .TRUE. 
          ELSE IF ( DENOM .EQ. 'KM2' .OR. DENOM .EQ. 'KM-2' .OR.
      &             DENOM .EQ. 'KM^2'.OR.DENOM .EQ. 'KM^-2' .OR.
@@ -616,8 +632,17 @@
      &             DENOM .EQ. 'KILOMETERS2'.OR.DENOM .EQ. 'KILOMETERS-2' .OR.
      &             DENOM .EQ. 'KILOMETERS^2'.OR.DENOM .EQ. 'KILOMETERS-2' ) THEN
             ! Convert kilometers^2 -> meters^2
-            CONV = CONV * 1.0E6
-            LAREA = .TRUE. 
+            CONV = CONV / 1.0E6
+            LAREA = .TRUE.
+         ELSE IF ( DENOM .EQ. 'CM2' .OR. DENOM .EQ. 'CM-2' .OR.
+     &             DENOM .EQ. 'CM^2'.OR.DENOM .EQ. 'CM^-2' .OR.
+     &             DENOM .EQ. 'CENTIMETER2'.OR.DENOM .EQ. 'CENTIMETER-2' .OR.
+     &             DENOM .EQ. 'CENTIMETER^2'.OR.DENOM .EQ. 'CENTIMETER^-2' .OR.
+     &             DENOM .EQ. 'CENTIMETERS2'.OR.DENOM .EQ. 'CENTIMETERS-2' .OR.
+     &             DENOM .EQ. 'CENTIMETERS^2'.OR.DENOM .EQ. 'CENTIMETERS-2' ) THEN
+            ! Convert centimeters^2 -> meters^2
+            CONV = CONV / 1.0E-4
+            LAREA = .TRUE.
          ELSE IF ( DENOM .EQ. 'MI2' .OR. DENOM .EQ. 'MI-2' .OR.
      &             DENOM .EQ. 'MI^2'.OR.DENOM .EQ. 'MI^-2' .OR.
      &             DENOM .EQ. 'MILE2'.OR.DENOM .EQ. 'MILE-2' .OR.
@@ -625,7 +650,7 @@
      &             DENOM .EQ. 'MILES2'.OR.DENOM .EQ. 'MILES-2' .OR.
      &             DENOM .EQ. 'MILES^2'.OR.DENOM .EQ. 'MILES-2' ) THEN
             ! Convert mile^2 -> meters^2
-            CONV = CONV * 2.59E6
+            CONV = CONV / 2.59E6
             LAREA = .TRUE.  
          ELSE IF ( DENOM .EQ. 'HA' .OR. DENOM .EQ. 'HA-1' .OR.
      &             DENOM .EQ. 'HA^1'.OR.DENOM .EQ. 'HA^-1' .OR.
@@ -634,7 +659,7 @@
      &             DENOM .EQ. 'HECTARES'.OR.DENOM .EQ. 'HECTARES-1' .OR.
      &             DENOM .EQ. 'HECTARES^1'.OR.DENOM .EQ. 'HECTARES^-1' ) THEN
             ! Convert hectares -> meters^2
-            CONV = CONV * 10000.0
+            CONV = CONV / 10000.0
             LAREA = .TRUE.   
          ELSE
             ! No Conversion and and Unknown Basis
@@ -649,6 +674,8 @@
 
 ! This subroutine checks for invalid values of the operation parameter 
 ! in the rules from the emission control list
+
+         use utilio_defn
 
          IMPLICIT NONE
 
@@ -676,6 +703,8 @@
 
 ! This subroutine checks for invalid values of the operation parameter 
 ! in the rules from the emission control list
+
+         use utilio_defn
 
          IMPLICIT NONE
 

@@ -65,7 +65,11 @@ C                   D. Wong 1 Feb 19: removed MY_N clauses
          Use GRID_CONF
          Use CGRID_SPCS          ! CGRID mechanism species
          Use UTILIO_DEFN
-         
+
+#ifdef mpas
+         Use util_module, only : index1
+#endif
+
          Implicit None
          
 C... Local:
@@ -76,7 +80,7 @@ C... Local:
          Logical, SAVE   :: INITIALIZED = .FALSE.
          
 C--------------------------------------------------------------------------
-C Prevent initilializing the code twice 
+C Prevent initializing the code twice 
          If ( INITIALIZED ) Return 
 
          INITIALIZED = .TRUE.
@@ -185,6 +189,7 @@ C Prevent initilializing the code twice
          Use GRID_CONF
          Use CGRID_SPCS          ! CGRID mechanism species
          Use UTILIO_DEFN
+         Use MIO_ASCII
 
          Implicit None
 
@@ -202,6 +207,7 @@ C Prevent initilializing the code twice
          
 C--------------------------------------------------------------------------
          
+#ifndef mpas
          If ( ABFLUX .And. .Not. HGBIDI) Then
 
             If ( .Not. OPEN3( MEDIA_CONC, FSRDWR3, PNAME ) ) Then
@@ -443,12 +449,30 @@ C--------------------------------------------------------------------------
             End If
                                                   
          End If         
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'MEDIA_CONC', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+
+
 ! Open file, then close it for subsequent open by all processors
             
          If ( .Not. OPEN3( MEDIA_CONC, FSNEW3, PNAME ) ) Then
             XMSG = 'Could not create '// TRIM( MEDIA_CONC) // ' file'
             Call M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
          End If                   
+
+#endif
 
          Return
 
@@ -516,12 +540,13 @@ C--------------------------------------------------------------------------
                End Do
             End Do
 
+#ifndef mpas
             If ( .Not. WRITE3( MEDIA_CONC, MEDIA_NAMES( V ), MDATE, MTIME,
      &                WRMC ) ) Then
                XMSG = 'Could not write ' // MEDIA_CONC // ' file'
                Call M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             End If
-
+#endif
          End Do                 
 
          Write( LOGDEV, '( /5X, A, I8, ":", I6.6 )' )

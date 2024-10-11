@@ -83,6 +83,7 @@ C**********************************************************************
       USE PA_DEFN, Only: LIRR   ! Process Anaylsis control and data variable
       USE PA_IRR_CLT
       USE CENTRALIZED_IO_MODULE, ONLY : INTERPOLATE_VAR, OCEAN, SZONE
+      USE CONST
 #ifdef sens
       USE DDM3D_CHEM
       Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, NP, NPMAX, CKTIME
@@ -93,7 +94,6 @@ C**********************************************************************
 C..Includes:
 
       INCLUDE SUBST_FILES_ID    ! CMAQ files
-      INCLUDE SUBST_CONST       ! CMAQ constants
  
 C..Arguments:
 
@@ -254,10 +254,17 @@ C.. Get fractional seawater coverage from the OCEAN file.
              END DO
          END DO
 
+#ifdef mpas
+         STARTCOLCO = 1
+         ENDCOLCO = NCOLS
+         STARTROWCO = 1
+         ENDROWCO = 1
+#else
          STARTCOLCO = COLSX_PE( 1, MYPE + 1 )
          ENDCOLCO   = COLSX_PE( 2, MYPE + 1 )
          STARTROWCO = ROWSX_PE( 1, MYPE + 1 )
          ENDROWCO   = ROWSX_PE( 2, MYPE + 1 )
+#endif
 
          ALLOCATE( DENS( NCOLS, NROWS, NLAYS ), PRES( NCOLS, NROWS, NLAYS ),
      &             QV  ( NCOLS, NROWS, NLAYS ), TA  ( NCOLS, NROWS, NLAYS ),

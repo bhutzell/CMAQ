@@ -36,14 +36,14 @@ cd CCTM/scripts
 #> Set General Parameters for Configuring the Simulation
  set VRSN      = v54               #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cracmm1_aq        #> Mechanism ID
+ set MECH      = cracmm2           #> Mechanism ID
  set EMIS      = WR705_2018gc2     #> Emission Inventory Details
  set APPL      = STAGE_EM_2018_12US1  #> Application Name (e.g. Gridname)
 
 #> Define RUNID as any combination of parameters above or others. By default,
 #> this information will be collected into this one string, $RUNID, for easy
 #> referencing in output binaries and log files as well as in other scripts.
- setenv RUNID  ${VRSN}_${MECH}_${EMIS}_${APPL}
+ setenv RUNID  ${VRSN}_${compilerString}_${APPL}
 
 #> Set the build directory (this is where the CMAQ executable
 #> is located by default).
@@ -88,7 +88,7 @@ set TSTEP      = 010000            #> output time step interval (HHMMSS)
 if ( $PROC == serial ) then
    setenv NPCOL_NPROW "1 1"; set NPROCS   = 1 # single processor setting
 else
-   @ NPCOL  =  16; @ NPROW = 16 
+   @ NPCOL  =  16; @ NPROW = 8 
    @ NPROCS = $NPCOL * $NPROW
    setenv NPCOL_NPROW "$NPCOL $NPROW"; 
 endif
@@ -172,10 +172,22 @@ setenv CTM_SFC_HONO Y        #> surface HONO interaction [ default: Y ]
                              #> please see user guide (6.10.4 Nitrous Acid (HONO))
                              #> for dependency on percent urban fraction dataset
 setenv CTM_GRAV_SETL Y       #> vdiff aerosol gravitational sedimentation [ default: Y ]
+setenv CTM_PVO3 N            #> consider potential vorticity module for O3 transport from the stratosphere
+                             #>    [default: N]
+
 
 setenv CTM_BIOGEMIS_BE Y     #> calculate in-line biogenic emissions with BEIS [ default: N ]
 setenv CTM_BIOGEMIS_MG N     #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N         #> turns on BDSNP soil NO emissions [ default: N ]
+
+setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affecting photolysis
+                             #> frequencies ( 3 is the default value )
+                             #>  VALUES 1 thru 3 determined Uniformly Volume Mixed spherical
+                             #>      (1-Tabular Mie; 2-Mie Calculation; 3-Case Approx to Mie Theory)
+                             #>  VALUES 4 thru 6 attempts to use core-shell mixing model when the
+                             #>      aerosol mode has signficant black carbon core otherwise use Volume Mixed
+                             #>      model where optics determined by
+                             #>      (4-Tabular Mie; 5-Mie Calculation; 6-Case Approx to Mie Theory)
 
 setenv IC_AERO_M2WET F       #> Specify whether or not initial condition aerosol size distribution
                             #>    is wet or dry [ default: F = dry ]
@@ -292,7 +304,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Initial conditions
   if ($NEW_START == true || $NEW_START == TRUE ) then
-     setenv ICFILE CCTM_CGRID_${RUNID}_${YESTERDAY}.nc #This needs to be replaced when there is a 6-30-2018 IC file SF 
+     setenv ICFILE CCTM_CGRID_${RUNID}_${YESTERDAY}.nc 
      setenv INIT_MEDC_1 notused
   else
      set ICpath = $OUTDIR
@@ -651,7 +663,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
         #echo "Deleting output file: $file"
         /bin/rm -f $file  
      end
-     /bin/rm -f ${OUTDIR}/CCTM_EMDIAG*${RUNID}_${YYYYMMDD}.nc
+     /bin/rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc
 
   else
      #> error if previous log files exist
@@ -660,7 +672,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
        echo "*** To overide, set CLOBBER_DATA = TRUE in run_cctm.csh ***"
        echo "*** and these files will be automatically deleted. ***"
        exit 1
-     endi
+     endif
      
      #> error if previous output files exist
      if ( "$out_test" != "" ) then

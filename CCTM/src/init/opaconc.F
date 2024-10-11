@@ -29,10 +29,13 @@
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE AVG_CONC              ! integral average CONC
       USE UTILIO_DEFN
-#ifdef parallel
+      USE MIO_ASCII
+#ifndef mpas
+#ifdef parallel    
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
+#endif
 #endif
 
       IMPLICIT NONE
@@ -71,7 +74,8 @@
 
 ! Change output date/time to starting date/time - e.g. timestamp 1995196:090000
 ! represents data computed from time 1995196:090000 to 1995196:100000
- 
+
+#ifndef mpas 
 ! Override default beginning time timestamp for ACONC?      
       IF ( END_TIME ) THEN   ! ending time timestamp
          MDATE = JDATE; MTIME = JTIME
@@ -220,6 +224,21 @@
      &                SPC, VNAME3D( SPC )
             END DO
 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+            
+            CALL LOAD_MIO_FILE ( 'A_CONC_1', NLAYS3D, ACONC_BLEV, ACONC_ELEV,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D), 
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D), 
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D), L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+
+            ! Open Output File
             IF ( .NOT. OPEN3( A_CONC_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not open '
      &              // TRIM( A_CONC_1 ) // ' file'
@@ -325,5 +344,6 @@
          END IF
 
       END IF   ! .NOT. OPEN A_CONC_1
+#endif
 
       END SUBROUTINE OPACONC

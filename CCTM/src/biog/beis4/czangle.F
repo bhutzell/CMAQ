@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/biog/beis3/czangle.F,v 1.4 2012/03/28 16:05:37 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE  CZANGLE( JDATE, JTIME, NX, NY )
 
@@ -38,6 +32,14 @@ C   JDATE:JTIME represented in GMT
 C Subroutines and Functions called:  none
  
 C Revision History:
+C Revision History:
+C   Prototype 12/95 by Carlie J Coats, Jr., adapted from UAM-BEIS
+C       subroutines SOLAR() and ZANGLE() for SMOKE-BEIS2:  produces
+C       COS( ZENITH )
+C
+C   Revised 8/96 by SL and CJC: algorithm change to match UAM BEIS2
+C       algorithm
+C
 C   11/99: by Jeff Vukovich taken from v4.2 SMOKE prototype
 C   10/06: yoj
 C   02/11: Shawn Roselle: Replaced I/O API include files with UTILIO_DEFN
@@ -66,12 +68,9 @@ C----------------------------------------------------------------------
 
       USE UTILIO_DEFN
       USE ASX_DATA_MOD, Only: Grid_Data, Met_Data
+      USE CONST
 
       IMPLICIT NONE
-
-C Includes:
-
-      INCLUDE SUBST_CONST     ! constants
 
 C Arguments:
 

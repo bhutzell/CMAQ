@@ -38,10 +38,14 @@ C-----------------------------------------------------------------------
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE MIO_ASCII
+      USE RUNTIME_VARS, ONLY : RUNLEN
+#ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
+#endif
 #endif
 
       IMPLICIT NONE
@@ -70,6 +74,7 @@ C Local variables:
       REAL( 8 ) :: XCELL_RF, YCELL_RF
       INTEGER VGTYP_RF
       REAL VGTOP_RF
+      INTEGER, SAVE :: EDATE, ETIME
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL OK
@@ -78,6 +83,7 @@ C Local variables:
 
 C-----------------------------------------------------------------------
 
+#ifndef mpas
       IF ( FIRSTIME ) THEN
 
          FIRSTIME = .FALSE.
@@ -106,10 +112,14 @@ C Get default file header attibutes from CONC file (assumes file already open)
                END IF
 
 C Set tstep negative to create "circular buffer" type file
-
 !              TSTEP3D = -TSTEP
-               SDATE3D = JDATE
-               STIME3D = JTIME
+
+               EDATE = JDATE
+               ETIME = JTIME
+               CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
+
+               SDATE3D = EDATE
+               STIME3D = ETIME
 
 C Get CGRID nvars
 
@@ -183,6 +193,20 @@ C pick up transported RHOJ
                   WRITE( LOGDEV,'( 5X, "=> VNAME3D(", I3, " ): ", A )' )
      &                   SPC, VNAME3D( SPC )
                END DO
+
+               ! Store MIO Metadata
+               NDIMS3D( 1:NVARS3D ) = 4
+               L_TSTEP( 1:NVARS3D ) = .True.
+               L_LAY  ( 1:NVARS3D ) = .True.
+               L_COL  ( 1:NVARS3D ) = .True.
+               L_ROW  ( 1:NVARS3D ) = .True.
+               L_VEXT ( 1:NVARS3D ) = .False.
+           
+               CALL LOAD_MIO_FILE ( 'S_CGRID', NLAYS3D, 1, NLAYS3D,
+     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &              L_VEXT(1:NVARS3D) )
 
                IF ( .NOT. OPEN3( S_CGRID, FSNEW3, PNAME ) ) THEN
                   XMSG = 'Could not open '
@@ -272,6 +296,8 @@ C proc 0 has CTM_CONC_1 open
 
          END IF   ! .NOT. OPEN S_CGRID
 
+         RETURN
+
       END IF   ! FIRSTIME
 
 #ifdef parallel_io
@@ -312,6 +338,7 @@ C proc 0 has CTM_CONC_1 open
       WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &      'Timestep written to', S_CGRID,
      &      'for date and time', JDATE, JTIME
+#endif
 
       RETURN 
       END

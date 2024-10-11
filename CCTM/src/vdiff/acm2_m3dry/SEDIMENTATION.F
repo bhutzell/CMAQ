@@ -20,7 +20,9 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       module sedimentation
 
 C Revision History:
-C 03 Jul 15 J.Young: inital
+C 03 Jul 15 J.Young: initial
+
+      use const
 
       implicit none
 
@@ -28,7 +30,6 @@ C 03 Jul 15 J.Young: inital
 
       private
 
-      include SUBST_CONST     ! constants
       include SUBST_FILES_ID  ! file name parameters
 
       real,    allocatable, save :: cgrd( :,: )   ! density units
@@ -272,8 +273,14 @@ C subset all the layers and species in cgrid for this grid cell
          end do
 #endif
          do l = 1, nlays
+#ifdef mpas
+            rdl( l ) = alpha * Met_Data%rjacf( c,r,l ) * inv_cell_thickness(c, r, l)
+            rrhodz( l ) = Met_Data%rrhoj( c,r,l ) * inv_cell_thickness(c, r, l)
+#else
             rdl( l ) = alpha * Met_Data%rjacf( c,r,l ) * Grid_Data%rdx3f( l )
             rrhodz( l ) = Met_Data%rrhoj( c,r,l ) * Grid_Data%rdx3f( l )
+#endif
+
             ldens( l ) = Met_Data%dens( c,r,l )
          end do
 

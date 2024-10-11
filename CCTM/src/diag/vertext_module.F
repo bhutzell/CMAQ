@@ -33,7 +33,9 @@
          INTEGER              :: MY_NVERTEXT
          INTEGER, ALLOCATABLE :: MY_VERTEXTJ(:), MY_VERTEXTI(:), PE_NVERTEXT(:,:)
 
+#ifndef mpas
          PRIVATE :: PWRVEC
+#endif
 
          CONTAINS
 
@@ -54,11 +56,14 @@ C-----------------------------------------------------------------------
          USE GRID_CONF
          USE RUNTIME_VARS, ONLY: LOGDEV, LVEXT, N_CONC_VARS, W_VEL
          USE UTILIO_DEFN
+#ifndef mpas
 #ifdef parallel
          USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
          USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
 #endif
+#endif
+         USE MIO_ASCII
 
          IMPLICIT NONE
 C        INTERFACE
@@ -107,6 +112,7 @@ C  environment variable description
 
 C-----------------------------------------------------------------------
 
+#ifndef mpas
          IF (.not. LVEXT) RETURN
          CALL GET_LONLAT(NVERTEXT, VERTEXTLON, VERTEXTLAT)
 
@@ -314,6 +320,21 @@ C Set output file characteristics from GRID_CONF and open
          ALLOCATE( VERTEXT_SPCS( NVERTEXT_SPCS ), STAT = STATUS )
          VERTEXT_SPCS( 1:NVERTEXT_SPCS ) = VNAME3D( 1:NVERTEXT_SPCS ) 
 
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .True.
+         L_COL  ( 1:NVARS3D ) = .False.
+         L_ROW  ( 1:NVARS3D ) = .False.
+         L_VEXT ( 1:NVARS3D ) = .True.
+
+         CALL LOAD_MIO_FILE ( 'CTM_VEXT_1', NLAYS3D, 1, NLAYS3D,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+
+
 C create header
 
          IF ( IO_PE_INCLUSIVE ) THEN   ! open new
@@ -331,8 +352,11 @@ C create header
          END IF
 
          DEALLOCATE(VERTEXTLAT, VERTEXTLON, VERTEXTJR, VERTEXTIR)
+#endif
 
          END SUBROUTINE OPVEXT
+
+#ifndef mpas
 #ifdef parallel
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          LOGICAL FUNCTION PWRVEC( FILNAME, VARNAME, DATE, TIME,
@@ -598,6 +622,7 @@ C Include Files:
          INCLUDE SUBST_FILES_ID    ! I/O definitions and declarations
 
          REAL,    POINTER    :: CGRID( :,:,:,: )  ! Species concentrations
+
          INTEGER, INTENT(IN) :: JDATE             ! current model date, coded YYYYDDD
          INTEGER, INTENT(IN) :: JTIME             ! current model time, coded HHMMSS
          INTEGER, INTENT(IN) :: TSTEP             ! output timestep (HHMMSS)
@@ -724,6 +749,7 @@ C open vext file for update
 
          END SUBROUTINE WR_VEXT
 #endif
+#endif
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          SUBROUTINE GET_LONLAT(NVERT, VERTLON, VERTLAT)
 C-----------------------------------------------------------------------
@@ -744,6 +770,7 @@ C-----------------------------------------------------------------------
          CHARACTER( 16 ) :: PNAME = 'OPVEXT'
          CHARACTER( 96 ) :: XMSG = ' '
 
+#ifndef mpas
          FUNIT = 100
 ! OPEN FORMATTED FILE
 ! EXPECTED FORMAT 
@@ -779,6 +806,8 @@ C-----------------------------------------------------------------------
          ENDDO
 ! CLOSE FILE
          CLOSE(FUNIT)
+#endif
+
          END SUBROUTINE GET_LONLAT
 
          SUBROUTINE LONLAT2XY(NVERTEXT, VERTEXTLON, VERTEXTLAT,
@@ -799,6 +828,7 @@ C-----------------------------------------------------------------------
 !         CALL XY2XY( GDTYP_GD, P_ALP_GD, P_BET_GD, P_GAM_GD, XCENT_GD, YCENT_GD,
 !     &               1      ,    0.d0,    0.d0,    0.d0,    0.d0,    0.d0,
 !     &               NVERTEXT, VERTEXTLON, VERTEXTLAT, VERTEXTIR, VERTEXTJR )
+#ifndef mpas
          IF ( GDTYP3D .EQ. LAMGRD3 ) THEN
              PRJSET = SETLAM( REAL(P_ALP_GD), REAL(P_BET_GD), REAL(P_GAM_GD),
      &                         REAL(XCENT_GD), REAL(YCENT_GD))
@@ -843,6 +873,7 @@ C-----------------------------------------------------------------------
              XMSG = 'Unsupported coordinate system type'
              CALL M3EXIT(PNAME, 0, 0, XMSG, XSTAT2)
          END IF
+#endif
 
          END SUBROUTINE LONLAT2XY
 

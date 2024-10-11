@@ -39,6 +39,9 @@ C   03 Mar 22: D. Wong and G. Sarwar* updated for DMS emissions with cb6r5
       USE RUNTIME_VARS
       USE HGRD_DEFN
       USE DESID_VARS
+#ifdef mpas
+      use util_module
+#endif
 
       IMPLICIT NONE
 
@@ -124,13 +127,11 @@ C   03 Nov 15: B. Gantt and G. Sarwar: created the initial version for marine ga
             USE CENTRALIZED_IO_MODULE, only : chlr, dmsl
 
             IMPLICIT NONE
-            INCLUDE SUBST_CONST                                     ! constants
             INCLUDE SUBST_FILES_ID                                  ! file name parameters
 
 C Arguments:
             INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP
             LOGICAL :: SUCCESS
-
 
             CHARACTER( 80 )       :: VARDESC                        ! env variable description
 
@@ -249,6 +250,7 @@ C 8 Aug 14 B.Gantt adapted from sea salt diagnostic
 
          USE GRID_CONF           ! horizontal & vertical domain specifications
          USE UTILIO_DEFN
+         USE MIO_ASCII
 
          IMPLICIT NONE
 
@@ -266,8 +268,23 @@ C Local variables:
          CHARACTER( 96 ) :: XMSG = ' '
 
          INTEGER      V, L       ! loop induction variables
+         
+#ifdef mpas
+         integer :: io_mode
+#endif
 
 C-----------------------------------------------------------------------
+
+#ifdef mpas
+         if (ncd_64bit_offset) then
+            io_mode = ior (nf90_noclobber, nf90_64bit_offset)
+         else
+            io_mode = nf90_noclobber
+         end if
+
+         call mio_fcreate (CTM_MGEM_1, io_mode)
+
+#else
 
 C Try to open existing file for update
          IF ( .NOT. OPEN3( CTM_MGEM_1, FSRDWR3, PNAME ) ) THEN
@@ -319,6 +336,21 @@ C Set output file characteristics based on COORD.EXT and open diagnostic file
                FDESC3D( L ) = ' '
             END DO
 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_MGEM_1', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+            
+
 C Open marine gas emissions diagnostic file
             IF ( .NOT. OPEN3( CTM_MGEM_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create the CTM_MGEM_1 file'
@@ -326,6 +358,7 @@ C Open marine gas emissions diagnostic file
             END IF
 
          END IF
+#endif
 
          RETURN
 
@@ -356,7 +389,7 @@ C Iodine's impact on tropospheric oxidants: a global model study in GEOS-Chem. A
 
 C-----------------------------------------------------------------------
             USE UTILIO_DEFN
-            USE AEROMET_DATA   ! Includes CONST.EXT
+            USE CONST, ONLY: PI180, DG2M, DKBOLTZ, GRAV
             USE ASX_DATA_MOD, ONLY: MET_DATA                 ! added by Sarwar
             USE CGRID_SPCS     ! CGRID mechanism species
             USE PCGRID_DEFN    ! get cgrid
@@ -406,7 +439,7 @@ C Local Variables:
             REAL    :: SST            
             REAL    :: DMS_L              ! DMS in ocean water - nM  
             REAL    :: DMS                ! DMS in atmosphere                        
-            REAL    :: SICE               ! SEAICE in a gird-cell
+            REAL    :: SICE               ! SEAICE in a grid cell
 
             REAL    :: SCN
             REAL    :: K600
@@ -446,11 +479,15 @@ C Local Variables:
             REAL, PARAMETER :: ONESIXHUNDREDS = 1.0 / 600.0    ! 1.0 / 600.0
 
             LOGICAL, SAVE   :: FIRST_TIME = .TRUE.
+#ifdef mpas
+            CHARACTER( 20 ) :: time_stamp
+#endif
 
 C----------------------------- Begin calc ------------------------------
 
            IF( FIRST_TIME ) THEN
 C calculate grid-cell area
+#ifndef mpas
              IF ( GDTYP_GD .EQ. LATGRD3 ) THEN
                 DX1 = DG2M * XCELL_GD ! in m.
                 DX2 = DG2M * YCELL_GD
@@ -460,6 +497,7 @@ C calculate grid-cell area
                 DX2 = YCELL_GD        ! in m.
              END IF
              A = DX1 * DX2                                      ! m2
+#endif
 
              FIRST_TIME = .FALSE.
            END IF
@@ -492,7 +530,11 @@ C Initialize marine gas output buffer
                 MARINE_AREA = ( OCEAN( C,R ) + SZONE( C,R ) )
                 IF ( MARINE_AREA .GT. 0.0 .AND. SEAICE( C, R ) .LE. 0.0) THEN
 !            convert area fraction to an actual area
+#ifdef mpas
+                     MARINE_AREA = MARINE_AREA * cell_area(c,1)
+#else
                      MARINE_AREA = MARINE_AREA * A
+#endif
 
                      CHLA      = MIN ( 1.0, CHLR ( C,R ) )
                      WSPD10    = U10( C,R )
@@ -624,13 +666,17 @@ C Then reset the MG emissions array and local write counter.
              WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )
 
              IF ( WSTEP .GE. TIME2SEC( TSTEP( 1 ) ) ) THEN
+                IWSTEP = 1.0 / REAL( WSTEP )
+#ifdef mpas
+                call mio_time_format_conversion (jdate, jtime, time_stamp)
+#else
+
                 IF ( .NOT. CURRSTEP( JDATE, JTIME, STDATE, STTIME, TSTEP( 1 ),
      &                                MDATE, MTIME ) ) THEN
                      XMSG = 'Cannot get step date and time'
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                 END IF
                 CALL NEXTIME( MDATE, MTIME, TSTEP( 1 ) )
-                IWSTEP = 1.0 / REAL( WSTEP )
 #ifdef parallel_io
                 IF ( .NOT. IO_PE_INCLUSIVE ) THEN
                   IF ( .NOT. OPEN3( CTM_MGEM_1, FSREAD3, PNAME ) ) THEN
@@ -639,21 +685,32 @@ C Then reset the MG emissions array and local write counter.
                   END IF
                 END IF
 #endif
+#endif
                 DO V = 1, NMGDIAG
                    DO R = 1, NROWS
                       DO C = 1, NCOLS
                          WRMG( C,R ) = MGBF( V,C,R ) * IWSTEP
                       END DO
                    END DO
+#ifdef mpas
+                   call mio_fwrite (CTM_MGEM_1, WRMG_SPC(V), pname, WRMG(:,1), time_stamp)
+#else
                    IF ( .NOT. WRITE3( CTM_MGEM_1, WRMG_SPC( V ),
      &                        MDATE, MTIME, WRMG ) ) THEN
                      XMSG = 'Couldnt write ' // CTM_MGEM_1 // 'file'
                      CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
                    END IF
+#endif
                END DO
+#ifdef mpas
+               WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), a19)')
+     &                      'Timestep written to', CTM_MGEM_1,
+     &                      'for time stamp', time_stamp
+#else
                WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )')
      &                      'Timestep written to', CTM_MGEM_1,
      &                      'for date and time', MDATE, MTIME
+#endif
                WSTEP = 0
                MGBF = 0.0
              END IF
