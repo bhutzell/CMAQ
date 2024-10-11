@@ -23,8 +23,8 @@ C
 C*************************************************************************
       MODULE SPECIES
 
-      Character*(16) :: SPECVARS(2048)
-      INTEGER NSPECVAR
+      Character*(16) :: SPECVARS(2048) = ''
+      INTEGER        :: NSPECVAR       = 0
  
       CONTAINS
  
@@ -46,43 +46,25 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          Character*(16)  field   
 
          NSPECVAR = 0
-         do k=1,2048
- 
-           !  build VARNAME
-           write(field,'(i5)') k
-           Call leftTrim(field)
-           varname = 'SPECIES_' // TRIM(field)
- 
-           ! get environment variable varname
-!          CALL ENVSTR( varname, 'Species Variable definition', 'Not Used', field, status)
-           CALL GET_ENV_STRING( VARNAME, 'Species Variable definition', 'Not Used', FIELD, STATUS )
-           IF( status .ne. 0 ) EXIT
-
-           ! check for SPECIES_1 = 'ALL" for all species
-           if( k.eq.1 .and. TRIM(field).eq.'ALL' ) then
-  
-             NSPECVAR = NVARS3D
-	     
-             if( NSPECVAR.gt.SIZE(SPECVARS) ) then
-                NSPECVAR = SIZE(SPECVARS)
-                write(*,'(//,''**Warning** the number of species exceed maximum'')')
-                write(*,'(''  Only the first'',i4,'' species will be processed'')') NSPECVAR
-              endif                
-
-             ! copy all species
-             do n=1,NVARS3D
-               SPECVARS(n) = VNAME3D(n)
-             enddo 
-
-             EXIT !using all species
-           endif
-      
-           NSPECVAR = NSPECVAR + 1
-           SPECVARS( NSPECVAR ) = field
-
-          enddo
- 
-         end Subroutine LoadSpecies
+         CALL GET_ENVLIST ( 'SPECIES', NSPECVAR, SPECVARS, STATUS )
+         IF ( STATUS .EQ. 0 ) THEN
+            IF ( TRIM( SPECVARS( 1 ) ) .EQ. 'ALL' ) THEN ! clear SPECVARS and set VNAME3D
+               SPECVARS = ''
+               NSPECVAR = NVARS3D
+               DO N = 1,NVARS3D
+                  SPECVARS( N ) = VNAME3D( N )
+               END DO 
+            END IF
+            DO N = 1,NSPECVAR
+               WRITE(6,'("N, SPECVARS( N ) = ",I5,1X,A16)')N,SPECVARS( N )
+            END DO 
+         ELSE
+            WRITE(6,*)'Environment Variable SPECIES not found'
+            STOP
+         END IF
+         RETURN
+          
+         END SUBROUTINE LOADSPECIES
  
       END MODULE SPECIES
 

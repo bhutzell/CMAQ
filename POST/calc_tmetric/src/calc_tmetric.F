@@ -51,19 +51,26 @@ C local variables
       character*(16)  PNAME
       character*(16)  VERSION
       real, allocatable :: in_data(:,:,:) 
-      real, allocatable :: proc_data(:,:,:) 
+      real, allocatable :: sum_data(:,:,:) 
+      real, allocatable :: proc_data(:,:,:,:) 
       integer lfn
       integer i, s, t, idx, K, N, NAVG
-      integer column, row
+      integer col, row, lay
       real x, y, lon, lat
       
-      INTEGER   NLOOPS       
+      INTEGER   NLOOPS      
       INTEGER   AVG_TIME
       INTEGER   N_RETREIVE   ! Number of hour to read for files per metric
       INTEGER   N_SAMPLE     ! NUMBER OF HOURS INCLUDED TO THE AVERAGE   
       INTEGER   N_PULL       ! ARRAY index
       INTEGER   OUTPUT_FREQ  ! 
       INTEGER   HOURS, MINUTES, SECONDS, START_SECONDS
+      INTEGER   PULL_DATE, PULL_TIME
+      INTEGER   NCOLS, NROWS, NLAYS
+      
+      CHARACTER(LEN = M3_FILE_LEN) :: PULL_FLNAME
+
+      LOGICAL :: COMPUTE_AVG = .FALSE.
 
 
 C**********************************************************************
@@ -108,12 +115,17 @@ C... get operation (SUM or AVG)
         WRITE(6,'("OPERATIONS set to ",A)')TRIM( C_PROC )
         CALL M3ERR(PNAME, 0, 0, 'Must set OPERATION to SUM or AVG', .TRUE.)      
       ENDIF
+      
+      IF( C_PROC .EQ. 'AVG' )COMPUTE_AVG = .TRUE.
 
 C... get species definitions from system variables
       Call loadSpecies()
       write(*,'(i5,'' species defined'')') NSPECVAR
-
-
+      IF ( NSPECVAR .LE. 0 ) THEN
+          WRITE(6,'("ERROR:: No species defined. Check Environment Varaible SPECIES")')
+!         CALL NF90_CLOSE
+          STOP
+      END IF
 
 C... get name of output file 
 C      CALL ENVSTR( 'OUTFILE', 'Name of output file', 'OUTFILE', outfile, status)
@@ -192,69 +204,84 @@ C... open output file as new
         stop 
       endif 
 
+      NROWS = NROWS3D
+      NCOLS = NCOLS3D
+      NLAYS = NLAYS3D
 
 C... start process loop
 
       ! allocate data array for 1 species
-      allocate( in_data(NCOLS3D, NROWS3D, M3GRID % NLAYS), stat=status )
+!     allocate( in_data(NCOLS, NROWS, NLAYS), stat=status )
+      allocate( in_data(NCOLS, NROWS, NLAYS), 
+     &          sum_data(NCOLS, NROWS, NLAYS), stat=status )
       IF ( status .NE. 0 ) THEN
-         MSG = 'Failure allocating in_data'
+         MSG = 'Failure allocating in_data or sum_data'
          CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
       END IF
 
-      allocate( proc_data(NCOLS3D, NROWS3D, M3GRID % NLAYS), stat=status )
+      allocate( proc_data(NSPECVAR, NCOLS, NROWS, NLAYS), stat=status )
       IF ( status .NE. 0 ) THEN
          MSG = 'Failure allocating proc_data'
          CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
       END IF
 
-
-      DO S = 1, NSPECVAR
-       write(*,'(''Processing species:'',a)') TRIM(SPECVARS(s))
-
-!        DO N = 1, NSTEPS !number of time steps across all model files from module_tstep
-        DO N = 1, NLOOPS, OUTPUT_FREQ ! loop for each block average
+      DO N = 1, NLOOPS, OUTPUT_FREQ ! loop for each block average
          
           N_RETREIVE = MIN( N+AVG_TIME-1,NSTEPS)
-
           IF( N+AVG_TIME-1 .GT. NSTEPS ) EXIT ! Do not compute for incomplete sample
           N_SAMPLE  = 0
-          PROC_DATA = 0.0
-       
+!         PROC_DATA(S,1:NCOLS,1:NROWS,1:NLAYS) = 0.0       
+          sum_data = 0.0
           DO NAVG = N, N_RETREIVE             
 ! have to determine if reading one timestep too many
               N_PULL = MIN( NAVG,NSTEPS ) 
               N_SAMPLE = N_SAMPLE + 1
+              PULL_FLNAME = M3_FLNAME(STEP_FILE(N_PULL))
+              PULL_DATE   = STEP_DATE(N_PULL)
+              PULL_TIME   = STEP_TIME(N_PULL)
+              DO S = 1, NSPECVAR
+                  IF( .NOT. READ3(PULL_FLNAME,SPECVARS(S),ALLAYS3,PULL_DATE,PULL_TIME,IN_DATA) )THEN
+                      MSG = 'Could not read input Models-3 file ' // PULL_FLNAME
+                      CALL M3ERR( PNAME, PULL_DATE, PULL_TIME, MSG, .FALSE. )             
+!                 ELSE             
+!                     DO LAY = 1,NLAYS
+!                        DO ROW = 1,NROWS
+!                           DO COL = 1,NCOLS
+!                              PROC_DATA(S,COL,ROW,LAY) = PROC_DATA(S,COL,ROW,LAY) + IN_DATA(COL,ROW,LAY)                    
+!                           END DO
+!                        END DO
+!                    END DO
+!                     PROC_DATA(S,:,:,:) = PROC_DATA(S,:,:,:) + IN_DATA                    
+                  END IF
 
-              IF( .NOT. READ3( M3_FLNAME(STEP_FILE(N_PULL)), SPECVARS(S), 
-     &                     ALLAYS3, STEP_DATE(N_PULL), 
-     &                     STEP_TIME(N_PULL), IN_DATA ) ) THEN
-                MSG = 'Could not read input Models-3 file ' // M3_FLNAME(STEP_FILE(N_PULL))
-                CALL M3ERR( PNAME, STEP_DATE(N_PULL), STEP_TIME(N_PULL), MSG, .FALSE. )             
-             ELSE             
-                PROC_DATA = PROC_DATA + IN_DATA                    
-             ENDIF
+                  SUM_DATA = SUM_DATA + IN_DATA                    
+!                 PROC_DATA(S,:,:,:) = PROC_DATA(S,:,:,:) + IN_DATA                    
+
+                  IF ( NAVG .EQ. N_RETREIVE )THEN
+!                     write(*,'(''Done Processing species:'',a)') TRIM(SPECVARS(S))
+                      PROC_DATA(S,:,:,:) = SUM_DATA(:,:,:)
+                  END IF
+              END DO ! NSPECVAR
 #ifdef verbose
              WRITE(6,'(3(A),2(I8,1X))')'Reading ',TRIM(SPECVARS(S)),' at ', 
-     &       STEP_DATE(N_PULL), STEP_TIME(N_PULL)             
+     &       PULL_DATE, PULL_TIME
 #endif
           END DO ! NAVG
-
-          Write(*,'(''Done reading for species '',a,I4,a)') VNAME3D(S),N_SAMPLE,
-     &    ' timestep(s) read.'
-c         compute average if desired, write out the result for this variable
-          
-          IF ( C_PROC .EQ. 'AVG' ) PROC_DATA = PROC_DATA 
-     &                                       / REAL(N_SAMPLE,4) 
-            
-          IF ( .NOT. WRITE3('OUTFILE', VNAME3D(S), STEP_DATE(N_PULL),
-     &                      STEP_TIME(N_PULL), PROC_DATA) ) THEN
-              MSG = ' Cannot write to OUTFILE for species ' // VNAME3D(S)
-              CALL M3EXIT( PNAME, STEP_DATE(N_PULL), STEP_TIME(N_PULL), MSG, 1 ) 
-          ENDIF
-
-        enddo !N
-      ENDDO !S
+!          Write(*,'(''Done reading for species '',a,I4,a)') VNAME3D(S),N_SAMPLE,
+!     &    ' timestep(s) read.'
+          Write(*,'(''Done reading for species '',I4,'' timestep(s) read.'')') N_SAMPLE
+c         compute average if desired, write out the results
+          IF ( COMPUTE_AVG ) PROC_DATA = PROC_DATA 
+     &                                  / REAL(N_SAMPLE,4)             
+          write(6,'("writing for JDATE, JTIME = ",2(I8,1X))')PULL_DATE,PULL_TIME
+          DO S = 1, NSPECVAR
+              IF ( .NOT. WRITE3('OUTFILE', VNAME3D(S), PULL_DATE,
+     &                            PULL_TIME, PROC_DATA(S,:,:,:)) ) THEN
+                  MSG = ' Cannot write to OUTFILE for species ' // VNAME3D(S)
+                  CALL M3EXIT( PNAME, STEP_DATE(N_PULL), STEP_TIME(N_PULL), MSG, 1 ) 
+              ENDIF
+          END DO ! NSPECVAR
+      END DO ! NLOOP    
                
       Write(*,'(''finished reading model values'')')
 

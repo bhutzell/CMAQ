@@ -41,7 +41,8 @@ C*************************************************************************
       INTEGER, PARAMETER :: MXM3FLS = MXFILE3 - 1   ! Max no. of input files - use IOAPI parameter 
                                                     ! MXFILE3 - 1 to also allow one output file
 
-      CHARACTER*16  M3_FLNAME( MXM3FLS )    ! Names of Models-3 file
+      INTEGER, PARAMETER    :: M3_FILE_LEN = 16
+      CHARACTER(LEN = M3_FILE_LEN) :: M3_FLNAME( MXM3FLS )    ! Names of Models-3 file
 
       CHARACTER*256 M3FILE                  ! first filename
 
