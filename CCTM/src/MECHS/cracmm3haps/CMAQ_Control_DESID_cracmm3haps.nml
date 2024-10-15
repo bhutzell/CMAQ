@@ -173,6 +173,7 @@
    'EVERYWHERE', 'ALL' ,'CHLOROPRENE','CHLOROPRENE',        'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'ETHYLBENZ','ETHYLBENZENE',         'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'BENZOAPYRNE','BENAPY',             'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'HCN','HCN',                        'GAS'  ,1.  ,'UNIT','a',
 ! Inert Tracers of PAH congeners for simple exposure assessments
    'EVERYWHERE', 'ALL' , 'PAH_000E0', 'PAH_000E0',          'GAS',1.0  ,'UNIT','a',
    'EVERYWHERE', 'ALL' , 'PAH_176E5', 'PAH_176E5',          'GAS',1.0  ,'UNIT','a',
