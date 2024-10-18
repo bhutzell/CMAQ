@@ -45,7 +45,7 @@
 #===============================================================================
 
 #> User choices: working directory and application ID
- set VRSN     = v54                            #> model version
+ set VRSN     = v60                            #> model version
  set EXEC     = calc_tmetric_${VRSN}.exe        #> executable name for this application
  set CFG      = calc_tmetric_${VRSN}.cfg        #> BLDMAKE configuration file name
  setenv BLDER   ${CMAQ_HOME}/UTIL/bldmake/bldmake_${compilerString}.exe #> location of makefile builder executable 
@@ -197,6 +197,22 @@
  mv Makefile Makefile.$compilerString
  if ( -e Makefile.$compilerString && -e Makefile ) rm Makefile
  ln -s Makefile.$compilerString Makefile
+
+#create make.it script that compiles create_omi without having to source config_cmaq.csh
+
+ set make_it = "make.it"
+ echo "#! /bin/csh -f" >! ${make_it}
+ echo " "              >> ${make_it}
+ echo "source ../../../../config_cmaq.csh "${compiler}" "${compilerVrsn}  >> ${make_it}
+ echo 'if ( $#argv == 1 )then'                                     >> ${make_it}
+ echo '   if ( $1  == "clean" )make clean'                         >> ${make_it}
+ echo "#setenv debug true"                                         >> ${make_it}
+ echo "endif"                                                      >> ${make_it}
+ echo "make"                                                       >> ${make_it}
+ echo "unsetenv compiler"                                          >> ${make_it}
+ echo "unsetenv compilerVrsn"                                      >> ${make_it}
+ echo 'exit()'         >> ${make_it}
+ chmod +x ${make_it}
 
 #> Check for error during makefile generation
  if ( $status != 0 ) then

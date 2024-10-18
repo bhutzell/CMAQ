@@ -52,6 +52,7 @@ C local variables
       character*(16)  VERSION
       real, allocatable :: in_data(:,:,:) 
       real, allocatable :: sum_data(:,:,:) 
+      real, allocatable :: min_data(:,:,:,:) 
       real, allocatable :: proc_data(:,:,:,:) 
       integer lfn
       integer i, s, t, idx, K, N, NAVG
@@ -67,6 +68,7 @@ C local variables
       INTEGER   HOURS, MINUTES, SECONDS, START_SECONDS
       INTEGER   PULL_DATE, PULL_TIME
       INTEGER   NCOLS, NROWS, NLAYS
+      INTEGER   :: OPERATION_FLAG = -1 
       
       CHARACTER(LEN = M3_FILE_LEN) :: PULL_FLNAME
 
@@ -111,13 +113,33 @@ C... get operation (SUM or AVG)
 !     CALL ENVSTR( 'OPERATION', 'Operation to be peformed - SUM or AVG', 'SUM', c_proc, status)
       CALL GET_ENV_STRING( 'OPERATION', 'Operation to be peformed - SUM or AVG', 'SUM', C_PROC, STATUS )
 
-      IF ( ( C_PROC .NE. 'SUM') .AND. ( C_PROC .NE. 'AVG') )THEN
-        WRITE(6,'("OPERATIONS set to ",A)')TRIM( C_PROC )
-        CALL M3ERR(PNAME, 0, 0, 'Must set OPERATION to SUM or AVG', .TRUE.)      
-      ENDIF
-      
-      IF( C_PROC .EQ. 'AVG' )COMPUTE_AVG = .TRUE.
+!      IF ( ( C_PROC .NE. 'SUM') .AND. ( C_PROC .NE. 'AVG') )THEN
+!        WRITE(6,'("OPERATIONS set to ",A)')TRIM( C_PROC )
+!        CALL M3ERR(PNAME, 0, 0, 'Must set OPERATION to SUM or AVG', .TRUE.)      
+!      ENDIF
+!      
+!      IF( C_PROC .EQ. 'AVG' )COMPUTE_AVG = .TRUE.
 
+      SELECT CASE ( C_PROC )
+        CASE( 'AVG' )
+            OPERATION_FLAG = -1
+            COMPUTE_AVG    = .TRUE.
+        CASE( 'SUM' )
+            OPERATION_FLAG = 0
+        CASE( 'MIN' )
+            OPERATION_FLAG = 1
+        CASE( 'MAX' )
+            OPERATION_FLAG = 2
+        CASE( 'RNG' )  ! range
+            OPERATION_FLAG = 3
+        CASE DEFAULT
+            WRITE(6,'("OPERATIONS set to ",A)')TRIM( C_PROC )
+            CALL M3ERR(PNAME, 0, 0, 
+     &      'Must set OPERATION to MAX, MIN, RNG (Range_, SUM or AVG', .TRUE.)      
+      END SELECT
+      WRITE(6,'("Operational Flag, COMPUTE_AVG = ",I3,", ",L4)')OPERATION_FLAG,
+     & COMPUTE_AVG      
+      
 C... get species definitions from system variables
       Call loadSpecies()
       write(*,'(i5,'' species defined'')') NSPECVAR
@@ -219,6 +241,14 @@ C... start process loop
          CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
       END IF
 
+      IF ( OPERATION_FLAG .GT. 2 ) THEN
+         allocate( min_data(NSPECVAR, NCOLS, NROWS, NLAYS), stat=status )
+         IF ( status .NE. 0 ) THEN
+            MSG = 'Failure allocating min_data'
+            CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
+         END IF
+      END IF
+      
       allocate( proc_data(NSPECVAR, NCOLS, NROWS, NLAYS), stat=status )
       IF ( status .NE. 0 ) THEN
          MSG = 'Failure allocating proc_data'
@@ -230,8 +260,18 @@ C... start process loop
           N_RETREIVE = MIN( N+AVG_TIME-1,NSTEPS)
           IF( N+AVG_TIME-1 .GT. NSTEPS ) EXIT ! Do not compute for incomplete sample
           N_SAMPLE  = 0
-!         PROC_DATA(S,1:NCOLS,1:NROWS,1:NLAYS) = 0.0       
-          sum_data = 0.0
+          
+!  initial data array(s) based on wanted operation
+          IF ( OPERATION_FLAG .EQ. 1 ) THEN       
+            PROC_DATA =  1.0E36
+          ELSE IF ( OPERATION_FLAG .EQ. 2 ) THEN
+            PROC_DATA  = -1.0E36
+          ELSE IF ( OPERATION_FLAG .EQ. 3 ) THEN
+            PROC_DATA  = -1.0E36
+            MIN_DATA   =  1.0E36
+          ELSE
+            PROC_DATA = 0.0
+          END IF
           DO NAVG = N, N_RETREIVE             
 ! have to determine if reading one timestep too many
               N_PULL = MIN( NAVG,NSTEPS ) 
@@ -239,28 +279,36 @@ C... start process loop
               PULL_FLNAME = M3_FLNAME(STEP_FILE(N_PULL))
               PULL_DATE   = STEP_DATE(N_PULL)
               PULL_TIME   = STEP_TIME(N_PULL)
+          
               DO S = 1, NSPECVAR
+
                   IF( .NOT. READ3(PULL_FLNAME,SPECVARS(S),ALLAYS3,PULL_DATE,PULL_TIME,IN_DATA) )THEN
                       MSG = 'Could not read input Models-3 file ' // PULL_FLNAME
                       CALL M3ERR( PNAME, PULL_DATE, PULL_TIME, MSG, .FALSE. )             
-!                 ELSE             
-!                     DO LAY = 1,NLAYS
-!                        DO ROW = 1,NROWS
-!                           DO COL = 1,NCOLS
-!                              PROC_DATA(S,COL,ROW,LAY) = PROC_DATA(S,COL,ROW,LAY) + IN_DATA(COL,ROW,LAY)                    
-!                           END DO
-!                        END DO
-!                    END DO
-!                     PROC_DATA(S,:,:,:) = PROC_DATA(S,:,:,:) + IN_DATA                    
                   END IF
 
-                  SUM_DATA = SUM_DATA + IN_DATA                    
-!                 PROC_DATA(S,:,:,:) = PROC_DATA(S,:,:,:) + IN_DATA                    
+                  SELECT CASE ( OPERATION_FLAG )
+                    CASE( -1 )
+                       PROC_DATA(S,:,:,:) = PROC_DATA(S,:,:,:) + IN_DATA 
+                    CASE( 0 )
+                       PROC_DATA(S,:,:,:) = PROC_DATA(S,:,:,:) + IN_DATA 
+                    CASE( 1 )
+                       WHERE( PROC_DATA(S,:,:,:) .GT. IN_DATA ) PROC_DATA(S,:,:,:) = IN_DATA                   
+                    CASE( 2 )
+                       WHERE( PROC_DATA(S,:,:,:) .LT. IN_DATA ) PROC_DATA(S,:,:,:) = IN_DATA 
+                    CASE( 3 )
+                       WHERE( PROC_DATA(S,:,:,:) .LT. IN_DATA ) PROC_DATA(S,:,:,:) = IN_DATA 
+                       WHERE( MIN_DATA(S,:,:,:) .GT. IN_DATA ) MIN_DATA(S,:,:,:) = IN_DATA                   
+                  END SELECT                   
+!                     SUM_DATA = PROC_DATA(S,:,:,:)
+!                     WRITE(6,'(A,3(ES12.4))')SPECVARS(S) // 'MAX, MIN, SUM DATA = ',MAXVAL(SUM_DATA),
+!    &                MINVAL(SUM_DATA),SUM(SUM_DATA)                      
 
+#ifdef verbose
                   IF ( NAVG .EQ. N_RETREIVE )THEN
-!                     write(*,'(''Done Processing species:'',a)') TRIM(SPECVARS(S))
-                      PROC_DATA(S,:,:,:) = SUM_DATA(:,:,:)
+                      write(*,'(''Done Processing species:'',a)') TRIM(SPECVARS(S))
                   END IF
+#endif
               END DO ! NSPECVAR
 #ifdef verbose
              WRITE(6,'(3(A),2(I8,1X))')'Reading ',TRIM(SPECVARS(S)),' at ', 
@@ -271,8 +319,11 @@ C... start process loop
 !     &    ' timestep(s) read.'
           Write(*,'(''Done reading for species '',I4,'' timestep(s) read.'')') N_SAMPLE
 c         compute average if desired, write out the results
-          IF ( COMPUTE_AVG ) PROC_DATA = PROC_DATA 
-     &                                  / REAL(N_SAMPLE,4)             
+          IF( OPERATION_FLAG .GT. 2 ) THEN
+             PROC_DATA = PROC_DATA - MIN_DATA
+          ELSE IF ( OPERATION_FLAG .LT. 0 ) THEN
+             PROC_DATA = PROC_DATA / REAL(N_SAMPLE,4)     
+          END IF        
           write(6,'("writing for JDATE, JTIME = ",2(I8,1X))')PULL_DATE,PULL_TIME
           DO S = 1, NSPECVAR
               IF ( .NOT. WRITE3('OUTFILE', VNAME3D(S), PULL_DATE,
