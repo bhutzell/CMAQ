@@ -79,11 +79,11 @@ C-------------------------------------------------------------------------------
          Use UTILIO_DEFN         
          Use Bidi_Mod, Only: gamma1, gamma2, MHp1, MHp2
          Use depv_data_module
+         Use const
          Use, intrinsic :: ieee_arithmetic, only: isnan => ieee_is_nan
 
          Implicit None 
 ! Includes
-         Include SUBST_CONST     ! constants
          Include SUBST_FILES_ID  ! file name parameters
 
 ! Local Variables

@@ -31,6 +31,7 @@
       USE DESID_VARS
       USE CENTRALIZED_IO_MODULE
       USE BUDGET_DEFN
+      USE CONST,     ONLY : MWAIR
 
 #ifndef mpas
 #ifdef parallel
@@ -113,7 +114,6 @@ C-----------------------------------------------------------------------
       IMPLICIT NONE 
 
       ! Includes:
-      INCLUDE SUBST_CONST       ! Constants
       INCLUDE SUBST_FILES_ID    ! file name parameters
       INCLUDE SUBST_EMISPRM     ! Emissions processing control parameters
       
@@ -260,7 +260,6 @@ C-----------------------------------------------------------------------
       IMPLICIT NONE
 
       ! Includes:
-      INCLUDE SUBST_CONST       ! Constants
       INCLUDE SUBST_FILES_ID    ! file name parameters
       INCLUDE SUBST_EMISPRM     ! Emissions processing control parameters
       
@@ -412,10 +411,10 @@ c  Dry Deposition processing section
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       SUBROUTINE PA_UPDATE_DDEP( DDEP, JDATE, JTIME, TSTEP )
 
+
       IMPLICIT NONE
 
       ! Includes:
-      INCLUDE SUBST_CONST       ! Constants
       INCLUDE SUBST_FILES_ID    ! file name parameters
       INCLUDE SUBST_EMISPRM     ! Emissions processing control parameters
       

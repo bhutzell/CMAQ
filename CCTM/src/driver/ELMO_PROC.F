@@ -679,7 +679,7 @@
      &                          'FPM10    ','FPM25TO10','FAMS     ' /)
 
       ELMO_KEY( 19 )%WORD = 'TOXICS'
-      ELMO_KEY( 19 )%N = 21
+      ELMO_KEY( 19 )%N = 27
       ALLOCATE( ELMO_KEY( 19 )%LIST( 21 ), STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_KEY(19)'
@@ -691,7 +691,8 @@
      &           'PM25_HMN    ','PM25_HNI    ','PM25_HAS    ','PM25_HG     ',
      &           'PM10_HDIESEL','PM10_HBE    ','PM10_HCD    ','PM10_HCR3   ',
      &           'PM10_HCR6   ','PM10_HCR    ','PM10_HPB    ','PM10_HMN    ',
-     &           'PM10_HAS    ','PM10_HG     '  /)
+     &           'PM10_HNI    ','PM10_HAS    ','PM10_HG     ','PM25_BENAPY ',
+     &           'PM10_BENAPY ','PMF_BENAPY  ','BENAPY_FAERO','GAS_BENAPY  ' /)
 
       ELMO_KEY( 20 )%WORD = 'SIMPLE'
       ELMO_KEY( 20 )%N = 2
@@ -1780,7 +1781,7 @@
              CASE ( ID_PM25_HCD ) 
                N_VARS = 1
                CALL INIT_ELMO_COEFFS( IDG, N_VARS, 'PM25' )
-               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACD', 1.0 )
+               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACADMIUM', 1.0 )
  
              ! Map PM25_HCR3 - HAP inventory Chromium III
              CASE ( ID_PM25_HCR3 ) 
@@ -1858,7 +1859,7 @@
              CASE ( ID_PM10_HCD ) 
                N_VARS = 1
                CALL INIT_ELMO_COEFFS( IDG, N_VARS, 'PM10' )
-               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACD', 1.0 )
+               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACADMIUM', 1.0 )
  
              ! Map PM10_HCR3 - HAP inventory Chromium III
              CASE ( ID_PM10_HCR3 ) 
@@ -2309,8 +2310,9 @@
      &                     MOMENT3_CONC, WET_AERO_DENS, AEROSPC_CONC,
      &                     AH2O_IDX, AORGH2O_IDX, AEROSPC, CALC_AERODIST_PARAMS,
      &                     AEROMODE, DRY_AERO_DENS, APOC_IDX, APNCOM_IDX
-      USE AEROMET_DATA, ONLY: AIRRH, PI, AIRTEMP, SRFTEMP, AIRPRES, DZ, CFRAC, PV, ZH
+      USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, SRFTEMP, AIRPRES, DZ, CFRAC, PV, ZH
       USE CGRID_SPCS, ONLY : RHOJ_LOC
+      USE CONST, ONLY : PI
       USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, OASPC, MAP_OAtoAERO
       USE RUNTIME_VARS, ONLY : PHOTDIAG
       USE ASX_DATA_MOD, ONLY : MET_DATA
@@ -3145,11 +3147,12 @@
       USE SOA_DEFN, ONLY : Extract_Soa
       USE AEROSOL_CHEMISTRY, ONLY: HETCHEM_RATES
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, AIRQV, AIRDENS, AIRPRES,
-     &                        SRFTEMP, H2OVP, H2OSATVP, MWWAT, MWAIR,
+     &                        SRFTEMP, H2OVP, H2OSATVP, 
      &                        CFRAC, DZ, PV, ZH
       use centralized_io_module, only : interpolate_var, pv_avail
       use RUNTIME_VARS
       Use phot_mod, Only: init_phot_shared 
+      use const, only: ESATL, MWWAT, MWAIR
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY : SENGRID
@@ -3174,26 +3177,12 @@
     
       ! Statement Function **************
       REAL, PARAMETER :: EPSWATER = MWWAT / MWAIR
-      REAL ESATL ! arithmetic statement function for vapor pressure [Pa]
-      REAL TT
-      ! Coefficients for the equation, ESATL defining saturation vapor pressure
-      REAL, PARAMETER :: AL = 610.94
-      REAL, PARAMETER :: BL = 17.625
-      REAL, PARAMETER :: CL = 243.04
 
       INTEGER C, R, L
 
       REAL, ALLOCATABLE, SAVE :: PRES(:,:,:), TA(:,:,:), TEMP2(:,:),
      &                           QV(:,:,:), DENS(:,:,:), CFRACS(:,:),
      &                           ZF(:,:,:), PVS(:,:,:), ZHS(:,:,:)
-
-      ! values of AL, BL, and CL are from:
-      ! Alduchov and Eskridge, "Improved Magnus Form Approximations of
-      !                       Saturation Vapor Pressure,"
-      !                       Jour. of Applied Meteorology, vol. 35,
-      !                       pp 601-609, April, 1996.
-      ESATL( TT ) = AL * EXP( BL * ( TT - 273.15 ) / ( TT - 273.15 + CL ) )
- 
 
       IF ( FIRSTIME ) THEN
           FIRSTIME = .FALSE.
@@ -3335,6 +3324,7 @@
 !-------------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
+      USE MIO_ASCII
 
       IMPLICIT NONE
 
@@ -3403,7 +3393,22 @@
             DO L = 2, MXDESC3
                FDESC3D( L ) = ' '
             END DO
-         
+
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_ELMO_1', NLAYS3D, INST_LAYER_BOT, INST_LAYER_TOP,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+ 
+
             ! Open the Instantaneous aerosol diagnostic file
             IF ( .NOT. OPEN3( CTM_ELMO_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create '// CTM_ELMO_1 // ' file'
@@ -3447,6 +3452,21 @@
                FDESC3D( L ) = ' '
             END DO
          
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_AELMO_1', NLAYS3D, AVRG_LAYER_BOT, AVRG_LAYER_TOP,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+
+
             ! Open the Instantaneous aerosol diagnostic file
             IF ( .NOT. OPEN3( CTM_AELMO_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create '// CTM_AELMO_1 // ' file'

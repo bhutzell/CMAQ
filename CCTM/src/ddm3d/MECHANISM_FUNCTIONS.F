@@ -118,9 +118,6 @@ C         Called by chemistry driver
 
         IMPLICIT NONE
 
-C..Includes:
-!         INCLUDE SUBST_CONST     ! CMAQ constants
- 
          CHARACTER( 16 ), PARAMETER :: PNAME = 'SET_MECHANISM'     ! Program name
 
 C..arguments: 
@@ -424,9 +421,6 @@ C         Called by chemistry driver
 
         IMPLICIT NONE
 
-C..Includes:
-!         INCLUDE SUBST_CONST     ! CMAQ constants
- 
          CHARACTER( 16 ), PARAMETER :: PNAME = 'CHART_IRR'     ! Program name
 
          INTEGER :: I, J, RXN, IP, IPNEG, IL 
