@@ -773,13 +773,12 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  endif
  mv ${CFG}.bld $Bld/${CFG}
 
-#> If a CRACMM mechanism is used and the compiler is gcc, remove trailing
-#>   comments in species namelist files (or else model will not run)
- if ( ${Mechanism} =~ *cracmm* && ${compiler} == gcc ) then
-    echo "   >>> removing trailing comments from species namelists <<<"
-    sed -i 's/,\!.*/,/' $Bld/GC_${Mechanism}.nml
-    sed -i 's/,\!.*/,/' $Bld/AE_${Mechanism}.nml
-    sed -i 's/,\!.*/,/' $Bld/NR_${Mechanism}.nml
+#> gcc compiler chokes on trailing comments in namelists 
+ if ( ${compiler} == gcc ) then
+    echo "   >>> removing trailing comments from namelists <<<"
+    foreach fnml ( $Bld/*.nml )
+      sed -i 's/,\!.*/,/' $fnml
+    end
  endif
 
 #> If Building WRF-CMAQ, download WRF, download auxillary files and build
