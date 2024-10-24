@@ -112,7 +112,7 @@
  
  # Run CHEMMECH
  cd ${CMAQ_HOME}/UTIL/chemmech/scripts
- ./run_chemmech.csh
+ ./run_chemmech.csh ${compiler} ${compilerVrsn}
  if ( $? != 0 ) then
    echo "CHEMMECH did not run correctly --> Build Process Halted"
    exit 1
