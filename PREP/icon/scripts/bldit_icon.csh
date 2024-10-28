@@ -71,6 +71,7 @@
 
 #> Set full path of Fortran 90 compiler
  set FC = ${myFC}
+ set CC = ${myCC}
  set FP = $FC
  setenv BLDER ${CMAQ_HOME}/UTIL/bldmake/bldmake_${compilerString}.exe   #> name of model builder executable
 
@@ -148,6 +149,8 @@
  echo                                                              >> $Cfile
  set text = "$quote$CPP_FLAGS$quote;"
  echo "cpp_flags   $text"                                          >> $Cfile
+ echo                                                              >> $Cfile
+ echo "c_compiler  $CC;"                                           >> $Cfile
  echo                                                              >> $Cfile
  echo "f_compiler  $FC;"                                           >> $Cfile
  echo                                                              >> $Cfile
