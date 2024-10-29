@@ -47,6 +47,6 @@ NR_SPECIES_DATA =
 'PAH_192E3'      ,278.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'PAH_101E2'      ,268.4   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'PAH_176E2'      ,302.4   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'PAH_114E1'      ,256.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes'
+'PAH_114E1'      ,256.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'HCN'            ,27.02   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'HYDROGEN_CYANIDE',1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes'
 /
