@@ -727,10 +727,10 @@
 
               IMPLICIT NONE
 
-              N_ATOMS = 14
+              N_ATOMS = 15
               ALLOCATE( ATOMS(N_ATOMS) )
               ATOMS(1:N_ATOMS) = ( / 'CA', 'MN', 'CL', 'HG', 'BR', 'NA', 'SI', 'S ', 
-     &                               'TI', 'FE', 'K ', 'I ', 'N ', 'C ' / )
+     &                               'TI', 'FE', 'K ', 'I ', 'N ', 'C ', 'O ' / )
 
               ALLOCATE( SPECIES_ATOMS ( N_ATOM_SPECIES,N_ATOMS),
      &                  ATOMS_SPECIES_REPRESENTATIVE( N_ATOM_SPECIES ),
@@ -770,7 +770,6 @@
                   ATOMS_SPC: DO IATOM_SPC = 1, N_ATOM_SPECIES 
                      IF( TRIM(MECHANISM_SPC( ISPC )) .EQ. TRIM(ATOM_SPECIES( IATOM_SPC )) )THEN
                          MECH_SPECIES_ATOMS( ISPC,1:N_ATOMS ) = SPECIES_ATOMS( IATOM_SPC,1:N_ATOMS )
-!                         print*,iatom_spc,size(ATOMS2MECH_MAP)
                          ATOMS2MECH_MAP( IATOM_SPC ) = ISPC
                          ATOMS_FOUND = .TRUE.
                          EXIT
@@ -1190,6 +1189,7 @@
               DO ISPC = 1, N_ATOM_SPECIES
                  IF ( TRIM( SPARSE_SPECIES( JSPC ) ) .EQ. TRIM( ATOM_SPECIES( ISPC ) ) ) THEN   ! found
                     MECH_SPECIES_ATOMS( JSPC,1:N_ATOMS ) = SPECIES_ATOMS( ISPC,1:N_ATOMS )
+                    print*, 'set: ',MECH_SPECIES_ATOMS( JSPC,1:N_ATOMS )
                     CYCLE MECH_SPECIES
                  END IF
               END DO
