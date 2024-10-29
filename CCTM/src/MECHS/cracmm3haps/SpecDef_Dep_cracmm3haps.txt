@@ -38,12 +38,12 @@ DDEP_O3            ,kg ha-1     ,O3[1]
 WDEP_O3            ,kg ha-1     ,O3[2]
 DDEP_PNA           ,kg ha-1     ,HNO4[1], PeroxyNitric Acid
 WDEP_PNA           ,kg ha-1     ,HNO4[2], PeroxyNitric Acid
-DDEP_ETHYLBENZENE  ,kg ha-1     ,ETHYLBENZENE[1] 
-WDEP_ETHYLBENZENE  ,kg ha-1     ,ETHYLBENZENE[2] 
+DDEP_ETHYLBENZENE  ,kg ha-1     ,EBZ[1] 
+WDEP_ETHYLBENZENE  ,kg ha-1     ,EBZ[2] 
 DDEP_DICLORBENZENE ,kg ha-1     ,DICL_BENZENE[1] 
 WDEP_DICLORBENZENE ,kg ha-1     ,DICL_BENZENE[2] 
-DDEP_STYRENE       ,kg ha-1     ,STYRENE[1] 
-WDEP_STYRENE       ,kg ha-1     ,STYRENE[2] 
+DDEP_STYRENE       ,kg ha-1     ,STY[1] 
+WDEP_STYRENE       ,kg ha-1     ,STY[2] 
 DDEP_XYLENE        ,kg ha-1     ,XYLENE[1] 
 WDEP_XYLENE        ,kg ha-1     ,XYLENE[2] 
 
@@ -91,19 +91,19 @@ WDEP_TCL           ,kg ha-1     ,0.972*HCL[2] + ACLJ[2] + ACLK[2]
 TDEP_CL            ,kg ha-1     ,DDEP_ACLJK[0] + WDEP_TCL[0]
 
 !! Calcium
-DDEP_CAJ	       ,kg ha-1     ,ACAJ[1]
-WDEP_CAJ	       ,kg ha-1     ,ACAJ[2]
+DDEP_CAJ	   ,kg ha-1     ,ACAJ[1]
+WDEP_CAJ	   ,kg ha-1     ,ACAJ[2]
 DDEP_CAK           ,kg ha-1     ,0.0320*ASEACAT[1]+0.0838*ASOIL[1]+0.0562*ACORS[1]
 WDEP_CAK           ,kg ha-1     ,0.0320*ASEACAT[2]+0.0838*ASOIL[2]+0.0562*ACORS[2]
-DDEP_CAJK	       ,kg ha-1     ,ACAJ[1]+DDEP_CAK[0]
-WDEP_CAJK	       ,kg ha-1     ,ACAJ[2]+WDEP_CAK[0]
+DDEP_CAJK	   ,kg ha-1     ,ACAJ[1]+DDEP_CAK[0]
+WDEP_CAJK	   ,kg ha-1     ,ACAJ[2]+WDEP_CAK[0]
 
 !! Iron
-DDEP_FEJ	       ,kg ha-1     ,AFEJ[1]
-WDEP_FEJ	       ,kg ha-1     ,AFEJ[2]
+DDEP_FEJ	   ,kg ha-1     ,AFEJ[1]
+WDEP_FEJ	   ,kg ha-1     ,AFEJ[2]
 
 !! Aluminum
-DDEP_ALJ	       ,kg ha-1     ,AALJ[1]
+DDEP_ALJ	   ,kg ha-1     ,AALJ[1]
 WDEP_ALJ           ,kg ha-1     ,AALJ[2]
 
 !! Silicon

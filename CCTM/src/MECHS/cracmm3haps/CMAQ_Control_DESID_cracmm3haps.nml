@@ -165,13 +165,11 @@
    'EVERYWHERE', 'ALL' ,'DICHLOROBENZENE','DICL_BENZENE',   'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'ACETONITRILE','ACET_NITRILE',      'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'XYLENES','XYLENE',                 'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'STYRENE','STYRENE',                'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'ACRYLICACID','ACRYACID',           'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'HEXANE','HEXANE',                  'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'METHCHLORIDE','METHCHLORIDE',      'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'CARBSULFIDE','CARBSULFIDE',        'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'CHLOROPRENE','CHLOROPRENE',        'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'ETHYLBENZ','ETHYLBENZENE',         'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'BENZOAPYRNE','BENAPY',             'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'HCN','HCN',                        'GAS'  ,1.  ,'UNIT','a',
 ! Inert Tracers of PAH congeners for simple exposure assessments
