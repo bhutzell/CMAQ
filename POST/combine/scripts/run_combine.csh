@@ -101,7 +101,7 @@
 
   #> Define name of combine output file to save hourly average concentration.
   #> A new file will be created for each month/year.
-   setenv OUTFILE ${POSTDIR}/COMBINE_ACONC_${RUNID}_$YYYY$MM.nc
+   setenv OUTFILE ${POSTDIR}/COMBINE_AELMO_${RUNID}_$YYYY$MM.nc
 
   #> Define name of input files needed for combine program.
   #> File [1]: CMAQ conc/aconc file
