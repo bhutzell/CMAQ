@@ -1,7 +1,7 @@
 #!/bin/csh -f
 
-# ============== CCTMv5.4.X STAGE EM CRACMM 12US1 Run Script ================
-# Usage: run.cctm >&! cctm_2018_12US1_CRACMM.log &                                
+# ============== CCTMv5.5.X STAGE EM CRACMM 12US1 Run Script ================
+# Usage: run_cctm_2018_12US1_v54_Base_STAGE_EM_CRACMM.csh >&! cctm_2018_12US1_CRACMM.log &                                
 #
 # To report problems or request help with this script/program:
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -34,7 +34,7 @@ source ./config_cmaq.csh $compiler $compilerVrsn
 cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v54               #> Code Version
+ set VRSN      = v55               #> Code Version
  set PROC      = mpi               #> serial or mpi
  set MECH      = cracmm2           #> Mechanism ID
  set EMIS      = WR705_2018gc2     #> Emission Inventory Details
@@ -157,8 +157,6 @@ setenv CTM_WB_DUST N         #> use inline windblown dust emissions [ default: Y
 setenv CTM_LTNG_NO Y         #> turn on lightning NOx [ default: N ]
 setenv KZMIN Y               #> use Min Kz option in edyintb [ default: Y ], 
                              #>    otherwise revert to Kz0UT
-setenv CTM_FST N             #> mosaic method to get land-use specific stomatal flux 
-                             #>    [ default: N ]
 setenv PX_VERSION Y          #> WRF PX LSM
 setenv CLM_VERSION N         #> WRF CLM LSM
 setenv NOAH_VERSION N        #> WRF NOAH LSM
