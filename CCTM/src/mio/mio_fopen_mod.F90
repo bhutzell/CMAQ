@@ -30,36 +30,49 @@
                      fmode, time_strlen_dim_loc, floc, l_num_of_outfiles
           character (mio_max_time_length) :: time_str
           character (mio_max_filename_len) :: full_name
-          logical :: done
+          logical :: done, called_once = .false.
           character :: tt
 
-          if (present(num_of_outfiles)) then
-             l_num_of_outfiles = num_of_outfiles
-          else
-             l_num_of_outfiles = 0
-          end if
-
-          if (mod(mio_n_infiles, mio_df_add_space) == 0) then
-             call mio_expand_file_data (l_num_of_outfiles)
-          end if
-
-          mio_n_infiles = mio_n_infiles + 1
-
-          mio_cfile = mio_n_infiles
- 
-          floc = mio_cfile
-
-          mio_file_data(floc)%filename = fname
-
           call mio_get_env (full_name, fname, ' ')
-          mio_file_data(floc)%full_filename = full_name
 
-          t = mio_search (full_name, mio_file_data(:)%full_filename, mio_nfiles-1)
+          if (mio_n_infiles == 0) then
+             t = -1
+          else
+             t = mio_search (full_name, mio_file_data(:)%full_filename, mio_nfiles)
+          end if
 
           if (t .gt. 0) then
-             mio_file_data(floc)%link = t
+!            mio_file_data(floc)%link = t
+             write (mio_logdev, '(a16, a25)') fname, ' has already been opened '
           else 
+
+             if (present(num_of_outfiles)) then
+                l_num_of_outfiles = num_of_outfiles
+                called_once = .true.
+             else
+                if (.not. called_once) then
+                   l_num_of_outfiles = mio_n_outfiles
+                   called_once = .true.
+                else 
+                   l_num_of_outfiles = 0
+                end if 
+             end if
+
+             if (mod(mio_n_infiles, mio_df_add_space) == 0) then
+                call mio_expand_file_data (l_num_of_outfiles)
+             end if
+
+             mio_n_infiles = mio_n_infiles + 1
+
              mio_nfiles = mio_nfiles + 1
+
+             mio_cfile = mio_nfiles
+ 
+             floc = mio_cfile
+
+             mio_file_data(floc)%filename = fname
+
+             mio_file_data(floc)%full_filename = full_name
 
              mio_file_data(floc)%link = -1
              if (mode .eq. mio_read_only) then
@@ -317,11 +330,11 @@
 
              if (mio_file_data(floc)%time_dim_loc .gt. 0) then
                 nsteps = mio_file_data(floc)%dim_value(mio_file_data(floc)%time_dim_loc)
-!             if (mio_file_data(floc)%mode .eq. mio_read_write) then
-!                allocate (mio_file_data(floc)%timestamp(nsteps+mio_preset_num_tsteps), stat=stat)
-!             else
-                 allocate (mio_file_data(floc)%timestamp(nsteps), stat=stat)
-!             end if
+!               if (mio_file_data(floc)%mode .eq. mio_read_write) then
+!                  allocate (mio_file_data(floc)%timestamp(nsteps+mio_preset_num_tsteps), stat=stat)
+!               else
+                   allocate (mio_file_data(floc)%timestamp(nsteps), stat=stat)
+!               end if
              else
                 allocate (mio_file_data(floc)%timestamp(1), stat=stat)
                 mio_file_data(floc)%timestamp(1) = zero_time
@@ -464,7 +477,7 @@
              if (mio_fd_circular == 0) then
                 df_size = size(mio_file_data1) - 1
                 allocate (mio_file_data0(0:df_size+mio_df_add_space), stat=stat)
-                do n = 1, mio_n_infiles
+                do n = 1, mio_nfiles
                    call mio_copy_file_data (mio_file_data1(n), mio_file_data0(n))
                 end do
                 deallocate (mio_file_data1)
@@ -472,7 +485,7 @@
              else
                 df_size = size(mio_file_data0) - 1
                 allocate (mio_file_data1(0:df_size+mio_df_add_space), stat=stat)
-                do n = 1, mio_n_infiles
+                do n = 1, mio_nfiles
                    call mio_copy_file_data (mio_file_data0(n), mio_file_data1(n))
                 end do
                 deallocate (mio_file_data0)

@@ -247,6 +247,11 @@
                           mio_file_data(dest)%rowde_pe(2, mio_nprocs, 2),                 &
                           stat=stat)
 
+                if (stat .ne. 0) then
+                   write (mio_logdev, '(a38)') 'Failure allocating data in mio_fcreate'
+                   stop
+                end if
+
                 mio_file_data(dest)%dim_name  = mio_file_data(source)%dim_name
                 mio_file_data(dest)%dim_value = mio_file_data(source)%dim_value
 

@@ -11,7 +11,7 @@
         type (mio_file_record), intent(inout) :: source
         type (mio_file_record), intent(out)   :: dest
 
-        integer :: v, size, lndims, lfnvars, lnsteps, &
+        integer :: v, dsize, lndims, lfnvars, lnsteps, &
                    ln_global_atts, stat
 
         dest%filename            = source%filename
@@ -143,21 +143,24 @@
         dest%nrows_pe       = source%nrows_pe
         dest%colde_pe       = source%colde_pe
         dest%rowde_pe       = source%rowde_pe
-        dest%timestamp      = source%timestamp
+
+        if (size(source%timestamp) > 0) then
+           dest%timestamp = source%timestamp
+        end if
 
         do v = 1, lfnvars
            lndims = source%var_ndims(v)
-           size   = source%num_var_att(v)
+           dsize  = source%num_var_att(v)
 
            dest%var_dimids(1:lndims, v)  = source%var_dimids(1:lndims, v)
            dest%var_dimsize(1:lndims, v) = source%var_dimsize(1:lndims, v)
 
-           dest%var_att_name(1:size, v)  = source%var_att_name(1:size, v)
-           dest%var_att_len(1:size, v)   = source%var_att_len(1:size, v)
-           dest%var_att_type(1:size, v)  = source%var_att_type(1:size, v)
-           dest%int_vatt_val(1:size, v)  = source%int_vatt_val(1:size, v)
-           dest%real_vatt_val(1:size, v) = source%real_vatt_val(1:size, v)
-           dest%char_vatt_val(1:size, v) = source%char_vatt_val(1:size, v)
+           dest%var_att_name(1:dsize, v)  = source%var_att_name(1:dsize, v)
+           dest%var_att_len(1:dsize, v)   = source%var_att_len(1:dsize, v)
+           dest%var_att_type(1:dsize, v)  = source%var_att_type(1:dsize, v)
+           dest%int_vatt_val(1:dsize, v)  = source%int_vatt_val(1:dsize, v)
+           dest%real_vatt_val(1:dsize, v) = source%real_vatt_val(1:dsize, v)
+           dest%char_vatt_val(1:dsize, v) = source%char_vatt_val(1:dsize, v)
         end do
 
 ! for circular buffer ?? for the time being not sure to keep circular
@@ -205,7 +208,10 @@
                     source%ncols_pe,                     &
                     source%nrows_pe,                     &
                     source%colde_pe,                     &
-                    source%rowde_pe,                     &
-                    source%timestamp)
+                    source%rowde_pe)
 
+        if (size(source%timestamp) > 0) then
+           deallocate(source%timestamp)
+        end if
+    
       end subroutine mio_copy_file_data
