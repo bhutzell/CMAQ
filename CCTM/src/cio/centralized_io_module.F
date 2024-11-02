@@ -344,13 +344,13 @@
      &                      n_l2d,               ! # of lightning strikes file variables
      &                              size_lt      ! lightning file variable size
 
-        integer, private ::   cro_ncols,   cro_nrows,   ! cro file nools and nrows 
-     &                      w_cro_ncols, w_cro_nrows,   ! window cro file nools and nrows 
-     &                      x_cro_ncols, x_cro_nrows,   ! extended cro file nools and nrows 
-     &                      s_cro_ncols, s_cro_nrows,   ! standard cro file nools and nrows (this is used to distinguish 
-                                                        ! met cro and regular cro file in twoway coupled model
-     &                        dot_ncols,   dot_nrows,   ! dot file nools and nrows 
-     &                      x_dot_ncols, x_dot_nrows    ! extended dot file nools and nrows 
+        integer, private ::   cro_ncols,   cro_nrows,   ! cro file ncols and nrows 
+     &                      w_cro_ncols, w_cro_nrows,   ! window cro file ncols and nrows 
+     &                      x_cro_ncols, x_cro_nrows,   ! extended cro file ncols and nrows 
+     &                      s_cro_ncols, s_cro_nrows,   ! standard cro file ncols and nrows (this is used to distinguish 
+                                                        ! met cro and regular cro file in twoway coupled model)
+     &                        dot_ncols,   dot_nrows,   ! dot file ncols and nrows 
+     &                      x_dot_ncols, x_dot_nrows    ! extended dot file ncols and nrows 
 
         integer, private :: cio_LTLYRS                  ! number of layers in lightning strike dataset
         CHARACTER( 16 )  :: LT_NAME                     ! LNT name: old Cis NLDNstrk and new is LNT
@@ -5966,6 +5966,7 @@ C Read the various categories of normalized emissions
           USE RXNS_DATA, ONLY : MECHNAME
           USE UTILIO_DEFN
           USE HGRD_DEFN
+          USE mio_module
 
           INCLUDE SUBST_FILES_ID             ! file name parameters
 
@@ -6003,93 +6004,102 @@ C Read the various categories of normalized emissions
 
           ELSEIF ( OCEAN_CHEM .AND. .NOT. USE_MARINE_GAS_EMISSION ) THEN
 
-             IF ( .NOT. OPEN3( OCEAN_1, FSREAD3, PNAME ) ) THEN
-                XMSG = 'Could not open ' // OCEAN_1
-                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-             ELSE 
-                n_opened_file = n_opened_file + 1
+!            IF ( .NOT. OPEN3( OCEAN_1, FSREAD3, PNAME ) ) THEN
+!               XMSG = 'Could not open ' // OCEAN_1
+!               Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!            ELSE 
+             call mio_fopen( OCEAN_1, mio_read_only )
+             n_opened_file = n_opened_file + 1
 
-                call subhfile ( OCEAN_1, gxoff, gyoff,
-     &                          startcol, endcol, startrow, endrow )
+             call subhfile ( OCEAN_1, gxoff, gyoff,
+     &                       startcol, endcol, startrow, endrow )
 
-                IF ( .NOT. XTRACT3( OCEAN_1, 'OPEN',
-     &                        1, 1, startrow, endrow, startcol, endcol,
-     &                        0, 0, ocean ) ) Then
-                   XMSG = 'Could not read OPEN from ' // OCEAN_1
-                   CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                END IF
+!               IF ( .NOT. XTRACT3( OCEAN_1, 'OPEN',
+!    &                        1, 1, startrow, endrow, startcol, endcol,
+!    &                        0, 0, ocean ) ) Then
+!                  XMSG = 'Could not read OPEN from ' // OCEAN_1
+!                  CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!               END IF
+             call mio_fread( OCEAN_1, 'OPEN', pname, ocean )
 
-                IF ( .NOT. XTRACT3( OCEAN_1, 'SURF',
-     &                        1, 1, startrow, endrow, startcol, endcol,
-     &                        0, 0, szone ) ) Then
-                   XMSG = 'Could not interpolate SURF from ' // OCEAN_1
-                   CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                END IF
+!               IF ( .NOT. XTRACT3( OCEAN_1, 'SURF',
+!    &                        1, 1, startrow, endrow, startcol, endcol,
+!    &                        0, 0, szone ) ) Then
+!                  XMSG = 'Could not interpolate SURF from ' // OCEAN_1
+!                  CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!               END IF
+             call mio_fread( OCEAN_1, 'SURF', pname, szone )
 
-                WHERE ( ocean .LT. 0.001 ) ocean = 0.0  ! ensure values are nonnegative and greater than 0.001
-                WHERE ( szone .LT. 0.001 ) szone = 0.0  ! ensure values are nonnegative and greater than 0.001  
+             WHERE ( ocean .LT. 0.001 ) ocean = 0.0  ! ensure values are nonnegative and greater than 0.001
+             WHERE ( szone .LT. 0.001 ) szone = 0.0  ! ensure values are nonnegative and greater than 0.001  
 
-                dmsl  = 0.0          
-                chlr  = 0.0
+             dmsl  = 0.0          
+             chlr  = 0.0
              
-             ENDIF
+!             ENDIF
 
           ELSEIF ( OCEAN_CHEM .AND. USE_MARINE_GAS_EMISSION ) THEN
 
-             IF ( .NOT. OPEN3( OCEAN_1, FSREAD3, PNAME ) ) THEN
-                XMSG = 'Could not open ' // OCEAN_1
-                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-             ELSE 
-                n_opened_file = n_opened_file + 1
+!            IF ( .NOT. OPEN3( OCEAN_1, FSREAD3, PNAME ) ) THEN
+!               XMSG = 'Could not open ' // OCEAN_1
+!               Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!            ELSE 
+             call mio_fopen( OCEAN_1, mio_read_only )
+             n_opened_file = n_opened_file + 1
 
-                call subhfile ( OCEAN_1, gxoff, gyoff,
-     &                          startcol, endcol, startrow, endrow )
+             call subhfile ( OCEAN_1, gxoff, gyoff,
+     &                       startcol, endcol, startrow, endrow )
 
-                IF ( .NOT. XTRACT3( OCEAN_1, 'OPEN',
-     &                        1, 1, startrow, endrow, startcol, endcol,
-     &                        0, 0, ocean ) ) Then
-                   XMSG = 'Could not read OPEN from ' // OCEAN_1
-                   CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                END IF
+!               IF ( .NOT. XTRACT3( OCEAN_1, 'OPEN',
+!    &                        1, 1, startrow, endrow, startcol, endcol,
+!    &                        0, 0, ocean ) ) Then
+!                  XMSG = 'Could not read OPEN from ' // OCEAN_1
+!                  CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!               END IF
+             call mio_fread( OCEAN_1, 'OPEN', pname, ocean ) 
 
-                IF ( .NOT. XTRACT3( OCEAN_1, 'SURF',
-     &                        1, 1, startrow, endrow, startcol, endcol,
-     &                        0, 0, szone ) ) Then
-                   XMSG = 'Could not interpolate SURF from ' // OCEAN_1
-                   CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                END IF                
+!               IF ( .NOT. XTRACT3( OCEAN_1, 'SURF',
+!    &                        1, 1, startrow, endrow, startcol, endcol,
+!    &                        0, 0, szone ) ) Then
+!                  XMSG = 'Could not interpolate SURF from ' // OCEAN_1
+!                  CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!               END IF                
+             call mio_fread( OCEAN_1, 'SURF', pname, szone )
 
-                WHERE ( ocean .LT. 0.001 ) ocean = 0.0  ! ensure values are nonnegative and greater than 0.001
-                WHERE ( szone .LT. 0.001 ) szone = 0.0  ! ensure values are nonnegative and greater than 0.001 
+             WHERE ( ocean .LT. 0.001 ) ocean = 0.0  ! ensure values are nonnegative and greater than 0.001
+             WHERE ( szone .LT. 0.001 ) szone = 0.0  ! ensure values are nonnegative and greater than 0.001 
 
-                If ( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) then
+             If ( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) then
       
-                   If ( .Not. XTRACT3( OCEAN_1, 'CHLO',
-     &                                 1, 1, startrow, endrow, startcol, endcol,
-     &                                 0, 0, chlr ) ) Then
-                      XMSG = 'Could not read CHLO from ' // OCEAN_1
-                      Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                   End If
+!                  If ( .Not. XTRACT3( OCEAN_1, 'CHLO',
+!    &                                 1, 1, startrow, endrow, startcol, endcol,
+!    &                                 0, 0, chlr ) ) Then
+!                     XMSG = 'Could not read CHLO from ' // OCEAN_1
+!                     Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!                  End If
+                call mio_fread( OCEAN_1, 'CHLO', pname, chlr )
 
-                   If ( .Not. XTRACT3( OCEAN_1, 'DMS',
-     &                                 1, 1, startrow, endrow, startcol, endcol,
-     &                                 0, 0, dmsl ) ) Then
-                      XMSG = 'Could not read DMS from ' // OCEAN_1
-                      Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                   End If
+!                  If ( .Not. XTRACT3( OCEAN_1, 'DMS',
+!    &                                 1, 1, startrow, endrow, startcol, endcol,
+!    &                                 0, 0, dmsl ) ) Then
+!                     XMSG = 'Could not read DMS from ' // OCEAN_1
+!                     Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!                  End If
+                call mio_fread( OCEAN_1, 'DMS', pname, dmsl )
 
-                ELSEIF ( INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0 ) then
+             ELSEIF ( INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0 ) then
 
-                   chlr = 0.0
+                chlr = 0.0
                 
-                   If ( .Not. XTRACT3( OCEAN_1, 'DMS',
-     &                                 1, 1, startrow, endrow, startcol, endcol,
-     &                                 0, 0, dmsl ) ) Then
-                      XMSG = 'Could not read DMS from ' // OCEAN_1
-                      Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                   End If
+!                  If ( .Not. XTRACT3( OCEAN_1, 'DMS',
+!    &                                 1, 1, startrow, endrow, startcol, endcol,
+!    &                                 0, 0, dmsl ) ) Then
+!                     XMSG = 'Could not read DMS from ' // OCEAN_1
+!                     Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!                  End If
+                 call mio_fread( 'OCEAN_1', 'DMS', pname, dmsl )
 
-                END IF
+!               END IF
 
              END IF
           END IF
