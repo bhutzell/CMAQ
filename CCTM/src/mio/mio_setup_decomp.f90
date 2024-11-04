@@ -103,7 +103,7 @@
 
            deallocate ( ncols_we, nrows_sn)
 
-! setup corresponding dot file map bases on subhfile setting
+! setup corresponding dot file map 
 
            do i = 1, nprocs
               colde_pe(1, i, 2) = colde_pe(1, i, 1)

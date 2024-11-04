@@ -1,4 +1,4 @@
-! Purpose: Initialize MIO system by readying in how many input and
+! Purpose: Initialize MIO system by reading in how many input and
 !          output files, forming a parallel domain decomposition map,
 !          and reading in output variable definition if it is available
 
@@ -72,7 +72,7 @@
         else
            call mio_setup_rank (mio_mype)
            if (present(ptype)) then
-              mio_parallelism = mio_true_parallel    ! true paralle using pnetCDF or netCDF-4
+              mio_parallelism = mio_true_parallel    ! true parallel using pnetCDF or netCDF-4
               if (mod(mio_mype, npcol) == 0) then
                  mio_io_pe_inclusive = .true.
               end if
