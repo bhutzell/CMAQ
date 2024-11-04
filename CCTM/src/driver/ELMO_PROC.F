@@ -565,8 +565,8 @@
       END IF
 
       ELMO_KEY( 9 )%LIST = (/'GAMMA_N2O5  ','GAMMA_N2O5K ','YIELD_CLNO2 ',
-     &          'YIELD_CLNO2K','GAMMA_IEPOX ','K_IEPOX     ','GAMMA_IMAE', 
-     &          'EF_HNO3 ' /)
+     &          'YIELD_CLNO2K','GAMMA_IEPOX ','K_IEPOX     ','GAMMA_IMAE  ', 
+     &          'EF_HNO3     ' /)
 
       ELMO_KEY( 10 )%WORD = 'FINE_SPECIES'
       ELMO_KEY( 10 )%N = 17

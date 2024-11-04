@@ -81,7 +81,7 @@
      &                       'HETERO_INO2_CLJ ', 'HETERO_INO2_BRJ ',
      &                       'HETERO_HOI_CLJ  ', 'HETERO_HOI_BRJ  ',
      &                       'HETERO_ISO3NOSJ ', 'HETERO_ISO3OSJ  ',
-     &                       'HETERO_HO2      ', 'HETERO_ANO3    '/)
+     &                       'HETERO_HO2      ', 'HETERO_ANO3     '/)
 
        INTEGER, PARAMETER  :: IA_N2O5IJ         =   1
        INTEGER, PARAMETER  :: IA_N2O5K          =   2
@@ -585,7 +585,7 @@ C *** Local Variables
 
 C *** variables for parameterization by Bertram and Thornton 
       REAL         :: ACL           ! i+j or k mode chloride, ug/m3 
-      REAL         :: ASS           ! j mode seasalt, ug/m3  
+      REAL         :: ASEAST        ! j mode seasalt, ug/m3  
       REAL         :: ABR           ! i+j or k mode bromide, ug/m3   
       REAL         :: AH2O          ! i+j or k mode water, ug/m3          
       REAL         :: POC           ! i or j mode primary organic carbon, ug/m3 
@@ -605,7 +605,7 @@ C Latitude and longitude for zenith angle calculation: Golam Sarwar * July 1, 20
       REAL          JHNO3                           ! HNO3 photolysis rate, 1/min
       LOGICAL       DARK                            ! DARK = TRUE is night,  DARK = FALSE is day
       
-      REAL      ASSM      ! seasalt,  [moles / m3 ] 
+      REAL      ASEASTM   ! seasalt,  [moles / m3 ] 
       REAL      ANO3      ! fine mode nitrate [ ug/m3 ] 
       REAL      ANO3M     ! nitrate,  [moles / m3 ] 
 
@@ -984,7 +984,7 @@ c *** get fine aerosol H2O and chlorine concentrations in
                   AH2O = aerospc_conc( AH2O_IDX,N )
                   ACL  = aerospc_conc( ACL_IDX, N )
                   CL_PPM( N ) = PPM_FACTOR * ( ACL * INV_MWCL )
-		  ASS  = aerospc_conc( ASS_IDX, N )
+		  ASEAST = aerospc_conc( ASEAST_IDX, N )
 
       If ( Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) Then 
          ABR  = aerospc_conc( ABR_IDX, N ) 
@@ -1077,13 +1077,13 @@ C...  calculate cosine of zenith angle for the cell and determine day or night; 
                 ANO3 = aerospc_conc( ANO3_IDX,1 ) + aerospc_conc( ANO3_IDX,2 )
                 ANO3M = ANO3 / aerospc_mw( ANO3_IDX )
         
-                ASSM = aerospc_conc( ASS_IDX, 2 ) / aerospc_mw( ASS_IDX )
+                ASEASTM = aerospc_conc( ASEAST_IDX, 2 ) / aerospc_mw( ASEAST_IDX )
                
-                FAC_HNO3 = 100.0  / ( 1.0 + ( ANO3M / ASSM ))                
+                FAC_HNO3 = 100.0  / ( 1.0 + ( ANO3M / ASEASTM ))                
                 FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
 
                 IF ( L_ELMO ) THEN 
-                 IF (DARK == .FALSE. ) THEN 
+		 IF (.NOT. DARK) THEN	 
                   EF_HNO3( C,R,L ) = FAC_HNO3
                  ELSE 
                   EF_HNO3( C,R,L ) = 0.0 

@@ -218,3 +218,4 @@ NUM,Number of particles
 SRF,Surface area of particles
 ATRPN,SOA from TRPN
 AHONIT,SOA from HONIT
+ASEAST, J-mode seasalt concentration (tracer)

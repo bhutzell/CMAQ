@@ -349,7 +349,6 @@
    'EVERYWHERE', 'ALL'    ,'PMFINE_MN'   ,'AMN'         ,'FINE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMFINE_H2O'  ,'AH2O'        ,'FINE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMFINE_OTHR' ,'AOTHR'       ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_SS'   ,'ASS'         ,'FINE',1.   ,'UNIT','a',
 
 
    ! Wind-Blown Dust and Sea Spray Scaling
@@ -360,7 +359,6 @@
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SS' ,'ASS'       ,'COARSE',1.   ,'UNIT','a',
 
 
    ! Updated aromatic species for CRACMM2
