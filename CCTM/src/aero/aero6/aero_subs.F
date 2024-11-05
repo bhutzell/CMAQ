@@ -30,7 +30,7 @@ C  KEY SUBROUTINES CALLED:
 C     GETPAR, ORGAER5, GETCOAGS, INTERCOAG_GH, INTRACOAG_GH,
 C     VOLINORG
 
-C  KEY FUNCTIONS CALLED:  ERF, ERFC, GETAF
+C  KEY FUNCTIONS CALLED:  GETAF
 
 C  REVISION HISTORY:
 C     Coded in December 1999 by Dr. Francis S. Binkowski
@@ -207,7 +207,7 @@ C-----------------------------------------------------------------------
       USE PRECURSOR_DATA      ! gas phase aero precursor data
       USE SOA_DEFN
       USE AEROMET_DATA
-      USE CONST, EXCLUDE_ERF => ERF  ! for maintaining consistency with research branch
+      USE CONST
       USE UTILIO_DEFN
       USE AERO_BUDGET
 
@@ -2784,8 +2784,6 @@ C             (If X = 1 (i.e. spherical), then D_st = D_ve = D_va * rho0/rho )
  
 C  Key Subroutines called: none
  
-C  Key Functions called:  ERF
- 
 C  Revision History:
 C    Coded Jul 2005 by Prakash Bhave
 C          Apr 2008 J.Kelly: corrected equation for Dst25 calculation
@@ -2842,7 +2840,7 @@ C     Cutoffs
           ! of this paper has a typo (i.e., eq. 2 is correct).
           D_ST1  = 0.5 * ( SQRT( B ** 2 + 4.0 * D_AD1 *
      &                        ( D_AD1 + B ) * 1.0E+03 / RHOP ) - B )
-          ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+          ! Calculate mass fraction with Dca < SizeCut
           ERFARG = ( LOG( D_ST1 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) - 3.0 * XXLSG / SQRT2
           ERF1 = ERF( ERFARG )
       END IF
@@ -2853,7 +2851,7 @@ C     Cutoffs
       D_ST2  = 0.5 * ( SQRT( B ** 2 + 4.0 * D_AD2 *
      &                     ( D_AD2 + B ) * 1.0E+03 / RHOP ) - B )
 
-      ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+      ! Calculate mass fraction with Dca < SizeCut
       ERFARG = ( LOG( D_ST2 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) - 3.0 * XXLSG / SQRT2
       ERF2 = ERF( ERFARG )
 
@@ -2903,8 +2901,6 @@ C         X   - Shape factor = (NonSpherical Drag Force)/(Spherical Drag Force)
 C       Vacuum Aerodynamic -> Volume Equivalent (DeCarlo et al., 2004)
 C         D_ve = D_va * ro0/ro * X
 C             (If X = 1 (i.e. spherical), then D_st = D_ve = D_va * ro0/ro )
- 
-C  Key Functions called:  ERF
  
 C  Revision History:
 C    Coded Feb 2016 B.Murphy: Created
@@ -3367,8 +3363,6 @@ C             (If X = 1 (i.e. spherical), then D_st = D_ve = D_va * rho0/rho )
  
 C  Key Subroutines called: none
  
-C  Key Functions called:  ERF
- 
 C  Revision History:
 C    Coded Jul 2005 by Prakash Bhave
 C          Apr 2008 J.Kelly: corrected equation for Dst25 calculation
@@ -3410,12 +3404,12 @@ C     Cutoffs
       IF ( D_ST1 .EQ. 0.0 ) THEN
           ERF1 = -1.0
       ELSE
-          ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+          ! Calculate mass fraction with Dca < SizeCut
           ERFARG = ( LOG( D_ST1 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) 
           ERF1 = ERF( ERFARG )
       END IF
 
-      ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+      ! Calculate mass fraction with Dca < SizeCut
       ERFARG = ( LOG( D_ST2 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) 
       ERF2 = ERF( ERFARG )
 
