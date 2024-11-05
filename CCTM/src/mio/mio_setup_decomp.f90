@@ -115,6 +115,17 @@
            ncols_pe(:, 2) = colde_pe(2, :, 2) - colde_pe(1, :, 2) + 1
            nrows_pe(:, 2) = rowde_pe(2, :, 2) - rowde_pe(1, :, 2) + 1
 
+!           write( mio_logdev, '(A8,2x,i3)' ) ' MYPE = ', mio_mype
+!           write( mio_logdev, '(A)' ) ' PE  NCOLS  Col_Range  NROWS Row_Range  NCOLSD  Col_RangeD NROWSD  Row_RangeD'
+!           do i = 1, nprocs
+!              write( mio_logdev, '(i3, 4(3x, i3, 2x, i3, ":", 2x, i3))') i-1, &
+!                     ncols_pe(i,1), colde_pe(1,i,1), colde_pe(2,i,1), &
+!                     nrows_pe(i,1), rowde_pe(1,i,1), rowde_pe(2,i,1), &
+!                     ncols_pe(i,2), colde_pe(1,i,2), colde_pe(2,i,2), &
+!                     nrows_pe(i,2), rowde_pe(1,i,2), colde_pe(2,i,2)
+!           end do
+!           write( mio_logdev, * )
+
         else if (op_type == mio_wrf_format) then  ! WRF grid
 ! for the column dimension
            quotient = ncols / npcol

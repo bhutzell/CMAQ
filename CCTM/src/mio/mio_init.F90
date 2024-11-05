@@ -60,6 +60,12 @@
         mio_nprocs   = 1
 #endif
 
+        if (present(logdev)) then
+           mio_logdev = logdev
+        else
+           mio_logdev = mio_setup_logdev ()
+        end if
+
         mio_npcol    = npcol
         mio_nprow    = nprow
 
@@ -121,7 +127,7 @@
            stop
         end if
 
-        ! first line is the line that contains number of input and output files and skips all
+        ! first line is the line that contains number of input and output files and skips 
         ! all lines with comments
         found_first_line = .false.
         do while (.not. found_first_line)
@@ -274,12 +280,6 @@
 
 !       mio_n_infiles  = num_of_infiles
         mio_n_outfiles = num_of_outfiles
-
-        if (present(logdev)) then
-           mio_logdev = logdev
-        else
-           mio_logdev = mio_setup_logdev ()
-        end if
 
         deallocate (ext_str)
 
