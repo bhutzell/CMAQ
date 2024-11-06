@@ -570,7 +570,7 @@ C                                                              fine    coarse
      &   emis_table( 'Lead          ',   'PB     ', 207.2, (/ 6.0E-11, 6.0E-11/) ),   ! Lead
      &   emis_table( 'Cadmium       ',   'CD     ', 112.4, (/ 1.93E-9, 1.93E-9/) ),   ! cadmium
      &   emis_table( 'Air Toxics Mn ',   'MN_HAPS',  54.9, (/ 4.7E-11, 4.7E-11/) ),   ! Air toxics Manganese
-     &   emis_table( 'seasalt tracer',   'SEAST  ',  36.0, (/ 1.00000, 0.00000/) ),   ! seasalt tracer
+     &   emis_table( 'seasalt tracer',   'SEAST  ',  31.3, (/ 1.00000, 0.00000/) ),   ! seasalt tracer
      &   emis_table( 'Bromine       ',   'BR     ',  79.9, (/ 0.00190, 0.00190/) ),   ! Bromine 
      &   emis_table( 'Water         ',   'H2O    ',  18.0, (/ 0.0    , 0.0    /) ) /) ! Water (uptake is calculated online)
  
