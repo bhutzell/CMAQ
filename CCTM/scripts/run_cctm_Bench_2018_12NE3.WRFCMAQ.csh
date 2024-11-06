@@ -221,9 +221,16 @@ setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [de
 setenv CTM_STAGE_S22 N       #> Shu et al. 2022 (CMAQ v5.3) Aerosol deposition model [default: N]
 
 setenv BC_AERO_M2WET F       #> Specify whether or not boundary condition aerosol size distribution 
-                             #>    is wet or dry [ default: F = dry ]
+                             #>    is wet or dry [ default: F = dry ]. This option should be set
+                             #>    to True if boundary condition size distirbution parameters are
+                             #>    provided in terms of wet diameter (e.g. by an offline calculation,
+                             #>    or a different 3D chemical transport model system).
 setenv BC_AERO_M2USE T       #> Specify whether or not to use aerosol surface area from boundary 
                              #>    conditions [ default: T = use aerosol surface area  ]
+                             #>    This setting can be significant for PM when using small domains.
+                             #>    It is recommended to set this option to True if (1) using boundary
+                             #>    conditions provided by a CMAQ simulation on a parent domain, (2) M2 
+                             #>    is available, and (3) the domain is smaller than CONUS. 
 
 #> Vertical Extraction Options
 setenv VERTEXT               N
