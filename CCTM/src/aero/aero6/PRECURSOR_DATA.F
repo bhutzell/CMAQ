@@ -173,13 +173,13 @@ C Build mapping to CGRID for each precursor species
          If ( n .Ne. 0 ) Then
             precursor_mw( spc ) = real( gc_molwt( gc_g2ae_map( n ) ), 8 )
             precursor_map( spc ) = gc_strt - 1 + gc_g2ae_map( n )
-            write(logdev,99902)Trim( precursor( spc )%name )
+            write(logdev,99902) Trim( precursor( spc )%name )
          Else
             n = index1( precursor( spc )%name, n_nr_n2ae, nr_n2ae )
             If ( n .Ne. 0 ) Then
                precursor_mw( spc ) = real( nr_molwt( nr_n2ae_map( n ) ), 8 )
                precursor_map( spc ) = nr_strt - 1 + nr_n2ae_map( n )
-               write(logdev,99902)Trim( precursor( spc )%name )
+               write(logdev,99902) Trim( precursor( spc )%name )
             Else
                 If ( precursor( spc )%required ) Then
                   Precursor_eflag = .True.
