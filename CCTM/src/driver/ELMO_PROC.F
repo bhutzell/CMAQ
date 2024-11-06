@@ -679,8 +679,8 @@
      &                          'FPM10    ','FPM25TO10','FAMS     ' /)
 
       ELMO_KEY( 19 )%WORD = 'TOXICS'
-      ELMO_KEY( 19 )%N = 21
-      ALLOCATE( ELMO_KEY( 19 )%LIST( 21 ), STAT=ALLOCSTAT )
+      ELMO_KEY( 19 )%N = 27
+      ALLOCATE( ELMO_KEY( 19 )%LIST( 27 ), STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_KEY(19)'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
@@ -691,7 +691,8 @@
      &           'PM25_HMN    ','PM25_HNI    ','PM25_HAS    ','PM25_HG     ',
      &           'PM10_HDIESEL','PM10_HBE    ','PM10_HCD    ','PM10_HCR3   ',
      &           'PM10_HCR6   ','PM10_HCR    ','PM10_HPB    ','PM10_HMN    ',
-     &           'PM10_HAS    ','PM10_HG     '  /)
+     &           'PM10_HNI    ','PM10_HAS    ','PM10_HG     ','PM25_BENAPY ',
+     &           'PM10_BENAPY ','PMF_BENAPY  ','BENAPY_FAERO','GAS_BENAPY  ' /)
 
       ELMO_KEY( 20 )%WORD = 'SIMPLE'
       ELMO_KEY( 20 )%N = 2
@@ -1780,7 +1781,7 @@
              CASE ( ID_PM25_HCD ) 
                N_VARS = 1
                CALL INIT_ELMO_COEFFS( IDG, N_VARS, 'PM25' )
-               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACD', 1.0 )
+               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACADMIUM', 1.0 )
  
              ! Map PM25_HCR3 - HAP inventory Chromium III
              CASE ( ID_PM25_HCR3 ) 
@@ -1858,7 +1859,7 @@
              CASE ( ID_PM10_HCD ) 
                N_VARS = 1
                CALL INIT_ELMO_COEFFS( IDG, N_VARS, 'PM10' )
-               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACD', 1.0 )
+               CALL SET_ELMO_COEFF_MAP( IDG, 1, 'AERO', 'ACADMIUM', 1.0 )
  
              ! Map PM10_HCR3 - HAP inventory Chromium III
              CASE ( ID_PM10_HCR3 ) 
