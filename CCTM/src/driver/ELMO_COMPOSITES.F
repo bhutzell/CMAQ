@@ -192,7 +192,7 @@
             N_COMPOSITES = N_COMPOSITES + 1
             CMPST( N_COMPOSITES )%NAME = AEROSPC(IAERO)%BULKNAME
             CMPST( N_COMPOSITES )%CUNIT = 'ug m-3'
-            CMPST( N_COMPOSITES )%CMPST_TYPE = 'ALL'
+            CMPST( N_COMPOSITES )%CMPST_TYPE = 'TSP'
             CMPST( N_COMPOSITES )%DESC = 'Total ' // TRIM(AEROSPC(IAERO)%BULKNAME) //
      &           ' across all modes.'
             DO IM = 1,N_MODE
@@ -423,6 +423,9 @@
              ELMO_COMP( J )%L_MODE( : ) = .TRUE.
              ELMO_COMP( J )%INLET = IPMAMS
              ELMO_COMP( J )%WETNESS = IWET
+         CASE ('ALL' )
+             ! This is a bulk quantity. All modes are selected.
+             ELMO_COMP( J )%L_MODE( : ) = .TRUE.
          CASE ('TSP' )
              ! This is a bulk quantity. All modes are selected.
              ELMO_COMP( J )%L_MODE( : ) = .TRUE.
