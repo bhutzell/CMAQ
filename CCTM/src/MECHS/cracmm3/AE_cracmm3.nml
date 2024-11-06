@@ -58,5 +58,5 @@ AE_SPECIES_DATA =
 'AISO5'     ,150.1  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!2-hydroperoxy-3;4-dihydroxy-3-methylbutanal,L,NA,CC(O)(CO)C(OO)C=O
 'ATRPN'     ,215.0  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'AHONIT'    ,265.0  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ASEAST'    ,35.50  ,F      ,T     ,F      ,''     ,'' ,-1     ,   ,-1     ,'VMASS'     , 1  ,'PRI'        , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
+'ASEAST'    ,31.30  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'PRI'        , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Sea salt tracer,L,NA,NA
 /   
