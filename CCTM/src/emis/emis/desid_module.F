@@ -1352,9 +1352,6 @@ C-----------------------------------------------------------------------
       REAL, ALLOCATABLE, SAVE :: VDEMIS_OUT ( :,:,: )
 
       ! Local Variables
-      REAL, PARAMETER  :: GPKG = 1.0E+03       ! g/kg
-      REAL, PARAMETER  :: MWAIR = 28.9628      ! g/mol
-      REAL, PARAMETER  :: AVO  = 6.0221367E23
       REAL, PARAMETER  :: RAVO = 1.0 / AVO
       REAL,ALLOCATABLE, SAVE :: CNVTC( :,:,: ) ! combined conversion factor
  
@@ -1384,7 +1381,6 @@ C-----------------------------------------------------------------------
         CNVTC( L,:,: ) = (GPKG / MWAIR) * CELLVOL( :,:,L ) / Met_Data%RRHOJ( :,:,L )     ! mol
 #endif
       END DO                                                              
-      CONVN( 1:NL,:,: ) = CONVM( 1:NL,:,: )                               
 
       !MAKE SURE TO APPLY RELEVANT UNIT CONVERSION TO EACH
       !TYPE OF VARIABLE (GAS, AEROSOL MASS, AEROSOL NUMBER,

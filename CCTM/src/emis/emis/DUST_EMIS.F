@@ -1184,9 +1184,6 @@ C to get a timestep average.
               dustouts( n,c,r ) = dustouts( n,c,r ) * gsfac( c,r )
             end do
  
-         do 
-
- 
          end do   ! col
          end do   ! row
 
