@@ -578,8 +578,8 @@ C Open windblown dust emissions diagnostic file
          end subroutine opdust_emis
 
 C=======================================================================
-         subroutine get_dust_emis( jdate, jtime, tstep, rjacm, cellhgt,
-     &                             l_desid_diag)
+         subroutine get_dust_emis( jdate, jtime, tstep, rjacm, cellvol,
+     &                             cellhgt, l_desid_diag)
 
          use grid_conf        ! horizontal & vertical domain specifications
          use asx_data_mod     ! meteorology data
@@ -602,6 +602,7 @@ C Arguments:
          integer, intent( in ) :: jtime        ! current model time, coded HHMMSS
          integer, intent( in ) :: tstep( 3 )   ! output time step, sync step, 2way step
          real,    intent( in ) :: rjacm( ncols,nrows ) ! reciprocal Jacobian [1/m]
+         real,    intent( in ) :: cellvol(:,:) ! grid-cell volume [m2*sigma]
          real,    intent( in ) :: cellhgt(:,:) ! grid-cell height [sigma]
          logical, intent( in ) :: l_desid_diag ! flag determining whether or not DESID 
                                                !   is in diagnostic mode
@@ -647,9 +648,10 @@ C Parameters:
          real       :: lai    ( ncols,nrows )      ! leaf area index
 
          real, allocatable, save :: ustr  ( :,:,: ) ! U* [m/s]
-         real, allocatable, save :: qam   ( :,:,: ) ! emis for landuse type [g/m**2/s]
+         real, allocatable, save :: qam   ( :,:,: ) ! emis for landuse type [g/m**3/s]
          real, allocatable, save :: elus  ( :,:,: ) ! erodible landuse percent (0~100)
          real, allocatable, save :: fruf  ( :,:,: ) ! surface roughness factor
+         real, allocatable, save :: gsfac ( :,: )   ! [m3]
 
          real       :: edust( 2 )       ! mass emis rate [g/s] per mode (only accum & coarse)
          real       :: sumdfr           ! sum var for desert fraction
@@ -754,7 +756,8 @@ C-----------------------------------------------------------------------
      &                  qam( ncols,nrows,n_dlcat+1 ),
      &                 fruf( ncols,nrows,n_dlcat+1 ),
      &                  kvh( ncols,nrows,n_dlcat+1 ),
-     &                 elus( ncols,nrows,n_dlcat+1 ), stat = status )
+     &                 elus( ncols,nrows,n_dlcat+1 ),
+     &                 gsfac(ncols,nrows ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure allocating USTR, QAM, FRUF, KVH, or ELUS'
                call m3exit( pname, jdate, jtime, xmsg, xstat1 )
@@ -816,6 +819,9 @@ C   Check PX soil texture data flag and log a message if or if not used in WB du
             CALL LOG_MESSAGE( LOGDEV, '   Clay, coarse and fine-medium sand from internal lookup table.' )
          end if
 
+         ! Calculate conversion factor from volume-based to total emission rate
+         gsfac( :,: ) = cellvol( :,: ) / rjacm( :,: ) ! [g/m3/s] to [g/s]
+         
 C --------- ###### Start Main Loop ###### ---------
  
          do r = 1, nrows
@@ -1045,6 +1051,8 @@ C --------- ###### End Main Loop ##### ---------
      &                                          dryhit, (c-1)*(r-1)
 #endif
 
+         ! Calculate Dust emission output and print diagnostic, if
+         ! requested
          do r = 1, nrows
          do c = 1, ncols
 
@@ -1163,6 +1171,22 @@ C to get a timestep average.
 #endif
                end do
             end if   ! dustem_diag
+
+            ! Convert Dust emissions from tendencies [e.g. g/m3/s] to
+            ! emission rates [e.g. g/s]
+            do n = 1,2
+              do v = 1, ndust_spc
+                 dustoutm( (n-1)*ndust_spc+v,c,r ) = 
+     &                     dustoutm( (n-1)*ndust_spc+v,c,r ) * gsfac( c,r )
+              end do
+            
+              dustoutn( n,c,r ) = dustoutn( n,c,r ) * gsfac( c,r )
+              dustouts( n,c,r ) = dustouts( n,c,r ) * gsfac( c,r )
+            end do
+ 
+         do 
+
+ 
          end do   ! col
          end do   ! row
 
@@ -1221,6 +1245,8 @@ C Then reset the emissions array and local write counter.
             end if   !  time to write
          end if   ! dustem_diag
 #endif
+
+
 
 2009     Format( '*** Erodible landuse incorrect ', 1pe13.5, 1x, 'at: ', 3i4 )
 2015     format( /5x, 'Total grid time-avg sum of dust emis variables at:',
