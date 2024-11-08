@@ -45,7 +45,7 @@ GC_SPECIES_DATA =
 'MAPAN'         ,147.09  ,''     ,-1     ,''     ,-1     ,'VD_PAN'          , 1   ,'MPAN'            , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
 'TBUO'          , 73.00  ,''     ,-1     ,''     ,-1     ,''                ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,''   ,
 'RNO3'          ,147.18  ,''     ,-1     ,''     ,-1     ,'VD_NTROH'        , 1   ,'NTR_OH'          , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'MTNO3'         ,231.00  ,''     ,-1     ,''     ,-1     ,'VD_MTNO3'        , 1   ,'MTNO3'           , 1  ,'MTNO3'        ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
+'MTNO3'         ,231.00  ,''     ,-1     ,''     ,-1     ,'VD_MTNO3'        , 1   ,'MTNO3'           , 1  ,'MTNO3'        ,'MTNO3'   ,'Yes' ,'Yes' ,'Yes' ,'Yes',
 'ACETONE'       , 58.08  ,''     ,-1     ,''     ,-1     ,''                ,-1   ,'ACETONE'         , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'NPHE'          ,139.11  ,''     ,-1     ,''     ,-1     ,''                ,-1   ,'2-NITROPHENOL'   , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'CRES'          ,108.14  ,''     ,-1     ,''     ,-1     ,''                ,-1   ,'2-CRESOL'        , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
