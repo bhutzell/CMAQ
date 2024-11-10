@@ -80,34 +80,18 @@ MODULE const
 !                         specified otherwise)
 
   ! Avogadro's Constant [ number/mol ] 
-  REAL,      PARAMETER :: AVO  = 6.0221367E23
-  REAL( 8 ), PARAMETER :: DAVO = 6.02214085774D23
-  ! The NIST Reference on Constants, Units, and Uncertainty. US National
-  ! Institute of Standards and Technology. June 2015. Retrieved 2017-04-21.
-
-  ! universal gas constant [ J/mol-K ]
- REAL, PARAMETER :: RGASUNIV = 8.314510
- ! The NIST Reference on Constants, Units, and Uncertainty. US National
- ! Institute of Standards and Technology. June 2015. Retrieved 2017-04-21.
- ! http://physics.nist.gov/cgi-bin/cuu/Value?r
- REAL( 8 ), PARAMETER :: DRGASUNIV = 8.314459848D0
-
-  ! Boltzmann Constant [ J K-1 ]
- REAL,      PARAMETER ::  KBOLTZ =  RGASUNIV / AVO
- REAL( 8 ), PARAMETER :: DKBOLTZ = DRGASUNIV / DAVO
-
   ! Exact definition. Source: NIST 2019 
-  !REAL,      PARAMETER :: AVO  = 6.02214076E23 
-  !REAL( 8 ), PARAMETER :: DAVO = 6.02214076D23
+  REAL,      PARAMETER :: AVO  = 6.02214076E23 
+  REAL( 8 ), PARAMETER :: DAVO = 6.02214076D23
 
   ! Boltzmann Constant [ J K-1 ]
   ! Exact definition. Source: NIST 2019
-  !REAL,      PARAMETER :: KBOLTZ   = 1.380649E-23 
-  !REAL( 8 ), PARAMETER :: DKBOLTZ  = 1.380649D-23 
+  REAL,      PARAMETER :: KBOLTZ   = 1.380649E-23 
+  REAL( 8 ), PARAMETER :: DKBOLTZ  = 1.380649D-23 
 
   ! Exact definition. Source: NIST 2019
-  !REAL,      PARAMETER ::  RGASUNIV =  AVO * KBOLTZ
-  !REAL( 8 ), PARAMETER :: DRGASUNIV = DAVO * DKBOLTZ
+  REAL,      PARAMETER :: RGASUNIV  =  AVO * KBOLTZ
+  REAL( 8 ), PARAMETER :: DRGASUNIV = DAVO * DKBOLTZ
 
   ! standard atmosphere  [ Pa ]
   REAL,      PARAMETER :: STDATMPA = 101325.0
@@ -130,7 +114,7 @@ MODULE const
 ! FSB: 78.06% N2, 21% O2, and 0.943% Ar on a mole 
 ! fraction basis (Source: Hobbs, pp. 69-70)
    REAL,     PARAMETER :: MWAIR = 28.9628
-   Real,     Parameter :: inv_mwair   = 1.0E3 / mwair  ! [ 1/g ]
+   Real,     Parameter :: inv_mwair   = 1.0E3 / mwair  ! [ mol/kg ]
 
 ! dry-air gas constant [ J / kg-K ]
    REAL,     PARAMETER :: RDGAS = 1.0E3 * RGASUNIV / MWAIR   ! 287.07548994
@@ -208,27 +192,6 @@ MODULE const
         REAL( 8 ), PARAMETER :: DL = 1.0D0 / AL
         INV_ESATL = DL * DEXP( BL * ( 273.15D0 - TT ) / ( TT - 273.15D0 + CL ) )
       END FUNCTION INV_ESATL
-
-! CMAQ previously used this approximation for error function, from 
-! Meng & Seinfeld (1994)
-!   Meng, Z., Seinfeld, J.H., On the source of the submicrometer
-!   droplet mode of urban and regional aerosols, Aerosol Sci. and
-!   Technology, 20:253-265, 1994.
-! ERF and ERFC are intrinsic functions as of Fortran 2008, so this
-! approximation is no longer necessary. 
-      REAL FUNCTION ERF( X )
-         REAL, INTENT( IN )  :: X                
-         ERF = SIGN( 1.0, X ) * SQRT( 1.0 - EXP( -4.0 * X * X / PI ) )
-      END FUNCTION ERF
-
-! CMAQ also previously used this approximation for the error function 
-! complement ERFC. However, at least since CMAQv5.0, CMAQ has used the 
-! Fortran intrinsics for ERF and ERFC in AEROPROC and the approximation 
-! for ERF elsewhere (AERO_INLET, AERO_AMS).
-!      REAL FUNCTION ERFC( X )
-!         REAL, INTENT( IN ) :: X
-!         ERFC = 1.0 - ERF( X )
-!      END FUNCTION ERFC
 
 END MODULE const
 
