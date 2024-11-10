@@ -245,7 +245,6 @@ C-----------------------------------------------------------------------
       ! Variables for controlling behavior of OA module
       Logical, Private, Save :: mapped              = .False.
       Logical, Private, Save :: RXNS_eflag          = .False. ! error flag for RXNS modules used
-      Logical, Private, Save :: OA_eflag            = .False. ! error flag for soa_defn
       Character( 16 ), Private, Save :: pname = 'SOA_DEFN        '
 
       Contains
@@ -336,7 +335,6 @@ C-----------------------------------------------------------------------
           End Do
           
           If ( n_oa .Eq. n_oa_tracers ) Then
-              OA_eflag  = .True.
               xmsg =  'FATAL: All SOA species are tracers at least '
      &            //  'one SOA species must not be a tracer.'
               write(logdev,'(a)')Trim( xmsg )           
@@ -394,7 +392,6 @@ C-----------------------------------------------------------------------
               ROG_mw( spc ) = gc_molwt( g )
             else
               ! Log an Error
-              OA_eflag  = .True.
               write(logdev,99903)Trim( oaspc( spc )%ctr_name ),
      &        Trim( oaspc( spc )%gas_name )
             End If
@@ -421,7 +418,6 @@ C-----------------------------------------------------------------------
            End If
 
            If( n .lt. 1 .and. g .lt. 1 ) Then
-               OA_eflag  = .True.
                write(logdev,99902)Trim( oaspc( spc )%gas_name ), 
      &                            Trim ( oaspc( spc )%name )
                call m3exit( pname, 0, 0, 'Please add these critical ' //
@@ -628,7 +624,6 @@ C-----------------------------------------------------------------------
       ! that are mapped to CGRID.
       xmsg = 'FATAL:' // Trim( vname )
      &  // ' is not found in the G2AE or N2AE values of GC or NR namelists.'
-      OA_eflag  = .True.
       Call m3warn( pname, 0, 0, xmsg )
  
 
