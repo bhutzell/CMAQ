@@ -307,7 +307,7 @@ C Allocate and initialize dry deposition array
          CALL LOG_HEADING( LOGDEV, "Initialize Emissions Module" )
 
 C Allocate and initialize emissions
-         IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP( 1 ) ) ) THEN
+         IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP ) ) THEN
             XMSG = 'Failure initializing emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
@@ -444,6 +444,7 @@ C Set up for grav. settling
          end if
 #endif
 
+         RETURN  ! Added for MIO implementation
       END IF   !  if Firstime
 
       MDATE = JDATE
@@ -646,7 +647,8 @@ C If last call this hour:  write accumulated depositions:
            DO R = 1, NROWS
                DO C = 1, NCOLS
                   NH3_FLUX(C,R) = DDEP( DD2DV(NH3_HIT),C,R )
-                  DDEP( DD2DV(NH3_HIT),C,R ) = NH3_EMIS(C,R)+NH3_FLUX(C,R)
+                  DDEP( DD2DV(NH3_HIT),C,R ) = NH3_DDEP(C,R)
+                  NH3_EMIS(C,R) = DDEP( DD2DV(NH3_HIT),C,R ) - NH3_FLUX(C,R)
                END DO
             END DO
 #ifdef isam
@@ -730,7 +732,7 @@ C Write extra arrays for NH3 emission and net flux for bidi
 ! the subdomain size for this PE. 
 !          WRITE( LOGDEV,*) ' NH3emis, drydep, flux=',NH3_EMIS(27,18),
 !    &                     DDEP_NH3(27,18),DDEP( DD2DV(NH3_HIT),27,18)
-         NH3_EMIS = 0.0
+         NH3_DDEP = 0.0
          END IF
 
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
@@ -751,7 +753,7 @@ C Write vdiff diagnostics
                      END DO
                   END DO
                   IF ( .NOT. WRITE3( CTM_VSED_DIAG, VSED_NAME( V ),
-     &                               MDATE, MTIME, VSED_BUF( 1,1,1,V ) ) ) THEN
+     &                               MDATE, MTIME, VSED_BUF( :,:,:,V ) ) ) THEN
                      XMSG = 'Could not write ' // TRIM( VSED_NAME( V ) )
      &                    // ' to ' // CTM_VSED_DIAG
                      CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )

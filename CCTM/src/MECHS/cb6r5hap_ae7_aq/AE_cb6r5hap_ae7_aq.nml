@@ -70,7 +70,7 @@ AE_SPECIES_DATA =
 'ADE_NO3' , 62.00  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 'ADE_SO4' , 96.00  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 'ADE_CORS',100.00  ,F      ,F     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
-'ACD'     ,112.40  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
+'ACADMIUM',112.40  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 'AMN_HAPS', 54.90  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 'APHG'    ,200.50  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'PHG'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 'AAS'     , 74.92  ,T      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'TRACER'      , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',

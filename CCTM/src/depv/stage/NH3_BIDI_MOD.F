@@ -23,9 +23,9 @@
 ! Contains the shared variables and subroutines needed for the bidirectional 
 ! NH3 flux model in CMAQ
 !
-! INIT_ABFLUX - Intitializes the NH3 flux routines, allocates arrays, reads in
-!               intial soil NH3 & H concentrations, and fertilizer application
-!               amounts and timing for the model run
+! INIT_NH3_BiDi - Initializes the NH3 flux routines, allocates arrays, reads in
+!                 initial soil NH3 & H concentrations, and fertilizer application
+!                 amounts and timing for the model run
 ! 
 ! Revision History: J. Bash Dec 08 10:      Created
 !                   J. Bash May 11 11:      Updated for CMAQ 5.0
@@ -56,6 +56,7 @@
 C                   J. Bash:   Nov   7 14:  Modified for the restructuring of vidff.
 !                   D. Wong:   Feb  10 19:  Implemented centralized I/O approach, removed all MY_N clauses
 C-------------------------------------------------------------------------------
+      Use, intrinsic :: ieee_arithmetic, only: isnan => ieee_is_nan
 
       Implicit None
 ! shared variables
@@ -63,7 +64,7 @@ C-------------------------------------------------------------------------------
 ! Private variables used in this module and subroutines     
       Real, Save,              Private :: C_gam           ! Canadian fertilizer factor   
       Real, Parameter,         Private :: maxgam   = 2.0e5 ! maximum soil gamma. It is assumed that any excess NH4 is from salts
-!      Real, Parameter,         Private :: natgam   = 20.0  ! Background soil gamma
+
 ! variables for STAGE bidi NH3
       Real, Save, Allocatable, Private :: frac_ag( :,: ) ! fraction of ag    
       Real, Save, Allocatable, Private :: knit1  ( :,: ) ! EPIC Grid nitrification rate
@@ -90,10 +91,10 @@ C-------------------------------------------------------------------------------
          Use LSM_MOD
          Use depv_data_module
          Use centralized_io_module
+!         Use CONST
 
          Implicit None 
 ! Includes
-         Include SUBST_CONST     ! constants
          Include SUBST_FILES_ID  ! file name parameters
 
 ! Local Variables
@@ -114,7 +115,7 @@ C-------------------------------------------------------------------------------
          Real,       Allocatable :: fagam1     ( :,: )   ! delta gamma due to fertilizer app and mineralization
          Real,       Allocatable :: fagam2     ( :,: )   ! delta gamma due to fertilizer app and mineralization           
  
-         Character( 16 ), Parameter :: pname = 'Init_ABFlux' 
+         Character( 16 ), Parameter :: pname = 'Init_NH3_Bidi' 
          Character( 96 )            :: xmsg = ' '
 
 ! Find the Canadian fertilizer factor based off of Sheppard et al 2010 Canadian J. Soil Sci. & 
@@ -193,14 +194,14 @@ C-------------------------------------------------------------------------------
 ! EPIC v1.4 does not always correctly write out m3badval in areas where there is no data. In these cases, 
 ! EPIC writes out large negative values which can cause issues with the bidirectional exchange numerics. 
 ! The following variables should always be positive and a floor of 0.0 is now set to mitigate numerical issues. 
-         Where( Nit1   .Ne. Nit1   ) Nit1   = 0.0
-         Where( Nit2   .Ne. Nit2   ) Nit2   = 0.0
-         Where( F1_NH4 .Ne. F1_NH4 ) F1_NH4 = 0.0
-         Where( F2_NH4 .Ne. F2_NH4 ) F2_NH4 = 0.0
-         Where( NH4ps1 .Ne. NH4ps1 ) NH4ps1 = 0.0
-         Where( NH4ps2 .Ne. NH4ps2 ) NH4ps2 = 0.0
-         Where( pHs1   .Ne. pHs1   ) pHs1   = 0.0
-         Where( pHs2   .Ne. pHs2   ) pHs2   = 0.0
+         Where( isnan( Nit1   ) ) Nit1   = 0.0
+         Where( isnan( Nit2   ) ) Nit2   = 0.0
+         Where( isnan( F1_NH4 ) ) F1_NH4 = 0.0
+         Where( isnan( F2_NH4 ) ) F2_NH4 = 0.0
+         Where( isnan( NH4ps1 ) ) NH4ps1 = 0.0
+         Where( isnan( NH4ps2 ) ) NH4ps2 = 0.0
+         Where( isnan( pHs1   ) ) pHs1   = 0.0
+         Where( isnan( pHs2   ) ) pHs2   = 0.0
          Where( Nit1   .Lt. 0.0 ) Nit1   = 0.0
          Where( Nit2   .Lt. 0.0 ) Nit2   = 0.0
          Where( F1_NH4 .Lt. 0.0 ) F1_NH4 = 0.0
@@ -571,7 +572,6 @@ C-------------------------------------------------------------------------------
          Real    :: Knit   ! EPIC combined nitrification rate
          Real    :: kn_max ! EPIC maximum nitrification rate
          Real    :: Kvs    ! Air-soil exchange rate for aqueous NH4+
-         Real    :: kvg    ! Air-soil exchange rate for gas phase NH3
          Real    :: MNHx   ! molar soil water NH4+ + NH3 conc.
          Real    :: pHsl   ! Soil pH
          Real    :: T_Soil ! Soil T
@@ -651,7 +651,7 @@ C-------------------------------------------------------------------------------
             gamma2( C,R ) = gam
          End If
 
-         If ( IsNaN( gam ) ) Then
+         If ( isnan( gam ) ) Then
             xmsg = 'NaN in Gamma Calculation'
             Write( logdev,* ) 'MNHx   :', MNHx
             Write( logdev,* ) 'gam    :', gam
@@ -661,7 +661,6 @@ C-------------------------------------------------------------------------------
             Write( logdev,* ) 'wsat   :', GRID_DATA%WSAT( c,r )
             Write( logdev,* ) 'wfc    :', GRID_DATA%WFC( c,r )
             Write( logdev,* ) 'wwlt   :', GRID_DATA%WWLT( c,r )
-            Write( logdev,* ) 'kvg    :', kvg
             Write( logdev,* ) 'kvs    :', kvs
             Write( logdev,* ) 'kn     :', kn
             Write( logdev,* ) 'zsoil  :', zsoil
@@ -671,15 +670,5 @@ C-------------------------------------------------------------------------------
 
          Return
          End Subroutine Calc_Nitrif
-
-         Logical Function IsNaN( a ) ! required for Portland Group compiler (pgi)
-            Real :: a
-            If ( a .Eq. a ) Then   ! requires -Kieee flag for pgi
-               IsNaN = .false.
-            Else
-               IsNaN = .true.
-            End If
-            Return
-         End Function IsNaN  ! error, if pgf90
 
       End Module NH3_Bidi_Mod

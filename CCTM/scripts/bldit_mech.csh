@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ================ CCTMv5.4 Mechanism Build Script ==================== 
+# ================ CCTMv5.5 Mechanism Build Script ==================== 
 # Usage: bldit_mech.csh >&! bldit_mech.log                                   
 # Requirements: I/O API & netCDF libraries, a Fortran compiler,               
 #               and MPI for multiprocessor computing                     
@@ -112,7 +112,7 @@
  
  # Run CHEMMECH
  cd ${CMAQ_HOME}/UTIL/chemmech/scripts
- ./run_chemmech.csh
+ ./run_chemmech.csh ${compiler} ${compilerVrsn}
  if ( $? != 0 ) then
    echo "CHEMMECH did not run correctly --> Build Process Halted"
    exit 1

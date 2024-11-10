@@ -479,6 +479,7 @@ C   27 Dec 10 J.Young: initial
 
          use grid_conf           ! horizontal & vertical domain specifications
          use utilio_defn
+         use mio_ascii
 
          implicit none
 
@@ -549,6 +550,20 @@ C Set output file characteristics based on COORD.EXT and open diagnostic file
                fdesc3d( l ) = ' '
             end do
 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_DUST_EMIS_1', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+            
 C Open windblown dust emissions diagnostic file
             if ( .not. open3( ctm_dust_emis_1, fsnew3, pname ) ) then
                xmsg = 'Could not create the CTM_DUST_EMIS_1 file'
@@ -563,12 +578,13 @@ C Open windblown dust emissions diagnostic file
          end subroutine opdust_emis
 
 C=======================================================================
-         subroutine get_dust_emis( jdate, jtime, tstep, rjacm, cellhgt,
-     &                             l_desid_diag)
+         subroutine get_dust_emis( jdate, jtime, tstep, rjacm, cellvol,
+     &                             cellhgt, l_desid_diag)
 
          use grid_conf        ! horizontal & vertical domain specifications
          use asx_data_mod     ! meteorology data
          use aero_data
+         use const, only: f6pi
          use utilio_defn
          use lus_data_module
          use centralized_io_module
@@ -586,6 +602,7 @@ C Arguments:
          integer, intent( in ) :: jtime        ! current model time, coded HHMMSS
          integer, intent( in ) :: tstep( 3 )   ! output time step, sync step, 2way step
          real,    intent( in ) :: rjacm( ncols,nrows ) ! reciprocal Jacobian [1/m]
+         real,    intent( in ) :: cellvol(:,:) ! grid-cell volume [m2*sigma]
          real,    intent( in ) :: cellhgt(:,:) ! grid-cell height [sigma]
          logical, intent( in ) :: l_desid_diag ! flag determining whether or not DESID 
                                                !   is in diagnostic mode
@@ -601,8 +618,6 @@ C Parameters:
                                            !  2  Fine-medium sand
                                            !  3  Silt
                                            !  4  Clay
-
-         real, parameter :: f6dpi = 6.0 / pi
 
          real, parameter :: mv    = 0.16
          real, parameter :: sigv  = 1.45
@@ -633,9 +648,10 @@ C Parameters:
          real       :: lai    ( ncols,nrows )      ! leaf area index
 
          real, allocatable, save :: ustr  ( :,:,: ) ! U* [m/s]
-         real, allocatable, save :: qam   ( :,:,: ) ! emis for landuse type [g/m**2/s]
+         real, allocatable, save :: qam   ( :,:,: ) ! emis for landuse type [g/m**3/s]
          real, allocatable, save :: elus  ( :,:,: ) ! erodible landuse percent (0~100)
          real, allocatable, save :: fruf  ( :,:,: ) ! surface roughness factor
+         real, allocatable, save :: gsfac ( :,: )   ! [m3]
 
          real       :: edust( 2 )       ! mass emis rate [g/s] per mode (only accum & coarse)
          real       :: sumdfr           ! sum var for desert fraction
@@ -740,7 +756,8 @@ C-----------------------------------------------------------------------
      &                  qam( ncols,nrows,n_dlcat+1 ),
      &                 fruf( ncols,nrows,n_dlcat+1 ),
      &                  kvh( ncols,nrows,n_dlcat+1 ),
-     &                 elus( ncols,nrows,n_dlcat+1 ), stat = status )
+     &                 elus( ncols,nrows,n_dlcat+1 ),
+     &                 gsfac(ncols,nrows ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure allocating USTR, QAM, FRUF, KVH, or ELUS'
                call m3exit( pname, jdate, jtime, xmsg, xstat1 )
@@ -802,6 +819,9 @@ C   Check PX soil texture data flag and log a message if or if not used in WB du
             CALL LOG_MESSAGE( LOGDEV, '   Clay, coarse and fine-medium sand from internal lookup table.' )
          end if
 
+         ! Calculate conversion factor from volume-based to total emission rate
+         gsfac( :,: ) = cellvol( :,: ) / rjacm( :,: ) ! [g/m3/s] to [g/s]
+         
 C --------- ###### Start Main Loop ###### ---------
  
          do r = 1, nrows
@@ -1031,10 +1051,12 @@ C --------- ###### End Main Loop ##### ---------
      &                                          dryhit, (c-1)*(r-1)
 #endif
 
+         ! Calculate Dust emission output and print diagnostic, if
+         ! requested
          do r = 1, nrows
          do c = 1, ncols
 
-C J/K mass emis rate [g/s]  (edust( 1 ) not used)
+C J/K mass emis rate [g/m3/s]  (edust( 1 ) not used)
             edust( 1 ) = fracmj * dust_em( c,r )
             edust( 2 ) = fracmk * dust_em( c,r )
 
@@ -1045,15 +1067,15 @@ C J/K mass emis rate [g/s]  (edust( 1 ) not used)
                end do
             end do
 
-C J/K 3rd moment emis rate [m3/s] (needed for number and surface)
-            m3j = edust( 1 ) * f6dpi / ( gpkg * dust_dens( 1 ) ) + TINY(0.0)
-            m3k = edust( 2 ) * f6dpi / ( gpkg * dust_dens( 2 ) ) + TINY(0.0)
+C J/K 3rd moment emis rate [m3/m3/s] (needed for number and surface)
+            m3j = edust( 1 ) * f6pi / ( gpkg * dust_dens( 1 ) ) + TINY(0.0)
+            m3k = edust( 2 ) * f6pi / ( gpkg * dust_dens( 2 ) ) + TINY(0.0)
 
-C Mode-specific emission rates of particle number [1/s]
+C Mode-specific emission rates of particle number [1/m3/s]
             dustoutn( 1,c,r ) = m3j * factnumj
             dustoutn( 2,c,r ) = m3k * factnumk
 
-C Mode-specific dry surface area emission rates [m**2/s].
+C Mode-specific dry surface area emission rates [m**2/m3/s].
 C 2nd moment multiplied by PI to obtain the surface area emissions rate.
             dustouts( 1,c,r ) = m3j * factsrfj
             dustouts( 2,c,r ) = m3k * factsrfk
@@ -1149,6 +1171,19 @@ C to get a timestep average.
 #endif
                end do
             end if   ! dustem_diag
+
+            ! Convert Dust emissions from tendencies [e.g. g/m3/s] to
+            ! emission rates [e.g. g/s]
+            do n = 1,2
+              do v = 1, ndust_spc
+                 dustoutm( (n-1)*ndust_spc+v,c,r ) = 
+     &                     dustoutm( (n-1)*ndust_spc+v,c,r ) * gsfac( c,r )
+              end do
+            
+              dustoutn( n,c,r ) = dustoutn( n,c,r ) * gsfac( c,r )
+              dustouts( n,c,r ) = dustouts( n,c,r ) * gsfac( c,r )
+            end do
+ 
          end do   ! col
          end do   ! row
 
@@ -1208,6 +1243,8 @@ C Then reset the emissions array and local write counter.
          end if   ! dustem_diag
 #endif
 
+
+
 2009     Format( '*** Erodible landuse incorrect ', 1pe13.5, 1x, 'at: ', 3i4 )
 2015     format( /5x, 'Total grid time-avg sum of dust emis variables at:',
      &            1x, i8, ":", I6.6  )
@@ -1228,9 +1265,8 @@ C                           ustr( c,r,m ),
 C                           sd_ep( c,r ),
 C                           dens( c,r ) )
 
+            use const, only: grav
             implicit none
-
-            include SUBST_CONST   ! for grav
 
             integer, intent( in ) :: ndp
             real,    intent( in ) :: dp( ndp )

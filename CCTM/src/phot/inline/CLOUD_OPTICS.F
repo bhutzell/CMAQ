@@ -714,9 +714,8 @@
 ! HISTORY: 08/15/2014: B.Hutzell adapted from NCAR CAM model version 3 
 !---------------------------------------------------------------------------
 
+            use const, only : PI
             implicit none
-!..Includes:
-!           INCLUDE SUBST_CONST     ! CMAQ constants
 
 !...Arguments:
             integer, intent(in)  :: hydro_type        ! aggregegate to calculate

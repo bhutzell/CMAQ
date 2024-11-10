@@ -1,7 +1,7 @@
 #!/bin/csh -f
 
-# ====================== JPROCv5.4 Run Script ======================= 
-# Usage: run.jproc >&! jproc_V5.log &                                 
+# ====================== JPROCv5.5 Run Script ======================= 
+# Usage: run_jproc.csh >&! jproc_V5.log &                                 
 #
 # To report problems or request help with this script/program:        
 #             http://www.cmascenter.org
@@ -31,8 +31,9 @@
     endif
  echo " "; echo " Input data path, CMAQ_REPO set to $CMAQ_REPO"; echo " "
 
- set VRSN     = v54 
- set MECH     = cb6r3_ae7_aq 
+
+ set VRSN     = v55 
+ set MECH     = cb6r5_ae7_aq 
 #set MECH     = saprc07tic_ae7i_aq 
  set APPL     = ${VRSN}_${MECH}
  set EXEC     = JPROC_${APPL}_${compiler}${compilerVrsn}    #> executable name
@@ -47,8 +48,8 @@
 
 #> JPROC run dates (produces one file per day)
 
- set STDATE   = 2016182         #> the beginning day for this run
- set ENDATE   = 2016182         #> the ending day
+ set STDATE   = 2018182         #> the beginning day for this run
+ set ENDATE   = 2018182         #> the ending day
 
 # =====================================================================
 #> Input/Output Directories
@@ -59,7 +60,7 @@
  set PROFpath   = $CMAQ_DATA # PROF input data
  set ETpath     = $CMAQ_DATA # ET input data
  set TOMSpath   = $CMAQ_DATA # TOMS input data
- set OUTDIR     = $BASE/jtable_${APPL}_${MECH}   # Output directory
+ set OUTDIR     = $BASE/jtable_${APPL}         # Output directory
 
 # =====================================================================
 #> Input Files
