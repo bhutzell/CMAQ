@@ -1069,7 +1069,7 @@ C...  calculate cosine of zenith angle for the cell and determine day or night; 
                       JHNO3 = 0.0D0                                 ! 1/min
                  ELSE
                       DARK = .FALSE.  ! day
-                      JHNO3 = RJ_RES( C, R, L, LHNO3 )              ! 1/min                   
+                      JHNO3 = RJ( C, R, L, LHNO3 )              ! 1/min                   
                  END IF
                  
 ! Calculate FAC_HNO3
