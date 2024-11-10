@@ -391,9 +391,10 @@ C-----------------------------------------------------------------------
               map_ROGtoCGRID( spc ) = gc_strt - 1 + g
               ROG_mw( spc ) = gc_molwt( g )
             else
-              ! Log an Error
-              write(logdev,99903)Trim( oaspc( spc )%ctr_name ),
-     &        Trim( oaspc( spc )%gas_name )
+              write(logdev,99903) Trim( oaspc( spc )%ctr_name ),
+     &                            Trim( oaspc( spc )%gas_name )
+               call m3exit( pname, 0, 0, 'Please add this critical ' //
+     &                      'species to your mechanism', xstat3 )
             End If
          End Do
 
@@ -418,8 +419,8 @@ C-----------------------------------------------------------------------
            End If
 
            If( n .lt. 1 .and. g .lt. 1 ) Then
-               write(logdev,99902)Trim( oaspc( spc )%gas_name ), 
-     &                            Trim ( oaspc( spc )%name )
+               write(logdev,99902) Trim( oaspc( spc )%gas_name ), 
+     &                             Trim ( oaspc( spc )%name )
                call m3exit( pname, 0, 0, 'Please add these critical ' //
      &                      'species to your mechanism', xstat3 )
            End If
