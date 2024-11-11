@@ -505,7 +505,6 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     echo                                                           >> $Cfile
  endif
  echo "include SUBST_PE_COMM    $ICL_PAR/PE_COMM.EXT;"             >> $Cfile
- echo "include SUBST_CONST      $ICL_CONST/CONST.EXT;"             >> $Cfile
  echo "include SUBST_FILES_ID   $ICL_FILES/FILES_CTM.EXT;"         >> $Cfile
  echo "include SUBST_EMISPRM    $ICL_EMCTL/EMISPRM.EXT;"           >> $Cfile
  echo                                                              >> $Cfile
