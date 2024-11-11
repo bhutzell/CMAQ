@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /work/MOD3DEV/tskipper/cracmm3/20240808_EBZupdate/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
+! Source file: /work/MAQSEA/cnolte/cmaq/2024-11-10-misc-cleanup/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
 ! for Mechanism Name: CRACMM3                         
 
 ! This file is used to create mechanism data and functions

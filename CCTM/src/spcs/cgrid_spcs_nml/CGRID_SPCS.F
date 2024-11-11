@@ -440,13 +440,9 @@ c-------------------------------------------------------------------------------
                   AE_SPECIES_DATA( N_AE_SPC )%CONC_FLAG    = STM_AE_SPECIES_DATA( IAE )%CONC_FLAG
                END DO
 
-               If ( ( Index( mechname, 'SAPRC07TIC_AE6I' ) .Gt. 0 ) .OR.
-     &              ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 ) .OR.
-     &              ( Index( mechname, 'CRACMM1_'        ) .Gt. 0 ) .OR.
+               If ( ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CRACMM2'         ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CRACMM3'         ) .Gt. 0 ) .OR.
-     &              ( Index( mechname, 'CRACMM1AMORE_'   ) .Gt. 0 ) .OR.
-     &              ( Index( mechname, 'CB6R3_AE7'       ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CB6R5_AE7'       ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CB6R5M_AE7'      ) .Gt. 0 ) ) Then
                      

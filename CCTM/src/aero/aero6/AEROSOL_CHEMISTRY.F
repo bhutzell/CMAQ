@@ -786,14 +786,12 @@ C ***  Determine molecular weights
 C ***  Map to acids/nucleophiles for epoxide uptake
        INDX =  INDEX1( NAMES_AERO_RATES( IA_IEPOX ), NHETERO, HETERO )   
        IF ( INDX .GT. 0 ) THEN ! Find indices for acid catalyzed species in IEPOX reaction
-          If ( ( INDEX( MECHNAME, 'AE6I' ) .GT. 0 ) .OR.
-     &         ( INDEX( MECHNAME, 'AE7I' ) .GT. 0 )  ) then
+          If ( ( INDEX( MECHNAME, 'AE7I' ) .GT. 0 ) ) then
              NUMVOC         = 2 ! IEPOX + MAE/HMML
              N_NUCPAIRS     = N_NUCPAIRS_AEI
              ALLOCATE ( ACID_NUC_PAIRS( N_NUCPAIRS ) )
              ACID_NUC_PAIRS = ACID_NUC_PAIRS_AEI
-          Else If ( (INDEX( MECHNAME, 'CRACMM1') .GT. 0)
-     &      .OR.    (INDEX( MECHNAME, 'CRACMM2') .GT. 0)
+          Else If ( (INDEX( MECHNAME, 'CRACMM2') .GT. 0)
      &      .OR.    (INDEX( MECHNAME, 'CRACMM3') .GT. 0) ) then
              NUMVOC         = 1
              N_NUCPAIRS     = N_NUCPAIRS_CRCM

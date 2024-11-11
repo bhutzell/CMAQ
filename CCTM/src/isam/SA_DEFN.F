@@ -1804,7 +1804,7 @@ c          END DO
       !-------------------------------------------------------------------------------------------   
         SUBROUTINE CHECK_MECH( TAG_NAME, IMECH, MECHNAME, EFLAG )
       !-------------------------------------------------------------------------------------------   
-      !  This subroutine checks whether or not the the chemical mechanism
+      !  This subroutine checks whether or not the chemical mechanism
       !  that the user has supplied is active for ISAM and reports an
       !  error if not.
       !-------------------------------------------------------------------------------------------   

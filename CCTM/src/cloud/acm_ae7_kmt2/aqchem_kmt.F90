@@ -290,12 +290,11 @@
 
          FIRSTIME = .FALSE.
 
-!...Is an AE6I or AE7I version of the mechanism is being used?  
+!...Is an AE7I version of the mechanism is being used?  
 !...This will include IETET, IMGA, etc. (rather than ISO3) and the IEPOX, 
 !...IMAE, etc., precursors (rather than just EPOX)
 
-        IF ( ( INDEX ( MECHNAME, 'AE6I' ) .LE. 0 ) .AND.   &
-             ( INDEX ( MECHNAME, 'AE7I' ) .LE. 0 ) ) THEN
+        IF ( ( INDEX ( MECHNAME, 'AE7I' ) .LE. 0 ) THEN
            AEI = .FALSE.
         END IF
 

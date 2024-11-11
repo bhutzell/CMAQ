@@ -1156,8 +1156,7 @@ C Find indices of required species
       apoc_idx    = findAero( req_poc,    .True. )
       apncom_idx  = findAero( req_ncom,   .True. )
 
-      If ( ( Index( mechname, 'SAPRC07TIC_AE6I' ) .Gt. 0 ) .OR.
-     &     ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 )  ) Then
+      If ( ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 ) ) Then
          ae6isoa     = .True.
          aietet_idx  = findAero( req_ietet, ae6isoa )
          aieos_idx   = findAero( req_ieos,  ae6isoa )
@@ -1208,11 +1207,8 @@ C AORGH2O is not required, but highly recommended for aero7
          aso4emis_idx   = findAero( req_so4emis,   .True. )
          aso4icbc_idx   = findAero( req_so4icbc,   .True. )
          If ( ( ae6isoa ) .OR.
-     &        ( Index( mechname, 'CRACMM1_'        ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM2'         ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM3'         ) .Gt. 0 ) .OR.
-     &        ( Index( mechname, 'CRACMM1AMORE_'   ) .Gt. 0 ) .OR.
-     &        ( Index( mechname, 'CB6R3_AE7'       ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R5_AE7'       ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R5M_AE7'      ) .Gt. 0 ) ) Then
             oso4_idx       = findAero( req_oso4,       .True. )
@@ -1277,7 +1273,7 @@ C compute aeromode_minNum and aeromode_minM2
       ! Exit if Errors are Detected
       if( AE_eflag )Then
          Write(logdev,99901) Trim( mechname )
-          xmsg = 'The FATAL errors found in namelist used. Check '
+          xmsg = 'FATAL errors found in namelist used. Check '
      &    //  'the log of exiting processor if more details are needed.'
          Call m3exit( pname, 0, 0, xmsg, xstat3 )
       End If 
@@ -1288,7 +1284,7 @@ C compute aeromode_minNum and aeromode_minM2
 99901 Format( 'FATAL Error(s) found in the AE namelist used. Check that' 
      &  /' this AE namelist contains the above required data '
      &  / 'as the file in '
-     &  /'the respository version of the mechanism: ', a )
+     &  /'the repository version of the mechanism: ', a )
       Return
       End Subroutine map_aero
 

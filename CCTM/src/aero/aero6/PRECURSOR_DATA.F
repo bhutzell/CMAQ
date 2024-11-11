@@ -234,7 +234,7 @@ C Find indices of required species
 
       If( Precursor_eflag )Then
          Write(logdev,99901) Trim( mechname )
-             xmsg = 'The FATAL errors found in namelist used. Check '
+             xmsg = 'FATAL errors found in namelist used. Check '
      &          //  'the log of exiting processor if more details are needed.'
          Call m3exit( pname, 0, 0, xmsg, xstat3 )
       End If 

@@ -27,7 +27,7 @@ C
 C  KEY SUBROUTINES/FUNCTIONS CALLED:  HRINIT, HRCALCKS, HRSOLVER
 C                                     FIND_DEGRADED, INIT_DEGRADE, FINAL_DEGRADE
 C
-C  REVISION HISTORY: Created by EBI solver program, Jun  8, 2022
+C  REVISION HISTORY: Created by EBI solver program, Nov 10, 2024
 C                       Based on the algorithm in "Test of Two Numerical
 C                       Schemes for Use in Atmospheric Transport-Chemistry
 C                       Models", O. Hertel, R. Berkowicz, J. Christensen,
@@ -85,13 +85,12 @@ C**********************************************************************
       USE DDM3D_CHEM
       Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, NP, NPMAX, CKTIME
 #endif
+      USE CONST, ONLY: MWAIR, MWWAT, STDATMPA
 
       IMPLICIT NONE
 
 C..Includes:
       INCLUDE SUBST_FILES_ID  ! CMAQ files
-      INCLUDE SUBST_CONST     ! CMAQ constants
-
       INCLUDE SUBST_EMISPRM   ! Emissions processing control parameters
 
 C..Arguments:
