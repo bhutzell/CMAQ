@@ -616,24 +616,24 @@
      &                       * SQUAREKM     ! LTNG_DATA in km-2
      &                       * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
      &                       * ( MOLSNCG + MOLSNIC * ICCG( COL,ROW ) ) )
-     &                       / ( 60.0 * 60.0 ) ! get time units right: emissions are in the unit of moles/s
+     &                       / 3600.0 ! get time units right: emissions are in the unit of moles/s
                        ELSE IF (LNO_OPTION == 2) THEN
                           COLUMN_LTNG_NO( COL,ROW ) =
      &                     ( LTNG_DATA( COL,ROW,GflIdx )
      &                       * SQUAREKM     ! LTNG_DATA in km-2
      &                       * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
      &                       * ( MOLSNCG + MOLSNIC * ICCG( COL,ROW ) ) )
-     &                       / ( 60.0 * 60.0 ) ! get time units right: emissions are in the unit of moles/s
+     &                       /3600.0 ! get time units right: emissions are in the unit of moles/s
                        ELSE IF (LNO_OPTION == 3) THEN
                           COLUMN_LTNG_NO( COL,ROW ) =
-     &                     ( LTNG_DATA( COL,ROW,GegIdx )*GetaF2E
-     &                       / ( 60.0 * 60.0 ) ! get time units right: emissions are in the unit of moles/s
+     &                     ( LTNG_DATA( COL,ROW,GegIdx )*GamaF2E)
+     &                       / 3600.0 ! get time units right: emissions are in the unit of moles/s
 ! LNO using maximum of GLMeng and WLNeng with daily Beta/Gama values
                        ELSE IF (LNO_OPTION == 4) THEN 
                           COLUMN_LTNG_NO( COL,ROW ) =
      &                     max( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E,
-     &                       LTNG_DATA( COL,ROW,WegIdx )*GamaF2E   
-     &                       / ( 60.0 * 60.0 ) ! get time units right: emissions are in the unit of moles/s
+     &                       LTNG_DATA( COL,ROW,WegIdx )*GamaF2E)   
+     &                       / 3600.0 ! get time units right: emissions are in the unit of moles/s
 ! LNO using maximum of GLMeng and WLNseng with daily Beta/sGama values
 ! and ICCG adjustmenet (setting the upper bound)
                        ELSE IF (LNO_OPTION == 5) THEN  !
@@ -641,7 +641,7 @@
      &                     max( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E,
      &                       LTNG_DATA( COL,ROW,WsegIdx )
      &                       * ( 1 + ICCG( COL,ROW ) )*sGamaF2E )
-     &                       / ( 60.0 * 60.0 ) ! get time units right: emissions are in the unit of moles/s
+     &                       / 3600.0 ! get time units right: emissions are in the unit of moles/s
                        ELSE
                          XMSG = 'LNO_OPTION is not correctly set; correct range is from 1 to 5'
                          CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
@@ -657,7 +657,7 @@
      &                           * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
      &                           * ( MOLSNCG  ! moles N per flash intercloud strikes per cloud-to-ground strike
      &                             + ( MOLSNIC * ICCG( COL,ROW ) ) ) )
-     &                         / ( 60.0 * 60.0 )         ! get time units right
+     &                         /3600.0          ! get time units right
                               IF ( COLUMN_LTNG_NO( COL,ROW ) .LT. 0 ) COLUMN_LTNG_NO( COL,ROW ) = 0.0
                            ELSE
                               COLUMN_LTNG_NO( COL,ROW ) =
@@ -666,7 +666,7 @@
      &                           * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
      &                           * ( MOLSNCG  ! moles N per flash intercloud strikes per cloud-to-ground strike
      &                             + ( MOLSNIC * ICCG( COL,ROW ) ) ) )
-     &                         / ( 60.0 * 60.0 )         ! get time units right 
+     &                         / 3600.0        ! get time units right 
                               IF ( COLUMN_LTNG_NO( COL,ROW ) .LT. 0 ) COLUMN_LTNG_NO( COL,ROW ) = 0.0
                            END IF
                         ELSE
