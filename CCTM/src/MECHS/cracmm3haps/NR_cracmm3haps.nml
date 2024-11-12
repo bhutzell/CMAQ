@@ -5,9 +5,9 @@ NR_SPECIES_DATA =
 !SPECIES         ,MOLWT   ,IC     ,IC_FAC  ,BC     ,BC_FAC ,DRYDEP SURR       ,FAC  ,WET-SCAV SURR     ,FAC ,NR2AE SURR     ,NR2AQ SURR,TRNS  ,DDEP  ,WDEP  ,CONC ,!RepCmp,ExplicitorLumped,DTXSID,SMILES
 'NH3'            , 17.0   ,''     ,-1      ,''     ,-1     ,'VD_NH3'          , 1   ,'NH3'             , 1  ,'NH3'          ,'NH3'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Ammonia,E,DTXSID0023872,N
 'HCL'            , 36.0   ,''     ,-1      ,''     ,-1     ,'VD_HCL'          , 1   ,'HCL'             , 1  ,'HCL'          ,'HCL'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrochloric acid,E,DTXSID2020711,Cl
-'HCHO_PRIM'      , 30.0   ,'HCHO' ,1.0     ,'HCHO' ,1.0    ,'VD_HCHO'         , 1   ,'FORMALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'CH3CHO_PRIM'    , 44.0   ,'ACD'  ,1.0     ,'ACD'  ,1.0    ,'VD_ACD'          , 1   ,'ACETALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'ACRO_PRIM'      , 56.1   ,'ACRO' ,1.0     ,'ACRO' ,1.0    ,'VD_ACRO'         , 1   ,'ACROOPERA'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,''    ,'Yes',
+'HCHO_PRIM'      , 30.0   ,''     ,-1      ,''     ,-1     ,'VD_HCHO'         , 1   ,'FORMALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
+'CH3CHO_PRIM'    , 44.0   ,''     ,-1      ,''     ,-1     ,'VD_ACD'          , 1   ,'ACETALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
+'ACRO_PRIM'      , 56.1   ,''     ,-1      ,''     ,-1     ,'VD_ACRO'         , 1   ,'ACROOPERA'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,''    ,'Yes',
 'ACRY_NITRILE'   , 53.10  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'ACRYLONITRILE'   , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'CARBONTET'      ,153.80  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CARBONTETRACHLOR', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'PROPYL_DICL'    ,113.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'PROPYLENE_DICHLO', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
