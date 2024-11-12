@@ -21,7 +21,6 @@ NR_SPECIES_DATA =
 'CL4_ETHE'       ,165.80  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'PERCHLOROETHYLEN', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'CL3_ETHE'       ,131.40  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'TRICHLOROETHENE' , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'CL_ETHE'        , 62.50  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'VINYL_CHLORIDE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'NAPHTHALENE'    ,128.20  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'QUINOLINE'      ,129.20  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'QUINOLINE'       , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
 'HEXMETH_DIS'    ,168.20  ,''     ,-1      ,''     ,-1     ,'VD_HEXMETH_DIIS' , 1   ,'HEXAMETHYLE_DIIS', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
 'HYDRAZINE'      , 32.00  ,''     ,-1      ,''     ,-1     ,'VD_HYDRAZINE'    , 1   ,'HYDRAZINE'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
