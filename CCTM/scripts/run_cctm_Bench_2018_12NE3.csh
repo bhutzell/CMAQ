@@ -33,7 +33,7 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v54              #> Code Version
+ set VRSN      = v55              #> Code Version
  set PROC      = mpi               #> serial or mpi
  set MECH      = cb6r5_ae7_aq      #> Mechanism ID
  set APPL      = Bench_2018_12NE3  #> Application Name (e.g. Gridname)
@@ -353,7 +353,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  
   #> Spatial Masks For Emissions Scaling
   #setenv CMAQ_MASKS $SZpath/OCEAN_${MM}_L3m_MC_CHL_chlor_a_12NE3.nc #> horizontal grid-dependent ocean file
-  setenv CMAQ_MASKS $INPDIR/GRIDMASK_STATES_12NE3.nc
+  setenv CMAQ_MASKS $INPDIR/surface/GRIDMASK_STATES_12NE3.nc
 
   #> Gridded Emissions Files 
   setenv N_EMIS_GR 2
@@ -507,7 +507,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
        setenv SA_CGRID_1      "$OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc -v"
 
        #> Set optional ISAM regions files
-       setenv ISAM_REGIONS $INPDIR/GRIDMASK_STATES_12NE3.nc
+       setenv ISAM_REGIONS $INPDIR/surface/GRIDMASK_STATES_12NE3.nc
 
        #> Options used to favor tracked species in reaction for Ozone-NOx chemistry
        setenv ISAM_O3_WEIGHTS 5   # weights for tracked species Default is 5
@@ -543,7 +543,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  setenv CTM_DDM3D N    # Sets up requisite script settings for DDM-3D (default is N/F)
                        # Additionally requires for CCTM to be compiled for DDM-3D simulations
 
- set NPMAX    = 1      # Number of sensitivity parameters defined in SEN_INPUT
+ set NPMAX    = 2      # Number of sensitivity parameters defined in SEN_INPUT
  setenv SEN_INPUT ${WORKDIR}/sensinput.2018_12NE3.dat
 
  setenv DDM3D_HIGH N   # allow higher-order sensitivity parameters in SEN_INPUT [ T | Y | F | N ] (default is N/F)
