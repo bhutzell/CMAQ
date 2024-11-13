@@ -248,7 +248,7 @@ C-----------------------------------------------------------------------
          END IF
 
 #ifndef mpas
-         IF ( BUDGET_DIAG .OR. LIPR ) THEN
+         IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) THEN
             ALLOCATE( NH3_DDEP0( NCOLS,NROWS), STAT = ASTAT )
             CALL CHECKMEM( ASTAT,'NH3_DDEP0',PNAME )
          END IF
@@ -328,7 +328,7 @@ C Set up for budget accumulation and process analysis
          CALL LOG_HEADING( LOGDEV, "Initialize Surface Exchange for Process Analysis" )
 
 #ifndef mpas
-         IF ( BUDGET_DIAG .OR. LIPR ) THEN
+         IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) THEN
             ALLOCATE ( EMIS_PA( NCOLS,NROWS,NLAYS,N_CGRID_SPC ), STAT = ASTAT )
             IF ( ASTAT .NE. 0 ) THEN
                XMSG = 'EMIS_PA memory allocation failed'

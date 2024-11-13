@@ -2355,7 +2355,7 @@
          !----------------------------!
          !!! DESID Chemical Mapping !!!
            ! Retrieve the Name of the Emission Control File
-           IF ( CMAQ_CHEM_CTRL .EQ. "CMAQ_CHEM_CTRL_NML" ) THEN
+           IF ( CMAQ_CHEM_CTRL .EQ. "CMAQ_CH_CTRL_NML" ) THEN
                XMSG = 'You have chosen not to indicate the location of an' //
      &                'Emission Control namelist file. You must give a value ' //
      &                'for the CMAQ_CHEM_CTRL variable in the CMAQ runscript.'

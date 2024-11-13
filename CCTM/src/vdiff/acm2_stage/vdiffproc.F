@@ -278,7 +278,7 @@ C Allocate and initialize dry deposition array
 C Set up for process analysis
          CALL LOG_HEADING( LOGDEV, "Initialize Surface Exchange for Process Analysis" )
 
-         IF ( BUDGET_DIAG .OR. LIPR ) THEN
+         IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) THEN
             ALLOCATE ( EMIS_PA( NCOLS,NROWS,NLAYS,N_CGRID_SPC ), STAT = ASTAT )
             IF ( ASTAT .NE. 0 ) THEN
                XMSG = 'EMIS_PA memory allocation failed'

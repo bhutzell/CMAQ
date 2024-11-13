@@ -101,7 +101,7 @@
       ! Retrieve the Name of the CMAQ Chemical Control File
       IF ( CMAQ_CHEM_CTRL .EQ. "CMAQ_CH_CTRL_NML" ) THEN
           XMSG = 'You have chosen not to indicate the location of a' //
-     &              'Misc. Control namelist file. You must give a value ' //
+     &              'Chemical Control namelist file. You must give a value ' //
      &              'for the CMAQ_CH_CTRL_NML variable in the CMAQ runscript.'
           CALL M3EXIT( 'READ_FAMILIES',0,0,XMSG,1 )
       END IF
