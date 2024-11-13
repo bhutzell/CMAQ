@@ -69,7 +69,7 @@
   Tmode = 'average', 'average', 'instant','average','average'
   Lay_Bot = 1, 1, 1, 1, 1
   Lay_Top = 1, 5, 35, 1, 1
-  File_Vars(1,:) = 'DEFAULT','PM_TOXICS'
+  File_Vars(1,:) = 'DEFAULT'
   File_Vars(2,:) = 'DEFAULT_DEP'
   File_Vars(3,:) = 'AEC','KZ','ANH4J','PMAMS_SO4','AMET_GAS'
   File_Vars(4,:) = 'ASO4','ANO3','AEC','ACL','AMG','PMF_SOA','PMF_SOC','PMF_POA','PMF_POC'
