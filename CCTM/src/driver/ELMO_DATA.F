@@ -661,7 +661,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       
       
       CHARACTER( 250 ) :: XMSG
-      CHARACTER, PARAMETER :: PNAME = 'MAP_ELMO_NML'
+      CHARACTER(32), PARAMETER :: PNAME = 'MAP_ELMO_NML'
 
       
       IERROR = 0
@@ -909,7 +909,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, INTENT( IN )       :: LAYER_BOT
       INTEGER, INTENT( IN )       :: IFILE
       CHARACTER(250)              :: XMSG
-      CHARACTER, PARAMETER        :: PNAME = 'ELMO_CHECK_LAYERS'
+      CHARACTER(32), PARAMETER    :: PNAME = 'ELMO_CHECK_LAYERS'
       CHARACTER( 13 )             :: FNAME
 
       WRITE( FNAME, '("ELMO FILE ",I3.3)' ) IFILE
