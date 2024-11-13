@@ -284,11 +284,12 @@ C Set up for process analysis
                XMSG = 'EMIS_PA memory allocation failed'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
-            ALLOCATE ( DDEP_PA( NCOLS,NROWS,N_CGRID_SPC ), STAT = ASTAT )
-            IF ( ASTAT .NE. 0 ) THEN
-               XMSG = 'DDEP_PA memory allocation failed'
-               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
+         END IF
+         
+         ALLOCATE ( DDEP_PA( NCOLS,NROWS,N_CGRID_SPC ), STAT = ASTAT )
+         IF ( ASTAT .NE. 0 ) THEN
+            XMSG = 'DDEP_PA memory allocation failed'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
 C Set up for grav. settling

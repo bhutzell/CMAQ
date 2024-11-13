@@ -248,10 +248,8 @@ C-----------------------------------------------------------------------
          END IF
 
 #ifndef mpas
-         IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) THEN
-            ALLOCATE( NH3_DDEP0( NCOLS,NROWS), STAT = ASTAT )
-            CALL CHECKMEM( ASTAT,'NH3_DDEP0',PNAME )
-         END IF
+         ALLOCATE( NH3_DDEP0( NCOLS,NROWS), STAT = ASTAT )
+         CALL CHECKMEM( ASTAT,'NH3_DDEP0',PNAME )
 #endif
 
 C create global maps
@@ -334,11 +332,12 @@ C Set up for budget accumulation and process analysis
                XMSG = 'EMIS_PA memory allocation failed'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
-            ALLOCATE ( DDEP_PA( NCOLS,NROWS,N_CGRID_SPC ), STAT = ASTAT )
-            IF ( ASTAT .NE. 0 ) THEN
-               XMSG = 'DDEP_PA memory allocation failed'
-               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
+         END IF
+
+         ALLOCATE ( DDEP_PA( NCOLS,NROWS,N_CGRID_SPC ), STAT = ASTAT )
+         IF ( ASTAT .NE. 0 ) THEN
+            XMSG = 'DDEP_PA memory allocation failed'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 #endif
 
