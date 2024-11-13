@@ -391,9 +391,10 @@ C-----------------------------------------------------------------------
               map_ROGtoCGRID( spc ) = gc_strt - 1 + g
               ROG_mw( spc ) = gc_molwt( g )
             else
+              ! Log an Error and Halt the model
               write(logdev,99903) Trim( oaspc( spc )%ctr_name ),
      &                            Trim( oaspc( spc )%gas_name )
-               call m3exit( pname, 0, 0, 'Please add this critical ' //
+              call m3exit( pname, 0, 0, 'Please add this critical ' //
      &                      'species to your mechanism', xstat3 )
             End If
          End Do
