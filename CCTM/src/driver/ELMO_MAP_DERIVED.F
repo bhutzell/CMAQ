@@ -87,7 +87,7 @@
         DO J = 1,N_ELMO_TABLE
           IF ( ELMO_TABLE( J )%SOURCE .EQ. ISRC ) THEN
             SELECT CASE ( ELMO_TABLE( J )%NAME )
-              CASE ( 'PMF_MASS' )
+              CASE ( 'PMF' )
                 J_PMF_MASS( ISRC+1 ) = J
               CASE ( 'PMF_SO4' )
                 J_PMF_SO4( ISRC+1 ) = J
@@ -117,6 +117,9 @@
       END DO
 
       ! Define Formulas for DERIVED Variables
+      DO J = 1,N_ELMO_TABLE
+         IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD
+
 
 
       END SUBROUTINE ELMO_MAP_DERIVED

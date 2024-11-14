@@ -264,14 +264,6 @@
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
       
-      USE CGRID_SPCS, ONLY : CGRID_NAME
-      USE AERO_DATA, ONLY : ascat_na_fac, asoil_na_fac, acors_na_fac,
-     &                      ascat_mg_fac, asoil_mg_fac, acors_mg_fac,
-     &                      ascat_k_fac,  asoil_k_fac,  acors_k_fac,
-     &                      ascat_ca_fac, asoil_ca_fac, acors_ca_fac,
-     &                                    asoil_fe_fac, acors_fe_fac,
-     &                                    asoil_mn_fac, acors_mn_fac
-
       IMPLICIT NONE
 
       INTEGER N_VARS, J, ID, IVAR
@@ -484,7 +476,6 @@
 !-------------------------------------------------------------------------
 
       USE PRECURSOR_DATA, ONLY : N_PRECURSOR, PRECURSOR
-      USE CGRID_SPCS, ONLY : N_CGRID_SPC, CGRID_NAME
       USE AERO_DATA, ONLY : N_AEROSPC, AEROSPC
       IMPLICIT NONE
 

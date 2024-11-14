@@ -1253,6 +1253,20 @@
                   END IF
 
                END DO
+
+            ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD_DDEP .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD_WDEP .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_DRVD .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_DRVD_DDEP .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_DRVD_WDEP .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_DRVD .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_DRVD_DDEP .OR.
+     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_DRVD_WDEP ) THEN
+               ! Make Formula Based on ID of Variable
+
+               
+
             END IF  
  
             IF ( FORMULA .NE. '' ) THEN   
