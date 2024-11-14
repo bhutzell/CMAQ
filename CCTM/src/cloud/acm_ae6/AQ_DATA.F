@@ -45,7 +45,7 @@ C-----------------------------------------------------------------------
 
       Implicit None
 
-      Integer, Parameter :: n_aq_gas = 15   ! number of gas-phase species for AQCHEM
+      Integer, Parameter :: n_aq_gas = 18   ! number of gas-phase species for AQCHEM
       Integer, Parameter :: n_aq_aer = 31   ! number of aerosol surrogate species for AQCHEM
 
       Integer, Parameter :: n_aq_liqs = 64  ! number of liquid-phase species in AQCHEM
@@ -77,25 +77,31 @@ C                       ----------    ----------
      & sur_gas_type( 'HCL       ',        0.0 ),
      & sur_gas_type( 'GLY       ',        0.0 ),
      & sur_gas_type( 'MGLY      ',        0.0 ),
-     & sur_gas_type( 'HO        ',        0.0 ) / )
+     & sur_gas_type( 'HO        ',        0.0 ),
+     & sur_gas_type( 'MTNO3     ',        0.0 ),
+     & sur_gas_type( 'HG        ',        0.0 ),
+     & sur_gas_type( 'HGIIGAS   ',        0.0 ) / )
 
 C...Pointers for the AQCHEM array GAS
 
-      Integer, Parameter :: lso2   = 1  ! Sulfur Dioxide
-      Integer, Parameter :: lhno3  = 2  ! Nitric Acid
-      Integer, Parameter :: ln2o5  = 3  ! Dinitrogen Pentoxide
-      Integer, Parameter :: lco2   = 4  ! Carbon Dioxide
-      Integer, Parameter :: lnh3   = 5  ! Ammonia
-      Integer, Parameter :: lh2o2  = 6  ! Hydrogen Peroxide
-      Integer, Parameter :: lo3    = 7  ! Ozone
-      Integer, Parameter :: lfoa   = 8  ! Formic Acid
-      Integer, Parameter :: lmhp   = 9  ! Methyl Hydrogen Peroxide
-      Integer, Parameter :: lpaa   = 10 ! Peroxyacetic Acid
-      Integer, Parameter :: lh2so4 = 11 ! Sulfuric Acid
-      Integer, Parameter :: lhcl   = 12 ! Hydrogen Chloride
-      Integer, Parameter :: lgly   = 13 ! Glyoxal
-      Integer, Parameter :: lmgly  = 14 ! Methylglyoxal
-      Integer, Parameter :: lho    = 15 ! OH, hydroxyl radical
+      Integer, Parameter :: lso2    = 1  ! Sulfur Dioxide
+      Integer, Parameter :: lhno3   = 2  ! Nitric Acid
+      Integer, Parameter :: ln2o5   = 3  ! Dinitrogen Pentoxide
+      Integer, Parameter :: lco2    = 4  ! Carbon Dioxide
+      Integer, Parameter :: lnh3    = 5  ! Ammonia
+      Integer, Parameter :: lh2o2   = 6  ! Hydrogen Peroxide
+      Integer, Parameter :: lo3     = 7  ! Ozone
+      Integer, Parameter :: lfoa    = 8  ! Formic Acid
+      Integer, Parameter :: lmhp    = 9  ! Methyl Hydrogen Peroxide
+      Integer, Parameter :: lpaa    = 10 ! Peroxyacetic Acid
+      Integer, Parameter :: lh2so4  = 11 ! Sulfuric Acid
+      Integer, Parameter :: lhcl    = 12 ! Hydrogen Chloride
+      Integer, Parameter :: lgly    = 13 ! Glyoxal
+      Integer, Parameter :: lmgly   = 14 ! Methylglyoxal
+      Integer, Parameter :: lho     = 15 ! OH, hydroxyl radical
+      Integer, Parameter :: lmtno3  = 16 ! Monoterpene Nitrate
+      Integer, Parameter :: lhg     = 17 ! Mercury
+      Integer, Parameter :: lhgiigas= 18 ! Divalent Mercury
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C...Aerosol surrogates species 
