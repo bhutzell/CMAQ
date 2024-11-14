@@ -45,7 +45,7 @@ C-----------------------------------------------------------------------
 
       Implicit None
 
-      Integer, Parameter :: n_aq_gas = 18   ! number of gas-phase species for AQCHEM
+      Integer, Parameter :: n_aq_gas = 15   ! number of gas-phase species for AQCHEM
       Integer, Parameter :: n_aq_aer = 31   ! number of aerosol surrogate species for AQCHEM
 
       Integer, Parameter :: n_aq_liqs = 64  ! number of liquid-phase species in AQCHEM
@@ -77,10 +77,7 @@ C                       ----------    ----------
      & sur_gas_type( 'HCL       ',        0.0 ),
      & sur_gas_type( 'GLY       ',        0.0 ),
      & sur_gas_type( 'MGLY      ',        0.0 ),
-     & sur_gas_type( 'HO        ',        0.0 ),
-     & sur_gas_type( 'MTNO3     ',        0.0 ),
-     & sur_gas_type( 'HG        ',        0.0 ),
-     & sur_gas_type( 'HGIIGAS   ',        0.0 ) / )
+     & sur_gas_type( 'HO        ',        0.0 ) / )
 
 C...Pointers for the AQCHEM array GAS
 
@@ -99,9 +96,6 @@ C...Pointers for the AQCHEM array GAS
       Integer, Parameter :: lgly    = 13 ! Glyoxal
       Integer, Parameter :: lmgly   = 14 ! Methylglyoxal
       Integer, Parameter :: lho     = 15 ! OH, hydroxyl radical
-      Integer, Parameter :: lmtno3  = 16 ! Monoterpene Nitrate
-      Integer, Parameter :: lhg     = 17 ! Mercury
-      Integer, Parameter :: lhgiigas= 18 ! Divalent Mercury
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C...Aerosol surrogates species 
