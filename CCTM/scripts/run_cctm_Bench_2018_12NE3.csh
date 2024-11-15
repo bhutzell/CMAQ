@@ -445,16 +445,16 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
     setenv MEGAN_SOILINP    $OUTDIR/CCTM_MSOILOUT_${RUNID}_${YESTERDAY}.nc
                              #> Biogenic NO soil input file; ignore if INITIAL_RUN = Y
                              #>                            ; ignore if IGNORE_SOILINP = Y
-         setenv MEGAN_CTS $SZpath/megan3.2/CT3_CONUS.ncf
-         setenv MEGAN_EFS $SZpath/megan3.2/EFMAPS_CONUS.ncf
-         setenv MEGAN_LDF $SZpath/megan3.2/LDF_CONUS.ncf
+         setenv MEGAN_CTS $SZpath/megan3.2/CT3_nebench.ncf
+         setenv MEGAN_EFS $SZpath/megan3.2/EF_nebench.ncf
+         setenv MEGAN_LDF $SZpath/megan3.2/LDF_nebench.ncf
          if ($BDSNP_MEGAN == 'Y') then
             setenv BDSNPINP    $OUTDIR/CCTM_BDSNPOUT_${RUNID}_${YESTERDAY}.nc
-            setenv BDSNP_FFILE $SZpath/megan3.2/FERT_tceq_12km.ncf
-            setenv BDSNP_NFILE $SZpath/megan3.2/NDEP_tceq_12km.ncf
-            setenv BDSNP_LFILE $SZpath/megan3.2/LANDTYPE_tceq_12km.ncf
-            setenv BDSNP_AFILE $SZpath/megan3.2/ARID_tceq_12km.ncf
-            setenv BDSNP_NAFILE $SZpath/megan3.2/NONARID_tceq_12km.ncf
+            setenv BDSNP_FFILE $SZpath/megan3.2/FERT_nebench.ncf
+            setenv BDSNP_NFILE $SZpath/megan3.2/NDEP_nebench.ncf
+            setenv BDSNP_LFILE $SZpath/megan3.2/LANDTYPE_nebench.ncf
+            setenv BDSNP_AFILE $SZpath/megan3.2/ARID_nebench.ncf
+            setenv BDSNP_NAFILE $SZpath/megan3.2/NONARID_nebench.ncf
          endif
   endif
 
