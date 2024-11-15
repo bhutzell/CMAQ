@@ -307,11 +307,24 @@
                          mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, pos)
                       end if
 
-                      if (.not. mio_get_data (mio_file_data(floc)%fileid,      &
-                                              mio_file_data(floc)%var_id(v),   &
-                                              mystart, mycount, data) ) then
+!                     if (.not. mio_get_data (mio_file_data(floc)%fileid,      &
+!                                             mio_file_data(floc)%var_id(v),   &
+!                                             mystart, mycount, data) ) then
+!                        lerror = .true.
+!                     end if
+
+                      stat = nf90_get_var(mio_file_data(floc)%fileid,              &
+                                          mio_file_data(floc)%var_id(v),           &
+                                          data,                                    &
+                                          start = mystart,                         &
+                                          count = mycount)
+
+                      if (stat .ne. 0) then
+                         write (mio_logdev, *) ' Error in routine mio_get_data_2d_real'
+                         write (mio_logdev, *) '       due to ', trim(nf90_strerror(stat))
                          lerror = .true.
                       end if
+
                    end if
                 end if
              end if
@@ -447,7 +460,8 @@
                    mycount = 1
                    mystart(4) = t
 
-                   if (mio_parallelism .eq. mio_serial) then
+!                  if (mio_parallelism .eq. mio_serial) then
+                   if ((mio_parallelism .eq. mio_serial) .or. (fname(1:5) == 'STK_G')) then
                       mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
                    else if (mio_parallelism .eq. mio_pseudo) then
                       if (mio_file_data(floc)%grid_type .eq. 'c') then
@@ -486,7 +500,6 @@
 ! --------------------------------------------------------------------------------------------
         subroutine mio_fread_3d_real_sub (fname, vname, caller, strcol, endcol, &
                                           strrow, endrow, strlay, endlay, data, timestamp)
-
 !       this routine is for CMAQ application only
 
           character (*), intent(in) :: fname
@@ -1457,7 +1470,8 @@
                    mycount = 1
                    mystart(4) = t
 
-                   if (mio_parallelism .eq. mio_serial) then
+!                  if (mio_parallelism .eq. mio_serial) then
+                   if ((mio_parallelism .eq. mio_serial) .or. (fname(1:5) == 'STK_G')) then
                       mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
                    else if (mio_parallelism .eq. mio_pseudo) then
                       if (mio_file_data(floc)%grid_type .eq. 'c') then

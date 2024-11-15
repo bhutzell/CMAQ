@@ -164,30 +164,36 @@
           integer :: ind, t_date, i
           logical :: found
 
-          year = julian_date / 1000
-          t_date = mod(julian_date, 1000)
-
-          if (mio_leap_year(year)) then
-             ind = 2
+          if (julian_date == 0) then
+             year = 0
+             month = 0
+             day = 0
           else
-             ind = 1
-          end if
+             year = julian_date / 1000
+             t_date = mod(julian_date, 1000)
 
-          found = .false.
-          i = 12
-          do while ((.not. found) .and. (i > 0))
-             if (t_date > num_days(i, ind)) then
-                found = .true.
+             if (mio_leap_year(year)) then
+                ind = 2
              else
-                i = i - 1
+                ind = 1
              end if
-          end do
 
-          month = i + 1
-          if (i == 0) then
-             day = t_date
-          else
-             day = t_date - num_days(i, ind)
+             found = .false.
+             i = 12
+             do while ((.not. found) .and. (i > 0))
+                if (t_date > num_days(i, ind)) then
+                   found = .true.
+                else
+                   i = i - 1
+                end if
+             end do
+
+             month = i + 1
+             if (i == 0) then
+                day = t_date
+             else
+                day = t_date - num_days(i, ind)
+             end if
           end if
 
         end subroutine mio_julian_to_calendar

@@ -254,18 +254,18 @@ C to determine DRYPERIOD, pulse state, prev. timestep soil moisture, and N reser
 C If initial run, initialize some variables, otherwise get them from file
          IF ( NEW_START .or. IGNORE_SOILINP) THEN
 
-            PFACTOR   = 1d0   ! array
+            PFACTOR   = 1.0   ! array
             DRYPERIOD = 0.01  ! array initialized non-zero to avoid log(0)
             CFRAC     = 0. 
-            SOILMPREV = 0d0   ! array
-            FERT      = 0d0   ! array
-            EMPOL  = 0d0
-            EMPOLSUM  = 0d0
-            EMPOLAVG  = 0d0
+            SOILMPREV = 0.0   ! array
+            FERT      = 0.0   ! array
+            EMPOL  = 0.0
+            EMPOLSUM  = 0.0
+            EMPOLAVG  = 0.0
             BASESUM = 0.0
             CRFAVG = 0.0
             PULSEAVG = 0.0
-            NDEPRES   = 0d0   ! array
+            NDEPRES   = 0.0   ! array
 
 C open nitrogen deposition file
 
@@ -705,6 +705,12 @@ C Open NO rain data save file
 
       VNAME = 'PULSEAVG'
       IF ( .NOT.WRITE3(SOILOUT,VNAME,NDATE,NTIME,PULSEAVG)) THEN 
+        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
+        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
+      ENDIF
+
+      VNAME = 'SOILMPREV'
+      IF ( .NOT.WRITE3(SOILOUT,VNAME,NDATE,NTIME,SOILMPREV)) THEN 
         MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
         CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
       ENDIF
