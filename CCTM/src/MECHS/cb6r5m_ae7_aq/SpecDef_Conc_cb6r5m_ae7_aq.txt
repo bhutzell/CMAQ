@@ -4,8 +4,7 @@
 
 /
 ! This Species Definition File is for Use with the COMBINE tool built for 
-! post-processing CMAQ output. It is compatible with CMAQv5.4.
-! Date: May 12 2017
+! post-processing CMAQ output. It is compatible with CMAQv6.0.
 
 ! Output variables that begin with 'PM' represent those in which a size cut was 
 ! applied based on modeled aerosol mode parameters.  For example, PM25_NA is all 
