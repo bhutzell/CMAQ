@@ -1124,7 +1124,6 @@ C Build mapping to CGRID for aero # and surf area variables
      &           // ' is not in AE namelist'
             AE_eflag  = .True.
             Call m3warn( pname, 0, 0, xmsg )
-!            Call m3exit( pname, 0, 0, xmsg, xstat3 )
          Else
             aerosrf_map( m ) = ae_strt - 1 + n
             aerocgrid_rhoinv( n ) = 1.0
@@ -1547,22 +1546,23 @@ C Find the substring vname in aerospc( spc )%name( n )
       Do spc = 1, n_aerospc
          If ( aerospc( spc )%bulkname .eq. vname ) Then
             idx = spc
+            xmsg = 'Aerosol Species '
+     &             // Trim( vname ) // ' found in AE namelist.'
+            write(logdev,'(5x,a)') xmsg
             Return
          End If
          Do n = 1, n_mode
             If ( aerospc( spc )%name( n ) .eq. vname ) Then
                idx = spc
+               xmsg = 'Aerosol Species '
+     &                // Trim( vname ) // ' found in AE namelist.'
+               write(logdev,'(5x,a)') xmsg
                Return
             End If
          End Do
       End Do
 
-      If ( .Not. required ) Then
-         xmsg = 'Optional Species '
-     &       // Trim( vname ) // ' Not found in AE namelist.'
-         write(logdev,'(5x,a)') xmsg
-         Return
-      End If
+      If ( .Not. required ) Return
 
       xmsg = 'Required Species ' // Trim( vname ) // 
      &       ' Not found in AE namelist'
