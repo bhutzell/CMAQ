@@ -137,16 +137,18 @@ C Convert to grid cell coord and truncate
 
 C open existing file for readonly access
 
-      IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
-         XMSG = 'Could not open '// FNAME
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
+!     IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
+!        XMSG = 'Could not open '// FNAME
+!        CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!     END IF
 
-      IF ( .NOT. DESC3( FNAME ) ) THEN
-         XMSG = 'Could not get ' // TRIM( FNAME )
-     &        // ' file description'
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
-      END IF
+!     IF ( .NOT. DESC3( FNAME ) ) THEN
+!        XMSG = 'Could not get ' // TRIM( FNAME )
+!    &        // ' file description'
+!        CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+!     END IF
+
+      call mio_fopen (FNAME, mio_read_only)
 
 C check some header data against the reference file in this met set -
 C mother grid center and grid cell resolution
@@ -171,21 +173,21 @@ C mother grid center and grid cell resolution
 !     END IF
 
       floc = mio_search (fname)
-      if (floc > 0) then
+!     if (floc > 0) then
          call mio_get_global_attr (fname, 'XORIG', lxorig3d)
          call mio_get_global_attr (fname, 'YORIG', lyorig3d)
          call mio_get_global_attr (fname, 'XCENT', lxcent3d)
          call mio_get_global_attr (fname, 'YCENT', lycent3d)
          call mio_get_global_attr (fname, 'XCELL', lxcell3d)
          call mio_get_global_attr (fname, 'YCELL', lycell3d)
-      else
-         lxorig3d = xorig3d
-         lyorig3d = yorig3d
-         lxcent3d = xcent3d
-         lycent3d = ycent3d
-         lxcell3d = xcell3d
-         lycell3d = ycell3d
-      end if
+!     else
+!        lxorig3d = xorig3d
+!        lyorig3d = yorig3d
+!        lxcent3d = xcent3d
+!        lycent3d = ycent3d
+!        lxcell3d = xcell3d
+!        lycell3d = ycell3d
+!     end if
 
 C check some header data against GRIDDESC
 

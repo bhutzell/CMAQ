@@ -100,6 +100,7 @@ C**********************************************************************
       USE UTILIO_DEFN   ! replaces ioparms, iofdesc, iodecl
       USE SA_DEFN   ! Mc06
       USE RUNTIME_VARS
+      USE mio_module
       
       IMPLICIT NONE 
 
@@ -120,13 +121,14 @@ c.....local variables:
       INTEGER, SAVE :: STARTCOL, ENDCOL, STARTROW, ENDROW
 
       INTEGER       ::   LOGENV
-      INTEGER       ::   C,R,L,S,K,I
+      INTEGER       ::   C,R,L,S,K,I, floc, lsdate, lstime, ltstep
 
       INTEGER       :: IBGN, JSPCTAG, NSPCTAG
       
       CHARACTER( 16 )    :: SPCNAME1( NSPC_SA ) 
       CHARACTER( 16 )    :: NAME_TAG
       CHARACTER( 99 )    :: XMSG
+      CHARACTER( 19 )    :: timestamp
       
       LOGICAL            :: EFLAG = .FALSE.
       
@@ -154,17 +156,26 @@ C Get domain decomp info from the emissions file
          CALL M3EXIT( 'READ_ISAM_ICON', 0, 0, 'Above Fatal Error Encountered', XSTAT2 )
       ENDIF 
 
+      call mio_fopen (INNAME, mio_read_only)
+
+      floc = mio_search (INNAME)
+
+      call mio_get_global_attr (INNAME, 'SDATE', lsdate)
+      call mio_get_global_attr (INNAME, 'STIME', lstime)
+      call mio_get_global_attr (INNAME, 'TSTEP', ltstep)
+
 cyqwang...begin  Get The last step data
 
-      DO I = 1, MXREC3D-1
-        CALL NEXTIME( SDATE3D, STIME3D, TSTEP3D )
+      DO I = 1, mio_file_data(floc)%nsteps-1
+!       CALL NEXTIME( SDATE3D, STIME3D, TSTEP3D )
+        CALL NEXTIME( lsdate, lstime, ltstep)
       END DO
 
 cyqwang...end
       
-      JDATE = SDATE3D
-      JTIME = STIME3D
-      NSPCTAG = NVARS3D
+      JDATE = lSDATE
+      JTIME = lSTIME
+      NSPCTAG = mio_file_data(floc)%nvars
 
 Ckrt....assign ISAM_SPEC( nspc_sa, ntag_sa ) to spcname1( nspc_sa )
       DO S = 1, NSPC_SA
@@ -172,32 +183,39 @@ Ckrt....assign ISAM_SPEC( nspc_sa, ntag_sa ) to spcname1( nspc_sa )
       ENDDO ! s
 
 Ckrt allocate data-loading array 
-      ALLOCATE( TEMP( NCOLS, NROWS, NLAYS3D ) )
+      ALLOCATE( TEMP( NCOLS, NROWS, mio_file_data(floc)%nlays ) )
       TEMP = 0.0
       
+      call mio_time_format_conversion (JDATE, JTIME, timestamp)
+
       DO JSPCTAG = 1, NSPCTAG
         !KRT: extract sa_conc_1 from previous day
-        IF ( .NOT. XTRACT3( INNAME, VNAME3D( JSPCTAG ), 
-     &       1, NLAYS3D, STARTROW, ENDROW, STARTCOL, ENDCOL,
-     &       JDATE, JTIME, TEMP ) ) THEN
-               XMSG = 'Read failure:  file ' // INNAME // 
-     &         ' variable ' // VNAME3D( JSPCTAG ) //
-     &         ' end of file...'
-                WRITE(LOGDEV,*) PNAME, JDATE, JTIME,
-     &          TRIM( XMSG )
-             CALL M3EXIT( 'READ_ISAM_ICON', 0, 0, 'Above Fatal Error Encountered', XSTAT2 )             
-        END IF
+!       IF ( .NOT. XTRACT3( INNAME, VNAME3D( JSPCTAG ), 
+!    &       1, NLAYS3D, STARTROW, ENDROW, STARTCOL, ENDCOL,
+!    &       JDATE, JTIME, TEMP ) ) THEN
+!              XMSG = 'Read failure:  file ' // INNAME // 
+!    &         ' variable ' // VNAME3D( JSPCTAG ) //
+!    &         ' end of file...'
+!               WRITE(LOGDEV,*) PNAME, JDATE, JTIME,
+!    &          TRIM( XMSG )
+!            CALL M3EXIT( 'READ_ISAM_ICON', 0, 0, 'Above Fatal Error Encountered', XSTAT2 )             
+!       END IF
         !KRT: identify isam indices from input species names
-        IBGN = INDEX( VNAME3D( JSPCTAG ),'_', BACK = .TRUE. )
-        S = INDEX1( VNAME3D( JSPCTAG )( 1:IBGN-1 ),NSPC_SA,SPCNAME1 )
-        K = INDEX1( VNAME3D( JSPCTAG )( IBGN+1:LEN_TRIM(VNAME3D(JSPCTAG))),
+
+        call mio_fread (INNAME, mio_file_data(floc)%var_name( JSPCTAG ), pname, 
+     &                  STARTCOL, ENDCOL, STARTROW, ENDROW, 1, mio_file_data(floc)%nlays,
+     &                  TEMP, timestamp)
+
+        IBGN = INDEX( mio_file_data(floc)%var_name( JSPCTAG ),'_', BACK = .TRUE. )
+        S = INDEX1( mio_file_data(floc)%var_name( JSPCTAG )( 1:IBGN-1 ),NSPC_SA,SPCNAME1 )
+        K = INDEX1( mio_file_data(floc)%var_name( JSPCTAG )( IBGN+1:LEN_TRIM(mio_file_data(floc)%var_name(JSPCTAG))),
      &        NTAG_SA, TAGNAME )
-        NAME_TAG = VNAME3D(JSPCTAG)(IBGN+1:LEN_TRIM(VNAME3D(JSPCTAG)))
+        NAME_TAG = mio_file_data(floc)%var_name(JSPCTAG)(IBGN+1:LEN_TRIM(mio_file_data(floc)%var_name(JSPCTAG)))
         IF ( S .GT. 0 ) THEN
           IF ( K .GT. 0 ) THEN
             DO C = 1, NCOLS
               DO R = 1, NROWS
-                DO L = 1, NLAYS3D
+                DO L = 1, mio_file_data(floc)%nlays
                   ISAM( C,R,L,S,K ) = TEMP( C,R,L )
                 END DO
               END DO
@@ -216,7 +234,7 @@ Ckrt allocate data-loading array
      &        TRIM( NAME_TAG )            
               EFLAG = .TRUE.      
             ELSE
-               DO L = 1, NLAYS3D
+               DO L = 1, mio_file_data(floc)%nlays
                   DO R = 1, NROWS
                      DO C = 1, NCOLS
                         ISAM( C,R,L,S,K ) = TEMP( C,R,L )

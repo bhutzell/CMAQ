@@ -36,7 +36,7 @@
 ! character string parameter
         integer, parameter :: mio_max_global_att_extra   = 100
         integer, parameter :: mio_max_num_att            = 20
-        integer, parameter :: mio_max_num_var_att        = 10
+        integer, parameter :: mio_max_num_var_att        = 20
         integer, parameter :: mio_max_att_value_char_len = 500
         integer, parameter :: mio_max_str_len            = 256
 !       integer, parameter :: mio_max_file_full_name_len = 512

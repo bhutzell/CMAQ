@@ -58,9 +58,7 @@ C-----------------------------------------------------------------------
 
          USE UTILIO_DEFN
          USE AERO_DATA, ONLY : MGPG, GPKG
-#ifdef mpas
          USE mio_module
-#endif
 
          IMPLICIT NONE
 
@@ -70,7 +68,7 @@ C-----------------------------------------------------------------------
 
          INTEGER I, J, N, NGRPS, LEN1, LEN2, ISRM, X, loc_sdate,
      &           loc_nsrcs, loc_nvars, loc
-         integer :: loc_tflag(2), floc
+         integer :: loc_tflag(2), floc, lsdate
          character (16), allocatable :: loc_vname(:), loc_units(:)
 
          INTEGER ASTAT
@@ -131,13 +129,21 @@ C-----------------------------------------------------------------------
                SUCCESS = .FALSE.; RETURN
             END IF
 
+            call mio_fopen (STKENAME( N ), mio_read_only)
+
+            floc = mio_search (STKENAME( N ))
+
+            call mio_get_global_attr (STKENAME( N ), 'SDATE', lsdate)
+
             ! Each file will use the default jdate, unless specified by the user 
             ! that the file is a representative day file
             loc_sdate = JDATE
-            IF ( DESID_STREAM_SYM_DATE( ISRM ) ) loc_sdate = SDATE3D
+            IF ( DESID_STREAM_SYM_DATE( ISRM ) ) loc_sdate = lsdate
 
-            loc_nsrcs = NROWS3D
-            loc_nvars = NVARS3D
+            call mio_get_global_attr (STKENAME( N ), 'NROWS', loc_nsrcs)
+            loc_nvars = mio_file_data(floc)%nvars
+!           loc_nsrcs = NROWS3D
+!           loc_nvars = NVARS3D
 
             allocate (loc_vname(loc_nvars), loc_units(loc_nvars), stat=astat)
             loc_vname = vname3d(1:loc_nvars)
