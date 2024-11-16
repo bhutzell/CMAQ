@@ -427,7 +427,6 @@ C Set CGRID mechanism
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, 1 )
          END IF
 
-!        call mio_init( npcol, nprow, ncols, nrows, logdev )
          call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
 
 #ifdef sens
@@ -785,10 +784,11 @@ C Initialize Modules
           call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
           if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
 
-      CALL SUBST_BARRIER ! ensure mio_ascii file written
+          CALL SUBST_BARRIER ! ensure mio_ascii file written
 
-C Initialize MIO
-!         call mio_init( npcol, nprow, ncols, nrows, logdev )
+C Initialize MIO 
+!         call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
+          call mio_init2
       END IF
 
 ! Output Instantaneous Values at first time step

@@ -129,7 +129,7 @@ C-----------------------------------------------------------------------
                SUCCESS = .FALSE.; RETURN
             END IF
 
-            call mio_fopen (STKENAME( N ), mio_read_only)
+!           call mio_fopen (STKENAME( N ), mio_read_only)
 
             floc = mio_search (STKENAME( N ))
 

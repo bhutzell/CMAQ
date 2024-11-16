@@ -35,43 +35,44 @@
 
           call mio_get_env (full_name, fname, ' ')
 
-          if (mio_n_infiles == 0) then
+          if ( size(mio_file_data) .eq. 0 ) then
+!         if (mio_n_infiles == 0) then
+!         if (mio_nfiles .eq. 0) then
              t = -1
           else
              t = mio_search (full_name, mio_file_data(:)%full_filename, mio_nfiles)
           end if
 
-          if (t .gt. 0) then
-!            mio_file_data(floc)%link = t
-             write (mio_logdev, '(a16, a25)') fname, ' has already been opened '
-          else 
+! write (mio_logdev, '(A,A,2x,2i5)' ) '==c== mio_fopen: fname, mode, t = ', trim(fname), mode, t
 
-             if (present(num_of_outfiles)) then
-                l_num_of_outfiles = num_of_outfiles
-                called_once = .true.
-             else
-                if (.not. called_once) then
-                   l_num_of_outfiles = mio_n_outfiles
-                   called_once = .true.
-                else 
-                   l_num_of_outfiles = 0
-                end if 
-             end if
+          if (present(num_of_outfiles)) then
+            if (called_once) then
+               write(mio_logdev, *) ' Abort in mio_fopen: called twice with outfiles'
+               stop
+            else
+               l_num_of_outfiles = num_of_outfiles
+               call mio_expand_file_data (l_num_of_outfiles)
+               called_once = .true.
+            end if
+          else
+             l_num_of_outfiles = 0
+          end if
+
+          if (t .gt. 0) then
+             write (mio_logdev, '(a16, a25)') fname, ' has already been opened '
+             return
+          end if 
+
 
              if (mod(mio_n_infiles, mio_df_add_space) == 0) then
                 call mio_expand_file_data (l_num_of_outfiles)
              end if
 
              mio_n_infiles = mio_n_infiles + 1
-
              mio_nfiles = mio_nfiles + 1
-
              mio_cfile = mio_nfiles
- 
              floc = mio_cfile
-
              mio_file_data(floc)%filename = fname
-
              mio_file_data(floc)%full_filename = full_name
 
              mio_file_data(floc)%link = -1
@@ -85,7 +86,7 @@
 
              if (stat == nf90_noerr) then
                 if (mio_mype == 0) then
-                   write (mio_logdev, '(a13, a)') 'File opened: ', trim(full_name)
+                   write (mio_logdev, '(a, a9, a)') trim(fname), ' opened: ', trim(full_name)
                 end if
              else
                 write (mio_logdev, *) 'Abort in routine mio_fopen opening file ', trim(fname)
@@ -133,6 +134,7 @@
 
              if (stat .ne. 0) then
                 write (mio_logdev, *) 'Abort in routine mio_fopen due to memory allocation error'
+                write (mio_logdev, '(A,i3,2x,A)') 'floc, fname: ', floc, trim(mio_file_data(floc)%filename)
                 stop
              end if
 
@@ -349,7 +351,7 @@
 
              mio_file_data(floc)%nsteps = nsteps
 
-             ! setup domain decompostion mapping
+             ! setup domain decomposition mapping
              ! the last dimension indicates cross or dot grid
              allocate (mio_file_data(floc)%ncols_pe(mio_nprocs, 2),     &
                        mio_file_data(floc)%nrows_pe(mio_nprocs, 2),     &
@@ -456,7 +458,10 @@
 !             end if
 
              end if
-          end if
+
+!   do i = 1, mio_nfiles
+!      write (mio_logdev, '(A,i3,2x,A)' ) '==c==', i, trim(mio_file_data(i)%filename)
+!   end do
 
         end subroutine mio_fopen
 
@@ -480,7 +485,8 @@
              mio_fd_circular = mod((mio_fd_circular + 1), 2)
              if (mio_fd_circular == 0) then
                 df_size = size(mio_file_data1) - 1
-                allocate (mio_file_data0(0:df_size+mio_df_add_space), stat=stat)
+!               allocate (mio_file_data0(0:df_size+mio_df_add_space), stat=stat)
+                allocate (mio_file_data0(0:df_size+mio_df_add_space+num_of_outfiles), stat=stat)
                 do n = 1, mio_nfiles
                    call mio_copy_file_data (mio_file_data1(n), mio_file_data0(n))
                 end do
@@ -488,7 +494,8 @@
                 mio_file_data => mio_file_data0
              else
                 df_size = size(mio_file_data0) - 1
-                allocate (mio_file_data1(0:df_size+mio_df_add_space), stat=stat)
+!               allocate (mio_file_data1(0:df_size+mio_df_add_space), stat=stat)
+                allocate (mio_file_data1(0:df_size+mio_df_add_space+num_of_outfiles), stat=stat)
                 do n = 1, mio_nfiles
                    call mio_copy_file_data (mio_file_data0(n), mio_file_data1(n))
                 end do
@@ -559,14 +566,14 @@
                abs( lxcell3d - mio_domain_xcell ) .gt. tol * lxcell3d .or.   &
                abs( lycell3d - mio_domain_ycell ) .gt. tol * lycell3d ) then
 
-             write (mio_logdev, '(a68)') ' Abort in mio_subhfile due to file header inconsistent with GRIDDESC'
+             write (mio_logdev, '(a)') trim(fname) // ' file header inconsistent with GRIDDESC'
              write (mio_logdev,2003 ) mio_domain_xcent, lxcent3d, mio_domain_ycent, lycent3d, &
                                       mio_domain_xcell, lxcell3d, mio_domain_ycell, lycell3d
  2003        format(/ 5x, 'XCENT_B:', f20.12, 2x, 'XCENT3D (file):', f20.12  &
                     / 5x, 'YCENT_B:', f20.12, 2x, 'YCENT3D (file):', f20.12  &
                     / 5x, 'XCELL_B:', f20.12, 2x, 'XCELL3D (file):', f20.12  &
                     / 5x, 'YCELL_B:', f20.12, 2x, 'YCELL3D (file):', f20.12 )
-
+             write (mio_logdev, '(a23)') ' Abort in mio_subhfile '
              stop
           end if
 
@@ -589,9 +596,10 @@
           if ( abs( reloffx ) .gt. min_double ) then ! it better be a dot file
              if ( abs( reloffx ) .lt. half - min_double .or.       &
                   abs( reloffx ) .gt. half + min_double ) then
-                write (mio_logdev, '(a67)') ' Abort in mio_subhfile due to file Xorig inconsistent with GRIDDESC'
+                write (mio_logdev, '(a)') trim(fname) // ' Xorig inconsistent with GRIDDESC'
                 write (mio_logdev,* ) '    RELOFFX: ', reloffx
                 write (mio_logdev,* ) '    XORIG_GD, XORIG_F: ', xorig_c, xorig_f
+                write (mio_logdev,* ) ' Abort in mio_subhfile '
                 stop
              end if
           end if
@@ -602,9 +610,10 @@
           if ( abs( reloffy ) .gt. min_double ) then ! it better be a dot file
              if ( abs( reloffy ) .lt. half - min_double .or.       &
                   abs( reloffy ) .gt. half + min_double ) then
-                write (mio_logdev, '(a67)') ' Abort in mio_subhfile due to file Yorig inconsistent with GRIDDESC'
+                write (mio_logdev, '(a)') trim(fname) // ' Yorig inconsistent with GRIDDESC'
                 write (mio_logdev,* ) '    RELOFFY: ', reloffy
                 write (mio_logdev,* ) '    YORIG_GD, YORIG_F: ', yorig_c, yorig_f
+                write (mio_logdev,* ) ' Abort in mio_subhfile '
                 stop
              else
                 dotfile = 1
@@ -613,7 +622,8 @@
              end if
           end if
           if ( abs( reloffx - reloffy ) .gt. min_double ) then
-             write (mio_logdev, '(a79)') ' Abort in mio_subhfile due to inconsistent X- and Y-resolution (file vs. model)'
+             write (mio_logdev, '(a)') ' inconsistent X- and Y-resolution (file vs. model) for file ' // trim(fname)
+             write (mio_logdev, * ) ' Abort in mio_subhfile '
              stop
           end if
 
@@ -627,7 +637,8 @@
 
 #ifndef twoway
           if ( gxoff .lt. 0 .or. gyoff .lt. 0 ) then
-             write (mio_logdev, '(a65)') ' Abort in mio_subhfile due to model domain is outside file domain'
+             write (mio_logdev, '(a)') trim(fname) // ' does not cover model domain '
+             write (mio_logdev, * ) ' Abort in mio_subhfile '
              stop
           end if
 #endif

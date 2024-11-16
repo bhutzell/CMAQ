@@ -148,7 +148,7 @@ C open existing file for readonly access
 !        CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
 !     END IF
 
-      call mio_fopen (FNAME, mio_read_only)
+!     call mio_fopen (FNAME, mio_read_only)
 
 C check some header data against the reference file in this met set -
 C mother grid center and grid cell resolution

@@ -14,8 +14,8 @@
         n = mio_search(fname)
 
         if (n < 0) then
-           write (6, *) ' Warning: Could not find file ', trim(fname)
-           write (6, *) '          File closing operation is not performed'
+           write (mio_logdev, *) ' Warning: Could not find file ', trim(fname)
+           write (mio_logdev, *) '          File closing operation is not performed'
         else
            if (mio_file_data(n)%link .eq. -1) then
               stat = nf90_close (mio_file_data(n)%fileid)
@@ -27,6 +27,7 @@
                              mio_file_data(n)%var_name,             &
                              mio_file_data(n)%lvar_name,            &
                              mio_file_data(n)%units,                &
+                             mio_file_data(n)%var_time_dep,         &
                              mio_file_data(n)%var_type,             &
                              mio_file_data(n)%var_decomp,           &
                              mio_file_data(n)%var_grid_type,        &
@@ -47,11 +48,15 @@
                              mio_file_data(n)%glo_att_crange,       &
                              mio_file_data(n)%glo_att_irange,       &
                              mio_file_data(n)%glo_att_rrange,       &
-                             mio_file_data(n)%glo_att_drange)
+                             mio_file_data(n)%glo_att_drange,       &
+                             mio_file_data(n)%ncols_pe,             &
+                             mio_file_data(n)%nrows_pe,             &
+                             mio_file_data(n)%colde_pe,             &
+                             mio_file_data(n)%rowde_pe)
               else
-                 write (6, *) trim(nf90_strerror(stat))
-                 write (6, *) ' Warning: Not able to close file ', trim(fname)
-                 write (6, *) '          File closing operation is not performed'
+                 write (mio_logdev, *) trim(nf90_strerror(stat))
+                 write (mio_logdev, *) ' Warning: Not able to close file ', trim(fname)
+                 write (mio_logdev, *) '          File closing operation is not performed'
               end if
            end if
         end if

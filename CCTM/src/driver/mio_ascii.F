@@ -167,6 +167,7 @@ C-----------------------------------------------------------------------
 
       ! Write Output File Metadata
       DO IFILE = 1,N_MIO_OUT
+         WRITE ( IOUT, 90210 ) MIO_TXT_FILE_DATA( IFILE )%FILE_LOGICAL
          WRITE ( IOUT, '(A)' ) MIO_TXT_FILE_DATA( IFILE )%FILE_LOGICAL
          WRITE ( IOUT, '(I0)' ) MIO_TXT_FILE_DATA( IFILE )%NVARS
 
@@ -194,7 +195,7 @@ C-----------------------------------------------------------------------
      &             '"',TRIM(MIO_TXT_FILE_DATA( IFILE )%VARDESC ( IVAR )),'"'
          END DO
       END DO
-
+90210 FORMAT ('# ',60('='),1x,A)
       CLOSE( IOUT )
 
       END SUBROUTINE WRITE_MIO_ASCII

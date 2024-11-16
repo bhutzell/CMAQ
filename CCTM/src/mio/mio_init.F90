@@ -114,6 +114,31 @@
                                mio_domain_colde_pe, mio_domain_rowde_pe)
 
         mio_n_infiles  = 0
+        mio_n_outfiles = 0
+        mio_nfiles = 0
+
+      end subroutine mio_init
+
+! ----------------------------------------------------------------------
+      subroutine mio_init2 
+
+        use mio_parameter_module
+        use mio_global_data_module
+        use mio_fopen_module
+        use mio_get_env_module
+        use mio_util_func_module, only : mio_extract_string
+        use mio_search_module
+        use mio_interpolation_module
+
+        implicit none
+
+        character (40)                   :: str, str1, str2
+        character (mio_max_filename_len) :: tstr, finfo
+        character (mio_max_str_len), allocatable :: ext_str(:)
+        character (mio_max_str_len) :: tvname, temp_str
+        integer :: i, j, n, stat, num_of_infiles,  num_of_outfiles, &
+                   mode, stage
+        logical :: eof, mpi_init_called, found_first_line
 
         allocate (ext_str(2), stat=stat)
 
@@ -147,21 +172,7 @@
            end if
         end do
 
-        mio_nfiles = 0
         mio_cfile  = 0
-        ! 0 index is for creating a brand new file
-!       mio_fd_circular = mod((num_of_infiles+num_of_outfiles) / mio_df_add_space, 2)
-!       if (mio_fd_circular == 0) then
-!          allocate (mio_file_data0(0:num_of_infiles + num_of_outfiles), stat=stat)
-!          mio_file_data => mio_file_data0
-!       else
-!          allocate (mio_file_data1(0:num_of_infiles + num_of_outfiles), stat=stat)
-!          mio_file_data => mio_file_data1
-!       end if
-!       if (stat .ne. 0) then
-!          write (mio_logdev, *) ' Abort in routine mio_inint due to mio_data_file allocation error'
-!          stop
-!       end if
 
         i = 0
         do while (i < num_of_infiles)
@@ -180,10 +191,8 @@
                     mode = mio_read_write
                  end if
               end if
-              mio_cfile = mio_cfile + 1
 
-!             mio_file_data(mio_cfile)%filename = ext_str(1)
-!             mio_file_data(mio_cfile)%mode = mode
+              mio_cfile = mio_cfile + 1
 
               if (i == 1) then
                  call mio_fopen (ext_str(1), mode, num_of_outfiles)
@@ -198,9 +207,8 @@
 
 ! reset mio_cfile
         mio_cfile = -1
-        mio_nfiles = num_of_infiles
 
-! reads in all the output file setup in file_input.txt and stores the
+! reads in all the output file setup in mio_file_info and stores the
 ! information in mio_outfile_def_info data structure
         eof = .false.
         i = 0
@@ -242,7 +250,7 @@
                        allocate (mio_outfile_def_info%flist(i)%vlist(n), stat=stat)
 
                        ! retrieve and store variable name which full information
-                       ! will be obtrained from a specificed input file
+                       ! will be obtained from a specified input file
                        j = 0
                        do while (j < n)
                           read (mio_iunit, '(a64)') temp_str
@@ -281,9 +289,19 @@
 !       mio_n_infiles  = num_of_infiles
         mio_n_outfiles = num_of_outfiles
 
+write (mio_logdev, '(A,4i5)') '==c== mio_init2 mio_n_infiles, mio_n_outfiles, mio_nfiles, size ', &
+                                     mio_n_infiles, mio_n_outfiles, mio_nfiles, size(mio_file_data)-1
+
+!        do i = 1, mio_n_outfiles
+!           mio_file_data(mio_n_infiles + i)%filename = 'undefined'
+!        end do
+        do i = 1, mio_nfiles 
+           write (mio_logdev, '(A,i3,2x,A)' ) '==c==', i, trim(mio_file_data(i)%filename)
+        end do
+
         deallocate (ext_str)
 
-      end subroutine mio_init
+      end subroutine mio_init2
 
 ! ----------------------------------------------------------------------
       subroutine remove_comment (str)

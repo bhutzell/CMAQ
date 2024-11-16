@@ -63,6 +63,7 @@
              n_replacements = 0
              loc_replacement = ' '
           end if
+!write( mio_logdev, '(A,2x,2i5)' ) ' ==c== creating file, mode, n_repl: ' // trim(fname), mode, n_replacements
 
           dest = mio_search(fname)
 
@@ -122,7 +123,7 @@
 
                 if (((mio_cfile <= 0) .or. (.not. cfile_is_an_input_file)) .and. &
                     (mio_outfile_def_info%flist(fnum)%copy_from == '')) then
-                   write (mio_logdev, *) ' Abort in routine mio_fcreate due to either mio_cfile has '
+                   write (mio_logdev, *) ' Abort in mio_fcreate ', trim(fname),  ' due to either mio_cfile has '
                    write (mio_logdev, *) ' not been set and/or copied from information is not known'
                    stop
                 end if
@@ -248,7 +249,7 @@
                           stat=stat)
 
                 if (stat .ne. 0) then
-                   write (mio_logdev, '(a38)') 'Failure allocating data in mio_fcreate'
+                   write (mio_logdev, '(a)') 'Abort in mio_fcreate: allocation failure for ' // trim(fname)
                    stop
                 end if
 

@@ -205,7 +205,7 @@ C-----------------------------------------------------------------------
 
       write (logdev, '(a18, a16)') ' ==d== check ic a ', fname
 
-      call mio_fopen (FNAME, mio_read_only)
+!     call mio_fopen (FNAME, mio_read_only)
       floc = mio_search (FNAME)
  
 !     IF ( GL_NCOLS .NE. NCOLS3D ) THEN
