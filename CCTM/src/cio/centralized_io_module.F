@@ -2250,10 +2250,6 @@
           ldate = 0
           ltime = 0
 #else
-          ! Get domain decomp info from the emissions file
-          CALL SUBHFILE ( FILENAMES( IFILE ), GXOFF, GYOFF,
-     &                    STARTCOL, ENDCOL, STARTROW, ENDROW )
-        
           ! Open input file
           IF ( .NOT. OPEN3( FILENAMES( IFILE ), FSREAD3, PNAME ) ) THEN
               XMSG = 'Could not open '// FILENAMES( IFILE ) // ' file'
@@ -2261,15 +2257,19 @@
           END IF
           n_opened_file = n_opened_file + 1
 
-          call mio_fopen (FILENAMES( IFILE ), mio_read_only)
-          floc = mio_search (FILENAMES( IFILE ))
-         
           ! Retrieve File Header Information
           IF ( .NOT. DESC3( FILENAMES( IFILE ) ) ) THEN
               XMSG = 'Could not get ' // FILENAMES( IFILE ) // ' file description'
              CALL M3EXIT( PNAME, STDATE, STTIME, XMSG, XSTAT1 )
           END IF
          
+          call mio_fopen (FILENAMES( IFILE ), mio_read_only)
+          floc = mio_search (FILENAMES( IFILE ))
+         
+          ! Get domain decomp info from the emissions file
+          CALL SUBHFILE ( FILENAMES( IFILE ), GXOFF, GYOFF,
+     &                    STARTCOL, ENDCOL, STARTROW, ENDROW )
+        
 #endif
 
           ! Read data from regions file into region array 
