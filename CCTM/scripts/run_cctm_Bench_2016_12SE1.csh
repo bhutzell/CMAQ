@@ -506,11 +506,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
        setenv SA_DD_1         "$OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc -v"
        setenv SA_WD_1         "$OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc -v"
        setenv SA_CGRID_1      "$OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc -v"
-       setenv SA_ACONC_1_MIO  $OUTDIR/CCTM_SA_ACONC_${CTM_APPL}.nc
-       setenv SA_CONC_1_MIO   $OUTDIR/CCTM_SA_CONC_${CTM_APPL}.nc
-       setenv SA_DD_1_MIO     $OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc
-       setenv SA_WD_1_MIO     $OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc
-       setenv SA_CGRID_1_MIO  $OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc
+       setenv SA_ACONC_1_MIO  $OUTDIR/CCTM_SA_ACONC_MIO_${CTM_APPL}.nc
+       setenv SA_CONC_1_MIO   $OUTDIR/CCTM_SA_CONC_MIO_${CTM_APPL}.nc
+       setenv SA_DD_1_MIO     $OUTDIR/CCTM_SA_DRYDEP_MIO_${CTM_APPL}.nc
+       setenv SA_WD_1_MIO     $OUTDIR/CCTM_SA_WETDEP_MIO_${CTM_APPL}.nc
+       setenv SA_CGRID_1_MIO  $OUTDIR/CCTM_SA_CGRID_MIO_${CTM_APPL}.nc
 
        #> Set optional ISAM regions files
        #setenv ISAM_REGIONS $INPDIR/GRIDMASK_STATES_12SE1.nc
