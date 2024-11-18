@@ -672,9 +672,9 @@ C statement function for ERF approximation
                   COLUMN_DIAG = COLUMN_DIAG*DIVFAC
                   if ( firstwrite ) then
                      call mio_setfile( MET_CRO_3D )
-                     call mio_fcreate( 'CTM_LTNG1_MIO', io_mode )
+                     call mio_fcreate( 'CTM_LTNG1_MIO', mio_new_file )
                      call mio_setfile( MET_CRO_2D )
-                     call mio_fcreate( 'CTM_LTNG2_MIO', io_mode )
+                     call mio_fcreate( 'CTM_LTNG2_MIO', mio_new_file )
                      firstwrite = .false.
                   end if
 

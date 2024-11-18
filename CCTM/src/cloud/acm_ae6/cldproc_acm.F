@@ -675,7 +675,7 @@ C...write data to the normal wet deposition file
         if ( FIRSTWRITE ) then
            FIRSTWRITE = .FALSE.
            call mio_setfile( MET_CRO_2D )
-           call mio_fcreate( 'CTM_WET_DEP1_MIO', io_mode )
+           call mio_fcreate( 'CTM_WET_DEP1_MIO', mio_new_file )
         end if
 
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
@@ -697,7 +697,7 @@ c gas species
         IF ( FIRST_WRITE_SENS ) THEN
            FIRST_WRITE_SENS = .FALSE.
            call mio_setfile( MET_CRO_2D )
-           call mio_fcreate( 'CTM_SWETDEP_MIO', io_mode )
+           call mio_fcreate( 'CTM_SWETDEP_MIO', mio_new_file )
         END IF
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
 
@@ -742,7 +742,7 @@ C...write data to the diagnostic file if requested by the user
           IF ( FIRSTDIAG ) THEN
              FIRSTDIAG = .FALSE.
              call mio_setfile( MET_CRO_2D )
-             call mio_fcreate( 'CTM_WET_DEP2_MIO', io_mode )
+             call mio_fcreate( 'CTM_WET_DEP2_MIO', mio_new_file )
           END IF
        
           IF ( .NOT. WRITE3( CTM_WET_DEP_2, ALLVAR3, NDATE,
@@ -778,7 +778,7 @@ C...reinitialize deposition array
         IF ( FIRST_WRITE_ISAM ) THEN
            FIRST_WRITE_ISAM = .FALSE.
            call mio_setfile( MET_CRO_2D )
-           call mio_fcreate( 'SA_WD_1_MIO', io_mode )   
+           call mio_fcreate( 'SA_WD_1_MIO', mio_new_file )   
         END IF
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
 

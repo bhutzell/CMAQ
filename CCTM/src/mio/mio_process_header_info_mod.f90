@@ -284,8 +284,6 @@
 
                end if
 
-!        write (6, *) ' ==d== ret glo a ', n, trim(file_data%glo_att_name(n)), '=='
-
                stat = nf90_inquire_attribute (file_data%fileid,          &
                                               nf90_global,               &
                                               file_data%glo_att_name(n), &

@@ -1178,7 +1178,77 @@
 
           end function poly
 
+! ------------------------------------------------------------------------------
+          logical function rdscgrid (gname, cname, gdtyp, 
+     &                              p_alp, p_bet, p_gam,
+     &                              xcent, ycent, xorig, yorig,
+     &                              xcell, ycell, ncols, nrows, nthik)
 
+!           use runtime_vars, only : logdev
+            use get_env_module
+
+            character (*), intent(in)  :: gname
+            character (*), intent(out) :: cname
+            integer,       intent(out) :: gdtyp, ncols, nrows, nthik
+            real*8,        intent(out) :: p_alp, p_bet, p_gam,
+     &                                    xcent, ycent, xorig, yorig,
+     &                                    xcell, ycell
+
+            integer, parameter :: funit = 10007
+            character, parameter :: pname = 'dscgrid'
+
+            character (1000) :: lfname
+            character (100)  :: lgname, line
+            logical :: found, eof
+            integer :: stage, stat
+
+            call get_env (lfname, 'GRIDDESC', ' ')
+
+            if (lfname == ' ') then
+               write (6, '(a4, a7)') ' In ', trim(pname)
+               write (6, '(a33)') ' Abort: Missing GRIDDESC definition'
+! cannot use logdev due to circular dependency: logdev_mod -> UTILIO -> replacement_util_module
+!              write (logdev, '(a4, a7)') ' In ', trim(pname)
+!              write (logdev, '(a33)') ' Abort: Missing GRIDDESC definition'
+               stop
+            else
+               open (unit = funit, file = lfname, status = 'old')
+               found = .false.
+               eof   = .false.
+               stage = 0
+               lgname = "'" // trim(gname) // "'"
+               do while ((.not. eof) .and. (.not. found))
+                  read (funit, '(a100)', iostat=stat) line   
+                  if (stat .ne. 0) then
+                     eof = .true.
+                  else 
+                     if (stage == 0) then
+                        if (line(1:1) .ne. "'") then
+                           read (line, *) gdtyp, p_alp, p_bet, p_gam, xcent, ycent
+                           stage = 1
+                        end if
+                     else 
+                        if (line == lgname) then
+                           read (funit, *) cname, xorig, yorig, xcell, ycell, ncols, nrows, nthik
+                           found = .true.
+                        end if
+                     end if
+                  end if 
+               end do
+               close (funit)
+            end if
+
+            if (.not. found) then
+               write (6, '(a4, a7)') ' In ', trim(pname)
+               write (6, '(a34)') ' Abort: Missing COORD_SYS defition'
+!              write (logdev, '(a4, a7)') ' In ', trim(pname)
+!              write (logdev, '(a34)') ' Abort: Missing COORD_SYS defition'
+               stop
+            else
+               rdscgrid = .true.
+            end if
+ 
+          end function rdscgrid
 
 ! -------------------------------------------------------------------------
 

@@ -158,7 +158,7 @@ c Create a species name list of ASENS file
          call mio_setfile( MET_CRO_3D )
          if (aconc_subset_layer) mio_nlays = A_NLAYS
 
-         call mio_fcreate( 'A_SENS_MIO', io_mode )
+         call mio_fcreate( 'A_SENS_MIO', mio_new_file )
 
          if (aconc_subset_layer) then
             if (mype == 0) then

@@ -86,8 +86,8 @@
 ! data and decomposition map
           integer, allocatable               :: ncols_pe(:,:)       ! nprocs, cross or dot, CMAQ or WRF
           integer, allocatable               :: nrows_pe(:,:)       ! nprocs, cross or dot, CMAQ or WRF
-          integer, allocatable               :: colde_pe(:,:,:)     ! begin and end col, nprocs, cross or dot
-          integer, allocatable               :: rowde_pe(:,:,:)     ! begin and end row, nprocs, cross or dot
+          integer, allocatable               :: colde_pe(:,:,:)     ! begin and end col w.r.t. PE decomposition for cross or dot
+          integer, allocatable               :: rowde_pe(:,:,:)     ! begin and end row w.r.t. PE decomposition for cross or dot
 
 ! for circular buffer
           integer                            :: n_vars(6)           ! number of variables in each type

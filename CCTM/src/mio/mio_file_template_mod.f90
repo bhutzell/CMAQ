@@ -71,23 +71,6 @@
           character (2000) :: fname
           logical :: eof
 
-          interface
-            subroutine mio_setup_decomp (nprocs, npcol, nprow, ncols, nrows, &
-                                         op_type, ncols_pe, nrows_pe,        &
-                                         colde_pe, rowde_pe)
-              integer, intent(in)  :: nprocs
-              integer, intent(in)  :: npcol
-              integer, intent(in)  :: nprow
-              integer, intent(in)  :: ncols
-              integer, intent(in)  :: nrows
-              integer, intent(in)  :: op_type
-              integer, intent(out) :: ncols_pe(:,:)
-              integer, intent(out) :: nrows_pe(:,:)
-              integer, intent(out) :: colde_pe(:,:,:)
-              integer, intent(out) :: rowde_pe(:,:,:)
-            end subroutine mio_setup_decomp
-          end interface
-
           read (n_in_char, *) n
 
           half_n = n / 2
@@ -167,16 +150,10 @@
           mio_file_data(0)%dim_value = loc_dim_value
 
           if ((gl_ncols > 0) .and. (gl_nrows > 0)) then
-             call mio_setup_decomp (mio_nprocs,                      &
-                                    mio_npcol,                       &
-                                    mio_nprow,                       &
-                                    gl_ncols,                        &
-                                    gl_nrows,                        &
-                                    mio_epa_format,                  &
-                                    mio_file_data(0)%ncols_pe,       &
-                                    mio_file_data(0)%nrows_pe,       &
-                                    mio_file_data(0)%colde_pe,       &
-                                    mio_file_data(0)%rowde_pe)
+             mio_file_data(0)%ncols_pe = mio_domain_ncols_pe
+             mio_file_data(0)%nrows_pe = mio_domain_nrows_pe
+             mio_file_data(0)%colde_pe = mio_domain_colde_pe
+             mio_file_data(0)%rowde_pe = mio_domain_rowde_pe
           else
              mio_file_data(0)%ncols_pe = 0
              mio_file_data(0)%nrows_pe = 0

@@ -263,7 +263,6 @@
              deallocate (mio_output_3d_data)
           else
 
-!     write (6, *) ' ==d== write 2d a ', mio_file_data(floc)%file_format
              if (floc < 0) then
                 write (mio_logdev, *) ' Error: in routine ', trim(pname)
                 write (mio_logdev, *) '        cannot find file ', trim(fname)
@@ -286,14 +285,12 @@
                 else
                    if (present(timestamp)) then
                       t = mio_search (timestamp, mio_file_data(floc)%timestamp, mio_file_data(floc)%nsteps)
-!     write (6, *) ' ==d== write 2d b ', t
                       ! when t < 0 means current time step data has not been written out
                       if ((t < 0) .or. (mio_file_data(floc)%file_format .eq. mio_ioapi3_format)) then
                          if (t < 0) then
                             t = mio_file_data(floc)%nsteps + 1
                             mio_file_data(floc)%nsteps = t
                          end if
-!     write (6, *) ' ==d== write 2d c ', t, floc, t
                          call mio_write_timestamp (floc, timestamp, v, t, pname)
                       end if
                    else
@@ -408,6 +405,7 @@
                 end if
              end if
           end if
+
           if (lerror) then
              write (mio_logdev, *) ' Calling from: ', trim(caller)
              write (mio_logdev, *) ' Abort in routine ', trim(pname), ' due to an error in writing ',  &
@@ -455,9 +453,12 @@
                 write (mio_logdev, *) '        cannot find variable ', trim(vname)
                 lerror = .true.
              else
-!  write (6, *) ' ==d== fwrite 3d a ', data(1:5,1,1), trim(timestamp)
                 if (present(timestamp)) then
-                   t = mio_search (timestamp, mio_file_data(floc)%timestamp, mio_file_data(floc)%nsteps)
+                   if (.not. allocated(mio_file_data(floc)%timestamp)) then
+                      t = -1
+                   else
+                      t = mio_search (timestamp, mio_file_data(floc)%timestamp, mio_file_data(floc)%nsteps)
+                   end if
                    ! when t < 0 means current time step data has not been written out
                    if ((t < 0) .or. (mio_file_data(floc)%file_format .eq. mio_ioapi3_format)) then
                       if (t < 0) then
@@ -485,19 +486,6 @@
                       ! do nothing, have not encountered any MPAS 3D variables
                    else
                       third_dim = size(data,3)
-! write (6, '(a19, a16, 2x, a19)') ' ==d== fwrite 3d a ', trim(vname), trim(timestamp)
-! write (6, '(a19, 5i5)') ' ==d== fwrite 3d c ', mio_parallelism, mio_serial, third_dim
-! write (6, '(a19, 8i5)') ' ==d== fwrite 3d h ', mycount
-! write (6, '(a19, 8i5)') ' ==d== fwrite 3d m ', mystart
-! write (6, '(a19, i3, a16, i8, a16, i8)') ' ==d== fwrite 3d n ', v, trim(fname), &
-!   mio_file_data(floc)%fileid, trim(vname), mio_file_data(floc)%var_id(v)
-
-!if (size(data,3) == 1) then
-! write (6, '(a19, 8e15.8)') ' ==d== fwrite 3d p ', minval(data(:,:,1)), maxval(data(:,:,1))
-!else
-! write (6, '(a19, 8e15.8)') ' ==d== fwrite 3d p ', minval(data(:,:,1)), maxval(data(:,:,1)), &
-!minval(data(:,:,3)), maxval(data(:,:,3)), minval(data(:,:,5)), maxval(data(:,:,5))
-!end if
 
                       if (mio_parallelism .eq. mio_serial) then
                          if (.not. mio_put_data (mio_file_data(floc)%fileid,    &
@@ -519,7 +507,6 @@
                                                stat=stat)
                          end if
 
-! write (6, '(a19, 8e15.8)') ' ==d== fwrite 3d q '
                          call mio_gather_data (data,                               &
                                                mio_file_data(floc)%grid_type,      &
                                                mio_file_data(floc)%colde_pe,       &
@@ -527,14 +514,11 @@
                                                mio_file_data(floc)%ncols_pe,       &
                                                mio_file_data(floc)%nrows_pe,       &
                                                recv_buf                        )
-! write (6, '(a19, 8e15.8)') ' ==d== fwrite 3d r '
 
                          if (mio_mype .eq. 0) then
-! write (6, '(a19, 8e15.8)') ' ==d== fwrite 3d s '
                             if (.not. mio_put_data (mio_file_data(floc)%fileid,    &
                                                     mio_file_data(floc)%var_id(v), &
                                                     mystart, mycount, recv_buf) ) then
-! write (6, '(a19, 8e15.8)') ' ==d== fwrite 3d t '
                                lerror = .true.
                             else
                                if (nf90_sync (mio_file_data(floc)%fileid) .ne. nf90_noerr) then

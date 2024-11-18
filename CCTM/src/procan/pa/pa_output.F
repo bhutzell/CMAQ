@@ -263,7 +263,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   FIRSTIPR = .FALSE.
                   call mio_setfile( MET_CRO_3D )
                   IF ( PALEVS .NE. NLAYS ) mio_nlays = PALEVS
-                  call mio_fcreate( 'CTM_IPR_1_MIO', io_mode )
+                  call mio_fcreate( 'CTM_IPR_1_MIO', mio_new_file )
                   IF ( MYPE .EQ. 0 .AND. PALEVS .NE. NLAYS ) THEN
                      CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IPR_1_MIO', 'NLAYS', PALEVS )
                      CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IPR_1_MIO', 'VGLVLS', MET_CRO_3D, 1, PALEVS+1 )
@@ -324,7 +324,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                   FIRSTIRR = .FALSE.
                   call mio_setfile( MET_CRO_3D )
                   IF ( PALEVS .NE. NLAYS ) mio_nlays = PALEVS
-                  call mio_fcreate( 'CTM_IRR_1_MIO', io_mode )
+                  call mio_fcreate( 'CTM_IRR_1_MIO', mio_new_file )
                   IF ( MYPE .EQ. 0 .AND. PALEVS .NE. NLAYS ) THEN
                      CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IRR_1_MIO', 'NLAYS', PALEVS )
                      CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IRR_1_MIO', 'VGLVLS', MET_CRO_3D, 1, PALEVS+1 )

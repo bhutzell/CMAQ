@@ -35,6 +35,7 @@ C returns local starting and ending column and row indices for file FNAME
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE UTILIO_DEFN
+      USE MIO_MODULE
 
       IMPLICIT NONE
  
@@ -73,13 +74,15 @@ C local variables:
       CHARACTER( 16 ) :: BNAME
       CHARACTER( 96 ) :: XMSG = ' '
 
-      INTEGER       :: LOC_STRTCOL, LOC_ENDCOL, LOC_STRTROW, LOC_ENDROW
+      INTEGER       :: LOC_STRTCOL, LOC_ENDCOL, LOC_STRTROW, LOC_ENDROW, FLOC
 
-      REAL( 8 ), SAVE :: XORIG_B, YORIG_B
-      REAL( 8 ), SAVE :: XCENT_B, YCENT_B
+!     REAL( 8 ), SAVE :: XORIG_B, YORIG_B
+!     REAL( 8 ), SAVE :: XCENT_B, YCENT_B
       REAL( 8 ), SAVE :: XCELL_B, YCELL_B
       REAL( 8 ), SAVE :: XORIG_C, YORIG_C  ! from GRIDDESC, in cell coord
       REAL( 8 ), SAVE :: XORIG_F, YORIG_F  ! from file, in cell coord
+
+      real( 8 ) :: lxorig3d, lyorig3d, lxcent3d, lycent3d, lxcell3d, lycell3d
 
       INTEGER DOTFILE
       REAL( 8 ) :: RELOFFX, RELOFFY
@@ -106,7 +109,7 @@ C open cross file for subsequent comparison
 
 C set base header data
 
-         XORIG_B = XORIG3D
+!        XORIG_B = XORIG3D
 !        YORIG_B = YORIG3D
 !        XCENT_B = XCENT3D
 !        YCENT_B = YCENT3D
@@ -134,16 +137,18 @@ C Convert to grid cell coord and truncate
 
 C open existing file for readonly access
 
-      IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
-         XMSG = 'Could not open '// FNAME
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
+!     IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
+!        XMSG = 'Could not open '// FNAME
+!        CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!     END IF
 
-      IF ( .NOT. DESC3( FNAME ) ) THEN
-         XMSG = 'Could not get ' // TRIM( FNAME )
-     &        // ' file description'
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
-      END IF
+!     IF ( .NOT. DESC3( FNAME ) ) THEN
+!        XMSG = 'Could not get ' // TRIM( FNAME )
+!    &        // ' file description'
+!        CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+!     END IF
+
+!     call mio_fopen (FNAME, mio_read_only)
 
 C check some header data against the reference file in this met set -
 C mother grid center and grid cell resolution
@@ -167,16 +172,33 @@ C mother grid center and grid cell resolution
 !#endif
 !     END IF
 
+      floc = mio_search (fname)
+!     if (floc > 0) then
+         call mio_get_global_attr (fname, 'XORIG', lxorig3d)
+         call mio_get_global_attr (fname, 'YORIG', lyorig3d)
+         call mio_get_global_attr (fname, 'XCENT', lxcent3d)
+         call mio_get_global_attr (fname, 'YCENT', lycent3d)
+         call mio_get_global_attr (fname, 'XCELL', lxcell3d)
+         call mio_get_global_attr (fname, 'YCELL', lycell3d)
+!     else
+!        lxorig3d = xorig3d
+!        lyorig3d = yorig3d
+!        lxcent3d = xcent3d
+!        lycent3d = ycent3d
+!        lxcell3d = xcell3d
+!        lycell3d = ycell3d
+!     end if
+
 C check some header data against GRIDDESC
 
-      IF ( ABS( XCENT3D - XCENT_GD ) .GT.
-     &     TOL * ABS( XCENT3D + XCENT_GD + TOL ) .OR.
-     &     ABS( YCENT3D - YCENT_GD ) .GT.
-     &     TOL * ABS( YCENT3D + YCENT_GD + TOL ) .OR.
-     &     ABS( XCELL3D - XCELL_GD ) .GT. TOL * XCELL3D .OR.
-     &     ABS( YCELL3D - YCELL_GD ) .GT. TOL * YCELL3D ) THEN
-         WRITE( LOGDEV,2003 ) XCENT_GD, XCENT3D, YCENT_GD, YCENT3D,
-     &                        XCELL_GD, XCELL3D, YCELL_GD, YCELL3D
+      IF ( ABS( lXCENT3D - XCENT_GD ) .GT.
+     &     TOL * ABS( lXCENT3D + XCENT_GD + TOL ) .OR.
+     &     ABS( lYCENT3D - YCENT_GD ) .GT.
+     &     TOL * ABS( lYCENT3D + YCENT_GD + TOL ) .OR.
+     &     ABS( lXCELL3D - XCELL_GD ) .GT. TOL * lXCELL3D .OR.
+     &     ABS( lYCELL3D - YCELL_GD ) .GT. TOL * lYCELL3D ) THEN
+         WRITE( LOGDEV,2003 ) XCENT_GD, lXCENT3D, YCENT_GD, lYCENT3D,
+     &                        XCELL_GD, lXCELL3D, YCELL_GD, lYCELL3D
  2003     FORMAT(/ 5X, 'XCENT_B:', F20.12, 2X, 'XCENT3D (file):', F20.12 
      &          / 5X, 'YCENT_B:', F20.12, 2X, 'YCENT3D (file):', F20.12
      &          / 5X, 'XCELL_B:', F20.12, 2X, 'XCELL3D (file):', F20.12 
@@ -188,9 +210,9 @@ C check some header data against GRIDDESC
 
 C Convert to grid cell coord and truncate
 
-      XORIG_F = XORIG3D / XCELL3D
+      XORIG_F = lXORIG3D / lXCELL3D
       XORIG_F = REAL( IDNINT( ONEK * XORIG_F ), 8 ) / ONEK
-      YORIG_F = YORIG3D / YCELL3D
+      YORIG_F = lYORIG3D / lYCELL3D
       YORIG_F = REAL( IDNINT( ONEK * YORIG_F ), 8 ) / ONEK
  
 C Check if file (cross or dot) is "lined up"

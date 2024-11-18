@@ -338,7 +338,8 @@ C Speciate emissions
          IF ( LASTTIC ) THEN
             if ( firstwrite ) then 
                call mio_setfile( MET_CRO_2D )
-               call mio_fcreate( 'B3GTS_MIO', io_mode )
+
+               call mio_fcreate( 'B3GTS_MIO', mio_new_file )
                firstwrite = .false.
             end if
 

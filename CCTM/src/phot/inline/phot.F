@@ -709,13 +709,13 @@ C...modules
             CREATE_MIO_OUTS = .FALSE.
 ! Create PHOTDIAG1_MIO file
             CALL MIO_SETFILE( MET_CRO_2D )
-            CALL MIO_FCREATE( FNAME='CTM_RJ_1_MIO', MODE=IO_MODE )
+            CALL MIO_FCREATE( FNAME='CTM_RJ_1_MIO', MODE=mio_new_file )
 ! Create PHOTDIAG2_MIO file
             IF (  NLAYS_DIAG .NE. 1 ) THEN
                 CALL MIO_SETFILE( MET_CRO_3D )
                 MIO_NLAYS = NLAYS_DIAG
             END IF
-            CALL MIO_FCREATE( FNAME='CTM_RJ_2_MIO', MODE=IO_MODE )
+            CALL MIO_FCREATE( FNAME='CTM_RJ_2_MIO', MODE=mio_new_file )
             IF ( MYPE .EQ. 0 .AND. NLAYS_DIAG .NE. 1 ) THEN
               CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_2_MIO', 'NLAYS', NLAYS_DIAG )
               CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_2_MIO', 'VGLVLS', MET_CRO_3D, 1, NLAYS_DIAG )
@@ -725,7 +725,7 @@ C...modules
                 CALL MIO_SETFILE( MET_CRO_3D )
                 MIO_NLAYS = NLAYS_DIAG
             END IF
-            CALL MIO_FCREATE( FNAME='CTM_RJ_3_MIO', MODE=IO_MODE )
+            CALL MIO_FCREATE( FNAME='CTM_RJ_3_MIO', MODE=mio_new_file )
             IF ( MYPE .EQ. 0 .AND. NLAYS_DIAG .NE. 1 ) THEN
               CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_3_MIO', 'NLAYS', NLAYS_DIAG )
               CALL MIO_SET_GLOBAL_ATTR ( 'CTM_RJ_3_MIO', 'VGLVLS', MET_CRO_3D, 1, NLAYS_DIAG )

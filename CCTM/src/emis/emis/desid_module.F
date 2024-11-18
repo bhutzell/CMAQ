@@ -1502,7 +1502,7 @@ C-----------------------------------------------------------------------
                    subset_layer = ( mio_nlays .ne. LAYS )
                    if ( subset_layer ) mio_nlays = LAYS
 
-                   call mio_fcreate( DESID_DIAG_LOGICAL_MIO(IDIAG), io_mode )
+                   call mio_fcreate( DESID_DIAG_LOGICAL_MIO(IDIAG), mio_new_file )
 
                    if (subset_layer) then
                       if (mype == 0) then
@@ -1575,7 +1575,7 @@ C-----------------------------------------------------------------------
                      subset_layer = ( mio_nlays .ne. LAYS )
                      if ( subset_layer ) mio_nlays = LAYS
 
-                     call mio_fcreate( DESID_DIAG_LOGICAL_MIO(IDIAG), io_mode )
+                     call mio_fcreate( DESID_DIAG_LOGICAL_MIO(IDIAG), mio_new_file )
 
                      if (subset_layer) then
                         if (mype == 0) then
@@ -3761,7 +3761,7 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
         END IF   ! DESID_STREAM_LDIAG?
       END DO     ! IDIAG
 #else
-         call mio_fcreate ('EMIS_DIAG',512 )
+         call mio_fcreate ('EMIS_DIAG', mio_new_file )
 #endif
   
   

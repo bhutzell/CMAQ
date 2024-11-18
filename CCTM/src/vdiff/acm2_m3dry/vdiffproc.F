@@ -477,6 +477,7 @@ C Convert non-molar mixing ratio species and re-order CGRID
 #endif
 
 C read & interpolate met data
+
       CALL GET_MET ( MDATE, MTIME, MSTEP )
 
 C read & interpolate deposition velocities
@@ -719,7 +720,7 @@ C If last call this hour:  write accumulated depositions:
 
             if ( write_firstime_mio ) then
                call mio_setfile( MET_CRO_2D )
-               call mio_fcreate( 'CTM_DRY_DEP_MIO', io_mode )
+               call mio_fcreate( 'CTM_DRY_DEP_MIO', mio_new_file )
                write_firstime_mio = .false.
             end if
             call mio_fwrite( 'CTM_DRY_DEP_MIO', DDEP_SPC( V ),
@@ -762,10 +763,10 @@ C Write vdiff diagnostics
 
             if ( first_write_diag ) then
                call mio_setfile( MET_CRO_2D )
-               call mio_fcreate( 'CTM_VDIFF_MIO', io_mode )
+               call mio_fcreate( 'CTM_VDIFF_MIO', mio_new_file )
                if ( GRAV_SETL ) then
                   call mio_setfile( MET_CRO_3D )
-                  call mio_fcreate( 'CTM_VSED_MIO', io_mode )
+                  call mio_fcreate( 'CTM_VSED_MIO', mio_new_file )
                end if
                first_write_diag = .false.
             end if
@@ -891,7 +892,7 @@ C Write other diagnostics
          IF ( FIRST_WRITE_ISAM ) THEN
             FIRST_WRITE_ISAM = .FALSE.
             call mio_setfile( MET_CRO_2D )
-            call mio_fcreate( 'SA_DD_1_MIO', io_mode )
+            call mio_fcreate( 'SA_DD_1_MIO', mio_new_file )
          END IF
          DO ITAG = 1, N_SPCTAG
             DO R = 1, NROWS
@@ -922,7 +923,7 @@ C WT - write out dry deposition sensitivities
          IF ( FIRST_WRITE_SENS ) THEN
             FIRST_WRITE_SENS = .FALSE.
             call mio_setfile( MET_CRO_2D )
-            call mio_fcreate( 'CTM_SDRYDEP_MIO', io_mode )
+            call mio_fcreate( 'CTM_SDRYDEP_MIO', mio_new_file )
          END IF
 
          DO V = 1, N_SPC_DDEP

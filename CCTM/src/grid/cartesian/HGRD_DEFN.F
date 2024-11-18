@@ -110,6 +110,7 @@ C Integral average conc
          FUNCTION HGRD_INIT ( NPROCS, MYID ) RESULT ( SUCCESS )
 
          USE UTILIO_DEFN
+         use replacement_util_module
 
 !        INCLUDE SUBST_VGRD_ID     ! vertical dimensioning parameters
 
@@ -143,7 +144,8 @@ C With GRID_NAME (only input) retrieve all horizontal grid parameters from
 C the grid description file pointed to by the GRIDDESC env var:
             WRITE( LOGDEV, * )
             CALL LOG_HEADING( LOGDEV, "Retrieve Horizontal Grid" )
-            IF ( .NOT. DSCGRID ( GRID_NAME,
+!           IF ( .NOT. DSCGRID ( GRID_NAME,
+            IF ( .NOT. rDSCGRID ( GRID_NAME,
      &                           COORD_SYS_NAME, GDTYP_GD, 
      &                           P_ALP_GD, P_BET_GD, P_GAM_GD,
      &                           XCENT_GD, YCENT_GD,
@@ -240,6 +242,9 @@ C Get corresponding dot file map
             NROWS = NROWS_PE( MYPE+1 )
             NBNDY = 2*NTHIK * ( NCOLS + NROWS + 2*NTHIK )
             GL_NBNDY = 2*NTHIK * ( GL_NCOLS + GL_NROWS + 2*NTHIK )
+
+          write (logdev, '(a12, 20i5)') ' ==d== hg a ', colsx_pe(:,mype+1), rowsx_pe(:,mype+1)
+          write (logdev, '(a12, 20i5)') ' ==d== hg b ', colsd_pe(:,mype+1), rowsd_pe(:,mype+1)
 
             MY_NCOLS_DOT = COLSD_PE( 2,MYPE+1 ) - COLSD_PE( 1,MYPE+1 ) + 1
             MY_NROWS_DOT = ROWSD_PE( 2,MYPE+1 ) - ROWSD_PE( 1,MYPE+1 ) + 1

@@ -99,7 +99,7 @@ C represents data computed from time 1995196:090000 to 1995196:100000
          call mio_setfile( MET_CRO_3D )
          if (aconc_subset_layer) mio_nlays = A_NLAYS
 
-         call mio_fcreate( 'A_CONC_MIO', io_mode )
+         call mio_fcreate( 'A_CONC_MIO', mio_new_file )
 
          if (aconc_subset_layer) then
             if (mype == 0) then

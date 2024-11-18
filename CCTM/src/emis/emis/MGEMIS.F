@@ -275,7 +275,7 @@ C Local variables:
 C-----------------------------------------------------------------------
 
 #ifdef mpas
-         call mio_fcreate (CTM_MGEM_1, io_mode)
+         call mio_fcreate (CTM_MGEM_1, mio_new_file)
 
 #else
 
@@ -695,7 +695,7 @@ C Then reset the MG emissions array and local write counter.
                    if ( firstwrite ) then
                       firstwrite = .false.
                       call mio_setfile( MET_CRO_2D )
-                      call mio_fcreate( 'CTM_MGEM_MIO', io_mode )
+                      call mio_fcreate( 'CTM_MGEM_MIO', mio_new_file )
                    end if
 
                    call mio_fwrite( 'CTM_MGEM_MIO', WRMG_SPC( V ),
