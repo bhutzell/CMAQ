@@ -1206,13 +1206,13 @@
 
             if (lfname == ' ') then
                write (6, '(a4, a7)') ' In ', trim(pname)
-               write (6, '(a33)') ' Abort: Missing GRIDDESC defition'
+               write (6, '(a33)') ' Abort: Missing GRIDDESC definition'
 ! cannot use logdev due to circular dependency: logdev_mod -> UTILIO -> replacement_util_module
 !              write (logdev, '(a4, a7)') ' In ', trim(pname)
-!              write (logdev, '(a33)') ' Abort: Missing GRIDDESC defition'
+!              write (logdev, '(a33)') ' Abort: Missing GRIDDESC definition'
                stop
             else
-               open (unit = funit, name = lfname, status = 'old')
+               open (unit = funit, file = lfname, status = 'old')
                found = .false.
                eof   = .false.
                stage = 0

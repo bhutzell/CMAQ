@@ -369,7 +369,7 @@ write (mio_logdev, '(A,4i5)') '==c== mio_init2 mio_n_infiles, mio_n_outfiles, mi
               write (mio_logdev, '(a37)') ' Abort: GRIDDESC file does not exist.'
               stop
            else
-              open (unit = funit, name = lfname, status = 'old')
+              open (unit = funit, file = lfname, status = 'old')
               found = .false.
               eof   = .false.
               stage = 0

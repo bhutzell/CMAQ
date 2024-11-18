@@ -5269,8 +5269,11 @@ C   mminlu and num_land_cat are WRF global variables
              stk_gp_stime(n) = stime3d
              stk_gp_nlays(n) = nlays3d
 
-             call mio_get_global_attr (STKGNAME( N ), 'SDATE', stk_gp_sdate(n))
-             call mio_get_global_attr (STKGNAME( N ), 'STIME', stk_gp_stime(n))
+! stack group files are supposed to be time-independent. 
+! They should have no UNLIMITED dimension and a TSTEP of 0, but sometimes they
+! have a single (bogus) time step.
+!             call mio_get_global_attr (STKGNAME( N ), 'SDATE', stk_gp_sdate(n))
+!             call mio_get_global_attr (STKGNAME( N ), 'STIME', stk_gp_stime(n))
              stk_gp_nlays(n) = mio_file_data(floc(n))%nlays
 
              NSRC( N ) = NROWS3D
@@ -5298,7 +5301,7 @@ C   mminlu and num_land_cat are WRF global variables
 ! read in stack group data
 
           do N = 1, NPTGRPS
-             call mio_time_format_conversion (stk_gp_sdate(n), stk_gp_stime(n), timestamp)
+!            call mio_time_format_conversion (stk_gp_sdate(n), stk_gp_stime(n), timestamp)
 
              IF ( .NOT. READ3( STKGNAME( N ), 'XLOCA', ALLAYS3,
      &                         stk_gp_sdate(n), stk_gp_stime(n), XLOCA(:,N) ) ) THEN
@@ -5306,7 +5309,8 @@ C   mminlu and num_land_cat are WRF global variables
                 call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
              END IF
 
-             call mio_fread (STKGNAME( N ), 'XLOCA', pname, tdata_3dr(1:1, 1:NSRC(N), 1:1), timestamp)
+!            call mio_fread (STKGNAME( N ), 'XLOCA', pname, tdata_3dr(1:1, 1:NSRC(N), 1:1), timestamp)
+             call mio_fread (STKGNAME( N ), 'XLOCA', pname, tdata_3dr(1:1, 1:NSRC(N), 1:1) )
 
              xloca(1:NSRC(N), N) = tdata_3dr(1, 1:NSRC(N), 1)
 
@@ -5316,7 +5320,8 @@ C   mminlu and num_land_cat are WRF global variables
                 call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
              END IF
 
-             call mio_fread (STKGNAME( N ), 'YLOCA', pname, tdata_3dr(1:1, 1:NSRC(N), 1:1), timestamp)
+!            call mio_fread (STKGNAME( N ), 'YLOCA', pname, tdata_3dr(1:1, 1:NSRC(N), 1:1), timestamp)
+             call mio_fread (STKGNAME( N ), 'YLOCA', pname, tdata_3dr(1:1, 1:NSRC(N), 1:1) )
 
              yloca(1:NSRC(N), N) = tdata_3dr(1, 1:NSRC(N), 1)
 
@@ -5326,7 +5331,8 @@ C   mminlu and num_land_cat are WRF global variables
                 call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
              END IF
 
-             call mio_fread (STKGNAME( N ), 'ISTACK', pname, tdata_3di(1:1, 1:NSRC(N), 1:1), timestamp)
+!            call mio_fread (STKGNAME( N ), 'ISTACK', pname, tdata_3di(1:1, 1:NSRC(N), 1:1), timestamp)
+             call mio_fread (STKGNAME( N ), 'ISTACK', pname, tdata_3di(1:1, 1:NSRC(N), 1:1) )
 
              stkid(1:NSRC(N), N) = tdata_3di(1, 1:NSRC(N), 1)
 
@@ -5341,7 +5347,7 @@ C   mminlu and num_land_cat are WRF global variables
 
              IF ( MY_NSRC( N ) .GT. 0 ) THEN
 
-                call mio_time_format_conversion (stk_gp_sdate(n), stk_gp_stime(n), timestamp)
+!                call mio_time_format_conversion (stk_gp_sdate(n), stk_gp_stime(n), timestamp)
 
                 IF ( .NOT. XTRACT3( STKGNAME( N ), 'STKDM', 1, stk_gp_nlays(n),
      &                              MY_STRT_SRC( N ), MY_END_SRC( N ),
@@ -5353,7 +5359,8 @@ C   mminlu and num_land_cat are WRF global variables
                 asize = MY_END_SRC( N ) - MY_STRT_SRC( N ) + 1
 
              call mio_fread (STKGNAME( N ), 'STKDM', pname, 1, 1, MY_STRT_SRC( N ), MY_END_SRC( N ),
-     &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
+!    &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
+     &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1) )
 
              STKDIAM( N )%ARRY = tdata_3dr(1, 1:asize, 1)
 
@@ -5365,7 +5372,8 @@ C   mminlu and num_land_cat are WRF global variables
                 END IF
 
              call mio_fread (STKGNAME( N ), 'STKHT', pname, 1, 1, MY_STRT_SRC( N ), MY_END_SRC( N ),
-     &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
+!    &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
+     &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1) )
 
              STKHT( N )%ARRY = tdata_3dr(1, 1:asize, 1)
 
@@ -5377,7 +5385,8 @@ C   mminlu and num_land_cat are WRF global variables
                 END IF
 
              call mio_fread (STKGNAME( N ), 'STKTK', pname, 1, 1, MY_STRT_SRC( N ), MY_END_SRC( N ),
-     &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
+!    &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
+     &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1) )
 
              STKTK( N )%ARRY = tdata_3dr(1, 1:asize, 1)
 
@@ -5389,7 +5398,8 @@ C   mminlu and num_land_cat are WRF global variables
                 END IF
 
              call mio_fread (STKGNAME( N ), 'STKVE', pname, 1, 1, MY_STRT_SRC( N ), MY_END_SRC( N ),
-     &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
+!    &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
+     &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1) )
 
              STKVEL( N )%ARRY = tdata_3dr(1, 1:asize, 1)
 
@@ -5402,7 +5412,8 @@ C   mminlu and num_land_cat are WRF global variables
                    END IF
 
                    call mio_fread (STKGNAME( N ), 'ACRESBURNED', pname, 1, 1, MY_STRT_SRC( N ), MY_END_SRC( N ),
-     &                             1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
+!    &                             1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
+     &                             1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1) )
 
                    ACRES_BURNED( N )%ARRY = tdata_3dr(1, 1:asize, 1)
 
