@@ -1380,11 +1380,12 @@
                 XMSG = 'Could not get description of file  '// NLDN_STRIKES 
                 CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
              END IF
-             call subhfile ( NLDN_STRIKES, gxoff, gyoff,
-     &                       STRTCOLLNT, ENDCOLLNT, STRTROWLNT, ENDROWLNT)
 
              call mio_fopen (NLDN_STRIKES, mio_read_only)
              floc = mio_search (NLDN_STRIKES)
+
+             call subhfile ( NLDN_STRIKES, gxoff, gyoff,
+     &                       STRTCOLLNT, ENDCOLLNT, STRTROWLNT, ENDROWLNT)
 
 !            file_sdate(f_ltng) = sdate3d
 !            file_stime(f_ltng) = stime3d
