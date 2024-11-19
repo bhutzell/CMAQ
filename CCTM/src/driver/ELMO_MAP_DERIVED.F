@@ -117,8 +117,8 @@
       END DO
 
       ! Define Formulas for DERIVED Variables
-      DO J = 1,N_ELMO_TABLE
-         IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD
+      !DO J = 1,N_ELMO_TABLE
+      !   IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD
 
 
 

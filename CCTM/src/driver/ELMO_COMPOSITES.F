@@ -843,7 +843,7 @@
                   O_VARS = O_VARS + 1
                   JVAR = JVAR + 1
                   IF ( CSPEC .EQ. 'ASEACAT' .OR. CSPEC .EQ. 'ASOIL'
-     &             .OR.CSPEC .EQ. 'ACORS' ) THEN
+     &             .OR.CSPEC .EQ. 'ACORS'   .OR. CSPEC .EQ. 'ADE_CORS' ) THEN
                      COMPS_OUT( JVAR ) = COMPS( IVAR )
                   ELSE
                      COMPS_OUT( JVAR ) = TRIM( COMPS( IVAR ) ) // MODESUFF( IM )
