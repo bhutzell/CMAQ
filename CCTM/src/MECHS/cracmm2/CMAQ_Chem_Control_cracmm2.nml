@@ -1130,6 +1130,10 @@ CMPST =
                 'ppmV', 'TSP',
                 'NO + NO2 + NO3 + 2*N2O5 + HONO + HNO3 + ANO3 + HNO4 + PAN + PPN + MPAN + ISON + INALD + IPX + TRPN + ONIT + HONIT',
 
+'NOZ'         , 'NOz Concentration',
+                'ppmV', 'TSP',
+                'NOY - NOX',
+
 'PMF_TNO3'    , 'Fine-Mode Nitrate plus Nitric Acid',
                 'ug m-3', 'FINE',
                 'ANO3 + HNO3',
