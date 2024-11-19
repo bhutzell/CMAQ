@@ -83,6 +83,7 @@ C**********************************************************************
       USE PA_DEFN, Only: LIRR   ! Process Anaylsis control and data variable
       USE PA_IRR_CLT
       USE CENTRALIZED_IO_MODULE, ONLY : INTERPOLATE_VAR, OCEAN, SZONE
+      USE CONST
 #ifdef sens
       USE DDM3D_CHEM
       Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, NP, NPMAX, CKTIME
@@ -93,7 +94,6 @@ C**********************************************************************
 C..Includes:
 
       INCLUDE SUBST_FILES_ID    ! CMAQ files
-      INCLUDE SUBST_CONST       ! CMAQ constants
  
 C..Arguments:
 

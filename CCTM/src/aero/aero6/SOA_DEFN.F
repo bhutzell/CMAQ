@@ -71,6 +71,8 @@ C   29 Aug 18 G. Sarwar: updated for CB6R3M
 C 17 Jan 20 B.Hutzell -Added algorithm to handle tracer species and
 C                     -added benzo[a]pyrene to oa_list. Its cstar is based
 C                      on the subcooled vapor pressure in Lei et. al (2002)
+C   15 Sep 23 G. Sarwar: updated for CRACMM2
+C 28 Nov 23 N. Skipper: added new species for CRACMM2
 C-----------------------------------------------------------------------
 #ifdef sens
       USE DDM3D_DEFN, ONLY : NP, NPMAX
@@ -82,7 +84,7 @@ C-----------------------------------------------------------------------
       Logical, Parameter, Private :: T = .true.
       Logical, Parameter, Private :: F = .false.
 
-      Integer, Parameter :: n_oa_list = 81   ! # of potential partitioning SVOCs
+      Integer, Parameter :: n_oa_list = 85   ! # of potential partitioning SVOCs
       Integer, Save      :: n_oa             ! Total # of simulated SOA vapors
       Integer, Save      :: n_oa_NotTracers  ! # of simulated SOA vapors that are not tracers
       Integer, Save      :: n_oa_tracers      ! # of simulated SOA vapors that are tracers
@@ -190,7 +192,11 @@ C-----------------------------------------------------------------------
      & oa_type('AROCP1OXY3','VROCP1OXY3','        ',0.0000,   1.e+1,  81.0E3, .300,1.54, F,  T,  F,  F ),
      & oa_type('AROCP2OXY2','VROCP2OXY2','        ',0.0000,   1.e+2,  77.0E3, .200,1.42, F,  T,  F,  F ),
      & oa_type('AROCP3OXY2','VROCP3OXY2','        ',0.0000,   1.e+3,  73.0E3, .200,1.42, F,  T,  F,  F ),
-     & oa_type('ABENAPY', 'BENAPY  ', '        ',  0.0000,   0.0396, 105.0E3, .000,1.00, F,  T,  F,  F ) /)
+     & oa_type('ABENAPY', 'BENAPY  ', '        ',  0.0000,   0.0396, 105.0E3, .000,1.00, F,  T,  F,  F ),
+     & oa_type('AISO4  ','         ','         ',     0.0,   1.e-10,   1.0E0,  1.2,2.80, F,  F,  T,  T ),
+     & oa_type('AISO5  ','         ','         ',     0.0,   1.e-10,   1.0E0,  1.0,2.50, F,  F,  T,  T ),
+     & oa_type('ATRPN  ','TRPN     ','         ',     0.0,   1410.0,  89.1E3, .400,1.79, F,  F,  T,  F ),
+     & oa_type('AHONIT ','HONIT    ','         ',     0.0,   0.0413, 121.0E3, .700,2.21, F,  F,  T,  F ) /)
       ! Table Comments:
       ! *Reaction Counters are only needed if the vapor species is not formed
       !  directly in the gas-phase chemistry mechanism.
@@ -239,7 +245,6 @@ C-----------------------------------------------------------------------
       ! Variables for controlling behavior of OA module
       Logical, Private, Save :: mapped              = .False.
       Logical, Private, Save :: RXNS_eflag          = .False. ! error flag for RXNS modules used
-      Logical, Private, Save :: OA_eflag            = .False. ! error flag for soa_defn
       Character( 16 ), Private, Save :: pname = 'SOA_DEFN        '
 
       Contains
@@ -270,12 +275,13 @@ C-----------------------------------------------------------------------
 
       Use rxns_data, only: mechname
       Use aero_data, only: AE_eflag, findAero, aerospc_mw, n_aerospc, aerospc
-      Use aeromet_data, only: airdens, inv_mwair, min_gasconc
+      Use aeromet_data, only: airdens, min_gasconc
+      Use const, only: inv_mwair
       Use cgrid_spcs, only: n_gc_spc, gc_spc, n_gc_g2ae, gc_g2ae, gc_strt, gc_molwt, gc_g2ae_map, 
      &                      n_nr_spc, nr_spc, n_nr_n2ae, nr_n2ae, nr_strt, nr_molwt, nr_n2ae_map,
      &                      n_ae_spc, ae_spc
-      Use runtime_vars, only: logdev
-      Use utilio_defn, only: index1, xstat3
+      Use runtime_vars, only: logdev, log_subheading
+      Use utilio_defn, only: index1, xstat3, m3exit
 
       Implicit None
 
@@ -298,6 +304,8 @@ C-----------------------------------------------------------------------
       ! Map All OA Species and Load Properties
       If ( .Not. mapped ) Then
           mapped = .TRUE.
+          
+          call log_subheading( logdev, 'Map Organic Aerosol and Vapor Species')
 
           ! First, the number and names of present and nontracer OA species must be
           ! determined by checking the AEROSOL Table with the species names
@@ -327,7 +335,6 @@ C-----------------------------------------------------------------------
           End Do
           
           If ( n_oa .Eq. n_oa_tracers ) Then
-              OA_eflag  = .True.
               xmsg =  'FATAL: All SOA species are tracers at least '
      &            //  'one SOA species must not be a tracer.'
               write(logdev,'(a)')Trim( xmsg )           
@@ -384,10 +391,11 @@ C-----------------------------------------------------------------------
               map_ROGtoCGRID( spc ) = gc_strt - 1 + g
               ROG_mw( spc ) = gc_molwt( g )
             else
-              ! Log an Error
-              OA_eflag  = .True.
-              write(logdev,99903)Trim( oaspc( spc )%ctr_name ),
-     &        Trim( oaspc( spc )%gas_name )
+              ! Log an Error and Halt the model
+              write(logdev,99903) Trim( oaspc( spc )%ctr_name ),
+     &                            Trim( oaspc( spc )%gas_name )
+              call m3exit( pname, 0, 0, 'Please add this critical ' //
+     &                      'species to your mechanism', xstat3 )
             End If
          End Do
 
@@ -412,15 +420,18 @@ C-----------------------------------------------------------------------
            End If
 
            If( n .lt. 1 .and. g .lt. 1 ) Then
-               OA_eflag  = .True.
-               write(logdev,99902)Trim( oaspc( spc )%gas_name ), 
-     &         Trim ( oaspc( spc )%name )
+               write(logdev,99902) Trim( oaspc( spc )%gas_name ), 
+     &                             Trim ( oaspc( spc )%name )
+               call m3exit( pname, 0, 0, 'Please add these critical ' //
+     &                      'species to your mechanism', xstat3 )
            End If
          End Do
 
          ! Find indices of required species based on mechname
          If( index( mechname,'CRACMM1_AQ' ) .eq. 0 
-     &          .and. index( mechname,'CRACMM1AMORE_AQ') .eq. 0 ) Then
+     &          .and. index( mechname,'CRACMM2') .eq. 0
+     &          .and. index( mechname,'CRACMM3') .eq. 0
+     &          .and. index( mechname,'CRACMM1AMORE_AQ') .eq. 0 ) then
              iso1_idx   = findVapor( req_sviso1, .True. )
              iso2_idx   = findVapor( req_sviso2, .True. )
              aiso1_idx  = findAero( req_aeiso1, .True. )
@@ -518,7 +529,8 @@ C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
 C-----------------------------------------------------------------------
 
       Use aero_data, only : cond_budget, npf_budget
-      Use aeromet_data, only: airdens, inv_mwair, min_gasconc
+      Use aeromet_data, only: airdens, min_gasconc
+      Use const, only: inv_mwair
       Use utilio_defn, only: xstat3, m3exit
 
       Implicit None
@@ -599,21 +611,21 @@ C-----------------------------------------------------------------------
       Do spc = 1, n_oa
          If ( oaspc( spc )%gas_name .Eq. vname ) Then
             ndx = spc
+            xmsg = 'Optional Species '
+     &             // Trim( vname ) // 
+     &             ' is found in the G2AE or N2AE values of GC or NR namelists.'
+         write(logdev,'(5x,a)') xmsg
             Return
          End If
       End Do
 
-      If ( .Not. required ) Then
-         xmsg = 'Optional Species '
-     &       // Trim( vname ) // 
-     &       ' is not found in the G2AE or N2AE values of GC or NR namelists.'
-         write(logdev,'(5x,a)') xmsg
-         Return
-      End If
+      If ( .Not. required ) Return
 
+      ! This warning should not be encountered since the OA table
+      ! already includes these gas-phase counterparts or precursors 
+      ! that are mapped to CGRID.
       xmsg = 'FATAL:' // Trim( vname )
      &  // ' is not found in the G2AE or N2AE values of GC or NR namelists.'
-      OA_eflag  = .True.
       Call m3warn( pname, 0, 0, xmsg )
  
 
@@ -908,6 +920,7 @@ C Key Subroutines/Functions called:  newt, soabisection
 
       Use aero_data
       Use aeromet_data
+      Use const
       Use utilio_defn
 
       Implicit None
@@ -2471,11 +2484,10 @@ C   aw  = RH * exp( ---------------)
 C                     R*T*dens*D
 C
 C The diameter is the wet, volume equivalent, diameter of the particle.
+      USE CONST, ONLY : rgasuniv
 
       Implicit None
                                        
-      Include SUBST_CONST    ! common constants
-
 C     Function arguments
       Real rh      ! RH between 0.005, 0.99 [fraction]
       Real temp    ! temperature [K]

@@ -30,7 +30,7 @@ C  KEY SUBROUTINES CALLED:
 C     GETPAR, ORGAER5, GETCOAGS, INTERCOAG_GH, INTRACOAG_GH,
 C     VOLINORG
 
-C  KEY FUNCTIONS CALLED:  ERF, ERFC, GETAF
+C  KEY FUNCTIONS CALLED:  GETAF
 
 C  REVISION HISTORY:
 C     Coded in December 1999 by Dr. Francis S. Binkowski
@@ -207,6 +207,7 @@ C-----------------------------------------------------------------------
       USE PRECURSOR_DATA      ! gas phase aero precursor data
       USE SOA_DEFN
       USE AEROMET_DATA
+      USE CONST
       USE UTILIO_DEFN
       USE AERO_BUDGET
 
@@ -242,12 +243,12 @@ C *** local variables
       REAL( 8 ) :: CGR( N_MODE-1 ) ! Aitken & Accum. modes
 
       REAL( 8 ) :: LAMDA      ! mean free path [ m ]
-      REAL( 8 ) :: KNC        ! KNC = TWO3 * BOLTZMANN *  AIRTEMP / AMU
+      REAL( 8 ) :: KNC        ! KNC = TWO3 * DKBOLTZ *  AIRTEMP / AMU
 
 C *** Free Molecular regime (depends upon modal density)
-      REAL( 8 ) :: KFMAT      ! = SQRT( 3.0*BOLTZMANN * AIRTEMP / PDENSAT )
-      REAL( 8 ) :: KFMAC      ! = SQRT( 3.0*BOLTZMANN * AIRTEMP / PDENSAC )
-      REAL( 8 ) :: KFMATAC    ! = SQRT( 6.0*BOLTZMANN * AIRTEMP / ( PDENSAT + PDENSAC ) )
+      REAL( 8 ) :: KFMAT      ! = SQRT( 3.0*DKBOLTZ * AIRTEMP / PDENSAT )
+      REAL( 8 ) :: KFMAC      ! = SQRT( 3.0*DKBOLTZ * AIRTEMP / PDENSAC )
+      REAL( 8 ) :: KFMATAC    ! = SQRT( 6.0*DKBOLTZ * AIRTEMP / ( PDENSAT + PDENSAC ) )
 
 C *** Intermodal coagulation rates [ m**3/s ] ( 0th & 2nd moments )
       REAL( 8 ) :: BATAC( 2 ) ! Aitken to accumulation
@@ -276,13 +277,12 @@ C *** variables for advancing concentrations one time step
       REAL( 8 ) :: LOSS, PROD, POL
       REAL         TMASS
       REAL         FACTRANS ! special factor to compute mass transfer
-      REAL         M30(3), M20(3), M00(3)      ! for initial condidtions in time stepping
+      REAL         M30(3), M20(3), M00(3)      ! for initial conditions in time stepping
 
 C *** Variables for mode merging
       REAL         GETAF
       REAL         AAA, XNUM, XM2, XM3,XXM2, XXM3
       REAL         FNUM, FM2, FM3, PHNUM, PHM2, PHM3
-      REAL         ERF, ERFC    ! Error and complementary error function
 
 C *** local variables
       INTEGER      SPC        ! loop counter
@@ -359,12 +359,12 @@ C *** Update size parameters (distribution is wet from ORGAER)
       LAMDA    = XLM
 
 ! *** calculate term used in Equation A6 of Binkowski & Shankar (1995)
-      KNC      = TWOTHIRDS * BOLTZMANN *  AIRTEMP / AMU
+      KNC      = TWOTHIRDS * DKBOLTZ *  AIRTEMP / AMU
 
 ! *** calculate terms used in Equation A5 of Binkowski & Shankar (1995)
-      KFMAT    = SQRT( 3.0 * BOLTZMANN * AIRTEMP / AEROMODE_DENS( 1 ) )
-      KFMAC    = SQRT( 3.0 * BOLTZMANN * AIRTEMP / AEROMODE_DENS( 2 ) )
-      KFMATAC  = SQRT( 6.0 * BOLTZMANN * AIRTEMP
+      KFMAT    = SQRT( 3.0 * DKBOLTZ * AIRTEMP / AEROMODE_DENS( 1 ) )
+      KFMAC    = SQRT( 3.0 * DKBOLTZ * AIRTEMP / AEROMODE_DENS( 2 ) )
+      KFMATAC  = SQRT( 6.0 * DKBOLTZ * AIRTEMP
      &         / ( AEROMODE_DENS( 1 ) + AEROMODE_DENS( 2 ) ) )
 
 ! *** transfer of number to accumulation mode from Aitken mode is zero
@@ -764,6 +764,7 @@ C    aerosols. ATMOSPHERIC CHEMISTRY AND PHYSICS. 7, 4639-4659
       USE PRECURSOR_DATA
       USE SOA_DEFN
       USE AEROMET_DATA
+      USE CONST
       USE UTILIO_DEFN
 
 #ifdef sens
@@ -1744,11 +1745,8 @@ C   1. Binkowski, F.S. and U. Shankar, The regional particulate matter
 C      model 1. Model description and preliminary results, J. Geophys.
 C      Res., Vol 100, No D12, 26101-26209, 1995.
 
+      USE CONST
       IMPLICIT NONE
-
-C *** Includes:
-
-      INCLUDE SUBST_CONST     ! physical and mathematical constants
 
 C *** Arguments:
 
@@ -1800,7 +1798,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE NEWPART3 ( RH, T, XH2SO4, SO4RATE, DNDT, DMDT_so4, DM2DT )
 
       USE AERO_DATA
-      USE AEROMET_DATA   ! Includes CONST.EXT
+      USE CONST
       USE PRECURSOR_DATA, ONLY: PRECURSOR_MW, SULF_IDX
       USE UTILIO_DEFN
       
@@ -2019,7 +2017,7 @@ C-----------------------------------------------------------------------
 
       USE AERO_DATA
       USE PRECURSOR_DATA
-      USE AEROMET_DATA
+!     USE AEROMET_DATA
 
       IMPLICIT NONE
 
@@ -2786,8 +2784,6 @@ C             (If X = 1 (i.e. spherical), then D_st = D_ve = D_va * rho0/rho )
  
 C  Key Subroutines called: none
  
-C  Key Functions called:  ERF
- 
 C  Revision History:
 C    Coded Jul 2005 by Prakash Bhave
 C          Apr 2008 J.Kelly: corrected equation for Dst25 calculation
@@ -2805,9 +2801,8 @@ C   Technology, 20:253-265, 1994.
  
 C-----------------------------------------------------------------------
 
+      USE CONST
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST    ! for PI
 
 C    Input variables
       REAL, INTENT( IN ) :: DGN     ! geometric mean Stokes diameter by number [ m ]
@@ -2829,11 +2824,6 @@ C    Internal variables
       REAL DG                        ! DGN converted to [ um ]
       REAL ERF1, ERF2, ERFARG        ! argument of ERF, from Step#6 of Jiang et al. (2006)
 
-C *** Error function approximation, from Meng & Seinfeld (1994)
-      REAL ERF        ! Error function
-      REAL XX         ! dummy argument for ERF
-      ERF( XX )  = SIGN( 1.0, XX ) * SQRT( 1.0 - EXP( -4.0 * XX * XX / PI ) )
-
 C ----------------------- Begin solution -------------------------------
 
 C *** Calculate Transmission Fractions for Inlets with Aerodynamic
@@ -2850,7 +2840,7 @@ C     Cutoffs
           ! of this paper has a typo (i.e., eq. 2 is correct).
           D_ST1  = 0.5 * ( SQRT( B ** 2 + 4.0 * D_AD1 *
      &                        ( D_AD1 + B ) * 1.0E+03 / RHOP ) - B )
-          ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+          ! Calculate mass fraction with Dca < SizeCut
           ERFARG = ( LOG( D_ST1 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) - 3.0 * XXLSG / SQRT2
           ERF1 = ERF( ERFARG )
       END IF
@@ -2861,7 +2851,7 @@ C     Cutoffs
       D_ST2  = 0.5 * ( SQRT( B ** 2 + 4.0 * D_AD2 *
      &                     ( D_AD2 + B ) * 1.0E+03 / RHOP ) - B )
 
-      ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+      ! Calculate mass fraction with Dca < SizeCut
       ERFARG = ( LOG( D_ST2 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) - 3.0 * XXLSG / SQRT2
       ERF2 = ERF( ERFARG )
 
@@ -2912,8 +2902,6 @@ C       Vacuum Aerodynamic -> Volume Equivalent (DeCarlo et al., 2004)
 C         D_ve = D_va * ro0/ro * X
 C             (If X = 1 (i.e. spherical), then D_st = D_ve = D_va * ro0/ro )
  
-C  Key Functions called:  ERF
- 
 C  Revision History:
 C    Coded Feb 2016 B.Murphy: Created
 
@@ -2926,12 +2914,11 @@ C   Angeles Basin during CalNex, Journ. Geophys. Res., 2013.
 
 C-----------------------------------------------------------------------
 
-      USE AERO_DATA, ONLY : MIN_SIGMA_G, MAX_SIGMA_G
-      USE AEROMET_DATA, ONLY : F6PI, PI6
+      USE AERO_DATA, ONLY    : MIN_SIGMA_G, MAX_SIGMA_G
+      USE CONST
+!     USE AEROMET_DATA, ONLY : F6PI, PI6
 
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST    ! for PI
 
 C    Input variables
       REAL, INTENT( IN ) :: M3_WET  ! Third Moment of Wet Distribution (m3/m3)
@@ -2957,11 +2944,6 @@ C    Internal variables
       REAL XFSUM, LXFM2, L2SG, ES36
       REAL DBlo_st, DBhi_st, LOG_HILO, LOG_LOHI, LOG_HI, LOG_LO
       REAL SQRT2LSG, TERM1, TERM2, TERM3, TERM4, TERM5
-
-C *** Error function approximation, from Meng & Seinfeld (1994)
-      REAL ERF        ! Error function
-      REAL XX         ! dummy argument for ERF
-      ERF( XX )  = SIGN( 1.0, XX ) * SQRT( 1.0 - EXP( -4.0 * XX * XX / PI ) )
 
 C ----------------------- Begin solution -------------------------------
 
@@ -3064,7 +3046,7 @@ C  Called by: Gas-Phase Chemistry Driver
       USE AERO_DATA, ONLY: EXTRACT_AERO, CALCMOMENTS, N_MODE, MOMENT2_CONC,
      &                     MOMENT3_CONC, AEROMODE_DIAM, AEROMODE_LNSG,
      &                     CHEM_M2DRY_INIT, CHEM_M3DRY_INIT, FIXED_SG
-      USE AEROMET_DATA, ONLY: pi
+      USE CONST, ONLY: pi
       USE GRID_CONF, ONLY: NLAYS, NCOLS, NROWS
       USE PRECURSOR_DATA, ONLY: EXTRACT_PRECURSOR
 
@@ -3148,7 +3130,7 @@ C  Key Subroutines Called: none
 C
 C  Called by: Gas-Phase Chemistry Driver
       USE AERO_DATA
-      USE AEROMET_DATA, ONLY: pi
+      USE CONST, ONLY: pi
       USE GRID_CONF, ONLY: NLAYS, NROWS, NCOLS
 
       IMPLICIT NONE
@@ -3381,8 +3363,6 @@ C             (If X = 1 (i.e. spherical), then D_st = D_ve = D_va * rho0/rho )
  
 C  Key Subroutines called: none
  
-C  Key Functions called:  ERF
- 
 C  Revision History:
 C    Coded Jul 2005 by Prakash Bhave
 C          Apr 2008 J.Kelly: corrected equation for Dst25 calculation
@@ -3392,9 +3372,8 @@ C          Feb 2020 B.Murphy: Created this number synthesizer
 C 
 C-----------------------------------------------------------------------
 
+      USE CONST
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST    ! for PI
 
 C    Input variables
       REAL, INTENT( IN ) :: DGN     ! geometric mean Stokes diameter by NUMBER [ m ]
@@ -3414,11 +3393,6 @@ C    Internal variables
       REAL ERFARG
       REAL DG         ! Internal units for median diameter
 
-C *** Error function approximation, from Meng & Seinfeld (1994)
-      REAL ERF        ! Error function
-      REAL XX         ! dummy argument for ERF
-      ERF( XX )  = SIGN( 1.0, XX ) * SQRT( 1.0 - EXP( -4.0 * XX * XX / PI ) )
-
 C ----------------------- Begin solution -------------------------------
 
 C *** Calculate Transmission Fractions for Inlets with Aerodynamic
@@ -3430,12 +3404,12 @@ C     Cutoffs
       IF ( D_ST1 .EQ. 0.0 ) THEN
           ERF1 = -1.0
       ELSE
-          ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+          ! Calculate mass fraction with Dca < SizeCut
           ERFARG = ( LOG( D_ST1 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) 
           ERF1 = ERF( ERFARG )
       END IF
 
-      ! Calculate mass fraction with Dca < SizeCut, using ERF approximation
+      ! Calculate mass fraction with Dca < SizeCut
       ERFARG = ( LOG( D_ST2 ) - LOG( DG ) ) / ( SQRT2 * XXLSG ) 
       ERF2 = ERF( ERFARG )
 
