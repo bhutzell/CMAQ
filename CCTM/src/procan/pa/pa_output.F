@@ -191,14 +191,6 @@ C Reset decomposition map
                   CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
                END IF
 
-               IF ( MYPE .EQ. 0 ) THEN
-                  IF ( .NOT. OPEN3( IPRFNAM( NFL ), FSRDWR3, PNAME ) ) THEN
-                     XMSG = 'Could not open Integrated Process Rate Output File: '
-     &                    // IPRFNAM( NFL )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
-               END IF
-
             END DO
 
          END IF
@@ -224,14 +216,6 @@ C Reset decomposition map
                   CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
                END IF
 
-               IF ( MYPE .EQ. 0 ) THEN
-                  IF ( .NOT. OPEN3( IRRFNAM( NFL ), FSRDWR3, PNAME ) ) THEN
-                     XMSG = 'Could not open Integrated Reaction Rate Output File: '
-     &                    // IRRFNAM( NFL )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
-               END IF
-
             END DO
 
          END IF
@@ -253,24 +237,18 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             DO NOUT = 1, NVARINDX
                VARINDX = ( NFL - 1 ) * MXVARS3 + NOUT
 
-               IF ( .NOT. WRITE3( IPRFNAM( NFL ), IPRNAME( VARINDX ),
-     &                 JDATE, JTIME, DELC( :,:,:,VARINDX ) ) ) THEN 
-                  XMSG = 'Could not write ' // IPRFNAM( NFL )
-                  CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-
                IF ( FIRSTIPR ) THEN
                   FIRSTIPR = .FALSE.
                   call mio_setfile( MET_CRO_3D )
                   IF ( PALEVS .NE. NLAYS ) mio_nlays = PALEVS
-                  call mio_fcreate( 'CTM_IPR_1_MIO', mio_new_file )
+                  call mio_fcreate( CTM_IPR_1, mio_new_file )
                   IF ( MYPE .EQ. 0 .AND. PALEVS .NE. NLAYS ) THEN
-                     CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IPR_1_MIO', 'NLAYS', PALEVS )
-                     CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IPR_1_MIO', 'VGLVLS', MET_CRO_3D, 1, PALEVS+1 )
+                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IPR_1, 'NLAYS', PALEVS )
+                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IPR_1, 'VGLVLS', MET_CRO_3D, 1, PALEVS+1 )
                   END IF
                END IF
    
-               call mio_fwrite( 'CTM_IPR_1_MIO', IPRNAME( VARINDX ),
+               call mio_fwrite( CTM_IPR_1, IPRNAME( VARINDX ),
      &                          PNAME, DELC( :,:,:,VARINDX ), TIME_STAMP )
             END DO
 
@@ -314,24 +292,19 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #else
                DBUFF = IRROUT( 1:MY_PACOLS,1:MY_PAROWS,1:PALEVS,VARINDX )
 #endif
-               IF ( .NOT. WRITE3( IRRFNAM( NFL ), IRRNAME( VARINDX ),
-     &              JDATE, JTIME, DBUFF ) ) THEN 
-                  XMSG = 'Could not write ' // IRRFNAM( NFL )
-                  CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
 
                IF ( FIRSTIRR ) THEN
                   FIRSTIRR = .FALSE.
                   call mio_setfile( MET_CRO_3D )
                   IF ( PALEVS .NE. NLAYS ) mio_nlays = PALEVS
-                  call mio_fcreate( 'CTM_IRR_1_MIO', mio_new_file )
+                  call mio_fcreate( CTM_IRR_1, mio_new_file )
                   IF ( MYPE .EQ. 0 .AND. PALEVS .NE. NLAYS ) THEN
-                     CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IRR_1_MIO', 'NLAYS', PALEVS )
-                     CALL MIO_SET_GLOBAL_ATTR ( 'CTM_IRR_1_MIO', 'VGLVLS', MET_CRO_3D, 1, PALEVS+1 )
+                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IRR_1, 'NLAYS', PALEVS )
+                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IRR_1, 'VGLVLS', MET_CRO_3D, 1, PALEVS+1 )
                   END IF
                END IF
 
-               call mio_fwrite( 'CTM_IRR_1_MIO', IRRNAME( VARINDX ),
+               call mio_fwrite( CTM_IRR_1, IRRNAME( VARINDX ),
      &                          PNAME, DBUFF, TIME_STAMP )
             END DO
 

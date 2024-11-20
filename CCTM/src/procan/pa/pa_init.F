@@ -163,30 +163,9 @@ C..open each one
 
             IF ( MYPE .EQ. 0 ) THEN
 
-C..try to open existing file for update
-               IF ( .NOT. OPEN3( OUTFNAME, FSRDWR3, PNAME ) ) THEN
-
-                  XMSG = 'Could not open ' // TRIM( OUTFNAME )
-     &                 // ' file for update - try to open new'
-                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-
                   CALL PA_MKHDR( 'IPR', NFL, OUTFNAME, SDATE, STIME, TSTEP )
 
-                  IF ( OPEN3( OUTFNAME, FSNEW3, PNAME ) ) THEN   ! open new
-                     XMSG = 'Opened Integrated Reaction Rate Output File: '
-     &                    // OUTFNAME
-                     CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-                  ELSE
-                     XMSG = 'Could not open Integrated Process Rate Output File: ' 
-     &                   // OUTFNAME
-                     CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
-                  END IF
-
-               END IF
-
             END IF
-
-            CALL SUBST_BARRIER
 
          END DO   ! NUMFLS
 
@@ -230,30 +209,9 @@ C..open each one
 
             IF ( MYPE .EQ. 0 ) THEN
 
-C..try to open existing file for update
-               IF ( .NOT. OPEN3( OUTFNAME, FSRDWR3, PNAME ) ) THEN
-
-                  XMSG = 'Could not open ' // TRIM( OUTFNAME )
-     &                 // ' file for update - try to open new'
-                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-
                   CALL PA_MKHDR( 'IRR', NFL, OUTFNAME, SDATE, STIME, TSTEP )
 
-                  IF ( OPEN3( OUTFNAME, FSNEW3, PNAME ) ) THEN   ! open new
-                     XMSG = 'Opened Integrated Reaction Rate Output File: '
-     &                    // OUTFNAME
-                     CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-                  ELSE
-                     XMSG = 'Could not open Integrated Reaction Rate Output'
-     &                    // ' File ' // OUTFNAME
-                     CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
-                  END IF
-
-               END IF
-
             END IF
-
-            CALL SUBST_BARRIER
 
          END DO   ! NFL
 

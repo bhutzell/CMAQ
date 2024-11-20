@@ -83,30 +83,6 @@ C Local variables:
 C-----------------------------------------------------------------------
 
 #ifndef mpas
-      IF ( FIRSTIME ) THEN
-
-         FIRSTIME = .FALSE.
-
-C open conc file for update
-
-         IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-            IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
-               XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-         END IF
-
-         IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
-            XMSG = 'Could not get file description from ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         
-         ! Retrieve number and values of variable names
-         NVARS = NVARS3D
-         ALLOCATE ( VNAME( NVARS ), STAT=ALLOCSTAT )
-         VNAME = VNAME3D( 1:NVARS )
-
-      END IF   ! firstime
 
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
 
@@ -115,100 +91,52 @@ C open conc file for update
       ! Write Gas-Phase Species to CONC File
       DO SPC = 1, N_C_GC_SPC
          VAR = VAR + 1
-         IF ( .NOT. WRITE3( CTM_CONC_1, C_GC_SPC( SPC ),
-     &      JDATE, JTIME, SGRID( :,:,:,VAR ) ) ) THEN
-            XMSG = 'Could not write '
-     &           // TRIM( C_GC_SPC( SPC ) )
-     &           // ' to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'CTM_CONC_MIO', C_GC_SPC( SPC ), pname, 
+         call mio_fwrite( CTM_CONC_1, C_GC_SPC( SPC ), pname, 
      &                    SGRID(:,:,:,VAR), TIME_STAMP )
       END DO
  
       ! Write Aerosol Species Concentrations to CONC File
       DO SPC = 1, N_C_AE_SPC
          VAR = VAR + 1
-         IF ( .NOT. WRITE3( CTM_CONC_1, C_AE_SPC( SPC ),
-     &      JDATE, JTIME, SGRID( :,:,:,VAR ) ) ) THEN
-            XMSG = 'Could not write '
-     &           // TRIM( C_AE_SPC( SPC ) )
-     &           // ' to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'CTM_CONC_MIO', C_AE_SPC( SPC ), pname, 
+         call mio_fwrite( CTM_CONC_1, C_AE_SPC( SPC ), pname, 
      &                    SGRID(:,:,:,VAR), TIME_STAMP )
       END DO
 
       ! Write Nonreactive Species Concentrations to CONC File
       DO SPC = 1, N_C_NR_SPC
          VAR = VAR + 1
-         IF ( .NOT. WRITE3( CTM_CONC_1, C_NR_SPC( SPC ),
-     &      JDATE, JTIME, SGRID( :,:,:,VAR ) ) ) THEN
-            XMSG = 'Could not write '
-     &           // TRIM( C_NR_SPC( SPC ) )
-     &           // ' to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'CTM_CONC_MIO', C_NR_SPC( SPC ), pname, 
+         call mio_fwrite( CTM_CONC_1, C_NR_SPC( SPC ), pname, 
      &                    SGRID(:,:,:,VAR), TIME_STAMP )
       END DO
 
       ! Write Tracer Species Concentrations to CONC File
       DO SPC = 1, N_C_TR_SPC
          VAR = VAR + 1
-         IF ( .NOT. WRITE3( CTM_CONC_1, C_TR_SPC( SPC ),
-     &      JDATE, JTIME, SGRID( :,:,:,VAR ) ) ) THEN
-            XMSG = 'Could not write '
-     &           // TRIM( C_TR_SPC( SPC ) )
-     &           // ' to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'CTM_CONC_MIO', C_TR_SPC( SPC ), pname, 
+         call mio_fwrite( CTM_CONC_1, C_TR_SPC( SPC ), pname, 
      &                    SGRID(:,:,:,VAR), TIME_STAMP )
       END DO
 
       ! Write Vertical Velocity to Output CONC file
       IF ( W_VEL ) THEN
-         IF ( .NOT. WRITE3( CTM_CONC_1, 'W_VEL',
-     &      JDATE, JTIME, WVEL( :,:,CONC_BLEV:CONC_ELEV ) ) ) THEN
-            XMSG = 'Could not write W_VEL to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'CTM_CONC_MIO', 'W_VEL', pname, 
+         call mio_fwrite( CTM_CONC_1, 'W_VEL', pname, 
      &                    WVEL(:,:,CONC_BLEV:CONC_ELEV ), TIME_STAMP )
       END IF   ! W_VEL
 
       ! Write Relative Humidity to Output CONC file
       IF ( L_CONC_RH ) THEN
-         IF ( .NOT. WRITE3( CTM_CONC_1, 'RH',
-     &        JDATE, JTIME, MET_DATA%RH( :,:,CONC_BLEV:CONC_ELEV ) ) ) THEN
-            XMSG = 'Could not write RH to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'CTM_CONC_MIO', 'RH', pname, 
+         call mio_fwrite( CTM_CONC_1, 'RH', pname, 
      &                    MET_DATA%RH(:,:,CONC_BLEV:CONC_ELEV ), TIME_STAMP )
       END IF
 
       ! Write Temperature to Output CONC file
       IF ( L_CONC_TA ) THEN
-         IF ( .NOT. WRITE3( CTM_CONC_1, 'TA',
-     &        JDATE, JTIME, MET_DATA%TA( :,:,CONC_BLEV:CONC_ELEV ) ) ) THEN
-            XMSG = 'Could not write Temperature to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'CTM_CONC_MIO', 'TA', pname, 
+         call mio_fwrite( CTM_CONC_1, 'TA', pname, 
      &                    MET_DATA%TA(:,:,CONC_BLEV:CONC_ELEV ), TIME_STAMP )
       END IF
 
       ! Write Pressure to Output CONC file
       IF ( L_CONC_PRES ) THEN
-         IF ( .NOT. WRITE3( CTM_CONC_1, 'PRES',
-     &        JDATE, JTIME, MET_DATA%PRES( :,:,CONC_BLEV:CONC_ELEV ) ) ) THEN
-            XMSG = 'Could not write Pressure to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'CTM_CONC_MIO', 'PRES', pname, 
+         call mio_fwrite( CTM_CONC_1, 'PRES', pname, 
      &                    MET_DATA%PRES(:,:,CONC_BLEV:CONC_ELEV ), TIME_STAMP )
       END IF
 

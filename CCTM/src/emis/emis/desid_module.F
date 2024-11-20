@@ -1485,7 +1485,7 @@ C-----------------------------------------------------------------------
      &             VDEMIS_OUT(:,:,1) = SUM( VDEMIS_OUT( :,:,1:NL ),3 )
 
               IF ( DESID_DIAG_N_STREAM( IDIAG ) .EQ. 1 ) THEN
-                ! Only this stream contributes. Write emisison
+                ! Only this stream contributes. Write emission
                 ! rates out directly
 #ifndef mpas
                 IF ( .NOT. WRITE3( DESID_DIAG_LOGICAL(IDIAG), DESID_DIAG_SPEC(IDIAG)%SPEC(ISPEC),

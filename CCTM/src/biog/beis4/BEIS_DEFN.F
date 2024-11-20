@@ -641,24 +641,13 @@ C Build description for, and open beis diagnostic file
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
 
-!           CALL LOAD_MIO_FILE ( 'B3GTS_S', 0, 0, 0,
-            CALL LOAD_MIO_FILE ( 'B3GTS_MIO', 0, 0, 0,
+            SNAME = 'B3GTS_S'
+            CALL LOAD_MIO_FILE ( SNAME, 0, 0, 0,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
 
-
-C Open mass output file (tons/hour)
-
-            SNAME = 'B3GTS_S'
-            CALL SUBST_BARRIER
-            IF ( IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( SNAME, FSNEW3, PNAME ) ) THEN
-                  MESG = 'Could not open "' // TRIM( SNAME ) // '" file'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
-               END IF
-            END IF
 
          END IF
 #endif

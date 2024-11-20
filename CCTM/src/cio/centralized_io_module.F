@@ -3099,20 +3099,9 @@
              call mio_fread (BSOILINP, 'PULSETIME', pname, pulsetime(:,1))
              fnumb = mio_search (BSOILINP)
 #else
-             IF ( .NOT. OPEN3( BSOILINP, FSREAD3, PNAME ) ) THEN
-                mesg = 'Open failure for ' // BSOILINP
-                Call M3EXIT( PNAME, 0, 0, mesg, XSTAT1 )
-             END IF
-             n_opened_file = n_opened_file + 1
              call mio_fopen (BSOILINP, mio_read_only)
              fnumb = mio_search (BSOILINP)
-
-! Get description of NO rain data file
-             IF ( .NOT. DESC3( BSOILINP ) ) THEN
-                MESG = 'Could not get description of file "' //
-     &                  TRIM( BSOILINP ) // '"'
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             END IF
+             n_opened_file = n_opened_file + 1
 
 ! Check that the file start date and time are consistent
 !            IF ( SDATE3D .NE. cio_model_sdate ) THEN
@@ -3130,33 +3119,12 @@
 94011        FORMAT( A, F10.2, 1X, A, I3, ',', I3 )
 
              VAR = 'PTYPE'
-             IF ( .NOT. XTRACT3( BSOILINP, 'PTYPE', 1, 1,
-     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
-     &                           0, 0, PTYPE ) ) THEN
-                MESG = 'Could not read "' // TRIM( VAR ) //
-     &                 '" from file "' // TRIM( BSOILINP ) // '"'
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             END IF
              call mio_fread (BSOILINP, VAR, pname, PTYPE)
 
              VAR = 'PULSEDATE'
-             IF ( .NOT. XTRACT3( BSOILINP, VAR, 1, 1,
-     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
-     &                           0, 0, PULSEDATE ) ) THEN
-                MESG = 'Could not read "' // TRIM( VAR ) //
-     &                 '" from file "' // TRIM( BSOILINP ) // '"'
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             END IF
              call mio_fread (BSOILINP, VAR, pname, PULSEDATE)
 
              VAR = 'PULSETIME'
-             IF ( .NOT. XTRACT3( BSOILINP, VAR, 1, 1,
-     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
-     &                           0, 0, PULSETIME ) ) THEN
-                MESG = 'Could not read "' // TRIM( VAR ) //
-     &                 '" from file "' // TRIM( BSOILINP ) // '"'
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             END IF
              call mio_fread (BSOILINP, VAR, pname, PULSETIME)
 #endif
 
@@ -3173,13 +3141,6 @@
      &                          rainfall(:,1,i), loc_time_stamp)
 
 #else
-                IF ( .NOT. XTRACT3( BSOILINP, VAR, 1, 1,
-     &                              STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
-     &                              0, 0, RAINFALL( :,:,I ) ) ) THEN
-                   MESG = 'Could not read "' // TRIM( VAR ) //
-     &                    '" from file "' // TRIM( BSOILINP ) // '"'
-                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-                END IF
 
                 call mio_fread (BSOILINP, VAR, pname, rainfall(:,:,i))
 

@@ -223,14 +223,6 @@ C Allocate memory for arrays
 #ifndef mpas
          IF ( BEMIS_DIAG ) THEN
             EMISS = 0.0   ! array
-#ifdef parallel_io
-            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( SNAME, FSREAD3, PNAME ) ) THEN
-                  MESG = 'Could not open ' // TRIM(SNAME)
-                  CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-               END IF
-            END IF
-#endif
          END IF
 #endif
 
@@ -266,15 +258,6 @@ C calculate fseas based on deep soil temperature following WRF 3.8.1 PX
 
       WRITE( MESG,94030 ) HHMMSS( JTIME )
       CALL LOG_MESSAGE( LOGDEV ,  MESG )
-
-#ifndef mpas
-C repopulate the met_cro_2d variable attributes
-      IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
-         MESG = 'Could not get description of file "'
-     &           // TRIM( MET_CRO_2D ) // '"'
-         CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-      END IF
-#endif
 
 C Calculate temporal non-speciated beis emissions
       CALL BEIS( JDATE, JTIME, NCOLS, NROWS, MSPCS, SEMIS, BIPOL )
@@ -339,19 +322,15 @@ C Speciate emissions
             if ( firstwrite ) then 
                call mio_setfile( MET_CRO_2D )
 
-               call mio_fcreate( 'B3GTS_MIO', mio_new_file )
+               call mio_fcreate( SNAME, mio_new_file )
                firstwrite = .false.
             end if
 
             EMISS = EMISS * HR2SEC   ! convert from gm/h to gm/s
             DO S = 1,MSPCS
-               IF ( .NOT. WRITE3( SNAME, EMSPC( S ), MDATE, MTIME, EMISS(:,:,S) ) ) THEN
-                  MESG = 'Could not write to output file "' // TRIM( SNAME ) // '"'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-               END IF
-               call mio_setfile( 'B3GTS_MIO' )
+               call mio_setfile( sname )
                call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
-               call mio_fwrite( 'B3GTS_MIO', EMSPC( S ), pname, EMISS(:,:,S), TIME_STAMP )
+               call mio_fwrite( sname, EMSPC( S ), pname, EMISS(:,:,S), TIME_STAMP )
             END DO
             WRITE( LOGDEV,94040 )
      &            'Timestep written to', SNAME,

@@ -87,24 +87,17 @@ C represents data computed from time 1995196:090000 to 1995196:100000
       IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
 
-         IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-            IF ( .NOT. OPEN3( A_CONC_1, FSREAD3, PNAME ) ) THEN
-               XMSG = 'Could not open ' // A_CONC_1 // ' file for update'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-         END IF
-
 ! If not writing all layers, change dimension mio_nlays before file creation, 
 ! then change global attribute NLAYS to match
          call mio_setfile( MET_CRO_3D )
          if (aconc_subset_layer) mio_nlays = A_NLAYS
 
-         call mio_fcreate( 'A_CONC_MIO', mio_new_file )
+         call mio_fcreate( A_CONC_1, mio_new_file )
 
          if (aconc_subset_layer) then
             if (mype == 0) then
-               call mio_set_global_attr ( 'A_CONC_MIO', 'NLAYS', A_NLAYS )
-               call mio_set_global_attr ( 'A_CONC_MIO', 'VGLVLS', MET_CRO_3D, ACONC_BLEV, ACONC_ELEV+1 )
+               call mio_set_global_attr ( A_CONC_1, 'NLAYS', A_NLAYS )
+               call mio_set_global_attr ( A_CONC_1, 'VGLVLS', MET_CRO_3D, ACONC_BLEV, ACONC_ELEV+1 )
             end if
          end if
       END IF
@@ -117,7 +110,7 @@ C Override default beginning time timestamp for ACONC?
          CALL NEXTIME ( MDATE, MTIME, -TSTEP )
       END IF
 
-      call mio_setfile( 'A_CONC_MIO')
+      call mio_setfile( A_CONC_1)
       call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
 
       VAR = 0
@@ -125,103 +118,51 @@ C Override default beginning time timestamp for ACONC?
       DO SPC = 1, N_A_GC_SPC
          VAR = VAR + 1
 
-         IF ( .NOT. WRITE3( A_CONC_1, A_GC_SPC( SPC ),
-     &      MDATE, MTIME, AGRID( :,:,:,VAR ) ) ) THEN
-            XMSG = 'Could not write '
-     &           // TRIM( A_GC_SPC( SPC ) )
-     &           // ' to ' // A_CONC_1
-            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'A_CONC_MIO', A_GC_SPC( SPC ), PNAME, 
+         call mio_fwrite( A_CONC_1, A_GC_SPC( SPC ), PNAME, 
      &                    AGRID( :,:,:,VAR ), TIME_STAMP )       
       END DO
  
       DO SPC = 1, N_A_AE_SPC
          VAR = VAR + 1
-         IF ( .NOT. WRITE3( A_CONC_1, A_AE_SPC( SPC ),
-     &      MDATE, MTIME, AGRID( :,:,:,VAR ) ) ) THEN
-            XMSG = 'Could not write '
-     &           // TRIM( A_AE_SPC( SPC ) )
-     &           // ' to ' // A_CONC_1
-            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'A_CONC_MIO', A_AE_SPC( SPC ), PNAME, 
+         call mio_fwrite( A_CONC_1, A_AE_SPC( SPC ), PNAME, 
      &                    AGRID( :,:,:,VAR ), TIME_STAMP )       
       END DO
  
       DO SPC = 1, N_A_NR_SPC
          VAR = VAR + 1
-         IF ( .NOT. WRITE3( A_CONC_1, A_NR_SPC( SPC ),
-     &      MDATE, MTIME, AGRID( :,:,:,VAR ) ) ) THEN
-            XMSG = 'Could not write '
-     &           // TRIM( A_NR_SPC( SPC ) )
-     &           // ' to ' // A_CONC_1
-            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'A_CONC_MIO', A_NR_SPC( SPC ), PNAME, 
+         call mio_fwrite( A_CONC_1, A_NR_SPC( SPC ), PNAME, 
      &                    AGRID( :,:,:,VAR ), TIME_STAMP )       
       END DO
  
       ! Write Tracer Species Concentrations to Average Concentration File
       DO SPC = 1, N_A_TR_SPC
          VAR = VAR + 1
-         IF ( .NOT. WRITE3( A_CONC_1, A_TR_SPC( SPC ),
-     &      MDATE, MTIME, AGRID( :,:,:,VAR ) ) ) THEN
-            XMSG = 'Could not write '
-     &           // TRIM( A_TR_SPC( SPC ) )
-     &           // ' to ' // A_CONC_1
-            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'A_CONC_MIO', A_TR_SPC( SPC ), PNAME, 
+         call mio_fwrite( A_CONC_1, A_TR_SPC( SPC ), PNAME, 
      &                    AGRID( :,:,:,VAR ), TIME_STAMP )       
       END DO
  
       ! Write Vertical Velocity to Average Concentration File
       IF ( W_VEL ) THEN
-        IF ( .NOT. WRITE3( A_CONC_1, 'W_VEL',
-     &        MDATE, MTIME, AVG_WVEL ) ) THEN
-              XMSG = 'Could not write Vertical Wind Velocity'
-     &             // ' to ' // A_CONC_1
-              CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-        END IF 
-         call mio_fwrite( 'A_CONC_MIO', 'W_VEL', PNAME, 
+         call mio_fwrite( A_CONC_1, 'W_VEL', PNAME, 
      &                    AVG_WVEL, TIME_STAMP )       
       END IF
  
       ! Write Relative Humidity to Average Concentration File
       IF ( L_ACONC_RH ) THEN
-        IF ( .NOT. WRITE3( A_CONC_1, 'RH',
-     &        MDATE, MTIME, AVG_RH ) ) THEN
-              XMSG = 'Could not write Relative Humidity'
-     &             // ' to ' // A_CONC_1
-              CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-        END IF 
-         call mio_fwrite( 'A_CONC_MIO', 'RH', PNAME, 
+         call mio_fwrite( A_CONC_1, 'RH', PNAME, 
      &                    AVG_RH, TIME_STAMP )       
       END IF
       
       ! Write Temperature to Average Concentration File
       IF ( L_ACONC_TA ) THEN
-        IF ( .NOT. WRITE3( A_CONC_1, 'TA',
-     &        MDATE, MTIME, AVG_TA ) ) THEN
-              XMSG = 'Could not write Temperature'
-     &             // ' to ' // A_CONC_1
-              CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-        END IF 
-         call mio_fwrite( 'A_CONC_MIO', 'TA', PNAME, 
+         call mio_fwrite( A_CONC_1, 'TA', PNAME, 
      &                    AVG_TA, TIME_STAMP )       
       END IF
  
 
       ! Write Pressure to Average Concentration File
       IF (L_ACONC_PRES ) THEN
-        IF ( .NOT. WRITE3( A_CONC_1, 'PRES',
-     &        MDATE, MTIME, AVG_PRES ) ) THEN
-              XMSG = 'Could not write Pressure'
-     &             // ' to ' // A_CONC_1
-              CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-        END IF 
-         call mio_fwrite( 'A_CONC_MIO', 'PRES', PNAME, 
+         call mio_fwrite( A_CONC_1, 'PRES', PNAME, 
      &                    AVG_PRES, TIME_STAMP )       
       END IF
  

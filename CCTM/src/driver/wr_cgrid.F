@@ -31,13 +31,6 @@ C-----------------------------------------------------------------------
       USE MIO_ASCII
       USE RUNTIME_VARS, ONLY : RUNLEN
       use mio_module
-#ifndef mpas
-#ifdef parallel
-      USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
-#else
-      USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
-#endif
-#endif
 
       IMPLICIT NONE
 
@@ -71,37 +64,13 @@ C-----------------------------------------------------------------------
          FIRSTIME = .FALSE.
 
          IF ( IO_PE_INCLUSIVE ) THEN
-            EDATE = JDATE
-            ETIME = JTIME
-            CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
-
-            SDATE3D = EDATE
-            STIME3D = ETIME
-            TSTEP3D = TSTEP
 
             NVARS3D = NSPCSD
-            NLAYS3D = NLAYS
-
-            FDESC3D = ' '
-            FDESC3D( 1 ) = 'Computational grid instantaneous concentrations'
-            FDESC3D( 2 ) = '- for scenario continuation.'
-
-            WRITE( LOGDEV,* ) ' '
-            WRITE( LOGDEV,* ) '       State CGRID File Header Description:'
-            DO K = 1, 2
-               WRITE( LOGDEV,* ) '    => ',
-     &         TRIM( FDESC3D( K ) )
-            END DO
-
-            WRITE( LOGDEV,* ) ' '
-            WRITE( LOGDEV,* ) '       State CGRID File Variable List:'
             DO K = 1, N_CGRID_SPC
                VTYPE3D( K ) = M3REAL
                VNAME3D( K ) = CGRID_NAME( K )
                UNITS3D( K ) = CGRID_UNITS( K )
                VDESC3D( K ) = 'Instantaneous value of ' // VNAME3D( K ) 
-               WRITE( LOGDEV,'( 5X, "=> VNAME3D(", I3, " ): ", A )' )
-     &                K, VNAME3D( K )
             END DO
 
             ! Store MIO Metadata
@@ -112,64 +81,24 @@ C-----------------------------------------------------------------------
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
            
-!           CALL LOAD_MIO_FILE ( 'S_CGRID', NLAYS3D, 1, NLAYS3D,
-            CALL LOAD_MIO_FILE ( 'S_CGRID_MIO', NLAYS3D, 1, NLAYS3D,
+            CALL LOAD_MIO_FILE ( 'S_CGRID', NLAYS3D, 1, NLAYS3D,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
-
-            IF ( .NOT. OPEN3( S_CGRID, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not open '
-     &              // TRIM( S_CGRID ) // ' file'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
 
          END IF ! IO_PE_INCLUSIVE
          RETURN
 
       END IF   ! FIRSTIME
 
-#ifdef parallel_io
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. FLUSH3 ( S_CGRID ) ) THEN
-            XMSG = 'Could not sync to disk ' // TRIM( S_CGRID )
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-      END IF
-      CALL SUBST_BARRIER
-      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( S_CGRID, FSREAD3, PNAME ) ) THEN
-            XMSG = 'Could not open ' // TRIM( S_CGRID )
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-      END IF
-
-      IF ( .NOT. WRITE3( S_CGRID, ALLVAR3, JDATE, JTIME, CGRID ) ) THEN
-         XMSG = 'Could not write S_CGRID'
-         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
-#else
-
-#ifdef parallel
-      IF ( .NOT. PTRWRITE3( S_CGRID, ALLVAR3, JDATE, JTIME, CGRID ) ) THEN
-         XMSG = 'Could not write S_CGRID'
-         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
-#else
-      IF ( .NOT. WRITE3( S_CGRID, ALLVAR3, JDATE, JTIME, CGRID ) ) THEN
-         XMSG = 'Could not write S_CGRID'
-         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
-#endif
       call mio_setfile( MET_CRO_3D )
-      call mio_fcreate( 'S_CGRID_MIO', mio_new_file)
+      call mio_fcreate( S_CGRID, mio_new_file)
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
       do K = 1, n_cgrid_spc
-         call mio_fwrite( 'S_CGRID_MIO', CGRID_NAME( K ),
+         call mio_fwrite( S_CGRID, CGRID_NAME( K ),
      &            PNAME, CGRID( :,:,:,K ), TIME_STAMP )
       end do
-#endif
 
       WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &      'Timestep written to', S_CGRID,

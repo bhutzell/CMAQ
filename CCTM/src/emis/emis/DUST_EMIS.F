@@ -501,77 +501,29 @@ C Local variables:
 C-----------------------------------------------------------------------
 
 #ifndef mpas
-C Try to open existing file for update
-         if ( .not. open3( ctm_dust_emis_1, fsrdwr3, pname ) ) then
-            xmsg = 'Could not open CTM_DUST_EMIS_1 for update - '
-     &           // 'try to open new'
-            CALL LOG_MESSAGE( LOGDEV ,  xmsg )
+         do v = 1, ndust_var
+            vtype3d( v ) = m3real
+            vname3d( v ) = dust_var( v )%var
+            units3d( v ) = dust_var( v )%units
+            vdesc3d( v ) = dust_var( v )%desc
+         end do
 
-C Set output file characteristics based on COORD.EXT and open diagnostic file
-            ftype3d = grdded3
-            sdate3d = jdate
-            stime3d = jtime
-            tstep3d = tstep
-            call nextime( sdate3d, stime3d, tstep3d ) !  start the next hour
+         NVARS3D = ndust_var
 
-            nvars3d = ndust_var
-            ncols3d = gl_ncols
-            nrows3d = gl_nrows
-            nlays3d = 1
-            nthik3d = 1
-            gdtyp3d = gdtyp_gd
-            p_alp3d = p_alp_gd
-            p_bet3d = p_bet_gd
-            p_gam3d = p_gam_gd
-            xorig3d = xorig_gd
-            yorig3d = yorig_gd
-            xcent3d = xcent_gd
-            ycent3d = ycent_gd
-            xcell3d = xcell_gd
-            ycell3d = ycell_gd
-            vgtyp3d = vgtyp_gd
-            vgtop3d = vgtop_gd
-!           vgtpun3d = vgtpun_gd ! currently, not defined
-            do l = 1, nlays3d + 1
-               vglvs3d( l ) = vglvs_gd( l )
-            end do
-            gdnam3d = grid_name  ! from HGRD_DEFN
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 4
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .True. ! even if 2-D
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
 
-            do v = 1, nvars3d
-               vtype3d( v ) = m3real
-               vname3d( v ) = dust_var( v )%var
-               units3d( v ) = dust_var( v )%units
-               vdesc3d( v ) = dust_var( v )%desc
-            end do
-
-            fdesc3d( 1 ) = 'windblown dust parameters, variables, and'
-            fdesc3d( 2 ) = 'hourly layer-1 windblown dust emission rates'
-            do l = 3, mxdesc3
-               fdesc3d( l ) = ' '
-            end do
-
-            ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 4
-            L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .True. ! even if 2-D
-            L_COL  ( 1:NVARS3D ) = .True.
-            L_ROW  ( 1:NVARS3D ) = .True.
-            L_VEXT ( 1:NVARS3D ) = .False.
-
-!           CALL LOAD_MIO_FILE ( 'CTM_DUST_EMIS_1', 0, 0, 0,
-            CALL LOAD_MIO_FILE ( 'CTM_DUST_MIO', 0, 0, 0,
-     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &           L_VEXT(1:NVARS3D) )
+         CALL LOAD_MIO_FILE ( CTM_DUST_EMIS_1, 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
             
-C Open windblown dust emissions diagnostic file
-            if ( .not. open3( ctm_dust_emis_1, fsnew3, pname ) ) then
-               xmsg = 'Could not create the CTM_DUST_EMIS_1 file'
-               call m3exit( pname, sdate3d, stime3d, xmsg, xstat1 )
-            end if
-
-         end if
 #endif
 
          return
@@ -1206,11 +1158,11 @@ C Then reset the emissions array and local write counter.
 #endif
                if ( firstwrite ) then
                   call mio_setfile( MET_CRO_2D )
-                  call mio_fcreate( 'CTM_DUST_MIO', mio_new_file )
+                  call mio_fcreate( CTM_DUST_EMIS_1, mio_new_file )
                   firstwrite = .false.
                end if
 
-               call mio_setfile( 'CTM_DUST_MIO' )
+               call mio_setfile( CTM_DUST_EMIS_1 )
                call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
 
                do v = 1, ndust_diag
@@ -1220,13 +1172,7 @@ C Then reset the emissions array and local write counter.
                      end do
                   end do
 
-                  if ( .not. WRITE3( ctm_dust_emis_1, diagnm( v )%var,
-     &                       mdate, mtime, wrbuf ) ) then
-                     xmsg = 'Could not write ' // trim( diagnm( v )%var )
-     &                    // ' to CTM_DUST_EMIS_1'
-                     call m3exit( pname, mdate, mtime, xmsg, xstat1 )
-                  end if
-                  call mio_fwrite( 'CTM_DUST_MIO', diagnm( v )%var,
+                  call mio_fwrite( CTM_DUST_EMIS_1, diagnm( v )%var,
      &                             pname, wrbuf, time_stamp )
                end do
                write( logdev,'( /5x, 2( a, 1x ), i8, ":", i6.6 )' )

@@ -328,29 +328,29 @@ C Set output file characteristics from GRID_CONF and open
          L_ROW  ( 1:NVARS3D ) = .False.
          L_VEXT ( 1:NVARS3D ) = .True.
 
-!        CALL LOAD_MIO_FILE ( 'CTM_VEXT_1', NLAYS3D, 1, NLAYS3D,
-         CALL LOAD_MIO_FILE ( 'CTM_VEXT_MIO', NLAYS3D, 1, NLAYS3D,
+         CALL LOAD_MIO_FILE ( 'CTM_VEXT_1', NLAYS3D, 1, NLAYS3D,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &        L_VEXT(1:NVARS3D) )
 
 
-C create header
-
-         IF ( IO_PE_INCLUSIVE ) THEN   ! open new
-
-            IF ( .NOT. OPEN3( CTM_VEXT_1, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not open ' // CTM_VEXT_1
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-
-            IF ( .NOT. FLUSH3 ( CTM_VEXT_1 ) ) THEN
-               XMSG = 'Could not sync to disk ' // CTM_VEXT_1
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-
-         END IF
+! mio does not yet support vertext
+!C create header
+!
+!         IF ( IO_PE_INCLUSIVE ) THEN   ! open new
+!
+!            IF ( .NOT. OPEN3( CTM_VEXT_1, FSNEW3, PNAME ) ) THEN
+!               XMSG = 'Could not open ' // CTM_VEXT_1
+!               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+!            END IF
+!
+!            IF ( .NOT. FLUSH3 ( CTM_VEXT_1 ) ) THEN
+!               XMSG = 'Could not sync to disk ' // CTM_VEXT_1
+!               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+!            END IF
+!
+!         END IF
 
          DEALLOCATE(VERTEXTLAT, VERTEXTLON, VERTEXTJR, VERTEXTIR)
 #endif
@@ -533,14 +533,14 @@ C Write the accumulated array to file
 
             FIL16 = FILNAME
             VAR16 = VARNAME
-            IF ( .NOT. WRITE3( FIL16, VAR16, DATE, TIME, WRITVBUF ) ) THEN
-               MSG = 'Could not write '
-     &               // TRIM( VARNAME ) //
-     &               ' to file '// TRIM( FIL16 )
-
-               CALL PM3WARN( 'PWRVEC', DATE, TIME, MSG )
-               LERROR = .TRUE.
-            END IF
+!            IF ( .NOT. WRITE3( FIL16, VAR16, DATE, TIME, WRITVBUF ) ) THEN
+!               MSG = 'Could not write '
+!     &               // TRIM( VARNAME ) //
+!     &               ' to file '// TRIM( FIL16 )
+!
+!               CALL PM3WARN( 'PWRVEC', DATE, TIME, MSG )
+!               LERROR = .TRUE.
+!            END IF
 
          ELSE      ! Non-I/O processors send data
 
@@ -653,13 +653,13 @@ C-----------------------------------------------------------------------
 
 C open vext file for update
 
-            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( CTM_VEXT_1, FSREAD3, PNAME ) ) THEN
-                  XMSG = 'Could not open ' // CTM_VEXT_1 //
-     &                    ' file for update'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-            END IF
+!            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
+!               IF ( .NOT. OPEN3( CTM_VEXT_1, FSREAD3, PNAME ) ) THEN
+!                  XMSG = 'Could not open ' // CTM_VEXT_1 //
+!     &                    ' file for update'
+!                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+!               END IF
+!            END IF
 
 !           IF ( .NOT. DESC3( CTM_VEXT_1 ) ) THEN
 !              XMSG = 'Could not get file description from ' // CTM_VEXT_1
