@@ -680,7 +680,7 @@
 
       ELMO_KEY( 19 )%WORD = 'TOXICS'
       ELMO_KEY( 19 )%N = 27
-      ALLOCATE( ELMO_KEY( 19 )%LIST( 21 ), STAT=ALLOCSTAT )
+      ALLOCATE( ELMO_KEY( 19 )%LIST( 27 ), STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_KEY(19)'
            CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
