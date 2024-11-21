@@ -674,7 +674,7 @@ c gas species
         IF ( FIRST_WRITE_SENS ) THEN
            FIRST_WRITE_SENS = .FALSE.
            call mio_setfile( MET_CRO_2D )
-           call mio_fcreate( 'CTM_SWETDEP_MIO', mio_new_file )
+           call mio_fcreate( CTM_SWETDEP_1, mio_new_file )
         END IF
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
 
@@ -685,15 +685,9 @@ c gas species
           END DO
         END DO
 
-        IF ( .NOT. WRITE3( CTM_SWETDEP_1, ALLVAR3, NDATE,
-     &                     NTIME, S_DEPWRT ) ) THEN
-          XMSG = 'Could not write ' // CTM_SWETDEP_1 // ' file'
-          CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
-        END IF
-
         DO SPC = 1, NPMAX * ( N_SPC_WDEP + 1 )
-           write(logdev,*) 'SWETDEP: spc, name', spc, swdep_spc(spc)
-           call mio_fwrite( 'CTM_SWETDEP_MIO', swdep_spc( SPC ),
+!          write(logdev,*) 'SWETDEP: spc, name', spc, swdep_spc(spc)
+           call mio_fwrite( CTM_SWETDEP_1, swdep_spc( SPC ),
      &                      PNAME, S_DEPWRT( :,:,SPC ), TIME_STAMP )
         END DO
 
@@ -749,7 +743,7 @@ C...reinitialize deposition array
         IF ( FIRST_WRITE_ISAM ) THEN
            FIRST_WRITE_ISAM = .FALSE.
            call mio_setfile( MET_CRO_2D )
-           call mio_fcreate( 'SA_WD_1_MIO', mio_new_file )   
+           call mio_fcreate( SA_WD_1, mio_new_file )   
         END IF
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
 
@@ -760,12 +754,7 @@ C...reinitialize deposition array
               BUFF2( COL,ROW ) = TOT_SADEP( COL,ROW,S_SPCTAG( SPC ),T_SPCTAG( SPC ) )
             END DO ! col
           END DO ! row
-          IF ( .NOT. WRITE3( SA_WD_1, VNAM_SPCTAG( SPC ),
-     &                       NDATE, NTIME, BUFF2 ) ) THEN
-            XMSG = 'Could not write ' // SA_WD_1 // ' file'
-            CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
-          END IF
-          call mio_fwrite( 'SA_WD_1_MIO', VNAM_SPCTAG( SPC ),
+          call mio_fwrite( SA_WD_1, VNAM_SPCTAG( SPC ),
      &                     PNAME, BUFF2, TIME_STAMP )
        END DO ! n_spctag
 

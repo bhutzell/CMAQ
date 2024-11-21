@@ -83,8 +83,8 @@
                 end if
              end do
              if (.not. found) then
-                write (mio_logdev, *) ' Abort in routine mio_fcreate due to file ', trim(fname)
-                write (mio_logdev, *) ' does not have an output file definition '
+                write (mio_logdev, *) ' Abort in mio_fcreate: ', trim(fname) // &
+                                      ' does not have an output file definition '
                 stop
              else
 
@@ -153,7 +153,7 @@
 
              if (found) then
                 if (mio_file_data(dest)%mode .eq. mio_new_file) then
-                   print *, ' Abort in routine mio_fcreate due to output file ', trim(fname), ' is already exist '
+                   print *, ' Abort in mio_fcreate: ', trim(fname), ' already exists '
                    stop
                 end if
              end if
@@ -166,8 +166,9 @@
 
                       stat = nf90_create (mio_file_data(dest)%full_filename, mode, mio_file_data(dest)%fileid)
                       if (stat .ne. nf90_noerr) then
-                         write (mio_logdev, *) 'Abort in routine mio_fcreate while creating file'
-                         write (mio_logdev, *) trim(mio_file_data(dest)%filename), ' due to an error ', trim(nf90_strerror(stat))
+                         write (mio_logdev, *) 'Abort in mio_fcreate while creating ' // &
+                                               trim(mio_file_data(dest)%filename)
+                         write (mio_logdev, *) 'root cause: ', trim(nf90_strerror(stat))
                          stop
                       end if
                    end if
@@ -615,8 +616,8 @@
                    stat = nf90_enddef (mio_file_data(dest)%fileid)
 
                    if (stat .ne. nf90_noerr) then
-                      write (mio_logdev, *) 'Abort in routine mio_fcreate due to ending netCDF definition '
-                      write (mio_logdev, *) ' section for file ', trim(fname), ' with an error ', trim(nf90_strerror(stat))
+                      write (mio_logdev, *) 'Abort in mio_fcreate in netCDF definition for', trim(fname)
+                      write (mio_logdev, *) 'root cause: ', trim(nf90_strerror(stat))
                       stop
                    end if
                 end if
@@ -1126,7 +1127,7 @@
                 end if
 
                 if (stat .ne. 0) then
-                   write (mio_logdev, *) ' Abort in routine mio_fcreate due to memory allocation error'
+                   write (mio_logdev, *) ' Abort in mio_fcreate: memory allocation error'
                    stop
                 end if
 
@@ -1240,8 +1241,8 @@
                 end if
 
                 if (error) then
-                   write (mio_logdev, *) ' Abort in routine mio_fcreate due to netCDF reading/writing '
-                   write (mio_logdev, *) ' variable, error is ', trim(mio_basic_mpas_vnames(vv))
+                   write (mio_logdev, *) ' Abort in mio_fcreate due to netCDF reading/writing '
+                   write (mio_logdev, *) ' variable ', trim(mio_basic_mpas_vnames(vv))
                    stop
                 end if
 

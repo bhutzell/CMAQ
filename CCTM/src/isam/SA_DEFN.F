@@ -133,6 +133,7 @@ c...Final, combined tags
       INTEGER,         ALLOCATABLE :: S_SPCTAG( : )
       INTEGER,         ALLOCATABLE :: T_SPCTAG( : )
       CHARACTER( 16 ), ALLOCATABLE :: VNAM_SPCTAG( : )
+      character( 16 ), allocatable :: vun_spctag( : )
 
 C ...Tagging indices for bcon, others, icon
       INTEGER, SAVE :: BIDITAG = 0

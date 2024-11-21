@@ -609,8 +609,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_IRR_1       $OUTDIR/CCTM_IRR_1_${CTM_APPL}.nc           #> Chem Process Analysis
   setenv CTM_IRR_2       "$OUTDIR/CCTM_IRR_2_${CTM_APPL}.nc -v"      #> Chem Process Analysis
   setenv CTM_IRR_3       "$OUTDIR/CCTM_IRR_3_${CTM_APPL}.nc -v"      #> Chem Process Analysis
-  setenv CTM_DRY_DEP_MOS "$OUTDIR/CCTM_DDMOS_${CTM_APPL}.nc -v"      #> Dry Dep
-  setenv CTM_DEPV_MOS    "$OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc -v"    #> Dry Dep Velocity
+  setenv CTM_DRY_DEP_MOS $OUTDIR/CCTM_DDMOS_${CTM_APPL}.nc           #> Dry Dep
+  setenv CTM_DEPV_MOS    $OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc         #> Dry Dep Velocity
   setenv CTM_VDIFF_DIAG  $OUTDIR/CCTM_VDIFF_DIAG_${CTM_APPL}.nc      #> Vertical Dispersion Diagnostic
   setenv CTM_VSED_DIAG   $OUTDIR/CCTM_VSED_DIAG_${CTM_APPL}.nc       #> Particle Grav. Settling Velocity
   setenv CTM_LTNGDIAG_1  $OUTDIR/CCTM_LTNGHRLY_${CTM_APPL}.nc        #> Hourly Avg Lightning NO
@@ -638,15 +638,12 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
              $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_DRY_DEP_MOS                 \
              $CTM_DEPV_MOS $CTM_VDIFF_DIAG $CTM_VSED_DIAG $CTM_LTNGDIAG_1 $CTM_LTNGDIAG_2 $CTM_VEXT_1 )
 
-  set OUT_FILES = (${OUT_FILES} \
-             $MEGAN_SOIL_MIO $BDSNPOUT_MIO )
-
-  set OUT_FILES = ( ${OUT_FILES} $CTM_DDEP_MOS_MIO $CTM_DEPV_MOS_MIO ) 
+  set OUT_FILES = (${OUT_FILES} $MEGAN_SOIL_MIO $BDSNPOUT_MIO )
 
   if ( $?CTM_ISAM ) then
      if ( $CTM_ISAM == 'Y' || $CTM_ISAM == 'T' ) then
-        set OUT_FILES = (${OUT_FILES} ${SA_ACONC_1} ${SA_CONC_1} ${SA_DD_1} ${SA_WD_1} ${SA_CGRID_1} \
-                         ${SA_ACONC_1_MIO} ${SA_CONC_1_MIO} ${SA_DD_1_MIO} ${SA_WD_1_MIO} ${SA_CGRID_1_MIO} )
+        set OUT_FILES = (${OUT_FILES} ${SA_ACONC_1} ${SA_CONC_1} ${SA_DD_1} ${SA_WD_1} ${SA_CGRID_1} )
+
      endif
   endif
   if ( $?CTM_DDM3D ) then

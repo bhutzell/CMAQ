@@ -84,7 +84,7 @@
          MDATE = JDATE; MTIME = JTIME
       END IF
  
-
+            VAR = 0
             NVARS3D = N_ACONC_VARS
 
             DO SPC = 1, N_A_GC_SPC

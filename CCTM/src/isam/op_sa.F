@@ -88,12 +88,8 @@ Ckrt Diagnostic
 
 C-----------------------------------------------------------------------
 
-
-
 Ckrt Create variable names for tag output
 
-
-        LOGDEV = INIT3()
 
         IF ( ISAM_ELEV .EQ. -1 ) ISAM_ELEV = NLAYS
         SA_NLAYS = ISAM_ELEV - ISAM_BLEV + 1
@@ -135,6 +131,7 @@ Ckrt Create variable names for tag output
 
 Ckrt Set nvars3d for SA_CONC_1 or SA_CGRID_1 file
         NVARS3D = N_SPCTAG
+        NLAYS3D = SA_NLAYS
 
 Ckrt Set vname3d for SA_CONC_1 file
         JSPCTAG = 0
@@ -154,6 +151,7 @@ Ckrt Set vname3d for SA_CONC_1 file
               S_SPCTAG  ( JSPCTAG ) = JSPC
               T_SPCTAG  ( JSPCTAG ) = ITAG
               VNAM_SPCTAG ( JSPCTAG ) = VNAME(JSPC,ITAG)
+              vun_spctag  ( jspctag ) = UNITS3D( JSPCTAG )
 !              WRITE(LOGDEV,'(I4,2(1X,I3),2(1X,A16),2(1X,I3))')
 !     &        JSPCTAG,JSPC,ITAG,  
 !     &        VNAME3D( JSPCTAG ), UNITS3D( JSPCTAG ),
@@ -161,45 +159,6 @@ Ckrt Set vname3d for SA_CONC_1 file
            END DO
         END DO
 
-        SDATE3D = JDATE
-        STIME3D = JTIME
-
-        FTYPE3D = GRDDED3
-cyqw    TSTEP3D = TSTEP(1)
-        TSTEP3D = TSTEP ( 1 ) * NSTEPS
-         
-        NCOLS3D = GL_NCOLS
-        NROWS3D = GL_NROWS
-        NLAYS3D = SA_NLAYS
-        NTHIK3D =     1
-        GDTYP3D = GDTYP_GD
-        P_ALP3D = P_ALP_GD
-        P_BET3D = P_BET_GD 
-        P_GAM3D = P_GAM_GD
-        XORIG3D = XORIG_GD
-        YORIG3D = YORIG_GD
-        XCENT3D = XCENT_GD
-        YCENT3D = YCENT_GD
-        XCELL3D = XCELL_GD
-        YCELL3D = YCELL_GD
-        VGTYP3D = VGTYP_GD
-        VGTOP3D = VGTOP_GD
-
-
-        K = 0
-        DO L = ISAM_BLEV, ISAM_ELEV
-           K = 1 + K
-           VGLVS3D( K ) = VGLVS_GD( L )
-        END DO
-
-!       GDNAM3D = GDNAME_GD
-        GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-        FDESC3D( 1 ) = 'SA_CONC_1 stores contributing srcs '
-        DO L = 2, MXDESC3
-            FDESC3D( L ) = ' '
-        END DO
-   
         ! Store MIO Metadata
         NDIMS3D( 1:NVARS3D ) = 4
         L_TSTEP( 1:NVARS3D ) = .True.
@@ -208,53 +167,12 @@ cyqw    TSTEP3D = TSTEP(1)
         L_ROW  ( 1:NVARS3D ) = .True.
         L_VEXT ( 1:NVARS3D ) = .False.
 
-!       CALL LOAD_MIO_FILE ( FILE_NAME, NLAYS3D, ISAM_BLEV, ISAM_ELEV,
-        CALL LOAD_MIO_FILE ( trim(FILE_NAME(1:12)) // '_MIO', NLAYS3D, ISAM_BLEV, ISAM_ELEV,
+        CALL LOAD_MIO_FILE ( FILE_NAME, NLAYS3D, ISAM_BLEV, ISAM_ELEV,
      &       VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &       VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &       L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &       L_VEXT(1:NVARS3D) )
                
-        IF ( MYPE .EQ. 0 ) THEN
-!           CALL M3EXIT( 'OP_SA', 0, 0, 'Fatal Error Encountered', XSTAT2 )
-           IF ( .NOT. OPEN3( FILE_NAME, FSNEW3, PNAME ) ) THEN
-              XMSG = 'Could not create '// FILE_NAME // ' file'
-              CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-           END IF
-        END IF
-
-Ckrt...Write initial conditions to sa_conc_1 ( or last hour sa_cgrid_1 )
-          ALLOCATE ( ISAM_BUFF( NCOLS, NROWS, SA_NLAYS, N_SPCTAG ), 
-     &     STAT = ALLOCSTAT )
-          IF ( ALLOCSTAT .NE. 0 ) THEN
-            XMSG = 'Failure allocating ISAM_BUFF'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-          ENDIF
-          ISAM_BUFF = 0.0
-C
-         ! print *, S, N_SPCTAG,ISAM_BLEV, ISAM_ELEV
-          DO S = 1, N_SPCTAG
-            K = 0
-            DO L = ISAM_BLEV, ISAM_ELEV
-              K = K + 1
-              ISAM_BUFF( :,:,K,S ) = ISAM( :,:,L,S_SPCTAG(S),T_SPCTAG(S) )
-            ENDDO
-          END DO ! loop over total tags
-          IF ( .NOT. WRITE3( FILE_NAME, ALLVAR3, JDATE, JTIME, 
-     &     ISAM_BUFF ) ) THEN
-            XMSG = 'Could not write to '
-     &         // FILE_NAME
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-          END IF
-          if ( MYPE .eq. 0 ) then
-            !print*,'Finished write3 S =',S
-            !print*,'While N_SPCTAG =',N_SPCTAG
-          endif
-          DEALLOCATE( ISAM_BUFF )
-
-      
-c.....couple ISAM after writing
-
       return
       end
 

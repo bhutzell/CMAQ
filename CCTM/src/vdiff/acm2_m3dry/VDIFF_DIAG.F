@@ -133,24 +133,9 @@ C Create the vsed_map (find the 1st vsed_ae species for each of the 6 surrogate 
 
          if ( io_pe_inclusive ) then
 
-C get CONC file header description
-            ok = open3( ctm_conc_1, fsread3, pname )
-            ok = desc3( ctm_conc_1 )
-            if ( .not. ok ) then
-               xmsg = 'could not read '// trim( ctm_conc_1 )
-               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-               success = .false.; return
-            end if
-
-            sdate3d = jdate
-            stime3d = jtime
-            call nextime ( sdate3d, stime3d, tstep1 ) 
-
             if ( grvsetl ) then
 
                nvars3d = n_vsed
-               fdesc3d = ' '   ! array
-               fdesc3d( 1 ) = 'representative coarse aerosol gravitational settling velocities'
                do v = 1, n_vsed
                   vtype3d( v ) = m3real
                   units3d( v ) = 'm s-1'
@@ -166,20 +151,12 @@ C get CONC file header description
                L_ROW  ( 1:NVARS3D ) = .True.
                L_VEXT ( 1:NVARS3D ) = .False.
 
-!              CALL LOAD_MIO_FILE ( 'CTM_VSED_DIAG', NLAYS3D, 1, NLAYS3D,
-               CALL LOAD_MIO_FILE ( 'CTM_VSED_MIO', NLAYS3D, 1, NLAYS3D,
+               CALL LOAD_MIO_FILE ( CTM_VSED_DIAG, NLAYS3D, 1, NLAYS3D,
      &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &              L_VEXT(1:NVARS3D) )
 
-
-               ok = open3( ctm_vsed_diag, fsnew3, pname )
-               if ( .not. ok ) then
-                  xmsg = 'could not create '// trim( ctm_vsed_diag ) // ' file'
-                  call LOG_WARNING( 'vdiff_diag', logdev, xmsg )
-                  success = .false.; return
-               end if
 
             end if
 
@@ -233,6 +210,8 @@ C get CONC file header description
             vname3d( v ) = 'LPBL'
             vdesc3d( v ) = 'PBL top sigma layer'
 
+            nvars3d = v
+
             ! Store MIO Metadata
             NDIMS3D( 1:NVARS3D ) = 4
             L_TSTEP( 1:NVARS3D ) = .True.
@@ -241,20 +220,11 @@ C get CONC file header description
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
 
-!           CALL LOAD_MIO_FILE ( 'CTM_VDIFF_DIAG', NLAYS3D, 1, NLAYS3D,
-            CALL LOAD_MIO_FILE ( 'CTM_VDIFF_MIO', NLAYS3D, 1, NLAYS3D,
+            CALL LOAD_MIO_FILE ( CTM_VDIFF_DIAG, NLAYS3D, 1, NLAYS3D,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
-
-
-            ok = open3( ctm_vdiff_diag, fsnew3, pname )
-            if ( .not. ok ) then
-               xmsg = 'could not create '// trim( ctm_vdiff_diag ) // ' file'
-               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-               success = .false.; return
-            end if
 
          end if  ! io_pe_inclusive
 
@@ -296,21 +266,6 @@ C get CONC file header description
 
          end if
 
-#ifdef parallel_io
-         call se_barrier
-         if ( .not. io_pe_inclusive ) then
-            if ( grvsetl ) then
-               if ( .not. open3 ( ctm_vsed_diag, fsread3, pname ) ) then
-                  xmsg = 'Could not open ' // trim( ctm_vsed_diag )
-                  call m3exit ( pname, jdate, jtime, xmsg, xstat2 )
-               end if
-            end if
-            if ( .not. open3 ( ctm_vdiff_diag, fsread3, pname ) ) then
-               xmsg = 'Could not open ' // trim( ctm_vdiff_diag )
-               call m3exit ( pname, jdate, jtime, xmsg, xstat2 )
-            end if
-         end if
-#endif
 #endif
 
          end function vdiff_diag_init

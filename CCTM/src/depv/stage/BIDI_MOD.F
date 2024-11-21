@@ -169,7 +169,7 @@ C Prevent initializing the code twice
          
          End Subroutine INIT_BIDI
 !*****************************************************************************
-!************** Iput / output section of the module **************************
+!************** Input / output section of the module **************************
 !*****************************************************************************
 
          Subroutine OPASX_MEDIA( JDATE, JTIME, TSTEP )
@@ -196,44 +196,8 @@ C--------------------------------------------------------------------------
          
          If ( ABFLUX .And. .Not. HGBIDI) Then
 
-            If ( .Not. OPEN3( MEDIA_CONC, FSRDWR3, PNAME ) ) Then
-
-               XMSG = 'Could not open ' // MEDIA_CONC // ' file for update - '
-     &             // 'try to open new'
-               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-
-               FTYPE3D = GRDDED3
-               SDATE3D = JDATE
-               STIME3D = JTIME
-               TSTEP3D = TSTEP
-               Call NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
-
                NVARS3D = N_TOT
-               NCOLS3D = GL_NCOLS
-               NROWS3D = GL_NROWS
                NLAYS3D =     1
-               NTHIK3D =     1
-               GDTYP3D = GDTYP_GD
-               P_ALP3D = P_ALP_GD
-               P_BET3D = P_BET_GD
-               P_GAM3D = P_GAM_GD
-               XORIG3D = XORIG_GD
-               YORIG3D = YORIG_GD
-               XCENT3D = XCENT_GD
-               YCENT3D = YCENT_GD
-               XCELL3D = XCELL_GD
-               YCELL3D = YCELL_GD
-               VGTYP3D = VGTYP_GD
-               VGTOP3D = VGTOP_GD
-               Do L = 1, NLAYS3D + 1
-                  VGLVS3D( L ) = VGLVS_GD( L )
-               End Do
-               GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-               FDESC3D = ' '   ! array
-
-               FDESC3D( 1 ) = 'Multimedia concentration estimates from integrated ambient '
-     &                     // 'NH3 concentrations and surface exchange algorithms'
                         
                N = 0
 
@@ -264,45 +228,11 @@ C--------------------------------------------------------------------------
                   UNITS3D( N ) = 'umol g-1'
                   VDESC3D( N ) = 'Solid phase concentration'
                End Do              
-            End If
             
          Else If ( .Not. ABFLUX .And. HGBIDI ) Then              
             
-            If ( .Not. OPEN3( MEDIA_CONC, FSRDWR3, PNAME ) ) Then!
-
-               XMSG = 'Could not open ' // MEDIA_CONC // ' file for update - '
-     &             // 'try to open new'
-               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-
-               FTYPE3D = GRDDED3
-               SDATE3D = JDATE
-               STIME3D = JTIME
-               TSTEP3D = TSTEP
-               Call NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour            
                NVARS3D = N_TOT
-               NCOLS3D = GL_NCOLS
-               NROWS3D = GL_NROWS
                NLAYS3D =     1
-               NTHIK3D =     1
-               GDTYP3D = GDTYP_GD
-               P_ALP3D = P_ALP_GD
-               P_BET3D = P_BET_GD
-               P_GAM3D = P_GAM_GD
-               XORIG3D = XORIG_GD
-               YORIG3D = YORIG_GD
-               XCENT3D = XCENT_GD
-               YCENT3D = YCENT_GD
-               XCELL3D = XCELL_GD
-               YCELL3D = YCELL_GD
-               VGTYP3D = VGTYP_GD
-               VGTOP3D = VGTOP_GD
-
-               FDESC3D = ' '   ! array
-
-               FDESC3D( 1 ) = 'Multimedia concentration estimates from integrated ambient '
-     &                     // 'HG concentrations and surface exchange algorithms'
-
-               NLAYS3D = 1
 
                N = 0
 
@@ -333,45 +263,11 @@ C--------------------------------------------------------------------------
                   UNITS3D( N ) = 'umol g-1'
                   VDESC3D( N ) = 'Solid phase concentration'
                End Do
-            End If
             
          Else If ( ABFLUX .And. HGBIDI ) Then         
             
-            If ( .Not. OPEN3( MEDIA_CONC, FSRDWR3, PNAME ) ) Then
-
-               XMSG = 'Could not open ' // MEDIA_CONC // ' file for update - '
-     &             // 'try to open new'
-               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-
-               FTYPE3D = GRDDED3
-               SDATE3D = JDATE
-               STIME3D = JTIME
-               TSTEP3D = TSTEP
-               Call NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour            
                NVARS3D = N_TOT
-               NCOLS3D = GL_NCOLS
-               NROWS3D = GL_NROWS
                NLAYS3D =     1
-               NTHIK3D =     1
-               GDTYP3D = GDTYP_GD
-               P_ALP3D = P_ALP_GD
-               P_BET3D = P_BET_GD
-               P_GAM3D = P_GAM_GD
-               XORIG3D = XORIG_GD
-               YORIG3D = YORIG_GD
-               XCENT3D = XCENT_GD
-               YCENT3D = YCENT_GD
-               XCELL3D = XCELL_GD
-               YCELL3D = YCELL_GD
-               VGTYP3D = VGTYP_GD
-               VGTOP3D = VGTOP_GD
-
-               FDESC3D = ' '   ! array
-
-               FDESC3D( 1 ) = 'Multimedia concentration estimates from integrated ambient '
-     &                     // 'NH3 and HG concentrations and surface exchange algorithms'
-
-               NLAYS3D = 1
 
                N = 0
 
@@ -432,7 +328,6 @@ C--------------------------------------------------------------------------
                   UNITS3D( N ) = 'umol g-1'
                   VDESC3D( N ) = 'Solid phase concentration'
                End Do        
-            End If
                                                   
          End If 
 
@@ -444,20 +339,12 @@ C--------------------------------------------------------------------------
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
 
-!        CALL LOAD_MIO_FILE ( 'MEDIA_CONC', 0, 0, 0,
-         CALL LOAD_MIO_FILE ( 'MEDIA_CONC_MIO', 0, 0, 0,
+         CALL LOAD_MIO_FILE ( 'MEDIA_CONC', 0, 0, 0,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &        L_VEXT(1:NVARS3D) )
          
-! Open file, then close it for subsequent open by all processors
-            
-         If ( .Not. OPEN3( MEDIA_CONC, FSNEW3, PNAME ) ) Then
-            XMSG = 'Could not create '// TRIM( MEDIA_CONC) // ' file'
-            Call M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         End If                   
-
          Return
 
          End Subroutine OPASX_MEDIA
@@ -532,16 +419,10 @@ C--------------------------------------------------------------------------
             If ( FIRSTWRITE ) Then
                FIRSTWRITE = .FALSE.
                call mio_setfile( MET_CRO_2D )
-               call mio_fcreate( 'MEDIA_CONC_MIO', mio_new_file )
+               call mio_fcreate( MEDIA_CONC, mio_new_file )
             End If
-            call mio_fwrite( 'MEDIA_CONC_MIO', MEDIA_NAMES( V ), 
+            call mio_fwrite( MEDIA_CONC, MEDIA_NAMES( V ), 
      &                       PNAME, WRMC, TIME_STAMP )
-
-            If ( .Not. WRITE3( MEDIA_CONC, MEDIA_NAMES( V ), MDATE, MTIME,
-     &                WRMC ) ) Then
-               XMSG = 'Could not write ' // MEDIA_CONC // ' file'
-               Call M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            End If
 
          End Do                 
 
