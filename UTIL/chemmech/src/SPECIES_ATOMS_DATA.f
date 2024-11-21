@@ -722,7 +722,7 @@
                   WRITE(EXUNIT_ATOMS_REPORT,2166)(ATOMS(IPOS),IPOS=1,N_ATOMS)
                   DO IC = START_POSITION, STOP_POSITION
                      WRITE(EXUNIT_ATOMS_REPORT,2163)IC,
-     &               (INT(SPECIES_ATOMS(IC,IPOS)),IPOS=1,N_ATOMS-1),INT(SPECIES_ATOMS(IC,N_ATOMS)),
+     &               (SPECIES_ATOMS(IC,IPOS),IPOS=1,N_ATOMS-1),SPECIES_ATOMS(IC,N_ATOMS),
      &               TRIM( ATOM_SPECIES(IC) ),TRIM( ATOMS_SPECIES_PHASE(IC) )
                   END DO
                   DO IC = START_POSITION, STOP_POSITION
@@ -776,27 +776,38 @@
      &       /12X, '   CHARACTER(   2) :: SPECIES_TYPE = ""',
      &       /12X, '   REAL            :: MOLWT = 0.0',
      &       /9X, 'END TYPE ',
-     &       /9X, 'TYPE( SPECIES_MODEL_INFO ) ::  MODEL_SPECIES( NUMB_MODEL_SPECIES )',
-     &       /9X, 'INTEGER :: SPECIES_ATOMS_COUNTS( NUMB_MODEL_ATOMS )' )
+     &       /9X, 'TYPE( MODEL_SPECIES_INFO ) ::  MODEL_SPECIES( NUMB_MODEL_SPECIES )',
+     &       /9X, 'REAL :: SPECIES_ATOMS_COUNTS( NUMB_MODEL_ATOMS,NUMB_MODEL_SPECIES )' )
 2251         FORMAT(9X, "CHARACTER(2) :: MODEL_ATOMS(NUMB_MODEL_ATOMS) = (/ &",/26X, 14("'",A2,"',",1X),"'", A2,"'/)")  
 2252         FORMAT(//9X,'CONTAINS',/12X,'LOGICAL FUNCTION SET_ATOMS_COUNTS( MECHANISM_NAME )',//12X,'IMPLICIT NONE')
 2267         FORMAT(//12X,'CHARACTER(LEN=*), INTENT( IN ) :: MECHANISM_NAME',
      &              /'! local:',
-     &              /12X,'LOGICAL, SAVE: FIRSTCALL = .TRUE.'
+     &              /12X,'LOGICAL, SAVE :: FIRSTCALL = .TRUE.',
+     &              /12X,'INTEGER       :: ISPECIES ',     
      &              //12X,'IF( FIRSTCALL )THEN',
      &              /15X,    'FIRSTCALL =  .FALSE.',
-     &              /15X,    'IF( TRIM(MECHANISM ) .NE. "',A,'" ) SET_ATOMS_COUNTS = .FALSE.'
+     &              /15X,    'IF( TRIM( MECHANISM_NAME ) .NE. "',A,'" ) SET_ATOMS_COUNTS = .FALSE.'
      &              /15X,    "RETURN"
      &              /12X,'END IF')
 2161   FORMAT(/ 12X, 'MODEL_SPECIES( ' I5, ' ) = MODEL_SPECIES_INFO(',5("'", A, "', & ",/34X),"'",A2,"',  &",
      &        /34X, F8.3, ')')
-2163   FORMAT( 12X, 'SPECIES_ATOMS_COUNTS( ',I5,') = (/ ',14(I4,',',1X), I4,'/)',' ! ',A,
+2163   FORMAT( 12X, 'SPECIES_ATOMS_COUNTS( :,',I5,') = & ',/12X,'(/ ',14(f6.1,',',1X), f6.1,'/)',' ! ',A,
      &         1X,A,' namelist')
 2164   FORMAT( "12X, 'SPECIES_ATOMS_COUNTS( ,I5,') = (/ ", I3, 
      &         "(I4,',',1X), I4,'/)',' ! ', A,1X,A,' namelist'")
 2165   FORMAT(12X,' SET_ATOMS_COUNTS = .TRUE.',
      &        //9X,'END FUNCTION SET_ATOMS_COUNTS', /6X,'END MODULE MODEL_ATOM_COUNTS')
-2166   FORMAT('!',46X,32(1X,A2,3X))
+2166   FORMAT('!',15X,32(A6,2X))
+2167   FORMAT(/ 12X,'ISPECIES = ', I5,
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%NAME = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%REPRESENTATIVE = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%REPRESENTATION = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%DSSTOX_ID = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%SMILES = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%SPECIES_TYPE = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%MOLWT = ', F8.3 )
+
+
             END SUBROUTINE READ_MATRICES_ATOMS
             SUBROUTINE ALLOCATE_SMILES_ATOMS()
             
@@ -1250,7 +1261,7 @@
                   WRITE(EXUNIT_ATOMS_REPORT,2166)(ATOMS(IPOS),IPOS=1,N_ATOMS)
                   DO IC = START_POSITION, STOP_POSITION
                      WRITE(EXUNIT_ATOMS_REPORT,2163)IC,
-     &               (INT(SPECIES_ATOMS(IC,IPOS)),IPOS=1,N_ATOMS-1),INT(SPECIES_ATOMS(IC,N_ATOMS)),
+     &               (SPECIES_ATOMS(IC,IPOS),IPOS=1,N_ATOMS-1),SPECIES_ATOMS(IC,N_ATOMS),
      &               TRIM( ATOM_SPECIES(IC) ),TRIM( ATOMS_SPECIES_PHASE(IC) )
                   END DO
                   IF( SMILES_FILE )THEN
@@ -1273,6 +1284,7 @@
      &                  TRIM(ATOMS_SPECIES_SMILES        ( IC )),
      &                  TRIM(ATOMS_SPECIES_PHASE         ( IC )),
      &                  ATOMS_SPECIES_MOLWT( IC )
+                        write(EXUNIT_ATOMS_REPORT,'(F8.3)')ATOMS_SPECIES_MOLWT( IC )
                      END DO
                   END IF
                   WRITE(EXUNIT_ATOMS_REPORT,2165)
@@ -1298,27 +1310,37 @@
      &       /12X, '   CHARACTER(   2) :: SPECIES_TYPE = ""',
      &       /12X, '   REAL            :: MOLWT = 0.0',
      &       /9X, 'END TYPE ',
-     &       /9X, 'TYPE( SPECIES_MODEL_INFO ) ::  MODEL_SPECIES( NUMB_MODEL_SPECIES )',
-     &       /9X, 'INTEGER :: SPECIES_ATOMS_COUNTS( NUMB_MODEL_ATOMS )' )
+     &       /9X, 'TYPE( MODEL_SPECIES_INFO ) ::  MODEL_SPECIES( NUMB_MODEL_SPECIES )',
+     &       /9X, 'REAL :: SPECIES_ATOMS_COUNTS( NUMB_MODEL_ATOMS,NUMB_MODEL_SPECIES )' )
 2251         FORMAT(9X, "CHARACTER(2) :: MODEL_ATOMS(NUMB_MODEL_ATOMS) = (\ &",/26X, 14("'",A2,"',",1X),"'", A2,"'/)")  
 2252         FORMAT(//9X,'CONTAINS',/12X,'LOGICAL FUNCTION SET_ATOMS_COUNTS( MECHANISM_NAME )',//12X,'IMPLICIT NONE')
 2267         FORMAT(//12X,'CHARACTER(LEN=*), INTENT( IN ) :: MECHANISM_NAME',
      &              /'! local:',
-     &              /12X,'LOGICAL, SAVE: FIRSTCALL = .TRUE.'
+     &              /12X,'LOGICAL, SAVE :: FIRSTCALL = .TRUE.',
+     &              /12X,'INTEGER       :: ISPECIES ',
      &              //12X,'IF( FIRSTCALL )THEN',
      &              /15X,    'FIRSTCALL =  .FALSE.',
-     &              /15X,    'IF( TRIM(MECHANISM ) .NE. "',A,'" ) SET_ATOMS_COUNTS = .FALSE.'
-     &              /15X,    "RETURN"
+     &              /15X,    'IF( TRIM( MECHANISM_NAME ) .NE. "',A,'" ) SET_ATOMS_COUNTS = .FALSE.'
+     &              /15X,    'RETURN'
      &              /12X,'END IF')
 2161   FORMAT(/ 12X, 'MODEL_SPECIES( ' I5, ' ) = MODEL_SPECIES_INFO(',5("'", A, "', & ",/34X),"'",A2,"',  &",
      &        /34X, F8.3, ')')
-2163   FORMAT( 12X, 'SPECIES_ATOMS_COUNTS( ',I5,') = (/ ',14(I4,',',1X), I4,'/)',' ! ',A,
+2163   FORMAT( 12X, 'SPECIES_ATOMS_COUNTS( :',I5,') = & ',/12X,'(/ ',14(f6.1,',',1X), f6.1,'/)',' ! ',A,
      &         1X,A,' namelist')
 2164   FORMAT( "12X, 'SPECIES_ATOMS_COUNTS( ,I5,') = (/ ", I3, 
      &         "(I4,',',1X), I4,'/)',' ! ', A,1X,A,' namelist'")
 2165   FORMAT(12X,' SET_ATOMS_COUNTS = .TRUE.',
      &        //9X,'END FUNCTION SET_ATOMS_COUNTS', /6X,'END MODULE MODEL_ATOM_COUNTS')
-2166   FORMAT('!',46X,32(1X,A2,3X))
+2166   FORMAT('!',15X,32(A6,2X))
+2167   FORMAT(/ 12X,'ISPECIES = ', I5,
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%NAME = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%REPRESENTATIVE = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%REPRESENTATION = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%DSSTOX_ID = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%SMILES = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%SPECIES_TYPE = "', A,'"',
+     &        / 12X,'MODEL_SPECIES( ISPECIES )%MOLWT = ', F8.3 )
+
 
          END SUBROUTINE READ_SPECIES_ATOMS            
          SUBROUTINE ARE_THEY_ATOM_SPECIES( )

@@ -1031,20 +1031,20 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
                IF ( TRIM( SPARSE_SPECIES( ISPC ) ) .EQ. TRIM( ATOM_SPECIES( JSPC ) ) ) THEN   ! found
                   WRITE(WRUNIT,'(A,1X,I5)')'! '// TRIM( SPARSE_SPECIES( ISPC ) ),ISPC
                   DO IRX = 1,N_ATOMS
-                      IBUFF(IRX) = INT( SPECIES_ATOMS( JSPC,IRX ) )
+                      DBUFF(IRX) = REAL( SPECIES_ATOMS( JSPC,IRX ),8 ) 
                   END DO 
                   EXIT
                END IF
             END DO
             WRITE( WRUNIT, 1367 ) ISPC
-            CALL WRBF6_FORTRAN90( WRUNIT, 10, N_ATOMS, IBUFF( 1:N_ATOMS ) )
+            CALL WRBF12D_FORTRAN90( WRUNIT, 5, N_ATOMS, DBUFF( 1:N_ATOMS ), 'D' )
          END DO
       ELSE
          WRITE( WRUNIT, 1368 )
       END IF
-1366  FORMAT(  6X, 'INTEGER', 12X, ':: CHEM_SPC_ATOMS( NUMB_MECH_SPC,N_ATOMS )' )
-1367  FORMAT(  6X, 'DATA ( CHEM_SPC_ATOMS( ', I3, :',IRXXN ), IRXXN = 1, N_ATOMS ) / & ' )
-1368  FORMAT(  6X, 'INTEGER', 12X, ':: CHEM_SPC_ATOMS( NUMB_MECH_SPC,N_ATOMS ) = 0 ' )
+1366  FORMAT(  6X, 'REAL( 8 )', 12X, ':: CHEM_SPC_ATOMS( NUMB_MECH_SPC,N_ATOMS )' )
+1367  FORMAT(  6X, 'DATA ( CHEM_SPC_ATOMS( ', I3, ',IRXXN ), IRXXN = 1, N_ATOMS ) / & ' )
+1368  FORMAT(  6X, 'REAL( 8 )', 12X, ':: CHEM_SPC_ATOMS( NUMB_MECH_SPC,N_ATOMS ) = 0.0D0 ' )
 
 
 c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
@@ -1275,8 +1275,8 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       ELSE
 
          WRITE( WRUNIT, 1717 )
-1717     FORMAT( /'! Photolysis table information not available ...'
-     &           /6X, 'INTEGER, PARAMETER', 1X, ':: NPHOTAB = 0' )
+1717     FORMAT( /'! Photolysis table information not available ...')
+C
                                                 
          WRITE( WRUNIT, 1719 )
 1719     FORMAT( /'! Photolysis table information not available ...'
