@@ -118,10 +118,8 @@
       INTEGER         ,ALLOCATABLE :: DESID_DIAG_N_STREAM( : )    ! Number of Streams for each diagnostic file
       LOGICAL         ,ALLOCATABLE :: DESID_DIAG_STREAM_MASK(:,:) ! True if a stream contributes to a diagnostic
       CHARACTER( 16 ) ,ALLOCATABLE :: DESID_DIAG_LOGICAL( : )     ! I/O Logical Name for each diagnostic file
-      CHARACTER( 16 ) ,ALLOCATABLE :: DESID_DIAG_LOGICAL_MIO( : ) ! I/O Logical Name for each diagnostic file
       CHARACTER( 6 )  ,ALLOCATABLE :: DESID_DIAG_FORMAT( : )      ! FALSE/TRUE/2D/3D/2DCOL
       CHARACTER( 300 ),ALLOCATABLE :: DESID_DIAG_FILENAME( : )    ! Filename for diagnostic
-      CHARACTER( 300 ),ALLOCATABLE :: DESID_DIAG_FILENAME_MIO( : )    ! Filename for diagnostic
       CHARACTER( 32 ) ,ALLOCATABLE :: DESID_DIAG_LAB( : )         ! Shorthand Label for Diagnostic
       INTEGER         ,ALLOCATABLE :: DESID_DIAG_LAYS( : )        ! Layers for each diagnostic file
       INTEGER         ,ALLOCATABLE :: DESID_DIAG_SUM( : )
