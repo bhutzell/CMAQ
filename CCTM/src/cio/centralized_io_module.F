@@ -1225,16 +1225,8 @@
 #ifndef mpas
 ! setup initial condition file
           n_i3d = 0
-          IF ( .NOT. OPEN3( ICFILE, FSREAD3, PNAME ) ) THEN
-             XMSG = 'Open failure for ' // ICFILE
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
           n_opened_file = n_opened_file + 1
           f_icon = n_opened_file
-          IF ( .NOT. DESC3( ICFILE ) ) THEN
-             XMSG = 'Could not get description of file  '// ICFILE 
-             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
           call mio_fopen (ICFILE, mio_read_only)
           floc = mio_search (ICFILE)
 
@@ -1271,20 +1263,12 @@
           n_is3d = 0
 
           if (ISAM_NEW_START == 'N') then
-             IF ( .NOT. OPEN3( ISAM_PREVDAY, FSREAD3, PNAME ) ) THEN
-                XMSG = 'Open failure for ' // ISAM_PREVDAY
-                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-             END IF
              n_opened_file = n_opened_file + 1
              f_is_icon = n_opened_file
 
              call mio_fopen (ISAM_PREVDAY, mio_read_only)
              floc = mio_search (ISAM_PREVDAY)
 
-             IF ( .NOT. DESC3( ISAM_PREVDAY ) ) THEN
-                XMSG = 'Could not get description of file  '// ISAM_PREVDAY 
-                CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-             END IF
              call subhfile ( ISAM_PREVDAY, gxoff, gyoff,
      &                       STRTCOLISIC, ENDCOLISIC, STRTROWISIC, ENDROWISIC )
 
@@ -2015,14 +1999,7 @@
                       
                       call mio_time_format_conversion (data_jdate, data_jtime, timestamp)
 
-                      IF ( .NOT. XTRACT3( ISAM_PREVDAY, cio_grid_var_name(v,1),
-     &                                    1, nlays, STRTROWISIC, ENDROWISIC, STRTCOLISIC, ENDCOLISIC, 
-     &                                    data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
-                         XMSG = 'Could not extract ' // ISAM_PREVDAY // ' file'
-                         CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
-                      END IF
-
-                      ! bases on the understanding that ISAM domains is exactly the same as the simulation domain
+                      ! based on the understanding that ISAM domains is exactly the same as the simulation domain
                       call mio_fread (ISAM_PREVDAY, cio_grid_var_name(v,1), pname, tdata_3ds, timestamp)
 
                       cio_grid_data(begin:end) = reshape (tdata_3ds, (/s_cro_ncols * s_cro_nrows * nlays/))

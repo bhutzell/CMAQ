@@ -99,17 +99,6 @@ C Get SENGRID nvars
          NVARS3D = NSPCSD * NPMAX
          NLAYS3D = NLAYS
 
-         FDESC3D = ' '
-         FDESC3D( 1 ) = 'Computational grid instantaneous sensitivities'
-         FDESC3D( 2 ) = '- for scenario continuation.'
-
-         WRITE( LOGDEV,* ) ' '
-         WRITE( LOGDEV,* ) '       State SENGRID File Header Description:'
-         DO K = 1, 2
-            WRITE( LOGDEV,* ) '    => ',
-     &      TRIM( FDESC3D( K ) )
-         END DO
-
 C Create the names of the sensitivity outputs
 
 C Gas species
@@ -194,20 +183,13 @@ c TR species
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
 
-!           CALL LOAD_MIO_FILE ( 'CTM_SENS_1', NLAYS3D, 1, NLAYS3D,
-            CALL LOAD_MIO_FILE ( 'CTM_SENS_MIO', NLAYS3D, 1, NLAYS3D,
+            CALL LOAD_MIO_FILE ( 'CTM_SENS_1', NLAYS3D, 1, NLAYS3D,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
 
 c open the file
-
-            IF ( .NOT. OPEN3( CTM_SENS_1, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not open '
-     &              // TRIM( CTM_SENS_1 )  // ' file'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
 
          END IF   
          RETURN   ! MIO Initialization
@@ -227,39 +209,12 @@ c open the file
          end do
       end do
 
-#ifdef parallel_io
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. FLUSH3 ( CTM_SENS_1 ) ) THEN
-            XMSG = 'Could not flush ' // TRIM(CTM_SENS_1)
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-      END IF
-      CALL SE_BARRIER
-      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( CTM_SENS_1, FSNONIO, PNAME ) ) THEN
-            XMSG = 'Could not open ' // TRIM(CTM_SENS_1)
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-      END IF
-
-      IF ( .NOT. WRITE3( CTM_SENS_1, ALLVAR3, JDATE, JTIME, WRBUFF ) ) THEN
-         XMSG = 'Could not write CTM_SENS_1'
-         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
-#else
-
-      IF ( .NOT. WRITE3( CTM_SENS_1, ALLVAR3, JDATE, JTIME, WRBUFF ) ) THEN
-         XMSG = 'Could not write SENGRID'
-         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
-
-#endif
       call mio_setfile( MET_CRO_3D )
-      call mio_fcreate( 'CTM_SENS_MIO', mio_new_file )
+      call mio_fcreate( CTM_SENS_1, mio_new_file )
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
       do I = 1, NSPCSD * NPMAX 
          write(logdev,*) 'SENGRID: i, name: ', i, senname(i)
-         call mio_fwrite( 'CTM_SENS_MIO', SENNAME( I ),
+         call mio_fwrite( CTM_SENS_1, SENNAME( I ),
      &                    PNAME, WRBUFF( :,:,:,I ), TIME_STAMP )
       end do
       WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )

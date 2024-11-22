@@ -17,7 +17,7 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-      SUBROUTINE SA_ARRAY_INIT(CGRID )
+      SUBROUTINE SA_ARRAY_INIT(IDATE, ITIME, CGRID )
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c20140428 If cold start, write ICON values to ISAM; otherwise,
@@ -48,12 +48,12 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 c.....arguments
 
+      integer, intent( in ) :: idate, itime
       REAL, POINTER :: CGRID( :,:,:,: ) ! for initial CONC
 
 c.....local variables
 
-      INTEGER          C, R, L, S, K              ! loop index
-      INTEGER          N, NSPC, JVOC              ! 20140123
+      INTEGER          C, R, L, S, K, N      ! loop indices
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     program entry
@@ -76,7 +76,7 @@ c.....update isam array according to isam ICON source tag
         END DO ! S
       ELSE
         ! Initialize ISAM array by isam output from previous day
-        CALL CREATE_ICON( )
+        CALL CREATE_ICON( idate, itime )
 
       END IF
 
@@ -86,13 +86,12 @@ c.....update isam array according to isam ICON source tag
 
 C=======================================================================
 
-      SUBROUTINE CREATE_ICON( )
+      SUBROUTINE CREATE_ICON( jdate, jtime )
       
 C**********************************************************************
 C
 C  FUNCTION: [1] read in a ISAM IOAPI output file
-C            [2] Load the last step's ISAM data into ISAM buffer array 
-C
+C            [2] Load the specified ISAM data into ISAM buffer array 
 C
 C**********************************************************************
 
@@ -104,8 +103,9 @@ C**********************************************************************
       
       IMPLICIT NONE 
 
-      
-C.....argument:
+C.....arguments:
+      INTEGER       ::   JDATE   ! current model date, coded YYYYDDD
+      INTEGER       ::   JTIME   ! midpoint model time, coded HHMMSS
 
 c.....local variables:
       
@@ -113,15 +113,11 @@ c.....local variables:
       CHARACTER( 16 ), PARAMETER :: INNAME  = 'ISAM_PREVDAY'
       
       
-      INTEGER       ::  JDATE   ! current model date, coded YYYYDDD
-      INTEGER       ::   JTIME   ! midpoint model time, coded HHMMSS
-
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       INTEGER       :: GXOFF, GYOFF              ! global origin offset from file
       INTEGER, SAVE :: STARTCOL, ENDCOL, STARTROW, ENDROW
 
-      INTEGER       ::   LOGENV
-      INTEGER       ::   C,R,L,S,K,I, floc, lsdate, lstime, ltstep
+      INTEGER       ::   C,R,L,S,K, floc
 
       INTEGER       :: IBGN, JSPCTAG, NSPCTAG
       
@@ -137,7 +133,7 @@ c.....local variables:
 C**********************************************************************
       IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
-         LOGENV = INIT3()
+
 C Get domain decomp info from the emissions file
          CALL SUBHFILE ( INNAME, GXOFF, GYOFF,
      &                   STARTCOL, ENDCOL, STARTROW, ENDROW )
@@ -145,36 +141,8 @@ C Get domain decomp info from the emissions file
       
       EFLAG = .FALSE.
       
-      IF ( .NOT. OPEN3( INNAME, FSREAD3, PNAME) )THEN 
-         WRITE(LOGDEV, *) 'Error: open file failed', INNAME
-         CALL M3EXIT( 'READ_ISAM_ICON', 0, 0, 'Above Fatal Error Encountered', XSTAT2 )
-      ENDIF 
-      
-      
-      IF ( .NOT. DESC3( INNAME ) ) THEN
-         WRITE(LOGDEV, *) 'Error: read', INNAME, 'failed'
-         CALL M3EXIT( 'READ_ISAM_ICON', 0, 0, 'Above Fatal Error Encountered', XSTAT2 )
-      ENDIF 
-
-      call mio_fopen (INNAME, mio_read_only)
-
       floc = mio_search (INNAME)
 
-      call mio_get_global_attr (INNAME, 'SDATE', lsdate)
-      call mio_get_global_attr (INNAME, 'STIME', lstime)
-      call mio_get_global_attr (INNAME, 'TSTEP', ltstep)
-
-cyqwang...begin  Get The last step data
-
-      DO I = 1, mio_file_data(floc)%nsteps-1
-!       CALL NEXTIME( SDATE3D, STIME3D, TSTEP3D )
-        CALL NEXTIME( lsdate, lstime, ltstep)
-      END DO
-
-cyqwang...end
-      
-      JDATE = lSDATE
-      JTIME = lSTIME
       NSPCTAG = mio_file_data(floc)%nvars
 
 Ckrt....assign ISAM_SPEC( nspc_sa, ntag_sa ) to spcname1( nspc_sa )
@@ -187,20 +155,9 @@ Ckrt allocate data-loading array
       TEMP = 0.0
       
       call mio_time_format_conversion (JDATE, JTIME, timestamp)
+      write(logdev,'(A,i7,:,i6,2x,A)') '==c== jdate, jtime, timestamp: ', jdate, jtime, timestamp
 
       DO JSPCTAG = 1, NSPCTAG
-        !KRT: extract sa_conc_1 from previous day
-!       IF ( .NOT. XTRACT3( INNAME, VNAME3D( JSPCTAG ), 
-!    &       1, NLAYS3D, STARTROW, ENDROW, STARTCOL, ENDCOL,
-!    &       JDATE, JTIME, TEMP ) ) THEN
-!              XMSG = 'Read failure:  file ' // INNAME // 
-!    &         ' variable ' // VNAME3D( JSPCTAG ) //
-!    &         ' end of file...'
-!               WRITE(LOGDEV,*) PNAME, JDATE, JTIME,
-!    &          TRIM( XMSG )
-!            CALL M3EXIT( 'READ_ISAM_ICON', 0, 0, 'Above Fatal Error Encountered', XSTAT2 )             
-!       END IF
-        !KRT: identify isam indices from input species names
 
         call mio_fread (INNAME, mio_file_data(floc)%var_name( JSPCTAG ), pname, 
      &                  STARTCOL, ENDCOL, STARTROW, ENDROW, 1, mio_file_data(floc)%nlays,
@@ -252,10 +209,7 @@ Ckrt allocate data-loading array
       
       DEALLOCATE(TEMP)
 
-      If ( .NOT. CLOSE3( INNAME ) ) Then
-         WRITE ( *,* )
-     &     '>>--> ISAM PREVDAY output not closed properly <--<<'
-      End if
+      call mio_close(inname)
       RETURN
            
       END

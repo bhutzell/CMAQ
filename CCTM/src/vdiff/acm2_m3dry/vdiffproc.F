@@ -819,7 +819,7 @@ C WT - write out dry deposition sensitivities
          IF ( FIRST_WRITE_SENS ) THEN
             FIRST_WRITE_SENS = .FALSE.
             call mio_setfile( MET_CRO_2D )
-            call mio_fcreate( 'CTM_SDRYDEP_MIO', mio_new_file )
+            call mio_fcreate( CTM_SDRYDEP_1, mio_new_file )
          END IF
 
          DO V = 1, N_SPC_DDEP
@@ -835,7 +835,7 @@ C WT - write out dry deposition sensitivities
                ENDDO
                WRITE( LOGDEV,'(A)')'SDRYDEP: WRITE3D for ' // TRIM( SPCNAME )
 
-               call mio_fwrite( 'CTM_SDRYDEP_MIO', SPCNAME, PNAME, WRDD, TIME_STAMP )
+               call mio_fwrite( CTM_SDRYDEP_1, SPCNAME, PNAME, WRDD, TIME_STAMP )
             ENDDO
          ENDDO
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )

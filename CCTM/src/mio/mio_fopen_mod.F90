@@ -35,9 +35,7 @@
 
           call mio_get_env (full_name, fname, ' ')
 
-          if ( size(mio_file_data) .eq. 0 ) then
-!         if (mio_n_infiles == 0) then
-!         if (mio_nfiles .eq. 0) then
+          if (mio_nfiles .eq. 0) then
              t = -1
           else
              t = mio_search (full_name, mio_file_data(:)%full_filename, mio_nfiles)

@@ -360,7 +360,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  
   #> Spatial Masks For Emissions Scaling
   #setenv CMAQ_MASKS $SZpath/OCEAN_${MM}_L3m_MC_CHL_chlor_a_12NE3.nc #> horizontal grid-dependent ocean file
-  setenv CMAQ_MASKS $INPDIR/GRIDMASK_STATES_12NE3.nc
+  setenv CMAQ_MASKS $INPDIR/surface/GRIDMASK_STATES_12NE3.nc
 
   #> Gridded Emissions Files 
   setenv N_EMIS_GR 2
@@ -507,11 +507,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
        endif
 
        #> Set Up ISAM Output Filenames
-       setenv SA_ACONC_1      "$OUTDIR/CCTM_SA_ACONC_${CTM_APPL}.nc -v"
-       setenv SA_CONC_1       "$OUTDIR/CCTM_SA_CONC_${CTM_APPL}.nc -v"
-       setenv SA_DD_1         "$OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc -v"
-       setenv SA_WD_1         "$OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc -v"
-       setenv SA_CGRID_1      "$OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc -v"
+       setenv SA_ACONC_1      $OUTDIR/CCTM_SA_ACONC_${CTM_APPL}.nc 
+       setenv SA_CONC_1       $OUTDIR/CCTM_SA_CONC_${CTM_APPL}.nc 
+       setenv SA_DD_1         $OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc
+       setenv SA_WD_1         $OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc
+       setenv SA_CGRID_1      $OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc 
        setenv SA_ACONC_1_MIO  $OUTDIR/CCTM_SA_ACONC_MIO_${CTM_APPL}.nc
        setenv SA_CONC_1_MIO   $OUTDIR/CCTM_SA_CONC_MIO_${CTM_APPL}.nc 
        setenv SA_DD_1_MIO     $OUTDIR/CCTM_SA_DRYDEP_MIO_${CTM_APPL}.nc
@@ -571,10 +571,10 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  endif
 
  setenv CTM_NPMAX       $NPMAX
- setenv CTM_SENS_1      "$OUTDIR/CCTM_SENGRID_${CTM_APPL}.nc -v"
- setenv A_SENS_1        "$OUTDIR/CCTM_ASENS_${CTM_APPL}.nc -v"
- setenv CTM_SWETDEP_1   "$OUTDIR/CCTM_SENWDEP_${CTM_APPL}.nc -v"
- setenv CTM_SDRYDEP_1   "$OUTDIR/CCTM_SENDDEP_${CTM_APPL}.nc -v"
+ setenv CTM_SENS_1      $OUTDIR/CCTM_SENGRID_${CTM_APPL}.nc
+ setenv A_SENS_1        $OUTDIR/CCTM_ASENS_${CTM_APPL}.nc
+ setenv CTM_SWETDEP_1   $OUTDIR/CCTM_SENWDEP_${CTM_APPL}.nc
+ setenv CTM_SDRYDEP_1   $OUTDIR/CCTM_SENDDEP_${CTM_APPL}.nc
  setenv INIT_SENS_1     $S_ICpath/$S_ICfile
  
  

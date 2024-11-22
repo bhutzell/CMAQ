@@ -138,8 +138,9 @@ C Local Variables
             REAL, POINTER                 :: CGRID( :,:,:,: )
          END SUBROUTINE LOAD_CGRID
 #ifdef isam
-         SUBROUTINE SA_ARRAY_INIT ( CGRID )
+         SUBROUTINE SA_ARRAY_INIT ( jdate, jtime, CGRID )
             IMPLICIT NONE
+            integer, intent( in )         :: JDATE, JTIME
             REAL, POINTER                 :: CGRID( :,:,:,: )
          END SUBROUTINE SA_ARRAY_INIT
          SUBROUTINE OP_SA ( JDATE, JTIME, TSTEP, NSTEPS, FNAME )
@@ -259,7 +260,8 @@ C *** Open the aerosol parameters file (diameters and standard deviations).
 
 #ifdef isam
 C Initialize ISAM array
-      CALL SA_ARRAY_INIT ( CGRID )
+!     CALL SA_ARRAY_INIT ( CGRID )
+      CALL SA_ARRAY_INIT ( STDATE, STTIME, CGRID )
 
 C Open SA_CONC_1 and SA_WD_1
       CALL OP_SA ( STDATE, STTIME, TSTEP, 1, SA_CONC_1 )
