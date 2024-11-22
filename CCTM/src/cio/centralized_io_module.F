@@ -5906,35 +5906,35 @@ C Read the various categories of normalized emissions
      &                       startcol, endcol, startrow, endrow )
 
              vname = 'Gamma1'
-             If ( .Not. Xtract3 ( INIT_MEDC_1, vname, 1, 1, startrow, endrow,
-     &                            startcol, endcol, cio_model_sdate, 0, gamma1 ) ) Then
-                Write( mesg,9001 ) vname, INIT_MEDC_1
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             End If
+!             If ( .Not. Xtract3 ( INIT_MEDC_1, vname, 1, 1, startrow, endrow,
+!     &                            startcol, endcol, cio_model_sdate, 0, gamma1 ) ) Then
+!                Write( mesg,9001 ) vname, INIT_MEDC_1
+!                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!             End If
              call mio_fread( INIT_MEDC_1, vname, pname, gamma1, timestamp )
 
              vname = 'Gamma2'
-             If ( .Not. Xtract3 ( INIT_MEDC_1, vname, 1, 1, startrow, endrow,
-     &                            startcol, endcol, cio_model_sdate, 0, gamma2 ) ) Then
-                Write( mesg,9001 ) vname, INIT_MEDC_1
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             End If
+!             If ( .Not. Xtract3 ( INIT_MEDC_1, vname, 1, 1, startrow, endrow,
+!     &                            startcol, endcol, cio_model_sdate, 0, gamma2 ) ) Then
+!                Write( mesg,9001 ) vname, INIT_MEDC_1
+!                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!             End If
              call mio_fread( INIT_MEDC_1, vname, pname, gamma2, timestamp )
 
              vname = 'L1_ANH3'
-             If ( .Not. Xtract3 ( E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                            startcol, endcol, cio_model_sdate, 0, F1_NH4 ) ) Then
-                Write( mesg,9001 ) vname, E2C_CHEM
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             End If
+!             If ( .Not. Xtract3 ( E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                            startcol, endcol, cio_model_sdate, 0, F1_NH4 ) ) Then
+!                Write( mesg,9001 ) vname, E2C_CHEM
+!                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!             End If
              call mio_fread( INIT_MEDC_1, vname, pname, F1_NH4, timestamp )
 
              vname = 'L2_ANH3'
-             If ( .Not. Xtract3 ( E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                            startcol, endcol, cio_model_sdate, 0, F2_NH4 ) ) Then
-                Write( mesg,9001 ) vname, E2C_CHEM
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             End If
+!             If ( .Not. Xtract3 ( E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                            startcol, endcol, cio_model_sdate, 0, F2_NH4 ) ) Then
+!                Write( mesg,9001 ) vname, E2C_CHEM
+!                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!             End If
              call mio_fread( INIT_MEDC_1, vname, pname, F2_NH4, timestamp )
 
              If( .not. GMN_AVAIL ) Then
