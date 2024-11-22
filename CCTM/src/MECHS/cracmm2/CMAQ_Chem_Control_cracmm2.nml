@@ -1,20 +1,25 @@
 !------------------------------------------------------------------------------!
-! Emission Control Interface                                                   !
-!    for the                                                                   !
-! Detailed Emissions Scaling, Isolation, and Diagnostics (DESID) Module,       !
-!    part of the                                                               !
+! Control Interface for the                                                    !                                                              !
+! (1) Detailed Emissions Scaling, Isolation, and Diagnostics (DESID) Module and!
+! (2) Explicit and Lumped Model Output (ELMO) Module                           !
+!    which are part of the                                                     !
 ! Community Multiscale Air Quality (CMAQ) Model                                !
 !    developed and maintained by the                                           !
 ! Center for Environmental Measurement and Modeling (CEMM),                    !
 ! Office of Research and Development (ORD)                                     !
 ! U.S. Environmental Protection Agency (USEPA)                                 !
 !                                                                              !
-! This namelist is consistent with CMAQv5.4 (Release AUGUST 2022)              !
+! This namelist is consistent with CMAQv6.0			               !
 !                                                                              !
-! See CMAQ User's Guide Appendix B (https://github.com/USEPA/CMAQ/blob/main/   !
+! For DESID,                                                                   !
+! see CMAQ User's Guide Appendix B (https://github.com/USEPA/CMAQ/blob/main/   !
 !     DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md)        !
 !     and Murphy et al., Geoscientific Model Development, 14, 3407-3420,       !
 !     https://doi.org/10.5194/gmd-14-3407-2021, 2021.                          !
+!                                                                              !
+! For ELMO,                                                                    !
+! see CMAQ User's Guide Appendix F (https://github.com/USEPA/CMAQ/blob/main/   !
+!     DOCS/Users_Guide/Appendix/CMAQ_UG_appendixF_elmo_output.md)              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -40,7 +45,7 @@
 &Desid_Scaling
  Desid_Rules_nml =
  ! Region      | Stream Label  |Emission | CMAQ-        |Phase/|Scale |Basis |Op  
- !  Label      |               |Surrogate| Species      |Mode  |Factor|      |     
+ !  Label      |               |Variable | Species      |Mode  |Factor|      |     
                                                                              
                             !> DEFAULT MAPPING <!                  
    ! Note: Without default mapping for a species, 
@@ -142,7 +147,7 @@
    'EVERYWHERE', 'ALL'        ,'VROCP4ALK' ,'VROCP4ALK'  ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'VROCP5OXY1','VROCP5OXY1' ,'GAS'  ,1   ,'UNIT','a',
 
-   ! Default Aerosols
+   ! Fine-Mode Aerosols
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'ASO4'        ,'FINE' ,1.  ,'MASS','a', 
    'EVERYWHERE', 'ALL'         ,'PSO4'   ,'ASO4'        ,'FINE' ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'PNH4'   ,'ANH4'        ,'FINE' ,1.  ,'UNIT','a', 
@@ -625,7 +630,7 @@
 !             ->'DEP_COARSE': gas phase and/or particle phase for just the     !
 !                         coarse mode.                                         !
 !         if the COMPOSITE applies to concentration the following options      !
-!         apply:                                                               !
+!         apply:                                                               ! 
 !             ->'GAS': only gas phase species involved                         !
 !             ->'TSP','PM25','PM10','PM1','PM01','PM25to10','FINE','COARSE',   !
 !                'ULTRAFINE','AITKEN','ACCUMULATION','PMAMS':                  !
@@ -1209,7 +1214,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',
                 'DD_ANO3',
 
-'WD_NO3'      , 'Wet Dep of Particulate Nitrate',
+'WD_TSP_NO3'  , 'Wet Dep of Particulate Nitrate',
                 'kg ha-1', 'DEP',
                 'WD_ANO3',
 
@@ -1222,7 +1227,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',
                 'DD_ANH4',
 
-'WD_NH4'      , 'Wet Dep of Particulate Ammonium',
+'WD_TSP_NH4'  , 'Wet Dep of Particulate Ammonium',
                 'kg ha-1', 'DEP',
                 'WD_ANH4',
 
@@ -1235,7 +1240,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',
                 'DD_ASO4',
 
-'WD_SO4'      , 'Wet Dep of Particulate Sulfate',
+'WD_TSP_SO4'  , 'Wet Dep of Particulate Sulfate',
                 'kg ha-1', 'DEP',
                 'WD_ASO4',
 
@@ -1244,7 +1249,7 @@ CMPST =
                 'kg ha-1', 'DEP_FINE',
                 'DD_ATRPN + DD_AHONIT',
 
-'WD_MTNO3'    , 'Wet Dep of Particulate Monoterpene Nitrate',
+'WD_TSP_MTNO3', 'Wet Dep of Particulate Monoterpene Nitrate',
                 'kg ha-1', 'DEP',
                 'WD_ATRPN + WD_AHONIT',
 
@@ -1270,13 +1275,13 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',
                 '0.8373*WD_ASEACAT + 0.0626*WD_ASOIL + 0.0023*WD_ACORS',
 
-'WD_NA'       , 'Wet Dep of Particulate Sodium',
+'WD_TSP_NA'   , 'Wet Dep of Particulate Sodium',
                 'kg ha-1', 'DEP',
                 'WD_ANA + WD_PMC_NA',
 
 'TD_NA'       , 'Total Dep of Particulate Sodium',
                 'kg ha-1', 'DEP',
-                'DD_NA + WD_NA',
+                'DD_NA + WD_TSP_NA',
 
 !-- Chloride --!
 'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride',
@@ -1299,7 +1304,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',
                 'WD_ACL',
 
-'WD_CL'       , 'Wet Dep of Particulate Chloride',
+'WD_TSP_CL'   , 'Wet Dep of Particulate Chloride',
                 'kg ha-1', 'DEP',
                 'WD_PMF_CL + WD_PMC_CL',
 
@@ -1324,7 +1329,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',
                 '0.032*WD_ASEACAT + 0.0838*WD_ASOIL + 0.0562*WD_ACORS',
 
-'WD_CA'       , 'Wet Dep of Particulate Calcium',
+'WD_TSP_CA'   , 'Wet Dep of Particulate Calcium',
                 'kg ha-1', 'DEP',
                 'WD_PMF_CA + WD_PMC_CA',
 
@@ -1332,7 +1337,6 @@ CMPST =
 'DD_PMF_FE'   , 'Dry Dep of Fine-Mode Iron',
                 'kg ha-1', 'DEP_FINE',
                 'DD_AFE',
-
 
 'WD_PMF_FE'   , 'Wet Dep of Fine-Mode Iron',
                 'kg ha-1', 'DEP_FINE',
@@ -1364,7 +1368,7 @@ CMPST =
 'WD_PMF_TI'   , 'Wet Dep of Fine-Mode Titanium',
                 'kg ha-1', 'DEP_FINE',
                 'WD_ATI',
-                                                     
+
 ! Manganese
 'DD_PMF_MN'   , 'Dry Dep of Fine-Mode Manganese',
                 'kg ha-1', 'DEP_FINE',
@@ -1395,7 +1399,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',
                 '0.0997*WD_ASEACAT + 0.0170*WD_ASOIL + 0.0032*WD_ACORS',
 
-'WD_MG'       , 'Wet Dep of Particulate Magnesium',
+'WD_TSP_MG'   , 'Wet Dep of Particulate Magnesium',
                 'kg ha-1', 'DEP',
                 'WD_PMF_MG + WD_PMC_MG',
 
@@ -1420,7 +1424,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',
                 '0.0310*WD_ASEACAT + 0.0242*WD_ASOIL + 0.0176*WD_ACORS',
 
-'WD_K'        , 'Wet Dep of Particulate Potassium',
+'WD_TSP_K'    , 'Wet Dep of Particulate Potassium',
                 'kg ha-1', 'DEP',
                 'WD_PMF_K + WD_PMC_K',
 
@@ -1450,7 +1454,6 @@ CMPST =
 'WD_TNO3'     , 'Wet Dep of Total Nitrate',
                 'kg ha-1', 'DEP',
                 'WD_ANO3 + 0.984*WD_HNO3 + WD_NO3',
-
 
 !-- Total Ammonia --!
 'DD_NHX'      , 'Dry Dep of Total Ammonia',
@@ -1559,44 +1562,6 @@ CMPST =
                 'kgN ha-1', 'DEP',
                 'DD_N_TOT + WD_N_TOT',
 
-!-- Nitrogen Deposition in milliequivalents Nitrogen --!
-!'DD_OXN_TOTMEQ' , 'Dry Dep of Total Oxidized Nitrogen',
-!                  'meqN m-2', 'DEP',
-!                  '7.14*DD_OXN_TOT',
-
-!'WD_OXN_TOTMEQ' , 'Wet Dep of Total Oxidized Nitrogen',
-!                  'meqN m-2', 'DEP',
-!                  '7.14*WD_OXN_TOT',
-
-!'TD_OXN_TOTMEQ' , 'Total Dep of Total Oxidized Nitrogen',
-!                  'meqN m-2', 'DEP',
-!                  'DD_OXN_TOTMEQ + WD_OXN_TOTMEQ',
-
-!'DD_REDN_TOTMEQ', 'Dry Dep of Total Reduced Nitrogen',
-!                  'meqN m-2', 'DEP',
-!                  '7.14*DD_REDN_TOT',
-
-!'WD_REDN_TOTMEQ', 'Wet Dep of Total Reduced Nitrogen',
-!                  'meqN m-2', 'DEP',
-!                  '7.14*WD_REDN_TOT',
-
-!'TD_REDN_TOTMEQ', 'Total Dep of Total Reduced Nitrogen',
-!                  'meqN m-2', 'DEP',
-!                  'DD_REDN_TOTMEQ + WD_REDN_TOTMEQ',
-
-!'DD_N_TOTMEQ'   , 'Dry Dep of Total Nitrogen',
-!                  'meqN m-2', 'DEP',
-!                  '7.14*DD_N_TOT',
-
-!'WD_N_TOTMEQ'   , 'Wet Dep of Total Nitrogen',
-!                  'meqN m-2', 'DEP',
-!                  '7.14*WD_N_TOT',
-
-!'TD_N_TOTMEQ'   , 'Total Dep of Total Nitrogen',
-!                  'meqN m-2', 'DEP',
-!                  'DD_N_TOTMEQ + WD_N_TOTMEQ',
-
-
 !---------------------------!
 !**** Sulfur Deposition ****!
 !---------------------------!
@@ -1627,31 +1592,4 @@ CMPST =
 !                  'kgS ha-1', 'DEP',
 !                  'DD_S_SEA + WD_S_SEA',
 
-!-- Sulfur Deposition in milliequivalents Sulfur --!
-!'DD_S_TOTMEQ'   , 'Dry Dep of Total Sulfur',
-!                  'meqS m-2', 'DEP',
-!                  '6.24*DD_S_TOT',
-
-!'WD_S_TOTMEQ'   , 'Wet Dep of Total Sulfur',
-!                  'meqS m-2', 'DEP',
-!                  '6.24*WD_S_TOT',
-
-!'TD_S_TOTMEQ'   , 'Total Dep of Total Sulfur',
-!                  'meqS m-2', 'DEP',
-!                  'DD_S_TOTMEQ + WD_S_TOTMEQ',
-
-!'DD_S_SEAMEQ'   , 'Dry Dep of Sea Spray Sulfur',
-!                  'meqS m-2', 'DEP',
-!                   '6.24*DD_S_SEA',
-
-!'WD_S_SEAMEQ'   , 'Wet Dep of Sea Spray Sulfur',
-!                  'meqS m-2', 'DEP',
-!                  '6.24*WD_S_SEA',
-
-!'TD_S_SEAMEQ'   , 'Total Dep of Sea Spray Sulfur',
-!                  'meqS m-2', 'DEP',
-!                  'DD_S_SEAMEQ + WD_S_SEAMEQ',
-
 /
-                                                
-

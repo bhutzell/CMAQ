@@ -378,7 +378,7 @@ CMPST =
 !-- Organic Composites --!
 'VOC'         , 'Volatile Organic Compound (VOC) Concentration',
                 'ppmC', 'GAS',
-                'PAR + 2.0*ETHA + 3.0*PRPA + MEOH + 2.0*ETH + 2.0*ETOH + 2.0*OLE + 3.0*ACET + 7.0*TOL + 8.0*XYLMN + 6.0*BENZENE + FORM + 3.0*GLY + 4.0*KET + 2.0*ETHY + 2.0*ALD2 + 4.0*IOLE + 2.0*ALDX + 5.0*ISOP + 10.0*TERP + 10.0*NAPH + 10.0*APIN'
+                'PAR + 2.0*ETHA + 3.0*PRPA + MEOH + 2.0*ETH + 2.0*ETOH + 2.0*OLE + 3.0*ACET + 7.0*TOL + 8.0*XYLMN + 6.0*BENZENE + FORM + 3.0*GLY + 4.0*KET + 2.0*ETHY + 2.0*ALD2 + 4.0*IOLE + 2.0*ALDX + 5.0*ISOP + 10.0*TERP + 10.0*NAPH + 10.0*APIN',
 
 !---------------------------------!
 !**** Particle Concentrations ****!
@@ -526,7 +526,7 @@ CMPST =
                 'ug m-3', 'FINE', 
                 'AMT1 + AMT2 + AMT3 + AMT4 + AMT5 + AMT6',
 
-'PMF_TC'      , 'Total Carbon (OC + EC)'
+'PMF_TC'      , 'Total Carbon (OC + EC)',
                 'ug m-3', 'FINE', 
                 'PMF_OC + PMF_EC',
 
@@ -705,7 +705,7 @@ CMPST =
                 'ug m-3', 'PM25', 
                 '0.05263 * AH3OP',
 
-'PM25_TC'     , 'PM2.5 Total Carbon (OC + EC)'
+'PM25_TC'     , 'PM2.5 Total Carbon (OC + EC)',
                 'ug m-3', 'PM25', 
                 'PM25_OC + PM25_EC',
 
@@ -856,7 +856,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 'DD_ANO3',
 
-'WD_NO3'  , 'Wet Dep of Particulate Nitrate', 
+'WD_TSP_NO3'  , 'Wet Dep of Particulate Nitrate', 
                 'kg ha-1', 'DEP', 
                 'WD_ANO3',
 
@@ -869,7 +869,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 'DD_ANH4',
 
-'WD_NH4'      , 'Wet Dep of Particulate Ammonium', 
+'WD_TSP_NH4'  , 'Wet Dep of Particulate Ammonium', 
                 'kg ha-1', 'DEP', 
                 'WD_ANH4',
 
@@ -882,7 +882,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 'DD_ASO4',
 
-'WD_SO4'      , 'Wet Dep of Particulate Sulfate', 
+'WD_TSP_SO4'  , 'Wet Dep of Particulate Sulfate', 
                 'kg ha-1', 'DEP', 
                 'WD_ASO4',
 
@@ -891,7 +891,7 @@ CMPST =
                 'kg ha-1', 'DEP_FINE', 
                 'DD_AMTNO3',
 
-'WD_MTNO3'    , 'Wet Dep of Particulate Monoterpene Nitrate', 
+'WD_TSP_MTNO3', 'Wet Dep of Particulate Monoterpene Nitrate', 
                 'kg ha-1', 'DEP', 
                 'WD_AMTNO3',
 
@@ -917,13 +917,13 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.8373*WD_ASEACAT + 0.0626*WD_ASOIL + 0.0023*WD_ACORS',
 
-'WD_NA'       , 'Wet Dep of Particulate Sodium', 
+'WD_TSP_NA'   , 'Wet Dep of Particulate Sodium', 
                 'kg ha-1', 'DEP', 
                 'WD_ANA + WD_PMC_NA',
 
 'TD_NA'       , 'Total Dep of Particulate Sodium', 
                 'kg ha-1', 'DEP', 
-                'DD_NA + WD_NA',
+                'DD_NA + WD_TSP_NA',
 
 !-- Chloride --!
 'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
@@ -959,7 +959,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.032*WD_ASEACAT + 0.0838*WD_ASOIL + 0.0562*WD_ACORS',
 
-'WD_CA'    , 'Wet Dep of Particulate Calcium', 
+'WD_TSP_CA'   , 'Wet Dep of Particulate Calcium', 
                 'kg ha-1', 'DEP', 
                 'WD_PMF_CA + WD_PMC_CA',
 
@@ -1029,7 +1029,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.0997*WD_ASEACAT + 0.0170*WD_ASOIL + 0.0032*WD_ACORS',
 
-'WD_MG'       , 'Wet Dep of Particulate Magnesium', 
+'WD_TSP_MG'   , 'Wet Dep of Particulate Magnesium', 
                 'kg ha-1', 'DEP', 
                 'WD_PMF_MG + WD_PMC_MG',
 
@@ -1054,7 +1054,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.0310*WD_ASEACAT + 0.0242*WD_ASOIL + 0.0176*WD_ACORS',
 
-'WD_K'        , 'Wet Dep of Particulate Potassium', 
+'WD_TSP_K'    , 'Wet Dep of Particulate Potassium', 
                 'kg ha-1', 'DEP', 
                 'WD_PMF_K + WD_PMC_K',
 
@@ -1192,44 +1192,6 @@ CMPST =
                 'kgN ha-1', 'DEP', 
                 'DD_N_TOT + WD_N_TOT',
 
-!-- Nitrogen Deposition in milliequivalents Nitrogen --!
-'DD_OXN_TOTMEQ' , 'Dry Dep of Total Oxidized Nitrogen', 
-                  'meqN m-2', 'DEP', 
-                  '7.14*DD_OXN_TOT',
-
-'WD_OXN_TOTMEQ' , 'Wet Dep of Total Oxidized Nitrogen', 
-                  'meqN m-2', 'DEP', 
-                  '7.14*WD_OXN_TOT',
-
-'TD_OXN_TOTMEQ' , 'Total Dep of Total Oxidized Nitrogen', 
-                  'meqN m-2', 'DEP', 
-                  'DD_OXN_TOTMEQ + WD_OXN_TOTMEQ',
-
-'DD_REDN_TOTMEQ', 'Dry Dep of Total Reduced Nitrogen', 
-                  'meqN m-2', 'DEP', 
-                  '7.14*DD_REDN_TOT',
-
-'WD_REDN_TOTMEQ', 'Wet Dep of Total Reduced Nitrogen', 
-                  'meqN m-2', 'DEP', 
-                  '7.14*WD_REDN_TOT',
-
-'TD_REDN_TOTMEQ', 'Total Dep of Total Reduced Nitrogen', 
-                  'meqN m-2', 'DEP', 
-                  'DD_REDN_TOTMEQ + WD_REDN_TOTMEQ',
-
-'DD_N_TOTMEQ'   , 'Dry Dep of Total Nitrogen', 
-                  'meqN m-2', 'DEP', 
-                  '7.14*DD_N_TOT',
-
-'WD_N_TOTMEQ'   , 'Wet Dep of Total Nitrogen', 
-                  'meqN m-2', 'DEP', 
-                  '7.14*WD_N_TOT',
-
-'TD_N_TOTMEQ'   , 'Total Dep of Total Nitrogen', 
-                  'meqN m-2', 'DEP', 
-                  'DD_N_TOTMEQ + WD_N_TOTMEQ',
-
-
 !---------------------------!
 !**** Sulfur Deposition ****!
 !---------------------------!
@@ -1260,29 +1222,4 @@ CMPST =
                   'kgS ha-1', 'DEP', 
                   'DD_S_SEA + WD_S_SEA',
 
-!-- Sulfur Deposition in milliequivalents Sulfur --!
-'DD_S_TOTMEQ'   , 'Dry Dep of Total Sulfur', 
-                  'meqS m-2', 'DEP', 
-                  '6.24*DD_S_TOT',
-
-'WD_S_TOTMEQ'   , 'Wet Dep of Total Sulfur', 
-                  'meqS m-2', 'DEP', 
-                  '6.24*WD_S_TOT',
-
-'TD_S_TOTMEQ'   , 'Total Dep of Total Sulfur', 
-                  'meqS m-2', 'DEP', 
-                  'DD_S_TOTMEQ + WD_S_TOTMEQ',
-
-'DD_S_SEAMEQ'   , 'Dry Dep of Sea Spray Sulfur', 
-                  'meqS m-2', 'DEP', 
-                   '6.24*DD_S_SEA',
-
-'WD_S_SEAMEQ'   , 'Wet Dep of Sea Spray Sulfur', 
-                  'meqS m-2', 'DEP', 
-                  '6.24*WD_S_SEA',
-
-'TD_S_SEAMEQ'   , 'Total Dep of Sea Spray Sulfur', 
-                  'meqS m-2', 'DEP', 
-                  'DD_S_SEAMEQ + WD_S_SEAMEQ',
-                
 /        

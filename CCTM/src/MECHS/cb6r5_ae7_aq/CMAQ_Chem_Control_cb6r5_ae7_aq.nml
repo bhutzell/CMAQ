@@ -1,20 +1,25 @@
 !------------------------------------------------------------------------------!
-! Emission Control Interface                                                   !
-!    for the                                                                   !
-! Detailed Emissions Scaling, Isolation, and Diagnostics (DESID) Module,       !
-!    part of the                                                               !
+! Control Interface for the                                                    !                                                              !
+! (1) Detailed Emissions Scaling, Isolation, and Diagnostics (DESID) Module and!
+! (2) Explicit and Lumped Model Output (ELMO) Module                           !
+!    which are part of the                                                     !
 ! Community Multiscale Air Quality (CMAQ) Model                                !
 !    developed and maintained by the                                           !
 ! Center for Environmental Measurement and Modeling (CEMM),                    !
 ! Office of Research and Development (ORD)                                     !
 ! U.S. Environmental Protection Agency (USEPA)                                 !
 !                                                                              !
-! This namelist is consistent with CMAQv5.4 (Release AUGUST 2022)              !
+! This namelist is consistent with CMAQv6.0			               !
 !                                                                              !
-! See CMAQ User's Guide Appendix B (https://github.com/USEPA/CMAQ/blob/main/   !
+! For DESID,                                                                   !
+! see CMAQ User's Guide Appendix B (https://github.com/USEPA/CMAQ/blob/main/   !
 !     DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md)        !
 !     and Murphy et al., Geoscientific Model Development, 14, 3407-3420,       !
 !     https://doi.org/10.5194/gmd-14-3407-2021, 2021.                          !
+!                                                                              !
+! For ELMO,                                                                    !
+! see CMAQ User's Guide Appendix F (https://github.com/USEPA/CMAQ/blob/main/   !
+!     DOCS/Users_Guide/Appendix/CMAQ_UG_appendixF_elmo_output.md)              !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -171,16 +176,16 @@
    'EVERYWHERE', 'ALL'    ,'PMFINE_OTHR' ,'AOTHR'       ,'FINE',1.   ,'UNIT','a', 
 
    ! Wind-Blown Dust and Sea Spray Scaling
-   ! Coarse Components                                               
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SO4','ASO4'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NO3','ANO3'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CL' ,'ACL'       ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a', 
-   
+   ! Coarse Components
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SO4','ASO4'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NO3','ANO3'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CL' ,'ACL'       ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a',
+
 /
- 
+
 !------------------------------------------------------------------------------!
 ! Emissions Scaling Family Definitions                                         !
 !    This component includes definitions for families of CMAQ chemical species !
@@ -210,8 +215,6 @@
 ! ChemFamilyUnits(1)    = 'PPMV'
 ! ChemFamilyMembers(1,:)= 'VSVOC1','ASVOA1J','ASVOA1I'
 /
-
-
 
 !------------------------------------------------------------------------------!
 ! ELMO COMPOSITE Variable Definitions                                          !
@@ -274,7 +277,7 @@
 !    N_MAX_COMPONENTS - must be equal to or larger than the largest number of  !
 !                       components of any COMPOSITE definition.                !
 !------------------------------------------------------------------------------!
-    
+
 &COMPOSITE_INIT
   N_MAX_COMPOSITES = 300
   N_MAX_COMPONENTS = 50
@@ -1165,7 +1168,7 @@ CMPST =
 !---------------------------!
 !**** Sulfur Deposition ****!
 !---------------------------!
-   
+
 !-- Total Sulfur --!
 'DD_S_TOT'      , 'Dry Dep of Total Sulfur', 
                   'kgS ha-1', 'DEP', 
