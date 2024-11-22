@@ -26,7 +26,6 @@
           found = .false.
           do while ((.not. found) .and. (i < mio_nfiles))
              i = i + 1
-!  write (6, *) ' ==d== search ', i, '==', trim(fname), '==', trim(mio_file_data(i)%filename), '=='
              if (fname == mio_file_data(i)%filename) then
                 found = .true.
              end if

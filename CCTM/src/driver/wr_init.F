@@ -38,7 +38,7 @@ C-----------------------------------------------------------------------
       USE STD_CONC              ! standard CONC
       USE UTILIO_DEFN
       use mio_module
-      USE RUNTIME_VARS, only: io_mode
+!     USE RUNTIME_VARS, only: io_mode
 
 #ifndef mpas
 #ifdef parallel
@@ -106,7 +106,7 @@ C (initial data assumed to be in correct output units)
       call mio_setfile( MET_CRO_3D )
       if (conc_subset_layer) mio_nlays = C_NLAYS
 
-      call mio_fcreate( 'CTM_CONC_MIO', io_mode )
+      call mio_fcreate( 'CTM_CONC_MIO', mio_new_file )
 
       if (conc_subset_layer) then
          if (mype == 0) then

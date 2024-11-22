@@ -66,9 +66,6 @@
                               start = mystart,  &
                               count = mycount)
 
-!       write (mio_logdev, '(a20, 15i8, 20e15.8)') ' ==d== get data 1d a ', mystart, mycount, stat
-!       write (mio_logdev, '(a20, 20e15.8)') ' ==d== get data 1d b ', minval(data), maxval(data), sum(data)
-
           if (stat .eq. 0) then
              success = .true.
           else

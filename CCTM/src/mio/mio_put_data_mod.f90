@@ -65,9 +65,6 @@
                               start = mystart,  &
                               count = mycount)
 
-!       write (mio_logdev, '(a18, 20i8)') ' ==d== put 1d b ', mystart, mycount, stat
-!       write (mio_logdev, '(a18, 10e15.8)') ' ==d== put 1d c ', minval(data), maxval(data), sum(data)
-
           if (stat .eq. 0) then
              success = .true.
           else
@@ -109,8 +106,6 @@
           logical :: success
 
           integer :: stat
-
-!    write (6, *) ' ==d== put 3d a ', fid, vid
 
           stat = nf90_put_var(fid,              &
                               vid,              &

@@ -20,18 +20,20 @@
           module procedure mio_fread_0d_real,         &
                            mio_fread_1d_real,         &
                            mio_fread_2d_real,         &
+                           mio_fread_2d_real_bdy,     &
                            mio_fread_3d_real,         &
-                           mio_fread_3d_lay_real,     &
+                           mio_fread_3d_real_sub,     &
+                           mio_fread_3d_real_lay,     &
                            mio_fread_0d_double,       &
                            mio_fread_1d_double,       &
                            mio_fread_2d_double,       &
                            mio_fread_3d_double,       &
-                           mio_fread_3d_lay_double,   &
+                           mio_fread_3d_double_lay,   &
                            mio_fread_0d_int,          &
                            mio_fread_1d_int,          &
                            mio_fread_2d_int,          &
                            mio_fread_3d_int,          &
-                           mio_fread_3d_lay_int,      &
+                           mio_fread_3d_int_lay,      &
                            mio_fread_char
         end interface
 
@@ -162,25 +164,14 @@
                       else if (mio_parallelism .eq. mio_pseudo) then
                          allocate (mio_mpas_input_1d_data(mycount(1)), stat=stat)
 
-!       write (mio_logdev, '(a18, a16, 2x, a16, 6i5, i10, 10i5)') ' ==d== stk mio 1d ', trim(fname), trim(vname)
-!       write (mio_logdev, '(a18, 5i5, i10, 10i5)') ' ==d== stk mio 1d ', mystart, mycount
                          if (.not. mio_get_data (mio_file_data(floc)%fileid,                   &
                                                  mio_file_data(floc)%var_id(v),                &
                                                  mystart, mycount, mio_mpas_input_1d_data) ) then
                             lerror = .true.
                          else
-!       write (mio_logdev, '(a20, 5i8, 2e15.8)') ' ==d== stk mio 1d a ', mio_mype, mio_mpas_dmap(0, mio_mype), &
-!        size(mio_mpas_input_1d_data), &
-!        minval(mio_mpas_dmap(1:mio_mpas_dmap(0, mio_mype), mio_mype)), &
-!        maxval(mio_mpas_dmap(1:mio_mpas_dmap(0, mio_mype), mio_mype)), &
-!        minval(mio_mpas_input_1d_data), maxval(mio_mpas_input_1d_data) 
                             do i = 1, mio_mpas_dmap(0, mio_mype)
                                data(i) = mio_mpas_input_1d_data(mio_mpas_dmap(i, mio_mype))
                             end do
-!       write (mio_logdev, '(a20, 8e15.8)') ' ==d== stk mio 1d b ', &
-!         minval(data(1:mio_mpas_dmap(0, mio_mype))), &
-!         maxval(data(1:mio_mpas_dmap(0, mio_mype))), &
-!         sum(data(1:mio_mpas_dmap(0, mio_mype)))
                          end if
                          deallocate (mio_mpas_input_1d_data)
                       end if
@@ -215,7 +206,6 @@
                                               mystart, mycount, data) ) then
                          lerror = .true.
                       end if
-!       write (mio_logdev, '(a20, 20e15.8)') ' ==d== stk mio 1d h ', minval(data), maxval(data), sum(data)
                    end if
                 end if
              end if
@@ -240,7 +230,7 @@
           character (*), intent(in), optional :: timestamp
 
           character (17), parameter :: pname = 'mio_fread_2d_real'
-          integer :: i, t, v, mystart(5), mycount(5), floc, stat
+          integer :: i, t, v, mystart(5), mycount(5), floc, stat, pos
           logical :: lerror = .false.
           real, allocatable :: mio_mpas_input_2d_data (:,:)
 
@@ -306,23 +296,35 @@
                          mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
                       else if (mio_parallelism .eq. mio_pseudo) then
                          if (mio_file_data(floc)%grid_type .eq. 'c') then
-                            mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, 1)
-                            mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, 1)
-                            mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, 1)
-                            mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, 1)
+                            pos = 1
                          else if (mio_file_data(floc)%grid_type .eq. 'd') then
-                            mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, 2)
-                            mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, 2)
-                            mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, 2)
-                            mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, 2)
+                            pos = 2
                          end if
+
+                         mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, pos)
+                         mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, pos)
+                         mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, pos)
+                         mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, pos)
                       end if
 
-                      if (.not. mio_get_data (mio_file_data(floc)%fileid,      &
-                                              mio_file_data(floc)%var_id(v),   &
-                                              mystart, mycount, data) ) then
+!                     if (.not. mio_get_data (mio_file_data(floc)%fileid,      &
+!                                             mio_file_data(floc)%var_id(v),   &
+!                                             mystart, mycount, data) ) then
+!                        lerror = .true.
+!                     end if
+
+                      stat = nf90_get_var(mio_file_data(floc)%fileid,              &
+                                          mio_file_data(floc)%var_id(v),           &
+                                          data,                                    &
+                                          start = mystart,                         &
+                                          count = mycount)
+
+                      if (stat .ne. 0) then
+                         write (mio_logdev, *) ' Error in routine mio_get_data_2d_real'
+                         write (mio_logdev, *) '       due to ', trim(nf90_strerror(stat))
                          lerror = .true.
                       end if
+
                    end if
                 end if
              end if
@@ -336,6 +338,80 @@
           end if
 
         end subroutine mio_fread_2d_real
+
+! --------------------------------------------------------------------------------------------
+        subroutine mio_fread_2d_real_bdy (fname, vname, caller, data, bdy_size, timestamp)
+
+! this routine can be removed in the future once parallelism is
+! determined w.r.t. individual variable rather than entire model
+
+          character (*), intent(in) :: fname
+          character (*), intent(in) :: vname
+          real, intent(out)         :: data(:,:)
+          character (*), intent(in) :: caller
+          integer, intent(in)       :: bdy_size
+          character (*), intent(in), optional :: timestamp
+
+          character (17), parameter :: pname = 'mio_fread_2d_real_bdy'
+          integer :: i, t, v, mystart(5), mycount(5), floc, stat, pos
+          logical :: lerror = .false.
+          real, allocatable :: mio_mpas_input_2d_data (:,:)
+
+          floc = mio_search (fname)
+
+          if (floc < 0) then
+             write (mio_logdev, *) ' Error: in routine ', trim(pname)
+             write (mio_logdev, *) '        cannot find file ', trim(fname)
+             lerror = .true.
+          else
+
+             if (mio_file_data(floc)%link .ne. -1) then
+                floc = mio_file_data(floc)%link
+             end if
+
+             v = mio_search (vname, mio_file_data(floc)%var_name, mio_file_data(floc)%fnvars)
+
+             if (v < 0) then
+                write (mio_logdev, *) ' Error: in routine ', trim(pname)
+                write (mio_logdev, *) '        cannot find variable ', trim(vname)
+                lerror = .true.
+             else
+                if (present(timestamp)) then
+                   t = mio_search (timestamp, mio_file_data(floc)%timestamp, mio_file_data(floc)%nsteps)
+                else
+                   t = 1
+                end if
+
+                if (t < 0) then
+                   write (mio_logdev, *) ' Error: requested timestamp ', trim(timestamp), ' does not exist'
+                   lerror = .true.
+                else
+
+                   mystart = 1
+                   mycount = 1
+                   mystart(3) = t
+
+! for the time being it is for IOAPI3 type file
+                   mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
+
+                   if (.not. mio_get_data (mio_file_data(floc)%fileid,      &
+                                           mio_file_data(floc)%var_id(v),   &
+                                           mystart, mycount, data) ) then
+                      lerror = .true.
+                   end if
+
+                end if
+             end if
+          end if
+
+          if (lerror) then
+             write (mio_logdev, *) ' Calling from ', trim(caller)
+             write (mio_logdev, *) ' Abort in routine ', trim(pname), ' due to'
+             write (mio_logdev, *) ' an error in reading ', trim(vname), ' from file ', trim(fname)
+             stop
+          end if
+
+        end subroutine mio_fread_2d_real_bdy
 
 ! --------------------------------------------------------------------------------------------
         subroutine mio_fread_3d_real (fname, vname, caller, data, timestamp)
@@ -380,14 +456,12 @@
                    lerror = .true.
                 else
 
-! write (6, *) ' ==d== fread 3d e '
                    mystart = 1
                    mycount = 1
                    mystart(4) = t
 
-!   write (6, '(a18, i3, a16, i6, a16, i6, 3i5, 2a2)') ' ==d== fread 3d m ', v, trim(fname), mio_file_data(floc)%fileid, &
-!    trim(vname), mio_file_data(floc)%var_id(v), mio_parallelism, mio_serial, mio_pseudo, mio_file_data(floc)%grid_type, '=='
-                   if (mio_parallelism .eq. mio_serial) then
+!                  if (mio_parallelism .eq. mio_serial) then
+                   if ((mio_parallelism .eq. mio_serial) .or. (fname(1:5) == 'STK_G')) then
                       mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
                    else if (mio_parallelism .eq. mio_pseudo) then
                       if (mio_file_data(floc)%grid_type .eq. 'c') then
@@ -405,19 +479,11 @@
 
                    mycount(3) = mio_file_data(floc)%var_dimsize(3,v)
 
-!   write (6, '(a18, 10i5)') ' ==d== fread 3d r ', size(data,1), size(data,2), size(data,3)
-
                    if (.not. mio_get_data (mio_file_data(floc)%fileid,      &
                                            mio_file_data(floc)%var_id(v),   &
                                            mystart, mycount, data) ) then
                       lerror = .true.
                    end if
-! if (size(data,3) == 1) then
-!   write (6, '(a18, 10e15.8)') ' ==d== fread 3d t ', minval(data(:,:,1)), maxval(data(:,:,1))
-! else
-!   write (6, '(a18, 10e15.8)') ' ==d== fread 3d u ', minval(data(:,:,1)), maxval(data(:,:,1)), &
-! minval(data(:,:,3)), maxval(data(:,:,3)), minval(data(:,:,5)), maxval(data(:,:,5))
-! end if
                 end if
              end if
           end if
@@ -432,7 +498,86 @@
         end subroutine mio_fread_3d_real
 
 ! --------------------------------------------------------------------------------------------
-        subroutine mio_fread_3d_lay_real (fname, vname, caller, data, beg_lay, end_lay, timestamp)
+        subroutine mio_fread_3d_real_sub (fname, vname, caller, strcol, endcol, &
+                                          strrow, endrow, strlay, endlay, data, timestamp)
+!       this routine is for CMAQ application only
+
+          character (*), intent(in) :: fname
+          character (*), intent(in) :: vname
+          real, intent(out)         :: data(:,:,:)
+          character (*), intent(in) :: caller
+          integer, intent(in)       :: strcol, endcol, strrow, endrow, strlay, endlay
+          character (*), intent(in), optional :: timestamp
+
+          character (17), parameter :: pname = 'mio_fread_3d_real_sub'
+          integer :: i, t, v, mystart(5), mycount(5), floc, stat, pos
+          logical :: lerror = .false.
+          character (80) :: err_message
+
+          floc = mio_search (fname)
+
+          if (floc < 0) then
+             err_message = '        cannot find file ' // trim(fname)
+             lerror = .true.
+          else
+
+             if (mio_file_data(floc)%link .ne. -1) then
+                floc = mio_file_data(floc)%link
+             end if
+
+             v = mio_search (vname, mio_file_data(floc)%var_name, mio_file_data(floc)%fnvars)
+
+             if (v < 0) then
+                err_message = '        cannot find variable ' // trim(vname)
+                lerror = .true.
+             else
+                if (present(timestamp)) then
+                   t = mio_search (timestamp, mio_file_data(floc)%timestamp, mio_file_data(floc)%nsteps)
+                else
+                   t = 1
+                end if
+
+                if (t < 0) then
+                   err_message = ' Error: requested timestamp ' // trim(timestamp) // ' does not exist'
+                   lerror = .true.
+                else
+
+                   mystart = 1
+                   mycount = 1
+                   mystart(4) = t
+
+                   if (mio_file_data(floc)%file_format .eq. mio_ioapi3_format) then
+                      mycount(1) = endcol - strcol + 1
+                      mycount(2) = endrow - strrow + 1
+                      mycount(3) = endlay - strlay + 1
+                      mystart(1) = strcol
+                      mystart(2) = strrow
+                      mystart(3) = strlay
+
+                      if (.not. mio_get_data (mio_file_data(floc)%fileid,      &
+                                              mio_file_data(floc)%var_id(v),   &
+                                              mystart, mycount, data) ) then
+                         lerror = .true.
+                      end if
+                   else
+                      err_message = ' Applied mio_fread_2d_real_sub to the wrong file type'
+                      lerror = .true.
+                   end if
+                end if
+             end if
+          end if
+
+          if (lerror) then
+             write (mio_logdev, *) ' Calling from ', trim(caller)
+             write (mio_logdev, *) ' Abort in routine ', trim(pname), ' due to'
+             write (mio_logdev, *) trim(err_message)
+             stop
+          end if
+
+        end subroutine mio_fread_3d_real_sub
+
+! --------------------------------------------------------------------------------------------
+        subroutine mio_fread_3d_real_lay (fname, vname, caller, data, beg_lay, end_lay, timestamp)
 
           character (*), intent(in) :: fname
           character (*), intent(in) :: vname
@@ -441,7 +586,7 @@
           character (*), intent(in) :: caller
           character (*), intent(in), optional :: timestamp
 
-          character (21), parameter :: pname = 'mio_fread_3d_lay_real'
+          character (21), parameter :: pname = 'mio_fread_3d_real_lay'
           integer :: t, v, mystart(5), mycount(5), floc, loc_slay, loc_nlays
           logical :: lerror = .false.
 
@@ -493,17 +638,17 @@
                    if (mio_parallelism .eq. mio_serial) then
                       mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
                    else if (mio_parallelism .eq. mio_pseudo) then
-                      if (mio_file_data(floc)%grid_type .eq. 'c') then
+!                     if (mio_file_data(floc)%grid_type .eq. 'c') then
                          mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, 1)
                          mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, 1)
                          mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, 1)
                          mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, 1)
-                      else if (mio_file_data(floc)%grid_type .eq. 'd') then
-                         mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, 2)
-                         mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, 2)
-                         mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, 2)
-                         mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, 2)
-                      end if
+!                     else if (mio_file_data(floc)%grid_type .eq. 'd') then
+!                        mycount(1) = mio_file_data(floc)%ncols_pe(mio_mype_p1, 2)
+!                        mycount(2) = mio_file_data(floc)%nrows_pe(mio_mype_p1, 2)
+!                        mystart(1) = mio_file_data(floc)%colde_pe(1, mio_mype_p1, 2)
+!                        mystart(2) = mio_file_data(floc)%rowde_pe(1, mio_mype_p1, 2)
+!                     end if
                    end if
 
                    mystart(3) = loc_slay
@@ -525,7 +670,7 @@
              stop
           end if
 
-        end subroutine mio_fread_3d_lay_real
+        end subroutine mio_fread_3d_real_lay
 
 ! --------------------------------------------------------------------------------------------
         subroutine mio_fread_0d_double (fname, vname, caller, data, timestamp)
@@ -895,7 +1040,7 @@
         end subroutine mio_fread_3d_double
 
 ! --------------------------------------------------------------------------------------------
-        subroutine mio_fread_3d_lay_double (fname, vname, caller, data, beg_lay, end_lay, timestamp)
+        subroutine mio_fread_3d_double_lay (fname, vname, caller, data, beg_lay, end_lay, timestamp)
 
           character (*), intent(in) :: fname
           character (*), intent(in) :: vname
@@ -904,7 +1049,7 @@
           character (*), intent(in) :: caller
           character (*), intent(in), optional :: timestamp
 
-          character (23), parameter :: pname = 'mio_fread_3d_lay_double'
+          character (23), parameter :: pname = 'mio_fread_3d_double_lay'
           integer :: t, v, mystart(5), mycount(5), floc, loc_slay, loc_nlays
           logical :: lerror = .false.
 
@@ -988,7 +1133,7 @@
              stop
           end if
 
-        end subroutine mio_fread_3d_lay_double
+        end subroutine mio_fread_3d_double_lay
 
 ! --------------------------------------------------------------------------------------------
         subroutine mio_fread_0d_int (fname, vname, caller, data, timestamp)
@@ -1325,7 +1470,8 @@
                    mycount = 1
                    mystart(4) = t
 
-                   if (mio_parallelism .eq. mio_serial) then
+!                  if (mio_parallelism .eq. mio_serial) then
+                   if ((mio_parallelism .eq. mio_serial) .or. (fname(1:5) == 'STK_G')) then
                       mycount(1:2) = mio_file_data(floc)%var_dimsize(1:2,v)
                    else if (mio_parallelism .eq. mio_pseudo) then
                       if (mio_file_data(floc)%grid_type .eq. 'c') then
@@ -1362,7 +1508,7 @@
         end subroutine mio_fread_3d_int
 
 ! --------------------------------------------------------------------------------------------
-        subroutine mio_fread_3d_lay_int (fname, vname, caller, data, beg_lay, end_lay, timestamp)
+        subroutine mio_fread_3d_int_lay (fname, vname, caller, data, beg_lay, end_lay, timestamp)
 
           character (*), intent(in) :: fname
           character (*), intent(in) :: vname
@@ -1371,7 +1517,7 @@
           character (*), intent(in) :: caller
           character (*), intent(in), optional :: timestamp
 
-          character (20), parameter :: pname = 'mio_fread_3d_lay_int'
+          character (20), parameter :: pname = 'mio_fread_3d_int_lay'
           integer :: t, v, mystart(5), mycount(5), floc, loc_slay, loc_nlays
           logical :: lerror = .false.
 
@@ -1455,7 +1601,7 @@
              stop
           end if
 
-        end subroutine mio_fread_3d_lay_int
+        end subroutine mio_fread_3d_int_lay
 
 ! --------------------------------------------------------------------------------------------
         subroutine mio_fread_char (fname, vname, caller, data, timestamp)

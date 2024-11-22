@@ -532,7 +532,7 @@ C--------------------------------------------------------------------------
             If ( FIRSTWRITE ) Then
                FIRSTWRITE = .FALSE.
                call mio_setfile( MET_CRO_2D )
-               call mio_fcreate( 'MEDIA_CONC_MIO', io_mode )
+               call mio_fcreate( 'MEDIA_CONC_MIO', mio_new_file )
             End If
             call mio_fwrite( 'MEDIA_CONC_MIO', MEDIA_NAMES( V ), 
      &                       PNAME, WRMC, TIME_STAMP )

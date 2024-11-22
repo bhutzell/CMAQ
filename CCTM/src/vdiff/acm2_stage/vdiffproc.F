@@ -484,7 +484,7 @@ C If last call this hour:  write accumulated depositions:
 
             if ( write_firstime_mio ) then
                call mio_setfile( MET_CRO_2D )
-               call mio_fcreate( 'CTM_DRY_DEP_MIO', io_mode )
+               call mio_fcreate( 'CTM_DRY_DEP_MIO', mio_new_file )
                write_firstime_mio = .false.
             end if
             call mio_fwrite( 'CTM_DRY_DEP_MIO', DDEP_SPC( V ),
@@ -537,13 +537,13 @@ C Write vdiff diagnostics
             if ( FIRST_WRITE_DIAG ) then
                FIRST_WRITE_DIAG = .FALSE.
                call mio_setfile( MET_CRO_2D )
-               call mio_fcreate( 'CTM_VDIFF_MIO', io_mode )
+               call mio_fcreate( 'CTM_VDIFF_MIO', mio_new_file )
                if ( GRAV_SETL ) then
                   call mio_setfile( MET_CRO_3D )
-                  call mio_fcreate( 'CTM_VSED_MIO', io_mode )
+                  call mio_fcreate( 'CTM_VSED_MIO', mio_new_file )
                end if
                if ( MOSAIC ) then
-                  call mio_fcreate( 'CTM_DDEP_MOS_MIO', io_mode )
+                  call mio_fcreate( 'CTM_DDEP_MOS_MIO', mio_new_file )
                end if
             end if
 
@@ -709,7 +709,7 @@ C re-set dry deposition array to zero
          IF ( FIRST_WRITE_ISAM ) THEN
             FIRST_WRITE_ISAM = .FALSE.
             call mio_setfile( MET_CRO_2D )
-            call mio_fcreate( 'SA_DD_1_MIO', io_mode )
+            call mio_fcreate( 'SA_DD_1_MIO', mio_new_file )
          END IF
          DO ITAG = 1, N_SPCTAG
             DO R = 1, NROWS

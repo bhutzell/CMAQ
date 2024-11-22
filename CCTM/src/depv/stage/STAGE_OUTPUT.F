@@ -274,9 +274,9 @@ C Open diagnostic file
          if ( firstime ) then
             firstime = .false.
             call mio_setfile( MET_CRO_3D )
-            call mio_fcreate( 'CTM_DEPV_MIO', io_mode )
+            call mio_fcreate( 'CTM_DEPV_MIO', mio_new_file )
             if ( MOSAIC ) then
-               call mio_fcreate( 'CTM_DEPV_MOS_MIO', io_mode )
+               call mio_fcreate( 'CTM_DEPV_MOS_MIO', mio_new_file )
             end if
          end if
 

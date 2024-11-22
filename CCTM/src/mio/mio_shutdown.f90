@@ -20,7 +20,7 @@
            do n = mio_n_infiles+1, mio_nfiles
               stat = nf90_sync(mio_file_data(n)%fileid)
               if (stat .ne. nf90_noerr) then
-                 write (mio_logdev, *) ' Abort in mio_shutdown routine dut to'
+                 write (mio_logdev, *) ' Abort in mio_shutdown routine due to'
                  write (mio_logdev, *) ' error closing file ', trim(mio_file_data(n)%filename)
                  stop
               end if
@@ -29,8 +29,12 @@
            end do
         end if
 
-        if (allocated(mio_file_data)) then
-           deallocate (mio_file_data)
+        if (allocated(mio_file_data0)) then
+           deallocate (mio_file_data0)
+        end if
+
+        if (allocated(mio_file_data1)) then
+           deallocate (mio_file_data1)
         end if
 
         close (mio_iunit)

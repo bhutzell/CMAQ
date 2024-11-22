@@ -1,4 +1,4 @@
-! Purpose: Initialize MIO system by readying in how many input and
+! Purpose: Initialize MIO system by reading in how many input and
 !          output files, forming a parallel domain decomposition map,
 !          and reading in output variable definition if it is available
 
@@ -6,6 +6,7 @@
 
         use mio_parameter_module
         use mio_global_data_module
+        use mio_fopen_module
         use mio_get_env_module
         use mio_util_func_module, only : mio_extract_string
         use mio_search_module
@@ -31,6 +32,23 @@
 
         integer, external :: mio_setup_logdev
 
+        interface
+          subroutine mio_setup_decomp (nprocs, npcol, nprow, ncols, nrows, &
+                                       op_type, ncols_pe, nrows_pe,        &
+                                       colde_pe, rowde_pe)
+            integer, intent(in)  :: nprocs
+            integer, intent(in)  :: npcol
+            integer, intent(in)  :: nprow
+            integer, intent(in)  :: ncols
+            integer, intent(in)  :: nrows
+            integer, intent(in)  :: op_type
+            integer, intent(out) :: ncols_pe(:,:)
+            integer, intent(out) :: nrows_pe(:,:)
+            integer, intent(out) :: colde_pe(:,:,:)
+            integer, intent(out) :: rowde_pe(:,:,:)
+          end subroutine mio_setup_decomp
+        end interface
+
 #ifdef parallel
         call mpi_initialized (mpi_init_called, stat)
         if (.not. mpi_init_called) then
@@ -41,6 +59,12 @@
 #else
         mio_nprocs   = 1
 #endif
+
+        if (present(logdev)) then
+           mio_logdev = logdev
+        else
+           mio_logdev = mio_setup_logdev ()
+        end if
 
         mio_npcol    = npcol
         mio_nprow    = nprow
@@ -54,7 +78,7 @@
         else
            call mio_setup_rank (mio_mype)
            if (present(ptype)) then
-              mio_parallelism = mio_true_parallel    ! true paralle using pnetCDF or netCDF-4
+              mio_parallelism = mio_true_parallel    ! true parallel using pnetCDF or netCDF-4
               if (mod(mio_mype, npcol) == 0) then
                  mio_io_pe_inclusive = .true.
               end if
@@ -67,8 +91,54 @@
         end if
         mio_mype_p1 = mio_mype + 1
 
-        mio_base_ncols = ncols
-        mio_base_nrows = nrows
+        call mio_read_dscgrid
+
+        if (mio_domain_gdtyp > 0) then  ! CMAQ simulation
+           mio_domain_ncols = mio_domain_ncols
+           mio_domain_nrows = mio_domain_nrows
+        else
+           mio_domain_ncols = ncols
+           mio_domain_nrows = nrows
+        end if
+
+        allocate (mio_domain_ncols_pe(mio_nprocs, 2),      &
+                  mio_domain_nrows_pe(mio_nprocs, 2),      &
+                  mio_domain_colde_pe(2, mio_nprocs, 2),   &
+                  mio_domain_rowde_pe(2, mio_nprocs, 2),   &
+                  stat=stat)
+
+        call mio_setup_decomp (mio_nprocs, npcol, nprow,                 &
+                               mio_domain_ncols, mio_domain_nrows,       &
+                               mio_ioapi3_format,                        &
+                               mio_domain_ncols_pe, mio_domain_nrows_pe, &
+                               mio_domain_colde_pe, mio_domain_rowde_pe)
+
+        mio_n_infiles  = 0
+        mio_n_outfiles = 0
+        mio_nfiles = 0
+
+      end subroutine mio_init
+
+! ----------------------------------------------------------------------
+      subroutine mio_init2 
+
+        use mio_parameter_module
+        use mio_global_data_module
+        use mio_fopen_module
+        use mio_get_env_module
+        use mio_util_func_module, only : mio_extract_string
+        use mio_search_module
+        use mio_interpolation_module
+
+        implicit none
+
+        character (40)                   :: str, str1, str2
+        character (mio_max_filename_len) :: tstr, finfo
+        character (mio_max_str_len), allocatable :: ext_str(:)
+        character (mio_max_str_len) :: tvname, temp_str
+        integer :: i, j, n, stat, num_of_infiles,  num_of_outfiles, &
+                   mode, stage
+        logical :: eof, mpi_init_called, found_first_line
 
         allocate (ext_str(2), stat=stat)
 
@@ -82,7 +152,7 @@
            stop
         end if
 
-        ! first line is the line that contains number of input and output files and skips all
+        ! first line is the line that contains number of input and output files and skips 
         ! all lines with comments
         found_first_line = .false.
         do while (.not. found_first_line)
@@ -102,14 +172,7 @@
            end if
         end do
 
-        mio_nfiles = 0
         mio_cfile  = 0
-        ! 0 index is for creating a brand new file
-        allocate (mio_file_data(0:num_of_infiles + num_of_outfiles), stat=stat)
-        if (stat .ne. 0) then
-           write (mio_logdev, *) ' Abort in routine mio_inint due to memory allocation error'
-           stop
-        end if
 
         i = 0
         do while (i < num_of_infiles)
@@ -128,23 +191,24 @@
                     mode = mio_read_write
                  end if
               end if
+
               mio_cfile = mio_cfile + 1
 
-              mio_file_data(mio_cfile)%filename = ext_str(1)
-              mio_file_data(mio_cfile)%mode = mode
-
-              call mio_fopen (ext_str(1), mode)
+              if (i == 1) then
+                 call mio_fopen (ext_str(1), mode, num_of_outfiles)
+              else
+                 call mio_fopen (ext_str(1), mode)
+              end if
            end if
  
         end do
 
-        call mio_interpolation_init (num_of_infiles)
+!       call mio_interpolation_init (num_of_infiles)
 
 ! reset mio_cfile
         mio_cfile = -1
-        mio_nfiles = num_of_infiles
 
-! reads in all the output file setup in file_input.txt and stores the
+! reads in all the output file setup in mio_file_info and stores the
 ! information in mio_outfile_def_info data structure
         eof = .false.
         i = 0
@@ -186,7 +250,7 @@
                        allocate (mio_outfile_def_info%flist(i)%vlist(n), stat=stat)
 
                        ! retrieve and store variable name which full information
-                       ! will be obtrained from a specificed input file
+                       ! will be obtained from a specified input file
                        j = 0
                        do while (j < n)
                           read (mio_iunit, '(a64)') temp_str
@@ -222,16 +286,22 @@
            call mio_set_barrier
         end if
 
-        mio_n_infiles  = num_of_infiles
+!       mio_n_infiles  = num_of_infiles
         mio_n_outfiles = num_of_outfiles
 
-        if (present(logdev)) then
-           mio_logdev = logdev
-        else
-           mio_logdev = mio_setup_logdev ()
-        end if
+write (mio_logdev, '(A,4i5)') '==c== mio_init2 mio_n_infiles, mio_n_outfiles, mio_nfiles, size ', &
+                                     mio_n_infiles, mio_n_outfiles, mio_nfiles, size(mio_file_data)-1
 
-      end subroutine mio_init
+!        do i = 1, mio_n_outfiles
+!           mio_file_data(mio_n_infiles + i)%filename = 'undefined'
+!        end do
+        do i = 1, mio_nfiles 
+           write (mio_logdev, '(A,i3,2x,A)' ) '==c==', i, trim(mio_file_data(i)%filename)
+        end do
+
+        deallocate (ext_str)
+
+      end subroutine mio_init2
 
 ! ----------------------------------------------------------------------
       subroutine remove_comment (str)
@@ -262,3 +332,74 @@
         end if
 
       end subroutine remove_comment
+
+! ----------------------------------------------------------------------
+      subroutine mio_read_dscgrid
+
+        use mio_get_env_module
+        use mio_global_data_module
+
+        integer, parameter :: funit = 10007
+
+        character (1000) :: lfname
+        character (100)  :: grid_name, lgname, cname, line
+        logical :: found, eof
+        integer :: stage, stat
+
+        call mio_get_env ( grid_name, 'GRID_NAME', ' ')
+
+        if (grid_name == ' ') then
+           mio_domain_gdtyp = -1
+           mio_domain_alp   = -1.0d0
+           mio_domain_bet   = -1.0d0
+           mio_domain_gam   = -1.0d0
+           mio_domain_xcent = -1.0d0
+           mio_domain_ycent = -1.0d0
+           mio_domain_xorig = -1.0d0
+           mio_domain_yorig = -1.0d0
+           mio_domain_xcell = -1.0d0
+           mio_domain_ycell = -1.0d0
+           mio_domain_ncols = -1
+           mio_domain_nrows = -1
+           mio_domain_nthik = -1
+        else
+           call mio_get_env (lfname, 'GRIDDESC', ' ')
+
+           if (lfname == ' ') then
+              write (mio_logdev, '(a37)') ' Abort: GRIDDESC file does not exist.'
+              stop
+           else
+              open (unit = funit, file = lfname, status = 'old')
+              found = .false.
+              eof   = .false.
+              stage = 0
+              lgname = "'" // trim(grid_name) // "'"
+              do while ((.not. eof) .and. (.not. found))
+                 read (funit, '(a100)', iostat=stat) line
+                 if (stat .ne. 0) then
+                    eof = .true.
+                 else
+                    if (stage == 0) then
+                       if (line(1:1) .ne. "'") then
+                          read (line, *) mio_domain_gdtyp,                               &
+                                         mio_domain_alp, mio_domain_bet, mio_domain_gam, &
+                                         mio_domain_xcent, mio_domain_ycent
+                          stage = 1
+                       end if
+                    else
+                       if (line == lgname) then
+                          read (funit, *) cname,                              &
+                                          mio_domain_xorig, mio_domain_yorig, &
+                                          mio_domain_xcell, mio_domain_ycell, &
+                                          mio_domain_ncols, mio_domain_nrows, &
+                                          mio_domain_nthik
+                          found = .true.
+                       end if
+                    end if
+                 end if
+              end do
+              close (funit)
+           end if
+        end if
+
+      end subroutine mio_read_dscgrid

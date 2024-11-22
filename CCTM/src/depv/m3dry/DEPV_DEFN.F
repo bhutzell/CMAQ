@@ -668,7 +668,7 @@ C-----------------------------------------------------------------------
               IF ( FIRSTWRITE ) THEN
                  FIRSTWRITE = .FALSE.
                  call mio_setfile( MET_CRO_2D )
-                 call mio_fcreate( 'CTM_DEPV_MIO', io_mode )
+                 call mio_fcreate( 'CTM_DEPV_MIO', mio_new_file )
               END IF            
 
               call mio_time_format_conversion (wdate, wtime, time_stamp)

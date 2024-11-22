@@ -250,7 +250,7 @@ C-----------------------------------------------------------------------
         INITTIME = .FALSE.
 
 #ifdef mpas
-         call mio_fcreate ('SOILOUT', io_mode)
+         call mio_fcreate ('SOILOUT', mio_new_file)
 #endif
 
 C Determine last timestamp
@@ -681,7 +681,7 @@ C Final timestamp
 C Write soil NO rain data file
       if ( FIRSTWRITE ) then
          call mio_setfile( MET_CRO_2D )
-         call mio_fcreate( SOIL_MIO, io_mode )
+         call mio_fcreate( SOIL_MIO, mio_new_file )
          FIRSTWRITE = .FALSE.
       end if
 

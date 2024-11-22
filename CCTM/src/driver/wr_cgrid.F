@@ -163,7 +163,7 @@ C-----------------------------------------------------------------------
       END IF
 #endif
       call mio_setfile( MET_CRO_3D )
-      call mio_fcreate( 'S_CGRID_MIO', io_mode)
+      call mio_fcreate( 'S_CGRID_MIO', mio_new_file)
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
       do K = 1, n_cgrid_spc
          call mio_fwrite( 'S_CGRID_MIO', CGRID_NAME( K ),

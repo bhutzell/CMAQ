@@ -255,7 +255,7 @@ c open the file
 
 #endif
       call mio_setfile( MET_CRO_3D )
-      call mio_fcreate( 'CTM_SENS_MIO', io_mode )
+      call mio_fcreate( 'CTM_SENS_MIO', mio_new_file )
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
       do I = 1, NSPCSD * NPMAX 
          write(logdev,*) 'SENGRID: i, name: ', i, senname(i)

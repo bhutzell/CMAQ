@@ -427,6 +427,8 @@ C Set CGRID mechanism
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, 1 )
          END IF
 
+         call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
+
 #ifdef sens
 C Initialize ddm3d calculations
          CALL INIT_DDM3D
@@ -616,35 +618,36 @@ C Convention: the input file concentration units are always ppmV.
         call mio_setfile ('GR_EMIS_001')
 
         if (L_ELMO) then
-           call mio_fcreate (CTM_ELMO_1, io_mode)
+           call mio_fcreate (CTM_ELMO_1, mio_new_file)
         end if
 
          call get_env (mpas_diag, 'mpas_diag', .false.)
 
          if (mpas_diag) then
-            call mio_fcreate ('CTM_OUT', io_mode)
+            call mio_fcreate ('CTM_OUT', mio_new_file)
          end if
 
 
-!       call mio_fcreate (CTM_DRY_DEP_1, io_mode)
-!       call mio_fcreate (CTM_WET_DEP_1, io_mode)
+!       call mio_fcreate (CTM_DRY_DEP_1, mio_new_file)
+!       call mio_fcreate (CTM_WET_DEP_1, mio_new_file)
 
         if ( depv_diag ) then
-            call mio_fcreate (CTM_DEPV_DIAG, io_mode)
+            call mio_fcreate (CTM_DEPV_DIAG, mio_new_file)
         end if
 
         if ( cld_diag ) then
-            call mio_fcreate (CTM_WET_DEP_2, io_mode)
+            call mio_fcreate (CTM_WET_DEP_2, mio_new_file)
         end if
 
 !       if (photdiag) then
-!          call mio_fcreate (CTM_RJ_1, io_mode)
-!          call mio_fcreate (CTM_RJ_2, io_mode)
+!          call mio_fcreate (CTM_RJ_1, mio_new_file)
+!          call mio_fcreate (CTM_RJ_2, mio_new_file)
 !       end if
 
 #endif
 
 C Initialize Meteorology Structures
+
          CALL INIT_LSM( JDATE, JTIME )
 #ifndef mpas
          CALL INIT_BIDI( )
@@ -781,10 +784,11 @@ C Initialize Modules
           call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
           if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
 
-      CALL SUBST_BARRIER ! ensure mio_ascii file written
+          CALL SUBST_BARRIER ! ensure mio_ascii file written
 
-C Initialize MIO
-          call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
+C Initialize MIO 
+!         call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
+          call mio_init2
       END IF
 
 ! Output Instantaneous Values at first time step

@@ -105,7 +105,7 @@ C-----------------------------------------------------------------------
 ! then change global attribute NLAYS to match
          call mio_setfile( MET_CRO_3D )
          if ( SA_NLAYS .lt. NLAYS ) mio_nlays = SA_NLAYS
-         call mio_fcreate( 'SA_CONC_1_MIO', io_mode )
+         call mio_fcreate( 'SA_CONC_1_MIO', mio_new_file )
          if ( mype == 0 ) then
             call mio_set_global_attr( 'SA_CONC_1_MIO', 'NLAYS', SA_NLAYS )
             call mio_set_global_attr( 'SA_CONC_1_MIO', 'VGLVLS', MET_CRO_3D, AISAM_BLEV, AISAM_ELEV+1 )

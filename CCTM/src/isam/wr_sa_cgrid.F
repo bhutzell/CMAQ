@@ -136,7 +136,7 @@ C-----------------------------------------------------------------------
       IF ( FIRSTWRITE ) THEN
          FIRSTWRITE = .FALSE.
          call mio_setfile( MET_CRO_3D )
-         call mio_fcreate( 'SA_CGRID_1_MIO', io_mode )
+         call mio_fcreate( 'SA_CGRID_1_MIO', mio_new_file )
       END IF
 
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )

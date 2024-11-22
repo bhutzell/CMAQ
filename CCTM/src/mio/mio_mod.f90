@@ -3,6 +3,7 @@
         use mio_global_data_module
         use mio_get_env_module
         use mio_print_module
+        use mio_fopen_module
         use mio_fread_module
         use mio_fwrite_module
         use mio_set_global_attr_module
