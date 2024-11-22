@@ -464,18 +464,20 @@
       INTEGER       :: ILIST, IUNIT, IFAM, S, IM, ICGRID,
      &                 IWDEP, IDDEP, ICMPST, IMODE, ISPC
       INTEGER       :: VAR_TYPE
-      INTEGER       :: N, IAERO, IOS, ITAG, ISPEC, NP, INDX
+      INTEGER       :: N, IAERO, IOS, ITAG, ISPEC, NP, INDX,
+     &                 N_TABLE
       CHARACTER(32) :: PNAME = 'BUILD_ELMO_TABLE'
       CHARACTER(200):: XMSG
 
       N = 0
+      N_TABLE = 2000
+
 #ifdef isam 
-      ALLOCATE( ELMO_TABLE( 10000 ), STAT=IOS )
+      N_TABLE = N_TABLE * NTAG_SA
 #elif defined( sens )
-      ALLOCATE( ELMO_TABLE( 10000 ), STAT=IOS )
-#else
-      ALLOCATE( ELMO_TABLE( 2000 ), STAT=IOS )
+      N_TABLE = N_TABLE * NPMAX
 #endif
+      ALLOCATE( ELMO_TABLE( N_TABLE ), STAT=IOS )
       CALL CHECKMEM( IOS, 'ELMO_TABLE',PNAME ) 
 
       ! Initialize Mode and Source Attributes
