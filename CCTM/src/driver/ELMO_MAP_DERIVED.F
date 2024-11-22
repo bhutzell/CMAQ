@@ -82,6 +82,20 @@
      &          STAT = IOS )
       CALL CHECKMEM( IOS, 'J DERIVED COMPONENTS','ELMO_MAP_DERIVED' )
 
+      ! Initialize Derived Variable Location Pointers
+      J_PMF_MASS    = 0
+      J_PMF_SO4     = 0
+      J_PMF_NO3     = 0
+      J_PMF_NH4     = 0
+      J_PM25_SO4    = 0
+      J_PM25_NO3    = 0
+      J_PM25_NH4    = 0
+      J_PMF_HP      = 0
+      J_PMF_HPMOLAL = 0
+      J_PMF_H2O     = 0
+      J_PMF_BENAPY  = 0
+      J_GAS_BENAPY  = 0
+
       ! Search for source-dependent indices in ELMO TABLE
       DO ISRC = 0,MX_SRC
         DO J = 1,N_ELMO_TABLE

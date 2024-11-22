@@ -214,8 +214,8 @@
   Keywd(31,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
                 'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL','DD_PMF_SI',
                 'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K','DD_PMF_SSSO4',
-                'DD_OC','WD_OC','DD_POC','WD_POC','DD_SOC','WD_SOC',
-                'DD_OA','WD_OA','DD_POA','WD_POA','DD_SOA','WD_SOA'
+                'DD_TSP_OC','WD_TSP_OC','DD_TSP_POC','WD_TSP_POC','DD_TSP_SOC','WD_TSP_SOC',
+                'DD_TSP_OA','WD_TSP_OA','DD_TSP_POA','WD_TSP_POA','DD_TSP_SOA','WD_TSP_SOA'
 
   Keywd_name(32) = 'COARSE_DDEP'
   Keywd(32,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
@@ -225,10 +225,10 @@
   Keywd(33,:) = 'DD_CL','DD_CA','DD_MG','DD_K','DD_NA'
 
   Keywd_name(34) = 'PM_WDEP'
-  Keywd(34,:) = 'WD_NO3','WD_NH4','WD_SO4','WD_MTNO3','WD_NA','WD_PMC_NA',
-                'WD_PMF_CA','WD_PMC_CA','WD_CA','WD_PMF_FE',
+  Keywd(34,:) = 'WD_TSP_NO3','WD_TSP_NH4','WD_TSP_SO4','WD_TSP_MTNO3','WD_TSP_NA',
+                'WD_PMC_NA','WD_PMF_CA','WD_PMC_CA','WD_TSP_CA','WD_PMF_FE',
                 'WD_PMF_AL','WD_PMF_SI','WD_PMF_TI','WD_PMF_MN','WD_PMF_MG','WD_PMC_MG',
-                'WD_MG','WD_PMF_K','WD_PMC_K','WD_K','WD_SSSO4'
+                'WD_TSP_MG','WD_PMF_K','WD_PMC_K','WD_TSP_K','WD_SSSO4'
 
   Keywd_name(35) = 'PM_TDEP'
   Keywd(35,:) = 'TD_NA'
