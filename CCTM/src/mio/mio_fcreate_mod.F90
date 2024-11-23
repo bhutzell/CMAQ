@@ -39,7 +39,8 @@
                      n_att, t_type, count, fnum, nlines, dim_loc,    &
                      new_file_dim_name_index(n_dim_names), ind, loc, &
                      index_mapping(n_dim_names), ind_count,          &
-                     n_replacements, dim_value, layer_id1, layer_id2
+                     n_replacements, dim_value, layer_id1, layer_id2, &
+                     lmode
           character (mio_max_varname_len) :: tvname, tdim_name(6), tunit_name
           character (500)                 :: t_type_str
           character (500)                 :: str
@@ -47,7 +48,8 @@
           character (500)                 :: loc_replacement(2,100)
           character (30)                  :: missing_value
           logical :: entire_file, partial_file, skip_search, found,   &
-                     cfile_is_an_input_file, use_new_file_template
+                     cfile_is_an_input_file, use_new_file_template,   &
+                     ncd_64bit_offset
 
 #ifdef parallel
           include 'mpif.h'
@@ -63,7 +65,6 @@
              n_replacements = 0
              loc_replacement = ' '
           end if
-!write( mio_logdev, '(A,2x,2i5)' ) ' ==c== creating file, mode, n_repl: ' // trim(fname), mode, n_replacements
 
           dest = mio_search(fname)
 
@@ -164,7 +165,15 @@
                 if (mio_file_data(dest)%mode .eq. mio_new_file) then
                    if (mio_mype .eq. 0) then
 
-                      stat = nf90_create (mio_file_data(dest)%full_filename, mode, mio_file_data(dest)%fileid)
+                     call mio_get_env (ncd_64bit_offset, 'ncd_64bit_offset', .false.)
+
+                      if (ncd_64bit_offset) then
+                         lmode = ior (nf90_noclobber, nf90_64bit_offset)
+                      else
+                         lmode = nf90_noclobber
+                      end if
+
+                      stat = nf90_create (mio_file_data(dest)%full_filename, lmode, mio_file_data(dest)%fileid)
                       if (stat .ne. nf90_noerr) then
                          write (mio_logdev, *) 'Abort in mio_fcreate while creating ' // &
                                                trim(mio_file_data(dest)%filename)

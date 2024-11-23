@@ -42,18 +42,21 @@
           end if
 
 ! write (mio_logdev, '(A,A,2x,2i5)' ) '==c== mio_fopen: fname, mode, t = ', trim(fname), mode, t
-
-          if (present(num_of_outfiles)) then
+           if (present(num_of_outfiles)) then
             if (called_once) then
                write(mio_logdev, *) ' Abort in mio_fopen: called twice with outfiles'
                stop
             else
                l_num_of_outfiles = num_of_outfiles
-               call mio_expand_file_data (l_num_of_outfiles)
                called_once = .true.
             end if
           else
              l_num_of_outfiles = 0
+          end if
+
+          if (mod(mio_n_infiles, mio_df_add_space) == 0 .or. &
+                  l_num_of_outfiles > 0 ) then
+                call mio_expand_file_data (l_num_of_outfiles)
           end if
 
           if (t .gt. 0) then
@@ -62,11 +65,6 @@
           end if 
 
 
-             if (mod(mio_n_infiles, mio_df_add_space) == 0) then
-                call mio_expand_file_data (l_num_of_outfiles)
-             end if
-
-             mio_n_infiles = mio_n_infiles + 1
              mio_nfiles = mio_nfiles + 1
              mio_cfile = mio_nfiles
              floc = mio_cfile
@@ -75,6 +73,7 @@
 
              mio_file_data(floc)%link = -1
              if (mode .eq. mio_read_only) then
+                mio_n_infiles = mio_n_infiles + 1
                 fmode = nf90_nowrite
              else
                 fmode = nf90_write
@@ -87,8 +86,8 @@
                    write (mio_logdev, '(a, a9, a)') trim(fname), ' opened: ', trim(full_name)
                 end if
              else
-                write (mio_logdev, *) 'Abort in routine mio_fopen opening file ', trim(fname)
-                write (mio_logdev, *) '      due to an error ', trim(nf90_strerror(stat))
+                write (mio_logdev, '(a)') 'Abort in mio_fopen opening ' // trim(full_name)
+                write (mio_logdev, *)  trim(nf90_strerror(stat))
                 stop
              end if
 

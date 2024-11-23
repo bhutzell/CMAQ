@@ -560,11 +560,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
        endif
 
        #> Set Up ISAM Output Filenames
-       setenv SA_ACONC_1      OUTDIR/CCTM_SA_ACONC_${CTM_APPL}.nc
-       setenv SA_CONC_1       OUTDIR/CCTM_SA_CONC_${CTM_APPL}.nc 
-       setenv SA_DD_1         OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc
-       setenv SA_WD_1         OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc
-       setenv SA_CGRID_1      OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc 
+       setenv SA_ACONC_1      $OUTDIR/CCTM_SA_ACONC_${CTM_APPL}.nc
+       setenv SA_CONC_1       $OUTDIR/CCTM_SA_CONC_${CTM_APPL}.nc 
+       setenv SA_DD_1         $OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc
+       setenv SA_WD_1         $OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc
+       setenv SA_CGRID_1      $OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc 
 
        #> Set optional ISAM regions files
        #setenv ISAM_REGIONS $INPDIR/GRIDMASK_STATES_12SE1.nc
@@ -619,10 +619,10 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
  endif
 
  setenv CTM_NPMAX       $NPMAX
- setenv CTM_SENS_1      OUTDIR/CCTM_SENGRID_${CTM_APPL}.nc
- setenv A_SENS_1        OUTDIR/CCTM_ASENS_${CTM_APPL}.nc 
- setenv CTM_SWETDEP_1   OUTDIR/CCTM_SENWDEP_${CTM_APPL}.nc
- setenv CTM_SDRYDEP_1   OUTDIR/CCTM_SENDDEP_${CTM_APPL}.nc
+ setenv CTM_SENS_1      $OUTDIR/CCTM_SENGRID_${CTM_APPL}.nc
+ setenv A_SENS_1        $OUTDIR/CCTM_ASENS_${CTM_APPL}.nc 
+ setenv CTM_SWETDEP_1   $OUTDIR/CCTM_SENWDEP_${CTM_APPL}.nc
+ setenv CTM_SDRYDEP_1   $OUTDIR/CCTM_SENDDEP_${CTM_APPL}.nc
  setenv INIT_SENS_1     $S_ICpath/$S_ICfile
  
 # =====================================================================
@@ -630,39 +630,39 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 # =====================================================================
 
   #> set output file names
-  setenv S_CGRID         OUTDIR/CCTM_CGRID_${CTM_APPL}.nc          #> 3D Inst. Concentrations
-  setenv CTM_CONC_1      OUTDIR/CCTM_CONC_${CTM_APPL}.nc           #> On-Hour Concentrations
-  setenv A_CONC_1        OUTDIR/CCTM_ACONC_${CTM_APPL}.nc          #> Hourly Avg. Concentrations
-  setenv MEDIA_CONC      OUTDIR/CCTM_MEDIA_CONC_${CTM_APPL}.nc     #> NH3 Conc. in Media
-  setenv CTM_DRY_DEP_1   OUTDIR/CCTM_DRYDEP_${CTM_APPL}.nc         #> Hourly Dry Deposition
-  setenv CTM_DEPV_DIAG   OUTDIR/CCTM_DEPV_${CTM_APPL}.nc           #> Dry Deposition Velocities
-  setenv B3GTS_S         OUTDIR/CCTM_B3GTS_S_${CTM_APPL}.nc        #> Biogenic Emissions
-  setenv BEIS_SOILOUT    OUTDIR/CCTM_BSOILOUT_${CTM_APPL}.nc       #> Soil Emissions
-  setenv MEGAN_SOILOUT   OUTDIR/CCTM_MSOILOUT_${CTM_APPL}.nc       #> Soil Emissions
-  setenv BDSNPOUT        OUTDIR/CCTM_BDSNPOUT_${CTM_APPL}.nc       #> Soil Emissions
-  setenv CTM_WET_DEP_1   OUTDIR/CCTM_WETDEP1_${CTM_APPL}.nc        #> Wet Dep From All Clouds
-  setenv CTM_WET_DEP_2   OUTDIR/CCTM_WETDEP2_${CTM_APPL}.nc        #> Wet Dep From SubGrid Clouds
-  setenv CTM_ELMO_1      OUTDIR/CCTM_ELMO_${CTM_APPL}.nc           #> On-Hour Particle Diagnostics
-  setenv CTM_AELMO_1     OUTDIR/CCTM_AELMO_${CTM_APPL}.nc          #> Hourly Avg. Particle Diagnostics
-  setenv CTM_RJ_1        OUTDIR/CCTM_PHOTDIAG1_${CTM_APPL}.nc      #> 2D Surface Summary from Inline Photolysis
-  setenv CTM_RJ_2        OUTDIR/CCTM_PHOTDIAG2_${CTM_APPL}.nc      #> 3D Photolysis Rates 
-  setenv CTM_RJ_3        OUTDIR/CCTM_PHOTDIAG3_${CTM_APPL}.nc      #> 3D Optical and Radiative Results from Photolysis
-  setenv CTM_SSEMIS_1    OUTDIR/CCTM_SSEMIS_${CTM_APPL}.nc         #> Sea Spray Emissions
-  setenv CTM_DUST_EMIS_1 OUTDIR/CCTM_DUSTEMIS_${CTM_APPL}.nc       #> Dust Emissions
-  setenv CTM_BUDGET      OUTDIR/CCTM_BUDGET_${CTM_APPL}.txt        #> Budget [Default Off]
-  setenv CTM_IPR_1       OUTDIR/CCTM_PA_1_${CTM_APPL}.nc           #> Process Analysis
-  setenv CTM_IPR_2       "OUTDIR/CCTM_PA_2_${CTM_APPL}.nc -v"      #> Process Analysis
-  setenv CTM_IPR_3       "OUTDIR/CCTM_PA_3_${CTM_APPL}.nc -v"      #> Process Analysis
-  setenv CTM_IRR_1       OUTDIR/CCTM_IRR_1_${CTM_APPL}.nc          #> Chem Process Analysis
-  setenv CTM_IRR_2       "OUTDIR/CCTM_IRR_2_${CTM_APPL}.nc -v"     #> Chem Process Analysis
-  setenv CTM_IRR_3       "OUTDIR/CCTM_IRR_3_${CTM_APPL}.nc -v"     #> Chem Process Analysis
-  setenv CTM_DRY_DEP_MOS OUTDIR/CCTM_DDMOS_${CTM_APPL}.nc          #> Dry Dep
-  setenv CTM_DEPV_MOS    OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc        #> Dry Dep Velocity
-  setenv CTM_VDIFF_DIAG  OUTDIR/CCTM_VDIFF_DIAG_${CTM_APPL}.nc     #> Vertical Dispersion Diagnostic
-  setenv CTM_VSED_DIAG   OUTDIR/CCTM_VSED_DIAG_${CTM_APPL}.nc      #> Particle Grav. Settling Velocity
-  setenv CTM_LTNGDIAG_1  OUTDIR/CCTM_LTNGHRLY_${CTM_APPL}.nc       #> Hourly Avg Lightning NO
-  setenv CTM_LTNGDIAG_2  OUTDIR/CCTM_LTNGCOL_${CTM_APPL}.nc        #> Column Total Lightning NO
-  setenv CTM_VEXT_1      OUTDIR/CCTM_VEXT_${CTM_APPL}.nc           #> On-Hour 3D Concs at select sites
+  setenv S_CGRID         $OUTDIR/CCTM_CGRID_${CTM_APPL}.nc          #> 3D Inst. Concentrations
+  setenv CTM_CONC_1      $OUTDIR/CCTM_CONC_${CTM_APPL}.nc           #> On-Hour Concentrations
+  setenv A_CONC_1        $OUTDIR/CCTM_ACONC_${CTM_APPL}.nc          #> Hourly Avg. Concentrations
+  setenv MEDIA_CONC      $OUTDIR/CCTM_MEDIA_CONC_${CTM_APPL}.nc     #> NH3 Conc. in Media
+  setenv CTM_DRY_DEP_1   $OUTDIR/CCTM_DRYDEP_${CTM_APPL}.nc         #> Hourly Dry Deposition
+  setenv CTM_DEPV_DIAG   $OUTDIR/CCTM_DEPV_${CTM_APPL}.nc           #> Dry Deposition Velocities
+  setenv B3GTS_S         $OUTDIR/CCTM_B3GTS_S_${CTM_APPL}.nc        #> Biogenic Emissions
+  setenv BEIS_SOILOUT    $OUTDIR/CCTM_BSOILOUT_${CTM_APPL}.nc       #> Soil Emissions
+  setenv MEGAN_SOILOUT   $OUTDIR/CCTM_MSOILOUT_${CTM_APPL}.nc       #> Soil Emissions
+  setenv BDSNPOUT        $OUTDIR/CCTM_BDSNPOUT_${CTM_APPL}.nc       #> Soil Emissions
+  setenv CTM_WET_DEP_1   $OUTDIR/CCTM_WETDEP1_${CTM_APPL}.nc        #> Wet Dep From All Clouds
+  setenv CTM_WET_DEP_2   $OUTDIR/CCTM_WETDEP2_${CTM_APPL}.nc        #> Wet Dep From SubGrid Clouds
+  setenv CTM_ELMO_1      $OUTDIR/CCTM_ELMO_${CTM_APPL}.nc           #> On-Hour Particle Diagnostics
+  setenv CTM_AELMO_1     $OUTDIR/CCTM_AELMO_${CTM_APPL}.nc          #> Hourly Avg. Particle Diagnostics
+  setenv CTM_RJ_1        $OUTDIR/CCTM_PHOTDIAG1_${CTM_APPL}.nc      #> 2D Surface Summary from Inline Photolysis
+  setenv CTM_RJ_2        $OUTDIR/CCTM_PHOTDIAG2_${CTM_APPL}.nc      #> 3D Photolysis Rates 
+  setenv CTM_RJ_3        $OUTDIR/CCTM_PHOTDIAG3_${CTM_APPL}.nc      #> 3D Optical and Radiative Results from Photolysis
+  setenv CTM_SSEMIS_1    $OUTDIR/CCTM_SSEMIS_${CTM_APPL}.nc         #> Sea Spray Emissions
+  setenv CTM_DUST_EMIS_1 $OUTDIR/CCTM_DUSTEMIS_${CTM_APPL}.nc       #> Dust Emissions
+  setenv CTM_BUDGET      $OUTDIR/CCTM_BUDGET_${CTM_APPL}.txt        #> Budget [Default Off]
+  setenv CTM_IPR_1       $OUTDIR/CCTM_PA_1_${CTM_APPL}.nc           #> Process Analysis
+  setenv CTM_IPR_2       "$OUTDIR/CCTM_PA_2_${CTM_APPL}.nc -v"      #> Process Analysis
+  setenv CTM_IPR_3       "$OUTDIR/CCTM_PA_3_${CTM_APPL}.nc -v"      #> Process Analysis
+  setenv CTM_IRR_1       $OUTDIR/CCTM_IRR_1_${CTM_APPL}.nc          #> Chem Process Analysis
+  setenv CTM_IRR_2       "$OUTDIR/CCTM_IRR_2_${CTM_APPL}.nc -v"     #> Chem Process Analysis
+  setenv CTM_IRR_3       "$OUTDIR/CCTM_IRR_3_${CTM_APPL}.nc -v"     #> Chem Process Analysis
+  setenv CTM_DRY_DEP_MOS $OUTDIR/CCTM_DDMOS_${CTM_APPL}.nc          #> Dry Dep
+  setenv CTM_DEPV_MOS    $OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc        #> Dry Dep Velocity
+  setenv CTM_VDIFF_DIAG  $OUTDIR/CCTM_VDIFF_DIAG_${CTM_APPL}.nc     #> Vertical Dispersion Diagnostic
+  setenv CTM_VSED_DIAG   $OUTDIR/CCTM_VSED_DIAG_${CTM_APPL}.nc      #> Particle Grav. Settling Velocity
+  setenv CTM_LTNGDIAG_1  $OUTDIR/CCTM_LTNGHRLY_${CTM_APPL}.nc       #> Hourly Avg Lightning NO
+  setenv CTM_LTNGDIAG_2  $OUTDIR/CCTM_LTNGCOL_${CTM_APPL}.nc        #> Column Total Lightning NO
+  setenv CTM_VEXT_1      $OUTDIR/CCTM_VEXT_${CTM_APPL}.nc           #> On-Hour 3D Concs at select sites
   
 # this is for creating physical files
   setenv PGRID_DOT_2D "$OUTDIR/GRID_DOT_2D_${CTM_APPL}.nc -v"
