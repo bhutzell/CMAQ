@@ -78,8 +78,8 @@ C-----------------------------------------------------------------------
 
             NVARS3D = N_SPCTAG
             NLAYS3D = NLAYS
-            VNAME3D = VNAM_SPCTAG
-            UNITS3D = VUN_SPCTAG
+            VNAME3D( 1:NVARS3D ) = VNAM_SPCTAG
+            UNITS3D( 1:NVARS3D ) = VUN_SPCTAG
             VTYPE3D = M3REAL
             VDESC3D = 'tracer conc.'
 
@@ -115,7 +115,7 @@ C-----------------------------------------------------------------------
       IF ( FIRSTWRITE ) THEN
          FIRSTWRITE = .FALSE.
          call mio_setfile( MET_CRO_3D )
-         call mio_fcreate( SA_CGRID_1, mio_new_file )
+         call mio_fcreate( SA_CGRID_1, io_mode )
       END IF
 
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )

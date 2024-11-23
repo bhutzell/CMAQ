@@ -94,8 +94,8 @@ C-----------------------------------------------------------------------
 
             NVARS3D = N_SPCTAG
             NLAYS3D = A_NLAYS
-            VNAME3D = VNAM_SPCTAG
-            UNITS3D = VUN_SPCTAG
+            VNAME3D( 1:NVARS3D ) = VNAM_SPCTAG
+            UNITS3D( 1:NVARS3D ) = VUN_SPCTAG
             VTYPE3D = M3REAL
             VDESC3D = 'tracer conc.'
 
@@ -131,7 +131,7 @@ C-----------------------------------------------------------------------
 ! then change global attribute NLAYS to match
          call mio_setfile( MET_CRO_3D )
          if ( A_NLAYS .lt. NLAYS ) mio_nlays = A_NLAYS
-         call mio_fcreate( SA_ACONC_1, mio_new_file )
+         call mio_fcreate( SA_ACONC_1, io_mode )
          if ( mype == 0 ) then
             call mio_set_global_attr( SA_ACONC_1, 'NLAYS', A_NLAYS )
             call mio_set_global_attr( SA_ACONC_1, 'VGLVLS', MET_CRO_3D, AISAM_BLEV, AISAM_ELEV+1 )
