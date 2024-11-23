@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /home/bmurphy/cmaq_projects/bicicle_1.6/UTIL/chemmech/input/cb6r5m_ae7_aq/mech_cb6r5m_ae7_aq.def
+! Source file: /home/bhutzell/CCTM_git_repository/UTIL/chemmech/input/cb6r5m_ae7_aq/mech_cb6r5m_ae7_aq.def
 ! for Mechanism Name: CB6R5M_AE7_AQ                   
 
 ! This file is used to create mechanism data and functions
@@ -1371,6 +1371,15 @@
      &    122/
       REAL( 8 ),    PARAMETER :: ATM_H2 = 5.60000D-01
 
+      INTEGER, PARAMETER :: N_ATOMS =  15
+      CHARACTER( 16 )    :: ATOMS( N_ATOMS )
+
+      DATA ( ATOMS( IRXXN ), IRXXN = 1, N_ATOMS ) / & 
+     &   'CA', 'MN', 'CL', 'HG', 'BR', 'NA', & 
+     &   'SI', 'S ', 'TI', 'FE', 'K ', 'I ', & 
+     &   'N ', 'C ', 'O '/
+      REAL( 8 )            :: CHEM_SPC_ATOMS( NUMB_MECH_SPC,N_ATOMS ) = 0.0D0 
+
       INTEGER, PARAMETER :: MXPRD =  14
       INTEGER            :: IRR( NRXNS,MXPRD+3 )
 
@@ -2611,8 +2620,8 @@
      &     1.0000D+00, 8.6000D-01, 7.5000D-01/           !        5   
 
       DATA ( SC( IRXXN,  2 ), IRXXN = 1, NRXNS ) / & 
-     &     1.0000D+00, 1.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, & ! +   
+     &     1.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! O   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 1   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 1.0000D+00, & ! 2   
@@ -2865,7 +2874,7 @@
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 3   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, & ! 4   
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 4   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 5   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
