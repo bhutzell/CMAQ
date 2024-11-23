@@ -420,8 +420,8 @@
                             N_AE_SPC = N_AE_SPC + 1
                             AE_SPC( N_AE_SPC )   = AERO_NAMES(IC)
                             AE_MOLWT( N_AE_SPC ) = COMPONENT_WEIGHT
-                            write(6,'(A,I3,1X,A,1X,f7.2)')"N_AE_SPC, AE_SPC, MOLWT= ",
-     &                       N_AE_SPC,AE_SPC( N_AE_SPC ),AE_MOLWT( N_AE_SPC )
+!                           write(6,'(A,I3,1X,A,1X,f7.2)')"N_AE_SPC, AE_SPC, MOLWT= ",
+!    &                       N_AE_SPC,AE_SPC( N_AE_SPC ),AE_MOLWT( N_AE_SPC )
                             ISPECIES = ISPECIES + 1
                             ATOM_SPECIES( ISPECIES ) = AERO_NAMES(IC)
                             ATOMS_SPECIES_MOLWT( ISPECIES ) = COMPONENT_WEIGHT
@@ -751,7 +751,7 @@
                   
                    DO IATOM = 1,N_ATOMS                    
                       IF( MAXVAL( SPECIES_ATOMS( :,IATOM ) ) .GT. 0.0 )THEN
-                          WRITE(6,'(A)')ATOMS(IATOM) // ' is present among atom species.'
+!                         WRITE(6,'(A)')ATOMS(IATOM) // ' is present among atom species.'
                           ATOM_FOUND( IATOM ) = .TRUE.
                       END IF
                    END DO
@@ -953,7 +953,7 @@
                IF( FIRSTCALL )THEN
                   DO IATOM = 1,N_ATOMS
                      IF( MAXVAL( ABS( REACTION_DELTA( :,IATOM ) ) ) .GT. 0.0 )THEN
-                         print*,ATOMS(IATOM),' is present among mechanism species: ',MAXVAL( ABS( REACTION_DELTA( :,IATOM ) ) )
+!                        print*,ATOMS(IATOM),' is present among mechanism species: ',MAXVAL( ABS( REACTION_DELTA( :,IATOM ) ) )
                          ATOM_FOUND( IATOM ) = .TRUE.
                          NONZERO_ATOMS       = .TRUE.
                      ELSE
@@ -1363,7 +1363,6 @@
               DO ISPC = 1, N_ATOM_SPECIES
                  IF ( TRIM( SPARSE_SPECIES( JSPC ) ) .EQ. TRIM( ATOM_SPECIES( ISPC ) ) ) THEN   ! found
                     MECH_SPECIES_ATOMS( JSPC,1:N_ATOMS ) = SPECIES_ATOMS( ISPC,1:N_ATOMS )
-                    print*, 'set: ',MECH_SPECIES_ATOMS( JSPC,1:N_ATOMS )
                     CYCLE MECH_SPECIES
                  END IF
               END DO
@@ -1425,7 +1424,6 @@
                
                SMILES = TRIM( ADJUSTL( SPECIES_SMILES ) )
                CALL UCASE( SMILES )
-               print*,'SPECIES_SMILES, SMILES = ',TRIM(SPECIES_SMILES),',  ',TRIM(SMILES)
                LEN_SMILES = LEN_TRIM( SMILES )        
                  
                
