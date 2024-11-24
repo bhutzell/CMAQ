@@ -53,7 +53,6 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE ASX_DATA_MOD, ONLY : MET_DATA
       USE CENTRALIZED_IO_MODULE
-      use runtime_vars, only : io_mode
       USE MIO_MODULE
 
       IMPLICIT NONE

@@ -571,49 +571,24 @@ C not found (skip entry)
 #ifndef mpas
 C Ensure met data time and grid for this run match beis emissions data files
 
-C Get description of met file
-         IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
-            MESG = 'Could not get description of file "'
-     &           // TRIM( MET_CRO_2D ) // '"'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
+!C Get description of met file
+!         IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
+!            MESG = 'Could not get description of file "'
+!     &           // TRIM( MET_CRO_2D ) // '"'
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!         END IF
 
-C Check that grid description matches BGRD file
-         IF ( .NOT. CHKGRID( MET_CRO_2D ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MNAME )
-     &           // '" does not match previously set grid.'
-            CALL LOG_WARNING( PNAME, LOGDEV, MESG )
-         END IF
+!C Check that grid description matches BGRD file
+!         IF ( .NOT. CHKGRID( MET_CRO_2D ) ) THEN
+!            MESG = 'Grid in file "' // TRIM( MNAME )
+!     &           // '" does not match previously set grid.'
+!            CALL LOG_WARNING( PNAME, LOGDEV, MESG )
+!         END IF
 
          IF ( BEMIS_DIAG ) THEN
 C Build description for, and open beis diagnostic file
             MDATE = STDATE; MTIME = STTIME
             CALL NEXTIME( MDATE, MTIME, TSTEP(1) )
-
-            GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-            SDATE3D = MDATE
-            STIME3D = MTIME
-            TSTEP3D = TSTEP(1)
-            NCOLS3D = GL_NCOLS
-            NROWS3D = GL_NROWS
-            NLAYS3D =     1
-            NTHIK3D =     1
-            GDTYP3D = GDTYP_GD
-            P_ALP3D = P_ALP_GD
-            P_BET3D = P_BET_GD
-            P_GAM3D = P_GAM_GD
-            XORIG3D = XORIG_GD
-            YORIG3D = YORIG_GD
-            XCENT3D = XCENT_GD
-            YCENT3D = YCENT_GD
-            XCELL3D = XCELL_GD
-            YCELL3D = YCELL_GD
-            VGTYP3D = VGTYP_GD
-            VGTOP3D = VGTOP_GD
-
-            DO I = 1, NLAYS3D + 1
-               VGLVS3D( I ) = VGLVS_GD( I )
-            END DO
 
             VNAME3D = ''
             VDESC3D = ''
@@ -621,17 +596,12 @@ C Build description for, and open beis diagnostic file
 
             DO J = 1, MSPCS
                VNAME3D( J ) = EMSPC( J )
-               VDESC3D( J ) = 'biogenic emissions of the indicated species'
+               VDESC3D( J ) = 'BEIS3 emissions of the indicated species'
                VTYPE3D( J ) = M3REAL
                UNITS3D( J ) = 'gm s-1'
             END DO
 
             NVARS3D = MSPCS
-            FDESC3D = ' '   ! array
-
-            FDESC3D( 1 ) = 'Gridded biogenic emissions from CMAQ-BEIS3'
-            FDESC3D( 2 ) = '/from/ ' // PNAME
-            FDESC3D( 3 ) = '/Version/ CMAQ'
 
             ! Store MIO Metadata
             NDIMS3D( 1:NVARS3D ) = 4

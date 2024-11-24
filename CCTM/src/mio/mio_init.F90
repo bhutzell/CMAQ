@@ -289,12 +289,12 @@
 !       mio_n_infiles  = num_of_infiles
         mio_n_outfiles = num_of_outfiles
 
-!write (mio_logdev, '(A,4i5)') '==c== mio_init2 mio_n_infiles, mio_n_outfiles, mio_nfiles, size ', &
-!                                     mio_n_infiles, mio_n_outfiles, mio_nfiles, size(mio_file_data)-1
+write (mio_logdev, '(A,4i5)') '==c== mio_init2 mio_n_infiles, mio_n_outfiles, mio_nfiles, size ', &
+                                     mio_n_infiles, mio_n_outfiles, mio_nfiles, size(mio_file_data)-1
 
-!        do i = 1, mio_nfiles 
-!           write (mio_logdev, '(A,i3,2x,A)' ) '==c==', i, trim(mio_file_data(i)%filename)
-!        end do
+        do i = 1, mio_nfiles 
+           write (mio_logdev, '(A,i3,2x,A)' ) '==c==', i, trim(mio_file_data(i)%filename)
+        end do
 
         deallocate (ext_str)
 

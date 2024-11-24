@@ -1726,7 +1726,7 @@ C and allowing the model to proceed.
             DESID_EMVAR( ISRM )%LAREAADJ= .FALSE.
 
             DO IEMVAR = 1,DESID_EMVAR( ISRM )%LEN
-               ! Assign Default Molecular Weight to Each Emision Variable
+               ! Assign Default Molecular Weight to Each Emission Variable
                B = DESID_EMVAR( ISRM )%ARRY( IEMVAR )
                IA  = INDEX1( B, DESID_N_EMVAR_TABLE, DESID_EMVAR_TABLE( : )%NAME )
                IF ( IA .GT. 0 ) THEN
@@ -1749,7 +1749,7 @@ C and allowing the model to proceed.
 
          END DO
 
-         WRITE( LOGDEV, '(/,5x,A)' ),'|> Checking Emissions Em. Var. Units: '
+         WRITE( LOGDEV, '(/,5x,A)' ),'|> Checking Emissions Variable Units: '
          WRITE( LOGDEV, '(5x,A)'   ),'======================================'
          DO ISRM = 1,DESID_N_SRM
             DO IEMVAR = 1,DESID_EMVAR( ISRM )%LEN
@@ -3471,9 +3471,9 @@ C                        removed deprecated TRIMLEN
       USE UTILIO_DEFN
       USE AERO_DATA, only : AEROMODE, N_MODE, MGPG, GPKG
       USE VDIFF_MAP, only : N_SPC_DIFF, DIFF_SPC, DIFF_MASK_AERO
+      use mio_module
 #ifdef mpas
       use util_module, only : index1, upcase
-      use mio_module
 #endif
   
       IMPLICIT NONE
@@ -3524,11 +3524,15 @@ C Open All Tracer Emission Files
               file_exist = .false.
            end if
 #else  
-             loc_nvars = nvars3d
-             loc_nlays = nlays3d
-             allocate (loc_vnames(loc_nvars), loc_units(loc_nvars), stat=status)
-             loc_vnames = VNAME3d(1:loc_nvars)
-             loc_units  = UNITS3D(1:loc_nvars)
+!          loc_nvars = nvars3d
+!          loc_nlays = nlays3d
+           loc_nvars = mio_file_data(floc)%nvars
+           loc_nlays = mio_file_data(floc)%nlays
+           allocate (loc_vnames(loc_nvars), loc_units(loc_nvars), stat=status)
+!          loc_vnames = VNAME3d(1:loc_nvars)
+!          loc_units  = UNITS3D(1:loc_nvars)
+           loc_vnames = mio_file_data(floc)%var_name
+           loc_units  = mio_file_data(floc)%units
 #endif  
 
            IF (FILE_EXIST) THEN
@@ -3567,7 +3571,6 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
         IF ( DESID_STREAM_TYPE( ISRM ) .EQ. 'GRID' ) THEN
           IGR = IGSRM( ISRM )
 
-#ifdef mpas 
           floc = mio_search (DESID_STREAM_NAME( ISRM ))
           call mio_timestamp_to_julian (mio_file_data(floc)%timestamp(1), loc_date, loc_time)
           loc_nvars = mio_file_data(floc)%nvars
@@ -3575,14 +3578,6 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
           allocate (loc_vnames(loc_nvars), loc_units(loc_nvars), stat=status)
           loc_vnames = mio_file_data(floc)%var_name
           loc_units  = mio_file_data(floc)%units
-#else
-          loc_nvars = NVARS3D
-          loc_nlays = nlays3d
-          allocate (loc_vnames(loc_nvars), loc_units(loc_nvars), stat=status)
-          loc_vnames = VNAME3d(1:loc_nvars)
-          loc_units  = UNITS3D(1:loc_nvars)
-          loc_date   = sdate3d
-#endif
             
           ! Let the date for this emission stream come from the model
           ! by default or the file if the user wishes to override the

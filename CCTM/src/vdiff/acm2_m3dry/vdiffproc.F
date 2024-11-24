@@ -795,7 +795,7 @@ C Write other diagnostics
          IF ( FIRST_WRITE_ISAM ) THEN
             FIRST_WRITE_ISAM = .FALSE.
             call mio_setfile( MET_CRO_2D )
-            call mio_fcreate( 'SA_DD_1_MIO', mio_new_file )
+            call mio_fcreate( SA_DD_1, mio_new_file )
          END IF
          DO ITAG = 1, N_SPCTAG
             DO R = 1, NROWS
@@ -804,7 +804,7 @@ C Write other diagnostics
                END DO
             END DO
 
-            call mio_fwrite( 'SA_DD_1_MIO', VNAM_SPCTAG( ITAG ), PNAME, WRDD, TIME_STAMP )
+            call mio_fwrite( SA_DD_1, VNAM_SPCTAG( ITAG ), PNAME, WRDD, TIME_STAMP )
          END DO
          SA_DDEP = 0.0
 #endif

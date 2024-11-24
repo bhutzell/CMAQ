@@ -538,11 +538,11 @@
                    E2C_CHEM_AVAIL = .true.
                    call get_env (full_name, E2C_CHEM, ' ')
                    inquire( file=full_name, exist=exists)
-                   If ( .Not. Open3( E2C_CHEM, fsread3, pname ) ) Then
-                      XMSG = 'Open failure for ' // E2C_CHEM
-                      Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                      E2C_CHEM_AVAIL = .false.
-                   END IF
+!                   If ( .Not. Open3( E2C_CHEM, fsread3, pname ) ) Then
+!                      XMSG = 'Open failure for ' // E2C_CHEM
+!                      Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!                      E2C_CHEM_AVAIL = .false.
+!                   END IF
                    if (exists) then
                       call mio_fopen( E2C_CHEM, mio_read_only )
                       n_opened_file = n_opened_file + 1
@@ -773,20 +773,20 @@
              n_opened_file = n_opened_file + 1
           end if
 
-          IF ( .NOT. OPEN3( LUFRAC_CRO, FSREAD3, PNAME ) ) THEN
-             XMSG = 'Could not open '// LUFRAC_CRO // ' file'
-             CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-             LUCRO_AVAIL = .FALSE.
-             XMSG = 'Solution: Reading Land Use Fractions from GRID_CRO_2D file'
-             WRITE(LOGDEV,'(5X,A)')TRIM( XMSG )
-          ELSE
+!          IF ( .NOT. OPEN3( LUFRAC_CRO, FSREAD3, PNAME ) ) THEN
+!             XMSG = 'Could not open '// LUFRAC_CRO // ' file'
+!             CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
+!             LUCRO_AVAIL = .FALSE.
+!             XMSG = 'Solution: Reading Land Use Fractions from GRID_CRO_2D file'
+!             WRITE(LOGDEV,'(5X,A)')TRIM( XMSG )
+!          ELSE
 !            n_opened_file = n_opened_file + 1
-             LUCRO_AVAIL = .TRUE.
-             IF ( .NOT. DESC3( LUFRAC_CRO ) ) THEN
-                XMSG = 'Could not get ' // LUFRAC_CRO //' file description'
-                CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-             END IF
-          END IF
+!             LUCRO_AVAIL = .TRUE.
+!             IF ( .NOT. DESC3( LUFRAC_CRO ) ) THEN
+!                XMSG = 'Could not get ' // LUFRAC_CRO //' file description'
+!                CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+!             END IF
+!          END IF
 
 ! met cro 2d file
           IF ( .NOT. OPEN3( MET_CRO_2D, FSREAD3, PNAME ) ) THEN
@@ -799,10 +799,10 @@
 
           n_opened_file = n_opened_file + 1
           f_met = n_opened_file
-          IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
-             XMSG = 'Could not get ' // MET_CRO_2D //' file description'
-             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!          IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
+!             XMSG = 'Could not get ' // MET_CRO_2D //' file description'
+!             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+!          END IF
 
 !         file_sdate(f_met) = sdate3d
 !         file_stime(f_met) = stime3d
@@ -900,10 +900,10 @@
              XMSG = 'Could not open '// MET_CRO_3D // ' file'
              CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
           END IF
-          IF ( .NOT. DESC3( MET_CRO_3D ) ) THEN
-             XMSG = 'Could not get ' // MET_CRO_3D //' file description'
-             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!          IF ( .NOT. DESC3( MET_CRO_3D ) ) THEN
+!             XMSG = 'Could not get ' // MET_CRO_3D //' file description'
+!             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+!          END IF
 
           call mio_fopen (MET_CRO_3D, mio_read_only)
           floc = mio_search (MET_CRO_3D)
@@ -1002,10 +1002,10 @@
              XMSG = 'Could not open '// MET_DOT_3D // ' file'
              CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
           END IF
-          IF ( .NOT. DESC3( MET_DOT_3D ) ) THEN
-             XMSG = 'Could not get description of file  '// MET_DOT_3D 
-             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!          IF ( .NOT. DESC3( MET_DOT_3D ) ) THEN
+!             XMSG = 'Could not get description of file  '// MET_DOT_3D 
+!             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+!          END IF
 
           call mio_fopen (MET_DOT_3D, mio_read_only)
           floc = mio_search (MET_DOT_3D)
@@ -1665,12 +1665,12 @@
              END IF
 #else
              call mio_time_format_conversion (jdate, jtime, timestamp)
-             If ( .Not. XTRACT3( MET_CRO_2D, 'SLTYP',
-     &                           1, 1, STRTROWMC2, ENDROWMC2, STRTCOLMC2, ENDCOLMC2, 
-     &                           jdate, jtime, SOILCAT_A ) ) THEN
-                XMSG = ' Error interpolating variable SLTYP from ' // MET_CRO_2D
-                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-             END IF
+!             If ( .Not. XTRACT3( MET_CRO_2D, 'SLTYP',
+!     &                           1, 1, STRTROWMC2, ENDROWMC2, STRTCOLMC2, ENDCOLMC2, 
+!     &                           jdate, jtime, SOILCAT_A ) ) THEN
+!                XMSG = ' Error interpolating variable SLTYP from ' // MET_CRO_2D
+!                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!             END IF
 
              call mio_fread (MET_CRO_2D, 'SLTYP', pname, SOILCAT_A, timestamp)
 
@@ -1719,12 +1719,12 @@
                       END IF
 #else
                       call mio_time_format_conversion (data_jdate, data_jtime, timestamp)
-                      IF ( .NOT. XTRACT3( MET_CRO_2D, cio_grid_var_name(v,1), 
-     &                                    1, 1, STRTROWMC2x, ENDROWMC2x, STRTCOLMC2x, ENDCOLMC2x, 
-     &                                    data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
-                         XMSG = 'Could not extract ' // MET_CRO_2D // ' file'
-                         CALL M3EXIT ( PNAME, DATA_JDATE, DATA_JTIME, XMSG, XSTAT1 )
-                      END IF
+!                      IF ( .NOT. XTRACT3( MET_CRO_2D, cio_grid_var_name(v,1), 
+!     &                                    1, 1, STRTROWMC2x, ENDROWMC2x, STRTCOLMC2x, ENDCOLMC2x, 
+!     &                                    data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
+!                         XMSG = 'Could not extract ' // MET_CRO_2D // ' file'
+!                         CALL M3EXIT ( PNAME, DATA_JDATE, DATA_JTIME, XMSG, XSTAT1 )
+!                      END IF
 
                       call mio_fread (MET_CRO_2D, cio_grid_var_name(v,1), pname, 
      &                                STRTCOLMC2x, ENDCOLMC2x, STRTROWMC2x, ENDROWMC2x, 1, 1, 
@@ -1764,12 +1764,12 @@
                    END IF
 #else
                    call mio_time_format_conversion (data_jdate, data_jtime, timestamp)
-                   IF ( .NOT. XTRACT3( MET_CRO_3D, cio_grid_var_name(v,1), 
-     &                                 1, nlays, STRTROWMC3, ENDROWMC3, STRTCOLMC3, ENDCOLMC3, 
-     &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
-                      XMSG = 'Could not extract ' // MET_CRO_3D // ' file'
-                      CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
-                   END IF
+!                   IF ( .NOT. XTRACT3( MET_CRO_3D, cio_grid_var_name(v,1), 
+!     &                                 1, nlays, STRTROWMC3, ENDROWMC3, STRTCOLMC3, ENDCOLMC3, 
+!     &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
+!                      XMSG = 'Could not extract ' // MET_CRO_3D // ' file'
+!                      CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
+!                   END IF
 
                    call mio_fread (MET_CRO_3D, cio_grid_var_name(v,1), pname,
      &                             STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3, 1, nlays,
@@ -1792,12 +1792,12 @@
 #else
                    call mio_time_format_conversion (data_jdate, data_jtime, timestamp)
 
-                   IF ( .NOT. XTRACT3( MET_DOT_3D, cio_grid_var_name(v,1), 
-     &                                 1, nlays, STRTROWMD3x, ENDROWMD3x, STRTCOLMD3x, ENDCOLMD3x, 
-     &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
-                      XMSG = 'Could not extract ' // MET_DOT_3D // ' file'
-                      CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
-                   END IF
+!                   IF ( .NOT. XTRACT3( MET_DOT_3D, cio_grid_var_name(v,1), 
+!     &                                 1, nlays, STRTROWMD3x, ENDROWMD3x, STRTCOLMD3x, ENDCOLMD3x, 
+!     &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
+!                      XMSG = 'Could not extract ' // MET_DOT_3D // ' file'
+!                      CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
+!                   END IF
 
                    call mio_fread (MET_DOT_3D, cio_grid_var_name(v,1), pname,
      &                             STRTCOLMD3x, ENDCOLMD3x, STRTROWMD3x, ENDROWMD3x, 1, nlays,
@@ -2015,12 +2015,12 @@
 
                    call mio_time_format_conversion (data_jdate, data_jtime, timestamp)
 
-                   IF ( .NOT. XTRACT3( NLDN_STRIKES, cio_grid_var_name(v,1), 
-     &                                 1, cio_LTLYRS, STRTROWLNT, ENDROWLNT, STRTCOLLNT, ENDCOLLNT, 
-     &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
-                      XMSG = 'Could not extract ' // NLDN_STRIKES // ' file'
-                      CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
-                   END IF
+!                   IF ( .NOT. XTRACT3( NLDN_STRIKES, cio_grid_var_name(v,1), 
+!     &                                 1, cio_LTLYRS, STRTROWLNT, ENDROWLNT, STRTCOLLNT, ENDCOLLNT, 
+!     &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
+!                      XMSG = 'Could not extract ' // NLDN_STRIKES // ' file'
+!                      CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
+!                   END IF
 
                    call mio_fread (NLDN_STRIKES, cio_grid_var_name(v,1), pname, tdata_3ds(:,:,1:1), timestamp)
 
@@ -2113,12 +2113,12 @@
           CALL SUBHFILE ( LUFRAC_CRO, GXOFF, GYOFF,
      &                    startcol, endcol, startrow, endrow )
 
-          IF ( .Not. XTRACT3( LUFRAC_CRO, 'LUFRAC',
-     &                        1, n_lufrac, startrow, endrow, startcol, endcol,
-     &                        0, 0, LUFRAC ) ) THEN
-             XMSG = 'Error interpolating variable LUFRAC from ' // LUFRAC_CRO
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          END IF
+!          IF ( .Not. XTRACT3( LUFRAC_CRO, 'LUFRAC',
+!     &                        1, n_lufrac, startrow, endrow, startcol, endcol,
+!     &                        0, 0, LUFRAC ) ) THEN
+!             XMSG = 'Error interpolating variable LUFRAC from ' // LUFRAC_CRO
+!             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!          END IF
           call mio_fread (LUFRAC_CRO, 'LUFRAC', pname, LUFRAC)
 
 #endif
@@ -2229,17 +2229,17 @@
           ltime = 0
 #else
           ! Open input file
-          IF ( .NOT. OPEN3( FILENAMES( IFILE ), FSREAD3, PNAME ) ) THEN
-              XMSG = 'Could not open '// FILENAMES( IFILE ) // ' file'
-             CALL M3EXIT( PNAME, STDATE, STTIME, XMSG, XSTAT1 )
-          END IF
+!          IF ( .NOT. OPEN3( FILENAMES( IFILE ), FSREAD3, PNAME ) ) THEN
+!              XMSG = 'Could not open '// FILENAMES( IFILE ) // ' file'
+!             CALL M3EXIT( PNAME, STDATE, STTIME, XMSG, XSTAT1 )
+!          END IF
           n_opened_file = n_opened_file + 1
 
-          ! Retrieve File Header Information
-          IF ( .NOT. DESC3( FILENAMES( IFILE ) ) ) THEN
-              XMSG = 'Could not get ' // FILENAMES( IFILE ) // ' file description'
-             CALL M3EXIT( PNAME, STDATE, STTIME, XMSG, XSTAT1 )
-          END IF
+!          ! Retrieve File Header Information
+!          IF ( .NOT. DESC3( FILENAMES( IFILE ) ) ) THEN
+!              XMSG = 'Could not get ' // FILENAMES( IFILE ) // ' file description'
+!             CALL M3EXIT( PNAME, STDATE, STTIME, XMSG, XSTAT1 )
+!          END IF
          
           call mio_fopen (FILENAMES( IFILE ), mio_read_only)
           floc = mio_search (FILENAMES( IFILE ))
@@ -2278,15 +2278,17 @@
 #ifdef mpas
                            call mio_fread (FILENAMES(IFILE), lvname, pname, DESID_REG_FAC(:,1,DESID_N_REG))
 #else
-                           IF ( .NOT. XTRACT3( FILENAMES( IFILE ), VNAME3D(IVAR), 1, 1,
-     &                                         STARTROW, ENDROW, STARTCOL, ENDCOL,
-     &                                         0, 0, DESID_REG_FAC( 1,1,DESID_N_REG ) ) ) Then
-                              XMSG = 'Could not read ' // VNAME3D(IVAR) //
-     &                               'from file ' // FILENAMES( IFILE ) 
-                              CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-                           End If
+!                           IF ( .NOT. XTRACT3( FILENAMES( IFILE ), VNAME3D(IVAR), 1, 1,
+!     &                                         STARTROW, ENDROW, STARTCOL, ENDCOL,
+!     &                                         0, 0, DESID_REG_FAC( 1,1,DESID_N_REG ) ) ) Then
+!                              XMSG = 'Could not read ' // VNAME3D(IVAR) //
+!     &                               'from file ' // FILENAMES( IFILE ) 
+!                              CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
+!                           End If
 
-                           call mio_fread (FILENAMES( IFILE ), VNAME3D(IVAR), pname, DESID_REG_FAC( :,:,DESID_N_REG ))
+!                          call mio_fread (FILENAMES( IFILE ), VNAME3D(IVAR), pname, DESID_REG_FAC( :,:,DESID_N_REG ))
+                           call mio_fread (FILENAMES( IFILE ), mio_file_data(floc)%var_name(IVAR), 
+     &                                     pname, DESID_REG_FAC( :,:,DESID_N_REG ))
 
 #endif
 
@@ -2301,13 +2303,13 @@
 #ifdef mpas
                      call mio_fread (FILENAMES(IFILE), VNAME, pname, DESID_REG_FAC(:,1,DESID_N_REG))
 #else
-                     IF ( .NOT. XTRACT3( FILENAMES( IFILE ), VNAME, 1, 1,
-     &                                   STARTROW, ENDROW, STARTCOL, ENDCOL,
-     &                                   0, 0, DESID_REG_FAC( 1,1,DESID_N_REG ) ) ) Then
-                        XMSG = 'Could not read ' // VNAME //
-     &                         'from file ' // FILENAMES( IFILE ) 
-                        CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-                     End If
+!                     IF ( .NOT. XTRACT3( FILENAMES( IFILE ), VNAME, 1, 1,
+!     &                                   STARTROW, ENDROW, STARTCOL, ENDCOL,
+!     &                                   0, 0, DESID_REG_FAC( 1,1,DESID_N_REG ) ) ) Then
+!                        XMSG = 'Could not read ' // VNAME //
+!     &                         'from file ' // FILENAMES( IFILE ) 
+!                        CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
+!                     End If
                      call mio_fread (FILENAMES( IFILE ), VNAME, pname, DESID_REG_FAC( :,:,DESID_N_REG ))
 #endif
 
@@ -2317,10 +2319,10 @@
 
 #ifndef mpas
           ! Close Regions File
-          IF ( .NOT. CLOSE3( FILENAMES( IFILE ) ) ) THEN
-            XMSG = 'Could not close ' // FILENAMES( IFILE )
-            CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-          END IF
+!          IF ( .NOT. CLOSE3( FILENAMES( IFILE ) ) ) THEN
+!            XMSG = 'Could not close ' // FILENAMES( IFILE )
+!            CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
+!          END IF
 #endif
          
           ! Error Check the Regions Array
@@ -2439,7 +2441,7 @@
      &                          + DESID_REG_FAC( :,:,IREAD )
             END IF
           END DO
-! Limit IREGION to < 1.0 incase some regions overlap.
+! Limit IREGION to < 1.0 in case some regions overlap.
           IREGION(:,:,:,NP) = MIN ( IREGION(:,:,:,NP), 1.0 )
 ! Copy up to layers above
           DO IFILE = 1, NLAYS
@@ -2871,7 +2873,7 @@
                backspace( FUNIT )
                read( FUNIT, fmt='(A)' ) tmpline
                XMSG = 'ERROR: There was a syntax error reading the max number of '//
-     &                'Size Distribution RUles for use by the DESID module. Please '//
+     &                'Size Distribution Rules for use by the DESID module. Please '//
      &                'check the format of each line for syntax errors. The '//
      &                'invalid line was likely: '
                CALL LOG_MESSAGE( LOGDEV, ' ')
@@ -3180,42 +3182,42 @@
 94010        FORMAT( A, F10.2, 1X, A, I3, ',', I3 )
 
              VAR = 'PTYPE'
-             IF ( .NOT. XTRACT3( MSOILINP, 'PTYPE', 1, 1,
-     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
-     &                           0, 0, PTYPE ) ) THEN
-                MESG = 'Could not read "' // TRIM( VAR ) //
-     &                 '" from file "' // TRIM( MSOILINP ) // '"'
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             END IF
+!             IF ( .NOT. XTRACT3( MSOILINP, 'PTYPE', 1, 1,
+!     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
+!     &                           0, 0, PTYPE ) ) THEN
+!                MESG = 'Could not read "' // TRIM( VAR ) //
+!     &                 '" from file "' // TRIM( MSOILINP ) // '"'
+!                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!             END IF
              call mio_fread (MSOILINP, var, pname, PTYPE)
 
              VAR = 'PULSEDATE'
-             IF ( .NOT. XTRACT3( MSOILINP, VAR, 1, 1,
-     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
-     &                           0, 0, PULSEDATE ) ) THEN
-                MESG = 'Could not read "' // TRIM( VAR ) //
-     &                 '" from file "' // TRIM( MSOILINP ) // '"'
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             END IF
+!             IF ( .NOT. XTRACT3( MSOILINP, VAR, 1, 1,
+!     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
+!     &                           0, 0, PULSEDATE ) ) THEN
+!                MESG = 'Could not read "' // TRIM( VAR ) //
+!     &                 '" from file "' // TRIM( MSOILINP ) // '"'
+!                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!             END IF
              call mio_fread (MSOILINP, var, pname, PULSEDATE)
 
              VAR = 'PULSETIME'
-             IF ( .NOT. XTRACT3( MSOILINP, VAR, 1, 1,
-     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
-     &                           0, 0, PULSETIME ) ) THEN
-                MESG = 'Could not read "' // TRIM( VAR ) //
-     &                 '" from file "' // TRIM( MSOILINP ) // '"'
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             END IF
+!             IF ( .NOT. XTRACT3( MSOILINP, VAR, 1, 1,
+!     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
+!     &                           0, 0, PULSETIME ) ) THEN
+!                MESG = 'Could not read "' // TRIM( VAR ) //
+!     &                 '" from file "' // TRIM( MSOILINP ) // '"'
+!                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!             END IF
              call mio_fread (MSOILINP, var, pname, PTYPE)
 
-             IF ( .NOT. XTRACT3( MSOILINP, 'LAI', 1, 1,
-     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
-     &                           0, 0, lai_y( :,: ) ) ) THEN
-                MESG = 'Could not read "' // 'LAI' //
-     &                 '" from file "' // TRIM( MSOILINP ) // '"'
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             END IF
+!             IF ( .NOT. XTRACT3( MSOILINP, 'LAI', 1, 1,
+!     &                           STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
+!     &                           0, 0, lai_y( :,: ) ) ) THEN
+!                MESG = 'Could not read "' // 'LAI' //
+!     &                 '" from file "' // TRIM( MSOILINP ) // '"'
+!                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!             END IF
              call mio_fread (MSOILINP, var, pname, lai_y)
 
 #endif
@@ -3245,13 +3247,13 @@
 
 
 #else
-                IF ( .NOT. XTRACT3( MSOILINP, VAR, 1, 1,
-     &                              STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
-     &                              0, 0, RAINFALL( :,:,I ) ) ) THEN
-                   MESG = 'Could not read "' // TRIM( VAR ) //
-     &                    '" from file "' // TRIM( MSOILINP ) // '"'
-                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-                END IF
+!                IF ( .NOT. XTRACT3( MSOILINP, VAR, 1, 1,
+!!     &                              STRTROWSTD, ENDROWSTD, STRTCOLSTD, ENDCOLSTD,  
+!     &                              0, 0, RAINFALL( :,:,I ) ) ) THEN
+!                   MESG = 'Could not read "' // TRIM( VAR ) //
+!     &                    '" from file "' // TRIM( MSOILINP ) // '"'
+!                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!                END IF
                 call mio_fread (MSOILINP, var, pname, RAINFALL( :,:,I ))
 
 !               J = INDEX( VDESC3D( I+3 ), 'for' ) + 3
@@ -3267,23 +3269,23 @@
                 DDTTM( I ) = mio_file_data(fnumm)%char_vatt_val(3,i+3)( J:K )
 
                 WRITE( VAR, '(A2,I2.2)' ) 'SW', I
-                IF ( .NOT. XTRACT3( MSOILINP, VAR, 1, 1,
-     &                              STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
-     &                              0, 0, sw24y( :,: ) ) ) THEN
-                   MESG = 'Could not read "' // TRIM( VAR ) //
-     &                    '" from file "' // TRIM( MSOILINP ) // '"'
-                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-                END IF
+!                IF ( .NOT. XTRACT3( MSOILINP, VAR, 1, 1,
+!     &                              STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
+!     &                              0, 0, sw24y( :,: ) ) ) THEN
+!                   MESG = 'Could not read "' // TRIM( VAR ) //
+!     &                    '" from file "' // TRIM( MSOILINP ) // '"'
+!                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!                END IF
                 call mio_fread (MSOILINP, var, pname, sw24y)
 
                 WRITE( VAR, '(A3,I2.2)' ) 'T2M', I
-                IF ( .NOT. XTRACT3( MSOILINP, VAR, 1, 1,
-     &                              STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
-     &                              0, 0, t24y( :,: ) ) ) THEN
-                   MESG = 'Could not read "' // TRIM( VAR ) //
-     &                    '" from file "' // TRIM( MSOILINP ) // '"'
-                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-                END IF
+!                IF ( .NOT. XTRACT3( MSOILINP, VAR, 1, 1,
+!     &                              STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
+!     &                              0, 0, t24y( :,: ) ) ) THEN
+!                   MESG = 'Could not read "' // TRIM( VAR ) //
+!     &                    '" from file "' // TRIM( MSOILINP ) // '"'
+!                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!                END IF
                 call mio_fread (MSOILINP, var, pname, t24y)
 #endif
                 sw24sum = sw24y + sw24sum
@@ -3316,44 +3318,44 @@
 
                 call mio_fopen (BDSNPINP, mio_read_only)
 
-                    IF ( .NOT. XTRACT3( BDSNPINP, 'DRYPERIOD',
-     &                                  1, 1, STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
-     &                                  0, 0, dryperiod(:,:) ) ) THEN
-                       mesg = 'Could not extract ' // BDSNPINP // ' file'
-                       CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
-                    END IF
+!                    IF ( .NOT. XTRACT3( BDSNPINP, 'DRYPERIOD',
+!     &                                  1, 1, STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
+!     &                                  0, 0, dryperiod(:,:) ) ) THEN
+!                       mesg = 'Could not extract ' // BDSNPINP // ' file'
+!                       CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
+!                    END IF
                 call mio_fread (BDSNPINP, 'DRYPERIOD', pname, dryperiod)
 
-                    IF ( .NOT. XTRACT3( BDSNPINP, 'NDEPRES',
-     &                                  1, 1, STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
-     &                                  0, 0, ndepres(:,:) ) ) THEN
-                       mesg = 'Could not extract ' // BDSNPINP // ' file'
-                       CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
-                    END IF
+!                    IF ( .NOT. XTRACT3( BDSNPINP, 'NDEPRES',
+!     &                                  1, 1, STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
+!     &                                  0, 0, ndepres(:,:) ) ) THEN
+!                       mesg = 'Could not extract ' // BDSNPINP // ' file'
+!                       CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
+!                    END IF
                 call mio_fread (BDSNPINP, 'NDEPRES', pname, ndepres)
 
-                    IF ( .NOT. XTRACT3( BDSNPINP, 'NDEPRATE_DIAG',
-     &                                  1, 1, STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
-     &                                  0, 0, ndeprate(:,:) ) ) THEN
-                       mesg = 'Could not extract ' // BDSNPINP // ' file'
-                       CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
-                    END IF
+!                    IF ( .NOT. XTRACT3( BDSNPINP, 'NDEPRATE_DIAG',
+!     &                                  1, 1, STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
+!     &                                  0, 0, ndeprate(:,:) ) ) THEN
+!                       mesg = 'Could not extract ' // BDSNPINP // ' file'
+!                       CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
+!                    END IF
                 call mio_fread (BDSNPINP, 'NDEPRATE_DIAG', pname, ndeprate)
 
-                    IF ( .NOT. XTRACT3( BDSNPINP, 'PFACTOR',
-     &                                  1, 1, STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
-     &                                  0, 0, pfactor(:,:) ) ) THEN
-                       mesg = 'Could not extract ' // BDSNPINP // ' file'
-                       CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
-                    END IF
+!                    IF ( .NOT. XTRACT3( BDSNPINP, 'PFACTOR',
+!     &                                  1, 1, STRTROWSTD, ENDROWSTD, STRTCOLSTD,ENDCOLSTD,
+!     &                                  0, 0, pfactor(:,:) ) ) THEN
+!                       mesg = 'Could not extract ' // BDSNPINP // ' file'
+!                       CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
+!                    END IF
                 call mio_fread (BDSNPINP, 'PFACTOR', pname, pfactor)
 
-                    IF ( .NOT. XTRACT3( BDSNPINP, 'SOILMPREV',
-     &                                  1, 1, STRTROWSTD, ENDROWSTD,STRTCOLSTD,ENDCOLSTD,
-     &                                  0, 0, soilmprev(:,:) ) ) THEN
-                       mesg = 'Could not extract ' // BDSNPINP // ' file'
-                       CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
-                    END IF
+!                    IF ( .NOT. XTRACT3( BDSNPINP, 'SOILMPREV',
+!     &                                  1, 1, STRTROWSTD, ENDROWSTD,STRTCOLSTD,ENDCOLSTD,
+!     &                                  0, 0, soilmprev(:,:) ) ) THEN
+!                       mesg = 'Could not extract ' // BDSNPINP // ' file'
+!                       CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
+!                    END IF
                 call mio_fread (BDSNPINP, 'SOILMPREV', pname, soilmprev)
 
 #endif
@@ -3604,13 +3606,13 @@ C   mminlu and num_land_cat are WRF global variables
                   call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
                end if
 #else
-               if ( .not. xtract3( lufile( 1 ), vnmld( i )%name, 1,1,
-     &                             strtrow1, endrow1,strtcol1, endcol1,
-     &                             0, 0, ladut( :,:,i ) ) ) then
-                  xmsg = 'Could not read ' // trim( vnmld( i )%name )
-     &                 // ' from ' // trim( lufile( 1 ) )
-                  call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
-               end if
+!               if ( .not. xtract3( lufile( 1 ), vnmld( i )%name, 1,1,
+!     &                             strtrow1, endrow1,strtcol1, endcol1,
+!     &                             0, 0, ladut( :,:,i ) ) ) then
+!                  xmsg = 'Could not read ' // trim( vnmld( i )%name )
+!     &                 // ' from ' // trim( lufile( 1 ) )
+!                  call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
+!               end if
 
                call mio_fread (lufile( 1 ), vnmld( i )%name, pname, ladut( :,:,i ))
 #endif
@@ -3627,13 +3629,13 @@ C   mminlu and num_land_cat are WRF global variables
                   call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
                end if
 #else
-               if ( .not. xtract3( lufile( 1 ), vnmlu( i )%name, 1,1,
-     &                             strtrow1, endrow1,strtcol1, endcol1,
-     &                             0, 0, lut( :,:,i ) ) ) then
-                  xmsg = 'Could not read ' // trim( vnmlu( i )%name )
-     &                 // ' from ' // trim( lufile( 1 ) )
-                  call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
-               end if
+!               if ( .not. xtract3( lufile( 1 ), vnmlu( i )%name, 1,1,
+!     &                             strtrow1, endrow1,strtcol1, endcol1,
+!     &                             0, 0, lut( :,:,i ) ) ) then
+!                  xmsg = 'Could not read ' // trim( vnmlu( i )%name )
+!     &                 // ' from ' // trim( lufile( 1 ) )
+!                  call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
+!               end if
 #endif 
                call mio_fread (lufile( 1 ), vnmlu( i )%name, pname, lut( :,:,i ))
                
@@ -3649,13 +3651,13 @@ C   mminlu and num_land_cat are WRF global variables
                   call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
                end if
 #else
-               if ( .not. xtract3( lufile( 1 ), vnmlu( i )%name, 1,1,
-     &                             strtrow1, endrow1,strtcol1, endcol1,
-     &                             0, 0, lut( :,:,i ) ) ) then
-                  xmsg = 'Could not read ' // trim( vnmlu( i )%name )
-     &                 // ' from ' // trim( lufile( 1 ) )
-                  call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
-               end if
+!               if ( .not. xtract3( lufile( 1 ), vnmlu( i )%name, 1,1,
+!     &                             strtrow1, endrow1,strtcol1, endcol1,
+!     &                             0, 0, lut( :,:,i ) ) ) then
+!                  xmsg = 'Could not read ' // trim( vnmlu( i )%name )
+!     &                 // ' from ' // trim( lufile( 1 ) )
+!                  call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
+!               end if
                call mio_fread (lufile( 1 ), vnmlu( i )%name, pname, lut( :,:,i ))
 #endif 
 #endif
@@ -3780,17 +3782,17 @@ C   mminlu and num_land_cat are WRF global variables
 !         megan_hr  = stime3d
           call mio_get_global_attr (MEGAN_CTS, 'SDATE', megan_day)
           call mio_get_global_attr (MEGAN_CTS, 'STIME', megan_hr)
-          megan_hr = 0
+!          megan_hr = 0
 
           do I = 1, mxrec3d 
 
-             IF ( .NOT. XTRACT3( MEGAN_CTS, 'CTS', 
-     &                           1, 1, strtrow, endrow, strtcol, endcol, 
-     &                           0, megan_hr, ctf(I,:,:,:) ) ) THEN
-                mesg = 'Could not extract ' // MEGAN_CTS // ' file'
-                CALL M3EXIT ( PNAME, megan_day, megan_hr, mesg, XSTAT1 )
-             END IF
-             megan_hr = megan_hr + 10000
+!             IF ( .NOT. XTRACT3( MEGAN_CTS, 'CTS', 
+!     &                           1, 1, strtrow, endrow, strtcol, endcol, 
+!     &                           0, megan_hr, ctf(I,:,:,:) ) ) THEN
+!                mesg = 'Could not extract ' // MEGAN_CTS // ' file'
+!                CALL M3EXIT ( PNAME, megan_day, megan_hr, mesg, XSTAT1 )
+!             END IF
+!             megan_hr = megan_hr + 10000
 
              call mio_fread (MEGAN_CTS, 'CTS', pname, ctf(I,:,:,:), mio_file_data(fnum)%timestamp(i))
 
@@ -3853,12 +3855,12 @@ C   mminlu and num_land_cat are WRF global variables
           megan_day = sdate3d 
           megan_hr  = stime3d
         
-          IF ( .NOT. XTRACT3( MEGAN_EFS, ALLVAR3, 
-     &                        1, 1, strtrow, endrow, strtcol, endcol, 
-     &                        megan_day, megan_hr, efmaps(:,:,:) ) ) THEN
-              mesg = 'Could not extract ' // MEGAN_EFS // ' file'
-              CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
-          END IF
+!          IF ( .NOT. XTRACT3( MEGAN_EFS, ALLVAR3, 
+!     &                        1, 1, strtrow, endrow, strtcol, endcol, 
+!     &                        megan_day, megan_hr, efmaps(:,:,:) ) ) THEN
+!              mesg = 'Could not extract ' // MEGAN_EFS // ' file'
+!              CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
+!          END IF
 
           call mio_fread ('MEGAN_EFS', 'EF_ISOP',    pname, efmaps(:,:, 1))
           call mio_fread ('MEGAN_EFS', 'EF_MBO',     pname, efmaps(:,:, 2))
@@ -3926,12 +3928,12 @@ C   mminlu and num_land_cat are WRF global variables
 
              do I = 1, nvars3d-2 ! lat/lon excluded
                 WRITE( VAR, '(A3,I2.2)' ) 'LAI', I
-                IF ( .NOT. XTRACT3( MEGAN_LAI, VAR, 
-     &                              1, 1, strtrow, endrow, strtcol, endcol, 
-     &                              megan_day, megan_hr, lai_m(:,:,I) ) ) THEN
-                   mesg = 'Could not extract ' // MEGAN_LAI // ' file'
-                   CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
-                END IF
+!                IF ( .NOT. XTRACT3( MEGAN_LAI, VAR, 
+!     &                              1, 1, strtrow, endrow, strtcol, endcol, 
+!     &                              megan_day, megan_hr, lai_m(:,:,I) ) ) THEN
+!                   mesg = 'Could not extract ' // MEGAN_LAI // ' file'
+!                   CALL M3EXIT ( PNAME, 0, 0, mesg, XSTAT1 )
+!                END IF
                 call mio_fread (MEGAN_LAI, VAR, pname, lai_m(:,:,I))
              end do
 #endif
@@ -3977,12 +3979,12 @@ C   mminlu and num_land_cat are WRF global variables
           megan_day = sdate3d 
           megan_hr  = stime3d
 
-             IF ( .NOT. XTRACT3( MEGAN_LDF, 'ALL',
-     &                           1, 1, strtrow, endrow, strtcol, endcol,
-     &                           megan_day, megan_hr, LDF(:,:,:) ) ) THEN
-                 mesg = 'Could not extract ' // MEGAN_LDF // ' file'
-                 CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
-             END IF
+!             IF ( .NOT. XTRACT3( MEGAN_LDF, 'ALL',
+!     &                           1, 1, strtrow, endrow, strtcol, endcol,
+!     &                           megan_day, megan_hr, LDF(:,:,:) ) ) THEN
+!                 mesg = 'Could not extract ' // MEGAN_LDF // ' file'
+!                 CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
+!             END IF
 
           do i = 1, mio_file_data(fnum)%nvars
             var = mio_file_data(fnum)%var_name(i)
@@ -4020,12 +4022,12 @@ C   mminlu and num_land_cat are WRF global variables
                 megan_hr  = stime3d
                 do i = 1,12
                    write( var, '(A8,I2.2)' ) 'NITROGEN', i
-                   IF ( .NOT. XTRACT3( BDSNP_NFILE, var,
-     &                                 1, 1, strtrow, endrow, strtcol, endcol,
-     &                                 megan_day, megan_hr, bdsnp_ndep(:,:,i) ) ) THEN
-                      mesg = 'Could not extract ' // BDSNP_NFILE // ' file'
-                      CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
-                   END IF
+!                   IF ( .NOT. XTRACT3( BDSNP_NFILE, var,
+!     &                                 1, 1, strtrow, endrow, strtcol, endcol,
+!     &                                 megan_day, megan_hr, bdsnp_ndep(:,:,i) ) ) THEN
+!                      mesg = 'Could not extract ' // BDSNP_NFILE // ' file'
+!                      CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
+!                   END IF
                    call mio_fread (BDSNP_NFILE, var, pname, bdsnp_ndep(:,:,i))
                 end do
 #endif
@@ -4063,12 +4065,12 @@ C   mminlu and num_land_cat are WRF global variables
 
              i  = FLOAT( MOD( STDATE, 1000 ) )
              write( var, '(A4,I3.3)' ) 'FERT', i
-             IF ( .NOT. XTRACT3( BDSNP_FFILE, var,
-     &                           1, 1, strtrow, endrow, strtcol, endcol,
-     &                           megan_day, megan_hr, bdsnp_fert(:,:) ) ) THEN
-                mesg = 'Could not extract ' // BDSNP_FFILE // ' file'
-                CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
-             END IF
+!             IF ( .NOT. XTRACT3( BDSNP_FFILE, var,
+!     &                           1, 1, strtrow, endrow, strtcol, endcol,
+!     &                           megan_day, megan_hr, bdsnp_fert(:,:) ) ) THEN
+!                mesg = 'Could not extract ' // BDSNP_FFILE // ' file'
+!                CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
+!             END IF
              call mio_fread (BDSNP_FFILE, var, pname, bdsnp_fert)
 
              ! BDSNP arid input
@@ -4089,12 +4091,12 @@ C   mminlu and num_land_cat are WRF global variables
              call subhfile( BDSNP_AFILE, gxoff, gyoff, strtcol,
      &                      endcol, strtrow, endrow )
 
-             IF ( .NOT. XTRACT3( BDSNP_AFILE, 'ARID',
-     &                           1, 1, strtrow, endrow, strtcol, endcol,
-     &                           megan_day, megan_hr, bdsnp_arid(:,:) ) ) THEN
-                mesg = 'Could not extract ' // BDSNP_AFILE // ' file'
-                CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
-             END IF
+!             IF ( .NOT. XTRACT3( BDSNP_AFILE, 'ARID',
+!     &                           1, 1, strtrow, endrow, strtcol, endcol,
+!     &                           megan_day, megan_hr, bdsnp_arid(:,:) ) ) THEN
+!                mesg = 'Could not extract ' // BDSNP_AFILE // ' file'
+!                CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
+!             END IF
              call mio_fread (BDSNP_AFILE, 'ARID', pname, bdsnp_arid)
 
              ! BDSNP nonarid input
@@ -4115,12 +4117,12 @@ C   mminlu and num_land_cat are WRF global variables
      &                      endcol, strtrow, endrow )
 
 
-             IF ( .NOT. XTRACT3( BDSNP_NAFILE, 'NONARID',
-     &                           1, 1, strtrow, endrow, strtcol, endcol,
-     &                           megan_day, megan_hr, bdsnp_nonarid(:,:) ) ) THEN
-                mesg = 'Could not extract ' // BDSNP_NAFILE // ' file'
-                CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
-             END IF
+!             IF ( .NOT. XTRACT3( BDSNP_NAFILE, 'NONARID',
+!     &                           1, 1, strtrow, endrow, strtcol, endcol,
+!     &                           megan_day, megan_hr, bdsnp_nonarid(:,:) ) ) THEN
+!                mesg = 'Could not extract ' // BDSNP_NAFILE // ' file'
+!                CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
+!             END IF
              call mio_fread (BDSNP_NAFILE, 'NONARID', pname, bdsnp_nonarid)
 
              ! BDSNP landtype input
@@ -4141,12 +4143,12 @@ C   mminlu and num_land_cat are WRF global variables
              call subhfile( BDSNP_LFILE, gxoff, gyoff, strtcol,
      &                      endcol, strtrow, endrow )
 
-             IF ( .NOT. XTRACT3( BDSNP_LFILE, 'LANDTYPE',
-     &                           1, 1, strtrow, endrow, strtcol, endcol,
-     &                           megan_day, megan_hr, bdsnp_landtype(:,:) ) ) THEN
-                mesg = 'Could not extract ' // BDSNP_LFILE // ' file'
-                CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
-             END IF
+!             IF ( .NOT. XTRACT3( BDSNP_LFILE, 'LANDTYPE',
+!     &                           1, 1, strtrow, endrow, strtcol, endcol,
+!     &                           megan_day, megan_hr, bdsnp_landtype(:,:) ) ) THEN
+!                mesg = 'Could not extract ' // BDSNP_LFILE // ' file'
+!                CALL M3EXIT ( PNAME, 0, megan_hr, mesg, XSTAT1 )
+!             END IF
              call mio_fread (BDSNP_LFILE, 'LANDTYPE', pname, bdsnp_landtype)
 #endif
 
@@ -5288,12 +5290,12 @@ C   mminlu and num_land_cat are WRF global variables
 
 !                call mio_time_format_conversion (stk_gp_sdate(n), stk_gp_stime(n), timestamp)
 
-                IF ( .NOT. XTRACT3( STKGNAME( N ), 'STKDM', 1, stk_gp_nlays(n),
-     &                              MY_STRT_SRC( N ), MY_END_SRC( N ),
-     &                              1, 1, stk_gp_sdate(n), stk_gp_stime(n), STKDIAM( N )%ARRY) ) THEN
-                   XMSG = 'Could not read STKDM from ' // TRIM( STKGNAME( N ) )
-                   call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
-                END IF
+!                IF ( .NOT. XTRACT3( STKGNAME( N ), 'STKDM', 1, stk_gp_nlays(n),
+!     &                              MY_STRT_SRC( N ), MY_END_SRC( N ),
+!     &                              1, 1, stk_gp_sdate(n), stk_gp_stime(n), STKDIAM( N )%ARRY) ) THEN
+!                   XMSG = 'Could not read STKDM from ' // TRIM( STKGNAME( N ) )
+!                   call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
+!                END IF
 
                 asize = MY_END_SRC( N ) - MY_STRT_SRC( N ) + 1
 
@@ -5303,12 +5305,12 @@ C   mminlu and num_land_cat are WRF global variables
 
              STKDIAM( N )%ARRY = tdata_3dr(1, 1:asize, 1)
 
-                IF ( .NOT. XTRACT3( STKGNAME( N ), 'STKHT', 1, stk_gp_nlays(n),
-     &                              MY_STRT_SRC( N ), MY_END_SRC( N ),
-     &                              1, 1, stk_gp_sdate(n), stk_gp_stime(n), STKHT( N )%ARRY) ) THEN
-                   XMSG = 'Could not read STKHT from ' // TRIM( STKGNAME( N ) )
-                   call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
-                END IF
+!                IF ( .NOT. XTRACT3( STKGNAME( N ), 'STKHT', 1, stk_gp_nlays(n),
+!     &                              MY_STRT_SRC( N ), MY_END_SRC( N ),
+!     &                              1, 1, stk_gp_sdate(n), stk_gp_stime(n), STKHT( N )%ARRY) ) THEN
+!                   XMSG = 'Could not read STKHT from ' // TRIM( STKGNAME( N ) )
+!                   call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
+!                END IF
 
              call mio_fread (STKGNAME( N ), 'STKHT', pname, 1, 1, MY_STRT_SRC( N ), MY_END_SRC( N ),
 !    &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
@@ -5316,12 +5318,12 @@ C   mminlu and num_land_cat are WRF global variables
 
              STKHT( N )%ARRY = tdata_3dr(1, 1:asize, 1)
 
-                IF ( .NOT. XTRACT3( STKGNAME( N ), 'STKTK', 1, stk_gp_nlays(n),
-     &                              MY_STRT_SRC( N ), MY_END_SRC( N ),
-     &                              1, 1, stk_gp_sdate(n), stk_gp_stime(n), STKTK( N )%ARRY) ) THEN
-                   XMSG = 'Could not read STKTK from ' // TRIM( STKGNAME( N ) )
-                   call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
-                END IF
+!                IF ( .NOT. XTRACT3( STKGNAME( N ), 'STKTK', 1, stk_gp_nlays(n),
+!     &                              MY_STRT_SRC( N ), MY_END_SRC( N ),
+!     &                              1, 1, stk_gp_sdate(n), stk_gp_stime(n), STKTK( N )%ARRY) ) THEN
+!                   XMSG = 'Could not read STKTK from ' // TRIM( STKGNAME( N ) )
+!                   call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
+!                END IF
 
              call mio_fread (STKGNAME( N ), 'STKTK', pname, 1, 1, MY_STRT_SRC( N ), MY_END_SRC( N ),
 !    &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
@@ -5329,12 +5331,12 @@ C   mminlu and num_land_cat are WRF global variables
 
              STKTK( N )%ARRY = tdata_3dr(1, 1:asize, 1)
 
-                IF ( .NOT. XTRACT3( STKGNAME( N ), 'STKVE', 1, stk_gp_nlays(n),
-     &                              MY_STRT_SRC( N ), MY_END_SRC( N ),
-     &                              1, 1, stk_gp_sdate(n), stk_gp_stime(n), STKVEL( N )%ARRY) ) THEN
-                   XMSG = 'Could not read STKVE from ' // TRIM( STKGNAME( N ) )
-                   call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
-                END IF
+!                IF ( .NOT. XTRACT3( STKGNAME( N ), 'STKVE', 1, stk_gp_nlays(n),
+!     &                              MY_STRT_SRC( N ), MY_END_SRC( N ),
+!     &                              1, 1, stk_gp_sdate(n), stk_gp_stime(n), STKVEL( N )%ARRY) ) THEN
+!                   XMSG = 'Could not read STKVE from ' // TRIM( STKGNAME( N ) )
+!                   call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
+!                END IF
 
              call mio_fread (STKGNAME( N ), 'STKVE', pname, 1, 1, MY_STRT_SRC( N ), MY_END_SRC( N ),
 !    &                       1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
@@ -5343,12 +5345,12 @@ C   mminlu and num_land_cat are WRF global variables
              STKVEL( N )%ARRY = tdata_3dr(1, 1:asize, 1)
 
                 IF ( FIRE_ON( N ) ) THEN
-                   IF ( .NOT. XTRACT3( STKGNAME( N ), 'ACRESBURNED', 1, stk_gp_nlays(n),
-     &                                 MY_STRT_SRC( N ), MY_END_SRC( N ),
-     &                                 1, 1, stk_gp_sdate(n), stk_gp_stime(n), ACRES_BURNED( N )%ARRY) ) THEN
-                      XMSG = 'Could not read ACRESBURNED from ' // TRIM( STKGNAME( N ) )
-                      call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
-                   END IF
+!                   IF ( .NOT. XTRACT3( STKGNAME( N ), 'ACRESBURNED', 1, stk_gp_nlays(n),
+!     &                                 MY_STRT_SRC( N ), MY_END_SRC( N ),
+!     &                                 1, 1, stk_gp_sdate(n), stk_gp_stime(n), ACRES_BURNED( N )%ARRY) ) THEN
+!                      XMSG = 'Could not read ACRESBURNED from ' // TRIM( STKGNAME( N ) )
+!                      call m3exit (pname, stk_gp_sdate(n), stk_gp_stime(n), xmsg, xstat1 )
+!                   END IF
 
                    call mio_fread (STKGNAME( N ), 'ACRESBURNED', pname, 1, 1, MY_STRT_SRC( N ), MY_END_SRC( N ),
 !    &                             1, stk_gp_nlays(n), tdata_3dr(1:1, 1:asize, 1:1), timestamp)
@@ -5503,19 +5505,19 @@ C   mminlu and num_land_cat are WRF global variables
           ALLOCATE( AVGEMIS( NCOLS,NROWS,NSEF-1,NSEASONS ),
      &              STAT=STAT )
 
-          IF ( .NOT. OPEN3( biogemis_fname, FSREAD3, PNAME ) ) THEN
-             XMSG = 'Could not open ' // trim(biogemis_fname) // ' file'
-             CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-          END IF
+!          IF ( .NOT. OPEN3( biogemis_fname, FSREAD3, PNAME ) ) THEN
+!             XMSG = 'Could not open ' // trim(biogemis_fname) // ' file'
+!             CALL LOG_MESSAGE( LOGDEV ,  XMSG )
+!          END IF
           n_opened_file = n_opened_file + 1
 
           call mio_fopen (biogemis_fname, mio_read_only)
           floc = mio_search (biogemis_fname)
 
-          IF ( .NOT. DESC3( biogemis_fname ) ) THEN
-             XMSG = 'Could not get ' // trim(biogemis_fname) // ' file description'
-             CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-          END IF
+!          IF ( .NOT. DESC3( biogemis_fname ) ) THEN
+!             XMSG = 'Could not get ' // trim(biogemis_fname) // ' file description'
+!             CALL LOG_MESSAGE( LOGDEV ,  XMSG )
+!          END IF
 
           call subhfile ( biogemis_fname, gxoff, gyoff,
      &                    startcol, endcol, startrow, endrow )
@@ -5526,13 +5528,13 @@ C Read the various categories of normalized emissions
              DO J = 1, NSEF-1
                 VAR = 'AVG_' // TRIM( BIOTYPES( J ) ) // SEASON( I )
 
-                IF ( .NOT. XTRACT3( biogemis_fname, VAR,
-     &                              1,1, startrow, endrow, startcol, endcol,
-     &                              0, 0, AVGEMIS( :,:,J,I ) ) ) THEN
-                   MESG = 'Could not read "' // TRIM( VAR ) //
-     &                    '" from file "' // TRIM( biogemis_fname ) // '"'
-                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-                END IF
+!                IF ( .NOT. XTRACT3( biogemis_fname, VAR,
+!     &                              1,1, startrow, endrow, startcol, endcol,
+!     &                              0, 0, AVGEMIS( :,:,J,I ) ) ) THEN
+!                   MESG = 'Could not read "' // TRIM( VAR ) //
+!     &                    '" from file "' // TRIM( biogemis_fname ) // '"'
+!                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!                END IF
                 call mio_fread (biogemis_fname, VAR, pname, AVGEMIS( :,:,J,I ))
              END DO
 
@@ -5560,45 +5562,46 @@ C Read the various categories of normalized emissions
      &              NONAGNO( NCOLS,NROWS ),
      &              STAT=STAT )
 
-          IF ( .NOT. OPEN3( fname, FSREAD3, PNAME ) ) THEN
-             MESG = 'Could not open ' // trim(fname) // ' file '
-             CALL LOG_MESSAGE( LOGDEV ,  MESG )
-          END IF
-          n_opened_file = n_opened_file + 1
+!          IF ( .NOT. OPEN3( fname, FSREAD3, PNAME ) ) THEN
+!             MESG = 'Could not open ' // trim(fname) // ' file '
+!             CALL LOG_MESSAGE( LOGDEV ,  MESG )
+!          END IF
+!          n_opened_file = n_opened_file + 1
 
-          call mio_fopen (fname, mio_read_only)
+! already opened in biogemis_setup
+!          call mio_fopen (fname, mio_read_only)
 
           call subhfile ( fname, gxoff, gyoff,
      &                    startcol, endcol, startrow, endrow )
 
           VAR = 'AVG_NOAG_GROW'
-          IF ( .NOT. XTRACT3( fname, VAR,
-     &                        1,1, startrow, endrow, startcol, endcol,
-     &                        0, 0, GROWAGNO ) ) THEN
-             MESG = 'Could not read "' // TRIM( VAR ) //
-     &              '" from file "' // TRIM( fname ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          END IF
+!          IF ( .NOT. XTRACT3( fname, VAR,
+!     &                        1,1, startrow, endrow, startcol, endcol,
+!     &                        0, 0, GROWAGNO ) ) THEN
+!             MESG = 'Could not read "' // TRIM( VAR ) //
+!     &              '" from file "' // TRIM( fname ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          END IF
           call mio_fread (fname, VAR, pname, GROWAGNO)
 
           VAR = 'AVG_NOAG_NONGROWNB3'
-          IF ( .NOT. XTRACT3( fname, VAR,
-     &                        1,1, startrow, endrow, startcol, endcol,
-     &                        0, 0, NGROWAGNO ) ) THEN
-             MESG = 'Could not read "' // TRIM( VAR ) //
-     &              '" from file "' // TRIM( fname ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          END IF
+!          IF ( .NOT. XTRACT3( fname, VAR,
+!     &                        1,1, startrow, endrow, startcol, endcol,
+!     &                        0, 0, NGROWAGNO ) ) THEN
+!             MESG = 'Could not read "' // TRIM( VAR ) //
+!     &              '" from file "' // TRIM( fname ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          END IF
           call mio_fread (fname, VAR, pname, NGROWAGNO)
 
           VAR = 'AVG_NONONAG'
-          IF ( .NOT. XTRACT3( fname, VAR,
-     &                        1,1, startrow, endrow, startcol, endcol,
-     &                        0, 0, NONAGNO ) ) THEN
-             MESG = 'Could not read "' // TRIM( VAR ) //
-     &              '" from file "' // TRIM( fname ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          END IF
+!          IF ( .NOT. XTRACT3( fname, VAR,
+!     &                        1,1, startrow, endrow, startcol, endcol,
+!     &                        0, 0, NONAGNO ) ) THEN
+!             MESG = 'Could not read "' // TRIM( VAR ) //
+!     &              '" from file "' // TRIM( fname ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          END IF
           call mio_fread (fname, VAR, pname, NONAGNO)
 
         end subroutine beis_norm_emis_setup
@@ -5641,13 +5644,13 @@ C Read the various categories of normalized emissions
 
           Do k = 1, e2c_cats
              vname = BELD_Names(k)
-             IF ( .NOT. XTRACT3( E2C_LU, vname,
-     &                            1, 1, startrow, endrow, startcol, endcol,
-     &                            0, 0, Beld_ag( :,:,k ) ) ) Then
-                MESG = 'Could not read "' // TRIM( vname ) //
-     &                 '" from file "' // TRIM( E2C_LU ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             End If
+!             IF ( .NOT. XTRACT3( E2C_LU, vname,
+!     &                            1, 1, startrow, endrow, startcol, endcol,
+!     &                            0, 0, Beld_ag( :,:,k ) ) ) Then
+!                MESG = 'Could not read "' // TRIM( vname ) //
+!     &                 '" from file "' // TRIM( E2C_LU ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!             End If
              call mio_fread (E2C_LU, vname, pname, Beld_ag( :,:,k ))
           End Do
 
@@ -5663,21 +5666,21 @@ C Read the various categories of normalized emissions
      &                    startcol, endcol, startrow, endrow )
 
           vname = 'L1_PH'
-          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
-     &                         startcol, endcol, 0, 0, pHs1 ) ) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
+!     &                         startcol, endcol, 0, 0, pHs1 ) ) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_SOIL, vname, pname, pHs1)
 
           vname = 'L2_PH'
-          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
-     &                         startcol, endcol, 0, 0, pHs2 ) ) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
+!     &                         startcol, endcol, 0, 0, pHs2 ) ) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_SOIL, vname, pname, pHs2)
 
 #ifdef m3dry_opt
@@ -5690,57 +5693,57 @@ C Read the various categories of normalized emissions
      &               STAT=STAT )
 
           vname = 'L1_Porosity'
-          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
-     &                         startcol, endcol, 0, 0, por1 ) ) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
+!     &                         startcol, endcol, 0, 0, por1 ) ) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_SOIL, vname, pname, por1)
 
           vname = 'L2_Porosity'
-          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
-     &                         startcol, endcol, 0, 0, por2 ) ) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
+!     &                         startcol, endcol, 0, 0, por2 ) ) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_SOIL, vname, pname, por2)
 
           vname = 'L1_Wilt_P'
-          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
-     &                         startcol, endcol, 0, 0, wp1 ) ) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
+!     &                         startcol, endcol, 0, 0, wp1 ) ) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_SOIL, vname, pname, wp1)
 
           vname = 'L2_Wilt_P'
-          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
-     &                         startcol, endcol, 0, 0, wp2 ) ) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
+!     &                         startcol, endcol, 0, 0, wp2 ) ) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_SOIL, vname, pname, wp2)
 
           vname = 'L1_Cation'
-          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
-     &                         startcol, endcol, 0, 0, cec1 ) ) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
+!     &                         startcol, endcol, 0, 0, cec1 ) ) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
            call mio_fread (E2C_SOIL, vname, pname, cec1)
 
           vname = 'L2_Cation'
-          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
-     &                         startcol, endcol, 0, 0, cec2 ) ) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 ( E2C_SOIL, vname, 1, e2c_cats, startrow, endrow,
+!     &                         startcol, endcol, 0, 0, cec2 ) ) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_SOIL ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_SOIL, vname, pname, cec2)
 #endif
  
@@ -5770,21 +5773,21 @@ C Read the various categories of normalized emissions
           call mio_time_format_conversion (cio_model_sdate, 0, timestamp)
 
           vname = 'L1_NH3'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, NH4ps1) ) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_CHEM ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, NH4ps1) ) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_CHEM ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, NH4ps1, timestamp)
 
           vname = 'L2_NH3'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, NH4ps2) ) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_CHEM ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, NH4ps2) ) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_CHEM ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, NH4ps2, timestamp)
 
 #ifdef m3dry_opt
@@ -5795,30 +5798,30 @@ C Read the various categories of normalized emissions
      &               STAT=STAT )
 
           vname = 'L1_SW'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, wep1)) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_CHEM ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, wep1)) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_CHEM ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, wep1, timestamp)
 
           vname = 'L2_SW'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, wep2)) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_CHEM ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, wep2)) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_CHEM ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, wep2, timestamp)
 
           vname = 'L2_DEP'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, dep2)) Then
-             MESG = 'Could not read "' // TRIM( vname ) //
-     &              '" from file "' // TRIM( E2C_CHEM ) // '"'
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, dep2)) Then
+!             MESG = 'Could not read "' // TRIM( vname ) //
+!     &              '" from file "' // TRIM( E2C_CHEM ) // '"'
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, dep2, timestamp)
 #else
 #ifdef stage_opt
@@ -5831,51 +5834,51 @@ C Read the various categories of normalized emissions
      &              STAT=STAT )
 
           vname = 'L1_NITR'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, Nit1 ) ) Then
-             Write( mesg,9001 ) vname, E2C_CHEM
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, Nit1 ) ) Then
+!             Write( mesg,9001 ) vname, E2C_CHEM
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, Nit1, timestamp)
 
           vname = 'L2_NITR'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, Nit2 ) ) Then
-             Write( mesg,9001 ) vname, E2C_CHEM
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, Nit2 ) ) Then
+!             Write( mesg,9001 ) vname, E2C_CHEM
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, Nit2, timestamp)
 
           vname = 'L1_ON'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, L1_ON ) ) Then
-             Write( mesg,9001 ) vname, E2C_CHEM
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, L1_ON ) ) Then
+!             Write( mesg,9001 ) vname, E2C_CHEM
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, L1_ON, timestamp)
 
           vname = 'L2_ON'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, L2_ON ) ) Then
-             Write( mesg,9001 ) vname, E2C_CHEM
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, L2_ON ) ) Then
+!             Write( mesg,9001 ) vname, E2C_CHEM
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, L2_ON, timestamp)
 
           vname = 'L1_BD'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, BDc1 ) ) Then
-             Write( mesg,9001 ) vname, E2C_CHEM
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, BDc1 ) ) Then
+!             Write( mesg,9001 ) vname, E2C_CHEM
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, BDc1, timestamp)
 
           vname = 'L2_BD'
-          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, BDc2 ) ) Then
-             Write( mesg,9001 ) vname, E2C_CHEM
-             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-          End If
+!          If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, BDc2 ) ) Then
+!             Write( mesg,9001 ) vname, E2C_CHEM
+!             CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!          End If
           call mio_fread (E2C_CHEM, vname, pname, BDc2, timestamp)
 
           If ( GMN_AVAIL ) Then ! Using Fest-C 1.4 output
@@ -5886,11 +5889,11 @@ C Read the various categories of normalized emissions
              End If
 
              vname = 'GMN'
-             If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                        startcol, endcol, cio_model_sdate, 0, GMN ) ) Then
-                Write( mesg,9001 ) vname, E2C_CHEM
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-             End If
+!             If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                        startcol, endcol, cio_model_sdate, 0, GMN ) ) Then
+!                Write( mesg,9001 ) vname, E2C_CHEM
+!                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!             End If
              call mio_fread (E2C_CHEM, vname, pname, GMN, timestamp)
 
           End If
@@ -5979,38 +5982,38 @@ C Read the various categories of normalized emissions
      &                          startcol, endcol, startrow, endrow )
 
                 vname = 'L1_AON'
-                If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                              startcol, endcol, cio_model_sdate, 0, F1_ON ) ) Then
-                   Write( mesg,9001 ) vname, E2C_CHEM
-                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-                End If
+!                If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                              startcol, endcol, cio_model_sdate, 0, F1_ON ) ) Then
+!                   Write( mesg,9001 ) vname, E2C_CHEM
+!                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!                End If
                 call mio_fread (E2C_CHEM, vname, pname, F1_ON, timestamp)
 
                 vname = 'L2_AON'
-                If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
-     &                              startcol, endcol, cio_model_sdate, 0, F2_ON ) ) Then
-                   Write( mesg,9001 ) vname, E2C_CHEM
-                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-                End If
+!                If ( .Not. Xtract3 (E2C_CHEM, vname, 1, e2c_cats, startrow, endrow,
+!     &                              startcol, endcol, cio_model_sdate, 0, F2_ON ) ) Then
+!                   Write( mesg,9001 ) vname, E2C_CHEM
+!                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!                End If
                 call mio_fread (E2C_CHEM, vname, pname, F2_ON, timestamp)
 
                 call subhfile ( E2C_CHEM_YEST, gxoff, gyoff,
      &                          startcol, endcol, startrow, endrow )
 
                 vname = 'L1_ON'
-                If ( .Not. Xtract3 (E2C_CHEM_YEST, vname, 1, e2c_cats, startrow, endrow,
-     &                              startcol, endcol, jdate_yest, 0, L1_ON_Yest ) ) Then
-                   Write( mesg,9001 ) vname, E2C_CHEM
-                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-                End If
+!                If ( .Not. Xtract3 (E2C_CHEM_YEST, vname, 1, e2c_cats, startrow, endrow,
+!     &                              startcol, endcol, jdate_yest, 0, L1_ON_Yest ) ) Then
+!                   Write( mesg,9001 ) vname, E2C_CHEM
+!                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!                End If
                 call mio_fread (E2C_CHEM_YEST, vname, pname, L1_ON_Yest, timestamp)
 
                 vname = 'L2_ON'
-                If ( .Not. Xtract3 (E2C_CHEM_YEST, vname, 1, e2c_cats, startrow, endrow,
-     &                              startcol, endcol, jdate_yest, 0, L2_ON_Yest ) ) Then
-                   Write( mesg,9001 ) vname, E2C_CHEM
-                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
-                End If
+!                If ( .Not. Xtract3 (E2C_CHEM_YEST, vname, 1, e2c_cats, startrow, endrow,
+!     &                              startcol, endcol, jdate_yest, 0, L2_ON_Yest ) ) Then
+!                   Write( mesg,9001 ) vname, E2C_CHEM
+!                   CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
+!                End If
                 call mio_fread (E2C_CHEM_YEST, vname, pname, L2_ON_Yest, timestamp)
              end if    ! .not. GMN_AVAIL
           end if   ! MEDC_AVAIL
@@ -6051,13 +6054,13 @@ C Read the various categories of normalized emissions
      &                    startcol, endcol, startrow, endrow )
 
           DO v = 1, Hg_TOT
-            IF ( .NOT. Xtract3( INIT_MEDC_1, MEDIA_NAMES( V ), 1, 1, 
-     &                          startrow, endrow, startcol, endcol,
-     &                          cio_model_sdate, 0, CMEDIA(:,:,v) ) )THEN
-               xmsg = 'Could not read ' // trim( MEDIA_NAMES( V ) )
-     &                // ' from ' // trim( INIT_MEDC_1 )
-             call m3exit( pname, cio_model_sdate, 0, xmsg, xstat1 )
-            END IF
+!            IF ( .NOT. Xtract3( INIT_MEDC_1, MEDIA_NAMES( V ), 1, 1, 
+!     &                          startrow, endrow, startcol, endcol,
+!     &                          cio_model_sdate, 0, CMEDIA(:,:,v) ) )THEN
+!               xmsg = 'Could not read ' // trim( MEDIA_NAMES( V ) )
+!     &                // ' from ' // trim( INIT_MEDC_1 )
+!             call m3exit( pname, cio_model_sdate, 0, xmsg, xstat1 )
+!            END IF
             call mio_fread (INIT_MEDC_1, MEDIA_NAMES( V ), pname, CMEDIA(:,:,v), timestamp)
           END DO
 
@@ -6478,60 +6481,60 @@ C Read the various categories of normalized emissions
           call subhfile ( LTNGPARMS_FILE, gxoff, gyoff,
      &                    startcol, endcol, startrow, endrow )
 
-          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "OCNMASK", 1, 1,
-     &                        startrow, endrow, startcol, endcol,
-     &                        0, 0, OCEAN_MASK ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          End If
+!          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "OCNMASK", 1, 1,
+!     &                        startrow, endrow, startcol, endcol,
+!     &                        0, 0, OCEAN_MASK ) ) Then
+!             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+!             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!          End If
           call mio_fread( LTNGPARMS_FILE, 'OCNMASK', pname, OCEAN_MASK )
 
-          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "SLOPE", 1, 1,
-     &                        startrow, endrow, startcol, endcol,
-     &                        0, 0, SLOPE ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          End If
+!          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "SLOPE", 1, 1,
+!     &                        startrow, endrow, startcol, endcol,
+!     &                        0, 0, SLOPE ) ) Then
+!             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+!             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!          End If
           call mio_fread( LTNGPARMS_FILE, 'SLOPE', pname, SLOPE )
 
-          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "INTERCEPT", 1, 1,
-     &                        startrow, endrow, startcol, endcol,
-     &                        0, 0, INTERCEPT ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          End If
+!          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "INTERCEPT", 1, 1,
+!     &                        startrow, endrow, startcol, endcol,
+!     &                        0, 0, INTERCEPT ) ) Then
+!             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+!             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!          End If
           call mio_fread( LTNGPARMS_FILE, 'INTERCEPT', pname, INTERCEPT )
 
-          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "SLOPE_lg", 1, 1,
-     &                        startrow, endrow, startcol, endcol,
-     &                        0, 0, SLOPE_lg ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          End If
+!          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "SLOPE_lg", 1, 1,
+!     &                        startrow, endrow, startcol, endcol,
+!     &                        0, 0, SLOPE_lg ) ) Then
+!             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+!             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!          End If
           call mio_fread( LTNGPARMS_FILE, 'SLOPE_lg', pname, SLOPE_lg )
 
-          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "INTERCEPT_lg", 1, 1,
-     &                        startrow, endrow, startcol, endcol,
-     &                        0, 0, INTERCEPT_lg ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          End If
+!          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "INTERCEPT_lg", 1, 1,
+!     &                        startrow, endrow, startcol, endcol,
+!     &                        0, 0, INTERCEPT_lg ) ) Then
+!             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+!             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!          End If
           call mio_fread( LTNGPARMS_FILE, 'INTERCEPT_lg', pname, INTERCEPT_lg )
 
-          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "ICCG_SUM", 1, 1,
-     &                        startrow, endrow, startcol, endcol,
-     &                        0, 0, ICCG_SUM ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          End If
+!          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "ICCG_SUM", 1, 1,
+!     &                        startrow, endrow, startcol, endcol,
+!     &                        0, 0, ICCG_SUM ) ) Then
+!             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+!             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!          End If
           call mio_fread( LTNGPARMS_FILE, 'ICCG_SUM', pname, ICCG_SUM )
 
-          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "ICCG_WIN", 1, 1,
-     &                        startrow, endrow, startcol, endcol,
-     &                        0, 0, ICCG_WIN ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
-             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-          End If
+!          IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "ICCG_WIN", 1, 1,
+!     &                        startrow, endrow, startcol, endcol,
+!     &                        0, 0, ICCG_WIN ) ) Then
+!             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+!             Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+!          End If
           call mio_fread( LTNGPARMS_FILE, 'ICCG_WIN', pname, ICCG_WIN )
 
         end subroutine retrieve_ltng_param_data
@@ -6750,6 +6753,7 @@ C Read the various categories of normalized emissions
                          XMSG = 'Could not extract ' // cio_stack_file_name(pt) // ' file'
                          CALL M3EXIT ( PNAME, loc_jdate, loc_jtime, XMSG, XSTAT1 )
                       END IF
+! needs mio implementation
                    end if
                 end do
 

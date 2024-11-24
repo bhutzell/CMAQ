@@ -38,7 +38,6 @@ C-----------------------------------------------------------------------
       USE STD_CONC              ! standard CONC
       USE UTILIO_DEFN
       use mio_module
-!     USE RUNTIME_VARS, only: io_mode
 
 #ifndef mpas
 #ifdef parallel

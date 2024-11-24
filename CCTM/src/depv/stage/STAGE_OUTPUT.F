@@ -188,7 +188,6 @@ C Local variables:
          USE UTILIO_DEFN
          USE MOSAIC_MOD,   Only: Tile_Data
          USE ASX_DATA_MOD, Only: MOSAIC_DATA
-         use runtime_vars, only: io_mode
          use mio_module
 
          Implicit None    

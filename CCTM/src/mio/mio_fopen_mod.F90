@@ -41,7 +41,6 @@
              t = mio_search (full_name, mio_file_data(:)%full_filename, mio_nfiles)
           end if
 
-! write (mio_logdev, '(A,A,2x,2i5)' ) '==c== mio_fopen: fname, mode, t = ', trim(fname), mode, t
            if (present(num_of_outfiles)) then
             if (called_once) then
                write(mio_logdev, *) ' Abort in mio_fopen: called twice with outfiles'
@@ -456,9 +455,9 @@
 
              end if
 
-!   do i = 1, mio_nfiles
-!      write (mio_logdev, '(A,i3,2x,A)' ) '==c==', i, trim(mio_file_data(i)%filename)
-!   end do
+   do i = 1, mio_nfiles
+      write (mio_logdev, '(A,i3,2x,A)' ) '==c==', i, trim(mio_file_data(i)%filename)
+   end do
 
         end subroutine mio_fopen
 

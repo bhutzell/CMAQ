@@ -512,14 +512,9 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
        setenv SA_DD_1         $OUTDIR/CCTM_SA_DRYDEP_${CTM_APPL}.nc
        setenv SA_WD_1         $OUTDIR/CCTM_SA_WETDEP_${CTM_APPL}.nc
        setenv SA_CGRID_1      $OUTDIR/CCTM_SA_CGRID_${CTM_APPL}.nc 
-       setenv SA_ACONC_1_MIO  $OUTDIR/CCTM_SA_ACONC_MIO_${CTM_APPL}.nc
-       setenv SA_CONC_1_MIO   $OUTDIR/CCTM_SA_CONC_MIO_${CTM_APPL}.nc 
-       setenv SA_DD_1_MIO     $OUTDIR/CCTM_SA_DRYDEP_MIO_${CTM_APPL}.nc
-       setenv SA_WD_1_MIO     $OUTDIR/CCTM_SA_WETDEP_MIO_${CTM_APPL}.nc
-       setenv SA_CGRID_1_MIO  $OUTDIR/CCTM_SA_CGRID_MIO_${CTM_APPL}.nc
 
        #> Set optional ISAM regions files
-       setenv ISAM_REGIONS $INPDIR/GRIDMASK_STATES_12NE3.nc
+       setenv ISAM_REGIONS $INPDIR/surface/GRIDMASK_STATES_12NE3.nc
 
        #> Options used to favor tracked species in reaction for Ozone-NOx chemistry
        setenv ISAM_O3_WEIGHTS 5   # weights for tracked species Default is 5
@@ -617,12 +612,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_LTNGDIAG_2  $OUTDIR/CCTM_LTNGCOL_${CTM_APPL}.nc         #> Column Total Lightning NO
   setenv CTM_VEXT_1      $OUTDIR/CCTM_VEXT_${CTM_APPL}.nc            #> On-Hour 3D Concs at select sites
 
-# 2nd set of output files using MIO
-  setenv MEGAN_SOIL_MIO  $OUTDIR/CCTM_MSOILOUT_MIO_${CTM_APPL}.nc        #> Soil Emissions
-  setenv BDSNPOUT_MIO    $OUTDIR/CCTM_BDSNPOUT_MIO_${CTM_APPL}.nc        #> Soil Emissions
-  setenv CTM_DDEP_MOS_MIO $OUTDIR/CCTM_DDMOS_MIO_${CTM_APPL}.nc      #> Dry Dep
-  setenv CTM_DEPV_MOS_MIO $OUTDIR/CCTM_DEPVMOS_MIO_${CTM_APPL}.nc    #> Dry Dep Velocity
-
   #> set floor file (neg concs)
   setenv FLOOR_FILE ${OUTDIR}/FLOOR_${CTM_APPL}.txt
 
@@ -638,7 +627,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
              $CTM_IPR_3 $CTM_BUDGET $CTM_IRR_1 $CTM_IRR_2 $CTM_IRR_3 $CTM_DRY_DEP_MOS                 \
              $CTM_DEPV_MOS $CTM_VDIFF_DIAG $CTM_VSED_DIAG $CTM_LTNGDIAG_1 $CTM_LTNGDIAG_2 $CTM_VEXT_1 )
 
-  set OUT_FILES = (${OUT_FILES} $MEGAN_SOIL_MIO $BDSNPOUT_MIO )
+  set OUT_FILES = (${OUT_FILES} )
 
   if ( $?CTM_ISAM ) then
      if ( $CTM_ISAM == 'Y' || $CTM_ISAM == 'T' ) then

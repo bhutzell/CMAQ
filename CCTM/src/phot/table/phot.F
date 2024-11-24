@@ -480,7 +480,7 @@ C...open the photolysis rate diagnostic files
             CREATE_MIO_OUTS = .FALSE.
 ! Create PHOTDIAG1_MIO file
             CALL MIO_SETFILE( MET_CRO_3D )
-            CALL MIO_FCREATE( FNAME='CTM_RJ_2_MIO', MODE=IO_MODE )
+            CALL MIO_FCREATE( FNAME=CTM_RJ_2, MODE=MIO_NEW_FILE )
       END IF
 
 C...compute XLHA (local hr angle) deviation from noon
