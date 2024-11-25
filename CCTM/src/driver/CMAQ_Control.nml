@@ -100,7 +100,7 @@
   Keywd(5,:) = 'TSP','PMC',
                'PMF','PMF_FRM','PMF_OC','PMF_EC','PMF_NA','PMF_CL','PMF_SO4',
                'PMF_NO3','PMF_NH4','PMF_FE','PMF_AL','PMF_SI','PMF_TI','PMF_CA',
-               'PMF_MG','PMF_K','PMF_MN','PMF_RECONSOIL','PMF_OTHWNC','PMF_NC',
+               'PMF_MG','PMF_K','PMF_MN','PMF_RCSOIL','PMF_OTHWNC','PMF_NC',
                'PMF_OTH',
                'PM25','PM25_FRM','PM25_OC','PM25_EC','PM25_SO4','PM25_NO3',
                'PM25_NH4',
@@ -124,7 +124,7 @@
  !-- Particle Speciation
   Keywd_name(10) = 'FINE_SPECIES'
   Keywd(10,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC','PMF_OC','PMF_OA',
-               'PMF_H2O','PMF_RECONSOIL','PMF_OTHWNC','PMF_OTH','PMF_HP','PMF_HPMOLAL',
+               'PMF_H2O','PMF_RCSOIL','PMF_OTHWNC','PMF_OTH','PMF_HP','PMF_HPMOLAL',
                'PMF_PH','FINE_ORG','PMF','TSP_NO3_PPM'
 
   Keywd_name(11) = 'COARSE_SPECIES'
@@ -136,12 +136,12 @@
   Keywd_name(13) = 'PM1_SPECIES'
   Keywd(13,:) = 'PM1','PM1_SO4','PM1_NO3','PM1_NH4','PM1_CL','PM1_NA','PM1_EC','PM1_OC',
                'PM1_OA','PM1_MG','PM1_K','PM1_CA','PM1_OTHER','PM1_FE','PM1_SI','PM1_TI',
-               'PM1_MN','PM1_AL','PM1_RECONSOIL','PM1_OTHWNC','PM1_UNSPCRS'
+               'PM1_MN','PM1_AL','PM1_RCSOIL','PM1_OTHWNC','PM1_UNSPCRS'
 
   Keywd_name(14) = 'PM25_SPECIES'
   Keywd(14,:) = 'PM25','PM25_SO4','PM25_NO3','PM25_NH4','PM25_CL','PM25_NA','PM25_EC','PM25_OC',
                'PM25_OA','PM25_MG','PM25_K','PM25_CA','PM25_OTHER','PM25_FE','PM25_SI','PM25_TI',
-               'PM25_MN','PM25_AL','PM25_RECONSOIL','PM25_OTHWNC','PM25_UNSPCRS','PM25_HP'
+               'PM25_MN','PM25_AL','PM25_RCSOIL','PM25_OTHWNC','PM25_UNSPCRS','PM25_HP'
 
   Keywd_name(15) = 'PM25TO10_SPECIES'
   Keywd(15,:) = 'PM25TO10','PM25TO10_SO4','PM25TO10_NO3','PM25TO10_NH4','PM25TO10_CL',
@@ -259,7 +259,7 @@
 
   Keywd_name(43) = 'ISAM_CONC_ANALYSIS'
   Keywd(43,:) = 'CO_ISAM','NO_ISAM','NO2_ISAM','NOX_ISAM','HNO3_ISAM','N2O5_ISAM','NOY_ISAM',
-                'O3_ISAM','SO2_ISAM','PMF_SOILIMPV_ISAM','PMF_CL_ISAM','PMF_EC_ISAM','PMF_NA_ISAM',
+                'O3_ISAM','SO2_ISAM','PMF_RCSOIL_ISAM','PMF_CL_ISAM','PMF_EC_ISAM','PMF_NA_ISAM',
                 'PMF_NO3_ISAM','PMC_NO3_ISAM','PMF_NH4_ISAM','PMC_NH4_ISAM','PMF_SO4_ISAM',
                 'PMC_SO4_ISAM','PMF_POC_ISAM','PMF_POA_ISAM','PMF_SOC_ISAM','PMF_SOA_ISAM',
                 'PMF_OC_ISAM','PMF_OA_ISAM','PMF_ASOA_ISAM','PMF_BSOA_ISAM','PMF_CLDGLY_ISAM',

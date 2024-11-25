@@ -118,7 +118,7 @@ ACAJ            ,ug m-3    ,PMF_CA[1]
 AMGJ            ,ug m-3    ,PMF_MG[1]
 AKJ             ,ug m-3    ,PMF_K[1]
 AMNJ            ,ug m-3    ,PMF_MN[1]
-ASOILJ          ,ug m-3    ,PMF_SOILIMPV[1]
+ASOILJ          ,ug m-3    ,PMF_RCSOIL[1]
 
 !! Non-Crustal Inorganic Particle Species
 AHPLUSIJ        ,umol m-3  ,PMF_HP[1]

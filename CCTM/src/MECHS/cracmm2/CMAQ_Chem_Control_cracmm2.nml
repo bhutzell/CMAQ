@@ -843,18 +843,18 @@ CMPST =
 'PMF_H2O'     , 'Fine-ModeParticle Water',
                 'ug m-3', 'FINE',
                 'AH2O',
-
-'RECON_SOIL',   'Recon of Soil PM from correlations at IMPROVE sites',
-                'ug m-3' , 'ACCUMULATION',
-                '2.20 * AAL + 2.49 * ASI + 1.63 * ACA + 2.42 * AFE + 1.94 * ATI',
-
+                                
+'PMF_RCSOIL'  ,'Reconstrcuted Soil PM (Malm et al., 1994; Eqn 5)',
+                'ug m-3' , 'ACCUMULATION', 
+                '2.20 * AAL + 2.49 * ASI + 1.63 * ACA + 2.42 * AFE + 1.94 * ATI', 
+                
 'PMF_OTHWNC'  , 'Unspeciated PM including non-carbon organic mass',
-                'ug m-3', 'FINE',
-                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OC -1.0*RECON_SOIL',
+                'ug m-3', 'FINE', 
+                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OC -1.0*PMF_RCSOIL',
 
 'PMF_OTH'     , 'Unspeciated PM excluding non-carbon organic mass',
-                'ug m-3', 'FINE',
-                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OA -1.0*RECON_SOIL',
+                'ug m-3', 'FINE', 
+                'PMF -1.0*ASO4 -1.0*ANO3 -1.0*ANH4 -1.0*ACL -1.0*ANA -1.0*AEC -1.0*PMF_OA -1.0*PMF_RCSOIL',
 
 'PMF_HP'      , 'Fine-Mode H+ Ion',
                 'umol m-3', 'FINE',
@@ -966,13 +966,13 @@ CMPST =
                 'ug m-3', 'PM1',
                 'AAL',
 
-'PM1_RECONSOIL','PM1 Recon Soil (Fine)',
-                'ug m-3', 'PM1',
+'PM1_RCSOIL'  ,'PM1 Reconstructed Soil <1 um (Malm et al., 1994; Eqn 5)',
+                'ug m-3', 'PM1', 
                 'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
 
 'PM1_OTHWNC'  , 'PM1 Unspeciated Coarse Mass for the IMPROVE Method',
-                'ug m-3', 'PM1',
-                'PM1 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM1_OC - PM1_RECONSOIL',
+                'ug m-3', 'PM1', 
+                'PM1 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM1_OC - PM1_RCSOIL',
 
 'PM1_UNSPCRS' , 'PM1 Unspeciated Coarse-Mode Mass',
                 'ug m-3', 'PM1',
@@ -1043,13 +1043,13 @@ CMPST =
                 'ug m-3', 'PM25',
                 'AAL',
 
-'PM25_RECONSOIL','PM2.5 Recon Soil (Fine) and Explicit (Coarse)',
-                'ug m-3', 'PM25',
+'PM25_RCSOIL' ,'PM2.5 Reconstructed Soil <2.5 um (Malm et al., 1994; Eqn 5)'
+                'ug m-3', 'PM25', 
                 'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
 
 'PM25_OTHWNC'   , 'PM2.5 Unspeciasted Coarse Mass for the IMPROVE Method',
-                'ug m-3', 'PM25',
-                'PM25 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM25_OC - PM25_RECONSOIL',
+                'ug m-3', 'PM25', 
+                'PM25 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM25_OC - PM25_RCSOIL',
 
 'PM25_UNSPCRS', 'PM2.5 Unspeciated Coarse Mass',
                 'ug m-3', 'PM25',
