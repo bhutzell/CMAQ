@@ -527,7 +527,7 @@
                 IF ( IERR .EQ. 1 ) THEN
                    ! Invalid Variable Type
                    WRITE ( XMSG, '(2A,I3,4A)'),'There was an error processing ', 
-     &                     'component number ',IX1,' of the composite ',
+     &                     'component number ',IVAR,' of the composite ',
      &                     TRIM(ELMO_TABLE( J )%NAME),'. Please check ',
      &                     'its definition.'
                    CALL LOG_MESSAGE( LOGDEV, XMSG )
