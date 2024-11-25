@@ -214,8 +214,8 @@
   Keywd(31,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
                 'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL','DD_PMF_SI',
                 'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K','DD_PMF_SSSO4',
-                'DD_TSP_OC','WD_TSP_OC','DD_TSP_POC','WD_TSP_POC','DD_TSP_SOC','WD_TSP_SOC',
-                'DD_TSP_OA','WD_TSP_OA','DD_TSP_POA','WD_TSP_POA','DD_TSP_SOA','WD_TSP_SOA'
+                'DD_PMF_OC','WD_PMF_OC','DD_PMF_POC','WD_PMF_POC','DD_PMF_SOC','WD_PMF_SOC',
+                'DD_PMF_OA','WD_PMF_OA','DD_PMF_POA','WD_PMF_POA','DD_PMF_SOA','WD_PMF_SOA'
 
   Keywd_name(32) = 'COARSE_DDEP'
   Keywd(32,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
