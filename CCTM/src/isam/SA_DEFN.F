@@ -663,26 +663,26 @@ c----------------------------------------------------------
 
         !PRESCRIBE NITRATE SPECIES
         !CB6R3_AE7_AQ
-        ALLOCATE( ISAM_SPEC_NO3( 1 )%LIST( 22 ) )
+        ALLOCATE( ISAM_SPEC_NO3( 1 )%LIST( 23 ) )
         ISAM_SPEC_NO3( 1 )%LIST = (/'HNO3 ','NO   ','NO2  ','NO3  ',
      &      'HONO ','N2O5 ','PAN  ','XO2N ','NTR1 ','NTR2 ','INTR ',
      &      'PNA  ','PANX ','CLNO2','CLNO3','XO2  ','XO2H ','MEO2 ',
-     &      'ISO2 ','C2O3 ','CXO3 ','ROR  '/ )
+     &      'ISO2 ','C2O3 ','CXO3 ','ROR  ','CRON '/ )
         
         !CB6R5_AE7_AQ
-        ALLOCATE( ISAM_SPEC_NO3( 2 )%LIST( 22 ) )
+        ALLOCATE( ISAM_SPEC_NO3( 2 )%LIST( 23 ) )
         ISAM_SPEC_NO3( 2 )%LIST = (/'HNO3 ','NO   ','NO2  ','NO3  ',
      &      'HONO ','N2O5 ','PAN  ','XO2N ','NTR1 ','NTR2 ','INTR ',
      &      'PNA  ','PANX ','CLNO2','CLNO3','XO2  ','XO2H ','MEO2 ',
-     &      'ISO2 ','C2O3 ','CXO3 ','ROR  '/ )
+     &      'ISO2 ','C2O3 ','CXO3 ','ROR  ','CRON '/ )
         
         !CB6R5M_AE7_AQ
-        ALLOCATE( ISAM_SPEC_NO3( 3 )%LIST( 27 ) )
+        ALLOCATE( ISAM_SPEC_NO3( 3 )%LIST( 28 ) )
         ISAM_SPEC_NO3( 3 )%LIST = (/'HNO3 ','NO   ','NO2  ','NO3  ',
      &      'HONO ','N2O5 ','PAN  ','XO2N ','NTR1 ','NTR2 ','INTR ',
      &      'PNA  ','PANX ','CLNO2','CLNO3','BRNO2','BRNO3','INO  ',
      &      'INO2 ','INO3 ','XO2  ','XO2H ','MEO2 ','ISO2 ','C2O3 ',
-     &      'CXO3 ','ROR  '/ )
+     &      'CXO3 ','ROR  ','CRON '/ )
 
         !SAPRC07TC_AE6_AQ
         ALLOCATE( ISAM_SPEC_NO3( 4 )%LIST( 25 ) )
