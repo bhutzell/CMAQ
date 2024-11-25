@@ -84,6 +84,7 @@ C     10 Mar 2021 G. Sarwar: Changed CB6R3M_AE7_KMTBR to CB6R3M_AE7_AQ
 C     10 June 2021 G. Sarwar: Added CB6R5M_AE7_AQ
 C 23 Jun 21 G. Sarwar: Replaced CB6R3M with CB6R5M
 C NS 11/28/2023 CRACMM2 updates
+C GS 07/31/2024  Added ASEAST
 
 C References:
 C 1. Eddingsaas, N. C., Vandervelde, D. G., Wennberg, P. O., "Kinetics and
@@ -134,7 +135,7 @@ C Define Logical values as T and F for the aerospc table
 
 C Number of aerosol species and modes
 
-      Integer, Parameter :: n_aerolist = 139    ! number of aero species
+      Integer, Parameter :: n_aerolist = 140    ! number of aero species
       Integer, Parameter :: n_mode = 3          ! number of modes:
       Integer, Parameter :: iait = 1            ! 1 = Aitken       
       Integer, Parameter :: iacc = 2            ! 2 = accumulation 
@@ -286,13 +287,14 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('AORGC   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.12), ! Cloud-Processed SOA
      & spcs_list_type('ASOIL   ',F,F,T, cm_set, 2600.0, '       ','       ',0.0  ,'NVL',F,F,  0,  0.6, 0.6,F, 'DUST  ', 0.00), ! Soil
      & spcs_list_type('ACORS   ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  0,  0.6, 0.6,F, 'DUST  ', 0.00), ! Coarse PM
-     & spcs_list_type('ASEACAT ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! SeaSpray Cations        
-                                                                                         
+     & spcs_list_type('ASEACAT ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! SeaSpray Cations
+     & spcs_list_type('ASEAST  ',F,T,F, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T, -1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! seasalt tracer
+                                                                                      
        ! Associated with ae6i                                                                
      & spcs_list_type('AMTNO3  ',F,T,F, cm_set, 1400.0, 'MTNO3  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! Monoterpene Nitrate SOA
      & spcs_list_type('AISOPNN ',F,T,F, cm_set, 1400.0, 'ISOPNN ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.32), ! Isoprene Nitrate SOA
-     & spcs_list_type('AMTHYD  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), ! 
-     & spcs_list_type('AIETET  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Iso. Tetrol SOA         #50
+     & spcs_list_type('AMTHYD  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), !                          #50
+     & spcs_list_type('AIETET  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Iso. Tetrol SOA         
      & spcs_list_type('AIEOS   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.30), ! Iso. Organosulfate SOA  
      & spcs_list_type('ADIM    ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), !
      & spcs_list_type('AIMGA   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.18), !
@@ -307,8 +309,8 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('AMT2    ',F,T,F, cm_set, 1400.0, 'SVMT2  ','TRPRXN ',0.032,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! 
      & spcs_list_type('AMT3    ',F,T,F, cm_set, 1400.0, 'SVMT3  ','TRPRXN ',0.032,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.09), !
      & spcs_list_type('AMT4    ',F,T,F, cm_set, 1400.0, 'SVMT4  ','TRPRXN ',0.103,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), !
-     & spcs_list_type('AMT5    ',F,T,F, cm_set, 1400.0, 'SVMT5  ','TRPRXN ',0.143,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), !
-     & spcs_list_type('AMT6    ',F,T,F, cm_set, 1400.0, 'SVMT6  ','TRPRXN ',0.285,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.05), !                         #60
+     & spcs_list_type('AMT5    ',F,T,F, cm_set, 1400.0, 'SVMT5  ','TRPRXN ',0.143,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), !                         #60
+     & spcs_list_type('AMT6    ',F,T,F, cm_set, 1400.0, 'SVMT6  ','TRPRXN ',0.285,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.05), !                         
      & spcs_list_type('AMT7    ',F,T,F, cm_set, 1400.0, 'SVMT7  ','TRPRXN ',0.160,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.06), ! MT SOA Highest Volatility
                                                                                        
        ! ae6i and cb6                                                                 
@@ -321,8 +323,8 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('ASVPO3  ',F,T,F, cm_set, 1400.0, 'VSVPO3 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! SV-POA 3
      & spcs_list_type('AIVPO1  ',F,T,F, cm_set, 1400.0, 'VIVPO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! IV-POA 
      & spcs_list_type('ALVOO1  ',T,T,F, cm_set, 1400.0, 'VLVOO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.15), ! LV-SOA 1                
-     & spcs_list_type('ALVOO2  ',T,T,F, cm_set, 1400.0, 'VLVOO2 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.13), ! LV-SOA 2
-     & spcs_list_type('ASVOO1  ',T,T,F, cm_set, 1400.0, 'VSVOO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.11), ! SV-SOA 1                #70
+     & spcs_list_type('ALVOO2  ',T,T,F, cm_set, 1400.0, 'VLVOO2 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.13), ! LV-SOA 2                #70
+     & spcs_list_type('ASVOO1  ',T,T,F, cm_set, 1400.0, 'VSVOO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.11), ! SV-SOA 1                
      & spcs_list_type('ASVOO2  ',T,T,F, cm_set, 1400.0, 'VSVOO2 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.09), ! SV-SOA 2
      & spcs_list_type('ASVOO3  ',F,T,F, cm_set, 1400.0, 'VSVOO3 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.08), ! SV-SOA 3
      & spcs_list_type('APCSO   ',F,T,F, cm_set, 1400.0, 'LVPCSOG','PCSOARXN',1.0 ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.12), ! pcSOA
@@ -356,8 +358,8 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
               
        ! The following species are associated with the Multi-Pollutant code
      & spcs_list_type('ANI     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Nickel
-     & spcs_list_type('ACR_VI  ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Chromium 6
-     & spcs_list_type('ACR_III ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Chromium 3              #80
+     & spcs_list_type('ACR_VI  ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Chromium 6              #80
+     & spcs_list_type('ACR_III ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Chromium 3              
      & spcs_list_type('ABE     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Beryllium
      & spcs_list_type('APB     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Lead                     
      & spcs_list_type('ADE_OTHR',T,T,F, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Diesel Fine PM          
@@ -366,11 +368,11 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('ADE_NO3 ',F,T,F, cm_set, 1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Diesel Nitrate
      & spcs_list_type('ADE_SO4 ',F,T,F, cm_set, 1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Diesel Sulfate
      & spcs_list_type('ADE_CORS',F,F,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Diesel Coarse PM
-     & spcs_list_type('ACADMIUM',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Cadmium
-     & spcs_list_type('AMN_HAPS',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Manganese               #90
+     & spcs_list_type('ACADMIUM',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Cadmium                 #90
+     & spcs_list_type('AMN_HAPS',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Manganese               
      & spcs_list_type('APHG    ',T,T,T, cm_set, 2200.0, 'HGIIAER','PHGRXN ',1.0  ,'IRV',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Mercury
-     & spcs_list_type('AAS     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Arsenic                 #92
-     & spcs_list_type('ABENAPY ',T,T,F, cm_set, 1400.0, 'BENAPY ','       ',1.0  ,'REV',F,T,  0,  0.0, 0.0,T, 'DUST  ', 0.00), ! Benzo[a]pyrene          #93
+     & spcs_list_type('AAS     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Arsenic                 #93
+     & spcs_list_type('ABENAPY ',T,T,F, cm_set, 1400.0, 'BENAPY ','       ',1.0  ,'REV',F,T,  0,  0.0, 0.0,T, 'DUST  ', 0.00), ! Benzo[a]pyrene          #94
                                                           
       ! The following species are associated with the marine chemistry code
      & spcs_list_type('ABR     ',F,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,F, -1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! Bromide 
@@ -548,7 +550,7 @@ C Sea-Spray Aerosol Speciation factors based on seawater composition:
 ! ISBN 9780080437514, http://dx.doi.org/10.1016/B0-08-043751-6/06105-3.
 
 C number of chemical species in seawater aerosol composition
-      integer, parameter :: nsea_spc = 17
+      integer, parameter :: nsea_spc = 18
 
       Type( emis_table ), Parameter :: sea_spc( nsea_spc ) = (/
 C                     -description--  -- Species -- --MW--  ------ spcfac ------
@@ -568,6 +570,7 @@ C                                                              fine    coarse
      &   emis_table( 'Lead          ',   'PB     ', 207.2, (/ 6.0E-11, 6.0E-11/) ),   ! Lead
      &   emis_table( 'Cadmium       ',   'CD     ', 112.4, (/ 1.93E-9, 1.93E-9/) ),   ! cadmium
      &   emis_table( 'Air Toxics Mn ',   'MN_HAPS',  54.9, (/ 4.7E-11, 4.7E-11/) ),   ! Air toxics Manganese
+     &   emis_table( 'seasalt tracer',   'SEAST  ',  31.3, (/ 1.00000, 0.00000/) ),   ! seasalt tracer
      &   emis_table( 'Bromine       ',   'BR     ',  79.9, (/ 0.00190, 0.00190/) ),   ! Bromine 
      &   emis_table( 'Water         ',   'H2O    ',  18.0, (/ 0.0    , 0.0    /) ) /) ! Water (uptake is calculated online)
  
@@ -678,6 +681,7 @@ C Optional Species
       Character( 16 ), Private, Parameter :: req_imos   = 'AIMOS'
       Character( 16 ), Private, Parameter :: req_phgj   = 'APHGJ'
       Character( 16 ), Private, Parameter :: req_orgh2o = 'AORGH2O'
+      Character( 16 ), Private, Parameter :: req_seast  = 'ASEAST'
       Character( 16 ), Private, Parameter :: req_br     = 'ABR' 
       Character( 16 ), Private, Parameter :: req_so4aqh2o2 = 'ASO4AQH2O2'
       Character( 16 ), Private, Parameter :: req_so4aqo3   = 'ASO4AQO3'
@@ -705,7 +709,9 @@ C Indices of Optional species
       Integer :: aimos_idx  = 0
       Integer :: aphgj_idx  = 0
       Integer :: aorgh2o_idx= 0
+      Integer :: aseast_idx = 0
       Integer :: abr_idx    = 0
+
 C Indices of Optional sulfur tracking species
       Integer :: aso4aqh2o2_idx = 0
       Integer :: aso4aqo3_idx   = 0
@@ -1172,8 +1178,17 @@ C Find indices of required species
          ae6isoa     = .False.
       End If
 
-       If ( Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) Then     
-         abr_idx     = findAero( req_br,     .True. )
+       If ( (Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) .OR.    
+     &      (Index( mechname, 'CRACMM3M'      ) .Gt. 0 ) .OR.    
+     &      (Index( mechname, 'CRACMM3'       ) .Gt. 0 )) Then           
+         aseast_idx     = findAero( req_seast,     .True. )	  
+      Else
+	 aseast_idx = 0
+      End If
+
+       If ( (Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) .OR.    
+     &       Index( mechname, 'CRACMM3M'      ) .Gt. 0 ) Then          
+         abr_idx     = findAero( req_br,     .True. )  
          marine = .True.
       Else
          abr_idx     = 0

@@ -58,6 +58,7 @@ AE_SPECIES_DATA =
 'AMT3'    ,186.00  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'ORG'         , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 'AMT4'    ,184.00  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'ORG'         , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 'AMT5'    ,170.00  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'ORG'         , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
-'AMT6'    ,168.00  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'ORG'         , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes', 
+'AMT6'    ,168.00  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'ORG'         , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
+'ASEAST'  , 31.30  ,F      ,T     ,F      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'PRI'         , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 'ABR'     , 79.90  ,F      ,T     ,T      ,''     ,''     ,-1    ,''     ,-1     ,'VMASS'     , 1  ,'PRI'         , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',
 /

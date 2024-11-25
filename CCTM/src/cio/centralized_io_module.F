@@ -85,6 +85,7 @@
 !  03/31/22, J. Willison: Removed wb_dust_setup and modified lus_setup to remove
 !                         BELD as an option for desert land information.  
 !  04/12/22, G. Sarwar: Revised to include "DMS" into cb6r5_ae7_aq 
+!  08/12/24, G. Sarwar: Revised to include cracmm3m  
 !------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------!
@@ -5847,8 +5848,9 @@ C Read the various categories of normalized emissions
              dmsl  = 0.0          
              chlr  = 0.0
 
-             If ( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) then
-                XMSG = 'CTM_OCEAN_CHEM must be set to TRUE when using CB6R5M_AE7_AQ mechanism' 
+             If (( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) .or. 
+     &             INDEX( MECHNAME, 'CRACMM3M'      ) .GT. 0 ) then
+                XMSG = 'CTM_OCEAN_CHEM must be set to TRUE when using CB6R5M_AE7_AQ or CRACMM3M mechanism' 
                 Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
              endif
 
@@ -5913,8 +5915,9 @@ C Read the various categories of normalized emissions
                 WHERE ( ocean .LT. 0.001 ) ocean = 0.0  ! ensure values are nonnegative and greater than 0.001
                 WHERE ( szone .LT. 0.001 ) szone = 0.0  ! ensure values are nonnegative and greater than 0.001 
 
-                If ( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) then
-      
+                If (( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) .or.
+     &                INDEX( MECHNAME, 'CRACMM3M     ' ) .GT. 0 ) then      
+
                    If ( .Not. XTRACT3( OCEAN_1, 'CHLO',
      &                                 1, 1, startrow, endrow, startcol, endcol,
      &                                 0, 0, chlr ) ) Then

@@ -66,7 +66,7 @@
 
            CHARACTER( 16 ) :: MECHANISM              ! Mechanism name
            INTEGER ios,INDX
-         INTEGER,        PARAMETER :: NMECHS = 18   ! dimension for number of mechanisms considered
+         INTEGER,        PARAMETER :: NMECHS = 19   ! dimension for number of mechanisms considered
 
          INTEGER I
 
@@ -95,7 +95,8 @@
      &         MIOG_MECH_TYPE( 'CRACMM1_AQ             ','CRACMM1 '),
      &         MIOG_MECH_TYPE( 'CRACMM1AMORE_AQ        ','CRACMM1 '),
      &         MIOG_MECH_TYPE( 'CRACMM2                ','CRACMM2 '),
-     &         MIOG_MECH_TYPE( 'CRACMM3                ','CRACMM3 ') /)
+     &         MIOG_MECH_TYPE( 'CRACMM3                ','CRACMM3 '),
+     &         MIOG_MECH_TYPE( 'CRACMM3M               ','CRACMM3 ') /)     
 
             INDX = INDEX1( MECHNAME, NMECHS, MIOG_MECH_MAP%CHEMMECH )
             MECHANISM = MIOG_MECH_MAP( INDX )%MIOGMECH
