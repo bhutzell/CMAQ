@@ -235,6 +235,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_RHOJ  =      187
       INTEGER, PARAMETER :: ID_GAS_HNO3 =   188
       INTEGER, PARAMETER :: ID_GAS_NH3  =   189
+      INTEGER, PARAMETER :: ID_EF_HNO3 =    190
 
       TYPE ELDTP
         CHARACTER (LEN = 16) :: NAME      !Parameter Name
@@ -245,7 +246,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
 
-      INTEGER, PARAMETER :: N_ELMO_LIST = 189
+      INTEGER, PARAMETER :: N_ELMO_LIST = 190
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
      &ELDTP( 'STDEV        ',ID_STDEV,      M3REAL, T, '      ', 'Mode standard deviation (dry and wet)' ),
@@ -454,7 +455,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'CFRAC        ',ID_CFRAC,      M3REAL, F, '      ', 'Cloud Fraction' ),
      &ELDTP( 'PV           ',ID_PV,         M3REAL, F, '      ', 'Potential Vorticity' ),
      &ELDTP( 'DENS         ',ID_DENS,       M3REAL, F, 'kg m-3', 'Advected Density' ),
-     &ELDTP( 'RHOJ         ',ID_RHOJ,       M3REAL, F, 'kg m-3', 'Advected Density x Jacobian/MSFX^2' ) /)
+     &ELDTP( 'RHOJ         ',ID_RHOJ,       M3REAL, F, 'kg m-3', 'Advected Density x Jacobian/MSFX^2' ),
+     &ELDTP( 'EF_HNO3      ',ID_EF_HNO3,    M3REAL, F, '1     ', 'Enhancement factor for HNO3 photolysis' ) /)
      
 
         TYPE ELMO_KEY_TYPE
@@ -484,6 +486,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         REAL, SAVE, ALLOCATABLE :: GAMMA_IMAE (  :,:,:  ) ! IMAE uptake coeff
         REAL, SAVE, ALLOCATABLE :: YCLNO2IJ   (  :,:,:  ) ! Yield CLNO2 in Fine modes 
         REAL, SAVE, ALLOCATABLE :: YCLNO2K    (  :,:,:  ) ! Yield CLNO2 in coarse mode 
+        REAL, SAVE, ALLOCATABLE :: EF_HNO3    (  :,:,:  ) ! Enhancement factor for calculating J_ANO3
   
         LOGICAL, SAVE           :: AERO_CHEM_SET = .FALSE.
  

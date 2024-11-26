@@ -27,6 +27,7 @@
 !
 ! Revision History:
 ! Ben Murphy 2020 Feb: Created
+! Golam Sarwar 2024 Nov: Added enhancement factor for photolysis of HNO3
 !-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
@@ -556,7 +557,7 @@
       ELMO_KEY( 8 )%LIST = (/'TA  ','PRES','RH  ' /) 
 
       ELMO_KEY( 9 )%WORD = 'CHEM'
-      ELMO_KEY( 9 )%N = 7
+      ELMO_KEY( 9 )%N = 8
       ALLOCATE( ELMO_KEY( 9 )%LIST( 7 ),STAT=ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating ELMO_KEY(9)'
@@ -564,7 +565,8 @@
       END IF
 
       ELMO_KEY( 9 )%LIST = (/'GAMMA_N2O5  ','GAMMA_N2O5K ','YIELD_CLNO2 ',
-     &          'YIELD_CLNO2K','GAMMA_IEPOX ','K_IEPOX     ','GAMMA_IMAE  ' /)
+     &          'YIELD_CLNO2K','GAMMA_IEPOX ','K_IEPOX     ','GAMMA_IMAE  ',
+     &          'EF_HNO3     ' /)
 
       ELMO_KEY( 10 )%WORD = 'FINE_SPECIES'
       ELMO_KEY( 10 )%N = 17
@@ -3011,6 +3013,10 @@
          ! Retrieve Air Density
          CASE ( ID_DENS )
             OUTVAL = MET_DATA%DENS( C1,R1,L1 ) ! kg m-3
+	    
+         ! Retrieve EF_HNO3
+         CASE ( ID_EF_HNO3 )
+            IF ( AERO_CHEM_SET ) OUTVAL = EF_HNO3( C1,R1,L1 )    
 
          CASE DEFAULT
             ! For most parameters the ELMO_COEFF structure will

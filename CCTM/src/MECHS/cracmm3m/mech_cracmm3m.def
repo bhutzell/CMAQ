@@ -153,6 +153,9 @@
 !     NO2PIJ is formed on fine-mode aerosol and NO2PK is formed on coarse-mode aerosol
 !     They are identified as dioxidonitrogen (SMILES: [N+](=O)=O) for nitrogen balance
 !------------------------------------------------------------------------------
+! 11-18-24 G. Sarwar
+! Aerosol nitrate photolysis is added
+!------------------------------------------------------------------------------
 
 CRACMM3M
 
@@ -2137,6 +2140,9 @@ REACTIONS[CM] =
 <HET_I2O4_AI> I2O4 =  + 2.0000*DELTA_I # 1.0~<HETERO_I2O4_AI>;
 <HET_I2O4_AJ> I2O4 =  + 2.0000*DELTA_I # 1.0~<HETERO_I2O4_AJ>;
 
+! Aerosol nitrate photolysis (implemented as heterogeneous reactions)
+<HET_ANO3I> ANO3I = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
+<HET_ANO3J> ANO3J = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
 
 END MECH
 
