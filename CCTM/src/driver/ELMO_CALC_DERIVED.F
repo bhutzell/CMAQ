@@ -501,23 +501,21 @@
 
          ! Calculate Aerosol Fraction of Benzo-a-Pyrene
          CASE ( ID_BENAPY_FAERO )
-            CALL CALC_ELMO( OUTVAL=VAL,  OUT_UNIT=IU_UGpM3, 
-     &                      J=J_PMF_BENAPY( ISRC+1 ), IERR=IERR )
-            IF ( IERR .EQ. 1 ) THEN
-               XMSG = 'PMF_BENAPY has not been defined in the chem control namelist'//
-     &                'so BENAPY_FAERO cannot be calculated. Please define PMF_BENAPY.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+            ! Confirm that particle and gas benzo-a-pyrene are 
+            ! actually mapped composites before computing partition
+            ! fraction
+            IF ( J_PMF_BENAPY( ISRC+1 ) .GT. 0 .AND. 
+     &           J_GAS_BENAPY( ISRC+1 ) .GT. 0 ) THEN
+
+               CALL CALC_ELMO( OUTVAL=VAL,  OUT_UNIT=IU_UGpM3, 
+     &                         J=J_PMF_BENAPY( ISRC+1 ), IERR=IERR )
+               CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IU_UGpM3, 
+     &                         J=J_GAS_BENAPY( ISRC+1 ), IERR=IERR )
+               OUTVAL = VAL / ( VAL + VAL2 + TINY( 0.0 ) )
+
+            ELSE 
+               OUTVAL = 0.0
             END IF
-            
-            CALL CALC_ELMO( OUTVAL=VAL2, OUT_UNIT=IU_UGpM3, 
-     &                      J=J_GAS_BENAPY( ISRC+1 ), IERR=IERR )
-            IF ( IERR .EQ. 1 ) THEN
-               XMSG = 'GAS_BENAPY has not been defined in the chem control namelist'//
-     &                'so BENAPY_FAERO cannot be calculated. Please define GAS_BENAPY.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
-            END IF
-            
-            OUTVAL = VAL / ( VAL + VAL2 + TINY( 0.0 ) )
 
          ! Retrieve Fine-Mode Particle Mass Collected by the Federal
          ! Reference Method compliant sampler

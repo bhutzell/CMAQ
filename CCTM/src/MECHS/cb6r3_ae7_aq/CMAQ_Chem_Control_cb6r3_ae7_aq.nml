@@ -291,7 +291,7 @@
    CMPST(24,:) = 'PMF_H2O', 'ug m-3', 'FINE', 'Fine-ModeParticle Water',
                  'AH2O'
                                                
-   CMPST(25,:) = 'PMF_SOILIMPV', 'ug m-3', 'ACCUMULATION', 'Recon of Soil PM from correlations at IMPROVE sites',
+   CMPST(25,:) = 'PMF_RCSOIL', 'ug m-3', 'ACCUMULATION', 'Recon of Soil PM from correlations at IMPROVE sites',
                  '2.20 * AAL + 2.49 * ASI + 1.63 * ACA + 2.42 * AFE + 1.94 * ATI'
 
    CMPST(26,:) = 'PMF_UN_IMPV1', 'ug m-3', 'FINE', 'Unspeciated PM including non-carbon organic mass',
