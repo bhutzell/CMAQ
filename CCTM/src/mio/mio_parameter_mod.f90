@@ -17,7 +17,7 @@
 ! I/O mode
         integer, parameter :: mio_read_only  = 1
         integer, parameter :: mio_read_write = 2
-        integer, parameter :: mio_new_file   = 3
+        integer, parameter :: mio_new_file   = 512
 
 ! netCDF file format
         integer, parameter :: mio_ioapi3_format = 1
