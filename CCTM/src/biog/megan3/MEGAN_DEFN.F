@@ -38,10 +38,12 @@ C=======================================================================
          FUNCTION MEGAN_INIT( JDATE, JTIME, TSTEP ) RESULT ( SUCCESS )
 
          USE HGRD_DEFN
+         USE MEGAN_HRNO_MOD
          USE CGRID_SPCS          ! CGRID mechanism species
          USE BEIS_DEFN           ! from beis
          USE centralized_io_module, only : soilinp_setup
          USE MEGAN_GSPRO
+         USE BDSNP_MOD
 #ifdef mpas
          USE utilio_defn
 #endif
@@ -98,10 +100,17 @@ C biogenics to gas-phase species map
 #ifdef mpas
             call mio_setfile ('GR_EMIS_001')
 
-             call mio_fcreate ('MEGAN_OUTPUT', mio_new_file ) ! 512 means clobber+netcdf64
+             call mio_fcreate ('MEGAN_OUTPUT',512 ) ! 512 means clobber+netcdf64
           if (BDSNP_MEGAN) then
-             call mio_fcreate ('BDSNPOUT', mio_new_file ) ! 512 means clobber+netcdf64
-             call mio_fcreate ('BDSNP_DIAG', mio_new_file ) ! 512 means clobber+netcdf64
+             call mio_fcreate ('BDSNPOUT',512 ) ! 512 means clobber+netcdf64
+             call mio_fcreate ('BDSNP_DIAG',512 ) ! 512 means clobber+netcdf64
+          end if
+
+#else
+
+            call MEGAN_YL_INIT(JDATE,JTIME,TSTEP)
+          if (BDSNP_MEGAN) then
+            call MEGAN_BDSNP_INIT(JDATE,JTIME,TSTEP)
           end if
 #endif
          END IF
@@ -219,7 +228,7 @@ C=======================================================================
          CALL MEGCANOPY( JYEAR, LAYERS, JDAY,CURRHR,    
      &            grid_data%lat, grid_data%lon, laic,          
      &            met_data%TEMP2, met_data%rgrnd, met_data%wspd10,
-     &            met_data%prsfc, met_data%Q2, ctf(1:6,:,:,:),
+     &            met_data%prsfc, met_data%Q2, ctf(1:6,:,:),
      &            ShadeleafTK, SunleafTK, SunFrac, SunPPFD, ShadePPFD)
 
 ! MEGAN_HRNO is here so we have rainfall/pulse/PRECADJ, temp and radiation 
@@ -238,7 +247,7 @@ C=======================================================================
 
           CALL MEGVSA (JDATE,JTIME,TSTEP,JYEAR,JDAY,
      &    L_DESID_DIAG,Grid_Data%SLTYP, 
-     &    ctf(1:6,:,:,:),laic, grid_data%lat, 
+     &    ctf(1:6,:,:),laic, grid_data%lat, 
      &    met_data%TEMP2,Met_Data%SOIM1, Met_Data%SOIM2,
      &    Met_Data%SOIT1,PRECADJ,
      &    CFNO, CFNOG, GAMSM, GAMNO,BDSNP_NO_out)

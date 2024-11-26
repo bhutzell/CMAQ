@@ -18,7 +18,169 @@
 !------------------------------------------------------------------------!
       MODULE MEGAN_HRNO_MOD
 
+      INTEGER, SAVE :: RHOURS    ! SOILINP(OUT) file no. of RAINFALL hour variables
+
       CONTAINS
+
+      SUBROUTINE MEGAN_YL_INIT(JDATE,JTIME,TSTEP)
+
+      USE RUNTIME_VARS
+      USE HGRD_DEFN             ! horizontal domain specifications
+      USE BEIS_DEFN, ONLY: NSEF ! beis
+      USE ASX_DATA_MOD
+      USE UTILIO_DEFN
+      USE MIO_ASCII
+      USE MIO_MODULE
+#ifndef mpas
+#ifdef parallel
+      USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
+#else
+      USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
+#endif
+#endif
+      USE centralized_io_module
+
+      INTEGER, INTENT( IN )  :: JDATE           ! current simulation date (YYYYDDD)
+      INTEGER, INTENT( IN )  :: JTIME           ! current simulation time (HHMMSS)
+      INTEGER, INTENT( IN )  :: TSTEP( 3 )      ! time step vector (HHMMSS)
+      CHARACTER( 256 ) :: MESG            ! message buffer
+      CHARACTER( 16 )  :: PNAME = 'MEGAN_YL_INIT'  ! procedure name
+
+      CHARACTER( 16 )  :: VAR        ! variable name
+
+      INTEGER, PARAMETER :: MXRHRS = 24     ! no. of rainfall hours for YL95 algorithm
+      INTEGER, SAVE :: EDATE     ! end scenario date
+      INTEGER, SAVE :: ETIME     ! end scenario time
+      INTEGER, SAVE :: NDATE     ! test date to update rainfall
+      INTEGER, SAVE :: NTIME     ! test time to update rainfall
+
+      CHARACTER( 16 ), SAVE :: SOILOUT          = 'MEGAN_SOILOUT' ! logical name for output NO soil data
+      CHARACTER( 16 ), SAVE :: SOILOUT_MIO      = 'MEGAN_SOIL_MIO' ! logical name for output NO soil data
+      CHARACTER( 33 ), SAVE :: DESCSTR      = 'hrly cnv. & non-cnv. rainfall for'
+      CHARACTER( 33 ), SAVE :: DESCSTRSW    = 'hrly instantaneous rgrnd for'
+      CHARACTER( 33 ), SAVE :: DESCSTRT2M   = 'hrly instantaneous 2m temp for'
+      CHARACTER( 33 ), SAVE :: DESCSTRLAI   = 'LAI for day'
+
+C Determine last timestamp
+         RHOURS = MXRHRS
+         EDATE = STDATE; ETIME = STTIME
+         CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
+         MSTEPS = TIME2SEC( RUNLEN ) / TIME2SEC( TSTEP( 1 ) )
+C Create rain data file for soil NO
+
+      NDATE = EDATE; NTIME = ETIME
+C Build description for, and create/open soil NO emissions output file
+      FTYPE3D = GRDDED3
+      SDATE3D = NDATE
+      STIME3D = NTIME
+      TSTEP3D = 0   ! make it a time-independent file
+      NCOLS3D = GL_NCOLS
+      NROWS3D = GL_NROWS
+      NLAYS3D = 1
+      NVARS3D = 52 + RHOURS
+      MXREC3D = 1
+      NTHIK3D = 1
+      GDTYP3D = GDTYP_GD
+      P_ALP3D = P_ALP_GD
+      P_BET3D = P_BET_GD
+      P_GAM3D = P_GAM_GD
+      XORIG3D = XORIG_GD
+      YORIG3D = YORIG_GD
+      XCENT3D = XCENT_GD
+      YCENT3D = YCENT_GD
+      XCELL3D = XCELL_GD
+      YCELL3D = YCELL_GD
+      VGTYP3D = VGTYP_GD
+      VGTOP3D = VGTOP_GD
+      DO L = 1, NLAYS3D + 1
+         VGLVS3D( L ) = VGLVS_GD( L )
+      END DO
+      GDNAM3D = GRID_NAME  ! from HGRD_DEFN
+
+      VNAME3D = ' '
+      VNAME3D( 1 ) = 'PTYPE'
+      VNAME3D( 2 ) = 'PULSEDATE'
+      VNAME3D( 3 ) = 'PULSETIME'
+
+      DO I = 1, RHOURS
+         WRITE( VAR, '(A8,I2.2)' ) 'RAINFALL', I
+         VNAME3D( I+3 ) = VAR
+         WRITE( VAR, '(A2,I2.2)' ) 'SW', I
+         VNAME3D( I+27 ) = VAR
+         WRITE( VAR, '(A3,I2.2)' ) 'T2M', I
+         VNAME3D( I+51 ) = VAR
+      END DO
+
+         VNAME3D( 52+RHOURS ) = 'LAI'
+
+      UNITS3D = ' '
+      UNITS3D( 1 ) = 'INTEGER'
+      UNITS3D( 2 ) = 'YYYYDDD'
+      UNITS3D( 3 ) = 'HHMMSS'
+      UNITS3D( 4:RHOURS+3 ) = 'cm'
+
+      VDESC3D( 1 ) = 'NO emission pulse type'
+      VDESC3D( 2 ) = 'CMAQ starting date for NO emission pulse'
+      VDESC3D( 3 ) = 'CMAQ starting time for NO emission pulse'
+      VDESC3D( 4:RHOURS+3 ) = 'hourly convective and non-convective rainfall'
+      DO I = 1, RHOURS
+         VDESC3D( I+3 )  = DESCSTR // DDTTM( I )
+         VDESC3D( I+27 ) = DESCSTRSW // DDTTM( I )
+         VDESC3D( I+51 ) = DESCSTRT2M // DDTTM( I )
+      END DO
+         VDESC3D( I+52 ) = DESCSTRLAI
+
+      VTYPE3D = 0
+      VTYPE3D( 1 ) = M3INT
+      VTYPE3D( 2 ) = M3INT
+      VTYPE3D( 3 ) = M3INT
+      VTYPE3D( 4:RHOURS+52 ) = M3REAL
+
+      FDESC3D = ' '
+      FDESC3D( 1 ) = 'Gridded rainfall data for soil NO emissions'
+      FDESC3D( 2 ) = '/From/ ' // PNAME
+      FDESC3D( 3 ) = '/Version/ CMAQ'
+
+
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True. ! even if 2-d
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+            CALL LOAD_MIO_FILE ( SOILOUT_MIO, 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+
+C Open NO rain data save file
+      IF ( IO_PE_INCLUSIVE ) THEN
+
+         IF ( .NOT. OPEN3( SOILOUT, FSNEW3, PNAME ) ) THEN
+            MESG = 'Could not open "' // TRIM( SOILOUT ) // '" file'
+            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
+         END IF
+      END IF
+
+#ifdef parallel_io
+      IF ( IO_PE_INCLUSIVE ) THEN
+         IF ( .NOT. FLUSH3 ( SOILOUT ) ) THEN
+            MESG = 'Could not sync to disk ' // TRIM( SOILOUT )
+            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+         END IF
+      END IF
+      CALL SE_BARRIER
+      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
+         IF ( .NOT. OPEN3( SOILOUT, FSREAD3, PNAME ) ) THEN
+            MESG = 'Could not open ' // TRIM( SOILOUT )
+            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+         END IF
+      END IF
+#endif
+
+      END SUBROUTINE MEGAN_YL_INIT
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE MEGAN_HRNO( JDATE, JTIME, TSTEP, L_DESID_DIAG, PRECADJ)
 
@@ -39,11 +201,13 @@ C Please see documentation for more information.
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE HGRD_DEFN             ! horizontal domain specifications
+      USE MIO_MODULE
       USE BEIS_DEFN, ONLY: NSEF ! beis
       USE ASX_DATA_MOD
       USE UTILIO_DEFN
       USE MIO_ASCII
-      use mio_module
+      USE centralized_io_module
+
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -51,7 +215,7 @@ C-----------------------------------------------------------------------
       USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
 #endif
 #endif
-      USE centralized_io_module
+
 
       IMPLICIT NONE
         
@@ -84,15 +248,12 @@ C See Jacquemin B. and Noilhan J. (1990), Bound.-Layer Meteorol., 52, 93-134.
 
 C Local Variables:
 
+      CHARACTER( 16 )  :: VAR        ! variable name
       CHARACTER( 16 ), SAVE :: SOILINP ! logical name for input NO soil data
-      CHARACTER( 16 ), SAVE :: SOILOUT      = 'MEGAN_SOILOUT' ! logical name for output NO soil data
-      CHARACTER( 33 ), SAVE :: DESCSTR      = 'hrly cnv. & non-cnv. rainfall for'
-      CHARACTER( 33 ), SAVE :: DESCSTRSW    = 'hrly instantaneous rgrnd for'
-      CHARACTER( 33 ), SAVE :: DESCSTRT2M   = 'hrly instantaneous 2m temp for'
-      CHARACTER( 33 ), SAVE :: DESCSTRLAI   = 'LAI for day'
 
+      CHARACTER( 16 ), SAVE :: SOILOUT          = 'MEGAN_SOILOUT' ! logical name for output NO soil data
+      CHARACTER( 16 ), SAVE :: SOILOUT_MIO      = 'MEGAN_SOIL_MIO' ! logical name for output NO soil data
 
-      CHARACTER( 16 ) :: VAR        ! variable name
 
       INTEGER, SAVE :: IHR       ! current simulation hour
       INTEGER          NDX       ! RAINFALL array timestep index
@@ -100,7 +261,7 @@ C Local Variables:
 
       REAL,    ALLOCATABLE, SAVE :: C_RAINFALL ( :,: ) ! rainfall for current hour
       REAL,    ALLOCATABLE, SAVE :: RNTOT    ( :,: )  ! RN + RC
-      INTEGER, SAVE :: RHOURS    ! SOILINP(OUT) file no. of RAINFALL hour variables
+
       INTEGER, SAVE :: RDATE     ! date to update rainfall
       INTEGER, SAVE :: RTIME     ! time to update rainfall
       INTEGER, SAVE :: EDATE     ! end scenario date
@@ -146,7 +307,7 @@ C Determine last timestamp
          MSTEPS = TIME2SEC( RUNLEN ) / TIME2SEC( TSTEP( 1 ) )
 
 #ifdef mpas
-         call mio_fcreate (SOILOUT, mio_new_file)
+         call mio_fcreate (SOILOUT_MIO, io_mode)
          METSTEP = TSTEP(3)
 
          output_step   = time2sec(tstep(1))
@@ -183,7 +344,7 @@ C Check that grid description matches B3GRD file
 C Initial run until a full 24 hours has been recorded on the SOIL(OUT/INP) file
 C for the Yienger and Levy algorithm
          WRITE( LOGDEV,'(/5X, A)' ) 'Temporal BEIS ...'
-         RHOURS = MXRHRS
+
 
 C If initial run, initialize some variables, otherwise get them from file
          IF ( NEW_START .or. IGNORE_SOILINP ) THEN
@@ -326,123 +487,7 @@ C-----------------------------------------------------------------------------
        IF ( SECSDIFF( JDATE,JTIME, EDATE,ETIME ) .GT. TIME2SEC( TSTEP( 2 ) ) .OR. L_DESID_DIAG ) RETURN
 #endif
 
-
-C Create rain data file for soil NO
-
-C Final timestamp
-      NDATE = EDATE; NTIME = ETIME
-
 #ifndef mpas
-
-C Build description for, and create/open soil NO emissions output file
-      FTYPE3D = GRDDED3
-      SDATE3D = NDATE
-      STIME3D = NTIME
-      TSTEP3D = 0   ! make it a time-independent file
-      NCOLS3D = GL_NCOLS
-      NROWS3D = GL_NROWS
-      NLAYS3D = 1
-      NVARS3D = 52 + RHOURS
-      MXREC3D = 1
-      NTHIK3D = 1
-      GDTYP3D = GDTYP_GD
-      P_ALP3D = P_ALP_GD
-      P_BET3D = P_BET_GD
-      P_GAM3D = P_GAM_GD
-      XORIG3D = XORIG_GD
-      YORIG3D = YORIG_GD
-      XCENT3D = XCENT_GD
-      YCENT3D = YCENT_GD
-      XCELL3D = XCELL_GD
-      YCELL3D = YCELL_GD
-      VGTYP3D = VGTYP_GD
-      VGTOP3D = VGTOP_GD
-      DO L = 1, NLAYS3D + 1
-         VGLVS3D( L ) = VGLVS_GD( L )
-      END DO
-      GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-      VNAME3D = ' '
-      VNAME3D( 1 ) = 'PTYPE'
-      VNAME3D( 2 ) = 'PULSEDATE'
-      VNAME3D( 3 ) = 'PULSETIME'
-
-      DO I = 1, RHOURS
-         WRITE( VAR, '(A8,I2.2)' ) 'RAINFALL', I
-         VNAME3D( I+3 ) = VAR
-         WRITE( VAR, '(A2,I2.2)' ) 'SW', I
-         VNAME3D( I+27 ) = VAR
-         WRITE( VAR, '(A3,I2.2)' ) 'T2M', I
-         VNAME3D( I+51 ) = VAR
-      END DO
-
-         VNAME3D( 52+RHOURS ) = 'LAI'
-
-      UNITS3D = ' '
-      UNITS3D( 1 ) = 'INTEGER'
-      UNITS3D( 2 ) = 'YYYYDDD'
-      UNITS3D( 3 ) = 'HHMMSS'
-      UNITS3D( 4:RHOURS+3 ) = 'cm'
-
-      VDESC3D( 1 ) = 'NO emission pulse type'
-      VDESC3D( 2 ) = 'CMAQ starting date for NO emission pulse'
-      VDESC3D( 3 ) = 'CMAQ starting time for NO emission pulse'
-      VDESC3D( 4:RHOURS+3 ) = 'hourly convective and non-convective rainfall'
-      DO I = 1, RHOURS
-         VDESC3D( I+3 )  = DESCSTR // DDTTM( I )
-         VDESC3D( I+27 ) = DESCSTRSW // DDTTM( I )
-         VDESC3D( I+51 ) = DESCSTRT2M // DDTTM( I )
-      END DO
-         VDESC3D( I+52 ) = DESCSTRLAI
-
-      VTYPE3D = 0
-      VTYPE3D( 1 ) = M3INT
-      VTYPE3D( 2 ) = M3INT
-      VTYPE3D( 3 ) = M3INT
-      VTYPE3D( 4:RHOURS+52 ) = M3REAL
-
-      FDESC3D = ' '
-      FDESC3D( 1 ) = 'Gridded rainfall data for soil NO emissions'
-      FDESC3D( 2 ) = '/From/ ' // PNAME
-      FDESC3D( 3 ) = '/Version/ CMAQ'
-
-C Open NO rain data save file
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( SOILOUT, FSNEW3, PNAME ) ) THEN
-            MESG = 'Could not open "' // TRIM( SOILOUT ) // '" file'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
-         END IF
-      END IF
-
-         ! Store MIO Metadata
-         NDIMS3D( 1:NVARS3D ) = 4
-         L_TSTEP( 1:NVARS3D ) = .True.
-         L_LAY  ( 1:NVARS3D ) = .True. ! even if 2-d
-         L_COL  ( 1:NVARS3D ) = .True.
-         L_ROW  ( 1:NVARS3D ) = .True.
-         L_VEXT ( 1:NVARS3D ) = .False.
-        
-         CALL LOAD_MIO_FILE ( SOILOUT, 0, 0, 0,
-     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &        L_VEXT(1:NVARS3D) )
-
-#ifdef parallel_io
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. FLUSH3 ( SOILOUT ) ) THEN
-            MESG = 'Could not sync to disk ' // TRIM( SOILOUT )
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-      END IF
-      CALL SE_BARRIER
-      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( SOILOUT, FSREAD3, PNAME ) ) THEN
-            MESG = 'Could not open ' // TRIM( SOILOUT )
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-      END IF
-#endif
 
 C Write soil NO rain data file
       IF ( FIRSTWRITE ) THEN
@@ -508,6 +553,31 @@ C Write soil NO rain data file
             CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
          END IF
       call mio_fwrite( SOILOUT, VAR, PNAME, Met_Data%LAI )
+
+!! MIO version:
+      call mio_setfile( MET_CRO_2D )
+      call mio_fcreate( SOILOUT_MIO, mio_new_file)
+      call mio_time_format_conversion (ndate, ntime, time_stamp)
+
+      VAR = 'PTYPE'
+      VAR = 'PULSEDATE'
+      VAR = 'PULSETIME'
+      call mio_fwrite( SOILOUT_MIO, 'LAI', pname,  Met_data%LAI , TIME_STAMP )
+      call mio_fwrite( SOILOUT_MIO, 'PTYPE', pname, PTYPE, TIME_STAMP )
+      call mio_fwrite( SOILOUT_MIO, 'PULSEDATE', pname, PULSEDATE, TIME_STAMP )
+      call mio_fwrite( SOILOUT_MIO, 'PULSETIME', pname, PULSETIME, TIME_STAMP )
+
+      NDX = 1 + MOD( IHR, MXRHRS )
+      RAINFALL( :,:,NDX ) = C_RAINFALL
+      DO I = 1, RHOURS
+         WRITE( VAR, '(A8,I2.2)' ) 'RAINFALL', I
+         call mio_fwrite( SOILOUT_MIO, VAR, pname, RAINFALL(:,:,I),TIME_STAMP )
+         WRITE( VAR, '(A2,I2.2)' ) 'SW', I
+         call mio_fwrite( SOILOUT_MIO, VAR, pname, HRNO_SW(:,:,I),TIME_STAMP )
+         WRITE( VAR, '(A3,I2.2)' ) 'T2M', I
+         call mio_fwrite( SOILOUT_MIO, VAR, pname, HRNO_T2M(:,:,I),TIME_STAMP )
+      END DO
+
 
 #else
          ! write MPAS end of day variables ==jwilliso

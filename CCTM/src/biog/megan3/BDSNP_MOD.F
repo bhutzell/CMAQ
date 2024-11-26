@@ -21,41 +21,195 @@ C Adopted from MEGAN3.1 and modified for CMAQ 5.4 by Jeff Willison
 
       MODULE BDSNP_MOD
  
+      USE UTILIO_DEFN
       USE centralized_io_util_module
       USE HGRD_DEFN
       USE ASX_DATA_MOD, ONLY: MET_DATA,GRID_DATA
       USE RUNTIME_VARS, ONLY: NEW_START, PX_LSM, MGN_ONLN_DEP, IGNORE_SOILINP
+      USE MIO_ASCII
+      USE MIO_MODULE
       
       IMPLICIT NONE
       
       CONTAINS
+
+      SUBROUTINE MEGAN_BDSNP_INIT(JDATE,JTIME,TSTEP)
+
+
+      INTEGER, INTENT( IN )  :: JDATE             ! current simulation date (YYYYDDD)
+      INTEGER, INTENT( IN )  :: JTIME             ! current simulation time (HHMMSS)
+      INTEGER, INTENT( IN )  :: TSTEP( 3 )        ! time step vector (HHMMSS)
+
+      CHARACTER( 16 ), SAVE :: SOILOUT = 'BDSNPOUT' ! logical name for output NO soil data - same format as soilinstate
+      CHARACTER( 16 ), SAVE :: SOILOUT_MIO = 'BDSNPOUT_MIO' ! logical name for output NO soil data - same format as soilinstate
+
+      CHARACTER( 256 ) :: MESG            ! message buffer
+      INTEGER, SAVE :: NDATE     ! test date to update rainfall
+      INTEGER, SAVE :: NTIME     ! test time to update rainfall
+      INTEGER, SAVE :: EDATE     ! end scenario date
+      INTEGER, SAVE :: ETIME     ! end scenario time
+      CHARACTER( 16 )  :: PNAME = 'MEGAN_BDSNP_INIT'  ! procedure name
+
+         EDATE = STDATE; ETIME = STTIME
+         NDATE = EDATE; NTIME = ETIME
+
+
+!C Build description for, and create/open soil NO emissions output file
+
+      FTYPE3D = GRDDED3
+      SDATE3D = NDATE
+      STIME3D = NTIME
+      TSTEP3D = 0   ! make it a time-independent file
+      NCOLS3D = GL_NCOLS
+      NROWS3D = GL_NROWS
+      NLAYS3D = 1
+      NVARS3D = 14
+      MXREC3D = 1
+!
+      VNAME3D = ' '
+      VNAME3D( 1 ) = 'PFACTOR'
+      VNAME3D( 2 ) = 'DRYPERIOD'
+      VNAME3D( 3 ) = 'NDEPRES'
+      VNAME3D( 4 ) = 'SOILMPREV'
+
+!C --- DIAGNOSTICS ---------------------------
+      VNAME3D( 5 ) = 'THETA_DIAG'
+      VNAME3D( 6 ) = 'WET_TERM_DIAG'
+      VNAME3D( 7 ) = 'TEMP_DIAG'
+      VNAME3D( 8 ) = 'TEMP_TERM_DIAG'
+      VNAME3D( 9 ) = 'A_DIAG'
+      VNAME3D( 10 ) = 'NRES_FERT_DIAG'
+      VNAME3D( 11 ) = 'AFERT_DIAG'
+      VNAME3D( 12 ) = 'NDEPRATE_DIAG'
+      VNAME3D( 13 ) = 'CRFAVG'
+      VNAME3D( 14 ) = 'PULSEAVG'
+!c -------------------------------------------
+      UNITS3D = ' '
+      UNITS3D( 1 ) = 'REAL'
+      UNITS3D( 2 ) = 'REAL'
+      UNITS3D( 3 ) = 'REAL'
+      UNITS3D( 4 ) = 'REAL'
+      UNITS3D( 5 ) = 'REAL'
+      UNITS3D( 6 ) = 'REAL'
+      UNITS3D( 7 ) = 'REAL'
+      UNITS3D( 8 ) = 'REAL'
+      UNITS3D( 9 ) = 'REAL'
+      UNITS3D( 10 ) = 'REAL'
+      UNITS3D( 11 ) = 'REAL'
+      UNITS3D( 12 ) = 'REAL'
+      UNITS3D( 13 ) = 'REAL'
+      UNITS3D( 14 ) = 'REAL'
+
+
+      VDESC3D( 1 ) = 'NO emission current pulse factor'
+      VDESC3D( 2 ) = 'length of the dry period in hours'
+      VDESC3D( 3 ) = 'soil N reservoir from deposition'
+      VDESC3D( 4 ) = 'Soil moisture prev. timestep m3/m3'
+      VDESC3D( 5 ) = 'moisture WFPS 0-1'
+      VDESC3D( 6 ) = 'moisture scale factore diagnostic'
+      VDESC3D( 7 ) = 'temperature diagnostic'
+      VDESC3D( 8 ) = 'temperature scale factor diagnostic'
+      VDESC3D( 9 ) = 'biome base emission diagnostic'
+      VDESC3D( 10 ) = 'NRES fert only diagnostic'
+      VDESC3D( 11 ) = 'fertilizer emission factor diagnostic'
+      VDESC3D( 12 ) = 'N deposition rate diagnostic'
+      VDESC3D( 13 ) = 'canopy reduction factor diagnostic'
+      VDESC3D( 14 ) = 'pulse factor diagnostic'
+
+      VTYPE3D = 0
+      VTYPE3D( 1:14 ) = M3REAL
+
+      FDESC3D = ' '
+      FDESC3D( 1 ) = 'Gridded soil state data for soil NO emissions'
+      FDESC3D( 2 ) = '/From/ ' // PNAME
+      FDESC3D( 3 ) = '/Version/ MEGAN3.1'
+!
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True. ! even if 2-d
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+            CALL LOAD_MIO_FILE ( SOILOUT_MIO, 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+
+C Open NO rain data save file
+      IF ( IO_PE_INCLUSIVE ) THEN
+         IF ( .NOT. OPEN3( SOILOUT, FSNEW3, PNAME ) ) THEN
+            MESG = 'Could not open "' // TRIM( SOILOUT ) // '" file'
+            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
+         END IF
+      END IF
+
+#ifdef parallel_io
+      IF ( IO_PE_INCLUSIVE ) THEN
+         IF ( .NOT. FLUSH3 ( SOILOUT ) ) THEN
+            MESG = 'Could not sync to disk ' // TRIM( SOILOUT )
+            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+         END IF
+      END IF
+      CALL SE_BARRIER
+      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
+         IF ( .NOT. OPEN3( SOILOUT, FSREAD3, PNAME ) ) THEN
+            MESG = 'Could not open ' // TRIM( SOILOUT )
+            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+         END IF
+      END IF
+#endif
+
+      END SUBROUTINE MEGAN_BDSNP_INIT
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE HRNOBDSNP( JDATE, JTIME, TSTEP,MONTH,  
+
      &             L_DESID_DIAG, SOILM, SOILT, RSTYP,LAI,
      &                       BDSNP_NO )
 
   
-      USE RUNTIME_VARS, ONLY: STTIME,STDATE,RUNLEN,LOGDEV
-      USE PHOT_MOD,     ONLY: CFRAC_2D_AVE
-
+      USE RUNTIME_VARS
+      USE HGRD_DEFN             ! horizontal domain specifications
+      USE BEIS_DEFN, ONLY: NSEF ! beis
+      USE ASX_DATA_MOD
       USE UTILIO_DEFN
-#ifdef mpas
-      use mio_module
-      use util_module, only : TIME2SEC, secsdiff, nextime
-#else
+      USE MIO_ASCII
+      USE MIO_MODULE
+#ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
 #endif
 #endif
+      USE centralized_io_module
 
 
-      USE centralized_io_module, only: bdsnp_ndep,bdsnp_landtype,
-     &                                 bdsnp_arid,bdsnp_nonarid,bdsnp_fert,
-     &                                 soilmprev,ndepres,ndeprate,dryperiod,pfactor
-     
+!
+!      USE RUNTIME_VARS, ONLY: STTIME,STDATE,RUNLEN,LOGDEV
+!      USE PHOT_MOD,     ONLY: CFRAC_2D_AVE
+!
+!
+!#ifdef mpas
+!      use mio_module
+!      use util_module, only : TIME2SEC, secsdiff, nextime
+!#else
+!#ifdef parallel
+!      USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
+!#else
+!      USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
+!#endif
+!#endif
+!
+!
+!      USE centralized_io_module, only: bdsnp_ndep,bdsnp_landtype,
+!     &                                 bdsnp_arid,bdsnp_nonarid,bdsnp_fert,
+!     &                                 soilmprev,ndepres,ndeprate,dryperiod,pfactor
+!     
       IMPLICIT NONE
+C Includes:
+      INCLUDE SUBST_FILES_ID
 
 C Arguments:
 
@@ -103,7 +257,9 @@ C Jacquemin B. and Noilhan J. (1990), Bound.-Layer Meteorol., 52, 93-134.
 C Local Variables:
 
       CHARACTER( 16 ), SAVE :: SOILINSTATE = 'SOILINSTATE' ! logical name for input NO soil data, restart file
+
       CHARACTER( 16 ), SAVE :: SOILOUT = 'BDSNPOUT' ! logical name for output NO soil data - same format as soilinstate
+      CHARACTER( 16 ), SAVE :: SOILOUT_MIO = 'BDSNPOUT_MIO' ! logical name for output NO soil data - same format as soilinstate
       integer, save :: output_step, half_syn_step  ! values are in seconds
       CHARACTER (20) :: TIME_STAMP
 
@@ -254,18 +410,18 @@ C to determine DRYPERIOD, pulse state, prev. timestep soil moisture, and N reser
 C If initial run, initialize some variables, otherwise get them from file
          IF ( NEW_START .or. IGNORE_SOILINP) THEN
 
-            PFACTOR   = 1.0   ! array
+            PFACTOR   = 1d0   ! array
             DRYPERIOD = 0.01  ! array initialized non-zero to avoid log(0)
             CFRAC     = 0. 
-            SOILMPREV = 0.0   ! array
-            FERT      = 0.0   ! array
-            EMPOL  = 0.0
-            EMPOLSUM  = 0.0
-            EMPOLAVG  = 0.0
+            SOILMPREV = 0d0   ! array
+            FERT      = 0d0   ! array
+            EMPOL  = 0d0
+            EMPOLSUM  = 0d0
+            EMPOLAVG  = 0d0
             BASESUM = 0.0
             CRFAVG = 0.0
             PULSEAVG = 0.0
-            NDEPRES   = 0.0   ! array
+            NDEPRES   = 0d0   ! array
 
 C open nitrogen deposition file
 
@@ -530,100 +686,7 @@ C Final timestamp
              call mio_fwrite('BDSNPOUT','NDEPRATE_DIAG', pname,
      &                           NDEPRATE(:,1),time_stamp)
 #else
-!C Build description for, and create/open soil NO emissions output file
 
-      FTYPE3D = GRDDED3
-      SDATE3D = NDATE
-      STIME3D = NTIME
-      TSTEP3D = 0   ! make it a time-independent file
-      NCOLS3D = GL_NCOLS
-      NROWS3D = GL_NROWS
-      NLAYS3D = 1
-      NVARS3D = 14
-      MXREC3D = 1
-!
-      VNAME3D = ' '
-      VNAME3D( 1 ) = 'PFACTOR'
-      VNAME3D( 2 ) = 'DRYPERIOD'
-      VNAME3D( 3 ) = 'NDEPRES'
-      VNAME3D( 4 ) = 'SOILMPREV'
-
-!C --- DIAGNOSTICS ---------------------------
-      VNAME3D( 5 ) = 'THETA_DIAG'
-      VNAME3D( 6 ) = 'WET_TERM_DIAG'
-      VNAME3D( 7 ) = 'TEMP_DIAG'
-      VNAME3D( 8 ) = 'TEMP_TERM_DIAG'
-      VNAME3D( 9 ) = 'A_DIAG'
-      VNAME3D( 10 ) = 'NRES_FERT_DIAG'
-      VNAME3D( 11 ) = 'AFERT_DIAG'
-      VNAME3D( 12 ) = 'NDEPRATE_DIAG'
-      VNAME3D( 13 ) = 'CRFAVG'
-      VNAME3D( 14 ) = 'PULSEAVG'
-!c -------------------------------------------
-      UNITS3D = ' '
-      UNITS3D( 1 ) = 'REAL'
-      UNITS3D( 2 ) = 'REAL'
-      UNITS3D( 3 ) = 'REAL'
-      UNITS3D( 4 ) = 'REAL'
-      UNITS3D( 5 ) = 'REAL'
-      UNITS3D( 6 ) = 'REAL'
-      UNITS3D( 7 ) = 'REAL'
-      UNITS3D( 8 ) = 'REAL'
-      UNITS3D( 9 ) = 'REAL'
-      UNITS3D( 10 ) = 'REAL'
-      UNITS3D( 11 ) = 'REAL'
-      UNITS3D( 12 ) = 'REAL'
-      UNITS3D( 13 ) = 'REAL'
-      UNITS3D( 14 ) = 'REAL'
-
-
-      VDESC3D( 1 ) = 'NO emission current pulse factor'
-      VDESC3D( 2 ) = 'length of the dry period in hours'
-      VDESC3D( 3 ) = 'soil N reservoir from deposition'
-      VDESC3D( 4 ) = 'Soil moisture prev. timestep m3/m3'
-      VDESC3D( 5 ) = 'moisture WFPS 0-1'
-      VDESC3D( 6 ) = 'moisture scale factore diagnostic'
-      VDESC3D( 7 ) = 'temperature diagnostic'
-      VDESC3D( 8 ) = 'temperature scale factor diagnostic'
-      VDESC3D( 9 ) = 'biome base emission diagnostic'
-      VDESC3D( 10 ) = 'NRES fert only diagnostic'
-      VDESC3D( 11 ) = 'fertilizer emission factor diagnostic'
-      VDESC3D( 12 ) = 'N deposition rate diagnostic'
-      VDESC3D( 13 ) = 'canopy reduction factor diagnostic'
-      VDESC3D( 14 ) = 'pulse factor diagnostic'
-
-      VTYPE3D = 0
-      VTYPE3D( 1:14 ) = M3REAL
-
-      FDESC3D = ' '
-      FDESC3D( 1 ) = 'Gridded soil state data for soil NO emissions'
-      FDESC3D( 2 ) = '/From/ ' // PNAME
-      FDESC3D( 3 ) = '/Version/ MEGAN3.1'
-!
-
-C Open NO rain data save file
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( SOILOUT, FSNEW3, PNAME ) ) THEN
-            MESG = 'Could not open "' // TRIM( SOILOUT ) // '" file'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
-         END IF
-      END IF
-
-#ifdef parallel_io
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. FLUSH3 ( SOILOUT ) ) THEN
-            MESG = 'Could not sync to disk ' // TRIM( SOILOUT )
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-      END IF
-      CALL SE_BARRIER
-      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( SOILOUT, FSREAD3, PNAME ) ) THEN
-            MESG = 'Could not open ' // TRIM( SOILOUT )
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-      END IF
-#endif
 
       VNAME = 'PFACTOR'
       IF ( .NOT. WRITE3(SOILOUT,VNAME,NDATE,NTIME,PFACTOR)) THEN
@@ -643,7 +706,7 @@ C Open NO rain data save file
         CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
       ENDIF
 
-      VNAME = 'SOILIMPREV'
+      VNAME = 'SOILMPREV'
       IF ( .NOT. WRITE3(SOILOUT,VNAME,NDATE,NTIME,SOILM )) THEN
         MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
         CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
@@ -709,11 +772,28 @@ C Open NO rain data save file
         CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
       ENDIF
 
-      VNAME = 'SOILMPREV'
-      IF ( .NOT.WRITE3(SOILOUT,VNAME,NDATE,NTIME,SOILMPREV)) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
+!! MIO version
+
+      call mio_setfile( MET_CRO_2D )
+      call mio_fcreate( SOILOUT_MIO, mio_new_file )
+      call mio_time_format_conversion (ndate, ntime, time_stamp)
+
+      call mio_fwrite( SOILOUT_MIO,'PFACTOR',PNAME,PFACTOR,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'DRYPERIOD',PNAME,DRYPERIOD,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'NDEPRES',PNAME,NDEPRES,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'SOILMPREV',PNAME,SOILM,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'THETA_DIAG',PNAME,THETA_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'WET_TERM_DIAG',PNAME,WET_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'TEMP_DIAG',PNAME,SOILT,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'TEMP_TERM_DIAG',PNAME,TEMP_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'A_DIAG',PNAME,A_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'AFERT_DIAG',PNAME,AFERT_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'NRES_FERT_DIAG',PNAME,NRES_FERT_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'NDEPRATE_DIAG',PNAME,NDEPRATE,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'CRFAVG',PNAME,CRFAVG,TIME_STAMP)
+      call mio_fwrite( SOILOUT_MIO,'PULSEAVG',PNAME,PULSEAVG,TIME_STAMP)
+
+
 #endif
 
 
