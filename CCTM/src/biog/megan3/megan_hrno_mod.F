@@ -544,6 +544,7 @@ C Write soil NO rain data file
       VAR = 'PTYPE'
       VAR = 'PULSEDATE'
       VAR = 'PULSETIME'
+      call mio_fwrite( SOILOUT_MIO, 'LAI', pname,  Met_data%LAI , TIME_STAMP )
       call mio_fwrite( SOILOUT_MIO, 'PTYPE', pname, PTYPE, TIME_STAMP )
       call mio_fwrite( SOILOUT_MIO, 'PULSEDATE', pname, PULSEDATE, TIME_STAMP )
       call mio_fwrite( SOILOUT_MIO, 'PULSETIME', pname, PULSETIME, TIME_STAMP )
