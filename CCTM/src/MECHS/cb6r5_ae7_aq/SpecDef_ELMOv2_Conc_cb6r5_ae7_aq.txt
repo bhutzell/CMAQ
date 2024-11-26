@@ -37,7 +37,7 @@
 !-------------------------------------------!
 AIR_DENS        ,kg m-3    ,DENS[1]
 RH              ,%         ,100.00*RH[1]
-SFC_TMP         ,C         ,(TEMP2[1]-273.15)
+SFC_TMP         ,C         ,(TA[1]-273.15)
 PBLH            ,m         ,PBL[1]
 SOL_RAD         ,W m-2     ,RGRND[1]
 precip          ,cm        ,PRECIP[1]
@@ -118,7 +118,7 @@ ACAJ            ,ug m-3    ,PMF_CA[1]
 AMGJ            ,ug m-3    ,PMF_MG[1]
 AKJ             ,ug m-3    ,PMF_K[1]
 AMNJ            ,ug m-3    ,PMF_MN[1]
-ASOILJ          ,ug m-3    ,PMF_SOILIMPV[1]
+ASOILJ          ,ug m-3    ,PMF_RCSOIL[1]
 
 !! Non-Crustal Inorganic Particle Species
 AHPLUSIJ        ,umol m-3  ,PMF_HP[1]
@@ -210,7 +210,7 @@ PM25_NH4        ,ug m-3    ,PM25_NH4[1]
 PM25_NO3        ,ug m-3    ,PM25_NO3[1] 
 PM25_OC         ,ugC m-3   ,PM25_OC[1] 
 PM25_OM         ,ug m-3    ,PM25_OA[1] 
-PM25_SOIL       ,ug m-3    ,PM25_SOIL[1] 
+!PM25_SOIL       ,ug m-3    ,PM25_SOIL[1]  !Missing from ELMO1_CONCS file
 PM25_SO4        ,ug m-3    ,PM25_SO4[1] 
 PM25_TOT        ,ug m-3    ,PM25[1] 
 PM25_UNSPEC1    ,ug m-3    ,PM25_OTHWNC[1] 

@@ -246,64 +246,64 @@ ANCOMIJ         ,ug m-3    ,AOMIJ[0] - AOCIJ[0]
 AUNSPEC2IJ      ,ug m-3     ,AUNSPEC1IJ[0] - ANCOMIJ[0]
 
 !! AMS Projection of Output Concentrations
-PMAMS_CL        ,ug m-3    ,ACLI[1] *FAMSAIT[3] +ACLJ[1]*FAMSACC[3]+ACLK[1] *FAMSCOR[3]
-PMAMS_NH4       ,ug m-3    ,ANH4I[1]*FAMSAIT[3]+ANH4J[1]*FAMSACC[3]+ANH4K[1]*FAMSCOR[3]
-PMAMS_NO3       ,ug m-3    ,ANO3I[1]*FAMSAIT[3]+ANO3J[1]*FAMSACC[3]+ANO3K[1]*FAMSCOR[3]
-PMAMS_OA        ,ug m-3    ,AOMI[0] *FAMSAIT[3]+AOMJ[0] *FAMSACC[3]
-PMAMS_SO4       ,ug m-3    ,ASO4I[1]*FAMSAIT[3]+ASO4J[1]*FAMSACC[3]+ASO4K[1]*FAMSCOR[3]
+PMAMS_CL        ,ug m-3    ,ACLI[1] *FAMS_AIT[3] +ACLJ[1]*FAMS_ACC[3]+ACLK[1] *FAMS_COR[3]
+PMAMS_NH4       ,ug m-3    ,ANH4I[1]*FAMS_AIT[3]+ANH4J[1]*FAMS_ACC[3]+ANH4K[1]*FAMS_COR[3]
+PMAMS_NO3       ,ug m-3    ,ANO3I[1]*FAMS_AIT[3]+ANO3J[1]*FAMS_ACC[3]+ANO3K[1]*FAMS_COR[3]
+PMAMS_OA        ,ug m-3    ,AOMI[0] *FAMS_AIT[3]+AOMJ[0] *FAMS_ACC[3]
+PMAMS_SO4       ,ug m-3    ,ASO4I[1]*FAMS_AIT[3]+ASO4J[1]*FAMS_ACC[3]+ASO4K[1]*FAMS_COR[3]
 
 !! PM1 Cutoff Output
-PM1_TOT         ,ug m-3    ,ATOTI[0]*FPM1AIT[3]+ATOTJ[0]*FPM1ACC[3]+ATOTK[0]*FPM1COR[3]
+PM1_TOT         ,ug m-3    ,ATOTI[0]*FPM1_AIT[3]+ATOTJ[0]*FPM1_ACC[3]+ATOTK[0]*FPM1_COR[3]
 
 !! Unused PM1 Species. Included Here for demonstration
-!PM1_EC         ,ug m-3    ,AECI[1] *FPM1AIT[3] +AECJ[1] *FPM1ACC[3]
-!PM1_OC         ,ugC m-3   ,AOCI[0] *FPM1AIT[3] +AOCJ[0] *FPM1ACC[3]
-!PM1_OM         ,ug m-3    ,AOMI[0] *FPM1AIT[3] +AOMJ[0] *FPM1ACC[3]
-!PM1_SO4        ,ug m-3    ,ASO4I[1]*FPM1AIT[3] +ASO4J[1]*FPM1ACC[3] +ASO4K[1]*FPM1COR[3]
-!PM1_CL         ,ug m-3    ,ACLI[1] *FPM1AIT[3] +ACLJ[1] *FPM1ACC[3] +ACLK[1] *FPM1COR[3]
-!PM1_NA         ,ug m-3    ,ANAI[1] *FPM1AIT[3] +ANAJ[1] *FPM1ACC[3] +ANAK[0] *FPM1COR[3]
-!PM1_MG         ,ug m-3    ,                     AMGJ[1] *FPM1ACC[3] +AMGK[0] *FPM1COR[3]
-!PM1_K          ,ug m-3    ,                     AKJ[1]  *FPM1ACC[3] +AKK[0]  *FPM1COR[3]
-!PM1_CA         ,ug m-3    ,                     ACAJ[1] *FPM1ACC[3] +ACAK[0] *FPM1COR[3]
-!PM1_NH4        ,ug m-3    ,ANH4I[1] *FPM1AIT[3]+ANH4J[1]*FPM1ACC[3] +ANH4K[1]*FPM1COR[3]
-!PM1_NO3        ,ug m-3    ,ANO3I[1] *FPM1AIT[3]+ANO3J[1]*FPM1ACC[3] +ANO3K[1]*FPM1COR[3] 
-!PM1_SOIL       ,ug m-3    ,ASOILJ[0]*FPM1ACC[3]+(ASOIL[1]+ACORS[1])*FPM1COR[3]
+!PM1_EC         ,ug m-3    ,AECI[1] *FPM1_AIT[3] +AECJ[1] *FPM1_ACC[3]
+!PM1_OC         ,ugC m-3   ,AOCI[0] *FPM1_AIT[3] +AOCJ[0] *FPM1_ACC[3]
+!PM1_OM         ,ug m-3    ,AOMI[0] *FPM1_AIT[3] +AOMJ[0] *FPM1_ACC[3]
+!PM1_SO4        ,ug m-3    ,ASO4I[1]*FPM1_AIT[3] +ASO4J[1]*FPM1_ACC[3] +ASO4K[1]*FPM1_COR[3]
+!PM1_CL         ,ug m-3    ,ACLI[1] *FPM1_AIT[3] +ACLJ[1] *FPM1_ACC[3] +ACLK[1] *FPM1_COR[3]
+!PM1_NA         ,ug m-3    ,ANAI[1] *FPM1_AIT[3] +ANAJ[1] *FPM1_ACC[3] +ANAK[0] *FPM1_COR[3]
+!PM1_MG         ,ug m-3    ,                     AMGJ[1] *FPM1_ACC[3] +AMGK[0] *FPM1_COR[3]
+!PM1_K          ,ug m-3    ,                     AKJ[1]  *FPM1_ACC[3] +AKK[0]  *FPM1_COR[3]
+!PM1_CA         ,ug m-3    ,                     ACAJ[1] *FPM1_ACC[3] +ACAK[0] *FPM1_COR[3]
+!PM1_NH4        ,ug m-3    ,ANH4I[1] *FPM1_AIT[3]+ANH4J[1]*FPM1_ACC[3] +ANH4K[1]*FPM1_COR[3]
+!PM1_NO3        ,ug m-3    ,ANO3I[1] *FPM1_AIT[3]+ANO3J[1]*FPM1_ACC[3] +ANO3K[1]*FPM1_COR[3] 
+!PM1_SOIL       ,ug m-3    ,ASOILJ[0]*FPM1_ACC[3]+(ASOIL[1]+ACORS[1])*FPM1_COR[3]
 !PM1_UNSPEC1    ,ug m-3    ,PM1_TOT[0] - (PM1_CL[0] + PM1_EC[0]+ PM1_NA[0]  + PM1_NH4[0] +  \
 !                                         PM1_NO3[0]+ PM1_OC[0]+ PM1_SOIL[0]+ PM1_SO4[0] ) 
-!PM1_UNSPCRS    ,ug m-3    ,ATOTK[0] *FPM1COR[3] - (ASO4K[1]*FPM1COR[3] \
-!                                                  +ACLK[1]*FPM1COR[3]  \
-!                                                  +ANAK[0]*FPM1COR[3]  \
-!                                                  +AMGK[0]*FPM1COR[3]  \
-!                                                  +AKK[0]*FPM1COR[3]   \
-!                                                  +ACAK[0]*FPM1COR[3]  \
-!                                                  +ANH4K[1]*FPM1COR[3] \
-!                                                  +ANO3K[1]*FPM1COR[3]) 
+!PM1_UNSPCRS    ,ug m-3    ,ATOTK[0] *FPM1_COR[3] - (ASO4K[1]*FPM1_COR[3] \
+!                                                  +ACLK[1]*FPM1_COR[3]  \
+!                                                  +ANAK[0]*FPM1_COR[3]  \
+!                                                  +AMGK[0]*FPM1_COR[3]  \
+!                                                  +AKK[0]*FPM1_COR[3]   \
+!                                                  +ACAK[0]*FPM1_COR[3]  \
+!                                                  +ANH4K[1]*FPM1_COR[3] \
+!                                                  +ANO3K[1]*FPM1_COR[3]) 
  
 !! PM2.5 species computed using modeled size distribution
-PM25_HP         ,ug m-3    ,(AH3OPI[1]*FPM25AIT[3]+AH3OPJ[1]*FPM25ACC[3]+AH3OPK[1]*FPM25COR[3])*1.0/19.0
-PM25_CL         ,ug m-3    ,ACLI[1]*FPM25AIT[3]+ACLJ[1]*FPM25ACC[3]+ACLK[1]*FPM25COR[3]
-PM25_EC         ,ug m-3    ,AECI[1]*FPM25AIT[3]+AECJ[1]*FPM25ACC[3]
-PM25_NA         ,ug m-3    ,ANAI[1]*FPM25AIT[3]+ANAJ[1]*FPM25ACC[3]+ANAK[0]*FPM25COR[3]
-PM25_MG         ,ug m-3    ,                    AMGJ[1]*FPM25ACC[3]+AMGK[0]*FPM25COR[3]
-PM25_K          ,ug m-3    ,                    AKJ[1] *FPM25ACC[3]+AKK[0] *FPM25COR[3]
-PM25_CA         ,ug m-3    ,                    ACAJ[1]*FPM25ACC[3]+ACAK[0]*FPM25COR[3]
-PM25_NH4        ,ug m-3    ,ANH4I[1]*FPM25AIT[3]+ANH4J[1]*FPM25ACC[3]+ANH4K[1]*FPM25COR[3]
-PM25_NO3        ,ug m-3    ,ANO3I[1]*FPM25AIT[3]+ANO3J[1]*FPM25ACC[3]+ANO3K[1]*FPM25COR[3]
-PM25_OC         ,ugC m-3   ,AOCI[0] *FPM25AIT[3]+AOCJ[0]*FPM25ACC[3]
-PM25_OM         ,ug m-3    ,AOMI[0] *FPM25AIT[3]+AOMJ[0]*FPM25ACC[3]
-PM25_SOIL       ,ug m-3    ,ASOILJ[0]*FPM25ACC[3]+ASOIL[1]*FPM25COR[3]
-PM25_SO4        ,ug m-3    ,ASO4I[1]*FPM25AIT[3]+ASO4J[1]*FPM25ACC[3]+ASO4K[1]*FPM25COR[3]
-PM25_TOT        ,ug m-3    ,ATOTI[0]*FPM25AIT[3]+ATOTJ[0]*FPM25ACC[3]+ATOTK[0]*FPM25COR[3]
+PM25_HP         ,ug m-3    ,(AH3OPI[1]*FPM25_AIT[3]+AH3OPJ[1]*FPM25_ACC[3]+AH3OPK[1]*FPM25_COR[3])*1.0/19.0
+PM25_CL         ,ug m-3    ,ACLI[1]*FPM25_AIT[3]+ACLJ[1]*FPM25_ACC[3]+ACLK[1]*FPM25_COR[3]
+PM25_EC         ,ug m-3    ,AECI[1]*FPM25_AIT[3]+AECJ[1]*FPM25_ACC[3]
+PM25_NA         ,ug m-3    ,ANAI[1]*FPM25_AIT[3]+ANAJ[1]*FPM25_ACC[3]+ANAK[0]*FPM25_COR[3]
+PM25_MG         ,ug m-3    ,                    AMGJ[1]*FPM25_ACC[3]+AMGK[0]*FPM25_COR[3]
+PM25_K          ,ug m-3    ,                    AKJ[1] *FPM25_ACC[3]+AKK[0] *FPM25_COR[3]
+PM25_CA         ,ug m-3    ,                    ACAJ[1]*FPM25_ACC[3]+ACAK[0]*FPM25_COR[3]
+PM25_NH4        ,ug m-3    ,ANH4I[1]*FPM25_AIT[3]+ANH4J[1]*FPM25_ACC[3]+ANH4K[1]*FPM25_COR[3]
+PM25_NO3        ,ug m-3    ,ANO3I[1]*FPM25_AIT[3]+ANO3J[1]*FPM25_ACC[3]+ANO3K[1]*FPM25_COR[3]
+PM25_OC         ,ugC m-3   ,AOCI[0] *FPM25_AIT[3]+AOCJ[0]*FPM25_ACC[3]
+PM25_OM         ,ug m-3    ,AOMI[0] *FPM25_AIT[3]+AOMJ[0]*FPM25_ACC[3]
+PM25_SOIL       ,ug m-3    ,ASOILJ[0]*FPM25_ACC[3]+ASOIL[1]*FPM25_COR[3]
+PM25_SO4        ,ug m-3    ,ASO4I[1]*FPM25_AIT[3]+ASO4J[1]*FPM25_ACC[3]+ASO4K[1]*FPM25_COR[3]
+PM25_TOT        ,ug m-3    ,ATOTI[0]*FPM25_AIT[3]+ATOTJ[0]*FPM25_ACC[3]+ATOTK[0]*FPM25_COR[3]
 PM25_UNSPEC1    ,ug m-3    ,PM25_TOT[0]-(PM25_CL[0]+PM25_EC[0]+PM25_NA[0]+PM25_NH4[0] \
                            +PM25_NO3[0]+PM25_OC[0]+PM25_SOIL[0]+PM25_SO4[0])
-PM25_UNSPCRS    ,ug m-3    ,ATOTK[0]*FPM25COR[3] - (ASO4K[1]*FPM25COR[3] \
-                                                  +ACLK[1]*FPM25COR[3]  \
-                                                  +ANAK[0]*FPM25COR[3]  \
-                                                  +AMGK[0]*FPM25COR[3]  \
-                                                  +AKK[0]*FPM25COR[3]   \
-                                                  +ACAK[0]*FPM25COR[3]  \
-                                                  +ANH4K[1]*FPM25COR[3] \
-                                                  +ANO3K[1]*FPM25COR[3]) 
+PM25_UNSPCRS    ,ug m-3    ,ATOTK[0]*FPM25_COR[3] - (ASO4K[1]*FPM25_COR[3] \
+                                                  +ACLK[1]*FPM25_COR[3]  \
+                                                  +ANAK[0]*FPM25_COR[3]  \
+                                                  +AMGK[0]*FPM25_COR[3]  \
+                                                  +AKK[0]*FPM25_COR[3]   \
+                                                  +ACAK[0]*FPM25_COR[3]  \
+                                                  +ANH4K[1]*FPM25_COR[3] \
+                                                  +ANO3K[1]*FPM25_COR[3]) 
 
 
 !! Fine particle acidity (pH). pH is undefined if there is no aerosol water. 
@@ -315,13 +315,13 @@ PM25_UNSPCRS    ,ug m-3    ,ATOTK[0]*FPM25COR[3] - (ASO4K[1]*FPM25COR[3] \
 !FINEPHF        ,           ,AH2OIJ[0]>0.01 ? ACIDITYTEMP[0] : -9.999E36
 
 !! PM10.0 and Coarse-Sized Species
-PM10            ,ug m-3    ,ATOTI[0]*FPM10AIT[3]+ATOTJ[0]*FPM10ACC[3]+ATOTK[0]*FPM10COR[3]
+PM10            ,ug m-3    ,ATOTI[0]*FPM10_AIT[3]+ATOTJ[0]*FPM10_ACC[3]+ATOTK[0]*FPM10_COR[3]
 
-PMC_CL          ,ug m-3    ,ACLI[1]*FPM10AIT[3] +ACLJ[1]*FPM10ACC[3] +ACLK[1]*FPM10COR[3] -PM25_CL[0]
-PMC_NA          ,ug m-3    ,ANAI[1]*FPM10AIT[3] +ANAJ[1]*FPM10ACC[3] +ANAK[0]*FPM10COR[3] -PM25_NA[0]
-PMC_NH4         ,ug m-3    ,ANH4I[1]*FPM10AIT[3]+ANH4J[1]*FPM10ACC[3]+ANH4K[1]*FPM10COR[3]-PM25_NH4[0]
-PMC_NO3         ,ug m-3    ,ANO3I[1]*FPM10AIT[3]+ANO3J[1]*FPM10ACC[3]+ANO3K[1]*FPM10COR[3]-PM25_NO3[0]
-PMC_SO4         ,ug m-3    ,ASO4I[1]*FPM10AIT[3]+ASO4J[1]*FPM10ACC[3]+ASO4K[1]*FPM10COR[3]-PM25_SO4[0]
+PMC_CL          ,ug m-3    ,ACLI[1]*FPM10_AIT[3] +ACLJ[1]*FPM10_ACC[3] +ACLK[1]*FPM10_COR[3] -PM25_CL[0]
+PMC_NA          ,ug m-3    ,ANAI[1]*FPM10_AIT[3] +ANAJ[1]*FPM10_ACC[3] +ANAK[0]*FPM10_COR[3] -PM25_NA[0]
+PMC_NH4         ,ug m-3    ,ANH4I[1]*FPM10_AIT[3]+ANH4J[1]*FPM10_ACC[3]+ANH4K[1]*FPM10_COR[3]-PM25_NH4[0]
+PMC_NO3         ,ug m-3    ,ANO3I[1]*FPM10_AIT[3]+ANO3J[1]*FPM10_ACC[3]+ANO3K[1]*FPM10_COR[3]-PM25_NO3[0]
+PMC_SO4         ,ug m-3    ,ASO4I[1]*FPM10_AIT[3]+ASO4J[1]*FPM10_ACC[3]+ASO4K[1]*FPM10_COR[3]-PM25_SO4[0]
 PMC_TOT         ,ug m-3    ,PM10[0]-PM25_TOT[0]
 
 !! FRM PM Equivalent Calculation
