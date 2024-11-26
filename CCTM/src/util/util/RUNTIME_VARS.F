@@ -989,8 +989,8 @@
       ! Get environ. variable met_tstep to control meteorology frequency
       CALL GET_ENV ( MET_TSTEP, 'MET_TSTEP', TSTEP3D, VARDEV)
 
-      ! Ensure users cannot pick a met_tstep that is not smaller than the
-      ! file time step and something that is not a multiple of that tstep
+      ! Ensure users cannot pick a met_tstep that is smaller than the
+      ! MC3 file time step or something that is not a multiple of that tstep
           
       IF (MOD(TIME2SEC(MET_TSTEP), TIME2SEC(TSTEP3D)) .NE. 0) then
           XMSG = 'MET_TSTEP environmental variable not equal to or a 

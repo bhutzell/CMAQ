@@ -139,7 +139,7 @@ C=======================================================================
          USE STK_PRMS, ONLY: SOURCE, STK_PRMS_INIT, MY_NSRC
          USE STK_EMIS, ONLY: DESID_STREAM_NAME, NSRC_EMIS, FIREFLAG,
      &                       MAP_PTtoISRM, STK_EMIS_INIT
-         USE PTMET, ONLY: PTMET_DATA, MC2NAME, MC3NAME, MD3NAME, PTMET_INIT
+         USE PTMET, ONLY: PTMET_DATA, PTMET_INIT
          USE PTBILIN, ONLY: NPTGRPS, 
      &                      METCXORIG, METCYORIG, XCELLCG, YCELLCG, 
      &                      METDXORIG, METDYORIG, XCELLDG, YCELLDG
@@ -150,6 +150,7 @@ C=======================================================================
          USE DESID_VARS, ONLY: DESID_LAYS, DESID_MAXLAYS
          USE stack_group_data_module
          USE centralized_io_module, only : window
+         use mio_module
 
          IMPLICIT NONE
 
@@ -282,56 +283,49 @@ C get scenario timing
          PT_DATE = JDATE 
          PT_TIME = JTIME
 
-C open met files
-
-         MC2NAME = MET_CRO_2D
-         MC3NAME = MET_CRO_3D
-         MD3NAME = MET_DOT_3D
-
 C Get grid parameters from 3-d cross-point met file and store header information.
-C Use time parameters for time defaults.
-         CALL RETRIEVE_IOAPI_HEADER( MC3NAME, JDATE, JTIME )
 
-         CALL SUBHFILE ( MC3NAME, GXOFF, GYOFF,
+         CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
      &                   STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC )
 
 C Initialize reference grid with met file
-         XCELLCG = XCELL3D
-         YCELLCG = YCELL3D
-         METCCOLS = NCOLS3D
-         METCROWS = NROWS3D
-         METCXORIG = XORIG3D
-         METCYORIG = YORIG3D
-
+!         XCELLCG = XCELL3D
+!         YCELLCG = YCELL3D
+!         METCCOLS = NCOLS3D
+!         METCROWS = NROWS3D
+!         METCXORIG = XORIG3D
+!         METCYORIG = YORIG3D
+         call mio_get_global_attr( MET_CRO_3D, 'XCELL', XCELLCG )
+         call mio_get_global_attr( MET_CRO_3D, 'YCELL', YCELLCG )
+         call mio_get_global_attr( MET_CRO_3D, 'XORIG', METCXORIG )
+         call mio_get_global_attr( MET_CRO_3D, 'YORIG', METCYORIG )  
          IF ( ( GXOFF .GT. 0 ) .AND. ( GYOFF .GT. 0 ) ) THEN
-            METCXORIG = XORIG3D + REAL( GXOFF,8 ) * XCELL3D
-            METCYORIG = YORIG3D + REAL( GYOFF,8 ) * YCELL3D
-         ELSE
-            METCXORIG = XORIG3D
-            METCYORIG = YORIG3D
+            METCXORIG = METCXORIG + REAL( GXOFF,8 ) * XCELLCG
+            METCYORIG = METCYORIG + REAL( GYOFF,8 ) * YCELLCG
          END IF
 
 !!!!!!^^^^^^^!!!! THESE NEED TO BE CHECKED AGAINST GRIDDESC
 
 C Get grid parameters from 3-d dot-point met file and store header information.
 C (declared and stored in PTBILIN module)
-         CALL RETRIEVE_IOAPI_HEADER( MD3NAME, JDATE, JTIME )
-         XCELLDG = XCELL3D
-         YCELLDG = YCELL3D
-         METDXORIG = XORIG3D
-         METDYORIG = YORIG3D
-         METDCOLS = NCOLS3D
-         METDROWS = NROWS3D
+!         XCELLDG = XCELL3D
+!         YCELLDG = YCELL3D
+!         METDXORIG = XORIG3D
+!         METDYORIG = YORIG3D
+!         METDCOLS = NCOLS3D
+!         METDROWS = NROWS3D
 
-         CALL SUBHFILE ( MD3NAME, GXOFF, GYOFF,
+         call mio_get_global_attr( MET_DOT_3D, 'XCELL', XCELLDG )
+         call mio_get_global_attr( MET_DOT_3D, 'YCELL', YCELLDG )
+         call mio_get_global_attr( MET_DOT_3D, 'XORIG', METDXORIG )
+         call mio_get_global_attr( MET_DOT_3D, 'YORIG', METDYORIG )
+
+         CALL SUBHFILE ( MET_DOT_3D, GXOFF, GYOFF,
      &                   STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC )
 
          IF ( ( GXOFF .GT. 0 ) .AND. ( GYOFF .GT. 0 ) ) THEN
-            METDXORIG = XORIG3D + REAL( GXOFF,8 ) * XCELL3D
-            METDYORIG = YORIG3D + REAL( GYOFF,8 ) * YCELL3D
-         ELSE
-            METDXORIG = XORIG3D
-            METDYORIG = YORIG3D
+            METDXORIG = METDXORIG + REAL( GXOFF,8 ) * XCELLDG
+            METDYORIG = METDYORIG + REAL( GYOFF,8 ) * YCELLDG
          END IF
 
 C Compare number of meteorology layers to number of emissions layers
@@ -1375,33 +1369,6 @@ C Possible report to REPRTLAY
 
 
       END SUBROUTINE CALC_PLUME_HEIGHT
-
-C-----------------------------------------------------------------------
-
-#ifndef mpas
-         SUBROUTINE RETRIEVE_IOAPI_HEADER( FNAME, JDATE, JTIME )
-
-
-            USE UTILIO_DEFN, ONLY : DESC3, XSTAT2
-
-            IMPLICIT NONE
-
-            CHARACTER( * ) :: FNAME
-            INTEGER        :: JDATE, JTIME
-
-            CHARACTER( 16 )  :: PNAME = 'RETRVE_IOAPI_HDR'   ! procedure name
-            CHARACTER( 120 ) :: XMSG = ' '
-
-            IF ( .NOT. DESC3( FNAME ) ) THEN
-               XMSG = 'Could not get description of file "' //
-     &                FNAME( 1:LEN_TRIM( FNAME ) ) // '"'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-
-            RETURN
-
-         END SUBROUTINE RETRIEVE_IOAPI_HEADER
-#endif
 
 C-----------------------------------------------------------------------
 

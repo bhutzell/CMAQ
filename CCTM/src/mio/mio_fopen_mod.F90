@@ -455,9 +455,9 @@
 
              end if
 
-   do i = 1, mio_nfiles
-      write (mio_logdev, '(A,i3,2x,A)' ) '==c==', i, trim(mio_file_data(i)%filename)
-   end do
+!   do i = 1, mio_nfiles
+!      write (mio_logdev, '(A,i3,2x,A)' ) '==c==', i, trim(mio_file_data(i)%filename)
+!   end do
 
         end subroutine mio_fopen
 

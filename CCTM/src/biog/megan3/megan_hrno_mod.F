@@ -118,6 +118,7 @@ C Local Variables:
       INTEGER          I, J, K, R, C, L   ! counters
       INTEGER          IOS                ! IO or memory allocation status
       INTEGER, SAVE :: METSTEP            ! met_cro_2d time step
+      INTEGER       :: floc
       
       REAL             FAC2
 
@@ -150,28 +151,31 @@ C Determine last timestamp
 
          output_step   = time2sec(tstep(1))
          half_syn_step = time2sec(tstep(2)) / 2
-#else
-
-C Get description of met file
-         IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
-            MESG = 'Could not get description of file "'
-     &           // TRIM( MET_CRO_2D ) // '"'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-
-         METSTEP = TSTEP3D
-
+!#else
+!
+!C Get description of met file
+!         IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
+!            MESG = 'Could not get description of file "'
+!     &           // TRIM( MET_CRO_2D ) // '"'
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!         END IF
+!
+!         METSTEP = TSTEP3D
+!
 C Check that grid description matches B3GRD file
-         IF ( .NOT. CHKGRID( MET_CRO_2D ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MET_CRO_2D )
-     &           // '" does not match grid in file ' // TRIM( MET_CRO_2D ) // '"'
-#ifdef twoway
-            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-#else
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!         IF ( .NOT. CHKGRID( MET_CRO_2D ) ) THEN
+!            MESG = 'Grid in file "' // TRIM( MET_CRO_2D )
+!     &           // '" does not match grid in file ' // TRIM( MET_CRO_2D ) // '"'
+!#ifdef twoway
+!            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
+!#else
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!#endif
+!         END IF
 #endif
-         END IF
-#endif
+
+         floc = mio_search( MET_CRO_2D )
+         METSTEP = mio_file_data(floc)%tstep
 
          ALLOCATE( RNTOT( NCOLS,NROWS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'RNTOT', PNAME )
@@ -418,7 +422,7 @@ C Open NO rain data save file
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
         
-         CALL LOAD_MIO_FILE ( 'MEGAN_SOIL_MIO', 0, 0, 0,
+         CALL LOAD_MIO_FILE ( SOILOUT, 0, 0, 0,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -443,7 +447,7 @@ C Open NO rain data save file
 C Write soil NO rain data file
       IF ( FIRSTWRITE ) THEN
          call mio_setfile( MET_CRO_2D )
-         call mio_fcreate( 'MEGAN_SOIL_MIO', mio_new_file )
+         call mio_fcreate( SOILOUT, mio_new_file )
          FIRSTWRITE = .FALSE.
       END IF
 
@@ -452,7 +456,7 @@ C Write soil NO rain data file
          MESG = 'Could not write "' // TRIM( VAR ) //
      &          '" to file "' // TRIM( SOILOUT ) // '"'
          CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-      call mio_fwrite( 'MEGAN_SOIL_MIO', VAR, PNAME, PTYPE )
+      call mio_fwrite( SOILOUT, VAR, PNAME, PTYPE )
       END IF
 
       VAR = 'PULSEDATE'
@@ -460,7 +464,7 @@ C Write soil NO rain data file
          MESG = 'Could not write "' // TRIM( VAR ) //
      &          '" to file "' // TRIM( SOILOUT ) // '"'
          CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-      call mio_fwrite( 'MEGAN_SOIL_MIO', VAR, PNAME, PULSEDATE )
+      call mio_fwrite( SOILOUT, VAR, PNAME, PULSEDATE )
       END IF
 
       VAR = 'PULSETIME'
@@ -468,7 +472,7 @@ C Write soil NO rain data file
          MESG = 'Could not write "' // TRIM( VAR ) //
      &          '" to file "' // TRIM( SOILOUT ) // '"'
          CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-      call mio_fwrite( 'MEGAN_SOIL_MIO', VAR, PNAME, PULSETIME )
+      call mio_fwrite( SOILOUT, VAR, PNAME, PULSETIME )
       END IF
 
       NDX = 1 + MOD( IHR, MXRHRS )
@@ -480,21 +484,21 @@ C Write soil NO rain data file
      &             '" to file "' // TRIM( SOILOUT ) // '"'
             CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
          END IF
-         call mio_fwrite( 'MEGAN_SOIL_MIO', VAR, PNAME, RAINFALL( :,:,I ) )
+         call mio_fwrite( SOILOUT, VAR, PNAME, RAINFALL( :,:,I ) )
          WRITE( VAR, '(A2,I2.2)' ) 'SW', I
          IF ( .NOT. WRITE3( SOILOUT, VAR, NDATE, NTIME, HRNO_SW( :,:,I ) ) ) THEN
             MESG = 'Could not write "' // TRIM( VAR ) //
      &             '" to file "' // TRIM( SOILOUT ) // '"'
             CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
          END IF
-         call mio_fwrite( 'MEGAN_SOIL_MIO', VAR, PNAME, HRNO_SW( :,:,I ) )
+         call mio_fwrite( SOILOUT, VAR, PNAME, HRNO_SW( :,:,I ) )
          WRITE( VAR, '(A3,I2.2)' ) 'T2M', I
          IF ( .NOT. WRITE3( SOILOUT, VAR, NDATE, NTIME, HRNO_T2M( :,:,I ) ) ) THEN
             MESG = 'Could not write "' // TRIM( VAR ) //
      &             '" to file "' // TRIM( SOILOUT ) // '"'
             CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
          END IF
-         call mio_fwrite( 'MEGAN_SOIL_MIO', VAR, PNAME, HRNO_T2M( :,:,I ) )
+         call mio_fwrite( SOILOUT, VAR, PNAME, HRNO_T2M( :,:,I ) )
       END DO
 
       VAR = 'LAI'
@@ -503,14 +507,14 @@ C Write soil NO rain data file
      &             '" to file "' // TRIM( SOILOUT ) // '"'
             CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
          END IF
-      call mio_fwrite( 'MEGAN_SOIL_MIO', VAR, PNAME, Met_Data%LAI )
+      call mio_fwrite( SOILOUT, VAR, PNAME, Met_Data%LAI )
 
 #else
          ! write MPAS end of day variables ==jwilliso
-            call mio_fwrite ('MEGAN_SOILOUT', 'PTYPE', pname,PTYPE(:,1),time_stamp)
-            call mio_fwrite ('MEGAN_SOILOUT', 'PULSEDATE', pname, PULSEDATE(:,1),time_stamp)
-            call mio_fwrite ('MEGAN_SOILOUT', 'PULSETIME', pname, PULSETIME(:,1),time_stamp)
-            call mio_fwrite ('MEGAN_SOILOUT', 'LAI', pname,Met_data%LAI(:,1),time_stamp)
+            call mio_fwrite (SOILOUT, 'PTYPE', pname,PTYPE(:,1),time_stamp)
+            call mio_fwrite (SOILOUT, 'PULSEDATE', pname, PULSEDATE(:,1),time_stamp)
+            call mio_fwrite (SOILOUT, 'PULSETIME', pname, PULSETIME(:,1),time_stamp)
+            call mio_fwrite (SOILOUT, 'LAI', pname,Met_data%LAI(:,1),time_stamp)
 #endif
 
       WRITE( LOGDEV,94040 )
