@@ -183,7 +183,6 @@ C Local Variables:
 
       CHARACTER( 16 ), SAVE :: SOILINP ! logical name for input NO soil data
       CHARACTER( 16 ), SAVE :: SOILOUT = 'BEIS_SOILOUT' ! logical name for output NO soil data
-      CHARACTER( 16 ), SAVE :: SOIL_MIO = 'BEIS_SOIL_MIO' ! logical name for output NO soil data
       CHARACTER( 33 ), SAVE :: DESCSTR = 'hrly cnv. & non-cnv. rainfall for'
 
       CHARACTER( 16 ) :: VAR        ! variable name
@@ -262,30 +261,30 @@ C Determine last timestamp
          METSTEP = tstep(3)
 #else
 
-C Get description of met file
-         IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
-            MESG = 'Could not get description of file "'
-     &           // TRIM( MET_CRO_2D ) // '"'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
+!C Get description of met file
+!         IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
+!            MESG = 'Could not get description of file "'
+!     &           // TRIM( MET_CRO_2D ) // '"'
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!         END IF
+!
+!         METSTEP = TSTEP3D
 
-         METSTEP = TSTEP3D
-
-C Check that grid description matches MET_CRO_2D file
-         IF ( .NOT. CHKGRID( MET_CRO_2D ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MET_CRO_2D )
-     &           // '" does not match grid in file ' // TRIM( MET_CRO_2D ) // '"'
-#ifdef twoway
-            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-#else
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!C Check that grid description matches MET_CRO_2D file
+!         IF ( .NOT. CHKGRID( MET_CRO_2D ) ) THEN
+!            MESG = 'Grid in file "' // TRIM( MET_CRO_2D )
+!     &           // '" does not match grid in file ' // TRIM( MET_CRO_2D ) // '"'
+!#ifdef twoway
+!            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
+!#else
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!#endif
+!         END IF
 #endif
-         END IF
-#endif
 
-         WRITE( MESG, '(A,I0,A,I0)' ),
-     &     'NCOLS = ',NCOLS,': NROWS = ',NROWS
-         CALL M3MESG( MESG )
+!         WRITE( MESG, '(A,I0,A,I0)' ),
+!     &     'NCOLS = ',NCOLS,': NROWS = ',NROWS
+!         CALL M3MESG( MESG )
 
          ALLOCATE( RNTOT( NCOLS,NROWS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'RNTOT', PNAME )
@@ -316,33 +315,7 @@ C If initial run, initialize some variables, otherwise get them from file
          ! Final timestamp
          NDATE = EDATE; NTIME = ETIME
 
-         ! Build description for, and create/open soil NO emissions output file
-         FTYPE3D = GRDDED3
-         SDATE3D = NDATE
-         STIME3D = NTIME
-         TSTEP3D = 0   ! make it a time-independent file
-         NCOLS3D = GL_NCOLS
-         NROWS3D = GL_NROWS
-         NLAYS3D = 1
          NVARS3D = 3 + RHOURS
-         MXREC3D = 1
-         NTHIK3D = 1
-         GDTYP3D = GDTYP_GD
-         P_ALP3D = P_ALP_GD
-         P_BET3D = P_BET_GD
-         P_GAM3D = P_GAM_GD
-         XORIG3D = XORIG_GD
-         YORIG3D = YORIG_GD
-         XCENT3D = XCENT_GD
-         YCENT3D = YCENT_GD
-         XCELL3D = XCELL_GD
-         YCELL3D = YCELL_GD
-         VGTYP3D = VGTYP_GD
-         VGTOP3D = VGTOP_GD
-         DO L = 1, NLAYS3D + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
-         END DO
-         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
         
          VNAME3D = ' '
          VNAME3D( 1 ) = 'PTYPE'
@@ -363,7 +336,6 @@ C If initial run, initialize some variables, otherwise get them from file
          VDESC3D( 1 ) = 'NO emission pulse type'
          VDESC3D( 2 ) = 'CMAQ starting date for NO emission pulse'
          VDESC3D( 3 ) = 'CMAQ starting time for NO emission pulse'
-!        VDESC3D( 4:RHOURS+3 ) = 'hourly convective and non-convective rainfall'
          DO I = 1, RHOURS
             VDESC3D( I+3 ) = DESCSTR // DDTTM( I )
          END DO
@@ -374,11 +346,6 @@ C If initial run, initialize some variables, otherwise get them from file
          VTYPE3D( 3 ) = M3INT
          VTYPE3D( 4:RHOURS+3 ) = M3REAL
         
-         FDESC3D = ' '
-         FDESC3D( 1 ) = 'Gridded rainfall data for soil NO emissions'
-         FDESC3D( 2 ) = '/From/ ' // PNAME
-         FDESC3D( 3 ) = '/Version/ CMAQ'
-        
          ! Store MIO Metadata
          NDIMS3D( 1:NVARS3D ) = 4
          L_TSTEP( 1:NVARS3D ) = .True.
@@ -387,24 +354,18 @@ C If initial run, initialize some variables, otherwise get them from file
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
         
-!        CALL LOAD_MIO_FILE ( SOILOUT, 0, 0, 0,
-         CALL LOAD_MIO_FILE ( SOIL_MIO, 0, 0, 0,
+         CALL LOAD_MIO_FILE ( SOILOUT, 0, 0, 0,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &        L_VEXT(1:NVARS3D) )
 
-         ! Open NO rain data save file
-         IF ( IO_PE_INCLUSIVE ) THEN
-            IF ( .NOT. OPEN3( SOILOUT, FSNEW3, PNAME ) ) THEN
-               MESG = 'Could not open "' // TRIM( SOILOUT ) // '" file'
-               CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
-            END IF
-         END IF
-
          RETURN
 
       END IF   ! INITTIME
+
+
+      metstep = 10000    ! cgn temporary hack since not reading from IOAPI
 
 C Non-convective (RN) and convective (RC) rain is the total amount for the met
 C preprocessor's (typically MCIP) output timestep (typically one hour). It doesn't
@@ -681,44 +642,24 @@ C Final timestamp
 C Write soil NO rain data file
       if ( FIRSTWRITE ) then
          call mio_setfile( MET_CRO_2D )
-         call mio_fcreate( SOIL_MIO, mio_new_file )
+         call mio_fcreate( SOILOUT, mio_new_file )
          FIRSTWRITE = .FALSE.
       end if
 
       VAR = 'PTYPE'
-      IF ( .NOT. WRITE3( SOILOUT, VAR, NDATE, NTIME, PTYPE ) ) THEN
-         MESG = 'Could not write "' // TRIM( VAR ) //
-     &          '" to file "' // TRIM( SOILOUT ) // '"'
-         CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-      END IF
-      call mio_fwrite( SOIL_MIO, VAR, PNAME, PTYPE )
+      call mio_fwrite( SOILOUT, VAR, PNAME, PTYPE )
 
       VAR = 'PULSEDATE'
-      IF ( .NOT. WRITE3( SOILOUT, VAR, NDATE, NTIME, PULSEDATE ) ) THEN
-         MESG = 'Could not write "' // TRIM( VAR ) //
-     &          '" to file "' // TRIM( SOILOUT ) // '"'
-         CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-      END IF
-      call mio_fwrite( SOIL_MIO, VAR, PNAME, PULSEDATE )
+      call mio_fwrite( SOILOUT, VAR, PNAME, PULSEDATE )
 
       VAR = 'PULSETIME'
-      IF ( .NOT. WRITE3( SOILOUT, VAR, NDATE, NTIME, PULSETIME ) ) THEN
-         MESG = 'Could not write "' // TRIM( VAR ) //
-     &          '" to file "' // TRIM( SOILOUT ) // '"'
-         CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-      END IF
-      call mio_fwrite( SOIL_MIO, VAR, PNAME, PULSETIME )
+      call mio_fwrite( SOILOUT, VAR, PNAME, PULSETIME )
 
       NDX = 1 + MOD( IHR, MXRHRS )
       RAINFALL( :,:,NDX ) = C_RAINFALL
       DO I = 1, RHOURS
          WRITE( VAR, '(A8,I2.2)' ) 'RAINFALL', I
-         IF ( .NOT. WRITE3( SOILOUT, VAR, NDATE, NTIME, RAINFALL( :,:,I ) ) ) THEN
-            MESG = 'Could not write "' // TRIM( VAR ) //
-     &             '" to file "' // TRIM( SOILOUT ) // '"'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-         call mio_fwrite( SOIL_MIO, VAR, PNAME, RAINFALL( :,:,I ) )
+         call mio_fwrite( SOILOUT, VAR, PNAME, RAINFALL( :,:,I ) )
       END DO
 
       WRITE( LOGDEV,94040 )

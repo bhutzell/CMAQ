@@ -257,35 +257,34 @@
             IF ( LTNGDIAG ) THEN
 !C Build description for, and open lightning diagnostic file
 !C (all but variables-table and horizontal domain in description is borrowed from MNAME)
-               FDATE = STDATE
-               FTIME = STTIME
-               CALL NEXTIME( FDATE, FTIME, TSTEP )
-               SDATE3D = FDATE
-               STIME3D = FTIME
-               TSTEP3D = TSTEP
-
-               FTYPE3D = GRDDED3
-               NCOLS3D = GL_NCOLS
-               NROWS3D = GL_NROWS
-               NTHIK3D = 1
-               GDTYP3D = GDTYP_GD
-               P_ALP3D = P_ALP_GD
-               P_BET3D = P_BET_GD
-               P_GAM3D = P_GAM_GD
-               XORIG3D = XORIG_GD
-               YORIG3D = YORIG_GD
-               XCENT3D = XCENT_GD
-               YCENT3D = YCENT_GD
-               XCELL3D = XCELL_GD
-               YCELL3D = YCELL_GD
-               VGTYP3D = VGTYP_GD
-               VGTOP3D = VGTOP_GD
-               GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-               NLAYS3D = DESID_LAYS
-               DO L = 1, NLAYS3D + 1
-                  VGLVS3D( L ) = VGLVS_GD( L )
-               END DO
+!               FDATE = STDATE
+!               FTIME = STTIME
+!               CALL NEXTIME( FDATE, FTIME, TSTEP )
+!               SDATE3D = FDATE
+!               STIME3D = FTIME
+!               TSTEP3D = TSTEP
+!
+!               FTYPE3D = GRDDED3
+!               NCOLS3D = GL_NCOLS
+!               NROWS3D = GL_NROWS
+!               NTHIK3D = 1
+!               GDTYP3D = GDTYP_GD
+!               P_ALP3D = P_ALP_GD
+!               P_BET3D = P_BET_GD
+!               P_GAM3D = P_GAM_GD
+!               XORIG3D = XORIG_GD
+!               YORIG3D = YORIG_GD
+!               XCENT3D = XCENT_GD
+!               YCENT3D = YCENT_GD
+!               XCELL3D = XCELL_GD
+!               YCELL3D = YCELL_GD
+!               VGTYP3D = VGTYP_GD
+!               VGTOP3D = VGTOP_GD
+!
+!               NLAYS3D = DESID_LAYS
+!               DO L = 1, NLAYS3D + 1
+!                  VGLVS3D( L ) = VGLVS_GD( L )
+!               END DO
 
                NVARS3D = 1
                VNAME3D( 1 ) = LTSPC
@@ -293,10 +292,10 @@
                VTYPE3D( 1 ) = M3REAL
                UNITS3D( 1 ) = 'mol s-1'
 
-               FDESC3D = ' '   ! array assignment
-               FDESC3D( 1 ) = 'Gridded lightning NO production from CMAQ'
-               FDESC3D( 2 ) = '/from/ ' // PNAME
-               FDESC3D( 3 ) = '/Version/ CMAQ'
+!               FDESC3D = ' '   ! array assignment
+!               FDESC3D( 1 ) = 'Gridded lightning NO production from CMAQ'
+!               FDESC3D( 2 ) = '/from/ ' // PNAME
+!               FDESC3D( 3 ) = '/Version/ CMAQ'
 
                ! Store MIO Metadata
                NDIMS3D( 1:NVARS3D ) = 4
@@ -306,8 +305,7 @@
                L_ROW  ( 1:NVARS3D ) = .True.
                L_VEXT ( 1:NVARS3D ) = .False.
           
-!              CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_1', NLAYS3D, 1, NLAYS3D,
-               CALL LOAD_MIO_FILE ( 'CTM_LTNG1_MIO', NLAYS3D, 1, NLAYS3D,
+               CALL LOAD_MIO_FILE ( CTM_LTNGDIAG_1, NLAYS3D, 1, NLAYS3D,
      &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -321,28 +319,13 @@
                L_ROW  ( 1:NVARS3D ) = .True.
                L_VEXT ( 1:NVARS3D ) = .False.
                
-!              CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_2', 0, 0, 0,
-               CALL LOAD_MIO_FILE ( 'CTM_LTNG2_MIO', 0, 0, 0,
+               CALL LOAD_MIO_FILE ( CTM_LTNGDIAG_2, 0, 0, 0,
      &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &              L_VEXT(1:NVARS3D) )
                
 !C Open output file (mol s-1)
-               IF ( IO_PE_INCLUSIVE ) THEN
-                  IF ( .NOT. OPEN3( CTM_LTNGDIAG_1, FSUNKN3, PNAME ) ) THEN
-                     XMSG = 'Could not open ' // TRIM( CTM_LTNGDIAG_1 )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
-                  NLAYS3D = 1
-                  VDESC3D( 1 ) = 'Column NO produced from lightning'
-                  IF ( .NOT. OPEN3( CTM_LTNGDIAG_2, FSUNKN3, PNAME ) ) THEN
-                     XMSG = 'Could not open ' // TRIM( CTM_LTNGDIAG_2 )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
-
-               END IF
-
                ALLOCATE( VDEMIS_LTDIAG( NCOLS,NROWS,DESID_LAYS ), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'VDEMIS_LTDIAG memory allocation failed'
@@ -672,32 +655,16 @@ C statement function for ERF approximation
                   COLUMN_DIAG = COLUMN_DIAG*DIVFAC
                   if ( firstwrite ) then
                      call mio_setfile( MET_CRO_3D )
-                     call mio_fcreate( 'CTM_LTNG1_MIO', mio_new_file )
+                     call mio_fcreate( CTM_LTNGDIAG_1, mio_new_file )
                      call mio_setfile( MET_CRO_2D )
-                     call mio_fcreate( 'CTM_LTNG2_MIO', mio_new_file )
+                     call mio_fcreate( CTM_LTNGDIAG_2, mio_new_file )
                      firstwrite = .false.
                   end if
 
                   call mio_time_format_conversion( LDATE, LTIME, TIME_STAMP )
-                  IF ( .NOT. WRITE3( CTM_LTNGDIAG_1, LTSPC, LDATE, LTIME, VDEMIS_LTDIAG ) )  THEN
-                     XMSG = 'Could not write to ' // TRIM( CTM_LTNGDIAG_1 )
-                     CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
-                  ELSE
-                     WRITE( LOGDEV,94040 )
-     &                    'Timestep written to', TRIM( CTM_LTNGDIAG_1 ),
-     &                    'for date and time', LDATE, LTIME
-                  END IF
-                  call mio_fwrite( 'CTM_LTNG1_MIO', LTSPC, PNAME, VDEMIS_LTDIAG, TIME_STAMP )
+                  call mio_fwrite( CTM_LTNGDIAG_1, LTSPC, PNAME, VDEMIS_LTDIAG, TIME_STAMP )
 
-                  IF ( .NOT. WRITE3( CTM_LTNGDIAG_2, LTSPC, LDATE, LTIME, COLUMN_DIAG ) )  THEN
-                     XMSG = 'Could not write to ' // TRIM( CTM_LTNGDIAG_2 )
-                     CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
-                  ELSE
-                     WRITE( LOGDEV,94040 )
-     &                    'Timestep written to', TRIM( CTM_LTNGDIAG_2 ),
-     &                    'for date and time', LDATE, LTIME
-                  END IF
-                  call mio_fwrite( 'CTM_LTNG2_MIO', LTSPC, PNAME, COLUMN_DIAG, TIME_STAMP )
+                  call mio_fwrite( CTM_LTNGDIAG_2, LTSPC, PNAME, COLUMN_DIAG, TIME_STAMP )
 
                   VDEMIS_LTDIAG = 0.0   ! array assignment
                   COLUMN_DIAG = 0.0

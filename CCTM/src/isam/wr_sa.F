@@ -69,23 +69,9 @@ C Local variables:
 
 C-----------------------------------------------------------------------
 
-      CALL SUBST_BARRIER
-
       IF ( FIRSTIME ) THEN
 
          FIRSTIME = .FALSE.
-
-         IF ( MYPE .NE. 0 ) THEN
-           IF ( .NOT. OPEN3( SA_CONC_1, FSREAD3, PNAME ) ) THEN
-             XMSG = 'Could not open ' // SA_CONC_1 // 'file for update'
-             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-           END IF !open3
-         END IF ! mype nonzero
-
-         IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
-           XMSG = 'Could not get file description from ' // SA_CONC_1
-           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
 
          IF ( ISAM_ELEV .EQ. -1 ) ISAM_ELEV = NLAYS
          SA_NLAYS = ISAM_ELEV - ISAM_BLEV + 1
@@ -105,10 +91,10 @@ C-----------------------------------------------------------------------
 ! then change global attribute NLAYS to match
          call mio_setfile( MET_CRO_3D )
          if ( SA_NLAYS .lt. NLAYS ) mio_nlays = SA_NLAYS
-         call mio_fcreate( 'SA_CONC_1_MIO', mio_new_file )
+         call mio_fcreate( SA_CONC_1, mio_new_file )
          if ( mype == 0 ) then
-            call mio_set_global_attr( 'SA_CONC_1_MIO', 'NLAYS', SA_NLAYS )
-            call mio_set_global_attr( 'SA_CONC_1_MIO', 'VGLVLS', MET_CRO_3D, AISAM_BLEV, AISAM_ELEV+1 )
+            call mio_set_global_attr( SA_CONC_1, 'NLAYS', SA_NLAYS )
+            call mio_set_global_attr( SA_CONC_1, 'VGLVLS', MET_CRO_3D, AISAM_BLEV, AISAM_ELEV+1 )
          end if
       END IF
 
@@ -127,12 +113,7 @@ C-----------------------------------------------------------------------
             ENDDO
          ENDDO
 
-         IF ( .NOT. WRITE3( SA_CONC_1, VNAM_SPCTAG(S), JDATE, JTIME,
-     &        ISAM_BUFF(:,:,:,S)) ) THEN
-            XMSG = 'Could not write to ' // trim( SA_CONC_1 )
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         call mio_fwrite( 'SA_CONC_1_MIO', VNAM_SPCTAG( S ),
+         call mio_fwrite( SA_CONC_1, VNAM_SPCTAG( S ),
      &                    PNAME, ISAM_BUFF( :,:,:,S ), TIME_STAMP )
       END DO
 

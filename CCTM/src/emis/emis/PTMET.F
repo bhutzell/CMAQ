@@ -85,13 +85,6 @@ c     END TYPE PTMET_TYPE
 
       TYPE( PTMET_TYPE ), ALLOCATABLE, SAVE :: PTMET_DATA( : )
 
-C cross-point surface met file name
-      CHARACTER(  16 ),              SAVE :: MC2NAME
-C cross-point layered met file name
-      CHARACTER(  16 ),              SAVE :: MC3NAME
-C dot-point layered met file name
-      CHARACTER(  16 ),              SAVE :: MD3NAME
-
 C-----------------------------------------------------------------------
       CONTAINS
 

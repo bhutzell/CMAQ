@@ -123,14 +123,6 @@ C-----------------------------------------------------------------------
                SUCCESS = .FALSE.; RETURN
             END IF
 
-            IF ( .NOT. DESC3( STKENAME( N ) ) ) THEN
-               XMSG = 'Could not get ' // TRIM( STKENAME( N ) ) // ' file description'
-               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-               SUCCESS = .FALSE.; RETURN
-            END IF
-
-!           call mio_fopen (STKENAME( N ), mio_read_only)
-
             floc = mio_search (STKENAME( N ))
 
             call mio_get_global_attr (STKENAME( N ), 'SDATE', lsdate)
@@ -142,12 +134,9 @@ C-----------------------------------------------------------------------
 
             call mio_get_global_attr (STKENAME( N ), 'NROWS', loc_nsrcs)
             loc_nvars = mio_file_data(floc)%nvars
-!           loc_nsrcs = NROWS3D
-!           loc_nvars = NVARS3D
-
             allocate (loc_vname(loc_nvars), loc_units(loc_nvars), stat=astat)
-            loc_vname = vname3d(1:loc_nvars)
-            loc_units = units3d(1:loc_nvars)
+            loc_vname = mio_file_data(floc)%var_name
+            loc_units = mio_file_data(floc)%units
 #endif
 
             DESID_STREAM_DATE( ISRM ) = loc_sdate
@@ -201,8 +190,8 @@ C-----------------------------------------------------------------------
             deallocate (loc_vname, loc_units)
          END DO
 
-          ALLOCATE( STKBUFF( MAXVAL( NSRC_EMIS(:) ) ) )
-             CALL CHECKMEM( ASTAT, 'NSRC_EMIS', PNAME )
+          ALLOCATE( STKBUFF( MAXVAL( NSRC_EMIS(:) ) ), STAT = ASTAT )
+             CALL CHECKMEM( ASTAT, 'STKBUFF', PNAME )
 
          RETURN
 

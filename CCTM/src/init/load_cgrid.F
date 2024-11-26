@@ -193,17 +193,6 @@ C-----------------------------------------------------------------------
       WRITE( CONCMIN,'(1PE9.2)' ) CMIN
 
 #ifndef mpas
-      IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
-         XMSG = 'Could not open ' // FNAME // ' file'
-         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
- 
-      IF ( .NOT. DESC3( FNAME ) ) THEN
-         XMSG = 'Could not get ' // FNAME // ' file description'
-         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
-
-      write (logdev, '(a18, a16)') ' ==d== check ic a ', fname
 
 !     call mio_fopen (FNAME, mio_read_only)
       floc = mio_search (FNAME)

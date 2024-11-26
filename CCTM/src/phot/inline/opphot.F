@@ -169,7 +169,6 @@ C...CSA Variables, Units and Descriptions for RJ_FILE
          VDESC( N ) = 'Photodissociation rate of ozone producing O(1D)'
          VTYPE( N ) = M3REAL
 
-
          N = N + 1
          VNAME( N ) = 'RESOLVED_CFRAC'
          UNITS( N ) = '1'
@@ -242,7 +241,7 @@ C...CSA Variables, Units and Descriptions for RJ_FILE
          N = N + 1
          VNAME( N ) = 'N_EXCEED_TROPO3'
          UNITS( N ) = ''
-         VDESC( N ) = 'occurances predicted tropospheric ozone column exceeds observed total column '
+         VDESC( N ) = 'num occurrences predicted ozone column exceeds obs total column '
      &               // 'per file time step'          
          VTYPE( N ) = M3REAL
 
@@ -356,72 +355,12 @@ C...assumes that lamba in nanometers is on order of 100 or less
          L_ROW  ( 1:NVARS_RJ_1 ) = .True.
          L_VEXT ( 1:NVARS_RJ_1 ) = .False.
        
-         CALL LOAD_MIO_FILE ( 'CTM_RJ_1_MIO', 1, 1, 1,
+         CALL LOAD_MIO_FILE ( CTM_RJ_1, 1, 1, 1,
      &        VNAME(1:NVARS_RJ_1), VTYPE(1:NVARS_RJ_1), UNITS(1:NVARS_RJ_1),
      &        VDESC(1:NVARS_RJ_1), NDIMS(1:NVARS_RJ_1), L_TSTEP(1:NVARS_RJ_1),
      &        L_LAY(1:NVARS_RJ_1),   L_COL(1:NVARS_RJ_1),   L_ROW(1:NVARS_RJ_1),
      &        L_VEXT(1:NVARS_RJ_1) )
  
-
-      IF ( .NOT. OPEN3( CTM_RJ_1, FSRDWR3, PNAME ) ) THEN
-
-         XMSG = 'Could not open ' // CTM_RJ_1 // ' file for update - '
-     &        // 'try to open new'
-         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-C...Set output file characteristics based on COORD.EXT and open
-C...  the photolysis diagnostic file
-
-         FTYPE3D = GRDDED3
-         SDATE3D = JDATE
-         STIME3D = JTIME
-         TSTEP3D = TSTEP
-
-         NCOLS3D = GL_NCOLS
-         NROWS3D = GL_NROWS
-         NLAYS3D =     1
-         NTHIK3D =     1
-         GDTYP3D = GDTYP_GD
-         P_ALP3D = P_ALP_GD
-         P_BET3D = P_BET_GD
-         P_GAM3D = P_GAM_GD
-         XORIG3D = XORIG_GD
-         YORIG3D = YORIG_GD
-         XCENT3D = XCENT_GD
-         YCENT3D = YCENT_GD
-         XCELL3D = XCELL_GD
-         YCELL3D = YCELL_GD
-         VGTYP3D = VGTYP_GD
-         VGTOP3D = VGTOP_GD
-
-         DO L = 1, NLAYS3D + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
-         END DO
-
-         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-         FDESC3D( 1 ) = 'Surface Values of Optical Inputs and Radiative Results '
-         FDESC3D( 2 ) = 'from the In-line calculation of Photolysis Rates '
-         FDESC3D( 3 ) = 'for the ' // TRIM( MECHNAME ) // ' photochemical mechanism '
-         DO L = 4, MXDESC3
-            FDESC3D( L ) = ' '
-         END DO
-
-C...Open the 1st photolysis diagnostic file
-
-         NVARS3D = NVARS_RJ_1
-         DO N = 1, NVARS3D
-            VNAME3D( N ) = VNAME( N )
-            VTYPE3D( N ) = VTYPE( N )
-            UNITS3D( N ) = UNITS( N )
-            VDESC3D( N ) = VDESC( N )
-         END DO
-
-         IF ( .NOT. OPEN3( CTM_RJ_1, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not create '// CTM_RJ_1 // ' file'
-            CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         END IF
-
-      END IF
-    
 C...load data from photolysis reaction list
 
          DO N = 1, NVARS_RJ_2
@@ -433,7 +372,7 @@ C...load data from photolysis reaction list
 
 !C...Write ascii table describing variables
 !         WRITE(LOGDEV,'(A)')'*PHOTDIAG2 File Contents'
-!         WRITE(LOGDEV,'(A)')'**Three dimensionals values of Photolysis rates '
+!         WRITE(LOGDEV,'(A)')'**Three dimensional values of Photolysis rates '
 !     &                   // 'used to make predictions from the In-line calculation '
 !     &                   // ' of Photolysis Rates '
 !         WRITE(LOGDEV,99950)
@@ -450,76 +389,13 @@ C...load data from photolysis reaction list
          L_ROW  ( 1:NVARS_RJ_2 ) = .True.
          L_VEXT ( 1:NVARS_RJ_2 ) = .False.
        
-         CALL LOAD_MIO_FILE ( 'CTM_RJ_2_MIO', NLAYS3D, 1, NLAYS3D,
+         CALL LOAD_MIO_FILE ( CTM_RJ_2, NLAYS3D, 1, NLAYS3D,
      &        VNAME(1:NVARS_RJ_2), VTYPE(1:NVARS_RJ_2), UNITS(1:NVARS_RJ_2),
      &        VDESC(1:NVARS_RJ_2), NDIMS(1:NVARS_RJ_2), L_TSTEP(1:NVARS_RJ_2),
      &        L_LAY(1:NVARS_RJ_2),   L_COL(1:NVARS_RJ_2),   L_ROW(1:NVARS_RJ_2),
      &        L_VEXT(1:NVARS_RJ_2) )
  
 
-C...Try to open existing file for update
-
-      IF ( .NOT. OPEN3( CTM_RJ_2, FSRDWR3, PNAME ) ) THEN
-
-         XMSG = 'Could not open ' // CTM_RJ_2 // ' file for update - '
-     &        // 'try to open new'
-         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-
-C...Set output file characteristics based on COORD.EXT and open
-C...  the photolysis diagnostic file
-
-         FTYPE3D = GRDDED3
-         SDATE3D = JDATE
-         STIME3D = JTIME
-         TSTEP3D = TSTEP
-
-         NCOLS3D = GL_NCOLS
-         NROWS3D = GL_NROWS
-         NLAYS3D = NLAYS_DIAG
-         NTHIK3D =     1
-         GDTYP3D = GDTYP_GD
-         P_ALP3D = P_ALP_GD
-         P_BET3D = P_BET_GD
-         P_GAM3D = P_GAM_GD
-         XORIG3D = XORIG_GD
-         YORIG3D = YORIG_GD
-         XCENT3D = XCENT_GD
-         YCENT3D = YCENT_GD
-         XCELL3D = XCELL_GD
-         YCELL3D = YCELL_GD
-         VGTYP3D = VGTYP_GD
-         VGTOP3D = VGTOP_GD
-         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-         DO L = 1, NLAYS3D + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
-         END DO
-
-         NVARS3D = NVARS_RJ_2
-         DO N = 1, NVARS3D
-            VNAME3D( N ) = VNAME( N )
-            VTYPE3D( N ) = VTYPE( N )
-            UNITS3D( N ) = UNITS( N )
-            VDESC3D( N ) = VDESC( N )
-         END DO
-
-         FDESC3D( 1 ) = 'Three dimensional values of Photolysis rates '
-         FDESC3D( 2 ) = 'used to make predictions for the ' // TRIM( MECHNAME )
-         FDESC3D( 3 ) = 'photochemical mechanism from the In-line calculation.'
-         FDESC3D( 4 ) = 'Data files can be found in CMAQ repository under subdirectory,'
-         FDESC3D( 5 ) = 'UTIL/inline_phot_preproc/photolysis_CSQY_data'
-         DO N = 6, MXDESC3
-            FDESC3D( N ) = ' '
-         END DO
-
-         IF ( .NOT. OPEN3( CTM_RJ_2, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not create '// CTM_RJ_2 // ' file'
-            CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         END IF
-
-      END IF
-
-         
          N = 0
          
          DO L = 1, N_DIAG_WVL
@@ -594,7 +470,7 @@ C...assumes that lamba in nanometers is on order of 100 or less
          END IF
 !C...Write ascii table describing variables
 !         WRITE(LOGDEV,'(A)')'*PHOTDIAG3 File Contents'
-!         WRITE(LOGDEV,'(A)')'**Three dimensionals values of Optical Inputs and Radiative '
+!         WRITE(LOGDEV,'(A)')'**Three dimensional values of Optical Inputs and Radiative '
 !     &                    // 'Results from the In-line photolysis calculation.'
 !         WRITE(LOGDEV,99950)
 !         WRITE(LOGDEV,99951)
@@ -610,73 +486,12 @@ C...assumes that lamba in nanometers is on order of 100 or less
          L_ROW  ( 1:NVARS_RJ_3 ) = .True.
          L_VEXT ( 1:NVARS_RJ_3 ) = .False.
        
-         CALL LOAD_MIO_FILE ( 'CTM_RJ_3_MIO', NLAYS_DIAG, 1, NLAYS_DIAG,
+         CALL LOAD_MIO_FILE ( CTM_RJ_3, NLAYS_DIAG, 1, NLAYS_DIAG,
      &        VNAME(1:NVARS_RJ_3), VTYPE(1:NVARS_RJ_3), UNITS(1:NVARS_RJ_3),
      &        VDESC(1:NVARS_RJ_3), NDIMS(1:NVARS_RJ_3), L_TSTEP(1:NVARS_RJ_3),
      &        L_LAY(1:NVARS_RJ_3),   L_COL(1:NVARS_RJ_3),   L_ROW(1:NVARS_RJ_3),
      &        L_VEXT(1:NVARS_RJ_3) )
 
-C...Try to open existing file for update
-
-      IF ( .NOT. OPEN3( CTM_RJ_3, FSRDWR3, PNAME ) ) THEN
-
-         XMSG = 'Could not open ' // CTM_RJ_3 // ' file for update - '
-     &        // 'try to open new'
-         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-
-C...Set output file characteristics based on COORD.EXT and open
-C...  the photolysis diagnostic file
-
-         FTYPE3D = GRDDED3
-         SDATE3D = JDATE
-         STIME3D = JTIME
-         TSTEP3D = TSTEP
-
-         NCOLS3D = GL_NCOLS
-         NROWS3D = GL_NROWS
-         NLAYS3D = NLAYS_DIAG
-         NTHIK3D =     1
-         GDTYP3D = GDTYP_GD
-         P_ALP3D = P_ALP_GD
-         P_BET3D = P_BET_GD
-         P_GAM3D = P_GAM_GD
-         XORIG3D = XORIG_GD
-         YORIG3D = YORIG_GD
-         XCENT3D = XCENT_GD
-         YCENT3D = YCENT_GD
-         XCELL3D = XCELL_GD
-         YCELL3D = YCELL_GD
-         VGTYP3D = VGTYP_GD
-         VGTOP3D = VGTOP_GD
-         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-         DO L = 1, NLAYS3D + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
-         END DO
-
-         NVARS3D = NVARS_RJ_3
-         DO N = 1, NVARS3D
-            VNAME3D( N ) = VNAME( N )
-            VTYPE3D( N ) = VTYPE( N )
-            UNITS3D( N ) = UNITS( N )
-            VDESC3D( N ) = VDESC( N )
-         END DO
-
-         FDESC3D( 1 ) = 'Three dimensionals values of Optical Inputs and Radiative'
-         FDESC3D( 2 ) = 'Results from the In-line photolysis calculation using the'
-         FDESC3D( 3 ) =  TRIM( MECHNAME ) // ' photochemical mechanism.'
-
-         DO N = 4, MXDESC3
-            FDESC3D( N ) = ' '
-         END DO
-C...Open the 3rd photolysis diagnostic file
-
-         IF ( .NOT. OPEN3( CTM_RJ_3, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not create '// CTM_RJ_3 // ' file'
-            CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         END IF
-
-      END IF
 
 99950    FORMAT('|Variable Name|Units|Description                                   |')         
 99951    FORMAT('|:----|:----:|:---------------------------------------------|')

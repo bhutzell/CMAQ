@@ -483,28 +483,6 @@ C-----------------------------------------------------------------------
                WDATE = CDATE; WTIME = CTIME
                WSTEP = 0
 
-#ifdef parallel_io
-               IF ( FIRSTIME ) THEN
-                  FIRSTIME = .FALSE.
-                  IF ( DEPV_DIAG ) THEN
-                     IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-                        IF ( .NOT. OPEN3( CTM_DEPV_DIAG, FSREAD3, PNAME ) ) THEN
-                           XMSG = 'Could not open ' // TRIM( CTM_DEPV_DIAG )
-                           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                        END IF
-                     END IF
-                  END IF
-
-                  IF ( MOSAIC ) THEN
-                     IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-                        IF ( .NOT. OPEN3( CTM_DEPV_MOS, FSREAD3, PNAME ) ) THEN
-                           XMSG = 'Could not open ' // TRIM( CTM_DEPV_MOS )
-                           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                        END IF
-                     END IF
-                  END IF
-               END IF
-#endif
             Call Write_depv( WDATE, WTIME )
 
             END IF ! Write time

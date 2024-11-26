@@ -414,23 +414,6 @@ Ckrt deposition arrays for tagged species.....
          S_DEPWRT = 0.0
 #endif
 
-#ifdef parallel_io
-         IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-            IF ( .NOT. OPEN3( CTM_WET_DEP_1, FSREAD3, PNAME ) ) THEN
-               XMSG = 'Could not open ' // TRIM( CTM_WET_DEP_1 )
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-         END IF
-         IF ( CLD_DIAG ) THEN
-            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( CTM_WET_DEP_2, FSREAD3, PNAME ) ) THEN
-                  XMSG = 'Could not open ' // TRIM( CTM_WET_DEP_2 )
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-            END IF
-         END IF
-#endif
-
 #ifdef mpas
 ! this is for creating the output name list
          found = .false.
@@ -666,22 +649,16 @@ Ckrt  for the tagged species as well....
 
 C...write data to the normal wet deposition file
 
-        IF ( .NOT. WRITE3( CTM_WET_DEP_1, ALLVAR3, NDATE,
-     &                     NTIME, TOT_DEP ) ) THEN
-          XMSG = 'Could not write ' // CTM_WET_DEP_1 // ' file'
-          CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
-        END IF
-        
         if ( FIRSTWRITE ) then
            FIRSTWRITE = .FALSE.
            call mio_setfile( MET_CRO_2D )
-           call mio_fcreate( 'CTM_WET_DEP1_MIO', mio_new_file )
+           call mio_fcreate( CTM_WET_DEP_1, mio_new_file )
         end if
 
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
 
         DO VAR = 1, N_SPC_WDEP + 1
-           call mio_fwrite( 'CTM_WET_DEP1_MIO', WDEP_SPC( VAR ),
+           call mio_fwrite( CTM_WET_DEP_1, WDEP_SPC( VAR ),
      &                      PNAME, TOT_DEP(:,:,VAR), TIME_STAMP )
         END DO
 
@@ -697,7 +674,7 @@ c gas species
         IF ( FIRST_WRITE_SENS ) THEN
            FIRST_WRITE_SENS = .FALSE.
            call mio_setfile( MET_CRO_2D )
-           call mio_fcreate( 'CTM_SWETDEP_MIO', mio_new_file )
+           call mio_fcreate( CTM_SWETDEP_1, mio_new_file )
         END IF
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
 
@@ -708,15 +685,9 @@ c gas species
           END DO
         END DO
 
-        IF ( .NOT. WRITE3( CTM_SWETDEP_1, ALLVAR3, NDATE,
-     &                     NTIME, S_DEPWRT ) ) THEN
-          XMSG = 'Could not write ' // CTM_SWETDEP_1 // ' file'
-          CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
-        END IF
-
         DO SPC = 1, NPMAX * ( N_SPC_WDEP + 1 )
-           write(logdev,*) 'SWETDEP: spc, name', spc, swdep_spc(spc)
-           call mio_fwrite( 'CTM_SWETDEP_MIO', swdep_spc( SPC ),
+!          write(logdev,*) 'SWETDEP: spc, name', spc, swdep_spc(spc)
+           call mio_fwrite( CTM_SWETDEP_1, swdep_spc( SPC ),
      &                      PNAME, S_DEPWRT( :,:,SPC ), TIME_STAMP )
         END DO
 
@@ -742,17 +713,11 @@ C...write data to the diagnostic file if requested by the user
           IF ( FIRSTDIAG ) THEN
              FIRSTDIAG = .FALSE.
              call mio_setfile( MET_CRO_2D )
-             call mio_fcreate( 'CTM_WET_DEP2_MIO', mio_new_file )
+             call mio_fcreate( CTM_WET_DEP_2, mio_new_file )
           END IF
        
-          IF ( .NOT. WRITE3( CTM_WET_DEP_2, ALLVAR3, NDATE,
-     &                       NTIME, CONV_DEP ) ) THEN
-          XMSG = 'Could not write ' // CTM_WET_DEP_2 // ' file'
-            CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
-          END IF
-
           DO VAR = 1, N_SPC_WDEP + 1 + 11
-             call mio_fwrite( 'CTM_WET_DEP2_MIO', WDEP_SPC( VAR ),
+             call mio_fwrite( CTM_WET_DEP_2, WDEP_SPC( VAR ),
      &                      PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
           END DO
 
@@ -778,7 +743,7 @@ C...reinitialize deposition array
         IF ( FIRST_WRITE_ISAM ) THEN
            FIRST_WRITE_ISAM = .FALSE.
            call mio_setfile( MET_CRO_2D )
-           call mio_fcreate( 'SA_WD_1_MIO', mio_new_file )   
+           call mio_fcreate( SA_WD_1, mio_new_file )   
         END IF
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
 
@@ -789,12 +754,7 @@ C...reinitialize deposition array
               BUFF2( COL,ROW ) = TOT_SADEP( COL,ROW,S_SPCTAG( SPC ),T_SPCTAG( SPC ) )
             END DO ! col
           END DO ! row
-          IF ( .NOT. WRITE3( SA_WD_1, VNAM_SPCTAG( SPC ),
-     &                       NDATE, NTIME, BUFF2 ) ) THEN
-            XMSG = 'Could not write ' // SA_WD_1 // ' file'
-            CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
-          END IF
-          call mio_fwrite( 'SA_WD_1_MIO', VNAM_SPCTAG( SPC ),
+          call mio_fwrite( SA_WD_1, VNAM_SPCTAG( SPC ),
      &                     PNAME, BUFF2, TIME_STAMP )
        END DO ! n_spctag
 

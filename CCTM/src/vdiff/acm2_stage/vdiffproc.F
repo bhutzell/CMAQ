@@ -126,7 +126,6 @@ C Local Variables:
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL, SAVE :: WRITE_FIRSTIME = .TRUE.
-      LOGICAL, SAVE :: WRITE_FIRSTIME_MIO = .TRUE.
       LOGICAL, SAVE :: FIRST_WRITE_DIAG = .TRUE.
 #ifdef isam
       LOGICAL, SAVE :: FIRST_WRITE_ISAM = .TRUE.
@@ -447,25 +446,6 @@ C If last call this hour:  write accumulated depositions:
          CALL NEXTIME( MDATE, MTIME, TSTEP( 2 ) )
          WSTEP = 0
 
-#ifdef parallel_io
-         IF ( WRITE_FIRSTIME ) THEN
-            WRITE_FIRSTIME = .FALSE.
-
-            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSREAD3, PNAME ) ) THEN
-                  XMSG = 'Could not open ' // TRIM(CTM_DRY_DEP_1)
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-               IF ( MOSAIC ) THEN
-                  IF ( .NOT. OPEN3( CTM_DRY_DEP_MOS, FSREAD3, PNAME ) ) THEN
-                     XMSG = 'Could not open ' // TRIM(CTM_DRY_DEP_MOS)
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
-               END IF
-            END IF   ! .NOT. IO_PE_INCLUSIVE
-         END IF
-#endif
-
          call mio_time_format_conversion( mdate, mtime, time_stamp )
 
          DO V = 1, N_SPC_DDEP
@@ -476,55 +456,29 @@ C If last call this hour:  write accumulated depositions:
                END DO
             END DO
 
-            IF ( .NOT. WRITE3( CTM_DRY_DEP_1, DDEP_SPC( V ),
-     &                 MDATE, MTIME, WRDD ) ) THEN
-               XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-
-            if ( write_firstime_mio ) then
+            if ( write_firstime ) then
                call mio_setfile( MET_CRO_2D )
-               call mio_fcreate( 'CTM_DRY_DEP_MIO', mio_new_file )
-               write_firstime_mio = .false.
+               call mio_fcreate( CTM_DRY_DEP_1, mio_new_file )
+               write_firstime = .false.
             end if
-            call mio_fwrite( 'CTM_DRY_DEP_MIO', DDEP_SPC( V ),
+            call mio_fwrite( CTM_DRY_DEP_1, DDEP_SPC( V ),
      &                       PNAME, WRDD, TIME_STAMP )
          END DO 
 ! STAGE Diagnostic output
          IF ( ABFLUX ) THEN
-            IF ( .NOT. WRITE3( CTM_DRY_DEP_1, BD_EMIS_SPC( NH3_E ),
-     &           MDATE, MTIME, TOT_BD_EMIS( NH3_E,:,: ) ) ) THEN
-               XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-            call mio_fwrite( 'CTM_DRY_DEP_MIO', BD_EMIS_SPC( NH3_E ),
+            call mio_fwrite( CTM_DRY_DEP_1, BD_EMIS_SPC( NH3_E ),
      &                       PNAME, TOT_BD_EMIS( NH3_E,:,: ), TIME_STAMP )
      
             WRDD( :,: ) = DDEP(NH3_HIT,:,:) - TOT_BD_EMIS( NH3_E,:,: )
-            IF ( .NOT. WRITE3( CTM_DRY_DEP_1, 'NH3_Flux',
-     &           MDATE, MTIME, WRDD ) ) THEN
-               XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF          
-            call mio_fwrite( 'CTM_DRY_DEP_MIO', 'NH3_Flux', 
+            call mio_fwrite( CTM_DRY_DEP_1, 'NH3_Flux', 
      &                       PNAME, WRDD, TIME_STAMP )
          ENDIF
          IF ( HGBIDI ) THEN
-            IF ( .NOT. WRITE3( CTM_DRY_DEP_1, BD_EMIS_SPC( HG_E ),
-     &           MDATE, MTIME, TOT_BD_EMIS( HG_E,:,: ) ) ) THEN
-               XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-            call mio_fwrite( 'CTM_DRY_DEP_MIO', BD_EMIS_SPC( HG_E ),
+            call mio_fwrite( CTM_DRY_DEP_1, BD_EMIS_SPC( HG_E ),
      &                       PNAME, TOT_BD_EMIS( HG_E,:,: ), TIME_STAMP )     
          ENDIF
          IF ( SFC_HONO ) THEN
-            IF ( .NOT. WRITE3( CTM_DRY_DEP_1, BD_EMIS_SPC( HONO_E ),
-     &           MDATE, MTIME, TOT_BD_EMIS( HONO_E,:,: ) ) ) THEN
-               XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-            call mio_fwrite( 'CTM_DRY_DEP_MIO', BD_EMIS_SPC( HONO_E ),
+            call mio_fwrite( CTM_DRY_DEP_1, BD_EMIS_SPC( HONO_E ),
      &                       PNAME, TOT_BD_EMIS( HONO_E,:,: ), TIME_STAMP )     
          ENDIF
 ! End of STAGE Diagnostic output
@@ -537,13 +491,13 @@ C Write vdiff diagnostics
             if ( FIRST_WRITE_DIAG ) then
                FIRST_WRITE_DIAG = .FALSE.
                call mio_setfile( MET_CRO_2D )
-               call mio_fcreate( 'CTM_VDIFF_MIO', mio_new_file )
+               call mio_fcreate( CTM_VDIFF_DIAG, mio_new_file )
                if ( GRAV_SETL ) then
                   call mio_setfile( MET_CRO_3D )
-                  call mio_fcreate( 'CTM_VSED_MIO', mio_new_file )
+                  call mio_fcreate( CTM_VSED_DIAG, mio_new_file )
                end if
                if ( MOSAIC ) then
-                  call mio_fcreate( 'CTM_DDEP_MOS_MIO', mio_new_file )
+                  call mio_fcreate( CTM_DRY_DEP_MOS, mio_new_file )
                end if
             end if
 
@@ -557,13 +511,7 @@ C Write vdiff diagnostics
                         END DO
                      END DO
                   END DO
-                  IF ( .NOT. WRITE3( CTM_VSED_DIAG, VSED_NAME( V ),
-     &                               MDATE, MTIME, VSED_BUF( :,:,:,V ) ) ) THEN
-                     XMSG = 'Could not write ' // TRIM( VSED_NAME( V ) )
-     &                    // ' to ' // CTM_VSED_DIAG
-                     CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-                  END IF
-                  call mio_fwrite( 'CTM_VSED_MIO', VSED_NAME( V ),
+                  call mio_fwrite( CTM_VSED_DIAG, VSED_NAME( V ),
      &                             PNAME, VSED_BUF( :,:,:,V ), TIME_STAMP )
                END DO
 
@@ -575,27 +523,12 @@ C Write vdiff diagnostics
 
 C Write other diagnostics
             NLPCR_MEAN = NLPCR_SUM / FLOAT( NTICS )
-            IF ( .NOT. WRITE3( CTM_VDIFF_DIAG, 'NLP_MEAN',
-     &                         MDATE, MTIME, NLPCR_MEAN ) ) THEN
-               XMSG = 'Could not write ' //  'NLP_MEAN to ' // CTM_VDIFF_DIAG
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-            IF ( .NOT. WRITE3( CTM_VDIFF_DIAG, 'NLP_MAX',
-     &                         MDATE, MTIME, NLPCR_MAX ) ) THEN
-               XMSG = 'Could not write ' //  'NLP_MAX to ' // CTM_VDIFF_DIAG
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-            IF ( .NOT. WRITE3( CTM_VDIFF_DIAG, 'NLP_MIN',
-     &                         MDATE, MTIME, NLPCR_MIN ) ) THEN
-               XMSG = 'Could not write ' //  'NLP_MIN to ' // CTM_VDIFF_DIAG
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
 
-            call mio_fwrite( 'CTM_VDIFF_MIO', 'NLP_MEAN', 
+            call mio_fwrite( CTM_VDIFF_DIAG, 'NLP_MEAN', 
      &                        PNAME, NLPCR_MEAN, TIME_STAMP )
-            call mio_fwrite( 'CTM_VDIFF_MIO', 'NLP_MAX', 
+            call mio_fwrite( CTM_VDIFF_DIAG, 'NLP_MAX', 
      &                        PNAME, NLPCR_MAX, TIME_STAMP )
-            call mio_fwrite( 'CTM_VDIFF_MIO', 'NLP_MIN', 
+            call mio_fwrite( CTM_VDIFF_DIAG, 'NLP_MIN', 
      &                        PNAME, NLPCR_MIN, TIME_STAMP )
 
             NLPCR_MAX = 0.0      ! array assignment
@@ -604,26 +537,11 @@ C Write other diagnostics
 
             IF ( GRAV_SETL ) THEN   ! Write vsed diagnostics
                DTCCR_MEAN = DTCCR_SUM / FLOAT( NTICS )
-               IF ( .NOT. WRITE3( CTM_VDIFF_DIAG, 'SEDI_DTC_MEAN',
-     &                            MDATE, MTIME, DTCCR_MEAN ) ) THEN
-                  XMSG = 'Could not write ' //  'SEDI_DTC_MEAN to ' // CTM_VDIFF_DIAG
-                  CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-               END IF
-               IF ( .NOT. WRITE3( CTM_VDIFF_DIAG, 'SEDI_DTC_MAX',
-     &                            MDATE, MTIME, DTCCR_MAX ) ) THEN
-                  XMSG = 'Could not write ' //  'SEDI_DTC_MAX to ' // CTM_VDIFF_DIAG
-                  CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-               END IF
-               IF ( .NOT. WRITE3( CTM_VDIFF_DIAG, 'SEDI_DTC_MIN',
-     &                            MDATE, MTIME, DTCCR_MIN ) ) THEN
-                  XMSG = 'Could not write ' //  'SEDI_DTC_MIN to ' // CTM_VDIFF_DIAG
-                  CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-               END IF
-               call mio_fwrite( 'CTM_VDIFF_MIO', 'SEDI_DTC_MEAN',
+               call mio_fwrite( CTM_VDIFF_DIAG, 'SEDI_DTC_MEAN',
      &                          PNAME, DTCCR_MEAN, TIME_STAMP )
-               call mio_fwrite( 'CTM_VDIFF_MIO', 'SEDI_DTC_MAX',
+               call mio_fwrite( CTM_VDIFF_DIAG, 'SEDI_DTC_MAX',
      &                          PNAME, DTCCR_MAX, TIME_STAMP )
-               call mio_fwrite( 'CTM_VDIFF_MIO', 'SEDI_DTC_MIN',
+               call mio_fwrite( CTM_VDIFF_DIAG, 'SEDI_DTC_MIN',
      &                          PNAME, DTCCR_MIN, TIME_STAMP )
 
                DTCCR_MAX = 0.0      ! array assignment
@@ -637,20 +555,8 @@ C Write other diagnostics
                   IF ( Met_Data%CONVCT( C,R ) ) CNVCT( C,R ) = 1.0
                END DO
             END DO
-            IF ( .NOT. WRITE3( CTM_VDIFF_DIAG, 'CONVCT',
-     &                         MDATE, MTIME, CNVCT ) ) THEN
-               XMSG = 'Could not write ' //  'convct to ' // CTM_VDIFF_DIAG
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-
-            IF ( .NOT. WRITE3( CTM_VDIFF_DIAG, 'LPBL',
-     &                         MDATE, MTIME, REAL( Met_Data%LPBL ) ) ) THEN
-               XMSG = 'Could not write ' //  'lpbl to ' // CTM_VDIFF_DIAG
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-
-            call mio_fwrite( 'CTM_VDIFF_MIO', 'CONVCT', PNAME, CNVCT, TIME_STAMP )
-            call mio_fwrite( 'CTM_VDIFF_MIO', 'LPBL', 
+            call mio_fwrite( CTM_VDIFF_DIAG, 'CONVCT', PNAME, CNVCT, TIME_STAMP )
+            call mio_fwrite( CTM_VDIFF_DIAG, 'LPBL', 
      &                       PNAME, REAL( Met_Data%LPBL ), TIME_STAMP )
 
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6, I6 )' )
@@ -676,12 +582,7 @@ C Write other diagnostics
                   END DO
                END DO
 
-               IF ( .NOT. WRITE3( CTM_DRY_DEP_MOS, DDEP_SPC( V ),
-     &                     MDATE, MTIME, WRDDJ ) ) THEN
-                  XMSG = 'Could not write ' // CTM_DRY_DEP_MOS // ' file'
-                  CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-               END IF
-               call mio_fwrite( 'CTM_DDEP_MOS_MIO', DDEP_SPC( V ),
+               call mio_fwrite( CTM_DRY_DEP_MOS, DDEP_SPC( V ),
      &                          PNAME, WRDDJ, TIME_STAMP )
 
             END DO
@@ -709,7 +610,7 @@ C re-set dry deposition array to zero
          IF ( FIRST_WRITE_ISAM ) THEN
             FIRST_WRITE_ISAM = .FALSE.
             call mio_setfile( MET_CRO_2D )
-            call mio_fcreate( 'SA_DD_1_MIO', mio_new_file )
+            call mio_fcreate( SA_DD_1, mio_new_file )
          END IF
          DO ITAG = 1, N_SPCTAG
             DO R = 1, NROWS
@@ -718,12 +619,7 @@ C re-set dry deposition array to zero
                END DO
             END DO
 
-            IF ( .NOT. WRITE3( SA_DD_1, VNAM_SPCTAG( ITAG ),
-     &                         MDATE, MTIME, WRDD ) ) THEN
-               XMSG = 'Could not write ' // SA_DD_1 // ' file'
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-            call mio_fwrite( 'SA_DD_1_MIO', VNAM_SPCTAG( ITAG ),
+            call mio_fwrite( SA_DD_1, VNAM_SPCTAG( ITAG ),
      &                       PNAME, WRDD, TIME_STAMP )
          END DO
 

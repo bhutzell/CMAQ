@@ -24,9 +24,10 @@ C returns the last data date & time on file FNAME
 C specifically used only for input files
 
       USE UTILIO_DEFN
+      use mio_module
 
       IMPLICIT NONE
- 
+      
 C Includes:
  
       INCLUDE SUBST_FILES_ID    ! file name parameters
@@ -45,25 +46,21 @@ C local variables:
       CHARACTER( 96 ) :: XMSG = ' '
 
       INTEGER      LSTEP
-
+      integer      floc, nsteps, tstep
 C-----------------------------------------------------------------------
 
 C open existing file for readonly access
 
 #ifndef mpas
-      IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
-         XMSG = 'Could not open '// FNAME
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-         END IF
-
-      IF ( .NOT. DESC3( FNAME ) ) THEN
-         XMSG = 'Could not get ' // FNAME // ' file description'
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
-         END IF
- 
-      LSTEP = SEC2TIME( ( MXREC3D - 1 ) * TIME2SEC( TSTEP3D ) )
-      LDATE = SDATE3D
-      LTIME = STIME3D
+      floc = mio_search( fname )
+      if (floc .le. 0 ) then
+         xmsg = 'ERROR: file ' // trim(fname) // ' unknown'
+         call m3exit(pname, 0, 0, xmsg, 1)
+      end if
+      tstep = mio_file_data(floc)%tstep
+      nsteps = mio_file_data(floc)%nsteps
+      LSTEP = SEC2TIME( ( nsteps - 1 ) * TIME2SEC( tstep ) )
+      call mio_get_global_attr( fname, 'SDATE', LDATE )
       CALL NEXTIME( LDATE, LTIME, LSTEP )
 #endif
  

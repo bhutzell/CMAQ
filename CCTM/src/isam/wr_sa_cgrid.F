@@ -75,28 +75,13 @@ C-----------------------------------------------------------------------
         FIRSTIME = .FALSE.
 
         IF ( IO_PE_INCLUSIVE ) THEN
-           IF ( .NOT. OPEN3( SA_CONC_1, FSRDWR3, PNAME ) ) THEN
-             XMSG = 'Could not open ' // trim(SA_CONC_1) //
-     &              ' file for update '
-             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-           END IF
 
-           IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
-             XMSG = 'Could not get file description from ' // SA_CONC_1
-             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-           END IF
-
-            EDATE = JDATE
-            ETIME = JTIME
-            CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
-
-            SDATE3D = EDATE
-            STIME3D = ETIME
+            NVARS3D = N_SPCTAG
             NLAYS3D = NLAYS
-
-            FDESC3D = ' '
-            FDESC3D( 1 ) = 'Instantaneous ISAM values on computational grid'
-            FDESC3D( 2 ) = '- for scenario continuation.'
+            VNAME3D( 1:NVARS3D ) = VNAM_SPCTAG
+            UNITS3D( 1:NVARS3D ) = VUN_SPCTAG
+            VTYPE3D = M3REAL
+            VDESC3D = 'tracer conc.'
 
             ! Store MIO Metadata
             NDIMS3D( 1:NVARS3D ) = 4
@@ -106,18 +91,12 @@ C-----------------------------------------------------------------------
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
       
-      
-!           CALL LOAD_MIO_FILE ( SA_CGRID_1, NLAYS3D, 1, NLAYS3D,
-            CALL LOAD_MIO_FILE ( 'SA_CGRID_1_MIO', NLAYS3D, 1, NLAYS3D,
+            CALL LOAD_MIO_FILE ( SA_CGRID_1, NLAYS3D, 1, NLAYS3D,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
 
-            IF ( .NOT. OPEN3( SA_CGRID_1, FSNEW3, PNAME ) ) THEN
-              XMSG = 'Could not create' // SA_CGRID_1 
-              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            ENDIF 
           ENDIF ! IO_PE_INCLUSIVE
 
         CALL SUBST_BARRIER
@@ -136,7 +115,7 @@ C-----------------------------------------------------------------------
       IF ( FIRSTWRITE ) THEN
          FIRSTWRITE = .FALSE.
          call mio_setfile( MET_CRO_3D )
-         call mio_fcreate( 'SA_CGRID_1_MIO', mio_new_file )
+         call mio_fcreate( SA_CGRID_1, mio_new_file )
       END IF
 
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
@@ -145,13 +124,7 @@ C-----------------------------------------------------------------------
 
       DO S = 1, N_SPCTAG
         ISAM_BUFF( :,:,:,S ) = ISAM( :,:,:,S_SPCTAG(S),T_SPCTAG(S) )
-        IF ( .NOT. WRITE3( SA_CGRID_1, VNAM_SPCTAG(S), JDATE, JTIME,
-     &          ISAM_BUFF(:,:,:,S)) ) THEN
-           XMSG = 'Could not write to ' 
-     &           // SA_CGRID_1 
-           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-        END IF
-        call mio_fwrite( 'SA_CGRID_1_MIO', VNAM_SPCTAG(S),
+        call mio_fwrite( SA_CGRID_1, VNAM_SPCTAG(S),
      &                   PNAME, ISAM_BUFF( :,:,:,S ), TIME_STAMP )
       END DO ! S
       

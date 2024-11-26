@@ -39,7 +39,8 @@
                      n_att, t_type, count, fnum, nlines, dim_loc,    &
                      new_file_dim_name_index(n_dim_names), ind, loc, &
                      index_mapping(n_dim_names), ind_count,          &
-                     n_replacements, dim_value, layer_id1, layer_id2
+                     n_replacements, dim_value, layer_id1, layer_id2, &
+                     lmode
           character (mio_max_varname_len) :: tvname, tdim_name(6), tunit_name
           character (500)                 :: t_type_str
           character (500)                 :: str
@@ -47,7 +48,8 @@
           character (500)                 :: loc_replacement(2,100)
           character (30)                  :: missing_value
           logical :: entire_file, partial_file, skip_search, found,   &
-                     cfile_is_an_input_file, use_new_file_template
+                     cfile_is_an_input_file, use_new_file_template,   &
+                     ncd_64bit_offset
 
 #ifdef parallel
           include 'mpif.h'
@@ -63,7 +65,6 @@
              n_replacements = 0
              loc_replacement = ' '
           end if
-!write( mio_logdev, '(A,2x,2i5)' ) ' ==c== creating file, mode, n_repl: ' // trim(fname), mode, n_replacements
 
           dest = mio_search(fname)
 
@@ -83,8 +84,8 @@
                 end if
              end do
              if (.not. found) then
-                write (mio_logdev, *) ' Abort in routine mio_fcreate due to file ', trim(fname)
-                write (mio_logdev, *) ' does not have an output file definition '
+                write (mio_logdev, *) ' Abort in mio_fcreate: ', trim(fname) // &
+                                      ' does not have an output file definition '
                 stop
              else
 
@@ -153,7 +154,7 @@
 
              if (found) then
                 if (mio_file_data(dest)%mode .eq. mio_new_file) then
-                   print *, ' Abort in routine mio_fcreate due to output file ', trim(fname), ' is already exist '
+                   print *, ' Abort in mio_fcreate: ', trim(fname), ' already exists '
                    stop
                 end if
              end if
@@ -164,10 +165,19 @@
                 if (mio_file_data(dest)%mode .eq. mio_new_file) then
                    if (mio_mype .eq. 0) then
 
-                      stat = nf90_create (mio_file_data(dest)%full_filename, mode, mio_file_data(dest)%fileid)
+                     call mio_get_env (ncd_64bit_offset, 'ncd_64bit_offset', .false.)
+
+                      if (ncd_64bit_offset) then
+                         lmode = ior (nf90_noclobber, nf90_64bit_offset)
+                      else
+                         lmode = nf90_noclobber
+                      end if
+
+                      stat = nf90_create (mio_file_data(dest)%full_filename, lmode, mio_file_data(dest)%fileid)
                       if (stat .ne. nf90_noerr) then
-                         write (mio_logdev, *) 'Abort in routine mio_fcreate while creating file'
-                         write (mio_logdev, *) trim(mio_file_data(dest)%filename), ' due to an error ', trim(nf90_strerror(stat))
+                         write (mio_logdev, *) 'Abort in mio_fcreate while creating ' // &
+                                               trim(mio_file_data(dest)%filename)
+                         write (mio_logdev, *) 'root cause: ', trim(nf90_strerror(stat))
                          stop
                       end if
                    end if
@@ -615,8 +625,8 @@
                    stat = nf90_enddef (mio_file_data(dest)%fileid)
 
                    if (stat .ne. nf90_noerr) then
-                      write (mio_logdev, *) 'Abort in routine mio_fcreate due to ending netCDF definition '
-                      write (mio_logdev, *) ' section for file ', trim(fname), ' with an error ', trim(nf90_strerror(stat))
+                      write (mio_logdev, *) 'Abort in mio_fcreate in netCDF definition for', trim(fname)
+                      write (mio_logdev, *) 'root cause: ', trim(nf90_strerror(stat))
                       stop
                    end if
                 end if
@@ -1126,7 +1136,7 @@
                 end if
 
                 if (stat .ne. 0) then
-                   write (mio_logdev, *) ' Abort in routine mio_fcreate due to memory allocation error'
+                   write (mio_logdev, *) ' Abort in mio_fcreate: memory allocation error'
                    stop
                 end if
 
@@ -1240,8 +1250,8 @@
                 end if
 
                 if (error) then
-                   write (mio_logdev, *) ' Abort in routine mio_fcreate due to netCDF reading/writing '
-                   write (mio_logdev, *) ' variable, error is ', trim(mio_basic_mpas_vnames(vv))
+                   write (mio_logdev, *) ' Abort in mio_fcreate due to netCDF reading/writing '
+                   write (mio_logdev, *) ' variable ', trim(mio_basic_mpas_vnames(vv))
                    stop
                 end if
 

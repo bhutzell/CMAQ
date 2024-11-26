@@ -104,37 +104,23 @@ C Arguments:
          END SUBROUTINE WR_CGRID
       END INTERFACE
 
-      ! Calculate Vertical Diffusion, Dry Deposition, and Emissions
       CALL VDIFF ( CGRID, JDATE, JTIME, TSTEP )
 
-      IF ( .NOT. COLUMN_MODEL ) THEN
-
-          !CALL HADV ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
-          !CALL ZADV ( CGRID, JDATE, JTIME, TSTEP )
-          !CALL HDIFF ( CGRID, JDATE, JTIME, TSTEP )
-
-      END IF
-          
       CALL PHOT ( CGRID, JDATE, JTIME, TSTEP )    
       CALL CLDPROC ( CGRID, JDATE, JTIME, TSTEP )
       !CALL CHEM ( CGRID, JDATE, JTIME, TSTEP )
       !CALL AERO ( CGRID, JDATE, JTIME, TSTEP )
 
-      ! Write CGRID state file for subsequent runs
       CALL WR_CGRID ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
+
 #ifdef isam
+      CALL WR_AVG_SA ( JDATE, JTIME, TSTEP( 1 ) )
       CALL WR_SA_CGRID ( JDATE, JTIME, TSTEP( 1 ) )
 #endif
+
 #ifdef sens
       CALL WR_SENGRID ( JDATE, JTIME, TSTEP( 1 )  )
 #endif
-
-      ! Open ISAM and DDM Concentration Files
-#ifdef isam
-      ! Write out ISAM source-resolved concentrations
-      CALL WR_AVG_SA ( JDATE, JTIME, TSTEP( 1 ) )
-#endif
-
 
       END SUBROUTINE INIT_CCTM_MODULES
 

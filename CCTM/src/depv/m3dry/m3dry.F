@@ -17,9 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/depv/m3dry/m3dry.F,v 1.12 2012/01/19 14:19:43 yoj Exp $
-
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE m3dry ( jdate, jtime, dtsec, cgridl1, depvel_gas, pvd, nh3_ddep)
 
@@ -154,6 +151,7 @@ C-------------------------------------------------------------------------------
       USE DEPVVARS
       USE VGRD_DEFN      ! to get VGTYP_GD
       USE UTILIO_DEFN
+      use mio_module
 #ifdef mpas
       Use util_module, only : secsdiff
 #else
@@ -240,7 +238,7 @@ C Local Variables:
       Real,            Parameter :: MolNH3   = 17.01     ! g/mol NH3  for NH3 bidi to convert to microg/m3
       Real,            Parameter :: MolAir   = 29.97     ! g/mol dry air
       Real                       :: cnh3,tpvd,lnh3,femis,fdep
-
+      Real(8)                    :: dtmp                 ! temporary variable for double precision global attributes
       REAL,    SAVE, ALLOCATABLE :: delta     ( :,: )
 
       REAL,            EXTERNAL  :: hlconst              ! [M / atm]
@@ -313,13 +311,10 @@ C-------------------------------------------------------------------------------
          xcent = 0.0
          ycent = 0.0
 #else
-         IF ( .NOT. desc3( met_cro_2d ) ) THEN
-            xmsg = 'Could not get  met_cro_2d  file description'
-            CALL m3exit( pname, jdate, jtime, xmsg, xstat2 )
-         END IF
-
-         xcent = real( xcent3d, 4 )
-         ycent = real( ycent3d, 4 )
+         call mio_get_global_attr( MET_CRO_2D, 'XCENT', dtmp )
+         xcent = real( dtmp, 4 )
+         call mio_get_global_attr( MET_CRO_2D, 'YCENT', dtmp )
+         ycent = real( dtmp, 4 )
 #endif
 
          IF ( abflux ) THEN

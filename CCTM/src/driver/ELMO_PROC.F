@@ -3378,54 +3378,26 @@
       IF ( INST_ACTIVE ) THEN
         
 #ifndef mpas
-         ! Try to open existing file for update
-         IF ( .NOT. OPEN3( CTM_ELMO_1, FSRDWR3, PNAME ) ) THEN
-
-            ! Set output file characteristics based on COORD.EXT and open the aerosol
-            ! diagnostic file
-            SDATE3D = JDATE
-            STIME3D = JTIME
-            !CALL NEXTIME ( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
+         NVARS3D = N_ELMO_INST_OUT 
+         VTYPE3D(1:NVARS3D) = INST_TYPE_OUT( 1:NVARS3D )
+         VNAME3D(1:NVARS3D) = INST_PARS_OUT( 1:NVARS3D )
+         UNITS3D(1:NVARS3D) = INST_UNIT_OUT( 1:NVARS3D )
+         VDESC3D(1:NVARS3D) = INST_DESC_OUT( 1:NVARS3D )
          
-            NLAYS3D = INST_LAYER_TOP - INST_LAYER_BOT + 1
-            DO L = INST_LAYER_BOT, INST_LAYER_TOP + 1
-               VGLVS3D( L ) = VGLVS_GD( L )
-            END DO
-         
-            NVARS3D = N_ELMO_INST_OUT 
-            VTYPE3D(1:NVARS3D) = INST_TYPE_OUT( 1:NVARS3D )
-            VNAME3D(1:NVARS3D) = INST_PARS_OUT( 1:NVARS3D )
-            UNITS3D(1:NVARS3D) = INST_UNIT_OUT( 1:NVARS3D )
-            VDESC3D(1:NVARS3D) = INST_DESC_OUT( 1:NVARS3D )
-         
-            FDESC3D( 1 ) = 'Parameters Relevant for PM Formation and Distribution'
-            DO L = 2, MXDESC3
-               FDESC3D( L ) = ' '
-            END DO
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 4
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .True.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
 
-            ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 4
-            L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .True.
-            L_COL  ( 1:NVARS3D ) = .True.
-            L_ROW  ( 1:NVARS3D ) = .True.
-            L_VEXT ( 1:NVARS3D ) = .False.
-
-!           CALL LOAD_MIO_FILE ( 'CTM_ELMO_1', NLAYS3D, INST_LAYER_BOT, INST_LAYER_TOP,
-            CALL LOAD_MIO_FILE ( 'CTM_ELMO_MIO', NLAYS3D, INST_LAYER_BOT, INST_LAYER_TOP,
-     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &           L_VEXT(1:NVARS3D) )
+         CALL LOAD_MIO_FILE ( CTM_ELMO_1, NLAYS3D, INST_LAYER_BOT, INST_LAYER_TOP,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
  
-
-            ! Open the Instantaneous aerosol diagnostic file
-            IF ( .NOT. OPEN3( CTM_ELMO_1, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not create '// CTM_ELMO_1 // ' file'
-               CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-            END IF
-
-         END IF
 #endif
       END IF
  
@@ -3434,57 +3406,27 @@
       IF ( AVRG_ACTIVE ) THEN
         
 #ifndef mpas
-         ! Try to open existing file for update
-         IF ( .NOT. OPEN3( CTM_AELMO_1, FSRDWR3, PNAME ) ) THEN
-
-            ! Get end time information from environment variable AVG_FILE_ENDTIME
-            MDATE = JDATE; MTIME = JTIME
-            IF ( END_TIME ) CALL NEXTIME ( MDATE, MTIME, TSTEP )
-
-            ! Set output file characteristics based on COORD.EXT and open the aerosol
-            ! diagnostic file
-            SDATE3D = MDATE
-            STIME3D = MTIME
+         NVARS3D = N_ELMO_AVRG_OUT 
+         VTYPE3D(1:NVARS3D) = AVRG_TYPE_OUT( 1:NVARS3D )
+         VNAME3D(1:NVARS3D) = AVRG_PARS_OUT( 1:NVARS3D )
+         UNITS3D(1:NVARS3D) = AVRG_UNIT_OUT( 1:NVARS3D )
+         VDESC3D(1:NVARS3D) = AVRG_DESC_OUT( 1:NVARS3D )
          
-            NLAYS3D = AVRG_LAYER_TOP - AVRG_LAYER_BOT + 1
-            DO L = AVRG_LAYER_BOT, AVRG_LAYER_TOP + 1
-               VGLVS3D( L ) = VGLVS_GD( L )
-            END DO
-         
-            NVARS3D = N_ELMO_AVRG_OUT 
-            VTYPE3D(1:NVARS3D) = AVRG_TYPE_OUT( 1:NVARS3D )
-            VNAME3D(1:NVARS3D) = AVRG_PARS_OUT( 1:NVARS3D )
-            UNITS3D(1:NVARS3D) = AVRG_UNIT_OUT( 1:NVARS3D )
-            VDESC3D(1:NVARS3D) = AVRG_DESC_OUT( 1:NVARS3D )
-         
-            FDESC3D( 1 ) = 'Parameters Relevant for PM Formation and Distribution'
-            DO L = 2, MXDESC3
-               FDESC3D( L ) = ' '
-            END DO
-         
-            ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 4
-            L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .True.
-            L_COL  ( 1:NVARS3D ) = .True.
-            L_ROW  ( 1:NVARS3D ) = .True.
-            L_VEXT ( 1:NVARS3D ) = .False.
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 4
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .True.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
 
-!           CALL LOAD_MIO_FILE ( 'CTM_AELMO_1', NLAYS3D, AVRG_LAYER_BOT, AVRG_LAYER_TOP,
-            CALL LOAD_MIO_FILE ( 'CTM_AELMO_MIO', NLAYS3D, AVRG_LAYER_BOT, AVRG_LAYER_TOP,
-     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &           L_VEXT(1:NVARS3D) )
+         CALL LOAD_MIO_FILE ( CTM_AELMO_1, NLAYS3D, AVRG_LAYER_BOT, AVRG_LAYER_TOP,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
 
 
-            ! Open the Instantaneous aerosol diagnostic file
-            IF ( .NOT. OPEN3( CTM_AELMO_1, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not create '// CTM_AELMO_1 // ' file'
-               CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-            END IF
-
-         END IF
 #endif
       END IF
  
@@ -3524,26 +3466,19 @@ C *** Write data to the scalar output file.
                INST_SUBSET_LAY = ( NLAY_ELMO_INST .NE. mio_nlays ) 
                if ( INST_SUBSET_LAY ) mio_nlays = NLAY_ELMO_INST
 
-               call mio_fcreate( 'CTM_ELMO_MIO', mio_new_file )
+               call mio_fcreate( CTM_ELMO_1, mio_new_file )
 
                if ( INST_SUBSET_LAY ) then
                   if (mype == 0) then
-                     call mio_set_global_attr ( 'CTM_ELMO_MIO', 'NLAYS', NLAY_ELMO_INST )
-                     call mio_set_global_attr ( 'CTM_ELMO_MIO', 'VGLVLS', MET_CRO_3D, INST_LAYER_TOP, INST_LAYER_BOT+1 )
+                     call mio_set_global_attr ( CTM_ELMO_1, 'NLAYS', NLAY_ELMO_INST )
+                     call mio_set_global_attr ( CTM_ELMO_1, 'VGLVLS', MET_CRO_3D, INST_LAYER_TOP, INST_LAYER_BOT+1 )
                   end if
                end if
             end if
 
 #ifndef mpas
-            IF ( .NOT. WRITE3( CTM_ELMO_1, 
-     &           ALLVAR3, MDATE, MTIME,
-     &           ELMO_INST(:,:,:,:) ) ) THEN
-               XMSG = 'Could not write ' // CTM_ELMO_1 // ' file'
-               CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-   
             do ispc = 1, n_elmo_inst_out
-               call mio_fwrite( 'CTM_ELMO_MIO', INST_PARS_OUT( ispc ), PNAME, 
+               call mio_fwrite( CTM_ELMO_1, INST_PARS_OUT( ispc ), PNAME, 
      &               ELMO_INST(:,:,:,ispc), TIME_STAMP )
             end do
 
@@ -3562,13 +3497,6 @@ C *** Write data to the average aerosol diagnostic file.
                CALL NEXTIME ( MDATE, MTIME, -TSTEP(1) )
             END IF
           
-            IF ( .NOT. WRITE3( CTM_AELMO_1, 
-     &          ALLVAR3, MDATE, MTIME, 
-     &          ELMO_AVRG(:,:,:,:) / ( 2.0 * ( ELMO_NSTEP -1.0 ) ) ) ) THEN
-               XMSG = 'Could not write ' // CTM_AELMO_1 // ' file'
-               CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-
             call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
             if ( firstavg ) then
                firstavg = .false.
@@ -3578,18 +3506,18 @@ C *** Write data to the average aerosol diagnostic file.
                AVRG_SUBSET_LAY = ( NLAY_ELMO_AVRG .NE. mio_nlays ) 
                if ( AVRG_SUBSET_LAY ) mio_nlays = NLAY_ELMO_AVRG
   
-               call mio_fcreate( 'CTM_AELMO_MIO', mio_new_file )
+               call mio_fcreate( CTM_AELMO_1, mio_new_file )
 
                if ( AVRG_SUBSET_LAY ) then
                   if (mype == 0) then
-                     call mio_set_global_attr ( 'CTM_AELMO_MIO', 'NLAYS', NLAY_ELMO_AVRG )
-                     call mio_set_global_attr ( 'CTM_AELMO_MIO', 'VGLVLS', MET_CRO_3D, AVRG_LAYER_TOP, AVRG_LAYER_BOT+1 )
+                     call mio_set_global_attr ( CTM_AELMO_1, 'NLAYS', NLAY_ELMO_AVRG )
+                     call mio_set_global_attr ( CTM_AELMO_1, 'VGLVLS', MET_CRO_3D, AVRG_LAYER_TOP, AVRG_LAYER_BOT+1 )
                   end if
                end if
             end if
 
             do ispc = 1, n_elmo_avrg_out
-               call mio_fwrite( 'CTM_AELMO_MIO', AVRG_PARS_OUT( ispc ), PNAME, 
+               call mio_fwrite( CTM_AELMO_1, AVRG_PARS_OUT( ispc ), PNAME, 
      &               ELMO_AVRG(:,:,:,ispc) / (2.0 * ( ELMO_NSTEP - 1.0 ) ), 
      &               TIME_STAMP )
             end do

@@ -125,7 +125,6 @@ C-----------------------------------------------------------------------
          USE CGRID_SPCS          ! CGRID mechanism species
          USE DEPVVARS
          USE UTILIO_DEFN
-!         USE MOSAIC_MOD, Only: Init_Mosaic
          USE LSM_MOD, Only: Init_LSM !, n_lufrac
          USE BIDI_MOD, Only: Init_Bidi, HgBidi
 
@@ -668,26 +667,10 @@ C-----------------------------------------------------------------------
               IF ( FIRSTWRITE ) THEN
                  FIRSTWRITE = .FALSE.
                  call mio_setfile( MET_CRO_2D )
-                 call mio_fcreate( 'CTM_DEPV_MIO', mio_new_file )
+                 call mio_fcreate( CTM_DEPV_DIAG, mio_new_file )
               END IF            
 
               call mio_time_format_conversion (wdate, wtime, time_stamp)
-#ifndef mpas
-#ifdef parallel_io
-               IF ( FIRSTIME ) THEN
-                  FIRSTIME = .FALSE.
-                  IF ( DEPV_DIAG ) THEN
-                     IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-                        IF ( .NOT. OPEN3( CTM_DEPV_DIAG, FSREAD3, PNAME ) ) THEN
-                           XMSG = 'Could not open ' // TRIM( CTM_DEPV_DIAG )
-                           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                        END IF
-                     END IF
-                  END IF
-
-               END IF
-#endif
-#endif
 
                N = 0
                DO V = 1, N_GC_DEPV
@@ -706,14 +689,9 @@ C-----------------------------------------------------------------------
                      call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
      &                                real(DBUFF(:,1), 4), TIME_STAMP)
 #else
-                     call mio_fwrite ('CTM_DEPV_MIO', UNIQUE_GDEPV( NDX), pname,
+                     call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
      &                                DBUFF, TIME_STAMP)
 
-                     IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX ),
-     &                                  WDATE, WTIME, DBUFF ) ) THEN
-                         XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
-                         CALL M3EXIT ( PNAME, WDATE, WTIME, XMSG, XSTAT1 )
-                     END IF
 #endif
                   END IF
 
@@ -734,13 +712,8 @@ C-----------------------------------------------------------------------
                      call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
      &                                real(DBUFF(:,1), 4), TIME_STAMP)
 #else
-                     call mio_fwrite ('CTM_DEPV_MIO', UNIQUE_GDEPV( NDX), pname,
+                     call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
      &                                DBUFF, TIME_STAMP)
-                     IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX ),
-     &                                  WDATE, WTIME, DBUFF ) ) THEN
-                         XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
-                         CALL M3EXIT ( PNAME, WDATE, WTIME, XMSG, XSTAT1 )
-                     END IF
 #endif
 
                   END IF
@@ -760,13 +733,8 @@ C-----------------------------------------------------------------------
                   call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_ADEPV( N ), pname,
      &                             real(DBUFF(:,1), 4), TIME_STAMP)
 #else
-                  call mio_fwrite ('CTM_DEPV_MIO', UNIQUE_ADEPV( N ), pname,
+                  call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_ADEPV( N ), pname,
      &                             DBUFF, TIME_STAMP)
-                  IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_ADEPV( N ),
-     &                               WDATE, WTIME, DBUFF ) ) THEN
-                      XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
-                      CALL M3EXIT ( PNAME, WDATE, WTIME, XMSG, XSTAT1 )
-                  END IF
 #endif
 
                END DO
