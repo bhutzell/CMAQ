@@ -41,7 +41,6 @@ C Adopted from MEGAN3.1 and modified for CMAQ 5.4 by Jeff Willison
       INTEGER, INTENT( IN )  :: TSTEP( 3 )        ! time step vector (HHMMSS)
 
       CHARACTER( 16 ), SAVE :: SOILOUT = 'BDSNPOUT' ! logical name for output NO soil data - same format as soilinstate
-      CHARACTER( 16 ), SAVE :: SOILOUT_MIO = 'BDSNPOUT_MIO' ! logical name for output NO soil data - same format as soilinstate
 
       CHARACTER( 256 ) :: MESG            ! message buffer
       INTEGER, SAVE :: NDATE     ! test date to update rainfall
@@ -53,18 +52,10 @@ C Adopted from MEGAN3.1 and modified for CMAQ 5.4 by Jeff Willison
          EDATE = STDATE; ETIME = STTIME
          NDATE = EDATE; NTIME = ETIME
 
-
 !C Build description for, and create/open soil NO emissions output file
 
-      FTYPE3D = GRDDED3
-      SDATE3D = NDATE
-      STIME3D = NTIME
-      TSTEP3D = 0   ! make it a time-independent file
-      NCOLS3D = GL_NCOLS
-      NROWS3D = GL_NROWS
       NLAYS3D = 1
       NVARS3D = 14
-      MXREC3D = 1
 !
       VNAME3D = ' '
       VNAME3D( 1 ) = 'PFACTOR'
@@ -106,7 +97,7 @@ C Adopted from MEGAN3.1 and modified for CMAQ 5.4 by Jeff Willison
       VDESC3D( 3 ) = 'soil N reservoir from deposition'
       VDESC3D( 4 ) = 'Soil moisture prev. timestep m3/m3'
       VDESC3D( 5 ) = 'moisture WFPS 0-1'
-      VDESC3D( 6 ) = 'moisture scale factore diagnostic'
+      VDESC3D( 6 ) = 'moisture scale factor diagnostic'
       VDESC3D( 7 ) = 'temperature diagnostic'
       VDESC3D( 8 ) = 'temperature scale factor diagnostic'
       VDESC3D( 9 ) = 'biome base emission diagnostic'
@@ -119,11 +110,6 @@ C Adopted from MEGAN3.1 and modified for CMAQ 5.4 by Jeff Willison
       VTYPE3D = 0
       VTYPE3D( 1:14 ) = M3REAL
 
-      FDESC3D = ' '
-      FDESC3D( 1 ) = 'Gridded soil state data for soil NO emissions'
-      FDESC3D( 2 ) = '/From/ ' // PNAME
-      FDESC3D( 3 ) = '/Version/ MEGAN3.1'
-!
             ! Store MIO Metadata
             NDIMS3D( 1:NVARS3D ) = 4
             L_TSTEP( 1:NVARS3D ) = .True.
@@ -131,35 +117,12 @@ C Adopted from MEGAN3.1 and modified for CMAQ 5.4 by Jeff Willison
             L_COL  ( 1:NVARS3D ) = .True.
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
-            CALL LOAD_MIO_FILE ( SOILOUT_MIO, 0, 0, 0,
+            CALL LOAD_MIO_FILE ( SOILOUT, 0, 0, 0,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
 
-C Open NO rain data save file
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( SOILOUT, FSNEW3, PNAME ) ) THEN
-            MESG = 'Could not open "' // TRIM( SOILOUT ) // '" file'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
-         END IF
-      END IF
-
-#ifdef parallel_io
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. FLUSH3 ( SOILOUT ) ) THEN
-            MESG = 'Could not sync to disk ' // TRIM( SOILOUT )
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-      END IF
-      CALL SE_BARRIER
-      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( SOILOUT, FSREAD3, PNAME ) ) THEN
-            MESG = 'Could not open ' // TRIM( SOILOUT )
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-      END IF
-#endif
 
       END SUBROUTINE MEGAN_BDSNP_INIT
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -185,28 +148,6 @@ C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #endif
       USE centralized_io_module
 
-
-!
-!      USE RUNTIME_VARS, ONLY: STTIME,STDATE,RUNLEN,LOGDEV
-!      USE PHOT_MOD,     ONLY: CFRAC_2D_AVE
-!
-!
-!#ifdef mpas
-!      use mio_module
-!      use util_module, only : TIME2SEC, secsdiff, nextime
-!#else
-!#ifdef parallel
-!      USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
-!#else
-!      USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
-!#endif
-!#endif
-!
-!
-!      USE centralized_io_module, only: bdsnp_ndep,bdsnp_landtype,
-!     &                                 bdsnp_arid,bdsnp_nonarid,bdsnp_fert,
-!     &                                 soilmprev,ndepres,ndeprate,dryperiod,pfactor
-!     
       IMPLICIT NONE
 C Includes:
       INCLUDE SUBST_FILES_ID
@@ -259,7 +200,6 @@ C Local Variables:
       CHARACTER( 16 ), SAVE :: SOILINSTATE = 'SOILINSTATE' ! logical name for input NO soil data, restart file
 
       CHARACTER( 16 ), SAVE :: SOILOUT = 'BDSNPOUT' ! logical name for output NO soil data - same format as soilinstate
-      CHARACTER( 16 ), SAVE :: SOILOUT_MIO = 'BDSNPOUT_MIO' ! logical name for output NO soil data - same format as soilinstate
       integer, save :: output_step, half_syn_step  ! values are in seconds
       CHARACTER (20) :: TIME_STAMP
 
@@ -687,112 +627,24 @@ C Final timestamp
      &                           NDEPRATE(:,1),time_stamp)
 #else
 
-
-      VNAME = 'PFACTOR'
-      IF ( .NOT. WRITE3(SOILOUT,VNAME,NDATE,NTIME,PFACTOR)) THEN
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'DRYPERIOD'
-      IF ( .NOT. WRITE3(SOILOUT,VNAME,NDATE,NTIME,DRYPERIOD )) THEN
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'NDEPRES'
-      IF ( .NOT. WRITE3(SOILOUT,VNAME,NDATE,NTIME,NDEPRES )) THEN
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'SOILMPREV'
-      IF ( .NOT. WRITE3(SOILOUT,VNAME,NDATE,NTIME,SOILM )) THEN
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'THETA_DIAG'
-      IF ( .NOT. WRITE3(SOILOUT,VNAME,NDATE,NTIME,THETA_DIAG )) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'WET_TERM_DIAG'
-      IF ( .NOT. WRITE3(SOILOUT,VNAME,NDATE,NTIME,WET_DIAG )) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-      ENDIF
-
-      VNAME = 'TEMP_DIAG'
-      IF ( .NOT. WRITE3(SOILOUT,VNAME,NDATE,NTIME,SOILT)) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'TEMP_TERM_DIAG'
-      IF ( .NOT.WRITE3(SOILOUT,VNAME,NDATE,NTIME,TEMP_DIAG)) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'A_DIAG'
-      IF ( .NOT.WRITE3(SOILOUT,'A_DIAG',NDATE,NTIME,A_DIAG)) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'AFERT_DIAG'
-      IF ( .NOT.WRITE3(SOILOUT,VNAME,NDATE,NTIME,AFERT_DIAG)) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'NRES_FERT_DIAG'
-      IF ( .NOT.WRITE3(SOILOUT,VNAME,NDATE,NTIME,NRES_FERT_DIAG)) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'NDEPRATE_DIAG'
-      IF ( .NOT.WRITE3(SOILOUT,VNAME,NDATE,NTIME,NDEPRATE)) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'CRFAVG'
-      IF ( .NOT.WRITE3(SOILOUT,VNAME,NDATE,NTIME,CRFAVG)) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-      VNAME = 'PULSEAVG'
-      IF ( .NOT.WRITE3(SOILOUT,VNAME,NDATE,NTIME,PULSEAVG)) THEN 
-        MESG = 'Error writing ' // VNAME // ' to file: '// SOILOUT
-        CALL M3EXIT(PNAME,JDATE,JTIME,MESG,XSTAT2)
-      ENDIF
-
-!! MIO version
-
       call mio_setfile( MET_CRO_2D )
-      call mio_fcreate( SOILOUT_MIO, mio_new_file )
+      call mio_fcreate( SOILOUT, mio_new_file )
       call mio_time_format_conversion (ndate, ntime, time_stamp)
 
-      call mio_fwrite( SOILOUT_MIO,'PFACTOR',PNAME,PFACTOR,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'DRYPERIOD',PNAME,DRYPERIOD,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'NDEPRES',PNAME,NDEPRES,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'SOILMPREV',PNAME,SOILM,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'THETA_DIAG',PNAME,THETA_DIAG,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'WET_TERM_DIAG',PNAME,WET_DIAG,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'TEMP_DIAG',PNAME,SOILT,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'TEMP_TERM_DIAG',PNAME,TEMP_DIAG,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'A_DIAG',PNAME,A_DIAG,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'AFERT_DIAG',PNAME,AFERT_DIAG,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'NRES_FERT_DIAG',PNAME,NRES_FERT_DIAG,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'NDEPRATE_DIAG',PNAME,NDEPRATE,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'CRFAVG',PNAME,CRFAVG,TIME_STAMP)
-      call mio_fwrite( SOILOUT_MIO,'PULSEAVG',PNAME,PULSEAVG,TIME_STAMP)
-
+      call mio_fwrite( SOILOUT,'PFACTOR',PNAME,PFACTOR,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'DRYPERIOD',PNAME,DRYPERIOD,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'NDEPRES',PNAME,NDEPRES,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'SOILMPREV',PNAME,SOILM,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'THETA_DIAG',PNAME,THETA_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'WET_TERM_DIAG',PNAME,WET_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'TEMP_DIAG',PNAME,SOILT,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'TEMP_TERM_DIAG',PNAME,TEMP_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'A_DIAG',PNAME,A_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'AFERT_DIAG',PNAME,AFERT_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'NRES_FERT_DIAG',PNAME,NRES_FERT_DIAG,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'NDEPRATE_DIAG',PNAME,NDEPRATE,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'CRFAVG',PNAME,CRFAVG,TIME_STAMP)
+      call mio_fwrite( SOILOUT,'PULSEAVG',PNAME,PULSEAVG,TIME_STAMP)
 
 #endif
 

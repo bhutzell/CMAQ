@@ -17,7 +17,7 @@
 ! I/O mode
         integer, parameter :: mio_read_only  = 1
         integer, parameter :: mio_read_write = 2
-        integer, parameter :: mio_new_file   = 512
+        integer, parameter :: mio_new_file   = 3  # token; mio_fcreate uses ior(nf90_noclobber, nf90_64bit_offset) for new files
 
 ! netCDF file format
         integer, parameter :: mio_ioapi3_format = 1

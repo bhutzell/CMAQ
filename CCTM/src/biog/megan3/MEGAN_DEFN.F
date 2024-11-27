@@ -228,7 +228,7 @@ C=======================================================================
          CALL MEGCANOPY( JYEAR, LAYERS, JDAY,CURRHR,    
      &            grid_data%lat, grid_data%lon, laic,          
      &            met_data%TEMP2, met_data%rgrnd, met_data%wspd10,
-     &            met_data%prsfc, met_data%Q2, ctf(1:6,:,:),
+     &            met_data%prsfc, met_data%Q2, ctf(1:6,:,:,:),
      &            ShadeleafTK, SunleafTK, SunFrac, SunPPFD, ShadePPFD)
 
 ! MEGAN_HRNO is here so we have rainfall/pulse/PRECADJ, temp and radiation 
@@ -247,7 +247,7 @@ C=======================================================================
 
           CALL MEGVSA (JDATE,JTIME,TSTEP,JYEAR,JDAY,
      &    L_DESID_DIAG,Grid_Data%SLTYP, 
-     &    ctf(1:6,:,:),laic, grid_data%lat, 
+     &    ctf(1:6,:,:,:),laic, grid_data%lat, 
      &    met_data%TEMP2,Met_Data%SOIM1, Met_Data%SOIM2,
      &    Met_Data%SOIT1,PRECADJ,
      &    CFNO, CFNOG, GAMSM, GAMNO,BDSNP_NO_out)
