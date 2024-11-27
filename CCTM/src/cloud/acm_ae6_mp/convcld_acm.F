@@ -132,11 +132,11 @@ C-----------------------------------------------------------------------
      &                   LHNO3_PHOTOLYSIS => LHNO3
       USE CENTRALIZED_IO_MODULE
       USE RUNTIME_VARS, ONLY: CONVECTIVE_SCHEME
+      USE CONST
       IMPLICIT NONE
 
 C...........INCLUDES
 
-      INCLUDE SUBST_CONST               ! constants
       INCLUDE SUBST_FILES_ID            ! file name parameters
 
 C...........Arguments

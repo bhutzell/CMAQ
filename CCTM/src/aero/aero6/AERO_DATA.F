@@ -366,7 +366,7 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('ADE_NO3 ',F,T,F, cm_set, 1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Diesel Nitrate
      & spcs_list_type('ADE_SO4 ',F,T,F, cm_set, 1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Diesel Sulfate
      & spcs_list_type('ADE_CORS',F,F,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Diesel Coarse PM
-     & spcs_list_type('ACD     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Cadmium
+     & spcs_list_type('ACADMIUM',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Cadmium
      & spcs_list_type('AMN_HAPS',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Manganese               #90
      & spcs_list_type('APHG    ',T,T,T, cm_set, 2200.0, 'HGIIAER','PHGRXN ',1.0  ,'IRV',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Mercury
      & spcs_list_type('AAS     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Arsenic                 #92
@@ -863,7 +863,7 @@ C-----------------------------------------------------------------------
 
       Use rxns_data       ! chemical mechanism data
       Use cgrid_spcs      ! CGRID mechanism species
-      Use aeromet_data
+      Use const
       Use vdiff_data, only : n_spc_diff, diff_spc
       Implicit None
 
@@ -1210,6 +1210,7 @@ C AORGH2O is not required, but highly recommended for aero7
          If ( ( ae6isoa ) .OR.
      &        ( Index( mechname, 'CRACMM1_'        ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM2'         ) .Gt. 0 ) .OR.
+     &        ( Index( mechname, 'CRACMM3'         ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM1AMORE_'   ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R3_AE7'       ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R5_AE7'       ) .Gt. 0 ) .OR.
@@ -1308,7 +1309,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only : pi, f6pi  ! fundamental constants, data type definitions, etc.
+      Use const, only : pi, f6pi  
 
       Implicit None
 
@@ -1437,7 +1438,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only : pi     ! fundamental constants, data type definitions, etc.
+      Use const, only : pi     
 
       Implicit None
 
@@ -1594,7 +1595,7 @@ C 4/2016: HOT Pye Created routine
 C
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only: f6dpi, f6pi
+      Use const, only: f6dpi, f6pi
 
       Implicit None
 
@@ -1726,7 +1727,7 @@ C
 C 11 May 16  B.Murphy  Program Written
 C
 C-----------------------------------------------------------------------
-      Use AEROMET_DATA, only : pi, f6pi
+      Use CONST, only : pi, f6pi
       Use CGRID_SPCS, only : N_AE_TRNS, N_AE_SPC
       Use HGRD_DEFN, ONLY : NROWS, NCOLS
 

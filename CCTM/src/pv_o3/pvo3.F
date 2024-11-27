@@ -49,12 +49,12 @@ C-----------------------------------------------------------------------
 #ifdef sens
       USE DDM3D_DEFN, ONLY : NP, NPMAX, SENGRID, IPT
 #endif
-
+      USE CONST, ONLY : PI180
+     
       IMPLICIT NONE
 
 C..Includes:
       INCLUDE SUBST_FILES_ID  ! CMAQ files
-      INCLUDE SUBST_CONST     ! CMAQ constants
 
 C..Parameters:
       REAL, PARAMETER :: PSFC = 100000.0  ! generic surface pres. [Pa]

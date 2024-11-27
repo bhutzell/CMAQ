@@ -90,10 +90,10 @@ C-------------------------------------------------------------------------------
          Use LSM_MOD
          Use depv_data_module
          Use centralized_io_module
+!         Use CONST
 
          Implicit None 
 ! Includes
-         Include SUBST_CONST     ! constants
          Include SUBST_FILES_ID  ! file name parameters
 
 ! Local Variables

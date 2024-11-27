@@ -85,6 +85,7 @@ C-----------------------------------------------------------------------
          !USE AERO_DATA           ! access subroutine map_pmemis
          USE CENTRALIZED_IO_MODULE, only : interpolate_var
          USE ASX_DATA_MOD, only: MET_DATA
+         USE CONST, only: DG2M, PI180
          USE BEIS_DEFN
 
 #ifdef isam
@@ -100,9 +101,6 @@ C-----------------------------------------------------------------------
         USE COUPLER_MODULE, ONLY : cell_thickness, cell_vol, MPAS_CELL_AREA => CELL_AREA
 #endif
          IMPLICIT NONE
-
-C Includes:
-         INCLUDE SUBST_CONST     ! constants
 
 C Arguments:
          INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP( 3 )   ! TSTEP is output time step (HHMMSS)
@@ -736,7 +734,7 @@ C Retrieve Emissions from All Stream Types
              CASE ( 8 )
                NL = 1
                CALL GET_DUST_EMIS ( JDATE, JTIME, TSTEP, Met_data%RJACM( :,:,1 ), 
-     &                              CELLHGT( :,:,1 ), L_DESID_DIAG ) ! g/m3/s
+     &                              CELLVOL( :,:,1 ), CELLHGT( :,:,1 ), L_DESID_DIAG ) ! g/m3/s
                FORALL( ISTR = 1:DESID_N_ISTR, MAP_ISTRtoEMVAR( ISTR,ISRM ) .GT. 0 )
                   VDEMIS_READ( ISTR,1,:,: ) = DUSTOUTM( MAP_ISTRtoEMVAR( ISTR,ISRM ),:,: ) 
                END FORALL
@@ -1210,12 +1208,7 @@ C-----------------------------------------------------------------------
 
       ! Local Variables
       REAL,ALLOCATABLE, SAVE :: CNVTC( :,:,: ) ! combined conversion factor
-      REAL,ALLOCATABLE, SAVE :: CNVTI( : )     ! intermediate combined conv. factor
-      REAL,       SAVE :: CNVTP                ! intermediate combined conv. factor
-      REAL,ALLOCATABLE, SAVE :: CONVM( :,:,: ) ! Aerosol Mass and Surface Area conversion factor         
-      REAL,ALLOCATABLE, SAVE :: CONVN( :,:,: ) ! Aerosol Number conversion factor       
-      REAL,ALLOCATABLE, SAVE :: CNVTI_M( :,:,: ) ! intermediate combined conv. factor
-      REAL, PARAMETER  :: GPKG = 1.0E+03       ! g/kg
+      REAL, PARAMETER  :: KGPG = 1.0E-03       ! kg/g
       REAL, PARAMETER  :: MWAIR = 28.9628      ! g/mol
       REAL, PARAMETER  :: AVO  = 6.0221367E23
       REAL, PARAMETER  :: RAVO = 1.0 / AVO
@@ -1230,50 +1223,38 @@ C-----------------------------------------------------------------------
       ! Get domain decomp info from the emissions file
       IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
-         ! Populate Persistent Variables
-#ifndef mpas
-         CNVTP = 1.0E+06 * MWAIR / REAL( DX1 * DX2 ) !Conv. Factor for Gases 
-#endif
-
-         ALLOCATE( CNVTI( DESID_LAYS ), CNVTC( DESID_LAYS,NCOLS,NROWS ), 
-#ifdef mpas
-     &             CNVTI_M( NCOLS,NROWS,DESID_LAYS ),
-#endif
-     &             CONVM( DESID_LAYS,NCOLS,NROWS ),
-     &             CONVN( DESID_LAYS,NCOLS,NROWS )  )
+         ALLOCATE( CNVTC( DESID_LAYS,NCOLS,NROWS ) )
       END IF    !FirstTime
       
       ! Convert All Emissions to Units Appropriate for the Dispersion Solver
-#ifdef mpas
-      CNVTI_M( :,1,1:NL ) = 1.0E+06 * MWAIR * inv_cell_vol(:,1,1:NL)
-#else
-      CNVTI( 1:NL ) = CNVTP * Grid_Data%RDX3F( 1:NL )
-#endif
 
       DO L = 1,NL
 #ifdef mpas
-        CNVTC( L,:,: ) = 1.0E-3 * CNVTI_M( :,:,L ) * Met_Data%RRHOJ( :,:,L )  ! Gas Moles:   mol/s -> ppmv/s
+        CNVTC( L,:,: ) = (MWAIR * KGPG) * inv_cell_vol(:,1,L) * Met_Data%RRHOJ( :,:,L )  ! 1/mol
 #else
-        CNVTC( L,:,: ) = 1.0E-3 * CNVTI( L ) * Met_Data%RRHOJ( :,:,L )        ! Gas Moles:   mol/s -> ppmv/s
+        CNVTC( L,:,: ) = (MWAIR * KGPG) / CELLVOL( :,:,L ) * Met_Data%RRHOJ( :,:,L )     ! 1/mol
 #endif
-        CONVM( L,:,: ) = MWAIR / GPKG / Met_Data%DENS( :,:,L ) !m3/mol  ! Aer. Mass:   umol/m3/s -> ppmv/s
-      END DO                                                            ! Aer. Surf:   m2/m3/s -> m2/mol/s
-      CONVN( 1:NL,:,: ) = CONVM( 1:NL,:,: )                             ! Aer. Num:    N/m3/s -> N/mol/s
+      END DO                                                                  
 
       !MAKE SURE TO APPLY RELEVANT UNIT CONVERSION TO EACH
       !TYPE OF VARIABLE (GAS, AEROSOL MASS, AEROSOL NUMBER,
       !AND AEROSOL SURFACE AREA)
+     
+      ! Gas Moles:   mol/s -> ppmv/s
       FORALL ( ISTR = 1:DESID_N_ISTR, MAP_ISTRtoGAS( ISTR ) .NE. 0 )
-     &    VDEMIS0( ISTR,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * VDEMIS0( ISTR,1:NL,:,: )
+     &    VDEMIS0( ISTR,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * 1.0E6 * VDEMIS0( ISTR,1:NL,:,: )
   
+      ! Aer. Mass:   mol/s -> ppmv/s    
       FORALL ( ISTR = 1:DESID_N_ISTR, MAP_ISTRtoAERO( ISTR ) .NE. 0 )
-     &    VDEMIS0( ISTR,1:NL,:,: ) = CONVM( 1:NL,:,: ) * VDEMIS0( ISTR,1:NL,:,: )
+     &    VDEMIS0( ISTR,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * 1.0E6 * VDEMIS0( ISTR,1:NL,:,: )
       
+      ! Aer. Surf:   m2/s  -> m2/mol/s
       FORALL ( ISTR = 1:DESID_N_ISTR, MAP_ISTRtoSRF( ISTR ) .NE. 0 )
-     &    VDEMIS0( ISTR,1:NL,:,: ) = CONVM( 1:NL,:,: ) * VDEMIS0( ISTR,1:NL,:,: )
+     &    VDEMIS0( ISTR,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * VDEMIS0( ISTR,1:NL,:,: )
       
+      ! Aer. Num:    N/s   -> N/mol/s 
       FORALL ( ISTR = 1:DESID_N_ISTR, MAP_ISTRtoNUM( ISTR ) .NE. 0 )
-     &    VDEMIS0( ISTR,1:NL,:,: ) = CONVN( 1:NL,:,: ) * VDEMIS0( ISTR,1:NL,:,: )
+     &    VDEMIS0( ISTR,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * VDEMIS0( ISTR,1:NL,:,: )
 
  
       ! zero out emissions values for diffused species not included in emissions list.
@@ -1359,13 +1340,14 @@ C-----------------------------------------------------------------------
      &                      DIFF_MASK_NR, DIFF_MASK_TRAC
       USE AERO_DATA, ONLY : GPKG
       USE MIO_MODULE
+      USE CONST, ONLY: AVO, MWAIR
+
 #ifdef mpas
       USE coupler_module, ONLY: inv_cell_vol
 #endif
 
       IMPLICIT NONE
          
-      INCLUDE SUBST_CONST     ! constants
       INCLUDE SUBST_FILES_ID
 
       INTEGER, INTENT( IN ) :: JDATE, JTIME, ISRM
@@ -1374,13 +1356,8 @@ C-----------------------------------------------------------------------
       REAL, ALLOCATABLE, SAVE :: VDEMIS_OUT ( :,:,: )
 
       ! Local Variables
-      REAL, PARAMETER :: RAVO = 1.0 / AVO
+      REAL, PARAMETER  :: RAVO = 1.0 / AVO
       REAL,ALLOCATABLE, SAVE :: CNVTC( :,:,: ) ! combined conversion factor
-      REAL,ALLOCATABLE, SAVE :: CNVTI( : )     ! intermediate combined conv. factor
-      REAL,ALLOCATABLE, SAVE :: CNVTI_M( :,:,: ) ! intermediate combined conv. factor for mpas
-      REAL,       SAVE :: CNVTP                ! intermediate combined conv. factor
-      REAL,ALLOCATABLE, SAVE :: CONVM( :,:,: ) ! Aerosol Mass and Surface Area conversion factor         
-      REAL,ALLOCATABLE, SAVE :: CONVN( :,:,: ) ! Aerosol Number conversion factor       
  
       INTEGER       :: LAYS, L, C, R, IVAR, NL, I
       INTEGER       :: ISPEC, IDIAG, IP, JSPEC, JDIAG, KSPEC
@@ -1395,16 +1372,8 @@ C-----------------------------------------------------------------------
       ! Get pressure info from ASX_DATA_MOD
       IF ( FIRST_TIME ) THEN
          FIRST_TIME = .FALSE.
-#ifndef mpas
-         CNVTP = 1.0E+06 * MWAIR / REAL( DX1 * DX2 ) !Conv. Factor for Gases 
-#endif
 
-         ALLOCATE( CNVTI( DESID_LAYS ), CNVTC( DESID_LAYS,NCOLS,NROWS ), 
-     &             CONVM( DESID_LAYS,NCOLS,NROWS ),
-#ifdef mpas
-     &             CNVTI_M( NCOLS,NROWS,DESID_LAYS ),
-#endif
-     &             CONVN( DESID_LAYS,NCOLS,NROWS ),
+         ALLOCATE( CNVTC( DESID_LAYS,NCOLS,NROWS ), 
      &             VDEMIS( N_SPC_DIFF,DESID_LAYS,NCOLS,NROWS ),
      &             VDEMIS_OUT( NCOLS,NROWS,DESID_LAYS ),
      &             DESID_DIAG_CREATE( DESID_N_DIAG), STAT=ALLOCSTAT )
@@ -1420,40 +1389,38 @@ C-----------------------------------------------------------------------
       VDEMIS_OUT = 0.0
 
       ! Convert All Emissions to Units Appropriate for the Dispersion Solver
-#ifdef mpas
-      CNVTI_M( :, 1, 1:NL ) = 1.0E+06 * MWAIR * inv_cell_vol(:, 1, 1:NL)
-#else
-      CNVTI( 1:NL ) = CNVTP * Grid_Data%RDX3F( 1:NL )
-#endif
       DO L = 1,NL
 #ifdef mpas
-        CNVTC( L,:,: ) = 1.0E3 / ( CNVTI_M( :,:,L ) * Met_Data%RRHOJ( :,:,L ) )   ! Gas Moles: ppmv/s -> mol/s
+        CNVTC( L,:,: ) = (GPKG / MWAIR) / inv_cell_vol(:,1,L) / Met_Data%RRHOJ( :,:,L )  ! mol
 #else
-        CNVTC( L,:,: ) = 1.0E3 / ( CNVTI( L ) * Met_Data%RRHOJ( :,:,L ) )         ! Gas Moles: ppmv/s -> mol/s
+        CNVTC( L,:,: ) = (GPKG / MWAIR) * CELLVOL( :,:,L ) / Met_Data%RRHOJ( :,:,L )     ! mol
 #endif
-        CONVM( L,:,: ) = (1.0 / MWAIR) * GPKG * Met_Data%DENS( :,:,L )    ! Aer. Mass: ppmv/s -> umol/s
-     &                   / Met_Data%RJACM( :,:,L ) * CELLVOL( :,:,L )     ! Aer. Surf: m2/mol/s -> m2/s
-      END DO                                                              ! Aer. Num:  N/mol/s -> N/s  
-      CONVN( 1:NL,:,: ) = CONVM( 1:NL,:,: )                               
+      END DO                                                              
 
       !MAKE SURE TO APPLY RELEVANT UNIT CONVERSION TO EACH
       !TYPE OF VARIABLE (GAS, AEROSOL MASS, AEROSOL NUMBER,
       !AND AEROSOL SURFACE AREA)
+
+      ! Gas Moles:   ppmv/s -> mol/s
       FORALL ( I = 1:N_SPC_DIFF, DIFF_MASK_GAS( I ) .OR.
      &                           DIFF_MASK_NR( I )  .OR.
      &                           DIFF_MASK_TRAC( I ) )
-     &    VDEMIS( I,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * VDEMIS0( I,1:NL,:,:)
+     &    VDEMIS( I,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * 1.0E-6 * VDEMIS0( I,1:NL,:,:)
 
+      ! Aer Moles:   ppmv/s -> g/s
       FORALL ( I = 1:N_SPC_DIFF, DIFF_MASK_AERO( I ) .AND.
      &                           .NOT. DIFF_MASK_NUM( I ) .AND.
      &                           .NOT. DIFF_MASK_SRF( I )  )
-     &    VDEMIS( I,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * VDEMIS0( I,1:NL,:,:) * DIFF_MW( I )
+     &    VDEMIS( I,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * 1.0E-6 * VDEMIS0( I,1:NL,:,:) 
+     &                           * DIFF_MW( I )
 
+      ! Aer. Srf:   m2/m3/s -> m2/s
       FORALL ( I = 1:N_SPC_DIFF, DIFF_MASK_SRF( I ) )
-     &    VDEMIS( I,1:NL,:,: ) = CONVM( 1:NL,:,: ) * VDEMIS0( I,1:NL,:,:)
+     &    VDEMIS( I,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * VDEMIS0( I,1:NL,:,:)
 
+      ! Aer. Num:  N/mol/s -> N/s  
       FORALL ( I = 1:N_SPC_DIFF, DIFF_MASK_NUM( I ) )
-     &    VDEMIS( I,1:NL,:,: ) = CONVN( 1:NL,:,: ) * VDEMIS0( I,1:NL,:,:)
+     &    VDEMIS( I,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * VDEMIS0( I,1:NL,:,:)
 
       call mio_time_format_conversion (jdate, jtime, time_stamp)
 

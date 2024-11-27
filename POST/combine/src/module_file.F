@@ -922,33 +922,6 @@ C******************************************************************************
          yorig3d = yorig - mycelloff * ycell3d
 
 
-
-         !! set vertical grid variables
-         VGTYP3D = 7
-
-         !! read V_TOP variable for VGTOP3D
-         start = (/ 1, 0, 0, 0 /)
-         count = (/ 1, 0, 0, 0 /)
-         status =          NF_INQ_VARID( WRFid(fileNo), 'P_TOP', varid)
-         status = status + NF_GET_VARA_REAL( WRFid(fileNo), varid, start, count, VGTOP3D)
-         if( status.ne. 0 ) then
-           write(*,'(''**ERROR** Reading VGTOP3D value from P_TOP variable'')')
-           rstatus = .false.
-           return
-           endif
-
-
-         !! read ZNW values for VGLVS3D values
-         start = (/ 1, 1, 1, 1 /)
-         count = (/ NLAYS3D+1, 1, 0, 0 /) 
-         status =          NF_INQ_VARID( WRFid(fileNo), 'ZNW', varid)
-         status = status + NF_GET_VARA_REAL( WRFid(fileNo), varid, start, count, VGLVS3D)
-         if( status.ne. 0 ) then
-           write(*,'(''**ERROR** Reading vertical sigma values from ZNW variable'')')
-           rstatus = .false.
-           return
-           endif
-
          !! set time and date variables
          status = NF_GET_ATT_TEXT( WRFid(fileNo), NF_GLOBAL, 'START_DATE', dateStr )
          status = status + NF_GET_ATT_REAL( WRFid(fileNo), NF_GLOBAL, 'DT', tstep)

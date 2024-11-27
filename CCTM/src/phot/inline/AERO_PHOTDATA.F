@@ -82,8 +82,8 @@ C Allocate and define arrays used to calculate aerosol optical properties
       
          USE AERO_DATA           ! aero variable data
          USE SOA_DEFN            ! gas soa data
-         USE AEROMET_DATA        ! constants and met data
-      
+         USE AEROMET_DATA        
+         USE CONST      
          USE CSQY_DATA, ONLY : NWL => NWL_REF, NUM_REFRACTIVE, REFRACTIVE_INDEX,
      &                         WAVELENGTH => EFFWL_REF !!! , FIRST_DAY => NEW_START
 
@@ -435,8 +435,8 @@ C-----------------------------------------------------------------------
 
       USE AERO_DATA           ! aero variable data
       USE SOA_DEFN            ! gas soa data
-      USE AEROMET_DATA        ! constants and met data
-      
+      USE AEROMET_DATA        ! met data
+      USE CONST      
       USE CSQY_DATA,  ONLY : NWL => NWL_REF, NUM_REFRACTIVE, REFRACTIVE_INDEX,
      &                       WAVELENGTH => EFFWL_REF
 
@@ -460,7 +460,6 @@ C Parameters:
 
       REAL( 8 ), PARAMETER :: NEGLECT_FRAC = 1.0D-9      ! skip if below this volume fraction
       REAL( 8 ), PARAMETER :: ONE_THIRD    = 1.0D0/3.0D0 
-      REAL,      PARAMETER :: ONE_OVER_PI  = 1.0 / PI
 
 C Local saved variables:
 
@@ -1034,9 +1033,8 @@ C     multmodal atmospheric particle size distributions, Atmospheric
 C     Environment, vol. 11, pp 95-999, 1977.
 C-----------------------------------------------------------------------
 
+      USE CONST, ONLY: PI, PI180
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST      ! physical constants
 
 C***arguments
 
@@ -1175,7 +1173,7 @@ C***FSB start calculation
 C FSB check range of SIGMA_G
 C *** Maximum value of SIGMA_G allowed is 2.0
       SIGMA_G = MIN( 2.0, SIGMA_G )
-C *** Minimum allowed value fo SIGMA_F is 1.05
+C *** Minimum allowed value of SIGMA_G is 1.05
       SIGMA_G = MAX( 1.05, SIGMA_G )
 
       XLNSIG2 = XLNSIG * XLNSIG
@@ -1186,7 +1184,7 @@ C *** Minimum allowed value fo SIGMA_F is 1.05
 
 C***evaluate polynomials
 C***  optimize for piplined microprocessor
-C***  appproach recommended by Dr. Carlie Coats
+C***  approach recommended by Dr. Carlie Coats
 
       NN = NR1 * NR1
 
@@ -1228,7 +1226,7 @@ C     1.0 / 0.95 = 1.052632.  1.0 / 0.95 * 0.13 = 0.136842
 
 C***evaluate more polynomials
 C***  optimize for piplined microprocessor
-C***  appproach recommended by Dr. Carlie Coats
+C***  approach recommended by Dr. Carlie Coats
 
          TT = TAU * TAU
          T1G1 = G1A0 + G1A1 * TAU
@@ -1511,18 +1509,15 @@ C     multmodal atmospheric particle size distributions, Atmospheric
 C     Environment, vol. 11, pp 95-999, 1977.
 C-----------------------------------------------------------------------
 
+      USE CONST, ONLY: PI, PI180
       IMPLICIT NONE
-
-C***include files
-
-      INCLUDE SUBST_CONST      ! physical constants
 
 C***arguments
 
       REAL, INTENT( IN )     :: NR, NI     ! indices of refraction
       REAL, INTENT( IN )     :: LAMBDA     ! wavelength, nm
       REAL, INTENT( IN )     :: DGN        ! geometric mean diameter, m
-      REAL, INTENT( INOUT )  :: SIGMA_G     ! geometric standard deviation
+      REAL, INTENT( INOUT )  :: SIGMA_G    ! geometric standard deviation
 
       REAL, INTENT( OUT )    :: BETA_EXT   ! normalized extinction coefficient
       REAL, INTENT( OUT )    :: BETA_SCAT  ! normalized scattering coefficient
@@ -1674,7 +1669,7 @@ C***FSB start calculation
 
 C***evaluate polynomials
 C***  optimize for piplined microprocessor
-C***  appproach recommended by Dr. Carlie Coats
+C***  approach recommended by Dr. Carlie Coats
 
       NN = NR1 * NR1
 
