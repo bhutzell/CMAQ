@@ -149,8 +149,9 @@ C----------------------------------------------------------------------
       Use aero_data, only: ae6hg, aphgj_idx
       Use cgrid_spcs, only: n_gc_g2ae, gc_g2ae, gc_g2ae_map, gc_molwt, gc_strt,
      &                      n_nr_n2ae, nr_n2ae, nr_n2ae_map, nr_molwt, nr_strt
+
       Use utilio_defn, only: index1, xstat3, m3exit
-      Use runtime_vars, only: logdev, LOG_MESSAGE, LOG_WARNING
+      Use runtime_vars, only: logdev, LOG_MESSAGE, LOG_WARNING, LOG_SUBHEADING
 
       Implicit None
 
@@ -161,7 +162,7 @@ C Local Variables:
 
 C If the species are mapped already, skip the mapping algorithm
       If ( mapped ) Return
-      CALL LOG_MESSAGE( LOGDEV, 'Map SOA Precursors' )
+      CALL LOG_SUBHEADING( LOGDEV, 'Map Inorganic and Organic Particle Precursors' )
 
 C Initialize Precursor Map Variables
       precursor_mw = 0.0d0
@@ -173,11 +174,13 @@ C Build mapping to CGRID for each precursor species
          If ( n .Ne. 0 ) Then
             precursor_mw( spc ) = real( gc_molwt( gc_g2ae_map( n ) ), 8 )
             precursor_map( spc ) = gc_strt - 1 + gc_g2ae_map( n )
+            write(logdev,99902) Trim( precursor( spc )%name )
          Else
             n = index1( precursor( spc )%name, n_nr_n2ae, nr_n2ae )
             If ( n .Ne. 0 ) Then
                precursor_mw( spc ) = real( nr_molwt( nr_n2ae_map( n ) ), 8 )
                precursor_map( spc ) = nr_strt - 1 + nr_n2ae_map( n )
+               write(logdev,99902) Trim( precursor( spc )%name )
             Else
                 If ( precursor( spc )%required ) Then
                   Precursor_eflag = .True.
@@ -248,8 +251,8 @@ C Find indices of required species
 99901 Format( 'FATAL error(s) found in the GC and/or NR namelists used. Check that '
      &     /  'these namelists contain the above required data as the respective files '
      &     /  'in the repository version of the mechanism: ' , a )
-99902 Format( 5x,'Note: Optional species ', a, ' is not found in G2AE or N2AE values of',
-     &    /   7x,'the GC or NR namelist. Simulation will ignore this species.' )
+99902 Format( 5x,'Particle precursor species ', a, ' is found in G2AE or N2AE values of ',
+     &        'the GC or NR namelist.' )
 
       Return
       End Subroutine map_precursor

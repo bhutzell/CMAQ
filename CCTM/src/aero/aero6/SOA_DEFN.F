@@ -246,7 +246,6 @@ C-----------------------------------------------------------------------
       ! Variables for controlling behavior of OA module
       Logical, Private, Save :: mapped              = .False.
       Logical, Private, Save :: RXNS_eflag          = .False. ! error flag for RXNS modules used
-      Logical, Private, Save :: OA_eflag            = .False. ! error flag for soa_defn
       Character( 16 ), Private, Save :: pname = 'SOA_DEFN        '
 
       Contains
@@ -282,8 +281,8 @@ C-----------------------------------------------------------------------
       Use cgrid_spcs, only: n_gc_spc, gc_spc, n_gc_g2ae, gc_g2ae, gc_strt, gc_molwt, gc_g2ae_map, 
      &                      n_nr_spc, nr_spc, n_nr_n2ae, nr_n2ae, nr_strt, nr_molwt, nr_n2ae_map,
      &                      n_ae_spc, ae_spc
-      Use runtime_vars, only: logdev
-      Use utilio_defn, only: index1, xstat3
+      Use runtime_vars, only: logdev, log_subheading
+      Use utilio_defn, only: index1, xstat3, m3exit
 
       Implicit None
 
@@ -306,6 +305,8 @@ C-----------------------------------------------------------------------
       ! Map All OA Species and Load Properties
       If ( .Not. mapped ) Then
           mapped = .TRUE.
+          
+          call log_subheading( logdev, 'Map Organic Aerosol and Vapor Species')
 
           ! First, the number and names of present and nontracer OA species must be
           ! determined by checking the AEROSOL Table with the species names
@@ -335,7 +336,6 @@ C-----------------------------------------------------------------------
           End Do
           
           If ( n_oa .Eq. n_oa_tracers ) Then
-              OA_eflag  = .True.
               xmsg =  'FATAL: All SOA species are tracers at least '
      &            //  'one SOA species must not be a tracer.'
               write(logdev,'(a)')Trim( xmsg )           
@@ -392,10 +392,11 @@ C-----------------------------------------------------------------------
               map_ROGtoCGRID( spc ) = gc_strt - 1 + g
               ROG_mw( spc ) = gc_molwt( g )
             else
-              ! Log an Error
-              OA_eflag  = .True.
-              write(logdev,99903)Trim( oaspc( spc )%ctr_name ),
-     &        Trim( oaspc( spc )%gas_name )
+              ! Log an Error and Halt the model
+              write(logdev,99903) Trim( oaspc( spc )%ctr_name ),
+     &                            Trim( oaspc( spc )%gas_name )
+              call m3exit( pname, 0, 0, 'Please add this critical ' //
+     &                      'species to your mechanism', xstat3 )
             End If
          End Do
 
@@ -420,9 +421,10 @@ C-----------------------------------------------------------------------
            End If
 
            If( n .lt. 1 .and. g .lt. 1 ) Then
-               OA_eflag  = .True.
-               write(logdev,99902)Trim( oaspc( spc )%gas_name ), 
-     &         Trim ( oaspc( spc )%name )
+               write(logdev,99902) Trim( oaspc( spc )%gas_name ), 
+     &                             Trim ( oaspc( spc )%name )
+               call m3exit( pname, 0, 0, 'Please add these critical ' //
+     &                      'species to your mechanism', xstat3 )
            End If
          End Do
 
@@ -610,23 +612,25 @@ C-----------------------------------------------------------------------
       Do spc = 1, n_oa
          If ( oaspc( spc )%gas_name .Eq. vname ) Then
             ndx = spc
+            xmsg = 'Optional Species '
+     &             // Trim( vname ) // 
+     &             ' is found in the G2AE or N2AE values of GC or NR namelists.'
+         write(logdev,'(5x,a)') xmsg
             Return
          End If
       End Do
 
-      If ( .Not. required ) Then
-         xmsg = 'Optional Species '
-     &       // Trim( vname ) // 
-     &       ' is not found in the G2AE or N2AE values of GC or NR namelists.'
-         write(logdev,'(5x,a)') xmsg
-         Return
-      End If
+      If ( .Not. required ) Return
 
+      ! This warning should not be encountered since the OA table
+      ! already includes these gas-phase counterparts or precursors 
+      ! that are mapped to CGRID.
       xmsg = 'FATAL:' // Trim( vname )
      &  // ' is not found in the G2AE or N2AE values of GC or NR namelists.'
-      OA_eflag  = .True.
-      CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
- 
+
+! if this is a FATAL error, then we should crash rather than warn
+!     CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
+      CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1)
 
       Return
       End Function findVapor
