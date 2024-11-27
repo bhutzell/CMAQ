@@ -37,7 +37,7 @@
 !-------------------------------------------!
 AIR_DENS        ,kg m-3    ,DENS[1]
 RH              ,%         ,100.00*RH[1]
-SFC_TMP         ,C         ,(TEMP2[1]-273.15)
+SFC_TMP         ,C         ,(TSURF[1]-273.15)
 PBLH            ,m         ,PBL[1]
 SOL_RAD         ,W m-2     ,RGRND[1]
 precip          ,cm        ,PRECIP[1]
@@ -194,7 +194,7 @@ PM1_TOT         ,ug m-3    ,PM1[1]
 !PM1_CA         ,ug m-3    ,PM1_CA[1]
 !PM1_NH4        ,ug m-3    ,PM1_NH4[1]
 !PM1_NO3        ,ug m-3    ,PM1_NO3[1]
-!PM1_SOIL       ,ug m-3    ,PM1_SOIL[1]
+!PM1_SOIL       ,ug m-3    ,PM1_RCSOIL[1]
 !PM1_UNSPEC1    ,ug m-3    ,PM1_OTHWNC[1]
 !PM1_UNSPCRS    ,ug m-3    ,PM1_UNSPCRS[1]
 
@@ -210,7 +210,7 @@ PM25_NH4        ,ug m-3    ,PM25_NH4[1]
 PM25_NO3        ,ug m-3    ,PM25_NO3[1] 
 PM25_OC         ,ugC m-3   ,PM25_OC[1] 
 PM25_OM         ,ug m-3    ,PM25_OA[1] 
-PM25_SOIL       ,ug m-3    ,PM25_SOIL[1] 
+PM25_SOIL       ,ug m-3    ,PM25_RCSOIL[1]  
 PM25_SO4        ,ug m-3    ,PM25_SO4[1] 
 PM25_TOT        ,ug m-3    ,PM25[1] 
 PM25_UNSPEC1    ,ug m-3    ,PM25_OTHWNC[1] 
