@@ -52,18 +52,24 @@ For gases, usually this name is the same as the CMAQ species. For aerosols, it i
   - 'MASS' - Conserve Mass. For example, if emissions of an aerosol are to be scaled to emissions of a gas species, it is common to want to conserve mass.
   - 'MOLE' - Conserve Moles. For example, if emissions of a gas-phase species are to be scaled to another gas, it is sometimes desired to conserve moles since gas emissions are provided on a mole basis.
   - 'UNIT' - Ignore molecular weight conversions and apply emission rate directly regardless of units.
-  - Example 1: Particle-phase variable Y (units in g/s) on the emission file is mapped to CMAQ gas-phase species X with a scale factor of B. Emissions for X are needed in mol/s.
-    - If Basis is set to UNIT, then EMIS(X) = EMIS(Y) * B
-    - If Basis is set to MASS, then EMIS(X) = EMIS(Y) * B / MW(X) 
-    - If Basis is set to MOLE, then EMIS(X) = EMIS(Y) * B / MW(Y) 
-  - Example 2: Gas-phase variable Y (units in mol/s) on the emission file is mapped to CMAQ gas-phase species X with a scale factor of B. Emissions for X are needed in mol/s.
-    - If Basis is set to UNIT, then EMIS(X) = EMIS(Y) * B
-    - If Basis is set to MASS, then EMIS(X) = EMIS(Y) * B * MW(Y) / MW(X) 
-    - If Basis is set to MOLE, then EMIS(X) = EMIS(Y) * B 
-  - Example 3: Particle-phase variable Y (units in g/s) on the emission file is mapped to CMAQ particle-phase species X with a scale factor of B. Emissions for X are needed in g/s.
-    - If Basis is set to UNIT, then EMIS(X) = EMIS(Y) * B 
-    - If Basis is set to MASS, then EMIS(X) = EMIS(Y) * B
-    - If Basis is set to MOLE, then EMIS(X) = EMIS(Y) * B / MW(Y) * MW(X)
+  - The following examples illustrate the unit conversions applied when emission rate units are converted from those consistent with the emission variable to those consistent with the CMAQ variable. MW(Y) corresponds to the emission variable and these MWs are looked up on a table compiled in the file desid_vard.F. MW(X) corresponds to the CMAQ variable and is found on the chemical species namelist containing CMAQ variable X.
+    - Example 1: Particle-phase variable Y (units in g/s) on the emission file is mapped to CMAQ gas-phase species X with a scale factor of B. Emissions for X are needed in mol/s.
+      - If Basis is set to UNIT, then EMIS(X) = EMIS(Y) * B
+      - If Basis is set to MASS, then EMIS(X) = EMIS(Y) * B / MW(X) 
+      - If Basis is set to MOLE, then EMIS(X) = EMIS(Y) * B / MW(Y) 
+    - Example 2: Gas-phase variable Y (units in mol/s) on the emission file is mapped to CMAQ gas-phase species X with a scale factor of B. Emissions for X are needed in mol/s.
+      - If Basis is set to UNIT, then EMIS(X) = EMIS(Y) * B
+      - If Basis is set to MASS, then EMIS(X) = EMIS(Y) * B * MW(Y) / MW(X) 
+      - If Basis is set to MOLE, then EMIS(X) = EMIS(Y) * B 
+    - Example 3: Particle-phase variable Y (units in g/s) on the emission file is mapped to CMAQ particle-phase species X with a scale factor of B. Emissions for X are needed in g/s.
+      - If Basis is set to UNIT, then EMIS(X) = EMIS(Y) * B 
+      - If Basis is set to MASS, then EMIS(X) = EMIS(Y) * B
+      - If Basis is set to MOLE, then EMIS(X) = EMIS(Y) * B / MW(Y) * MW(X)
+    - Example 4: Gas-phase variable Y (units in mol/s) on the emission file is mapped to CMAQ particle-phase species X with a scale factor of B. Emissions for X are needed in g/s.
+      - If Basis is set to UNIT, then EMIS(X) = EMIS(Y) * B 
+      - If Basis is set to MASS, then EMIS(X) = EMIS(Y) * B * MW(Y)
+      - If Basis is set to MOLE, then EMIS(X) = EMIS(Y) * B * MW(X)
+
 
 - 'Operation' - Specifies the kind of rule to be carried out. Options are:
   - 'a' - add the rule to existing instructions. This operation should be used for new entries, too.
