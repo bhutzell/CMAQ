@@ -582,6 +582,9 @@
           CALL M3EXIT( PNAME,0,0,XMSG,1 )
       END IF
  
+
+
+
       !CALL LOG_MESSAGE( LOGDEV, '      Component: '//CSPEC )
 
       END SUBROUTINE ELMO_SET_COMPONENTS
