@@ -18,7 +18,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE LOAD_SENGRID ( FNAME, JDATE, JTIME, SPC_CAT )
 
@@ -39,7 +38,6 @@ C-----------------------------------------------------------------------
 
       IMPLICIT NONE
 
-      INCLUDE SUBST_CONST       ! constants
       INCLUDE SUBST_FILES_ID    ! file name parameters
 
 C Arguments:

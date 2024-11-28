@@ -105,11 +105,11 @@ C-----------------------------------------------------------------------
          USE BIDI_MOD, Only: Init_Bidi
          USE STAGE_MOD, Only: INIT_STAGE
          USE STAGE_OUTPUT
+         USE CONST, ONLY: RGASUNIV, MWAIR
 
          IMPLICIT NONE
 
 C Includes:
-         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments:
@@ -399,6 +399,7 @@ C-----------------------------------------------------------------------
          SUBROUTINE GET_DEPV( JDATE, JTIME, TSTEP, CGRID )
 C-----------------------------------------------------------------------
 
+         USE CONST
          USE HGRD_DEFN
          USE CGRID_SPCS          ! CGRID mechanism species
          USE UTILIO_DEFN
@@ -419,7 +420,6 @@ C Arguments:
 
          REAL, POINTER         :: CGRID( :,:,:,: ) ! concentrations
 
-         INCLUDE SUBST_CONST     ! constants
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Parameters:

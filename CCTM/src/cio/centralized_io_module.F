@@ -3421,7 +3421,7 @@ C   mminlu and num_land_cat are WRF global variables
      &                 bdsnp_ndep( ncols,nrows,12),
      &                 stat=stat)
              IF ( STAT .NE. 0 ) THEN
-                MESG = 'Failure BIOGEMIS_MEGAN arrays in megan_setup'
+                MESG = 'Failure allocating BIOGEMIS_MEGAN arrays in megan_setup'
                 CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT3 )
              END IF
              bdsnp_fert     = 0.
@@ -3432,8 +3432,8 @@ C   mminlu and num_land_cat are WRF global variables
           end if
 
           call mio_fopen (MEGAN_CTS, mio_read_only)
-          nsteps = mio_file_data(fnum)%nsteps
           fnum = mio_search (MEGAN_CTS)
+          nsteps = mio_file_data(fnum)%nsteps
 
           n_opened_file = n_opened_file + 1
           f_mbiog = n_opened_file

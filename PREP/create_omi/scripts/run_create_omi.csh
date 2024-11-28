@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-# ======================= CREATE_OMI 5.4.X Run Script ========================
+# ======================= CREATE_OMI 5.5.X Run Script ========================
 # Usage: run_create_omi.csh >&! create_omi.log &
 #
 # To report problems or request help with this script/program:
@@ -13,7 +13,7 @@ set echo
 
 #> Choose compiler and set up CMAQ environment with correct
 #> libraries using config.cmaq. Options: intel | gcc | pgi
-  setenv compiler gcc
+  setenv compiler intel
 
 set echo
 
@@ -38,18 +38,13 @@ set echo
 echo $compilerString
 
 #define executable and its path
- set VRSN  = v54                #> Code Version
+ set VRSN  = v55                #> Code Version
  set EXEC  = create_omi_${VRSN}.exe
 
 # uncomment if using executable compiled with debugging flags
 if( ! ( $?Offline ) )then
 #define paths and create data file list
-   setenv Debugging 
-   if( $?Debugging )then
-       set XBASE = ${BASE}/BLD_create_omi_${VRSN}_${compilerString}_debug
-   else
-       set XBASE = ${BASE}/BLD_create_omi_${VRSN}_${compilerString}
-   endif
+ set XBASE = ${BASE}/BLD_create_omi_${VRSN}_${compilerString}
  echo "working online"
 else
  set XBASE = ${BASE}/../src
@@ -71,7 +66,7 @@ set input_dir = ${BASE}
 #\ls -1 $DATA_DIR/*.ascii  >&! ${input_dir}/${infile}
 
 # The below commands uses raw data from NASA TOMS
- set YEAR      = "2019"
+ set YEAR      = "2020"
  set DATA_DIR  = ${BASE}"/TOMS_OMI_O3_column/"${YEAR}
 #set DATA_DIR  = ${BASE}"/TOMS_OMI_O3_column/test_data_"${YEAR}
  set infile = toms_list.dat

@@ -68,12 +68,9 @@ C-----------------------------------------------------------------------
       USE RUNTIME_VARS    
       USE CSQY_DATA
       USE PHOT_MET_DATA, ONLY: CFRAC_2D_AVE => CFRAC_2D
+      USE CONST
 
       IMPLICIT NONE
-
-!***include files
-
-      INCLUDE SUBST_CONST      ! physical constants
 
 !***parameters
 
@@ -839,8 +836,6 @@ C*** find ozone column density for atmosphere, stratosphere, and troposphere
             TAUC_AERO( II,IWL ) = DT_AERO( L )  ! aerosol optical depth
             TAU_TOT  ( II,IWL ) = DTAU( L )     ! total optical depth
             TAU_CLOUD( II,IWL ) = DT_CLOUD( L ) ! cloud optical depth
-!***change extinction units from meters to Megameters
-            EXTINCTION( II,IWL ) = 1000.0 * EXTINCTION( II,IWL )
 
          END DO                 ! loop over layers
 

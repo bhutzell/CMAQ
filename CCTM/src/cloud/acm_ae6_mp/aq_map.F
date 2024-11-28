@@ -76,9 +76,9 @@ C-----------------------------------------------------------------------
       USE AERO_DATA      ! aerosol shared parameters
       USE AQ_DATA        ! aqueous chemistry shared parameters
       USE UTILIO_DEFN
+      USE CONST, ONLY : PI
 
       IMPLICIT NONE
-      INCLUDE SUBST_CONST   ! for PI
 
       CHARACTER( 120 ) :: XMSG = ' '    ! Exit status message
 

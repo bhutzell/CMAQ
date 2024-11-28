@@ -148,6 +148,7 @@ C***********************************************************************
           USE UTILIO_DEFN
           USE RXNS_DATA
           USE SA_DEFN
+          USE CONST, ONLY: MWAIR
 C Initialize arrays and maps that store reaction rates in each grid cell and that
 C         relate ISAM species to chemistry species
 C
@@ -155,9 +156,6 @@ C         Called by chemistry driver
 
         IMPLICIT NONE
 
-C..Includes:
-         INCLUDE SUBST_CONST     ! CMAQ constants
- 
          CHARACTER( 16 ), PARAMETER :: PNAME = 'SA_IRR_INIT'     ! Program name
 
          INTEGER :: I, J, RXN, IP, IL 
@@ -932,9 +930,6 @@ c..Add the number of species molecules produced in this reaction
          REAL,      INTENT( IN ) ::  DENS       ! air mass density, kg/m3
          REAL(8),   INTENT( IN ) ::  CONC( : )  ! cgrid concentrations
 
-C..Includes:
-         INCLUDE SUBST_CONST     ! CMAQ constants
-
 !..Local:
          CHARACTER( 16 ), PARAMETER :: PNAME = 'SA_IRR_EXTRACT'     ! Program name
 
@@ -1033,9 +1028,6 @@ C..Includes:
          INTEGER,   INTENT( IN ) ::  LAY        ! cell layer index      
          REAL,      INTENT( IN ) ::  DENS       ! air mass density, kg/m3
          REAL(8),   INTENT( IN ) ::  CONC( : )  ! cgrid concentrations
-
-C..Includes:
-         INCLUDE SUBST_CONST     ! CMAQ constants
 
 !..Local:
          CHARACTER( 16 ), PARAMETER :: PNAME = 'SA_IRR_UPLOAD'     ! Program name

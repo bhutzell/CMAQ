@@ -73,13 +73,13 @@ C-----------------------------------------------------------------------
       USE NOOP_MODULES         ! stenex (using NOOP_GLOBAL_MAX_MODULE, NOOP_COMM_MODULE)
 #endif
       use CENTRALIZED_IO_MODULE, only : interpolate_var, window
+      USE CONST, ONLY: DG2M, PI180
 
       IMPLICIT NONE
 
 C Includes:
 
       INCLUDE SUBST_FILES_ID   ! file name parameters
-      INCLUDE SUBST_CONST      ! constants
       INCLUDE SUBST_PE_COMM    ! PE communication displacement and direction
  
 C Parameters:

@@ -401,16 +401,15 @@ C-----------------------------------------------------------------------
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE RXNS_DATA
       USE AERO_DATA
-      USE AEROMET_DATA, ONLY: f6dpi, airdens
+      USE AEROMET_DATA, ONLY: airdens
       USE PRECURSOR_DATA
       USE SOA_DEFN
       USE ELMO_DATA
       !USE ELMO_PROC
       USE CENTRALIZED_IO_MODULE
+      USE CONST
 
       IMPLICIT NONE
-
-      INCLUDE SUBST_CONST       ! CMAQ constants
 
 C *** Arguments
       REAL,           POINTER       :: CGRID ( :,:,:,: )  ! pointer of model concentrations
@@ -618,9 +617,6 @@ C *** variables for getting aerosol diagnostic file flag
       
       CHARACTER( 132 )  :: XMSG
       
-C *** Statement Function **************
-      REAL( 8 )            :: INV_ESATL ! arithmetic statement function for reciprocal vapor pressure [Pa]
-      REAL( 8 )            :: TT
 
 C *** parameters for calculating GAMMA of HBR ---> ABR, Sherwen et al., ACP, 2016 and IUPAC
       REAL( 8 ) :: GAMMA_HBR                             ! uptake coefficient of HBR  
@@ -643,17 +639,6 @@ C *** parameters for calculating GAMMA of HBR ---> ABR, Sherwen et al., ACP, 201
       REAL( 8 ), PARAMETER :: INV_GAMMA_INO3  = 1.0D0 / 0.01D0                     ! Saiz-Lopez et al. 2014
       REAL( 8 ), PARAMETER :: INV_GAMMA_INO2  = 1.0D0 / 0.02D0                     ! Saiz-Lopez et al. 2014
 
-C *** Coefficients for the equation, ESATL defining saturation vapor pressure
-C *** values of AL, BL, and CL are from:
-C     Alduchov and Eskridge, "Improved Magnus Form Approximations of
-C                            Saturation Vapor Pressure,"
-C                            Jour. of Applied Meteorology, vol. 35,
-C                            pp 601-609, April, 1996.
-      REAL( 8 ), PARAMETER :: AL = 610.94D0 
-      REAL( 8 ), PARAMETER :: BL = 17.625D0
-      REAL( 8 ), PARAMETER :: CL = 243.04D0
-      REAL( 8 ), PARAMETER :: DL = 1.0D0 / AL
-
 
 #ifdef verbose_aerosol_chemistry
        LOGICAL              :: DUMP_CELL
@@ -672,7 +657,6 @@ C                            pp 601-609, April, 1996.
          End Subroutine Hetchem_Extract_Aero
       END INTERFACE 
   
-      INV_ESATL( TT ) = DL * DEXP( BL * ( 273.15D0 - TT ) / ( TT - 273.15D0 + CL ) )
       
 C-----------------------------------------------------------------------
 
@@ -800,6 +784,8 @@ C ***  Determine molecular weights
        CFACTOR_HO2 = DSQRT( 8.0D3 * REAL( RGASUNIV, 8 ) / ( MWTHO2 * DPI ) )
 
 C ***  Map to acids/nucleophiles for epoxide uptake
+       CALL LOG_SUBHEADING( LOGDEV, 'Map Acid-Nuc Pairs for Heterogeneous Chemistry')
+
        INDX =  INDEX1( NAMES_AERO_RATES( IA_IEPOX ), NHETERO, HETERO )   
        IF ( INDX .GT. 0 ) THEN ! Find indices for acid catalyzed species in IEPOX reaction
           If ( ( INDEX( MECHNAME, 'AE6I' ) .GT. 0 ) .OR.
@@ -809,7 +795,8 @@ C ***  Map to acids/nucleophiles for epoxide uptake
              ALLOCATE ( ACID_NUC_PAIRS( N_NUCPAIRS ) )
              ACID_NUC_PAIRS = ACID_NUC_PAIRS_AEI
           Else If ( (INDEX( MECHNAME, 'CRACMM1') .GT. 0)
-     &      .OR.    (INDEX( MECHNAME, 'CRACMM2') .GT. 0) ) then
+     &      .OR.    (INDEX( MECHNAME, 'CRACMM2') .GT. 0)
+     &      .OR.    (INDEX( MECHNAME, 'CRACMM3') .GT. 0) ) then
              NUMVOC         = 1
              N_NUCPAIRS     = N_NUCPAIRS_CRCM
              ALLOCATE ( ACID_NUC_PAIRS( N_NUCPAIRS ) )
@@ -1733,7 +1720,7 @@ C      particle liquid water, nitrate, and chloride, ACP, 9, 8351-8363, 2009.
 C-----------------------------------------------------------------------
 
       USE AERO_DATA
-      USE AEROMET_DATA   ! Includes CONST.EXT
+      USE CONST, ONLY: F6PI
 
       IMPLICIT NONE
 
@@ -1802,9 +1789,9 @@ C *** variables for parameterization based on Bertram and Thornton (2009)
       REAL      AH2OM     ! water,    [moles / liter of particles] 
       REAL      ANO3M     ! nitrate,  [moles / liter of particles] 
    
-      REAL DEN1           ! local varible
-      REAL DEN2           ! local varible
-      REAL DEN            ! local varible
+      REAL DEN1           ! local variable
+      REAL DEN2           ! local variable
+      REAL DEN            ! local variable
       REAL INV_VOL        ! local variable 
       
       REAL, PARAMETER :: A = 3.2E-08       ! Unit [s] - Table 2       
@@ -1812,7 +1799,7 @@ C *** variables for parameterization based on Bertram and Thornton (2009)
       REAL, PARAMETER :: DELTA = 1.3E-01   ! Unit [1/M] - Table 2  
       REAL, PARAMETER :: K3OK2B = 6.0E-02  ! Unit [ ] - Table 2  
       REAL, PARAMETER :: K4OK2B = 29.0     ! Unit [ ] - Table 2  
-      REAL K2FP                            ! varible in eqn 10
+      REAL K2FP                            ! variable in eqn 10
                  
 C *** statement function for inverting the logit transformation given
 C     in Eq 7 by Davis et al (2008)
@@ -1962,7 +1949,7 @@ C     It calculates N2O5_GAMMA based on Bertran and Thornton, 2009
          CASE DEFAULT
       
 C *** Default setting in current version of CMAQ:
-C     This code implements the paramaterization given in Eq 15 by Davis
+C     This code implements the parameterization given in Eq 15 by Davis
 C     et al (2008), in which N2O5_GAMMA is a function of RH, TEMP,
 C     particle composition, and phase state.  Note: In this function, RH
 C     is in fractional units whereas the published equations refer to RH
@@ -2328,7 +2315,7 @@ C-----------------------------------------------------------------------
 
       Use aero_data
       Use precursor_data
-      Use aeromet_data   ! Includes CONST.EXT (pi) and airtemp
+      Use aeromet_data   ! airtemp
       Use utilio_defn    ! error message and abort
 
       Implicit None

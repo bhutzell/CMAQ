@@ -82,9 +82,8 @@ C-----------------------------------------------------------------------
      &                       S_REMOVAC, S_HPWDEP, S_GAS, S_GASWDEP,
      &                       S_AEROSOL, S_AERWDEP
 #endif 
-
+      USE CONST, ONLY  : PI
       IMPLICIT NONE
-      INCLUDE SUBST_CONST   ! for PI
       
       CHARACTER( 120 ) :: XMSG = ' '    ! Exit status message
 

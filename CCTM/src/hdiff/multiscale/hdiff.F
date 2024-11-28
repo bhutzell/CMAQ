@@ -91,12 +91,12 @@ C-----------------------------------------------------------------------
 #ifdef sens
       USE DDM3D_DEFN, ONLY: SENGRID, NPMAX, NP
 #endif
+      USE CONST, only: DG2M, PI180
 
       IMPLICIT NONE
 
 C Includes:
 
-      INCLUDE SUBST_CONST       ! constants
       INCLUDE SUBST_PE_COMM     ! PE communication displacement and direction
 
 C Arguments:
