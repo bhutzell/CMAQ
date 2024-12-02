@@ -94,8 +94,8 @@ DDEP_CAJ           ,kg ha-1     ,DD_PMF_CA[1]
 WDEP_CAJ	   ,kg ha-1     ,WD_PMF_CA[1]
 DDEP_CAK           ,kg ha-1     ,DD_PMC_CA[1]
 WDEP_CAK           ,kg ha-1     ,WD_PMC_CA[1]
-DDEP_CAJK	   ,kg ha-1     ,DD_PMF_CA[1]
-WDEP_CAJK	   ,kg ha-1     ,WD_PMF_CA[1]
+DDEP_CAJK	   ,kg ha-1     ,DD_CA[1]
+WDEP_CAJK	   ,kg ha-1     ,WD_TSP_CA[1]
 
 !! Iron
 DDEP_FEJ	   ,kg ha-1     ,DD_PMF_FE[1]
@@ -118,16 +118,16 @@ DDEP_MGJ           ,kg ha-1     ,DD_PMF_MG[1]
 WDEP_MGJ           ,kg ha-1     ,WD_PMF_MG[1]
 DDEP_MGK           ,kg ha-1     ,DD_PMC_MG[1]
 WDEP_MGK           ,kg ha-1     ,WD_PMC_MG[1]
-DDEP_MGJK          ,kg ha-1     ,DD_PMF_MG[1]
-WDEP_MGJK          ,kg ha-1     ,WD_PMF_MG[1]
+DDEP_MGJK          ,kg ha-1     ,DD_MG[1]
+WDEP_MGJK          ,kg ha-1     ,WD_TSP_MG[1]
 
 !! Potassium
 DDEP_KJ            ,kg ha-1     ,DD_PMF_K[1]
 WDEP_KJ            ,kg ha-1     ,WD_PMF_K[1]
 DDEP_KK            ,kg ha-1     ,DD_PMC_K[1]
 WDEP_KK            ,kg ha-1     ,WD_PMC_K[1]
-DDEP_KJK           ,kg ha-1     ,DD_PMF_K[1]
-WDEP_KJK           ,kg ha-1     ,WD_PMF_K[1]
+DDEP_KJK           ,kg ha-1     ,DD_K[1]
+WDEP_KJK           ,kg ha-1     ,WD_TSP_K[1]
 
 !! Manganese
 DDEP_MNJ           ,kg ha-1     ,DD_PMF_MN[1]
