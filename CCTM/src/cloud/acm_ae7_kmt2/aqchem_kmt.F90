@@ -180,6 +180,7 @@
       USE AQ_DATA
       USE AERO_DATA
       USE UTILIO_DEFN
+      USE HLCONST_MOD
    
       USE aqchem_Model
       USE aqchem_Initialize, ONLY: Initialize  
@@ -278,10 +279,6 @@
 
       INTEGER :: I, IGAS, IAER, IMOD, count, J, OLIG
 
-!...........External Functions:
-
-      REAL, EXTERNAL :: HLCONST
-
 !*********************************************************************
 
 !...Initialization
@@ -368,32 +365,33 @@
       
 !...Set Henry's Law coefficients and other options
 
-      SO2H   = HLCONST( 'SO2             ', TEMP2, .FALSE., 0.0 )
-      CO2H   = HLCONST( 'CO2             ', TEMP2, .FALSE., 0.0 )
-      NH3H   = HLCONST( 'NH3             ', TEMP2, .FALSE., 0.0 )
-      H2O2H  = HLCONST( 'H2O2            ', TEMP2, .FALSE., 0.0 )
-      O3H    = HLCONST( 'O3              ', TEMP2, .FALSE., 0.0 )
-      HCLH   = HLCONST( 'HCL             ', TEMP2, .FALSE., 0.0 )
-      HNO3H  = HLCONST( 'HNO3            ', TEMP2, .FALSE., 0.0 )
-      MHPH   = HLCONST( 'METHYLHYDROPEROX', TEMP2, .FALSE., 0.0 )
-      PAAH   = HLCONST( 'PEROXYACETIC_ACI', TEMP2, .FALSE., 0.0 )
-      FOAH   = HLCONST( 'FORMIC_ACID     ', TEMP2, .FALSE., 0.0 )
-      GLYH   = HLCONST( 'GLYOXAL         ', TEMP2, .FALSE., 0.0 )
-      MGLYH  = HLCONST( MGLYSUR,            TEMP2, .FALSE., 0.0 )
-      HOH    = HLCONST( 'OH              ', TEMP2, .FALSE., 0.0 ) 
+      SO2H   = HLCONST( HLC_SO2       , TEMP2, .FALSE., 0.0 )
+      CO2H   = HLCONST( HLC_CO2       , TEMP2, .FALSE., 0.0 )
+      NH3H   = HLCONST( HLC_NH3       , TEMP2, .FALSE., 0.0 )
+      H2O2H  = HLCONST( HLC_H2O2      , TEMP2, .FALSE., 0.0 )
+      O3H    = HLCONST( HLC_O3        , TEMP2, .FALSE., 0.0 )
+      HCLH   = HLCONST( HLC_HCL       , TEMP2, .FALSE., 0.0 )
+      HNO3H  = HLCONST( HLC_HNO3      , TEMP2, .FALSE., 0.0 )
+      MHPH   = HLCONST( HLC_MHYDPOX   , TEMP2, .FALSE., 0.0 )
+      PAAH   = HLCONST( HLC_PEROXYACET, TEMP2, .FALSE., 0.0 )
+      FOAH   = HLCONST( HLC_HCOOH     , TEMP2, .FALSE., 0.0 )
+      GLYH   = HLCONST( HLC_GLY       , TEMP2, .FALSE., 0.0 )
+      MGLYH  = HLCONST( HLC_MGLY      , TEMP2, .FALSE., 0.0 )
+      HOH    = HLCONST( HLC_OH        , TEMP2, .FALSE., 0.0 ) 
       GCOLH  = 4.1D+04 * EXP( 4.6D+03 * ( ( 298.D0 - TEMP2 ) / ( 298.D0 * TEMP2 ) ) )  ! Sander (2015)
-      CCOOHH = HLCONST( 'ACETIC_ACID     ', TEMP2, .FALSE., 0.0 )
+
+      CCOOHH = HLCONST( HLC_CH3COOH     , TEMP2, .FALSE., 0.0 )
       HCHOH  = 2.5D0   !HLCONST( 'FORMALDEHYDE    ', TEMP2, .FALSE., 0.0 )             ! Seinfeld and Pandis (2016)
-      HO2H   = HLCONST( 'HO2             ', TEMP2, .FALSE., 0.0 ) 
-      NO2H  = HLCONST( 'NO2             ', TEMP2, .FALSE., 0.0 )
-      HONOH = HLCONST( 'HNO2            ', TEMP2, .FALSE., 0.0 )  
-      HNO4H = HLCONST( 'HNO4            ', TEMP2, .FALSE., 0.0 ) 
-      HIEPOX  = HLCONST( 'IEPOX           ', TEMP2, .FALSE., 0.0 )
-      HMAE    = HLCONST( 'IMAE            ', TEMP2, .FALSE., 0.0 )
-      HHMML   = HLCONST( 'IMAE            ', TEMP2, .FALSE., 0.0 )   
-      NO3H    = HLCONST( 'NO3             ', TEMP2, .FALSE., 0.0 )
+      HO2H   = HLCONST( HLC_HO2         , TEMP2, .FALSE., 0.0 ) 
+      NO2H  = HLCONST( HLC_NO2          , TEMP2, .FALSE., 0.0 )
+      HONOH = HLCONST( HLC_HNO2         , TEMP2, .FALSE., 0.0 )  
+      HNO4H = HLCONST( HLC_HNO4         , TEMP2, .FALSE., 0.0 ) 
+      HIEPOX  = HLCONST( HLC_IEPOX      , TEMP2, .FALSE., 0.0 )
+      HMAE    = HLCONST( HLC_IMAE       , TEMP2, .FALSE., 0.0 )
+      HHMML   = HLCONST( HLC_IMAE       , TEMP2, .FALSE., 0.0 )   
+      NO3H    = HLCONST( HLC_NO3        , TEMP2, .FALSE., 0.0 )
       CH3O2H  = 2.7D0 * EXP( 2.03D+03 * ( ( 298.D0 - TEMP2 ) / ( 298.D0 * TEMP2 ) ) )  ! Leriche et al., 2013 
-      PYRACH  = HLCONST( 'PYRUVIC_ACID    ', TEMP2, .FALSE., 0.0 )     
+      PYRACH  = HLCONST( HLC_PYRUVACID  , TEMP2, .FALSE., 0.0 )     
 
       ONE_OVER_TEMP = 1.0D0 / TEMP2
       
