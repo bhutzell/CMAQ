@@ -69,6 +69,7 @@ C-----------------------------------------------------------------------
       USE CGRID_SPCS                    ! CGRID mechanism species
       USE UTILIO_DEFN
       USE CONST
+      USE HLCONST_MOD, MXHSPCS => MXSPCS
 #ifdef sens
       USE DDM3D_DEFN, ONLY : NP, NPMAX, S_POLC, S_CEND, S_REMOV, S_REMOVAC
 #endif 
@@ -130,6 +131,7 @@ C...........Local Variables:
       INTEGER, ALLOCATABLE, SAVE :: L_NUMAKN( : ) ! pointers to aitken aerosol #
       INTEGER, ALLOCATABLE, SAVE :: L_MASAKN( : ) ! pointers to aitken aerosols
       INTEGER, ALLOCATABLE, SAVE :: L_SRFAKN( : ) ! pntrs to aitken aerosol surface area
+      INTEGER, ALLOCATABLE, SAVE :: HLIND( : )    ! pointers to Henry's Law species
       INTEGER ASTAT
 
       INTEGER       I
@@ -156,7 +158,6 @@ C...........Local Variables:
 C...........External Functions:
 
       INTEGER, EXTERNAL :: INDEXN
-      REAL,    EXTERNAL :: HLCONST
 
 C-----------------------------------------------------------------------
 
@@ -188,9 +189,10 @@ C...  for scavenging, otherwise notify the user and return
      &             SCAV_MASK_NUM( N_SPC_SCAV ),
      &             SCAV_MASK_SRF( N_SPC_SCAV ),
      &             SCAV_MASK_NR( N_SPC_SCAV ),
-     &             SCAV_MASK_TRAC( N_SPC_SCAV ), STAT = ASTAT )
+     &             SCAV_MASK_TRAC( N_SPC_SCAV ), 
+     &             HLIND( N_SPC_SCAV ), STAT = ASTAT )
         IF ( ASTAT .NE. 0 ) THEN
-          XMSG = 'Failure allocating SCAV_SPC, SCAV_MAP or SCAV_FAC'
+          XMSG = 'Failure allocating arrays dimensioned N_SPC_SCAV'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
 
@@ -215,6 +217,7 @@ C...prepare indices for scavenged species
         SCAV_MASK_SRF = .FALSE.
         SCAV_MASK_NR = .FALSE.
         SCAV_MASK_TRAC = .FALSE.
+        HLIND = 0
 
 C...  load the CGRID to scavenged species pointers for the gases
         SPC = 0
@@ -263,6 +266,16 @@ C...create the pointers from CGRID to the species needed by AQCHEM
         N_NUMAKN = INDEXN( 'NUM_AITKEN', N_SPC_SCAV, SCAV_SPC, L_NUMAKN )
         N_MASAKN = INDEXN( 'AITKEN    ', N_SPC_SCAV, SCAV_SPC, L_MASAKN )
         N_SRFAKN = INDEXN( 'SRF_AITKEN', N_SPC_SCAV, SCAV_SPC, L_SRFAKN )
+
+        DO SPC=1, N_SPC_SCAV
+           IF ( SCAV_MASK_AERO( SPC ) ) CYCLE
+           HLIND( SPC ) = INDEX1( SCAV_SPC( SPC ), MXHSPCS, SUBNAME )
+           IF ( HLIND( SPC ) .EQ. 0 ) THEN
+              XMSG = 'Could not find ' // trim( SCAV_SPC( SPC ) ) 
+     &            // ' in Henry''s Law table SUBNAME '
+              CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+           END IF
+        END DO
 
       END IF
 
@@ -340,7 +353,7 @@ C...         time, but it should be added in the future!
 
           ! Gases, Non-Reactives, and Tracers
           PNTR = SCAV_MAP( SPC )
-          KH = HLCONST( SCAV_SPC( SPC ), TBARC, .TRUE., HPLUS )
+          KH = HLCONST( HLIND( SPC ), TBARC, .TRUE., HPLUS )
           IF ( KH .GT. 0.0 ) THEN
             ALFA = SCAV_FAC( SPC ) * ONE_OVER_TWASH / ( 1.0 + TWF / KH )
             CEND ( PNTR ) = POLC( PNTR ) * EXP( -ALFA * TAUCLD )

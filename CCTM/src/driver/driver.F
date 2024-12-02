@@ -165,6 +165,7 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
 #endif   ! end mpas
 
       USE MIO_ASCII
+      USE HLCONST_MOD
 
       IMPLICIT NONE
 
@@ -657,6 +658,8 @@ C Initialize Meteorology Structures
          CALL GET_MET ( JDATE, JTIME, 0 )
 
          IF ( W_VEL ) CALL GET_WVEL( JDATE, JTIME ) ! If the user wants vertical velocity written to file, retrieve it.
+
+         call hlconst_init
 
          FIRST_RUN = .FALSE.
 
