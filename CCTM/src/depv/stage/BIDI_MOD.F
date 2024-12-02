@@ -339,7 +339,7 @@ C--------------------------------------------------------------------------
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
 
-         CALL LOAD_MIO_FILE ( 'MEDIA_CONC', 0, 0, 0,
+         CALL LOAD_MIO_FILE ( MEDIA_CONC, 0, 0, 0,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -395,18 +395,6 @@ C--------------------------------------------------------------------------
             End Do
          End If
 
-#ifdef parallel_io
-         If ( FIRSTIME ) Then
-            FIRSTIME = .FALSE.
-            If ( .Not. IO_PE_INCLUSIVE ) Then
-               If ( .Not. OPEN3( MEDIA_CONC, FSREAD3, PNAME ) ) Then
-                  XMSG = 'Could not open ' // TRIM( MEDIA_CONC )
-                  Call M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-               End If
-            End If
-         End If
-#endif
-         
          call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
 
          Do V = 1, N_TOT ! species/media loop
