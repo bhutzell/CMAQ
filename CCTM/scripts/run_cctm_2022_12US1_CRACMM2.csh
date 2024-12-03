@@ -243,7 +243,7 @@ set ICpath    = $INPDIR/icbc/CMAQv54_2022_36US3_STAGE_CRACCM2_FROM_CB6R5       #
 set BCpath    = $INPDIR/icbc/CMAQv54_2022_108NHEMI_STAGE_CRACCM2_FROM_CB6R5M   #> boundary conditions input directory
 set EMISpath  = $INPDIR/emis/cracmmv2_20241031/cmaq_ready                      #> gridded emissions input directory
 set IN_PTpath = $INPDIR/emis/cracmmv2_20241031/cmaq_ready                      #> point source emissions input directory
-set IN_LTpath = $INPDIR/wwlls                                                  #> lightning NOx input directory
+set IN_LTpath = $INPDIR/wwllns                                                  #> lightning NOx input directory
 set METpath   = $INPDIR/met/WRFv4.4.2_LTNG_MCIP5.3.3                           #> meteorology input directory 
 #set JVALpath  = $INPDIR/jproc                                                 #> offline photolysis rate table directory
 #set OMIpath   = $BLD                                                          #> ozone column data for the photolysis model
@@ -270,6 +270,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set YYYYMMDD = `date -ud "${TODAYG}" +%Y%m%d` #> Convert YYYY-MM-DD to YYYYMMDD
   set YYYYMM = `date -ud "${TODAYG}" +%Y%m`     #> Convert YYYY-MM-DD to YYYYMM
   set YYMMDD = `date -ud "${TODAYG}" +%y%m%d`   #> Convert YYYY-MM-DD to YYMMDD
+  set YYYY   = `date -ud "${TODAYG}" +%Y`       #> Convert YYYY-MM-DD to YYYY
   set MM = `date -ud "${TODAYG}" +%m`           #> Convert YYYY-MM-DD to MM  
   set YYYYJJJ = $TODAYJ
 
@@ -295,7 +296,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Initial conditions
   if ($NEW_START == true || $NEW_START == TRUE ) then
-     setenv ICFILE ICON_CONC_12US1_CMAQv54_2022_36US3_STAGE_CRACCM2_FROM_CB6R5_regrid_20211222.nc
+#     setenv ICFILE ICON_CONC_12US1_CMAQv54_2022_36US3_STAGE_CRACCM2_FROM_CB6R5_regrid_20211222.nc
+     setenv ICFILE ICON_CONC_12US1_CMAQv54_2022_36US3_STAGE_CRACCM2_FROM_CB6R5_regrid_20220621.nc
      setenv INIT_MEDC_1 notused
   else
      set ICpath = $OUTDIR
@@ -701,7 +703,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv BNDY_CONC_1 $BCpath/$BCFILE
   setenv OMI $OMIpath/$OMIfile
   setenv MIE_TABLE $OUTDIR/mie_table_coeffs_${compilerString}.txt
-  setenv OPTICS_DATA $OMIpath/$OPTfile
+#  setenv OPTICS_DATA $OMIpath/$OPTfile
+  setenv OPTICS_DATA ${BLD}/$OPTfile
  #setenv XJ_DATA $JVALpath/$JVALfile
  
   #> species defn & photolysis
