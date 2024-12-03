@@ -623,22 +623,6 @@ C Create rain data file for soil NO
 C Final timestamp
       NDATE = EDATE; NTIME = ETIME
 
-#ifdef parallel_io
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. FLUSH3 ( SOILOUT ) ) THEN
-            MESG = 'Could not sync to disk ' // TRIM( SOILOUT )
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-      END IF
-      CALL SE_BARRIER
-      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( SOILOUT, FSREAD3, PNAME ) ) THEN
-            MESG = 'Could not open ' // TRIM( SOILOUT )
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-      END IF
-#endif
-
 C Write soil NO rain data file
       if ( FIRSTWRITE ) then
          call mio_setfile( MET_CRO_2D )

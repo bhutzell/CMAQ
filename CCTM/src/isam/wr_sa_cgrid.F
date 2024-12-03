@@ -99,8 +99,6 @@ C-----------------------------------------------------------------------
 
           ENDIF ! IO_PE_INCLUSIVE
 
-        CALL SUBST_BARRIER
-
         ALLOCATE ( ISAM_BUFF( NCOLS, NROWS, NLAYS, N_SPCTAG ),
      &     STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
