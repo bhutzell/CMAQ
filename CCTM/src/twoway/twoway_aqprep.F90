@@ -134,13 +134,12 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
   USE twoway_data_module
   USE HGRD_DEFN
   USE SE_MODULES
-
+  use const
   use se_comm_info_ext
   use utilio_defn
 
   IMPLICIT NONE
 
-  INCLUDE SUBST_CONST
   INCLUDE SUBST_MPI
 
   TYPE(domain), INTENT(IN)                :: grid
