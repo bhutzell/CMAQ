@@ -1283,8 +1283,9 @@ C-----------------------------------------------------------------------
 !     VDEMIS is the scaled emissions and VDEMIS0 is the emissions
 !     read in from each stream.
 !-----------------------------------------------------------------------
-      USE UTILIO_DEFN
-      USE VDIFF_MAP, only : DIFF_SPC ! Name for every Diffusion Module Species 
+      USE UTILIO_DEFN                                             
+      USE VDIFF_DATA, only : N_SPC_DIFF
+      USE VDIFF_MAP, only : DIFF_SPC, DIFF_MASK_NUM, DIFF_MASK_SRF 
 
       IMPLICIT NONE
 
@@ -1292,7 +1293,7 @@ C-----------------------------------------------------------------------
       INTEGER, INTENT( IN ) :: NL
       INTEGER, INTENT( IN ) :: ISRM
 
-      INTEGER :: ISPC
+      INTEGER :: ISPC, ILAY, ICOL, IROW, JCOL, JROW
       INTEGER :: STAT
       INTEGER :: ALOC( 4 )
       REAL    :: EMIS_MIN
@@ -1304,26 +1305,38 @@ C-----------------------------------------------------------------------
       EMIS_MIN = MINVAL( VDEMIS( :,1:NL,:,: ) )
       IF ( EMIS_MIN .GE. 0.0 ) RETURN
 
-      IF ( EMIS_MIN .LT. -1.0e-7 ) THEN
+      ! Loop through species to make sure correct threshold is applied
+      DO ISPC = 1,N_SPC_DIFF
+         EMIS_MIN = MINVAL( VDEMIS( ISPC,1:NL,:,: ) )
+         IF ( ( (DIFF_MASK_NUM( ISPC )) .AND. EMIS_MIN .LT. -1.0e11 ) .OR.
+     &        ( (DIFF_MASK_SRF( ISPC )) .AND. EMIS_MIN .LT. -0.1   ) .OR.
+     &        ( (.NOT.DIFF_MASK_NUM( ISPC ) .AND. .NOT. DIFF_MASK_SRF( ISPC )) 
+     &          .AND. EMIS_MIN .LT. -1.0e-7 ) ) THEN
 
-          STAT = 1
+           ! Threshold Exceeded. Model Must Crash
+           STAT = 1
 
-          ! Find Where the Most Negative Value Is and Exit
-          ALOC = MINLOC( VDEMIS( :,1:NL,:,: ) )
-          ISPC = ALOC( 1 )
+           ! Find Where the Most Negative Value Is and Exit
+           ALOC = MINLOC( VDEMIS( :,1:NL,:,: ) )
+           ILAY = ALOC( 2 )
+           ICOL = ALOC( 3 )
+           IROW = ALOC( 4 )
+           CALL GET_GLOBAL_COORDS( ICOL, IROW, JCOL, JROW )
 
-          WRITE( LOGDEV, '(/,5x,A,ES10.3,A,/,5x,3A,/,5x,A,/,5x,A)' ),
-     &      'ERROR: Invalid Negative emission rate ', EMIS_MIN, ' has been ',
-     &      ' detected for CMAQ species ',TRIM(DIFF_SPC( ISPC )),'.',
-     &      'Please inspect the Emission Control Namelist File (Search for ',
-     &      '"Reading Emission Control Namelist" in this Log File).'
-          XMSG = 'Negative Emissions Detected'
-          CALL M3EXIT( 'EMISS_NEG_CHECK', 0, 0, XMSG, XSTAT1 )
+           WRITE( LOGDEV, '(/,5x,A,ES10.3,A,/,5x,3A,/,5x,A,I3,A1,I3,A1,I2,A2)' ),
+     &       'ERROR: Invalid Negative emission rate ', EMIS_MIN, ' has been ',
+     &       'detected for CMAQ species ',TRIM(DIFF_SPC( ISPC )),' at gridcell',
+     &       '  (COL,ROW,LAY): (',JCOL,',',JROW,',',ILAY,').'
+           XMSG = 'Negative Emissions Detected'
+           CALL M3EXIT( 'EMISS_NEG_CHECK', 0, 0, XMSG, XSTAT1 )
 
-      ELSE ! reset slightly negative values to 0.0
-          WHERE ( VDEMIS .LT. 0.0 ) VDEMIS = 0.0
-      END IF
+        ELSE IF ( EMIS_MIN .LT. 0.0 ) THEN
+           ! Threshold was not exceeded, but there are negatives that
+           ! must be corrected.
+           WHERE ( VDEMIS( ISPC,1:NL,:,: ) .LT. 0.0 ) VDEMIS( ISPC,1:NL,:,: ) = 0.0
+        END IF
 
+      END DO  
       END FUNCTION DESID_CHECK_NEG    
 
 !-----------------------------------------------------------------------
