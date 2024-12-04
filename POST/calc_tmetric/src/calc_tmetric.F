@@ -37,6 +37,8 @@ C external functions
       character*(16) time2Str
 
 C local variables
+      character*(16), PARAMETER ::  PNAME = 'CALC_TMETRIC'
+      character*(16), PARAMETER  :: VERSION = '1.0'
       integer status
       logical lstatus
       integer logdev
@@ -46,16 +48,14 @@ C local variables
       character*(256)  infile
       character*(256)  outfile
       character*(256)  MSG
-      character*(16)  VNAME_IN(MXVARS3)
-      character*(16)  VUNITS_IN(MXVARS3)
-      character*(16) ::  PNAME = 'CALC_TMETRIC'
-      character*(16) :: VERSION = '1.0'
       real, allocatable :: in_data(:,:,:) 
       real, allocatable :: sum_data(:,:,:) 
       real, allocatable :: MIN_PARALLEL(:,:,:,:) 
       real, allocatable :: proc_parallel(:,:,:,:) 
       real, allocatable :: min_serial(:,:,:) 
       real, allocatable :: proc_serial(:,:,:) 
+      character*(16), ALLOCATABLE :: VNAME_IN( : )
+      character*(16), ALLOCATABLE :: VUNITS_IN( : )
       CHARACTER*(16), ALLOCATABLE :: OUT_VARNAME( : )
       CHARACTER*(16), ALLOCATABLE :: OUT_UNITS( : )
       integer lfn
@@ -164,6 +164,13 @@ C... set up metadata for output file
       ENDIF
       
       NVARS_IN = NVARS3D
+      ALLOCATE(  VNAME_IN(NVARS_IN),
+     &           VUNITS_IN(NVARS_IN), stat=status )
+      IF( STATUS .NE. 0 )THEN
+         MSG = 'Failure allocating VNAME_IN or VUNITS_IN'
+         CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
+      END IF    
+
       DO S = 1, NVARS_IN !obtain units for all species from first input file
        VNAME_IN(S)  = VNAME3D(S)
        VUNITS_IN(S) = UNITS3D(S)
@@ -244,7 +251,6 @@ C... open output file as new
 C... start process loop
 
       ! allocate data array for 1 species
-!     allocate( in_data(NCOLS, NROWS, NLAYS), stat=status )
       allocate( in_data(NCOLS, NROWS, NLAYS), 
      &          sum_data(NCOLS, NROWS, NLAYS), stat=status )
       IF ( status .NE. 0 ) THEN
@@ -252,16 +258,15 @@ C... start process loop
          CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
       END IF
 
-      PARALLEL_PROCESS = .FALSE.
       IF( PARALLEL_PROCESS )THEN
-      IF ( OPERATION_FLAG .GT. 2 ) THEN
-         ALLOCATE(  PROC_PARALLEL(NSPECVAR, NCOLS, NROWS, NLAYS),
-     &              MIN_PARALLEL(NSPECVAR, NCOLS, NROWS, NLAYS), stat=status )
-         MSG = 'Failure allocating PROC_PARALLEL or MIN_PARALLEL.'
-      ELSE
-         ALLOCATE( PROC_PARALLEL(NSPECVAR, NCOLS, NROWS, NLAYS), stat=status )
-         MSG = 'Failure allocating PROC_PARALLEL.'
-      END IF
+         IF ( OPERATION_FLAG .GT. 2 ) THEN
+            ALLOCATE(  PROC_PARALLEL(NSPECVAR, NCOLS, NROWS, NLAYS),
+     &                 MIN_PARALLEL(NSPECVAR, NCOLS, NROWS, NLAYS), stat=status )
+            MSG = 'Failure allocating PROC_PARALLEL or MIN_PARALLEL.'
+         ELSE
+            ALLOCATE( PROC_PARALLEL(NSPECVAR, NCOLS, NROWS, NLAYS), stat=status )
+            MSG = 'Failure allocating PROC_PARALLEL.'
+         END IF
       END IF
       
       IF( STATUS .NE. 0 )THEN
@@ -270,8 +275,6 @@ C... start process loop
           PARALLEL_PROCESS = .FALSE.
       END IF 
       
-      PARALLEL_PROCESS = .FALSE.
-
       IF( PARALLEL_PROCESS )THEN
           CALL PROCESS_PARALLEL
       ELSE
@@ -288,80 +291,6 @@ C... start process loop
       END IF
       
       
-!      DO N = 1, NLOOPS, OUTPUT_FREQ ! loop for each block average
-!         
-!          N_RETREIVE = MIN( N+AVG_TIME-1,NSTEPS)
-!          IF( N+AVG_TIME-1 .GT. NSTEPS ) EXIT ! Do not compute for incomplete sample
-!          N_SAMPLE  = 0
-!          
-!!  initial data array(s) based on wanted operation
-!          IF ( OPERATION_FLAG .EQ. 1 ) THEN       
-!            PROC_PARALLEL =  1.0E36
-!          ELSE IF ( OPERATION_FLAG .EQ. 2 ) THEN
-!            PROC_PARALLEL  = -1.0E36
-!          ELSE IF ( OPERATION_FLAG .EQ. 3 ) THEN
-!            PROC_PARALLEL  = -1.0E36
-!            MIN_PARALLEL   =  1.0E36
-!          ELSE
-!            PROC_PARALLEL = 0.0
-!          END IF
-!          DO NAVG = N, N_RETREIVE             
-!! have to determine if reading one timestep too many
-!              N_PULL = MIN( NAVG,NSTEPS ) 
-!              N_SAMPLE = N_SAMPLE + 1
-!              PULL_FLNAME = M3_FLNAME(STEP_FILE(N_PULL))
-!              PULL_DATE   = STEP_DATE(N_PULL)
-!              PULL_TIME   = STEP_TIME(N_PULL)
-!          
-!              DO S = 1, NSPECVAR
-!
-!                  IF( .NOT. READ3(PULL_FLNAME,SPECVARS(S),ALLAYS3,PULL_DATE,PULL_TIME,IN_DATA) )THEN
-!                      MSG = 'Could not read input Models-3 file ' // PULL_FLNAME
-!                      CALL M3ERR( PNAME, PULL_DATE, PULL_TIME, MSG, .FALSE. )             
-!                  END IF
-!
-!                  SELECT CASE ( OPERATION_FLAG )
-!                    CASE( -1 )
-!                       PROC_PARALLEL(S,:,:,:) = PROC_PARALLEL(S,:,:,:) + IN_DATA 
-!                    CASE( 0 )
-!                       PROC_PARALLEL(S,:,:,:) = PROC_PARALLEL(S,:,:,:) + IN_DATA 
-!                    CASE( 1 )
-!                       WHERE( PROC_PARALLEL(S,:,:,:) .GT. IN_DATA ) PROC_PARALLEL(S,:,:,:) = IN_DATA                   
-!                    CASE( 2 )
-!                       WHERE( PROC_PARALLEL(S,:,:,:) .LT. IN_DATA ) PROC_PARALLEL(S,:,:,:) = IN_DATA 
-!                    CASE( 3 )
-!                       WHERE( PROC_PARALLEL(S,:,:,:) .LT. IN_DATA ) PROC_PARALLEL(S,:,:,:) = IN_DATA 
-!                       WHERE( MIN_PARALLEL(S,:,:,:) .GT. IN_DATA ) MIN_PARALLEL(S,:,:,:) = IN_DATA                   
-!                  END SELECT                   
-!#ifdef verbose
-!                  IF ( NAVG .EQ. N_RETREIVE )THEN
-!                      write(*,'(''Done Processing species:'',a)') TRIM(SPECVARS(S))
-!                  END IF
-!#endif
-!              END DO ! NSPECVAR
-!#ifdef verbose
-!             WRITE(6,'(3(A),2(I8,1X))')'Reading ',TRIM(SPECVARS(S)),' at ', 
-!     &       PULL_DATE, PULL_TIME
-!#endif
-!          END DO ! NAVG
-!!          Write(*,'(''Done reading for species '',a,I4,a)') VNAME3D(S),N_SAMPLE,
-!!     &    ' timestep(s) read.'
-!          Write(*,'(''Done reading for species '',I4,'' timestep(s) read.'')') N_SAMPLE
-!c         compute average if desired, write out the results
-!          IF( OPERATION_FLAG .GT. 2 ) THEN
-!             PROC_PARALLEL = PROC_PARALLEL - MIN_PARALLEL
-!          ELSE IF ( OPERATION_FLAG .LT. 0 ) THEN
-!             PROC_PARALLEL = PROC_PARALLEL / REAL(N_SAMPLE,4)     
-!          END IF        
-!          write(6,'("writing for JDATE, JTIME = ",2(I8,1X))')PULL_DATE,PULL_TIME
-!          DO S = 1, NSPECVAR
-!              IF ( .NOT. WRITE3('OUTFILE', OUT_VARNAME(S), PULL_DATE,
-!     &                            PULL_TIME, PROC_PARALLEL(S,:,:,:)) ) THEN
-!                  MSG = ' Cannot write to OUTFILE for species ' // VNAME3D(S)
-!                  CALL M3EXIT( PNAME, STEP_DATE(N_PULL), STEP_TIME(N_PULL), MSG, 1 ) 
-!              ENDIF
-!          END DO ! NSPECVAR
-!      END DO ! NLOOP    
                
       WRITE(6,'(''finished output values'')')
 
@@ -507,11 +436,11 @@ c         compute average if desired, write out the results
                    Write(*,'(''Done reading for species '',I4,'' timestep(s) read.'')') N_SAMPLE
 c         compute average if desired, write out the results
                    IF( OPERATION_FLAG .GT. 2 ) THEN
-                      PROC_PARALLEL = PROC_PARALLEL - MIN_PARALLEL
+                      PROC_SERIAL = PROC_SERIAL - MIN_SERIAL
                    ELSE IF ( OPERATION_FLAG .LT. 0 ) THEN
-                      PROC_PARALLEL = PROC_PARALLEL / REAL(N_SAMPLE,4)
+                      PROC_SERIAL = PROC_SERIAL / REAL(N_SAMPLE,4)
                    END IF
-                   write(6,'("writing for JDATE, JTIME = ",2(I8,1X))')PULL_DATE,PULL_TIME
+                   WRITE(6,'("writing for JDATE, JTIME = ",2(I8,1X))')PULL_DATE,PULL_TIME
                    
                    IF ( .NOT. WRITE3('OUTFILE', OUT_VARNAME(S), PULL_DATE,PULL_TIME, PROC_SERIAL) ) THEN
                       MSG = ' Cannot write to OUTFILE for species ' // VNAME3D(S)
