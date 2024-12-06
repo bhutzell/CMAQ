@@ -25,16 +25,11 @@ C*******************************************************************************
       USE GRID_DATA
       USE TIME_STEP
       USE GET_ENV_VARS
+      USE PARSER
 
       USE M3UTILIO
 
       IMPLICIT NONE
-
-C external functions
-      CHARACTER(LEN=16) int2Str
-      CHARACTER(LEN=16) real2Str
-      CHARACTER(LEN=16) date2Str
-      CHARACTER(LEN=16) time2Str
 
 C local variables
       CHARACTER(LEN=16), PARAMETER ::  PNAME = 'CALC_TMETRIC'
@@ -450,79 +445,4 @@ c         compute average if desired, write out the results
 
          END  SUBROUTINE PROCESS_SEARIAL
       END PROGRAM CALC_TMETRIC
-C****************************************************************************
-C  routine to convert integer to string
-C****************************************************************************
-      Character*16 Function int2Str( value, fmt ) result(intStr)
-
-      IMPLICIT NONE
-
-      ! argument
-      Integer value
-      CHARACTER(LEN=*) fmt
-
-      Write(intStr,fmt) value
-      Call LeftTrim(intStr)
-      return
-      End Function int2Str   
-
-
-C****************************************************************************
-C  routine to convert real to string
-C****************************************************************************
-      Character*16 Function real2Str( value, fmt ) result(realStr)
-
-      IMPLICIT NONE
-
-      ! argument
-      Real value
-      CHARACTER(LEN=*) fmt
-
-      Write(realStr,fmt) value
-      Call LeftTrim(realStr)
-      return
-      End Function real2Str    
- 
-
-C****************************************************************************
-C  routine to convert date and time to string as "yyyy-mm-dd"
-C****************************************************************************
-      Character*16 Function date2Str( date ) result(dateStr)
- 
-      Implicit None
-
-      Integer date
- 
-C..  local variables
-      Integer month, day, year
- 
-      call DayMon( date, month, day )
-      year = date/1000
- 
-      write(dateStr,'(i4.4,''-'',i2.2,''-'',i2.2)') year, month, day
-
-      return
-      End Function date2Str
-
-
-C****************************************************************************
-C  routine to convert time to string as "HH:MM:SS"         
-C****************************************************************************
-      Character*16 Function time2Str( time ) result(timeStr)
-                                                              
-      Implicit None
-
-      Integer time                                      
-                                                              
-C..  local variables                                          
-      Integer hour, minutes, secs
-                                                              
-      hour = time/10000                                       
-      minutes = (time - 10000*hour)/100                       
-      secs = mod(time,100)                       
-                                                              
-      write(timeStr,'(i2.2,'':'',i2.2,'':'',i2.2)')   
-     &      hour,minutes,secs
-      return                                                  
-      End Function time2Str                                   
   
