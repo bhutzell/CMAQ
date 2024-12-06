@@ -623,7 +623,7 @@ C Map the user specified ISAM regions to available CMAQ regions
 C If this is a diagnostic call, and no diagnostics were requested, then
 C return
          IF ( L_DESID_DIAG .AND. 
-     &        .NOT. .ANY.(DESID_DIAG_STREAM_MASK(:,:)) ) RETURN
+     &        .NOT. ANY(DESID_DIAG_STREAM_MASK(:,:)) ) RETURN
 
 C Initialize Emissions Array
          VDEMIS_DIFF = 0.0
@@ -642,7 +642,7 @@ C Retrieve Emissions from All Stream Types
          IF ( DESID_N_SRM .GT. 0 ) THEN
 
          DO ISRM = 1,DESID_N_SRM
-           IF ( L_DESID_DIAG .AND. .ANY.(DESID_DIAG_STREAM_MASK( ISRM,: )) ) THEN
+           IF ( L_DESID_DIAG .AND. ANY(DESID_DIAG_STREAM_MASK( ISRM,: )) ) THEN
 
              DO R = 1,NROWS
              DO C = 1,NCOLS
