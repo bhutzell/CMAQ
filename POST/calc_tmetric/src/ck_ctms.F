@@ -45,10 +45,10 @@ C..PARAMETERS: None
 C..SAVED LOCAL VARIABLES: None
 
 C..SCRATCH LOCAL VARIABLES:
-      CHARACTER*80  MSG               ! Log message
-      CHARACTER*16  PNAME             ! Program Name
-      CHARACTER*15  VAL1              ! Character value of real
-      CHARACTER*15  VAL2              ! Character value of real
+      CHARACTER(80) MSG               ! Log message
+      CHARACTER(16) PNAME             ! Program Name
+      CHARACTER(15) VAL1              ! Character value of real
+      CHARACTER(15) VAL2              ! Character value of real
 
       INTEGER L, N      ! Loop indices
       INTEGER FTYPE1    ! File 1 file type

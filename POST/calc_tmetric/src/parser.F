@@ -25,8 +25,8 @@ C***********************************************************************
 C  Return the number of fields in record
       INTEGER FUNCTION getNumberOfFields( record, delimiter ) result( nfields )
 
-      CHARACTER*(*) record
-      CHARACTER*(1) delimiter
+      CHARACTER*(*), INTENT( IN ) :: record
+      CHARACTER*(1), INTENT( IN ) :: delimiter
       Integer getFieldCount
 
       Integer i
@@ -50,8 +50,8 @@ C  this method considers duplicate delimiters as one
       INTEGER FUNCTION getFieldCount(record, delimiter)
      &    result(nfields)
 
-      CHARACTER*(*) record
-      CHARACTER*(*) delimiter
+      CHARACTER*(*), INTENT( IN ) :: record
+      CHARACTER*(*), INTENT( IN ) :: delimiter
 
       Integer i
       Logical infield
@@ -83,10 +83,10 @@ C  this method considers duplicate delimiters as one
 C  Return the nth field of record
       Subroutine getField( record, delimiter, nth, field )
 
-      CHARACTER*(*) record
-      CHARACTER*(1) delimiter
-      Integer nth
-      CHARACTER*(*) field
+      CHARACTER*(*), INTENT( IN ) :: record
+      CHARACTER*(1), INTENT( IN ) :: delimiter
+      Integer, INTENT( IN ) :: nth
+      CHARACTER*(*), INTENT( OUT ) :: field
 
       Integer nfields
       Integer i, pos1
@@ -129,10 +129,10 @@ C  this method considers duplicate delimiters as one
 C
       Subroutine getField2( record, delimiter, nth, field )
  
-      CHARACTER*(*) record
-      CHARACTER*(*) delimiter
-      Integer nth
-      CHARACTER*(*) field
+      CHARACTER*(*), INTENT( IN ) :: record
+      CHARACTER*(*), INTENT( IN ) :: delimiter
+      Integer, INTENT( IN ) :: nth
+      CHARACTER*(*), INTENT( OUT ) :: field
  
       Integer nfields
       Integer i, pos1
@@ -174,8 +174,8 @@ C
 C  Return the number of parsed fields in record
       INTEGER FUNCTION getParsedNumber( record, delimiter ) result( nfields )
 
-      CHARACTER*(*) record
-      CHARACTER*(*) delimiter
+      CHARACTER*(*), INTENT( IN ) :: record
+      CHARACTER*(*), INTENT( IN ) :: delimiter
 
       Integer i
 
@@ -190,11 +190,11 @@ C  Return the number of parsed fields in record
 C  Return the nth field of record
       Subroutine getParsedField( record, delimiter, nth, field, includeDel )
 
-      CHARACTER*(*) record
-      CHARACTER*(*) delimiter
-      Integer nth
-      CHARACTER*(*) field
-      Logical includeDel 
+      CHARACTER*(*), INTENT( IN ) :: record
+      CHARACTER*(*), INTENT( IN ) :: delimiter
+      Integer, INTENT( IN ) :: nth
+      CHARACTER*(*), INTENT( OUT ) :: field
+      Logical, INTENT( IN ) :: includeDel 
 
       Integer nfields
       Integer i, pos1
@@ -234,11 +234,11 @@ C***********************************************************************
  
       IMPLICIT NONE
  
-      CHARACTER*(*) record
-      CHARACTER*(*) delimiter
-      CHARACTER del
-      Integer nth
-      CHARACTER*(*) field
+      CHARACTER*(*), INTENT( IN ) :: record
+      CHARACTER*(*), INTENT( IN ) :: delimiter
+      CHARACTER, INTENT( OUT ) :: del
+      Integer, INTENT( IN ) :: nth
+      CHARACTER*(*), INTENT( OUT ) :: field
  
       Integer nfields
       Integer i, pos1
@@ -282,8 +282,8 @@ C***********************************************************************
  
       IMPLICIT NONE
  
-      CHARACTER*(*) record
-      CHARACTER*(*) delimiter
+      CHARACTER*(*), INTENT( IN ) :: record
+      CHARACTER*(*), INTENT( IN ) :: delimiter
  
       Integer i
       Logical isDel
@@ -307,7 +307,7 @@ C  routine to remove leading blank spaces from Character String
 C****************************************************************************
       Subroutine LeftTrim( STRING )
 
-      CHARACTER*(*) STRING
+      CHARACTER*(*), INTENT( INOUT ) :: STRING
       Integer I
 
       Do I=1,LEN(STRING)
@@ -325,7 +325,7 @@ C  routine to remove trailing white spaces from Character String
 C****************************************************************************
       Subroutine RightTrim( STRING )
  
-      CHARACTER*(*) STRING
+      CHARACTER*(*), INTENT( INOUT ) :: STRING
       Integer I
  
       Do I=LEN(STRING),1,-1
@@ -345,7 +345,7 @@ C****************************************************************************
       Implicit none
       
       ! arguments                                                                      
-      Character*(*) string
+      Character*(*), INTENT( INOUT ) :: string
  
       Integer last, i
  
@@ -373,7 +373,7 @@ C***********************************************************************
  
       IMPLICIT NONE
  
-      CHARACTER STR*( * )
+      CHARACTER, INTENT( INOUT ) :: STR*( * )
       INTEGER I
       INTEGER K
  

@@ -23,7 +23,7 @@ C
 C*************************************************************************
       MODULE SPECIES
 
-      Character*(16) :: SPECVARS(2048) = ''
+      CHARACTER(LEN=16) :: SPECVARS(2048) = ''
       INTEGER        :: NSPECVAR       = 0
  
       CONTAINS
@@ -42,8 +42,8 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          ! local variables
          Integer k, n
          Integer status
-         Character*(16)  varname
-         Character*(16)  field   
+         CHARACTER(LEN=16)  varname
+         CHARACTER(LEN=16)  field   
 
          NSPECVAR = 0
          CALL GET_ENVLIST ( 'SPECIES', NSPECVAR, SPECVARS, STATUS )
@@ -55,9 +55,6 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
                   SPECVARS( N ) = VNAME3D( N )
                END DO 
             END IF
-            DO N = 1,NSPECVAR
-               WRITE(6,'("N, SPECVARS( N ) = ",I5,1X,A16)')N,SPECVARS( N )
-            END DO 
          ELSE
             WRITE(6,*)'Environment Variable SPECIES not found'
             STOP

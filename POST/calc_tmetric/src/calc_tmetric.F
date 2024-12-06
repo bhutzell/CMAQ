@@ -31,33 +31,33 @@ C*******************************************************************************
       IMPLICIT NONE
 
 C external functions
-      character*(16) int2Str
-      character*(16) real2Str
-      character*(16) date2Str
-      character*(16) time2Str
+      CHARACTER(LEN=16) int2Str
+      CHARACTER(LEN=16) real2Str
+      CHARACTER(LEN=16) date2Str
+      CHARACTER(LEN=16) time2Str
 
 C local variables
-      character*(16), PARAMETER ::  PNAME = 'CALC_TMETRIC'
-      character*(16), PARAMETER  :: VERSION = '1.0'
+      CHARACTER(LEN=16), PARAMETER ::  PNAME = 'CALC_TMETRIC'
+      CHARACTER(LEN=16), PARAMETER  :: VERSION = '1.0'
       integer status
       logical lstatus
       integer logdev
       INTEGER NVARS_IN, KSWIT
-      character*(3)  c_proc
-      character*(16)  field
-      character*(256)  infile
-      character*(256)  outfile
-      character*(256)  MSG
+      CHARACTER(LEN=3)  c_proc
+      CHARACTER(LEN=16)  field
+      CHARACTER(LEN=256)  infile
+      CHARACTER(LEN=256)  outfile
+      CHARACTER(LEN=256)  MSG
       real, allocatable :: in_data(:,:,:) 
       real, allocatable :: sum_data(:,:,:) 
       real, allocatable :: MIN_PARALLEL(:,:,:,:) 
       real, allocatable :: proc_parallel(:,:,:,:) 
       real, allocatable :: min_serial(:,:,:) 
       real, allocatable :: proc_serial(:,:,:) 
-      character*(16), ALLOCATABLE :: VNAME_IN( : )
-      character*(16), ALLOCATABLE :: VUNITS_IN( : )
-      CHARACTER*(16), ALLOCATABLE :: OUT_VARNAME( : )
-      CHARACTER*(16), ALLOCATABLE :: OUT_UNITS( : )
+      CHARACTER(LEN=16), ALLOCATABLE :: VNAME_IN( : )
+      CHARACTER(LEN=16), ALLOCATABLE :: VUNITS_IN( : )
+      CHARACTER(LEN=16), ALLOCATABLE :: OUT_VARNAME( : )
+      CHARACTER(LEN=16), ALLOCATABLE :: OUT_UNITS( : )
       integer lfn
       integer i, s, t, idx, K, N, NAVG
       integer col, row, lay
@@ -113,15 +113,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 
 C... get operation (SUM or AVG)
-!     CALL ENVSTR( 'OPERATION', 'Operation to be peformed - SUM or AVG', 'SUM', c_proc, status)
-      CALL GET_ENV_STRING( 'OPERATION', 'Operation to be peformed - SUM or AVG', 'SUM', C_PROC, STATUS )
-
-!      IF ( ( C_PROC .NE. 'SUM') .AND. ( C_PROC .NE. 'AVG') )THEN
-!        WRITE(6,'("OPERATIONS set to ",A)')TRIM( C_PROC )
-!        CALL M3ERR(PNAME, 0, 0, 'Must set OPERATION to SUM or AVG', .TRUE.)      
-!      ENDIF
-!      
-!      IF( C_PROC .EQ. 'AVG' )COMPUTE_AVG = .TRUE.
+      CALL GET_ENV_STRING( 'OPERATION', 'Operation to be peformed: AVG,SUM,MAX,MIN,RNG', 'AVG', C_PROC, STATUS )
 
       SELECT CASE ( C_PROC )
         CASE( 'AVG' )
@@ -138,10 +130,8 @@ C... get operation (SUM or AVG)
         CASE DEFAULT
             WRITE(6,'("OPERATIONS set to ",A)')TRIM( C_PROC )
             CALL M3ERR(PNAME, 0, 0, 
-     &      'Must set OPERATION to MAX, MIN, RNG (Range_, SUM or AVG', .TRUE.)      
+     &      'Must set OPERATION to MAX, MIN, RNG (Range), SUM or AVG', .TRUE.)      
       END SELECT
-      WRITE(6,'("Operational Flag, COMPUTE_AVG = ",I3,", ",L4)')OPERATION_FLAG,
-     & COMPUTE_AVG      
       
 C... get species definitions from system variables
       Call loadSpecies()
@@ -167,7 +157,7 @@ C... set up metadata for output file
       ALLOCATE(  VNAME_IN(NVARS_IN),
      &           VUNITS_IN(NVARS_IN), stat=status )
       IF( STATUS .NE. 0 )THEN
-         MSG = 'Failure allocating VNAME_IN or VUNITS_IN'
+         MSG = 'Failure allocating PROC_PARALLEL or MIN_PARALLEL'
          CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
       END IF    
 
@@ -218,8 +208,8 @@ C... set up metadata for output file
 ! start date and time of output file
       N_PULL  = MAX( AVG_TIME-1,1 )
       N_PULL  = MAX( AVG_TIME,1 )
-      SDATE3D = STEP_DATE( N_PULL )
-      STIME3D = STEP_TIME( N_PULL )
+      SDATE3D = STEP_DATE( 1 )
+      STIME3D = STEP_TIME( 1 )
       
       NVARS3D = NSPECVAR    !number of output species from module_spec 
       ALLOCATE( OUT_VARNAME( NSPECVAR ),
@@ -312,6 +302,9 @@ C... shut down ioapi
          SUBROUTINE PROCESS_PARALLEL()
            IMPLICIT NONE
 
+           INTEGER :: WRITE_DATE
+           INTEGER :: WRITE_TIME
+
            DO N = 1, NLOOPS, OUTPUT_FREQ ! loop for each block average
       
                N_RETREIVE = MIN( N+AVG_TIME-1,NSTEPS)
@@ -328,6 +321,8 @@ C... shut down ioapi
                ELSE
                  PROC_PARALLEL = 0.0
                END IF
+               WRITE_DATE   = STEP_DATE(N)
+               WRITE_TIME   = STEP_TIME(N)
                DO NAVG = N, N_RETREIVE
 ! have to determine if reading one timestep too many
                   N_PULL = MIN( NAVG,NSTEPS )
@@ -374,12 +369,12 @@ c         compute average if desired, write out the results
                ELSE IF ( OPERATION_FLAG .LT. 0 ) THEN
                   PROC_PARALLEL = PROC_PARALLEL / REAL(N_SAMPLE,4)
                END IF
-               WRITE(6,'("writing for JDATE, JTIME = ",2(I8,1X))')PULL_DATE,PULL_TIME
+               WRITE(6,'("writing for JDATE, JTIME = ",2(I8,1X))')WRITE_DATE,WRITE_TIME
                DO S = 1, NSPECVAR
-                   IF ( .NOT. WRITE3('OUTFILE', OUT_VARNAME(S), PULL_DATE,
-     &                                 PULL_TIME, PROC_PARALLEL(S,:,:,:)) ) THEN
+                   IF ( .NOT. WRITE3('OUTFILE', OUT_VARNAME(S), WRITE_DATE,
+     &                                 WRITE_TIME, PROC_PARALLEL(S,:,:,:)) ) THEN
                        MSG = ' Cannot write to OUTFILE for species ' // VNAME3D(S)
-                       CALL M3EXIT( PNAME, STEP_DATE(N_PULL), STEP_TIME(N_PULL), MSG, 1 )
+                       CALL M3EXIT( PNAME, WRITE_DATE, WRITE_TIME, MSG, 1 )
                    ENDIF
                END DO ! NSPECVAR
            END DO ! NLOOP
@@ -388,6 +383,8 @@ c         compute average if desired, write out the results
          SUBROUTINE PROCESS_SEARIAL()
            IMPLICIT NONE
            
+           INTEGER :: WRITE_DATE
+           INTEGER :: WRITE_TIME
            
            DO S = 1, NSPECVAR
               DO N = 1, NLOOPS, OUTPUT_FREQ ! loop for each block average
@@ -406,6 +403,8 @@ c         compute average if desired, write out the results
                   ELSE
                     PROC_SERIAL = 0.0
                   END IF
+                  WRITE_DATE   = STEP_DATE(N)
+                  WRITE_TIME   = STEP_TIME(N)
                   DO NAVG = N, N_RETREIVE
 ! have to determine if reading one timestep too many
                      N_PULL = MIN( NAVG,NSTEPS )
@@ -440,11 +439,11 @@ c         compute average if desired, write out the results
                    ELSE IF ( OPERATION_FLAG .LT. 0 ) THEN
                       PROC_SERIAL = PROC_SERIAL / REAL(N_SAMPLE,4)
                    END IF
-                   WRITE(6,'("writing for JDATE, JTIME = ",2(I8,1X))')PULL_DATE,PULL_TIME
+                   WRITE(6,'("writing for JDATE, JTIME = ",2(I8,1X))')WRITE_DATE,WRITE_TIME
                    
-                   IF ( .NOT. WRITE3('OUTFILE', OUT_VARNAME(S), PULL_DATE,PULL_TIME, PROC_SERIAL) ) THEN
+                   IF ( .NOT. WRITE3('OUTFILE', OUT_VARNAME(S), WRITE_DATE,WRITE_TIME, PROC_SERIAL) ) THEN
                       MSG = ' Cannot write to OUTFILE for species ' // VNAME3D(S)
-                      CALL M3EXIT( PNAME, STEP_DATE(N_PULL), STEP_TIME(N_PULL), MSG, 1 )
+                      CALL M3EXIT( PNAME, WRITE_DATE, WRITE_TIME, MSG, 1 )
                    ENDIF
               END DO ! NLOOP
            END DO ! NSPECVAR
@@ -460,7 +459,7 @@ C****************************************************************************
 
       ! argument
       Integer value
-      Character*(*) fmt
+      CHARACTER(LEN=*) fmt
 
       Write(intStr,fmt) value
       Call LeftTrim(intStr)
@@ -477,7 +476,7 @@ C****************************************************************************
 
       ! argument
       Real value
-      Character*(*) fmt
+      CHARACTER(LEN=*) fmt
 
       Write(realStr,fmt) value
       Call LeftTrim(realStr)
