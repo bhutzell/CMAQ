@@ -4,6 +4,7 @@
 
 ifndef compiler
 #compiler = intel
+#compiler = intelx
 #compiler = gcc
  compiler = pgi
 #compiler = nvhpc
@@ -18,7 +19,18 @@ ifeq "$(compiler)" "intel"
  f90_FLAGS = -free -132 -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -mp1  -I . 
  F90_FLAGS = $(f90_FLAGS)
  C_FLAGS   =  -O2  -DFLDMN=1
- LINK_FLAGS = 
+ LINK_FLAGS =  -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -fp-model=strict  -I .
+
+else ifeq "$(compiler)" "intelx"
+
+ FC = ifx
+ CC = icx
+ f_FLAGS   = -fixed -132 -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -fp-model=strict  -I .
+ F_FLAGS   = $(f_FLAGS)
+ f90_FLAGS = -free -132 -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -fp-model=strict  -I .
+ F90_FLAGS = $(f90_FLAGS)
+ C_FLAGS   =  -O2  -DFLDMN=1
+ LINK_FLAGS =  -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -fp-model=strict  -I .
 
 else ifeq "$(compiler)" "pgi"
 
