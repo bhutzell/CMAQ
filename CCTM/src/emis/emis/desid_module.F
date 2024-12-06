@@ -1286,8 +1286,22 @@ C-----------------------------------------------------------------------
       FUNCTION DESID_CHECK_NEG( VDEMIS, ISRM, NL ) RESULT( STAT )
 
 !     Check Emissions Array for negative values and exit if negative values
-!     exceed tolerance of 1.0E-7. Emissions that are negative but within 
-!     tolerance are set to 0.0.
+!     exceed tolerance of 1.0E-7 for gas or aerosol mass emission rates.
+!     This value was chosen through trial and error for detection of
+!     obvious issues with negative inputs. Users should increase or
+!     decrease this tolerance corresponding to the level of quality they
+!     require for their application.
+!          
+!     Number and surface area emission rates are scaled up consistent
+!     with assuming approximately 1 um particles. Because there are so
+!     many potentially varying parameters (e.g. particle size, density,
+!     mode standard deviation, etc.), the relationships between the mass
+!     threshold and number/surface area thresholds are somewhat arbitrary. 
+!
+!     In all cases, thresholds are set to provide some layer of
+!     protection against egregious errors in emissions input files.
+!          
+!     Emissions that are negative but within tolerance are set to 0.0.
 !     VDEMIS is the scaled emissions and VDEMIS0 is the emissions
 !     read in from each stream.
 !-----------------------------------------------------------------------
