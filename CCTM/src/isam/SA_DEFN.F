@@ -508,34 +508,37 @@ c----------------------------------------------------------
 
         ! PRESCRIBE VOC SPECIES
         !CB6R3_AE7_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 1 )%LIST( 28 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 1 )%LIST( 29 ) )
         ISAM_SPEC_VOC( 1 )%LIST = (/'ALD2   ','ALDX   ','ETH    ',
      &          'ETHA   ','ETOH   ','FORM   ','IOLE   ','ISOP   ',
      &          'MEOH   ','OLE    ','PAR    ','TERP   ','TOL    ',
      &          'XYLMN  ','NAPH   ','ETHY   ','PRPA   ','ACET   ',
      &          'KET    ','GLY    ','BENZENE','GLYD   ','MEPX   ',
-     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   '/)
+     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   ',
+     &          'PCVOC  '/)
 
         !CB6R5_AE7_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 2 )%LIST( 28 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 2 )%LIST( 29 ) )
         ISAM_SPEC_VOC( 2 )%LIST = (/'ALD2   ','ALDX   ','ETH    ',
      &          'ETHA   ','ETOH   ','FORM   ','IOLE   ','ISOP   ',
      &          'MEOH   ','OLE    ','PAR    ','TERP   ','TOL    ',
      &          'XYLMN  ','NAPH   ','ETHY   ','PRPA   ','ACET   ',
      &          'KET    ','GLY    ','BENZENE','GLYD   ','MEPX   ',
-     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   '/)
+     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   ',
+     &          'PCVOC  '/)
 
         !CB6R5M_AE7_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 3 )%LIST( 28 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 3 )%LIST( 29 ) )
         ISAM_SPEC_VOC( 3 )%LIST = (/'ALD2   ','ALDX   ','ETH    ',
      &          'ETHA   ','ETOH   ','FORM   ','IOLE   ','ISOP   ',
      &          'MEOH   ','OLE    ','PAR    ','TERP   ','TOL    ',
      &          'XYLMN  ','NAPH   ','ETHY   ','PRPA   ','ACET   ',
      &          'KET    ','GLY    ','BENZENE','GLYD   ','MEPX   ',
-     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   '/)
+     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   ',
+     &          'PCVOC  '/)
 
         !SAPRC07TC_AE6_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 4 )%LIST( 41 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 4 )%LIST( 42 ) )
         ISAM_SPEC_VOC( 4 )%LIST = (/'HCHO       ','CCHO       ',
      &  'RCHO       ','xHCHO      ','xCCHO      ','xRCHO      ',
      &  'ALK1       ','ALK2       ','ALK3       ','ALK4       ',
@@ -546,10 +549,10 @@ c----------------------------------------------------------
      &  'TOLUENE    ','MXYL       ','OXYL       ','PXYL       ',
      &  'NAPHTHAL   ','ARO1       ','ARO2MN     ','BUTADIENE13',
      &  'ACROLEIN   ','ACETONE    ','MEK        ','MVK        ',
-     &  'MACR       ','SOAALK     ','CO         '/ )
+     &  'MACR       ','SOAALK     ','CO         ','PCVOC      '/ )
 
         !SAPRC07TIC_AE6I_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 5 )%LIST( 41 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 5 )%LIST( 42 ) )
         ISAM_SPEC_VOC( 5 )%LIST = (/'HCHO       ','CCHO       ',
      &  'RCHO       ','xHCHO      ','xCCHO      ','xRCHO      ',
      &  'ALK1       ','ALK2       ','ALK3       ','ALK4       ',
@@ -560,10 +563,10 @@ c----------------------------------------------------------
      &  'TOLUENE    ','MXYL       ','OXYL       ','PXYL       ',
      &  'NAPHTHAL   ','ARO1       ','ARO2MN     ','BUTADIENE13',
      &  'ACROLEIN   ','ACETONE    ','MEK        ','MVK        ',
-     &  'MACR       ','SOAALK     ','CO         '/ )
+     &  'MACR       ','SOAALK     ','CO         ','PCVOC      '/ )
 
         !SAPRC07TIC_AE7I_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 41 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 42 ) )
         ISAM_SPEC_VOC( 6 )%LIST = (/'HCHO       ','CCHO       ',
      &  'RCHO       ','xHCHO      ','xCCHO      ','xRCHO      ',
      &  'ALK1       ','ALK2       ','ALK3       ','ALK4       ',
@@ -574,7 +577,7 @@ c----------------------------------------------------------
      &  'TOLUENE    ','MXYL       ','OXYL       ','PXYL       ',
      &  'NAPHTHAL   ','ARO1       ','ARO2MN     ','BUTADIENE13',
      &  'ACROLEIN   ','ACETONE    ','MEK        ','MVK        ',
-     &  'MACR       ','SOAALK     ','CO         '/ )
+     &  'MACR       ','SOAALK     ','CO         ','PCVOC      '/ )
 
         !RACM2_AE6_AQ
         ALLOCATE( ISAM_SPEC_VOC( 7 )%LIST( 38 ) )
