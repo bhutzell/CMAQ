@@ -642,7 +642,8 @@ C Retrieve Emissions from All Stream Types
          IF ( DESID_N_SRM .GT. 0 ) THEN
 
          DO ISRM = 1,DESID_N_SRM
-           IF ( L_DESID_DIAG .AND. ANY(DESID_DIAG_STREAM_MASK( ISRM,: )) ) THEN
+           IF ( (L_DESID_DIAG .AND. ANY(DESID_DIAG_STREAM_MASK( ISRM,: ))) 
+     &          .OR. .NOT. L_DESID_DIAG ) THEN
 
              DO R = 1,NROWS
              DO C = 1,NCOLS
