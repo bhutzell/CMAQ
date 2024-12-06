@@ -683,6 +683,7 @@
 !         subroutine mio_define_global_attribute_information (file_data, replacement)
           subroutine mio_define_global_attribute_information (file_data)
 
+            include 'netcdf.inc'
             type (mio_file_record), intent(in) :: file_data
 !           character (*), intent(in) :: replacement
 
@@ -725,16 +726,35 @@
                      end if
                   end if
 
-                  stat = nf90_put_att (file_data%fileid,             &
-                                       nf90_global,                  &
-                                       file_data%glo_att_name(n),    &
-                                       c_val(1:e-s+1))
-!                                      file_data%glo_att_cval(s:e))
 
-                  if (stat .ne. nf90_noerr) then
+! At least for some versions of I/O API, it is necessary that every species in VAR-LIST
+! be 16 characters. The NF90 wrapper applies a LEN_TRIM function to determine the 
+! number of characters being written, which leads to the last species not being blank-
+! padded, which results in the file not being openable by I/O API. 
+! Use the F77 call as a workaround.
+
+!                  stat = nf90_put_att (file_data%fileid,             &
+!                                       nf90_global,                  &
+!                                       file_data%glo_att_name(n),    &
+!                                       c_val(1:e-s+1))
+!!                                      file_data%glo_att_cval(s:e))
+!
+!                  if (stat .ne. nf90_noerr) then
+!                     error = .true.
+!                     write (mio_logdev, *) ' Calling nf90_put_att for char type in routine ', pname, ' for attribute # ', n
+!                     write (mio_logdev, *) ' Error: ', trim(nf90_strerror(stat))
+!                  end if
+
+                  stat = nf_put_att_text ( file_data%fileid,          &
+                                           nf_global,                 &
+                                           file_data%glo_att_name(n), &
+                                           e-s+1,                     &
+                                           c_val(1:e-s+1) )
+
+                  if (stat .ne. nf_noerr) then
                      error = .true.
-                     write (mio_logdev, *) ' Calling nf90_put_att for char type in routine ', pname, ' for attribute # ', n
-                     write (mio_logdev, *) ' Error: ', trim(nf90_strerror(stat))
+                     write (mio_logdev, *) ' Calling nf_put_att_text for char type in routine ', pname, ' for attribute # ', n
+                     write (mio_logdev, *) ' Error: ', trim(nf_strerror(stat))
                   end if
 
                else if (file_data%glo_att_type(n) .eq. nf90_int) then

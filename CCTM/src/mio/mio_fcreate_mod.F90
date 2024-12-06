@@ -995,7 +995,8 @@
                 if (mio_file_data(dest)%glo_att_type(n) .eq. nf90_char) then
                    if (n .eq. 31) then   ! VAR-LIST
                       s2 = e2 + 1
-                      e2 = s2 + nvars * 16
+!                     e2 = s2 + nvars * 16
+                      e2 = s2 + nvars * 16 - 1
                       mio_file_data(dest)%glo_att_cval(s2:e2) = vlist(1:nvars*16)
                       mio_file_data(dest)%glo_att_len(1:n)    = nvars * 16
                    else
