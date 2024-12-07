@@ -117,12 +117,6 @@ C-----------------------------------------------------------------------
             loc_units = mio_file_data(floc)%units
 #else
 
-            IF ( .NOT. OPEN3( STKENAME( N ), FSREAD3, PNAME ) ) THEN
-               XMSG = 'Could not open '// TRIM( STKENAME( N ) ) // ' file'
-               CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-               SUCCESS = .FALSE.; RETURN
-            END IF
-
             floc = mio_search (STKENAME( N ))
 
             call mio_get_global_attr (STKENAME( N ), 'SDATE', lsdate)

@@ -252,7 +252,7 @@
         integer, allocatable :: n_cio_stack_emis_vars(:),
      &                          cio_stack_file_loc(:),
      &                          n_cio_stack_emis_lays(:),
-     &                          n_cio_stack_emis_pts(:),
+     &                          n_cio_stack_emis_pts(:),      ! this variable seems duplicative and useless
      &                          cio_stack_emis_data_inx (:,:,:,:),
      &                          head_stack_emis(:,:), tail_stack_emis(:,:),  ! head and tail of the stack emis data circular buffer
      &                          cio_stack_emis_data_tstamp(:,:,:,:)
@@ -4687,12 +4687,6 @@ C   mminlu and num_land_cat are WRF global variables
           do pt = 1, NPTGRPS
              WRITE( cio_stack_file_name(pt), '( "STK_EMIS_",I3.3 )' ) pt
 
-! XTRACT3 still being used in retrieve_stack_data, so we need to open these files with IOAPI
-             IF ( .NOT. OPEN3( cio_stack_file_name( pt ), FSREAD3, PNAME ) ) THEN
-                XMSG = 'Could not open '// TRIM( cio_stack_file_name( pt ) ) // ' file'
-                CALL LOG_MESSAGE( LOGDEV ,  XMSG )
-             END IF
-
              call mio_fopen (cio_stack_file_name( pt ), mio_read_only)
              n_opened_file = n_opened_file + 1
              f_stk_emis(pt) = n_opened_file
@@ -5585,12 +5579,12 @@ C Read the various categories of normalized emissions
           LOGICAL, SAVE :: firstime = .true.
           INTEGER :: STAT, i, j, begin, end, buf_loc, iterations,
      &               iter, loc_jdate, loc_jtime, v, beg_v, end_v, 
-     &               beg_pt, end_pt, pt, fnum
+     &               beg_pt, end_pt, pt, fnum, my_pt
 
           CHARACTER( 120 ) :: XMSG = ' '
           CHARACTER( 20  ) :: timestamp
 
-          real, allocatable :: tdata_1dr( : )
+          real, allocatable :: tdata_3d( :,:,: )
 
           if (firstime) then
 
@@ -5613,9 +5607,8 @@ C Read the various categories of normalized emissions
           end if
 
           do pt = beg_pt, end_pt
-
-             allocate (tdata_1dr(nsrc(pt)), stat=stat)
-
+             my_pt = my_end_src(pt) - my_strt_src(pt) + 1
+             allocate (tdata_3d(1,my_pt,1), stat=stat)
              if (firstime) then
                 loc_jdate = jdate
                 if (file_sym_date(f_stk_emis(pt))) loc_jdate = file_sdate(f_stk_emis(pt)) ! Representative day check
@@ -5646,24 +5639,20 @@ C Read the various categories of normalized emissions
                    end   = cio_stack_emis_data_inx(2, buf_loc, v, pt)
 
                    if ( (begin .gt. 0) .and. (my_nsrc(pt) .gt. 0) ) then
-                      IF ( .NOT. XTRACT3( cio_stack_file_name(pt), cio_stack_var_name(v, pt), 
-     &                                    1,1, MY_STRT_SRC( pt ),MY_END_SRC( pt), 1,1,
-     &                                    loc_jdate, loc_jtime, cio_stack_data(begin:end) ) ) THEN
-                         XMSG = 'Could not extract ' // cio_stack_file_name(pt) // ' file'
-                         CALL M3EXIT ( PNAME, loc_jdate, loc_jtime, XMSG, XSTAT1 )
-                      END IF
-! WRONG
-!                      call mio_fread( cio_stack_file_name(pt), 
-!     &                                cio_stack_var_name(v, pt), 
-!     &                                pname, 
-!     &                                cio_stack_data(begin:end), timestamp )
+
+                      call mio_fread( cio_stack_file_name(pt), 
+     &                                cio_stack_var_name(v, pt), pname, 
+     &                                1,1, my_strt_src(pt),my_end_src(pt), 1,1,
+     &                                tdata_3d(1:1,:,1:1), timestamp )
+
+                      cio_stack_data(begin:end) = reshape(tdata_3d, (/ my_pt /))
                    end if
                 end do
 
                 CALL NEXTIME ( loc_jdate, loc_jtime, file_tstep(f_stk_emis(pt)) )
              end do  ! end iter
 
-             deallocate (tdata_1dr)
+             deallocate (tdata_3d)
 
           end do
 
