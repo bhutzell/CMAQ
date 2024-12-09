@@ -59,7 +59,7 @@
           end if
 
           if (t .gt. 0) then
-             write (mio_logdev, '(a16, a25)') fname, ' has already been opened '
+             write (mio_logdev, '(a, a25)') trim(fname), ' has already been opened '
              return
           end if 
 

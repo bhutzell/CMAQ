@@ -95,39 +95,6 @@ C-----------------------------------------------------------------------
 
 C open cross file for subsequent comparison
 
-!        BNAME = TRIM( GRID_CRO_2D )
-
-!        IF ( .NOT. OPEN3( BNAME, FSREAD3, PNAME ) ) THEN
-!           XMSG = 'Could not open '// BNAME
-!           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-!           END IF
-
-!        IF ( .NOT. DESC3( BNAME ) ) THEN
-!           XMSG = 'Could not get ' // BNAME // ' file description'
-!           CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
-!           END IF
-
-C set base header data
-
-!        XORIG_B = XORIG3D
-!        YORIG_B = YORIG3D
-!        XCENT_B = XCENT3D
-!        YCENT_B = YCENT3D
-!        XCELL_B = XCELL3D
-!        YCELL_B = YCELL3D
-
-C Scale resolution
-
-!        XCELL_B = REAL( IDNINT( TENK * XCELL_B ), 8 ) / TENK
-!        YCELL_B = REAL( IDNINT( TENK * YCELL_B ), 8 ) / TENK
-
-C Convert to grid cell coord and truncate
-
-!        XORIG_B = XORIG_B / XCELL_B
-!        XORIG_B = REAL( IDNINT( ONEK * XORIG_B ), 8 ) / ONEK
-!        YORIG_B = YORIG_B / YCELL_B
-!        YORIG_B = REAL( IDNINT( ONEK * YORIG_B ), 8 ) / ONEK
-
          XORIG_C = XORIG_GD / XCELL_GD
          XORIG_C = REAL( IDNINT( ONEK * XORIG_C ), 8 ) / ONEK
          YORIG_C = YORIG_GD / YCELL_GD
@@ -135,59 +102,14 @@ C Convert to grid cell coord and truncate
 
       END IF   ! FIRSTIME
 
-C open existing file for readonly access
-
-!     IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
-!        XMSG = 'Could not open '// FNAME
-!        CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-!     END IF
-
-!     IF ( .NOT. DESC3( FNAME ) ) THEN
-!        XMSG = 'Could not get ' // TRIM( FNAME )
-!    &        // ' file description'
-!        CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
-!     END IF
-
-!     call mio_fopen (FNAME, mio_read_only)
-
-C check some header data against the reference file in this met set -
-C mother grid center and grid cell resolution
-
-!     IF ( ABS( XCENT3D - XCENT_B ) .GT.
-!    &     TOL * ABS( XCENT3D + XCENT_B + TOL ) .OR.
-!    &     ABS( YCENT3D - YCENT_B ) .GT.
-!    &     TOL * ABS( YCENT3D + YCENT_B + TOL ) .OR.
-!    &     ABS( XCELL3D - XCELL_B ) .GT. TOL * XCELL3D .OR.
-!    &     ABS( YCELL3D - YCELL_B ) .GT. TOL * YCELL3D ) THEN
-!        WRITE( LOGDEV,2003 ) XCENT_B, XCENT3D, YCENT_B, YCENT3D,
-!    &                        XCELL_B, XCELL3D, YCELL_B, YCELL3D
-!2003     FORMAT(/ 5X, 'XCENT_B:', F20.12, 2X, 'XCENT3D (file):', F20.12 
-!    &          / 5X, 'YCENT_B:', F20.12, 2X, 'YCENT3D (file):', F20.12
-!    &          / 5X, 'XCELL_B:', F20.12, 2X, 'XCELL3D (file):', F20.12 
-!    &          / 5X, 'YCELL_B:', F20.12, 2X, 'YCELL3D (file):', F20.12 )
-
-!        XMSG = 'File header inconsistent with GRID_CRO_2D'
-!#ifndef twoway
-!        CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
-!#endif
-!     END IF
 
       floc = mio_search (fname)
-!     if (floc > 0) then
-         call mio_get_global_attr (fname, 'XORIG', lxorig3d)
-         call mio_get_global_attr (fname, 'YORIG', lyorig3d)
-         call mio_get_global_attr (fname, 'XCENT', lxcent3d)
-         call mio_get_global_attr (fname, 'YCENT', lycent3d)
-         call mio_get_global_attr (fname, 'XCELL', lxcell3d)
-         call mio_get_global_attr (fname, 'YCELL', lycell3d)
-!     else
-!        lxorig3d = xorig3d
-!        lyorig3d = yorig3d
-!        lxcent3d = xcent3d
-!        lycent3d = ycent3d
-!        lxcell3d = xcell3d
-!        lycell3d = ycell3d
-!     end if
+      call mio_get_global_attr (fname, 'XORIG', lxorig3d)
+      call mio_get_global_attr (fname, 'YORIG', lyorig3d)
+      call mio_get_global_attr (fname, 'XCENT', lxcent3d)
+      call mio_get_global_attr (fname, 'YCENT', lycent3d)
+      call mio_get_global_attr (fname, 'XCELL', lxcell3d)
+      call mio_get_global_attr (fname, 'YCELL', lycell3d)
 
 C check some header data against GRIDDESC
 

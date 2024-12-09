@@ -21,21 +21,6 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE HGRD_DEFN
 
 C Define the horizontal domain, globally and for each processor, if parallel
-C Revision History: David Wong 18 Feb 01: created
-C                   Jeff Young 23 Feb 01: generalize
-C                              31 Mar 01: add BLKPRM.EXT
-C                              10 Nov 01: change to use GRIDDESC, env vars
-C                   J Gipson   01 Sep 04: change block size to 50
-C                   J Young    07 Dec 04: remove layer dependency (for MXCELLS,
-C                                         MXBLKS) to implement vertical layer
-C                                         dyn alloc appropriately
-C                   J Young    22 Dec 05: move proc. anayl. stuff to PAGRD_DEFN
-C                   S. Roselle 29 Mar 11: Replaced I/O API include files
-C                                         with UTILIO_DEFN
-C                   D. Wong    11 May 11: incorporated twoway model implementation
-C                   D. Wong    Aug 15:    Added a new logical variable, IO_PE_INCLUSIVE
-C                                           to facilitate parallel I/O implementation
-C                   D. Wong    01 Feb 19: removed all MY_N clauses
 C.......................................................................
       USE RUNTIME_VARS
 
@@ -48,19 +33,19 @@ C map projection type (should be named PRTYP_GD!)
       INTEGER, SAVE :: GDTYP_GD = 2 ! LAMGRD3
 
 C first map projection parameter (degrees)
-      REAL( 8 ), SAVE :: P_ALP_GD = 30.0
+      REAL( 8 ), SAVE :: P_ALP_GD = 30.D0
 
 C second map projection parameter (degrees)
-      REAL( 8 ), SAVE :: P_BET_GD = 60.0
+      REAL( 8 ), SAVE :: P_BET_GD = 60.D0
 
 C third map projection parameter (degrees)
-      REAL( 8 ), SAVE :: P_GAM_GD = -90.0
+      REAL( 8 ), SAVE :: P_GAM_GD = -90.D0
 
 C longitude for coord-system center (degrees)
-      REAL( 8 ), SAVE :: XCENT_GD = -90.0
+      REAL( 8 ), SAVE :: XCENT_GD = -90.D0
 
 C latitude for coord-system center (degrees)
-      REAL( 8 ), SAVE :: YCENT_GD = 40.0
+      REAL( 8 ), SAVE :: YCENT_GD = 40.D0
 
       REAL( 8 ), SAVE :: XORIG_GD ! X-coordinate origin of computational grid
       REAL( 8 ), SAVE :: YORIG_GD ! Y-coordinate origin of computational grid
@@ -75,12 +60,11 @@ C latitude for coord-system center (degrees)
       INTEGER, SAVE :: NCOLS      ! grid columns array dimension
       INTEGER, SAVE :: NROWS      ! grid rows array dimension
       INTEGER, SAVE :: NBNDY      ! no. of cells in one layer of local boundary
- 
-!     INTEGER, PARAMETER :: NTHIK = 1     ! boundary thickness (cells)
       INTEGER, SAVE :: NTHIK      ! boundary thickness (cells)
  
       INTEGER, SAVE :: MY_NCOLS_DOT ! local no. of dot file grid columns
       INTEGER, SAVE :: MY_NROWS_DOT ! local no. of dot file grid rows
+
 C column range for each processor
       INTEGER, ALLOCATABLE, SAVE :: COLSX_PE( :,: )
       INTEGER, ALLOCATABLE, SAVE :: COLSD_PE( :,: )  ! dot file
@@ -98,12 +82,9 @@ C maximum stencil displacement in the north, east, south, and west direction
 
 C BLKPRM
 
-!     INTEGER, PARAMETER :: BLKSIZE = 500
-!     INTEGER, PARAMETER :: BLKSIZE = 50
-!     INTEGER, SAVE :: MXCELLS
-!     INTEGER, SAVE :: MXBLKS
-
-C Integral average conc
+      INTEGER, PARAMETER :: BLKSIZE = 50
+      INTEGER, SAVE :: MXCELLS
+      INTEGER, SAVE :: MXBLKS
 
       CONTAINS
 
@@ -111,8 +92,6 @@ C Integral average conc
 
          USE UTILIO_DEFN
          use replacement_util_module
-
-!        INCLUDE SUBST_VGRD_ID     ! vertical dimensioning parameters
 
          INTEGER, INTENT( IN ) :: NPROCS  ! total worker processors
          INTEGER, INTENT( IN ) :: MYID
@@ -124,6 +103,7 @@ C Integral average conc
 C environment variable grid name to select from GRIDDESC
          INTEGER :: STATUS, ALST
 
+! These arrays are probably duplicative of those in mio...
          INTEGER, ALLOCATABLE :: NCOLS_PE( : )  ! Column range for each PE
          INTEGER, ALLOCATABLE :: NROWS_PE( : )  ! Row range for each PE
 
@@ -243,8 +223,8 @@ C Get corresponding dot file map
             NBNDY = 2*NTHIK * ( NCOLS + NROWS + 2*NTHIK )
             GL_NBNDY = 2*NTHIK * ( GL_NCOLS + GL_NROWS + 2*NTHIK )
 
-          write (logdev, '(a12, 20i5)') ' ==d== hg a ', colsx_pe(:,mype+1), rowsx_pe(:,mype+1)
-          write (logdev, '(a12, 20i5)') ' ==d== hg b ', colsd_pe(:,mype+1), rowsd_pe(:,mype+1)
+!          write (logdev, '(a12, 20i5)') ' ==d== hg a ', colsx_pe(:,mype+1), rowsx_pe(:,mype+1)
+!          write (logdev, '(a12, 20i5)') ' ==d== hg b ', colsd_pe(:,mype+1), rowsd_pe(:,mype+1)
 
             MY_NCOLS_DOT = COLSD_PE( 2,MYPE+1 ) - COLSD_PE( 1,MYPE+1 ) + 1
             MY_NROWS_DOT = ROWSD_PE( 2,MYPE+1 ) - ROWSD_PE( 1,MYPE+1 ) + 1

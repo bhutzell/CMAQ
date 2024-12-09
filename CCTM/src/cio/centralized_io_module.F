@@ -583,7 +583,6 @@
           end if
 
           call retrieve_time_dep_gridded_data (cio_model_sdate, cio_model_stime)
-
 #ifdef mpas
           call retrieve_stack_data_mpas (cio_model_sdate, cio_model_stime)
 #else
@@ -4429,6 +4428,7 @@ C   mminlu and num_land_cat are WRF global variables
 
           CHARACTER( 120 ) :: XMSG = ' '
           INTEGER          :: GXOFF, GYOFF, stat, n, v, d_size, begin, end, floc, lnvars3d
+          integer          :: lcols, lrows, lthik
 
           character( 16 ), allocatable :: b3d_name(:,:)
           character( 16 ) :: mb3d_name(2, 2)
@@ -4451,18 +4451,19 @@ C   mminlu and num_land_cat are WRF global variables
           f_bcon = n_opened_file
 
           call mio_fopen (BCFILE, mio_read_only)
-          floc = mio_search (BCFILE)
-
           call mio_get_global_attr (BCFILE, 'SDATE', file_sdate(f_bcon))
           call mio_get_global_attr (BCFILE, 'STIME', file_stime(f_bcon))
           call mio_get_global_attr (BCFILE, 'TSTEP', file_tstep(f_bcon))
           call mio_get_global_attr (BCFILE, 'XCELL', file_xcell(f_bcon))
           call mio_get_global_attr (BCFILE, 'YCELL', file_ycell(f_bcon))
-
+          call mio_get_global_attr (BCFILE, 'NCOLS', lcols)
+          call mio_get_global_attr (BCFILE, 'NROWS', lrows)
+          call mio_get_global_attr (BCFILE, 'NTHIK', lthik)
+          floc = mio_search (BCFILE)
           lnvars3d = mio_file_data(floc)%nvars
 
           n_b3d = lnvars3d
-          size_b2d = (ncols3d + nrows3d + 2 * nthik3d) * 2 * nthik3d
+          size_b2d = (lcols + lrows + 2 * lthik) * 2 * lthik
           size_b3d = size_b2d * nlays
 
           allocate (b3d_name(n_b3d, 2),
@@ -5449,7 +5450,6 @@ C Read the various categories of normalized emissions
           CHARACTER( 120 ) :: XMSG = ' '
 
           if (firstime) then
-
              head_bndy = -1
              tail_bndy = -1
 
@@ -5609,8 +5609,14 @@ C Read the various categories of normalized emissions
 
           do pt = beg_pt, end_pt
              my_pt = my_end_src(pt) - my_strt_src(pt) + 1
-             allocate (tdata_3d(1,my_pt,1), stat=stat)
-!            allocate (tdata(my_pt), stat=stat)
+             if ( my_pt .gt. 0 ) then
+                allocate (tdata_3d(1,my_pt,1), stat=stat)
+!               allocate (tdata(my_pt), stat=stat)
+                if (stat .ne. 0) then
+                   xmsg = 'error allocating tdata_3d'
+                   call m3exit(pname, jdate, jtime, xmsg, 1)
+                end if
+             end if
              if (firstime) then
                 loc_jdate = jdate
                 if (file_sym_date(f_stk_emis(pt))) loc_jdate = file_sdate(f_stk_emis(pt)) ! Representative day check
@@ -5659,8 +5665,10 @@ C Read the various categories of normalized emissions
                 CALL NEXTIME ( loc_jdate, loc_jtime, file_tstep(f_stk_emis(pt)) )
              end do  ! end iter
 
-             deallocate (tdata_3d)
 !            deallocate (tdata)
+             if ( allocated (tdata_3d) ) then
+                deallocate (tdata_3d)
+             end if
 
           end do
 

@@ -103,43 +103,41 @@ C   09 Sep 19 F. Sidi: Replaced L_CONC_WVEL & L_ACONC_WVEL (depreciated) with W_
 C   21 Nov 19 S.L.Napelenok: Include DDM3D for versions 5.3.1
 C-----------------------------------------------------------------------
 
-      USE RXNS_DATA             ! chemical mechanism data
-      USE CENTRALIZED_IO_MODULE
-      USE ASX_DATA_MOD, Only : MET_DATA, INIT_MET, GET_MET
-      USE LSM_MOD
-      USE WVEL_DEFN             ! derived vertical velocity component
-      USE BUDGET_DEFN
       USE AERO_DATA
+      USE ASX_DATA_MOD, Only : MET_DATA, INIT_MET, GET_MET
+      USE BUDGET_DEFN
+      USE CENTRALIZED_IO_MODULE
+      USE CGRID_SPCS            ! CGRID mechanism species
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP
       USE ELMO_PROC, ONLY : ELMO_DRIVER, WRITE_ELMO, MAP_ELMO
+      USE HLCONST_MOD
+      USE LSM_MOD
+      use mio_module
+      USE RUNTIME_VARS
+      USE RXNS_DATA             ! chemical mechanism data
+      USE STD_CONC              ! standard CONC
       USE UTILIO_DEFN
       USE util_Family_module
-      USE RUNTIME_VARS
-      USE STD_CONC              ! standard CONC
-      USE CGRID_SPCS            ! CGRID mechanism species
-      use mio_module
+      USE WVEL_DEFN             ! derived vertical velocity component
 #ifdef mpas
-      USE HGRD_DEFN, ONLY: MYPE
       use coupler_module
-      use VGRD_DEFN, ONLY : NLAYS
-      use HGRD_DEFN, ONLY : NCOLS, NROWS
-
-      use mydata_module
       use get_env_module
+      USE HGRD_DEFN, ONLY: MYPE, NCOLS, NROWS
       use lus_defn
+      use mydata_module
+      use VGRD_DEFN, ONLY : NLAYS
 #else
-      USE PCGRID_DEFN           ! inherits GRID_CONF
       USE AVG_CONC              ! integral average CONC
-      USE PA_DEFN, Only: LIPR, LIRR  ! Process Anaylsis control and data variables
-      USE PAGRD_DEFN            ! Process Anaylsis horiz domain specs
-
       USE BIDI_MOD, Only : INIT_BIDI
+      USE lus_data_module
+      USE MIO_ASCII
+      USE PA_DEFN, Only: LIPR, LIRR  ! Process Analysis control and data variables
+      USE PAGRD_DEFN            ! Process Analysis horiz domain specs
+      USE PCGRID_DEFN           ! inherits GRID_CONF
 
 #ifdef isam
-c     USE SA_LAYERS
       USE SA_DEFN
-      USE PISAM_DEFN            ! SA array definition (borrowed )
-c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
+      USE PISAM_DEFN
 #endif
 
 #ifdef sens
@@ -147,25 +145,18 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
       USE S_PCGRID_DEFN
 #endif
 
-#ifdef parallel
-      USE VERTEXT_MODULE
-#endif
-      USE lus_data_module
-
 #ifdef twoway
       use twoway_data_module
       use sd_time_series_module
 #endif
 
 #ifdef parallel
+      USE VERTEXT_MODULE
       USE SE_MODULES            ! stenex (using SE_INIT_MODULE)
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_INIT_MODULE)
 #endif
-#endif   ! end mpas
-
-      USE MIO_ASCII
-      USE HLCONST_MOD
+#endif   
 
       IMPLICIT NONE
 
@@ -177,7 +168,6 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
 
 #ifdef mpas
       real, parameter :: cmin = 1.0E-30
-
       integer :: ncols_gl
 #endif
 
@@ -212,7 +202,6 @@ C Local variables:
       REAL( 8 )         :: CPU_TIME_START, CPU_TIME_FINISH
       REAL              :: REAL_TIME
 
-
       CHARACTER(  2 ) :: COLROW = 'CR'  ! col/row arg list order
       CHARACTER( 16 ) :: PNAME = 'DRIVER'
       CHARACTER( 96 ) :: XMSG = ' '
@@ -242,11 +231,9 @@ C Local variables:
                                            !      Before
                                            !      (N, M2, M3) -
                                            !      After
-      REAL,ALLOCATABLE :: AECON( : )
-
+      REAL, ALLOCATABLE :: AECON( : )
       REAL( 8 ) :: BEGTIME     ! Wall-clock time (sec) at MPI initialization
       LOGICAL       :: L_WRITE_WARNING
-
 
 #endif
 
@@ -255,6 +242,16 @@ C Local variables:
             REAL, POINTER            :: CGRID( :,:,:,: )
             INTEGER, INTENT( OUT )   :: TSTEP( 3 )
          END SUBROUTINE INITSCEN
+         SUBROUTINE SCIPROC ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+            REAL, POINTER            :: CGRID( :,:,:,: )
+            INTEGER, INTENT( INOUT ) :: JDATE, JTIME
+            INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
+         END SUBROUTINE SCIPROC
+         SUBROUTINE INIT_CCTM_MODULES ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+            REAL, POINTER            :: CGRID( :,:,:,: )
+            INTEGER, INTENT( INOUT ) :: JDATE, JTIME
+            INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
+         END SUBROUTINE INIT_CCTM_MODULES
 #ifndef mpas
          SUBROUTINE ADVSTEP ( JDATE, JTIME, TSTEP, ASTEP, NREPS )
             INTEGER, INTENT( IN )    :: JDATE, JTIME
@@ -314,16 +311,6 @@ C Local variables:
 #endif
 #endif
 
-         SUBROUTINE SCIPROC ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
-            REAL, POINTER            :: CGRID( :,:,:,: )
-            INTEGER, INTENT( INOUT ) :: JDATE, JTIME
-            INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
-         END SUBROUTINE SCIPROC
-         SUBROUTINE INIT_CCTM_MODULES ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
-            REAL, POINTER            :: CGRID( :,:,:,: )
-            INTEGER, INTENT( INOUT ) :: JDATE, JTIME
-            INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
-         END SUBROUTINE INIT_CCTM_MODULES
 #ifdef mpas
          SUBROUTINE UNLOAD_CGRID ( CGRID )
             REAL, INTENT(IN)  :: CGRID( :,:,:,: )
@@ -388,12 +375,18 @@ C Set CGRID mechanism
             call M3EXIT (PNAME, JDATE, JTIME, XMSG, 1)
          END IF
 
-C Set up horizontal domain, calculate processor-to-subdomain maps
-C and define vertical layer structure (in module GRID_CONF)
-         IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
-            XMSG = '*** Failure defining domain configuration'
-            call M3EXIT (PNAME, JDATE, JTIME, XMSG, 1)
-         END IF
+
+!C Set up horizontal domain, calculate processor-to-subdomain maps
+!C and define vertical layer structure (in module GRID_CONF)
+!         IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
+!            XMSG = '*** Failure defining domain configuration'
+!            call M3EXIT (PNAME, JDATE, JTIME, XMSG, 1)
+!         END IF
+
+! this is the only part of GRID_INIT that executes for MPAS-CMAQ
+! but does MPAS-CMAQ need the HGRD_DEFN and VGRD_DEFN modules?
+          MXCELLS = NCOLS * NROWS * NLAYS
+          MXBLKS  = 1 + ( MXCELLS - 1 ) / BLKSIZE
 
 #else
 #ifdef twoway
@@ -403,12 +396,17 @@ C Initialize Environment Variables
          CALL INIT_ENV_VARS( JDATE, JTIME )
 #endif
 
-C Set up horizontal domain, calculate processor-to-subdomain maps
-C and define vertical layer structure (in module GRID_CONF)
-         IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
-            XMSG = '*** Failure defining domain configuration'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+!C Set up horizontal domain, calculate processor-to-subdomain maps
+!C and define vertical layer structure (in module GRID_CONF)
+!         IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
+!            XMSG = '*** Failure defining domain configuration'
+!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+!         END IF
+
+          IF ( .NOT. HGRD_INIT ( NPROCS, MYPE ) ) THEN
+             XMSG = '*** Failure defining horizontal domain'
+             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+          END IF
 
 #ifdef verbose_driver
          write( logdev,* ) ' MYPE -> NPROCS:   ', mype, nprocs
@@ -429,6 +427,11 @@ C Set CGRID mechanism
          END IF
 
          call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
+
+         IF ( .NOT. VGRD_INIT() ) THEN
+            XMSG = '*** Failure defining vertical structure'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
 
 #ifdef sens
 C Initialize ddm3d calculations
@@ -476,19 +479,6 @@ C Initialize stencil exchange
 C Generate the process analysis data: load PA_DEFN module
          CALL PA_DATAGEN( )
 
-C Abort if the number of output variables exceeds the maximum allowed
-C by I/O-API
-         IF ( NSPCSD .GT. MXVARS3 ) THEN
-            WRITE( XMSG,'(5X, A, I5, A)' ) 'The number of variables,', NSPCSD,
-     &      ' to be written to the State CGRID File'
-            CALL LOG_MESSAGE( LOGDEV, XMSG )
-            WRITE( XMSG,'(5X, A, I5)' ) 'exceeds the I/O-API limit:', MXVARS3
-            CALL LOG_MESSAGE( LOGDEV, XMSG )
-            XMSG = 'Recompile with an I/O-API lib having a larger MXVARS3'
-            CALL LOG_MESSAGE( LOGDEV, XMSG )
-            CALL M3EXIT( PNAME, JDATE, JTIME, ' ', XSTAT1 )
-         END IF
-
 C Initialize PCGRID
          IF ( .NOT. PCGRID_INIT () ) THEN
             XMSG = 'Failure defining horizontal domain'
@@ -497,7 +487,7 @@ C Initialize PCGRID
       
          CGRID => PCGRID( 1:NCOLS,1:NROWS,:,: )   ! required for PinG
 
-C Initalize CONC definitions (in STD_CONC F90 module)
+C Initialize CONC definitions (in STD_CONC F90 module)
          CALL CONC_DEFN ()
 
 C Get avg CONC definitions, species and layer pointers (in AVG_CONC F90 module)
@@ -508,7 +498,6 @@ C Miscellaneous Configuration Operations
          CALL LOG_HEADING( LOGDEV, "Configure Scenario" )
 
 #ifdef isam
-c        CALL GET_SA_LAYS ()
          CALL SA_DIM()
 
 C Initialize PISAM
@@ -545,8 +534,7 @@ C Initialize ddm3d calculations
          SAGRID = 0.0
 #endif
 
-
-#endif  ! end of mpas
+#endif  
 
 
 C Initialize Global Arrays for Storing Chemical, Regional, Process,
@@ -574,6 +562,8 @@ C Convention: the input file concentration units are always ppmV.
 #endif
 
 #ifndef mpas
+         CALL LOG_HEADING( LOGDEV, "Check Initial Concentrations" )
+
          CALL CKSUMMER ( 'INITSCEN', CGRID, JDATE, JTIME )
 
          IF ( LIPR .OR. LIRR ) CALL PA_INIT ( CGRID, JDATE, JTIME, TSTEP )
@@ -599,8 +589,6 @@ C Convention: the input file concentration units are always ppmV.
          AISAM = 0.
 #endif
 
-
-
 #ifdef twoway
          IF ( SD_TIME_SERIES ) THEN
             CALL SD_TIME_SERIES_INIT ( LOGDEV, TSTEP( 3 ) )
@@ -612,22 +600,18 @@ C Convention: the input file concentration units are always ppmV.
          END IF
 #endif
 #else
-!       if (.not. lus_init (mminlu_mpas, lufrac_data(:,:,1)) ) then
-!          CALL M3EXIT( 'DRIVER',JDATE,JTIME,'ERROR: Cannot initialize Land Use Category', 2)
-!       end if
 
-        call mio_setfile ('GR_EMIS_001')
+         call mio_setfile ('GR_EMIS_001')
 
-        if (L_ELMO) then
-           call mio_fcreate (CTM_ELMO_1, mio_new_file)
-        end if
+         if (L_ELMO) then
+            call mio_fcreate (CTM_ELMO_1, mio_new_file)
+         end if
 
          call get_env (mpas_diag, 'mpas_diag', .false.)
 
          if (mpas_diag) then
             call mio_fcreate ('CTM_OUT', mio_new_file)
          end if
-
 
 !       call mio_fcreate (CTM_DRY_DEP_1, mio_new_file)
 !       call mio_fcreate (CTM_WET_DEP_1, mio_new_file)
@@ -657,7 +641,8 @@ C Initialize Meteorology Structures
 
          CALL GET_MET ( JDATE, JTIME, 0 )
 
-         IF ( W_VEL ) CALL GET_WVEL( JDATE, JTIME ) ! If the user wants vertical velocity written to file, retrieve it.
+! If the user wants vertical velocity written to file, retrieve it.
+         IF ( W_VEL ) CALL GET_WVEL( JDATE, JTIME ) 
 
          call hlconst_init
 

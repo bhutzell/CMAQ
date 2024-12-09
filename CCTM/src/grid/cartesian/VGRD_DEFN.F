@@ -86,17 +86,19 @@ C-----------------------------------------------------------------------
          FUNCTION VGRD_INIT ( ) RESULT ( SUCCESS )
 
             USE UTILIO_DEFN
+            use mio_module
 
             IMPLICIT NONE
 
+            INCLUDE SUBST_FILES_ID
+ 
             LOGICAL :: SUCCESS
 
             LOGICAL, SAVE :: FIRSTIME = .TRUE.
             CHARACTER( 96 ) :: XMSG = ' '
-!           CHARACTER( 16 ) :: LAYER_FILE = 'LAYER_FILE'
-            CHARACTER( 16 ) :: LAYER_FILE = 'MET_CRO_3D'
 
-            INTEGER L, ALLOCSTAT
+            INTEGER L, ALLOCSTAT, floc
+            real, allocatable :: vglvs_mc3(:)
 
 C This function is expected to be called only once - at startup
 
@@ -106,56 +108,47 @@ C This function is expected to be called only once - at startup
 
 #ifndef mpas
 
-C get vert layer definition from LAYER_FILE
+C get vertical layer definition 
 
                WRITE( LOGDEV, * )
                CALL LOG_HEADING( LOGDEV, "Retrieve Vertical Grid" )
-               IF ( .NOT. OPEN3( LAYER_FILE, FSREAD3, 'VGRD_INIT' ) ) THEN
-                  XMSG = 'Could not open '// LAYER_FILE
-                  CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
-                  SUCCESS = .FALSE.; RETURN
-                  END IF
 
-               IF ( .NOT. DESC3( LAYER_FILE ) ) THEN
-                  XMSG = 'Could not get ' // LAYER_FILE // ' file description'
-                  CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
-                  SUCCESS = .FALSE.; RETURN
-                  END IF
-
-               GDNAME_GD = GDNAM3D
-
-               NLAYS = NLAYS3D
-
-               VGTYP_GD  = VGTYP3D
-               VGTOP_GD  = VGTOP3D
+               call mio_fopen ( MET_CRO_3D, mio_read_only )
+               floc = mio_search ( MET_CRO_3D )
+               NLAYS = mio_file_data(floc)%nlays
+      
+               call mio_get_global_attr( MET_CRO_3D, 'GDNAM', GDNAME_GD )
+               call mio_get_global_attr( MET_CRO_3D, 'VGTYP', VGTYP_GD )
+               call mio_get_global_attr( MET_CRO_3D, 'VGTOP', VGTOP_GD )
                VGTPUN_GD = 'Pa'
                VGLVUN_GD = 'none'
 
-               ALLOCATE ( VGLVS_GD( NLAYS + 1 ), STAT = ALLOCSTAT )
-               ALLOCATE ( X3FACE_GD( 0:NLAYS ), STAT = ALLOCSTAT )
+! For array-valued attributes, mio_get_global_attr returns the length of the array
+! in the first element. We know what this value should be already, so skip over it.
+               ALLOCATE ( VGLVS_GD( NLAYS + 1 ), 
+     &                    vglvs_mc3( nlays + 2), 
+     &                    X3FACE_GD( 0:NLAYS ), STAT = ALLOCSTAT )
                IF ( ALLOCSTAT .NE. 0 ) THEN
                   XMSG = 'Failure allocating VGLVS_GD, X3FACE_GD'
                   CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
                   SUCCESS = .FALSE.; RETURN
-                  END IF
+               END IF
 
-               DO L = 1, NLAYS + 1
-                  VGLVS_GD( L ) = VGLVS3D( L )
-                  END DO
+               call mio_get_global_attr( MET_CRO_3D, 'VGLVLS', VGLVS_mc3 )
 
-C set layer layer thickenesses
+C set layer layer thicknesses
 
                DO L = 0, NLAYS
+                  VGLVS_GD( L+1 ) = VGLVS_MC3( L+2 )
                   X3FACE_GD( L ) = 1.0 - VGLVS_GD( L + 1 )
-                  END DO
+               END DO
 
+!              deallocate( VGLVS_MC3 )
             ELSE
-            XMSG = 'Vertical layer structure already defined'
-            CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
-            SUCCESS = .FALSE.; RETURN
-
+               XMSG = 'Vertical layer structure already defined'
+               CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
+               SUCCESS = .FALSE.; RETURN
 #endif
-
             END IF   ! FIRSTIME
 
          RETURN
@@ -163,27 +156,3 @@ C set layer layer thickenesses
 
       END MODULE VGRD_DEFN
 
-C  21   VGLVS_GD   X3FACE_GD
-C  
-C   1     1.0       0.0
-C   2     0.995     0.005
-C   3     0.99      0.01
-C   4     0.985     0.015
-C   5     0.98      0.02
-C   6     0.97      0.03
-C   7     0.96      0.04
-C   8     0.945     0.055
-C   9     0.93      0.07
-C  10     0.91      0.09
-C  11     0.89      0.11
-C  12     0.865     0.135
-C  13     0.84      0.16
-C  14     0.78      0.22
-C  15     0.7       0.3
-C  16     0.6       0.4
-C  17     0.5       0.5
-C  18     0.4       0.6
-C  19     0.3       0.7
-C  20     0.2       0.8
-C  21     0.1       0.9
-C  22     0.0       1.0

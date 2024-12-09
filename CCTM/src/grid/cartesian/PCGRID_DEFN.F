@@ -59,8 +59,6 @@ C-----------------------------------------------------------------------
 
          USE UTILIO_DEFN
 
-!        INCLUDE SUBST_VGRD_ID     ! vertical dimensioning parameters
-
          LOGICAL :: SUCCESS
          INTEGER :: ALLOCSTAT
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
@@ -99,7 +97,6 @@ C PCGRID extents
                END IF
 
             PCGRID = 0.0
-!           PCGRID = -999.999
 
             ELSE
             XMSG = 'PCGRID already ALLOCATED'

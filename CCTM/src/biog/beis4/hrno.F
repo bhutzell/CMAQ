@@ -261,30 +261,7 @@ C Determine last timestamp
          METSTEP = tstep(3)
 #else
 
-!C Get description of met file
-!         IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
-!            MESG = 'Could not get description of file "'
-!     &           // TRIM( MET_CRO_2D ) // '"'
-!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-!         END IF
-!
-!         METSTEP = TSTEP3D
-
-!C Check that grid description matches MET_CRO_2D file
-!         IF ( .NOT. CHKGRID( MET_CRO_2D ) ) THEN
-!            MESG = 'Grid in file "' // TRIM( MET_CRO_2D )
-!     &           // '" does not match grid in file ' // TRIM( MET_CRO_2D ) // '"'
-!#ifdef twoway
-!            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
-!#else
-!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-!#endif
-!         END IF
 #endif
-
-!         WRITE( MESG, '(A,I0,A,I0)' ),
-!     &     'NCOLS = ',NCOLS,': NROWS = ',NROWS
-!         CALL M3MESG( MESG )
 
          ALLOCATE( RNTOT( NCOLS,NROWS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'RNTOT', PNAME )

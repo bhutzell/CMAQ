@@ -123,7 +123,7 @@
       INTEGER :: STDATE          = 1995192  ! Start Date
       INTEGER :: STTIME          = 000000   ! Start Time
       INTEGER :: LOCAL_TSTEP     = 010000   ! set to TSTEP( 1 ) in initscen.F
-      INTEGER :: MET_TSTEP                  ! set meterology input temporal frequency
+      INTEGER :: MET_TSTEP       = 010000   ! set meterology input temporal frequency
       INTEGER :: NPCOL           = 1        ! no. of processors across grid columns
       INTEGER :: NPROW           = 1        ! no. of processors across grid rows
       INTEGER :: MAXSYNC         = 720      ! force max TSTEP(2) (sec)
@@ -965,56 +965,44 @@
 #ifdef twoway
       WRF_V4P = .TRUE.
 #else
-! to obtain WRF version information
-      IF ( .NOT. OPEN3( MET_CRO_3D, FSREAD3, PNAME ) ) THEN
-         XMSG = 'Could not open '// MET_CRO_3D // ' file'
-         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
-
-      IF ( .NOT. DESC3( MET_CRO_3D ) ) THEN
-         XMSG = 'Could not get ' // MET_CRO_3D //' file description'
-         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
 
       ! Get environ. variable met_tstep to control meteorology frequency
-      CALL GET_ENV ( MET_TSTEP, 'MET_TSTEP', TSTEP3D, VARDEV)
+      CALL GET_ENV ( MET_TSTEP, 'MET_TSTEP', MET_TSTEP, VARDEV)
 
+! commented out for now, but we will want to revisit whether and where
+! to put this check later
       ! Ensure users cannot pick a met_tstep that is smaller than the
       ! MC3 file time step or something that is not a multiple of that tstep
           
-      IF (MOD(TIME2SEC(MET_TSTEP), TIME2SEC(TSTEP3D)) .NE. 0) then
-          XMSG = 'MET_TSTEP environmental variable not equal to or a 
-     & multiple greater than time step of met file ' // MET_CRO_3D
-          CALL M3EXIT(PNAME, 0, 0, XMSG, XSTAT1)
-      end if 
+!      IF (MOD(TIME2SEC(MET_TSTEP), TIME2SEC(TSTEP3D)) .NE. 0) then
+!          XMSG = 'MET_TSTEP environmental variable not equal to or a 
+!     & multiple greater than time step of met file ' // MET_CRO_3D
+!          CALL M3EXIT(PNAME, 0, 0, XMSG, XSTAT1)
+!      end if 
 
-      FOUND = .FALSE.
-      NV = 0
-      Do WHILE ((.NOT. FOUND) .AND. (NV .LT. MXDESC3))
-         NV = NV + 1
-         LOC = INDEX (FDESC3D(NV), 'WRF ARW V')
-         IF (LOC > 0) THEN
-            FOUND = .TRUE.
-            STR_LEN = LEN_TRIM(FDESC3D(NV))
-            READ (FDESC3D(NV)(LOC+9:STR_LEN), *) WRF_VERSION
-            IF (WRF_VERSION .GE. '4.1') THEN
-               WRF_V4P = .TRUE.
-            END IF
-         END IF
-      END DO
+!      FOUND = .FALSE.
+!      NV = 0
+!      Do WHILE ((.NOT. FOUND) .AND. (NV .LT. MXDESC3))
+!         NV = NV + 1
+!         LOC = INDEX (FDESC3D(NV), 'WRF ARW V')
+!         IF (LOC > 0) THEN
+!            FOUND = .TRUE.
+!            STR_LEN = LEN_TRIM(FDESC3D(NV))
+!            READ (FDESC3D(NV)(LOC+9:STR_LEN), *) WRF_VERSION
+!            IF (WRF_VERSION .GE. '4.1') THEN
+!               WRF_V4P = .TRUE.
+!            END IF
+!         END IF
+!      END DO
 
-      XMSG = 'MET data determined based on WRF ARW version '
-      IF( MYPE .EQ. 0 ) THEN
-          WRITE(OUTDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-          WRITE(LOGDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-      ELSE
-          WRITE(LOGDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-      END IF
+!      XMSG = 'MET data determined based on WRF ARW version '
+!      IF( MYPE .EQ. 0 ) THEN
+!          WRITE(OUTDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
+!          WRITE(LOGDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
+!      ELSE
+!          WRITE(LOGDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
+!      END IF
 
-      IF ( .NOT. CLOSE3( MET_CRO_3D ) ) THEN
-        XMSG = 'Could not close ' // MET_CRO_3D
-        CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
 #endif
 
 #endif

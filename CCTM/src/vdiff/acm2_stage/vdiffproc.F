@@ -147,7 +147,6 @@ C Local Variables:
       REAL, ALLOCATABLE, SAVE :: DDEP_PA  ( :,:,: )   ! ddep for process analysis
       REAL, ALLOCATABLE, SAVE :: EMIS_PA( :,:,:,: )   ! emis for process analysis
 
-      INTEGER, SAVE :: N_SPC_CGRID              ! no. of CGRID species
       INTEGER, SAVE :: NH3_HIT
 
       REAL     :: EDDYV ( NCOLS,NROWS,NLAYS )   ! from EDYINTB
@@ -304,9 +303,7 @@ C Set up for grav. settling
             END IF
          END IF
 
-         N_SPC_CGRID = SIZE ( CGRID,4 )
-
-         ALLOCATE ( CNGRD( N_SPC_CGRID,NLAYS,NCOLS,NROWS ), STAT = ASTAT )
+         ALLOCATE ( CNGRD( N_CGRID_SPC,NLAYS,NCOLS,NROWS ), STAT = ASTAT )
          IF ( ASTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating CNGRD'
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )

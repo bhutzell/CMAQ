@@ -88,7 +88,7 @@ C processes (NPROCS)
         ! Get Simulation Scenario Name to Label Log Files, etc
         CALL GET_ENV( APP_NAME_IN, 'CTM_APPL', APP_NAME_IN, VARDEV )
 
-        ! Start I/O-API and set up log file(s)
+        ! Set up log file(s)
         CALL SETUP_LOGDEV(APP_NAME_IN)
 
         ! Initialize all runscript environmental variables
@@ -124,9 +124,11 @@ C processes (NPROCS)
         WRITE( XMSG, '(A,F10.1,A)' ) 'The elapsed time for this simulation was', 
      &                               ELAPTIME, ' seconds.'
         CALL LOG_MESSAGE( LOGDEV, XMSG )
-        IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
-        IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
-        IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
+        IF ( MYPE .EQ. 0 ) THEN
+           WRITE( OUTDEV, * )
+           CALL LOG_MESSAGE( OUTDEV, XMSG )
+           WRITE( OUTDEV, * )
+        END IF
 
 #ifdef parallel
 C Shut down MPI
