@@ -33,12 +33,12 @@ C Adopted from MEGAN3.1 and modified for CMAQ 5.4 by Jeff Willison
       
       CONTAINS
 
-      SUBROUTINE MEGAN_BDSNP_INIT(JDATE,JTIME,TSTEP)
+      SUBROUTINE MEGAN_BDSNP_INIT(JDATE,JTIME)
 
 
       INTEGER, INTENT( IN )  :: JDATE             ! current simulation date (YYYYDDD)
       INTEGER, INTENT( IN )  :: JTIME             ! current simulation time (HHMMSS)
-      INTEGER, INTENT( IN )  :: TSTEP( 3 )        ! time step vector (HHMMSS)
+!     INTEGER, INTENT( IN )  :: TSTEP( 3 )        ! time step vector (HHMMSS)
 
       CHARACTER( 16 ), SAVE :: SOILOUT = 'BDSNPOUT' ! logical name for output NO soil data - same format as soilinstate
 

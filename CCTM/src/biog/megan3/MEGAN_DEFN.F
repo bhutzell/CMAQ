@@ -110,7 +110,7 @@ C biogenics to gas-phase species map
 
             call MEGAN_YL_INIT(JDATE,JTIME,TSTEP)
           if (BDSNP_MEGAN) then
-            call MEGAN_BDSNP_INIT(JDATE,JTIME,TSTEP)
+            call MEGAN_BDSNP_INIT(JDATE,JTIME)
           end if
 #endif
          END IF

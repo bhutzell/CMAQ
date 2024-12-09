@@ -5585,6 +5585,7 @@ C Read the various categories of normalized emissions
           CHARACTER( 20  ) :: timestamp
 
           real, allocatable :: tdata_3d( :,:,: )
+!         real, allocatable :: tdata( : )
 
           if (firstime) then
 
@@ -5609,6 +5610,7 @@ C Read the various categories of normalized emissions
           do pt = beg_pt, end_pt
              my_pt = my_end_src(pt) - my_strt_src(pt) + 1
              allocate (tdata_3d(1,my_pt,1), stat=stat)
+!            allocate (tdata(my_pt), stat=stat)
              if (firstime) then
                 loc_jdate = jdate
                 if (file_sym_date(f_stk_emis(pt))) loc_jdate = file_sdate(f_stk_emis(pt)) ! Representative day check
@@ -5646,6 +5648,11 @@ C Read the various categories of normalized emissions
      &                                tdata_3d(1:1,:,1:1), timestamp )
 
                       cio_stack_data(begin:end) = reshape(tdata_3d, (/ my_pt /))
+
+! does not work
+!                     call mio_fread( cio_stack_file_name(pt), 
+!    &                                cio_stack_var_name(v, pt), pname, 
+!    &                                cio_stack_data(begin:end), timestamp )
                    end if
                 end do
 
@@ -5653,6 +5660,7 @@ C Read the various categories of normalized emissions
              end do  ! end iter
 
              deallocate (tdata_3d)
+!            deallocate (tdata)
 
           end do
 

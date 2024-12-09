@@ -42,7 +42,7 @@
 
       INTEGER, INTENT( IN )  :: JDATE           ! current simulation date (YYYYDDD)
       INTEGER, INTENT( IN )  :: JTIME           ! current simulation time (HHMMSS)
-      INTEGER, INTENT( IN )  :: TSTEP( 3 )      ! time step vector (HHMMSS)
+      INTEGER, INTENT( IN )  :: TSTEP           ! time step (HHMMSS)
       CHARACTER( 256 ) :: MESG            ! message buffer
       CHARACTER( 16 )  :: PNAME = 'MEGAN_YL_INIT'  ! procedure name
 
@@ -64,7 +64,7 @@ C Determine last timestamp
          RHOURS = MXRHRS
          EDATE = STDATE; ETIME = STTIME
          CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
-         MSTEPS = TIME2SEC( RUNLEN ) / TIME2SEC( TSTEP( 1 ) )
+         MSTEPS = TIME2SEC( RUNLEN ) / TIME2SEC( TSTEP )
 C Create rain data file for soil NO
 
       NDATE = EDATE; NTIME = ETIME
