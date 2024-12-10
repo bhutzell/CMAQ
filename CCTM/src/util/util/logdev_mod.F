@@ -1,6 +1,4 @@
         module logdev_mod
-         
-
 
         IMPLICIT NONE
 
@@ -16,8 +14,6 @@
         INTEGER :: OUTDEV = 6   ! File Unit for Standard Output
         INTEGER :: MYPE   = -1  ! Processor Number
         CHARACTER( 200 ) :: APPL_NAME = 'APPL' ! Logfile Names
-
-
 
         contains
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -38,7 +34,6 @@ C   16 Feb 11 S.Roselle: replaced I/O API include files with UTILIO_DEFN;
 C                        removed deprecated TRIMLEN
 C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
 
-      !USE RUNTIME_VARS
       USE UTILIO_DEFN
 
       IMPLICIT NONE
@@ -48,7 +43,6 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
 #endif
       INTEGER, PARAMETER :: MAXLEN_CTM_LOG   = MAXLEN_CCTM_APPL_loc + 11
 
-
       CHARACTER( * ), INTENT( IN )    :: APP_NAME_IN
 
       INTEGER :: TOTPE  = 1   ! Number of Total Processors
@@ -56,10 +50,11 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       CHARACTER( MAXLEN_CTM_LOG ) :: IOLOGEQ
 
       INTEGER :: IOST, IHEAD
-      INTEGER :: NIOAPI_HEAD, NCMAQ_HEAD
+      INTEGER :: NCMAQ_HEAD
       INTEGER, PARAMETER :: NHEAD = 200
       CHARACTER( 90 ) :: CMAQ_HEADER( NHEAD )
-      CHARACTER( 90 ) :: IOAPI_HEADER( NHEAD )
+      character( 16 ) :: pname = 'SETUP_LOGDEV'
+      character(200)  :: xmsg
 
       integer :: i
       logical :: found, opened
@@ -76,11 +71,13 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       ! Fetch CMAQ Header
       CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD )
 
+      WRITE ( CMYPE, '(I3.3)' ) MYPE
 
 #ifdef mpas
-      write ( cmype, '(I3.3)' ) mype
-      iologeq = 'CTM_LOG_' // cmype
-
+      IOLOGEQ = PRESTR // CMYPE
+     
+! MPAS-CMAQ should be able to use same algorithm as in the JUNIT replacement
+! (or JUNIT should use the algorithm here) 
       i = 99
       found = .false.
       do while ((.not. found) .and. (i .le. 150))
@@ -102,14 +99,8 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
 
 #else
 
-      ! Create Log Filename using the processor rank and initialize
-      ! I/O-API and Logs
-      WRITE ( CMYPE, '(I3.3)' ) MYPE
+      ! Create Log Filename using the processor rank 
       IOLOGEQ = PRESTR // CMYPE // '.' // TRIM( APPL_NAME )
-      IF ( .NOT. SETENVVAR ( 'LOGFILE', IOLOGEQ ) ) THEN
-         WRITE( *,* ) '*** Could not set environment variable for ' // IOLOGEQ
-         CALL M3EXIT( 'SETUP_LOGDEV', 0, 0, '', 2 )
-      END IF
 
 #ifndef twoway
       ! Write CMAQ Header to Screen
@@ -120,41 +111,19 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       END IF
 #endif
 
-      ! Redirect Standard Output
-      IF ( MYPE .NE. 0 ) OPEN( UNIT = 6, FILE = "/dev/null", STATUS = "OLD" )
-
-      LOGDEV = INIT3() 
-
-      ! Put Standard Output Back to File Unit 6 By Closing File Unit 6
-      IF ( MYPE .NE. 0 ) CLOSE( 6 ) 
-
-      ! Fetch I/O-API Header
-#ifndef twoway
-      REWIND( LOGDEV )
-      DO IHEAD = 1,NHEAD
-          READ( LOGDEV, '(A)', IOSTAT=IOST ), IOAPI_HEADER( IHEAD )
-          ! Check for End of File
-          IF ( IOST .LT. 0 ) THEN
-             NIOAPI_HEAD = IHEAD - 1
-             EXIT
-          END IF
-      END DO
-      REWIND( LOGDEV )
-#endif
+      LOGDEV = JUNIT()
+      OPEN( UNIT=LOGDEV, FILE=IOLOGEQ, status='new', access='sequential', iostat=iost )
+      if ( iost .ne. 0 ) then
+         xmsg = 'Could not open logfile ' // IOLOGEQ
+         call m3exit( pname, 0, 0, xmsg, 1 )
+      end if
 #endif
 
-      ! Write CMAQ Header and then I/O-API Header
+      ! Write CMAQ Header to log file
       DO IHEAD = 1,NCMAQ_HEAD
           WRITE( LOGDEV, '(A)' ) CMAQ_HEADER( IHEAD )
       END DO
       WRITE( LOGDEV, * )
-#ifndef mpas
-#ifndef twoway
-      DO IHEAD = 1,NIOAPI_HEAD
-          WRITE( LOGDEV, '(A)' ) IOAPI_HEADER( IHEAD )
-      END DO
-#endif
-#endif
 
       END SUBROUTINE SETUP_LOGDEV 
 

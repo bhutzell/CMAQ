@@ -155,7 +155,6 @@ Ckrt allocate data-loading array
       TEMP = 0.0
       
       call mio_time_format_conversion (JDATE, JTIME, timestamp)
-      write(logdev,'(A,i7,:,i6,2x,A)') '==c== jdate, jtime, timestamp: ', jdate, jtime, timestamp
 
       DO JSPCTAG = 1, NSPCTAG
 

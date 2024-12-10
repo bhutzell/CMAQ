@@ -493,7 +493,7 @@
                 call megan_setup
              end if
 #else
-             cio_logdev = init3()
+             cio_logdev = logdev
 
              cio_model_sdate = STDATE
              cio_model_stime = STTIME
@@ -3640,7 +3640,7 @@ C   mminlu and num_land_cat are WRF global variables
           close (97)
 
           fire_on = .false.   ! array assignment
-! go through all stack group one time to figure out max number of source points
+! go through all stack groups once to figure out max number of source points
           stkgname = ' '   ! array
           do n = 1, nptgrps
              write( stkgname( n ),'( "STK_GRPS_",I3.3 )' ) n
@@ -3654,13 +3654,8 @@ C   mminlu and num_land_cat are WRF global variables
           do n = 1, nptgrps
 
              floc = mio_search(stkgname(n))
-
-!            stk_gp_sdate(n) = mio_file_data(floc)%var_name(ivar)
-!            stk_gp_stime(n) = mio_file_data(floc)%var_name(ivar)
              stk_gp_nlays(n) = mio_file_data(floc)%dim_value(3)
-
              nsrc( n ) = mio_file_data(floc)%dim_value(5)
-
 
              do v = 1, mio_file_data(floc)%nvars
                 if ( mio_file_data(floc)%var_name(v) .eq. 'ACRESBURNED' ) fire_on( n ) = .true.
