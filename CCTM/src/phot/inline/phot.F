@@ -833,6 +833,21 @@ C...modules
 !...get total ozone column based on OMI observations
                   CALL O3TOTCOL ( LAT( COL,ROW ), LON( COL,ROW ), MIDDATE, MIDTIME, TOTAL_OC( COL,ROW ) )
                   CALL GET_AERO_DATA ( COL,ROW, NLAYS, DENS, CGRID )
+                  DO LEV = 1, NLAYS
+                     AERO_EXT_550( COL,ROW,LEV ) = 1000.0 * AERO_EXTI_550( LEV )
+                     TAU_AERO_550 ( COL,ROW ) = TAU_AERO_550 ( COL,ROW )
+     &                                        + AERO_EXTI_550( LEV ) * BLKDZ( LEV )
+                     TAU_ABS_AERO_550 ( COL,ROW ) = TAU_ABS_AERO_550 ( COL,ROW )
+     &                                            + AERO_ABSO_550( LEV ) * BLKDZ( LEV )
+                  END DO
+                  DO L = 1, N_DIAG_WVL
+                     IWL = DIAG_WVL( L )
+                     DO LEV = 1,NLAYS_DIAG 
+                        AERO_SCAT( COL,ROW,LEV,L )  = 1000.0 * AERO_SCAT_COEF( LEV,IWL )
+                        AERO_EXT( COL,ROW,LEV,L )   = 1000.0 * AERO_EXTI_COEF( LEV,IWL )
+                        AERO_ASYM( COL,ROW,LEV,L )  = AERO_ASYM_FAC( LEV,IWL )
+                     END DO
+                  END DO
                END DO
             END DO   
          ELSE
@@ -906,6 +921,21 @@ C...modules
 !...get total ozone column based on OMI observations
                      CALL O3TOTCOL ( LAT( COL,ROW ), LON( COL,ROW ), MIDDATE, MIDTIME, TOTAL_OC( COL,ROW ) )
                      CALL GET_AERO_DATA ( COL,ROW, NLAYS, DENS, CGRID )
+                     DO LEV = 1, NLAYS
+                        AERO_EXT_550( COL,ROW,LEV ) = 1000.0 * AERO_EXTI_550( LEV )
+                        TAU_AERO_550 ( COL,ROW ) = TAU_AERO_550 ( COL,ROW )
+     &                                           + AERO_EXTI_550( LEV ) * BLKDZ( LEV )
+                        TAU_ABS_AERO_550 ( COL,ROW ) = TAU_ABS_AERO_550 ( COL,ROW )
+     &                                               + AERO_ABSO_550( LEV ) * BLKDZ( LEV )
+                     END DO
+                     DO L = 1, N_DIAG_WVL
+                        IWL = DIAG_WVL( L )
+                        DO LEV = 1,NLAYS_DIAG
+                           AERO_EXT( COL,ROW,LEV,L )    = 1000.0 * AERO_EXTI_COEF( LEV,IWL )
+                           AERO_ASYM( COL,ROW,LEV,L )   = AERO_ASYM_FAC( LEV,IWL )
+                           AERO_SCAT( COL,ROW,LEV,L )   = 1000.0 * AERO_SCAT_COEF( LEV,IWL )
+                        END DO
+                     END DO
                   END IF   
 
                   CYCLE LOOP_COLS
