@@ -3181,7 +3181,7 @@ C stkemis_init.
 #ifdef mpas
          use util_module, only : index1, upcase
 #endif
-  
+        USE MIO_MODULE
         IMPLICIT NONE
   
         CHARACTER( 200 ) :: PREFIX = 'CCTM_DESID'
@@ -3197,7 +3197,8 @@ C stkemis_init.
      &                      SPEC_VECTOR( N_SPC_DIFF )
         CHARACTER( 3)    :: CDIAG
         LOGICAL          :: LERROR
-   
+        CHARACTER( 16 )  :: PNAME = 'DESID_INIT_DIAG'
+
         N_Diag_Nml = SIZE( Desid_Diag_Fmt_Nml )
         N_Buff = N_Diag_Nml * 20
 
@@ -3400,7 +3401,11 @@ C stkemis_init.
            END IF
            WRITE( DESID_DIAG_LOGICAL( IDIAG ),'( "DESID_",I3.3 )' ) IDIAG
 #ifndef mpas
-           VALUE = SETENVVAR( DESID_DIAG_LOGICAL( IDIAG ), DESID_DIAG_FILENAME( IDIAG ) )
+           VALUE = MIO_SETENV( DESID_DIAG_LOGICAL( IDIAG ), DESID_DIAG_FILENAME( IDIAG ) )
+           IF ( VALUE .NE. 0 ) THEN 
+             XMSG = 'Cannot setenv DESID DIAG FNAME: ' // DESID_DIAG_FILENAME( IDIAG ) 
+             CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+           END IF 
 #endif
         END DO
    

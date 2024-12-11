@@ -142,4 +142,64 @@
 
         end subroutine mio_get_env_logical
 
+
+! --------------------------------------------------------------------------------
+
+
+        integer function mio_setenv ( env_name, env_value )
+
+        !------------------------------------------------------------------------------!
+        ! description:                                                                 !
+        !                                                                              !
+        ! wrapper function around c function mio_setenvvarc to set a shell             !
+        ! environmental variable from within program                                   !
+        !                                                                              !
+        ! inputs: env_name  : shell environmental variable                             !
+        !         env_value : value that is env_name is set to                         !
+        !                                                                              !
+        ! example:                                                                     !
+        !          you want to setenv foo bar                                          !
+        !          iout = mio_setenvar ( "foo", "bar" )                                !
+        !                                                                              !
+        ! external functions called:                                                   !
+        !          c function mio_setenvvarc                                           !
+        !                                                                              !
+        ! revision history:                                                            !
+        !     2024: prototype adapted from d.wong/CJC setenvvar f.sidi usepa           !
+        !                                                                              !
+        !------------------------------------------------------------------------------!
+            implicit none
+
+            ! function arguments
+            character(*), intent(in) :: env_name    ! logical env. name to be set
+            character(*), intent(in) :: env_value   ! value that env_name is set to
+
+
+            ! scratch variables
+            integer :: env_name_len                 ! length of env_name string
+            integer :: env_value_len                ! length of env_value string
+
+            ! exteranal functions
+
+            integer, external :: mio_setenvvarc
+
+
+            ! find length of strings
+
+            env_name_len  = len_trim ( env_name  )
+            env_value_len = len_trim ( env_value )
+
+            ! check to make sure no blank string is passed & call c function
+            ! mio_setenvvarc
+            if ( ( env_name_len .eq. 0 ) .or. (env_value_len .eq. 0 ) ) then
+              mio_setenv = -1
+              return
+            else
+              mio_setenv = mio_setenvvarc ( env_name, env_name_len, &
+                                              env_value, env_value_len )
+            endif
+
+
+        end function mio_setenv
+
       end module mio_get_env_module
