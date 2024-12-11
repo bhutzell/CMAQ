@@ -470,13 +470,13 @@
       ! Determine if this variable has been mapped already. If it
       ! has, send it back
       ILOC = MAP_TABLEtoUSED( J )
-      IF ( ILOC .GT. 0 ) THEN
-        IF ( L_CALCULATED( ILOC ) .AND. 
-     &       ELMO_USED_UNIT( ILOC ) .EQ. OUT_UNIT ) THEN
-           OUTVAL = ELMO_USED( ILOC )
-           RETURN
-        END IF
-      END IF
+      !IF ( ILOC .GT. 0 ) THEN
+      !  IF ( L_CALCULATED( ILOC ) .AND. 
+      !&       ELMO_USED_UNIT( ILOC ) .EQ. OUT_UNIT ) THEN
+      !     OUTVAL = ELMO_USED( ILOC )
+      !     RETURN
+      !  END IF
+      !END IF
  
       ! For most variables, the ELMO_TABLE and ELMO_COMP structures 
       ! will define all of the mappings and coefficients needed for
@@ -612,11 +612,11 @@
       END SELECT
       
       ! Save the fact that this variable has been calculated
-      IF ( ILOC .GT. 0 ) THEN
-        L_CALCULATED( ILOC ) = .TRUE.
-        ELMO_USED_UNIT( ILOC ) = OUT_UNIT
-        ELMO_USED( ILOC ) = OUTVAL
-      END IF
+      !IF ( ILOC .GT. 0 ) THEN
+        !L_CALCULATED( ILOC ) = .TRUE.
+        !ELMO_USED_UNIT( ILOC ) = OUT_UNIT
+        !ELMO_USED( ILOC ) = OUTVAL
+      !END IF
 
       END SUBROUTINE CALC_ELMO
  
