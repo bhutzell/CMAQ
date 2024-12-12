@@ -312,7 +312,7 @@ This optional 2-D CCTM file contains hourly column-total lightning NO emissions 
 
 **CCTM_PHOTDIAG1: In-line photolysis inputs and outputs - summary file**
 <!-- BEGIN COMMENT -->
-[Return to Table 7-1](#ctm_rj1_t)
+[Return to Table 7-1](#ctm_rj1_1)
 <!-- END COMMENT -->
 
 This optional 2-D CCTM file contains general summary information for the photolysis calculation including the surface albedo, 
@@ -322,7 +322,7 @@ select photolysis rates and flux values.  This file is only created if the CTM_P
 
 **CCTM_PHOTDIAG2_2: In-line photolysis output – gridded photolysis rates**
 <!-- BEGIN COMMENT -->
-[Return to Table 7-1](#ctm_rj2_t)
+[Return to Table 7-1](#ctm_rj2_2)
 <!-- END COMMENT -->
 
 This optional 3-D CCTM file contains the photolysis rates calculated in-line by the CCTM.  The number of layers is set by the  NLAYS_PHOTDIAG environment variable (Default is all layers). This file is only created if the CTM_PHOTDIAG environment variable in the RunScript is set to T (Default is N).
@@ -331,7 +331,7 @@ This optional 3-D CCTM file contains the photolysis rates calculated in-line by 
 
 **CCTM_PHOTDIAG3: In-line photolysis inputs and outputs – detailed**
 <!-- BEGIN COMMENT -->
-[Return to Table 7-1](#ctm_rj3_t)
+[Return to Table 7-1](#ctm_rj3_3)
 <!-- END COMMENT -->
 
 This optional 3-D CCTM file contains detailed inputs and results from the photolysis rate calculation done in-line by the CCTM. The number of layers is set by the  NLAYS_PHOTDIAG environment variable (Default is all layers). The number of wavelengths included in the file is set by the NWAVE_PHOTDIAG environment variable (Default is all wavelengths). This file is only created if the CTM_PHOTDIAG environment variable in the RunScript is set to T (Default is N).
