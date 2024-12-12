@@ -143,6 +143,7 @@ C set layer layer thicknesses
                   X3FACE_GD( L ) = 1.0 - VGLVS_GD( L + 1 )
                END DO
 
+               VGLVS3D = VGLVS_GD
                deallocate( VGLVS_MC3 )
             ELSE
                XMSG = 'Vertical layer structure already defined'
