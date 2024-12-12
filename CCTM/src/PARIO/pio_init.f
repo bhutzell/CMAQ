@@ -17,9 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker] 
-C $Header: /project/work/rep/PARIO/src/pio_re_init.f,v 1.6 2011/03/30 18:13:02 sjr Exp $
-
       LOGICAL FUNCTION PIO_INIT ( COLROW, GL_NCOLS, GL_NROWS, NLAYS,
      &                            NTHIK, NCOLS, NROWS, NPCOL, NPROW,
      &                            NPROCS, MYPE, WFLG, IO_PE_INCLUSIVE )
@@ -148,6 +145,7 @@ C .......................................................................
       USE PIOMAPS_MODULE
       !USE M3UTILIO              ! i/o api
       USE LOGDEV_MOD, ONLY : LOGDEV, LOG_WARNING
+      use replacement_util_module
 
       IMPLICIT  NONE
 

@@ -40,7 +40,7 @@ C-----------------------------------------------------------------------
       USE PA_VARS
       USE PA_DEFN
       USE PA_PARSE
-      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
       

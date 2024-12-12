@@ -67,8 +67,8 @@
 !     
 ! ----------------------------------------------------------------------
 
-      use RUNTIME_VARS, only : DESID_CTRL, MISC_CTRL, logdev, log_message, 
-     &                         log_subheading
+      use RUNTIME_VARS, only : DESID_CTRL, MISC_CTRL
+      use logdev_mod, only: logdev, log_message, log_subheading, m3exit
       use UTILIO_DEFN
       use desid_param_module, only : Desid_Max_Reg
       use aero_data, only : n_aerospc, aerospc, n_mode, aero_missing

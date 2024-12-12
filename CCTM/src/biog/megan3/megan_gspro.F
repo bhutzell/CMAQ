@@ -59,7 +59,7 @@
          subroutine MEGAN_MAP
 
          USE RXNS_DATA, ONLY : MECHNAME
-         USE RUNTIME_VARS, ONLY : LOGDEV
+         USE LOGDEV_MOD, ONLY : LOGDEV, M3EXIT
          USE UTILIO_DEFN
 
           IMPLICIT NONE

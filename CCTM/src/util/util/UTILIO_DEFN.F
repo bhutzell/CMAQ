@@ -51,57 +51,82 @@ C....................................................................
      &                            M3EXIT => prog_interrupt_exit
 
 
-       INTEGER, PARAMETER :: XSTAT1 = 1
-       INTEGER, PARAMETER :: XSTAT2 = 1
-       INTEGER, PARAMETER :: XSTAT3 = 1
-
 #else
 
 #ifdef parallel
 
-       use replacement_util_module, only: getefile, index1, findc,
-     &      nextime, time2sec, sec2time, secsdiff, daymon, hhmmss, mmddyy,
-     &      dt2str, wkday, yr2day, isdstime, getcdttime 
+!       use replacement_util_module, only: getefile, index1, findc,
+!     &      nextime, time2sec, sec2time, secsdiff, daymon, hhmmss, mmddyy,
+!     &      dt2str, wkday, yr2day, isdstime, getcdttime 
+ 
+        use replacement_util_module
        
-         USE M3UTILIO, EXCLUDE_INTERPB  => INTERP3,
-     &                 EXCLUDE_M3EXIT   => M3EXIT,
-     &                 EXCLUDE_M3WARN   => M3WARN,
-     &                 EXCLUDE_SHUT3    => SHUT3,
-     &                 EXCLUDE_WRITE3   => WRITE3,
-     &                 BUF_WRITE3       => WRITE3,
-     &                 exclude_nextime  => nextime,
-     &                 exclude_time2sec => time2sec,
-     &                 exclude_sec2time => sec2time,
-     &                 exclude_secsdiff => secsdiff,
-     &                 exclude_daymon   => daymon,
-     &                 exclude_hhmmss   => hhmmss,
-     &                 exclude_mmddyy   => mmddyy,
-     &                 exclude_wkday    => wkday,
-     &                 exclude_yr2day   => yr2day,    
-     &                 exclude_isdstime => isdstime,
-     &                 exclude_dt2str   => dt2str,
-!     &                 exclude_getdttime => getdttime,
-     &                 exclude_getefile => getefile,
-     &                 exclude_index1   => index1,
-     &                 exclude_findc    => findc
-!     &                 exclude_sortic   => sortic    
+!         USE M3UTILIO, EXCLUDE_INTERPB  => INTERP3,
+!     &                 EXCLUDE_M3EXIT   => M3EXIT,
+!     &                 EXCLUDE_M3WARN   => M3WARN,
+!     &                 EXCLUDE_SHUT3    => SHUT3,
+!     &                 EXCLUDE_WRITE3   => WRITE3,
+!     &                 BUF_WRITE3       => WRITE3,
+!     &                 exclude_nextime  => nextime,
+!     &                 exclude_time2sec => time2sec,
+!     &                 exclude_sec2time => sec2time,
+!     &                 exclude_secsdiff => secsdiff,
+!     &                 exclude_daymon   => daymon,
+!     &                 exclude_hhmmss   => hhmmss,
+!     &                 exclude_mmddyy   => mmddyy,
+!     &                 exclude_wkday    => wkday,
+!     &                 exclude_yr2day   => yr2day,    
+!     &                 exclude_isdstime => isdstime,
+!     &                 exclude_dt2str   => dt2str,
+!!     &                 exclude_getdttime => getdttime,
+!     &                 exclude_getefile => getefile,
+!     &                 exclude_index1   => index1,
+!     &                 exclude_findc    => findc
+!!     &                 exclude_sortic   => sortic    
 
-         USE PARUTILIO, 
-     &                  M3ERR   => PM3ERR,
-     &                  M3EXIT  => PM3EXIT,
-     &                  M3WARN  => PM3WARN,
-#ifdef parallel_io
-     &                  SHUT3   => PSHUT3
+          use parutilio, only: pio_init, subdmap, wrsubdmap
 
-         LOGICAL, EXTERNAL :: WRITE3
-#else
-     &                  SHUT3   => PSHUT3,
-     &                  WRITE3  => PWRITE3
-#endif
+!         USE PARUTILIO, 
+!     &                  M3ERR   => PM3ERR,
+!     &                  M3EXIT  => PM3EXIT,
+!     &                  M3WARN  => PM3WARN,
+!#ifdef parallel_io
+!     &                  SHUT3   => PSHUT3
+!
+!         LOGICAL, EXTERNAL :: WRITE3
+!#else
+!     &                  SHUT3   => PSHUT3,
+!     &                  WRITE3  => PWRITE3
+!#endif
 #else
          USE M3UTILIO, INTERPB => INTERP3
 #endif
 
 #endif
+
+         INTEGER, PARAMETER :: XSTAT1 = 1
+         INTEGER, PARAMETER :: XSTAT2 = 1
+         INTEGER, PARAMETER :: XSTAT3 = 1
+         INTEGER, PARAMETER :: M3INT  = 4
+         INTEGER, PARAMETER :: M3REAL = 5
+         INTEGER, PARAMETER :: LATGRD3 = 1
+         integer, parameter :: mxvars3 = 2048
+         integer, parameter :: mxlays3 = 100
+         integer, parameter :: mxfile3 = 256
+         integer            :: nvars3d
+         integer            :: nlays3d
+         integer            :: sdate3d
+         integer            :: stime3d
+         integer            :: vtype3d(mxvars3)
+
+         real, parameter    :: AMISS3  = -9.0E36
+         real, parameter    :: BADVAL3 = -9.999E36
+         real               :: xcell3d
+         real               :: ycell3d
+         real               :: vglvs3d(mxlays3+1)
+
+         character(16)      :: vname3d(mxvars3)
+         character(16)      :: units3d(mxvars3)
+         character(80)      :: vdesc3d(mxvars3)
 
       END MODULE UTILIO_DEFN

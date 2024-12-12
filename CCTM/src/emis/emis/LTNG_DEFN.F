@@ -156,7 +156,6 @@
          INTEGER               :: CJDATE
          CHARACTER( 7 )        :: SJDATE
 
-         LOGICAL OK
          INTEGER               :: SPC
 
 !-----------------------------------------------------------------------
@@ -344,10 +343,6 @@
 
 !C Lightning NO production from an input file
             CALL LOG_MESSAGE( LOGDEV ,  'Using lightning NO production from a file' )
-
-!C Check grid definition (intialize, if first call)
-            OK = CHKGRID( LTNG_FNAME )
-
 
          END IF   ! IF ( LTNG_FNAME .EQ. "INLINE" ) inline or offline lightning NO production
 #endif

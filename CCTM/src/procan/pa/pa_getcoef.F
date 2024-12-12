@@ -35,10 +35,10 @@ C  Aug 2011 Jeff Young: Replaced I/O API include files with IOAPI's M3UTILIO
 C  Sep 2018 C. Nolte, S. Roselle: replace M3UTILIO with UTILIO_DEFN
 C-----------------------------------------------------------------------
 
-      USE UTILIO_DEFN, Only: M3MESG, M3EXIT, XSTAT2      ! IOAPI module
+      USE UTILIO_DEFN, Only: XSTAT2      
       USE PA_GLOBAL     ! Mech data used 
       USE PA_PARSE
-      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
       

@@ -299,9 +299,9 @@
 
 ! print header lines
       if ( twoway) then
-         write( lfn, *) 'IOAPI_PATH = $(IOAPI)/$(LIOAPI)'
-         write( lfn, *) 'IOAPI_INC_PATH = $(IOAPI)/ioapi/fixed_src'
-         write( lfn, *)
+!        write( lfn, *) 'IOAPI_PATH = $(IOAPI)/$(LIOAPI)'
+!        write( lfn, *) 'IOAPI_INC_PATH = $(IOAPI)/ioapi/fixed_src'
+!        write( lfn, *)
          if ( Index( f_flags, '-Mfixed') > 0) then
             write( lfn, *) 'EXTEND_FLAG = -Mextend'
          else if ( Index( f_flags, '-ffixed-form') > 0) then
@@ -319,13 +319,17 @@
          write( lfn, *)
          write( lfn, *) '#   Compiler flags'
          write( lfn, *) 'f_FLAGS    = $(FORMAT_FIXED) $(EXTEND_FLAG) \'
-         write( lfn, *) '             $(FCOPTIM) -I $(IOAPI_PATH) -I $(IOAPI_INC_PATH) $(WRF_MODULE) -I.'
+!        write( lfn, *) '             $(FCOPTIM) -I $(IOAPI_PATH) -I $(IOAPI_INC_PATH) $(WRF_MODULE) -I.'
+         write( lfn, *) '             $(FCOPTIM) $(WRF_MODULE) -I.'
          write( lfn, *) 'F_FLAGS    = $(FORMAT_FIXED) $(EXTEND_FLAG) \'
-         write( lfn, *) '             $(FCOPTIM) -I $(IOAPI_PATH) -I $(IOAPI_INC_PATH) $(WRF_MODULE) -I.'
+!        write( lfn, *) '             $(FCOPTIM) -I $(IOAPI_PATH) -I $(IOAPI_INC_PATH) $(WRF_MODULE) -I.'
+         write( lfn, *) '             $(FCOPTIM) $(WRF_MODULE) -I.'
          write( lfn, *) 'F90_FLAGS  = -c $(FORMAT_FREE) $(FCOPTIM) \'
-         write( lfn, *) '             -I $(IOAPI_PATH) -I $(IOAPI_INC_PATH) $(WRF_MODULE) -I.'
+!        write( lfn, *) '             -I $(IOAPI_PATH) -I $(IOAPI_INC_PATH) $(WRF_MODULE) -I.'
+         write( lfn, *) '             $(WRF_MODULE) -I.'
          write( lfn, *) 'f90_FLAGS  = -c $(FORMAT_FREE) $(FCOPTIM) \'
-         write( lfn, *) '             -I $(IOAPI_PATH) -I $(IOAPI_INC_PATH) $(WRF_MODULE) -I.'
+!        write( lfn, *) '             -I $(IOAPI_PATH) -I $(IOAPI_INC_PATH) $(WRF_MODULE) -I.'
+         write( lfn, *) '             $(WRF_MODULE) -I.'
          write( lfn, *) 'C_FLAGS    = -O2  -DFLDMN -I /usr/include'
          write( lfn, *)
       else
@@ -350,14 +354,14 @@
          End If 
 
          ! Document Explicit Library Paths
-         Call GETENV( 'IOAPI_INCL_DIR', ioapi_incl_dir )
-         Call GETENV( 'IOAPI_LIB_DIR',  ioapi_lib_dir )
+!        Call GETENV( 'IOAPI_INCL_DIR', ioapi_incl_dir )
+!        Call GETENV( 'IOAPI_LIB_DIR',  ioapi_lib_dir )
          Call GETENV( 'NETCDF_LIB_DIR', netcdf_lib_dir )
          Call GETENV( 'NETCDFF_LIB_DIR', netcdff_lib_dir )
          Call GETENV( 'MPI_LIB_DIR',    mpi_lib_dir )
          Write( lfn, '("#   Library Paths:")' ) 
-         Write( lfn, '("#      $(LIB)/ioapi/include_files -> ",a)' ) Trim( ioapi_incl_dir )
-         Write( lfn, '("#      $(LIB)/ioapi/lib -> ",a)' ) Trim( ioapi_lib_dir )
+!        Write( lfn, '("#      $(LIB)/ioapi/include_files -> ",a)' ) Trim( ioapi_incl_dir )
+!        Write( lfn, '("#      $(LIB)/ioapi/lib -> ",a)' ) Trim( ioapi_lib_dir )
          Write( lfn, '("#      $(LIB)/mpi -> ",a)' ) Trim( mpi_lib_dir )
          Write( lfn, '("#      $(LIB)/netcdf -> ",a)' ) Trim( netcdf_lib_dir )
          Write( lfn, '("#      $(LIB)/netcdff -> ",a)' ) Trim( netcdff_lib_dir )
@@ -385,15 +389,22 @@
 
          Write( lfn, '(/" LIB = ",a)' ) Trim( lib_base )
          Write( lfn, '( " include_path = -I $(LIB)/",a,1x,a)' ) Trim( lib_1 ), backslash 
-         If ( l_lib_5) Then
-            Write( lfn, '( "                -I $(LIB)/",a,1x,a)' ) Trim( lib_2 ), backslash 
-            Write( lfn, '( "                -I $(LIB)/",a,1x,a)' ) Trim( lib_3 ), backslash
-            Write( lfn, '( "                -I $(LIB)/",a)' )      Trim( lib_5 )
-         Else if ( l_lib_3 ) Then
-            Write( lfn, '( "                -I $(LIB)/",a,1x,a)' ) Trim( lib_2 ), backslash 
-            Write( lfn, '( "                -I $(LIB)/",a)' )      Trim( lib_3 )
+!        If ( l_lib_5) Then
+!           Write( lfn, '( "                -I $(LIB)/",a,1x,a)' ) Trim( lib_2 ), backslash 
+!           Write( lfn, '( "                -I $(LIB)/",a,1x,a)' ) Trim( lib_3 ), backslash
+!           Write( lfn, '( "                -I $(LIB)/",a)' )      Trim( lib_5 )
+!        Else if ( l_lib_3 ) Then
+!           Write( lfn, '( "                -I $(LIB)/",a,1x,a)' ) Trim( lib_2 ), backslash 
+!           Write( lfn, '( "                -I $(LIB)/",a)' )      Trim( lib_3 )
+!        Else
+!           Write( lfn, '( "                -I $(LIB)/",a,1x,a)' ) Trim( lib_2 )
+!        End If
+
+         If ( l_lib_1 ) Then
+            Write( lfn, '( "                -I $(LIB)/",a,1x,a)' ) Trim( lib_1 ), backslash
+            Write( lfn, '( "                -I $(LIB)/",a)' )      Trim( lib_2 )
          Else
-            Write( lfn, '( "                -I $(LIB)/",a,1x,a)' ) Trim( lib_2 )
+            Write( lfn, '( "                -I $(LIB)/",a)' )      Trim( lib_2 )
          End If
 
          Write( lfn, '(/" WARN = ")' )
@@ -452,16 +463,18 @@
            Write( *, '("  CPP Flags defined")' )
          End If
 
-         Write( lfn, '(/" IOAPI  = -L$(LIB)/",a,1x,a)' ) Trim( lib_4 ), Trim( ioapi )
+!        Write( lfn, '(/" IOAPI  = -L$(LIB)/",a,1x,a)' ) Trim( lib_4 ), Trim( ioapi )
          Write( lfn, '( " NETCDF = -L$(LIB)/",a,1x,a, " -L$(LIB)/",a,1x,a)' ) 
      &     ,"netcdff/lib", Trim( netcdff ), "netcdf/lib", Trim(netcdf)
       
          If ( serial ) Then
-            Write( lfn, '( " LIBRARIES = $(IOAPI) $(NETCDF)")' )
+!           Write( lfn, '( " LIBRARIES = $(IOAPI) $(NETCDF)")' )
+           Write( lfn, '( " LIBRARIES = $(NETCDF)")' )
          Else
 !            Write( lfn, '( " MPICH  = -L$(LIB)/",a,1x,a)' ) "mpich/lib", Trim( mpich )
             Write( lfn, '( " MPICH  = -L$(LIB)/",a,1x,a)' ) "mpi/lib", Trim( mpich )
-            Write( lfn, '( " LIBRARIES = $(IOAPI) $(NETCDF) $(MPICH)")' )
+!           Write( lfn, '( " LIBRARIES = $(IOAPI) $(NETCDF) $(MPICH)")' )
+            Write( lfn, '( " LIBRARIES = $(NETCDF) $(MPICH)")' )
          End If
 
 !        Call writeLIB( lfn )

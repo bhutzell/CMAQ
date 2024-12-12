@@ -49,7 +49,7 @@ C-----------------------------------------------------------------------
       USE PA_DEFN
       USE PA_PARSE, Only: IZERO
       USE CGRID_SPCS, Only: N_CGRID_SPC, CGRID_NAME
-      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
       

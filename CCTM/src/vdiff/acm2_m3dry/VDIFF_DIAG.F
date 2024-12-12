@@ -162,8 +162,7 @@ C Create the vsed_map (find the 1st vsed_ae species for each of the 6 surrogate 
 
             nvars3d = n_vdiff
             nlays3d = 1
-            fdesc3d = ' '   ! array
-            fdesc3d( 1 ) = 'vdiff diagnostic variables'
+
             v = 1
             vtype3d( v ) = m3real
             units3d( v ) = ''

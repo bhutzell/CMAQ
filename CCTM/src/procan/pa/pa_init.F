@@ -156,15 +156,8 @@ C..open each one
                CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
             END IF
 
-            ENV_DESC = 'IPR Output file ' // OUTFNAME 
-            ENV_DFLT = ' '       
-            XMSG = 'IPR output file ' // TRIM( OUTFNAME ) // ' not assigned'
-            CALL GET_ENV( RET_VAL, OUTFNAME, ENV_DFLT, LOGDEV ) 
-
             IF ( MYPE .EQ. 0 ) THEN
-
                   CALL PA_MKHDR( 'IPR', NFL, OUTFNAME, SDATE, STIME, TSTEP )
-
             END IF
 
          END DO   ! NUMFLS
@@ -201,16 +194,8 @@ C..open each one
                CALL M3EXIT(PNAME, SDATE, STIME, XMSG, XSTAT2 )
             END IF
 
-            ENV_DESC = 'IRR Output file ' // OUTFNAME 
-            ENV_DFLT = ' '       
-            CALL GET_ENV( RET_VAL, OUTFNAME, ENV_DFLT, LOGDEV )
-            XMSG = 'IRR output file ' // TRIM( OUTFNAME ) // ' not assigned'
-            IF ( STATUS .NE. 0 ) CALL M3EXIT( PNAME, SDATE, STIME, XMSG, XSTAT1 )
-
             IF ( MYPE .EQ. 0 ) THEN
-
                   CALL PA_MKHDR( 'IRR', NFL, OUTFNAME, SDATE, STIME, TSTEP )
-
             END IF
 
          END DO   ! NFL

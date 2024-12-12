@@ -688,13 +688,11 @@ C-------------------------------------------------------------------------------
 
 #ifdef mpas
       use util_module, only : TIME2SEC
+#else
+      use replacement_util_module, only: TIME2SEC
 #endif
 
          IMPLICIT NONE
-
-#ifndef mpas
-         INTEGER, EXTERNAL       ::   TIME2SEC
-#endif
 
 C Function arguments:
          INTEGER, INTENT( IN )    :: TSTEP( 3 )        ! time step vector (HHMMSS)
@@ -765,13 +763,11 @@ C Return reservoir amount.
 #ifdef mpas
          USE utilio_defn
          use util_module, only : TIME2SEC
+#else
+         use replacement_util_module, only: time2sec
 #endif
 
          IMPLICIT NONE
-
-#ifndef mpas
-         INTEGER, EXTERNAL       ::   TIME2SEC
-#endif
 
 C Function arguments:
 

@@ -54,7 +54,7 @@
 ! -----------------------------------------------------------
           logical function leap_year (year)
 
-! determine a given year is a leap year or not
+! determine whether a given year is a leap year or not
 
             integer :: year
 

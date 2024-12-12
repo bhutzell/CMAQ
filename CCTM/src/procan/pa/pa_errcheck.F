@@ -48,7 +48,7 @@ C-----------------------------------------------------------------------
       USE PA_VARS
       USE PA_PARSE
       USE PA_DEFN
-      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
       
@@ -497,7 +497,7 @@ c..If all species requested, insert all species into position
                   CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94840 )
                   CALL LOG_MESSAGE( LOGDEV ,  MSG )
-                  CALL M3EXIT( 'ERRCHECK', IZERO, IZERO, ' ', XSTAT1 )
+                  CALL M3EXIT( 'PA_ERRCHECK', IZERO, IZERO, ' ', XSTAT1 )
                END IF
 
                OFFSET = PAINDX - 1 + N_CGRID_SPC - NOUT
@@ -768,7 +768,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF ( LERREND ) THEN
          WRITE( MSG, 95740 )
          CALL LOG_MESSAGE( LOGDEV ,  MSG )
-         CALL M3EXIT( 'ERRCHECK', IZERO, IZERO, ' ', XSTAT1 )
+         CALL M3EXIT( 'PA_ERRCHECK', IZERO, IZERO, ' ', XSTAT1 )
       ELSE
          WRITE( MSG, 95760 )
          CALL LOG_MESSAGE( LOGDEV ,  MSG )

@@ -69,7 +69,8 @@ C  NOTES:  Uses dynamic memory allocation for NCOLS_WE and NROWS_SN
 C .......................................................................
 
 !     USE PIOMAPS_MODULE
-      USE M3UTILIO              ! i/o api
+!     USE M3UTILIO              ! i/o api
+      use replacement_util_module
       USE LOGDEV_MOD, ONLY : LOGDEV, LOG_WARNING
 
       IMPLICIT  NONE

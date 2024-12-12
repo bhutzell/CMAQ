@@ -81,7 +81,8 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN      
       USE AERO_DATA           ! aero variable data
       USE AEROMET_DATA
-      USE CONST        
+      USE CONST
+      USE LOGDEV_MOD, ONLY: M3EXIT        
 !      USE Mosaic_Mod, Only: ADEPVJ  ! Shared mosaic variables
 !      Use LSM_Mod, Only: N_LUFRAC
       USE ASX_DATA_MOD, Only: Met_Data
@@ -324,7 +325,7 @@ C-----------------------------------------------------------------------
       USE AERO_DATA, Only: N_MODE
       Use LSM_Mod, Only: N_LUFRAC
       USE UTILIO_DEFN
-      USE RUNTIME_VARS, ONLY: LOGDEV
+      USE LOGDEV_MOD, ONLY: LOGDEV, M3EXIT
       IMPLICIT NONE
       CHARACTER( 96 ) :: XMSG = ' '
 

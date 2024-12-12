@@ -273,7 +273,8 @@ set make_options = "-j"                #> additional options for make command if
     set PAR = ( -Dparallel )
     set Popt = SE
     set seL = se_snl
-    set LIB2 = "${ioapi_lib}"
+#   set LIB2 = "${ioapi_lib}"
+    set LIB2 = 
     set LIB3 = "${mpi_lib} ${extra_lib}"
     set Str1 = (// Parallel / Include message passing definitions)
     set Str2 = (include SUBST_MPI mpif.h;)
@@ -293,7 +294,8 @@ set make_options = "-j"                #> additional options for make command if
     set PAR = ""
     set Popt = NOOP
     set seL = sef90_noop
-    set LIB2 = "${ioapi_lib} ${extra_lib}"
+#   set LIB2 = "${ioapi_lib} ${extra_lib}"
+    set LIB2 = "${extra_lib}"
     set Str1 =
     set Str2 =
  endif 
@@ -464,18 +466,26 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo                                                              >> $Cfile
  echo "lib_base    $CMAQ_LIB;"                                     >> $Cfile
  echo                                                              >> $Cfile
- echo "lib_1       ioapi/lib;"                                     >> $Cfile
- echo                                                              >> $Cfile
- echo "lib_2       ioapi/include_files;"                           >> $Cfile
- echo                                                              >> $Cfile
+#echo "lib_1       ioapi/lib;"                                     >> $Cfile
+#echo                                                              >> $Cfile
+#echo "lib_2       ioapi/include_files;"                           >> $Cfile
+#echo                                                              >> $Cfile
+#if ( $?ParOpt ) then
+#   echo "lib_3       ${quote}mpi -I.$quote;"                      >> $Cfile
+#   echo                                                           >> $Cfile
+#endif
+#echo                                                              >> $Cfile
+#echo "lib_4       ioapi/lib;"                                     >> $Cfile
+#echo                                                              >> $Cfile
+#echo "lib_5       netcdf/include;"                                >> $Cfile
+#echo                                                              >> $Cfile
+
  if ( $?ParOpt ) then
-    echo "lib_3       ${quote}mpi -I.$quote;"                      >> $Cfile
-    echo                                                           >> $Cfile
+   echo "lib_1       ${quote}mpi -I.$quote;"                       >> $Cfile
+   echo                                                            >> $Cfile
  endif
  echo                                                              >> $Cfile
- echo "lib_4       ioapi/lib;"                                     >> $Cfile
- echo                                                              >> $Cfile
- echo "lib_5       netcdf/include;"                                >> $Cfile
+ echo "lib_2       netcdf/include;"                                >> $Cfile
  echo                                                              >> $Cfile
  set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $cpp_depmod $STX1 $STX2$quote;"
  echo "cpp_flags   $text"                                          >> $Cfile
@@ -496,8 +506,8 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo                                                              >> $Cfile
  echo "link_flags  $quote$LINK_FLAGS$quote;"                       >> $Cfile
  echo                                                              >> $Cfile
- echo "ioapi       $quote$LIB2$quote;     "                        >> $Cfile
- echo                                                              >> $Cfile
+#echo "ioapi       $quote$LIB2$quote;     "                        >> $Cfile
+#echo                                                              >> $Cfile
  echo "netcdf      $quote$netcdf_lib$quote;"                       >> $Cfile
  echo                                                              >> $Cfile
  echo "netcdff     $quote$netcdff_lib$quote;"                      >> $Cfile

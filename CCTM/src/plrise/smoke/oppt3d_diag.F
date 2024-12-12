@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/plrise/smoke/oppt3d_diag.F,v 1.3 2011/10/21 16:11:31 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPPT3D_DIAG( PT3DNAME, TSTEP, 
      &                        N_SPC, SPEC_NAME, SPEC_UNITS )
@@ -34,9 +28,6 @@ C    Opens the output 3d point source emissions diagnostic file
  
 C  Preconditions:
  
-C  Subroutines and Functions Called:
-C       I/O API 
-
 C Revision History:
 C      4 Sep 2007 J.Young: initial
 C     29 Jan 2010 D. Wong: Eliminate potential race condition at the MYPE = 0
@@ -79,32 +70,7 @@ C-----------------------------------------------------------------------
 #ifndef mpas
 C Set output file characteristics based on GRID_CONF module and open the 3D emis file
 
-      FTYPE3D = GRDDED3
-      SDATE3D = STDATE
-      STIME3D = STTIME
-      TSTEP3D = TSTEP
-      NCOLS3D = GL_NCOLS
-      NROWS3D = GL_NROWS
-      NLAYS3D = DESID_LAYS
-      NTHIK3D = 1
       NVARS3D = N_SPC
-      GDTYP3D = GDTYP_GD
-      P_ALP3D = P_ALP_GD
-      P_BET3D = P_BET_GD
-      P_GAM3D = P_GAM_GD
-      XORIG3D = XORIG_GD
-      YORIG3D = YORIG_GD
-      XCENT3D = XCENT_GD
-      YCENT3D = YCENT_GD
-      XCELL3D = XCELL_GD
-      YCELL3D = YCELL_GD
-      VGTYP3D = VGTYP_GD
-      VGTOP3D = VGTOP_GD
-      GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-      DO L = 1, NLAYS3D + 1
-         VGLVS3D( L ) = VGLVS_GD( L )
-      END DO
 
       VNAME3D = ' '     ! array
       DO V = 1, N_SPC
@@ -124,11 +90,6 @@ C Set output file characteristics based on GRID_CONF module and open the 3D emis
          VDESC3D( V ) = 'Model species: ' // TRIM( SPEC_NAME( V ) )
       END DO
 
-      FDESC3D = ' '  ! array
-      FDESC3D( 1 ) = 'gridded hourly point source layered emissions'
-      FDESC3D( 2 ) = '/From/ ' // PNAME
-      FDESC3D( 3 ) = '/Version/ Inline'
-
       ! Store MIO Metadata
       NDIMS3D( 1:NVARS3D ) = 4
       L_TSTEP( 1:NVARS3D ) = .True.
@@ -146,12 +107,13 @@ C Set output file characteristics based on GRID_CONF module and open the 3D emis
 
 C create header
 
-      IF ( IO_PE_INCLUSIVE ) THEN   ! open new
-         IF ( .NOT. OPEN3( PT3DNAME, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not open ' // TRIM( PT3DNAME )
-            CALL M3EXIT( PNAME, STDATE, STTIME, XMSG, XSTAT1 )
-         END IF
-      END IF
+! needs mio implementation
+!      IF ( IO_PE_INCLUSIVE ) THEN   ! open new
+!         IF ( .NOT. OPEN3( PT3DNAME, FSNEW3, PNAME ) ) THEN
+!            XMSG = 'Could not open ' // TRIM( PT3DNAME )
+!            CALL M3EXIT( PNAME, STDATE, STTIME, XMSG, XSTAT1 )
+!         END IF
+!      END IF
 #endif
 
       RETURN

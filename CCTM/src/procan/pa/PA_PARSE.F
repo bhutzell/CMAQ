@@ -65,7 +65,7 @@ C           column are skipped. The line count is stored in LINNUM.
 C......................................................................
 
          USE UTILIO_DEFN
-         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+         USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
          IMPLICIT NONE
 C.......................................................................
@@ -147,7 +147,7 @@ C Key Subroutines/Functions Called: EATCOM, GETCHR, RDLINE
 C......................................................................
 
          USE UTILIO_DEFN
-         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+         USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
          IMPLICIT NONE
 
@@ -262,7 +262,7 @@ C              but only the first sixteen characters are retained.  The
 C              first character must be alphabetic.
 C.......................................................................
          USE UTILIO_DEFN
-         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+         USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
          IMPLICIT NONE
          
@@ -395,7 +395,7 @@ C Key Subroutines/Functions Called: EATCOM, GETCHR
 C.......................................................................
  
          USE UTILIO_DEFN
-         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+         USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
          IMPLICIT NONE
          
@@ -461,7 +461,7 @@ C Key Subroutines/Functions Called: RDLINE, GETCHR
 C.......................................................................
  
          USE UTILIO_DEFN
-         USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+         USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
          IMPLICIT NONE
          

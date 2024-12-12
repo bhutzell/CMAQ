@@ -17,13 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/vadv/wrf/vppm.F,v 1.5 2011/10/21 16:11:40 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef isam
       SUBROUTINE VPPM ( NI, DT, DS, FLX, VEL, CON, SA_CON  )
@@ -111,6 +104,7 @@ C----------------------------------------------------------------------
       
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE LOGDEV_MOD, ONLY: M3EXIT
 #ifdef isam
       USE SA_DEFN
 #elif sens
@@ -136,9 +130,6 @@ Ckrt
       REAL,    INTENT( INOUT ) :: SA_CON( NI,N_SPCTAG )
 #endif
 
-!!! NOTE: Even tho' VEL is not used on output, declaring it as INTENT(IN) causes the
-!!!       code to fail. ifort compiler error?
-      
 C Parameters:
       
       REAL, PARAMETER :: TWO3RDS = 2.0 / 3.0
@@ -398,6 +389,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 C get ppm coefficients CR, CL, DC, and C6
 
       USE UTILIO_DEFN
+      USE LOGDEV_MOD, ONLY: M3EXIT
 
       IMPLICIT NONE
 

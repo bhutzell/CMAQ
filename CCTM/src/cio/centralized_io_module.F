@@ -106,8 +106,9 @@
       MODULE CENTRALIZED_IO_MODULE
 
         use RUNTIME_VARS, only : LTNG_NO, STDATE, STTIME, ABFLUX, MOSAIC, 
-     &                           NPTGRPS, USE_MARINE_GAS_EMISSION, logdev,
-     &                           CONVECTIVE_SCHEME, EMIS_SYM_DATE, LOG_MESSAGE, LOG_WARNING
+     &                           NPTGRPS, USE_MARINE_GAS_EMISSION,
+     &                           CONVECTIVE_SCHEME, EMIS_SYM_DATE
+        use logdev_mod, only:  LOGDEV, LOG_MESSAGE, LOG_WARNING, M3EXIT
         use CENTRALIZED_IO_UTIL_MODULE
         use get_env_module 
         USE UTILIO_DEFN

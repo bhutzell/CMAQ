@@ -85,9 +85,6 @@ C-----------------------------------------------------------------------
          IMPLICIT NONE
          INCLUDE SUBST_FILES_ID
 
-C External Functions
-         LOGICAL,         EXTERNAL :: CHKGRID
-
 C Arguments:
          LOGICAL :: SUCCESS
          INTEGER, INTENT(  IN ) :: JDATE   ! current simulation date (YYYYDDD)

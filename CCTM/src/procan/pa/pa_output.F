@@ -77,6 +77,7 @@ C-----------------------------------------------------------------------
       USE PAGRD_DEFN            ! PA horiz domain specs
       USE UTILIO_DEFN           ! inherits PARUTILIO
       use mio_module
+      use replacement_util_module
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE, SE_DATA_COPY_MODULE)

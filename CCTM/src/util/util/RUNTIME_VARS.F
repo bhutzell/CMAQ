@@ -309,11 +309,7 @@
 
       USE LOGDEV_MOD
       USE RXNS_DATA, ONLY : MECHNAME
-#ifdef mpas
       use utilio_defn
-#else
-      USE M3UTILIO
-#endif
 
       IMPLICIT NONE                         
 

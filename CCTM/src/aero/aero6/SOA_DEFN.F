@@ -281,8 +281,9 @@ C-----------------------------------------------------------------------
       Use cgrid_spcs, only: n_gc_spc, gc_spc, n_gc_g2ae, gc_g2ae, gc_strt, gc_molwt, gc_g2ae_map, 
      &                      n_nr_spc, nr_spc, n_nr_n2ae, nr_n2ae, nr_strt, nr_molwt, nr_n2ae_map,
      &                      n_ae_spc, ae_spc
-      Use runtime_vars, only: logdev, log_subheading
-      Use utilio_defn, only: index1, xstat3, m3exit
+      Use logdev_mod, only: logdev, log_subheading, m3exit
+      Use utilio_defn, only: index1, xstat3
+
 
       Implicit None
 
@@ -532,7 +533,8 @@ C-----------------------------------------------------------------------
       Use aero_data, only : cond_budget, npf_budget
       Use aeromet_data, only: airdens, min_gasconc
       Use const, only: inv_mwair
-      Use utilio_defn, only: xstat3, m3exit
+      Use utilio_defn, only: xstat3
+      Use logdev_mod, only: m3exit
 
       Implicit None
 

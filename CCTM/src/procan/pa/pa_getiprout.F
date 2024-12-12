@@ -39,7 +39,7 @@ C-----------------------------------------------------------------------
       USE PA_DEFN, Only: N_IPR_SPC
       USE PA_IPRVARS
       USE PA_PARSE
-      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
       

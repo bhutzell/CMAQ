@@ -55,6 +55,7 @@
           include 'mpif.h'
 #endif
 
+write(mio_logdev,'(A,A)') '==c== mio_fcreate: ', trim(fname)
           entire_file  = .false.
           partial_file = .false.
           subset_layer = .false.
@@ -644,6 +645,14 @@
                 call mio_output_mpas_basic_var (source, dest, ndims)
              end if
           end if
+
+write (mio_logdev, '(A,4i5)') '==c== mio_fcreate mio_n_infiles, mio_n_outfiles, mio_nfiles, size ', &
+                                     mio_n_infiles, mio_n_outfiles, mio_nfiles, size(mio_file_data)-1
+
+   do n = 1, mio_nfiles
+      write (mio_logdev, '(A,i3,2x,A)' ) '==c== fcreate', n, trim(mio_file_data(n)%filename)
+   end do
+
 
         end subroutine mio_fcreate
 

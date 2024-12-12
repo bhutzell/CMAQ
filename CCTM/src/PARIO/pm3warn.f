@@ -51,8 +51,9 @@ C  SUBROUTINES AND FUNCTIONS CALLED:  M3WARN.
 C
 C***********************************************************************
 
-      USE M3UTILIO              ! i/o api
+!      USE M3UTILIO              ! i/o api
       USE LOGDEV_MOD, ONLY : LOGDEV,LOG_WARNING
+      use replacement_util_module
 
       IMPLICIT NONE
 

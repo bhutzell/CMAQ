@@ -27,7 +27,7 @@
 
           integer :: stat, fnvars, ndims, n_global_atts, unlimited,   &
                      nsteps, t, i, ins, iwe, year, month, day, hh, mm, ss,      &
-                     fmode, time_strlen_dim_loc, floc, l_num_of_outfiles
+                     fmode, time_strlen_dim_loc, floc, mfdsize
           character (mio_max_time_length) :: time_str
           character (mio_max_filename_len) :: full_name
           logical :: done, called_once = .false.
@@ -37,25 +37,20 @@
 
           if (mio_nfiles .eq. 0) then
              t = -1
+             mfdsize = 0
           else
              t = mio_search (full_name, mio_file_data(:)%full_filename, mio_nfiles)
+             mfdsize = size(mio_file_data) - 1
           end if
 
-           if (present(num_of_outfiles)) then
+          if (present(num_of_outfiles)) then
             if (called_once) then
                write(mio_logdev, *) ' Abort in mio_fopen: called twice with outfiles'
                stop
             else
-               l_num_of_outfiles = num_of_outfiles
+               call mio_expand_file_data( num_of_outfiles )
                called_once = .true.
             end if
-          else
-             l_num_of_outfiles = 0
-          end if
-
-          if (mod(mio_n_infiles, mio_df_add_space) == 0 .or. &
-                  l_num_of_outfiles > 0 ) then
-                call mio_expand_file_data (l_num_of_outfiles)
           end if
 
           if (t .gt. 0) then
@@ -63,417 +58,425 @@
              return
           end if 
 
+          if ( mio_n_infiles + mio_n_outfiles .ge. mfdsize )  then
+             call mio_expand_file_data( mio_df_add_space )
+          end if
 
-             mio_nfiles = mio_nfiles + 1
-             mio_cfile = mio_nfiles
-             floc = mio_cfile
-             mio_file_data(floc)%filename = fname
-             mio_file_data(floc)%full_filename = full_name
 
-             mio_file_data(floc)%link = -1
-             if (mode .eq. mio_read_only) then
-                mio_n_infiles = mio_n_infiles + 1
-                fmode = nf90_nowrite
+          mio_nfiles = mio_nfiles + 1
+          mio_cfile = mio_nfiles
+          floc = mio_cfile
+          mio_file_data(floc)%filename = fname
+          mio_file_data(floc)%full_filename = full_name
+
+          mio_file_data(floc)%link = -1
+          if (mode .eq. mio_read_only) then
+             mio_n_infiles = mio_n_infiles + 1
+             fmode = nf90_nowrite
+          else
+             fmode = nf90_write
+          end if
+
+          stat = nf90_open (full_name, fmode, mio_file_data(floc)%fileid)
+
+          if (stat == nf90_noerr) then
+             if (mio_mype == 0) then
+                write (mio_logdev, '(a, a9, a)') trim(fname), ' opened: ', trim(full_name)
+             end if
+          else
+             write (mio_logdev, '(a)') 'Abort in mio_fopen opening ' // trim(full_name)
+             write (mio_logdev, *)  trim(nf90_strerror(stat))
+             stop
+          end if
+
+          stat = nf90_inquire (mio_file_data(floc)%fileid, ndims,    &
+                               fnvars, n_global_atts, unlimited)
+
+          mio_file_data(floc)%ndims         = ndims
+          mio_file_data(floc)%fnvars        = fnvars
+          mio_file_data(floc)%nvars         = fnvars - 1
+          mio_file_data(floc)%n_global_atts = n_global_atts
+          mio_file_data(floc)%mode          = mode
+
+          allocate (mio_file_data(floc)%dim_name(ndims),                            &
+                    mio_file_data(floc)%dim_value(ndims),                           &
+                    mio_file_data(floc)%var_time_dep(fnvars),                       &
+                    mio_file_data(floc)%var_name(fnvars),                           &
+                    mio_file_data(floc)%lvar_name(fnvars),                          &
+                    mio_file_data(floc)%units(fnvars),                              &
+                    mio_file_data(floc)%var_type(fnvars),                           &
+                    mio_file_data(floc)%var_decomp(fnvars),                         &
+                    mio_file_data(floc)%var_grid_type(fnvars),                      &
+                    mio_file_data(floc)%var_id(fnvars),                             &
+                    mio_file_data(floc)%var_ndims(fnvars),                          &
+                    mio_file_data(floc)%var_dimids(ndims, fnvars),                  &
+                    mio_file_data(floc)%var_dimsize(ndims, fnvars),                 &
+                    mio_file_data(floc)%num_var_att(fnvars),                        &
+                    mio_file_data(floc)%var_att_name(mio_max_num_var_att, fnvars),  &
+                    mio_file_data(floc)%var_att_len(mio_max_num_var_att, fnvars),   &
+                    mio_file_data(floc)%var_att_type(mio_max_num_var_att, fnvars),  &
+                    mio_file_data(floc)%int_vatt_val(mio_max_num_var_att, fnvars),  &
+                    mio_file_data(floc)%real_vatt_val(mio_max_num_var_att, fnvars), &
+                    mio_file_data(floc)%char_vatt_val(mio_max_num_var_att, fnvars), &
+                    mio_file_data(floc)%glo_att_name(n_global_atts),                &
+                    mio_file_data(floc)%glo_att_type(n_global_atts),                &
+                    mio_file_data(floc)%glo_att_len(n_global_atts),                 &
+                    mio_file_data(floc)%glo_att_crange(n_global_atts*2),            &
+                    mio_file_data(floc)%glo_att_irange(n_global_atts*2),            &
+                    mio_file_data(floc)%glo_att_rrange(n_global_atts*2),            &
+                    mio_file_data(floc)%glo_att_drange(n_global_atts*2),            &
+                    stat=stat)
+
+          if (stat .ne. 0) then
+             write (mio_logdev, *) 'Abort in routine mio_fopen due to memory allocation error'
+             write (mio_logdev, '(A,i3,2x,A)') 'floc, fname: ', floc, trim(mio_file_data(floc)%filename)
+             stop
+          end if
+
+          call mio_retrieve_dimension_information (mio_file_data(floc))
+
+          i = mio_search ('nCells',                          &
+                          mio_file_data(floc)%dim_name,      &
+                          mio_file_data(floc)%ndims)
+
+          if (i .gt. 0) then
+             mio_file_data(floc)%file_format = mio_mpas_format
+             mio_file_data(floc)%nvars       = fnvars - 1
+          end if
+
+          call mio_retrieve_variable_information (mio_file_data(floc))
+
+          call mio_retrieve_global_attribute_information (mio_file_data(floc))
+
+          i = mio_search ('TITLE',                            &
+                          mio_file_data(floc)%glo_att_name,   &
+                          mio_file_data(floc)%n_global_atts)
+
+          if (i .gt. 0) then                                           !  WRF
+             mio_file_data(floc)%file_format  = mio_wrf_format
+
+             ! local WRF file DateStrLen dimension location
+             time_strlen_dim_loc = mio_search ('DateStrLen',                        &
+                                               mio_file_data(floc)%dim_name,   &
+                                               mio_file_data(floc)%ndims)
+
+             mio_file_data(floc)%time_strlen_dim_loc = time_strlen_dim_loc
+
+             ins = mio_search ('south_north',                      &
+                               mio_file_data(floc)%dim_name,  &
+                               mio_file_data(floc)%ndims)
+             if (ins .gt. 0) then
+                mio_file_data(floc)%gl_nrows = mio_file_data(floc)%dim_value(ins)
              else
-                fmode = nf90_write
+                mio_file_data(floc)%gl_nrows = 1
              end if
 
-             stat = nf90_open (full_name, fmode, mio_file_data(floc)%fileid)
-
-             if (stat == nf90_noerr) then
-                if (mio_mype == 0) then
-                   write (mio_logdev, '(a, a9, a)') trim(fname), ' opened: ', trim(full_name)
-                end if
+             iwe = mio_search ('west_east',                        &
+                               mio_file_data(floc)%dim_name,  &
+                               mio_file_data(floc)%ndims)
+             if (iwe .gt. 0) then
+                mio_file_data(floc)%gl_ncols = mio_file_data(floc)%dim_value(iwe)
              else
-                write (mio_logdev, '(a)') 'Abort in mio_fopen opening ' // trim(full_name)
-                write (mio_logdev, *)  trim(nf90_strerror(stat))
-                stop
+                mio_file_data(floc)%gl_ncols = 1
              end if
 
-             stat = nf90_inquire (mio_file_data(floc)%fileid, ndims,    &
-                                  fnvars, n_global_atts, unlimited)
-
-             mio_file_data(floc)%ndims         = ndims
-             mio_file_data(floc)%fnvars        = fnvars
-             mio_file_data(floc)%nvars         = fnvars - 1
-             mio_file_data(floc)%n_global_atts = n_global_atts
-             mio_file_data(floc)%mode          = mode
-
-             allocate (mio_file_data(floc)%dim_name(ndims),                            &
-                       mio_file_data(floc)%dim_value(ndims),                           &
-                       mio_file_data(floc)%var_time_dep(fnvars),                       &
-                       mio_file_data(floc)%var_name(fnvars),                           &
-                       mio_file_data(floc)%lvar_name(fnvars),                          &
-                       mio_file_data(floc)%units(fnvars),                              &
-                       mio_file_data(floc)%var_type(fnvars),                           &
-                       mio_file_data(floc)%var_decomp(fnvars),                         &
-                       mio_file_data(floc)%var_grid_type(fnvars),                      &
-                       mio_file_data(floc)%var_id(fnvars),                             &
-                       mio_file_data(floc)%var_ndims(fnvars),                          &
-                       mio_file_data(floc)%var_dimids(ndims, fnvars),                  &
-                       mio_file_data(floc)%var_dimsize(ndims, fnvars),                 &
-                       mio_file_data(floc)%num_var_att(fnvars),                        &
-                       mio_file_data(floc)%var_att_name(mio_max_num_var_att, fnvars),  &
-                       mio_file_data(floc)%var_att_len(mio_max_num_var_att, fnvars),   &
-                       mio_file_data(floc)%var_att_type(mio_max_num_var_att, fnvars),  &
-                       mio_file_data(floc)%int_vatt_val(mio_max_num_var_att, fnvars),  &
-                       mio_file_data(floc)%real_vatt_val(mio_max_num_var_att, fnvars), &
-                       mio_file_data(floc)%char_vatt_val(mio_max_num_var_att, fnvars), &
-                       mio_file_data(floc)%glo_att_name(n_global_atts),                &
-                       mio_file_data(floc)%glo_att_type(n_global_atts),                &
-                       mio_file_data(floc)%glo_att_len(n_global_atts),                 &
-                       mio_file_data(floc)%glo_att_crange(n_global_atts*2),            &
-                       mio_file_data(floc)%glo_att_irange(n_global_atts*2),            &
-                       mio_file_data(floc)%glo_att_rrange(n_global_atts*2),            &
-                       mio_file_data(floc)%glo_att_drange(n_global_atts*2),            &
-                       stat=stat)
-
-             if (stat .ne. 0) then
-                write (mio_logdev, *) 'Abort in routine mio_fopen due to memory allocation error'
-                write (mio_logdev, '(A,i3,2x,A)') 'floc, fname: ', floc, trim(mio_file_data(floc)%filename)
-                stop
-             end if
-
-             call mio_retrieve_dimension_information (mio_file_data(floc))
-
-             i = mio_search ('nCells',                          &
-                             mio_file_data(floc)%dim_name,      &
+             i = mio_search ('bottom_top',                        &
+                             mio_file_data(floc)%dim_name,   &
                              mio_file_data(floc)%ndims)
-
              if (i .gt. 0) then
-                mio_file_data(floc)%file_format = mio_mpas_format
-                mio_file_data(floc)%nvars       = fnvars - 1
+                mio_file_data(floc)%nlays = mio_file_data(floc)%dim_value(i)
+             else
+                mio_file_data(floc)%nlays = 1
              end if
 
-             call mio_retrieve_variable_information (mio_file_data(floc))
+             mio_file_data(floc)%time_dim_loc = mio_search ('Time',                         &
+                                                            mio_file_data(floc)%dim_name,   &
+                                                            mio_file_data(floc)%ndims)
 
-             call mio_retrieve_global_attribute_information (mio_file_data(floc))
+             mio_file_data(floc)%layer_dim_loc = mio_search ('bottom_top',                   &
+                                                             mio_file_data(floc)%dim_name,   &
+                                                             mio_file_data(floc)%ndims)
 
-             i = mio_search ('TITLE',                            &
+             mio_file_data(floc)%var_decomp = .false.
+             do i = 1, fnvars
+                if ((mio_search (ins, mio_file_data(floc)%var_dimids(:,i),     &
+                                 mio_file_data(floc)%var_ndims(i)) > 0) .and.  &
+                    (mio_search (iwe, mio_file_data(floc)%var_dimids(:,i),     &
+                                 mio_file_data(floc)%var_ndims(i)) > 0)) then
+                   mio_file_data(floc)%var_decomp(i) = .true.
+                end if
+             end do
+
+          else
+
+             i = mio_search ('IOAPI_VERSION',                    &
                              mio_file_data(floc)%glo_att_name,   &
                              mio_file_data(floc)%n_global_atts)
 
-             if (i .gt. 0) then                                           !  WRF
-                mio_file_data(floc)%file_format  = mio_wrf_format
+             if (i .gt. 0) then                                                 !  IOAPI_3
+                mio_file_data(floc)%file_format  = mio_ioapi3_format
 
-                ! local WRF file DateStrLen dimension location
-                time_strlen_dim_loc = mio_search ('DateStrLen',                        &
-                                                  mio_file_data(floc)%dim_name,   &
+                if (mio_bndy_var_ind == -1) then  ! a non-boundary file
+                   mio_file_data(floc)%nbndy_cells = 0
+                   mio_file_data(floc)%gl_ncols    = mio_file_data(floc)%dim_value(6)
+                   mio_file_data(floc)%gl_nrows    = mio_file_data(floc)%dim_value(5)
+                else
+                   mio_file_data(floc)%nbndy_cells = mio_file_data(floc)%dim_value(5)
+                   i = mio_search ('NCOLS',                            &
+                                   mio_file_data(floc)%glo_att_name,   &
+                                   mio_file_data(floc)%n_global_atts)
+                   t = mio_file_data(floc)%glo_att_irange(2*i)
+                   mio_file_data(floc)%gl_ncols    = mio_file_data(floc)%glo_att_ival(t)
+
+                   i = mio_search ('NROWS',                            &
+                                   mio_file_data(floc)%glo_att_name,   &
+                                   mio_file_data(floc)%n_global_atts)
+                   t = mio_file_data(floc)%glo_att_irange(2*i)
+                   mio_file_data(floc)%gl_nrows    = mio_file_data(floc)%glo_att_ival(t)
+
+                   i = mio_search ('NTHIK',                            &
+                                   mio_file_data(floc)%glo_att_name,   &
+                                   mio_file_data(floc)%n_global_atts)
+                   t = mio_file_data(floc)%glo_att_irange(2*i)
+                   mio_file_data(floc)%bndy_thickness = mio_file_data(floc)%glo_att_ival(t)
+                end if
+
+                mio_file_data(floc)%time_dim_loc = mio_search ('TSTEP',                        &
+                                                               mio_file_data(floc)%dim_name,   &
+                                                               mio_file_data(floc)%ndims)
+ 
+                i = mio_search ('LAY',                                                         &
+                                mio_file_data(floc)%dim_name,                                  &
+                                mio_file_data(floc)%ndims)
+                mio_file_data(floc)%layer_dim_loc = i
+
+                mio_file_data(floc)%nlays = mio_file_data(floc)%dim_value(i)
+ 
+                mio_file_data(floc)%var_decomp = .false.
+                do i = 1, fnvars
+                   if ((mio_search (5, mio_file_data(floc)%var_dimids(:,i),       &
+                                    mio_file_data(floc)%var_ndims(i)) > 0) .and.  &
+                       (mio_search (6, mio_file_data(floc)%var_dimids(:,i),       &
+                                    mio_file_data(floc)%var_ndims(i)) > 0)) then
+                      mio_file_data(floc)%var_decomp(i) = .true.
+                   end if
+                end do
+
+             else if (mio_file_data(floc)%file_format .eq. mio_mpas_format) then
+
+                ! local MPAS file StrLen dimension location
+                time_strlen_dim_loc = mio_search ('StrLen',                          &
+                                                  mio_file_data(floc)%dim_name, &
                                                   mio_file_data(floc)%ndims)
 
                 mio_file_data(floc)%time_strlen_dim_loc = time_strlen_dim_loc
 
-                ins = mio_search ('south_north',                      &
-                                  mio_file_data(floc)%dim_name,  &
-                                  mio_file_data(floc)%ndims)
-                if (ins .gt. 0) then
-                   mio_file_data(floc)%gl_nrows = mio_file_data(floc)%dim_value(ins)
-                else
-                   mio_file_data(floc)%gl_nrows = 1
-                end if
+                i = mio_search ('nCells',                     &
+                                mio_file_data(floc)%dim_name, &
+                                mio_file_data(floc)%ndims)
 
-                iwe = mio_search ('west_east',                        &
-                                  mio_file_data(floc)%dim_name,  &
-                                  mio_file_data(floc)%ndims)
-                if (iwe .gt. 0) then
-                   mio_file_data(floc)%gl_ncols = mio_file_data(floc)%dim_value(iwe)
-                else
-                   mio_file_data(floc)%gl_ncols = 1
-                end if
+                mio_file_data(floc)%gl_ncols = mio_file_data(floc)%dim_value(i)
+                mio_file_data(floc)%gl_nrows = 1
 
-                i = mio_search ('bottom_top',                        &
-                                mio_file_data(floc)%dim_name,   &
+                if (mio_parallelism .eq. mio_serial) then
+                   mio_file_data(floc)%ncols = mio_file_data(floc)%gl_ncols
+!               else
+!                  need implementation
+                end if
+                mio_file_data(floc)%nrows = 1
+
+                i = mio_search ('nVertLevels',                     &
+                                mio_file_data(floc)%dim_name,      &
                                 mio_file_data(floc)%ndims)
                 if (i .gt. 0) then
                    mio_file_data(floc)%nlays = mio_file_data(floc)%dim_value(i)
                 else
-                   mio_file_data(floc)%nlays = 1
+                   i = mio_search ('nVertLevelsP1',                &
+                                   mio_file_data(floc)%dim_name,   &
+                                   mio_file_data(floc)%ndims)
+                   if (i .gt. 0) then
+                      mio_file_data(floc)%nlays = mio_file_data(floc)%dim_value(i) - 1
+                   else
+                      ! # of layers information does not exist, set to 1 by default'
+                      mio_file_data(floc)%nlays = 1
+                   end if
                 end if
 
                 mio_file_data(floc)%time_dim_loc = mio_search ('Time',                         &
                                                                mio_file_data(floc)%dim_name,   &
                                                                mio_file_data(floc)%ndims)
 
-                mio_file_data(floc)%layer_dim_loc = mio_search ('bottom_top',                   &
+                mio_file_data(floc)%layer_dim_loc = mio_search ('nVertLevels',                  &
                                                                 mio_file_data(floc)%dim_name,   &
                                                                 mio_file_data(floc)%ndims)
 
+                ins = mio_search ('nCells',                      &
+                                  mio_file_data(floc)%dim_name,  &
+                                  mio_file_data(floc)%ndims)
+
                 mio_file_data(floc)%var_decomp = .false.
                 do i = 1, fnvars
-                   if ((mio_search (ins, mio_file_data(floc)%var_dimids(:,i),     &
-                                    mio_file_data(floc)%var_ndims(i)) > 0) .and.  &
-                       (mio_search (iwe, mio_file_data(floc)%var_dimids(:,i),     &
-                                    mio_file_data(floc)%var_ndims(i)) > 0)) then
+                   if (mio_search (ins, mio_file_data(floc)%var_dimids(:,i),       &
+                                    mio_file_data(floc)%var_ndims(i)) > 0) then
                       mio_file_data(floc)%var_decomp(i) = .true.
                    end if
                 end do
+             end if
+          end if
 
+!       if (unlimited .ge. 1) then
+!          nsteps = mio_file_data(floc)%dim_value(mio_file_data(floc)%time_dim_loc)
+!          mio_file_data(floc)%unlimited = unlimited
+!       else
+!          nsteps = 0
+!       end if
+
+          if (mio_file_data(floc)%time_dim_loc .gt. 0) then
+             nsteps = mio_file_data(floc)%dim_value(mio_file_data(floc)%time_dim_loc)
+!            if (mio_file_data(floc)%mode .eq. mio_read_write) then
+!               allocate (mio_file_data(floc)%timestamp(nsteps+mio_preset_num_tsteps), stat=stat)
+!            else
+                allocate (mio_file_data(floc)%timestamp(nsteps), stat=stat)
+!            end if
+          else
+             allocate (mio_file_data(floc)%timestamp(1), stat=stat)
+             mio_file_data(floc)%timestamp(1) = zero_time
+             nsteps = 1
+          end if
+
+          mio_file_data(floc)%nsteps = nsteps
+
+          ! setup domain decomposition mapping
+          ! the last dimension indicates cross or dot grid
+          allocate (mio_file_data(floc)%ncols_pe(mio_nprocs, 2),     &
+                    mio_file_data(floc)%nrows_pe(mio_nprocs, 2),     &
+                    mio_file_data(floc)%colde_pe(2, mio_nprocs, 2),  &
+                    mio_file_data(floc)%rowde_pe(2, mio_nprocs, 2),  &
+                    stat=stat)
+ 
+          mio_file_data(floc)%colde_pe = 0
+          mio_file_data(floc)%rowde_pe = 0
+
+          mio_file_data(floc)%ncols_pe = mio_domain_ncols_pe
+          mio_file_data(floc)%nrows_pe = mio_domain_nrows_pe
+          mio_file_data(floc)%colde_pe = mio_domain_colde_pe
+          mio_file_data(floc)%rowde_pe = mio_domain_rowde_pe
+
+          if (mio_file_data(floc)%file_format .eq. mio_ioapi3_format) then         ! this is for IOAPI data 
+             if (mio_parallelism .eq. mio_serial) then
+                mio_file_data(floc)%ncols = mio_file_data(floc)%gl_ncols
+                mio_file_data(floc)%nrows = mio_file_data(floc)%gl_nrows
              else
+                if (mio_file_data(floc)%ndims == 5) then                           ! boundary file 
+                   mio_file_data(floc)%grid_type = 'b'
+                   mio_file_data(floc)%ncols = -1
+                   mio_file_data(floc)%nrows = -1
+                else
 
-                i = mio_search ('IOAPI_VERSION',                    &
-                                mio_file_data(floc)%glo_att_name,   &
-                                mio_file_data(floc)%n_global_atts)
+                   mio_file_data(floc)%grid_type = '-'
+                   call mio_subhfile (fname)
 
-                if (i .gt. 0) then                                                 !  IOAPI_3
-                   mio_file_data(floc)%file_format  = mio_ioapi3_format
-
-                   if (mio_bndy_var_ind == -1) then  ! a non-boundary file
-                      mio_file_data(floc)%nbndy_cells = 0
-                      mio_file_data(floc)%gl_ncols    = mio_file_data(floc)%dim_value(6)
-                      mio_file_data(floc)%gl_nrows    = mio_file_data(floc)%dim_value(5)
-                   else
-                      mio_file_data(floc)%nbndy_cells = mio_file_data(floc)%dim_value(5)
-                      i = mio_search ('NCOLS',                            &
-                                      mio_file_data(floc)%glo_att_name,   &
-                                      mio_file_data(floc)%n_global_atts)
-                      t = mio_file_data(floc)%glo_att_irange(2*i)
-                      mio_file_data(floc)%gl_ncols    = mio_file_data(floc)%glo_att_ival(t)
-
-                      i = mio_search ('NROWS',                            &
-                                      mio_file_data(floc)%glo_att_name,   &
-                                      mio_file_data(floc)%n_global_atts)
-                      t = mio_file_data(floc)%glo_att_irange(2*i)
-                      mio_file_data(floc)%gl_nrows    = mio_file_data(floc)%glo_att_ival(t)
-
-                      i = mio_search ('NTHIK',                            &
-                                      mio_file_data(floc)%glo_att_name,   &
-                                      mio_file_data(floc)%n_global_atts)
-                      t = mio_file_data(floc)%glo_att_irange(2*i)
-                      mio_file_data(floc)%bndy_thickness = mio_file_data(floc)%glo_att_ival(t)
+                   if (mio_domain_nrows .eq. 1) then   ! for MPAS stack group data in IOAPI3 format
+                      mio_file_data(floc)%grid_type = 'm'
+                      mio_file_data(floc)%ncols = mio_domain_ncols_pe(mio_mype_p1,1)
+                      mio_file_data(floc)%nrows = mio_file_data(floc)%dim_value(5)
                    end if
 
-                   mio_file_data(floc)%time_dim_loc = mio_search ('TSTEP',                        &
-                                                                  mio_file_data(floc)%dim_name,   &
-                                                                  mio_file_data(floc)%ndims)
- 
-                   i = mio_search ('LAY',                                                         &
-                                   mio_file_data(floc)%dim_name,                                  &
-                                   mio_file_data(floc)%ndims)
-                   mio_file_data(floc)%layer_dim_loc = i
-
-                   mio_file_data(floc)%nlays = mio_file_data(floc)%dim_value(i)
- 
-                   mio_file_data(floc)%var_decomp = .false.
-                   do i = 1, fnvars
-                      if ((mio_search (5, mio_file_data(floc)%var_dimids(:,i),       &
-                                       mio_file_data(floc)%var_ndims(i)) > 0) .and.  &
-                          (mio_search (6, mio_file_data(floc)%var_dimids(:,i),       &
-                                       mio_file_data(floc)%var_ndims(i)) > 0)) then
-                         mio_file_data(floc)%var_decomp(i) = .true.
-                      end if
-                   end do
-
-                else if (mio_file_data(floc)%file_format .eq. mio_mpas_format) then
-
-                   ! local MPAS file StrLen dimension location
-                   time_strlen_dim_loc = mio_search ('StrLen',                          &
-                                                     mio_file_data(floc)%dim_name, &
-                                                     mio_file_data(floc)%ndims)
-
-                   mio_file_data(floc)%time_strlen_dim_loc = time_strlen_dim_loc
-
-                   i = mio_search ('nCells',                     &
-                                   mio_file_data(floc)%dim_name, &
-                                   mio_file_data(floc)%ndims)
-
-                   mio_file_data(floc)%gl_ncols = mio_file_data(floc)%dim_value(i)
-                   mio_file_data(floc)%gl_nrows = 1
-
-                   if (mio_parallelism .eq. mio_serial) then
-                      mio_file_data(floc)%ncols = mio_file_data(floc)%gl_ncols
-!                  else
-!                     need implementation
-                   end if
-                   mio_file_data(floc)%nrows = 1
-
-                   i = mio_search ('nVertLevels',                     &
-                                   mio_file_data(floc)%dim_name,      &
-                                   mio_file_data(floc)%ndims)
-                   if (i .gt. 0) then
-                      mio_file_data(floc)%nlays = mio_file_data(floc)%dim_value(i)
-                   else
-                      i = mio_search ('nVertLevelsP1',                &
-                                      mio_file_data(floc)%dim_name,   &
-                                      mio_file_data(floc)%ndims)
-                      if (i .gt. 0) then
-                         mio_file_data(floc)%nlays = mio_file_data(floc)%dim_value(i) - 1
-                      else
-                         ! # of layers information does not exist, set to 1 by default'
-                         mio_file_data(floc)%nlays = 1
-                      end if
-                   end if
-
-                   mio_file_data(floc)%time_dim_loc = mio_search ('Time',                         &
-                                                                  mio_file_data(floc)%dim_name,   &
-                                                                  mio_file_data(floc)%ndims)
-
-                   mio_file_data(floc)%layer_dim_loc = mio_search ('nVertLevels',                  &
-                                                                   mio_file_data(floc)%dim_name,   &
-                                                                   mio_file_data(floc)%ndims)
-
-                   ins = mio_search ('nCells',                      &
-                                     mio_file_data(floc)%dim_name,  &
-                                     mio_file_data(floc)%ndims)
-
-                   mio_file_data(floc)%var_decomp = .false.
-                   do i = 1, fnvars
-                      if (mio_search (ins, mio_file_data(floc)%var_dimids(:,i),       &
-                                       mio_file_data(floc)%var_ndims(i)) > 0) then
-                         mio_file_data(floc)%var_decomp(i) = .true.
-                      end if
-                   end do
                 end if
              end if
 
-!          if (unlimited .ge. 1) then
-!             nsteps = mio_file_data(floc)%dim_value(mio_file_data(floc)%time_dim_loc)
-!             mio_file_data(floc)%unlimited = unlimited
-!          else
-!             nsteps = 0
-!          end if
+             allocate (mio_file_data(floc)%tflag(2,nsteps), stat=stat)
+             do t = 1, nsteps
+                stat = nf90_get_var(mio_file_data(floc)%fileid,                    &
+                                    mio_file_data(floc)%var_id(mio_time_var_ind),  &
+                                    mio_file_data(floc)%tflag(:,t),                &
+                                    start = (/ 1, 1, t /),                         &
+                                    count = (/ 2, 1, 1 /))
+                if (stat .ne. nf90_noerr) then
+                   write (mio_logdev, *) ' Abort in routine mio_fopen while getting time stamp info '
+                   write (mio_logdev, *) ' for IOAPI_3 file due to an error ', trim(nf90_strerror(stat))
+                   stop
+                end if
+                call mio_julian_to_calendar (mio_file_data(floc)%tflag(1,t), year, month, day)
+                mm = mio_file_data(floc)%tflag(2,t) / 100
 
-             if (mio_file_data(floc)%time_dim_loc .gt. 0) then
-                nsteps = mio_file_data(floc)%dim_value(mio_file_data(floc)%time_dim_loc)
-!               if (mio_file_data(floc)%mode .eq. mio_read_write) then
-!                  allocate (mio_file_data(floc)%timestamp(nsteps+mio_preset_num_tsteps), stat=stat)
-!               else
-                   allocate (mio_file_data(floc)%timestamp(nsteps), stat=stat)
-!               end if
-             else
-                allocate (mio_file_data(floc)%timestamp(1), stat=stat)
-                mio_file_data(floc)%timestamp(1) = zero_time
-                nsteps = 1
-             end if
+                hh = mm / 100
+                mm = mod(mm, 100)
+                ss = mod(mio_file_data(floc)%tflag(2,t), 100)
 
-             mio_file_data(floc)%nsteps = nsteps
+                write (mio_file_data(floc)%timestamp(t),                      &
+                     '(i4.4, a1, i2.2, a1, i2.2, 1a, i2.2, 2(a1, i2.2))')     &
+                     year, '-', month, '-', day, '_', hh, ':', mm, ':', ss
+             end do
+          else if ((mio_file_data(floc)%file_format .eq. mio_wrf_format) .or.   &   ! this is for WRF data 
+                   (mio_file_data(floc)%file_format .eq. mio_mpas_format)) then     ! this is for MPAS data 
 
-             ! setup domain decomposition mapping
-             ! the last dimension indicates cross or dot grid
-             allocate (mio_file_data(floc)%ncols_pe(mio_nprocs, 2),     &
-                       mio_file_data(floc)%nrows_pe(mio_nprocs, 2),     &
-                       mio_file_data(floc)%colde_pe(2, mio_nprocs, 2),  &
-                       mio_file_data(floc)%rowde_pe(2, mio_nprocs, 2),  &
-                       stat=stat)
- 
-             mio_file_data(floc)%colde_pe = 0
-             mio_file_data(floc)%rowde_pe = 0
-
-             mio_file_data(floc)%ncols_pe = mio_domain_ncols_pe
-             mio_file_data(floc)%nrows_pe = mio_domain_nrows_pe
-             mio_file_data(floc)%colde_pe = mio_domain_colde_pe
-             mio_file_data(floc)%rowde_pe = mio_domain_rowde_pe
-
-             if (mio_file_data(floc)%file_format .eq. mio_ioapi3_format) then         ! this is for IOAPI data 
+             if (mio_file_data(floc)%file_format .eq. mio_wrf_format) then          ! this is for WRF data 
                 if (mio_parallelism .eq. mio_serial) then
                    mio_file_data(floc)%ncols = mio_file_data(floc)%gl_ncols
                    mio_file_data(floc)%nrows = mio_file_data(floc)%gl_nrows
                 else
-                   if (mio_file_data(floc)%ndims == 5) then                           ! boundary file 
-                      mio_file_data(floc)%grid_type = 'b'
-                      mio_file_data(floc)%ncols = -1
-                      mio_file_data(floc)%nrows = -1
-                   else
-
-                      mio_file_data(floc)%grid_type = '-'
-                      call mio_subhfile (fname)
-
-                      if (mio_domain_nrows .eq. 1) then   ! for MPAS stack group data in IOAPI3 format
-                         mio_file_data(floc)%grid_type = 'm'
-                         mio_file_data(floc)%ncols = mio_domain_ncols_pe(mio_mype_p1,1)
-                         mio_file_data(floc)%nrows = mio_file_data(floc)%dim_value(5)
-                      end if
-
-                   end if
+                   mio_file_data(floc)%ncols = mio_file_data(floc)%ncols_pe(mio_mype_p1, 1)
+                   mio_file_data(floc)%nrows = mio_file_data(floc)%nrows_pe(mio_mype_p1, 1)
                 end if
-
-                allocate (mio_file_data(floc)%tflag(2,nsteps), stat=stat)
-                do t = 1, nsteps
-                   stat = nf90_get_var(mio_file_data(floc)%fileid,                    &
-                                       mio_file_data(floc)%var_id(mio_time_var_ind),  &
-                                       mio_file_data(floc)%tflag(:,t),                &
-                                       start = (/ 1, 1, t /),                         &
-                                       count = (/ 2, 1, 1 /))
-                   if (stat .ne. nf90_noerr) then
-                      write (mio_logdev, *) ' Abort in routine mio_fopen while getting time stamp info '
-                      write (mio_logdev, *) ' for IOAPI_3 file due to an error ', trim(nf90_strerror(stat))
-                      stop
-                   end if
-                   call mio_julian_to_calendar (mio_file_data(floc)%tflag(1,t), year, month, day)
-                   mm = mio_file_data(floc)%tflag(2,t) / 100
-
-                   hh = mm / 100
-                   mm = mod(mm, 100)
-                   ss = mod(mio_file_data(floc)%tflag(2,t), 100)
-
-                   write (mio_file_data(floc)%timestamp(t),                      &
-                        '(i4.4, a1, i2.2, a1, i2.2, 1a, i2.2, 2(a1, i2.2))')     &
-                        year, '-', month, '-', day, '_', hh, ':', mm, ':', ss
-                end do
-             else if ((mio_file_data(floc)%file_format .eq. mio_wrf_format) .or.   &   ! this is for WRF data 
-                      (mio_file_data(floc)%file_format .eq. mio_mpas_format)) then     ! this is for MPAS data 
-
-                if (mio_file_data(floc)%file_format .eq. mio_wrf_format) then          ! this is for WRF data 
-                   if (mio_parallelism .eq. mio_serial) then
-                      mio_file_data(floc)%ncols = mio_file_data(floc)%gl_ncols
-                      mio_file_data(floc)%nrows = mio_file_data(floc)%gl_nrows
-                   else
-                      mio_file_data(floc)%ncols = mio_file_data(floc)%ncols_pe(mio_mype_p1, 1)
-                      mio_file_data(floc)%nrows = mio_file_data(floc)%nrows_pe(mio_mype_p1, 1)
-                   end if
-                end if
-
-!             allocate (mio_file_data(floc)%timestamp(nsteps), stat=stat)
-                do t = 1, nsteps
-                   time_str = ' '
-                   done = .false.
-                   i = 0
-                   do while ((.not. done) .and.  (i .lt. mio_file_data(floc)%dim_value(time_strlen_dim_loc)))
-                      i = i + 1
-                      stat = nf90_get_var(mio_file_data(floc)%fileid,                      &
-                                          mio_file_data(floc)%var_id(mio_time_var_ind),    &
-                                          tt,                                                   &
-                                          start = (/ i, t /),                                   &
-                                          count = (/ 1, 1 /) )
-                      if (stat .ne. nf90_noerr) then
-                         write (mio_logdev, *) ' Abort in routine mio_fopen while getting time stamp info '
-                         write (mio_logdev, *) ' due to an error ', trim(nf90_strerror(stat))
-                         stop
-                      end if
-                      if ((tt .eq. ' ') .or. (ichar(tt) .eq. 0)) then
-                         done = .true.
-                      else
-                         time_str(i:i) = tt
-                      end if
-                   end do
-                   mio_file_data(floc)%timestamp(t) = time_str
-                end do
-!             if (nsteps > 1) then
-!                mio_file_data(floc)%tstep = 0
-!             else
-!                mio_file_data(floc)%tstep = 0
-!             end if
-
              end if
 
-!   do i = 1, mio_nfiles
-!      write (mio_logdev, '(A,i3,2x,A)' ) '==c==', i, trim(mio_file_data(i)%filename)
-!   end do
+!          allocate (mio_file_data(floc)%timestamp(nsteps), stat=stat)
+             do t = 1, nsteps
+                time_str = ' '
+                done = .false.
+                i = 0
+                do while ((.not. done) .and.  (i .lt. mio_file_data(floc)%dim_value(time_strlen_dim_loc)))
+                   i = i + 1
+                   stat = nf90_get_var(mio_file_data(floc)%fileid,                      &
+                                       mio_file_data(floc)%var_id(mio_time_var_ind),    &
+                                       tt,                                                   &
+                                       start = (/ i, t /),                                   &
+                                       count = (/ 1, 1 /) )
+                   if (stat .ne. nf90_noerr) then
+                      write (mio_logdev, *) ' Abort in routine mio_fopen while getting time stamp info '
+                      write (mio_logdev, *) ' due to an error ', trim(nf90_strerror(stat))
+                      stop
+                   end if
+                   if ((tt .eq. ' ') .or. (ichar(tt) .eq. 0)) then
+                      done = .true.
+                   else
+                      time_str(i:i) = tt
+                   end if
+                end do
+                mio_file_data(floc)%timestamp(t) = time_str
+             end do
+!          if (nsteps > 1) then
+!             mio_file_data(floc)%tstep = 0
+!          else
+!             mio_file_data(floc)%tstep = 0
+!          end if
+
+          end if
+
+write (mio_logdev, '(A,4i5)') '==c== mio_fopen mio_n_infiles, mio_n_outfiles, mio_nfiles, size ', &
+                                     mio_n_infiles, mio_n_outfiles, mio_nfiles, size(mio_file_data)-1
+
+   do i = 1, mio_nfiles
+      write (mio_logdev, '(A,i3,2x,A)' ) '==c== fopen', i, trim(mio_file_data(i)%filename)
+   end do
 
         end subroutine mio_fopen
 
 ! ---------------------------------------------------------------------------------------
-        subroutine mio_expand_file_data (num_of_outfiles)
+        subroutine mio_expand_file_data (nexpand)
 
           use mio_global_data_module
+          implicit none
 
-          integer, intent(in) :: num_of_outfiles
-
+          integer, intent(in) :: nexpand
           integer :: n, stat, df_size
 
-          if (mio_n_infiles == 0) then
-             allocate (mio_file_data0(0:mio_df_add_space+num_of_outfiles), stat=stat)
+write(mio_logdev,'(A,2i4)') '==c== nexpand: ', nexpand
+          if (mio_nfiles == 0) then
+             allocate (mio_file_data0(0:nexpand), stat=stat)
              if (stat .ne. 0) then
-                write (mio_logdev, *) 'Abort in routine mio_expand_file_data due to insufficient additional space'
+                write (mio_logdev, *) 'Abort in mio_expand_file_data: memory allocation error'
                 stop
              end if
              mio_file_data => mio_file_data0
@@ -481,18 +484,26 @@
              mio_fd_circular = mod((mio_fd_circular + 1), 2)
              if (mio_fd_circular == 0) then
                 df_size = size(mio_file_data1) - 1
-!               allocate (mio_file_data0(0:df_size+mio_df_add_space), stat=stat)
-                allocate (mio_file_data0(0:df_size+mio_df_add_space+num_of_outfiles), stat=stat)
+                allocate (mio_file_data0(0:df_size+nexpand), stat=stat)
+                if (stat .ne. 0) then
+                   write (mio_logdev, *) 'Abort in mio_expand_file_data: cannot allocate mio_file_data0'
+                   stop
+                end if
                 do n = 1, mio_nfiles
+                   write(mio_logdev,'(A,i3,2x,A)') '==c== copy 1 to 0: ', n, trim(mio_file_data1(n)%filename)
                    call mio_copy_file_data (mio_file_data1(n), mio_file_data0(n))
                 end do
                 deallocate (mio_file_data1)
                 mio_file_data => mio_file_data0
              else
                 df_size = size(mio_file_data0) - 1
-!               allocate (mio_file_data1(0:df_size+mio_df_add_space), stat=stat)
-                allocate (mio_file_data1(0:df_size+mio_df_add_space+num_of_outfiles), stat=stat)
+                allocate (mio_file_data1(0:df_size+nexpand), stat=stat)
+                if (stat .ne. 0) then
+                   write (mio_logdev, *) 'Abort in mio_expand_file_data cannot allocate mio_file_data1'
+                   stop
+                end if
                 do n = 1, mio_nfiles
+                   write(mio_logdev,'(A,i3,2x,A)') '==c== copy 0 to 1: ', n, trim(mio_file_data0(n)%filename)
                    call mio_copy_file_data (mio_file_data0(n), mio_file_data1(n))
                 end do
                 deallocate (mio_file_data0)
@@ -508,6 +519,8 @@
           use mio_global_data_module
           use mio_search_module
           use mio_get_global_attr_module
+
+          implicit none
 
           character (*), intent(in) :: fname
 

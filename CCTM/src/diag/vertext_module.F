@@ -100,7 +100,7 @@ C  environment variable description
          REAL, ALLOCATABLE  :: VERTEXTLAT(:), VERTEXTLON(:)
          REAL, ALLOCATABLE :: VERTEXTJR(:), VERTEXTIR(:)
 
-         LOGICAL, EXTERNAL :: FLUSH3
+!        LOGICAL, EXTERNAL :: FLUSH3
          CHARACTER( 16 ) :: DOVERTNAME = 'DOVERTEXT'
          CHARACTER( 16 ) :: VERTEXTLATNAME = 'VERTEXTLAT'
          CHARACTER( 16 ) :: VERTEXTLONNAME = 'VERTEXTLON'
@@ -131,66 +131,27 @@ C-----------------------------------------------------------------------
 
 C Set output file characteristics from GRID_CONF and open 
 
-         FTYPE3D = GRDDED3
-         SDATE3D = JDATE
-         STIME3D = JTIME + TSTEP
-         TSTEP3D = TSTEP
          NVARS3D = N_CONC_VARS
-         NCOLS3D = 1
-         NROWS3D = NVERTEXT
+!        NCOLS3D = 1
+!        NROWS3D = NVERTEXT
          NLAYS3D = NLAYS
-         NTHIK3D = 1
-         GDTYP3D = GDTYP_GD
-         P_ALP3D = P_ALP_GD
-         P_BET3D = P_BET_GD 
-         P_GAM3D = P_GAM_GD
-         XORIG3D = XORIG_GD
-         YORIG3D = YORIG_GD
-         XCENT3D = XCENT_GD
-         YCENT3D = YCENT_GD
-         XCELL3D = XCELL_GD
-         YCELL3D = YCELL_GD
-         VGTYP3D = VGTYP_GD
-         VGTOP3D = VGTOP_GD
-         DO L = 1, NLAYS + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
-         END DO
-         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
 
-         FDESC3D( 1 ) = 'Concentration file output'
-         FDESC3D( 2 ) = 'From CMAQ model dyn alloc version CTM'
-         FDESC3D( 3 ) = 'Set of variables (possibly) reduced from CGRID'
-         FDESC3D( 4 ) = 'For next scenario continuation runs,'
-         FDESC3D( 5 ) = 'use the "one-step" CGRID file'
-         KD = 5
-         L = 0
-         DO K = KD + 1, MIN ( NLAYS + KD, MXDESC3 )
-            L = L + 1
-            WRITE( FDESC3D( K ),'( "Layer", I3, " to", I3, " " )' )
-     &      L - 1, L
-         END DO
-!        IF ( ( KD + 1 + L ) .LT. MXDESC3 ) THEN
-!           DO K = KD + 1 + L, MXDESC3
-!              FDESC3D( K ) = ' '
-!           END DO
-!        END IF
          WRITE (MYFMT, '(a10, i3, a6)') '(A16, 1X, ', NVERTEXT, 'f12.6)'
-         WRITE (FDESC3D(KD + 2 + L), MYFMT) 'Latitude  list: ', VERTEXTLAT(1:NVERTEXT)
-         WRITE (FDESC3D(KD + 3 + L), MYFMT) 'Longitude list: ', VERTEXTLON(1:NVERTEXT)
-         CALL LONLAT2XY(NVERTEXT, VERTEXTLON, VERTEXTLAT,
-     &                  VERTEXTIR, VERTEXTJR)
+!        WRITE (FDESC3D(KD + 2 + L), MYFMT) 'Latitude  list: ', VERTEXTLAT(1:NVERTEXT)
+!        WRITE (FDESC3D(KD + 3 + L), MYFMT) 'Longitude list: ', VERTEXTLON(1:NVERTEXT)
+!         CALL LONLAT2XY(NVERTEXT, VERTEXTLON, VERTEXTLAT,
+!     &                  VERTEXTIR, VERTEXTJR)
          WRITE (MYFMT, '(a10, i3, a6)') '(A16, 1X, ', NVERTEXT, 'f12.6)'
-         WRITE (FDESC3D(KD + 4 + L), myfmt) 'Y list: ', VERTEXTJR(1:NVERTEXT)
-         WRITE (FDESC3D(KD + 5 + L), myfmt) 'X list: ', VERTEXTIR(1:NVERTEXT)
-         
+!        WRITE (FDESC3D(KD + 4 + L), myfmt) 'Y list: ', VERTEXTJR(1:NVERTEXT)
+!        WRITE (FDESC3D(KD + 5 + L), myfmt) 'X list: ', VERTEXTIR(1:NVERTEXT)
          
          STATUS = 0
          MY_NVERTEXT = 0
          PE_NVERTEXT = 0
          VERT_SEQ = -1
          DO V = 1, NVERTEXT
-            VERTEXTI(V) = INT((VERTEXTIR(V) - XORIG3D) / XCELL3D) + 1
-            VERTEXTJ(V) = INT((VERTEXTJR(V) - YORIG3D) / YCELL3D) + 1
+!            VERTEXTI(V) = INT((VERTEXTIR(V) - XORIG3D) / XCELL3D) + 1
+!            VERTEXTJ(V) = INT((VERTEXTJR(V) - YORIG3D) / YCELL3D) + 1
             IF ((VERTEXTI(V) .gt. GL_NCOLS) .or. (VERTEXTI(V) .lt. 1) .or.
      &          (VERTEXTJ(V) .gt. GL_NROWS) .or. (VERTEXTJ(V) .lt. 1)) THEN
                STATUS = STATUS + 1
@@ -225,12 +186,12 @@ C Set output file characteristics from GRID_CONF and open
          END DO
 
          WRITE (MYFMT, '(a10, i3, a6)') '(A16, 1X, ', NVERTEXT, 'I6)'
-         WRITE (FDESC3D(KD + 6 + L), MYFMT) 'J list: ', VERTEXTJ(1:NVERTEXT)
-         WRITE (FDESC3D(KD + 7 + L), MYFMT) 'I list: ', VERTEXTI(1:NVERTEXT)
+!        WRITE (FDESC3D(KD + 6 + L), MYFMT) 'J list: ', VERTEXTJ(1:NVERTEXT)
+!        WRITE (FDESC3D(KD + 7 + L), MYFMT) 'I list: ', VERTEXTI(1:NVERTEXT)
          WRITE( LOGDEV,* ) ' '
          WRITE( LOGDEV,* ) '      VEXT  File Header Description:'
          DO K = 1, KD + L
-            WRITE( LOGDEV,* ) '    => ', TRIM( FDESC3D( K ) )
+!           WRITE( LOGDEV,* ) '    => ', TRIM( FDESC3D( K ) )
          END DO
 
          V = 0
@@ -360,6 +321,9 @@ C Set output file characteristics from GRID_CONF and open
 #ifndef mpas
 #ifdef parallel
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+#ifdef UNBLOCKED
+
          LOGICAL FUNCTION PWRVEC( FILNAME, VARNAME, DATE, TIME,
      &                            BUFFER, NLAYS,
      &                            NCOLS, NROWS, NP, 
@@ -597,6 +561,7 @@ C Notify non-I/O processors of failure
          END IF
 
          END FUNCTION PWRVEC
+#endif
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          SUBROUTINE WR_VEXT( CGRID, JDATE, JTIME, TSTEP )
@@ -683,65 +648,65 @@ C open vext file for update
 
          DO V = 1, N_CSPCS
             INDX = CONC_MAP( V )
-            IF ( .NOT. PWRVEC(CTM_VEXT_1, CONC_FILE_SPCS( V ), JDATE, JTIME,
-     &                        CGRID(:, :, :, INDX), NLAYS,
-     &                        NCOLS, NROWS, NUMPROCS, 
-     &                        NVERTEXT, VERTEXTI, VERTEXTJ     ) ) THEN
-               XMSG = 'PWRGRDD failed writing variable '
-     &              // TRIM( CONC_FILE_SPCS(V) ) //
-     &              ' to file '// TRIM( CTM_VEXT_1 )
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            ELSE
-               XMSG = 'PWRGRDD wrote variable '
-     &              // TRIM( CONC_FILE_SPCS(V) ) //
-     &              ' to file '// TRIM( CTM_VEXT_1 )
-               WRITE( LOGDEV, '(A)') XMSG
-            END IF
+!            IF ( .NOT. PWRVEC(CTM_VEXT_1, CONC_FILE_SPCS( V ), JDATE, JTIME,
+!     &                        CGRID(:, :, :, INDX), NLAYS,
+!     &                        NCOLS, NROWS, NUMPROCS, 
+!     &                        NVERTEXT, VERTEXTI, VERTEXTJ     ) ) THEN
+!               XMSG = 'PWRGRDD failed writing variable '
+!     &              // TRIM( CONC_FILE_SPCS(V) ) //
+!     &              ' to file '// TRIM( CTM_VEXT_1 )
+!               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+!            ELSE
+!               XMSG = 'PWRGRDD wrote variable '
+!     &              // TRIM( CONC_FILE_SPCS(V) ) //
+!     &              ' to file '// TRIM( CTM_VEXT_1 )
+!               WRITE( LOGDEV, '(A)') XMSG
+!            END IF
          END DO
  
          IF ( W_VEL ) THEN
-         IF ( .NOT. PWRVEC(CTM_VEXT_1, 'W_VEL', JDATE, JTIME,
-     &                     WVEL(:, :, :), NLAYS,
-     &                     NCOLS, NROWS, NUMPROCS, 
-     &                     NVERTEXT, VERTEXTI, VERTEXTJ     ) ) THEN
-            XMSG = 'PWRGRDD failed writing variable WVEL'
-     &          // ' to file '// TRIM( CTM_VEXT_1 )
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+ !        IF ( .NOT. PWRVEC(CTM_VEXT_1, 'W_VEL', JDATE, JTIME,
+ !    &                     WVEL(:, :, :), NLAYS,
+ !    &                     NCOLS, NROWS, NUMPROCS, 
+ !    &                     NVERTEXT, VERTEXTI, VERTEXTJ     ) ) THEN
+ !           XMSG = 'PWRGRDD failed writing variable WVEL'
+ !    &          // ' to file '// TRIM( CTM_VEXT_1 )
+ !           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+ !        END IF
          END IF
          
          IF ( L_CONC_RH ) THEN
-         IF ( .NOT. PWRVEC(CTM_VEXT_1, 'RH', JDATE, JTIME,
-     &                     MET_DATA%RH(:, :, :), NLAYS,
-     &                     NCOLS, NROWS, NUMPROCS, 
-     &                     NVERTEXT, VERTEXTI, VERTEXTJ     ) ) THEN
-            XMSG = 'PWRGRDD failed writing variable RH'
-     &          // ' to file '// TRIM( CTM_VEXT_1 )
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+ !        IF ( .NOT. PWRVEC(CTM_VEXT_1, 'RH', JDATE, JTIME,
+ !    &                     MET_DATA%RH(:, :, :), NLAYS,
+ !    &                     NCOLS, NROWS, NUMPROCS, 
+ !    &                     NVERTEXT, VERTEXTI, VERTEXTJ     ) ) THEN
+ !           XMSG = 'PWRGRDD failed writing variable RH'
+ !    &          // ' to file '// TRIM( CTM_VEXT_1 )
+ !           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+ !        END IF
          END IF
          
  
          IF ( L_CONC_PRES ) THEN
-         IF ( .NOT. PWRVEC(CTM_VEXT_1, 'PRES', JDATE, JTIME,
-     &                     Met_Data%PRES(:, :, :), NLAYS,
-     &                     NCOLS, NROWS, NUMPROCS, 
-     &                     NVERTEXT, VERTEXTI, VERTEXTJ     ) ) THEN
-            XMSG = 'PWRGRDD failed writing variable PRES'
-     &          // ' to file '// TRIM( CTM_VEXT_1 )
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+!         IF ( .NOT. PWRVEC(CTM_VEXT_1, 'PRES', JDATE, JTIME,
+!     &                     Met_Data%PRES(:, :, :), NLAYS,
+!     &                     NCOLS, NROWS, NUMPROCS, 
+!     &                     NVERTEXT, VERTEXTI, VERTEXTJ     ) ) THEN
+!            XMSG = 'PWRGRDD failed writing variable PRES'
+!     &          // ' to file '// TRIM( CTM_VEXT_1 )
+!            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+!         END IF
          END IF
          
          IF ( L_CONC_TA ) THEN
-         IF ( .NOT. PWRVEC(CTM_VEXT_1, 'TA', JDATE, JTIME,
-     &                     Met_Data%TA(:, :, :), NLAYS,
-     &                     NCOLS, NROWS, NUMPROCS, 
-     &                     NVERTEXT, VERTEXTI, VERTEXTJ     ) ) THEN
-            XMSG = 'PWRGRDD failed writing variable TA '
-     &          // ' to file '// TRIM( CTM_VEXT_1 )
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+ !        IF ( .NOT. PWRVEC(CTM_VEXT_1, 'TA', JDATE, JTIME,
+ !    &                     Met_Data%TA(:, :, :), NLAYS,
+ !    &                     NCOLS, NROWS, NUMPROCS, 
+ !    &                     NVERTEXT, VERTEXTI, VERTEXTJ     ) ) THEN
+ !           XMSG = 'PWRGRDD failed writing variable TA '
+ !    &          // ' to file '// TRIM( CTM_VEXT_1 )
+ !           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+ !        END IF
          END IF
 
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
@@ -752,6 +717,7 @@ C open vext file for update
 #endif
 #endif
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
          SUBROUTINE GET_LONLAT(NVERT, VERTLON, VERTLAT)
 C-----------------------------------------------------------------------
 C Function:
@@ -811,6 +777,7 @@ C-----------------------------------------------------------------------
 
          END SUBROUTINE GET_LONLAT
 
+#ifdef UNBLOCKED
          SUBROUTINE LONLAT2XY(NVERTEXT, VERTEXTLON, VERTEXTLAT,
      &                        VERTEXTIR, VERTEXTJR)
          USE UTILIO_DEFN
@@ -877,5 +844,5 @@ C-----------------------------------------------------------------------
 #endif
 
          END SUBROUTINE LONLAT2XY
-
+#endif
        END MODULE VERTEXT_MODULE

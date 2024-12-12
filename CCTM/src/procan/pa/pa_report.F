@@ -43,6 +43,7 @@ C-----------------------------------------------------------------------
       USE PA_IPRVARS
       USE PA_DEFN, Only: LFULLIRR, LPARTIRR, N_IPR_SPC, IRRNAME
       USE PA_PARSE
+      USE LOGDEV_MOD, ONLY: M3EXIT
       use get_env_module 
 
       IMPLICIT NONE

@@ -32,6 +32,7 @@
       USE UTILIO_DEFN
       USE ELMO_DATA
       USE GRID_CONF, ONLY: NCOLS, NROWS, NLAYS, IO_PE_INCLUSIVE
+      USE LOGDEV_MOD, ONLY: M3EXIT
 
       IMPLICIT NONE
 
@@ -67,7 +68,8 @@
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
          
-      USE RUNTIME_VARS, ONLY: MISC_CTRL, LOGDEV
+      USE RUNTIME_VARS, ONLY: MISC_CTRL
+      USE LOGDEV_MOD, ONLY: LOGDEV
       USE CGRID_SPCS, ONLY: CGRID_NAME, N_CGRID_SPC
       USE UTIL_FAMILY_MODULE, ONLY: N_Chem_Fams,ChemFamilyName,
      &                              Map_Chem_Families
@@ -3341,28 +3343,7 @@
 
         INTEGER :: L          ! loop induction variables
         INTEGER :: MDATE, MTIME
-#ifndef mpas
-      ! Define General Output File Parameters
-      FTYPE3D = GRDDED3
-      GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-      TSTEP3D = TSTEP
-      NCOLS3D = GL_NCOLS
-      NROWS3D = GL_NROWS
-      GDTYP3D = GDTYP_GD
-      P_ALP3D = P_ALP_GD
-      P_BET3D = P_BET_GD 
-      P_GAM3D = P_GAM_GD
-      XORIG3D = XORIG_GD
-      YORIG3D = YORIG_GD
-      XCENT3D = XCENT_GD
-      YCENT3D = YCENT_GD
-      XCELL3D = XCELL_GD
-      YCELL3D = YCELL_GD
-      VGTYP3D = VGTYP_GD
-      VGTOP3D = VGTOP_GD
-      NTHIK3D =     1
 
-#endif
       ! Open Instantaneous PM Diagnostic File
       IF ( INST_ACTIVE ) THEN
         

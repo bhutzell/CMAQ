@@ -58,8 +58,9 @@ C  SUBROUTINES AND FUNCTIONS CALLS:  INIT3, SHUT3, MPI_ABORT, INQUIRE.
 C
 C***********************************************************************
 
-      USE M3UTILIO              ! i/o api
+!     USE M3UTILIO              ! i/o api
       USE RUNTIME_VARS
+      use replacement_util_module
 
       IMPLICIT NONE
 
@@ -139,10 +140,10 @@ C.......  Do M3EXIT tasks.
 
 
 C.......  Shut down the I/O API.
-      IF ( .NOT. SHUT3() ) THEN
-         WRITE( LOGDEV,91000 )
-     &   'Could not shut down I/O API files correctly'
-      END IF
+!      IF ( .NOT. SHUT3() ) THEN
+!         WRITE( LOGDEV,91000 )
+!     &   'Could not shut down I/O API files correctly'
+!      END IF
 
 
 C.......  Close all files.

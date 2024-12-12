@@ -255,6 +255,8 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
 
 #ifdef mpas
       use util_module
+#else
+      use replacement_util_module, only: UPCASE
 #endif
 
       IMPLICIT NONE
@@ -464,4 +466,17 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
 #endif
       END SUBROUTINE TIMING_SPLIT    
  
-        end module logdev_mod
+      subroutine m3exit( pname, jdate, jtime, xmsg, xstat )
+         implicit none
+         character(*), intent(in) :: pname, xmsg
+         integer, intent(in)      :: jdate, jtime, xstat
+
+         if ( xstat .ne. 0 ) then
+            call log_warning( pname, logdev, 'ERROR ABORT' )
+         end if
+         call log_message( logdev, xmsg )
+         call mio_shutdown
+
+      end subroutine m3exit
+
+      end module logdev_mod

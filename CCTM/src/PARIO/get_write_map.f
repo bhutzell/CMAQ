@@ -18,12 +18,6 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/PARIO/src/get_write_map.f,v 1.6 2011/10/20 22:49:57 sjr Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
       SUBROUTINE GET_WRITE_MAP( NP, NPC, NPR, NCOLS3D, NROWS3D, NLAYS3D )
 C.....................................................................
  

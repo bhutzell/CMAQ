@@ -17,9 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/biog/beis3/parsline.f,v 1.3 2011/10/21 16:10:18 yoj Exp $
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         SUBROUTINE PARSLINE( LINE, N, SEGMENT )
@@ -62,7 +59,7 @@ C Last updated: $Date: 2011/10/21 16:10:18 $
 C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
-      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
 

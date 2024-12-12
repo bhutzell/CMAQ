@@ -40,6 +40,7 @@ C***********************************************************************
       USE RXNS_DATA
       USE RXNS_FUNCTION
       USE CONST, ONLY : MWAIR
+      USE LOGDEV_MOD
 
       IMPLICIT NONE
 

@@ -30,9 +30,9 @@ C-----------------------------------------------------------------------
           Use aero_data, only : n_aerolist, aerolist, modesuff,
      &                          iait, iacc, icor, reqd_modes
           Use runtime_vars, only : log_message, log_subheading, logdev,
-     &                             log_warning, outdev, cmype
+     &                             log_warning, outdev, cmype, m3exit
           Use cgrid_spcs_types
-          Use utilio_defn, only : index1, xstat2, m3exit, m3warn, m3mesg
+          Use utilio_defn, only : index1, xstat2
 
           Implicit None
 

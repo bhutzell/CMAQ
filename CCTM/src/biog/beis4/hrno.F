@@ -166,9 +166,6 @@ C Arguments:
       REAL,    INTENT( OUT)  :: NOPOL( :,: )  ! output NO emissions
       LOGICAL, INTENT( IN )  :: L_DESID_DIAG  ! flag determining whether or not DESID
                                               !   is in diagnostic mode              
-C External Functions
-      LOGICAL,         EXTERNAL :: CHKGRID
-
 C Parameters:
       INTEGER, PARAMETER :: MXRHRS = 24     ! no. of rainfall hours for YL95 algorithm
       INTEGER, PARAMETER :: LSM_WATER = 14
@@ -605,6 +602,9 @@ C Write soil NO rain data file
          call mio_setfile( MET_CRO_2D )
          call mio_fcreate( SOILOUT, mio_new_file )
          FIRSTWRITE = .FALSE.
+      else 
+         mesg = 'trying to write to SOILOUT twice'
+         call m3exit(pname, ndate, ntime, mesg, 1)
       end if
 
       VAR = 'PTYPE'

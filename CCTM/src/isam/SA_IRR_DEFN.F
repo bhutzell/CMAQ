@@ -21,7 +21,6 @@
       MODULE SA_IRR_DEFN
 
 C***********************************************************************
-C20140428                       
 C  
 C  (1) Stores initial reaction rates in a C-R-L-nrxns array
 C  (2) Contains subroutines SA_IRR_INIT
@@ -31,6 +30,7 @@ C    Aug 16, 2011: chemical integration time interval is in MINUTES
 C
 C***********************************************************************
 
+      USE LOGDEV_MOD, ONLY: M3EXIT
 
       IMPLICIT NONE
 
@@ -40,9 +40,6 @@ C***********************************************************************
       REAL, ALLOCATABLE :: YC_INIT( :,:,:,: )
       REAL, ALLOCATABLE :: PRDRATE( : )
       REAL, ALLOCATABLE :: RKMID ( : )
-
-!20140307 Integrated Rates
-
 
       INTEGER              :: ISAM_CHEMISTRY_SPC ! number of ISAM species om photochemistry
       INTEGER, ALLOCATABLE :: ISAM_SPC_MAP( : ) ! index in ISAM species array
@@ -188,8 +185,7 @@ C         Called by chemistry driver
          
 C=======================================================
 
-        ISAM_LOG = INIT3( )
-        
+        ISAM_LOG = LOGDEV       
 
 
         ALLOCATE( ISAM_2_CHEMI( NSPC_SA + 1 ) )

@@ -25,6 +25,7 @@ C specifically used only for input files
 
       USE UTILIO_DEFN
       use mio_module
+      USE LOGDEV_MOD, ONLY: M3EXIT
 
       IMPLICIT NONE
       

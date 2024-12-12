@@ -956,23 +956,20 @@ C write CGRID state file for subsequent runs
          CALL WR_SENGRID ( JDATE, JTIME, TSTEP( 1 )  )
 #endif
 
-C Shut down IOAPI
-         IF ( SHUT3() ) THEN
-            WRITE( LOGDEV, * )
-            CALL LOG_HEADING( LOGDEV, 'Program Completed Successfully' )
-            WRITE( XMSG, '(A,A,A,I7,A,I6.6,A)' ) 'Date and time ',
-     &             DT2STR( JDATE, JTIME ), ' (',JDATE,':',JTIME,')' 
-            CALL LOG_MESSAGE( LOGDEV, XMSG ) 
+         WRITE( LOGDEV, * )
+         CALL LOG_HEADING( LOGDEV, 'Program Completed Successfully' )
+         WRITE( XMSG, '(A,A,A,I7,A,I6.6,A)' ) 'Date and time ',
+     &          DT2STR( JDATE, JTIME ), ' (',JDATE,':',JTIME,')' 
+         CALL LOG_MESSAGE( LOGDEV, XMSG ) 
 
-            IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
-            IF ( MYPE .EQ. 0 ) CALL LOG_HEADING( OUTDEV, 'Program Completed Successfully' )
-            IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
-         ELSE
-            CALL LOG_MESSAGE( LOGDEV, ' *** FATAL ERROR shutting down Models-3 I/O *** ' )
-         END IF
+         IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
+         IF ( MYPE .EQ. 0 ) CALL LOG_HEADING( OUTDEV, 'Program Completed Successfully' )
+         IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
       END IF
 
       ! Output Verification of MIO Input File
       IF ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input_check' )
+
+      call mio_shutdown
 
       END SUBROUTINE CMAQ_DRIVER        

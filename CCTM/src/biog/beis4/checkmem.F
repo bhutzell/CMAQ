@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/biog/beis3/checkmem.f,v 1.3 2011/10/21 16:10:17 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE CHECKMEM( MSTATUS, AVAR, CALLER )
  
@@ -60,6 +54,7 @@ C-----------------------------------------------------------------------
 #ifdef mpas
       use utilio_defn
 #endif
+      use logdev_mod, only: m3exit
  
       IMPLICIT NONE
 

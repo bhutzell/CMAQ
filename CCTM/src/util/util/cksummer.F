@@ -56,8 +56,8 @@ C-----------------------------------------------------------------------
      &                      N_AE_SPC, AE_STRT, AE_SPC,
      &                      N_NR_SPC, NR_STRT, NR_SPC,
      &                      N_TR_SPC, TR_STRT, TR_SPC
-      USE RUNTIME_VARS, ONLY: LOGDEV, OUTDEV, CMYPE, APPL_NAME
-
+      USE RUNTIME_VARS, ONLY: APPL_NAME
+      USE LOGDEV_MOD, ONLY: LOGDEV, OUTDEV, CMYPE, M3EXIT
       USE UTILIO_DEFN
 #ifndef mpas
 #ifdef parallel
