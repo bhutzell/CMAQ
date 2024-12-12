@@ -208,7 +208,6 @@ Ckrt allocate data-loading array
       
       DEALLOCATE(TEMP)
 
-      call mio_fclose(inname)
       RETURN
            
       END
