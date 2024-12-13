@@ -55,11 +55,11 @@
       USE SOA_DEFN, ONLY : Extract_Soa
       USE AEROSOL_CHEMISTRY, ONLY: HETCHEM_RATES
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, AIRQV, AIRDENS, AIRPRES,
-     &                        SRFTEMP, H2OVP, H2OSATVP, 
-     &                        CFRAC, DZ, PV, ZH
+     &                        SRFTEMP, H2OVP, H2OSATVP 
       USE CGRID_SPCS, ONLY : N_CGRID_SPC, N_SPC_WDEP, N_SPC_DDEP
       !USE VDIFF_MAP, ONLY : N_SPC_DDEP
-      use centralized_io_module, only : interpolate_var, pv_avail
+      use centralized_io_module, only : interpolate_var, pv_avail,
+     &                                  wdir10_avail
       Use phot_mod, Only: init_phot_shared
       Use ASX_DATA_MOD, Only : GET_MET, MET_DATA
 
@@ -97,29 +97,15 @@
       INTEGER C, R, L, IOS
       CHARACTER(16) :: PNAME = 'ELMO_DRIVER'
 
-      REAL, ALLOCATABLE, SAVE :: PRES(:,:,:), TA(:,:,:), TEMP2(:,:),
-     &                           QV(:,:,:), DENS(:,:,:), CFRACS(:,:),
-     &                           ZF(:,:,:), PVS(:,:,:), ZHS(:,:,:),
-     &                           PBLS(:,:), RGRNDS(:,:),
-     &                           WSPD10S(:,:), WDIR10S(:,:)
+      REAL, ALLOCATABLE, SAVE :: PVS(:,:,:),
+     &                           WDIR10S(:,:)
 
       IF ( FIRSTIME ) THEN
           FIRSTIME = .FALSE.
           ! Initialize Number of Steps Used for Calculating Average
           ELMO_NSTEP = 0.
 
-          ALLOCATE( PRES( NCOLS, NROWS, NLAYS),
-     &              TA( NCOLS, NROWS, NLAYS ),
-     &              QV( NCOLS, NROWS, NLAYS ),
-     &              DENS( NCOLS, NROWS, NLAYS ),
-     &              CFRACS( NCOLS, NROWS ),
-     &              ZF( NCOLS, NROWS, NLAYS ),
-     &              ZHS( NCOLS, NROWS, NLAYS ),
-     &              PVS( NCOLS, NROWS, NLAYS ),
-     &              TEMP2( NCOLS, NROWS ),
-     &              PBLS( NCOLS,NROWS ), 
-     &              RGRNDS( NCOLS,NROWS ), 
-     &              WSPD10S( NCOLS,NROWS ), 
+          ALLOCATE( PVS( NCOLS, NROWS, NLAYS ),
      &              WDIR10S( NCOLS,NROWS ) ) 
          
          ! Allocate local image of CGRID so it can be used each time step
@@ -165,7 +151,11 @@
       CALL GET_MET( JDATE, JTIME, TSTEP(2) )
 
       ! get Wind Direction at 10 m (degrees)
-      call interpolate_var ('WDIR10', jdate, jtime, WDIR10S)
+      if ( wdir10_avail ) then
+           call interpolate_var ('WDIR10', jdate, jtime, WDIR10S)
+      else
+           WDIR10S = ELMO_BLANK
+      end if
 
       ! retrieve potential vorticity
       if ( pv_avail ) then
@@ -193,23 +183,10 @@
          H2OVP    = AIRPRES * AIRQV / ( EPSWATER  + AIRQV )
          AIRRH    = MAX( 0.005, MIN( 0.99, H2OVP / H2OSATVP ) ) ! 0-1
          IF ( L .EQ. 1 ) THEN
-             DZ       = ZF( C,R,L )
-             RC       = MET_DATA%RC( C,R )
-             RN       = MET_DATA%RN( C,R )
              WDIR10   = WDIR10S( C,R )
-
          ELSE
-             DZ      = MET_DATA%ZF( C,R,L ) - MET_DATA%ZF( C,R,L-1 )
-             CFRAC   = ELMO_BLANK
-             PBL     = ELMO_BLANK
-             RGRND   = ELMO_BLANK
-             RC      = ELMO_BLANK
-             RN      = ELMO_BLANK
-             WSPD10  = ELMO_BLANK
              WDIR10  = ELMO_BLANK
- 
          END IF
-         ZH       = MET_DATA%ZH( C,R,L )
          PV       = PVS( C,R,L )
 
          ! Extract Aerosols

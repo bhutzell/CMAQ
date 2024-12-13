@@ -279,6 +279,7 @@
      &             QI_AVAIL,                 ! flag for QI available in MET_CRO_3D
      &             QS_AVAIL,                 ! flag for QS available in MET_CRO_3D
      &             QC_AVAIL       = .true.,  ! flag for QC and it is always set to .true.
+     &             WDIR10_AVAIL           ,  ! flag for 10-m Wind Direction
      &             JACOBF_AVAIL,             ! flag for JACOBF available in MET_CRO_3D
      &             RNA_AVAIL      = .false., ! flag for RNA available in MET_CRO_2D
      &             RCA_AVAIL      = .false., ! flag for RCA available in MET_CRO_2D
@@ -833,6 +834,8 @@
           QG_AVAIL       = (INDEX1( 'QG', NVARS3D, VNAME3D ) .gt. 0)
           JACOBF_AVAIL   = (INDEX1( 'JACOBF', NVARS3D, VNAME3D ) .gt. 0)
           QC_AVAIL       = .true.
+
+          WDIR10_AVAIL   = (INDEX1( 'WDIR10', NVARS3D, VNAME3D ) .gt. 0)
 
           CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
      &                    STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )

@@ -548,7 +548,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         REAL, ALLOCATABLE, SAVE :: ELMO_DDM_WDEP(:,:,:,:) ! wet deposition accumulated per time step
         REAL, ALLOCATABLE, SAVE :: ELMO_DDM_DDEP(:,:,:,:) ! dry deposition accumulated per time step
              
-        REAL, SAVE :: PBL, RGRND, RC, RN, WSPD10, WDIR10
+        REAL, SAVE :: WDIR10, PV
 
         LOGICAL, SAVE :: INIT_TIME
 

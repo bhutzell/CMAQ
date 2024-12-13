@@ -33,7 +33,7 @@
      &                     AH2O_IDX, AORGH2O_IDX, AEROSPC, CALC_AERODIST_PARAMS,
      &                     AEROMODE, DRY_AERO_DENS, APOC_IDX, APNCOM_IDX,
      &                     AEROSPC_MAP
-      USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, SRFTEMP, AIRPRES, DZ, CFRAC, PV, ZH
+      USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, SRFTEMP, AIRPRES
       USE CGRID_SPCS, ONLY : RHOJ_LOC
       USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, OASPC, MAP_OAtoAERO
       USE RUNTIME_VARS, ONLY : PHOTDIAG
@@ -724,11 +724,9 @@
 
          ! Retrieve Precipitation
          CASE ( ID_PRECIP )
-            IF ( RC .GE. 0.0 ) THEN
-              OUTVAL = RN + RC
-            ELSE
-              OUTVAL = RN
-            END IF
+            OUTVAL = MET_DATA%RN( C1,R1 )
+            IF ( MET_DATA%RC( C1,R1 ) .GE. 0.0 ) 
+     &           OUTVAL = OUTVAL + MET_DATA%RC( C1,R1 )
 
          ! Retrieve Wind Speed at 10 m
          CASE ( ID_WSPD10 )
@@ -740,7 +738,11 @@
 
          ! Retrieve DZ
          CASE ( ID_DZ )
-            OUTVAL = DZ
+            IF ( L1 .EQ. 1 ) THEN
+               OUTVAL = MET_DATA%ZF( C1,R1,L1 )
+            ELSE 
+               OUTVAL = MET_DATA%ZF( C1,R1,L1 ) - MET_DATA%ZF( C1,R1,L1-1 )
+            END IF
 
          ! Retrieve ZH
          CASE ( ID_ZH )
