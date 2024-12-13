@@ -100,8 +100,8 @@
       REAL, ALLOCATABLE, SAVE :: PRES(:,:,:), TA(:,:,:), TEMP2(:,:),
      &                           QV(:,:,:), DENS(:,:,:), CFRACS(:,:),
      &                           ZF(:,:,:), PVS(:,:,:), ZHS(:,:,:),
-     &                           PBLS(:,:), RGRNDS(:,:), RCS(:,:),
-     &                           RNS(:,:), WSPD10S(:,:), WDIR10S(:,:)
+     &                           PBLS(:,:), RGRNDS(:,:),
+     &                           WSPD10S(:,:), WDIR10S(:,:)
 
       IF ( FIRSTIME ) THEN
           FIRSTIME = .FALSE.
@@ -119,8 +119,6 @@
      &              TEMP2( NCOLS, NROWS ),
      &              PBLS( NCOLS,NROWS ), 
      &              RGRNDS( NCOLS,NROWS ), 
-     &              RCS( NCOLS,NROWS ), 
-     &              RNS( NCOLS,NROWS ), 
      &              WSPD10S( NCOLS,NROWS ), 
      &              WDIR10S( NCOLS,NROWS ) ) 
          
@@ -166,12 +164,6 @@
       ! Get Meteorological Variables
       CALL GET_MET( JDATE, JTIME, TSTEP(2) )
 
-      ! get Convective Rain Rate (cm)
-      call interpolate_var ('RC', jdate, jtime, RCS)
-
-      ! get Non-Convective Rain Rate (cm)
-      call interpolate_var ('RN', jdate, jtime, RNS)
-
       ! get Wind Direction at 10 m (degrees)
       call interpolate_var ('WDIR10', jdate, jtime, WDIR10S)
 
@@ -201,9 +193,9 @@
          H2OVP    = AIRPRES * AIRQV / ( EPSWATER  + AIRQV )
          AIRRH    = MAX( 0.005, MIN( 0.99, H2OVP / H2OSATVP ) ) ! 0-1
          IF ( L .EQ. 1 ) THEN
-             DZ   = ZF( C,R,L )
-             RC       = RCS( C,R )
-             RN       = RNS( C,R )
+             DZ       = ZF( C,R,L )
+             RC       = MET_DATA%RC( C,R )
+             RN       = MET_DATA%RN( C,R )
              WDIR10   = WDIR10S( C,R )
 
          ELSE
