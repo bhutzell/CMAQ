@@ -170,7 +170,6 @@ c     ISAM0(:,:,:,:,:) = MAX( DBLE( ISAM(:,:,:,:,:) ), MIN_VAL )
                      IF ( AERO_COND( C,R,L,CAER(3) ) .GT. 0.0 ) THEN 
                         ! Condensation - Gas-phase drives attribution
                         TAG_FRAC( C,R,L ) = MIN( TAG_FRAC( C,R,L ), 
-c    &                                           ISAM1( C,R,L,JGAS,K )-MIN_VAL )
      &                                           ISAM1( C,R,L,JGAS,K ) )
                         ISAM1( C,R,L,JAER(3),K ) = 
      &                         ISAM1( C,R,L,JAER(3),K ) + TAG_FRAC( C,R,L ) 
@@ -179,7 +178,6 @@ c    &                                           ISAM1( C,R,L,JGAS,K )-MIN_VAL )
                      ELSE   
                         ! Evaporation - Aerosol drives attribution
                         TAG_FRAC2( C,R,L ) = MIN( TAG_FRAC2( C,R,L ), 
-c    &                                           ISAM1( C,R,L,JAER(3),K )-MIN_VAL )
      &                                           ISAM1( C,R,L,JAER(3),K ) )
                         ISAM1( C,R,L,JAER(3),K ) = 
      &                         ISAM1( C,R,L,JAER(3),K ) - TAG_FRAC2( C,R,L )
@@ -274,9 +272,11 @@ c    &                                           ISAM1( C,R,L,JAER(3),K )-MIN_VA
                ! Find Source Apportionment of the low volatility vapor species
                ! or, if it doesn't exist, the reaction counter
                IF ( JGAS .GT. 0 ) THEN
-                  TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JGAS,K ) / BULK0( :,:,:,JGAS )
+                  TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JGAS,K ) / 
+     &                                (BULK0( :,:,:,JGAS ) + MIN_VAL )
                ELSE  IF ( JCTR .GT. 0 ) THEN
-                  TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JCTR,K ) / BULK0( :,:,:,JCTR )
+                  TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JCTR,K ) / 
+     &                                (BULK0( :,:,:,JCTR ) + MIN_VAL )
                ELSE
                   XMSG = 'Either a Low-Volatility Gas or a Reaction Counter ' //
      &                   'must be defined for Irreversible Aerosol Species '// 
