@@ -15,7 +15,7 @@
 
         integer :: t, v, loc, reg_var, basic_var,  &
                    n, s, e, s1, e1, s2, e2, nvars
-        character (50000) :: vlist
+        character (mio_max_vlist_len) :: vlist
 
         reg_var = 0
         basic_var = 0
@@ -156,7 +156,7 @@
         use mio_global_data_module, only : mio_file_data,         &
                                            mio_outfile_def_info
         use mio_search_module
-!       use mio_parameter_module, only: mio_iunit
+        use mio_parameter_module, only: mio_max_vlist_len
 
         implicit none
 
@@ -167,7 +167,7 @@
 
         integer :: v, t, s, e, s1, e1, s2, e2, n, loc, fnum
         character (mio_max_str_len) :: t_vname
-        character (50000) :: vlist
+        character (mio_max_vlist_len) :: vlist
         logical :: found_mpas_basic_variable, found
 
         found = .false.

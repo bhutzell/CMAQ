@@ -221,8 +221,13 @@
                            write (mio_logdev, *) ' Error: ', trim(nf90_strerror(stat))
                         end if
 
+                     else if (file_data%var_att_type(t,loc) .eq. nf90_double) then
+                           write (mio_logdev, *) ' ignoring double-precision attribute in ', pname
+                           write (mio_logdev, *) ' name of attribute: ', file_data%var_att_name(t,loc)
                      else
-                        print *, ' Error: Unknown attribute type '
+
+                        write (mio_logdev, *) ' Error: Unknown attribute type for ' // &
+                                              trim(file_data%var_att_name(t,loc))
                         stop
                      end if
                   end do

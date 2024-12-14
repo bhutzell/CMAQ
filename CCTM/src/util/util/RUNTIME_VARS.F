@@ -106,7 +106,7 @@
       !-----------------------------------------------------------------------------------
 
       ! Met model version
-      LOGICAL :: WRF_V4P         = .FALSE.  ! Indicator of whether WRF version is 4+ or not
+      LOGICAL :: WRF_V4P         = .TRUE.  ! Indicator of whether WRF version is 4+ or not
 
       ! Convective scheme in met model
       LOGICAL :: CONVECTIVE_SCHEME = .TRUE.
@@ -980,6 +980,7 @@
 !          CALL M3EXIT(PNAME, 0, 0, XMSG, XSTAT1)
 !      end if 
 
+! Also commented out for now. Set to TRUE above and restore this check later.
 !      FOUND = .FALSE.
 !      NV = 0
 !      Do WHILE ((.NOT. FOUND) .AND. (NV .LT. MXDESC3))

@@ -18,6 +18,7 @@
 !------------------------------------------------------------------------!
 
       MODULE MIO_ASCII
+      USE UTILIO_DEFN
 
       IMPLICIT NONE
 
@@ -43,12 +44,12 @@
 
       TYPE( MIO_FILE_DATA_TYPE ) :: MIO_TXT_FILE_DATA( 200 )
 
-      INTEGER :: NDIMS3D(2048)
-      LOGICAL :: L_TSTEP(2048)
-      LOGICAL :: L_LAY(2048)
-      LOGICAL :: L_COL(2048)
-      LOGICAL :: L_ROW(2048)
-      LOGICAL :: L_VEXT(2048)
+      INTEGER :: NDIMS3D(MXVARS3)
+      LOGICAL :: L_TSTEP(MXVARS3)
+      LOGICAL :: L_LAY(MXVARS3)
+      LOGICAL :: L_COL(MXVARS3)
+      LOGICAL :: L_ROW(MXVARS3)
+      LOGICAL :: L_VEXT(MXVARS3)
 
       CONTAINS
 

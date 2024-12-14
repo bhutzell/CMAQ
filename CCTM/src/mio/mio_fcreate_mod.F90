@@ -965,7 +965,7 @@
           integer, intent(in) :: source, dest
 
           integer :: n, s, e, s1, e1, s2, e2, nvars
-          character (50000) :: vlist
+          character (mio_max_vlist_len) :: vlist
 
 ! transfer global attribute information
           n = mio_file_data(dest)%n_global_atts
