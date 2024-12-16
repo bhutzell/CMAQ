@@ -4,8 +4,7 @@
 
 /
 ! This Species Definition File is for Use with the COMBINE tool built for 
-! post-processing CMAQ output. It is compatible with CMAQv5.2.
-! Date: May 12 2017
+! post-processing CMAQ output. It is compatible with CMAQv6.0.
 
 ! Output variables that begin with 'PM' represent those in which a size cut was 
 ! applied based on modeled aerosol mode parameters.  For example, PM25_NA is all 
@@ -37,7 +36,7 @@
 !-------------------------------------------!
 AIR_DENS        ,kg m-3    ,DENS[1]
 RH              ,%         ,100.00*RH[1]
-SFC_TMP         ,C         ,(TSURF[1]-273.15)
+SFC_TMP         ,C         ,(SFC_TMP[1]-273.15)
 PBLH            ,m         ,PBL[1]
 SOL_RAD         ,W m-2     ,RGRND[1]
 precip          ,cm        ,PRECIP[1]
@@ -152,7 +151,7 @@ AORGAIJ         ,ug m-3    ,PMF_ASOA[1]
 AORGBIJ         ,ug m-3    ,PMF_BSOA[1]
 
 !!! Cloud-Processed  SOA
-AORGCJ          ,ug m-3    ,PMF_CLDGLY[1]
+AORGCJ          ,ug m-3    ,AORGCJ[1]
 
 !!! OM/OC ratios
 AOMOCRAT_TOT    ,          ,PMF_OMOC[1]

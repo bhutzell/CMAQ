@@ -16,8 +16,8 @@ WDEP_NO2           ,kg ha-1     ,WD_NO2[1]
 DDEP_NO            ,kg ha-1     ,DD_NO[1]
 WDEP_NO            ,kg ha-1     ,WD_NO[1]
 DDEP_FORM          ,kg ha-1     ,DD_FORMALD[1]
-WDEP_FORM	   ,kg ha-1     ,WD_FORMALD[1]
-DDEP_H2O2	   ,kg ha-1     ,DD_H2O2[1]
+WDEP_FORM	       ,kg ha-1     ,WD_FORMALD[1]
+DDEP_H2O2	       ,kg ha-1     ,DD_H2O2[1]
 WDEP_H2O2          ,kg ha-1     ,WD_H2O2[1]
 DDEP_N2O5          ,kg ha-1     ,DD_N2O5[1]
 WDEP_N2O5          ,kg ha-1     ,WD_N2O5[1]
@@ -48,23 +48,23 @@ WDEP_PNA           ,kg ha-1     ,WD_HNO4[1]
 !---------------------------------------------------!
 DDEP_ANO3IJ        ,kg ha-1     ,DD_PMF_NO3[1]
 DDEP_ANO3K         ,kg ha-1     ,DD_PMC_NO3[1]
-WDEP_ANO3IJK       ,kg ha-1     ,WD_TSP_NO3[1] 
+WDEP_ANO3IJK       ,kg ha-1     ,WD_TSP_NO3[1]
 DDEP_TNO3          ,kg ha-1     ,DD_TNO3[1]
 WDEP_TNO3          ,kg ha-1     ,WD_TNO3[1]
 DDEP_ANH4IJ        ,kg ha-1     ,DD_PMF_NH4[1]
 DDEP_ANH4K         ,kg ha-1     ,DD_PMC_NH4[1]
-WDEP_ANH4IJK       ,kg ha-1     ,WD_TSP_NH4[1] 
+WDEP_ANH4IJK       ,kg ha-1     ,WD_TSP_NH4[1]
 DDEP_AMTNO3J       ,kg ha-1     ,DD_PMF_MTNO3[1]
 WDEP_AMTNO3J       ,kg ha-1     ,WD_TSP_MTNO3[1] 
 DDEP_ASO4IJ        ,kg ha-1     ,DD_PMF_SO4[1]
 DDEP_ASO4K         ,kg ha-1     ,DD_PMC_SO4[1]
-WDEP_ASO4IJK       ,kg ha-1     ,WD_TSP_SO4[1] 
-DDEP_AECIJ	   ,kg ha-1     ,DD_PMF_EC[1]
-DDEP_AOCIJ         ,kgC ha-1    ,DD_PMF_OC[1] 
+WDEP_ASO4IJK       ,kg ha-1     ,WD_TSP_SO4[1]
+DDEP_AECIJ	       ,kg ha-1     ,DD_PMF_EC[1]
+DDEP_AOCIJ         ,kgC ha-1    ,DD_PMF_OC[1]
                                
 !DDEP_SSSO4J       ,kg ha-1     ,DD_PMF_SSSO4[1]
 !DDEP_SSSO4K       ,kg ha-1     ,DD_PMC_SSSO4[1]
-!WDEP_SSSO4JK      ,kg ha-1     ,WD_SSSO4[1] 
+!WDEP_SSSO4JK      ,kg ha-1     ,WD_TSP_SSSO4[1]
 
 
 !-----------------------------------------------------!
@@ -75,34 +75,34 @@ WDEP_NHX           ,kg ha-1     ,WD_NHX[1]
 WDEP_TSO4          ,kg ha-1     ,WD_SOX[1]
 
 !! Sodium
-DDEP_ANAJ          ,kg ha-1     ,DD_PMF_NA[1]
+DDEP_ANAJ          ,kg ha-1     ,DD_ANAJ[1]
 DDEP_ANAK          ,kg ha-1     ,DD_PMC_NA[1]
-DDEP_ANAJK         ,kg ha-1     ,DD_PMF_NA[1]
+DDEP_ANAJK         ,kg ha-1     ,DD_ANAJ[1] + DD_PMC_NA[1]
 WDEP_ANAK          ,kg ha-1     ,WD_PMC_NA[1]
-WDEP_ANAJK         ,kg ha-1     ,WD_TSP_NA[1] 
+WDEP_ANAJK         ,kg ha-1     ,WD_ANAJ[1] + WD_PMC_NA[1]
 TDEP_ANAJK         ,kg ha-1     ,WDEP_ANAJK[0] + DDEP_ANAJK[0]  
 
 !! Chloride
 DDEP_ACLJ          ,kg ha-1     ,DD_PMF_CL[1]
 DDEP_ACLK          ,kg ha-1     ,DD_PMC_CL[1]
-DDEP_ACLJK         ,kg ha-1     ,DD_PMF_CL[1]
+DDEP_ACLJK         ,kg ha-1     ,DD_ACLJ[1] + DD_PMC_CL[1]
 WDEP_TCL           ,kg ha-1     ,WD_TCL[1]
 TDEP_CL            ,kg ha-1     ,TD_TCL[1]
 
 !! Calcium
 DDEP_CAJ           ,kg ha-1     ,DD_PMF_CA[1]
-WDEP_CAJ	   ,kg ha-1     ,WD_PMF_CA[1]
+WDEP_CAJ	       ,kg ha-1     ,WD_PMF_CA[1]
 DDEP_CAK           ,kg ha-1     ,DD_PMC_CA[1]
 WDEP_CAK           ,kg ha-1     ,WD_PMC_CA[1]
-DDEP_CAJK	   ,kg ha-1     ,DD_CA[1]
-WDEP_CAJK	   ,kg ha-1     ,WD_TSP_CA[1]
+DDEP_CAJK	       ,kg ha-1     ,DD_CA[1]
+WDEP_CAJK	       ,kg ha-1     ,WD_TSP_CA[1]
 
 !! Iron
 DDEP_FEJ	   ,kg ha-1     ,DD_PMF_FE[1]
 WDEP_FEJ	   ,kg ha-1     ,WD_PMF_FE[1]
 
 !! Aluminum
-DDEP_ALJ	   ,kg ha-1     ,DD_PMF_AL[1]
+DDEP_ALJ	       ,kg ha-1     ,DD_PMF_AL[1]
 WDEP_ALJ           ,kg ha-1     ,WD_PMF_AL[1]
 
 !! Silicon

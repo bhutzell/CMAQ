@@ -110,7 +110,7 @@
                'HNO3_UGM3','SO2_UGM3','NH3_UGM3'
   
   Keywd_name(7) = 'AMET_MET'
-  Keywd(7,:) = 'MET','TSURF'
+  Keywd(7,:) = 'MET','SFC_TMP'
 
  !-- Default Gas Concentration Output
   Keywd_name(8) = 'DEFAULT_GAS'
@@ -152,7 +152,7 @@
 
   Keywd_name(17) = 'FINE_ORG'
   Keywd(17,:) = 'PMF_OC','PMF_OA','PMF_POC','PMF_SOC','PMF_POA','PMF_SOA','PMF_NC',
-               'PMF_OMOC','PMF_OTOC','PMF_ASOA','PMF_BSOA','PMF_CLDGLY',
+               'PMF_OMOC','PMF_OTOC','PMF_ASOA','PMF_BSOA','PMF_CLDGLY','AORGCJ',
                'PMF_ISOPSOA','PMF_IEPOXSOA','PMF_MTNSOA','PMF_MTSOA'
  
  !-- Particle Size Distribution Parameters
@@ -215,7 +215,8 @@
                 'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL','DD_PMF_SI',
                 'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K','DD_PMF_SSSO4',
                 'DD_PMF_OC','WD_PMF_OC','DD_PMF_POC','WD_PMF_POC','DD_PMF_SOC','WD_PMF_SOC',
-                'DD_PMF_OA','WD_PMF_OA','DD_PMF_POA','WD_PMF_POA','DD_PMF_SOA','WD_PMF_SOA'
+                'DD_PMF_OA','WD_PMF_OA','DD_PMF_POA','WD_PMF_POA','DD_PMF_SOA','WD_PMF_SOA',
+                'DD_ANAJ','DD_ACLJ'
 
   Keywd_name(32) = 'COARSE_DDEP'
   Keywd(32,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
@@ -228,7 +229,7 @@
   Keywd(34,:) = 'WD_TSP_NO3','WD_TSP_NH4','WD_TSP_SO4','WD_TSP_MTNO3','WD_TSP_NA',
                 'WD_PMC_NA','WD_PMF_CA','WD_PMC_CA','WD_TSP_CA','WD_PMF_FE',
                 'WD_PMF_AL','WD_PMF_SI','WD_PMF_TI','WD_PMF_MN','WD_PMF_MG','WD_PMC_MG',
-                'WD_TSP_MG','WD_PMF_K','WD_PMC_K','WD_TSP_K','WD_SSSO4'
+                'WD_TSP_MG','WD_PMF_K','WD_PMC_K','WD_TSP_K','WD_SSSO4','WD_ANAJ'
 
   Keywd_name(35) = 'PM_TDEP'
   Keywd(35,:) = 'TD_NA'

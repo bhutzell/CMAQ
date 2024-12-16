@@ -287,7 +287,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'PMF_FRM      ',ID_PMF_FRM,    ET_DRVD,     F, 'ug m-3', 'Federal Reference Method PMIJ' ),
      &ELDTP( 'RH           ',ID_RH,         ET_MET,      F, '1     ', 'Relative humidity' ),
      &ELDTP( 'TA           ',ID_TEMP,       ET_MET,      F, 'K     ', 'Temperature' ),
-     &ELDTP( 'TSURF        ',ID_SRFTEMP,    ET_MET,      F, 'K     ', '2-meter Surface Temperature' ),
+     &ELDTP( 'SFC_TMP      ',ID_SRFTEMP,    ET_MET,      F, 'K     ', '2-meter Surface Temperature' ),
      &ELDTP( 'PRES         ',ID_PRES,       ET_MET,      F, 'Pa    ', 'Pressure' ),
      &ELDTP( 'PBL          ',ID_PBL,        ET_MET,      F, 'm     ', 'Planetry Boundary Layer (PBL) Height' ),
      &ELDTP( 'RGRND        ',ID_RGRND,      ET_MET,      F, 'W m-2 ', 'Solar Radiation at Ground' ),
