@@ -454,12 +454,12 @@
 
           end if
 
-write (mio_logdev, '(A,4i5)') '==c== mio_fopen mio_n_infiles, mio_n_outfiles, mio_nfiles, size ', &
-                                     mio_n_infiles, mio_n_outfiles, mio_nfiles, size(mio_file_data)-1
+!write (mio_logdev, '(A,4i5)') '==c== mio_fopen mio_n_infiles, mio_n_outfiles, mio_nfiles, size ', &
+!                                     mio_n_infiles, mio_n_outfiles, mio_nfiles, size(mio_file_data)-1
 
-   do i = 1, mio_nfiles
-      write (mio_logdev, '(A,i3,2x,A)' ) '==c== fopen', i, trim(mio_file_data(i)%filename)
-   end do
+!   do i = 1, mio_nfiles
+!      write (mio_logdev, '(A,i3,2x,A)' ) '==c== fopen', i, trim(mio_file_data(i)%filename)
+!   end do
 
         end subroutine mio_fopen
 
@@ -472,7 +472,6 @@ write (mio_logdev, '(A,4i5)') '==c== mio_fopen mio_n_infiles, mio_n_outfiles, mi
           integer, intent(in) :: nexpand
           integer :: n, stat, df_size
 
-write(mio_logdev,'(A,2i4)') '==c== nexpand: ', nexpand
           if (mio_nfiles == 0) then
              allocate (mio_file_data0(0:nexpand), stat=stat)
              if (stat .ne. 0) then
@@ -490,7 +489,6 @@ write(mio_logdev,'(A,2i4)') '==c== nexpand: ', nexpand
                    stop
                 end if
                 do n = 1, mio_nfiles
-                   write(mio_logdev,'(A,i3,2x,A)') '==c== copy 1 to 0: ', n, trim(mio_file_data1(n)%filename)
                    call mio_copy_file_data (mio_file_data1(n), mio_file_data0(n))
                 end do
                 deallocate (mio_file_data1)
@@ -503,7 +501,6 @@ write(mio_logdev,'(A,2i4)') '==c== nexpand: ', nexpand
                    stop
                 end if
                 do n = 1, mio_nfiles
-                   write(mio_logdev,'(A,i3,2x,A)') '==c== copy 0 to 1: ', n, trim(mio_file_data0(n)%filename)
                    call mio_copy_file_data (mio_file_data0(n), mio_file_data1(n))
                 end do
                 deallocate (mio_file_data0)
