@@ -965,11 +965,12 @@ C write CGRID state file for subsequent runs
          IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
          IF ( MYPE .EQ. 0 ) CALL LOG_HEADING( OUTDEV, 'Program Completed Successfully' )
          IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
+
+         call mio_shutdown
+
       END IF
 
       ! Output Verification of MIO Input File
       IF ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input_check' )
-
-      call mio_shutdown
 
       END SUBROUTINE CMAQ_DRIVER        
