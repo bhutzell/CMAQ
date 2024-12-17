@@ -303,7 +303,8 @@ Rate constant parameters begin with either a # sign or the expression, "%s#", wh
 3.  Calculating the photolysis and heteorogeneous rates takes place outside the RXNS_FUNC_MODULE.F90 file produced by the CHEMMECH processor.
 4.  Operators are defined the SPECIAL block where <''REACTION''> is the rate constant for the given ''REACTION'' and [''species''] equals the concentration of a mechanism ''species'' at the beginning of the integration time-step for the chemistry's integration.
 5.  Type 12 is used to include ozone destruction by marine bromine and iodide compounds. It parameterizes effects from by a photochemical mechanism that includes such compounds.
-6.  Type 13 can use TEMP (K), PRES (atm), and the constant atmospheric species (molec/cm\*\*3). They also can use function and operator defined in the __FUNCTIONS__ and __SPECIAL__ blocks.
+6.  Type 13 can use TEMP (K), PRES (atm), and the constant atmospheric species (molec/cm\*\*3). They also can use functions defined in the __FUNCTIONS__ blocks.
+7.  Type 14 can use TEMP (K), PRES (atm), and the constant atmospheric species (molec/cm\*\*3). They also can use functions and operators defined in the __FUNCTIONS__ and __SPECIAL__ blocks.
 
 #### CONSTANTS <a name="CONSTANTS"></a>
 
