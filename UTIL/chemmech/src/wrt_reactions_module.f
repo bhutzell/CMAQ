@@ -1403,8 +1403,8 @@ C Error-check phot tables and report to log
      &      /   7X,'REAL( 8 ) :: CAIR'  )
      
      
-95051  FORMAT(  7X,'REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule*min) to 1/(ppm*min)'
-     &      /   7X,'REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molec^2*min) to 1/(ppm^2*min)'
+95051  FORMAT(  7X,'REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule*sec) to 1/(ppm*min)'
+     &      /   7X,'REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molecule^2*sec) to 1/(ppm^2*min)'
      &      /   '! special rate operators listed below'
      &      //  7X,'DO NCELL = 1, NUMCELLS'
      &      /   7X,'   TEMP      = TAIR( NCELL )'
