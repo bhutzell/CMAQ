@@ -106,7 +106,7 @@
       !-----------------------------------------------------------------------------------
 
       ! Met model version
-      LOGICAL :: WRF_V4P         = .TRUE.  ! Indicator of whether WRF version is 4+ or not
+      LOGICAL :: WRF_V4P         = .FALSE.  ! Indicator of whether WRF version is 4+ or not
 
       ! Convective scheme in met model
       LOGICAL :: CONVECTIVE_SCHEME = .TRUE.
@@ -337,10 +337,8 @@
 
       INTEGER          :: VARDEV = -1
 
-      LOGICAL          :: FOUND
       LOGICAL          :: EFLAG = .FALSE.
       INTEGER          :: LOC, STR_LEN
-      CHARACTER(10)    :: WRF_VERSION
 
       CHARACTER( 16 ) :: PNAME = 'RUNTIME_VARS'
 
@@ -952,12 +950,6 @@
        ENDIF
       ENDIF
 
-!      call get_env (ncd_64bit_offset, 'ncd_64bit_offset', .false., vardev)
-!      if (ncd_64bit_offset) then
-!         io_mode = ior( nf90_noclobber, nf90_64bit_offset)
-!      else
-!         io_mode = nf90_noclobber
-!      end if
 #ifdef mpas
       call get_env( cell_num, 'cell_num', 1, vardev)
 #else
@@ -980,29 +972,6 @@
 !          CALL M3EXIT(PNAME, 0, 0, XMSG, XSTAT1)
 !      end if 
 
-! Also commented out for now. Set to TRUE above and restore this check later.
-!      FOUND = .FALSE.
-!      NV = 0
-!      Do WHILE ((.NOT. FOUND) .AND. (NV .LT. MXDESC3))
-!         NV = NV + 1
-!         LOC = INDEX (FDESC3D(NV), 'WRF ARW V')
-!         IF (LOC > 0) THEN
-!            FOUND = .TRUE.
-!            STR_LEN = LEN_TRIM(FDESC3D(NV))
-!            READ (FDESC3D(NV)(LOC+9:STR_LEN), *) WRF_VERSION
-!            IF (WRF_VERSION .GE. '4.1') THEN
-!               WRF_V4P = .TRUE.
-!            END IF
-!         END IF
-!      END DO
-
-!      XMSG = 'MET data determined based on WRF ARW version '
-!      IF( MYPE .EQ. 0 ) THEN
-!          WRITE(OUTDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-!          WRITE(LOGDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-!      ELSE
-!          WRITE(LOGDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-!      END IF
 
 #endif
 
