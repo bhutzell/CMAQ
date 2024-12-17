@@ -2552,6 +2552,7 @@ C-----------------------------------------------------------------------
       Use precursor_data
       Use aeromet_data   ! airtemp
       Use utilio_defn    ! error message and abort
+      Use hlconst_mod
 
       Implicit None
 
@@ -2600,18 +2601,6 @@ C *** Local Variables
       Real( 8 ) :: cfactor_isop(2)     ! cfactor for IEPOX(1) and MAE(2)
       Real( 4 ) :: temp                ! air temperature [deg K]
       Character ( 80 ) :: xmsg         ! error message
-
-C *** External functions
-      Interface
-         Real Function hlconst ( cname, temp, effective, hplus )
-           Use utilio_defn
-           Implicit None
-           Character*(*), Intent ( In ) :: cname
-           Real,          Intent ( In ) :: temp
-           Logical,       Intent ( In ) :: effective
-           Real,          Intent ( In ) :: hplus
-        End Function hlconst
-      End Interface
 
 C-----------------------------------------------------------------------
 
@@ -2717,8 +2706,8 @@ C *** Calculate gammas for IEPOX and IMAE
 
 C *** Henry's Law coefficients
       temp = real( TEMPERATURE, 4)
-      Heff( 1 ) = REAL(HLCONST( 'IEPOX', temp, .False., 0.0 ), 8)
-      Heff( 2 ) = REAL(HLCONST( 'IMAE',  temp, .False., 0.0 ), 8)
+      Heff( 1 ) = REAL(HLCONST( HLC_IEPOX, temp, .False., 0.0 ), 8)
+      Heff( 2 ) = REAL(HLCONST( HLC_IMAE,  temp, .False., 0.0 ), 8)
 
 C *** Cfactor
       cfactor_isop( 1 ) = cfactor_iepox

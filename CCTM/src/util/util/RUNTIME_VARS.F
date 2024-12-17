@@ -183,12 +183,8 @@
       LOGICAL :: LPVO3     = .FALSE.       ! Activate Potential Vorticity Module (default=False)
 
       ! Aerosols
-      LOGICAL :: IC_AERO_M2WET=.FALSE.! flag for specifying wet aerosol size parameters 
-                                      !   for initial conditions. FALSE = dry
       LOGICAL :: BC_AERO_M2WET=.FALSE.! flag for specifying wet aerosol size parameters 
                                       !   for boundary conditions. FALSE = dry
-      LOGICAL :: IC_AERO_M2USE=.TRUE. ! flag for using the second moment from the input file
-                                          !   for initial conditions. TRUE = use input 2nd moment
       LOGICAL :: BC_AERO_M2USE=.TRUE. ! flag for using the second moment from the input file
                                           !   for boundary conditions.TRUE = use input 2nd moment
 
@@ -681,13 +677,7 @@
       END IF
 
       ! Get flag for interpreting initial condition aerosol size distributions as dry
-      CALL GET_ENV ( IC_AERO_M2WET, 'IC_AERO_M2WET', IC_AERO_M2WET, VARDEV )
-
-      ! Get flag for interpreting initial condition aerosol size distributions as dry
       CALL GET_ENV ( BC_AERO_M2WET, 'BC_AERO_M2WET', BC_AERO_M2WET, VARDEV )
-
-      ! Get flag for using initial condition aerosol second moment
-      CALL GET_ENV ( IC_AERO_M2USE, 'IC_AERO_M2USE', IC_AERO_M2USE, VARDEV )
 
       ! Get flag for using initial condition aerosol second moment
       CALL GET_ENV ( BC_AERO_M2USE, 'BC_AERO_M2USE', BC_AERO_M2USE, VARDEV )
