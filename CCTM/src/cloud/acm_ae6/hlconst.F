@@ -43,7 +43,7 @@ C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
 
 C...........PARAMETERS and their descriptions:
 
-         INTEGER, PARAMETER :: MXSPCS = 278     ! Number of substances
+         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 278     ! Number of substances
 
          PRIVATE 
 
