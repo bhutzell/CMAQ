@@ -128,7 +128,7 @@
                'PMF_PH','FINE_ORG','PMF','TSP_NO3_PPM'
 
   Keywd_name(11) = 'COARSE_SPECIES'
-  Keywd(11,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA'
+  Keywd(11,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA','PMC_CL'
 
   Keywd_name(12) = 'AMS_SPECIES'
   Keywd(12,:) = 'PMAMS','PMAMS_SO4','PMAMS_NO3','PMAMS_NH4','PMAMS_CL','PMAMS_OA','PMAMS_OTOC'
@@ -216,7 +216,7 @@
                 'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K','DD_PMF_SSSO4',
                 'DD_PMF_OC','WD_PMF_OC','DD_PMF_POC','WD_PMF_POC','DD_PMF_SOC','WD_PMF_SOC',
                 'DD_PMF_OA','WD_PMF_OA','DD_PMF_POA','WD_PMF_POA','DD_PMF_SOA','WD_PMF_SOA',
-                'DD_ANAJ','DD_ACLJ'
+                'DD_ANAJ','DD_ACLJ','DD_ACLK'
 
   Keywd_name(32) = 'COARSE_DDEP'
   Keywd(32,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',

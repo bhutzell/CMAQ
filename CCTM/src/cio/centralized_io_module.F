@@ -766,6 +766,7 @@
           end if
 
           WSPD10_AVAIL = (INDEX1( 'WSPD10', NVARS3D, VNAME3D ) .gt. 0)
+          WDIR10_AVAIL = (INDEX1( 'WDIR10', NVARS3D, VNAME3D ) .gt. 0)
           RNA_AVAIL    = (INDEX1( 'RNA', NVARS3D, VNAME3D ) .gt. 0)
           RCA_AVAIL    = (INDEX1( 'RCA', NVARS3D, VNAME3D ) .gt. 0)
           RA_RS_AVAIL  = (INDEX1( 'RA', NVARS3D, VNAME3D ) .gt. 0)
@@ -834,8 +835,6 @@
           QG_AVAIL       = (INDEX1( 'QG', NVARS3D, VNAME3D ) .gt. 0)
           JACOBF_AVAIL   = (INDEX1( 'JACOBF', NVARS3D, VNAME3D ) .gt. 0)
           QC_AVAIL       = .true.
-
-          WDIR10_AVAIL   = (INDEX1( 'WDIR10', NVARS3D, VNAME3D ) .gt. 0)
 
           CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
      &                    STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )

@@ -595,7 +595,7 @@ CMPST =
 
 'PM1_UNSPCRS' , 'PM1 Unspeciated Coarse-Mode Mass',
                 'ug m-3', 'PM1', 
-                '0.7847 * ASOIL + 0.8729 * ACORS',
+                '0.8124 * ASOIL + 0.9207 * ACORS',
 
 'PM1_HP'      , 'PM1 H+ Ion',
                 'ug m-3', 'PM1', 
@@ -668,11 +668,11 @@ CMPST =
 
 'PM25_OTHWNC'   , 'PM2.5 Unspeciasted Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM25', 
-                'PM25 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM25_OC - PM25_RCSOIL',
+                'PM25 - PM25_SO4 - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_OC - PM25_RCSOIL',
 
 'PM25_UNSPCRS', 'PM2.5 Unspeciated Coarse Mass',
                 'ug m-3', 'PM25', 
-                '0.7847 * ASOIL + 0.8729 * ACORS',
+                '0.8124 * ASOIL + 0.9207 * ACORS',
 
 'PM25_HP'     , 'PM2.5 H+ Ion', 
                 'ug m-3', 'PM25', 
@@ -752,7 +752,7 @@ CMPST =
 !-- Nitrate --!
 'NOY'         , 'NOy Concentration', 
                 'ppmV', 'TSP', 
-                'NO + NO2 + NO3 + N2O5 + HONO + HNO3 + ANO3 + PNA + CRON + CLNO2 + CLNO3 + PANS + NTR', 
+                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + PNA + CRON + CLNO2 + CLNO3 + PANS + NTR', 
              
 'PMF_TNO3'    , 'Fine-Mode Nitrate plus Nitric Acid', 
                 'ug m-3', 'FINE', 
@@ -901,7 +901,7 @@ CMPST =
 !-- Chloride --!
 'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
                 'kg ha-1', 'DEP_FINE', 
-                'DD_ACL - DD_ACLI',
+                'DD_ACL',
 
 'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride', 
                 'kg ha-1', 'DEP_COARSE', 

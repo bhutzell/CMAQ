@@ -83,7 +83,7 @@ WDEP_ANAJK         ,kg ha-1     ,WD_ANAJ[1] + WD_PMC_NA[1]
 TDEP_ANAJK         ,kg ha-1     ,WDEP_ANAJK[0] + DDEP_ANAJK[0]  
 
 !! Chloride
-DDEP_ACLJ          ,kg ha-1     ,DD_PMF_CL[1]
+DDEP_ACLJ          ,kg ha-1     ,DD_ACLJ[1]
 DDEP_ACLK          ,kg ha-1     ,DD_PMC_CL[1]
 DDEP_ACLJK         ,kg ha-1     ,DD_ACLJ[1] + DD_PMC_CL[1]
 WDEP_TCL           ,kg ha-1     ,WD_TCL[1]
@@ -98,8 +98,8 @@ DDEP_CAJK	       ,kg ha-1     ,DD_CA[1]
 WDEP_CAJK	       ,kg ha-1     ,WD_TSP_CA[1]
 
 !! Iron
-DDEP_FEJ	   ,kg ha-1     ,DD_PMF_FE[1]
-WDEP_FEJ	   ,kg ha-1     ,WD_PMF_FE[1]
+DDEP_FEJ	       ,kg ha-1     ,DD_PMF_FE[1]
+WDEP_FEJ	       ,kg ha-1     ,WD_PMF_FE[1]
 
 !! Aluminum
 DDEP_ALJ	       ,kg ha-1     ,DD_PMF_AL[1]

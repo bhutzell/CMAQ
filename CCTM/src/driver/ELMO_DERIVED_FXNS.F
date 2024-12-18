@@ -69,10 +69,8 @@
                  CALL GET_AERO_INLET( INLET, IM, WETNESS, FRAC )
                  OUTVAL = OUTVAL + FRAC * 
      &                    SUM( AEROSPC_CONC( :,IM ),
-     &                         MASK=.NOT.AEROSPC(:)%TRACER ) ! ug m-3
-     &                    - FRAC * AEROSPC_CONC( AH2O_IDX,IM )
-                 IF ( AORGH2O_IDX .GT. 0 ) OUTVAL = OUTVAL
-     &                - FRAC * AEROSPC_CONC( AORGH2O_IDX,IM ) ! ug m-3 
+     &                         MASK=.NOT.AEROSPC(:)%TRACER .AND.
+     &                              .NOT.AEROSPC(:)%NO_M2WET) ! ug m-3
                END IF
             END DO
 
