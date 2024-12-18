@@ -196,7 +196,7 @@ CCCCCCC Sensitivity to Emissions CCCCCCCCCCCCCCCCCCCCCCCCCCCCC
   30      CONTINUE
 
           ! Check if an emissions label has been specified. Otherwise, assume total.
-          READ( JVUNIT, '(A80)', END = 999 ) EMISTYPE
+          READ( JVUNIT, '(A1024)', END = 999 ) EMISTYPE
 
           IF ( INDEX(EMISTYPE,'SPECIES') .NE. 0 )  THEN ! start reading species
             GOTO 35 ! 
@@ -586,7 +586,7 @@ CCCCCCC Which region(s) ? CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
         END IF
 
         IF (  INDEX( TXT, 'REGION' ) .NE. 0 ) THEN
-          READ( JVUNIT, '(A80)' ) TXT
+          READ( JVUNIT, '(A1024)' ) TXT
           S_NRGN( NPSEN ) = 1+COUNT(TRANSFER(TXT, 'A', LEN(TXT)) == "," )
           READ(TXT,*) S_RGNLBL( NPSEN, 1:S_NRGN( NPSEN ) )
             ! Process these regions in central_io_module after the regions
