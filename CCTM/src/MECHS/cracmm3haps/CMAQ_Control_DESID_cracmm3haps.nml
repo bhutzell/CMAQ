@@ -83,7 +83,6 @@
    'EVERYWHERE', 'ALL'         ,'HC10'   ,'HC10'        ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'HCHO'   ,'HCHO'        ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'HCHO'   ,'HCHO_PRIM'   ,'GAS'  ,1.  ,'UNIT','a', 
-!  'EVERYWHERE', 'ALL'         ,'HCHO'   ,'HCHO_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'HKET'   ,'HKET'        ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'ISO'    ,'ISO'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'KET'    ,'KET'         ,'GAS'  ,1.  ,'UNIT','a', 
