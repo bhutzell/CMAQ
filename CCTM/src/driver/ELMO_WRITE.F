@@ -50,7 +50,7 @@ C *** If IO Proceesor, then Write Data
         SELECT CASE ( ELMO_FILE( IFL )%TMODE )
 
         CASE ( 0 )
-          ! *** Write data to the scalar output file.
+          ! *** Write data to the instantaneous output file.
 #ifndef mpas
           MDATE = JDATE
           MTIME = JTIME
@@ -79,21 +79,21 @@ C *** If IO Proceesor, then Write Data
             END IF
            
             ! Finalize Values for Averaged Variables
-            DO IVAR = 1,ELMO_FILE( IFL )%N_VARS 
-                J = ELMO_FILE( IFL )%TABID( IVAR )
-                IV = ELMO_TABLE( J )%VAR_TYPE
-                IF ( IV .NE. ET_WDEP .AND. IV .NE. ET_DDEP .AND.
-     &               IV .NE. ET_ISAM_WDEP .AND. IV .NE. ET_ISAM_DDEP .AND.
-     &               IV .NE. ET_DDM_WDEP .AND. IV .NE. ET_DDM_DDEP .AND.
-     &               IV .NE. ET_CMPST_DEP .AND. IV .NE. ET_ISAM_CMPST_DEP .AND.
-     &               IV .NE. ET_DDM_CMPST_DEP .AND. IV .NE. ET_DRVD_DDEP .AND.
-     &               IV .NE. ET_ISAM_DRVD_DDEP .AND. IV .NE. ET_DDM_DRVD_DDEP .AND.
-     &               IV .NE. ET_DRVD_WDEP .AND. IV .NE. ET_ISAM_DRVD_WDEP .AND. 
-     &               IV .NE. ET_DDM_DRVD_WDEP ) THEN
-                ELMO_OUT(IFL)%DATA( :,:,:,IVAR ) = ELMO_OUT(IFL)%DATA( :,:,:,IVAR )
-     &                                        / 2.0 / (ELMO_NSTEP - 1.0)
-                END IF
-            END DO
+!            DO IVAR = 1,ELMO_FILE( IFL )%N_VARS 
+!                J = ELMO_FILE( IFL )%TABID( IVAR )
+!                IV = ELMO_TABLE( J )%VAR_TYPE
+!                IF ( IV .NE. ET_WDEP .AND. IV .NE. ET_DDEP .AND.
+!     &               IV .NE. ET_ISAM_WDEP .AND. IV .NE. ET_ISAM_DDEP .AND.
+!     &               IV .NE. ET_DDM_WDEP .AND. IV .NE. ET_DDM_DDEP .AND.
+!     &               IV .NE. ET_CMPST_DEP .AND. IV .NE. ET_ISAM_CMPST_DEP .AND.
+!     &               IV .NE. ET_DDM_CMPST_DEP .AND. IV .NE. ET_DRVD_DDEP .AND.
+!     &               IV .NE. ET_ISAM_DRVD_DDEP .AND. IV .NE. ET_DDM_DRVD_DDEP .AND.
+!     &               IV .NE. ET_DRVD_WDEP .AND. IV .NE. ET_ISAM_DRVD_WDEP .AND. 
+!     &               IV .NE. ET_DDM_DRVD_WDEP ) THEN
+!                ELMO_OUT(IFL)%DATA( :,:,:,IVAR ) = ELMO_OUT(IFL)%DATA( :,:,:,IVAR )
+!     &                                        / 2.0 / (ELMO_NSTEP - 1.0)
+!                END IF
+!            END DO
            
             ! Write Data
             IF ( .NOT. WRITE3( ELMO_FILE( IFL )%FLOGICAL, 

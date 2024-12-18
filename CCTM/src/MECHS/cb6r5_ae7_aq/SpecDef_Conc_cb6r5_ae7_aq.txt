@@ -136,6 +136,9 @@ ANAK            ,ug m-3    ,0.8373*ASEACAT[1]+0.0626*ASOIL[1]+0.0023*ACORS[1]
 AMGK            ,ug m-3    ,0.0997*ASEACAT[1]+0.0170*ASOIL[1]+0.0032*ACORS[1]
 AKK             ,ug m-3    ,0.0310*ASEACAT[1]+0.0242*ASOIL[1]+0.0176*ACORS[1]
 ACAK            ,ug m-3    ,0.0320*ASEACAT[1]+0.0838*ASOIL[1]+0.0562*ACORS[1]
+AFEK            ,ug m-3    ,                  0.02695*ASOIL[1]+0.0467*ACORS[1]
+AMNK            ,ug m-3    ,                  0.00075*ASOIL[1]+0.0011*ACORS[1]
+
 ACLIJ           ,ug m-3    ,ACLI[1]+ACLJ[1]
 AECIJ           ,ug m-3    ,AECI[1]+AECJ[1]
 ANAIJ           ,ug m-3    ,ANAJ[1]+ANAI[1]
@@ -276,6 +279,8 @@ PM1_TOT         ,ug m-3    ,ATOTI[0]*FPM1_AIT[3]+ATOTJ[0]*FPM1_ACC[3]+ATOTK[0]*F
 !                                                  +AMGK[0]*FPM1_COR[3]  \
 !                                                  +AKK[0]*FPM1_COR[3]   \
 !                                                  +ACAK[0]*FPM1_COR[3]  \
+!                                                  +AFEK[0]*FPM1_COR[3]  \
+!                                                  +AMNK[0]*FPM1_COR[3]  \
 !                                                  +ANH4K[1]*FPM1_COR[3] \
 !                                                  +ANO3K[1]*FPM1_COR[3]) 
  
@@ -302,6 +307,8 @@ PM25_UNSPCRS    ,ug m-3    ,ATOTK[0]*FPM25_COR[3] - (ASO4K[1]*FPM25_COR[3] \
                                                   +AMGK[0]*FPM25_COR[3]  \
                                                   +AKK[0]*FPM25_COR[3]   \
                                                   +ACAK[0]*FPM25_COR[3]  \
+                                                  +AFEK[0]*FPM25_COR[3]  \
+                                                  +AMNK[0]*FPM25_COR[3]  \
                                                   +ANH4K[1]*FPM25_COR[3] \
                                                   +ANO3K[1]*FPM25_COR[3]) 
 

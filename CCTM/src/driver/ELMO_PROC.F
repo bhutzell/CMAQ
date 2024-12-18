@@ -264,6 +264,7 @@
 
       LOGICAL, INTENT( IN ) :: WRITE_STEP
       LOGICAL, INTENT( IN ) :: INIT_STEP
+      REAL                  :: DIVFAC
 
       CHARACTER(250) :: XMSG
       INTEGER        :: XSTAT1
@@ -327,6 +328,8 @@
              ! *** Aggregate Diagnostic Variables in Average Array
              !     using trapezoidal rule
              OL = L - ELMO_FILE( IFL )%LAY_BOT + 1
+             DIVFAC = 0.5 / ( ELMO_NSTEP - 1.0 )
+
              DO  IVAR = 1,ELMO_FILE( IFL )%N_VARS
                 J   = ELMO_FILE( IFL )%TABID( IVAR )
                 U   = ELMO_FILE( IFL )%USEDID( IVAR )
@@ -346,7 +349,11 @@
                    ! offline.
                    IF ( INIT_STEP ) THEN
                       ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
-                   ELSE IF ( .NOT. WRITE_STEP ) THEN
+                   ELSE IF ( WRITE_STEP ) THEN
+                       ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = DIVFAC * 
+     &                          ( ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) 
+     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) ) - ELMO_OUT(IFL)%DATA( C,R,OL,IVAR )
+                   ELSE 
                        ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) =
      &                          ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) 
      &                        + 2.0 * ELMO_OUT(IFL)%DATA( C,R,OL,IVAR )
@@ -381,8 +388,8 @@
                    IF ( INIT_STEP ) THEN
                       ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = ELMO_USED( U ) 
                    ELSE IF ( WRITE_STEP ) THEN
-                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 
-     &                     ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + ELMO_USED( U )
+                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = DIVFAC *
+     &                     ( ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + 2.0 * ELMO_USED( U ) ) - ELMO_USED( U )
                    ELSE
                       ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 
      &                     ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + 2.0 * ELMO_USED(U)

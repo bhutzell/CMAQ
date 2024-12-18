@@ -595,7 +595,7 @@ CMPST =
 
 'PM1_UNSPCRS' , 'PM1 Unspeciated Coarse-Mode Mass',
                 'ug m-3', 'PM1', 
-                '0.8124 * ASOIL + 0.9207 * ACORS',
+                '0.7847 * ASOIL + 0.8729 * ACORS',
 
 'PM1_HP'      , 'PM1 H+ Ion',
                 'ug m-3', 'PM1', 
@@ -672,7 +672,7 @@ CMPST =
 
 'PM25_UNSPCRS', 'PM2.5 Unspeciated Coarse Mass',
                 'ug m-3', 'PM25', 
-                '0.8124 * ASOIL + 0.9207 * ACORS',
+                '0.7847 * ASOIL + 0.8729 * ACORS',
 
 'PM25_HP'     , 'PM2.5 H+ Ion', 
                 'ug m-3', 'PM25', 
