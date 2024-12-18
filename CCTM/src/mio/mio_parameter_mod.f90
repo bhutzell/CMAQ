@@ -47,6 +47,7 @@
         integer, parameter :: mio_max_outfile_def_list   = 500   ! max number of outfile definitions
         integer, parameter :: mio_preset_num_tsteps      = 100   ! pre-set number of time step in timestamp
         integer, parameter :: mio_max_att_cval_len       = 80000 ! max attribute cval length
+        integer, parameter :: mio_max_vlist_len          = 50000
 
         integer, parameter :: mio_iunit = 168   ! file that contains input and output data information
 

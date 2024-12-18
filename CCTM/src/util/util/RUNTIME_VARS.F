@@ -333,10 +333,8 @@
 
       INTEGER          :: VARDEV = -1
 
-      LOGICAL          :: FOUND
       LOGICAL          :: EFLAG = .FALSE.
       INTEGER          :: LOC, STR_LEN
-      CHARACTER(10)    :: WRF_VERSION
 
       CHARACTER( 16 ) :: PNAME = 'RUNTIME_VARS'
 
@@ -948,12 +946,6 @@
        ENDIF
       ENDIF
 
-!      call get_env (ncd_64bit_offset, 'ncd_64bit_offset', .false., vardev)
-!      if (ncd_64bit_offset) then
-!         io_mode = ior( nf90_noclobber, nf90_64bit_offset)
-!      else
-!         io_mode = nf90_noclobber
-!      end if
 #ifdef mpas
       call get_env( cell_num, 'cell_num', 1, vardev)
 #else
@@ -976,28 +968,6 @@
 !          CALL M3EXIT(PNAME, 0, 0, XMSG, XSTAT1)
 !      end if 
 
-!      FOUND = .FALSE.
-!      NV = 0
-!      Do WHILE ((.NOT. FOUND) .AND. (NV .LT. MXDESC3))
-!         NV = NV + 1
-!         LOC = INDEX (FDESC3D(NV), 'WRF ARW V')
-!         IF (LOC > 0) THEN
-!            FOUND = .TRUE.
-!            STR_LEN = LEN_TRIM(FDESC3D(NV))
-!            READ (FDESC3D(NV)(LOC+9:STR_LEN), *) WRF_VERSION
-!            IF (WRF_VERSION .GE. '4.1') THEN
-!               WRF_V4P = .TRUE.
-!            END IF
-!         END IF
-!      END DO
-
-!      XMSG = 'MET data determined based on WRF ARW version '
-!      IF( MYPE .EQ. 0 ) THEN
-!          WRITE(OUTDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-!          WRITE(LOGDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-!      ELSE
-!          WRITE(LOGDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-!      END IF
 
 #endif
 

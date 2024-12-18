@@ -775,14 +775,12 @@ C Initialize Modules
           CALL SUBST_BARRIER ! ensure mio_ascii file written
 
 C Initialize MIO 
-!         call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
           call mio_init2
       END IF
 
 ! Output Instantaneous Values at first time step
       IF ( JDATE .EQ. STDATE .AND. JTIME .EQ. STTIME ) THEN
          CALL WR_INIT ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
-!        CALL WR_CONC ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
 #ifdef isam
          CALL WR_SA     ( JDATE, JTIME, TSTEP, 1 )
 #endif

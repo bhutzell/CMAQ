@@ -96,8 +96,11 @@ C-----------------------------------------------------------------------
 
             LOGICAL, SAVE :: FIRSTIME = .TRUE.
             CHARACTER( 96 ) :: XMSG = ' '
+            character( 5000 ) :: filedesc
+            CHARACTER(10)   :: WRF_VERSION = ' '
 
             INTEGER L, ALLOCSTAT, floc
+            INTEGER  :: NV, LOC, STR_LEN
             real, allocatable :: vglvs_mc3(:)
 
 C This function is expected to be called only once - at startup
@@ -143,13 +146,34 @@ C set layer layer thicknesses
                   X3FACE_GD( L ) = 1.0 - VGLVS_GD( L + 1 )
                END DO
 
-               VGLVS3D = VGLVS_GD
+               VGLVS3D(1:NLAYS+1) = VGLVS_GD(1:NLAYS+1)
                deallocate( VGLVS_MC3 )
+
+C Determine whether WRF version is 4.1 or greater
+               call mio_get_global_attr( MET_CRO_3D, 'FILEDESC', FILEDESC )
+               LOC = INDEX (FILEDESC, 'WRF ARW V')
+               IF (LOC > 0) THEN
+                  STR_LEN = LEN_TRIM(FILEDESC)
+                  READ (FILEDESC(LOC+9:STR_LEN), *) WRF_VERSION
+                  IF (WRF_VERSION .GE. '4.1') THEN
+                     WRF_V4P = .TRUE.
+                  END IF
+               END IF
+
+               XMSG = 'MET data determined based on WRF ARW version '
+               IF ( MYPE .EQ. 0 ) THEN
+                  WRITE(OUTDEV,'(/,5X,2(A,1X),/)') TRIM( XMSG ), TRIM( WRF_VERSION )
+                  WRITE(LOGDEV,'(/,5X,2(A,1X),/)') TRIM( XMSG ), TRIM( WRF_VERSION )
+               ELSE
+                  WRITE(LOGDEV,'(/,5X,2(A,1X),/)') TRIM( XMSG ), TRIM( WRF_VERSION )
+               END IF
+
             ELSE
                XMSG = 'Vertical layer structure already defined'
                CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
 #endif
+
             END IF   ! FIRSTIME
 
          RETURN
