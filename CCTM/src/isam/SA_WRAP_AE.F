@@ -327,7 +327,8 @@ c     ISAM0(:,:,:,:,:) = MAX( DBLE( ISAM(:,:,:,:,:) ), MIN_VAL )
                      IF ( JAER(IM) .NE. 0 ) THEN
                        SPEC_BULK0( C,R,L ) = SUM( ISAM0( C,R,L,JAER(IM),: ) )
                        ISAM1( C,R,L,JAER(IM),: ) = ISAM0( C,R,L,JAER(IM),: ) *
-     &                       ( 1.0 + BULK_TRANS_SRC( C,R,L )/SPEC_BULK0( C,R,L ) )
+     &                       ( 1.0 + BULK_TRANS_SRC( C,R,L )/
+     &                       ( SPEC_BULK0( C,R,L ) ) + MIN_VAL )
                      END IF
                    ELSE
                      ! Assume that net gains are apportioned like current non-water aerosol
@@ -346,7 +347,8 @@ c     ISAM0(:,:,:,:,:) = MAX( DBLE( ISAM(:,:,:,:,:) ), MIN_VAL )
      &                                L_MASK_TYPE .NE. 'H2O'  .AND.
      &                                OMH2O .EQV. L_MASK_OM   .AND. 
      &                                IM .EQ. L_MASK_IM  ) )
-     &                          /SPEC_BULK0( C,R,L ) * BULK_TRANS_SRC( C,R,L )
+     &                          * BULK_TRANS_SRC( C,R,L )
+     &                          / ( SPEC_BULK0( C,R,L ) + MIN_VAL )
                        END IF
                      END DO
                    END IF
