@@ -328,7 +328,8 @@
              ! *** Aggregate Diagnostic Variables in Average Array
              !     using trapezoidal rule
              OL = L - ELMO_FILE( IFL )%LAY_BOT + 1
-             DIVFAC = 0.5 / ( ELMO_NSTEP - 1.0 )
+             DIVFAC = 1.0
+             IF ( WRITE_STEP ) DIVFAC = 0.5 / ( ELMO_NSTEP - 1.0 )
 
              DO  IVAR = 1,ELMO_FILE( IFL )%N_VARS
                 J   = ELMO_FILE( IFL )%TABID( IVAR )
