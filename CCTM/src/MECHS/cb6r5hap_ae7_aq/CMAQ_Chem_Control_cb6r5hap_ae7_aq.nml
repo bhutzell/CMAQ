@@ -1,25 +1,25 @@
 !------------------------------------------------------------------------------!
-! Control Interface for the                                                    !                                                              !
-! (1) Detailed Emissions Scaling, Isolation, and Diagnostics (DESID) Module and!
-! (2) Explicit and Lumped Model Output (ELMO) Module                           !
-!    which are part of the                                                     !
+! Emission Control Interface                                                   !
+!    for the                                                                   !
+! Detailed Emissions Scaling, Isolation, and Diagnostics (DESID) Module,       !
+!    part of the                                                               !
 ! Community Multiscale Air Quality (CMAQ) Model                                !
 !    developed and maintained by the                                           !
 ! Center for Environmental Measurement and Modeling (CEMM),                    !
 ! Office of Research and Development (ORD)                                     !
 ! U.S. Environmental Protection Agency (USEPA)                                 !
 !                                                                              !
-! This namelist is consistent with CMAQv6.0			               !
+! This namelist is consistent with CMAQv6.0                                    !
 !                                                                              !
 ! For DESID,                                                                   !
 ! see CMAQ User's Guide Appendix B (https://github.com/USEPA/CMAQ/blob/main/   !
-!     DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md)        !
-!     and Murphy et al., Geoscientific Model Development, 14, 3407-3420,       !
-!     https://doi.org/10.5194/gmd-14-3407-2021, 2021.                          !
+!      DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md)       !
+!      and Murphy et al., Geoscientific Model Development, 14, 3407-3420,      !
+!      https://doi.org/10.5194/gmd-14-3407-2021, 2021.                         !
 !                                                                              !
 ! For ELMO,                                                                    !
 ! see CMAQ User's Guide Appendix F (https://github.com/USEPA/CMAQ/blob/main/   !
-!     DOCS/Users_Guide/Appendix/CMAQ_UG_appendixF_elmo_output.md)              !
+!      DOCS/Users_Guide/Appendix/CMAQ_UG_appendixF_elmo_output.md)             !
 !------------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------------!
@@ -39,7 +39,7 @@
 !       of that species.                                                       !
 !------------------------------------------------------------------------------!
 &Desid_ScalingVars
- Desid_Max_Rules = 2000
+ Desid_Max_Rules = 2500
 /
 
 &Desid_Scaling
@@ -89,11 +89,12 @@
    'EVERYWHERE', 'ALL'        ,'ACROLEIN','ACRO_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'     ,'BUTADIENE13','BUTADIENE13' ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'SULF'        ,'GAS'  ,0.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'TOLU'   ,'TOLU'        ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'HGNRVA' ,'HG'          ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'HGIIGAS','HGIIGAS'     ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'GLY'    ,'GLY'         ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'GLYD'   ,'GLYD'        ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a',
 
    ! Marine Halogen Chemistry
    'EVERYWHERE', 'ALL'         ,'DMS'    ,'DMS'         ,'GAS'  ,1.  ,'UNIT','a',
@@ -128,6 +129,7 @@
    ! --> Nonvolatile POA
     'EVERYWHERE', 'ALL'         ,'POC'    ,'APOC'       ,'FINE',0.   ,'MASS','a', 
     'EVERYWHERE', 'ALL'         ,'PNCOM'  ,'APNCOM'     ,'FINE',0.   ,'MASS','a', 
+
    ! --> Semivolatile POA (see CMAQ User's Guide Appendix B.2.2.1)
     'EVERYWHERE', 'ALL'         ,'POC'    ,'VSVPO1'     ,'GAS' ,0.045,'MASS','a', 
     'EVERYWHERE', 'ALL'         ,'PNCOM'  ,'VSVPO1'     ,'GAS' ,0.045,'MASS','a', 
@@ -181,16 +183,108 @@
    'EVERYWHERE', 'ALL'    ,'PMFINE_OTHR' ,'AOTHR'       ,'FINE',1.   ,'UNIT','a', 
 
    ! Wind-Blown Dust and Sea Spray Scaling
-   ! Coarse Components
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SO4','ASO4'      ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NO3','ANO3'      ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CL' ,'ACL'       ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a',
+   ! Coarse Components                                               
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SO4','ASO4'      ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NO3','ANO3'      ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CL' ,'ACL'       ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a', 
 
+    ! Optional Air Toxics in NR namelist, comment out species if the NR namelist
+    ! does not include one or more of them.
+   'EVERYWHERE', 'ALL' ,'ACRYLONITRILE','ACRY_NITRILE',     'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'CARBONTET','CARBONTET',            'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'PROPDICHLORIDE','PROPYL_DICL',     'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'DICHLOROPROPENE','DICL_PROPENE',   'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'CL4_ETHANE1122','CL4_ETHANE',      'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'CHCL3','CHCL3',                    'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'BR2_C2_12','BR2_C2_12',            'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'CL2_C2_12','CL2_C2_12',            'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'ETOX','ETOX',                      'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'CL2_ME','CL2_ME',                  'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'CL4_ETHE','CL4_ETHE',              'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'CL3_ETHE','CL3_ETHE',              'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'CL_ETHE','CL_ETHE',                'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'NAPH','NAPHTHALENE',               'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'QUINOLINE','QUINOLINE',            'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'HEXAMETHY_DIIS','HEXMETH_DIS',     'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'HYDRAZINE','HYDRAZINE',            'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'MAL_ANHYDRIDE','MAL_ANHYDRID',     'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'TOL_DIIS','TOL_DIIS',              'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'TRIETHYLAMINE','TRIETHYLAMIN',     'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'DICHLOROBENZENE','DICL_BENZENE',   'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'ACETONITRILE','ACET_NITRILE',      'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'XYLENES','XYLENE',                 'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'STYRENE','STYRENE',                'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'ACRYLICACID','ACRYACID',           'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'HEXANE','HEXANE',                  'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'METHCHLORIDE','METHCHLORIDE',      'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'CARBSULFIDE','CARBSULFIDE',        'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'CHLOROPRENE','CHLOROPRENE',        'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'ETHYLBENZ','ETHYLBENZENE',         'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'BENZOAPYRNE','BENAPY',             'GAS'  ,1.  ,'UNIT','a',
+
+ ! Inert Tracers of PAH congeners for simple exposure assessments
+   'EVERYWHERE', 'ALL' , 'PAH_000E0', 'PAH_000E0',          'GAS',1.0  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' , 'PAH_176E5', 'PAH_176E5',          'GAS',1.0  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' , 'PAH_880E5', 'PAH_880E5',          'GAS',1.0  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' , 'PAH_176E4', 'PAH_176E4',          'GAS',1.0  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' , 'PAH_176E3', 'PAH_176E3',          'GAS',1.0  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' , 'PAH_192E3', 'PAH_192E3',          'GAS',1.0  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' , 'PAH_101E2', 'PAH_101E2',          'GAS',1.0  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' , 'PAH_176E2', 'PAH_176E2',          'GAS',1.0  ,'UNIT','a',
+   'EVERYWHERE', 'ALL' , 'PAH_114E1', 'PAH_114E1',          'GAS',1.0  ,'UNIT','a',
+
+   ! Particulate Hazardous Air Pollutants (HAPs), can comment individual aerosol
+   ! components across mode if AE namelist does not contain them
+   'EVERYWHERE', 'ALL'         'NICKEL_F','ANI'     ,'FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         'NICKEL_C','ANI'     ,'COARSE',1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'       'CHROMHEX_F','ACR_VI'  ,'FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'       'CHROMHEX_C','ACR_VI'  ,'COARSE',1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'       'CHROMTRI_F','ACR_III' ,'FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'       'CHROMTRI_C','ACR_III' ,'COARSE',1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'      'BERYLLIUM_F','ABE'     ,'FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'      'BERYLLIUM_C','ABE'     ,'COARSE',1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'           'LEAD_F','APB'     ,'FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'           'LEAD_C','APB'     ,'COARSE',1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    'DIESEL_PMFINE','ADE_OTHR','FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'      'DIESEL_PMEC','ADE_EC'  ,'FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'      'DIESEL_PMOC','ADE_OC'  ,'FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'     'DIESEL_PMNO3','ADE_NO3' ,'FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'     'DIESEL_PMSO4','ADE_SO4' ,'FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'       'DIESEL_PMC','ADE_CORS','COARSE',1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        'CADMIUM_F','ACADMIUM','FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        'CADMIUM_C','ACADMIUM','COARSE',1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'      'MANGANESE_F','AMN_HAPS','FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'      'MANGANESE_C','AMN_HAPS','COARSE',1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        'ARSENIC_F','AAS'     ,'FINE'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        'ARSENIC_C','AAS'     ,'COARSE',1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'             'PHGI','APHG'    ,'FINE'  ,1.  ,'UNIT','a',
+
+   'EVERYWHERE', 'ALL'    ,'PMFINE_CR_III'  ,'ACR_III'  ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_CR_VI'   ,'ACR_VI'   ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_NI'      ,'ANI'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_AS'      ,'AAS'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_BE'      ,'ABE'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_PHG'     ,'APHG'     ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_PB'      ,'APB'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_CD'      ,'ACADMIUM' ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_MN_HAPS' ,'AMN_HAPS' ,'FINE',1.   ,'UNIT','a',
+
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CR_III'  ,'ACR_III'  ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CR_VI'   ,'ACR_VI'   ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NI'      ,'ANI'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_AS'      ,'AAS'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_BE'      ,'ABE'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_PHG'     ,'APHG'     ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_PB'      ,'APB'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CD'      ,'ACADMIUM' ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_MN_HAPS' ,'AMN_HAPS' ,'COARSE',1.   ,'UNIT','a',
+
+   
 /
-
+ 
 !------------------------------------------------------------------------------!
 ! Emissions Scaling Family Definitions                                         !
 !    This component includes definitions for families of CMAQ chemical species !
@@ -220,6 +314,8 @@
 ! ChemFamilyUnits(1)    = 'PPMV'
 ! ChemFamilyMembers(1,:)= 'VSVOC1','ASVOA1J','ASVOA1I'
 /
+
+
 
 !------------------------------------------------------------------------------!
 ! ELMO COMPOSITE Variable Definitions                                          !
@@ -282,9 +378,9 @@
 !    N_MAX_COMPONENTS - must be equal to or larger than the largest number of  !
 !                       components of any COMPOSITE definition.                !
 !------------------------------------------------------------------------------!
-
+    
 &COMPOSITE_INIT
-  N_MAX_COMPOSITES = 300
+  N_MAX_COMPOSITES = 500
   N_MAX_COMPONENTS = 50
 /
 
@@ -407,6 +503,46 @@ CMPST =
                 'ug m-3', 'COARSE', 
                 '0.0320 * ASEACAT + 0.0838 * ASOIL + 0.0562 * ACORS',
 
+'PMC_HNI'      , 'Coarse-Mode Nickel',
+                'ug m-3', 'COARSE',
+                'ANI',
+
+'PMC_HCR6'     , 'Coarse-Mode Hexavalent Chromium',
+                'ug m-3', 'COARSE',
+                'ACR_VI',
+
+'PMC_HCR3'     , 'Coarse-Mode Trivalent Chromium',
+                'ug m-3', 'COARSE',
+                'ACR_III',
+
+'PMC_HBE'      , 'Coarse-Mode Beryllium',
+                'ug m-3', 'COARSE',
+                'ABE',
+
+'PMC_HPB'      , 'Coarse-Mode Lead',
+                'ug m-3', 'COARSE',
+                'APB',
+
+'PMC_HCD'      , 'Coarse-Mode Cadmium',
+                'ug m-3', 'COARSE',
+                'ACADMIUM',
+
+'PMC_HG'      , 'Coarse-Mode Mercury',
+                'ug m-3', 'COARSE',
+                'APHG',
+
+'PMC_HAS'      , 'Coarse-Mode Arsenic',
+                'ug m-3', 'COARSE',
+                'AAS',
+
+'PMC_HBNPY'    , 'Coarse-Mode Benzo-a-pyrene',
+                'ug m-3', 'COARSE',
+                'ABENAPY',
+
+'PMC_HDIESEL' , 'Coarse-Mode Diesel-sourced PM',
+                'ug m-3', 'COARSE',
+                'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
+
 !-- Fine-Mode Particle Composites --!
 'PMF_SO4'     , 'Fine-Mode Sulfate', 
                 'ug m-3',  'FINE', 
@@ -512,6 +648,55 @@ CMPST =
                 'ug m-3', 'FINE', 
                 'PMF_OC + PMF_EC',
 
+'PMF_HNI'     , 'Fine-Mode Nickel',
+                'ug m-3', 'FINE',
+                'ANI',
+
+'PMF_HCR6'    , 'Fine-Mode Hexavalent Chromium',
+                'ug m-3', 'FINE',
+                'ACR_VI',
+
+'PMF_HCR3'    , 'Fine-Mode Trivalent Chromium',
+                'ug m-3', 'FINE',
+                'ACR_III',
+
+'PMF_HCR'     , 'Fine-Mode Total Chromium',
+                'ug m-3', 'FINE',
+                'ACR_III + ACR_VI',
+
+'PMF_HBE'     , 'Fine-Mode Beryllium',
+                'ug m-3', 'FINE',
+                'ABE',
+
+'PMF_HPB'     , 'Fine-Mode Lead',
+                'ug m-3', 'FINE',
+                'APB',
+
+'PMF_HCD'     , 'Fine-Mode Cadmium',
+                'ug m-3', 'FINE',
+                'ACADMIUM',
+
+'PMF_HMN'     , 'Fine-Mode HAPs Manganese',
+                'ug m-3', 'FINE',
+                'AMN_HAPS',
+
+'PMF_HG'      , 'Fine-Mode Mercury',
+                'ug m-3', 'FINE',
+                'APHG',
+
+'PMF_HAS'     , 'Fine-Mode Arsenic',
+                'ug m-3', 'FINE',
+                'AAS',
+
+'PMF_HBNPY'   , 'Fine-Mode Benzo-a-pyrene',
+                'ug m-3', 'FINE',
+                'ABENAPY',
+
+'PMF_HDIESEL' , 'Fine-Mode Diesel PM',
+                'ug m-3', 'FINE',
+                'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
+
+
 !-- Particle Composites Projected to Aerosol Mass Spectrometer --!
 'PMAMS_SO4'   , 'Sulfate Collected by the AMS',
                 'ug m-3', 'PMAMS', 
@@ -599,12 +784,57 @@ CMPST =
                 'PM1 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM1_OC - PM1_RCSOIL',
 
 'PM1_UNSPCRS' , 'PM1 Unspeciated Coarse-Mode Mass',
-                'ug m-3', 'PM1', 
-                '0.7847 * ASOIL + 0.8729 * ACORS',
+                'ug m-3', 'PM1',
+                '0.8124 * ASOIL + 0.9207 * ACORS', 
 
 'PM1_HP'      , 'PM1 H+ Ion',
                 'ug m-3', 'PM1', 
                 '0.05263 * AH3OP',
+
+'PM1_HNI'     , 'PM1 Nickel',
+                'ug m-3', 'PM1',
+                'ANI',
+
+'PM1_HCR6'    , 'PM1 Hexavalent Chromium',
+                'ug m-3', 'PM1',
+                'ACR_VI',
+
+'PM1_HCR3'    , 'PM1 Trivalent Chromium',
+                'ug m-3', 'PM1',
+                'ACR_III',
+
+'PM1_HCR'     , 'PM1 Total Chromium',
+                'ug m-3', 'PM1',
+                'ACR_III + ACR_VI',
+
+'PM1_HBE'     , 'PM1 Beryllium',
+                'ug m-3', 'PM1',
+                'ABE',
+
+'PM1_HPB'     , 'PM1 Lead',
+                'ug m-3', 'PM1',
+                'APB',
+
+'PM1_HCD'     , 'PM1 Cadmium',
+                'ug m-3', 'PM1',
+                'ACADMIUM',
+
+'PM1_HG'      , 'PM1 Mercury',
+                'ug m-3', 'PM1',
+                'APHG',
+
+'PM1_HAS'     , 'PM1 Arsenic',
+                'ug m-3', 'PM1',
+                'AAS',
+
+'PM1_HBNPY'   , 'PM1 Benzo-a-pyrene',
+                'ug m-3', 'PM1',
+                'ABENAPY',
+
+'PM1_HDIESEL' , 'PM1 Diesel PM',
+                'ug m-3', 'PM1',
+                'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
+
 
 !-- Particle Composites (Dp < 2.5 um) --!
 'PM25_SO4'    , 'PM2.5 Sulfate',
@@ -677,7 +907,7 @@ CMPST =
 
 'PM25_UNSPCRS', 'PM2.5 Unspeciated Coarse Mass',
                 'ug m-3', 'PM25', 
-                '0.7847 * ASOIL + 0.8729 * ACORS',
+                '0.8124 * ASOIL + 0.9207 * ACORS',
 
 'PM25_HP'     , 'PM2.5 H+ Ion', 
                 'ug m-3', 'PM25', 
@@ -686,6 +916,55 @@ CMPST =
 'PM25_TC'     , 'PM2.5 Total Carbon (OC + EC)',
                 'ug m-3', 'PM25', 
                 'PM25_OC + PM25_EC',
+
+'PM25_HNI'    , 'PM2.5 Nickel',
+                'ug m-3', 'PM25',
+                'ANI',
+
+'PM25_HCR6'   , 'PM2.5 Hexavalent Chromium',
+                'ug m-3', 'PM25',
+                'ACR_VI',
+
+'PM25_HCR3'   , 'PM2.5 Trivalent Chromium',
+                'ug m-3', 'PM25',
+                'ACR_III',
+
+'PM25_HCR'    , 'PM2.5 Total Chromium',
+                'ug m-3', 'PM25',
+                'ACR_III + ACR_VI',
+
+'PM25_HBE'    , 'PM2.5 Beryllium',
+                'ug m-3', 'PM25',
+                'ABE',
+
+'PM25_HPB'    , 'PM2.5 Lead',
+                'ug m-3', 'PM25',
+                'APB',
+
+'PM25_HCD'    , 'PM2.5 Cadmium',
+                'ug m-3', 'PM25',
+                'ACADMIUM',
+
+'PM25_HMN'    , 'PM2.5 HAPs Manganese',
+                'ug m-3', 'PM25',
+                'AMN_HAPS',
+
+'PM25_HG'     , 'PM2.5 Mercury',
+                'ug m-3', 'PM25',
+                'APHG',
+
+'PM25_HAS'    , 'PM2.5 Arsenic',
+                'ug m-3', 'PM25',
+                'AAS',
+
+'PM25_HBNPY'  , 'PM2.5 Benzo-a-pyrene',
+                'ug m-3', 'PM25',
+                'ABENAPY',
+
+'PM25_HDIESEL', 'PM2.5 Diesel-sourced',
+                'ug m-3', 'PM25',
+                'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
+
 
 !-- Particle Composites (2.5 um < Dp < 10 um) --!
 'PM25TO10_SO4', 'Coarse-Mode Sulfate',
@@ -707,6 +986,105 @@ CMPST =
 'PM25TO10_NA' , 'Coarse-Mode Sodium',
                 'ug m-3', 'PM25TO10', 
                 'ANA + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS',
+
+'PM25TO10_HNI' , 'Coarse-Mode Nickel',
+                'ug m-3', 'PM25TO10',
+                'ANI',
+
+'PM25TO10_HCR6', 'Coarse-Mode Hexavalent Chromium',
+                'ug m-3', 'PM25TO10',
+                'ACR_VI',
+
+'PM25TO10_HCR3', 'Coarse-Mode Trivalent Chromium',
+                'ug m-3', 'PM25TO10',
+                'ACR_III',
+
+'PM25TO10_HCR' , 'Coarse-Mode Trivalent Chromium',
+                'ug m-3', 'PM25TO10',
+                'ACR_III + ACR_VI',
+
+'PM25TO10_HBE' , 'Coarse-Mode Beryllium',
+                'ug m-3', 'PM25TO10',
+                'ABE',
+
+'PM25TO10_HPB' , 'Coarse-Mode Lead',
+                'ug m-3', 'PM25TO10',
+                'APB',
+
+'PM25TO10_HCD' , 'Coarse-Mode Cadmium',
+                'ug m-3', 'PM25TO10',
+                'ACADMIUM',
+
+'PM25TO10_HMN' , 'Coarse-Mode HAPs Manganese',
+                'ug m-3', 'PM25TO10',
+                'AMN_HAPS',
+
+'PM25TO10_HG' , 'Coarse-Mode Mercury',
+                'ug m-3', 'PM25TO10',
+                'APHG',
+
+'PM25TO10_HAS' , 'Coarse-Mode Arsenic',
+                'ug m-3', 'PM25TO10',
+                'AAS',
+
+'PM25TO10_HBNPY', 'Coarse-Mode Benzo-a-pyrene',
+                'ug m-3', 'PM25TO10',
+                'ABENAPY',
+
+'PM25TO10_DIES', 'Coarse-Mode Diesel PM',
+                'ug m-3', 'PM25TO10',
+                'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
+
+!-- Particle Composites ( Dp < 10 um) --!
+
+'PM10_HNI'    , 'Coarse-Mode Nickel',
+                'ug m-3', 'PM10',
+                'ANI',
+
+'PM10_HCR6'   , 'Coarse-Mode Hexavalent Chromium',
+                'ug m-3', 'PM10',
+                'ACR_VI',
+
+'PM10_HCR3'   , 'Coarse-Mode Trivalent Chromium',
+                'ug m-3', 'PM10',
+                'ACR_III',
+
+'PM10_HCR'    , 'Coarse-Mode Total Chromium',
+                'ug m-3', 'PM10',
+                'ACR_III + ACR_VI',
+
+'PM10_HBE'    , 'Coarse-Mode Beryllium',
+                'ug m-3', 'PM10',
+                'ABE',
+
+'PM10_HPB'    , 'Coarse-Mode Lead',
+                'ug m-3', 'PM10',
+                'APB',
+
+'PM10_HCD'    , 'Coarse-Mode Cadmium',
+                'ug m-3', 'PM10',
+                'ACADMIUM',
+
+'PM10_HMN'    , 'Coarse-Mode HAPs Mangenese',
+                'ug m-3', 'PM10',
+                'AMN_HAPS',
+
+'PM10_HG'     , 'Coarse-Mode Mercury',
+                'ug m-3', 'PM10',
+                'APHG',
+
+'PM10_HAS'    , 'Coarse-Mode Arsenic',
+                'ug m-3', 'PM10',
+                'AAS',
+
+'PM10_HBNPY'  , 'Coarse-Mode Benzo-a-pyrene',
+                'ug m-3', 'PM10',
+                'ABENAPY',
+
+'PM10_HDIESEL', 'Coarse-Mode Diesel PM',
+                'ug m-3', 'PM10',
+                'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
+
 
 !-- Particle Composites Across All Sizes --!
 'TSP_SO4'     , 'Total Particulate Sulfate',
@@ -744,6 +1122,55 @@ CMPST =
 'TSP_CL'      , 'Total Particulate Chloride',
                 'ug m-3', 'TSP',
                 'ACL',
+
+'TSP_HNI'     , 'Total Particulate Nickel',
+                'ug m-3', 'TSP',
+                'ANI',
+
+'TSP_HCR6'    , 'Total Particulate Hexavalent Chromium',
+                'ug m-3', 'TSP',
+                'ACR_VI',
+
+'TSP_HCR3'    , 'Total Particulate Trivalent Chromium',
+                'ug m-3', 'TSP',
+                'ACR_III',
+
+'TSP_HCR'     , 'Total Particulate Total Chromium',
+                'ug m-3', 'TSP',
+                'ACR_III + ACR_VI',
+
+'TSP_HBE'     , 'Total Particulate Beryllium',
+                'ug m-3', 'TSP',
+                'ABE',
+
+'TSP_HPB'     , 'Total Particulate Lead',
+                'ug m-3', 'TSP',
+                'APB',
+
+'TSP_HCD'     , 'Total Particulate Cadmium',
+                'ug m-3', 'TSP',
+                'ACADMIUM',
+
+'TSP_HMN'     , 'Total Particulate HAPs Manganese',
+                'ug m-3', 'TSP',
+                'AMN_HAPS',
+
+'TSP_HG'      , 'Total Particulate Mercury',
+                'ug m-3', 'TSP',
+                'APHG',
+
+'TSP_HAS'     , 'Total Particulate Arsenic',
+                'ug m-3', 'TSP',
+                'AAS',
+
+'TSP_HBNPY'   , 'Total Particulate Benzo-a-pyrene',
+                'ug m-3', 'TSP',
+                'ABENAPY',
+
+'TSP_HDIES'   , 'Coarse-Mode Diesel PM',
+                'ug m-3', 'TSP',
+                'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
+
 
 !-------------------------------------!
 !**** Gas+Particle Concentrations ****!
@@ -834,9 +1261,9 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 'DD_ANO3',
 
-'WD_TSP_NO3'  , 'Wet Dep of Particulate Nitrate', 
-                'kg ha-1', 'DEP', 
-                'WD_ANO3',
+'WD_TSP_NO3'  , 'Wet Dep of Particulate Nitrate',
+                 'kg ha-1', 'DEP',
+                 'WD_ANO3',
 
 !-- Ammonium --!
 'DD_PMF_NH4'  , 'Dry Dep of Fine-Mode Ammonium', 
@@ -847,9 +1274,9 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 'DD_ANH4',
 
-'WD_TSP_NH4'  , 'Wet Dep of Particulate Ammonium', 
-                'kg ha-1', 'DEP', 
-                'WD_ANH4',
+'WD_TSP_NH4'  , 'Wet Dep of Particulate Ammonium',
+                 'kg ha-1', 'DEP',
+                 'WD_ANH4',
 
 !-- Sulfate --!
 'DD_PMF_SO4'  , 'Dry Dep of Fine-Mode Sulfate', 
@@ -860,7 +1287,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 'DD_ASO4',
 
-'WD_TSP_SO4'  , 'Wet Dep of Particulate Sulfate', 
+'WD_TSP_SO4'    , 'Wet Dep of Particulate Sulfate', 
                 'kg ha-1', 'DEP', 
                 'WD_ASO4',
 
@@ -869,9 +1296,9 @@ CMPST =
                 'kg ha-1', 'DEP_FINE', 
                 'DD_AMTNO3',
 
-'WD_TSP_MTNO3', 'Wet Dep of Particulate Monoterpene Nitrate', 
-                'kg ha-1', 'DEP', 
-                'WD_AMTNO3',
+'WD_TSP_MTNO3', 'Wet Dep of Particulate Monoterpene Nitrate',
+                 'kg ha-1', 'DEP',
+                 'WD_AMTNO3',
 
 !-- Elemental Carbon --!
 'DD_PMF_EC'   , 'Dry Dep of Fine-Mode Elemental Carbon', 
@@ -895,7 +1322,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.8373*WD_ASEACAT + 0.0626*WD_ASOIL + 0.0023*WD_ACORS',
 
-'WD_TSP_NA'   , 'Wet Dep of Particulate Sodium', 
+'WD_TSP_NA'       , 'Wet Dep of Particulate Sodium', 
                 'kg ha-1', 'DEP', 
                 'WD_ANA + WD_PMC_NA',
 
@@ -915,6 +1342,18 @@ CMPST =
 'DD_CL'       , 'Dry Dep of Particulate Chloride', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_CL + DD_PMC_CL',
+
+'WD_PMF_CL'   , 'Wet Dep of Fine-Mode Chloride',
+                'kg ha-1', 'DEP_FINE',
+                'WD_ACL - WD_ACLI',
+
+'WD_PMC_CL'   , 'Wet Dep of Coarse-Mode Chloride',
+                'kg ha-1', 'DEP_COARSE',
+                'WD_ACL',
+
+'WD_CL'       , 'Wet Dep of Particulate Chloride',
+                'kg ha-1', 'DEP',
+                'WD_PMF_CL + WD_PMC_CL',
 
 !-- Calcium --!
 'DD_PMF_CA'   , 'Dry Dep of Fine-Mode Calcium', 
@@ -937,7 +1376,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.032*WD_ASEACAT + 0.0838*WD_ASOIL + 0.0562*WD_ACORS',
 
-'WD_TSP_CA'   , 'Wet Dep of Particulate Calcium', 
+'WD_TSP_CA'    , 'Wet Dep of Particulate Calcium', 
                 'kg ha-1', 'DEP', 
                 'WD_PMF_CA + WD_PMC_CA',
 
@@ -1007,7 +1446,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.0997*WD_ASEACAT + 0.0170*WD_ASOIL + 0.0032*WD_ACORS',
 
-'WD_TSP_MG'   , 'Wet Dep of Particulate Magnesium', 
+'WD_TSP_MG'       , 'Wet Dep of Particulate Magnesium', 
                 'kg ha-1', 'DEP', 
                 'WD_PMF_MG + WD_PMC_MG',
 
@@ -1032,22 +1471,23 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.0310*WD_ASEACAT + 0.0242*WD_ASOIL + 0.0176*WD_ACORS',
 
-'WD_TSP_K'    , 'Wet Dep of Particulate Potassium', 
+'WD_TSP_K'        , 'Wet Dep of Particulate Potassium', 
                 'kg ha-1', 'DEP', 
                 'WD_PMF_K + WD_PMC_K',
 
 !-- Sea Spray Sulfate --!
-'DD_PMF_SSSO4', 'Dry Dep of Fine-Mode Sea Spray Sulfate', 
-                'kg ha-1', 'DEP_FINE', 
+'DD_PMF_SSSO4', 'Dry Dep of Fine-Mode Sea Spray Sulfate',
+                'kg ha-1', 'DEP_FINE',
                 '0.2514 * DD_PMF_NA',
 
-'DD_PMC_SSSO4', 'Dry Dep of Coarse-Mode Sea Spray Sulfate', 
-                'kg ha-1', 'DEP_COARSE', 
-                '0.2514 * DD_PMC_NA',
+'DD_PMC_SSSO4', 'Dry Dep of Coarse-Mode Sea Spray Sulfate',
+                'kg ha-1', 'DEP_COARSE',
+                '0.2105 * DD_ASEACAT',
 
-'WD_SSSO4'    , 'Wet Dep of Particulate Sea Spray Sulfate', 
-                'kg ha-1', 'DEP', 
-                '0.2514 * WD_ANA + 0.2514 * WD_PMC_NA',
+'WD_SSSO4'    , 'Wet Dep of Particulate Sea Spray Sulfate',
+                'kg ha-1', 'DEP',
+                '0.2514 * WD_ANA + 0.2105 * WD_ASEACAT',
+
 
 
 !---------------------------------------!
@@ -1170,10 +1610,48 @@ CMPST =
                 'kgN ha-1', 'DEP', 
                 'DD_N_TOT + WD_N_TOT',
 
+!-- Nitrogen Deposition in milliequivalents Nitrogen --!
+'DD_OXN_TOTMEQ' , 'Dry Dep of Total Oxidized Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*DD_OXN_TOT',
+
+'WD_OXN_TOTMEQ' , 'Wet Dep of Total Oxidized Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*WD_OXN_TOT',
+
+'TD_OXN_TOTMEQ' , 'Total Dep of Total Oxidized Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  'DD_OXN_TOTMEQ + WD_OXN_TOTMEQ',
+
+'DD_REDN_TOTMEQ', 'Dry Dep of Total Reduced Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*DD_REDN_TOT',
+
+'WD_REDN_TOTMEQ', 'Wet Dep of Total Reduced Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*WD_REDN_TOT',
+
+'TD_REDN_TOTMEQ', 'Total Dep of Total Reduced Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  'DD_REDN_TOTMEQ + WD_REDN_TOTMEQ',
+
+'DD_N_TOTMEQ'   , 'Dry Dep of Total Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*DD_N_TOT',
+
+'WD_N_TOTMEQ'   , 'Wet Dep of Total Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  '7.14*WD_N_TOT',
+
+'TD_N_TOTMEQ'   , 'Total Dep of Total Nitrogen', 
+                  'meqN m-2', 'DEP', 
+                  'DD_N_TOTMEQ + WD_N_TOTMEQ',
+
+
 !---------------------------!
 !**** Sulfur Deposition ****!
 !---------------------------!
-
+   
 !-- Total Sulfur --!
 'DD_S_TOT'      , 'Dry Dep of Total Sulfur', 
                   'kgS ha-1', 'DEP', 
@@ -1200,4 +1678,29 @@ CMPST =
                   'kgS ha-1', 'DEP', 
                   'DD_S_SEA + WD_S_SEA',
 
+!-- Sulfur Deposition in milliequivalents Sulfur --!
+'DD_S_TOTMEQ'   , 'Dry Dep of Total Sulfur', 
+                  'meqS m-2', 'DEP', 
+                  '6.24*DD_S_TOT',
+
+'WD_S_TOTMEQ'   , 'Wet Dep of Total Sulfur', 
+                  'meqS m-2', 'DEP', 
+                  '6.24*WD_S_TOT',
+
+'TD_S_TOTMEQ'   , 'Total Dep of Total Sulfur', 
+                  'meqS m-2', 'DEP', 
+                  'DD_S_TOTMEQ + WD_S_TOTMEQ',
+
+'DD_S_SEAMEQ'   , 'Dry Dep of Sea Spray Sulfur', 
+                  'meqS m-2', 'DEP', 
+                   '6.24*DD_S_SEA',
+
+'WD_S_SEAMEQ'   , 'Wet Dep of Sea Spray Sulfur', 
+                  'meqS m-2', 'DEP', 
+                  '6.24*WD_S_SEA',
+
+'TD_S_SEAMEQ'   , 'Total Dep of Sea Spray Sulfur', 
+                  'meqS m-2', 'DEP', 
+                  'DD_S_SEAMEQ + WD_S_SEAMEQ',
+                
 /        
