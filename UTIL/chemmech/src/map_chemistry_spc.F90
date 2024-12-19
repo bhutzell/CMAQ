@@ -6,6 +6,7 @@
             USE UTILIO_DEFN
             USE CGRID_SPCS
             USE RXNS_DATA
+            USE LOGDEV_MOD
 
             IMPLICIT NONE
 
