@@ -389,7 +389,7 @@
                       ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = ELMO_USED( U ) 
                    ELSE IF ( WRITE_STEP ) THEN
                       ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = DIVFAC *
-     &                     ( ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + 2.0 * ELMO_USED( U ) ) - ELMO_USED( U )
+     &                     ( ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + 2.0 * ELMO_USED( U ) - ELMO_USED( U ) )
                    ELSE
                       ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 
      &                     ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + 2.0 * ELMO_USED(U)
