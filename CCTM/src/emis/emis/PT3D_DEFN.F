@@ -338,7 +338,7 @@ C (declared and stored in PTBILIN module)
          call mio_get_global_attr( MET_DOT_3D, 'VGLVLS', VGLVSMD3 )
  
 C Store local layer information
-         J = LBOUND( VGLVSMD3, 1 )   ! F90 array intrinsic
+         J = LBOUND( VGLVSMD3, 1 ) + 1  ! 1st value contains num elements; skip it
          VGLVSXG( 0 ) = VGLVSMD3( J )
          DO L = 1, NLAYS
             J = J + 1

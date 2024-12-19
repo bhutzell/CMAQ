@@ -17,12 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/plrise/smoke/preplm.f,v 1.3 2011/10/21 16:11:31 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE PREPLM( FIREFLG, EMLAYS, HMIX, HTS, PSFC, TS, DDZF, QV,
      &                   TA, UW, VW, ZH, ZF, PRES, LSTK, LPBL, TSTK, 
@@ -182,8 +176,10 @@ C overrides the layer 1 gradient determined above
       IF ( .NOT. FIREFLG ) THEN
 C Interpolate ambient temp. and windspeed to top of stack using DEG deg. polynomial
          M    = MAX( 1, LSTK - DEG - 1 )
-         TSTK =      POLY( HTS, ZH( M:EMLAYS ), TA( M:EMLAYS ), DEG )
-         WSTK = MAX( POLY( HTS, ZH( M:EMLAYS ), WSPD( M:EMLAYS ), DEG ), 0.1 )
+!        TSTK =      POLY( HTS, ZH( M:EMLAYS ), TA( M:EMLAYS ), DEG )
+!        WSTK = MAX( POLY( HTS, ZH( M:EMLAYS ), WSPD( M:EMLAYS ), DEG ), 0.1 )
+         TSTK =      POLYIOAPI( HTS, ZH( M:EMLAYS ), TA( M:EMLAYS ), DEG )
+         WSTK = MAX( POLYIOAPI( HTS, ZH( M:EMLAYS ), WSPD( M:EMLAYS ), DEG ), 0.1 )
       ELSE
          TSTK = TS
          WSTK = WSPD( 1 )

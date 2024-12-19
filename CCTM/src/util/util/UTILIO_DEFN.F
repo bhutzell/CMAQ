@@ -50,54 +50,12 @@ C....................................................................
        use prog_interrupt_module, M3WARN => prog_interrupt_warning,
      &                            M3EXIT => prog_interrupt_exit
 
-
 #else
 
+       use replacement_util_module
+
 #ifdef parallel
-
-!       use replacement_util_module, only: getefile, index1, findc,
-!     &      nextime, time2sec, sec2time, secsdiff, daymon, hhmmss, mmddyy,
-!     &      dt2str, wkday, yr2day, isdstime, getcdttime 
- 
-        use replacement_util_module
-       
-!         USE M3UTILIO, EXCLUDE_INTERPB  => INTERP3,
-!     &                 EXCLUDE_M3EXIT   => M3EXIT,
-!     &                 EXCLUDE_M3WARN   => M3WARN,
-!     &                 EXCLUDE_SHUT3    => SHUT3,
-!     &                 EXCLUDE_WRITE3   => WRITE3,
-!     &                 BUF_WRITE3       => WRITE3,
-!     &                 exclude_nextime  => nextime,
-!     &                 exclude_time2sec => time2sec,
-!     &                 exclude_sec2time => sec2time,
-!     &                 exclude_secsdiff => secsdiff,
-!     &                 exclude_daymon   => daymon,
-!     &                 exclude_hhmmss   => hhmmss,
-!     &                 exclude_mmddyy   => mmddyy,
-!     &                 exclude_wkday    => wkday,
-!     &                 exclude_yr2day   => yr2day,    
-!     &                 exclude_isdstime => isdstime,
-!     &                 exclude_dt2str   => dt2str,
-!!     &                 exclude_getdttime => getdttime,
-!     &                 exclude_getefile => getefile,
-!     &                 exclude_index1   => index1,
-!     &                 exclude_findc    => findc
-!!     &                 exclude_sortic   => sortic    
-
-          use parutilio, only: pio_init, subdmap, wrsubdmap
-
-!         USE PARUTILIO, 
-!     &                  M3ERR   => PM3ERR,
-!     &                  M3EXIT  => PM3EXIT,
-!     &                  M3WARN  => PM3WARN,
-!#ifdef parallel_io
-!     &                  SHUT3   => PSHUT3
-!
-!         LOGICAL, EXTERNAL :: WRITE3
-!#else
-!     &                  SHUT3   => PSHUT3,
-!     &                  WRITE3  => PWRITE3
-!#endif
+        use parutilio, only: pio_init, subdmap, wrsubdmap
 #else
          USE M3UTILIO, INTERPB => INTERP3
 #endif
