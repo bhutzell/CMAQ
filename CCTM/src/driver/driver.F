@@ -376,17 +376,12 @@ C Set CGRID mechanism
          END IF
 
 
-!C Set up horizontal domain, calculate processor-to-subdomain maps
-!C and define vertical layer structure (in module GRID_CONF)
-!         IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
-!            XMSG = '*** Failure defining domain configuration'
-!            call M3EXIT (PNAME, JDATE, JTIME, XMSG, 1)
-!         END IF
-
-! this is the only part of GRID_INIT that executes for MPAS-CMAQ
-! but does MPAS-CMAQ need the HGRD_DEFN and VGRD_DEFN modules?
-          MXCELLS = NCOLS * NROWS * NLAYS
-          MXBLKS  = 1 + ( MXCELLS - 1 ) / BLKSIZE
+C Set up horizontal domain, calculate processor-to-subdomain maps
+C and define vertical layer structure (in module GRID_CONF)
+         IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
+            XMSG = '*** Failure defining domain configuration'
+            call M3EXIT (PNAME, JDATE, JTIME, XMSG, 1)
+         END IF
 
 #else
 #ifdef twoway
@@ -396,28 +391,18 @@ C Initialize Environment Variables
          CALL INIT_ENV_VARS( JDATE, JTIME )
 #endif
 
+         call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
+
 !C Set up horizontal domain, calculate processor-to-subdomain maps
 !C and define vertical layer structure (in module GRID_CONF)
-!         IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
-!            XMSG = '*** Failure defining domain configuration'
-!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-!         END IF
+         IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
+            XMSG = '*** Failure defining domain configuration'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
 
-          IF ( .NOT. HGRD_INIT ( NPROCS, MYPE ) ) THEN
-             XMSG = '*** Failure defining horizontal domain'
-             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-          END IF
-
-#ifdef verbose_driver
-         write( logdev,* ) ' MYPE -> NPROCS:   ', mype, nprocs
-         write( logdev,* ) ' MYPE -> NPCOL:    ', mype, npcol
-         write( logdev,* ) ' MYPE -> NPROW:    ', mype, nprow
-         write( logdev,* ) ' MYPE -> MY_NCOLS: ', mype, ncols
-         write( logdev,* ) ' MYPE -> MY_NROWS: ', mype, nrows
-         write( logdev,* ) ' MYPE -> GL_NCOLS: ', mype, gl_ncols
-         write( logdev,* ) ' MYPE -> GL_NROWS: ', mype, gl_nrows
-         write( logdev,* ) ' MYPE -> NLAYS:    ', mype, nlays
-         write( logdev,* ) ' MYPE -> NBNDY:    ', mype, nbndy
+#ifdef parallel
+         CALL WRSUBDMAP ( NPROCS, mio_domain_ncols_pe(:,1), mio_domain_nrows_pe(:,1), 
+     &                    mio_domain_colde_pe(:,:,1), mio_domain_rowde_pe(:,:,1), logdev )
 #endif
 
 C Set CGRID mechanism
@@ -426,12 +411,10 @@ C Set CGRID mechanism
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, 1 )
          END IF
 
-         call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
-
-         IF ( .NOT. VGRD_INIT() ) THEN
-            XMSG = '*** Failure defining vertical structure'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+!         IF ( .NOT. VGRD_INIT() ) THEN
+!            XMSG = '*** Failure defining vertical structure'
+!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+!         END IF
 
 #ifdef sens
 C Initialize ddm3d calculations
@@ -439,10 +422,6 @@ C Initialize ddm3d calculations
 #endif
 
         CALL MAP_AERO()
-
-#ifdef verbose_driver
-         write( logdev,* ) ' MYPE -> NSPCS:    ', mype, nspcsd
-#endif
 
 #ifdef parallel_io
          IF ( MOD( MYPE, NPCOL ) .EQ. 0 ) THEN
@@ -454,27 +433,9 @@ C Initialize ddm3d calculations
             IO_PE_INCLUSIVE = .FALSE.
          END IF
 
-#ifdef parallel
-C Initialize PARIO
-         IF ( .NOT. PIO_INIT( COLROW, GL_NCOLS, GL_NROWS, NLAYS, NTHIK,
-     &                        NCOLS, NROWS, NPCOL, NPROW, NPROCS, MYPE,
-     &                        wflg = WFLG, io_pe_inclusive = IO_PE_INCLUSIVE ) ) THEN
-            XMSG = 'Failed to initialize parallel I/O library.'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-
-#endif
 C Initialize stencil exchange
          CALL SUBST_SE_INIT( NPROCS, NPCOL, NPROW, GL_NCOLS, GL_NROWS, NLAYS,
      &                       NSPCSD, MYPE, MNDIS, MEDIS, MSDIS, MWDIS )
-
-
-#ifdef verbose_driver
-         write( logdev,* ) ' MYPE -> MNDIS:    ', mype, mndis
-         write( logdev,* ) ' MYPE -> MEDIS:    ', mype, medis
-         write( logdev,* ) ' MYPE -> MSDIS:    ', mype, msdis
-         write( logdev,* ) ' MYPE -> MWDIS:    ', mype, mwdis
-#endif
 
 C Generate the process analysis data: load PA_DEFN module
          CALL PA_DATAGEN( )

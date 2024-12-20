@@ -33,10 +33,10 @@ C.......................................................................
 
       IMPLICIT NONE
 
-!!     INTEGER, PARAMETER :: BLKSIZE = 500
-!      INTEGER, PARAMETER :: BLKSIZE = 50
-!      INTEGER, SAVE :: MXCELLS
-!      INTEGER, SAVE :: MXBLKS
+!     INTEGER, PARAMETER :: BLKSIZE = 500
+      INTEGER, PARAMETER :: BLKSIZE = 50
+      INTEGER, SAVE :: MXCELLS
+      INTEGER, SAVE :: MXBLKS
 
       CONTAINS
 

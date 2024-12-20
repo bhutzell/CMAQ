@@ -18,9 +18,6 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/depv/m3dry/LSM_MOD.F,v 1.5 2012/01/19 14:23:58 yoj Exp $
-
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       Module LSM_Mod
        
@@ -201,7 +198,7 @@ C-------------------------------------------------------------------------------
      &          1.66e6, 1.83e6, 1.78e6, 1.83e6, 1.62e6, 1.83e6, 1.83e6, 1.67e6 /)
 
 C-------------------------------------------------------------------------------
-C Soil hydrolic properties as calculated from soil sand and clay fractions 
+C Soil hydraulic properties as calculated from soil sand and clay fractions 
 C in WRF-CLM in WRF 3.7.1-3.8.1. 
 C WRES is calculated as WSAT*(psi_air_dry/psi_sat)^(-1.0/BSLP) following CLM soil hydraulic 
 C relationships. Note that this is a common paramterization, e.g. Campbell and Norman (1998)
@@ -382,8 +379,9 @@ C-------------------------------------------------------------------------------
          
          SUBROUTINE STAGE_LU_MAPPER
             
-            USE RUNTIME_VARS, ONLY: STAGECTRL, LOGDEV
+            USE RUNTIME_VARS, ONLY: STAGECTRL
             use UTILIO_DEFN
+            USE LOGDEV_MOD, ONLY: LOGDEV, M3EXIT
       
             IMPLICIT NONE
 

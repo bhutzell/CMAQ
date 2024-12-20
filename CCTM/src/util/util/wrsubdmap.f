@@ -18,8 +18,10 @@
 !------------------------------------------------------------------------!
 
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      subroutine wrsubdmap ( nprocs, ncols_pe, nrows_pe, colsx_pe, rowsx_pe )
+      subroutine wrsubdmap ( nprocs, ncols_pe, nrows_pe, 
+     &                       colsx_pe, rowsx_pe, logdev )
 
+      use mio_global_data_module, only: mio_mype
       implicit none
 
 !> layout parallel decomp subdomains given processor decomp and grid dimensions
@@ -29,6 +31,7 @@
       integer, intent( in ) :: nrows_pe( nprocs ) ! No. of 2nd dimension elements per PE
       integer, intent( in ) :: colsx_pe( 2,nprocs ) ! 1st dimension index range per PE
       integer, intent( in ) :: rowsx_pe( 2,nprocs ) ! 2nd dimension index range per PE
+      integer, intent( in ) :: logdev
 
       character( 49 ) :: colrow = '  PE    #Cols    Col_Range     #Rows    Row_Range'
       character( 49 ) :: title
@@ -37,20 +40,20 @@
 
       title = colrow
 
-      write( *,* )
-      write( *,* ) '         -=-  MPP Processor-to-Subdomain Map  -=-'
-      write( *,'(A,I3)' ) '                 Number of Processors = ',nprocs
-      write( *,* ) '   ____________________________________________________'
-      write( *,* ) '   |                                                  |'
-      write( *,* ) '   |' // title // ' |'
-      write( *,* ) '   |__________________________________________________|'
-      write( *,* ) '   |                                                  |'
+      write( logdev, * )
+      write( logdev, * ) '         -=-  MPP Processor-to-Subdomain Map  -=-'
+      write( logdev,'(10x,A,I3,A,I3)' ) 'MYPE = ', mio_mype, '  Number of Processors = ',nprocs
+      write( logdev, * ) '   ____________________________________________________'
+      write( logdev, * ) '   |                                                  |'
+      write( logdev, * ) '   |' // title // ' |'
+      write( logdev, * ) '   |__________________________________________________|'
+      write( logdev, * ) '   |                                                  |'
       do i = 1, nprocs
-         write( *,1003 ) i-1, ncols_pe(i), colsx_pe(1,i), colsx_pe(2,i),
+         write( logdev,1003 ) i-1, ncols_pe(i), colsx_pe(1,i), colsx_pe(2,i),
      &                        nrows_pe(i), rowsx_pe(1,i), rowsx_pe(2,i)
       end do
-      write( *,* ) '   |__________________________________________________|'
-      write( *,* )
+      write( logdev, * ) '   |__________________________________________________|'
+      write( logdev, * )
 
 1003  format('    |', i3, 5x, i4, 3x, i4, ':', i4,
      &                    7x, i4, 3x, i4, ':', i4, '   |')

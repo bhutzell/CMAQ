@@ -54,11 +54,11 @@ C....................................................................
 
        use replacement_util_module
 
-#ifdef parallel
-        use parutilio, only: pio_init, subdmap, wrsubdmap
-#else
-         USE M3UTILIO, INTERPB => INTERP3
-#endif
+!#ifdef parallel
+!        use parutilio, only: pio_init, subdmap, wrsubdmap
+!#else
+!         USE M3UTILIO, INTERPB => INTERP3
+!#endif
 
 #endif
 

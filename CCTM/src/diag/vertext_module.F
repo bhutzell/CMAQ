@@ -382,15 +382,15 @@ C             BUFFER is assumed to be filled as BUFFER(1:C,1:R,1:NLAYS),
 C             where C = WR_COLSX_PE(2,MY_PE+1), R = WR_ROWSX_PE(2,MY_PE+1).
 C-----------------------------------------------------------------------
 
-         USE PIOMAPS_MODULE
-         USE M3UTILIO, ONLY : WRITE3              ! i/o api
+!         USE PIOMAPS_MODULE
+!         USE M3UTILIO, ONLY : WRITE3              ! i/o api
 
          IMPLICIT NONE
 
 C Include Files
 
          INCLUDE 'mpif.h'            ! MPI definitions and parameters
-         INCLUDE 'PIOVARS.EXT'
+!         INCLUDE 'PIOVARS.EXT'
 
 C Arguments
 
@@ -576,7 +576,7 @@ C-----------------------------------------------------------------------
          USE GRID_CONF             ! horizontal & vertical domain specifications
          USE RUNTIME_VARS
          USE STD_CONC              ! standard CONC
-         USE PIOMAPS_MODULE
+!         USE PIOMAPS_MODULE
          USE UTILIO_DEFN
          USE ASX_DATA_MOD, Only: Met_Data
          USE WVEL_DEFN, Only : WVEL

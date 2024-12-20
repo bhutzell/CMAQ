@@ -308,9 +308,9 @@
      &             STRTCOLMC3,  ENDCOLMC3,  STRTROWMC3,  ENDROWMC3,
      &             STRTCOLMD3,  ENDCOLMD3,  STRTROWMD3,  ENDROWMD3,
      &             STRTCOLMD3x, ENDCOLMD3x, STRTROWMD3x, ENDROWMD3x,  ! extension setup for READMD3
-     &             STRTCOLIC,   ENDCOLIC,   STRTROWIC,   ENDROWIC,    ! for ICFILE
-     &             STRTCOLISIC, ENDCOLISIC, STRTROWISIC, ENDROWISIC,  ! for ISAM ICFILE
-     &             STRTCOLLNT,  ENDCOLLNT,  STRTROWLNT,  ENDROWLNT   ! for lightning strike file
+     &             STRTCOLIC,   ENDCOLIC,   STRTROWIC,   ENDROWIC     ! for ICFILE
+!     &             STRTCOLISIC, ENDCOLISIC, STRTROWISIC, ENDROWISIC,  ! for ISAM ICFILE
+!     &             STRTCOLLNT,  ENDCOLLNT,  STRTROWLNT,  ENDROWLNT   ! for lightning strike file
 
         private :: gridded_files_setup,
      &             retrieve_lufrac_cro_data
@@ -1130,8 +1130,8 @@
              call mio_fopen (ISAM_PREVDAY, mio_read_only)
              floc = mio_search (ISAM_PREVDAY)
 
-             call subhfile ( ISAM_PREVDAY, gxoff, gyoff,
-     &                       STRTCOLISIC, ENDCOLISIC, STRTROWISIC, ENDROWISIC )
+!             call subhfile ( ISAM_PREVDAY, gxoff, gyoff,
+!     &                       STRTCOLISIC, ENDCOLISIC, STRTROWISIC, ENDROWISIC )
 
              n_is3d = mio_file_data(floc)%nvars
              allocate (is3d_name(n_is3d, 3), stat=stat)
@@ -1218,8 +1218,8 @@
              n_opened_file = n_opened_file + 1
              f_ltng = n_opened_file
 
-             call subhfile ( NLDN_STRIKES, gxoff, gyoff,
-     &                       STRTCOLLNT, ENDCOLLNT, STRTROWLNT, ENDROWLNT)
+!             call subhfile ( NLDN_STRIKES, gxoff, gyoff,
+!     &                       STRTCOLLNT, ENDCOLLNT, STRTROWLNT, ENDROWLNT)
 
              call mio_get_global_attr (NLDN_STRIKES, 'SDATE', file_sdate(f_ltng))
              call mio_get_global_attr (NLDN_STRIKES, 'STIME', file_stime(f_ltng))

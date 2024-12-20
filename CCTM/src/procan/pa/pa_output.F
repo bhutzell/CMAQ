@@ -144,32 +144,32 @@ C-----------------------------------------------------------------------
      $             stat=allocstat)
       end if
 
-#ifdef parallel
-      IF ( .NOT. LFIRST ) THEN
-C Reset decomposition map
-         IF ( .NOT. PIO_INIT( COLROW, PACOLS, PAROWS, PALEVS, NTHIK,
-     &                        MY_PACOLS, MY_PAROWS, NPCOL, NPROW, NPCOL*NPROW,
-     &                        MYPE ) ) THEN
-            XMSG = 'Failed to re-initialize parallel I/O library.'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            RETURN
-         END IF
-      END IF
-#endif
+!#ifdef parallel
+!      IF ( .NOT. LFIRST ) THEN
+!C Reset decomposition map
+!         IF ( .NOT. PIO_INIT( COLROW, PACOLS, PAROWS, PALEVS, NTHIK,
+!     &                        MY_PACOLS, MY_PAROWS, NPCOL, NPROW, NPCOL*NPROW,
+!     &                        MYPE ) ) THEN
+!            XMSG = 'Failed to re-initialize parallel I/O library.'
+!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!            RETURN
+!         END IF
+!      END IF
+!#endif
 
 C On first call, get and save the output file names 
       IF ( LFIRST ) THEN
 
-#ifdef parallel
-C Reset decomposition map
-         IF ( .NOT. PIO_INIT( COLROW, PACOLS, PAROWS, PALEVS, NTHIK,
-     &                        MY_PACOLS, MY_PAROWS, NPCOL, NPROW, NPCOL*NPROW,
-     &                        MYPE, WFLG = .TRUE. ) ) THEN
-            XMSG = 'Failed to re-initialize parallel I/O library.'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            RETURN
-         END IF
-#endif
+!#ifdef parallel
+!C Reset decomposition map
+!         IF ( .NOT. PIO_INIT( COLROW, PACOLS, PAROWS, PALEVS, NTHIK,
+!     &                        MY_PACOLS, MY_PAROWS, NPCOL, NPROW, NPCOL*NPROW,
+!     &                        MYPE, WFLG = .TRUE. ) ) THEN
+!            XMSG = 'Failed to re-initialize parallel I/O library.'
+!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!            RETURN
+!         END IF
+!#endif
 
          IF ( LIPR .AND. NIPRVAR. GT. 0 ) THEN
 
@@ -332,26 +332,26 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       END IF   ! IRR
 
-#ifdef parallel
-      IF ( .NOT. LFIRST ) THEN
-C Reset decomposition map
-         IF ( .NOT. PIO_INIT( COLROW, GL_NCOLS, GL_NROWS, NLAYS, NTHIK,
-     &                        NCOLS, NROWS, NPCOL, NPROW, NPCOL*NPROW,
-     &                        MYPE ) ) THEN
-            XMSG = 'Failed to re-initialize parallel I/O library.'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            RETURN
-         END IF
-      ELSE
-         IF ( .NOT. PIO_INIT( COLROW, GL_NCOLS, GL_NROWS, NLAYS, NTHIK,
-     &                        NCOLS, NROWS, NPCOL, NPROW, NPCOL*NPROW,
-     &                        MYPE, WFLG = .TRUE. ) ) THEN
-            XMSG = 'Failed to re-initialize parallel I/O library.'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            RETURN
-         END IF
-      END IF
-#endif
+!#ifdef parallel
+!      IF ( .NOT. LFIRST ) THEN
+!C Reset decomposition map
+!         IF ( .NOT. PIO_INIT( COLROW, GL_NCOLS, GL_NROWS, NLAYS, NTHIK,
+!     &                        NCOLS, NROWS, NPCOL, NPROW, NPCOL*NPROW,
+!     &                        MYPE ) ) THEN
+!            XMSG = 'Failed to re-initialize parallel I/O library.'
+!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!            RETURN
+!         END IF
+!      ELSE
+!         IF ( .NOT. PIO_INIT( COLROW, GL_NCOLS, GL_NROWS, NLAYS, NTHIK,
+!     &                        NCOLS, NROWS, NPCOL, NPROW, NPCOL*NPROW,
+!     &                        MYPE, WFLG = .TRUE. ) ) THEN
+!            XMSG = 'Failed to re-initialize parallel I/O library.'
+!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!            RETURN
+!         END IF
+!      END IF
+!#endif
 #endif
 
       IF ( LFIRST ) THEN

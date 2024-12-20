@@ -55,16 +55,12 @@ C latitude for coord-system center (degrees)
 
       INTEGER, SAVE :: GL_NCOLS   ! no. of columns in global grid
       INTEGER, SAVE :: GL_NROWS   ! no. of rows in global grid
-      INTEGER, SAVE :: GL_NBNDY   ! no. of cells in one layer of global boundary
  
       INTEGER, SAVE :: NCOLS      ! grid columns array dimension
       INTEGER, SAVE :: NROWS      ! grid rows array dimension
       INTEGER, SAVE :: NBNDY      ! no. of cells in one layer of local boundary
       INTEGER, SAVE :: NTHIK      ! boundary thickness (cells)
  
-      INTEGER, SAVE :: MY_NCOLS_DOT ! local no. of dot file grid columns
-      INTEGER, SAVE :: MY_NROWS_DOT ! local no. of dot file grid rows
-
 C column range for each processor
       INTEGER, ALLOCATABLE, SAVE :: COLSX_PE( :,: )
       INTEGER, ALLOCATABLE, SAVE :: COLSD_PE( :,: )  ! dot file
@@ -80,18 +76,15 @@ C maximum stencil displacement in the north, east, south, and west direction
 
       LOGICAL :: IO_PE_INCLUSIVE
 
-C BLKPRM
-
-      INTEGER, PARAMETER :: BLKSIZE = 50
-      INTEGER, SAVE :: MXCELLS
-      INTEGER, SAVE :: MXBLKS
-
       CONTAINS
 
          FUNCTION HGRD_INIT ( NPROCS, MYID ) RESULT ( SUCCESS )
 
          USE UTILIO_DEFN
          use replacement_util_module
+         use mio_module
+
+         INCLUDE SUBST_FILES_ID
 
          INTEGER, INTENT( IN ) :: NPROCS  ! total worker processors
          INTEGER, INTENT( IN ) :: MYID
@@ -100,10 +93,9 @@ C BLKPRM
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
          CHARACTER( 96 ) :: XMSG = ' '
 
-C environment variable grid name to select from GRIDDESC
          INTEGER :: STATUS, ALST
 
-! These arrays are probably duplicative of those in mio...
+! These arrays are duplicative of those in mio...
          INTEGER, ALLOCATABLE :: NCOLS_PE( : )  ! Column range for each PE
          INTEGER, ALLOCATABLE :: NROWS_PE( : )  ! Row range for each PE
 
@@ -124,7 +116,6 @@ C With GRID_NAME (only input) retrieve all horizontal grid parameters from
 C the grid description file pointed to by the GRIDDESC env var:
             WRITE( LOGDEV, * )
             CALL LOG_HEADING( LOGDEV, "Retrieve Horizontal Grid" )
-!           IF ( .NOT. DSCGRID ( GRID_NAME,
             IF ( .NOT. rDSCGRID ( GRID_NAME,
      &                           COORD_SYS_NAME, GDTYP_GD, 
      &                           P_ALP_GD, P_BET_GD, P_GAM_GD,
@@ -189,51 +180,18 @@ C Check NPROCS against NPCOL*NPROW
                SUCCESS = .FALSE.; RETURN
             END IF
 
-            ALLOCATE ( NCOLS_PE( NPROCS ),
-     &                 NROWS_PE( NPROCS ), STAT = ALST )
-            IF ( ALST .NE. 0 ) THEN
-               XMSG = '*** NCOLS_PE or NROWS_PE Memory allocation failed'
-               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
-               SUCCESS = .FALSE.; RETURN
-            END IF
+           call mio_fopen( MET_CRO_3D, mio_read_only )
+           call mio_setfile( MET_CRO_3D )
+           ncols = mio_ncols
+           nrows = mio_nrows
+           nbndy = 2*mio_domain_nthik * ( ncols + nrows + 2*mio_domain_nthik )
 
-C Construct the processor-to-subdomain map for main domain
-            CALL SUBHDOMAIN( NPROCS, NPCOL, NPROW, GL_NCOLS, GL_NROWS,
-     &                       NCOLS_PE, NROWS_PE, COLSX_PE, ROWSX_PE )
-
-C Get corresponding dot file map
-
-            DO I = 1, NPROCS
-               COLSD_PE( 1,I ) = COLSX_PE( 1,I )
-               COLSD_PE( 2,I ) = COLSX_PE( 2,I )
-               ROWSD_PE( 1,I ) = ROWSX_PE( 1,I )
-               ROWSD_PE( 2,I ) = ROWSX_PE( 2,I )
-            END DO
-
-            DO I = NPCOL, NPROCS, NPCOL
-               COLSD_PE( 2,I ) = COLSD_PE( 2,I ) + 1
-            END DO
-
-            DO I = NPROCS, NPROCS - NPCOL + 1, -1
-               ROWSD_PE( 2,I ) = ROWSD_PE( 2,I ) + 1
-            END DO
-
-            NCOLS = NCOLS_PE( MYPE+1 )
-            NROWS = NROWS_PE( MYPE+1 )
-            NBNDY = 2*NTHIK * ( NCOLS + NROWS + 2*NTHIK )
-            GL_NBNDY = 2*NTHIK * ( GL_NCOLS + GL_NROWS + 2*NTHIK )
-
-!          write (logdev, '(a12, 20i5)') ' ==d== hg a ', colsx_pe(:,mype+1), rowsx_pe(:,mype+1)
-!          write (logdev, '(a12, 20i5)') ' ==d== hg b ', colsd_pe(:,mype+1), rowsd_pe(:,mype+1)
-
-            MY_NCOLS_DOT = COLSD_PE( 2,MYPE+1 ) - COLSD_PE( 1,MYPE+1 ) + 1
-            MY_NROWS_DOT = ROWSD_PE( 2,MYPE+1 ) - ROWSD_PE( 1,MYPE+1 ) + 1
-
-!           MXCELLS = NCOLS * NROWS * NLAYS
-!           MXBLKS  = 1 + ( MXCELLS - 1 ) / BLKSIZE
-
-            DEALLOCATE ( NCOLS_PE )
-            DEALLOCATE ( NROWS_PE )
+            do i = 1, nprocs 
+               colsx_pe(:,i) = mio_domain_colde_pe(:,i,1)   ! starting and ending column for cross points
+               rowsx_pe(:,i) = mio_domain_rowde_pe(:,i,1)   ! starting and ending row for cross points
+               colsd_pe(:,i) = mio_domain_colde_pe(:,i,2)   ! starting and ending column for dot points
+               rowsd_pe(:,i) = mio_domain_rowde_pe(:,i,2)   ! starting and ending row for dot points
+            end do
 
          ELSE
             XMSG = 'Horizontal domain decomposition already defined'

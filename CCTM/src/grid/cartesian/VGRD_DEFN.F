@@ -99,7 +99,7 @@ C-----------------------------------------------------------------------
             character( 5000 ) :: filedesc
             CHARACTER(10)   :: WRF_VERSION = ' '
 
-            INTEGER L, ALLOCSTAT, floc
+            INTEGER L, ALLOCSTAT
             INTEGER  :: NV, LOC, STR_LEN
             real, allocatable :: vglvs_mc3(:)
 
@@ -116,9 +116,8 @@ C get vertical layer definition
                WRITE( LOGDEV, * )
                CALL LOG_HEADING( LOGDEV, "Retrieve Vertical Grid" )
 
-               call mio_fopen ( MET_CRO_3D, mio_read_only )
-               floc = mio_search ( MET_CRO_3D )
-               NLAYS = mio_file_data(floc)%nlays
+               call mio_setfile ( MET_CRO_3D )
+               NLAYS = mio_nlays
       
                call mio_get_global_attr( MET_CRO_3D, 'GDNAM', GDNAME_GD )
                call mio_get_global_attr( MET_CRO_3D, 'VGTYP', VGTYP_GD )
@@ -139,7 +138,7 @@ C get vertical layer definition
 
                call mio_get_global_attr( MET_CRO_3D, 'VGLVLS', VGLVS_mc3 )
 
-C set layer layer thicknesses
+C set layer thicknesses
 
                DO L = 0, NLAYS
                   VGLVS_GD( L+1 ) = VGLVS_MC3( L+2 )
@@ -160,7 +159,7 @@ C Determine whether WRF version is 4.1 or greater
                   END IF
                END IF
 
-               XMSG = 'MET data determined based on WRF ARW version '
+               XMSG = 'MET data determined based on WRF ARW version'
                IF ( MYPE .EQ. 0 ) THEN
                   WRITE(OUTDEV,'(/,5X,2(A,1X),/)') TRIM( XMSG ), TRIM( WRF_VERSION )
                   WRITE(LOGDEV,'(/,5X,2(A,1X),/)') TRIM( XMSG ), TRIM( WRF_VERSION )

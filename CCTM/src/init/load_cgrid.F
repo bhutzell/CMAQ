@@ -121,10 +121,10 @@ C Local Variables
       INTEGER      LSULF                             ! Gas chem CGRID index
       INTEGER      ISO4AJ, ISO4AI, INUMATKN, INUMACC ! CGRID aerosol indices
 
-      INTEGER      GXOFF, GYOFF               ! global origin offset from file
-
-C for XTRACT3
-      INTEGER       :: STRTCOLINI, ENDCOLINI, STRTROWINI, ENDROWINI
+!      INTEGER      GXOFF, GYOFF               ! global origin offset from file
+!
+!C for XTRACT3
+!      INTEGER       :: STRTCOLINI, ENDCOLINI, STRTROWINI, ENDROWINI
       REAL      :: DBUFF( NCOLS,NROWS,NLAYS )
       REAL      :: DBUFF_TMP( NCOLS,NROWS,NLAYS )
 

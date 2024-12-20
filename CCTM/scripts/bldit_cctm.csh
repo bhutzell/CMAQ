@@ -264,7 +264,7 @@ set make_options = "-j"                #> additional options for make command if
     #Multiprocessor system configuration
     echo "   Parallel; set MPI flags"
     set ModStenex = STENEX/se
-    set ModPario = PARIO
+#   set ModPario = PARIO
     set ModPar = par/mpi
     set PARIO = ${CMAQ_MODEL}/PARIO
     set STENEX = ${CMAQ_MODEL}/STENEX
@@ -532,9 +532,8 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "// options are" $text                                       >> $Cfile
  echo "Module ${ModStenex};"                                       >> $Cfile
  if ( $?ParOpt ) then
-    set text = "// parallel executable; stenex and pario included"
+    set text = "// parallel executable; stenex included"
     echo $text                                                     >> $Cfile
-    echo "Module ${ModPario};"                                     >> $Cfile
  else
     set text = "serial executable; noop stenex"
     echo $text                                                     >> $Cfile

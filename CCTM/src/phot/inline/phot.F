@@ -30,7 +30,7 @@
 ! Preconditions: HGRD_INIT() called from PAR_INIT, which is called from
 !     DRIVER
 !
-! Subroutines/Functions called: M3EXIT, SUBHFILE, CGRID_MAP,
+! Subroutines/Functions called: M3EXIT, CGRID_MAP,
 !     OPPHOT, LOAD_CSQY_DATA, LOAD_OPTICS_DATA, INITIALIZE_ALBEDO, 
 !     GET_PHOT_MET, UPDATE_SUN, GET_ALBEDO, GET_DROPLET_OPTICS, 
 !     GET_ICE_OPTICS, GET_AGGREGATE_OPTICS, CLEAR_HYDROMETEOR_OPTICS, 

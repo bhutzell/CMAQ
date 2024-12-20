@@ -140,9 +140,9 @@ C=======================================================================
          USE STK_EMIS, ONLY: DESID_STREAM_NAME, NSRC_EMIS, FIREFLAG,
      &                       MAP_PTtoISRM, STK_EMIS_INIT
          USE PTMET, ONLY: PTMET_DATA, PTMET_INIT
-         USE PTBILIN, ONLY: NPTGRPS, 
-     &                      METCXORIG, METCYORIG, XCELLCG, YCELLCG, 
-     &                      METDXORIG, METDYORIG, XCELLDG, YCELLDG
+         USE PTBILIN, ONLY: NPTGRPS 
+!     &                      METCXORIG, METCYORIG, XCELLCG, YCELLCG, 
+!     &                      METDXORIG, METDYORIG, XCELLDG, YCELLDG
 
          USE UTILIO_DEFN
          USE RUNTIME_VARS, ONLY: LOGDEV,LOG_WARNING, MYPE, PT3DFRAC, PT_DATE, STDATE, STTIME,
@@ -286,10 +286,10 @@ C get scenario timing
          PT_DATE = JDATE 
          PT_TIME = JTIME
 
-C Get grid parameters from 3-d cross-point met file and store header information.
-
-         CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
-     &                   STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC )
+!C Get grid parameters from 3-d cross-point met file and store header information.
+!
+!         CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
+!     &                   STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC )
 
 C Initialize reference grid with met file
 !         XCELLCG = XCELL3D
@@ -298,14 +298,14 @@ C Initialize reference grid with met file
 !         METCROWS = NROWS3D
 !         METCXORIG = XORIG3D
 !         METCYORIG = YORIG3D
-         call mio_get_global_attr( MET_CRO_3D, 'XCELL', XCELLCG )
-         call mio_get_global_attr( MET_CRO_3D, 'YCELL', YCELLCG )
-         call mio_get_global_attr( MET_CRO_3D, 'XORIG', METCXORIG )
-         call mio_get_global_attr( MET_CRO_3D, 'YORIG', METCYORIG )  
-         IF ( ( GXOFF .GT. 0 ) .AND. ( GYOFF .GT. 0 ) ) THEN
-            METCXORIG = METCXORIG + REAL( GXOFF,8 ) * XCELLCG
-            METCYORIG = METCYORIG + REAL( GYOFF,8 ) * YCELLCG
-         END IF
+!         call mio_get_global_attr( MET_CRO_3D, 'XCELL', XCELLCG )
+!         call mio_get_global_attr( MET_CRO_3D, 'YCELL', YCELLCG )
+!         call mio_get_global_attr( MET_CRO_3D, 'XORIG', METCXORIG )
+!         call mio_get_global_attr( MET_CRO_3D, 'YORIG', METCYORIG )  
+!         IF ( ( GXOFF .GT. 0 ) .AND. ( GYOFF .GT. 0 ) ) THEN
+!            METCXORIG = METCXORIG + REAL( GXOFF,8 ) * XCELLCG
+!            METCYORIG = METCYORIG + REAL( GYOFF,8 ) * YCELLCG
+!         END IF
 
 !!!!!!^^^^^^^!!!! THESE NEED TO BE CHECKED AGAINST GRIDDESC
 
@@ -318,18 +318,18 @@ C (declared and stored in PTBILIN module)
 !         METDCOLS = NCOLS3D
 !         METDROWS = NROWS3D
 
-         call mio_get_global_attr( MET_DOT_3D, 'XCELL', XCELLDG )
-         call mio_get_global_attr( MET_DOT_3D, 'YCELL', YCELLDG )
-         call mio_get_global_attr( MET_DOT_3D, 'XORIG', METDXORIG )
-         call mio_get_global_attr( MET_DOT_3D, 'YORIG', METDYORIG )
-         
-         CALL SUBHFILE ( MET_DOT_3D, GXOFF, GYOFF,
-     &                   STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC )
-
-         IF ( ( GXOFF .GT. 0 ) .AND. ( GYOFF .GT. 0 ) ) THEN
-            METDXORIG = METDXORIG + REAL( GXOFF,8 ) * XCELLDG
-            METDYORIG = METDYORIG + REAL( GYOFF,8 ) * YCELLDG
-         END IF
+!         call mio_get_global_attr( MET_DOT_3D, 'XCELL', XCELLDG )
+!         call mio_get_global_attr( MET_DOT_3D, 'YCELL', YCELLDG )
+!         call mio_get_global_attr( MET_DOT_3D, 'XORIG', METDXORIG )
+!         call mio_get_global_attr( MET_DOT_3D, 'YORIG', METDYORIG )
+!         
+!         CALL SUBHFILE ( MET_DOT_3D, GXOFF, GYOFF,
+!     &                   STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC )
+!
+!         IF ( ( GXOFF .GT. 0 ) .AND. ( GYOFF .GT. 0 ) ) THEN
+!            METDXORIG = METDXORIG + REAL( GXOFF,8 ) * XCELLDG
+!            METDYORIG = METDYORIG + REAL( GYOFF,8 ) * YCELLDG
+!         END IF
 
          call mio_get_global_attr( MET_DOT_3D, 'NLAYS', METDLAYS )
          ALLOCATE( VGLVSXG( 0:MXLAYS3 ), 
