@@ -436,6 +436,14 @@
              ! Deposition will consist of particles from 
              ! the coarse mode range
              ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%COARSE_MASK
+         CASE ('DEP_AITKEN')
+             ! Deposition will consist of particles from 
+             ! the Aitken mode range
+             ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%AITKEN_MASK
+         CASE ('DEP_ACCUMULATION')
+             ! Deposition will consist of particles from 
+             ! the accumulation mode range
+             ELMO_COMP( J )%L_MODE( : ) = AEROMODE(:)%ACCUM_MASK
          CASE DEFAULT
              XMSG = 'An aerosol descriptor (' // trim(AEROTYPE) // ') has been given ' //
      &              'for the mapping of an ELMO composite variable. It is not recognized.'
