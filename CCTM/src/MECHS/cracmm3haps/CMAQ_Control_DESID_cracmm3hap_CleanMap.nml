@@ -58,10 +58,10 @@
 
    ! Organic gases
    'EVERYWHERE', 'ALL'         ,'ACD'    ,'ACD'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'ACD'    ,'CH3CHO_PRIM' ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ACD'    ,'CH3CHO_PRIM' ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'ACE'    ,'ACE'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'ACRO'   ,'ACRO'        ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'ACRO'   ,'ACRO_PRIM'   ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'ACRO'   ,'ACRO'        ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'ACT'    ,'ACT'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'ALD'    ,'ALD'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'API'    ,'API'         ,'GAS'  ,1.  ,'UNIT','a', 
@@ -70,7 +70,7 @@
    'EVERYWHERE', 'ALL'         ,'BEN'    ,'BEN'         ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'CSL'    ,'CSL'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'DCB1'   ,'DCB1'        ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'ETHYLBENZ','EBZ'       ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'EBZ'    ,'EBZ'         ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'ECH4'   ,'ECH4'        ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'EOH'    ,'EOH'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'ETE'    ,'ETE'         ,'GAS'  ,1.  ,'UNIT','a', 
@@ -105,14 +105,14 @@
    'EVERYWHERE', 'ALL'         ,'VROCIOXY','VROCIOXY'   ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'ROH'    ,'ROH'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'SESQ'   ,'SESQ'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'STYRENE','STY'         ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'SLOWROC','SLOWROC'     ,'GAS'  ,1   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'STY'    ,'STY'         ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'TOL'    ,'TOL'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'UALD'   ,'UALD'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'XYM'    ,'XYL'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'XYE'    ,'XYL'         ,'GAS'  ,1.  ,'UNIT','a',  
+   'EVERYWHERE', 'ALL'         ,'XYL'    ,'XYL'         ,'GAS'  ,1.  ,'UNIT','a',  
 
-   ! Volatility resolved CRACMM gases (ignore in RACM2)
+
+   ! Volatility resolved CRACMM gases
    'EVERYWHERE', 'ALL'      ,'ROCN2ALK'   ,'VROCN2ALK'  ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'      ,'ROCN1ALK'   ,'VROCN1ALK'  ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'      ,'ROCP0ALK'   ,'VROCP0ALK'  ,'GAS'  ,1.  ,'UNIT','a',
@@ -122,7 +122,6 @@
    'EVERYWHERE', 'ALL'      ,'ROCP4ALK'   ,'VROCP4ALK'  ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'      ,'ROCP5ALK'   ,'VROCP5ALK'  ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'      ,'ROCP6ALK'   ,'VROCP6ALK'  ,'GAS'  ,1.  ,'UNIT','a',
-
 
 
    'EVERYWHERE', 'ALL'         ,'ROCN2'  ,'VROCN2ALK'   ,'GAS'  ,1   ,'UNIT','a',
@@ -137,8 +136,15 @@
    'EVERYWHERE', 'ALL'        ,'ROCP5ARO','VROCP5ARO'   ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'ROCP6ARO','VROCP6ARO'   ,'GAS'  ,1   ,'UNIT','a',
    ! For biogenics:
-   'EVERYWHERE', 'ALL'        ,'VROCP6ARO','VROCP6ARO'  ,'GAS'  ,1   ,'UNIT','a', 
-
+   ! Used for BEIS and MEGAN
+   'EVERYWHERE', 'ALL'        ,'VROCP6ARO','VROCP6ARO'  ,'GAS'  ,1   ,'UNIT','a',
+   ! Used for MEGAN only
+   'EVERYWHERE', 'ALL'        ,'VROCP5ARO' ,'VROCP5ARO'  ,'GAS'  ,1   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        ,'VROCP1OXY1','VROCP1OXY1' ,'GAS'  ,1   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        ,'VROCP1OXY3','VROCP1OXY3' ,'GAS'  ,1   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        ,'VROCP2OXY2','VROCP2OXY2' ,'GAS'  ,1   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        ,'VROCP4ALK' ,'VROCP4ALK'  ,'GAS'  ,1   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        ,'VROCP5OXY1','VROCP5OXY1' ,'GAS'  ,1   ,'UNIT','a',
    ! Optional Air Toxics in NR namelist, comment out species if the NR namelist
    ! does not include one or more of them.
    'EVERYWHERE', 'ALL' ,'ACRYLONITRILE','ACRY_NITRILE',     'GAS'  ,1.  ,'UNIT','a',
@@ -169,8 +175,7 @@
    'EVERYWHERE', 'ALL' ,'CARBSULFIDE','CARBSULFIDE',        'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'CHLOROPRENE','CHLOROPRENE',        'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'BENZOAPYRNE','BENAPY',             'GAS'  ,1.  ,'UNIT','a',
-!  'EVERYWHERE', 'ALL' ,'HCN','HCN',                        'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CO', 'HCN',                        'GAS'  ,0.00301,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'HCN','HCN',                        'GAS'  ,1.  ,'UNIT','a',
 ! Inert Tracers of PAH congeners for simple exposure assessments
    'EVERYWHERE', 'ALL' , 'PAH_000E0', 'PAH_000E0',          'GAS',1.0  ,'UNIT','a',
    'EVERYWHERE', 'ALL' , 'PAH_176E5', 'PAH_176E5',          'GAS',1.0  ,'UNIT','a',
@@ -211,7 +216,7 @@
    'EVERYWHERE', 'ALL'         ,'PMC'    ,'ACL'     ,'COARSE',0.00145,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'PMC'    ,'AH2O'    ,'COARSE',0.00032,'UNIT','a', 
 
-   ! Particulate Hazardous Air Pollutants (HAPs), can comment individual aerosol 
+   ! Particulate Hazardous Air Pollutants (HAPs), can comment individual aerosol
    ! components across mode if AE namelist does not contain them
    'EVERYWHERE', 'ALL'         'NICKEL_F','ANI'     ,'FINE'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         'NICKEL_C','ANI'     ,'COARSE',1.  ,'UNIT','a',
@@ -259,7 +264,7 @@
    !           conserve the total. For Example,
    !            'EVERYWHERE', 'ALL' ,'POC'  ,'VSVPO2'   ,'GAS' ,0.14 ,'MASS','a', 
    !            'EVERYWHERE', 'ALL' ,'PNCOM','VSVPO2'   ,'GAS' ,0.14 ,'MASS','a', 
-   !     Note: To avoid large swigns in repartitioning after emission, it's a good idea
+   !     Note: To avoid large swings in repartitioning after emission, it's a good idea
    !           to split mass between gas and particle phases, with all mass going to 
    !           the particle in the C* = 0.1-1 range and all gas for C* = 100-1000. 
    !           Species with C*=10 can generally have mass split between gas and particle
@@ -296,6 +301,7 @@
     'EVERYWHERE', 'GRIDDED_EMIS'     ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
     'EVERYWHERE', 'GRIDDED_EMIS'     ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
 
+    ! GENERAL_POA volatility profile
     'EVERYWHERE', 'PT_NONEGU'     ,'PMOCN2'  ,'VROCN2OXY2'  ,'GAS' ,0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_NONEGU'     ,'PMNCOMN2','VROCN2OXY2'  ,'GAS' ,0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_NONEGU'     ,'PMOCN2' ,'VROCP0OXY2'  ,'GAS' ,0.175,'MASS','a', 
@@ -317,7 +323,7 @@
     'EVERYWHERE', 'PT_NONEGU'     ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_NONEGU'     ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
 
-
+    ! GENERAL_POA volatility profile
     'EVERYWHERE', 'PT_EGU'     ,'PMOCN2'  ,'VROCN2OXY2'  ,'GAS' ,0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_EGU'     ,'PMNCOMN2','VROCN2OXY2'  ,'GAS' ,0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_EGU'     ,'PMOCN2' ,'VROCP0OXY2'  ,'GAS' ,0.175,'MASS','a', 
@@ -339,6 +345,7 @@
     'EVERYWHERE', 'PT_EGU'     ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_EGU'     ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
 
+    ! GENERAL_POA volatility profile
     'EVERYWHERE', 'PT_OTHER'     ,'PMOCN2'  ,'VROCN2OXY2'  ,'GAS' ,0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_OTHER'     ,'PMNCOMN2','VROCN2OXY2'  ,'GAS' ,0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_OTHER'     ,'PMOCN2' ,'VROCP0OXY2'  ,'GAS' ,0.175,'MASS','a', 
@@ -360,6 +367,7 @@
     'EVERYWHERE', 'PT_OTHER'     ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_OTHER'     ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
 
+    ! GENERAL_POA volatility profile
     'EVERYWHERE', 'PT_OILGAS'     ,'PMOCN2'  ,'VROCN2OXY2'  ,'GAS' ,0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_OILGAS'     ,'PMNCOMN2','VROCN2OXY2'  ,'GAS' ,0.   ,'MASS','a', 
     'EVERYWHERE', 'PT_OILGAS'     ,'PMOCN2' ,'VROCP0OXY2'  ,'GAS' ,0.175,'MASS','a', 
@@ -382,6 +390,7 @@
     'EVERYWHERE', 'PT_OILGAS'     ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
 
    ! Diesel Family Volatility Distribution (Mostly Onroad and Offroad Sources and CMV)
+   ! Diesel profile based on Lu et al. 2020 https://doi.org/10.5194/acp-20-4313-2020
     'EVERYWHERE', 'PT_CMV_C1C2'      ,'PMOCN2' ,'AROCN1ALK'  ,'FINE',0.187,'MASS','a',
     'EVERYWHERE', 'PT_CMV_C1C2'     ,'PMNCOMN2','AROCN1ALK'  ,'FINE',0.187,'MASS','a',
     'EVERYWHERE', 'PT_CMV_C1C2'      ,'PMOCN2' ,'AROCP0ALK'  ,'FINE',0.043,'MASS','a',
@@ -402,6 +411,7 @@
     'EVERYWHERE', 'PT_CMV_C1C2'      ,'NMOG'   ,'VROCP5ARO'  ,'GAS' ,0.0043,'MASS','a',
     'EVERYWHERE', 'PT_CMV_C1C2'      ,'NMOG'   ,'VROCP6ARO'  ,'GAS' ,0.0025,'MASS','a',
 
+    ! Diesel volatility profile
     'EVERYWHERE', 'PT_CMV_C3'      ,'PMOCN2' ,'AROCN1ALK'  ,'FINE',0.187,'MASS','a',
     'EVERYWHERE', 'PT_CMV_C3'     ,'PMNCOMN2','AROCN1ALK'  ,'FINE',0.187,'MASS','a',
     'EVERYWHERE', 'PT_CMV_C3'      ,'PMOCN2' ,'AROCP0ALK'  ,'FINE',0.043,'MASS','a',
@@ -423,171 +433,121 @@
     'EVERYWHERE', 'PT_CMV_C3'      ,'NMOG'   ,'VROCP6ARO'  ,'GAS' ,0.0025,'MASS','a',
 
 
-
    ! --> Semivolatile POA - Use Woody et al. 2016 biomass burning for Fires
     ! O:C ratio of 0.4 (or similar) used based on OM/OC of 1.7 and 
     !   Canagaratna et al. 2015 ACP relationship (OM/OC =1.29*O:C+1.17)
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2'  ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2'  ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_AGFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
 
-    'EVERYWHERE', 'PT_AGFIRES'         ,'ROCN2ALK' ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a',
-    'EVERYWHERE', 'PT_AGFIRES'         ,'ROCP0ALK' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a',
-    'EVERYWHERE', 'PT_AGFIRES'         ,'ROCP1ALK' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a',
-    'EVERYWHERE', 'PT_AGFIRES'         ,'ROCP2ALK' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a',
-    'EVERYWHERE', 'PT_AGFIRES'         ,'ROCP3ALK' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a',
-    'EVERYWHERE', 'PT_AGFIRES'         ,'ROCN2ALK' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a',
-    'EVERYWHERE', 'PT_AGFIRES'         ,'ROCP0ALK' ,'AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a',
-    'EVERYWHERE', 'PT_AGFIRES'         ,'ROCP1ALK' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a',
-    'EVERYWHERE', 'PT_AGFIRES'         ,'ROCP2ALK' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a',
-    'EVERYWHERE', 'PT_AGFIRES'         ,'ROCP3ALK' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
+    ! Biomass burning volatility profile
+    'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2'  ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2'  ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_FIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
+    ! Biomass burning volatility profile
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2'  ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
    
-    'EVERYWHERE', 'PT_FIRES'         ,'ROCN2ALK' ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a',
-    'EVERYWHERE', 'PT_FIRES'         ,'ROCP0ALK' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a',
-    'EVERYWHERE', 'PT_FIRES'         ,'ROCP1ALK' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a',
-    'EVERYWHERE', 'PT_FIRES'         ,'ROCP2ALK' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a',
-    'EVERYWHERE', 'PT_FIRES'         ,'ROCP3ALK' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a',
-    'EVERYWHERE', 'PT_FIRES'         ,'ROCN2ALK' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a',
-    'EVERYWHERE', 'PT_FIRES'         ,'ROCP0ALK' ,'AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a',
-    'EVERYWHERE', 'PT_FIRES'         ,'ROCP1ALK' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a',
-    'EVERYWHERE', 'PT_FIRES'         ,'ROCP2ALK' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a',
-    'EVERYWHERE', 'PT_FIRES'         ,'ROCP3ALK' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
-
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2'  ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_RXFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
+    ! Biomass burning volatility profile
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2'  ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
    
-    'EVERYWHERE', 'PT_RXFIRES'         ,'ROCN2ALK' ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a',
-    'EVERYWHERE', 'PT_RXFIRES'         ,'ROCP0ALK' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a',
-    'EVERYWHERE', 'PT_RXFIRES'         ,'ROCP1ALK' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a',
-    'EVERYWHERE', 'PT_RXFIRES'         ,'ROCP2ALK' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a',
-    'EVERYWHERE', 'PT_RXFIRES'         ,'ROCP3ALK' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a',
-    'EVERYWHERE', 'PT_RXFIRES'         ,'ROCN2ALK' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a',
-    'EVERYWHERE', 'PT_RXFIRES'         ,'ROCP0ALK' ,'AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a',
-    'EVERYWHERE', 'PT_RXFIRES'         ,'ROCP1ALK' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a',
-    'EVERYWHERE', 'PT_RXFIRES'         ,'ROCP2ALK' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a',
-    'EVERYWHERE', 'PT_RXFIRES'         ,'ROCP3ALK' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
-
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2'  ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'PT_OTHFIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
+    ! Biomass burning volatility profile
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2'  ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
+    'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
    
-    'EVERYWHERE', 'PT_OTHFIRES'         ,'ROCN2ALK' ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a',
-    'EVERYWHERE', 'PT_OTHFIRES'         ,'ROCP0ALK' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a',
-    'EVERYWHERE', 'PT_OTHFIRES'         ,'ROCP1ALK' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a',
-    'EVERYWHERE', 'PT_OTHFIRES'         ,'ROCP2ALK' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a',
-    'EVERYWHERE', 'PT_OTHFIRES'         ,'ROCP3ALK' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a',
-    'EVERYWHERE', 'PT_OTHFIRES'         ,'ROCN2ALK' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a',
-    'EVERYWHERE', 'PT_OTHFIRES'         ,'ROCP0ALK' ,'AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a',
-    'EVERYWHERE', 'PT_OTHFIRES'         ,'ROCP1ALK' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a',
-    'EVERYWHERE', 'PT_OTHFIRES'         ,'ROCP2ALK' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a',
-    'EVERYWHERE', 'PT_OTHFIRES'         ,'ROCP3ALK' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
-
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2'  ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','AROCP1OXY3'  ,'FINE',0.009,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','AROCP2OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMOCN2' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a', 
-!   'EVERYWHERE', 'GR_RES_FIRES'         ,'PMNCOMN2','VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
-   
-    'EVERYWHERE', 'GR_RES_FIRES'         ,'ROCN2ALK' ,'VROCN2OXY4'  ,'GAS' ,0.   ,'MASS','a',
-    'EVERYWHERE', 'GR_RES_FIRES'         ,'ROCP0ALK' ,'VROCP0OXY4'  ,'GAS' ,0.05 ,'MASS','a',
-    'EVERYWHERE', 'GR_RES_FIRES'         ,'ROCP1ALK' ,'VROCP1OXY3'  ,'GAS' ,0.091,'MASS','a',
-    'EVERYWHERE', 'GR_RES_FIRES'         ,'ROCP2ALK' ,'VROCP2OXY2'  ,'GAS' ,0.200,'MASS','a',
-    'EVERYWHERE', 'GR_RES_FIRES'         ,'ROCP3ALK' ,'VROCP3OXY2'  ,'GAS' ,0.400,'MASS','a',
-    'EVERYWHERE', 'GR_RES_FIRES'         ,'ROCN2ALK' ,'AROCN2OXY4'  ,'FINE',0.20 ,'MASS','a',
-    'EVERYWHERE', 'GR_RES_FIRES'         ,'ROCP0ALK' ,'AROCP0OXY4'  ,'FINE',0.05 ,'MASS','a',
-    'EVERYWHERE', 'GR_RES_FIRES'         ,'ROCP1ALK' ,'AROCP1OXY3'  ,'FINE',0.009,'MASS','a',
-    'EVERYWHERE', 'GR_RES_FIRES'         ,'ROCP2ALK' ,'AROCP2OXY2'  ,'FINE',0.   ,'MASS','a',
-    'EVERYWHERE', 'GR_RES_FIRES'         ,'ROCP3ALK' ,'VROCP3OXY2'  ,'FINE',0.   ,'MASS','a',
    
 !   ! Gasoline-Source Volatility Distribution (Mostly Onroad and Offroad Vehicles)
+!   ! Gasoline profile based on Lu et al. 2020 https://doi.org/10.5194/acp-20-4313-2020
 !    'EVERYWHERE', 'GRIDDED_GASOLINE','PMOCN2'  ,'AROCN1ALK'  ,'FINE',0.228,'MASS','a', 
 !    'EVERYWHERE', 'GRIDDED_GASOLINE','PMNCOMN2','AROCN1ALK'  ,'FINE',0.228,'MASS','a', 
 !    'EVERYWHERE', 'GRIDDED_GASOLINE','PMOCN2'  ,'AROCP0ALK'  ,'FINE',0.054,'MASS','a', 
@@ -610,6 +570,7 @@
 
  
 !   ! Aircraft Family Turbine Engine Volatility Distribution
+!   ! Aircraft profile based on Lu et al. 2020 https://doi.org/10.5194/acp-20-4313-2020
 !    'EVERYWHERE', 'AIRCRAFT'    ,'PMOCN2' ,'AROCN1ALK'  ,'FINE',0.149,'MASS','a', 
 !    'EVERYWHERE', 'AIRCRAFT'   ,'PMNCOMN2','AROCN1ALK'  ,'FINE',0.149,'MASS','a', 
 !    'EVERYWHERE', 'AIRCRAFT'    ,'PMOCN2' ,'AROCP0ALK'  ,'FINE',0.130,'MASS','a', 
@@ -623,9 +584,7 @@
 !    'EVERYWHERE', 'AIRCRAFT'    ,'PMOCN2' ,'VROCP3ALK'  ,'GAS' ,0.0  ,'MASS','a', 
 !    'EVERYWHERE', 'AIRCRAFT'   ,'PMNCOMN2','VROCP3ALK'  ,'GAS' ,0.0  ,'MASS','a', 
 
-   ! Semivolatile POA from the inventory via SPECIATE and SMOKE.
-   ! These species are not populated with mass for LISTOS, but in the future
-   ! the following species will have mass. Map them for safety.
+   ! Volatility resolved CRACMM semivolatile POA
     'EVERYWHERE', 'ALL'        ,'POCN2'   ,'AROCN2ALK'  ,'FINE',1.0,'UNIT','a', 
     'EVERYWHERE', 'ALL'        ,'POCN1'   ,'AROCN1ALK'  ,'FINE',1.0,'UNIT','a', 
     'EVERYWHERE', 'ALL'        ,'POCP0'   ,'AROCP0ALK'  ,'FINE',1.0,'UNIT','a', 
@@ -645,74 +604,47 @@
 
    ! Wind-Blown Dust and Sea Spray Scaling
    ! Fine Components
-   'EVERYWHERE', 'ALL'    ,'PMFINE_SO4'  ,'ASO4'        ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_NO3'  ,'ANO3'        ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_CL'   ,'ACL'         ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_NH4'  ,'ANH4'        ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_NA'   ,'ANA'         ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_CA'   ,'ACA'         ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_MG'   ,'AMG'         ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_K'    ,'AK'          ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_FE'   ,'AFE'         ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_AL'   ,'AAL'         ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_SI'   ,'ASI'         ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_TI'   ,'ATI'         ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_MN'   ,'AMN'         ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_H2O'  ,'AH2O'        ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_OTHR' ,'AOTHR'       ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_CR_III'  ,'ACR_III'  ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_CR_VI'   ,'ACR_VI'   ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_NI'      ,'ANI'      ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_AS'      ,'AAS'      ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_BE'      ,'ABE'      ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_PHG'     ,'APHG'     ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_PB'      ,'APB'      ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_CD'      ,'ACADMIUM' ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_MN_HAPS' ,'AMN_HAPS' ,'FINE',1.   ,'UNIT','a', 
-
+   'EVERYWHERE', 'ALL'    ,'PMFINE_SO4'     ,'ASO4'     ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_NO3'     ,'ANO3'     ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_CL'      ,'ACL'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_NH4'     ,'ANH4'     ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_NA'      ,'ANA'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_CA'      ,'ACA'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_MG'      ,'AMG'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_K'       ,'AK'       ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_FE'      ,'AFE'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_AL'      ,'AAL'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_SI'      ,'ASI'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_TI'      ,'ATI'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_MN'      ,'AMN'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_H2O'     ,'AH2O'     ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_OTHR'    ,'AOTHR'    ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_CR_III'  ,'ACR_III'  ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_CR_VI'   ,'ACR_VI'   ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_NI'      ,'ANI'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_AS'      ,'AAS'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_BE'      ,'ABE'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_PHG'     ,'APHG'     ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_PB'      ,'APB'      ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_CD'      ,'ACADMIUM' ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_MN_HAPS' ,'AMN_HAPS' ,'FINE',1.   ,'UNIT','a',
 
    ! Wind-Blown Dust and Sea Spray Scaling
    ! Coarse Components
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SO4','ASO4'      ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NO3','ANO3'      ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CL' ,'ACL'       ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CR_III'  ,'ACR_III'  ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CR_VI'   ,'ACR_VI'   ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NI'      ,'ANI'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_AS'      ,'AAS'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_BE'      ,'ABE'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_PHG'     ,'APHG'     ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_PB'      ,'APB'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CD'      ,'ACADMIUM' ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_MN_HAPS' ,'AMN_HAPS' ,'COARSE',1.   ,'UNIT','a', 
-
-   ! Updated aromatic species for CRACMM2
-   !   EBZ is now explicit ethylbenzene; was lumped in XYE before.
-   !   XYL is now all xylenes and similar aromatics. Previously o- and p-xylenes
-   !   were included in XYE while m-xylene was included in XYM.
-   !   New species STY is explicit styrene. Styrene was previously included in XYM.
-
-   ! EBZ and XYE remapping
-   ! Generic scaling if not scaling by sector: 70% XYL; 30% EBZ
-   'EVERYWHERE', 'ALL'         ,'XYE'    ,'XYL'         ,'GAS'  ,0.70,'UNIT','m',
-
-   ! XYM remapping
-   ! Generic scaling if not scaling by sector: 93% XYL; 7% STY
-   !'EVERYWHERE', 'ALL'         ,'XYM'    ,'XYL'         ,'GAS'  ,0.93,'UNIT','m',
-   ! Source-specific scaling
-   ! gasoline: 99% XYL; 1% STY
-   'EVERYWHERE', 'GRIDDED_GASOLINE','XYM'    ,'XYL'         ,'GAS'  ,0.99,'UNIT','m',
-   ! ptnonipm: 35% XYL; 65% STY
-!  'EVERYWHERE', 'PT_NONEGU'   ,'ALL'    ,'ALL'         ,'ALL'  ,0.0  ,'UNIT','m',! zero ptnonipm emissions
-!  'EVERYWHERE', 'PT_NONEGU'   ,'XYM'    ,'XYL'         ,'GAS'  ,-0.65,'UNIT','a',! remove 65% of XYM that was already included in P_pt_other_nonfire
-   'EVERYWHERE', 'PT_NONEGU'   ,'XYM'    ,'XYL'         ,'GAS'  ,0.35 ,'UNIT','m',
-   ! fires (not including rwc): 78% XYM; 12% STY
-   'EVERYWHERE', 'PT_AGFIRES'   ,'XYM'    ,'XYL'         ,'GAS'  ,0.78,'UNIT','m',
-   'EVERYWHERE', 'PT_FIRES'     ,'XYM'    ,'XYL'         ,'GAS'  ,0.78,'UNIT','m',
-   'EVERYWHERE', 'PT_RXFIRES'   ,'XYM'    ,'XYL'         ,'GAS'  ,0.78,'UNIT','m',
-   'EVERYWHERE', 'PT_OTHFIRES'  ,'XYM'    ,'XYL'         ,'GAS'  ,0.78,'UNIT','m',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SO4'     ,'ASO4'     ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NO3'     ,'ANO3'     ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CL'      ,'ACL'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O'     ,'AH2O'     ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SOIL'    ,'ASOIL'    ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SEACAT'  ,'ASEACAT'  ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CR_III'  ,'ACR_III'  ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CR_VI'   ,'ACR_VI'   ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NI'      ,'ANI'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_AS'      ,'AAS'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_BE'      ,'ABE'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_PHG'     ,'APHG'     ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_PB'      ,'APB'      ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CD'      ,'ACADMIUM' ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_MN_HAPS' ,'AMN_HAPS' ,'COARSE',1.   ,'UNIT','a',
 
 /
