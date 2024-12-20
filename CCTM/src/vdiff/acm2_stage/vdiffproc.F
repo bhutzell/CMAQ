@@ -424,9 +424,10 @@ C Store Deposition Change in Budget and Process Analysis Arrays
       IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) THEN
          DDEP_PA = 0.0
          DO V = 1, N_SPC_DDEP
+            S = DD2DV( V )
             DO R = 1, NROWS
                DO C = 1, NCOLS
-                  DDEP_PA( C,R,MAP_DDEPtoCGRID(V)) = DDEP( V,C,R ) - DDEP0( V,C,R )
+                  DDEP_PA( C,R,MAP_DDEPtoCGRID(V)) = DDEP( S,C,R ) - DDEP0( S,C,R )
                END DO
             END DO
             IF ( L_ELMO ) 
