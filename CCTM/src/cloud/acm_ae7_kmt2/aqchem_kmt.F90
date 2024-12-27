@@ -20,8 +20,7 @@
 !:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE AQCHEM ( JDATE, JTIME, TEMP2, PRES_PA, TAUCLD, PRCRATE,   &
                           WCAVG, WTAVG, AIRM, ALFA0, ALFA2, ALFA3, GAS,    &
-                          AEROSOL, GASWDEP, AERWDEP, HPWDEP, BETASO4, COSZEN, &
-                          FRACTR, FRACPOA, FRACPRI, FRACSOA )      
+                          AEROSOL, GASWDEP, AERWDEP, HPWDEP, BETASO4, COSZEN )      
 !-----------------------------------------------------------------------
 !  Description:
 !    Compute concentration changes in cloud due to aqueous chemistry,
@@ -170,16 +169,26 @@
 !        and its application, J. Geophys. Res., 108 (D14), 4426, 2003  
 !
 !  Called by:  AQMAP
-!
-!  Calls the following subroutines:  Initialize, Update_RCONST, INTEGRATE
-!
-!  Calls the following functions: none
+
+!  Calls the following subroutines:  none
+
+!  Calls the following functions:  HLCONST
+
+!  Arguments     Type      I/O       Description
+!  ---------     ----  ------------  --------------------------------
+!  GAS(N_AQ_GAS)     real  input&output  Concentration for species i=1,15
+!  GASWDEP(N_AQ_GAS) real     output     wet deposition for species
+
+!  AEROSOL(N_AQ_AER,nmodes) real input&output   Concentration for species i=1,51
+!  AERWDEP(N_AQ_AER,nmodes) real     output     wet deposition for species
 !-----------------------------------------------------------------------
 
-      USE RXNS_DATA           ! chemical mechanism data
-      USE AQ_DATA
+      USE RXNS_DATA       ! chemical mechanism data
+      USE AQ_DATA         ! doesn't inherit; gets only n_aerospc, conmin from AERO_DATA
       USE AERO_DATA
       USE UTILIO_DEFN
+      USE CONST
+      USE HLCONST_MOD
    
       USE aqchem_Model
       USE aqchem_Initialize, ONLY: Initialize  
@@ -215,12 +224,7 @@
       REAL( 8 ), INTENT( INOUT ) :: GAS    ( : )            ! gas phase concentrations (mol/molV)
       REAL( 8 ), INTENT( INOUT ) :: AEROSOL( :, : )         ! aerosol concentrations (mol/molV)
       REAL( 8 ), INTENT( INOUT ) :: GASWDEP( : )            ! gas phase wet deposition array (mm mol/liter)
-      REAL( 8 ), INTENT( INOUT ) :: AERWDEP( :, : )         ! aerosol wet deposition array (mm mol/liter)
-      
-      REAL( 8 ), INTENT( OUT ) :: FRACTR    ! Fraction of J mode tracer scavenged from I mode 
-      REAL( 8 ), INTENT( OUT ) :: FRACPOA   ! Fraction of J mode poa scavenged from I mode 
-      REAL( 8 ), INTENT( OUT ) :: FRACPRI   ! Fraction of J mode pri scavenged from I mode
-      REAL( 8 ), INTENT( OUT ) :: FRACSOA   ! Fraction of J mode soa scavenged from I mode       
+      REAL( 8 ), INTENT( INOUT ) :: AERWDEP( :, : )         ! aerosol wet deposition array (mm mol/liter)   
       
       REAL( 8 ), SAVE :: SOIL_FE_FAC                        ! Fe molar fraction of ASOIL
       REAL( 8 ), SAVE :: CORS_FE_FAC                        ! Fe molar fraction of ACORS
@@ -277,10 +281,6 @@
       REAL(kind=dp) :: RSTATE(20)                           ! KPP integrator variables
 
       INTEGER :: I, IGAS, IAER, IMOD, count, J, OLIG
-
-!...........External Functions:
-
-      REAL, EXTERNAL :: HLCONST
 
 !*********************************************************************
 
@@ -367,32 +367,33 @@
       
 !...Set Henry's Law coefficients and other options
 
-      SO2H   = HLCONST( 'SO2             ', TEMP2, .FALSE., 0.0 )
-      CO2H   = HLCONST( 'CO2             ', TEMP2, .FALSE., 0.0 )
-      NH3H   = HLCONST( 'NH3             ', TEMP2, .FALSE., 0.0 )
-      H2O2H  = HLCONST( 'H2O2            ', TEMP2, .FALSE., 0.0 )
-      O3H    = HLCONST( 'O3              ', TEMP2, .FALSE., 0.0 )
-      HCLH   = HLCONST( 'HCL             ', TEMP2, .FALSE., 0.0 )
-      HNO3H  = HLCONST( 'HNO3            ', TEMP2, .FALSE., 0.0 )
-      MHPH   = HLCONST( 'METHYLHYDROPEROX', TEMP2, .FALSE., 0.0 )
-      PAAH   = HLCONST( 'PEROXYACETIC_ACI', TEMP2, .FALSE., 0.0 )
-      FOAH   = HLCONST( 'FORMIC_ACID     ', TEMP2, .FALSE., 0.0 )
-      GLYH   = HLCONST( 'GLYOXAL         ', TEMP2, .FALSE., 0.0 )
-      MGLYH  = HLCONST( MGLYSUR,            TEMP2, .FALSE., 0.0 )
-      HOH    = HLCONST( 'OH              ', TEMP2, .FALSE., 0.0 ) 
+      SO2H   = HLCONST( HLC_SO2       , TEMP2, .FALSE., 0.0 )
+      CO2H   = HLCONST( HLC_CO2       , TEMP2, .FALSE., 0.0 )
+      NH3H   = HLCONST( HLC_NH3       , TEMP2, .FALSE., 0.0 )
+      H2O2H  = HLCONST( HLC_H2O2      , TEMP2, .FALSE., 0.0 )
+      O3H    = HLCONST( HLC_O3        , TEMP2, .FALSE., 0.0 )
+      HCLH   = HLCONST( HLC_HCL       , TEMP2, .FALSE., 0.0 )
+      HNO3H  = HLCONST( HLC_HNO3      , TEMP2, .FALSE., 0.0 )
+      MHPH   = HLCONST( HLC_MHYDPOX   , TEMP2, .FALSE., 0.0 )
+      PAAH   = HLCONST( HLC_PEROXYACET, TEMP2, .FALSE., 0.0 )
+      FOAH   = HLCONST( HLC_HCOOH     , TEMP2, .FALSE., 0.0 )
+      GLYH   = HLCONST( HLC_GLY       , TEMP2, .FALSE., 0.0 )
+      MGLYH  = HLCONST( HLC_MGLY      , TEMP2, .FALSE., 0.0 )
+      HOH    = HLCONST( HLC_OH        , TEMP2, .FALSE., 0.0 ) 
       GCOLH  = 4.1D+04 * EXP( 4.6D+03 * ( ( 298.D0 - TEMP2 ) / ( 298.D0 * TEMP2 ) ) )  ! Sander (2015)
-      CCOOHH = HLCONST( 'ACETIC_ACID     ', TEMP2, .FALSE., 0.0 )
+
+      CCOOHH = HLCONST( HLC_CH3COOH     , TEMP2, .FALSE., 0.0 )
       HCHOH  = 2.5D0   !HLCONST( 'FORMALDEHYDE    ', TEMP2, .FALSE., 0.0 )             ! Seinfeld and Pandis (2016)
-      HO2H   = HLCONST( 'HO2             ', TEMP2, .FALSE., 0.0 ) 
-      NO2H  = HLCONST( 'NO2             ', TEMP2, .FALSE., 0.0 )
-      HONOH = HLCONST( 'HNO2            ', TEMP2, .FALSE., 0.0 )  
-      HNO4H = HLCONST( 'HNO4            ', TEMP2, .FALSE., 0.0 ) 
-      HIEPOX  = HLCONST( 'IEPOX           ', TEMP2, .FALSE., 0.0 )
-      HMAE    = HLCONST( 'IMAE            ', TEMP2, .FALSE., 0.0 )
-      HHMML   = HLCONST( 'IMAE            ', TEMP2, .FALSE., 0.0 )   
-      NO3H    = HLCONST( 'NO3             ', TEMP2, .FALSE., 0.0 )
+      HO2H   = HLCONST( HLC_HO2         , TEMP2, .FALSE., 0.0 ) 
+      NO2H  = HLCONST( HLC_NO2          , TEMP2, .FALSE., 0.0 )
+      HONOH = HLCONST( HLC_HNO2         , TEMP2, .FALSE., 0.0 )  
+      HNO4H = HLCONST( HLC_HNO4         , TEMP2, .FALSE., 0.0 ) 
+      HIEPOX  = HLCONST( HLC_IEPOX      , TEMP2, .FALSE., 0.0 )
+      HMAE    = HLCONST( HLC_IMAE       , TEMP2, .FALSE., 0.0 )
+      HHMML   = HLCONST( HLC_IMAE       , TEMP2, .FALSE., 0.0 )   
+      NO3H    = HLCONST( HLC_NO3        , TEMP2, .FALSE., 0.0 )
       CH3O2H  = 2.7D0 * EXP( 2.03D+03 * ( ( 298.D0 - TEMP2 ) / ( 298.D0 * TEMP2 ) ) )  ! Leriche et al., 2013 
-      PYRACH  = HLCONST( 'PYRUVIC_ACID    ', TEMP2, .FALSE., 0.0 )     
+      PYRACH  = HLCONST( HLC_PYRUVACID  , TEMP2, .FALSE., 0.0 )     
 
       ONE_OVER_TEMP = 1.0D0 / TEMP2
       
@@ -434,41 +435,41 @@
 
 !...Compute fractional weights for several species     
 
-      TOTNIT = GAS( LHNO3 ) + AEROSOL( LNO3, ACC )
+      TOTNIT = GAS( LHNO3 ) + AEROSOL( LNO3, IACC )
       IF ( TOTNIT .GT. 0.0D0 ) THEN
          FHNO3   = GAS( LHNO3 ) / TOTNIT
       ELSE
          FHNO3   = 1.0D0
       END IF
       
-      IF ( AEROSOL( LNO3, ACC ) + AEROSOL( LNO3, COR ) .GT. 0.0D0 ) THEN
-         FNO3ACC = AEROSOL( LNO3, ACC ) / (AEROSOL( LNO3, ACC ) + AEROSOL( LNO3, COR ))  !just aerosol
+      IF ( AEROSOL( LNO3, IACC ) + AEROSOL( LNO3, ICOR ) .GT. 0.0D0 ) THEN
+         FNO3ACC = AEROSOL( LNO3, IACC ) / (AEROSOL( LNO3, IACC ) + AEROSOL( LNO3, ICOR ))  !just aerosol
       ELSE
          FNO3ACC = 1.d0
       END IF
 
-      TOTAMM = GAS( LNH3 ) + AEROSOL( LNH4, ACC )
+      TOTAMM = GAS( LNH3 ) + AEROSOL( LNH4, IACC )
       IF ( TOTAMM .GT. 0.0D0 ) THEN
          FNH3    = GAS( LNH3 ) / TOTAMM
       ELSE
          FNH3    = 1.0D0
       END IF
       
-      IF ( AEROSOL( LNH4, ACC ) + AEROSOL( LNH4, COR ) .GT. 0.0D0 ) THEN      
-         FNH4ACC = AEROSOL( LNH4, ACC ) / (AEROSOL( LNH4, ACC ) + AEROSOL( LNH4, COR ))  !just aerosol
+      IF ( AEROSOL( LNH4, IACC ) + AEROSOL( LNH4, ICOR ) .GT. 0.0D0 ) THEN      
+         FNH4ACC = AEROSOL( LNH4, IACC ) / (AEROSOL( LNH4, IACC ) + AEROSOL( LNH4, ICOR ))  !just aerosol
       ELSE
          FNH4ACC = 1.d0
       END IF
       
-      TOTCL = GAS( LHCL ) + AEROSOL( LCL, ACC )
+      TOTCL = GAS( LHCL ) + AEROSOL( LCL, IACC )
       IF ( TOTCL .GT. 0.0D0 ) THEN
          FHCL    = GAS( LHCL ) / TOTCL
       ELSE
          FHCL    = 1.0D0
       END IF
       
-      IF ( AEROSOL( LCL, ACC ) + AEROSOL( LCL, COR ) .GT. 0.0D0 ) THEN            
-         FCLACC = AEROSOL( LCL, ACC ) / (AEROSOL( LCL, ACC ) + AEROSOL( LCL, COR ))  !just aerosol
+      IF ( AEROSOL( LCL, IACC ) + AEROSOL( LCL, ICOR ) .GT. 0.0D0 ) THEN            
+         FCLACC = AEROSOL( LCL, IACC ) / (AEROSOL( LCL, IACC ) + AEROSOL( LCL, ICOR ))  !just aerosol
       ELSE
          FCLACC = 1.d0
       END IF
@@ -490,20 +491,17 @@
         STARTM(3) = GAS(LNH3)*14.007     
         STARTM(4) = GAS(LHCL)*35.5 
                   
-        DO I =  1,NMODES
+        DO I =  1,n_mode
            STARTM(1) = STARTM(1) + AEROSOL(LSO4, I)*32.06
            STARTM(2) = STARTM(2) + AEROSOL(LNO3, I)*14.007
            STARTM(3) = STARTM(3) + AEROSOL(LNH4, I)*14.007
            STARTM(4) = STARTM(4) + AEROSOL(LCL, I)*35.5
         ENDDO   
 	
-	POAIinit = AEROSOL(LPOA, AKN)	
-	PRIIinit = AEROSOL(LPRI, AKN)	
-	TRACIinit = AEROSOL(LTRACER_AKN, AKN)
-	SOAIinit = AEROSOL(LSOA, AKN)
-	
-	POAJinit = AEROSOL(LPOA, ACC)
-
+	POAIinit = AEROSOL(LPOA, IAIT)	
+	PRIIinit = AEROSOL(LPRI, IAIT)	
+        TRACIinit = AEROSOL(LTRACER, IAIT)
+	SOAIinit = AEROSOL(LSOA, IAIT)
      
 !...Initialize dynamic species, rel/abs tolerances, and other specifications before calling integrator
 
@@ -553,44 +551,44 @@ kron: DO WHILE (T < TEND)
       
 !...AEROSOL species, Aitken Mode
 
-      AEROSOL( LNO3, AKN ) = VAR( ind_A_NO3AKN ) * INVCFAC
-      AEROSOL( LNH4, AKN ) = VAR( ind_A_NH4AKN ) * INVCFAC
-      AEROSOL( LCL, AKN )  = VAR( ind_A_CLAKN ) * INVCFAC
-      AEROSOL( LNA, AKN )  = VAR( ind_A_NAAKN ) * INVCFAC
-      AEROSOL( LSO4, AKN ) = VAR( ind_A_SO4AKN ) * INVCFAC
-      AEROSOL( LEC, AKN )  = VAR( ind_A_PECAKN ) * INVCFAC
-      AEROSOL( LPOA, AKN ) = VAR( ind_A_POAAKN ) * INVCFAC
-      AEROSOL( LPRI, AKN ) = VAR( ind_A_PRIAKN ) * INVCFAC
-      AEROSOL( LNUM, AKN ) = AEROSOL( LNUM, AKN ) * EXP(-ALFA0 * TAUCLD) 
+      AEROSOL( LNO3, IAIT ) = VAR( ind_A_NO3AKN ) * INVCFAC
+      AEROSOL( LNH4, IAIT ) = VAR( ind_A_NH4AKN ) * INVCFAC
+      AEROSOL( LCL, IAIT )  = VAR( ind_A_CLAKN ) * INVCFAC
+      AEROSOL( LNA, IAIT )  = VAR( ind_A_NAAKN ) * INVCFAC
+      AEROSOL( LSO4, IAIT ) = VAR( ind_A_SO4AKN ) * INVCFAC
+      AEROSOL( LEC, IAIT )  = VAR( ind_A_PECAKN ) * INVCFAC
+      AEROSOL( LPOA, IAIT ) = VAR( ind_A_POAAKN ) * INVCFAC
+      AEROSOL( LPRI, IAIT ) = VAR( ind_A_PRIAKN ) * INVCFAC
+      AEROSOL( LNUM, IAIT ) = AEROSOL( LNUM, IAIT ) * EXP(-ALFA0 * TAUCLD) 
       
 !...Simple treatment for Hg/toxic tracer species    
       
-      AEROSOL( LTRACER_ACC, ACC ) = AEROSOL( LTRACER_ACC, ACC ) + &
-                                    AEROSOL( LTRACER_AKN, AKN ) * (1.d0-EXP(-ALFA3 * TAUCLD))  
-      AEROSOL( LPHG_ACC, ACC )    = AEROSOL( LPHG_ACC, ACC ) + &
-                                    AEROSOL( LPHG_AKN, AKN ) * (1.d0-EXP(-ALFA3 * TAUCLD))
+      AEROSOL( LTRACER, IACC ) = AEROSOL( LTRACER, IACC ) + &
+                                    AEROSOL( LTRACER, IAIT ) * (1.d0-EXP(-ALFA3 * TAUCLD))  
+      AEROSOL( LPHG, IACC )    = AEROSOL( LPHG, IACC ) + &
+                                    AEROSOL( LPHG, IAIT ) * (1.d0-EXP(-ALFA3 * TAUCLD))
 				    
-      AEROSOL( LTRACER_AKN, AKN ) = AEROSOL( LTRACER_AKN, AKN ) * EXP(-ALFA3 * TAUCLD)  
-      AEROSOL( LPHG_AKN, AKN )    = AEROSOL( LPHG_AKN, AKN ) * EXP(-ALFA3 * TAUCLD)				       
-      AERWDEP( LTRACER_ACC, ACC ) = AEROSOL( LTRACER_ACC,ACC ) * ( 1.d0 - EXPWET ) * CFACTOR 
-      AERWDEP( LPHG_ACC, ACC )    = AEROSOL( LPHG_ACC,ACC ) * ( 1.d0 - EXPWET ) * CFACTOR  
-      AERWDEP( LTRACER_COR, COR ) = AEROSOL( LTRACER_COR,COR ) * ( 1.d0 - EXPWET ) * CFACTOR 
-      AERWDEP( LPHG_COR, COR )    = AEROSOL( LPHG_COR,COR ) * ( 1.d0 - EXPWET ) * CFACTOR  
+      AEROSOL( LTRACER, IAIT ) = AEROSOL( LTRACER, IAIT ) * EXP(-ALFA3 * TAUCLD)  
+      AEROSOL( LPHG, IAIT )    = AEROSOL( LPHG, IAIT ) * EXP(-ALFA3 * TAUCLD)				       
+      AERWDEP( LTRACER, IACC ) = AEROSOL( LTRACER,IACC ) * ( 1.d0 - EXPWET ) * CFACTOR 
+      AERWDEP( LPHG, IACC )    = AEROSOL( LPHG,IACC ) * ( 1.d0 - EXPWET ) * CFACTOR  
+      AERWDEP( LTRACER, ICOR ) = AEROSOL( LTRACER,ICOR ) * ( 1.d0 - EXPWET ) * CFACTOR 
+      AERWDEP( LPHG, ICOR )    = AEROSOL( LPHG,ICOR ) * ( 1.d0 - EXPWET ) * CFACTOR  
          
-      AEROSOL( LTRACER_ACC, ACC ) = AEROSOL( LTRACER_ACC, ACC ) * EXPWET
-      AEROSOL( LPHG_ACC, ACC )    = AEROSOL( LPHG_ACC, ACC ) * EXPWET
+      AEROSOL( LTRACER, IACC ) = AEROSOL( LTRACER, IACC ) * EXPWET
+      AEROSOL( LPHG, IACC )    = AEROSOL( LPHG, IACC ) * EXPWET
       
-      AEROSOL( LTRACER_COR, COR ) = AEROSOL( LTRACER_COR, COR ) * EXPWET
-      AEROSOL( LPHG_COR, COR )    = AEROSOL( LPHG_COR, COR ) * EXPWET 
+      AEROSOL( LTRACER, ICOR ) = AEROSOL( LTRACER, ICOR ) * EXPWET
+      AEROSOL( LPHG, ICOR )    = AEROSOL( LPHG, ICOR ) * EXPWET 
       
       
 !...SOA (it now can have an AKN mode)
             
-      AEROSOL( LSOA, ACC ) = AEROSOL( LSOA, ACC ) + &
-                                    AEROSOL( LSOA, AKN ) * (1.d0-EXP(-ALFA3 * TAUCLD))
-      AEROSOL( LSOA, AKN ) = AEROSOL( LSOA, AKN ) * EXP(-ALFA3 * TAUCLD)     
-      AERWDEP( LSOA, ACC ) = AEROSOL( LSOA, ACC ) * ( 1.d0 - EXPWET ) * CFACTOR 
-      AEROSOL( LSOA, ACC ) = AEROSOL( LSOA, ACC ) * EXPWET      
+      AEROSOL( LSOA, IACC ) = AEROSOL( LSOA, IACC ) + &
+                                    AEROSOL( LSOA, IAIT ) * (1.d0-EXP(-ALFA3 * TAUCLD))
+      AEROSOL( LSOA, IAIT ) = AEROSOL( LSOA, IAIT ) * EXP(-ALFA3 * TAUCLD)     
+      AERWDEP( LSOA, IACC ) = AEROSOL( LSOA, IACC ) * ( 1.d0 - EXPWET ) * CFACTOR 
+      AEROSOL( LSOA, IACC ) = AEROSOL( LSOA, IACC ) * EXPWET      
    
         
 ! As in standard "AQCHEM", the assumption is made here that final coarse mode
@@ -599,182 +597,174 @@ kron: DO WHILE (T < TEND)
      
 !...AERWDEP species, coarse mode
 
-      AERWDEP( LSOILC, COR ) = AEROSOL( LSOILC,COR ) * ( 1.d0 - EXPWET ) * CFACTOR      
-      AERWDEP( LSEASC, COR ) = AEROSOL( LSEASC,COR ) * ( 1.d0 - EXPWET ) * CFACTOR     
-      AERWDEP( LANTHC, COR ) = AEROSOL( LANTHC,COR ) * ( 1.d0 - EXPWET ) * CFACTOR      
-      AERWDEP( LSO4, COR )   = AEROSOL( LSO4,COR ) * ( 1.d0 - EXPWET ) * CFACTOR
-      AERWDEP( LNH4, COR )   = AEROSOL( LNH4,COR ) * ( 1.d0 - EXPWET ) * CFACTOR
-      AERWDEP( LNO3, COR )   = AEROSOL( LNO3,COR ) * ( 1.d0 - EXPWET ) * CFACTOR
-      AERWDEP( LCL, COR )    = AEROSOL( LCL,COR ) * ( 1.d0 - EXPWET ) * CFACTOR
+      AERWDEP( LSOIL, ICOR ) = AEROSOL( LSOIL, ICOR ) * ( 1.d0 - EXPWET ) * CFACTOR      
+      AERWDEP( LSEAS, ICOR ) = AEROSOL( LSEAS, ICOR ) * ( 1.d0 - EXPWET ) * CFACTOR     
+      AERWDEP( LANTH, ICOR ) = AEROSOL( LANTH, ICOR ) * ( 1.d0 - EXPWET ) * CFACTOR      
+      AERWDEP( LSO4, ICOR )   = AEROSOL( LSO4, ICOR ) * ( 1.d0 - EXPWET ) * CFACTOR
+      AERWDEP( LNH4, ICOR )   = AEROSOL( LNH4, ICOR ) * ( 1.d0 - EXPWET ) * CFACTOR
+      AERWDEP( LNO3, ICOR )   = AEROSOL( LNO3, ICOR ) * ( 1.d0 - EXPWET ) * CFACTOR
+      AERWDEP( LCL, ICOR )    = AEROSOL( LCL, ICOR ) * ( 1.d0 - EXPWET ) * CFACTOR
 
 !...AEROSOL species, coarse mode 
 
-      AEROSOL( LNUM, COR )   = AEROSOL( LNUM, COR ) * EXPWET 
-      AEROSOL( LSOILC, COR ) = AEROSOL( LSOILC, COR ) * EXPWET
-      AEROSOL( LSEASC, COR ) = AEROSOL( LSEASC, COR ) * EXPWET
-      AEROSOL( LANTHC, COR ) = AEROSOL( LANTHC, COR ) * EXPWET
-      AEROSOL( LSO4, COR )   = AEROSOL( LSO4, COR ) * EXPWET
-      AEROSOL( LNH4, COR )   = AEROSOL( LNH4, COR ) * EXPWET
-      AEROSOL( LNO3, COR )   = AEROSOL( LNO3, COR ) * EXPWET
-      AEROSOL( LCL, COR )    = AEROSOL( LCL, COR ) * EXPWET   
+      AEROSOL( LNUM, ICOR )   = AEROSOL( LNUM, ICOR ) * EXPWET 
+      AEROSOL( LSOIL, ICOR ) = AEROSOL( LSOIL, ICOR ) * EXPWET
+      AEROSOL( LSEAS, ICOR ) = AEROSOL( LSEAS, ICOR ) * EXPWET
+      AEROSOL( LANTH, ICOR ) = AEROSOL( LANTH, ICOR ) * EXPWET
+      AEROSOL( LSO4, ICOR )   = AEROSOL( LSO4, ICOR ) * EXPWET
+      AEROSOL( LNH4, ICOR )   = AEROSOL( LNH4, ICOR ) * EXPWET
+      AEROSOL( LNO3, ICOR )   = AEROSOL( LNO3, ICOR ) * EXPWET
+      AEROSOL( LCL, ICOR )    = AEROSOL( LCL, ICOR ) * EXPWET   
 
 !...AERWDEP species, accumulation mode 
 
-!      AERWDEP( LSOA, ACC ) = AEROSOL( LSOA, ACC ) * ( 1 - EXPWET) * CFACTOR ! SOA is only impacted by wet dep process 
+!      AERWDEP( LSOA, IACC ) = AEROSOL( LSOA, IACC ) * ( 1 - EXPWET) * CFACTOR ! SOA is only impacted by wet dep process 
 !                                                                            ! and not included in the list of dynamic 
 !                                                                            ! species, VAR      
       
-      WDFECOR   = SOIL_FE_FAC * AERWDEP( LSOILC, COR ) + CORS_FE_FAC * AERWDEP( LANTHC, COR )
-      WDMNCOR   = SOIL_MN_FAC * AERWDEP( LSOILC, COR ) + CORS_MN_FAC * AERWDEP( LANTHC, COR )     
-      WDNACOR   = SEAS_NA_FAC * AERWDEP( LSEASC, COR ) + SOIL_NA_FAC * AERWDEP( LSOILC, COR )  &
-                + CORS_NA_FAC * AERWDEP( LANTHC, COR )
-      WDMGCOR   = SEAS_MG_FAC * AERWDEP( LSEASC, COR ) + SOIL_MG_FAC * AERWDEP( LSOILC, COR )  &
-                + CORS_MG_FAC * AERWDEP( LANTHC, COR )
-      WDCACOR   = SEAS_CA_FAC * AERWDEP( LSEASC, COR ) + SOIL_CA_FAC * AERWDEP( LSOILC, COR )  &
-                + CORS_CA_FAC * AERWDEP( LANTHC, COR )
-      WDKCOR    = SEAS_K_FAC  * AERWDEP( LSEASC, COR ) + SOIL_K_FAC  * AERWDEP( LSOILC, COR )  &
-                + CORS_K_FAC  * AERWDEP( LANTHC, COR )
+      WDFECOR   = SOIL_FE_FAC * AERWDEP( LSOIL, ICOR ) + CORS_FE_FAC * AERWDEP( LANTH, ICOR )
+      WDMNCOR   = SOIL_MN_FAC * AERWDEP( LSOIL, ICOR ) + CORS_MN_FAC * AERWDEP( LANTH, ICOR )     
+      WDNACOR   = SEAS_NA_FAC * AERWDEP( LSEAS, ICOR ) + SOIL_NA_FAC * AERWDEP( LSOIL, ICOR )  &
+                + CORS_NA_FAC * AERWDEP( LANTH, ICOR )
+      WDMGCOR   = SEAS_MG_FAC * AERWDEP( LSEAS, ICOR ) + SOIL_MG_FAC * AERWDEP( LSOIL, ICOR )  &
+                + CORS_MG_FAC * AERWDEP( LANTH, ICOR )
+      WDCACOR   = SEAS_CA_FAC * AERWDEP( LSEAS, ICOR ) + SOIL_CA_FAC * AERWDEP( LSOIL, ICOR )  &
+                + CORS_CA_FAC * AERWDEP( LANTH, ICOR )
+      WDKCOR    = SEAS_K_FAC  * AERWDEP( LSEAS, ICOR ) + SOIL_K_FAC  * AERWDEP( LSOIL, ICOR )  &
+                + CORS_K_FAC  * AERWDEP( LANTH, ICOR )
 
 !     For aerosol species with both accumulation mode and coarse mode components, the accumulation
 !     mode wet deposition amount is determined by subtracting the analytically determined
 !     coarse mode deposition amount from the total (accumulation+coarse mode) species wet 
 !     deposition amount       
       
-      AERWDEP( LFEACC, ACC ) = MAX( ( VAR( ind_WD_FEPLUS3 ) / FE_III / FE_SOL) - WDFECOR, 0.0d0 )
-      AERWDEP( LMNACC, ACC ) = MAX( ( VAR( ind_WD_MNPLUS2 ) / MN_II / MN_SOL) - WDMNCOR, 0.0d0 )                  
-      AERWDEP( LNA,  ACC )   = MAX( VAR( ind_WD_NAPLUS ) - WDNACOR, 0.0d0 )
-      AERWDEP( LCAACC, ACC ) = MAX( VAR( ind_WD_CAPLUS2 ) - WDCACOR, 0.0d0 )
-      AERWDEP( LMGACC, ACC ) = MAX( VAR( ind_WD_MGPLUS2 ) - WDMGCOR, 0.0d0 )
-      AERWDEP( LKACC, ACC )  = MAX( VAR( ind_WD_KPLUS ) - WDKCOR, 0.0d0 )
+      AERWDEP( LFE, IACC ) = MAX( ( VAR( ind_WD_FEPLUS3 ) / FE_III / FE_SOL) - WDFECOR, 0.0d0 )
+      AERWDEP( LMN, IACC ) = MAX( ( VAR( ind_WD_MNPLUS2 ) / MN_II / MN_SOL) - WDMNCOR, 0.0d0 )                  
+      AERWDEP( LNA, IACC )   = MAX( VAR( ind_WD_NAPLUS ) - WDNACOR, 0.0d0 )
+      AERWDEP( LCA, IACC ) = MAX( VAR( ind_WD_CAPLUS2 ) - WDCACOR, 0.0d0 )
+      AERWDEP( LMG, IACC ) = MAX( VAR( ind_WD_MGPLUS2 ) - WDMGCOR, 0.0d0 )
+      AERWDEP( LK, IACC )  = MAX( VAR( ind_WD_KPLUS ) - WDKCOR, 0.0d0 )
       
-      AERWDEP( LSO4, ACC )   = MAX( VAR( ind_WD_H2SO4 ) - AERWDEP( LSO4, COR ), 0.0d0 )
-      AERWDEP( LNH4, ACC )   = MAX( VAR( ind_WD_NH4PLUS ) - AERWDEP( LNH4, COR ), 0.0d0 )
-      AERWDEP( LNO3, ACC )   = MAX( VAR( ind_WD_NO3MIN ) - AERWDEP( LNO3, COR ), 0.0d0 )
-      AERWDEP( LCL, ACC )    = MAX( VAR( ind_WD_CLMIN ) - AERWDEP( LCL, COR ), 0.0d0 )
+      AERWDEP( LSO4, IACC )   = MAX( VAR( ind_WD_H2SO4 ) - AERWDEP( LSO4, ICOR ), 0.0d0 )
+      AERWDEP( LNH4, IACC )   = MAX( VAR( ind_WD_NH4PLUS ) - AERWDEP( LNH4, ICOR ), 0.0d0 )
+      AERWDEP( LNO3, IACC )   = MAX( VAR( ind_WD_NO3MIN ) - AERWDEP( LNO3, ICOR ), 0.0d0 )
+      AERWDEP( LCL, IACC )    = MAX( VAR( ind_WD_CLMIN ) - AERWDEP( LCL, ICOR ), 0.0d0 )
       
-      AERWDEP( LPRI, ACC )   = VAR( ind_WD_PRIACC )
-      AERWDEP( LEC, ACC )    = VAR( ind_WD_PECACC )
-      AERWDEP( LORGC, ACC )  = VAR( ind_WD_ORGC )
-      AERWDEP( LPOA, ACC )   = VAR( ind_WD_POAACC ) 
+      AERWDEP( LPRI, IACC )   = VAR( ind_WD_PRIACC )
+      AERWDEP( LEC, IACC )    = VAR( ind_WD_PECACC )
+      AERWDEP( LORGC, IACC )  = VAR( ind_WD_ORGC )
+      AERWDEP( LPOA, IACC )   = VAR( ind_WD_POAACC ) 
       
       IF(ISPC8 .gt. 0) THEN        
-         AERWDEP( LIETET, ACC ) = VAR( ind_WD_IETET )
-         AERWDEP( LIEOS, ACC )  = VAR( ind_WD_IEOS )
-         AERWDEP( LDIMER, ACC ) = VAR( ind_WD_DIMER )
-         AERWDEP( LIMGA, ACC )  = VAR( ind_WD_IMGA )
-         AERWDEP( LIMOS, ACC )  = VAR( ind_WD_IMOS )
+         AERWDEP( LIETET, IACC ) = VAR( ind_WD_IETET )
+         AERWDEP( LIEOS, IACC )  = VAR( ind_WD_IEOS )
+         AERWDEP( LDIMER, IACC ) = VAR( ind_WD_DIMER )
+         AERWDEP( LIMGA, IACC )  = VAR( ind_WD_IMGA )
+         AERWDEP( LIMOS, IACC )  = VAR( ind_WD_IMOS )
       ELSE   
-         AERWDEP( LISO3, ACC )  = VAR( ind_WD_IETET )
+         AERWDEP( LISO3, IACC )  = VAR( ind_WD_IETET )
       END IF
            
 !     For volatile species represented in the coarse mode -- make sure you are 
 !     not depositing more mass from the coarse mode than was calculated for the total
 
-      IF( AERWDEP( LNH4, COR ) .GT. VAR( ind_WD_NH4PLUS ) ) THEN
-          AERWDEP( LNH4, COR ) = ( 1.0d0 - FNH4ACC ) * VAR( ind_WD_NH4PLUS )
-          AERWDEP( LNH4, ACC ) = FNH4ACC * VAR( ind_WD_NH4PLUS )
-          AEROSOL( LNH4, COR ) = ( 1.0d0 - FNH4ACC ) * ( VAR( ind_L_NH4OH ) + &
+      IF( AERWDEP( LNH4, ICOR ) .GT. VAR( ind_WD_NH4PLUS ) ) THEN
+          AERWDEP( LNH4, ICOR ) = ( 1.0d0 - FNH4ACC ) * VAR( ind_WD_NH4PLUS )
+          AERWDEP( LNH4, IACC ) = FNH4ACC * VAR( ind_WD_NH4PLUS )
+          AEROSOL( LNH4, ICOR ) = ( 1.0d0 - FNH4ACC ) * ( VAR( ind_L_NH4OH ) + &
                                    VAR( ind_L_NH4PLUS ) ) * INVCFAC
       END IF
       
-      IF( AERWDEP( LNO3, COR ) .GT. VAR( ind_WD_NO3MIN ) ) THEN
-          AERWDEP( LNO3, COR ) = ( 1.0d0 - FNO3ACC ) * VAR( ind_WD_NO3MIN )
-          AERWDEP( LNO3, ACC ) = FNO3ACC * VAR( ind_WD_NO3MIN )
-          AEROSOL( LNO3, COR ) = ( 1.0d0 - FNO3ACC ) * ( VAR( ind_L_HNO3 ) + &
+      IF( AERWDEP( LNO3, ICOR ) .GT. VAR( ind_WD_NO3MIN ) ) THEN
+          AERWDEP( LNO3, ICOR ) = ( 1.0d0 - FNO3ACC ) * VAR( ind_WD_NO3MIN )
+          AERWDEP( LNO3, IACC ) = FNO3ACC * VAR( ind_WD_NO3MIN )
+          AEROSOL( LNO3, ICOR ) = ( 1.0d0 - FNO3ACC ) * ( VAR( ind_L_HNO3 ) + &
                                    VAR( ind_L_NO3MIN ) ) * INVCFAC
       END IF
       
-      IF( AERWDEP( LCL, COR) .GT. VAR( ind_WD_CLMIN ) ) THEN
-          AERWDEP( LCL, COR) = ( 1.0d0 - FCLACC ) * VAR( ind_WD_CLMIN )
-          AERWDEP( LCL, ACC) = FCLACC * VAR( ind_WD_CLMIN )
-          AEROSOL( LCL, COR) = ( 1.0d0 - FCLACC ) * VAR( ind_L_CLMIN ) * INVCFAC
+      IF( AERWDEP( LCL, ICOR) .GT. VAR( ind_WD_CLMIN ) ) THEN
+          AERWDEP( LCL, ICOR) = ( 1.0d0 - FCLACC ) * VAR( ind_WD_CLMIN )
+          AERWDEP( LCL, IACC) = FCLACC * VAR( ind_WD_CLMIN )
+          AEROSOL( LCL, ICOR) = ( 1.0d0 - FCLACC ) * VAR( ind_L_CLMIN ) * INVCFAC
       END IF      
         
-!...AEROSOL species, accumulation mode
+!...AEROSOL species, IACCumulation mode
            
-      AEROSOL( LPRI, ACC )  = VAR( ind_L_PRIACC ) * INVCFAC
-      AEROSOL( LEC, ACC )   = VAR( ind_L_PECACC ) * INVCFAC 
-      AEROSOL( LORGC, ACC ) = VAR( ind_L_ORGC ) * INVCFAC 
-      AEROSOL( LPOA, ACC )  = VAR( ind_L_POAACC ) * INVCFAC 
-!      AEROSOL( LSOA, ACC )  = AEROSOL( LSOA, ACC ) * EXPWET   ! SOA is only impacted by wet dep process 
+      AEROSOL( LPRI, IACC )  = VAR( ind_L_PRIACC ) * INVCFAC
+      AEROSOL( LEC, IACC )   = VAR( ind_L_PECACC ) * INVCFAC 
+      AEROSOL( LORGC, IACC ) = VAR( ind_L_ORGC ) * INVCFAC 
+      AEROSOL( LPOA, IACC )  = VAR( ind_L_POAACC ) * INVCFAC 
+!      AEROSOL( LSOA, IACC )  = AEROSOL( LSOA, IACC ) * EXPWET   ! SOA is only impacted by wet dep process 
 !                                                              ! and not included in the list of dynamic 
 !                                                              ! species, VAR             
 		       
-		       
+		     
       
-      IF( AEROSOL(LTRACER_ACC, ACC) .GT. 0.d0 ) THEN      
-         FRACTR = MIN(((TRACIinit - AEROSOL(LTRACER_AKN, AKN))*EXPWET) /  &
-	 AEROSOL( LTRACER_ACC, ACC ), 1.0D0) 
-      ELSE 
-         FRACTR = 0.d0
-      END IF
+!...Store the fraction of aitken-mode associated mass in the 
+!   bulk aerosol aqueous chemistry tracer
+      FRACAIT( : ) = 0.d0
+      IF( AEROSOL(LTRACER, IACC) .GT. 0.d0 ) &
+       FRACAIT( LTRACER )  = MIN(((TRACIinit - AEROSOL(LTRACER, IAIT))*EXPWET) /  &
+	 AEROSOL( LTRACER, IACC ), 1.0D0) 
       
-      IF( AEROSOL(LPOA, ACC) .GT. 0.d0 ) THEN      
-         FRACPOA = MIN(((POAIinit - AEROSOL(LPOA, AKN))*EXPWET) / &
-	 AEROSOL( LPOA, ACC ), 1.0D0) 
-      ELSE 
-         FRACPOA = 0.d0
-      END IF
+      IF( AEROSOL(LPOA, IACC) .GT. 0.d0 ) &
+        FRACAIT( LPOA ) = MIN(((POAIinit - AEROSOL(LPOA, IAIT))*EXPWET) / &
+	 AEROSOL( LPOA, IACC ), 1.0D0) 
       
-      IF( AEROSOL(LPRI, ACC) .GT. 0.d0 ) THEN      
-         FRACPRI = MIN(((PRIIinit - AEROSOL(LPRI, AKN))*EXPWET) / &
-	 AEROSOL( LPRI, ACC ), 1.0D0) 
-      ELSE 
-         FRACPRI = 0.d0
-      END IF
+      IF( AEROSOL(LPRI, IACC) .GT. 0.d0 ) &
+        FRACAIT( LPRI ) = MIN(((PRIIinit - AEROSOL(LPRI, IAIT))*EXPWET) / &
+	 AEROSOL( LPRI, IACC ), 1.0D0) 
       
-      IF( AEROSOL(LSOA, ACC) .GT. 0.d0 ) THEN      
-         FRACSOA = MIN(((SOAIinit - AEROSOL(LSOA, AKN))*EXPWET) / &
-	 AEROSOL( LSOA, ACC ), 1.0D0) 
-      ELSE 
-         FRACSOA = 0.d0
-      END IF
-      
+      IF( AEROSOL(LSOA, IACC) .GT. 0.d0 ) &
+       FRACAIT( LSOA ) = MIN(((SOAIinit - AEROSOL(LSOA, IAIT))*EXPWET) / &
+	 AEROSOL( LSOA, IACC ), 1.0D0)   
+     
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        
 
       IF(ISPC8 .gt. 0) THEN                                                                                               
-         AEROSOL( LIETET, ACC ) = VAR( ind_L_IETET ) * INVCFAC
-         AEROSOL( LIEOS, ACC )  = VAR( ind_L_IEOS ) * INVCFAC
-         AEROSOL( LDIMER, ACC ) = VAR( ind_L_DIMER ) * INVCFAC
-         AEROSOL( LIMGA, ACC )  = VAR( ind_L_IMGA ) * INVCFAC
-         AEROSOL( LIMOS, ACC )  = VAR( ind_L_IMOS ) * INVCFAC 
+         AEROSOL( LIETET, IACC ) = VAR( ind_L_IETET ) * INVCFAC
+         AEROSOL( LIEOS, IACC )  = VAR( ind_L_IEOS ) * INVCFAC
+         AEROSOL( LDIMER, IACC ) = VAR( ind_L_DIMER ) * INVCFAC
+         AEROSOL( LIMGA, IACC )  = VAR( ind_L_IMGA ) * INVCFAC
+         AEROSOL( LIMOS, IACC )  = VAR( ind_L_IMOS ) * INVCFAC 
       ELSE
-         AEROSOL( LISO3, ACC )  = ( VAR( ind_L_ISO3 ) ) * INVCFAC
+         AEROSOL( LISO3, IACC )  = ( VAR( ind_L_ISO3 ) ) * INVCFAC
       END IF
       
-      FECOR   = SOIL_FE_FAC * AEROSOL( LSOILC, COR ) + CORS_FE_FAC * AEROSOL( LANTHC, COR )
-      MNCOR   = SOIL_MN_FAC * AEROSOL( LSOILC, COR ) + CORS_MN_FAC * AEROSOL( LANTHC, COR )
-      NACOR   = SEAS_NA_FAC * AEROSOL( LSEASC, COR ) + SOIL_NA_FAC * AEROSOL( LSOILC, COR )  &
-              + CORS_NA_FAC * AEROSOL( LANTHC, COR )
-      MGCOR   = SEAS_MG_FAC * AEROSOL( LSEASC, COR ) + SOIL_MG_FAC * AEROSOL( LSOILC, COR)  &
-              + CORS_MG_FAC * AEROSOL( LANTHC, COR )
-      CACOR   = SEAS_CA_FAC * AEROSOL( LSEASC, COR ) + SOIL_CA_FAC * AEROSOL( LSOILC, COR)  &
-              + CORS_CA_FAC * AEROSOL( LANTHC, COR )
-      KCOR    = SEAS_K_FAC  * AEROSOL( LSEASC, COR ) + SOIL_K_FAC  * AEROSOL( LSOILC, COR )  &
-              + CORS_K_FAC  * AEROSOL( LANTHC, COR )    
+      FECOR   = SOIL_FE_FAC * AEROSOL( LSOIL, ICOR ) + CORS_FE_FAC * AEROSOL( LANTH, ICOR )
+      MNCOR   = SOIL_MN_FAC * AEROSOL( LSOIL, ICOR ) + CORS_MN_FAC * AEROSOL( LANTH, ICOR )
+      NACOR   = SEAS_NA_FAC * AEROSOL( LSEAS, ICOR ) + SOIL_NA_FAC * AEROSOL( LSOIL, ICOR )  &
+              + CORS_NA_FAC * AEROSOL( LANTH, ICOR )
+      MGCOR   = SEAS_MG_FAC * AEROSOL( LSEAS, ICOR ) + SOIL_MG_FAC * AEROSOL( LSOIL, ICOR)  &
+              + CORS_MG_FAC * AEROSOL( LANTH, ICOR )
+      CACOR   = SEAS_CA_FAC * AEROSOL( LSEAS, ICOR ) + SOIL_CA_FAC * AEROSOL( LSOIL, ICOR)  &
+              + CORS_CA_FAC * AEROSOL( LANTH, ICOR )
+      KCOR    = SEAS_K_FAC  * AEROSOL( LSEAS, ICOR ) + SOIL_K_FAC  * AEROSOL( LSOIL, ICOR )  &
+              + CORS_K_FAC  * AEROSOL( LANTH, ICOR )    
       
-      AEROSOL( LFEACC, ACC ) = MAX( ( VAR( ind_L_FEPLUS3 ) / FE_III / FE_SOL - FECOR * CFACTOR ) * & 
+      AEROSOL( LFE, IACC ) = MAX( ( VAR( ind_L_FEPLUS3 ) / FE_III / FE_SOL - FECOR * CFACTOR ) * & 
                                       INVCFAC, 0.0d0 )
-      AEROSOL( LMNACC, ACC ) = MAX( ( VAR( ind_L_MNPLUS2 ) / MN_II / MN_SOL - MNCOR * CFACTOR ) *  &
+      AEROSOL( LMN, IACC ) = MAX( ( VAR( ind_L_MNPLUS2 ) / MN_II / MN_SOL - MNCOR * CFACTOR ) *  &
                                       INVCFAC, 0.0d0 )                  
-      AEROSOL( LNA, ACC )    = MAX( ( VAR( ind_L_NAPLUS ) - NACOR * CFACTOR ) * INVCFAC, 0.0d0 )
-      AEROSOL( LCAACC, ACC ) = MAX( ( VAR( ind_L_CAPLUS2 ) - CACOR * CFACTOR ) * INVCFAC, 0.0d0 ) 
-      AEROSOL( LMGACC, ACC ) = MAX( ( VAR( ind_L_MGPLUS2 ) - MGCOR * CFACTOR ) * INVCFAC, 0.0d0 ) 
-      AEROSOL( LKACC, ACC )  = MAX( ( VAR( ind_L_KPLUS ) - KCOR * CFACTOR ) * INVCFAC, 0.0d0 ) 
+      AEROSOL( LNA, IACC )    = MAX( ( VAR( ind_L_NAPLUS ) - NACOR * CFACTOR ) * INVCFAC, 0.0d0 )
+      AEROSOL( LCA, IACC ) = MAX( ( VAR( ind_L_CAPLUS2 ) - CACOR * CFACTOR ) * INVCFAC, 0.0d0 ) 
+      AEROSOL( LMG, IACC ) = MAX( ( VAR( ind_L_MGPLUS2 ) - MGCOR * CFACTOR ) * INVCFAC, 0.0d0 ) 
+      AEROSOL( LK, IACC )  = MAX( ( VAR( ind_L_KPLUS ) - KCOR * CFACTOR ) * INVCFAC, 0.0d0 ) 
       
-      AEROSOL( LSO4, ACC ) = MAX( ( (VAR( ind_L_H2SO4 ) + VAR( ind_L_SO4MIN2 ) +    &
-                             VAR( ind_L_HSO4MIN ) ) * INVCFAC ) - AEROSOL( LSO4, COR ), 0.0d0 ) 
-      AEROSOL( LCL, ACC ) =  MAX( ( VAR( ind_L_CLMIN ) * INVCFAC ) - AEROSOL (LCL, COR ), 0.0d0 )    
+      AEROSOL( LSO4, IACC ) = MAX( ( (VAR( ind_L_H2SO4 ) + VAR( ind_L_SO4MIN2 ) +    &
+                             VAR( ind_L_HSO4MIN ) ) * INVCFAC ) - AEROSOL( LSO4, ICOR ), 0.0d0 ) 
+      AEROSOL( LCL, IACC ) =  MAX( ( VAR( ind_L_CLMIN ) * INVCFAC ) - AEROSOL (LCL, ICOR ), 0.0d0 )    
       
       TOTAMM = VAR( ind_G_NH3 ) + VAR( ind_L_NH4OH ) + VAR( ind_L_NH4PLUS ) - &
-               AEROSOL( LNH4, COR ) * CFACTOR
+               AEROSOL( LNH4, ICOR ) * CFACTOR
       TOTNIT = VAR( ind_G_HNO3 ) + VAR( ind_L_HNO3 ) + VAR( ind_L_NO3MIN ) -  &
-               AEROSOL( LNO3, COR ) * CFACTOR
+               AEROSOL( LNO3, ICOR ) * CFACTOR
 
       TOTAMM = MAX( TOTAMM, 0.0d0 )
       TOTNIT = MAX( TOTNIT, 0.0d0 )
       
-      AEROSOL( LNO3, ACC ) = ( ( 1.0d0 - FHNO3 ) * TOTNIT ) * INVCFAC
-      AEROSOL (LNH4, ACC ) = ( ( 1.0d0 - FNH3 ) * TOTAMM ) * INVCFAC            
+      AEROSOL( LNO3, IACC ) = ( ( 1.0d0 - FHNO3 ) * TOTNIT ) * INVCFAC
+      AEROSOL (LNH4, IACC ) = ( ( 1.0d0 - FNH3 ) * TOTAMM ) * INVCFAC            
 
 !...Gas phase species
 
@@ -873,13 +863,13 @@ kron: DO WHILE (T < TEND)
       END IF
       
 
-      AEROSOL(LORGC,ACC) = (VAR(ind_L_ORGC) + ((74.04/177.)*VAR(ind_L_GLYAC)) + ((90.03/177.)*VAR(ind_L_OXLAC)) &
+      AEROSOL(LORGC, IACC) = (VAR(ind_L_ORGC) + ((74.04/177.)*VAR(ind_L_GLYAC)) + ((90.03/177.)*VAR(ind_L_OXLAC)) &
       + ((90.03/177.)*VAR(ind_L_OXLACMIN)) + ((90.03/177.)*VAR(ind_L_OXLACMIN2)) + ((88.06/177.)* APYRAC ) & 
       + ((76.05/177.)*VAR(ind_L_GCOLAC)) + ((74.04/177.)*VAR(ind_L_GLYACMIN)) &
       + ((76.05/177.)*VAR(ind_L_GCOLACMIN)) &
       + (58.04/177.)*OLIGGLY*VAR(ind_L_GLY) + (72.06/177.)*OLIGMGLY*VAR(ind_L_MGLY))*INVCFAC
   
-      AERWDEP(LORGC,ACC) = VAR(ind_WD_ORGC) + ((74.04/177.)*VAR(ind_WD_GLYAC)) + &
+      AERWDEP(LORGC, IACC) = VAR(ind_WD_ORGC) + ((74.04/177.)*VAR(ind_WD_GLYAC)) + &
                           ((90.03/177.)*VAR(ind_WD_OXLAC))  + & 
                           ((88.06/177.)* WDPYRAC) + &
                           ((76.05/177.)*VAR(ind_WD_GCOLAC)) + &
@@ -888,23 +878,23 @@ kron: DO WHILE (T < TEND)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!         
 !...Convert to appropriate units (mol / m2)
      
-      DO I = 1,NGAS
+      DO I = 1,N_AQ_GAS
          GASWDEP( I ) = GASWDEP( I ) * WFACTOR
       END DO
      
-      DO J = 1, NMODES
-      DO I = 1, NAER
+      DO J = 1, n_mode
+      DO I = 1, N_AQ_AER
          AERWDEP( I, J ) = AERWDEP( I, J ) * WFACTOR
       END DO
       END DO     
      
-      DO I = 1, NGAS
+      DO I = 1, N_AQ_GAS
          IF( GAS( I ) .LT. 0.0d0 )     GAS( I ) = 0.0d0
          IF( GASWDEP( I ) .LT. 0.0d0 ) GASWDEP( I ) = 0.0d0
       END DO
      
-      DO J =1, NMODES
-      DO I =1, NAER
+      DO J =1, n_mode
+      DO I =1, N_AQ_AER
          IF( AEROSOL( I, J ) .LT. 0.d0 ) AEROSOL( I, J ) = 0.d0
          IF( AERWDEP( I, J ) .LT. 0.d0 ) AERWDEP( I, J ) = 0.d0
       END DO
@@ -914,16 +904,16 @@ kron: DO WHILE (T < TEND)
 
       HPWDEP = VAR( ind_WD_HPLUS ) * WFACTOR
       BETASO4 = 0.0D0
-      DEPSUM =  AERWDEP( LSO4, ACC ) / WFACTOR
+      DEPSUM =  AERWDEP( LSO4, IACC ) / WFACTOR
       
-      IF( AEROSOL( LSO4, ACC ) * CFACTOR + DEPSUM .GT. 0.0d0 ) THEN
-         BETASO4 = DEPSUM / ( AEROSOL( LSO4, ACC ) * CFACTOR + DEPSUM ) / &
+      IF( AEROSOL( LSO4, IACC ) * CFACTOR + DEPSUM .GT. 0.0d0 ) THEN
+         BETASO4 = DEPSUM / ( AEROSOL( LSO4, IACC ) * CFACTOR + DEPSUM ) / &
                    TAUCLD      
       ELSE
          BETASO4 = 0.d0
       END IF
       
-      AEROSOL( LNUM, ACC ) = AEROSOL( LNUM, ACC ) * EXP( -BETASO4 * TAUCLD )   
+      AEROSOL( LNUM, IACC ) = AEROSOL( LNUM, IACC ) * EXP( -BETASO4 * TAUCLD )   
 
 !...Mass balance check - end
                 
@@ -935,14 +925,14 @@ kron: DO WHILE (T < TEND)
         ENDM(3) = (GAS(LNH3)+ GASWDEP(LNH3)/WFACTOR/CFACTOR)*14.007      
         ENDM(4) = (GAS(LHCL)+GASWDEP(LHCL)/WFACTOR/CFACTOR)*35.5 
           
-        DO I = 1,NMODES
+        DO I = 1, n_mode
            ENDM(1) = ENDM(1) + AEROSOL(LSO4, I)*32.06
            ENDM(2) = ENDM(2) + AEROSOL(LNO3, I)*14.007
            ENDM(3) = ENDM(3) + AEROSOL(LNH4, I)*14.007
            ENDM(4) = ENDM(4) + AEROSOL(LCL, I)*35.5
         ENDDO 
    
-        DO I = 1,NMODES
+        DO I = 1, n_mode
            ENDM(1) = ENDM(1) + (AERWDEP(LSO4,I)/WFACTOR/CFACTOR)*32.06
            ENDM(2) = ENDM(2) + (AERWDEP(LNO3,I)/WFACTOR/CFACTOR)*14.007
            ENDM(3) = ENDM(3) + (AERWDEP(LNH4,I)/WFACTOR/CFACTOR)*14.007
