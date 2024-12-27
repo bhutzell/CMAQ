@@ -146,7 +146,8 @@ set make_options = "-j"                #> additional options for make command if
  # Special cloud modules for kmt versions
  if( ${Mechanism} == cb6r5_ae7_aqkmt2 ) then
      set ModCloud = cloud/acm_ae7_kmt2
- 
+ endif
+
  # Gas chem solver
  if ( ${Mechanism} == cb6r5m_ae7_aq ) then  #> Gas-phase chemistry solver options ($CMAQ_MODEL/CCTM/src/gas)
      setenv ChemSolver ros3                  #> ros3 (or smvgear) are system independent
