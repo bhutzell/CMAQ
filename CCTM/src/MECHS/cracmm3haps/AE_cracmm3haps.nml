@@ -58,20 +58,20 @@ AE_SPECIES_DATA =
 'AISO5'     ,150.1  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!2-hydroperoxy-3;4-dihydroxy-3-methylbutanal,L,NA,CC(O)(CO)C(OO)C=O
 'ATRPN'     ,215.0  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'AHONIT'    ,265.0  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ANI'     , 58.70   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ACR_VI'  , 52.00   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ACR_III' , 52.00   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ABE'     ,  9.00   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'APB'     ,207.20   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ADE_OTHR',200.00   ,T      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ADE_EC'  , 12.00   ,T      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ADE_OC'  ,220.00   ,T      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ADE_NO3' , 62.00   ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ADE_SO4' , 96.00   ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ADE_CORS',100.00   ,F      ,F     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ACADMIUM',112.40   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'AMN_HAPS', 54.90   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'APHG'    ,200.50   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'PHG'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'AAS'     , 74.92   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
-'ABENAPY' ,252.30   ,T      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
+'ANI'     , 58.70   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Nickel,E,DTXSID2020925,[Ni]
+'ACR_VI'  , 52.00   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Chromium Hexavalent,E,DTXSID7023982,[Cr+6]
+'ACR_III' , 52.00   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Chromium Trivalent,E,DTXSID2023981,[Cr+3]
+'ABE'     ,  9.00   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Beryllium,E,DTXSID4023913,[Be]
+'APB'     ,207.20   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Lead,E,DTXSID2024161,[Pb++]
+'ADE_OTHR',200.00   ,T      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,L,DTXSID1024043,NA
+'ADE_EC'  , 12.00   ,T      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,L,DTXSID1024043,NA
+'ADE_OC'  ,220.00   ,T      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,L,DTXSID1024043,NA
+'ADE_NO3' , 62.00   ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,L,DTXSID1024043,NA
+'ADE_SO4' , 96.00   ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,L,DTXSID1024043,NA
+'ADE_CORS',100.00   ,F      ,F     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,L,DTXSID1024043,NA
+'ACADMIUM',112.40   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Cadmium,E,DTXSID60177060,[Cd++]
+'AMN_HAPS', 54.90   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Manganese ions,L,DTXSID00167687,[Mn++]
+'APHG'    ,200.50   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'PHG'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Mercury,L,DTXSID9074933,[Hg++]
+'AAS'     , 74.92   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Arsenic,E,DTXSID4023886,[As]
+'ABENAPY' ,252.30   ,T      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Benzo[a]pyrene,E,DTXSID2020139,C1=CC=C2C(=C1)C=C1C=CC3=CC=CC4=CC=C2C1=C34
 /   

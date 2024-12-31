@@ -5,47 +5,47 @@ NR_SPECIES_DATA =
 !SPECIES         ,MOLWT   ,IC     ,IC_FAC  ,BC     ,BC_FAC ,DRYDEP SURR       ,FAC  ,WET-SCAV SURR     ,FAC ,NR2AE SURR     ,NR2AQ SURR,TRNS  ,DDEP  ,WDEP  ,CONC ,!RepCmp,ExplicitorLumped,DTXSID,SMILES
 'NH3'            , 17.0   ,''     ,-1      ,''     ,-1     ,'VD_NH3'          , 1   ,'NH3'             , 1  ,'NH3'          ,'NH3'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Ammonia,E,DTXSID0023872,N
 'HCL'            , 36.0   ,''     ,-1      ,''     ,-1     ,'VD_HCL'          , 1   ,'HCL'             , 1  ,'HCL'          ,'HCL'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrochloric acid,E,DTXSID2020711,Cl
-'HCHO_PRIM'      , 30.0   ,''     ,-1      ,''     ,-1     ,'VD_HCHO'         , 1   ,'FORMALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'CH3CHO_PRIM'    , 44.0   ,''     ,-1      ,''     ,-1     ,'VD_ACD'          , 1   ,'ACETALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'ACRO_PRIM'      , 56.1   ,''     ,-1      ,''     ,-1     ,'VD_ACRO'         , 1   ,'ACROOPERA'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,''    ,'Yes',
-'ACRY_NITRILE'   , 53.10  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'ACRYLONITRILE'   , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'CARBONTET'      ,153.80  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CARBONTETRACHLOR', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'PROPYL_DICL'    ,113.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'PROPYLENE_DICHLO', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'DICL_PROPENE'   , 99.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'13DICHLOROPROPEN', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'CL4_ETHANE'     ,167.90  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'1122-CL4ETHANE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'CHCL3'          ,119.40  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CHLOROFORM'      , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'BR2_C2_12'      ,187.90  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'12DIBROMOETHANE' , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'CL2_C2_12'      , 99.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'12DICHLOROETHANE', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'ETOX'           , 44.10  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'ETHYLENE_OXIDE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'CL2_ME'         , 84.90  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'METHYLENE_CHLORI', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'CL4_ETHE'       ,165.80  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'PERCHLOROETHYLEN', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'CL3_ETHE'       ,131.40  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'TRICHLOROETHENE' , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'CL_ETHE'        , 62.50  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'VINYL_CHLORIDE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'QUINOLINE'      ,129.20  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'QUINOLINE'       , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'HEXMETH_DIS'    ,168.20  ,''     ,-1      ,''     ,-1     ,'VD_HEXMETH_DIIS' , 1   ,'HEXAMETHYLE_DIIS', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'HYDRAZINE'      , 32.00  ,''     ,-1      ,''     ,-1     ,'VD_HYDRAZINE'    , 1   ,'HYDRAZINE'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'MAL_ANHYDRID'   , 98.00  ,''     ,-1      ,''     ,-1     ,'VD_MAL_ANHYDRIDE', 1   ,'MALEIC_ANHYDRIDE', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'TOL_DIIS'       ,174.20  ,''     ,-1      ,''     ,-1     ,'VD_TOLUENE_DIIS' , 1   ,'24-TOLUENE_DIIS' , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'TRIETHYLAMIN'   ,101.20  ,''     ,-1      ,''     ,-1     ,'VD_TRIETHYLAMINE', 1   ,'TRIETHYLAMINE'   , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'DICL_BENZENE'   ,147.00  ,''     ,-1      ,''     ,-1     ,'VD_BENZ'         , 1   ,'P_DICHLOROBENZEN', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'ACET_NITRILE'   , 41.05  ,''     ,-1      ,''     ,-1     ,'VD_ACETONITRILE' , 1   ,'ACETONITRILE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'XYLENE'         ,106.20  ,''     ,-1      ,''     ,-1     ,'VD_XYLMN'        , 1   ,'M-XYLENE'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'ACRYACID'       , 72.06  ,''     ,-1      ,''     ,-1     ,'VD_ACRYACID'     , 1   ,'ACRYACID'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'HEXANE'         , 86.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'HEXANE'          , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'METHCHLORIDE'   , 50.40  ,''     ,-1      ,''     ,-1     ,''                , 1   ,'METHCHLORIDE'    , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'CARBSULFIDE'    , 60.10  ,''     ,-1      ,''     ,-1     ,'VD_CARBSULFIDE'  , 1   ,'CARBSULFIDE'     , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'CHLOROPRENE'    , 88.50  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CHLOROPRENE'     , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'BENAPY'         ,252.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'BENAPY'          , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'HG'             ,200.6   ,''     ,-1      ,''     ,-1     ,'VD_HG'           , 1   ,'HG'              , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'HGIIGAS'        ,271.5   ,''     ,-1      ,''     ,-1     ,'VD_HGIIGAS'      , 1   ,'HGIIGAS'         , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',
-'PAH_000E0'      ,186.2   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'PAH_176E5'      ,197.7   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'PAH_880E5'      ,197.9   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'PAH_176E4'      ,254.4   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'PAH_176E3'      ,259.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'PAH_192E3'      ,278.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'PAH_101E2'      ,268.4   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'PAH_176E2'      ,302.4   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'PAH_114E1'      ,256.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',
-'HCN'            ,27.02   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'HYDROGEN_CYANIDE',1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes'
+'HCHO_PRIM'      , 30.0   ,''     ,-1      ,''     ,-1     ,'VD_HCHO'         , 1   ,'FORMALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Formaldehyde,E,DTXSID7020637,C=O
+'CH3CHO_PRIM'    , 44.0   ,''     ,-1      ,''     ,-1     ,'VD_ACD'          , 1   ,'ACETALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Acetaldehyde,E,DTXSID5039224,CC=O
+'ACRO_PRIM'      , 56.1   ,''     ,-1      ,''     ,-1     ,'VD_ACRO'         , 1   ,'ACROOPERA'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,''    ,'Yes',!Acrolein,E,DTXSID5020023,C=CC=O
+'ACRY_NITRILE'   , 53.10  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'ACRYLONITRILE'   , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Acrylonitrile,E,DTXSID5020029,C=CC#N
+'CARBONTET'      ,153.80  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CARBONTETRACHLOR', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Carbon Tetrachloride,E,DTXSID8020250,ClC(Cl)(Cl)Cl
+'PROPYL_DICL'    ,113.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'PROPYLENE_DICHLO', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Propylene Dichloride,E,DTXSID0020448,CC(Cl)CCl
+'DICL_PROPENE'   , 99.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'13DICHLOROPROPEN', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!13-Dichloropropene,E,DTXSID1022057, ClCC=CCl
+'CL4_ETHANE'     ,167.90  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'1122-CL4ETHANE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!1122-Tetrachloroethane,E,DTXSID7021318,ClC(Cl)C(Cl)Cl
+'CHCL3'          ,119.40  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CHLOROFORM'      , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Chloroform,E,DTXSID1020306, ClC(Cl)Cl
+'BR2_C2_12'      ,187.90  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'12DIBROMOETHANE' , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!12-Dibromoethane,E,DTXSID3020415,BrCCBr
+'CL2_C2_12'      , 99.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'12DICHLOROETHANE', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!12-Dichloroethane,E,DTXSID6020438,CLCCCL
+'ETOX'           , 44.10  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'ETHYLENE_OXIDE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Ethylene Oxide,E,DTXSID0020600,C1CO1
+'CL2_ME'         , 84.90  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'METHYLENE_CHLORI', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Methylene Chloride,E, DTXSID0020868,CLCCL
+'CL4_ETHE'       ,165.80  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'PERCHLOROETHYLEN', 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Perchloroethylene,E, DTXSID2021319,ClC(Cl)=C(Cl)Cl
+'CL3_ETHE'       ,131.40  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'TRICHLOROETHENE' , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Trichloroethylene,E,DTXSID0021383,ClC=C(Cl)Cl
+'CL_ETHE'        , 62.50  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'VINYL_CHLORIDE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Vinyl Chloride,E,DTXSID8021434,ClC=C
+'QUINOLINE'      ,129.20  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'QUINOLINE'       , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Quinoline,E,DTXSID1021798,C1=CC2=C(C=C1)N=CC=C2
+'HEXMETH_DIS'    ,168.20  ,''     ,-1      ,''     ,-1     ,'VD_HEXMETH_DIIS' , 1   ,'HEXAMETHYLE_DIIS', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!n-Hexane,E,DTXSID0021917,CCCCCC
+'HYDRAZINE'      , 32.00  ,''     ,-1      ,''     ,-1     ,'VD_HYDRAZINE'    , 1   ,'HYDRAZINE'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrazine,E,DTXSID3020702,NN
+'MAL_ANHYDRID'   , 98.00  ,''     ,-1      ,''     ,-1     ,'VD_MAL_ANHYDRIDE', 1   ,'MALEIC_ANHYDRIDE', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Maleic Anhydride,E,DTXSID7024166,O=C1OC(=O)C=C1
+'TOL_DIIS'       ,174.20  ,''     ,-1      ,''     ,-1     ,'VD_TOLUENE_DIIS' , 1   ,'24-TOLUENE_DIIS' , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!24-Toluene Diisocyanate,DTXSID7026156,CC1=CC=C(C=C1N=C=O)N=C=O
+'TRIETHYLAMIN'   ,101.20  ,''     ,-1      ,''     ,-1     ,'VD_TRIETHYLAMINE', 1   ,'TRIETHYLAMINE'   , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Triethylamine,E,DTXSID3024366,CCN(CC)CC
+'DICL_BENZENE'   ,147.00  ,''     ,-1      ,''     ,-1     ,'VD_BENZ'         , 1   ,'P_DICHLOROBENZEN', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!14-Dichlorobenzene,E,DTXSID1020431,ClC1=CC=C(Cl)C=C1
+'ACET_NITRILE'   , 41.05  ,''     ,-1      ,''     ,-1     ,'VD_ACETONITRILE' , 1   ,'ACETONITRILE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Acetonitrile,E,DTXSID0020868,CC#N
+'XYLENE'         ,106.20  ,''     ,-1      ,''     ,-1     ,'VD_XYLMN'        , 1   ,'M-XYLENE'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!m-xylene,L,DTXSID2021446,CC1=CC(C)=CC=C1
+'ACRYACID'       , 72.06  ,''     ,-1      ,''     ,-1     ,'VD_ACRYACID'     , 1   ,'ACRYACID'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!acrylic acid,E,DTXSID0039229, OC(=O)C=C
+'HEXANE'         , 86.00  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'HEXANE'          , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!n-Hexane,E,DTXSID0021917,CCCCCC
+'METHCHLORIDE'   , 50.40  ,''     ,-1      ,''     ,-1     ,''                , 1   ,'METHCHLORIDE'    , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Methyl Chloride,E,DTXSID0021541,CCl
+'CARBSULFIDE'    , 60.10  ,''     ,-1      ,''     ,-1     ,'VD_CARBSULFIDE'  , 1   ,'CARBSULFIDE'     , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Carbonyl Sulfide,E,DTXSID6023949,O=C=S
+'CHLOROPRENE'    , 88.50  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'CHLOROPRENE'     , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Chloroprene,E,DTXSID5020316,ClC(=C)C=C
+'BENAPY'         ,252.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'BENAPY'          , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Benzo[a]Pyrene,E,DTXSID2020139,C1=CC=C2C(=C1)C=C1C=CC3=CC=CC4=CC=C2C1=C34
+'HG'             ,200.6   ,''     ,-1      ,''     ,-1     ,'VD_HG'           , 1   ,'HG'              , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Elemental Mercury,E,DTXSID9074933,Hg
+'HGIIGAS'        ,271.5   ,''     ,-1      ,''     ,-1     ,'VD_HGIIGAS'      , 1   ,'HGIIGAS'         , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Mercuric Chloride,L,DTXSID9074933,[Hg++]
+'PAH_000E0'      ,186.2   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Naphthalene,L,DTXSID3044043,NA
+'PAH_176E5'      ,197.7   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Naphthalene,L,DTXSID3044043,NA
+'PAH_880E5'      ,197.9   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Naphthalene,L,DTXSID3044043,NA
+'PAH_176E4'      ,254.4   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Naphthalene,L,DTXSID3044043,NA
+'PAH_176E3'      ,259.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Naphthalene,L,DTXSID3044043,NA
+'PAH_192E3'      ,278.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Naphthalene,L,DTXSID3044043,NA
+'PAH_101E2'      ,268.4   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Naphthalene,L,DTXSID3044043,NA
+'PAH_176E2'      ,302.4   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Naphthalene,L,DTXSID3044043,NA
+'PAH_114E1'      ,256.3   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'NAPHTHALENE'     ,1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Naphthalene,L,DTXSID3044043,NA
+'HCN'            ,27.02   ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'HYDROGEN_CYANIDE',1.0 ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes' !Hydrogen Cyanide,E,DTXSID9024148,C#N
 /
