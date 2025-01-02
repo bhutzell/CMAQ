@@ -20,7 +20,8 @@
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE CMAQ_DRIVER ( MODEL_STDATE, MODEL_STTIME, MODEL_TSTEP,
      $                         MODEL_JDATE, MODEL_JTIME, LAST_STEP,
-     $                         COUPLE_TSTEP, NCOLS_IN, NLAYS_IN)
+     $                         COUPLE_TSTEP, NCOLS_IN, NLAYS_IN,
+     &                         MODEL_XCENT, MODEL_YCENT)
 
 C-----------------------------------------------------------------------
 C Function:
@@ -101,6 +102,7 @@ C   02 Aug 19 F. Sidi: Restored serial processing option
 C   03 AUG 19 D.Wong:  Modified code to work with two-way model
 C   09 Sep 19 F. Sidi: Replaced L_CONC_WVEL & L_ACONC_WVEL (depreciated) with W_VEL
 C   21 Nov 19 S.L.Napelenok: Include DDM3D for versions 5.3.1
+C   10 Jan 24 D. Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE RXNS_DATA             ! chemical mechanism data
@@ -128,6 +130,10 @@ C-----------------------------------------------------------------------
       use lus_defn
       use mio_module
 #else
+#ifdef twoway
+      use coupler_module, only : coupled_model_stdate, coupled_model_sttime,
+     &                           coupled_model_xcent, coupled_model_ycent
+#endif
       USE PCGRID_DEFN           ! inherits GRID_CONF
       USE AVG_CONC              ! integral average CONC
       USE PA_DEFN, Only: LIPR, LIRR  ! Process Anaylsis control and data variables
@@ -173,6 +179,7 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
       LOGICAL, INTENT( IN )  :: LAST_STEP
       INTEGER, INTENT( IN ), OPTIONAL :: COUPLE_TSTEP
       INTEGER, INTENT( IN ), OPTIONAL :: NCOLS_IN, NLAYS_IN
+      REAL,    INTENT( IN ), OPTIONAL :: MODEL_XCENT, MODEL_YCENT
 
 #ifdef mpas
       real, parameter :: cmin = 1.0E-30
@@ -344,8 +351,19 @@ C-----------------------------------------------------------------------
 #endif
 
 #ifdef twoway
+         coupled_model_stdate = MODEL_STDATE
+         coupled_model_sttime = MODEL_STTIME
+
          TSTEP( 1 ) = LOCAL_TSTEP
          TSTEP( 3 ) = SEC2TIME(MODEL_TSTEP)
+
+         IF (PRESENT (MODEL_XCENT)) THEN
+            COUPLED_MODEL_XCENT = MODEL_XCENT
+            COUPLED_MODEL_YCENT = MODEL_YCENT
+         ELSE
+            COUPLED_MODEL_XCENT = 0
+            COUPLED_MODEL_YCENT = 0
+         END IF
 #else
          TSTEP( 1 ) = MODEL_TSTEP
 #endif
@@ -679,8 +697,8 @@ C Main processing loop:
 
       DO L = 1, NLAYS
          DO C = 1, NCOLS
-            CGRID( C,1,L,1:N_GC_SPC ) = cmaq_species( c,1,l,1:N_GC_SPC )
-            CGRID( C,1,L,N_GC_SPC+2:v ) = cmaq_species( c,1,l,N_GC_SPC+1:v-1 )
+            CGRID( C,1,L,1:N_GC_SPC )   = coupler_m2a_dr_3d_data( c,1,l,1:N_GC_SPC,1 )
+            CGRID( C,1,L,N_GC_SPC+2:v ) = coupler_m2a_dr_3d_data( c,1,l,N_GC_SPC+1:v-1,1 )
          END DO
       END DO
 
