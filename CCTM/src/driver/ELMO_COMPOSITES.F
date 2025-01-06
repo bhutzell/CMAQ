@@ -27,14 +27,14 @@
  
       INTEGER, SAVE ::  N_COMPOSITES
       INTEGER, SAVE ::  N_MAX_COMPONENTS
-      INTEGER, PARAMETER ::  N_MAX_FORMULA = 300
+      INTEGER, PARAMETER ::  N_MAX_FORMULA = 1024
 
       TYPE COMPOSITE_NML
           CHARACTER(LEN = 16) :: NAME
           CHARACTER(LEN = 100) :: DESC
           CHARACTER(LEN = 16) :: CUNIT
           CHARACTER(LEN = 16) :: CMPST_TYPE
-          CHARACTER(LEN = 300) :: FORMULA
+          CHARACTER(LEN = N_MAX_FORMULA) :: FORMULA
       END TYPE COMPOSITE_NML
 
       TYPE( COMPOSITE_NML ), ALLOCATABLE, SAVE :: CMPST( : )
@@ -63,7 +63,7 @@
 
       INTEGER FUNIT
       INTEGER IOST, IW, ID
-      CHARACTER( 200 ) :: TMPLINE
+      CHARACTER( 200 ) :: TMPLINE1, TMPLINE2, TMPLINE3
       CHARACTER( 40 )  :: PNAME = 'ELMO_READ_COMPOSITES'
       INTEGER IAERO, IAER, ICOMP, IM, INDX
       INTEGER N_MAX_COMPOSITES
@@ -74,7 +74,7 @@
 
       CALL LOG_MESSAGE( LOGDEV, ' ' )
       CALL LOG_SUBHEADING( LOGDEV, 'Reading ELMO Composites '//
-     &                             'from Mechanism-Spcific Namelist')
+     &                             'from Mechanism-Specific Namelist')
 
       ! Retrieve the Name of the Mechanism-Specific Control File
       IF ( CMAQ_CHEM_CTRL .EQ. "CMAQ_CH_CTRL_NML" ) THEN
@@ -113,14 +113,14 @@
       ELSE IF ( IOST .NE. 0 ) THEN
           ! Read Error detected for COMPOSITES_INIT
           backspace( FUNIT )
-          read( FUNIT, fmt='(A)' ) tmpline
+          read( FUNIT, fmt='(A)' ) tmpline1
           XMSG = 'ERROR: There was a syntax error reading the number of '//
      &           'composite variables for use by the ELMO module. Please '//
      &           'check the format of each line for syntax errors. The '//
      &           'invalid line was likely: '
           CALL LOG_MESSAGE( LOGDEV, ' ')
           CALL LOG_MESSAGE( LOGDEV, XMSG )
-          WRITE( LOGDEV, '(8x,A)' ) TMPLINE
+          WRITE( LOGDEV, '(8x,A)' ) TMPLINE1
           CALL M3EXIT ( PNAME, 0, 0, 'CMAQ must Crash until you '//
      &                  'fix the specification.', 1 )
       END IF
@@ -150,13 +150,20 @@
       ELSE IF ( IOST .NE. 0 ) THEN
           ! Read Error for Composite Variables
           backspace( FUNIT )
-          read( FUNIT, fmt='(A)' ) tmpline
+          backspace( FUNIT )
+          backspace( FUNIT )
+          read( FUNIT, fmt='(A)' ) tmpline1
+          read( FUNIT, fmt='(A)' ) tmpline2
+          read( FUNIT, fmt='(A)' ) tmpline3
           XMSG = 'ERROR: There was a syntax error reading Composite '//
      &           'Variables for output by the ELMO module. Please check the format of '//
-     &           'each line for syntax errors. The invalid line was likely: '
+     &           'each line for syntax errors. The invalid line was likely the last '//
+     &           'of this selection: '
           CALL LOG_MESSAGE( LOGDEV, ' ')
           CALL LOG_MESSAGE( LOGDEV, XMSG )
-          WRITE( LOGDEV, '(8x,A)' ) TMPLINE
+          WRITE( LOGDEV, '(8x,A)' ) TMPLINE1
+          WRITE( LOGDEV, '(8x,A)' ) TMPLINE2
+          WRITE( LOGDEV, '(8x,A)' ) TMPLINE3
           CALL M3EXIT ( 'DESID_READ_NAMELIST', 0, 0, 'CMAQ must Crash until you '//
      &                  'fix the Composite Variable Specification.', 1 )
       END IF
@@ -178,7 +185,7 @@
          IF ( INDX .NE. 0 ) THEN
             XMSG = 'The name of a Composite: ' // TRIM( CMPST(ICOMP)%NAME ) //
      &             ' is the same as a gas or particle species in CGRID. This is ' //
-     &             'not allowed. Either delte this Composite or rename it.'
+     &             'not allowed. Either delete this Composite or rename it.'
             CALL M3EXIT ( 'DESID_READ_NAMELIST', 0, 0, XMSG, 1 ) 
          END IF
       END DO
@@ -618,7 +625,7 @@
 
       FORMULA = CMPST( ICMP )%FORMULA
 
-      !CALL LOG_MESSAGE( LOGDEV, '      Formula: '//FORMULA)
+      !WRITE( LOGDEV, '(6x,A)' )'Formula: '//FORMULA
 
       COMPS( 1:N_MAX_COMPONENTS ) = ''
       COEFFS( 1:N_MAX_COMPONENTS ) = 1.0
@@ -709,6 +716,7 @@
       CHARACTER( LEN=MX ) :: F
       LOGICAL LNEG
       REAL COEF
+      CHARACTER( 16 ), SAVE :: PNAME = 'ELMO_GETREAL'
       CHARACTER( 300 ) XMSG
             
       INTEGER ICHR, LENGTH, NOSIGNS
@@ -752,8 +760,8 @@
               ! Too many exponents
               XMSG = 'Too many exponents have been used to specify '//
      &               'a coefficient in an ELMO Composite formula. '//
-     &               'The formaula is: '//TRIM(F)
-              CALL M3EXIT( 'ELMO_GETREAL',0,0,XMSG,XSTAT1 )
+     &               'The formula is: '//TRIM(F)
+              CALL M3EXIT( PNAME,0,0,XMSG,XSTAT1 )
            ELSE
               LEXP = .TRUE.
               LENGTH = LENGTH + 1 
@@ -764,10 +772,10 @@
         ELSE IF ( CHR .EQ. '+' .OR. CHR .EQ. '-' ) THEN
            IF ( LSIGN ) THEN
               ! Too many signs
-              XMSG = 'Too many sings have been used to specify '//
+              XMSG = 'Too many signs have been used to specify '//
      &               'a coefficient in an ELMO Composite formula. '//
-     &               'The formaula is: '//TRIM(F)
-              CALL M3EXIT( 'ELMO_GETREAL',0,0,XMSG,XSTAT1 )
+     &               'The formula is: '//TRIM(F)
+              CALL M3EXIT( PNAME,0,0,XMSG,XSTAT1 )
            ELSE
               LSIGN = .TRUE.
               LENGTH = LENGTH + 1 
@@ -803,7 +811,7 @@
      &       'exceeded the allowed length specified by N_MAX_FORMULA. '//
      &       'The formula is: '//TRIM(F)
 
-      CALL M3EXIT( 'ELMO_GETREAL',0,0,XMSG,XSTAT1 )
+      CALL M3EXIT( PNAME,0,0,XMSG,XSTAT1 )
 
       END SUBROUTINE ELMO_GETREAL          
        

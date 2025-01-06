@@ -55,8 +55,8 @@
 !------------------------------------------------------------------------------!
 &ELMO_INIT
   N_Files = 5
-  N_Max_Output_Variables = 40
-  N_Keywords = 46
+  N_Max_Output_Variables = 50
+  N_Keywords = 48
   N_Max_Keyword_Variables = 50
 /
 
@@ -72,8 +72,8 @@
   File_Vars(1,:) = 'DEFAULT'
   File_Vars(2,:) = 'DEFAULT'
   File_Vars(3,:) = 'DEFAULT_DEP'
-  File_Vars(4,:) = 'ALL_CONC','RH','TA','PRES'
-  File_Vars(5,:) = 'ALL_CONC','RH','TA','PRES'
+  File_Vars(4,:) = 'ALL_CONC','RH','TA','PRES','WVEL'
+  File_Vars(5,:) = 'ALL_CONC','RH','TA','PRES','WVEL'
 
 
  !
@@ -125,7 +125,8 @@
   Keywd_name(10) = 'FINE_SPECIES'
   Keywd(10,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC','PMF_OC','PMF_OA',
                'PMF_H2O','PMF_RCSOIL','PMF_OTHWNC','PMF_OTH','PMF_HP','PMF_HPMOLAL',
-               'PMF_PH','FINE_ORG','PMF','TSP_NO3_PPM'
+               'PMF_PH','FINE_ORG','PMF','TSP_NO3_PPM','PMF_FE','PMF_SI','PMF_TI','PMF_CA',
+               'PMF_MG','PMF_MN','PMF_AL','PMF_K'
 
   Keywd_name(11) = 'COARSE_SPECIES'
   Keywd(11,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA','PMC_CL'

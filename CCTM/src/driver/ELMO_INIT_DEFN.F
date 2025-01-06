@@ -358,7 +358,7 @@
             ELMO_FILE( IFL )%STRUCT     = 1
         ELSE
             WRITE( XMSG, "(A,I3.3,A)"),
-     &             'An ELMO file may only be gridded or unsctructured.  '//
+     &             'An ELMO file may only be gridded or unstructured.  '//
      &             'Please revise the value of Ftype(',IFL,') in ELMO_FILE.'
             CALL M3EXIT ( PNAME, 0, 0, XMSG, 1 ) 
         END IF

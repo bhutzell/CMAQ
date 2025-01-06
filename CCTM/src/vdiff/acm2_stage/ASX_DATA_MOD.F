@@ -77,6 +77,7 @@ C-------------------------------------------------------------------------------
       Use LSM_MOD             ! Land surface data
       use centralized_io_module
       USE CONST
+      Use WVEL_DEFN
 
       Implicit None
 
@@ -140,6 +141,7 @@ C-------------------------------------------------------------------------------
          Real,    Allocatable :: RJACM    ( :,:,: )  ! reciprocal mid-layer Jacobian
          Real,    Allocatable :: RJACF    ( :,:,: )  ! reciprocal full-layer Jacobian
          Real,    Allocatable :: RRHOJ    ( :,:,: )  ! reciprocal density X Jacobian
+         Real,    Allocatable :: WVEL     ( :,:,: )  ! vertical velocity
       End Type MET_Type
       
       Type :: GRID_Type
@@ -347,6 +349,7 @@ C-----------------------------------------------------------------------
      &             Met_Data%RJACM    ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%RJACF    ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%RRHOJ    ( NCOLS,NROWS,NLAYS ),
+     &             Met_Data%WVEL     ( NCOLS,NROWS,NLAYS ),
      &             STAT = ALLOCSTAT )
          If ( ALLOCSTAT .Ne. 0 ) Then
             XMSG = 'Failure allocating met vars'
@@ -641,11 +644,35 @@ C-------------------------------- MET_CRO_3D --------------------------------
 
          call interpolate_var ('JACOBM', jdate, jtime, Met_Data%RJACM)
      
-         Met_Data%RJACM = 1.0 / Met_Data%RJACM
-
          call interpolate_var ('JACOBF', jdate, jtime, Met_Data%RJACF)
 
-         Met_Data%RJACF = 1.0 / Met_Data%RJACF
+         ! Calculate Vertical Velocity
+         ! RJACM and RJACF are not yet reciprocals. They are the actual
+         ! Jacobians.
+         IF ( W_VEL ) THEN
+            DO L = 1,NLAYS
+               IF ( JACOBF_AVAIL ) THEN
+                  Met_Data%WVEL( :,:,L ) = MSFX2( :,: ) * WY( L,:,: ) * Met_Data%RJACF( :,:,L )
+               ELSE
+                  If ( L .LT. NLAYS ) THEN
+                     Met_Data%WVEL( :,:,L ) = MSFX2( :,: ) * WY( L,:,: ) * 0.5 *
+     &                                         ( Met_Data%RJACM(:,:,L) +
+     &                                           Met_Data%RJACM(:,:,L+1) )
+                  ELSE
+                     Met_Data%WVEL( :,:,L ) = MSFX2( :,: ) * WY( L,:,: ) * 0.4 *
+     &                                         ( Met_Data%RJACF(:,:,L-1)+
+     &                                           Met_Data%RJACM(:,:,L)   )
+                  END IF
+               END IF
+            END DO
+         ELSE
+            Met_Data%WVEL = 0.0
+         END IF
+         
+         ! Now convert RJACM and RJACF to reciprocals 
+         Met_Data%RJACM = 1.0 / Met_Data%RJACM
+         Met_Data%RJACF = 1.0 / Met_Data%RJACF 
+
 
          call interpolate_var ('DENSA_J', jdate, jtime, Met_Data%RRHOJ)
 
@@ -796,7 +823,6 @@ C Met_cro_2D variables that have recently changed due to MCIP or WRF/CMAQ
      &                                 ( MET_DATA%TA - 273.15 + 243.04 ) ) )
          MET_DATA%RH = MIN( 0.9999, MAX( 0.001, MET_DATA%RH ) )
  
-
 
 C-------------------------------- MET_DOT_3D --------------------------------
          call interpolate_var (vname_uc, jdate, jtime, Met_Data%UWIND)

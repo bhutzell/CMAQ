@@ -162,18 +162,19 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_PRECIP =      88
       INTEGER, PARAMETER :: ID_WSPD10 =      89
       INTEGER, PARAMETER :: ID_WDIR10 =      90
-      INTEGER, PARAMETER :: ID_DD_OA =       91
-      INTEGER, PARAMETER :: ID_WD_OA =       92
-      INTEGER, PARAMETER :: ID_DD_OC =       93
-      INTEGER, PARAMETER :: ID_WD_OC =       94
-      INTEGER, PARAMETER :: ID_DD_POA =      95
-      INTEGER, PARAMETER :: ID_WD_POA =      96
-      INTEGER, PARAMETER :: ID_DD_POC =      97
-      INTEGER, PARAMETER :: ID_WD_POC =      98
-      INTEGER, PARAMETER :: ID_DD_SOA =      99
-      INTEGER, PARAMETER :: ID_WD_SOA =     100
-      INTEGER, PARAMETER :: ID_DD_SOC =     101
-      INTEGER, PARAMETER :: ID_WD_SOC =     102
+      INTEGER, PARAMETER :: ID_WVEL   =      91
+      INTEGER, PARAMETER :: ID_DD_OA =       92
+      INTEGER, PARAMETER :: ID_WD_OA =       93
+      INTEGER, PARAMETER :: ID_DD_OC =       94
+      INTEGER, PARAMETER :: ID_WD_OC =       95
+      INTEGER, PARAMETER :: ID_DD_POA =      96
+      INTEGER, PARAMETER :: ID_WD_POA =      97
+      INTEGER, PARAMETER :: ID_DD_POC =      98
+      INTEGER, PARAMETER :: ID_WD_POC =      99
+      INTEGER, PARAMETER :: ID_DD_SOA =     100
+      INTEGER, PARAMETER :: ID_WD_SOA =     101
+      INTEGER, PARAMETER :: ID_DD_SOC =     102
+      INTEGER, PARAMETER :: ID_WD_SOC =     103
 
 
 
@@ -186,7 +187,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
 
-      INTEGER, PARAMETER :: N_ELMO_LIST = 102
+      INTEGER, PARAMETER :: N_ELMO_LIST = 103
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
 
@@ -294,6 +295,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'PRECIP       ',ID_PRECIP,     ET_MET,      F, 'cm    ', 'Precipitation' ),
      &ELDTP( 'WSPD10       ',ID_WSPD10,     ET_MET,      F, 'm s-1 ', 'Wind Speed at 10 m' ),
      &ELDTP( 'WDIR10       ',ID_WDIR10,     ET_MET,      F, 'deg   ', 'Wind Direction at 10 m' ),
+     &ELDTP( 'WVEL         ',ID_WVEL,       ET_MET,      F, 'm s-1 ', 'Vertical Wind Velocity' ),
      &ELDTP( 'GAMMA_N2O5   ',ID_GN2O5F,     ET_CHEM,     F, '1     ', 'Fine Mode N2O5 Heterogeneous rxn probability' ),
      &ELDTP( 'GAMMA_N2O5K  ',ID_GN2O5C,     ET_CHEM,     F, '1     ', 'Coarse Mode N2O5 Heterogeneous rxn probability' ),
      &ELDTP( 'YIELD_CLNO2  ',ID_YCLNO2F,    ET_CHEM,     F, '1     ', 'Fine Mode CLNO2 Heterogeneous reaction yield' ),
@@ -312,7 +314,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      
 
       TYPE ELMO_KEY_TYPE
-          CHARACTER( 32 )             :: WORD    ! Keyword for selecting mulitple ELMO parameters
+          CHARACTER( 32 )             :: WORD    ! Keyword for selecting multiple ELMO parameters
           INTEGER                     :: N       ! Number of Parameters associated with the Keyword
           CHARACTER( 32 ),ALLOCATABLE :: LIST(:) ! List of parameters
       END TYPE ELMO_KEY_TYPE
@@ -325,7 +327,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       TYPE ELMO_FILE_TYPE
           CHARACTER(300)              :: FILENAME     ! Filename with full path
           CHARACTER(50)               :: SHORTNAME    ! ELMO[N]_[Flabel]
-          INTEGER                     :: STRUCT       ! 0 = gridded, 1 = unstrcutured
+          INTEGER                     :: STRUCT       ! 0 = gridded, 1 = unstructured
           CHARACTER( 16)              :: FLOGICAL     ! I/O Logical Name for each output file
           INTEGER                     :: TSTEP        ! Output Time Step (HHMMSS)
           INTEGER                     :: TMODE        ! 0 = Instantaneous, 1 = Average/Cumulative
@@ -333,7 +335,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
           INTEGER                     :: LAY_TOP      ! Top Layer
           INTEGER                     :: NLAYS        ! Number of Layers
           INTEGER                     :: N_VARS_IN    ! Number of variables for this file 
-                                                      !   specified thorugh the interface
+                                                      !   specified through the interface
           CHARACTER(32), ALLOCATABLE  :: VARS_IN(:)   ! Variables on each output file
           INTEGER                     :: N_VARS       ! Number of Variables after processing
           INTEGER, ALLOCATABLE        :: TABID(:)     ! ID of Variable on ELMO_TABLE
@@ -642,7 +644,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !     This subroutine maps user input from the CMAQ_Control namelist to
 !     the ELMO_TABLE to define which variables should be output. It
 !     expands Keywords, maps to concentrations, deposition fluxes, and
-!     families, with expansion for families if reuqested (using a * in
+!     families, with expansion for families if requested (using a * in
 !     front of the family name).
 !-------------------------------------------------------------------------
 
@@ -695,7 +697,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          I3 = INDEX1( VARS_NML(1), N_ELMO_TABLE, ELMO_TABLE%OUT_NAME )
 
          IF ( VARS_NML(1) .EQ. 'ALL' ) THEN
-            ! Add All ELMO_TABLE variables to the Instaneous File
+            ! Add All ELMO_TABLE variables to the File
             L_ELMO_TABLE( : ) = .TRUE.
 
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_CONC' ) THEN
@@ -763,35 +765,35 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             END DO
           
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_DDM_DDEP' ) THEN
-            ! Activate all DDM Dry Depostion Fluxes
+            ! Activate all DDM Dry Deposition Fluxes
             DO IT = 1,N_ELMO_TABLE
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_DDM_DDEP )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
          
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_AEROPROP' ) THEN
-            ! Activate all DDM Dry Depostion Fluxes
+            ! Activate all Aerosol Properties
             DO IT = 1,N_ELMO_TABLE
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_AEROPROP )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
          
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_CHEM' ) THEN
-            ! Activate all DDM Dry Depostion Fluxes
+            ! Activate all Available Chemistry Parameters
             DO IT = 1,N_ELMO_TABLE
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_CHEM )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
          
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_MET' ) THEN
-            ! Activate all DDM Dry Depostion Fluxes
+            ! Activate all Meteorological Variables
             DO IT = 1,N_ELMO_TABLE
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_MET )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
          
          ELSE IF ( VARS_NML(1) .EQ. 'ALL_PHOT' ) THEN
-            ! Activate all DDM Dry Depostion Fluxes
+            ! Activate all Photolysis Variables
             DO IT = 1,N_ELMO_TABLE
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_PHOT )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
@@ -875,22 +877,33 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          N_END = N_END - 1
       END DO
 
+      ! Check if any dry deposition variable has been requested
+      L_ELMO_DDEP = .FALSE.
       DO IVAR = 1,N_ELMO_TABLE
          IV = ELMO_TABLE( IVAR )%VAR_TYPE
          IF ( IV .EQ. ET_DDEP .OR. IV .EQ. ET_ISAM_DDEP .OR.
      &        IV .EQ. ET_DDM_DDEP .OR. IV .EQ. ET_CMPST_DEP .OR.
      &        IV .EQ. ET_ISAM_CMPST_DEP .OR. IV .EQ. ET_DDM_CMPST_DEP .OR.
      &        IV .EQ. ET_DRVD_DDEP .OR. IV .EQ. ET_ISAM_DRVD_DDEP .OR.
-     &        IV .EQ. ET_DDM_DRVD_DDEP ) 
-     &                                    L_ELMO_DDEP = .TRUE.
+     &        IV .EQ. ET_DDM_DRVD_DDEP ) THEN
+         
+              L_ELMO_DDEP = .TRUE.
+              EXIT
+         END IF
+      END DO
 
+      ! Check if any wet deposition variable has been requested
+      L_ELMO_WDEP = .FALSE.
+      DO IVAR = 1,N_ELMO_TABLE
          IF ( IV .EQ. ET_WDEP .OR. IV .EQ. ET_ISAM_WDEP .OR.
      &        IV .EQ. ET_DDM_WDEP .OR. IV .EQ. ET_CMPST_DEP .OR.
      &        IV .EQ. ET_ISAM_CMPST_DEP .OR. IV .EQ. ET_DDM_CMPST_DEP .OR.
      &        IV .EQ. ET_DRVD_WDEP .OR. IV .EQ. ET_ISAM_DRVD_WDEP .OR.
-     &        IV .EQ. ET_DDM_DRVD_WDEP ) 
-     &                                    L_ELMO_WDEP = .TRUE.
-
+     &        IV .EQ. ET_DDM_DRVD_WDEP ) THEN
+         
+              L_ELMO_WDEP = .TRUE.
+              EXIT
+         END IF
       END DO
 
       END SUBROUTINE MAP_ELMO_NML    
@@ -991,6 +1004,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       REAL,    INTENT( IN )  :: D         ! Data to be converted 
 
       INTEGER :: SPC_UNIT
+      CHARACTER(16) :: PNAME = 'ELMO_UNIT_CONV'
       CHARACTER(200) :: XMSG
 
       ! Determine Unit Conversion Factors
@@ -1007,7 +1021,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         XMSG = 'ELMO is attempting to convert variable ' // 
      &       TRIM( ELMO_TABLE( J )%NAME ) // ' from '//
      &       'units but the MW is equal to 0.0'
-        CALL M3WARN( 'COMP_UNIT_CONVERSION', 0, 0, XMSG )
+        CALL M3WARN( PNAME, 0, 0, XMSG )
       END IF
 
       ! Calculate Unit Conversions
@@ -1024,7 +1038,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
      &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+              CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
           END SELECT 
 
 
@@ -1040,7 +1054,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
      &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+              CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
           END SELECT 
  
         CASE ( IU_UMOLpM3 ) ! umol m-3 out
@@ -1054,7 +1068,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
      &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+              CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
           END SELECT 
  
         CASE ( IU_NGpM3 ) ! ng m-3 out
@@ -1069,7 +1083,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
      &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+              CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
           END SELECT 
 
         CASE ( IU_PPBV ) ! ppbV out
@@ -1084,7 +1098,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
      &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+              CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
           END SELECT 
  
         CASE ( IU_PPMC ) ! ppmC out
@@ -1099,7 +1113,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
      &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+              CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
           END SELECT 
  
         CASE ( IU_KGNpHA ) ! kgN ha-1 out
@@ -1111,7 +1125,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
      &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+              CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
           END SELECT 
  
         CASE ( IU_KGSpHA ) ! kgS ha-1 out
@@ -1123,7 +1137,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &           TRIM( ELMO_TABLE( J )%NAME ) // ' from '// 
      &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but it does not know to do it. No conversion is applied.'
-              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+              CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
           END SELECT 
  
 
@@ -1133,8 +1147,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &           TRIM(CUNIT( SPC_UNIT )) // ' to ' // TRIM(CUNIT( OUT_UNIT )) //
      &           ' but cannot complete it because '//TRIM(CUNIT( OUT_UNIT ))//
      &           ' is not a supported option in ELMO. Please add it to '//
-     &           'COMP_UNIT_CONVERSION.'
-              CALL M3EXIT( 'COMP_UNIT_CONVERSION', 0, 0, XMSG, 1 )
+     &           'ELMO_UNIT_CONV.'
+              CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
  
       END SELECT 
  

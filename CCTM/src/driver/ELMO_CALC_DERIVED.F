@@ -736,6 +736,10 @@
          CASE ( ID_WDIR10 )
             OUTVAL = WDIR10
 
+         ! Retrieve Vertical Wind Velocity
+         CASE ( ID_WVEL )
+            OUTVAL = MET_DATA%WVEL( C1,R1,L1 )
+
          ! Retrieve DZ
          CASE ( ID_DZ )
             IF ( L1 .EQ. 1 ) THEN

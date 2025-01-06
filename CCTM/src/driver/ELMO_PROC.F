@@ -62,6 +62,7 @@
      &                                  wdir10_avail
       Use phot_mod, Only: init_phot_shared
       Use ASX_DATA_MOD, Only : GET_MET, MET_DATA
+      Use WVEL_DEFN
 
 #ifdef isam
       USE SA_DEFN, ONLY : NTAG_SA, ISAM, NSPC_SA

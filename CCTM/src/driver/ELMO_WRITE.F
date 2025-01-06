@@ -45,12 +45,11 @@
 
       CHARACTER( 16 ), SAVE :: PNAME = 'WRITE_ELMO'
 
-C *** If IO Proceesor, then Write Data
       DO IFL = 1,N_ELMO_FILES
         SELECT CASE ( ELMO_FILE( IFL )%TMODE )
 
         CASE ( 0 )
-          ! *** Write data to the instantaneous output file.
+          ! *** Write data to an instantaneous output file.
 #ifndef mpas
           MDATE = JDATE
           MTIME = JTIME
@@ -69,7 +68,7 @@ C *** If IO Proceesor, then Write Data
 
 #endif
         CASE ( 1 )
-          ! *** Write data to the average aerosol diagnostic file.
+          ! *** Write data to a time-averaged output file.
           IF ( .NOT.INIT_TIME ) THEN
 #ifndef mpas
             MDATE = JDATE
