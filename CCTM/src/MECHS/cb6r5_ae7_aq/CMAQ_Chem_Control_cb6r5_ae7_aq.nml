@@ -1078,13 +1078,17 @@ CMPST =
                 'WD_ASO4 + 1.5*WD_SO2',
 
 !-- Total Chloride --!
+'DD_TCL'      , 'Dry Dep of Total Chloride', 
+                'kg ha-1', 'DEP', 
+                'DD_CL + 0.4352*DD_CLNO2 + 0.36377*DD_CLNO3',
+
 'WD_TCL'      , 'Wet Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
                 '0.972*WD_HCL + WD_CL2 + WD_ACL - WD_ACLI + 0.6758*WD_HOCL + 0.4352*WD_CLNO2 + 0.36377*WD_CLNO3',
 
 'TD_TCL'      , 'Total Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
-                'WD_TCL + DD_CL',
+                'DD_TCL + WD_TCL',
 
 
 !-----------------------------!
@@ -1106,7 +1110,7 @@ CMPST =
 
 'WD_OXN_TNO3' , 'Wet Dep of Oxidized Nitrogen from Nitrate', 
                 'kgN ha-1', 'DEP', 
-                '0.22222*WD_HNO3 + 0.22581*WD_ANO3 + 0.22581*WD_NO3',
+                '0.22222*WD_HNO3 + 0.22581*WD_ANO3 + 0.22581*WD_NO3 + 0.6362*WD_CLNO3',
 
 'DD_OXN_PANT' , 'Dry Dep of Oxidized Nitrogen from PAN', 
                 'kgN ha-1', 'DEP', 

@@ -6,7 +6,7 @@
       CHARACTER( 90 ) :: HEADER_TXT( 200 )
       INTEGER         :: N_TXT
 
-      N_TXT = 21
+      N_TXT = 39
       HEADER_TXT( : ) = ''
 
       HEADER_TXT( 1:N_TXT ) = (/   
@@ -30,7 +30,25 @@
      &   '#|         Environment, University of North Carolina at Chapel Hill.            |#', 
      &   '#|         CMAS URL: (https://www.cmascenter.org)                               |#', 
      &   '#|                                                                              |#', 
-     &   '#================================================================================#'  
+     &   '#================================================================================#',  
+     &   '                                                                                  ',
+     &   '                                                                                  ',
+     &   '  ====================                                                            ',
+     &   '  |>--- Contents ---<|                                                            ',
+     &   '  ====================                                                            ',
+     &   '  Use these headings to jump to specific log output of interest.                  ',
+     &   '   * INITIALIZE GRID                                                              ',
+     &   '   * INITIALIZE CHEMICAL SPECIES                                                  ',
+     &   '   * INITIALIZE DESID EMISSION MODULE                                             ',
+     &   '       - ERROR CHECK EMISSION MAPPING CONFIGURATION                               ',
+     &   '       - DESID EMISSION SCALING REPORT                                            ',
+     &   '       - DESID EMISSION DIAGNOSTIC CONFIGURATION                                  ',
+     &   '   * INITIALIZE ELMO MODULE                                                       ',
+     &   '       - ELMO COMPOSITE LIST                                                      ',
+     &   '       - ELMO OUTPUT VARIABLE REPORT                                              ',
+     &   '   * BEGIN TIME-DEPENDENT MODEL CALCULATIONS                                      ',
+     &   '                                                                                  ',
+     &   '                                                                                  '
      &      /)
 
        end subroutine LOAD_HEADER 

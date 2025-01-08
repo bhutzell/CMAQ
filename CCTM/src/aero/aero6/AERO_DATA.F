@@ -1016,7 +1016,6 @@ C Build mapping to CGRID for each species in the master AeroList
             End If
          End Do
       End Do
-      Write(logdev,*)' '
 
       ! Migrate all of the user-requested aerosols from AeroList to
       ! AeroSpc. Begin by allocating all of the new arrays now that we
@@ -1093,7 +1092,6 @@ C Build mapping to CGRID for each species in the master AeroList
          End Do
 
       End Do
-      Write(logdev,*)' '
 
 C Build mapping to CGRID for aero # and surf area variables
       aeronum_map = 0

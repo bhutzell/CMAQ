@@ -104,7 +104,7 @@
       IF ( FIRSTIME ) THEN
           FIRSTIME = .FALSE.
           ! Initialize Number of Steps Used for Calculating Average
-          ELMO_NSTEP = 0.
+          ELMO_NSTEP = 0
 
           ALLOCATE( PVS( NCOLS, NROWS, NLAYS ),
      &              WDIR10S( NCOLS,NROWS ) ) 
@@ -138,7 +138,7 @@
       INIT_TIME = INIT_TIME_IN
       WRITE_STEP = .FALSE.
       INIT_STEP  = .FALSE.
-      IF ( ELMO_NSTEP .LT. 1.0 ) THEN
+      IF ( ELMO_NSTEP .LT. 1 ) THEN
          WSTEP = 0
          INIT_STEP = .TRUE.
       ELSE
@@ -146,7 +146,7 @@
          IF ( WSTEP .GE. TIME2SEC( TSTEP( 1 ) ) )
      &        WRITE_STEP = .TRUE.
       END IF
-      ELMO_NSTEP = ELMO_NSTEP + 1.0
+      ELMO_NSTEP = ELMO_NSTEP + 1
 
       ! Get Meteorological Variables
       CALL GET_MET( JDATE, JTIME, TSTEP(2) )
@@ -170,10 +170,10 @@
       CALL HETCHEM_RATES( MET_DATA%TA, MET_DATA%PRES, MET_DATA%QV,
      &                    CGRID, MET_DATA%DENS )
 
-      ! Process PM Diagnostics for Base Model
-      DO C = 1,NCOLS
-      DO R = 1,NROWS
+      ! Loop over grid cells to process ELMO output
       DO L = 1,NLAYS
+      DO R = 1,NROWS
+      DO C = 1,NCOLS
          ! Grid cell meteorological data.
          AIRTEMP  = MET_DATA%TA   ( C,R,L )
          SRFTEMP  = MET_DATA%TEMP2( C,R )     ! 2-meter temperature (K)
@@ -330,7 +330,7 @@
              !     using trapezoidal rule
              OL = L - ELMO_FILE( IFL )%LAY_BOT + 1
              DIVFAC = 1.0
-             IF ( WRITE_STEP ) DIVFAC = 0.5 / ( ELMO_NSTEP - 1.0 )
+             IF ( WRITE_STEP ) DIVFAC = 0.5 / FLOAT( ELMO_NSTEP - 1 )
 
              DO  IVAR = 1,ELMO_FILE( IFL )%N_VARS
                 J   = ELMO_FILE( IFL )%TABID( IVAR )
@@ -354,7 +354,7 @@
                    ELSE IF ( WRITE_STEP ) THEN
                        ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = DIVFAC * 
      &                          ( ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) 
-     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) ) - ELMO_OUT(IFL)%DATA( C,R,OL,IVAR )
+     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) - ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) )
                    ELSE 
                        ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) =
      &                          ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) 

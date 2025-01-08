@@ -105,7 +105,8 @@ C-----------------------------------------------------------------------
 #endif
 
 #ifdef isam
-      USE SA_DEFN, Only: ITAG, N_SPCTAG, VNAM_SPCTAG, SA_DDEP, SA_BIDI, ISAM, NTAG_SA, 
+      USE SA_DEFN, Only: ITAG, N_SPCTAG, VNAM_SPCTAG, SA_DDEP, SA_DDEP0, 
+     &                   SA_BIDI, ISAM, NTAG_SA, 
      &                   S_SPCTAG, T_SPCTAG, NSPC_SA, ISAM_SPEC, OTHRTAG
       USE ELMO_DATA, ONLY : ELMO_ISAM_DDEP
 #endif
@@ -314,12 +315,14 @@ C Allocate and initialize emissions
          END IF
 
 #ifdef isam
-         ALLOCATE ( SA_DDEP( NCOLS,NROWS,N_SPCTAG ), STAT = ASTAT )
+         ALLOCATE ( SA_DDEP( NCOLS,NROWS,N_SPCTAG ),
+     &              SA_DDEP0(NCOLS,NROWS,N_SPCTAG ), STAT = ASTAT )
          IF ( ASTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating SA_DDEP'
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
          SA_DDEP = 0.0
+         SA_DDEP0= 0.0
 #endif
 
 C Set up for budget accumulation and process analysis
@@ -547,7 +550,16 @@ C EDDYV returned = Kz, where Kz is in m**2/sec
 C Store Deposition Change in Budget and Process Analysis Arrays
 
 #ifndef mpas
-      IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO) DDEP0 = DDEP
+      IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO) THEN
+          DDEP0 = DDEP
+#ifdef isam
+          IF ( L_ELMO ) SA_DDEP0 = SA_DDEP
+#endif
+#ifdef sens
+          IF ( L_ELMO ) S_DDEP0 = S_DDEP
+#endif         
+
+      END IF
 #endif
 
 C Calculate the change in concentration and dry dep from vertical diffusion and vsed
@@ -600,10 +612,28 @@ C Store Deposition Change in Budget and Process Analysis Arrays
             ! Pass Dry Deposition Rates to ELMO
             IF ( L_ELMO ) THEN
                ELMO_DDEP(:,:,MAP_DDEPtoCGRID(V)) = DDEP_PA(:,:,MAP_DDEPtoCGRID(V))
+
+#ifdef sens               
+               DO NP = 1,NPMAX
+                  IF ( L_ELMO ) THEN
+                     ELMO_DDM_DDEP(:,:,MAP_DDEPtoCGRID(V),NP) =
+     &                     S_DDEP(S,:,:,NP) - S_DDEP0(S,:,:,NP)
+                  END IF
+               END DO
+#endif             
             END IF
 
          END DO
          CALL PA_UPDATE_DDEP ( DDEP_PA, JDATE, JTIME, TSTEP )
+
+#ifdef isam
+         IF ( L_ELMO ) THEN
+            DO ITAG = 1, N_SPCTAG
+               ELMO_ISAM_DDEP(:,:,S_SPCTAG(ITAG), T_SPCTAG(ITAG) ) =
+     &               SA_DDEP( :,:,ITAG ) - SA_DDEP0( :,:,ITAG )
+            END DO
+         END IF
+#endif 
       END IF
       
 
@@ -863,12 +893,6 @@ C Write other diagnostics
                   WRDD( C,R ) = SA_DDEP( C,R,ITAG )
                END DO
             END DO
-            
-            IF ( L_ELMO .AND. ISAM_DEPV(ITAG) .GT. 0 ) THEN
-               ELMO_ISAM_DDEP( :,:,S_SPCTAG(ITAG),T_SPCTAG(ITAG) ) = 
-     &                SA_DDEP( :,:,ITAG )
-            END IF
-              
 
             IF ( .NOT. WRITE3( SA_DD_1, VNAM_SPCTAG( ITAG ),
      &                         MDATE, MTIME, WRDD ) ) THEN
@@ -904,10 +928,6 @@ C WT - write out dry deposition sensitivities
      &                 MDATE, MTIME, WRDD ) ) THEN
                   XMSG = 'Could not write ' // CTM_SDRYDEP_1 // ' file'
                   CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-               END IF
-
-               IF ( L_ELMO ) THEN
-                  ELMO_DDM_DDEP(:,:,MAP_DDEPtoCGRID(V),NP) = S_DDEP(S,:,:,NP)
                END IF
             ENDDO
          ENDDO

@@ -200,7 +200,7 @@ c !! NO   and to populate the allocated arrays from the stnd gc_spc.ext  !!! NO
 c----------------------------------------------------------------------------------------
             success = .true.
 
-            CALL LOG_HEADING( LOGDEV, "Retrieve Species Namelist" )
+            CALL LOG_HEADING( LOGDEV, "Initialize Chemical Species" )
 
             ! Gas (GC) Namelist
             ALLOCATE( GC_SPECIES_DATA( SPC_DIM ), STAT=IOS )

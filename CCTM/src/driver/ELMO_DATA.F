@@ -34,7 +34,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       Logical, Parameter, Private :: F = .false.
 
       LOGICAL, SAVE :: L_ELMO
-      REAL,    SAVE :: ELMO_NSTEP = 0.
+      INTEGER, SAVE :: ELMO_NSTEP = 0
  
       ! Define ELMO Variable Types
       INTEGER, PARAMETER :: ET_CONC  = 1, ET_WDEP      = 2, ET_DDEP = 3, 

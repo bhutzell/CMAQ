@@ -95,7 +95,7 @@ C-----------------------------------------------------------------------
       USE PA_DEFN, ONLY : LIPR, BUDGET_DIAG
 
 #ifdef isam
-      USE SA_DEFN, Only: ITAG, N_SPCTAG, VNAM_SPCTAG, SA_DDEP,
+      USE SA_DEFN, Only: ITAG, N_SPCTAG, VNAM_SPCTAG, SA_DDEP, SA_DDEP0,
      &                   S_SPCTAG, T_SPCTAG, NSPC_SA, ISAM_SPEC
       USE ELMO_DATA, Only : ELMO_ISAM_DDEP
 #endif
@@ -267,12 +267,14 @@ C Allocate and initialize dry deposition array
          END IF
 
 #ifdef isam
-         ALLOCATE ( SA_DDEP( NCOLS,NROWS,N_SPCTAG ), STAT = ASTAT )
+         ALLOCATE ( SA_DDEP( NCOLS,NROWS,N_SPCTAG ),
+     &              SA_DDEP0(NCOLS,NROWS,N_SPCTAG ), STAT = ASTAT )
          IF ( ASTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating SA_DDEP'
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
          SA_DDEP = 0.0
+         SA_DDEP0= 0.0
 #endif
 
 C Set up for process analysis
@@ -388,7 +390,12 @@ C EDDYV returned = Kz, where Kz is in m**2/sec
       END IF
 
 C Store Deposition Change in Budget and Process Analysis Arrays
-      IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) DDEP0 = DDEP
+      IF ( BUDGET_DIAG .OR. LIPR .OR. L_ELMO ) THEN
+          DDEP0 = DDEP
+#ifdef isam
+          SA_DDEP0 = SA_DDEP
+#endif
+      END IF
 
 C Calculate the change in concentration and dry dep from vertical diffusion and vsed
 C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual argument
@@ -434,6 +441,13 @@ C Store Deposition Change in Budget and Process Analysis Arrays
      &         ELMO_DDEP(:,:,MAP_DDEPtoCGRID(V)) = DDEP_PA(:,:,MAP_DDEPtoCGRID(V))
          END DO
          CALL PA_UPDATE_DDEP ( DDEP_PA, JDATE, JTIME, TSTEP )
+
+#ifdef isam
+         DO ITAG = 1, N_SPCTAG
+            ELMO_ISAM_DDEP(:,:,S_SPCTAG(ITAG), T_SPCTAG(ITAG) ) =
+     &            SA_DDEP( :,:,ITAG ) - SA_DDEP0( :,:,ITAG )
+         END DO
+#endif
       END IF
  
 C Revert non-molar mixing ratio species and re-order CGRID

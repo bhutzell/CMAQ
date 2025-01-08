@@ -434,6 +434,10 @@ C Initialize ddm3d calculations
 
         CALL MAP_AERO()
 
+C Initialize Global Arrays for Storing Chemical, Regional, Process,
+C and Emission Stream Families
+         call read_families
+
 #ifdef verbose_driver
          write( logdev,* ) ' MYPE -> NSPCS:    ', mype, nspcsd
 #endif
@@ -500,10 +504,6 @@ C Initalize CONC definitions (in STD_CONC F90 module)
 C Get avg CONC definitions, species and layer pointers (in AVG_CONC F90 module)
          CALL A_CONC_DEFN ()
 
-C Miscellaneous Configuration Operations
-         WRITE( LOGDEV, * )
-         CALL LOG_HEADING( LOGDEV, "Configure Scenario" )
-
 #ifdef isam
 c        CALL GET_SA_LAYS ()
          CALL SA_DIM()
@@ -545,10 +545,6 @@ C Initialize ddm3d calculations
 
 #endif  ! end of mpas
 
-
-C Initialize Global Arrays for Storing Chemical, Regional, Process,
-C and Emission Stream Families
-         call read_families
 
 C Initiliaze IO Arrays and Open Files
 #ifdef mpas

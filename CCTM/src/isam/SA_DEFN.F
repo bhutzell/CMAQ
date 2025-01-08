@@ -143,7 +143,7 @@ C ...Tagging indices for bcon, others, icon
       REAL, PRIVATE, ALLOCATABLE :: BUFF2( :,: )
 
 ! Diffusion module variables
-      REAL, ALLOCATABLE, SAVE :: SA_DDEP( :,:,: )
+      REAL, ALLOCATABLE, SAVE :: SA_DDEP( :,:,: ), SA_DDEP0( :,:,: )
 
 ! Advection module variables
       LOGICAL, ALLOCATABLE, SAVE :: BCON_SPC( : )

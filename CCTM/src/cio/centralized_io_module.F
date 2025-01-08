@@ -2295,10 +2295,10 @@
      &                                     Desid_Diag_Fmt_Nml, 
      &                                     Desid_Diag_Spec_Nml
 
-         CALL LOG_MESSAGE( LOGDEV, ' ' )
-         CALL LOG_SUBHEADING( LOGDEV, 'Reading Emission Control Namelist')
-         
          !!! Budget Options !!!
+         CALL LOG_MESSAGE( LOGDEV, ' ' )
+         CALL LOG_SUBHEADING( LOGDEV, 'Reading Budget Options from CMAQ Control File')
+         
            ! Allocate and Initialize Budget Variables
            Budget_Diag = .FALSE.
            ALLOCATE( BudgetVariables( Max_Budget_Vars_Nml ) )
@@ -2329,8 +2329,8 @@
            READ( NML = Budget_Options, UNIT = FUNIT, IOSTAT= IOST )
            IF ( IOST .EQ. -1 ) THEN
                WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A,/,5x,A)" ),
-     &                'Note: The BudgetOptions section of the Emissions Control ',
-     &                'Namelist is missing. Default values for this section will be ',
+     &                'Note: The BudgetOptions section of the CMAQ Control File ',
+     &                'is missing. Default values for this section will be ',
      &                'assumed.'
                Budget_Diag   = .FALSE.
                BudgetVariables  = 'ALL'
@@ -2339,7 +2339,7 @@
                backspace( FUNIT )
                read( FUNIT, fmt='(A)' ) tmpline
                XMSG = 'ERROR: There was a syntax error reading the Budget_Options '//
-     &                'variable in the CMAQ control namelist. Please check the format of '//
+     &                'variable in the CMAQ Control File. Please check the format of '//
      &                'each line for syntax errors. The invalid line was likely: '
                CALL LOG_MESSAGE( LOGDEV, ' ')
                CALL LOG_MESSAGE( LOGDEV, XMSG )
@@ -2356,6 +2356,9 @@
 
          !----------------------------!
          !!! DESID Chemical Mapping !!!
+         CALL LOG_MESSAGE( LOGDEV, ' ' )
+         CALL LOG_SUBHEADING( LOGDEV, 'Reading DESID Chemical Mapping from Chemical Control File')
+         
            ! Retrieve the Name of the Emission Control File
            IF ( CMAQ_CHEM_CTRL .EQ. "CMAQ_CH_CTRL_NML" ) THEN
                XMSG = 'You have chosen not to indicate the location of an' //
@@ -2382,8 +2385,8 @@
            IF ( IOST .EQ. -1 ) THEN
                ! The DESID_Max_Rules Variable was completely missing
                XMSG = 'WARNING: Maximum Number of DESID Scaling Rules was not specified. '//
-     &                'If you intended to specify Desid_Max_Rules, check
-     the CMAQ_CHEM_CTRL file.'
+     &                'If you intended to specify Desid_Max_Rules, check ' //
+     &                'the CMAQ_CHEM_CTRL file.'
                CALL LOG_MESSAGE( LOGDEV, ' ')
                CALL LOG_MESSAGE( LOGDEV, XMSG )
                DESID_MAX_RULES = 500
