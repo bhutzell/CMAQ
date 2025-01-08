@@ -182,7 +182,7 @@ C Local variables
      &         BIOG_MECH_TYPE( 'CRACMM2                ','CRACMM2 '),
      &         BIOG_MECH_TYPE( 'CRACMM1_AQ             ','CRACMM1 '),
      &         BIOG_MECH_TYPE( 'CRACMM1AMORE_AQ        ','CRACMM1 '),
-     &         BIOG_MECH_TYPE( 'CRACMM3M               ','CRACMM3M') /)     
+     &         BIOG_MECH_TYPE( 'CRACMM3M               ','CRACMM3 ') /)     
  
          CHARACTER( 16 )  :: PNAME = 'BEIS_INIT'
          CHARACTER( 120 ) :: XMSG = ' '
