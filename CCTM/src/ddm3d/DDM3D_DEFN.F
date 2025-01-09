@@ -135,6 +135,7 @@ c Cloud module variables
 c VDIFF module variables
       REAL, ALLOCATABLE, SAVE :: SNGRD( :,:,:,:,: )        ! sengrid replacement
       REAL, ALLOCATABLE, SAVE :: S_DDEP( :,:,:,: )         ! ddep sens accumulator
+      REAL, ALLOCATABLE, SAVE :: S_DDEP0( :,:,:,: )        ! ddep sens accumulator for ELMO
       REAL, ALLOCATABLE, SAVE :: SENS( :,:,: )             ! secondary SENGRID expression
       REAL, ALLOCATABLE, SAVE :: S_EMIS( :,:,: )           ! stores SVDEMIS*DTS
       REAL, ALLOCATABLE, SAVE :: S_DD ( :,:,: )            ! DD for sens 

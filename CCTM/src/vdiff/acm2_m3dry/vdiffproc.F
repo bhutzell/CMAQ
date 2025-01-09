@@ -112,7 +112,8 @@ C-----------------------------------------------------------------------
 #endif
 
 #ifdef sens
-      USE DDM3D_DEFN, ONLY: NP, NPMAX, SENGRID, SPCNAME, S_DDEP, SNGRD, SENGRID_TEMP, SEN_PAR
+      USE DDM3D_DEFN, ONLY: NP, NPMAX, SENGRID, SPCNAME, S_DDEP, S_DDEP0, 
+     &                      SNGRD, SENGRID_TEMP, SEN_PAR
       USE ELMO_DATA, ONLY : ELMO_DDM_DDEP
 #endif 
 
@@ -370,12 +371,14 @@ C Set up for grav. settling
          END DO
 
 #ifdef sens
-         ALLOCATE ( S_DDEP( N_SPC_DEPV,NCOLS,NROWS,NPMAX ), STAT = ASTAT )
+         ALLOCATE ( S_DDEP( N_SPC_DEPV,NCOLS,NROWS,NPMAX ), 
+     &              S_DDEP0(N_SPC_DEPV,NCOLS,NROWS,NPMAX ), STAT = ASTAT )
          IF ( ASTAT .NE. 0 ) THEN
-            XMSG = 'Failure allocating S_DDEP'
+            XMSG = 'Failure allocating S_DDEP and S_DDEP0'
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
          S_DDEP = 0.0
+         S_DDEP0 = 0.0
 
          ALLOCATE ( SNGRD( N_SPC_CGRID,NLAYS,NCOLS,NROWS,NPMAX ), STAT = ASTAT )
          IF ( ASTAT .NE. 0 ) THEN
