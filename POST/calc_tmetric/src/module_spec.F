@@ -23,7 +23,7 @@ C
 C*************************************************************************
       MODULE SPECIES
 
-      CHARACTER(LEN=16) :: SPECVARS(2048) = ''
+      CHARACTER(LEN=16), ALLOCATABLE :: SPECVARS(:)
       INTEGER        :: NSPECVAR       = 0
  
       CONTAINS
@@ -44,6 +44,14 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
          Integer status
          CHARACTER(LEN=16)  varname
          CHARACTER(LEN=16)  field   
+         CHARACTER(LEN=120) MSG
+
+         ALLOCATE( SPECVARS(MXVARS3), stat=status )
+         IF( STATUS .NE. 0 )THEN
+            MSG = 'Failure allocating SPECVARS'
+            CALL M3EXIT ( 'LoadSpecies', 0, 0, MSG, XSTAT2 )
+         END IF
+         SPECVARS = ''
 
          NSPECVAR = 0
          CALL GET_ENVLIST ( 'SPECIES', NSPECVAR, SPECVARS, STATUS )

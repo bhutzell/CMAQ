@@ -10,7 +10,7 @@ This Fortran program creates gridded IOAPI files with temporally blocked or step
                or RNG for RANGE
  SAMPLE_PERIOD number of time steps used to compute OPERATION (set to less then zero for total number of steps)
  SPECIES       list of species to output (e.g. setenv SPECIES "O3 HO HO2 NH3 HCL ANO3J ASO4J").  
-               To extract all species use: setenv SPECIES_1 ALL
+               To extract all species use: setenv SPECIES "ALL"
  M3_FILE_#     List of input IOAPI file names with time-dependent values.
                The program will concatenate time steps from all input files to construct the
 	       longest possible time record which can be processed. Duplicate time steps are
