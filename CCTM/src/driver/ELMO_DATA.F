@@ -878,7 +878,6 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       END DO
 
       ! Check if any dry deposition variable has been requested
-      L_ELMO_DDEP = .FALSE.
       DO IVAR = 1,N_ELMO_TABLE
          IV = ELMO_TABLE( IVAR )%VAR_TYPE
          IF ( IV .EQ. ET_DDEP .OR. IV .EQ. ET_ISAM_DDEP .OR.
@@ -893,8 +892,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       END DO
 
       ! Check if any wet deposition variable has been requested
-      L_ELMO_WDEP = .FALSE.
       DO IVAR = 1,N_ELMO_TABLE
+         IV = ELMO_TABLE( IVAR )%VAR_TYPE
          IF ( IV .EQ. ET_WDEP .OR. IV .EQ. ET_ISAM_WDEP .OR.
      &        IV .EQ. ET_DDM_WDEP .OR. IV .EQ. ET_CMPST_DEP .OR.
      &        IV .EQ. ET_ISAM_CMPST_DEP .OR. IV .EQ. ET_DDM_CMPST_DEP .OR.
