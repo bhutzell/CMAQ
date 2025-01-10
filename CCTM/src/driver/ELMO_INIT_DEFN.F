@@ -19,6 +19,7 @@
       MODULE ELMO_INIT_DEFN
 
       USE ELMO_DATA
+      USE RUNTIME_VARS, ONLY : LOGDEV,LOG_MESSAGE,LOG_HEADING,LOG_SUBHEADING
       
       CONTAINS
 !-------------------------------------------------------------------------
@@ -31,7 +32,6 @@
 !-------------------------------------------------------------------------
    
       USE ELMO_DERIVED, ONLY : ELMO_MAP_DERIVED
-      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
       USE GRID_CONF, ONLY : NCOLS, NROWS
       USE ELMO_COMPOSITES, ONLY : ELMO_MAP_COMPOSITES, ELMO_READ_COMPOSITES
       USE AERO_DATA, ONLY : N_MODE
@@ -53,6 +53,9 @@
       INTEGER ALLOCSTAT, IOS, IERROR
       INTEGER :: N_MAP_MODE_SOURCE, N_MAP_MODE, N_MAP_SOURCE
 
+      CALL LOG_MESSAGE( LOGDEV,'' )
+      CALL LOG_HEADING( LOGDEV, 'Initialize ELMO Module' )
+
       ! Read User-Input from Namelist input file (CMAQ Control File)
       CALL READ_ELMO_NML(TSTEP)
       IF ( .NOT. L_ELMO ) RETURN
@@ -63,6 +66,7 @@
 
       ! Read Mechanism-Specific Composite Variables so they may be added
       ! to the ELMO Table next
+      CALL LOG_SUBHEADING( LOGDEV, 'Reading and Mapping ELMO variables' )
       CALL ELMO_READ_COMPOSITES()
 
       ! Initialize ELMO Table for all possible output variables
@@ -74,6 +78,7 @@
       CALL ELMO_MAP_DERIVED()
 
       ! Map All Table Variables to their components, if applicable
+      CALL LOG_MESSAGE( LOGDEV, 'Map ELMO Composite Variables' )
       CALL LOG_MESSAGE( LOGDEV, 'Mapping ELMO Composites' )
       CALL ELMO_MAP_COMPOSITES()
 
@@ -204,8 +209,7 @@
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
       
-      USE RUNTIME_VARS, ONLY: CMAQ_CTRL, LOGDEV, LOG_MESSAGE,
-     &                        LOG_SUBHEADING, APPL_NAME, OUTDIR
+      USE RUNTIME_VARS, ONLY: CMAQ_CTRL, APPL_NAME, OUTDIR
       
       IMPLICIT NONE
 
@@ -240,7 +244,6 @@
 
       L_ELMO = .TRUE.
 
-      CALL LOG_MESSAGE( LOGDEV, ' ' )
       CALL LOG_SUBHEADING( LOGDEV, 'Reading ELMO File Specifications '//
      &                             'from CMAQ Control Namelist')
  
@@ -1082,6 +1085,9 @@
         INTEGER :: MDATE, MTIME, IFL, IVAR, J, ICOMP
         INTEGER :: LAY_BOT, LAY_TOP
 
+      CALL LOG_MESSAGE( LOGDEV,'' )
+      CALL LOG_SUBHEADING( LOGDEV, 'Open ELMO Output Files' )
+
 #ifndef mpas
       ! Define General Output File Parameters
       FTYPE3D = GRDDED3
@@ -1177,7 +1183,6 @@
       SUBROUTINE ELMO_WRITE_LOG ( )
 !-------------------------------------------------------------------------
     
-      USE RUNTIME_VARS, ONLY : LOGDEV
       USE AERO_DATA, ONLY : N_MODE, AEROSPC, AERO_MISSING, AEROMODE
 
       IMPLICIT NONE
@@ -1190,8 +1195,8 @@
       LOGICAL L_MODE
 
       ! Write out all ELMO variables organized by output file
-      WRITE( LOGDEV, '(/,/,5x,A)' ),'|> ELMO OUTPUT VARIABLE REPORT:'
-      WRITE( LOGDEV, '(5x,A)' ),'+========================================'
+      CALL LOG_MESSAGE( LOGDEV,'' )
+      CALL LOG_SUBHEADING( LOGDEV, 'ELMO Output Variable Report' )
       WRITE( LOGDEV,'(7x,A,8(/,13x,A))' ),
      &                              'Note: these are populated using rules from the',
      &                              'CMAQ Control File supplied by the User. ',
@@ -1307,10 +1312,6 @@
          END DO
       END DO
 
-      WRITE( LOGDEV, * )
-      WRITE( LOGDEV, '(/,/,5x,A)' ),'|> ELMO OUTPUT VARIABLE REPORT COMPLETE'
-      WRITE( LOGDEV, '(5x,A)' ),'+========================================='
-      WRITE( LOGDEV, * )
       WRITE( LOGDEV, * )
 
       END SUBROUTINE ELMO_WRITE_LOG

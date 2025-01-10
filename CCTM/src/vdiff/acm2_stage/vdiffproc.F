@@ -259,7 +259,7 @@ C Allocate and initialize dry deposition array
          END IF
          TOT_BD_EMIS = 0.0   ! array assignment
 
-         CALL LOG_HEADING( LOGDEV, "Initialize Emissions Module" )
+         CALL LOG_HEADING( LOGDEV, "Initialize DESID Emission Module" )
 
          IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP ) ) THEN
             XMSG = 'Failure initializing emissions module'

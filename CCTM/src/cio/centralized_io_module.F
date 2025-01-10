@@ -107,7 +107,8 @@
 
         use RUNTIME_VARS, only : LTNG_NO, STDATE, STTIME, ABFLUX, MOSAIC, 
      &                           NPTGRPS, USE_MARINE_GAS_EMISSION, logdev,
-     &                           CONVECTIVE_SCHEME, EMIS_SYM_DATE
+     &                           CONVECTIVE_SCHEME, EMIS_SYM_DATE,
+     &                           LOG_HEADING, LOG_MESSAGE, LOG_SUBHEADING
         use CENTRALIZED_IO_UTIL_MODULE
         use get_env_module 
         USE UTILIO_DEFN
@@ -424,7 +425,6 @@
 
           use lsm_mod, only: n_lufrac, init_lsm
           USE UTILIO_DEFN
-          USE RUNTIME_VARS, only: log_heading, logdev
 
 #ifdef mpas
           use hgrd_defn, only : ncols
@@ -529,6 +529,7 @@
 
              call stack_files_setup
 
+             call log_subheading( logdev, 'Open Biogenic Emission Files' )
              if (BIOGEMIS_BEIS) then
                 call biogemis_setup
                 call beis_norm_emis_setup
@@ -538,6 +539,7 @@
              end if
 
 
+             call log_subheading( logdev, 'Open Other Surface Data Files' )
              if (ABFLUX) then
                 call depv_data_setup
              end if
@@ -627,6 +629,8 @@
           integer :: emis_file_dist_layer, tdate(2), ttime(2), diffsec
 
           logical :: layer_exist
+
+          call log_subheading( logdev, 'Opening Gridded Input Files' )
 
 #ifdef mpas
           n_c2d = 0
@@ -989,9 +993,11 @@
              f_emis(n)     = n_opened_file
 
 ! Check whether file is a representative day type
+             call log_message( logdev, '' )
+
              file_sym_date(f_emis(n)) = emis_sym_date ! Master switch to change default
              write (fname, '(a15, i3.3)') "GR_EM_SYM_DATE_", n
-             call get_env(file_sym_date(f_emis(n)), fname,
+             call get_env(file_sym_date(f_emis(n)), trim(fname),
      &                    file_sym_date(f_emis(n)), logdev )
 
              write (fname, '(a8, i3.3)') "GR_EMIS_", n
@@ -2249,8 +2255,7 @@
 
       use desid_param_module
       use util_family_module
-      use RUNTIME_VARS, only: CMAQ_CTRL, CMAQ_CHEM_CTRL,
-     &                        logdev, log_message, log_subheading
+      use RUNTIME_VARS, only: CMAQ_CTRL, CMAQ_CHEM_CTRL
       use PA_DEFN, ONLY : BudgetVariables, MAX_BUDGET_VARS_NML, BUDGET_DIAG
 #ifdef mpas
       use util_module, only : junit, upcase
@@ -2352,6 +2357,12 @@
                CALL UPCASE( BudgetVariables( IFAM ) )
            END DO
           
+           IF ( BUDGET_DIAG ) THEN
+               CALL LOG_MESSAGE( LOGDEV, 'Budget Tool is activated' )
+           ELSE
+               CALL LOG_MESSAGE( LOGDEV, 'Budget Tool is deactivated' )
+           END IF
+
            CLOSE( FUNIT )
 
          !----------------------------!
@@ -2452,8 +2463,7 @@
      &                       'fix the Emission Scaling Rules', 1 )
            END IF
            
-           CALL LOG_MESSAGE( LOGDEV,' ' )
-           CALL LOG_MESSAGE( LOGDEV,'Performing Basic Error Checks for Emission Scaling Rules' )
+           CALL LOG_MESSAGE( LOGDEV,'Performing Error Checks for Emission Scaling Rules' )
            
            ! Check that the operator field is correct since it has not so
            ! many possible values.
@@ -2470,10 +2480,14 @@
            
            CLOSE( FUNIT )
 
-         !-----------------------------!
-         !!! Open DESID Control File !!!
-         !-----------------------------!
-         ! Retrieve the Name of the Emission Control File
+         !----------------------------!
+         !!! Open CMAQ Control File !!!
+         !----------------------------!
+         
+         CALL LOG_SUBHEADING( LOGDEV,'Reading Chemical Mechanism- ' //
+     &                               'Independent DESID Parameters' )
+         
+         ! Retrieve the Name of the CMAQ Control File
          IF ( CMAQ_CTRL .EQ. "CMAQ_CTRL_NML" ) THEN
              XMSG = 'You have chosen not to indicate the location of an' //
      &              'Emission Control namelist file. You must give a value ' //
@@ -2495,6 +2509,9 @@
  
          !----------------------!
          !!! DESID Top Layer  !!!
+           
+           CALL LOG_MESSAGE( LOGDEV,'Read top layer for emissions' )
+           
            ! Read the Maximum Emissions Layer
            REWIND( FUNIT )
            READ( NML = Desid_Options, UNIT = FUNIT, IOSTAT=IOST )
@@ -2523,6 +2540,9 @@
  
          !------------------------------!
          !!! DESID Area Normalization !!!
+           
+           CALL LOG_MESSAGE( LOGDEV,'Read area normalization settings' )
+           
            ! Read the number of Max Emissions Rules to inform scaling operations
            REWIND( FUNIT )
            READ( NML = Desid_AreaNormVars, UNIT = FUNIT, IOSTAT=IOST )
@@ -2584,6 +2604,9 @@
               
          !-----------------------------!
          !!! DESID Region Definition !!!
+           
+           CALL LOG_MESSAGE( LOGDEV,'Read region mask definitions' )
+           
            ! Read the number of Max Emissions Rules to inform scaling operations
            REWIND( FUNIT )
            READ( NML = Desid_RegionDefVars, UNIT = FUNIT, IOSTAT=IOST )
@@ -2646,6 +2669,9 @@
            
          !------------------------------!
          !!! DESID Size Distributions !!!
+           
+           CALL LOG_MESSAGE( LOGDEV,'Read emission size distribution configuration' )
+           
            ! Read the number of Max Size Dist Rules to inform scaling operations
            REWIND( FUNIT )
            READ( NML = Desid_SizeDistVars, UNIT = FUNIT, IOSTAT=IOST )
@@ -2707,6 +2733,9 @@
 
          !----------------------------------!
          !!! DESID Diagnostic File Inputs !!!
+           
+           CALL LOG_MESSAGE( LOGDEV,'Read diagnostic file configuration' )
+           
            ! Read the number of Max Emissions Rules to inform scaling operations
            REWIND( FUNIT )
            READ( NML = Desid_DiagVars, UNIT = FUNIT, IOSTAT=IOST )
@@ -3441,7 +3470,7 @@ C   mminlu and num_land_cat are WRF global variables
         subroutine megan_setup ! reads in variables 
 
           use hgrd_defn, only : ncols,nrows
-          use RUNTIME_VARS, only : logdev, USE_MEGAN_LAI, BDSNP_MEGAN,
+          use RUNTIME_VARS, only : USE_MEGAN_LAI, BDSNP_MEGAN,
      &                             MGN_ONLN_DEP
           Use, intrinsic :: ieee_arithmetic, only: isnan => ieee_is_nan
           USE UTILIO_DEFN
@@ -4057,6 +4086,7 @@ C   mminlu and num_land_cat are WRF global variables
           end do
 
 ! process stack emission files
+          call log_subheading( logdev, 'Opening Point-Source Emission Files'
           max_nvars = 0
           d_size    = 0
           do pt = 1, nptgrps
@@ -4111,7 +4141,7 @@ C   mminlu and num_land_cat are WRF global variables
 ! Check whether file is a representative day type
              write (fname, '(a16, i3.3)') "STK_EM_SYM_DATE_", pt
              file_sym_date(f_stk_emis(pt)) = emis_sym_date ! Master switch to change default
-             call get_env(file_sym_date(f_stk_emis(pt)), fname,
+             call get_env(file_sym_date(f_stk_emis(pt)), trim(fname),
      &                    file_sym_date(f_stk_emis(pt)), logdev)
 
              file_sdate(f_stk_emis(pt)) = mio_file_data(floc)%tflag(1,1)
@@ -4974,6 +5004,7 @@ C   mminlu and num_land_cat are WRF global variables
           end do
 
 ! process stack emission files
+          call log_subheading( logdev, 'Read Point-Source Emission Files' )
           max_nvars = 0
           d_size    = 0
           do pt = 1, NPTGRPS
@@ -5004,7 +5035,7 @@ C   mminlu and num_land_cat are WRF global variables
 ! Check whether file is a representative day type
              write (fname, '(a16, i3.3)') "STK_EM_SYM_DATE_", pt 
              file_sym_date(f_stk_emis(pt)) = emis_sym_date ! Master switch to change default 
-             call get_env(file_sym_date(f_stk_emis(pt)), fname, 
+             call get_env(file_sym_date(f_stk_emis(pt)), trim(fname), 
      &                    file_sym_date(f_stk_emis(pt)), logdev)             
 
              found = .false.

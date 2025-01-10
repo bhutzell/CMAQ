@@ -307,7 +307,7 @@ C Allocate and initialize dry deposition array
          END IF
          ICMP = 0.0   ! array assignment
 
-         CALL LOG_HEADING( LOGDEV, "Initialize Emissions Module" )
+         CALL LOG_HEADING( LOGDEV, "Initialize DESID Emission Module" )
 
 C Allocate and initialize emissions
          IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP ) ) THEN

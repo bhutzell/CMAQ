@@ -72,7 +72,6 @@
       Namelist / COMPOSITE_INIT / N_MAX_COMPOSITES, N_MAX_COMPONENTS
       Namelist / ELMO_COMPOSITES / CMPST
 
-      CALL LOG_MESSAGE( LOGDEV, ' ' )
       CALL LOG_SUBHEADING( LOGDEV, 'Reading ELMO Composites '//
      &                             'from Mechanism-Specific Namelist')
 

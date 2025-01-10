@@ -282,7 +282,7 @@ C-----------------------------------------------------------------------
       Use cgrid_spcs, only: n_gc_spc, gc_spc, n_gc_g2ae, gc_g2ae, gc_strt, gc_molwt, gc_g2ae_map, 
      &                      n_nr_spc, nr_spc, n_nr_n2ae, nr_n2ae, nr_strt, nr_molwt, nr_n2ae_map,
      &                      n_ae_spc, ae_spc
-      Use runtime_vars, only: logdev, log_subheading
+      Use runtime_vars, only: logdev, log_subheading, log_heading
       Use utilio_defn, only: index1, xstat3, m3exit
 
       Implicit None
@@ -307,6 +307,7 @@ C-----------------------------------------------------------------------
       If ( .Not. mapped ) Then
           mapped = .TRUE.
           
+          call log_heading( logdev, 'Initialize OA Extraction to Aerosol Module')
           call log_subheading( logdev, 'Map Organic Aerosol and Vapor Species')
 
           ! First, the number and names of present and nontracer OA species must be

@@ -228,7 +228,7 @@ C Get tracer IC's
       END IF  ! N_TR_SPC > 0
 
 C Test opening existing conc file for update
-      CALL LOG_HEADING( LOGDEV, "Open or Create Concentration File" )
+      CALL LOG_HEADING( LOGDEV, "Open/Create Concentration File" )
 
 C *** Open the aerosol parameters file (diameters and standard deviations).
       !IF ( L_ELMO .AND. IO_PE_INCLUSIVE ) THEN
@@ -255,10 +255,10 @@ C *** Open the aerosol parameters file (diameters and standard deviations).
 
       CALL WR_INIT ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
       
-      CALL LOG_HEADING( LOGDEV, "Open or Create Average Concentration File" )
+      CALL LOG_HEADING( LOGDEV, "Open/Create Average Concentration File" )
       CALL OPACONC ( STDATE, STTIME, TSTEP( 1 ) )
       
-      CALL LOG_HEADING( LOGDEV, "Open or Create Wet Deposition File" )
+      CALL LOG_HEADING( LOGDEV, "Open/Create Wet Deposition File" )
       CALL OPWDEP  ( STDATE, STTIME, TSTEP( 1 ) )
 
 #ifdef sens
@@ -334,7 +334,6 @@ C Open SA_CONC_1 and SA_CGRID_1
 
       CALL SUBST_BARRIER
 
-      CALL LOG_HEADING( LOGDEV, "Check Initial Concentrations" )
 #endif
 
       RETURN

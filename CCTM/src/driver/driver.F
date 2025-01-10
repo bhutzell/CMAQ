@@ -564,6 +564,7 @@ C Convention: the input file concentration units are always ppmV.
 #endif
 
 #ifndef mpas
+         CALL LOG_HEADING( LOGDEV, "Check Initial Concentrations" )
          CALL CKSUMMER ( 'INITSCEN', CGRID, JDATE, JTIME )
 
          IF ( LIPR .OR. LIRR ) CALL PA_INIT ( CGRID, JDATE, JTIME, TSTEP )
@@ -663,7 +664,6 @@ C Initialize Meteorology Structures
          FIRST_RUN = .FALSE.
 
 C Main processing loop:
-         IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
          IF ( MYPE. EQ. 0 ) CALL LOG_HEADING( OUTDEV, "Time Integration" )
 
       END IF ! first_run
@@ -768,6 +768,8 @@ C Initialize Modules
           L_INIT = .FALSE.
           call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
           if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
+
+          CALL LOG_HEADING( LOGDEV, 'Time Integration' )
 
       ELSE IF ( L_ELMO .AND. ELMO_NSTEP .LT. 1.0 ) THEN
           ! Calculate all ELMO Variables for averaging but do not output them

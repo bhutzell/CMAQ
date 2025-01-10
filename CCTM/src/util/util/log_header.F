@@ -1,15 +1,17 @@
 
-      subroutine LOAD_HEADER( HEADER_TXT, N_TXT )
+      subroutine LOAD_HEADER( HEADER_TXT, N_HEADER_TXT, TOC_TXT, N_TOC_TXT )
 
       IMPLICIT NONE
 
-      CHARACTER( 90 ) :: HEADER_TXT( 200 )
-      INTEGER         :: N_TXT
+      CHARACTER( 90 ) :: HEADER_TXT( 200 ), TOC_TXT( 200 )
+      INTEGER         :: N_HEADER_TXT, N_TOC_TXT
 
-      N_TXT = 39
+      N_HEADER_TXT = 21
       HEADER_TXT( : ) = ''
+      N_TOC_TXT = 19
+      TOC_TXT( : ) = ''
 
-      HEADER_TXT( 1:N_TXT ) = (/   
+      HEADER_TXT( 1:N_HEADER_TXT ) = (/   
      &   '#================================================================================#', 
      &   '#|                                                                              |#', 
      &   '#|               The Community Multiscale Air Quality (CMAQ) Model              |#', 
@@ -30,25 +32,30 @@
      &   '#|         Environment, University of North Carolina at Chapel Hill.            |#', 
      &   '#|         CMAS URL: (https://www.cmascenter.org)                               |#', 
      &   '#|                                                                              |#', 
-     &   '#================================================================================#',  
+     &   '#================================================================================#'  
+     &      /)
+
+
+      TOC_TXT( 1:N_TOC_TXT ) = (/   
      &   '                                                                                  ',
+     &   '     ------------------------                                                     ',
+     &   '     |>>   Useful Links   <<|                                                     ',
+     &   '     ------------------------                                                     ',
      &   '                                                                                  ',
-     &   '  ====================                                                            ',
-     &   '  |>--- Contents ---<|                                                            ',
-     &   '  ====================                                                            ',
-     &   '  Use these headings to jump to specific log output of interest.                  ',
-     &   '   * INITIALIZE GRID                                                              ',
-     &   '   * INITIALIZE CHEMICAL SPECIES                                                  ',
-     &   '   * INITIALIZE DESID EMISSION MODULE                                             ',
-     &   '       - ERROR CHECK EMISSION MAPPING CONFIGURATION                               ',
-     &   '       - DESID EMISSION SCALING REPORT                                            ',
-     &   '       - DESID EMISSION DIAGNOSTIC CONFIGURATION                                  ',
-     &   '   * INITIALIZE ELMO MODULE                                                       ',
-     &   '       - ELMO COMPOSITE LIST                                                      ',
-     &   '       - ELMO OUTPUT VARIABLE REPORT                                              ',
-     &   '   * BEGIN TIME-DEPENDENT MODEL CALCULATIONS                                      ',
+     &   '     Search for the headings below to jump to error checks, reports, and          ', 
+     &   '     diagnostic tables documenting emission input, prediction output, etc.        ',
      &   '                                                                                  ',
-     &   '                                                                                  '
+     &   '     ** It is STRONGLY recommended that users check these sections when           ', 
+     &   '        configuring a new scenario or beginning production-level simulations. **  ',
+     &   '                                                                                  ',
+     &   '     -> INITIALIZE DESID EMISSION MODULE                                          ',
+     &   '         - Error Check Emission Mapping Configuration                             ',
+     &   '         - DESID Emission Scaling Report                                          ',
+     &   '         - DESID Emission Diagnostic Report                                       ',
+     &   '     -> INITIALIZE ELMO MODULE                                                    ',
+     &   '         - Reading ELMO Composites from Mechanism-Specific Namelist               ',
+     &   '         - ELMO Output Variable Report                                            ',
+     &   '    ------------------------------------------------------------------------------'
      &      /)
 
        end subroutine LOAD_HEADER 

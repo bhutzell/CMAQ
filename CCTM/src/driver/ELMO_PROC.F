@@ -281,7 +281,7 @@
 
       ! Check to make sure the current layer is requested for diagnostic
       ! output.
-      IF ( L .GE. LAY_BOT_MIN .AND. L .LE. LAY_TOP_MAX ) THEN
+      IF ( L1 .GE. LAY_BOT_MIN .AND. L1 .LE. LAY_TOP_MAX ) THEN
        
         ! Calculate All Aerosol Size Distribution Parameters
         CALL CALC_AERODIST_PARAMS( INIT_TIME )
@@ -311,24 +311,24 @@
       END IF
 
       DO IFL = 1,N_ELMO_FILES
-        IF ( L .GE. ELMO_FILE( IFL )%LAY_BOT .AND.
-     &       L .LE. ELMO_FILE( IFL )%LAY_TOP ) THEN
+        IF ( L1 .GE. ELMO_FILE( IFL )%LAY_BOT .AND.
+     &       L1 .LE. ELMO_FILE( IFL )%LAY_TOP ) THEN
 
           SELECT CASE ( ELMO_FILE( IFL )%TMODE )
           CASE( 0 ) 
              ! *** Populate Diagnostic Variables to Instantaneous 
              !     Array if this is a write step
              IF ( INIT_TIME .OR. WRITE_STEP ) THEN
-               OL = L - ELMO_FILE( IFL )%LAY_BOT + 1
+               OL = L1 - ELMO_FILE( IFL )%LAY_BOT + 1
                DO IVAR = 1,ELMO_FILE( IFL )%N_VARS
-                   ELMO_OUT( IFL )%DATA( C,R,OL,IVAR ) = ELMO_USED( ELMO_FILE(IFL)%USEDID( IVAR ) )
+                   ELMO_OUT( IFL )%DATA( C1,R1,OL,IVAR ) = ELMO_USED( ELMO_FILE(IFL)%USEDID( IVAR ) )
                END DO
              END IF
  
           CASE ( 1 )
              ! *** Aggregate Diagnostic Variables in Average Array
              !     using trapezoidal rule
-             OL = L - ELMO_FILE( IFL )%LAY_BOT + 1
+             OL = L1 - ELMO_FILE( IFL )%LAY_BOT + 1
              DIVFAC = 1.0
              IF ( WRITE_STEP ) DIVFAC = 0.5 / FLOAT( ELMO_NSTEP - 1 )
 
@@ -350,15 +350,15 @@
                    ! value or recalculate the average fine particle acidity
                    ! offline.
                    IF ( INIT_STEP ) THEN
-                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
+                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 3.5  ! Assume relatively acidic particles
                    ELSE IF ( WRITE_STEP ) THEN
-                       ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = DIVFAC * 
-     &                          ( ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) 
-     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) - ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) )
+                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC * 
+     &                          ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) 
+     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) - ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) )
                    ELSE 
-                       ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) =
-     &                          ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) 
-     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C,R,OL,IVAR )
+                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) =
+     &                          ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) 
+     &                        + 2.0 * ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR )
                    END IF
               
                 ELSE IF ( IV .EQ. ET_DDEP .OR.
@@ -379,22 +379,22 @@
                    ! This is a deposition species so we should be
                    ! computing a cumulative sum, not an average by default
                    IF ( INIT_STEP ) THEN
-                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 0.0 !ELMO_USED( U )
+                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 0.0 !ELMO_USED( U )
                    ELSE   
-                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 
-     &                     ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + ELMO_USED( U )
+                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 
+     &                     ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) + ELMO_USED( U )
                    END IF
               
                 ELSE
                    ! For all other variables, apply trapezoidal rule for averaging.
                    IF ( INIT_STEP ) THEN
-                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = ELMO_USED( U ) 
+                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U ) 
                    ELSE IF ( WRITE_STEP ) THEN
-                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = DIVFAC *
-     &                     ( ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + 2.0 * ELMO_USED( U ) - ELMO_USED( U ) )
+                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = DIVFAC *
+     &                     ( ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) + 2.0 * ELMO_USED( U ) - ELMO_USED( U ) )
                    ELSE
-                      ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) = 
-     &                     ELMO_OUT(IFL)%DATA( C,R,OL,IVAR ) + 2.0 * ELMO_USED(U)
+                      ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 
+     &                     ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) + 2.0 * ELMO_USED(U)
                    END IF 
                 END IF
              END DO
@@ -522,7 +522,7 @@
      &          ET_DRVD_DDEP, ET_ISAM_DRVD_DDEP, ET_DDM_DRVD_DDEP,
      &          ET_DRVD_WDEP, ET_ISAM_DRVD_WDEP, ET_DDM_DRVD_WDEP,
      &          ET_AEROPROP, ET_CHEM, ET_MET, ET_PHOT )
-            ! Retrieve Detailed ELMO Variable
+            ! Retrieve Derived ELMO Variable
             CALL ELMO_CALC_DERIVED( VAL2, J )
             OUTVAL = OUTVAL + ELMO_UNIT_CONV( J, OUT_UNIT, VAL2 )
 

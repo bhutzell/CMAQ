@@ -144,6 +144,12 @@
  
       END IF
  
+      IF ( N_CHEM_FAMS .EQ. 0 ) THEN
+          CALL LOG_MESSAGE( LOGDEV, 'No chemical families have been ' //
+     &         'added by the user. Bulk aerosol species are still ' //
+     &         'available as chemical families.')
+      END IF
+
       ! Read Chemical Family Specification Section
       N_Chem_Fams = N_Chem_Fams + n_aerospc
       ALLOCATE( ChemFamilyName( N_Chem_Fams),
