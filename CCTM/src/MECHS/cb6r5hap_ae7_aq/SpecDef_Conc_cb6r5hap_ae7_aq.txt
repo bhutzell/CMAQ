@@ -65,8 +65,8 @@ OH              ,ppbV      ,1000.0*(OH[1])
 ISOP            ,ppbV      ,1000.0*ISOP[1]
 N2O5            ,ppbV      ,1000.0*N2O5[1]
 NH3             ,ppbV      ,1000.0*NH3[1]
-NH3_UGM3        ,ug m-3    ,1000.0*(NH3[1]*0.5869*DENS[2])
-NHX             ,ug m-3    ,1000.0*(NH3[1]*0.5869*DENS[2])+ANH4I[1]+ANH4J[1]+ANH4K[1]
+NH3_UGM3        ,ug m-3    ,1000.0*(NH3[1]*0.587*DENS[2])
+NHX             ,ug m-3    ,1000.0*(NH3[1]*0.587*DENS[2])+ANH4I[1]+ANH4J[1]+ANH4K[1]
 NO              ,ppbV      ,1000.0*NO[1]
 NO2             ,ppbV      ,1000.0*NO2[1]
 NOX             ,ppbV      ,1000.0*(NO[1] + NO2[1])
