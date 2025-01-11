@@ -18,13 +18,13 @@
 !------------------------------------------------------------------------!
       
 !-------------------------------------------------------------------------
-      SUBROUTINE ELMO_CALC_DERIVED( OUTVAL, J )
+      SUBROUTINE ELMO_DERIVED_CALC( OUTVAL, J )
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
       USE CONST
       USE ELMO_DATA
-      USE ELMO_DERIVED
+      USE ELMO_DERIVED_DEFN
       USE ELMO_PROC, ONLY : CALC_ELMO
       USE AERO_DATA, ONLY: AEROMODE_LNSG, DRY_AERO_DIAM, WET_AERO_DIAM,
      &                     DRY_AERO_M2, WET_AERO_M2, DRY_AERO_M3, 
@@ -46,9 +46,10 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT( IN ) :: J
+      INTEGER, INTENT( IN ) :: J 
       REAL, INTENT( INOUT ) :: OUTVAL
-      INTEGER ILOC, IMODE, IVAR, IOA, IM, IV, ISRC, IDG, IUNIT, IERR
+      INTEGER ILOC, IMODE, IVAR, IOA, IM, IV, ISRC, IDG, IUNIT, 
+     &        IERR, N
       REAL VAL4, VAL3, VAL2, VAL, FRAC( N_MODE )
       REAL PM01, PM1, PM25, PM10, PMAMS, PM25to10, POM, POC, OtoC
       REAL K, P1, P2, P3, a, K2, PMF_NO3, PMF_NO3_LOSS,
@@ -147,41 +148,6 @@
             OUTVAL = PI * SUM( MOMENT2_CONC( : ), 
      &                          MASK=AEROMODE(:)%COARSE_MASK ) ! N m-3
 
-         ! Retrieve Total Particle Mass
-         CASE ( ID_PM_MASS )
-            MODE_MASK = AEROMODE%ALL_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, 0, 0, IV, ISRC ) 
-
-         ! Retrieve Ultrafine Particle Mass
-         CASE ( ID_PMU_MASS )
-            MODE_MASK = AEROMODE%ULTRAFINE_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, 0, 0, IV, ISRC ) 
-
-         ! Retrieve Fine Particle Mass
-         CASE ( ID_PMF_MASS )
-            MODE_MASK = AEROMODE%FINE_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, 0, 0, IV, ISRC ) 
-
-         ! Retrieve Coarse Particle Mass
-         CASE ( ID_PMC_MASS )
-            MODE_MASK = AEROMODE%COARSE_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, 0, 0, IV, ISRC ) 
-
-         ! Retrieve Nucleation-Mode Particle Mass
-         CASE ( ID_PMNUC_MASS )
-            MODE_MASK = AEROMODE%NUC_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, 0, 0, IV, ISRC ) 
-
-         ! Retrieve Aitken-Mode Particle Mass
-         CASE ( ID_PMAIT_MASS )
-            MODE_MASK = AEROMODE%AITKEN_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, 0, 0, IV, ISRC ) 
-
-         ! Retrieve Accumution-Mode Particle Mass
-         CASE ( ID_PMACC_MASS )
-            MODE_MASK = AEROMODE%ACCUM_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, 0, 0, IV, ISRC ) 
-
          ! Retrieve Dry Mode Density [kg m-3]
          CASE ( ID_DRY_DENS )
             OUTVAL = DRY_AERO_DENS( IM )  ! dry i-mode Density
@@ -220,36 +186,6 @@
             CALL GET_AERO_INLET( IPMAMS, IM, IWET, VAL ) 
             OUTVAL = VAL
  
-         ! Retrieve Bulk PM0.1 Concentration
-         CASE ( ID_PM01 )
-            MODE_MASK = AEROMODE%ALL_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, IPM01, IWET, IV, ISRC ) 
-
-         ! Retrieve Bulk PM1.0 Concentration
-         CASE ( ID_PM1 )
-            MODE_MASK = AEROMODE%ALL_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, IPM1, IWET, IV, ISRC ) 
-
-         ! Retrieve Bulk PM2.5 Concentration
-         CASE ( ID_PM25 )
-            MODE_MASK = AEROMODE%ALL_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, IPM25, IWET, IV, ISRC ) 
-
-         ! Retrieve Bulk PM10.0 Concentration
-         CASE ( ID_PM10 )
-            MODE_MASK = AEROMODE%ALL_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, IPM10, IWET, IV, ISRC ) 
-         
-         ! Retrieve Bulk PM2.5-10.0 Concentration
-         CASE ( ID_PM25to10 )
-            MODE_MASK = AEROMODE%ALL_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, IPM25to10, IWET, IV, ISRC ) 
-
-         ! Retrieve Bulk PM Concentration Relevant for the AMS
-         CASE ( ID_PMAMS )
-            MODE_MASK = AEROMODE%ALL_MASK 
-            OUTVAL = SUM_PM_MODES( MODE_MASK, IPMAMS, IWET, IV, ISRC ) 
-         
          ! Calculate AHPMOLAL - Fine Mode Concentration of H+ in
          ! Particle Water
          CASE ( ID_PMF_HPM )
@@ -259,7 +195,7 @@
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_HP has not been defined in the chem control namelist '//
      &                'so PMF_HPM cannot be calculated. Please define PMF_HP.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+               CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
             END IF 
 
             ! Retrieve AH2OIJ (ug m-3)
@@ -268,7 +204,7 @@
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_H2O has not been defined in the chem control namelist'//
      &                'so PMF_HPMOLAL cannot be calculated. Please define PMF_H2O.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+               CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
             END IF
             
             ! HPMOLAL = AHPLUSIJ / AH2OIJ * 1000.0 [mol kg-1]
@@ -282,7 +218,7 @@
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_HPMOLAL has not been defined in the chem control namelist'//
      &                'so PMF_PH cannot be calculated. Please define PMF_HPMOLAL.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+               CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
             END IF
 
             ! Retrieve AH2OIJ (ug m-3)
@@ -291,213 +227,13 @@
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_H2O has not been defined in the chem control namelist'//
      &                'so PMF_PH cannot be calculated. Please define PMF_H2O.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+               CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
             END IF
 
             OUTVAL = ELMO_BLANK
 
             IF ( VAL2 .GT. 0.01 )
      &           OUTVAL = -1.0 * LOG10( VAL )
-
-         ! Calculate PMF_OA - Fine-Mode Organic Aerosol Mass
-         CASE ( ID_PMF_OA )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%FINE_MASK
-            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate PMF_POA - Fine-Mode Primary Organic Aerosol Mass
-         CASE ( ID_PMF_POA )
-            ORG_MASK = OASPC(:)%PRIMARY
-            MODE_MASK = AEROMODE%FINE_MASK
-            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate PMF_SOA - Fine-Mode Secondary Organic Aerosol Mass
-         CASE ( ID_PMF_SOA )
-            ORG_MASK = .NOT. OASPC(:)%PRIMARY
-            MODE_MASK = AEROMODE%FINE_MASK
-            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Fine-Mode Organic Carbon Mass
-         CASE ( ID_PMF_OC )
-            ORG_MASK = OASPC( : )%OMtoOC .GT. 0.0
-            MODE_MASK = AEROMODE%FINE_MASK
-            OUTVAL = SUM_ORGS( OT_OC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Fine-Particle Primary Organic Carbon Mass
-         CASE ( ID_PMF_POC )
-            ORG_MASK = ( OASPC(:)%OMtoOC .GT. 0.0 ) .AND.
-     &                 ( OASPC(:)%PRIMARY )
-            MODE_MASK = AEROMODE%FINE_MASK
-            OUTVAL = SUM_ORGS( OT_OC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Fine-Particle Secondary Organic Carbon Mass
-         CASE ( ID_PMF_SOC )
-            ORG_MASK = ( OASPC(:)%OMtoOC .GT. 0.0 ) .AND.
-     &                 ( .NOT. OASPC(:)%PRIMARY )
-            MODE_MASK = AEROMODE%FINE_MASK
-            OUTVAL = SUM_ORGS( OT_OC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate PMF_ASOA - Fine-Mode Anthropogenic OA Mass
-         CASE ( ID_PMF_ASOA )
-            ORG_MASK = ( .NOT. OASPC(:)%PRIMARY ) .AND.
-     &                 ( OASPC(:)%ANTHRO )
-            MODE_MASK = AEROMODE%FINE_MASK
-            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate PMF_BSOA - Fine-Mode Biogenic SOA Mass
-         CASE ( ID_PMF_BSOA )
-            ORG_MASK = ( .NOT. OASPC(:)%PRIMARY ) .AND.
-     &                 ( OASPC(:)%BIOG )
-            MODE_MASK = AEROMODE%FINE_MASK
-            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate PMF_OMOC - Fine-Mode OM:OC 
-         CASE ( ID_PMF_OMOC )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%FINE_MASK
-            OUTVAL = SUM_ORGS( OT_OMOC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate PMF_OtoC - Fine-Mode O:C 
-         CASE ( ID_PMF_OtoC )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%FINE_MASK
-            OUTVAL = SUM_ORGS( OT_OTOC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate PM1_OM - PM1.0 Organic Aerosol Mass
-         CASE ( ID_PM1_OA )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
-     &                         MODE_MASK, IPM1, IWET, IV, ISRC )
-
-         ! Calculate PM1_OC - PM1.0 Organic Carbon Mass
-         CASE ( ID_PM1_OC )
-            ORG_MASK = OASPC( : )%OMtoOC .GT. 0.0
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_OC, ORG_MASK, 
-     &                         MODE_MASK, IPM1, IWET, IV, ISRC )
-
-         ! Calculate PM25_OM - PM2.5 Organic Aerosol Mass
-         CASE ( ID_PM25_OA )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
-     &                         MODE_MASK, IPM25, IWET, IV, ISRC )
-
-         ! Calculate PM25_OC - PM2.5 Organic Carbon Mass
-         CASE ( ID_PM25_OC )
-            ORG_MASK = OASPC( : )%OMtoOC .GT. 0.0
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_OC, ORG_MASK, 
-     &                         MODE_MASK, IPM25, IWET, IV, ISRC )
-
-         ! Retrieve OA Concentration Relevant for the AMS
-         CASE ( ID_AMS_OA )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_OA, ORG_MASK, 
-     &                         MODE_MASK, IPMAMS, IWET, IV, ISRC )
-
-         ! Calculate O:C relevant for AMS observations
-         CASE ( ID_AMS_OtoC )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_OTOC, ORG_MASK, 
-     &                         MODE_MASK, IPMAMS, IWET, IV, ISRC )
-
-         ! Calculate Dry Deposition of Total OA
-         CASE ( ID_DD_OA )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_DD_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Wet Deposition of Total OA
-         CASE ( ID_WD_OA )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_WD_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Dry Deposition of Total OC
-         CASE ( ID_DD_OC )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_DD_OC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Wet Deposition of Total OC
-         CASE ( ID_WD_OC )
-            ORG_MASK = .TRUE.
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_WD_OC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Dry Deposition of Primary OA
-         CASE ( ID_DD_POA )
-            ORG_MASK = OASPC(:)%PRIMARY
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_DD_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Wet Deposition of Primary OA
-         CASE ( ID_WD_POA )
-            ORG_MASK = OASPC(:)%PRIMARY
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_WD_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Dry Deposition of Primary OC
-         CASE ( ID_DD_POC )
-            ORG_MASK = OASPC(:)%PRIMARY
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_DD_OC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Wet Deposition of Primary OC
-         CASE ( ID_WD_POC )
-            ORG_MASK = OASPC(:)%PRIMARY
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_WD_OC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Dry Deposition of Secondary OA
-         CASE ( ID_DD_SOA )
-            ORG_MASK = .NOT. OASPC(:)%PRIMARY
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_DD_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Wet Deposition of Secondary OA
-         CASE ( ID_WD_SOA )
-            ORG_MASK = .NOT. OASPC(:)%PRIMARY
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_WD_OA, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Dry Deposition of Secondary OC
-         CASE ( ID_DD_SOC )
-            ORG_MASK = .NOT. OASPC(:)%PRIMARY
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_DD_OC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
-
-         ! Calculate Wet Deposition of Secondary OC
-         CASE ( ID_WD_SOC )
-            ORG_MASK = .NOT. OASPC(:)%PRIMARY
-            MODE_MASK = AEROMODE%ALL_MASK
-            OUTVAL = SUM_ORGS( OT_WD_OC, ORG_MASK, 
-     &                         MODE_MASK, 0, 0, IV, ISRC )
 
          ! Calculate Aerosol Fraction of Benzo-a-Pyrene
          CASE ( ID_BENAPY_FAERO )
@@ -536,7 +272,7 @@
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_NO3 has not been defined in the chem control namelist'//
      &                'so PMF_FRM cannot be calculated. Please define PMF_NO3.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+               CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
             END IF
             
             PMF_NO3_LOSS = MIN( 745.7/SRFTEMP * K2, PMF_NO3 )
@@ -548,7 +284,7 @@
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_NH4 has not been defined in the chem control namelist'//
      &                'so PMF_FRM cannot be calculated. Please define PMF_NH4.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+               CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
             END IF
             
             CALL CALC_ELMO( OUTVAL=PMF_SO4,  OUT_UNIT=IUNIT, 
@@ -556,11 +292,10 @@
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PMF_SO4 has not been defined in the chem control namelist'//
      &                'so PMF_FRM cannot be calculated. Please define PMF_SO4.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+               CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
             END IF
             
-            MODE_MASK = AEROMODE%FINE_MASK 
-            PMF = SUM_PM_MODES( MODE_MASK, 0, 0, IV, ISRC ) 
+            PMF = SUM_PM_MODES( IM_F, 0, 0, IV, ISRC ) 
 
             OUTVAL = PMF - PMF_NO3_LOSS - PMF_NH4_LOSS
      &                      +0.24 * ( PMF_SO4 + PMF_NH4 - PMF_NH4_LOSS ) + 0.5
@@ -584,7 +319,7 @@
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PM25_NO3 has not been defined in the chem control namelist'//
      &                'so PM25_FRM cannot be calculated. Please define PM25_NO3.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+               CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
             END IF
             
             PM25_NO3_LOSS = MIN( 745.7/SRFTEMP * K2, PM25_NO3 )
@@ -596,7 +331,7 @@
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PM25_NH4 has not been defined in the chem control namelist'//
      &                'so PM25_FRM cannot be calculated. Please define PM25_NH4.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+               CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
             END IF
             
             CALL CALC_ELMO( OUTVAL=PM25_SO4, OUT_UNIT=IUNIT, 
@@ -604,11 +339,10 @@
             IF ( IERR .EQ. 1 ) THEN
                XMSG = 'PM25_SO4 has not been defined in the chem control namelist'//
      &                'so PM25_FRM cannot be calculated. Please define PM25_SO4.'
-               CALL M3EXIT( 'ELMO_CALC_DERIVED',0,0,XMSG,1)
+               CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
             END IF
             
-            MODE_MASK = AEROMODE%ALL_MASK 
-            PM25 = SUM_PM_MODES( MODE_MASK, IPM25, IWET, IV, ISRC ) 
+            PM25 = SUM_PM_MODES( IM_ALL, IPM25, IWET, IV, ISRC ) 
 
             OUTVAL = PM25 - PM25_NO3_LOSS - PM25_NH4_LOSS
      &                      +0.24 * ( PM25_SO4 + PM25_NH4 - PM25_NH4_LOSS ) + 0.5
@@ -769,8 +503,25 @@
             OUTVAL = MET_DATA%DENS( C1,R1,L1 ) ! kg m-3
 
          CASE DEFAULT
-
+            ! This Could be a PM mass or organic aerosol derived
+            ! concentration or deposition. Check the DRVD_TAB field
+            N = ELMO_TABLE( J )%DRVD_TAB
+            IF ( N .GT. 0 ) THEN
+               IF ( ELMO_DRVD_TAB( N )%ORG_OP .EQ. 0 ) THEN
+                  ! Total PM Mass across MODES for INLET
+                  OUTVAL = SUM_PM_MODES( ELMO_DRVD_TAB( N )%MODE, 
+     &                                   ELMO_DRVD_TAB( N )%INLET, 
+     &                                   IWET, IV, ISRC ) 
+               ELSE
+                  ! Organic Aerosol Concentration or Deposition Metric
+                  OUTVAL = SUM_ORGS( ELMO_DRVD_TAB( N )%ORG_OP,
+     &                               ELMO_DRVD_TAB( N )%ORG_MASK,
+     &                               ELMO_DRVD_TAB( N )%MODE, 
+     &                               ELMO_DRVD_TAB( N )%INLET, 
+     &                               IWET, IV, ISRC )
+               END IF
+            END IF
          END SELECT 
  
-      END SUBROUTINE ELMO_CALC_DERIVED
+      END SUBROUTINE ELMO_DERIVED_CALC
  

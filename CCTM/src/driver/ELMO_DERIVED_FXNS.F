@@ -22,7 +22,7 @@
       CONTAINS 
 
 !----------------------------------------------------------------------
-      REAL FUNCTION SUM_PM_MODES( MODE_MASK, INLET, WETNESS, IV, ISRC )
+      REAL FUNCTION SUM_PM_MODES( MODE_MASK_IN, INLET, WETNESS, IV, ISRC )
      &              RESULT( OUTVAL )
 !----------------------------------------------------------------------
 !     SUM_PM_MODES returns the sum of total PM Mass ignoring water,
@@ -36,8 +36,9 @@
 !----------------------------------------------------------------------
 
       USE AERO_DATA, ONLY: N_MODE, AEROSPC_CONC, AH2O_IDX, AORGH2O_IDX, 
-     &                     AEROSPC, N_AEROSPC
-      USE ELMO_DATA, ONLY : ET_CMPST, ET_DRVD
+     &                     AEROSPC, N_AEROSPC, AEROMODE
+      USE ELMO_DATA, ONLY : ET_CMPST, ET_DRVD, IM_ALL, IM_UF, IM_F,
+     &                      IM_C, IM_ACC, IM_AIT, IM_NUC
 #ifdef isam      
       USE ELMO_DATA, ONLY : ET_ISAM_CMPST, ET_ISAM_DRVD, ISAM_VEC
       USE SA_DEFN, ONLY : MAP_AEROtoSA, NTAG_SA
@@ -50,15 +51,36 @@
 
       IMPLICIT NONE
 
-      LOGICAL :: MODE_MASK( N_MODE )  ! Mask Indicating which modes to sum
+      INTEGER :: MODE_MASK_IN         ! Index for Mode Selection
       INTEGER :: IV, ISRC             ! ELMO Variable type, Source number
       INTEGER :: INLET                ! Integer prescribing the inlet type
       INTEGER :: WETNESS              ! 1 = Wet Aerosol; 2 = Dry Aerosol
                                       !   (see ELMO_INLET table in ELMO_DATA module)
+      LOGICAL :: MODE_MASK( N_MODE )  ! Mask Indicating which modes to sum
       INTEGER :: IM, IAER, ISA
       REAL    :: FRAC
                                         
       OUTVAL = 0.0
+
+      ! Select Correct Mode Mask
+      SELECT CASE ( MODE_MASK_IN )
+         CASE( IM_ALL )
+            MODE_MASK = AEROMODE%ALL_MASK
+         CASE( IM_UF )
+            MODE_MASK = AEROMODE%ULTRAFINE_MASK
+         CASE( IM_F )
+            MODE_MASK = AEROMODE%FINE_MASK
+         CASE( IM_C )
+            MODE_MASK = AEROMODE%COARSE_MASK
+         CASE( IM_ACC )
+            MODE_MASK = AEROMODE%ACCUM_MASK
+         CASE( IM_AIT )
+            MODE_MASK = AEROMODE%AITKEN_MASK
+         CASE( IM_NUC )
+            MODE_MASK = AEROMODE%NUC_MASK
+         CASE DEFAULT
+            MODE_MASK = .FALSE.
+      END SELECT
 
       ! Determine Which Type of ELMO Variable is Requested
       SELECT CASE ( IV )
@@ -122,8 +144,8 @@
       END FUNCTION SUM_PM_MODES
 
 !----------------------------------------------------------------------
-      RECURSIVE FUNCTION SUM_ORGS( ORG_TYPE, ORG_MASK, MODE_MASK, INLET, 
-     &                        WETNESS, IV, ISRC ) RESULT( OUTVAL )
+      RECURSIVE FUNCTION SUM_ORGS( ORG_TYPE, ORG_MASK_IN, MODE_MASK_IN, 
+     &                        INLET, WETNESS, IV, ISRC ) RESULT( OUTVAL )
 !----------------------------------------------------------------------
 !     SUM_ORGS returns the sum of total Organic species given a mask
 !     of which species to add. This mask should be of the same length
@@ -142,10 +164,12 @@
 
       USE AERO_DATA, ONLY: N_MODE, AEROSPC_CONC, AH2O_IDX, AORGH2O_IDX, 
      &                     AEROSPC, N_AEROSPC, AEROSPC_MAP, 
-     &                     AEROMODE, APOC_IDX, APNCOM_IDX, AERO_MISSING
+     &                     APOC_IDX, APNCOM_IDX, AERO_MISSING,
+     &                     MAP_MODE_MASK
       USE CGRID_SPCS, ONLY : MAP_CGRIDtoWDEP
       USE VDIFF_MAP, ONLY : DEPV_MAP
-      USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, MAP_OAtoAERO, OASPC
+      USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, MAP_OAtoAERO, OASPC,
+     &                     MAP_ORG_MASK
       USE ELMO_DATA, ONLY : ET_CMPST, ET_DRVD, OT_OA, OT_OC, OT_OMOC, 
      &                      OT_OTOC, OT_DD_OA, OT_DD_OC, OT_WD_OA, 
      &                      OT_DD_OC, OT_WD_OC, ET_DRVD_DDEP, ET_DRVD_WDEP,
@@ -165,7 +189,9 @@
       IMPLICIT NONE
 
       INTEGER :: ORG_TYPE
+      INTEGER :: ORG_MASK_IN
       LOGICAL :: ORG_MASK( N_OA )
+      INTEGER :: MODE_MASK_IN         ! Parameter selecting the aerosol modes
       LOGICAL :: MODE_MASK( N_MODE )  ! Mask Indicating which modes to sum
       INTEGER :: IV, ISRC             ! ELMO Variable type, Source number
       INTEGER :: INLET                ! Integer prescribing the inlet type
@@ -175,13 +201,30 @@
       REAL    :: FRAC( N_MODE ), VAL, VAL2,
      &           POC, POM, OtoC
       REAL    :: OUTVAL
-                                        
+ 
+      ! Select Correct Mode Mask
+      CALL MAP_MODE_MASK( MODE_MASK_IN, MODE_MASK )                                 
+
       ! Loop through modes and calculate inlet fraction     
+      ! unless this is OM:OC, in which case the fraction will be applied
+      ! at a lower level (i.e. the sums of OA and OC)
       IF ( ORG_TYPE .NE. OT_OMOC ) THEN
         DO IM = 1,N_MODE
            CALL GET_AERO_INLET( INLET, IM, WETNESS, FRAC(IM) )
         END DO
       END IF
+
+      ! Map ORG_MASK_IN input parameter to a Mask of Organic Aerosol
+      ! Variables
+      CALL MAP_ORG_MASK( ORG_MASK_IN, ORG_MASK )
+
+      ! If Organic Carbon is being calculated, only
+      ! consider species with real OM:OC
+      IF ( ORG_TYPE .EQ. OT_OC .OR.
+     &     ORG_TYPE .EQ. OT_DD_OC .OR.
+     &     ORG_TYPE .EQ. OT_WD_OC )
+     &   ORG_MASK = ORG_MASK .AND. OASPC( : )%OMtoOC .GT. 0.0
+
 
       ! Calculate Organic Aerosol Metric
       OUTVAL = 0.0
@@ -264,11 +307,11 @@
 
         CASE ( OT_OMOC )
           ! Calculate OM:OC of Species selected by ORG_MASK
-          VAL = SUM_ORGS( OT_OA, ORG_MASK, MODE_MASK, INLET, 
+          VAL = SUM_ORGS( OT_OA, ORG_MASK_IN, MODE_MASK_IN, INLET, 
      &                    WETNESS, ET_DRVD, 0 )
 
           ORG_MASK = ORG_MASK .AND. OASPC( : )%OMtoOC .GT. 0.0
-          VAL2= SUM_ORGS( OT_OC, ORG_MASK, MODE_MASK, INLET, 
+          VAL2= SUM_ORGS( OT_OC, ORG_MASK_IN, MODE_MASK_IN, INLET, 
      &                    WETNESS, ET_DRVD, 0 )
 
           OUTVAL = VAL / ( VAL2 + TINY( 0.0 ) )
@@ -276,7 +319,7 @@
         CASE ( OT_OTOC )
           ! Calculate O:C of Species selected by ORG_MASK
           ! First retrieve OM of this selection
-          VAL = SUM_ORGS( OT_OA, ORG_MASK, MODE_MASK, INLET, 
+          VAL = SUM_ORGS( OT_OA, ORG_MASK_IN, MODE_MASK_IN, INLET, 
      &                    WETNESS, ET_DRVD, 0 )
         
           ! Now Calculate Weighted O:C
@@ -300,12 +343,10 @@
                      IF ( IVAR .NE. 0 ) THEN
                      IF ( ISRC .LE. NTAG_SA ) THEN
                        VAL2 = VAL2 + FRAC( IM )
-     &                        * ISAM_VEC( IVAR,ISRC ) 
-     &                        * OASPC( IOA )%OtoC
+     &                        * ISAM_VEC( IVAR,ISRC ) * OASPC( IOA )%OtoC
                      ELSE
                        VAL2 = VAL2 + FRAC( IM )
-     &                        * SUM(ISAM_VEC( IVAR,: )) 
-     &                        * OASPC( IOA )%OtoC
+     &                        * SUM(ISAM_VEC( IVAR,: )) * OASPC( IOA )%OtoC
                      END IF
                      END IF
 #endif
@@ -314,8 +355,7 @@
 #ifdef sens      
                      IVAR = AEROSPC_MAP( MAP_OAtoAERO(IOA),IM )
                      VAL2 = VAL2 + FRAC( IM )
-     &                      * DDM_VEC( ISRC,IVAR ) 
-     &                      * OASPC( IOA )%OtoC
+     &                      * DDM_VEC( ISRC,IVAR ) * OASPC( IOA )%OtoC
 #endif
 
                    END IF
@@ -344,22 +384,18 @@
      &                 .AND. .NOT. AERO_MISSING( APOC_IDX,IM) ) THEN
                      IVAR = MAP_AEROtoSA( APOC_IDX,IM )
                      IF ( ISRC .LE. NTAG_SA ) THEN
-                        POC = POC + FRAC(IM) 
-     &                    * ISAM_VEC( IVAR,ISRC ) 
+                        POC = POC + FRAC(IM) * ISAM_VEC( IVAR,ISRC ) 
                      ELSE
-                        POC = POC + FRAC(IM) 
-     &                    * SUM(ISAM_VEC( IVAR,: ))
+                        POC = POC + FRAC(IM) * SUM(ISAM_VEC( IVAR,: ))
                      END IF
                   END IF
                   IF ( APNCOM_IDX .NE. 0 
      &                 .AND. .NOT. AERO_MISSING( APNCOM_IDX,IM) ) THEN
                      IVAR = MAP_AEROtoSA( APNCOM_IDX,IM )
                      IF ( ISRC .LE. NTAG_SA ) THEN
-                        POM = POM + FRAC(IM) 
-     &                    * ISAM_VEC( IVAR,ISRC ) 
+                        POM = POM + FRAC(IM) * ISAM_VEC( IVAR,ISRC ) 
                      ELSE
-                        POM = POM + FRAC(IM) 
-     &                    * SUM(ISAM_VEC( IVAR,: ))
+                        POM = POM + FRAC(IM) * SUM(ISAM_VEC( IVAR,: ))
                      END IF   
                   END IF 
 #endif

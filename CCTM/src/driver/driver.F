@@ -110,6 +110,7 @@ C-----------------------------------------------------------------------
       USE WVEL_DEFN             ! derived vertical velocity component
       USE BUDGET_DEFN
       USE AERO_DATA
+      USE SOA_DEFN, ONLY : MAP_OA
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP, ELMO_INIT_SHARED
       USE ELMO_PROC, ONLY : ELMO_DRIVER
       USE UTILIO_DEFN
@@ -433,6 +434,8 @@ C Initialize ddm3d calculations
 #endif
 
         CALL MAP_AERO()
+        CALL MAP_OA()
+
 
 C Initialize Global Arrays for Storing Chemical, Regional, Process,
 C and Emission Stream Families

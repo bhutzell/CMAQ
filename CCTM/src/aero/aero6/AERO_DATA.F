@@ -764,6 +764,13 @@ C                  ------- ----------  -------   --- -  -  - -- -- --  -------- 
      &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', T,  F, F, T, F, F, F, conmin,  conmin, conmin)/)
 
 
+      ! Indices for mode masks
+      INTEGER, PARAMETER :: IM_ALL = 1, IM_UF = 2, IM_F = 3, IM_C = 4,
+     &                      IM_ACC = 5, IM_AIT = 6, IM_NUC = 7
+
+      CHARACTER( 5 ), PARAMETER :: CMODE(7) = (/ 'TSP  ','PMU  ','PMF  ','PMC  ',
+     &                                           'PMACC','PMAIT','PMNUC'/)
+
       Real          :: moment0_conc( n_mode )     ! 0th moment concentration
       Real          :: moment2_conc( n_mode )     ! 2nd moment concentration
       Real          :: moment3_conc( n_mode )     ! 3rd moment concentration
@@ -846,6 +853,39 @@ C Private variables for loading from and unloading to CGRID array
 
       Contains
 
+
+
+C-----------------------------------------------------------------------
+      Subroutine map_mode_mask( mode_mask_in, mode_mask )
+C     Maps the mode mask indices to a vector of logicals correpsonding
+C     to the mode mask.
+C-----------------------------------------------------------------------
+      IMPLICIT NONE
+
+      integer :: mode_mask_in
+      logical :: mode_mask( n_mode )
+
+      ! Select Correct Mode Mask
+      SELECT CASE ( MODE_MASK_IN )
+         CASE( IM_ALL )
+            MODE_MASK = AEROMODE%ALL_MASK
+         CASE( IM_UF )
+            MODE_MASK = AEROMODE%ULTRAFINE_MASK
+         CASE( IM_F )
+            MODE_MASK = AEROMODE%FINE_MASK
+         CASE( IM_C )
+            MODE_MASK = AEROMODE%COARSE_MASK
+         CASE( IM_ACC )
+            MODE_MASK = AEROMODE%ACCUM_MASK
+         CASE( IM_AIT )
+            MODE_MASK = AEROMODE%AITKEN_MASK
+         CASE( IM_NUC )
+            MODE_MASK = AEROMODE%NUC_MASK
+         CASE DEFAULT
+            MODE_MASK = .FALSE.
+      END SELECT
+
+      End Subroutine map_mode_mask
 
 C-----------------------------------------------------------------------
       Subroutine map_aero()
@@ -1282,7 +1322,6 @@ C compute aeromode_minNum and aeromode_minM2
       End If 
 
       mapped = .True.
-
 
 99901 Format( 'FATAL Error(s) found in the AE namelist used. Check that' 
      &  /' this AE namelist contains the above required data '

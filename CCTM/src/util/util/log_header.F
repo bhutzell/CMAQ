@@ -38,14 +38,14 @@
 
       TOC_TXT( 1:N_TOC_TXT ) = (/   
      &   '                                                                                  ',
-     &   '     ------------------------                                                     ',
-     &   '     |>>   Useful Links   <<|                                                     ',
-     &   '     ------------------------                                                     ',
+     &   '     -----------------------                                                      ',
+     &   '     |>>   Please Note   <<|                                                      ',
+     &   '     -----------------------                                                      ',
      &   '                                                                                  ',
      &   '     Search for the headings below to jump to error checks, reports, and          ', 
      &   '     diagnostic tables documenting emission input, prediction output, etc.        ',
      &   '                                                                                  ',
-     &   '     ** It is STRONGLY recommended that users check these sections when           ', 
+     &   '     ** It is CRITICALLY IMPORTANT that users check these sections when           ', 
      &   '        configuring a new scenario or beginning production-level simulations. **  ',
      &   '                                                                                  ',
      &   '     -> INITIALIZE DESID EMISSION MODULE                                          ',

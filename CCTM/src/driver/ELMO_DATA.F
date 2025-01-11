@@ -20,7 +20,9 @@
 c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE ELMO_DATA
 
-      USE AERO_DATA, ONLY : N_MODE
+      USE AERO_DATA, ONLY : N_MODE, IM_ALL, IM_UF, IM_F, IM_C, IM_AIT,
+     &                      IM_ACC, IM_NUC
+      USE SOA_DEFN, ONLY  : IOA_PRI, IOA_SEC, IOA_ANT, IOA_BIO
       USE UTILIO_DEFN
 
       IMPLICIT NONE
@@ -90,13 +92,13 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_PMU_SRF =     16
       INTEGER, PARAMETER :: ID_PMF_SRF =     17
       INTEGER, PARAMETER :: ID_PMC_SRF =     18
-      INTEGER, PARAMETER :: ID_PM_MASS =     19
-      INTEGER, PARAMETER :: ID_PMU_MASS =    20
-      INTEGER, PARAMETER :: ID_PMF_MASS =    21
-      INTEGER, PARAMETER :: ID_PMC_MASS =    22
-      INTEGER, PARAMETER :: ID_PMNUC_MASS =  23
-      INTEGER, PARAMETER :: ID_PMAIT_MASS =  24
-      INTEGER, PARAMETER :: ID_PMACC_MASS =  25
+      INTEGER, PARAMETER :: ID_PM =          19
+      INTEGER, PARAMETER :: ID_PMU =         20
+      INTEGER, PARAMETER :: ID_PMF =         21
+      INTEGER, PARAMETER :: ID_PMC =         22
+      INTEGER, PARAMETER :: ID_PMNUC =       23
+      INTEGER, PARAMETER :: ID_PMAIT =       24
+      INTEGER, PARAMETER :: ID_PMACC =       25
       INTEGER, PARAMETER :: ID_DRY_DENS =    26
       INTEGER, PARAMETER :: ID_WET_DENS =    27
       INTEGER, PARAMETER :: ID_FPM01 =       28
@@ -176,8 +178,6 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_DD_SOC =     102
       INTEGER, PARAMETER :: ID_WD_SOC =     103
 
-
-
       TYPE ELDTP
         CHARACTER (LEN = 16) :: NAME      !Parameter Name
         INTEGER              :: ID        !ID Number in Case Statement
@@ -210,13 +210,13 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'PMU_SRF      ',ID_PMU_SRF,    ET_AEROPROP, F, 'm2 m-3', 'Ultrafine-Mode Surface Area' ),
      &ELDTP( 'PMF_SRF      ',ID_PMF_SRF,    ET_AEROPROP, F, 'm2 m-3', 'Fine-Mode Surface Area' ),
      &ELDTP( 'PMC_SRF      ',ID_PMC_SRF,    ET_AEROPROP, F, 'm2 m-3', 'Coarse-Mode Surface Area' ),
-     &ELDTP( 'TSP          ',ID_PM_MASS,    ET_DRVD,     F, 'ug m-3', 'Total Particle Mass' ),
-     &ELDTP( 'PMU          ',ID_PMU_MASS,   ET_DRVD,     F, 'ug m-3', 'Ultrafine Particle Mass' ),
-     &ELDTP( 'PMF          ',ID_PMF_MASS,   ET_DRVD,     F, 'ug m-3', 'Fine Particle Mass' ),
-     &ELDTP( 'PMC          ',ID_PMC_MASS,   ET_DRVD,     F, 'ug m-3', 'Coarse Particle Mass' ),
-     &ELDTP( 'PMNUC        ',ID_PMNUC_MASS, ET_DRVD,     F, 'ug m-3', 'Nucleation Mode Total PM' ),
-     &ELDTP( 'PMAIT        ',ID_PMAIT_MASS, ET_DRVD,     F, 'ug m-3', 'Aitken Mode Total PM' ),
-     &ELDTP( 'PMACC        ',ID_PMACC_MASS, ET_DRVD,     F, 'ug m-3', 'Accumulation Mode Total PM' ),
+     &ELDTP( 'TSP          ',ID_PM,         ET_DRVD,     F, 'ug m-3', 'Total Particle Mass' ),
+     &ELDTP( 'PMU          ',ID_PMU,        ET_DRVD,     F, 'ug m-3', 'Ultrafine Particle Mass' ),
+     &ELDTP( 'PMF          ',ID_PMF,        ET_DRVD,     F, 'ug m-3', 'Fine Particle Mass' ),
+     &ELDTP( 'PMC          ',ID_PMC,        ET_DRVD,     F, 'ug m-3', 'Coarse Particle Mass' ),
+     &ELDTP( 'PMNUC        ',ID_PMNUC,      ET_DRVD,     F, 'ug m-3', 'Nucleation Mode Total PM' ),
+     &ELDTP( 'PMAIT        ',ID_PMAIT,      ET_DRVD,     F, 'ug m-3', 'Aitken Mode Total PM' ),
+     &ELDTP( 'PMACC        ',ID_PMACC,      ET_DRVD,     F, 'ug m-3', 'Accumulation Mode Total PM' ),
      &ELDTP( 'DRY_DENS     ',ID_DRY_DENS,   ET_AEROPROP, T, 'kg m-3', 'Bulk Density of Particles excluding particle water' ),
      &ELDTP( 'WET_DENS     ',ID_WET_DENS,   ET_AEROPROP, T, 'kg m-3', 'Bulk Density of Particles including particle water' ),
      &ELDTP( 'FPM01        ',ID_FPM01,      ET_AEROPROP, T, '1     ', 'PM01 fraction of mode' ),
@@ -235,7 +235,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       ! Fine-Mode PM Species                         
      &ELDTP( 'PMF_OA       ',ID_PMF_OA,     ET_DRVD,     F, 'ug m-3', 'Fine-Mode Organic Aerosol' ),
      &ELDTP( 'PMF_OC       ',ID_PMF_OC,     ET_DRVD,     F, 'ug m-3', 'Fine-Mode Organic Carbon (excludes non-carbon atoms)' ),
-     &ELDTP( 'PMF_HPMOLAL  ',ID_PMF_HPM,    ET_DRVD,     F, 'mol kg-1','Fine-Mode Concentration of H+ in Particle Water' ),
+     &ELDTP( 'PMF_HPMOLAL  ',ID_PMF_HPM,    ET_AEROPROP, F, 'mol kg-1','Fine-Mode Concentration of H+ in Particle Water' ),
      &ELDTP( 'PMF_PH       ',ID_PMF_PH,     ET_AEROPROP, F, '1'     , 'Fine-Mode pH' ),
                                                   
       ! Organic Aerosol Relevant Aggregates          
@@ -250,7 +250,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                                                   
       ! AMS Speciation                            
      &ELDTP( 'PMAMS_OA     ',ID_AMS_OA,     ET_DRVD,     F, 'ug m-3', 'Organic Aerosol Collected by the AMS' ),
-     &ELDTP( 'PMAMS_OTOC   ',ID_AMS_OTOC,   ET_DRVD,     F, 'ug ug-1','O:C Collected and Measured by the AMS' ),
+     &ELDTP( 'PMAMS_OTOC   ',ID_AMS_OTOC,   ET_AEROPROP, F, 'ug ug-1','O:C Collected and Measured by the AMS' ),
                                                   
       ! PM1 Speciation                            
      &ELDTP( 'PM1_OA       ',ID_PM1_OA,     ET_DRVD,     F, 'ug m-3', 'PM1 Organic Aerosol' ),
@@ -407,6 +407,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                                               
           REAL                 :: MW          ! Species molecular weight, if defined
           LOGICAL              :: L_COMP      ! Is this variable a linear combination of other variables
+          INTEGER              :: DRVD_TAB    ! Index in the table of Derived Variable Parameters
       END TYPE ELMO_TABLE_TYPE
 
       TYPE ELMO_COMP_TYPE
@@ -509,14 +510,14 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: IWET = 1, IDRY = 2
 
       TYPE (ELMO_INLET_TYPE), PARAMETER :: ELMO_INLET( N_INLET ) = (/
-       !                          Inlet Name D_Lo  D_Hi
-       !                          ---------- ----  ----
+       !                       Inlet Name D_Lo  D_Hi
+       !                       ---------- ----  ----
      &        ELMO_INLET_TYPE( 'PM01    ', 0.0,  0.1 ),
      &        ELMO_INLET_TYPE( 'PM1     ', 0.0,  1.0 ),
      &        ELMO_INLET_TYPE( 'PM25    ', 0.0,  2.5 ),
      &        ELMO_INLET_TYPE( 'PM10    ', 0.0, 10.0 ),
      &        ELMO_INLET_TYPE( 'PM25TO10', 2.5, 10.0 ),
-     &        ELMO_INLET_TYPE( 'PMAMS   ', 0.0,  0.0 ),
+     &        ELMO_INLET_TYPE( 'AMS     ', 0.0,  0.0 ),
      &        ELMO_INLET_TYPE( 'INUM10  ', 0.01,1.0e3),
      &        ELMO_INLET_TYPE( 'INUM20  ', 0.02,1.0e3),
      &        ELMO_INLET_TYPE( 'INUM40  ', 0.04,1.0e3),
@@ -533,25 +534,93 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                      OT_OTOC = 4, OT_DD_OA = 5, OT_WD_OA = 6,
      &                      OT_DD_OC = 7, OT_WD_OC = 8
 
-        REAL, ALLOCATABLE, SAVE, PUBLIC :: 
-     &                             ELMO_AOD_550(:,:),  ! total aerosol optical depth at 
-                                                       !   550 nm (Angstrom Interpolation) 
-     &                             ELMO_EXT_550(:,:,:),! aerosol extinction at 550 nm for layer [1/m]
-     &                             ELMO_NO2COL(:,:), ! NO2 Column
-     &                             ELMO_SO2COL(:,:), ! SO2 Column
-     &                             ELMO_HCHOCOL(:,:),! Formaldehyde Column
-     &                             ELMO_COCOL(:,:)   ! CO Column
+      
+      ! Make table of Parameters for documenting and calculating derived
+      ! concentration and deposition variables
+      TYPE ELMO_DRVD_TYPE
+          INTEGER  ID        ! Variable ID from ELMO_LIST
+          INTEGER  MODE      ! Index of Mode Mask
+          INTEGER  INLET     ! Index of Mode Mask
+          INTEGER  ORG_OP    ! Operation used for calculation
+          INTEGER  ORG_MASK  ! Which organic categories to consider
+      END TYPE ELMO_DRVD_TYPE
 
+      INTEGER, PARAMETER :: N_ELMO_DRVD = 41
+      TYPE (ELMO_DRVD_TYPE), PARAMETER :: ELMO_DRVD_TAB( N_ELMO_DRVD ) = (/
+       !                 ID           Mode    Inlet   ORG_OP    ORG_MASK
+       !                ------------- -----   -----   ------    --------
+       !                                   
+        ! Mass Variables
+     &  ELMO_DRVD_TYPE( ID_PM,        IM_ALL, 0,        0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PMU,       IM_UF,  0,        0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PMF,       IM_F,   0,        0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PMC,       IM_C,   0,        0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PMNUC,     IM_NUC, 0,        0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PMAIT,     IM_AIT, 0,        0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PMACC,     IM_ACC, 0,        0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PM01,      IM_ALL, IPM01,    0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PM1,       IM_ALL, IPM1,     0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PM25,      IM_ALL, IPM25,    0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PM10,      IM_ALL, IPM10,    0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PM25to10,  IM_ALL, IPM25to10,0,        0       ),
+     &  ELMO_DRVD_TYPE( ID_PMAMS,     IM_ALL, IPMAMS,   0,        0       ),
 
-        REAL, ALLOCATABLE, SAVE :: ELMO_WDEP(:,:,:) ! wet deposition accumulated per time step
-        REAL, ALLOCATABLE, SAVE :: ELMO_DDEP(:,:,:) ! dry deposition accumulated per time step
-        REAL, ALLOCATABLE, SAVE :: ELMO_ISAM_WDEP(:,:,:,:) ! wet deposition accumulated per time step
-        REAL, ALLOCATABLE, SAVE :: ELMO_ISAM_DDEP(:,:,:,:) ! dry deposition accumulated per time step
-        REAL, ALLOCATABLE, SAVE :: ELMO_DDM_WDEP(:,:,:,:) ! wet deposition accumulated per time step
-        REAL, ALLOCATABLE, SAVE :: ELMO_DDM_DDEP(:,:,:,:) ! dry deposition accumulated per time step
-             
-        REAL, SAVE :: WDIR10, PV
+        ! Organics
+     &  ELMO_DRVD_TYPE( ID_PMF_OA,    IM_F,   0,        OT_OA,    0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_PMF_OC,    IM_F,   0,        OT_OC,    0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_PMF_POA,   IM_F,   0,        OT_OA,    IOA_PRI ),                                          
+     &  ELMO_DRVD_TYPE( ID_PMF_POC,   IM_F,   0,        OT_OC,    IOA_PRI ),                                          
+     &  ELMO_DRVD_TYPE( ID_PMF_SOA,   IM_F,   0,        OT_OA,    IOA_SEC ),                                          
+     &  ELMO_DRVD_TYPE( ID_PMF_SOC,   IM_F,   0,        OT_OC,    IOA_SEC ),                                          
+     &  ELMO_DRVD_TYPE( ID_PMF_ASOA,  IM_F,   0,        OT_OA,    IOA_ANT ),  
+     &  ELMO_DRVD_TYPE( ID_PMF_BSOA,  IM_F,   0,        OT_OA,    IOA_BIO ),                                          
+     &  ELMO_DRVD_TYPE( ID_PMF_OMOC,  IM_F,   0,        OT_OMOC,  0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_PMF_OTOC,  IM_F,   0,        OT_OTOC,  0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_AMS_OA,    IM_ALL, IPMAMS,   OT_OA,    0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_AMS_OTOC,  IM_ALL, IPMAMS,   OT_OTOC,  0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_PM1_OA,    IM_ALL, IPM1,     OT_OA,    0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_PM1_OC,    IM_ALL, IPM1,     OT_OC,    0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_PM25_OA,   IM_ALL, IPM25,    OT_OA,    0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_PM25_OC,   IM_ALL, IPM25,    OT_OC,    0       ),                                          
+       
+        ! Organic Deposition
+     &  ELMO_DRVD_TYPE( ID_DD_OA,     IM_F,   0,        OT_DD_OA, 0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_WD_OA,     IM_F,   0,        OT_WD_OA, 0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_DD_OC,     IM_F,   0,        OT_DD_OC, 0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_WD_OC,     IM_F,   0,        OT_WD_OC, 0       ),                                          
+     &  ELMO_DRVD_TYPE( ID_DD_POA,    IM_F,   0,        OT_DD_OA, IOA_PRI ),                                          
+     &  ELMO_DRVD_TYPE( ID_WD_POA,    IM_F,   0,        OT_WD_OA, IOA_PRI ),                                          
+     &  ELMO_DRVD_TYPE( ID_DD_POC,    IM_F,   0,        OT_DD_OC, IOA_PRI ),                                          
+     &  ELMO_DRVD_TYPE( ID_WD_POC,    IM_F,   0,        OT_WD_OC, IOA_PRI ),                                          
+     &  ELMO_DRVD_TYPE( ID_DD_SOA,    IM_F,   0,        OT_DD_OA, IOA_SEC ),                                          
+     &  ELMO_DRVD_TYPE( ID_WD_SOA,    IM_F,   0,        OT_WD_OA, IOA_SEC ),                                          
+     &  ELMO_DRVD_TYPE( ID_DD_SOC,    IM_F,   0,        OT_DD_OC, IOA_SEC ),                                    
+     &  ELMO_DRVD_TYPE( ID_WD_SOC,    IM_F,   0,        OT_WD_OC, IOA_SEC )
 
+     &  /)
+                                                                                                                   
+                                                                                                                                  
+                                                                                                                                  
+      ! Define global arrays for capturing ELMO variable data from other                                                          
+      ! CMAQ modules                                                                                                              
+        REAL, ALLOCATABLE, SAVE, PUBLIC ::                                                                                        
+     &                             ELMO_AOD_550(:,:),  ! total aerosol optical depth at                                           
+                                                       !   550 nm (Angstrom Interpolation)                                        
+     &                             ELMO_EXT_550(:,:,:),! aerosol extinction at 550 nm for layer [1/m]                             
+     &                             ELMO_NO2COL(:,:), ! NO2 Column                                                                 
+     &                             ELMO_SO2COL(:,:), ! SO2 Column                                                                 
+     &                             ELMO_HCHOCOL(:,:),! Formaldehyde Column                                                        
+     &                             ELMO_COCOL(:,:)   ! CO Column                                                                  
+                                                                                                                                  
+        REAL, ALLOCATABLE, SAVE :: ELMO_WDEP(:,:,:) ! wet deposition accumulated per time step                                    
+        REAL, ALLOCATABLE, SAVE :: ELMO_DDEP(:,:,:) ! dry deposition accumulated per time step                                    
+        REAL, ALLOCATABLE, SAVE :: ELMO_ISAM_WDEP(:,:,:,:) ! wet deposition accumulated per time step                             
+        REAL, ALLOCATABLE, SAVE :: ELMO_ISAM_DDEP(:,:,:,:) ! dry deposition accumulated per time step                             
+        REAL, ALLOCATABLE, SAVE :: ELMO_DDM_WDEP(:,:,:,:) ! wet deposition accumulated per time step                              
+        REAL, ALLOCATABLE, SAVE :: ELMO_DDM_DDEP(:,:,:,:) ! dry deposition accumulated per time step                              
+                                                                                                                                  
+        REAL, SAVE :: WDIR10, PV                                                                                                                
+                                                                                                                                                
         LOGICAL, SAVE :: INIT_TIME
 
         ! Set Value for Missing Variables

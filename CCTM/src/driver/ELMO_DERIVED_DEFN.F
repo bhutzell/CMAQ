@@ -16,7 +16,7 @@
 !  General Public License or the GNU Lesser General Public License is    !
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
-      MODULE ELMO_DERIVED
+      MODULE ELMO_DERIVED_DEFN
 
       USE ELMO_DATA
 
@@ -60,7 +60,7 @@
 
       IMPLICIT NONE    
 
-      INTEGER J, IOS, ISRC
+      INTEGER J, IOS, ISRC, K
       
       MX_SRC = 0
 #ifdef isam
@@ -130,13 +130,30 @@
         END DO
       END DO
 
-      ! Define Formulas for DERIVED Variables
-      !DO J = 1,N_ELMO_TABLE
-      !   IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD
+      ! Map Derived Concentration and Deposition ELMO Variables to the
+      ! ELMO Derived Parameters Table
+      DO J = 1,N_ELMO_TABLE
+         ELMO_TABLE( J )%DRVD_TAB = 0
+         IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD .OR.
+     &        ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD_DDEP .OR.
+     &        ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD_WDEP .OR.
+     &        ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_DRVD .OR.
+     &        ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_DRVD_DDEP .OR.
+     &        ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_DRVD_WDEP .OR.
+     &        ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_DRVD .OR.
+     &        ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_DRVD_DDEP .OR.
+     &        ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_DRVD_WDEP .OR.
+     &        ELMO_TABLE( J )%VAR_TYPE .EQ. ET_AEROPROP ) THEN
 
-
+            DO K = 1,N_ELMO_DRVD
+               IF ( ELMO_TABLE( J )%ID .EQ. ELMO_DRVD_TAB( K )%ID ) THEN
+                  ELMO_TABLE( J )%DRVD_TAB = K
+               END IF
+            END DO
+         END IF
+      END DO
 
       END SUBROUTINE ELMO_MAP_DERIVED
 
-      END MODULE ELMO_DERIVED
+      END MODULE ELMO_DERIVED_DEFN
       

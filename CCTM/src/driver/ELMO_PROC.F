@@ -523,7 +523,7 @@
      &          ET_DRVD_WDEP, ET_ISAM_DRVD_WDEP, ET_DDM_DRVD_WDEP,
      &          ET_AEROPROP, ET_CHEM, ET_MET, ET_PHOT )
             ! Retrieve Derived ELMO Variable
-            CALL ELMO_CALC_DERIVED( VAL2, J )
+            CALL ELMO_DERIVED_CALC( VAL2, J )
             OUTVAL = OUTVAL + ELMO_UNIT_CONV( J, OUT_UNIT, VAL2 )
 
          CASE ( ET_WDEP )

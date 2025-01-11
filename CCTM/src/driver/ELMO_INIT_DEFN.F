@@ -31,7 +31,7 @@
       ! vectors.
 !-------------------------------------------------------------------------
    
-      USE ELMO_DERIVED, ONLY : ELMO_MAP_DERIVED
+      USE ELMO_DERIVED_DEFN, ONLY : ELMO_MAP_DERIVED
       USE GRID_CONF, ONLY : NCOLS, NROWS
       USE ELMO_COMPOSITES, ONLY : ELMO_MAP_COMPOSITES, ELMO_READ_COMPOSITES
       USE AERO_DATA, ONLY : N_MODE
@@ -1183,16 +1183,23 @@
       SUBROUTINE ELMO_WRITE_LOG ( )
 !-------------------------------------------------------------------------
     
-      USE AERO_DATA, ONLY : N_MODE, AEROSPC, AERO_MISSING, AEROMODE
+      USE AERO_DATA, ONLY : N_MODE, AEROSPC, AERO_MISSING, AEROMODE,
+     &                      CMODE, N_AEROSPC, MAP_MODE_MASK
+      USE SOA_DEFN,  ONLY : N_OA, OASPC, MAP_AEROtoOA, MAP_ORG_MASK
 
       IMPLICIT NONE
 
-      INTEGER IFL, IVAR, ICOMP, J, TABID, IFILE, AERO_ID, IMODE, INLET
-      CHARACTER( 1000 ) :: FORMULA
+      INTEGER IFL, IVAR, ICOMP, J, TABID, IFILE, AERO_ID, 
+     &        IMODE, INLET, IOA, IM, K, IAER
+      CHARACTER( 3000 ) :: FORMULA
       CHARACTER(    2 ) :: CSIGN
       CHARACTER(   70 ) :: FTEMP
       INTEGER FORM_SIZE, LAST_SPACE
-      LOGICAL L_MODE
+      LOGICAL L_MODE,L_SPEC
+      LOGICAL :: MODE_MASK( N_MODE ), ORG_MASK( N_OA )
+      INTEGER :: ORG_OP
+
+      INTEGER, EXTERNAL :: FINDEX
 
       ! Write out all ELMO variables organized by output file
       CALL LOG_MESSAGE( LOGDEV,'' )
@@ -1236,7 +1243,9 @@
      &              TRIM( ELMO_TABLE( J )%DESC )
 
             FORMULA = ''
-            ! Make Output Formula for Composites
+
+            ! Determine type of variable in order to make formula
+            ! correctly
             IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_CMPST .OR.
      &           ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST .OR.
      &           ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST .OR.
@@ -1244,7 +1253,7 @@
      &           ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_CMPST_DEP .OR.
      &           ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_CMPST_DEP ) THEN
 
-               ! Make Formula from Components
+               ! Make Formula of Composite Variable from Components
                DO ICOMP = 1,ELMO_COMP( J )%N_VARS
                   TABID = ELMO_COMP( J )%TABID( ICOMP )
                   IMODE = ELMO_TABLE( TABID )%IM
@@ -1254,41 +1263,113 @@
                   IF ( IMODE .NE. 0 ) L_MODE = ELMO_COMP( J )%L_MODE( IMODE )
 
                   IF ( L_MODE ) THEN
+                     WRITE( FORMULA, '(A,A1,SPES9.2,A1,A)' ),TRIM(FORMULA),
+     &                  ' ',ELMO_COMP( J )%COEFF(ICOMP),'*',
+     &                  TRIM( ELMO_TABLE( TABID )%OUT_NAME )
+
+                     ! If this is an aerosol with a size cutoff, make sure
+                     ! to add the FPM[dp]_[mode] to the formula
                      IF ( ELMO_TABLE( TABID )%VAR_TYPE .EQ. ET_CONC .AND.
      &                    IMODE .NE. 0 .AND.INLET .NE. 0 ) THEN
-
-                        ! This is an aerosol with a size cutoff. Make sure
-                        ! to add the FPM[dp]_[mode] to the formula
-                        WRITE( FORMULA, '(A,A1,SPES9.2,A1,A,A2,A,A1,A)' ),TRIM(FORMULA),
-     &                     ' ',ELMO_COMP( J )%COEFF(ICOMP),'*',
-     &                     TRIM( ELMO_TABLE( TABID )%OUT_NAME ),'*F',
-     &                     TRIM( ELMO_INLET(INLET)%CINLET ),'_',TRIM(AEROMODE( IMODE )%SUFF)
-                     ELSE
-                        ! This is not an aerosol concentration or does not
-                        ! have a size cutoff.
-                        WRITE( FORMULA, '(A,A1,SPES9.2,A1,A)' ),TRIM(FORMULA),
-     &                     ' ',ELMO_COMP( J )%COEFF(ICOMP),'*',
-     &                     TRIM( ELMO_TABLE( TABID )%OUT_NAME )
+                        WRITE( FORMULA, '(A,A2,A,A1,A)' ),TRIM(FORMULA),'*F',
+     &                     TRIM( ELMO_INLET(INLET)%CINLET ),'_',
+     &                     TRIM(AEROMODE( IMODE )%SUFF)
                      END IF
                   END IF
-
                END DO
 
-            ELSE IF ( ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD .OR.
-     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD_DDEP .OR.
-     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DRVD_WDEP .OR.
-     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_DRVD .OR.
-     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_DRVD_DDEP .OR.
-     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_ISAM_DRVD_WDEP .OR.
-     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_DRVD .OR.
-     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_DRVD_DDEP .OR.
-     &                ELMO_TABLE( J )%VAR_TYPE .EQ. ET_DDM_DRVD_WDEP ) THEN
-               ! Make Formula Based on ID of Variable
-
+            ELSE IF ( ELMO_TABLE( J )%DRVD_TAB .GT. 0 ) THEN
                
+               ! Make Formula for Derived Variable Based on Derived
+               ! Variable Parameter Table
+               K = ELMO_TABLE( J )%DRVD_TAB
+
+               CALL MAP_MODE_MASK( ELMO_DRVD_TAB( K )%MODE, MODE_MASK )
+               CALL MAP_ORG_MASK ( ELMO_DRVD_TAB( K )%ORG_MASK, ORG_MASK )
+               INLET  = ELMO_DRVD_TAB( K )%INLET
+               ORG_OP = ELMO_DRVD_TAB( K )%ORG_OP
+
+               ! Write the formula for total aerosol metrics
+               IF ( ORG_OP .EQ. OT_OMOC .OR. ORG_OP .EQ. OT_OTOC ) THEN
+                   ! Begin with a parenthesis
+                   WRITE( FORMULA, '(A,A2)' ),TRIM(FORMULA),'( '
+               END IF
+
+               ! Add each aerosol species
+               DO IAER = 1,N_AEROSPC
+                  L_SPEC = .NOT. AEROSPC(IAER)%TRACER .AND. 
+     &                     .NOT. AEROSPC(IAER)%NO_M2WET
+                  IF ( ORG_OP .GT. 0 ) THEN
+                      IOA = MAP_AEROtoOA( IAER )
+                      IF ( IOA .EQ. 0 ) THEN
+                         L_SPEC = .FALSE.
+                      ELSE 
+                         L_SPEC = L_SPEC .AND. ORG_MASK( IOA )
+                         IF ( (ORG_OP.EQ.OT_OMOC .AND. OASPC(IOA)%OMtoOC.LE.1.0) .OR. 
+     &                        (ORG_OP.EQ.OT_OTOC .AND. OASPC(IOA)%OTOC.LE.0.0)   .OR.
+     &                        (ORG_OP.EQ.OT_OC   .AND. OASPC(IOA)%OMtoOC.LE.0.0) .OR.
+     &                        (ORG_OP.EQ.OT_DD_OC.AND. OASPC(IOA)%OMtoOC.LE.0.0) .OR.
+     &                        (ORG_OP.EQ.OT_WD_OC.AND. OASPC(IOA)%OMtoOC.LE.0.0) )
+     &                      L_SPEC = .FALSE.
+                      END IF
+                  END IF
+                  IF ( .NOT. L_SPEC ) CYCLE
+                  
+                  DO IM = 1,N_MODE
+                     IF ( MODE_MASK( IM ) .AND. .NOT. AERO_MISSING(IAER,IM) ) THEN
+
+                        ! Add Deposition Prefixes if applicable
+                        IF ( ORG_OP .EQ. OT_DD_OA .OR. ORG_OP .EQ. OT_DD_OC ) THEN
+                           WRITE( FORMULA, '(A,A5)' ),TRIM(FORMULA),' +DD_'
+                        ELSE IF ( ORG_OP .EQ. OT_WD_OA. OR. ORG_OP .EQ. OT_WD_OC) THEN
+                           WRITE( FORMULA, '(A,A5)' ),TRIM(FORMULA),' +WD_'
+                        ELSE
+                           WRITE( FORMULA, '(A,A2)' ),TRIM(FORMULA),' +'
+                        END IF
+
+                        ! Add Species Name and Coefficient
+                        IF ( ORG_OP .EQ. 0 .OR. ORG_OP .EQ. OT_OA .OR.
+     &                       ORG_OP .EQ. OT_DD_OA .OR. ORG_OP .EQ. OT_WD_OA ) THEN 
+                           WRITE( FORMULA, '(A,A)' ),TRIM(FORMULA),
+     &                        TRIM( AEROSPC(IAER)%NAME(IM) )
+                        ELSE IF ( ORG_OP .EQ. OT_OC .OR. ORG_OP .EQ. OT_DD_OC .OR. 
+     &                            ORG_OP .EQ. OT_WD_OC ) THEN
+                           WRITE( FORMULA, '(A,A,A1,ES8.2)' ),TRIM(FORMULA),
+     &                        TRIM( AEROSPC(IAER)%NAME(IM) ),'/',OASPC(IOA)%OMtoOC
+                        ELSE IF ( ORG_OP .EQ. OT_OMOC ) THEN
+                           WRITE( FORMULA, '(A,ES8.2,A1,A)' ),TRIM(FORMULA),
+     &                        OASPC(IOA)%OMtoOC,'*',TRIM(AEROSPC(IAER)%NAME(IM) )
+                        ELSE IF ( ORG_OP .EQ. OT_OTOC ) THEN
+                           WRITE( FORMULA, '(A,ES8.2,A1,A)' ),TRIM(FORMULA),
+     &                        OASPC(IOA)%OtoC,'*',TRIM( AEROSPC(IAER)%NAME(IM) )
+                        END IF
+
+                        ! Multiply by inlet fraction if applicable
+                        IF ( INLET .GT. 0 ) 
+     &                     WRITE( FORMULA, '(A,A2,A,A1,A)' ),TRIM(FORMULA),'*F',
+     &                        TRIM( ELMO_INLET(INLET)%CINLET ),'_',
+     &                        TRIM(AEROMODE( IM )%SUFF)
+                     END IF
+                  END DO
+               END DO
+               
+               ! Add Denominator For OM:OC and O:C
+               IF ( ORG_OP .EQ. OT_OMOC .OR. ORG_OP .EQ. OT_OTOC ) THEN
+                   ! Begin with a parenthesis
+                   WRITE( FORMULA, '(A,A5)' ),TRIM(FORMULA),') / ('
+                   IF ( INLET .EQ. 0 ) 
+     &                WRITE( FORMULA, '(A,A,A1)' ),TRIM(FORMULA),
+     &                   TRIM( CMODE( ELMO_DRVD_TAB(K)%MODE ) ),'_'
+                   WRITE( FORMULA, '(A,A2)' ),TRIM(FORMULA),'OA'
+                   IF ( INLET .NE. 0 ) 
+     &                WRITE( FORMULA, '(A,A2,A)' ),TRIM(FORMULA),'*F',
+     &                   TRIM( ELMO_INLET(INLET)%CINLET )
+                   WRITE( FORMULA, '(A,A1)' ),TRIM(FORMULA),')'
+               END IF
 
             END IF  
  
+            ! Write Formula to Log File Table
             IF ( FORMULA .NE. '' ) THEN   
                ! Parse Formula so that it prints correctly to screen
                FORMULA = '='//FORMULA( 1:LEN(FORMULA) )

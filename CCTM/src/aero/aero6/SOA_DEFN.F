@@ -236,6 +236,7 @@ C-----------------------------------------------------------------------
 
       ! Variables for mapping OA to aerosol and CGRID arrays
       Integer, Allocatable :: map_OAtoAERO( : )    ! organic aerosol pointers to aerospc
+      Integer, Allocatable :: map_AEROtoOA( : )    ! aerospc map to organic aerosol table
       Integer, Allocatable :: map_OAtoCGRID( : )   ! organic aerosol pointers to CGRID
       Integer, Allocatable :: map_OGtoCGRID( : )   ! pointers of vapor species to CGRID
       Integer, Allocatable :: map_ROGtoCGRID( : )  ! pointers of SOA parent species to CGRID
@@ -249,36 +250,44 @@ C-----------------------------------------------------------------------
       Logical, Private, Save :: RXNS_eflag          = .False. ! error flag for RXNS modules used
       Character( 16 ), Private, Save :: pname = 'SOA_DEFN        '
 
+      ! Indices for specifying groups of organics to sum for output
+      INTEGER, PARAMETER :: IOA_ALL = 0, IOA_PRI = 1, IOA_SEC = 2,
+     &                                   IOA_ANT = 3, IOA_BIO = 4
+      
       Contains
 
+      subroutine map_org_mask( org_mask_in, org_mask )
+
+      integer org_mask_in
+      logical org_mask( n_oa )
+
+      ! Map ORG_MASK_IN input parameter to a Mask of Organic Aerosol
+      ! Variables
+      SELECT CASE ( ORG_MASK_IN )
+         CASE( IOA_ALL )
+            ORG_MASK = .TRUE.
+         CASE( IOA_PRI )
+            ORG_MASK = OASPC(:)%PRIMARY
+         CASE( IOA_SEC )
+            ORG_MASK = .NOT. OASPC(:)%PRIMARY
+         CASE( IOA_ANT )
+            ORG_MASK = OASPC(:)%ANTHRO
+         CASE( IOA_BIO )
+            ORG_MASK = .NOT. OASPC(:)%BIOG
+         CASE DEFAULT
+            ORG_MASK = .FALSE.
+      END SELECT
+
+      end subroutine map_org_mask
+
+
 C-----------------------------------------------------------------------
-#ifdef sens
-      Subroutine extract_soa( conc, s_conc, schk )
-#else
-      Subroutine extract_soa( conc )
-#endif
-
-C  Extracts the required soa data from CGRID into the conc array.
-
-C  Revision History:
-C     First version was coded in April 2010 by Steve Howard with
-C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
-C
-C SH  03/10/11 Renamed met_data to aeromet_data
-C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
-C HP  09/27/14 alk_factor removed, updated for alkane/PAH SOA.
-C              Conversion of reacted alkane to dodecane equivalent
-C              is handled in mech.def. A factor of 0.47 is in use and
-C              reflects the fact that alkane SOA precursor
-C              emissions are dominated by compounds smaller than dodecane.
-C BM  02/19/19 Major Revision to simplify the mapping procedure and
-C              remove redundat variables.
+      subroutine map_oa( )
+C  Maps all vectors and tables for organic aerosol calculations
 C-----------------------------------------------------------------------
 
       Use rxns_data, only: mechname
       Use aero_data, only: AE_eflag, findAero, aerospc_mw, n_aerospc, aerospc
-      Use aeromet_data, only: airdens, min_gasconc
-      Use const, only: inv_mwair
       Use cgrid_spcs, only: n_gc_spc, gc_spc, n_gc_g2ae, gc_g2ae, gc_strt, gc_molwt, gc_g2ae_map, 
      &                      n_nr_spc, nr_spc, n_nr_n2ae, nr_n2ae, nr_strt, nr_molwt, nr_n2ae_map,
      &                      n_ae_spc, ae_spc
@@ -287,25 +296,15 @@ C-----------------------------------------------------------------------
 
       Implicit None
 
-      ! Arguments:
-      Real, Intent( In ) :: conc( : )
-#ifdef sens
-      Real, Intent( In ) :: s_conc( :,: )
-      Logical, Intent( In ) :: schk  ! necessary because some routines don't require sensitivity updates
-#endif
-
-
       ! Local Variables:
       Character( 300 ):: xmsg
       Real            :: gasconv
       Real            :: vtmp
       Integer         :: n, a, g
-      Integer         :: spc
+      Integer         :: spc, iaer
       Integer         :: map_OAtoOAlist( 200 )
 
       ! Map All OA Species and Load Properties
-      If ( .Not. mapped ) Then
-          mapped = .TRUE.
           
           call log_heading( logdev, 'Initialize OA Extraction to Aerosol Module')
           call log_subheading( logdev, 'Map Organic Aerosol and Vapor Species')
@@ -355,6 +354,7 @@ C-----------------------------------------------------------------------
           Allocate ( rog_dconc( n_oa ))
           Allocate ( map_ROGtoCGRID( n_oa ))
           Allocate ( map_OAtoAERO( n_oa ))
+          Allocate ( map_AEROtoOA( n_aerospc ))
           Allocate ( map_OGtoCGRID( n_oa ))
           Allocate ( lnonvol_oa( n_aerospc ))
           Allocate ( l_oa( n_aerospc ))
@@ -366,19 +366,24 @@ C-----------------------------------------------------------------------
 
           ! Initialize and populate key OA variables
           map_OAtoAERO = 0
+          map_AEROtoOA = 0
           op_mw = 200.0
           lnonvol_oa = .false.
           l_oa       = .false.
           Do spc = 1,n_oa
              oaspc( spc ) = oa_list( map_OAtoOAlist( spc ) )
-             map_OAtoAERO( spc ) = findAero( oaspc( spc )%name, .False. )
-             If( map_OAtoAERO( spc ) .Lt. 1 ) 
-     &           write(logdev,99904) Trim( oaspc( spc )%name )
-             op_mw( spc ) = aerospc_mw( map_OAtoAERO( spc ) )
-             lnonvol_oa( map_OAtoAERo( spc ) ) = ( oaspc( spc )%nonvol .and.
-     &                                             .Not. aerospc( map_OAtoAERo( spc ) )%tracer )
-             l_oa( map_OAtoAERo( spc ) )       = (  aerospc( map_OAtoAERo( spc ) )%om .and.
-     &                                             .Not. aerospc( map_OAtoAERo( spc ) )%tracer )
+             iaer = findAero( oaspc( spc )%name, .False. )
+             If ( iaer .gt. 0 ) then
+                map_OAtoAERO( spc ) = iaer
+                map_AEROtoOA( iaer ) = spc
+                l_oa( iaer ) = ( aerospc(iaer)%om .and. .Not. aerospc(iaer)%tracer )
+                op_mw( spc ) = aerospc_mw( iaer )
+                lnonvol_oa( iaer ) = ( oaspc( spc )%nonvol .and.
+     &                                 .Not. aerospc( iaer )%tracer )
+             else 
+                write(logdev,99904) Trim( oaspc( spc )%name )
+                op_mw( spc ) = 0.0
+             end if
           End Do
 
           ! Determine the location of any reaction counter species on the 
@@ -450,7 +455,62 @@ C-----------------------------------------------------------------------
 
          aorgc_idx  = findAero( req_aeorgc, .True. )
 
-      End If     ! mapping condition
+      mapped   = .TRUE.
+
+      return
+
+99902 Format('FATAL: SOA Vapor, ', a, 
+     &       ', is not found among the species in '
+     &     / 'the NR or GC namelist used. Required for modeling ', a / )
+99903 Format( 'FATAL: SOA Reaction Counter, ', a,  
+     &        '. is not found among the species',
+     &     / 'in GC namelist used. Required for modeling vapor, ', 
+     &       a / )
+99904 Format(1X,'aerosol product from namelist species: ', a /)
+  
+      end subroutine map_oa
+
+C-----------------------------------------------------------------------
+#ifdef sens
+      Subroutine extract_soa( conc, s_conc, schk )
+#else
+      Subroutine extract_soa( conc )
+#endif
+
+C  Extracts the required soa data from CGRID into the conc array.
+
+C  Revision History:
+C     First version was coded in April 2010 by Steve Howard with
+C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
+C
+C SH  03/10/11 Renamed met_data to aeromet_data
+C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
+C HP  09/27/14 alk_factor removed, updated for alkane/PAH SOA.
+C              Conversion of reacted alkane to dodecane equivalent
+C              is handled in mech.def. A factor of 0.47 is in use and
+C              reflects the fact that alkane SOA precursor
+C              emissions are dominated by compounds smaller than dodecane.
+C BM  02/19/19 Major Revision to simplify the mapping procedure and
+C              remove redundat variables.
+C-----------------------------------------------------------------------
+
+      Use aeromet_data, only: airdens, min_gasconc
+      Use const, only: inv_mwair
+
+      Implicit None
+
+      ! Arguments:
+      Real, Intent( In ) :: conc( : )
+#ifdef sens
+      Real, Intent( In ) :: s_conc( :,: )
+      Logical, Intent( In ) :: schk  ! necessary because some routines don't require sensitivity updates
+#endif
+
+      ! Local Variables:
+      Real            :: gasconv
+      Real            :: vtmp
+      Integer         :: n
+      Integer         :: spc
 
 #ifdef sens
       If ( .Not. ae_ddm3d_ready ) Then
@@ -502,15 +562,6 @@ C-----------------------------------------------------------------------
          End If
       End Do
 
-99902 Format('FATAL: SOA Vapor, ', a, 
-     &       ', is not found among the species in '
-     &     / 'the NR or GC namelist used. Required for modeling ', a / )
-99903 Format( 'FATAL: SOA Reaction Counter, ', a,  
-     &        '. is not found among the species',
-     &     / 'in GC namelist used. Required for modeling vapor, ', 
-     &       a / )
-99904 Format(1X,'aerosol product from namelist species: ', a /)
-  
       Return
       End Subroutine extract_soa
 
