@@ -27,7 +27,7 @@
 !-------------------------------------------!
 AIR_DENS        ,kg m-3    ,DENS[1]
 RH              ,%         ,100.00*RH[1]
-SFC_TMP         ,C         ,(TEMP2[1]-273.15)
+!SFC_TMP         ,C         ,(TEMP2[1]-273.15)
 PBLH            ,m         ,PBL[1]
 SOL_RAD         ,W m-2     ,RGRND[1]
 precip          ,cm        ,PRECIP[1]
@@ -96,9 +96,9 @@ ALDX            ,ppbV      ,1000.0*ALD[1],            C3 and higher aldehydes is
 NOZ             ,ppbV      ,NOZ[1],
 SULF            ,ppbV      ,1000.0*SULF[1],
 ! SIGROC: L/S/IVOC alk and oxy gas species
-LSIVROC         ,ppbC      ,1000.0*LSIVROC[1], 
+!LSIROCG         ,ppbC      ,1000.0*LSIROCG[1], 
 ! VROC: Total gas-phase (vapor) reactive organic carbon (stable species only) 
-VROC             ,ppbC      ,1000.0*VROC[1]
+!TOTROCG         ,ppbC      ,1000.0*TOTROCG[1]
 
 !-------------------------------------------!
 !--------------- Particles -----------------!
@@ -151,19 +151,19 @@ AORGCJ          ,ug m-3    ,AORGCJ[1]
 AOMOCRAT_TOT    ,          ,PMF_OMOC[1]
 
 !! Total PM Aggregates
-ATOTI           ,ug m-3    ,PMAIT_MASS[1]
-ATOTJ           ,ug m-3    ,PMACC_MASS[1]
-ATOTK           ,ug m-3    ,PMC_MASS[1]
-ATOTIJ          ,ug m-3    ,PMF_MASS[1]
-ATOTIJK         ,ug m-3    ,PM_MASS[1]
+ATOTI           ,ug m-3    ,PMAIT[1]
+ATOTJ           ,ug m-3    ,PMACC[1]
+ATOTK           ,ug m-3    ,PMC[1]
+ATOTIJ          ,ug m-3    ,PMF[1]
+ATOTIJK         ,ug m-3    ,TSP[1]
 
 !! Unspeciated PM including non-carbon organic mass
-AUNSPEC1IJ      ,ug m-3    ,PMF_UN_IMPV1[1] 
+AUNSPEC1IJ      ,ug m-3    ,PMF_OTHWNC[1] 
 !! Non-Carbon Organic Mass
-ANCOMIJ         ,ug m-3    ,PMF_NCOM[1]
+ANCOMIJ         ,ug m-3    ,PMF_NC[1]
 
 !! Unspeciated PM excluding non-carbon organic mass
-AUNSPEC2IJ      ,ug m-3    ,PMF_UN_IMPV2[1]
+AUNSPEC2IJ      ,ug m-3    ,PMF_OTH[1]
 
 !! AMS Projection of Output Concentrations
 PMAMS_CL        ,ug m-3    ,PMAMS_CL[1]
@@ -203,10 +203,11 @@ PM25_NH4        ,ug m-3    ,PM25_NH4[1]
 PM25_NO3        ,ug m-3    ,PM25_NO3[1] 
 PM25_OC         ,ugC m-3   ,PM25_OC[1] 
 PM25_OM         ,ug m-3    ,PM25_OA[1] 
-PM25_SOIL       ,ug m-3    ,PM25_SOIL[1] 
+PM25_SOIL       ,ug m-3    ,PM25_RCSOIL[1] 
 PM25_SO4        ,ug m-3    ,PM25_SO4[1] 
 PM25_TOT        ,ug m-3    ,PM25[1] 
-PM25_UNSPEC1    ,ug m-3    ,PM25_UNSP1[1] 
+PM25_UNSPEC1    ,ug m-3    ,PM25[1]-(PM25_CL[1]+PM25_EC[1]+PM25_NA[1]+PM25_NH4[1] \
+                           +PM25_NO3[1]+PM25_OC[1]+PM25_RCSOIL[1]+PM25_SO4[1])
 PM25_UNSPCRS    ,ug m-3    ,PM25_UNSPCRS[1] 
                            
 
