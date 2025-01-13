@@ -596,7 +596,7 @@ Aerosol Diagnostics are now handled by the Explicit and Lumped Model Output modu
     Short label of the gridded file for stream ###, where ### = 001, 002,…,N_EMIS_GR. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information. 
 
 -   `GR_EM_SYM_DATE_### [default: False]`<a id=GR_EM_SYM_DATE_###></a>  
-    Switch to indicate whether gridded emission is of representative day type for stream ###, where ### = 01, 02,…,N_EMIS_GR. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
+    Switch to indicate whether gridded emission is of representative day type for stream ###, where ### = 01, 02,…,N_EMIS_GR. Variable should be set to indicate if the date on an emission file can be different from the simulation day date (T for True). A setting of F (False) requires the emission input file date to match the simulation date. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
     
 -   `N_EMIS_PT `<a id=N_EMIS_PT></a>
     The number of offline Point emission streams to be used by the model. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
@@ -614,7 +614,7 @@ Aerosol Diagnostics are now handled by the Explicit and Lumped Model Output modu
     Short label of the point emissions file for sector ###, where ### = 001, 002,…,N_EMIS_PT. Each ### refers to the one of the plume rise point-source sectors. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
     
  -   `STK_EM_SYM_DATE_### [default: False]`<a id=STK_EM_SYM_DATE_###></a>  
-    Switch to indicate whether point emission file is of representative day type for sector ###, where ### = 01, 02,…,N_EMIS_PT. Each ### refers to the one of the plume rise point-source sectors. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information. 
+    Switch to indicate whether point emission file is of representative day type for sector ###, where ### = 01, 02,…,N_EMIS_PT. Variable should be set to indicate if the date on an emission file can be different from the simulation day date (T for True). A setting of F (False) requires the emission input file date to match the simulation date. Each ### refers to the one of the plume rise point-source sectors. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information. 
     
 -   `EMIS_SYM_DATE [default: False]`<a id=EMIS_SYM_DATE></a>  
     The default for GR_EM_SYM_DATE_### and STK_EM_SYM_DATE_### if not set explicitly is false, however users have the option to set this default by setting this environment variable. Users should note, that if this variable is set and GR_EM_SYM_DATE_### or STK_EM_SYM_DATE_### is set, the individual stream switch takes precedent over this variable. This switch maybe useful if all offline emissions are of representative day type. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
