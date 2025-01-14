@@ -4,8 +4,7 @@
 
 /
 ! This Species Definition File is for Use with the COMBINE tool built for 
-! post-processing CMAQ output. It is compatible with CMAQv5.4.
-! Date: May 12 2017
+! post-processing CMAQ output. It is compatible with CMAQv6.0.
 
 ! Output variables that begin with 'PM' represent those in which a size cut was 
 ! applied based on modeled aerosol mode parameters.  For example, PM25_NA is all 
@@ -144,7 +143,7 @@ AECIJ           ,ug m-3    ,AECI[1]+AECJ[1]
 ANAIJ           ,ug m-3    ,ANAJ[1]+ANAI[1]
 ANO3IJ          ,ug m-3    ,ANO3I[1]+ANO3J[1]
 ANO3K           ,ug m-3    ,ANO3K[1]
-TNO3            ,ug m-3    ,2175.204*(HNO3[1]*DENS[2])+ANO3I[1]+ANO3J[1]+ANO3K[1]
+TNO3            ,ug m-3    ,1000.0*HNO3[1]*(63.0/28.9628)*DENS[2]+ANO3I[1]+ANO3J[1]+ANO3K[1]
 ANH4IJ          ,ug m-3    ,ANH4I[1]+ANH4J[1]
 ANH4K           ,ug m-3    ,ANH4K[1]
 ASO4IJ          ,ug m-3    ,ASO4I[1]+ASO4J[1]
@@ -226,7 +225,7 @@ AOMOCRAT_TOT    ,           ,AOMIJ[0]/AOCIJ[0]
 
 !! Total PM Aggregates
 ATOTI           ,ug m-3    ,ASO4I[1] + ANH4I[1] + ANO3I[1] + ANAI[1]   \
-                           +ACLI[1] + AECI[1] + AOMI[0] + AOTHRI[1] 
+                           +ACLI[1] + AECI[1] + AOMI[0] + AOTHRI[1]
 ATOTJ           ,ug m-3    ,ASO4J[1] + ANH4J[1] + ANO3J[1] + ANAJ[1]   \
                            +ACLJ[1] + AECJ[1] + AOMJ[0] + AOTHRJ[1]    \
                            +AFEJ[1] + AALJ[1] + ASIJ[1] + ATIJ[1]      \

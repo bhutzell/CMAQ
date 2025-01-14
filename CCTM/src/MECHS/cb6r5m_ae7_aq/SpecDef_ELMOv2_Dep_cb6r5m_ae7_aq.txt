@@ -64,7 +64,7 @@ DDEP_AOCIJ         ,kgC ha-1    ,DD_PMF_OC[1]
                                
 !DDEP_SSSO4J       ,kg ha-1     ,DD_PMF_SSSO4[1]
 !DDEP_SSSO4K       ,kg ha-1     ,DD_PMC_SSSO4[1]
-!WDEP_SSSO4JK      ,kg ha-1     ,WD_SSSO4[1]
+!WDEP_SSSO4JK      ,kg ha-1     ,WD_TSP_SSSO4[1]
 
 
 !-----------------------------------------------------!
@@ -83,7 +83,7 @@ WDEP_ANAJK         ,kg ha-1     ,WD_ANAJ[1] + WD_PMC_NA[1]
 TDEP_ANAJK         ,kg ha-1     ,WDEP_ANAJK[0] + DDEP_ANAJK[0]  
 
 !! Chloride
-DDEP_ACLJ          ,kg ha-1     ,DD_PMF_CL[1]
+DDEP_ACLJ          ,kg ha-1     ,DD_ACLJ[1]
 DDEP_ACLK          ,kg ha-1     ,DD_PMC_CL[1]
 DDEP_ACLJK         ,kg ha-1     ,DD_ACLJ[1] + DD_PMC_CL[1]
 WDEP_TCL           ,kg ha-1     ,WD_TCL[1]
