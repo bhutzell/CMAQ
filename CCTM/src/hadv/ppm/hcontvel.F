@@ -60,6 +60,7 @@ C   28 Jul 11 David Wong: set REVERT to .false. for twoway model case since
 C                         buffered file has only two time steps data
 C   01 Feb 19 David Wong: Implemented centralized I/O approach, removed all MY_N
 C                         clauses
+C   10 Jan 24 David Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -70,6 +71,7 @@ C-----------------------------------------------------------------------
       USE NOOP_MODULES          ! stenex (using NOOP_COMM_MODULE)
 #endif
       use CENTRALIZED_IO_MODULE, only : interpolate_var, window
+      use coupler_module
 
       IMPLICIT NONE
 
@@ -158,6 +160,14 @@ C-----------------------------------------------------------------------
 
          WRITE( COMMSTR,'(4I2)' )  1, 1-NTHIK, 2, 1-NTHIK  ! ' 1 0 2 0'
 
+#ifdef twoway
+         VNAME = 'UWINDC'
+         IF ( INDEX1( VNAME, n_metdot3d_var, metdot3d_vlist ) .LE. 0 ) THEN
+            XMSG = 'Could not find ' // VNAME // ' in MET_DOT_3D'
+            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            CSTAGUV = .FALSE.
+         END IF
+#else
          VNAME3D = ' '   ! array assignment
          IF ( .NOT. DESC3( MET_DOT_3D ) ) THEN
             XMSG = 'Could not get '
@@ -171,6 +181,7 @@ C-----------------------------------------------------------------------
             CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
             CSTAGUV = .FALSE.
          END IF
+#endif
 
          IF ( .NOT. CSTAGUV ) THEN
 

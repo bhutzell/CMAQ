@@ -113,6 +113,8 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 !                 sr_d, and er_d to avoid naming conflicts
 !           16 Mar 2023  (David Wong)
 !              -- fixed a bug in creating u and v components
+!           10 Jan 2024  (David Wong)
+!              --  Incorporated unified coupler implmentation
 !           30 Apr 2024  (Tanya Spero)
 !              -- Changed constraint on XORIG and YORIG for Lambert conformal
 !                 projections. Original constraint of 500 meters introduced an
@@ -130,13 +132,15 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
   USE twoway_util_module
   USE twoway_header_data_module
-  USE twoway_met_param_module
+! USE twoway_met_param_module
   USE twoway_data_module
   USE HGRD_DEFN
   USE SE_MODULES
-  use const
+  USE coupler_module
+
   use se_comm_info_ext
   use utilio_defn
+  use const
 
   IMPLICIT NONE
 
@@ -280,7 +284,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
     integer :: i, j, status(MPI_STATUS_SIZE)
     character (len = 50) :: myfmt
 
-!   character (len = 4), save :: pe_str
+    character (16) :: vname
 
     logical, parameter :: debug = .true.
 
@@ -463,6 +467,8 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
      cmaq_tstep = sec2time(grid%time_step*wrf_cmaq_freq)
 
+     coupled_model_tstep = cmaq_tstep
+
      jdate = sdate
      jtime = stime
 
@@ -606,6 +612,8 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
         end if
      end if
 
+     CALL coupler_init (cmaq_c_ncols, cmaq_c_nrows, nlays, config_flags%num_land_cat)
+
      if (config_flags%cu_physics == 0) then
         wrf_convective_scheme = .false.
      else
@@ -704,6 +712,8 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
         end if
      end if
 
+     mminlu_wrf = mminlu
+
      allocate ( land_use_index (wrf_c_ncols, wrf_c_nrows), stat=stat)
      land_use_index = grid%lu_index (tw_sc:tw_ec, tw_sr:tw_er)
 
@@ -799,10 +809,14 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
                             wrf_cmaq_c_send_index_l, wrf_cmaq_c_recv_index_l, 1)
 
      if (wrf_cmaq_option .gt. 1) then
-        if ( .not. buf_write3 (fname, allvar3, jdate, jtime, gridcro2d_data_cmaq ) ) then
-           print *, ' Error: Could not write to file ', fname
-           stop
-        end if
+        do v = 1, n_gridcro2d_var
+           call coupler_data_storing (gridcro2d_vlist(v), gridcro2d_data_cmaq(:,:,v))
+        end do
+
+        do v = 1, numlu
+           write (vname, '(a7, i2.2)') 'LUFRAC_', v
+           call coupler_data_storing (vname, gridcro2d_data_cmaq(:,:,v+n_gridcro2d_var))
+        end do
      end if
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         if ( .not. write3 (pfname, allvar3, jdate, jtime, gridcro2d_data_cmaq ) ) then
@@ -886,10 +900,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
                             wrf_cmaq_d_send_index_l, wrf_cmaq_d_recv_index_l, 2)
 
      if (wrf_cmaq_option .gt. 1) then
-        if ( .not. buf_write3 (fname, allvar3, jdate, jtime, griddot2d_data_cmaq ) ) then
-           print *, ' Error: Could not write to file ', fname
-           stop
-        end if
+        call coupler_data_storing ('MSFD2', griddot2d_data_cmaq)
      end if
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         tsc_d = 1
@@ -1431,10 +1442,9 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
                          wrf_cmaq_ce_send_index_l, wrf_cmaq_ce_recv_index_l, 3)
 
   if (wrf_cmaq_option .gt. 1) then
-     if ( .not. buf_write3 (fname, allvar3, jdate, jtime, metcro3d_data_cmaq ) ) then
-        print *, ' Error: Could not write to file ', fname
-        stop
-     end if
+     do v = 1, n_metcro3d_var
+        call coupler_data_storing (metcro3d_vlist(v), metcro3d_data_cmaq(:,:,:,v))
+     end do
   end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      if (mod(time2sec(jtime), file_time_step_in_sec) == 0) then
@@ -1583,10 +1593,9 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
                          wrf_cmaq_de_send_index_l, wrf_cmaq_de_recv_index_l, 4)
 
   if (wrf_cmaq_option .gt. 1) then
-     if ( .not. buf_write3 (fname, allvar3, jdate, jtime, metdot3d_data_cmaq ) ) then
-       print *, ' Error: Could not write to file ', fname
-       stop
-     end if
+     do v = 1, n_metdot3d_var
+        call coupler_data_storing (metdot3d_vlist(v), metdot3d_data_cmaq(:,:,:,v))
+     end do
   end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      if (write_to_physical_file) then
@@ -1834,10 +1843,9 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
   end if
 
   if (wrf_cmaq_option .gt. 1) then
-     if ( .not. buf_write3 (fname, allvar3, jdate, jtime, metcro2d_data_cmaq ) ) then
-       print *, ' Error: Could not write to file ', fname
-       stop
-     end if
+     do v = 1, n_metcro2d_var
+        call coupler_data_storing (metcro2d_vlist(v), metcro2d_data_cmaq(:,:,v))
+     end do
   end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      if (write_to_physical_file) then
