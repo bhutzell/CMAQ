@@ -1128,7 +1128,8 @@ CMPST =
 
 'WD_OXN_TNO3' , 'Wet Dep of Oxidized Nitrogen from Nitrate', 
                 'kgN ha-1', 'DEP', 
-                '0.22222*WD_HNO3 + 0.22581*WD_ANO3 + 0.22581*WD_NO3',
+                '0.22222*WD_HNO3 + 0.22581*WD_ANO3 + 0.22581*WD_NO3 + 0.14366*WD_CLNO3',
+
 
 'DD_OXN_PANT' , 'Dry Dep of Oxidized Nitrogen from PAN', 
                 'kgN ha-1', 'DEP', 
