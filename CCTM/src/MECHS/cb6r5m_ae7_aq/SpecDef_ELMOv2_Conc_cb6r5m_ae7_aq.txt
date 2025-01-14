@@ -214,7 +214,9 @@ PM25_OM         ,ug m-3    ,PM25_OA[1]
 PM25_SOIL       ,ug m-3    ,PM25_RCSOIL[1]  
 PM25_SO4        ,ug m-3    ,PM25_SO4[1] 
 PM25_TOT        ,ug m-3    ,PM25[1] 
-PM25_UNSPEC1    ,ug m-3    ,PM25_OTHWNC[1] 
+!PM25_UNSPEC1    ,ug m-3    ,PM25_OTHWNC[1] 
+PM25_UNSPEC1    ,ug m-3    ,PM25[1]-(PM25_CL[1]+PM25_EC[1]+PM25_NA[1]+PM25_NH4[1] \
+                           +PM25_NO3[1]+PM25_OC[1]+PM25_RCSOIL[1]+PM25_SO4[1])
 PM25_UNSPCRS    ,ug m-3    ,PM25_UNSPCRS[1] 
                            
 
@@ -236,6 +238,23 @@ PMC_NO3         ,ug m-3    ,PM25TO10_NO3[1]
 PMC_SO4         ,ug m-3    ,PM25TO10_SO4[1] 
 PMC_TOT         ,ug m-3    ,PM25TO10[1] 
  
+!! Size Fractions
+FPM01_AIT       ,          ,FPM01_AIT[1]    
+FPM01_ACC       ,          ,FPM01_ACC[1]    
+FPM01_COR       ,          ,FPM01_COR[1]    
+FPM1_AIT        ,          ,FPM1_AIT[1]     
+FPM1_ACC        ,          ,FPM1_ACC[1]     
+FPM1_COR        ,          ,FPM1_COR[1]     
+FPM25_AIT       ,          ,FPM25_AIT[1]    
+FPM25_ACC       ,          ,FPM25_ACC[1]    
+FPM25_COR       ,          ,FPM25_COR[1]    
+FPM25TO10_AIT   ,          ,FPM25TO10_AIT[1]
+FPM25TO10_ACC   ,          ,FPM25TO10_ACC[1]
+FPM25TO10_COR   ,          ,FPM25TO10_COR[1]
+FPM10_AIT       ,          ,FPM10_AIT[1]    
+FPM10_ACC       ,          ,FPM10_ACC[1]    
+FPM10_COR       ,          ,FPM10_COR[1]   
+
 !! FRM PM Equivalent Calculation
 PMIJ_FRM        ,ug m-3    ,PMF_FRM[1]
 PM25_FRM        ,ug m-3    ,PM25_FRM[1]
