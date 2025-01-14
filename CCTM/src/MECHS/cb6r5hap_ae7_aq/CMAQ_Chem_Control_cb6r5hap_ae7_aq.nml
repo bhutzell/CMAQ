@@ -380,7 +380,7 @@
 !------------------------------------------------------------------------------!
     
 &COMPOSITE_INIT
-  N_MAX_COMPOSITES = 500
+  N_MAX_COMPOSITES = 800
   N_MAX_COMPONENTS = 50
 /
 
@@ -504,43 +504,43 @@ CMPST =
                 '0.0320 * ASEACAT + 0.0838 * ASOIL + 0.0562 * ACORS',
 
 'PMC_HNI'      , 'Coarse-Mode Nickel',
-                'ug m-3', 'COARSE',
+                'ng m-3', 'COARSE',
                 'ANI',
 
 'PMC_HCR6'     , 'Coarse-Mode Hexavalent Chromium',
-                'ug m-3', 'COARSE',
+                'ng m-3', 'COARSE',
                 'ACR_VI',
 
 'PMC_HCR3'     , 'Coarse-Mode Trivalent Chromium',
-                'ug m-3', 'COARSE',
+                'ng m-3', 'COARSE',
                 'ACR_III',
 
 'PMC_HBE'      , 'Coarse-Mode Beryllium',
-                'ug m-3', 'COARSE',
+                'ng m-3', 'COARSE',
                 'ABE',
 
 'PMC_HPB'      , 'Coarse-Mode Lead',
-                'ug m-3', 'COARSE',
+                'ng m-3', 'COARSE',
                 'APB',
 
 'PMC_HCD'      , 'Coarse-Mode Cadmium',
-                'ug m-3', 'COARSE',
+                'ng m-3', 'COARSE',
                 'ACADMIUM',
 
 'PMC_HG'      , 'Coarse-Mode Mercury',
-                'ug m-3', 'COARSE',
+                'ng m-3', 'COARSE',
                 'APHG',
 
 'PMC_HAS'      , 'Coarse-Mode Arsenic',
-                'ug m-3', 'COARSE',
+                'ng m-3', 'COARSE',
                 'AAS',
 
 'PMC_HBNPY'    , 'Coarse-Mode Benzo-a-pyrene',
-                'ug m-3', 'COARSE',
+                'ng m-3', 'COARSE',
                 'ABENAPY',
 
 'PMC_HDIESEL' , 'Coarse-Mode Diesel-sourced PM',
-                'ug m-3', 'COARSE',
+                'ng m-3', 'COARSE',
                 'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
 
 !-- Fine-Mode Particle Composites --!
@@ -649,51 +649,51 @@ CMPST =
                 'PMF_OC + PMF_EC',
 
 'PMF_HNI'     , 'Fine-Mode Nickel',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'ANI',
 
 'PMF_HCR6'    , 'Fine-Mode Hexavalent Chromium',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'ACR_VI',
 
 'PMF_HCR3'    , 'Fine-Mode Trivalent Chromium',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'ACR_III',
 
 'PMF_HCR'     , 'Fine-Mode Total Chromium',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'ACR_III + ACR_VI',
 
 'PMF_HBE'     , 'Fine-Mode Beryllium',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'ABE',
 
 'PMF_HPB'     , 'Fine-Mode Lead',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'APB',
 
 'PMF_HCD'     , 'Fine-Mode Cadmium',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'ACADMIUM',
 
 'PMF_HMN'     , 'Fine-Mode HAPs Manganese',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'AMN_HAPS',
 
 'PMF_HG'      , 'Fine-Mode Mercury',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'APHG',
 
 'PMF_HAS'     , 'Fine-Mode Arsenic',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'AAS',
 
 'PMF_HBNPY'   , 'Fine-Mode Benzo-a-pyrene',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'ABENAPY',
 
 'PMF_HDIESEL' , 'Fine-Mode Diesel PM',
-                'ug m-3', 'FINE',
+                'ng m-3', 'FINE',
                 'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
 
 
@@ -792,47 +792,47 @@ CMPST =
                 '0.05263 * AH3OP',
 
 'PM1_HNI'     , 'PM1 Nickel',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'ANI',
 
 'PM1_HCR6'    , 'PM1 Hexavalent Chromium',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'ACR_VI',
 
 'PM1_HCR3'    , 'PM1 Trivalent Chromium',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'ACR_III',
 
 'PM1_HCR'     , 'PM1 Total Chromium',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'ACR_III + ACR_VI',
 
 'PM1_HBE'     , 'PM1 Beryllium',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'ABE',
 
 'PM1_HPB'     , 'PM1 Lead',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'APB',
 
 'PM1_HCD'     , 'PM1 Cadmium',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'ACADMIUM',
 
 'PM1_HG'      , 'PM1 Mercury',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'APHG',
 
 'PM1_HAS'     , 'PM1 Arsenic',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'AAS',
 
 'PM1_HBNPY'   , 'PM1 Benzo-a-pyrene',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'ABENAPY',
 
 'PM1_HDIESEL' , 'PM1 Diesel PM',
-                'ug m-3', 'PM1',
+                'ng m-3', 'PM1',
                 'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
 
 
@@ -918,51 +918,51 @@ CMPST =
                 'PM25_OC + PM25_EC',
 
 'PM25_HNI'    , 'PM2.5 Nickel',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'ANI',
 
 'PM25_HCR6'   , 'PM2.5 Hexavalent Chromium',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'ACR_VI',
 
 'PM25_HCR3'   , 'PM2.5 Trivalent Chromium',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'ACR_III',
 
 'PM25_HCR'    , 'PM2.5 Total Chromium',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'ACR_III + ACR_VI',
 
 'PM25_HBE'    , 'PM2.5 Beryllium',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'ABE',
 
 'PM25_HPB'    , 'PM2.5 Lead',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'APB',
 
 'PM25_HCD'    , 'PM2.5 Cadmium',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'ACADMIUM',
 
 'PM25_HMN'    , 'PM2.5 HAPs Manganese',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'AMN_HAPS',
 
 'PM25_HG'     , 'PM2.5 Mercury',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'APHG',
 
 'PM25_HAS'    , 'PM2.5 Arsenic',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'AAS',
 
 'PM25_HBNPY'  , 'PM2.5 Benzo-a-pyrene',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'ABENAPY',
 
 'PM25_HDIESEL', 'PM2.5 Diesel-sourced',
-                'ug m-3', 'PM25',
+                'ng m-3', 'PM25',
                 'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
 
 
@@ -988,101 +988,101 @@ CMPST =
                 'ANA + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS',
 
 'PM25TO10_HNI' , 'Coarse-Mode Nickel',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'ANI',
 
 'PM25TO10_HCR6', 'Coarse-Mode Hexavalent Chromium',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'ACR_VI',
 
 'PM25TO10_HCR3', 'Coarse-Mode Trivalent Chromium',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'ACR_III',
 
 'PM25TO10_HCR' , 'Coarse-Mode Trivalent Chromium',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'ACR_III + ACR_VI',
 
 'PM25TO10_HBE' , 'Coarse-Mode Beryllium',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'ABE',
 
 'PM25TO10_HPB' , 'Coarse-Mode Lead',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'APB',
 
 'PM25TO10_HCD' , 'Coarse-Mode Cadmium',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'ACADMIUM',
 
 'PM25TO10_HMN' , 'Coarse-Mode HAPs Manganese',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'AMN_HAPS',
 
 'PM25TO10_HG' , 'Coarse-Mode Mercury',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'APHG',
 
 'PM25TO10_HAS' , 'Coarse-Mode Arsenic',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'AAS',
 
 'PM25TO10_HBNPY', 'Coarse-Mode Benzo-a-pyrene',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'ABENAPY',
 
 'PM25TO10_DIES', 'Coarse-Mode Diesel PM',
-                'ug m-3', 'PM25TO10',
+                'ng m-3', 'PM25TO10',
                 'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
 
 !-- Particle Composites ( Dp < 10 um) --!
 
 'PM10_HNI'    , 'Coarse-Mode Nickel',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'ANI',
 
 'PM10_HCR6'   , 'Coarse-Mode Hexavalent Chromium',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'ACR_VI',
 
 'PM10_HCR3'   , 'Coarse-Mode Trivalent Chromium',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'ACR_III',
 
 'PM10_HCR'    , 'Coarse-Mode Total Chromium',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'ACR_III + ACR_VI',
 
 'PM10_HBE'    , 'Coarse-Mode Beryllium',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'ABE',
 
 'PM10_HPB'    , 'Coarse-Mode Lead',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'APB',
 
 'PM10_HCD'    , 'Coarse-Mode Cadmium',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'ACADMIUM',
 
 'PM10_HMN'    , 'Coarse-Mode HAPs Mangenese',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'AMN_HAPS',
 
 'PM10_HG'     , 'Coarse-Mode Mercury',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'APHG',
 
 'PM10_HAS'    , 'Coarse-Mode Arsenic',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'AAS',
 
 'PM10_HBNPY'  , 'Coarse-Mode Benzo-a-pyrene',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'ABENAPY',
 
 'PM10_HDIESEL', 'Coarse-Mode Diesel PM',
-                'ug m-3', 'PM10',
+                'ng m-3', 'PM10',
                 'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
 
 
@@ -1124,51 +1124,51 @@ CMPST =
                 'ACL',
 
 'TSP_HNI'     , 'Total Particulate Nickel',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'ANI',
 
 'TSP_HCR6'    , 'Total Particulate Hexavalent Chromium',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'ACR_VI',
 
 'TSP_HCR3'    , 'Total Particulate Trivalent Chromium',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'ACR_III',
 
 'TSP_HCR'     , 'Total Particulate Total Chromium',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'ACR_III + ACR_VI',
 
 'TSP_HBE'     , 'Total Particulate Beryllium',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'ABE',
 
 'TSP_HPB'     , 'Total Particulate Lead',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'APB',
 
 'TSP_HCD'     , 'Total Particulate Cadmium',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'ACADMIUM',
 
 'TSP_HMN'     , 'Total Particulate HAPs Manganese',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'AMN_HAPS',
 
 'TSP_HG'      , 'Total Particulate Mercury',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'APHG',
 
 'TSP_HAS'     , 'Total Particulate Arsenic',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'AAS',
 
 'TSP_HBNPY'   , 'Total Particulate Benzo-a-pyrene',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'ABENAPY',
 
 'TSP_HDIES'   , 'Coarse-Mode Diesel PM',
-                'ug m-3', 'TSP',
+                'ng m-3', 'TSP',
                 'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
 
 
@@ -1206,6 +1206,202 @@ CMPST =
                 'umol m-3', 'TSP', 
                 'ANO3 + HNO3 + AMTNO3',
 
+!-- HAPs Species --!
+'P_ACRO'       ,'Total mole-based acrolein concentration',
+                'ug m-3', 'TSP',
+                'ACROLEIN',
+
+'P_ACRO_PRIM'   ,'Total mole-based primary acrolein concentration',
+                'ug m-3', 'TSP',
+                'ACRO_PRIMARY',
+
+'P_ACRYN'      ,'Total mole-based acrylonitrile concentration',
+                'ug m-3', 'TSP',
+                'ACRY_NITRILE',
+
+'P_ALD2'       ,'Total mole-based acetaldehyde concentration',
+                'ug m-3', 'TSP',
+                'ALD2',
+
+'P_ALD2_PRIM'  ,'Total mole-based primary acetaldehyde concentration',
+                'ug m-3', 'TSP',
+                'ALD2_PRIMARY',
+
+'P_BENZ'        ,'Total mole-based benzene concentration',
+                'ug m-3', 'TSP',
+                'BENZENE',
+
+'P_BR2C212'     ,'Total mole-based 1,2-dibromoethane concentration',
+                'ug m-3', 'TSP',
+                'BR2_C2_12',
+
+'P_13BUTA'      ,'Total mole-based 1,3-butadiene concentration',
+                'ug m-3', 'TSP',
+                'BUTADIENE13',
+
+'P_CHCL3'       ,'Total mole-based chloroform concentration',
+                'ug m-3', 'TSP',
+                'CHCL3',
+
+'P_CLETHE'      ,'Total mole-based vinyl chloride concentration',
+                'ug m-3', 'TSP',
+                'CL_ETHE',
+
+'P_CL2C212 '    ,'Total mole-based 1,2-dichloroethane concentration',
+                'ug m-3', 'TSP',
+                'CL2_C2_12',
+
+'P_CL2ME'       ,'Total mole-based methylene chloride concentration',
+                'ug m-3', 'TSP',
+                'CL2_ME',
+
+'P_CL3ETHE'     ,'Total mole-based trichloroethylene concentration',
+                'ug m-3', 'TSP',
+                'CL3_ETHE',
+
+'P_CL4ETHE'     ,'Total mole-based perchloroethylene concentration',
+                'ug m-3', 'TSP',
+                'CL4_ETHE',
+
+'P_CL4ETHA'     ,'Total mole-based 1,1,2,2-tetrachloroethane concentration',
+                'ug m-3', 'TSP',
+                'CL4_ETHANE',
+
+'P_CARBTET'     ,'Total mole-based carbon tetrachloride concentration',
+                'ug m-3', 'TSP',
+                'CARBONTET',
+
+'P_DCLBENZ'     ,'Total mole-based 1,4-dichlorobenzene concentration',
+                'ug m-3', 'TSP',
+                'DICL_BENZENE',
+
+'P_DCLPROP'     ,'Total mole-based 1,4-dichloropropene concentration',
+                'ug m-3', 'TSP',
+                'DICL_PROPENE',
+
+'P_ETOX'       ,'Total mole-based ethylene oxide concentration',
+                'ug m-3', 'TSP',
+                'ETOX',
+
+'P_FORM'       ,'Total mole-based formaldehyde concentration',
+                'ug m-3', 'TSP',
+                'FORM',
+
+'P_FORM_PRIM'  ,'Total mole-based primary formaldehyde concentration',
+                'ug m-3', 'TSP',
+                'FORM_PRIMARY',
+
+'P_HXMEDIS'    ,'Total mole-based hexamethylene 1,6-diisocyanate concentration',
+                'ug m-3', 'TSP',
+                'HEXMETH_DIS',
+
+'P_HYDRAZN'    ,'Total mole-based hydrazine concentration',
+                'ug m-3', 'TSP',
+                'HYDRAZINE',
+
+'P_MALANHYD'   ,'Total mole-based maleic anhydride concentration',
+                'ug m-3', 'TSP',
+                'MAL_ANHYDRID',
+
+'P_NAPTH'      ,'Total mole-based napthalene concentration',
+                'ug m-3', 'TSP',
+                'NAPHTHALENE',
+
+'P_PROPDICL'    ,'Total mole-based propylene dichloride concentration',
+                'ug m-3', 'TSP',
+                'PROPYL_DICL',
+
+'P_QUIN'       ,'Total mole-based quinoline concentration',
+                'ug m-3', 'TSP',
+                'QUINOLINE',
+
+'P_TOLDIIS'    ,'Total mole-based 2,4-toluene diisocyanate concentration',
+                'ug m-3', 'TSP',
+                'TOL_DIIS',
+
+'P_TRIETHAMIN' ,'Total mole-based triethylamine concentration',
+                'ug m-3', 'TSP',
+                'TRIETHYLAMIN',
+
+'P_ACETNIT'    ,'Total mole-based acetonitrile concentration',
+                'ug m-3', 'TSP',
+                'ACET_NITRILE',
+
+'P_STYRENE'    ,'Total mole-based styrene concentration',
+                'ug m-3', 'TSP',
+                'STYRENE',
+
+'P_ACRYACID'   ,'Total mole-based acrylic acid concentration',
+                'ug m-3', 'TSP',
+                'ACRYACID',
+
+'P_HEXANE'     ,'Total mole-based n-hexane concentration',
+                'ug m-3', 'TSP',
+                'HEXANE',
+
+'P_METHCL'     ,'Total mole-based methyl chloride concentration',
+                'ug m-3', 'TSP',
+                'METHCHLORIDE',
+
+'P_CRBSULF'    ,'Total mole-based carbonyl sulfide concentration',
+                'ug m-3', 'TSP',
+                'CARBSULFIDE',
+
+'P_CHLRPRN'    ,'Total mole-based chloroprene concentration',
+                'ug m-3', 'TSP',
+                'CHLOROPRENE',
+
+'P_ETHYLBENZ'  ,'Total mole-based ethyl benzene concentration',
+                'ug m-3', 'TSP',
+                'ETHYLBENZENE',
+
+'P_PAH_000E0'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.0 Unit Risk Exposure concentration',
+                'ug m-3', 'TSP',
+                'PAH_000E0',
+
+'P_PAH_176E5'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.0000096 Unit Risk Exposure concentration',
+                'ug m-3', 'TSP',
+                'PAH_176E5',
+
+'P_PAH_880E5'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.000048 Unit Risk Exposure concentration',
+                'ug m-3', 'TSP',
+                'PAH_880E5',
+
+'P_PAH_176E4'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.000096 Unit Risk Exposure concentration',
+                'ug m-3', 'TSP',
+                'PAH_176E4',
+
+'P_PAH_176E3'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.00096 Unit Risk Exposure concentration',
+                'ug m-3', 'TSP',
+                'PAH_176E3',
+
+'P_PAH_192E3'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.00099 Unit Risk Exposure concentration',
+                'ug m-3', 'TSP',
+                'PAH_192E3',
+
+'P_PAH_101E2'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.01008 Unit Risk Exposure concentration',
+                'ug m-3', 'TSP',
+                'PAH_101E2',
+
+'P_PAH_176E2'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.0096 Unit Risk Exposure concentration',
+                'ug m-3', 'TSP',
+                'PAH_176E2',
+
+'P_PAH_114E1'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.1136 Unit Risk Exposure concentration',
+                'ug m-3', 'TSP',
+                'PAH_114E1',
+
+'P_HG0'        ,'Total mole-based elemental mercury',
+                'ug m-3', 'TSP',
+                'HG',
+
+'P_HGII'       ,'Total mole-based divalent mercury',
+                'ug m-3', 'TSP',
+                'HGIIGAS',
+
+'P_BENAPY'     ,'Total mole-based benzo-a-pyrene',
+                'ug m-3', 'TSP',
+                'BENAPY',
 
 !------------------------!
 !**** Gas Deposition ****!
@@ -1246,6 +1442,47 @@ CMPST =
 'WD_PANT'     , 'Wet Dep of Total PAN', 
                 'kg ha-1', 'DEP', 
                 'WD_PAN + WD_PANX + WD_OPAN',
+
+!-- HAPs --!
+'DD_BENZ'     , 'Dry Dep of Total HAPs Benzene',
+                'kg ha-1', 'DEP',
+                'DD_BENZENE',
+
+'WD_BENZ'     , 'Wet Dep of Total HAPs Benzene',
+                'kg ha-1', 'DEP',
+                'WD_BENZENE',
+
+'DD_EBENZ'    , 'Dry Dep of Total HAPs ethylbenzene',
+                'kg ha-1', 'DEP',
+                'DD_ETHYLBENZENE',
+
+'WD_EBENZ'    , 'Wet Dep of Total HAPs ethylbenzene',
+                'kg ha-1', 'DEP',
+                'WD_ETHYLBENZENE',
+
+'DD_DCBENZ'    ,'Dry Dep of Total HAPs dichlorobenzene',
+                'kg ha-1', 'DEP',
+                'DD_DICL_BENZENE',
+
+'WD_DCBENZ'    ,'Wet Dep of Total HAPs dichlorobenzene',
+                'kg ha-1', 'DEP',
+                'WD_DICL_BENZENE',
+
+'DD_STYR'      ,'Dry Dep of Total HAPs styrene',
+                'kg ha-1', 'DEP',
+                'DD_STYRENE',
+
+'WD_STYR'      ,'Wet Dep of Total HAPs styrene',
+                'kg ha-1', 'DEP',
+                'WD_STYRENE',
+
+'DD_XYL'       ,'Dry Dep of Total HAPs xylene',
+                'kg ha-1', 'DEP',
+                'DD_XYLENE',
+
+'WD_XYL'       ,'Wet Dep of Total HAPs xylene',
+                'kg ha-1', 'DEP',
+                'WD_XYLENE',
 
 
 !-----------------------------!
@@ -1489,6 +1726,78 @@ CMPST =
                 '0.2514 * WD_ANA + 0.2105 * WD_ASEACAT',
 
 
+!-- HAPS Particle Deposition --!
+'DD_MN_HAPS'  , 'Dry Dep of Particulate HAPs Manganese',
+                'kg ha-1', 'DEP',
+                'DD_AMN_HAPS',
+
+'WD_MN_HAPS'  , 'Wet Dep of Particulate HAPs Manganese',
+                'kg ha-1', 'DEP',
+                'WD_AMN_HAPS',
+
+'DD_AS_HAPS'  , 'Dry Dep of Particulate HAPs Arsenic',
+                'kg ha-1', 'DEP',
+                'DD_AAS',
+
+'WD_AS_HAPS'  , 'Wet Dep of Particulate HAPs Arsenic',
+                'kg ha-1', 'DEP',
+                'WD_AAS',
+
+'DD_CR3_HAPS' , 'Dry Dep of Particulate HAPs Trivalent Chromium',
+                'kg ha-1', 'DEP',
+                'DD_ACR_III',
+
+'WD_CR3_HAPS' , 'Wet Dep of Particulate HAPs Trivalent Chromium',
+                'kg ha-1', 'DEP',
+                'WD_ACR_III',
+
+'DD_CR6_HAPS' , 'Dry Dep of Particulate HAPs Hexavalent Chromium',
+                'kg ha-1', 'DEP',
+                'DD_ACR_VI',
+
+'WD_CR6_HAPS' , 'Wet Dep of Particulate HAPs Hexavalent Chromium',
+                'kg ha-1', 'DEP',
+                'WD_ACR_VI',
+
+'DD_CR_HAPS' , 'Dry Dep of Particulate HAPs Total Chromium',
+                'kg ha-1', 'DEP',
+                'DD_CR3_HAPS + DD_CR6_HAPS',
+
+'WD_CR_HAPS' , 'Wet Dep of Particulate HAPs Total Chromium',
+                'kg ha-1', 'DEP',
+                'WD_CR3_HAPS + WD_CR6_HAPS',
+
+'DD_BE_HAPS'  , 'Dry Dep of Particulate HAPs Beryllium',
+                'kg ha-1', 'DEP',
+                'DD_ABE',
+
+'WD_BE_HAPS'  , 'Wet Dep of Particulate HAPs Beryllium',
+                'kg ha-1', 'DEP',
+                'WD_ABE',
+
+'DD_CD_HAPS'  , 'Dry Dep of Particulate HAPs Cadmium',
+                'kg ha-1', 'DEP',
+                'DD_ACADMIUM',
+
+'WD_CD_HAPS'  , 'Wet Dep of Particulate HAPs Cadmium',
+                'kg ha-1', 'DEP',
+                'WD_ACADMIUM',
+
+'DD_NI_HAPS'  , 'Dry Dep of Particulate HAPs Nickel',
+                'kg ha-1', 'DEP',
+                'DD_ANI',
+
+'WD_NI_HAPS'  , 'Wet Dep of Particulate HAPs Nickel',
+                'kg ha-1', 'DEP',
+                'WD_ANI',
+
+'DD_PB_HAPS'  , 'Dry Dep of Particulate HAPs Lead',
+                'kg ha-1', 'DEP',
+                'DD_APB',
+
+'WD_PB_HAPS'  , 'Wet Dep of Particulate HAPs Lead',
+                'kg ha-1', 'DEP',
+                'WD_APB',
 
 !---------------------------------------!
 !**** Total Particle+Gas Deposition ****!
@@ -1518,14 +1827,35 @@ CMPST =
                 'WD_ASO4 + 1.5*WD_SO2',
 
 !-- Total Chloride --!
+'DD_TCL'      , 'Dry Dep of Total Chloride',
+                'kg ha-1', 'DEP',
+                '0.972*DD_HCL + DD_CL2 + DD_ACL - DD_ACLI + 0.6758*DD_HOCL + 0.4352*DD_CLNO2 + 0.36377*DD_CLNO3',
+
 'WD_TCL'      , 'Wet Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
                 '0.972*WD_HCL + WD_CL2 + WD_ACL - WD_ACLI + 0.6758*WD_HOCL + 0.4352*WD_CLNO2 + 0.36377*WD_CLNO3',
 
 'TD_TCL'      , 'Total Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
-                'WD_TCL + DD_CL',
+                'WD_TCL + DD_TCL',
 
+
+!-- Total HAPS --!
+'DD_TOT_HG'       , 'Dry Dep of HAPS Mercury',
+                'kg ha-1', 'DEP',
+                'DD_APHG + DD_HG + DD_HGIIGAS',
+
+'WD_TOT_HG'       , 'Wet Dep of HAPS Mercury',
+                'kg ha-1', 'DEP',
+                'WD_APHG + WD_HG + WD_HGIIGAS',
+
+'DD_TOT_BNPY'   , 'Dry Dep of HAPS Benzo-A-Pyrene',
+                'kg ha-1', 'DEP',
+                'DD_ABENAPY',
+
+'WD_TOT_BNPY'   , 'Wet Dep of HAPS Benzo-A-Pyrene',
+                'kg ha-1', 'DEP',
+                'WD_ABENAPY + WD_BENAPY',
 
 !-----------------------------!
 !**** Nitrogen Deposition ****!

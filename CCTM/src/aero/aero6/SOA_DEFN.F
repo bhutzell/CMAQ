@@ -252,7 +252,7 @@ C-----------------------------------------------------------------------
 
       ! Indices for specifying groups of organics to sum for output
       INTEGER, PARAMETER :: IOA_ALL = 0, IOA_PRI = 1, IOA_SEC = 2,
-     &                                   IOA_ANT = 3, IOA_BIO = 4
+     &                                   IOA_ANTSEC = 3, IOA_BIOSEC = 4
       
       Contains
 
@@ -265,16 +265,22 @@ C-----------------------------------------------------------------------
       ! Variables
       SELECT CASE ( ORG_MASK_IN )
          CASE( IOA_ALL )
+            ! All OA
             ORG_MASK = .TRUE.
          CASE( IOA_PRI )
+            ! Total Primary
             ORG_MASK = OASPC(:)%PRIMARY
          CASE( IOA_SEC )
+            ! Total Secondary
             ORG_MASK = .NOT. OASPC(:)%PRIMARY
-         CASE( IOA_ANT )
-            ORG_MASK = OASPC(:)%ANTHRO
-         CASE( IOA_BIO )
-            ORG_MASK = .NOT. OASPC(:)%BIOG
+         CASE( IOA_ANTSEC )
+            ! Anthropogenic Secondary
+            ORG_MASK = OASPC(:)%ANTHRO .AND. .NOT. OASPC(:)%PRIMARY
+         CASE( IOA_BIOSEC )
+            ! Biogenic Secondary
+            ORG_MASK = OASPC(:)%BIOG .AND. .NOT. OASPC(:)%PRIMARY
          CASE DEFAULT
+            ! No OA
             ORG_MASK = .FALSE.
       END SELECT
 

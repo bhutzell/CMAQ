@@ -22,7 +22,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       USE AERO_DATA, ONLY : N_MODE, IM_ALL, IM_UF, IM_F, IM_C, IM_AIT,
      &                      IM_ACC, IM_NUC
-      USE SOA_DEFN, ONLY  : IOA_PRI, IOA_SEC, IOA_ANT, IOA_BIO
+      USE SOA_DEFN, ONLY  : IOA_PRI, IOA_SEC, IOA_ANTSEC, IOA_BIOSEC
       USE UTILIO_DEFN
 
       IMPLICIT NONE
@@ -572,8 +572,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &  ELMO_DRVD_TYPE( ID_PMF_POC,   IM_F,   0,        OT_OC,    IOA_PRI ),                                          
      &  ELMO_DRVD_TYPE( ID_PMF_SOA,   IM_F,   0,        OT_OA,    IOA_SEC ),                                          
      &  ELMO_DRVD_TYPE( ID_PMF_SOC,   IM_F,   0,        OT_OC,    IOA_SEC ),                                          
-     &  ELMO_DRVD_TYPE( ID_PMF_ASOA,  IM_F,   0,        OT_OA,    IOA_ANT ),  
-     &  ELMO_DRVD_TYPE( ID_PMF_BSOA,  IM_F,   0,        OT_OA,    IOA_BIO ),                                          
+     &  ELMO_DRVD_TYPE( ID_PMF_ASOA,  IM_F,   0,        OT_OA, IOA_ANTSEC ),  
+     &  ELMO_DRVD_TYPE( ID_PMF_BSOA,  IM_F,   0,        OT_OA, IOA_BIOSEC ),                                          
      &  ELMO_DRVD_TYPE( ID_PMF_OMOC,  IM_F,   0,        OT_OMOC,  0       ),                                          
      &  ELMO_DRVD_TYPE( ID_PMF_OTOC,  IM_F,   0,        OT_OTOC,  0       ),                                          
      &  ELMO_DRVD_TYPE( ID_AMS_OA,    IM_ALL, IPMAMS,   OT_OA,    0       ),                                          

@@ -55,9 +55,9 @@
 !------------------------------------------------------------------------------!
 &ELMO_INIT
   N_Files = 5
-  N_Max_Output_Variables = 40
-  N_Keywords = 48
-  N_Max_Keyword_Variables = 100
+  N_Max_Output_Variables = 400
+  N_Keywords = 52
+  N_Max_Keyword_Variables = 75
 /
 
 &ELMO_Files
@@ -69,8 +69,8 @@
   Tmode = 'average', 'instant', 'average','average','instant'
   Lay_Bot = 1, 1, 1, 1, 1
   Lay_Top = 1, 1, 1, 1, 1
-  File_Vars(1,:) = 'ALL_CONC', 'DEFAULT', 'NOZ'
-  File_Vars(2,:) = 'ALL_CONC', 'DEFAULT', 'NOZ'
+  File_Vars(1,:) = 'ALL_CONC', 'DEFAULT' 
+  File_Vars(2,:) = 'ALL_CONC', 'DEFAULT' 
   File_Vars(3,:) = 'ALL_DEP', 'DEFAULT_DEP'
   File_Vars(4,:) = 'ALL_CONC','RH','TA','PRES'
   File_Vars(5,:) = 'ALL_CONC','RH','TA','PRES'
@@ -125,7 +125,8 @@
   Keywd_name(10) = 'FINE_SPECIES'
   Keywd(10,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC','PMF_OC','PMF_OA',
                'PMF_H2O','PMF_RCSOIL','PMF_OTHWNC','PMF_OTH','PMF_HP','PMF_HPMOLAL',
-               'PMF_PH','FINE_ORG','PMF','TSP_NO3_PPM'
+               'PMF_PH','FINE_ORG','PMF','TSP_NO3_PPM','PMF_FE','PMF_SI','PMF_TI','PMF_CA',
+               'PMF_MG','PMF_MN','PMF_AL','PMF_K'
 
   Keywd_name(11) = 'COARSE_SPECIES'
   Keywd(11,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA'!,'PMC_CL'
@@ -280,8 +281,14 @@
   Keywd_name(46) = 'ISAM_TDEP_ANALYSIS'
   Keywd(46,:) = 'TD_OXN_TOT_ISAM','TD_REDN_TOT_ISAM','TD_N_TOT_ISAM','TD_S_TOT_ISAM'
 
-  Keywd_name(47) = 'GAS_TOXICS_EXT'
-  Keywd(47,:) = 'FORMALD','ACETALD','BENZENE','ACETYLENE','ETHANE','ETHENE',
+  Keywd_name(47) = 'HAPS_CONCS'
+  Keywd(47,:) = 'GAS_TOXICS_EXT','PM_TOXICS_EXT'
+
+  Keywd_name(48) = 'HAPS_DEP'
+  Keywd(48,:) = 'WDEP_TOXICS_EXT','DDEP_TOXICS_EXT'
+
+  Keywd_name(49) = 'GAS_TOXICS_EXT'
+  Keywd(49,:) = 'FORMALD','ACETALD','BENZENE','ACETYLENE','ETHANE','ETHENE',
                 'TOLUENE','XYLENES','NAPHTHAL','ACRY_NITRILE','CARBONTET','PROPYL_DICL',
                 'DICL_PROPENE','CL4_ETHANE','CHCL3','BR2_C2_12','CL2_C2_12','ETOX',
                 'CL2_ME','CL4_ETHE','CL3_ETHE','CL_ETHE','QUINOLINE','HEXMETH_DIS',
@@ -289,13 +296,31 @@
                 'ACET_NITRILE','STYRENE','ACRYACID','HEXANE','METHCHLORIDE','CARBSULFIDE',
                 'CHLOROPRENE','ETHYLBENZENE','BENAPY','PAH_000E0','PAH_176E5','PAH_880E5',
                 'PAH_176E4','PAH_176E3','PAH_192E3','PAH_101E2','PAH_176E2','PAH_114E1',
-                'BENAPY'
+                'BENAPY','CL2','ETOH','HCL','MEOH','XYLENE','TOLU'
 
-  Keywd_name(48) = 'PM_TOXICS_EXT'
-  Keywd(48,:) = 'PM25_HDIESEL','PM25_HBE','PM25_HCD','PM25_HCR3','PM25_HCR6','PM25_HCR',
-               'PM25_HPB','PM25_HMN','PM25_HNI','PM25_HAS','PM25_HG',
+  Keywd_name(50) = 'PM_TOXICS_EXT'
+  Keywd(50,:) = 'PM25_HDIESEL','PM25_HBE','PM25_HCD','PM25_HCR3','PM25_HCR6','PM25_HCR',
+               'PM25_HPB','PM25_HMN','PM25_HNI','PM25_HAS','PM25_HG','PM25_HBNPY',
                'PM10_HDIESEL','PM10_HBE','PM10_HCD','PM10_HCR3','PM10_HCR6','PM10_HCR',
-               'PM10_HPB','PM10_HMN','PM10_HNI','PM10_HAS','PM10_HG'
+               'PM10_HPB','PM10_HMN','PM10_HNI','PM10_HAS','PM10_HG','PM10_HBNPY','P_ACRO','P_ACRO_PRIM',
+               'P_ALD2_PRIM','P_FORM_PRIM','P_FORM','P_13BUTA','P_ACRYN','P_ALD2','P_BENZ',
+               'P_BR2C212','P_CHCL3','P_CLETHE','P_CL2C212','P_CL2ME','P_CL3ETHE','P_CL4ETHE',
+               'P_CL4ETHA','P_CARBTET','P_DCLBENZ','P_DCLPROP','P_ETOX','P_HXMEDIS','P_HYDRAZN',
+               'P_MALANHYD','P_NAPTH','P_PROPDICL','P_QUIN','P_TOLDIIS','P_TRIETHAMIN','P_ACETNIT',
+               'P_STYRENE','P_ACRYACID','P_HEXANE','P_METHCL','P_CRBSULF','P_CHLRPRN','P_ETHYLBENZ',
+               'P_HG0','P_HGII','P_PAH_000E0','P_PAH_176E5','P_PAH_880E5','P_PAH_176E4',
+               'P_PAH_176E3','P_PAH_192E3','P_PAH_101E2','P_PAH_176E2','P_PAH_114E1','P_BENAPY',
+               'TSP_HBNPY',
+
+  Keywd_name(51) = 'WDEP_TOXICS_EXT'
+  Keywd(51,:) = 'WD_MN_HAPS','WD_AS_HAPS','WD_CR3_HAPS','WD_CR6_HAPS','WD_CR_HAPS',
+                'WD_BE_HAPS','WD_CD_HAPS','WD_NI_HAPS','WD_PB_HAPS','WD_BENZ','WD_TOLU',
+		'WD_EBENZ','WD_DCBENZ','WD_STYR','WD_XYL','WD_TOT_HG','WD_TOT_BNPY'
+
+  Keywd_name(52) = 'DDEP_TOXICS_EXT'
+  Keywd(52,:) = 'DD_MN_HAPS','DD_AS_HAPS','DD_CR3_HAPS','DD_CR6_HAPS','DD_CR_HAPS',
+                'DD_BE_HAPS','DD_CD_HAPS','DD_NI_HAPS','DD_PB_HAPS','DD_BENZ','DD_TOLU',
+		'DD_EBENZ','DD_DCBENZ','DD_STYR','DD_XYL','DD_TOT_HG','DD_TOT_BNPY'
 
 /
 
