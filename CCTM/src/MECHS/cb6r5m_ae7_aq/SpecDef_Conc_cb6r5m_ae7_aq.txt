@@ -316,7 +316,7 @@ PM25_UNSPCRS    ,ug m-3    ,ATOTK[0]*FPM25_COR[3] - (ASO4K[1]*FPM25_COR[3] \
                                                   +AFEK[0]*FPM25_COR[3]  \
                                                   +AMNK[0]*FPM25_COR[3]  \
                                                   +ANH4K[1]*FPM25_COR[3] \
-                                                  +ANO3K[1]*FPM25_COR[3]) \
+                                                  +ANO3K[1]*FPM25_COR[3] \
                                                   +ABRK[1]*FPM25_COR[3]) 
 
 
