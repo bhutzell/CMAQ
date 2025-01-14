@@ -632,6 +632,8 @@ C-----------------------------------------------------------------------
             Call M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          End If
 
+         Met_Data%KZ = 0.0
+
          ALLOCATE( Grid_Data%DX3F    ( NLAYS ),
      &             Grid_Data%RDX3F   ( NLAYS ),
      &             Grid_Data%RDX3M   ( NLAYS ),
