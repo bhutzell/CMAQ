@@ -215,7 +215,14 @@ PM25_TOT        ,ug m-3    ,PM25[1]
 !PM25_UNSPEC1    ,ug m-3    ,PM25_OTHWNC[1] 
 PM25_UNSPEC1    ,ug m-3    ,PM25[1]-(PM25_CL[1]+PM25_EC[1]+PM25_NA[1]+PM25_NH4[1] \
                            +PM25_NO3[1]+PM25_OC[1]+PM25_RCSOIL[1]+PM25_SO4[1])
-PM25_UNSPCRS    ,ug m-3    ,PM25_UNSPCRS[1] 
+PM25_UNSPCRS    ,ug m-3    ,PM25_UNSPCRS[1]
+
+!The following definition of PM25_UNSPCRS is for testing purposes only because it
+!will more closely match combine output when using the 'non-ELMO' SpecDef file
+!(SpecDef_Conc_cb6r5_ae7_aq.txt). The definition of the ELMO aggregate PM25_UNSPCRS 
+!on the line above is identical to the following formula based on individual species, 
+!however the aggregation is calculated at every time step, rather than on an hourly 
+!basis. This difference was found to lead to >1 ug m-3 differences in PM25_UNSPCRS. 
 !PM25_UNSPCRS    ,ug m-3    ,PMC[1]*FPM25_COR[1] - (PMC_SO4[1]*FPM25_COR[1] \
 !                                                  +PMC_CL[1]*FPM25_COR[1]  \
 !                                                  +PMC_NA[1]*FPM25_COR[1]  \
