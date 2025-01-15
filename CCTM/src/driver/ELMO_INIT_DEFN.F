@@ -1112,68 +1112,82 @@
       DO IFL = 1,N_ELMO_FILES
 #ifndef mpas
          ! Try to open existing file for update
-         IF ( .NOT. OPEN3( ELMO_FILE(IFL)%FLOGICAL, FSRDWR3, PNAME ) ) THEN
-            
-            ! Set output file characteristics based on COORD.EXT and 
-            ! open the ELMO file
-            SDATE3D = JDATE
-            STIME3D = JTIME
-            
-            IF ( ELMO_FILE( IFL )%TMODE .EQ. 1 ) THEN
-              ! Recalculate Date/Time Applicable for an Average file
-              MDATE = JDATE; MTIME = JTIME
-              IF ( END_TIME ) CALL NEXTIME ( MDATE, MTIME, TSTEP )
-            
-              SDATE3D = MDATE
-              STIME3D = MTIME
-            END IF
-            
-            ! Specify Layers
-            NLAYS3D = ELMO_FILE(IFL)%NLAYS
-            LAY_BOT = ELMO_FILE( IFL )%LAY_BOT
-            LAY_TOP = ELMO_FILE( IFL )%LAY_TOP
-            DO L = LAY_BOT, LAY_TOP + 1
-               VGLVS3D( L ) = VGLVS_GD( L )
-            END DO
-            
-            ! Specify Variables and their Properties
-            NVARS3D = ELMO_FILE( IFL )%N_VARS 
-            DO IVAR = 1,NVARS3D
-              J = ELMO_FILE( IFL )%TABID( IVAR )
-              VTYPE3D( IVAR ) = ELMO_TABLE( J )%OUT_TYPE
-              VNAME3D( IVAR ) = ELMO_TABLE( J )%OUT_NAME
-              UNITS3D( IVAR ) = ELMO_TABLE( J )%CUNIT
-              VDESC3D( IVAR ) = ELMO_TABLE( J )%DESC
-            END DO
-            
-            FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
-            DO L = 2, MXDESC3
-               FDESC3D( L ) = ' '
-            END DO
-            
-            ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 4
-            L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .True.
-            L_COL  ( 1:NVARS3D ) = .True.
-            L_ROW  ( 1:NVARS3D ) = .True.
-            L_VEXT ( 1:NVARS3D ) = .False.
-            
-            CALL LOAD_MIO_FILE ( ELMO_FILE( IFL )%FLOGICAL, NLAYS3D, 
-     &           LAY_BOT, LAY_TOP,
-     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D), L_ROW(1:NVARS3D),
-     &           L_VEXT(1:NVARS3D) )
-            
-            ! Open the Instantaneous ELMO File
-            IF ( .NOT. OPEN3( ELMO_FILE(IFL)%FLOGICAL, FSNEW3, PNAME ) ) THEN
-                XMSG = 'Could not create '// 
-     &                 ELMO_FILE( IFL )%FLOGICAL // ' file'
-               CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-            END IF
-            
-         END IF 
+         IF ( IO_PE_INCLUSIVE ) THEN
+
+            ! Open or append ELMO Output file in read/write mode for I/O
+            ! Processors
+            IF ( .NOT. OPEN3( ELMO_FILE(IFL)%FLOGICAL, FSRDWR3, PNAME ) ) THEN
+               
+               ! Set output file characteristics based on COORD.EXT and 
+               ! open the ELMO file
+               SDATE3D = JDATE
+               STIME3D = JTIME
+               
+               IF ( ELMO_FILE( IFL )%TMODE .EQ. 1 ) THEN
+                 ! Recalculate Date/Time Applicable for an Average file
+                 MDATE = JDATE; MTIME = JTIME
+                 IF ( END_TIME ) CALL NEXTIME ( MDATE, MTIME, TSTEP )
+               
+                 SDATE3D = MDATE
+                 STIME3D = MTIME
+               END IF
+               
+               ! Specify Layers
+               NLAYS3D = ELMO_FILE(IFL)%NLAYS
+               LAY_BOT = ELMO_FILE( IFL )%LAY_BOT
+               LAY_TOP = ELMO_FILE( IFL )%LAY_TOP
+               DO L = LAY_BOT, LAY_TOP + 1
+                  VGLVS3D( L ) = VGLVS_GD( L )
+               END DO
+               
+               ! Specify Variables and their Properties
+               NVARS3D = ELMO_FILE( IFL )%N_VARS 
+               DO IVAR = 1,NVARS3D
+                 J = ELMO_FILE( IFL )%TABID( IVAR )
+                 VTYPE3D( IVAR ) = ELMO_TABLE( J )%OUT_TYPE
+                 VNAME3D( IVAR ) = ELMO_TABLE( J )%OUT_NAME
+                 UNITS3D( IVAR ) = ELMO_TABLE( J )%CUNIT
+                 VDESC3D( IVAR ) = ELMO_TABLE( J )%DESC
+               END DO
+               
+               FDESC3D( 1 ) = 'Variables Relevant for PM Formation and Distribution'
+               DO L = 2, MXDESC3
+                  FDESC3D( L ) = ' '
+               END DO
+               
+               ! Store MIO Metadata
+               NDIMS3D( 1:NVARS3D ) = 4
+               L_TSTEP( 1:NVARS3D ) = .True.
+               L_LAY  ( 1:NVARS3D ) = .True.
+               L_COL  ( 1:NVARS3D ) = .True.
+               L_ROW  ( 1:NVARS3D ) = .True.
+               L_VEXT ( 1:NVARS3D ) = .False.
+               
+               CALL LOAD_MIO_FILE ( ELMO_FILE( IFL )%FLOGICAL, NLAYS3D, 
+     &              LAY_BOT, LAY_TOP,
+     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D), L_ROW(1:NVARS3D),
+     &              L_VEXT(1:NVARS3D) )
+               
+               ! Open the Instantaneous ELMO File
+               IF ( .NOT. OPEN3( ELMO_FILE(IFL)%FLOGICAL, FSNEW3, PNAME ) ) THEN
+                   XMSG = 'Could not create '// 
+     &                    ELMO_FILE( IFL )%FLOGICAL // ' file'
+                  CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
+               END IF
+               
+            END IF 
+
+         ELSE
+
+           ! Open ELMO Output files in read mode for non-I/O processors  
+           IF ( .NOT. OPEN3( ELMO_FILE(IFL)%FLOGICAL, FSREAD3, PNAME ) ) THEN
+              XMSG = 'Could not open ' // TRIM( ELMO_FILE(IFL)%FLOGICAL )
+              CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+           END IF
+
+         END IF
 #endif
       END DO
  

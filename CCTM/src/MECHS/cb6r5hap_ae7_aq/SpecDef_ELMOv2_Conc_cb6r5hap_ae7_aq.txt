@@ -344,8 +344,8 @@ FPM25TO10_ACC   ,          ,FPM25TO10_ACC[1]
 FPM25TO10_COR   ,          ,FPM25TO10_COR[1]
 FPM10_AIT       ,          ,FPM10_AIT[1]    
 FPM10_ACC       ,          ,FPM10_ACC[1]    
-FPM10_COR       ,          ,FPM10_COR[1]    
- 
+FPM10_COR       ,          ,FPM10_COR[1]   
+
 !! FRM PM Equivalent Calculation
 PMIJ_FRM        ,ug m-3    ,PMF_FRM[1]
 PM25_FRM        ,ug m-3    ,PM25_FRM[1]

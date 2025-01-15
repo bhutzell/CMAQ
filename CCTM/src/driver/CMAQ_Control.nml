@@ -142,27 +142,27 @@
                'HNO3_UGM3','SO2_UGM3','NH3_UGM3','FORMALD','ACETALD','BENZENE',
                'ACETYLENE','ETHANE','ETHENE','TOLUENE','XYLENES','NAPHTHAL'
   
-  Keywd_name(5) = 'AMET_PM'
-  Keywd(5,:) = 'TSP','PMC','PMF','PM25','PMF_FRM','PM25_FRM',
+  Keywd_name(11) = 'AMET_PM'
+  Keywd(11,:) = 'TSP','PMC','PMF','PM25','PMF_FRM','PM25_FRM',
                'PMF_OC','PMF_EC','PMF_NA','PMF_CL','PMF_SO4','PMF_NO3',
                'PMF_NH4','PMF_FE','PMF_AL','PMF_SI','PMF_TI','PMF_CA',
                'PMF_MG','PMF_K','PMF_MN','PMF_RCSOIL','PMF_OTHWNC','PMF_NC',
-               'PMF_OTH','PM25_OC','PM25_EC','PM25_SO4','PM25_NO3','PM25_NH4',
+               'PMF_OTH','PM25_OC','PM25_EC','PM25_SO4','PM25_NO3','PM25_NH4'
   
 
  !------------------------------!
  !----- Gas Concentrations -----!
  !------------------------------!
-  Keywd_name(8) = 'COMMON_GASES'
-  Keywd(8,:) = 'AMET_GAS','H2O2','HONO','HOX','ISOPRENE','N2O5','NTR','PANS',!'TERP','VOC',
+  Keywd_name(12) = 'COMMON_GASES'
+  Keywd(12,:) = 'AMET_GAS','H2O2','HONO','HOX','ISOPRENE','N2O5','NTR','PANS',!'TERP','VOC',
                'OH','NHX','TERPENES','TNO3'
 
  
  !---------------------------------------!
  !----- Total Particle Mass Metrics -----!
  !---------------------------------------!
-  Keywd_name(9) = 'PM_MASS'
-  Keywd(9,:) = 'PMF','PMC','PM1','PM01','PM25','PM10','PM25TO10','PMU','PMAMS','PMAIT','PMACC'
+  Keywd_name(13) = 'PM_MASS'
+  Keywd(13,:) = 'PMF','PMC','PM1','PM01','PM25','PM10','PM25TO10','PMU','PMAMS','PMAIT','PMACC'
 
 
  !-------------------------------!
@@ -175,55 +175,55 @@
  ! the user's preference. If all three FINE_SPECIES keywords are invoked then
  ! the union of both lists will be output.
 
-  Keywd_name(10) = 'FINE_SPECIES_A'
-  Keywd(10,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
+  Keywd_name(14) = 'FINE_SPECIES_A'
+  Keywd(14,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
                 'PMF_OA','PMF_OTH','PMF_RCSOIL'
 
-  Keywd_name(10) = 'FINE_SPECIES_B'
-  Keywd(10,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
+  Keywd_name(15) = 'FINE_SPECIES_B'
+  Keywd(15,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
                 'PMF_OC','PMF_OTHWNC','PMF_RCSOIL'
 
-  Keywd_name(10) = 'FINE_SPECIES_C'
-  Keywd(10,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
+  Keywd_name(16) = 'FINE_SPECIES_C'
+  Keywd(16,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
                 'PMF_OA','AOTHR','PMF_FE','PMF_SI','PMF_CA','PMF_MG',
                 'PMF_MN','PMF_AL','PMF_K'
 
-  Keywd_name(10) = 'PM_FINE_VARS'
-  Keywd(10,:) = 'PMF_H2O','PMF_HP','PMF_HPMOLAL','PMF_PH','FINE_ORG'
+  Keywd_name(17) = 'PM_FINE_VARS'
+  Keywd(17,:) = 'PMF_H2O','PMF_HP','PMF_HPMOLAL','PMF_PH','FINE_ORG'
 
-  Keywd_name(11) = 'COARSE_SPECIES'
-  Keywd(11,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA'!,'PMC_CL'
+  Keywd_name(18) = 'COARSE_SPECIES'
+  Keywd(18,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA'!,'PMC_CL'
 
-  Keywd_name(12) = 'AMS_SPECIES'
-  Keywd(12,:) = 'PMAMS','PMAMS_SO4','PMAMS_NO3','PMAMS_NH4','PMAMS_CL','PMAMS_OA','PMAMS_OTOC'
+  Keywd_name(19) = 'AMS_SPECIES'
+  Keywd(19,:) = 'PMAMS','PMAMS_SO4','PMAMS_NO3','PMAMS_NH4','PMAMS_CL','PMAMS_OA','PMAMS_OTOC'
 
-  Keywd_name(13) = 'PM1_SPECIES'
-  Keywd(13,:) = 'PM1','PM1_SO4','PM1_NO3','PM1_NH4','PM1_CL','PM1_NA','PM1_EC','PM1_OC',
+  Keywd_name(20) = 'PM1_SPECIES'
+  Keywd(20,:) = 'PM1','PM1_SO4','PM1_NO3','PM1_NH4','PM1_CL','PM1_NA','PM1_EC','PM1_OC',
                'PM1_OA','PM1_MG','PM1_K','PM1_CA','PM1_OTHER','PM1_FE','PM1_SI','PM1_TI',
                'PM1_MN','PM1_AL','PM1_RCSOIL','PM1_OTHWNC','PM1_UNSPCRS'
 
-  Keywd_name(14) = 'PM25_SPECIES_A'
-  Keywd(14,:) = 'PM25_SO4','PM25_NO3','PM25_NH4','PM25_CL','PM25_NA','PM25_EC',
+  Keywd_name(21) = 'PM25_SPECIES_A'
+  Keywd(21,:) = 'PM25_SO4','PM25_NO3','PM25_NH4','PM25_CL','PM25_NA','PM25_EC',
                 'PM25_OC','PM25_OTHWNC','PM25_RCSOIL'
 
-  Keywd_name(14) = 'PM25_SPECIES_B'
-  Keywd(14,:) = 'PM25_SO4','PM25_NO3','PM25_NH4','PM25_CL','PM25_NA','PM25_EC',
+  Keywd_name(22) = 'PM25_SPECIES_B'
+  Keywd(22,:) = 'PM25_SO4','PM25_NO3','PM25_NH4','PM25_CL','PM25_NA','PM25_EC',
                 'PM25_OA','PM25_OTHER','PM25_MG','PM25_K','PM25_CA','PM25_FE','PM25_SI',
                 'PM25_TI','PM25_MN','PM25_AL'
 
-  Keywd_name(15) = 'PM25TO10_SPECIES'
-  Keywd(15,:) = 'PM25TO10','PM25TO10_SO4','PM25TO10_NO3','PM25TO10_NH4','PM25TO10_CL',
+  Keywd_name(23) = 'PM25TO10_SPECIES'
+  Keywd(23,:) = 'PM25TO10','PM25TO10_SO4','PM25TO10_NO3','PM25TO10_NH4','PM25TO10_CL',
                'PM25TO10_NA'
 
 
  !-----------------------------------!
  !----- Organic Aerosol Metrics -----!
  !-----------------------------------!
-  Keywd_name(16) = 'ORGANIC_AEROSOL'
-  Keywd(16,:) = 'FINE_ORG','PM1_OC','PM1_OA','PMAMS_OA','PMAMS_OTOC','PM25_OA'
+  Keywd_name(24) = 'ORGANIC_AEROSOL'
+  Keywd(24,:) = 'FINE_ORG','PM1_OC','PM1_OA','PMAMS_OA','PMAMS_OTOC','PM25_OA'
 
-  Keywd_name(17) = 'FINE_ORG'
-  Keywd(17,:) = 'PMF_OC','PMF_OA','PMF_POC','PMF_SOC','PMF_POA','PMF_SOA','PMF_NC',
+  Keywd_name(25) = 'FINE_ORG'
+  Keywd(25,:) = 'PMF_OC','PMF_OA','PMF_POC','PMF_SOC','PMF_POA','PMF_SOA','PMF_NC',
                'PMF_OMOC','PMF_OTOC','PMF_ASOA','PMF_BSOA','PMF_CLDGLY',!'AORGCJ',
                'PMF_ISOPSOA','PMF_IEPOXSOA','PMF_MTNSOA','PMF_MTSOA'
  
@@ -231,24 +231,24 @@
  !-------------------------------------------------!
  !----- Particle Size Distribution Parameters -----!
  !-------------------------------------------------!
-  Keywd_name(18) = 'NUMBER'
-  Keywd(18,:) = 'TSP_NUM','PMF_NUM','PMC_NUM','N10','N20','N40','N100'
+  Keywd_name(26) = 'NUMBER'
+  Keywd(26,:) = 'TSP_NUM','PMF_NUM','PMC_NUM','N10','N20','N40','N100'
 
-  Keywd_name(19) = 'SURFACE_AREA'
-  Keywd(19,:) = 'PM_SRF','PMU_SRF','PMF_SRF','PMC_SRF','WET_M2'
+  Keywd_name(27) = 'SURFACE_AREA'
+  Keywd(27,:) = 'PM_SRF','PMU_SRF','PMF_SRF','PMC_SRF','WET_M2'
 
-  Keywd_name(20) = 'SIZE'
-  Keywd(20,:) = 'NUMBER','DRY_DG','WET_DG','STDEV','DRY_M3','WET_M3','WET_M2','DRY_DENS','WET_DENS'
+  Keywd_name(28) = 'SIZE'
+  Keywd(28,:) = 'NUMBER','DRY_DG','WET_DG','STDEV','DRY_M3','WET_M3','WET_M2','DRY_DENS','WET_DENS'
 
-  Keywd_name(21) = 'CUTOFF_FRACTIONS'
-  Keywd(21,:) = 'FPM01','FPM1','FPM25','FPM10','FPM25TO10','FAMS'
+  Keywd_name(29) = 'CUTOFF_FRACTIONS'
+  Keywd(29,:) = 'FPM01','FPM1','FPM25','FPM10','FPM25TO10','FAMS'
 
 
  !--------------------------------------------------!
  !----- Chemical Reaction Rates and Parameters -----!
  !--------------------------------------------------!
-  Keywd_name(22) = 'CHEM'
-  Keywd(22,:) = 'GAMMA_N2O5','GAMMA_N2O5K','YIELD_CLNO2','YIELD_CLNO2K','GAMMA_IEPOX',
+  Keywd_name(30) = 'CHEM'
+  Keywd(30,:) = 'GAMMA_N2O5','GAMMA_N2O5K','YIELD_CLNO2','YIELD_CLNO2K','GAMMA_IEPOX',
                'K_IEPOX','GAMMA_IMAE'
 
 
@@ -258,8 +258,8 @@
  ! These are available in mechanisms with the 
  ! 'HAP' acronym (e.g. CB6R5HAP_AE7_AQ)
 
-  Keywd_name(49) = 'GAS_TOXICS'
-  Keywd(49,:) = 'ACRY_NITRILE','CARBONTET','PROPYL_DICL',
+  Keywd_name(31) = 'GAS_TOXICS'
+  Keywd(31,:) = 'ACRY_NITRILE','CARBONTET','PROPYL_DICL',
                 'DICL_PROPENE','CL4_ETHANE','CHCL3','BR2_C2_12','CL2_C2_12','ETOX',
                 'CL2_ME','CL4_ETHE','CL3_ETHE','CL_ETHE','QUINOLINE','HEXMETH_DIS',
                 'HYDRAZINE','MAL_ANHYDRID','TOL_DIIS','TRIETHYLAMIN','DICL_BENZENE',
@@ -276,8 +276,8 @@
                 'P_HG0','P_HGII','P_PAH_000E0','P_PAH_176E5','P_PAH_880E5','P_PAH_176E4',
                 'P_PAH_176E3','P_PAH_192E3','P_PAH_101E2','P_PAH_176E2','P_PAH_114E1','P_BENAPY'
  
-  Keywd_name(24) = 'PM_TOXICS'
-  Keywd(24,:) = 'PM25_HDIESEL','PM25_HBE','PM25_HCD','PM25_HCR3','PM25_HCR6','PM25_HCR',
+  Keywd_name(32) = 'PM_TOXICS'
+  Keywd(32,:) = 'PM25_HDIESEL','PM25_HBE','PM25_HCD','PM25_HCR3','PM25_HCR6','PM25_HCR',
                 'PM25_HPB','PM25_HMN','PM25_HNI','PM25_HAS','PM25_HG','PM25_HBNPY',
                 'PM10_HDIESEL','PM10_HBE','PM10_HCD','PM10_HCR3','PM10_HCR6','PM10_HCR',
                 'PM10_HPB','PM10_HMN','PM10_HNI','PM10_HAS','PM10_HG','PM10_HBNPY',
@@ -289,14 +289,14 @@
  !--------------------------------!
  ! Use these keywords for evaluation with satellite data
 
-  Keywd_name(25) = 'SAT'
-  Keywd(25,:) = 'SATMET','SATCONC'
+  Keywd_name(33) = 'SAT'
+  Keywd(33,:) = 'SATMET','SATCONC'
 
-  Keywd_name(26) = 'SATMET'
-  Keywd(26,:) = 'DENS','DZ','ZH','CFRAC','PV','PRES','TA'
+  Keywd_name(34) = 'SATMET'
+  Keywd(34,:) = 'DENS','DZ','ZH','CFRAC','PV','PRES','TA'
 
-  Keywd_name(27) = 'SATCONC'
-  Keywd(27,:) = 'NO2','SO2','O3','CO','FORMALD','NH3','AOD_550'
+  Keywd_name(35) = 'SATCONC'
+  Keywd(35,:) = 'NO2','SO2','O3','CO','FORMALD','NH3','AOD_550'
  
 
  !----------------------!
@@ -304,20 +304,20 @@
  !----------------------!
  ! Definitions of mechanism-specific deposition variable lists
 
-  Keywd_name(28) = 'DEFAULT_DEP_CB6R5_AE7_AQ'
-  Keywd(28,:) = 'PRECIP','GAS_DEP','PM_DEP','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
+  Keywd_name(36) = 'DEFAULT_DEP_CB6R5_AE7_AQ'
+  Keywd(36,:) = 'PRECIP','GAS_DEP','PM_DEP','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
                 'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
                 'SEASPRAY_SULFUR_DEP','DD_CLNO2','WD_CLNO2','DD_CLNO3','WD_CLNO3',
                 'DD_PMC_SSSO4','DD_PMF_SSSO4','WD_SSSO4'
 
-  Keywd_name(28) = 'DEFAULT_DEP_CB6R5M_AE7_AQ'
-  Keywd(28,:) = 'DEFAULT_DEP_CB6R5_AE7_AQ'
+  Keywd_name(37) = 'DEFAULT_DEP_CB6R5M_AE7_AQ'
+  Keywd(37,:) = 'DEFAULT_DEP_CB6R5_AE7_AQ'
 
-  Keywd_name(28) = 'DEFAULT_DEP_CB6R5HAP_AE7_AQ'
-  Keywd(28,:) = 'DEFAULT_DEP_CB6R5_AE7_AQ','TOXICS_DEP'
+  Keywd_name(38) = 'DEFAULT_DEP_CB6R5HAP_AE7_AQ'
+  Keywd(38,:) = 'DEFAULT_DEP_CB6R5_AE7_AQ','TOXICS_DEP'
 
-  Keywd_name(28) = 'DEFAULT_DEP_CCRACMM2'
-  Keywd(28,:) = 'PRECIP','GAS_DEP','PM_DEP','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
+  Keywd_name(39) = 'DEFAULT_DEP_CCRACMM2'
+  Keywd(39,:) = 'PRECIP','GAS_DEP','PM_DEP','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
                 'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
                 'SEASPRAY_SULFUR_DEP'
 
@@ -325,8 +325,8 @@
  !--------------------------!
  !----- Gas Deposition -----!
  !--------------------------!
-  Keywd_name(29) = 'GAS_DEP'
-  Keywd(29,:) = 'DD_FORMALD','WD_FORMALD','DD_HNO4','WD_HNO4','DD_NTR','WD_NTR',
+  Keywd_name(40) = 'GAS_DEP'
+  Keywd(40,:) = 'DD_FORMALD','WD_FORMALD','DD_HNO4','WD_HNO4','DD_NTR','WD_NTR',
                 'DD_PANT','WD_PANT','DD_NO2','WD_NO2','DD_NO','WD_NO','DD_H2O2',
                 'WD_H2O2','DD_N2O5','WD_N2O5','DD_HONO','WD_HONO','DD_HNO3','WD_HNO3',
                 'DD_NO3','WD_NO3','DD_NH3','WD_NH3','DD_SO2','DD_O3','WD_O3'
@@ -335,26 +335,26 @@
  !-------------------------------!
  !----- Particle Deposition -----!
  !-------------------------------!
-  Keywd_name(30) = 'PM_DEP'
-  Keywd(30,:) = 'FINE_DDEP','COARSE_DDEP','TSP_DDEP','PM_WDEP'
+  Keywd_name(41) = 'PM_DEP'
+  Keywd(41,:) = 'FINE_DDEP','COARSE_DDEP','TSP_DDEP','PM_WDEP'
   
-  Keywd_name(31) = 'FINE_DDEP'
-  Keywd(31,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
+  Keywd_name(42) = 'FINE_DDEP'
+  Keywd(42,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
                 'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL','DD_PMF_SI',
                 'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K',!'DD_PMF_SSSO4',
                 'DD_PMF_OC','WD_PMF_OC','DD_PMF_POC','WD_PMF_POC','DD_PMF_SOC','WD_PMF_SOC',
                 'DD_PMF_OA','WD_PMF_OA','DD_PMF_POA','WD_PMF_POA','DD_PMF_SOA','WD_PMF_SOA'!,
                 'DD_ANAJ','DD_ACLJ','DD_ACLK'
 
-  Keywd_name(32) = 'COARSE_DDEP'
-  Keywd(32,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
+  Keywd_name(43) = 'COARSE_DDEP'
+  Keywd(43,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
                 'DD_PMC_CA','DD_PMC_MG','DD_PMC_K'
 
-  Keywd_name(33) = 'TSP_DDEP'
-  Keywd(33,:) = 'DD_CL','DD_CA','DD_MG','DD_K','DD_NA'
+  Keywd_name(44) = 'TSP_DDEP'
+  Keywd(44,:) = 'DD_CL','DD_CA','DD_MG','DD_K','DD_NA'
 
-  Keywd_name(34) = 'PM_WDEP'
-  Keywd(34,:) = 'WD_TSP_NO3','WD_TSP_NH4','WD_TSP_SO4','WD_TSP_MTNO3','WD_TSP_NA',
+  Keywd_name(45) = 'PM_WDEP'
+  Keywd(45,:) = 'WD_TSP_NO3','WD_TSP_NH4','WD_TSP_SO4','WD_TSP_MTNO3','WD_TSP_NA',
                 'WD_PMC_NA','WD_PMF_CA','WD_PMC_CA','WD_TSP_CA','WD_PMF_FE',
                 'WD_PMF_AL','WD_PMF_SI','WD_PMF_TI','WD_PMF_MN','WD_PMF_MG','WD_PMC_MG',
                 'WD_TSP_MG','WD_PMF_K','WD_PMC_K','WD_TSP_K','WD_ANAJ'
@@ -363,49 +363,49 @@
  !----------------------------!
  !----- Total Deposition -----!
  !----------------------------!
-  Keywd_name(35) = 'PM_TDEP'
-  Keywd(35,:) = 'TD_NA'
+  Keywd_name(46) = 'PM_TDEP'
+  Keywd(46,:) = 'TD_NA'
 
-  Keywd_name(36) = 'GASPM_DEP'
-  Keywd(36,:) = 'DD_TNO3','WD_TNO3','DD_NHX','WD_NHX','WD_SOX','WD_TCL','TD_TCL'
+  Keywd_name(47) = 'GASPM_DEP'
+  Keywd(47,:) = 'DD_TNO3','WD_TNO3','DD_NHX','WD_NHX','WD_SOX','WD_TCL','TD_TCL'
 
 
  !--------------------------------!
  !----- Elemental Deposition -----!
  !--------------------------------!
-  Keywd_name(37) = 'OXIDIZED_NITROGEN_DEP'
-  Keywd(37,:) = 'DD_OXN_NOX', 'WD_OXN_NOX', 'DD_OXN_TNO3','WD_OXN_TNO3',
+  Keywd_name(48) = 'OXIDIZED_NITROGEN_DEP'
+  Keywd(48,:) = 'DD_OXN_NOX', 'WD_OXN_NOX', 'DD_OXN_TNO3','WD_OXN_TNO3',
                 'DD_OXN_PANT','WD_OXN_PANT','DD_OXN_ORGN','WD_OXN_ORGN',
                 'DD_OXN_OTHR','WD_OXN_OTHR','DD_OXN_TOT', 'WD_OXN_TOT',
                 'TD_OXN_TOT'
 
-  Keywd_name(38) = 'REDUCED_NITROGEN_DEP'
-  Keywd(38,:) = 'DD_REDN_TOT','WD_REDN_TOT','TD_REDN_TOT'
+  Keywd_name(49) = 'REDUCED_NITROGEN_DEP'
+  Keywd(49,:) = 'DD_REDN_TOT','WD_REDN_TOT','TD_REDN_TOT'
 
-  Keywd_name(39) = 'TOTAL_NITROGEN_DEP'
-  Keywd(39,:) = 'DD_N_TOT','WD_N_TOT','TD_N_TOT'
+  Keywd_name(50) = 'TOTAL_NITROGEN_DEP'
+  Keywd(50,:) = 'DD_N_TOT','WD_N_TOT','TD_N_TOT'
 
-  Keywd_name(40) = 'TOTAL_SULFUR_DEP'
-  Keywd(40,:) = 'DD_S_TOT','WD_S_TOT','TD_S_TOT'
+  Keywd_name(51) = 'TOTAL_SULFUR_DEP'
+  Keywd(51,:) = 'DD_S_TOT','WD_S_TOT','TD_S_TOT'
 
-  Keywd_name(41) = 'SEASPRAY_SULFUR_DEP'
-  Keywd(41,:) = ''!'DD_S_SEA','WD_S_SEA','TD_S_SEA'
+  Keywd_name(52) = 'SEASPRAY_SULFUR_DEP'
+  Keywd(52,:) = ''!'DD_S_SEA','WD_S_SEA','TD_S_SEA'
  
  
  !-----------------------------!
  !----- Toxics Deposition -----!
  !-----------------------------!
-  Keywd_name(48) = 'TOXICS_DEP'
-  Keywd(48,:) = 'TOXICS_WDEP','TOXICS_DDEP'
+  Keywd_name(53) = 'TOXICS_DEP'
+  Keywd(53,:) = 'TOXICS_WDEP','TOXICS_DDEP'
 
 
-  Keywd_name(51) = 'TOXICS_WDEP'
-  Keywd(51,:) = 'WD_MN_HAPS','WD_AS_HAPS','WD_CR3_HAPS','WD_CR6_HAPS','WD_CR_HAPS',
+  Keywd_name(54) = 'TOXICS_WDEP'
+  Keywd(54,:) = 'WD_MN_HAPS','WD_AS_HAPS','WD_CR3_HAPS','WD_CR6_HAPS','WD_CR_HAPS',
                 'WD_BE_HAPS','WD_CD_HAPS','WD_NI_HAPS','WD_PB_HAPS','WD_BENZ','WD_TOLU',
                 'WD_EBENZ','WD_DCBENZ','WD_STYR','WD_XYL','WD_TOT_HG','WD_TOT_BNPY'
 
-  Keywd_name(52) = 'TOXICS_DDEP'
-  Keywd(52,:) = 'DD_MN_HAPS','DD_AS_HAPS','DD_CR3_HAPS','DD_CR6_HAPS','DD_CR_HAPS',
+  Keywd_name(55) = 'TOXICS_DDEP'
+  Keywd(55,:) = 'DD_MN_HAPS','DD_AS_HAPS','DD_CR3_HAPS','DD_CR6_HAPS','DD_CR_HAPS',
                 'DD_BE_HAPS','DD_CD_HAPS','DD_NI_HAPS','DD_PB_HAPS','DD_BENZ','DD_TOLU',
                 'DD_EBENZ','DD_DCBENZ','DD_STYR','DD_XYL','DD_TOT_HG','DD_TOT_BNPY'
  
@@ -416,31 +416,63 @@
  ! These output variables are useful for the 
  ! Integrated Source Apportionment Method (ISAM)
 
-  Keywd_name(42) = 'ISAM_ANALYSIS'
-  Keywd(42,:) = 'ISAM_CONC_ANALYSIS','ISAM_DDEP_ANALYSIS','ISAM_WDEP_ANALYSIS','ISAM_TDEP_ANALYSIS'
+  Keywd_name(56) = 'ISAM_ANALYSIS'
+  Keywd(56,:) = 'ISAM_CONC_ANALYSIS','ISAM_DDEP_ANALYSIS','ISAM_WDEP_ANALYSIS','ISAM_TDEP_ANALYSIS'
 
-  Keywd_name(43) = 'ISAM_CONC_ANALYSIS'
-  Keywd(43,:) = 'CO_ISAM','NO_ISAM','NO2_ISAM','NOX_ISAM','HNO3_ISAM','N2O5_ISAM',
+  Keywd_name(57) = 'ISAM_CONC_ANALYSIS'
+  Keywd(57,:) = 'CO_ISAM','NO_ISAM','NO2_ISAM','NOX_ISAM','HNO3_ISAM','N2O5_ISAM',
                 'O3_ISAM','SO2_ISAM','PMF_RCSOIL_ISAM','PMF_CL_ISAM','PMF_EC_ISAM','PMF_NA_ISAM',
                 'PMF_NO3_ISAM','PMC_NO3_ISAM','PMF_NH4_ISAM','PMC_NH4_ISAM','PMF_SO4_ISAM',
                 'PMC_SO4_ISAM','PMF_POC_ISAM','PMF_POA_ISAM','PMF_SOC_ISAM','PMF_SOA_ISAM',
                 'PMF_OC_ISAM','PMF_OA_ISAM','PMF_ASOA_ISAM','PMF_BSOA_ISAM','PMF_CLDGLY_ISAM',
                 'PMF_ISAM','PMC_ISAM','TSP_ISAM','PMF_OTHWNC_ISAM','PMF_OTH_ISAM','PMF_NC_ISAM'
 
-  Keywd_name(44) = 'ISAM_DDEP_ANALYSIS'
-  Keywd(44,:) = 'DD_NO2_ISAM','DD_NO_ISAM','DD_NH3_ISAM','DD_SO2_ISAM','DD_O3_ISAM',
+  Keywd_name(58) = 'ISAM_DDEP_ANALYSIS'
+  Keywd(58,:) = 'DD_NO2_ISAM','DD_NO_ISAM','DD_NH3_ISAM','DD_SO2_ISAM','DD_O3_ISAM',
                 'DD_PMF_NO3_ISAM','DD_PMC_NO3_ISAM','DD_TNO3_ISAM','DD_PMF_NH4_ISAM','DD_PMC_NH4_ISAM',
                 'DD_PMF_SO4_ISAM','DD_PMC_SO4_ISAM','DD_PMF_EC_ISAM','DD_PMF_OC_ISAM','DD_NHX_ISAM',
                 'DD_OXN_TOT_ISAM','DD_REDN_TOT_ISAM','DD_N_TOT_ISAM','DD_S_TOT_ISAM'
 
-  Keywd_name(45) = 'ISAM_WDEP_ANALYSIS'
-  Keywd(45,:) = 'WD_NO2_ISAM','WD_NO_ISAM','WD_NH3_ISAM','WD_O3_ISAM','WD_TSP_NO3_ISAM','WD_TNO3_ISAM',
+  Keywd_name(59) = 'ISAM_WDEP_ANALYSIS'
+  Keywd(59,:) = 'WD_NO2_ISAM','WD_NO_ISAM','WD_NH3_ISAM','WD_O3_ISAM','WD_TSP_NO3_ISAM','WD_TNO3_ISAM',
                 'WD_TSP_NH4_ISAM','WD_TSP_SO4_ISAM','WD_NHX_ISAM','WD_SOX_ISAM',
                 'WD_OXN_TOT_ISAM','WD_REDN_TOT_ISAM','WD_N_TOT_ISAM','WD_S_TOT_ISAM'
 
-  Keywd_name(46) = 'ISAM_TDEP_ANALYSIS'
-  Keywd(46,:) = 'TD_OXN_TOT_ISAM','TD_REDN_TOT_ISAM','TD_N_TOT_ISAM','TD_S_TOT_ISAM'
+  Keywd_name(60) = 'ISAM_TDEP_ANALYSIS'
+  Keywd(60,:) = 'TD_OXN_TOT_ISAM','TD_REDN_TOT_ISAM','TD_N_TOT_ISAM','TD_S_TOT_ISAM'
+ 
+ 
+ !--------------------------!
+ !----- DDM Variables -----!
+ !--------------------------!
+ ! These output variables are useful for the 
+ ! Decoupled Direct Method (DDM)
 
+  Keywd_name(61) = 'DDM_ANALYSIS'
+  Keywd(61,:) = 'DDM_CONC_ANALYSIS','DDM_DDEP_ANALYSIS','DDM_WDEP_ANALYSIS','DDM_TDEP_ANALYSIS'
+
+  Keywd_name(62) = 'DDM_CONC_ANALYSIS'
+  Keywd(62,:) = 'CO_DDM','NO_DDM','NO2_DDM','NOX_DDM','HNO3_DDM','N2O5_DDM',
+                'O3_DDM','SO2_DDM','PMF_RCSOIL_DDM','PMF_CL_DDM','PMF_EC_DDM','PMF_NA_DDM',
+                'PMF_NO3_DDM','PMC_NO3_DDM','PMF_NH4_DDM','PMC_NH4_DDM','PMF_SO4_DDM',
+                'PMC_SO4_DDM','PMF_POC_DDM','PMF_POA_DDM','PMF_SOC_DDM','PMF_SOA_DDM',
+                'PMF_OC_DDM','PMF_OA_DDM','PMF_ASOA_DDM','PMF_BSOA_DDM','PMF_CLDGLY_DDM',
+                'PMF_DDM','PMC_DDM','TSP_DDM','PMF_OTHWNC_DDM','PMF_OTH_DDM','PMF_NC_DDM'
+
+  Keywd_name(63) = 'DDM_DDEP_ANALYSIS'
+  Keywd(63,:) = 'DD_NO2_DDM','DD_NO_DDM','DD_NH3_DDM','DD_SO2_DDM','DD_O3_DDM',
+                'DD_PMF_NO3_DDM','DD_PMC_NO3_DDM','DD_TNO3_DDM','DD_PMF_NH4_DDM','DD_PMC_NH4_DDM',
+                'DD_PMF_SO4_DDM','DD_PMC_SO4_DDM','DD_PMF_EC_DDM','DD_PMF_OC_DDM','DD_NHX_DDM',
+                'DD_OXN_TOT_DDM','DD_REDN_TOT_DDM','DD_N_TOT_DDM','DD_S_TOT_DDM'
+
+  Keywd_name(64) = 'DDM_WDEP_ANALYSIS'
+  Keywd(64,:) = 'WD_NO2_DDM','WD_NO_DDM','WD_NH3_DDM','WD_O3_DDM','WD_TSP_NO3_DDM','WD_TNO3_DDM',
+                'WD_TSP_NH4_DDM','WD_TSP_SO4_DDM','WD_NHX_DDM','WD_SOX_DDM',
+                'WD_OXN_TOT_DDM','WD_REDN_TOT_DDM','WD_N_TOT_DDM','WD_S_TOT_DDM'
+
+  Keywd_name(65) = 'DDM_TDEP_ANALYSIS'
+  Keywd(65,:) = 'TD_OXN_TOT_DDM','TD_REDN_TOT_DDM','TD_N_TOT_DDM','TD_S_TOT_DDM'
+ 
 /
 
 

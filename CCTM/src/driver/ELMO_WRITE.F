@@ -32,6 +32,7 @@
      &                      ET_DRVD_DDEP, ET_ISAM_DRVD_DDEP, ET_DDM_DRVD_DDEP,
      &                      ET_DRVD_WDEP, ET_ISAM_DRVD_WDEP, ET_DDM_DRVD_WDEP 
       USE UTILIO_DEFN
+      USE MYDATA_MODULE
 
       IMPLICIT NONE 
 
@@ -46,6 +47,7 @@
       CHARACTER( 16 ), SAVE :: PNAME = 'WRITE_ELMO'
 
       DO IFL = 1,N_ELMO_FILES
+        
         SELECT CASE ( ELMO_FILE( IFL )%TMODE )
 
         CASE ( 0 )

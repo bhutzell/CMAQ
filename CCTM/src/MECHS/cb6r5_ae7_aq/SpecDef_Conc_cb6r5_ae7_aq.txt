@@ -83,17 +83,17 @@ TOL             ,ppbV      ,1000.0*TOL[1]
 XYL             ,ppbV      ,1000.0*XYLMN[1]
 
 !Additional Toxic gases
-!ACROLEIN        ,ug m-3    ,1000.0*(ACROLEIN[1]*1.9365*DENS[2])
-!ACRO_PRIMARY    ,ug m-3    ,1000.0*(ACRO_PRIMARY*1.9365*DENS[2])
-!ALD2_PRIMARY    ,ug m-3    ,1000.0*(ALD2_PRIMARY[1]*1.5188*DENS[2])
-!FORM_PRIMARY    ,ug m-3    ,1000.0*(FORM_PRIMARY[1]*1.0356*DENS[2])
-!BUTADIENE13     ,ug m-3    ,1000.0*(BUTADIENE13[1]*1.8674*DENS[2])
+!ACROLEIN        ,ug m-3    ,1000.0*(ACROLEIN[1]*(56.1/28.9628)*DENS[2])
+!ACRO_PRIMARY    ,ug m-3    ,1000.0*(ACRO_PRIMARY*(56.1/28.9628)*DENS[2])
+!ALD2_PRIMARY    ,ug m-3    ,1000.0*(ALD2_PRIMARY[1]*(44.0/28.9628)*DENS[2])
+!FORM_PRIMARY    ,ug m-3    ,1000.0*(FORM_PRIMARY[1]*(30.0/28.9628)*DENS[2])
+!BUTADIENE13     ,ug m-3    ,1000.0*(BUTADIENE13[1]*(54.0/28.9628)*DENS[2])
 !HCL             ,ppbV      ,1000.0*HCL[1]
 !TOLUENE         ,ppbV      ,1000.0*TOLU[1]
 
 !Mercuric gas species
-!HG_0            ,ng/m3     ,1000.0*(HG[1]*8.3330*DENS[2]*1000.0)       
-!HG_II           ,ng/m3     ,1000.0*(HGIIGAS[1]*8.3330*DENS[2]*1000.0) 
+!HG_0            ,ng/m3     ,1000.0*(HG[1]*(200.6/28.9628)*DENS[2]*1000.0)       
+!HG_II           ,ng/m3     ,1000.0*(HGIIGAS[1]*(271.5/28.9628)*DENS[2]*1000.0) 
 
 !! Unused Gases. Presented Here for illustration. Users can uncomment
 !! them if they choose.

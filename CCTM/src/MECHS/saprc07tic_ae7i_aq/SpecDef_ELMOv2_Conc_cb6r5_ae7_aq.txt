@@ -8,7 +8,8 @@
 
 ! Output variables that begin with 'PM' represent those in which a size cut was 
 ! applied based on modeled aerosol mode parameters.  For example, PM25_NA is all 
-! sodium that falls below 2.5 um diameter. 
+! sodium that falls below 2.5 um diameter. These 'PM' variables are used for 
+! comparisons at IMPROVE and CSN sites.
 
 ! Output variables that begin with 'PMAMS' represent the mass that would have
 ! been detected  by an Aerosol Mass Spectrometer.
@@ -76,6 +77,27 @@ TERP            ,ppbV      ,1000.0*TERPENES[1]
 TOL             ,ppbV      ,1000.0*TOLUENE[1]
 XYL             ,ppbV      ,1000.0*XYLENES[1]
 
+!Additional Toxic gases
+!ACROLEIN        ,ug m-3    ,1000.0*(ACROLEIN[1]*1.9365*DENS[1])
+!ACRO_PRIMARY    ,ug m-3    ,1000.0*(ACRO_PRIMARY*1.9365*DENS[1])
+!ALD2_PRIMARY    ,ug m-3    ,1000.0*(ALD2_PRIMARY[1]*1.5188*DENS[1])
+!FORM_PRIMARY    ,ug m-3    ,1000.0*(FORM_PRIMARY[1]*1.0356*DENS[1])
+!BUTADIENE13     ,ug m-3    ,1000.0*(BUTADIENE13[1]*1.8674*DENS[1])
+!HCL             ,ppbV      ,1000.0*HCL[1]
+!TOLUENE         ,ppbV      ,1000.0*TOLU[1]
+
+!Mercuric gas species
+!HG_0            ,ng/m3     ,1000.0*(HG[1]*8.3330*DENS[1]*1000.0)       
+!HG_II           ,ng/m3     ,1000.0*(HGIIGAS[1]*8.3330*DENS[1]*1000.0) 
+
+!! Unused Gases. Presented Here for illustration. Users can uncomment
+!! them if they choose.
+!ALDX            ,ppbV      ,1000.0*ALDX[1]
+!IOLE            ,ppbV      ,1000.0*IOLE[1]
+!OLE             ,ppbV      ,1000.0*OLE[1]
+!PAR             ,ppbV      ,1000.0*PAR[1]
+!PAN             ,ppbV      ,1000.0*PAN[1]
+!SULF            ,ppbV      ,1000.0*SULF[1]
 ! emitted VOCs
 VOC             ,ppbC      ,1000.0*VOC[1]
 
@@ -245,8 +267,8 @@ FPM25TO10_ACC   ,          ,FPM25TO10_ACC[1]
 FPM25TO10_COR   ,          ,FPM25TO10_COR[1]
 FPM10_AIT       ,          ,FPM10_AIT[1]    
 FPM10_ACC       ,          ,FPM10_ACC[1]    
-FPM10_COR       ,          ,FPM10_COR[1]   
-
+FPM10_COR       ,          ,FPM10_COR[1]    
+ 
 !! FRM PM Equivalent Calculation
 PMIJ_FRM        ,ug m-3    ,PMF_FRM[1]
 PM25_FRM        ,ug m-3    ,PM25_FRM[1]

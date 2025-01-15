@@ -667,11 +667,11 @@ CMPST =
                 'ug m-3', 'PM25', 
                 'AAL',
 
-'PM25_RCSOIL' ,'PM2.5 Reconstructed Soil <2.5 um (Malm et al., 1994; Eqn 5)',
+'PM25_RCSOIL' ,'PM2.5 Reconstructed Soil <2.5 um (Malm et al., 1994; Eqn 5)'
                 'ug m-3', 'PM25', 
                 'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
 
-'PM25_OTHWNC'  ,'PM2.5 Unspeciated Coarse Mass for the IMPROVE Method',
+'PM25_OTHWNC'   , 'PM2.5 Unspeciasted Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM25', 
                 'PM25 - PM25_SO4 - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_OC - PM25_RCSOIL',
 
@@ -1041,13 +1041,13 @@ CMPST =
                 'kg ha-1', 'DEP_FINE', 
                 '0.2514 * DD_PMF_NA',
 
-'DD_PMC_SSSO4', 'Dry Dep of Coarse-Mode Sea Spray Sulfate',
-                'kg ha-1', 'DEP_COARSE',
-                '0.2105 * DD_ASEACAT',
+'DD_PMC_SSSO4', 'Dry Dep of Coarse-Mode Sea Spray Sulfate', 
+                'kg ha-1', 'DEP_COARSE', 
+                '0.2514 * DD_PMC_NA',
 
-'WD_SSSO4'    , 'Wet Dep of Particulate Sea Spray Sulfate',
-                'kg ha-1', 'DEP',
-                '0.2514 * WD_ANA + 0.2105 * WD_ASEACAT',
+'WD_SSSO4'    , 'Wet Dep of Particulate Sea Spray Sulfate', 
+                'kg ha-1', 'DEP', 
+                '0.2514 * WD_ANA + 0.2514 * WD_PMC_NA',
 
 
 !---------------------------------------!

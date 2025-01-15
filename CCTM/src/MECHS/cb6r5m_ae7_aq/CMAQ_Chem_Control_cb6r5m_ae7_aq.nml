@@ -88,7 +88,12 @@
    'EVERYWHERE', 'ALL'    ,'FORM_PRIMARY','FORM_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'        ,'ACROLEIN','ACRO_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'     ,'BUTADIENE13','BUTADIENE13' ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'SULF'   ,'SULF'        ,'GAS'  ,0.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'SULF'   ,'SULF'        ,'GAS'  ,0.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'HGNRVA' ,'HG'          ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'HGIIGAS','HGIIGAS'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'GLY'    ,'GLY'         ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'GLYD'   ,'GLYD'        ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a', 
 
    ! Marine Halogen Chemistry
    'EVERYWHERE', 'ALL'         ,'HOI'    ,'HOI'         ,'GAS'  ,1.  ,'UNIT','a', 
@@ -198,7 +203,7 @@
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_BR' ,'ABR'       ,'COARSE',1.   ,'UNIT','a',    
 
 /
- 
+
 !------------------------------------------------------------------------------!
 ! Emissions Scaling Family Definitions                                         !
 !    This component includes definitions for families of CMAQ chemical species !
@@ -228,8 +233,6 @@
 ! ChemFamilyUnits(1)    = 'PPMV'
 ! ChemFamilyMembers(1,:)= 'VSVOC1','ASVOA1J','ASVOA1I'
 /
-
-
 
 !------------------------------------------------------------------------------!
 ! ELMO COMPOSITE Variable Definitions                                          !
@@ -292,7 +295,7 @@
 !    N_MAX_COMPONENTS - must be equal to or larger than the largest number of  !
 !                       components of any COMPOSITE definition.                !
 !------------------------------------------------------------------------------!
-    
+
 &COMPOSITE_INIT
   N_MAX_COMPOSITES = 300
   N_MAX_COMPONENTS = 50
@@ -695,7 +698,7 @@ CMPST =
 
 'PM25_OTHWNC'   , 'PM2.5 Unspeciasted Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM25', 
-                'PM25 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM25_OC - PM25_RCSOIL',
+                'PM25 - PM25_SO4 - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_OC - PM25_RCSOIL',
 
 'PM25_UNSPCRS', 'PM2.5 Unspeciated Coarse Mass',
                 'ug m-3', 'PM25', 
@@ -779,7 +782,7 @@ CMPST =
 !-- Nitrate --!
 'NOY'         , 'NOy Concentration', 
                 'ppmV', 'TSP', 
-                'NO + NO2 + NO3 + N2O5 + HONO + HNO3 + ANO3 + PNA + CRON + CLNO2 + CLNO3 + BRNO2 + BRNO3 + INO + INO2 + INO3 + PANS + NTR', 
+                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + PNA + CRON + CLNO2 + CLNO3 + BRNO2 + BRNO3 + INO + INO2 + INO3 + PANS + NTR', 
              
 'PMF_TNO3'    , 'Fine-Mode Nitrate plus Nitric Acid', 
                 'ug m-3', 'FINE', 
@@ -928,7 +931,7 @@ CMPST =
 !-- Chloride --!
 'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
                 'kg ha-1', 'DEP_FINE', 
-                'DD_ACL - DD_ACLI',
+                'DD_ACL',
 
 'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride', 
                 'kg ha-1', 'DEP_COARSE', 
@@ -1063,13 +1066,13 @@ CMPST =
                 'kg ha-1', 'DEP_FINE', 
                 '0.2514 * DD_PMF_NA',
 
-'DD_PMC_SSSO4', 'Dry Dep of Coarse-Mode Sea Spray Sulfate', 
-                'kg ha-1', 'DEP_COARSE', 
-                '0.2514 * DD_PMC_NA',
+'DD_PMC_SSSO4', 'Dry Dep of Coarse-Mode Sea Spray Sulfate',
+                'kg ha-1', 'DEP_COARSE',
+                '0.2105 * DD_ASEACAT',
 
-'WD_SSSO4'    , 'Wet Dep of Particulate Sea Spray Sulfate', 
-                'kg ha-1', 'DEP', 
-                '0.2514 * WD_ANA + 0.2514 * WD_PMC_NA',
+'WD_SSSO4'    , 'Wet Dep of Particulate Sea Spray Sulfate',
+                'kg ha-1', 'DEP',
+                '0.2514 * WD_ANA + 0.2105 * WD_ASEACAT',
 
 
 !---------------------------------------!
@@ -1079,11 +1082,11 @@ CMPST =
 !-- Total Nitrate --!
 'DD_TNO3'     , 'Dry Dep of Total Nitrate', 
                 'kg ha-1', 'DEP', 
-                'DD_ANO3 + 0.984*DD_HNO3 + DD_NO3',
+                'DD_ANO3 + 0.984*DD_HNO3 + DD_NO3 + 0.6362*DD_CLNO3',
 
 'WD_TNO3'     , 'Wet Dep of Total Nitrate', 
                 'kg ha-1', 'DEP', 
-                'WD_ANO3 + 0.984*WD_HNO3 + WD_NO3',
+                'WD_ANO3 + 0.984*WD_HNO3 + WD_NO3 + 0.6362*WD_CLNO3',
 
 !-- Total Ammonia --!
 'DD_NHX'      , 'Dry Dep of Total Ammonia', 
@@ -1129,7 +1132,6 @@ CMPST =
 'WD_OXN_TNO3' , 'Wet Dep of Oxidized Nitrogen from Nitrate', 
                 'kgN ha-1', 'DEP', 
                 '0.22220*WD_HNO3 + 0.22581*WD_ANO3 + 0.22581*WD_NO3 + 0.14366*WD_CLNO3',
-
 
 'DD_OXN_PANT' , 'Dry Dep of Oxidized Nitrogen from PAN', 
                 'kgN ha-1', 'DEP', 
@@ -1196,7 +1198,7 @@ CMPST =
 !---------------------------!
 !**** Sulfur Deposition ****!
 !---------------------------!
-   
+
 !-- Total Sulfur --!
 'DD_S_TOT'      , 'Dry Dep of Total Sulfur', 
                   'kgS ha-1', 'DEP', 
