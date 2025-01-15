@@ -1029,7 +1029,8 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
          DO ISPC = 1, NUMB_MECH_SPCS
             DO JSPC = 1, N_ATOM_SPECIES
                IF ( TRIM( SPARSE_SPECIES( ISPC ) ) .EQ. TRIM( ATOM_SPECIES( JSPC ) ) ) THEN   ! found
-                  WRITE(WRUNIT,'(A,1X,I5)')'! '// TRIM( SPARSE_SPECIES( ISPC ) ),ISPC
+                  WRITE(WRUNIT,'(A,1X,A)')'! '// TRIM( SPARSE_SPECIES( ISPC ) ) // ' found in '
+     &            // TRIM( SPECIES_TYPE( ISPC ) ) // ' namelist '
                   DO IRX = 1,N_ATOMS
                       DBUFF(IRX) = REAL( SPECIES_ATOMS( JSPC,IRX ),8 ) 
                   END DO 
