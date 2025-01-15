@@ -369,7 +369,7 @@ setenv GR_EMIS_LAB_001 MOBILE
 and if the stream contains data in a representative day fashion (i.e. data from 2016 maybe used to model emissions in 2019 since the diurnal pattern maybe the same for that stream): 
 
 ```
-setenv GR_EM_SYM_DATE_001 F
+setenv GR_EM_SYM_DATE_001 T
 ```
 
 Note: if GR_EM_SYM_DATE_XXX is not set, the default value for this variable is false. However, this default value can be changed using the environment variable EM_SYM_DATE like so: 
@@ -414,7 +414,7 @@ setenv STK_EMIS_LAB_002 POINT_FIRES
 and if the stream contains data in a representative day fashion (i.e. data from 2016 maybe used to model emissions in 2019 since the diurnal pattern maybe the same for that stream): 
 
 ```
-setenv STK_EM_SYM_DATE_002 F
+setenv STK_EM_SYM_DATE_002 T
 ```
 
 Note: if STK_EM_SYM_DATE_XXX is not set, the default value for this variable is false. However, this default value can be changed using the environment variable EM_SYM_DATE like so: 
