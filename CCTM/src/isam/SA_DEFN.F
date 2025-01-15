@@ -509,37 +509,34 @@ c----------------------------------------------------------
 
         ! PRESCRIBE VOC SPECIES
         !CB6R3_AE7_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 1 )%LIST( 29 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 1 )%LIST( 28 ) )
         ISAM_SPEC_VOC( 1 )%LIST = (/'ALD2   ','ALDX   ','ETH    ',
      &          'ETHA   ','ETOH   ','FORM   ','IOLE   ','ISOP   ',
      &          'MEOH   ','OLE    ','PAR    ','TERP   ','TOL    ',
      &          'XYLMN  ','NAPH   ','ETHY   ','PRPA   ','ACET   ',
      &          'KET    ','GLY    ','BENZENE','GLYD   ','MEPX   ',
-     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   ',
-     &          'PCVOC  '/)
+     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   '/)
 
         !CB6R5_AE7_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 2 )%LIST( 29 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 2 )%LIST( 28 ) )
         ISAM_SPEC_VOC( 2 )%LIST = (/'ALD2   ','ALDX   ','ETH    ',
      &          'ETHA   ','ETOH   ','FORM   ','IOLE   ','ISOP   ',
      &          'MEOH   ','OLE    ','PAR    ','TERP   ','TOL    ',
      &          'XYLMN  ','NAPH   ','ETHY   ','PRPA   ','ACET   ',
      &          'KET    ','GLY    ','BENZENE','GLYD   ','MEPX   ',
-     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   ',
-     &          'PCVOC  '/)
+     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   '/)
 
         !CB6R5M_AE7_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 3 )%LIST( 29 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 3 )%LIST( 28 ) )
         ISAM_SPEC_VOC( 3 )%LIST = (/'ALD2   ','ALDX   ','ETH    ',
      &          'ETHA   ','ETOH   ','FORM   ','IOLE   ','ISOP   ',
      &          'MEOH   ','OLE    ','PAR    ','TERP   ','TOL    ',
      &          'XYLMN  ','NAPH   ','ETHY   ','PRPA   ','ACET   ',
      &          'KET    ','GLY    ','BENZENE','GLYD   ','MEPX   ',
-     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   ',
-     &          'PCVOC  '/)
+     &          'APIN   ','SOAALK ','ECH4   ','CO     ','MGLY   '/)
 
         !SAPRC07TC_AE6_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 4 )%LIST( 42 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 4 )%LIST( 41 ) )
         ISAM_SPEC_VOC( 4 )%LIST = (/'HCHO       ','CCHO       ',
      &  'RCHO       ','xHCHO      ','xCCHO      ','xRCHO      ',
      &  'ALK1       ','ALK2       ','ALK3       ','ALK4       ',
@@ -550,10 +547,10 @@ c----------------------------------------------------------
      &  'TOLUENE    ','MXYL       ','OXYL       ','PXYL       ',
      &  'NAPHTHAL   ','ARO1       ','ARO2MN     ','BUTADIENE13',
      &  'ACROLEIN   ','ACETONE    ','MEK        ','MVK        ',
-     &  'MACR       ','SOAALK     ','CO         ','PCVOC      '/ )
+     &  'MACR       ','SOAALK     ','CO         '/ )
 
         !SAPRC07TIC_AE6I_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 5 )%LIST( 42 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 5 )%LIST( 41 ) )
         ISAM_SPEC_VOC( 5 )%LIST = (/'HCHO       ','CCHO       ',
      &  'RCHO       ','xHCHO      ','xCCHO      ','xRCHO      ',
      &  'ALK1       ','ALK2       ','ALK3       ','ALK4       ',
@@ -564,10 +561,10 @@ c----------------------------------------------------------
      &  'TOLUENE    ','MXYL       ','OXYL       ','PXYL       ',
      &  'NAPHTHAL   ','ARO1       ','ARO2MN     ','BUTADIENE13',
      &  'ACROLEIN   ','ACETONE    ','MEK        ','MVK        ',
-     &  'MACR       ','SOAALK     ','CO         ','PCVOC      '/ )
+     &  'MACR       ','SOAALK     ','CO         '/ )
 
         !SAPRC07TIC_AE7I_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 42 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 41 ) )
         ISAM_SPEC_VOC( 6 )%LIST = (/'HCHO       ','CCHO       ',
      &  'RCHO       ','xHCHO      ','xCCHO      ','xRCHO      ',
      &  'ALK1       ','ALK2       ','ALK3       ','ALK4       ',
@@ -578,10 +575,10 @@ c----------------------------------------------------------
      &  'TOLUENE    ','MXYL       ','OXYL       ','PXYL       ',
      &  'NAPHTHAL   ','ARO1       ','ARO2MN     ','BUTADIENE13',
      &  'ACROLEIN   ','ACETONE    ','MEK        ','MVK        ',
-     &  'MACR       ','SOAALK     ','CO         ','PCVOC      '/ )
+     &  'MACR       ','SOAALK     ','CO         ' / )
 
         !RACM2_AE6_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 7 )%LIST( 39 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 7 )%LIST( 38 ) )
         ISAM_SPEC_VOC( 7 )%LIST = (/'HCHO   ','ACD    ','ALD    ',
      &          'UALD   ','HC3    ','HC5    ','HC8    ','OLI    ',
      &          'OLT    ','ETH    ','ETE    ','ACE    ','ISO    ',
@@ -589,8 +586,7 @@ c----------------------------------------------------------
      &          'GLY    ','MGLY   ','BENZENE','TOL    ','XYM    ',
      &          'XYO    ','XYP    ','NAPH   ','DIEN   ','ACT    ',
      &          'HKET   ','KET    ','MVK    ','MEK    ','MACR   ',
-     &          'DCB1   ','DCB2   ','DCB3   ','SOAALK ','CO     ',
-     &          'PCVOC  '/ )
+     &          'DCB1   ','DCB2   ','DCB3   ','SOAALK ','CO     '/ )
 
         !CRACMM1_AQ
         ALLOCATE( ISAM_SPEC_VOC( 8 )%LIST( 97 ) )
@@ -663,26 +659,26 @@ c----------------------------------------------------------
 
         !PRESCRIBE NITRATE SPECIES
         !CB6R3_AE7_AQ
-        ALLOCATE( ISAM_SPEC_NO3( 1 )%LIST( 24 ) )
+        ALLOCATE( ISAM_SPEC_NO3( 1 )%LIST( 22 ) )
         ISAM_SPEC_NO3( 1 )%LIST = (/'HNO3 ','NO   ','NO2  ','NO3  ',
      &      'HONO ','N2O5 ','PAN  ','XO2N ','NTR1 ','NTR2 ','INTR ',
      &      'PNA  ','PANX ','CLNO2','CLNO3','XO2  ','XO2H ','MEO2 ',
-     &      'ISO2 ','C2O3 ','CXO3 ','ROR  ','CRON ','OPAN '/ )
+     &      'ISO2 ','C2O3 ','CXO3 ','ROR  '/ )
         
         !CB6R5_AE7_AQ
-        ALLOCATE( ISAM_SPEC_NO3( 2 )%LIST( 24 ) )
+        ALLOCATE( ISAM_SPEC_NO3( 2 )%LIST( 22 ) )
         ISAM_SPEC_NO3( 2 )%LIST = (/'HNO3 ','NO   ','NO2  ','NO3  ',
      &      'HONO ','N2O5 ','PAN  ','XO2N ','NTR1 ','NTR2 ','INTR ',
      &      'PNA  ','PANX ','CLNO2','CLNO3','XO2  ','XO2H ','MEO2 ',
-     &      'ISO2 ','C2O3 ','CXO3 ','ROR  ','CRON ','OPAN '/ )
+     &      'ISO2 ','C2O3 ','CXO3 ','ROR  '/ )
         
         !CB6R5M_AE7_AQ
-        ALLOCATE( ISAM_SPEC_NO3( 3 )%LIST( 29 ) )
+        ALLOCATE( ISAM_SPEC_NO3( 3 )%LIST( 27 ) )
         ISAM_SPEC_NO3( 3 )%LIST = (/'HNO3 ','NO   ','NO2  ','NO3  ',
      &      'HONO ','N2O5 ','PAN  ','XO2N ','NTR1 ','NTR2 ','INTR ',
      &      'PNA  ','PANX ','CLNO2','CLNO3','BRNO2','BRNO3','INO  ',
      &      'INO2 ','INO3 ','XO2  ','XO2H ','MEO2 ','ISO2 ','C2O3 ',
-     &      'CXO3 ','ROR  ','CRON ','OPAN '/ )
+     &      'CXO3 ','ROR  '/ )
 
         !SAPRC07TC_AE6_AQ
         ALLOCATE( ISAM_SPEC_NO3( 4 )%LIST( 25 ) )

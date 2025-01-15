@@ -718,6 +718,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !-------------------------------------------------------------------------
 
       USE util_Family_module
+      USE RXNS_DATA, ONLY :: MECHNAME
 
       IMPLICIT NONE
 
@@ -867,6 +868,18 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                 IF ( ELMO_TABLE( IT )%VAR_TYPE .EQ. ET_PHOT )
      &                  L_ELMO_TABLE( IT ) = .TRUE.
             END DO
+ 
+         ELSE IF ( VARS_NML(1) .EQ. 'DEFAULT' ) THEN
+            ! Replace generic DEFAULT keyword with mechanism-specific
+            ! keyword
+            VARS_NML( N_END+1 ) = 'DEFAULT_' // TRIM( MECHNAME )
+            N_END = N_END + 1
+         
+         ELSE IF ( VARS_NML(1) .EQ. 'DEFAULT_DEP' ) THEN
+            ! Replace generic DEFAULT keyword with mechanism-specific
+            ! keyword
+            VARS_NML( N_END+1 ) = 'DEFAULT_DEP_' // TRIM( MECHNAME )
+            N_END = N_END + 1
          
          ELSEIF ( I1 .GT. 0 ) THEN
             ! Expand Matched Keyword
@@ -940,7 +953,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
          END IF
 
-         ! Remove Family name after expansion
+         ! Remove Keyword after processing
          VARS_NML( 1:N_END-1 ) = VARS_NML( 2:N_END )
          VARS_NML( N_END ) = ''
          N_END = N_END - 1

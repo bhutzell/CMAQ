@@ -27,7 +27,7 @@
 !-------------------------------------------!
 AIR_DENS        ,kg m-3    ,DENS[1]
 RH              ,%         ,100.00*RH[1]
-!SFC_TMP         ,C         ,(TEMP2[1]-273.15)
+SFC_TMP         ,C         ,(SFC_TMP[1]-273.15)
 PBLH            ,m         ,PBL[1]
 SOL_RAD         ,W m-2     ,RGRND[1]
 precip          ,cm        ,PRECIP[1]
