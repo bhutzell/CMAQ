@@ -57,11 +57,14 @@ C This function is expected to be called only once - at startup
             FIRSTIME = .FALSE.
             SUCCESS = .TRUE.
 
+            CALL LOG_HEADING( LOGDEV, "Initialize Grid" )
+
 #ifdef mpas
             MXCELLS = NCOLS * NROWS * NLAYS
             MXBLKS  = 1 + ( MXCELLS - 1 ) / BLKSIZE
 #else
 C Set up horizontal domain and calculate processor-to-subdomain maps
+            CALL LOG_SUBHEADING( LOGDEV, "Retrieve Horizontal Grid" )
             IF ( .NOT. HGRD_INIT ( NPROCS, MYID ) ) THEN
                MSG = '*** Failure defining horizontal domain'
                CALL M3WARN ( 'GRID_INIT', 0, 0, MSG )
@@ -70,6 +73,7 @@ C Set up horizontal domain and calculate processor-to-subdomain maps
                END IF
 
 C define vertical layer structure
+            CALL LOG_SUBHEADING( LOGDEV, "Retrieve Vertical Grid" )
             IF ( .NOT. VGRD_INIT() ) THEN
                MSG = '*** Failure defining vertical structure'
                CALL M3WARN ( 'GRID_INIT', 0, 0, MSG )
