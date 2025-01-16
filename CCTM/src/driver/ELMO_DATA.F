@@ -145,38 +145,39 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_GIEPOX =      69
       INTEGER, PARAMETER :: ID_KIEPOX =      70
       INTEGER, PARAMETER :: ID_GIMAE =       71
-      INTEGER, PARAMETER :: ID_DZ    =       72
-      INTEGER, PARAMETER :: ID_ZH    =       73
-      INTEGER, PARAMETER :: ID_CFRAC =       74
-      INTEGER, PARAMETER :: ID_PV    =       75
-      INTEGER, PARAMETER :: ID_DENS  =       76
-      INTEGER, PARAMETER :: ID_RHOJ  =       77
-      INTEGER, PARAMETER :: ID_NO2COL  =     78
-      INTEGER, PARAMETER :: ID_SO2COL  =     79
-      INTEGER, PARAMETER :: ID_HCHOCOL  =    80
-      INTEGER, PARAMETER :: ID_COCOL  =      81
-      INTEGER, PARAMETER :: ID_KZ     =      82
-      INTEGER, PARAMETER :: ID_KZMIN  =      83
-      INTEGER, PARAMETER :: ID_AOD550 =      84
-      INTEGER, PARAMETER :: ID_PMEXT550 =    85
-      INTEGER, PARAMETER :: ID_PBL =         86
-      INTEGER, PARAMETER :: ID_RGRND =       87
-      INTEGER, PARAMETER :: ID_PRECIP =      88
-      INTEGER, PARAMETER :: ID_WSPD10 =      89
-      INTEGER, PARAMETER :: ID_WDIR10 =      90
-      INTEGER, PARAMETER :: ID_WVEL   =      91
-      INTEGER, PARAMETER :: ID_DD_OA =       92
-      INTEGER, PARAMETER :: ID_WD_OA =       93
-      INTEGER, PARAMETER :: ID_DD_OC =       94
-      INTEGER, PARAMETER :: ID_WD_OC =       95
-      INTEGER, PARAMETER :: ID_DD_POA =      96
-      INTEGER, PARAMETER :: ID_WD_POA =      97
-      INTEGER, PARAMETER :: ID_DD_POC =      98
-      INTEGER, PARAMETER :: ID_WD_POC =      99
-      INTEGER, PARAMETER :: ID_DD_SOA =     100
-      INTEGER, PARAMETER :: ID_WD_SOA =     101
-      INTEGER, PARAMETER :: ID_DD_SOC =     102
-      INTEGER, PARAMETER :: ID_WD_SOC =     103
+      INTEGER, PARAMETER :: ID_VOC_NOX =     72
+      INTEGER, PARAMETER :: ID_DZ    =       73
+      INTEGER, PARAMETER :: ID_ZH    =       74
+      INTEGER, PARAMETER :: ID_CFRAC =       75
+      INTEGER, PARAMETER :: ID_PV    =       76
+      INTEGER, PARAMETER :: ID_DENS  =       77
+      INTEGER, PARAMETER :: ID_RHOJ  =       78
+      INTEGER, PARAMETER :: ID_NO2COL  =     79
+      INTEGER, PARAMETER :: ID_SO2COL  =     80
+      INTEGER, PARAMETER :: ID_HCHOCOL  =    81
+      INTEGER, PARAMETER :: ID_COCOL  =      82
+      INTEGER, PARAMETER :: ID_KZ     =      83
+      INTEGER, PARAMETER :: ID_KZMIN  =      84
+      INTEGER, PARAMETER :: ID_AOD550 =      85
+      INTEGER, PARAMETER :: ID_PMEXT550 =    86
+      INTEGER, PARAMETER :: ID_PBL =         87
+      INTEGER, PARAMETER :: ID_RGRND =       88
+      INTEGER, PARAMETER :: ID_PRECIP =      89
+      INTEGER, PARAMETER :: ID_WSPD10 =      90
+      INTEGER, PARAMETER :: ID_WDIR10 =      91
+      INTEGER, PARAMETER :: ID_WVEL   =      92
+      INTEGER, PARAMETER :: ID_DD_OA =       93
+      INTEGER, PARAMETER :: ID_WD_OA =       94
+      INTEGER, PARAMETER :: ID_DD_OC =       95
+      INTEGER, PARAMETER :: ID_WD_OC =       96
+      INTEGER, PARAMETER :: ID_DD_POA =      97
+      INTEGER, PARAMETER :: ID_WD_POA =      98
+      INTEGER, PARAMETER :: ID_DD_POC =      99
+      INTEGER, PARAMETER :: ID_WD_POC =     100
+      INTEGER, PARAMETER :: ID_DD_SOA =     101
+      INTEGER, PARAMETER :: ID_WD_SOA =     102
+      INTEGER, PARAMETER :: ID_DD_SOC =     103
+      INTEGER, PARAMETER :: ID_WD_SOC =     104
 
       TYPE ELDTP
         CHARACTER (LEN = 16) :: NAME      !Parameter Name
@@ -187,7 +188,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
 
-      INTEGER, PARAMETER :: N_ELMO_LIST = 103
+      INTEGER, PARAMETER :: N_ELMO_LIST = 104
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
 
@@ -303,6 +304,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'GAMMA_IEPOX  ',ID_GIEPOX,     ET_CHEM,     F, '1     ', 'IEPOX heterogeneous uptake coefficient' ),
      &ELDTP( 'K_IEPOX      ',ID_KIEPOX,     ET_CHEM,     F, 's-1   ', 'IEPOX 1st order particle phase reaction rate const' ),
      &ELDTP( 'GAMMA_IMAE   ',ID_GIMAE,      ET_CHEM,     F, '1     ', 'IMAE+HMML heterogeneous uptake coefficient' ),
+     &ELDTP( 'VOC_NOX      ',ID_VOC_NOX,    ET_CHEM,     F, '      ', 'VOC-limiting (>0.35) or NOx-limiting (<0.35) O3 formation' ),
      &ELDTP( 'DZ           ',ID_DZ,         ET_MET,      F, 'm     ', 'Height of each grid cell computed from top layer height' ),
      &ELDTP( 'ZH           ',ID_ZH,         ET_MET,      F, 'm     ', 'Height of grid cell midpoints (mass-weighted)' ),
      &ELDTP( 'CFRAC        ',ID_CFRAC,      ET_MET,      F, '      ', 'Cloud Fraction' ),
@@ -607,10 +609,11 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                             ELMO_AOD_550(:,:),  ! total aerosol optical depth at                                           
                                                        !   550 nm (Angstrom Interpolation)                                        
      &                             ELMO_EXT_550(:,:,:),! aerosol extinction at 550 nm for layer [1/m]                             
-     &                             ELMO_NO2COL(:,:), ! NO2 Column                                                                 
-     &                             ELMO_SO2COL(:,:), ! SO2 Column                                                                 
-     &                             ELMO_HCHOCOL(:,:),! Formaldehyde Column                                                        
-     &                             ELMO_COCOL(:,:)   ! CO Column                                                                  
+     &                             ELMO_NO2COL(:,:),   ! NO2 Column                                                                 
+     &                             ELMO_SO2COL(:,:),   ! SO2 Column                                                                 
+     &                             ELMO_HCHOCOL(:,:),  ! Formaldehyde Column                                                        
+     &                             ELMO_COCOL(:,:),    ! CO Column                                                                  
+     &                             ELMO_VOC_NOX(:,:,:) ! VOC or NOx limited ozone formation                                                                  
                                                                                                                                   
         REAL, ALLOCATABLE, SAVE :: ELMO_WDEP(:,:,:) ! wet deposition accumulated per time step                                    
         REAL, ALLOCATABLE, SAVE :: ELMO_DDEP(:,:,:) ! dry deposition accumulated per time step                                    
@@ -634,6 +637,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !------------------------------------------------------------------------------------------            
         subroutine elmo_init_shared
 !------------------------------------------------------------------------------------------            
+        use runtime_vars, only : voc_nox_trans
         use grid_conf,  only : ncols, nrows, nlays
         use cgrid_spcs, only : n_cgrid_spc
 #ifdef isam
@@ -685,6 +689,10 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
             elmo_ddep = 0.0
 
 #ifdef isam
+            allocate( elmo_voc_nox(ncols, nrows, nlays ), stat=ios)
+            call checkmem( ios, 'ELMO_VOC_NOX',pname )
+            elmo_voc_nox = voc_nox_trans
+         
             allocate( elmo_isam_wdep(ncols, nrows, nspc_sa, ntag_sa ), stat=ios)
             call checkmem( ios, 'ELMO_ISAM_WDEP',pname )
             elmo_isam_wdep = 0.0
@@ -718,7 +726,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !-------------------------------------------------------------------------
 
       USE util_Family_module
-      USE RXNS_DATA, ONLY :: MECHNAME
+      USE RXNS_DATA, ONLY : MECHNAME
 
       IMPLICIT NONE
 

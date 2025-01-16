@@ -32,7 +32,6 @@
      &                      ET_DRVD_DDEP, ET_ISAM_DRVD_DDEP, ET_DDM_DRVD_DDEP,
      &                      ET_DRVD_WDEP, ET_ISAM_DRVD_WDEP, ET_DDM_DRVD_WDEP 
       USE UTILIO_DEFN
-      USE MYDATA_MODULE
 
       IMPLICIT NONE 
 

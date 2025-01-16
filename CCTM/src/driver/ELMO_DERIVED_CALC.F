@@ -375,6 +375,11 @@
          CASE ( ID_GIMAE )
             IF ( AERO_CHEM_SET ) OUTVAL = GAMMA_IMAE( C1,R1,L1 )
 
+         ! Retrieve Indicator for VOC-limited (>0.35) or NOx_limited
+         ! (<0.35) ozone formation
+         CASE ( ID_VOC_NOX )
+            IF ( AERO_CHEM_SET ) OUTVAL = ELMO_VOC_NOX( C1,R1,L1 )
+
          ! Retrieve AOD at 550 nm
          CASE ( ID_AOD550 )
              IF ( L1 .EQ. 1 ) THEN

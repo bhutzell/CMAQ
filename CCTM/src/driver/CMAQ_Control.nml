@@ -54,10 +54,10 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 &ELMO_INIT
-  N_Files = 5
+  N_Files = 2
   N_Max_Output_Variables = 400
-  N_Keywords = 52
-  N_Max_Keyword_Variables = 75
+  N_Keywords = 65
+  N_Max_Keyword_Variables = 150
 /
 
 &ELMO_Files
@@ -65,15 +65,17 @@
  !
  !-- Set Properties and Contents for each ELMO Output File
  !
-  Flabel= 'AVGD_DEFAULT','INST_DEFAULT','DEP','ACONC','CONC'
-  Tmode = 'average', 'instant', 'average','average','instant'
-  Lay_Bot = 1, 1, 1, 1, 1
-  Lay_Top = 1, 1, 1, 1, 1
-  File_Vars(1,:) = 'ALL_CONC', 'DEFAULT' 
-  File_Vars(2,:) = 'ALL_CONC', 'DEFAULT' 
-  File_Vars(3,:) = 'ALL_DEP', 'DEFAULT_DEP'
-  File_Vars(4,:) = 'ALL_CONC','RH','TA','PRES'
-  File_Vars(5,:) = 'ALL_CONC','RH','TA','PRES'
+  Flabel(1)= 'DEFAULT'
+  Tmode(1) = 'average'
+  Lay_Bot(1) = 1
+  Lay_Top(1) = 1
+  File_Vars(1,:) = 'DEFAULT' 
+
+  Flabel(2)= 'DEFAULT_DEP'
+  Tmode(2) = 'average'
+  Lay_Bot(2) = 1
+  Lay_Top(2) = 1
+  File_Vars(2,:) = 'DEFAULT_DEP'
 
 
  !-----------------------------------------------------!
@@ -90,22 +92,26 @@
  !--------------------------------------------------!
  !----- Define Mechanism-Specific Default Lists ----!
  !--------------------------------------------------!
+ ! When the string 'DEFAULT' is used to specify File_Vars for any ELMO output
+ ! file, it is appended with the chemical mechanism for the simulation and 
+ ! mapped to one of the keywords below.
+
   Keywd_name(2) = 'DEFAULT_CB6R5_AE7_AQ'
   Keywd(2,:) = 'AMET','PM_MASS','CHEM','MET','TSP_NUM','PMF_NUM','PMC_NUM',
-               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES',
-               'PM_FINE_VARS','SIZE','AMS_SPECIES','PM25TO10_SPECIES',
+               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES_A',
+               'PM25_SPECIES_B','PM_FINE_VARS','SIZE','AMS_SPECIES','PM25TO10_SPECIES',
                'CUTOFF_FRACTIONS','COMMON_GASES'
 
   Keywd_name(3) = 'DEFAULT_CB6R5M_AE7_AQ'
   Keywd(3,:) = 'AMET','PM_MASS','CHEM','MET','TSP_NUM','PMF_NUM','PMC_NUM',
-               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES',
-               'PM_FINE_VARS','SIZE','AMS_SPECIES','PM25TO10_SPECIES',
+               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES_A',
+               'PM25_SPECIES_B','PM_FINE_VARS','SIZE','AMS_SPECIES','PM25TO10_SPECIES',
                'CUTOFF_FRACTIONS','COMMON_GASES','DMS','MSA'
 
   Keywd_name(4) = 'DEFAULT_CB6R5HAP_AE7_AQ'
   Keywd(4,:) = 'AMET','PM_MASS','CHEM','MET','TSP_NUM','PMF_NUM','PMC_NUM',
-               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES',
-               'SIZE','AMS_SPECIES','PM_FINE_VARS','PM25TO10_SPECIES',
+               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES_A',
+               'PM25_SPECIES_B','SIZE','AMS_SPECIES','PM_FINE_VARS','PM25TO10_SPECIES',
                'CUTOFF_FRACTIONS','COMMON_GASES','DMS','MSA','GAS_TOXICS','PM_TOXICS'
 
   Keywd_name(5) = 'DEFAULT_SAPRC07TIC_AE7I'
@@ -113,10 +119,11 @@
 
   Keywd_name(6) = 'DEFAULT_CRACMM2'
   Keywd(6,:) = 'AMET','PM_MASS','CHEM','MET','TSP_NUM','PMF_NUM','PMC_NUM',
-               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES',
-               'SIZE','AMS_SPECIES','PM25TO10_SPECIES','CUTOFF_FRACTIONS','PM_FINE_VARS',
-               'COMMON_GASES','ACRO','ACT','BDE13','MEK','EBZ','STY','HC3','HC5',
-               'HC10','OLI','OLT','API','ALD','NOZ','SULF','LSIROCG','TOTROCG'
+               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES_A',
+               'PM25_SPECIES_B','SIZE','AMS_SPECIES','PM25TO10_SPECIES',
+               'CUTOFF_FRACTIONS','PM_FINE_VARS','COMMON_GASES','ACRO','ACT',
+               'BDE13','MEK','EBZ','STY','HC3','HC5','HC10','OLI','OLT','API',
+               'ALD','NOZ','SULF','LSIROCG','TOTROCG'
 
   Keywd_name(7) = 'DEFAULT_CRACMM3'
   Keywd(7,:) = 'DEFAULT_CRACMM2'
