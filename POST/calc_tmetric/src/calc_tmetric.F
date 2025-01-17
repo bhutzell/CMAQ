@@ -72,8 +72,8 @@ C local variables
       CHARACTER(LEN = M3_FILE_LEN) :: PULL_FLNAME
 
       LOGICAL :: COMPUTE_AVG = .FALSE.
+      LOGICAL :: SET_ZERO_TSTEP = .FALSE.
       LOGICAL :: PARALLEL_PROCESS = .TRUE.
-
 
 C**********************************************************************
 
@@ -174,10 +174,11 @@ C... set up metadata for output file
           MSG = 'Correct the above Error by changing value of AVG_TIME option.'
           CALL M3ERR( PNAME, 0, 0, MSG, .TRUE. )
       ELSE IF ( AVG_TIME .LE. 0 ) THEN
-          WRITE( MSG,'(A)')'Requested sample size or averaging period <= 0.'
-          WRITE( MSG,'(A)')'Setting to number of timesteps over input files.'
-          WRITE( 6,'(5X,A)')TRIM( MSG )
+          WRITE( 6,'(A)')'Requested sample size or averaging period <= 0.'
+          WRITE( 6,'(A)')'Setting to number of timesteps over input files.'
+          WRITE( 6,'(A)')'OUTFILE will have TSTEP equal to zero'
           AVG_TIME = NSTEPS
+          SET_ZERO_TSTEP = .TRUE.
           WRITE( 6,'(5X,"SAMPLE SIZE = ",I5)')AVG_TIME
       END IF
       IF( MOD(NSTEPS,AVG_TIME) .GT. 0 )THEN
@@ -189,17 +190,21 @@ C... set up metadata for output file
       OUTPUT_FREQ = AVG_TIME
       NLOOPS      = MAX( NSTEPS - ( AVG_TIME - 1 ),1 )
 
+      IF ( SET_ZERO_TSTEP ) THEN
+         TSTEP3D = 000000
+      ELSE
 ! based on output frequency compute output file timestep
-      HOURS   = INT( TIMESTEP/10000 )
-      SECONDS = MOD( TIMESTEP,100 )
-      MINUTES = MAX( (INT(TIMESTEP/100)-100*HOURS),0 )
+         HOURS   = INT( TIMESTEP/10000 )
+         SECONDS = MOD( TIMESTEP,100 )
+         MINUTES = MAX( (INT(TIMESTEP/100)-100*HOURS),0 )
 ! value of input timestep in seconds 
-      SECONDS  = OUTPUT_FREQ * ( 60*( 60*HOURS + MINUTES ) + SECONDS )
+         SECONDS  = OUTPUT_FREQ * ( 60*( 60*HOURS + MINUTES ) + SECONDS )
 ! assemble output timestep in HHMMSS format
-      HOURS   = INT( SECONDS/3600 )
-      MINUTES = MAX( ( INT(SECONDS/60)-3600*HOURS ),0  )
-      SECONDS = MOD(SECONDS,60) 
-      TSTEP3D = 100*( 100*HOURS + MINUTES ) + SECONDS
+         HOURS   = INT( SECONDS/3600 )
+         MINUTES = MAX( ( INT(SECONDS/60)-3600*HOURS ),0  )
+         SECONDS = MOD(SECONDS,60) 
+         TSTEP3D = 100*( 100*HOURS + MINUTES ) + SECONDS
+       END IF
 ! start date and time of output file
       N_PULL  = MAX( AVG_TIME-1,1 )
       N_PULL  = MAX( AVG_TIME,1 )
@@ -215,7 +220,7 @@ C... set up metadata for output file
       END IF
 
       DO S = 1, NSPECVAR
-       VNAME3D(S) = TRIM(SPECVARS(S))//"_"//C_PROC      
+       VNAME3D(S) = TRIM(SPECVARS(S))      
        VTYPE3D(S) = M3REAL      
        VDESC3D(S) = C_PROC//" OF "//TRIM(SPECVARS(S))
        UNITS3D(S) = VUNITS_IN(INDEX1(SPECVARS(S),NVARS_IN,VNAME_IN))
