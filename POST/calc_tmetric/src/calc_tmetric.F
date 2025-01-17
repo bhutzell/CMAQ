@@ -60,7 +60,7 @@ C local variables
       
       INTEGER   NLOOPS      
       INTEGER   AVG_TIME
-      INTEGER   N_RETREIVE   ! Number of hour to read for files per metric
+      INTEGER   N_RETRIEVE   ! Number of hour to read for files per metric
       INTEGER   N_SAMPLE     ! NUMBER OF HOURS INCLUDED TO THE AVERAGE   
       INTEGER   N_PULL       ! ARRAY index
       INTEGER   OUTPUT_FREQ  ! 
@@ -307,7 +307,7 @@ C... shut down ioapi
 
            DO N = 1, NLOOPS, OUTPUT_FREQ ! loop for each block average
       
-               N_RETREIVE = MIN( N+AVG_TIME-1,NSTEPS)
+               N_RETRIEVE = MIN( N+AVG_TIME-1,NSTEPS)
                IF( N+AVG_TIME-1 .GT. NSTEPS ) EXIT ! Do not compute for incomplete sample
                N_SAMPLE  = 0
 !  initial data array(s) based on wanted operation
@@ -323,7 +323,7 @@ C... shut down ioapi
                END IF
                WRITE_DATE   = STEP_DATE(N)
                WRITE_TIME   = STEP_TIME(N)
-               DO NAVG = N, N_RETREIVE
+               DO NAVG = N, N_RETRIEVE
 ! have to determine if reading one timestep too many
                   N_PULL = MIN( NAVG,NSTEPS )
                   N_SAMPLE = N_SAMPLE + 1
@@ -352,7 +352,7 @@ C... shut down ioapi
                            WHERE( MIN_PARALLEL(S,:,:,:) .GT. IN_DATA ) MIN_PARALLEL(S,:,:,:) = IN_DATA
                       END SELECT
 #ifdef verbose
-                      IF ( NAVG .EQ. N_RETREIVE )THEN
+                      IF ( NAVG .EQ. N_RETRIEVE )THEN
                           write(*,'(''Done Processing species:'',a)') TRIM(SPECVARS(S))
                       END IF
 #endif
@@ -389,7 +389,7 @@ c         compute average if desired, write out the results
            DO S = 1, NSPECVAR
               DO N = 1, NLOOPS, OUTPUT_FREQ ! loop for each block average
       
-                  N_RETREIVE = MIN( N+AVG_TIME-1,NSTEPS)
+                  N_RETRIEVE = MIN( N+AVG_TIME-1,NSTEPS)
                   IF( N+AVG_TIME-1 .GT. NSTEPS ) EXIT ! Do not compute for incomplete sample
                   N_SAMPLE  = 0
 !  initial data array(s) based on wanted operation
@@ -405,7 +405,7 @@ c         compute average if desired, write out the results
                   END IF
                   WRITE_DATE   = STEP_DATE(N)
                   WRITE_TIME   = STEP_TIME(N)
-                  DO NAVG = N, N_RETREIVE
+                  DO NAVG = N, N_RETRIEVE
 ! have to determine if reading one timestep too many
                      N_PULL = MIN( NAVG,NSTEPS )
                      N_SAMPLE = N_SAMPLE + 1
