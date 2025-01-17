@@ -8,7 +8,7 @@ This Fortran program creates gridded IOAPI files with temporally blocked or step
 ```
  OPERATION     operation to perform - SUM for summation, AVG for averaging, MAX for maximum, MIN for minimum,
                or RNG for RANGE
- SAMPLE_PERIOD number of time steps used to compute OPERATION, set to less then or equal to zero for total 
+ SAMPLE_PERIOD number of time steps used to compute OPERATION, set to less than or equal to zero for total 
                number of steps. Note that output file will have time step equal to zero.
  SPECIES       list of species to output (e.g. setenv SPECIES "O3 HO HO2 NH3 HCL ANO3J ASO4J").  
                To extract all species use: setenv SPECIES "ALL"
