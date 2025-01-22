@@ -304,6 +304,7 @@
              lerror = .true.
           end if
 
+          call mpi_barrier(mpi_comm_world, stat)
           if (.not. lerror) then
              third_dim = size(in_data, 3)
 
@@ -319,6 +320,7 @@
 #ifdef parallel
 ! for other PEs
                 allocate (recv_buf(size(in_data,1)*size(in_data,2)*size(in_data,3)), stat=stat)
+                recv_size = size(in_data,1)*size(in_data,2)*size(in_data,3)
                 if (stat .ne. 0) then
                    write (mio_logdev, *) ' Error: In routine ' // pname
                    write (mio_logdev, *) '        not able to allocate recv_buf'
@@ -326,35 +328,21 @@
                 end if
 
                 do pe = 1, mio_nprocs-1
-                   loc_tag1 = tag1 + pe * 3
-                   call mpi_recv (who, 1, mpi_integer, mpi_any_source,    &
-                                  loc_tag1, mpi_comm_world, status, stat)
 
-                   if (stat .ne. 0) then
-                      write (mio_logdev, *) ' Error: In routine ' // pname
-                      write (mio_logdev, *) '        MPI error receiving processor id WHO'
-                      lerror = .true.
-                   end if
-
-                   who_p1 = who + 1
-
-                   col_s = colde_pe(1, who_p1, pos)
-                   col_e = colde_pe(2, who_p1, pos)
-                   row_s = rowde_pe(1, who_p1, pos)
-                   row_e = rowde_pe(2, who_p1, pos)
-                   nc    = ncols_pe(who_p1, pos)
-                   nr    = nrows_pe(who_p1, pos)
-                   recv_size = nc * nr * third_dim
-
-                   loc_tag2 = tag2 + pe * 3
-                   call mpi_recv (recv_buf, recv_size, mpi_real, who,     &
-                                  loc_tag2, mpi_comm_world, status, stat)
+                   call mpi_recv (recv_buf, recv_size, mpi_real, MPI_ANY_SOURCE,     &
+                                  tag2, mpi_comm_world, status, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error receiving recv_buf'
                       lerror = .true.
                    end if
 
+                   who = status(MPI_SOURCE)
+                   who_p1 = who + 1
+                   col_s = colde_pe(1, who_p1, pos)
+                   col_e = colde_pe(2, who_p1, pos)
+                   row_s = rowde_pe(1, who_p1, pos)
+                   row_e = rowde_pe(2, who_p1, pos)
                    loc = 0
                    do k = 1, third_dim
                       do r = row_s, row_e
@@ -367,22 +355,12 @@
 
                 end do
              else
-                loc_tag1 = tag1 + mio_mype * 3
-                call mpi_send (mio_mype, 1, mpi_integer, 0,     &
-                               loc_tag1, mpi_comm_world, stat)
-                if (stat .ne. 0) then
-                   write (mio_logdev, *) ' Error: In routine ' // pname
-                   write (mio_logdev, *) '        MPI error sending WHO info'
-                   lerror = .true.
-                end if
-
                 nc = ncols_pe(mio_mype_p1, pos)
                 nr = nrows_pe(mio_mype_p1, pos)
                 send_size = nc * nr * third_dim
 
-                loc_tag2 = tag2 + mio_mype * 3
                 call mpi_send (in_data, send_size, mpi_real, 0, &
-                               loc_tag2, mpi_comm_world, stat)
+                               tag2, mpi_comm_world, stat)
                 if (stat .ne. 0) then
                    write (mio_logdev, *) ' Error: In routine ' // pname
                    write (mio_logdev, *) '        MPI error sending in_data'
