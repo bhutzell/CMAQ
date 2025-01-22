@@ -1163,7 +1163,7 @@ CMPST =
                 'umol m-3', 'TSP', 
                 'ANO3 + HNO3',
 
-'TNO3TOT'     , 'Total Nitrate only including Organics', 
+'TNO3TOT'     , 'Total Nitrate including Inorganics and Organics', 
                 'umol m-3', 'TSP', 
                 'ANO3 + HNO3 + ATRPN + AHONIT',
 
