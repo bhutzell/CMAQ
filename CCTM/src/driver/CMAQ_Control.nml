@@ -315,7 +315,8 @@
   Keywd(36,:) = 'PRECIP','GAS_DEP','PM_DEP','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
                 'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
                 'SEASPRAY_SULFUR_DEP','DD_CLNO2','WD_CLNO2','DD_CLNO3','WD_CLNO3',
-                'DD_PMC_SSSO4','DD_PMF_SSSO4','WD_SSSO4'
+                'DD_PMC_SSSO4','DD_PMF_SSSO4','WD_SSSO4','DD_CL','WD_CL','DD_CL2','WD_CL2',
+                'DD_HCL','WD_HCL','DD_HOCL','WD_HOCL'
 
   Keywd_name(37) = 'DEFAULT_DEP_CB6R5M_AE7_AQ'
   Keywd(37,:) = 'DEFAULT_DEP_CB6R5_AE7_AQ'
@@ -323,7 +324,7 @@
   Keywd_name(38) = 'DEFAULT_DEP_CB6R5HAP_AE7_AQ'
   Keywd(38,:) = 'DEFAULT_DEP_CB6R5_AE7_AQ','TOXICS_DEP'
 
-  Keywd_name(39) = 'DEFAULT_DEP_CCRACMM2'
+  Keywd_name(39) = 'DEFAULT_DEP_CRACMM2'
   Keywd(39,:) = 'PRECIP','GAS_DEP','PM_DEP','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
                 'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
                 'SEASPRAY_SULFUR_DEP'
@@ -348,17 +349,17 @@
   Keywd_name(42) = 'FINE_DDEP'
   Keywd(42,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
                 'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL','DD_PMF_SI',
-                'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K',!'DD_PMF_SSSO4',
+                'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K',
                 'DD_PMF_OC','WD_PMF_OC','DD_PMF_POC','WD_PMF_POC','DD_PMF_SOC','WD_PMF_SOC',
                 'DD_PMF_OA','WD_PMF_OA','DD_PMF_POA','WD_PMF_POA','DD_PMF_SOA','WD_PMF_SOA'!,
-                'DD_ANAJ','DD_ACLJ','DD_ACLK'
+                'DD_ANAJ'
 
   Keywd_name(43) = 'COARSE_DDEP'
   Keywd(43,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
                 'DD_PMC_CA','DD_PMC_MG','DD_PMC_K'
 
   Keywd_name(44) = 'TSP_DDEP'
-  Keywd(44,:) = 'DD_CL','DD_CA','DD_MG','DD_K','DD_NA'
+  Keywd(44,:) = 'DD_TSP_CL','DD_TSP_CA','DD_TSP_MG','DD_TSP_K','DD_TSP_NA'
 
   Keywd_name(45) = 'PM_WDEP'
   Keywd(45,:) = 'WD_TSP_NO3','WD_TSP_NH4','WD_TSP_SO4','WD_TSP_MTNO3','WD_TSP_NA',
@@ -371,10 +372,10 @@
  !----- Total Deposition -----!
  !----------------------------!
   Keywd_name(46) = 'PM_TDEP'
-  Keywd(46,:) = 'TD_NA'
+  Keywd(46,:) = 'TD_TSP_NA'
 
   Keywd_name(47) = 'GASPM_DEP'
-  Keywd(47,:) = 'DD_TNO3','WD_TNO3','DD_NHX','WD_NHX','WD_SOX','WD_TCL','TD_TCL'
+  Keywd(47,:) = 'DD_TNO3','WD_TNO3','DD_NHX','WD_NHX','WD_SOX','DD_TCL','WD_TCL','TD_TCL'
 
 
  !--------------------------------!

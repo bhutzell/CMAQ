@@ -17,9 +17,9 @@ DDEP_NO2           ,kg ha-1     ,NO2[1]
 WDEP_NO2           ,kg ha-1     ,NO2[2]
 DDEP_NO            ,kg ha-1     ,NO[1]
 WDEP_NO            ,kg ha-1     ,NO[2]
-DDEP_FORM	   ,kg ha-1     ,FORM[1]
-WDEP_FORM	   ,kg ha-1     ,FORM[2]
-DDEP_H2O2	   ,kg ha-1     ,H2O2[1]
+DDEP_FORM	       ,kg ha-1     ,FORM[1]
+WDEP_FORM	       ,kg ha-1     ,FORM[2]
+DDEP_H2O2	       ,kg ha-1     ,H2O2[1]
 WDEP_H2O2          ,kg ha-1     ,H2O2[2]
 DDEP_N2O5          ,kg ha-1     ,N2O5[1]
 WDEP_N2O5          ,kg ha-1     ,N2O5[2]
@@ -94,20 +94,22 @@ WDEP_NHX           ,kg ha-1     ,ANH4I[2] + ANH4J[2] + ANH4K[2] + 1.059*NH3[2]
 WDEP_TSO4          ,kg ha-1     ,ASO4I[2] + ASO4J[2] + ASO4K[2] + 1.5*SO2[2]
 
 !! Sodium
-DDEP_ANAJ          ,kg ha-1     ,ANAJ[1]
+DDEP_ANAIJ         ,kg ha-1     ,ANAI[1] + ANAJ[1]
 DDEP_ANAK          ,kg ha-1     ,0.8373*ASEACAT[1]+0.0626*ASOIL[1]+0.0023*ACORS[1]
-DDEP_ANAJK         ,kg ha-1     ,DDEP_ANAJ[0] + DDEP_ANAK[0]
+DDEP_ANAIJK        ,kg ha-1     ,DDEP_ANAIJ[0] + DDEP_ANAK[0]
 WDEP_ANAK          ,kg ha-1     ,0.8373*ASEACAT[2]+0.0626*ASOIL[2]+0.0023*ACORS[2]
-WDEP_ANAJK         ,kg ha-1     ,ANAJ[2] + WDEP_ANAK[0]
-TDEP_ANAJK         ,kg ha-1     ,DDEP_ANAJK[0] + WDEP_ANAJK[0]
+WDEP_ANAIJK        ,kg ha-1     ,ANAI[2] + ANAJ[2] + WDEP_ANAK[0]
+TDEP_ANAIJK        ,kg ha-1     ,DDEP_ANAIJK[0] + WDEP_ANAIJK[0]
 
 !! Chloride
-DDEP_ACLJ          ,kg ha-1     ,ACLJ[1]
+DDEP_ACLIJ         ,kg ha-1     ,ACLJ[1] + ACLI[1]
 DDEP_ACLK          ,kg ha-1     ,ACLK[1]
-DDEP_ACLJK         ,kg ha-1     ,ACLJ[1] + ACLK[1]
-DDEP_TCL           ,kg ha-1     ,DDEP_ACLJK[0] + 0.4352*DDEP_CLNO2[0] + 0.36377*DDEP_CLNO3[0]
-WDEP_TCL           ,kg ha-1     ,0.972*HCL[2]+CL2[2] + ACLJ[2] + ACLK[2] + 0.6758*HOCL[2] \
-                                             +0.4352*CLNO2[2]  + 0.36377*CLNO3[2]
+DDEP_ACLIJK        ,kg ha-1     ,ACLI[1] + ACLJ[1] + ACLK[1]
+WDEP_ACLIJK        ,kg ha-1     ,ACLI[2] + ACLJ[2] + ACLK[2]
+DDEP_TCL           ,kg ha-1     ,DDEP_ACLIJK[0] + CL2[1] + 0.972*HCL[1] + 0.6578*HOCL[1] \
+                                             + 0.4352*CLNO2[1] + 0.36377*CLNO3[1]
+WDEP_TCL           ,kg ha-1     ,WDEP_ACLIJK[0] + 0.972*HCL[2] + CL2[2] + 0.6758*HOCL[2] \
+                                             + 0.4352*CLNO2[2]  + 0.36377*CLNO3[2]
 TDEP_CL            ,kg ha-1     ,DDEP_TCL[0] + WDEP_TCL[0]
 
 !! Calcium
