@@ -262,11 +262,12 @@
 ! ----------------------------------------------------------------------------
           subroutine mio_retrieve_global_attribute_information (file_data)
 
+            use mio_parameter_module, only: mio_max_vlist_len
             type (mio_file_record), intent(inout) :: file_data
 
             character (41), parameter :: pname = 'mio_retrieve_global_attribute_information'
 
-            character (50000) :: t_str
+            character (mio_max_vlist_len) :: t_str
             integer :: n, stat, s, e, length, start(6), leng(6)    ! for 6 different types of data which is 
                                                                    ! defined in mio_parameter_mod.f90
             logical :: error
