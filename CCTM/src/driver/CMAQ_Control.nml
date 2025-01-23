@@ -12,9 +12,11 @@
 !                                                                              !
 !   Format of ELMO_Files specification                                         !
 !       Flabel - short name for each file                                      !
-!       Tmode - 'average' or 'instantaneous'. For deposition variables,        !
-!               selecting 'average' will yield values accumulated across the   !
-!               output time step.                                              !
+!       Tmode - 'aggregate' or 'instantaneous'. For concentration variables,   !
+!               selecting 'aggregate' will yield average values across the     !
+!               output time step. For deposition variables, selecting          !
+!               'aggregate' will yield values accumulated across the output    !
+!               time step.                                                     !
 !       Lay_Bot - Bottom layer for each file                                   !
 !       Lay_Top - Top layer for each file                                      !
 !       File_Vars(f,:) - These may be CMAQ species, deposition of CMAQ species !
@@ -66,13 +68,13 @@
  !-- Set Properties and Contents for each ELMO Output File
  !
   Flabel(1)= 'DEFAULT'
-  Tmode(1) = 'average'
+  Tmode(1) = 'aggregate'
   Lay_Bot(1) = 1
   Lay_Top(1) = 1
   File_Vars(1,:) = 'DEFAULT' 
 
   Flabel(2)= 'DEFAULT_DEP'
-  Tmode(2) = 'average'
+  Tmode(2) = 'aggregate'
   Lay_Bot(2) = 1
   Lay_Top(2) = 1
   File_Vars(2,:) = 'DEFAULT_DEP'
