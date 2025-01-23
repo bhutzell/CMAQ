@@ -154,7 +154,8 @@
                'PMF_OC','PMF_EC','PMF_NA','PMF_CL','PMF_SO4','PMF_NO3',
                'PMF_NH4','PMF_FE','PMF_AL','PMF_SI','PMF_TI','PMF_CA',
                'PMF_MG','PMF_K','PMF_MN','PMF_RCSOIL','PMF_OTHWNC','PMF_NC',
-               'PMF_OTH','PM25_OC','PM25_EC','PM25_SO4','PM25_NO3','PM25_NH4'
+               'PMF_OTH','PM25_OC','PM25_EC','PM25_SO4','PM25_NO3','PM25_NH4',
+               'TSP_NO3_PPM'
   
 
  !------------------------------!
