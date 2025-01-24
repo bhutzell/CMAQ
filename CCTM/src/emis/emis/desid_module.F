@@ -958,7 +958,7 @@ C Subset the emissions array for DDM-3D (by species and region)
 
          ! Check for Negative Emissions after scaling rules and unit
          ! conversions are applied.
-         ERROR_NEG     = DESID_CHECK_NEG( VDEMIS_DIFF, 1, DESID_LAYS )
+         CALL DESID_CHECK_NEG( VDEMIS_DIFF, 1, DESID_LAYS )
          
          ! Write Out Aggregate Diagnostic Emissions to Files
          IF ( L_DESID_DIAG ) CALL DESID_WRITE_DIAG( JDATE, JTIME )
@@ -1284,23 +1284,24 @@ C-----------------------------------------------------------------------
 
 
 !-----------------------------------------------------------------------
-      FUNCTION DESID_CHECK_NEG( VDEMIS, ISRM, NL ) RESULT( STAT )
+      SUBROUTINE DESID_CHECK_NEG( VDEMIS, ISRM, NL )
 
 !     Check Emissions Array for negative values and exit if negative values
 !     exceed tolerance of 1.0E-7 for gas or aerosol mass emission rates.
 !     This value was chosen through trial and error for detection of
-!     obvious issues with negative inputs. Users should increase or
-!     decrease this tolerance corresponding to the level of quality they
-!     require for their application.
+!     obvious issues with negative inputs. Users may adjust this
+!     tolerance if it is too stringent for their application.
 !          
 !     Number and surface area emission rates are scaled up consistent
-!     with assuming approximately 1 um particles. Because there are so
+!     with assuming particles 2 um in diameter. Because there are so
 !     many potentially varying parameters (e.g. particle size, density,
 !     mode standard deviation, etc.), the relationships between the mass
 !     threshold and number/surface area thresholds are somewhat arbitrary. 
 !
-!     In all cases, thresholds are set to provide some layer of
-!     protection against egregious errors in emissions input files.
+!     In all cases, thresholds are set to allow slightly negative emission 
+!     rates due to numerical roundoff in difference calculations, but
+!     the simulation will stop if the threshold is exceeded, which
+!     likely indicates a serious error in emissions processing.
 !          
 !     Emissions that are negative but within tolerance are set to 0.0.
 !     VDEMIS is the scaled emissions and VDEMIS0 is the emissions
@@ -1317,16 +1318,16 @@ C-----------------------------------------------------------------------
       INTEGER, INTENT( IN ) :: ISRM
 
       INTEGER :: ISPC, ILAY, ICOL, IROW, JCOL, JROW
-      INTEGER :: STAT
-      INTEGER :: ALOC( 4 )
+      INTEGER :: ALOC( 3 ), STAT
       REAL    :: EMIS_MIN
       CHARACTER(250) :: XMSG
 
-      STAT = 0
 
       ! If All Values Are Positive then Return Right Away
       EMIS_MIN = MINVAL( VDEMIS( :,1:NL,:,: ) )
       IF ( EMIS_MIN .GE. 0.0 ) RETURN
+
+      STAT = 0
 
       ! Loop through species to make sure correct threshold is applied
       DO ISPC = 1,N_SPC_DIFF
@@ -1336,23 +1337,20 @@ C-----------------------------------------------------------------------
      &        ( (.NOT.DIFF_MASK_NUM( ISPC ) .AND. .NOT. DIFF_MASK_SRF( ISPC )) 
      &          .AND. EMIS_MIN .LT. -1.0e-7 ) ) THEN
 
-           ! Threshold Exceeded. Model Must Crash
-           STAT = 1
-
            ! Find Where the Most Negative Value Is and Exit
-           ALOC = MINLOC( VDEMIS( :,1:NL,:,: ) )
-           ILAY = ALOC( 2 )
-           ICOL = ALOC( 3 )
-           IROW = ALOC( 4 )
+           ALOC = MINLOC( VDEMIS( ISPC,1:NL,:,: ) )
+           ILAY = ALOC( 1 )
+           ICOL = ALOC( 2 )
+           IROW = ALOC( 3 )
            CALL GET_GLOBAL_COORDS( ICOL, IROW, JCOL, JROW )
 
-           WRITE( LOGDEV, '(/,5x,A,ES10.3,A,/,5x,3A,/,5x,A,I3,A1,I3,A1,I2,A2)' ),
-     &       'ERROR: Invalid Negative emission rate ', EMIS_MIN, ' has been ',
-     &       'detected for CMAQ species ',TRIM(DIFF_SPC( ISPC )),' at gridcell',
-     &       '  (COL,ROW,LAY): (',JCOL,',',JROW,',',ILAY,').'
-           XMSG = 'Negative Emissions Detected'
-           CALL M3EXIT( 'EMISS_NEG_CHECK', 0, 0, XMSG, XSTAT1 )
+           WRITE( LOGDEV, '(/,5x,A,/,5x,A,A,A,A/,5x,A,ES10.3,A,A,/,5x,A1,I3,A1,I3,A1,I2,A2)' ),
+     &       'ERROR: At least one invalid negative emission rate has been ',
+     &       'detected for CMAQ species ',TRIM(DIFF_SPC( ISPC )),'. The ', 
+     &       'most negative emission','rate is ',EMIS_MIN,' at gridcell',
+     &       ' (COL,ROW,LAY): ','(',JCOL,',',JROW,',',ILAY,').'
 
+           STAT = 1
         ELSE IF ( EMIS_MIN .LT. 0.0 ) THEN
            ! Threshold was not exceeded, but there are negatives that
            ! must be corrected.
@@ -1360,7 +1358,13 @@ C-----------------------------------------------------------------------
         END IF
 
       END DO  
-      END FUNCTION DESID_CHECK_NEG    
+        
+      IF ( STAT .EQ. 1 ) THEN
+         XMSG = 'Negative Emissions Detected'
+         CALL M3EXIT( 'EMISS_NEG_CHECK', 0, 0, XMSG, XSTAT1 )
+      END IF
+
+      END SUBROUTINE DESID_CHECK_NEG    
 
 !-----------------------------------------------------------------------
       SUBROUTINE DESID_CALC_DIAG( JDATE, JTIME, VDEMIS0, ISRM, NL ) 
