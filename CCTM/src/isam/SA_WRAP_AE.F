@@ -160,9 +160,9 @@ c     ISAM0(:,:,:,:,:) = MAX( DBLE( ISAM(:,:,:,:,:) ), MIN_VAL )
              ! explicitly, if it exists.
              IF ( JAER(3) .GT. 0 ) THEN
                 DO K = 1,NTAG_SA
-                   TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JGAS,K ) / BULK0( :,:,:,JGAS )
+                   TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JGAS,K ) / ( BULK0( :,:,:,JGAS ) + MIN_VAL )
      &                                * DBLE( AERO_COND( :,:,:,CAER(3) ) )
-                   TAG_FRAC2( :,:,: )= ISAM0( :,:,:,JAER(3),K ) / BULK0( :,:,:,JAER(3) )
+                   TAG_FRAC2( :,:,: )= ISAM0( :,:,:,JAER(3),K ) / ( BULK0( :,:,:,JAER(3) ) + MIN_VAL )
      &                                * DBLE( AERO_COND( :,:,:,CAER(3) ) * -1.0 )
                    DO C = 1,NCOLS
                    DO R = 1,NROWS
