@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
       
 !-------------------------------------------------------------------------
-      SUBROUTINE ELMO_DERIVED_CALC( OUTVAL, J )
+      RECURSIVE SUBROUTINE ELMO_DERIVED_CALC( OUTVAL, J )
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
