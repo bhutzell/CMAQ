@@ -547,3 +547,154 @@
    'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a',
 
 /
+
+&COMPOSITE_INIT
+  N_COMPOSITES = 47
+  N_MAX_COMPONENTS = 20
+/
+
+&ELMO_COMPOSITES
+
+   CMPST(1,:) = 'NOX', 'ppmV', 'GAS', 'NOx Concentration', 
+                'NO + NO2'
+
+   CMPST(2,:) = 'PMC_SO4', 'ug m-3', 'COARSE', 'Coarse-Mode Sulfate', 
+                'ASO4' 
+
+   CMPST(3,:) = 'PMC_NO3', 'ug m-3', 'COARSE', 'Coarse-Mode Nitrate', 
+                'ANO3'
+
+   CMPST(4,:) = 'PMC_NH4', 'ug m-3', 'COARSE', 'Coarse-Mode Ammonium', 
+                'ANH4'
+
+   CMPST(5,:) = 'PMC_CL', 'ug m-3', 'COARSE', 'Coarse-Mode Chlorine', 
+                'ACL'
+
+   CMPST(6,:) = 'PMC_NA', 'ug m-3', 'COARSE', 'Recon Crs Sodium', 
+                '0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(7,:) = 'PMC_MG', 'ug m-3', 'COARSE', 'Recon Crs Magnesium', 
+                '0.0997 * ASEACAT + 0.0170 * ASOIL + 0.0032 * ACORS'
+
+   CMPST(8,:) = 'PMC_K', 'ug m-3', 'COARSE', 'Recon Crs Potasium', 
+                '0.0310 * ASEACAT + 0.0242 * ASOIL + 0.0176 * ACORS'
+
+   CMPST(9,:) = 'PMC_CA', 'ug m-3', 'COARSE', 'Recon Crs Calcium', 
+                '0.0320 * ASEACAT + 0.0838 * ASOIL + 0.0562 * ACORS'
+
+   CMPST(10,:) = 'PMF_SO4', 'ug m-3',  'FINE', 'Fine-Mode Sulfate', 
+                 'ASO4'
+
+   CMPST(11,:) = 'PMF_NO3',  'ug m-3',  'FINE', 'Fine-Mode Nitrate', 
+                 'ANO3'
+
+   CMPST(12,:) = 'PMF_NH4', 'ug m-3', 'FINE', 'Fine-Mode Ammonium', 
+                 'ANH4'
+
+   CMPST(13,:) = 'PMF_CL', 'ug m-3', 'FINE', 'Fine-Mode Chloride', 
+                 'ACL'
+
+   CMPST(14,:) = 'PMF_NA', 'ug m-3', 'FINE', 'Fine-Mode Sodium', 
+                 'ANA'
+
+   CMPST(15,:) = 'PMF_EC', 'ug m-3', 'FINE', 'Fine-Mode Black Carbon', 
+                 'AEC'
+
+   CMPST(16,:) = 'PMF_FE', 'ug m-3', 'FINE', 'Fine-Mode Iron', 
+                 'AFE'
+
+   CMPST(17,:) = 'PMF_AL', 'ug m-3', 'FINE', 'Fine-Mode Aluminum', 
+                 'AAL'
+
+   CMPST(18,:) = 'PMF_SI', 'ug m-3', 'FINE', 'Fine-Mode Silicon', 
+                 'ASI' 
+
+   CMPST(19,:) = 'PMF_TI', 'ug m-3', 'FINE', 'Fine-Mode Titanium', 
+                 'ATI'
+
+   CMPST(20,:) = 'PMF_CA', 'ug m-3', 'FINE', 'Fine-Mode Calcium', 
+                 'ACA'
+
+   CMPST(21,:) = 'PMF_MG', 'ug m-3', 'FINE', 'Fine-Mode Magnesium', 
+                 'AMG'
+
+   CMPST(22,:) = 'PMF_K', 'ug m-3', 'FINE', 'Fine-Mode Potassium',
+                 'AK'
+
+   CMPST(23,:) = 'PMF_MN', 'ug m-3', 'FINE', 'Fine-Mode Manganese',
+                 'AMN'
+
+   CMPST(24,:) = 'PMF_H2O', 'ug m-3', 'FINE', 'Fine-ModeParticle Water',
+                 'AH2O'
+                                               
+   CMPST(25,:) = 'PMF_SOILIMPV', 'ug m-3', 'ACCUMULATION', 'Recon of Soil PM from correlations at IMPROVE sites',
+                 '2.20 * AAL + 2.49 * ASI + 1.63 * ACA + 2.42 * AFE + 1.94 * ATI'
+
+   CMPST(26,:) = 'PMF_UN_IMPV1', 'ug m-3', 'FINE', 'Unspeciated PM including non-carbon organic mass',
+                 'PMF_MASS -1.0 * ASO4 -1.0 * ANO3 -1.0 * ANH4 -1.0 * ACL -1.0 * ANA + -1.0 * AEC -1.0 * PMF_OC -1.0 * PMF_SOILIMPV'
+
+   CMPST(27,:) = 'PMF_UN_IMPV2', 'ug m-3', 'FINE', 'Unspeciated PM excluding non-carbon organic mass',
+                 'PMF_MASS -1.0 * ASO4 -1.0 * ANO3 -1.0 * ANH4 -1.0 * ACL -1.0 * ANA -1.0 * AEC -1.0 * PMF_OA -1.0 * PMF_SOILIMPV'
+
+   CMPST(28,:) = 'PMF_HP', 'umol m-3', 'FINE', 'Fine-Mode H+ Ion',
+                 'AH3OP'
+
+   CMPST(29,:) = 'PMF_NCOM', 'ug m-3', 'FINE', 'Fine-Mode Non-Carbon Organic Matter in POA',
+                 'PMF_OA -1.0 * PMF_OC'
+
+   CMPST(30,:) = 'PMF_CLDGLY', 'ug m-3', 'FINE', 'Fine-Mode SOA from glyoxal and methylglyoxal',
+                 'AORGC + AGLY'
+
+   CMPST(31,:) = 'PMF_ISOPSOA', 'ug m-3', 'FINE', 'Fine-Mode Isoprene SOA excl IEPOX SOA',
+                 'AISO1 + AISO2'
+
+   CMPST(32,:) = 'PMF_IEPOXSOA', 'ug m-3', 'FINE', 'Fine-Mode IEPOX SOA',
+                 'AISO3'
+
+   CMPST(33,:) = 'PMF_MTNSOA', 'ug m-3', 'FINE', 'Fine-Mode Monoterpene Nitrate SOA',
+                 'AMTNO3 + AMTHYD'
+
+   CMPST(34,:) = 'PMF_MTSOA', 'ug m-3', 'FINE', 'Fine-Mode Monoterpene SOA excl Nitrates',
+                 'AMT1 + AMT2 + AMT3 + AMT4 + AMT5 + AMT6'
+
+   CMPST(35,:) = 'PMF_BENAPY', 'ug m-3', 'FINE', 'Fine-Mode Benzo-a-Pyrene',
+                 'ABENAPY'
+
+   CMPST(36,:) = 'GAS_BENAPY', 'ug m-3', 'GAS', 'Gas-Phase Benzo-a-Pyrene',
+                 'BENAPY'
+
+   CMPST(37,:) = 'GAS_NH3', 'ug m-3', 'GAS', 'Gas-Phase Ammonia',
+                 'NH3'
+
+   CMPST(38,:) = 'GAS_HNO3', 'ug m-3', 'GAS', 'Gas-Phase Nitric Acid',
+                 'HNO3'
+
+   CMPST(39,:) = 'PMAMS_SO4', 'ug m-3', 'PMAMS', 'Sulfate Collected by the AMS',
+                 'ASO4'
+
+   CMPST(40,:) = 'PMAMS_NO3', 'ug m-3', 'PMAMS', 'Nitrate Collected by the AMS',
+                 'ANO3'
+
+   CMPST(41,:) = 'PMAMS_NH4', 'ug m-3', 'PMAMS', 'Ammonium Collected by the AMS',
+                 'ANH4'
+
+   CMPST(42,:) = 'PMAMS_CL', 'ug m-3', 'PMAMS', 'Chloride Collected by the AMS',
+                 'ACL'
+
+   CMPST(43,:) = 'PM1_SO4', 'ug m-3', 'PM1', 'PM1 Sulfate',
+                 'ASO4'
+
+   CMPST(44,:) = 'PM1_NO3', 'ug m-3', 'PM1', 'PM1 Nitrate',
+                 'ANO3'
+
+   CMPST(45,:) = 'PM1_NH4', 'ug m-3', 'PM1', 'PM1 Ammonium',
+                 'ANH4'
+
+   CMPST(46,:) = 'PM1_CL', 'ug m-3', 'PM1', 'PM1 Chloride',
+                 'ACL'
+
+   CMPST(47,:) = 'PM1_NA', 'ug m-3', 'PM1', 'PM1 Sodium',
+                 'ANA + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+/
+ 
