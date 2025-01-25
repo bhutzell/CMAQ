@@ -476,7 +476,7 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
          end if
          call log_message( logdev, xmsg )
          call mio_shutdown
-
+         call exit( xstat )
       end subroutine m3exit
 
       end module logdev_mod
