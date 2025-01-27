@@ -1049,19 +1049,22 @@ C *** get KN2O5 rate constants YIELD_CLNO2 for each mode
                      KHO2( N ) = 0.0D0
                   END IF
 
+
 c *** get fine aerosol H2O and chlorine concentrations in
                   AH2O = aerospc_conc( AH2O_IDX,N )
                   ACL  = aerospc_conc( ACL_IDX, N )
-                  CL_PPM( N ) = PPM_FACTOR * ( ACL * INV_MWCL )		  
-
-       If ( (Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) .OR.    
-     &       Index( mechname, 'CRACMM3M'      ) .Gt. 0 ) Then     
+                  CL_PPM( N ) = PPM_FACTOR * ( ACL * INV_MWCL )
+!                 ASEAST = aerospc_conc( ASEAST_IDX, N )		  
+     
+      If ( (Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) .OR.  
+     &     Index( mechname,  'CRACMM3M'      ) .Gt. 0 ) Then 
+       
          ABR  = aerospc_conc( ABR_IDX, N ) 
          INV_MWBR  = REAL( 1.0 / aerospc_mw( ABR_IDX ), 8 )  
          BR_PPM( N ) = PPM_FACTOR * ( ABR * INV_MWBR ) 
       Else
          BR_PPM( N ) = 0.0D0  
-      End If    
+      End If
 
 C *** If only a small amount of water is present on aerosol, keep YIELD_CLNO2 zero
                  IF ( AH2O .GT. 5.0E-01 .AND. ACL .GT. 1.0E-04 ) THEN
@@ -1113,14 +1116,9 @@ C *** Calculate IEPOX and MAE uptake information for accumulation mode
 
 C *** Calculate approximate seasalt surface area, m2/m3
 
-      If ( (Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) .OR.  
-     &      Index( mechname, 'CRACMM3M'      ) .Gt. 0 ) Then 
                MARINE_AREA = ( OCEAN( C,R ) + SZONE( C,R ) )
                SSALT_VOL  =   1.0D-9 * Real ( aerospc_conc( ASEAST_IDX,2 ) / aerospc(ASEAST_IDX)%density, 8 )              ! m3/m3 - use seasalt concentration 
                SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * DEXP ( 0.5D0 * AEROMODE_LNSG( 2 ) * AEROMODE_LNSG( 2 ) )
-      Else
-               SSALT_SURFA =0.0D0
-      End If      
 
 C *** calculate GAMMA_HBR  
       GAMMA_HBR = 1.3D-8 * DEXP ( 4290/ AIRTEMP) 

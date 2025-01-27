@@ -695,11 +695,11 @@ Information is based on the mech.def file.
 | CLOR12   | CLO + ISOP ---->   0.4000\*HCHO +    0.8800\*HO2 +    0.8800\*CLOO +    0.1800\*MACR +    0.5100\*MVK +    0.1200\*HCL  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR13   | CLO + APIP1 ---->   0.7630\*HO2 +    0.7630\*CLOO +    0.1950\*PINAL +    0.2840\*ALD +    0.0865\*ACT +    0.1285\*LIMAL +    0.3080\*HCHO +    0.0715\*OPB +    0.0840\*KET +    0.2370\*HCL  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR14   | CLO + APIP2 ---->   0.8200\*HO +    0.8200\*CLOO +    0.1800\*HCL + HOM  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
-| CLOR15   | CLO + APINP1 ---->   2.0000\*CLOO +    0.6045\*PINAL +    0.1540\*ALD +    0.0070\*KET +    0.0070\*HCHO +    0.1645\*HO2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
+| CLOR15   | CLO + APINP1 ----> CLOO +    0.6955\*NO2 +    0.2345\*TRPN +    0.0700\*ONIT +    0.6045\*PINAL +    0.1540\*ALD +    0.0070\*KET +    0.0070\*HCHO +    0.1645\*HO2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR16   | CLO + APINP2 ---->   0.8200\*CLOO +    0.8200\*HO +    0.1800\*HCL + HOM  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR17   | CLO + LIMP1 ---->   0.7700\*HO2 + CLOO +    0.7700\*LIMAL +    0.4300\*HCHO  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR18   | CLO + LIMP2 ---->   0.7700\*HO +    0.7700\*CLOO +    0.2300\*HCL + HOM  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
-| CLOR19   | CLO + LIMNP1 ---->   2.0000\*CLOO +    0.4300\*LIMAL +    0.5000\*HO2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
+| CLOR19   | CLO + LIMNP1 ----> CLOO +    0.5700\*TRPN +    0.0700\*ONIT +    0.3600\*NO2 +    0.4300\*LIMAL +    0.5000\*HO2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR20   | CLO + LIMNP2 ---->   0.7700\*CLOO +    0.7700\*HO +    0.2300\*HCL + HOM  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR21   | CLO + PINALP ----> CLOO +    0.6400\*HOM  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR22   | CLO + LIMALP ----> CLOO +    0.3600\*HO2 +    0.3600\*HCHO +    0.3600\*PAA  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
@@ -718,12 +718,12 @@ Information is based on the mech.def file.
 | CLOR35   | CLO + MCTP ----> MCTO + CLOO  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR36   | CLO + ORAP ----> CLOO + GLY + HO2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR37   | CLO + OLNN ----> CLOO + HO2 + ONIT  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
-| CLOR38   | CLO + OLND ---->   2.0000\*CLOO +    0.2870\*HCHO +    1.2400\*ALD +    0.4640\*KET  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
-| CLOR39   | CLO + ADCN ---->   2.0000\*CLOO + GLY + OP2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
+| CLOR38   | CLO + OLND ----> CLOO + NO2 +    0.2870\*HCHO +    1.2400\*ALD +    0.4640\*KET  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
+| CLOR39   | CLO + ADCN ----> CLOO + NO2 + GLY + OP2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR40   | CLO + XO2 ----> CLOO  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR41   | CLO + BDE13P ---->   0.9680\*HO2 + CLOO +    0.8950\*ACRO +    0.8950\*HCHO +    0.0720\*FURAN  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR42   | CLO + FURANO2 ----> CLOO +    0.9200\*FURANONE +    0.7500\*HO2 +    0.1700\*MO2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
-| CLOR43   | CLO + SESQNRO2 ----> VROCP3OXY2 +    2.0000\*CLOO  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
+| CLOR43   | CLO + SESQNRO2 ----> CLOO + VROCP3OXY2 + NO2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR44   | CLO + SESQRO2 ---->   0.2470\*VROCP1OXY3 +    0.7530\*VROCP3OXY2 +    0.7530\*CLOO +    0.2470\*HCL  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR45   | CLO + VROCP6ALKP ---->   0.7200\*VROCP6ALKP2 +    0.2800\*VROCP4OXY2 +    0.7200\*CLOO +    0.2800\*HCL  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
 | CLOR46   | CLO + VROCP5ALKP ---->   0.7200\*VROCP5ALKP2 +    0.2800\*VROCP3OXY2 +    0.7200\*CLOO +    0.2800\*HCL  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |

@@ -146,21 +146,22 @@
    'EVERYWHERE', 'ALL'        ,'VROCP2OXY2','VROCP2OXY2' ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'VROCP4ALK' ,'VROCP4ALK'  ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'VROCP5OXY1','VROCP5OXY1' ,'GAS'  ,1   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        ,'CH3I'      ,'CH3I'       ,'GAS'  ,0.  ,'UNIT','a',   
 
    ! Marine Halogen Chemistry
-   'EVERYWHERE', 'ALL'         ,'HOI'    ,'HOI'         ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'I2'     ,'I2'          ,'GAS'  ,1.  ,'UNIT','a',
-!  'EVERYWHERE', 'ALL'         ,'DMS'    ,'DMS'         ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'CH3I'   ,'CH3I'        ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'CH2I2'  ,'CH2I2'       ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'CH2IBR' ,'CH2IBR'      ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'CH2ICL' ,'CH2ICL'      ,'GAS'  ,1.  ,'UNIT','a',
-!  'EVERYWHERE', 'ALL'         ,'BR2'    ,'BR2'         ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'CHBR3'  ,'CHBR3'       ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'CH2BR2' ,'CH2BR2'      ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'CHBR2CL','CHBR2CL'     ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'CHBRCL2','CHBRCL2'     ,'GAS'  ,1.  ,'UNIT','a'
-   'EVERYWHERE', 'ALL'         ,'CH2BRCL','CH2BRCL'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'HOI'    ,'HOI'         ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'I2'     ,'I2'          ,'GAS'  ,1.  ,'UNIT','a',
+!  'EVERYWHERE', 'MGEM'         ,'DMS'    ,'DMS'         ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CH3I'   ,'CH3I'        ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CH2I2'  ,'CH2I2'       ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CH2IBR' ,'CH2IBR'      ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CH2ICL' ,'CH2ICL'      ,'GAS'  ,1.  ,'UNIT','a',
+!  'EVERYWHERE', 'MGEM'         ,'BR2'    ,'BR2'         ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CHBR3'  ,'CHBR3'       ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CH2BR2' ,'CH2BR2'      ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CHBR2CL','CHBR2CL'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CHBRCL2','CHBRCL2'     ,'GAS'  ,1.  ,'UNIT','a'
+   'EVERYWHERE', 'MGEM'         ,'CH2BRCL','CH2BRCL'     ,'GAS'  ,1.  ,'UNIT','a',
 
    ! Default Aerosols
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'ASO4'        ,'FINE' ,1.  ,'MASS','a', 
