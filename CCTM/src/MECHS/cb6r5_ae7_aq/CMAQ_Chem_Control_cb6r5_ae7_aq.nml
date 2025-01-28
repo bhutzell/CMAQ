@@ -1134,11 +1134,11 @@ CMPST =
 
 'DD_OXN_OTHR' , 'Dry Dep of Oxidized Nitrogen from Other Components', 
                 'kgN ha-1', 'DEP', 
-                '0.25926*DD_N2O5 + 0.29787*DD_HONO + 0.17720*DD_PNA + 0.1717*DD_CLNO2 + 0.1436*DD_CLNO3',
+                '0.25926*DD_N2O5 + 0.29787*DD_HONO + 0.17720*DD_PNA + 0.1717*DD_CLNO2',
 
 'WD_OXN_OTHR' , 'Wet Dep of Oxidized Nitrogen from Other Components', 
                 'kgN ha-1', 'DEP', 
-                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.17720*WD_PNA + 0.1717*WD_CLNO2 + 0.1436*WD_CLNO3',
+                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.17720*WD_PNA + 0.1717*WD_CLNO2',
 
 'DD_OXN_TOT'  , 'Dry Dep of Total Oxidized Nitrogen', 
                 'kgN ha-1', 'DEP', 
