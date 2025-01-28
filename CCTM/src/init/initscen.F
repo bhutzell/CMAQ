@@ -73,7 +73,7 @@ C-----------------------------------------------------------------------
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP 
-      USE ELMO_PROC, ONLY : OPEN_ELMO
+      USE ELMO_INIT_DEFN, ONLY : OPEN_ELMO
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -190,12 +190,6 @@ C Get tracer IC's
          CALL LOAD_CGRID ( FNAME, 'TR', CMIN, CGRID )
       END IF  ! N_TR_SPC > 0
 
-C Assemble definitions of various output files
-      IF ( L_ELMO .AND. IO_PE_INCLUSIVE ) THEN
-           CALL OPEN_ELMO ( STDATE, STTIME, TSTEP( 1 ) )
-           ELMO_NSTEP = 0.0
-      END IF
-
 #ifndef mpas
 
 #ifndef twoway
@@ -203,7 +197,7 @@ C Assemble definitions of various output files
       BACKSPACE( LOGDEV )
 #endif
 
-      CALL LOG_HEADING( LOGDEV, "Define Concentration File" )
+      CALL LOG_HEADING( LOGDEV, "Open/Create Concentration File" )
 
 ! the OPCONC routine should get renamed and moved inside CONC_DEFN
       CALL OPCONC ( STDATE, STTIME, TSTEP( 1 ) )
@@ -211,12 +205,14 @@ C Assemble definitions of various output files
       CALL OPVEXT ( STDATE, STTIME, TSTEP( 1 ) )
 #endif
 
-      CALL LOG_HEADING( LOGDEV, "Define Average Concentration File" )
+      CALL LOG_HEADING( LOGDEV, "Open/Create Average Concentration File" )
 ! likewise OPACONC should get renamed and moved inside AVG_CONC
       CALL OPACONC ( STDATE, STTIME, TSTEP( 1 ) )
       
+      CALL LOG_HEADING( LOGDEV, "Open/Create Wet Deposition File" )
       CALL LOG_HEADING( LOGDEV, "Define Wet Deposition File" )
 ! likewise OPWDED should get renamed and perhaps moved elsewhere
+      
       CALL OPWDEP  ( STDATE, STTIME, TSTEP( 1 ) )
 
 #ifdef sens
@@ -298,6 +294,8 @@ C Define ISAM output files SA_CONC_1 and SA_WD_1
 
       END IF
 #endif
+
+      CALL SUBST_BARRIER
 
 #endif
 

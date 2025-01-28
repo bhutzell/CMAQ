@@ -402,8 +402,8 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
       ! The following species are associated with CRACMM2
      & spcs_list_type('AISO4   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.21), ! from heterogeneous uptake of IPX
      & spcs_list_type('AISO5   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.18), ! from heterogeneous uptake of INALD
-     & spcs_list_type('ATRPN   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! SOA from first generation monoterpene nitrate
-     & spcs_list_type('AHONIT  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14)  ! SOA from second generation monoterpene nitrate
+     & spcs_list_type('ATRPN   ',F,T,F, cm_set, 1400.0, 'TRPN   ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! SOA from first generation monoterpene nitrate
+     & spcs_list_type('AHONIT  ',F,T,F, cm_set, 1400.0, 'HONIT  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14)  ! SOA from second generation monoterpene nitrate
      & /)                                                 
  
 ! Define Reference Emissions Size Distributions
@@ -743,6 +743,7 @@ C-------------------------------------------------------------------------------
          Character( 3  ) :: suff         ! Suffix
          Character( 16 ) :: num_name     ! name of aerosol number variable
          Character( 16 ) :: srf_name     ! name of aerosol surface area variable
+         Logical         :: all_mask     ! is this mode ultrafine PM?
          Logical         :: ultrafine_mask ! is this mode ultrafine PM?
          Logical         :: fine_mask    ! is this mode fine PM?
          Logical         :: coarse_mask  ! is this mode coarse PM?
@@ -756,12 +757,19 @@ C-------------------------------------------------------------------------------
 
       Type ( mode_type ), Parameter  :: aeromode( n_mode ) = (/
 C                  suffix   number     surface         Masks       minimum minimum minimum
-C                            name       name     U  F  C AC AI NU  numconc  m2conc  m3conc
-C                  ------- ----------  -------   -  -  - -- -- --  -------- -------  ------
-     &   mode_type('AIT'  ,'NUMATKN', 'SRFATKN', T, T, F, F, T, F, conmin,  conmin, conmin),
-     &   mode_type('ACC'  ,'NUMACC ', 'SRFACC ', F, T, F, T, F, F, conmin,  conmin, conmin),
-     &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', F, F, T, F, F, F, conmin,  conmin, conmin)/)
+C                            name       name     ALL U  F  C AC AI NU  numconc  m2conc  m3conc
+C                  ------- ----------  -------   --- -  -  - -- -- --  -------- -------  ------
+     &   mode_type('AIT'  ,'NUMATKN', 'SRFATKN', T,  T, T, F, F, T, F, conmin,  conmin, conmin),
+     &   mode_type('ACC'  ,'NUMACC ', 'SRFACC ', T,  F, T, F, T, F, F, conmin,  conmin, conmin),
+     &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', T,  F, F, T, F, F, F, conmin,  conmin, conmin)/)
 
+
+      ! Indices for mode masks
+      INTEGER, PARAMETER :: IM_ALL = 1, IM_UF = 2, IM_F = 3, IM_C = 4,
+     &                      IM_ACC = 5, IM_AIT = 6, IM_NUC = 7
+
+      CHARACTER( 5 ), PARAMETER :: CMODE(7) = (/ 'TSP  ','PMU  ','PMF  ','PMC  ',
+     &                                           'PMACC','PMAIT','PMNUC'/)
 
       Real          :: moment0_conc( n_mode )     ! 0th moment concentration
       Real          :: moment2_conc( n_mode )     ! 2nd moment concentration
@@ -845,6 +853,39 @@ C Private variables for loading from and unloading to CGRID array
 
       Contains
 
+
+
+C-----------------------------------------------------------------------
+      Subroutine map_mode_mask( mode_mask_in, mode_mask )
+C     Maps the mode mask indices to a vector of logicals correpsonding
+C     to the mode mask.
+C-----------------------------------------------------------------------
+      IMPLICIT NONE
+
+      integer :: mode_mask_in
+      logical :: mode_mask( n_mode )
+
+      ! Select Correct Mode Mask
+      SELECT CASE ( MODE_MASK_IN )
+         CASE( IM_ALL )
+            MODE_MASK = AEROMODE%ALL_MASK
+         CASE( IM_UF )
+            MODE_MASK = AEROMODE%ULTRAFINE_MASK
+         CASE( IM_F )
+            MODE_MASK = AEROMODE%FINE_MASK
+         CASE( IM_C )
+            MODE_MASK = AEROMODE%COARSE_MASK
+         CASE( IM_ACC )
+            MODE_MASK = AEROMODE%ACCUM_MASK
+         CASE( IM_AIT )
+            MODE_MASK = AEROMODE%AITKEN_MASK
+         CASE( IM_NUC )
+            MODE_MASK = AEROMODE%NUC_MASK
+         CASE DEFAULT
+            MODE_MASK = .FALSE.
+      END SELECT
+
+      End Subroutine map_mode_mask
 
 C-----------------------------------------------------------------------
       Subroutine map_aero()
@@ -1015,7 +1056,6 @@ C Build mapping to CGRID for each species in the master AeroList
             End If
          End Do
       End Do
-      Write(logdev,*)' '
 
       ! Migrate all of the user-requested aerosols from AeroList to
       ! AeroSpc. Begin by allocating all of the new arrays now that we
@@ -1092,7 +1132,6 @@ C Build mapping to CGRID for each species in the master AeroList
          End Do
 
       End Do
-      Write(logdev,*)' '
 
 C Build mapping to CGRID for aero # and surf area variables
       aeronum_map = 0
@@ -1283,7 +1322,6 @@ C compute aeromode_minNum and aeromode_minM2
       End If 
 
       mapped = .True.
-
 
 99901 Format( 'FATAL Error(s) found in the AE namelist used. Check that' 
      &  /' this AE namelist contains the above required data '

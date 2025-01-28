@@ -75,6 +75,7 @@ c...Define Allocatable Apportionment Arrays
       REAL, POINTER :: ISAM  ( :,:,:,:,: )
       REAL, ALLOCATABLE :: AISAM ( :,:,:,:,: )
       REAL, ALLOCATABLE :: TOT_SADEP ( :,:,:,: )
+      REAL, ALLOCATABLE :: TOT_SADEP0( :,:,:,: )
       REAL, ALLOCATABLE :: CONV_SADEP ( :,:,:,: )
       REAL, ALLOCATABLE :: SA_VDEMIS_CONV( :,:,:,:,: ) ! full emissions array mapped to diffused species
       REAL, ALLOCATABLE :: SA_VDEMIS_CONV_OTHER( :,:,:,: ) ! emissions left for 'OTHRTAG'
@@ -145,7 +146,7 @@ C ...Tagging indices for bcon, others, icon
       REAL, PRIVATE, ALLOCATABLE :: BUFF2( :,: )
 
 ! Diffusion module variables
-      REAL, ALLOCATABLE, SAVE :: SA_DDEP( :,:,: )
+      REAL, ALLOCATABLE, SAVE :: SA_DDEP( :,:,: ), SA_DDEP0( :,:,: )
 
 ! Advection module variables
       LOGICAL, ALLOCATABLE, SAVE :: BCON_SPC( : )
@@ -577,7 +578,7 @@ c----------------------------------------------------------
      &  'TOLUENE    ','MXYL       ','OXYL       ','PXYL       ',
      &  'NAPHTHAL   ','ARO1       ','ARO2MN     ','BUTADIENE13',
      &  'ACROLEIN   ','ACETONE    ','MEK        ','MVK        ',
-     &  'MACR       ','SOAALK     ','CO         '/ )
+     &  'MACR       ','SOAALK     ','CO         ' / )
 
         !RACM2_AE6_AQ
         ALLOCATE( ISAM_SPEC_VOC( 7 )%LIST( 38 ) )
@@ -591,7 +592,7 @@ c----------------------------------------------------------
      &          'DCB1   ','DCB2   ','DCB3   ','SOAALK ','CO     '/ )
 
         !CRACMM1_AQ
-        ALLOCATE( ISAM_SPEC_VOC( 8 )%LIST( 96 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 8 )%LIST( 97 ) )
         ISAM_SPEC_VOC( 8 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
      &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
      &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
@@ -611,10 +612,10 @@ c----------------------------------------------------------
      &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
      &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
      &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
-     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1'/ )
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','CO        '/ )
 
         !CRACMM2
-        ALLOCATE( ISAM_SPEC_VOC( 9 )%LIST( 97 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 9 )%LIST( 98 ) )
         ISAM_SPEC_VOC( 9 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
      &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
      &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
@@ -634,10 +635,10 @@ c----------------------------------------------------------
      &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
      &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
      &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
-     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      '/ )
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      ','CO        '/ )
 
         !CRACMM3
-        ALLOCATE( ISAM_SPEC_VOC( 10 )%LIST( 97 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 10 )%LIST( 98 ) )
         ISAM_SPEC_VOC( 10 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
      &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
      &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
@@ -657,7 +658,7 @@ c----------------------------------------------------------
      &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
      &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
      &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
-     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      '/ )
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      ','CO        '/ )
 
         !PRESCRIBE NITRATE SPECIES
         !CB6R3_AE7_AQ

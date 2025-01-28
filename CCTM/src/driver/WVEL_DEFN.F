@@ -55,15 +55,18 @@ C-----------------------------------------------------------------------
 
          IF ( W_VEL ) THEN
 
-            ALLOCATE ( WVEL( NCOLS,NROWS,NLAYS ), STAT = ALLOCSTAT )
+            ALLOCATE ( WVEL( NCOLS,NROWS,NLAYS ), 
+     &                 WY( NLAYS,NCOLS,NROWS ),
+     &                 STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'WVEL memory allocation failed'
                CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
-
+            
             WVEL = 0.0
-
+            WY = 0.0
+         
          END IF
 
          END FUNCTION WVEL_INIT
@@ -100,8 +103,6 @@ C-----------------------------------------------------------------------
                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
 
-            ALLOCATE( WY( NLAYS,NCOLS,NROWS ) )
-            WY = 0.0
       END IF
  
 #ifdef mpas

@@ -138,7 +138,7 @@
                                            ! science submodules
       LOGICAL :: FL_ERR_STOP=.TRUE.        ! Flag to stop run if errors are found.
       LOGICAL :: CKSUM     = .TRUE.        ! flag for cksum on, default = [T]
-      LOGICAL :: END_TIME  = .FALSE.       ! Override default beginning ACON timestamp
+      LOGICAL :: END_TIME  = .FALSE.       ! Override default beginning ACONC timestamp
       LOGICAL :: CTM_MIO_FILE = .FALSE.    ! Flag to write out ascii file that informs MIO 
       CHARACTER( 16 ) :: MIO_INPUTS( 20 )  ! environment variable fnames
       INTEGER :: N_MIO_INPUTS = 0
@@ -215,9 +215,8 @@
 
       ! Emissions Processes
       CHARACTER( MAXLEN_CCTM_APPL ) :: STAGECTRL  = 'STAGECTRL_NML' ! STAGE Deposition Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: MISC_CTRL  = 'MISC_CTRL_NML' ! Emission Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: DESID_CTRL  = 'DESID_CTRL_NML' ! Emission Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: DESID_CHEM_CTRL  = 'DESID_CHEM_CTRL_NML' ! Emission Control Filename
+      CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CTRL  = 'CMAQ_CTRL_NML' ! Emission Control Filename
+      CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CHEM_CTRL  = 'CMAQ_CH_CTRL_NML' ! Emission Control Filename
       INTEGER :: EMLAYS_MX     = 0       ! Emission Layers
       INTEGER :: N_FILE_GR     = 0       ! Number of Gridded Emission Files
       INTEGER :: N_FILE_TR     = 0       ! NUmber of Tracer Emission Files
@@ -345,6 +344,13 @@
  
       IF ( MYPE .EQ. 0 ) VARDEV = OUTDEV
 
+      IF ( MYPE .EQ. 0 ) THEN 
+         CALL LOG_HEADING( OUTDEV, "Environment Variable Report" )
+         CALL LOG_SUBHEADING( OUTDEV, "Grid and High-Level Model Parameters" )
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
+         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
+      END IF
+
        ! Get Logfile Directory
       CALL GET_ENV ( BLDFOLD, 'BLD', BLDFOLD, VARDEV ) 
  
@@ -412,7 +418,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Multiprocess control, output and error checking" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -509,7 +515,7 @@
       !-------------------------------------------------------------------------------------------------------
       IF ( MYPE .EQ. 0 ) THEN
          CALL LOG_SUBHEADING( OUTDEV, "ISAM setting and output options" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -590,7 +596,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Chemistry and Photolysis" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -648,7 +654,7 @@
       
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Aerosols" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -676,7 +682,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Cloud Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -689,7 +695,7 @@
  
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Air-Surface Exchange Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -743,7 +749,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Transport Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -778,7 +784,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Emissions Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -786,9 +792,8 @@
       CALL GET_ENV ( EMLAYS_MX, 'CTM_EMLAYS', EMLAYS_MX, VARDEV )
 
       ! Get Name of Emission Control File
-      CALL GET_ENV ( MISC_CTRL, 'MISC_CTRL_NML', MISC_CTRL, VARDEV )
-      CALL GET_ENV ( DESID_CTRL, 'DESID_CTRL_NML', DESID_CTRL, VARDEV )
-      CALL GET_ENV ( DESID_CHEM_CTRL,'DESID_CHEM_CTRL_NML', DESID_CHEM_CTRL, VARDEV )
+      CALL GET_ENV ( CMAQ_CTRL, 'CMAQ_CTRL_NML', CMAQ_CTRL, VARDEV )
+      CALL GET_ENV ( CMAQ_CHEM_CTRL,'CMAQ_CH_CTRL_NML', CMAQ_CHEM_CTRL, VARDEV )
 
       ! Get number of different Gridded File Emissions Streams
       CALL GET_ENV ( N_FILE_GR, 'N_EMIS_GR', N_FILE_GR, VARDEV )
@@ -892,7 +897,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Process Analysis Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -900,39 +905,41 @@
       CALL GET_ENV ( PROCAN, 'CTM_PROCAN', PROCAN, VARDEV )
        
       ! Get the Beginning and Ending Columns for Process Analysis
-      CALL GET_ENVLIST ( 'PA_BCOL_ECOL', NV, V_LIST2, VARDEV )
-      IF ( NV .LE. 0 ) THEN   
-         PA_BEGCOL = 1; PA_ENDCOL = 0
-      ELSE IF ( NV .EQ. 2 ) THEN
-         READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGCOL
-         READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDCOL
-      ELSE 
-         XMSG = 'Environment variable error for PA_BCOL_ECOL'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
-      END IF
-
-      ! Get the Beginning and Ending Rows for Process Analysis
-      CALL GET_ENVLIST ( 'PA_BROW_EROW', NV, V_LIST2, VARDEV )
-      IF ( NV .LE. 0 ) THEN   
-         PA_BEGROW = 1; PA_ENDROW = 0
-      ELSE IF ( NV .EQ. 2 ) THEN
-         READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGROW
-         READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDROW
-      ELSE 
-         XMSG = 'Environment variable error for PA_BROW_EROW'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
-      END IF
-
-      ! Get the Beginning and Ending Layers for Process Analysis
-      CALL GET_ENVLIST ( 'PA_BLEV_ELEV', NV, V_LIST2, VARDEV )
-      IF ( NV .LE. 0 ) THEN  
-         PA_BEGLEV = 1; PA_ENDLEV = 0
-      ELSE IF ( NV .EQ. 2 ) THEN
-         READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGLEV
-         READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDLEV
-      ELSE 
-         XMSG = 'Environment variable error for PA_BLEV_ELEV'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+      IF ( PROCAN ) THEN
+         CALL GET_ENVLIST ( 'PA_BCOL_ECOL', NV, V_LIST2, VARDEV )
+         IF ( NV .LE. 0 ) THEN   
+            PA_BEGCOL = 1; PA_ENDCOL = 0
+         ELSE IF ( NV .EQ. 2 ) THEN
+            READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGCOL
+            READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDCOL
+         ELSE 
+            XMSG = 'Environment variable error for PA_BCOL_ECOL'
+            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         END IF
+     
+         ! Get the Beginning and Ending Rows for Process Analysis
+         CALL GET_ENVLIST ( 'PA_BROW_EROW', NV, V_LIST2, VARDEV )
+         IF ( NV .LE. 0 ) THEN   
+            PA_BEGROW = 1; PA_ENDROW = 0
+         ELSE IF ( NV .EQ. 2 ) THEN
+            READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGROW
+            READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDROW
+         ELSE 
+            XMSG = 'Environment variable error for PA_BROW_EROW'
+            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         END IF
+     
+         ! Get the Beginning and Ending Layers for Process Analysis
+         CALL GET_ENVLIST ( 'PA_BLEV_ELEV', NV, V_LIST2, VARDEV )
+         IF ( NV .LE. 0 ) THEN  
+            PA_BEGLEV = 1; PA_ENDLEV = 0
+         ELSE IF ( NV .EQ. 2 ) THEN
+            READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGLEV
+            READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDLEV
+         ELSE 
+            XMSG = 'Environment variable error for PA_BLEV_ELEV'
+            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         END IF
       END IF
 
       ! Get the Budget File Name
@@ -953,6 +960,9 @@
 #ifdef twoway
       WRF_V4P = .TRUE.
 #else
+      
+      ! to obtain WRF version information
+      CALL LOG_HEADING( LOGDEV, 'Determine WRF Input Version' )
 
       ! Get environ. variable met_tstep to control meteorology frequency
       CALL GET_ENV ( MET_TSTEP, 'MET_TSTEP', MET_TSTEP, VARDEV)

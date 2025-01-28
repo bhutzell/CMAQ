@@ -49,10 +49,10 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       CHARACTER(  8 ) :: PRESTR  = 'CTM_LOG_'
       CHARACTER( MAXLEN_CTM_LOG ) :: IOLOGEQ
 
-      INTEGER :: IOST, IHEAD
-      INTEGER :: NCMAQ_HEAD
-      INTEGER, PARAMETER :: NHEAD = 200
-      CHARACTER( 90 ) :: CMAQ_HEADER( NHEAD )
+      INTEGER :: IOST, IHEAD, ITOC
+      INTEGER :: NCMAQ_HEAD, NCMAQ_TOC
+      INTEGER, PARAMETER :: NTXT = 200
+      CHARACTER( 90 ) :: CMAQ_HEADER( NTXT ), CMAQ_TOC( NTXT )
       character( 16 ) :: pname = 'SETUP_LOGDEV'
       character(200)  :: xmsg
 
@@ -69,7 +69,7 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       TOTPE = 0
 #endif
       ! Fetch CMAQ Header
-      CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD )
+      CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD, CMAQ_TOC, NCMAQ_TOC )
 
       WRITE ( CMYPE, '(I3.3)' ) MYPE
 
@@ -123,6 +123,10 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       DO IHEAD = 1,NCMAQ_HEAD
           WRITE( LOGDEV, '(A)' ) CMAQ_HEADER( IHEAD )
       END DO
+      DO ITOC = 1,NCMAQ_TOC
+          WRITE( LOGDEV, '(A)' ) CMAQ_TOC( ITOC )
+      END DO
+
       WRITE( LOGDEV, * )
 
       END SUBROUTINE SETUP_LOGDEV 

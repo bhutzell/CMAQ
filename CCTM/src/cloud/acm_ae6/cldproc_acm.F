@@ -65,17 +65,21 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       use CENTRALIZED_IO_MODULE, only : interpolate_var
       use mio_module
+      USE ELMO_DATA, ONLY : L_ELMO, ELMO_WDEP
       USE CONST
 
 #ifdef isam
-      USE SA_DEFN, ONLY: ISAM, NSPC_SA, N_SPCTAG, TOT_SADEP, CONV_SADEP,
-     &                   MAP_SAtoCGR, VNAM_SPCTAG, NTAG_SA, S_SPCTAG, 
-     &                   ITAG, T_SPCTAG
+      USE SA_DEFN, ONLY: ISAM, NSPC_SA, N_SPCTAG, TOT_SADEP, TOT_SADEP0, 
+     &                   CONV_SADEP, MAP_SAtoCGR, VNAM_SPCTAG, NTAG_SA, 
+     &                   S_SPCTAG, ITAG, T_SPCTAG, ISAM_SPEC
+      USE ELMO_DATA, ONLY : ELMO_ISAM_WDEP
 #endif
 
 #ifdef sens
-      USE DDM3D_DEFN, ONLY: NP, NPMAX, SENGRID, SENNUM,
-     &                      S_TOTDEP, S_CONDEP, S_DEPWRT, SEN_PAR
+      USE DDM3D_DEFN, ONLY: NP, NPMAX, SENGRID, SENNUM, 
+     &                      S_TOTDEP, S_TOTDEP0, S_CONDEP, S_DEPWRT, 
+     &                      SEN_PAR
+      USE ELMO_DATA, ONLY : ELMO_DDM_WDEP
 #endif
 
 #ifdef mpas
@@ -147,14 +151,11 @@ C...........Local Variables
       REAL, ALLOCATABLE, SAVE :: FAC     ( :,:,: ) ! conversion factor
       REAL, ALLOCATABLE, SAVE :: CONV_DEP( :,:,: ) ! convective wdep only
       REAL, ALLOCATABLE, SAVE :: TOT_DEP ( :,:,: ) ! total wdep
+      REAL, ALLOCATABLE, SAVE :: TOT_DEP0( :,:,: ) ! total wdep
       REAL, ALLOCATABLE, SAVE :: RESTRANS( :,: )   ! resolved cloud transmissivity
       REAL, ALLOCATABLE, SAVE :: SUBTRANS( :,:,: ) ! subgrid cloud transmissivity
 
       REAL CCMIN
-      character (16), ALLOCATABLE, SAVE :: wdep_spc( : )
-#ifdef sens
-      character (16), ALLOCATABLE, SAVE :: swdep_spc( : )
-#endif
       CHARACTER (20) :: TIME_STAMP               ! this is for mio
 #ifdef mpas
       integer :: year, month, day, hour, minute  ! this is for mpas
@@ -171,6 +172,9 @@ C...........Local Variables
 
 #ifdef isam
       REAL, ALLOCATABLE, SAVE :: BUFF2 ( :,: )
+      INTEGER, ALLOCATABLE, SAVE :: ISAM_WDEP( : )
+      INTEGER :: W
+      CHARACTER( 16 ) :: ISAM_SPECIES
 #endif
 
 C...........EXTERNAL FUNCTIONS
@@ -216,110 +220,11 @@ C...and return
           CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
         END IF
-
-        allocate ( wdep_spc ( N_SPC_WDEP+1+11 ), 
-#ifdef sens
-     &             swdep_spc( NPMAX * (N_SPC_WDEP+1) ),
-#endif
-     &             stat = allocstat )
-        IF ( ALLOCSTAT .NE. 0 ) THEN
-          XMSG = 'Failure allocating WDEP_SPC and/or SWDEP_SPC'
-          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-        END IF
-        WDEP_SPC = ' '
-
-        SPC = 0
-        STRT = 1
-        FINI = N_GC_WDEP
-        DO VAR = STRT, FINI
-           SPC = SPC + 1
-           wdep_spc( VAR ) = GC_WDEP( SPC )
-#ifdef sens
-           DO NP = 1, NPMAX
-              SENNUM = ( SPC - 1 ) * NPMAX + NP
-              swdep_spc( SENNUM ) = TRIM( GC_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
-           END DO
-#endif
-        END DO
-
-        SPC = 0
-        STRT = N_GC_WDEP + 1
-        FINI = N_GC_WDEP + N_AE_WDEP
-        DO VAR = STRT, FINI
-           SPC = SPC + 1
-           wdep_spc ( VAR ) = AE_WDEP( SPC )
-#ifdef sens
-           DO NP = 1, NPMAX
-              SENNUM = ( NPMAX * N_GC_WDEP ) + ( SPC - 1 ) *NPMAX + NP
-              swdep_spc( SENNUM ) = TRIM( AE_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
-           END DO
-#endif
-        END DO
-
-        SPC = 0
-        STRT = N_GC_WDEP + N_AE_WDEP + 1
-        FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP
-        DO VAR = STRT, FINI
-           SPC = SPC + 1
-           wdep_spc ( VAR ) = NR_WDEP( SPC )
-#ifdef sens
-           DO NP = 1, NPMAX
-              SENNUM = NPMAX * ( N_GC_WDEP + N_AE_WDEP ) + ( SPC - 1 ) * NPMAX + NP
-              swdep_spc( SENNUM ) = TRIM( NR_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
-           END DO
-#endif
-        END DO
-
-        SPC = 0
-        STRT = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + 1
-        FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP
-        DO VAR = STRT, FINI
-           SPC = SPC + 1
-           wdep_spc ( VAR ) = TR_WDEP( SPC )
-#ifdef sens
-           DO NP = 1, NPMAX
-              SENNUM = NPMAX * ( N_GC_WDEP + N_AE_WDEP + N_NR_WDEP ) + ( SPC - 1 ) * NPMAX + NP
-              swdep_spc( SENNUM ) = TRIM( TR_WDEP( SPC )( 1:12 ) ) //'_'// SEN_PAR( NP )
-           END DO
-#endif
-        END DO
-        
-        SPC = FINI + 1
-        wdep_spc( SPC ) = 'HPLUS'
-#ifdef sens
-        DO NP = 1, NPMAX
-           SENNUM = NPMAX * ( N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP ) + NP
-           swdep_spc( SENNUM ) = 'HPLUS_' // SEN_PAR( NP )
-        END DO
-#endif
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'PLCL'
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'CLOUD_BOTTOM'
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'PR_CLOUDTOP'
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'NP_CLOUDTOP'
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'RAIN_FLAG'
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'PR_CLDFRAC'
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'NP_CLDFRAC'
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'PR_TRANS'
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'NP_TRANS'
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'RES_TRANS'
-        SPC = SPC + 1
-        wdep_spc( SPC ) = 'CLD_TRANS'
-
-
  
 C...initialize the deposition array before processing clouds
 
         ALLOCATE ( TOT_DEP ( NCOLS,NROWS,N_SPC_WDEP+1 ),
+     &             TOT_DEP0( NCOLS,NROWS,N_SPC_WDEP+1 ),
      &             STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
           XMSG = 'Failure allocating TOT_DEP'
@@ -371,6 +276,8 @@ C...initialize the deposition array before processing clouds
 Ckrt deposition arrays for tagged species.....
         ALLOCATE ( TOT_SADEP ( NCOLS,NROWS,NSPC_SA,NTAG_SA ),
      &            CONV_SADEP ( NCOLS,NROWS,NSPC_SA,NTAG_SA ),
+     &             TOT_SADEP0( NCOLS,NROWS,NSPC_SA,NTAG_SA ),
+     &            ISAM_WDEP  ( N_SPCTAG ),
      &             STAT = ALLOCSTAT )
         IF ( ALLOCSTAT .NE. 0 ) THEN
           XMSG = 'Failure allocating TOT_ or CONV_SADEP'
@@ -383,11 +290,23 @@ Ckrt deposition arrays for tagged species.....
           XMSG = 'Failure allocating BUFF2'
           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
         END IF
+        
+        ISAM_WDEP = 0
+        DO ITAG = 1, N_SPCTAG
+          DO W = 1, N_SPC_WDEP
+            ISAM_SPECIES =  ISAM_SPEC( S_SPCTAG(ITAG),1 )
+            IF ( TRIM( ISAM_SPECIES ) .EQ. CGRID_NAME( MAP_WDEPtoCGRID(W) ) ) THEN
+              ISAM_WDEP( ITAG ) = W
+            END IF
+          END DO
+        END DO
+
 #endif
 
 #ifdef sens
          ALLOCATE ( S_TOTDEP ( NCOLS,NROWS,NPMAX,N_SPC_WDEP+1 ),
-     &             STAT = ALLOCSTAT )
+     &              S_TOTDEP0( NCOLS,NROWS,NPMAX,N_SPC_WDEP+1 ),
+     &              STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
            XMSG = 'Failure allocating S_TOTDEP'
            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -459,6 +378,7 @@ Ckrt deposition arrays for tagged species.....
 
       call interpolate_var ('DENS', mdate, mtime, DENS)  ! kg m-3
       CGRD = CGRID
+
 
 C...convert units on cgrid and pass data to local cgrd array
       DO LAY = 1, NLAYS
@@ -565,6 +485,17 @@ c                 ENDIF
       END DO
 #endif
 
+      ! Store Deposition Accumulation so it can be subtracted out to
+      ! inform ELMO
+      TOT_DEP0 = TOT_DEP + CONV_DEP
+#ifdef isam
+      TOT_SADEP0 = TOT_SADEP + CONV_SADEP
+#endif
+#ifdef sens
+      S_TOTDEP0 = S_TOTDEP + S_CONDEP
+#endif
+
+
 C...compute cloud effects for the resolved clouds and resolved rainwater
 
       CALL RESCLD ( CGRD, JDATE, JTIME, TSTEP,
@@ -574,6 +505,37 @@ C...compute cloud effects for convective (subgrid) clouds
 
       CALL CONVCLD_ACM ( CGRD, JDATE, JTIME, TSTEP,
      &                   CONV_DEP, SUBTRANS )
+
+C...pass deposition flux to ELMO        
+      IF ( L_ELMO ) THEN
+          DO VAR = 1,N_SPC_WDEP 
+              ELMO_WDEP( :,:,MAP_WDEPtoCGRID(VAR) ) = TOT_DEP( :,:,VAR ) 
+     &                 + CONV_DEP( :,:,VAR ) - TOT_DEP0(:,:,VAR )
+          END DO
+
+#ifdef isam
+          DO SPC = 1,N_SPCTAG
+            IF ( ISAM_WDEP(SPC) .GT. 0 ) THEN
+              ELMO_ISAM_WDEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) ) = 
+     &             TOT_SADEP( :,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
+     &           + CONV_SADEP(:,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
+     &           - TOT_SADEP0(:,:,S_SPCTAG(SPC),T_SPCTAG(SPC) )
+            END IF
+          END DO
+#endif          
+#ifdef sens
+          DO NP = 1,NPMAX
+            IF ( L_ELMO ) THEN
+              DO SPC = 1, N_SPC_WDEP
+                 ELMO_DDM_WDEP( :,:,MAP_WDEPtoCGRID(SPC),NP ) = 
+     &                S_TOTDEP(:,:,NP,SPC) + S_CONDEP(:,:,NP,SPC) 
+     &                                     - S_TOTDEP0(:,:,NP,SPC)
+              END DO
+            END IF
+          END DO
+#endif          
+
+      END IF
 
 C...now check to see if it's time to write the deposition file
       WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )
@@ -668,6 +630,7 @@ C...write data to the normal wet deposition file
      &         'Timestep written to', CTM_WET_DEP_1,
      &         'for date and time', NDATE, NTIME
 
+
 #ifdef sens
 C...write data to the sensitivity wet deposition file
 c gas species
@@ -683,6 +646,7 @@ c gas species
             SENNUM = ( SPC - 1 ) * NPMAX + NP
             S_DEPWRT(:,:,SENNUM) = S_TOTDEP( :,:,NP,SPC )
           END DO
+
         END DO
 
         DO SPC = 1, NPMAX * ( N_SPC_WDEP + 1 )
@@ -754,6 +718,7 @@ C...reinitialize deposition array
               BUFF2( COL,ROW ) = TOT_SADEP( COL,ROW,S_SPCTAG( SPC ),T_SPCTAG( SPC ) )
             END DO ! col
           END DO ! row
+
           call mio_fwrite( SA_WD_1, VNAM_SPCTAG( SPC ),
      &                     PNAME, BUFF2, TIME_STAMP )
        END DO ! n_spctag

@@ -114,9 +114,7 @@ C This function is expected to be called only once - at startup
 #ifndef mpas
 C With GRID_NAME (only input) retrieve all horizontal grid parameters from
 C the grid description file pointed to by the GRIDDESC env var:
-            WRITE( LOGDEV, * )
-            CALL LOG_HEADING( LOGDEV, "Retrieve Horizontal Grid" )
-            IF ( .NOT. rDSCGRID ( GRID_NAME,
+            IF ( .NOT. RDSCGRID( GRID_NAME,
      &                           COORD_SYS_NAME, GDTYP_GD, 
      &                           P_ALP_GD, P_BET_GD, P_GAM_GD,
      &                           XCENT_GD, YCENT_GD,

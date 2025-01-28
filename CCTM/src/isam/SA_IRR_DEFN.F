@@ -84,6 +84,7 @@ C***********************************************************************
       INTEGER, ALLOCATABLE :: H2O2_HNO3_PROD_RXNS( : ) ! indices of H2O2 or HNO3 producing reactions
 
       REAL( 8 ), ALLOCATABLE :: H2O2_HNO3_YIELD( : )   ! H2O2 or HNO3 yield for a reaction subset
+      REAL( 8 ) :: VOC_TO_NOX 
        
       INTEGER :: ISAM_LOG        ! Unit number of output log
       INTEGER :: ISAM_JDATE = 0
@@ -136,7 +137,7 @@ C***********************************************************************
        REAL( 8 ), PARAMETER, PRIVATE :: ZERO   = 0.0D0
        REAL( 8 ), PARAMETER, PRIVATE :: CUTOFF = 1.0D-23
        REAL( 8 ), PARAMETER, PRIVATE :: BULK_CUTOFF = ZERO
-       
+
       CONTAINS
         SUBROUTINE SA_IRR_INIT
 
@@ -1523,8 +1524,8 @@ C...Calculate reaction rates and source probabilties
 ! Using H2O2 and HNO3 concentrations
 !              IF ( CONC( H2O2_INDEX )/MAX( 1.0D-30,CONC( HNO3_INDEX ) ) .LT. VOC_NOX_TRANS  ) THEN
 ! Using gross production of H2O2 and HNO3
-
-               IF ( PH2O2_OVER_PHNO3( RK,CONC ) .GT. NOX_VOC_SWITCH  ) THEN
+               VOC_TO_NOX = PH2O2_OVER_PHNO3( RK,CONC )
+               IF ( VOC_TO_NOX .GT. NOX_VOC_SWITCH  ) THEN
 !              IF ( PH2O2_OVER_PHNO3( RK,CONC ) .GT. REAL( VOC_NOX_TRANS,8 )  ) THEN
                   NC = ISAM_NOX_CASE
                ELSE 
@@ -1541,6 +1542,7 @@ C...Calculate reaction rates and source probabilties
             END IF
         ELSE 
             NC = ISAM_CHEM_BIAS
+            VOC_TO_NOX = NOX_VOC_SWITCH
         END IF
         DO NRX = 1, NRXNS
             NR = MAP_REACTANT_CASE( NRX )

@@ -111,11 +111,6 @@ C This function is expected to be called only once - at startup
 
 #ifndef mpas
 
-C get vertical layer definition 
-
-               WRITE( LOGDEV, * )
-               CALL LOG_HEADING( LOGDEV, "Retrieve Vertical Grid" )
-
                call mio_setfile ( MET_CRO_3D )
                NLAYS = mio_nlays
       

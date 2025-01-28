@@ -50,7 +50,6 @@
       LOGICAL :: L_COL(MXVARS3)
       LOGICAL :: L_ROW(MXVARS3)
       LOGICAL :: L_VEXT(MXVARS3)
-
       CONTAINS
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

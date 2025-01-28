@@ -68,7 +68,7 @@ C....................................................................
          INTEGER, PARAMETER :: M3INT  = 4
          INTEGER, PARAMETER :: M3REAL = 5
          INTEGER, PARAMETER :: LATGRD3 = 1
-         integer, parameter :: mxvars3 = 2048
+         integer, parameter :: mxvars3 = 5000
          integer, parameter :: mxlays3 = 100
          integer, parameter :: mxfile3 = 256
          integer            :: nvars3d

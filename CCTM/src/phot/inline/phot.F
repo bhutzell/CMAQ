@@ -125,8 +125,9 @@ C...modules
       USE CLOUD_OPTICS         ! data and routines for optics of cloud hydrometeors
       USE SEAS_STRAT_O3_MIN    ! monthly minimum fraction of ozone column density above Pressure TOP
       USE CENTRALIZED_IO_MODULE, ONLY : LAT, LON, HT
-      USE ELMO_DATA, ONLY : ELMO_AOD_550, ELMO_EXT_550
+      USE ELMO_DATA, ONLY : ELMO_AOD_550, ELMO_EXT_550, ELMO_NO2COL,ELMO_SO2COL, ELMO_HCHOCOL, ELMO_COCOL
       USE MIO_MODULE
+
 #ifdef mpas
       USE COUPLER_MODULE
 #else
@@ -1265,6 +1266,13 @@ C...modules
       ! Store PM Diagnostic AOD and extinction
       ELMO_AOD_550 = TAU_AERO_550
       ELMO_EXT_550 = AERO_EXT_550
+
+      IF ( PHOTDIAG ) THEN
+          ELMO_NO2COL  = NO2_COLUMN
+          ELMO_SO2COL  = SO2_COLUMN
+          ELMO_HCHOCOL = HCHO_COLUMN
+          ELMO_COCOL   = CO_COLUMN
+      END IF
 
 !...report on whether stratospheric ozone column satisfies climatological minimums
       IF( N_TROPO_O3_TOGGLE .GT. 0 )THEN
