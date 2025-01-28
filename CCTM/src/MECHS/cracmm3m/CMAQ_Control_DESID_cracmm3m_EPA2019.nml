@@ -146,7 +146,7 @@
    'EVERYWHERE', 'ALL'        ,'VROCP2OXY2','VROCP2OXY2' ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'VROCP4ALK' ,'VROCP4ALK'  ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'VROCP5OXY1','VROCP5OXY1' ,'GAS'  ,1   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'        ,'CH3I'      ,'CH3I'       ,'GAS'  ,0.03,'UNIT','a',   
+   'EVERYWHERE', 'ALL'        ,'CH3I'      ,'CH3I'       ,'GAS'  ,0   ,'UNIT','a',   
 
    ! Marine Halogen Chemistry
    'EVERYWHERE', 'MGEM'         ,'HOI'    ,'HOI'         ,'GAS'  ,1.  ,'UNIT','a',
