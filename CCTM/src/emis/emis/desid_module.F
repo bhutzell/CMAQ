@@ -1347,7 +1347,7 @@ C-----------------------------------------------------------------------
            WRITE( LOGDEV, '(/,5x,A,/,5x,A,A,A,A/,5x,A,ES10.3,A,A,/,5x,A1,I3,A1,I3,A1,I2,A2)' ),
      &       'ERROR: At least one invalid negative emission rate has been ',
      &       'detected for CMAQ species ',TRIM(DIFF_SPC( ISPC )),'. The ', 
-     &       'most negative emission','rate is ',EMIS_MIN,' at gridcell',
+     &       'most negative emission','rate is ',EMIS_MIN,' at domain-wide gridcell',
      &       ' (COL,ROW,LAY): ','(',JCOL,',',JROW,',',ILAY,').'
 
            STAT = 1
