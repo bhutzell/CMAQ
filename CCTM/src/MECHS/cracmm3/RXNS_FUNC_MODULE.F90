@@ -356,8 +356,8 @@
 
                 IF ( SEAWATER (NCELL) .GT. 0.001D0 ) THEN
 !  Reaction Label HAL_Ozone       
-                   RKI( NCELL,  428) = SEAWATER (NCELL) *  SFACT * HALOGEN_FALLOFF( BLKPRES( NCELL ),   6.7006D-11,   1.0743D+01,  & 
-     &                                                           3.4153D-08,  -6.7130D-01,         2.0000D-06 )
+                   RKI( NCELL,  428) = SEAWATER (NCELL) *  SFACT * HALOGEN_FALLOFF( BLKPRES( NCELL ),   1.0650D-12,   1.3906D+01,  & 
+     &                                                           1.4422D-08,   3.0844D+00,         8.4000D-07 )
                 ELSE
                    RKI( NCELL,  428) = 0.0D0 
                 END IF
@@ -409,7 +409,7 @@
      &                                                 4.2000D-34,   2.6600D+03,   2.9400D-54,  & 
      &                                                 3.1200D+03 )
 !  Reaction Label R047            
-             RKI( NCELL,   54) =  CFACT * ARRHENUIS_T03( INV_TEMP,  1.8000D-12,   0.0000D+00 )
+             RKI( NCELL,   54) =  CFACT * ARRHENUIS_T03( INV_TEMP,  1.8000D-12,  -0.0000D+00 )
 !  Reaction Label R048            
              RKI( NCELL,   55) =  CFACT * FALLOFF_T10( INV_TEMP,  TEMPOT300,  CAIR, & 
      &                                                 9.1000D-32,   0.0000D+00,  -1.5000D+00,  & 
@@ -588,9 +588,9 @@
 !  Reaction Label R105            
              RKI( NCELL,  124) =  CFACT * ARRHENUIS_T03( INV_TEMP,  6.7500D-12,   4.0500D+02 )
 !  Reaction Label R106            
-             RKI( NCELL,  125) =  CFACT * ARRHENUIS_T03( INV_TEMP,  4.6500D-11,   0.0000D+00 )
+             RKI( NCELL,  125) =  CFACT * ARRHENUIS_T03( INV_TEMP,  4.6500D-11,  -0.0000D+00 )
 !  Reaction Label R108            
-             RKI( NCELL,  126) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.0500D-10,   0.0000D+00 )
+             RKI( NCELL,  126) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.0500D-10,  -0.0000D+00 )
 !  Reaction Label R109            
              RKI( NCELL,  127) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.8500D-12,  -3.4500D+02 )
 !  Reaction Label R110            
@@ -1759,7 +1759,7 @@
              INDEX_EBZP        = IOLD2NEW( INDEX_EBZP       , 1 )
              INDEX_ISO         = IOLD2NEW( INDEX_ISO        , 1 )
              INDEX_ISON        = IOLD2NEW( INDEX_ISON       , 1 )
-             INDEX_INO2        = IOLD2NEW( INDEX_INO2       , 1 )
+             INDEX_ISONP       = IOLD2NEW( INDEX_ISONP      , 1 )
              INDEX_ISOP        = IOLD2NEW( INDEX_ISOP       , 1 )
              INDEX_ISHP        = IOLD2NEW( INDEX_ISHP       , 1 )
              INDEX_IEPOX       = IOLD2NEW( INDEX_IEPOX      , 1 )
