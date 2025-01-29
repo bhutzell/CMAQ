@@ -315,43 +315,47 @@ CMPST =
 !-- Inorganic Composites --!
 'FORMALD'     , 'Formaldehyde Concentration', 
                 'ppmV', 'GAS', 
-                'FORM', 
+                'HCHO', 
 
 'ISOPRENE'    , 'Isoprene Concentration', 
                 'ppmV', 'GAS', 
-                'ISOP', 
+                'ISOPRENE', 
 
 'ACETALD'     , 'Acetaldehyde Concentration', 
                 'ppmV', 'GAS', 
-                'ALD2', 
+                'CCHO', 
 
 'ACETYLENE'   , 'Acetylene Concentration', 
                 'ppmV', 'GAS', 
-                'ETHY', 
+                'ACETYLENE', 
 
 'ETHANE'      , 'Ethane Concentration', 
                 'ppmV', 'GAS', 
-                'ETHA', 
+                'ALK1', 
 
 'ETHENE'      , 'Ethene Concentration', 
                 'ppmV', 'GAS', 
-                'ETH', 
+                'ETHENE', 
+
+'H2O2'        , 'Hydrogen Peroxide Concentration', 
+                'ppmV', 'GAS', 
+                'HO2H', 
 
 'TOLUENE'     , 'Toluene Concentration', 
                 'ppmV', 'GAS', 
-                'TOL', 
+                'TOLUENE', 
 
 'XYLENES'     , 'Xylenes Concentration', 
                 'ppmV', 'GAS', 
-                'XYLMN', 
+                'MXYL + OXYL + PXYL', 
 
 'NAPHTHAL'    , 'Naphthalene Concentration', 
                 'ppmV', 'GAS', 
-                'NAPH', 
+                'NAPHTHAL', 
 
 'TERPENES'    , 'Monoterpene Concentration', 
                 'ppmV', 'GAS', 
-                'TERP', 
+                'TERP + APIN', 
 
 'HOX'         , 'HOx Concentration', 
                 'ppmV', 'GAS', 
@@ -363,11 +367,11 @@ CMPST =
 
 'NTR'         , 'Organic Nitrates', 
                 'ppmV', 'GAS', 
-                'NTR1 + NTR2 + INTR', 
+                'ISOPND + ISOPNB + NIT1 + NISOPOOH + MVKN + MACRN + ETHLN + RNO3I + PROPNN + 2.0*ISOPNN + RNO3 + MTNO3', 
 
 'PANS'        , 'Peroxy-Acetyl Nitrates', 
                 'ppmV', 'GAS', 
-                'PAN + PANX + OPAN', 
+                'PAN + PAN2 + PBZN + MAPAN + IMAPAN', 
 
 'HNO3_UGM3'   , 'Gas-Phase Nitric Acid',
                 'ug m-3', 'GAS', 
@@ -384,7 +388,7 @@ CMPST =
 !-- Organic Composites --!
 'VOC'         , 'Volatile Organic Compound (VOC) Concentration',
                 'ppmC', 'GAS',
-                'PAR + 2.0*ETHA + 3.0*PRPA + MEOH + 2.0*ETH + 2.0*ETOH + 2.0*OLE + 3.0*ACET + 7.0*TOL + 8.0*XYLMN + 6.0*BENZENE + FORM + 3.0*GLY + 4.0*KET + 2.0*ETHY + 2.0*ALD2 + 4.0*IOLE + 2.0*ALDX + 5.0*ISOP + 10.0*TERP + 10.0*NAPH + 10.0*APIN',
+                '3.*ACETONE + 2.*ACETYLENE + 3.*ACROLEIN + 4.*BACL + 4.*BUTADIENE13 + 2.*CCHO + 7.*CRES + 2.*ETHENE + 2.*ETOH + 2.*GLY + HCHO + 4.*MEK+ MEOH + 3.*MGLY + 4.*MVK + 5.*OLE1 + 5.*OLE2 + 6.*PRD2 + 3.*PROPENE + 3.*RCHO + 6.0*RNO3 + 2.*ALK1 + 3.*ALK2 + 4.*ALK3 + 5.*ALK4 + 8.*ALK5 + 3.*RCOOH + 2.*CCOOH + HCOOH + 10.*TERPENES + 5.*ISOPRENE + 15.*SESQ + 6.*BENZENE + 7.*TOLUENE + 8.*XYLENES + 10.*NAPHTHAL + 9.*TMBENZ124'  \
 
 !---------------------------------!
 !**** Particle Concentrations ****!
@@ -773,7 +777,7 @@ CMPST =
 !-- Nitrate --!
 'NOY'         , 'NOy Concentration', 
                 'ppmV', 'TSP', 
-                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + PNA + CRON + CLNO2 + CLNO3 + PANS + NTR', 
+                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + HNO4 + ANO3 + PANS + NTR + CLNO + CLONO + CLNO2 + CLONO2', 
              
 'PMF_TNO3'    , 'Fine-Mode Nitrate plus Nitric Acid', 
                 'ug m-3', 'FINE', 

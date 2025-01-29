@@ -531,10 +531,6 @@ CMPST =
                 'ng m-3', 'COARSE',
                 'AAS',
 
-'PMC_HBNPY'    , 'Coarse-Mode Benzo-a-pyrene',
-                'ng m-3', 'COARSE',
-                'ABENAPY',
-
 'PMC_HDIESEL' , 'Coarse-Mode Diesel-sourced PM',
                 'ng m-3', 'COARSE',
                 'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
@@ -1073,7 +1069,7 @@ CMPST =
                 'ng m-3', 'PM10',
                 'AAS',
 
-'PM10_HBNPY'  , 'Coarse-Mode Benzo-a-pyrene',
+'PM10_HBNPY'  , 'PM10 Benzo-a-pyrene',
                 'ng m-3', 'PM10',
                 'ABENAPY',
 
