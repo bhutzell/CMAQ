@@ -139,6 +139,9 @@
 !      +DELTA_C means the reaction has a net loss of carbon (carbon needs to be added
 !      to make the number carbons in the products match the number of carbons in
 !      the reactants).
+! 09-25-24 G. Sarwar
+!    INO2 is renamed to ISONP 
+!    Condensed halogen chemistry (HAL_OZONE) is updated using hemispheric CMAQ results with CRACMM2
 !------------------------------------------------------------------------------
 CRACMM3
 
@@ -147,14 +150,6 @@ DELTA_SI;
 DELTA_N;
 DELTA_C;
 END ELIMINATE
-
-
-
-
-
-
-
-
 
 
 
@@ -276,14 +271,14 @@ REACTIONS[CM] =
 <ROCARO51> XYL + HO = 0.830*XYLP + 0.170*CSL + 0.170*HO2  
                     - 0.1700*DELTA_C # 2.33E-11;                    
 <ROCARO61> EBZ + HO = 0.820*EBZP + 0.180*CSL + 0.180*HO2  
-                    - 0.1800*DELTA_C # 7.00E-12;                    
-<ROCARO61a> EBZ + NO3 = EBZP + HNO3 # 5.70E-16;
+                    - 0.1800*DELTA_C # 7.00E-12;      
+<ROCARO61a> EBZ + NO3 = EBZP + HNO3 # 5.70E-16;		                  
 !Isoprene AMORE mechanism
 <RAM01> ISO + O3 = 0.250*HO + 0.250*HO2 + 0.400*MO2 + 0.018*ACO3 
                  + 0.100*MACP + 0.090*H2O2 + 0.220*CO + HCHO 
                  + 0.300*MACR + 0.140*MVK + 0.280*ORA1 + 0.153*OLT  
                  + 0.4450*DELTA_C # 1.58E-14 @ 2000;                 
-<RAM02> ISO + NO3 = 0.400*NO2 + 0.045*ISON + 0.350*HCHO + 0.555*INO2 
+<RAM02> ISO + NO3 = 0.400*NO2 + 0.045*ISON + 0.350*HCHO + 0.555*ISONP 
                   + 0.260*MVK + 0.028*MACR  + 0.4980*DELTA_C 
                   # 2.95E-12 @ 450;                  
 <RAM03> ISO + HO = ISOP + 0.250*HCHO + 0.030*MACR + 0.050*MGLY  
@@ -296,9 +291,9 @@ REACTIONS[CM] =
 <RAM07> ISHP + HO = 0.040*MGLY + 0.020*GLY + 0.130*MVK + 0.440*IEPOX 
                   + 0.110*ACO3 + 0.030*MACR + 2.000*HO + 0.340*HO2 
                   + 0.140*IPX + CO  + 0.0800*DELTA_C # 2.97E-11 @ -390;                  
-<RAM08> INO2 + HO2 = 0.450*HO + 0.950*INALD + 0.020*IPX  
+<RAM08> ISONP + HO2 = 0.450*HO + 0.950*INALD + 0.020*IPX  
                    + 0.0500*DELTA_N + 0.1500*DELTA_C # 3.14E-11 @ -580;                   
-<RAM09> INO2 + NO = 0.150*MVK + 0.650*INALD + 0.050*ISON + 0.200*HCHO 
+<RAM09> ISONP + NO = 0.150*MVK + 0.650*INALD + 0.050*ISON + 0.200*HCHO 
                   + 1.300*NO2  + 0.7000*DELTA_C # 9.42E-12 @ -580;                  
 <RAM10> ISON + HO = HO + 0.350*INALD + 0.170*IEPOX + 0.650*NO2  
                   + 2.4000*DELTA_C # 2.4E-11 @ -390;                  
@@ -995,8 +990,8 @@ REACTIONS[CM] =
 <HET_NO3> NO3 = HNO3 # 1.0~<HETERO_NO3>;
 
 ! Simplified ozone loss from oceanic halogens excluding chlorine
+<HAL_Ozone> O3 = %H # 1.0650E-12@-13.9058 & 1.4422E-08@-3.0844 & 8.4E-7;
 
-<HAL_Ozone> O3 = %H # 6.7006E-11@-10.7435 & 3.4153E-08@0.6713 & 2.0E-6;
 <HET_IEPOX> IEPOX = IEPOXP  + 5.0000*DELTA_C # 1.0~<HETERO_IEPOX>;
 <HET_ISO3TET> IEPOXP = AISO3NOSJ  - 5.0000*DELTA_C 
                      # 1.0~<HETERO_ISO3NOSJ>;                     

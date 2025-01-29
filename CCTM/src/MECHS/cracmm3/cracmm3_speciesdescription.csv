@@ -62,7 +62,7 @@ HONO,Nitrous acid
 IEPOX,isoprene epoxydiols 
 IEPOXP,IEPOX intermediate (tracking species)
 INALD,Isoprene nitrates
-INO2,Isoprene nitrate-derived peroxy radicals
+ISONP,Isoprene nitrate-derived peroxy radicals
 IPX,Isoprene tetrafunctional compounds
 ISHP,Beta-hydroxy hydroperoxides from ISOP+HO2
 ISO,Isoprene 
