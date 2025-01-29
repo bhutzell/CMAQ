@@ -160,12 +160,13 @@
 CRACMM3M
 
 ELIMINATE = 
-DELTA_CL;
 DELTA_SI;
 DELTA_I;
 DELTA_N;
 DELTA_C;
 END ELIMINATE
+
+
 
 
 
@@ -1447,7 +1448,7 @@ REACTIONS[CM] =
 
 <CLT31> CLO + CLO = CL2O2  # 1.9E-32^-3.6@0.0 &   3.7E-12^-1.6@0.0 
                   & 0.6;                  
-<CLT32> CL2O2 = 2.000*CLO  # 2.16E-27 @ -8537.0 *E<CLT31>;
+<CLT32> CL2O2 = 2.000*CLO # 2.16E-27 @ -8537.0 *E<CLT31>;
 <CLT35> OCLO + NO = CLO + NO2 # 1.10E-13 @ -350;
 <CLT36> HO + CL2 = CL + HOCL # 2.60E-12 @ 1100;
 <CLT37> HO + CLO = HCL # 6.00E-13 @ -230;
@@ -1778,19 +1779,19 @@ REACTIONS[CM] =
                      + 4.2105*DELTA_C # 3.25E-12 @ 114;				                     
 <CLOR14> CLO + APIP2 = 0.820*HO + 0.820*CLOO + 0.180*HCL + HOM 
                      # 3.25E-12 @ 114;                     
-<CLOR15> CLO + APINP1 = 2.000*CLOO + 0.6045*PINAL + 0.154*ALD 
-                      + 0.007*KET + 0.007*HCHO + 0.1645*HO2  
-                      - 1.0000*DELTA_CL + 1.0000*DELTA_N 
-                      + 3.4510*DELTA_C # 3.25E-12 @ 114;                      
+<CLOR15> CLO + APINP1 = CLOO + 0.6955*NO2 + 0.2345*TRPN + 0.070*ONIT 
+                      + 0.6045*PINAL + 0.154*ALD + 0.007*KET 
+                      + 0.007*HCHO + 0.1645*HO2  + 0.8260*DELTA_C 
+                      # 3.25E-12 @ 114;                      
 <CLOR16> CLO + APINP2 = 0.820*CLOO + 0.820*HO + 0.180*HCL + HOM  
                       + 1.0000*DELTA_N # 3.25E-12 @ 114;                      
 <CLOR17> CLO + LIMP1 = 0.770*HO2 + CLOO + 0.770*LIMAL + 0.430*HCHO  
                      + 1.8700*DELTA_C # 3.25E-12 @ 114;				                     
 <CLOR18> CLO + LIMP2 = 0.770*HO + 0.770*CLOO + 0.230*HCL + HOM 
-                     # 3.25E-12 @ 114;				                     
-<CLOR19> CLO + LIMNP1 = 2.000*CLOO + 0.430*LIMAL + 0.500*HO2  
-                      - 1.0000*DELTA_CL + 1.0000*DELTA_N 
-                      + 5.7000*DELTA_C # 3.25E-12 @ 114;                      
+                     # 3.25E-12 @ 114;				                     		                     
+<CLOR19> CLO + LIMNP1 = CLOO + 0.570*TRPN + 0.070*ONIT + 0.360*NO2 
+                      + 0.430*LIMAL + 0.500*HO2  - 0.2800*DELTA_C 
+                      # 3.25E-12 @ 114;                      
 <CLOR20> CLO + LIMNP2 = 0.770*CLOO + 0.770*HO + 0.230*HCL + HOM  
                       + 1.0000*DELTA_N # 3.25E-12 @ 114;                      
 <CLOR21> CLO + PINALP = CLOO + 0.640*HOM  + 3.6000*DELTA_C 
@@ -1822,19 +1823,17 @@ REACTIONS[CM] =
 <CLOR35> CLO + MCTP = MCTO + CLOO # 3.25E-12 @ 114;
 <CLOR36> CLO + ORAP = CLOO + GLY + HO2 # 3.25E-12 @ 114;
 <CLOR37> CLO + OLNN = CLOO + HO2 + ONIT  - 1.0000*DELTA_C 
+                    # 3.25E-12 @ 114;                    		    			                    
+<CLOR38> CLO + OLND = CLOO + NO2 + 0.287*HCHO + 1.240*ALD + 0.464*KET  
+                    - 3.3270*DELTA_C # 3.25E-12 @ 114;                    
+<CLOR39> CLO + ADCN = CLOO + NO2 + GLY + OP2  + 2.0000*DELTA_C 
                     # 3.25E-12 @ 114;                    
-<CLOR38> CLO + OLND = 2.000*CLOO + 0.287*HCHO + 1.240*ALD + 0.464*KET  
-                    - 1.0000*DELTA_CL + 1.0000*DELTA_N 
-                    - 3.3270*DELTA_C # 3.25E-12 @ 114;				                    
-<CLOR39> CLO + ADCN = 2.000*CLOO + GLY + OP2  - 1.0000*DELTA_CL 
-                    + 1.0000*DELTA_N + 2.0000*DELTA_C # 3.25E-12 @ 114;                    
 <CLOR40> CLO + XO2 = CLOO # 3.25E-12 @ 114;
 <CLOR41> CLO + BDE13P = 0.968*HO2 + CLOO + 0.895*ACRO + 0.895*HCHO 
                       + 0.072*FURAN  + 0.0600*DELTA_C # 3.25E-12 @ 114;                      
 <CLOR42> CLO + FURANO2 = CLOO + 0.920*FURANONE + 0.750*HO2 + 0.170*MO2  
                        + 1.1500*DELTA_C # 3.25E-12 @ 114;                       
-<CLOR43> CLO + SESQNRO2 = VROCP3OXY2 + 2.000*CLOO  - 1.0000*DELTA_CL 
-                        + 1.0000*DELTA_N + 4.0000*DELTA_C 
+<CLOR43> CLO + SESQNRO2 = CLOO + VROCP3OXY2 + NO2  + 4.0000*DELTA_C 
                         # 3.25E-12 @ 114;				                        
 <CLOR44> CLO + SESQRO2 = 0.247*VROCP1OXY3 + 0.753*VROCP3OXY2 
                        + 0.753*CLOO + 0.247*HCL  + 4.0000*DELTA_C 
@@ -2030,8 +2029,8 @@ REACTIONS[CM] =
 <IT03> I2 + NO3 = I + INO3 # 1.50E-12;
 <IT04> I + O3 = IO # 2.10E-11 @ 830;
 <IT05> I + HO2 = HI # 1.50E-11 @ 1090;
-<IT06> I + NO = INO  # 1.8E-32^-1.0 &   1.7E-11^0.0 & 0.60 & 1.0;
-<IT07> I + NO2 = INO2  # 3.0E-31^-1.0 &   6.6E-11^0.00 & 0.6 & 1.0;
+<IT06> I + NO = INO # 1.8E-32^-1.0 &   1.7E-11^0.0 & 0.60 & 1.0;
+<IT07> I + NO2 = INO2 # 3.0E-31^-1.0 &   6.6E-11^0.00 & 0.6 & 1.0;
 <IT09> I + INO3 = I2 + NO3 # 9.10E-11 @ 146;
 <IT10> INO2 = I + NO2 # 9.94E17 @ 11859;
 <IT11> INO3 = IO + NO2 # 2.10E+15 @ 13670;
@@ -2042,7 +2041,7 @@ REACTIONS[CM] =
 <IT20> IO + HO2 = HOI # 1.40E-11 @ -540;
 <IT21> IO + NO = I + NO2 # 8.60E-12 @ -230;
 <IT22> OIO + NO = IO + NO2 # 1.10E-12 @ -542;
-<IT23> IO + NO2 = INO3  # 7.7E-31^-3.5 &   7.7E-12^-1.5 & 0.60 & 1.0;
+<IT23> IO + NO2 = INO3 # 7.7E-31^-3.5 &   7.7E-12^-1.5 & 0.60 & 1.0;
 <IT25> IO + IO = 0.640*I + 0.400*OIO + 0.480*I2O2 # 1.50E-11 @ -500;
 <IT30> I2O2 = OIO + I # 2.50E+14 @ 9770;
 <IT33> HOI + NO3 = IO + HNO3 # 2.7E-12 ^ -2.66;

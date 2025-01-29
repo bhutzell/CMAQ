@@ -230,8 +230,8 @@ GC_SPECIES_DATA =
 'CHBR2CL'       ,208.3  ,''      ,-1     ,''     ,-1     ,'VD_MB2C'           , 1   ,'MB2C'           , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Dibromochloromethane,E,DTXSID1020300,ClC(Br)Br
 'CHBRCL2'       ,163.9  ,''      ,-1     ,''     ,-1     ,'VD_MBC2'           , 1   ,'MBC2'           , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Bromodichloromethane,E,DTXSID1020198,ClC(Cl)Br
 'CH2BRCL'       ,129.4  ,''      ,-1     ,''     ,-1     ,'VD_MBC'            , 1   ,'MBC'            , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Bromochloromethane,E,DTXSID4021503,ClCBr
-'NO2PIJ'        , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''   ,''    ,'Yes',!Dioxidonitrogen, L, NA,[N+](=O)=O
-'NO2PK'         , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''    ,''   ,'Yes',!Dioxidonitrogen, L, NA, [N+](=O)=O
+'NO2PIJ'        , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''   ,''    ,'Yes',!Dioxidonitrogen, E, NA,[N+](=O)=O
+'NO2PK'         , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''    ,''   ,'Yes',!Dioxidonitrogen, E, NA, [N+](=O)=O
 'I2O3'          ,301.8  ,''      ,-1     ,''     ,-1     ,'VD_I2O3'           , 1   ,'I2O3'           , 1  ,''             ,''        ,'Yes' ,''    ,''   ,'Yes',!Diiodine trioxide,E,NA,O=IOI(=O)
 'I2O4'          ,317.8  ,''      ,-1     ,''     ,-1     ,'VD_I2O4'           , 1   ,'I2O4'           , 1  ,''             ,''        ,'Yes' ,''    ,''   ,'Yes',!Diiodine Tetroxide,E,NA,O=IOI(=O)=O
 /

@@ -294,7 +294,7 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
        ! Associated with ae6i                                                                
      & spcs_list_type('AMTNO3  ',F,T,F, cm_set, 1400.0, 'MTNO3  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! Monoterpene Nitrate SOA
      & spcs_list_type('AISOPNN ',F,T,F, cm_set, 1400.0, 'ISOPNN ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.32), ! Isoprene Nitrate SOA
-     & spcs_list_type('AMTHYD  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), !                          #50
+     & spcs_list_type('AMTHYD  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.07), !                         #50
      & spcs_list_type('AIETET  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! Iso. Tetrol SOA         
      & spcs_list_type('AIEOS   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.30), ! Iso. Organosulfate SOA  
      & spcs_list_type('ADIM    ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), !
@@ -648,6 +648,7 @@ C Required species
       Character( 16 ), Private, Parameter :: req_soil   = 'ASOIL'
       Character( 16 ), Private, Parameter :: req_cors   = 'ACORS'
       Character( 16 ), Private, Parameter :: req_seacat = 'ASEACAT'
+      Character( 16 ), Private, Parameter :: req_seast  = 'ASEAST'
 
 C Indices of required species
       Integer :: aso4_idx
@@ -667,6 +668,7 @@ C Indices of required species
       Integer :: asoil_idx
       Integer :: acors_idx
       Integer :: aseacat_idx
+      Integer :: aseast_idx
 
 C Flag if optional species present
       Logical :: ae6isoa = .False.
@@ -682,7 +684,6 @@ C Optional Species
       Character( 16 ), Private, Parameter :: req_imos   = 'AIMOS'
       Character( 16 ), Private, Parameter :: req_phgj   = 'APHGJ'
       Character( 16 ), Private, Parameter :: req_orgh2o = 'AORGH2O'
-      Character( 16 ), Private, Parameter :: req_seast  = 'ASEAST'
       Character( 16 ), Private, Parameter :: req_br     = 'ABR' 
       Character( 16 ), Private, Parameter :: req_so4aqh2o2 = 'ASO4AQH2O2'
       Character( 16 ), Private, Parameter :: req_so4aqo3   = 'ASO4AQO3'
@@ -710,9 +711,7 @@ C Indices of Optional species
       Integer :: aimos_idx  = 0
       Integer :: aphgj_idx  = 0
       Integer :: aorgh2o_idx= 0
-      Integer :: aseast_idx = 0
       Integer :: abr_idx    = 0
-
 C Indices of Optional sulfur tracking species
       Integer :: aso4aqh2o2_idx = 0
       Integer :: aso4aqo3_idx   = 0
@@ -1161,6 +1160,7 @@ C Find indices of required species
       aseacat_idx = findAero( req_seacat, .True. )
       apoc_idx    = findAero( req_poc,    .True. )
       apncom_idx  = findAero( req_ncom,   .True. )
+      aseast_idx  = findAero( req_seast,  .True. )
 
       If ( ( Index( mechname, 'SAPRC07TIC_AE6I' ) .Gt. 0 ) .OR.
      &     ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 )  ) Then
@@ -1185,16 +1185,16 @@ C Find indices of required species
          aseast_idx     = findAero( req_seast,     .True. )	  
       Else
 	 aseast_idx = 0
-      End If
-
-       If ( (Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) .OR.    
-     &       Index( mechname, 'CRACMM3M'      ) .Gt. 0 ) Then          
+      End If     
+      
+      If ( (Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) .OR.    
+     &      Index( mechname, 'CRACMM3M'      ) .Gt. 0 ) Then          
          abr_idx     = findAero( req_br,     .True. )  
          marine = .True.
       Else
          abr_idx     = 0
          marine = .False.
-      End If
+      End If      
 
       aphgj_idx = findAero( req_phgj,  .False. )
       If ( aphgj_idx .Gt. 0 ) Then
