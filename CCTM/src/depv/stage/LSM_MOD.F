@@ -428,11 +428,10 @@ C-------------------------------------------------------------------------------
 
       ! Retrieve the Name of the STAGE Control File
             IF ( STAGECTRL .EQ. "STAGECTRL_NML" ) THEN
-               WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A)"),
-     &           'You have chosen not to indicate the location of an',
-     &           'STAGE Control namelist file. Default settings ',
-     &           'will be assumed.'
-               RETURN
+            XMSG = 'You have chosen not to indicate the location of a ' //
+     &             'STAGE deposition Control namelist file. This file ' //
+     &             'is required by the STAGE dry deposition module.'
+               CALL M3EXIT( 'STAGE_LU_MAPPER',0,0,XMSG,1 )
             END IF
 
       ! Open STAGE Control Namelist File

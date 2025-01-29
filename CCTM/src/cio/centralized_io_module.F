@@ -5048,6 +5048,9 @@ C Read the various categories of normalized emissions
      &              F2_NH4     ( ncols,nrows,e2c_cats ),
      &              STAT=STAT )
 
+          F1_NH4 = 0.0
+          F2_NH4 = 0.0
+
           if ( MEDC_AVAIL ) then
              call subhfile ( INIT_MEDC_1, gxoff, gyoff,
      &                       startcol, endcol, startrow, endrow )
