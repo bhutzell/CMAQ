@@ -381,21 +381,6 @@ c..Load ICs
                   END IF
                END DO
 
-               IF(CALL_DEG)THEN ! INITIALIZE degradation routines
-
-                  YCCELL = 0.0D0
-                  DO S = 1, MODEL_SPECIES
-                     YCCELL( S ) = REAL( CGRID(C,R,L,S), 8)
-                  END DO
-                  CALL INIT_DEGRADE(YCCELL,TA(C,R,L),DENS(C,R,L),PRES(C,R,L),QV(C,R,L),RJIN(NCELL,:),
-     &                              JDATE, JTIME)
-
-#ifdef isam
-                  CALL SA_DEGRADE_EXTRACT( C,R,L,DENS(C,R,L) )
-#endif
-               END IF
-
-c..Set physical quantities
                TEMP( NCELL )     = REAL( TA( C,R,L ), 8)
                DENSITY( NCELL )  = REAL( DENS( C,R,L ), 8)
 !                PRESCELL( NCELL ) = REAL( PRES( C,R,L ), 8)
@@ -413,6 +398,21 @@ c..Get rate constants
                CALL CALC_RCONST( TEMP, ATMPRES, H2O, RJIN, HET, LSUNLIGHT, SEAWATER, RKI_SAV, NCELL )
                FORALL( NPH = 1:NRXNS )RKI( NPH ) = RKI_SAV( NCELL, NPH )
 
+               IF(CALL_DEG)THEN ! INITIALIZE degradation routines
+
+                  YCCELL = 0.0D0
+                  DO S = 1, MODEL_SPECIES
+                     YCCELL( S ) = REAL( CGRID(C,R,L,S), 8)
+                  END DO
+                  CALL INIT_DEGRADE(YCCELL,TA(C,R,L),DENS(C,R,L),PRES(C,R,L),QV(C,R,L),RJIN(NCELL,:),
+     &                              JDATE, JTIME)
+
+#ifdef isam
+                  CALL SA_DEGRADE_EXTRACT( C,R,L,DENS(C,R,L) )
+#endif
+               END IF
+
+c..Set physical quantities
 #ifdef isam
 #if defined(isam) || defined(verbose_isam)
 C...For diagnosing IRR calculations in log files
