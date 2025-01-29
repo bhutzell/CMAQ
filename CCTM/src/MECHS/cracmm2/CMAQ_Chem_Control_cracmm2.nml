@@ -876,7 +876,7 @@ CMPST =
                 'ug m-3', 'FINE', 
                 'AORGC',
 
-'PMF_PRTGLY'  , 'Fine-Mode SOA from glyoxal and methylglyoxal particles',
+'PMF_PRTGLY'  , 'Fine-Mode SOA from glyoxal and methylglyoxal formed in the aqueous particle phase',
                 'ug m-3', 'FINE', 
                 'AGLY',
 
