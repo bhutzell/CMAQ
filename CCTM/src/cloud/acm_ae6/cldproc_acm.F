@@ -619,10 +619,15 @@ C...write data to the normal wet deposition file
 
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
 
-        DO VAR = 1, N_SPC_WDEP + 1
+        DO VAR = 1, N_SPC_WDEP 
            call mio_fwrite( CTM_WET_DEP_1, WDEP_SPC( VAR ),
      &                      PNAME, TOT_DEP(:,:,VAR), TIME_STAMP )
         END DO
+
+        VAR = N_SPC_WDEP + 1
+        VNAME = 'HPLUS'
+        call mio_fwrite( CTM_WET_DEP_1, VNAME,
+     &                   PNAME, TOT_DEP(:,:,VAR), TIME_STAMP )
 
 #endif
 
@@ -680,10 +685,70 @@ C...write data to the diagnostic file if requested by the user
              call mio_fcreate( CTM_WET_DEP_2, mio_new_file )
           END IF
        
-          DO VAR = 1, N_SPC_WDEP + 1 + 11
+          DO VAR = 1, N_SPC_WDEP 
              call mio_fwrite( CTM_WET_DEP_2, WDEP_SPC( VAR ),
      &                      PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
           END DO
+
+          VAR = VAR + 1
+          VNAME = 'HPLUS'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'PLCL'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'CLOUD_BOTTOM'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'PR_CLOUDTOP'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'NP_CLOUDTOP'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'RAIN_FLAG'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'PR_CLDFRAC'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'NP_CLDFRAC'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'PR_TRANS'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'NP_TRANS'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'RES_TRANS'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'CLD_TRANS'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
 
 #endif
 

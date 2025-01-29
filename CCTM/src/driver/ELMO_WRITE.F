@@ -48,6 +48,7 @@
       CHARACTER( 300 ) XMSG
       character( 20 ) :: timestamp
       CHARACTER( 16 ), SAVE :: PNAME = 'WRITE_ELMO'
+      CHARACTER( 16 )       :: VNAME
 
       if (firstime) then
          firstime = .false.
@@ -89,9 +90,10 @@
           call mio_time_format_conversion( MDATE, MTIME, TIMESTAMP )
 
           DO IVAR = 1, ELMO_FILE( IFL )%N_VARS
-          call mio_fwrite( ELMO_FILE( IFL )%FLOGICAL, 
-     &       ELMO_TABLE( ELMO_FILE( IFL )%TABID( IVAR ) )%NAME, PNAME,
-     &       ELMO_OUT(IFL)%DATA(IVAR,:,:,:), TIMESTAMP ) 
+            VNAME = ELMO_TABLE( ELMO_FILE( IFL )%TABID( IVAR ) )%OUT_NAME 
+            call mio_fwrite( ELMO_FILE( IFL )%FLOGICAL, 
+     &          VNAME, PNAME,
+     &          ELMO_OUT(IFL)%DATA(IVAR,:,:,:), TIMESTAMP ) 
           END DO
           WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &                   'Timestep written to', trim(ELMO_FILE(IFL)%FLOGICAL),
@@ -105,8 +107,7 @@
             MDATE = JDATE
             MTIME = JTIME
             IF ( .NOT. END_TIME ) THEN   ! ending time timestamp
-!              CALL NEXTIME ( MDATE, MTIME, -TSTEP(1) )
-               CALL nextime ( MDATE, MTIME, -TSTEP(1) )
+               CALL NEXTIME ( MDATE, MTIME, -TSTEP(1) )
             END IF
             call mio_time_format_conversion( MDATE, MTIME, TIMESTAMP )
 
@@ -129,9 +130,10 @@
            
             ! Write Data
             DO IVAR = 1, ELMO_FILE(IFL)%N_VARS
+               vname = ELMO_TABLE( ELMO_FILE(IFL)%TABID(IVAR) )%OUT_NAME
                call mio_fwrite( ELMO_FILE( IFL )%FLOGICAL, 
-     &           ELMO_TABLE( ELMO_FILE(IFL)%TABID(IVAR) )%NAME, PNAME,
-     &           ELMO_OUT(IFL)%DATA(IVAR,:,:,:), TIMESTAMP ) 
+     &                          VNAME, PNAME,
+     &                          ELMO_OUT(IFL)%DATA(:,:,:,IVAR), TIMESTAMP ) 
             END DO
            
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
