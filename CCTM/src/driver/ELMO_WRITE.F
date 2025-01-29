@@ -73,8 +73,8 @@
      &                                     ELMO_FILE( IFL )%NLAYS )
                  call mio_set_global_attr( ELMO_FILE( IFL )%FLOGICAL, 
      &                                     'VGLVLS', MET_CRO_3D,
-     &                                     ELMO_FILE( IFL )%LAY_TOP, 
-     &                                     ELMO_FILE( IFL )%LAY_BOT+1 )
+     &                                     ELMO_FILE( IFL )%LAY_BOT, 
+     &                                     ELMO_FILE( IFL )%LAY_TOP+1 )
               end if
            end if
            firstwrite( IFL ) = .FALSE.
@@ -93,10 +93,10 @@
             VNAME = ELMO_TABLE( ELMO_FILE( IFL )%TABID( IVAR ) )%OUT_NAME 
             call mio_fwrite( ELMO_FILE( IFL )%FLOGICAL, 
      &          VNAME, PNAME,
-     &          ELMO_OUT(IFL)%DATA(IVAR,:,:,:), TIMESTAMP ) 
+     &          ELMO_OUT(IFL)%DATA(:,:,:,IVAR), TIMESTAMP ) 
           END DO
           WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
-     &                   'Timestep written to', trim(ELMO_FILE(IFL)%FLOGICAL),
+     &                   'Timestep written to', ELMO_FILE(IFL)%FLOGICAL,
      &                   'for date and time', MDATE, MTIME
 
 #endif
@@ -130,14 +130,14 @@
            
             ! Write Data
             DO IVAR = 1, ELMO_FILE(IFL)%N_VARS
-               vname = ELMO_TABLE( ELMO_FILE(IFL)%TABID(IVAR) )%OUT_NAME
+               VNAME = ELMO_TABLE( ELMO_FILE(IFL)%TABID(IVAR) )%OUT_NAME
                call mio_fwrite( ELMO_FILE( IFL )%FLOGICAL, 
      &                          VNAME, PNAME,
      &                          ELMO_OUT(IFL)%DATA(:,:,:,IVAR), TIMESTAMP ) 
             END DO
            
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
-     &                       'Timestep written to', trim(ELMO_FILE(IFL)%FLOGICAL),
+     &                       'Timestep written to', ELMO_FILE(IFL)%FLOGICAL,
      &                       'for date and time', MDATE, MTIME
            
            

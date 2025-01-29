@@ -690,7 +690,7 @@ C...write data to the diagnostic file if requested by the user
      &                      PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
           END DO
 
-          VAR = VAR + 1
+          VAR = N_SPC_WDEP + 1
           VNAME = 'HPLUS'
           call mio_fwrite( CTM_WET_DEP_2, VNAME, 
      &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
