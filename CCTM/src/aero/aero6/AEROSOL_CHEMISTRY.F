@@ -671,6 +671,8 @@ C *** compute only on first pass
         CALL MAP_AERO()
         CALL MAP_PRECURSOR()
 
+        CALL LOG_HEADING( LOGDEV,'Initialize Aerosol Heterogeneous Chemistry')
+
         ALLOCATE( WHICH_AERO_RATE( NHETERO ) )
         
 C *** 2nd and 3rd moments (w. H2O and svOA)
