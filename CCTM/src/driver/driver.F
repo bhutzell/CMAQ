@@ -713,6 +713,11 @@ C Initialize Modules
          CALL LOG_HEADING( LOGDEV, 'Time Integration' )
 C Initialize MIO 
          call mio_init2
+      
+      ELSE IF ( L_ELMO .AND. ELMO_NSTEP .LT. 1.0 ) THEN
+          ! Calculate all ELMO Variables for averaging but do not output them
+          CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN=.FALSE. )
+
       END IF
 
 ! Output Instantaneous Values at first time step
