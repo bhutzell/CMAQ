@@ -1588,18 +1588,9 @@ C-----------------------------------------------------------------------
          LOGICAL              :: LREG_RMDR
          REAL, ALLOCATABLE    :: RMDR_MASK( :,: )
 
-C Retrieve Environment Variable Letting User Ignore this Check
-C and allowing the model to proceed.
-         CALL LOG_SUBHEADING( LOGDEV, "Check Emissions Mapping" )
 
-         WRITE( LOGDEV, '(/,/,5x,A)' ), REPEAT( '=', 77 )
-         WRITE( LOGDEV, '(5x,A,A)' ), '|> SCALING EMISSIONS CONSISTENT WITH ',
-     &                  'EMISSIONS CONTROL FILE SUPPLIED BY USER' 
-         WRITE( LOGDEV, '(5x,A)' ), REPEAT( '=', 77 )
- 
 ! Write Out Region Diagnostic Information
-         WRITE( LOGDEV, '(/,5x,A)' ),'|> Regions Available for Scaling:'
-         WRITE( LOGDEV, '(5x,A)'   ),'================================='
+         CALL LOG_SUBHEADING( LOGDEV, "Regions Available for Scaling" )
 
          ! Print Information about All the Available Regions for Scaling
          WRITE( LOGDEV,'(8x,A,2x,A,8x,A,10x,A)' ),'Number','Region Label','File Label','Variable'
@@ -1618,9 +1609,9 @@ C and allowing the model to proceed.
 ! Retrieve the Emission Variables Available From Emissions Streams
          ! Load Default Molecular Weights and Units based on 
          ! SMOKE/MOVES/SPECIATE specifications
+         CALL LOG_MESSAGE( LOGDEV, '' )
+         CALL LOG_MESSAGE( LOGDEV, "Map Emissions Variables to Default Units and Molecular Weight" )
 
-         WRITE( LOGDEV, '(/,5x,A)' ),'|> Map Available Emissions Variables to Defaults:'
-         WRITE( LOGDEV, '(5x,A)'   ),'=================================================='
          N_EMVAR_CATCH = 0
          DO ISRM = 1,DESID_N_SRM
 
@@ -1662,8 +1653,7 @@ C and allowing the model to proceed.
 
          END DO
 
-         WRITE( LOGDEV, '(/,5x,A)' ),'|> Checking Emissions Em. Var. Units: '
-         WRITE( LOGDEV, '(5x,A)'   ),'======================================'
+         CALL LOG_MESSAGE( LOGDEV, "Checking Emission Units" )
          DO ISRM = 1,DESID_N_SRM
             DO IEMVAR = 1,DESID_EMVAR( ISRM )%LEN
                ! Check Units and Assign Conversion Factors for
@@ -1730,8 +1720,7 @@ C and allowing the model to proceed.
          END DO
  
 ! Write Out All Available Stream Families to the Log File
-         WRITE( LOGDEV, '(/,5x,A)' ),'|> Emission Stream Family Definitions:'
-         WRITE( LOGDEV, '(5x,A)'   ),'======================================'
+         CALL LOG_SUBHEADING( LOGDEV, 'Emission Stream Families' )
          WRITE( LOGDEV,'(8x,A19,15x,A)' ),'Stream Family Label','Stream Family Members'
          WRITE( LOGDEV,'(8x,A19,15x,A)' ),'-------------------','---------------------'
          DO IFAM = 1,DESID_N_STREAM_FAMS
@@ -1745,8 +1734,7 @@ C and allowing the model to proceed.
          END DO
 
 ! Write Out All Available Species Families to the Log File
-         WRITE( LOGDEV, '(/,5x,A)' ),'|> CMAQ Species Family Definitions:'
-         WRITE( LOGDEV, '(5x,A)'   ),'======================================'
+         CALL LOG_SUBHEADING( LOGDEV, 'Chemical Species and Emission Variable Families')
          WRITE( LOGDEV,'(8x,A20,14x,A)' ),'Species Family Label','Species Family Members'
          WRITE( LOGDEV,'(8x,A20,14x,A)' ),'--------------------','---------------------'
          DO IFAM = 1,N_CHEM_FAMS
@@ -1762,8 +1750,7 @@ C and allowing the model to proceed.
 ! Set up Stream <-> Size Distribution relationship. This routine
 ! populates the DESID_STREAM_AERO structure which tells the logic below which
 ! modes are present on which streams.
-         WRITE( LOGDEV, '(/,5x,A)' ),'|> Mapping Particle Size Distributions to Each Emission Stream:'
-         WRITE( LOGDEV, '(5x,A)'   ),'==============================================================='
+         CALL LOG_SUBHEADING( LOGDEV, 'Mapping Particle Size Distributions to Each Emission Stream')
          CALL DESID_INIT_SIZE_DIST( JDATE, JTIME )
 
 ! Process Default Emissions Mapping (if requested in namelist; i.e. 
@@ -2667,6 +2654,9 @@ C and allowing the model to proceed.
         ! Reduce the size of the Region Remainder Mask
         DESID_REG_RMDR = DESID_REG_RMDR( 1:N_REG_RMDR )
 
+
+         CALL LOG_SUBHEADING( LOGDEV, 'Error Check Emission Mapping Configuration')
+
          ! Warn the User if there are no emissions instructions provided        
          IF ( DESID_N_ISTR .LE. 0 ) THEN
             XMSG = 'There are no emissions instructions: VDEMIS is set to zero' ! below
@@ -2674,8 +2664,7 @@ C and allowing the model to proceed.
          END IF
 
          ! Print a message for each emissions stream variable that is not used.
-         WRITE( LOGDEV, '(/,5x,A)' ) '|> Checking for unused Emissions Variables: '
-         WRITE( LOGDEV, '(5x,A)'   ),'============================================'
+         CALL LOG_MESSAGE( LOGDEV, 'Checking for unused Emissions Variables:' )
 
          LERROR = .FALSE.
          DO ISRM = 1,DESID_N_SRM
@@ -2702,8 +2691,7 @@ C and allowing the model to proceed.
 
          ! Print a message for every used variable that is not recognized on 
          ! the DESID_EMVAR_TABLE                 
-         WRITE( LOGDEV, '(/,5x,A)' ) '|> Checking status of used Emissions Variables:'
-         WRITE( LOGDEV, '(5x,A)'   ),'================================================'
+         CALL LOG_MESSAGE( LOGDEV, 'Checking status of used Emissions Variables:')
 
          DO ICATCH = 1,N_EMVAR_CATCH
              B = EMVAR_CATCH( ICATCH )
@@ -2741,8 +2729,8 @@ C and allowing the model to proceed.
 ! Print out the Tables of CMAQ Emissions Instructions organized by each 
 ! emission stream and then by CMAQ internal species.
 
-         WRITE( LOGDEV, '(/,/,5x,A)' ),'|> EMISSIONS SCALING REPORT:'
-         WRITE( LOGDEV, '(5x,A)'   ),'=================================='
+         CALL LOG_MESSAGE( LOGDEV,'' )
+         CALL LOG_SUBHEADING( LOGDEV, 'DESID Emission Scaling Report')
          WRITE( LOGDEV,'(7x,A,/,13x,A)' ),'Note: these are populated using rules from the',
      &                              'Emission Control File Supplied by the User.'
          DO ISRM = 1,DESID_N_SRM
@@ -2853,11 +2841,6 @@ C and allowing the model to proceed.
            END DO
          END DO
 
-         ! End Emissions Scaling Preparation and Diagnostic Output
-         WRITE( LOGDEV, '(/,5x,A)' ), REPEAT( '=',80 )
-         WRITE( LOGDEV, '(5x,A,/,/)' ),
-     &          '|> END EMISSIONS SCALING PREPARATION AND DIAGNOSTIC OUTPUT'
-
         END SUBROUTINE DESID_PROCESS_RULES
 
 !-----------------------------------------------------------------------
@@ -2880,7 +2863,7 @@ C and allowing the model to proceed.
       INTEGER ISRM, N
   
       CHARACTER( 16 )  :: PNAME = 'DESID_INIT_STREAMS'
-      CHARACTER( 32 )  :: VLAB
+      CHARACTER( 20 )  :: VLAB
       INTEGER          :: STATUS
       LOGICAL :: SUCCESS
   
@@ -2937,7 +2920,6 @@ C stkemis_init.
   
          CALL LOG_MESSAGE( LOGDEV, ' ' )
          CALL LOG_MESSAGE( LOGDEV, 'Retrieving Env. Variables for Gridded and Elevated Point Emission Inputs' )
-         CALL LOG_MESSAGE( LOGDEV, ' ' )
   
          ISRM = 0
          DESID_STREAM_LAPPLY   = .TRUE.
@@ -2961,7 +2943,7 @@ C stkemis_init.
              
               ! Retrieve Short-Name Label for Each Gridded File
               WRITE( VLAB,'( "GR_EMIS_LAB_",I3.3 )' ) N
-              CALL GET_ENV( DESID_STREAM_LAB( ISRM ), VLAB,
+              CALL GET_ENV( DESID_STREAM_LAB( ISRM ), TRIM(VLAB),
      &                      DESID_STREAM_LAB( ISRM ), LOGDEV )
               CALL UPCASE( DESID_STREAM_LAB( ISRM ) )
   
@@ -2972,13 +2954,13 @@ C stkemis_init.
               ! Retrieve Toggle for whether or not to apply these
               ! emissions 
               WRITE( VLAB,'( "GR_EMIS_APPLY_",I3.3 )' ) N
-              CALL GET_ENV( DESID_STREAM_LAPPLY( ISRM ), VLAB, 
+              CALL GET_ENV( DESID_STREAM_LAPPLY( ISRM ), TRIM(VLAB), 
      &                      DESID_STREAM_LAPPLY( ISRM ), LOGDEV )
   
               ! Retrieve Toggle for overriding emissions file date with
               ! internal model date
               WRITE( VLAB,'( "GR_EM_SYM_DATE_",I3.3 )' ) N
-              CALL GET_ENV( DESID_STREAM_SYM_DATE( ISRM ), VLAB, 
+              CALL GET_ENV( DESID_STREAM_SYM_DATE( ISRM ), TRIM(VLAB), 
      &                      EMIS_SYM_DATE, LOGDEV )
   
            END DO
@@ -3000,7 +2982,7 @@ C stkemis_init.
              
               ! Retrieve Short-Name Label for Each Inline File
               WRITE( VLAB,'( "STK_EMIS_LAB_",I3.3 )' ) N
-              CALL GET_ENV( DESID_STREAM_LAB( ISRM ), VLAB, 
+              CALL GET_ENV( DESID_STREAM_LAB( ISRM ), TRIM(VLAB), 
      &                      DESID_STREAM_LAB( ISRM ), LOGDEV )
               CALL UPCASE( DESID_STREAM_LAB( ISRM ) )
   
@@ -3011,13 +2993,13 @@ C stkemis_init.
               ! Retrieve Toggle for whether or not to apply these
               ! emissions 
               WRITE( VLAB,'( "STK_EMIS_APPLY_",I3.3 )' ) N
-              CALL GET_ENV( DESID_STREAM_LAPPLY( ISRM ), VLAB, 
+              CALL GET_ENV( DESID_STREAM_LAPPLY( ISRM ), TRIM(VLAB), 
      &                      DESID_STREAM_LAPPLY( ISRM ), LOGDEV )
   
               ! Retrieve Toggle for overriding emissions file date with
               ! internal model date
               WRITE( VLAB,'( "STK_EM_SYM_DATE_",I3.3 )' ) N
-              CALL GET_ENV( DESID_STREAM_SYM_DATE( ISRM ), VLAB, 
+              CALL GET_ENV( DESID_STREAM_SYM_DATE( ISRM ), TRIM(VLAB), 
      &                      EMIS_SYM_DATE, LOGDEV )
   
            END DO
@@ -3038,7 +3020,7 @@ C stkemis_init.
   
               ! Retrieve Short-Name Label for Each Tracer File
               WRITE( VLAB,'( "TR_EMIS_LAB_",I2.2 )' ) N
-              CALL GET_ENV( DESID_STREAM_LAB( ISRM ), VLAB,
+              CALL GET_ENV( DESID_STREAM_LAB( ISRM ), TRIM(VLAB),
      &                      DESID_STREAM_LAB( ISRM ), LOGDEV )
               CALL UPCASE( DESID_STREAM_LAB( ISRM ) )
   
@@ -3158,8 +3140,6 @@ C stkemis_init.
         ALLOCATE( DESID_DIAG_LAB ( N_Buff ) )
         ALLOCATE( DESID_DIAG_SUM( N_Buff ) )
         ALLOCATE( DESID_DIAG_LAYS( N_Buff ) )
-   
-        CALL LOG_SUBHEADING( LOGDEV,'Initialize Emissions Diagnostic Files' )
    
         DESID_DIAG_STREAM_MASK = .FALSE.
         DESID_DIAG_FORMAT      = 'OFF'
@@ -3325,9 +3305,12 @@ C stkemis_init.
         DEALLOCATE ( DESID_DIAG_SPEC_BUFF )
 
         ! Write Details of Diagnostic Output to Log File
-        WRITE( LOGDEV, * )
-        WRITE( LOGDEV, '(/,/,5x,A)' ),'|> EMISSIONS DIAGNOSTIC REPORT:'
-        WRITE( LOGDEV, '(5x,A)'   ),'=================================='
+        CALL LOG_MESSAGE( LOGDEV,'' )
+        CALL LOG_SUBHEADING( LOGDEV, 'DESID Emission Diagnostic Report' )
+        
+        IF ( DESID_N_DIAG .EQ. 0 ) 
+     &       CALL LOG_MESSAGE( LOGDEV, 'No DESID Diagnostic Files Requested')
+
         DO IDIAG = 1,DESID_N_DIAG
            WRITE( LOGDEV, * )
            WRITE( LOGDEV,'(5x,A19,2x,A)' ),'Diagnostic File: ',TRIM(DESID_DIAG_LAB( IDIAG ))

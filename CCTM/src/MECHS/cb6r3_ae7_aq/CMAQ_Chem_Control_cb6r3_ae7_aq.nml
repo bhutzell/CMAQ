@@ -83,64 +83,9 @@
    'EVERYWHERE', 'ALL'    ,'FORM_PRIMARY','FORM_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'        ,'ACROLEIN','ACRO_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'     ,'BUTADIENE13','BUTADIENE13' ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'TOLU'   ,'TOLU'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'HGNRVA' ,'HG'          ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'HGIIGAS','HGIIGAS'     ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'SULF'        ,'GAS'  ,0.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'GLY'    ,'GLY'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'GLYD'   ,'GLYD'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a', 
-   
 
-   ! Marine Halogen Chemistry
-   'EVERYWHERE', 'ALL'         ,'DMS'    ,'DMS'         ,'GAS'  ,1.  ,'UNIT','a',
-
-
-   ! Optional Air Toxics in NR namelist, comment out species if the NR namelist
-   ! does not include one or more of them.
-   'EVERYWHERE', 'ALL' ,'ACRYLONITRILE','ACRY_NITRILE',     'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CARBONTET','CARBONTET',            'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'PROPDICHLORIDE','PROPYL_DICL',     'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'DICHLOROPROPENE','DICL_PROPENE',   'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CL4_ETHANE1122','CL4_ETHANE',      'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CHCL3','CHCL3',                    'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'BR2_C2_12','BR2_C2_12',            'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CL2_C2_12','CL2_C2_12',            'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'ETOX','ETOX',                      'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CL2_ME','CL2_ME',                  'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CL4_ETHE','CL4_ETHE',              'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CL3_ETHE','CL3_ETHE',              'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CL_ETHE','CL_ETHE',                'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'NAPH','NAPHTHALENE',               'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'QUINOLINE','QUINOLINE',            'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'HEXAMETHY_DIIS','HEXMETH_DIS',     'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'HYDRAZINE','HYDRAZINE',            'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'MAL_ANHYDRIDE','MAL_ANHYDRID',     'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'TOL_DIIS','TOL_DIIS',              'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'TRIETHYLAMINE','TRIETHYLAMIN',     'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'DICHLOROBENZENE','DICL_BENZENE',   'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'ACETONITRILE','ACET_NITRILE',      'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'XYLENES','XYLENE',                 'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'STYRENE','STYRENE',                'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'ACRYLICACID','ACRYACID',           'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'HEXANE','HEXANE',                  'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'METHCHLORIDE','METHCHLORIDE',      'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CARBSULFIDE','CARBSULFIDE',        'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'CHLOROPRENE','CHLOROPRENE',        'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'ETHYLBENZ','ETHYLBENZENE',         'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'BENZOAPYRNE','BENAPY',             'GAS'  ,1.  ,'UNIT','a',
-! Inert Tracers of PAH congeners for simple exposure assessments
-   'EVERYWHERE', 'ALL' , 'PAH_000E0', 'PAH_000E0',          'GAS',1.0  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' , 'PAH_176E5', 'PAH_176E5',          'GAS',1.0  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' , 'PAH_880E5', 'PAH_880E5',          'GAS',1.0  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' , 'PAH_176E4', 'PAH_176E4',          'GAS',1.0  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' , 'PAH_176E3', 'PAH_176E3',          'GAS',1.0  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' , 'PAH_192E3', 'PAH_192E3',          'GAS',1.0  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' , 'PAH_101E2', 'PAH_101E2',          'GAS',1.0  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' , 'PAH_176E2', 'PAH_176E2',          'GAS',1.0  ,'UNIT','a',
-   'EVERYWHERE', 'ALL' , 'PAH_114E1', 'PAH_114E1',          'GAS',1.0  ,'UNIT','a',
-
-   ! Default Aerosols
+   ! Fine-Mode Aerosols
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'ASO4'        ,'FINE' ,1.  ,'MASS','a', 
    'EVERYWHERE', 'ALL'         ,'PSO4'   ,'ASO4'        ,'FINE' ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'PNH4'   ,'ANH4'        ,'FINE' ,1.  ,'UNIT','a', 
@@ -165,32 +110,6 @@
    'EVERYWHERE', 'ALL'         ,'PMC'    ,'ANO3'    ,'COARSE',0.00048,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'PMC'    ,'ACL'     ,'COARSE',0.00145,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'PMC'    ,'AH2O'    ,'COARSE',0.00032,'UNIT','a', 
-
-   ! Particulate Hazardous Air Pollutants (HAPs), can comment individual aerosol 
-   ! components across mode if AE namelist does not contain them
-   'EVERYWHERE', 'ALL'         'NICKEL_F','ANI'     ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         'NICKEL_C','ANI'     ,'COARSE',1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'       'CHROMHEX_F','ACR_VI'  ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'       'CHROMHEX_C','ACR_VI'  ,'COARSE',1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'       'CHROMTRI_F','ACR_III' ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'       'CHROMTRI_C','ACR_III' ,'COARSE',1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'      'BERYLLIUM_F','ABE'     ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'      'BERYLLIUM_C','ABE'     ,'COARSE',1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'           'LEAD_F','APB'     ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'           'LEAD_C','APB'     ,'COARSE',1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    'DIESEL_PMFINE','ADE_OTHR','FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'      'DIESEL_PMEC','ADE_EC'  ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'      'DIESEL_PMOC','ADE_OC'  ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'     'DIESEL_PMNO3','ADE_NO3' ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'     'DIESEL_PMSO4','ADE_SO4' ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'       'DIESEL_PMC','ADE_CORS','COARSE',1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'        'CADMIUM_F','ACADMIUM','FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'        'CADMIUM_C','ACADMIUM','COARSE',1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'      'MANGANESE_F','AMN_HAPS','FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'      'MANGANESE_C','AMN_HAPS','COARSE',1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'        'ARSENIC_F','AAS'     ,'FINE'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'        'ARSENIC_C','AAS'     ,'COARSE',1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'             'PHGI','APHG'    ,'FINE'  ,1.  ,'UNIT','a',
 
    ! Fine-Mode Primary Organic Aerosol Scaling
    ! --> Nonvolatile POA
@@ -247,16 +166,10 @@
    'EVERYWHERE', 'ALL'    ,'PMFINE_MN'   ,'AMN'         ,'FINE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMFINE_H2O'  ,'AH2O'        ,'FINE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'    ,'PMFINE_OTHR' ,'AOTHR'       ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_CR_III'  ,'ACR_III'  ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_CR_VI'   ,'ACR_VI'   ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_NI'      ,'ANI'      ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_AS'      ,'AAS'      ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_BE'      ,'ABE'      ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_PHG'     ,'APHG'     ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_PB'      ,'APB'      ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_CD'      ,'ACADMIUM' ,'FINE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMFINE_MN_HAPS' ,'AMN_HAPS' ,'FINE',1.   ,'UNIT','a', 
 
+   ! :Scaling of Fine-Mode POA from Wind-Blown Dust or Sea Spray. Either the 
+   ! :Nonvolatile POA should be propagated to the transport model, or the Low 
+   ! :Volatility POA should be propagated, not both.
 
    ! Wind-Blown Dust and Sea Spray Scaling
    ! Coarse Components                                               
@@ -266,15 +179,186 @@
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a', 
    'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CR_III'  ,'ACR_III'  ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CR_VI'   ,'ACR_VI'   ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NI'      ,'ANI'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_AS'      ,'AAS'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_BE'      ,'ABE'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_PHG'     ,'APHG'     ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_PB'      ,'APB'      ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CD'      ,'ACADMIUM' ,'COARSE',1.   ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_MN_HAPS' ,'AMN_HAPS' ,'COARSE',1.   ,'UNIT','a', 
    
 /
 
+!------------------------------------------------------------------------------!
+! Emissions Scaling Family Definitions                                         !
+!    This component includes definitions for families of CMAQ chemical species !
+!    and emission variables.                                                   !
+!    Note that if you are defining a 'VOC' family to apply scaling to all VOC  !
+!    emissions, it is recommended that you define 'VOC' either in terms of the !
+!    emission variables (consistent with variable names on your emission file) !
+!    or with CMAQ species names. In order to use this family to scale VOC      !
+!    emissions via an emission rule, use the 'VOC' family for either the       !
+!    emission variable or CMAQ species, consistent with how you have defined it!
+!    here, and use the 'ALL' keyword for the other field.                      !
+!                                                                              !
+!    Options for ChemFamilyUnits are: 'PPMV' - part per million mixing ratio   !
+!                                     'UG M-3' - mass concentration            !
+!                                     'PPMC' - part per million carbon         !
+!                                     'UGC M-3' - carbon mass concentration    !
+!                                     'PPMN' - part per million nitrogen       !
+!                                     'UGN M-3' - nitrogen mass concentration  !
+!------------------------------------------------------------------------------!
+&Chemical_FamVars
+ N_Chem_Fams = 0
+ Max_Chem_Fam_Members = 20
+/
+
+&ChemicalFamilies
+! ChemFamilyName(1)     = 'SVOC'
+! ChemFamilyUnits(1)    = 'PPMV'
+! ChemFamilyMembers(1,:)= 'VSVOC1','ASVOA1J','ASVOA1I'
+/
+ 
+
+&COMPOSITE_INIT
+  N_COMPOSITES = 47
+/
+
+&ELMO_COMPOSITES
+
+   CMPST(1,:) = 'NOX', 'ppmV', 'GAS', 'NOx Concentration', 
+                'NO + NO2'
+
+   CMPST(2,:) = 'PMC_SO4', 'ug m-3', 'COARSE', 'Coarse-Mode Sulfate', 
+                'ASO4' 
+
+   CMPST(3,:) = 'PMC_NO3', 'ug m-3', 'COARSE', 'Coarse-Mode Nitrate', 
+                'ANO3'
+
+   CMPST(4,:) = 'PMC_NH4', 'ug m-3', 'COARSE', 'Coarse-Mode Ammonium', 
+                'ANH4'
+
+   CMPST(5,:) = 'PMC_CL', 'ug m-3', 'COARSE', 'Coarse-Mode Chlorine', 
+                'ACL'
+
+   CMPST(6,:) = 'PMC_NA', 'ug m-3', 'COARSE', 'Recon Crs Sodium', 
+                '0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+   CMPST(7,:) = 'PMC_MG', 'ug m-3', 'COARSE', 'Recon Crs Magnesium', 
+                '0.0997 * ASEACAT + 0.0170 * ASOIL + 0.0032 * ACORS'
+
+   CMPST(8,:) = 'PMC_K', 'ug m-3', 'COARSE', 'Recon Crs Potasium', 
+                '0.0310 * ASEACAT + 0.0242 * ASOIL + 0.0176 * ACORS'
+
+   CMPST(9,:) = 'PMC_CA', 'ug m-3', 'COARSE', 'Recon Crs Calcium', 
+                '0.0320 * ASEACAT + 0.0838 * ASOIL + 0.0562 * ACORS'
+
+   CMPST(10,:) = 'PMF_SO4', 'ug m-3',  'FINE', 'Fine-Mode Sulfate', 
+                 'ASO4'
+
+   CMPST(11,:) = 'PMF_NO3',  'ug m-3',  'FINE', 'Fine-Mode Nitrate', 
+                 'ANO3'
+
+   CMPST(12,:) = 'PMF_NH4', 'ug m-3', 'FINE', 'Fine-Mode Ammonium', 
+                 'ANH4'
+
+   CMPST(13,:) = 'PMF_CL', 'ug m-3', 'FINE', 'Fine-Mode Chloride', 
+                 'ACL'
+
+   CMPST(14,:) = 'PMF_NA', 'ug m-3', 'FINE', 'Fine-Mode Sodium', 
+                 'ANA'
+
+   CMPST(15,:) = 'PMF_EC', 'ug m-3', 'FINE', 'Fine-Mode Black Carbon', 
+                 'AEC'
+
+   CMPST(16,:) = 'PMF_FE', 'ug m-3', 'FINE', 'Fine-Mode Iron', 
+                 'AFE'
+
+   CMPST(17,:) = 'PMF_AL', 'ug m-3', 'FINE', 'Fine-Mode Aluminum', 
+                 'AAL'
+
+   CMPST(18,:) = 'PMF_SI', 'ug m-3', 'FINE', 'Fine-Mode Silicon', 
+                 'ASI' 
+
+   CMPST(19,:) = 'PMF_TI', 'ug m-3', 'FINE', 'Fine-Mode Titanium', 
+                 'ATI'
+
+   CMPST(20,:) = 'PMF_CA', 'ug m-3', 'FINE', 'Fine-Mode Calcium', 
+                 'ACA'
+
+   CMPST(21,:) = 'PMF_MG', 'ug m-3', 'FINE', 'Fine-Mode Magnesium', 
+                 'AMG'
+
+   CMPST(22,:) = 'PMF_K', 'ug m-3', 'FINE', 'Fine-Mode Potassium',
+                 'AK'
+
+   CMPST(23,:) = 'PMF_MN', 'ug m-3', 'FINE', 'Fine-Mode Manganese',
+                 'AMN'
+
+   CMPST(24,:) = 'PMF_H2O', 'ug m-3', 'FINE', 'Fine-ModeParticle Water',
+                 'AH2O'
+                                               
+   CMPST(25,:) = 'PMF_RCSOIL', 'ug m-3', 'ACCUMULATION', 'Recon of Soil PM from correlations at IMPROVE sites',
+                 '2.20 * AAL + 2.49 * ASI + 1.63 * ACA + 2.42 * AFE + 1.94 * ATI'
+
+   CMPST(26,:) = 'PMF_UN_IMPV1', 'ug m-3', 'FINE', 'Unspeciated PM including non-carbon organic mass',
+                 'PMF_MASS -1.0 * ASO4 -1.0 * ANO3 -1.0 * ANH4 -1.0 * ACL -1.0 * ANA + -1.0 * AEC -1.0 * PMF_OC -1.0 * PMF_SOILIMPV'
+
+   CMPST(27,:) = 'PMF_UN_IMPV2', 'ug m-3', 'FINE', 'Unspeciated PM excluding non-carbon organic mass',
+                 'PMF_MASS -1.0 * ASO4 -1.0 * ANO3 -1.0 * ANH4 -1.0 * ACL -1.0 * ANA -1.0 * AEC -1.0 * PMF_OA -1.0 * PMF_SOILIMPV'
+
+   CMPST(28,:) = 'PMF_HP', 'umol m-3', 'FINE', 'Fine-Mode H+ Ion',
+                 'AH3OP'
+
+   CMPST(29,:) = 'PMF_NCOM', 'ug m-3', 'FINE', 'Fine-Mode Non-Carbon Organic Matter in POA',
+                 'PMF_OA -1.0 * PMF_OC'
+
+   CMPST(30,:) = 'PMF_CLDGLY', 'ug m-3', 'FINE', 'Fine-Mode SOA from glyoxal and methylglyoxal',
+                 'AORGC + AGLY'
+
+   CMPST(31,:) = 'PMF_ISOPSOA', 'ug m-3', 'FINE', 'Fine-Mode Isoprene SOA excl IEPOX SOA',
+                 'AISO1 + AISO2'
+
+   CMPST(32,:) = 'PMF_IEPOXSOA', 'ug m-3', 'FINE', 'Fine-Mode IEPOX SOA',
+                 'AISO3'
+
+   CMPST(33,:) = 'PMF_MTNSOA', 'ug m-3', 'FINE', 'Fine-Mode Monoterpene Nitrate SOA',
+                 'AMTNO3 + AMTHYD'
+
+   CMPST(34,:) = 'PMF_MTSOA', 'ug m-3', 'FINE', 'Fine-Mode Monoterpene SOA excl Nitrates',
+                 'AMT1 + AMT2 + AMT3 + AMT4 + AMT5 + AMT6'
+
+   CMPST(35,:) = 'PMF_BENAPY', 'ug m-3', 'FINE', 'Fine-Mode Benzo-a-Pyrene',
+                 'ABENAPY'
+
+   CMPST(36,:) = 'GAS_BENAPY', 'ug m-3', 'GAS', 'Gas-Phase Benzo-a-Pyrene',
+                 'BENAPY'
+
+   CMPST(37,:) = 'GAS_NH3', 'ug m-3', 'GAS', 'Gas-Phase Ammonia',
+                 'NH3'
+
+   CMPST(38,:) = 'GAS_HNO3', 'ug m-3', 'GAS', 'Gas-Phase Nitric Acid',
+                 'HNO3'
+
+   CMPST(39,:) = 'PMAMS_SO4', 'ug m-3', 'PMAMS', 'Sulfate Collected by the AMS',
+                 'ASO4'
+
+   CMPST(40,:) = 'PMAMS_NO3', 'ug m-3', 'PMAMS', 'Nitrate Collected by the AMS',
+                 'ANO3'
+
+   CMPST(41,:) = 'PMAMS_NH4', 'ug m-3', 'PMAMS', 'Ammonium Collected by the AMS',
+                 'ANH4'
+
+   CMPST(42,:) = 'PMAMS_CL', 'ug m-3', 'PMAMS', 'Chloride Collected by the AMS',
+                 'ACL'
+
+   CMPST(43,:) = 'PM1_SO4', 'ug m-3', 'PM1', 'PM1 Sulfate',
+                 'ASO4'
+
+   CMPST(44,:) = 'PM1_NO3', 'ug m-3', 'PM1', 'PM1 Nitrate',
+                 'ANO3'
+
+   CMPST(45,:) = 'PM1_NH4', 'ug m-3', 'PM1', 'PM1 Ammonium',
+                 'ANH4'
+
+   CMPST(46,:) = 'PM1_CL', 'ug m-3', 'PM1', 'PM1 Chloride',
+                 'ACL'
+
+   CMPST(47,:) = 'PM1_NA', 'ug m-3', 'PM1', 'PM1 Sodium',
+                 'ANA + 0.8373 * ASEACAT + 0.0626 * ASOIL + 0.0023 * ACORS'
+
+/
+ 

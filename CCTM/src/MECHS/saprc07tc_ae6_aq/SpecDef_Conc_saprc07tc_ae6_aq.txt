@@ -58,19 +58,19 @@ ETHA            ,ppbV      ,1000.0*ALK1[1]
 FORM            ,ppbV      ,1000.0*HCHO[1]
 H2O2            ,ppbV      ,1000.0*HO2H[1]
 HNO3            ,ppbV      ,1000.0*HNO3[1]
-HNO3_UGM3       ,ug m-3     ,1000.0*(HNO3[1]*2.1756*DENS[2])
+HNO3_UGM3       ,ug m-3     ,1000.0*(HNO3[1]*2.1752*DENS[2])
 HONO            ,ppbV      ,1000.0*HONO[1]
 HOX             ,ppbV      ,1000.0*(OH[1]+HO2[1])
 OH              ,ppbV      ,1000.0*(OH[1])
 ISOP            ,ppbV      ,1000.0*ISOPRENE[1]
 N2O5            ,ppbV      ,1000.0*N2O5[1]
 NH3             ,ppbV      ,1000.0*NH3[1]
-NH3_UGM3        ,ug m-3     ,1000.0*(NH3[1]*0.5880*DENS[2])
-NHX             ,ug m-3     ,1000.0*(NH3[1]*0.5880*DENS[2])+ANH4I[1]+ANH4J[1]+ANH4K[1]
+NH3_UGM3        ,ug m-3     ,1000.0*(NH3[1]*0.5870*DENS[2])
+NHX             ,ug m-3     ,1000.0*(NH3[1]*0.5870*DENS[2])+ANH4I[1]+ANH4J[1]+ANH4K[1]
 NO              ,ppbV      ,1000.0*NO[1]
 NO2             ,ppbV      ,1000.0*NO2[1]
 NOX             ,ppbV      ,1000.0*(NO[1]+NO2[1])
-ANO3_PPB         ,ppbV      ,(ANO3I[1]+ANO3J[1]+ANO3K[1])/(DENS[2]*(62.0/28.97))
+ANO3_PPB         ,ppbV      ,(ANO3I[1]+ANO3J[1]+ANO3K[1])/(DENS[2]*(62.0/28.9628))
 NTR             ,ppbV      ,1000.0*RNO3[1]
 PANs            ,ppbV      ,1000.0*(PAN[1]+PAN2[1]+PBZN[1]+MAPAN[1])
 CLNTOT          ,ppbv      ,1000.0*(CLNO[1]+CLONO[1]+CLNO2[1]+CLONO2[1])
@@ -78,7 +78,7 @@ NOY             ,ppbV      ,1000.0*(NO2[1]+NO[1]+NO3[1]+ 2.0*N2O5[1]+HONO[1]+HNO
                                     HNO4[1]+RNO3[1]+NPHE[1])+PANs[0]+CLNTOT[0]+ANO3_PPB[0]
 O3              ,ppbV      ,1000.0*O3[1]
 SO2             ,ppbV      ,1000.0*SO2[1]
-SO2_UGM3        ,ug m-3     ,1000.0*(SO2[1]*2.2118*DENS[2])
+SO2_UGM3        ,ug m-3     ,1000.0*(SO2[1]*2.2097*DENS[2])
 TERPTOT         ,ppbV      ,1000.0*(TERP[1]+APIN[1])
 APIN            ,ppbV      ,1000.0*APIN[1]
 TOL             ,ppbV      ,1000.0*TOLUENE[1]

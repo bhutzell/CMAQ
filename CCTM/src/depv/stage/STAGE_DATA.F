@@ -93,11 +93,10 @@ C     26 June 2014 J.Bash: initial implementation
 
       ! Retrieve the Name of the Deposition Control File
          IF ( STAGECTRL .EQ. "STAGECTRL_NML" ) THEN
-            WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A)"),
-     &        'You have chosen not to indicate the location of an',
-     &        'STAGE deposition Control namelist file. Default ',
-     &        'settings will be assumed.'
-            RETURN
+            XMSG = 'You have chosen not to indicate the location of a ' //
+     &             'STAGE deposition Control namelist file. This file ' //
+     &             'is required by the STAGE dry deposition module.'
+            CALL M3EXIT( 'Map_STAGE',0,0,XMSG,1 )
          END IF
 
       ! Open Deposition Control Namelist File
