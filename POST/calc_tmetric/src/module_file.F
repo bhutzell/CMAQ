@@ -120,8 +120,8 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          ENDDO
 
          IF( N_M3FILES .EQ. 0 ) THEN
-            MSG = 'No CTM CONC files found'
-            CALL M3ERR( PNAME, 0, 0, MSG, .TRUE. )
+            MSG = 'No Input files found'
+            CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
          ENDIF
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

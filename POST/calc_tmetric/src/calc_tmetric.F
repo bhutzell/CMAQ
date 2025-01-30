@@ -86,6 +86,28 @@ C... write program name and version number
 C... start program
       logdev = init3 ()
 
+
+C... get operation (SUM or AVG)
+      CALL GET_ENV_STRING( 'OPERATION', 'Operation to be peformed: AVG,SUM,MAX,MIN,RNG', 'AVG', C_PROC, STATUS )
+
+      SELECT CASE ( C_PROC )
+        CASE( 'AVG' )
+            OPERATION_FLAG = -1
+            COMPUTE_AVG    = .TRUE.
+        CASE( 'SUM' )
+            OPERATION_FLAG = 0
+        CASE( 'MIN' )
+            OPERATION_FLAG = 1
+        CASE( 'MAX' )
+            OPERATION_FLAG = 2
+        CASE( 'RNG' )  ! range
+            OPERATION_FLAG = 3
+        CASE DEFAULT
+            WRITE(6,'("OPERATIONS set to ",A)')TRIM( C_PROC )
+            CALL M3EXIT(PNAME, 0, 0, 
+     &      'Must set OPERATION to MAX, MIN, RNG (Range), SUM or AVG', XSTAT2 )      
+      END SELECT
+      
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Get the Models-3 file(s) to process and the other environment   
 c  variables
@@ -106,28 +128,6 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       CALL GET_TSTEPS
 
-
-C... get operation (SUM or AVG)
-      CALL GET_ENV_STRING( 'OPERATION', 'Operation to be peformed: AVG,SUM,MAX,MIN,RNG', 'AVG', C_PROC, STATUS )
-
-      SELECT CASE ( C_PROC )
-        CASE( 'AVG' )
-            OPERATION_FLAG = -1
-            COMPUTE_AVG    = .TRUE.
-        CASE( 'SUM' )
-            OPERATION_FLAG = 0
-        CASE( 'MIN' )
-            OPERATION_FLAG = 1
-        CASE( 'MAX' )
-            OPERATION_FLAG = 2
-        CASE( 'RNG' )  ! range
-            OPERATION_FLAG = 3
-        CASE DEFAULT
-            WRITE(6,'("OPERATIONS set to ",A)')TRIM( C_PROC )
-            CALL M3ERR(PNAME, 0, 0, 
-     &      'Must set OPERATION to MAX, MIN, RNG (Range), SUM or AVG', .TRUE.)      
-      END SELECT
-      
 C... get species definitions from system variables
       Call loadSpecies()
       write(*,'(i5,'' species defined'')') NSPECVAR
@@ -145,7 +145,7 @@ C... set up metadata for output file
       IF( .NOT. DESC3 ( M3_FLNAME( 1 ) ) ) THEN
          MSG = 'Could not read DESC of  ' // M3_FLNAME( 1 ) 
      &         // ' file'
-         CALL M3ERR( PNAME, 0, 0, MSG, .TRUE. )
+         CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
       ENDIF
       
       NVARS_IN = NVARS3D
@@ -172,7 +172,7 @@ C... set up metadata for output file
           WRITE( 6,'(5X,"SAMPLE SIZE = ",I5)')AVG_TIME
           WRITE( 6,'(5X,"Number TimeSteps from Input File(s) = ",I5)')NSTEPS
           MSG = 'Correct the above Error by changing value of AVG_TIME option.'
-          CALL M3ERR( PNAME, 0, 0, MSG, .TRUE. )
+          CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT2 )
       ELSE IF ( AVG_TIME .LE. 0 ) THEN
           WRITE( 6,'(A)')'Requested sample size or averaging period <= 0.'
           WRITE( 6,'(A)')'Setting to number of timesteps over input files.'
@@ -223,6 +223,14 @@ C... set up metadata for output file
        VNAME3D(S) = TRIM(SPECVARS(S))      
        VTYPE3D(S) = M3REAL      
        VDESC3D(S) = C_PROC//" OF "//TRIM(SPECVARS(S))
+       I = INDEX1(SPECVARS(S),NVARS_IN,VNAME_IN)
+       IF ( I .LE. 0 ) THEN
+         WRITE(6,'("Input File Variables: ")')
+         WRITE(6,'(6(A16,1X))')VNAME_IN( 1:NVARS_IN ) 
+         MSG = 'Requested Variable: ' // TRIM( SPECVARS(S) )
+     &       //  ' not found in input files'
+         CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
+       END IF 
        UNITS3D(S) = VUNITS_IN(INDEX1(SPECVARS(S),NVARS_IN,VNAME_IN))
        OUT_VARNAME(S) = VNAME3D(S)
        OUT_UNITS(S)   = UNITS3D(S)
@@ -294,8 +302,9 @@ C... start process loop
       END IF
 
 C... shut down ioapi
-      KSWIT = SHUT3()
       WRITE(*,'('' IOAPI Shut down'')')
+      MSG = 'Normal Termination of CALC_TMETRIC'
+      CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT0 )
       STOP
 
       CONTAINS
@@ -335,7 +344,7 @@ C... shut down ioapi
     
                       IF( .NOT. READ3(PULL_FLNAME,SPECVARS(S),ALLAYS3,PULL_DATE,PULL_TIME,IN_DATA) )THEN
                           MSG = 'Could not read input Models-3 file ' // PULL_FLNAME
-                          CALL M3ERR( PNAME, PULL_DATE, PULL_TIME, MSG, .FALSE. )
+                          CALL M3EXIT( PNAME, PULL_DATE, PULL_TIME, MSG, XSTAT1 )
                       END IF
     
                       SELECT CASE ( OPERATION_FLAG )
@@ -374,7 +383,7 @@ c         compute average if desired, write out the results
                    IF ( .NOT. WRITE3('OUTFILE', OUT_VARNAME(S), WRITE_DATE,
      &                                 WRITE_TIME, PROC_PARALLEL(S,:,:,:)) ) THEN
                        MSG = ' Cannot write to OUTFILE for species ' // VNAME3D(S)
-                       CALL M3EXIT( PNAME, WRITE_DATE, WRITE_TIME, MSG, 1 )
+                       CALL M3EXIT( PNAME, WRITE_DATE, WRITE_TIME, MSG, XSTAT1 )
                    ENDIF
                END DO ! NSPECVAR
            END DO ! NLOOP
@@ -415,7 +424,7 @@ c         compute average if desired, write out the results
                  
                       IF( .NOT. READ3(PULL_FLNAME,SPECVARS(S),ALLAYS3,PULL_DATE,PULL_TIME,IN_DATA) )THEN
                           MSG = 'Could not read input Models-3 file ' // PULL_FLNAME
-                          CALL M3ERR( PNAME, PULL_DATE, PULL_TIME, MSG, .FALSE. )
+                          CALL M3EXIT( PNAME, PULL_DATE, PULL_TIME, MSG, XSTAT1 )
                       END IF
                  
                       SELECT CASE ( OPERATION_FLAG )
@@ -443,7 +452,7 @@ c         compute average if desired, write out the results
                    
                    IF ( .NOT. WRITE3('OUTFILE', OUT_VARNAME(S), WRITE_DATE,WRITE_TIME, PROC_SERIAL) ) THEN
                       MSG = ' Cannot write to OUTFILE for species ' // VNAME3D(S)
-                      CALL M3EXIT( PNAME, WRITE_DATE, WRITE_TIME, MSG, 1 )
+                      CALL M3EXIT( PNAME, WRITE_DATE, WRITE_TIME, MSG, XSTAT1 )
                    ENDIF
               END DO ! NLOOP
            END DO ! NSPECVAR

@@ -90,7 +90,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF( .NOT. DESC3 ( M3_FLNAME( 1 ) ) ) THEN
          MSG = 'Could not read DESC of  ' // M3_FLNAME( 1 ) 
      &         // ' file'
-         CALL M3ERR( PNAME, 0, 0, MSG, .TRUE. )
+         CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
       ENDIF
 
       FTYPE1 = FTYPE3D
@@ -127,7 +127,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF( .NOT. DESC3 ( M3_FLNAME( N ) ) ) THEN
             MSG = 'Could not read DESC of  ' // M3_FLNAME( N ) 
      &         // ' file'
-            CALL M3ERR( PNAME, 0, 0, MSG, .TRUE. )
+            CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
          ENDIF
 
       ENDDO
@@ -161,7 +161,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF( .NOT. DESC3 ( M3_FLNAME( N ) ) ) THEN
             MSG = 'Could not read DESC of  ' // M3_FLNAME( N ) 
      &         // ' file'
-            CALL M3ERR( PNAME, 0, 0, MSG, .TRUE. )
+            CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
          ENDIF
          
          IF( FTYPE1 .NE. FTYPE3D ) THEN
@@ -290,7 +290,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LSTOP ) THEN
           MSG = 'Missing variable or file inconsistencies detected: stopping' 
-          CALL M3ERR( PNAME, 0, 0, MSG, .TRUE. )
+          CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT2 )
       ENDIF
      
       RETURN
