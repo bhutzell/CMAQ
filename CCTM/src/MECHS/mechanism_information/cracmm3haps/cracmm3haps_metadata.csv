@@ -139,7 +139,7 @@ HYDRAZINE,Hydrazine,G,Yes,32.0,E,Hydrazine,NN,1140.0,0.0,NA,NA,NA,NA,NA
 IEPOX,isoprene epoxydiols ,G,Yes,118.1,E,Isoprene epoxydiol,OCC1OC1(C)CO,83000.0,7400.0,NA,NA,NA,NA,NA
 IEPOXP,IEPOX intermediate (tracking species),G,No,118.1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 INALD,Isoprene nitrates,G,Yes,195.1,L,2-hydroperoxy-4-hydroxy-3-methyl-3-(nitrooxy)butanal,CC(CO)(O[N+](=O)O)C(C=O)OO,100000.0,0.0,NA,NA,NA,NA,NA
-INO2,Isoprene nitrate-derived peroxy radicals,G,No,162.1,L,[(2E)-3-methyl-4-(nitrooxy)but-2-en-1-yl]peroxy,C/C(=C\CO[O])CON(=O)=O,NA,NA,NA,NA,NA,NA,NA
+ISONP,Isoprene nitrate-derived peroxy radicals,G,No,162.1,L,[(2E)-3-methyl-4-(nitrooxy)but-2-en-1-yl]peroxy,C/C(=C\CO[O])CON(=O)=O,NA,NA,NA,NA,NA,NA,NA
 IPX,Isoprene tetrafunctional compounds,G,Yes,150.1,L,3-(1-hydroperoxy-2-hydroxypropan-2-yl)oxiran-2-ol,CC(O)(COO)C1OC1O,15500000.0,0.0,NA,NA,NA,NA,NA
 ISHP,Beta-hydroxy hydroperoxides from ISOP+HO2,G,Yes,118.0,L,2-hydroperoxy-2-methylbut-3-en-1-ol,C=CC(OO)(CO)C,6.5,0.0,NA,NA,NA,NA,NA
 ISO,Isoprene ,G,Yes,68.1,E,Isoprene,CC(=C)C=C,0.0186,0.0,NA,NA,NA,NA,NA
