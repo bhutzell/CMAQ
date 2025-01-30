@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Aug  8, 2024
+C  REVISION HISTORY: Created by EBI solver program, Sep 25, 2024
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -48,7 +48,6 @@ C.....INCLUDES:
 C.....ARGUMENTS: NONE
 
 C.....PARAMETERS: NONE
-
 
 C.....SAVED VARIABLES:
       CHARACTER( 16 ), SAVE  ::  PNAME = 'HRINIT'   ! Program name
@@ -215,7 +214,7 @@ c..Allocate and define ebi species
       EBISP(  61 ) = EBZP
       EBISP(  62 ) = ISO
       EBISP(  63 ) = ISON
-      EBISP(  64 ) = INO2
+      EBISP(  64 ) = ISONP
       EBISP(  65 ) = ISOP
       EBISP(  66 ) = ISHP
       EBISP(  67 ) = IEPOX
@@ -410,7 +409,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( EBZP        ) = 5.0D-04
       RTOL( ISO         ) = 5.0D-04
       RTOL( ISON        ) = 5.0D-04
-      RTOL( INO2        ) = 5.0D-04
+      RTOL( ISONP       ) = 5.0D-04
       RTOL( ISOP        ) = 5.0D-04
       RTOL( ISHP        ) = 5.0D-04
       RTOL( IEPOX       ) = 5.0D-04
