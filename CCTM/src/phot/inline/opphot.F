@@ -400,7 +400,7 @@ C...load data from photolysis reaction list
          
          DO L = 1, N_DIAG_WVL
 
-C...assumes that lamba in nanometers is on order of 100 or less
+C...assumes that lambda in nanometers is on order of 100 or less
 
             JWL = DIAG_WVL( L )
             

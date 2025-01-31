@@ -21,7 +21,6 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPDEPV_DIAG ( JDATE, JTIME, TSTEP,
      &                         N_GDEPV_NAMES, GDEPV_NAMES,
      &                         N_ADEPV_NAMES, ADEPV_NAMES )
-!    &                         N_SDEPV_NAMES, SDEPV_NAMES)
 
 C 2006-Jun-30 - created by W Hutzell
 C 2006-Dec-05 - modified by J.Young
