@@ -68,7 +68,7 @@ Information is based on the mech.def file.
 | R044   | HO + HO2 ----> |   4.80E-11e<sup>   250.00/T</sup> |   1.1102E-10 |
 | R045   | HO2 + HO2 ----> H2O2  | k<sub>0</sub>=  3.00E-13e<sup>   460.0/T</sup><br>k<sub>1</sub>=  2.10E-33e<sup>   920.0/T</sup> |   2.5345E-12 |
 | R046   | HO2 + HO2 + H2O ----> H2O2  | k<sub>0</sub>=  4.20E-34e<sup>  2660.0/T</sup><br>k<sub>1</sub>=  2.94E-54e<sup>  3120.0/T</sup> |   5.6834E-30 |
-| R047   | H2O2 + HO ----> HO2  |   1.80E-12e<sup>     0.00/T</sup> |   1.8000E-12 |
+| R047   | H2O2 + HO ----> HO2  |   1.80E-12e<sup>    -0.00/T</sup> |   1.8000E-12 |
 | R048   | NO + O3P ----> NO2  | k<sub>o</sub>=  9.10E-32e<sup>     0.0/T</sup>(T/300)<sup> -1.50</sup><br>k<sub>i</sub> =   3.00E-11e<sup>     0.0/T</sup>(T/300)<sup>  0.00</sup><br>n=     1.00;F=     0.60 |   1.6772E-12 |
 | R049   | NO + HO ----> HONO  | k<sub>o</sub>=  7.10E-31e<sup>     0.0/T</sup>(T/300)<sup> -2.60</sup><br>k<sub>i</sub> =   3.60E-11e<sup>     0.0/T</sup>(T/300)<sup> -0.10</sup><br>n=     1.00;F=     0.60 |   7.4585E-12 |
 | R050   | NO + HO2 ----> NO2 + HO  |   3.44E-12e<sup>   260.00/T</sup> |   8.2278E-12 |
@@ -85,10 +85,10 @@ Information is based on the mech.def file.
 | R061   | NO3 + NO2 ----> NO + NO2  |   4.35E-14e<sup> -1335.00/T</sup> |   4.9418E-16 |
 | R062   | NO3 + NO3 ---->   2.0000\*NO2  |   8.50E-13e<sup> -2450.00/T</sup> |   2.2944E-16 |
 | R063   | NO3 + NO2 ----> N2O5  | k<sub>o</sub>=  2.40E-30e<sup>     0.0/T</sup>(T/300)<sup> -3.00</sup><br>k<sub>i</sub> =   1.60E-12e<sup>     0.0/T</sup>(T/300)<sup>  0.10</sup><br>n=     1.00;F=     0.60 |   1.3451E-12 |
-| R064   | N2O5 ----> NO2 + NO3  |   1.72E+26e<sup>-10840.00/T</sup> \*R063 |   3.7623E-02<sup>8</sup>| 
+| R064   | N2O5 ----> NO2 + NO3  |   1.72E+26e<sup>-10840.00/T</sup> *R063 |   3.7623E-02<sup>8</sup>| 
 | R065   | N2O5 + H2O ---->   2.0000\*HNO3  |   1.0000E-22 |   1.0000E-22 |
 | R066   | NO2 + HO2 ----> HNO4  | k<sub>o</sub>=  1.90E-31e<sup>     0.0/T</sup>(T/300)<sup> -3.40</sup><br>k<sub>i</sub> =   4.00E-12e<sup>     0.0/T</sup>(T/300)<sup> -0.30</sup><br>n=     1.00;F=     0.60 |   1.3113E-12 |
-| R067   | HNO4 ----> HO2 + NO2  |   4.76E+26e<sup>-10900.00/T</sup> \*R066 |   8.2835E-02<sup>8</sup>| 
+| R067   | HNO4 ----> HO2 + NO2  |   4.76E+26e<sup>-10900.00/T</sup> *R066 |   8.2835E-02<sup>8</sup>| 
 | R068   | HNO4 + HO ----> NO2  |   4.50E-13e<sup>   610.00/T</sup> |   3.4814E-12 |
 | R069   | SO2 + HO ----> HO2 + SULF + SULRXN  | k<sub>o</sub>=  2.90E-31e<sup>     0.0/T</sup>(T/300)<sup> -4.10</sup><br>k<sub>i</sub> =   1.70E-12e<sup>     0.0/T</sup>(T/300)<sup>  0.20</sup><br>n=     1.00;F=     0.60 |   9.5762E-13 |
 | R070   | CO + HO ----> HO2  | k<sub>0</sub>=  1.44E-13e<sup>     0.0/T</sup><br>k<sub>1</sub>=  2.74E-33e<sup>     0.0/T</sup> |   2.1145E-13 |
@@ -106,14 +106,14 @@ Information is based on the mech.def file.
 | ROCARO61   | EBZ + HO ---->   0.8200\*EBZP +    0.1800\*CSL +    0.1800\*HO2  |   7.0000E-12 |   7.0000E-12 |
 | ROCARO61a   | EBZ + NO3 ----> EBZP + HNO3  |   5.7000E-16 |   5.7000E-16 |
 | RAM01   | ISO + O3 ---->   0.2500\*HO +    0.2500\*HO2 +    0.4000\*MO2 +    0.0180\*ACO3 +    0.1000\*MACP +    0.0900\*H2O2 +    0.2200\*CO + HCHO +    0.3000\*MACR +    0.1400\*MVK +    0.2800\*ORA1 +    0.1530\*OLT  |   1.58E-14e<sup> -2000.00/T</sup> |   1.9293E-17 |
-| RAM02   | ISO + NO3 ---->   0.4000\*NO2 +    0.0450\*ISON +    0.3500\*HCHO +    0.5550\*INO2 +    0.2600\*MVK +    0.0280\*MACR  |   2.95E-12e<sup>  -450.00/T</sup> |   6.5214E-13 |
+| RAM02   | ISO + NO3 ---->   0.4000\*NO2 +    0.0450\*ISON +    0.3500\*HCHO +    0.5550\*ISONP +    0.2600\*MVK +    0.0280\*MACR  |   2.95E-12e<sup>  -450.00/T</sup> |   6.5214E-13 |
 | RAM03   | ISO + HO ----> ISOP +    0.2500\*HCHO +    0.0300\*MACR +    0.0500\*MGLY  |   2.69E-11e<sup>   390.00/T</sup> |   9.9503E-11 |
 | RAM04   | ISOP + HO2 ----> ISHP +    0.0700\*HO2 +    0.5000\*HO  |   4.50E-13e<sup>  1300.00/T</sup> |   3.5224E-11 |
 | RAM05   | ISOP + NO ---->   0.1300\*ISON +    0.4000\*HCHO +    0.8800\*HO2 +    0.8700\*NO2 +    0.1800\*MACR +    0.5100\*MVK  |   6.00E-12e<sup>   350.00/T</sup> |   1.9408E-11 |
 | RAM06   | ISHP + HO ----> ISOP  |   4.60E-12e<sup>   200.00/T</sup> |   8.9967E-12 |
 | RAM07   | ISHP + HO ---->   0.0400\*MGLY +    0.0200\*GLY +    0.1300\*MVK +    0.4400\*IEPOX +    0.1100\*ACO3 +    0.0300\*MACR +    2.0000\*HO +    0.3400\*HO2 +    0.1400\*IPX + CO  |   2.97E-11e<sup>   390.00/T</sup> |   1.0986E-10 |
-| RAM08   | INO2 + HO2 ---->   0.4500\*HO +    0.9500\*INALD +    0.0200\*IPX  |   3.14E-11e<sup>   580.00/T</sup> |   2.1967E-10 |
-| RAM09   | INO2 + NO ---->   0.1500\*MVK +    0.6500\*INALD +    0.0500\*ISON +    0.2000\*HCHO +    1.3000\*NO2  |   9.42E-12e<sup>   580.00/T</sup> |   6.5902E-11 |
+| RAM08   | ISONP + HO2 ---->   0.4500\*HO +    0.9500\*INALD +    0.0200\*IPX  |   3.14E-11e<sup>   580.00/T</sup> |   2.1967E-10 |
+| RAM09   | ISONP + NO ---->   0.1500\*MVK +    0.6500\*INALD +    0.0500\*ISON +    0.2000\*HCHO +    1.3000\*NO2  |   9.42E-12e<sup>   580.00/T</sup> |   6.5902E-11 |
 | RAM10   | ISON + HO ----> HO +    0.3500\*INALD +    0.1700\*IEPOX +    0.6500\*NO2  |   2.40E-11e<sup>   390.00/T</sup> |   8.8776E-11 |
 | RAM11   | HO + INALD ----> CO + NO2 +    0.3000\*HO2 + HCHO  |   1.5000E-11 |   1.5000E-11 |
 | RAM12   | ISON ----> HNO3 + ROH  |   4.0000E-05 |   4.0000E-05 |
@@ -139,8 +139,8 @@ Information is based on the mech.def file.
 | R103   | DCB3 + HO ---->   0.5600\*HO2 +    0.2100\*MACP +    0.1100\*CO +    0.2700\*GLY +    0.0100\*MGLY +    0.7900\*OP2  |   1.0000E-11 |   1.0000E-11 |
 | R104   | BALD + HO ----> BALP  |   5.32E-12e<sup>   243.00/T</sup> |   1.2019E-11 |
 | R105   | PHEN + HO ---->   0.1520\*ASOATJ +    0.6190\*HO2 +    0.1700\*ADDC +    0.0590\*CHO +    0.6190\*MCT  |   6.75E-12e<sup>   405.00/T</sup> |   2.6257E-11 |
-| R106   | CSL + HO ---->   0.2000\*ASOATJ +    0.5840\*HO2 +    0.1600\*ADDC +    0.0560\*CHO +    0.5840\*MCT  |   4.65E-11e<sup>     0.00/T</sup> |   4.6500E-11 |
-| R108   | MCT + HO ----> MCTO  |   2.05E-10e<sup>     0.00/T</sup> |   2.0500E-10 |
+| R106   | CSL + HO ---->   0.2000\*ASOATJ +    0.5840\*HO2 +    0.1600\*ADDC +    0.0560\*CHO +    0.5840\*MCT  |   4.65E-11e<sup>    -0.00/T</sup> |   4.6500E-11 |
+| R108   | MCT + HO ----> MCTO  |   2.05E-10e<sup>    -0.00/T</sup> |   2.0500E-10 |
 | R109   | MOH + HO ----> HO2 + HCHO  |   2.85E-12e<sup>  -345.00/T</sup> |   8.9600E-13 |
 | R110   | EOH + HO ----> HO2 + ACD  |   3.00E-12e<sup>    20.00/T</sup> |   3.2081E-12 |
 | R111   | ROH + HO ----> HO2 +    0.7190\*ALD +    0.1840\*ACD  |   2.60E-12e<sup>   200.00/T</sup> |   5.0851E-12 |
@@ -193,9 +193,9 @@ Information is based on the mech.def file.
 | TRP11   | PINALP ----> HOM  |   2.9000E-02 |   2.9000E-02 |
 | TRP12   | LIMALP ----> HOM  |   2.4000E-02 |   2.4000E-02 |
 | R166   | ACO3 + NO2 ----> PAN  | k<sub>o</sub>=  9.70E-29e<sup>     0.0/T</sup>(T/300)<sup> -5.60</sup><br>k<sub>i</sub> =   9.30E-12e<sup>     0.0/T</sup>(T/300)<sup> -1.50</sup><br>n=     1.00;F=     0.60 |   8.6800E-12 |
-| R167   | PAN ----> ACO3 + NO2  |   1.11E+28e<sup>-14000.00/T</sup> \*R166 |   3.9034E-04<sup>8</sup>| 
+| R167   | PAN ----> ACO3 + NO2  |   1.11E+28e<sup>-14000.00/T</sup> *R166 |   3.9034E-04<sup>8</sup>| 
 | R168   | RCO3 + NO2 ----> PPN  | k<sub>o</sub>=  9.70E-29e<sup>     0.0/T</sup>(T/300)<sup> -5.60</sup><br>k<sub>i</sub> =   9.30E-12e<sup>     0.0/T</sup>(T/300)<sup> -1.50</sup><br>n=     1.00;F=     0.60 |   8.6800E-12 |
-| R169   | PPN ----> RCO3 + NO2  |   1.11E+28e<sup>-14000.00/T</sup> \*R168 |   3.9034E-04<sup>8</sup>| 
+| R169   | PPN ----> RCO3 + NO2  |   1.11E+28e<sup>-14000.00/T</sup> *R168 |   3.9034E-04<sup>8</sup>| 
 | R170   | MACP + NO2 ----> MPAN  |   2.80E-12e<sup>   181.00/T</sup> |   5.1382E-12 |
 | R171   | MPAN ----> MACP + NO2  |   1.60E+16e<sup>-13486.00/T</sup> |   3.6308E-04 |
 | R172   | MO2 + NO ----> HO2 + NO2 + HCHO  |   2.80E-12e<sup>   300.00/T</sup> |   7.6586E-12 |
@@ -442,12 +442,12 @@ Information is based on the mech.def file.
 | HET_NO2   | NO2 ---->   0.5000\*HONO +    0.5000\*HNO3  | HETERO_NO2 | Not Available<sup>2</sup> | 
 | HET_HO2   | HO2 ----> | HETERO_HO2 | Not Available<sup>2</sup> | 
 | HET_NO3   | NO3 ----> HNO3  | HETERO_NO3 | Not Available<sup>2</sup> | 
-| HAL_Ozone   | O3 ----> | SEAWATER*min( 6.701E-11e<sup> 1.074E+01P</sup>+ 3.415E-08e<sup>-6.713E-01P</sup>, <br> 2.000E-06) |   2.0000E-06<sup>4</sup>| 
+| HAL_Ozone   | O3 ----> | SEAWATER*min( 1.065E-12e<sup> 1.391E+01P</sup>+ 1.442E-08e<sup> 3.084E+00P</sup>, <br> 8.400E-07) |   8.4000E-07<sup>4</sup>| 
 | HET_IEPOX   | IEPOX ----> IEPOXP  | HETERO_IEPOX | Not Available<sup>2</sup> | 
 | HET_ISO3TET   | IEPOXP ----> AISO3NOSJ  | HETERO_ISO3NOSJ | Not Available<sup>2</sup> | 
 | HET_IEPOXOS   | IEPOXP + ASO4J ----> AISO3OSJ  | HETERO_ISO3OSJ | Not Available<sup>2</sup> | 
-| HET_IPX   | IPX ----> AISO4J  |   2.0000E+00\*HETERO_IEPOX | Not Available<sup>2</sup> | 
-| HET_INALD   | INALD ----> AISO5J + HNO3  |   5.0000E-01\*HETERO_IEPOX | Not Available<sup>2</sup> | 
+| HET_IPX   | IPX ----> AISO4J  |   2.0000E+00*HETERO_IEPOX | Not Available<sup>2</sup> | 
+| HET_INALD   | INALD ----> AISO5J + HNO3  |   5.0000E-01*HETERO_IEPOX | Not Available<sup>2</sup> | 
 | ROCALK1c   | VROCP6ALK + HO ----> VROCP6ALKP  |   1.5300E-11 |   1.5300E-11 |
 | ROCALK2c   | VROCP5ALK + HO ----> VROCP5ALKP  |   1.6800E-11 |   1.6800E-11 |
 | ROCALK3c   | VROCP4ALK + HO ----> VROCP4ALKP  |   2.2400E-11 |   2.2400E-11 |

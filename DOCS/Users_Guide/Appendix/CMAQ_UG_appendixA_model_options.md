@@ -485,10 +485,10 @@ Sets if the CCTM will run in multi-processor or serial mode.
     ---  6-Approximations to Mie Theory    
 -   `CTM_PVO3 [default: N]`<a id=CTM_PVO3></a>    
      Y/N determines whether to scale ozone in free-troposphere to potential vorticity. Option requires that METCRO3D file has PV, potential vorticity. See [User Guide 6.13](../CMAQ_UG_ch06_model_configuration_options.md#613-potential-vorticity-scaling) for more information.
--   `IC_AERO_M2USE [default: T]`<a id=IC_AERO_M2USE></a> Instructs CMAQ whether or not to use aerosol surface area from the Initial Condition file. If this option is set to false, then uniform diameter and standard deviation will be applied to each aerosol mode. If a particular simulation is a restart from a simulation preceeding in time (i.e. if this is any day after the first simulation day), then IC_AERO_M2USE is automatically set to True inside CMAQ.
--   `IC_AERO_M2WET [default: F=dry]`<a id=IC_AERO_M2WET></a> Instructs CMAQ whether or not to assume the initial condition surface area is consistent with dry or wet diameter. Note that most air quality models assume mode parameters are dry, and then will calculate wet diameter when needed (e.g. for deposition).
--   `BC_AERO_M2USE [default: T]`<a id=BC_AERO_M2USE></a> Instructs CMAQ whether or not to use aerosol surface area from the Boundary Condition file. If this option is set to false, then uniform diameter and standard deviation will be applied to each aerosol mode from the boundaries. 
--   `BC_AERO_M2WET [default: F=dry]`<a id=BC_AERO_M2WET></a> Instructs CMAQ whether or not to assume the boundary condition surface area is consistent with dry or wet diameter. Note that most air quality models assume mode parameters are dry, and then will calculate wet diameter when needed (e.g. for deposition). For more information about the IC_AERO and BC_AERO options, please see [Chapter 6](CMAQ_UG_ch06_model_configuration_options.md#6.11.1_Aero_BC)
+-   `BC_AERO_M2USE [default: T]`<a id=BC_AERO_M2USE></a> 
+    This option instructs CMAQ to use aerosol surface area from the boundary condition files. The definition of the second moment changed with the release of CMAQv5.4, and SOA is now considered part of the dry aerosol components. Therefore, all boundary conditions created with versions before v5.4 have incompatible aerosol surface area with current CMAQ. Run scripts that point to boundary conditions created with CMAQv5.3.3 and previous should have BC_AERO_M2USE set to False, and run scripts with boundary conditions created after this date should be set to True.   This setting can be significant for PM when using small domains. It is recommended to set this option to True if (1) using boundary conditions provided by a CMAQ simulation on a parent domain, (2) M2 is available, and (3) the domain is smaller than CONUS. 
+-   `BC_AERO_M2WET [default: F=dry]`<a id=BC_AERO_M2WET></a> 
+    Generally, aerosol surface area is assumed to be dry when transported or output in CMAQ, and this option should be set to False by default. If a user knows their aerosol surface area applies to the wet size distribution (e.g. through an offline calculation or another modeling system), this option may be used to enforce compatibility.
 
 <a id=Process_Analysis_Options></a>
 
@@ -596,7 +596,7 @@ Aerosol Diagnostics are now handled by the Explicit and Lumped Model Output modu
     Short label of the gridded file for stream ###, where ### = 001, 002,…,N_EMIS_GR. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information. 
 
 -   `GR_EM_SYM_DATE_### [default: False]`<a id=GR_EM_SYM_DATE_###></a>  
-    Switch to indicate whether gridded emission is of representative day type for stream ###, where ### = 01, 02,…,N_EMIS_GR. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
+    Switch to indicate whether gridded emission is of representative day type for stream ###, where ### = 01, 02,…,N_EMIS_GR. Variable should be set to indicate if the date on an emission file can be different from the simulation day date (T for True). A setting of F (False) requires the emission input file date to match the simulation date. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
     
 -   `N_EMIS_PT `<a id=N_EMIS_PT></a>
     The number of offline Point emission streams to be used by the model. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
@@ -614,7 +614,7 @@ Aerosol Diagnostics are now handled by the Explicit and Lumped Model Output modu
     Short label of the point emissions file for sector ###, where ### = 001, 002,…,N_EMIS_PT. Each ### refers to the one of the plume rise point-source sectors. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
     
  -   `STK_EM_SYM_DATE_### [default: False]`<a id=STK_EM_SYM_DATE_###></a>  
-    Switch to indicate whether point emission file is of representative day type for sector ###, where ### = 01, 02,…,N_EMIS_PT. Each ### refers to the one of the plume rise point-source sectors. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information. 
+    Switch to indicate whether point emission file is of representative day type for sector ###, where ### = 01, 02,…,N_EMIS_PT. Variable should be set to indicate if the date on an emission file can be different from the simulation day date (T for True). A setting of F (False) requires the emission input file date to match the simulation date. Each ### refers to the one of the plume rise point-source sectors. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information. 
     
 -   `EMIS_SYM_DATE [default: False]`<a id=EMIS_SYM_DATE></a>  
     The default for GR_EM_SYM_DATE_### and STK_EM_SYM_DATE_### if not set explicitly is false, however users have the option to set this default by setting this environment variable. Users should note, that if this variable is set and GR_EM_SYM_DATE_### or STK_EM_SYM_DATE_### is set, the individual stream switch takes precedent over this variable. This switch maybe useful if all offline emissions are of representative day type. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
