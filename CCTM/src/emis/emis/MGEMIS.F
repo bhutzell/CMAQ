@@ -127,13 +127,11 @@ C   03 Nov 15: B. Gantt and G. Sarwar: created the initial version for marine ga
             USE CENTRALIZED_IO_MODULE, only : chlr, dmsl
 
             IMPLICIT NONE
-            INCLUDE SUBST_CONST                                     ! constants
             INCLUDE SUBST_FILES_ID                                  ! file name parameters
 
 C Arguments:
             INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP
             LOGICAL :: SUCCESS
-
 
             CHARACTER( 80 )       :: VARDESC                        ! env variable description
 
@@ -252,6 +250,7 @@ C 8 Aug 14 B.Gantt adapted from sea salt diagnostic
 
          USE GRID_CONF           ! horizontal & vertical domain specifications
          USE UTILIO_DEFN
+         USE MIO_ASCII
 
          IMPLICIT NONE
 
@@ -337,6 +336,21 @@ C Set output file characteristics based on COORD.EXT and open diagnostic file
                FDESC3D( L ) = ' '
             END DO
 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_MGEM_1', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+            
+
 C Open marine gas emissions diagnostic file
             IF ( .NOT. OPEN3( CTM_MGEM_1, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create the CTM_MGEM_1 file'
@@ -375,7 +389,7 @@ C Iodine's impact on tropospheric oxidants: a global model study in GEOS-Chem. A
 
 C-----------------------------------------------------------------------
             USE UTILIO_DEFN
-            USE AEROMET_DATA   ! Includes CONST.EXT
+            USE CONST, ONLY: PI180, DG2M, DKBOLTZ, GRAV
             USE ASX_DATA_MOD, ONLY: MET_DATA                 ! added by Sarwar
             USE CGRID_SPCS     ! CGRID mechanism species
             USE PCGRID_DEFN    ! get cgrid
@@ -425,7 +439,7 @@ C Local Variables:
             REAL    :: SST            
             REAL    :: DMS_L              ! DMS in ocean water - nM  
             REAL    :: DMS                ! DMS in atmosphere                        
-            REAL    :: SICE               ! SEAICE in a gird-cell
+            REAL    :: SICE               ! SEAICE in a grid cell
 
             REAL    :: SCN
             REAL    :: K600

@@ -85,13 +85,12 @@ R5#endif
       USE DDM3D_CHEM
       Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, NP, NPMAX, CKTIME
 #endif 
+      USE CONST, ONLY: MWAIR, MWWAT, STDATMPA
 
       IMPLICIT NONE 
 
 C..Includes:
       INCLUDE SUBST_FILES_ID  ! CMAQ files
-      INCLUDE SUBST_CONST     ! CMAQ constants
-      
       INCLUDE SUBST_EMISPRM   ! Emissions processing control parameters
 
 C..Arguments:
@@ -392,20 +391,6 @@ c..Load ICs
                   END IF
                END DO
 
-R5               IF(CALL_DEG)THEN ! INITIALIZE degradation routines
-R5
-R5                  YCCELL = 0.0D0
-R5                  DO S = 1, MODEL_SPECIES
-R5                     YCCELL( S ) = REAL( CGRID(C,R,L,S), 8)
-R5                  END DO
-R5                  CALL INIT_DEGRADE(YCCELL,TA(C,R,L),DENS(C,R,L),PRES(C,R,L),QV(C,R,L),RJIN(NCELL,:),
-R5     &                              JDATE, JTIME)
-R5
-R5#ifdef isam
-R5                  CALL SA_DEGRADE_EXTRACT( C,R,L,DENS(C,R,L) )
-R5#endif     
-R5               END IF
-
 c..Set physical quantities
                TEMP( NCELL )     = REAL( TA( C,R,L ), 8)
                DENSITY( NCELL )  = REAL( DENS( C,R,L ), 8)
@@ -423,6 +408,20 @@ c..Get rate constants
 
                CALL CALC_RCONST( TEMP, ATMPRES, H2O, RJIN, HET, LSUNLIGHT, SEAWATER, RKI_SAV, NCELL )
                FORALL( NPH = 1:NRXNS )RKI( NPH ) = RKI_SAV( NCELL, NPH )
+
+R5               IF(CALL_DEG)THEN ! INITIALIZE degradation routines
+R5
+R5                  YCCELL = 0.0D0
+R5                  DO S = 1, MODEL_SPECIES
+R5                     YCCELL( S ) = REAL( CGRID(C,R,L,S), 8)
+R5                  END DO
+R5                  CALL INIT_DEGRADE(YCCELL,TA(C,R,L),DENS(C,R,L),PRES(C,R,L),QV(C,R,L),RJIN(NCELL,:),
+R5     &                              JDATE, JTIME)
+R5
+R5#ifdef isam
+R5                  CALL SA_DEGRADE_EXTRACT( C,R,L,DENS(C,R,L) )
+R5#endif     
+R5               END IF
 
 #ifdef isam
 #if defined(isam) || defined(verbose_isam)

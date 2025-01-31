@@ -343,68 +343,68 @@ CONTAINS
          
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      
-      VAR( ind_A_NO3AKN ) = AEROSOL( LNO3, AKN )
-      VAR( ind_A_NH4AKN ) = AEROSOL( LNH4, AKN )
-      VAR( ind_A_CLAKN )  = AEROSOL( LCL, AKN )
-      VAR( ind_A_NAAKN )  = AEROSOL( LNA, AKN )
-      VAR( ind_A_SO4AKN ) = AEROSOL( LSO4, AKN )
-      VAR( ind_A_PECAKN ) = AEROSOL( LEC, AKN )
-      VAR( ind_A_POAAKN ) = AEROSOL( LPOA, AKN )
-      VAR( ind_A_PRIAKN ) = AEROSOL( LPRI, AKN )
+      VAR( ind_A_NO3AKN ) = AEROSOL( LNO3, IAIT )
+      VAR( ind_A_NH4AKN ) = AEROSOL( LNH4, IAIT )
+      VAR( ind_A_CLAKN )  = AEROSOL( LCL, IAIT )
+      VAR( ind_A_NAAKN )  = AEROSOL( LNA, IAIT )
+      VAR( ind_A_SO4AKN ) = AEROSOL( LSO4, IAIT )
+      VAR( ind_A_PECAKN ) = AEROSOL( LEC, IAIT )
+      VAR( ind_A_POAAKN ) = AEROSOL( LPOA, IAIT )
+      VAR( ind_A_PRIAKN ) = AEROSOL( LPRI, IAIT )
      
-! Instantaneous droplet activation of ACC and COR modes and dissolution of H2SO4
-! Initial dynamic aqueous species represent the sum of ACC and COR mode 
+! Instantaneous droplet activation of ACC and ICOR modes and dissolution of H2SO4
+! Initial dynamic aqueous species represent the sum of ACC and ICOR mode 
 ! concentrations.  
 
-      VAR( ind_L_SO4MIN2 ) = AEROSOL( LSO4, ACC ) + AEROSOL( LSO4, COR )
-      VAR( ind_L_NO3MIN )  = AEROSOL( LNO3, ACC ) + AEROSOL( LNO3, COR )
-      VAR( ind_L_NH4PLUS ) = AEROSOL( LNH4, ACC ) + AEROSOL( LNH4, COR )
-      VAR( ind_L_CLMIN )   = AEROSOL( LCL, ACC ) + AEROSOL( LCL, COR )
-      VAR( ind_L_PRIACC )  = AEROSOL( LPRI, ACC )
-      VAR( ind_L_NAPLUS )  = AEROSOL( LNA, ACC )
-      VAR( ind_L_CAPLUS2 ) = AEROSOL( LCAACC, ACC )
-      VAR( ind_L_MGPLUS2 ) = AEROSOL( LMGACC, ACC )
-      VAR( ind_L_KPLUS )   = AEROSOL( LKACC, ACC )
-      VAR( ind_L_PECACC )  = AEROSOL( LEC, ACC )
-!      VAR( ind_L_ORGC )    = AEROSOL( LORGC, ACC )
-      VAR( ind_L_ORGC )    = 0.2*AEROSOL( LORGC, ACC )
-      VAR( ind_L_OXLACMIN2 ) = 0.8*AEROSOL( LORGC, ACC ) / & 
+      VAR( ind_L_SO4MIN2 ) = AEROSOL( LSO4, IACC ) + AEROSOL( LSO4, ICOR )
+      VAR( ind_L_NO3MIN )  = AEROSOL( LNO3, IACC ) + AEROSOL( LNO3, ICOR )
+      VAR( ind_L_NH4PLUS ) = AEROSOL( LNH4, IACC ) + AEROSOL( LNH4, ICOR )
+      VAR( ind_L_CLMIN )   = AEROSOL( LCL, IACC ) + AEROSOL( LCL, ICOR )
+      VAR( ind_L_PRIACC )  = AEROSOL( LPRI, IACC )
+      VAR( ind_L_NAPLUS )  = AEROSOL( LNA, IACC )
+      VAR( ind_L_CAPLUS2 ) = AEROSOL( LCA, IACC )
+      VAR( ind_L_MGPLUS2 ) = AEROSOL( LMG, IACC )
+      VAR( ind_L_KPLUS )   = AEROSOL( LK, IACC )
+      VAR( ind_L_PECACC )  = AEROSOL( LEC, IACC )
+!      VAR( ind_L_ORGC )    = AEROSOL( LORGC, IACC )
+      VAR( ind_L_ORGC )    = 0.2*AEROSOL( LORGC, IACC )
+      VAR( ind_L_OXLACMIN2 ) = 0.8*AEROSOL( LORGC, IACC ) / & 
                              ( 90.03 / 177. ) ! Assume 80% of AORGC is oxalate --
 			                      ! based on average results from CMAQ
 			                      ! simulations where cloud generated 
 					      ! org acid species were tracked                                                        
-      VAR( ind_L_POAACC )  = AEROSOL( LPOA, ACC )
+      VAR( ind_L_POAACC )  = AEROSOL( LPOA, IACC )
       
       IF( ISPC8 .gt. 0 ) THEN
-      VAR( ind_L_IETET )   = AEROSOL( LIETET, ACC )
-      VAR( ind_L_IEOS )    = AEROSOL( LIEOS, ACC )
-      VAR( ind_L_DIMER )   = AEROSOL( LDIMER, ACC )
-      VAR( ind_L_IMGA )    = AEROSOL( LIMGA, ACC )
-      VAR( ind_L_IMOS )    = AEROSOL( LIMOS, ACC )
+      VAR( ind_L_IETET )   = AEROSOL( LIETET, IACC )
+      VAR( ind_L_IEOS )    = AEROSOL( LIEOS, IACC )
+      VAR( ind_L_DIMER )   = AEROSOL( LDIMER, IACC )
+      VAR( ind_L_IMGA )    = AEROSOL( LIMGA, IACC )
+      VAR( ind_L_IMOS )    = AEROSOL( LIMOS, IACC )
       ELSE
-      VAR( ind_L_ISO3 )   = AEROSOL( LISO3, ACC )
+      VAR( ind_L_ISO3 )   = AEROSOL( LISO3, IACC )
       END IF
          
       VAR( ind_L_SO4MIN2 ) = VAR( ind_L_SO4MIN2 ) + GAS( LH2SO4 )
 
-! Coarse crustal species from SOILCOR, ANTHCOR, SEASCOR
+! Coarse crustal species from SOILICOR, ANTHICOR, SEASICOR
  
-      FECOR   = SOIL_FE_FAC * AEROSOL(LSOILC,COR) + CORS_FE_FAC &
-              * AEROSOL(LANTHC,COR)
-      MNCOR   = SOIL_MN_FAC * AEROSOL(LSOILC,COR) + CORS_MN_FAC &
-              * AEROSOL(LANTHC,COR)
-      NACOR   = SEAS_NA_FAC * AEROSOL(LSEASC,COR) + SOIL_NA_FAC &
-              * AEROSOL(LSOILC,COR)  &
-              + CORS_NA_FAC * AEROSOL(LANTHC,COR)
-      MGCOR   = SEAS_MG_FAC * AEROSOL(LSEASC,COR) + SOIL_MG_FAC &
-              * AEROSOL(LSOILC,COR)  &
-              + CORS_MG_FAC * AEROSOL(LANTHC,COR)
-      CACOR   = SEAS_CA_FAC * AEROSOL(LSEASC,COR) + SOIL_CA_FAC &
-              * AEROSOL(LSOILC,COR)  &
-              + CORS_CA_FAC * AEROSOL(LANTHC,COR)
-      KCOR    = SEAS_K_FAC  * AEROSOL(LSEASC,COR) + SOIL_K_FAC  &
-              * AEROSOL(LSOILC,COR)  &
-              + CORS_K_FAC  * AEROSOL(LANTHC,COR)
+      FECOR   = SOIL_FE_FAC * AEROSOL(LSOIL,ICOR) + CORS_FE_FAC &
+              * AEROSOL(LANTH,ICOR)
+      MNCOR   = SOIL_MN_FAC * AEROSOL(LSOIL,ICOR) + CORS_MN_FAC &
+              * AEROSOL(LANTH,ICOR)
+      NACOR   = SEAS_NA_FAC * AEROSOL(LSEAS,ICOR) + SOIL_NA_FAC &
+              * AEROSOL(LSOIL,ICOR)  &
+              + CORS_NA_FAC * AEROSOL(LANTH,ICOR)
+      MGCOR   = SEAS_MG_FAC * AEROSOL(LSEAS,ICOR) + SOIL_MG_FAC &
+              * AEROSOL(LSOIL,ICOR)  &
+              + CORS_MG_FAC * AEROSOL(LANTH,ICOR)
+      CACOR   = SEAS_CA_FAC * AEROSOL(LSEAS,ICOR) + SOIL_CA_FAC &
+              * AEROSOL(LSOIL,ICOR)  &
+              + CORS_CA_FAC * AEROSOL(LANTH,ICOR)
+      KCOR    = SEAS_K_FAC  * AEROSOL(LSEAS,ICOR) + SOIL_K_FAC  &
+              * AEROSOL(LSOIL,ICOR)  &
+              + CORS_K_FAC  * AEROSOL(LANTH,ICOR)
             
 ! Cloudwater cations 
 
@@ -416,9 +416,9 @@ CONTAINS
 ! Fe3+ and Mn2+ for SIV oxidation
                
       VAR( ind_L_FEPLUS3 ) = FE_SOL * FE_III &
-                           * ( AEROSOL( LFEACC, ACC ) + FECOR )     
+                           * ( AEROSOL( LFE, IACC ) + FECOR )     
       VAR( ind_L_MNPLUS2 ) = MN_SOL * MN_II &
-                           * ( AEROSOL( LMNACC, ACC ) + MNCOR )
+                           * ( AEROSOL( LMN, IACC ) + MNCOR )
       
 ! Convert concententrations from input units mol/mol air --> molec/cm3 air     
 

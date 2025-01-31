@@ -20,7 +20,6 @@
       SUBROUTINE OP_SA ( JDATE, JTIME, TSTEP, NSTEPS, FILE_NAME )
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c20140428  Opens ISAM's SA_CONC_1 file
 c       op_sa.F called by initscen.F
 c
 C     01 Nov 2018: S.Napelenok Updates for cmaq5.3 release 
@@ -35,8 +34,8 @@ c     USE SA_LAYERS
       USE SA_DEFN               ! Mc06
       USE UTILIO_DEFN           ! replaces ioparms, iofdesc, iodecl
 c     USE SUBST_MODULES         ! stenex
-      USE RXNS_DATA, ONLY : MECHNAME !Get Chemical Mechanism Name
       USE RUNTIME_VARS
+      USE MIO_ASCII
 
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -199,6 +198,19 @@ cyqw    TSTEP3D = TSTEP(1)
             FDESC3D( L ) = ' '
         END DO
    
+        ! Store MIO Metadata
+        NDIMS3D( 1:NVARS3D ) = 4
+        L_TSTEP( 1:NVARS3D ) = .True.
+        L_LAY  ( 1:NVARS3D ) = .True.
+        L_COL  ( 1:NVARS3D ) = .True.
+        L_ROW  ( 1:NVARS3D ) = .True.
+        L_VEXT ( 1:NVARS3D ) = .False.
+
+        CALL LOAD_MIO_FILE ( FILE_NAME, NLAYS3D, ISAM_BLEV, ISAM_ELEV,
+     &       VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &       VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &       L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &       L_VEXT(1:NVARS3D) )
                
         IF ( MYPE .EQ. 0 ) THEN
 !           CALL M3EXIT( 'OP_SA', 0, 0, 'Fatal Error Encountered', XSTAT2 )

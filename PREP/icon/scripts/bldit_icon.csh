@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-# ====================== ICONv5.4.X Build Script ====================   
+# ====================== ICONv5.5.X Build Script ====================   
 # Usage: bldit_icon.csh >&! bldit.icon.log                                
 # Requirements: I/O API & netCDF libs, and a Fortran compiler    
 # Note that this script is configured/tested for Red Hat Linux O/S    
@@ -38,7 +38,7 @@
  setenv REPOROOT $ICON_SRC
 
 #> Working directory and Version IDs
- set VRSN  = v54                    #> Code Version
+ set VRSN  = v55                    #> Code Version
  set EXEC = ICON_${VRSN}.exe        #> executable name for this application
  set CFG  = ICON_${VRSN}.cfg        #> BLDMAKE configuration file name
 
@@ -71,6 +71,7 @@
 
 #> Set full path of Fortran 90 compiler
  set FC = ${myFC}
+ set CC = ${myCC}
  set FP = $FC
  setenv BLDER ${CMAQ_HOME}/UTIL/bldmake/bldmake_${compilerString}.exe   #> name of model builder executable
 
@@ -148,6 +149,8 @@
  echo                                                              >> $Cfile
  set text = "$quote$CPP_FLAGS$quote;"
  echo "cpp_flags   $text"                                          >> $Cfile
+ echo                                                              >> $Cfile
+ echo "c_compiler  $CC;"                                           >> $Cfile
  echo                                                              >> $Cfile
  echo "f_compiler  $FC;"                                           >> $Cfile
  echo                                                              >> $Cfile

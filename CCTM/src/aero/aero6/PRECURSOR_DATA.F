@@ -150,7 +150,7 @@ C----------------------------------------------------------------------
       Use cgrid_spcs, only: n_gc_g2ae, gc_g2ae, gc_g2ae_map, gc_molwt, gc_strt,
      &                      n_nr_n2ae, nr_n2ae, nr_n2ae_map, nr_molwt, nr_strt
       Use utilio_defn, only: index1, xstat3, m3warn, m3exit
-      Use runtime_vars, only: logdev, LOG_MESSAGE
+      Use runtime_vars, only: logdev, log_subheading
 
       Implicit None
 
@@ -161,7 +161,7 @@ C Local Variables:
 
 C If the species are mapped already, skip the mapping algorithm
       If ( mapped ) Return
-      CALL LOG_MESSAGE( LOGDEV, 'Map SOA Precursors' )
+      CALL LOG_SUBHEADING( LOGDEV, 'Map Inorganic and Organic Particle Precursors' )
 
 C Initialize Precursor Map Variables
       precursor_mw = 0.0d0
@@ -173,19 +173,19 @@ C Build mapping to CGRID for each precursor species
          If ( n .Ne. 0 ) Then
             precursor_mw( spc ) = real( gc_molwt( gc_g2ae_map( n ) ), 8 )
             precursor_map( spc ) = gc_strt - 1 + gc_g2ae_map( n )
+            write(logdev,99902) Trim( precursor( spc )%name )
          Else
             n = index1( precursor( spc )%name, n_nr_n2ae, nr_n2ae )
             If ( n .Ne. 0 ) Then
                precursor_mw( spc ) = real( nr_molwt( nr_n2ae_map( n ) ), 8 )
                precursor_map( spc ) = nr_strt - 1 + nr_n2ae_map( n )
+               write(logdev,99902) Trim( precursor( spc )%name )
             Else
                 If ( precursor( spc )%required ) Then
                   Precursor_eflag = .True.
                   xmsg = 'FATAL: Simulation requires a species in GC or NR namelist ' //
      &                   'to have its G2AE or N2AE value set to ' // Trim( precursor( spc )%name )
                   Call m3warn( 'map_precursor', 0, 0, xmsg )
-                Else
-                  write(logdev,99902)Trim( precursor( spc )%name )
                 End If 
             End If
          End If
@@ -234,7 +234,7 @@ C Find indices of required species
 
       If( Precursor_eflag )Then
          Write(logdev,99901) Trim( mechname )
-             xmsg = 'The FATAL errors found in namelist used. Check '
+             xmsg = 'FATAL errors found in namelist used. Check '
      &          //  'the log of exiting processor if more details are needed.'
          Call m3exit( pname, 0, 0, xmsg, xstat3 )
       End If 
@@ -248,8 +248,8 @@ C Find indices of required species
 99901 Format( 'FATAL error(s) found in the GC and/or NR namelists used. Check that '
      &     /  'these namelists contain the above required data as the respective files '
      &     /  'in the repository version of the mechanism: ' , a )
-99902 Format( 5x,'Note: Optional species ', a, ' is not found in G2AE or N2AE values of',
-     &    /   7x,'the GC or NR namelist. Simulation will ignore this species.' )
+99902 Format( 5x,'Particle precursor species ', a, ' is found in G2AE or N2AE values of ',
+     &        'the GC or NR namelist.' )
 
       Return
       End Subroutine map_precursor
@@ -271,7 +271,8 @@ C SH  03/10/11 Renamed met_data to aeromet_data
 C HS  03/10/11 Changed vtmp and gasconv to real(8)
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only: airdens, inv_mwair, min_gasconc
+      Use aeromet_data, only: airdens, min_gasconc
+      Use const, only: inv_mwair
 
       Implicit None
 
@@ -343,7 +344,8 @@ C    -changed vtmp and gasconv to real(8)
 C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only: airdens, inv_mwair, min_gasconc
+      Use aeromet_data, only: airdens, min_gasconc
+      Use const, only: inv_mwair
       Use utilio_defn, only: xstat3, m3exit
       Use aero_data, only : COND_BUDGET, COAG_BUDGET, NPF_BUDGET, GROWTH_BUDGET
 

@@ -17,13 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header$
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
-
       MODULE DEGRADE_PARAMETERS
 C**********************************************************************
 C
@@ -44,11 +37,11 @@ C.....INCLUDES:
 
 C..declare and define variables used by maps and data
 
-      INTEGER, PARAMETER :: N_REACT       = 34   ! number of  species being degraded
+      INTEGER, PARAMETER :: N_REACT       = 38   ! number of  species being degraded
       INTEGER, PARAMETER :: N_UNI_LOSS    = 1     ! Number of Unimolecular Loss Processes
       INTEGER, PARAMETER :: N_BI_LOSS     = 5     ! Number of Bimolcular Loss processes
       INTEGER, PARAMETER :: N_TRI_LOSS    = 2     ! Number of Bimolcular Loss processes
-      INTEGER, PARAMETER :: N_PHOTO_LOSS  = 2     ! Number of Photolysis Loss processes
+      INTEGER, PARAMETER :: N_PHOTO_LOSS  = 5     ! Number of Photolysis Loss processes
       INTEGER, PARAMETER :: N_LANHIN_LOSS = 1     ! Number of Langmuir-Hinshelwood Loss Processes
 
 ! Total number of Loss processes      
@@ -142,6 +135,7 @@ C                                             HAPs mechanisms
 C**********************************************************************
 
             USE CGRID_SPCS           ! CGRID species number and offsets
+            USE RXNS_DATA,  ONLY: MECHNAME
             
             IMPLICIT NONE
             
@@ -409,8 +403,8 @@ C.. XYLENE
 C.. STYRENE
 
             REACT(23)       = 'STYRENE        '
-            BICAUSE(1:4,23) = (/'OH','HO','O3','CL'/)
-            BIRATE(1:4,23)  = (/1.02D-11, 1.02D-11, 1.51D-13, 3.6D-10/)
+            BICAUSE(1:5,23) = (/'OH ','HO ','NO3','O3 ','CL '/)
+            BIRATE(1:5,23)  = (/1.02D-11, 1.02D-11, 1.51D-13, 1.4D-17, 3.6D-10/)
             BI_ACT(1:2,23)  = (/    -532.0D0,   -532.0D0/)
 
 C.. ACETONITRILE
@@ -458,8 +452,7 @@ C.. ETHYLBENZENE
 
            REACT(30)       = 'ETHYLBENZENE   '
            BICAUSE(1:4,30) = (/'OH ','HO ','NO3','CL '/)
-           BIRATE(1:4,30)  = (/          7.00D-12,          7.00D-12,          5.70D-16,
-     &                                   1.15D-10/)
+           BIRATE(1:4,30)  = (/ 7.00D-12, 7.00D-12, 5.70D-16, 1.15D-10/)
 
 C.. BENZO[A]PYRENE    
 
@@ -472,7 +465,7 @@ C.. BENZO[A]PYRENE, accumulation mode
            REACT(32)       = 'ABENAPYJ       '
            LHCAUSE(1,32) = 'O3 '
 !           LHRATE(1,32)  =  5.40D-02  ! average between 0% and 70%  Rel. Hum. Points in Owususa et al. (2004)
-!           LH_EQU(32)  =  2.00D-15  ! average between 0% and 70%  Rel. Hum. Points in Owususa et al. (2004)
+!           LH_EQU(32)  =  2.00D-15    ! average between 0% and 70%  Rel. Hum. Points in Owususa et al. (2004)
            LHRATE(1,32)  = 3.10D-02   ! average between 50% and 70% Rel. Hum. Points in Zhou et al. (2013) for organic shell around NH4SO4 core
            LH_EQU(1,32)  = 10.1D-15   ! average between 50% and 70% Rel. Hum. Points in Zhou et al. (2013) for organic shell around NH4SO4 core
            LH_TAMIN(1,32)  =  275.15  ! based on New-Shield BaP heteorogeneous oxidation treatment in Shrivastava et al. (2017)
@@ -495,6 +488,90 @@ C.. CARBON TETRACHLORIDE without boundary conditions
             BICAUSE(1:5,34) = (/'OH ','HO ','O3 ','NO3','CL '/)
             BIRATE(1:5,34)  = (/ 1.0D-12, 1.0D-12, 0.0D0, 0.0D0, 9.55D-11/)
             BI_ACT(1:5,34)  = (/2300.0D0,2300.0D0, 0.0D0, 0.0D0, 7.80D+03/)
+
+
+C.. Tracer for formaldehyde emissions
+            REACT(35)       = 'HCHO_PRIM'
+            IF( INDEX(MECHNAME,'CB6R') .GT. 0 )THEN
+               BICAUSE(1:4,35) = (/'OH ','O  ', 'NO3', 'CL '/)
+               BIRATE(1:4,35)  = (/ 5.4D-12, 3.4D-11, 5.5D-16, 8.20D-11 /)
+               BI_ACT(1:4,35)  = (/ -1.35D2,  1.60D3,   0.0D0,  3.4D1 /) 
+               PHOTO_NAME(1:4,35 ) = (/"FORM_R_IUPAC13","FORM_M_IUPAC13","FORM_R_IUPAC10","FORM_M_IUPAC10" /)
+               A_PHOTO(1:4,35)     = 1.0D0
+            ELSE IF( INDEX(MECHNAME,'SAPRC07T') .GT. 0 )THEN
+               BICAUSE(1:3,35) = (/'OH ',      'NO3', 'CL '/)
+               BIRATE(1:3,35)  = (/ 5.4D-12, 2.0D-12, 8.10D-11 /) 
+               BI_ACT(1:3,35)  = (/ -1.35D2, 2.431D3,  3.0D1 /)  
+               PHOTO_NAME(1:2,35 ) = (/"HCHOR_06","HCHOM_06" /)
+               A_PHOTO(1:2,35)     = 1.0D0
+            ELSE IF( INDEX(MECHNAME,'RACM2') .GT. 0 )THEN
+               BICAUSE(1:3,35) = (/'OH ',      'NO3', 'CL '/)
+               BIRATE(1:3,35)  = (/ 5.5D-12, 2.0D-12, 8.10D-11 /) 
+               BI_ACT(1:3,35)  = (/ -1.25D2, 2.431D3,  3.0D1 /)  
+               PHOTO_NAME(1:2,35 ) = (/"HCHO_MOL_JPL19","HCHO_RAD_JPL19" /)
+               A_PHOTO(1:2,35)     = 1.0D0
+            ELSE ! cracmm1 by default
+               BICAUSE(1:3,35) = (/'HO ', 'NO3', 'CL '/)
+               BIRATE(1:3,35)  = (/  5.5D-12, 2.0D-12, 8.10D-11 /) 
+               BI_ACT(1:3,35)  = (/  -1.25D2,  2.44D3, 3.0D1 /)   
+               PHOTO_NAME(1:2,35 ) = (/"HCHO_MOL_JPL19","HCHO_RAD_JPL19" /)
+               A_PHOTO(1:2,35)     = 1.0D0
+            END IF
+
+C.. Tracer for acetaldehyde emissions
+            REACT(36)        = 'CH3CHO_PRIM'
+            IF( INDEX(MECHNAME,'CB6R') .GT. 0 )THEN
+              BICAUSE(1:4,36)  = (/     'OH ',  'O  ',   'NO3',      'CL ' /)
+              BIRATE(1:4,36)   = (/ 4.7D-12, 1.8D-11, 1.4D-12, 7.90D-11 /)
+              BI_ACT(1:4,36)   = (/ -3.45D2,  1.10D3,  1.86D3,    0.0D0 /)
+              PHOTO_NAME(1:2,36 ) = (/"ALD2_R_IUPAC13","ALD2_R_IUPAC10"/)
+              A_PHOTO(1:2,36)     = 1.0D0
+            ELSE IF( INDEX(MECHNAME,'SAPRC07T') .GT. 0 )THEN
+              BICAUSE(1:3,36)  = (/     'OH ',     'NO3',       'CL ' /)
+              BIRATE(1:3,36)   = (/ 4.4D-12,     1.4D-12,   8.0D-11 /)
+              BI_ACT(1:3,36)   = (/ -3.65D2,      1.86D3,     0.0D0 /)
+              PHOTO_NAME(1:1,36 ) = (/"CCHO_R"/)
+              A_PHOTO(1:1,36)     = 1.0D0
+            ELSE IF( INDEX(MECHNAME,'RACM2') .GT. 0 )THEN 
+              BICAUSE(1:3,36)  = (/     'HO ',   'NO3',     'CL ' /)
+              BIRATE(1:3,36)   = (/   4.7D-12, 1.4D-12, 7.90D-11 /)
+              BI_ACT(1:3,36)   = (/   -3.45D2,   1.9D3,    0.0D0 /)
+              PHOTO_NAME(1:1,36 ) = (/"CH3CHO_RACM2"/)
+              A_PHOTO(1:1,36)     = 1.0D0
+            ELSE ! cracmm1 by default
+              BICAUSE(1:3,36)  = (/     'HO ',   'NO3',     'CL ' /)
+              BIRATE(1:3,36)   = (/   4.7D-12, 1.4D-12, 7.90D-11 /)
+              BI_ACT(1:3,36)   = (/   -3.45D2,   1.9D3,    0.0D0 /)
+              PHOTO_NAME(1:1,36 ) = (/"CH3CHO_RACM2"/)
+              A_PHOTO(1:1,36)     = 1.0D0
+            END IF
+
+C.. Tracer for acrolein emissions
+            REACT(37)        = 'ACRO_PRIM'
+            IF( INDEX(MECHNAME,'CB6R') .GT. 0 )THEN
+               BICAUSE(1:4,37)  = (/   'OH ',    'O3 ',    'NO3',     'CL '/)
+               BIRATE(1:4,37)   = (/ 2.0D-11,2.61D-19, 1.15D-15, 2.37D-10/)
+               BI_ACT(1:4,37)   = (/  0.00D0,   0.0D0,    0.0D0,    0.0D0/)
+            ELSE IF( INDEX(MECHNAME,'SAPRC07T') .GT. 0 )THEN
+               BICAUSE(1:5,37)  = (/   'OH ',    'O3 ',    'NO3',     'CL ',     'O3P'/)
+               BIRATE(1:5,37)   = (/ 2.0D-11, 2.37D-15, 1.18D-15, 2.94D-10, 2.37D-12/)
+               BI_ACT(1:5,37)   = (/  0.00D0,  2.528D3,    0.0D0,    0.0D0,    0.0D0/)
+               BI_ACT(1:5,37)   = (/  0.00D0,  2.528D3,    0.0D0,    0.0D0,    0.0D0/)
+            ELSE  ! cracmm1 by default
+               BICAUSE(1:4,37)  = (/    'HO ',     'O3 ',    'NO3',     'CL '/)
+               BIRATE(1:4,37)   = (/ 8.0D-12, 2.90D-19, 3.40D-15, 2.23D-10/)
+               BI_ACT(1:4,37)   = (/  -3.8D2,    0.0D0,    0.0D0,    0.0D0/)
+            END IF
+            PHOTO_NAME(1:1,37 ) = (/"ACRO_09"/)
+            A_PHOTO(1:1,37)     = 1.0D0
+
+
+C..hydrogen cyanide
+            REACT(38)        = 'HYD_CYANIDE'
+            BICAUSE(1:2,38)  = (/   'OH ',    'HO '/)
+            BIRATE(1:2,38)   = (/  1.20D-13, 1.20D-13/)
+            BI_ACT(1:2,38)   = (/  4.0005D2, 4.0005D2/)
+        
 
            NDEGRADED_FOUND = 0
            DO I = 1, N_REACT

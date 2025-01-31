@@ -87,6 +87,7 @@ C***********************************************************************
       INTEGER, ALLOCATABLE :: H2O2_HNO3_PROD_RXNS( : ) ! indices of H2O2 or HNO3 producing reactions
 
       REAL( 8 ), ALLOCATABLE :: H2O2_HNO3_YIELD( : )   ! H2O2 or HNO3 yield for a reaction subset
+      REAL( 8 ) :: VOC_TO_NOX 
        
       INTEGER :: ISAM_LOG        ! Unit number of output log
       INTEGER :: ISAM_JDATE = 0
@@ -139,7 +140,7 @@ C***********************************************************************
        REAL( 8 ), PARAMETER, PRIVATE :: ZERO   = 0.0D0
        REAL( 8 ), PARAMETER, PRIVATE :: CUTOFF = 1.0D-23
        REAL( 8 ), PARAMETER, PRIVATE :: BULK_CUTOFF = ZERO
-       
+
       CONTAINS
         SUBROUTINE SA_IRR_INIT
 
@@ -148,6 +149,7 @@ C***********************************************************************
           USE UTILIO_DEFN
           USE RXNS_DATA
           USE SA_DEFN
+          USE CONST, ONLY: MWAIR
 C Initialize arrays and maps that store reaction rates in each grid cell and that
 C         relate ISAM species to chemistry species
 C
@@ -155,9 +157,6 @@ C         Called by chemistry driver
 
         IMPLICIT NONE
 
-C..Includes:
-         INCLUDE SUBST_CONST     ! CMAQ constants
- 
          CHARACTER( 16 ), PARAMETER :: PNAME = 'SA_IRR_INIT'     ! Program name
 
          INTEGER :: I, J, RXN, IP, IL 
@@ -932,9 +931,6 @@ c..Add the number of species molecules produced in this reaction
          REAL,      INTENT( IN ) ::  DENS       ! air mass density, kg/m3
          REAL(8),   INTENT( IN ) ::  CONC( : )  ! cgrid concentrations
 
-C..Includes:
-         INCLUDE SUBST_CONST     ! CMAQ constants
-
 !..Local:
          CHARACTER( 16 ), PARAMETER :: PNAME = 'SA_IRR_EXTRACT'     ! Program name
 
@@ -1033,9 +1029,6 @@ C..Includes:
          INTEGER,   INTENT( IN ) ::  LAY        ! cell layer index      
          REAL,      INTENT( IN ) ::  DENS       ! air mass density, kg/m3
          REAL(8),   INTENT( IN ) ::  CONC( : )  ! cgrid concentrations
-
-C..Includes:
-         INCLUDE SUBST_CONST     ! CMAQ constants
 
 !..Local:
          CHARACTER( 16 ), PARAMETER :: PNAME = 'SA_IRR_UPLOAD'     ! Program name
@@ -1535,8 +1528,8 @@ C...Calculate reaction rates and source probabilties
 ! Using H2O2 and HNO3 concentrations
 !              IF ( CONC( H2O2_INDEX )/MAX( 1.0D-30,CONC( HNO3_INDEX ) ) .LT. VOC_NOX_TRANS  ) THEN
 ! Using gross production of H2O2 and HNO3
-
-               IF ( PH2O2_OVER_PHNO3( RK,CONC ) .GT. NOX_VOC_SWITCH  ) THEN
+               VOC_TO_NOX = PH2O2_OVER_PHNO3( RK,CONC )
+               IF ( VOC_TO_NOX .GT. NOX_VOC_SWITCH  ) THEN
 !              IF ( PH2O2_OVER_PHNO3( RK,CONC ) .GT. REAL( VOC_NOX_TRANS,8 )  ) THEN
                   NC = ISAM_NOX_CASE
                ELSE 
@@ -1553,6 +1546,7 @@ C...Calculate reaction rates and source probabilties
             END IF
         ELSE 
             NC = ISAM_CHEM_BIAS
+            VOC_TO_NOX = NOX_VOC_SWITCH
         END IF
         DO NRX = 1, NRXNS
             NR = MAP_REACTANT_CASE( NRX )
@@ -1918,7 +1912,7 @@ c..Compute change in source concentrations for updating source concentrations
        IF ( WRITE_CELL ) THEN            
                    write(isam_log,'(A,2(ES12.4,1X))')
      &            'H2O2_Production/HNO3_Production, PH2O2_OVER_PHNO3  = ',
-     &             H2O2_Production/max(HNO3_Production,1.0e-30) ,PH2O2_OVER_PHNO3( RK,CONC )
+     &             H2O2_Production/max(HNO3_Production,1.0d-30) ,PH2O2_OVER_PHNO3( RK,CONC )
        END IF
 
 C...update SOLD using SOURCE_DELTA       

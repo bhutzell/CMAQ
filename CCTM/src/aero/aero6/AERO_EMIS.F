@@ -173,8 +173,8 @@ C-----------------------------------------------------------------------
          USE SSEMIS, ONLY:    SSEMIS_INIT
          USE UTILIO_DEFN
          USE VDIFF_MAP, ONLY : N_SPC_DIFF, DIFF_SPC
-     
-         INCLUDE SUBST_CONST     ! physical and mathematical constants
+         USE CONST
+
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
 C Arguments:
@@ -332,7 +332,7 @@ C-----------------------------------------------------------------------
        CHARACTER( 20 )                  :: DESID_AERO_REF_CAPS( DESID_N_AERO_REF )
 
        INTEGER IRULE, ISUR, N, NLEN, ISD, IM, IEM, NRULE
-       LOGICAL   :: LREMOVE
+       LOGICAL   :: LREMOVE, LERROR
        
        ! Find Total Number of Size Distribution Registries
        N_SD_RULE = 0
@@ -366,7 +366,7 @@ C-----------------------------------------------------------------------
          LREMOVE = .FALSE.
          IF ( DESID_SD_NML( IRULE )%STREAM .EQ. '' ) CYCLE
          CALL DESID_GET_RULE_STREAMS( DESID_SD_NML( IRULE )%STREAM, IRULE, 
-     &                 RULE_STREAM, LREMOVE )
+     &                 RULE_STREAM, LREMOVE, LERROR )
          IF ( LREMOVE ) CYCLE
 
          ! Loop through streams, set defaults, and build map array
@@ -467,7 +467,7 @@ C
 C ----------------------------------------------------------------------
 
          USE AERO_DATA, ONLY: AEROSPC, N_AEROSPC, AEROSPC_MWINV 
-         USE AEROMET_DATA, ONLY: F6DPI
+         USE CONST, ONLY: F6DPI
          USE ASX_DATA_MOD, ONLY: MET_DATA
          USE DESID_VARS, ONLY: DESID_N_ISTR, IDUSTSRM, ISEASRM
          USE GRID_CONF, ONLY: NCOLS, NROWS
@@ -482,7 +482,7 @@ C ----------------------------------------------------------------------
          REAL, ALLOCATABLE, SAVE :: EMISM3( :,:,:,:,: ) 
          REAL, ALLOCATABLE, SAVE :: GSFAC( :,:,: )
          REAL, ALLOCATABLE, SAVE :: DENS_FAC( : )
-         REAL, PARAMETER   :: F6DPIM9 = 1.0E-9 * F6DPI  ! 1.0E-9 = Kg/ug
+         REAL, PARAMETER   :: F6DPIM3 = 1.0E-3 * F6DPI  ! 1.0E-3 = Kg/g
          LOGICAL, SAVE     :: FIRST_TIME = .TRUE.
 
 C *** Initialize Variables  
@@ -493,7 +493,9 @@ C *** Initialize Variables
 
              ALLOCATE( DENS_FAC( N_AEROSPC ) )
              DO IAERO = 1,N_AEROSPC
-                 DENS_FAC( IAERO ) = F6DPIM9 / AEROSPC( IAERO )%DENSITY
+                 ! Conversion from g --> m3
+                 !     F6DPIM3 [kg/g] / DENS [kg/m3]
+                 DENS_FAC( IAERO ) = F6DPIM3 / AEROSPC( IAERO )%DENSITY
              END DO
              
              MAX_N_SD = MAXVAL( DESID_STREAM_AERO(:)%LEN )
@@ -504,13 +506,6 @@ C *** Initialize Variables
          N_SD   = DESID_STREAM_AERO( ISRM )%LEN 
          EMISM3 = 0.0
 
-C *** Calculate scaling factor for converting mass emissions into [ug/m3/s]
-C     note: RJACM converts grid heights from sigma coordinates to meters
-C     Also calculate scaling factors for converting to molar-mixing-ratio units
-         DO LAY = 1,NL
-           GSFAC( LAY,:,: ) = Met_Data%RJACM( :,:,LAY ) / CELLVOL( :,:,LAY ) ![ug/s] to [ug/m3/s]
-         END DO
- 
 C *** Apply Aerosol Size Distribution
          DO ISTR = 1, DESID_N_ISTR
              ! Find which Size Distribution or Phase this emissions species belongs 
@@ -522,33 +517,23 @@ C *** Apply Aerosol Size Distribution
              
              ! Look up Aerosol Species and Mode of Interest
              IAERO = MAP_ISTRtoAERO( ISTR )   !This maps to the CMAQ aerosol
-                                            !  species so we can retrieve density
+                                              !  species so we can retrieve density
              IM    = MAP_ISTRtoMODE( ISTR )   !This maps to the internal CMAQ modes 
-                                            !  (ie. I, J, and K)
-             !DENS_FAC = F6DPIM9 / AEROSPC( IAERO )%DENSITY 
+                                              !  (ie. I, J, and K)
 
-             ! Convert Aerosol from [g/s] to [ug/m3/s] for all streams
-             ! except Dust and Sea Spray. For those streams, convert
-             ! [g/m3/s] to [ug/m3/s]
-             VDEMIS( ISTR,1:NL,:,: ) = VDEMIS( ISTR,1:NL,:,: )  * 1.0E6
-
-             IF ( ISRM .NE. ISEASRM .AND. ISRM .NE. IDUSTSRM ) THEN
-                VDEMIS( ISTR,1:NL,:,: ) = VDEMIS( ISTR,1:NL,:,: ) * GSFAC( 1:NL,:,: ) 
-             END IF
-
-             ! Sum Total Volume of Mode N [m3/m3/s]
+             ! Sum Total Volume of Mode N [m3/s]
              IF ( .NOT. AEROSPC( IAERO )%TRACER )
      &             EMISM3( 1:NL,:,:,IM,ISD ) = EMISM3( 1:NL,:,:,IM,ISD ) + 
      &                  VDEMIS( ISTR,1:NL,:,: ) * DENS_FAC( IAERO )
 
-             ! Convert Mass Emission Rates from [ug/m3/s] to [umol/m3/s]
+             ! Convert Mass Emission Rates from [g/s] to [mol/s]
              VDEMIS( ISTR,1:NL,:,: ) = VDEMIS( ISTR,1:NL,:,: ) * AEROSPC_MWINV( IAERO )
 
          END DO          
 
-C *** Calculate the number emissions rate for each mode [1/m3/s], using 
+C *** Calculate the number emissions rate for each mode [1/s], using 
 C     Equation 7b of Binkowski & Roselle (2003).
-C     Calculate the surface area emissions rate for the fine modes [m2/m3/s],
+C     Calculate the surface area emissions rate for the fine modes [m2/s],
 C     using Equation 7c of Binkowski & Roselle (2003).  Multiplying by PI 
 C     converts 2nd moment to surface area.
             

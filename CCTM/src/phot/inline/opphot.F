@@ -18,12 +18,6 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/phot/phot_inline/opphot.F,v 1.3 2011/10/21 16:11:28 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPPHOT ( JDATE, JTIME, TSTEP )
 
@@ -50,6 +44,7 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE PHOT_MET_DATA, ONLY:  USE_ACM_CLOUD ! Met and Grid data
       USE PHOT_MOD                            ! photolysis in-line routines and data
+      USE MIO_ASCII
 
       IMPLICIT none
 
@@ -260,7 +255,14 @@ C...assumes that lamba in nanometers is on order of 100 or less
             N = N + 1
             VNAME3D( N ) = 'AOD_W' // TRIM( LAMBDA )
             UNITS3D( N ) = ''
-            VDESC3D( N ) = 'Aerosol Optical Depth at '
+            VDESC3D( N ) = 'Total Aerosol Optical Depth at '
+     &                   // TRIM( LAMBDA ) // ' nm'
+            VTYPE3D( N ) = M3REAL
+
+            N = N + 1
+            VNAME3D( N ) = 'AOD_ABS_W' // TRIM( LAMBDA )
+            UNITS3D( N ) = ''
+            VDESC3D( N ) = 'Absorption Aerosol Optical Depth at '
      &                   // TRIM( LAMBDA ) // ' nm'
             VTYPE3D( N ) = M3REAL
 
@@ -313,7 +315,14 @@ C...assumes that lamba in nanometers is on order of 100 or less
          UNITS3D( N ) = ''
          VDESC3D( N ) = 'Aerosol Optical Depth at'
      &                // ' 550 nm based on an Angstrom Interpolation'
-            VTYPE3D( N ) = M3REAL
+         VTYPE3D( N ) = M3REAL
+
+         N = N + 1
+         VNAME3D( N ) = 'AAOD_W550_ANGST' 
+         UNITS3D( N ) = ''
+         VDESC3D( N ) = 'Aerosol Absorption Optical Depth at'
+     &                // ' 550 nm based on an Angstrom Interpolation'
+         VTYPE3D( N ) = M3REAL
 
          NVARS3D = N
 
@@ -333,6 +342,21 @@ C...assumes that lamba in nanometers is on order of 100 or less
 !         DO L = 1, NVARS3D
 !            WRITE(LOGDEV,99952)TRIM(VNAME3D( L )),TRIM(UNITS3D( L )),TRIM(VDESC3D( L ))
 !         END DO
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 4
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .True.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+       
+         CALL LOAD_MIO_FILE ( 'CTM_RJ_1', NLAYS3D, 1, NLAYS3D,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+ 
 
 C...Open the 1st photolysis diagnostic file
 
@@ -411,6 +435,21 @@ C...load data from photolysis reaction list
 !         DO L = 1, NVARS3D
 !            WRITE(LOGDEV,99952)TRIM(VNAME3D( L )),TRIM(UNITS3D( L )),TRIM(VDESC3D( L ))
 !         END DO
+ 
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 4
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .True.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+       
+         CALL LOAD_MIO_FILE ( 'CTM_RJ_2', NLAYS3D, 1, NLAYS3D,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+ 
 
          IF ( .NOT. OPEN3( CTM_RJ_2, FSNEW3, PNAME ) ) THEN
             XMSG = 'Could not create '// CTM_RJ_2 // ' file'
@@ -457,7 +496,7 @@ C...  the photolysis diagnostic file
             VGLVS3D( L ) = VGLVS_GD( L )
          END DO
 
-         FDESC3D( 1 ) = 'Three dimensionals values of Optical Inputs and Radiative'
+         FDESC3D( 1 ) = 'Three dimensional values of Optical Inputs and Radiative'
          FDESC3D( 2 ) = 'Results from the In-line photolysis calculation using the'
          FDESC3D( 3 ) =  TRIM( MECHNAME ) // ' photochemical mechanism.'
 
@@ -469,16 +508,16 @@ C...  the photolysis diagnostic file
          
          DO L = 1, N_DIAG_WVL
 
-C...assumes that lamba in nanometers is on order of 100 or less
+C...assumes that lambda in nanometers is on order of 100 or less
 
             JWL = DIAG_WVL( L )
             
             WRITE( LAMBDA,'(I3.3)' ) INT( WAVELENGTH( JWL ) )
 
             N = N + 1
-            VNAME3D( N ) = 'AERO_SSA_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = '1'
-            VDESC3D( N ) = 'Aerosol Single Scattering Albedo at '
+            VNAME3D( N ) = 'AERO_SCAT_W' // TRIM( LAMBDA )
+            UNITS3D( N ) = 'Km-1'
+            VDESC3D( N ) = 'Aerosol Scattering of layer at '
      &                   // TRIM( LAMBDA ) // ' nm'
             VTYPE3D( N ) = M3REAL
 
@@ -533,7 +572,7 @@ C...assumes that lamba in nanometers is on order of 100 or less
          VTYPE3D( N ) = M3REAL
         
 
-        NVARS3D = N
+         NVARS3D = N
 
 !C...Write ascii table describing variables
 !         WRITE(LOGDEV,'(A)')'*PHOTDIAG3 File Contents'
@@ -544,6 +583,20 @@ C...assumes that lamba in nanometers is on order of 100 or less
 !         DO L = 1, NVARS3D
 !            WRITE(LOGDEV,99952)TRIM(VNAME3D( L )),TRIM(UNITS3D( L )),TRIM(VDESC3D( L ))
 !         END DO
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 4
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .True.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+       
+         CALL LOAD_MIO_FILE ( 'CTM_RJ_3', NLAYS3D, 1, NLAYS3D,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
 
 C...Open the 3rd photolysis diagnostic file
 

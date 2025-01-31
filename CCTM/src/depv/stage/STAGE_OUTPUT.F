@@ -20,7 +20,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE STAGE_OUTPUT
 
 C-----------------------------------------------------------------------
-C Function: Collection of ouput routines for STAGE deposition velocities
+C Function: Collection of output routines for STAGE deposition velocities
 C           and dry deposition
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS, Only: MOSAIC
@@ -49,6 +49,7 @@ C-----------------------------------------------------------------------
          USE STAGE_DATA
          USE UTILIO_DEFN
          USE MOSAIC_MOD, Only: Tile_Data
+         USE MIO_ASCII 
 
          IMPLICIT NONE
  
@@ -128,6 +129,21 @@ C Set output file characteristics based on GRIDDESC and open the dep velocity di
                End If
             END DO
 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_DEPV_DIAG', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+
+
 C Open diagnostic file, then close it for subsequent open by all processors
 
             IF ( .NOT. OPEN3( CTM_DEPV_DIAG, FSNEW3, PNAME ) ) THEN
@@ -202,7 +218,21 @@ C Set output file characteristics based on GRIDDESC and open the dep velocity di
 
                End If
             END DO
-         
+ 
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+
+            CALL LOAD_MIO_FILE ( 'CTM_DEPV_MOS', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+
 C Open diagnostic file
 
             IF ( .NOT. OPEN3( CTM_DEPV_MOS, FSNEW3, PNAME ) ) THEN

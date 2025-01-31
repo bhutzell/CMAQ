@@ -35,7 +35,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 
 C HS = Heather Simon; GS = Golam Sarwar; SH = Steve Howard; SR = Shawn Roselle;
 C JY = Jeff Young; HOTP = Havala Pye; KF = Kathleen Fahey, CGN = Chris Nolte;
-C PL = Peng Liu; BM = Ben Murphy; BH = Bill Hutzell
+C PL = Peng Liu; BM = Ben Murphy; BH = Bill Hutzell, NS = Nash Skipper
 
 C HS  01/24/11 Updated to initial AERO6; PMOTHR -> 9 species
 C GS  03/02/11 Revised parameters for Mg, K, and Ca
@@ -83,6 +83,7 @@ C SLN 12/30/2019 ddm-3d implementaiton for v 5.3.1
 C     10 Mar 2021 G. Sarwar: Changed CB6R3M_AE7_KMTBR to CB6R3M_AE7_AQ
 C     10 June 2021 G. Sarwar: Added CB6R5M_AE7_AQ
 C 23 Jun 21 G. Sarwar: Replaced CB6R3M with CB6R5M
+C NS 11/28/2023 CRACMM2 updates
 
 C References:
 C 1. Eddingsaas, N. C., Vandervelde, D. G., Wennberg, P. O., "Kinetics and
@@ -133,7 +134,7 @@ C Define Logical values as T and F for the aerospc table
 
 C Number of aerosol species and modes
 
-      Integer, Parameter :: n_aerolist = 135    ! number of aero species
+      Integer, Parameter :: n_aerolist = 139    ! number of aero species
       Integer, Parameter :: n_mode = 3          ! number of modes:
       Integer, Parameter :: iait = 1            ! 1 = Aitken       
       Integer, Parameter :: iacc = 2            ! 2 = accumulation 
@@ -141,6 +142,7 @@ C Number of aerosol species and modes
       
       Logical, Parameter :: reqd_modes( n_mode ) = (/ T,T,T /)
       Character(1), Parameter :: modesuff( n_mode ) = (/ 'I','J','K' /)
+      Character(6), Parameter :: modename( n_mode ) = (/'AITKEN','ACCUM ','COARSE'/)
 
       Integer, Save :: n_aerospc ! number of aero species
 
@@ -365,7 +367,7 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('ADE_NO3 ',F,T,F, cm_set, 1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Diesel Nitrate
      & spcs_list_type('ADE_SO4 ',F,T,F, cm_set, 1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Diesel Sulfate
      & spcs_list_type('ADE_CORS',F,F,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Diesel Coarse PM
-     & spcs_list_type('ACD     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Cadmium
+     & spcs_list_type('ACADMIUM',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Cadmium
      & spcs_list_type('AMN_HAPS',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Manganese               #90
      & spcs_list_type('APHG    ',T,T,T, cm_set, 2200.0, 'HGIIAER','PHGRXN ',1.0  ,'IRV',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Mercury
      & spcs_list_type('AAS     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Arsenic                 #92
@@ -395,7 +397,13 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('OSO4AQPAA ',T,T,T,cm_set,1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'SOLUTE', 0.00), ! SO4 from aqueous PAA rxn loss to organosulfate
      & spcs_list_type('OSO4GAS   ',T,T,T,cm_set,1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'SOLUTE', 0.00), ! SO4 from gas rxn loss to organosulfate
      & spcs_list_type('OSO4EMIS  ',T,T,T,cm_set,1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'SOLUTE', 0.00), ! SO4 from emitted SO4 loss to organosulfate
-     & spcs_list_type('OSO4ICBC  ',T,T,T,cm_set,1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'SOLUTE', 0.00)  ! SO4 from ICBCs loss to organosulfate
+     & spcs_list_type('OSO4ICBC  ',T,T,T,cm_set,1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'SOLUTE', 0.00), ! SO4 from ICBCs loss to organosulfate
+     
+      ! The following species are associated with CRACMM2
+     & spcs_list_type('AISO4   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.21), ! from heterogeneous uptake of IPX
+     & spcs_list_type('AISO5   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.18), ! from heterogeneous uptake of INALD
+     & spcs_list_type('ATRPN   ',F,T,F, cm_set, 1400.0, 'TRPN   ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! SOA from first generation monoterpene nitrate
+     & spcs_list_type('AHONIT  ',F,T,F, cm_set, 1400.0, 'HONIT  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14)  ! SOA from second generation monoterpene nitrate
      & /)                                                 
  
 ! Define Reference Emissions Size Distributions
@@ -735,6 +743,7 @@ C-------------------------------------------------------------------------------
          Character( 3  ) :: suff         ! Suffix
          Character( 16 ) :: num_name     ! name of aerosol number variable
          Character( 16 ) :: srf_name     ! name of aerosol surface area variable
+         Logical         :: all_mask     ! is this mode ultrafine PM?
          Logical         :: ultrafine_mask ! is this mode ultrafine PM?
          Logical         :: fine_mask    ! is this mode fine PM?
          Logical         :: coarse_mask  ! is this mode coarse PM?
@@ -748,12 +757,19 @@ C-------------------------------------------------------------------------------
 
       Type ( mode_type ), Parameter  :: aeromode( n_mode ) = (/
 C                  suffix   number     surface         Masks       minimum minimum minimum
-C                            name       name     U  F  C AC AI NU  numconc  m2conc  m3conc
-C                  ------- ----------  -------   -  -  - -- -- --  -------- -------  ------
-     &   mode_type('AIT'  ,'NUMATKN', 'SRFATKN', T, T, F, F, T, F, conmin,  conmin, conmin),
-     &   mode_type('ACC'  ,'NUMACC ', 'SRFACC ', F, T, F, T, F, F, conmin,  conmin, conmin),
-     &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', F, F, T, F, F, F, conmin,  conmin, conmin)/)
+C                            name       name     ALL U  F  C AC AI NU  numconc  m2conc  m3conc
+C                  ------- ----------  -------   --- -  -  - -- -- --  -------- -------  ------
+     &   mode_type('AIT'  ,'NUMATKN', 'SRFATKN', T,  T, T, F, F, T, F, conmin,  conmin, conmin),
+     &   mode_type('ACC'  ,'NUMACC ', 'SRFACC ', T,  F, T, F, T, F, F, conmin,  conmin, conmin),
+     &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', T,  F, F, T, F, F, F, conmin,  conmin, conmin)/)
 
+
+      ! Indices for mode masks
+      INTEGER, PARAMETER :: IM_ALL = 1, IM_UF = 2, IM_F = 3, IM_C = 4,
+     &                      IM_ACC = 5, IM_AIT = 6, IM_NUC = 7
+
+      CHARACTER( 5 ), PARAMETER :: CMODE(7) = (/ 'TSP  ','PMU  ','PMF  ','PMC  ',
+     &                                           'PMACC','PMAIT','PMNUC'/)
 
       Real          :: moment0_conc( n_mode )     ! 0th moment concentration
       Real          :: moment2_conc( n_mode )     ! 2nd moment concentration
@@ -838,6 +854,39 @@ C Private variables for loading from and unloading to CGRID array
       Contains
 
 
+
+C-----------------------------------------------------------------------
+      Subroutine map_mode_mask( mode_mask_in, mode_mask )
+C     Maps the mode mask indices to a vector of logicals correpsonding
+C     to the mode mask.
+C-----------------------------------------------------------------------
+      IMPLICIT NONE
+
+      integer :: mode_mask_in
+      logical :: mode_mask( n_mode )
+
+      ! Select Correct Mode Mask
+      SELECT CASE ( MODE_MASK_IN )
+         CASE( IM_ALL )
+            MODE_MASK = AEROMODE%ALL_MASK
+         CASE( IM_UF )
+            MODE_MASK = AEROMODE%ULTRAFINE_MASK
+         CASE( IM_F )
+            MODE_MASK = AEROMODE%FINE_MASK
+         CASE( IM_C )
+            MODE_MASK = AEROMODE%COARSE_MASK
+         CASE( IM_ACC )
+            MODE_MASK = AEROMODE%ACCUM_MASK
+         CASE( IM_AIT )
+            MODE_MASK = AEROMODE%AITKEN_MASK
+         CASE( IM_NUC )
+            MODE_MASK = AEROMODE%NUC_MASK
+         CASE DEFAULT
+            MODE_MASK = .FALSE.
+      END SELECT
+
+      End Subroutine map_mode_mask
+
 C-----------------------------------------------------------------------
       Subroutine map_aero()
 
@@ -856,7 +905,7 @@ C-----------------------------------------------------------------------
 
       Use rxns_data       ! chemical mechanism data
       Use cgrid_spcs      ! CGRID mechanism species
-      Use aeromet_data
+      Use const
       Use vdiff_data, only : n_spc_diff, diff_spc
       Implicit None
 
@@ -1007,7 +1056,6 @@ C Build mapping to CGRID for each species in the master AeroList
             End If
          End Do
       End Do
-      Write(logdev,*)' '
 
       ! Migrate all of the user-requested aerosols from AeroList to
       ! AeroSpc. Begin by allocating all of the new arrays now that we
@@ -1084,7 +1132,6 @@ C Build mapping to CGRID for each species in the master AeroList
          End Do
 
       End Do
-      Write(logdev,*)' '
 
 C Build mapping to CGRID for aero # and surf area variables
       aeronum_map = 0
@@ -1117,7 +1164,6 @@ C Build mapping to CGRID for aero # and surf area variables
      &           // ' is not in AE namelist'
             AE_eflag  = .True.
             Call m3warn( pname, 0, 0, xmsg )
-!            Call m3exit( pname, 0, 0, xmsg, xstat3 )
          Else
             aerosrf_map( m ) = ae_strt - 1 + n
             aerocgrid_rhoinv( n ) = 1.0
@@ -1149,8 +1195,7 @@ C Find indices of required species
       apoc_idx    = findAero( req_poc,    .True. )
       apncom_idx  = findAero( req_ncom,   .True. )
 
-      If ( ( Index( mechname, 'SAPRC07TIC_AE6I' ) .Gt. 0 ) .OR.
-     &     ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 )  ) Then
+      If ( ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 ) ) Then
          ae6isoa     = .True.
          aietet_idx  = findAero( req_ietet, ae6isoa )
          aieos_idx   = findAero( req_ieos,  ae6isoa )
@@ -1201,10 +1246,8 @@ C AORGH2O is not required, but highly recommended for aero7
          aso4emis_idx   = findAero( req_so4emis,   .True. )
          aso4icbc_idx   = findAero( req_so4icbc,   .True. )
          If ( ( ae6isoa ) .OR.
-     &        ( Index( mechname, 'CRACMM1_'        ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM2'         ) .Gt. 0 ) .OR.
-     &        ( Index( mechname, 'CRACMM1AMORE_'   ) .Gt. 0 ) .OR.
-     &        ( Index( mechname, 'CB6R3_AE7'       ) .Gt. 0 ) .OR.
+     &        ( Index( mechname, 'CRACMM3'         ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R5_AE7'       ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R5M_AE7'      ) .Gt. 0 ) ) Then
             oso4_idx       = findAero( req_oso4,       .True. )
@@ -1269,18 +1312,17 @@ C compute aeromode_minNum and aeromode_minM2
       ! Exit if Errors are Detected
       if( AE_eflag )Then
          Write(logdev,99901) Trim( mechname )
-          xmsg = 'The FATAL errors found in namelist used. Check '
+          xmsg = 'FATAL errors found in namelist used. Check '
      &    //  'the log of exiting processor if more details are needed.'
          Call m3exit( pname, 0, 0, xmsg, xstat3 )
       End If 
 
       mapped = .True.
 
-
 99901 Format( 'FATAL Error(s) found in the AE namelist used. Check that' 
      &  /' this AE namelist contains the above required data '
      &  / 'as the file in '
-     &  /'the respository version of the mechanism: ', a )
+     &  /'the repository version of the mechanism: ', a )
       Return
       End Subroutine map_aero
 
@@ -1301,7 +1343,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only : pi, f6pi  ! fundamental constants, data type definitions, etc.
+      Use const, only : pi, f6pi  
 
       Implicit None
 
@@ -1430,7 +1472,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only : pi     ! fundamental constants, data type definitions, etc.
+      Use const, only : pi     
 
       Implicit None
 
@@ -1539,22 +1581,23 @@ C Find the substring vname in aerospc( spc )%name( n )
       Do spc = 1, n_aerospc
          If ( aerospc( spc )%bulkname .eq. vname ) Then
             idx = spc
+            xmsg = 'Aerosol Species '
+     &             // Trim( vname ) // ' found in AE namelist.'
+            write(logdev,'(5x,a)') xmsg
             Return
          End If
          Do n = 1, n_mode
             If ( aerospc( spc )%name( n ) .eq. vname ) Then
                idx = spc
+               xmsg = 'Aerosol Species '
+     &                // Trim( vname ) // ' found in AE namelist.'
+               write(logdev,'(5x,a)') xmsg
                Return
             End If
          End Do
       End Do
 
-      If ( .Not. required ) Then
-         xmsg = 'Optional Species '
-     &       // Trim( vname ) // ' Not found in AE namelist.'
-         write(logdev,'(5x,a)') xmsg
-         Return
-      End If
+      If ( .Not. required ) Return
 
       xmsg = 'Required Species ' // Trim( vname ) // 
      &       ' Not found in AE namelist'
@@ -1587,7 +1630,7 @@ C 4/2016: HOT Pye Created routine
 C
 C-----------------------------------------------------------------------
 
-      Use aeromet_data, only: f6dpi, f6pi
+      Use const, only: f6dpi, f6pi
 
       Implicit None
 
@@ -1719,7 +1762,7 @@ C
 C 11 May 16  B.Murphy  Program Written
 C
 C-----------------------------------------------------------------------
-      Use AEROMET_DATA, only : pi, f6pi
+      Use CONST, only : pi, f6pi
       Use CGRID_SPCS, only : N_AE_TRNS, N_AE_SPC
       Use HGRD_DEFN, ONLY : NROWS, NCOLS
 
@@ -1898,7 +1941,7 @@ C Local variables:
          AER_PAR ( 1, IMODE, 8 ) = 0.    
 
          ! Begin Checking Aerosol Parameters. 
-         IF ( M3DRY .LT. 1.0e-30 .OR. M3WET .LT. 1.0e-30 ) THEN
+         IF ( M3DRY .LT. 1.1e-30 .OR. M3WET .LT. 1.1e-30 ) THEN
              ! Dry or Wet Mass is below limit -> reset distribution
              LSTAT( IMODE ) = 11
 
@@ -1907,7 +1950,7 @@ C Local variables:
              IF ( IS_BC ) THEN
                 DO IT = 1,N_AE_TRNS
                   IF ( L_AETR_MODE( IMODE,IT ) .AND. L_AETR_MASS( IT ) ) 
-     &               IBCON(IT) = MAX( IBCON(IT), CONMIN )
+     &               IBCON(IT) = MAX( IBCON(IT), CONMIND )
                 END DO
                 M3DRY = SUM( IBCON( : ) * REAL(AEROCGRID_RHOINV * F6PI,8), 
      &                       MASK = ( L_AETR_MASS .AND. L_AETR_MODE( IMODE,: )  
@@ -1917,7 +1960,7 @@ C Local variables:
              ELSE
                 DO IS = 1,N_AE_SPC
                   IF ( L_AESP_MODE( IMODE,IS ) .AND. L_AESP_MASS( IS ) ) 
-     &               IBCON(IS) = MAX( IBCON(IS), CONMIN )
+     &               IBCON(IS) = MAX( IBCON(IS), CONMIND )
                 END DO
                 M3DRY = SUM( IBCON( : ) * REAL(AEROCGRID_RHOINV * F6PI,8), 
      &                       MASK = ( L_AESP_MASS .AND. L_AESP_MODE( IMODE,: )  
@@ -1936,7 +1979,7 @@ C Local variables:
              DGWET = ( M3WET / NUM * EXP( -4.5 * L2SG ) )  ** ( ONE_THIRD )
              M2WET = EXP( ONE_THIRD * LOG( NUM ) + TWO_THIRDS * LOG( M3WET ) - L2SG )
 
-         ELSE IF ( NUM .LT. 1.0e-30 ) THEN
+         ELSE IF ( NUM .LT. 1.1e-30 ) THEN
              ! Number is below limit -> reset Num and Surf with
              !  default dry diameter and default standard deviation
              LSTAT( IMODE ) = 12
@@ -1951,7 +1994,7 @@ C Local variables:
              DGWET = ( M3WET / NUM * EXP( -4.5 * L2SG ) )  ** ( ONE_THIRD )
              M2WET = EXP( ONE_THIRD * LOG( NUM ) + TWO_THIRDS * LOG( M3WET ) - L2SG )
 
-         ELSE IF ( M2 .LT. 1.0e-30 .OR. .NOT. USE_M2 ) THEN                
+         ELSE IF ( M2 .LT. 1.1e-30 .OR. .NOT. USE_M2 ) THEN                
              ! Mass and Number are valid. Surface area is either invalid
              ! or the user has issued an override. The mass and number
              ! concentrations specify the dry and wet diameters, and the

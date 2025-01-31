@@ -110,8 +110,9 @@ C-----------------------------------------------------------------------
       USE WVEL_DEFN             ! derived vertical velocity component
       USE BUDGET_DEFN
       USE AERO_DATA
-      USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP
-      USE ELMO_PROC, ONLY : ELMO_DRIVER, WRITE_ELMO, MAP_ELMO
+      USE SOA_DEFN, ONLY : MAP_OA
+      USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP, ELMO_INIT_SHARED
+      USE ELMO_PROC, ONLY : ELMO_DRIVER
       USE UTILIO_DEFN
       USE util_Family_module
       USE RUNTIME_VARS
@@ -163,6 +164,9 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
       USE NOOP_MODULES          ! stenex (using NOOP_INIT_MODULE)
 #endif
 #endif   ! end mpas
+
+      USE MIO_ASCII
+      USE HLCONST_MOD
 
       IMPLICIT NONE
 
@@ -219,7 +223,8 @@ C Local variables:
       REAL    DIVFAC      ! trapezoidal average factor
 
       LOGICAL, SAVE :: FIRST_RUN = .TRUE.  ! used for twoway model
-      LOGICAL       :: WFLG                ! turn on write subdmap in pio_init
+      LOGICAL, SAVE :: L_INIT    = .TRUE.  ! used for MIO File Input Initialization
+      LOGICAL       :: WFLG = .TRUE.       ! turn on write subdmap in pio_init
 
       INTEGER, SAVE :: myNREPS = 0
       INTEGER       :: STATUS
@@ -313,6 +318,11 @@ C Local variables:
             INTEGER, INTENT( INOUT ) :: JDATE, JTIME
             INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
          END SUBROUTINE SCIPROC
+         SUBROUTINE INIT_CCTM_MODULES ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+            REAL, POINTER            :: CGRID( :,:,:,: )
+            INTEGER, INTENT( INOUT ) :: JDATE, JTIME
+            INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
+         END SUBROUTINE INIT_CCTM_MODULES
 #ifdef mpas
          SUBROUTINE UNLOAD_CGRID ( CGRID )
             REAL, INTENT(IN)  :: CGRID( :,:,:,: )
@@ -323,6 +333,9 @@ C Local variables:
 C-----------------------------------------------------------------------
 
       IF ( FIRST_RUN ) THEN
+
+         ! Initialize variables for passing file data to MIO
+         CALL INIT_MIO_FILE_DATA()
 
          TSTEP = 0
 #ifdef mpas
@@ -421,6 +434,12 @@ C Initialize ddm3d calculations
 #endif
 
         CALL MAP_AERO()
+        CALL MAP_OA()
+
+
+C Initialize Global Arrays for Storing Chemical, Regional, Process,
+C and Emission Stream Families
+         call read_families
 
 #ifdef verbose_driver
          write( logdev,* ) ' MYPE -> NSPCS:    ', mype, nspcsd
@@ -488,10 +507,6 @@ C Initalize CONC definitions (in STD_CONC F90 module)
 C Get avg CONC definitions, species and layer pointers (in AVG_CONC F90 module)
          CALL A_CONC_DEFN ()
 
-C Miscellaneous Configuration Operations
-         WRITE( LOGDEV, * )
-         CALL LOG_HEADING( LOGDEV, "Configure Scenario" )
-
 #ifdef isam
 c        CALL GET_SA_LAYS ()
          CALL SA_DIM()
@@ -534,19 +549,12 @@ C Initialize ddm3d calculations
 #endif  ! end of mpas
 
 
-C Initialize Global Arrays for Storing Chemical, Regional, Process,
-C and Emission Stream Families
-         call read_families
-
 C Initiliaze IO Arrays and Open Files
 #ifdef mpas
          call centralized_io_init (NCOLS_IN)
 #else
          call centralized_io_init
 #endif
-
-C Initialize ELMO Arrays and Maps
-         call map_elmo
 
 C Initialize conc field: Copy IC's to CONC file as step 0
 C Convention: the input file concentration units are always ppmV.
@@ -559,12 +567,10 @@ C Convention: the input file concentration units are always ppmV.
 #endif
 
 #ifndef mpas
+         CALL LOG_HEADING( LOGDEV, "Check Initial Concentrations" )
          CALL CKSUMMER ( 'INITSCEN', CGRID, JDATE, JTIME )
 
          IF ( LIPR .OR. LIRR ) CALL PA_INIT ( CGRID, JDATE, JTIME, TSTEP )
-
-C Verify input file header consistency and run duration
-!         CALL FLCHECK ( JDATE, JTIME, TSTEP( 1 ) )
 
          ALLOCATE ( AGRID( NCOLS,NROWS,A_NLYS,N_ASPCS ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -641,6 +647,10 @@ C Verify input file header consistency and run duration
 
 #endif
 
+C Initialize Shared Global Output Variables used for 
+C ELMO (e.g. AOD, extinction, Kz, etc.)
+         CALL ELMO_INIT_SHARED()
+
 C Initialize Meteorology Structures
          CALL INIT_LSM( JDATE, JTIME )
 #ifndef mpas
@@ -652,10 +662,11 @@ C Initialize Meteorology Structures
 
          IF ( W_VEL ) CALL GET_WVEL( JDATE, JTIME ) ! If the user wants vertical velocity written to file, retrieve it.
 
+         call hlconst_init
+
          FIRST_RUN = .FALSE.
 
 C Main processing loop:
-         IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
          IF ( MYPE. EQ. 0 ) CALL LOG_HEADING( OUTDEV, "Time Integration" )
 
       END IF ! first_run
@@ -711,9 +722,11 @@ C Main processing loop:
  
       NREPS = 1
 #else
-C Get synchronization and advection time steps, TSTEP(2), ASTEP(L) and NREPS
+      ! Get synchronization and advection time steps, TSTEP(2), ASTEP(L) and NREPS
       CALL ADVSTEP ( JDATE, JTIME, TSTEP, ASTEP, NREPS )
 
+      ! Initialize arrays for storing output data averaged across the
+      ! synchornization time step
       IF ( MOD( TIME2SEC( JTIME ), TIME2SEC( TSTEP( 1 ) ) ) .EQ. 0 ) THEN
          DO V = 1, N_ASPCS
             S = AVG_CONC_MAP( V )
@@ -725,6 +738,8 @@ C Get synchronization and advection time steps, TSTEP(2), ASTEP(L) and NREPS
 #endif if
          END DO
 #ifdef isam
+            IF ( AISAM_ELEV .EQ. -1 ) AISAM_ELEV = NLAYS
+
             DO ITAG = 1, NTAG_SA ! average isam
                DO V = 1, NSPC_SA
                   L = 0
@@ -751,36 +766,32 @@ C Get synchronization and advection time steps, TSTEP(2), ASTEP(L) and NREPS
       END IF
 #endif
 
-C Compute ELMO Values at Beginning of Main Time Step
-      IF ( L_ELMO ) THEN
-        IF ( JDATE .EQ. STDATE .AND. JTIME .EQ. STTIME ) THEN
+C Initialize Modules
+      IF ( L_INIT ) THEN
+          L_INIT = .FALSE.
+          call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+          if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
 
-             ! Calculate all ELMO variables for both Instantaneous and
-             ! Average parameters
-             CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.TRUE.)
-             ! Print Instantaneous Values at first time step
-             CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.TRUE. )
+          CALL LOG_HEADING( LOGDEV, 'Time Integration' )
 
-        ELSE IF ( ELMO_NSTEP .LT. 1.0 ) THEN
-             ! Calculate all ELMO Variables for averaging but do not output them
-             CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
-        END IF
+      ELSE IF ( L_ELMO .AND. ELMO_NSTEP .LT. 1.0 ) THEN
+          ! Calculate all ELMO Variables for averaging but do not output them
+          CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN=.FALSE. )
+
       END IF
 
-C Initialize Budget Output File and Concentration Array
-      IF ( BUDGET_DIAG ) CALL BUDGET_INIT( CGRID, JDATE, JTIME, TSTEP )
-
-C science process sequence:
+      ! science process sequence:
          
       myNREPS = myNREPS + NREPS
 
       DO IREP = 1, NREPS
 
+         ! Execute time-split science processes (e.g. VDIFF, HADV,
+         ! CHEM, CLD_PROC, etc.)
          CALL SCIPROC ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
 
 #ifndef mpas
-C Use trapezoidal rule to time-average data
-
+         ! Use trapezoidal rule to time-average data
          DO V = 1, N_ASPCS
             S = AVG_CONC_MAP( V )
             AGRID( :,:,:,V ) = AGRID( :,:,:,V )
@@ -820,12 +831,21 @@ C Use trapezoidal rule to time-average data
 #endif
 
 #endif
-         ! OUTPUT DIAGNOSTIC INFORMATION
-         IF ( L_ELMO ) CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
+         ! Output ELMO Diagnostic Information
+         IF ( L_ELMO ) CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN=.FALSE. )
 
       END DO
 
-#ifndef mpas
+#ifndef mpas 
+      ! Store CGRID data in SGRID array for desired output species and
+      ! model layers to be written to the CONC output file
+      DO V = 1, N_CSPCS
+         S = CONC_MAP( V )
+         SGRID( :,:,:,V ) = CGRID( :,:,CONC_BLEV:CONC_ELEV,S )
+      END DO
+
+      ! Finalize calculation of output data accumulated across the
+      ! synchronization time step
       IF ( MOD( TIME2SEC( JTIME ), TIME2SEC( TSTEP( 1 ) ) ) .EQ. 0 ) THEN
          DIVFAC = 0.5 / FLOAT( myNREPS )
          myNREPS = 0
@@ -869,37 +889,38 @@ C Use trapezoidal rule to time-average data
 
       END IF
 
-      DO V = 1, N_CSPCS
-         S = CONC_MAP( V )
-         SGRID( :,:,:,V ) = CGRID( :,:,CONC_BLEV:CONC_ELEV,S )
-      END DO
-
-C write conc fields
+C Write Data to Output Files
 
       IF ( MOD( TIME2SEC( JTIME ), TIME2SEC( TSTEP( 1 ) ) ) .EQ. 0 ) THEN
 #ifdef parallel
          CPU_TIME_START =  MPI_WTIME()
+         IF ( LVEXT ) CALL WR_VEXT ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
 #else
          CALL CPU_TIME( REAL_TIME )
          CPU_TIME_START = REAL( REAL_TIME,8 )
 #endif
+         ! Write CONC and ACONC output data
          CALL WR_CONC ( JDATE, JTIME, TSTEP( 1 ) )
-#ifdef parallel
-         IF ( LVEXT ) CALL WR_VEXT ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
-#endif
          CALL WR_ACONC ( AGRID, JDATE, JTIME, TSTEP( 1 ) )
+
 #ifdef isam
+         ! Write out ISAM source-resolved concentrations
          CALL WR_SA     ( JDATE, JTIME, TSTEP, 1 )
          CALL WR_AVG_SA ( JDATE, JTIME, TSTEP( 1 ) )
 #endif
 
 #ifdef sens
+         ! Write out DDM3D sensitivities
          CALL WR_ASENS ( JDATE, JTIME, TSTEP( 1 ) )
 #endif
-         IF ( L_ELMO ) CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
+         ! Write output generated from ELMO module
+         IF ( L_ELMO ) CALL WRITE_ELMO( JDATE, JTIME, TSTEP, .FALSE. )
 
+         ! Write out process analysis and budget diagnostics
          IF ( LIPR .OR. LIRR ) CALL PA_OUTPUT ( CGRID, JDATE, JTIME )
          IF ( BUDGET_DIAG ) CALL WRITE_BUDGET ( CGRID, JDATE, JTIME, TSTEP )
+
+         ! Print wall-clock time to write output
          IF ( PRINT_PROC_TIME ) CALL TIMING_SPLIT ( CPU_TIME_START, 3 )
          
       END IF
@@ -944,4 +965,7 @@ C Shut down IOAPI
 #endif
       END IF
 
-      END SUBROUTINE CMAQ_DRIVER
+      ! Output Verification of MIO Input File
+      IF ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input_check' )
+
+      END SUBROUTINE CMAQ_DRIVER        
