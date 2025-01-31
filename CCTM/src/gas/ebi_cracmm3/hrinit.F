@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Sep 25, 2024
+C  REVISION HISTORY: Created by EBI solver program, Jan 31, 2025
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -138,7 +138,7 @@ C***********************************************************************
 
 c..Allocate and define ebi species
 
-      N_EBISP  = 177
+      N_EBISP  = 179
       ALLOCATE( EBISP( N_EBISP ), STAT = IOS ) 
       IF ( IOS .NE. 0 ) THEN
          MSG = 'Error allocating EBISP' 
@@ -322,6 +322,8 @@ c..Allocate and define ebi species
       EBISP( 175 ) = STY
       EBISP( 176 ) = STYP
       EBISP( 177 ) = CO2
+      EBISP( 178 ) = ANO3I
+      EBISP( 179 ) = ANO3J
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -517,6 +519,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( STY         ) = 5.0D-04
       RTOL( STYP        ) = 5.0D-04
       RTOL( CO2         ) = 5.0D-04
+      RTOL( ANO3I       ) = 5.0D-04
+      RTOL( ANO3J       ) = 5.0D-04
 
 
       RETURN
