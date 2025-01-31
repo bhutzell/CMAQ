@@ -85,13 +85,12 @@ C**********************************************************************
       USE DDM3D_CHEM
       Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, NP, NPMAX, CKTIME
 #endif
+      USE CONST, ONLY: MWAIR, MWWAT, STDATMPA
 
       IMPLICIT NONE
 
 C..Includes:
       INCLUDE SUBST_FILES_ID  ! CMAQ files
-      INCLUDE SUBST_CONST     ! CMAQ constants
-
       INCLUDE SUBST_EMISPRM   ! Emissions processing control parameters
 
 C..Arguments:

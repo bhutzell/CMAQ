@@ -24,7 +24,7 @@ ocean-water concentrations (nM). Halogen emissons are calculated based on
 chlorophyll-a (CHLO) concentrations (`mg/m**3`).
 
 The OCEAN file with or without DMS and CHLO is a time-independent file. For
-most mechanisms (CRACMM, cb6r3, saprc, racm) that do not utilize DMS or CHLO,
+most mechanisms (CRACMM, cb6r5, saprc) that do not utilize DMS or CHLO,
 the OCEAN file is typically a single file covering the whole modeling period.
 For cb6r5m, OCEAN file should represent the seasonality of DMS and CHLO. This
 allows CMAQ to create appropriate seasonally varying emissions.

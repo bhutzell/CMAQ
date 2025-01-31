@@ -442,10 +442,8 @@ C-----------------------------------------------------------------------
          End Do
 
          ! Find indices of required species based on mechname
-         If( index( mechname,'CRACMM1_AQ' ) .eq. 0 
-     &          .and. index( mechname,'CRACMM2') .eq. 0
-     &          .and. index( mechname,'CRACMM3') .eq. 0
-     &          .and. index( mechname,'CRACMM1AMORE_AQ') .eq. 0 ) then
+         If( index( mechname,'CRACMM2' ) .eq. 0 
+     &          .and. index( mechname,'CRACMM3') .eq. 0 ) then
              iso1_idx   = findVapor( req_sviso1, .True. )
              iso2_idx   = findVapor( req_sviso2, .True. )
              aiso1_idx  = findAero( req_aeiso1, .True. )
