@@ -146,38 +146,39 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_KIEPOX =      70
       INTEGER, PARAMETER :: ID_GIMAE =       71
       INTEGER, PARAMETER :: ID_VOC_NOX =     72
-      INTEGER, PARAMETER :: ID_DZ    =       73
-      INTEGER, PARAMETER :: ID_ZH    =       74
-      INTEGER, PARAMETER :: ID_CFRAC =       75
-      INTEGER, PARAMETER :: ID_PV    =       76
-      INTEGER, PARAMETER :: ID_DENS  =       77
-      INTEGER, PARAMETER :: ID_RHOJ  =       78
-      INTEGER, PARAMETER :: ID_NO2COL  =     79
-      INTEGER, PARAMETER :: ID_SO2COL  =     80
-      INTEGER, PARAMETER :: ID_HCHOCOL  =    81
-      INTEGER, PARAMETER :: ID_COCOL  =      82
-      INTEGER, PARAMETER :: ID_KZ     =      83
-      INTEGER, PARAMETER :: ID_KZMIN  =      84
-      INTEGER, PARAMETER :: ID_AOD550 =      85
-      INTEGER, PARAMETER :: ID_PMEXT550 =    86
-      INTEGER, PARAMETER :: ID_PBL =         87
-      INTEGER, PARAMETER :: ID_RGRND =       88
-      INTEGER, PARAMETER :: ID_PRECIP =      89
-      INTEGER, PARAMETER :: ID_WSPD10 =      90
-      INTEGER, PARAMETER :: ID_WDIR10 =      91
-      INTEGER, PARAMETER :: ID_WVEL   =      92
-      INTEGER, PARAMETER :: ID_DD_OA =       93
-      INTEGER, PARAMETER :: ID_WD_OA =       94
-      INTEGER, PARAMETER :: ID_DD_OC =       95
-      INTEGER, PARAMETER :: ID_WD_OC =       96
-      INTEGER, PARAMETER :: ID_DD_POA =      97
-      INTEGER, PARAMETER :: ID_WD_POA =      98
-      INTEGER, PARAMETER :: ID_DD_POC =      99
-      INTEGER, PARAMETER :: ID_WD_POC =     100
-      INTEGER, PARAMETER :: ID_DD_SOA =     101
-      INTEGER, PARAMETER :: ID_WD_SOA =     102
-      INTEGER, PARAMETER :: ID_DD_SOC =     103
-      INTEGER, PARAMETER :: ID_WD_SOC =     104
+      INTEGER, PARAMETER :: ID_EF_HNO3 =     73
+      INTEGER, PARAMETER :: ID_DZ    =       74
+      INTEGER, PARAMETER :: ID_ZH    =       75
+      INTEGER, PARAMETER :: ID_CFRAC =       76
+      INTEGER, PARAMETER :: ID_PV    =       77
+      INTEGER, PARAMETER :: ID_DENS  =       78
+      INTEGER, PARAMETER :: ID_RHOJ  =       79
+      INTEGER, PARAMETER :: ID_NO2COL  =     80
+      INTEGER, PARAMETER :: ID_SO2COL  =     81
+      INTEGER, PARAMETER :: ID_HCHOCOL  =    82
+      INTEGER, PARAMETER :: ID_COCOL  =      83
+      INTEGER, PARAMETER :: ID_KZ     =      84
+      INTEGER, PARAMETER :: ID_KZMIN  =      85
+      INTEGER, PARAMETER :: ID_AOD550 =      86
+      INTEGER, PARAMETER :: ID_PMEXT550 =    87
+      INTEGER, PARAMETER :: ID_PBL =         88
+      INTEGER, PARAMETER :: ID_RGRND =       89
+      INTEGER, PARAMETER :: ID_PRECIP =      90
+      INTEGER, PARAMETER :: ID_WSPD10 =      91
+      INTEGER, PARAMETER :: ID_WDIR10 =      92
+      INTEGER, PARAMETER :: ID_WVEL   =      93
+      INTEGER, PARAMETER :: ID_DD_OA =       94
+      INTEGER, PARAMETER :: ID_WD_OA =       95
+      INTEGER, PARAMETER :: ID_DD_OC =       96
+      INTEGER, PARAMETER :: ID_WD_OC =       97
+      INTEGER, PARAMETER :: ID_DD_POA =      98
+      INTEGER, PARAMETER :: ID_WD_POA =      99
+      INTEGER, PARAMETER :: ID_DD_POC =     100
+      INTEGER, PARAMETER :: ID_WD_POC =     101
+      INTEGER, PARAMETER :: ID_DD_SOA =     102
+      INTEGER, PARAMETER :: ID_WD_SOA =     103
+      INTEGER, PARAMETER :: ID_DD_SOC =     104
+      INTEGER, PARAMETER :: ID_WD_SOC =     105
 
       TYPE ELDTP
         CHARACTER (LEN = 16) :: NAME      !Parameter Name
@@ -188,7 +189,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
 
-      INTEGER, PARAMETER :: N_ELMO_LIST = 104
+      INTEGER, PARAMETER :: N_ELMO_LIST = 105
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
 
@@ -305,6 +306,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'K_IEPOX      ',ID_KIEPOX,     ET_CHEM,     F, 's-1   ', 'IEPOX 1st order particle phase reaction rate const' ),
      &ELDTP( 'GAMMA_IMAE   ',ID_GIMAE,      ET_CHEM,     F, '1     ', 'IMAE+HMML heterogeneous uptake coefficient' ),
      &ELDTP( 'VOC_NOX      ',ID_VOC_NOX,    ET_CHEM,     F, '      ', 'VOC-limiting (>0.35) or NOx-limiting (<0.35) O3 formation' ),
+     &ELDTP( 'EF_HNO3      ',ID_EF_HNO3,    ET_CHEM,     F, '1     ', 'Enhancement factor for HNO3 photolysis' ),
      &ELDTP( 'DZ           ',ID_DZ,         ET_MET,      F, 'm     ', 'Height of each grid cell computed from top layer height' ),
      &ELDTP( 'ZH           ',ID_ZH,         ET_MET,      F, 'm     ', 'Height of grid cell midpoints (mass-weighted)' ),
      &ELDTP( 'CFRAC        ',ID_CFRAC,      ET_MET,      F, '      ', 'Cloud Fraction' ),
@@ -388,6 +390,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       REAL, SAVE, ALLOCATABLE :: GAMMA_IMAE (  :,:,:  ) ! IMAE uptake coeff
       REAL, SAVE, ALLOCATABLE :: YCLNO2IJ   (  :,:,:  ) ! Yield CLNO2 in Fine modes 
       REAL, SAVE, ALLOCATABLE :: YCLNO2K    (  :,:,:  ) ! Yield CLNO2 in coarse mode 
+      REAL, SAVE, ALLOCATABLE :: EF_HNO3    (  :,:,:  ) ! Enhancement factor for calculating J_ANO3
   
       LOGICAL, SAVE           :: AERO_CHEM_SET = .FALSE.
  
