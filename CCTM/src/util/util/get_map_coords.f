@@ -43,8 +43,8 @@
           i = mype + 1
 !         global_col = colsx_pe( 1,i ) - 1 + local_col
 !         global_row = rowsx_pe( 1,i ) - 1 + local_row
-          global_col = mio_domain_ncols_pe( i,1 ) - 1 + local_col
-          global_row = mio_domain_nrows_pe( i,1 ) - 1 + local_row
+          global_col = mio_domain_colde_pe( 1,i,1 ) - 1 + local_col
+          global_row = mio_domain_rowde_pe( 1,i,1 ) - 1 + local_row
       end if
 
       end subroutine get_global_coords
@@ -75,8 +75,8 @@
           i = mype + 1
 !         local_col = global_col - colsx_pe( 1,i ) + 1
 !         local_row = global_row - rowsx_pe( 1,i ) + 1
-          local_col = global_col - mio_domain_ncols_pe( i,1 ) + 1
-          local_row = global_row - mio_domain_nrows_pe( i,1 ) + 1
+          local_col = global_col - mio_domain_colde_pe( 1,i,1 ) + 1
+          local_row = global_row - mio_domain_rowde_pe( 1,i,1 ) + 1
       end if
 
       end subroutine get_local_coords 
