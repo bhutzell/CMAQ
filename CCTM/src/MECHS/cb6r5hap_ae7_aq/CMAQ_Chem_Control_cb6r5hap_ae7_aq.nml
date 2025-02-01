@@ -617,9 +617,13 @@ CMPST =
                 'ug m-3', 'FINE', 
                 'PMF_OA -1.0 * PMF_OC',
 
-'PMF_CLDGLY'  , 'Fine-Mode SOA from glyoxal and methylglyoxal',
+'PMF_CLDGLY'  , 'Fine-Mode SOA from glyoxal and methylglyoxal via clouds',
                 'ug m-3', 'FINE', 
-                'AORGC + AGLY',
+                'AORGC',
+
+'PMF_PRTGLY'  , 'Fine-Mode SOA from glyoxal and methylglyoxal via particle rxn',
+                'ug m-3', 'FINE', 
+                'AGLY',
 
 'PMF_ISOPSOA' , 'Fine-Mode Isoprene SOA excl IEPOX SOA',
                 'ug m-3', 'FINE', 
@@ -894,7 +898,7 @@ CMPST =
                 'ug m-3', 'PM25', 
                 'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
 
-'PM25_OTHWNC'   , 'PM2.5 Unspeciasted Coarse Mass for the IMPROVE Method',
+'PM25_OTHWNC'  ,'PM2.5 Unspeciated Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM25', 
                 'PM25 - PM25_SO4 - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_OC - PM25_RCSOIL',
 
