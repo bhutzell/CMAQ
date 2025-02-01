@@ -58,6 +58,7 @@ AE_SPECIES_DATA =
 'AISO5'     ,150.1  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!2-hydroperoxy-3;4-dihydroxy-3-methylbutanal,L,NA,CC(O)(CO)C(OO)C=O
 'ATRPN'     ,215.0  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'AHONIT'    ,265.0  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
+'ASEAST'    ,31.30  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'PRI'        , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Sea salt tracer,L,NA,NA
 'ANI'     , 58.70   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Nickel,E,DTXSID2020925,[Ni]
 'ACR_VI'  , 52.00   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Chromium Hexavalent,E,DTXSID7023982,[Cr+6]
 'ACR_III' , 52.00   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Chromium Trivalent,E,DTXSID2023981,[Cr+3]
