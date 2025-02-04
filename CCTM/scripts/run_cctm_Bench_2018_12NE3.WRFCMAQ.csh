@@ -40,7 +40,7 @@ echo 'Start Model Run At ' `date`
 setenv CTM_DIAG_LVL 0 
 
 #> Set General Parameters and Labels for Configuring the Simulation
-set VRSN        = ${wrfv}54          #> Code Version
+set VRSN        = ${wrfv}55          #> Code Version
 set PROC        = mpi                #> serial or mpi
 set MECH        = cb6r5_ae7_aq       #> Mechanism ID
 set APPL        = Bench_2018_12NE3   #> Application Name (e.g. Domain)
@@ -57,7 +57,7 @@ set EXEC      = wrf.exe
 
 # Set Working, Input, and Output Directories
 set WORKDIR     = ${PWD}                                  # Pathname of current Working Directory
-set WRF_DIR     = $WORKDIR/BLD_WRFv4.4_CCTM_v54_intel18.0 # Location of WRF-CMAQ Install
+set WRF_DIR     = $WORKDIR/BLD_WRFv4.4_CCTM_v55_intel18.0 # Location of WRF-CMAQ Install
 set INPDIR      = ${CMAQ_DATA}/2018_12NE3               # Input directory for WRF & CMAQ
 set OUTPUT_ROOT = $WORKDIR                                # output root directory
 set output_direct_name = WRFCMAQ-output-${version}        # Output Directory Name
@@ -194,9 +194,22 @@ setenv CTM_BIDI_FERT_NH3     T   #> subtract fertilizer NH3 from emissions becau
 setenv CTM_HGBIDI            N   #> mercury bi-directional flux for in-line deposition velocities [ N ]
 setenv CTM_SFC_HONO          Y   #> surface HONO interaction [ Y ]
 setenv CTM_GRAV_SETL         Y   #> vdiff aerosol gravitational sedimentation [ Y ]
+setenv CTM_PVO3              N   #> consider potential vorticity module for O3 transport from the stratosphere
+                                 #> In WRF-CMAQ model, option also can activate calculating potential vorticity
+                                 #> [default: N]
+
 setenv CTM_BIOGEMIS_BE Y         #> calculate in-line biogenic emissions with BEIS [ default: N ]
 setenv CTM_BIOGEMIS_MG N         #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N             #> turns on BDSNP soil NO emissions [ default: N ]
+
+setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affecting photolysis
+                             #> frequencies ( 3 is the default value )
+                             #>  VALUES 1 thru 3 determined Uniformly Volume Mixed spherical
+                             #>      (1-Tabular Mie; 2-Mie Calculation; 3-Case Approx to Mie Theory)
+                             #>  VALUES 4 thru 6 attempts to use core-shell mixing model when the
+                             #>      aerosol mode has signficant black carbon core otherwise use Volume Mixed
+                             #>      model where optics determined by
+                             #>      (4-Tabular Mie; 5-Mie Calculation; 6-Case Approx to Mie Theory)
 
 setenv CTM_TURN_ON_PV        N   # WRF-CMAQ ONLY turn on/off PV [ N -- make sure compiled with pv on ]
 
@@ -207,14 +220,17 @@ setenv CTM_STAGE_P22 N       #> Pleim et al. 2022 Aerosol deposition model [defa
 setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [default: Y]
 setenv CTM_STAGE_S22 N       #> Shu et al. 2022 (CMAQ v5.3) Aerosol deposition model [default: N]
 
-setenv IC_AERO_M2WET F       #> Specify whether or not initial condition aerosol size distribution 
-                             #>    is wet or dry [ default: F = dry ]
 setenv BC_AERO_M2WET F       #> Specify whether or not boundary condition aerosol size distribution 
-                             #>    is wet or dry [ default: F = dry ]
-setenv IC_AERO_M2USE F       #> Specify whether or not to use aerosol surface area from initial 
+                             #>    is wet or dry [ default: F = dry ]. This option should be set
+                             #>    to True if boundary condition size distirbution parameters are
+                             #>    provided in terms of wet diameter (e.g. by an offline calculation,
+                             #>    or a different 3D chemical transport model system).
+setenv BC_AERO_M2USE T       #> Specify whether or not to use aerosol surface area from boundary 
                              #>    conditions [ default: T = use aerosol surface area  ]
-setenv BC_AERO_M2USE F       #> Specify whether or not to use aerosol surface area from boundary 
-                             #>    conditions [ default: T = use aerosol surface area  ]
+                             #>    This setting can be significant for PM when using small domains.
+                             #>    It is recommended to set this option to True if (1) using boundary
+                             #>    conditions provided by a CMAQ simulation on a parent domain, (2) M2 
+                             #>    is available, and (3) the domain is smaller than CONUS. 
 
 #> Vertical Extraction Options
 setenv VERTEXT               N
@@ -380,13 +396,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> + Emission Control (DESID) Documentation in the CMAQ User's Guide:
   #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
   #>
-  setenv DESID_CTRL_NML ${WRF_DIR}/cmaq/CMAQ_Control_DESID.nml
-  setenv DESID_CHEM_CTRL_NML ${WRF_DIR}/cmaq/CMAQ_Control_DESID_${MECH}.nml
-
-  #> The following namelist configures aggregated output (via the Explicit and Lumped
-  #> Air Quality Model Output (ELMO) Module), domain-wide budget output, and chemical
-  #> family output.
-  setenv MISC_CTRL_NML ${WRF_DIR}/cmaq/CMAQ_Control_Misc.nml
+  setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
+  setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml
 
   #> The following namelist controls the mapping of meteorological land use types and the NH3 and Hg emission
   #> potentials
@@ -707,7 +718,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
         #echo "Deleting output file: $file"
         /bin/rm -f $file  
      end
-     /bin/rm -f ${OUTDIR}/CCTM_EMDIAG*${RUNID}_${YYYYMMDD}.nc
+     /bin/rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc ${OUTDIR}/CCTM_ELMO*${CTM_APPL}.nc
 
   else
      #> error if previous log files exist
@@ -738,6 +749,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv INIT_CONC_1 $ICpath/$ICFILE
   setenv BNDY_CONC_1 $BCpath/$BCFILE
   setenv OMI $OMIpath/$OMIfile
+  setenv MIE_TABLE $OUTDIR/mie_table_coeffs_${compilerString}.txt
   setenv OPTICS_DATA $OMIpath/$OPTfile
  #setenv XJ_DATA $JVALpath/$JVALfile
   set TR_DVpath = $METpath

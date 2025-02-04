@@ -59,14 +59,13 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE AERO_DATA, ONLY : CHECK_AERO_ICBC, N_MODE
       Use CENTRALIZED_IO_MODULE, only : interpolate_var
-      USE RUNTIME_VARS, ONLY : IC_AERO_M2WET, IC_AERO_M2USE
 #ifdef mpas
       USE coupler_module
 #endif
+      USE CONST, ONLY: MWAIR
 
       IMPLICIT NONE
 
-      INCLUDE SUBST_CONST       ! constants
       INCLUDE SUBST_FILES_ID    ! file name parameters
 
 C Arguments:
@@ -500,8 +499,6 @@ C Load RHOJ for transport and mixing ratio advection adjustment
          CALL LOG_SUBHEADING( LOGDEV, 'Check Aerosol IC Size Distributions' )
 
          ! Check Aerosol Size Distributions and Warn the User if They Are Not Robust.
-         ! Surface area is output from this routine consistent with the
-         ! specification in IC_AERO_M2WET.
          IF ( NEW_START ) THEN
            SPC_STRT = AE_STRT
            SPC_FINI = AE_STRT + N_AE_SPC - 1
@@ -510,7 +507,7 @@ C Load RHOJ for transport and mixing ratio advection adjustment
            DO R = 1, NROWS
            DO C = 1, NCOLS
               AECON( 1:N_AE_SPC ) = CGRID( C,R,L,SPC_STRT:SPC_FINI )
-              CALL CHECK_AERO_ICBC( AECON, IC_AERO_M2WET, IC_AERO_M2USE, 
+              CALL CHECK_AERO_ICBC( AECON, .FALSE., .TRUE., 
      &                              .FALSE., L_WRITE_WARNING, C,R,L )
               CGRID( C,R,L,SPC_STRT:SPC_FINI ) = AECON( 1:N_AE_SPC )
            END DO

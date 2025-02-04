@@ -25,7 +25,7 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
  
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE OPDDEP ( JDATE, JTIME, TSTEP, N_SPC_DDEP )
+      SUBROUTINE OPDDEP ( JDATE, JTIME, TSTEP )
 
 C   30 Mar 01 J.Young: dyn alloc - Use HGRD_DEFN
 C   03 Sep 01 David Wong: for new pario
@@ -40,6 +40,7 @@ C   08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC)
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
+      USE MIO_ASCII
 
       IMPLICIT NONE
  
@@ -50,7 +51,6 @@ C Arguments:
       INTEGER, INTENT( IN ) :: JDATE  ! current model date, coded YYYYDDD
       INTEGER, INTENT( IN ) :: JTIME  ! current model time, coded HHMMSS
       INTEGER, INTENT( IN ) :: TSTEP  ! output time step
-      INTEGER, INTENT( IN ) :: N_SPC_DDEP ! no. of dry dep species
 
 C Local variables:
 
@@ -61,7 +61,7 @@ C Local variables:
       INTEGER,         SAVE :: N_BD_EMIS 
       CHARACTER( 16 ), SAVE :: BD_EMIS_SPC( 3 )
       INTEGER,         SAVE :: N_BD_FLUX 
-      CHARACTER( 16 ), SAVE :: BD_FLUX_SPC( 7 )
+      CHARACTER( 16 ), SAVE :: BD_FLUX_SPC( 1 )
 
       INTEGER      V, N, L     ! loop induction variables
       INTEGER      STRT, FINI  ! loop induction variables
@@ -77,14 +77,8 @@ C Try to open existing file for update
          If( ABFLUX ) Then
             N_BD_EMIS = N_BD_EMIS + 1
             BD_EMIS_SPC( N_BD_EMIS ) = 'NH3_Emis'
-            N_BD_FLUX = 7
+            N_BD_FLUX = 1
             BD_FLUX_SPC( 1 ) = 'NH3_Flux'
-            BD_FLUX_SPC( 2 ) = 'NH3_Stom'
-            BD_FLUX_SPC( 3 ) = 'NH3_Cut'
-            BD_FLUX_SPC( 4 ) = 'NH3_Soil'
-            BD_FLUX_SPC( 5 ) = 'NH3_Ag'
-            BD_FLUX_SPC( 6 ) = 'NH3_Nat'
-            BD_FLUX_SPC( 7 ) = 'NH3_Wat'              
          End If 
          If( HGBIDI ) Then
             N_BD_EMIS = N_BD_EMIS + 1
@@ -135,7 +129,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = GC_DDEP( N )
-            UNITS3D( V ) = 'kg/hectare'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
@@ -147,11 +141,11 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = AE_DDEP( N )
             IF ( AE_DDEP( N )( 1:3 ) .EQ. 'NUM' ) THEN
-               UNITS3D( V ) = 'number/hectare'
+               UNITS3D( V ) = 'ha-1'
             ELSE IF ( AE_DDEP( N )( 1:3 ) .EQ. 'SRF' ) THEN
-               UNITS3D( V ) = 'm**2/hectare'
+               UNITS3D( V ) = 'm2 ha-1'
             ELSE
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
             END IF
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
@@ -163,7 +157,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = NR_DDEP( N )
-            UNITS3D( V ) = 'kg/hectare'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
@@ -174,7 +168,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = TR_DDEP( N )
-            UNITS3D( V ) = '----'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
@@ -186,7 +180,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
                N = N + 1
                VTYPE3D( V ) = M3REAL
                VNAME3D( V ) = BD_EMIS_SPC( N )
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
                VDESC3D( V ) = 'hourly emission values'
             END DO
             N = 0   
@@ -196,7 +190,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
                N = N + 1
                VTYPE3D( V ) = M3REAL
                VNAME3D( V ) = BD_FLUX_SPC( N )
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
                VDESC3D( V ) = 'hourly flux values'
             END DO
          END IF
@@ -206,7 +200,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             DO V = STRT, FINI
                VTYPE3D( V ) = M3REAL
                VNAME3D( V ) = 'HG_Emis'
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
                VDESC3D( V ) = 'hourly emission values'
             END DO
          END IF
@@ -216,7 +210,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             DO V = STRT, FINI
                VTYPE3D( V ) = M3REAL
                VNAME3D( V ) = 'HONO_Het '
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
                VDESC3D( V ) = 'hourly surface heterogenous production values'
             END DO
          END IF
@@ -226,6 +220,20 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             FDESC3D( L ) = ' '
          END DO
 
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_1', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+         
 C    Open dry deposition file
 
          IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSNEW3, PNAME ) ) THEN

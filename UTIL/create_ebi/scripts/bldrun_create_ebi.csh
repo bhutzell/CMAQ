@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-# ============ CREATE_EBI_SOLVERv5.4.x Build Script ================= #
+# ============ CREATE_EBI_SOLVERv5.5.x Build Script ================= #
 # Usage: bldrun_create_ebi.csh [compiler] >&! bldrun_create_ebi.log   #
 # Options for [compiler]: intel | gcc | pgi                           #
 #                                                                     #
@@ -78,7 +78,7 @@
     setenv OUTDIR  ${WORKDIR}/output/ebi_${MECH}
  endif 
 
- set VRSN =     v54                       #> model version
+ set VRSN =     v55                       #> model version
  setenv EXEC    CREATE_EBI_${VRSN}.exe     #> executable name for this application
  setenv BLDIR   ${WORKDIR}/scripts/BLD_create_ebi_${VRSN}_${compilerString}
 
@@ -124,7 +124,7 @@
 
 
 #============================================================================================
-#> Confiugre options for running CREATE_EBI
+#> Configure options for running CREATE_EBI
 #============================================================================================
 
 #Set options for the photochemical mechanism
@@ -133,12 +133,8 @@
  
 #Set the below compound names within the mechanism
  if ( ${MECH} =~ *"cb"* || ${MECH} =~ *"CB"* ) then
-   setenv PAR_NEG_FLAG    T    # True for CB6 but false for SAPRC07t and RACM2 
-   if ( ${MECH} =~ *"cb6r3m"* || ${MECH} =~ *"CB6R3M"* ) then
-      setenv SOLVER_DELT     1.25 # maximum time step (minutes) of solver integration up to four 
-                                  # significant figures in general or scientific notation
-                                  # For cb6r3m recommended.
-   else if ( ${MECH} =~ *"cb6r5m"* || ${MECH} =~ *"CB6R5M"* ) then
+   setenv PAR_NEG_FLAG    T    # True for CB6 but false for SAPRC07t
+   if ( ${MECH} =~ *"cb6r5m"* || ${MECH} =~ *"CB6R5M"* ) then
       setenv SOLVER_DELT     1.25 # maximum time step (minutes) of solver integration up to four 
                                   # significant figures in general or scientific notation
                                   # For cb6r5m recommended.
@@ -149,7 +145,7 @@
    endif
 
    #                 #Mech   # Description
-   #              cb6r3/cb05 #
+   #              cb6r5
     setenv MECH_NO    NO     # Species name for nitric oxide
     setenv MECH_NO2   NO2    # Species name for nitrogen dioxide
     setenv MECH_O3    O3     # Species name for ozone
@@ -197,7 +193,7 @@
    setenv PAR_NEG_FLAG    F    # True for CB6 but false for SAPRC07t and RACM2 
    setenv SOLVER_DELT     2.50 # maximum time step (minutes) of solver integration up to four 
                                # significant figures in general or scientific notation
-                               # For cb6r3m and saprc07tic based mechanisms, 1.25 minutes is recommended.
+                               # For cb6r5m and saprc07tic based mechanisms, 1.25 minutes is recommended.
 
    #                 #Mech   # Description
    #                 RACM2   #

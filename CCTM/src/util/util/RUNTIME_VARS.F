@@ -140,9 +140,11 @@
       ! General; Multiprocess control, output and error checking
       LOGICAL :: PRINT_PROC_TIME = .FALSE. ! Flag to print elapsed time for all 
                                            ! science submodules
-      LOGICAL :: FL_ERR_STOP=.TRUE.  ! Flag to stop run if errors are found.
-      LOGICAL :: CKSUM     = .TRUE.  ! flag for cksum on, default = [T]
-      LOGICAL :: END_TIME  = .FALSE. ! Override default beginning ACON timestamp
+      LOGICAL :: FL_ERR_STOP=.TRUE.        ! Flag to stop run if errors are found.
+      LOGICAL :: CKSUM     = .TRUE.        ! flag for cksum on, default = [T]
+      LOGICAL :: END_TIME  = .FALSE.       ! Override default beginning ACONC timestamp
+      LOGICAL :: CTM_MIO_FILE = .FALSE.    ! Flag to write out ascii file that informs MIO 
+                                           !   about output file metadata
       
       INTEGER :: N_ACONC_VARS = 0    ! Number of species saved to avg conc file
       INTEGER :: N_CONC_VARS  = 0    ! Number of species saved to conc file
@@ -169,21 +171,18 @@
       INTEGER :: NWAVE = 0                 ! Number of Diagnostic Wavelengths
       CHARACTER(16) :: WAVE_ENV(100)       ! Targeted wavelengths for diagnostic output
       LOGICAL :: CORE_SHELL= .FALSE.       ! flag for using core-shell mixing model for aerosol optics
-      LOGICAL :: MIE_CALC  = .FALSE.       ! flag for using Mie Theory in aerosol optics calculation
+      INTEGER :: AEROSOL_OPTICS = 3        ! optics calculation method of volume mixture aerosols
       REAL    :: GEAR_RTOL = 1.0E-3        ! Relative Tolerance for Gear Solver
       REAL    :: GEAR_MAX_ATOL = 1.0E-7    ! Upper Bound for Absolute Tolerance in Gear Solver (ppmV)
       REAL    :: GEAR_MIN_ATOL = 1.0E-9    ! Lower Bound for Absolute Tolerance in Gear Solver (ppmV)
       REAL    :: GEAR_CONC_FLOOR = 1.0E-12 ! Lowest Concentration used determing ATOL in Gear Solver (ppmV)
       REAL    :: GLBL_ATOL = 1.0E-7        ! Absolute Tolerance for Rosenbrock Solver (ppmV)
       REAL    :: GLBL_RTOL = 1.0E-3        ! Relative Tolerance for Rosenbrock Solver
+      LOGICAL :: LPVO3     = .FALSE.       ! Activate Potential Vorticity Module (default=False)
 
       ! Aerosols
-      LOGICAL :: IC_AERO_M2WET=.FALSE.! flag for specifying wet aerosol size parameters 
-                                      !   for initial conditions. FALSE = dry
       LOGICAL :: BC_AERO_M2WET=.FALSE.! flag for specifying wet aerosol size parameters 
                                       !   for boundary conditions. FALSE = dry
-      LOGICAL :: IC_AERO_M2USE=.TRUE. ! flag for using the second moment from the input file
-                                          !   for initial conditions. TRUE = use input 2nd moment
       LOGICAL :: BC_AERO_M2USE=.TRUE. ! flag for using the second moment from the input file
                                           !   for boundary conditions.TRUE = use input 2nd moment
 
@@ -218,9 +217,8 @@
 
       ! Emissions Processes
       CHARACTER( MAXLEN_CCTM_APPL ) :: STAGECTRL  = 'STAGECTRL_NML' ! STAGE Deposition Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: MISC_CTRL  = 'MISC_CTRL_NML' ! Emission Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: DESID_CTRL  = 'DESID_CTRL_NML' ! Emission Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: DESID_CHEM_CTRL  = 'DESID_CHEM_CTRL_NML' ! Emission Control Filename
+      CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CTRL  = 'CMAQ_CTRL_NML' ! Emission Control Filename
+      CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CHEM_CTRL  = 'CMAQ_CH_CTRL_NML' ! Emission Control Filename
       INTEGER :: EMLAYS_MX     = 0       ! Emission Layers
       INTEGER :: N_FILE_GR     = 0       ! Number of Gridded Emission Files
       INTEGER :: N_FILE_TR     = 0       ! NUmber of Tracer Emission Files
@@ -367,7 +365,7 @@
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_HEADING( OUTDEV, "Environment Variable Report" )
          CALL LOG_SUBHEADING( OUTDEV, "Grid and High-Level Model Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -410,7 +408,7 @@
 
       ! Retrieve the domain decomposition processor array
       IF ( NPROCS .GT. 1 ) THEN
-         CALL GET_ENV ( 'NPCOL_NPROW', NV, V_LIST2, VARDEV )
+         CALL GET_ENVLIST ( 'NPCOL_NPROW', NV, V_LIST2, VARDEV )
          IF ( NV .NE. 2 ) THEN
             XMSG = 'Environment variable problem for NPCOL_NPROW'
      &           // ' using default 1X1'
@@ -438,7 +436,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Multiprocess control, output and error checking" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -448,6 +446,9 @@
       ! FL_ERR_STOP
       CALL GET_ENV ( FL_ERR_STOP, 'FL_ERR_STOP', FL_ERR_STOP, VARDEV )  
 
+      ! PRINT MIO INPUT FILE
+      CALL GET_ENV ( CTM_MIO_FILE, 'CTM_MIO_FILE', CTM_MIO_FILE, VARDEV )  
+
       ! CKSUM
       CALL GET_ENV ( CKSUM, 'CTM_CKSUM', CKSUM, VARDEV )
 
@@ -455,13 +456,13 @@
       CALL GET_ENV ( END_TIME, 'AVG_FILE_ENDTIME', END_TIME, VARDEV )
       
       ! ACONC File Species List
-      CALL GET_ENV ( 'AVG_CONC_SPCS', N_ACONC_VARS, ACONC_FILE_SPCS, VARDEV )
+      CALL GET_ENVLIST ( 'AVG_CONC_SPCS', N_ACONC_VARS, ACONC_FILE_SPCS, VARDEV )
 
       ! CONC File Species List 
-      CALL GET_ENV ( 'CONC_SPCS', N_CONC_VARS, CONC_FILE_SPCS, VARDEV )
+      CALL GET_ENVLIST ( 'CONC_SPCS', N_CONC_VARS, CONC_FILE_SPCS, VARDEV )
  
       ! ACONC Layer Specification
-      CALL GET_ENV ( 'ACONC_BLEV_ELEV', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'ACONC_BLEV_ELEV', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   ! assume 1:NLAYS
          ACONC_BLEV = 1
          ACONC_ELEV = -1
@@ -477,7 +478,7 @@
       END IF
   
       ! CONC File Vertical Layer Range and Speciation
-      CALL GET_ENV ( 'CONC_BLEV_ELEV', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'CONC_BLEV_ELEV', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   ! assume 1:NLAYS
          CONC_BLEV = 1
          CONC_ELEV = -1
@@ -529,7 +530,7 @@
       !-------------------------------------------------------------------------------------------------------
       IF ( MYPE .EQ. 0 ) THEN
          CALL LOG_SUBHEADING( OUTDEV, "ISAM setting and output options" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -538,7 +539,7 @@
       CALL GET_ENV ( ISAM_NEW_START, 'ISAM_NEW_START', ISAM_NEW_START, VARDEV )
     
       ! SA_ACONC Layer Specification
-      CALL GET_ENV ( 'AISAM_BLEV_ELEV', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'AISAM_BLEV_ELEV', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   ! assume 1:NLAYS
          AISAM_BLEV = 1
          AISAM_ELEV = -1
@@ -554,7 +555,7 @@
       END IF
 
       ! SA_CONC File Vertical Layer Range and Speciation
-      CALL GET_ENV ( 'ISAM_BLEV_ELEV', NV, V_LIST2, VARDEV )
+      CALL GET_ENVLIST ( 'ISAM_BLEV_ELEV', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   ! assume 1:NLAYS
          ISAM_BLEV = 1
          ISAM_ELEV = -1
@@ -610,7 +611,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Chemistry and Photolysis" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -622,14 +623,20 @@
          CALL GET_ENV ( NLAYS_DIAG, 'NLAYS_PHOTDIAG', NLAYS_DIAG, VARDEV )
 
       ! Get Desired Wavelengths for Diagnostic Output
-        CALL GET_ENV( 'NWAVE_PHOTDIAG', NWAVE, WAVE_ENV, VARDEV )
+        CALL GET_ENVLIST( 'NWAVE_PHOTDIAG', NWAVE, WAVE_ENV, VARDEV )
       END IF  
 
-      ! Get flag to use core-shell mixing model for aerosol optical properties
-      CALL GET_ENV ( CORE_SHELL, 'CORE_SHELL_OPTICS', CORE_SHELL, VARDEV )
+      CALL GET_ENV ( AEROSOL_OPTICS, 'AEROSOL_OPTICS', AEROSOL_OPTICS, VARDEV )
+      IF ( AEROSOL_OPTICS .GT. 3 ) THEN ! core-shell mixing model possible
+          CORE_SHELL = .TRUE.
+          AEROSOL_OPTICS = AEROSOL_OPTICS - 3
+      END IF
 
-      ! Get flag to use fast optics for volume mixing model for aerosol optical properties
-      CALL GET_ENV ( MIE_CALC, 'OPTICS_MIE_CALC', MIE_CALC, VARDEV )
+      IF ( AEROSOL_OPTICS .LT. 1 .OR. AEROSOL_OPTICS .GT. 3 ) THEN
+         XMSG = 'AEROSOL_OPTICS option must equal 1 to 6'
+         WRITE( OUTDEV, '(A)' )TRIM( XMSG )
+         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+      END IF
 
       IF ( MYPE .EQ. 0 ) THEN
          WRITE( OUTDEV, '(/,6x,A,/)' )'--ATOL settings are in ppmV.--'
@@ -652,6 +659,9 @@
 
       ! Absolute Tolerance for RB Solver
       CALL GET_ENV ( GLBL_ATOL, 'RB_ATOL', GLBL_ATOL, VARDEV )
+      
+      ! Get option for scaling ozone in free-troposphere to potential vorticity
+      CALL GET_ENV ( LPVO3, 'CTM_PVO3', LPVO3, VARDEV )
  
       !-------------------------------------------------------------------------------------------------------
       !>> Aerosols
@@ -659,18 +669,12 @@
       
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Aerosols" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
       ! Get flag for interpreting initial condition aerosol size distributions as dry
-      CALL GET_ENV ( IC_AERO_M2WET, 'IC_AERO_M2WET', IC_AERO_M2WET, VARDEV )
-
-      ! Get flag for interpreting initial condition aerosol size distributions as dry
       CALL GET_ENV ( BC_AERO_M2WET, 'BC_AERO_M2WET', BC_AERO_M2WET, VARDEV )
-
-      ! Get flag for using initial condition aerosol second moment
-      CALL GET_ENV ( IC_AERO_M2USE, 'IC_AERO_M2USE', IC_AERO_M2USE, VARDEV )
 
       ! Get flag for using initial condition aerosol second moment
       CALL GET_ENV ( BC_AERO_M2USE, 'BC_AERO_M2USE', BC_AERO_M2USE, VARDEV )
@@ -693,7 +697,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Cloud Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -706,7 +710,7 @@
  
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Air-Surface Exchange Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -760,7 +764,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Transport Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -795,7 +799,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Emissions Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -803,9 +807,8 @@
       CALL GET_ENV ( EMLAYS_MX, 'CTM_EMLAYS', EMLAYS_MX, VARDEV )
 
       ! Get Name of Emission Control File
-      CALL GET_ENV ( MISC_CTRL, 'MISC_CTRL_NML', MISC_CTRL, VARDEV )
-      CALL GET_ENV ( DESID_CTRL, 'DESID_CTRL_NML', DESID_CTRL, VARDEV )
-      CALL GET_ENV ( DESID_CHEM_CTRL,'DESID_CHEM_CTRL_NML', DESID_CHEM_CTRL, VARDEV )
+      CALL GET_ENV ( CMAQ_CTRL, 'CMAQ_CTRL_NML', CMAQ_CTRL, VARDEV )
+      CALL GET_ENV ( CMAQ_CHEM_CTRL,'CMAQ_CH_CTRL_NML', CMAQ_CHEM_CTRL, VARDEV )
 
       ! Get number of different Gridded File Emissions Streams
       CALL GET_ENV ( N_FILE_GR, 'N_EMIS_GR', N_FILE_GR, VARDEV )
@@ -909,7 +912,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Process Analysis Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -917,39 +920,41 @@
       CALL GET_ENV ( PROCAN, 'CTM_PROCAN', PROCAN, VARDEV )
        
       ! Get the Beginning and Ending Columns for Process Analysis
-      CALL GET_ENV ( 'PA_BCOL_ECOL', NV, V_LIST2, VARDEV )
-      IF ( NV .LE. 0 ) THEN   
-         PA_BEGCOL = 1; PA_ENDCOL = 0
-      ELSE IF ( NV .EQ. 2 ) THEN
-         READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGCOL
-         READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDCOL
-      ELSE 
-         XMSG = 'Environment variable error for PA_BCOL_ECOL'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
-      END IF
-
-      ! Get the Beginning and Ending Rows for Process Analysis
-      CALL GET_ENV ( 'PA_BROW_EROW', NV, V_LIST2, VARDEV )
-      IF ( NV .LE. 0 ) THEN   
-         PA_BEGROW = 1; PA_ENDROW = 0
-      ELSE IF ( NV .EQ. 2 ) THEN
-         READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGROW
-         READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDROW
-      ELSE 
-         XMSG = 'Environment variable error for PA_BROW_EROW'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
-      END IF
-
-      ! Get the Beginning and Ending Layers for Process Analysis
-      CALL GET_ENV ( 'PA_BLEV_ELEV', NV, V_LIST2, VARDEV )
-      IF ( NV .LE. 0 ) THEN  
-         PA_BEGLEV = 1; PA_ENDLEV = 0
-      ELSE IF ( NV .EQ. 2 ) THEN
-         READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGLEV
-         READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDLEV
-      ELSE 
-         XMSG = 'Environment variable error for PA_BLEV_ELEV'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+      IF ( PROCAN ) THEN
+         CALL GET_ENVLIST ( 'PA_BCOL_ECOL', NV, V_LIST2, VARDEV )
+         IF ( NV .LE. 0 ) THEN   
+            PA_BEGCOL = 1; PA_ENDCOL = 0
+         ELSE IF ( NV .EQ. 2 ) THEN
+            READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGCOL
+            READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDCOL
+         ELSE 
+            XMSG = 'Environment variable error for PA_BCOL_ECOL'
+            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         END IF
+     
+         ! Get the Beginning and Ending Rows for Process Analysis
+         CALL GET_ENVLIST ( 'PA_BROW_EROW', NV, V_LIST2, VARDEV )
+         IF ( NV .LE. 0 ) THEN   
+            PA_BEGROW = 1; PA_ENDROW = 0
+         ELSE IF ( NV .EQ. 2 ) THEN
+            READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGROW
+            READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDROW
+         ELSE 
+            XMSG = 'Environment variable error for PA_BROW_EROW'
+            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         END IF
+     
+         ! Get the Beginning and Ending Layers for Process Analysis
+         CALL GET_ENVLIST ( 'PA_BLEV_ELEV', NV, V_LIST2, VARDEV )
+         IF ( NV .LE. 0 ) THEN  
+            PA_BEGLEV = 1; PA_ENDLEV = 0
+         ELSE IF ( NV .EQ. 2 ) THEN
+            READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGLEV
+            READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDLEV
+         ELSE 
+            XMSG = 'Environment variable error for PA_BLEV_ELEV'
+            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         END IF
       END IF
 
       ! Get the Budget File Name
@@ -972,7 +977,10 @@
 #ifdef twoway
       WRF_V4P = .TRUE.
 #else
-! to obtain WRF version information
+      
+      ! to obtain WRF version information
+      CALL LOG_HEADING( LOGDEV, 'Determine WRF Input Version' )
+
       IF ( .NOT. OPEN3( MET_CRO_3D, FSREAD3, PNAME ) ) THEN
          XMSG = 'Could not open '// MET_CRO_3D // ' file'
          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
@@ -1056,6 +1064,7 @@
       CALL UPCASE( CHEAD )
 
       ! Write the heading to the log file
+      WRITE( FUNIT, * )
       WRITE( FUNIT, * )
       WRITE( FMT, '("(", I0, "x,A,A,A)")' ) LOG_MAJOR_TAB
       WRITE( FMT2,'("(", I0, "x,A,)")' ) LOG_MAJOR_TAB
@@ -1148,6 +1157,69 @@
 
 
       END SUBROUTINE LOG_MESSAGE
+!.........................................................................
+      REAL( 8 ) FUNCTION SET_CPU_TIMING()
+
+! Function set cpu time
+      
+       IMPLICIT NONE
+
+#ifdef parallel
+      INCLUDE 'mpif.h'
+#endif
+      
+ ! local:      
+      REAL( 8 )  :: CPU_TIME_FINISH
+#ifndef parallel
+      REAL       :: REAL_TIME
+#endif
+       
+#ifdef parallel
+      SET_CPU_TIMING = MPI_WTIME()
+#else
+      CALL CPU_TIME( REAL_TIME )
+      SET_CPU_TIMING = REAL( REAL_TIME,8 )
+#endif
+          
+      END FUNCTION SET_CPU_TIMING
+!.........................................................................
+      SUBROUTINE TIMING_DELTA( CPU_TIME_START, CPU_TIME_DELTA )
+      
+         IMPLICIT NONE
+
+#ifdef parallel
+      INCLUDE 'mpif.h'
+#endif
+        REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_START
+        REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_DELTA
+      
+ ! local:      
+      REAL( 8 )  :: CPU_TIME_FINISH
+#ifndef parallel
+      REAL       :: REAL_TIME
+#endif
+
+!  This subroutine calculates and returns elapsed time from CPU_TIME_START
+!  as an update to CPU_TIME_DELTA so total time expense can be determine
+!  for code block in a cyclng loop.
+!  It also resets CPU_TIME_START to current CPU time.
+
+#ifdef parallel
+      CPU_TIME_FINISH = MPI_WTIME()
+#else
+      CALL CPU_TIME( REAL_TIME )
+      CPU_TIME_FINISH = REAL( REAL_TIME,8 )
+#endif
+      CPU_TIME_DELTA = CPU_TIME_DELTA + (CPU_TIME_FINISH-CPU_TIME_START)
+
+#ifdef parallel      
+      CPU_TIME_START = MPI_WTIME()
+#else
+      CALL CPU_TIME( REAL_TIME )
+      CPU_TIME_START = REAL( REAL_TIME,8 )
+#endif
+      
+      END SUBROUTINE TIMING_DELTA
 
 !.........................................................................
       SUBROUTINE TIMING_SPLIT( CPU_TIME_START, IMSG, CPROCIN )
@@ -1162,13 +1234,15 @@
 #ifdef parallel
       INCLUDE 'mpif.h'
 #endif
-      REAL( 8 )        :: CPU_TIME_START
+      REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_START
+      INTEGER,   INTENT( IN   )  :: IMSG   ! What kind of checkpoint this is
+      CHARACTER( * ), INTENT(IN), OPTIONAL :: CPROCIN
+      
+! local:      
       REAL( 8 )        :: CPU_TIME_FINISH
-      INTEGER          :: IMSG   ! What kind of checkpoint this is
                                  !  1 = 'PROCESS'
                                  !  2 = 'MASTER TIME STEP'
                                  !  3 = 'OUTPUT'
-      CHARACTER( * ), INTENT(IN), OPTIONAL :: CPROCIN
       CHARACTER( len=: ), ALLOCATABLE :: CPROC
       CHARACTER( 250 ) :: XMSG
 
@@ -1219,7 +1293,9 @@
           WRITE( LOGDEV, * )
 #ifndef twoway
           IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
+          
 #endif
+      CASE( 4 )
  
       END SELECT 
 

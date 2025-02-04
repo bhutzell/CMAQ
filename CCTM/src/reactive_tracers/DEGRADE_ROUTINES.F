@@ -16,16 +16,13 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header$
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
       MODULE DEGRADE_ROUTINES
 
          USE DEGRADE_SETUP_TOX
 
          IMPLICIT NONE
+
+         REAL( 8 ), PARAMETER, PRIVATE :: COEF1     =  7.33981D+15 ! Molec/cc to ppm conv factor
 
       CONTAINS
 
@@ -544,10 +541,16 @@ C..Loop over each reactant
          LOOP_LIFE: DO I_CELL = 1, NCELLS
             IF ( NET_RATE( I_CELL ) * DT .LE. EFFECTIVE_ZERO .OR. CURR_CONC( I_CELL, I_RXT ) <=  CONMIN ) THEN
                TRANS( I_CELL ) = ZERO
-               IF( WRITE_CELL( I_CELL ) )LIFETIME( I ) = INFINITY
+#ifdef verbose_deg
+!              IF( WRITE_CELL( I_CELL ) )LIFETIME( I ) = INFINITY
+               LIFETIME( I ) = INFINITY
+#endif
             ELSE
                NET_LIFE( I_CELL ) = 1.0D0 / NET_RATE( I_CELL )
-               IF( WRITE_CELL( I_CELL ) )LIFETIME( I ) = NET_LIFE( I_CELL ) 
+#ifdef verbose_deg
+!              IF( WRITE_CELL( I_CELL ) )LIFETIME( I ) = NET_LIFE( I_CELL ) 
+               LIFETIME( I ) = NET_LIFE( I_CELL ) 
+#endif
                TRANS( I_CELL ) = CURR_CONC( I_CELL, I_RXT )
      &                         * ( 1.0D0 - DEXP( - NET_RATE( I_CELL )*DT ) )
                DELT_CONC( I_CELL, I_RXT ) = - MAX( TRANS( I_CELL ), ZERO )
@@ -578,15 +581,14 @@ C..update previous concentrations
       ENDDO
 
 C..update current concentrations
-#ifdef verbose_gas
+#ifdef verbose_deg
       IF( WRITE_BLOCK )THEN
          DEGRADE_STEP = DEGRADE_STEP + 1
          WRITE(LOGDEV,'(/,A,I3)')'DEGRADE_STEP: ',DEGRADE_STEP
-         WRITE(LOGDEV,'(/A18,4(1X,A18))')'S DEGRADED', 'FACTOR', 
-     &   'PREV_CONC','CURR_CONC','LIFE (days)'
+         WRITE(LOGDEV,'(/A18,7(1X,A18))')'S DEGRADED', 'FACTOR', 
+     &   'PREV_CONC','CURR_CONC','LIFE (days)','DCONC','LOSS FREQ(1/min)'
       END IF
 #endif
-
       LOOP_UPDATE1: DO I = 1, N_REACT
       
          I_RXT = RXTANT_MAP( I )
@@ -596,11 +598,12 @@ C..update current concentrations
               CURR_CONC( I_CELL, I_RXT  ) = MAX( (PREV_CONC( I_CELL, I_RXT  ) + DELT_CONC( I_CELL, I_RXT )),
      &                                            CONMIN )
             END IF
-#ifdef verbose_gas
+#ifdef verbose_deg
             IF( WRITE_CELL( I_CELL ) )THEN
                 FACTOR = 1.0D0 + MIN( -1.0D0,( DELT_CONC( I_CELL,I_RXT )/PREV_CONC( I_CELL,I_RXT ) )  )
-                WRITE(LOGDEV,'(A2,A16,5(1X,ES18.10))')'S ',REACT( I ), FACTOR, 
-     &          PREV_CONC( I_CELL,I_RXT ),CURR_CONC( I_CELL,I_RXT ),1.15741D-5*LIFETIME( I ),DELT_CONC( I_CELL,I_RXT )
+                WRITE(LOGDEV,'(A2,A16,7(1X,ES18.10))')'S ',REACT( I ), FACTOR, 
+     &          PREV_CONC( I_CELL,I_RXT ),CURR_CONC( I_CELL,I_RXT ),1.15741D-5*LIFETIME( I ),
+     &          DELT_CONC( I_CELL,I_RXT ), 60.0D0 / LIFETIME(I)
             END IF
 #endif
          ENDDO
@@ -725,19 +728,11 @@ c..update CBLK
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/gas/smvgear/final_degrade.F,v 1.4 2011/10/21 16:11:12 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
-
       SUBROUTINE FINAL_DEGRADE_BLK( CBLK )
 C**********************************************************************
 C
-C  FUNCTION: Update CBLK concentrations with concentrations from degrade
-C            routines
+C  FUNCTION:  Update CBLK concentrations with concentrations from degrade
+C             routines
 C
 C  CALLED BY: GRDRIVER or RBDRIVER
 C
@@ -954,6 +949,8 @@ C.....LOCAL VARIABLES:
       REAL, PARAMETER :: SVP2  = 17.2693882
       REAL, PARAMETER :: SVP3  = 35.86
 
+      REAL( 8 ), SAVE :: COEF2   ! COEF1 time Pascal to atm conv fac
+
       REAL    :: ESW        ! water vapor liquid saturaturion vapor pressure (Pa)
       REAL    :: QVSW       ! water vapor saturation mixing ratio (Kg/Kg)
       REAL    :: RHUM       ! relative humidity (fraction)
@@ -965,6 +962,8 @@ C.....LOCAL VARIABLES:
 C**********************************************************************
 
       IF ( FIRSTCALL ) THEN  ! initialize constants and allocate arrays
+
+         COEF2 =  REAL( 1.0 / STDATMPA, 8) * COEF1
 
          MASS_TO_NUMBER = REAL( 1.0E-3*AVO / MWAIR, 8 )
          
@@ -1000,17 +999,21 @@ C..initialize concentrations and their changes
       END DO
          
 
-      CONC_AIR  = MASS_TO_NUMBER * REAL( DCELL, 8 )
+      TEMP_AIR = REAL( TCELL, 8 )
+      INV_TAIR   = 1.0D0 / TEMP_AIR
+
+!!!!  CONC_AIR  = MASS_TO_NUMBER * REAL( DCELL, 8 )
+      CONC_AIR  = 1.0E6 * COEF2 * REAL( PRESS_CELL,8 ) * INV_TAIR
+
       CONC_N2   = ATM_N2  * CONC_AIR  
       CONC_O2   = ATM_O2  * CONC_AIR  
       CONC_CH4  = ATM_CH4 * CONC_AIR  
       CONC_H2   = ATM_H2  * CONC_AIR  
       CONC_H2O  = MAOMW   * QV_CELL * CONC_AIR  
       
-      TEMP_AIR = REAL( TCELL, 8 )
 
-      PPM_2_NUMBER  = CONV_M2N * REAL( DCELL, 8 )
-      INV_TAIR   = 1.0D0 / TEMP_AIR
+!!!!  PPM_2_NUMBER  = CONV_M2N * REAL( DCELL, 8 )
+      PPM_2_NUMBER = 1.0D-6 * CONC_AIR
 
       LOOP_REACT: DO I = 1, N_REACT ! calculated rate constants
 
@@ -1047,6 +1050,16 @@ C..initialize concentrations and their changes
      &                                    * DEXP( -BI_ACT( J, I )*INV_TAIR )
 
          END DO LOOP_BIRATE
+#ifdef verbose_deg
+         WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL,CONC_AIR,
+     &   PRESS
+         WRITE(LOGDEV,*)'BIRATES for ',REACT(I)
+         DO J = 1, N_BI_LOSS
+            WRITE(LOGDEV,'(I5,2(1X,ES12.4))')J+UNI_STOP,
+     &      CELL_RKI( J+UNI_STOP, I  )/FACTOR, FACTOR 
+         END DO
+#endif
+
 
          LOOP_TRIRATE: DO J = 1, N_TRI_LOSS
             IF( TRIRATE( J, I ) .LT. EFFECTIVE_ZERO )CYCLE
@@ -1093,7 +1106,7 @@ C..initialize concentrations and their changes
             K = PHOTO_MAP( J, I )
             IF ( K < 1 ) CYCLE
             IF( A_PHOTO( J, I ) .LT. EFFECTIVE_ZERO )CYCLE
-            CELL_RKI( J+TRI_STOP, I ) = 60.0D0 * A_PHOTO( J, I )
+            CELL_RKI( J+TRI_STOP, I ) = A_PHOTO( J, I )
      &                                  * PHOTO_CELL( K )
 
          END DO LOOP_PHOTORATE
@@ -1181,7 +1194,7 @@ C
 C  FUNCTION:  Initialize arrays used by degrade routines then load
 C             CBLK concentration needed in degrade routines.
 C
-C  CALLED BY: HRDRIVER
+C  CALLED BY: GRDRIVER or RBDRIVER
 C
 C  REVISION HISTORY:  07/29/05 : B.Hutzell - Initial version
 C                     09/30/11 : B.Hutzell - added CYCLE statements to allow 
@@ -1233,6 +1246,7 @@ C.....LOCAL VARIABLES:
       REAL,      PARAMETER :: MAOMW     =  MWAIR / MWWAT           ! Mol Wt of air over Mol Wt of water 
       REAL( 8 ), PARAMETER :: MWOMA     =  REAL( MWWAT / MWAIR,8 ) ! Mol Wt of water over Mol Wt of air 
       REAL( 8 ), PARAMETER :: ATM_TO_PA =  REAL( STDATMPA,8 )      ! Pascals per Atmosphere
+
       
 !   Murray, F.W. 1966. ``On the computation of Saturation Vapor Pressure,'
 !   J. Appl. Meteor.,  6, p. 204.
@@ -1276,7 +1290,6 @@ C**********************************************************************
          ALLOCATE( NUMB_DENS ( BLKSIZE ) )
          ALLOCATE( NUMB_H2O  ( BLKSIZE ) )
          ALLOCATE( CONV_FACT ( BLKSIZE ) )
-         ALLOCATE( WRITE_CELL( BLKSIZE ) )
          ALLOCATE( IS_AERO_ORGANIC ( N_AEROSPC ) )
 
          ALLOCATE( RATE_CONST( BLKSIZE, N_PROCESSES, N_REACT ) )
@@ -1302,22 +1315,28 @@ C..initialize concentrations and their changes
          CURR_CONC( :,I ) = PREV_CONC( :,I )
       END DO
          
-      NUMB_DENS = MASS_TO_NUMBER * REAL( DCELL, 8 )
-      NUMB_H2O  = 1.0D-6 * H2O_CELL * NUMB_DENS
-      CONV_FACT = CONV_M2N * REAL( DCELL, 8 )
-      
-      TEMP =  REAL( TCELL, 8 )
       PRESS = ATM_TO_PA * PRESS_CELL
 
+      TEMP =  REAL( TCELL, 8 )
       WHERE( TEMP .GT. 0 )
          INV_TEMP = 1.0D0 / TEMP
       ELSE WHERE
          INV_TEMP = 0.0D0
       END WHERE
 
+      NUMB_DENS = 1.0E6 * COEF1 * REAL( PRESS_CELL,8 ) * INV_TEMP
+      NUMB_H2O  = 1.0D-6 * H2O_CELL * NUMB_DENS
+      CONV_FACT = 1.0D-6 * NUMB_DENS
+      
+      
+
       LOOP_REACT: DO I = 1, N_REACT ! calculated rate constants
 
          IF( RXTANT_MAP( I ) < 0 )CYCLE LOOP_REACT
+
+#ifdef verbose_deg
+         WRITE(LOGDEV,'(2A)')'DEGRADED SPECIES: ',TRIM( REACT(I) )
+#endif
 
          LOOP_UNIRATE: DO J = 1, N_UNI_LOSS
             IF( UNIRATE( J, I ) .LT. EFFECTIVE_ZERO )CYCLE
@@ -1327,13 +1346,13 @@ C..initialize concentrations and their changes
      &                                   * DEXP( -UNI_ACT( J, I )*INV_TEMP( ICELL ) )
             END DO LOOP_CELL
          END DO LOOP_UNIRATE
-#ifdef verbose_gas
+#ifdef verbose_deg
          IF( WRITE_BLOCK )THEN
             WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
      &      PRESS(ICELL_WRITE)
             WRITE(LOGDEV,*)'UNIRATES for ',REACT(I)
             DO J = 1, N_UNI_LOSS
-               WRITE(LOGDEV,*)J,RATE_CONST( ICELL_WRITE, J, I  )
+               WRITE(LOGDEV,'(I5,1X,ES12.4)')J,RATE_CONST( ICELL_WRITE, J, I  )
             END DO
          END IF
 #endif
@@ -1369,13 +1388,15 @@ C..initialize concentrations and their changes
                 END DO      
              END IF
          END DO LOOP_BIRATE
-#ifdef verbose_gas
+#ifdef verbose_deg
          IF( WRITE_BLOCK )THEN
             WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
      &      PRESS(ICELL_WRITE)
             WRITE(LOGDEV,*)'BIRATES for ',REACT(I)
             DO J = 1, N_BI_LOSS
-               WRITE(LOGDEV,*)J+UNI_STOP,RATE_CONST( ICELL_WRITE, J+UNI_STOP, I  )
+               WRITE(LOGDEV,'(I5,2(1X,ES12.4))')J+UNI_STOP,
+     &         RATE_CONST( ICELL_WRITE, J+UNI_STOP, I  )/( FACTOR * CONV_FACT( ICELL_WRITE ) ),
+     &         FACTOR * CONV_FACT( ICELL_WRITE )
             END DO
          END IF
 #endif
@@ -1399,7 +1420,7 @@ C..initialize concentrations and their changes
              END SELECT
              SELECT CASE ( RAD2_MAP( 2, J, I ) )
                CASE ( 9999 )
-                  FACTOR = FACTOR
+                  FACTOR = FACTOR * ATM_AIR
                CASE ( 9998 )
                   FACTOR = FACTOR * ATM_N2
                CASE ( 9997 )
@@ -1441,13 +1462,14 @@ C..initialize concentrations and their changes
                 END DO
              END IF
          END DO LOOP_TRIRATE
-#ifdef verbose_gas
+#ifdef verbose_deg
          IF( WRITE_BLOCK )THEN
             WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
      &      PRESS(ICELL_WRITE)
             WRITE(LOGDEV,*)'TRI_RATES for ',REACT(I)
             DO J = 1, N_TRI_LOSS
-               WRITE(LOGDEV,*)J+BI_STOP,RATE_CONST( ICELL_WRITE, J+BI_STOP, I  )
+               WRITE(LOGDEV,'(I5,1X,ES12.4)')J+BI_STOP,RATE_CONST( ICELL_WRITE, J+BI_STOP, I  )
+     &         /(FACTOR*CONV_FACT( ICELL_WRITE ))
             END DO
          END IF
 #endif
@@ -1458,18 +1480,19 @@ C..initialize concentrations and their changes
             IF ( K < 1 ) CYCLE
             IF( A_PHOTO( J, I ) .LT. EFFECTIVE_ZERO )CYCLE
             DO ICELL = 1, NCELLS
-               RATE_CONST( ICELL, J+TRI_STOP, I ) = 60.0D0 * A_PHOTO( J, I )
+!              RATE_CONST( ICELL, J+TRI_STOP, I ) = 60.0D0 * A_PHOTO( J, I )
+               RATE_CONST( ICELL, J+TRI_STOP, I ) = A_PHOTO( J, I )
      &                                            * PHOTO_CELL( ICELL, K )
             END DO
 
          END DO LOOP_PHOTORATE
-#ifdef verbose_gas
+#ifdef verbose_deg
          IF( WRITE_BLOCK )THEN
             WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
      &      PRESS(ICELL_WRITE)
             WRITE(LOGDEV,*)'PHOTO_RATES for ',REACT(I)
             DO J = 1, N_PHOTO_LOSS
-               WRITE(LOGDEV,*)J+TRI_STOP,RATE_CONST( ICELL_WRITE,J+TRI_STOP, I  )
+               WRITE(LOGDEV,'(I5,1X,ES12.4)')J+TRI_STOP,RATE_CONST( ICELL_WRITE,J+TRI_STOP, I  )
             END DO
          END IF
 #endif
@@ -1489,7 +1512,7 @@ C..initialize concentrations and their changes
      &                          MASK=IS_AERO_ORGANIC( : ) )
                 H2O_MOLAR_FRACTION( ICELL ) = ORG_H2O 
      &                                      / MAX( (ORG_H2O + ORG_AERO), EFFECTIVE_ZERO )
-#ifdef verbose_gas
+#ifdef verbose_deg
                 IF( ICELL .EQ. ICELL_WRITE )THEN
                   WRITE(LOGDEV,'(A,6(1X,ES12.4))')'ORG_H2O, ORG_H2O,H2O_MOLAR_FRACTION = ',  
      &            ORG_H2O, ORG_H2O,H2O_MOLAR_FRACTION(ICELL)                    
@@ -1536,13 +1559,14 @@ C..initialize concentrations and their changes
             END IF
 
          END DO LOOP_LHRATE
-#ifdef verbose_gas
+#ifdef verbose_deg
          IF( WRITE_BLOCK )THEN
             WRITE(LOGDEV,'(A,6(1X,ES12.4))')'TEMP,NUMB,PRESS,H2O = ',TCELL(ICELL_WRITE),NUMB_DENS(ICELL_WRITE),
      &      PRESS(ICELL_WRITE),NUMB_H2O(ICELL_WRITE)
-            WRITE(LOGDEV,*)'LH_RATES for ',REACT(I)
+            WRITE(LOGDEV,'(2A)')'LH_RATES for ',REACT(I)
             DO J = 1, N_LANHIN_LOSS
                WRITE(LOGDEV,'(A,1X,I3,6(1X,ES12.4))')'LH_RCONST:', J+PHOTO_STOP,RATE_CONST( ICELL_WRITE, J+PHOTO_STOP, I  )
+     &         / (FACTOR * CONV_FACT( ICELL_WRITE  ))
             END DO
          END IF
 #endif

@@ -21,7 +21,6 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPDEPV_DIAG ( JDATE, JTIME, TSTEP,
      &                         N_GDEPV_NAMES, GDEPV_NAMES,
      &                         N_ADEPV_NAMES, ADEPV_NAMES )
-!    &                         N_SDEPV_NAMES, SDEPV_NAMES)
 
 C 2006-Jun-30 - created by W Hutzell
 C 2006-Dec-05 - modified by J.Young
@@ -35,7 +34,7 @@ C                 processors to open CTM_DEPV_DIAG file (D. Wong)
       USE GRID_CONF           ! horizontal & vertical domain specifications
       USE DEPVVARS
       USE UTILIO_DEFN
-!     USE pio_module
+      USE MIO_ASCII
 
       IMPLICIT NONE
  
@@ -54,10 +53,6 @@ C number and names of gas deposition velocities
 C number and names of aerosol deposition velocities
       INTEGER, INTENT( IN ) :: N_ADEPV_NAMES
       CHARACTER( 16 ), INTENT( IN ) :: ADEPV_NAMES( : )
-
-C number and names of (SOA+aerosol) species deposition velocities
-!     INTEGER, INTENT( IN ) :: N_SDEPV_NAMES
-!     CHARACTER( 16 ), INTENT( IN ) :: SDEPV_NAMES( : )
 
 C Local variables:
 
@@ -79,7 +74,7 @@ C Try to open existing file for update
      &           // 'try to open new'
             CALL M3MESG( XMSG )
 
-C Set output file characteristics based on GRIDDESC and open the dep velocity dignostic file
+C Set output file characteristics based on GRIDDESC and open the dep velocity diagnostic file
 
             SDATE3D = JDATE
             STIME3D = JTIME
@@ -113,7 +108,7 @@ C Set output file characteristics based on GRIDDESC and open the dep velocity di
             FDESC3D = ' '   ! array
 
             L = LEN_TRIM( DEPV_METHOD )
-            FDESC3D( 1 ) = 'Instanteous values of dry deposition velocities:'
+            FDESC3D( 1 ) = 'Instantaneous values of dry deposition velocities:'
      &                  // ' the gas phase velocities are' 
             FDESC3D( 2 ) = 'estimated by the '
      &                  //  DEPV_METHOD( 1:L ) // ' algorithm.'
@@ -138,18 +133,20 @@ C Set output file characteristics based on GRIDDESC and open the dep velocity di
                VDESC3D( N ) = 'aerosol phase dry deposition velocity'
             END DO
 
-!        N = N_GDEPV_NAMES + N_ADEPV_NAMES
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
 
-!        DO V = 1, N_SDEPV_NAMES
-!           N = N + 1
-!           VTYPE3D( N ) = M3REAL
-!           VNAME3D( N ) = SDEPV_NAMES( V )
-!           UNITS3D( N ) = 'cm s-1'
-!           VDESC3D( N ) = 'deposition velocity for (GAS-AEROSOL) '
-!    &                  // ' semi-volatile compound'
-!        END DO
+            CALL LOAD_MIO_FILE ( 'CTM_DEPV_DIAG', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
 
-C Open diagnostic file, then close it for subsequent open by all processors
 
             IF ( .NOT. OPEN3( CTM_DEPV_DIAG, FSNEW3, PNAME ) ) THEN
                XMSG = 'Could not create '// TRIM( CTM_DEPV_DIAG ) // ' file'

@@ -527,7 +527,7 @@ C...begin read
 
       DO IPHOT_LOAD = 1, NPHOT_MAP
          DO ITT_LOAD = 1, NTEMP_REF
-            READ( PHOTAB_UNIT,'(A16,7X,F8.3,1X,40(1PE12.6,2X))' )
+            READ( PHOTAB_UNIT,'(A16,7X,F8.3,1X,40(1PE13.6,2X))' )
      &            PHOT_EXPECT, TEMP_REF( ITT_LOAD, IPHOT_LOAD),
      &            ( CS_REF( IWL_LOAD, ITT_LOAD, IPHOT_LOAD ), IWL_LOAD = 1, NWL_REF )
 
@@ -543,7 +543,7 @@ C...begin read
                 CALL M3EXIT( PNAME, 0, 0, MSG, -1 )
             END IF
 
-            READ( PHOTAB_UNIT,'(A16,7X,F8.3,1X,40(1PE12.6,2X))' )
+            READ( PHOTAB_UNIT,'(A16,7X,F8.3,1X,40(1PE13.6,2X))' )
      &            PHOT_EXPECT, TEMP_REF( ITT_LOAD, IPHOT_LOAD),
      &            ( EQY_REF( IWL_LOAD, ITT_LOAD, IPHOT_LOAD ), IWL_LOAD = 1, NWL_REF )
 
@@ -580,7 +580,7 @@ C...begin read
       READ( PHOTAB_UNIT,'(A)' ) FILE_LINE
 
       DO ITT_LOAD = 1, NTEMP_STRAT_REF
-         READ( PHOTAB_UNIT,'(A16,7X,F8.3,1X,40(1PE12.6,2X))' )
+         READ( PHOTAB_UNIT,'(A16,7X,F8.3,1X,40(1PE13.6,2X))' )
      &         PHOT_EXPECT, TEMP_STRAT_REF( ITT_LOAD ),
      &         ( O3_CS_STRAT_REF( IWL_LOAD, ITT_LOAD ), IWL_LOAD = 1, NWL_REF )
 
@@ -1257,7 +1257,7 @@ C...begin read
 #endif
 
       DO ITT_LOAD = 1, NUMB_LANDUSE_REF
-         READ( OPTICS_UNIT,'(A30,1X,40(1PE12.6,2X))' ) LAND_EXPECT,
+         READ( OPTICS_UNIT,'(A30,1X,40(1PE13.6,2X))' ) LAND_EXPECT,
      &        ( SPECTRAL_ALBEDO_REF(IWL_LOAD, ITT_LOAD), IWL_LOAD = 1, NWL_REF )
 
 #ifdef verbose_phot

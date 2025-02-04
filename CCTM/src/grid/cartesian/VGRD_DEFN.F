@@ -107,9 +107,6 @@ C This function is expected to be called only once - at startup
 #ifndef mpas
 
 C get vert layer definition from LAYER_FILE
-
-               WRITE( LOGDEV, * )
-               CALL LOG_HEADING( LOGDEV, "Retrieve Vertical Grid" )
                IF ( .NOT. OPEN3( LAYER_FILE, FSREAD3, 'VGRD_INIT' ) ) THEN
                   XMSG = 'Could not open '// LAYER_FILE
                   CALL M3WARN ( 'VGRD_INIT', 0, 0, XMSG )

@@ -17,11 +17,8 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/depv/m3dry/m3dry.F,v 1.12 2012/01/19 14:19:43 yoj Exp $
-
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE m3dry ( jdate, jtime, dtsec, cgridl1, depvel_gas, pvd, nh3_emis)
+      SUBROUTINE m3dry ( jdate, jtime, dtsec, cgridl1, depvel_gas, pvd, nh3_ddep)
 
 C-------------------------------------------------------------------------------
 C Name:     Models-3 Dry Deposition
@@ -154,6 +151,7 @@ C-------------------------------------------------------------------------------
       USE DEPVVARS
       USE VGRD_DEFN      ! to get VGTYP_GD
       USE UTILIO_DEFN
+      USE HLCONST_MOD
 #ifdef mpas
       Use util_module, only : secsdiff
 #else
@@ -190,7 +188,7 @@ C Arguments:
       REAL,        INTENT( IN )  :: cgridl1( :,:,: )    ! layer 1 concentrations
       REAL,        INTENT( OUT ) :: depvel_gas( :,:,: )
       REAL,        INTENT( OUT ) :: pvd( :,:,: )
-      REAL,        INTENT( OUT ) :: nh3_emis(:,:)
+      REAL,        INTENT( OUT ) :: nh3_ddep(:,:)
 
 C Local Variables:
 
@@ -199,6 +197,7 @@ C Local Variables:
       INTEGER                    :: ifsnow               ! 1=snow
       INTEGER, SAVE, ALLOCATABLE :: lstwetdate( :,: )
       INTEGER, SAVE, ALLOCATABLE :: lstwettime( :,: )
+      INTEGER, SAVE, ALLOCATABLE :: hlind( : )
 
       REAL                       :: cp_air               ! specific heat of moist air
       REAL                       :: ctemp2               ! temp2 [C]
@@ -239,11 +238,9 @@ C Local Variables:
       REAL                       :: rh_func              ! Simple RH function for the development of a water film on leaf cuticles 
       Real,            Parameter :: MolNH3   = 17.01     ! g/mol NH3  for NH3 bidi to convert to microg/m3
       Real,            Parameter :: MolAir   = 29.97     ! g/mol dry air
-      Real                       :: cnh3,tpvd,lnh3,femis
+      Real                       :: cnh3,tpvd,lnh3,femis,fdep
 
       REAL,    SAVE, ALLOCATABLE :: delta     ( :,: )
-
-      REAL,            EXTERNAL  :: hlconst              ! [M / atm]
 
       LOGICAL                    :: effective  ! true=compute effective Henry's Law const
       LOGICAL, SAVE              :: first_call = .TRUE.
@@ -340,6 +337,10 @@ C-------------------------------------------------------------------------------
             ALLOCATE ( lstwettime( ncols,nrows ) )
             lstwettime( :,: ) = 0
          END IF
+
+         IF ( .NOT. ALLOCATED ( hlind ) ) THEN
+            ALLOCATE( hlind( n_spc_m3dry ) )
+         END IF
 C-----------------------------------------------------------------
 C        Species maps
 C-----------------------------------------------------------------
@@ -384,6 +385,13 @@ C-----------------------------------------------------------------
                l_HGII = l
                n_HGII = n
             End If
+
+            hlind( l ) = index1( depname( l ), mxspcs, subname )
+            if ( hlind( l ) .eq. 0 ) then
+               xmsg = 'Could not find ' // trim(depname(l)) // ' in Henry''s Law table SUBNAME'
+               CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+            end if
+
          END DO maploop
 
       END IF   ! first_call
@@ -512,13 +520,14 @@ C-------------------------------------------------------------------------------
 
             n = n + 1
 
-            IF ( ( NINT(GRID_DATA%LWMASK( c,r )) .EQ. 0 ) .OR. ( vegcr .EQ. 0.0 ) ) THEN  ! water
+!            IF ( ( NINT(GRID_DATA%LWMASK( c,r )) .EQ. 0 ) .OR. ( vegcr .EQ. 0.0 ) ) THEN  ! water
+            IF ( NINT(GRID_DATA%LWMASK( c,r )) .EQ. 0 ) THEN  ! water
 
                IF ( l .EQ. l_HG ) THEN  ! elemental mercury gas
 ! calculate and save Henry's constant for use in HGSIM
 
                   IF( HGBIDI ) THEN 
-                     awhg = hlconst( subname( l ), tw, effective, hplus_h2o )* 0.08205 * tw
+                     awhg = hlconst( hlind( l ), tw, effective, hplus_h2o )* 0.08205 * tw
                   ELSE
                      rsurf = 1.0e30
                   END IF
@@ -529,7 +538,7 @@ C-------------------------------------------------------------------------------
          ! dimensional Henry's Law (caq/cg).   Water pH is different
          ! than rain, and we need to use the water temperature.
 
-                  heff  = hlconst( subname( l ), tw, effective, hplus_h2o )
+                  heff  = hlconst( hlind( l ), tw, effective, hplus_h2o )
 
          ! Make Henry's Law constant non-dimensional.
 
@@ -579,7 +588,7 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
          ! constant.  Note that original M3DRY wants inverse,
          ! non-dimensional Henry's Law (caq/cg).
 
-               heff  = hlconst( subname( l ), temp2p0cr, effective, hplus )
+               heff  = hlconst( hlind( l ), temp2p0cr, effective, hplus )
 
          ! Make Henry's Law constant non-dimensional.
 
@@ -616,7 +625,7 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
                   rcut = rcut0 * a0 / ar( l ) * ( 1.0 -rh_func) + rwetsfc * rh_func
                ELSE IF ( l .Eq. l_NH3 ) THEN
          !        rcut = 4000.0 * EXP( -0.054 * MET_DATA%RH( c,r ) )
-                  rcut = rwetsfc + 100.0-max(MET_DATA%RH2( c,r ),60.0) ! consistant with bidi
+                  rcut = rwetsfc + (100.0-max(MET_DATA%RH2( c,r ),60.0))*laicr ! consistant with bidi
                ELSE 
                   rcut = rcut0 * a0 / ar( l )
                END IF
@@ -659,7 +668,7 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 
          ! Bulk stomatal resistance; include mesophyll resistance.
 
-               heff_ap = hlconst( subname( l ), temp2p0cr, effective, hplus_ap )
+               heff_ap = hlconst( hlind( l ), temp2p0cr, effective, hplus_ap )
 
                rstom = MET_DATA%RS( c,r ) * dwat / dif0( l )
      &               + 1.0 / ( heff_ap / 3000.0 + 100.0 * meso( l ) ) / laicr
@@ -691,13 +700,14 @@ C--------------------------------------------------------------------------
                IF ( NINT( GRID_DATA%LWMASK( c,r ) ) .NE. 0 .and. ifsnow .EQ. 0 ) THEN  ! land
 
                   CALL Get_Flux( cnh3,rwetsfc,rgw,r,c,l,tpvd,lnh3, rbc, rinc, 
-     >                           rstom, delta(c,r),rgnd,femis )
+     >                           rstom, delta(c,r),rgnd,femis,fdep )
                    pvd( n,c,r ) = tpvd * 0.001 * MolAir / (MolNH3 * Met_Data%DENS1( C,R ))
-                   nh3_emis(c,r) = nh3_emis(c,r) + femis * dtsec * 1.0e-5  ! convert from microg/m2  to kg/ha
+                   nh3_ddep(c,r) = nh3_ddep(c,r) + fdep * dtsec * 1.0e-5  ! convert from microg/m2  to kg/ha
+!                   nh3_emis(c,r) =  nh3_emis(c,r) + depvel_gas( n,c,r ) * cnh3* dtsec * 1.0e-5
                    depvel_gas( n,c,r ) = lnh3
                ELSE   ! water or snow covered
 !                   ddep_nh3(c,r) = ddep_nh3(c,r) + depvel_gas( n,c,r ) * cnh3 * dt(2) * 1.0e-5
-                   nh3_emis(c,r) = 0.0
+                   nh3_ddep(c,r) = nh3_ddep(c,r) + depvel_gas( n,c,r ) * cnh3* dtsec * 1.0e-5
                END IF
             END IF   ! 'abflux'
 
@@ -791,7 +801,7 @@ C--------------------------------------------------------------------------
 
                ELSE ! terrestrial
 
-                  awhg  = hlconst( subname( l ), temp2p0cr, effective, hplus )* 0.08205 * temp2p0cr
+                  awhg  = hlconst( hlind( l ), temp2p0cr, effective, hplus )* 0.08205 * temp2p0cr
 
 C************* Call the Hg air surface exchange subroutine *************************************************
                  CALL ATX(rbc, rcut, rwetsfc, rinc,rsnow, rgw, ifsnow, xm, dvel, chg, awhg,
@@ -834,7 +844,7 @@ C Error-handling section.
 C-------------------------------------------------------------------------------
 
 999   CONTINUE
-      WRITE( logdev,9003 ) c, r, TRIM( subname( l ) ), depvel_gas( n,c,r )
+      WRITE( logdev,9003 ) c, r, TRIM( depname( l ) ), depvel_gas( n,c,r )
       xmsg = 'ABORT'
 
 1001  CONTINUE

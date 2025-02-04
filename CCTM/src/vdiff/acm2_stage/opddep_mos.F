@@ -25,7 +25,7 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
  
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE OPDDEP_MOS ( JDATE, JTIME, TSTEP, N_SPC_DDEP )
+      SUBROUTINE OPDDEP_MOS ( JDATE, JTIME, TSTEP )
 
 C   30 Mar 01 J.Young: dyn alloc - Use HGRD_DEFN
 C   03 Sep 01 David Wong: for new pario
@@ -39,6 +39,7 @@ C   20 May 11 D.Schwede: modified to include mosaic output file
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
       USE MOSAIC_MOD, Only: Tile_Data
+      USE MIO_ASCII
 
       IMPLICIT NONE
  
@@ -49,7 +50,6 @@ C Arguments:
       INTEGER      JDATE      ! current model date, coded YYYYDDD
       INTEGER      JTIME      ! current model time, coded HHMMSS
       INTEGER      TSTEP      ! output time step
-      INTEGER      N_SPC_DDEP ! no. of dry dep species
 
 C Local variables:
 
@@ -109,7 +109,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = GC_DDEP( N )
-            UNITS3D( V ) = 'kg/hectare'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
@@ -121,11 +121,11 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = AE_DDEP( N )
             IF ( AE_DDEP( N )( 1:3 ) .EQ. 'NUM' ) THEN
-               UNITS3D( V ) = 'number/hectare'
+               UNITS3D( V ) = 'ha-1'
             ELSE IF ( AE_DDEP( N )( 1:3 ) .EQ. 'SRF' ) THEN
-               UNITS3D( V ) = 'm**2/hectare'
+               UNITS3D( V ) = 'm2 ha-1'
             ELSE
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
             END IF
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
@@ -137,7 +137,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = NR_DDEP( N )
-            UNITS3D( V ) = 'kg/hectare'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
@@ -148,14 +148,29 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = TR_DDEP( N )
-            UNITS3D( V ) = '----'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
          FDESC3D( 1 ) = 'hourly 1-layer cross-point STAGE dry deposition data'
          DO L = 2, MXDESC3
             FDESC3D( L ) = ' '
-            END DO
+         END DO
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_MOS', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+          
 
 C    Open dry deposition file
 

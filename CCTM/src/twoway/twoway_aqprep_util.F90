@@ -29,10 +29,9 @@ SUBROUTINE bcldprc_ak (wrf_ncols, wrf_nrows, nlays,                &
 !-------------------------------------------------------------------------------
 
   USE module_model_constants
+  use const
 
   IMPLICIT NONE
-
-  INCLUDE SUBST_CONST
 
   INTEGER,       INTENT(IN)    :: wrf_ncols
   INTEGER,       INTENT(IN)    :: wrf_nrows

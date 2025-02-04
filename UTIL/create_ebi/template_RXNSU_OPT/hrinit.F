@@ -39,16 +39,9 @@ C***********************************************************************
       USE HRDATA
       USE RXNS_DATA
       USE RXNS_FUNCTION
+      USE CONST, ONLY : MWAIR
        
       IMPLICIT NONE
-
-C.....INCLUDES:
-      Include SUBST_CONST          ! common constants
-
-C.....ARGUMENTS: NONE
- 
-C.....PARAMETERS: NONE
-
 
 C.....SAVED VARIABLES:
       CHARACTER( 16 ), SAVE  ::  PNAME = 'HRINIT'   ! Program name

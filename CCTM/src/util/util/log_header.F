@@ -1,19 +1,21 @@
 
-      subroutine LOAD_HEADER( HEADER_TXT, N_TXT )
+      subroutine LOAD_HEADER( HEADER_TXT, N_HEADER_TXT, TOC_TXT, N_TOC_TXT )
 
       IMPLICIT NONE
 
-      CHARACTER( 90 ) :: HEADER_TXT( 200 )
-      INTEGER         :: N_TXT
+      CHARACTER( 90 ) :: HEADER_TXT( 200 ), TOC_TXT( 200 )
+      INTEGER         :: N_HEADER_TXT, N_TOC_TXT
 
-      N_TXT = 21
+      N_HEADER_TXT = 21
       HEADER_TXT( : ) = ''
+      N_TOC_TXT = 19
+      TOC_TXT( : ) = ''
 
-      HEADER_TXT( 1:N_TXT ) = (/   
+      HEADER_TXT( 1:N_HEADER_TXT ) = (/   
      &   '#================================================================================#', 
      &   '#|                                                                              |#', 
      &   '#|               The Community Multiscale Air Quality (CMAQ) Model              |#', 
-     &   '#|                                   Version 5.4                                |#', 
+     &   '#|                                   Version 5.5                                |#', 
      &   '#|                                                                              |#', 
      &   '#|                          Built and Maintained by the                         |#', 
      &   '#|                        Office of Research and Development                    |#', 
@@ -31,6 +33,29 @@
      &   '#|         CMAS URL: (https://www.cmascenter.org)                               |#', 
      &   '#|                                                                              |#', 
      &   '#================================================================================#'  
+     &      /)
+
+
+      TOC_TXT( 1:N_TOC_TXT ) = (/   
+     &   '                                                                                  ',
+     &   '     -----------------------                                                      ',
+     &   '     |>>   Please Note   <<|                                                      ',
+     &   '     -----------------------                                                      ',
+     &   '                                                                                  ',
+     &   '     Search for the headings below to jump to error checks, reports, and          ', 
+     &   '     diagnostic tables documenting emission input, prediction output, etc.        ',
+     &   '                                                                                  ',
+     &   '     ** It is CRITICALLY IMPORTANT that users check these sections when           ', 
+     &   '        configuring a new scenario or beginning production-level simulations. **  ',
+     &   '                                                                                  ',
+     &   '     -> INITIALIZE DESID EMISSION MODULE                                          ',
+     &   '         - Error Check Emission Mapping Configuration                             ',
+     &   '         - DESID Emission Scaling Report                                          ',
+     &   '         - DESID Emission Diagnostic Report                                       ',
+     &   '     -> INITIALIZE ELMO MODULE                                                    ',
+     &   '         - Reading ELMO Composites from Mechanism-Specific Namelist               ',
+     &   '         - ELMO Output Variable Report                                            ',
+     &   '    ------------------------------------------------------------------------------'
      &      /)
 
        end subroutine LOAD_HEADER 

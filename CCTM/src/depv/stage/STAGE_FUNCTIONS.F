@@ -86,10 +86,10 @@
 !--------------------------------------------------------------------------------------------------
          Pure Function Calc_Rwater( ustar, q_2m, temp_2m, temp_g, tw, MVol, H, O3_Hit, 
      &                         Hg_Hit, sea_ice  ) Result( Rwater )         
+         USE CONST, only: stdtemp
+
          Implicit None
 
-         Include SUBST_CONST     ! constants
-         
          Real, Intent( IN ) :: ustar   ! Surface friction velocity (m/s)
          Real, Intent( IN ) :: q_2m    ! temp water vapor mixing ratio
          Real, Intent( IN ) :: temp_2m ! 2m temp (K)
@@ -166,11 +166,10 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 ! Calculate resistance to snow-covered surfaces
 !--------------------------------------------------------------------------------------------------
          Pure Function Calc_Rsnow( temp_g, snow, molwt, M_ac, heff, dif_T, rel_rx ) Result( Rsnow )
+         Use const, only: stdtemp
 
          Implicit None
 
-         Include SUBST_CONST     ! constants
-         
          Real, Intent( IN ) :: temp_g ! surface temperature (K) 
          Real, Intent( IN ) :: snow   ! snow coverage (ratio)
          Real, Intent( IN ) :: molwt  ! molar mass (g/mol)
@@ -212,11 +211,10 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 ! Resistance to air-wet surface exchange
 !-------------------------------------------------------------------------------------------------
          Pure Function Calc_Rwet( temp_g, MW, ac, H, dif_T ) Result( Rwet )
+         Use Const, only: RGASUNIV
 
          Implicit None
 
-         Include SUBST_CONST     ! constants
-         
          Real,    Intent( IN ) :: temp_g
          Real,    Intent( IN ) :: H
          Real,    Intent( IN ) :: dif_T
@@ -279,6 +277,7 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
          Pure Function Calc_Rcut( temp_g, Rx, molwt, M_ac, heff, dif_T, a_cut,  
      &                            snow, no_snow, dry, wet, rh, lai, O3_hit, NH3_hit, ABFLUX ) Result( Rcut )
 
+         Use const, only: stdtemp
          Implicit None
 
          Real, Intent( IN ) :: temp_g
@@ -308,7 +307,6 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
          Real, Parameter :: rcut0   = 3000.0     ! [s/m]
          Real, Parameter :: rwm     = 31.5              ! Minimum NH3 cuticle resistance [s/m] from Massad et al. 2010
 
-         Include SUBST_CONST     ! constants
 C Calculate Rcut
          ! wet Cuticle
          ! If the surface is cold and wet, use dry snow.                   
@@ -389,9 +387,8 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
      &                          sm_v5cm, sm_vsat, sm_vfc, sm_vwlt, sm_vres, sm_bslp, zsoil, frac_ir,
      &                          dry, wet, snow, no_snow, O3_Hit, NH3_Hit, ABFLUX ) Result( Rgc )
 
+         Use Const, only: grav, pi
          Implicit None
-
-         Include SUBST_CONST     ! constants
 
          Real, Intent   ( IN ) :: dif_T
          Real, Intent   ( IN ) :: k_vis
@@ -497,9 +494,8 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
 !-------------------------------------------------------------------------------------------------
          Pure Function RD_Veg(Vghat, ustar, SC,l_width, lai) Result( RD )
                   
+         Use Const, only: GRAV
          Implicit None
-
-         Include SUBST_CONST     ! constants
 
          Real, Intent( IN ) :: Vghat
          Real, Intent( IN ) :: ustar
@@ -523,10 +519,9 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
 ! Aerosol surface resistance for water and bare soil surfaces
 !-------------------------------------------------------------------------------------------------
          Pure Function RD_Smooth(Vghat, ustar, SC, nu ) Result( RD )
-                  
-         Implicit None
 
-         Include SUBST_CONST     ! constants
+         USE CONST, ONLY: GRAV                  
+         Implicit None
 
          Real, Intent( IN ) :: Vghat
          Real, Intent( IN ) :: ustar
@@ -634,13 +629,12 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
 ! Zhang et al. A size-segregated particle dry depositionscheme for an atmospheric aerosol module. 
 !    Atmos. Environ.35, 549560, https://doi.org/10.1016/S1352-2310(00)00326-5, 2001 
 !-------------------------------------------------------------------------------------------------
-! Aerosol surface resistance for vegitative surfaces
+! Aerosol surface resistance for vegetative surfaces
 !-------------------------------------------------------------------------------------------------
          Pure Function RD_Veg_E20(Vghat, ustar, SC,l_width, lai, Dp, wet, Alpha, EINHAT) Result( RD )
-                  
+         Use Const, only: grav
+         
          Implicit None
-
-         Include SUBST_CONST     ! constants
 
          Real, Intent( IN ) :: Vghat
          Real, Intent( IN ) :: ustar
@@ -662,7 +656,7 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
 ! Integration of lai(z)/hc u*(z) from 0 to hc.   
          veg_ustar = max((4.0 - (2.0 * lai + 4.0) * exp( -lai/2.0 )) * ustar, 1.0e-3) ! Replaces the constant 3 in Zhang et 2001
          ST        = Vghat * ustar / ( GRAV * l_width )
-         R1        = Exp( -SQRT( ST ) ) ! only apply to particles with diameter larger than 5 um Zhang et al 2001
+         R1        = max( Exp( -SQRT( ST ) ), 1.0e-20) ! only apply to particles with diameter larger than 5 um Zhang et al 2001
          EIB       = Calc_EIB_E20( SC )
          EIN       = EIN_Veg_E20( Dp, l_width ) * EINHAT
          EIM       = EIM_Veg_E20( ST, alpha )
@@ -675,9 +669,8 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
 !-------------------------------------------------------------------------------------------------
          Pure Function RD_Smooth_E20(Vghat, ustar, lai, SC, nu, wet ) Result( RD )
                   
+         Use Const, only: grav
          Implicit None
-
-         Include SUBST_CONST     ! constants
 
          Real, Intent( IN ) :: Vghat
          Real, Intent( IN ) :: ustar
@@ -692,11 +685,11 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
          Real               :: EIB
          Real               :: R1
 
-         ST      = Vghat * ustar**2 / ( GRAV * nu )
-         R1      = Exp( -SQRT( ST ) ) ! only apply to particles with diameter larger than 5 cm
+         ustg    = max( ustar * exp( -lai/2.0 ), 0.001 )
+         ST      = Vghat * ustg**2 / ( GRAV * nu )
+         R1      = max( Exp( -SQRT( ST ) ), 1.0e-20) ! only apply to particles with diameter larger than 5 um Zhang et al 2001
          EIB     = Calc_EIB_E20( SC )
          EIM     = EIM_SMOOTH_E20( ST )
-         ustg    = max( ustar * exp( -lai/2.0 ), 0.001 )
          RD      = 1.0 / (        wet  * ( 3.0 * ustg * ( EIB + EIM ) ) +      ! Wet surface
      &                     (1.0 - wet) * ( 3.0 * ustg * ( EIB + EIM ) * R1 ) ) ! Dry Surface
 
@@ -816,7 +809,7 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
 !-------------------------------------------------------------------------------------------------
          Pure Function aero_depv_P22(veg, lai, bai, Ustar, Ubar, Ra, Water, aleaf, ahair, fhair, SC,
      &                               NU, VGHAT, SeaIce, SST) Result( depv )
-                  
+
          Implicit None
 
          Real,    Intent( IN ) :: veg
@@ -854,10 +847,9 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
          End Function aero_depv_P22
 
          Pure Function RD_Veg_P22(Vghat, ustar, SC, aleaf, ahair, fhair, lai ) Result( RD )
-                  
+         
+         Use Const, only: GRAV         
          Implicit None
-
-         Include SUBST_CONST     ! constants
 
          Real, Intent( IN ) :: Vghat
          Real, Intent( IN ) :: ustar
@@ -888,9 +880,8 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
 !-------------------------------------------------------------------------------------------------
          Pure Function RD_Smooth_P22(Vghat, ustar, Ubar, BAI, SC, nu, SST, SeaIce, water ) Result( RD )
                   
+         Use CONST, ONLY: GRAV
          Implicit None
-
-         Include SUBST_CONST     ! constants
 
          Real,    Intent( IN ) :: Vghat
          Real,    Intent( IN ) :: ustar

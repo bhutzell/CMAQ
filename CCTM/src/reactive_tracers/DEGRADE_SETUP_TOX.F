@@ -17,13 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header$
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
-
       MODULE DEGRADE_SETUP_TOX
 C**********************************************************************
 C
@@ -41,12 +34,9 @@ C**********************************************************************
       USE CGRID_SPCS               ! CGRID species number and offsets
       USE UTILIO_DEFN              ! IOAPI declarations and definitions
       USE DEGRADE_PARAMETERS
+      USE CONST
 
       IMPLICIT NONE
-
-C.....INCLUDES:
-
-      INCLUDE SUBST_CONST         ! constants
 
       REAL(8)              :: EFFECTIVE_ZERO
       REAL(8)              :: LOG_EFFECTIVE_ZERO
@@ -114,12 +104,12 @@ C..saved blocked cells concentrations
       LOGICAL, ALLOCATABLE :: IS_AERO_ORGANIC( : )  ! is aerosol species as OA and not a tracer
 
 
-      INTEGER :: NCELLS                             ! number of cells in block
+      INTEGER :: NCELLS  = 0                        ! number of cells in block
 C.. variables used to write cell results
       INTEGER :: DEG_LAY = 0
       INTEGER :: DEG_ROW = 0
       INTEGER :: DEG_COL = 0
-C.. varaible used to write a cell in a block
+C.. variable used to write a cell in a block
       INTEGER :: ICELL_WRITE = 1
       LOGICAL :: WRITE_BLOCK = .FALSE.
       LOGICAL, ALLOCATABLE :: WRITE_CELL( : )       ! write cell value used for debugging and QA
@@ -254,7 +244,7 @@ C..Quality control on pairs of Reactant and Products
                      WRITE( XMSG,* ) 'ERROR: ',
      &                 TRIM( VNAME( 1 ) ), ' is a destroyed  and produced.'
      &                 // ' The property is not allowed because it'
-     &                 // ' brakes linear assumptions used.'
+     &                 // ' breaks linear assumptions used.'
                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                   END IF
                END DO    
@@ -265,8 +255,8 @@ C..Quality control on pairs of Reactant and Products
                IF ( VNAME( 1 ) == BICAUSE( K, I ) ) THEN
                   WRITE( XMSG,* ) 'ERROR: ',
      &                 TRIM( VNAME( 1 ) ), ' has same name'
-     &                 // ' same as a species causing its bimolecular loss.'
-     &                 // ' This brakes linear assumptions used.'
+     &                 // ' as a species causing its bimolecular loss.'
+     &                 // ' This breaks linear assumptions used.'
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                ENDIF
             ENDDO
@@ -277,7 +267,7 @@ C..Quality control on pairs of Reactant and Products
                   WRITE( XMSG,* ) 'ERROR: ',
      &                 TRIM( VNAME( 1 ) ), ' has same name as'
      &                 // ' a species causing its trimolecular loss.'
-     &                 // ' This brakes linear assumptions used.'
+     &                 // ' This breaks linear assumptions used.'
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                ENDIF
             ENDDO
@@ -287,7 +277,7 @@ C..Quality control on pairs of Reactant and Products
                   WRITE( XMSG,* ) 'ERROR: ',
      &                 VNAME( 1 )( 1:LEN_NAME ), ' has'
      &                 // ' same name as a species causing its Langmuir'
-     &                 // '-Hinshwood loss. This brakes linear assumptions used. '
+     &                 // '-Hinshwood loss. This breaks linear assumptions used. '
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                ENDIF
             ENDDO
@@ -314,7 +304,7 @@ C..Set up indices that point to concentrations in CGRID.
                         N = INDEX1( WNAME, N_NR_SPC, NR_SPC )
                         MARKER = NR_STRT
                         IF ( N == 0 ) THEN
-#ifdef verbose_gas
+#ifdef verbose_deg
                            WRITE( LOGDEV,'(a)' ) TRIM( WNAME ), ' is not '
      &                          // 'in gas or nonreactive species table.'
      &                          // 'its loss processes not calculated '
@@ -371,7 +361,7 @@ C..check UNIMOLECULAR decay rates
 
                WRITE( LOGDEV,1100 ) VNAME( 1 ), RXTANT_MAP( I ),
      &              ' Unimolecular ',
-     &              UNIRATE( J, I ) * TEMP_298K**UNI_TEXP( J, I )
+     &              UNIRATE( J, I ) * (TEMP_298K*INV_T298K)**UNI_TEXP( J, I )
      &              * EXP( -UNI_ACT( J, I ) * INV_T298K ),
      &              VNAME( J+1 ), PROD_MAP( J, I )
 
@@ -441,13 +431,13 @@ C..checking degradation rates
                IF ( RAD_MAP( J, I ) > 0 ) THEN
                   WRITE( LOGDEV,1200 ) VNAME( 1 ), RXTANT_MAP( I ),
      &                 ' Bimolecular ', WNAME, RAD_MAP( J, I ),
-     &                 BIRATE( J, I ) * TEMP_298K**BI_TEXP( J, I )
+     &                 BIRATE( J, I ) * (TEMP_298K*INV_T298K)**BI_TEXP( J, I )
      &                 * EXP( -BI_ACT( J, I ) * INV_T298K ),
      &                 VNAME( J+K+1 ), PROD_MAP( J+K, I )
                ELSE
                    WRITE( LOGDEV,1200 ) VNAME( 1 ), RXTANT_MAP( I ),
      &                 'NOT INCLUDED', WNAME, RAD_MAP( J, I ),
-     &                  BIRATE( J,I ) * TEMP_298K**BI_TEXP( J, I )
+     &                  BIRATE( J,I ) * (TEMP_298K*INV_T298K)**BI_TEXP( J, I )
      &                  * EXP( -BI_ACT( J, I ) * INV_T298K ),
      &                  VNAME( J+K+1 ), PROD_MAP( J+K, I )
                END IF
@@ -525,14 +515,14 @@ C..checking degradation rates
                   WRITE( LOGDEV,1300 ) VNAME( 1 ), RXTANT_MAP( I ),
      &                 ' Trimolecular ', TRICAUSE( 1, J, I ), RAD2_MAP( 1, J, I ),
      &                 TRICAUSE( 2, J, I ), RAD2_MAP( 2, J, I ),
-     &                 TRIRATE( J, I ) * TEMP_298K**TRI_TEXP( J, I )
+     &                 TRIRATE( J, I ) * (TEMP_298K*INV_T298K)**TRI_TEXP( J, I )
      &                 * EXP( -TRI_ACT( J, I ) * INV_T298K ),
      &                 VNAME( J+K+1 ), PROD_MAP( J+K, I )
                ELSE IF ( ICOUNT .GT. 0 ) THEN
                   WRITE( LOGDEV,1300 ) VNAME( 1 ), RXTANT_MAP( I ),
      &                 ' NOT INCLUDED ', TRICAUSE( 1, J, I ), RAD2_MAP( 1, J, I ),
      &                 TRICAUSE( 2, J, I ), RAD2_MAP( 2, J, I ),
-     &                 TRIRATE( J, I ) * TEMP_298K**TRI_TEXP( J, I )
+     &                 TRIRATE( J, I ) * (TEMP_298K*INV_T298K)**TRI_TEXP( J, I )
      &                 * EXP( -TRI_ACT( J, I ) * INV_T298K ),
      &                 VNAME( J+K+1 ), PROD_MAP( J+K, I )
                ENDIF
@@ -554,18 +544,19 @@ C..checking degradation rates
                IF ( LEN_TRIM( WNAME ) < 2 ) CYCLE
 
                IF ( N < 1 ) THEN
-                  WRITE( LOGDEV,* ) 'Photolysis rate, ', WNAME, ' for ',
-     &                 REACT( I )( 1:LEN_NAME ),
-     &                 'is not JTABLE and is not included. '
+                  WRITE( LOGDEV,1350 ) 'Photolysis rate, ', TRIM( WNAME ), ' for ',
+     &            TRIM( REACT( I ) ), ' is not JTABLE and is not included. '
                   CYCLE
                ENDIF
 
                PHOTO_MAP( J, I ) = N
 
                WRITE( LOGDEV,1400 ) VNAME( 1 ), RXTANT_MAP( I ),
-     &              ' Photolysis ', PHOTAB( N ), ' ', 'times', ' ',
+     &              ' Photolysis ', PHOTAB( N ), PHOTO_MAP( J, I ), 'times', ' ',
      &              A_PHOTO( J, I ),
      &              VNAME( J+K+1 ), PROD_MAP( J+K, I )
+!  adjust A_PHOT to account for units of calculated photolysis frequencies (min-1)
+                    A_PHOTO( J, I ) = A_PHOTO( J, I )/60.0D0
 
 70          CONTINUE
 
@@ -662,7 +653,8 @@ C..checking degradation rates
 1100     FORMAT(A20,1X,I5,1X,A20,1X,2(21X,6X),ES12.4,1X,A20,1X,I5)
 1200     FORMAT(A20,1X,I5,1X,A20,1X,A20,1X,I5,1X,21X,6X,ES12.4,1X,A20,1X,I5)
 1300     FORMAT(A20,1X,I5,1X,A20,1X,2(A20,1X,I5,1X),ES12.4,1X,A20,1X,I5)
-1400     FORMAT(A20,1X,I5,1X,A20,1X,2(A20,1X,A5,1X),ES12.4,1X,A20,1X,I5)
+1350     FORMAT(A,A,A,A16,A)
+1400     FORMAT(A20,1X,I5,1X,A20,1X,(A20,1X,I5,1X),(A20,1X,A5,1X),ES12.4,1X,A20,1X,I5)
 1600     FORMAT('       DEGRADED      ',' Index',
      &              '       Process      ','        Cause A      ',
      &              ' Index', '       Cause B      ',' Index',
@@ -686,7 +678,7 @@ C         Called by DEGRADE_MAP
 
 C..Includes: None
  
-           CHARACTER( 16 ), PARAMETER :: PNAME = 'SA_DEGRAGE_INIT'     ! Program name
+           CHARACTER( 16 ), PARAMETER :: PNAME = 'SA_DEGRADE_INIT'     ! Program name
  
            INTEGER :: I, J, RXN, IP, IL 
            INTEGER :: IOSTAT
