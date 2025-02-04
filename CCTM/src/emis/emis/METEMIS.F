@@ -80,7 +80,7 @@
 
         REAL, ALLOCATABLE, SAVE :: ETABLE( :,:,:,: )  !! ( NCOLS,NROWS,NMTEMP,NMETSPC )
         REAL, ALLOCATABLE, SAVE :: TEMPVAL( :,: )     !! ( NCOLS,NROWS ) for temperature
-        REAL, ALLOCATABLE, SAVE :: QVMOL( :,: )       !! ( NCOLS,NROWS ) for specific humidity 
+        REAL, ALLOCATABLE, SAVE :: QVMOL( :,:,: )       !! ( NCOLS,NROWS, NLAYS ) for specific humidity 
 
         INTEGER,SAVE  :: NTICS = 0 ! num. of substeps within an output tstep
         INTEGER,SAVE  :: MTICS = 0 ! temporary sub for NTICS before it is set to 0
@@ -150,12 +150,16 @@
      &                DESID_EMVAR( IMETSRM )%LAREAADJ( NMETSPC ),
      &                ETABLE( NCOLS,NROWS,NMTEMP,NMETSPC ),
      &                TEMPVAL( NCOLS,NROWS ), MTEMPS( NMTEMP ),
-     &                QVMOL( NCOLS,NROWS), VDEMIS_MV( NMETSPC,NCOLS,NROWS ),
+     &                VDEMIS_MV( NMETSPC,NCOLS,NROWS ),
      &                VDEMIS_MVDIAG( NMETSPC,NCOLS,NROWS ), STAT = ISTAT )
             ETABLE = 0.0
             TEMPVAL= 0.0
-            QVMOL= 0.0
             VDEMIS_MVDIAG = 0.0
+            
+            IF (HUM_NOX_YN) THEN
+                ALLOCATE( QVMOL( NCOLS,NROWS,NLAYS), STAT = ISTAT ) 
+                QVMOL= 0.0
+            END IF
 
             MTEMPS( 1:NMTEMP )  = VGLVS3D( 1:NMTEMP )
             MTNAME( 1:NMETSPC ) = VNAME3D( 1:NMETSPC )
@@ -218,7 +222,7 @@
 
                 !! borrow rest of FDESC from input-file...
                 FDESC3D      = ' '
-                FDESC3D( 1 ) = 'hourly met-modulated emissions (diagnostic outputs)'
+                FDESC3D( 1 ) = 'hourly met-modulated mobile emissions (diagnostic outputs)'
                 IF ( .NOT. OPEN3( CTM_METEMIS_DIAG, FSUNKN3, PNAME ) ) THEN
                     CALL M3WARN( PNAME, 0,0, 'Could not open '//CTM_METEMIS_DIAG )
                     METEMIS_INIT = .FALSE.
@@ -266,7 +270,7 @@
             CHARACTER( 120 )  :: XMSG = ' '
             LOGICAL,SAVE  :: FIRSTIME = .TRUE.
 
-            REAL            TF2, PP, E1, E2
+            REAL            TF2, QV, QVM, ADJ, PP, E1, E2, A, B
             CHARACTER*16    VNAME
             CHARACTER*512   MESG
         !!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -296,7 +300,8 @@
             
             !!.......   Retrieve Met variable (TEMP2) to compute MetEmis
             CALL interpolate_var ( 'TEMP2', JDATE, JTIME, TEMPVAL )
-            CALL interpolate_var ( 'QV', JDATE, JTIME, QVMOL )
+            IF (HUM_NOX_YN) 
+     &          CALL interpolate_var ( 'QV', JDATE, JTIME, QVMOL )
 
             !!........  Compute-process:  interpolate between pseudo-layers in table
             !!........  Do not extrapolate beyond temperature-range of table.
@@ -342,6 +347,31 @@
                         VDEMIS_MV( V,C,R ) = E1 + PP * ( E2 - E1 )
                     END DO
 
+                END IF
+
+C.................  NOx humidity corrections for mobile sources (MOVES3)
+                IF (HUM_NOX_YN) THEN
+                  QV  = QVMOL( C,R,1 ) * 1000.0  ! convert from kg water/kg dry air to g/kg
+
+                  DO V = 1, NMETSPC
+                      IF( MTNAME( V ) == 'NO_GAS' .OR.
+     &                    MTNAME( V ) == 'NO2_GAS' .OR.
+     &                    MTNAME( V ) == 'HONO_GAS' ) THEN
+                          A = MIN( QV, 17.71 )
+                          B = MAX( 3.0, A )
+                          ADJ = 1.0 - 0.0329 * ( B - 10.71 )   ! NOx humidity correction for Gasoline fuel
+                          VDEMIS_MV( V,C,R ) = VDEMIS_MV( V,C,R ) * ADJ
+
+                      ELSE IF( MTNAME( V ) == 'NO_DIS' .OR.
+     &                    MTNAME( V ) == 'NO2_DIS' .OR.
+     &                    MTNAME( V ) == 'HONO_DIS' ) THEN
+                          QVM = QV * 0.001607524  ! convert from g of water/kg of dry air to moles of water/moles
+                          A = MIN( QVM, 0.035 )
+                          B = MAX( 0.002, A )
+                          ADJ = 1.0 / ( 9.953 * B  + 0.832 )  ! NOx humidity correction for Diesel fuel
+                          VDEMIS_MV( V,C,R ) = VDEMIS_MV( V,C,R ) * ADJ
+                      END IF
+                  END DO
                 END IF
 
             END DO

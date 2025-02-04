@@ -260,6 +260,7 @@
       LOGICAL :: USE_MARINE_GAS_EMISSION = .FALSE.
       LOGICAL :: USE_MET_EMIS            = .FALSE. ! flag for met-modulated emissions
       LOGICAL :: METEMDIAG               = .FALSE. ! flag for MET_EM diagnostic file
+      LOGICAL :: HUM_NOX_YN              = .FALSE. ! flag for MET_EM NOx correction
 
       ! Process Analysis
       LOGICAL :: PROCAN    = .FALSE. ! flag for process analysis
@@ -857,7 +858,10 @@
  
       ! Get met-modulated emission diagnostic output file flag.
       CALL GET_ENV ( METEMDIAG, 'CTM_METEMDIAG', METEMDIAG, VARDEV )
- 
+
+      ! Get met-modulated emission diagnostic output file flag.
+      CALL GET_ENV ( HUM_NOX_YN, 'METEMIS_NOX_HUM_ADJ', HUM_NOX_YN, VARDEV )
+
       ! Set LTNG_NO to Y or T to turn on lightning NO production
       CALL GET_ENV ( LTNG_NO, 'CTM_LTNG_NO', LTNG_NO, VARDEV ) 
 

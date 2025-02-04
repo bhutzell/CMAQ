@@ -236,7 +236,7 @@ C Initialize Online Lightning NOx Emissions
 C Initialize Online Meteorology-Dependent Emissions
          IF ( USE_MET_EMIS ) THEN 
            CALL LOG_SUBHEADING( LOGDEV, 'Initialize Met-Modulated Emissions' )
-           IF ( .NOT. METEMIS_INIT( JDATE, JTIME, TSTEP ) ) THEN
+           IF ( .NOT. METEMIS_INIT( JDATE, JTIME, TSTEP(1) ) ) THEN
               XMSG = 'Failure initializing met-modulated emissions module'
               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
            END IF
