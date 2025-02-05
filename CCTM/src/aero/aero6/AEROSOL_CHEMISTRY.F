@@ -51,7 +51,7 @@
        
        PRIVATE 
 
-       INTEGER, PARAMETER :: NUMB_AERO_RATES = 56
+       INTEGER, PARAMETER :: NUMB_AERO_RATES = 57
        
        CHARACTER( 16 ), PARAMETER :: NAMES_AERO_RATES( NUMB_AERO_RATES ) = 
      &                    (/ 'HETERO_N2O5IJ   ', 'HETERO_N2O5K    ', 
@@ -68,8 +68,8 @@
      &                       'HETERO_IMAE     ', 'HETERO_2MG      ',
      &                       'HETERO_IMAEOS   ', 'HETERO_NO3      ',
      &                       'HETERO_GLY      ', 'HETERO_MGLY     ',
-     &                       'HETERO_NTR2     ', 'HETERO_CLNO3_WAI',
-     &                       'HETERO_CLNO3_WAJ', 'HETERO_HBR_BRJ  ',
+     &                       'HETERO_NTR2     ', 'HETERO_CLN3_WAI ',
+     &                       'HETERO_CLN3_WAJ ', 'HETERO_HBR_BRJ  ',
      &                       'HETERO_BRNO3_WAI', 'HETERO_BRNO3_WAJ',
      &                       'HETERO_HOBR_CLJ ', 'HETERO_HOBR_BRJ ',
      &                       'HETERO_BRNO3_CLJ', 'HETERO_BRNO3_BRJ',
@@ -81,8 +81,9 @@
      &                       'HETERO_INO2_CLJ ', 'HETERO_INO2_BRJ ',
      &                       'HETERO_HOI_CLJ  ', 'HETERO_HOI_BRJ  ',
      &                       'HETERO_ISO3NOSJ ', 'HETERO_ISO3OSJ  ',
-     &                       'HETERO_HO2      ', 'HETERO_ANO3     '/)
-
+     &                       'HETERO_HO2      ', 'HETERO_ANO3     ',
+     &                       'HETERO_CLN3_ACLJ'/)
+     
        INTEGER, PARAMETER  :: IA_N2O5IJ         =   1
        INTEGER, PARAMETER  :: IA_N2O5K          =   2
        INTEGER, PARAMETER  :: IA_N2O5IJY        =   3
@@ -112,8 +113,8 @@
        INTEGER, PARAMETER  :: IA_GLY            =   27
        INTEGER, PARAMETER  :: IA_MGLY           =   28
        INTEGER, PARAMETER  :: IA_NTR2           =   29
-       INTEGER, PARAMETER  :: IA_CLNO3_WAI      =   30
-       INTEGER, PARAMETER  :: IA_CLNO3_WAJ      =   31
+       INTEGER, PARAMETER  :: IA_CLN3_WAI       =   30
+       INTEGER, PARAMETER  :: IA_CLN3_WAJ       =   31
        INTEGER, PARAMETER  :: IA_HBR_BRJ        =   32
        INTEGER, PARAMETER  :: IA_BRNO3_WAI      =   33
        INTEGER, PARAMETER  :: IA_BRNO3_WAJ      =   34
@@ -138,7 +139,8 @@
        INTEGER, PARAMETER  :: IA_ISO3NOSJ       =   53
        INTEGER, PARAMETER  :: IA_ISO3OSJ        =   54
        INTEGER, PARAMETER  :: IA_HO2            =   55
-       INTEGER, PARAMETER  :: IA_ANO3           =   56
+       INTEGER, PARAMETER  :: IA_ANO3           =   56       
+       INTEGER, PARAMETER  :: IA_CLN3_ACLJ      =   57
 
        INTEGER, PARAMETER :: INDEX_AERO_RATES( NUMB_AERO_RATES ) = 
      &                    (/ IA_N2O5IJ   , IA_N2O5K    , 
@@ -155,8 +157,8 @@
      &                       IA_IMAE     , IA_2MG      ,
      &                       IA_IMAEOS   , IA_NO3      ,
      &                       IA_GLY      , IA_MGLY     ,
-     &                       IA_NTR2     , IA_CLNO3_WAI,
-     &                       IA_CLNO3_WAJ, IA_HBR_BRJ  ,
+     &                       IA_NTR2     , IA_CLN3_WAI ,
+     &                       IA_CLN3_WAJ , IA_HBR_BRJ  ,
      &                       IA_BRNO3_WAI, IA_BRNO3_WAJ,
      &                       IA_HOBR_CLJ , IA_HOBR_BRJ ,
      &                       IA_BRNO3_CLJ, IA_BRNO3_BRJ,
@@ -168,7 +170,8 @@
      &                       IA_INO2_CLJ , IA_INO2_BRJ ,
      &                       IA_HOI_CLJ  , IA_HOI_BRJ  ,
      &                       IA_ISO3NOSJ , IA_ISO3OSJ  ,
-     &                       IA_HO2      , IA_ANO3    /)
+     &                       IA_HO2      , IA_ANO3     ,
+     &                       IA_CLN3_ACLJ/)
 
        INTEGER               :: SELECTED_AERO_RATES
        INTEGER, ALLOCATABLE  :: WHICH_AERO_RATE( : )
@@ -447,6 +450,8 @@ C *** Parameters
       REAL( 8 ), PARAMETER :: GAMMA_NO3       = 1.0D-3 ! Jacob 2000
       REAL( 8 ), PARAMETER :: GAMMA_GLY       = 2.9D-3 ! Liggio et al. 2005
       REAL( 8 ), PARAMETER :: GAMMA_HO2       = 0.2D+0 ! Ivatt et al. 2022
+      
+      REAL( 8 ), PARAMETER :: GAMMA_CLNO3_ACL = 0.0244D0 ! Dieber et al., ACP, 2004
 
       REAL( 8 ), PARAMETER :: STD_DIFF_N2O5 = 0.0855D-4  ! N2O5 molecular diffusivity at 101325 Pa and 273.15 K [m2/sec]
       REAL( 8 ), PARAMETER :: STD_DIFF_CLNO3  = 0.1014D-4    ! CLNO3 molecular diffusivity at 101325 Pa and 273.15 K [m2/sec]   
@@ -560,6 +565,7 @@ C *** Local Variables
       REAL( 8 )       :: INO2_RXN_TIME        ! INO2 reaction time per aerosol surface area density (s/m)
       REAL( 8 )       :: INO3_RXN_TIME        ! INO3 reaction time per aerosol surface area density (s/m)
       REAL( 8 )       :: HOI_RXN_TIME         ! HOI reaction time per aerosol surface area density (s/m)
+      REAL( 8 )       :: CLNO3_CL_RXN_TIME    ! CLNO3 reaction time per aerosol surface area density with ACL (s/m)
 
       REAL( 8 )       :: INV_DIFF_CLNO3       ! reciprocal molecular diffusivity [m2/sec]
       REAL( 8 )       :: INV_DIFF_HBR         ! reciprocal molecular diffusivity [m2/sec]
@@ -634,7 +640,8 @@ C *** variables for getting aerosol diagnostic file flag
 
 C *** parameters for calculating GAMMA of HBR ---> ABR, Sherwen et al., ACP, 2016 and IUPAC
       REAL( 8 ) :: GAMMA_HBR                             ! uptake coefficient of HBR  
-      REAL( 8 ) :: INV_GAMMA_HBR       
+      REAL( 8 ) :: INV_GAMMA_HBR   
+      REAL( 8 ) :: INV_GAMMA_CLNO3_ACL     
       
 ! reciprocal of rxn probability for CLNO3 on aerosol, Dieber et al., ACP, 2004
       REAL( 8 ), PARAMETER :: INV_GAMMA_CLNO3_H2O  = 1.0D0 / 0.024D0               ! Dieber et al., ACP, 2004 (with H2O)
@@ -1016,6 +1023,9 @@ c *** compute yield from lumped Aitken and Accumulations concentrations
                   END IF
                END IF  
               
+C *** determine inverse of GAMMA uptakes on chloride
+               INV_GAMMA_CLNO3_ACL  = 1.0D0 / GAMMA_CLNO3_ACL              	      
+	      
                KN2O5 = CBAR * DPI * KN2O5
 C *** calculate aerosol surface area
                TOTSURFA = ( WET_M2( 1 ) + WET_M2( 2 ) ) * DPI
@@ -1061,6 +1071,7 @@ C *** set up variables needed for calculating K_BRONO2
                INO3_RXN_TIME        = 4.0D0 * INV_GAMMA_INO3 / CBAR_INO3
                INO2_RXN_TIME        = 4.0D0 * INV_GAMMA_INO2 / CBAR_INO2
                HOI_RXN_TIME         = 4.0D0 * INV_GAMMA_HOI  / CBAR_HOI
+               CLNO3_CL_RXN_TIME    = 4.0D0 * INV_GAMMA_CLNO3_ACL / CBAR_CLNO3
                
 C...  calculate cosine of zenith angle for the cell and determine day or night; Golam Sarwar
                  
@@ -1334,10 +1345,10 @@ C hydrolysis
      &                                            * ( 5.0D0 * AIRRH - 1.0D0 )
                      END IF
 
-                CASE( IA_CLNO3_WAI )
+                CASE( IA_CLN3_WAI )
                   KHETERO( IRATE, C,R,L ) = 60.0D0 * WET_M2( 1 ) * DPI / ( RADIUS_I * INV_DIFF_CLNO3 + CLNO3_H2O_RXN_TIME )
 
-                CASE( IA_CLNO3_WAJ )   
+                CASE( IA_CLN3_WAJ )   
                   KHETERO( IRATE, C,R,L ) = 60.0D0 * WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_CLNO3 + CLNO3_H2O_RXN_TIME )  
 
                  CASE( IA_HBR_BRJ )
@@ -1465,6 +1476,13 @@ C hydrolysis
 
                 CASE( IA_ANO3 )                                   
                   KHETERO( IRATE, C,R,L ) = JHNO3 * FAC_HNO3                                                          ! 1/min 
+
+                CASE( IA_CLN3_ACLJ )
+                    KHETERO( IRATE, C,R,L ) = 0.0
+                    IF ( CL_PPM(2) .GT. MIN_VALUE ) THEN
+                     K1 = SSALT_SURFA * DPI / ( RADIUS * INV_DIFF_CLNO3 + CLNO3_CL_RXN_TIME ) / CL_PPM(2)            ! 1/(min*ppm)
+                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1
+                    END IF
 
                END SELECT
 

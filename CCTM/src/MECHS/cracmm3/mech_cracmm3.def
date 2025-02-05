@@ -145,6 +145,11 @@
 ! 09-26-24 G. Sarwar
 ! Aerosol nitrate photolysis
 !------------------------------------------------------------------------------
+! 01-29-25 G. Sarwar
+!    added chlorine (includes ClNO2 chemistry) chemistry
+!    For implementing ClNO2 chemistry, two additional intermediate products are introduced: NO2PIJ and NO2PK
+!     NO2PIJ is formed on fine-mode aerosol and NO2PK is formed on coarse-mode aerosol
+!------------------------------------------------------------------------------
 CRACMM3
 
 ELIMINATE = 
@@ -988,8 +993,6 @@ REACTIONS[CM] =
 
 ! heteorogeneous reactions from hetchem and poaaging routines version 5.0.2
 
-<HET_N2O5> N2O5 = 2.000*HNO3 # 1.0~<HETERO_N2O5IJ>;
-
 <HET_NO2> NO2 = 0.500*HONO + 0.500*HNO3 # 1.0~<HETERO_NO2>;
 
 ! hetorogeneous uptake of HO2
@@ -1397,7 +1400,92 @@ REACTIONS[CM] =
 
 ! Aerosol nitrate photolysis (implemented as heterogeneous reactions)
 <HET_ANO3I> ANO3I = 0.67*HONO + 0.33*NO2 # 1.0~<HETERO_ANO3>;
-<HET_ANO3J> ANO3J = 0.67*HONO + 0.33*NO2 # 1.0~<HETERO_ANO3>;                       
+<HET_ANO3J> ANO3J = 0.67*HONO + 0.33*NO2 # 1.0~<HETERO_ANO3>;      
+
+!! Chlorine chemistry
+
+! photolysis
+<CLP01> CL2 = 2.000*CL # 1.0/<CL2_JPL19>;
+<CLP02> CLO = CL + O3P # 1.0/<CLO_JPL19>;
+<CLP03> OCLO = CLO + O3P # 1.0/<OCLO_JPL19>;
+<CLP07> CL2O2 = CL + CLOO # 1.0/<CL2O2_JPL19>;
+<CLP10> HOCL = HO + CL # 1.0/<HOCL_JPL19>;
+<CLP12> CLNO = CL + NO # 1.0/<CLNO_JPL19>;
+<CLP14> CLNO2 = CL + NO2 # 1.0/<CLNO2_JPL19>;
+<CLP17> CLNO3 = CL + NO3 # 1.0/<CLNO3_R_JPL19>;
+<CLP18> CLNO3 = CLO + NO2 # 1.0/<CLNO3_M_JPL19>;
+
+! Inorganic thermal reactions
+<CLT01> CL + O3 = CLO # 2.3E-11 @ 200;
+<CLT02> CL + H2 = HCL + HO2 # 3.05E-11 @ 2270;
+<CLT03> CL + HO2 = CLO + HO # 3.60E-11 @ 375;
+<CLT04> CL + HO2 = HCL # 1.40E-11 @ -270;
+<CLT05> CL + H2O2 = HCL + HO2 # 1.10E-11 @ 980;
+<CLT06> CL + CLOO = 2.000*CLO # 1.20E-11 @ 0;
+<CLT07> CL + CLOO = CL2 # 2.30E-10 @ 0;
+<CLT08> CL + OCLO = 2.000*CLO # 3.40E-11 @ -160;
+<CLT09> CL + CL2O2 = CL2 + CLOO # 7.60E-11 @ -65;
+<CLT10> CL + HOCL = CL2 + HO # 3.40E-12 @ 130;
+<CLT11> CL + NO + M = CLNO # 7.70E-32^-1.80;
+<CLT12> CL + NO2 = CLNO2  # 1.8E-31^-2.0@0.0 &   1.0E-10^-1.0@0.0 
+                 & 0.6 & 1.0;                 
+<CLT14> CL + NO3 = CLO + NO2 # 2.40E-11;
+<CLT15> CL + CLNO = CL2 + NO # 5.80E-11 @ -100;
+<CLT17> CL + CLNO3 = CL2 + NO3 # 6.20E-12 @ -145;
+<CLT22> CLO + HO2 = HOCL # 2.60E-12 @ -290;
+<CLT23> CLO + NO = CL + NO2 # 6.40E-12 @ -290;
+<CLT25> CLO + NO2 = CLNO3  # 1.8E-31^-3.4@0.0 &   1.5E-11^-1.9@0.0 
+                  & 0.6;                  
+<CLT27> CLO + CLO = CL2 # 1.00E-12 @ 1590;
+<CLT28> CLO + CLO = OCLO + CL # 3.50E-13 @ 1370;
+
+<CLT31> CLO + CLO = CL2O2  # 1.9E-32^-3.6@0.0 &   3.7E-12^-1.6@0.0 
+                  & 0.6;                  
+<CLT32> CL2O2 = 2.000*CLO # 2.16E-27 @ -8537.0 *E<CLT31>;
+<CLT35> OCLO + NO = CLO + NO2 # 1.10E-13 @ -350;
+<CLT36> HO + CL2 = CL + HOCL # 2.60E-12 @ 1100;
+<CLT37> HO + CLO = HCL # 6.00E-13 @ -230;
+<CLT38> HO + CLO = CL + HO2 # 7.40E-12 @ -270;
+<CLT39> HO + HCL = CL # 1.80E-12 @ 250;
+<CLT40> HO + HOCL = CLO # 3.00E-12 @ 500;
+<CLT41> HO + CLNO2 = HOCL + NO2 # 2.40E-12 @ 1250;
+<CLT43> HO + CLNO3 = HOCL + NO3 # 1.20E-12 @ 330;
+<CLT44> HO + OCLO = HOCL # 1.40E-12 @ -600;
+<CLT45> HO + CL2O2 = HOCL + CLOO # 6.00E-13 @ -670;
+
+! Organic thermal reactions
+<CLTO01> CL + CH4 = HCL + MO2  - 1.0000*DELTA_C # 7.10E-12 @ 1270;
+<CLTO02> CL + ETH = HCL + ETHP # 7.20E-11 @ 70;
+<CLTO03> CL + HC3 = HCL + HC3P + 0.0000281*ASOATJ  - 0.0001*DELTA_C 
+                  # 1.40E-10 @ 0;                  
+<CLTO04> CL + HC5 = HCL + HC5P + 0.00134*ASOATJ  - 0.0093*DELTA_C 
+                  # 2.70E-10 @ 0;                  
+<CLTO05> CL + HC10 = HCL + HC10P # 5.27E-10;
+
+! Reactions of ClO with organic peroxy radicals
+<CLOR01> CLO + MO2 = CLOO + HCHO + HO2 # 3.25E-12 @ 114;
+<CLOR02> CLO + ETHP = CLOO + ACD + HO2 # 3.25E-12 @ 114;
+<CLOR03> CLO + HC3P = 0.660*HO2 + 0.131*MO2 + 0.048*ETHP + 0.089*XO2 
+                    + CLOO + 0.504*ACD + 0.132*ALD + 0.165*ACT 
+                    + 0.042*MEK  + 0.7060*DELTA_C # 3.25E-12 @ 114;                    
+<CLOR04> CLO + HC5P = 0.200*HO2 + 0.051*MO2 + 0.231*ETHP + 0.235*XO2 
+                    + CLOO + 0.018*HCHO + 0.045*ACD + 0.203*ALD 
+                    + 0.033*MEK + 0.217*ACT + 0.033*KET + 0.272*HKET  
+                    + 2.0060*DELTA_C # 3.25E-12 @ 114;   
+<CLOR51> CLO + HC10P = 0.740*HC10P2 + CLOO  + 2.6000*DELTA_C 
+                     # 3.25E-12 @ 114;     
+		     
+<HET_N2O5IJ> N2O5 = HNO3 + NO2PIJ # 1.0~<HETERO_N2O5IJ>;
+<HET_N2O5K>  N2O5 = HNO3 + NO2PK  # 1.0~<HETERO_N2O5K>;
+<HET_H2NO3PIJA> NO2PIJ = HNO3 # 1.0~<HETERO_H2NO3PAIJ>;
+<HET_H2NO3PKA>  NO2PK = HNO3 # 1.0~<HETERO_H2NO3PAK>;
+<HET_H2NO3PIB>  NO2PIJ + ACLI = CLNO2 # 1.0~<HETERO_H2NO3PBIJ>;
+<HET_H2NO3PJB>  NO2PIJ + ACLJ = CLNO2 # 1.0~<HETERO_H2NO3PBIJ>;
+<HET_H2NO3PKB>  NO2PK + ACLK = CLNO2 # 1.0~<HETERO_H2NO3PBK>;
+
+<HET_CLN3_WAI> CLNO3 = HOCL + HNO3               # 1.0~<HETERO_CLN3_WAI>;
+<HET_CLN3_WAJ> CLNO3 = HOCL + HNO3               # 1.0~<HETERO_CLN3_WAJ>;
+<HET_CLN3_ACLJ> CLNO3 + ACLJ = CL2 + ANO3J       # 1.0~<HETERO_CLN3_ACLJ>;
 
 END MECH
 

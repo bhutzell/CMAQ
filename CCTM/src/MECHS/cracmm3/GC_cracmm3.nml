@@ -186,4 +186,17 @@ GC_SPECIES_DATA =
 'VROCP6OXY1'    ,142.2   ,''     ,-1     ,''     ,-1     ,'VD_VROCP6OXY1'     , 1   ,'VROCP6OXY1OPERA', 1 ,'VROCP6OXY1'   ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nonanal,L,DTXSID9021639,CCCCCCCCC=O
 'ECH4'          ,16.0    ,''     ,-1    ,''      ,-1     ,'VD_METHANE'        , 1   ,'METHANE'        , 1  ,''            ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Methane,E,DTXSID8025545,C
 'CO2'           ,44.0    ,''     ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''            ,''        ,'Yes' ,''    ,''    ,'Yes',!Carbon dioxide,E,DTXSID4027028,O=C=O
+'CL2'           , 71.0    ,''    ,-1     ,''     ,-1     ,'VD_CL2'            , 1   ,'CL2'            , 1  ,''             ,''       ,'Yes', 'Yes' ,'Yes' ,'Yes',!Chlorine,E,DTXSID1020273,ClCl
+'CL'            , 35.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,'',    ''    ,''    ,'Yes',!Chlorine atom,E,DTXSID801014230,[Cl]
+'CLO'           , 51.5  ,''      ,-1     ,''     ,-1     ,'VD_CLO'            , 1   ,'CLO'            , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Chlorine monoxide,E,DTXSID8073136,[O-]Cl
+'OCLO'          , 67.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,'',    ''    ,''    ,'Yes',!Chlorine dioxide isomar,E,NA,O=Cl[O]
+'CL2O2'         ,103.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,'',   ''     ,''    ,'Yes',!Dichlorine dioxide,E,DTXSID001310193,ClOOCl
+'HOCL'          , 52.5  ,''      ,-1     ,''     ,-1     ,'VD_HOCL'           , 1   ,'HOCL'           , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hypochlorous acid,E,DTXSID3036737,OCl
+'CLNO'          , 65.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,''    ,''    ,''    ,'Yes',!Nitrosyl chloride,E,DTXSID5051945,ClN=O
+'CLNO2'         , 81.5  ,''      ,-1     ,''     ,-1     ,'VD_CLNO2'          , 1   ,'NITRYL_CHLORIDE', 1  ,'CLNO2'        ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nitryl chloride,E,DTXSID601317066,ClN(=O)=O
+'CLNO3'         , 97.5  ,''      ,-1     ,''     ,-1     ,'VD_CLNO3'          , 1   ,'CLNO3'          , 1  ,'CLNO3'        ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Chlorine nitrate,E,DTXSID00163043,[O-][N+](=O)OCl
+'HCL'           , 36.0   ,''     ,-1     ,''     ,-1     ,'VD_HCL'            , 1   ,'HCL'            , 1  ,'HCL'          ,'HCL'    ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrochloric acid,E,DTXSID2020711,Cl
+'CLOO'          , 67.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,''    ,''    ,''    ,'Yes',!Chlorine dioxide,E,DTXSID5023958,O=Cl[O]
+'NO2PIJ'        , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''   ,''    ,'Yes',!Dioxidonitrogen, E, NA,[N+](=O)=O
+'NO2PK'         , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''    ,''   ,'Yes',!Dioxidonitrogen, E, NA, [N+](=O)=O
 /
