@@ -171,6 +171,8 @@ END ELIMINATE
 
 
 
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -220,7 +222,7 @@ REACTIONS[CM] =
 <R031> ONIT = HO2 + NO2 + 0.200*ALD + 0.800*KET  - 0.6000*DELTA_C 
             # 1.0/<ONIT_RACM2>;            
 <R032> PAN = ACO3 + NO2 # 1.0/<PAN1_RACM2>;
-<R033> PAN = MO2 + NO3  + 1.0000*DELTA_C # 1.0/<PAN2_RACM2>;
+<R033> PAN = MO2 + NO3 + CO2 # 1.0/<PAN2_RACM2>;
 <TRP55> TRPN = NO2 + 0.670*KET + 0.330*UALD  + 5.0000*DELTA_C 
              # 1.0/<ONIT_RACM2>;             
 <TRP56> HONIT = HKET + NO2  + 7.0000*DELTA_C # 1.0/<ONIT_RACM2>;
@@ -264,8 +266,7 @@ REACTIONS[CM] =
 <R068> HNO4 + HO = NO2 # 4.50E-13 @ -610.;
 <R069> SO2 + HO = HO2 + SULF + SULRXN  # 2.9E-31 ^ -4.1 
                 & 1.7E-12 ^ +0.2;                
-<R070> CO + HO = HO2  + 1.0000*DELTA_C  %3 # 1.44E-13 @ 0.0 
-               & 2.74E-33 @ 0.0;               
+<R070> CO + HO = HO2 + CO2  %3 # 1.44E-13 @ 0.0 & 2.74E-33 @ 0.0;
 <R071> HO + CH4 = MO2  - 1.0000*DELTA_C # 2.45E-12 @ 1775.;
 <R072> ETH + HO = ETHP # 7.66E-12 @ 1020.;
 <R073> HC3 + HO = HC3P + 0.0000281*ASOATJ  - 0.0001*DELTA_C 
@@ -363,9 +364,8 @@ REACTIONS[CM] =
 <R114a> OP3 + HO = 0.010*HO + 0.440*HC10P + 0.070*XO2 + 0.080*ALD 
                  + 0.410*KET  + 1.3100*DELTA_C # 3.40E-12 @ -190.0;                 
 <R116> MAHP + HO = MACP # 3.0E-11;
-<R117> ORA1 + HO = HO2  + 1.0000*DELTA_C # 4.5E-13;
-<R118> ORA2 + HO = 0.640*MO2 + 0.360*ORAP  + 0.6400*DELTA_C 
-                 # 4.0E-14 @ -850.;                 
+<R117> ORA1 + HO = HO2 + CO2 # 4.5E-13;
+<R118> ORA2 + HO = 0.640*MO2 + 0.360*ORAP + 0.640*CO2 # 4.0E-14 @ -850.;
 <R119> PAA + HO = 0.350*HO + 0.650*ACO3 + 0.350*XO2 + 0.350*HCHO  
                 + 0.3500*DELTA_C # 2.93E-12 @ -190.;                
 <R120> PAN + HO = XO2 + NO3 + HCHO  + 1.0000*DELTA_C # 4.0E-14;
@@ -413,14 +413,14 @@ REACTIONS[CM] =
                  + 0.028*KET + 0.491*GLY + 0.003*MGLY + 0.044*ORA1  
                  + 2.6500*DELTA_C # 1.66E-18;                 
 <R136> DCB1 + O3 = 0.050*HO + HO2 + 0.600*RCO3 + 0.600*XO2 + 1.500*CO 
-                 + 0.050*HCHO + 0.050*GLY + 0.080*MGLY + 0.650*OP2  
-                 + 0.0100*DELTA_C # 2.0E-16;                 
+                 + 0.500*CO2 + 0.050*HCHO + 0.050*GLY + 0.080*MGLY 
+                 + 0.650*OP2  - 0.4900*DELTA_C # 2.0E-16;                 
 <R137> DCB2 + O3 = 0.050*HO + HO2 + 0.600*RCO3 + 0.600*XO2 + 1.500*CO 
-                 + 0.050*HCHO + 0.050*GLY + 0.080*MGLY + 0.700*DCB1 
-                 + 0.650*OP2  - 2.4900*DELTA_C # 2.0E-16;                 
-<R138> DCB3 + O3 = 0.050*HO + HO2 + 1.500*CO + 0.480*GLY + 0.700*DCB1 
-                 + 0.250*ORA1 + 0.250*ORA2 + 0.110*PAA  
-                 - 2.9300*DELTA_C # 9.0E-17;                 
+                 + 0.500*CO2 + 0.050*HCHO + 0.050*GLY + 0.080*MGLY 
+                 + 0.700*DCB1 + 0.650*OP2  - 2.9900*DELTA_C # 2.0E-16;                 
+<R138> DCB3 + O3 = 0.050*HO + HO2 + 1.500*CO + 0.500*CO2 + 0.480*GLY 
+                 + 0.700*DCB1 + 0.250*ORA1 + 0.250*ORA2 + 0.110*PAA  
+                 - 3.4300*DELTA_C # 9.0E-17;                 
 <R140> MCTO + O3 = MCTP # 2.86E-13;
 <R141> ETE + NO3 = 0.800*OLNN + 0.200*OLND  - 1.0000*DELTA_C 
                  # 4.392E-13^2.0@2282.0;                 
@@ -584,10 +584,10 @@ REACTIONS[CM] =
                      # 2.71E-13 @ -1300.;                     
 <TRP28> LIMALP + HO2 = 0.900*OPB + 0.100*HO + 0.100*HO2 + 0.100*HCHO 
                      + 0.100*PAA  + 0.7000*DELTA_C # 2.73E-13 @ -1300.;                     
-<R231> ACO3 + HO2 = 0.440*HO + 0.440*MO2 + 0.150*ORA2 + 0.410*PAA  
-                  + 0.4400*DELTA_C # 4.3E-13 @ -1040.;                  
-<R232> RCO3 + HO2 = 0.440*HO + 0.440*ETHP + 0.150*ORA2 + 0.410*PAA  
-                  + 1.0000*DELTA_C # 4.3E-13 @ -1040.;                  
+<R231> ACO3 + HO2 = 0.440*HO + 0.440*MO2 + 0.440*CO2 + 0.150*ORA2 
+                  + 0.410*PAA  - 0.0000*DELTA_C # 4.3E-13 @ -1040.;                  
+<R232> RCO3 + HO2 = 0.440*HO + 0.440*ETHP + 0.440*CO2 + 0.150*ORA2 
+                  + 0.410*PAA  + 0.5600*DELTA_C # 4.3E-13 @ -1040.;                  
 <R233> ACTP + HO2 = 0.150*HO + 0.150*ACO3 + 0.150*HCHO + 0.850*OP2  
                   + 0.8500*DELTA_C # 1.15E-13 @ -1300.;                  
 <R234> MEKP + HO2 = OP2  + 2.0000*DELTA_C # 1.15E-13 @ -1300.;
@@ -658,10 +658,10 @@ REACTIONS[CM] =
                      + 0.310*LIMAL + 0.310*NO2 # 2.0E-12;                     
 <TRP34> LIMNP2 + MO2 = 0.750*HO2 + 0.750*HCHO + 0.750*NO2 + 0.250*MOH 
                      + HOM  + 0.2500*DELTA_N # 1.00E-10;                     
-<R267> ACO3 + MO2 = 0.900*HO2 + 0.900*MO2 + HCHO + 0.100*ORA2  
-                  + 0.9000*DELTA_C # 2.0E-11 @ -500.;                  
-<R268> RCO3 + MO2 = 0.900*HO2 + 0.900*MO2 + HCHO + 0.100*ORA2  
-                  + 1.9000*DELTA_C # 2.0E-11 @ -500.;                  
+<R267> ACO3 + MO2 = 0.900*HO2 + 0.900*MO2 + 0.400*CO2 + HCHO 
+                  + 0.100*ORA2  + 0.5000*DELTA_C # 2.0E-11 @ -500.;                  
+<R268> RCO3 + MO2 = 0.900*HO2 + 0.900*MO2 + 0.400*CO2 + HCHO 
+                  + 0.100*ORA2  + 1.5000*DELTA_C # 2.0E-11 @ -500.;                  
 <R269> ACTP + MO2 = 0.500*HO2 + 0.500*ACO3 + 1.500*HCHO + 0.250*MOH 
                   + 0.250*ROH + 0.125*ORA2  + 0.2500*DELTA_C 
                   # 7.5E-13 @ -500.;                  
@@ -749,8 +749,8 @@ REACTIONS[CM] =
                       + 0.540*HO2  + 1.0000*DELTA_C # 2.0E-12 @ -500.;                      
 <TRP40> LIMNP2 + ACO3 = 0.500*MO2 + 0.500*NO2 + 0.500*ORA2 + HOM  
                       + 0.5000*DELTA_N + 0.5000*DELTA_C # 1.0E-10;                      
-<R303> ACO3 + ACO3 = 2.000*MO2  + 2.0000*DELTA_C # 2.5E-12 @ -500.;
-<R304> RCO3 + ACO3 = MO2 + ETHP  + 2.0000*DELTA_C # 2.5E-12 @ -500.;
+<R303> ACO3 + ACO3 = 2.000*MO2 + 2.000*CO2 # 2.5E-12 @ -500.;
+<R304> RCO3 + ACO3 = MO2 + ETHP + 2.000*CO2 # 2.5E-12 @ -500.;
 <R305> ACTP + ACO3 = 0.500*MO2 + 0.500*ACO3 + HCHO + 0.750*ORA2  
                    + 1.0000*DELTA_C # 7.51E-13 @ -565.;                   
 <R306> MEKP + ACO3 = 0.330*HO2 + 0.500*MO2 + 0.330*HCHO + 0.334*DCB1 
@@ -781,7 +781,7 @@ REACTIONS[CM] =
 <R319> ADCN + ACO3 = HO2 + MO2 + 0.700*NO2 + 0.700*GLY + 0.700*OP2 
                    + 0.300*ONIT  + 3.0000*DELTA_C # 7.4E-13 @ -708.;                   
 <R320> XO2 + ACO3 = MO2  + 1.0000*DELTA_C # 3.4E-14 @ -1560.;
-<R321> RCO3 + RCO3 = 2.000*ETHP  + 2.0000*DELTA_C # 2.50E-12 @ -500.0;
+<R321> RCO3 + RCO3 = 2.000*ETHP + 2.000*CO2 # 2.50E-12 @ -500.0;
 <R322> MO2 + NO3 = HO2 + HCHO + NO2 # 1.20E-12;
 <R323> ETHP + NO3 = HO2 + NO2 + ACD # 1.2E-12;
 <R324> HC3P + NO3 = 0.254*HO2 + 0.140*MO2 + 0.092*XO2 + 0.503*ETHP 
@@ -859,7 +859,7 @@ REACTIONS[CM] =
 <R360> OLND + OLND = NO2 + 0.504*HCHO + 1.210*ALD + 0.285*KET + ONIT  
                    - 3.5590*DELTA_C # 2.96E-14 @ -1000.;                   
 <R361> XO2 + NO3 = NO2 # 1.2E-12;
-<R362> XO2 + RCO3 = ETHP  + 1.0000*DELTA_C # 2.5E-12 @ -500.;
+<R362> XO2 + RCO3 = ETHP + CO2 # 2.5E-12 @ -500.;
 <R363> XO2 + XO2 = # 7.13E-17 @ -2950.;
 <TRP41> APIP2 + APIP1 = 0.960*HOM + 0.480*ROH + 0.480*PINAL + 0.480*HO 
                       + 0.480*HO2 + 0.040*ELHOM  + 3.3600*DELTA_C 

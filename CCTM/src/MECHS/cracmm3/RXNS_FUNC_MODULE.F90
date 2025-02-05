@@ -1731,6 +1731,7 @@
              INDEX_PAA         = IOLD2NEW( INDEX_PAA        , 1 )
              INDEX_ONIT        = IOLD2NEW( INDEX_ONIT       , 1 )
              INDEX_PAN         = IOLD2NEW( INDEX_PAN        , 1 )
+             INDEX_CO2         = IOLD2NEW( INDEX_CO2        , 1 )
              INDEX_TRPN        = IOLD2NEW( INDEX_TRPN       , 1 )
              INDEX_HONIT       = IOLD2NEW( INDEX_HONIT      , 1 )
              INDEX_N2O5        = IOLD2NEW( INDEX_N2O5       , 1 )
@@ -1876,7 +1877,6 @@
              INDEX_AHONITJ     = IOLD2NEW( INDEX_AHONITJ    , 1 )
              INDEX_STY         = IOLD2NEW( INDEX_STY        , 1 )
              INDEX_STYP        = IOLD2NEW( INDEX_STYP       , 1 )
-             INDEX_CO2         = IOLD2NEW( INDEX_CO2        , 1 )
              INDEX_ANO3I       = IOLD2NEW( INDEX_ANO3I      , 1 )
              INDEX_ANO3J       = IOLD2NEW( INDEX_ANO3J      , 1 )
           END SUBROUTINE RESET_SPECIES_POINTERS
