@@ -318,17 +318,17 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('AGLY    ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! Glyoxal SOA
                                                                                       
        ! Semivolatile POA                                                             
-     & spcs_list_type('ALVPO1  ',T,T,F, cm_set, 1400.0, 'VLVPO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.05), ! LV-POA
-     & spcs_list_type('ASVPO1  ',T,T,F, cm_set, 1400.0, 'VSVPO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.05), ! SV-POA 1
-     & spcs_list_type('ASVPO2  ',T,T,F, cm_set, 1400.0, 'VSVPO2 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.04), ! SV-POA 2
-     & spcs_list_type('ASVPO3  ',F,T,F, cm_set, 1400.0, 'VSVPO3 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! SV-POA 3
-     & spcs_list_type('AIVPO1  ',F,T,F, cm_set, 1400.0, 'VIVPO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! IV-POA 
-     & spcs_list_type('ALVOO1  ',T,T,F, cm_set, 1400.0, 'VLVOO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.15), ! LV-SOA 1                
-     & spcs_list_type('ALVOO2  ',T,T,F, cm_set, 1400.0, 'VLVOO2 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.13), ! LV-SOA 2
-     & spcs_list_type('ASVOO1  ',T,T,F, cm_set, 1400.0, 'VSVOO1 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.11), ! SV-SOA 1                #70
-     & spcs_list_type('ASVOO2  ',T,T,F, cm_set, 1400.0, 'VSVOO2 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.09), ! SV-SOA 2
-     & spcs_list_type('ASVOO3  ',F,T,F, cm_set, 1400.0, 'VSVOO3 ','       ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.08), ! SV-SOA 3
-     & spcs_list_type('APCSO   ',F,T,F, cm_set, 1400.0, 'LVPCSOG','PCSOARXN',1.0 ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.12), ! pcSOA
+     & spcs_list_type('ALVPO1  ',T,T,F, cm_set, 1400.0, 'VLVPO1 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.05), ! LV-POA
+     & spcs_list_type('ASVPO1  ',T,T,F, cm_set, 1400.0, 'VSVPO1 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.05), ! SV-POA 1
+     & spcs_list_type('ASVPO2  ',T,T,F, cm_set, 1400.0, 'VSVPO2 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.04), ! SV-POA 2
+     & spcs_list_type('ASVPO3  ',F,T,F, cm_set, 1400.0, 'VSVPO3 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.03), ! SV-POA 3
+     & spcs_list_type('AIVPO1  ',F,T,F, cm_set, 1400.0, 'VIVPO1 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.03), ! IV-POA 
+     & spcs_list_type('ALVOO1  ',T,T,F, cm_set, 1400.0, 'VLVOO1 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! LV-SOA 1                
+     & spcs_list_type('ALVOO2  ',T,T,F, cm_set, 1400.0, 'VLVOO2 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! LV-SOA 2
+     & spcs_list_type('ASVOO1  ',T,T,F, cm_set, 1400.0, 'VSVOO1 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! SV-SOA 1                #70
+     & spcs_list_type('ASVOO2  ',T,T,F, cm_set, 1400.0, 'VSVOO2 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.09), ! SV-SOA 2
+     & spcs_list_type('ASVOO3  ',F,T,F, cm_set, 1400.0, 'VSVOO3 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! SV-SOA 3
+     & spcs_list_type('APCSO   ',F,T,F, cm_set, 1400.0, 'LVPCSOG','PCSOARXN',1.0 ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.12), ! pcSOA
                                                                                   
        ! Lumped anthropogenic SOA (introduced aero7, M. Qin, 8/2018)
      & spcs_list_type('AAVB1   ',F,T,F, cm_set, 1400.0, 'SVAVB1 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.20),
@@ -337,25 +337,25 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('AAVB4   ',F,T,F, cm_set, 1400.0, 'SVAVB4 ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.12),
                                                           
        ! CRACMM SVOCs and LVOCs                                                             
-     & spcs_list_type('AOP3      ',F,T,F,cm_set,1400.0,'OP3      ','      ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.05), ! 
-     & spcs_list_type('AROCN2ALK ',T,T,F,cm_set,1400.0,'VROCN2ALK','      ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.05), ! 
-     & spcs_list_type('AROCN1ALK ',T,T,F,cm_set,1400.0,'VROCN1ALK','      ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.05), ! 
-     & spcs_list_type('AROCP0ALK ',T,T,F,cm_set,1400.0,'VROCP0ALK','      ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.04), !   
-     & spcs_list_type('AROCP1ALK ',T,T,F,cm_set,1400.0,'VROCP1ALK','      ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! 
-     & spcs_list_type('AROCP2ALK ',F,T,F,cm_set,1400.0,'VROCP2ALK','      ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! 
-     & spcs_list_type('AROCP3ALK ',F,T,F,cm_set,1400.0,'VROCP3ALK','      ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.03), ! 
-     & spcs_list_type('AROCN2OXY2',T,T,F,cm_set,1400.0,'VROCN2OXY2','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.15), ! 
-     & spcs_list_type('AROCN2OXY4',T,T,F,cm_set,1400.0,'VROCN2OXY4','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.15), ! 
-     & spcs_list_type('AROCN2OXY8',T,T,F,cm_set,1400.0,'VROCN2OXY8','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.15), ! 
-     & spcs_list_type('AROCN1OXY1',T,T,F,cm_set,1400.0,'VROCN1OXY1','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.13), ! 
-     & spcs_list_type('AROCN1OXY3',T,T,F,cm_set,1400.0,'VROCN1OXY3','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.13), ! 
-     & spcs_list_type('AROCN1OXY6',T,T,F,cm_set,1400.0,'VROCN1OXY6','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.13), ! 
-     & spcs_list_type('AROCP0OXY2',T,T,F,cm_set,1400.0,'VROCP0OXY2','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.11), !   
-     & spcs_list_type('AROCP0OXY4',T,T,F,cm_set,1400.0,'VROCP0OXY4','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.11), ! 
-     & spcs_list_type('AROCP1OXY1',T,T,F,cm_set,1400.0,'VROCP1OXY1','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.09), ! 
-     & spcs_list_type('AROCP1OXY3',T,T,F,cm_set,1400.0,'VROCP1OXY3','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.09), ! 
-     & spcs_list_type('AROCP2OXY2',F,T,F,cm_set,1400.0,'VROCP2OXY2','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.08), ! 
-     & spcs_list_type('AROCP3OXY2',F,T,F,cm_set,1400.0,'VROCP3OXY2','     ',0.0  ,'REV',F,F,  0,  4.0, 6.1,T, 'DUST  ', 0.08), ! 
+     & spcs_list_type('AOP3      ',F,T,F,cm_set,1400.0,'OP3      ','      ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.05), ! 
+     & spcs_list_type('AROCN2ALK ',T,T,F,cm_set,1400.0,'VROCN2ALK','      ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.05), ! 
+     & spcs_list_type('AROCN1ALK ',T,T,F,cm_set,1400.0,'VROCN1ALK','      ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.05), ! 
+     & spcs_list_type('AROCP0ALK ',T,T,F,cm_set,1400.0,'VROCP0ALK','      ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.04), !   
+     & spcs_list_type('AROCP1ALK ',T,T,F,cm_set,1400.0,'VROCP1ALK','      ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.03), ! 
+     & spcs_list_type('AROCP2ALK ',F,T,F,cm_set,1400.0,'VROCP2ALK','      ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.03), ! 
+     & spcs_list_type('AROCP3ALK ',F,T,F,cm_set,1400.0,'VROCP3ALK','      ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.03), ! 
+     & spcs_list_type('AROCN2OXY2',T,T,F,cm_set,1400.0,'VROCN2OXY2','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! 
+     & spcs_list_type('AROCN2OXY4',T,T,F,cm_set,1400.0,'VROCN2OXY4','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! 
+     & spcs_list_type('AROCN2OXY8',T,T,F,cm_set,1400.0,'VROCN2OXY8','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.15), ! 
+     & spcs_list_type('AROCN1OXY1',T,T,F,cm_set,1400.0,'VROCN1OXY1','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! 
+     & spcs_list_type('AROCN1OXY3',T,T,F,cm_set,1400.0,'VROCN1OXY3','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! 
+     & spcs_list_type('AROCN1OXY6',T,T,F,cm_set,1400.0,'VROCN1OXY6','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! 
+     & spcs_list_type('AROCP0OXY2',T,T,F,cm_set,1400.0,'VROCP0OXY2','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), !   
+     & spcs_list_type('AROCP0OXY4',T,T,F,cm_set,1400.0,'VROCP0OXY4','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! 
+     & spcs_list_type('AROCP1OXY1',T,T,F,cm_set,1400.0,'VROCP1OXY1','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.09), ! 
+     & spcs_list_type('AROCP1OXY3',T,T,F,cm_set,1400.0,'VROCP1OXY3','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.09), ! 
+     & spcs_list_type('AROCP2OXY2',F,T,F,cm_set,1400.0,'VROCP2OXY2','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! 
+     & spcs_list_type('AROCP3OXY2',F,T,F,cm_set,1400.0,'VROCP3OXY2','     ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.08), ! 
               
        ! The following species are associated with the Multi-Pollutant code
      & spcs_list_type('ANI     ',T,T,T, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'DUST  ', 0.00), ! Nickel
