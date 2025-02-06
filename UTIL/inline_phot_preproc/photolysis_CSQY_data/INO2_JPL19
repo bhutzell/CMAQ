@@ -1,0 +1,48 @@
+INO2_JPL19
+! INO2 + HV = I + NO2
+! JPL Publication 19-5;  Evaluation Number 19; May 2020
+! Page: 4-390; Table 4H-9
+! Quantum yield is taken as 1.0
+! Note: Bröske2 from Atkinson et al.
+! Bröske, R. Ph.D. Thesis, University of Wuppertal, Germany, 1999
+! Chemical Kinetics and Photochemical Data for Use in Atmospheric Studies
+! https://jpldataeval.jpl.nasa.gov/pdf/NASA-JPL%20Evaluation%2019-5.pdf
+! Assume these are point values (not specified in data source)
+POINT
+! With FAC, units are (cm^2/molecule)
+FAC=1.0
+210	2.36E-18	1.00
+215	1.87E-18	1.00
+220	1.96E-18	1.00
+225	2.79E-18	1.00
+230	3.47E-18	1.00
+235	3.99E-18	1.00
+240	4.22E-18	1.00
+245	4.00E-18	1.00
+250	3.30E-18	1.00
+255	2.34E-18	1.00
+260	1.62E-18	1.00
+265	9.96E-19	1.00
+270	8.71E-19	1.00
+275	8.98E-19	1.00
+280	9.96E-19	1.00
+285	9.22E-19	1.00
+290	8.10E-19	1.00
+295	6.20E-19	1.00
+300	3.73E-19	1.00
+305	3.08E-19	1.00
+310	2.47E-19	1.00
+315	2.51E-19	1.00
+320	2.75E-19	1.00
+325	3.25E-19	1.00
+330	3.12E-19	1.00
+335	3.49E-19	1.00
+340	3.73E-19	1.00
+345	3.73E-19	1.00
+350	2.98E-19	1.00
+355	2.95E-19	1.00
+360	2.71E-19	1.00
+365	2.07E-19	1.00
+370	1.49E-19	1.00
+375	7.40E-20	1.00
+380	2.40E-20	1.00
