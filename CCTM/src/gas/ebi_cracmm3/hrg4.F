@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Jan 31, 2025
+C  REVISION HISTORY: Created by EBI solver program, Feb  5, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -69,7 +69,7 @@ C**********************************************************************
 
 c..Production of NO3 (except from N2O5 )
       P15 =    2.0000D-01 * RKI(     9 ) * YC ( HNO4        )                           ! HNO4=0.2000D+00*NO3+...
-     &    +                 RKI(    38 ) * YC ( PAN         )                           ! PAN=NO3+MO2
+     &    +                 RKI(    38 ) * YC ( PAN         )                           ! PAN=NO3+MO2+CO2
      &    +                 RKI(    44 ) * YCP( O3          ) * YCP( NO2         )      ! O3+NO2=NO3
      &    +                 RKI(    62 ) * YCP( NO2         ) * YCP( O3P         )      ! NO2+O3P=NO3
      &    +                 RKI(    64 ) * YC ( HNO3        ) * YCP( HO          )      ! HNO3+HO=NO3

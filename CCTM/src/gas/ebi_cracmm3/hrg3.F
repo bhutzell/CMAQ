@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Jan 31, 2025
+C  REVISION HISTORY: Created by EBI solver program, Feb  5, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -126,7 +126,7 @@ c..Loss frequency of ACO3 ( not including ACO3 + ACO3 )
      &   +                 RKI(   318 ) * YC ( LIMP2       )   ! ACO3+LIMP2=...
      &   +                 RKI(   319 ) * YC ( LIMNP1      )   ! ACO3+LIMNP1=MO2+...
      &   +                 RKI(   320 ) * YC ( LIMNP2      )   ! ACO3+LIMNP2=...
-     &   +                 RKI(   322 ) * YC ( RCO3        )   ! ACO3+RCO3=MO2+ETHP
+     &   +                 RKI(   322 ) * YC ( RCO3        )   ! ACO3+RCO3=MO2+...
      &   +    5.0000D-01 * RKI(   323 ) * YC ( ACTP        )   ! ACO3+ACTP=...
      &   +                 RKI(   324 ) * YC ( MEKP        )   ! ACO3+MEKP=...
      &   +                 RKI(   325 ) * YC ( KETP        )   ! ACO3+KETP=...
@@ -151,7 +151,7 @@ c..Loss frequency of ACO3 ( not including ACO3 + ACO3 )
 
 c..Loss frequency of PAN
       L9 =                 RKI(    37 )                        ! PAN=ACO3+NO2
-     &   +                 RKI(    38 )                        ! PAN=MO2+NO3
+     &   +                 RKI(    38 )                        ! PAN=MO2+NO3+CO2
      &   +                 RKI(   139 ) * YC ( HO          )   ! PAN+HO=XO2+NO3+HCHO
      &   +                 RKI(   179 )                        ! PAN=ACO3+NO2
 
