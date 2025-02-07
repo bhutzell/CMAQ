@@ -857,10 +857,10 @@
       CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
  
       ! Get met-modulated emission diagnostic output file flag.
-      CALL GET_ENV ( METEMDIAG, 'CTM_METEMDIAG', METEMDIAG, VARDEV )
+      CALL GET_ENV ( METEMDIAG, 'CTM_MET_EMIS_DIAG', METEMDIAG, VARDEV )
 
       ! Get met-modulated emission diagnostic output file flag.
-      CALL GET_ENV ( HUM_NOX_YN, 'METEMIS_NOX_HUM_ADJ', HUM_NOX_YN, VARDEV )
+      CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
 
       ! Set LTNG_NO to Y or T to turn on lightning NO production
       CALL GET_ENV ( LTNG_NO, 'CTM_LTNG_NO', LTNG_NO, VARDEV ) 

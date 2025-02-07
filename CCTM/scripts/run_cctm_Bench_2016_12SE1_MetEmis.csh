@@ -172,6 +172,7 @@ setenv CTM_BIOGEMIS_MG N     #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N         #> turns on BDSNP soil NO emissions [ default: N ]
 
 setenv CTM_MET_EMIS Y        #> turns on met-dependent emissions
+setenv CTM_MET_EMIS_DIAG Y   #> turns on met-dependent emissions
 
 #> Surface Tiled Aerosol and Gaseous Exchange Options
 #> Only active if DepMod=stage at compile time
@@ -457,9 +458,12 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Met-Dependent Emissions Table
   if ( $CTM_MET_EMIS == 'Y' ) then
-     set METEMIS_FOLD = /home/bmurphy/projdir/Met-Emis
-     set METEMIS_DATE = 20200706
-     setenv METEMIS_TBL ${METEMIS_FOLD}/emis_mole_RPD_onroad_${METEMIS_DATE}_SE53BENCH_cmaq_cb6ae7_2020ha2_cb6_20k.ncf
+     set METEMIS_FOLD = /home/bmurphy/projdir/Met-Emis/2016
+
+     set MMDD = `date -ud "${TODAYG}" +%m%d`   #> Convert YYYY-MM-DD to YYMMDD
+     set METEMIS_DATE = `echo "2016${MMDD} + 14" | bc -l`
+
+     setenv METEMIS_TBL ${METEMIS_FOLD}/emis_mole_onroad_${METEMIS_DATE}_SE53BENCH_cmaq_cb6ae7_2021hb_cb6_21k.ncf
   endif
 
 #> Inline Process Analysis 

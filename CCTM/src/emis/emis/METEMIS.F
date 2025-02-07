@@ -53,6 +53,7 @@
         REAL,  ALLOCATABLE, PUBLIC, PROTECTED, SAVE :: MTEMPS( : )
         REAL,  ALLOCATABLE, PUBLIC, PROTECTED, SAVE :: VDEMIS_MV( :,:,: ) !! ( NMETSPC,NCOLS,NROWS )
         REAL,  ALLOCATABLE, PRIVATE, PROTECTED, SAVE :: VDEMIS_MVDIAG( :,:,: ) !! ( NMETSPC,NCOLS,NROWS )
+        LOGICAL, ALLOCATABLE,PRIVATE,PROTECTED, SAVE :: MT_GAS( : ), MT_DSL( : )
 
 
         PRIVATE     !!  everything else
@@ -156,15 +157,31 @@
             TEMPVAL= 0.0
             VDEMIS_MVDIAG = 0.0
             
-            IF (HUM_NOX_YN) THEN
-                ALLOCATE( QVMOL( NCOLS,NROWS,NLAYS), STAT = ISTAT ) 
-                QVMOL= 0.0
-            END IF
-
             MTEMPS( 1:NMTEMP )  = VGLVS3D( 1:NMTEMP )
             MTNAME( 1:NMETSPC ) = VNAME3D( 1:NMETSPC )
             MTUNIT( 1:NMETSPC ) = UNITS3D( 1:NMETSPC )
             MTBASIS( 1:NMETSPC) = 'UNIT'
+
+            IF (HUM_NOX_YN) THEN
+                ALLOCATE( QVMOL( NCOLS,NROWS,NLAYS), STAT = ISTAT ) 
+                QVMOL= 0.0
+                ALLOCATE( MT_GAS( NMETSPC ), MT_DSL( NMETSPC ), STAT=ISTAT )
+                MT_GAS = .FALSE.
+                MT_DSL = .FALSE.
+
+                DO ISPC = 1,NMETSPC
+                    IF ( MTNAME( ISPC ) .EQ. 'NO_GAS' .OR.
+     &                   MTNAME( ISPC ) .EQ. 'NO2_GAS' .OR.
+     &                   MTNAME( ISPC ) .EQ. 'HONO_GAS' ) THEN
+                      MT_GAS( ISPC ) = .TRUE.
+                    ELSE IF( MTNAME( ISPC ) .EQ. 'NO_DIS' .OR.
+     &                       MTNAME( ISPC ) .EQ. 'NO2_DIS' .OR.
+     &                       MTNAME( ISPC ) .EQ. 'HONO_DIS' ) THEN
+                      MT_DSL( ISPC ) = .TRUE.
+                    END IF
+               END DO
+            END IF
+
 
             IF ( ISTAT .NE. 0 ) THEN
                 WRITE( MESG, '( A, I9 )' ) 'Error allocating ETABLE:  STATUS=', ISTAT
@@ -354,17 +371,15 @@ C.................  NOx humidity corrections for mobile sources (MOVES3)
                   QV  = QVMOL( C,R,1 ) * 1000.0  ! convert from kg water/kg dry air to g/kg
 
                   DO V = 1, NMETSPC
-                      IF( MTNAME( V ) == 'NO_GAS' .OR.
-     &                    MTNAME( V ) == 'NO2_GAS' .OR.
-     &                    MTNAME( V ) == 'HONO_GAS' ) THEN
+                      IF( MT_GAS( V ) ) THEN
+                          ! Correct Gasoline Emission (NO, NO2, and HONO) for Humidity
                           A = MIN( QV, 17.71 )
                           B = MAX( 3.0, A )
                           ADJ = 1.0 - 0.0329 * ( B - 10.71 )   ! NOx humidity correction for Gasoline fuel
                           VDEMIS_MV( V,C,R ) = VDEMIS_MV( V,C,R ) * ADJ
 
-                      ELSE IF( MTNAME( V ) == 'NO_DIS' .OR.
-     &                    MTNAME( V ) == 'NO2_DIS' .OR.
-     &                    MTNAME( V ) == 'HONO_DIS' ) THEN
+                      ELSE IF( MT_DSL( V ) ) THEN
+                          ! Correct Diesel Emission (NO, NO2, and HONO) for Humidity
                           QVM = QV * 0.001607524  ! convert from g of water/kg of dry air to moles of water/moles
                           A = MIN( QVM, 0.035 )
                           B = MAX( 0.002, A )
