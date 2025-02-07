@@ -466,7 +466,7 @@ REACTIONS[CM] =
                  + 0.864*NO2 + 0.018*HCHO + 0.045*ACD + 0.203*ALD 
                  + 0.033*MEK + 0.217*ACT + 0.033*KET + 0.272*HKET 
                  + 0.136*ONIT  + 1.4620*DELTA_C # 2.7E-12 @ -360.;                 
-<R177> ETEP + NO = HO2 + NO2 + 1.600*HCHO + 0.200*ACD # 9.0E-12;
+<R177> ETEP + NO = HO2 + NO2 + 1.600*HCHO + 0.200*ACD # 2.7E-12 @ -360.;
 <R178> OLTP + NO = 0.780*HO2 + 0.970*NO2 + 0.780*HCHO + 0.012*ACD 
                  + 0.440*ALD + 0.060*ACT + 0.130*MEK + 0.030*ONIT  
                  + 0.0560*DELTA_C # 2.7E-12 @ -360.;                 
