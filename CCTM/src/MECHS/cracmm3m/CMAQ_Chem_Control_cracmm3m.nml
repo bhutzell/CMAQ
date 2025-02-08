@@ -60,6 +60,7 @@
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'SULF'        ,'GAS'  ,0.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'NH3'    ,'NH3'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'HCL'    ,'HCL'         ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'CL2'    ,'CL2'         ,'GAS'  ,1.  ,'UNIT','a', 
 
    ! Organic gases
    'EVERYWHERE', 'ALL'         ,'ACD'    ,'ACD'         ,'GAS'  ,1.  ,'UNIT','a', 
@@ -146,6 +147,22 @@
    'EVERYWHERE', 'ALL'        ,'VROCP2OXY2','VROCP2OXY2' ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'VROCP4ALK' ,'VROCP4ALK'  ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'VROCP5OXY1','VROCP5OXY1' ,'GAS'  ,1   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'        ,'CH3I'      ,'CH3I'       ,'GAS'  ,0   ,'UNIT','a',
+
+   ! Marine Halogen Chemistry
+   'EVERYWHERE', 'MGEM'         ,'HOI'    ,'HOI'         ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'I2'     ,'I2'          ,'GAS'  ,1.  ,'UNIT','a',
+!  'EVERYWHERE', 'MGEM'         ,'DMS'    ,'DMS'         ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CH3I'   ,'CH3I'        ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CH2I2'  ,'CH2I2'       ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CH2IBR' ,'CH2IBR'      ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CH2ICL' ,'CH2ICL'      ,'GAS'  ,1.  ,'UNIT','a',
+!  'EVERYWHERE', 'MGEM'         ,'BR2'    ,'BR2'         ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CHBR3'  ,'CHBR3'       ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CH2BR2' ,'CH2BR2'      ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CHBR2CL','CHBR2CL'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CHBRCL2','CHBRCL2'     ,'GAS'  ,1.  ,'UNIT','a'
+   'EVERYWHERE', 'MGEM'         ,'CH2BRCL','CH2BRCL'     ,'GAS'  ,1.  ,'UNIT','a',   
 
    ! Fine-Mode Aerosols
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'ASO4'        ,'FINE' ,1.  ,'MASS','a', 
@@ -550,7 +567,8 @@
    'EVERYWHERE', 'ALL'    ,'PMFINE_MN'   ,'AMN'         ,'FINE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMFINE_H2O'  ,'AH2O'        ,'FINE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMFINE_OTHR' ,'AOTHR'       ,'FINE',1.   ,'UNIT','a',
-
+   'EVERYWHERE', 'ALL'    ,'PMFINE_BR'   ,'ABR'         ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_SEAST','ASEAST'      ,'FINE',1.   ,'UNIT','a',
 
    ! Wind-Blown Dust and Sea Spray Scaling
    ! Coarse Components
@@ -560,6 +578,7 @@
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_BR' ,'ABR'       ,'COARSE',1.   ,'UNIT','a',
 
 /
 
@@ -1145,7 +1164,7 @@ CMPST =
 !-- Nitrate --!
 'NOY'         , 'NOy Concentration',
                 'ppmV', 'TSP',
-                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + HNO4 + PAN + PPN + MPAN + ISON + INALD + IPX + TRPN + ONIT + HONIT',
+                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + HNO4 + PAN + PPN + MPAN + ISON + INALD + IPX + TRPN + ONIT + HONIT + CLNO + CLNO2 + CLNO3',
 
 'NOZ'         , 'NOz Concentration',
                 'ppmV', 'TSP',
@@ -1480,16 +1499,15 @@ CMPST =
 'WD_SOX'      , 'Wet Dep of Total Sulfate', 
                 'kg ha-1', 'DEP', 
                 'WD_ASO4 + 1.5*WD_SO2',
-
+		
 !-- Total Chloride --!
-'WD_TCL'      , 'Wet Dep of Total Chloride',
-                'kg ha-1', 'DEP',
-                '0.972*WD_HCL + WD_ACL - WD_ACLI',
+'WD_TCL'      , 'Wet Dep of Total Chloride', 
+                'kg ha-1', 'DEP', 
+                '0.972*WD_HCL + WD_CL2 + WD_ACL - WD_ACLI + 0.6758*WD_HOCL',
 
-'TD_TCL'      , 'Total Dep of Total Chloride',
-                'kg ha-1', 'DEP',
-                'WD_TCL + DD_CL',
-
+'TD_TCL'      , 'Total Dep of Total Chloride', 
+                'kg ha-1', 'DEP', 
+                'WD_TCL + DD_CL',		
 
 !-----------------------------!
 !**** Nitrogen Deposition ****!
@@ -1530,11 +1548,11 @@ CMPST =
 
 'DD_OXN_OTHR' , 'Dry Dep of Oxidized Nitrogen from Other Components',
                 'kgN ha-1', 'DEP',
-                '0.25926*DD_N2O5 + 0.29787*DD_HONO',
-
+                '0.25926*DD_N2O5 + 0.29787*DD_HONO + 0.1717*DD_CLNO2 + 0.1436*DD_CLNO3',
+				
 'WD_OXN_OTHR' , 'Wet Dep of Oxidized Nitrogen from Other Components',
                 'kgN ha-1', 'DEP',
-                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.177720*WD_PNA',
+                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.177720*WD_PNA + 0.1717*WD_CLNO2 + 0.1436*WD_CLNO3',				
 
 'DD_OXN_TOT'  , 'Dry Dep of Total Oxidized Nitrogen',
                 'kgN ha-1', 'DEP',

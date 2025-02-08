@@ -56,7 +56,7 @@
 &ELMO_INIT
   N_Files = 2
   N_Max_Output_Variables = 400
-  N_Keywords = 68
+  N_Keywords = 69
   N_Max_Keyword_Variables = 150
 /
 
@@ -337,7 +337,10 @@
 
   Keywd_name(41) = 'DEFAULT_DEP_CRACMM3'
   Keywd(41,:) = 'DEFAULT_DEP_CRACMM2'
- 
+
+  Keywd_name(69) = 'DEFAULT_DEP_CRACMM3M'
+  Keywd(69,:) = 'DEFAULT_DEP_CRACMM2'
+
  !--------------------------!
  !----- Gas Deposition -----!
  !--------------------------!
