@@ -39,6 +39,7 @@
 ! 03 Apr 19 H. Pye: Updated IEPOX to consume inorganic sulfate when OS are formed
 ! 11 Dec 20 G. Sarwar: Removed unused uptake cofficients and added few uptake cofficients for halogen species
 ! 23 Jun 21 G. Sarwar: Replaced CB6R3M with CB6R5M
+! 24 Sep 24 G. Sarwar: Added photolysis of aerosol nitrate
 ! 15 Nov 24 G. Sarwar: Updated for CRACMM3M 
 !-----------------------------------------------------------------------
 
@@ -51,7 +52,7 @@
        
        PRIVATE 
 
-       INTEGER, PARAMETER :: NUMB_AERO_RATES = 66
+       INTEGER, PARAMETER :: NUMB_AERO_RATES = 67
        
        CHARACTER( 16 ), PARAMETER :: NAMES_AERO_RATES( NUMB_AERO_RATES ) = 
      &                    (/ 'HETERO_N2O5IJ   ', 'HETERO_N2O5K    ', 
@@ -86,7 +87,8 @@
      &                       'HETERO_CLN2_WAI ', 'HETERO_CLN2_WAJ ',   
      &                       'HETERO_CLN2_ACLJ', 'HETERO_CLN2_ABRJ',
      &                       'HETERO_CLN3_ACLJ', 'HETERO_CLN3_ABRJ',
-     &                       'HETERO_INO3_WAI ', 'HETERO_INO3_WAJ '/)     
+     &                       'HETERO_INO3_WAI ', 'HETERO_INO3_WAJ ',
+     &                       'HETERO_ANO3     '/)
 
        INTEGER, PARAMETER  :: IA_N2O5IJ         =   1
        INTEGER, PARAMETER  :: IA_N2O5K          =   2
@@ -154,6 +156,7 @@
        INTEGER, PARAMETER  :: IA_CLN3_ABRJ      =   64
        INTEGER, PARAMETER  :: IA_INO3_WAI       =   65
        INTEGER, PARAMETER  :: IA_INO3_WAJ       =   66
+       INTEGER, PARAMETER  :: IA_ANO3           =   67
 
        INTEGER, PARAMETER :: INDEX_AERO_RATES( NUMB_AERO_RATES ) = 
      &                    (/ IA_N2O5IJ   , IA_N2O5K    , 
@@ -188,8 +191,8 @@
      &                       IA_CLN2_WAI , IA_CLN2_WAJ ,   
      &                       IA_CLN2_ACLJ, IA_CLN2_ABRJ,
      &                       IA_CLN3_ACLJ, IA_CLN3_ABRJ,
-     &                       IA_INO3_WAI , IA_INO3_WAJ /)
-       
+     &                       IA_INO3_WAI , IA_INO3_WAJ ,
+     &                       IA_ANO3    /)
 
        INTEGER               :: SELECTED_AERO_RATES
        INTEGER, ALLOCATABLE  :: WHICH_AERO_RATE( : )
@@ -420,14 +423,15 @@ C      doi: 10.1016/S1352-2310(99)00462-8, 2000
 C
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
+      USE UTILIO_DEFN
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE RXNS_DATA
       USE AERO_DATA
       USE AEROMET_DATA, ONLY: airdens
       USE PRECURSOR_DATA
       USE SOA_DEFN
-      USE ASX_DATA_MOD, ONLY: MET_DATA, GRID_DATA
-      USE PHOT_MOD, ONLY: RJ, RJ_RES, RJ_SUB, LHNO3        
+      USE ASX_DATA_MOD,  ONLY: MET_DATA, GRID_DATA
+      USE PHOT_MOD,      ONLY: RJ, RJ_RES, RJ_SUB, LHNO3  
       USE ELMO_DATA
       !USE ELMO_PROC
       USE CENTRALIZED_IO_MODULE
@@ -641,7 +645,8 @@ C *** Local Variables
       INTEGER, SAVE   :: HO2_IDX
 
 C *** variables for parameterization by Bertram and Thornton 
-      REAL         :: ACL           ! i+j or k mode chloride, ug/m3  
+      REAL         :: ACL           ! i+j or k mode chloride, ug/m3 
+      REAL         :: ASEAST        ! j mode seasalt, ug/m3  
       REAL         :: ABR           ! i+j or k mode bromide, ug/m3   
       REAL         :: AH2O          ! i+j or k mode water, ug/m3   
       REAL         :: AH3OP         ! ug/m3               
@@ -661,6 +666,16 @@ C *** variables for heterogeneous hydrolysis of NTR2
       REAL            :: CON_TOA       ! Conc. of total OA [ug/m3]
       REAL            :: F_PART_NTR2   ! NTR2 fraction in the particle phase
       
+C Latitude and longitude for zenith angle calculation: Golam Sarwar * July 1, 2024
+      REAL          COSZ                            ! local cosine of zenith angle
+      REAL          JHNO3                           ! HNO3 photolysis rate, 1/min
+      LOGICAL       DARK                            ! DARK = TRUE is night,  DARK = FALSE is day
+      
+      REAL      ASEASTM   ! seasalt,  [moles / m3 ] 
+      REAL      ANO3      ! fine mode nitrate [ ug/m3 ] 
+      REAL      ANO3M     ! nitrate,  [moles / m3 ] 
+
+      REAL      FAC_HNO3  ! Enhancement factor for HNO3 photolysis rate for a grid-cell [-]  
       
       LOGICAL, SAVE     :: FIRSTIME = .TRUE.
 
@@ -682,7 +697,7 @@ C *** variables for getting aerosol diagnostic file flag
       CHARACTER( 80 )   :: VARDESC                     ! environment variable description
       
       CHARACTER( 132 )  :: XMSG
-      
+
 C *** parameters for calculating GAMMA of HBR ---> ABR, Sherwen et al., ACP, 2016 and IUPAC
       REAL( 8 ) :: GAMMA_HBR                             ! uptake coefficient of HBR  
       REAL( 8 ) :: INV_GAMMA_HBR     
@@ -713,6 +728,7 @@ C *** parameters for calculating GAMMA of HBR ---> ABR, Sherwen et al., ACP, 201
       REAL( 8 ), PARAMETER :: INV_GAMMA_INO2  = 1.0D0 / 0.02D0                     ! Saiz-Lopez et al. 2014
       REAL( 8 ), PARAMETER :: INV_GAMMA_INO3_WA  = 1.0D0 / 0.01D0                  ! Sherwen et al., 2016       
 
+
 #ifdef verbose_aerosol_chemistry
        LOGICAL              :: DUMP_CELL
 #endif
@@ -729,7 +745,6 @@ C *** parameters for calculating GAMMA of HBR ---> ABR, Sherwen et al., ACP, 201
            Real(8), Intent( Out ):: Wet_M2( : ), Wet_M3( : ), De_Wet( : )
          End Subroutine Hetchem_Extract_Aero
       END INTERFACE 
-  
       
 C-----------------------------------------------------------------------
 
@@ -743,6 +758,8 @@ C *** compute only on first pass
 
         CALL MAP_AERO()
         CALL MAP_PRECURSOR()
+
+        CALL LOG_HEADING( LOGDEV,'Initialize Aerosol Heterogeneous Chemistry')
 
         ALLOCATE( WHICH_AERO_RATE( NHETERO ) )
         
@@ -776,6 +793,7 @@ C     end of the gas-phase chemical driver
           ALLOCATE(   KPARTIEPOX( NCOLS,NROWS,NLAYS ) )
           ALLOCATE(     YCLNO2IJ( NCOLS,NROWS,NLAYS ) )
           ALLOCATE(      YCLNO2K( NCOLS,NROWS,NLAYS ) )
+          ALLOCATE(      EF_HNO3( NCOLS,NROWS,NLAYS ) )
        END IF
 
 C ***  Determine molecular weights
@@ -861,14 +879,13 @@ C ***  Map to acids/nucleophiles for epoxide uptake
 
        INDX =  INDEX1( NAMES_AERO_RATES( IA_IEPOX ), NHETERO, HETERO )   
        IF ( INDX .GT. 0 ) THEN ! Find indices for acid catalyzed species in IEPOX reaction
-          If ( ( INDEX( MECHNAME, 'AE6I' ) .GT. 0 ) .OR.
-     &         ( INDEX( MECHNAME, 'AE7I' ) .GT. 0 )  ) then
+          If ( ( INDEX( MECHNAME, 'AE7I' ) .GT. 0 ) ) then
              NUMVOC         = 2 ! IEPOX + MAE/HMML
              N_NUCPAIRS     = N_NUCPAIRS_AEI
              ALLOCATE ( ACID_NUC_PAIRS( N_NUCPAIRS ) )
              ACID_NUC_PAIRS = ACID_NUC_PAIRS_AEI
-          Else If ( (INDEX( MECHNAME, 'CRACMM1') .GT. 0)
-     &      .OR.    (INDEX( MECHNAME, 'CRACMM2') .GT. 0)
+
+          Else If ( (INDEX( MECHNAME, 'CRACMM2') .GT. 0)
      &      .OR.    (INDEX( MECHNAME, 'CRACMM3') .GT. 0) 
      &      .OR.    (INDEX( MECHNAME, 'CRACMM3M') .GT. 0) ) then
              NUMVOC         = 1
@@ -909,6 +926,7 @@ C ***  Map to acids/nucleophiles for epoxide uptake
          GAMMA_IEPOX  = 0.0
          GAMMA_IMAE   = 0.0
          KPARTIEPOX   = 0.0
+	     EF_HNO3      = 0.0
       END IF
      
 C *** Calculate rate constants at each grid cell location
@@ -1054,11 +1072,16 @@ c *** get fine aerosol H2O and chlorine concentrations in
                   AH2O = aerospc_conc( AH2O_IDX,N )
                   ACL  = aerospc_conc( ACL_IDX, N )
                   CL_PPM( N ) = PPM_FACTOR * ( ACL * INV_MWCL )
-!                 ASEAST = aerospc_conc( ASEAST_IDX, N )		  
-     
-      If ( (Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) .OR.  
-     &     Index( mechname,  'CRACMM3M'      ) .Gt. 0 ) Then 
-       
+   
+      If ( (Index( mechname, 'CRACMM3'       ) .Gt. 0 ) .OR.  
+     &      Index( mechname, 'CRACMM3M'      ) .Gt. 0 ) Then 
+		  ASEAST = aerospc_conc( ASEAST_IDX, N )
+            Else
+                  ASEAST = 0.0
+      End if
+
+      If ( (Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) .OR.
+     &      Index( mechname, 'CRACMM3M'      ) .Gt. 0 ) Then       
          ABR  = aerospc_conc( ABR_IDX, N ) 
          INV_MWBR  = REAL( 1.0 / aerospc_mw( ABR_IDX ), 8 )  
          BR_PPM( N ) = PPM_FACTOR * ( ABR * INV_MWBR ) 
@@ -1113,12 +1136,34 @@ C *** calculate aerosol surface area
 C *** Calculate IEPOX and MAE uptake information for accumulation mode
                RADIUS_I  = 0.5D0 * DE_WET( 1 ) ! particle size - i-mode
                RADIUS    = 0.5D0 * DE_WET( 2 ) ! particle size - j-mode
+	       	 
+C *** Calculate approximate seasalt surface area, m2/m3
+               MARINE_AREA = ( OCEAN( C,R ) + SZONE( C,R ) )
+
+               IF ( MARINE_AREA .GT. 0.0 .AND. Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) THEN
 
 C *** Calculate approximate seasalt surface area, m2/m3
+C *** Main components of Seasalt are: NA, CL, MG, K, CA, SO4
+C *** However, SO4 over seawater can generate from other sources
+C *** Fo SO4, use SO4/NA emissions ratio in seasalt
 
-               MARINE_AREA = ( OCEAN( C,R ) + SZONE( C,R ) )
-               SSALT_VOL  =   1.0D-9 * Real ( aerospc_conc( ASEAST_IDX,2 ) / aerospc(ASEAST_IDX)%density, 8 )              ! m3/m3 - use seasalt concentration 
-               SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * DEXP ( 0.5D0 * AEROMODE_LNSG( 2 ) * AEROMODE_LNSG( 2 ) )
+                SSALT_VOL  =   1.0D-9 * ( Real ( aerospc_conc( ANA_IDX,2 ) / aerospc(ANA_IDX)%density, 8 ) +          ! NAJ - m3/m3
+     @                                    Real ( aerospc_conc( ACL_IDX,2 ) / aerospc(ACL_IDX)%density, 8 ) +          ! CLJ - m3/m3
+     @                                    Real ( aerospc_conc( AMG_IDX,2 ) / aerospc(AMG_IDX)%density, 8 ) +          ! MGJ - m3/m3
+     @                                    Real ( aerospc_conc( AK_IDX,2 )  / aerospc(AK_IDX)%density, 8  ) +          ! KJ - m3/m3
+     @                                    Real ( aerospc_conc( ACA_IDX,2 ) / aerospc(ACA_IDX)%density, 8 ) +          ! CAJ - m3/m3
+     @                                    Real ( 0.2514 * aerospc_conc( ANA_IDX,2 ) / aerospc(ASO4_IDX)%density, 8) ) ! SO4 - m3/m3 - use SO4/NA ratio in seasalt
+
+                SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * DEXP ( 0.5D0 * AEROMODE_LNSG( 2 ) * AEROMODE_LNSG( 2 ) )
+
+               Elseif( MARINE_AREA .GT. 0.0 .AND. Index( mechname, 'CRACMM3M' ) .Gt. 0 ) THEN
+	       
+                SSALT_VOL  =   1.0D-9 * Real ( aerospc_conc( ASEAST_IDX,2 ) / aerospc(ASEAST_IDX)%density, 8 )              ! m3/m3 - use seasalt concentration 
+                SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * DEXP ( 0.5D0 * AEROMODE_LNSG( 2 ) * AEROMODE_LNSG( 2 ) )
+
+               ELSE
+                SSALT_SURFA = 0.0
+                ENDIF	
 
 C *** calculate GAMMA_HBR  
       GAMMA_HBR = 1.3D-8 * DEXP ( 4290/ AIRTEMP) 
@@ -1146,7 +1191,39 @@ C *** set up variables needed for calculating K_BRONO2
                CLNO3_CL_RXN_TIME    = 4.0D0 * INV_GAMMA_CLNO3_ACL / CBAR_CLNO3
                CLNO3_BR_RXN_TIME    = 4.0D0 * INV_GAMMA_CLNO3_ABR / CBAR_CLNO3
                INO3_WA_RXN_TIME     = 4.0D0 * INV_GAMMA_INO3_WA / CBAR_INO3
-	                    
+               
+C...  calculate cosine of zenith angle for the cell and determine day or night; Golam Sarwar
+                 
+                 COSZ = MET_DATA%COSZEN( C, R )
+                 
+                 IF ( COSZ .LE. 0.0 ) THEN
+                      DARK = .TRUE.   ! night
+                      JHNO3 = 0.0D0                                 ! 1/min
+                 ELSE
+                      DARK = .FALSE.  ! day
+                      JHNO3 = RJ( C, R, L, LHNO3 )              ! 1/min                   
+                 END IF
+                 
+! Calculate FAC_HNO3
+
+                ANO3 = aerospc_conc( ANO3_IDX,1 ) + aerospc_conc( ANO3_IDX,2 )
+                ANO3M = ANO3 / aerospc_mw( ANO3_IDX )
+        
+                ASEASTM = aerospc_conc( ASEAST_IDX, 2 ) / aerospc_mw( ASEAST_IDX )
+               
+                FAC_HNO3 = 100.0  / ( 1.0 + ( ANO3M / ASEASTM ))                
+                FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
+
+                IF ( L_ELMO ) THEN 
+		           IF (.NOT. DARK) THEN	 
+                     EF_HNO3( C,R,L ) = FAC_HNO3
+                   ELSE 
+                     EF_HNO3( C,R,L ) = 0.0 
+                   ENDIF
+                ENDIF
+
+! Done FAC_HNO3       
+
                CBARIEPOX = CFACTOR_IEPOX * DSQRT( AIRTEMP )
                CBARIMAE  = CFACTOR_IMAE  * DSQRT( AIRTEMP )
 
@@ -1592,6 +1669,9 @@ C hydrolysis
                      ELSEIF (AIRRH .GT. 0.2D0) THEN   
                       KHETERO( IRATE, C,R,L ) = 60.0D0 * WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_INO3 + INO3_WA_RXN_TIME )
                      ENDIF  
+		     
+                CASE( IA_ANO3 )                                   
+                  KHETERO( IRATE, C,R,L ) = JHNO3 * FAC_HNO3                                                          ! 1/min 
 
                END SELECT
 

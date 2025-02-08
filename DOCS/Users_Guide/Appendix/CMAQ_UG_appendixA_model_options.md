@@ -1,4 +1,3 @@
-
 <!-- BEGIN COMMENT -->
 
 [<< Tables and Figures](../CMAQ_UG_tables_figures.md) - [Home](../README.md) - [Next Appendix >>](CMAQ_UG_appendixB_emissions_control.md)
@@ -383,11 +382,11 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `CTM_APPL [default: ${RUNID}_${YYYYMMDD}]`<a id=CTM_APPL></a>  
     CCTM log and output file naming extension.      
 -   `CONC_SPCS [if commented out, all species]`<a id=CONC_SPCS></a>  
-    Model species to be written to the CCTM_CONC file, including temperature, relative humidity and pressure. See [Chapter 6](../CMAQ_UG_ch07_model_outputs.md#72-cctm-output-files) for further information.
+    Model species to be written to the CCTM_CONC file, including temperature, relative humidity and pressure. See [Chapter 7](../CMAQ_UG_ch07_model_outputs.md#72-cctm-output-files) for further information.
 -   `CONC_BLEV_ELEV [if commented out, all layers]`<a id=CONC_BLEV_ELEV></a>  
     Vertical model layer range for the CCTM_CONC file concentrations; this variable sets the lower and upper layers over which to output the CCTM_CONC file. In the example script, BLEV and ELEV are both set to 1, so concentrations will only be written for the first layer.
 -   `AVG_CONC_SPCS [if commented out, output all species]`<a id=AVG_CONC_SPCS></a>  
-    Model species for calculating integral average concentrations for each output time step. Options can be any of the standard output species that are written to the CCTM_CONC file, including temperature, relative humidity and pressure. The species in this list will be written to the CCTM_ACONC output file. See [Chapter 6](../CMAQ_UG_ch07_model_outputs.md#72-cctm-output-files) for further information.
+    Model species for calculating integral average concentrations for each output time step. Options can be any of the standard output species that are written to the CCTM_CONC file, including temperature, relative humidity and pressure. The species in this list will be written to the CCTM_ACONC output file. See [Chapter 7](../CMAQ_UG_ch07_model_outputs.md#72-cctm-output-files) for further information.
 -   `ACONC_BLEV_ELEV [default: if commented out, all layers]`<a id=ACONC_BLEV_ELEV></a>  
     Vertical model layer range for integral average concentrations; this variable sets the lower and upper layers over which to calculate integral average concentrations. For example, setting this variable to “1 5” will produce integral average concentrations for model layers 1 through 5.
 -   `AVG_FILE_END_TIME [default: N]`<a id=AVG_FILE_END_TIME></a>  
@@ -490,6 +489,7 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `BC_AERO_M2WET [default: F=dry]`<a id=BC_AERO_M2WET></a> 
     Generally, aerosol surface area is assumed to be dry when transported or output in CMAQ, and this option should be set to False by default. If a user knows their aerosol surface area applies to the wet size distribution (e.g. through an offline calculation or another modeling system), this option may be used to enforce compatibility.
 
+
 <a id=Process_Analysis_Options></a>
 
 ### Process analysis options
@@ -542,7 +542,7 @@ Sets if the CCTM will run in multi-processor or serial mode.
 
 <!-- END COMMENT -->
 
-Aerosol Diagnostics are now handled by the Explicit and Lumped Model Output module (ELMO), which is directed by the Emission Control Interface (ECI). See [Appendix B.6: ELMO](Appendix/CMAQ_UG_appendixB_emissions_control.md) 
+Aerosol Diagnostics are now handled by the Explicit and Lumped Model Output module (ELMO), which is directed by the Emission Control Interface (ECI). See [Appendix B.6: ELMO](./CMAQ_UG_appendixB_emissions_control.md) 
 
 <a id=Diagnostic_Output_Flags></a>
 
@@ -596,7 +596,7 @@ Aerosol Diagnostics are now handled by the Explicit and Lumped Model Output modu
     Short label of the gridded file for stream ###, where ### = 001, 002,…,N_EMIS_GR. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information. 
 
 -   `GR_EM_SYM_DATE_### [default: False]`<a id=GR_EM_SYM_DATE_###></a>  
-    Switch to indicate whether gridded emission is of representative day type for stream ###, where ### = 01, 02,…,N_EMIS_GR. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
+    Switch to indicate whether gridded emission is of representative day type for stream ###, where ### = 01, 02,…,N_EMIS_GR. Variable should be set to indicate if the date on an emission file can be different from the simulation day date (T for True). A setting of F (False) requires the emission input file date to match the simulation date. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
     
 -   `N_EMIS_PT `<a id=N_EMIS_PT></a>
     The number of offline Point emission streams to be used by the model. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
@@ -614,7 +614,7 @@ Aerosol Diagnostics are now handled by the Explicit and Lumped Model Output modu
     Short label of the point emissions file for sector ###, where ### = 001, 002,…,N_EMIS_PT. Each ### refers to the one of the plume rise point-source sectors. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
     
  -   `STK_EM_SYM_DATE_### [default: False]`<a id=STK_EM_SYM_DATE_###></a>  
-    Switch to indicate whether point emission file is of representative day type for sector ###, where ### = 01, 02,…,N_EMIS_PT. Each ### refers to the one of the plume rise point-source sectors. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information. 
+    Switch to indicate whether point emission file is of representative day type for sector ###, where ### = 01, 02,…,N_EMIS_PT. Variable should be set to indicate if the date on an emission file can be different from the simulation day date (T for True). A setting of F (False) requires the emission input file date to match the simulation date. Each ### refers to the one of the plume rise point-source sectors. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information. 
     
 -   `EMIS_SYM_DATE [default: False]`<a id=EMIS_SYM_DATE></a>  
     The default for GR_EM_SYM_DATE_### and STK_EM_SYM_DATE_### if not set explicitly is false, however users have the option to set this default by setting this environment variable. Users should note, that if this variable is set and GR_EM_SYM_DATE_### or STK_EM_SYM_DATE_### is set, the individual stream switch takes precedent over this variable. This switch maybe useful if all offline emissions are of representative day type. See [Chapter 6](../CMAQ_UG_ch06_model_configuration_options.md#inline-stream-offline) for further information.
