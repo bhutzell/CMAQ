@@ -1164,7 +1164,7 @@ CMPST =
 !-- Nitrate --!
 'NOY'         , 'NOy Concentration',
                 'ppmV', 'TSP',
-                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + HNO4 + PAN + PPN + MPAN + ISON + INALD + IPX + TRPN + ONIT + HONIT + CLNO + CLNO2 + CLNO3',
+                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + HNO4 + PAN + PPN + MPAN + ISON + INALD + IPX + TRPN + ONIT + HONIT + CLNO + CLNO2 + CLNO3 + BRNO + BRNO2 + BRNO3 + INO + INO2 + INO3',
 
 'NOZ'         , 'NOz Concentration',
                 'ppmV', 'TSP',
