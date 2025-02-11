@@ -129,8 +129,8 @@
    !'EVERYWHERE', 'ALL'         ,'XYM'    ,'STY'         ,'GAS'  ,0.07,'UNIT','a',
    ! Source-specific scaling
    ! gasoline: 99% XYL; 1% STY
-   'EVERYWHERE', 'GRIDDED_GASOLINE','XYM'    ,'XYL'         ,'GAS'  ,0.99,'UNIT','m',
-   'EVERYWHERE', 'GRIDDED_GASOLINE','XYM'    ,'STY'         ,'GAS'  ,0.01,'UNIT','a',
+   'EVERYWHERE', 'G_np_gasoline','XYM'    ,'XYL'         ,'GAS'  ,0.99,'UNIT','m',
+   'EVERYWHERE', 'G_np_gasoline','XYM'    ,'STY'         ,'GAS'  ,0.01,'UNIT','a',
    ! ptnonipm: 35% XYL; 65% STY
    'EVERYWHERE', 'P_ptnonipm'   ,'ALL'    ,'ALL'         ,'ALL'  ,0.0  ,'UNIT','m',! zero ptnonipm emissions
    'EVERYWHERE', 'P_ptnonipm'   ,'XYM'    ,'STY'         ,'GAS'  ,0.65 ,'UNIT','a',! 65% of XYM emissions to STY
