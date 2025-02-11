@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3M mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Nov 22, 2024
+C  REVISION HISTORY: Created by EBI solver program, Feb 10, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -112,7 +112,7 @@ c..Loss frequency of NO3 ( except NO3 + NO3 if present )
      &    +                 RKI(   172 ) * YC ( PHEN        )   ! NO3+PHEN=0.1520D+...
      &    +                 RKI(   173 ) * YC ( CSL         )   ! NO3+CSL=0.2000D+...
      &    +                 RKI(   174 ) * YC ( MCT         )   ! NO3+MCT=MCTO+HNO3
-     &    +                 RKI(   175 ) * YC ( MPAN        )   ! NO3+MPAN=MACP+NO2
+     &    +                 RKI(   175 ) * YC ( MPAN        )   ! NO3+MPAN=MACP+...
      &    +                 RKI(   340 ) * YC ( MO2         )   ! NO3+MO2=HO2+HCHO+NO2
      &    +                 RKI(   341 ) * YC ( ETHP        )   ! NO3+ETHP=HO2+NO2+ACD
      &    +                 RKI(   342 ) * YC ( HC3P        )   ! NO3+HC3P=0.2540D+...

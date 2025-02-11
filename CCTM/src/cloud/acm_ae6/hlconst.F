@@ -43,7 +43,7 @@ C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
 
 C...........PARAMETERS and their descriptions:
 
-      INTEGER, PARAMETER, PUBLIC :: MXSPCS = 281     ! Number of substances
+         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 281     ! Number of substances
 
          PRIVATE 
 
@@ -70,9 +70,8 @@ C...pointers for the dissociation constants (arrays B and D)
          INTEGER, PARAMETER :: MHBR       = 17  ! HBR
          INTEGER, PARAMETER :: MHI        = 18  ! HI
          INTEGER, PARAMETER :: MACRYACID  = 19  ! CCH3COOH
-
-         CHARACTER( 16 )    :: SUBNAME( MXSPCS )  ! list of substance names
-
+	 
+         CHARACTER( 16 )    :: SUBNAME( MXSPCS )  ! list of substance names	 
 
 C...Henry's law constant data taken mostly from Rolf Sanders' Compilation of
 C...  Henry's Law Constants for Inorganic and Organic Species of Potential
@@ -290,7 +289,7 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(192), A(192), E(192) / 'DMS             ', 4.80E-01, 3.1E+03 /   ! ROLF SANDERS COMPILATION (1999)/De Bryuyn et al. (1995)
       DATA SUBNAME(193), A(193), E(193) / 'MSA             ', 7.70E+04, 0.0E+00 /   ! Meylan and Howard (1991), inverse of the value is used due to unit conversion
       DATA SUBNAME(194), A(194), E(194) / 'XYLENE          ', 1.90E-01, 4.2E+03  / ! .35/.3/.35 m/o/p, Sander ACP 2015, Staudinger and Roberts (2001) for m; Fogg and Sangster (2003) for o and p
-      DATA SUBNAME(195), A(195), E(195) / 'ETHYLBENZENE    ', 1.42E-01, 4.8E+03 /  ! Sander ACP 2015, Fogg Sangster (2003)
+      DATA SUBNAME(195), A(195), E(195) / 'ETHYLBENZENE    ', 1.42E-01, 4.8E+03 / ! Sander ACP 2015, Fogg Sangster (2003)
       DATA SUBNAME(196), A(196), E(196) / 'ACRYACID        ', 3.141E+03, 0.0E+00 / ! Sander ACP 2015, Lide Frederikse (1995)
       DATA SUBNAME(197), A(197), E(197) / 'ACETONITRILE    ', 5.269E+01, 4.0E+03 / ! Sander ACP 2015, Sander et al (2011)
       DATA SUBNAME(198), A(198), E(198) / 'CHLOROPRENE     ', 4.760E+00, 0.0E+00 / ! Sander ACP 2015, Mackay et al. (1993)
@@ -400,13 +399,12 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA B( MHBR   ), D( MHBR   ) / 1.00E+09,  0.00E+00 /  ! HBR <=> H + BR       : Schweitzer et al. (2000)
       DATA B( MHI    ), D( MHI    ) / 3.20E+09,  0.00E+00 /  ! HI <=> H + I         : Schweitzer et al. (2000)
       DATA B( MACRYACID ), D( MACRYACID ) / 5.62E-05,  0.00E+00 /  ! CH3C(O)OH <=> H + CH3C(O)O  : Riddick et al. (1985)
-
+      
 !-------------------------------------------------------------------------------
 ! Note for dissociation constant for equation LCL2: CL2*H2O <=> HOCL + H + CL
 ! Need aqueous [CL-] concentration to calculate effective henry's law coefficient
 ! Used a value of 2.0 mM following Lin and Pehkonen, JGR, 103, D21, 28093-28102, November 20, 1998
 !-------------------------------------------------------------------------------
-
 
       CONTAINS
 
@@ -484,7 +482,7 @@ C...  Atmospheric Chemistry and Physics, 1997
             END IF
 
          END SUBROUTINE HLCONST_INIT
-
+	 
          REAL FUNCTION HLCONST ( ISUB, TEMP, EFFECTIVE, HPLUS )
 
 C-----------------------------------------------------------------------
@@ -598,7 +596,7 @@ C...error if index out of range in table
         WRITE( XMSG, '(A,I4,A)' ) ' index ', ISUB, ' out of range in Henry''s'//
      &         ' Law Constant table in routine HLCONST'
         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
-      END IF
+      END IF	 
 
 C...compute the Henry's Law Constant
 
@@ -621,13 +619,14 @@ C...compute the effective Henry's law constants
 
 C...assign a value for clminus.  use 2.0 mM based on Lin and Pehkonen, 1998, JGR
 
-        CLMINUS   = 2.0E-03                ! chloride ion conc [CL-]
+	CLMINUS   = 2.0E-03                ! chloride ion conc [CL-]
         CLMINUSI  = 1.0 / CLMINUS          ! 1 / CLMINUS
 
-        IF ( ISUB .EQ. HLC_SO2 ) THEN         !   SO2H2O <=> HSO3- + H+
+        IF ( ISUB .EQ. HLC_SO2 ) THEN      !   SO2H2O <=> HSO3- + H+
                                            ! & HSO3- <=> SO3= + H+
 
-          AKEQ1 = B( MSO2 )  * EXP( D( MSO2 )  * TFAC )
+ 
+         AKEQ1 = B( MSO2 )  * EXP( D( MSO2 )  * TFAC )
           AKEQ2 = B( MHSO3 ) * EXP( D( MHSO3 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI + AKEQ1 * AKEQ2 * HPLUS2I )
 
@@ -724,5 +723,5 @@ C...assign a value for clminus.  use 2.0 mM based on Lin and Pehkonen, 1998, JGR
 
       RETURN
       END
-
+      
       END MODULE HLCONST_MOD

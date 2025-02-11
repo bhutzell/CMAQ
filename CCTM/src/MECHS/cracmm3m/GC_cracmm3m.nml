@@ -189,25 +189,25 @@ GC_SPECIES_DATA =
 'CL2'           , 71.0    ,''    ,-1     ,''     ,-1     ,'VD_CL2'            , 1   ,'CL2'            , 1  ,''             ,''       ,'Yes', 'Yes' ,'Yes' ,'Yes',!Chlorine,E,DTXSID1020273,ClCl
 'CL'            , 35.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,'',    ''    ,''    ,'Yes',!Chlorine atom,E,DTXSID801014230,[Cl]
 'CLO'           , 51.5  ,''      ,-1     ,''     ,-1     ,'VD_CLO'            , 1   ,'CLO'            , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Chlorine monoxide,E,DTXSID8073136,[O-]Cl
-'OCLO'          , 67.5  ,''      ,-1     ,''     ,-1     ,'VD_CLOO'           , 1   ,'CLOO'           , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Chlorine dioxide isomar,E,NA,O=Cl[O]
-'CL2O2'         ,103.0  ,''      ,-1     ,''     ,-1     ,'VD_CL2O2'          , 1   ,'CL2O2'          , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Dichlorine dioxide,E,DTXSID001310193,ClOOCl
+'OCLO'          , 67.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,'',    ''    ,''    ,'Yes',!Chlorine dioxide isomar,E,NA,O=Cl[O]
+'CL2O2'         ,103.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,'',   ''     ,''    ,'Yes',!Dichlorine dioxide,E,DTXSID001310193,ClOOCl
 'HOCL'          , 52.5  ,''      ,-1     ,''     ,-1     ,'VD_HOCL'           , 1   ,'HOCL'           , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hypochlorous acid,E,DTXSID3036737,OCl
-'CLNO'          , 65.5  ,''      ,-1     ,''     ,-1     ,'VD_CLNO'           , 1   ,'NITROSYL_CHLORID',1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nitrosyl chloride,E,DTXSID5051945,ClN=O
+'CLNO'          , 65.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,''    ,''    ,''    ,'Yes',!Nitrosyl chloride,E,DTXSID5051945,ClN=O
 'CLNO2'         , 81.5  ,''      ,-1     ,''     ,-1     ,'VD_CLNO2'          , 1   ,'NITRYL_CHLORIDE', 1  ,'CLNO2'        ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nitryl chloride,E,DTXSID601317066,ClN(=O)=O
 'CLNO3'         , 97.5  ,''      ,-1     ,''     ,-1     ,'VD_CLNO3'          , 1   ,'CLNO3'          , 1  ,'CLNO3'        ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Chlorine nitrate,E,DTXSID00163043,[O-][N+](=O)OCl
 'HCOCL'         , 64.5  ,''      ,-1     ,''     ,-1     ,'VD_FMCL'           , 1   ,'FMCL'           , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Formyl chloride,E,DTXSID30180344,ClC=O
 'HCL'           , 36.0   ,''     ,-1     ,''     ,-1     ,'VD_HCL'            , 1   ,'HCL'            , 1  ,'HCL'          ,'HCL'    ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrochloric acid,E,DTXSID2020711,Cl
-'CLOO'          , 67.5  ,''      ,-1     ,''     ,-1     ,'VD_CLOO'           , 1   ,'CLOO'           , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Chlorine dioxide,E,DTXSID5023958,O=Cl[O]
-'BR2'           ,159.8   ,''     ,-1     ,''     ,-1     ,'VD_BR2'            , 1   ,'BR2'            , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Bromine,E,DTXSID1035238,BrBr
+'CLOO'          , 67.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,''    ,''    ,''    ,'Yes',!Chlorine dioxide,E,DTXSID5023958,O=Cl[O]
+'BR2'           ,159.8   ,''     ,-1     ,''     ,-1     ,'VD_BR2'            , 1   ,'BR2'            , 1  ,''             ,''       ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Bromine,E,DTXSID1035238,BrBr
 'BR'            , 79.9   ,''     ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''        ,''    ,''    ,''   ,'Yes',!Bromine atom,E,DTXSID201014232,[Br]
 'BRO'           , 95.9   ,''     ,-1     ,''     ,-1     ,'VD_BRO'            , 1   ,'BRO'            , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Bromine monoxide,E,DTXSID201315575,[O]Br
-'OBRO'          ,111.9   ,''     ,-1     ,''     ,-1     ,'VD_OBRO'           , 1   ,'OBRO'           , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Bromine dioxide,E,DTXSID401028281,O=[Br]=O
+'OBRO'          ,111.9   ,''     ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''        ,''    ,''   ,''    ,'Yes',!Bromine dioxide,E,DTXSID401028281,O=[Br]=O
 'HOBR'          , 96.9  ,''      ,-1     ,''     ,-1     ,'VD_HOBR'           , 1   ,'HOBR'           , 1  ,'HOBR'         ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Hypobromous acid,E,DTXSID701024864,OBr
-'BRNO'          ,109.9  ,''      ,-1     ,''     ,-1     ,'VD_BRNO'           , 1   ,'NITROSYL_BROMID', 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Nitrosyl bromide,E,DTXSID90158701,BrN=O
+'BRNO'          ,109.9  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''        ,''    ,''   ,''    ,'Yes',!Nitrosyl bromide,E,DTXSID90158701,BrN=O
 'BRNO2'         ,125.9  ,''      ,-1     ,''     ,-1     ,'VD_BRNO2'          , 1   ,'BRNO2'          , 1  ,'BRNO2'        ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Nitryl bromide,E,NA,BrN(=O)=O
 'BRNO3'         ,141.9  ,''      ,-1     ,''     ,-1     ,'VD_BRNO3'          , 1   ,'BRNO3'          , 1  ,'BRNO3'        ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Bromine nitrate,E,DTXSID90960821,BrON(=O)=O
 'CH2BR2'        ,173.8  ,''      ,-1     ,''     ,-1     ,'VD_MB2'            , 1   ,'MB2'            , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Dibromomethane,E,DTXSID4021557,BrCBr
-'CHBR3'         ,252.7  ,''      ,-1     ,''     ,-1     ,'VD_CHBR3'          , 1   ,'MB3'            , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Bromoform,E,DTXSID1021374,BrC(Br)Br
+'CHBR3'         ,252.7  ,''      ,-1     ,''     ,-1     ,'VD_MB3'            , 1   ,'MB3'            , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Bromoform,E,DTXSID1021374,BrC(Br)Br
 'HBR'           , 80.9  ,''      ,-1     ,''     ,-1     ,'VD_HBR'            , 1   ,'HBR'            , 1  ,'HBR'          ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Hydobromic acid,E,DTXSID0029713,Br
 'HCOBR'         ,108.9  ,''      ,-1     ,''     ,-1     ,'VD_FMBR'           , 1   ,'FMBR'           , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Formyl bromide,E,DTXSID20227994,BrC=O
 'I2'            ,253.8  ,''      ,-1     ,''     ,-1     ,'VD_I2'             , 1   ,'I2'             , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Iodine,E,DTXSID7034672,II
@@ -217,7 +217,7 @@ GC_SPECIES_DATA =
 'I2O2'          ,285.8  ,''      ,-1     ,''     ,-1     ,'VD_I2O2'           , 1   ,'I2O2'           , 1  ,'I2O2'         ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Diiodine dioxide,E,NA,O=I(=O)I
 'HOI'           ,143.9  ,''      ,-1     ,''     ,-1     ,'VD_HOI'            , 1   ,'HOI'            , 1  ,'HOI'          ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Hypoiodous acid,E,DTXSID8042050,OI
 'HI'            ,127.9  ,''      ,-1     ,''     ,-1     ,'VD_HI'             , 1   ,'HI'             , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Hydrogen iodide,E,DTXSID2044349,I
-'INO'           ,156.9  ,''      ,-1     ,''     ,-1     ,'VD_INO'            , 1   ,'INO'            , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Nitrosyl iodide,E,DTXSID80207297,IN=O
+'INO'           ,156.9  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''        ,''    ,''   ,''    ,'Yes',!Nitrosyl iodide,E,DTXSID80207297,IN=O
 'INO2'          ,172.9  ,''      ,-1     ,''     ,-1     ,'VD_INO2'           , 1   ,'INO2'           , 1  ,'INO2'         ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Iodine nitrite, E,NA,IN(=O)=O
 'INO3'          ,188.9  ,''      ,-1     ,''     ,-1     ,'VD_INO3'           , 1   ,'INO3'           , 1  ,'INO3'         ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Iodine nitrate,E,DTXSID001336624,ION(=O)=O
 'CH3I'          ,141.9  ,''      ,-1     ,''     ,-1     ,'VD_CH3I'           , 1   ,'CH3I'           , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Iodomethane,E,DTXSID0024187,CI
@@ -230,8 +230,8 @@ GC_SPECIES_DATA =
 'CHBR2CL'       ,208.3  ,''      ,-1     ,''     ,-1     ,'VD_MB2C'           , 1   ,'MB2C'           , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Dibromochloromethane,E,DTXSID1020300,ClC(Br)Br
 'CHBRCL2'       ,163.9  ,''      ,-1     ,''     ,-1     ,'VD_MBC2'           , 1   ,'MBC2'           , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Bromodichloromethane,E,DTXSID1020198,ClC(Cl)Br
 'CH2BRCL'       ,129.4  ,''      ,-1     ,''     ,-1     ,'VD_MBC'            , 1   ,'MBC'            , 1  ,''             ,''        ,'Yes' ,'Yes','Yes' ,'Yes',!Bromochloromethane,E,DTXSID4021503,ClCBr
-'NO2PIJ'        , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''   ,''    ,'Yes',!Dioxidonitrogen, L, NA,[N+](=O)=O
-'NO2PK'         , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''    ,''   ,'Yes',!Dioxidonitrogen, L, NA, [N+](=O)=O
+'NO2PIJ'        , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''   ,''    ,'Yes',!Dioxidonitrogen, E, NA,[N+](=O)=O
+'NO2PK'         , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''    ,''   ,'Yes',!Dioxidonitrogen, E, NA, [N+](=O)=O
 'I2O3'          ,301.8  ,''      ,-1     ,''     ,-1     ,'VD_I2O3'           , 1   ,'I2O3'           , 1  ,''             ,''        ,'Yes' ,''    ,''   ,'Yes',!Diiodine trioxide,E,NA,O=IOI(=O)
 'I2O4'          ,317.8  ,''      ,-1     ,''     ,-1     ,'VD_I2O4'           , 1   ,'I2O4'           , 1  ,''             ,''        ,'Yes' ,''    ,''   ,'Yes',!Diiodine Tetroxide,E,NA,O=IOI(=O)=O
 /

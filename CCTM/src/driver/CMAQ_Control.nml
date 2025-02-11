@@ -1,0 +1,753 @@
+!------------------------------------------------------------------------------!
+! Explicit and Lumped air quality Model Output (ELMO) Module Interface         !
+!                                                                              !
+!   Definition of ELMO_INIT Fields:                                            !
+!       N_Files - number of output files                                       !
+!       N_Max_Output_Variables - maximum number of variables or keywords       !
+!                 specified for any file in this interface. This is before     !
+!                 variable or keyword expansion.                               !
+!       N_Keywords - number of keywords specified below                        !
+!       N_Max_keyword_variables - maximum number of components of any keyword  !
+!                 below, before taking into account any expansion.             !
+!                                                                              !
+!   Format of ELMO_Files specification                                         !
+!       Flabel - short name for each file                                      !
+!       Tmode - 'average' or 'instantaneous'. For deposition variables,        !
+!               selecting 'average' will yield values accumulated across the   !
+!               output time step.                                              !
+!       Lay_Bot - Bottom layer for each file                                   !
+!       Lay_Top - Top layer for each file                                      !
+!       File_Vars(f,:) - These may be CMAQ species, deposition of CMAQ species !
+!             (species name preceeded by DD_ for dry deposition and WD_ for    !
+!             wet deposition, COMPOSITES defined in CMAQ_Chemistry_Control.nml,!
+!             or keywords defined in the Keywd list below.                     !
+!                                                                              !
+!             For aerosols, the bulk name (e.g. ASO4 for sulfate) may be used  !
+!             without size suffix to output the sum of species across all      !
+!             sizes. A * may be added preceeding the bulk aerosol name to      !
+!             output all sizes for that species individually.                  !
+!                                                                              !
+!             Additionally, a list of DERIVED variables is found in ELMO_DATA.F!
+!             that is available for output. These include particle number and  !
+!             mass concentrtions (e.g. N20 or PM25) and may be output directly !
+!             using this interface. Key metrics for organic aerosol like OA,   !
+!             OC, POA, POC, SOA, SOC, OM:OC, and O:C are available with        !
+!             optional filtering for specific particle sizes. The organic      !
+!             aerosol variables are, by design, always consistent with the     !
+!             species properties in the chemical mechanism selected for the    !
+!             model build.                                                     !
+!                                                                              !
+!             Other diagnostic variables are available like particle diameter, !
+!             density, and surface area, select chemical reaction parameters,  !
+!             and meteorological variables.                                    !
+!                                                                              !
+!             For ISAM or DDM simulations, suffixes may be added to deposition,!
+!             concentration, or COMPOSITE variables to specify source          !
+!             attribution. For example, NO2_EGU would output NO2 specific for  !
+!             EGU sources, provided a source sector is named EGU. Entering     !
+!             NO2_ISAM will output NO2 for all ISAM sources including initial  !
+!             conditions, boundary conditions, and the 'other' category. It    !
+!             will also add a variable with the suffix 'TAGS' that equals the  !
+!             sum of all ISAM tags for this species so it may be compared to   !
+!             core model result. The analagous option for DDM (NO2_DDM) does   !
+!             not include a sum of sources option.                             !
+!                                                                              !
+!------------------------------------------------------------------------------!
+&ELMO_INIT
+  N_Files = 2
+  N_Max_Output_Variables = 400
+  N_Keywords = 69
+  N_Max_Keyword_Variables = 150
+/
+
+&ELMO_Files
+
+ !
+ !-- Set Properties and Contents for each ELMO Output File
+ !
+  Flabel(1)= 'DEFAULT'
+  Tmode(1) = 'average'
+  Lay_Bot(1) = 1
+  Lay_Top(1) = 1
+  File_Vars(1,:) = 'DEFAULT' 
+
+  Flabel(2)= 'DEFAULT_DEP'
+  Tmode(2) = 'average'
+  Lay_Bot(2) = 1
+  Lay_Top(2) = 1
+  File_Vars(2,:) = 'DEFAULT_DEP'
+
+
+ !-----------------------------------------------------!
+ !----- DEFINE ELMO KEYWORDS FOR USE IN FILE_VARS -----!
+ !-----------------------------------------------------!
+
+ !------------------------------------------!
+ !----- Define Streamlined Output List -----!
+ !------------------------------------------!
+  Keywd_name(1) = 'SIMPLE'
+  Keywd(1,:) = 'PM25','PM10','O3','SO2','CO','NOX','NH3','ISOPRENE','FORMALD'
+
+
+ !--------------------------------------------------!
+ !----- Define Mechanism-Specific Default Lists ----!
+ !--------------------------------------------------!
+ ! When the string 'DEFAULT' is used to specify File_Vars for any ELMO output
+ ! file, it is appended with the chemical mechanism for the simulation and 
+ ! mapped to one of the keywords below.
+
+  Keywd_name(2) = 'DEFAULT_CB6R5_AE7_AQ'
+  Keywd(2,:) = 'AMET','PM_MASS','CHEM','MET','TSP_NUM','PMF_NUM','PMC_NUM',
+               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES_A',
+               'PM25_SPECIES_B','PM_FINE_VARS','SIZE','AMS_SPECIES','PM25TO10_SPECIES',
+               'PM25_VARS','CUTOFF_FRACTIONS','COMMON_GASES'
+
+  Keywd_name(3) = 'DEFAULT_CB6R5M_AE7_AQ'
+  Keywd(3,:) = 'AMET','PM_MASS','CHEM','MET','TSP_NUM','PMF_NUM','PMC_NUM',
+               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES_A',
+               'PM25_SPECIES_B','PM_FINE_VARS','SIZE','AMS_SPECIES','PM25TO10_SPECIES',
+               'PM25_VARS','CUTOFF_FRACTIONS','COMMON_GASES','DMS','MSA'
+
+  Keywd_name(4) = 'DEFAULT_CB6R5HAP_AE7_AQ'
+  Keywd(4,:) = 'AMET','PM_MASS','CHEM','MET','TSP_NUM','PMF_NUM','PMC_NUM',
+               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES_A',
+               'PM25_SPECIES_B','SIZE','AMS_SPECIES','PM_FINE_VARS','PM25TO10_SPECIES',
+               'PM25_VARS','CUTOFF_FRACTIONS','COMMON_GASES','DMS','MSA','GAS_TOXICS',
+               'PM_TOXICS'
+
+  Keywd_name(5) = 'DEFAULT_SAPRC07TIC_AE7I'
+  Keywd(5,:) = 'PLACEHOLDER'
+
+  Keywd_name(6) = 'DEFAULT_CRACMM2'
+  Keywd(6,:) = 'AMET','PM_MASS','CHEM','MET','TSP_NUM','PMF_NUM','PMC_NUM',
+               'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES_A',
+               'PM25_SPECIES_B','SIZE','AMS_SPECIES','PM25TO10_SPECIES',
+               'CUTOFF_FRACTIONS','PM_FINE_VARS','PM25_VARS','COMMON_GASES','ACRO','ACT',
+               'BDE13','MEK','EBZ','STY','HC3','HC5','HC10','OLI','OLT','API',
+               'ALD','NOZ','SULF','LSIROCG','TOTROCG'
+
+  Keywd_name(7) = 'DEFAULT_CRACMM3'
+  Keywd(7,:) = 'DEFAULT_CRACMM2'
+
+  Keywd_name(68) = 'DEFAULT_CRACMM3M'
+  Keywd(68,:) = 'DEFAULT_CRACMM2'
+
+ !------------------------------------!
+ !----- Meteorological Variables -----!
+ !------------------------------------!
+  Keywd_name(8) = 'MET'           
+  Keywd(8,:) = 'TA','PRES','RH','PBL','PRECIP','RGRND','WSPD10','WDIR10',
+               'DENS','CFRAC','SFC_TMP','WVEL'
+
+
+ !----------------------------------------------------!
+ !----- Routine evaluation variables for the     -----!
+ !----- Atmospheric Model Evaluation Tool (AMET) -----!
+ !----------------------------------------------------!
+  Keywd_name(9) = 'AMET'          
+  Keywd(9,:) = 'AMET_GAS','AMET_PM','MET'
+
+  Keywd_name(10) = 'AMET_GAS'
+  Keywd(10,:) = 'O3','NO2','NO','SO2','CO','NH3','HNO3','NOX','NOY',
+               'HNO3_UGM3','SO2_UGM3','NH3_UGM3','FORMALD','ACETALD','BENZENE',
+               'ACETYLENE','ETHANE','ETHENE','TOLUENE','XYLENES','NAPHTHAL'
+  
+  Keywd_name(11) = 'AMET_PM'
+  Keywd(11,:) = 'TSP','PMC','PMF','PM25','PMF_FRM','PM25_FRM',
+               'PMF_OC','PMF_EC','PMF_NA','PMF_CL','PMF_SO4','PMF_NO3',
+               'PMF_NH4','PMF_FE','PMF_AL','PMF_SI','PMF_TI','PMF_CA',
+               'PMF_MG','PMF_K','PMF_MN','PMF_RCSOIL','PMF_OTHWNC','PMF_NC',
+               'PMF_OTH','PM25_OC','PM25_EC','PM25_SO4','PM25_NO3','PM25_NH4',
+               'TSP_NO3_PPM'
+  
+
+ !------------------------------!
+ !----- Gas Concentrations -----!
+ !------------------------------!
+  Keywd_name(12) = 'COMMON_GASES'
+  Keywd(12,:) = 'AMET_GAS','H2O2','HONO','HOX','ISOPRENE','N2O5','NTR','PANS',!'TERP','VOC',
+               'OH','NHX','TERPENES','TNO3'
+
+ 
+ !---------------------------------------!
+ !----- Total Particle Mass Metrics -----!
+ !---------------------------------------!
+  Keywd_name(13) = 'PM_MASS'
+  Keywd(13,:) = 'PMF','PMC','PM1','PM01','PM25','PM10','PM25TO10','PMU','PMAMS','PMAIT','PMACC'
+
+
+ !-------------------------------!
+ !----- Particle Speciation -----!
+ !-------------------------------!
+ ! There are three ways of summing together fine particle species to get total
+ ! fine particle mass, PMF. Likewise, there are two ways to do this for PM25 
+ ! species. Therefore, keyword lists are structured to provide sets of species 
+ ! that will sum to the total particle mass. They may be selected according to
+ ! the user's preference. If all three FINE_SPECIES keywords are invoked then
+ ! the union of both lists will be output.
+
+  Keywd_name(14) = 'FINE_SPECIES_A'
+  Keywd(14,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
+                'PMF_OA','PMF_OTH','PMF_RCSOIL'
+
+  Keywd_name(15) = 'FINE_SPECIES_B'
+  Keywd(15,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
+                'PMF_OC','PMF_OTHWNC','PMF_RCSOIL'
+
+  Keywd_name(16) = 'FINE_SPECIES_C'
+  Keywd(16,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
+                'PMF_OA','AOTHR','PMF_FE','PMF_SI','PMF_CA','PMF_MG',
+                'PMF_MN','PMF_AL','PMF_K'
+
+  Keywd_name(17) = 'PM_FINE_VARS'
+  Keywd(17,:) = 'PMF_H2O','PMF_HP','PMF_HPMOLAL','PMF_PH','FINE_ORG'
+
+  Keywd_name(18) = 'COARSE_SPECIES'
+  Keywd(18,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA'!,'PMC_CL'
+
+  Keywd_name(19) = 'AMS_SPECIES'
+  Keywd(19,:) = 'PMAMS','PMAMS_SO4','PMAMS_NO3','PMAMS_NH4','PMAMS_CL','PMAMS_OA','PMAMS_OTOC'
+
+  Keywd_name(20) = 'PM1_SPECIES'
+  Keywd(20,:) = 'PM1','PM1_SO4','PM1_NO3','PM1_NH4','PM1_CL','PM1_NA','PM1_EC','PM1_OC',
+               'PM1_OA','PM1_MG','PM1_K','PM1_CA','PM1_OTHER','PM1_FE','PM1_SI','PM1_TI',
+               'PM1_MN','PM1_AL','PM1_RCSOIL','PM1_OTHWNC','PM1_UNSPCRS'
+
+  Keywd_name(21) = 'PM25_SPECIES_A'
+  Keywd(21,:) = 'PM25_SO4','PM25_NO3','PM25_NH4','PM25_CL','PM25_NA','PM25_EC',
+                'PM25_OC','PM25_OTHWNC','PM25_RCSOIL'
+
+  Keywd_name(22) = 'PM25_SPECIES_B'
+  Keywd(22,:) = 'PM25_SO4','PM25_NO3','PM25_NH4','PM25_CL','PM25_NA','PM25_EC',
+                'PM25_OA','PM25_OTHER','PM25_MG','PM25_K','PM25_CA','PM25_FE','PM25_SI',
+                'PM25_TI','PM25_MN','PM25_AL'
+
+  Keywd_name(23) = 'PM25TO10_SPECIES'
+  Keywd(23,:) = 'PM25TO10','PM25TO10_SO4','PM25TO10_NO3','PM25TO10_NH4','PM25TO10_CL',
+               'PM25TO10_NA'
+  
+  Keywd_name(24) = 'PM25_VARS'
+  Keywd(24,:) = 'PM25_HP','PM25_UNSPCRS'
+
+
+ !-----------------------------------!
+ !----- Organic Aerosol Metrics -----!
+ !-----------------------------------!
+  Keywd_name(25) = 'ORGANIC_AEROSOL'
+  Keywd(25,:) = 'FINE_ORG','PM1_OC','PM1_OA','PMAMS_OA','PMAMS_OTOC','PM25_OA'
+
+  Keywd_name(26) = 'FINE_ORG'
+  Keywd(26,:) = 'PMF_OC','PMF_OA','PMF_POC','PMF_SOC','PMF_POA','PMF_SOA','PMF_NC',
+               'PMF_OMOC','PMF_OTOC','PMF_ASOA','PMF_BSOA','PMF_CLDGLY',!'AORGCJ',
+               'PMF_ISOPSOA','PMF_IEPOXSOA','PMF_MTNSOA','PMF_MTSOA'
+ 
+
+ !-------------------------------------------------!
+ !----- Particle Size Distribution Parameters -----!
+ !-------------------------------------------------!
+  Keywd_name(27) = 'NUMBER'
+  Keywd(27,:) = 'TSP_NUM','PMF_NUM','PMC_NUM','N10','N20','N40','N100'
+
+  Keywd_name(28) = 'SURFACE_AREA'
+  Keywd(28,:) = 'PM_SRF','PMU_SRF','PMF_SRF','PMC_SRF','WET_M2'
+
+  Keywd_name(29) = 'SIZE'
+  Keywd(29,:) = 'NUMBER','DRY_DG','WET_DG','STDEV','DRY_M3','WET_M3','WET_M2','DRY_DENS','WET_DENS'
+
+  Keywd_name(30) = 'CUTOFF_FRACTIONS'
+  Keywd(30,:) = 'FPM01','FPM1','FPM25','FPM10','FPM25TO10','FAMS'
+
+
+ !--------------------------------------------------!
+ !----- Chemical Reaction Rates and Parameters -----!
+ !--------------------------------------------------!
+  Keywd_name(31) = 'CHEM'
+  Keywd(31,:) = 'GAMMA_N2O5','GAMMA_N2O5K','YIELD_CLNO2','YIELD_CLNO2K','GAMMA_IEPOX',
+               'K_IEPOX','GAMMA_IMAE'
+
+
+ !-------------------------! 
+ !----- Toxic Species -----!
+ !-------------------------!           
+ ! These are available in mechanisms with the 
+ ! 'HAP' acronym (e.g. CB6R5HAP_AE7_AQ)
+
+  Keywd_name(32) = 'GAS_TOXICS'
+  Keywd(32,:) = 'ACRY_NITRILE','CARBONTET','PROPYL_DICL',
+                'DICL_PROPENE','CL4_ETHANE','CHCL3','BR2_C2_12','CL2_C2_12','ETOX',
+                'CL2_ME','CL4_ETHE','CL3_ETHE','CL_ETHE','QUINOLINE','HEXMETH_DIS',
+                'HYDRAZINE','MAL_ANHYDRID','TOL_DIIS','TRIETHYLAMIN','DICL_BENZENE',
+                'ACET_NITRILE','STYRENE','ACRYACID','HEXANE','METHCHLORIDE','CARBSULFIDE',
+                'CHLOROPRENE','ETHYLBENZENE','BENAPY','PAH_000E0','PAH_176E5','PAH_880E5',
+                'PAH_176E4','PAH_176E3','PAH_192E3','PAH_101E2','PAH_176E2','PAH_114E1',
+                'BENAPY','CL2','ETOH','HCL','MEOH','XYLENE','TOLU',
+                'P_ACRO','P_ACRO_PRIM', 'P_ALD2_PRIM','P_FORM_PRIM','P_FORM','P_13BUTA',
+                'P_ACRYN','P_ALD2','P_BENZ','P_BR2C212','P_CHCL3','P_CLETHE','P_CL2C212',
+                'P_CL2ME','P_CL3ETHE','P_CL4ETHE','P_CL4ETHA','P_CARBTET','P_DCLBENZ',
+                'P_DCLPROP','P_ETOX','P_HXMEDIS','P_HYDRAZN','P_MALANHYD','P_NAPTH',
+                'P_PROPDICL','P_QUIN','P_TOLDIIS','P_TRIETHAMIN','P_ACETNIT','P_STYRENE',
+                'P_ACRYACID','P_HEXANE','P_METHCL','P_CRBSULF','P_CHLRPRN','P_ETHYLBENZ',
+                'P_HG0','P_HGII','P_PAH_000E0','P_PAH_176E5','P_PAH_880E5','P_PAH_176E4',
+                'P_PAH_176E3','P_PAH_192E3','P_PAH_101E2','P_PAH_176E2','P_PAH_114E1','P_BENAPY'
+ 
+  Keywd_name(33) = 'PM_TOXICS'
+  Keywd(33,:) = 'PM25_HDIESEL','PM25_HBE','PM25_HCD','PM25_HCR3','PM25_HCR6','PM25_HCR',
+                'PM25_HPB','PM25_HMN','PM25_HNI','PM25_HAS','PM25_HG','PM25_HBNPY',
+                'PM10_HDIESEL','PM10_HBE','PM10_HCD','PM10_HCR3','PM10_HCR6','PM10_HCR',
+                'PM10_HPB','PM10_HMN','PM10_HNI','PM10_HAS','PM10_HG','PM10_HBNPY',
+                'TSP_HBNPY'
+
+
+ !--------------------------------!
+ !----- Satellite Retrievals -----!
+ !--------------------------------!
+ ! Use these keywords for evaluation with satellite data
+
+  Keywd_name(34) = 'SAT'
+  Keywd(34,:) = 'SATMET','SATCONC'
+
+  Keywd_name(35) = 'SATMET'
+  Keywd(35,:) = 'DENS','DZ','ZH','CFRAC','PV','PRES','TA'
+
+  Keywd_name(36) = 'SATCONC'
+  Keywd(36,:) = 'NO2','SO2','O3','CO','FORMALD','NH3','AOD_550'
+ 
+
+ !----------------------!
+ !----- Deposition -----!
+ !----------------------!
+ ! Definitions of mechanism-specific deposition variable lists
+
+  Keywd_name(37) = 'DEFAULT_DEP_CB6R5_AE7_AQ'
+  Keywd(37,:) = 'PRECIP','GAS_DEP','PM_DEP','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
+                'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
+                'SEASPRAY_SULFUR_DEP','DD_CLNO2','WD_CLNO2','DD_CLNO3','WD_CLNO3',
+                'DD_PMC_SSSO4','DD_PMF_SSSO4','WD_SSSO4'
+
+  Keywd_name(38) = 'DEFAULT_DEP_CB6R5M_AE7_AQ'
+  Keywd(38,:) = 'DEFAULT_DEP_CB6R5_AE7_AQ'
+
+  Keywd_name(39) = 'DEFAULT_DEP_CB6R5HAP_AE7_AQ'
+  Keywd(39,:) = 'DEFAULT_DEP_CB6R5_AE7_AQ','TOXICS_DEP'
+
+  Keywd_name(40) = 'DEFAULT_DEP_CRACMM2'
+  Keywd(40,:) = 'PRECIP','GAS_DEP','PM_DEP','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
+                'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
+                'SEASPRAY_SULFUR_DEP'
+
+  Keywd_name(41) = 'DEFAULT_DEP_CRACMM3'
+  Keywd(41,:) = 'DEFAULT_DEP_CRACMM2'
+
+  Keywd_name(69) = 'DEFAULT_DEP_CRACMM3M'
+  Keywd(69,:) = 'DEFAULT_DEP_CRACMM2'
+
+ !--------------------------!
+ !----- Gas Deposition -----!
+ !--------------------------!
+  Keywd_name(42) = 'GAS_DEP'
+  Keywd(42,:) = 'DD_FORMALD','WD_FORMALD','DD_HNO4','WD_HNO4','DD_NTR','WD_NTR',
+                'DD_PANT','WD_PANT','DD_NO2','WD_NO2','DD_NO','WD_NO','DD_H2O2',
+                'WD_H2O2','DD_N2O5','WD_N2O5','DD_HONO','WD_HONO','DD_HNO3','WD_HNO3',
+                'DD_NO3','WD_NO3','DD_NH3','WD_NH3','DD_SO2','DD_O3','WD_O3'
+ 
+ 
+ !-------------------------------!
+ !----- Particle Deposition -----!
+ !-------------------------------!
+  Keywd_name(43) = 'PM_DEP'
+  Keywd(43,:) = 'FINE_DDEP','COARSE_DDEP','TSP_DDEP','PM_WDEP'
+  
+  Keywd_name(44) = 'FINE_DDEP'
+  Keywd(44,:) = 'DD_PMF_NO3','DD_PMF_NH4','DD_PMF_SO4','DD_PMF_MTNO3','DD_PMF_EC',
+                'DD_PMF_NA','DD_PMF_CL','DD_PMF_CA','DD_PMF_FE','DD_PMF_AL','DD_PMF_SI',
+                'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K',!'DD_PMF_SSSO4',
+                'DD_PMF_OC','WD_PMF_OC','DD_PMF_POC','WD_PMF_POC','DD_PMF_SOC','WD_PMF_SOC',
+                'DD_PMF_OA','WD_PMF_OA','DD_PMF_POA','WD_PMF_POA','DD_PMF_SOA','WD_PMF_SOA'!,
+                'DD_ANAJ','DD_ACLJ','DD_ACLK'
+
+  Keywd_name(45) = 'COARSE_DDEP'
+  Keywd(45,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
+                'DD_PMC_CA','DD_PMC_MG','DD_PMC_K'
+
+  Keywd_name(46) = 'TSP_DDEP'
+  Keywd(46,:) = 'DD_CL','DD_CA','DD_MG','DD_K','DD_NA'
+
+  Keywd_name(47) = 'PM_WDEP'
+  Keywd(47,:) = 'WD_TSP_NO3','WD_TSP_NH4','WD_TSP_SO4','WD_TSP_MTNO3','WD_TSP_NA',
+                'WD_PMC_NA','WD_PMF_CA','WD_PMC_CA','WD_TSP_CA','WD_PMF_FE',
+                'WD_PMF_AL','WD_PMF_SI','WD_PMF_TI','WD_PMF_MN','WD_PMF_MG','WD_PMC_MG',
+                'WD_TSP_MG','WD_PMF_K','WD_PMC_K','WD_TSP_K','WD_ANAJ'
+
+ 
+ !----------------------------!
+ !----- Total Deposition -----!
+ !----------------------------!
+  Keywd_name(48) = 'PM_TDEP'
+  Keywd(48,:) = 'TD_NA'
+
+  Keywd_name(49) = 'GASPM_DEP'
+  Keywd(49,:) = 'DD_TNO3','WD_TNO3','DD_NHX','WD_NHX','WD_SOX','WD_TCL','TD_TCL'
+
+
+ !--------------------------------!
+ !----- Elemental Deposition -----!
+ !--------------------------------!
+  Keywd_name(50) = 'OXIDIZED_NITROGEN_DEP'
+  Keywd(50,:) = 'DD_OXN_NOX', 'WD_OXN_NOX', 'DD_OXN_TNO3','WD_OXN_TNO3',
+                'DD_OXN_PANT','WD_OXN_PANT','DD_OXN_ORGN','WD_OXN_ORGN',
+                'DD_OXN_OTHR','WD_OXN_OTHR','DD_OXN_TOT', 'WD_OXN_TOT',
+                'TD_OXN_TOT'
+
+  Keywd_name(51) = 'REDUCED_NITROGEN_DEP'
+  Keywd(51,:) = 'DD_REDN_TOT','WD_REDN_TOT','TD_REDN_TOT'
+
+  Keywd_name(52) = 'TOTAL_NITROGEN_DEP'
+  Keywd(52,:) = 'DD_N_TOT','WD_N_TOT','TD_N_TOT'
+
+  Keywd_name(53) = 'TOTAL_SULFUR_DEP'
+  Keywd(53,:) = 'DD_S_TOT','WD_S_TOT','TD_S_TOT'
+
+  Keywd_name(54) = 'SEASPRAY_SULFUR_DEP'
+  Keywd(54,:) = ''!'DD_S_SEA','WD_S_SEA','TD_S_SEA'
+ 
+ 
+ !-----------------------------!
+ !----- Toxics Deposition -----!
+ !-----------------------------!
+  Keywd_name(55) = 'TOXICS_DEP'
+  Keywd(55,:) = 'TOXICS_WDEP','TOXICS_DDEP'
+
+
+  Keywd_name(56) = 'TOXICS_WDEP'
+  Keywd(56,:) = 'WD_MN_HAPS','WD_AS_HAPS','WD_CR3_HAPS','WD_CR6_HAPS','WD_CR_HAPS',
+                'WD_BE_HAPS','WD_CD_HAPS','WD_NI_HAPS','WD_PB_HAPS','WD_BENZ','WD_TOLU',
+                'WD_EBENZ','WD_DCBENZ','WD_STYR','WD_XYL','WD_TOT_HG','WD_TOT_BNPY'
+
+  Keywd_name(57) = 'TOXICS_DDEP'
+  Keywd(57,:) = 'DD_MN_HAPS','DD_AS_HAPS','DD_CR3_HAPS','DD_CR6_HAPS','DD_CR_HAPS',
+                'DD_BE_HAPS','DD_CD_HAPS','DD_NI_HAPS','DD_PB_HAPS','DD_BENZ','DD_TOLU',
+                'DD_EBENZ','DD_DCBENZ','DD_STYR','DD_XYL','DD_TOT_HG','DD_TOT_BNPY'
+ 
+
+ !--------------------------!
+ !----- ISAM Variables -----!
+ !--------------------------!
+ ! These output variables are useful for the 
+ ! Integrated Source Apportionment Method (ISAM)
+
+  Keywd_name(58) = 'ISAM_ANALYSIS'
+  Keywd(58,:) = 'ISAM_CONC_ANALYSIS','ISAM_DDEP_ANALYSIS','ISAM_WDEP_ANALYSIS','ISAM_TDEP_ANALYSIS'
+
+  Keywd_name(59) = 'ISAM_CONC_ANALYSIS'
+  Keywd(59,:) = 'CO_ISAM','NO_ISAM','NO2_ISAM','NOX_ISAM','HNO3_ISAM','N2O5_ISAM',
+                'O3_ISAM','SO2_ISAM','PMF_RCSOIL_ISAM','PMF_CL_ISAM','PMF_EC_ISAM','PMF_NA_ISAM',
+                'PMF_NO3_ISAM','PMC_NO3_ISAM','PMF_NH4_ISAM','PMC_NH4_ISAM','PMF_SO4_ISAM',
+                'PMC_SO4_ISAM','PMF_POC_ISAM','PMF_POA_ISAM','PMF_SOC_ISAM','PMF_SOA_ISAM',
+                'PMF_OC_ISAM','PMF_OA_ISAM','PMF_ASOA_ISAM','PMF_BSOA_ISAM','PMF_CLDGLY_ISAM',
+                'PMF_ISAM','PMC_ISAM','TSP_ISAM','PMF_OTHWNC_ISAM','PMF_OTH_ISAM','PMF_NC_ISAM'
+
+  Keywd_name(60) = 'ISAM_DDEP_ANALYSIS'
+  Keywd(60,:) = 'DD_NO2_ISAM','DD_NO_ISAM','DD_NH3_ISAM','DD_SO2_ISAM','DD_O3_ISAM',
+                'DD_PMF_NO3_ISAM','DD_PMC_NO3_ISAM','DD_TNO3_ISAM','DD_PMF_NH4_ISAM','DD_PMC_NH4_ISAM',
+                'DD_PMF_SO4_ISAM','DD_PMC_SO4_ISAM','DD_PMF_EC_ISAM','DD_PMF_OC_ISAM','DD_NHX_ISAM',
+                'DD_OXN_TOT_ISAM','DD_REDN_TOT_ISAM','DD_N_TOT_ISAM','DD_S_TOT_ISAM'
+
+  Keywd_name(61) = 'ISAM_WDEP_ANALYSIS'
+  Keywd(61,:) = 'WD_NO2_ISAM','WD_NO_ISAM','WD_NH3_ISAM','WD_O3_ISAM','WD_TSP_NO3_ISAM','WD_TNO3_ISAM',
+                'WD_TSP_NH4_ISAM','WD_TSP_SO4_ISAM','WD_NHX_ISAM','WD_SOX_ISAM',
+                'WD_OXN_TOT_ISAM','WD_REDN_TOT_ISAM','WD_N_TOT_ISAM','WD_S_TOT_ISAM'
+
+  Keywd_name(62) = 'ISAM_TDEP_ANALYSIS'
+  Keywd(62,:) = 'TD_OXN_TOT_ISAM','TD_REDN_TOT_ISAM','TD_N_TOT_ISAM','TD_S_TOT_ISAM'
+ 
+ 
+ !--------------------------!
+ !----- DDM Variables -----!
+ !--------------------------!
+ ! These output variables are useful for the 
+ ! Decoupled Direct Method (DDM)
+
+  Keywd_name(63) = 'DDM_ANALYSIS'
+  Keywd(63,:) = 'DDM_CONC_ANALYSIS','DDM_DDEP_ANALYSIS','DDM_WDEP_ANALYSIS','DDM_TDEP_ANALYSIS'
+
+  Keywd_name(64) = 'DDM_CONC_ANALYSIS'
+  Keywd(64,:) = 'CO_DDM','NO_DDM','NO2_DDM','NOX_DDM','HNO3_DDM','N2O5_DDM',
+                'O3_DDM','SO2_DDM','PMF_RCSOIL_DDM','PMF_CL_DDM','PMF_EC_DDM','PMF_NA_DDM',
+                'PMF_NO3_DDM','PMC_NO3_DDM','PMF_NH4_DDM','PMC_NH4_DDM','PMF_SO4_DDM',
+                'PMC_SO4_DDM','PMF_POC_DDM','PMF_POA_DDM','PMF_SOC_DDM','PMF_SOA_DDM',
+                'PMF_OC_DDM','PMF_OA_DDM','PMF_ASOA_DDM','PMF_BSOA_DDM','PMF_CLDGLY_DDM',
+                'PMF_DDM','PMC_DDM','TSP_DDM','PMF_OTHWNC_DDM','PMF_OTH_DDM','PMF_NC_DDM'
+
+  Keywd_name(65) = 'DDM_DDEP_ANALYSIS'
+  Keywd(65,:) = 'DD_NO2_DDM','DD_NO_DDM','DD_NH3_DDM','DD_SO2_DDM','DD_O3_DDM',
+                'DD_PMF_NO3_DDM','DD_PMC_NO3_DDM','DD_TNO3_DDM','DD_PMF_NH4_DDM','DD_PMC_NH4_DDM',
+                'DD_PMF_SO4_DDM','DD_PMC_SO4_DDM','DD_PMF_EC_DDM','DD_PMF_OC_DDM','DD_NHX_DDM',
+                'DD_OXN_TOT_DDM','DD_REDN_TOT_DDM','DD_N_TOT_DDM','DD_S_TOT_DDM'
+
+  Keywd_name(66) = 'DDM_WDEP_ANALYSIS'
+  Keywd(66,:) = 'WD_NO2_DDM','WD_NO_DDM','WD_NH3_DDM','WD_O3_DDM','WD_TSP_NO3_DDM','WD_TNO3_DDM',
+                'WD_TSP_NH4_DDM','WD_TSP_SO4_DDM','WD_NHX_DDM','WD_SOX_DDM',
+                'WD_OXN_TOT_DDM','WD_REDN_TOT_DDM','WD_N_TOT_DDM','WD_S_TOT_DDM'
+
+  Keywd_name(67) = 'DDM_TDEP_ANALYSIS'
+  Keywd(67,:) = 'TD_OXN_TOT_DDM','TD_REDN_TOT_DDM','TD_N_TOT_DDM','TD_S_TOT_DDM'
+ 
+/
+
+
+!------------------------------------------------------------------------------!
+! Detailed Emissions Scaling, Isolation, and Diagnostics (DESID) Module        !
+!                                                                              !
+! See CMAQ User's Guide Appendix B and                                         !
+!     Murphy et al., Geoscientific Model Development, 14, 3407-3420,           !
+!     https://doi.org/10.5194/gmd-14-3407-2021, 2021.                          !
+!------------------------------------------------------------------------------!
+!                                                                              !
+! Emissions Diagnostic Output Component                                        !
+!    This section allows users to specify individual species for output on     !
+!    emissions diagnostic output files.                                        !
+!  Definition of Fields:                                                       !
+!   Desid_Diag_Streams_Nml(1:Desid_N_Diag_Rules,:) - The stream names that are !
+!        to be exported. In addition to the labels of individual streams, you  !
+!        may also use stream family names here to identify more than one stream!
+!        at a time. By default, each stream family element will instruct CMAQ  !
+!        to sum all of the streams in that group. The keyword 'ALL' is         !
+!        available by default to expand a list of all streams individually. The!
+!        keyword 'TOTAL' is availble to select the sum of all streams. You may !
+!        use a '*' at the beginning of a family name to instruct CMAQ to expand!
+!        that keyword and export files for all of the streams in that group.   !
+!   Desid_Diag_Fmt_Nml(1:Desid_N_Diag_Rules) - the format of every stream      !
+!        created as a result of the instruction. Options are:                  !
+!              - COLSUM = the column-sum                                       !
+!              - 3D = 3D output                                                !
+!              - LAYER1 = Just the surface layer                               !
+!              - OFF = Turn Off File                                           !
+!   Desid_Diag_Spec_Nml(1:Desid_N_Diag_Rules,:) - The species to be added to   !
+!        each diagnostic file. Species will only appear on a diagnostic file if!
+!        the relevant stream or group of streams for the file have that species!
+!        present. The keyword 'ALL' may also be used to easily add all species !
+!        of any stream.                                                        !
+!------------------------------------------------------------------------------!
+&Desid_DiagVars
+  Desid_N_Diag_Rules = 0    ! Exact Number of Diagnostic Rules Below
+  Desid_Max_Diag_Streams=20 ! Maximum number of species variables on all rules 
+                            ! below (do not count expansions)
+  Desid_Max_Diag_Spec = 80  ! Maximum number of species variables on all rules 
+                            ! below (do not count expansions)
+/
+
+&Desid_Diag
+  
+ ! Example 1: Print all streams individually to many diagnostic files of 2D 
+ ! column sums. NO, NO2, total NOX (defined in the chemical family interface
+ ! in CMAQ_Control_Misc.nml), bulk ASO4 (all modes), and CO will all be on the 
+ ! file.
+
+   ! Desid_Diag_Streams_Nml(1,:)= 'ALL'
+   ! Desid_Diag_Fmt_Nml(1)      = 'COLSUM'    ! Options: LAYER1, COLSUM, 3D
+   ! Desid_Diag_Spec_Nml(1,:)   = 'NO','NO2','NOX','ASO4','CO'
+ 
+
+ ! Example 2: Activate the sum of all streams using the keyword TOTAL. This file 
+ ! will be 3D and will include six variables: 'AEC' = AECI + AECJ + AECK; 
+ ! 'AECI'; 'NO2'; 'ACLK'; 'AMG' and 'TERP' if those variables are avilable on 
+ ! the stream.
+
+   ! Desid_Diag_Streams_Nml(2,:)= 'TOTAL'
+   ! Desid_Diag_Fmt_Nml(2)      = '3D'    
+   ! Desid_Diag_Spec_Nml(2,:)   = 'AEC','AECI','NO2','ACLK','AMG','TERP'
+
+  
+ ! Example 3: Create a diagnostic of the sum of the components of the PT_SOURCES 
+ ! family (defined in the stream family section). This file will be column sums 
+ ! and will include all the emitted species as long as they appear on at least 
+ ! one of the streams within PT_SOURCES.
+
+   ! Desid_Diag_Streams_Nml(3,:)= 'PT_SOURCES'
+   ! Desid_Diag_Fmt_Nml(3)      = 'COLSUM'   
+   ! Desid_Diag_Spec_Nml(3,:)   = 'ALL'
+/
+ 
+
+!------------------------------------------------------------------------------!
+! Region-Based Scaling Specification Component (See User's Guide section B.3)  !
+!   It is possible in CMAQ to scale emissions for a subset of the model domain !
+!   using gridded masks to indicate where the scaling should occur.            !
+!                                                                              !
+!   Definition of Fields:                                                      !
+!      'Region  - Label for the region that is being specified. By default, the!
+!        Label'   first region, is the whole domain, or "EVERYWHERE". It is    !
+!      'File  - With this label, the user identifies the file that the data for!
+!       Label'  this region is stored on. The CMAQ runscript should provide the!
+!               path to this file (or files) using the environment variable    !
+!               construct.                                                     !   
+!      'Variable  - This label identifies the variable on the region file that !
+!        on File'   should be used to populate this particular region.         !
+!                                                                              !
+!      Note that the 'Region Label' and 'Variable on File' fields are case     !
+!      insensitive. It is required that region variable names on the file be   !
+!      capitalized. This requirement willl be relaxed in future CMAQ versions. !
+!------------------------------------------------------------------------------!
+&Desid_RegionDefVars
+ Desid_Max_Reg    = 60           ! Maximum number of region definition rules
+ Desid_N_Reg_Fams = 0            ! Exact number of region family definitions
+ Desid_Max_Reg_Fam_Members = 100 ! Larger than the number of regions on all
+                                 ! family definitions
+/
+
+&Desid_RegionDef
+ Desid_Reg_nml  =   
+ !            Region Label   | File_Label  | Variable on File
+               'EVERYWHERE'  ,'N/A'        ,'N/A',
+ !<Example>    'WATER'       ,'CMAQ_MASKS' ,'OPEN',
+ !<Example>    'ALL'         ,'CMAQ_MASKS' ,'ALL',
+ !             'ALL'         ,'ISAM_REGIONS','ALL',
+/
+
+&Desid_RegionFam
+ ! Region Family Definitions
+   ! RegionFamilyName(1)     = 'Water'
+   ! RegionFamilyMembers(1,:)= 'SURF','OPEN'
+
+/
+
+!------------------------------------------------------------------------------!
+! Emissions Scaling Family Definitions                                         !
+!    This component includes definitions for families of emission streams and  !
+!    region combinations.                                                      ! 
+!------------------------------------------------------------------------------!
+&Desid_StreamFamVars
+ Desid_N_Stream_Fams = 0           ! Exact number of stream family definitions
+ Desid_Max_Stream_Fam_Members = 20 ! Larger than the number of streams on all 
+                                   ! family definitions
+/
+
+&Desid_StreamFam
+! For emission streams available in several run scripts under CCTM/scripts
+! Set Desid_N_Stream_Fams to 1 !!!!!!!
+ ! StreamFamilyName(1)     = 'PT_SOURCES'
+ ! StreamFamilyMembers(1,1:3)= 'PT_NONEGU','PT_EGU','PT_OTHER'
+
+! For emission streams unique in CCTM/src/run_cctm_cracmm_4LISTOS1.csh script
+! Set Desid_N_Stream_Fams to 3 !!!!!!!
+ ! Sources that do not have a source-specific POA treatment
+ !StreamFamilyName(1)     = 'GENERAL_POA'
+ !StreamFamilyMembers(1,1:5)= 'GRIDDED_OTHER','GRIDDED_SOLVENTS','PT_CANADA_SOLVENTS','PT_OTHER','PT_US_SOLVENTS'
+ ! Diesel-Like Sources
+ !StreamFamilyName(2)     = 'DIESEL' 
+ !StreamFamilyMembers(2,1:2)= 'GRIDDED_DIESEL','PT_CMV'
+ ! US and Canada Aircraft
+ !StreamFamilyName(3)     = 'AIRCRAFT'
+ !StreamFamilyMembers(3,1:2)= 'GRIDDED_US_AIRCRAFT','PT_CANADA_AIRPORTS'
+
+/
+ 
+!------------------------------------------------------------------------------!
+! Other options for the                                                        !
+! Detailed Emissions Scaling, Isolation, and Diagnostics (DESID) Module        !
+!    Miscellaneous options in this section include the maximum number of layers!
+!    considered for emission input in the model.                               !
+!------------------------------------------------------------------------------!
+
+&Desid_Options
+ Desid_MaxLays = 0  ! Add all emissions above Desid_MaxLays to the grid cell at 
+                    ! Desid_MaxLays. If Desid_MaxLays = 0, then all model layers are 
+                    ! available for emissions.
+/
+
+!------------------------------------------------------------------------------!
+! Size Distribution Specification Component                                    !
+!   Each size distribution rule either modifies the parameters associated with !
+!   the aerosol modes of a particular stream, or adds new modes to a particular!
+!   stream if they do not already exist.                                       !
+!                                                                              !
+!   Definition of Fields:                                                      !
+!      'Stream - Label for the emissions stream that the instruction will      !
+!        Label'   apply to. If the label is 'ALL', then the instruction will   !
+!                 be expanded to apply to all streams.                         !
+!      'Emission Mode' - With this label, the user identifies which mode from  !
+!                        the emissions is to be modified or created. With this !
+!                        specificity, multiple streams can be defined and      !
+!                        mapped in the emissions rules.                        !
+!      'Reference Mode' - This label maps the emissions species aerosol mode   !
+!                         to specific parameters catalogued in the AERO_DATA   !
+!                         module.                                              !
+!------------------------------------------------------------------------------!
+&Desid_SizeDistVars
+ Desid_Max_Sd = 10  ! Maximum number of size distribution rules
+/
+
+&Desid_SizeDist
+ Desid_Sd_nml    = 
+
+ !           Stream Label   | Emiss. Mode  | Ref. Mode 
+             'ALL'          ,'FINE'        ,'FINE_REF',
+             'ALL'          ,'COARSE'      ,'COARSE_REF',
+             'WBDUST'       ,'FINE'        ,'FINE_WBDUST',
+             'WBDUST'       ,'COARSE'      ,'COARSE_WBDUST',
+             'SEASPRAY'     ,'FINE'        ,'FINE_SEASPRAY',
+             'SEASPRAY'     ,'COARSE'      ,'COARSE_SEASPRAY',
+ !<Example>  'AIRCRAFT'     ,'FINE'        ,'AIR_FINE',   !To use these examples, you 
+ !<Example>  'AIRCRAFT'     ,'COARSE'      ,'AIR_COARSE', ! must add entries for AIR_FINE
+                                                          ! and AIR_COARSE to the data structure
+                                                          ! em_aero_ref in AERO_DATA.
+
+/
+                                        
+!------------------------------------------------------------------------------!
+! Area Normalization Component                                                 !
+!   Specify area-normalized emission fluxes from input streams. If emission    !
+!   inputs are provided to CMAQ in area-normalized fluxes for any stream, this !
+!   component may be used to convert them correctly to emission rates          !
+!   appropriate for the model simulation grid projection. For example, if      !
+!   offline biogenic emissions are provided in units of moles/m2/s, then that  !
+!   stream may be identified here and DESID can be instructed to adjust each   !
+!   flux to moles/s and adjust the rates using the map scale factor that       !
+!   converts emissions in real geographic space into projected grid space.     !
+!                                                                              !
+!   Definition of Fields:                                                      !
+!      'Stream - Declare a stream. If the label is 'ALL', then the instruction !
+!        Label'  will be expanded to all OFFLINE streams.                      !
+!                                                                              !
+!      'Area Normalization' - If TRUE, then this stream's emissions will be    !
+!                multiplied by grid cell area. If AUTO, then DESID will deduce !
+!                from the units string whether or not each variable on the     !
+!                stream input file should be multiplied by the area scale      !
+!                factor.                                                       !
+!                                                                              !
+!      'Projection Adjustment' - If TRUE, then this stream's emissions will be !
+!                multiplied by the area Map Scale Factor. If AUTO, then DESID  !
+!                will inherit the per-stream value from Area Normalization. If !
+!                Area Normalization is TRUE, the Projection Adjustment is True !
+!------------------------------------------------------------------------------!
+&Desid_AreaNormVars
+ Desid_Max_Area = 30  ! Maximum number of Area Normalization rules
+/
+
+&Desid_AreaNorm
+ Desid_Area_Nml  =
+ !         | Stream Label   | Area Normalization | Projection Adjustment 
+                'ALL'       ,'AUTO'              ,'AUTO',
+ !<Example>     'GRIDDED'   ,'TRUE'              ,'TRUE',
+ !<Example>     'FIRES'     ,'TRUE'              ,'FALSE',
+ !<Example>     'VCP'       ,'FALSE'             ,'TRUE',
+/            
+
+!------------------------------------------------------------------------------!
+! Budget Tool Variable and Family Definitions                                  !
+!    This section includes selections for species and families of CMAQ         !
+!    that may be grouped together when calculating budget values for the       !
+!    budget output file. Users may select any CMAQ chemical species, chemical  !
+!    family defined in the ChemicalFamilies section of this namelist or may    !
+!    use the ALL keyword to select all species.                                !
+!    If a Family name or the TOTAL keyword are provided, the sum of those      !
+!    species will be output on the budget file. If a * proceeds the name (e.g. !
+!    '*NOX') then the Family name will be expanded and all of the species it   !
+!    comprises will be added separately. The default selection is for all      !
+!    chemical species to be output individually.                               !
+!------------------------------------------------------------------------------!
+
+&Budget_Options
+  Budget_Diag = .FALSE.
+  BudgetVariables  = 'ALL'
+/
