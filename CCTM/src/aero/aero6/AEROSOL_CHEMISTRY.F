@@ -1193,7 +1193,11 @@ C *** set up variables needed for calculating K_BRONO2
                INO3_WA_RXN_TIME     = 4.0D0 * INV_GAMMA_INO3_WA / CBAR_INO3
                
 C...  calculate cosine of zenith angle for the cell and determine day or night; Golam Sarwar
+C ... Only do aerosol nitrate photolysis for CRACMM3 and CRACMM3M
                  
+              IF (( Index( mechname, 'CRACMM3 ' ) .Gt. 0 ) .OR. 
+     &              Index( mechname, 'CRACMM3M' ) .Gt. 0 ) THEN
+		         
                  COSZ = MET_DATA%COSZEN( C, R )
                  
                  IF ( COSZ .LE. 0.0 ) THEN
@@ -1215,12 +1219,17 @@ C...  calculate cosine of zenith angle for the cell and determine day or night; 
                 FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
 
                 IF ( L_ELMO ) THEN 
-		           IF (.NOT. DARK) THEN	 
+		     IF (.NOT. DARK) THEN	 
                      EF_HNO3( C,R,L ) = FAC_HNO3
                    ELSE 
                      EF_HNO3( C,R,L ) = 0.0 
                    ENDIF
                 ENDIF
+		
+	        ELSE
+                 JHNO3    = 0.0D0
+                 FAC_HNO3 = 0.0D0
+		ENDIF
 
 ! Done FAC_HNO3       
 

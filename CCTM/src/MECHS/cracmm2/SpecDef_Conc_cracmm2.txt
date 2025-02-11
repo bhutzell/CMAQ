@@ -178,6 +178,7 @@ AFEK            ,ug m-3    ,                  0.02695*ASOIL[1]+0.0467*ACORS[1]
 AMNK            ,ug m-3    ,                  0.00075*ASOIL[1]+0.0011*ACORS[1]
 
 ACLIJ           ,ug m-3    ,ACLI[1]+ACLJ[1]
+ACLK            ,ug m-3    ,ACLK[1]
 AECIJ           ,ug m-3    ,AECI[1]+AECJ[1]
 ANAIJ           ,ug m-3    ,ANAJ[1]+ANAI[1]
 ANO3IJ          ,ug m-3    ,ANO3I[1]+ANO3J[1]
