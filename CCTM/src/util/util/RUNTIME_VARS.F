@@ -61,8 +61,6 @@
 !     -- Added 'CB6R5M' and deleted "CB6R3M"
 !  4 Mar 2022 (G. Sarwar)
 !     -- Added 'CB6R5'
-! 9 Aug 24 (G. Sarwar)
-!     -- Added halogen chemistry in CRACMM3M
 !....................................................................
 
       MODULE RUNTIME_VARS
@@ -144,7 +142,7 @@
                                            ! science submodules
       LOGICAL :: FL_ERR_STOP=.TRUE.        ! Flag to stop run if errors are found.
       LOGICAL :: CKSUM     = .TRUE.        ! flag for cksum on, default = [T]
-      LOGICAL :: END_TIME  = .FALSE.       ! Override default beginning ACON timestamp
+      LOGICAL :: END_TIME  = .FALSE.       ! Override default beginning ACONC timestamp
       LOGICAL :: CTM_MIO_FILE = .FALSE.    ! Flag to write out ascii file that informs MIO 
                                            !   about output file metadata
       
@@ -219,9 +217,8 @@
 
       ! Emissions Processes
       CHARACTER( MAXLEN_CCTM_APPL ) :: STAGECTRL  = 'STAGECTRL_NML' ! STAGE Deposition Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: MISC_CTRL  = 'MISC_CTRL_NML' ! Emission Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: DESID_CTRL  = 'DESID_CTRL_NML' ! Emission Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: DESID_CHEM_CTRL  = 'DESID_CHEM_CTRL_NML' ! Emission Control Filename
+      CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CTRL  = 'CMAQ_CTRL_NML' ! Emission Control Filename
+      CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CHEM_CTRL  = 'CMAQ_CH_CTRL_NML' ! Emission Control Filename
       INTEGER :: EMLAYS_MX     = 0       ! Emission Layers
       INTEGER :: N_FILE_GR     = 0       ! Number of Gridded Emission Files
       INTEGER :: N_FILE_TR     = 0       ! NUmber of Tracer Emission Files
@@ -261,6 +258,10 @@
       CHARACTER(  16 ), SAVE, ALLOCATABLE :: PLAY_BASE( : ) ! Use for Plume Rise Calculation
 
       LOGICAL :: USE_MARINE_GAS_EMISSION = .FALSE.
+
+      LOGICAL :: USE_MET_EMIS            = .FALSE. ! flag for met-modulated emissions
+      LOGICAL :: METEMDIAG               = .FALSE. ! flag for MET_EM diagnostic file
+      LOGICAL :: HUM_NOX_YN              = .FALSE. ! flag for MET_EM NOx correction
 
       ! Process Analysis
       LOGICAL :: PROCAN    = .FALSE. ! flag for process analysis
@@ -368,7 +369,7 @@
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_HEADING( OUTDEV, "Environment Variable Report" )
          CALL LOG_SUBHEADING( OUTDEV, "Grid and High-Level Model Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -439,7 +440,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Multiprocess control, output and error checking" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -533,7 +534,7 @@
       !-------------------------------------------------------------------------------------------------------
       IF ( MYPE .EQ. 0 ) THEN
          CALL LOG_SUBHEADING( OUTDEV, "ISAM setting and output options" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -614,7 +615,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Chemistry and Photolysis" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -672,7 +673,7 @@
       
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Aerosols" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -700,7 +701,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Cloud Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -713,7 +714,7 @@
  
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Air-Surface Exchange Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -767,7 +768,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Transport Processes" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -802,7 +803,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Emissions Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -810,9 +811,8 @@
       CALL GET_ENV ( EMLAYS_MX, 'CTM_EMLAYS', EMLAYS_MX, VARDEV )
 
       ! Get Name of Emission Control File
-      CALL GET_ENV ( MISC_CTRL, 'MISC_CTRL_NML', MISC_CTRL, VARDEV )
-      CALL GET_ENV ( DESID_CTRL, 'DESID_CTRL_NML', DESID_CTRL, VARDEV )
-      CALL GET_ENV ( DESID_CHEM_CTRL,'DESID_CHEM_CTRL_NML', DESID_CHEM_CTRL, VARDEV )
+      CALL GET_ENV ( CMAQ_CTRL, 'CMAQ_CTRL_NML', CMAQ_CTRL, VARDEV )
+      CALL GET_ENV ( CMAQ_CHEM_CTRL,'CMAQ_CH_CTRL_NML', CMAQ_CHEM_CTRL, VARDEV )
 
       ! Get number of different Gridded File Emissions Streams
       CALL GET_ENV ( N_FILE_GR, 'N_EMIS_GR', N_FILE_GR, VARDEV )
@@ -854,6 +854,15 @@
       ! Get sea spray emission diagnostic output file flag.
       CALL GET_ENV ( SSEMDIAG, 'CTM_SSEMDIAG', SSEMDIAG, VARDEV )
  
+     ! Set CTM_MET_EMIS to Y or T ro turn on met-modulated emissions
+       CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
+ 
+     ! Get met-modulated emission diagnostic output file flag.
+      CALL GET_ENV ( METEMDIAG, 'CTM_MET_EMIS_DIAG', METEMDIAG, VARDEV )
+
+     ! Get met-modulated emission diagnostic output file flag.
+      CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
+  
       ! Set LTNG_NO to Y or T to turn on lightning NO production
       CALL GET_ENV ( LTNG_NO, 'CTM_LTNG_NO', LTNG_NO, VARDEV ) 
 
@@ -916,7 +925,7 @@
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Process Analysis Parameters" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
+         WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
@@ -924,39 +933,41 @@
       CALL GET_ENV ( PROCAN, 'CTM_PROCAN', PROCAN, VARDEV )
        
       ! Get the Beginning and Ending Columns for Process Analysis
-      CALL GET_ENVLIST ( 'PA_BCOL_ECOL', NV, V_LIST2, VARDEV )
-      IF ( NV .LE. 0 ) THEN   
-         PA_BEGCOL = 1; PA_ENDCOL = 0
-      ELSE IF ( NV .EQ. 2 ) THEN
-         READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGCOL
-         READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDCOL
-      ELSE 
-         XMSG = 'Environment variable error for PA_BCOL_ECOL'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
-      END IF
-
-      ! Get the Beginning and Ending Rows for Process Analysis
-      CALL GET_ENVLIST ( 'PA_BROW_EROW', NV, V_LIST2, VARDEV )
-      IF ( NV .LE. 0 ) THEN   
-         PA_BEGROW = 1; PA_ENDROW = 0
-      ELSE IF ( NV .EQ. 2 ) THEN
-         READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGROW
-         READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDROW
-      ELSE 
-         XMSG = 'Environment variable error for PA_BROW_EROW'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
-      END IF
-
-      ! Get the Beginning and Ending Layers for Process Analysis
-      CALL GET_ENVLIST ( 'PA_BLEV_ELEV', NV, V_LIST2, VARDEV )
-      IF ( NV .LE. 0 ) THEN  
-         PA_BEGLEV = 1; PA_ENDLEV = 0
-      ELSE IF ( NV .EQ. 2 ) THEN
-         READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGLEV
-         READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDLEV
-      ELSE 
-         XMSG = 'Environment variable error for PA_BLEV_ELEV'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+      IF ( PROCAN ) THEN
+         CALL GET_ENVLIST ( 'PA_BCOL_ECOL', NV, V_LIST2, VARDEV )
+         IF ( NV .LE. 0 ) THEN   
+            PA_BEGCOL = 1; PA_ENDCOL = 0
+         ELSE IF ( NV .EQ. 2 ) THEN
+            READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGCOL
+            READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDCOL
+         ELSE 
+            XMSG = 'Environment variable error for PA_BCOL_ECOL'
+            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         END IF
+     
+         ! Get the Beginning and Ending Rows for Process Analysis
+         CALL GET_ENVLIST ( 'PA_BROW_EROW', NV, V_LIST2, VARDEV )
+         IF ( NV .LE. 0 ) THEN   
+            PA_BEGROW = 1; PA_ENDROW = 0
+         ELSE IF ( NV .EQ. 2 ) THEN
+            READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGROW
+            READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDROW
+         ELSE 
+            XMSG = 'Environment variable error for PA_BROW_EROW'
+            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         END IF
+     
+         ! Get the Beginning and Ending Layers for Process Analysis
+         CALL GET_ENVLIST ( 'PA_BLEV_ELEV', NV, V_LIST2, VARDEV )
+         IF ( NV .LE. 0 ) THEN  
+            PA_BEGLEV = 1; PA_ENDLEV = 0
+         ELSE IF ( NV .EQ. 2 ) THEN
+            READ( V_LIST2( 1 ), '( I4 )' ) PA_BEGLEV
+            READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDLEV
+         ELSE 
+            XMSG = 'Environment variable error for PA_BLEV_ELEV'
+            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         END IF
       END IF
 
       ! Get the Budget File Name
@@ -965,8 +976,8 @@
 
       IF ( OCEAN_CHEM ) THEN
        IF ( (INDEX( MECHNAME, 'CB6R5M_AE7_AQ') .GT. 0 ) .OR. 
-     &      (INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0 ) .OR. 
-     &      (INDEX( MECHNAME, 'CRACMM3M'     ) .GT. 0 )) THEN     
+     &      (INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0 )  .OR.    
+     &      (INDEX( MECHNAME, 'CRACMM3M'     ) .GT. 0 ) ) then  
        USE_MARINE_GAS_EMISSION = .TRUE.
        ENDIF
       ENDIF
@@ -980,7 +991,10 @@
 #ifdef twoway
       WRF_V4P = .TRUE.
 #else
-! to obtain WRF version information
+      
+      ! to obtain WRF version information
+      CALL LOG_HEADING( LOGDEV, 'Determine WRF Input Version' )
+
       IF ( .NOT. OPEN3( MET_CRO_3D, FSREAD3, PNAME ) ) THEN
          XMSG = 'Could not open '// MET_CRO_3D // ' file'
          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
@@ -1064,6 +1078,7 @@
       CALL UPCASE( CHEAD )
 
       ! Write the heading to the log file
+      WRITE( FUNIT, * )
       WRITE( FUNIT, * )
       WRITE( FMT, '("(", I0, "x,A,A,A)")' ) LOG_MAJOR_TAB
       WRITE( FMT2,'("(", I0, "x,A,)")' ) LOG_MAJOR_TAB

@@ -25,7 +25,7 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
  
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE OPDDEP ( JDATE, JTIME, TSTEP, N_SPC_DDEP )
+      SUBROUTINE OPDDEP ( JDATE, JTIME, TSTEP )
 
 C   30 Mar 01 J.Young: dyn alloc - Use HGRD_DEFN
 C   03 Sep 01 David Wong: for new pario
@@ -57,7 +57,6 @@ C Arguments:
       INTEGER, INTENT( IN ) :: JDATE  ! current model date, coded YYYYDDD
       INTEGER, INTENT( IN ) :: JTIME  ! current model time, coded HHMMSS
       INTEGER, INTENT( IN ) :: TSTEP  ! output time step
-      INTEGER, INTENT( IN ) :: N_SPC_DDEP ! no. of dry dep species
 
 C Local variables:
 
@@ -159,19 +158,19 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = TR_DDEP( N )
-            UNITS3D( V ) = 'ha-1'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
          IF ( ABFLUX ) THEN
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = 'NH3_Flux'
-            UNITS3D( V ) = 'kg/hectare'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly bidi flux values'
   
             VTYPE3D( V+1 ) = M3REAL
             VNAME3D( V+1 ) = 'NH3_Emis'
-            UNITS3D( V+1 ) = 'kg/hectare'
+            UNITS3D( V+1 ) = 'kg ha-1'
             VDESC3D( V+1 ) = 'hourly NH3_Emis values'
          END IF
 

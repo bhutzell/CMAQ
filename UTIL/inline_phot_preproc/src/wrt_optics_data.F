@@ -397,7 +397,7 @@
           WRITE(ODATA_UNIT,'(A7,7X,A16,2X,40(A5,I3,A1,5X))')'!      ',
      &    'LANDUSE CATEGORY',('WBIN(',J,')', J = 1, N_INLINE_BAND)
           DO I = 1, NUMB_LANDUSE_MODIS
-             WRITE(ODATA_UNIT,'(A30,1X,40(1PE12.6,2X))')
+             WRITE(ODATA_UNIT,'(A30,1X,40(1PE13.6,2X))')
      &       TRIM(LANDUSE(I)),(MODIS_ALBEDO( NJO_NEW - N_INLINE_BAND + J, I), J = 1, N_INLINE_BAND)
           ENDDO
 
