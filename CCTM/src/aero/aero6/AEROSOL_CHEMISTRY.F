@@ -1085,15 +1085,15 @@ C...  calculate cosine of zenith angle for the cell and determine day or night; 
                 FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
 
                 IF ( L_ELMO ) THEN 
-		           IF (.NOT. DARK) THEN	 
+                   IF (.NOT. DARK) THEN
                      EF_HNO3( C,R,L ) = FAC_HNO3
                    ELSE 
                      EF_HNO3( C,R,L ) = 0.0 
                    ENDIF
                 ENDIF
                Else
-                JHNO3    = 1.0D0
-                FAC_HNO3 = 1.0D0
+                JHNO3    = 0.0D0
+                FAC_HNO3 = 0.0D0
                End If
 
 ! Done FAC_HNO3       
