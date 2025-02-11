@@ -257,6 +257,11 @@ C SOURCE maps STKEMIS read from stk emis file to local STKEM in GET_PT3D_EMIS.
             
             WRITE( XMSG, '(A,I3,A,I7)'), 
      &             'Number of Point Sources from ',N,' equals ', MY_NSRC(N)
+            IF ( N .EQ. 1 ) THEN
+                CALL LOG_MESSAGE( LOGDEV, '')
+                CALL LOG_SUBHEADING( LOGDEV, 
+     &              'Checking the number of sources on each point source file.')
+            END IF
             CALL LOG_MESSAGE( LOGDEV, XMSG )
 
          END DO   ! NGRPS

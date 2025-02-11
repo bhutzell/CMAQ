@@ -31,7 +31,7 @@ C  KEY SUBROUTINES/FUNCTIONS CALLED:  HRRATES, HRG1, HRG2, HRG3
 C                                     HRG4, HRPRODLOSS
 C                                     DEGRADE
 C
-C  REVISION HISTORY: Created by EBI solver program, Nov 19, 2024
+C  REVISION HISTORY: Created by EBI solver program, Jan 31, 2025
 C   21 Jun 10 J.Young: convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised 1) to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files and 2) to use
@@ -45,6 +45,7 @@ C**********************************************************************
       USE PA_IRR_MODULE
 #ifdef isam
       USE SA_IRR_DEFN
+      USE ELMO_DATA, ONLY : ELMO_VOC_NOX
 #endif
 #ifdef sens
       USE DDM3D_CHEM, ONLY: YCDDM
@@ -358,6 +359,7 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
                  IF( NEBI .EQ. N_EBI_STEPS )UPDATE_SOLD = .TRUE.
                  CALL SA_IRR_UNBLOCKED ( .FALSE., RKI, YC, DTC )
                  UPDATE_PROBABILITIES = .FALSE.
+                 ELMO_VOC_NOX( C,R,L )  = VOC_TO_NOX
 #endif
 
 #ifdef sens

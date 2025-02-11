@@ -8,9 +8,7 @@
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
 ! Source file: /home/bhutzell/CCTM_git_repository/UTIL/chemmech/scripts/../input/cracmm2/mech_cracmm2.def
 ! for Mechanism Name: CRACMM2                         
-
 ! This file is used to create mechanism data and functions
-
 ! The following are reserved symbols declared in this file:
 !    MECHNAME        = Mechanism name
 !    N_GAS_CHEM_SPC  = Total number of gas species in chemical mechanism
