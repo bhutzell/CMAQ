@@ -2922,7 +2922,7 @@ C-----------------------------------------------------------------------
          ! Online Biogenic Emissions from MEGAN
          IF ( BIOGEMIS_MEGAN ) DESID_N_SRM = DESID_N_SRM + 1
   
-         ! Marine gas emissions; use online marine gas option only if CB6R5M is used
+         ! Marine gas emissions; use online marine gas option only if CB6R5M or CRACMM3M is used
          IF ( USE_MARINE_GAS_EMISSION ) DESID_N_SRM = DESID_N_SRM + 1
   
          ! Lightning NO Emissions

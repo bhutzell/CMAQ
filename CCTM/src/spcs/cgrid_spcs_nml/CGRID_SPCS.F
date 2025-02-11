@@ -30,7 +30,7 @@ C 07 Jul 14 B.Hutzell: replaced mechanism include file(s) with fortran module
 C 21 Apr 16 D.Luecken:  increased spc_dim to 1000
 C 07 Mar 2019 F. Sidi:  Split up ICBC for CMAQ species  namelist 
 C 10 June 2021 G. Sarwar: Replacd CB6R3M_AE7_AQ with CB6R5M_AE7_AQ
-C 15 Nov 2024 G. Sarwar: Added cracmm3m
+C 2 Feb 2025: G. Sarwar: Added CRACMM3M
 c-----------------------------------------------------------------------
       USE RUNTIME_VARS
       Use rxns_data, only: mechname       ! chemical mechanism data
@@ -451,9 +451,9 @@ c-------------------------------------------------------------------------------
                If ( ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CRACMM2'         ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CRACMM3'         ) .Gt. 0 ) .OR.
+     &              ( Index( mechname, 'CRACMM3M'        ) .Gt. 0 ) .OR.
      &              ( Index( mechname, 'CB6R5_AE7'       ) .Gt. 0 ) .OR.
-     &              ( Index( mechname, 'CB6R5M_AE7'      ) .Gt. 0 ) .OR. 
-     &              ( Index( mechname, 'CRACMM3M'        ) .Gt. 0 ) ) Then
+     &              ( Index( mechname, 'CB6R5M_AE7'      ) .Gt. 0 ) ) Then
                      
                   ORGANOSULF = .TRUE.
 
