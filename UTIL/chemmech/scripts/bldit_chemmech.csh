@@ -76,7 +76,7 @@
        echo "   *** build directory exists, set CLEAR to TRUE to remove it***"
        exit(1)
     endif
-    echo "   *** build directory exist, deleting it***"
+    echo "   *** build directory exists, deleting it***"
     \rm -rf $Bld
  endif
  mkdir -pv $Bld

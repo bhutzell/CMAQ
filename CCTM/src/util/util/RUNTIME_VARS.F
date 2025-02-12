@@ -61,8 +61,6 @@
 !     -- Added 'CB6R5M' and deleted "CB6R3M"
 !  4 Mar 2022 (G. Sarwar)
 !     -- Added 'CB6R5'
-! 9 Aug 24 (G. Sarwar)
-!     -- Added halogen chemistry in CRACMM3M
 !....................................................................
 
       MODULE RUNTIME_VARS
@@ -260,6 +258,10 @@
       CHARACTER(  16 ), SAVE, ALLOCATABLE :: PLAY_BASE( : ) ! Use for Plume Rise Calculation
 
       LOGICAL :: USE_MARINE_GAS_EMISSION = .FALSE.
+
+      LOGICAL :: USE_MET_EMIS            = .FALSE. ! flag for met-modulated emissions
+      LOGICAL :: METEMDIAG               = .FALSE. ! flag for MET_EM diagnostic file
+      LOGICAL :: HUM_NOX_YN              = .FALSE. ! flag for MET_EM NOx correction
 
       ! Process Analysis
       LOGICAL :: PROCAN    = .FALSE. ! flag for process analysis
@@ -852,6 +854,15 @@
       ! Get sea spray emission diagnostic output file flag.
       CALL GET_ENV ( SSEMDIAG, 'CTM_SSEMDIAG', SSEMDIAG, VARDEV )
  
+      ! Set CTM_MET_EMIS to Y or T ro turn on met-modulated emissions
+       CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
+ 
+      ! Get met-modulated emission diagnostic output file flag.
+      CALL GET_ENV ( METEMDIAG, 'CTM_MET_EMIS_DIAG', METEMDIAG, VARDEV )
+
+      ! Get met-modulated emission diagnostic output file flag.
+      CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
+  
       ! Set LTNG_NO to Y or T to turn on lightning NO production
       CALL GET_ENV ( LTNG_NO, 'CTM_LTNG_NO', LTNG_NO, VARDEV ) 
 
@@ -965,8 +976,8 @@
 
       IF ( OCEAN_CHEM ) THEN
        IF ( (INDEX( MECHNAME, 'CB6R5M_AE7_AQ') .GT. 0 ) .OR. 
-     &      (INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0 ) .OR. 
-     &      (INDEX( MECHNAME, 'CRACMM3M'     ) .GT. 0 )) THEN     
+     &      (INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0 )  .OR.    
+     &      (INDEX( MECHNAME, 'CRACMM3M'     ) .GT. 0 ) ) then  
        USE_MARINE_GAS_EMISSION = .TRUE.
        ENDIF
       ENDIF

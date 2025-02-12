@@ -28,7 +28,7 @@ C  PRECONDITIONS: For the CRACMM3M mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Jan 28, 2025
+C  REVISION HISTORY: Created by EBI solver program, Feb 11, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -306,7 +306,7 @@ c..Remaining HO2 production terms
      &   +    8.3400D-01 * RXRAT(   287 )      ! MEKP+MO2=0.8340D+00*HO2+...
      &   +                 RXRAT(   288 )      ! KETP+MO2=HO2+0.7500D+...
      &   +    5.0000D-01 * RXRAT(   289 )      ! MACP+MO2=0.5000D+00*HO2+...
-     &   +                 RXRAT(   290 )      ! MCP+MO2=HO2+NO2+0.1500D+...
+     &   +                 RXRAT(   290 )      ! MCP+MO2=HO2+0.1500D+...
      &   +                 RXRAT(   291 )      ! MVKP+MO2=HO2+0.1160D+...
      &   +                 RXRAT(   292 )      ! UALP+MO2=HO2+0.3050D+00*CO+...
      &   +                 RXRAT(   293 )      ! BALP+MO2=HO2+BAL1+HCHO
@@ -691,7 +691,7 @@ c..HO2 loss terms not included in R4_5 & R21_5 (except for HO2+HO2 )
      &   +                 RKI(   259 ) * YC ( ORAP        )   ! HO2+ORAP=OP2
      &   +                 RKI(   260 ) * YC ( OLNN        )   ! HO2+OLNN=ONIT
      &   +                 RKI(   261 ) * YC ( OLND        )   ! HO2+OLND=ONIT
-     &   +                 RKI(   262 ) * YC ( ADCN        )   ! HO2+ADCN=OP2
+     &   +                 RKI(   262 ) * YC ( ADCN        )   ! HO2+ADCN=ONIT
      &   +                 RKI(   263 ) * YC ( XO2         )   ! HO2+XO2=OP2
      &   +                 RKI(   401 ) * YC ( BDE13P      )   ! HO2+BDE13P=OP2
      &   +    2.8000D-01 * RKI(   408 ) * YC ( FURANO2     )   ! HO2+FURANO2=...

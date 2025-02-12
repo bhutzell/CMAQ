@@ -219,17 +219,17 @@ SRF,Surface area of particles
 ATRPN,SOA from TRPN
 AHONIT,SOA from HONIT
 ASEAST, J-mode seasalt concentration (tracer)
-CL2, Chlorine 
-CL, Chlorine atom
+CL2, Molecular chlorine 
+CL, Atomic chlorine
 CLO, Chlorine monoxide
-OCLO, Chlorine dioxide isomar
-CL2O2, Dichlorine dioxide
+OCLO, Chlorine dioxide 
+CL2O2, Chloryl chloride
 HOCL, Hypochlorous acid
 CLNO, Nitrosyl chloride
 CLNO2, Nitryl chloride
 CLNO3, Chlorine nitrate
 HCOCL, Formyl chloride
-CLOO, Chlorine dioxide
+CLOO, Chlorine superoxide
 BR2, Bromine
 BR, Bromine atom
 BRO, Bromine monoxide

@@ -113,157 +113,72 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_PM10 =        37
       INTEGER, PARAMETER :: ID_PM25to10 =    38
       INTEGER, PARAMETER :: ID_PMAMS =       39
-      INTEGER, PARAMETER :: ID_PMC_SO4 =     40
-      INTEGER, PARAMETER :: ID_PMC_NO3 =     41
-      INTEGER, PARAMETER :: ID_PMC_NH4 =     42
-      INTEGER, PARAMETER :: ID_PMC_CL =      43
-      INTEGER, PARAMETER :: ID_PMC_NA =      44
-      INTEGER, PARAMETER :: ID_PMC_MG =      45
-      INTEGER, PARAMETER :: ID_PMC_K =       46
-      INTEGER, PARAMETER :: ID_PMC_CA =      47
-      INTEGER, PARAMETER :: ID_PMF_SO4 =     48
-      INTEGER, PARAMETER :: ID_PMF_NO3 =     49
-      INTEGER, PARAMETER :: ID_PMF_NH4 =     50
-      INTEGER, PARAMETER :: ID_PMF_CL =      51
-      INTEGER, PARAMETER :: ID_PMF_NA =      52
-      INTEGER, PARAMETER :: ID_PMF_EC =      53
-      INTEGER, PARAMETER :: ID_PMF_OC =      54
-      INTEGER, PARAMETER :: ID_PMF_OA =      55
-      INTEGER, PARAMETER :: ID_PMF_FE =      56
-      INTEGER, PARAMETER :: ID_PMF_AL =      57
-      INTEGER, PARAMETER :: ID_PMF_SI =      58
-      INTEGER, PARAMETER :: ID_PMF_TI =      59
-      INTEGER, PARAMETER :: ID_PMF_CA =      60
-      INTEGER, PARAMETER :: ID_PMF_MG =      61
-      INTEGER, PARAMETER :: ID_PMF_K  =      62
-      INTEGER, PARAMETER :: ID_PMF_MN =      63
-      INTEGER, PARAMETER :: ID_PMF_H2O =     64                
-      INTEGER, PARAMETER :: ID_SOIL_IMPV =   65                
-      INTEGER, PARAMETER :: ID_PMF_UNSP1 =   66                
-      INTEGER, PARAMETER :: ID_PMF_UNSP2 =   67                
-      INTEGER, PARAMETER :: ID_PMF_HP =      68                
-      INTEGER, PARAMETER :: ID_PMF_HPM =     69                
-      INTEGER, PARAMETER :: ID_PMF_PH =      70                
-      INTEGER, PARAMETER :: ID_PMF_POC =     71                
-      INTEGER, PARAMETER :: ID_PMF_SOC =     72
-      INTEGER, PARAMETER :: ID_PMF_POA =     73
-      INTEGER, PARAMETER :: ID_PMF_SOA =     74
-      INTEGER, PARAMETER :: ID_PMF_NCOM =    75
-      INTEGER, PARAMETER :: ID_PMF_OMOC =    76
-      INTEGER, PARAMETER :: ID_PMF_OtoC =    77
-      INTEGER, PARAMETER :: ID_PMF_ASOA =    78
-      INTEGER, PARAMETER :: ID_PMF_BSOA =    79
-      INTEGER, PARAMETER :: ID_PMF_CLDGLY =  80
-      INTEGER, PARAMETER :: ID_PMF_ISOP =    81
-      INTEGER, PARAMETER :: ID_PMF_IEPOX =   82
-      INTEGER, PARAMETER :: ID_PMF_MTNSOA =  83
-      INTEGER, PARAMETER :: ID_PMF_MTSOA =   84
-      INTEGER, PARAMETER :: ID_AMS_SO4 =     85
-      INTEGER, PARAMETER :: ID_AMS_NO3 =     86
-      INTEGER, PARAMETER :: ID_AMS_NH4 =     87
-      INTEGER, PARAMETER :: ID_AMS_CL =      88
-      INTEGER, PARAMETER :: ID_AMS_OA =      89
-      INTEGER, PARAMETER :: ID_AMS_OTOC =    90
-      INTEGER, PARAMETER :: ID_PM1_SO4 =     91
-      INTEGER, PARAMETER :: ID_PM1_NO3 =     92
-      INTEGER, PARAMETER :: ID_PM1_NH4 =     93
-      INTEGER, PARAMETER :: ID_PM1_CL =      94
-      INTEGER, PARAMETER :: ID_PM1_NA =      95
-      INTEGER, PARAMETER :: ID_PM1_EC =      96
-      INTEGER, PARAMETER :: ID_PM1_OC =      97
-      INTEGER, PARAMETER :: ID_PM1_OA =      98
-      INTEGER, PARAMETER :: ID_PM1_MG =      99
-      INTEGER, PARAMETER :: ID_PM1_K =      100
-      INTEGER, PARAMETER :: ID_PM1_CA =     101
-      INTEGER, PARAMETER :: ID_PM1_OT =     102
-      INTEGER, PARAMETER :: ID_PM1_FE =     103
-      INTEGER, PARAMETER :: ID_PM1_SI =     104
-      INTEGER, PARAMETER :: ID_PM1_TI =     105
-      INTEGER, PARAMETER :: ID_PM1_MN =     106
-      INTEGER, PARAMETER :: ID_PM1_AL =     107
-      INTEGER, PARAMETER :: ID_PM1_SOIL =   108
-      INTEGER, PARAMETER :: ID_PM1_UNSP1 =  109
-      INTEGER, PARAMETER :: ID_PM1_UN =     110
-      INTEGER, PARAMETER :: ID_PM1_HP =     111
-      INTEGER, PARAMETER :: ID_PM25_SO4 =   112
-      INTEGER, PARAMETER :: ID_PM25_NO3 =   113
-      INTEGER, PARAMETER :: ID_PM25_NH4 =   114
-      INTEGER, PARAMETER :: ID_PM25_CL =    115
-      INTEGER, PARAMETER :: ID_PM25_NA =    116
-      INTEGER, PARAMETER :: ID_PM25_EC =    117
-      INTEGER, PARAMETER :: ID_PM25_OC =    118
-      INTEGER, PARAMETER :: ID_PM25_OA =    119
-      INTEGER, PARAMETER :: ID_PM25_MG =    120
-      INTEGER, PARAMETER :: ID_PM25_K =     121
-      INTEGER, PARAMETER :: ID_PM25_CA =    122
-      INTEGER, PARAMETER :: ID_PM25_OT =    123
-      INTEGER, PARAMETER :: ID_PM25_FE =    124
-      INTEGER, PARAMETER :: ID_PM25_SI =    125
-      INTEGER, PARAMETER :: ID_PM25_TI =    126
-      INTEGER, PARAMETER :: ID_PM25_MN =    127
-      INTEGER, PARAMETER :: ID_PM25_AL =    128
-      INTEGER, PARAMETER :: ID_PM25_SOIL =  129
-      INTEGER, PARAMETER :: ID_PM25_UNSP1 = 130
-      INTEGER, PARAMETER :: ID_PM25_UN =    131
-      INTEGER, PARAMETER :: ID_PM25_HP =    132
-      INTEGER, PARAMETER :: ID_PM25to10_SO4=133
-      INTEGER, PARAMETER :: ID_PM25to10_NO3=134
-      INTEGER, PARAMETER :: ID_PM25to10_NH4=135
-      INTEGER, PARAMETER :: ID_PM25to10_CL =136
-      INTEGER, PARAMETER :: ID_PM25to10_NA =137
-      INTEGER, PARAMETER :: ID_PM25_HDSL   =138
-      INTEGER, PARAMETER :: ID_PM25_HBE    =139
-      INTEGER, PARAMETER :: ID_PM25_HCD    =140
-      INTEGER, PARAMETER :: ID_PM25_HCR3   =141
-      INTEGER, PARAMETER :: ID_PM25_HCR6   =142
-      INTEGER, PARAMETER :: ID_PM25_HCR    =143
-      INTEGER, PARAMETER :: ID_PM25_HPB    =144
-      INTEGER, PARAMETER :: ID_PM25_HMN    =145
-      INTEGER, PARAMETER :: ID_PM25_HNI    =146
-      INTEGER, PARAMETER :: ID_PM25_HAS    =147
-      INTEGER, PARAMETER :: ID_PM25_HG     =148
-      INTEGER, PARAMETER :: ID_PM10_HDSL   =149
-      INTEGER, PARAMETER :: ID_PM10_HBE    =150
-      INTEGER, PARAMETER :: ID_PM10_HCD    =151
-      INTEGER, PARAMETER :: ID_PM10_HCR3   =152
-      INTEGER, PARAMETER :: ID_PM10_HCR6   =153
-      INTEGER, PARAMETER :: ID_PM10_HCR    =154
-      INTEGER, PARAMETER :: ID_PM10_HPB    =155
-      INTEGER, PARAMETER :: ID_PM10_HMN    =156
-      INTEGER, PARAMETER :: ID_PM10_HNI    =157
-      INTEGER, PARAMETER :: ID_PM10_HAS    =158
-      INTEGER, PARAMETER :: ID_PM10_HG     =159
-      INTEGER, PARAMETER :: ID_PM25_BENAPY =160
-      INTEGER, PARAMETER :: ID_PM10_BENAPY =161
-      INTEGER, PARAMETER :: ID_PMF_BENAPY  =162
-      INTEGER, PARAMETER :: ID_GAS_BENAPY  =163
-      INTEGER, PARAMETER :: ID_BENAPY_FAERO=164
-      INTEGER, PARAMETER :: ID_TNO3 =       165                     
-      INTEGER, PARAMETER :: ID_TNO3TOT =    166                     
-      INTEGER, PARAMETER :: ID_PM25_FRM =   167                     
-      INTEGER, PARAMETER :: ID_PMF_FRM =    168                     
-      INTEGER, PARAMETER :: ID_AOD550 =     169                     
-      INTEGER, PARAMETER :: ID_PMEXT550 =   170
-      INTEGER, PARAMETER :: ID_RH =         171
-      INTEGER, PARAMETER :: ID_TEMP =       172
-      INTEGER, PARAMETER :: ID_SRFTEMP =    173
-      INTEGER, PARAMETER :: ID_PRES =       174
-      INTEGER, PARAMETER :: ID_GN2O5F =     175
-      INTEGER, PARAMETER :: ID_GN2O5C =     176
-      INTEGER, PARAMETER :: ID_YCLNO2F =    177
-      INTEGER, PARAMETER :: ID_YCLNO2C =    178
-      INTEGER, PARAMETER :: ID_GIEPOX =     179
-      INTEGER, PARAMETER :: ID_KIEPOX =     180
-      INTEGER, PARAMETER :: ID_GIMAE =      181
-      INTEGER, PARAMETER :: ID_DZ    =      182
-      INTEGER, PARAMETER :: ID_ZH    =      183
-      INTEGER, PARAMETER :: ID_CFRAC =      184
-      INTEGER, PARAMETER :: ID_PV    =      185
-      INTEGER, PARAMETER :: ID_DENS  =      186
-      INTEGER, PARAMETER :: ID_RHOJ  =      187
-      INTEGER, PARAMETER :: ID_GAS_HNO3 =   188
-      INTEGER, PARAMETER :: ID_GAS_NH3  =   189
-      INTEGER, PARAMETER :: ID_EF_HNO3 =    190
+      INTEGER, PARAMETER :: ID_PMF_OC =      40
+      INTEGER, PARAMETER :: ID_PMF_OA =      41
+      INTEGER, PARAMETER :: ID_PMF_HPM =     42               
+      INTEGER, PARAMETER :: ID_PMF_PH =      43               
+      INTEGER, PARAMETER :: ID_PMF_POC =     44               
+      INTEGER, PARAMETER :: ID_PMF_SOC =     45
+      INTEGER, PARAMETER :: ID_PMF_POA =     46
+      INTEGER, PARAMETER :: ID_PMF_SOA =     47
+      INTEGER, PARAMETER :: ID_PMF_OMOC =    48
+      INTEGER, PARAMETER :: ID_PMF_OtoC =    49
+      INTEGER, PARAMETER :: ID_PMF_ASOA =    50
+      INTEGER, PARAMETER :: ID_PMF_BSOA =    51
+      INTEGER, PARAMETER :: ID_AMS_OA =      52
+      INTEGER, PARAMETER :: ID_AMS_OTOC =    53
+      INTEGER, PARAMETER :: ID_PM1_OC =      54
+      INTEGER, PARAMETER :: ID_PM1_OA =      55
+      INTEGER, PARAMETER :: ID_PM25_OC =     56
+      INTEGER, PARAMETER :: ID_PM25_OA =     57
+      INTEGER, PARAMETER :: ID_BENAPY_FAERO= 58
+      INTEGER, PARAMETER :: ID_PM25_FRM =    59                   
+      INTEGER, PARAMETER :: ID_PMF_FRM =     60                   
+      INTEGER, PARAMETER :: ID_RH =          61
+      INTEGER, PARAMETER :: ID_TEMP =        62
+      INTEGER, PARAMETER :: ID_SRFTEMP =     63
+      INTEGER, PARAMETER :: ID_PRES =        64
+      INTEGER, PARAMETER :: ID_GN2O5F =      65
+      INTEGER, PARAMETER :: ID_GN2O5C =      66
+      INTEGER, PARAMETER :: ID_YCLNO2F =     67
+      INTEGER, PARAMETER :: ID_YCLNO2C =     68
+      INTEGER, PARAMETER :: ID_GIEPOX =      69
+      INTEGER, PARAMETER :: ID_KIEPOX =      70
+      INTEGER, PARAMETER :: ID_GIMAE =       71
+      INTEGER, PARAMETER :: ID_VOC_NOX =     72
+      INTEGER, PARAMETER :: ID_EF_HNO3 =     73
+      INTEGER, PARAMETER :: ID_DZ    =       74
+      INTEGER, PARAMETER :: ID_ZH    =       75
+      INTEGER, PARAMETER :: ID_CFRAC =       76
+      INTEGER, PARAMETER :: ID_PV    =       77
+      INTEGER, PARAMETER :: ID_DENS  =       78
+      INTEGER, PARAMETER :: ID_RHOJ  =       79
+      INTEGER, PARAMETER :: ID_NO2COL  =     80
+      INTEGER, PARAMETER :: ID_SO2COL  =     81
+      INTEGER, PARAMETER :: ID_HCHOCOL  =    82
+      INTEGER, PARAMETER :: ID_COCOL  =      83
+      INTEGER, PARAMETER :: ID_KZ     =      84
+      INTEGER, PARAMETER :: ID_KZMIN  =      85
+      INTEGER, PARAMETER :: ID_AOD550 =      86
+      INTEGER, PARAMETER :: ID_PMEXT550 =    87
+      INTEGER, PARAMETER :: ID_PBL =         88
+      INTEGER, PARAMETER :: ID_RGRND =       89
+      INTEGER, PARAMETER :: ID_PRECIP =      90
+      INTEGER, PARAMETER :: ID_WSPD10 =      91
+      INTEGER, PARAMETER :: ID_WDIR10 =      92
+      INTEGER, PARAMETER :: ID_WVEL   =      93
+      INTEGER, PARAMETER :: ID_DD_OA =       94
+      INTEGER, PARAMETER :: ID_WD_OA =       95
+      INTEGER, PARAMETER :: ID_DD_OC =       96
+      INTEGER, PARAMETER :: ID_WD_OC =       97
+      INTEGER, PARAMETER :: ID_DD_POA =      98
+      INTEGER, PARAMETER :: ID_WD_POA =      99
+      INTEGER, PARAMETER :: ID_DD_POC =     100
+      INTEGER, PARAMETER :: ID_WD_POC =     101
+      INTEGER, PARAMETER :: ID_DD_SOA =     102
+      INTEGER, PARAMETER :: ID_WD_SOA =     103
+      INTEGER, PARAMETER :: ID_DD_SOC =     104
+      INTEGER, PARAMETER :: ID_WD_SOC =     105
 
       TYPE ELDTP
         CHARACTER (LEN = 16) :: NAME      !Parameter Name
@@ -274,8 +189,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
 
-      INTEGER, PARAMETER :: N_ELMO_LIST = 190
-
+      INTEGER, PARAMETER :: N_ELMO_LIST = 105
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
 
@@ -392,6 +306,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'K_IEPOX      ',ID_KIEPOX,     ET_CHEM,     F, 's-1   ', 'IEPOX 1st order particle phase reaction rate const' ),
      &ELDTP( 'GAMMA_IMAE   ',ID_GIMAE,      ET_CHEM,     F, '1     ', 'IMAE+HMML heterogeneous uptake coefficient' ),
      &ELDTP( 'VOC_NOX      ',ID_VOC_NOX,    ET_CHEM,     F, '      ', 'VOC-limiting (>0.35) or NOx-limiting (<0.35) O3 formation' ),
+     &ELDTP( 'EF_HNO3      ',ID_EF_HNO3,    ET_CHEM,     F, '1     ', 'Enhancement factor for HNO3 photolysis' ),
      &ELDTP( 'DZ           ',ID_DZ,         ET_MET,      F, 'm     ', 'Height of each grid cell computed from top layer height' ),
      &ELDTP( 'ZH           ',ID_ZH,         ET_MET,      F, 'm     ', 'Height of grid cell midpoints (mass-weighted)' ),
      &ELDTP( 'CFRAC        ',ID_CFRAC,      ET_MET,      F, '      ', 'Cloud Fraction' ),
@@ -400,8 +315,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'KZ           ',ID_KZ,         ET_MET,      F, 'm2 s-1', 'Vertical diffusivity coefficients' ),
      &ELDTP( 'KZMIN        ',ID_KZMIN,      ET_MET,      F, 'm2 s-1', 'Vertical diffusivity coefficients' ),
      &ELDTP( 'RHOJ         ',ID_RHOJ,       ET_MET,      F, 'kg m-3', 'Advected Density x Jacobian/MSFX^2' ) /)
-     &ELDTP( 'EF_HNO3      ',ID_EF_HNO3,    M3REAL, F, '1     ', 'Enhancement factor for HNO3 photolysis' ) /)
      
+
       TYPE ELMO_KEY_TYPE
           CHARACTER( 32 )             :: WORD    ! Keyword for selecting multiple ELMO parameters
           INTEGER                     :: N       ! Number of Parameters associated with the Keyword
@@ -475,7 +390,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       REAL, SAVE, ALLOCATABLE :: GAMMA_IMAE (  :,:,:  ) ! IMAE uptake coeff
       REAL, SAVE, ALLOCATABLE :: YCLNO2IJ   (  :,:,:  ) ! Yield CLNO2 in Fine modes 
       REAL, SAVE, ALLOCATABLE :: YCLNO2K    (  :,:,:  ) ! Yield CLNO2 in coarse mode 
-      REAL, SAVE, ALLOCATABLE :: EF_HNO3    (  :,:,:  ) ! Enhancement factor for calculating J_ANO3      
+      REAL, SAVE, ALLOCATABLE :: EF_HNO3    (  :,:,:  ) ! Enhancement factor for calculating J_ANO3
   
       LOGICAL, SAVE           :: AERO_CHEM_SET = .FALSE.
  

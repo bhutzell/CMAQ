@@ -27,7 +27,7 @@ C
 C  KEY SUBROUTINES/FUNCTIONS CALLED:  HRINIT, HRCALCKS, HRSOLVER
 C                                     FIND_DEGRADED, INIT_DEGRADE, FINAL_DEGRADE
 C
-C  REVISION HISTORY: Created by EBI solver program, Mar 15, 2024
+C  REVISION HISTORY: Created by EBI solver program, Nov 10, 2024
 C                       Based on the algorithm in "Test of Two Numerical
 C                       Schemes for Use in Atmospheric Transport-Chemistry
 C                       Models", O. Hertel, R. Berkowicz, J. Christensen,
@@ -85,13 +85,12 @@ C**********************************************************************
       USE DDM3D_CHEM
       Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, NP, NPMAX, CKTIME
 #endif
+      USE CONST, ONLY: MWAIR, MWWAT, STDATMPA
 
       IMPLICIT NONE
 
 C..Includes:
       INCLUDE SUBST_FILES_ID  ! CMAQ files
-      INCLUDE SUBST_CONST     ! CMAQ constants
-
       INCLUDE SUBST_EMISPRM   ! Emissions processing control parameters
 
 C..Arguments:
@@ -382,20 +381,6 @@ c..Load ICs
                   END IF
                END DO
 
-               IF(CALL_DEG)THEN ! INITIALIZE degradation routines
-
-                  YCCELL = 0.0D0
-                  DO S = 1, MODEL_SPECIES
-                     YCCELL( S ) = REAL( CGRID(C,R,L,S), 8)
-                  END DO
-                  CALL INIT_DEGRADE(YCCELL,TA(C,R,L),DENS(C,R,L),PRES(C,R,L),QV(C,R,L),RJIN(NCELL,:),
-     &                              JDATE, JTIME)
-
-#ifdef isam
-                  CALL SA_DEGRADE_EXTRACT( C,R,L,DENS(C,R,L) )
-#endif
-               END IF
-
 c..Set physical quantities
                TEMP( NCELL )     = REAL( TA( C,R,L ), 8)
                DENSITY( NCELL )  = REAL( DENS( C,R,L ), 8)
@@ -413,6 +398,20 @@ c..Get rate constants
 
                CALL CALC_RCONST( TEMP, ATMPRES, H2O, RJIN, HET, LSUNLIGHT, SEAWATER, RKI_SAV, NCELL )
                FORALL( NPH = 1:NRXNS )RKI( NPH ) = RKI_SAV( NCELL, NPH )
+
+               IF(CALL_DEG)THEN ! INITIALIZE degradation routines
+
+                  YCCELL = 0.0D0
+                  DO S = 1, MODEL_SPECIES
+                     YCCELL( S ) = REAL( CGRID(C,R,L,S), 8)
+                  END DO
+                  CALL INIT_DEGRADE(YCCELL,TA(C,R,L),DENS(C,R,L),PRES(C,R,L),QV(C,R,L),RJIN(NCELL,:),
+     &                              JDATE, JTIME)
+
+#ifdef isam
+                  CALL SA_DEGRADE_EXTRACT( C,R,L,DENS(C,R,L) )
+#endif
+               END IF
 
 #ifdef isam
 #if defined(isam) || defined(verbose_isam)

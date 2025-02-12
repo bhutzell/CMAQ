@@ -85,7 +85,6 @@
 !  03/31/22, J. Willison: Removed wb_dust_setup and modified lus_setup to remove
 !                         BELD as an option for desert land information.  
 !  04/12/22, G. Sarwar: Revised to include "DMS" into cb6r5_ae7_aq 
-!  08/12/24, G. Sarwar: Revised to include cracmm3m  
 !------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------!
@@ -5486,6 +5485,9 @@ C Read the various categories of normalized emissions
      &              F2_NH4     ( ncols,nrows,e2c_cats ),
      &              STAT=STAT )
 
+          F1_NH4 = 0.0
+          F2_NH4 = 0.0
+
           if ( MEDC_AVAIL ) then
              call subhfile ( INIT_MEDC_1, gxoff, gyoff,
      &                       startcol, endcol, startrow, endrow )
@@ -5885,12 +5887,16 @@ C Read the various categories of normalized emissions
              dmsl  = 0.0          
              chlr  = 0.0
 
-             If (( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) .or. 
-     &             INDEX( MECHNAME, 'CRACMM3M'      ) .GT. 0 ) then
-                XMSG = 'CTM_OCEAN_CHEM must be set to TRUE when using CB6R5M_AE7_AQ or CRACMM3M mechanism' 
+             If ( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) then
+                XMSG = 'CTM_OCEAN_CHEM must be set to TRUE when using CB6R5M_AE7_AQ mechanism' 
                 Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
              endif
 
+             If ( INDEX( MECHNAME, 'CRACMM3M' ) .GT. 0 ) then
+                XMSG = 'CTM_OCEAN_CHEM must be set to TRUE when using CRACMM3M mechanism' 
+                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+             endif
+	     
           ELSEIF ( OCEAN_CHEM .AND. .NOT. USE_MARINE_GAS_EMISSION ) THEN
 
              IF ( .NOT. OPEN3( OCEAN_1, FSREAD3, PNAME ) ) THEN
@@ -5952,9 +5958,8 @@ C Read the various categories of normalized emissions
                 WHERE ( ocean .LT. 0.001 ) ocean = 0.0  ! ensure values are nonnegative and greater than 0.001
                 WHERE ( szone .LT. 0.001 ) szone = 0.0  ! ensure values are nonnegative and greater than 0.001 
 
-                If (( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) .or.
-     &                INDEX( MECHNAME, 'CRACMM3M     ' ) .GT. 0 ) then      
-
+                If ( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) then
+      
                    If ( .Not. XTRACT3( OCEAN_1, 'CHLO',
      &                                 1, 1, startrow, endrow, startcol, endcol,
      &                                 0, 0, chlr ) ) Then
@@ -5966,6 +5971,15 @@ C Read the various categories of normalized emissions
      &                                 1, 1, startrow, endrow, startcol, endcol,
      &                                 0, 0, dmsl ) ) Then
                       XMSG = 'Could not read DMS from ' // OCEAN_1
+                      Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+                   End If
+
+                ELSEIF ( INDEX( MECHNAME, 'CRACMM3M' ) .GT. 0 ) then
+                
+                   If ( .Not. XTRACT3( OCEAN_1, 'CHLO',
+     &                                 1, 1, startrow, endrow, startcol, endcol,
+     &                                 0, 0, chlr ) ) Then
+                      XMSG = 'Could not read CHLO from ' // OCEAN_1
                       Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
                    End If
 
