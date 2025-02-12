@@ -144,8 +144,8 @@
 !    Condensed halogen chemistry (HAL_OZONE) is removed and detailed halogen chemistry is added
 ! 09-26-24 G. Sarwar
 ! Aerosol nitrate photolysis
-!
-! 07-29-24 G. Sarwar
+!------------------------------------------------------------------------------
+! 01-29-25 G. Sarwar
 !    added chlorine (includes ClNO2 chemistry), bromine and iodine chemistry
 !    For implementing ClNO2 chemistry, two additional intermediate products are introduced: NO2PIJ and NO2PK
 !     NO2PIJ is formed on fine-mode aerosol and NO2PK is formed on coarse-mode aerosol
@@ -2129,6 +2129,10 @@ REACTIONS[CM] =
 <HET_I2O3_AJ> I2O3 =  + 2.0000*DELTA_I # 1.0~<HETERO_I2O3_AJ>;
 <HET_I2O4_AI> I2O4 =  + 2.0000*DELTA_I # 1.0~<HETERO_I2O4_AI>;
 <HET_I2O4_AJ> I2O4 =  + 2.0000*DELTA_I # 1.0~<HETERO_I2O4_AJ>;
+
+! Aerosol nitrate photolysis (implemented as heterogeneous reactions)
+<HET_ANO3I> ANO3I = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
+<HET_ANO3J> ANO3J = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
 
 END MECH
 

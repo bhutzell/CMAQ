@@ -914,8 +914,10 @@ Information is based on the mech.def file.
 | HET_I2O2_AJ   | I2O2 ----> | HETERO_I2O2_AJ | Not Available<sup>2</sup> | 
 | HET_I2O3_AI   | I2O3 ----> | HETERO_I2O3_AI | Not Available<sup>2</sup> | 
 | HET_I2O3_AJ   | I2O3 ----> | HETERO_I2O3_AJ | Not Available<sup>2</sup> | 
-| HET_I2O4_AI   | I2O4 ----> | HETERO_I2O3_AJ | Not Available<sup>2</sup> | 
-| HET_I2O4_AJ   | I2O4 ----> | HETERO_I2O3_AJ | Not Available<sup>2</sup> | 
+| HET_I2O4_AI   | I2O4 ----> | HETERO_I2O4_AI | Not Available<sup>2</sup> | 
+| HET_I2O4_AJ   | I2O4 ----> | HETERO_I2O4_AI | Not Available<sup>2</sup> | 
+| HET_ANO3I   | ANO3I ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_I2O4_AI | Not Available<sup>2</sup> | 
+| HET_ANO3J   | ANO3J ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_I2O4_AI | Not Available<sup>2</sup> | 
 
 <sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     
 <sup>1</sup>Photolysis Reaction;depends on radiation and predicted concentrations     
