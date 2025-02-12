@@ -854,13 +854,12 @@
       ! Get sea spray emission diagnostic output file flag.
       CALL GET_ENV ( SSEMDIAG, 'CTM_SSEMDIAG', SSEMDIAG, VARDEV )
  
-     ! Set CTM_MET_EMIS to Y or T ro turn on met-modulated emissions
        CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
  
-     ! Get met-modulated emission diagnostic output file flag.
+
       CALL GET_ENV ( METEMDIAG, 'CTM_MET_EMIS_DIAG', METEMDIAG, VARDEV )
 
-     ! Get met-modulated emission diagnostic output file flag.
+     
       CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
   
       ! Set LTNG_NO to Y or T to turn on lightning NO production
