@@ -142,6 +142,8 @@
 ! 09-25-24 G. Sarwar
 !    INO2 is renamed to ISONP 
 !    Condensed halogen chemistry (HAL_OZONE) is updated using hemispheric CMAQ results with CRACMM2
+! 09-26-24 G. Sarwar
+! Aerosol nitrate photolysis
 !------------------------------------------------------------------------------
 CRACMM3
 
@@ -1391,7 +1393,11 @@ REACTIONS[CM] =
 <ROCARO75> STYP + MO2 = 1.370*HO2 + 1.680*HCHO + BALD + 0.320*MOH  
                       + 0.0000*DELTA_C # 2.5E-13;                      
 <ROCARO76> STYP + ACO3 = HO2 + HCHO + BALD + 0.700*MO2 + 0.300*ORA2  
-                       + 0.7000*DELTA_C # 2.5E-13;                       
+                       + 0.7000*DELTA_C # 2.5E-13;
+
+! Aerosol nitrate photolysis (implemented as heterogeneous reactions)
+<HET_ANO3I> ANO3I = 0.67*HONO + 0.33*NO2 # 1.0~<HETERO_ANO3>;
+<HET_ANO3J> ANO3J = 0.67*HONO + 0.33*NO2 # 1.0~<HETERO_ANO3>;                       
 
 END MECH
 

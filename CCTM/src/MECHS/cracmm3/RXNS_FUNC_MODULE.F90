@@ -409,7 +409,7 @@
      &                                                 4.2000D-34,   2.6600D+03,   2.9400D-54,  & 
      &                                                 3.1200D+03 )
 !  Reaction Label R047            
-             RKI( NCELL,   54) =  CFACT * ARRHENUIS_T03( INV_TEMP,  1.8000D-12,  -0.0000D+00 )
+             RKI( NCELL,   54) =  CFACT * ARRHENUIS_T03( INV_TEMP,  1.8000D-12,   0.0000D+00 )
 !  Reaction Label R048            
              RKI( NCELL,   55) =  CFACT * FALLOFF_T10( INV_TEMP,  TEMPOT300,  CAIR, & 
      &                                                 9.1000D-32,   0.0000D+00,  -1.5000D+00,  & 
@@ -588,9 +588,9 @@
 !  Reaction Label R105            
              RKI( NCELL,  124) =  CFACT * ARRHENUIS_T03( INV_TEMP,  6.7500D-12,   4.0500D+02 )
 !  Reaction Label R106            
-             RKI( NCELL,  125) =  CFACT * ARRHENUIS_T03( INV_TEMP,  4.6500D-11,  -0.0000D+00 )
+             RKI( NCELL,  125) =  CFACT * ARRHENUIS_T03( INV_TEMP,  4.6500D-11,   0.0000D+00 )
 !  Reaction Label R108            
-             RKI( NCELL,  126) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.0500D-10,  -0.0000D+00 )
+             RKI( NCELL,  126) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.0500D-10,   0.0000D+00 )
 !  Reaction Label R109            
              RKI( NCELL,  127) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.8500D-12,  -3.4500D+02 )
 !  Reaction Label R110            
@@ -1414,6 +1414,10 @@
              RKI( NCELL,  533) =   2.5000D-13 * CFACT 
 !  Reaction Label ROCARO76        
              RKI( NCELL,  534) =   2.5000D-13 * CFACT 
+!  Reaction Label HET_ANO3I       
+             RKI( NCELL,  535) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
+!  Reaction Label HET_ANO3J       
+             RKI( NCELL,  536) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
 
         END DO  
 !  Multiply rate constants by [M], [O2], [N2], [H2O], [H2], or [CH4]
@@ -1873,5 +1877,7 @@
              INDEX_STY         = IOLD2NEW( INDEX_STY        , 1 )
              INDEX_STYP        = IOLD2NEW( INDEX_STYP       , 1 )
              INDEX_CO2         = IOLD2NEW( INDEX_CO2        , 1 )
+             INDEX_ANO3I       = IOLD2NEW( INDEX_ANO3I      , 1 )
+             INDEX_ANO3J       = IOLD2NEW( INDEX_ANO3J      , 1 )
           END SUBROUTINE RESET_SPECIES_POINTERS
        END MODULE RXNS_FUNCTION

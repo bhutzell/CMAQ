@@ -256,6 +256,9 @@
       CHARACTER(  16 ), SAVE, ALLOCATABLE :: PLAY_BASE( : ) ! Use for Plume Rise Calculation
 
       LOGICAL :: USE_MARINE_GAS_EMISSION = .FALSE.
+      LOGICAL :: USE_MET_EMIS            = .FALSE. ! flag for met-modulated emissions
+      LOGICAL :: METEMDIAG               = .FALSE. ! flag for MET_EM diagnostic file
+      LOGICAL :: HUM_NOX_YN              = .FALSE. ! flag for MET_EM NOx correction
 
       ! Process Analysis
       LOGICAL :: PROCAN    = .FALSE. ! flag for process analysis
@@ -835,6 +838,15 @@
       ! Get sea spray emission diagnostic output file flag.
       CALL GET_ENV ( SSEMDIAG, 'CTM_SSEMDIAG', SSEMDIAG, VARDEV )
  
+      ! Set CTM_MET_EMIS to Y or T ro turn on met-modulated emissions
+      CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
+ 
+      ! Get met-modulated emission diagnostic output file flag.
+      CALL GET_ENV ( METEMDIAG, 'CTM_MET_EMIS_DIAG', METEMDIAG, VARDEV )
+
+      ! Get met-modulated emission diagnostic output file flag.
+      CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
+
       ! Set LTNG_NO to Y or T to turn on lightning NO production
       CALL GET_ENV ( LTNG_NO, 'CTM_LTNG_NO', LTNG_NO, VARDEV ) 
 
