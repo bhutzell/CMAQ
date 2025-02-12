@@ -69,7 +69,7 @@
   Tmode(1) = 'average'
   Lay_Bot(1) = 1
   Lay_Top(1) = 1
-  File_Vars(1,:) = 'DEFAULT' 
+  File_Vars(1,:) = 'DEFAULT', 'EF_HNO3'
 
   Flabel(2)= 'DEFAULT_DEP'
   Tmode(2) = 'average'
