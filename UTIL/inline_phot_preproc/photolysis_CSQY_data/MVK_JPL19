@@ -1,0 +1,42 @@
+MVK_JPL19
+! MVK + HV = 0.3*MO2 + 0.3*MACP + 0.7*CO + 0.7*UALD  
+! Source: Chemical Kinetics and Photochemical Data for Use in Atmospheric Studies, Evaluation No.
+!         19," JPL Publication 19-5, Jet Propulsion Laboratory, Pasadena,
+!         2019 http://jpldataeval.jpl.nasa.gov (May 2020)
+! Absorption x-section from Table 4D-25 (pages 4-129 and 4-130)
+! Quantum yield data are calculated using the Stern-Volmer type expression on page 4-129 ( calculated at 1 atm and 25 C)
+! Supplied by Dr. William Stockwell, reformatted by Dr. Golam Sarwar to make it compatible with CMAQ
+!
+Points 
+! With FAC, units are (cm^2/molecule)
+FAC=1.0
+250	2.41E-21	0.863
+255	2.58E-21	0.656
+260	3.27E-21	0.498
+265	4.65E-21	0.378
+270	6.54E-21	0.287
+275	9.29E-21	0.218
+280	1.33E-20	0.166
+285	1.81E-20	0.126
+290	2.43E-20	0.096
+295	3.08E-20	0.073
+300	3.87E-20	0.055
+305	4.66E-20	0.042
+310	5.44E-20	0.032
+315	6.14E-20	0.024
+320	6.70E-20	0.018
+325	6.95E-20	0.014
+330	7.28E-20	0.011
+335	6.94E-20	0.008
+340	6.44E-20	0.006
+345	6.23E-20	0.005
+350	5.20E-20	0.004
+355	4.15E-20	0.003
+360	3.68E-20	0.002
+365	3.03E-20	0.002
+370	1.88E-20	0.001
+375	1.31E-20	0.001
+380	1.05E-20	0.001
+385	7.57E-21	0.001
+390	3.44E-21	0.000
+
