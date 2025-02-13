@@ -46,9 +46,9 @@
         PUBLIC METEMIS_INIT, GET_METEMIS
 
         INTEGER           , PUBLIC, PROTECTED, SAVE :: NMETSPC
-        CHARACTER(NAMLEN3), PUBLIC, PROTECTED, SAVE :: MTNAME( MXVARS3 )
-        CHARACTER(NAMLEN3), PUBLIC, PROTECTED, SAVE :: MTUNIT( MXVARS3 )
-        CHARACTER(NAMLEN3), PUBLIC, PROTECTED, SAVE :: MTBASIS( MXVARS3 )
+        CHARACTER( 16 )   , PUBLIC, PROTECTED, SAVE :: MTNAME( MXVARS3 )
+        CHARACTER( 16 )   , PUBLIC, PROTECTED, SAVE :: MTUNIT( MXVARS3 )
+        CHARACTER( 16 )   , PUBLIC, PROTECTED, SAVE :: MTBASIS( MXVARS3 )
         REAL              , PUBLIC, PROTECTED, SAVE :: MET_WT( MXVARS3 )
         REAL,  ALLOCATABLE, PUBLIC, PROTECTED, SAVE :: MTEMPS( : )
         REAL,  ALLOCATABLE, PUBLIC, PROTECTED, SAVE :: VDEMIS_MV( :,:,: ) !! ( NMETSPC,NCOLS,NROWS )
@@ -108,34 +108,22 @@
             CHARACTER*256   MESG
 
             !!........  Open MVMT and read header
+            CALL MIO_FOPEN( TBLNAME, MIO_READ_ONLY )
+            FLOC = MIO_SEARCH( TBLNAME )          
 
-            IF ( .NOT.OPEN3( TBLNAME, FSREAD3, PNAME ) ) THEN
-                CALL M3WARN( PNAME, 0,0, 'Could not open "'//TRIM(TBLNAME)//'"')
-                METEMIS_INIT = .FALSE.
-                RETURN
-            ELSE IF ( .NOT.DESC3( TBLNAME ) ) THEN
-                CALL M3WARN( PNAME, 0,0, 'Could not DESC3( MTEMP )')
-                METEMIS_INIT = .FALSE.
-                RETURN
-            ELSE IF ( .NOT.FILCHK3( TBLNAME,  GRDDED3,
-     &                              GL_NCOLS, GL_NROWS, NLAYS3D, NTHIK3D ) ) THEN
-                CALL M3WARN( PNAME, 0,0, 'Inconsistent dims for "'//TRIM(TBLNAME)//'"')
-                METEMIS_INIT =.FALSE.
-                RETURN
-            ELSE IF ( .NOT.GRDCHK3( TBLNAME,
-     &                              P_ALP_GD, P_BET_GD, P_GAM_GD, XCENT_GD, YCENT_GD,
-     &                              XORIG_GD, YORIG_GD, XCELL_GD, YCELL_GD,
-     &                              NLAYS3D, VGTYP3D, VGTOP3D, VGLVS3D ) ) THEN
-                CALL M3WARN( PNAME, 0,0, 'Inconsistent coord/grid  for "'//TRIM(TBLNAME)//'"')
-                METEMIS_INIT = .FALSE.
-                RETURN
-            ELSE
-                SDATEMT = SDATE3D
-                STIMEMT = STIME3D
-                TSTEPMT = TSTEP3D
-                NMTEMP  = NLAYS3D
-                NMETSPC = NVARS3D
-            END IF      !!  if not open3() ...else...
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'SDATE', SDATE3D )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'STIME', STIME3D )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'TSTEP', TSTEP3D )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NLAYS', NMTEMP )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NVARS', NMETSPC )
+
+
+            call mio_get_global_attr( MET_CRO_3D, 'GDNAM', GDNAME_GD )
+            call mio_get_global_attr( MET_CRO_3D, 'VGTYP', VGTYP_GD )
+            call mio_get_global_attr( MET_CRO_3D, 'VGTOP', VGTOP_GD )
+            VGTPUN_GD = 'Pa'
+            VGLVUN_GD = 'none'
+
 
             CALL SUBHFILE( TBLNAME, GXOFF, GYOFF, STRTCOL, ENDCOL,
      &                     STRTROW, ENDROW )
@@ -157,9 +145,10 @@
             TEMPVAL= 0.0
             VDEMIS_MVDIAG = 0.0
             
-            MTEMPS( 1:NMTEMP )  = VGLVS3D( 1:NMTEMP )
-            MTNAME( 1:NMETSPC ) = VNAME3D( 1:NMETSPC )
-            MTUNIT( 1:NMETSPC ) = UNITS3D( 1:NMETSPC )
+
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VGLVLS', MTEMPS )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VAR_NAME', MTNAME )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'UNITS', MTUNIT )
             MTBASIS( 1:NMETSPC) = 'UNIT'
 
             IF (HUM_NOX_YN) THEN
@@ -205,47 +194,41 @@
 
             LDATE = STDATE; LTIME = STTIME
 
+
+            ! Open Diagnostic File if Requested
             IF ( .NOT.METEMDIAG ) THEN
                 CONTINUE
 
             ELSE IF( IO_PE_INCLUSIVE ) THEN
-
-                FDATE = STDATE
-                FTIME = STTIME
-                CALL NEXTIME( FDATE, FTIME, TSTEP )
-                SDATE3D = FDATE
-                STIME3D = FTIME
-                TSTEP3D = TSTEP
-                FTYPE3D = GRDDED3
-                NCOLS3D = GL_NCOLS
-                NROWS3D = GL_NROWS
-                NLAYS3D = 1
-                NTHIK3D = 1
-                GDTYP3D = GDTYP_GD
-                GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-                P_ALP3D = P_ALP_GD
-                P_BET3D = P_BET_GD
-                P_GAM3D = P_GAM_GD
-                XORIG3D = XORIG_GD
-                YORIG3D = YORIG_GD
-                XCENT3D = XCENT_GD
-                YCENT3D = YCENT_GD
-                XCELL3D = XCELL_GD
-                YCELL3D = YCELL_GD
-                VGTYP3D = VGTYP_GD
-                VGTOP3D = VGTOP_GD
-
+#ifdef mpas
+                call mio_fcreate( CTM_METEMIS_DIAG, mio_new_file )
+#else
+                
                 NVARS3D = NMETSPC
+                NLAYS3D = 1
 
-                !! borrow rest of FDESC from input-file...
-                FDESC3D      = ' '
-                FDESC3D( 1 ) = 'hourly met-modulated mobile emissions (diagnostic outputs)'
-                IF ( .NOT. OPEN3( CTM_METEMIS_DIAG, FSUNKN3, PNAME ) ) THEN
-                    CALL M3WARN( PNAME, 0,0, 'Could not open '//CTM_METEMIS_DIAG )
-                    METEMIS_INIT = .FALSE.
-                    RETURN
-                END IF
+                DO V = 1,NVARS3D
+                  VTYPE3D( V ) = M3REAL
+                  VNAME3D( V ) = MTNAME( V )
+                  UNITS3D( V ) = MTUNIT( V )
+                  VDESC3D( V ) = 'met-modulated mobile emission rate for '//TRIM( VNAME3D( V ) )
+                END DO
 
+                ! Store MIO Metadata
+                NDIMS3D( 1:NVARS3D ) = 3
+                L_TSTEP( 1:NVARS3D ) = .True.
+                L_LAY  (1 :NVARS3D ) = .True. ! even if 2D
+                L_COL  (1 :NVARS3D ) = .True. 
+                L_ROW  (1 :NVARS3D ) = .True. 
+                L_VEXT (1 :NVARS3D ) = .False.
+
+                CALL LOAD_MIO_FILE ( 'CTM_MGEM_1', 0, 0, 0,
+     &               VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &               VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &               L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &               L_VEXT(1:NVARS3D) )
+
+#endif
             END IF
 
             METEMIS_INIT = .TRUE.
@@ -290,6 +273,7 @@
             REAL            TF2, QV, QVM, ADJ, PP, E1, E2, A, B
             CHARACTER*16    VNAME
             CHARACTER*512   MESG
+            CHARACTER( 20 ) :: TIMESTAMP
         !!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
             IF ( FIRSTIME ) THEN
@@ -402,6 +386,7 @@ C ..........  Determine the time to read and/or write the hourly files
                  NTICS = 0
                  TOT_TSTEP = 0
                  CALL NEXTIME( LDATE, LTIME, MV_TSTEP_F)
+                 CALL MIO_TIME_FORMAT_CONVERSION( LDATE, LTIME, TIMESTAMP )
                  R_READY = .TRUE.
               END IF
 
@@ -413,11 +398,8 @@ C ..........  Output diagnostic emissions
                  IF ( LASTTIC ) THEN   ! time to write out
                     VDEMIS_MVDIAG = VDEMIS_MVDIAG / REAL( MTICS, 4 )  ! array assignment
                     DO V = 1, NMETSPC
-                      IF ( .NOT. WRITE3( CTM_METEMIS_DIAG, MTNAME(V), 
-     &                                   LDATE, LTIME,VDEMIS_MVDIAG( V,:,:) ) ) THEN
-                         XMSG = 'Could not write to ' // TRIM( CTM_METEMIS_DIAG )
-                         CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
-                      END IF
+                        CALL MIO_FWRITE( CTM_METEMIS_DIAG, MTNAME(V), PNAME,
+     &                                   VDEMIS_MVDIAG( V,:,:), TIMESTAMP ) 
                     END DO
                     WRITE( LOGDEV,94040 )
      &                     'Timestep written to', TRIM( CTM_METEMIS_DIAG ),
