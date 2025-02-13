@@ -38,6 +38,8 @@
         USE HGRD_DEFN             ! horizontal domain specifications
         USE ASX_DATA_MOD          ! all gridded input variables, as Met_Data%*(ncols,nrows)
         USE UTILIO_DEFN
+        USE MIO_MODULE
+        USE MIO_ASCII
 
         IMPLICIT NONE
         
@@ -53,7 +55,7 @@
         REAL,  ALLOCATABLE, PUBLIC, PROTECTED, SAVE :: MTEMPS( : )
         REAL,  ALLOCATABLE, PUBLIC, PROTECTED, SAVE :: VDEMIS_MV( :,:,: ) !! ( NMETSPC,NCOLS,NROWS )
         REAL,  ALLOCATABLE, PRIVATE, PROTECTED, SAVE :: VDEMIS_MVDIAG( :,:,: ) !! ( NMETSPC,NCOLS,NROWS )
-        LOGICAL, ALLOCATABLE,PRIVATE,PROTECTED, SAVE :: MT_GAS( : ), MT_DSL( : )
+        LOGICAL, ALLOCATABLE,PRIVATE,PROTECTED, SAVE :: MT_GSL( : ), MT_DSL( : )
 
 
         PRIVATE     !!  everything else
@@ -104,16 +106,16 @@
 
             CHARACTER*24, PARAMETER :: PNAME = 'METEMIS:METEMIS_INIT'
 
-            INTEGER         ISTAT, ISPC, K, N
+            INTEGER         ISTAT, ISPC, K, N, V, FLOC
             CHARACTER*256   MESG
 
-            !!........  Open MVMT and read header
+            ! Open Temperature-Binned Mobile Emission File and read header
             CALL MIO_FOPEN( TBLNAME, MIO_READ_ONLY )
             FLOC = MIO_SEARCH( TBLNAME )          
 
-            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'SDATE', SDATE3D )
-            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'STIME', STIME3D )
-            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'TSTEP', TSTEP3D )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'SDATE', SDATEMT )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'STIME', STIMEMT )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'TSTEP', TSTEPMT )
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NLAYS', NMTEMP )
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NVARS', NMETSPC )
 
@@ -128,7 +130,7 @@
             CALL SUBHFILE( TBLNAME, GXOFF, GYOFF, STRTCOL, ENDCOL,
      &                     STRTROW, ENDROW )
 
-         !!........  Allocate input-related arrays:
+            ! Allocate and initialize input-related arrays:
             ALLOCATE( DESID_EMVAR( IMETSRM )%ARRY ( NMETSPC ),
      &                DESID_EMVAR( IMETSRM )%UNITS( NMETSPC ),
      &                DESID_EMVAR( IMETSRM )%MW   ( NMETSPC ),
@@ -141,44 +143,44 @@
      &                TEMPVAL( NCOLS,NROWS ), MTEMPS( NMTEMP ),
      &                VDEMIS_MV( NMETSPC,NCOLS,NROWS ),
      &                VDEMIS_MVDIAG( NMETSPC,NCOLS,NROWS ), STAT = ISTAT )
-            ETABLE = 0.0
-            TEMPVAL= 0.0
-            VDEMIS_MVDIAG = 0.0
-            
-
-            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VGLVLS', MTEMPS )
-            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VAR_NAME', MTNAME )
-            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'UNITS', MTUNIT )
-            MTBASIS( 1:NMETSPC) = 'UNIT'
-
-            IF (HUM_NOX_YN) THEN
-                ALLOCATE( QVMOL( NCOLS,NROWS,NLAYS), STAT = ISTAT ) 
-                QVMOL= 0.0
-                ALLOCATE( MT_GAS( NMETSPC ), MT_DSL( NMETSPC ), STAT=ISTAT )
-                MT_GAS = .FALSE.
-                MT_DSL = .FALSE.
-
-                DO ISPC = 1,NMETSPC
-                    IF ( MTNAME( ISPC ) .EQ. 'NO_GAS' .OR.
-     &                   MTNAME( ISPC ) .EQ. 'NO2_GAS' .OR.
-     &                   MTNAME( ISPC ) .EQ. 'HONO_GAS' ) THEN
-                      MT_GAS( ISPC ) = .TRUE.
-                    ELSE IF( MTNAME( ISPC ) .EQ. 'NO_DIS' .OR.
-     &                       MTNAME( ISPC ) .EQ. 'NO2_DIS' .OR.
-     &                       MTNAME( ISPC ) .EQ. 'HONO_DIS' ) THEN
-                      MT_DSL( ISPC ) = .TRUE.
-                    END IF
-               END DO
-            END IF
-
-
             IF ( ISTAT .NE. 0 ) THEN
                 WRITE( MESG, '( A, I9 )' ) 'Error allocating ETABLE:  STATUS=', ISTAT
                 CALL M3WARN( PNAME, 0, 0, MESG )
                 METEMIS_INIT = .FALSE.
                 RETURN
             END IF
+            
+            ETABLE = 0.0
+            TEMPVAL= 0.0
+            VDEMIS_MVDIAG = 0.0
+            
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VGLVLS', MTEMPS )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VAR_NAME', MTNAME )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'UNITS', MTUNIT )
+            MTBASIS( 1:NMETSPC) = 'UNIT'
 
+            ! Map Emission Variables Needed for Humidity Adjustment
+            IF (HUM_NOX_YN) THEN
+                ALLOCATE( QVMOL( NCOLS,NROWS,NLAYS), STAT = ISTAT ) 
+                QVMOL= 0.0
+                ALLOCATE( MT_GSL( NMETSPC ), MT_DSL( NMETSPC ), STAT=ISTAT )
+                MT_GSL = .FALSE.
+                MT_DSL = .FALSE.
+
+                DO ISPC = 1,NMETSPC
+                    IF ( MTNAME( ISPC ) .EQ. 'NO_GSL' .OR.
+     &                   MTNAME( ISPC ) .EQ. 'NO2_GSL' .OR.
+     &                   MTNAME( ISPC ) .EQ. 'HONO_GSL' ) THEN
+                      MT_GSL( ISPC ) = .TRUE.
+                    ELSE IF( MTNAME( ISPC ) .EQ. 'NO_DSL' .OR.
+     &                       MTNAME( ISPC ) .EQ. 'NO2_DSL' .OR.
+     &                       MTNAME( ISPC ) .EQ. 'HONO_DSL' ) THEN
+                      MT_DSL( ISPC ) = .TRUE.
+                    END IF
+               END DO
+            END IF
+
+            ! Populate Data-Structures needed for DESID
             DESID_EMVAR( IMETSRM )%LEN   = NMETSPC
             DESID_EMVAR( IMETSRM )%ARRY  = MTNAME( 1:NMETSPC )
             DESID_EMVAR( IMETSRM )%UNITS = MTUNIT( 1:NMETSPC )
@@ -189,9 +191,9 @@
             DESID_EMVAR( IMETSRM )%LAREA = .FALSE.
             DESID_EMVAR( IMETSRM )%LAREAADJ = .FALSE.
             
+            ! Initialize Time Parameters
             MV_TSTEP = TIME2SEC( TSTEP )
             MV_TSTEP_F = TSTEP
-
             LDATE = STDATE; LTIME = STTIME
 
 
@@ -355,7 +357,7 @@ C.................  NOx humidity corrections for mobile sources (MOVES3)
                   QV  = QVMOL( C,R,1 ) * 1000.0  ! convert from kg water/kg dry air to g/kg
 
                   DO V = 1, NMETSPC
-                      IF( MT_GAS( V ) ) THEN
+                      IF( MT_GSL( V ) ) THEN
                           ! Correct Gasoline Emission (NO, NO2, and HONO) for Humidity
                           A = MIN( QV, 17.71 )
                           B = MAX( 3.0, A )
