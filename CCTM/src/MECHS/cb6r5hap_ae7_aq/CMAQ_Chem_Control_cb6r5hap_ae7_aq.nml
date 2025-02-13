@@ -616,9 +616,13 @@ CMPST =
                 'ug m-3', 'FINE', 
                 'PMF_OA -1.0 * PMF_OC',
 
-'PMF_CLDGLY'  , 'Fine-Mode SOA from glyoxal and methylglyoxal',
+'PMF_CLDGLY'  , 'Fine-Mode SOA from glyoxal and methylglyoxal via clouds',
                 'ug m-3', 'FINE', 
-                'AORGC + AGLY',
+                'AORGC',
+
+'PMF_PRTGLY'  , 'Fine-Mode SOA from glyoxal and methylglyoxal via particle rxn',
+                'ug m-3', 'FINE', 
+                'AGLY',
 
 'PMF_ISOPSOA' , 'Fine-Mode Isoprene SOA excl IEPOX SOA',
                 'ug m-3', 'FINE', 

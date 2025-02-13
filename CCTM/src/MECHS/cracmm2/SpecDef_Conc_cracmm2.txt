@@ -68,8 +68,8 @@ NTR             ,ppbV      ,1000.0*(ONIT[1]+ISON[1]+INALD[1]+TRPN[1]+HONIT[1]), 
 PANS            ,ppbV      ,1000.0*(PAN[1]+PPN[1]+MPAN[1])
 NOY             ,ppbV      ,1000.0*(NO[1]+NO2[1]+NO3[1]+2*N2O5[1]+HONO[1] \
                                    +HNO3[1]+HNO4[1]+PAN[1]+PPN[1]+MPAN[1] \
-                                   +ISON[1]+INALD[1]+IPX[1]+TRPN[1]+ONIT[1]) \
-                                   +HONIT[1]+ANO3_PPB[0]
+                                   +ISON[1]+INALD[1]+IPX[1]+TRPN[1]+ONIT[1] \
+                                   +HONIT[1])+ANO3_PPB[0]
 O3              ,ppbV      ,1000.0*O3[1]
 SO2             ,ppbV      ,1000.0*SO2[1]
 SO2_UGM3        ,ug m-3    ,1000.0*(SO2[1]*(64.0/28.9628)*DENS[2])
@@ -178,6 +178,7 @@ AFEK            ,ug m-3    ,                  0.02695*ASOIL[1]+0.0467*ACORS[1]
 AMNK            ,ug m-3    ,                  0.00075*ASOIL[1]+0.0011*ACORS[1]
 
 ACLIJ           ,ug m-3    ,ACLI[1]+ACLJ[1]
+ACLK            ,ug m-3    ,ACLK[1]
 AECIJ           ,ug m-3    ,AECI[1]+AECJ[1]
 ANAIJ           ,ug m-3    ,ANAJ[1]+ANAI[1]
 ANO3IJ          ,ug m-3    ,ANO3I[1]+ANO3J[1]
@@ -257,7 +258,8 @@ AORGAJ          ,ug m-3     ,AROCN2OXY2J[1]+AROCN2OXY4J[1]+AROCN2OXY8J[1]+AROCN1
 AORGAIJ         ,ug m-3     ,AORGAI[0] + AORGAJ[0]
 
 !!! Biogenic-VOC Derived Organic Aerosol
-AORGBIJ         ,ug m-3    ,AISO3NOSJ[1] +AISO3OSJ[1] +AHOMJ[1] + AELHOMJ[1]
+AORGBIJ         ,ug m-3    ,AISO3NOSJ[1] +AISO3OSJ[1] +AHOMJ[1] + AELHOMJ[1] \
+                            AISO4J[1] + AISO5J[1] + ATRPNJ[1] + AHONITJ[1]
 
 !!! Cloud-Processed  SOA
 AORGCJ          ,ug m-3    ,AORGCJ[1]
