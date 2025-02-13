@@ -1,6 +1,6 @@
 Information is based on the mech.def file.
 * Fall-off or pressure dependent reaction rate constants (M equals air number density):
- * For rate constants with k<sub>o</sub>, k<sub>i</sub>, n, F values: k = [ k<sub>o</sub>M/(1+k<sub>o</sub>M/k<sub>i</sub>)]F<sup>G</sup>, where G=(1+(log<sub>10</sub>(k<sub>o</sub>M/k<sub>i</sub>)/n)<sup>2</sup>))<sup>-1</sup> 
+ * For rate constants with k<sub>o</sub>, k<sub>i</sub>, n, F values: k = [ k<sub>o</sub>M/(1+k<sub>o</sub>M/k<sub>i</sub>)]F<sup>G</sup>, where G=(1+(log<sub>10</sub>(k<sub>o</sub>M/k<sub>i</sub>)/n)<sup>2</sup>)<sup>-1</sup> 
  * For rate constants with k<sub>1</sub>, k<sub>2</sub>: k = k<sub>1</sub> + k<sub>2</sub>M
  * For rate constants with k<sub>0</sub>, k<sub>2</sub>, k<sub>3</sub>: k = k<sub>0</sub> + k<sub>3</sub>M/(1+k<sub>3</sub>M/k<sub>2</sub>)
  * For rate constants with k<sub>1</sub>, k<sub>2</sub>, k<sub>3</sub>: k = k<sub>1</sub> + k<sub>2</sub>M + k<sub>3</sub> 
@@ -8,7 +8,7 @@ Information is based on the mech.def file.
 * For rate constants with the form A<_Reference_>, k equals A times a reference that represents photolysis rate, a heteorogeneous rate constant, rate constant for the given reaction or an operator. A equals one if not given.
 
 * In the mechanism definition file, the rate is formatted as
- * A~<_HETEOROGENEOUS_>
+ * A~<_HETEROGENEOUS_>
  * A*K<_REACTION_>
  * A/<_PHOTOLYSIS_>
  * A?<_OPERATOR_>
@@ -270,8 +270,8 @@ Information is based on the mech.def file.
 | CL28   | CLO + NO2 ----> CLNO3  | k<sub>o</sub>=  1.80E-31e<sup>     0.0/T</sup>(T/300)<sup> -3.40</sup><br>k<sub>i</sub> =   1.50E-11e<sup>     0.0/T</sup>(T/300)<sup> -1.90</sup><br>n=     1.00;F=     0.60 |   2.3359E-12 |
 | CL30   | CLNO3 ----> CLO + NO2  | CLONO2_1 | Not Available<sup>1</sup> | 
 | CL31   | CLNO3 ----> CL + NO3  | CLONO2_2 | Not Available<sup>1</sup> | 
-| HET_CLNO3_WAI   | CLNO3 ----> HOCL + HNO3  | HETERO_CLNO3_WAI | Not Available<sup>2</sup> | 
-| HET_CLNO3_WAJ   | CLNO3 ----> HOCL + HNO3  | HETERO_CLNO3_WAJ | Not Available<sup>2</sup> | 
+| HET_CLN3_WAI   | CLNO3 ----> HOCL + HNO3  | HETERO_CLN3_WAI | Not Available<sup>2</sup> | 
+| HET_CLN3_WAJ   | CLNO3 ----> HOCL + HNO3  | HETERO_CLN3_WAJ | Not Available<sup>2</sup> | 
 | SA01   | TOLRO2 + NO ----> NO +    0.0160\*SVAVB2 +    0.0510\*SVAVB3 +    0.0470\*SVAVB4  |   2.70E-12e<sup>   360.00/T</sup> |   9.0313E-12 |
 | SA02   | TOLRO2 + HO2 ----> HO2 +    0.1400\*SVAVB1  |   1.90E-13e<sup>  1300.00/T</sup> |   1.4872E-11 |
 | SA03   | XYLRO2 + NO ----> NO +    0.0150\*SVAVB2 +    0.0230\*SVAVB3 +    0.0600\*SVAVB4  |   2.70E-12e<sup>   360.00/T</sup> |   9.0313E-12 |
@@ -365,8 +365,8 @@ Information is based on the mech.def file.
 | DMS3   | DMS + NO3 ----> SO2 + HNO3 + MEO2 + FORM  |   1.90E-13e<sup>   520.00/T</sup> |   1.0869E-12 |
 | DMS4   | DMS + CL ---->   0.8600\*SO2 + MEO2 +    0.4500\*FORM +    0.4500\*HCL +    0.1400\*MSA +    0.5500\*CLO  |   3.40E-13e<sup>  2081.00/T</sup> |   3.6537E-10 |
 
-<sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molcules/cm<sup>3</sup>;   1.00 Atm.     
+<sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     
 <sup>1</sup>Photolysis Reaction;depends on radiation and predicted concentrations     
-<sup>2</sup>Heteorogeneous Reaction;Depends predicted concentrations                
-<sup>4</sup>Set to zero if sun is below the horizon. SEAWATER equals surface fraction covered by ice free open ocean plus surf zones. P equals air pressure in atmospheres.         
+<sup>2</sup>Heterogeneous Reaction; depends on predicted concentrations                
+<sup>4</sup>Set to zero if sun is below the horizon. SEAWATER equals fraction of ocean plus surf zones not covered by seaice. P equals air pressure in atmospheres.         
 <sup>7</sup>Rate constant multiple of constant for listed reaction   
