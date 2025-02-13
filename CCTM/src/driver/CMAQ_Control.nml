@@ -378,7 +378,7 @@
                 'DD_PMC_CA','DD_PMC_MG','DD_PMC_K'
 
   Keywd_name(47) = 'TSP_DDEP'
-  Keywd(47,:) = 'DD_CL','DD_CA','DD_MG','DD_K','DD_NA'
+  Keywd(47,:) = 'DD_TSP_CL','DD_TSP_CA','DD_TSP_MG','DD_TSP_K','DD_TSP_NA'
 
   Keywd_name(48) = 'PM_WDEP'
   Keywd(48,:) = 'WD_TSP_NO3','WD_TSP_NH4','WD_TSP_SO4','WD_TSP_MTNO3','WD_TSP_NA',
@@ -391,7 +391,7 @@
  !----- Total Deposition -----!
  !----------------------------!
   Keywd_name(49) = 'PM_TDEP'
-  Keywd(49,:) = 'TD_NA'
+  Keywd(49,:) = 'TD_TSP_NA'
 
   Keywd_name(50) = 'GASPM_DEP'
   Keywd(50,:) = 'DD_TNO3','WD_TNO3','DD_NHX','WD_NHX','WD_SOX','WD_TCL','TD_TCL'
