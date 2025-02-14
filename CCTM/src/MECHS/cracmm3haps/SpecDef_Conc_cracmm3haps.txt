@@ -111,8 +111,8 @@ ABPINENES       ,ppbV      ,1000.0*(API[1])
 ALDX            ,ppbV      ,1000.0*ALD[1],            C3 and higher aldehydes is ALD in CRACMM
 !NOZ             ,ppbV      ,NOY[0]-NOX[0]
 !SULF            ,ppbV      ,1000.0*SULF[1]
-! SIGROC: S/IVOC alk and oxy gas species
-LSIVROC         ,ppbC      ,1000.0* (9.5*VROCIOXY[1] \
+! LSIGROC: L/S/IVOC alk and oxy gas species
+LSIVROCG        ,ppbC      ,1000.0* (9.5*VROCIOXY[1] \
                                     +14.0*VROCP5ARO[1]+13.0*VROCP6ARO[1] \
                                     +30.0*VROCN2ALK[1]+29.0*VROCN1ALK[1] \
                                     +28.0*VROCP0ALK[1]+27.0*VROCP1ALK[1] \
@@ -127,8 +127,8 @@ LSIVROC         ,ppbC      ,1000.0* (9.5*VROCIOXY[1] \
                                     +12.0*VROCP2OXY2[1]+11.0*VROCP3OXY2[1] \ 
                                     +9.0*VROCP4OXY2[1]+11.0*VROCP5OXY1[1] \ 
                                     +9.0*VROCP6OXY1[1] ),                  
-! VROC: Total gas-phase (vapor) reactive organic carbon (stable species only) 
-VROC             ,ppbC      ,1000.0*(2.0*ACD[1]+2.0*ACE[1] \
+! TOTROCG: Total gas-phase (vapor) reactive organic carbon (stable species only) 
+TOTROCG        ,ppbC      ,1000.0*(2.0*ACD[1]+2.0*ACE[1] \
                                     +3.0*ACRO[1]+3.0*ACT[1]+3.0*ALD[1]+10*API[1] \
                                     +7.0*BALD[1]+4.0*BDE13[1]+6.0*BEN[1] \
                                     +9.0*CSL[1]+5.0*DCB1[1]+6.0*DCB2[1]+4.0*DCB3[1] \
@@ -153,7 +153,7 @@ VROC             ,ppbC      ,1000.0*(2.0*ACD[1]+2.0*ACE[1] \
                                     +2.0*PAA[1]+2.0*PAN[1]+3.0*PPN[1]+4.0*MPAN[1] \  
                                     +4.0*ONIT[1]+5.0*ISON[1] \
                                     +5.0*INALD[1]+5.0*IPX[1]+10.0*TRPN[1]+10.0*HONIT[1] ) \ 
-                                    +LSIVROC[0] ,
+                                    +LSIVROCG[0] ,
 !! Additional Global, Regional and Urban Toxic gases
 ACROLEIN_UGM3   ,ug/m3     ,1000.0*(ACRO[1]*1.9370*DENS[2])
 ACROLEIN_PRIMARY,ug/m3     ,1000.0*(ACRO_PRIM[1]*1.9370*DENS[2])
@@ -241,11 +241,13 @@ AECIJ           ,ug m-3    ,AECI[1]+AECJ[1]
 ANAIJ           ,ug m-3    ,ANAJ[1]+ANAI[1]
 ANO3IJ          ,ug m-3    ,ANO3I[1]+ANO3J[1]
 ANO3K           ,ug m-3    ,ANO3K[1]
-TNO3            ,ug m-3    ,2175.6*(HNO3[1]*DENS[2])+ANO3I[1]+ANO3J[1]+ANO3K[1]
+TNO3            ,ug m-3    ,2175.2*(HNO3[1]*DENS[2])+ANO3I[1]+ANO3J[1]+ANO3K[1]
 ANH4IJ          ,ug m-3    ,ANH4I[1]+ANH4J[1]
 ANH4K           ,ug m-3    ,ANH4K[1]
 ASO4IJ          ,ug m-3    ,ASO4I[1]+ASO4J[1]
 ASO4K           ,ug m-3    ,ASO4K[1]
+AFEK            ,ug m-3    ,0.02695*ASOIL[1]+0.0467*ACORS[1]
+AMNK            ,ug m-3    ,0.00075*ASOIL[1]+0.0011*ACORS[1]
 
 !! Organic Particle Species
 ! Why is there an APOCI and APOCJ in the output? It doesn't match below
@@ -352,38 +354,40 @@ ANCOMIJ         ,ug m-3    ,AOMIJ[0] - AOCIJ[0]
 AUNSPEC2IJ      ,ug m-3     ,AUNSPEC1IJ[0] - ANCOMIJ[0]
 
 !! AMS Projection of Output Concentrations
-PMAMS_CL        ,ug m-3    ,ACLI[1] *FAMSAIT[3] +ACLJ[1]*FAMSACC[3]+ACLK[1] *FAMSCOR[3]
-PMAMS_NH4       ,ug m-3    ,ANH4I[1]*FAMSAIT[3]+ANH4J[1]*FAMSACC[3]+ANH4K[1]*FAMSCOR[3]
-PMAMS_NO3       ,ug m-3    ,ANO3I[1]*FAMSAIT[3]+ANO3J[1]*FAMSACC[3]+ANO3K[1]*FAMSCOR[3]
-PMAMS_OA        ,ug m-3    ,AOMI[0] *FAMSAIT[3]+AOMJ[0] *FAMSACC[3]
-PMAMS_SO4       ,ug m-3    ,ASO4I[1]*FAMSAIT[3]+ASO4J[1]*FAMSACC[3]+ASO4K[1]*FAMSCOR[3]
+PMAMS_CL        ,ug m-3    ,ACLI[1] *FAMS_AIT[3] +ACLJ[1]*FAMS_ACC[3]+ACLK[1] *FAMS_COR[3]
+PMAMS_NH4       ,ug m-3    ,ANH4I[1]*FAMS_AIT[3]+ANH4J[1]*FAMS_ACC[3]+ANH4K[1]*FAMS_COR[3]
+PMAMS_NO3       ,ug m-3    ,ANO3I[1]*FAMS_AIT[3]+ANO3J[1]*FAMS_ACC[3]+ANO3K[1]*FAMS_COR[3]
+PMAMS_OA        ,ug m-3    ,AOMI[0] *FAMS_AIT[3]+AOMJ[0] *FAMS_ACC[3]
+PMAMS_SO4       ,ug m-3    ,ASO4I[1]*FAMS_AIT[3]+ASO4J[1]*FAMS_ACC[3]+ASO4K[1]*FAMS_COR[3]
 
 !! PM1 Cutoff Output
-PM1_TOT         ,ug m-3    ,ATOTI[0]*FPM1AIT[3]+ATOTJ[0]*FPM1ACC[3]+ATOTK[0]*FPM1COR[3]
+PM1_TOT         ,ug m-3    ,ATOTI[0]*FPM1_AIT[3]+ATOTJ[0]*FPM1_ACC[3]+ATOTK[0]*FPM1_COR[3]
 
 !! Unused PM1 Species. Included Here for demonstration
-!PM1_EC         ,ug m-3    ,AECI[1] *FPM1AIT[3] +AECJ[1] *FPM1ACC[3]
-!PM1_OC         ,ugC m-3   ,AOCI[0] *FPM1AIT[3] +AOCJ[0] *FPM1ACC[3]
-!PM1_OM         ,ug m-3    ,AOMI[0] *FPM1AIT[3] +AOMJ[0] *FPM1ACC[3]
-!PM1_SO4        ,ug m-3    ,ASO4I[1]*FPM1AIT[3] +ASO4J[1]*FPM1ACC[3] +ASO4K[1]*FPM1COR[3]
-!PM1_CL         ,ug m-3    ,ACLI[1] *FPM1AIT[3] +ACLJ[1] *FPM1ACC[3] +ACLK[1] *FPM1COR[3]
-!PM1_NA         ,ug m-3    ,ANAI[1] *FPM1AIT[3] +ANAJ[1] *FPM1ACC[3] +ANAK[0] *FPM1COR[3]
-!PM1_MG         ,ug m-3    ,                     AMGJ[1] *FPM1ACC[3] +AMGK[0] *FPM1COR[3]
-!PM1_K          ,ug m-3    ,                     AKJ[1]  *FPM1ACC[3] +AKK[0]  *FPM1COR[3]
-!PM1_CA         ,ug m-3    ,                     ACAJ[1] *FPM1ACC[3] +ACAK[0] *FPM1COR[3]
-!PM1_NH4        ,ug m-3    ,ANH4I[1] *FPM1AIT[3]+ANH4J[1]*FPM1ACC[3] +ANH4K[1]*FPM1COR[3]
-!PM1_NO3        ,ug m-3    ,ANO3I[1] *FPM1AIT[3]+ANO3J[1]*FPM1ACC[3] +ANO3K[1]*FPM1COR[3]
-!PM1_SOIL       ,ug m-3    ,ASOILJ[0]*FPM1ACC[3]+(ASOIL[1]+ACORS[1])*FPM1COR[3]
+!PM1_EC         ,ug m-3    ,AECI[1] *FPM1_AIT[3] +AECJ[1] *FPM1_ACC[3]
+!PM1_OC         ,ugC m-3   ,AOCI[0] *FPM1_AIT[3] +AOCJ[0] *FPM1_ACC[3]
+!PM1_OM         ,ug m-3    ,AOMI[0] *FPM1_AIT[3] +AOMJ[0] *FPM1_ACC[3]
+!PM1_SO4        ,ug m-3    ,ASO4I[1]*FPM1_AIT[3] +ASO4J[1]*FPM1_ACC[3] +ASO4K[1]*FPM1_COR[3]
+!PM1_CL         ,ug m-3    ,ACLI[1] *FPM1_AIT[3] +ACLJ[1] *FPM1_ACC[3] +ACLK[1] *FPM1_COR[3]
+!PM1_NA         ,ug m-3    ,ANAI[1] *FPM1_AIT[3] +ANAJ[1] *FPM1_ACC[3] +ANAK[0] *FPM1_COR[3]
+!PM1_MG         ,ug m-3    ,                     AMGJ[1] *FPM1_ACC[3] +AMGK[0] *FPM1_COR[3]
+!PM1_K          ,ug m-3    ,                     AKJ[1]  *FPM1_ACC[3] +AKK[0]  *FPM1_COR[3]
+!PM1_CA         ,ug m-3    ,                     ACAJ[1] *FPM1_ACC[3] +ACAK[0] *FPM1_COR[3]
+!PM1_NH4        ,ug m-3    ,ANH4I[1] *FPM1_AIT[3]+ANH4J[1]*FPM1_ACC[3] +ANH4K[1]*FPM1_COR[3]
+!PM1_NO3        ,ug m-3    ,ANO3I[1] *FPM1_AIT[3]+ANO3J[1]*FPM1_ACC[3] +ANO3K[1]*FPM1_COR[3]
+!PM1_SOIL       ,ug m-3    ,ASOILJ[0]*FPM1_ACC[3]+(ASOIL[1]+ACORS[1])*FPM1_COR[3]
 !PM1_UNSPEC1    ,ug m-3    ,PM1_TOT[0] - (PM1_CL[0] + PM1_EC[0]+ PM1_NA[0]  + PM1_NH4[0] +  \
 !                                         PM1_NO3[0]+ PM1_OC[0]+ PM1_SOIL[0]+ PM1_SO4[0] )
-!PM1_UNSPCRS    ,ug m-3    ,ATOTK[0] *FPM1COR[3] - (ASO4K[1]*FPM1COR[3] \
-!                                                  +ACLK[1]*FPM1COR[3]  \
-!                                                  +ANAK[0]*FPM1COR[3]  \
-!                                                  +AMGK[0]*FPM1COR[3]  \
-!                                                  +AKK[0]*FPM1COR[3]   \
-!                                                  +ACAK[0]*FPM1COR[3]  \
-!                                                  +ANH4K[1]*FPM1COR[3] \
-!                                                  +ANO3K[1]*FPM1COR[3])
+!PM1_UNSPCRS    ,ug m-3    ,ATOTK[0] *FPM1_COR[3] - (ASO4K[1]*FPM1_COR[3] \
+!                                                  +ACLK[1]*FPM1_COR[3]  \
+!                                                  +ANAK[0]*FPM1_COR[3]  \
+!                                                  +AMGK[0]*FPM1_COR[3]  \
+!                                                  +AKK[0]*FPM1_COR[3]   \
+!                                                  +ACAK[0]*FPM1_COR[3]  \
+!                                                  +AFEK[0]*FPM1_COR[3]  \
+!                                                  +AMNK[0]*FPM1_COR[3]  \
+!                                                  +ANH4K[1]*FPM1_COR[3] \
+!                                                  +ANO3K[1]*FPM1_COR[3])
 
 !! PM2.5 species computed using modeled size distribution
 PM25_HP         ,ug m-3    ,(AH3OPI[1]*FPM25_AIT[3]+AH3OPJ[1]*FPM25_ACC[3]+AH3OPK[1]*FPM25_COR[3])*1.0/19.0
@@ -408,6 +412,8 @@ PM25_UNSPCRS    ,ug m-3    ,ATOTK[0]*FPM25_COR[3] - (ASO4K[1]*FPM25_COR[3] \
                                                   +AMGK[0]*FPM25_COR[3]  \
                                                   +AKK[0]*FPM25_COR[3]   \
                                                   +ACAK[0]*FPM25_COR[3]  \
+                                                  +AFEK[0]*FPM25_COR[3]  \
+                                                  +AMNK[0]*FPM25_COR[3]  \
                                                   +ANH4K[1]*FPM25_COR[3] \
                                                   +ANO3K[1]*FPM25_COR[3])
 
@@ -423,13 +429,13 @@ PM25_UNSPCRS    ,ug m-3    ,ATOTK[0]*FPM25_COR[3] - (ASO4K[1]*FPM25_COR[3] \
 !! PM10.0 and Coarse-Sized Species
 PM10            ,ug m-3    ,ATOTI[0]*FPM10_AIT[3]+ATOTJ[0]*FPM10_ACC[3]+ATOTK[0]*FPM10_COR[3]
 
-PMC_CL          ,ug m-3    ,ACLI[1]*FPM10_AIT[3] +ACLJ[1]*FPM10_ACC[3] +ACLK[1]*FPM10_COR[3] -PM25_CL[0]
-PMC_NA          ,ug m-3    ,ANAI[1]*FPM10_AIT[3] +ANAJ[1]*FPM10_ACC[3] +ANAK[0]*FPM10_COR[3] -PM25_NA[0]
-PMC_NH4         ,ug m-3    ,ANH4I[1]*FPM10_AIT[3]+ANH4J[1]*FPM10_ACC[3]+ANH4K[1]*FPM10_COR[3]-PM25_NH4[0]
-PMC_NO3         ,ug m-3    ,ANO3I[1]*FPM10_AIT[3]+ANO3J[1]*FPM10_ACC[3]+ANO3K[1]*FPM10_COR[3]-PM25_NO3[0]
-PMC_SO4         ,ug m-3    ,ASO4I[1]*FPM10_AIT[3]+ASO4J[1]*FPM10_ACC[3]+ASO4K[1]*FPM10_COR[3]-PM25_SO4[0]
-PMC_TOT         ,ug m-3    ,PM10[0]-PM25_TOT[0]
-
+PMC_CL          ,ug m-3    ,ACLI[1]*FPM25TO10_AIT[3] +ACLJ[1]*FPM25TO10_ACC[3] +ACLK[1]*FPM25TO10_COR[3] 
+PMC_NA          ,ug m-3    ,ANAI[1]*FPM25TO10_AIT[3] +ANAJ[1]*FPM25TO10_ACC[3] +ANAK[0]*FPM25TO10_COR[3] 
+PMC_NH4         ,ug m-3    ,ANH4I[1]*FPM25TO10_AIT[3]+ANH4J[1]*FPM25TO10_ACC[3]+ANH4K[1]*FPM25TO10_COR[3]
+PMC_NO3         ,ug m-3    ,ANO3I[1]*FPM25TO10_AIT[3]+ANO3J[1]*FPM25TO10_ACC[3]+ANO3K[1]*FPM25TO10_COR[3]
+PMC_SO4         ,ug m-3    ,ASO4I[1]*FPM25TO10_AIT[3]+ASO4J[1]*FPM25TO10_ACC[3]+ASO4K[1]*FPM25TO10_COR[3]
+PMC_TOT         ,ug m-3    ,ATOTI[0]*FPM25TO10_AIT[3]+ATOTJ[0]*FPM25TO10_ACC[3]+ATOTK[0]*FPM25TO10_COR[3]
+ 
 
 !! FRM PM Equivalent Calculation
 !! This section calculates the FRM applicable PM species, PMIJ_FRM and
