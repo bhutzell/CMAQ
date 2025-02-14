@@ -173,6 +173,8 @@ END ELIMINATE
 
 
 
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -266,7 +268,7 @@ REACTIONS[CM] =
 <R068> HNO4 + HO = NO2 # 4.50E-13 @ -610.;
 <R069> SO2 + HO = HO2 + SULF + SULRXN  # 2.9E-31 ^ -4.1 
                 & 1.7E-12 ^ +0.2;                
-<R070> CO + HO = HO2 + CO2  %3 # 1.44E-13 @ 0.0 & 2.74E-33 @ 0.0;
+<R070> CO + HO = HO2 + CO2 %3 # 1.44E-13 @ 0.0 & 2.74E-33 @ 0.0;
 <R071> HO + CH4 = MO2  - 1.0000*DELTA_C # 2.45E-12 @ 1775.;
 <R072> ETH + HO = ETHP # 7.66E-12 @ 1020.;
 <R073> HC3 + HO = HC3P + 0.0000281*ASOATJ  - 0.0001*DELTA_C 
@@ -281,12 +283,12 @@ REACTIONS[CM] =
 ! MCM-based chemistry for aromatics, RACM2 rates for BEN, TOL, XYL, EBZ
 <ROCARO31> BEN + HO = 0.470*BENP + 0.530*PHEN + 0.530*HO2 
                     # 2.33E-12 @ 193.;                    
-<ROCARO41> TOL + HO = 0.820*TOLP + 0.180*CSL + 0.180*HO2  
-                    - 0.3600*DELTA_C # 1.81E-12 @ -354.;                    
+<ROCARO41> TOL + HO = 0.820*TOLP + 0.180*CSL + 0.180*HO2 
+                    # 1.81E-12 @ -354.;                    
 <ROCARO51> XYL + HO = 0.830*XYLP + 0.170*CSL + 0.170*HO2  
-                    - 0.1700*DELTA_C # 2.33E-11;                    
+                    + 0.1700*DELTA_C # 2.33E-11;                    
 <ROCARO61> EBZ + HO = 0.820*EBZP + 0.180*CSL + 0.180*HO2  
-                    - 0.1800*DELTA_C # 7.00E-12;                    
+                    + 0.1800*DELTA_C # 7.00E-12;                    
 <ROCARO61a> EBZ + NO3 = EBZP + HNO3 # 5.70E-16;		
 !Isoprene AMORE mechanism
 <RAM01> ISO + O3 = 0.250*HO + 0.250*HO2 + 0.400*MO2 + 0.018*ACO3 
@@ -347,10 +349,10 @@ REACTIONS[CM] =
                  + 0.010*MGLY + 0.790*OP2  + 0.9000*DELTA_C # 1.00E-11;                 
 <R104> BALD + HO = BALP # 5.32E-12 @ -243.;
 <R105> PHEN + HO = 0.152*ASOATJ + 0.619*HO2 + 0.170*ADDC + 0.059*CHO 
-                 + 0.619*MCT  - 1.0590*DELTA_C # 6.75E-12 @ -405.;                 
+                 + 0.619*MCT  - 0.4400*DELTA_C # 6.75E-12 @ -405.;                 
 <R106> CSL + HO = 0.200*ASOATJ + 0.584*HO2 + 0.160*ADDC + 0.056*CHO 
-                + 0.584*MCT  + 1.9440*DELTA_C # 4.65E-11 @ 0.0;                
-<R108> MCT + HO = MCTO # 2.05E-10 @ 0.0;
+                + 0.584*MCT  + 0.5280*DELTA_C # 4.65E-11 @ 0.0;                
+<R108> MCT + HO = MCTO  - 1.0000*DELTA_C # 2.05E-10 @ 0.0;
 <R109> MOH + HO = HO2 + HCHO # 2.85E-12 @ 345.;
 <R110> EOH + HO = HO2 + ACD # 3.0E-12 @ -20.;
 <R111> ROH + HO = HO2 + 0.719*ALD + 0.184*ACD  + 0.4750*DELTA_C 
@@ -445,9 +447,9 @@ REACTIONS[CM] =
                   + 0.424*HNO3  + 0.1520*DELTA_N - 6.2700*DELTA_C 
                   # 3.78E-12;                  
 <R156> CSL + NO3 = 0.200*ASOATJ + 0.320*CHO + 0.080*ADDC + 0.400*ADCN 
-                 + 0.400*HNO3  + 0.2000*DELTA_N + 2.0800*DELTA_C 
+                 + 0.400*HNO3  + 0.2000*DELTA_N + 0.0800*DELTA_C 
                  # 1.06E-12;                 
-<R158> MCT + NO3 = MCTO + HNO3 # 2.01E-10;
+<R158> MCT + NO3 = MCTO + HNO3  - 1.0000*DELTA_C # 2.01E-10;
 <R159> MPAN + NO3 = MACP + NO2 + HNO3 # 2.2E-14 @ 500.;
 <TRP11> PINALP = HOM # 0.029;
 <TRP12> LIMALP = HOM # 0.024;
@@ -461,7 +463,8 @@ REACTIONS[CM] =
 <R173> ETHP + NO = HO2 + NO2 + ACD # 2.6E-12 @ -365.;
 <R174> HC3P + NO = 0.660*HO2 + 0.131*MO2 + 0.048*ETHP + 0.089*XO2 
                  + 0.935*NO2 + 0.504*ACD + 0.132*ALD + 0.165*ACT 
-                 + 0.042*MEK + 0.065*ONIT  + 0.4460*DELTA_C # 2.7E-12 @ -360.;                 
+                 + 0.042*MEK + 0.065*ONIT  + 0.4460*DELTA_C 
+                 # 2.7E-12 @ -360.;                 
 <R175> HC5P + NO = 0.200*HO2 + 0.051*MO2 + 0.231*ETHP + 0.235*XO2 
                  + 0.864*NO2 + 0.018*HCHO + 0.045*ACD + 0.203*ALD 
                  + 0.033*MEK + 0.217*ACT + 0.033*KET + 0.272*HKET 
@@ -499,7 +502,7 @@ REACTIONS[CM] =
                   + 0.0715*OPB + 0.084*KET  + 1.8405*DELTA_C 
                   # 2.7E-12 @ -360.;                  
 <TRP13> APIP2 + NO = 0.820*HO + 0.820*NO2 + HOM  + 0.1800*DELTA_N 
-                   # 2.7E-12 @ -360.;                  
+                   # 2.7E-12 @ -360.;                   
 <TRP14> APINP1 + NO = 1.6955*NO2 + 0.2345*TRPN + 0.070*ONIT 
                     + 0.6045*PINAL + 0.154*ALD + 0.007*KET + 0.007*HCHO 
                     + 0.1645*HO2  + 0.8260*DELTA_C # 2.7E-12 @ -360.;                    
@@ -597,7 +600,7 @@ REACTIONS[CM] =
 <R238> MVKP + HO2 = OP2  + 2.0000*DELTA_C # 2.91E-13 @ -1300.;
 <R239> UALP + HO2 = OP2  + 3.0000*DELTA_C # 2.91E-13 @ -1300.;
 <R240> ADDC + HO2 = OP2  + 5.0000*DELTA_C # 3.75E-13 @ -980.;
-<R241> CHO + HO2 = CSL  - 1.0000*DELTA_C # 1.00E-11;
+<R241> CHO + HO2 = CSL  + 1.0000*DELTA_C # 1.00E-11;
 <R242> MCTP + HO2 = OP2  + 5.0000*DELTA_C # 3.75E-13 @ -980.;
 <R243> ORAP + HO2 = OP2 # 1.15E-13 @ -1300.;
 <R244> OLNN + HO2 = ONIT  - 1.0000*DELTA_C # 1.66E-13 @ -1300.;
@@ -1055,12 +1058,18 @@ REACTIONS[CM] =
 <ROCALK18c> VROCP1ALKP + NO3 = VROCP1ALKP2 + NO2 # 2.30e-12;
 <HC1003> HC10P + NO3 = HC10P2 + NO2 # 2.30e-12;
 
-<ROCALK19c> VROCP6ALKP + HO2 = VROCP3OXY2  + 2.0000*DELTA_C # 2.68E-13 @ -1300;
-<ROCALK20c> VROCP5ALKP + HO2 = VROCP2OXY2  + 2.0000*DELTA_C # 2.71E-13 @ -1300;
-<ROCALK21c> VROCP4ALKP + HO2 = VROCP1OXY1  + 1.0000*DELTA_C # 2.78E-13 @ -1300;
-<ROCALK22c> VROCP3ALKP + HO2 = VROCP0OXY2  + 7.0000*DELTA_C # 2.80E-13 @ -1300;
-<ROCALK23c> VROCP2ALKP + HO2 = VROCN1OXY1  + 4.0000*DELTA_C # 2.81E-13 @ -1300;
-<ROCALK24c> VROCP1ALKP + HO2 = VROCN2OXY2  + 10.0000*DELTA_C # 2.81E-13 @ -1300;
+<ROCALK19c> VROCP6ALKP + HO2 = VROCP3OXY2  + 2.0000*DELTA_C 
+                             # 2.68E-13 @ -1300;                             
+<ROCALK20c> VROCP5ALKP + HO2 = VROCP2OXY2  + 2.0000*DELTA_C 
+                             # 2.71E-13 @ -1300;                             
+<ROCALK21c> VROCP4ALKP + HO2 = VROCP1OXY1  + 1.0000*DELTA_C 
+                             # 2.78E-13 @ -1300;                             
+<ROCALK22c> VROCP3ALKP + HO2 = VROCP0OXY2  + 7.0000*DELTA_C 
+                             # 2.80E-13 @ -1300;                             
+<ROCALK23c> VROCP2ALKP + HO2 = VROCN1OXY1  + 4.0000*DELTA_C 
+                             # 2.81E-13 @ -1300;                             
+<ROCALK24c> VROCP1ALKP + HO2 = VROCN2OXY2  + 10.0000*DELTA_C 
+                             # 2.81E-13 @ -1300;                             
 <HC1004> HC10P + HO2 = OP2  + 8.0000*DELTA_C # 2.66e-13 @ -1300.;
 
 <ROCALK25c> VROCP6ALKP2 = HO2 + VROCP3OXY2  + 2.0000*DELTA_C # 1.88e-1;
@@ -1113,11 +1122,15 @@ REACTIONS[CM] =
                               + 10.0000*DELTA_C # 2.30e-12;                              
 <HC1007> HC10P2 + NO3 = NO2 + KET + HO2  + 5.0000*DELTA_C # 2.30e-12;
 
-<ROCALK43c> VROCP6ALKP2 + HO2 = VROCP1OXY3  + 2.0000*DELTA_C # 2.71e-13 @ -1300;
-<ROCALK44c> VROCP5ALKP2 + HO2 = VROCP0OXY2                   # 2.73e-13 @ -1300;
-<ROCALK45c> VROCP4ALKP2 + HO2 = VROCN1OXY1  - 2.0000*DELTA_C # 2.78e-13 @ -1300;
-<ROCALK46c> VROCP3ALKP2 + HO2 = VROCN2OXY2  + 4.0000*DELTA_C # 2.80e-13 @ -1300;
-<ROCALK47c> VROCP2ALKP2 + HO2 = VROCN2OXY2  + 7.0000*DELTA_C # 2.81e-13 @ -1300;
+<ROCALK43c> VROCP6ALKP2 + HO2 = VROCP1OXY3  + 2.0000*DELTA_C 
+                              # 2.71e-13 @ -1300;                              
+<ROCALK44c> VROCP5ALKP2 + HO2 = VROCP0OXY2 # 2.73e-13 @ -1300;
+<ROCALK45c> VROCP4ALKP2 + HO2 = VROCN1OXY1  - 2.0000*DELTA_C 
+                              # 2.78e-13 @ -1300;                              
+<ROCALK46c> VROCP3ALKP2 + HO2 = VROCN2OXY2  + 4.0000*DELTA_C 
+                              # 2.80e-13 @ -1300;                              
+<ROCALK47c> VROCP2ALKP2 + HO2 = VROCN2OXY2  + 7.0000*DELTA_C 
+                              # 2.81e-13 @ -1300;                              
 <ROCALK48c> VROCP1ALKP2 + HO2 = VROCN2OXY2  + 10.0000*DELTA_C 
                               # 2.82e-13 @ -1300;                              
 <HC1008> HC10P2 + HO2 = VROCP2OXY2  - 2.0000*DELTA_C 

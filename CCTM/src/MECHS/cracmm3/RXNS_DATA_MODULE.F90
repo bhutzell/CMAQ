@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /work/MOD3DEV/has/2023cracmm_ages/runs/20250207u1cracmmdev/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
+! Source file: /work/MOD3DEV/has/2023cracmm_ages/runs/20250214aromatics/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
 ! for Mechanism Name: CRACMM3                         
 
 ! This file is used to create mechanism data and functions
@@ -378,10 +378,10 @@
       & MEMBER("ORA1            ",   61, "GC",   46.00D0, F), &
       & MEMBER("BEN             ",   62, "GC",   78.11D0, F), &
       & MEMBER("BENP            ",   63, "GC",  159.12D0, F), &
-      & MEMBER("PHEN            ",   64, "GC",  110.10D0, F), &
+      & MEMBER("PHEN            ",   64, "GC",   94.11D0, F), &
       & MEMBER("TOL             ",   65, "GC",   92.14D0, F), &
       & MEMBER("TOLP            ",   70, "GC",  173.14D0, F), &
-      & MEMBER("CSL             ",   66, "GC",  136.20D0, F), &
+      & MEMBER("CSL             ",   66, "GC",  108.14D0, F), &
       & MEMBER("XYL             ",   67, "GC",  106.20D0, F), &
       & MEMBER("XYLP            ",   71, "GC",  187.17D0, F), &
       & MEMBER("EBZ             ",   68, "GC",  106.20D0, F), &
@@ -413,7 +413,7 @@
       & MEMBER("DCB3            ",   99, "GC",   84.00D0, F), &
       & MEMBER("BALP            ",  100, "GC",  137.00D0, F), &
       & MEMBER("ADDC            ",  101, "GC",  125.00D0, F), &
-      & MEMBER("MCT             ",  102, "GC",  124.10D0, F), &
+      & MEMBER("MCT             ",  102, "GC",  110.11D0, F), &
       & MEMBER("MCTO            ",  103, "GC",  123.00D0, F), &
       & MEMBER("MOH             ",  104, "GC",   32.00D0, F), &
       & MEMBER("EOH             ",  105, "GC",   46.10D0, F), &
@@ -571,10 +571,10 @@
       DATA CHEMISTRY_SPC(  65 ), SPECIES_MOLWT(  65 ) / 'ORA1            ',   46.00D0 /
       DATA CHEMISTRY_SPC(  66 ), SPECIES_MOLWT(  66 ) / 'BEN             ',   78.11D0 /
       DATA CHEMISTRY_SPC(  67 ), SPECIES_MOLWT(  67 ) / 'BENP            ',  159.12D0 /
-      DATA CHEMISTRY_SPC(  68 ), SPECIES_MOLWT(  68 ) / 'PHEN            ',  110.10D0 /
+      DATA CHEMISTRY_SPC(  68 ), SPECIES_MOLWT(  68 ) / 'PHEN            ',   94.11D0 /
       DATA CHEMISTRY_SPC(  69 ), SPECIES_MOLWT(  69 ) / 'TOL             ',   92.14D0 /
       DATA CHEMISTRY_SPC(  70 ), SPECIES_MOLWT(  70 ) / 'TOLP            ',  173.14D0 /
-      DATA CHEMISTRY_SPC(  71 ), SPECIES_MOLWT(  71 ) / 'CSL             ',  136.20D0 /
+      DATA CHEMISTRY_SPC(  71 ), SPECIES_MOLWT(  71 ) / 'CSL             ',  108.14D0 /
       DATA CHEMISTRY_SPC(  72 ), SPECIES_MOLWT(  72 ) / 'XYL             ',  106.20D0 /
       DATA CHEMISTRY_SPC(  73 ), SPECIES_MOLWT(  73 ) / 'XYLP            ',  187.17D0 /
       DATA CHEMISTRY_SPC(  74 ), SPECIES_MOLWT(  74 ) / 'EBZ             ',  106.20D0 /
@@ -606,7 +606,7 @@
       DATA CHEMISTRY_SPC( 100 ), SPECIES_MOLWT( 100 ) / 'DCB3            ',   84.00D0 /
       DATA CHEMISTRY_SPC( 101 ), SPECIES_MOLWT( 101 ) / 'BALP            ',  137.00D0 /
       DATA CHEMISTRY_SPC( 102 ), SPECIES_MOLWT( 102 ) / 'ADDC            ',  125.00D0 /
-      DATA CHEMISTRY_SPC( 103 ), SPECIES_MOLWT( 103 ) / 'MCT             ',  124.10D0 /
+      DATA CHEMISTRY_SPC( 103 ), SPECIES_MOLWT( 103 ) / 'MCT             ',  110.11D0 /
       DATA CHEMISTRY_SPC( 104 ), SPECIES_MOLWT( 104 ) / 'MCTO            ',  123.00D0 /
       DATA CHEMISTRY_SPC( 105 ), SPECIES_MOLWT( 105 ) / 'MOH             ',   32.00D0 /
       DATA CHEMISTRY_SPC( 106 ), SPECIES_MOLWT( 106 ) / 'EOH             ',   46.10D0 /
