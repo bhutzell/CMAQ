@@ -103,7 +103,8 @@
 
       IF ( FIRSTIME ) THEN
           FIRSTIME = .FALSE.
-          ! Initialize Number of Steps Used for Calculating Average
+          ! Initialize Number of Steps Used for Calculating Average if
+          ! this is an Aggregate file
           ELMO_NSTEP = 0
 
           ALLOCATE( PVS( NCOLS, NROWS, NLAYS ),
@@ -326,8 +327,9 @@
              END IF
  
           CASE ( 1 )
-             ! *** Aggregate Diagnostic Variables in Average Array
-             !     using trapezoidal rule
+             ! *** Calculate Diagnostic Variables for Aggregate File
+             !     using trapezoidal rule for averages and summing for 
+             !     cumulative deposition variables.
              OL = L1 - ELMO_FILE( IFL )%LAY_BOT + 1
              DIVFAC = 1.0
              IF ( WRITE_STEP ) DIVFAC = 0.5 / FLOAT( ELMO_NSTEP - 1 )
@@ -377,7 +379,7 @@
      &                    IV .EQ. ET_ISAM_DRVD_WDEP .OR.
      &                    IV .EQ. ET_DDM_DRVD_WDEP ) THEN
                    ! This is a deposition species so we should be
-                   ! computing a cumulative sum, not an average by default
+                   ! computing a cumulative sum
                    IF ( INIT_STEP ) THEN
                       ELMO_OUT(IFL)%DATA( C1,R1,OL,IVAR ) = 0.0 !ELMO_USED( U )
                    ELSE   
