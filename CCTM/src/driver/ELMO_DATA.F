@@ -334,7 +334,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
           INTEGER                     :: STRUCT       ! 0 = gridded, 1 = unstructured
           CHARACTER( 16)              :: FLOGICAL     ! I/O Logical Name for each output file
           INTEGER                     :: TSTEP        ! Output Time Step (HHMMSS)
-          INTEGER                     :: TMODE        ! 0 = Instantaneous, 1 = Average/Cumulative
+          INTEGER                     :: TMODE        ! 0 = Instantaneous, 
+                                                      ! 1 = Aggregate (Average/Cumulative)
           INTEGER                     :: LAY_BOT      ! Bottom Layer
           INTEGER                     :: LAY_TOP      ! Top Layer
           INTEGER                     :: NLAYS        ! Number of Layers
