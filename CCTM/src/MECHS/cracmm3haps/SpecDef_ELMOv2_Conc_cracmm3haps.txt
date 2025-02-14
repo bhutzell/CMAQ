@@ -217,7 +217,7 @@ AORGAIJ         ,ug m-3    ,PMF_ASOA[1]
 AORGBIJ         ,ug m-3    ,PMF_BSOA[1]
 
 !!! Cloud-Processed  SOA
-AORGCJ          ,ug m-3    ,AORGCJ[1]
+AORGCJ          ,ug m-3    ,PMF_CLDGLY[1]
 
 !!! OM/OC ratios
 AOMOCRAT_TOT    ,          ,PMF_OMOC[1]

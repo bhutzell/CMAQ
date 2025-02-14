@@ -83,34 +83,36 @@ WDEP_NHX           ,kg ha-1     ,WD_NHX[1]
 WDEP_TSO4          ,kg ha-1     ,WD_SOX[1]
 
 !! Sodium
-DDEP_ANAJ          ,kg ha-1     ,DD_ANAJ[1]
+DDEP_ANAIJ         ,kg ha-1     ,DD_PMF_NA[1]
 DDEP_ANAK          ,kg ha-1     ,DD_PMC_NA[1]
-DDEP_ANAJK         ,kg ha-1     ,DD_ANAJ[1] + DD_PMC_NA[1]
+DDEP_ANAIJK        ,kg ha-1     ,DD_TSP_NA[1]
 WDEP_ANAK          ,kg ha-1     ,WD_PMC_NA[1]
-WDEP_ANAJK         ,kg ha-1     ,WD_ANAJ[1] + WD_PMC_NA[1]
-TDEP_ANAJK         ,kg ha-1     ,WDEP_ANAJK[0] + DDEP_ANAJK[0]  
+WDEP_ANAIJK        ,kg ha-1     ,WD_TSP_NA[1]
+TDEP_ANAIJK        ,kg ha-1     ,TD_TSP_NA[1]
 
 !! Chloride
-DDEP_ACLJ          ,kg ha-1     ,DD_PMF_CL[1]
+DDEP_ACLIJ         ,kg ha-1     ,DD_PMF_CL[1]
 DDEP_ACLK          ,kg ha-1     ,DD_PMC_CL[1]
-DDEP_ACLJK         ,kg ha-1     ,DD_ACLJ[1] + DD_PMC_CL[1]
+DDEP_ACLIJK        ,kg ha-1     ,DD_TSP_CL[1]
+WDEP_ACLIJK        ,kg ha-1     ,WD_TSP_CL[1]
+DDEP_TCL           ,kg ha-1     ,DD_TCL[1]
 WDEP_TCL           ,kg ha-1     ,WD_TCL[1]
 TDEP_CL            ,kg ha-1     ,TD_TCL[1]
 
 !! Calcium
 DDEP_CAJ           ,kg ha-1     ,DD_PMF_CA[1]
-WDEP_CAJ	       ,kg ha-1     ,WD_PMF_CA[1]
+WDEP_CAJ	   ,kg ha-1     ,WD_PMF_CA[1]
 DDEP_CAK           ,kg ha-1     ,DD_PMC_CA[1]
 WDEP_CAK           ,kg ha-1     ,WD_PMC_CA[1]
-DDEP_CAJK	       ,kg ha-1     ,DD_CA[1]
-WDEP_CAJK	       ,kg ha-1     ,WD_TSP_CA[1]
+DDEP_CAJK	   ,kg ha-1     ,DD_TSP_CA[1]
+WDEP_CAJK	   ,kg ha-1     ,WD_TSP_CA[1]
 
 !! Iron
-DDEP_FEJ	       ,kg ha-1     ,DD_PMF_FE[1]
-WDEP_FEJ	       ,kg ha-1     ,WD_PMF_FE[1]
+DDEP_FEJ	    ,kg ha-1    ,DD_PMF_FE[1]
+WDEP_FEJ	    ,kg ha-1    ,WD_PMF_FE[1]
 
 !! Aluminum
-DDEP_ALJ	       ,kg ha-1     ,DD_PMF_AL[1]
+DDEP_ALJ	   ,kg ha-1     ,DD_PMF_AL[1]
 WDEP_ALJ           ,kg ha-1     ,WD_PMF_AL[1]
 
 !! Silicon
@@ -126,7 +128,7 @@ DDEP_MGJ           ,kg ha-1     ,DD_PMF_MG[1]
 WDEP_MGJ           ,kg ha-1     ,WD_PMF_MG[1]
 DDEP_MGK           ,kg ha-1     ,DD_PMC_MG[1]
 WDEP_MGK           ,kg ha-1     ,WD_PMC_MG[1]
-DDEP_MGJK          ,kg ha-1     ,DD_MG[1]
+DDEP_MGJK          ,kg ha-1     ,DD_TSP_MG[1]
 WDEP_MGJK          ,kg ha-1     ,WD_TSP_MG[1]
 
 !! Potassium
@@ -134,7 +136,7 @@ DDEP_KJ            ,kg ha-1     ,DD_PMF_K[1]
 WDEP_KJ            ,kg ha-1     ,WD_PMF_K[1]
 DDEP_KK            ,kg ha-1     ,DD_PMC_K[1]
 WDEP_KK            ,kg ha-1     ,WD_PMC_K[1]
-DDEP_KJK           ,kg ha-1     ,DD_K[1]
+DDEP_KJK           ,kg ha-1     ,DD_TSP_K[1]
 WDEP_KJK           ,kg ha-1     ,WD_TSP_K[1]
 
 !! Manganese
@@ -142,8 +144,8 @@ DDEP_MNJ           ,kg ha-1     ,DD_PMF_MN[1]
 WDEP_MNJ           ,kg ha-1     ,WD_PMF_MN[1]
 
 !! Lead
-DDEP_LEAD          ,kg ha-1   ,DD_PB_HAPS[1]
-WDEP_LEAD          ,kg ha-1   ,WD_PB_HAPS[1]
+DDEP_LEAD          ,kg ha-1     ,DD_PB_HAPS[1]
+WDEP_LEAD          ,kg ha-1     ,WD_PB_HAPS[1]
 
 ! Manganese for Air Toxics Inventory
 DDEP_MN_HAPS       ,kg ha-1   ,DD_MN_HAPS[1]
