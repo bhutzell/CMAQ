@@ -66,9 +66,9 @@ GC_SPECIES_DATA =
 'ORA1'          , 46.0   ,''     ,-1     ,''     ,-1     ,'VD_ORA1'          , 1   ,'ORA1OPERA'       , 1  ,''             ,'FOA'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Formic acid,E,DTXSID2024115,OC=O
 'BEN'           , 78.11  ,''     ,-1     ,''     ,-1     ,'VD_BEN'           , 1   ,'BENOPERA'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Benzene,E,DTXSID3039242,C1=CC=CC=C1
 'BENP'          ,159.12  ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!{8-hydroxy-6;7-dioxabicyclo[3.2.1]oct-3-en-2-yl}peroxy,L,NA,[O]OC1C=CC2OOC1C2O
-'PHEN'          ,110.1   ,''     ,-1     ,''     ,-1     ,'VD_PHEN'          , 1   ,'PHENOPERA'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Resorcinol,L,DTXSID2021238,OC1=CC(O)=CC=C1
+'PHEN'          ,94.11   ,''     ,-1     ,''     ,-1     ,'VD_PHEN'          , 1   ,'PHENOPERA'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Phenol,E,DTXSID5021124,OC1=CC=CC=C1
 'TOL'           ,92.14   ,''     ,-1     ,''     ,-1     ,'VD_TOL'           , 1   ,'TOLOPERA'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Toluene,E,DTXSID7021360,CC1=CC=CC=C1
-'CSL'           ,136.2   ,''     ,-1     ,''     ,-1     ,'VD_CSL'           , 1   ,'CSLOPERA'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!2-Phenylpropan-2-ol,L,DTXSID3027247,CC(C)(O)C1=CC=CC=C1
+'CSL'           ,108.14  ,''     ,-1     ,''     ,-1     ,'VD_CSL'           , 1   ,'CSLOPERA'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!o-cresol,L,DTXSID8021808,CC1=C(O)C=CC=C1
 'XYL'           ,106.2   ,''     ,-1     ,''     ,-1     ,'VD_XYL'           , 1   ,'XYLOPERA'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!m-Xylene,L,DTXSID6026298,CC1=CC(C)=CC=C1
 'EBZ'           ,106.2   ,''     ,-1     ,''     ,-1     ,'VD_EBZ'           , 1   ,'EBZOPERA'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Ethylbenzene,L,DTXSID3020596,CCC1=CC=CC=C1
 'STY'           ,104.0   ,''     ,-1     ,''     ,-1     ,'VD_STY'           , 1   ,'STYOPERA'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Styrene,E,DTXSID2021284,C=CC1=CC=CC=C1
@@ -104,7 +104,7 @@ GC_SPECIES_DATA =
 'DCB3'          , 84.0   ,''     ,-1     ,''     ,-1     ,'VD_DCB3'          , 1   ,'METHACROLEIN'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!but-2-enedial,L,NA,O=CC=CC=O
 'BALP'          ,137.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!benzoylperoxy,L,NA,O=C(O[O])C1=CC=CC=C1
 'ADDC'          ,125.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!3-methyl-5-oxocyclohex-3-en-1-yloxidanyl,L,NA,CC1=CC(O)=CC([O])C1
-'MCT'           ,124.1   ,''     ,-1     ,''     ,-1     ,'VD_MCT'           , 1   ,'MCTOPERA'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!4-Methylcatechol,L,DTXSID5020861,CC1=CC(O)=C(O)C=C1
+'MCT'           ,110.11  ,''     ,-1     ,''     ,-1     ,'VD_MCT'           , 1   ,'MCTOPERA'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Catechol,L,DTXSID3020257,OC1=C(O)C=CC=C1
 'MCTO'          ,123.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!3-hydroxy-5-methylphenyloxidanyl,L,NA,CC1=CC(O)=CC([O])=C1
 'MOH'           , 32.0   ,''     ,-1     ,''     ,-1     ,'VD_MOH'           , 1   ,'METHANOL'        , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Methanol,E,DTXSID2021731,CO
 'EOH'           , 46.1   ,''     ,-1     ,''     ,-1     ,'VD_EOH'           , 1   ,'ETHANOL'         , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Ethanol,E,DTXSID9020584,CCO
