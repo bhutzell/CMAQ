@@ -630,7 +630,7 @@ c----------------------------------------------------------
         ISAM_SPEC_NO3( 6 )%LIST = (/   'HNO3 ','NO   ','NO2  ','NO3  ','HONO ',
      &         'N2O5 ','PAN  ','HNO4 ','ONIT ','MPAN ','PPN  ','ISON ','TRPN ',
      &         'INALD','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
-     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP ', 'CLNO', 
+     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP ', 'CLNO ', 
      &          'CLNO2', 'CLNO3'/ )
  
         !PRESCRIBE SPECIES RELEVANT FOR ASSIGNING BIAS TO VOCs
