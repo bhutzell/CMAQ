@@ -356,8 +356,8 @@
 
                 IF ( SEAWATER (NCELL) .GT. 0.001D0 ) THEN
 !  Reaction Label HAL_Ozone       
-                   RKI( NCELL,  428) = SEAWATER (NCELL) *  SFACT * HALOGEN_FALLOFF( BLKPRES( NCELL ),   6.7006D-11,   1.0743D+01,  & 
-     &                                                           3.4153D-08,  -6.7130D-01,         2.0000D-06 )
+                   RKI( NCELL,  428) = SEAWATER (NCELL) *  SFACT * HALOGEN_FALLOFF( BLKPRES( NCELL ),   1.0650D-12,   1.3906D+01,  & 
+     &                                                           1.4422D-08,   3.0844D+00,         8.4000D-07 )
                 ELSE
                    RKI( NCELL,  428) = 0.0D0 
                 END IF
@@ -1414,6 +1414,10 @@
              RKI( NCELL,  533) =   2.5000D-13 * CFACT 
 !  Reaction Label ROCARO76        
              RKI( NCELL,  534) =   2.5000D-13 * CFACT 
+!  Reaction Label HET_ANO3I       
+             RKI( NCELL,  535) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
+!  Reaction Label HET_ANO3J       
+             RKI( NCELL,  536) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
 
         END DO  
 !  Multiply rate constants by [M], [O2], [N2], [H2O], [H2], or [CH4]
@@ -1759,7 +1763,7 @@
              INDEX_EBZP        = IOLD2NEW( INDEX_EBZP       , 1 )
              INDEX_ISO         = IOLD2NEW( INDEX_ISO        , 1 )
              INDEX_ISON        = IOLD2NEW( INDEX_ISON       , 1 )
-             INDEX_INO2        = IOLD2NEW( INDEX_INO2       , 1 )
+             INDEX_ISONP       = IOLD2NEW( INDEX_ISONP      , 1 )
              INDEX_ISOP        = IOLD2NEW( INDEX_ISOP       , 1 )
              INDEX_ISHP        = IOLD2NEW( INDEX_ISHP       , 1 )
              INDEX_IEPOX       = IOLD2NEW( INDEX_IEPOX      , 1 )
@@ -1873,5 +1877,7 @@
              INDEX_STY         = IOLD2NEW( INDEX_STY        , 1 )
              INDEX_STYP        = IOLD2NEW( INDEX_STYP       , 1 )
              INDEX_CO2         = IOLD2NEW( INDEX_CO2        , 1 )
+             INDEX_ANO3I       = IOLD2NEW( INDEX_ANO3I      , 1 )
+             INDEX_ANO3J       = IOLD2NEW( INDEX_ANO3J      , 1 )
           END SUBROUTINE RESET_SPECIES_POINTERS
        END MODULE RXNS_FUNCTION

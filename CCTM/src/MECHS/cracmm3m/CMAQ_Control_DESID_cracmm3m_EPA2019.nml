@@ -54,8 +54,8 @@
    'EVERYWHERE', 'ALL'         ,'SO2'    ,'SO2'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'SULF'        ,'GAS'  ,0.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'NH3'    ,'NH3'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'HCL'    ,'HCL'         ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'CL2'    ,'CL2'         ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'HCL'    ,'HCL'         ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'CL2'    ,'CL2'         ,'GAS'  ,1.  ,'UNIT','a',   
 
    ! Organic gases
    'EVERYWHERE', 'ALL'         ,'ACD'    ,'ACD'         ,'GAS'  ,1.  ,'UNIT','a', 
@@ -108,7 +108,7 @@
    'EVERYWHERE', 'ALL'         ,'XYE'    ,'XYL'         ,'GAS'  ,1.  ,'UNIT','a',
    ! Updated species for CRACMM2. Not currently used in emission input files but
    ! will be in the future.
-   'EVERYWHERE', 'ALL'         ,'XYL'    ,'XYL'         ,'GAS'  ,1.  ,'UNIT','a',
+!  'EVERYWHERE', 'ALL'         ,'XYL'    ,'XYL'         ,'GAS'  ,1.  ,'UNIT','a',
 !  'EVERYWHERE', 'ALL'         ,'EBZ'    ,'EBZ'         ,'GAS'  ,1.  ,'UNIT','a',  
 !  'EVERYWHERE', 'ALL'         ,'STY'    ,'STY'         ,'GAS'  ,1.  ,'UNIT','a',
 
@@ -146,7 +146,7 @@
    'EVERYWHERE', 'ALL'        ,'VROCP2OXY2','VROCP2OXY2' ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'VROCP4ALK' ,'VROCP4ALK'  ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'VROCP5OXY1','VROCP5OXY1' ,'GAS'  ,1   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'        ,'CH3I'      ,'CH3I'       ,'GAS'  ,0   ,'UNIT','a',   
+   'EVERYWHERE', 'ALL'        ,'CH3I'      ,'CH3I'       ,'GAS'  ,0   ,'UNIT','a',
 
    ! Marine Halogen Chemistry
    'EVERYWHERE', 'MGEM'         ,'HOI'    ,'HOI'         ,'GAS'  ,1.  ,'UNIT','a',
@@ -376,8 +376,8 @@
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_CL' ,'ACL'       ,'COARSE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_BR' ,'ABR'       ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a',
 
    ! Updated aromatic species for CRACMM2
    !   EBZ is now explicit ethylbenzene; was lumped in XYE before.
@@ -392,21 +392,21 @@
 
    ! STY and XYM remapping
    ! Generic scaling if not scaling by sector: 93% XYL; 7% STY
-   'EVERYWHERE', 'ALL'         ,'XYM'    ,'XYL'         ,'GAS'  ,0.93,'UNIT','m',
-   'EVERYWHERE', 'ALL'         ,'XYM'    ,'STY'         ,'GAS'  ,0.07,'UNIT','a',
+   !'EVERYWHERE', 'ALL'         ,'XYM'    ,'XYL'         ,'GAS'  ,0.93,'UNIT','m',
+   !'EVERYWHERE', 'ALL'         ,'XYM'    ,'STY'         ,'GAS'  ,0.07,'UNIT','a',
    ! Source-specific scaling
    ! gasoline: 99% XYL; 1% STY
-   !'EVERYWHERE', 'GRIDDED_GASOLINE','XYM'    ,'XYL'         ,'GAS'  ,0.99,'UNIT','m',
-   !'EVERYWHERE', 'GRIDDED_GASOLINE','XYM'    ,'STY'         ,'GAS'  ,0.01,'UNIT','a',
+   'EVERYWHERE', 'GRIDDED_GASOLINE','XYM'    ,'XYL'         ,'GAS'  ,0.99,'UNIT','m',
+   'EVERYWHERE', 'GRIDDED_GASOLINE','XYM'    ,'STY'         ,'GAS'  ,0.01,'UNIT','a',
    ! ptnonipm: 35% XYL; 65% STY
-   !'EVERYWHERE', 'P_ptnonipm'   ,'ALL'    ,'ALL'         ,'ALL'  ,0.0  ,'UNIT','m',! zero ptnonipm emissions
-   !'EVERYWHERE', 'P_ptnonipm'   ,'XYM'    ,'STY'         ,'GAS'  ,0.65 ,'UNIT','a',! 65% of XYM emissions to STY
-   !'EVERYWHERE', 'P_ptnonipm'   ,'XYM'    ,'XYL'         ,'GAS'  ,-0.65,'UNIT','a',! remove 65% of XYM that was already included in P_pt_other_nonfire
+   'EVERYWHERE', 'P_ptnonipm'   ,'ALL'    ,'ALL'         ,'ALL'  ,0.0  ,'UNIT','m',! zero ptnonipm emissions
+   'EVERYWHERE', 'P_ptnonipm'   ,'XYM'    ,'STY'         ,'GAS'  ,0.65 ,'UNIT','a',! 65% of XYM emissions to STY
+   'EVERYWHERE', 'P_ptnonipm'   ,'XYM'    ,'XYL'         ,'GAS'  ,-0.65,'UNIT','a',! remove 65% of XYM that was already included in P_pt_other_nonfire
    ! fires (not including rwc): 78% XYM; 12% STY
-   !'EVERYWHERE', 'P_all_fire'   ,'XYM'    ,'XYL'         ,'GAS'  ,0.78,'UNIT','m',
-   !'EVERYWHERE', 'P_all_fire'   ,'XYM'    ,'STY'         ,'GAS'  ,0.12,'UNIT','a',
+   'EVERYWHERE', 'P_all_fire'   ,'XYM'    ,'XYL'         ,'GAS'  ,0.78,'UNIT','m',
+   'EVERYWHERE', 'P_all_fire'   ,'XYM'    ,'STY'         ,'GAS'  ,0.12,'UNIT','a',
    ! solvents (aka VCP): 94% XYL; 6% STY
-   !'EVERYWHERE', 'G_np_solvents','XYM'    ,'XYL'         ,'GAS'  ,0.94,'UNIT','m',
-   !'EVERYWHERE', 'G_np_solvents','XYM'    ,'STY'         ,'GAS'  ,0.06,'UNIT','a',
+   'EVERYWHERE', 'G_np_solvents','XYM'    ,'XYL'         ,'GAS'  ,0.94,'UNIT','m',
+   'EVERYWHERE', 'G_np_solvents','XYM'    ,'STY'         ,'GAS'  ,0.06,'UNIT','a',
 
 /

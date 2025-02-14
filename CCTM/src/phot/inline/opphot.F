@@ -18,12 +18,6 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/phot/phot_inline/opphot.F,v 1.3 2011/10/21 16:11:28 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPPHOT ( JDATE, JTIME, TSTEP )
 
@@ -502,7 +496,7 @@ C...  the photolysis diagnostic file
             VGLVS3D( L ) = VGLVS_GD( L )
          END DO
 
-         FDESC3D( 1 ) = 'Three dimensionals values of Optical Inputs and Radiative'
+         FDESC3D( 1 ) = 'Three dimensional values of Optical Inputs and Radiative'
          FDESC3D( 2 ) = 'Results from the In-line photolysis calculation using the'
          FDESC3D( 3 ) =  TRIM( MECHNAME ) // ' photochemical mechanism.'
 
@@ -514,7 +508,7 @@ C...  the photolysis diagnostic file
          
          DO L = 1, N_DIAG_WVL
 
-C...assumes that lamba in nanometers is on order of 100 or less
+C...assumes that lambda in nanometers is on order of 100 or less
 
             JWL = DIAG_WVL( L )
             
