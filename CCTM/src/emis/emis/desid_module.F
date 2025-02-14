@@ -1680,10 +1680,7 @@ C-----------------------------------------------------------------------
          N_EMVAR_CATCH = 0
          DO ISRM = 1,DESID_N_SRM
 
-            IF ( ISRM .EQ. ISEASRM .OR. ISRM .EQ. IBIOSRM .OR. 
-     &           ISRM .EQ. IDUSTSRM.OR. ISRM .EQ. ILTSRM  .OR.
-     &           ISRM .EQ. IMGSRM  .OR. ISRM .EQ. IMIOGSRM .OR.
-     &           ISRM .EQ. IMETSRM ) CYCLE
+            IF ( DESID_STREAM_ONLINE( ISRM ) ) CYCLE
 
             ALLOCATE( DESID_EMVAR( ISRM )%MW      ( DESID_EMVAR( ISRM )%LEN ) )
             ALLOCATE( DESID_EMVAR( ISRM )%USED    ( DESID_EMVAR( ISRM )%LEN ) )
@@ -1756,12 +1753,9 @@ C-----------------------------------------------------------------------
             ! If the 'ALL' keyword was used, set all of the online
             ! sources to false.
             IF ( DESID_AREA_NML(IAREA)%STREAM .EQ. 'ALL' ) THEN
-               IF ( ISEASRM .GT. 0 )  RULE_STREAM( ISEASRM  )  = .FALSE. 
-               IF ( IBIOSRM .GT. 0 )  RULE_STREAM( IBIOSRM  )  = .FALSE. 
-               IF ( IDUSTSRM .GT. 0 ) RULE_STREAM( IDUSTSRM  ) = .FALSE. 
-               IF ( ILTSRM .GT. 0 )   RULE_STREAM( ILTSRM  )   = .FALSE. 
-               IF ( IMGSRM .GT. 0 )   RULE_STREAM( IMGSRM  )   = .FALSE. 
-               IF ( IMIOGSRM .GT. 0 ) RULE_STREAM( IMIOGSRM  ) = .FALSE. 
+               DO ISRM = 1,DESID_N_SRM
+                 IF ( DESID_STREAM_ONLINE( ISRM  ) ) RULE_STREAM( ISRM ) = .FALSE. 
+               END DO
             ENDIF   
                
             DO ISRM = 1,DESID_N_SRM
@@ -2976,6 +2970,7 @@ C-----------------------------------------------------------------------
          Allocate( DESID_STREAM_DATE  ( DESID_N_SRM ) )
          Allocate( DESID_STREAM_SYM_DATE ( DESID_N_SRM ) ) 
          Allocate( DESID_STREAM_FIRE  ( DESID_N_SRM ) )
+         Allocate( DESID_STREAM_ONLINE( DESID_N_SRM ) )
          Allocate( IGSRM         ( DESID_N_SRM ) )
          Allocate( IPSRM         ( DESID_N_SRM ) )
          Allocate( ITSRM         ( DESID_N_SRM ) )
@@ -2995,6 +2990,7 @@ C stkemis_init.
          DESID_STREAM_DATE     = JDATE
          DESID_STREAM_SYM_DATE = EMIS_SYM_DATE ! representative day files (default: false)
          DESID_STREAM_FIRE     = .FALSE.
+         DESID_STREAM_ONLINE   = .FALSE.
          DESID_GRID_LAYS       = 0
          
          ! Gridded Emission Files
@@ -3107,7 +3103,8 @@ C stkemis_init.
              DESID_STREAM_ITYPE( ISRM ) = 4
              DESID_STREAM_LAB ( ISRM ) = 'BIOG'
              DESID_STREAM_DESC( ISRM ) = 'Biogenic Emissions'
- 
+             DESID_STREAM_ONLINE( ISRM ) = .TRUE.
+
              IBIOSRM = ISRM
          END IF
          
@@ -3118,7 +3115,8 @@ C stkemis_init.
              DESID_STREAM_ITYPE( ISRM ) = 9
              DESID_STREAM_LAB ( ISRM ) = 'MIOG'
              DESID_STREAM_DESC( ISRM ) = 'Megan Biogenic Emissions'
- 
+             DESID_STREAM_ONLINE( ISRM ) = .TRUE.
+
              IMIOGSRM = ISRM
          END IF
  
@@ -3130,7 +3128,8 @@ C stkemis_init.
              DESID_STREAM_ITYPE( ISRM ) = 5
              DESID_STREAM_LAB ( ISRM ) = 'MGEM'
              DESID_STREAM_DESC( ISRM ) = 'Marine Gas Emissions'
- 
+             DESID_STREAM_ONLINE( ISRM ) = .TRUE.
+
              IMGSRM = ISRM
          END IF
  
@@ -3141,7 +3140,8 @@ C stkemis_init.
              DESID_STREAM_ITYPE( ISRM ) = 6
              DESID_STREAM_LAB ( ISRM ) = 'LTNG'
              DESID_STREAM_DESC( ISRM ) = 'Lightning NO Emissions'
- 
+             DESID_STREAM_ONLINE( ISRM ) = .TRUE.
+
              ILTSRM = ISRM
          END IF
  
@@ -3152,7 +3152,8 @@ C stkemis_init.
              DESID_STREAM_ITYPE( ISRM ) = 7
              DESID_STREAM_LAB ( ISRM ) = 'SEASPRAY'
              DESID_STREAM_DESC( ISRM ) = 'Sea Spray Aerosol Emissions'
-             
+             DESID_STREAM_ONLINE( ISRM ) = .TRUE.
+
              ISEASRM = ISRM
          END IF
  
@@ -3163,19 +3164,21 @@ C stkemis_init.
              DESID_STREAM_ITYPE( ISRM ) = 8
              DESID_STREAM_LAB ( ISRM ) = 'WBDUST'
              DESID_STREAM_DESC( ISRM ) = 'Wind-Blown Dust Emissions'
-             
+             DESID_STREAM_ONLINE( ISRM ) = .TRUE.
+
              IDUSTSRM = ISRM
          END IF
          
          ! Met-Modulated Emissions
          IF ( USE_MET_EMIS ) THEN
            ISRM = ISRM + 1
-           DESID_STREAM_TYPE( ISRM ) = 'METEMIS'
-           DESID_STREAM_ITYPE( ISRM ) = 10
-           DESID_STREAM_LAB ( ISRM ) = 'METEMIS'
-           DESID_STREAM_DESC( ISRM ) = 'Met-Modulated Emissions'
+             DESID_STREAM_TYPE( ISRM ) = 'METEMIS'
+             DESID_STREAM_ITYPE( ISRM ) = 10
+             DESID_STREAM_LAB ( ISRM ) = 'METEMIS'
+             DESID_STREAM_DESC( ISRM ) = 'Met-Modulated Emissions'
+             DESID_STREAM_ONLINE( ISRM ) = .TRUE.
 
-           IMETSRM = ISRM
+             IMETSRM = ISRM
          END IF
 
         END SUBROUTINE DESID_INIT_STREAMS 
