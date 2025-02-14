@@ -585,7 +585,6 @@ C *** Local Variables
 
 C *** variables for parameterization by Bertram and Thornton 
       REAL         :: ACL           ! i+j or k mode chloride, ug/m3 
-      REAL         :: ASEAST        ! j mode seasalt, ug/m3  
       REAL         :: ABR           ! i+j or k mode bromide, ug/m3   
       REAL         :: AH2O          ! i+j or k mode water, ug/m3          
       REAL         :: POC           ! i or j mode primary organic carbon, ug/m3 
@@ -986,7 +985,6 @@ c *** get fine aerosol H2O and chlorine concentrations in
                   AH2O = aerospc_conc( AH2O_IDX,N )
                   ACL  = aerospc_conc( ACL_IDX, N )
                   CL_PPM( N ) = PPM_FACTOR * ( ACL * INV_MWCL )
-		  ASEAST = aerospc_conc( ASEAST_IDX, N )
 
       If ( Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) Then 
          ABR  = aerospc_conc( ABR_IDX, N ) 
@@ -1061,7 +1059,9 @@ C *** set up variables needed for calculating K_BRONO2
                INO3_RXN_TIME        = 4.0D0 * INV_GAMMA_INO3 / CBAR_INO3
                INO2_RXN_TIME        = 4.0D0 * INV_GAMMA_INO2 / CBAR_INO2
                HOI_RXN_TIME         = 4.0D0 * INV_GAMMA_HOI  / CBAR_HOI
-               
+              
+! Only do aerosol nitrate photolysis for CRACMM3
+               If ( ( Index( mechname, 'CRACMM3' ) .Gt. 0 ) ) Then 
 C...  calculate cosine of zenith angle for the cell and determine day or night; Golam Sarwar
                  
                  COSZ = MET_DATA%COSZEN( C, R )
@@ -1085,12 +1085,16 @@ C...  calculate cosine of zenith angle for the cell and determine day or night; 
                 FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
 
                 IF ( L_ELMO ) THEN 
-		           IF (.NOT. DARK) THEN	 
+                   IF (.NOT. DARK) THEN
                      EF_HNO3( C,R,L ) = FAC_HNO3
                    ELSE 
                      EF_HNO3( C,R,L ) = 0.0 
                    ENDIF
                 ENDIF
+               Else
+                JHNO3    = 0.0D0
+                FAC_HNO3 = 0.0D0
+               End If
 
 ! Done FAC_HNO3       
 
