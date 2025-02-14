@@ -378,7 +378,7 @@
 
 &COMPOSITE_INIT
   N_MAX_COMPOSITES = 800
-  N_MAX_COMPONENTS = 50
+  N_MAX_COMPONENTS = 100
 /
 
 &ELMO_COMPOSITES
@@ -776,7 +776,7 @@ CMPST =
                 'ug m-3', 'PM1', 
                 'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
 
-'PM1_OTHWNC'  , 'PM1 Unspeciated Coarse Mass for the IMPROVE Method',
+'PM1_OTHWNC'  ,'PM1 Unspeciated Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM1', 
                 'PM1 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM1_OC - PM1_RCSOIL',
 
@@ -898,7 +898,7 @@ CMPST =
                 'ug m-3', 'PM25', 
                 'ASOIL + 2.2*AAL + 2.49*ASI + 1.63*ACA + 2.42*AFE + 1.94*ATI',
 
-'PM25_OTHWNC'  ,'PM2.5 Unspeciated Coarse Mass for the IMPROVE Method',
+'PM25_OTHWNC'   , 'PM2.5 Unspeciasted Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM25', 
                 'PM25 - PM25_SO4 - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_OC - PM25_RCSOIL',
 
@@ -1205,199 +1205,199 @@ CMPST =
 
 !-- HAPs Species --!
 'P_ACRO'       ,'Total mole-based acrolein concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'ACROLEIN',
 
 'P_ACRO_PRIM'   ,'Total mole-based primary acrolein concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'ACRO_PRIMARY',
 
 'P_ACRYN'      ,'Total mole-based acrylonitrile concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'ACRY_NITRILE',
 
 'P_ALD2'       ,'Total mole-based acetaldehyde concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'ALD2',
 
 'P_ALD2_PRIM'  ,'Total mole-based primary acetaldehyde concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'ALD2_PRIMARY',
 
 'P_BENZ'        ,'Total mole-based benzene concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'BENZENE',
 
 'P_BR2C212'     ,'Total mole-based 1,2-dibromoethane concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'BR2_C2_12',
 
 'P_13BUTA'      ,'Total mole-based 1,3-butadiene concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'BUTADIENE13',
 
 'P_CHCL3'       ,'Total mole-based chloroform concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'CHCL3',
 
 'P_CLETHE'      ,'Total mole-based vinyl chloride concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'CL_ETHE',
 
 'P_CL2C212 '    ,'Total mole-based 1,2-dichloroethane concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'CL2_C2_12',
 
 'P_CL2ME'       ,'Total mole-based methylene chloride concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'CL2_ME',
 
 'P_CL3ETHE'     ,'Total mole-based trichloroethylene concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'CL3_ETHE',
 
 'P_CL4ETHE'     ,'Total mole-based perchloroethylene concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'CL4_ETHE',
 
 'P_CL4ETHA'     ,'Total mole-based 1,1,2,2-tetrachloroethane concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'CL4_ETHANE',
 
 'P_CARBTET'     ,'Total mole-based carbon tetrachloride concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'CARBONTET',
 
 'P_DCLBENZ'     ,'Total mole-based 1,4-dichlorobenzene concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'DICL_BENZENE',
 
 'P_DCLPROP'     ,'Total mole-based 1,4-dichloropropene concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'DICL_PROPENE',
 
 'P_ETOX'       ,'Total mole-based ethylene oxide concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'ETOX',
 
 'P_FORM'       ,'Total mole-based formaldehyde concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'FORM',
 
 'P_FORM_PRIM'  ,'Total mole-based primary formaldehyde concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'FORM_PRIMARY',
 
 'P_HXMEDIS'    ,'Total mole-based hexamethylene 1,6-diisocyanate concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'HEXMETH_DIS',
 
 'P_HYDRAZN'    ,'Total mole-based hydrazine concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'HYDRAZINE',
 
 'P_MALANHYD'   ,'Total mole-based maleic anhydride concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'MAL_ANHYDRID',
 
 'P_NAPTH'      ,'Total mole-based napthalene concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'NAPHTHALENE',
 
 'P_PROPDICL'    ,'Total mole-based propylene dichloride concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'PROPYL_DICL',
 
 'P_QUIN'       ,'Total mole-based quinoline concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'QUINOLINE',
 
 'P_TOLDIIS'    ,'Total mole-based 2,4-toluene diisocyanate concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'TOL_DIIS',
 
 'P_TRIETHAMIN' ,'Total mole-based triethylamine concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'TRIETHYLAMIN',
 
 'P_ACETNIT'    ,'Total mole-based acetonitrile concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'ACET_NITRILE',
 
 'P_STYRENE'    ,'Total mole-based styrene concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'STYRENE',
 
 'P_ACRYACID'   ,'Total mole-based acrylic acid concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'ACRYACID',
 
 'P_HEXANE'     ,'Total mole-based n-hexane concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'HEXANE',
 
 'P_METHCL'     ,'Total mole-based methyl chloride concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'METHCHLORIDE',
 
 'P_CRBSULF'    ,'Total mole-based carbonyl sulfide concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'CARBSULFIDE',
 
 'P_CHLRPRN'    ,'Total mole-based chloroprene concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'CHLOROPRENE',
 
 'P_ETHYLBENZ'  ,'Total mole-based ethyl benzene concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'ETHYLBENZENE',
 
 'P_PAH_000E0'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.0 Unit Risk Exposure concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'PAH_000E0',
 
 'P_PAH_176E5'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.0000096 Unit Risk Exposure concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'PAH_176E5',
 
 'P_PAH_880E5'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.000048 Unit Risk Exposure concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'PAH_880E5',
 
 'P_PAH_176E4'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.000096 Unit Risk Exposure concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'PAH_176E4',
 
 'P_PAH_176E3'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.00096 Unit Risk Exposure concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'PAH_176E3',
 
 'P_PAH_192E3'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.00099 Unit Risk Exposure concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'PAH_192E3',
 
 'P_PAH_101E2'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.01008 Unit Risk Exposure concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'PAH_101E2',
 
 'P_PAH_176E2'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.0096 Unit Risk Exposure concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'PAH_176E2',
 
 'P_PAH_114E1'  ,'Total mole-based Lumped POM or PAHs Inert Tracer with a 0.1136 Unit Risk Exposure concentration',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'PAH_114E1',
 
 'P_HG0'        ,'Total mole-based elemental mercury',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'HG',
 
 'P_HGII'       ,'Total mole-based divalent mercury',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'HGIIGAS',
 
 'P_BENAPY'     ,'Total mole-based benzo-a-pyrene',
-                'ug m-3', 'TSP',
+                'ug m-3', 'GAS',
                 'BENAPY',
 
 !------------------------!
@@ -1473,11 +1473,11 @@ CMPST =
                 'kg ha-1', 'DEP',
                 'WD_STYRENE',
 
-'DD_XYL'       ,'Dry Dep of Total HAPs xylene',
+'DD_HAP_XYL'    ,'Dry Dep of Total HAPs xylene',
                 'kg ha-1', 'DEP',
                 'DD_XYLENE',
 
-'WD_XYL'       ,'Wet Dep of Total HAPs xylene',
+'WD_HAP_XYL'    ,'Wet Dep of Total HAPs xylene',
                 'kg ha-1', 'DEP',
                 'WD_XYLENE',
 

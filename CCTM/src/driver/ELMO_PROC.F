@@ -437,6 +437,13 @@
 
       CHARACTER( 500 ) :: XMSG
   
+      INTERFACE
+        RECURSIVE SUBROUTINE ELMO_DERIVED_CALC( OUTVAL, J )
+          INTEGER, INTENT( IN ) :: J
+          REAL, INTENT( INOUT ) :: OUTVAL
+        END SUBROUTINE ELMO_DERIVED_CALC
+      END INTERFACE
+
       ! Stop CALC_ELMO and return an error code if the Table Index
       ! is equal to or less than zero.
       IERR = 0

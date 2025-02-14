@@ -532,14 +532,15 @@ c                 ENDIF
 
       ! Store Deposition Accumulation so it can be subtracted out to
       ! inform ELMO
-      TOT_DEP0 = TOT_DEP + CONV_DEP
+      DO VAR = 1,N_SPC_WDEP+1
+         TOT_DEP0( :,:,VAR) = TOT_DEP( :,:,VAR) + CONV_DEP( :,:,VAR)
+      END DO
 #ifdef isam
       TOT_SADEP0 = TOT_SADEP + CONV_SADEP
 #endif
 #ifdef sens
       S_TOTDEP0 = S_TOTDEP + S_CONDEP
 #endif
-
 
 C...compute cloud effects for the resolved clouds and resolved rainwater
 
