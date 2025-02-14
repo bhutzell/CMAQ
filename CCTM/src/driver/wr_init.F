@@ -163,12 +163,12 @@ C (initial data assumed to be in correct output units)
  
       IF ( L_CONC_TA ) THEN   ! for Temperature      
          CALL interpolate_var ('TA', JDATE, JTIME, DBUFFTA)         
-         call mio_fwrite( CTM_CONC_1, 'TA', PNAME, DBUFF, TIME_STAMP )
+         call mio_fwrite( CTM_CONC_1, 'TA', PNAME, DBUFFTA, TIME_STAMP )
       END IF
 
       IF ( L_CONC_PRES ) THEN   ! for Pressure      
          CALL interpolate_var ('PRES', JDATE, JTIME, DBUFFP)
-         call mio_fwrite( CTM_CONC_1, 'PRES', PNAME, DBUFF, TIME_STAMP )
+         call mio_fwrite( CTM_CONC_1, 'PRES', PNAME, DBUFFP, TIME_STAMP )
       END IF
 
       IF ( L_CONC_RH ) THEN   ! for Relative Humidity
