@@ -601,14 +601,14 @@ C *** variables for heterogeneous hydrolysis of NTR2
       
 C Latitude and longitude for zenith angle calculation: Golam Sarwar * July 1, 2024
       REAL          COSZ                            ! local cosine of zenith angle
-      REAL          JHNO3                           ! HNO3 photolysis rate, 1/min
       LOGICAL       DARK                            ! DARK = TRUE is night,  DARK = FALSE is day
       
       REAL      ASEASTM   ! seasalt,  [moles / m3 ] 
       REAL      ANO3      ! fine mode nitrate [ ug/m3 ] 
       REAL      ANO3M     ! nitrate,  [moles / m3 ] 
 
-      REAL      FAC_HNO3  ! Enhancement factor for HNO3 photolysis rate for a grid-cell [-]  
+      REAL, SAVE :: JHNO3 = 0.0    ! HNO3 photolysis rate, 1/min
+      REAL, SAVE :: FAC_HNO3 = 0.0 ! Enhancement factor for HNO3 photolysis rate for a grid-cell [-]  
       
       LOGICAL, SAVE     :: FIRSTIME = .TRUE.
 
@@ -706,6 +706,21 @@ C     end of the gas-phase chemical driver
            WHICH_AERO_RATE( SELECTED_AERO_RATES ) = INDEX_AERO_RATES( INDX )
        END DO
 
+! checkout if IA_ANO3 is used and ASEAST is and aerosol species.
+       DO IRATE = 1,SELECTED_AERO_RATES
+          IF( WHICH_AERO_RATE( IRATE ) .EQ. IA_ANO3 )THEN
+             IF ( ASEAST_IDX .LT. 1) THEN
+                XMSG = 'Heterogeneous Reaction Label ' 
+     &          // TRIM ( NAMES_AERO_RATES( IA_ANO3 ) )
+     &          // ' used but ASEAST is not an aerosol species. '
+     &          // 'Possible solution adds ASEAST accumulation mode species and '
+     &          // 'emissions to AE species and CMAQ_Chem_Control namelists, '
+     &          // 'respecitively. '
+                CALL M3EXIT( 'HETCHEM_RATES', 0, 0, XMSG, XSTAT3 )
+             END IF 
+          END IF 
+       END DO 
+
        ALLOCATE( KHETERO( SELECTED_AERO_RATES, NCOLS,NROWS,NLAYS ) )
        
        IF ( L_ELMO ) THEN
@@ -717,6 +732,7 @@ C     end of the gas-phase chemical driver
           ALLOCATE(     YCLNO2IJ( NCOLS,NROWS,NLAYS ) )
           ALLOCATE(      YCLNO2K( NCOLS,NROWS,NLAYS ) )
           ALLOCATE(      EF_HNO3( NCOLS,NROWS,NLAYS ) )
+          EF_HNO3 = 0.0
        END IF
 
 C ***  Determine molecular weights
@@ -847,7 +863,7 @@ C ***  Map to acids/nucleophiles for epoxide uptake
          GAMMA_IEPOX  = 0.0
          GAMMA_IMAE   = 0.0
          KPARTIEPOX   = 0.0
-	     EF_HNO3      = 0.0
+         EF_HNO3      = 0.0
       END IF
      
 C *** Calculate rate constants at each grid cell location
@@ -986,13 +1002,13 @@ c *** get fine aerosol H2O and chlorine concentrations in
                   ACL  = aerospc_conc( ACL_IDX, N )
                   CL_PPM( N ) = PPM_FACTOR * ( ACL * INV_MWCL )
 
-      If ( Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) Then 
-         ABR  = aerospc_conc( ABR_IDX, N ) 
-         INV_MWBR  = REAL( 1.0 / aerospc_mw( ABR_IDX ), 8 )  
-         BR_PPM( N ) = PPM_FACTOR * ( ABR * INV_MWBR ) 
-      Else
-         BR_PPM( N ) = 0.0D0  
-      End If
+                  If ( Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) Then 
+                      ABR  = aerospc_conc( ABR_IDX, N ) 
+                     INV_MWBR  = REAL( 1.0 / aerospc_mw( ABR_IDX ), 8 )  
+                     BR_PPM( N ) = PPM_FACTOR * ( ABR * INV_MWBR ) 
+                  Else
+                     BR_PPM( N ) = 0.0D0  
+                  End If
 
 C *** If only a small amount of water is present on aerosol, keep YIELD_CLNO2 zero
                  IF ( AH2O .GT. 5.0E-01 .AND. ACL .GT. 1.0E-04 ) THEN
@@ -1040,11 +1056,11 @@ C *** Fo SO4, use SO4/NA emissions ratio in seasalt
                 SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * DEXP ( 0.5D0 * AEROMODE_LNSG( 2 ) * AEROMODE_LNSG( 2 ) )
                ELSE
                 SSALT_SURFA = 0.0
-                ENDIF
+               ENDIF
 
 C *** calculate GAMMA_HBR  
-      GAMMA_HBR = 1.3D-8 * DEXP ( 4290/ AIRTEMP) 
-      INV_GAMMA_HBR = 1.0D0 / GAMMA_HBR
+              GAMMA_HBR = 1.3D-8 * DEXP ( 4290/ AIRTEMP) 
+              INV_GAMMA_HBR = 1.0D0 / GAMMA_HBR
                                                                                                                
 C *** set up variables needed for calculating K_BRONO2              
                CLNO3_H2O_RXN_TIME   = 4.0D0 * INV_GAMMA_CLNO3_H2O / CBAR_CLNO3
@@ -1060,43 +1076,7 @@ C *** set up variables needed for calculating K_BRONO2
                INO2_RXN_TIME        = 4.0D0 * INV_GAMMA_INO2 / CBAR_INO2
                HOI_RXN_TIME         = 4.0D0 * INV_GAMMA_HOI  / CBAR_HOI
               
-! Only do aerosol nitrate photolysis for CRACMM3
-               If ( ( Index( mechname, 'CRACMM3' ) .Gt. 0 ) ) Then 
-C...  calculate cosine of zenith angle for the cell and determine day or night; Golam Sarwar
-                 
-                 COSZ = MET_DATA%COSZEN( C, R )
-                 
-                 IF ( COSZ .LE. 0.0 ) THEN
-                      DARK = .TRUE.   ! night
-                      JHNO3 = 0.0D0                                 ! 1/min
-                 ELSE
-                      DARK = .FALSE.  ! day
-                      JHNO3 = RJ( C, R, L, LHNO3 )              ! 1/min                   
-                 END IF
-                 
-! Calculate FAC_HNO3
-
-                ANO3 = aerospc_conc( ANO3_IDX,1 ) + aerospc_conc( ANO3_IDX,2 )
-                ANO3M = ANO3 / aerospc_mw( ANO3_IDX )
-        
-                ASEASTM = aerospc_conc( ASEAST_IDX, 2 ) / aerospc_mw( ASEAST_IDX )
-               
-                FAC_HNO3 = 100.0  / ( 1.0 + ( ANO3M / ASEASTM ))                
-                FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
-
-                IF ( L_ELMO ) THEN 
-                   IF (.NOT. DARK) THEN
-                     EF_HNO3( C,R,L ) = FAC_HNO3
-                   ELSE 
-                     EF_HNO3( C,R,L ) = 0.0 
-                   ENDIF
-                ENDIF
-               Else
-                JHNO3    = 0.0D0
-                FAC_HNO3 = 0.0D0
-               End If
-
-! Done FAC_HNO3       
+               COSZ = MET_DATA%COSZEN( C, R )
 
                CBARIEPOX = CFACTOR_IEPOX * DSQRT( AIRTEMP )
                CBARIMAE  = CFACTOR_IMAE  * DSQRT( AIRTEMP )
@@ -1467,8 +1447,24 @@ C hydrolysis
                    KHETERO( IRATE, C,R,L ) = 0.0D0    
                   ENDIF
 
-                CASE( IA_ANO3 )                                   
-                  KHETERO( IRATE, C,R,L ) = JHNO3 * FAC_HNO3                                                          ! 1/min 
+                CASE( IA_ANO3 )
+
+                    IF ( COSZ .LE. 0.0 ) THEN
+                      DARK = .TRUE.     ! sun is down
+                      JHNO3    = 0.0D0  ! no photolysis
+                      FAC_HNO3 = 0.0D0
+                    ELSE
+                      DARK = .FALSE.            ! sun is up
+                      JHNO3 = RJ( C,R,L,LHNO3 ) ! get HNO3 photolysis frequency
+                      ! Calculate FAC_HNO3
+                      ANO3 = aerospc_conc( ANO3_IDX,1 ) + aerospc_conc( ANO3_IDX,2 )
+                      ANO3M = ANO3 / aerospc_mw( ANO3_IDX )
+                      ASEASTM = aerospc_conc( ASEAST_IDX, 2 ) / aerospc_mw( ASEAST_IDX )
+                      FAC_HNO3 = 100.0  / ( 1.0 + ( ANO3M / ASEASTM ))                
+                      FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
+                      IF ( L_ELMO ) EF_HNO3( C,R,L ) = FAC_HNO3
+                    END IF                 
+                    KHETERO( IRATE, C,R,L ) = REAL( JHNO3 * FAC_HNO3,8 )                                                          ! 1/min ,
 
                END SELECT
 
