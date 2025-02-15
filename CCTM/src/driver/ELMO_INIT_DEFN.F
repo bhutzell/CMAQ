@@ -1147,11 +1147,12 @@
                  VTYPE3D( IVAR ) = ELMO_TABLE( J )%OUT_TYPE
                  VNAME3D( IVAR ) = ELMO_TABLE( J )%OUT_NAME
                  UNITS3D( IVAR ) = ELMO_TABLE( J )%CUNIT
-                 
+
                  ! If this is an instantaneous file and a deposition
                  ! species, then indicate the units are a flux rather
                  ! than an aggregate per output time step
                  IF ( ELMO_FILE( IFL )%TMODE .EQ. 0 ) THEN
+                   IV = ELMO_TABLE( J )%VAR_TYPE
                    IF ( IV .EQ. ET_DDEP .OR.
      &                  IV .EQ. ET_ISAM_DDEP .OR.
      &                  IV .EQ. ET_DDM_DDEP .OR.
