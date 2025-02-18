@@ -41,7 +41,7 @@
 &Desid_ScalingVars
  Desid_Max_Rules = 2000
 /
-
+ 
 &Desid_Scaling
  Desid_Rules_nml =
 
@@ -52,51 +52,67 @@
    'EVERYWHERE', 'ALL'         ,'NO2'    ,'NO2'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'NO'     ,'NO'          ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'HONO'   ,'HONO'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'CO'     ,'CO'          ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'SO2'    ,'SO2'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'NH3'    ,'NH3'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'AACD'   ,'AACD'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'ALD2'   ,'ALD2'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'FORM'   ,'FORM'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'HCHO'   ,'HCHO'        ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'MEOH'   ,'MEOH'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'FACD'   ,'FACD'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'CO'     ,'CO'          ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'ALDX'   ,'ALDX'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'ETHA'   ,'ETHA'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'ETOH'   ,'ETOH'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'KET'    ,'KET'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'PAR'    ,'PAR'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'ACET'   ,'ACET'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'PRPA'   ,'PRPA'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'ETHY'   ,'ETHY'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'ETH'    ,'ETH'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'OLE'    ,'OLE'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'IOLE'   ,'IOLE'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'ISOP'   ,'ISOP'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'AACD'   ,'CCOOH'       ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'        ,'CCOOH'   ,'CCOOH'       ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'PACD'   ,'RCOOH'       ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'RNO3'   ,'RNO3'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ACET'   ,'ACETONE'     ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'      ,'ACETONE'   ,'ACETONE'     ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'CRES'   ,'CRES'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'CCHO'   ,'CCHO'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'RCHO'   ,'RCHO'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'MEK'    ,'MEK'         ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'FACD'   ,'HCOOH'       ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'        ,'HCOOH'   ,'HCOOH'       ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'PRD2'   ,'PRD2'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'IPRD'   ,'IPRD'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'GLY'    ,'GLY'         ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'BACL'   ,'BACL'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'BALD'   ,'BALD'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'MACR'   ,'MACR'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'MVK'    ,'MVK'         ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ACRO'   ,'ACROLEIN'    ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'     ,'ACROLEIN'   ,'ACROLEIN'    ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ETHE'   ,'ETHENE'      ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'       ,'ETHENE'   ,'ETHENE'      ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'PRPE'   ,'PROPENE'     ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'      ,'PROPENE'   ,'PROPENE'     ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'BDE13'  ,'BUTADIENE13' ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ISOP'   ,'ISOPRENE'    ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'     ,'ISOPRENE'   ,'ISOPRENE'    ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'APIN'   ,'APIN'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'TERP'   ,'TERP'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ACYE'   ,'ACETYLENE'   ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'BENZ'   ,'BENZENE'     ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'TOL'    ,'TOL'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'XYLMN'  ,'XYLMN'       ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'NAPH'   ,'NAPH'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'CH4'    ,'ECH4'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'TOLU'   ,'TOLUENE'     ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'MXYL'   ,'MXYL'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'OXYL'   ,'OXYL'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'PXYL'   ,'PXYL'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'B124'   ,'TMBENZ124'   ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ETOH'   ,'ETOH'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ALK1'   ,'ALK1'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ALK2'   ,'ALK2'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ALK3'   ,'ALK3'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ALK4'   ,'ALK4'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ALK5'   ,'ALK5'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'SOAALK' ,'SOAALK'      ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'OLE1'   ,'OLE1'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'OLE2'   ,'OLE2'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ARO1'   ,'ARO1'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ARO2MN' ,'ARO2MN'      ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'     ,'NAPHTHALENE','NAPHTHAL'    ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'TERP'   ,'TERP'        ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'SESQ'   ,'SESQ'        ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'CL2'    ,'CL2'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'HCL'    ,'HCL'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'SESQ'   ,'SESQ'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'SOAALK' ,'SOAALK'      ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'        ,'ACROLEIN','ACROLEIN'    ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'ALD2_PRIMARY','ALD2_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'    ,'FORM_PRIMARY','FORM_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'        ,'ACROLEIN','ACRO_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'     ,'BUTADIENE13','BUTADIENE13' ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'SULF'   ,'SULF'        ,'GAS'  ,0.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'HGNRVA' ,'HG'          ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'HGIIGAS','HGIIGAS'     ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'GLY'    ,'GLY'         ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'GLYD'   ,'GLYD'        ,'GAS'  ,1.  ,'UNIT','a',
-   'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a', 
-
-   ! Marine Halogen Chemistry
-   'EVERYWHERE', 'ALL'         ,'DMS'    ,'DMS'         ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'ALL'         ,'HCHO'   ,'HCHO_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'CCHO'   ,'CCHO_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'ACRO'   ,'ACRO_PRIMARY','GAS'  ,1.  ,'UNIT','a', 
 
    ! Fine-Mode Aerosols
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'ASO4'        ,'FINE' ,1.  ,'MASS','a', 
@@ -154,7 +170,6 @@
    ! and wood-burning related sources.
     'EVERYWHERE', 'PT_FIRES'     ,'ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o', 
     'EVERYWHERE', 'PT_RXFIRES'   ,'ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o', 
-    'EVERYWHERE', 'PT_WILDFIRES' ,'ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o', 
     'EVERYWHERE', 'PT_AGFIRES'   ,'ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o', 
     'EVERYWHERE', 'PT_OTHFIRES'  ,'ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o', 
     'EVERYWHERE', 'PT_FIRES_MXCA','ALL'   ,'PCVOC'      ,'GAS' ,0.0  ,'MASS','o', 
@@ -181,15 +196,16 @@
    'EVERYWHERE', 'ALL'    ,'PMFINE_OTHR' ,'AOTHR'       ,'FINE',1.   ,'UNIT','a', 
 
    ! Wind-Blown Dust and Sea Spray Scaling
-   ! Coarse Components
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SO4','ASO4'      ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NO3','ANO3'      ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CL' ,'ACL'       ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a',
-
+   ! Coarse Components                                               
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_SO4','ASO4'      ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_NO3','ANO3'      ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_CL' ,'ACL'       ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a', 
+   'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a', 
+   
 /
+
 
 !------------------------------------------------------------------------------!
 ! Emissions Scaling Family Definitions                                         !
@@ -299,43 +315,51 @@ CMPST =
 !-- Inorganic Composites --!
 'FORMALD'     , 'Formaldehyde Concentration', 
                 'ppmV', 'GAS', 
-                'FORM', 
+                'HCHO', 
 
 'ISOPRENE'    , 'Isoprene Concentration', 
                 'ppmV', 'GAS', 
-                'ISOP', 
+                'ISOPRENE', 
 
 'ACETALD'     , 'Acetaldehyde Concentration', 
                 'ppmV', 'GAS', 
-                'ALD2', 
+                'CCHO', 
 
 'ACETYLENE'   , 'Acetylene Concentration', 
                 'ppmV', 'GAS', 
-                'ETHY', 
+                'ACETYLENE', 
 
 'ETHANE'      , 'Ethane Concentration', 
                 'ppmV', 'GAS', 
-                'ETHA', 
+                'ALK1', 
 
 'ETHENE'      , 'Ethene Concentration', 
                 'ppmV', 'GAS', 
-                'ETH', 
+                'ETHENE', 
+
+'H2O2'        , 'Hydrogen Peroxide Concentration', 
+                'ppmV', 'GAS', 
+                'HO2H', 
 
 'TOLUENE'     , 'Toluene Concentration', 
                 'ppmV', 'GAS', 
-                'TOL', 
+                'TOLUENE', 
 
 'XYLENES'     , 'Xylenes Concentration', 
                 'ppmV', 'GAS', 
-                'XYLMN', 
+                'MXYL + OXYL + PXYL', 
 
 'NAPHTHAL'    , 'Naphthalene Concentration', 
                 'ppmV', 'GAS', 
-                'NAPH', 
+                'NAPHTHAL', 
+
+'ALKANES'     , 'Alkane Concentration', 
+                'ppmC', 'GAS', 
+                '2.*ALK1 + 3.*ALK2 + 4.*ALK3 + 5.*ALK4 + 8.*ALK5', 
 
 'TERPENES'    , 'Monoterpene Concentration', 
                 'ppmV', 'GAS', 
-                'TERP', 
+                'TERP + APIN', 
 
 'HOX'         , 'HOx Concentration', 
                 'ppmV', 'GAS', 
@@ -345,13 +369,17 @@ CMPST =
                 'ppmV', 'GAS', 
                 'NO + NO2', 
 
-'NTR'         , 'Organic Nitrates', 
+'ISOPNS'      , 'Gas-Phase Isoprene Nitrates'
+                'ppmV', 'GAS',
+                'ISOPND + ISOPNB + NIT1 + NISOPOOH + MVKN + MACRN + ETHLN + RNO3I + PROPNN + 2.0*ISOPNN'
+
+'NTR'         , 'Gas-Phase Organic Nitrates', 
                 'ppmV', 'GAS', 
-                'NTR1 + NTR2 + INTR', 
+                'ISOPNS + RNO3 + MTNO3', 
 
 'PANS'        , 'Peroxy-Acetyl Nitrates', 
                 'ppmV', 'GAS', 
-                'PAN + PANX + OPAN', 
+                'PAN + PAN2 + PBZN + MAPAN + IMAPAN', 
 
 'HNO3_UGM3'   , 'Gas-Phase Nitric Acid',
                 'ug m-3', 'GAS', 
@@ -368,7 +396,7 @@ CMPST =
 !-- Organic Composites --!
 'VOC'         , 'Volatile Organic Compound (VOC) Concentration',
                 'ppmC', 'GAS',
-                'PAR + 2.0*ETHA + 3.0*PRPA + MEOH + 2.0*ETH + 2.0*ETOH + 2.0*OLE + 3.0*ACET + 7.0*TOL + 8.0*XYLMN + 6.0*BENZENE + FORM + 3.0*GLY + 4.0*KET + 2.0*ETHY + 2.0*ALD2 + 4.0*IOLE + 2.0*ALDX + 5.0*ISOP + 10.0*TERP + 10.0*NAPH + 10.0*APIN',
+                '3.*ACETONE + 2.*ACETYLENE + 3.*ACROLEIN + 4.*BACL + 4.*BUTADIENE13 + 2.*CCHO + 7.*CRES + 2.*ETHENE + 2.*ETOH + 2.*GLY + HCHO + 4.*MEK+ MEOH + 3.*MGLY + 4.*MVK + 5.*OLE1 + 5.*OLE2 + 6.*PRD2 + 3.*PROPENE + 3.*RCHO + 6.0*RNO3 + 2.*ALK1 + 3.*ALK2 + 4.*ALK3 + 5.*ALK4 + 8.*ALK5 + 3.*RCOOH + 2.*CCOOH + HCOOH + 10.*TERPENES + 5.*ISOPRENE + 15.*SESQ + 6.*BENZENE + 7.*TOLUENE + 8.*XYLENES + 10.*NAPHTHAL + 9.*TMBENZ124'  \
 
 !---------------------------------!
 !**** Particle Concentrations ****!
@@ -713,11 +741,11 @@ CMPST =
                 'ug m-3', 'TSP',
                 'ASO4',
 
-'TSP_NO3'     , 'Total Particulate Nitrate',
+'TSP_INO3'    , 'Total Inorganic Particulate Nitrate',
                 'ug m-3', 'TSP',
                 'ANO3',
 
-'TSP_NO3_PPM'  , 'Total Particulate Nitrate',
+'TSP_INO3_PPM  , 'Total Inorganic Particulate Nitrate',
                 'ppmV', 'TSP',
                 'ANO3',
 
@@ -755,9 +783,15 @@ CMPST =
                 'ANH4 + NH3',
 
 !-- Nitrate --!
+'TSP_NO3_PPM' , 'Total Inorganic and Organic Particulate Nitrate',
+                'ppmV', 'TSP',
+                'ANO3 + AMTNO3 + AISOPNN'
+
+
+
 'NOY'         , 'NOy Concentration', 
                 'ppmV', 'TSP', 
-                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + PNA + CRON + CLNO2 + CLNO3 + PANS + NTR', 
+                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + HNO4 + ANO3 + AMTNO3 + AISOPNN + PANS + NTR + CLNO + CLONO + CLNO2 + CLONO2', 
              
 'PMF_TNO3'    , 'Fine-Mode Nitrate plus Nitric Acid', 
                 'ug m-3', 'FINE', 
@@ -787,38 +821,38 @@ CMPST =
 !-- Formaldehyde --!
 'DD_FORMALD'  , 'Dry Dep of Formaldehyde', 
                 'kg ha-1', 'DEP', 
-                'DD_FORM',
+                'DD_HCHO',
 
 'WD_FORMALD'  , 'Wet Dep of Formaldehyde', 
                 'kg ha-1', 'DEP', 
-                'WD_FORM',
+                'WD_HCHO',
 
-!-- Pernitric Acid --!
-'DD_HNO4'     , 'Dry Dep of Pernitric Acid', 
+!-- Hydrogen Peroxide --!
+'DD_H2O2'     , 'Dry Dep of Hydrogen Peroxide', 
                 'kg ha-1', 'DEP', 
-                'DD_PNA',
+                'DD_HO2H',
 
-'WD_HNO4'  , 'Wet Dep of Pernitric Acid', 
+'WD_H2O2'     , 'Wet Dep of Hydrogen Peroxide', 
                 'kg ha-1', 'DEP', 
-                'WD_PNA',
+                'WD_HO2H',
 
 !-- Organic Nitrates --!
 'DD_NTR'      , 'Dry Dep of Organic Nitrates', 
                 'kg ha-1', 'DEP', 
-                'DD_NTR1 + DD_NTR2 + DD_INTR',
+                'DD_ISOPND + DD_ISOPNB + DD_NIT1 + DD_NISOPOOH + DD_MVKN + DD_MACRN + DD_ETHLN + DD_RNO3I + DD_PROPNN + DD_ISOPNN + DD_RNO3 + DD_MTNO3',
 
 'WD_NTR'      , 'Wet Dep of Organic Nitrates', 
                 'kg ha-1', 'DEP', 
-                'WD_NTR1 + WD_NTR2 + WD_INTR',
+                'WD_ISOPND + WD_ISOPNB + WD_NIT1 + WD_NISOPOOH + WD_MVKN + WD_MACRN + WD_ETHLN + WD_RNO3I + WD_PROPNN + WD_ISOPNN + WD_RNO3 + WD_MTNO3',
 
 !-- PAN --!
 'DD_PANT'     , 'Dry Dep of Total PAN', 
                 'kg ha-1', 'DEP', 
-                'DD_PAN + DD_PANX + DD_OPAN',
+                'DD_PAN + DD_PAN2 + DD_PBZN + DD_MAPAN + DD_IMAPAN',
 
 'WD_PANT'     , 'Wet Dep of Total PAN', 
                 'kg ha-1', 'DEP', 
-                'WD_PAN + WD_PANX + WD_OPAN',
+                'WD_PAN + WD_PAN2 + WD_PBZN + WD_MAPAN + WD_IMAPAN',
 
 
 !-----------------------------!
@@ -912,7 +946,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 'DD_ACL',
 
-'DD_CL'       , 'Dry Dep of Particulate Chloride', 
+'DD_TSP_CL'   , 'Dry Dep of Particulate Chloride', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_CL + DD_PMC_CL',
 
@@ -1057,11 +1091,11 @@ CMPST =
 !-- Total Nitrate --!
 'DD_TNO3'     , 'Dry Dep of Total Nitrate', 
                 'kg ha-1', 'DEP', 
-                'DD_ANO3 + 0.984*DD_HNO3 + DD_NO3 + 0.6362*DD_CLNO3',
+                'DD_ANO3 + 0.984*DD_HNO3 + DD_NO3',
 
 'WD_TNO3'     , 'Wet Dep of Total Nitrate', 
                 'kg ha-1', 'DEP', 
-                'WD_ANO3 + 0.984*WD_HNO3 + WD_NO3 + 0.6362*WD_CLNO3',
+                'WD_ANO3 + 0.984*WD_HNO3 + WD_NO3',
 
 !-- Total Ammonia --!
 'DD_NHX'      , 'Dry Dep of Total Ammonia', 
@@ -1078,18 +1112,17 @@ CMPST =
                 'WD_ASO4 + 1.5*WD_SO2',
 
 !-- Total Chloride --!
-'DD_TCL'      , 'Dry Dep of Total Chloride', 
-                'kg ha-1', 'DEP', 
-                'DD_CL + 0.4352*DD_CLNO2 + 0.36377*DD_CLNO3',
+'DD_TCL'      , 'Dry Dep of Total Chloride',
+                'kg ha-1', 'DEP',
+                'DD_TSP_CL + DD_CL2 + 0.972*DD_HCL + 0.6758*DD_HOCL + 0.4352*DD_CLNO2',
 
-'WD_TCL'      , 'Wet Dep of Total Chloride', 
-                'kg ha-1', 'DEP', 
-                '0.972*WD_HCL + WD_CL2 + WD_ACL - WD_ACLI + 0.6758*WD_HOCL + 0.4352*WD_CLNO2 + 0.36377*WD_CLNO3',
+'WD_TCL'      , 'Wet Dep of Total Chloride',
+                'kg ha-1', 'DEP',
+                '0.972*WD_HCL + WD_CL2 + WD_TSP_CL + 0.6758*WD_HOCL + 0.4352*WD_CLNO2',
 
-'TD_TCL'      , 'Total Dep of Total Chloride', 
-                'kg ha-1', 'DEP', 
+'TD_TCL'      , 'Total Dep of Total Chloride',
+                'kg ha-1', 'DEP',
                 'DD_TCL + WD_TCL',
-
 
 !-----------------------------!
 !**** Nitrogen Deposition ****!
@@ -1106,35 +1139,35 @@ CMPST =
 
 'DD_OXN_TNO3' , 'Dry Dep of Oxidized Nitrogen from Nitrate', 
                 'kgN ha-1', 'DEP', 
-                '0.22220*DD_HNO3 + 0.22581*DD_ANO3 + 0.22581*DD_NO3 + 0.14366*DD_CLNO3',
+                '0.22220*DD_HNO3 + 0.22581*DD_ANO3 + 0.22581*DD_NO3',
 
 'WD_OXN_TNO3' , 'Wet Dep of Oxidized Nitrogen from Nitrate', 
                 'kgN ha-1', 'DEP', 
-                '0.22220*WD_HNO3 + 0.22581*WD_ANO3 + 0.22581*WD_NO3 + 0.14366*WD_CLNO3',
+                '0.22220*WD_HNO3 + 0.22581*WD_ANO3 + 0.22581*WD_NO3',
 
 'DD_OXN_PANT' , 'Dry Dep of Oxidized Nitrogen from PAN', 
                 'kgN ha-1', 'DEP', 
-                '0.11570*DD_PAN + 0.11570*DD_PANX + 0.11570*DD_OPAN',
+                '0.11570*DD_PANT',
 
 'WD_OXN_PANT' , 'Wet Dep of Oxidized Nitrogen from PAN', 
                 'kgN ha-1', 'DEP', 
-                '0.11570*WD_PAN + 0.11570*WD_PANX + 0.11570*WD_OPAN',
+                '0.11570*WD_PANT',
 
 'DD_OXN_ORGN' , 'Dry Dep of Oxidized Nitrogen from Organic Nitrate', 
                 'kgN ha-1', 'DEP', 
-                '0.10770*DD_NTR1 + 0.10770*DD_NTR2 + 0.10770*DD_INTR + 0.06061*DD_AMTNO3 + DD_OXN_PANT', 
+                '0.10770*DD_NTR + 0.10770*DD_ISOPNN + DD_OXN_PANT', 
 
 'WD_OXN_ORGN' , 'Wet Dep of Oxidized Nitrogen from Organic Nitrate', 
                 'kgN ha-1', 'DEP', 
-                '0.10770*WD_NTR1 + 0.10770*WD_NTR2 + 0.10770*WD_INTR + 0.06061*WD_AMTNO3 + WD_OXN_PANT',
+                '0.10770*WD_NTR + 0.10770*WD_ISOPNN + WD_OXN_PANT', 
 
 'DD_OXN_OTHR' , 'Dry Dep of Oxidized Nitrogen from Other Components', 
                 'kgN ha-1', 'DEP', 
-                '0.25926*DD_N2O5 + 0.29787*DD_HONO + 0.17720*DD_PNA + 0.1717*DD_CLNO2 + 0.1436*DD_CLNO3',
+                '0.25926*DD_N2O5 + 0.29787*DD_HONO + 0.17720*DD_HNO4 + 0.1717*DD_CLNO2',
 
 'WD_OXN_OTHR' , 'Wet Dep of Oxidized Nitrogen from Other Components', 
                 'kgN ha-1', 'DEP', 
-                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.17720*WD_PNA + 0.1717*WD_CLNO2 + 0.1436*WD_CLNO3',
+                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.17720*WD_HNO4 + 0.1717*WD_CLNO2',
 
 'DD_OXN_TOT'  , 'Dry Dep of Total Oxidized Nitrogen', 
                 'kgN ha-1', 'DEP', 
