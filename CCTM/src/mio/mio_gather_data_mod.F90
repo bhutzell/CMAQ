@@ -43,7 +43,7 @@
 
           character(23), parameter :: pname = 'mio_gather_data_1d_real'
 
-          integer :: i, pe, dsize, stat, loc_tag2
+          integer :: i, pe, dsize, stat
           real, allocatable :: recv_buf(:)
           logical :: lerror
 
@@ -62,9 +62,8 @@
                       dsize = mio_mpas_dmap(0, pe)
                       allocate (recv_buf(dsize), stat=stat)
 
-                      loc_tag2 = tag2 + pe * 3
                       call mpi_recv (recv_buf, dsize, mpi_real, pe,          &
-                                     loc_tag2, mpi_comm_world, status, stat)
+                                     tag2, mpi_comm_world, status, stat)
 
                       if (stat .ne. 0) then
                          write (mio_logdev, *) ' Error: In routine ' // pname
@@ -79,9 +78,8 @@
                    end do
                 else
                    dsize = mio_mpas_dmap(0, mio_mype)
-                   loc_tag2 = tag2 + mio_mype * 3
                    call mpi_send (in_data, dsize, mpi_real, 0,    &
-                                  loc_tag2, mpi_comm_world, stat)
+                                  tag2, mpi_comm_world, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error, not able to send data'
@@ -124,8 +122,7 @@
 
           integer :: stat, col_s, col_e, row_s, row_e, nc, nr, pe,     &
                      who, who_p1, send_size, recv_size, r, c, loc,     &
-                     pos, dsize, i, first_dim, second_dim,             &
-                     loc_tag1, loc_tag2
+                     pos, dsize, i, first_dim, second_dim
           real, allocatable :: recv_buf(:), recv_buf_mpas(:,:)
           logical :: lerror
 
@@ -144,9 +141,8 @@
                    dsize = first_dim * second_dim
                    allocate (recv_buf_mpas(first_dim, second_dim), stat=stat)
 
-                   loc_tag2 = tag2 + pe * 3
                    call mpi_recv (recv_buf_mpas, dsize, mpi_real, pe,     &
-                                  loc_tag2, mpi_comm_world, status, stat)
+                                  tag2, mpi_comm_world, status, stat)
                    do i = 1, second_dim
                       out_data(:, mio_mpas_dmap(i, pe)) = recv_buf_mpas(:, i)
                    end do
@@ -156,9 +152,8 @@
                 second_dim = mio_mpas_dmap(0, mio_mype)
                 dsize = first_dim * second_dim
 
-                loc_tag2 = tag2 + mio_mype * 3
                 call mpi_send (in_data(:,1:second_dim), dsize, mpi_real, 0,     &
-                               loc_tag2, mpi_comm_world, stat)
+                               tag2, mpi_comm_world, stat)
 #endif
              end if
           else
@@ -192,9 +187,8 @@
                    end if
 
                    do pe = 1, mio_nprocs-1
-                      loc_tag1 = tag1 + pe * 3
                       call mpi_recv (who, 1, mpi_integer, mpi_any_source,    &
-                                     loc_tag1, mpi_comm_world, status, stat)
+                                     tag1, mpi_comm_world, status, stat)
 
                       if (stat .ne. 0) then
                          write (mio_logdev, *) ' Error: In routine ' // pname
@@ -211,9 +205,8 @@
                       nr    = nrows_pe(who_p1, pos)
                       recv_size = nc * nr
 
-                      loc_tag2 = tag2 + pe * 3
                       call mpi_recv (recv_buf, recv_size, mpi_real, who,     &
-                                     loc_tag2, mpi_comm_world, status, stat)
+                                     tag2, mpi_comm_world, status, stat)
                       if (stat .ne. 0) then
                          write (mio_logdev, *) ' Error: In routine ' // pname
                          write (mio_logdev, *) '        MPI error receiving recv_buf'
@@ -229,9 +222,8 @@
                       end do
                    end do
                 else
-                   loc_tag1 = tag1 + mio_mype * 3
                    call mpi_send (mio_mype, 1, mpi_integer, 0,    &
-                                  loc_tag1, mpi_comm_world, stat)
+                                  tag1, mpi_comm_world, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error sending WHO info'
@@ -242,9 +234,8 @@
                    nr = nrows_pe(mio_mype_p1, pos)
                    send_size = nc * nr
 
-                   loc_tag2 = tag2 + mio_mype * 3
                    call mpi_send (in_data, send_size, mpi_real, 0, &
-                                  loc_tag2, mpi_comm_world, stat)
+                                  tag2, mpi_comm_world, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error sending in_data'
@@ -288,7 +279,7 @@
 
           integer :: stat, col_s, col_e, row_s, row_e, nc, nr, third_dim,  &
                      pe, who, who_p1, send_size, recv_size, k, r, c, loc,  &
-                     pos, loc_tag1, loc_tag2
+                     pos
           real, allocatable :: recv_buf(:)
           logical :: lerror
 
@@ -396,7 +387,7 @@
 
           character(25), parameter :: pname = 'mio_gather_data_1d_double'
 
-          integer :: i, pe, dsize, stat, loc_tag2
+          integer :: i, pe, dsize, stat
           real*8, allocatable :: recv_buf(:)
           logical :: lerror
 
@@ -415,9 +406,8 @@
                       dsize = mio_mpas_dmap(0, pe)
                       allocate (recv_buf(dsize), stat=stat)
 
-                      loc_tag2 = tag2 + pe * 3
                       call mpi_recv (recv_buf, dsize, mpi_double, pe,        &
-                                     loc_tag2, mpi_comm_world, status, stat)
+                                     tag2, mpi_comm_world, status, stat)
 
                       if (stat .ne. 0) then
                          write (mio_logdev, *) ' Error: In routine ' // pname
@@ -432,9 +422,8 @@
                    end do
                 else
                    dsize = mio_mpas_dmap(0, mio_mype)
-                   loc_tag2 = tag2 + mio_mype * 3
                    call mpi_send (in_data, dsize, mpi_double, 0,  &
-                                  loc_tag2, mpi_comm_world, stat)
+                                  tag2, mpi_comm_world, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error, not able to send data'
@@ -477,8 +466,7 @@
 
           integer :: stat, col_s, col_e, row_s, row_e, nc, nr, pe,     &
                      who, who_p1, send_size, recv_size, r, c, loc,     &
-                     pos, dsize, i, first_dim, second_dim,             &
-                     loc_tag1, loc_tag2
+                     pos, dsize, i, first_dim, second_dim
           real*8, allocatable :: recv_buf(:), recv_buf_mpas(:,:)
           logical :: lerror
 
@@ -497,9 +485,8 @@
                    dsize = first_dim * second_dim
                    allocate (recv_buf_mpas(first_dim, second_dim), stat=stat)
 
-                   loc_tag2 = tag2 + pe * 3
                    call mpi_recv (recv_buf_mpas, dsize, mpi_real, pe,     &
-                                  loc_tag2, mpi_comm_world, status, stat)
+                                  tag2, mpi_comm_world, status, stat)
                    do i = 1, second_dim
                       out_data(:, mio_mpas_dmap(i, pe)) = recv_buf_mpas(:, i)
                    end do
@@ -509,9 +496,8 @@
                 second_dim = mio_mpas_dmap(0, mio_mype)
                 dsize = first_dim * second_dim
 
-                loc_tag2 = tag2 + mio_mype * 3
                 call mpi_send (in_data(:,1:second_dim), dsize, mpi_real, 0,     &
-                               loc_tag2, mpi_comm_world, stat)
+                               tag2, mpi_comm_world, stat)
 #endif
              end if
           else
@@ -545,9 +531,8 @@
                    end if
 
                    do pe = 1, mio_nprocs-1
-                      loc_tag1 = tag1 + pe * 3
                       call mpi_recv (who, 1, mpi_integer, mpi_any_source,    &
-                                     loc_tag1, mpi_comm_world, status, stat)
+                                     tag1, mpi_comm_world, status, stat)
 
                       if (stat .ne. 0) then
                          write (mio_logdev, *) ' Error: In routine ' // pname
@@ -564,9 +549,8 @@
                       nr    = nrows_pe(who_p1, pos)
                       recv_size = nc * nr
 
-                      loc_tag2 = tag2 + pe * 3
                       call mpi_recv (recv_buf, recv_size, mpi_double, who,   &
-                                     loc_tag2, mpi_comm_world, status, stat)
+                                     tag2, mpi_comm_world, status, stat)
                       if (stat .ne. 0) then
                          write (mio_logdev, *) ' Error: In routine ' // pname
                          write (mio_logdev, *) '        MPI error receiving recv_buf'
@@ -582,9 +566,8 @@
                       end do
                    end do
                 else
-                   loc_tag1 = tag1 + mio_mype * 3
                    call mpi_send (mio_mype, 1, mpi_integer, 0,    &
-                                  loc_tag1, mpi_comm_world, stat)
+                                  tag1, mpi_comm_world, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error sending WHO info'
@@ -595,9 +578,8 @@
                    nr = nrows_pe(mio_mype_p1, pos)
                    send_size = nc * nr
 
-                   loc_tag2 = tag2 + mio_mype * 3
                    call mpi_send (in_data, send_size, mpi_double, 0, &
-                                  loc_tag2, mpi_comm_world, stat)
+                                  tag2, mpi_comm_world, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error sending in_data'
@@ -641,7 +623,7 @@
 
           integer :: stat, col_s, col_e, row_s, row_e, nc, nr, third_dim,  &
                      pe, who, who_p1, send_size, recv_size, k, r, c, loc,  &
-                     pos, loc_tag1, loc_tag2
+                     pos
           real*8, allocatable :: recv_buf(:)
           logical :: lerror
 
@@ -679,9 +661,8 @@
                 end if
 
                 do pe = 1, mio_nprocs-1
-                   loc_tag1 = tag1 + pe * 3
                    call mpi_recv (who, 1, mpi_integer, mpi_any_source,    &
-                                  loc_tag1, mpi_comm_world, status, stat)
+                                  tag1, mpi_comm_world, status, stat)
 
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
@@ -699,9 +680,8 @@
                    nr    = nrows_pe(who_p1, pos)
                    recv_size = nc * nr * third_dim
 
-                   loc_tag2 = tag2 + pe * 3
                    call mpi_recv (recv_buf, recv_size, mpi_double, who,   &
-                                  loc_tag2, mpi_comm_world, status, stat)
+                                  tag2, mpi_comm_world, status, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error receiving recv_buf'
@@ -720,9 +700,8 @@
 
                 end do
              else
-                loc_tag1 = tag1 + mio_mype * 3
                 call mpi_send (mio_mype, 1, mpi_integer, 0,    &
-                               loc_tag1, mpi_comm_world, stat)
+                               tag1, mpi_comm_world, stat)
                 if (stat .ne. 0) then
                    write (mio_logdev, *) ' Error: In routine ' // pname
                    write (mio_logdev, *) '        MPI error sending WHO info'
@@ -733,9 +712,8 @@
                 nr = nrows_pe(mio_mype_p1, pos)
                 send_size = nc * nr * third_dim
 
-                loc_tag2 = tag2 + mio_mype * 3
                 call mpi_send (in_data, send_size, mpi_double, 0, &
-                               loc_tag2, mpi_comm_world, stat)
+                               tag2, mpi_comm_world, stat)
                 if (stat .ne. 0) then
                    write (mio_logdev, *) ' Error: In routine ' // pname
                    write (mio_logdev, *) '        MPI error sending in_data'
@@ -771,7 +749,7 @@
 
           character(22), parameter :: pname = 'mio_gather_data_1d_int'
 
-          integer :: i, pe, dsize, stat, loc_tag2
+          integer :: i, pe, dsize, stat
           integer, allocatable :: recv_buf(:)
           logical :: lerror
 
@@ -790,9 +768,8 @@
                       dsize = mio_mpas_dmap(0, pe)
                       allocate (recv_buf(dsize), stat=stat)
 
-                      loc_tag2 = tag2 + pe * 3
                       call mpi_recv (recv_buf, dsize, mpi_int, pe,           &
-                                     loc_tag2, mpi_comm_world, status, stat)
+                                     tag2, mpi_comm_world, status, stat)
 
                       if (stat .ne. 0) then
                          write (mio_logdev, *) ' Error: In routine ' // pname
@@ -807,9 +784,8 @@
                    end do
                 else
                    dsize = mio_mpas_dmap(0, mio_mype)
-                   loc_tag2 = tag2 + mio_mype * 3
                    call mpi_send (in_data, dsize, mpi_int, 0,     &
-                                  loc_tag2, mpi_comm_world, stat)
+                                  tag2, mpi_comm_world, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error, not able to send data'
@@ -852,8 +828,7 @@
 
           integer :: stat, col_s, col_e, row_s, row_e, nc, nr, pe,     &
                      who, who_p1, send_size, recv_size, r, c, loc,     &
-                     pos, dsize, i, first_dim, second_dim,             &
-                     loc_tag1, loc_tag2
+                     pos, dsize, i, first_dim, second_dim
           integer, allocatable :: recv_buf(:), recv_buf_mpas(:,:)
           logical :: lerror
 
@@ -872,9 +847,8 @@
                    dsize = first_dim * second_dim
                    allocate (recv_buf_mpas(first_dim, second_dim), stat=stat)
 
-                   loc_tag2 = tag2 + pe * 3
                    call mpi_recv (recv_buf_mpas, dsize, mpi_real, pe,     &
-                                  loc_tag2, mpi_comm_world, status, stat)
+                                  tag2, mpi_comm_world, status, stat)
                    do i = 1, second_dim
                       out_data(:, mio_mpas_dmap(i, pe)) = recv_buf_mpas(:, i)
                    end do
@@ -884,9 +858,8 @@
                 second_dim = mio_mpas_dmap(0, mio_mype)
                 dsize = first_dim * second_dim
 
-                loc_tag2 = tag2 + mio_mype * 3
                 call mpi_send (in_data(:,1:second_dim), dsize, mpi_real, 0,     &
-                               loc_tag2, mpi_comm_world, stat)
+                               tag2, mpi_comm_world, stat)
 #endif
              end if
           else
@@ -920,9 +893,8 @@
                    end if
 
                    do pe = 1, mio_nprocs-1
-                      loc_tag1 = tag1 + pe * 3
                       call mpi_recv (who, 1, mpi_integer, mpi_any_source,    &
-                                     loc_tag1, mpi_comm_world, status, stat)
+                                     tag1, mpi_comm_world, status, stat)
 
                       if (stat .ne. 0) then
                          write (mio_logdev, *) ' Error: In routine ' // pname
@@ -939,9 +911,8 @@
                       nr    = nrows_pe(who_p1, pos)
                       recv_size = nc * nr
 
-                      loc_tag2 = tag2 + pe * 3
                       call mpi_recv (recv_buf, recv_size, mpi_int, who,      &
-                                     loc_tag2, mpi_comm_world, status, stat)
+                                     tag2, mpi_comm_world, status, stat)
                       if (stat .ne. 0) then
                          write (mio_logdev, *) ' Error: In routine ' // pname
                          write (mio_logdev, *) '        MPI error receiving recv_buf'
@@ -957,9 +928,8 @@
                       end do
                    end do
                 else
-                   loc_tag1 = tag1 + mio_mype * 3
                    call mpi_send (mio_mype, 1, mpi_integer, 0,    &
-                                  loc_tag1, mpi_comm_world, stat)
+                                  tag1, mpi_comm_world, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error sending WHO info'
@@ -970,9 +940,8 @@
                    nr = nrows_pe(mio_mype_p1, pos)
                    send_size = nc * nr
 
-                   loc_tag2 = tag2 + mio_mype * 3
                    call mpi_send (in_data, send_size, mpi_int, 0, &
-                                  loc_tag2, mpi_comm_world, stat)
+                                  tag2, mpi_comm_world, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error sending in_data'
@@ -1016,7 +985,7 @@
 
           integer :: stat, col_s, col_e, row_s, row_e, nc, nr, third_dim,  &
                      pe, who, who_p1, send_size, recv_size, k, r, c, loc,  &
-                     pos, loc_tag1, loc_tag2
+                     pos
           integer, allocatable :: recv_buf(:)
           logical :: lerror
 
@@ -1054,9 +1023,8 @@
                 end if
 
                 do pe = 1, mio_nprocs-1
-                   loc_tag1 = tag1 + pe * 3
                    call mpi_recv (who, 1, mpi_integer, mpi_any_source,    &
-                                  loc_tag1, mpi_comm_world, status, stat)
+                                  tag1, mpi_comm_world, status, stat)
 
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
@@ -1074,9 +1042,8 @@
                    nr    = nrows_pe(who_p1, pos)
                    recv_size = nc * nr * third_dim
 
-                   loc_tag2 = tag2 + pe * 3
                    call mpi_recv (recv_buf, recv_size, mpi_int, who,      &
-                                  loc_tag2, mpi_comm_world, status, stat)
+                                  tag2, mpi_comm_world, status, stat)
                    if (stat .ne. 0) then
                       write (mio_logdev, *) ' Error: In routine ' // pname
                       write (mio_logdev, *) '        MPI error receiving recv_buf'
@@ -1095,9 +1062,8 @@
 
                 end do
              else
-                loc_tag2 = tag2 + mio_mype * 3
                 call mpi_send (mio_mype, 1, mpi_integer, 0,    &
-                               loc_tag1, mpi_comm_world, stat)
+                               tag1, mpi_comm_world, stat)
                 if (stat .ne. 0) then
                    write (mio_logdev, *) ' Error: In routine ' // pname
                    write (mio_logdev, *) '        MPI error sending WHO info'
@@ -1108,9 +1074,8 @@
                 nr = nrows_pe(mio_mype_p1, pos)
                 send_size = nc * nr * third_dim
 
-                loc_tag2 = tag2 + mio_mype * 3
                 call mpi_send (in_data, send_size, mpi_int, 0, &
-                               loc_tag2, mpi_comm_world, stat)
+                               tag2, mpi_comm_world, stat)
                 if (stat .ne. 0) then
                    write (mio_logdev, *) ' Error: In routine ' // pname
                    write (mio_logdev, *) '        MPI error sending in_data'
