@@ -34,7 +34,7 @@
         !!-----------------------------------------------------------------------
 
         USE DESID_VARS
-        USE RUNTIME_VARS, ONLY: MYPE
+        USE RUNTIME_VARS, ONLY: MYPE, LOGDEV
         USE HGRD_DEFN             ! horizontal domain specifications
         USE ASX_DATA_MOD          ! all gridded input variables, as Met_Data%*(ncols,nrows)
         USE UTILIO_DEFN
@@ -145,7 +145,8 @@
      &                VDEMIS_MVDIAG( NMETSPC,NCOLS,NROWS ), STAT = ISTAT )
             IF ( ISTAT .NE. 0 ) THEN
                 WRITE( MESG, '( A, I9 )' ) 'Error allocating ETABLE:  STATUS=', ISTAT
-                CALL M3WARN( PNAME, 0, 0, MESG )
+                !CALL M3WARN( PNAME, 0, 0, MESG )
+                CALL LOG_WARNING( PNAME, LOGDEV, MESG )
                 METEMIS_INIT = .FALSE.
                 RETURN
             END IF
@@ -155,8 +156,10 @@
             VDEMIS_MVDIAG = 0.0
             
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VGLVLS', MTEMPS )
-            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VAR_NAME', MTNAME )
-            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'UNITS', MTUNIT )
+            DO ISPC = 1,NMETSPC
+               MTNAME( ISPC ) = MIO_FILE_DATA( FLOC )%VAR_NAME( ISPC )
+               MTUNIT( ISPC ) = MIO_FILE_DATA( FLOC )%UNITS( ISPC )
+            END DO   
             MTBASIS( 1:NMETSPC) = 'UNIT'
 
             ! Map Emission Variables Needed for Humidity Adjustment
@@ -292,12 +295,17 @@
             ! the most recent time point on the table.
             STIMEMT = INT( JTIME/10000 ) * 10000
             IF ( PRVHR .NE. STIMEMT ) THEN
-                IF( .NOT.XTRACT3( TBLNAME, ALLVAR3, 1, NMTEMP,
-     &                         STRTROW, ENDROW, STRTCOL, ENDCOL,
-     &                         SDATEMT, STIMEMT, ETABLE ) ) THEN
-                    MESG = 'Error(s) reading "'//TRIM(TBLNAME)//'"'
-                    CALL M3EXIT( PNAME, SDATEMT, STIMEMT, MESG, 2 )
-                END IF
+      !           IF( .NOT.XTRACT3( TBLNAME, ALLVAR3, 1, NMTEMP,
+      !&                         STRTROW, ENDROW, STRTCOL, ENDCOL,
+      !&                         SDATEMT, STIMEMT, ETABLE ) ) THEN
+      !               MESG = 'Error(s) reading "'//TRIM(TBLNAME)//'"'
+      !               CALL M3EXIT( PNAME, SDATEMT, STIMEMT, MESG, 2 )
+      !           END IF
+
+                DO V = 1,NMETSPC
+                   CALL INTERPOLATE_VAR( MTNAME(V), SDATEMT, STIMEMT, 
+     &                                   ETABLE(:,:,:,V), TBLNAME )
+                END DO
                 PRVHR = STIMEMT
             END IF
             
