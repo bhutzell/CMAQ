@@ -533,10 +533,6 @@ CMPST =
                 'ng m-3', 'COARSE',
                 'AAS',
 
-'PMC_HBNPY'    , 'Coarse-Mode Benzo-a-pyrene',
-                'ng m-3', 'COARSE',
-                'ABENAPY',
-
 'PMC_HDIESEL' , 'Coarse-Mode Diesel-sourced PM',
                 'ng m-3', 'COARSE',
                 'ADE_EC + ADE_OC + ADE_NO3 + ADE_SO4 + ADE_CORS + ADE_OTHR',
@@ -1079,7 +1075,7 @@ CMPST =
                 'ng m-3', 'PM10',
                 'AAS',
 
-'PM10_HBNPY'  , 'Coarse-Mode Benzo-a-pyrene',
+'PM10_HBNPY'  , 'PM10 Benzo-a-pyrene',
                 'ng m-3', 'PM10',
                 'ABENAPY',
 
@@ -1553,7 +1549,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.8373*DD_ASEACAT + 0.0626*DD_ASOIL + 0.0023*DD_ACORS',
 
-'DD_NA'       , 'Dry Dep of Particulate Sodium', 
+'DD_TSP_NA'   , 'Dry Dep of Particulate Sodium', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_NA + DD_PMC_NA',
 
@@ -1565,9 +1561,9 @@ CMPST =
                 'kg ha-1', 'DEP', 
                 'WD_ANA + WD_PMC_NA',
 
-'TD_NA'       , 'Total Dep of Particulate Sodium', 
+'TD_TSP_NA'   , 'Total Dep of Particulate Sodium', 
                 'kg ha-1', 'DEP', 
-                'DD_NA + WD_TSP_NA',
+                'DD_TSP_NA + WD_TSP_NA',
 
 !-- Chloride --!
 'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
@@ -1578,21 +1574,13 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 'DD_ACL',
 
-'DD_CL'       , 'Dry Dep of Particulate Chloride', 
+'DD_TSP_CL'   , 'Dry Dep of Particulate Chloride', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_CL + DD_PMC_CL',
 
-'WD_PMF_CL'   , 'Wet Dep of Fine-Mode Chloride',
-                'kg ha-1', 'DEP_FINE',
-                'WD_ACL - WD_ACLI',
-
-'WD_PMC_CL'   , 'Wet Dep of Coarse-Mode Chloride',
-                'kg ha-1', 'DEP_COARSE',
+'WD_TSP_CL'   , 'Wet Dep of Particulate Chloride', 
+                'kg ha-1', 'DEP', 
                 'WD_ACL',
-
-'WD_CL'       , 'Wet Dep of Particulate Chloride',
-                'kg ha-1', 'DEP',
-                'WD_PMF_CL + WD_PMC_CL',
 
 !-- Calcium --!
 'DD_PMF_CA'   , 'Dry Dep of Fine-Mode Calcium', 
@@ -1603,7 +1591,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE',                 
                 '0.032*DD_ASEACAT + 0.0838*DD_ASOIL + 0.0562*DD_ACORS',
 
-'DD_CA'       , 'Dry Dep of Particulate Calcium', 
+'DD_TSP_CA'   , 'Dry Dep of Particulate Calcium', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_CA + DD_PMC_CA',
 
@@ -1673,7 +1661,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.0997*DD_ASEACAT + 0.0170*DD_ASOIL + 0.0032*DD_ACORS',
 
-'DD_MG'       , 'Dry Dep of Particulate Magnesium', 
+'DD_TSP_MG'   , 'Dry Dep of Particulate Magnesium', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_MG + DD_PMC_MG',
 
@@ -1698,7 +1686,7 @@ CMPST =
                 'kg ha-1', 'DEP_COARSE', 
                 '0.0310*DD_ASEACAT + 0.0242*DD_ASOIL + 0.0176*DD_ACORS',
 
-'DD_K'        , 'Dry Dep of Particulate Potassium', 
+'DD_TSP_K'    , 'Dry Dep of Particulate Potassium', 
                 'kg ha-1', 'DEP', 
                 'DD_PMF_K + DD_PMC_K',
 
@@ -1829,17 +1817,17 @@ CMPST =
                 'WD_ASO4 + 1.5*WD_SO2',
 
 !-- Total Chloride --!
-'DD_TCL'      , 'Dry Dep of Total Chloride',
-                'kg ha-1', 'DEP',
-                '0.972*DD_HCL + DD_CL2 + DD_ACL - DD_ACLI + 0.6758*DD_HOCL + 0.4352*DD_CLNO2 + 0.36377*DD_CLNO3',
+'DD_TCL'      , 'Dry Dep of Total Chloride', 
+                'kg ha-1', 'DEP', 
+                'DD_TSP_CL + DD_CL2 + 0.972*DD_HCL + 0.6758*DD_HOCL + 0.4352*DD_CLNO2 + 0.36377*DD_CLNO3',
 
 'WD_TCL'      , 'Wet Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
-                '0.972*WD_HCL + WD_CL2 + WD_ACL - WD_ACLI + 0.6758*WD_HOCL + 0.4352*WD_CLNO2 + 0.36377*WD_CLNO3',
+                '0.972*WD_HCL + WD_CL2 + WD_TSP_CL + 0.6758*WD_HOCL + 0.4352*WD_CLNO2 + 0.36377*WD_CLNO3',
 
 'TD_TCL'      , 'Total Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
-                'WD_TCL + DD_TCL',
+                'DD_TCL + WD_TCL',
 
 
 !-- Total HAPS --!
@@ -1898,11 +1886,11 @@ CMPST =
 
 'DD_OXN_OTHR' , 'Dry Dep of Oxidized Nitrogen from Other Components', 
                 'kgN ha-1', 'DEP', 
-                '0.25926*DD_N2O5 + 0.29787*DD_HONO + 0.17720*DD_PNA + 0.1717*DD_CLNO2 + 0.1436*DD_CLNO3',
+                '0.25926*DD_N2O5 + 0.29787*DD_HONO + 0.17720*DD_PNA + 0.1717*DD_CLNO2',
 
 'WD_OXN_OTHR' , 'Wet Dep of Oxidized Nitrogen from Other Components', 
                 'kgN ha-1', 'DEP', 
-                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.17720*WD_PNA + 0.1717*WD_CLNO2 + 0.1436*WD_CLNO3',
+                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.17720*WD_PNA + 0.1717*WD_CLNO2',
 
 'DD_OXN_TOT'  , 'Dry Dep of Total Oxidized Nitrogen', 
                 'kgN ha-1', 'DEP', 
