@@ -1,5 +1,5 @@
 OCLO_JPL19
-! OCLO + hv  =  CLO + O3P
+! OCLO + hν  =  CLO + O3P
 ! JPL Publication 19-5;  Evaluation Number 19; May 2020
 ! Page: 4-211-to 4-216; Table 4F-4-2 for absorption cross-section
 ! Quantum yield is taken as 1.0
@@ -236,3 +236,4 @@ FAC=1.0
 470	7.69E-20	1.0
 471	6.14E-20	1.0
 472	3.18E-20	1.0
+

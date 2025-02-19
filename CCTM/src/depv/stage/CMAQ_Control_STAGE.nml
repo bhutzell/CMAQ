@@ -305,6 +305,7 @@
   'CL2O2        ',     1.0,  0.0,         63.0   0.70,
   'CLNO         ',     1.0,  0.0,         38.5,  0.0058,
   'CHBR3        ',     1.0,  0.0,        108.5,  0.70,
+  'MB3          ',     1.0,  0.0,        108.5,  0.70,
 !------------------------------------------------------------------------------!
 ! Below is an example of how to add a deposited species to STAGE. The variable !
 ! $name, here $name = ISOPOOH, must match a VD_$name in the GC namelist        !

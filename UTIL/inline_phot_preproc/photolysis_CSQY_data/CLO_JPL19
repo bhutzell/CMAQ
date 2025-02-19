@@ -1,5 +1,5 @@
 CLO_JPL19
-! CLO + hv =  CL + O3P
+! CLO + hν =  CL + O3P
 ! JPL Publication 19-5;  Evaluation Number 19; May 2020
 ! Page: 4-207-to 4-210; Table 4F-2-1 
 ! Quantum yield is taken as 1.0
@@ -82,3 +82,4 @@ FAC=1.0
 314	2.89E-19	1.0
 315	2.78E-19	1.0
 316	2.68E-19	1.0
+

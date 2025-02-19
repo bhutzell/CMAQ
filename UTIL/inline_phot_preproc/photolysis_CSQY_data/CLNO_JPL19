@@ -1,9 +1,9 @@
 CLNO_JPL19
-! CLNO + hv  =  CL + NO
+! CLNO + hν  =  CL + NO
 ! JPL Publication 19-5;  Evaluation Number 19; May 2020
 ! Page: 4-233-to 4-233; Table 4F-15 for absorption cross-section
 ! Quantum yield is taken as 1.0
-! Note: 190-350 nm from Tyndall et al. and 355–500 nm from Roehl et al.
+! Note: 190–350 nm from Tyndall et al. and 355–500 nm from Roehl et al.
 ! Tyndall, G. S.; Stedman, K. M.; Schneider, W.; Burrows, J. P.; Moortgat, G. K. The absorption spectrum of ClNO between 190 and 350 nm. J. Photochem. 1987, 36, 133-139, doi:10.1016/0047- 2670(87)87070-3.
 ! Chemical Kinetics and Photochemical Data for Use in Atmospheric Studies
 ! https://jpldataeval.jpl.nasa.gov/pdf/NASA-JPL%20Evaluation%2019-5.pdf
@@ -122,3 +122,4 @@ FAC=1.0
 490	2.07E-20	1.0
 495	1.78E-20	1.0
 500	1.50E-20	1.0
+
