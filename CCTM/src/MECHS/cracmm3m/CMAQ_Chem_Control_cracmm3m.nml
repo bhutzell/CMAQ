@@ -1501,13 +1501,17 @@ CMPST =
                 'WD_ASO4 + 1.5*WD_SO2',
 		
 !-- Total Chloride --!
+'DD_TCL'      , 'Dry Dep of Total Chloride',
+                'kg ha-1', 'DEP',
+                'DD_CL + DD_CL2 + 0.972*DD_HCL + 0.6758*DD_HOCL + 0.4352*DD_CLNO2 + 0.36377*DD_CLNO3',		
+
 'WD_TCL'      , 'Wet Dep of Total Chloride', 
-                'kg ha-1', 'DEP', 
-                '0.972*WD_HCL + WD_CL2 + WD_ACL - WD_ACLI + 0.6758*WD_HOCL',
+                'kg ha-1', 'DEP',
+		'0.972*WD_HCL + WD_CL2 + WD_ACL - WD_ACLI + 0.6758*WD_HOCL + 0.4352*WD_CLNO2 + 0.36377*WD_CLNO3',
 
 'TD_TCL'      , 'Total Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
-                'WD_TCL + DD_CL',		
+                'WD_TCL + DD_TCL',		
 
 !-----------------------------!
 !**** Nitrogen Deposition ****!
