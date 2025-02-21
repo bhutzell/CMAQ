@@ -1138,19 +1138,17 @@
              cio_met_emis_nlays = mio_file_data(floc)%nlays
              
              
-             allocate (emis_name(n_e3dm, 3), stat=stat)
+             allocate (met_emis_name(n_e3dm, 3), stat=stat)
              if (stat .ne. 0) then
                 xmsg = 'Failure allocating met_emis_name '
                 call m3exit (pname, 0, 0, xmsg, xstat1 )
              end if
-             write (tname, '(a1, i3.3)') '_MEM'
              end = 0
              do v = 1, mio_file_data(floc)%nvars
-                end = end + 1
-                met_emis_name(end,1) = trim(mio_file_data(floc)%var_name(v)) // tname
+                met_emis_name(v,1) = trim(mio_file_data(floc)%var_name(v)) // '_MEM'
              end do
-             met_emis_name(begin:end, 2) = 'e3dm'       ! denote emission 3d variable
-             met_emis_name(begin:end, 3) = ' '          ! not a meteorological variable
+             met_emis_name(:, 2) = 'e3dm'       ! denote emission 3d variable
+             met_emis_name(:, 3) = ' '          ! not a meteorological variable
  
              ! Find Initial Time Step
              found = .false.
@@ -1627,7 +1625,7 @@
 
                 begin = cio_grid_data_inx(1,buf_loc,v)
                 end   = cio_grid_data_inx(2,buf_loc,v)
-
+ 
                 if (cio_grid_var_name(v,2) == 'mc2') then
 
 #ifndef mpas
@@ -1915,7 +1913,7 @@
 
                    call mio_time_format_conversion (data_jdate, data_jtime, timestamp)
 
-                   call mio_fread (cio_met_emis_file_name, loc_vname, pname, 
+                   call mio_fread (cio_met_emis_file_name, loc_vname, pname,
      &                             cio_met_emis_file_startcol, cio_met_emis_file_endcol,
      &                             cio_met_emis_file_startrow, cio_met_emis_file_endrow,
      &                             1, cio_met_emis_nlays, tdata_3ds, timestamp)
@@ -4490,7 +4488,7 @@ C   mminlu and num_land_cat are WRF global variables
           character (20) :: loc_mpas_time_stamp
  
           if (present(fname)) then
-             if ( fname .eq. 'METEMIS_TBL' ) then
+             if ( fname .eq. cio_met_emis_file_name ) then
                 loc_vname = trim(vname) // '_MEM'
              else
                 slen = len_trim(fname)
@@ -6572,7 +6570,7 @@ C Read the various categories of normalized emissions
 
 
           if (present(fname)) then
-             if ( fname .eq. 'METEMIS_TBL' ) then
+             if ( fname .eq. cio_met_emis_file_name ) then
                 loc_vname = trim(vname) // '_MEM'
              else
                 slen = len_trim(fname)

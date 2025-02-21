@@ -34,7 +34,7 @@
         !!-----------------------------------------------------------------------
 
         USE DESID_VARS
-        USE RUNTIME_VARS, ONLY: MYPE, LOGDEV
+        USE RUNTIME_VARS, ONLY: MYPE, LOGDEV, LOG_MESSAGE
         USE HGRD_DEFN             ! horizontal domain specifications
         USE ASX_DATA_MOD          ! all gridded input variables, as Met_Data%*(ncols,nrows)
         USE UTILIO_DEFN
@@ -106,8 +106,9 @@
 
             CHARACTER*24, PARAMETER :: PNAME = 'METEMIS:METEMIS_INIT'
 
-            INTEGER         ISTAT, ISPC, K, N, V, FLOC
+            INTEGER         ISTAT, ISPC, IT, K, N, V, FLOC
             CHARACTER*256   MESG
+            REAL, ALLOCATABLE :: MTEMP(:)
 
             ! Open Temperature-Binned Mobile Emission File and read header
             FLOC = MIO_SEARCH( TBLNAME )          
@@ -117,12 +118,6 @@
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'TSTEP', TSTEPMT )
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NLAYS', NMTEMP )
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NVARS', NMETSPC )
-
-            call mio_get_global_attr( MET_CRO_3D, 'GDNAM', GDNAME_GD )
-            call mio_get_global_attr( MET_CRO_3D, 'VGTYP', VGTYP_GD )
-            call mio_get_global_attr( MET_CRO_3D, 'VGTOP', VGTOP_GD )
-            VGTPUN_GD = 'Pa'
-            VGLVUN_GD = 'none'
 
             ! Allocate and initialize input-related arrays:
             ALLOCATE( DESID_EMVAR( IMETSRM )%ARRY ( NMETSPC ),
@@ -134,7 +129,8 @@
      &                DESID_EMVAR( IMETSRM )%LAREA( NMETSPC ),
      &                DESID_EMVAR( IMETSRM )%LAREAADJ( NMETSPC ),
      &                ETABLE( NCOLS,NROWS,NMTEMP,NMETSPC ),
-     &                TEMPVAL( NCOLS,NROWS ), MTEMPS( NMTEMP ),
+     &                TEMPVAL( NCOLS,NROWS ), 
+     &                MTEMP( 0:NMTEMP+1 ), MTEMPS( NMTEMP ),
      &                VDEMIS_MV( NMETSPC,NCOLS,NROWS ),
      &                VDEMIS_MVDIAG( NMETSPC,NCOLS,NROWS ), STAT = ISTAT )
             IF ( ISTAT .NE. 0 ) THEN
@@ -149,7 +145,11 @@
             TEMPVAL= 0.0
             VDEMIS_MVDIAG = 0.0
             
-            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VGLVLS', MTEMPS )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VGLVLS', MTEMP )
+            DO IT = 1,NMTEMP
+                MTEMPS( IT ) = MTEMP( IT )
+            END DO
+
             DO ISPC = 1,NMETSPC
                MTNAME( ISPC ) = MIO_FILE_DATA( FLOC )%VAR_NAME( ISPC )
                MTUNIT( ISPC ) = MIO_FILE_DATA( FLOC )%UNITS( ISPC )
@@ -198,7 +198,7 @@
             IF ( .NOT.MET_EMIS_DIAG ) THEN
                 CONTINUE
 
-            ELSE IF( IO_PE_INCLUSIVE ) THEN
+            ELSE !IF( IO_PE_INCLUSIVE ) THEN
 #ifdef mpas
                 call mio_fcreate( CTM_METEMIS_DIAG, mio_new_file )
 #else
@@ -214,14 +214,14 @@
                 END DO
 
                 ! Store MIO Metadata
-                NDIMS3D( 1:NVARS3D ) = 3
+                NDIMS3D( 1:NVARS3D ) = 4
                 L_TSTEP( 1:NVARS3D ) = .True.
                 L_LAY  (1 :NVARS3D ) = .True. ! even if 2D
                 L_COL  (1 :NVARS3D ) = .True. 
                 L_ROW  (1 :NVARS3D ) = .True. 
                 L_VEXT (1 :NVARS3D ) = .False.
 
-                CALL LOAD_MIO_FILE ( 'CTM_MGEM_1', 0, 0, 0,
+                CALL LOAD_MIO_FILE ( CTM_METEMIS_DIAG, 1, 1, 1,
      &               VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &               VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &               L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
@@ -278,6 +278,11 @@
             IF ( FIRSTIME ) THEN
                TOT_TSTEP = 0
                FIRSTIME = .FALSE.
+                
+               ! Create Output Diagnostic File
+               call mio_setfile( MET_CRO_2D )
+               call mio_fcreate( CTM_METEMIS_DIAG, mio_new_file )
+
             END IF
 
             WRITE( MESG, '(A,I8)' ),
@@ -289,9 +294,10 @@
             ! the most recent time point on the table.
             STIMEMT = INT( JTIME/10000 ) * 10000
             IF ( PRVHR .NE. STIMEMT ) THEN
+                CALL MIO_TIME_FORMAT_CONVERSION( SDATEMT, STIMEMT, TIMESTAMP )
                 DO V = 1,NMETSPC
-                   CALL INTERPOLATE_VAR( MTNAME(V), SDATEMT, STIMEMT, 
-     &                                   ETABLE(:,:,:,V), TBLNAME )
+                   CALL MIO_FREAD( TBLNAME, MTNAME(V),
+     &                             PNAME, ETABLE(:,:,:,V), TIMESTAMP )
                 END DO
                 PRVHR = STIMEMT
             END IF
@@ -315,7 +321,7 @@
                         VDEMIS_MV( V,C,R ) =  ETABLE( C,R,1,V )
                     END DO
 
-                ELSE IF ( TF2 .GT. MTEMPS( NMTEMP ) ) THEN     !!  error?  above top of table-temperatures
+                    ELSE IF ( TF2 .GT. MTEMPS( NMTEMP ) ) THEN     !!  error?  above top of table-temperatures
 
                     DO V = 1, NMETSPC
                         VDEMIS_MV( V,C,R ) = ETABLE( C,R,NMTEMP,V )
@@ -395,7 +401,7 @@ C ..........  Output diagnostic emissions
                  IF ( LASTTIC ) THEN   ! time to write out
                     VDEMIS_MVDIAG = VDEMIS_MVDIAG / REAL( MTICS, 4 )  ! array assignment
                     DO V = 1, NMETSPC
-                        CALL MIO_FWRITE( CTM_METEMIS_DIAG, MTNAME(V), PNAME,
+                        CALL MIO_FWRITE( 'CTM_METEMIS_DIAG', MTNAME(V), PNAME,
      &                                   VDEMIS_MVDIAG( V,:,:), TIMESTAMP ) 
                     END DO
                     WRITE( LOGDEV,94040 )

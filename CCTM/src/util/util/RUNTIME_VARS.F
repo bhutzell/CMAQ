@@ -842,7 +842,7 @@
       CALL GET_ENV ( MET_EMIS, 'CTM_MET_EMIS', MET_EMIS, VARDEV )
  
       ! Get met-modulated emission diagnostic output file flag.
-      CALL GET_ENV ( MET_EMIS_DIAG, 'CTM_MET_EMIS_DIAG', MET_EMIS_DIAG, VARDEV )
+      CALL GET_ENV ( MET_EMIS_DIAG, 'MET_EMIS_DIAG', MET_EMIS_DIAG, VARDEV )
 
       ! Get met-modulated emission diagnostic output file flag.
       CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
