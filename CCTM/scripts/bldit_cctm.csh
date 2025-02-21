@@ -81,7 +81,7 @@ set make_options = "-j"                #> additional options for make command if
 #set DDM3D_CCTM                        #> uncomment to compile CCTM with DDM-3D activated
                                        #>   comment out to use standard process
 #> WRF-CMAQ coupled model 
- set build_wrf_cmaq                    #> uncomment to build WRF-CMAQ coupled model; 
+#set build_wrf_cmaq                    #> uncomment to build WRF-CMAQ coupled model; 
                                        #>   comment out for off-line chemistry 
 
 #> MPAS-CMAQ coupled model
@@ -106,7 +106,7 @@ set make_options = "-j"                #> additional options for make command if
  endif
 
  if ( $?build_wrf_cmaq ) then          # WRF Version used for WRF-CMAQ Model (must be v4.4+)
-    set WRF_VRSN = v4.4
+    set WRF_VRSN = v4.4.1
  endif   
 
 #========================================================================
@@ -137,8 +137,7 @@ set make_options = "-j"                #> additional options for make command if
  set ModPhot   = phot/inline                #> photolysis calculation module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/phot)
 
- setenv Mechanism cb6r5_ae7_aq #cb6r5m_ae7_aq              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
-#setenv Mechanism cracmm2 #cb6r5m_ae7_aq              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
+ setenv Mechanism cb6r5_ae7_aq              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
  set ModMech   = MECHS/${Mechanism}
 
  if ( ${Mechanism} =~ *ae7* ) then          #> ae7 family of aero and cloud chem
@@ -191,8 +190,8 @@ set make_options = "-j"                #> additional options for make command if
  setenv FC ${myFC}                     #> path of Fortan compiler; set in config.cmaq
  set    FP = $FC                       #> path of Fortan preprocessor; set in config.cmaq
  set    CC = ${myCC}                   #> path of C compiler; set in config.cmaq
-#setenv BLDER ${CMAQ_HOME}/UTIL/bldmake/bldmake_${compilerString}.exe   #> name of model builder executable
- setenv BLDER /work/MOD3DEV/wdx/ptmp/wdx/testc/junk/bldmake/src/bldmake
+ setenv BLDER ${CMAQ_HOME}/UTIL/bldmake/bldmake_${compilerString}.exe   #> name of model builder executable
+# setenv BLDER /work/MOD3DEV/wdx/ptmp/wdx/testc/junk/bldmake/src/bldmake
 
 #> Libraries/include files
 #set LIOAPI   = "${IOAPI_DIR}/lib ${ioapi_lib}"      #> I/O API library directory
@@ -246,7 +245,6 @@ set make_options = "-j"                #> additional options for make command if
     set MakeFileOnly   
 #   set Modwrfcmaq = wrf_cmaq
     set Modwrfcmaq = twoway
-#    set Modcoupler  = coupler
     set Modcoupler = unified_coupler
  endif
 
@@ -369,9 +367,9 @@ set make_options = "-j"                #> additional options for make command if
 #> Set and create the "BLD" directory for checking out and compiling 
 #> source code. Move current directory to that build directory.
  if ( $?Debug_CCTM ) then
-     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_${Mechanism}_${DepMod}_debug
+     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_debug
  else
-     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_${Mechanism}_${DepMod}
+     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
  endif
 
 
@@ -565,7 +563,6 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  if ( $?build_wrf_cmaq ) then
     echo "// option set for WRF-CMAQ coupled model"                >> $Cfile
     echo "Module ${Modwrfcmaq};"                                   >> $Cfile
-#    echo "Module ${Modcoupler};"                                   >> $Cfile
     echo "Module ${Modcoupler};"                                   >> $Cfile
     echo                                                           >> $Cfile
  endif
@@ -573,7 +570,6 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  if ( $?build_mpas_cmaq ) then
     echo "// option set for MPAS-CMAQ coupled model"               >> $Cfile
     echo "Module ${Modmpascmaq};"                                  >> $Cfile
-#    echo "Module ${Modcoupler};"                                   >> $Cfile
     echo                                                           >> $Cfile
  endif
 
@@ -824,13 +820,12 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  endif
  mv ${CFG}.bld $Bld/${CFG}
 
-#> If a CRACMM mechanism is used and the compiler is gcc, remove trailing
-#>   comments in species namelist files (or else model will not run)
- if ( ${Mechanism} =~ *cracmm* && ${compiler} == gcc ) then
-    echo "   >>> removing trailing comments from species namelists <<<"
-    sed -i 's/,\!.*/,/' $Bld/GC_${Mechanism}.nml
-    sed -i 's/,\!.*/,/' $Bld/AE_${Mechanism}.nml
-    sed -i 's/,\!.*/,/' $Bld/NR_${Mechanism}.nml
+#> gcc compiler chokes on trailing comments in namelists
+ if ( ${compiler} == gcc ) then
+    echo "   >>> removing trailing comments from namelists <<<"
+    foreach fnml ( $Bld/*.nml )
+      sed -i 's/,\!.*/,/' $fnml
+    end
  endif
 
 #> If Building WRF-CMAQ, download WRF, download auxillary files and build

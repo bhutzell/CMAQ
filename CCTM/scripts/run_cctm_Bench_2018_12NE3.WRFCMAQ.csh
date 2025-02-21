@@ -11,7 +11,8 @@
 
 set NPROCS = 32
 
-set wrfv    = 4.4
+set wrfv    = v4.4.1
+set cmaqv   = v55
 set version = sw_feedback
 set option  = 3
 
@@ -40,7 +41,7 @@ echo 'Start Model Run At ' `date`
 setenv CTM_DIAG_LVL 0 
 
 #> Set General Parameters and Labels for Configuring the Simulation
-set VRSN        = ${wrfv}55          #> Code Version
+set VRSN        = ${wrfv}${cmaqv}    #> Code Version
 set PROC        = mpi                #> serial or mpi
 set MECH        = cb6r5_ae7_aq       #> Mechanism ID
 set APPL        = Bench_2018_12NE3   #> Application Name (e.g. Domain)
@@ -57,11 +58,12 @@ set EXEC      = wrf.exe
 
 # Set Working, Input, and Output Directories
 set WORKDIR     = ${PWD}                                  # Pathname of current Working Directory
-set WRF_DIR     = $WORKDIR/BLD_WRFv4.4_CCTM_v55_intel18.0 # Location of WRF-CMAQ Install
-set INPDIR      = ${CMAQ_DATA}/2018_12NE3               # Input directory for WRF & CMAQ
-set OUTPUT_ROOT = $WORKDIR                                # output root directory
+set WRF_DIR     = $WORKDIR/BLD_WRF${wrfv}_CCTM_${cmaqv}_$compilerString # Location of WRF-CMAQ Install
+#set INPDIR     = ${CMAQ_DATA}/2018_12NE3                 # Input directory for WRF & CMAQ
+set INPDIR      = /work/MOD3DATA/2018_12NE3               # Input directory for WRF & CMAQ
+set OUTPUT_ROOT = ${CMAQ_DATA}                            # output root directory
 set output_direct_name = WRFCMAQ-output-${version}        # Output Directory Name
-setenv OUTDIR $OUTPUT_ROOT/$output_direct_name   # output files and directories
+setenv OUTDIR $OUTPUT_ROOT/$output_direct_name            # output files and directories
 set NMLpath     = $WRF_DIR/cmaq                           # path with *.nml file mechanism dependent
 
 echo ""

@@ -53,7 +53,8 @@ module coupler_module
   integer, parameter :: mpas_cmaq = 1
   integer, parameter :: mta       = 0
   integer, parameter :: atm       = 1
-  integer, parameter :: vname_max_str_len = 32
+! integer, parameter :: vname_max_str_len = 32
+  integer, parameter :: vname_max_str_len = 16
 
   integer, parameter :: n_so4 = 3
 
