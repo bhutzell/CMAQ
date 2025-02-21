@@ -28,7 +28,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Feb 14, 2025
+C  REVISION HISTORY: Created by EBI solver program, Feb 21, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -120,7 +120,7 @@ c..Remaining HO production
      &   +                 RXRAT(    32 )      ! OP2=HO+HO2+ALD
      &   +                 RXRAT(    33 )      ! OPB=HO+HO2+ALD
      &   +                 RXRAT(    34 )      ! OP3=HO+HO2+ALD
-     &   +                 RXRAT(    35 )      ! PAA=HO+MO2
+     &   +                 RXRAT(    35 )      ! PAA=HO+MO2+CO2
      &   +   OH_S  *       RXRAT(     2 )      ! O1D=0.2000D+01*HO
      &   +    2.5000D-01 * RXRAT(    91 )      ! ISO+O3=0.2500D+00*HO+...
      &   +                 RXRAT(    97 )      ! ISHP+HO=0.2000D+01*HO+...
@@ -180,7 +180,7 @@ c..Production of HO2 from OH ( r5,4 terms )
      &     +                 RKI(   127 ) * YC ( MOH         )   ! HO+MOH=HO2+HCHO
      &     +                 RKI(   128 ) * YC ( EOH         )   ! HO+EOH=HO2+ACD
      &     +                 RKI(   129 ) * YC ( ROH         )   ! HO+ROH=HO2+...
-     &     +                 RKI(   130 ) * YC ( ETEG        )   ! HO+ETEG=HO2+ALD
+     &     +                 RKI(   130 ) * YC ( ETEG        )   ! HO+ETEG=HO2+ACD
      &     +                 RKI(   136 ) * YC ( ORA1        )   ! HO+ORA1=HO2+CO2
      &     +    3.3300D-01 * RKI(   398 ) * YC ( BDE13       )   ! HO+BDE13=0.3330D+...
      &     +    4.9000D-01 * RKI(   406 ) * YC ( FURAN       )   ! HO+FURAN=0.4900D+...
@@ -316,7 +316,7 @@ c..Remaining HO2 production terms
      &   +    5.0000D-01 * RXRAT(   328 )      ! MVKP+ACO3=0.5000D+00*HO2+...
      &   +    5.0000D-01 * RXRAT(   329 )      ! UALP+ACO3=0.5000D+00*HO2+...
      &   +    2.0000D+00 * RXRAT(   332 )      ! ADDC+ACO3=0.2000D+01*HO2+...
-     &   +                 RXRAT(   333 )      ! MCTP+ACO3=HO2+MO2+MCTO
+     &   +                 RXRAT(   333 )      ! MCTP+ACO3=HO2+MO2+MCTO+CO2
      &   +                 RXRAT(   335 )      ! OLNN+ACO3=HO2+MO2+ONIT
      &   +                 RXRAT(   337 )      ! ADCN+ACO3=HO2+MO2+0.7000D+...
      &   +                 RXRAT(   340 )      ! MO2+NO3=HO2+HCHO+NO2
@@ -474,7 +474,7 @@ c..HO loss terms not in R5_4 & R19_4
      &   +    6.5000D-01 * RKI(   138 ) * YC ( PAA         )   ! HO+PAA=0.3500D+...
      &   +                 RKI(   139 ) * YC ( PAN         )   ! HO+PAN=XO2+NO3+HCHO
      &   +                 RKI(   140 ) * YC ( PPN         )   ! HO+PPN=XO2+NO3+HCHO
-     &   +                 RKI(   141 ) * YC ( MPAN        )   ! HO+MPAN=NO2+HKET
+     &   +                 RKI(   141 ) * YC ( MPAN        )   ! HO+MPAN=NO2+HKET+CO
      &   +                 RKI(   142 ) * YC ( ONIT        )   ! HO+ONIT=HC3P+NO2
      &   +                 RKI(   143 ) * YC ( TRPN        )   ! HO+TRPN=0.3300D+...
      &   +                 RKI(   144 ) * YC ( HONIT       )   ! HO+HONIT=HKET+NO3

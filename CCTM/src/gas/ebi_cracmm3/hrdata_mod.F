@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Feb 14, 2025
+C  REVISION HISTORY: Created by EBI solver program, Feb 21, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables for solution
 C*************************************************************************
@@ -152,9 +152,9 @@ c..Species indices
       INTEGER, PARAMETER :: OPB              =   40
       INTEGER, PARAMETER :: OP3              =   41
       INTEGER, PARAMETER :: PAA              =   42
-      INTEGER, PARAMETER :: ONIT             =   43
-      INTEGER, PARAMETER :: PAN              =   44
-      INTEGER, PARAMETER :: CO2              =   45
+      INTEGER, PARAMETER :: CO2              =   43
+      INTEGER, PARAMETER :: ONIT             =   44
+      INTEGER, PARAMETER :: PAN              =   45
       INTEGER, PARAMETER :: TRPN             =   46
       INTEGER, PARAMETER :: HONIT            =   47
       INTEGER, PARAMETER :: N2O5             =   48
