@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /work/MOD3DEV/has/2023cracmm_ages/runs/20250214aromatics/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
+! Source file: /work/MOD3DEV/tskipper/cracmm3/20250221_avprepend/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
 ! for Mechanism Name: CRACMM3                         
 
 ! This file is used to create mechanism data and functions
@@ -454,7 +454,7 @@
       & MEMBER("SESQRO2         ",  138, "GC",  253.40D0, F), &
       & MEMBER("VROCP0OXY2      ",  173, "GC",  242.40D0, F), &
       & MEMBER("VROCP1OXY3      ",  176, "GC",  202.30D0, F), &
-      & MEMBER("AGLYJ           ",  195, "AE",   66.40D0, T), &
+      & MEMBER("AGLYOLIGJ       ",  195, "AE",   66.40D0, T), &
       & MEMBER("IEPOXP          ",  110, "GC",  118.10D0, F), &
       & MEMBER("AISO3NOSJ       ",  269, "AE",  136.20D0, T), &
       & MEMBER("ASO4J           ",  186, "AE",   96.00D0, T), &
@@ -647,7 +647,7 @@
       DATA CHEMISTRY_SPC( 141 ), SPECIES_MOLWT( 141 ) / 'SESQRO2         ',  253.40D0 /
       DATA CHEMISTRY_SPC( 142 ), SPECIES_MOLWT( 142 ) / 'VROCP0OXY2      ',  242.40D0 /
       DATA CHEMISTRY_SPC( 143 ), SPECIES_MOLWT( 143 ) / 'VROCP1OXY3      ',  202.30D0 /
-      DATA CHEMISTRY_SPC( 144 ), SPECIES_MOLWT( 144 ) / 'AGLYJ           ',   66.40D0 /
+      DATA CHEMISTRY_SPC( 144 ), SPECIES_MOLWT( 144 ) / 'AGLYOLIGJ       ',   66.40D0 /
       DATA CHEMISTRY_SPC( 145 ), SPECIES_MOLWT( 145 ) / 'IEPOXP          ',  118.10D0 /
       DATA CHEMISTRY_SPC( 146 ), SPECIES_MOLWT( 146 ) / 'AISO3NOSJ       ',  136.20D0 /
       DATA CHEMISTRY_SPC( 147 ), SPECIES_MOLWT( 147 ) / 'ASO4J           ',   96.00D0 /
@@ -841,7 +841,7 @@
       DATA CGRID_INDEX( 141 ), SPECIES_TYPE( 141 ), CONVERT_CONC( 141 ) /  138, 'GC', F /  ! SESQRO2
       DATA CGRID_INDEX( 142 ), SPECIES_TYPE( 142 ), CONVERT_CONC( 142 ) /  173, 'GC', F /  ! VROCP0OXY2
       DATA CGRID_INDEX( 143 ), SPECIES_TYPE( 143 ), CONVERT_CONC( 143 ) /  176, 'GC', F /  ! VROCP1OXY3
-      DATA CGRID_INDEX( 144 ), SPECIES_TYPE( 144 ), CONVERT_CONC( 144 ) /  195, 'AE', T /  ! AGLYJ
+      DATA CGRID_INDEX( 144 ), SPECIES_TYPE( 144 ), CONVERT_CONC( 144 ) /  195, 'AE', T /  ! AGLYOLIGJ
       DATA CGRID_INDEX( 145 ), SPECIES_TYPE( 145 ), CONVERT_CONC( 145 ) /  110, 'GC', F /  ! IEPOXP
       DATA CGRID_INDEX( 146 ), SPECIES_TYPE( 146 ), CONVERT_CONC( 146 ) /  269, 'AE', T /  ! AISO3NOSJ
       DATA CGRID_INDEX( 147 ), SPECIES_TYPE( 147 ), CONVERT_CONC( 147 ) /  186, 'AE', T /  ! ASO4J
@@ -1037,7 +1037,7 @@
       INTEGER :: INDEX_SESQRO2     =  141
       INTEGER :: INDEX_VROCP0OXY2  =  142
       INTEGER :: INDEX_VROCP1OXY3  =  143
-      INTEGER :: INDEX_AGLYJ       =  144
+      INTEGER :: INDEX_AGLYOLIGJ   =  144
       INTEGER :: INDEX_IEPOXP      =  145
       INTEGER :: INDEX_AISO3NOSJ   =  146
       INTEGER :: INDEX_ASO4J       =  147

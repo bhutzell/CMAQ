@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Feb 14, 2025
+C  REVISION HISTORY: Created by EBI solver program, Feb 21, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 
@@ -954,7 +954,7 @@ C***********************************************************************
      &                     +                 RXRAT(    26 )      ! GLY=0.2000D+01*HO2+0.2000D+...
      &                     +                 RXRAT(   118 )      ! GLY+HO=HO2+0.2000D+01*CO
      &                     +                 RXRAT(   170 )      ! GLY+NO3=HO2+0.2000D+01*CO+HNO3
-     &                     +                 RXRAT(   422 )      ! GLY=AGLYJ
+     &                     +                 RXRAT(   422 )      ! GLY=AGLYOLIGJ
 
       PROD(  MGLY        ) =    5.0000D-01 * RXRAT(    28 )      ! DCB1=0.5000D+00*MGLY+...
      &                     +    5.0000D-01 * RXRAT(    29 )      ! DCB2=0.5000D+00*MGLY+...
@@ -1007,7 +1007,7 @@ C***********************************************************************
       LOSS(  MGLY        ) =                 RXRAT(    27 )      ! MGLY=HO2+ACO3+CO
      &                     +                 RXRAT(   119 )      ! MGLY+HO=ACO3+CO
      &                     +                 RXRAT(   171 )      ! MGLY+NO3=ACO3+CO+HNO3
-     &                     +                 RXRAT(   423 )      ! MGLY=AGLYJ
+     &                     +                 RXRAT(   423 )      ! MGLY=AGLYOLIGJ
 
       PROD(  DCB1        ) =    7.0000D-01 * RXRAT(   156 )      ! DCB2+O3=0.7000D+00*DCB1+...
      &                     +    7.0000D-01 * RXRAT(   157 )      ! DCB3+O3=0.7000D+00*DCB1+...
@@ -2200,9 +2200,9 @@ C***********************************************************************
      &                     +    5.0300D-02 * RXRAT(   522 )      ! VROCP6OXY1+HO=0.5030D-...
       LOSS(  VROCP1OXY3  ) =    9.9940D-01 * RXRAT(   516 )      ! VROCP1OXY3+HO=0.6000D-...
 
-      PROD(  AGLYJ       ) =                 RXRAT(   422 )      ! GLY=AGLYJ
-     &                     +                 RXRAT(   423 )      ! MGLY=AGLYJ
-      LOSS(  AGLYJ       ) =   0.0D0
+      PROD(  AGLYOLIGJ   ) =                 RXRAT(   422 )      ! GLY=AGLYOLIGJ
+     &                     +                 RXRAT(   423 )      ! MGLY=AGLYOLIGJ
+      LOSS(  AGLYOLIGJ   ) =   0.0D0
 
       PROD(  IEPOXP      ) =                 RXRAT(   429 )      ! IEPOX=IEPOXP
       LOSS(  IEPOXP      ) =                 RXRAT(   430 )      ! IEPOXP=AISO3NOSJ

@@ -175,6 +175,14 @@ END ELIMINATE
 
 
 
+
+
+
+
+
+
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -987,8 +995,8 @@ REACTIONS[CM] =
                      # 2.70E-12 @ -360.0;                     
 
 ! GLY and MGLY uptake
-<HET_GLY> GLY = AGLYJ  - 4.0000*DELTA_C # 1.0~<HETERO_GLY>;
-<HET_MGLY> MGLY = AGLYJ  - 3.0000*DELTA_C # 1.0~<HETERO_MGLY>;
+<HET_GLY> GLY = AGLYOLIGJ  - 4.0000*DELTA_C # 1.0~<HETERO_GLY>;
+<HET_MGLY> MGLY = AGLYOLIGJ  - 3.0000*DELTA_C # 1.0~<HETERO_MGLY>;
 
 ! heteorogeneous reactions from hetchem and poaaging routines version 5.0.2
 

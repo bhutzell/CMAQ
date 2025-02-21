@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Feb 14, 2025
+C  REVISION HISTORY: Created by EBI solver program, Feb 21, 2025
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -275,7 +275,7 @@ c..Allocate and define ebi species
       EBISP( 128 ) = SESQRO2
       EBISP( 129 ) = VROCP0OXY2
       EBISP( 130 ) = VROCP1OXY3
-      EBISP( 131 ) = AGLYJ
+      EBISP( 131 ) = AGLYOLIGJ
       EBISP( 132 ) = IEPOXP
       EBISP( 133 ) = AISO3NOSJ
       EBISP( 134 ) = ASO4J
@@ -472,7 +472,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( SESQRO2     ) = 5.0D-04
       RTOL( VROCP0OXY2  ) = 5.0D-04
       RTOL( VROCP1OXY3  ) = 5.0D-04
-      RTOL( AGLYJ       ) = 5.0D-04
+      RTOL( AGLYOLIGJ   ) = 5.0D-04
       RTOL( IEPOXP      ) = 5.0D-04
       RTOL( AISO3NOSJ   ) = 5.0D-04
       RTOL( ASO4J       ) = 5.0D-04

@@ -436,8 +436,8 @@ Information is based on the mech.def file.
 | R017c   | SESQRO2 + HO2 ----> VROCP0OXY2  |   2.84E-13e<sup>  1300.00/T</sup> |   2.2230E-11 |
 | R019c   | SESQRO2 + NO3 ----> VROCP3OXY2  |   2.3000E-12 |   2.3000E-12 |
 | R020c   | SESQRO2 + NO ---->   0.2470\*VROCP1OXY3 +    0.7530\*VROCP3OXY2 +    0.7530\*NO2  |   2.70E-12e<sup>   360.00/T</sup> |   9.0313E-12 |
-| HET_GLY   | GLY ----> AGLYJ  | HETERO_GLY | Not Available<sup>2</sup> | 
-| HET_MGLY   | MGLY ----> AGLYJ  | HETERO_MGLY | Not Available<sup>2</sup> | 
+| HET_GLY   | GLY ----> AGLYOLIGJ  | HETERO_GLY | Not Available<sup>2</sup> | 
+| HET_MGLY   | MGLY ----> AGLYOLIGJ  | HETERO_MGLY | Not Available<sup>2</sup> | 
 | HET_N2O5   | N2O5 ---->   2.0000\*HNO3  | HETERO_N2O5IJ | Not Available<sup>2</sup> | 
 | HET_NO2   | NO2 ---->   0.5000\*HONO +    0.5000\*HNO3  | HETERO_NO2 | Not Available<sup>2</sup> | 
 | HET_HO2   | HO2 ----> | HETERO_HO2 | Not Available<sup>2</sup> | 

@@ -135,7 +135,7 @@ C Define Logical values as T and F for the aerospc table
 
 C Number of aerosol species and modes
 
-      Integer, Parameter :: n_aerolist = 140    ! number of aero species
+      Integer, Parameter :: n_aerolist = 141    ! number of aero species
       Integer, Parameter :: n_mode = 3          ! number of modes:
       Integer, Parameter :: iait = 1            ! 1 = Aitken       
       Integer, Parameter :: iacc = 2            ! 2 = accumulation 
@@ -401,11 +401,12 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('OSO4EMIS  ',T,T,T,cm_set,1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'SOLUTE', 0.00), ! SO4 from emitted SO4 loss to organosulfate
      & spcs_list_type('OSO4ICBC  ',T,T,T,cm_set,1800.0, '       ','       ',0.0  ,'NVL',F,T,  0,  0.0, 0.0,F, 'SOLUTE', 0.00), ! SO4 from ICBCs loss to organosulfate
      
-      ! The following species are associated with CRACMM2
+      ! The following species are associated with CRACMM
      & spcs_list_type('AISO4   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.21), ! from heterogeneous uptake of IPX
      & spcs_list_type('AISO5   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.18), ! from heterogeneous uptake of INALD
      & spcs_list_type('ATRPN   ',F,T,F, cm_set, 1400.0, 'TRPN   ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! SOA from first generation monoterpene nitrate
-     & spcs_list_type('AHONIT  ',F,T,F, cm_set, 1400.0, 'HONIT  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14)  ! SOA from second generation monoterpene nitrate
+     & spcs_list_type('AHONIT  ',F,T,F, cm_set, 1400.0, 'HONIT  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14), ! SOA from second generation monoterpene nitrate
+     & spcs_list_type('AGLYOLIG',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13)  ! glyoxal SOA (CRACMM3)
      & /)                                                 
  
 ! Define Reference Emissions Size Distributions
