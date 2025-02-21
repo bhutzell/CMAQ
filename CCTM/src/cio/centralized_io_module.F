@@ -240,11 +240,11 @@
         integer              :: cio_emis_nlays                     ! max value among cio_emis_file_layer
 
 ! - met_emis temperature-dependent emission data          
-        character (16), save :: cio_met_emis_file_name = 'METEMIS_TBL'
-        integer, allocatable :: cio_met_emis_file_startcol
-        integer, allocatable :: cio_met_emis_file_endcol
-        integer, allocatable :: cio_met_emis_file_startrow
-        integer, allocatable :: cio_met_emis_file_endrow
+        character (16), save :: cio_met_emis_file_name = 'MET_EMIS_TBL'
+        integer              :: cio_met_emis_file_startcol
+        integer              :: cio_met_emis_file_endcol
+        integer              :: cio_met_emis_file_startrow
+        integer              :: cio_met_emis_file_endrow
         integer              :: cio_met_emis_nlays                     ! max value among cio_emis_file_layer
 
 ! this is for MPAS only
@@ -1111,8 +1111,9 @@
              f_met_emis    = n_opened_file
 
              ! Open Temperature-Binned Mobile Emission File and read header
-             call mio_fopen( cio_met_emis_file_name, mio_read_only )
-             floc = mio_search( cio_met_emis_file_name )
+             fname = cio_met_emis_file_name
+             call mio_fopen( fname, mio_read_only )
+             floc = mio_search( fname )
 
              ! Check whether file is for a representative day
              call log_message( logdev, '' )
@@ -1121,12 +1122,11 @@
      &                    file_sym_date(f_met_emis), logdev )
 
              ! Load Sub-domain Grid Parameters
-             call subhfile ( cio_met_emis_file_name, gxoff, gyoff,
+             call subhfile ( fname, gxoff, gyoff,
      &                       cio_met_emis_file_startcol, cio_met_emis_file_endcol, 
      &                       cio_met_emis_file_startrow, cio_met_emis_file_endrow )
 
              ! Load File Properties into CIO Variables
-             fname = cio_met_emis_file_name
              call mio_get_global_attr (fname, 'SDATE', file_sdate(f_met_emis))
              call mio_get_global_attr (fname, 'STIME', file_stime(f_met_emis))
              call mio_get_global_attr (fname, 'TSTEP', file_tstep(f_met_emis))
@@ -1136,6 +1136,13 @@
              ! Load Variable List Attributes
              n_e3dm = mio_file_data(floc)%nvars
              cio_met_emis_nlays = mio_file_data(floc)%nlays
+             
+             
+             allocate (emis_name(n_e3dm, 3), stat=stat)
+             if (stat .ne. 0) then
+                xmsg = 'Failure allocating met_emis_name '
+                call m3exit (pname, 0, 0, xmsg, xstat1 )
+             end if
              write (tname, '(a1, i3.3)') '_MEM'
              end = 0
              do v = 1, mio_file_data(floc)%nvars
@@ -1707,7 +1714,7 @@
 
                    str_len = len_trim(cio_grid_var_name(v,1))
                    read (cio_grid_var_name(v,1)(str_len-2:str_len), *) fnum
-                   loc_vname = cio_grid_var_name(v,1) !(1:str_len-4)
+                   loc_vname = cio_grid_var_name(v,1)(1:str_len-4)
 
 #ifdef mpas
                    floc = cio_emis_file_loc(fnum)

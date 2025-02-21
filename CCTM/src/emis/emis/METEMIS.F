@@ -79,7 +79,7 @@
         INTEGER, SAVE :: STIMEMT
         INTEGER, SAVE :: TSTEPMT
 
-        CHARACTER*16, SAVE :: TBLNAME = 'METEMIS_TBL'
+        CHARACTER*16, SAVE :: TBLNAME = 'MET_EMIS_TBL'
 
         REAL, ALLOCATABLE, SAVE :: ETABLE( :,:,:,: )  !! ( NCOLS,NROWS,NMTEMP,NMETSPC )
         REAL, ALLOCATABLE, SAVE :: TEMPVAL( :,: )     !! ( NCOLS,NROWS ) for temperature
