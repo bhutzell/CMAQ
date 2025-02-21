@@ -234,7 +234,7 @@ C Initialize Online Lightning NOx Emissions
          END IF
 
 C Initialize Online Meteorology-Dependent Emissions
-         IF ( USE_MET_EMIS ) THEN 
+         IF ( MET_EMIS ) THEN 
            CALL LOG_SUBHEADING( LOGDEV, 'Initialize Met-Modulated Emissions' )
            IF ( .NOT. METEMIS_INIT( JDATE, JTIME, TSTEP(1) ) ) THEN
               XMSG = 'Failure initializing met-modulated emissions module'
@@ -3002,7 +3002,7 @@ C-----------------------------------------------------------------------
          IF ( USE_MARINE_GAS_EMISSION ) DESID_N_SRM = DESID_N_SRM + 1
   
          ! Met-Modulated Emissions; use if met-emis is activated
-         IF ( USE_MET_EMIS ) DESID_N_SRM = DESID_N_SRM + 1
+         IF ( MET_EMIS ) DESID_N_SRM = DESID_N_SRM + 1
   
          ! Lightning NO Emissions
          IF ( LTNG_NO ) DESID_N_SRM = DESID_N_SRM + 1
@@ -3218,7 +3218,7 @@ C stkemis_init.
          END IF
          
          ! Met-Modulated Emissions
-         IF ( USE_MET_EMIS ) THEN
+         IF ( MET_EMIS ) THEN
            ISRM = ISRM + 1
            DESID_STREAM_TYPE( ISRM ) = 'METEMIS'
            DESID_STREAM_ITYPE( ISRM ) = 10

@@ -110,7 +110,6 @@
             CHARACTER*256   MESG
 
             ! Open Temperature-Binned Mobile Emission File and read header
-            CALL MIO_FOPEN( TBLNAME, MIO_READ_ONLY )
             FLOC = MIO_SEARCH( TBLNAME )          
 
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'SDATE', SDATEMT )
@@ -119,16 +118,11 @@
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NLAYS', NMTEMP )
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NVARS', NMETSPC )
 
-
             call mio_get_global_attr( MET_CRO_3D, 'GDNAM', GDNAME_GD )
             call mio_get_global_attr( MET_CRO_3D, 'VGTYP', VGTYP_GD )
             call mio_get_global_attr( MET_CRO_3D, 'VGTOP', VGTOP_GD )
             VGTPUN_GD = 'Pa'
             VGLVUN_GD = 'none'
-
-
-            CALL SUBHFILE( TBLNAME, GXOFF, GYOFF, STRTCOL, ENDCOL,
-     &                     STRTROW, ENDROW )
 
             ! Allocate and initialize input-related arrays:
             ALLOCATE( DESID_EMVAR( IMETSRM )%ARRY ( NMETSPC ),
@@ -201,7 +195,7 @@
 
 
             ! Open Diagnostic File if Requested
-            IF ( .NOT.METEMDIAG ) THEN
+            IF ( .NOT.MET_EMIS_DIAG ) THEN
                 CONTINUE
 
             ELSE IF( IO_PE_INCLUSIVE ) THEN
@@ -295,13 +289,6 @@
             ! the most recent time point on the table.
             STIMEMT = INT( JTIME/10000 ) * 10000
             IF ( PRVHR .NE. STIMEMT ) THEN
-      !           IF( .NOT.XTRACT3( TBLNAME, ALLVAR3, 1, NMTEMP,
-      !&                         STRTROW, ENDROW, STRTCOL, ENDCOL,
-      !&                         SDATEMT, STIMEMT, ETABLE ) ) THEN
-      !               MESG = 'Error(s) reading "'//TRIM(TBLNAME)//'"'
-      !               CALL M3EXIT( PNAME, SDATEMT, STIMEMT, MESG, 2 )
-      !           END IF
-
                 DO V = 1,NMETSPC
                    CALL INTERPOLATE_VAR( MTNAME(V), SDATEMT, STIMEMT, 
      &                                   ETABLE(:,:,:,V), TBLNAME )
@@ -402,7 +389,7 @@ C ..........  Determine the time to read and/or write the hourly files
 
 
 C ..........  Output diagnostic emissions
-              IF ( METEMDIAG ) THEN
+              IF ( MET_EMIS_DIAG ) THEN
                 
                  VDEMIS_MVDIAG = VDEMIS_MVDIAG + VDEMIS_MV   ! array assignment
                  IF ( LASTTIC ) THEN   ! time to write out

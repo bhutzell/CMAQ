@@ -256,8 +256,8 @@
       CHARACTER(  16 ), SAVE, ALLOCATABLE :: PLAY_BASE( : ) ! Use for Plume Rise Calculation
 
       LOGICAL :: USE_MARINE_GAS_EMISSION = .FALSE.
-      LOGICAL :: USE_MET_EMIS            = .FALSE. ! flag for met-modulated emissions
-      LOGICAL :: METEMDIAG               = .FALSE. ! flag for MET_EM diagnostic file
+      LOGICAL :: MET_EMIS                = .FALSE. ! flag for met-modulated emissions
+      LOGICAL :: MET_EMIS_DIAG           = .FALSE. ! flag for MET_EM diagnostic file
       LOGICAL :: HUM_NOX_YN              = .FALSE. ! flag for MET_EM NOx correction
 
       ! Process Analysis
@@ -839,10 +839,10 @@
       CALL GET_ENV ( SSEMDIAG, 'CTM_SSEMDIAG', SSEMDIAG, VARDEV )
  
       ! Set CTM_MET_EMIS to Y or T ro turn on met-modulated emissions
-      CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
+      CALL GET_ENV ( MET_EMIS, 'CTM_MET_EMIS', MET_EMIS, VARDEV )
  
       ! Get met-modulated emission diagnostic output file flag.
-      CALL GET_ENV ( METEMDIAG, 'CTM_MET_EMIS_DIAG', METEMDIAG, VARDEV )
+      CALL GET_ENV ( MET_EMIS_DIAG, 'CTM_MET_EMIS_DIAG', MET_EMIS_DIAG, VARDEV )
 
       ! Get met-modulated emission diagnostic output file flag.
       CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
