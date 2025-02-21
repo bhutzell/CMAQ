@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
       
 !-------------------------------------------------------------------------
-      SUBROUTINE ELMO_DERIVED_CALC( OUTVAL, J )
+      RECURSIVE SUBROUTINE ELMO_DERIVED_CALC( OUTVAL, J )
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.
 !-------------------------------------------------------------------------
@@ -379,6 +379,11 @@
          ! (<0.35) ozone formation
          CASE ( ID_VOC_NOX )
             IF ( AERO_CHEM_SET ) OUTVAL = ELMO_VOC_NOX( C1,R1,L1 )
+
+         ! Retrieve Nitric Acid Enhancement Factor from photolysis
+         ! of aerosols
+         CASE ( ID_EF_HNO3 )
+            IF ( AERO_CHEM_SET ) OUTVAL = EF_HNO3( C1,R1,L1 )
 
          ! Retrieve AOD at 550 nm
          CASE ( ID_AOD550 )

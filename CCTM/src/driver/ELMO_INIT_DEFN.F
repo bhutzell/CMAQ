@@ -384,13 +384,13 @@
         ! Output Time Step
         ELMO_FILE( IFL )%TSTEP = FTSTEP( IFL )
         CALL UPCASE( TMODE( IFL ) )
-        IF ( TMODE( IFL ) .EQ. 'INSTANT' ) THEN
+        IF ( TMODE( IFL )(1:4) .EQ. 'INST' ) THEN
            ELMO_FILE( IFL )%TMODE = 0
-        ELSE IF ( TMODE( IFL ) .EQ. 'AVERAGE' ) THEN
+        ELSE IF ( TMODE( IFL )(1:3) .EQ. 'AGG' ) THEN
            ELMO_FILE( IFL )%TMODE = 1
         ELSE
             WRITE( XMSG, "(A,I3.3,A)")
-     &             'An ELMO file may only be average or instantaneous.  '//
+     &             'An ELMO file may only be aggregate or instantaneous.  '//
      &             'Please revise the value of Tmode(',IFL,') in ELMO_FILE.'
             CALL M3EXIT ( PNAME, 0, 0, XMSG, 1 ) 
         END IF
@@ -1144,6 +1144,7 @@
       CHARACTER( 3000 ) :: FORMULA
       CHARACTER(    2 ) :: CSIGN
       CHARACTER(   70 ) :: FTEMP
+      CHARACTER(   20 ) :: CTMODE
       INTEGER FORM_SIZE, LAST_SPACE
       LOGICAL L_MODE,L_SPEC
       LOGICAL :: MODE_MASK( N_MODE ), ORG_MASK( N_OA )
@@ -1169,9 +1170,15 @@
       DO IFL = 1,N_ELMO_FILES
          
          ! Header and File Metadata
+         IF ( ELMO_FILE(IFL)%TMODE .EQ. 0 ) THEN
+             CTMODE = 'Instantaneous'
+         ELSE
+             CTMODE = 'Aggregate'
+         END IF
+
          WRITE( LOGDEV, '(/,5x,A,A)'   ),'>',REPEAT('-',80 )
          WRITE( LOGDEV,'(5x,A,I2,A,A,/,5x,A,A,/,8x,A,I2,A,I2,/,8x,A,I5)' ),
-     &       'Output File Num: "',IFL,'" | Temporality: ','Average',
+     &       'Output File Num: "',IFL,'" | Temporality: ',TRIM(CTMODE),
      &       'Output Filename: ',TRIM(ELMO_FILE(IFL)%SHORTNAME),
      &       ' Bottom Layer: ',ELMO_FILE( IFL )%LAY_BOT,
      &       ' Top Layer: ',ELMO_FILE( IFL )%LAY_TOP,

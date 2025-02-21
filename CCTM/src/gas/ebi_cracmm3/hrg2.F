@@ -28,7 +28,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Sep 25, 2024
+C  REVISION HISTORY: Created by EBI solver program, Jan 31, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -412,6 +412,8 @@ c..Production of HONO from OH (r19,4 terms )
 
 c..Remaining HONO production terms
       P19 =    5.0000D-01 * RXRAT(   425 )      ! NO2=0.5000D+00*HONO+...
+     &    +    6.7000D-01 * RXRAT(   535 )      ! ANO3I=0.6700D+00*HONO+...
+     &    +    6.7000D-01 * RXRAT(   536 )      ! ANO3J=0.6700D+00*HONO+...
 
       P19 = YC0( HONO ) + P19 * DTC
 
