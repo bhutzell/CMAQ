@@ -42,6 +42,7 @@ C @(#)WREXTS.F	1.1 /project/mod3/MECH/src/driver/mech/SCCS/s.WREXTS.F 02 Jan 199
      &                              LITE ) 
       
       USE MECHANISM_DATA
+      USE SPECIES_ATOMS_DATA
       USE BASIC_WRITE_ROUTINES
       
       IMPLICIT NONE
@@ -69,7 +70,7 @@ C Local Variables
       LOGICAL, PARAMETER  :: FALSE = .FALSE.
    
       
-      INTEGER ISPC, ISPCNEW, IRX, IRXOUT, IFLD0, IFLD1, IFLD2, NLINES
+      INTEGER ISPC, JSPC, ISPCNEW, IRX, IRXOUT, IFLD0, IFLD1, IFLD2, NLINES
 
       INTEGER, EXTERNAL :: JUNIT
       INTEGER, EXTERNAL :: INDEX1
@@ -85,6 +86,7 @@ C Local Variables
       CHARACTER( 20 ) :: BUFF20( MAXRXNUM )
       REAL( 8 ) ::  DBUFF( MAXRXNUM )
       REAL          SBUFF( MAXRXNUM )
+      INTEGER       IBUFF( MAXRXNUM )
       
 C----------------------------------------------------------------------
 
@@ -988,6 +990,65 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       END IF
 
 c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+c     Atoms across CHEMISTRY_SPC
+c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+
+      WRITE( WRUNIT, 1361 ) N_ATOMS
+1361  FORMAT( /6X, 'INTEGER, PARAMETER', 1X, ':: N_ATOMS =', I4 )
+
+         WRITE( WRUNIT, 1362 )
+1362     FORMAT(  6X, 'CHARACTER( 16 )', 4X, ':: ATOMS( N_ATOMS )' )
+
+         WRITE( WRUNIT, 1633 )
+1633     FORMAT( /6X, 'DATA ( ATOMS( IRXXN ), IRXXN = 1, N_ATOMS ) / & ' )
+
+         DO IRX = 1, N_ATOMS - 1
+            WRITE( BUFF20( IRX ), '(1X, "''", A2, "''", ",")' ) ATOMS( IRX )
+         END DO
+         WRITE( BUFF20( N_ATOMS ), '(1X, "''", A2, "''", "/")' ) ATOMS( N_ATOMS )
+
+         IF( 6 * INT(  N_ATOMS / 6 ) .NE.  N_ATOMS )THEN
+             NLINES =  N_ATOMS / 6
+         ELSE
+             NLINES = N_ATOMS / 6 - 1
+         END IF
+         IFLD1 = 1
+         DO IFLD0 = 1, NLINES
+            IFLD2 = IFLD1 + 5
+            IF( IFLD2 .EQ. NPHOTAB )EXIT
+            WRITE( WRUNIT, 1364 ) ( BUFF20( IRX ), IRX = IFLD1, IFLD2 )
+1364        FORMAT(5X, '&', 2X, 6A6, ' & ' )
+            IFLD1 = IFLD2 + 1
+         END DO
+         IF ( IFLD1 .LE. N_ATOMS )
+     &      WRITE( WRUNIT, 1365 ) ( BUFF20( IRX ), IRX = IFLD1, N_ATOMS )
+1365        FORMAT(5X, '&', 2X, 6A6 )
+
+      IF( MAXVAL( SPECIES_ATOMS ) .GT. 0.0 )THEN
+         WRITE( WRUNIT, 1366 )
+         DO ISPC = 1, NUMB_MECH_SPCS
+            DO JSPC = 1, N_ATOM_SPECIES
+               IF ( TRIM( SPARSE_SPECIES( ISPC ) ) .EQ. TRIM( ATOM_SPECIES( JSPC ) ) ) THEN   ! found
+                  WRITE(WRUNIT,'(A,1X,A)')'! '// TRIM( SPARSE_SPECIES( ISPC ) ) // ' found in '
+     &            // TRIM( SPECIES_TYPE( ISPC ) ) // ' namelist '
+                  DO IRX = 1,N_ATOMS
+                      DBUFF(IRX) = REAL( SPECIES_ATOMS( JSPC,IRX ),8 ) 
+                  END DO 
+                  EXIT
+               END IF
+            END DO
+            WRITE( WRUNIT, 1367 ) ISPC
+            CALL WRBF12D_FORTRAN90( WRUNIT, 5, N_ATOMS, DBUFF( 1:N_ATOMS ), 'D' )
+         END DO
+      ELSE
+         WRITE( WRUNIT, 1368 )
+      END IF
+1366  FORMAT(  6X, 'REAL( 8 )', 12X, ':: CHEM_SPC_ATOMS( NUMB_MECH_SPC,N_ATOMS )' )
+1367  FORMAT(  6X, 'DATA ( CHEM_SPC_ATOMS( ', I3, ',IRXXN ), IRXXN = 1, N_ATOMS ) / & ' )
+1368  FORMAT(  6X, 'REAL( 8 )', 12X, ':: CHEM_SPC_ATOMS( NUMB_MECH_SPC,N_ATOMS ) = 0.0D0 ' )
+
+
+c_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 c     IRR
 c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
@@ -1215,8 +1276,8 @@ c-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
       ELSE
 
          WRITE( WRUNIT, 1717 )
-1717     FORMAT( /'! Photolysis table information not available ...'
-     &           /6X, 'INTEGER, PARAMETER', 1X, ':: NPHOTAB = 0' )
+1717     FORMAT( /'! Photolysis table information not available ...')
+C
                                                 
          WRITE( WRUNIT, 1719 )
 1719     FORMAT( /'! Photolysis table information not available ...'
