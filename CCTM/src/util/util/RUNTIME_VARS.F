@@ -166,6 +166,9 @@
       CHARACTER(256) :: TR_NAMELIST = '' ! Tracer Species Namelist
      
       ! Chemistry and Photolysis
+      CHARACTER(32) :: MECH = ''           ! Chemical Mechanism Name as it appears in the run_script 
+                                           !   and mechanism folder names. This string may or may not 
+                                           !   match the variable MECHNAME that appears in RXNS_DATA.
       LOGICAL :: PHOTDIAG  = .FALSE.       ! Flag for PHOTDIAG file
       INTEGER :: NLAYS_DIAG = 0            ! Number of Diagnostic Layers to write out for photolysis
       INTEGER :: NWAVE = 0                 ! Number of Diagnostic Wavelengths
@@ -617,6 +620,9 @@
          WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
+
+      ! Get Filename for Chemical Mechanism
+      CALL GET_ENV ( MECH, 'MECH', MECH, VARDEV )
 
       ! Get photolysis rate diagnostic file flag
       CALL GET_ENV ( PHOTDIAG, 'CTM_PHOTDIAG', PHOTDIAG, VARDEV )

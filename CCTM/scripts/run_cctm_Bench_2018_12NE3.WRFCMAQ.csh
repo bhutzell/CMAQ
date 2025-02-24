@@ -42,7 +42,7 @@ setenv CTM_DIAG_LVL 0
 #> Set General Parameters and Labels for Configuring the Simulation
 set VRSN        = ${wrfv}55          #> Code Version
 set PROC        = mpi                #> serial or mpi
-set MECH        = cb6r5_ae7_aq       #> Mechanism ID
+setenv MECH       cb6r5_ae7_aq       #> Mechanism ID
 set APPL        = Bench_2018_12NE3   #> Application Name (e.g. Domain)
 
 #> Define RUNID as any combination of parameters above or others. By default,
