@@ -1478,10 +1478,12 @@ CMPST =
 'DD_TCL'      , 'Dry Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
                 'DD_TSP_CL + 0.972*DD_HCL',
+!                'DD_TSP_CL + DD_CL2 + 0.972*DD_HCL + 0.6758*DD_HOCL',
 
 'WD_TCL'      , 'Wet Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
                 '0.972*WD_HCL + WD_TSP_CL',
+!                '0.972*WD_HCL + WD_CL2 + WD_TSP_CL + 0.6758*WD_HOCL',
 
 'TD_TCL'      , 'Total Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
