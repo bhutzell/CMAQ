@@ -34,7 +34,7 @@
         !!-----------------------------------------------------------------------
 
         USE DESID_VARS
-        USE RUNTIME_VARS, ONLY: MYPE, LOGDEV, LOG_MESSAGE
+        USE LOGDEV_MOD, ONLY: MYPE, LOGDEV, LOG_MESSAGE
         USE HGRD_DEFN             ! horizontal domain specifications
         USE ASX_DATA_MOD          ! all gridded input variables, as Met_Data%*(ncols,nrows)
         USE UTILIO_DEFN
@@ -77,7 +77,6 @@
 
         INTEGER, SAVE :: SDATEMT
         INTEGER, SAVE :: STIMEMT
-        INTEGER, SAVE :: TSTEPMT
 
         CHARACTER*16, SAVE :: TBLNAME = 'MET_EMIS_TBL'
 
@@ -99,8 +98,6 @@
 
         LOGICAL FUNCTION METEMIS_INIT( JDATE, JTIME, TSTEP )
 
-            USE RUNTIME_VARS, ONLY: MYPE
-
             INTEGER, INTENT(IN   ) :: JDATE, JTIME
             INTEGER, INTENT(IN   ) :: TSTEP
 
@@ -115,7 +112,6 @@
 
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'SDATE', SDATEMT )
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'STIME', STIMEMT )
-            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'TSTEP', TSTEPMT )
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NLAYS', NMTEMP )
             CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NVARS', NMETSPC )
 
@@ -242,7 +238,6 @@
         SUBROUTINE GET_METEMIS( JDATE, JTIME, TSTEP, L_DESID_DIAG )
 
             USE DESID_VARS
-            USE RUNTIME_VARS, ONLY: MYPE
             USE HGRD_DEFN             ! horizontal domain specifications
             USE ASX_DATA_MOD          ! all gridded input variables, as Met_Data%*(ncols,nrows)
             USE UTILIO_DEFN
