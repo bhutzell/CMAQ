@@ -1200,9 +1200,7 @@ C Find indices of required species
       apoc_idx    = findAero( req_poc,    .True. )
       apncom_idx  = findAero( req_ncom,   .True. )
 
-      If ( ( Index( mechname, 'CRACMM3' ) .Gt. 0 ) ) Then
-         aseast_idx  = findAero( req_seast,  .True. )
-      End If
+      aseast_idx  = findAero( req_seast,  .False. )
 
       If ( ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 ) ) Then
          ae6isoa     = .True.

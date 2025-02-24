@@ -629,7 +629,7 @@ C *** variables for getting aerosol diagnostic file flag
       INTEGER           :: STATUS                      ! ENV... status
       CHARACTER( 80 )   :: VARDESC                     ! environment variable description
       
-      CHARACTER( 132 )  :: XMSG
+      CHARACTER( 386 )  :: XMSG
 
 C *** parameters for calculating GAMMA of HBR ---> ABR, Sherwen et al., ACP, 2016 and IUPAC
       REAL( 8 ) :: GAMMA_HBR                             ! uptake coefficient of HBR  
@@ -715,7 +715,7 @@ C     end of the gas-phase chemical driver
      &          // ' used but ASEAST is not an aerosol species. '
      &          // 'Possible solution adds ASEAST accumulation mode species and '
      &          // 'emissions to AE species and CMAQ_Chem_Control namelists, '
-     &          // 'respecitively. '
+     &          // 'respectively. '
                 CALL M3EXIT( 'HETCHEM_RATES', 0, 0, XMSG, XSTAT3 )
              END IF 
           END IF 
@@ -732,7 +732,6 @@ C     end of the gas-phase chemical driver
           ALLOCATE(     YCLNO2IJ( NCOLS,NROWS,NLAYS ) )
           ALLOCATE(      YCLNO2K( NCOLS,NROWS,NLAYS ) )
           ALLOCATE(      EF_HNO3( NCOLS,NROWS,NLAYS ) )
-          EF_HNO3 = 0.0
        END IF
 
 C ***  Determine molecular weights
@@ -1076,7 +1075,11 @@ C *** set up variables needed for calculating K_BRONO2
                INO2_RXN_TIME        = 4.0D0 * INV_GAMMA_INO2 / CBAR_INO2
                HOI_RXN_TIME         = 4.0D0 * INV_GAMMA_HOI  / CBAR_HOI
               
-               COSZ = MET_DATA%COSZEN( C, R )
+               IF( MET_DATA%COSZEN( C, R ) .LE. 0.0 )THEN
+                   DARK = .TRUE.
+               ELSE
+                   DARK = .FALSE.
+               END IF
 
                CBARIEPOX = CFACTOR_IEPOX * DSQRT( AIRTEMP )
                CBARIMAE  = CFACTOR_IMAE  * DSQRT( AIRTEMP )
@@ -1440,31 +1443,28 @@ C hydrolysis
                   ENDIF 
 
                  CASE( IA_HOI_BRJ )                            
-                  K1 = 0.5 * SSALT_SURFA / ( RADIUS * INV_DIFF_HOI + HOI_RXN_TIME )           ! use sea-salt surface area
+                  K1 = 0.5 * SSALT_SURFA / ( RADIUS * INV_DIFF_HOI + HOI_RXN_TIME ) ! use sea-salt surface area
                   IF ( BR_PPM (2) .GT. MIN_VALUE ) THEN
-                   KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / BR_PPM (2)                                         ! 1/(min*ppm)
+                   KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / BR_PPM (2) ! 1/(min*ppm)
                   ELSE
                    KHETERO( IRATE, C,R,L ) = 0.0D0    
                   ENDIF
 
                 CASE( IA_ANO3 )
 
-                    IF ( COSZ .LE. 0.0 ) THEN
-                      DARK = .TRUE.     ! sun is down
-                      JHNO3    = 0.0D0  ! no photolysis
-                      FAC_HNO3 = 0.0D0
-                    ELSE
-                      DARK = .FALSE.            ! sun is up
+                    IF ( .NOT. DARK ) THEN
                       JHNO3 = RJ( C,R,L,LHNO3 ) ! get HNO3 photolysis frequency
                       ! Calculate FAC_HNO3
                       ANO3 = aerospc_conc( ANO3_IDX,1 ) + aerospc_conc( ANO3_IDX,2 )
                       ANO3M = ANO3 / aerospc_mw( ANO3_IDX )
                       ASEASTM = aerospc_conc( ASEAST_IDX, 2 ) / aerospc_mw( ASEAST_IDX )
-                      FAC_HNO3 = 100.0  / ( 1.0 + ( ANO3M / ASEASTM ))                
+!                      FAC_HNO3 = 100.0  / ( 1.0 + ( ANO3M / ASEASTM ))                
+                      FAC_HNO3 = 100.0 * ASEASTM / ( ASEASTM + ANO3M )                
                       FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
                       IF ( L_ELMO ) EF_HNO3( C,R,L ) = FAC_HNO3
+                      KHETERO( IRATE, C,R,L ) = REAL( JHNO3 * FAC_HNO3,8 ) ! 1/min ,
+!                   KHETERO( IRATE, C,R,L ) = JHNO3 * FAC_HNO3 ! 1/min ,
                     END IF                 
-                    KHETERO( IRATE, C,R,L ) = REAL( JHNO3 * FAC_HNO3,8 )                                                          ! 1/min ,
 
                END SELECT
 
