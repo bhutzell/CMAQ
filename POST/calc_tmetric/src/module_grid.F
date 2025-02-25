@@ -37,15 +37,15 @@ C*************************************************************************
          INTEGER  :: NLAYS
          INTEGER  :: GDTYP
 
-         REAL*8  ::  P_ALP
-         REAL*8  ::  P_BET
-         REAL*8  ::  P_GAM
-         REAL*8  ::  XCENT
-         REAL*8  ::  YCENT
-         REAL*8  ::  XORIG
-         REAL*8  ::  YORIG
-         REAL*8  ::  XCELL
-         REAL*8  ::  YCELL
+         REAL(8) ::  P_ALP
+         REAL(8) ::  P_BET
+         REAL(8) ::  P_GAM
+         REAL(8) ::  XCENT
+         REAL(8) ::  YCENT
+         REAL(8) ::  XORIG
+         REAL(8) ::  YORIG
+         REAL(8) ::  XCELL
+         REAL(8) ::  YCELL
 
       END TYPE GRID
 
@@ -73,7 +73,7 @@ C..EXTERNAL FUNCTIONS: None
 C..SAVED LOCAL VARIABLES: None
 
 C..SCRATCH LOCAL VARIABLES:
-         CHARACTER*16    PNAME        ! Program Name
+         CHARACTER(16)   PNAME        ! Program Name
 
          INTEGER   N                  ! Loop index
          INTEGER   STATUS             ! Status code
