@@ -471,6 +471,12 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             CALL M3EXIT( PNAME, JDATE, JTIME, MSG, XSTAT1 )
          END IF
 
+         IF ( .NOT. ALLOCATED( CNGRD ) ) THEN
+           ALLOCATE ( CNGRD( NCOLS,NROWS,NLAYS,N_CGRID_SPC ),
+     &                STAT = ASTAT )
+           CALL CHECKMEM( ASTAT, 'CNGRD', PNAME )
+         END IF
+         
          ! Set layer thickenesses
          CONVDD = 1.0 / ABS ( VGLVS_GD( 2 ) - VGLVS_GD( 1 ) ) 
 
@@ -503,10 +509,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       call interpolate_var ('ZF', jdate, jtime, ZF)
 
       ! Convert DDEP to ppm, ug m-3, N m-3, and m2 m-3
-      CNGRD(:,:,1,: ) = -DDEP * CONVH2M 
-      CNGRD( :,:,2:NLAYS,: ) = 0.0
+      DO L = 2,NLAYS
+         CNGRD( :,:,L,: ) = 0.0
+      END DO
 
       DO ICG = 1,N_CGRID_SPC
+         CNGRD(:,:,1,ICG ) = -DDEP(:,:,ICG) * CONVH2M 
+
          IF ( CGRID_MASK_AERO( ICG ) ) THEN
             CNGRD(:,:,1,ICG) = CNGRD(:,:,1,ICG) * PA_DEPV_CONV( ICG ) / ZF( :,:,1 )
          ELSE

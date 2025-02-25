@@ -8,7 +8,6 @@
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
 ! Source file: /work/MOD3DEV/sgq/manage_git/research/PR_1212/TEST/UTIL/chemmech/input/cb6r5_ae7_aq/mech_cb6r5_ae7_aq.def
 ! for Mechanism Name: CB6R5_AE7_AQ                    
-
 ! This file is used to create mechanism data and functions
 
 ! The following are reserved symbols declared in this file:
@@ -1161,6 +1160,15 @@
       DATA ( NRXWH2( IRXXN ), IRXXN = 1, NWH2 ) / & 
      &    122/
       REAL( 8 ),    PARAMETER :: ATM_H2 = 5.60000D-01
+
+      INTEGER, PARAMETER :: N_ATOMS =  15
+      CHARACTER( 16 )    :: ATOMS( N_ATOMS )
+
+      DATA ( ATOMS( IRXXN ), IRXXN = 1, N_ATOMS ) / & 
+     &   'CA', 'MN', 'CL', 'HG', 'BR', 'NA', & 
+     &   'SI', 'S ', 'TI', 'FE', 'K ', 'I ', & 
+     &   'N ', 'C ', 'O '/
+      REAL( 8 )            :: CHEM_SPC_ATOMS( NUMB_MECH_SPC,N_ATOMS ) = 0.0D0 
 
       INTEGER, PARAMETER :: MXPRD =  14
       INTEGER            :: IRR( NRXNS,MXPRD+3 )
