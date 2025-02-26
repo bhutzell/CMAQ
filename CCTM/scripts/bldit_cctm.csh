@@ -855,11 +855,6 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
         ${WRF_ARCH}
         1
 EOF
-
-    else
-      # Clean-up 
-      rm -r $Bld
-      cd $wrf_path
     endif
 
      # Compile WRF-CMAQ
