@@ -35,7 +35,7 @@ echo 'Start Model Run At ' `date`
 #> Set General Parameters for Configuring the Simulation
  set VRSN      = v55              #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cb6r5_ae7_aq      #> Mechanism ID
+ setenv MECH     cb6r5_ae7_aq      #> Mechanism ID
  set EMIS      = 2016fh            #> Emission Inventory Details
  set APPL      = 2016_CONUS        #> Application Name (e.g. Gridname)
 
@@ -350,13 +350,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> + Emission Control (DESID) Documentation in the CMAQ User's Guide:
   #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
   #>
-  setenv DESID_CTRL_NML ${BLD}/CMAQ_Control_DESID.nml
-  setenv DESID_CHEM_CTRL_NML ${BLD}/CMAQ_Control_DESID_${MECH}.nml
-
-  #> The following namelist configures aggregated output (via the Explicit and Lumped
-  #> Air Quality Model Output (ELMO) Module), domain-wide budget output, and chemical
-  #> family output.
-  setenv MISC_CTRL_NML ${BLD}/CMAQ_Control_Misc.nml
+  setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
+  setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml
 
   #> The following namelist controls the mapping of meteorological land use types and the NH3 and Hg emission
   #> potentials

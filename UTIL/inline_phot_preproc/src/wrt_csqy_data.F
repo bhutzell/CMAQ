@@ -452,7 +452,7 @@ C            WRITE(JTABLE_UNIT,'(I3,2X,F6.2)')ITTR, TEMPERATURE(ITTR)
              WRITE(JTABLE_UNIT,'(A7,7X,A8,3X,A4,3X,40(A5,I3,A1,5X))')'!      ',
      &      'QUANTITY','TEMP',('WBIN(',J,')', J = 1, N_INLINE_BAND)
              DO I = 1, N_TEMP_STRAT
-                WRITE(JTABLE_UNIT,'(A16,1X,A5,1X,F8.3,1X,40(1PE12.6,2X))')'O3_STRAT ',
+                WRITE(JTABLE_UNIT,'(A16,1X,A5,1X,F8.3,1X,40(1PE13.6,2X))')'O3_STRAT ',
      &          'CS',TEMP_STRAT(I),(O3_CS_STRAT( I, J), J = 1, N_INLINE_BAND)
              ENDDO
              RETURN
@@ -659,19 +659,19 @@ c---    SR bands are split (by Opacity Distrib Fn) into a range of JX bins
       ENDDO LOOP_TROP
 
        TEMP = 298.0
-       write(6,'(A16,1X,A5,1X,F8.3,1X,40(1PE12.6,2X))')
+       write(6,'(A16,1X,A5,1X,F8.3,1X,40(1PE13.6,2X))')
      &    TRIM(SAFE_NAME), 'CS0', TEMP, 
      &    (AABIN(NJO_NEW - N_INLINE_BAND + J),J= 1, N_INLINE_BAND)
 
 
       DO I = 1, N_TEMPERATURE
 
-        WRITE(JTABLE_UNIT,'(A16,1X,A5,1X,F8.3,1X,40(1PE12.6,2X))')SPECTRA_NAME,
+        WRITE(JTABLE_UNIT,'(A16,1X,A5,1X,F8.3,1X,40(1PE13.6,2X))')SPECTRA_NAME,
      &       'CS',TEMPERATURE(I),(CS_PHOT( I, J, IRXN), J = 1, N_INLINE_BAND)
-        WRITE(JTABLE_UNIT,'(A16,1X,A5,1X,F8.3,1X,40(1PE12.6,2X))')SPECTRA_NAME,
+        WRITE(JTABLE_UNIT,'(A16,1X,A5,1X,F8.3,1X,40(1PE13.6,2X))')SPECTRA_NAME,
      &       'EQY',TEMPERATURE(I),(EQY_PHOT( I, J, IRXN), J = 1, N_INLINE_BAND)
 
-        WRITE(6,'(A16,1X,A5,1X,F8.3,1X,40(1PE12.6,2X))')SPECTRA_NAME,
+        WRITE(6,'(A16,1X,A5,1X,F8.3,1X,40(1PE13.6,2X))')SPECTRA_NAME,
      &       'CS',TEMPERATURE(I),(CS_PHOT( I, J, IRXN), J = 1, N_INLINE_BAND)
 
 
@@ -688,7 +688,7 @@ c---    SR bands are split (by Opacity Distrib Fn) into a range of JX bins
           WRITE(JTABLE_UNIT,'(A7,7X,A8,3X,A4,3X,40(A5,I3,A1,5X))')'!      ',
      &    'QUANTITY','TEMP',('WBIN(',J,')', J = 1, N_INLINE_BAND)
           DO I = 1, N_TEMP_STRAT
-             WRITE(JTABLE_UNIT,'(A16,1X,A5,1X,F8.3,1X,40(1PE12.6,2X))')'O3_STRAT        ',
+             WRITE(JTABLE_UNIT,'(A16,1X,A5,1X,F8.3,1X,40(1PE13.6,2X))')'O3_STRAT        ',
      &       'CS',TEMP_STRAT(I),(O3_CS_STRAT( I, J), J = 1, N_INLINE_BAND)
           ENDDO
 
@@ -709,7 +709,7 @@ c---    SR bands are split (by Opacity Distrib Fn) into a range of JX bins
           WRITE(JTABLE_UNIT,'(A7,7X,A16,2X,40(A5,I3,A1,5X))')'!      ',
      &    'LANDUSE CATEGORY',('WBIN(',J,')', J = 1, N_INLINE_BAND)
           DO I = 1, NUMB_LANDUSE_MODIS
-             WRITE(JTABLE_UNIT,'(A30,1X,40(1PE12.6,2X))')
+             WRITE(JTABLE_UNIT,'(A30,1X,40(1PE13.6,2X))')
      &       TRIM(LANDUSE(I)),(MODIS_ALBEDO( NJO_NEW - N_INLINE_BAND + J, I), J = 1, N_INLINE_BAND)
           ENDDO
 

@@ -778,15 +778,6 @@
      &                         (/'SUBST_PE_COMM ',
      &                           'SUBST_PACTL_ID',
      &                           'SUBST_MPI     '/)
- !    Character( EXT_LEN ) :: pathInc( n_Inc ) =
- !   &                         (/'SUBST_PE_COMM ',
- !   &                           'SUBST_CONST   ',
- !   &                           'SUBST_FILES_ID',
- !   &                           'SUBST_EMISPRM ',
- !   &                           'SUBST_PACTL_ID',
- !   &                           'SUBST_PACMN_ID',
- !   &                           'SUBST_PADAT_ID',
- !   &                           'SUBST_MPI     '/)
       Character( EXT_LEN ) :: pathStr( n_Mac )
       Logical              :: hasPaths
 
@@ -877,7 +868,6 @@
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !  include(n)%name  include(n)%path
 !  SUBST_PE_COMM = ./PE_COMM.EXT             <- BASE_INC
-!  SUBST_CONST = ./CONST.EXT                 <- BASE_INC
 !  SUBST_FILES_ID = ./FILES_CTM.EXT          <- BASE_INC
 !  SUBST_EMISPRM = ./EMISPRM.EXT             <- BASE_INC
 !  SUBST_PACTL_ID = ./PA_CTL.EXT             <- PA_INC

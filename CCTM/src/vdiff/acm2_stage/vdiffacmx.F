@@ -57,6 +57,7 @@ C-----------------------------------------------------------------------
       USE VDIFF_DIAG, NLPCR => NLPCR_MEAN
       USE HGRD_DEFN,only : COLSX_PE, ROWSX_PE
       USE BDSNP_MOD, ONLY: GET_N_DEP
+      USE ELMO_DATA, ONLY : L_ELMO
 
 #ifdef isam
       USE SA_DEFN, ONLY: N_SPCTAG, ISAM, VNAM_SPCTAG, TRANSPORT_SPC,

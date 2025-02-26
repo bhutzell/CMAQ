@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Jun  8, 2022
+C  REVISION HISTORY: Created by EBI solver program, Nov 19, 2024
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -39,16 +39,9 @@ C***********************************************************************
       USE HRDATA
       USE RXNS_DATA
       USE RXNS_FUNCTION
+      USE CONST, ONLY : MWAIR
 
       IMPLICIT NONE
-
-C.....INCLUDES:
-      Include SUBST_CONST          ! common constants
-
-C.....ARGUMENTS: NONE
-
-C.....PARAMETERS: NONE
-
 
 C.....SAVED VARIABLES:
       CHARACTER( 16 ), SAVE  ::  PNAME = 'HRINIT'   ! Program name

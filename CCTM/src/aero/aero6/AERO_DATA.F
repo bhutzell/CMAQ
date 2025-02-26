@@ -85,6 +85,7 @@ C     10 June 2021 G. Sarwar: Added CB6R5M_AE7_AQ
 C 23 Jun 21 G. Sarwar: Replaced CB6R3M with CB6R5M
 C NS 11/28/2023 CRACMM2 updates
 C 10 Jan 24 D. Wong: Incorporated unified coupler implmentation
+C GS 07/31/2024  Added ASEAST
 
 C References:
 C 1. Eddingsaas, N. C., Vandervelde, D. G., Wennberg, P. O., "Kinetics and
@@ -135,7 +136,7 @@ C Define Logical values as T and F for the aerospc table
 
 C Number of aerosol species and modes
 
-      Integer, Parameter :: n_aerolist = 139    ! number of aero species
+      Integer, Parameter :: n_aerolist = 140    ! number of aero species
       Integer, Parameter :: n_mode = 3          ! number of modes:
       Integer, Parameter :: iait = 1            ! 1 = Aitken       
       Integer, Parameter :: iacc = 2            ! 2 = accumulation 
@@ -288,7 +289,8 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('AORGC   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.12), ! Cloud-Processed SOA
      & spcs_list_type('ASOIL   ',F,F,T, cm_set, 2600.0, '       ','       ',0.0  ,'NVL',F,F,  0,  0.6, 0.6,F, 'DUST  ', 0.00), ! Soil
      & spcs_list_type('ACORS   ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  0,  0.6, 0.6,F, 'DUST  ', 0.00), ! Coarse PM
-     & spcs_list_type('ASEACAT ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! SeaSpray Cations        
+     & spcs_list_type('ASEACAT ',F,F,T, cm_cor, 2200.0, '       ','       ',0.0  ,'NVL',F,F,  1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! SeaSpray Cations
+     & spcs_list_type('ASEAST  ',F,T,F, cm_set, 2200.0, '       ','       ',0.0  ,'NVL',F,T, -1,  1.7, 1.7,F, 'SOLUTE', 0.00), ! seasalt tracer        
                                                                                          
        ! Associated with ae6i                                                                
      & spcs_list_type('AMTNO3  ',F,T,F, cm_set, 1400.0, 'MTNO3  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.11), ! Monoterpene Nitrate SOA
@@ -403,8 +405,8 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
       ! The following species are associated with CRACMM2
      & spcs_list_type('AISO4   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.21), ! from heterogeneous uptake of IPX
      & spcs_list_type('AISO5   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.18), ! from heterogeneous uptake of INALD
-     & spcs_list_type('ATRPN   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! SOA from first generation monoterpene nitrate
-     & spcs_list_type('AHONIT  ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14)  ! SOA from second generation monoterpene nitrate
+     & spcs_list_type('ATRPN   ',F,T,F, cm_set, 1400.0, 'TRPN   ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! SOA from first generation monoterpene nitrate
+     & spcs_list_type('AHONIT  ',F,T,F, cm_set, 1400.0, 'HONIT  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14)  ! SOA from second generation monoterpene nitrate
      & /)                                                 
  
 ! Define Reference Emissions Size Distributions
@@ -550,7 +552,7 @@ C Sea-Spray Aerosol Speciation factors based on seawater composition:
 ! ISBN 9780080437514, http://dx.doi.org/10.1016/B0-08-043751-6/06105-3.
 
 C number of chemical species in seawater aerosol composition
-      integer, parameter :: nsea_spc = 17
+      integer, parameter :: nsea_spc = 18
 
       Type( emis_table ), Parameter :: sea_spc( nsea_spc ) = (/
 C                     -description--  -- Species -- --MW--  ------ spcfac ------
@@ -570,6 +572,7 @@ C                                                              fine    coarse
      &   emis_table( 'Lead          ',   'PB     ', 207.2, (/ 6.0E-11, 6.0E-11/) ),   ! Lead
      &   emis_table( 'Cadmium       ',   'CD     ', 112.4, (/ 1.93E-9, 1.93E-9/) ),   ! cadmium
      &   emis_table( 'Air Toxics Mn ',   'MN_HAPS',  54.9, (/ 4.7E-11, 4.7E-11/) ),   ! Air toxics Manganese
+     &   emis_table( 'seasalt tracer',   'SEAST  ',  31.3, (/ 1.00000, 0.00000/) ),   ! seasalt tracer
      &   emis_table( 'Bromine       ',   'BR     ',  79.9, (/ 0.00190, 0.00190/) ),   ! Bromine 
      &   emis_table( 'Water         ',   'H2O    ',  18.0, (/ 0.0    , 0.0    /) ) /) ! Water (uptake is calculated online)
  
@@ -646,6 +649,7 @@ C Required species
       Character( 16 ), Private, Parameter :: req_soil   = 'ASOIL'
       Character( 16 ), Private, Parameter :: req_cors   = 'ACORS'
       Character( 16 ), Private, Parameter :: req_seacat = 'ASEACAT'
+      Character( 16 ), Private, Parameter :: req_seast  = 'ASEAST'
 
 C Indices of required species
       Integer :: aso4_idx
@@ -665,6 +669,7 @@ C Indices of required species
       Integer :: asoil_idx
       Integer :: acors_idx
       Integer :: aseacat_idx
+      Integer :: aseast_idx
 
 C Flag if optional species present
       Logical :: ae6isoa = .False.
@@ -744,6 +749,7 @@ C-------------------------------------------------------------------------------
          Character( 3  ) :: suff         ! Suffix
          Character( 16 ) :: num_name     ! name of aerosol number variable
          Character( 16 ) :: srf_name     ! name of aerosol surface area variable
+         Logical         :: all_mask     ! is this mode ultrafine PM?
          Logical         :: ultrafine_mask ! is this mode ultrafine PM?
          Logical         :: fine_mask    ! is this mode fine PM?
          Logical         :: coarse_mask  ! is this mode coarse PM?
@@ -757,12 +763,19 @@ C-------------------------------------------------------------------------------
 
       Type ( mode_type ), Parameter  :: aeromode( n_mode ) = (/
 C                  suffix   number     surface         Masks       minimum minimum minimum
-C                            name       name     U  F  C AC AI NU  numconc  m2conc  m3conc
-C                  ------- ----------  -------   -  -  - -- -- --  -------- -------  ------
-     &   mode_type('AIT'  ,'NUMATKN', 'SRFATKN', T, T, F, F, T, F, conmin,  conmin, conmin),
-     &   mode_type('ACC'  ,'NUMACC ', 'SRFACC ', F, T, F, T, F, F, conmin,  conmin, conmin),
-     &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', F, F, T, F, F, F, conmin,  conmin, conmin)/)
+C                            name       name     ALL U  F  C AC AI NU  numconc  m2conc  m3conc
+C                  ------- ----------  -------   --- -  -  - -- -- --  -------- -------  ------
+     &   mode_type('AIT'  ,'NUMATKN', 'SRFATKN', T,  T, T, F, F, T, F, conmin,  conmin, conmin),
+     &   mode_type('ACC'  ,'NUMACC ', 'SRFACC ', T,  F, T, F, T, F, F, conmin,  conmin, conmin),
+     &   mode_type('COR'  ,'NUMCOR ', 'SRFCOR ', T,  F, F, T, F, F, F, conmin,  conmin, conmin)/)
 
+
+      ! Indices for mode masks
+      INTEGER, PARAMETER :: IM_ALL = 1, IM_UF = 2, IM_F = 3, IM_C = 4,
+     &                      IM_ACC = 5, IM_AIT = 6, IM_NUC = 7
+
+      CHARACTER( 5 ), PARAMETER :: CMODE(7) = (/ 'TSP  ','PMU  ','PMF  ','PMC  ',
+     &                                           'PMACC','PMAIT','PMNUC'/)
 
       Real          :: moment0_conc( n_mode )     ! 0th moment concentration
       Real          :: moment2_conc( n_mode )     ! 2nd moment concentration
@@ -846,6 +859,39 @@ C Private variables for loading from and unloading to CGRID array
 
       Contains
 
+
+
+C-----------------------------------------------------------------------
+      Subroutine map_mode_mask( mode_mask_in, mode_mask )
+C     Maps the mode mask indices to a vector of logicals correpsonding
+C     to the mode mask.
+C-----------------------------------------------------------------------
+      IMPLICIT NONE
+
+      integer :: mode_mask_in
+      logical :: mode_mask( n_mode )
+
+      ! Select Correct Mode Mask
+      SELECT CASE ( MODE_MASK_IN )
+         CASE( IM_ALL )
+            MODE_MASK = AEROMODE%ALL_MASK
+         CASE( IM_UF )
+            MODE_MASK = AEROMODE%ULTRAFINE_MASK
+         CASE( IM_F )
+            MODE_MASK = AEROMODE%FINE_MASK
+         CASE( IM_C )
+            MODE_MASK = AEROMODE%COARSE_MASK
+         CASE( IM_ACC )
+            MODE_MASK = AEROMODE%ACCUM_MASK
+         CASE( IM_AIT )
+            MODE_MASK = AEROMODE%AITKEN_MASK
+         CASE( IM_NUC )
+            MODE_MASK = AEROMODE%NUC_MASK
+         CASE DEFAULT
+            MODE_MASK = .FALSE.
+      END SELECT
+
+      End Subroutine map_mode_mask
 
 C-----------------------------------------------------------------------
       Subroutine map_aero()
@@ -1020,7 +1066,6 @@ C Build mapping to CGRID for each species in the master AeroList
             End If
          End Do
       End Do
-      Write(logdev,*)' '
 
       ! Migrate all of the user-requested aerosols from AeroList to
       ! AeroSpc. Begin by allocating all of the new arrays now that we
@@ -1097,7 +1142,6 @@ C Build mapping to CGRID for each species in the master AeroList
          End Do
 
       End Do
-      Write(logdev,*)' '
 
 C Build mapping to CGRID for aero # and surf area variables
       aeronum_map = 0
@@ -1161,8 +1205,11 @@ C Find indices of required species
       apoc_idx    = findAero( req_poc,    .True. )
       apncom_idx  = findAero( req_ncom,   .True. )
 
-      If ( ( Index( mechname, 'SAPRC07TIC_AE6I' ) .Gt. 0 ) .OR.
-     &     ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 )  ) Then
+      If ( ( Index( mechname, 'CRACMM3' ) .Gt. 0 ) ) Then
+         aseast_idx  = findAero( req_seast,  .True. )
+      End If
+
+      If ( ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 ) ) Then
          ae6isoa     = .True.
          aietet_idx  = findAero( req_ietet, ae6isoa )
          aieos_idx   = findAero( req_ieos,  ae6isoa )
@@ -1213,11 +1260,8 @@ C AORGH2O is not required, but highly recommended for aero7
          aso4emis_idx   = findAero( req_so4emis,   .True. )
          aso4icbc_idx   = findAero( req_so4icbc,   .True. )
          If ( ( ae6isoa ) .OR.
-     &        ( Index( mechname, 'CRACMM1_'        ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM2'         ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CRACMM3'         ) .Gt. 0 ) .OR.
-     &        ( Index( mechname, 'CRACMM1AMORE_'   ) .Gt. 0 ) .OR.
-     &        ( Index( mechname, 'CB6R3_AE7'       ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R5_AE7'       ) .Gt. 0 ) .OR.
      &        ( Index( mechname, 'CB6R5M_AE7'      ) .Gt. 0 ) ) Then
             oso4_idx       = findAero( req_oso4,       .True. )
@@ -1282,18 +1326,17 @@ C compute aeromode_minNum and aeromode_minM2
       ! Exit if Errors are Detected
       if( AE_eflag )Then
          Write(logdev,99901) Trim( mechname )
-          xmsg = 'The FATAL errors found in namelist used. Check '
+          xmsg = 'FATAL errors found in namelist used. Check '
      &    //  'the log of exiting processor if more details are needed.'
          Call m3exit( pname, 0, 0, xmsg, xstat3 )
       End If 
 
       mapped = .True.
 
-
 99901 Format( 'FATAL Error(s) found in the AE namelist used. Check that' 
      &  /' this AE namelist contains the above required data '
      &  / 'as the file in '
-     &  /'the respository version of the mechanism: ', a )
+     &  /'the repository version of the mechanism: ', a )
       Return
       End Subroutine map_aero
 
@@ -1314,7 +1357,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use const, only : pi, f6pi  
+      Use const, only : pi, f6pi
 
       Implicit None
 
@@ -1443,7 +1486,7 @@ C     Prakash Bhave, Jeff Young, and Sergey Napelenok.
 C     4/2016: Updated for 2nd moment by H. Pye and B. Murphy
 C-----------------------------------------------------------------------
 
-      Use const, only : pi     
+      Use const, only : pi
 
       Implicit None
 
