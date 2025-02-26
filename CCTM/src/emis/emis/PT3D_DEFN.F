@@ -901,11 +901,13 @@ C-----------------------------------------------------------------------
       USE RUNTIME_VARS, ONLY : LOGDEV, IPVERT, PT3DFRAC, REP_LAYR, LOG_MESSAGE
       USE UTILIO_DEFN
       USE CENTRALIZED_IO_MODULE, only : interpolate_var
+      USE CONST, only: CPD
+#ifdef twoway
       USE coupler_module
+#endif
 #ifdef mpas
       USE util_module, only : crlf
 #endif
-      USE CONST, only: CPD
 
       IMPLICIT NONE
 

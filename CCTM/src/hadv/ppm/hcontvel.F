@@ -71,7 +71,9 @@ C-----------------------------------------------------------------------
       USE NOOP_MODULES          ! stenex (using NOOP_COMM_MODULE)
 #endif
       use CENTRALIZED_IO_MODULE, only : interpolate_var, window
+#ifdef twoway
       use coupler_module
+#endif
 
       IMPLICIT NONE
 
