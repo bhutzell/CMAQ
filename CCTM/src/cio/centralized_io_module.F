@@ -134,7 +134,7 @@
 ! stored accordingly.
 
         integer :: n_opened_file = 0
-        integer :: f_met, f_ltng, f_bcon, f_icon, f_is_icon, f_mbiog
+        integer :: f_met, f_ltng, f_bcon, f_icon, f_is_icon, f_mbiog, f_met_emis
         integer, allocatable :: f_emis(:), f_stk_emis(:)
 
         integer :: file_sdate(max_nfiles) = -1
@@ -239,6 +239,14 @@
         integer, allocatable :: cio_emis_file_endrow(:)
         integer              :: cio_emis_nlays                     ! max value among cio_emis_file_layer
 
+! - met_emis temperature-dependent emission data          
+        character (16), save :: cio_met_emis_file_name = 'MET_EMIS_TBL'
+        integer              :: cio_met_emis_file_startcol
+        integer              :: cio_met_emis_file_endcol
+        integer              :: cio_met_emis_file_startrow
+        integer              :: cio_met_emis_file_endrow
+        integer              :: cio_met_emis_nlays                     ! max value among cio_emis_file_layer
+
 ! this is for MPAS only
         integer, allocatable :: num_dist_layers(:,:)      ! number of layers in MPAS grid has re-distributed emission data
         real, allocatable    :: dist_frac(:,:,:)          ! calculated layer distribution fraction
@@ -341,6 +349,9 @@
      &                      n_is3d,              ! # of initial condition 3d variables for ISAM
      &                      n_e2d,               ! # of 2d emission variables
      &                      n_e3d,  size_e3d,    ! # of 3d emission variables and a variable size
+     &                      n_e3dm, size_e3dm,   ! # of 2d emission variables with temperature-
+                                                 !   dependent 3rd dimension and a  variable size
+                                                 !   (this is for METEMIS)
      &                      n_mb3d,              ! # of 3d met boundary variables
      &                      n_b3d,               ! # of 3d boundary variables
      &                              size_b3d,    ! a 3d boundary variable size
@@ -607,7 +618,7 @@
           USE RUNTIME_VARS, only : N_FILE_GR,
      &                             STDATE, WB_DUST, ISAM_NEW_START,
      &                             local_tstep, met_tstep, NLDNSTRIKE,
-     &                             LPVO3
+     &                             LPVO3, MET_EMIS
           use LSM_Mod, only : LAND_SCHEME
           use cgrid_spcs, only : n_gc_spcd, n_ae_spc
 #ifdef mpas
@@ -627,8 +638,10 @@
      &                        nl, s, e, c, time, floc, mype_p1, lnvars3d
           character( 32 )  :: tname, fname
 
+
           character( 24 ), allocatable :: c2d_name(:, :), c3d_name(:, :), 
      &                                    d3d_name(:,:), emis_name(:,:),
+     &                                    met_emis_name(:,:),
      &                                    i3d_name(:,:), is3d_name(:,:),
      &                                    l2d_name(:,:), medc_name(:,:)
           logical :: done = .false.
@@ -1092,6 +1105,72 @@
           end if
 
 #ifndef mpas
+! Setup Met-Emis temperature-dependent emissions file
+          if ( MET_EMIS ) then
+             n_opened_file = n_opened_file + 1
+             f_met_emis    = n_opened_file
+
+             ! Open Temperature-Binned Mobile Emission File and read header
+             fname = cio_met_emis_file_name
+             call mio_fopen( fname, mio_read_only )
+             floc = mio_search( fname )
+
+             ! Check whether file is for a representative day
+             call log_message( logdev, '' )
+             file_sym_date(f_met_emis) = emis_sym_date ! Master switch to change default
+             call get_env(file_sym_date(f_met_emis), "MET_EM_SYM_DATE",
+     &                    file_sym_date(f_met_emis), logdev )
+
+             ! Load Sub-domain Grid Parameters
+             call subhfile ( fname, gxoff, gyoff,
+     &                       cio_met_emis_file_startcol, cio_met_emis_file_endcol, 
+     &                       cio_met_emis_file_startrow, cio_met_emis_file_endrow )
+
+             ! Load File Properties into CIO Variables
+             call mio_get_global_attr (fname, 'SDATE', file_sdate(f_met_emis))
+             call mio_get_global_attr (fname, 'STIME', file_stime(f_met_emis))
+             call mio_get_global_attr (fname, 'TSTEP', file_tstep(f_met_emis))
+             call mio_get_global_attr (fname, 'XCELL', file_xcell(f_met_emis))
+             call mio_get_global_attr (fname, 'YCELL', file_ycell(f_met_emis))
+
+             ! Load Variable List Attributes
+             n_e3dm = mio_file_data(floc)%nvars
+             cio_met_emis_nlays = mio_file_data(floc)%nlays
+             
+             
+             allocate (met_emis_name(n_e3dm, 3), stat=stat)
+             if (stat .ne. 0) then
+                xmsg = 'Failure allocating met_emis_name '
+                call m3exit (pname, 0, 0, xmsg, xstat1 )
+             end if
+             end = 0
+             do v = 1, mio_file_data(floc)%nvars
+                met_emis_name(v,1) = trim(mio_file_data(floc)%var_name(v)) // '_MEM'
+             end do
+             met_emis_name(:, 2) = 'e3dm'       ! denote emission 3d variable
+             met_emis_name(:, 3) = ' '          ! not a meteorological variable
+ 
+             ! Find Initial Time Step
+             found = .false.
+             ldate = file_sdate(f_met_emis)
+             ltime = file_stime(f_met_emis)
+             if (ldate == stdate) then
+                found = .true.
+             else
+                t = 1
+                do while ((t < mio_file_data(floc)%nsteps) .and. (.not. found))
+                   call nextime (ldate, ltime, file_tstep(f_met_emis))
+                   if (ldate == stdate) then
+                      found = .true.
+                   end if
+                   t = t + 1
+                end do
+             end if 
+             
+          end if
+#endif
+
+#ifndef mpas
 ! setup initial condition file
           n_i3d = 0
           n_opened_file = n_opened_file + 1
@@ -1182,18 +1261,10 @@
              begin = end + 1
 
              write (tname, '(a1, i3.3)') '_', n
-!#ifdef mpas
              do v = 1, mio_file_data(floc)%nvars
                 end = end + 1
                 emis_name(end,1) = trim(mio_file_data(floc)%var_name(v)) // tname
              end do
-
-!#else
-!             do v = 1, nvars3d
-!                end = end + 1
-!                emis_name(end,1) = trim(vname3d(v)) // tname
-!             end do
-!#endif
 
              if (nl .eq. 1) then
                 emis_name(begin:end, 2) = 'e2d'        ! e denote emission 2d variable
@@ -1257,7 +1328,8 @@
 #endif
 
 ! combining all files
-          n_cio_grid_vars = n_c2d + n_c3d + n_d3d + n_e2d + n_e3d + n_l2d + n_i3d + n_is3d
+          n_cio_grid_vars = n_c2d + n_c3d + n_d3d + n_e2d + 
+     &                      n_e3d + n_e3dm + n_l2d + n_i3d + n_is3d
 
 #ifdef mpas
           cro_ncols = ncols
@@ -1301,8 +1373,9 @@
              size_c3d = size_c2dx * nlays
           end if
 
-          size_e3d = size_s2d * cio_emis_nlays
-          size_s3d = size_s2d * nlays
+          size_e3d  = size_s2d * cio_emis_nlays
+          size_e3dm = size_s2d * cio_met_emis_nlays
+          size_s3d  = size_s2d * nlays
 
           size_lt = size_s2d * cio_LTLYRS
 
@@ -1315,6 +1388,7 @@
      &                            + size_c2d  * 3 * n_e2d                ! 2d emis data
      &                            + size_c3d  * 3 * n_c3d                ! 3D met data
      &                            + size_e3d  * 3 * n_e3d                ! 3d emis data 
+     &                            + size_e3dm * 3 * n_e3dm               ! 3d met-emis data 
      &                            + size_s3d  * 3 * n_i3d                ! 3d initial condition data 
      &                            + size_s3d  * 3 * n_is3d               ! 3d ISAM initial condition data 
      &                            + size_d3dx * 3 * n_d3d                ! 3d dot data
@@ -1348,6 +1422,12 @@
           begin = end + 1
           end = end + n_e2d + n_e3d
           cio_grid_var_name(begin:end, :) = emis_name
+
+          if ( met_emis ) then
+             begin = end + 1
+             end = end + n_e3dm
+             cio_grid_var_name(begin:end, :) = met_emis_name
+          end if
 
 #ifndef mpas
           begin = end + 1
@@ -1397,6 +1477,8 @@
                 d_size = size_c3d
              else if (cio_grid_var_name(v,2) .eq. 'e3d') then
                 d_size = size_e3d
+             else if (cio_grid_var_name(v,2) .eq. 'e3dm') then
+                d_size = size_e3dm
              else if ((cio_grid_var_name(v,2) .eq. 'ic') .or.
      &                (cio_grid_var_name(v,2) .eq. 'is')) then
                 d_size = size_s3d
@@ -1543,7 +1625,7 @@
 
                 begin = cio_grid_data_inx(1,buf_loc,v)
                 end   = cio_grid_data_inx(2,buf_loc,v)
-
+ 
                 if (cio_grid_var_name(v,2) == 'mc2') then
 
 #ifndef mpas
@@ -1766,7 +1848,81 @@
                    cio_grid_data(begin:end) = reshape (tdata_3ds, (/x_cro_ncols * x_cro_nrows * cio_emis_file_layer(fnum)/))
 
 #endif
+ 
+                else if (cio_grid_var_name(v,2) == 'e3dm') then
 
+                   str_len = len_trim(cio_grid_var_name(v,1))
+                   loc_vname = cio_grid_var_name(v,1)(1:str_len-4)
+
+#ifdef mpas
+                   floc = cio_met_emis_file_loc
+
+                   if (.not. allocated(mpas_tdata)) then
+                      allocate (mpas_tdata(ncols, nlays), 
+     &                          temp_data_1d(ncols),
+     &                          stat=stat)
+                   end if
+
+                   file_tstep(f_met_emis) = mio_file_data(floc)%tstep
+
+                   ! Check if its a representative day on start-up (every other
+                   ! time it will be managed by the emissions processing)
+                   if (firstime) then
+                     if (file_sym_date(f_met_emis)) loc_jdate(f_met_emis) = file_sdate(f_met_emis)
+                   end if
+                   data_jdate = loc_jdate(f_met_emis)
+                   data_jtime = loc_jtime(f_met_emis)
+
+                   call mio_time_format_conversion (data_jdate, data_jtime, loc_mpas_time_stamp)
+
+                   call mio_fread (cio_met_emis_file_name,
+     &                             loc_vname,
+     &                             pname,
+     &                             temp_data_1d,
+     &                             loc_mpas_time_stamp)
+
+                   cio_mpas_grid_data_tstamp(buf_loc, v) = loc_mpas_time_stamp
+
+                   call mio_time_format_conversion (loc_mpas_time_stamp, data_jdate, data_jtime)
+
+! de-normalized the data 
+                   mpas_tdata = 0.0
+                   do i = 1, ncols
+                      do k = 1, num_dist_layers(i,fnum)
+!                        mpas_tdata(i,k) = temp_data_1d(i) * dist_frac(k,i,fnum)
+                         mpas_tdata(i,k) = temp_data_1d(i) * dist_frac(k,i,fnum) * cell_area(i,1)
+                      end do
+                   end do
+
+                   t_beg = begin
+                   t_end = begin + ncols - 1
+                   do k = 1, nlays
+                      cio_grid_data(t_beg:t_end) = mpas_tdata(:,k)
+                      t_beg = t_end + 1
+                      t_end = t_end + ncols
+                   end do
+
+#else
+                   ! Check if its a representative day on start-up (every other time it will
+                   ! be managed by the emissions processing) 
+                   if (firstime) then  
+                     if (file_sym_date(f_met_emis)) loc_jdate(f_met_emis) = file_sdate(f_met_emis)
+                   end if
+                   data_jdate = loc_jdate(f_met_emis)
+                   data_jtime = loc_jtime(f_met_emis)
+
+                   call mio_time_format_conversion (data_jdate, data_jtime, timestamp)
+
+                   call mio_fread (cio_met_emis_file_name, loc_vname, pname,
+     &                             cio_met_emis_file_startcol, cio_met_emis_file_endcol,
+     &                             cio_met_emis_file_startrow, cio_met_emis_file_endrow,
+     &                             1, cio_met_emis_nlays, tdata_3ds, timestamp)
+
+                   cio_grid_data(begin:end) = reshape (tdata_3ds,
+     &                            (/x_cro_ncols * x_cro_nrows * cio_met_emis_nlays/))
+
+#endif
+ 
                 else if (cio_grid_var_name(v,2) == 'ic') then
 
 #ifndef mpas
@@ -4328,16 +4484,20 @@ C   mminlu and num_land_cat are WRF global variables
           integer, save :: prev_head_time = -1
           integer, save :: lcount = 0
           real, save :: ratio1, ratio2
-          character (40) :: msg, loc_vname
+          character (50) :: msg, loc_vname
           character (20) :: loc_mpas_time_stamp
-
+ 
           if (present(fname)) then
-             slen = len_trim(fname)
-             loc_vname = trim(vname) // fname(slen-3:slen)
+             if ( fname .eq. cio_met_emis_file_name ) then
+                loc_vname = trim(vname) // '_MEM'
+             else
+                slen = len_trim(fname)
+                loc_vname = trim(vname) // fname(slen-3:slen)
+             end if
           else
              loc_vname = vname
           end if
-
+ 
           var_loc = binary_search (loc_vname, vname_3d, n3d_data)
 
           if (var_loc .gt. 0) then
@@ -4362,6 +4522,8 @@ C   mminlu and num_land_cat are WRF global variables
                    read (cio_grid_var_name(var_loc,1)(slen-2:slen), *) fnum
 
                    loc_tstep = file_tstep(f_emis(fnum)) 
+                else if (cio_grid_var_name(var_loc,2) == 'e3dm') then
+                   loc_tstep = file_tstep(f_met_emis) 
                 else if (cio_grid_var_name(var_loc,2) == 'lnt') then
                    loc_tstep = file_tstep(f_ltng)
                 else if (cio_grid_var_name(var_loc,2) == 'ic') then
@@ -6398,7 +6560,7 @@ C Read the various categories of normalized emissions
      &               col_size, extra_c, extra_r, adj1, adj2, adj3,
      &               slen, str_len, fnum, loc_tstep
 
-          character (20) :: loc_vname
+          character (50) :: loc_vname
           integer, save :: prev_time = -1
           integer, save :: prev_head_time = -1
           integer, save :: prev_tail_time = -1
@@ -6406,9 +6568,14 @@ C Read the various categories of normalized emissions
           real, save :: ratio1, ratio2
           character(200) :: xmsg
 
+
           if (present(fname)) then
-             slen = len_trim(fname)
-             loc_vname = trim(vname) // fname(slen-3:slen)
+             if ( fname .eq. cio_met_emis_file_name ) then
+                loc_vname = trim(vname) // '_MEM'
+             else
+                slen = len_trim(fname)
+                loc_vname = trim(vname) // fname(slen-3:slen)
+             end if
           else
              loc_vname = vname
           end if
@@ -6431,6 +6598,8 @@ C Read the various categories of normalized emissions
                 read (cio_grid_var_name(var_loc,1)(str_len-2:str_len), *) fnum
 
                 loc_tstep = file_tstep(f_emis(fnum)) 
+             else if (cio_grid_var_name(var_loc,2) == 'e3dm') then
+                loc_tstep = file_tstep(f_met_emis)
              else if (cio_grid_var_name(var_loc,2) == 'lnt') then
                 loc_tstep = file_tstep(f_ltng)
              else if (cio_grid_var_name(var_loc,2) == 'ic') then

@@ -1110,7 +1110,7 @@
          END DO
                
          ! Store MIO Metadata
-        NDIMS3D( 1:NVARS3D ) = 4
+         NDIMS3D( 1:NVARS3D ) = 4
          L_TSTEP( 1:NVARS3D ) = .True.
          L_LAY  ( 1:NVARS3D ) = .True.
          L_COL  ( 1:NVARS3D ) = .True.

@@ -34,10 +34,12 @@
         !!-----------------------------------------------------------------------
 
         USE DESID_VARS
-        USE RUNTIME_VARS, ONLY: MYPE
+        USE LOGDEV_MOD, ONLY: MYPE, LOGDEV, LOG_MESSAGE
         USE HGRD_DEFN             ! horizontal domain specifications
         USE ASX_DATA_MOD          ! all gridded input variables, as Met_Data%*(ncols,nrows)
         USE UTILIO_DEFN
+        USE MIO_MODULE
+        USE MIO_ASCII
 
         IMPLICIT NONE
         
@@ -46,14 +48,14 @@
         PUBLIC METEMIS_INIT, GET_METEMIS
 
         INTEGER           , PUBLIC, PROTECTED, SAVE :: NMETSPC
-        CHARACTER(NAMLEN3), PUBLIC, PROTECTED, SAVE :: MTNAME( MXVARS3 )
-        CHARACTER(NAMLEN3), PUBLIC, PROTECTED, SAVE :: MTUNIT( MXVARS3 )
-        CHARACTER(NAMLEN3), PUBLIC, PROTECTED, SAVE :: MTBASIS( MXVARS3 )
+        CHARACTER( 16 )   , PUBLIC, PROTECTED, SAVE :: MTNAME( MXVARS3 )
+        CHARACTER( 16 )   , PUBLIC, PROTECTED, SAVE :: MTUNIT( MXVARS3 )
+        CHARACTER( 16 )   , PUBLIC, PROTECTED, SAVE :: MTBASIS( MXVARS3 )
         REAL              , PUBLIC, PROTECTED, SAVE :: MET_WT( MXVARS3 )
         REAL,  ALLOCATABLE, PUBLIC, PROTECTED, SAVE :: MTEMPS( : )
         REAL,  ALLOCATABLE, PUBLIC, PROTECTED, SAVE :: VDEMIS_MV( :,:,: ) !! ( NMETSPC,NCOLS,NROWS )
         REAL,  ALLOCATABLE, PRIVATE, PROTECTED, SAVE :: VDEMIS_MVDIAG( :,:,: ) !! ( NMETSPC,NCOLS,NROWS )
-        LOGICAL, ALLOCATABLE,PRIVATE,PROTECTED, SAVE :: MT_GAS( : ), MT_DSL( : )
+        LOGICAL, ALLOCATABLE,PRIVATE,PROTECTED, SAVE :: MT_GSL( : ), MT_DSL( : )
 
 
         PRIVATE     !!  everything else
@@ -75,9 +77,8 @@
 
         INTEGER, SAVE :: SDATEMT
         INTEGER, SAVE :: STIMEMT
-        INTEGER, SAVE :: TSTEPMT
 
-        CHARACTER*16, SAVE :: TBLNAME = 'METEMIS_TBL'
+        CHARACTER*16, SAVE :: TBLNAME = 'MET_EMIS_TBL'
 
         REAL, ALLOCATABLE, SAVE :: ETABLE( :,:,:,: )  !! ( NCOLS,NROWS,NMTEMP,NMETSPC )
         REAL, ALLOCATABLE, SAVE :: TEMPVAL( :,: )     !! ( NCOLS,NROWS ) for temperature
@@ -97,50 +98,24 @@
 
         LOGICAL FUNCTION METEMIS_INIT( JDATE, JTIME, TSTEP )
 
-            USE RUNTIME_VARS, ONLY: MYPE
-
             INTEGER, INTENT(IN   ) :: JDATE, JTIME
             INTEGER, INTENT(IN   ) :: TSTEP
 
             CHARACTER*24, PARAMETER :: PNAME = 'METEMIS:METEMIS_INIT'
 
-            INTEGER         ISTAT, ISPC, K, N
+            INTEGER         ISTAT, ISPC, IT, K, N, V, FLOC
             CHARACTER*256   MESG
+            REAL, ALLOCATABLE :: MTEMP(:)
 
-            !!........  Open MVMT and read header
+            ! Open Temperature-Binned Mobile Emission File and read header
+            FLOC = MIO_SEARCH( TBLNAME )          
 
-            IF ( .NOT.OPEN3( TBLNAME, FSREAD3, PNAME ) ) THEN
-                CALL M3WARN( PNAME, 0,0, 'Could not open "'//TRIM(TBLNAME)//'"')
-                METEMIS_INIT = .FALSE.
-                RETURN
-            ELSE IF ( .NOT.DESC3( TBLNAME ) ) THEN
-                CALL M3WARN( PNAME, 0,0, 'Could not DESC3( MTEMP )')
-                METEMIS_INIT = .FALSE.
-                RETURN
-            ELSE IF ( .NOT.FILCHK3( TBLNAME,  GRDDED3,
-     &                              GL_NCOLS, GL_NROWS, NLAYS3D, NTHIK3D ) ) THEN
-                CALL M3WARN( PNAME, 0,0, 'Inconsistent dims for "'//TRIM(TBLNAME)//'"')
-                METEMIS_INIT =.FALSE.
-                RETURN
-            ELSE IF ( .NOT.GRDCHK3( TBLNAME,
-     &                              P_ALP_GD, P_BET_GD, P_GAM_GD, XCENT_GD, YCENT_GD,
-     &                              XORIG_GD, YORIG_GD, XCELL_GD, YCELL_GD,
-     &                              NLAYS3D, VGTYP3D, VGTOP3D, VGLVS3D ) ) THEN
-                CALL M3WARN( PNAME, 0,0, 'Inconsistent coord/grid  for "'//TRIM(TBLNAME)//'"')
-                METEMIS_INIT = .FALSE.
-                RETURN
-            ELSE
-                SDATEMT = SDATE3D
-                STIMEMT = STIME3D
-                TSTEPMT = TSTEP3D
-                NMTEMP  = NLAYS3D
-                NMETSPC = NVARS3D
-            END IF      !!  if not open3() ...else...
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'SDATE', SDATEMT )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'STIME', STIMEMT )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NLAYS', NMTEMP )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'NVARS', NMETSPC )
 
-            CALL SUBHFILE( TBLNAME, GXOFF, GYOFF, STRTCOL, ENDCOL,
-     &                     STRTROW, ENDROW )
-
-         !!........  Allocate input-related arrays:
+            ! Allocate and initialize input-related arrays:
             ALLOCATE( DESID_EMVAR( IMETSRM )%ARRY ( NMETSPC ),
      &                DESID_EMVAR( IMETSRM )%UNITS( NMETSPC ),
      &                DESID_EMVAR( IMETSRM )%MW   ( NMETSPC ),
@@ -150,46 +125,55 @@
      &                DESID_EMVAR( IMETSRM )%LAREA( NMETSPC ),
      &                DESID_EMVAR( IMETSRM )%LAREAADJ( NMETSPC ),
      &                ETABLE( NCOLS,NROWS,NMTEMP,NMETSPC ),
-     &                TEMPVAL( NCOLS,NROWS ), MTEMPS( NMTEMP ),
+     &                TEMPVAL( NCOLS,NROWS ), 
+     &                MTEMP( 0:NMTEMP+1 ), MTEMPS( NMTEMP ),
      &                VDEMIS_MV( NMETSPC,NCOLS,NROWS ),
      &                VDEMIS_MVDIAG( NMETSPC,NCOLS,NROWS ), STAT = ISTAT )
+            IF ( ISTAT .NE. 0 ) THEN
+                WRITE( MESG, '( A, I9 )' ) 'Error allocating ETABLE:  STATUS=', ISTAT
+                !CALL M3WARN( PNAME, 0, 0, MESG )
+                CALL LOG_WARNING( PNAME, LOGDEV, MESG )
+                METEMIS_INIT = .FALSE.
+                RETURN
+            END IF
+            
             ETABLE = 0.0
             TEMPVAL= 0.0
             VDEMIS_MVDIAG = 0.0
             
-            MTEMPS( 1:NMTEMP )  = VGLVS3D( 1:NMTEMP )
-            MTNAME( 1:NMETSPC ) = VNAME3D( 1:NMETSPC )
-            MTUNIT( 1:NMETSPC ) = UNITS3D( 1:NMETSPC )
+            CALL MIO_GET_GLOBAL_ATTR (TBLNAME, 'VGLVLS', MTEMP )
+            DO IT = 1,NMTEMP
+                MTEMPS( IT ) = MTEMP( IT )
+            END DO
+
+            DO ISPC = 1,NMETSPC
+               MTNAME( ISPC ) = MIO_FILE_DATA( FLOC )%VAR_NAME( ISPC )
+               MTUNIT( ISPC ) = MIO_FILE_DATA( FLOC )%UNITS( ISPC )
+            END DO   
             MTBASIS( 1:NMETSPC) = 'UNIT'
 
+            ! Map Emission Variables Needed for Humidity Adjustment
             IF (HUM_NOX_YN) THEN
                 ALLOCATE( QVMOL( NCOLS,NROWS,NLAYS), STAT = ISTAT ) 
                 QVMOL= 0.0
-                ALLOCATE( MT_GAS( NMETSPC ), MT_DSL( NMETSPC ), STAT=ISTAT )
-                MT_GAS = .FALSE.
+                ALLOCATE( MT_GSL( NMETSPC ), MT_DSL( NMETSPC ), STAT=ISTAT )
+                MT_GSL = .FALSE.
                 MT_DSL = .FALSE.
 
                 DO ISPC = 1,NMETSPC
-                    IF ( MTNAME( ISPC ) .EQ. 'NO_GAS' .OR.
-     &                   MTNAME( ISPC ) .EQ. 'NO2_GAS' .OR.
-     &                   MTNAME( ISPC ) .EQ. 'HONO_GAS' ) THEN
-                      MT_GAS( ISPC ) = .TRUE.
-                    ELSE IF( MTNAME( ISPC ) .EQ. 'NO_DIS' .OR.
-     &                       MTNAME( ISPC ) .EQ. 'NO2_DIS' .OR.
-     &                       MTNAME( ISPC ) .EQ. 'HONO_DIS' ) THEN
+                    IF ( MTNAME( ISPC ) .EQ. 'NO_GSL' .OR.
+     &                   MTNAME( ISPC ) .EQ. 'NO2_GSL' .OR.
+     &                   MTNAME( ISPC ) .EQ. 'HONO_GSL' ) THEN
+                      MT_GSL( ISPC ) = .TRUE.
+                    ELSE IF( MTNAME( ISPC ) .EQ. 'NO_DSL' .OR.
+     &                       MTNAME( ISPC ) .EQ. 'NO2_DSL' .OR.
+     &                       MTNAME( ISPC ) .EQ. 'HONO_DSL' ) THEN
                       MT_DSL( ISPC ) = .TRUE.
                     END IF
                END DO
             END IF
 
-
-            IF ( ISTAT .NE. 0 ) THEN
-                WRITE( MESG, '( A, I9 )' ) 'Error allocating ETABLE:  STATUS=', ISTAT
-                CALL M3WARN( PNAME, 0, 0, MESG )
-                METEMIS_INIT = .FALSE.
-                RETURN
-            END IF
-
+            ! Populate Data-Structures needed for DESID
             DESID_EMVAR( IMETSRM )%LEN   = NMETSPC
             DESID_EMVAR( IMETSRM )%ARRY  = MTNAME( 1:NMETSPC )
             DESID_EMVAR( IMETSRM )%UNITS = MTUNIT( 1:NMETSPC )
@@ -200,52 +184,46 @@
             DESID_EMVAR( IMETSRM )%LAREA = .FALSE.
             DESID_EMVAR( IMETSRM )%LAREAADJ = .FALSE.
             
+            ! Initialize Time Parameters
             MV_TSTEP = TIME2SEC( TSTEP )
             MV_TSTEP_F = TSTEP
-
             LDATE = STDATE; LTIME = STTIME
 
-            IF ( .NOT.METEMDIAG ) THEN
+
+            ! Open Diagnostic File if Requested
+            IF ( .NOT.MET_EMIS_DIAG ) THEN
                 CONTINUE
 
-            ELSE IF( IO_PE_INCLUSIVE ) THEN
-
-                FDATE = STDATE
-                FTIME = STTIME
-                CALL NEXTIME( FDATE, FTIME, TSTEP )
-                SDATE3D = FDATE
-                STIME3D = FTIME
-                TSTEP3D = TSTEP
-                FTYPE3D = GRDDED3
-                NCOLS3D = GL_NCOLS
-                NROWS3D = GL_NROWS
-                NLAYS3D = 1
-                NTHIK3D = 1
-                GDTYP3D = GDTYP_GD
-                GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-                P_ALP3D = P_ALP_GD
-                P_BET3D = P_BET_GD
-                P_GAM3D = P_GAM_GD
-                XORIG3D = XORIG_GD
-                YORIG3D = YORIG_GD
-                XCENT3D = XCENT_GD
-                YCENT3D = YCENT_GD
-                XCELL3D = XCELL_GD
-                YCELL3D = YCELL_GD
-                VGTYP3D = VGTYP_GD
-                VGTOP3D = VGTOP_GD
-
+            ELSE !IF( IO_PE_INCLUSIVE ) THEN
+#ifdef mpas
+                call mio_fcreate( CTM_METEMIS_DIAG, mio_new_file )
+#else
+                
                 NVARS3D = NMETSPC
+                NLAYS3D = 1
 
-                !! borrow rest of FDESC from input-file...
-                FDESC3D      = ' '
-                FDESC3D( 1 ) = 'hourly met-modulated mobile emissions (diagnostic outputs)'
-                IF ( .NOT. OPEN3( CTM_METEMIS_DIAG, FSUNKN3, PNAME ) ) THEN
-                    CALL M3WARN( PNAME, 0,0, 'Could not open '//CTM_METEMIS_DIAG )
-                    METEMIS_INIT = .FALSE.
-                    RETURN
-                END IF
+                DO V = 1,NVARS3D
+                  VTYPE3D( V ) = M3REAL
+                  VNAME3D( V ) = MTNAME( V )
+                  UNITS3D( V ) = MTUNIT( V )
+                  VDESC3D( V ) = 'met-modulated mobile emission rate for '//TRIM( VNAME3D( V ) )
+                END DO
 
+                ! Store MIO Metadata
+                NDIMS3D( 1:NVARS3D ) = 4
+                L_TSTEP( 1:NVARS3D ) = .True.
+                L_LAY  (1 :NVARS3D ) = .True. ! even if 2D
+                L_COL  (1 :NVARS3D ) = .True. 
+                L_ROW  (1 :NVARS3D ) = .True. 
+                L_VEXT (1 :NVARS3D ) = .False.
+
+                CALL LOAD_MIO_FILE ( CTM_METEMIS_DIAG, 1, 1, 1,
+     &               VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &               VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &               L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &               L_VEXT(1:NVARS3D) )
+
+#endif
             END IF
 
             METEMIS_INIT = .TRUE.
@@ -260,7 +238,6 @@
         SUBROUTINE GET_METEMIS( JDATE, JTIME, TSTEP, L_DESID_DIAG )
 
             USE DESID_VARS
-            USE RUNTIME_VARS, ONLY: MYPE
             USE HGRD_DEFN             ! horizontal domain specifications
             USE ASX_DATA_MOD          ! all gridded input variables, as Met_Data%*(ncols,nrows)
             USE UTILIO_DEFN
@@ -290,11 +267,17 @@
             REAL            TF2, QV, QVM, ADJ, PP, E1, E2, A, B
             CHARACTER*16    VNAME
             CHARACTER*512   MESG
+            CHARACTER( 20 ) :: TIMESTAMP
         !!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
             IF ( FIRSTIME ) THEN
                TOT_TSTEP = 0
                FIRSTIME = .FALSE.
+                
+               ! Create Output Diagnostic File
+               call mio_setfile( MET_CRO_2D )
+               call mio_fcreate( CTM_METEMIS_DIAG, mio_new_file )
+
             END IF
 
             WRITE( MESG, '(A,I8)' ),
@@ -306,12 +289,11 @@
             ! the most recent time point on the table.
             STIMEMT = INT( JTIME/10000 ) * 10000
             IF ( PRVHR .NE. STIMEMT ) THEN
-                IF( .NOT.XTRACT3( TBLNAME, ALLVAR3, 1, NMTEMP,
-     &                         STRTROW, ENDROW, STRTCOL, ENDCOL,
-     &                         SDATEMT, STIMEMT, ETABLE ) ) THEN
-                    MESG = 'Error(s) reading "'//TRIM(TBLNAME)//'"'
-                    CALL M3EXIT( PNAME, SDATEMT, STIMEMT, MESG, 2 )
-                END IF
+                CALL MIO_TIME_FORMAT_CONVERSION( SDATEMT, STIMEMT, TIMESTAMP )
+                DO V = 1,NMETSPC
+                   CALL MIO_FREAD( TBLNAME, MTNAME(V),
+     &                             PNAME, ETABLE(:,:,:,V), TIMESTAMP )
+                END DO
                 PRVHR = STIMEMT
             END IF
             
@@ -334,7 +316,7 @@
                         VDEMIS_MV( V,C,R ) =  ETABLE( C,R,1,V )
                     END DO
 
-                ELSE IF ( TF2 .GT. MTEMPS( NMTEMP ) ) THEN     !!  error?  above top of table-temperatures
+                    ELSE IF ( TF2 .GT. MTEMPS( NMTEMP ) ) THEN     !!  error?  above top of table-temperatures
 
                     DO V = 1, NMETSPC
                         VDEMIS_MV( V,C,R ) = ETABLE( C,R,NMTEMP,V )
@@ -371,7 +353,7 @@ C.................  NOx humidity corrections for mobile sources (MOVES3)
                   QV  = QVMOL( C,R,1 ) * 1000.0  ! convert from kg water/kg dry air to g/kg
 
                   DO V = 1, NMETSPC
-                      IF( MT_GAS( V ) ) THEN
+                      IF( MT_GSL( V ) ) THEN
                           ! Correct Gasoline Emission (NO, NO2, and HONO) for Humidity
                           A = MIN( QV, 17.71 )
                           B = MAX( 3.0, A )
@@ -402,22 +384,20 @@ C ..........  Determine the time to read and/or write the hourly files
                  NTICS = 0
                  TOT_TSTEP = 0
                  CALL NEXTIME( LDATE, LTIME, MV_TSTEP_F)
+                 CALL MIO_TIME_FORMAT_CONVERSION( LDATE, LTIME, TIMESTAMP )
                  R_READY = .TRUE.
               END IF
 
 
 C ..........  Output diagnostic emissions
-              IF ( METEMDIAG ) THEN
+              IF ( MET_EMIS_DIAG ) THEN
                 
                  VDEMIS_MVDIAG = VDEMIS_MVDIAG + VDEMIS_MV   ! array assignment
                  IF ( LASTTIC ) THEN   ! time to write out
                     VDEMIS_MVDIAG = VDEMIS_MVDIAG / REAL( MTICS, 4 )  ! array assignment
                     DO V = 1, NMETSPC
-                      IF ( .NOT. WRITE3( CTM_METEMIS_DIAG, MTNAME(V), 
-     &                                   LDATE, LTIME,VDEMIS_MVDIAG( V,:,:) ) ) THEN
-                         XMSG = 'Could not write to ' // TRIM( CTM_METEMIS_DIAG )
-                         CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
-                      END IF
+                        CALL MIO_FWRITE( 'CTM_METEMIS_DIAG', MTNAME(V), PNAME,
+     &                                   VDEMIS_MVDIAG( V,:,:), TIMESTAMP ) 
                     END DO
                     WRITE( LOGDEV,94040 )
      &                     'Timestep written to', TRIM( CTM_METEMIS_DIAG ),
