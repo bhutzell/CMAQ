@@ -21,7 +21,7 @@
 !       Lay_Top - Top layer for each file                                      !
 !       File_Vars(f,:) - These may be CMAQ species, deposition of CMAQ species !
 !             (species name preceeded by DD_ for dry deposition and WD_ for    !
-!             wet deposition, COMPOSITES defined in CMAQ_Chemistry_Control.nml,!
+!             wet deposition, COMPOSITES defined in CMAQ_Chemistry_Control.nml,
 !             or keywords defined in the Keywd list below.                     !
 !                                                                              !
 !             For aerosols, the bulk name (e.g. ASO4 for sulfate) may be used  !
@@ -43,7 +43,7 @@
 !             density, and surface area, select chemical reaction parameters,  !
 !             and meteorological variables.                                    !
 !                                                                              !
-!             For ISAM or DDM simulations, suffixes may be added to deposition,!
+!             For ISAM or DDM simulations, suffixes may be added to deposition,
 !             concentration, or COMPOSITE variables to specify source          !
 !             attribution. For example, NO2_EGU would output NO2 specific for  !
 !             EGU sources, provided a source sector is named EGU. Entering     !
@@ -58,7 +58,7 @@
 &ELMO_INIT
   N_Files = 2
   N_Max_Output_Variables = 400
-  N_Keywords = 68
+  N_Keywords = 70
   N_Max_Keyword_Variables = 150
 /
 
@@ -115,9 +115,11 @@
                'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES_A',
                'PM25_SPECIES_B','SIZE','AMS_SPECIES','PM_FINE_VARS','PM25TO10_SPECIES',
                'PM25_VARS','CUTOFF_FRACTIONS','COMMON_GASES','DMS','MSA','GAS_TOXICS',
-               'PM_TOXICS'
+               'PM_TOXICS','CL2','ETOH','HCL','MEOH','ETHYLBENZENE','STYRENE','XYLENE',
+               'TOLU','NAPHTHALENE'
 
-  Keywd_name(5) = 'DEFAULT_SAPRC07TIC_AE7I'
+
+  Keywd_name(5) = 'DEFAULT_SAPRC07TIC_AE7I_AQ'
   Keywd(5,:) = 'AMET','PM_MASS','CHEM','MET','TSP_NUM','PMF_NUM','PMC_NUM',
                'FINE_SPECIES_A','FINE_SPECIES_B','COARSE_SPECIES','PM25_SPECIES_A',
                'PM25_SPECIES_B','SIZE','AMS_SPECIES','PM_FINE_VARS','PM25TO10_SPECIES',
@@ -133,6 +135,12 @@
 
   Keywd_name(7) = 'DEFAULT_CRACMM3'
   Keywd(7,:) = 'DEFAULT_CRACMM2'
+
+  Keywd_name(69) = 'DEFAULT_CRACMM3HAPS'
+  Keywd(69,:) = 'DEFAULT_CRACMM2','PM_TOXICS','GAS_TOXICS','P_HCN','EOH','HCL','MOH',
+                'EBZ','STY','XYLENE','TOLUENE','NAPHTHAL','BENZENE'
+!              ,'CL2'
+
 
 
  !------------------------------------!
@@ -168,7 +176,7 @@
  !----- Gas Concentrations -----!
  !------------------------------!
   Keywd_name(12) = 'COMMON_GASES'
-  Keywd(12,:) = 'AMET_GAS','H2O2','HONO','HOX','ISOPRENE','N2O5','NTR','PANS',!'TERPENES','VOC',
+  Keywd(12,:) = 'AMET_GAS','H2O2','HONO','HOX','ISOPRENE','N2O5','NTR','PANS',
                'OH','NHX','TERPENES','TNO3'
 
  
@@ -241,7 +249,7 @@
 
   Keywd_name(26) = 'FINE_ORG'
   Keywd(26,:) = 'PMF_OC','PMF_OA','PMF_POC','PMF_SOC','PMF_POA','PMF_SOA','PMF_NC',
-               'PMF_OMOC','PMF_OTOC','PMF_ASOA','PMF_BSOA','PMF_CLDGLY',!'AORGCJ',
+               'PMF_OMOC','PMF_OTOC','PMF_ASOA','PMF_BSOA','PMF_CLDGLY',
                'PMF_ISOPSOA','PMF_IEPOXSOA','PMF_MTNSOA','PMF_MTSOA'
  
 
@@ -280,10 +288,10 @@
                 'DICL_PROPENE','CL4_ETHANE','CHCL3','BR2_C2_12','CL2_C2_12','ETOX',
                 'CL2_ME','CL4_ETHE','CL3_ETHE','CL_ETHE','QUINOLINE','HEXMETH_DIS',
                 'HYDRAZINE','MAL_ANHYDRID','TOL_DIIS','TRIETHYLAMIN','DICL_BENZENE',
-                'ACET_NITRILE','STYRENE','ACRYACID','HEXANE','METHCHLORIDE','CARBSULFIDE',
-                'CHLOROPRENE','ETHYLBENZENE','BENAPY','PAH_000E0','PAH_176E5','PAH_880E5',
+                'ACET_NITRILE','ACRYACID','HEXANE','METHCHLORIDE','CARBSULFIDE',
+                'CHLOROPRENE','BENAPY','PAH_000E0','PAH_176E5','PAH_880E5',
                 'PAH_176E4','PAH_176E3','PAH_192E3','PAH_101E2','PAH_176E2','PAH_114E1',
-                'BENAPY','CL2','ETOH','HCL','MEOH','XYLENE','TOLU',
+                'BENAPY',
                 'P_ACRO','P_ACRO_PRIM', 'P_ALD2_PRIM','P_FORM_PRIM','P_FORM','P_13BUTA',
                 'P_ACRYN','P_ALD2','P_BENZ','P_BR2C212','P_CHCL3','P_CLETHE','P_CL2C212',
                 'P_CL2ME','P_CL3ETHE','P_CL4ETHE','P_CL4ETHA','P_CARBTET','P_DCLBENZ',
@@ -348,6 +356,9 @@
   
   Keywd_name(42) = 'DEFAULT_DEP_CRACMM3'
   Keywd(42,:) = 'DEFAULT_DEP_CRACMM2'
+ 
+  Keywd_name(70) = 'DEFAULT_DEP_CRACMM3HAPS'
+  Keywd(70,:) = 'DEFAULT_DEP_CRACMM2','TOXICS_DEP'
  
  !--------------------------!
  !----- Gas Deposition -----!
@@ -429,12 +440,12 @@
   Keywd_name(57) = 'TOXICS_WDEP'
   Keywd(57,:) = 'WD_MN_HAPS','WD_AS_HAPS','WD_CR3_HAPS','WD_CR6_HAPS','WD_CR_HAPS',
                 'WD_BE_HAPS','WD_CD_HAPS','WD_NI_HAPS','WD_PB_HAPS','WD_BENZ','WD_TOLU',
-                'WD_EBENZ','WD_DCBENZ','WD_STYR','WD_XYL','WD_TOT_HG','WD_TOT_BNPY'
+                'WD_EBENZ','WD_DCBENZ','WD_STYR','WD_HAP_XYL','WD_TOT_HG','WD_TOT_BNPY'
 
   Keywd_name(58) = 'TOXICS_DDEP'
   Keywd(58,:) = 'DD_MN_HAPS','DD_AS_HAPS','DD_CR3_HAPS','DD_CR6_HAPS','DD_CR_HAPS',
                 'DD_BE_HAPS','DD_CD_HAPS','DD_NI_HAPS','DD_PB_HAPS','DD_BENZ','DD_TOLU',
-                'DD_EBENZ','DD_DCBENZ','DD_STYR','DD_XYL','DD_TOT_HG','DD_TOT_BNPY'
+                'DD_EBENZ','DD_DCBENZ','DD_STYR','DD_HAP_XYL','DD_TOT_HG','DD_TOT_BNPY'
  
 
  !--------------------------!
