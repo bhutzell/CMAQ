@@ -370,17 +370,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Optics file
   set OPTfile = PHOT_OPTICS.dat
 
-  #> MCIP meteorology files 
-  setenv GRID_BDY_2D BUFFERED  # GRID files are static, not day-specific
-  setenv GRID_CRO_2D BUFFERED
-  setenv GRID_CRO_3D BUFFERED
-  setenv GRID_DOT_2D BUFFERED
-  setenv MET_CRO_2D BUFFERED 
-  setenv MET_CRO_3D BUFFERED
-  setenv MET_DOT_3D BUFFERED
-  setenv MET_BDY_3D BUFFERED
-  #setenv LUFRAC_CRO BUFFERED
-
   #> Control Files
   #>
   #> IMPORTANT NOTE
@@ -398,12 +387,12 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> + Emission Control (DESID) Documentation in the CMAQ User's Guide:
   #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
   #>
-  setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
-  setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml
+  setenv CMAQ_CTRL_NML ${NMLpath}/CMAQ_Control.nml
+  setenv CMAQ_CH_CTRL_NML ${NMLpath}/CMAQ_Chem_Control_${MECH}.nml
 
   #> The following namelist controls the mapping of meteorological land use types and the NH3 and Hg emission
   #> potentials
-  setenv STAGECTRL_NML ${WRF_DIR}/cmaq/CMAQ_Control_STAGE.nml
+  setenv STAGECTRL_NML ${NMLpath}/CMAQ_Control_STAGE.nml
  
   #> Spatial Masks For Emissions Scaling
   setenv CMAQ_MASKS $SZpath/OCEAN_07_L3m_MC_CHL_chlor_a_12NE3.nc #> horizontal grid-dependent ocean file
@@ -667,13 +656,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   if ($SD_TIME_SERIES == T) then
      setenv CTM_SD_TS "$OUTDIR/SD_TSfile_${CTM_APPL}.nc -v"
   endif
-  setenv     LAYER_FILE      MET_CRO_3D
-  @ n = 0
-  while ($n < $NPROCS)
-    set name = `printf "_%3.3d\n" $n`
-    setenv feed_back$name BUFFERED   # for feedback file
-    @ n++
-  end
+
+  setenv     LAYER_FILE      $ICpath/$ICFILE
 
   #> set floor file (neg concs)
   setenv FLOOR_FILE ${OUTDIR}/FLOOR_${CTM_APPL}.txt
@@ -754,8 +738,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv MIE_TABLE $OUTDIR/mie_table_coeffs_${compilerString}.txt
   setenv OPTICS_DATA $OMIpath/$OPTfile
  #setenv XJ_DATA $JVALpath/$JVALfile
-  set TR_DVpath = $METpath
-  set TR_DVfile = $MET_CRO_2D
+ # set TR_DVpath = $METpath
+ # set TR_DVfile = $MET_CRO_2D
  
   #> species defn & photolysis
   setenv gc_matrix_nml ${NMLpath}/GC_$MECH.nml
