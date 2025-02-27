@@ -21,7 +21,7 @@
 !       Lay_Top - Top layer for each file                                      !
 !       File_Vars(f,:) - These may be CMAQ species, deposition of CMAQ species !
 !             (species name preceeded by DD_ for dry deposition and WD_ for    !
-!             wet deposition, COMPOSITES defined in CMAQ_Chemistry_Control.nml,!
+!             wet deposition, COMPOSITES defined in CMAQ_Chemistry_Control.nml,
 !             or keywords defined in the Keywd list below.                     !
 !                                                                              !
 !             For aerosols, the bulk name (e.g. ASO4 for sulfate) may be used  !
@@ -43,7 +43,7 @@
 !             density, and surface area, select chemical reaction parameters,  !
 !             and meteorological variables.                                    !
 !                                                                              !
-!             For ISAM or DDM simulations, suffixes may be added to deposition,!
+!             For ISAM or DDM simulations, suffixes may be added to deposition,
 !             concentration, or COMPOSITE variables to specify source          !
 !             attribution. For example, NO2_EGU would output NO2 specific for  !
 !             EGU sources, provided a source sector is named EGU. Entering     !
@@ -58,7 +58,7 @@
 &ELMO_INIT
   N_Files = 2
   N_Max_Output_Variables = 400
-  N_Keywords = 69
+  N_Keywords = 70
   N_Max_Keyword_Variables = 150
 /
 
@@ -133,52 +133,15 @@
                'BDE13','MEK','EBZ','STY','HC3','HC5','HC10','OLI','OLT','API',
                'ALD','NOZ','SULF','LSIROCG','TOTROCG'
 
-  Keywd_name(7) = 'DEFAULT_CRACMM3'
-  Keywd(7,:) = 'DEFAULT_CRACMM2','PM_TOXICS','GAS_TOXICS','P_HCN','EOH','HCL','MOH',
-               'EBZ','STY','XYLENE','TOLUENE','NAPHTHAL','BENZENE'
-!              ,'CL2'
-
-
-!               'ACRY_NITRILE','CARBONTET','PROPYL_DICL',
-!               'DICL_PROPENE','CL4_ETHANE','CHCL3','BR2_C2_12','CL2_C2_12','ETOX',
-!               'CL2_ME','CL4_ETHE','CL3_ETHE','CL_ETHE','QUINOLINE','HEXMETH_DIS',
-!               'HYDRAZINE','MAL_ANHYDRID','TOL_DIIS','TRIETHYLAMIN','DICL_BENZENE',
-!               'ACET_NITRILE','STY','ACRYACID','HEXANE','METHCHLORIDE','CARBSULFIDE',
-!               'CHLOROPRENE','EBZ','BENAPY','PAH_000E0','PAH_176E5','PAH_880E5',
-!               'PAH_176E4','PAH_176E3','PAH_192E3','PAH_101E2','PAH_176E2','PAH_114E1',
-!               'BENAPY','EOH','HCL','MOH','XYLENE','TOLUENE',
-!               'P_ACRO','P_ACRO_PRIM', 'P_ALD2_PRIM','P_FORM_PRIM','P_FORM','P_13BUTA',
-!               'P_ACRYN','P_ALD2','P_BENZ','P_BR2C212','P_CHCL3','P_CLETHE','P_CL2C212',
-!               'P_CL2ME','P_CL3ETHE','P_CL4ETHE','P_CL4ETHA','P_CARBTET','P_DCLBENZ',
-!               'P_DCLPROP','P_ETOX','P_HXMEDIS','P_HYDRAZN','P_MALANHYD','P_NAPTH',
-!               'P_PROPDICL','P_QUIN','P_TOLDIIS','P_TRIETHAMIN','P_ACETNIT','P_STYRENE',
-!               'P_ACRYACID','P_HEXANE','P_METHCL','P_CRBSULF','P_CHLRPRN','P_ETHYLBENZ',
-!               'P_HG0','P_HGII','P_PAH_000E0','P_PAH_176E5','P_PAH_880E5','P_PAH_176E4',
-!               'P_PAH_176E3','P_PAH_192E3','P_PAH_101E2','P_PAH_176E2','P_PAH_114E1',
-!               'P_BENAPY','P_HCN'
-
-  Keywd_name(68) = 'DEFAULT_CRACMM3HAPS'
-  Keywd(68,:) = 'DEFAULT_CRACMM2','PM_TOXICS','GAS_TOXICS','P_HCN','EOH','HCL','MOH',
+  Keywd_name(69) = 'DEFAULT_CRACMM3HAPS'
+  Keywd(69,:) = 'DEFAULT_CRACMM2','PM_TOXICS','GAS_TOXICS','P_HCN','EOH','HCL','MOH',
                 'EBZ','STY','XYLENE','TOLUENE','NAPHTHAL','BENZENE'
 !              ,'CL2'
-!  Keywd(68,:) = 'DEFAULT_CRACMM2','PM_TOXICS','ACRY_NITRILE','CARBONTET','PROPYL_DICL',
-!               'DICL_PROPENE','CL4_ETHANE','CHCL3','BR2_C2_12','CL2_C2_12','ETOX',
-!               'CL2_ME','CL4_ETHE','CL3_ETHE','CL_ETHE','QUINOLINE','HEXMETH_DIS',
-!               'HYDRAZINE','MAL_ANHYDRID','TOL_DIIS','TRIETHYLAMIN','DICL_BENZENE',
-!               'ACET_NITRILE','ACRYACID','HEXANE','METHCHLORIDE','CARBSULFIDE',
-!               'CHLOROPRENE','BENAPY','PAH_000E0','PAH_176E5','PAH_880E5',
-!               'PAH_176E4','PAH_176E3','PAH_192E3','PAH_101E2','PAH_176E2','PAH_114E1',
-!               'BENAPY',
-!               'P_ACRO','P_ACRO_PRIM', 'P_ALD2_PRIM','P_FORM_PRIM','P_FORM','P_13BUTA',
-!               'P_ACRYN','P_ALD2','P_BENZ','P_BR2C212','P_CHCL3','P_CLETHE','P_CL2C212',
-!               'P_CL2ME','P_CL3ETHE','P_CL4ETHE','P_CL4ETHA','P_CARBTET','P_DCLBENZ',
-!               'P_DCLPROP','P_ETOX','P_HXMEDIS','P_HYDRAZN','P_MALANHYD','P_NAPTH',
-!               'P_PROPDICL','P_QUIN','P_TOLDIIS','P_TRIETHAMIN','P_ACETNIT','P_STYRENE',
-!               'P_ACRYACID','P_HEXANE','P_METHCL','P_CRBSULF','P_CHLRPRN','P_ETHYLBENZ',
-!               'P_HG0','P_HGII','P_PAH_000E0','P_PAH_176E5','P_PAH_880E5','P_PAH_176E4',
-!               'P_PAH_176E3','P_PAH_192E3','P_PAH_101E2','P_PAH_176E2','P_PAH_114E1',
-!               'P_BENAPY','P_HCN',
-!               'EOH','HCL','MOH','EBZ','STY','XYLENE','TOLUENE'
+
+
+! Keywd_name(7) = 'DEFAULT_CRACMM3HAPS'
+  Keywd_name(7) = 'DEFAULT_CRACMM3'
+  Keywd(7,:) = 'DEFAULT_CRACMM2'
 
 
  !------------------------------------!
@@ -214,7 +177,7 @@
  !----- Gas Concentrations -----!
  !------------------------------!
   Keywd_name(12) = 'COMMON_GASES'
-  Keywd(12,:) = 'AMET_GAS','H2O2','HONO','HOX','ISOPRENE','N2O5','NTR','PANS',!'TERPENES','VOC',
+  Keywd(12,:) = 'AMET_GAS','H2O2','HONO','HOX','ISOPRENE','N2O5','NTR','PANS',
                'OH','NHX','TERPENES','TNO3'
 
  
@@ -287,7 +250,7 @@
 
   Keywd_name(26) = 'FINE_ORG'
   Keywd(26,:) = 'PMF_OC','PMF_OA','PMF_POC','PMF_SOC','PMF_POA','PMF_SOA','PMF_NC',
-               'PMF_OMOC','PMF_OTOC','PMF_ASOA','PMF_BSOA','PMF_CLDGLY',!'AORGCJ',
+               'PMF_OMOC','PMF_OTOC','PMF_ASOA','PMF_BSOA','PMF_CLDGLY',
                'PMF_ISOPSOA','PMF_IEPOXSOA','PMF_MTNSOA','PMF_MTSOA'
  
 
@@ -393,10 +356,10 @@
                 'SEASPRAY_SULFUR_DEP',
   
   Keywd_name(42) = 'DEFAULT_DEP_CRACMM3'
-  Keywd(42,:) = 'DEFAULT_DEP_CRACMM2','TOXICS_DEP'
+  Keywd(42,:) = 'DEFAULT_DEP_CRACMM2'
  
-  Keywd_name(69) = 'DEFAULT_DEP_CRACMM3HAPS'
-  Keywd(69,:) = 'DEFAULT_DEP_CRACMM2','TOXICS_DEP'
+  Keywd_name(70) = 'DEFAULT_DEP_CRACMM3HAPS'
+  Keywd(70,:) = 'DEFAULT_DEP_CRACMM2','TOXICS_DEP'
  
  !--------------------------!
  !----- Gas Deposition -----!
