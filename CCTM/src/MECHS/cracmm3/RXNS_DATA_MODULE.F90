@@ -1224,8 +1224,8 @@
      &     11,   12,   13,   14,   15,   16,   13,   13,   17,   18, & 
      &     19,   20,   21,   22,   23,   24,   25,   25,   25,   26, & 
      &     27,   28,   28,   28,   28,   29,   30,   31,   32,   33, & 
-     &     34,   30,   30,   35,   36,   37,   38,   39,   40,   41, & 
-     &     42,   43,   44/
+     &     34,   35,   35,   36,   37,   38,   39,   40,   41,   42, & 
+     &     43,   44,   45/
 
       DATA ( IPH( IRXXN,3 ), IRXXN = 1, NMPHOT ) / & 
      &      1,    2,    3,    4,    5,    6,    7,    8,    9,   10, & 
@@ -7455,7 +7455,7 @@
      &      9,    9,   10,   11,   12,   13,   14,   14,   15,   16, & 
      &     17,   18/
 
-      INTEGER, PARAMETER :: NPHOTAB =  44
+      INTEGER, PARAMETER :: NPHOTAB =  45
       CHARACTER( 16 )    :: PHOTAB( NPHOTAB )
 
       DATA ( PHOTAB( IRXXN ), IRXXN = 1, NPHOTAB ) / & 
@@ -7470,10 +7470,10 @@
      &   'MGLY_RACM2      ', 'BALD1_CALVERT11 ', 'BALD2_CALVERT11 ', & 
      &   'OP1_RACM2       ', 'PAA_RACM2       ', 'ONIT_CALVERT08  ', & 
      &   'PAN1_JPL19      ', 'PAN2_JPL19      ', 'PPN1_JPL19      ', & 
-     &   'PPN2_JPL19      ', 'ACRO_09         ', 'CL2_JPL19       ', & 
-     &   'CLO_JPL19       ', 'OCLO_JPL19      ', 'CL2O2_JPL19     ', & 
-     &   'HOCL_JPL19      ', 'CLNO_JPL19      ', 'CLNO2_JPL19     ', & 
-     &   'CLNO3_R_JPL19   ', 'CLNO3_M_JPL19   '/
+     &   'PPN2_JPL19      ', 'TRPN_WANG2023   ', 'ACRO_09         ', & 
+     &   'CL2_JPL19       ', 'CLO_JPL19       ', 'OCLO_JPL19      ', & 
+     &   'CL2O2_JPL19     ', 'HOCL_JPL19      ', 'CLNO_JPL19      ', & 
+     &   'CLNO2_JPL19     ', 'CLNO3_R_JPL19   ', 'CLNO3_M_JPL19   '/
 
       INTEGER, PARAMETER :: NHETERO =  18
       CHARACTER( 16 )    :: HETERO( NHETERO )
@@ -7785,16 +7785,17 @@
        INTEGER, PARAMETER  :: IJ_PAN2_JPL19       =  32
        INTEGER, PARAMETER  :: IJ_PPN1_JPL19       =  33
        INTEGER, PARAMETER  :: IJ_PPN2_JPL19       =  34
-       INTEGER, PARAMETER  :: IJ_ACRO_09          =  35
-       INTEGER, PARAMETER  :: IJ_CL2_JPL19        =  36
-       INTEGER, PARAMETER  :: IJ_CLO_JPL19        =  37
-       INTEGER, PARAMETER  :: IJ_OCLO_JPL19       =  38
-       INTEGER, PARAMETER  :: IJ_CL2O2_JPL19      =  39
-       INTEGER, PARAMETER  :: IJ_HOCL_JPL19       =  40
-       INTEGER, PARAMETER  :: IJ_CLNO_JPL19       =  41
-       INTEGER, PARAMETER  :: IJ_CLNO2_JPL19      =  42
-       INTEGER, PARAMETER  :: IJ_CLNO3_R_JPL19    =  43
-       INTEGER, PARAMETER  :: IJ_CLNO3_M_JPL19    =  44
+       INTEGER, PARAMETER  :: IJ_TRPN_WANG2023    =  35
+       INTEGER, PARAMETER  :: IJ_ACRO_09          =  36
+       INTEGER, PARAMETER  :: IJ_CL2_JPL19        =  37
+       INTEGER, PARAMETER  :: IJ_CLO_JPL19        =  38
+       INTEGER, PARAMETER  :: IJ_OCLO_JPL19       =  39
+       INTEGER, PARAMETER  :: IJ_CL2O2_JPL19      =  40
+       INTEGER, PARAMETER  :: IJ_HOCL_JPL19       =  41
+       INTEGER, PARAMETER  :: IJ_CLNO_JPL19       =  42
+       INTEGER, PARAMETER  :: IJ_CLNO2_JPL19      =  43
+       INTEGER, PARAMETER  :: IJ_CLNO3_R_JPL19    =  44
+       INTEGER, PARAMETER  :: IJ_CLNO3_M_JPL19    =  45
        INTEGER, PARAMETER  :: IK_HETERO_GLY       =   1
        INTEGER, PARAMETER  :: IK_HETERO_MGLY      =   2
        INTEGER, PARAMETER  :: IK_HETERO_NO2       =   3
