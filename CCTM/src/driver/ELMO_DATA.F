@@ -334,7 +334,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
           INTEGER                     :: STRUCT       ! 0 = gridded, 1 = unstructured
           CHARACTER( 16)              :: FLOGICAL     ! I/O Logical Name for each output file
           INTEGER                     :: TSTEP        ! Output Time Step (HHMMSS)
-          INTEGER                     :: TMODE        ! 0 = Instantaneous, 1 = Average/Cumulative
+          INTEGER                     :: TMODE        ! 0 = Instantaneous, 
+                                                      ! 1 = Aggregate (Average/Cumulative)
           INTEGER                     :: LAY_BOT      ! Bottom Layer
           INTEGER                     :: LAY_TOP      ! Top Layer
           INTEGER                     :: NLAYS        ! Number of Layers
@@ -729,7 +730,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !-------------------------------------------------------------------------
 
       USE util_Family_module
-      USE RXNS_DATA, ONLY : MECHNAME
+      USE RUNTIME_VARS, ONLY : MECH
 
       IMPLICIT NONE
 
@@ -883,13 +884,13 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          ELSE IF ( VARS_NML(1) .EQ. 'DEFAULT' ) THEN
             ! Replace generic DEFAULT keyword with mechanism-specific
             ! keyword
-            VARS_NML( N_END+1 ) = 'DEFAULT_' // TRIM( MECHNAME )
+            VARS_NML( N_END+1 ) = 'DEFAULT_' // TRIM( MECH ) 
             N_END = N_END + 1
          
          ELSE IF ( VARS_NML(1) .EQ. 'DEFAULT_DEP' ) THEN
             ! Replace generic DEFAULT keyword with mechanism-specific
             ! keyword
-            VARS_NML( N_END+1 ) = 'DEFAULT_DEP_' // TRIM( MECHNAME )
+            VARS_NML( N_END+1 ) = 'DEFAULT_DEP_' // TRIM( MECH )
             N_END = N_END + 1
          
          ELSEIF ( I1 .GT. 0 ) THEN
