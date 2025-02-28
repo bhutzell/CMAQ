@@ -589,8 +589,6 @@ C Arguments:
 
 C Parameters:
          Real, Parameter :: cond_min = 1.0 / resist_max ! minimum conductance [m/s]
-         Real, Parameter :: KZMAXL = 500.0    ! upper limit for min Kz [m]
-         Real, Parameter :: KZ0UT  = 1.0      ! minimum eddy diffusivity [m**2/sec] KZ0
          Real, Parameter :: KZL    = 0.01     ! lowest KZ
          Real, Parameter :: KZU    = 1.0      ! 2.0  ! highest KZ
          Real, Parameter :: EPS    = 1.0E-08  ! small number for temperature difference
@@ -813,12 +811,12 @@ C-------------------------------- Calculated Variables -------------------------
          IF ( MINKZ ) THEN
             Met_Data%KZMIN = KZL
             DO L = 1, NLAYS
-               Where( Met_Data%ZF( :,:,L ) .LE. KZMAXL )
+               Where( Met_Data%ZF( :,:,L ) .LE. Met_Data%PBL )
                   Met_Data%KZMIN( :,:,L ) = KZL + ( KZU - KZL ) * 0.01 * Grid_data%PURB
                End Where
             End Do
          ELSE
-            Met_Data%KZMIN = KZ0UT
+            Met_Data%KZMIN = KZL
          END IF
 
          BUFF3D = Met_Data%TA * ( 1.0 + 0.608 * Met_Data%QV )
