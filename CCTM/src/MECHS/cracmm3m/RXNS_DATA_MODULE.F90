@@ -1406,11 +1406,11 @@
      &     11,   12,   13,   14,   15,   16,   13,   13,   17,   18, & ! 1   
      &     19,   20,   21,   22,   23,   24,   25,   25,   25,   26, & ! 2   
      &     27,   28,   28,   28,   28,   29,   30,   31,   32,   33, & ! 3   
-     &     34,   30,   30,   35,   36,   37,   38,   39,   40,   41, & ! 4   
-     &     42,   43,   44,   45,   46,   47,   48,   49,   50,   51, & ! 5   
-     &     52,   53,   54,   55,   56,   57,   58,   59,   60,   61, & ! 6   
-     &     62,   63,   64,   60,   65,   66,   60,   60,   67,   68, & ! 7   
-     &     69,   70,   71,   72,   73/     !  8   
+     &     34,   35,   35,   36,   37,   38,   39,   40,   41,   42, & ! 4   
+     &     43,   44,   45,   46,   47,   48,   49,   50,   51,   52, & ! 5   
+     &     53,   54,   55,   56,   57,   58,   59,   60,   61,   62, & ! 6   
+     &     63,   64,   65,   61,   66,   67,   61,   61,   68,   69, & ! 7   
+     &     70,   71,   72,   73,   74/     !  8   
 
       DATA ( IPH( IRXXN,3 ), IRXXN = 1, NMPHOT ) / & 
      &      1,    2,    3,    4,    5,    6,    7,    8,    9,   10, & ! O   
@@ -10709,7 +10709,7 @@
      &     28,   29,   30,   31,   32,   33,   34,   35,   36,   37, & 
      &     38,   39,   40,   41,   42,   43,   44,   45,   46,   46/
 
-      INTEGER, PARAMETER :: NPHOTAB =  73
+      INTEGER, PARAMETER :: NPHOTAB =  74
       CHARACTER( 16 )    :: PHOTAB( NPHOTAB )
 
       DATA ( PHOTAB( IRXXN ), IRXXN = 1, NPHOTAB ) / & 
@@ -10724,20 +10724,20 @@
      &   'MGLY_RACM2      ', 'BALD1_CALVERT11 ', 'BALD2_CALVERT11 ', & 
      &   'OP1_RACM2       ', 'PAA_RACM2       ', 'ONIT_CALVERT08  ', & 
      &   'PAN1_JPL19      ', 'PAN2_JPL19      ', 'PPN1_JPL19      ', & 
-     &   'PPN2_JPL19      ', 'ACRO_09         ', 'CL2_JPL19       ', & 
-     &   'CLO_JPL19       ', 'OCLO_JPL19      ', 'CL2O2_JPL19     ', & 
-     &   'HOCL_JPL19      ', 'CLNO_JPL19      ', 'CLNO2_JPL19     ', & 
-     &   'CLNO3_R_JPL19   ', 'CLNO3_M_JPL19   ', 'HCOCL_JPL19     ', & 
-     &   'BR2_JPL19       ', 'BRO_JPL19       ', 'OBRO_JPL19      ', & 
-     &   'HOBR_JPL19      ', 'BRNO_JPL19      ', 'BRNO2_JPL19     ', & 
-     &   'BRNO3_R_JPL19   ', 'BRNO3_M_JPL19   ', 'CH2BR2_JPL19    ', & 
-     &   'CHBR3_JPL19     ', 'HCOBR_JPL19     ', 'I2_JPL19        ', & 
-     &   'IO_JPL19        ', 'OIO_JPL19       ', 'INO3_06         ', & 
-     &   'HOI_JPL19       ', 'HI_JPL19        ', 'INO_JPL19       ', & 
-     &   'INO2_JPL19      ', 'CH3I_JPL19      ', 'CH2I2_JPL19     ', & 
-     &   'BRCL_JPL19      ', 'ICL_JPL19       ', 'IBR_JPL19       ', & 
-     &   'CH2IBR_JPL19    ', 'CH2ICL_JPL19    ', 'CHBR2CL_JPL19   ', & 
-     &   'CHBRCL2_JPL19   '/
+     &   'PPN2_JPL19      ', 'TRPN_WANG2023   ', 'ACRO_09         ', & 
+     &   'CL2_JPL19       ', 'CLO_JPL19       ', 'OCLO_JPL19      ', & 
+     &   'CL2O2_JPL19     ', 'HOCL_JPL19      ', 'CLNO_JPL19      ', & 
+     &   'CLNO2_JPL19     ', 'CLNO3_R_JPL19   ', 'CLNO3_M_JPL19   ', & 
+     &   'HCOCL_JPL19     ', 'BR2_JPL19       ', 'BRO_JPL19       ', & 
+     &   'OBRO_JPL19      ', 'HOBR_JPL19      ', 'BRNO_JPL19      ', & 
+     &   'BRNO2_JPL19     ', 'BRNO3_R_JPL19   ', 'BRNO3_M_JPL19   ', & 
+     &   'CH2BR2_JPL19    ', 'CHBR3_JPL19     ', 'HCOBR_JPL19     ', & 
+     &   'I2_JPL19        ', 'IO_JPL19        ', 'OIO_JPL19       ', & 
+     &   'INO3_06         ', 'HOI_JPL19       ', 'HI_JPL19        ', & 
+     &   'INO_JPL19       ', 'INO2_JPL19      ', 'CH3I_JPL19      ', & 
+     &   'CH2I2_JPL19     ', 'BRCL_JPL19      ', 'ICL_JPL19       ', & 
+     &   'IBR_JPL19       ', 'CH2IBR_JPL19    ', 'CH2ICL_JPL19    ', & 
+     &   'CHBR2CL_JPL19   ', 'CHBRCL2_JPL19   '/
 
       INTEGER, PARAMETER :: NHETERO =  46
       CHARACTER( 16 )    :: HETERO( NHETERO )
@@ -11161,45 +11161,46 @@
        INTEGER, PARAMETER  :: IJ_PAN2_JPL19       =  32
        INTEGER, PARAMETER  :: IJ_PPN1_JPL19       =  33
        INTEGER, PARAMETER  :: IJ_PPN2_JPL19       =  34
-       INTEGER, PARAMETER  :: IJ_ACRO_09          =  35
-       INTEGER, PARAMETER  :: IJ_CL2_JPL19        =  36
-       INTEGER, PARAMETER  :: IJ_CLO_JPL19        =  37
-       INTEGER, PARAMETER  :: IJ_OCLO_JPL19       =  38
-       INTEGER, PARAMETER  :: IJ_CL2O2_JPL19      =  39
-       INTEGER, PARAMETER  :: IJ_HOCL_JPL19       =  40
-       INTEGER, PARAMETER  :: IJ_CLNO_JPL19       =  41
-       INTEGER, PARAMETER  :: IJ_CLNO2_JPL19      =  42
-       INTEGER, PARAMETER  :: IJ_CLNO3_R_JPL19    =  43
-       INTEGER, PARAMETER  :: IJ_CLNO3_M_JPL19    =  44
-       INTEGER, PARAMETER  :: IJ_HCOCL_JPL19      =  45
-       INTEGER, PARAMETER  :: IJ_BR2_JPL19        =  46
-       INTEGER, PARAMETER  :: IJ_BRO_JPL19        =  47
-       INTEGER, PARAMETER  :: IJ_OBRO_JPL19       =  48
-       INTEGER, PARAMETER  :: IJ_HOBR_JPL19       =  49
-       INTEGER, PARAMETER  :: IJ_BRNO_JPL19       =  50
-       INTEGER, PARAMETER  :: IJ_BRNO2_JPL19      =  51
-       INTEGER, PARAMETER  :: IJ_BRNO3_R_JPL19    =  52
-       INTEGER, PARAMETER  :: IJ_BRNO3_M_JPL19    =  53
-       INTEGER, PARAMETER  :: IJ_CH2BR2_JPL19     =  54
-       INTEGER, PARAMETER  :: IJ_CHBR3_JPL19      =  55
-       INTEGER, PARAMETER  :: IJ_HCOBR_JPL19      =  56
-       INTEGER, PARAMETER  :: IJ_I2_JPL19         =  57
-       INTEGER, PARAMETER  :: IJ_IO_JPL19         =  58
-       INTEGER, PARAMETER  :: IJ_OIO_JPL19        =  59
-       INTEGER, PARAMETER  :: IJ_INO3_06          =  60
-       INTEGER, PARAMETER  :: IJ_HOI_JPL19        =  61
-       INTEGER, PARAMETER  :: IJ_HI_JPL19         =  62
-       INTEGER, PARAMETER  :: IJ_INO_JPL19        =  63
-       INTEGER, PARAMETER  :: IJ_INO2_JPL19       =  64
-       INTEGER, PARAMETER  :: IJ_CH3I_JPL19       =  65
-       INTEGER, PARAMETER  :: IJ_CH2I2_JPL19      =  66
-       INTEGER, PARAMETER  :: IJ_BRCL_JPL19       =  67
-       INTEGER, PARAMETER  :: IJ_ICL_JPL19        =  68
-       INTEGER, PARAMETER  :: IJ_IBR_JPL19        =  69
-       INTEGER, PARAMETER  :: IJ_CH2IBR_JPL19     =  70
-       INTEGER, PARAMETER  :: IJ_CH2ICL_JPL19     =  71
-       INTEGER, PARAMETER  :: IJ_CHBR2CL_JPL19    =  72
-       INTEGER, PARAMETER  :: IJ_CHBRCL2_JPL19    =  73
+       INTEGER, PARAMETER  :: IJ_TRPN_WANG2023    =  35
+       INTEGER, PARAMETER  :: IJ_ACRO_09          =  36
+       INTEGER, PARAMETER  :: IJ_CL2_JPL19        =  37
+       INTEGER, PARAMETER  :: IJ_CLO_JPL19        =  38
+       INTEGER, PARAMETER  :: IJ_OCLO_JPL19       =  39
+       INTEGER, PARAMETER  :: IJ_CL2O2_JPL19      =  40
+       INTEGER, PARAMETER  :: IJ_HOCL_JPL19       =  41
+       INTEGER, PARAMETER  :: IJ_CLNO_JPL19       =  42
+       INTEGER, PARAMETER  :: IJ_CLNO2_JPL19      =  43
+       INTEGER, PARAMETER  :: IJ_CLNO3_R_JPL19    =  44
+       INTEGER, PARAMETER  :: IJ_CLNO3_M_JPL19    =  45
+       INTEGER, PARAMETER  :: IJ_HCOCL_JPL19      =  46
+       INTEGER, PARAMETER  :: IJ_BR2_JPL19        =  47
+       INTEGER, PARAMETER  :: IJ_BRO_JPL19        =  48
+       INTEGER, PARAMETER  :: IJ_OBRO_JPL19       =  49
+       INTEGER, PARAMETER  :: IJ_HOBR_JPL19       =  50
+       INTEGER, PARAMETER  :: IJ_BRNO_JPL19       =  51
+       INTEGER, PARAMETER  :: IJ_BRNO2_JPL19      =  52
+       INTEGER, PARAMETER  :: IJ_BRNO3_R_JPL19    =  53
+       INTEGER, PARAMETER  :: IJ_BRNO3_M_JPL19    =  54
+       INTEGER, PARAMETER  :: IJ_CH2BR2_JPL19     =  55
+       INTEGER, PARAMETER  :: IJ_CHBR3_JPL19      =  56
+       INTEGER, PARAMETER  :: IJ_HCOBR_JPL19      =  57
+       INTEGER, PARAMETER  :: IJ_I2_JPL19         =  58
+       INTEGER, PARAMETER  :: IJ_IO_JPL19         =  59
+       INTEGER, PARAMETER  :: IJ_OIO_JPL19        =  60
+       INTEGER, PARAMETER  :: IJ_INO3_06          =  61
+       INTEGER, PARAMETER  :: IJ_HOI_JPL19        =  62
+       INTEGER, PARAMETER  :: IJ_HI_JPL19         =  63
+       INTEGER, PARAMETER  :: IJ_INO_JPL19        =  64
+       INTEGER, PARAMETER  :: IJ_INO2_JPL19       =  65
+       INTEGER, PARAMETER  :: IJ_CH3I_JPL19       =  66
+       INTEGER, PARAMETER  :: IJ_CH2I2_JPL19      =  67
+       INTEGER, PARAMETER  :: IJ_BRCL_JPL19       =  68
+       INTEGER, PARAMETER  :: IJ_ICL_JPL19        =  69
+       INTEGER, PARAMETER  :: IJ_IBR_JPL19        =  70
+       INTEGER, PARAMETER  :: IJ_CH2IBR_JPL19     =  71
+       INTEGER, PARAMETER  :: IJ_CH2ICL_JPL19     =  72
+       INTEGER, PARAMETER  :: IJ_CHBR2CL_JPL19    =  73
+       INTEGER, PARAMETER  :: IJ_CHBRCL2_JPL19    =  74
        INTEGER, PARAMETER  :: IK_HETERO_GLY       =   1
        INTEGER, PARAMETER  :: IK_HETERO_MGLY      =   2
        INTEGER, PARAMETER  :: IK_HETERO_NO2       =   3

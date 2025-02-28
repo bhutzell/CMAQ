@@ -1214,8 +1214,8 @@ C ... Only do aerosol nitrate photolysis for CRACMM3 and CRACMM3M
                 ANO3M = ANO3 / aerospc_mw( ANO3_IDX )
         
                 ASEASTM = aerospc_conc( ASEAST_IDX, 2 ) / aerospc_mw( ASEAST_IDX )
-               
-                FAC_HNO3 = 100.0  / ( 1.0 + ( ANO3M / ASEASTM ))                
+                              
+                FAC_HNO3 = 100.0  * ASEASTM / ( ASEASTM + ANO3M ) 
                 FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
 
                 IF ( L_ELMO ) THEN 

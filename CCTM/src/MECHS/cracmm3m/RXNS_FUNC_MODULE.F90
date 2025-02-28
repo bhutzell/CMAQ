@@ -354,9 +354,9 @@
 !  Reaction Label R033b           
                 RKI( NCELL,   41) =  RJBLK( NCELL, IJ_PPN2_JPL19 )
 !  Reaction Label TRP55           
-                RKI( NCELL,   42) =  RJBLK( NCELL, IJ_ONIT_CALVERT08 )
+                RKI( NCELL,   42) =  RJBLK( NCELL, IJ_TRPN_WANG2023 )
 !  Reaction Label TRP56           
-                RKI( NCELL,   43) =  RJBLK( NCELL, IJ_ONIT_CALVERT08 )
+                RKI( NCELL,   43) =  RJBLK( NCELL, IJ_TRPN_WANG2023 )
 !  Reaction Label T20             
                 RKI( NCELL,  400) =  RJBLK( NCELL, IJ_ACRO_09 )
 !  Reaction Label CLP01           

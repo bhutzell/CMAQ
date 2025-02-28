@@ -58,7 +58,7 @@
 &ELMO_INIT
   N_Files = 2
   N_Max_Output_Variables = 400
-  N_Keywords = 69
+  N_Keywords = 70
   N_Max_Keyword_Variables = 150
 /
 
@@ -134,8 +134,8 @@
   Keywd_name(7) = 'DEFAULT_CRACMM3'
   Keywd(7,:) = 'DEFAULT_CRACMM2'
 
-  Keywd_name(68) = 'DEFAULT_CRACMM3M'
-  Keywd(68,:) = 'DEFAULT_CRACMM2'
+  Keywd_name(69) = 'DEFAULT_CRACMM3M'
+  Keywd(69,:) = 'DEFAULT_CRACMM2'
 
  !------------------------------------!
  !----- Meteorological Variables -----!
@@ -343,12 +343,17 @@
                 'DD_PMF_CL','DD_PMC_CL','DD_TSP_CL',
                 'WD_TSP_CL','DD_CL2','WD_CL2','DD_HCL','WD_HCL','DD_HOCL','WD_HOCL'
 
-  Keywd_name(41) = 'DEFAULT_DEP_CRACMM3'
-  Keywd(41,:) = 'DEFAULT_DEP_CRACMM2'
-
-  Keywd_name(69) = 'DEFAULT_DEP_CRACMM3M'
-  Keywd(69,:) = 'DEFAULT_DEP_CRACMM2'
-
+  Keywd_name(41) = 'DEFAULT_DEP_CRACMM2'
+  Keywd(41,:) = 'PRECIP','GAS_DEP','PM_DEP','GASPM_DEP','PM_TDEP','OXIDIZED_NITROGEN_DEP',
+                'REDUCED_NITROGEN_DEP','TOTAL_NITROGEN_DEP','TOTAL_SULFUR_DEP',
+                'SEASPRAY_SULFUR_DEP',
+  
+  Keywd_name(42) = 'DEFAULT_DEP_CRACMM3'
+  Keywd(42,:) = 'DEFAULT_DEP_CRACMM2'
+  
+  Keywd_name(70) = 'DEFAULT_DEP_CRACMM3M'
+  Keywd(70,:) = 'DEFAULT_DEP_CRACMM2'
+ 
  !--------------------------!
  !----- Gas Deposition -----!
  !--------------------------!
