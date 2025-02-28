@@ -1,5 +1,5 @@
 HCOCL_JPL19
-! HCOCL + hv = CL + CO + HO2
+! HCOCL + hν = CL + CO + HO2
 ! JPL Publication 19-5;  Evaluation Number 19; May 2020
 ! Page: 4-252; Table 4F-31
 ! Quantum yield is taken as 1.0
@@ -78,3 +78,4 @@ FAC=1.0
 305	2.75E-22	1.00
 306	1.57E-22	1.00
 307	1.31E-22	1.00
+

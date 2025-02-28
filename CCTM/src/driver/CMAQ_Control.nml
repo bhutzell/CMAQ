@@ -58,7 +58,7 @@
 &ELMO_INIT
   N_Files = 2
   N_Max_Output_Variables = 400
-  N_Keywords = 68
+  N_Keywords = 70
   N_Max_Keyword_Variables = 150
 /
 
@@ -71,7 +71,7 @@
   Tmode(1) = 'aggregate'
   Lay_Bot(1) = 1
   Lay_Top(1) = 1
-  File_Vars(1,:) = 'DEFAULT' 
+  File_Vars(1,:) = 'DEFAULT', 'EF_HNO3'
 
   Flabel(2)= 'DEFAULT_DEP'
   Tmode(2) = 'aggregate'
@@ -134,6 +134,8 @@
   Keywd_name(7) = 'DEFAULT_CRACMM3'
   Keywd(7,:) = 'DEFAULT_CRACMM2'
 
+  Keywd_name(69) = 'DEFAULT_CRACMM3M'
+  Keywd(69,:) = 'DEFAULT_CRACMM2'
 
  !------------------------------------!
  !----- Meteorological Variables -----!
@@ -348,6 +350,9 @@
   
   Keywd_name(42) = 'DEFAULT_DEP_CRACMM3'
   Keywd(42,:) = 'DEFAULT_DEP_CRACMM2'
+  
+  Keywd_name(70) = 'DEFAULT_DEP_CRACMM3M'
+  Keywd(70,:) = 'DEFAULT_DEP_CRACMM2'
  
  !--------------------------!
  !----- Gas Deposition -----!

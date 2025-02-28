@@ -1,5 +1,5 @@
 HOCL_JPL19
-! HOCL + hv =  CL + HO
+! HOCL + hν =  CL + HO
 ! JPL Publication 19-5;  Evaluation Number 19; May 2020
 ! Page: 4-230-to 4-232; Table 4F-14 for absorption cross-section
 ! Quantum yield is taken as 1.0
@@ -121,3 +121,4 @@ FAC=1.0
 416	8.90E-22	1.0
 418	7.50E-22	1.0
 420	6.30E-22	1.0
+
