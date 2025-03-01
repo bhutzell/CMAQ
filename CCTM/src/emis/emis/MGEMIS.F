@@ -657,12 +657,14 @@ C.. Calculate HOI emission rate in mole/s (Macdonald et al., ACP, 14, 5841-5852,
                         VDEMIS_MG( IHOI, C, R ) = MAX( 0.0, DUMMY )
                      END IF
 
-C .. Calculate DMS emission rate in mole/s for CB6R5M_AE7_AQ
-                     IF (INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) THEN 
+C .. Calculate DMS emission rate in mole/s for CB6R5M_AE7_AQ and CB6R5_AE7_AQ
+                     IF ( (INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) .OR.
+     &                     INDEX( MECHNAME, 'CB6R5_AE7_AQ'  ) .GT. 0 ) Then 
                       DUMMY = MARINE_AREA *  DMS_L * KT * 2.78E-12
                       VDEMIS_MG( IDMS, C, R ) = MAX ( 0.0, DUMMY)
                      ENDIF
-C .. Calculate DMS emission rate in mole/s for CRACMM1M_AQ
+
+C .. Calculate DMS emission rate in mole/s for CRACMM3M
                      IF (INDEX( MECHNAME, 'CRACMM3M' ) .GT. 0 ) THEN
                       VDEMIS_MG( IDMS, C, R ) = 0.0 
                      ENDIF
