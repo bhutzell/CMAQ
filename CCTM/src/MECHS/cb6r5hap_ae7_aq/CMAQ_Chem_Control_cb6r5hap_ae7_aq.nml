@@ -64,7 +64,7 @@
    'EVERYWHERE', 'ALL'         ,'ETHA'   ,'ETHA'        ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'ETOH'   ,'ETOH'        ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'KET'    ,'KET'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'PACD'   ,'PACD'        ,'GAS'  ,1.  ,'UNIT','a',
+!  'EVERYWHERE', 'ALL'         ,'PACD'   ,'PACD'        ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'PAR'    ,'PAR'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'ACET'   ,'ACET'        ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'PRPA'   ,'PRPA'        ,'GAS'  ,1.  ,'UNIT','a', 
