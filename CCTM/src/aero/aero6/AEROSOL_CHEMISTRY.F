@@ -1663,7 +1663,7 @@ C hydrolysis
                       ANO3M = ANO3 / aerospc_mw( ANO3_IDX )
                       ASEASTM = aerospc_conc( ASEAST_IDX, 2 ) / aerospc_mw( ASEAST_IDX )
                       FAC_HNO3 = 100.0 * ASEASTM / ( ASEASTM + ANO3M )                
-                      FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
+                      FAC_HNO3 = MAX(10.0, FAC_HNO3)
                       IF ( L_ELMO ) EF_HNO3( C,R,L ) = FAC_HNO3
                       KHETERO( IRATE, C,R,L ) = REAL( JHNO3 * FAC_HNO3,8 ) ! 1/min ,
                     END IF                 
