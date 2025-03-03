@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM2 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Nov 10, 2024
+C  REVISION HISTORY: Created by EBI solver program, Mar  3, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables for solution
 C*************************************************************************
@@ -150,12 +150,12 @@ c..Species indices
       INTEGER, PARAMETER :: OP1              =   38
       INTEGER, PARAMETER :: OP2              =   39
       INTEGER, PARAMETER :: OPB              =   40
-      INTEGER, PARAMETER :: OP3              =   41
+      INTEGER, PARAMETER :: VOP3             =   41
       INTEGER, PARAMETER :: PAA              =   42
       INTEGER, PARAMETER :: ONIT             =   43
       INTEGER, PARAMETER :: PAN              =   44
-      INTEGER, PARAMETER :: TRPN             =   45
-      INTEGER, PARAMETER :: HONIT            =   46
+      INTEGER, PARAMETER :: VTRPN            =   45
+      INTEGER, PARAMETER :: VHONIT           =   46
       INTEGER, PARAMETER :: N2O5             =   47
       INTEGER, PARAMETER :: SO2              =   48
       INTEGER, PARAMETER :: SULF             =   49
@@ -229,7 +229,7 @@ c..Species indices
       INTEGER, PARAMETER :: LIMNP1           =  117
       INTEGER, PARAMETER :: LIMNP2           =  118
       INTEGER, PARAMETER :: ADCN             =  119
-      INTEGER, PARAMETER :: HOM              =  120
+      INTEGER, PARAMETER :: VHOM             =  120
       INTEGER, PARAMETER :: VROCP4OXY2       =  121
       INTEGER, PARAMETER :: VROCN1OXY6       =  122
       INTEGER, PARAMETER :: FURANONE         =  123
@@ -237,7 +237,7 @@ c..Species indices
       INTEGER, PARAMETER :: VROCP0OXY4       =  125
       INTEGER, PARAMETER :: BAL1             =  126
       INTEGER, PARAMETER :: BAL2             =  127
-      INTEGER, PARAMETER :: ELHOM            =  128
+      INTEGER, PARAMETER :: VELHOM           =  128
       INTEGER, PARAMETER :: VROCIOXY         =  129
       INTEGER, PARAMETER :: SLOWROC          =  130
       INTEGER, PARAMETER :: ACRO             =  131

@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /work/MOD3DEV/tskipper/cracmm3/20250221_avprepend/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
+! Source file: /work/MOD3DEV/tskipper/cracmm3/20250303_avprepend/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
 ! for Mechanism Name: CRACMM3                         
 
 ! This file is used to create mechanism data and functions
@@ -142,13 +142,13 @@
       DATA GAS_CHEM_SPC(  38 ) / 'OP1             ' /
       DATA GAS_CHEM_SPC(  39 ) / 'OP2             ' /
       DATA GAS_CHEM_SPC(  40 ) / 'OPB             ' /
-      DATA GAS_CHEM_SPC(  41 ) / 'OP3             ' /
+      DATA GAS_CHEM_SPC(  41 ) / 'VOP3            ' /
       DATA GAS_CHEM_SPC(  42 ) / 'PAA             ' /
       DATA GAS_CHEM_SPC(  43 ) / 'ONIT            ' /
       DATA GAS_CHEM_SPC(  44 ) / 'PAN             ' /
       DATA GAS_CHEM_SPC(  45 ) / 'CO2             ' /
-      DATA GAS_CHEM_SPC(  46 ) / 'TRPN            ' /
-      DATA GAS_CHEM_SPC(  47 ) / 'HONIT           ' /
+      DATA GAS_CHEM_SPC(  46 ) / 'VTRPN           ' /
+      DATA GAS_CHEM_SPC(  47 ) / 'VHONIT          ' /
       DATA GAS_CHEM_SPC(  48 ) / 'N2O5            ' /
       DATA GAS_CHEM_SPC(  49 ) / 'SO2             ' /
       DATA GAS_CHEM_SPC(  50 ) / 'SULF            ' /
@@ -221,7 +221,7 @@
       DATA GAS_CHEM_SPC( 117 ) / 'LIMNP1          ' /
       DATA GAS_CHEM_SPC( 118 ) / 'LIMNP2          ' /
       DATA GAS_CHEM_SPC( 119 ) / 'ADCN            ' /
-      DATA GAS_CHEM_SPC( 120 ) / 'HOM             ' /
+      DATA GAS_CHEM_SPC( 120 ) / 'VHOM            ' /
       DATA GAS_CHEM_SPC( 121 ) / 'VROCP4OXY2      ' /
       DATA GAS_CHEM_SPC( 122 ) / 'VROCN1OXY6      ' /
       DATA GAS_CHEM_SPC( 123 ) / 'FURANONE        ' /
@@ -229,7 +229,7 @@
       DATA GAS_CHEM_SPC( 125 ) / 'VROCP0OXY4      ' /
       DATA GAS_CHEM_SPC( 126 ) / 'BAL1            ' /
       DATA GAS_CHEM_SPC( 127 ) / 'BAL2            ' /
-      DATA GAS_CHEM_SPC( 128 ) / 'ELHOM           ' /
+      DATA GAS_CHEM_SPC( 128 ) / 'VELHOM          ' /
       DATA GAS_CHEM_SPC( 129 ) / 'VROCIOXY        ' /
       DATA GAS_CHEM_SPC( 130 ) / 'SLOWROC         ' /
       DATA GAS_CHEM_SPC( 131 ) / 'ACRO            ' /
@@ -351,13 +351,13 @@
       & MEMBER("OP1             ",   35, "GC",   48.00D0, F), &
       & MEMBER("OP2             ",   36, "GC",   62.00D0, F), &
       & MEMBER("OPB             ",   37, "GC",  186.20D0, F), &
-      & MEMBER("OP3             ",   38, "GC",  176.20D0, F), &
+      & MEMBER("VOP3            ",   38, "GC",  176.20D0, F), &
       & MEMBER("PAA             ",   39, "GC",   76.00D0, F), &
       & MEMBER("ONIT            ",   40, "GC",  119.00D0, F), &
       & MEMBER("PAN             ",   41, "GC",  121.00D0, F), &
       & MEMBER("CO2             ",  183, "GC",   44.00D0, F), &
-      & MEMBER("TRPN            ",  120, "GC",  215.00D0, F), &
-      & MEMBER("HONIT           ",  121, "GC",  265.00D0, F), &
+      & MEMBER("VTRPN           ",  120, "GC",  215.00D0, F), &
+      & MEMBER("VHONIT          ",  121, "GC",  265.00D0, F), &
       & MEMBER("N2O5            ",   42, "GC",  108.00D0, F), &
       & MEMBER("SO2             ",   43, "GC",   64.00D0, F), &
       & MEMBER("SULF            ",   44, "GC",   98.00D0, F), &
@@ -431,7 +431,7 @@
       & MEMBER("LIMNP1          ",   86, "GC",  230.00D0, F), &
       & MEMBER("LIMNP2          ",   87, "GC",  230.00D0, F), &
       & MEMBER("ADCN            ",  125, "GC",  155.00D0, F), &
-      & MEMBER("HOM             ",   90, "GC",  250.00D0, F), &
+      & MEMBER("VHOM            ",   90, "GC",  250.00D0, F), &
       & MEMBER("VROCP4OXY2      ",  179, "GC",  158.20D0, F), &
       & MEMBER("VROCN1OXY6      ",  172, "GC",  190.20D0, F), &
       & MEMBER("FURANONE        ",  134, "GC",  100.10D0, F), &
@@ -439,7 +439,7 @@
       & MEMBER("VROCP0OXY4      ",  174, "GC",  202.30D0, F), &
       & MEMBER("BAL1            ",  126, "GC",  123.00D0, F), &
       & MEMBER("BAL2            ",  127, "GC",  109.00D0, F), &
-      & MEMBER("ELHOM           ",   91, "GC",  402.00D0, F), &
+      & MEMBER("VELHOM          ",   91, "GC",  402.00D0, F), &
       & MEMBER("VROCIOXY        ",  135, "GC",  247.00D0, F), &
       & MEMBER("SLOWROC         ",  136, "GC",   75.40D0, F), &
       & MEMBER("ACRO            ",  128, "GC",   56.10D0, F), &
@@ -544,13 +544,13 @@
       DATA CHEMISTRY_SPC(  38 ), SPECIES_MOLWT(  38 ) / 'OP1             ',   48.00D0 /
       DATA CHEMISTRY_SPC(  39 ), SPECIES_MOLWT(  39 ) / 'OP2             ',   62.00D0 /
       DATA CHEMISTRY_SPC(  40 ), SPECIES_MOLWT(  40 ) / 'OPB             ',  186.20D0 /
-      DATA CHEMISTRY_SPC(  41 ), SPECIES_MOLWT(  41 ) / 'OP3             ',  176.20D0 /
+      DATA CHEMISTRY_SPC(  41 ), SPECIES_MOLWT(  41 ) / 'VOP3            ',  176.20D0 /
       DATA CHEMISTRY_SPC(  42 ), SPECIES_MOLWT(  42 ) / 'PAA             ',   76.00D0 /
       DATA CHEMISTRY_SPC(  43 ), SPECIES_MOLWT(  43 ) / 'ONIT            ',  119.00D0 /
       DATA CHEMISTRY_SPC(  44 ), SPECIES_MOLWT(  44 ) / 'PAN             ',  121.00D0 /
       DATA CHEMISTRY_SPC(  45 ), SPECIES_MOLWT(  45 ) / 'CO2             ',   44.00D0 /
-      DATA CHEMISTRY_SPC(  46 ), SPECIES_MOLWT(  46 ) / 'TRPN            ',  215.00D0 /
-      DATA CHEMISTRY_SPC(  47 ), SPECIES_MOLWT(  47 ) / 'HONIT           ',  265.00D0 /
+      DATA CHEMISTRY_SPC(  46 ), SPECIES_MOLWT(  46 ) / 'VTRPN           ',  215.00D0 /
+      DATA CHEMISTRY_SPC(  47 ), SPECIES_MOLWT(  47 ) / 'VHONIT          ',  265.00D0 /
       DATA CHEMISTRY_SPC(  48 ), SPECIES_MOLWT(  48 ) / 'N2O5            ',  108.00D0 /
       DATA CHEMISTRY_SPC(  49 ), SPECIES_MOLWT(  49 ) / 'SO2             ',   64.00D0 /
       DATA CHEMISTRY_SPC(  50 ), SPECIES_MOLWT(  50 ) / 'SULF            ',   98.00D0 /
@@ -624,7 +624,7 @@
       DATA CHEMISTRY_SPC( 118 ), SPECIES_MOLWT( 118 ) / 'LIMNP1          ',  230.00D0 /
       DATA CHEMISTRY_SPC( 119 ), SPECIES_MOLWT( 119 ) / 'LIMNP2          ',  230.00D0 /
       DATA CHEMISTRY_SPC( 120 ), SPECIES_MOLWT( 120 ) / 'ADCN            ',  155.00D0 /
-      DATA CHEMISTRY_SPC( 121 ), SPECIES_MOLWT( 121 ) / 'HOM             ',  250.00D0 /
+      DATA CHEMISTRY_SPC( 121 ), SPECIES_MOLWT( 121 ) / 'VHOM            ',  250.00D0 /
       DATA CHEMISTRY_SPC( 122 ), SPECIES_MOLWT( 122 ) / 'VROCP4OXY2      ',  158.20D0 /
       DATA CHEMISTRY_SPC( 123 ), SPECIES_MOLWT( 123 ) / 'VROCN1OXY6      ',  190.20D0 /
       DATA CHEMISTRY_SPC( 124 ), SPECIES_MOLWT( 124 ) / 'FURANONE        ',  100.10D0 /
@@ -632,7 +632,7 @@
       DATA CHEMISTRY_SPC( 126 ), SPECIES_MOLWT( 126 ) / 'VROCP0OXY4      ',  202.30D0 /
       DATA CHEMISTRY_SPC( 127 ), SPECIES_MOLWT( 127 ) / 'BAL1            ',  123.00D0 /
       DATA CHEMISTRY_SPC( 128 ), SPECIES_MOLWT( 128 ) / 'BAL2            ',  109.00D0 /
-      DATA CHEMISTRY_SPC( 129 ), SPECIES_MOLWT( 129 ) / 'ELHOM           ',  402.00D0 /
+      DATA CHEMISTRY_SPC( 129 ), SPECIES_MOLWT( 129 ) / 'VELHOM          ',  402.00D0 /
       DATA CHEMISTRY_SPC( 130 ), SPECIES_MOLWT( 130 ) / 'VROCIOXY        ',  247.00D0 /
       DATA CHEMISTRY_SPC( 131 ), SPECIES_MOLWT( 131 ) / 'SLOWROC         ',   75.40D0 /
       DATA CHEMISTRY_SPC( 132 ), SPECIES_MOLWT( 132 ) / 'ACRO            ',   56.10D0 /
@@ -738,13 +738,13 @@
       DATA CGRID_INDEX(  38 ), SPECIES_TYPE(  38 ), CONVERT_CONC(  38 ) /   35, 'GC', F /  ! OP1
       DATA CGRID_INDEX(  39 ), SPECIES_TYPE(  39 ), CONVERT_CONC(  39 ) /   36, 'GC', F /  ! OP2
       DATA CGRID_INDEX(  40 ), SPECIES_TYPE(  40 ), CONVERT_CONC(  40 ) /   37, 'GC', F /  ! OPB
-      DATA CGRID_INDEX(  41 ), SPECIES_TYPE(  41 ), CONVERT_CONC(  41 ) /   38, 'GC', F /  ! OP3
+      DATA CGRID_INDEX(  41 ), SPECIES_TYPE(  41 ), CONVERT_CONC(  41 ) /   38, 'GC', F /  ! VOP3
       DATA CGRID_INDEX(  42 ), SPECIES_TYPE(  42 ), CONVERT_CONC(  42 ) /   39, 'GC', F /  ! PAA
       DATA CGRID_INDEX(  43 ), SPECIES_TYPE(  43 ), CONVERT_CONC(  43 ) /   40, 'GC', F /  ! ONIT
       DATA CGRID_INDEX(  44 ), SPECIES_TYPE(  44 ), CONVERT_CONC(  44 ) /   41, 'GC', F /  ! PAN
       DATA CGRID_INDEX(  45 ), SPECIES_TYPE(  45 ), CONVERT_CONC(  45 ) /  183, 'GC', F /  ! CO2
-      DATA CGRID_INDEX(  46 ), SPECIES_TYPE(  46 ), CONVERT_CONC(  46 ) /  120, 'GC', F /  ! TRPN
-      DATA CGRID_INDEX(  47 ), SPECIES_TYPE(  47 ), CONVERT_CONC(  47 ) /  121, 'GC', F /  ! HONIT
+      DATA CGRID_INDEX(  46 ), SPECIES_TYPE(  46 ), CONVERT_CONC(  46 ) /  120, 'GC', F /  ! VTRPN
+      DATA CGRID_INDEX(  47 ), SPECIES_TYPE(  47 ), CONVERT_CONC(  47 ) /  121, 'GC', F /  ! VHONIT
       DATA CGRID_INDEX(  48 ), SPECIES_TYPE(  48 ), CONVERT_CONC(  48 ) /   42, 'GC', F /  ! N2O5
       DATA CGRID_INDEX(  49 ), SPECIES_TYPE(  49 ), CONVERT_CONC(  49 ) /   43, 'GC', F /  ! SO2
       DATA CGRID_INDEX(  50 ), SPECIES_TYPE(  50 ), CONVERT_CONC(  50 ) /   44, 'GC', F /  ! SULF
@@ -818,7 +818,7 @@
       DATA CGRID_INDEX( 118 ), SPECIES_TYPE( 118 ), CONVERT_CONC( 118 ) /   86, 'GC', F /  ! LIMNP1
       DATA CGRID_INDEX( 119 ), SPECIES_TYPE( 119 ), CONVERT_CONC( 119 ) /   87, 'GC', F /  ! LIMNP2
       DATA CGRID_INDEX( 120 ), SPECIES_TYPE( 120 ), CONVERT_CONC( 120 ) /  125, 'GC', F /  ! ADCN
-      DATA CGRID_INDEX( 121 ), SPECIES_TYPE( 121 ), CONVERT_CONC( 121 ) /   90, 'GC', F /  ! HOM
+      DATA CGRID_INDEX( 121 ), SPECIES_TYPE( 121 ), CONVERT_CONC( 121 ) /   90, 'GC', F /  ! VHOM
       DATA CGRID_INDEX( 122 ), SPECIES_TYPE( 122 ), CONVERT_CONC( 122 ) /  179, 'GC', F /  ! VROCP4OXY2
       DATA CGRID_INDEX( 123 ), SPECIES_TYPE( 123 ), CONVERT_CONC( 123 ) /  172, 'GC', F /  ! VROCN1OXY6
       DATA CGRID_INDEX( 124 ), SPECIES_TYPE( 124 ), CONVERT_CONC( 124 ) /  134, 'GC', F /  ! FURANONE
@@ -826,7 +826,7 @@
       DATA CGRID_INDEX( 126 ), SPECIES_TYPE( 126 ), CONVERT_CONC( 126 ) /  174, 'GC', F /  ! VROCP0OXY4
       DATA CGRID_INDEX( 127 ), SPECIES_TYPE( 127 ), CONVERT_CONC( 127 ) /  126, 'GC', F /  ! BAL1
       DATA CGRID_INDEX( 128 ), SPECIES_TYPE( 128 ), CONVERT_CONC( 128 ) /  127, 'GC', F /  ! BAL2
-      DATA CGRID_INDEX( 129 ), SPECIES_TYPE( 129 ), CONVERT_CONC( 129 ) /   91, 'GC', F /  ! ELHOM
+      DATA CGRID_INDEX( 129 ), SPECIES_TYPE( 129 ), CONVERT_CONC( 129 ) /   91, 'GC', F /  ! VELHOM
       DATA CGRID_INDEX( 130 ), SPECIES_TYPE( 130 ), CONVERT_CONC( 130 ) /  135, 'GC', F /  ! VROCIOXY
       DATA CGRID_INDEX( 131 ), SPECIES_TYPE( 131 ), CONVERT_CONC( 131 ) /  136, 'GC', F /  ! SLOWROC
       DATA CGRID_INDEX( 132 ), SPECIES_TYPE( 132 ), CONVERT_CONC( 132 ) /  128, 'GC', F /  ! ACRO
@@ -934,13 +934,13 @@
       INTEGER :: INDEX_OP1         =   38
       INTEGER :: INDEX_OP2         =   39
       INTEGER :: INDEX_OPB         =   40
-      INTEGER :: INDEX_OP3         =   41
+      INTEGER :: INDEX_VOP3        =   41
       INTEGER :: INDEX_PAA         =   42
       INTEGER :: INDEX_ONIT        =   43
       INTEGER :: INDEX_PAN         =   44
       INTEGER :: INDEX_CO2         =   45
-      INTEGER :: INDEX_TRPN        =   46
-      INTEGER :: INDEX_HONIT       =   47
+      INTEGER :: INDEX_VTRPN       =   46
+      INTEGER :: INDEX_VHONIT      =   47
       INTEGER :: INDEX_N2O5        =   48
       INTEGER :: INDEX_SO2         =   49
       INTEGER :: INDEX_SULF        =   50
@@ -1014,7 +1014,7 @@
       INTEGER :: INDEX_LIMNP1      =  118
       INTEGER :: INDEX_LIMNP2      =  119
       INTEGER :: INDEX_ADCN        =  120
-      INTEGER :: INDEX_HOM         =  121
+      INTEGER :: INDEX_VHOM        =  121
       INTEGER :: INDEX_VROCP4OXY2  =  122
       INTEGER :: INDEX_VROCN1OXY6  =  123
       INTEGER :: INDEX_FURANONE    =  124
@@ -1022,7 +1022,7 @@
       INTEGER :: INDEX_VROCP0OXY4  =  126
       INTEGER :: INDEX_BAL1        =  127
       INTEGER :: INDEX_BAL2        =  128
-      INTEGER :: INDEX_ELHOM       =  129
+      INTEGER :: INDEX_VELHOM      =  129
       INTEGER :: INDEX_VROCIOXY    =  130
       INTEGER :: INDEX_SLOWROC     =  131
       INTEGER :: INDEX_ACRO        =  132
