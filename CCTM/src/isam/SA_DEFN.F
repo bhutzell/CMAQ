@@ -562,7 +562,7 @@ c----------------------------------------------------------
 
         !CRACMM3
         ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 98 ) )
-        ISAM_SPEC_VOC( 10 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
+        ISAM_SPEC_VOC( 6 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
      &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
      &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
      &    'EBZ       ','VELHOM    ','EOH       ','ETE       ','ETEG      ',
