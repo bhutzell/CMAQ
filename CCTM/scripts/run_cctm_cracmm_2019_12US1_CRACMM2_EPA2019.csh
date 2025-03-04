@@ -35,7 +35,7 @@ echo 'Start Model Run At ' `date`
 #> Set General Parameters for Configuring the Simulation
  set VRSN      = v55              #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cracmm2      #> Mechanism ID
+ setenv MECH     cracmm2      #> Mechanism ID
 # set EMIS      = 2016fh            #> Emission Inventory Details
  set APPL      = 2019_12US1        #> Application Name (e.g. Gridname)
 
