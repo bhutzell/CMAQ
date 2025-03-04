@@ -192,15 +192,11 @@ C-----------------------------------------------------------------------
       WRITE( CONCMIN,'(1PE9.2)' ) CMIN
 
 #ifndef mpas
-
+      SKIP = .FALSE.
 #ifdef twoway
       IF (FNAME == 'MET_CRO_3D') THEN
          SKIP = .TRUE.
-      ELSE
-         SKIP = .FALSE.
       END IF
-#else
-      SKIP = .FALSE.
 #endif
 
       IF (.NOT. SKIP) THEN

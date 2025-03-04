@@ -9,7 +9,7 @@
 !                         according to new PX implementation in WRFv4.1+
 !           Aug 01, 2019  Wong -- added two new metdot3d variables, UWIND and
 !                                 VWIND (wind component of the mass point)
-!           Jan 10, 2024  David Wong -- Incorporated unified coupler implmentation
+!           Jan 10, 2024  David Wong -- Incorporated unified coupler implementation
 !===============================================================================
 
   module twoway_met_param_module
@@ -22,4 +22,4 @@
 
     INTEGER, PARAMETER :: max_nvars       = 1000
 
-end module twoway_met_param_module
+  end module twoway_met_param_module

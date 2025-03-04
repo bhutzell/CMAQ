@@ -114,7 +114,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 !           16 Mar 2023  (David Wong)
 !              -- fixed a bug in creating u and v components
 !           10 Jan 2024  (David Wong)
-!              --  Incorporated unified coupler implmentation
+!              --  Incorporated unified coupler implementation
 !           30 Apr 2024  (Tanya Spero)
 !              -- Changed constraint on XORIG and YORIG for Lambert conformal
 !                 projections. Original constraint of 500 meters introduced an
@@ -132,7 +132,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
   USE twoway_util_module
   USE twoway_header_data_module
-! USE twoway_met_param_module
   USE twoway_data_module
   USE HGRD_DEFN
   USE SE_MODULES
@@ -181,7 +180,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
   INTEGER, INTENT(IN)           :: ims, ime, jms, jme, kms, kme
   INTEGER, INTENT(IN)           :: its, ite, jts, jte, kts, kte
 
-  LOGICAL, PARAMETER            :: def_false = .false.
   LOGICAL, SAVE                 :: first = .TRUE.
 
   INTEGER, SAVE :: nlays, nvars
@@ -200,7 +198,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
   CHARACTER (LEN = 16), PARAMETER :: pname = 'aq_prep         '
 
-  CHARACTER (LEN = 16) :: fname, pfname
+  CHARACTER (LEN = 16) :: pfname
 
 ! Calc for PV
 
@@ -267,7 +265,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
   real, allocatable, save :: metcro3d_data_cmaq (:,:,:,:)
   real, allocatable, save :: metdot3d_data_cmaq (:,:,:,:)
   real, allocatable, save :: metcro2d_data_cmaq (:,:,:)
-! real, allocatable, save :: previous_rain_rec(:,:,:)
   real, allocatable, save :: temp_rainnc(:,:)
   real, allocatable, save :: temp_rainc(:,:)
 
@@ -544,28 +541,28 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 ! the reason for twoway_nprocs*3 is in the worst scenario, the entire cmaq domain is inside one wrf processor domain
      allocate (wrf_cmaq_c_send_to(0:9, 0:twoway_nprocs-1),               &
                wrf_cmaq_c_recv_from(0:9, 0:twoway_nprocs-1),             &
-               wrf_cmaq_c_send_index_g(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_c_send_index_l(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_c_recv_index_g(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_c_recv_index_l(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimenionality
+               wrf_cmaq_c_send_index_g(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_c_send_index_l(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_c_recv_index_g(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_c_recv_index_l(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimensionality
                wrf_cmaq_d_send_to(0:9, 0:twoway_nprocs-1),               &
                wrf_cmaq_d_recv_from(0:9, 0:twoway_nprocs-1),             &
-               wrf_cmaq_d_send_index_g(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_d_send_index_l(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_d_recv_index_g(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_d_recv_index_l(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimenionality
+               wrf_cmaq_d_send_index_g(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_d_send_index_l(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_d_recv_index_g(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_d_recv_index_l(9*3, 2, 0:twoway_nprocs-1),       &    ! starting and ending dimension, dimensionality
                wrf_cmaq_ce_send_to(0:9, 0:twoway_nprocs-1),              &
                wrf_cmaq_ce_recv_from(0:9, 0:twoway_nprocs-1),            &
-               wrf_cmaq_ce_send_index_g(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_ce_send_index_l(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_ce_recv_index_g(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_ce_recv_index_l(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimenionality
+               wrf_cmaq_ce_send_index_g(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_ce_send_index_l(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_ce_recv_index_g(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_ce_recv_index_l(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimensionality
                wrf_cmaq_de_send_to(0:9, 0:twoway_nprocs-1),              &
                wrf_cmaq_de_recv_from(0:9, 0:twoway_nprocs-1),            &
-               wrf_cmaq_de_send_index_g(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_de_send_index_l(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_de_recv_index_g(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimenionality
-               wrf_cmaq_de_recv_index_l(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimenionality
+               wrf_cmaq_de_send_index_g(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_de_send_index_l(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_de_recv_index_g(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimensionality
+               wrf_cmaq_de_recv_index_l(9*3, 2, 0:twoway_nprocs-1),      &    ! starting and ending dimension, dimensionality
                stat=stat) 
      if (stat .ne. 0) then
         print *, ' Error: Allocating communication indices arrays'
@@ -625,9 +622,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 ! only need to do this once per run, not each step
 !-------------------------------------------------------------------------------
 
-     if (wrf_cmaq_option .gt. 1) then
-        fname = 'GRID_CRO_2D'
-     end if
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         pfname = 'PGRID_CRO_2D'
      end if
@@ -658,20 +652,12 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
         allocate ( gridcro2d_data_wrf (wrf_c_ncols, wrf_c_nrows, nvars3d), stat=stat)
         allocate ( gridcro2d_data_cmaq (cmaq_c_ncols, cmaq_c_nrows, nvars3d), stat=stat)
 
-        if (wrf_cmaq_option .gt. 1) then
-           if ( .not. open3 (fname, FSRDWR3, pname) ) then
-              print *, ' Error: Could not open file ', fname, 'for update'
-              if ( .not. open3 (fname, FSNEW3, pname) ) then
-                 print *, ' Error: Could not open file ', fname
-              end if
-           end if
-        end if
         if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
            if (twoway_mype == 0) then
               ncols3d = cmaq_c_col_dim
               nrows3d = cmaq_c_row_dim
               if ( .not. open3 (pfname, FSRDWR3, pname) ) then
-                 print *, ' Error: Could not open file ', pfname, 'for update'
+                 print *, ' Could not open file ', pfname, 'for update'
                  if ( .not. open3 (pfname, FSNEW3, pname) ) then
                     print *, ' Error: Could not open file ', pfname
                  end if
@@ -708,7 +694,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
               mminlu = config_flags%mminlu
            end if
         else
-           print *, ' Warning: Unknow landuse type ', config_flags%mminlu, grid%num_land_cat
+           print *, ' Warning: Unknown landuse type ', config_flags%mminlu, grid%num_land_cat
         end if
      end if
 
@@ -792,7 +778,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
                                                     grid%landusef(ii,13,jj)       ) /  &
                                                   (1.0 - grid%landusef(ii,lwater,jj)) ) * 100.0
                  else
-                    print *, ' Warning:: Unknow Land Use type'
+                    print *, ' Warning:: Unknown Land Use type'
                     stop
                  end if
               else
@@ -826,7 +812,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
      end if
 
     !---------------------------------------------------------------------------
-    ! Compute sqaured dot-point map-scale factors (MSFD2).
+    ! Compute squared dot-point map-scale factors (MSFD2).
     !
     ! The correct method would be to use the grid projection information and
     ! call a routine like gridgeometry from MCIP.  Here, for simplicity, 
@@ -834,9 +820,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
     ! factors that are readily available in WRF using four-point interpolation.
     !---------------------------------------------------------------------------
 
-     if (wrf_cmaq_option .gt. 1) then
-        fname = 'GRID_DOT_2D'
-     end if
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         pfname = 'PGRID_DOT_2D'
      end if
@@ -853,20 +836,12 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
         tstep3d = 0
         vtype3d = ioapi_header%vtype
 
-        if (wrf_cmaq_option .gt. 1) then
-           if ( .not. open3 (fname, FSRDWR3, pname) ) then
-              print *, ' Error: Could not open file ', fname, 'for update'
-              if ( .not. open3 (fname, FSNEW3, pname) ) then
-                 print *, ' Error: Could not open file ', fname
-              end if
-           end if
-        end if
         if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
            if (twoway_mype == 0) then
               ncols3d = cmaq_c_col_dim + 1
               nrows3d = cmaq_c_row_dim + 1
               if ( .not. open3 (pfname, FSRDWR3, pname) ) then
-                 print *, ' Error: Could not open file ', pfname, 'for update'
+                 print *, ' Could not open file ', pfname, 'for update'
                  if ( .not. open3 (pfname, FSNEW3, pname) ) then
                     print *, ' Error: Could not open file ', pfname
                  end if
@@ -926,9 +901,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
   ENDIF  ! first
 
-  if (wrf_cmaq_option .gt. 1) then
-     fname = 'MET_CRO_3D'
-  end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      pfname = 'PMET_CRO_3D'
   end if
@@ -980,15 +952,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
      end if
 
-     if (wrf_cmaq_option .gt. 1) then
-        if ( .not. open3 (fname, FSRDWR3, pname) ) then
-           print *, ' Error: Could not open file ', fname, 'for update'
-           if ( .not. open3 (fname, FSNEW3, pname) ) then
-              print *, ' Error: Could not open file ', fname
-           end if
-        end if
-     end if
-
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         if (twoway_mype == 0) then
            ncols3d = cmaq_c_col_dim + 2
@@ -996,7 +959,7 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
            tstep3d = file_time_step
 
            if ( .not. open3 (pfname, FSRDWR3, pname) ) then
-              print *, ' Error: Could not open file ', pfname, 'for update'
+              print *, ' Could not open file ', pfname, 'for update'
               if ( .not. open3 (pfname, FSNEW3, pname) ) then
                  print *, ' Error: Could not open file ', pfname
               end if
@@ -1460,9 +1423,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
 ! --------------------------
 
-  if (wrf_cmaq_option .gt. 1) then
-     fname = 'MET_DOT_3D'
-  end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      pfname = 'PMET_DOT_3D'
   end if
@@ -1497,22 +1457,13 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
         end if
      end if
 
-     if (wrf_cmaq_option .gt. 1) then
-        if ( .not. open3 (fname, FSRDWR3, pname) ) then
-           print *, ' Error: Could not open file ', fname, 'for update'
-           if ( .not. open3 (fname, FSNEW3, pname) ) then
-              print *, ' Error: Could not open file ', fname
-           end if
-        end if
-     end if
-
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         if (twoway_mype == 0) then
            ncols3d = cmaq_c_col_dim + 1
            nrows3d = cmaq_c_row_dim + 1
            tstep3d = file_time_step
            if ( .not. open3 (pfname, FSRDWR3, pname) ) then
-              print *, ' Error: Could not open file ', pfname, 'for update'
+              print *, ' Could not open file ', pfname, 'for update'
               if ( .not. open3 (pfname, FSNEW3, pname) ) then
                  print *, ' Error: Could not open file ', pfname
               end if
@@ -1608,9 +1559,6 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
 
 ! ------------------
 
-  if (wrf_cmaq_option .gt. 1) then
-     fname = 'MET_CRO_2D'
-  end if
   if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
      pfname = 'PMET_CRO_2D'
   end if
@@ -1639,22 +1587,13 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
         temp_rainc  = 0.0
      end if
 
-     if (wrf_cmaq_option .gt. 1) then
-        if ( .not. open3 (fname, FSRDWR3, pname) ) then
-           print *, ' Error: Could not open file ', fname, 'for update'
-           if ( .not. open3 (fname, FSNEW3, pname) ) then
-              print *, ' Error: Could not open file ', fname
-           end if
-        end if
-     end if
-
      if ((wrf_cmaq_option == 1) .or. (wrf_cmaq_option == 3)) then
         if (twoway_mype == 0) then
            ncols3d = cmaq_c_col_dim
            nrows3d = cmaq_c_row_dim
            tstep3d = file_time_step
            if ( .not. open3 (pfname, FSRDWR3, pname) ) then
-              print *, ' Error: Could not open file ', pfname, 'for update'
+              print *, ' Could not open file ', pfname, 'for update'
               if ( .not. open3 (pfname, FSNEW3, pname) ) then
                  print *, ' Error: Could not open file ', pfname
               end if

@@ -16,7 +16,7 @@
 !       In terms of memory requirement, it needs space to hold A in model X,
 !       B in model Y, and A and B in coupler.
 !
-!       In some instances, retrieving var B takes place in multiple subourintes
+!       In some instances, retrieving var B takes place in multiple subroutines
 !       in model Y. This means multiple copies of B are required, i.e. increase
 !       of memory footprint. To mitigate this potential large memory footprint
 !       scenario, implementation of the generic form of the coupler was relaxed
@@ -25,19 +25,19 @@
 !
 !       In MPAS, spatial data is stored in 1D array (NROWS = 1) but such data is
 !       stored in coupler's 2D data structure. Similarly, three dimensional 
-!       volumn data in MPAS is stored in a 2D array (NROWS = 1) but such data is 
+!       volume data in MPAS is stored in a 2D array (NROWS = 1) but such data is 
 !       stored in coupler's 3D data structure. In addition, 2D MPAS array 
 !       defined as (nlays, ncols) is converted to (ncols, nrows, nlays) 
 !       structure, where nrows = 1.
 !
 !       Variable naming convention:
 !         time dependency ( i / d )        -- time independent vs time dependent
-!         grep type ( r / e )              -- regular cross vs extended dot grid
+!         grid type ( r / e )              -- regular cross vs extended dot grid
 !         transfer direction ( m2a / a2m ) -- from met to CMAQ or CMAQ to met
 !
 !       For MPAS-CMAQ coupled model: 
 !         * there are m met variables (2D and 3D together) and all CMAQ 
-!           concentration fields, n variables, are transferring from MPAS to 
+!           concentration fields, n variables, are transferred from MPAS to 
 !           CMAQ. Only those m met variables' name are stored and sorted. 
 !         * All n variables are communicated back to MPAS from CMAQ at once so 
 !           coupler_a2m_vname does not bear any significance.
@@ -78,14 +78,14 @@ module coupler_module
 !                                        and 1 for MPAS-CMAQ since it dose not 
 !                                        require time interpolation
 
-! coupler_m2a_rd_3d_data contains data transfer from met model to CMAQ model
+! coupler_m2a_dr_3d_data contains data transfer from met model to CMAQ model
 ! namely met fields information. However on the MPAS-CMAQ side, it also contains
 ! conc fields. Hence the data arrangement is conc fields first and then met
 ! fields. The conc fields are in and out at once always but the met fields are
 ! being accessed individually. With this consideration, variable 
 ! coupler_a2m_nvars indicates the number of met variables from met model to CMAQ
 ! model and it is the same as coupler_m2a_mnvars (for MPAS-CMAQ only). With this
-! reasoning, coupler_m2a_vname only contains met variable names only. Variable
+! reasoning, coupler_m2a_vname contains met variable names only. Variable
 ! coupler_m2a_ncvars indicates the number of conc variables in the coupled model
 ! (for MPAS-CMAQ only).
 
@@ -107,7 +107,7 @@ module coupler_module
   real, allocatable                          :: coupler_a2m_3d_data(:,:,:,:)
 
   integer :: coupler_m2a_nvars             ! # of vars from met to CMAQ model
-  integer :: coupler_a2m_nvars             ! # of vars from CMAQ to met modol
+  integer :: coupler_a2m_nvars             ! # of vars from CMAQ to met model
   integer :: coupler_m2a_nmvars            ! # of met  vars from met to CMAQ model, MPAS only
   integer :: coupler_m2a_ncvars            ! # of conc vars from met to CMAQ model, MPAS only
 
@@ -206,7 +206,7 @@ module coupler_module
 
     integer, allocatable :: wi_spc_index(:,:)
 
-    ! elmental carbon
+    ! elemental carbon
     integer, parameter :: num_ec_spc = 2
 
     integer :: ec_spc_index(num_ec_spc)
@@ -243,71 +243,6 @@ module coupler_module
          'O3              '                                           &
       /)
 
-! for 2d variable
-!        integer, parameter :: n2d_data_old   = 35
-
-!        integer, parameter :: cfrac2dr_ind =  1
-!        integer, parameter :: chlo_ind     =  2
-!        integer, parameter :: dms_ind      =  3
-!        integer, parameter :: hfx_ind      =  4
-!        integer, parameter :: ht_ind       =  5
-!        integer, parameter :: lai_ind      =  6
-!        integer, parameter :: lat_ind      =  7
-!        integer, parameter :: lh_ind       =  8
-!        integer, parameter :: lon_ind      =  9
-!        integer, parameter :: lwmask_ind   = 10
-!        integer, parameter :: open_ind     = 11
-!        integer, parameter :: pbl_ind      = 12
-!        integer, parameter :: prsfc_ind    = 13
-!        integer, parameter :: purb_ind     = 14
-!        integer, parameter :: q2_ind       = 15
-!        integer, parameter :: ra_ind       = 16     ! aerodynamic resistance
-!        integer, parameter :: rainc_ind    = 17     ! time-step convective precipitation
-!        integer, parameter :: rgrnd_ind    = 18
-!        integer, parameter :: rainnc_ind   = 19     ! time-step total grid-scale precipitation
-!        integer, parameter :: rs_ind       = 20     ! surface resistance
-!        integer, parameter :: seaice_ind   = 21
-!        integer, parameter :: sltyp_ind    = 22
-!        integer, parameter :: snocov_ind   = 23
-!        integer, parameter :: soit1_ind    = 24
-!        integer, parameter :: surf_ind     = 25
-!        integer, parameter :: temp2_ind    = 26
-!        integer, parameter :: tempg_ind    = 27
-!        integer, parameter :: ustar_ind    = 28
-!        integer, parameter :: vegpx_ind    = 29
-!        integer, parameter :: canwat_ind   = 30 
-!        integer, parameter :: wspd10_ind   = 31     ! 2m wind speed
-!        integer, parameter :: znt_ind      = 32
-!        integer, parameter :: cellArea_ind = 33     ! cell area, m**2
-!        integer, parameter :: cfrac2dt_ind = 34
-!        integer, parameter :: rmol_ind     = 35
-
-! alphabetical order and upper case letter goes first than lower case letter
-!        character (20), parameter :: vname_2d_old(n2d_data_old) =                &   ! in ascending order
-!           (/ 'CFRAC   ',  'CHLO    ',  'DMS     ',  'HFX     ',  'HT      ',    &
-!              'LAI     ',  'LAT     ',  'LH      ',  'LON     ',  'LWMASK  ',    &
-!              'OPEN    ',  'PBL     ',  'PRSFC   ',  'PURB    ',  'Q2      ',    &
-!              'RA      ',  'RC      ',  'RGRND   ',  'RN      ',  'RS      ',    &
-!              'SEAICE  ',  'SLTYP   ',  'SNOCOV  ',  'SOIT1   ',  'SURF    ',    &
-!              'TEMP2   ',  'TEMPG   ',  'USTAR   ',  'VEG     ',  'WR      ',    &
-!              'WSPD10  ',  'ZRUF    ',  'cellArea',  'cfrac2dt',  'rmol    '  /)
-
-! for 3d variable
-!        integer, parameter :: n3d_data_old     = 18
-
-!        integer, parameter :: cfrac3d_ind    =  1
-!        integer, parameter :: dens_ind       =  2
-!        integer, parameter :: densa_j_ind    =  3
-!        integer, parameter :: qc_ind         =  5
-!        integer, parameter :: qg_ind         =  6
-!        integer, parameter :: qi_ind         =  7
-!        integer, parameter :: qr_ind         =  8
-!        integer, parameter :: qs_ind         =  9
-!        integer, parameter :: cldfracwcu_ind = 15
-!        integer, parameter :: eddy_ind       = 16
-!        integer, parameter :: qc_cu_ind      = 17
-!        integer, parameter :: qi_cu_ind      = 18
-
     real, allocatable :: smois_data(:,:,:)                ! surface layer
 
     integer, private :: num_land_cat   ! for WRF-CMAQ only
@@ -321,10 +256,10 @@ module coupler_module
     integer, parameter :: n2d_data = 32
 
 ! Note: RA       - aerodynamic resistance
-!       RC       - time-step convective precipitation
-!       RN       - time-step total grid-scale precipitation
+!       RC       - time-step convective (subgrid) precipitation
+!       RN       - time-step nonconvective (grid-scale) precipitation
 !       RS       - surface resistance
-!       WSPD10   - 2m wind speed
+!       WSPD10   - 10-m wind speed
 !       cellArea - cell area, m**2
     character (vname_max_str_len), parameter :: vname_2d (n2d_data) =        &
       (/ 'CFRAC   ',  'HFX     ',  'HT      ',  'LAI     ',  'LAT     ',     &
@@ -338,9 +273,9 @@ module coupler_module
 ! 3d variable
     integer, parameter :: n3d_data = 18
 
-! Note: 1. cellht means cell thickness
-!          cellvol means cell volumn
-!          inv means inverse/reciprical
+! Note: 1. cell_ht means cell thickness
+!          cell_vol means cell volume
+!          inv means inverse/reciprocal
 !          mlvl means mid level
 !       2. currently cldfracwcu is not used
 
@@ -358,11 +293,11 @@ module coupler_module
                        coupler_ocean(:,:),               &
                        coupler_szone(:,:),               &
                        cell_area(:,:),                   &
-                       cell_vol(:,:,:),                  &     ! cell volume!
-                       inv_cell_vol(:,:,:),              &     ! reciprical of cell volume
+                       cell_vol(:,:,:),                  &     ! cell volume
+                       inv_cell_vol(:,:,:),              &     ! reciprocal of cell volume
                        cell_ht(:,:,:),                   &     ! cell thickness full level
-                       inv_cell_ht(:,:,:),               &     ! reciprical of cell thickness
-                       inv_mlvl_cell_ht(:,:,:)                 ! reciprical of cell thickness mid level
+                       inv_cell_ht(:,:,:),               &     ! reciprocal of cell thickness
+                       inv_mlvl_cell_ht(:,:,:)                 ! reciprocal of cell thickness mid level
 
   character(1000) :: namelist
 
@@ -1058,7 +993,7 @@ module coupler_module
           eof = .true.
        else
           if (line(1:1) == "'") then
-! for 5.4: AE speicies does not provide full name in the *.nml file and only 
+! for 5.4: AE species does not provide full name in the *.nml file and only 
 !          indicates under Aitken, Accum, and Coarse modes
              if (present(so4_ind)) then
                 if (line(2:5) == 'ASO4') then
