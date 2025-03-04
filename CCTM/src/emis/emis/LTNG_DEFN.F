@@ -87,7 +87,7 @@
 
       INTEGER,              SAVE :: LTLYRS     ! no. of emissions layers
       REAL,    ALLOCATABLE, SAVE :: VDEMIS_LTDIAG( :,:,: ) ! lightning NO diagnostic
-      REAL,    ALLOCATABLE, SAVE :: COLUMN_DIAG( :,: ) ! column total NO
+      REAL,    ALLOCATABLE, SAVE :: COLUMN_DIAG( :,:,:) ! column total NO
 
       CHARACTER( 16 ),      SAVE :: RC_NAME       ! RC name: old is RC and CCnew is RCA
 
@@ -243,13 +243,13 @@
                     WegIdx = INDEX1("WLNeng", LT_VARS, LT_NAME)
                     WsflIdx = INDEX1("WLNsfl", LT_VARS, LT_NAME)
                     WsegIdx = INDEX1("WLNseng", LT_VARS, LT_NAME)
-                    WLNgZlen = COUNT(LTNG_DATA4D(:,:,:,WflIdx) > 0)  ! gZ: greater than zero
+                    WLNgZlen = COUNT(LTNG_DATA4D(:,:,1,:,WflIdx) > 0)  ! gZ: greater than zero
                     ALLOCATE(gZWLNeng(WLNgZlen),gZWLNseng(WLNgZlen), gZWLNfl(WLNgZlen))
                     ALLOCATE(gZWLNsfl(WLNgZlen), EngPfl(WLNgZlen), sEngPfl(WLNgZlen))
-                    gZWLNfl = PACK(LTNG_DATA4D(:,:,:,WflIdx), LTNG_DATA4D(:,:,:,WflIdx) > 0)
-                    gZWLNsfl = PACK(LTNG_DATA4D(:,:,:,WsflIdx), LTNG_DATA4D(:,:,:,WsflIdx) > 0)
-                    gZWLNeng = PACK(LTNG_DATA4D(:,:,:,WegIdx), LTNG_DATA4D(:,:,:,WegIdx) > 0)
-                    gZWLNseng = PACK(LTNG_DATA4D(:,:,:,WsegIdx), LTNG_DATA4D(:,:,:,WsegIdx) > 0)
+                    gZWLNfl = PACK(LTNG_DATA4D(:,:,1,:,WflIdx), LTNG_DATA4D(:,:,1,:,WflIdx) > 0)
+                    gZWLNsfl = PACK(LTNG_DATA4D(:,:,1,:,WsflIdx), LTNG_DATA4D(:,:,1,:,WsflIdx) > 0)
+                    gZWLNeng = PACK(LTNG_DATA4D(:,:,1,:,WegIdx), LTNG_DATA4D(:,:,1,:,WegIdx) > 0)
+                    gZWLNseng = PACK(LTNG_DATA4D(:,:,1,:,WsegIdx), LTNG_DATA4D(:,:,1,:,WsegIdx) > 0)
                     EngPfl = gZWLNeng/(gZWLNfl*SQUAREKM)
                     sEngPfl = gZWLNseng/(gZWLNsfl*SQUAREKM)
                     mEngPfl = sum(EngPfl)/WLNgZlen
@@ -260,36 +260,36 @@
                     szScore = smEngPfl + 3*sWLNsd
 ! filter out possible spurious WWLLN energy records that are outliers
 ! and recompute using the strokes and the mean energy per stroke
-                  DO i = 1, size(LTNG_DATA4D,3) 
+                  DO i = 1, size(LTNG_DATA4D,4) 
                     DO r = 1, NROWS
                       DO c = 1, NCOLS
-                        IF((LTNG_DATA4D(c,r,i,WflIdx) > 0) .and.  
-     &                    (LTNG_DATA4D(c,r,i,WegIdx)/(LTNG_DATA4D(c,r,i,WflIdx)*SQUAREKM) 
+                        IF((LTNG_DATA4D(c,r,1,i,WflIdx) > 0) .and.  
+     &                     (LTNG_DATA4D(c,r,1,i,WegIdx)/(LTNG_DATA4D(c,r,1,i,WflIdx)*SQUAREKM) 
      &                    > zScore)) THEN
-                          LTNG_DATA4D(c,r,i,WegIdx) = LTNG_DATA4D(c,r,i,WflIdx) * mEngPfl
+                          LTNG_DATA4D(c,r,1,i,WegIdx) = LTNG_DATA4D(c,r,1,i,WflIdx) * mEngPfl
                         ENDIF
-                        IF((LTNG_DATA4D(c,r,i,WsflIdx) > 0) .and. 
-     &                   (LTNG_DATA4D(c,r,i,WsegIdx)/(LTNG_DATA4D(c,r,i,WsflIdx)*SQUAREKM) >
+                        IF((LTNG_DATA4D(c,r,1,i,WsflIdx) > 0) .and. 
+     &                    (LTNG_DATA4D(c,r,1,i,WsegIdx)/(LTNG_DATA4D(c,r,1,i,WsflIdx)*SQUAREKM) >
      &                   szScore)) THEN
-                          LTNG_DATA4D(c,r,i,WsegIdx) = LTNG_DATA4D(c,r,i,WsflIdx) * smEngPfl
+                          LTNG_DATA4D(c,r,1,i,WsegIdx) = LTNG_DATA4D(c,r,1,i,WsflIdx) * smEngPfl
                         ENDIF
                       ENDDO
                     ENDDO
                  ENDDO
-                 IF(sum(LTNG_DATA4D(:,:,:,GflIdx)) > 0) then
-                    BetaF2E = sum(LTNG_DATA4D(:,:,:,GegIdx))/(sum(LTNG_DATA4D(:,:,:,GflIdx))*SQUAREKM)
+                 IF(sum(LTNG_DATA4D(:,:,1,:,GflIdx)) > 0) then
+                    BetaF2E = sum(LTNG_DATA4D(:,:,1,:,GegIdx))/(sum(LTNG_DATA4D(:,:,1,:,GflIdx))*SQUAREKM)
                     BetaF2E = MOLSNCG/BetaF2E                 !moles N per flash energy of GLM
                  ELSE 
                     BetaF2E = 0
                  ENDIF 
-                 IF(sum(LTNG_DATA4D(:,:,:,WflIdx)) > 0) then
-                   GamaF2E = sum(LTNG_DATA4D(:,:,:,WegIdx))/(sum(LTNG_DATA4D(:,:,:,WflIdx))*SQUAREKM)
+                 IF(sum(LTNG_DATA4D(:,:,1,:,WflIdx)) > 0) then
+                   GamaF2E = sum(LTNG_DATA4D(:,:,1,:,WegIdx))/(sum(LTNG_DATA4D(:,:,1,:,WflIdx))*SQUAREKM)
                    GamaF2E = MOLSNCG/GamaF2E                 !moles N per flash energy of WWLLN
                  ELSE 
                    GamaF2E = 0
                  ENDIF 
-                 IF(sum(LTNG_DATA4D(:,:,:,WsflIdx)) > 0) then
-                  sGamaF2E = sum(LTNG_DATA4D(:,:,:,WsegIdx))/(sum(LTNG_DATA4D(:,:,:,WsflIdx))*SQUAREKM)
+                 IF(sum(LTNG_DATA4D(:,:,1,:,WsflIdx)) > 0) then
+                  sGamaF2E = sum(LTNG_DATA4D(:,:,1,:,WsegIdx))/(sum(LTNG_DATA4D(:,:,1,:,WsflIdx))*SQUAREKM)
                   sGamaF2E = MOLSNCG/sGamaF2E                 !moles N per flash energy of WWLLN
                  ELSE 
                   sGamaF2E = 0
@@ -433,7 +433,7 @@
                   SUCCESS = .FALSE.; RETURN
                END IF
                VDEMIS_LTDIAG = 0.0   ! array assignment
-               ALLOCATE( COLUMN_DIAG( NCOLS,NROWS), STAT = STATUS )
+               ALLOCATE( COLUMN_DIAG( NCOLS,NROWS,1), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'COLUMN_DIAG memory allocation failed'
                   CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
@@ -773,7 +773,7 @@
 !C Write lightning NO to the diagnostic file
             IF ( LTNGDIAG .AND. .NOT. L_DESID_DIAG ) THEN 
                VDEMIS_LTDIAG = VDEMIS_LTDIAG + VDEMIS_LT   ! array assignment
-               COLUMN_DIAG = COLUMN_DIAG + COLUMN_LTNG_NO
+               COLUMN_DIAG(:,:,1) = COLUMN_DIAG(:,:,1) + COLUMN_LTNG_NO
                IF ( LASTTIC ) THEN   ! time to write out
                   DIVFAC = 1.0 / REAL( MTICS, 4 )
                   VDEMIS_LTDIAG = VDEMIS_LTDIAG * DIVFAC   ! array assignment

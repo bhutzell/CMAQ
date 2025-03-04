@@ -164,7 +164,7 @@
      &                       szone(:,:),         ! from OCEAN data
      &                       chlr(:,:),          ! from OCEAN data
      &                       dmsl(:,:),          ! from OCEAN data
-     &                       LTNG_DATA4D(:,:,:,:), ! lightning input data (col, row, time, vars)
+     &                       LTNG_DATA4D(:,:,:,:,:), ! lightning input data (col, row, layer, time, vars)
      &                       OCEAN_MASK(:,:),    ! from LTNG parameter data
      &                       SLOPE(:,:),         ! from LTNG parameter data
      &                       INTERCEPT(:,:),     ! from LTNG parameter data
@@ -6030,7 +6030,7 @@ C Read the various categories of normalized emissions
      &              INTERCEPT_lg(ncols, nrows), 
      &              ICCG_SUM(ncols, nrows), 
      &              ICCG_WIN(ncols, nrows), 
-     &              LTNG_DATA4D(ncols, nrows, nstep, nvars),
+     &              LTNG_DATA4D(ncols, nrows, 1, nstep, nvars),
      &              STAT=STAT)
           IF ( STAT .NE. 0 ) THEN
              XMSG = 'Failure allocating ltng parameter arrays'
@@ -6100,7 +6100,7 @@ C Read the various categories of normalized emissions
             DO n = 1, nstep
                IF ( .NOT. XTRACT3( LTNGFILE, LT_NAME(v), 1, 1,
      &                        startrow, endrow, startcol, endcol,
-     &                        jdate, jtime, LTNG_DATA4D(:,:,n,v) ) ) Then
+     &                        jdate, jtime, LTNG_DATA4D(:,:,:,n,v) ) ) Then
                   XMSG = 'Could not interpolate OPEN from ' // LTNGFILE
                   Call M3EXIT( PNAME, jdate, jtime, XMSG, XSTAT1 )
                End If
