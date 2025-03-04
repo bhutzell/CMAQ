@@ -189,7 +189,6 @@ set make_options = "-j"                #> additional options for make command if
  set    FP = $FC                       #> path of Fortan preprocessor; set in config.cmaq
  set    CC = ${myCC}                   #> path of C compiler; set in config.cmaq
  setenv BLDER ${CMAQ_HOME}/UTIL/bldmake/bldmake_${compilerString}.exe   #> name of model builder executable
-# setenv BLDER /work/MOD3DEV/wdx/ptmp/wdx/testc/junk/bldmake/src/bldmake
 
 #> Libraries/include files
 #set LIOAPI   = "${IOAPI_DIR}/lib ${ioapi_lib}"      #> I/O API library directory
