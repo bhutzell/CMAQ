@@ -16,8 +16,7 @@
 #> the repository. The user may also set their own preferred 
 #> directory.
 
- set CMAQ_HOME = /work/MOD3DEV/dkj/github_CMAQ/CMAQ_LTNG/Bld_xioapi_ltng
-
+ set CMAQ_HOME = /home/username/path
 #> This section allows users to choose explicitly which tools
 #> to make available from the repo. For each selected tool,
 #> extract_scripts.csh will copy any build and run scripts
