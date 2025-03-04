@@ -98,7 +98,7 @@ HONO|Nitrous acid |G|47.0|E|Nitrous acid|[N\(=O\)O](https://comptox.epa.gov/dash
 IEPOX|isoprene epoxydiols |G|118.1|E|Isoprene epoxydiol|OCC1OC1\(C\)CO
 IEPOXP|IEPOX intermediate (tracking species)|G|118.1||NA|
 INALD|Isoprene nitrates|G|195.1|L|2-hydroperoxy-4-hydroxy-3-methyl-3-(nitrooxy)butanal|CC\(CO\)\(O\[N+\]\(=O\)O\)C\(C=O\)OO
-INO2|Isoprene nitrate-derived peroxy radicals|G|162.1|L|[(2E)-3-methyl-4-(nitrooxy)but-2-en-1-yl]peroxy|C/C\(=C\CO\[O\]\)CON\(=O\)=O
+ISONP|Isoprene nitrate-derived peroxy radicals|G|162.1|L|[(2E)-3-methyl-4-(nitrooxy)but-2-en-1-yl]peroxy|C/C\(=C\CO\[O\]\)CON\(=O\)=O
 IPX|Isoprene tetrafunctional compounds|G|150.1|L|3-(1-hydroperoxy-2-hydroxypropan-2-yl)oxiran-2-ol|CC\(O\)\(COO\)C1OC1O
 ISHP|Beta-hydroxy hydroperoxides from ISOP+HO2|G|118.0|L|2-hydroperoxy-2-methylbut-3-en-1-ol|C=CC\(OO\)\(CO\)C
 ISO|Isoprene |G|68.1|E|Isoprene|[CC\(=C\)C=C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID2020761)

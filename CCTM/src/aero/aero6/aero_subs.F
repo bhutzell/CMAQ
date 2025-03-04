@@ -3230,7 +3230,9 @@ C ----------------------- Begin solution -------------------------------
 
       USE ELMO_DATA
       USE AERO_DATA, ONLY : WET_AERO_DIAM, AEROMODE_LNSG, WET_AERO_DENS,
-     &                      DRY_AERO_DIAM, DRY_AERO_DENS
+     &                      DRY_AERO_DIAM, DRY_AERO_DENS, AH2O_IDX,
+     &                      MOMENT0_CONC, AEROSPC, AEROSPC_CONC,
+     &                      WET_AERO_M3, WET_AERO_M2
 
       IMPLICIT NONE
 
@@ -3246,8 +3248,19 @@ C ----------------------- Begin solution -------------------------------
 
 C ----------------------- Begin solution -------------------------------
       
+      IF ( INLET .EQ. 0 ) THEN
+          FRAC = 1.0
+          RETURN
+      END IF
+
       IF ( INLET_FRAC( INLET,IMODE,WETNESS ) .LT. 0. ) THEN
-         IF ( WETNESS .EQ. IWET ) THEN
+         IF ( INLET .EQ. IPMAMS ) THEN
+           CALL AERO_AMS( WET_AERO_M3( IMODE ), WET_AERO_M2( IMODE ),
+     &                    MOMENT0_CONC( IMODE ), AEROSPC_CONC( AH2O_IDX,IMODE ),
+     &                    WET_AERO_DENS( IMODE ), AEROSPC(AH2O_IDX)%DENSITY,
+     &                    FRAC )
+
+         ELSE IF ( WETNESS .EQ. IWET ) THEN
            CALL AERO_INLET( WET_AERO_DIAM( IMODE ), AEROMODE_LNSG( IMODE ),
      &                      WET_AERO_DENS( IMODE ), 
      &                      ELMO_INLET( INLET )%DIAM_LO, 

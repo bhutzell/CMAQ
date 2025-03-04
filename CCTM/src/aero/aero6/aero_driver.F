@@ -119,7 +119,6 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE AERO ( CGRID, JDATE, JTIME, TSTEP )
 
       USE GRID_CONF, ONLY: NCOLS, NROWS, NLAYS, IO_PE_INCLUSIVE
-      USE RXNS_DATA, ONLY: MECHNAME
       USE AERO_DATA, ONLY: COAG_BUDGET, COND_BUDGET, GROWTH_BUDGET, NPF_BUDGET,
      &                     FIXED_sg, AEROMODE_DIAM, AEROMODE_LNSG, AEROMODE_DENS,
      &                     MOMENT0_CONC, MOMENT2_CONC, MOMENT3_CONC,

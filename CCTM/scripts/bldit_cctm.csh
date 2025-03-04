@@ -146,8 +146,6 @@ set make_options = "-j"                #> additional options for make command if
  # Special cloud modules for kmt versions
  if( ${Mechanism} == cb6r5_ae7_aqkmt2 ) then
      set ModCloud = cloud/acm_ae7_kmt2
- else if( ${Mechanism} == saprc07tic_ae7i_aqkmt2 ) then
-     set ModCloud = cloud/acm_ae7_kmt2
  endif
 
  # Gas chem solver
@@ -505,7 +503,6 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     echo                                                           >> $Cfile
  endif
  echo "include SUBST_PE_COMM    $ICL_PAR/PE_COMM.EXT;"             >> $Cfile
- echo "include SUBST_CONST      $ICL_CONST/CONST.EXT;"             >> $Cfile
  echo "include SUBST_FILES_ID   $ICL_FILES/FILES_CTM.EXT;"         >> $Cfile
  echo "include SUBST_EMISPRM    $ICL_EMCTL/EMISPRM.EXT;"           >> $Cfile
  echo                                                              >> $Cfile
@@ -629,7 +626,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "Module ${ModGas};"                                          >> $Cfile
  echo                                                              >> $Cfile
 
- set MechList = "cb6r5hap_ae7_aq, cb6r3_ae7_aq, cb6r5_ae7_aq, cb6r5_ae7_aqkmt2, cb6r5m_ae7_aq, racm2_ae6_aq, saprc07tc_ae6_aq, saprc07tic_ae7i_aq, saprc07tic_ae7i_aqkmt2"
+ set MechList = "cb6r5_ae7_aq, cb6r5_ae7_aqkmt2, cb6r5hap_ae7_aq, cb6r5m_ae7_aq, cracmm2, cracmm3, saprc07tc_ae6_aq, saprc07tic_ae7i_aq"
 
  set text = "gas chemistry mechanisms"
  echo "// " $text                                                  >> $Cfile
@@ -654,7 +651,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "Module ${ModAero};"                                         >> $Cfile
  echo                                                              >> $Cfile
 
- set text = "acm_ae6, acm_ae6_kmt, acm_ae7_kmt2, acm_ae6_mp, acm_ae7"
+ set text = "acm_ae6, acm_ae7_kmt2"
  echo "// options are" $text                                       >> $Cfile
  echo "Module ${ModCloud};"                                        >> $Cfile
  echo                                                              >> $Cfile

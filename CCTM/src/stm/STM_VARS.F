@@ -118,9 +118,9 @@ C                      ------------ ---- -- -+- -- -+- ----+--- --- ------------
       TYPE (STM_SPC_DATA_1), Parameter :: STM_NR_SPECIES_DATA(N_STM_NR_SPC) = (/
 C                                                             DRYDEP                                             DDEP
 C                                            ICFAC      BCFAC  SURR        WET-SCAV                          TRNS | WDEP
-C                      SPECIES    MW   IC      |  BC      |      |     FAC   SURR  FAC AE2AQ SURR  NR2AE SURR   | | | CONC  
+C                      SPECIES    MW   IC      |  BC      |      |     FAC   SURR  FAC NR2AE SURR  NR2AQ SURR   | | | CONC  
 C                      ---------- ---- ------ -+- ------ -+- ----+---- --- ------- --- ----------- ------------ + + + +
-     & STM_SPC_DATA_1('SULF_ICBC',98.0,'SULF',1.0,'SULF',1.0,'VD_SULF',1.0,'H2SO4',1.0,'SULF_ICBC','H2SO4_ICBC',Y,Y,Y,Y)
+     & STM_SPC_DATA_1('SULF_ICBC',98.0,'SULF',1.0,'SULF',1.0,'VD_SULF',1.0,'H2SO4',1.0,'SULF_ICBC','          ',Y,Y,Y,Y)
      & /)
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

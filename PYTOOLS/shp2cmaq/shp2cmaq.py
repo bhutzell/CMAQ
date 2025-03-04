@@ -93,7 +93,7 @@ def shp2cmaq(
             rootname = os.path.splitext(os.path.basename(shppath))[0]
             outpath = f'./{rootname}.{attrkey}.{gdnam}.IOAPI.nc'
         else:
-            raise ValueError('outpath is required when shppath is not a string.')
+            raise ValueError('outpath required when shppath is not a string.')
 
     if os.path.exists(outpath):
         if overwrite:
@@ -182,7 +182,7 @@ def shp2cmaq(
         msg += '    shpf["shortname"] = shpf["geoid"].str[7:]\n'
         msg += '    shp2cmaq(shpf, "shortname", "36US3", srckey="B01003001")'
         print(msg)
-        
+
     # only required if calculating weighted values
     dshpf['shape_area'] = dshpf.geometry.area
 
@@ -288,7 +288,7 @@ if __name__ == '__main__':
     aa('--gdpath', help='GRIDDESC path', default=None)
     aa('shppath', help='Path to shapefile or zip containing shapefile')
     aa('attrkey', help='Attribute in shapefile')
-    aa('GDNAM', help='Grid definition name (must be in gdpath)')
+    aa('gdnam', help='Grid definition name (must be in gdpath)')
     aa('outpath', nargs='?', default=None)
     args = prsr.parse_args()
-    shp2cmaq(vars(args))
+    shp2cmaq(**vars(args))

@@ -25,7 +25,7 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
  
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE OPDDEP ( JDATE, JTIME, TSTEP, N_SPC_DDEP )
+      SUBROUTINE OPDDEP ( JDATE, JTIME, TSTEP )
 
 C   30 Mar 01 J.Young: dyn alloc - Use HGRD_DEFN
 C   03 Sep 01 David Wong: for new pario
@@ -51,7 +51,6 @@ C Arguments:
       INTEGER, INTENT( IN ) :: JDATE  ! current model date, coded YYYYDDD
       INTEGER, INTENT( IN ) :: JTIME  ! current model time, coded HHMMSS
       INTEGER, INTENT( IN ) :: TSTEP  ! output time step
-      INTEGER, INTENT( IN ) :: N_SPC_DDEP ! no. of dry dep species
 
 C Local variables:
 
@@ -130,7 +129,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = GC_DDEP( N )
-            UNITS3D( V ) = 'kg/hectare'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
@@ -142,11 +141,11 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = AE_DDEP( N )
             IF ( AE_DDEP( N )( 1:3 ) .EQ. 'NUM' ) THEN
-               UNITS3D( V ) = 'number/hectare'
+               UNITS3D( V ) = 'ha-1'
             ELSE IF ( AE_DDEP( N )( 1:3 ) .EQ. 'SRF' ) THEN
-               UNITS3D( V ) = 'm**2/hectare'
+               UNITS3D( V ) = 'm2 ha-1'
             ELSE
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
             END IF
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
@@ -158,7 +157,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = NR_DDEP( N )
-            UNITS3D( V ) = 'kg/hectare'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
@@ -169,7 +168,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             N = N + 1
             VTYPE3D( V ) = M3REAL
             VNAME3D( V ) = TR_DDEP( N )
-            UNITS3D( V ) = '----'
+            UNITS3D( V ) = 'kg ha-1'
             VDESC3D( V ) = 'hourly dry deposition values'
          END DO
 
@@ -181,7 +180,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
                N = N + 1
                VTYPE3D( V ) = M3REAL
                VNAME3D( V ) = BD_EMIS_SPC( N )
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
                VDESC3D( V ) = 'hourly emission values'
             END DO
             N = 0   
@@ -191,7 +190,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
                N = N + 1
                VTYPE3D( V ) = M3REAL
                VNAME3D( V ) = BD_FLUX_SPC( N )
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
                VDESC3D( V ) = 'hourly flux values'
             END DO
          END IF
@@ -201,7 +200,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             DO V = STRT, FINI
                VTYPE3D( V ) = M3REAL
                VNAME3D( V ) = 'HG_Emis'
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
                VDESC3D( V ) = 'hourly emission values'
             END DO
          END IF
@@ -211,7 +210,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             DO V = STRT, FINI
                VTYPE3D( V ) = M3REAL
                VNAME3D( V ) = 'HONO_Het '
-               UNITS3D( V ) = 'kg/hectare'
+               UNITS3D( V ) = 'kg ha-1'
                VDESC3D( V ) = 'hourly surface heterogenous production values'
             END DO
          END IF

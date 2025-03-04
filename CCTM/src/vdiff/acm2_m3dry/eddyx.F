@@ -207,6 +207,7 @@ C Capture the col, row, lvl, and EDDYV for the global min DT
          END IF
 
          EDDYV( C,R,L ) = EDDV
+         Met_Data%KZ( C,R,L ) = EDDV
 
 211   CONTINUE       !  end loop on columns
 222   CONTINUE       !  end loop on rows

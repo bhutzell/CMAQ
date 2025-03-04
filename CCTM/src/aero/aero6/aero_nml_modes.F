@@ -50,7 +50,6 @@ C-----------------------------------------------------------------------
           aedat_mode = aedat
           nsp2 = 0
 
-          call log_message( LOGDEV,"")
           Call log_subheading( LOGDEV, "Add Modal Dimension to CMAQ Aerosol Species" )
           call log_message( LOGDEV,"")
 

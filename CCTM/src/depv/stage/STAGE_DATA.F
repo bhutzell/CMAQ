@@ -37,6 +37,7 @@ C     26 June 2014 J.Bash: initial implementation
       Real, Allocatable, Save            :: M_ac        ( : )       ! Mass accommodation Coeff
       Real, Allocatable, Save            :: molwt_all   ( : )       ! Molar Weight from the namelist
       CHARACTER( 16 ), Allocatable, SAVE :: H_name_all  ( : )       ! Henry's constant name for all species        
+      Integer, Allocatable, SAVE         :: hlind       ( : )       ! Henry's constant index
       LOGICAL, Allocatable, SAVE         :: USE_DEPSPC  ( : )
       Logical, Allocatable, Save         :: asx_run_map ( : )
 
@@ -49,6 +50,7 @@ C     26 June 2014 J.Bash: initial implementation
          USE CGRID_SPCS          ! CGRID mechanism species
          USE UTILIO_DEFN 
          USE RUNTIME_VARS, ONLY: STAGECTRL, LOGDEV!, log_message, log_subheading
+         USE HLCONST_MOD
 
          IMPLICIT NONE
 
@@ -91,11 +93,10 @@ C     26 June 2014 J.Bash: initial implementation
 
       ! Retrieve the Name of the Deposition Control File
          IF ( STAGECTRL .EQ. "STAGECTRL_NML" ) THEN
-            WRITE( LOGDEV, "(5x,A,/,5x,A,/,5x,A)"),
-     &        'You have chosen not to indicate the location of an',
-     &        'STAGE deposition Control namelist file. Default ',
-     &        'settings will be assumed.'
-            RETURN
+            XMSG = 'You have chosen not to indicate the location of a ' //
+     &             'STAGE deposition Control namelist file. This file ' //
+     &             'is required by the STAGE dry deposition module.'
+            CALL M3EXIT( 'Map_STAGE',0,0,XMSG,1 )
          END IF
 
       ! Open Deposition Control Namelist File
@@ -139,6 +140,7 @@ C     26 June 2014 J.Bash: initial implementation
      &              M_ac        ( dep_gas_all ),
      &              molwt_all   ( dep_gas_all ),
      &              H_name_all  ( dep_gas_all ),
+     &              hlind       ( dep_gas_all ),
      &              USE_DEPSPC  ( dep_gas_all ),
      &              asx_run_map ( dep_gas_all ),
      &              gc_depv_name( dep_gas_all ),STAT = ALLOCSTAT )
@@ -172,6 +174,12 @@ C     26 June 2014 J.Bash: initial implementation
             s = index1(gc_spc(gc_scav_map(v)),dep_gas_all,gc_depv_name)
             if( s .Gt. 0.0 ) Then
                H_name_all( s ) = gc_scav(v)
+               hlind( s ) = index1( H_name_all( s ), MXSPCS, SUBNAME )
+               if ( hlind( s ) .eq. 0 ) then
+                  xmsg = 'Could not find ' // trim(H_name_all(s)) // 
+     &                   ' in Henry''s Law table SUBNAME'
+                  CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+               end if 
             End if
          End Do
          Do v = 1, N_NR_DEPV
@@ -186,6 +194,12 @@ C     26 June 2014 J.Bash: initial implementation
             s = index1(nr_spc(nr_scav_map(v)),dep_gas_all,gc_depv_name)
             if( s .Gt. 0.0 ) Then
                H_name_all( s ) = nr_scav(v)
+               hlind( s ) = index1( H_name_all( s ), MXSPCS, SUBNAME )
+               if ( hlind( s ) .eq. 0 ) then
+                  xmsg = 'Could not find ' // trim(H_name_all(s)) // 
+     &                   ' in Henry''s Law table SUBNAME'
+                  CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+               end if
             End if
          End Do
          Do v = 1, N_TR_DEPV
@@ -200,6 +214,12 @@ C     26 June 2014 J.Bash: initial implementation
             s = index1(tr_spc(tr_scav_map(v)),dep_gas_all,gc_depv_name)
             if( s .Gt. 0.0 ) Then
                H_name_all( s ) = tr_scav(v)
+               hlind( s ) = index1( H_name_all( s ), MXSPCS, SUBNAME )
+               if ( hlind( s ) .eq. 0 ) then
+                  xmsg = 'Could not find ' // trim(H_name_all(s)) // 
+     &                   ' in Henry''s Law table SUBNAME'
+                  CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+               end if
             End if
          End Do
 

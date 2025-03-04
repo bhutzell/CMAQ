@@ -102,6 +102,7 @@ c     Logical, Save           :: ES   ! Flag for pre-merged emissions
 c Cloud module variables
       REAL( 8 ), ALLOCATABLE, SAVE       :: S_CONDEP( :,:,:,: )  ! sens of conv wdep
       REAL( 8 ), ALLOCATABLE, SAVE       :: S_TOTDEP( :,:,:,: )  ! sens of tot dep
+      REAL( 8 ), ALLOCATABLE, SAVE       :: S_TOTDEP0( :,:,:,: )  ! sens of tot dep
       REAL( 4 ), ALLOCATABLE, SAVE       :: S_DEPWRT( :,:,: )    ! wdep write array
 
       REAL( 8 ), ALLOCATABLE, SAVE       :: S_POLC ( :,: )       ! sens of incloud conc (mol/mol) 
@@ -134,6 +135,7 @@ c Cloud module variables
 c VDIFF module variables
       REAL, ALLOCATABLE, SAVE :: SNGRD( :,:,:,:,: )        ! sengrid replacement
       REAL, ALLOCATABLE, SAVE :: S_DDEP( :,:,:,: )         ! ddep sens accumulator
+      REAL, ALLOCATABLE, SAVE :: S_DDEP0( :,:,:,: )        ! ddep sens accumulator for ELMO
       REAL, ALLOCATABLE, SAVE :: SENS( :,:,: )             ! secondary SENGRID expression
       REAL, ALLOCATABLE, SAVE :: S_EMIS( :,:,: )           ! stores SVDEMIS*DTS
       REAL, ALLOCATABLE, SAVE :: S_DD ( :,:,: )            ! DD for sens 

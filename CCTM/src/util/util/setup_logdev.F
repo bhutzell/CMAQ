@@ -48,17 +48,17 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       CHARACTER(  8 ) :: PRESTR  = 'CTM_LOG_'
       CHARACTER( MAXLEN_CTM_LOG ) :: IOLOGEQ
 
-      INTEGER :: IOST, IHEAD
-      INTEGER :: NIOAPI_HEAD, NCMAQ_HEAD
-      INTEGER, PARAMETER :: NHEAD = 200
-      CHARACTER( 90 ) :: CMAQ_HEADER( NHEAD )
-      CHARACTER( 90 ) :: IOAPI_HEADER( NHEAD )
+      INTEGER :: IOST, IHEAD, ITOC
+      INTEGER :: NIOAPI_HEAD, NCMAQ_HEAD, NCMAQ_TOC
+      INTEGER, PARAMETER :: NTXT = 200
+      CHARACTER( 90 ) :: CMAQ_HEADER( NTXT ), CMAQ_TOC( NTXT )
+      CHARACTER( 90 ) :: IOAPI_HEADER( NTXT )
 
       integer :: i
       logical :: found, opened
 
       ! Fetch CMAQ Header
-      CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD )
+      CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD, CMAQ_TOC, NCMAQ_TOC )
 
 #ifdef mpas
       write ( cmype, '(I3.3)' ) mype
@@ -105,7 +105,8 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
 
       ! Redirect Standard Output
       IF ( MYPE .NE. 0 ) OPEN( UNIT = 6, FILE = "/dev/null", STATUS = "OLD" )
-
+               
+      IF ( MYPE .EQ. 0 ) CALL LOG_HEADING( OUTDEV, 'Initialize I/O-API' )
       LOGDEV = INIT3() 
 
       ! Put Standard Output Back to File Unit 6 By Closing File Unit 6
@@ -113,8 +114,9 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
 
       ! Fetch I/O-API Header
 #ifndef twoway
+      NIOAPI_HEAD = 200
       REWIND( LOGDEV )
-      DO IHEAD = 1,NHEAD
+      DO IHEAD = 1,200
           READ( LOGDEV, '(A)', IOSTAT=IOST ), IOAPI_HEADER( IHEAD )
           ! Check for End of File
           IF ( IOST .LT. 0 ) THEN
@@ -130,9 +132,12 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       DO IHEAD = 1,NCMAQ_HEAD
           WRITE( LOGDEV, '(A)' ) CMAQ_HEADER( IHEAD )
       END DO
-      WRITE( LOGDEV, * )
+      DO ITOC = 1,NCMAQ_TOC
+          WRITE( LOGDEV, '(A)' ) CMAQ_TOC( ITOC )
+      END DO
 #ifndef mpas
 #ifndef twoway
+      CALL LOG_HEADING( LOGDEV, 'Initialize I/O-API' )
       DO IHEAD = 1,NIOAPI_HEAD
           WRITE( LOGDEV, '(A)' ) IOAPI_HEADER( IHEAD )
       END DO

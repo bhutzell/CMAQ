@@ -149,6 +149,12 @@ if ( $?COMPUTE_DELTA_ATOMS ) then
      endif
 endif
 
+ #> Copy mechanism markdown file
+ set MECH_MD_DIR = ${MECH_OUT}/../mechanism_information/${Mechanism}
+ if ( -e ${MECH_MD_DIR} ) then
+   cp -f ${CHEMMECH_OUTPUT}/mech*.md ${MECH_MD_DIR}/
+ endif
+
 #################### CSQY Photolysis Processor ##########################
 
 #> Copy Inputs to Inline Phot Preprocessor

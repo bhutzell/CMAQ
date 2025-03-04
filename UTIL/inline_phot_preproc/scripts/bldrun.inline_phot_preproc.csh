@@ -62,7 +62,7 @@ unset echo
 
 #> User choices: working directory and application ID
  if ( ! $?MECH ) then
-   set MECH =     'cb6r3_ae7_aq'
+   set MECH =     'cb6r5_ae7_aq'
  endif
  setenv CLEAR "TRUE" #> over-write existing output files
 
