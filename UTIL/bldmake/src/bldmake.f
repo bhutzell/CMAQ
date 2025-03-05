@@ -57,8 +57,6 @@
       Integer status
       Integer n
 
-      write (6, *) ' ==d== =========================== '
-
 ! call Setup routine to process command line arguments
       Call setup( cfgFile )
 
