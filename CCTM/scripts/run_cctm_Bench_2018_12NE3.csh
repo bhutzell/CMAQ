@@ -38,6 +38,12 @@ echo 'Start Model Run At ' `date`
  setenv MECH     cb6r5_ae7_aq      #> Mechanism ID
  set APPL      = Bench_2018_12NE3  #> Application Name (e.g. Gridname)
 
+#> Check that mechanism is cb6 or cracmm
+ if ! ( ${MECH} =~ *cb6* || ${MECH} =~ *cracmm* ) then
+     echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
+     exit 1
+ endif
+
 #> Define RUNID as any combination of parameters above or others. By default,
 #> this information will be collected into this one string, $RUNID, for easy
 #> referencing in output binaries and log files as well as in other scripts.
@@ -133,9 +139,6 @@ set NCELLS = `echo "${NX} * ${NY} * ${NZ}" | bc -l`
        setenv CONC_SPCS "O3 NO ANO3I ANO3J NO2 FORM ISOP NH3 ANH4I ANH4J ASO4I ASO4J"
    else if ( ${MECH} =~ *cracmm* ) then
        setenv CONC_SPCS "O3 NO ANO3I ANO3J NO2 HCHO ISO NH3 ANH4I ANH4J ASO4I ASO4J"
-   else
-       echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
-       exit 1
    endif
    setenv CONC_BLEV_ELEV " 1 1" #> CONC file layer range; comment to write all layers to CONC
 
@@ -254,9 +257,6 @@ if ( ${MECH} =~ *cb6* ) then
 else if ( ${MECH} =~ *cracmm* ) then
     set EMISpath  = $INPDIR/emis_cracmm2            #> gridded emissions input directory
     set IN_PTpath = $INPDIR/emis_cracmm2            #> point source emissions input directory
-else
-    echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
-    exit 1
 endif
 set IN_LTpath = $INPDIR/lightning                   #> lightning NOx input directory
 set METpath   = $INPDIR/met/mcipv5.4                #> meteorology input directory 
@@ -314,9 +314,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
       set ICBC_LAB = "v54_cb6r5_ae7_aq"
   else if ( ${MECH} =~ *cracmm* ) then
       set ICBC_LAB = "v55_CRACMM2_STAGE"
-  else
-      echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
-      exit 1
   endif
 
   #> Initial conditions
@@ -387,9 +384,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   else if ( ${MECH} =~ *cracmm* ) then
       set GR_EM_LAB  = "WR705_2018gc2"
       set GR_RWC_LAB = "cracmmv2_${GR_EM_LAB}"
-  else
-      echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
-      exit 1
   endif
   setenv N_EMIS_GR 2
   set EMISfile  = emis_mole_all_${YYYYMMDD}_12NE3_nobeis_norwc_${GR_EM_LAB}.ncf
@@ -411,9 +405,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   else if ( ${MECH} =~ *cracmm* ) then
       set STKCASEG = 12US1_WR705_2018gc2               # Stack Group Version Label
       set STKCASEE = 12US1_cmaq_cracmmv2_WR705_2018gc2 # Stack Emission Version Label
-  else
-      echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
-      exit 1
   endif
 
   # Time-Independent Stack Parameters for Inline Point Sources
@@ -467,9 +458,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
       setenv STK_GRPS_006 $IN_PTpath/ptfire_grass/stack_groups_ptfire_grass_${YYYYMMDD}_${STKCASEG}.ncf
       setenv STK_EMIS_006 $IN_PTpath/ptfire_grass/inln_mole_ptfire_grass_${YYYYMMDD}_${STKCASEE}.ncf
       setenv STK_EMIS_LAB_006 PT_RXFIRES  # label as rxfires so default chem control file works
-  else
-      echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
-      exit 1
   endif
 
   # Allow CMAQ to Use Point Source files with dates that do not
