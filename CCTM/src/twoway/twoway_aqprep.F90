@@ -357,6 +357,9 @@ SUBROUTINE aqprep (grid, config_flags, t_phy_wrf, p_phy_wrf, rho_wrf,     &
   else
      convective_scheme = .true.
   end if
+
+  coupled_model_xcent = config_flags%cen_lon
+  coupled_model_ycent = config_flags%cen_lat
 !-------------------------------------------------------------------------------
 
 !-------------------------------------------------------------------------------
