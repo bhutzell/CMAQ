@@ -180,11 +180,6 @@ C set dry dep conversion factor (done here so that vdiff doesn`t need the includ
             DD_CONV( S ) = CNVTD * TR_MOLWT( TR_DEPV_MAP( V ) )
          END DO
 
-         CALL SUBHFILE ( MET_CRO_2D, GXOFF, GYOFF,
-     &                   STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2 )
-         CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
-     &                   STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )                       
-
          INIT_GAS_DV:
      &   IF ( N_GAS_DEPV .GT. 0 ) THEN
 
