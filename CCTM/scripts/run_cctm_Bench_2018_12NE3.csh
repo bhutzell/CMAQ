@@ -37,7 +37,7 @@ echo 'Start Model Run At ' `date`
  set PROC      = mpi               #> serial or mpi
  setenv MECH     cb6r5_ae7_aq      #> Mechanism ID
  set APPL      = Bench_2018_12NE3  #> Application Name (e.g. Gridname)
-                                                       
+
 #> Define RUNID as any combination of parameters above or others. By default,
 #> this information will be collected into this one string, $RUNID, for easy
 #> referencing in output binaries and log files as well as in other scripts.
@@ -129,7 +129,14 @@ set NCELLS = `echo "${NX} * ${NY} * ${NZ}" | bc -l`
 
 #> Output Species and Layer Options
    #> CONC file species; comment or set to "ALL" to write all species to CONC
-   setenv CONC_SPCS "O3 NO ANO3I ANO3J NO2 FORM ISOP NH3 ANH4I ANH4J ASO4I ASO4J" 
+   if ( ${MECH} =~ *cb6* ) then
+       setenv CONC_SPCS "O3 NO ANO3I ANO3J NO2 FORM ISOP NH3 ANH4I ANH4J ASO4I ASO4J"
+   else if ( ${MECH} =~ *cracmm* ) then
+       setenv CONC_SPCS "O3 NO ANO3I ANO3J NO2 HCHO ISO NH3 ANH4I ANH4J ASO4I ASO4J"
+   else
+       echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
+       exit 1
+   endif
    setenv CONC_BLEV_ELEV " 1 1" #> CONC file layer range; comment to write all layers to CONC
 
    #> ACONC file species; comment or set to "ALL" to write all species to ACONC
@@ -241,8 +248,16 @@ setenv CTM_WVEL Y            #> save derived vertical velocity component to conc
 
 set ICpath    = $INPDIR/icbc                        #> initial conditions input directory 
 set BCpath    = $INPDIR/icbc                        #> boundary conditions input directory
-set EMISpath  = $INPDIR/emis                        #> gridded emissions input directory
-set IN_PTpath = $INPDIR/emis                        #> point source emissions input directory
+if ( ${MECH} =~ *cb6* ) then
+    set EMISpath  = $INPDIR/emis                    #> gridded emissions input directory
+    set IN_PTpath = $INPDIR/emis                    #> point source emissions input directory
+else if ( ${MECH} =~ *cracmm* ) then
+    set EMISpath  = $INPDIR/emis_cracmm2            #> gridded emissions input directory
+    set IN_PTpath = $INPDIR/emis_cracmm2            #> point source emissions input directory
+else
+    echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
+    exit 1
+endif
 set IN_LTpath = $INPDIR/lightning                   #> lightning NOx input directory
 set METpath   = $INPDIR/met/mcipv5.4                #> meteorology input directory 
 #set JVALpath  = $INPDIR/jproc                      #> offline photolysis rate table directory
@@ -291,10 +306,22 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 # =====================================================================
 #> Input Files (Some are Day-Dependent)
 # =====================================================================
+  
+  #> mechanism label for IC/BC
+  if ( ${MECH} == cb6r5hap_ae7_aq ) then
+      set ICBC_LAB = "v54_${MECH}"
+  else if ( ${MECH} =~ *cb6* ) then
+      set ICBC_LAB = "v54_cb6r5_ae7_aq"
+  else if ( ${MECH} =~ *cracmm* ) then
+      set ICBC_LAB = "v55_CRACMM2_STAGE"
+  else
+      echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
+      exit 1
+  endif
 
   #> Initial conditions
   if ($NEW_START == true || $NEW_START == TRUE ) then
-     setenv ICFILE CCTM_ICON_v54_${MECH}_12NE3_20180701.nc
+     setenv ICFILE CCTM_ICON_${ICBC_LAB}_12NE3_20180701.nc
      setenv INIT_MEDC_1 notused
   else
      set ICpath = $OUTDIR
@@ -303,7 +330,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   endif
 
   #> Boundary conditions
-  set BCFILE = CCTM_BCON_v54_${MECH}_12NE3_${YYYYMMDD}.nc
+  set BCFILE = CCTM_BCON_${ICBC_LAB}_12NE3_${YYYYMMDD}.nc
 
   #> Off-line photolysis rates 
   #set JVALfile  = JTABLE_${YYYYJJJ}
@@ -353,14 +380,24 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #setenv CMAQ_MASKS $SZpath/OCEAN_${MM}_L3m_MC_CHL_chlor_a_12NE3.nc #> horizontal grid-dependent ocean file
   setenv CMAQ_MASKS $INPDIR/surface/GRIDMASK_STATES_12NE3.nc
 
-  #> Gridded Emissions Files 
+  #> Gridded Emissions Files
+  if ( ${MECH} =~ *cb6* ) then
+      set GR_EM_LAB  = "2018gc_cb6_18j"
+      set GR_RWC_LAB = "cb6ae7_${GR_EM_LAB}"
+  else if ( ${MECH} =~ *cracmm* ) then
+      set GR_EM_LAB  = "WR705_2018gc2"
+      set GR_RWC_LAB = "cracmmv2_${GR_EM_LAB}"
+  else
+      echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
+      exit 1
+  endif
   setenv N_EMIS_GR 2
-  set EMISfile  = emis_mole_all_${YYYYMMDD}_12NE3_nobeis_norwc_2018gc_cb6_18j.ncf
+  set EMISfile  = emis_mole_all_${YYYYMMDD}_12NE3_nobeis_norwc_${GR_EM_LAB}.ncf
   setenv GR_EMIS_001 ${EMISpath}/merged_nobeis_norwc/${EMISfile}
   setenv GR_EMIS_LAB_001 GRIDDED_EMIS
   setenv GR_EM_SYM_DATE_001 F # To change default behaviour please see Users Guide for EMIS_SYM_DATE
 
-  set EMISfile  = emis_mole_rwc_${YYYYMMDD}_12NE3_cmaq_cb6ae7_2018gc_cb6_18j.ncf
+  set EMISfile  = emis_mole_rwc_${YYYYMMDD}_12NE3_cmaq_${GR_RWC_LAB}.ncf
   setenv GR_EMIS_002 ${EMISpath}/rwc/${EMISfile}
   setenv GR_EMIS_LAB_002 GR_RES_FIRES
   setenv GR_EM_SYM_DATE_002 F # To change default behaviour please see Users Guide for EMIS_SYM_DATE
@@ -368,16 +405,24 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> In-line point emissions configuration
   setenv N_EMIS_PT 10          #> Number of elevated source groups
 
-  set STKCASEG = 12US1_2018gc_cb6_18j              # Stack Group Version Label
-  set STKCASEE = 12US1_cmaq_cb6ae7_2018gc_cb6_18j  # Stack Emission Version Label
+  if ( ${MECH} =~ *cb6* ) then
+      set STKCASEG = 12US1_2018gc_cb6_18j              # Stack Group Version Label
+      set STKCASEE = 12US1_cmaq_cb6ae7_2018gc_cb6_18j  # Stack Emission Version Label
+  else if ( ${MECH} =~ *cracmm* ) then
+      set STKCASEG = 12US1_WR705_2018gc2               # Stack Group Version Label
+      set STKCASEE = 12US1_cmaq_cracmmv2_WR705_2018gc2 # Stack Emission Version Label
+  else
+      echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
+      exit 1
+  endif
 
   # Time-Independent Stack Parameters for Inline Point Sources
   setenv STK_GRPS_001 $IN_PTpath/ptnonipm/stack_groups_ptnonipm_${STKCASEG}.ncf
   setenv STK_GRPS_002 $IN_PTpath/ptegu/stack_groups_ptegu_${STKCASEG}.ncf
   setenv STK_GRPS_003 $IN_PTpath/othpt/stack_groups_othpt_${STKCASEG}.ncf
   setenv STK_GRPS_004 $IN_PTpath/ptagfire/stack_groups_ptagfire_${YYYYMMDD}_${STKCASEG}.ncf
-  setenv STK_GRPS_005 $IN_PTpath/ptfire-rx/stack_groups_ptfire-rx_${YYYYMMDD}_${STKCASEG}.ncf
-  setenv STK_GRPS_006 $IN_PTpath/ptfire-wild/stack_groups_ptfire-wild_${YYYYMMDD}_${STKCASEG}.ncf
+  #setenv STK_GRPS_005 $IN_PTpath/ptfire-rx/stack_groups_ptfire-rx_${YYYYMMDD}_${STKCASEG}.ncf
+  #setenv STK_GRPS_006 $IN_PTpath/ptfire-wild/stack_groups_ptfire-wild_${YYYYMMDD}_${STKCASEG}.ncf
   setenv STK_GRPS_007 $IN_PTpath/ptfire_othna/stack_groups_ptfire_othna_${YYYYMMDD}_${STKCASEG}.ncf
   setenv STK_GRPS_008 $IN_PTpath/pt_oilgas/stack_groups_pt_oilgas_${STKCASEG}.ncf
   setenv STK_GRPS_009 $IN_PTpath/cmv_c3_12/stack_groups_cmv_c3_12_${STKCASEG}.ncf
@@ -388,8 +433,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv STK_EMIS_002 $IN_PTpath/ptegu/inln_mole_ptegu_${YYYYMMDD}_${STKCASEE}.ncf
   setenv STK_EMIS_003 $IN_PTpath/othpt/inln_mole_othpt_${YYYYMMDD}_${STKCASEE}.ncf
   setenv STK_EMIS_004 $IN_PTpath/ptagfire/inln_mole_ptagfire_${YYYYMMDD}_${STKCASEE}.ncf
-  setenv STK_EMIS_005 $IN_PTpath/ptfire-rx/inln_mole_ptfire-rx_${YYYYMMDD}_${STKCASEE}.ncf
-  setenv STK_EMIS_006 $IN_PTpath/ptfire-wild/inln_mole_ptfire-wild_${YYYYMMDD}_${STKCASEE}.ncf
+  #setenv STK_EMIS_005 $IN_PTpath/ptfire-rx/inln_mole_ptfire-rx_${YYYYMMDD}_${STKCASEE}.ncf
+  #setenv STK_EMIS_006 $IN_PTpath/ptfire-wild/inln_mole_ptfire-wild_${YYYYMMDD}_${STKCASEE}.ncf
   setenv STK_EMIS_007 $IN_PTpath/ptfire_othna/inln_mole_ptfire_othna_${YYYYMMDD}_${STKCASEE}.ncf
   setenv STK_EMIS_008 $IN_PTpath/pt_oilgas/inln_mole_pt_oilgas_${YYYYMMDD}_${STKCASEE}.ncf
   setenv STK_EMIS_009 $IN_PTpath/cmv_c3_12/inln_mole_cmv_c3_12_${YYYYMMDD}_${STKCASEE}.ncf
@@ -400,12 +445,32 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv STK_EMIS_LAB_002 PT_EGU
   setenv STK_EMIS_LAB_003 PT_OTHER
   setenv STK_EMIS_LAB_004 PT_AGFIRES
-  setenv STK_EMIS_LAB_005 PT_RXFIRES
-  setenv STK_EMIS_LAB_006 PT_WILDFIRES
+  #setenv STK_EMIS_LAB_005 PT_RXFIRES
+  #setenv STK_EMIS_LAB_006 PT_WILDFIRES
   setenv STK_EMIS_LAB_007 PT_OTHFIRES
   setenv STK_EMIS_LAB_008 PT_OILGAS
   setenv STK_EMIS_LAB_009 PT_CMV_C3
   setenv STK_EMIS_LAB_010 PT_CMV_C1C2
+  
+  # fire emissions that differ by mechanism
+  if ( ${MECH} =~ *cb6* ) then
+      setenv STK_GRPS_005 $IN_PTpath/ptfire-rx/stack_groups_ptfire-rx_${YYYYMMDD}_${STKCASEG}.ncf
+      setenv STK_EMIS_005 $IN_PTpath/ptfire-rx/inln_mole_ptfire-rx_${YYYYMMDD}_${STKCASEE}.ncf
+      setenv STK_EMIS_LAB_005 PT_RXFIRES
+      setenv STK_GRPS_006 $IN_PTpath/ptfire-wild/stack_groups_ptfire-wild_${YYYYMMDD}_${STKCASEG}.ncf
+      setenv STK_EMIS_006 $IN_PTpath/ptfire-wild/inln_mole_ptfire-wild_${YYYYMMDD}_${STKCASEE}.ncf
+      setenv STK_EMIS_LAB_006 PT_WILDFIRES
+  else if ( ${MECH} =~ *cracmm* ) then
+      setenv STK_GRPS_005 $IN_PTpath/ptfire/stack_groups_ptfire_${YYYYMMDD}_${STKCASEG}.ncf
+      setenv STK_EMIS_005 $IN_PTpath/ptfire/inln_mole_ptfire_${YYYYMMDD}_${STKCASEE}.ncf
+      setenv STK_EMIS_LAB_005 PT_FIRES
+      setenv STK_GRPS_006 $IN_PTpath/ptfire_grass/stack_groups_ptfire_grass_${YYYYMMDD}_${STKCASEG}.ncf
+      setenv STK_EMIS_006 $IN_PTpath/ptfire_grass/inln_mole_ptfire_grass_${YYYYMMDD}_${STKCASEE}.ncf
+      setenv STK_EMIS_LAB_006 PT_RXFIRES  # label as rxfires so default chem control file works
+  else
+      echo "ERROR: Mechanism must be a cb6 or cracmm variant but '${MECH}' was selected"
+      exit 1
+  endif
 
   # Allow CMAQ to Use Point Source files with dates that do not
   # match the internal model date
@@ -418,6 +483,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv STK_EM_SYM_DATE_006 F
   setenv STK_EM_SYM_DATE_007 F
   setenv STK_EM_SYM_DATE_008 F
+  setenv STK_EM_SYM_DATE_009 F
+  setenv STK_EM_SYM_DATE_010 F
 
   #> Lightning NOx configuration
   if ( $CTM_LTNG_NO == 'Y' ) then
