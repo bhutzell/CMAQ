@@ -2274,7 +2274,7 @@ CMPST =
 
 'TD_TCL'      , 'Total Dep of Total Chloride',
                 'kg ha-1', 'DEP',
-                'DD_TCL + DD_TCL',
+                'DD_TCL + WD_TCL',
 
 
 

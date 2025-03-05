@@ -214,7 +214,7 @@
   Keywd(18,:) = 'PMF_H2O','PMF_HP','PMF_HPMOLAL','PMF_PH','FINE_ORG'
 
   Keywd_name(19) = 'COARSE_SPECIES'
-  Keywd(19,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA'!,'PMC_CL'
+  Keywd(19,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA','PMC_CL'
 
   Keywd_name(20) = 'AMS_SPECIES'
   Keywd(20,:) = 'PMAMS','PMAMS_SO4','PMAMS_NO3','PMAMS_NH4','PMAMS_CL','PMAMS_OA','PMAMS_OTOC'
@@ -358,7 +358,8 @@
   Keywd(43,:) = 'DEFAULT_DEP_CRACMM2'
  
   Keywd_name(44) = 'DEFAULT_DEP_CRACMM3HAPS'
-  Keywd(44,:) = 'DEFAULT_DEP_CRACMM2','TOXICS_DEP'
+  Keywd(44,:) = 'DEFAULT_DEP_CRACMM2','DD_PMF_CL','DD_PMC_CL','DD_TSP_CL','WD_TSP_CL','DD_HCL','WD_HCL',
+                'DD_TCL','WD_TCL','TD_TCL','TOXICS_DEP'
  
  !--------------------------!
  !----- Gas Deposition -----!

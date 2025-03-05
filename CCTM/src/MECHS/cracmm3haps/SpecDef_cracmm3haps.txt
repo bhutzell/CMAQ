@@ -227,7 +227,7 @@ ACAJ            ,ug m-3    ,PMF_CA[3]
 AMGJ            ,ug m-3    ,PMF_MG[3]
 AKJ             ,ug m-3    ,PMF_K[3]
 AMNJ            ,ug m-3    ,PMF_MN[3]
-ASOILJ          ,ug m-3    ,PMF_SOILIMPV[3]
+ASOILJ          ,ug m-3    ,PMF_RCSOIL[3]
 
 !! Non-Crustal Inorganic Particle Species
 AHPLUSIJ        ,ug m-3    ,PMF_HP[3]
@@ -266,19 +266,11 @@ AORGCJ          ,ug m-3    ,AORGCJ[1]
 AOMOCRAT_TOT    ,          ,PMF_OMOC[3]
 
 !! Total PM Aggregates
-ATOTI           ,ug m-3    ,PMAIT_MASS[3]
-ATOTJ           ,ug m-3    ,PMACC_MASS[3]
-ATOTK           ,ug m-3    ,PMC_MASS[3]
-ATOTIJ          ,ug m-3    ,PMF_MASS[3]
-ATOTIJK         ,ug m-3    ,PM_MASS[3]
-
-!! Unspeciated PM including non-carbon organic mass
-AUNSPEC1IJ      ,ug m-3    ,PMF_UN_IMPV1[3] 
-!! Non-Carbon Organic Mass
-ANCOMIJ         ,ug m-3    ,PMF_NCOM[3]
-
-!! Unspeciated PM excluding non-carbon organic mass
-AUNSPEC2IJ      ,ug m-3    ,PMF_UN_IMPV2[3]
+ATOTI           ,ug m-3    ,PMAIT[3]
+ATOTJ           ,ug m-3    ,PMACC[3]
+ATOTK           ,ug m-3    ,PMC[3]
+ATOTIJ          ,ug m-3    ,PMF[3]
+ATOTIJK         ,ug m-3    ,PMC[3]+PMF[3]
 
 !! AMS Projection of Output Concentrations
 PMAMS_CL        ,ug m-3    ,PMAMS_CL[3]
@@ -302,9 +294,7 @@ PM1_TOT         ,ug m-3    ,PM1[3]
 !PM1_CA         ,ug m-3    ,PM1_CA[3]
 !PM1_NH4        ,ug m-3    ,PM1_NH4[3]
 !PM1_NO3        ,ug m-3    ,PM1_NO3[3]
-!PM1_SOIL       ,ug m-3    ,PM1_SOIL[3]
-!PM1_UNSPEC1    ,ug m-3    ,PM1_UNSP1[3]
-!PM1_UNSPCRS    ,ug m-3    ,PM1_UNSPCRS[3]
+!PM1_SOIL       ,ug m-3    ,PM1_RCSOIL[3]
 
 !! PM2.5 species computed using modeled size distribution
 PM25_HP         ,ug m-3    ,PM25_HP[3]
@@ -318,11 +308,9 @@ PM25_NH4        ,ug m-3    ,PM25_NH4[3]
 PM25_NO3        ,ug m-3    ,PM25_NO3[3] 
 PM25_OC         ,ugC m-3   ,PM25_OC[3] 
 PM25_OM         ,ug m-3    ,PM25_OA[3] 
-PM25_SOIL       ,ug m-3    ,PM25_SOIL[3] 
+PM25_SOIL       ,ug m-3    ,PM25_RCSOIL[3] 
 PM25_SO4        ,ug m-3    ,PM25_SO4[3] 
 PM25_TOT        ,ug m-3    ,PM25[3] 
-PM25_UNSPEC1    ,ug m-3    ,PM25_UNSP1[3] 
-PM25_UNSPCRS    ,ug m-3    ,PM25_UNSPCRS[3] 
                            
 
 !! PM10.0 and Coarse-Sized Species
@@ -344,11 +332,11 @@ DIESEL_PM10     ,ug m-3    ,PM10_HDIESEL[3]
 DIESEL_PM25  	  ,ug m-3    ,PM25_HDIESEL[3]
  
 !!Benzo-A-Pyrene, gas and aerosol species
-BAP_GAS          ,ng/m3           ,1000.0*GAS_BENAPY[3], gas phase benzo-a-pyrene
-BAP_AERO         ,ng/m3           ,1000.0*PMF_BENAPY[3], fine aerosol phase benzo-a-pyrene
-BAP_FAERO        ,                ,BENAPY_FAERO[3],      aerosol fraction benzo-a-pyrene
-BAP_PM10         ,ng/m3           ,1000.0*PM10_BENAPY[3]                  
-BAP_PM25         ,ng/m3           ,1000.0*PM25_BENAPY[3]   
+BAP_GAS         ,ng/m3     ,1.0e6*8.7112*BENAPY[1]*DENS[2]      , gas phase benzo-a-pyrene
+BAP_AERO        ,ng/m3     ,1000.0*(ABENAPYI[1]+ABENAPYJ[1])    , fine aerosol phase benzo-a-pyrene
+BAP_FAERO       ,          ,BAP_AERO[0]/(BAP_AERO[0]+BAP_GAS[0]), aerosol fraction benzo-a-pyrene
+BAP_PM10        ,ng/m3     ,PM10_HBNPY[3]                  
+BAP_PM25        ,ng/m3     ,PM25_HBNPY[3]   
  
 !Toxic Metallic PM species
 BERYLLIUM_PM10  ,ng m-3    ,1000.0*PM10_HBE[3]

@@ -52,8 +52,8 @@ DDEP_DICLORBENZENE ,kg ha-1     ,DD_DCBENZ[1]
 WDEP_DICLORBENZENE ,kg ha-1     ,WD_DCBENZ[1]
 DDEP_STYRENE       ,kg ha-1     ,DD_STYR[1]
 WDEP_STYRENE       ,kg ha-1     ,WD_STYR[1]
-DDEP_XYLENE        ,kg ha-1     ,DD_XYL[1]
-WDEP_XYLENE        ,kg ha-1     ,WD_XYL[1]
+DDEP_XYLENE        ,kg ha-1     ,DD_HAP_XYL[1]
+WDEP_XYLENE        ,kg ha-1     ,WD_HAP_XYL[1]
    
 
 !---------------------------------------------------!
