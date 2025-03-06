@@ -105,7 +105,7 @@ echo 'Start Model Run At ' `date`
 #> Set Timestepping Parameters
 set STTIME     = 000000            #> beginning GMT time (HHMMSS)
 set NSTEPS     = 240000            #> time duration (HHMMSS) for this run
-set TSTEP      = 000500            #> output time step interval (HHMMSS)
+set TSTEP      = 010000            #> output time step interval (HHMMSS)
 
 #> Horizontal domain decomposition
 if ( $PROC == serial ) then
