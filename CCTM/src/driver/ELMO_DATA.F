@@ -330,11 +330,11 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'ZOL          ',ID_ZOL,        ET_MET,      F, '      ', 'Grid Cell Midpoint over Monin-Obukhov length' ),
      &ELDTP( 'SHFX         ',ID_SHFX,       ET_MET,      F, 'W m-2 ', 'Sensible Heat Flux' ),
      &ELDTP( 'LHFX         ',ID_LHFX,       ET_MET,      F, 'W m-2 ', 'Latent Heat FLux' ),
-     &ELDTP( 'GHFX         ',ID_GHFX,       ET_MET,      F, 'W m-2 ', 'Soil Heaf Flux' ),
+     &ELDTP( 'GHFX         ',ID_GHFX,       ET_MET,      F, 'W m-2 ', 'Soil Heat Flux' ),
      &ELDTP( 'SWC_1        ',ID_SWC_1,      ET_MET,      F, '      ', 'Layer 1 soil moisture saturation ratio' ),
      &ELDTP( 'SWC_2        ',ID_SWC_2,      ET_MET,      F, '      ', 'Layer 2 soil moisture saturation ratio' ),
      &ELDTP( 'SOILT_1      ',ID_SOILT_1,    ET_MET,      F, 'K     ', 'Layer 1 soil temperature' ),
-     &ELDTP( 'SOILT_2      ',ID_SOILT_2,    ET_MET,      F, 'K     ', 'Layer 1 soil temperature' ) /)
+     &ELDTP( 'SOILT_2      ',ID_SOILT_2,    ET_MET,      F, 'K     ', 'Layer 2 soil temperature' ) /)
      
 
       TYPE ELMO_KEY_TYPE
@@ -354,8 +354,8 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
           INTEGER                     :: STRUCT       ! 0 = gridded, 1 = unstructured
           CHARACTER( 16)              :: FLOGICAL     ! I/O Logical Name for each output file
           INTEGER                     :: TSTEP        ! Output Time Step (HHMMSS)
-          INTEGER                     :: TMODE        ! 0 = Instantaneous
-                                                      ! 1 = Average/Cumulative
+          INTEGER                     :: TMODE        ! 0 = Instantaneous,
+                                                      ! 1 = Aggregate (Average/Cumulative)
           INTEGER                     :: LAY_BOT      ! Bottom Layer
           INTEGER                     :: LAY_TOP      ! Top Layer
           INTEGER                     :: NLAYS        ! Number of Layers
@@ -904,7 +904,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          ELSE IF ( VARS_NML(1) .EQ. 'DEFAULT' ) THEN
             ! Replace generic DEFAULT keyword with mechanism-specific
             ! keyword
-            VARS_NML( N_END+1 ) = 'DEFAULT_' // TRIM( MECH )
+            VARS_NML( N_END+1 ) = 'DEFAULT_' // TRIM( MECH ) 
             N_END = N_END + 1
          
          ELSE IF ( VARS_NML(1) .EQ. 'DEFAULT_DEP' ) THEN

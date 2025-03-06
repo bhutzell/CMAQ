@@ -382,8 +382,8 @@
 
          ! Retrieve Nitric Acid Enhancement Factor from photolysis
          ! of aerosols
-          CASE ( ID_EF_HNO3 )
-             IF ( AERO_CHEM_SET ) OUTVAL = EF_HNO3( C1,R1,L1 )
+         CASE ( ID_EF_HNO3 )
+            IF ( AERO_CHEM_SET ) OUTVAL = EF_HNO3( C1,R1,L1 )
 
          ! Retrieve AOD at 550 nm
          CASE ( ID_AOD550 )
