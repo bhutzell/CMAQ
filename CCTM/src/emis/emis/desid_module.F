@@ -3103,7 +3103,7 @@ C stkemis_init.
              DESID_STREAM_TYPE( ISRM ) = 'BIOG'
              DESID_STREAM_ITYPE( ISRM ) = 4
              DESID_STREAM_LAB ( ISRM ) = 'BIOG'
-             DESID_STREAM_DESC( ISRM ) = 'Biogenic Emissions'
+             DESID_STREAM_DESC( ISRM ) = 'BEIS Biogenic Emissions'
              DESID_STREAM_ONLINE( ISRM ) = .TRUE.
 
              IBIOSRM = ISRM
@@ -3115,7 +3115,7 @@ C stkemis_init.
              DESID_STREAM_TYPE( ISRM ) = 'MIOG'
              DESID_STREAM_ITYPE( ISRM ) = 9
              DESID_STREAM_LAB ( ISRM ) = 'MIOG'
-             DESID_STREAM_DESC( ISRM ) = 'Megan Biogenic Emissions'
+             DESID_STREAM_DESC( ISRM ) = 'MEGAN Biogenic Emissions'
              DESID_STREAM_ONLINE( ISRM ) = .TRUE.
 
              IMIOGSRM = ISRM
