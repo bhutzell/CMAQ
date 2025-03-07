@@ -3285,11 +3285,11 @@
 
 
           use RUNTIME_VARS
-!         use UTILIO_DEFN
           use lus_data_module  ! Data module that contains info. on different land schemes
           use HGRD_DEFN, only : ncols, nrows
 #ifdef twoway
           use twoway_data_module
+          use coupler_module
 #endif
 
           INCLUDE SUBST_FILES_ID             ! file name parameters
@@ -3305,6 +3305,7 @@
           lufile( 1 ) = grid_cro_2d
 
 #ifndef mpas
+#ifndef twoway
           if ( .not. lucro_avail  ) then ! TRUE if LUFRAC file isn't there 
           
             if ( .not. open3( lufile( 1 ), fsread3, pname ) ) then
@@ -3319,7 +3320,7 @@
  
           
           end if
-
+#endif
 #endif
 
     ! determine land_scheme from GRID_CRO_2D
@@ -3501,51 +3502,33 @@ C   mminlu and num_land_cat are WRF global variables
 ! Get desert land (fraction) data (assume if BELD, all desert types are in file 1)
             do i = 1, n_dlcat
 #ifdef twoway
-               if ( .not. interpx( lufile( 1 ), vnmld( i )%name, pname,
-     &                             strtcol1, endcol1, strtrow1, endrow1,
-     &                             1, 1, 0, 0, ladut( :,:,i ) ) ) then
+               call coupler_data_retrieving( vnmld( i )%name, ladut( :,:,i ) )
 #else
                if ( .not. xtract3( lufile( 1 ), vnmld( i )%name, 1,1,
      &                             strtrow1, endrow1,strtcol1, endcol1,
      &                             0, 0, ladut( :,:,i ) ) ) then
-#endif
                   xmsg = 'Could not read ' // trim( vnmld( i )%name )
      &                 // ' from ' // trim( lufile( 1 ) )
                   call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
                end if
+#endif
             end do
 
 ! Get land  use (fraction) data
-            do i = 1, n_lucat-1
+            do i = 1, n_lucat
 #ifdef twoway
-               if ( .not. interpx( lufile( 1 ), vnmlu( i )%name, pname,
-     &                             strtcol1, endcol1, strtrow1, endrow1,
-     &                             1, 1, 0, 0, lut( :,:,i ) ) ) then
+               call coupler_data_retrieving( vnmlu( i )%name, lut( :,:,i ) ) 
 #else
                if ( .not. xtract3( lufile( 1 ), vnmlu( i )%name, 1,1,
      &                             strtrow1, endrow1,strtcol1, endcol1,
      &                             0, 0, lut( :,:,i ) ) ) then
-#endif 
                   xmsg = 'Could not read ' // trim( vnmlu( i )%name )
      &                 // ' from ' // trim( lufile( 1 ) )
                   call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
                end if
+#endif 
             end do
 
-            i = n_lucat
-#ifdef twoway
-               if ( .not. interpx( lufile( 1 ), vnmlu( i )%name, pname, 
-     &                             strtcol1, endcol1, strtrow1, endrow1,
-     &                             1, 1, 0, 0, lut( :,:,i ) ) ) then
-#else
-               if ( .not. xtract3( lufile( 1 ), vnmlu( i )%name, 1,1,
-     &                             strtrow1, endrow1,strtcol1, endcol1,
-     &                             0, 0, lut( :,:,i ) ) ) then
-#endif 
-                  xmsg = 'Could not read ' // trim( vnmlu( i )%name )
-     &                 // ' from ' // trim( lufile( 1 ) )
-                  call m3exit( pname, cio_model_sdate, cio_model_stime, xmsg, xstat1 )
-               end if
 #endif
 
           else ! IF LUFRAC is there
