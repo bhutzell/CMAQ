@@ -224,7 +224,7 @@ REACTIONS[CM] =
             + 0.500*MGLY  + 2.0000*DELTA_C - 4.7500*DELTA_O 
             # 1.0/<MGLY_RACM2>;            
 <R027a> BALD = BEN + CO # 1.0/<BALD1_CALVERT11>;
-<R027b> BALD = BENP + CO + HO2  - 7.0000*DELTA_O 
+<R027b> BALD = BAL1 + CO + HO2  - 1.0000*DELTA_C - 4.0000*DELTA_O 
              # 1.0/<BALD2_CALVERT11>;             
 <R028> OP1 = HO + HO2 + HCHO  - 2.0000*DELTA_O # 1.0/<OP1_RACM2>;
 <R029> OP2 = HO + HO2 + ALD  - 1.0000*DELTA_C - 2.0000*DELTA_O 
