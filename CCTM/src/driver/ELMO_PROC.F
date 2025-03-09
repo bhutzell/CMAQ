@@ -38,7 +38,7 @@
 
       IMPLICIT NONE
 
-      INTEGER, PRIVATE, SAVE :: TSTEP_SYNC
+      REAL, PRIVATE, SAVE :: TSTEP_SYNC_R
 
       CONTAINS
 
@@ -141,7 +141,7 @@
       INIT_TIME = INIT_TIME_IN
       WRITE_STEP = .FALSE.
       INIT_STEP  = .FALSE.
-      TSTEP_SYNC = TSTEP( 2 )
+      TSTEP_SYNC_R = 1.0 / REAL( TIME2SEC( TSTEP( 2 ) ), 4 )
       IF ( ELMO_NSTEP .LT. 1 ) THEN
          WSTEP = 0
          INIT_STEP = .TRUE.
@@ -346,7 +346,7 @@
                      ! This is a deposition species so we should be
                      ! outputting a flux
                      ELMO_OUT( IFL )%DATA( C1,R1,OL,IVAR ) = 
-     &                    ELMO_USED( U ) / REAL( TSTEP_SYNC, 4 )
+     &                    ELMO_USED( U ) * TSTEP_SYNC_R
      &             
                    ELSE
                      ELMO_OUT( IFL )%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U )
