@@ -388,6 +388,10 @@
            ELMO_FILE( IFL )%TMODE = 0
         ELSE IF ( TMODE( IFL )(1:3) .EQ. 'AGG' ) THEN
            ELMO_FILE( IFL )%TMODE = 1
+        ELSE IF ( TMODE( IFL )(1:3) .EQ. 'AVG' ) THEN
+           ELMO_FILE( IFL )%TMODE = 1
+        ELSE IF ( TMODE( IFL )(1:3) .EQ. 'AVE' ) THEN
+           ELMO_FILE( IFL )%TMODE = 1
         ELSE
             WRITE( XMSG, "(A,I3.3,A)")
      &             'An ELMO file may only be aggregate or instantaneous.  '//
