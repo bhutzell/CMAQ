@@ -60,6 +60,7 @@ C   28 Jul 11 David Wong: set REVERT to .false. for twoway model case since
 C                         buffered file has only two time steps data
 C   01 Feb 19 David Wong: Implemented centralized I/O approach, removed all MY_N
 C                         clauses
+C   10 Jan 24 David Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -71,6 +72,9 @@ C-----------------------------------------------------------------------
 #endif
       use CENTRALIZED_IO_MODULE, only : interpolate_var, window
       use mio_module
+#ifdef twoway
+      use coupler_module
+#endif
 
       IMPLICIT NONE
 
@@ -172,6 +176,7 @@ C-----------------------------------------------------------------------
             CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             CSTAGUV = .FALSE.
          END IF
+#endif
 
          IF ( .NOT. CSTAGUV ) THEN
 

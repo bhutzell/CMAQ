@@ -122,7 +122,6 @@ C-------------------------------------------------------------------------------
          Real,    Allocatable :: Z0       ( :,: )  ! roughness length [m]
          Real,    Allocatable :: SOIM1    ( :,: )  ! 1 cm soil moisture [m**3/m**3]
          Real,    Allocatable :: SOIM2    ( :,: )  ! 1 m soil moisture  [m**3/m**3]
-         Real,    Allocatable :: CLDFRAC  ( :,: )  ! Total cloud fraction including cu
          Real,    Allocatable :: SOIT1    ( :,: )  ! 1 cm soil temperature [K]
          Real,    Allocatable :: SOIT2    ( :,: )  ! 1 m soil temperature [K]
          Real,    Allocatable :: SEAICE   ( :,: )  ! Sea ice coverage [%]
@@ -133,7 +132,6 @@ C-------------------------------------------------------------------------------
          Integer, Allocatable :: LPBL     ( :,: )  ! PBL layer
          Logical, Allocatable :: CONVCT   ( :,: )  ! convection flag
          Real,    Allocatable :: PBL      ( :,: )  ! pbl height (m)
-!         Real,    Allocatable :: NACL_EMIS( :,: )  ! NACL mass emission rate of particles with d <10 um (g/m2/s)
          Real,    Allocatable :: COSZEN   ( :,: )  ! Cosine of the zenith angle
          Real,    Allocatable :: CFRAC    ( :,: )  ! cloud fraction
 !> U and V wind components on the cross grid points
@@ -605,7 +603,6 @@ C-----------------------------------------------------------------------
      &             Met_Data%LPBL     ( NCOLS,NROWS ),
      &             Met_Data%CONVCT   ( NCOLS,NROWS ),
      &             Met_Data%PBL      ( NCOLS,NROWS ),
-!     &             Met_Data%NACL_EMIS( NCOLS,NROWS ),
      &             Met_Data%COSZEN   ( NCOLS,NROWS ),
      &             Met_Data%CFRAC    ( NCOLS,NROWS ),
      &             Met_Data%UWIND    ( NCOLS+1,NROWS+1,NLAYS ),
@@ -749,8 +746,8 @@ C-----------------------------------------------------------------------
 !> reciprocal of msfx2**2
 #ifdef mpas
          Grid_Data%RMSFX4 = 1.0
-         Grid_Data%PURB = g2ddata(:,:,purb_ind)
-         Grid_Data%SLTYP = INT( g2ddata(:,:,sltyp_ind) )
+         call coupler_data_retrieving ('PURB', Grid_Data%PURB)
+         call coupler_data_retrieving ('SLTYP', Grid_Data%SLTYP)
          Grid_Data%LUFRAC = LUFRAC
 
          DO R = 1, NROWS
@@ -940,7 +937,6 @@ C Soil vars
 #ifdef mpas
          Met_Data%SOIM1 = smois_data(:,:,1)
          Met_Data%SOIM2 = smois_data(:,:,2)
-         Met_Data%CLDFRAC = g2ddata(:,:,cfrac2dt_ind) ! for BDSNP soil NO
 #else
          call interpolate_var ('SOIM1', jdate, jtime, Met_Data%SOIM1)
 
@@ -1108,14 +1104,13 @@ C-------------------------------- Calculated Variables -------------------------
          Met_Data%THETAV = BUFF3D * ( P0 / Met_Data%PRES ) ** 0.286
 
 #ifdef mpas
-         Met_Data%MOL = 1./g2ddata(:,:,rmol_ind)
+         call coupler_data_retrieving ('rmol', Met_Data%MOL)   ! divided by 1.0 is done in data preparation step
 #endif
 
 C------  Updating MOL, then WSTAR, MOLI, HOL 
          DO R = 1, NROWS
             DO C = 1, NCOLS
 #ifndef mpas
- !             CPAIR    = 1004.67 * ( 1.0 + 0.84 * Met_Data%QV( C,R,1 ) )   ! J/(K KG)
                CPAIR    = CPD * ( 1.0 + 0.84 * Met_Data%QV( C,R,1 ) )   ! J/(K KG)
                TMPFX    = Met_Data%HFX( C,R ) / ( CPAIR * Met_Data%DENS( C,R,1 ) )
                TMPVTCON = 1.0 + 0.608 * Met_Data%QV( C,R,1 )  ! Conversion factor for virtual temperature

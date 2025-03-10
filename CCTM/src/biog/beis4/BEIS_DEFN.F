@@ -552,7 +552,6 @@ C not found (skip entry)
 2999     CONTINUE ! end reading speciation profile input lines
 
 #ifndef mpas
-C Ensure met data time and grid for this run match beis emissions data files
 
          IF ( BEMIS_DIAG ) THEN
 C Build description for, and open beis diagnostic file

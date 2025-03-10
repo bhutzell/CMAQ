@@ -36,7 +36,7 @@ echo 'Start Model Run At ' `date`
 #> Set General Parameters for Configuring the Simulation
  set VRSN      = v55               #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cb6r5m_ae7_aq     #> Mechanism ID
+ setenv MECH     cb6r5m_ae7_aq     #> Mechanism ID
  set APPL      = 2015_HEMI         #> Application Name (e.g. Gridname)
                                                        
 #> Define RUNID as any combination of parameters above or others. By default,
@@ -593,6 +593,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_LTNGDIAG_2  $OUTDIR/CCTM_LTNGCOL_${CTM_APPL}.nc        #> Column Total Lightning NO
   setenv CTM_VEXT_1      $OUTDIR/CCTM_VEXT_${CTM_APPL}.nc           #> On-Hour 3D Concs at select sites
 
+
+  setenv LAYER_FILE  $ICpath/$ICFILE
 
   #> set floor file (neg concs)
   setenv FLOOR_FILE ${OUTDIR}/FLOOR_${CTM_APPL}.txt

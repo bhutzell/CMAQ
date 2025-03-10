@@ -37,7 +37,7 @@ cd CCTM/scripts
 #> Set General Parameters for Configuring the Simulation
  set VRSN      = v55               #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cracmm2           #> Mechanism ID
+ setenv MECH     cracmm2           #> Mechanism ID
  set EMIS      = WR705_2018gc2     #> Emission Inventory Details
  set APPL      = STAGE_EM_2018_12US1  #> Application Name (e.g. Gridname)
 
@@ -620,6 +620,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_LTNGDIAG_2  $OUTDIR/CCTM_LTNGCOL_${CTM_APPL}.nc        #> Column Total Lightning NO
   setenv CTM_VEXT_1      $OUTDIR/CCTM_VEXT_${CTM_APPL}.nc           #> On-Hour 3D Concs at select sites
   
+  setenv LAYER_FILE  $ICpath/$ICFILE
+
   #> set floor file (neg concs)
   setenv FLOOR_FILE ${OUTDIR}/FLOOR_${CTM_APPL}.txt
 

@@ -58,6 +58,7 @@ C    Apr 2019 F.Sidi &
 C             S.Roselle:      Fixed bug relating to incorrect unit conversions
 C                             in GC, NR and TR. 
 C    Dec 2019 S.Napelenok     DDM-3D implementation for v 5.3.1
+C    Jan 2024 D.Wong          Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -86,6 +87,7 @@ C-----------------------------------------------------------------------
       use util_module, only : nextime, index1, time2sec
       use coupler_module
 #endif
+      USE CONST
 
       IMPLICIT NONE
 
@@ -487,7 +489,9 @@ c                 ENDIF
 
       ! Store Deposition Accumulation so it can be subtracted out to
       ! inform ELMO
-      TOT_DEP0 = TOT_DEP + CONV_DEP
+      DO VAR = 1,N_SPC_WDEP + 1
+        TOT_DEP0( :,:,VAR ) = TOT_DEP( :,:,VAR ) + CONV_DEP( :,:,VAR )
+      END DO
 #ifdef isam
       TOT_SADEP0 = TOT_SADEP + CONV_SADEP
 #endif

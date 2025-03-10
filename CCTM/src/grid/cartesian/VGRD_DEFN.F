@@ -26,6 +26,8 @@ C                              26 Jul 06: comments in line with PARMS3.EXT
 C                   S. Roselle 29 Mar 11: Replaced I/O API include files
 C                                         with UTILIO_DEFN
 C                   D. Wong    11 May 11: incorporated twoway model implementation
+C                   D. Wong    10 Jan 24: used LAYER_FILE which is set in run 
+C                                         time, rather than MET_CRO_3D
 C.......................................................................
 
       USE RUNTIME_VARS
@@ -98,6 +100,7 @@ C-----------------------------------------------------------------------
             CHARACTER( 96 ) :: XMSG = ' '
             character( 5000 ) :: filedesc
             CHARACTER(10)   :: WRF_VERSION = ' '
+            CHARACTER( 16 ) :: LAYER_FILE = 'LAYER_FILE'
 
             INTEGER L, ALLOCSTAT
             INTEGER  :: NV, LOC, STR_LEN

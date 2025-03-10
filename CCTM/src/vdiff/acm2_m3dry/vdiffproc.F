@@ -77,6 +77,7 @@ C 16 Sep 16 J.Young: update for inline procan (IPR)
 C 02 Nov 2018: L.Zhou, S.Napelenok: isam implementation
 C  1 Feb 19 D.Wong: removed all MY_N clauses
 C 12 Dec 19 S.L.Napelenok: ddm-3d implementation for version 5.3.1
+C 10 Jan 24 D.Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE CGRID_SPCS          ! CGRID mechanism species
@@ -509,7 +510,7 @@ C read & interpolate emissions data => VDEMIS_DIFF from EMIS_DEFN module
       DO R = 1, NROWS
          DO C = 1, NCOLS
             DO L = 1, NLAYS
-               SEDDY( L,C,R ) = g3ddata(C,R,L,eddy_ind)
+               SEDDY( L,C,R ) = coupler_m2a_dr_3d_data(C,R,L,eddy_loc,1)
             END DO
          END DO
       END DO

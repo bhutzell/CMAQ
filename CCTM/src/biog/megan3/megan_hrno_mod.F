@@ -251,6 +251,8 @@ C Determine last timestamp
 
          output_step   = time2sec(tstep(1))
          half_syn_step = time2sec(tstep(2)) / 2
+#else
+         METSTEP = 10000  ! temporary hack
 #endif
 
          floc = mio_search( MET_CRO_2D )

@@ -11,7 +11,8 @@
 
 set NPROCS = 32
 
-set wrfv    = 4.4
+set wrfv    = v4.4.1
+set cmaqv   = v55
 set version = sw_feedback
 set option  = 3
 
@@ -41,9 +42,9 @@ setenv CTM_DIAG_LVL 0
 setenv CTM_MIO_FILE Y # turn on generation of MIO_ASCII file
 
 #> Set General Parameters and Labels for Configuring the Simulation
-set VRSN        = ${wrfv}55          #> Code Version
+set VRSN        = ${wrfv}${cmaqv}    #> Code Version
 set PROC        = mpi                #> serial or mpi
-set MECH        = cb6r5_ae7_aq       #> Mechanism ID
+setenv MECH       cb6r5_ae7_aq       #> Mechanism ID
 set APPL        = Bench_2018_12NE3   #> Application Name (e.g. Domain)
 
 #> Define RUNID as any combination of parameters above or others. By default,
@@ -58,11 +59,12 @@ set EXEC      = wrf.exe
 
 # Set Working, Input, and Output Directories
 set WORKDIR     = ${PWD}                                  # Pathname of current Working Directory
-set WRF_DIR     = $WORKDIR/BLD_WRFv4.4_CCTM_v55_intel18.0 # Location of WRF-CMAQ Install
-set INPDIR      = ${CMAQ_DATA}/2018_12NE3               # Input directory for WRF & CMAQ
-set OUTPUT_ROOT = $WORKDIR                                # output root directory
+set WRF_DIR     = $WORKDIR/BLD_WRF${wrfv}_CCTM_${cmaqv}_$compilerString # Location of WRF-CMAQ Install
+#set INPDIR     = ${CMAQ_DATA}/2018_12NE3                 # Input directory for WRF & CMAQ
+set INPDIR      = /work/MOD3DATA/2018_12NE3               # Input directory for WRF & CMAQ
+set OUTPUT_ROOT = ${CMAQ_DATA}                            # output root directory
 set output_direct_name = WRFCMAQ-output-${version}        # Output Directory Name
-setenv OUTDIR $OUTPUT_ROOT/$output_direct_name   # output files and directories
+setenv OUTDIR $OUTPUT_ROOT/$output_direct_name            # output files and directories
 set NMLpath     = $WRF_DIR/cmaq                           # path with *.nml file mechanism dependent
 
 echo ""
@@ -375,17 +377,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> Optics file
   set OPTfile = PHOT_OPTICS.dat
 
-  #> MCIP meteorology files 
-  setenv GRID_BDY_2D BUFFERED  # GRID files are static, not day-specific
-  setenv GRID_CRO_2D BUFFERED
-  setenv GRID_CRO_3D BUFFERED
-  setenv GRID_DOT_2D BUFFERED
-  setenv MET_CRO_2D BUFFERED 
-  setenv MET_CRO_3D BUFFERED
-  setenv MET_DOT_3D BUFFERED
-  setenv MET_BDY_3D BUFFERED
-  #setenv LUFRAC_CRO BUFFERED
-
   #> Control Files
   #>
   #> IMPORTANT NOTE
@@ -403,12 +394,12 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> + Emission Control (DESID) Documentation in the CMAQ User's Guide:
   #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
   #>
-  setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
-  setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml
+  setenv CMAQ_CTRL_NML ${NMLpath}/CMAQ_Control.nml
+  setenv CMAQ_CH_CTRL_NML ${NMLpath}/CMAQ_Chem_Control_${MECH}.nml
 
   #> The following namelist controls the mapping of meteorological land use types and the NH3 and Hg emission
   #> potentials
-  setenv STAGECTRL_NML ${WRF_DIR}/cmaq/CMAQ_Control_STAGE.nml
+  setenv STAGECTRL_NML ${NMLpath}/CMAQ_Control_STAGE.nml
  
   #> Spatial Masks For Emissions Scaling
   setenv CMAQ_MASKS $SZpath/OCEAN_07_L3m_MC_CHL_chlor_a_12NE3.nc #> horizontal grid-dependent ocean file
@@ -503,16 +494,16 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
     setenv MEGAN_SOILINP    $OUTDIR/CCTM_MSOILOUT_${RUNID}_${YESTERDAY}.nc
                              #> Biogenic NO soil input file; ignore if INITIAL_RUN = Y
                              #>                            ; ignore if IGNORE_SOILINP = Y
-         setenv MEGAN_CTS $SZpath/megan3.2/CT3_CONUS.ncf
-         setenv MEGAN_EFS $SZpath/megan3.2/EFMAPS_CONUS.ncf
-         setenv MEGAN_LDF $SZpath/megan3.2/LDF_CONUS.ncf
+         setenv MEGAN_CTS $SZpath/megan3.2/CT3_nebench.ncf
+         setenv MEGAN_EFS $SZpath/megan3.2/EF_nebench.ncf
+         setenv MEGAN_LDF $SZpath/megan3.2/LDF_nebench.ncf
          if ($BDSNP_MEGAN == 'Y') then
             setenv BDSNPINP    $OUTDIR/CCTM_BDSNPOUT_${RUNID}_${YESTERDAY}.nc
-            setenv BDSNP_FFILE $SZpath/megan3.2/FERT_tceq_12km.ncf
-            setenv BDSNP_NFILE $SZpath/megan3.2/NDEP_tceq_12km.ncf
-            setenv BDSNP_LFILE $SZpath/megan3.2/LANDTYPE_tceq_12km.ncf
-            setenv BDSNP_AFILE $SZpath/megan3.2/ARID_tceq_12km.ncf
-            setenv BDSNP_NAFILE $SZpath/megan3.2/NONARID_tceq_12km.ncf
+            setenv BDSNP_FFILE $SZpath/megan3.2/FERT_nebench.ncf
+            setenv BDSNP_NFILE $SZpath/megan3.2/NDEP_nebench.ncf
+            setenv BDSNP_LFILE $SZpath/megan3.2/LANDTYPE_nebench.ncf
+            setenv BDSNP_AFILE $SZpath/megan3.2/ARID_nebench.ncf
+            setenv BDSNP_NAFILE $SZpath/megan3.2/NONARID_nebench.ncf
          endif
   endif
 
@@ -672,13 +663,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   if ($SD_TIME_SERIES == T) then
      setenv CTM_SD_TS "$OUTDIR/SD_TSfile_${CTM_APPL}.nc -v"
   endif
-  setenv     LAYER_FILE      MET_CRO_3D
-  @ n = 0
-  while ($n < $NPROCS)
-    set name = `printf "_%3.3d\n" $n`
-    setenv feed_back$name BUFFERED   # for feedback file
-    @ n++
-  end
+
+  setenv     LAYER_FILE      $ICpath/$ICFILE
 
 
   #> set floor file (neg concs)
@@ -761,8 +747,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv MIE_TABLE $OUTDIR/mie_table_coeffs_${compilerString}.txt
   setenv OPTICS_DATA $OMIpath/$OPTfile
  #setenv XJ_DATA $JVALpath/$JVALfile
-  set TR_DVpath = $METpath
-  set TR_DVfile = $MET_CRO_2D
+ # set TR_DVpath = $METpath
+ # set TR_DVfile = $MET_CRO_2D
  
   #> species defn & photolysis
   setenv gc_matrix_nml ${NMLpath}/GC_$MECH.nml

@@ -3,9 +3,10 @@
   MODEL = CHEMMECH.exe
 
 ifndef compiler
- compiler = intel
+#compiler = intel
+#compiler = intelx
 #compiler = gcc
-#compiler = pgi
+ compiler = pgi
 #compiler = nvhpc
 endif
 
@@ -18,15 +19,26 @@ ifeq "$(compiler)" "intel"
  f90_FLAGS = -free -132 -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -mp1  -I . 
  F90_FLAGS = $(f90_FLAGS)
  C_FLAGS   =  -O2  -DFLDMN=1
- LINK_FLAGS = 
+ LINK_FLAGS =  -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -fp-model=strict  -I .
+
+else ifeq "$(compiler)" "intelx"
+
+ FC = ifx
+ CC = icx
+ f_FLAGS   = -fixed -132 -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -fp-model=strict  -I .
+ F_FLAGS   = $(f_FLAGS)
+ f90_FLAGS = -free -132 -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -fp-model=strict  -I .
+ F90_FLAGS = $(f90_FLAGS)
+ C_FLAGS   =  -O2  -DFLDMN=1
+ LINK_FLAGS =  -O0 -fpe0 -check uninit -check bounds -check format -g -traceback -fno-alias -fp-model=strict  -I .
 
 else ifeq "$(compiler)" "pgi"
 
  FC = pgf90
  CC = pgcc
- f_FLAGS   = -Mfixed -Mextend -Mbounds  -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
+ f_FLAGS   = -Mfixed -Mextend -Mbackslash -Mbounds  -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
  F_FLAGS   = $(f_FLAGS) 
- f90_FLAGS = -Mfree -Mextend -Mbounds -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
+ f90_FLAGS = -Mfree -Mextend -Mbackslash -Mbounds -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
  F90_FLAGS = $(f90_FLAGS)
  C_FLAGS   =  -O2  -DFLDMN=1
  LINK_FLAGS = 
@@ -35,9 +47,9 @@ else ifeq "$(compiler)" "nvhpc"
 
  FC = nvfortran
  CC = nvc
- f_FLAGS   = -Mfixed -Mextend -Mbounds  -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
+ f_FLAGS   = -Mfixed -Mextend -Mbounds  -Mbackslash -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
  F_FLAGS   = $(f_FLAGS) 
- f90_FLAGS = -Mfree -Mextend -Mbounds  -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
+ f90_FLAGS = -Mfree -Mextend -Mbounds  -Mbackslash -Mchkptr -Mchkstk -traceback -Ktrap=fp -O0 -I . -g
  F90_FLAGS = $(f90_FLAGS)
  C_FLAGS   =  -O2  -DFLDMN=1
  LINK_FLAGS = 

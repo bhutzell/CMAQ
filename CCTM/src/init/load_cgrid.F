@@ -52,6 +52,7 @@ C                     MY_N clauses
 C   08 Mar 19 F. Sidi  Split up ICBC_FAC into IC_FAC and BC_FAC for 
 C                      tracer namelist only
 C   13 Mar 19 D. Wong: Implemented centralized I/O approach
+C   10 Jan 24 D. Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -158,10 +159,10 @@ C Local Variables
       CHARACTER( 34 ) :: ESTR2 = ' '
       CHARACTER( 34 ) :: ESTR3 = ' '
 
-      LOGICAL, SAVE :: FIRSTIME = .TRUE.
-      LOGICAL       :: L_WRITE_WARNING
-
-      integer :: floc
+      INTEGER         :: floc
+      LOGICAL, SAVE   :: FIRSTIME = .TRUE.
+      LOGICAL         :: L_WRITE_WARNING
+      LOGICAL         :: SKIP
 
 C-----------------------------------------------------------------------
 
@@ -193,7 +194,6 @@ C-----------------------------------------------------------------------
 
 #ifndef mpas
 
-!     call mio_fopen (FNAME, mio_read_only)
       floc = mio_search (FNAME)
  
       IF ( GL_NCOLS .NE. mio_file_data(floc)%gl_ncols ) THEN

@@ -51,14 +51,7 @@ C....................................................................
      &                            M3EXIT => prog_interrupt_exit
 
 #else
-
        use replacement_util_module
-
-!#ifdef parallel
-!        use parutilio, only: pio_init, subdmap, wrsubdmap
-!#else
-!         USE M3UTILIO, INTERPB => INTERP3
-!#endif
 
 #endif
 

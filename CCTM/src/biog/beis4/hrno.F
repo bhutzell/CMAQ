@@ -258,6 +258,7 @@ C Determine last timestamp
          METSTEP = tstep(3)
 #else
 
+         METSTEP = 10000   ! temporary hack
 #endif
 
          ALLOCATE( RNTOT( NCOLS,NROWS ), STAT=IOS )
