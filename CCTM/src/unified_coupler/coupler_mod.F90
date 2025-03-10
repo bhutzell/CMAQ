@@ -2,7 +2,8 @@
 ! Purpose:  To provide a platform for exchanging data between met and CMAQ 
 !           models in the WRF-CMAQ and MPAS-CMAQ coupled model systems.
 !
-! Revised:  31 Aug 2023  Original version.  (D. Wong)
+! Revision History:  
+! 31 Aug 2023, D. Wong: Original version.
 ! 10 Mar 2025, D. Wong: added a specific comment to describe gridcro2d_vlist
 !===============================================================================
 

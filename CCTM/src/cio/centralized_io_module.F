@@ -1990,6 +1990,7 @@
           USE UTILIO_DEFN
           USE HGRD_DEFN
           USE LSM_Mod, ONLY: n_lufrac, init_lsm
+          USE coupler_module
 
           INCLUDE SUBST_FILES_ID             ! file name parameters
 
@@ -1997,6 +1998,7 @@
           integer :: startcol, endcol, startrow, endrow, gxoff, gyoff
 
           CHARACTER( 120 ) :: XMSG = ' '
+          CHARACTER( 20 )  :: vname
           INTEGER          :: STAT, n, c
 
           CALL INIT_LSM( 0, 0 )
@@ -2013,6 +2015,12 @@
                 lufrac(c,1,n) = lufrac_data(n,c)
              end do
           end do
+#elif defined (twoway)
+          do n = 1, n_lufrac
+             write (vname, '(a7, i2.2)') 'LUFRAC_', n
+             call coupler_data_retrieving (vname, lufrac(:,:,n))
+          end do
+         
 #else
           CALL SUBHFILE ( LUFRAC_CRO, GXOFF, GYOFF,
      &                    startcol, endcol, startrow, endrow )
@@ -3309,7 +3317,6 @@
           lufile( 1 ) = grid_cro_2d
 
 #ifndef mpas
-#ifndef twoway
           if ( .not. lucro_avail  ) then ! TRUE if LUFRAC file isn't there 
           
             if ( .not. open3( lufile( 1 ), fsread3, pname ) ) then
@@ -3324,7 +3331,6 @@
  
           
           end if
-#endif
 #endif
 
     ! determine land_scheme from GRID_CRO_2D
