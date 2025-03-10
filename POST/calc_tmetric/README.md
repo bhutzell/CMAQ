@@ -1,14 +1,18 @@
 calc_tmetric
 ========
 
-This Fortran program creates gridded IOAPI files with temporally averaged or summed values that were calculated from one or more gridded time-dependent IOAPI files.
+This Fortran program creates gridded IOAPI files with temporally blocked or stepped values of an OPERATION (see below) calculated from one or more gridded time-dependent IOAPI files.
 
 ## Run Time Environment variables used:
 
 ```
- OPERATION     operation to perform - SUM for summation and AVG for averaging (default SUM)
- SPECIES_#     list of species to output (e.g. setenv SPECIES_1 O3).  
-               To extract all species use: setenv SPECIES_1 ALL
+ OPERATION     operation to perform - SUM for summation, AVG for averaging, MAX for maximum, MIN for minimum,
+               or RNG for RANGE
+ SAMPLE_PERIOD number of time steps used to compute OPERATION, set to less than or equal to zero for total 
+               number of steps. Note that output file will have time step equal to zero if SAMPLE_PERIOD is less
+               than or equal to zero.
+ SPECIES       list of species to output (e.g. setenv SPECIES "O3 HO HO2 NH3 HCL ANO3J ASO4J").  
+               To extract all species use: setenv SPECIES "ALL"
  M3_FILE_#     List of input IOAPI file names with time-dependent values.
                The program will concatenate time steps from all input files to construct the
 	       longest possible time record which can be processed. Duplicate time steps are

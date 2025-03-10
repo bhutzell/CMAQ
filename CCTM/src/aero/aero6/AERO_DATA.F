@@ -648,7 +648,6 @@ C Required species
       Character( 16 ), Private, Parameter :: req_soil   = 'ASOIL'
       Character( 16 ), Private, Parameter :: req_cors   = 'ACORS'
       Character( 16 ), Private, Parameter :: req_seacat = 'ASEACAT'
-      Character( 16 ), Private, Parameter :: req_seast  = 'ASEAST'
 
 C Indices of required species
       Integer :: aso4_idx
@@ -668,7 +667,6 @@ C Indices of required species
       Integer :: asoil_idx
       Integer :: acors_idx
       Integer :: aseacat_idx
-      Integer :: aseast_idx
 
 C Flag if optional species present
       Logical :: ae6isoa = .False.
@@ -684,7 +682,8 @@ C Optional Species
       Character( 16 ), Private, Parameter :: req_imos   = 'AIMOS'
       Character( 16 ), Private, Parameter :: req_phgj   = 'APHGJ'
       Character( 16 ), Private, Parameter :: req_orgh2o = 'AORGH2O'
-      Character( 16 ), Private, Parameter :: req_br     = 'ABR' 
+      Character( 16 ), Private, Parameter :: req_br     = 'ABR'
+      Character( 16 ), Private, Parameter :: req_seast  = 'ASEAST'      
       Character( 16 ), Private, Parameter :: req_so4aqh2o2 = 'ASO4AQH2O2'
       Character( 16 ), Private, Parameter :: req_so4aqo3   = 'ASO4AQO3'
       Character( 16 ), Private, Parameter :: req_so4aqfemn = 'ASO4AQFEMN'
@@ -711,6 +710,7 @@ C Indices of Optional species
       Integer :: aimos_idx  = 0
       Integer :: aphgj_idx  = 0
       Integer :: aorgh2o_idx= 0
+      Integer :: aseast_idx = 0
       Integer :: abr_idx    = 0
 C Indices of Optional sulfur tracking species
       Integer :: aso4aqh2o2_idx = 0
@@ -1200,9 +1200,7 @@ C Find indices of required species
       apoc_idx    = findAero( req_poc,    .True. )
       apncom_idx  = findAero( req_ncom,   .True. )
 
-      If ( ( Index( mechname, 'CRACMM3' ) .Gt. 0 ) ) Then
-         aseast_idx  = findAero( req_seast,  .True. )
-      End If
+      aseast_idx  = findAero( req_seast,  .False. )
 
       If ( ( Index( mechname, 'SAPRC07TIC_AE7I' ) .Gt. 0 ) ) Then
          ae6isoa     = .True.
@@ -1220,7 +1218,8 @@ C Find indices of required species
          ae6isoa     = .False.
       End If
 
-       If ( Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) Then     
+       If ( (Index( mechname, 'CB6R5M_AE7_AQ' ) .Gt. 0 ) .OR.
+     &       Index( mechname, 'CRACMM3M'      ) .Gt. 0 ) Then  
          abr_idx     = findAero( req_br,     .True. )
          marine = .True.
       Else

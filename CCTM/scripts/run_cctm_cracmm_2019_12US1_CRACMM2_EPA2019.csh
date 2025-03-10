@@ -35,7 +35,7 @@ echo 'Start Model Run At ' `date`
 #> Set General Parameters for Configuring the Simulation
  set VRSN      = v55              #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cracmm2      #> Mechanism ID
+ setenv MECH     cracmm2      #> Mechanism ID
 # set EMIS      = 2016fh            #> Emission Inventory Details
  set APPL      = 2019_12US1        #> Application Name (e.g. Gridname)
 
@@ -361,7 +361,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
   #>
   setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
-  setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml
+  setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}_${APPL}.nml
 
   #> The following namelist controls the mapping of meteorological land use types and the NH3 and Hg emission
   #> potentials
