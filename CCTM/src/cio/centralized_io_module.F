@@ -85,7 +85,10 @@
 !  03/31/22, J. Willison: Removed wb_dust_setup and modified lus_setup to remove
 !                         BELD as an option for desert land information.  
 !  04/12/22, G. Sarwar: Revised to include "DMS" into cb6r5_ae7_aq 
-!  01/10/24, D. Wong: Incorporated unified coupler implmentation
+!  01/10/24, D. Wong: Incorporated unified coupler implementation
+!  03/10/25, D. Wong: 1. set LUCRO_AVAIL = .TRUE. in WRF-CMAQ coupled model
+!                     2. enabled receiving LUFRAC information from WRF through
+!                        unified coupler in subroutine retrieve_lufrac_cro_data
 !------------------------------------------------------------------------!
 
 !------------------------------------------------------------------------!
@@ -800,6 +803,7 @@
           UWINDC_AVAIL = (INDEX1( 'UWINDC', n_metdot3d_var, metdot3d_vlist ) .gt. 0)
           VWINDC_AVAIL = (INDEX1( 'VWINDC', n_metdot3d_var, metdot3d_vlist ) .gt. 0)
 
+          LUCRO_AVAIL = .TRUE.
 #else
           IF ( .NOT. OPEN3( GRID_CRO_2D, FSREAD3, PNAME ) ) THEN
              XMSG = 'Could not open '// GRID_CRO_2D // ' file'
@@ -3287,9 +3291,9 @@
           use RUNTIME_VARS
           use lus_data_module  ! Data module that contains info. on different land schemes
           use HGRD_DEFN, only : ncols, nrows
+          use coupler_module
 #ifdef twoway
           use twoway_data_module
-          use coupler_module
 #endif
 
           INCLUDE SUBST_FILES_ID             ! file name parameters

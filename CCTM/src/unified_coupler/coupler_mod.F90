@@ -3,6 +3,7 @@
 !           models in the WRF-CMAQ and MPAS-CMAQ coupled model systems.
 !
 ! Revised:  31 Aug 2023  Original version.  (D. Wong)
+! 10 Mar 2025, D. Wong: added a specific comment to describe gridcro2d_vlist
 !===============================================================================
 
 ! Note: In a generic form, a coupler serves as a middle man to supply a piece
@@ -133,6 +134,7 @@ module coupler_module
   integer, parameter :: n_metdot3d_var  = 4
   integer, parameter :: n_metcro2d_var  = 38
 
+  ! gridcro2d_vlist contains only basic variable names and does not include LUFRAC_*
   character (len = vname_max_str_len), parameter :: gridcro2d_vlist(n_gridcro2d_var) = &
     (/ 'LAT   ', 'LON   ', 'MSFX2 ', 'HT    ', 'LWMASK',                               &
        'PURB  ', 'DLUSE '                                                    /)

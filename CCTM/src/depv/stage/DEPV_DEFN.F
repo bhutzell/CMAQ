@@ -81,11 +81,6 @@ C flag for diagnostic DEPV file
 
       INTEGER, SAVE :: NR_OFFSET            ! Offset to NR start in CGRID
 
-      INTEGER :: GXOFF, GYOFF              ! global origin offset from file
-C for INTERPX
-      INTEGER, SAVE :: STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2
-      INTEGER, SAVE :: STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3
-
       REAL,    ALLOCATABLE, SAVE :: UCROSS( :,:,:)
       REAL,    ALLOCATABLE, SAVE :: VCROSS( :,:,:)
       REAL,    ALLOCATABLE, SAVE :: DLUSE( :,: )
