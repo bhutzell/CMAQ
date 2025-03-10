@@ -568,23 +568,23 @@ C not found (skip entry)
 
 #ifndef mpas
 C Ensure met data time and grid for this run match beis emissions data files
-         MNAME = PROMPTMFILE(
-     &           'Enter name for gridded met input file',
-     &           FSREAD3, 'MET_CRO_2D', PNAME )
+!         MNAME = PROMPTMFILE(
+!     &           'Enter name for gridded met input file',
+!     &           FSREAD3, 'MET_CRO_2D', PNAME )
 
 C Get description of met file
-         IF ( .NOT. DESC3( MNAME ) ) THEN
-            MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
+!         IF ( .NOT. DESC3( MNAME ) ) THEN
+!            MESG = 'Could not get description of file "'
+!     &           // TRIM( MNAME ) // '"'
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!         END IF
 
 C Check that grid description matches BGRD file
-         IF ( .NOT. CHKGRID( MNAME ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MNAME )
-     &           // '" does not match previously set grid.'
-            CALL M3WARN( PNAME, 0, 0, MESG )
-         END IF
+!         IF ( .NOT. CHKGRID( MNAME ) ) THEN
+!            MESG = 'Grid in file "' // TRIM( MNAME )
+!     &           // '" does not match previously set grid.'
+!            CALL M3WARN( PNAME, 0, 0, MESG )
+!         END IF
 
          IF ( BEMIS_DIAG ) THEN
 C Build description for, and open beis diagnostic file

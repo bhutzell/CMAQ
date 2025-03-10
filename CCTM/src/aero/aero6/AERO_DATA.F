@@ -84,6 +84,7 @@ C     10 Mar 2021 G. Sarwar: Changed CB6R3M_AE7_KMTBR to CB6R3M_AE7_AQ
 C     10 June 2021 G. Sarwar: Added CB6R5M_AE7_AQ
 C 23 Jun 21 G. Sarwar: Replaced CB6R3M with CB6R5M
 C NS 11/28/2023 CRACMM2 updates
+C 10 Jan 24 D. Wong: Incorporated unified coupler implmentation
 C GS 07/31/2024  Added ASEAST
 
 C References:
@@ -911,6 +912,10 @@ C-----------------------------------------------------------------------
       Use cgrid_spcs      ! CGRID mechanism species
       Use const
       Use vdiff_data, only : n_spc_diff, diff_spc
+#ifdef mpas
+      Use util_module, only : index1
+#endif
+
       Implicit None
 
 C Local Variables:
