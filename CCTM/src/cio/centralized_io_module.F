@@ -3162,11 +3162,8 @@
           use RUNTIME_VARS
           use lus_data_module  ! Data module that contains info. on different land schemes
           use HGRD_DEFN, only : ncols, nrows
-<<<<<<< HEAD
           use mio_module
-=======
 #if defined twoway || defined mpas
->>>>>>> e387e52dfee47cf7fa6fe39febe234e290fae929
           use coupler_module
 #endif
 #ifdef twoway
