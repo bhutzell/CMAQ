@@ -109,6 +109,8 @@ C-----------------------------------------------------------------------
 
       USE AERO_DATA
       USE ASX_DATA_MOD, Only : MET_DATA, INIT_MET, GET_MET
+      USE AVG_CONC              ! integral average CONC
+      USE BIDI_MOD, Only : INIT_BIDI
       USE BUDGET_DEFN
       USE CENTRALIZED_IO_MODULE
       USE CGRID_SPCS            ! CGRID mechanism species
@@ -116,7 +118,12 @@ C-----------------------------------------------------------------------
       USE ELMO_PROC, ONLY : ELMO_DRIVER
       USE HLCONST_MOD
       USE LSM_MOD
+      USE lus_data_module
       use mio_module
+      USE MIO_ASCII
+      USE PA_DEFN, Only: LIPR, LIRR  ! Process Analysis control and data variables
+      USE PAGRD_DEFN            ! Process Analysis horiz domain specs
+      USE PCGRID_DEFN           ! inherits GRID_CONF
       USE RUNTIME_VARS
       USE RXNS_DATA             ! chemical mechanism data
       USE SOA_DEFN, ONLY : MAP_OA
@@ -134,14 +141,9 @@ C-----------------------------------------------------------------------
 #else
 #ifdef twoway
       use coupler_module, only : coupled_model_stdate, coupled_model_sttime
+      use twoway_data_module
+      use sd_time_series_module
 #endif
-      USE AVG_CONC              ! integral average CONC
-      USE BIDI_MOD, Only : INIT_BIDI
-      USE lus_data_module
-      USE MIO_ASCII
-      USE PA_DEFN, Only: LIPR, LIRR  ! Process Analysis control and data variables
-      USE PAGRD_DEFN            ! Process Analysis horiz domain specs
-      USE PCGRID_DEFN           ! inherits GRID_CONF
 
 #ifdef isam
       USE SA_DEFN
@@ -151,11 +153,6 @@ C-----------------------------------------------------------------------
 #ifdef sens
       USE DDM3D_DEFN
       USE S_PCGRID_DEFN
-#endif
-
-#ifdef twoway
-      use twoway_data_module
-      use sd_time_series_module
 #endif
 
 #ifdef parallel
