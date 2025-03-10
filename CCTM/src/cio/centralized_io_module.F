@@ -1990,7 +1990,9 @@
           USE UTILIO_DEFN
           USE HGRD_DEFN
           USE LSM_Mod, ONLY: n_lufrac, init_lsm
+#if defined twoway || defined mpas
           USE coupler_module
+#endif
 
           INCLUDE SUBST_FILES_ID             ! file name parameters
 
@@ -3299,7 +3301,9 @@
           use RUNTIME_VARS
           use lus_data_module  ! Data module that contains info. on different land schemes
           use HGRD_DEFN, only : ncols, nrows
+#if defined twoway || defined mpas
           use coupler_module
+#endif
 #ifdef twoway
           use twoway_data_module
 #endif
