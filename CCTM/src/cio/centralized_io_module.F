@@ -1820,17 +1820,17 @@
 
                 else if (cio_grid_var_name(v,2) == 'lnt') then
 
-!#ifndef mpas
-!                  data_jdate = loc_jdate(f_ltng)
-!                  data_jtime = loc_jtime(f_ltng)
+#ifndef mpas
+                  data_jdate = loc_jdate(f_ltng)
+                  data_jtime = loc_jtime(f_ltng)
 
-!                  IF ( .NOT. XTRACT3( LTNGFILE, cio_grid_var_name(v,1), 
-!    &                                 1, cio_LTLYRS, STRTROWLNT, ENDROWLNT, STRTCOLLNT, ENDCOLLNT, 
-!    &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
-!                     XMSG = 'Could not extract ' // LTNGFILE // ' file'
-!                     CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
-!                  END IF
-!#endif
+                  IF ( .NOT. XTRACT3( LTNGFILE, cio_grid_var_name(v,1), 
+     &                                 1, cio_LTLYRS, STRTROWLNT, ENDROWLNT, STRTCOLLNT, ENDCOLLNT, 
+     &                                 data_jdate, data_jtime, cio_grid_data(begin:end) ) ) THEN
+                     XMSG = 'Could not extract ' // LTNGFILE // ' file'
+                     CALL M3EXIT ( PNAME, data_jdate, data_jtime, XMSG, XSTAT1 )
+                  END IF
+#endif
 
                 else
                    CALL M3EXIT( 'Centralized I/O',0,0,' ==d== UNKOWN Type of File',1 )
