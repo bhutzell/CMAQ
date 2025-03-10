@@ -5892,6 +5892,11 @@ C Read the various categories of normalized emissions
                 Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
              endif
 
+             If ( INDEX( MECHNAME, 'CRACMM3M' ) .GT. 0 ) then
+                XMSG = 'CTM_OCEAN_CHEM must be set to TRUE when using CRACMM3M mechanism' 
+                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+             endif
+	     
           ELSEIF ( OCEAN_CHEM .AND. .NOT. USE_MARINE_GAS_EMISSION ) THEN
 
              IF ( .NOT. OPEN3( OCEAN_1, FSREAD3, PNAME ) ) THEN
@@ -5952,9 +5957,7 @@ C Read the various categories of normalized emissions
 
                 WHERE ( ocean .LT. 0.001 ) ocean = 0.0  ! ensure values are nonnegative and greater than 0.001
                 WHERE ( szone .LT. 0.001 ) szone = 0.0  ! ensure values are nonnegative and greater than 0.001 
-
-                If ( INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) then
-      
+     
                    If ( .Not. XTRACT3( OCEAN_1, 'CHLO',
      &                                 1, 1, startrow, endrow, startcol, endcol,
      &                                 0, 0, chlr ) ) Then
@@ -5968,19 +5971,6 @@ C Read the various categories of normalized emissions
                       XMSG = 'Could not read DMS from ' // OCEAN_1
                       Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
                    End If
-
-                ELSEIF ( INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0 ) then
-
-                   chlr = 0.0
-                
-                   If ( .Not. XTRACT3( OCEAN_1, 'DMS',
-     &                                 1, 1, startrow, endrow, startcol, endcol,
-     &                                 0, 0, dmsl ) ) Then
-                      XMSG = 'Could not read DMS from ' // OCEAN_1
-                      Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-                   End If
-
-                END IF
 
              END IF
           END IF

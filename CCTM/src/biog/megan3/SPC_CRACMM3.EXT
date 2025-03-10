@@ -16,7 +16,7 @@ C=======================================================================
       PARAMETER     (SPC_CRACMM3MECH = 'CRACMM3         ')
 
       INTEGER        N_CRACMM3_SPC
-      PARAMETER     (N_CRACMM3_SPC = 46)
+      PARAMETER     (N_CRACMM3_SPC = 47)
 
       CHARACTER*16   MECH_SPC_CRACMM3( N_CRACMM3_SPC )  ! Mechanism species name
       REAL           MECH_MWT_CRACMM3( N_CRACMM3_SPC )  ! Mechanism species molecular weight
@@ -66,4 +66,6 @@ C=======================================================================
       DATA  MECH_SPC_CRACMM3( 43), MECH_MWT_CRACMM3( 43) / 'HC5             ',  72.10    /
       DATA  MECH_SPC_CRACMM3( 44), MECH_MWT_CRACMM3( 44) / 'NO              ',  30.00    /
       DATA  MECH_SPC_CRACMM3( 45), MECH_MWT_CRACMM3( 45) / 'ECH4            ',  16.04    /
-      DATA  MECH_SPC_CRACMM3( 46), MECH_MWT_CRACMM3( 46) / 'CO              ',  28.01    /
+      DATA  MECH_SPC_CRACMM3( 46), MECH_MWT_CRACMM3( 46) / 'CO              ',  28.01    /    
+      DATA  MECH_SPC_CRACMM3( 47), MECH_MWT_CRACMM3( 47) / 'CH3I            ',  141.9   /
+      

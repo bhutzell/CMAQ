@@ -95,19 +95,19 @@
    'EVERYWHERE', 'ALL'         ,'GLYD'   ,'GLYD'        ,'GAS'  ,1.  ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'MGLY'   ,'MGLY'        ,'GAS'  ,1.  ,'UNIT','a', 
 
-   ! Marine Halogen Chemistry
-   'EVERYWHERE', 'ALL'         ,'HOI'    ,'HOI'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'DMS'    ,'DMS'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'CH3I'   ,'CH3I'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'MI2'    ,'MI2'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'MIB'    ,'MIB'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'MIC'    ,'MIC'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'BR2'    ,'BR2'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'MB3'    ,'MB3'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'MB2'    ,'MB2'         ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'MB2C'   ,'MB2C'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'MBC2'   ,'MBC2'        ,'GAS'  ,1.  ,'UNIT','a', 
-   'EVERYWHERE', 'ALL'         ,'MBC'    ,'MBC'         ,'GAS'  ,1.  ,'UNIT','a',    
+      ! Marine Halogen Chemistry
+   'EVERYWHERE', 'MGEM'        ,'HYPOIODUSACID'   ,'HOI'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'        ,'MOLECULARIODINE' ,'I2'      ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'        ,'DIMETHYLSULFIDE' ,'DMS'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'        ,'METHYLIODIDE'    ,'CH3I'    ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'        ,'DIIODOMETHANE '  ,'MI2'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'        ,'BROMOIODOMETHANE','MIB'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'        ,'CHLOROIODOMETHAN','MIC'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'        ,'TRIBROMOMETHANE' ,'MB3'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'        ,'DIBROMOMETHANE'  ,'MB2'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'        ,'DIBROMOCHLORMETA','MB2C'    ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'        ,'BROMODICHLOROMET','MBC2'    ,'GAS'  ,1.  ,'UNIT','a'
+   'EVERYWHERE', 'MGEM'        ,'BROMOCHLOROMETHA','MBC'     ,'GAS'  ,1.  ,'UNIT','a',
 
    ! Fine-Mode Aerosols
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'ASO4'        ,'FINE' ,1.  ,'MASS','a', 

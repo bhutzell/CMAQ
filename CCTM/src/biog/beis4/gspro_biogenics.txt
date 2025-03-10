@@ -20,6 +20,7 @@
 # SMFAC (dimensionless)
 #    BEIS VOC Molecular weight divided by the 
 #    mass of the carbon atoms in the molecule;
+# CRACMM3-based biogenic mapping is added for CRACMM3M (08/2024, G.S)
 #
 B10SP;"ACET";"ACETONE";1.0;36.0;1.6111
 B10SP;"ACTAC";"CCOOH";1.0;24.0;2.5     ! Corrected mapping for Acetic Acid*
@@ -177,4 +178,3 @@ CRACMM3;"CO";"CO";1;12.01;2.3322
 CRACMM3;"ORVOC";"HC3";1;48.04;1.2099
 CRACMM3;"SESQT";"SESQ";1;180.15;1.1344
 CRACMM3;"NO";"NO";1.0;14;2.1429
-

@@ -1,0 +1,35 @@
+INO_JPL19
+! INO + HV = I + NO
+! JPL Publication 19-5;  Evaluation Number 19; May 2020
+! Page: 4-388; Table 4H-8
+! Quantum yield is taken as 1.0
+! Note: 223-290 nm: mean of data from Basco and Hunt1 and Forte et al.; 300, 310, 360 nm: Basco and Hunt; 370-400 nm: smoothed data from Basco and Hunt; >400 nm: based on the data from van den Berg and Troe,4 Basco and Hunt, and Forte et al.
+! Chemical Kinetics and Photochemical Data for Use in Atmospheric Studies
+! https://jpldataeval.jpl.nasa.gov/pdf/NASA-JPL%20Evaluation%2019-5.pdf
+! Assume these are point values (not specified in data source)
+POINT
+! With FAC, units are (cm^2/molecule)
+FAC=1.0
+223	2.25E-18	1.00
+230	1.69E-17	1.00
+235	5.64E-17	1.00
+238	6.85E-17	1.00
+245	6.00E-17	1.00
+251	4.88E-17	1.00
+260	2.27E-17	1.00
+270	1.04E-17	1.00
+280	5.00E-18	1.00
+290	1.87E-18	1.00
+300	9.20E-19	1.00
+310	4.10E-19	1.00
+360	4.50E-19	1.00
+370	5.90E-19	1.00
+380	6.50E-19	1.00
+390	7.80E-19	1.00
+400	9.20E-19	1.00
+410	1.10E-18	1.00
+420	1.00E-18	1.00
+430	9.40E-19	1.00
+440	8.00E-19	1.00
+450	6.00E-19	1.00
+460	4.00E-19	1.00

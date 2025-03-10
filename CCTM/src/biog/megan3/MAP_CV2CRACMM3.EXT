@@ -1324,7 +1324,7 @@ C=======================================================================
        DATA SPMH_NAM_CRACMM3( 186) , SPMH_MAP_CRACMM3(186)     
      &    / 'met_iodide  ',  187        / 
        DATA MECH_NAM_CRACMM3(186 )  , MECH_MAP_CRACMM3( 186)  
-     &    / 'SLOWROC    ', 37     /  
+     &    / 'CH3I    ', 47     /  
        DATA CONV_FAC_CRACMM3( 186)   
      &    / 1      /
 
