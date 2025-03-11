@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Feb 14, 2025
+C  REVISION HISTORY: Created by EBI solver program, Feb 21, 2025
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -176,8 +176,8 @@ c..Allocate and define ebi species
       EBISP(  29 ) = OPB
       EBISP(  30 ) = OP3
       EBISP(  31 ) = PAA
-      EBISP(  32 ) = ONIT
-      EBISP(  33 ) = CO2
+      EBISP(  32 ) = CO2
+      EBISP(  33 ) = ONIT
       EBISP(  34 ) = TRPN
       EBISP(  35 ) = HONIT
       EBISP(  36 ) = SO2
@@ -371,9 +371,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( OPB         ) = 5.0D-04
       RTOL( OP3         ) = 5.0D-04
       RTOL( PAA         ) = 5.0D-04
+      RTOL( CO2         ) = 5.0D-04
       RTOL( ONIT        ) = 5.0D-04
       RTOL( PAN         ) = 5.0D-04
-      RTOL( CO2         ) = 5.0D-04
       RTOL( TRPN        ) = 5.0D-04
       RTOL( HONIT       ) = 5.0D-04
       RTOL( N2O5        ) = 5.0D-04
