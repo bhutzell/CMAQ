@@ -605,21 +605,21 @@
 ! -------------------------------------------------------------------------
         subroutine gridded_files_setup
 
-          USE UTILIO_DEFN
+          use cgrid_spcs, only : n_gc_spcd, n_ae_spc
           use HGRD_DEFN, only : ncols, nrows, mype, colsx_pe, rowsx_pe
-          USE VGRD_DEFN, only : VGTYP_GD, nlays
+          USE VGRD_DEFN, only : nlays
+          use LSM_Mod, only : LAND_SCHEME
+          use mio_module
           USE RUNTIME_VARS, only : N_FILE_GR,
      &                             STDATE, WB_DUST, ISAM_NEW_START,
      &                             local_tstep, met_tstep, NLDNSTRIKE,
      &                             LPVO3
-          use LSM_Mod, only : LAND_SCHEME
-          use cgrid_spcs, only : n_gc_spcd, n_ae_spc
+          USE UTILIO_DEFN
 #ifdef mpas
           use centralized_io_util_module, only : ext_layer_info, cal_distribution , 
      &                                           binary_search, quicksort
           use util_module, only : sec2time, nextime, index1, secsdiff
 #endif
-          use mio_module
 
 #ifdef twoway
           use coupler_module
@@ -631,24 +631,23 @@
           Character( 40 ), parameter :: pname = 'gridded_files_setup'
 
           CHARACTER( 120 ) :: XMSG = ' '
-          INTEGER          :: GXOFF, GYOFF, stat, n, v, d_size, begin, end, adj,
-     &                        n_dust_vars, idx, t, ldate, ltime,
-     &                        nl, s, e, c, time, floc, mype_p1, lnvars3d
           character( 32 )  :: tname, fname
-
           character( 24 ), allocatable :: c2d_name(:, :), c3d_name(:, :), 
      &                                    d3d_name(:,:), emis_name(:,:),
      &                                    i3d_name(:,:), is3d_name(:,:),
      &                                    l2d_name(:,:), medc_name(:,:)
-          logical :: done = .false.
-          logical :: found
+          character( 16 ), allocatable :: tvname3d(:)
+          CHARACTER( 500 ) :: full_name
 
+          INTEGER          :: GXOFF, GYOFF, stat, n, v, d_size, begin, end, adj,
+     &                        n_dust_vars, idx, t, ldate, ltime,
+     &                        nl, s, e, c, time, floc, mype_p1, lnvars3d
           integer, allocatable :: bottom(:), top(:)
           integer :: emis_file_dist_layer, tdate(2), ttime(2), diffsec
 
+          logical :: done = .false.
+          logical :: found
           logical :: layer_exist, exists
-          character( 16 ), allocatable :: tvname3d(:)
-          CHARACTER( 500 ) :: full_name
 
           call log_subheading( logdev, 'Opening Gridded Input Files' )
 
@@ -658,23 +657,23 @@
           n_d3d = 0
           size_d3dx = 1
 
+          n_opened_file = n_opened_file + 1
+          f_met         = n_opened_file
+          file_tstep(f_met) = mpas_tstep
+
           if (binary_search( 'LH', vname_2d, n2d_data) .gt. 0) then
              lh_avail = .true.
           else
              lh_avail = .false.
           end if
 
-          n_opened_file = n_opened_file + 1
-          f_met         = n_opened_file
-          file_tstep(f_met) = mpas_tstep
-
           wspd10_avail = .true.
-
-          P0 = 100000.0
-
           QI_AVAIL     = .true.
           QS_AVAIL     = .true.
           JACOBF_AVAIL = .false.
+
+          P0 = 100000.0
+
 #else
 
 ! for standard domain
@@ -696,8 +695,6 @@
           TSEASFC_AVAIL = .false.
           adj = 1
 
-          HAS_SEAICE = (INDEX1( 'SEAICE', n_metcro2d_var, metcro2d_vlist ) .gt. 0)
-
           n_c2d = n_metcro2d_var + adj
 
           allocate (c2d_name(n_c2d, 3), stat=stat)
@@ -713,6 +710,7 @@
              c2d_name(n_c2d,1)         = 'TSEASFC'
           end if
 
+          HAS_SEAICE   = (INDEX1( 'SEAICE',  n_metcro2d_var, metcro2d_vlist ) .gt. 0)
           WSPD10_AVAIL = (INDEX1( 'WSPD10',  n_metcro2d_var, metcro2d_vlist ) .gt. 0)
           RNA_AVAIL    = (INDEX1( 'RNA',     n_metcro2d_var, metcro2d_vlist ) .gt. 0)
           RCA_AVAIL    = (INDEX1( 'RCA',     n_metcro2d_var, metcro2d_vlist ) .gt. 0)
@@ -771,7 +769,7 @@
 
           V = INDEX1( 'PRES', n_metcro3d_var, metcro3d_vlist )
           If ( V .eq. 0 ) Then
-             XMSG = 'Could not get variable PRES from MET_CRO_3D'
+             XMSG = 'Could not get variable PRES from metcro3d_vlist'
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
@@ -786,7 +784,7 @@
                 CONVPA = 1.0E-03
                 P0     = 100000.0 * CONVPA
              Case Default
-                XMSG = 'PRES units incorrect on ' // MET_CRO_3D
+                XMSG = 'PRES units incorrect on metcro3d_vlist' 
                 Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End Select
 
@@ -870,12 +868,7 @@
           call mio_get_global_attr (MET_CRO_2D, 'STIME', file_stime(f_met))
 
           lnvars3d = mio_file_data(floc)%nvars
-
-#ifdef twoway
-          file_tstep(f_met) = mio_file_data(floc)%tstep
-#else
           file_tstep(f_met) = met_tstep ! offline model controlled by runtime var MET_TSTEP
-#endif
 
           call mio_get_global_attr (MET_CRO_2D, 'XCELL', file_xcell(f_met))
           call mio_get_global_attr (MET_CRO_2D, 'YCELL', file_ycell(f_met))
@@ -888,8 +881,6 @@
              adj = 1
           end if
 
-          HAS_SEAICE = (INDEX1( 'SEAICE', lnvars3d, mio_file_data(floc)%var_name ) .gt. 0)
-
 ! include an additional variable TSEASFC when MET_CRO_2D does not have it and CMAQ code is looking for it
           n_c2d = lnvars3d + adj
           allocate (c2d_name(n_c2d, 3), stat=stat)
@@ -897,9 +888,6 @@
              xmsg = 'Failure allocating c2d_name '
              call m3exit (pname, 0, 0, xmsg, xstat1 )
           end if
-
-! only met data has 'm' distinction and since twoway model does not provide 
-! boundary data, so this distinction only apply to non boundary met data
 
           c2d_name(1:lnvars3d,1) = mio_file_data(floc)%var_name(1:lnvars3d)
           c2d_name(:,2)         = 'mc2'     ! denote 2d variable
@@ -922,12 +910,6 @@
           CALL SUBHFILE ( MET_CRO_2D, GXOFF, GYOFF,
      &                    STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2 )
 
-#ifdef twoway
-          STRTCOLMC2x = STRTCOLMC2
-          STRTROWMC2x = STRTROWMC2
-          ENDCOLMC2x  = ENDCOLMC2
-          ENDROWMC2x  = ENDROWMC2
-#else
           mype_p1 = mype + 1
           STRTCOLMC2x = mio_domain_colde_pe(1,mype_p1,1)
           STRTROWMC2x = mio_domain_rowde_pe(1,mype_p1,1)
@@ -1061,8 +1043,6 @@
              ENDCOLMD3x = ENDCOLMD3 + 1
           end if
 
-          UWINDC_AVAIL = (INDEX1( 'UWINDC', NVARS3D, VNAME3D ) .gt. 0)
-          VWINDC_AVAIL = (INDEX1( 'VWINDC', NVARS3D, VNAME3D ) .gt. 0)
 #endif  
 
           dot_ncols = ENDCOLMD3 - STRTCOLMD3 + 1

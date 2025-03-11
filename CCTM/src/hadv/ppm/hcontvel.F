@@ -170,12 +170,20 @@ C-----------------------------------------------------------------------
             call m3exit( pname, jdate, jtime, xmsg, xstat1 )
          end if
 
+#ifdef twoway
+         VNAME = 'UWINDC'
+         IF ( INDEX1( VNAME, n_metdot3d_var, metdot3d_vlist ) .LE. 0 ) THEN
+            XMSG = 'Could not find ' // VNAME // ' in metdot3d_vlist' 
+            CALL LOG_WARNING( PNAME, LOGDEV, XMSG)
+            CSTAGUV = .FALSE.
+         END IF
+#else
          VNAME = 'UWINDC'
          IF ( INDEX1( VNAME, mio_file_data(floc)%nvars, mio_file_data(floc)%var_name ) .LE. 0 ) THEN
             XMSG = 'Could not find ' // VNAME // ' in ' // MET_DOT_3D
-            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
+            CALL LOG_WARNING( PNAME, LOGDEV, XMSG)
             CSTAGUV = .FALSE.
-         END IF
+         END IF            
 #endif
 
          IF ( .NOT. CSTAGUV ) THEN

@@ -67,7 +67,7 @@ C     10 Jan  2024 D. Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE UDTYPES, ONLY: RARRY1
-      USE RUNTIME_VARS, ONLY : LOG_MESSAGE
+      USE LOGDEV_MOD, ONLY : LOG_MESSAGE
 
       IMPLICIT NONE
       INCLUDE SUBST_FILES_ID
@@ -287,8 +287,6 @@ C get scenario timing
 
          PT_DATE = JDATE 
          PT_TIME = JTIME
-
-#endif
 
          call mio_get_global_attr( MET_DOT_3D, 'NLAYS', METDLAYS )
          ALLOCATE( VGLVSXG( 0:MXLAYS3 ), 
