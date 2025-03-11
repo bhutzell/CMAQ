@@ -57,6 +57,7 @@ C     16 Dec 2019 S.L.Napelenok: ddm-3d implementation for version 5.3.1
 C     6 Jul 2021 D.Wong: fixed time marching through a day line during simulation w.r.t.
 C                        representative Day Emissions in subroutine GR3D
 C     12 July 2022 B.H. Baek & C. Coats: USE METEMIS and related changes
+C     10 Jan 2024 D.Wong: changed variable name cell_thickness to cell_ht
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE GRID_CONF           ! horizontal & vertical domain specifications      
@@ -100,7 +101,7 @@ C-----------------------------------------------------------------------
 #endif
 
 #ifdef mpas
-        USE COUPLER_MODULE, ONLY : cell_thickness, cell_vol, MPAS_CELL_AREA => CELL_AREA
+        USE COUPLER_MODULE, ONLY : cell_ht, cell_vol, MPAS_CELL_AREA => CELL_AREA
 #endif
          IMPLICIT NONE
 
@@ -131,7 +132,7 @@ C-----------------------------------------------------------------------
          CALL CHECKMEM( STATUS, 'CELLVOL', PNAME )
 #ifdef mpas
          CELLAREA(:,:) = MPAS_CELL_AREA(:,:)
-         CELLHGT( :,1,: ) = cell_thickness(:,1,:)
+         CELLHGT( :,1,: ) = cell_ht(:,1,:)
          CELLVOL( :,1,: ) = cell_vol(:,1,:)
 #else
          IF ( GDTYP_GD .EQ. LATGRD3 ) THEN

@@ -169,6 +169,8 @@
       CHARACTER(32) :: MECH = ''           ! Chemical Mechanism Name as it appears in the run_script 
                                            !   and mechanism folder names. This string may or may not 
                                            !   match the variable MECHNAME that appears in RXNS_DATA.
+                                           ! Its values is generally the subdirectory in the CCTM/src/MECHS
+                                           ! that the mechanism modules and namelist were taken.
       LOGICAL :: PHOTDIAG  = .FALSE.       ! Flag for PHOTDIAG file
       INTEGER :: NLAYS_DIAG = 0            ! Number of Diagnostic Layers to write out for photolysis
       INTEGER :: NWAVE = 0                 ! Number of Diagnostic Wavelengths
@@ -624,6 +626,11 @@
 
       ! Get Filename for Chemical Mechanism
       CALL GET_ENV ( MECH, 'MECH', MECH, VARDEV )
+      IF ( LEN_TRIM( MECH ) .LE. 0 ) THEN
+         XMSG = 'Run script does not set environment MECH.'  
+         WRITE( OUTDEV, '(A)' )TRIM( XMSG )
+         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
+      END IF
 
       ! Get photolysis rate diagnostic file flag
       CALL GET_ENV ( PHOTDIAG, 'CTM_PHOTDIAG', PHOTDIAG, VARDEV )
