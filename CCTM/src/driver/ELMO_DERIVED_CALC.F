@@ -37,7 +37,7 @@
       USE CGRID_SPCS, ONLY : RHOJ_LOC
       USE SOA_DEFN, ONLY : N_OA, N_OA_NotTracers, OASPC, MAP_OAtoAERO
       USE RUNTIME_VARS, ONLY : PHOTDIAG
-      USE ASX_DATA_MOD, ONLY : MET_DATA
+      USE ASX_DATA_MOD, ONLY : MET_DATA, GRID_DATA
       USE ELMO_DERIVED_FXNS
 
 #ifdef isam
@@ -511,6 +511,86 @@
          ! Retrieve Air Density
          CASE ( ID_DENS )
             OUTVAL = MET_DATA%DENS( C1,R1,L1 ) ! kg m-3
+
+         ! Retrieve Surface Friction Velocity
+         CASE ( ID_USTAR )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = MET_DATA%USTAR( C1,R1 ) ! m s-1
+             ELSE
+             OUTVAL = ELMO_BLANK
+             END IF
+
+         ! Retrieve Surface Aerodynamic Resistance
+         CASE ( ID_GA )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = 1.0/MET_DATA%RA( C1,R1 ) ! s m-1
+             ELSE
+             OUTVAL = ELMO_BLANK
+             END IF
+
+         ! Retrieve Surface Stabilty Parameter 
+         CASE ( ID_ZOL )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = MET_DATA%MOLI( C1,R1 ) * MET_DATA%ZH( C1,R1,L1 )
+             ELSE
+             OUTVAL = ELMO_BLANK
+             END IF
+
+         ! Retrieve Sensible Heat Flux 
+         CASE ( ID_SHFX )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = MET_DATA%HFX( C1,R1 ) ! W m-1
+             ELSE
+             OUTVAL = ELMO_BLANK
+             END IF
+
+         ! Retrieve Latent Heat Flux 
+         CASE ( ID_LHFX )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = MET_DATA%LH( C1,R1 ) ! W m-1
+             ELSE
+             OUTVAL = ELMO_BLANK
+             END IF
+
+         ! Retrieve Ground Heat Flux 
+         CASE ( ID_GHFX )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = MET_DATA%RGRND( C1,R1 ) - MET_DATA%HFX( C1,R1 ) - MET_DATA%LH( C1,R1 ) ! W m-1
+             ELSE
+             OUTVAL = ELMO_BLANK
+             END IF
+
+         ! Retrieve Latent Heat Flux 
+         CASE ( ID_SWC_1 )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = MET_DATA%SOIM1( C1,R1 ) / GRID_DATA%WSAT( C1,R1 ) ! ratio
+             ELSE
+             OUTVAL = ELMO_BLANK
+             END IF
+
+         ! Retrieve Latent Heat Flux 
+         CASE ( ID_SWC_2 )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = MET_DATA%SOIM2( C1,R1 ) / GRID_DATA%WSAT( C1,R1 ) ! ratio
+             ELSE
+             OUTVAL = ELMO_BLANK
+             END IF
+
+         ! Retrieve Latent Heat Flux 
+         CASE ( ID_SOILT_1 )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = MET_DATA%SOIT1( C1,R1 ) ! K
+             ELSE
+             OUTVAL = ELMO_BLANK
+             END IF
+
+         ! Retrieve Latent Heat Flux 
+         CASE ( ID_SOILT_2 )
+             IF ( L1 .EQ. 1 ) THEN
+             OUTVAL = MET_DATA%SOIT2( C1,R1 ) ! K
+             ELSE
+             OUTVAL = ELMO_BLANK
+             END IF
 
          CASE DEFAULT
             ! This Could be a PM mass or organic aerosol derived
