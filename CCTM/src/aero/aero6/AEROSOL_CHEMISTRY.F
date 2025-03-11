@@ -1154,7 +1154,7 @@ C *** Calculate IEPOX and MAE uptake information for accumulation mode
 C *** Calculate approximate seasalt surface area, m2/m3
                MARINE_AREA = ( OCEAN( C,R ) + SZONE( C,R ) )
                IF ( MARINE_AREA .GT. 0.0 .AND. MARINE_MECH ) THEN 
-                  IF ( ASEAST_IDX .LE. 0 ) THEN ! CB6R5M_AE7_AQ approach
+                  IF ( ASEAST_IDX .LE. 0 ) THEN ! CMAQ version 5.5 approach
 C *** Calculate approximate seasalt surface area, m2/m3
 C *** Main components of Seasalt are: NA, CL, MG, K, CA, SO4
 C *** However, SO4 over seawater can generate from other sources
@@ -1166,7 +1166,7 @@ C *** Fo SO4, use SO4/NA emissions ratio in seasalt
      &                                         Real ( aerospc_conc( ACA_IDX,2 ) / aerospc(ACA_IDX)%density, 8 ) +          ! CAJ - m3/m3
      &                                         Real ( 0.2514 * aerospc_conc( ANA_IDX,2 ) / aerospc(ASO4_IDX)%density, 8) ) ! SO4 - m3/m3 - use SO4/NA ratio in seasalt
                      SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * DEXP ( 0.5D0 * AEROMODE_LNSG( 2 ) * AEROMODE_LNSG( 2 ) )
-                   ELSE IF( ASEAST_IDX .GT. 0 ) THEN ! CRACMM3M approach
+                   ELSE  ! CMAQ version 6.0 approach
                      SSALT_VOL  =   1.0D-9 * Real ( aerospc_conc( ASEAST_IDX,2 ) / aerospc(ASEAST_IDX)%density, 8 )        ! m3/m3 - use seasalt concentration 
                      SSALT_SURFA = ( 3.0D0 * SSALT_VOL / RADIUS ) * DEXP ( 0.5D0 * AEROMODE_LNSG( 2 ) * AEROMODE_LNSG( 2 ) )
                    END IF
@@ -1663,7 +1663,7 @@ C hydrolysis
                       ANO3M = ANO3 / aerospc_mw( ANO3_IDX )
                       ASEASTM = aerospc_conc( ASEAST_IDX, 2 ) / aerospc_mw( ASEAST_IDX )
                       FAC_HNO3 = 100.0 * ASEASTM / ( ASEASTM + ANO3M )                
-                      FAC_HNO3 = AMAX1(10.0, FAC_HNO3)
+                      FAC_HNO3 = MAX(10.0, FAC_HNO3)
                       IF ( L_ELMO ) EF_HNO3( C,R,L ) = FAC_HNO3
                       KHETERO( IRATE, C,R,L ) = REAL( JHNO3 * FAC_HNO3,8 ) ! 1/min ,
                     END IF                 
