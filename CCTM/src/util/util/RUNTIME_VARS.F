@@ -1140,10 +1140,10 @@
       CHARACTER( 20 )       :: FMT
 
       CHARACTER( LOG_LINE_LENGTH ) :: CTEMP
-      INTEGER :: MSG_SIZE
+      INTEGER :: MSG_SIZE, IT
       INTEGER :: NLINE1, NLINE2, NLINE, NTAB, LAST_SPACE
 
-      CMSG = CMSG_IN
+      CMSG = CMSG_IN 
 
       ! Write the message to the log file, while trimming to 80
       ! characters (while accounting for tab-length)
@@ -1154,8 +1154,11 @@
       
       ! Determine Length of Total Message
       MSG_SIZE = LEN_TRIM( CMSG )
-      
-      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH )
+      IT = 0
+
+      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH .AND. IT .LE. 1000 )
+         IT = IT + 1
+
          ! Isolate One Line of Text
          LAST_SPACE = INDEX( CMSG( 1:NLINE+1 ), " ", BACK=.TRUE. )
      

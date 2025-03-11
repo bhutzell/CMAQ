@@ -64,41 +64,25 @@ C Variables for the marine gas diagnostic file
       REAL,    ALLOCATABLE, SAVE :: WRMG( :,: )       ! marine gas emiss write buffer
       INTEGER, SAVE              :: MGSPC_MAP( NMGSPC )
 
-      CHARACTER( 16 ) :: MG_SPC_CRACMM3M( NMGSPC)     ! emitted CRACMM species
-      CHARACTER( 16 ) :: MG_SPC_CB6R5M( NMGSPC)       ! emitted CB6R%M species
-
 ! Species names in the speciated marine gas-emissions
       CHARACTER( 16 ), ALLOCATABLE :: WRMG_SPC( : )   ! species names
 
       CHARACTER( 16 ) :: MG_SPC( NMGSPC)           ! emitted species
 
       INTEGER :: MG_SPC_IND ( NMGSPC)              ! emitted species index
-     
-       DATA MG_SPC_CRACMM3M    /  'CHBR3           ',
-     &                            'CH2BR2          ',
-     &                            'CH2BRCL         ',
-     &                            'CHBR2CL         ',
-     &                            'CHBRCL2         ',
-     &                            'CH3I            ',
-     &                            'CH2ICL          ',
-     &                            'CH2IBR          ',
-     &                            'CH2I2           ',
-     &                            'I2              ',
-     &                            'HOI             ',
-     &                            'DMS             ' /
-
-       DATA MG_SPC_CB6R5M      /  'MB3             ',
-     &                            'MB2             ',
-     &                            'MBC             ',
-     &                            'MB2C            ',
-     &                            'MBC2            ',
-     &                            'CH3I            ',
-     &                            'MIC             ',
-     &                            'MIB             ',
-     &                            'MI2             ',
-     &                            'I2              ',
-     &                            'HOI             ',
-     &                            'DMS             ' /     
+         
+      DATA  MG_SPC            /   'TRIBROMOMETHANE ',
+     &                            'DIBROMOMETHANE  ',
+     &                            'BROMOCHLOROMETHA',
+     &                            'DIBROMOCHLORMETA',
+     &                            'BROMODICHLOROMET',
+     &                            'METHYLIODIDE    ',
+     &                            'CHLOROIODOMETHAN',
+     &                            'BROMOIODOMETHANE',
+     &                            'DIIODOMETHANE   ',
+     &                            'MOLECULARIODINE ',
+     &                            'HYPOIODUSACID   ',
+     &                            'DIMETHYLSULFIDE ' /      
 
        REAL :: MG_MW( NMGSPC )                    ! emitted species molecular weight (g/mol)
 
@@ -168,12 +152,6 @@ C-----------------------------------------------------------------------
 C flag for marine gas emissions; this flag is set in the subroutine EM_FILE_INIT 
             IF ( .NOT. USE_MARINE_GAS_EMISSION ) RETURN
 
-            IF (MECHNAME == 'CRACMM3M') THEN
-                MG_SPC = MG_SPC_CRACMM3M
-            ELSE
-                MG_SPC = MG_SPC_CB6R5M
-            END IF
-
 C Allocate MG arrays using NMGSPC value
             DESID_EMVAR( IMGSRM )%LEN = NMGSPC
             ALLOCATE( DESID_EMVAR( IMGSRM )%ARRY ( NMGSPC ) )
@@ -194,7 +172,9 @@ C Allocate MG arrays using NMGSPC value
             DESID_EMVAR( IMGSRM )%LAREA = .FALSE.
             DESID_EMVAR( IMGSRM )%LAREAADJ = .FALSE.
 
-            ALLOCATE ( VDEMIS_MG( NMGSPC,NCOLS,NROWS), STAT = STATUS )
+            ALLOCATE ( VDEMIS_MG( NMGSPC,NCOLS,NROWS), STAT = STATUS )	    
+	    VDEMIS_MG = 0.0
+	    
             IF ( STATUS .NE. 0 ) THEN
                XMSG = '*** VDEMIS_MG, memory allocation failed'
                CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
@@ -235,14 +215,8 @@ C Allocate diagnostic arrays
                 END IF
 
 C Build diagnostic file write buffer (WRMG_SPC) array
-                IF ((INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0) .OR.
-     &              (INDEX( MECHNAME, 'CRACMM3M'      ) .GT. 0)) THEN
                    START_INDEX = 1
                    END_INDEX = 12
-                ELSE
-                   START_INDEX = 12
-                   END_INDEX = 12
-                END IF
 
                 NMGDIAG = 0
                 DO S = START_INDEX, END_INDEX
@@ -433,20 +407,19 @@ C Includes:
 C Parameters:
 C.. Define Marine Gas indices
 	    
-            INTEGER, PARAMETER :: ICHBR3   = 1
-            INTEGER, PARAMETER :: ICH2BR2  = 2
-            INTEGER, PARAMETER :: ICH2BRCL = 3
-            INTEGER, PARAMETER :: ICHBR2CL = 4
-            INTEGER, PARAMETER :: ICHBRCL2 = 5
-            INTEGER, PARAMETER :: ICH3I    = 6
-            INTEGER, PARAMETER :: ICH2ICL  = 7
-            INTEGER, PARAMETER :: ICH2IBR  = 8
-            INTEGER, PARAMETER :: ICH2I2   = 9
-            INTEGER, PARAMETER :: II2      = 10
-            INTEGER, PARAMETER :: IHOI     = 11
-            INTEGER, PARAMETER :: IDMS     = 12
-	    
-
+            INTEGER, PARAMETER :: ITRIBROMOMETHANE = 1
+            INTEGER, PARAMETER :: IDIBROMOMETHANE  = 2
+            INTEGER, PARAMETER :: IBROMOCHLOROMETH = 3
+            INTEGER, PARAMETER :: IDIBROMOCHLORMET = 4
+            INTEGER, PARAMETER :: IBROMODICHLOROME = 5
+            INTEGER, PARAMETER :: IMETHYLIODIDE    = 6
+            INTEGER, PARAMETER :: ICHLOROIODOMETHA = 7
+            INTEGER, PARAMETER :: IBROMOIODOMETHAN = 8
+            INTEGER, PARAMETER :: IDIIODOMETHANE   = 9
+            INTEGER, PARAMETER :: IMOLECULARIODINE = 10
+            INTEGER, PARAMETER :: IHYPOIODUSACID   = 11
+            INTEGER, PARAMETER :: IDIMETHYLSULFID  = 12
+	       	      	      
             REAL, PARAMETER :: SECS2HR = 1.0 / 3600.0          ! hour per seconds
             REAL, PARAMETER :: C_FACT  = 1.0E-9 /(24.0*3600.0) ! factor to convert nmole/m2/day to mole/m2/sec
             REAL, PARAMETER :: LON2TZ  = 1.0 / 15.0            ! longitude to time zone, 1/degrees
@@ -457,8 +430,6 @@ C.. Define Marine Gas indices
      &                             0.034, 0.033, 0.032, 0.032, 0.032, 0.032 / )
 
 C Local Variables:
-!            REAL    :: OFRAC              ! fractional seawater cover
-!            REAL    :: SFRAC              ! fractional surf-zone cover
             REAL    :: CHLA
             REAL    :: SSTC
             REAL    :: SST            
@@ -492,8 +463,6 @@ C Local Variables:
             REAL            :: DX1, DX2                        ! CX x1- and x2-cell widths
             REAL            :: O3, I_AQ                        ! SST in K, SSTC in C, O3 in ppb, SWPD10 in m/s
             REAL            :: DUMMY                           ! dummy variable for calculating marine gas emission
-!            REAL            :: WDSCALO                         ! WDSCALO: 10 meter wind-speed-dependent scaling factors for emissions flux functions
-!            REAL            :: SSTSCALO                        ! SSTSCALO: SST-dependent scaling factor for emissions from Jaegle et al. (2011) (SST in Celsius)
             REAL            :: LOC_LON                         ! grid-cell longitude
             REAL            :: WSPD10                          ! wind speed
             REAL            :: WSPD10_M5                       ! wind speed with a minimum speed of 5 m/s (used for HOI and I2 emission calculation)
@@ -552,7 +521,9 @@ C Assume MET_CRO_2D file is already opened
 C Initialize marine gas output buffer
           DO R = 1, NROWS
              DO C = 1, NCOLS
+
                 MARINE_AREA = ( OCEAN( C,R ) + SZONE( C,R ) )
+
                 IF ( MARINE_AREA .GT. 0.0 .AND. SEAICE( C, R ) .LE. 0.0) THEN
 !            convert area fraction to an actual area
 #ifdef mpas
@@ -565,7 +536,6 @@ C Initialize marine gas output buffer
                      WSPD10    = U10( C,R )
                      WSPD10_M5 = MAX (5.0, WSPD10)
                      SST       = TSEASFC (C,R)
-!                    SSTC    = SST - 273.15
                      SSTC      = MIN( (SST - 273.15), 30.0)                          
                      LOC_LON   = LON (C,R)
                      O3       = 1000.0 * CGRID(C, R, 1, LGC_O3)
@@ -611,68 +581,52 @@ C.. calculate local hour
 
                      IF (LOCHR .LT.  0) LOCHR = LOCHR + 24
                      IF (LOCHR .GT. 23) LOCHR = LOCHR - 24
-      
-                     IF ( (INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) .OR. 
-     &                     INDEX( MECHNAME, 'CRACMM3M'      ) .GT. 0 ) THEN
-      
-                        DUMMY = 4.31E-8 * MARINE_AREA * FHRLY(LOCHR) * CHLA * SECS2HR
+            
+                     DUMMY = 4.31E-8 * MARINE_AREA * FHRLY(LOCHR) * CHLA * SECS2HR
 
-C.. Calculate CHBR3 or MB3 emission rate in mole/s
-                        VDEMIS_MG( ICHBR3, C, R ) = DUMMY * 2.00
+C.. Calculate TRIBROMOMETHANE emission rate in mole/s
+                     VDEMIS_MG( ITRIBROMOMETHANE, C, R ) = DUMMY * 2.00
 
-C.. Calculate CH2BR2 or MB2 emission rate in mole/s
-                        VDEMIS_MG( ICH2BR2, C, R ) = DUMMY * 0.50
+C.. Calculate DIBROMOMETHANE emission rate in mole/s
+                     VDEMIS_MG( IDIBROMOMETHANE, C, R ) = DUMMY * 0.50
 
-C.. Calculate CH2BRCL or MBC emission rate in mole/s
-                        VDEMIS_MG( ICH2BRCL, C, R ) = DUMMY * 0.08
+C.. Calculate BROMOCHLOROMETHANE emission rate in mole/s
+                     VDEMIS_MG( IBROMOCHLOROMETH, C, R ) = DUMMY * 0.08
 
-C.. Calculate CHBR2CL or MB2C emission rate in mole/s
-                        VDEMIS_MG( ICHBR2CL, C, R ) = DUMMY * 0.12
+C.. Calculate DIBROMOCHLORMETHANE emission rate in mole/s
+                     VDEMIS_MG( IDIBROMOCHLORMET, C, R ) = DUMMY * 0.12
 
-C.. Calculate CHBRCL2 or MBC2 emission rate in mole/s
-                        VDEMIS_MG( ICHBRCL2, C, R ) = DUMMY * 0.10
+C.. Calculate BROMODICHLOROMETHANE emission rate in mole/s
+                     VDEMIS_MG( IBROMODICHLOROME, C, R ) = DUMMY * 0.10
 
-C.. Calculate CH3I emission rate in mole/s
-                        VDEMIS_MG( ICH3I, C, R ) = DUMMY * 1.60
+C.. Calculate METHYLIODIDE emission rate in mole/s
+                     VDEMIS_MG( IMETHYLIODIDE, C, R ) = DUMMY * 1.60
 
-C.. Calculate CH2ICL or MIC emission rate in mole/s
-                        VDEMIS_MG( ICH2ICL, C, R ) = DUMMY * 1.41
+C.. Calculate CHLOROIODOMETHANE emission rate in mole/s
+                     VDEMIS_MG( ICHLOROIODOMETHA, C, R ) = DUMMY * 1.41
 
-C.. Calculate CH2IBR or MIB emission rate in mole/s
-                        VDEMIS_MG( ICH2IBR, C, R ) = DUMMY * 0.42
+C.. Calculate BROMOIODOMETHANE emission rate in mole/s
+                     VDEMIS_MG( IBROMOIODOMETHAN, C, R ) = DUMMY * 0.42
 
-C.. Calculate CH2I2 or MI2 emission rate in mole/s
-                        VDEMIS_MG( ICH2I2, C, R ) = DUMMY * 0.46
+C.. Calculate DIIODOMETHANE emission rate in mole/s
+                     VDEMIS_MG(IDIIODOMETHANE, C, R ) = DUMMY * 0.46
 
-C.. Calculate I2 emission rate in mole/s (Macdonald et al., ACP, 14, 5841-5852, 2014)
-                        DUMMY = O3 * (I_AQ**1.3) * (1.74E9 - 6.54E8*LOG(WSPD10_M5)) ! NMOL/M2/D
-                        DUMMY = MARINE_AREA * DUMMY * C_FACT
-                        VDEMIS_MG( II2, C, R ) = MAX( 0.0, DUMMY )
+C.. Calculate MOLECULARIODINE emission rate in mole/s (Macdonald et al., ACP, 14, 5841-5852, 2014)
+                     DUMMY = O3 * (I_AQ**1.3) * (1.74E9 - 6.54E8*LOG(WSPD10_M5)) ! NMOL/M2/D
+                     DUMMY = MARINE_AREA * DUMMY * C_FACT
+                     VDEMIS_MG(  IMOLECULARIODINE, C, R ) = MAX( 0.0, DUMMY )
 
-C.. Calculate HOI emission rate in mole/s (Macdonald et al., ACP, 14, 5841-5852, 2014)
-                        DUMMY = SQRT(I_AQ)
-                        DUMMY = O3
-     &                        * ((4.15E5*DUMMY - 20.6)/WSPD10_M5 - 23600.0*DUMMY)  ! NMOL/M2/D
-                        DUMMY = MARINE_AREA * DUMMY * C_FACT
-                        VDEMIS_MG( IHOI, C, R ) = MAX( 0.0, DUMMY )
-                     END IF
+C.. Calculate HYPOIODUSACID emission rate in mole/s (Macdonald et al., ACP, 14, 5841-5852, 2014)
+                     DUMMY = SQRT(I_AQ)
+                     DUMMY = O3 * ((4.15E5*DUMMY - 20.6)/WSPD10_M5 - 23600.0*DUMMY)  ! NMOL/M2/D
+                     DUMMY = MARINE_AREA * DUMMY * C_FACT
+                     VDEMIS_MG( IHYPOIODUSACID, C, R ) = MAX( 0.0, DUMMY )
 
-C .. Calculate DMS emission rate in mole/s for CB6R5M_AE7_AQ
-                     IF (INDEX( MECHNAME, 'CB6R5M_AE7_AQ' ) .GT. 0 ) THEN 
-                      DUMMY = MARINE_AREA *  DMS_L * KT * 2.78E-12
-                      VDEMIS_MG( IDMS, C, R ) = MAX ( 0.0, DUMMY)
-                     ENDIF
-C .. Calculate DMS emission rate in mole/s for CRACMM1M_AQ
-                     IF (INDEX( MECHNAME, 'CRACMM3M' ) .GT. 0 ) THEN
-                      VDEMIS_MG( IDMS, C, R ) = 0.0 
-                     ENDIF
-
-                ELSE
-                     DO N = 1, NMGSPC
-                        VDEMIS_MG( N, C, R ) = 0.0
-                     END DO
-                     CYCLE
-                END IF
+C .. Calculate DIMETHYLSULFIDE emission rate in mole/s 
+                     DUMMY = MARINE_AREA *  DMS_L * KT * 2.78E-12
+                     VDEMIS_MG( IDIMETHYLSULFID, C, R ) = MAX ( 0.0, DUMMY)
+		     
+                     END IF  ! Marine area
 
 C Update the MGBF array, for writing the diagnostic marine gas emission file
                 IF ( MGEMDIAG .AND. .NOT. L_DESID_DIAG ) THEN
