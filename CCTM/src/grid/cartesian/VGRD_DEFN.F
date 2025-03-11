@@ -26,6 +26,8 @@ C                              26 Jul 06: comments in line with PARMS3.EXT
 C                   S. Roselle 29 Mar 11: Replaced I/O API include files
 C                                         with UTILIO_DEFN
 C                   D. Wong    11 May 11: incorporated twoway model implementation
+C                   D. Wong    10 Jan 24: used LAYER_FILE which is set in run 
+C                                         time, rather than MET_CRO_3D
 C.......................................................................
 
       USE RUNTIME_VARS
@@ -93,8 +95,7 @@ C-----------------------------------------------------------------------
 
             LOGICAL, SAVE :: FIRSTIME = .TRUE.
             CHARACTER( 96 ) :: XMSG = ' '
-!           CHARACTER( 16 ) :: LAYER_FILE = 'LAYER_FILE'
-            CHARACTER( 16 ) :: LAYER_FILE = 'MET_CRO_3D'
+            CHARACTER( 16 ) :: LAYER_FILE = 'LAYER_FILE'
 
             INTEGER L, ALLOCSTAT
 
@@ -160,27 +161,3 @@ C set layer layer thickenesses
 
       END MODULE VGRD_DEFN
 
-C  21   VGLVS_GD   X3FACE_GD
-C  
-C   1     1.0       0.0
-C   2     0.995     0.005
-C   3     0.99      0.01
-C   4     0.985     0.015
-C   5     0.98      0.02
-C   6     0.97      0.03
-C   7     0.96      0.04
-C   8     0.945     0.055
-C   9     0.93      0.07
-C  10     0.91      0.09
-C  11     0.89      0.11
-C  12     0.865     0.135
-C  13     0.84      0.16
-C  14     0.78      0.22
-C  15     0.7       0.3
-C  16     0.6       0.4
-C  17     0.5       0.5
-C  18     0.4       0.6
-C  19     0.3       0.7
-C  20     0.2       0.8
-C  21     0.1       0.9
-C  22     0.0       1.0
