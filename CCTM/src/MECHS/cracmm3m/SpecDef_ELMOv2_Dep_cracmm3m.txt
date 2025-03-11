@@ -1,0 +1,185 @@
+!#start   YYYYJJJ
+!#end     YYYYJJJ
+#layer         1
+
+/ File [1]: ELMO
+/
+/new species       ,units     ,expression
+
+RT                 ,cm        ,PRECIP[1]
+
+!---------------------------------------------------!
+!--------------- Gas Deposition --------------------!
+!---------------------------------------------------!
+DDEP_NO2           ,kg ha-1     ,DD_NO2[1]
+WDEP_NO2           ,kg ha-1     ,WD_NO2[1]
+DDEP_NO            ,kg ha-1     ,DD_NO[1]
+WDEP_NO            ,kg ha-1     ,WD_NO[1]
+DDEP_FORM          ,kg ha-1     ,DD_FORMALD[1]
+WDEP_FORM	       ,kg ha-1     ,WD_FORMALD[1]
+DDEP_H2O2	       ,kg ha-1     ,DD_H2O2[1]
+WDEP_H2O2          ,kg ha-1     ,WD_H2O2[1]
+DDEP_N2O5          ,kg ha-1     ,DD_N2O5[1]
+WDEP_N2O5          ,kg ha-1     ,WD_N2O5[1]
+DDEP_HONO          ,kg ha-1     ,DD_HONO[1]
+WDEP_HONO          ,kg ha-1     ,WD_HONO[1]
+DDEP_HNO3          ,kg ha-1     ,DD_HNO3[1]
+WDEP_HNO3          ,kg ha-1     ,WD_HNO3[1]
+DDEP_NO3           ,kg ha-1     ,DD_NO3[1]
+WDEP_NO3           ,kg ha-1     ,WD_NO3[1]
+DDEP_NTR           ,kg ha-1     ,DD_NTR[1]
+WDEP_NTR           ,kg ha-1     ,WD_NTR[1]
+DDEP_PANT          ,kg ha-1     ,DD_PANT[1]
+WDEP_PANT          ,kg ha-1     ,WD_PANT[1]
+DDEP_NH3           ,kg ha-1     ,DD_NH3[1]
+WDEP_NH3           ,kg ha-1     ,WD_NH3[1]
+DDEP_SO2           ,kg ha-1     ,DD_SO2[1]
+DDEP_O3            ,kg ha-1     ,DD_O3[1]
+WDEP_O3            ,kg ha-1     ,WD_O3[1]
+DDEP_PNA           ,kg ha-1     ,DD_HNO4[1]   
+WDEP_PNA           ,kg ha-1     ,WD_HNO4[1]   
+
+!---------------------------------------------------!
+!------------- Aerosol Deposition ------------------!
+!---------------------------------------------------!
+DDEP_ANO3IJ        ,kg ha-1     ,DD_PMF_NO3[1]
+DDEP_ANO3K         ,kg ha-1     ,DD_PMC_NO3[1]
+WDEP_ANO3IJK       ,kg ha-1     ,WD_TSP_NO3[1]
+DDEP_TNO3          ,kg ha-1     ,DD_TNO3[1]
+WDEP_TNO3          ,kg ha-1     ,WD_TNO3[1]
+DDEP_ANH4IJ        ,kg ha-1     ,DD_PMF_NH4[1]
+DDEP_ANH4K         ,kg ha-1     ,DD_PMC_NH4[1]
+WDEP_ANH4IJK       ,kg ha-1     ,WD_TSP_NH4[1]
+DDEP_AMTNO3J       ,kg ha-1     ,DD_PMF_MTNO3[1]
+WDEP_AMTNO3J       ,kg ha-1     ,WD_TSP_MTNO3[1] 
+DDEP_ASO4IJ        ,kg ha-1     ,DD_PMF_SO4[1]
+DDEP_ASO4K         ,kg ha-1     ,DD_PMC_SO4[1]
+WDEP_ASO4IJK       ,kg ha-1     ,WD_TSP_SO4[1]
+DDEP_AECIJ	       ,kg ha-1     ,DD_PMF_EC[1]
+DDEP_AOCIJ         ,kgC ha-1    ,DD_PMF_OC[1]
+                               
+!DDEP_SSSO4J       ,kg ha-1     ,DD_PMF_SSSO4[1]
+!DDEP_SSSO4K       ,kg ha-1     ,DD_PMC_SSSO4[1]
+!WDEP_SSSO4JK      ,kg ha-1     ,WD_TSP_SSSO4[1]
+
+
+!-----------------------------------------------------!
+!-------- Total (Gas + Aerosol) Deposition -----------!
+!-----------------------------------------------------!
+DDEP_NHX           ,kg ha-1     ,DD_NHX[1]
+WDEP_NHX           ,kg ha-1     ,WD_NHX[1]
+WDEP_TSO4          ,kg ha-1     ,WD_SOX[1]
+
+!! Sodium
+DDEP_ANAJ          ,kg ha-1     ,DD_ANAJ[1]
+DDEP_ANAK          ,kg ha-1     ,DD_PMC_NA[1]
+DDEP_ANAJK         ,kg ha-1     ,DD_ANAJ[1] + DD_PMC_NA[1]
+WDEP_ANAK          ,kg ha-1     ,WD_PMC_NA[1]
+WDEP_ANAJK         ,kg ha-1     ,WD_ANAJ[1] + WD_PMC_NA[1]
+TDEP_ANAJK         ,kg ha-1     ,WDEP_ANAJK[0] + DDEP_ANAJK[0]  
+
+!! Chloride
+DDEP_ACLJ          ,kg ha-1     ,DD_PMF_CL[1]
+DDEP_ACLK          ,kg ha-1     ,DD_PMC_CL[1]
+DDEP_ACLJK         ,kg ha-1     ,DD_ACLJ[1] + DD_PMC_CL[1]
+WDEP_TCL           ,kg ha-1     ,WD_TCL[1]
+TDEP_CL            ,kg ha-1     ,TD_TCL[1]
+
+!! Calcium
+DDEP_CAJ           ,kg ha-1     ,DD_PMF_CA[1]
+WDEP_CAJ	       ,kg ha-1     ,WD_PMF_CA[1]
+DDEP_CAK           ,kg ha-1     ,DD_PMC_CA[1]
+WDEP_CAK           ,kg ha-1     ,WD_PMC_CA[1]
+DDEP_CAJK	       ,kg ha-1     ,DD_CA[1]
+WDEP_CAJK	       ,kg ha-1     ,WD_TSP_CA[1]
+
+!! Iron
+DDEP_FEJ	       ,kg ha-1     ,DD_PMF_FE[1]
+WDEP_FEJ	       ,kg ha-1     ,WD_PMF_FE[1]
+
+!! Aluminum
+DDEP_ALJ	       ,kg ha-1     ,DD_PMF_AL[1]
+WDEP_ALJ           ,kg ha-1     ,WD_PMF_AL[1]
+
+!! Silicon
+DDEP_SIJ           ,kg ha-1     ,DD_PMF_SI[1]
+WDEP_SIJ           ,kg ha-1     ,WD_PMF_SI[1]
+
+!! Titanium
+DDEP_TIJ           ,kg ha-1     ,DD_PMF_TI[1]
+WDEP_TIJ           ,kg ha-1     ,WD_PMF_TI[1]
+
+!! Magnesium
+DDEP_MGJ           ,kg ha-1     ,DD_PMF_MG[1]
+WDEP_MGJ           ,kg ha-1     ,WD_PMF_MG[1]
+DDEP_MGK           ,kg ha-1     ,DD_PMC_MG[1]
+WDEP_MGK           ,kg ha-1     ,WD_PMC_MG[1]
+DDEP_MGJK          ,kg ha-1     ,DD_MG[1]
+WDEP_MGJK          ,kg ha-1     ,WD_TSP_MG[1]
+
+!! Potassium
+DDEP_KJ            ,kg ha-1     ,DD_PMF_K[1]
+WDEP_KJ            ,kg ha-1     ,WD_PMF_K[1]
+DDEP_KK            ,kg ha-1     ,DD_PMC_K[1]
+WDEP_KK            ,kg ha-1     ,WD_PMC_K[1]
+DDEP_KJK           ,kg ha-1     ,DD_K[1]
+WDEP_KJK           ,kg ha-1     ,WD_TSP_K[1]
+
+!! Manganese
+DDEP_MNJ           ,kg ha-1     ,DD_PMF_MN[1]
+WDEP_MNJ           ,kg ha-1     ,WD_PMF_MN[1]
+
+
+!---------------------------------------------------!
+!------------- Nitrogen Deposition -----------------!
+!---------------------------------------------------!
+DD_OXN_NOX         ,kgN ha-1    ,DD_OXN_NOX[1] 
+WD_OXN_NOX         ,kgN ha-1    ,WD_OXN_NOX[1] 
+DD_OXN_TNO3        ,kgN ha-1    ,DD_OXN_TNO3[1]
+WD_OXN_TNO3        ,kgN ha-1    ,WD_OXN_TNO3[1]
+DD_OXN_PANT        ,kgN ha-1    ,DD_OXN_PANT[1]
+WD_OXN_PANT        ,kgN ha-1    ,WD_OXN_PANT[1]
+DD_OXN_ORGN        ,kgN ha-1    ,DD_OXN_ORGN[1]
+WD_OXN_ORGN        ,kgN ha-1    ,WD_OXN_ORGN[1]
+DD_OXN_OTHR        ,kgN ha-1    ,DD_OXN_OTHR[1]
+WD_OXN_OTHR        ,kgN ha-1    ,WD_OXN_OTHR[1]
+DD_OXN_TOT         ,kgN ha-1    ,DD_OXN_TOT[1] 
+WD_OXN_TOT         ,kgN ha-1    ,WD_OXN_TOT[1] 
+                                            
+TD_OXN_TOT         ,kgN ha-1    ,TD_OXN_TOT[1] 
+DD_REDN_TOT        ,kgN ha-1    ,DD_REDN_TOT[1]
+WD_REDN_TOT        ,kgN ha-1    ,WD_REDN_TOT[1]
+TD_REDN_TOT        ,kgN ha-1    ,TD_REDN_TOT[1]
+                                            
+DD_N_TOT           ,kgN ha-1    ,DD_N_TOT[1]   
+WD_N_TOT           ,kgN ha-1    ,WD_N_TOT[1]   
+TD_N_TOT           ,kgN ha-1    ,TD_N_TOT[1]   
+
+!! Nitrogen Deposition in milliequivalents Nitrogen
+!DD_OXN_TOTMEQ     ,meqN m-2   ,DD_OXN_TOTMEQ[1]  
+!WD_OXN_TOTMEQ     ,meqN m-2   ,WD_OXN_TOTMEQ[1]  
+!TD_OXN_TOTMEQ     ,meqN m-2   ,TD_OXN_TOTMEQ[1]  
+!DD_REDN_TOTMEQ    ,meqN m-2   ,DD_REDN_TOTMEQ[1] 
+!WD_REDN_TOTMEQ    ,meqN m-2   ,WD_REDN_TOTMEQ[1] 
+!TD_REDN_TOTMEQ    ,meqN m-2   ,TD_REDN_TOTMEQ[1] 
+!DD_N_TOTMEQ       ,meqN m-2   ,DD_N_TOTMEQ[1]    
+!WD_N_TOTMEQ       ,meqN m-2   ,WD_N_TOTMEQ[1]    
+!TD_N_TOTMEQ       ,meqN m-2   ,TD_N_TOTMEQ[1]    
+
+!-------------------------------------------------!
+!------------- Sulfur Deposition -----------------!
+!-------------------------------------------------!
+DD_S_TOT           ,kgS ha-1    ,DD_S_TOT[1] 
+WD_S_TOT           ,kgS ha-1    ,WD_S_TOT[1] 
+TD_S_TOT           ,kgS ha-1    ,TD_S_TOT[1] 
+!DD_S_SeaS         ,kgS ha-1    ,DD_S_SEA[1] 
+!WD_S_SeaS         ,kgS ha-1    ,WD_S_SEA[1] 
+!TD_S_SeaS         ,kgS ha-1    ,TD_S_SEA[1] 
+
+!! Sulfur Deposition in milliequivalents Sulfur
+!DD_S_TOTMEQ       ,meqS m-2   ,DD_S_TOTMEQ  
+!WD_S_TOTMEQ       ,meqS m-2   ,WD_S_TOTMEQ  
+!TD_S_TOTMEQ       ,meqS m-2   ,TD_S_TOTMEQ  
+!DD_S_SeaSMEQ      ,meqS m-2   ,DD_S_SeaMEQ 
+!WD_S_SeaSMEQ      ,meqS m-2   ,WD_S_SeaMEQ 
+!TD_S_SeaSMEQ      ,meqS m-2   ,TD_S_SeaMEQ 

@@ -40,6 +40,7 @@ C     07 June 2021 G. Sarwar: replaced "B10RD" with "B3V10" for RACM2
 C     30 Sept 2021 G. Sarwar: added CB6R5_AE7_AQ
 C     04 Oct  2021 G. Sarwar: added CB6R5HAP_AE7_AQ
 C     14 Sep  2023 G. Sarwar: added CRACMM2
+C     14 Nov  2024 G. Sarwar: added CRACMM3M
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE DESID_VARS
@@ -98,7 +99,7 @@ C (A line from the profile file is a record.)
          INTEGER,        PARAMETER :: NSEGS = 6  ! # of potential line segments (fields)
          INTEGER,        PARAMETER :: MXLINES = 100 ! max lines for requested sppro name
          INTEGER,        PARAMETER :: MXSPPOL = 10  ! max no. spc per pollutant
-         INTEGER,        PARAMETER :: NMECHS  = 7  ! dimension for number of mechanisms considered
+         INTEGER,        PARAMETER :: NMECHS  = 8  ! dimension for number of mechanisms considered
          CHARACTER,      PARAMETER :: CINVHDR = '#' ! Indicator for inventory hdr fields
 !        REAL,           PARAMETER :: GM2TON  = 1.0 / 907184.74  ! grams to tons
                          
@@ -164,8 +165,9 @@ C Local variables
      &         BIOG_MECH_TYPE( 'CB6R5M_AE7_AQ          ','B10C6AE7'),
      &         BIOG_MECH_TYPE( 'SAPRC07TC_AE6_AQ       ','B10SP   '),
      &         BIOG_MECH_TYPE( 'SAPRC07TIC_AE7I_AQ     ','B10SP   '),
+     &         BIOG_MECH_TYPE( 'CRACMM2                ','CRACMM2 '),
      &         BIOG_MECH_TYPE( 'CRACMM3                ','CRACMM3 '),
-     &         BIOG_MECH_TYPE( 'CRACMM2                ','CRACMM2 ') /)
+     &         BIOG_MECH_TYPE( 'CRACMM3M               ','CRACMM3 ') /)
  
          CHARACTER( 16 )  :: PNAME = 'BEIS_INIT'
          CHARACTER( 120 ) :: XMSG = ' '
@@ -566,23 +568,23 @@ C not found (skip entry)
 
 #ifndef mpas
 C Ensure met data time and grid for this run match beis emissions data files
-         MNAME = PROMPTMFILE(
-     &           'Enter name for gridded met input file',
-     &           FSREAD3, 'MET_CRO_2D', PNAME )
+!         MNAME = PROMPTMFILE(
+!     &           'Enter name for gridded met input file',
+!     &           FSREAD3, 'MET_CRO_2D', PNAME )
 
 C Get description of met file
-         IF ( .NOT. DESC3( MNAME ) ) THEN
-            MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
+!         IF ( .NOT. DESC3( MNAME ) ) THEN
+!            MESG = 'Could not get description of file "'
+!     &           // TRIM( MNAME ) // '"'
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!         END IF
 
 C Check that grid description matches BGRD file
-         IF ( .NOT. CHKGRID( MNAME ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MNAME )
-     &           // '" does not match previously set grid.'
-            CALL M3WARN( PNAME, 0, 0, MESG )
-         END IF
+!         IF ( .NOT. CHKGRID( MNAME ) ) THEN
+!            MESG = 'Grid in file "' // TRIM( MNAME )
+!     &           // '" does not match previously set grid.'
+!            CALL M3WARN( PNAME, 0, 0, MESG )
+!         END IF
 
          IF ( BEMIS_DIAG ) THEN
 C Build description for, and open beis diagnostic file

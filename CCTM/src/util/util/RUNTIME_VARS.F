@@ -166,6 +166,9 @@
       CHARACTER(256) :: TR_NAMELIST = '' ! Tracer Species Namelist
      
       ! Chemistry and Photolysis
+      CHARACTER(32) :: MECH = ''           ! Chemical Mechanism Name as it appears in the run_script 
+                                           !   and mechanism folder names. This string may or may not 
+                                           !   match the variable MECHNAME that appears in RXNS_DATA.
       LOGICAL :: PHOTDIAG  = .FALSE.       ! Flag for PHOTDIAG file
       INTEGER :: NLAYS_DIAG = 0            ! Number of Diagnostic Layers to write out for photolysis
       INTEGER :: NWAVE = 0                 ! Number of Diagnostic Wavelengths
@@ -258,6 +261,7 @@
       CHARACTER(  16 ), SAVE, ALLOCATABLE :: PLAY_BASE( : ) ! Use for Plume Rise Calculation
 
       LOGICAL :: USE_MARINE_GAS_EMISSION = .FALSE.
+
       LOGICAL :: USE_MET_EMIS            = .FALSE. ! flag for met-modulated emissions
       LOGICAL :: METEMDIAG               = .FALSE. ! flag for MET_EM diagnostic file
       LOGICAL :: HUM_NOX_YN              = .FALSE. ! flag for MET_EM NOx correction
@@ -618,6 +622,9 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
+      ! Get Filename for Chemical Mechanism
+      CALL GET_ENV ( MECH, 'MECH', MECH, VARDEV )
+
       ! Get photolysis rate diagnostic file flag
       CALL GET_ENV ( PHOTDIAG, 'CTM_PHOTDIAG', PHOTDIAG, VARDEV )
 
@@ -854,14 +861,14 @@
       CALL GET_ENV ( SSEMDIAG, 'CTM_SSEMDIAG', SSEMDIAG, VARDEV )
  
       ! Set CTM_MET_EMIS to Y or T ro turn on met-modulated emissions
-      CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
+       CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
  
       ! Get met-modulated emission diagnostic output file flag.
       CALL GET_ENV ( METEMDIAG, 'CTM_MET_EMIS_DIAG', METEMDIAG, VARDEV )
 
       ! Get met-modulated emission diagnostic output file flag.
       CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
-
+  
       ! Set LTNG_NO to Y or T to turn on lightning NO production
       CALL GET_ENV ( LTNG_NO, 'CTM_LTNG_NO', LTNG_NO, VARDEV ) 
 
@@ -975,7 +982,8 @@
 
       IF ( OCEAN_CHEM ) THEN
        IF ( (INDEX( MECHNAME, 'CB6R5M_AE7_AQ') .GT. 0 ) .OR. 
-     &      (INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0) ) then     
+     &      (INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0 )  .OR.    
+     &      (INDEX( MECHNAME, 'CRACMM3M'     ) .GT. 0 ) ) then  
        USE_MARINE_GAS_EMISSION = .TRUE.
        ENDIF
       ENDIF
