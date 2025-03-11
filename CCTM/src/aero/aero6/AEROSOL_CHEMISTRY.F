@@ -1154,7 +1154,7 @@ C *** Calculate IEPOX and MAE uptake information for accumulation mode
 C *** Calculate approximate seasalt surface area, m2/m3
                MARINE_AREA = ( OCEAN( C,R ) + SZONE( C,R ) )
                IF ( MARINE_AREA .GT. 0.0 .AND. MARINE_MECH ) THEN 
-                  IF ( ASEAST_IDX .LE. 0 ) THEN ! CMAQ version 6.0 approach
+                  IF ( ASEAST_IDX .LE. 0 ) THEN ! CMAQ version 5.5 approach
 C *** Calculate approximate seasalt surface area, m2/m3
 C *** Main components of Seasalt are: NA, CL, MG, K, CA, SO4
 C *** However, SO4 over seawater can generate from other sources
