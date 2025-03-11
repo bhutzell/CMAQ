@@ -66,8 +66,7 @@ C....................................................................
      &                 EXCLUDE_M3EXIT  => M3EXIT,
      &                 EXCLUDE_M3WARN  => M3WARN,
      &                 EXCLUDE_SHUT3   => SHUT3,
-     &                 EXCLUDE_WRITE3  => WRITE3,
-     &                 BUF_WRITE3      => WRITE3
+     &                 EXCLUDE_WRITE3  => WRITE3
 
          USE PARUTILIO, 
      &                  M3ERR   => PM3ERR,

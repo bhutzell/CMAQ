@@ -158,30 +158,32 @@ C Determine last timestamp
          half_syn_step = time2sec(tstep(2)) / 2
 #else
 
-C Open met file
-         MNAME = PROMPTMFILE(
-     &           'Enter name for gridded met input file',
-     &           FSREAD3, 'MET_CRO_2D', PNAME )
+!C Open met file
+!         MNAME = PROMPTMFILE(
+!     &           'Enter name for gridded met input file',
+!     &           FSREAD3, 'MET_CRO_2D', PNAME )
+!
+!C Get description of met file
+!         IF ( .NOT. DESC3( MNAME ) ) THEN
+!            MESG = 'Could not get description of file "'
+!     &           // TRIM( MNAME ) // '"'
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!         END IF
+!
+!         METSTEP = TSTEP3D
+!
+!C Check that grid description matches B3GRD file
+!         IF ( .NOT. CHKGRID( MNAME ) ) THEN
+!            MESG = 'Grid in file "' // TRIM( MNAME )
+!     &           // '" does not match grid in file ' // TRIM( MNAME ) // '"'
+!#ifdef twoway
+!            CALL M3WARN( PNAME, 0, 0, MESG )
+!#else
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!#endif
+!         END IF
 
-C Get description of met file
-         IF ( .NOT. DESC3( MNAME ) ) THEN
-            MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
-
-         METSTEP = TSTEP3D
-
-C Check that grid description matches B3GRD file
-         IF ( .NOT. CHKGRID( MNAME ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MNAME )
-     &           // '" does not match grid in file ' // TRIM( MNAME ) // '"'
-#ifdef twoway
-            CALL M3WARN( PNAME, 0, 0, MESG )
-#else
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-#endif
-         END IF
+          METSTEP = 10000  ! temporary hack
 #endif
 
          ALLOCATE( RNTOT( NCOLS,NROWS ), STAT=IOS )

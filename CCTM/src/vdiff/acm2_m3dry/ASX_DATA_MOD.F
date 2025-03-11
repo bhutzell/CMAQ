@@ -80,6 +80,7 @@ C    D. Wong: Implemented centralized I/O approach, removed all MY_N clauses, re
 C             unnecessary SAVE attribute (02/2019)
 C    G. Sarwar: Removed CH3BR (03/2021)
 C    R. Gilliam: Include PX soil texture information when available (03/2022)
+C    G. Sarwar: Added CRACMM3M species (02/2022)
 C-------------------------------------------------------------------------------
       Use RUNTIME_VARS
       Use GRID_CONF           ! horizontal & vertical domain specifications
@@ -122,7 +123,6 @@ C-------------------------------------------------------------------------------
          Real,    Allocatable :: Z0       ( :,: )  ! roughness length [m]
          Real,    Allocatable :: SOIM1    ( :,: )  ! 1 cm soil moisture [m**3/m**3]
          Real,    Allocatable :: SOIM2    ( :,: )  ! 1 m soil moisture  [m**3/m**3]
-         Real,    Allocatable :: CLDFRAC  ( :,: )  ! Total cloud fraction including cu
          Real,    Allocatable :: SOIT1    ( :,: )  ! 1 cm soil temperature [K]
          Real,    Allocatable :: SOIT2    ( :,: )  ! 1 m soil temperature [K]
          Real,    Allocatable :: SEAICE   ( :,: )  ! Sea ice coverage [%]
@@ -133,7 +133,6 @@ C-------------------------------------------------------------------------------
          Integer, Allocatable :: LPBL     ( :,: )  ! PBL layer
          Logical, Allocatable :: CONVCT   ( :,: )  ! convection flag
          Real,    Allocatable :: PBL      ( :,: )  ! pbl height (m)
-!         Real,    Allocatable :: NACL_EMIS( :,: )  ! NACL mass emission rate of particles with d <10 um (g/m2/s)
          Real,    Allocatable :: COSZEN   ( :,: )  ! Cosine of the zenith angle
          Real,    Allocatable :: CFRAC    ( :,: )  ! cloud fraction
 !> U and V wind components on the cross grid points
@@ -512,7 +511,16 @@ C Land use information:
       DATA depname(263), dif0(263), ar(263), meso(263), lebas(263) / 'IPXOPERA        ',0.0716,    1.0,      0.3,  99.3/
       DATA depname(264), dif0(264), ar(264), meso(264), lebas(264) / 'INALDOPERA      ',0.0671,    1.0,      0.1,  78.0/
       DATA depname(265), dif0(265), ar(265), meso(265), lebas(265) / '2NITRO_1BUTNL   ',0.0517,216903.,      0.1, 152.2/ ! HONIT
-
+      DATA depname(266), dif0(266), ar(266), meso(266), lebas(266) / 'HCOCL           ',0.1094,   10.0,      0.0,  45.5/ ! Use FMCL data
+      DATA depname(267), dif0(267), ar(267), meso(267), lebas(267) / 'CH2BR2          ',0.0804,    2.0,      0.0,  84.0/ ! Use MB2 data
+      DATA depname(268), dif0(268), ar(268), meso(268), lebas(268) / 'CHBR3           ',0.0705,    2.0,      0.0, 108.5/ ! Use MB3 data
+      DATA depname(269), dif0(269), ar(269), meso(269), lebas(269) / 'HCOBR           ',0.0965,   10.0,      0.0,  52.5/ ! Use FMBR data
+      DATA depname(270), dif0(270), ar(270), meso(270), lebas(270) / 'CH2I2           ',0.0713,    2.0,      0.0,  98.0/ ! Use MI2 data
+      DATA depname(271), dif0(271), ar(271), meso(271), lebas(271) / 'CH2IBR          ',0.0753,    2.0,      0.0,  91.0/ ! Use MIB data
+      DATA depname(272), dif0(272), ar(272), meso(272), lebas(272) / 'CH2ICL          ',0.0773,    2.0,      0.0,  84.0/ ! Use MIC data
+      DATA depname(273), dif0(273), ar(273), meso(273), lebas(273) / 'CHBR2CL         ',0.0720,    2.0,      0.0, 101.5/ ! Use MB2C data
+      DATA depname(274), dif0(274), ar(274), meso(274), lebas(274) / 'CHBRCL2         ',0.0739,    2.0,      0.0,  94.5/ ! Use MBC2 data
+      DATA depname(275), dif0(275), ar(275), meso(275), lebas(275) / 'CH2BRCL         ',0.0834,    2.0,      0.0,  77.0/ ! Use MBC data
 
       CONTAINS
 
@@ -605,7 +613,6 @@ C-----------------------------------------------------------------------
      &             Met_Data%LPBL     ( NCOLS,NROWS ),
      &             Met_Data%CONVCT   ( NCOLS,NROWS ),
      &             Met_Data%PBL      ( NCOLS,NROWS ),
-!     &             Met_Data%NACL_EMIS( NCOLS,NROWS ),
      &             Met_Data%COSZEN   ( NCOLS,NROWS ),
      &             Met_Data%CFRAC    ( NCOLS,NROWS ),
      &             Met_Data%UWIND    ( NCOLS+1,NROWS+1,NLAYS ),
@@ -749,8 +756,8 @@ C-----------------------------------------------------------------------
 !> reciprocal of msfx2**2
 #ifdef mpas
          Grid_Data%RMSFX4 = 1.0
-         Grid_Data%PURB = g2ddata(:,:,purb_ind)
-         Grid_Data%SLTYP = INT( g2ddata(:,:,sltyp_ind) )
+         call coupler_data_retrieving ('PURB', Grid_Data%PURB)
+         call coupler_data_retrieving ('SLTYP', Grid_Data%SLTYP)
          Grid_Data%LUFRAC = LUFRAC
 
          DO R = 1, NROWS
@@ -940,7 +947,6 @@ C Soil vars
 #ifdef mpas
          Met_Data%SOIM1 = smois_data(:,:,1)
          Met_Data%SOIM2 = smois_data(:,:,2)
-         Met_Data%CLDFRAC = g2ddata(:,:,cfrac2dt_ind) ! for BDSNP soil NO
 #else
          call interpolate_var ('SOIM1', jdate, jtime, Met_Data%SOIM1)
 
@@ -1108,14 +1114,13 @@ C-------------------------------- Calculated Variables -------------------------
          Met_Data%THETAV = BUFF3D * ( P0 / Met_Data%PRES ) ** 0.286
 
 #ifdef mpas
-         Met_Data%MOL = 1./g2ddata(:,:,rmol_ind)
+         call coupler_data_retrieving ('rmol', Met_Data%MOL)   ! divided by 1.0 is done in data preparation step
 #endif
 
 C------  Updating MOL, then WSTAR, MOLI, HOL 
          DO R = 1, NROWS
             DO C = 1, NCOLS
 #ifndef mpas
- !             CPAIR    = 1004.67 * ( 1.0 + 0.84 * Met_Data%QV( C,R,1 ) )   ! J/(K KG)
                CPAIR    = CPD * ( 1.0 + 0.84 * Met_Data%QV( C,R,1 ) )   ! J/(K KG)
                TMPFX    = Met_Data%HFX( C,R ) / ( CPAIR * Met_Data%DENS( C,R,1 ) )
                TMPVTCON = 1.0 + 0.608 * Met_Data%QV( C,R,1 )  ! Conversion factor for virtual temperature
