@@ -134,6 +134,8 @@
   Keywd_name(7) = 'DEFAULT_CRACMM3'
   Keywd(7,:) = 'DEFAULT_CRACMM2'
 
+  Keywd_name(69) = 'DEFAULT_CRACMM3M'
+  Keywd(69,:) = 'DEFAULT_CRACMM2'
 
  !------------------------------------!
  !----- Meteorological Variables -----!
@@ -356,6 +358,7 @@
   
   Keywd_name(43) = 'DEFAULT_DEP_CRACMM3'
   Keywd(43,:) = 'DEFAULT_DEP_CRACMM2'
+ 
  
  !--------------------------!
  !----- Gas Deposition -----!

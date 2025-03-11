@@ -263,14 +263,14 @@ C calculate fseas based on deep soil temperature following WRF 3.8.1 PX
       WRITE( MESG,94030 ) HHMMSS( JTIME )
       CALL M3MSG2( MESG )
 
-#ifndef mpas
-C repopulate the met_cro_2d variable attributes
-      IF ( .NOT. DESC3( MNAME ) ) THEN
-         MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
-         CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-      END IF
-#endif
+!#ifndef mpas
+!C repopulate the met_cro_2d variable attributes
+!      IF ( .NOT. DESC3( MNAME ) ) THEN
+!         MESG = 'Could not get description of file "'
+!     &           // TRIM( MNAME ) // '"'
+!         CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!      END IF
+!#endif
 
 C Calculate temporal non-speciated beis emissions
       CALL BEIS( JDATE, JTIME, NCOLS, NROWS, MSPCS, SEMIS, BIPOL )
