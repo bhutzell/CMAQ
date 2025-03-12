@@ -31,6 +31,8 @@ C*************************************************************************
       MODULE M3FILES
 
       USE M3UTILIO
+      USE GET_ENV_VARS
+
 
       INTEGER LOGUNIT                       ! Logdevice
 
@@ -39,7 +41,8 @@ C*************************************************************************
       INTEGER, PARAMETER :: MXM3FLS = MXFILE3 - 1   ! Max no. of input files - use IOAPI parameter 
                                                     ! MXFILE3 - 1 to also allow one output file
 
-      CHARACTER*16  M3_FLNAME( MXM3FLS )    ! Names of Models-3 file
+      INTEGER, PARAMETER    :: M3_FILE_LEN = 16
+      CHARACTER(LEN = M3_FILE_LEN) :: M3_FLNAME( MXM3FLS )    ! Names of Models-3 file
 
       CHARACTER*256 M3FILE                  ! first filename
 
@@ -103,7 +106,8 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ENDIF
 
             ENV_DFLT = ' '        
-            CALL ENVSTR( FL_NAME, ENV_DESC, ENV_DFLT, RET_VAL, STATUS)
+!           CALL ENVSTR( FL_NAME, ENV_DESC, ENV_DFLT, RET_VAL, STATUS)
+            CALL GET_ENV_STRING( FL_NAME, ENV_DESC, ENV_DFLT, RET_VAL, STATUS )
 
             IF( STATUS .EQ. 0 ) THEN
                If( N_M3FILES .eq. 0) M3FILE = RET_VAL
@@ -116,8 +120,8 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          ENDDO
 
          IF( N_M3FILES .EQ. 0 ) THEN
-            MSG = 'No CTM CONC files found'
-            CALL M3ERR( PNAME, 0, 0, MSG, .TRUE. )
+            MSG = 'No Input files found'
+            CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
          ENDIF
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

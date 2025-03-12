@@ -1,0 +1,53 @@
+ICL_JPL19
+! ICL + HV = I + CL 
+! JPL Publication 19-5;  Evaluation Number 19; May 2020
+! Page: 4-385; Table 4H-6
+! Quantum yield is taken as 1.0
+! Jenkin, M. E.; Cox, R. A.; Mellouki, A.; Le Bras, G.; Poulet, G. Kinetics of the reaction of iodine atoms with HO2 radicals. J. Phys. Chem. 1990, 94, 2927-2934, doi:10.1021/j100370a036.
+! https://jpldataeval.jpl.nasa.gov/pdf/NASA-JPL%20Evaluation%2019-5.pdf
+! Assume these are point values (not specified in data source)
+POINT
+! With FAC, units are (cm^2/molecule)
+FAC=1.0
+210	7.40E-20	1.00
+220	2.13E-19	1.00
+230	4.00E-19	1.00
+240	4.90E-19	1.00
+244	5.00E-19	1.00
+250	4.78E-19	1.00
+260	3.68E-19	1.00
+270	2.44E-19	1.00
+280	1.29E-19	1.00
+290	6.40E-20	1.00
+300	3.20E-20	1.00
+310	1.00E-20	1.00
+320	1.00E-20	1.00
+330	1.00E-20	1.00
+340	1.00E-20	1.00
+350	1.00E-20	1.00
+360	2.30E-20	1.00
+370	4.60E-20	1.00
+380	8.74E-20	1.00
+390	1.38E-19	1.00
+400	1.90E-19	1.00
+410	2.50E-19	1.00
+420	2.85E-19	1.00
+430	3.20E-19	1.00
+440	3.54E-19	1.00
+450	3.88E-19	1.00
+460	4.17E-19	1.00
+467	4.20E-19	1.00
+470	4.18E-19	1.00
+480	4.00E-19	1.00
+490	3.54E-19	1.00
+500	2.90E-19	1.00
+510	2.11E-19	1.00
+520	1.56E-19	1.00
+530	1.10E-19	1.00
+540	7.30E-20	1.00
+550	5.50E-20	1.00
+560	4.20E-20	1.00
+570	3.40E-20	1.00
+580	2.90E-20	1.00
+590	2.10E-20	1.00
+600	1.90E-20	1.00

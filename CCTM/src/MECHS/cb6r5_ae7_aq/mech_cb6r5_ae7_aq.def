@@ -393,8 +393,8 @@ REACTIONS[CM] =
 <CL31> CLNO3          = CL + NO3                 # 1.0/<CLONO2_2>;
 
 ! heterogeneous reactions
-<HET_CLNO3_WAI> CLNO3     = HOCL + HNO3               # 1.0~<HETERO_CLNO3_WAI>;
-<HET_CLNO3_WAJ> CLNO3     = HOCL + HNO3               # 1.0~<HETERO_CLNO3_WAJ>;
+<HET_CLN3_WAI>  CLNO3     = HOCL + HNO3          # 1.0~<HETERO_CLN3_WAI>;
+<HET_CLN3_WAJ>  CLNO3     = HOCL + HNO3          # 1.0~<HETERO_CLN3_WAJ>;
 
 ! SOA counter species and semivolatiles formed
 <SA01>  TOLRO2  + NO      = NO  + 0.016*SVAVB2 + 0.051*SVAVB3 +

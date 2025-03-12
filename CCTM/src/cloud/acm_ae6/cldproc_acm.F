@@ -58,6 +58,7 @@ C    Apr 2019 F.Sidi &
 C             S.Roselle:      Fixed bug relating to incorrect unit conversions
 C                             in GC, NR and TR. 
 C    Dec 2019 S.Napelenok     DDM-3D implementation for v 5.3.1
+C    Jan 2024 D.Wong          Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -86,6 +87,7 @@ C-----------------------------------------------------------------------
       use mio_module
       use coupler_module
 #endif
+      USE CONST
 
       IMPLICIT NONE
 
@@ -327,23 +329,6 @@ Ckrt deposition arrays for tagged species.....
          S_DEPWRT = 0.0
 #endif
 
-#ifdef parallel_io
-         IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-            IF ( .NOT. OPEN3( CTM_WET_DEP_1, FSREAD3, PNAME ) ) THEN
-               XMSG = 'Could not open ' // TRIM( CTM_WET_DEP_1 )
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-         END IF
-         IF ( CLD_DIAG ) THEN
-            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( CTM_WET_DEP_2, FSREAD3, PNAME ) ) THEN
-                  XMSG = 'Could not open ' // TRIM( CTM_WET_DEP_2 )
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-            END IF
-         END IF
-#endif
-
 #ifdef mpas
 ! this is for creating the output name list
          found = .false.
@@ -414,6 +399,22 @@ Ckrt deposition arrays for tagged species.....
             SPC = SPC + 1
             wdep_spc ( VAR ) = TR_WDEP( SPC )
          END DO
+#else
+         IF ( .NOT. IO_PE_INCLUSIVE ) THEN
+            IF ( .NOT. OPEN3( CTM_WET_DEP_1, FSREAD3, PNAME ) ) THEN
+               XMSG = 'Could not open ' // TRIM( CTM_WET_DEP_1 )
+               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            END IF
+         END IF
+         IF ( CLD_DIAG ) THEN
+            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
+               IF ( .NOT. OPEN3( CTM_WET_DEP_2, FSREAD3, PNAME ) ) THEN
+                  XMSG = 'Could not open ' // TRIM( CTM_WET_DEP_2 )
+                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+               END IF
+            END IF
+         END IF
+
 #endif
          RETURN ! Added for MIO Implementation
       END IF   ! FIRSTIME
@@ -532,7 +533,9 @@ c                 ENDIF
 
       ! Store Deposition Accumulation so it can be subtracted out to
       ! inform ELMO
-      TOT_DEP0 = TOT_DEP + CONV_DEP
+      DO VAR = 1,N_SPC_WDEP + 1
+        TOT_DEP0( :,:,VAR ) = TOT_DEP( :,:,VAR ) + CONV_DEP( :,:,VAR )
+      END DO
 #ifdef isam
       TOT_SADEP0 = TOT_SADEP + CONV_SADEP
 #endif

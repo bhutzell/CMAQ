@@ -1,0 +1,47 @@
+CH2BR2_JPL19             
+! CH2BR2 + HV = 2.0*BR + 2.0*HO2  
+! JPL Publication 19-5; Evaluation Number 19; May 2020
+! Page: 4-333; Table 4G-14
+! Quantum yield is taken as 1.0
+! Note: Absorption cross sections (σ): 174–198 nm: Gillotay et al.; 200–210 nm: mean of data from Molina et al. and Gillotay et al.; 215–290 nm: mean of data from Molina et al., Gillotay et al., and Mössinger et al; 295–300 nm: Mössinger et al.
+! Note: Temperature correction of cross-sections are needed - see page 4-333
+! Gillotay, D.; Simon, P. C. Ultraviolet absorption cross-sections of photoactive species of stratospheric interest Part 1: The halocarbons. Aeronomica Acta A 1990, 356, 1-173
+! https://jpldataeval.jpl.nasa.gov/pdf/NASA-JPL%20Evaluation%2019-5.pdf
+! Assume these are point values (not specified in data source)
+POINT
+! With FAC, units are (cm^2/molecule)
+FAC=1.0
+174	1.17E-17	1.00
+176	6.62E-18	1.00
+178	3.77E-18	1.00
+180	2.41E-18	1.00
+182	1.78E-18	1.00
+184	1.54E-18	1.00
+186	1.54E-18	1.00
+188	1.66E-18	1.00
+190	1.87E-18	1.00
+192	2.09E-18	1.00
+194	2.23E-18	1.00
+196	2.28E-18	1.00
+198	2.26E-18	1.00
+200	2.26E-18	1.00
+205	2.15E-18	1.00
+210	2.35E-18	1.00
+215	2.63E-18	1.00
+220	2.72E-18	1.00
+225	2.47E-18	1.00
+230	1.96E-18	1.00
+235	1.39E-18	1.00
+240	8.86E-19	1.00
+245	5.19E-19	1.00
+250	2.80E-19	1.00
+255	1.40E-19	1.00
+260	6.61E-20	1.00
+265	3.04E-20	1.00
+270	1.35E-20	1.00
+275	5.90E-21	1.00
+280	2.55E-21	1.00
+285	1.14E-21	1.00
+290	4.99E-22	1.00
+295	2.10E-22	1.00
+300	9.00E-23	1.00

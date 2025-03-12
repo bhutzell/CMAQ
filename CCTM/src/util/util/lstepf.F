@@ -23,7 +23,12 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 C returns the last data date & time on file FNAME
 C specifically used only for input files
 
+C   10 Jan 24 D. Wong: Incorporated unified coupler implmentation
+
       USE UTILIO_DEFN
+#ifdef twoway
+      USE coupler_module
+#endif
 
       IMPLICIT NONE
  
@@ -51,6 +56,11 @@ C-----------------------------------------------------------------------
 C open existing file for readonly access
 
 #ifndef mpas
+#ifdef twoway
+      LSTEP = coupled_model_tstep
+      LDATE = coupled_model_stdate
+      LTIME = coupled_model_sttime
+#else
       IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
          XMSG = 'Could not open '// FNAME
          CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
@@ -64,6 +74,7 @@ C open existing file for readonly access
       LSTEP = SEC2TIME( ( MXREC3D - 1 ) * TIME2SEC( TSTEP3D ) )
       LDATE = SDATE3D
       LTIME = STIME3D
+#endif
       CALL NEXTIME( LDATE, LTIME, LSTEP )
 #endif
  

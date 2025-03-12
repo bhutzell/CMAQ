@@ -47,6 +47,8 @@
       REAL, EXTERNAL  :: RQY_GLYOXAL
       REAL, EXTERNAL  :: RQUANTUM_ACETONE
       REAL, EXTERNAL  :: RQY_ACETONE_CH3CO
+      REAL, EXTERNAL  :: RFACTOR_XCROSS_CHBR3
+      REAL, EXTERNAL  :: RFACTOR_XCROSS_BRCL
 
       REAL NO2_XCROSS_298K( KW )
 !      REAL NO2_QUANT_298K ( KW )
@@ -103,7 +105,7 @@
       LOGICAL       :: RESET_WC
       LOGICAL       :: RESET_TD
 
-      REAL          :: SIG, ALPHA, BETA, CHI, PHI
+      REAL          :: SIG, ALPHA, BETA, TAU, UPSILON, CHI, PHI, PSI
       REAL          :: XCROSS( NZ, NW), QUANT( NZ,NW )
 
       REAL          :: PHI_CO_STP     ! CO branch of IUPAC (2013) acetone QYZ at STP
@@ -520,7 +522,7 @@
 
              REPLACE = .TRUE.
              
-         CASE( 'CLNO2', 'CLNO2_IUPAC13' )
+         CASE( 'CLNO2', 'CLNO2_IUPAC13', 'CLNO2_JPL19' )
 
 ! IUPAC 2013 Data Sheet recommended temperature correction to cross-section
 ! from
@@ -660,7 +662,7 @@
 
            REPLACE = .TRUE.
 
-         CASE(  'CLONO2-2', 'CLONO2_2' )    ! 'ClONO2 -> Cl + NO3'
+         CASE(  'CLONO2-2', 'CLONO2_2', 'CLNO3_R_JPL19' )    ! 'ClONO2 -> Cl + NO3'
 
 ! temperature correction to cross-section 
 
@@ -674,7 +676,7 @@
 
             REPLACE = .TRUE.
 
-         CASE( 'CLONO2-1', 'CLONO2_1' )     ! 'ClONO2 -> ClO + NO2'
+         CASE( 'CLONO2-1', 'CLONO2_1', 'CLNO3_M_JPL19' )     ! 'ClONO2 -> ClO + NO2'
 
 ! temperature correction to cross-section 
 
@@ -842,7 +844,7 @@
 
            REPLACE = .TRUE.
 
-         CASE(  'PAN1_RACM2', 'PAN2_RACM2'  )  ! 'PAN + hv -> PRODUCTS'
+         CASE(  'PAN1_RACM2', 'PAN2_RACM2', 'PAN1_JPL19', 'PAN2_JPL19'  )  ! 'PAN + hv -> PRODUCTS'
 
 
 ! temperature correction to cross-section 
@@ -857,34 +859,305 @@
 
 
            REPLACE = .TRUE.
-         CASE( 'GLY_R_IUPAC10', 'GLY_R_IUPAC13', 'GLYOX_R_CRI', 'GLYOX_M_CRI' )
+         CASE(  'PPN1_JPL19', 'PPN2_JPL19'  )  ! 'PPN + hv -> PRODUCTS'
 
+
+! temperature correction to cross-section 
 
            DO IW = 1, NW
-               CHI = QY_GLYOXAL( T298K, DENS0, WC( IW ) )
-               SIG = DENS0
                DO I = 1, NZ
-                    IF( CHI .GT. 0.0 )THEN
-                        FACTOR  = QY_GLYOXAL( TLEV( I ), DENS( I ), WC( IW ) )
-     &                          / CHI 
-                    ELSE
-                        FACTOR  = 1.0
-                    END IF
-                    QY(I, IW) = MIN(1.0, MAX(0.0, FACTOR * QY(I, IW)))
+                    FACTOR    = EXP(PPN_XCROSS_B(IW)*(TLEV(I)-T296K))
+                    XC(I, IW) = FACTOR * XC(I, IW)
                     SQ(I, IW) = XC(I,IW) * QY(I, IW)
-#ifdef verbose
-                    WRITE(6,'(A,10(1X,ES12.4))')'SIG, WC( IW ), RQY_GLYOXAL( T298K, SIG, WC( IW ) ) = ',
-     &              SIG, WC( IW ), RQY_GLYOXAL( T298K, SIG, WC( IW ) ),QY_GLYOXAL( T298K, SIG, WC( IW ) )
-     &              /QY_GLYOXAL( T298K, DENS0, WC( IW ) )
-
-#endif
-                    SIG = 0.90*SIG
                ENDDO
            ENDDO
 
 
            REPLACE = .TRUE.
 
+         CASE( 'BRNO3_M_JPL19', 'BRNO3_R_JPL19' )
+         
+!200-500 nm, data of
+!J.B. Burkholder, A.R. Ravishankara, and S Solomon, "UV/visible and IR absorption cross sections of BrONO2," 
+!J. Geophys. Res. 100, 16793-16800 (1995); DOI: 10.1029/95JD01223, and
+!temperature coefficients for the parameterization of the temperature dependence 220-296 K
+!XC(T) = XC(296) [1 + A1 (T - 296) + A2 (T-296)2]
+! temperature correction to cross-section 
+
+           DO IW = 1, NW
+               DO I = 1, NZ
+                    IF( TLEV(I) .GE. T296K )THEN
+                        FACTOR = 1.0
+                    ELSE
+                        TDUM = ( MAX( 220.0,TLEV(I) ) - T296K )
+                        FACTOR = 1.0 + BRNO3_XCROSS_A1(IW)*TDUM + BRNO3_XCROSS_A2(IW)*TDUM*TDUM
+                    END IF
+                    XC(I, IW) = FACTOR * XC(I, IW)
+                    SQ(I, IW) = XC(I,IW) * QY(I, IW)
+               ENDDO
+           ENDDO
+         
+           REPLACE = .TRUE.
+
+        CASE( 'CH2I2_JPL19' )
+! 295-300 nm, data of
+!J.C. Mössinger, D.E. Shallcross, and R.A. Cox,
+!"UV-VIS absorption cross-sections and atmospheric lifetimes of CH2Br2, CH2I2, and CH2BrI,"
+!J. Chem. Soc. Faraday Trans. 94, 1391-1396 (1998); DOI: 10.1039/A709160E
+!The parameterization of the cross section temperature dependence (215-300 nm, 270-348 K)
+! using the expression: ln XC(wavelength, T) = ln XC(wavelength, 298 K) + B(wavelength) (T-298)
+! temperature correction to cross-section 
+
+           DO IW = 1, NW               
+               DO I = 1, NZ                    
+                    IF( TLEV(I) .GE. 348.0 )THEN
+                        TDUM = 50.0
+                    ELSE
+                       TDUM = ( MAX( 273.0,TLEV(I) ) - T298K )
+                    END IF
+                    FACTOR    = EXP( CH2I2_XCROSS_B(IW)*TDUM )
+                    XC(I, IW) = FACTOR * XC(I, IW)
+                    SQ(I, IW) = XC(I,IW) * QY(I, IW)
+               ENDDO
+           ENDDO
+
+           REPLACE = .TRUE.
+        CASE( 'CH2BR2_JPL19' )
+! 295-300 nm, data of
+!J.C. Mössinger, D.E. Shallcross, and R.A. Cox,
+!"UV-VIS absorption cross-sections and atmospheric lifetimes of CH2Br2, CH2I2, and CH2BrI,"
+!J. Chem. Soc. Faraday Trans. 94, 1391-1396 (1998); DOI: 10.1039/A709160E
+!The parameterization of the cross section temperature dependence (215-300 nm, 250-348 K)
+! using the expression: ln XC(wavelength, T) = ln XC(wavelength, 298 K) + B(wavelength) (T-298)
+! temperature correction to cross-section 
+
+           DO IW = 1, NW               
+               DO I = 1, NZ                    
+                    IF( TLEV(I) .GE. 348.0 )THEN
+                        TDUM = 50.0
+                    ELSE
+                       TDUM = ( MAX( 250.0,TLEV(I) ) - T298K )
+                    END IF
+                    FACTOR    = EXP( CH2BR2_XCROSS_B(IW)*TDUM )
+                    XC(I, IW) = FACTOR * XC(I, IW)
+                    SQ(I, IW) = XC(I,IW) * QY(I, IW)
+               ENDDO
+           ENDDO
+
+           REPLACE = .TRUE.
+
+        CASE( 'CH2IBR_JPL19' )
+!Temperature coefficients B:
+!273-348 K,
+!J.C. Mössinger, D.E. Shallcross, and R.A. Cox, 
+!"UV-VIS absorption cross-sections and atmospheric lifetimes
+! of CH2Br2, CH2I2, and CH2BrI," J. Chem. Soc. Faraday 
+!Trans. 94, 1391-1396 (1998); DOI: 10.1039/A709160E ,
+!ln XC(wavelength, T) = ln XC(wavelength, 298 K) + B × (T - 298)
+           DO IW = 1, NW               
+               DO I = 1, NZ                    
+                    IF( TLEV(I) .GE. 348.0 )THEN
+                        TDUM = 50.0
+                    ELSE
+                       TDUM = ( MAX( 273.0,TLEV(I) ) - T298K )
+                    END IF
+                    FACTOR    = EXP( CH2IBR_XCROSS_B(IW)*TDUM )
+                    XC(I, IW) = FACTOR * XC(I, IW)
+                    SQ(I, IW) = XC(I,IW) * QY(I, IW)
+               ENDDO
+           ENDDO
+
+           REPLACE = .TRUE.
+
+        CASE( 'CH2ICL_JPL19' )        
+
+           DO IW = 1, NW
+
+              IF( WC(IW) .LE. 355.0 )THEN  
+!Temperature coefficients a1 and a2:
+!223-298 K,
+!C.M. Roehl, J.B. Burkholder, G.K. Moortgat, A.R. Ravishankara, and P.J. Crutzen,
+!"Temperature dependence of UV absorption cross sections and atmospheric
+!implications of several alkyl iodides," J. Geophys. Res. 102(D11),
+!12819-12829 (1997); DOI: 10.1029/97JD00530,
+!XC(wavelength, T) = XC(298 K) [1 + a1(T-298) + a2(T-298)2] with
+! temperature correction to cross-section 
+                  DO I = 1, NZ
+                       IF( TLEV(I) .GE. T298K )THEN
+                          FACTOR = 1.0
+                       ELSE
+                         TDUM = ( MAX( 220.0,TLEV(I) ) - T298K )
+                          FACTOR    = 1.0 + CH2ICL_XCROSS_A1(IW)*TDUM + CH2ICL_XCROSS_A2(IW)*TDUM*TDUM
+                       END IF
+                       XC(I, IW) = FACTOR * XC(I, IW)
+                       SQ(I, IW) = XC(I,IW) * QY(I, IW)
+                  END DO
+               ELSE
+!Temperature coefficients B:
+!243-333 K,
+!O.V. Rattigan, D.E. Shallcross, and R.A. Cox, 
+!"UV absorption cross-sections and atmospheric photolysis rates of CF3I, CH3I, 
+!C2H5I and CH2ICl," J. Chem. Soc. Faraday Trans. 93, 2839-2846 (1997); 
+!DOI: 10.1039/A701529A,
+!ln XC(wavelength, T) = ln XC(wavelength, 298 K) + B × (T - 298)
+                  DO I = 1, NZ                    
+                       IF( TLEV(I) .GE. 333.0 )THEN
+                           TDUM = 35.0
+                       ELSE
+                          TDUM = ( MAX( 243.0,TLEV(I) ) - T298K )
+                       END IF
+                       FACTOR    = EXP( CH2ICL_XCROSS_B(IW)*TDUM )
+                       XC(I, IW) = FACTOR * XC(I, IW)
+                       SQ(I, IW) = XC(I,IW) * QY(I, IW)
+                  END DO
+              END IF
+           ENDDO
+        
+           REPLACE = .TRUE.
+           
+        CASE( 'CH3I_JPL19' )        
+
+           DO IW = 1, NW
+
+              IF( WC(IW) .LE. 355.0 )THEN  
+!Temperature coefficients a1 and a2:
+!210-298 K,
+!C.M. Roehl, J.B. Burkholder, G.K. Moortgat, A.R. Ravishankara, and P.J. Crutzen,
+!"Temperature dependence of UV absorption cross sections and atmospheric
+!implications of several alkyl iodides," J. Geophys. Res. 102(D11),
+!12819-12829 (1997); DOI: 10.1029/97JD00530 ,
+!XC(wavelegth, T) = XC(298 K) [1 + a1(T - 298) + a2(T - 298)2]
+! temperature correction to cross-section 
+                  DO I = 1, NZ
+                       IF( TLEV(I) .GE. T298K )THEN
+                          FACTOR = 1.0
+                       ELSE
+                         TDUM = ( MAX( 210.0,TLEV(I) ) - T298K )
+                          FACTOR    = 1.0 + CH3I_XCROSS_A1(IW)*TDUM + CH3I_XCROSS_A2(IW)*TDUM*TDUM
+                       END IF
+                       XC(I, IW) = FACTOR * XC(I, IW)
+                       SQ(I, IW) = XC(I,IW) * QY(I, IW)
+                  END DO
+               ELSE
+!Temperature coefficients B:
+!243-333 K,
+!O.V. Rattigan, D.E. Shallcross, and R.A. Cox,
+!"UV absorption cross-sections and atmospheric photolysis rates of CF3I, CH3I,
+!C2H5I and CH2ICl," J. Chem. Soc. Faraday Trans. 93, 2839-2846 (1997);
+!DOI: 10.1039/A701529A,
+!ln XC(wavelength, T) = ln s(wavelength, 298 K) + B × (T - 298)
+                  DO I = 1, NZ                    
+                       IF( TLEV(I) .GE. 333.0 )THEN
+                           TDUM = 35.0
+                       ELSE
+                          TDUM = ( MAX( 243.0,TLEV(I) ) - T298K )
+                       END IF
+                       FACTOR    = EXP( CH3I_XCROSS_B(IW)*TDUM )
+                       XC(I, IW) = FACTOR * XC(I, IW)
+                       SQ(I, IW) = XC(I,IW) * QY(I, IW)
+                  END DO
+              END IF
+           ENDDO
+        
+           REPLACE = .TRUE.
+           
+         CASE( 'BRCL_JPL19' )        
+             DO IW = 1, NW
+                 DO I = 1, NZ
+                      FACTOR = RFACTOR_XCROSS_BRCL( WC(IW), TLEV(I) )
+                     write(6,'(A,2(1x,f8.2),A,f8.2)')'BRCL_JPL19', WC(IW), TLEV(I),"FACTOR = ",FACTOR
+                      XC(I, IW) = FACTOR * XC(I, IW)
+                      SQ(I, IW) = XC(I,IW) * QY(I, IW)
+                 ENDDO
+             ENDDO
+             REPLACE = .TRUE.
+         CASE( 'CHBR3_JPL19' )        
+            DO IW = 1, NW
+                DO I = 1, NZ
+                     FACTOR = RFACTOR_XCROSS_CHBR3( WC(IW), TLEV(I) )
+!                    write(6,'(A,2(1x,f8.2),A,f8.2)')'CHBR3_JPL19: ', WC(IW), TLEV(I)," FACTOR = ",FACTOR
+                     XC(I, IW) = FACTOR * XC(I, IW)
+                     SQ(I, IW) = XC(I,IW) * QY(I, IW)
+                ENDDO
+            ENDDO
+            REPLACE = .TRUE.
+         CASE( 'GLY_R_IUPAC10', 'GLYOX_R_CRI' )
+
+
+           DO IW = 1, NW
+               CHI = QY_GLYOXAL( T298K, DENS0, WC( IW ) )
+               SIG = DENS0
+               WRITE(6,'(A3,2(1X,A7),15(1X,A12))')
+     &         'IW','Lambda', 'TEMP','DENS','QY_GLYOXAL','QYO_GLYOXAL','RQY_GLYOXAL','FACTOR',
+     &         'INIT_QY_RAD'
+               DO I = 1, NZ
+                    TAU = QY(I, IW)
+                    IF( CHI .GT. 0.0 )THEN
+                        PHI     = QY_GLYOXAL( TLEV( I ), DENS( I ), WC( IW ) ) 
+                        FACTOR  = PHI / CHI 
+                    ELSE
+                        FACTOR  = 1.0
+                    END IF
+                    QY(I, IW) = MIN(1.0, MAX(0.0, FACTOR * QY(I, IW)))
+                    SQ(I, IW) = XC(I,IW) * QY(I, IW)
+
+                    psi = QY_GLYOXAL( TLEV( I ), DENS( I ), WC( IW ) )
+                    WRITE(6,'(I3,2(1X,F7.2),15(1X,ES12.4))')
+     &              IW,WC( IW ), TLEV( I ), DENS( I ), 
+     &              PHI,CHI,
+     &              RQY_GLYOXAL( TLEV( I ), DENS( I ), WC( IW ) ),FACTOR,TAU
+
+!                    SIG = 0.90*SIG
+               ENDDO
+           ENDDO
+
+
+           REPLACE = .TRUE.
+
+
+         CASE( 'GLYHX_JPL19','GLY_R_IUPAC13' )
+
+
+           DO IW = 1, NW
+! compute radical channel based on JPL-19 conclusion that the nonradical channels
+! do not depend on temperature and pressure.
+               PSI     =  QY_GLYOXAL( T296K, DENS0, WC( IW ) )
+               UPSILON = ( GLY_QYH2_JPL19(IW)+GLY_QYHCHO_JPL19(IW) )
+               CHI = MAX( 0.0,(PSI-UPSILON) )
+               SIG = DENS0
+!              WRITE(6,'(A3,2(1X,A7),15(1X,A12))')
+!    &         'IW','Lambda', 'TEMP','DENS','QY_GLYOXAL','QY_RAD','QY_RAD0','RQY_GLYOXAL','FACTOR', 'OLD_FACT','MAX_GLY_RAD',
+!    &         'INIT_QY_RAD'
+               DO I = 1, NZ
+                    TAU = QY(I, IW)
+                    IF( CHI .GT. 0.0 )THEN
+                        PHI = MAX( 0.0,  
+     &                        QY_GLYOXAL( TLEV( I ), DENS( I ), WC( IW ) ) 
+     &                      - UPSILON )
+                        FACTOR  = PHI /CHI 
+                    ELSE
+                        FACTOR  = 1.0
+                    END IF
+                    QY(I, IW) = MIN(1.0, MAX(0.0, FACTOR * QY(I, IW)))
+                    SQ(I, IW) = XC(I,IW) * QY(I, IW)
+
+
+                    IF( PSI .GT. 0.0 )THEN
+                        ALPHA  = QY_GLYOXAL( TLEV( I ), DENS( I ), WC( IW ) ) /PSI
+                    ELSE
+                        ALPHA  = 1.0
+                    END IF
+!                   WRITE(6,'(I3,2(1X,F7.2),15(1X,ES12.4))')
+!    &              IW,WC( IW ), TLEV( I ), DENS( I ), 
+!    &              QY_GLYOXAL( TLEV( I ), DENS( I ), WC( IW ) ),PHI,CHI,RQY_GLYOXAL( TLEV( I ), DENS( I ), WC( IW ) ),
+!    &              FACTOR,ALPHA,MAX(0.0,(1.0-CHI)),TAU
+
+!                    SIG = 0.90*SIG
+               ENDDO
+           ENDDO
+
+
+           REPLACE = .TRUE.
 
          CASE( 'NC3CHO_R_MCMv32', 'NC3CHO_M_MCMv32' )
 !Number density correction to quantum yield
@@ -970,6 +1243,31 @@
 
 
              REPLACE = .TRUE.
+
+         CASE( 'MVK_JPL19' )
+
+C quantum yield correction from
+C Gierczak, T., J. B. Burkholder, R. K. Talukdar, A. Mellouki, S. B. Barone,
+C and A. R. Ravishankara, Atmospheric fate of methyl vinyl ketone and methacrolein,
+C J. Photochem. Photobiol A: Chemistry, 110 1-10, 1997.
+C depends on pressure and wavelength, set upper limit to 1.0
+         DO IW = 1, NW
+            DO I = 1, NZ
+
+               FACTOR = (5.5 + 9.2E-19*2.465E+19)
+     &                / (5.5 + 9.2E-19*DENS(I))
+               
+ 
+               QY(I, IW) = FACTOR * QY(I, IW)
+               QY(I, IW) = MIN(1.0, QY(I, IW))
+               QY(I, IW) = MAX(0.0, QY(I, IW))
+               SQ(I, IW) = XC(I,IW)* QY(I, IW)
+
+            ENDDO
+         ENDDO
+
+
+         REPLACE = .TRUE.
 
          CASE( 'MVK-06', 'ISPD', 'MVK_06', 'MVK_RACM2' )
 
@@ -2660,16 +2958,17 @@ C-----------------------------------------------------------------------
         REAL( 8 ) WN_OFFSET    ! adjusted wavenumber, 1/cm
         REAL( 8 ) R8_DENS      ! air number density, 1/cm^3 
 
-        REAL ONE_OVER_LAMBDA  ! wavenumber, 10E7/nm or 1/cm
-        REAL QY_DENS_NUMB     ! total qy at DENS_NUMB
-        REAL IQY_DENS0        ! reciporcal of total qy at DENS0
+        REAL( 8 ) ONE_OVER_LAMBDA  ! wavenumber, 10E7/nm or 1/cm
+        REAL( 8 ) QY_DENS_NUMB     ! total qy at DENS_NUMB
+        REAL( 8 ) IQY_DENS0        ! reciporcal of total qy at DENS0
       
         TEMP_OVER_295K  = REAL( TEMP * ONE_OVER_295K, 8 )
         WN_OFFSET       = REAL( 1.0E7 / LAMBDA - 23800.0, 8 )
         R8_DENS         = REAL( DENS_NUMB, 8 )
 
 
-         IF( LAMBDA .LT. 650.0 .AND. LAMBDA .GT. 250.0 )THEN
+!        IF( LAMBDA .LT. 650.0 .AND. LAMBDA .GT. 250.0 )THEN
+        IF( LAMBDA .LT. 425.0 .AND. LAMBDA .GT. 250.0 )THEN
             AA = 6.48D-19 * TEMP_OVER_295K**(-1.83D0)
             BB = 7.60D-04 * TEMP_OVER_295K**(-0.515D0)
             A1 = AA * EXP( -BB * WN_OFFSET ) 
@@ -2685,13 +2984,16 @@ C-----------------------------------------------------------------------
 !*** note that values are normalized by total qy at DENS = 0.0 but
 !    its values equals 1.0
 
-            IQY_DENS0 = REAL( (1.0 + A2 + A3*DENS0 ) 
-     &                / ((1.0 + A1*DENS0 + A2)*(1.0 + A3*DENS0)) )
+            IQY_DENS0 = (1.0D0 + A2 + A3*DENS0 ) 
+     &                / ((1.0D0 + A1*DENS0 + A2)*(1.0D0 + A3*DENS0))
 
-            QY_DENS_NUMB  = REAL( (1.0 + A2 + A3*R8_DENS ) 
-     &                / ((1.0 + A1*R8_DENS + A2)*(1.0 + A3*R8_DENS)) )
+            QY_DENS_NUMB  = (1.0D0 + A2 + A3*R8_DENS ) 
+     &                / ((1.0D0 + A1*R8_DENS + A2)*(1.0D0 + A3*R8_DENS))
 
-            RQY_GLYOXAL  = QY_DENS_NUMB * IQY_DENS0
+            RQY_GLYOXAL  = REAL( QY_DENS_NUMB * IQY_DENS0 )
+            
+!         WRITE(6,'(A,10(F13.6,1X))')'TEMP, LAMBDA, RQY_GLYOXAL,QY,1/QY0 = ', TEMP, LAMBDA, RQY_GLYOXAL,
+!     &   QY_DENS_NUMB,IQY_DENS0       
 
           ELSE
 
@@ -2769,3 +3071,112 @@ C-----------------------------------------------------------------------
        END FUNCTION QY_GLYOXAL
 
 !*******************************************************************************
+         REAL FUNCTION RFACTOR_XCROSS_BRCL( WAVELENGTH, TEMPERATURE )
+!Maric, D.; Burrows, J. P.; Moortgat, G. K. A Study of the UV-visible absorption spectra of Br2 and
+!BrCl. J. Photochem. Photobiol A: Chem. 1994, 83, 179-192, doi:10.1016/1010-6030(94)03823-6.         
+              IMPLICIT NONE
+! arguments:              
+              REAL, INTENT( IN ) :: WAVELENGTH  ! nm
+              REAL, INTENT( IN ) :: TEMPERATURE ! deg K
+! local:
+              REAL, PARAMETER :: A1 = 7.34E-20 ! cm2      
+              REAL, PARAMETER :: A2 = 4.35E-19 ! cm2       
+              REAL, PARAMETER :: A3 = 1.23E-19 ! cm2       
+              REAL, PARAMETER :: B1 = -68.60   ! dimensionaless       
+              REAL, PARAMETER :: B2 = -123.6   ! dimensionaless       
+              REAL, PARAMETER :: B3 = -84.80   ! dimensionaless      
+              REAL, PARAMETER :: C1 = 227.60   ! cm        
+              REAL, PARAMETER :: C2 = 372.50   ! cm       
+              REAL, PARAMETER :: C3 = 442.40   ! cm                     
+              REAL, PARAMETER :: TEMPERATURE_COEFF = 318.80 ! deg K
+              
+              
+              REAL :: TEMPERATURE_EFFECT 
+              REAL :: WAVELENGTH_EFFECT 
+              REAL :: SQRT_EFFECT
+              REAL :: WAVENUMBER
+              REAL :: XCROSS_298K
+              REAL  :: XCROSS
+              
+              TEMPERATURE_EFFECT = 0.789385353 ! temperature effect at 298 K
+              SQRT_EFFECT        = 0.888473608 ! square root effect at 298 K
+              WAVENUMBER         = 1.0 /MAX( 200.0,MIN( 600.0,WAVELENGTH ) )
+              
+              XCROSS_298K = A1*SQRT_EFFECT*EXP(B1*TEMPERATURE_EFFECT*LOG(C1*WAVENUMBER)*LOG(C1*WAVENUMBER))
+     &                    + A2*SQRT_EFFECT*EXP(B2*TEMPERATURE_EFFECT*LOG(C2*WAVENUMBER)*LOG(C2*WAVENUMBER))             
+     &                    + A3*SQRT_EFFECT*EXP(B3*TEMPERATURE_EFFECT*LOG(C3*WAVENUMBER)*LOG(C3*WAVENUMBER))             
+              IF( XCROSS_298K .LE. 1.0E-25 )THEN
+                  RFACTOR_XCROSS_BRCL = 1.0
+                  RETURN
+              END IF     
+
+              TEMPERATURE_EFFECT = TANH( TEMPERATURE_COEFF/MAX( 195.0,MIN( 300.0,TEMPERATURE )) )
+              SQRT_EFFECT = TEMPERATURE_EFFECT**0.5
+              XCROSS      = A1*SQRT_EFFECT*EXP(B1*TEMPERATURE_EFFECT*LOG(C1*WAVENUMBER)*LOG(C1*WAVENUMBER))
+     &                    + A2*SQRT_EFFECT*EXP(B2*TEMPERATURE_EFFECT*LOG(C2*WAVENUMBER)*LOG(C2*WAVENUMBER))             
+     &                    + A3*SQRT_EFFECT*EXP(B3*TEMPERATURE_EFFECT*LOG(C3*WAVENUMBER)*LOG(C3*WAVENUMBER))             
+              RFACTOR_XCROSS_BRCL = XCROSS/XCROSS_298K                          
+              
+              RETURN   
+              
+         END FUNCTION RFACTOR_XCROSS_BRCL              
+         REAL FUNCTION RFACTOR_XCROSS_CHBR3( WAVELENGTH, TEMPERATURE )
+!Papanastasiou, D. K.; McKeen, S. A.; Burkholder, J. B. The very short-lived ozone depleting
+!substance CHBr3 (bromoform): revised UV absorption spectrum, atmospheric lifetime and ozone
+!depletion potential. Atmos. Chem. Phys. 2014, 14, 3017-3025, doi:10.5194/acp-14-3017-2014.
+              IMPLICIT NONE
+! arguments:              
+              REAL, INTENT( IN ) :: WAVELENGTH  ! nm
+              REAL, INTENT( IN ) :: TEMPERATURE ! deg K
+! local:
+              REAL(8), PARAMETER :: A( 0:5 ) = (/
+     &        -3.2607D+01,  1.0308D-01, 6.3900D-05,
+     &        -7.7392D-07, -2.2513D-09, 6.1376D-12 /)
+              REAL(8), PARAMETER :: B( 0:5 ) = (/
+     &        1.5820D-01, -1.4758D-03, 3.8058D-06,
+     &        9.1870D-10, -1.0772D-11, 0.0000D+00  /)
+     
+              INTEGER :: I
+              REAL(8) :: XCROSS_296K
+              REAL(8) :: XCROSS
+              REAL(8) :: SUM_A
+              REAL(8) :: SUM_B
+              REAL(8) :: SUM_C
+              REAL(8) :: WAVE_FACTOR 
+              REAL(8) :: TEMP_FACTOR 
+
+              XCROSS_296K = 0.0D0
+              XCROSS      = 0.0D0
+              
+              
+              IF( WAVELENGTH .GE. 345.0 .OR. WAVELENGTH .LE. 260.0 )THEN
+                  RFACTOR_XCROSS_CHBR3 = 1.0
+                  RETURN
+              END IF
+
+              SUM_A = 0.0
+              SUM_B = 0.0
+              DO I = 0,5,1
+                 WAVE_FACTOR = REAL( WAVELENGTH**REAL( I ),8 )
+                 SUM_A = SUM_A
+     &                 + A( I )*WAVE_FACTOR                
+                 SUM_B = SUM_B
+     &                 + B( I )*WAVE_FACTOR                               
+              END DO
+
+              TEMP_FACTOR =  ( 296.0D0-MAX( 260.0D0,MIN(330.0D0,TEMPERATURE) ) )
+              SUM_B       =  TEMP_FACTOR*SUM_B
+              XCROSS_296K = 10.0D0**SUM_A
+              XCROSS      = XCROSS_296K * ( 10.0D0**SUM_B )
+!             IF( XCROSS_296K .LE. 1.0E-30 )THEN
+!                 RFACTOR_XCROSS_CHBR3 = 1.0
+!                 RETURN
+!             END IF
+              RFACTOR_XCROSS_CHBR3 = REAL( 10.0D0**SUM_B ) !  REAL( XCROSS/MAX( XCROSS_296K,1.0D0E-30 ) )
+              write(6,'(A,2(F8.2,1x),8(ES12.4,1x))')
+     &        'WAVELENGTH,TEMPERATURE,XCROSS,XCROSS_296K,SUMA,SUMB,TEMP_FACTOR,RFACTOR_XCROSS_CHBR3: ',
+     &        WAVELENGTH,TEMPERATURE,XCROSS,XCROSS_296K,
+     &        SUM_A,SUM_B,TEMP_FACTOR,
+     &        RFACTOR_XCROSS_CHBR3
+              RETURN
+        END FUNCTION RFACTOR_XCROSS_CHBR3
