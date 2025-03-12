@@ -6,11 +6,9 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /home/bhutzell/CCTM_git_repository/UTIL/chemmech/input/cb6r5m_ae7_aq/mech_cb6r5m_ae7_aq.def
+! Source file: /work/MOD3DEV/sgq/manage_git/research/cracmm3/BASE/UTIL/chemmech/input/cb6r5m_ae7_aq/mech_cb6r5m_ae7_aq.def
 ! for Mechanism Name: CB6R5M_AE7_AQ                   
-
 ! This file is used to create mechanism data and functions
-
 ! The following are reserved symbols declared in this file:
 !    MECHNAME        = Mechanism name
 !    N_GAS_CHEM_SPC  = Total number of gas species in chemical mechanism
@@ -3970,19 +3968,19 @@
       CHARACTER( 16 )    :: HETERO( NHETERO )
 
       DATA ( HETERO( IRXXN ), IRXXN = 1, NHETERO ) / & 
-     &   'HETERO_CLNO3_WAI', 'HETERO_CLNO3_WAJ', 'HETERO_NTR2     ', &
+     &   'HETERO_CLN3_WAI ', 'HETERO_CLN3_WAJ ', 'HETERO_NTR2     ', &
      &   'HETERO_N2O5IJ   ', 'HETERO_N2O5K    ', 'HETERO_H2NO3PAIJ', &
      &   'HETERO_H2NO3PAK ', 'HETERO_H2NO3PBIJ', 'HETERO_H2NO3PBK ', &
      &   'HETERO_NO2      ', 'HETERO_IEPOX    ', 'HETERO_IEPOXOS  ', &
      &   'HETERO_TETROL   ', 'HETERO_GLY      ', 'HETERO_MGLY     ', &
-     &   'HETERO_PNCOMLI  ', 'HETERO_PNCOMLJ  ', 'HETERO_BRNO3_WAI', &
-     &   'HETERO_BRNO3_WAJ', 'HETERO_HOBR_CLJ ', 'HETERO_HOBR_BRJ ', &
-     &   'HETERO_BRNO3_CLJ', 'HETERO_BRNO3_BRJ', 'HETERO_BRNO2_CLJ', &
-     &   'HETERO_BRNO2_BRJ', 'HETERO_HBR_BRJ  ', 'HETERO_I2O2_AI  ', &
+     &   'HETERO_PNCOMLI  ', 'HETERO_PNCOMLJ  ', 'HETERO_BRN3_WAI ', &
+     &   'HETERO_BRN3_WAJ ', 'HETERO_HOBR_ACLJ', 'HETERO_HOBR_ABRJ', &
+     &   'HETERO_BRN3_ACLJ', 'HETERO_BRN3_ABRJ', 'HETERO_BRN2_ACLJ', &
+     &   'HETERO_BRN2_ABRJ', 'HETERO_HBR_ABRJ ', 'HETERO_I2O2_AI  ', &
      &   'HETERO_I2O2_AJ  ', 'HETERO_I2O3_AI  ', 'HETERO_I2O3_AJ  ', &
-     &   'HETERO_I2O4_AI  ', 'HETERO_I2O4_AJ  ', 'HETERO_INO3_CLJ ', &
-     &   'HETERO_INO3_BRJ ', 'HETERO_INO2_CLJ ', 'HETERO_INO2_BRJ ', &
-     &   'HETERO_HOI_CLJ  ', 'HETERO_HOI_BRJ  '/
+     &   'HETERO_I2O4_AI  ', 'HETERO_I2O4_AJ  ', 'HETERO_INO3_ACLJ', &
+     &   'HETERO_INO3_ABRJ', 'HETERO_INO2_ACLJ', 'HETERO_INO2_ABRJ', &
+     &   'HETERO_HOI_ACLJ ', 'HETERO_HOI_ABRJ '/
 
       CHARACTER( 16 )    :: RXLABEL( NRXNS )
 
@@ -4072,7 +4070,7 @@
      &    'CL22            ', 'CL23            ', 'CL24            ', & ! 2   
      &    'CL25            ', 'CL26            ', 'CL27            ', & ! 3   
      &    'CL28            ', 'CL30            ', 'CL31            ', & ! 4   
-     &    'HET_CLNO3_WAI   ', 'HET_CLNO3_WAJ   ', 'SA01            ', & ! 5   
+     &    'HET_CLN3_WAI    ', 'HET_CLN3_WAJ    ', 'SA01            ', & ! 5   
      &    'SA02            ', 'SA03            ', 'SA04            ', & ! 6   
      &    'SA06            ', 'SA07            ', 'SA08            ', & ! 7   
      &    'SA09            ', 'SA10            ', 'SA11            ', & ! 8   
@@ -4114,9 +4112,9 @@
      &    'BR30            ', 'BR31            ', 'BR32            ', & ! 4   
      &    'BR33            ', 'BR34            ', 'BR35            ', & ! 5   
      &    'BR36            ', 'BR37            ', 'BR38            ', & ! 6   
-     &    'HET_BRNO3_WAI   ', 'HET_BRNO3_WAJ   ', 'HET_HOBR_CLJ    ', & ! 7   
-     &    'HET_HOBR_BRJ    ', 'HET_BRNO3_CLJ   ', 'HET_BRNO3_BRJ   ', & ! 8   
-     &    'HET_BRNO2_CLJ   ', 'HET_BRNO2_BRJ   ', 'HET_HBR_BRJ     ', & ! 9   
+     &    'HET_BRN3_WAI    ', 'HET_BRN3_WAJ    ', 'HET_HOBR_ACLJ   ', & ! 7   
+     &    'HET_HOBR_ABRJ   ', 'HET_BRN3_ACLJ   ', 'HET_BRN3_ABRJ   ', & ! 8   
+     &    'HET_BRN2_ACLJ   ', 'HET_BRN2_ABRJ   ', 'HET_HBR_ABRJ    ', & ! 9   
      &    'IO01            ', 'IO02            ', 'IO03            ', & ! 0   
      &    'IO04            ', 'IO05            ', 'IO06            ', & ! 1   
      &    'IO07            ', 'IO08            ', 'IO09            ', & ! 2   
@@ -4134,9 +4132,9 @@
      &    'IO43            ', 'IO44            ', 'IO45            ', & ! 4   
      &    'IO46            ', 'HET_I2O2_AI     ', 'HET_I2O2_AJ     ', & ! 5   
      &    'HET_I2O3_AI     ', 'HET_I2O3_AJ     ', 'HET_I2O4_AI     ', & ! 6   
-     &    'HET_I2O4_AJ     ', 'HET_INO3_CLJ    ', 'HET_INO3_BRJ    ', & ! 7   
-     &    'HET_INO2_CLJ    ', 'HET_INO2_BRJ    ', 'HET_HOI_CLJ     ', & ! 8   
-     &    'HET_HOI_BRJ     ', 'DMS1            ', 'DMS2            ', & ! 9   
+     &    'HET_I2O4_AJ     ', 'HET_INO3_ACLJ   ', 'HET_INO3_ABRJ   ', & ! 7   
+     &    'HET_INO2_ACLJ   ', 'HET_INO2_ABRJ   ', 'HET_HOI_ACLJ    ', & ! 8   
+     &    'HET_HOI_ABRJ    ', 'DMS1            ', 'DMS2            ', & ! 9   
      &    'DMS3            ', 'DMS4            ', 'DMS5            '/! 0  
 
 !    NSPECIAL     = Number of special rate coefficients
@@ -4256,8 +4254,8 @@
        INTEGER, PARAMETER  :: IJ_MI2_IUPAC10      =  54
        INTEGER, PARAMETER  :: IJ_MIB_IUPAC10      =  55
        INTEGER, PARAMETER  :: IJ_MIC_IUPAC10      =  56
-       INTEGER, PARAMETER  :: IK_HETERO_CLNO3_WAI =   1
-       INTEGER, PARAMETER  :: IK_HETERO_CLNO3_WAJ =   2
+       INTEGER, PARAMETER  :: IK_HETERO_CLN3_WAI  =   1
+       INTEGER, PARAMETER  :: IK_HETERO_CLN3_WAJ  =   2
        INTEGER, PARAMETER  :: IK_HETERO_NTR2      =   3
        INTEGER, PARAMETER  :: IK_HETERO_N2O5IJ    =   4
        INTEGER, PARAMETER  :: IK_HETERO_N2O5K     =   5
@@ -4273,25 +4271,25 @@
        INTEGER, PARAMETER  :: IK_HETERO_MGLY      =  15
        INTEGER, PARAMETER  :: IK_HETERO_PNCOMLI   =  16
        INTEGER, PARAMETER  :: IK_HETERO_PNCOMLJ   =  17
-       INTEGER, PARAMETER  :: IK_HETERO_BRNO3_WAI =  18
-       INTEGER, PARAMETER  :: IK_HETERO_BRNO3_WAJ =  19
-       INTEGER, PARAMETER  :: IK_HETERO_HOBR_CLJ  =  20
-       INTEGER, PARAMETER  :: IK_HETERO_HOBR_BRJ  =  21
-       INTEGER, PARAMETER  :: IK_HETERO_BRNO3_CLJ =  22
-       INTEGER, PARAMETER  :: IK_HETERO_BRNO3_BRJ =  23
-       INTEGER, PARAMETER  :: IK_HETERO_BRNO2_CLJ =  24
-       INTEGER, PARAMETER  :: IK_HETERO_BRNO2_BRJ =  25
-       INTEGER, PARAMETER  :: IK_HETERO_HBR_BRJ   =  26
+       INTEGER, PARAMETER  :: IK_HETERO_BRN3_WAI  =  18
+       INTEGER, PARAMETER  :: IK_HETERO_BRN3_WAJ  =  19
+       INTEGER, PARAMETER  :: IK_HETERO_HOBR_ACLJ =  20
+       INTEGER, PARAMETER  :: IK_HETERO_HOBR_ABRJ =  21
+       INTEGER, PARAMETER  :: IK_HETERO_BRN3_ACLJ =  22
+       INTEGER, PARAMETER  :: IK_HETERO_BRN3_ABRJ =  23
+       INTEGER, PARAMETER  :: IK_HETERO_BRN2_ACLJ =  24
+       INTEGER, PARAMETER  :: IK_HETERO_BRN2_ABRJ =  25
+       INTEGER, PARAMETER  :: IK_HETERO_HBR_ABRJ  =  26
        INTEGER, PARAMETER  :: IK_HETERO_I2O2_AI   =  27
        INTEGER, PARAMETER  :: IK_HETERO_I2O2_AJ   =  28
        INTEGER, PARAMETER  :: IK_HETERO_I2O3_AI   =  29
        INTEGER, PARAMETER  :: IK_HETERO_I2O3_AJ   =  30
        INTEGER, PARAMETER  :: IK_HETERO_I2O4_AI   =  31
        INTEGER, PARAMETER  :: IK_HETERO_I2O4_AJ   =  32
-       INTEGER, PARAMETER  :: IK_HETERO_INO3_CLJ  =  33
-       INTEGER, PARAMETER  :: IK_HETERO_INO3_BRJ  =  34
-       INTEGER, PARAMETER  :: IK_HETERO_INO2_CLJ  =  35
-       INTEGER, PARAMETER  :: IK_HETERO_INO2_BRJ  =  36
-       INTEGER, PARAMETER  :: IK_HETERO_HOI_CLJ   =  37
-       INTEGER, PARAMETER  :: IK_HETERO_HOI_BRJ   =  38
+       INTEGER, PARAMETER  :: IK_HETERO_INO3_ACLJ =  33
+       INTEGER, PARAMETER  :: IK_HETERO_INO3_ABRJ =  34
+       INTEGER, PARAMETER  :: IK_HETERO_INO2_ACLJ =  35
+       INTEGER, PARAMETER  :: IK_HETERO_INO2_ABRJ =  36
+       INTEGER, PARAMETER  :: IK_HETERO_HOI_ACLJ  =  37
+       INTEGER, PARAMETER  :: IK_HETERO_HOI_ABRJ  =  38
        END MODULE RXNS_DATA
