@@ -876,8 +876,6 @@ C     mass partitioning between the modes
       REAL( 8 ) :: DELT                 ! time step DT [s]
       REAL( 8 ) :: HPLUS( N_MODE )      ! scratch var for H+ [umol/m**3]
 
-      REAL( 8 ), SAVE :: H2SO4RATM1     ! Mol. wt. ratio of SO4/H2SO4
-
       REAL( 8 ) :: DVOLINORG( NVOLINORG ) ! vol inorg spcs mass to be xferred [mol/m3]
       REAL( 8 ) :: DVOLMAX                ! max value for DVOLINORG 
       REAL( 8 ) :: CINORG( NINORG,N_MODE ) ! scratch array for inorg spcs [ug/m**3]
@@ -934,25 +932,8 @@ C *** Local Saved Variables
       REAL( 8 ), SAVE :: SO4FAC         !  F6DPIM9 / RHOSO4
       REAL( 8 ), SAVE :: SOILFAC        !  F6DPIM9 / RHOSOIL
       REAL( 8 ), SAVE :: ANTHFAC        !  F6DPIM9 / RHOANTH
-      REAL( 8 ), SAVE :: H2SO4RAT       ! Mol. wt ratios H2SO4/SO4
-      REAL( 8 ), SAVE :: NH3RAT         ! Mol. wt ratios NH3/NH4
-      REAL( 8 ), SAVE :: HNO3RAT        ! Mol. wt ratios HNO3/NO3
-      REAL( 8 ), SAVE :: HCLRAT         ! Mol. wt ratios HCL/CL 
-      REAL( 8 ), SAVE :: MWH2SO4        ! molecular weight for H2SO4
-      REAL( 8 ), SAVE :: FAERH2SO4      ! 1e-6 / mw(h2so4)
 
-      REAL( 8 ), SAVE :: CFAC_ANA
-      REAL( 8 ), SAVE :: CFAC_ASO4
-      REAL( 8 ), SAVE :: CFAC_ANH4
-      REAL( 8 ), SAVE :: CFAC_ANO3
-      REAL( 8 ), SAVE :: CFAC_ACL
-      REAL( 8 ), SAVE :: CFAC_ACA
-      REAL( 8 ), SAVE :: CFAC_AK
-      REAL( 8 ), SAVE :: CFAC_AMG
-      REAL( 8 ), SAVE :: CFAC_ASEACAT
-      REAL( 8 ), SAVE :: CFAC_GNH3
-      REAL( 8 ), SAVE :: CFAC_GHNO3
-      REAL( 8 ), SAVE :: CFAC_GHCL
+      REAL( 8 ), SAVE :: CFAC( 12 )
 
       REAL( 8 ), SAVE :: M3FAC_ANA
       REAL( 8 ), SAVE :: M3FAC_ASO4
@@ -982,45 +963,46 @@ C-----------------------------------------------------------------------
          write( logdev,* ) 'aero_subs, volinorg: noiso'
 #endif
 
-         CFAC_ANA  = 1.0D-6 / REAL( AEROSPC_MW( ANA_IDX ), 8 )
-         CFAC_ASO4 = 1.0D-6 / REAL( AEROSPC_MW( ASO4_IDX ), 8 )
-         CFAC_ANH4 = 1.0D-6 / REAL( AEROSPC_MW( ANH4_IDX ), 8 )
-         CFAC_ANO3 = 1.0D-6 / REAL( AEROSPC_MW( ANO3_IDX ), 8 )
-         CFAC_ACL  = 1.0D-6 / REAL( AEROSPC_MW( ACL_IDX ), 8 )
-         CFAC_ACA  = 1.0D-6 / REAL( AEROSPC_MW( ACA_IDX ), 8 )
-         CFAC_AK   = 1.0D-6 / REAL( AEROSPC_MW( AK_IDX ), 8 )
-         CFAC_AMG  = 1.0D-6 / REAL( AEROSPC_MW( AMG_IDX ), 8 )
-         CFAC_ASEACAT = 1.0D-6 / REAL( AEROSPC_MW( ASEACAT_IDX ), 8 )
-         CFAC_GNH3 = 1.0D-6 / PRECURSOR_MW( NH3_IDX )
-         CFAC_GHNO3= 1.0D-6 / PRECURSOR_MW( HNO3_IDX )
-         CFAC_GHCL = 1.0D-6 / PRECURSOR_MW( HCL_IDX )
+         CFAC( KNA )  = 1.0D-6 / REAL( AEROSPC_MW( ANA_IDX ), 8 )
+         CFAC( KSO4 ) = 1.0D-6 / REAL( AEROSPC_MW( ASO4_IDX ), 8 )
+         CFAC( KNH4 ) = 1.0D-6 / REAL( AEROSPC_MW( ANH4_IDX ), 8 )
+         CFAC( KNO3 ) = 1.0D-6 / REAL( AEROSPC_MW( ANO3_IDX ), 8 )
+         CFAC( KCL )  = 1.0D-6 / REAL( AEROSPC_MW( ACL_IDX ), 8 )
+         CFAC( KCA )  = 1.0D-6 / REAL( AEROSPC_MW( ACA_IDX ), 8 )
+         CFAC( KK  )  = 1.0D-6 / REAL( AEROSPC_MW( AK_IDX ), 8 )
+         CFAC( KMG )  = 1.0D-6 / REAL( AEROSPC_MW( AMG_IDX ), 8 )
+         CFAC( KSEACAT) = 1.0D-6 / REAL( AEROSPC_MW( ASEACAT_IDX ), 8 )
+         CFAC( KH2SO4 ) = 1.0D-6 / PRECURSOR_MW( SULF_IDX )
+         CFAC( KNH3 ) = 1.0D-6 / PRECURSOR_MW( NH3_IDX )
+         CFAC( KHNO3 )= 1.0D-6 / PRECURSOR_MW( HNO3_IDX )
+         CFAC( KHCL ) = 1.0D-6 / PRECURSOR_MW( HCL_IDX )
+         CFAC( KH2O ) = 1.0D-6 / MWWAT
 
-         M3FAC_ANA  = 1.0D-9 * F6DPI / REAL( AEROSPC( ANA_IDX )%DENSITY, 8 )
-         M3FAC_ASO4 = 1.0D-9 * F6DPI / REAL( AEROSPC( ASO4_IDX )%DENSITY, 8 )
-         M3FAC_ANH4 = 1.0D-9 * F6DPI / REAL( AEROSPC( ANH4_IDX )%DENSITY, 8 )
-         M3FAC_ANO3 = 1.0D-9 * F6DPI / REAL( AEROSPC( ANO3_IDX )%DENSITY, 8 )
-         M3FAC_ACL  = 1.0D-9 * F6DPI / REAL( AEROSPC( ACL_IDX )%DENSITY, 8 )
-         M3FAC_H2O  = 1.0D-9 * F6DPI / REAL( AEROSPC( AH2O_IDX )%DENSITY, 8 )
+         M3FAC( KNA ) = 1.0D-9 * F6DPI / REAL( AEROSPC( ANA_IDX )%DENSITY, 8 )
+         M3FAC( KSO4) = 1.0D-9 * F6DPI / REAL( AEROSPC( ASO4_IDX )%DENSITY, 8 )
+         M3FAC( KNH4) = 1.0D-9 * F6DPI / REAL( AEROSPC( ANH4_IDX )%DENSITY, 8 )
+         M3FAC( KNO3) = 1.0D-9 * F6DPI / REAL( AEROSPC( ANO3_IDX )%DENSITY, 8 )
+         M3FAC( KCL ) = 1.0D-9 * F6DPI / REAL( AEROSPC( ACL_IDX )%DENSITY, 8 )
+         M3FAC( KH2O) = 1.0D-9 * F6DPI / REAL( AEROSPC( AH2O_IDX )%DENSITY, 8 )
 
-         MWH2SO4 = PRECURSOR_MW( SULF_IDX ) ! molecular weight for H2SO4
-         FAERH2SO4 = 1.0E-6 / MWH2SO4
-
-         COFCBAR_SO4 = SQRT( 8.0 * RGASUNIV / ( PI * REAL( MWH2SO4,4 ) * 1.0E-3 ) )
-         H2SO4RATM1 = AEROSPC_MW( ASO4_IDX ) / MWH2SO4
+         COFCBAR_SO4 = SQRT( 8.0 * RGASUNIV / 
+     &                 ( PI * REAL( PRECURSOR_MW( SULF_IDX ),4 ) * 1.0E-3 ) )
          SO4FAC  = 1.0D-9 * F6DPI / REAL( AEROSPC( ASO4_IDX )%DENSITY, 8 )
          SOILFAC = 1.0D-9 * F6DPI / REAL( AEROSPC( ASOIL_IDX )%DENSITY, 8 )
          ANTHFAC = 1.0D-9 * F6DPI / REAL( AEROSPC( ACORS_IDX )%DENSITY, 8 )
 
-         DF( KNH4 ) = 1.0D0 / CFAC_ANH4
-         DF( KNO3 ) = 1.0D0 / CFAC_ANO3
-         DF( KCL )  = 1.0D0 / CFAC_ACL
-         DFH2OR8    = 1.0D6 * MWWAT      ! aerospc_mw(AH2O_IDX) (18.0 != 18.0153)
+         DF( KSO4 ) = 1.0D0 / 
+         DF( KNH4 ) = 1.0D0 / CFAC( KNH4 )
+         DF( KNO3 ) = 1.0D0 / CFAC( KNO3 )
+         DF( KCL )  = 1.0D0 / CFAC( KCL )
+         DF( KH2O ) = 1.0D0 / CFAC( KH2O )      ! aerospc_mw(AH2O_IDX) (18.0 != 18.0153)
 
          ! Mol. wt ratios H2SO4/SO4, NH3/NH4, HNO3/NO3, HCL/CL
-         H2SO4RAT= PRECURSOR_MW( SULF_IDX ) / REAL( AEROSPC_MW( ASO4_IDX ), 8 )
-         NH3RAT  = PRECURSOR_MW( NH3_IDX )  / REAL( AEROSPC_MW( ANH4_IDX ), 8 )
-         HNO3RAT = PRECURSOR_MW( HNO3_IDX ) / REAL( AEROSPC_MW( ANO3_IDX ), 8 )
-         HCLRAT  = PRECURSOR_MW( HCL_IDX )  / REAL( AEROSPC_MW( ACL_IDX ), 8 )
+         MWRATIO( KSO4 ) =  PRECURSOR_MW( SULF_IDX ) / REAL( AEROSPC_MW( ASO4_IDX ), 8 )
+         MWRATIO( KNH4 ) =  PRECURSOR_MW( NH3_IDX )  / REAL( AEROSPC_MW( ANH4_IDX ), 8 )
+         MWRATIO( KNO3 ) =  PRECURSOR_MW( HNO3_IDX ) / REAL( AEROSPC_MW( ANO3_IDX ), 8 )
+         MWRATIO( KCL  ) =  PRECURSOR_MW( HCL_IDX )  / REAL( AEROSPC_MW( ACL_IDX ), 8 )
+
       END IF
 
 C *** Determine if Hybrid
@@ -1143,7 +1125,7 @@ C     3.23 of Jiang & Roth (2003).
 
 ! *** Propagate NPF Change to budget variables
          NPF_BUDGET( PRECURSOR_MAP( SULF_IDX ) ) = -DMDT_SO4 
-     &             * H2SO4RAT  * DELT ! ug m-3 of Sulfuric Acid
+     &             * MWRATIO( KSO4 )  * DELT ! ug m-3 of Sulfuric Acid
                                       ! (converted to ppmv in update_precursor)
          NPF_BUDGET( AEROSPC_MAP( ASO4_IDX,1 ) ) =  DMDT_SO4 * DELT ! ug m-3
          NPF_BUDGET( AERONUM_MAP( 1 ) ) =  DNDT * DELT  ! N m-3
@@ -1196,8 +1178,16 @@ C *** Growth values for mode merge condition
          CONDSO4( 3 ) = 0.0D0               ! no coarse mode chemistry
       END IF
 
-C *** For Hybrid approach, calculate dynamic mass trasfer for
-C     semi-volatile components of coarse mode (NO3, CL, NH4)  
+! All Modes are available for equilibrium or dynamic mass transfer.
+! In equilibrium mass transfer, the composition of all equilibrium 
+! modes will be added and sent to ISORROPIA to calculate equilibrium
+! gas concentrations. The change in particle mass concentration will 
+! be applied to all equilibrium modes consistent with their surface
+! area for net condensation and mass for net evaporation.
+!
+! For dynamic partitioning, each mode's composition will be used
+! to compute a flux and that flux will be integrated forward in time
+! for a sub-time step while interacting with the gas phase.
 
       IF ( HYBRID ) THEN 
 
@@ -1274,7 +1264,8 @@ C *** Initial vapor-phase concentrations [ug/m3]
 C *** Compute sulfate production rate [ug/m3 s] for coarse mode
 
             RATE = CONDSO4( IMODE )
-            SO4  = CINORG( KSO4,IMODE ) + RATE * TSTEP * H2SO4RATM1
+            SO4  = CINORG( KSO4,IMODE ) + RATE * TSTEP / MWRATIO( KSO4 )
+
 
             IF ( TrustIso ) THEN
 
@@ -1321,21 +1312,6 @@ C     equilibrium, calculated as initial-gas-phase concentration minus
 C     equilibrium gas-phase concentration.  DVOLINORG is positive for
 C     condensation and negative for evaporation.
 
-#ifdef verbose_aero
-         if ( write1 ) then
-         write( logdev,'(a, 3e13.3)' ) "GASes:", gas( 1 ), gas( 2 ), gas( 3 )
-
-         dvolinorg( knh4 ) = gnh3r8 * CFAC_GNH3  - gas( 1 )  ! [mol/m**3]
-         dvolinorg( kno3 ) = gno3r8 * CFAC_GHNO3 - gas( 2 )  ! [mol/m**3]
-         dvolinorg( kcl )  = gclr8  * CFAC_GHCL  - gas( 3 )  ! [mol/m**3]
-           
-         write( logdev,'(a, 3e13.3)' ) "DVOLINORG_coarse:",
-     &      dvolinorg( knh4 ) / ( gnh3r8 * CFAC_GNH3 ),
-     &      dvolinorg( kno3 ) / ( gno3r8 * CFAC_GHNO3),
-     &      dvolinorg( kcl )  / ( gclr8  * CFAC_GHCL )
-         end if
-#endif
-
 C *** Calculate condensation/evaporation flux for this time step and update 
 C     volatile species concentrations.  Final aerosol conc set to be no less
 C     than the minimum aerosol conc.
@@ -1347,17 +1323,17 @@ C     than the minimum aerosol conc.
                J( : ) = 0.0D0
             END IF 
 
-            IF ( J( KNH4 ) * TSTEP * DF( KNH4 ) * NH3RAT .GT. GNH3R8 ) THEN
+            IF ( J( KNH4 ) * TSTEP * DF( KNH4 ) * MWRATIO( KNH4 ) .GT. GNH3R8 ) THEN
                WRITE( LOGDEV,* ) 'Condensed amt. exceeds NH3 conc: aero_subs.f'
-               J( KNH4 ) = GNH3R8 / ( TSTEP * DF( KNH4 ) * NH3RAT )
+               J( KNH4 ) = GNH3R8 / ( TSTEP * DF( KNH4 ) * MWRATIO( KNH4 ))
             END IF
-            IF ( J( KNO3 ) * TSTEP * DF( KNO3 ) * HNO3RAT .GT. GNO3R8 ) THEN
+            IF ( J( KNO3 ) * TSTEP * DF( KNO3 ) * MWRATIO(KNO3) .GT. GNO3R8 ) THEN
                WRITE( LOGDEV,* ) 'Condensed amt. exceeds HNO3 conc: aero_subs.f'
-               J( KNO3 ) = GNO3R8 / ( TSTEP * DF( KNO3 ) * HNO3RAT )
+               J( KNO3 ) = GNO3R8 / ( TSTEP * DF( KNO3 ) * MWRATIO(KNO3) )
             END IF
-            IF ( J( KCL ) * TSTEP * DF(KCL) * HCLRAT .GT. GCLR8 ) THEN
+            IF ( J( KCL ) * TSTEP * DF(KCL) * MWRATIO(KCL) .GT. GCLR8 ) THEN
                WRITE( LOGDEV,* ) 'Condensed amt. exceeds HCl conc: aero_subs.f'
-               J( KCL ) = GCLR8 / ( TSTEP * DF( KCL ) * HCLRAT )
+               J( KCL ) = GCLR8 / ( TSTEP * DF( KCL ) * MWRATIO(KCL) )
             END IF
 
 C *** Integrate mass transfer equation, convert flux from molar to mass
@@ -1405,11 +1381,11 @@ C *** Update all Local Aerosol Mass and Vapor Concentrations
 
             !Gas
             PRECURSOR_CONC( NH3_IDX ) = GNH3R8 + ( CINORG( KNH4,IMODE )
-     &                                 -CFINAL( KNH4,IMODE ) ) * NH3RAT 
+     &                                 -CFINAL( KNH4,IMODE ) ) * MWRATIO( KNH4 ) 
             PRECURSOR_CONC( HNO3_IDX )= GNO3R8 + ( CINORG( KNO3,IMODE )
-     &                                 -CFINAL( KNO3,IMODE) ) * HNO3RAT  
+     &                                 -CFINAL( KNO3,IMODE) ) * MWRATIO(KNO3)  
             PRECURSOR_CONC( HCL_IDX ) = GCLR8 + ( CINORG( KCL,IMODE )
-     &                                 -CFINAL( KCL,IMODE) ) * HCLRAT 
+     &                                 -CFINAL( KCL,IMODE) ) * MWRATIO(KCL) 
  
 C *** Compute net change in 3rd moment due to dry inorganic mass transfer
 
@@ -1475,7 +1451,7 @@ C     ISORROPIA. Convert everything to [mol m-3].
       !Compute sulfate from total sulfate production rate [ug/m3-s] for fine 
       !modes; add in H2SO4 nucleated in model timestep
       WI( 2 ) = ( SUM( AEROSPC_CONC( ASO4_IDX,1:2 ) ) 
-     &           +( DMDT_SO4 + SUM( CONDSO4( 1:2 ) ) ) * DELT * H2SO4RATM1 ) * CFAC_ASO4
+     &           +( DMDT_SO4 + SUM( CONDSO4( 1:2 ) ) ) * DELT / MWRATIO(KSO4) ) * CFAC_ASO4
       WI( 3 ) = PRECURSOR_CONC( NH3_IDX )  * CFAC_GNH3
      &         +SUM( AEROSPC_CONC( ANH4_IDX,1:2 ) ) * CFAC_ANH4 
       WI( 4 ) = PRECURSOR_CONC( HNO3_IDX ) * CFAC_GHNO3
@@ -1600,10 +1576,10 @@ C *** Apply Final Concentrations to Moment Variables in Aerosol Scheme
             MOMENT0_CONC( IMODE ) = REAL( AM0(IMODE) + DNDT * DELT, 4 )
             ! Add NPF to total condensation rate
             RATE = DMDT_SO4 + CONDSO4( IMODE )
-            SO4 = CINORG( KSO4,IMODE ) + RATE * DELT * H2SO4RATM1 
+            SO4 = CINORG( KSO4,IMODE ) + RATE * DELT / MWRATIO( KSO4 )
          ELSE
             ! Ignore NPF. The small particles are not in these modes
-            SO4 = CINORG( KSO4,IMODE ) + CONDSO4( IMODE ) * DELT * H2SO4RATM1
+            SO4 = CINORG( KSO4,IMODE ) + CONDSO4( IMODE ) * DELT / MWRATIO( KSO4 )
          END IF
 
 C *** Double precision vars for CALC_H2O
@@ -1701,21 +1677,21 @@ C     aerospc_conc variables. This should be for the wet distribution.
       COND_BUDGET( AEROSPC_MAP( AH2O_IDX,: ) ) = REAL( DELH2O( : ), 4 )
       COND_BUDGET( AEROSPC_MAP( AH3OP_IDX,:) ) = REAL( DELH3OP( : ),4 )
 
-      COND_BUDGET( PRECURSOR_MAP( SULF_IDX ) ) = SUM( REAL( -DELSO4(:) * H2SO4RAT, 4 ))
-      COND_BUDGET( PRECURSOR_MAP( NH3_IDX  ) ) = SUM( REAL( -DELNH4(:) * NH3RAT  , 4 ))
-      COND_BUDGET( PRECURSOR_MAP( HNO3_IDX ) ) = SUM( REAL( -DELNO3(:) * HNO3RAT , 4 ))
-      COND_BUDGET( PRECURSOR_MAP( HCL_IDX  ) ) = SUM( REAL( -DELCL(:)  * HCLRAT  , 4 ))
+      COND_BUDGET( PRECURSOR_MAP( SULF_IDX ) ) = SUM( REAL( -DELSO4(:) * MWRATIO( KSO4 ), 4 ))
+      COND_BUDGET( PRECURSOR_MAP( NH3_IDX  ) ) = SUM( REAL( -DELNH4(:) * MWRATIO( KNH4 ), 4 ))
+      COND_BUDGET( PRECURSOR_MAP( HNO3_IDX ) ) = SUM( REAL( -DELNO3(:) * MWRATIO( KNO3 ), 4 ))
+      COND_BUDGET( PRECURSOR_MAP( HCL_IDX  ) ) = SUM( REAL( -DELCL(:)  * MWRATIO( KCL ) , 4 ))
 
  
 C *** Update gas-phase concentrations from Aitken and Accumulation Mode Partitioning
       PRECURSOR_CONC( SULF_IDX ) = PRECURSOR_CONC( SULF_IDX )
-     &                            +SUM( -DELSO4(:) * H2SO4RAT )
+     &                            +SUM( -DELSO4(:) * MWRATIO(KSO4) )
       PRECURSOR_CONC( NH3_IDX )  = GNH3R8 + sum( CINORG( KNH4,1:2 )
-     &                            -CFINAL( KNH4,1:2 ) ) * NH3RAT 
+     &                            -CFINAL( KNH4,1:2 ) ) * MWRATIO(KNH4)
       PRECURSOR_CONC( HNO3_IDX ) = GNO3R8 + sum( CINORG( KNO3,1:2 )
-     &                            -CFINAL( KNO3,1:2) ) * HNO3RAT  
+     &                            -CFINAL( KNO3,1:2) ) * MWRATIO(KNO3)  
       PRECURSOR_CONC( HCL_IDX )  = GCLR8 + sum( CINORG( KCL,1:2 )
-     &                            -CFINAL( KCL,1:2) ) * HCLRAT 
+     &                            -CFINAL( KCL,1:2) ) * MWRATIO(KCL) 
 
 2023  FORMAT( 1X, 'VOLINORG returning negative gas concentrations from ISOROPIA:'
      &       /10X, 'GAS(1) = NH3, GAS(2) = HNO3, GAS(3) = HCl' )
