@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Mar 11, 2025
+C  REVISION HISTORY: Created by EBI solver program, Mar 12, 2025
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -170,7 +170,7 @@ c..Allocate and define ebi species
       EBISP(  23 ) = DCB1
       EBISP(  24 ) = DCB2
       EBISP(  25 ) = BALD
-      EBISP(  26 ) = CHO
+      EBISP(  26 ) = BAL1
       EBISP(  27 ) = OP1
       EBISP(  28 ) = OP2
       EBISP(  29 ) = OPB
@@ -234,31 +234,31 @@ c..Allocate and define ebi species
       EBISP(  87 ) = DCB3
       EBISP(  88 ) = BALP
       EBISP(  89 ) = ADDC
-      EBISP(  90 ) = MCT
-      EBISP(  91 ) = MCTO
-      EBISP(  92 ) = MOH
-      EBISP(  93 ) = EOH
-      EBISP(  94 ) = ETEG
-      EBISP(  95 ) = MAHP
-      EBISP(  96 ) = ORA2
-      EBISP(  97 ) = ORAP
-      EBISP(  98 ) = PPN
-      EBISP(  99 ) = MPAN
-      EBISP( 100 ) = MCTP
-      EBISP( 101 ) = OLNN
-      EBISP( 102 ) = OLND
-      EBISP( 103 ) = APINP1
-      EBISP( 104 ) = APINP2
-      EBISP( 105 ) = LIMNP1
-      EBISP( 106 ) = LIMNP2
-      EBISP( 107 ) = ADCN
-      EBISP( 108 ) = HOM
-      EBISP( 109 ) = VROCP4OXY2
-      EBISP( 110 ) = VROCN1OXY6
-      EBISP( 111 ) = FURANONE
-      EBISP( 112 ) = VROCP3OXY2
-      EBISP( 113 ) = VROCP0OXY4
-      EBISP( 114 ) = BAL1
+      EBISP(  90 ) = CHO
+      EBISP(  91 ) = MCT
+      EBISP(  92 ) = MCTO
+      EBISP(  93 ) = MOH
+      EBISP(  94 ) = EOH
+      EBISP(  95 ) = ETEG
+      EBISP(  96 ) = MAHP
+      EBISP(  97 ) = ORA2
+      EBISP(  98 ) = ORAP
+      EBISP(  99 ) = PPN
+      EBISP( 100 ) = MPAN
+      EBISP( 101 ) = MCTP
+      EBISP( 102 ) = OLNN
+      EBISP( 103 ) = OLND
+      EBISP( 104 ) = APINP1
+      EBISP( 105 ) = APINP2
+      EBISP( 106 ) = LIMNP1
+      EBISP( 107 ) = LIMNP2
+      EBISP( 108 ) = ADCN
+      EBISP( 109 ) = HOM
+      EBISP( 110 ) = VROCP4OXY2
+      EBISP( 111 ) = VROCN1OXY6
+      EBISP( 112 ) = FURANONE
+      EBISP( 113 ) = VROCP3OXY2
+      EBISP( 114 ) = VROCP0OXY4
       EBISP( 115 ) = BAL2
       EBISP( 116 ) = ELHOM
       EBISP( 117 ) = VROCIOXY
@@ -365,7 +365,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( DCB1        ) = 5.0D-04
       RTOL( DCB2        ) = 5.0D-04
       RTOL( BALD        ) = 5.0D-04
-      RTOL( CHO         ) = 5.0D-04
+      RTOL( BAL1        ) = 5.0D-04
       RTOL( OP1         ) = 5.0D-04
       RTOL( OP2         ) = 5.0D-04
       RTOL( OPB         ) = 5.0D-04
@@ -431,6 +431,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( DCB3        ) = 5.0D-04
       RTOL( BALP        ) = 5.0D-04
       RTOL( ADDC        ) = 5.0D-04
+      RTOL( CHO         ) = 5.0D-04
       RTOL( MCT         ) = 5.0D-04
       RTOL( MCTO        ) = 5.0D-04
       RTOL( MOH         ) = 5.0D-04
@@ -455,7 +456,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( FURANONE    ) = 5.0D-04
       RTOL( VROCP3OXY2  ) = 5.0D-04
       RTOL( VROCP0OXY4  ) = 5.0D-04
-      RTOL( BAL1        ) = 5.0D-04
       RTOL( BAL2        ) = 5.0D-04
       RTOL( ELHOM       ) = 5.0D-04
       RTOL( VROCIOXY    ) = 5.0D-04

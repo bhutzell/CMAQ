@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Mar 11, 2025
+C  REVISION HISTORY: Created by EBI solver program, Mar 12, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables for solution
 C*************************************************************************
@@ -146,7 +146,7 @@ c..Species indices
       INTEGER, PARAMETER :: DCB1             =   34
       INTEGER, PARAMETER :: DCB2             =   35
       INTEGER, PARAMETER :: BALD             =   36
-      INTEGER, PARAMETER :: CHO              =   37
+      INTEGER, PARAMETER :: BAL1             =   37
       INTEGER, PARAMETER :: OP1              =   38
       INTEGER, PARAMETER :: OP2              =   39
       INTEGER, PARAMETER :: OPB              =   40
@@ -212,31 +212,31 @@ c..Species indices
       INTEGER, PARAMETER :: DCB3             =  100
       INTEGER, PARAMETER :: BALP             =  101
       INTEGER, PARAMETER :: ADDC             =  102
-      INTEGER, PARAMETER :: MCT              =  103
-      INTEGER, PARAMETER :: MCTO             =  104
-      INTEGER, PARAMETER :: MOH              =  105
-      INTEGER, PARAMETER :: EOH              =  106
-      INTEGER, PARAMETER :: ETEG             =  107
-      INTEGER, PARAMETER :: MAHP             =  108
-      INTEGER, PARAMETER :: ORA2             =  109
-      INTEGER, PARAMETER :: ORAP             =  110
-      INTEGER, PARAMETER :: PPN              =  111
-      INTEGER, PARAMETER :: MPAN             =  112
-      INTEGER, PARAMETER :: MCTP             =  113
-      INTEGER, PARAMETER :: OLNN             =  114
-      INTEGER, PARAMETER :: OLND             =  115
-      INTEGER, PARAMETER :: APINP1           =  116
-      INTEGER, PARAMETER :: APINP2           =  117
-      INTEGER, PARAMETER :: LIMNP1           =  118
-      INTEGER, PARAMETER :: LIMNP2           =  119
-      INTEGER, PARAMETER :: ADCN             =  120
-      INTEGER, PARAMETER :: HOM              =  121
-      INTEGER, PARAMETER :: VROCP4OXY2       =  122
-      INTEGER, PARAMETER :: VROCN1OXY6       =  123
-      INTEGER, PARAMETER :: FURANONE         =  124
-      INTEGER, PARAMETER :: VROCP3OXY2       =  125
-      INTEGER, PARAMETER :: VROCP0OXY4       =  126
-      INTEGER, PARAMETER :: BAL1             =  127
+      INTEGER, PARAMETER :: CHO              =  103
+      INTEGER, PARAMETER :: MCT              =  104
+      INTEGER, PARAMETER :: MCTO             =  105
+      INTEGER, PARAMETER :: MOH              =  106
+      INTEGER, PARAMETER :: EOH              =  107
+      INTEGER, PARAMETER :: ETEG             =  108
+      INTEGER, PARAMETER :: MAHP             =  109
+      INTEGER, PARAMETER :: ORA2             =  110
+      INTEGER, PARAMETER :: ORAP             =  111
+      INTEGER, PARAMETER :: PPN              =  112
+      INTEGER, PARAMETER :: MPAN             =  113
+      INTEGER, PARAMETER :: MCTP             =  114
+      INTEGER, PARAMETER :: OLNN             =  115
+      INTEGER, PARAMETER :: OLND             =  116
+      INTEGER, PARAMETER :: APINP1           =  117
+      INTEGER, PARAMETER :: APINP2           =  118
+      INTEGER, PARAMETER :: LIMNP1           =  119
+      INTEGER, PARAMETER :: LIMNP2           =  120
+      INTEGER, PARAMETER :: ADCN             =  121
+      INTEGER, PARAMETER :: HOM              =  122
+      INTEGER, PARAMETER :: VROCP4OXY2       =  123
+      INTEGER, PARAMETER :: VROCN1OXY6       =  124
+      INTEGER, PARAMETER :: FURANONE         =  125
+      INTEGER, PARAMETER :: VROCP3OXY2       =  126
+      INTEGER, PARAMETER :: VROCP0OXY4       =  127
       INTEGER, PARAMETER :: BAL2             =  128
       INTEGER, PARAMETER :: ELHOM            =  129
       INTEGER, PARAMETER :: VROCIOXY         =  130

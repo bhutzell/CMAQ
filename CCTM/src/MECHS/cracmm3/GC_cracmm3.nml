@@ -128,8 +128,8 @@ GC_SPECIES_DATA =
 'OLNN'          ,136.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',![1-(nitrooxy)propan-2-yl]peroxy,L,NA,CC(O[O])CO[N+]([O-])=O
 'OLND'          ,136.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',![1-(nitrooxy)propan-2-yl]peroxy,L,NA,CC(O[O])CO[N+]([O-])=O
 'ADCN'          ,155.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!4-oxocyclohex-2-en-1-yl nitrate,L,NA,OC1=C[C]C(O[N+]([O-])=O)C=C1
-'BAL1'          ,123.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!(4-methylphenyl)peroxy,L, NA, [O]OC1=CC=C(C)C=C1
-'BAL2'          ,109.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!phenylperoxy,L, NA, [O]OC1=CC=CC=C1
+'BAL1'          ,109.1   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!Phenylperoxy radical,L, NA,[O]Oc1ccccc1
+'BAL2'          , 93.1   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!phenoxy radical,L, NA,[O]c1ccccc1
 'ACRO'          , 56.1   ,''     ,-1     ,''     ,-1     ,'VD_ACRO'          , 1   ,'ACROOPERA'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Acrolein,E,DTXSID5020023,C=CC=O
 'BDE13'         , 54.1   ,''     ,-1     ,''     ,-1     ,'VD_BDE13'         , 1   ,'BDE13OPERA'      , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!1;3-Butadiene,E,DTXSID3020203,C=CC=C
 'BDE13P'        ,103.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                , 1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!(1-hydroxybut-3-en-2-yl)peroxy,L,NA,C=CC(O[O])CO

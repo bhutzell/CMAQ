@@ -221,7 +221,7 @@ REACTIONS[CM] =
             + 0.500*MGLY  + 1.0000*DELTA_C # 1.0/<MGLY_RACM2>;            
 <R026> DCB2 = 1.500*HO2 + 0.250*ACO3 + 0.200*XO2 + CO + 0.500*GLY 
             + 0.500*MGLY  + 2.0000*DELTA_C # 1.0/<MGLY_RACM2>;            
-<R027> BALD = CHO + HO2 + CO  - 2.0000*DELTA_C # 1.0/<BALD_RACM2>;
+<R027> BALD = BAL1 + HO2 + CO # 1.0/<BALD_RACM2>;
 <R028> OP1 = HO + HO2 + HCHO # 1.0/<OP1_RACM2>;
 <R029> OP2 = HO + HO2 + ALD  - 1.0000*DELTA_C # 1.0/<OP1_RACM2>;
 <TRP03> OPB = HO + HO2 + ALD  + 7.0000*DELTA_C # 1.0/<OP1_RACM2>;
@@ -449,6 +449,7 @@ REACTIONS[CM] =
                   + ONIT  - 0.9960*DELTA_C # 5.02E-13 @ 1076.;                  
 <R153> GLY + NO3 = HO2 + 2.000*CO + HNO3 # 2.90E-12 @ 1900.;
 <R154> MGLY + NO3 = ACO3 + CO + HNO3 # 3.76E-12 @ 1900.;
+<RBAL1> BALD + NO3 = BALP + HNO3 # 2.40E-15;
 <R155> PHEN + NO3 = 0.152*ASOATJ + 0.339*CHO + 0.850*ADDC + 0.424*ADCN 
                   + 0.424*HNO3  + 0.1520*DELTA_N - 6.2700*DELTA_C 
                   # 3.78E-12;                  
@@ -459,6 +460,7 @@ REACTIONS[CM] =
 <R159> MPAN + NO3 = MACP + NO2 + HNO3 # 2.2E-14 @ 500.;
 <TRP11> PINALP = HOM # 0.029;
 <TRP12> LIMALP = HOM # 0.024;
+<RBAL2> BALP + NO2 = PAN # 9.7E-29 ^ -5.6 & 9.3E-12 ^ -1.5 & 1.42 & 0.3;
 <R166> ACO3 + NO2 = PAN # 9.7E-29 ^ -5.6 & 9.3E-12 ^ -1.5;
 <R167> PAN = ACO3 + NO2 # 9.00E-29 @ -14000.0 *E<R166>;
 <R168> RCO3 + NO2 = PPN # 9.7E-29 ^ -5.6 & 9.3E-12 ^ -1.5;
@@ -544,8 +546,8 @@ REACTIONS[CM] =
 <R199> UALP + NO = HO2 + NO2 + 0.610*CO + 0.030*HCHO + 0.270*ALD 
                  + 0.180*GLY + 0.700*KET + 0.210*MGLY  
                  - 0.9400*DELTA_C # 2.54E-12 @ -360.;                 
-<R200> BALP + NO = BAL1 + NO2 # 2.7E-12 @ -360.;
-<R201> BAL1 + NO = BAL2 + NO2  + 1.0000*DELTA_C # 2.7E-12 @ -360.;
+<R200> BALP + NO = BAL1 + NO2 + CO2 # 2.7E-12 @ -360.;
+<R201> BAL1 + NO = BAL2 + NO2 # 2.7E-12 @ -360.;
 <R202> ADDC + NO = HO2 + NO2 + 0.320*HKET + 0.680*GLY + 0.680*OP2  
                  + 3.3200*DELTA_C # 2.7E-12 @ -360.;                 
 <R203> MCTP + NO = MCTO + NO2 # 2.7E-12 @ -360.;
@@ -556,7 +558,7 @@ REACTIONS[CM] =
 <R207> ADCN + NO = 2.000*NO2 + GLY + OP2  + 2.0000*DELTA_C 
                  # 2.7E-12 @ -360.;                 
 <R208> XO2 + NO = NO2 # 2.7E-12 @ -360.;
-<R209> BAL2 + NO2 = ONIT  + 2.0000*DELTA_C # 2.0E-11;
+<R209> BAL2 + NO2 = ONIT  + 1.0000*DELTA_C # 2.0E-11;
 <R210> CHO + NO2 = ONIT  + 4.0000*DELTA_C # 2.0E-11;
 <R211> MCTO + NO2 = ONIT  + 3.0000*DELTA_C # 2.08E-12;
 <R212> MO2 + HO2 = OP1 # 4.1E-13 @ -750.;
@@ -605,6 +607,10 @@ REACTIONS[CM] =
 <R237> MCP + HO2 = MAHP # 1.82E-13 @ -1300.;
 <R238> MVKP + HO2 = OP2  + 2.0000*DELTA_C # 2.91E-13 @ -1300.;
 <R239> UALP + HO2 = OP2  + 3.0000*DELTA_C # 2.91E-13 @ -1300.;
+<RBAL3> BALP + HO2 = 0.41*OP3 + 0.15*ORA2 + 0.15*O3
+                   + 0.44*BAL1 + 0.44*HO + 0.44*CO2 # 2.38E-13@ -1300.;
+<RBAL4> BAL1 + HO2 = ORA2 # 2.11E-13@ -1300;
+<RBAL5> BAL2 + O3 = BAL1 # 2.86E-13;
 <R240> ADDC + HO2 = OP2  + 5.0000*DELTA_C # 3.75E-13 @ -980.;
 <R241> CHO + HO2 = CSL  + 1.0000*DELTA_C # 1.00E-11;
 <R242> MCTP + HO2 = OP2  + 5.0000*DELTA_C # 3.75E-13 @ -980.;
@@ -689,8 +695,8 @@ REACTIONS[CM] =
 <R275> UALP + MO2 = HO2 + 0.305*CO + 0.773*HCHO + 0.203*ALD + 0.525*KET 
                   + 0.135*GLY + 0.105*MGLY + 0.250*MOH + 0.250*ROH  
                   + 0.1030*DELTA_C # 3.4E-14 @ -221.;                  
-<R276> BALP + MO2 = HO2 + BAL1 + HCHO # 3.56E-14 @ -708.;
-<R277> BAL1 + MO2 = HO2 + BAL2 + HCHO  + 1.0000*DELTA_C 
+<R276> BALP + MO2 = HO2 + BAL1 + HCHO + CO2 # 3.56E-14 @ -708.;
+<R277> BAL1 + MO2 = HO2 + BAL2 + HCHO   
                   # 3.56E-14 @ -708.;                  
 <R278> ADDC + MO2 = 2.000*HO2 + HCHO + 0.320*HKET + 0.680*GLY 
                   + 0.680*OP2  + 3.3200*DELTA_C # 3.56E-14 @ -708.;                  
@@ -783,8 +789,8 @@ REACTIONS[CM] =
                    + 0.270*ALD + 0.700*KET + 0.180*GLY + 0.105*MGLY 
                    + 0.500*ORA2 + 0.500*CO2  - 0.5150*DELTA_C 
                    # 1.68E-12 @ -500.;                   
-<R312> BALP + ACO3 = MO2 + BAL1 + CO2 # 7.4E-13 @ -765.;
-<R313> BAL1 + ACO3 = MO2 + BAL2 + CO2  + 1.0000*DELTA_C 
+<R312> BALP + ACO3 = MO2 + BAL1 + 2*CO2 # 7.4E-13 @ -765.;
+<R313> BAL1 + ACO3 = MO2 + BAL2 + CO2  
                    # 7.4E-13 @ -765.;                   
 <R314> ADDC + ACO3 = 2.000*HO2 + MO2 + 0.320*HKET + 0.680*GLY 
                    + 0.680*OP2 + CO2  + 3.3200*DELTA_C 
@@ -859,8 +865,8 @@ REACTIONS[CM] =
 <R349> UALP + NO3 = HO2 + NO2 + 0.610*CO + 0.030*HCHO + 0.270*ALD 
                   + 0.700*KET + 0.180*GLY + 0.210*MGLY  
                   - 0.9400*DELTA_C # 2.5E-12;                  
-<R350> BALP + NO3 = BAL1 + NO2 # 2.5E-12;
-<R351> BAL1 + NO3 = BAL2 + NO2  + 1.0000*DELTA_C # 2.5E-12;
+<R350> BALP + NO3 = BAL1 + NO2 + CO2 # 2.5E-12;
+<R351> BAL1 + NO3 = BAL2 + NO2  # 2.5E-12;
 <R352> ADDC + NO3 = HO2 + NO2 + 0.320*HKET + 0.680*GLY + 0.680*OP2  
                   + 3.3200*DELTA_C # 1.2E-12;                  
 <R353> MCTP + NO3 = NO2 + MCTO # 1.2E-12;
