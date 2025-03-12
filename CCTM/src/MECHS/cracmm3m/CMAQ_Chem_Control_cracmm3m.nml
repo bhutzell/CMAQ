@@ -1492,16 +1492,10 @@ CMPST =
                 'WD_ASO4 + 1.5*WD_SO2',
 		
 !-- Total Chloride --!
-<<<<<<< HEAD
 
 'DD_TCL'      , 'Dry Dep of Total Chloride',
                 'kg ha-1', 'DEP',
                 'DD_CL + DD_CL2 + 0.972*DD_HCL + 0.6758*DD_HOCL + 0.4352*DD_CLNO2 + 0.36377*DD_CLNO3',
-=======
-'DD_TCL'      , 'Dry Dep of Total Chloride',
-                'kg ha-1', 'DEP',
-                'DD_CL2 + 0.972*DD_HCL + 0.6758*DD_HOCL + 0.4352*DD_CLNO2 + 0.36377*DD_CLNO3',		
->>>>>>> CRACMM3M_pNO3_photolysis
 
 'WD_TCL'      , 'Wet Dep of Total Chloride', 
                 'kg ha-1', 'DEP',
