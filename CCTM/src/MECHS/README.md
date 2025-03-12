@@ -44,6 +44,7 @@ Table 1.  CMAQv6.0 Chemical Mechanisms
 | cracmm2 | [Community Regional Atmospheric Chemistry Multiphase Mechanism version 2](mechanism_information/cracmm2/mech_cracmm2.md)  | [species table](mechanism_information/cracmm2/cracmm2_species_table.md)                   | acm     |
 | cracmm3 | [Community Regional Atmospheric Chemistry Multiphase Mechanism version 3](mechanism_information/cracmm3/mech_cracmm3.md)  | [species table](mechanism_information/cracmm3/cracmm3_species_table.md)                   | acm     |
 | cracmm3haps | [Community Regional Atmospheric Chemistry Multiphase Mechanism version 3 with air toxics](mechanism_information/cracmm3/mech_cracmm3.md)  | [species table](mechanism_information/cracmm3haps/cracmm3haps_species_table.md)                   | acm     |
+| cracmm3m | [Community Regional Atmospheric Chemistry Multiphase Mechanism version 3 and marine halogen chemistry](mechanism_information/cracmm3m/mech_cracmm3m.md)  | [species table](mechanism_information/cracmm3m/cracmm3m_species_table.md)                   | acm     |
 
 1. mechanisms can share the same model species but differ cloud chemistry
 2. species tables define model species in a mechanism's GC, AE, and NR namelists.

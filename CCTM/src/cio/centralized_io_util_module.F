@@ -34,6 +34,7 @@
 !                     * for intent(out) mpas_time_stamp in subroutine
 !                     julian_to_mpas_date_time and put in some error
 !                     checking for jdate
+!  01/10/24, D. Wong: Incorporated unified coupler implmentation
 !------------------------------------------------------------------------!
 
       module centralized_io_util_module
@@ -286,12 +287,13 @@
         end subroutine quicksort_c2d
 
 ! -------------------------------------------------------------------------
-        function binary_search_char (name, list, n) result (loc)
+        function binary_search_char (name, list, n, list_map) result (loc)
 
          use RUNTIME_VARS
 
-          character (*), intent(in) :: name, list(:)
-          integer, intent(in)        :: n
+          character (*), intent(in)     :: name, list(:)
+          integer, intent(in)           :: n
+          integer, optional, intent(in) :: list_map(:)
           integer :: loc
 
           logical :: found
@@ -312,7 +314,11 @@
           end do
 
           if (found) then
-             loc = mid_loc
+             if (present(list_map)) then
+                loc = list_map(mid_loc)
+             else
+                loc = mid_loc
+             end if
           else
              loc = -1
           end if

@@ -58,7 +58,7 @@
 &ELMO_INIT
   N_Files = 2
   N_Max_Output_Variables = 400
-  N_Keywords = 70
+  N_Keywords = 72
   N_Max_Keyword_Variables = 150
 /
 
@@ -136,12 +136,15 @@
   Keywd_name(7) = 'DEFAULT_CRACMM3'
   Keywd(7,:) = 'DEFAULT_CRACMM2'
 
+<<<<<<< HEAD
   Keywd_name(8) = 'DEFAULT_CRACMM3HAPS'
   Keywd(8,:) = 'DEFAULT_CRACMM2','PM_TOXICS','GAS_TOXICS','P_HCN','EOH','HCL','MOH',
                 'EBZ','STY','XYLENE','TOLUENE','NAPHTHAL','BENZENE'
 !              ,'CL2'
 
 
+  Keywd_name(71) = 'DEFAULT_CRACMM3M'
+  Keywd(71,:) = 'DEFAULT_CRACMM2'
 
  !------------------------------------!
  !----- Meteorological Variables -----!
@@ -360,6 +363,9 @@
   Keywd_name(44) = 'DEFAULT_DEP_CRACMM3HAPS'
   Keywd(44,:) = 'DEFAULT_DEP_CRACMM2','DD_PMF_CL','DD_PMC_CL','DD_TSP_CL','WD_TSP_CL','DD_HCL','WD_HCL',
                 'DD_TCL','WD_TCL','TD_TCL','TOXICS_DEP'
+  
+  Keywd_name(72) = 'DEFAULT_DEP_CRACMM3M'
+  Keywd(72,:) = 'DEFAULT_DEP_CRACMM2'
  
  !--------------------------!
  !----- Gas Deposition -----!
