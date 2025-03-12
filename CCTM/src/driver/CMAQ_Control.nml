@@ -136,7 +136,6 @@
   Keywd_name(7) = 'DEFAULT_CRACMM3'
   Keywd(7,:) = 'DEFAULT_CRACMM2'
 
-<<<<<<< HEAD
   Keywd_name(8) = 'DEFAULT_CRACMM3HAPS'
   Keywd(8,:) = 'DEFAULT_CRACMM2','PM_TOXICS','GAS_TOXICS','P_HCN','EOH','HCL','MOH',
                 'EBZ','STY','XYLENE','TOLUENE','NAPHTHAL','BENZENE'
