@@ -54,7 +54,7 @@
      &                     MOMENT3_CONC, WET_AERO_DENS, AEROSPC_CONC,
      &                     AH2O_IDX, AEROSPC, CALC_AERODIST_PARAMS,
      &                     Extract_Aero
-      USE SOA_DEFN, ONLY : Extract_Soa
+      USE ORG_DEFN, ONLY : Extract_Soa
       USE AEROSOL_CHEMISTRY, ONLY: HETCHEM_RATES
       USE AEROMET_DATA, ONLY: AIRRH, AIRTEMP, AIRQV, AIRDENS, AIRPRES,
      &                        SRFTEMP, H2OVP, H2OSATVP 

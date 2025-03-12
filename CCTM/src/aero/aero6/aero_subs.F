@@ -160,7 +160,7 @@ C JOY 12/07/08 Removed unused EQL3 code, add column and row arguments to
 C     VOLINORG for diagnostic logging
 
 C SH  12/17/09 Major restructuring of all aerosol codes
-C     -use new Fortran modules (e.g., AERO_DATA, SOA_DEFN); shortened call
+C     -use new Fortran modules (e.g., AERO_DATA, ORG_DEFN); shortened call
 C      vector; replaced CBLK with aerospc structure; eliminated AERO_INFO
 
 C SH  03/10/11 Renamed met_data to aeromet_data
@@ -205,7 +205,7 @@ C-----------------------------------------------------------------------
       
       USE AERO_DATA
       USE PRECURSOR_DATA      ! gas phase aero precursor data
-      USE SOA_DEFN
+      USE ORG_DEFN
       USE AEROMET_DATA
       USE CONST
       USE UTILIO_DEFN
@@ -762,7 +762,7 @@ C    aerosols. ATMOSPHERIC CHEMISTRY AND PHYSICS. 7, 4639-4659
 
       USE AERO_DATA
       USE PRECURSOR_DATA
-      USE SOA_DEFN
+      USE ORG_DEFN
       USE AEROMET_DATA
       USE CONST
       USE UTILIO_DEFN

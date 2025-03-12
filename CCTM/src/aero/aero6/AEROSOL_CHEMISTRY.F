@@ -429,7 +429,7 @@ C-----------------------------------------------------------------------
       USE AERO_DATA
       USE AEROMET_DATA, ONLY: airdens
       USE PRECURSOR_DATA
-      USE SOA_DEFN
+      USE ORG_DEFN
       USE ASX_DATA_MOD,  ONLY: MET_DATA, GRID_DATA
       USE PHOT_MOD,      ONLY: RJ, RJ_RES, RJ_SUB, LHNO3  
       USE ELMO_DATA
