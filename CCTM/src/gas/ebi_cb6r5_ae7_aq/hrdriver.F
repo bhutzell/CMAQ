@@ -27,7 +27,7 @@ C
 C  KEY SUBROUTINES/FUNCTIONS CALLED:  HRINIT, HRCALCKS, HRSOLVER
 C                                     FIND_DEGRADED, INIT_DEGRADE, FINAL_DEGRADE
 C
-C  REVISION HISTORY: Created by EBI solver program, Nov 19, 2024
+C  REVISION HISTORY: Created by EBI solver program, Mar 14, 2025
 C                       Based on the algorithm in "Test of Two Numerical
 C                       Schemes for Use in Atmospheric Transport-Chemistry
 C                       Models", O. Hertel, R. Berkowicz, J. Christensen,
@@ -381,6 +381,7 @@ c..Load ICs
                   END IF
                END DO
 
+c..Set physical quantities
                TEMP( NCELL )     = REAL( TA( C,R,L ), 8)
                DENSITY( NCELL )  = REAL( DENS( C,R,L ), 8)
 !                PRESCELL( NCELL ) = REAL( PRES( C,R,L ), 8)
@@ -412,7 +413,6 @@ c..Get rate constants
 #endif
                END IF
 
-c..Set physical quantities
 #ifdef isam
 #if defined(isam) || defined(verbose_isam)
 C...For diagnosing IRR calculations in log files
