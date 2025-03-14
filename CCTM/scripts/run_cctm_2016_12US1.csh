@@ -626,8 +626,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_VEXT_1      $OUTDIR/CCTM_VEXT_${CTM_APPL}.nc -v        #> On-Hour 3D Concs at select sites
 
 
-  setenv LAYER_FILE  $ICpath/$ICFILE
-
   #> set floor file (neg concs)
   setenv FLOOR_FILE ${OUTDIR}/FLOOR_${CTM_APPL}.txt
 

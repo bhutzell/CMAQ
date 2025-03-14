@@ -1043,6 +1043,8 @@
              ENDCOLMD3x = ENDCOLMD3 + 1
           end if
 
+          UWINDC_AVAIL = (INDEX1( 'UWINDC', LNVARS3D, mio_file_data(floc)%var_name(1:n_d3d) ) .gt. 0)
+          VWINDC_AVAIL = (INDEX1( 'VWINDC', LNVARS3D, mio_file_data(floc)%var_name(1:n_d3d) ) .gt. 0)
 #endif  
 
           dot_ncols = ENDCOLMD3 - STRTCOLMD3 + 1
@@ -1054,8 +1056,6 @@
           size_d2dx = x_dot_ncols * x_dot_nrows
           size_d3dx = size_d2dx * nlays
 
-          UWINDC_AVAIL = (INDEX1( 'UWINDC', LNVARS3D, mio_file_data(floc)%var_name(1:n_d3d) ) .gt. 0)
-          VWINDC_AVAIL = (INDEX1( 'VWINDC', LNVARS3D, mio_file_data(floc)%var_name(1:n_d3d) ) .gt. 0)
 #endif
 
 ! emission file, could be one or multiple layer
@@ -5364,9 +5364,11 @@ C Read the various categories of normalized emissions
           INCLUDE SUBST_FILES_ID             ! file name parameters
 
           Character( 40 ), parameter :: pname = 'retrieve_grid_dot_2d_data'
+          CHARACTER( 120 ) :: XMSG = ' '
 
           INTEGER          :: STAT
-          CHARACTER( 120 ) :: XMSG = ' '
+          INTEGER          :: gxoff, gyoff, 
+     &                        STRTCOLGD2, ENDCOLGD2, STRTROWGD2, ENDROWGD2
 
           ALLOCATE ( MSFD2( NCOLS+1, NROWS+1 ), STAT = STAT )
           IF ( STAT .NE. 0 ) THEN

@@ -136,7 +136,7 @@ C=======================================================================
          FUNCTION PT3D_INIT ( JDATE, JTIME, TSTEP )
      &                       RESULT ( SUCCESS )
 
-         USE GRID_CONF, ONLY: NLAYS, VGTYP_GD
+         USE GRID_CONF, ONLY: NLAYS, VGLVS_GD
          USE STK_PRMS, ONLY: SOURCE, STK_PRMS_INIT, MY_NSRC
          USE STK_EMIS, ONLY: DESID_STREAM_NAME, NSRC_EMIS, FIREFLAG,
      &                       MAP_PTtoISRM, STK_EMIS_INIT
@@ -288,29 +288,30 @@ C get scenario timing
          PT_DATE = JDATE 
          PT_TIME = JTIME
 
-         call mio_get_global_attr( MET_DOT_3D, 'NLAYS', METDLAYS )
-         ALLOCATE( VGLVSXG( 0:MXLAYS3 ), 
-     &             VGLVSMD3( 0:METDLAYS+1), STAT = IOS )
-         CALL CHECKMEM( IOS, 'VGLVSXG', PNAME )
-         call mio_get_global_attr( MET_DOT_3D, 'VGLVLS', VGLVSMD3 )
- 
-C Store local layer information
-         J = LBOUND( VGLVSMD3, 1 ) + 1  ! 1st value contains num elements; skip it
-         VGLVSXG( 0 ) = VGLVSMD3( J )
-         DO L = 1, NLAYS
-            J = J + 1
-            VGLVSXG( L ) = VGLVSMD3( J )
-         END DO
-
-         floc = mio_search( MET_DOT_3D )
-         METDNSTEPS = mio_file_data(floc)%nsteps
-         IF ( PT_NSTEPS .GT. METDNSTEPS ) THEN
-            WRITE( XMSG,94010 ) 'Requested output time steps > those on met file '
-     &                          // CRLF() // BLANK10 // 'reset to ', 
-     &                       METDNSTEPS
-            PT_NSTEPS = METDNSTEPS
-         END IF
-
+!#ifndef twoway
+!         call mio_get_global_attr( MET_DOT_3D, 'NLAYS', METDLAYS )
+!         ALLOCATE( VGLVSXG( 0:MXLAYS3 ), 
+!     &             VGLVSMD3( 0:METDLAYS+1), STAT = IOS )
+!         CALL CHECKMEM( IOS, 'VGLVSXG', PNAME )
+!         call mio_get_global_attr( MET_DOT_3D, 'VGLVLS', VGLVSMD3 )
+! 
+!C Store local layer information
+!         J = LBOUND( VGLVSMD3, 1 ) + 1  ! 1st value contains num elements; skip it
+!         VGLVSXG( 0 ) = VGLVSMD3( J )
+!         DO L = 1, NLAYS
+!            J = J + 1
+!            VGLVSXG( L ) = VGLVSMD3( J )
+!         END DO
+!
+!         floc = mio_search( MET_DOT_3D )
+!         METDNSTEPS = mio_file_data(floc)%nsteps
+!         IF ( PT_NSTEPS .GT. METDNSTEPS ) THEN
+!            WRITE( XMSG,94010 ) 'Requested output time steps > those on met file '
+!     &                          // CRLF() // BLANK10 // 'reset to ', 
+!     &                       METDNSTEPS
+!            PT_NSTEPS = METDNSTEPS
+!         END IF
+!#endif
 #endif
 
 #ifdef srcid
@@ -360,7 +361,7 @@ C Open diagnostic layer fractions file?
             PLAYNAME = ' '   ! array
             NDATE = PT_DATE; NTIME = PT_TIME
             CALL NEXTIME( NDATE, NTIME, TSTEP ) ! advance one output tstep
-            CALL OPENLAYOUT( NDATE, NTIME, TSTEP, DESID_LAYS, VGLVSXG, NPTGRPS,
+            CALL OPENLAYOUT( NDATE, NTIME, TSTEP, DESID_LAYS, VGLVS_GD, NPTGRPS,
      &                       MY_NSRC, PLAYNAME )
          END IF
 
@@ -800,7 +801,7 @@ C=======================================================================
 
 C-----------------------------------------------------------------------
 
-      USE VGRD_DEFN, ONLY : VGTOP_GD
+      USE VGRD_DEFN, ONLY : VGTOP_GD, VGLVS_GD
       USE STK_EMIS, ONLY : FIREVAR, FIREFLAG
 #ifdef mpas
       USE STK_PRMS, ONLY : MY_STRT_SRC, MY_END_SRC, MY_NSRC, SOURCE, my_nsrc_pressure, my_nsrc_mesh_index
@@ -1072,7 +1073,7 @@ C Get pressures: Use SIGMA values and surface pres. p=sigma*(psfc-ptop)+ptop
 
          PSFC = P_D( N )%PRSFC( S )
          DO L = 0, DESID_LAYS
-            P_D( N )%PRESF( L ) = ( VGLVSXG( L ) * ( PSFC - VGTOP_GD )
+            P_D( N )%PRESF( L ) = ( VGLVS_GD( L+1 ) * ( PSFC - VGTOP_GD )
      &                          +   VGTOP_GD ) * CONVPA
          END DO
 

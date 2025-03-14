@@ -633,8 +633,13 @@ C Then reset the MG emissions array and local write counter.
 
                    if ( firstwrite ) then
                       firstwrite = .false.
-                      call mio_setfile( MET_CRO_2D )
+                      call mio_setfile( INIT_CONC_1 )
+                      mio_nlays = 1
                       call mio_fcreate( CTM_MGEM_1, mio_new_file )
+                      if (mype .eq. 0) then
+                         call mio_set_global_attr ( CTM_MGEM_1, 'NLAYS', 1 )
+                         call mio_set_global_attr ( CTM_MGEM_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                      end if
                    end if
 
                    call mio_fwrite( CTM_MGEM_1, WRMG_SPC( V ),

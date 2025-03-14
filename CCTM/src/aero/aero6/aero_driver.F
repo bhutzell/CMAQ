@@ -139,7 +139,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #ifdef twoway
      &                      , N_GC_CONC, GC_CONC, GC_STRT, GC_CONC_MAP
 #endif
-      USE RUNTIME_VARS, ONLY: LOGDEV, END_TIME
+      USE RUNTIME_VARS, ONLY: LOGDEV, END_TIME, M3EXIT
       USE AERO_BUDGET, ONLY: AERO_COAG, AERO_COND, AERO_GROWTH, AERO_NPF
 
 #ifdef twoway

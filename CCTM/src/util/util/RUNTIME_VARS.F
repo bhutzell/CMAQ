@@ -346,8 +346,7 @@
       !-------------------------------------------------------------------------------------------------------
       !>> Grid and High-Level Model Parameters
       !-------------------------------------------------------------------------------------------------------
-
- 
+  
       IF ( MYPE .EQ. 0 ) VARDEV = OUTDEV
 
       IF ( MYPE .EQ. 0 ) THEN 
@@ -357,7 +356,10 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
-       ! Get Logfile Directory
+      ! Get Simulation Scenario Name to Label Log Files, etc
+      CALL GET_ENV( APPL_NAME, 'CTM_APPL', APPL_NAME, VARDEV )
+
+      ! Get Logfile Directory
       CALL GET_ENV ( BLDFOLD, 'BLD', BLDFOLD, VARDEV ) 
  
       ! Get Logfile Directory

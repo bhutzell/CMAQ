@@ -600,8 +600,13 @@ C Final timestamp
 
 C Write soil NO rain data file
       if ( FIRSTWRITE ) then
-         call mio_setfile( MET_CRO_2D )
+         call mio_setfile( INIT_CONC_1 )
+         mio_nlays = 1
          call mio_fcreate( SOILOUT, mio_new_file )
+         if (mype .eq. 0) then
+            call mio_set_global_attr ( SOILOUT, 'NLAYS', 1 )
+            call mio_set_global_attr ( SOILOUT, 'VGLVLS', INIT_CONC_1, 1, 2 )
+         end if
          FIRSTWRITE = .FALSE.
       else 
          mesg = 'trying to write to SOILOUT twice'

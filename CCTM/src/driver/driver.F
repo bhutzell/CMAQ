@@ -327,9 +327,6 @@ C-----------------------------------------------------------------------
 
       IF ( FIRST_RUN ) THEN
 
-         ! Initialize variables for passing file data to MIO
-         CALL INIT_MIO_FILE_DATA()
-
          TSTEP = 0
 #ifdef mpas
          CALL INIT_ENV_VARS( 0, 0 )
@@ -397,13 +394,23 @@ C and define vertical layer structure (in module GRID_CONF)
 C Initialize Environment Variables
          JDATE = 0
          JTIME = 0
+#ifdef parallel
+         CALL MPI_COMM_RANK ( MPI_COMM_WORLD, MYPE, ERROR )
+         CALL MPI_COMM_SIZE ( MPI_COMM_WORLD, TOTPE, ERROR )
+#else
+         MYPE = 0
+         TOTPE = 1
+#endif
          CALL INIT_ENV_VARS( JDATE, JTIME )
 #endif
 
+         ! Initialize variables for passing file data to MIO
+         CALL INIT_MIO_FILE_DATA()
+
          call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
 
-!C Set up horizontal domain, calculate processor-to-subdomain maps
-!C and define vertical layer structure (in module GRID_CONF)
+C Set up horizontal domain, calculate processor-to-subdomain maps
+C and define vertical layer structure (in module GRID_CONF)
          IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
             XMSG = '*** Failure defining domain configuration'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )

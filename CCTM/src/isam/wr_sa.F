@@ -89,12 +89,12 @@ C-----------------------------------------------------------------------
          FIRSTWRITE = .FALSE.
 ! If not writing all layers, change dimension mio_nlays before file creation, 
 ! then change global attribute NLAYS to match
-         call mio_setfile( MET_CRO_3D )
+         call mio_setfile( INIT_CONC_1 )
          if ( SA_NLAYS .lt. NLAYS ) mio_nlays = SA_NLAYS
          call mio_fcreate( SA_CONC_1, mio_new_file )
          if ( mype == 0 ) then
             call mio_set_global_attr( SA_CONC_1, 'NLAYS', SA_NLAYS )
-            call mio_set_global_attr( SA_CONC_1, 'VGLVLS', MET_CRO_3D, AISAM_BLEV, AISAM_ELEV+1 )
+            call mio_set_global_attr( SA_CONC_1, 'VGLVLS', INIT_CONC_1, AISAM_BLEV, AISAM_ELEV+1 )
          end if
       END IF
 

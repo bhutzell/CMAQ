@@ -936,8 +936,13 @@ C Then reset the sea-salt emissions array and local write counter.
 
                if ( firstwrite ) then
                   firstwrite = .false.
-                  call mio_setfile( MET_CRO_2D )
+                  call mio_setfile( INIT_CONC_1 )
+                  mio_nlays = 1
                   call mio_fcreate( CTM_SSEMIS_1, mio_new_file )
+                  if (mype .eq. 0) then
+                     call mio_set_global_attr ( CTM_SSEMIS_1, 'NLAYS', 1 )
+                     call mio_set_global_attr ( CTM_SSEMIS_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                  end if
                end if
 
                WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )
@@ -949,7 +954,6 @@ C Then reset the sea-salt emissions array and local write counter.
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                   END IF
                   CALL NEXTIME( MDATE, MTIME, TSTEP( 1 ) )
-                  call mio_setfile( CTM_CONC_1)
                   call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
                   
                   DO V = 1, NSSDIAG

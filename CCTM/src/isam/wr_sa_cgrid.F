@@ -112,7 +112,7 @@ C-----------------------------------------------------------------------
 
       IF ( FIRSTWRITE ) THEN
          FIRSTWRITE = .FALSE.
-         call mio_setfile( MET_CRO_3D )
+         call mio_setfile( INIT_CONC_1 )
          call mio_fcreate( SA_CGRID_1, mio_new_file )
       END IF
 

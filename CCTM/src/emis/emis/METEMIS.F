@@ -276,8 +276,13 @@
 
                ! Create Output Diagnostic File if requested
                if ( METEMDIAG ) then
-                  call mio_setfile( MET_CRO_2D )
+                  call mio_setfile( INIT_CONC_1 )
+                  mio_nlays = 1
                   call mio_fcreate( CTM_METEMIS_DIAG, mio_new_file )
+                  if (mype .eq. 0) then
+                     call mio_set_global_attr ( CTM_METEMIS_DIAG, 'NLAYS', 1 )
+                     call mio_set_global_attr ( CTM_METEMIS_DIAG, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                  end if
                end if
             END IF
 

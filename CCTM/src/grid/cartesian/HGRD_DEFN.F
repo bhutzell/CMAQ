@@ -178,8 +178,8 @@ C Check NPROCS against NPCOL*NPROW
                SUCCESS = .FALSE.; RETURN
             END IF
 
-           call mio_fopen( MET_CRO_3D, mio_read_only )
-           call mio_setfile( MET_CRO_3D )
+           call mio_fopen( INIT_CONC_1, mio_read_only )
+           call mio_setfile( INIT_CONC_1 )
            ncols = mio_ncols
            nrows = mio_nrows
            nbndy = 2*mio_domain_nthik * ( ncols + nrows + 2*mio_domain_nthik )

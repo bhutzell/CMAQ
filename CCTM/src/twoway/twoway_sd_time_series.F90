@@ -23,70 +23,74 @@ module sd_time_series_module
 ! --------------------------------------------------------------------------------
   subroutine sd_time_series_init (in_logdev, tstep)
 
-    use hgrd_defn, only : mype
+    use hgrd_defn, only   : mype
     use get_env_module
-
+    use logdev_mod, only  : m3exit
+    use mio_ascii
+    use mio_module
+    use runtime_vars, only: CONC_BLEV, CONC_ELEV
+    use std_conc, only    : C_NLAYS, N_CSPCS 
     use utilio_defn
-!   include 'PARMS3.EXT'
-!   include 'FDESC3.EXT'
-!   include 'IODECL3.EXT'
-    include SUBST_FILES_ID    ! I/O definitions and declarations
+ 
+    include SUBST_FILES_ID    ! Filenames
 
     integer, intent(in) :: in_logdev, tstep
 
-    character (len = 80), allocatable :: temp(:,:)
-    integer :: stat, n
-!   integer, external :: index1
-
     character (len = 16), parameter :: pname = 'sd_time_series_i'
+    character ( 200 ) xmsg
+    integer :: stat, n, i, j, sd_ncols, sd_nrows
+    logical :: found = .false.
 
-    if ( .not. desc3( ctm_conc_1 ) ) then
-       write (in_logdev, '(a14, a16, a17)') 'Could not get ', CTM_CONC_1, ' file description'
-       stop
-    end if
-
-    allocate (sd_spcs(nvars3d), stat=stat)
+    allocate (sd_spcs(N_CSPCS), stat=stat)
 
     call get_envlist ('SD_CONC_SPCS', n_sd_spcs, sd_spcs)
 
-    allocate (sd_spcs_index(n_sd_spcs), temp(n_sd_spcs,3), stat=stat)
+    allocate (sd_spcs_index(n_sd_spcs), stat=stat)
+
+! search for CTM_CONC_1 in mio_txt_file_data
+    i = 0
+    do while (i .lt. n_mio_out .and. .not. found)
+      i = i+1
+      if ( mio_txt_file_data(i)%file_logical == ctm_conc_1 ) found = .true.       
+    end do
+    if ( i .le. 0 ) then
+       xmsg = 'Could not find CTM_CONC_1 in mio_txt_file_data'
+       call m3exit(pname, 0, 0, xmsg, 1)
+    end if
 
     do n = 1, n_sd_spcs
-       sd_spcs_index(n) = index1 (sd_spcs(n), nvars3d, vname3d)
+       j = index1 (sd_spcs(n), mio_txt_file_data(i)%NVARS, mio_txt_file_data(i)%VARNAMES)
+       if ( j .le. 0 ) then
+          xmsg = 'Could not find requested species ' // sd_spcs(n) // &
+                 ' on file ' // mio_txt_file_data(i)%file_logical
+          call m3exit(pname, 0, 0, xmsg, 1)
+       end if
+       sd_spcs_index(n) = j
+       VTYPE3D(n)       = M3REAL
+       VNAME3D(n)(1:16) = mio_txt_file_data(i)%VARNAMES(j)
+       UNITS3D(n)(1:16) = mio_txt_file_data(i)%VARUNITS(j)
+       VDESC3D(n)       = mio_txt_file_data(i)%VARDESC(j)
     end do
 
     nvars3d = n_sd_spcs
-    ncols3d = sd_ecol - sd_scol + 1
-    nrows3d = sd_erow - sd_srow + 1
+    sd_ncols = sd_ecol - sd_scol + 1
+    sd_nrows = sd_erow - sd_srow + 1
 
-    do n = 1, n_sd_spcs
-       temp(n,1)(1:16) = vname3d(sd_spcs_index(n))
-       temp(n,2)(1:16) = units3d(sd_spcs_index(n))
-       temp(n,3)       = vdesc3d(sd_spcs_index(n))
-    end do
-    do n = 1, n_sd_spcs
-       vname3d(n) = temp(n,1)(1:16)
-       units3d(n) = temp(n,2)(1:16)
-       vdesc3d(n) = temp(n,3)
-    end do
+    ! Store MIO Metadata
+    NDIMS3D( 1:NVARS3D ) = 4
+    L_TSTEP( 1:NVARS3D ) = .True.
+    L_LAY  (1 :NVARS3D ) = .True. ! even if 2D
+    L_COL  (1 :NVARS3D ) = .True. 
+    L_ROW  (1 :NVARS3D ) = .True. 
+    L_VEXT (1 :NVARS3D ) = .False.
 
-    xorig3d = xorig3d + (sd_scol - 1) * xcell3d
-    yorig3d = yorig3d + (sd_srow - 1) * ycell3d
+    CALL LOAD_MIO_FILE ( CTM_SD_TS, C_NLAYS, CONC_BLEV, CONC_ELEV,     &
+           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D), &
+           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D), &
+           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),   &
+           L_VEXT(1:NVARS3D) )
 
-    tstep3d = tstep
-
-    if (mype .eq. 0) then
-       if ( .not. open3 (ctm_sd_ts, FSRDWR3, pname) ) then
-          write (in_logdev, '(a30, a16, a11)') ' Warning: Could not open file ', ctm_sd_ts, ' for update'
-          if ( .not. open3 (ctm_sd_ts, FSNEW3, pname) ) then
-             write (in_logdev, '(a30, a16)') ' Warning: Could not open file ', ctm_sd_ts
-          end if
-       end if
-    end if
-
-    allocate (sd_ts_data(ncols3d, nrows3d, nlays3d, nvars3d), stat=stat)
-
-    deallocate (temp)
+    allocate (sd_ts_data(sd_ncols, sd_nrows, c_nlays, n_sd_spcs), stat=stat)
 
   end subroutine sd_time_series_init
 
@@ -155,28 +159,28 @@ module sd_time_series_module
   subroutine output_sd_time_series (cgrid, jdate, jtime)
 
     use HGRD_DEFN
-
+    use mio_module
+    use runtime_vars, only: CONC_BLEV, CONC_ELEV
+    use std_conc, only: CONC_SUBSET_LAYER, C_NLAYS
     use utilio_defn
-!   include 'PARMS3.EXT'
-!   include 'FDESC3.EXT'
-!   include 'IODECL3.EXT'
-    include SUBST_FILES_ID    ! I/O definitions and declarations
+
+    include SUBST_FILES_ID    ! filenames
 
     real, pointer :: cgrid(:,:,:,:)
     integer, intent(in) :: jdate, jtime
 
     character (len = 16), parameter :: pname = 'output_sd_time_s'
+    character (len = 80) :: xmsg
+    character (len = 20) :: timestamp
+
     integer :: stat, n
     integer, save :: send_to, n_recv, send_index(2,2)
     logical, save :: firstime = .true.
-    character (len = 80) :: xmsg
     integer, allocatable, save :: recv_from(:), recv_index(:,:,:)
     logical :: x_intercepted, y_intercepted 
 
     if (firstime) then
        allocate (recv_from(nprow*npcol), recv_index(2,2,nprow*npcol), stat=stat)
-
-       allocate (sd_ts_data(ncols3d, nrows3d, nlays3d, nvars3d), stat=stat)
 
        send_to = -1
        recv_from = -1
@@ -211,6 +215,17 @@ module sd_time_series_module
           end if
        end do
 
+       call mio_setfile( met_cro_3d )
+       if (CONC_SUBSET_LAYER) mio_nlays = c_nlays
+
+       call mio_fcreate( ctm_sd_ts, mio_new_file )
+       if (conc_subset_layer) then
+          if (mype .eq. 0) then
+             call mio_set_global_attr ( CTM_SD_TS, 'NLAYS', C_NLAYS )
+             call mio_set_global_attr ( CTM_SD_TS, 'VGLVLS', MET_CRO_3D, CONC_BLEV, CONC_ELEV+1 )
+          end if
+       end if
+
        firstime = .false.
 
     end if
@@ -219,12 +234,11 @@ module sd_time_series_module
                          recv_from, recv_index, n_recv, n_sd_spcs,  &
                          sd_spcs_index, jtime, mype)
 
-    if (mype .eq. 0) then
-       if (.not. write3(ctm_sd_ts, allvar3, jdate, jtime, sd_ts_data)) then
-          xmsg = 'Could not write to ' // ctm_sd_ts
-          call m3exit(pname, jdate, jtime, xmsg, stat)
-       end if
-    end if
+    call mio_time_format_conversion( jdate, jtime, timestamp )
+
+    do n = 1, n_sd_spcs
+       call mio_fwrite( ctm_sd_ts, sd_spcs(n), pname, sd_ts_data(:,:,:,n), timestamp )
+    end do
 
   end subroutine output_sd_time_series
 

@@ -617,8 +617,13 @@ C...write data to the normal wet deposition file
 
         if ( FIRSTWRITE ) then
            FIRSTWRITE = .FALSE.
-           call mio_setfile( MET_CRO_2D )
+           call mio_setfile( INIT_CONC_1 )
+           mio_nlays = 1
            call mio_fcreate( CTM_WET_DEP_1, mio_new_file )
+           if (mype .eq. 0) then
+              call mio_set_global_attr ( CTM_WET_DEP_1, 'NLAYS', 1 )
+              call mio_set_global_attr ( CTM_WET_DEP_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+           end if
         end if
 
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
@@ -645,8 +650,13 @@ C...write data to the sensitivity wet deposition file
 c gas species
         IF ( FIRST_WRITE_SENS ) THEN
            FIRST_WRITE_SENS = .FALSE.
-           call mio_setfile( MET_CRO_2D )
+           call mio_setfile( INIT_CONC_1 )
+           mio_nlays = 1
            call mio_fcreate( CTM_SWETDEP_1, mio_new_file )
+           if (mype .eq. 0) then
+              call mio_set_global_attr ( CTM_SWETDEP_1, 'NLAYS', 1 )
+              call mio_set_global_attr ( CTM_SWETDEP_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+           end if
         END IF
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
 
@@ -685,8 +695,13 @@ C...write data to the diagnostic file if requested by the user
 #else
           IF ( FIRSTDIAG ) THEN
              FIRSTDIAG = .FALSE.
-             call mio_setfile( MET_CRO_2D )
+             call mio_setfile( INIT_CONC_1 )
+             mio_nlays = 1
              call mio_fcreate( CTM_WET_DEP_2, mio_new_file )
+             if (mype .eq. 0) then
+                call mio_set_global_attr ( CTM_WET_DEP_2, 'NLAYS', 1 )
+                call mio_set_global_attr ( CTM_WET_DEP_2, 'VGLVLS', INIT_CONC_1, 1, 2 )
+             end if
           END IF
        
           DO VAR = 1, N_SPC_WDEP 
@@ -775,8 +790,13 @@ C...reinitialize deposition array
 #ifdef isam
         IF ( FIRST_WRITE_ISAM ) THEN
            FIRST_WRITE_ISAM = .FALSE.
-           call mio_setfile( MET_CRO_2D )
+           call mio_setfile( INIT_CONC_1 )
+           mio_nlays = 1
            call mio_fcreate( SA_WD_1, mio_new_file )   
+           if (mype .eq. 0) then
+              call mio_set_global_attr ( SA_WD_1, 'NLAYS', 1 )
+              call mio_set_global_attr ( SA_WD_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+           end if
         END IF
         call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
 

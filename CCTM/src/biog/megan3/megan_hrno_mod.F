@@ -251,12 +251,13 @@ C Determine last timestamp
 
          output_step   = time2sec(tstep(1))
          half_syn_step = time2sec(tstep(2)) / 2
+#elif defined (twoway)
+         METSTEP = 10000   ! temporary hack for consistency, should be TSTEP(3)? 
 #else
-         METSTEP = 10000  ! temporary hack
-#endif
-
          floc = mio_search( MET_CRO_2D )
          METSTEP = mio_file_data(floc)%tstep
+#endif
+
 
          ALLOCATE( RNTOT( NCOLS,NROWS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'RNTOT', PNAME )
@@ -405,8 +406,13 @@ C-----------------------------------------------------------------------------
 
 #ifndef mpas
 
-      call mio_setfile( MET_CRO_2D )
+      call mio_setfile( INIT_CONC_1 )
+      mio_nlays = 1
       call mio_fcreate( SOILOUT, mio_new_file)
+      if (mype .eq. 0) then
+         call mio_set_global_attr ( SOILOUT, 'NLAYS', 1 )
+         call mio_set_global_attr ( SOILOUT, 'VGLVLS', INIT_CONC_1, 1, 2 )
+      end if
       call mio_time_format_conversion (ndate, ntime, time_stamp)
 
       call mio_fwrite( SOILOUT, 'LAI', pname,  Met_data%LAI , TIME_STAMP )

@@ -13,6 +13,7 @@
         CHARACTER( 3 ) :: CMYPE  = ""  ! Processor Number
         INTEGER :: OUTDEV = 6   ! File Unit for Standard Output
         INTEGER :: MYPE   = -1  ! Processor Number
+        INTEGER :: TOTPE  = 1   ! Total Number of Processors
         CHARACTER( 200 ) :: APPL_NAME = 'APPL' ! Logfile Names
 
         contains
@@ -44,8 +45,6 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       INTEGER, PARAMETER :: MAXLEN_CTM_LOG   = MAXLEN_CCTM_APPL_loc + 11
 
       CHARACTER( * ), INTENT( IN )    :: APP_NAME_IN
-
-      INTEGER :: TOTPE  = 1   ! Number of Total Processors
       CHARACTER(  8 ) :: PRESTR  = 'CTM_LOG_'
       CHARACTER( MAXLEN_CTM_LOG ) :: IOLOGEQ
 
@@ -66,7 +65,6 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       CALL MPI_COMM_SIZE ( MPI_COMM_WORLD, TOTPE, ERROR )
 #else
       MYPE = 0
-      TOTPE = 0
 #endif
       ! Fetch CMAQ Header
       CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD, CMAQ_TOC, NCMAQ_TOC )

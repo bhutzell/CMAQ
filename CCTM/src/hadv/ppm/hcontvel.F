@@ -164,12 +164,6 @@ C-----------------------------------------------------------------------
 
          WRITE( COMMSTR,'(4I2)' )  1, 1-NTHIK, 2, 1-NTHIK  ! ' 1 0 2 0'
 
-         floc = mio_search ( MET_DOT_3D )
-         if ( floc .le. 0 ) then
-            xmsg = 'Error: file ' // trim(MET_DOT_3D) // ' unknown.'
-            call m3exit( pname, jdate, jtime, xmsg, xstat1 )
-         end if
-
 #ifdef twoway
          VNAME = 'UWINDC'
          IF ( INDEX1( VNAME, n_metdot3d_var, metdot3d_vlist ) .LE. 0 ) THEN
@@ -178,6 +172,12 @@ C-----------------------------------------------------------------------
             CSTAGUV = .FALSE.
          END IF
 #else
+         floc = mio_search ( MET_DOT_3D )
+         if ( floc .le. 0 ) then
+            xmsg = 'Error: file ' // trim(MET_DOT_3D) // ' unknown.'
+            call m3exit( pname, jdate, jtime, xmsg, xstat1 )
+         end if
+
          VNAME = 'UWINDC'
          IF ( INDEX1( VNAME, mio_file_data(floc)%nvars, mio_file_data(floc)%var_name ) .LE. 0 ) THEN
             XMSG = 'Could not find ' // VNAME // ' in ' // MET_DOT_3D

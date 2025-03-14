@@ -193,24 +193,32 @@ C-----------------------------------------------------------------------
       WRITE( CONCMIN,'(1PE9.2)' ) CMIN
 
 #ifndef mpas
+      SKIP = .FALSE.
+#ifdef twoway
+      if (FNAME == MET_CRO_3D) then
+         SKIP = .TRUE.
+      end if
+#endif
 
-      floc = mio_search (FNAME)
+      IF (.NOT. SKIP) THEN
+         floc = mio_search (FNAME)
  
-      IF ( GL_NCOLS .NE. mio_file_data(floc)%gl_ncols ) THEN
-         WRITE( LOGDEV,* ) ' '
-         WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
-         WRITE( LOGDEV,* ) '>>  GL_NCOLS: ', GL_NCOLS, '  NCOLS3D: ', mio_file_data(floc)%gl_ncols
-      END IF
+         IF ( GL_NCOLS .NE. mio_file_data(floc)%gl_ncols ) THEN
+            WRITE( LOGDEV,* ) ' '
+            WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
+            WRITE( LOGDEV,* ) '>>  GL_NCOLS: ', GL_NCOLS, '  NCOLS3D: ', mio_file_data(floc)%gl_ncols
+         END IF
  
-      IF ( GL_NROWS .NE. mio_file_data(floc)%gl_nrows ) THEN
-         WRITE( LOGDEV,* ) ' '
-         WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
-         WRITE( LOGDEV,* ) '>>  GL_NROWS: ', GL_NROWS, '  NROWS3D: ', mio_file_data(floc)%gl_nrows
-      END IF
+         IF ( GL_NROWS .NE. mio_file_data(floc)%gl_nrows ) THEN
+            WRITE( LOGDEV,* ) ' '
+            WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
+            WRITE( LOGDEV,* ) '>>  GL_NROWS: ', GL_NROWS, '  NROWS3D: ', mio_file_data(floc)%gl_nrows
+         END IF
  
-      IF ( NLAYS .NE. mio_file_data(floc)%nlays ) THEN
-         XMSG = 'Wrong number of layers in ' // FNAME // ' file'
-         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         IF ( NLAYS .NE. mio_file_data(floc)%nlays ) THEN
+            XMSG = 'Wrong number of layers in ' // FNAME // ' file'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
       END IF
 #endif
 

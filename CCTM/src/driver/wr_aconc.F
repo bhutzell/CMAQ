@@ -89,7 +89,7 @@ C represents data computed from time 1995196:090000 to 1995196:100000
 
 ! If not writing all layers, change dimension mio_nlays before file creation, 
 ! then change global attribute NLAYS to match
-         call mio_setfile( MET_CRO_3D )
+         call mio_setfile( INIT_CONC_1 )
          if (aconc_subset_layer) mio_nlays = A_NLAYS
 
          call mio_fcreate( A_CONC_1, mio_new_file )
@@ -97,7 +97,7 @@ C represents data computed from time 1995196:090000 to 1995196:100000
          if (aconc_subset_layer) then
             if (mype == 0) then
                call mio_set_global_attr ( A_CONC_1, 'NLAYS', A_NLAYS )
-               call mio_set_global_attr ( A_CONC_1, 'VGLVLS', MET_CRO_3D, ACONC_BLEV, ACONC_ELEV+1 )
+               call mio_set_global_attr ( A_CONC_1, 'VGLVLS', INIT_CONC_1, ACONC_BLEV, ACONC_ELEV+1 )
             end if
          end if
       END IF

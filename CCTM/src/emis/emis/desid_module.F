@@ -1525,7 +1525,7 @@ C-----------------------------------------------------------------------
                    DESID_DIAG_CREATE( IDIAG ) = .FALSE.
 ! If not writing all layers, change dimension mio_nlays before file creation, 
 ! then change global attribute NLAYS to match
-                   call mio_setfile( MET_CRO_3D )
+                   call mio_setfile( INIT_CONC_1 )
                    subset_layer = ( mio_nlays .ne. LAYS )
                    if ( subset_layer ) mio_nlays = LAYS
 
@@ -1535,7 +1535,7 @@ C-----------------------------------------------------------------------
                       if (mype == 0) then
                          call mio_set_global_attr ( DESID_DIAG_LOGICAL(IDIAG), 'NLAYS', LAYS )
                          ! not sure what to do here regarding vglvls
-                         call mio_set_global_attr ( DESID_DIAG_LOGICAL(IDIAG), 'VGLVLS', MET_CRO_3D, 1, LAYS+1 )
+                         call mio_set_global_attr ( DESID_DIAG_LOGICAL(IDIAG), 'VGLVLS', INIT_CONC_1, 1, LAYS+1 )
                       end if
                    end if
                 END IF
@@ -1592,7 +1592,7 @@ C-----------------------------------------------------------------------
                      DESID_DIAG_CREATE( IDIAG ) = .FALSE.
 ! If not writing all layers, change dimension mio_nlays before file creation, 
 ! then change global attribute NLAYS to match
-                     call mio_setfile( MET_CRO_3D )
+                     call mio_setfile( INIT_CONC_1 )
                      subset_layer = ( mio_nlays .ne. LAYS )
                      if ( subset_layer ) mio_nlays = LAYS
 
@@ -1602,7 +1602,7 @@ C-----------------------------------------------------------------------
                         if (mype == 0) then
                            call mio_set_global_attr ( DESID_DIAG_LOGICAL(IDIAG), 'NLAYS', LAYS )
                            ! not sure what to do here regarding vglvls
-                           call mio_set_global_attr ( DESID_DIAG_LOGICAL(IDIAG), 'VGLVLS', MET_CRO_3D, 1, LAYS+1 )
+                           call mio_set_global_attr ( DESID_DIAG_LOGICAL(IDIAG), 'VGLVLS', INIT_CONC_1, 1, LAYS+1 )
                         end if
                      end if
                   END IF

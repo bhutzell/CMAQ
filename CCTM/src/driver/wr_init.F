@@ -93,7 +93,7 @@ C (initial data assumed to be in correct output units)
 
 ! If not writing all layers, change dimension mio_nlays before file creation, 
 ! then change global attribute NLAYS to match
-      call mio_setfile( MET_CRO_3D )
+      call mio_setfile( INIT_CONC_1 )
       if (conc_subset_layer) mio_nlays = C_NLAYS
 
       call mio_fcreate( CTM_CONC_1, mio_new_file )
@@ -101,7 +101,7 @@ C (initial data assumed to be in correct output units)
       if (conc_subset_layer) then
          if (mype == 0) then
             call mio_set_global_attr ( CTM_CONC_1, 'NLAYS', C_NLAYS )
-            call mio_set_global_attr ( CTM_CONC_1, 'VGLVLS', MET_CRO_3D, CONC_BLEV, CONC_ELEV+1 )
+            call mio_set_global_attr ( CTM_CONC_1, 'VGLVLS', INIT_CONC_1, CONC_BLEV, CONC_ELEV+1 )
          end if
       end if
       call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )

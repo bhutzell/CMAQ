@@ -475,8 +475,13 @@ C If last call this hour:  write accumulated depositions:
             END DO
 
             if ( write_firstime ) then
-               call mio_setfile( MET_CRO_2D )
+               call mio_setfile( INIT_CONC_1 )
+               mio_nlays = 1                  
                call mio_fcreate( CTM_DRY_DEP_1, mio_new_file )
+               if (mype .eq. 0) then
+                  call mio_set_global_attr( CTM_DRY_DEP_1, 'NLAYS', 1 )
+                  call mio_set_global_attr( CTM_DRY_DEP_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+               end if
                write_firstime = .false.
             end if
             call mio_fwrite( CTM_DRY_DEP_1, DDEP_SPC( V ),
@@ -508,10 +513,15 @@ C Write vdiff diagnostics
          IF ( VDIFFDIAG ) THEN
             if ( FIRST_WRITE_DIAG ) then
                FIRST_WRITE_DIAG = .FALSE.
-               call mio_setfile( MET_CRO_2D )
+               call mio_setfile( INIT_CONC_1 )
+               mio_nlays = 1
                call mio_fcreate( CTM_VDIFF_DIAG, mio_new_file )
+               if (mype .eq. 0) then
+                  call mio_set_global_attr( CTM_VDIFF_DIAG, 'NLAYS', 1 )
+                  call mio_set_global_attr( CTM_VDIFF_DIAG, 'VGLVLS', INIT_CONC_1, 1, 2 )
+               end if
                if ( GRAV_SETL ) then
-                  call mio_setfile( MET_CRO_3D )
+                  call mio_setfile( INIT_CONC_1 )
                   call mio_fcreate( CTM_VSED_DIAG, mio_new_file )
                end if
                if ( MOSAIC ) then
@@ -627,8 +637,13 @@ C re-set dry deposition array to zero
          WRDD = 0.0
          IF ( FIRST_WRITE_ISAM ) THEN
             FIRST_WRITE_ISAM = .FALSE.
-            call mio_setfile( MET_CRO_2D )
+            call mio_setfile( INIT_CONC_1 )
+            mio_nlays = 1
             call mio_fcreate( SA_DD_1, mio_new_file )
+            if (mype .eq. 0) then
+               call mio_set_global_attr( SA_DD_1, 'NLAYS', 1 )
+               call mio_set_global_attr( SD_DD_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+            end if
          END IF
          DO ITAG = 1, N_SPCTAG
             DO R = 1, NROWS
