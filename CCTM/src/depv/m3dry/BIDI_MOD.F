@@ -422,8 +422,13 @@ C--------------------------------------------------------------------------
 #ifndef mpas
             If ( FIRSTWRITE ) Then
                FIRSTWRITE = .FALSE.
-               call mio_setfile( MET_CRO_2D )
+               call mio_setfile( INIT_CONC_1 )
+               mio_nlays = 1
                call mio_fcreate( MEDIA_CONC, mio_new_file )
+               if (mype .eq. 0) then
+                  call mio_set_global_attr ( MEDIA_CONC, 'NLAYS', 1 )
+                  call mio_set_global_attr ( MEDIA_CONC, 'VGLVLS', INIT_CONC_1, 1, 2 )
+               end if
             End If
             call mio_fwrite( MEDIA_CONC, MEDIA_NAMES( V ), PNAME, WRMC, TIME_STAMP )
 

@@ -164,6 +164,9 @@
       CHARACTER(256) :: TR_NAMELIST = '' ! Tracer Species Namelist
      
       ! Chemistry and Photolysis
+      CHARACTER(32) :: MECH = ''           ! Chemical Mechanism Name as it appears in the run_script 
+                                           !   and mechanism folder names. This string may or may not 
+                                           !   match the variable MECHNAME that appears in RXNS_DATA.
       LOGICAL :: PHOTDIAG  = .FALSE.       ! Flag for PHOTDIAG file
       INTEGER :: NLAYS_DIAG = 0            ! Number of Diagnostic Layers to write out for photolysis
       INTEGER :: NWAVE = 0                 ! Number of Diagnostic Wavelengths
@@ -343,8 +346,7 @@
       !-------------------------------------------------------------------------------------------------------
       !>> Grid and High-Level Model Parameters
       !-------------------------------------------------------------------------------------------------------
-
- 
+  
       IF ( MYPE .EQ. 0 ) VARDEV = OUTDEV
 
       IF ( MYPE .EQ. 0 ) THEN 
@@ -354,7 +356,10 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
-       ! Get Logfile Directory
+      ! Get Simulation Scenario Name to Label Log Files, etc
+      CALL GET_ENV( APPL_NAME, 'CTM_APPL', APPL_NAME, VARDEV )
+
+      ! Get Logfile Directory
       CALL GET_ENV ( BLDFOLD, 'BLD', BLDFOLD, VARDEV ) 
  
       ! Get Logfile Directory
@@ -603,6 +608,9 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
+      ! Get Filename for Chemical Mechanism
+      CALL GET_ENV ( MECH, 'MECH', 'BLANK', VARDEV )
+
       ! Get photolysis rate diagnostic file flag
       CALL GET_ENV ( PHOTDIAG, 'CTM_PHOTDIAG', PHOTDIAG, VARDEV )
 
@@ -839,14 +847,18 @@
       CALL GET_ENV ( SSEMDIAG, 'CTM_SSEMDIAG', SSEMDIAG, VARDEV )
  
       ! Set CTM_MET_EMIS to Y or T ro turn on met-modulated emissions
+<<<<<<< HEAD
       CALL GET_ENV ( MET_EMIS, 'CTM_MET_EMIS', MET_EMIS, VARDEV )
+=======
+       CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
+>>>>>>> 7d6727211e29ad06ce6c1db18d3bdfff17d71344
  
       ! Get met-modulated emission diagnostic output file flag.
       CALL GET_ENV ( MET_EMIS_DIAG, 'MET_EMIS_DIAG', MET_EMIS_DIAG, VARDEV )
 
       ! Apply humidity adjustment for met-modulated mobile emissions
       CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
-
+  
       ! Set LTNG_NO to Y or T to turn on lightning NO production
       CALL GET_ENV ( LTNG_NO, 'CTM_LTNG_NO', LTNG_NO, VARDEV ) 
 
@@ -960,7 +972,8 @@
 
       IF ( OCEAN_CHEM ) THEN
        IF ( (INDEX( MECHNAME, 'CB6R5M_AE7_AQ') .GT. 0 ) .OR. 
-     &      (INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0) ) then     
+     &      (INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0 )  .OR.    
+     &      (INDEX( MECHNAME, 'CRACMM3M'     ) .GT. 0 ) ) then  
        USE_MARINE_GAS_EMISSION = .TRUE.
        ENDIF
       ENDIF

@@ -131,12 +131,11 @@
      &                VDEMIS_MVDIAG( NMETSPC,NCOLS,NROWS ), STAT = ISTAT )
             IF ( ISTAT .NE. 0 ) THEN
                 WRITE( MESG, '( A, I9 )' ) 'Error allocating ETABLE:  STATUS=', ISTAT
-                !CALL M3WARN( PNAME, 0, 0, MESG )
                 CALL LOG_WARNING( PNAME, LOGDEV, MESG )
                 METEMIS_INIT = .FALSE.
                 RETURN
             END IF
-            
+
             ETABLE = 0.0
             TEMPVAL= 0.0
             VDEMIS_MVDIAG = 0.0
@@ -173,7 +172,8 @@
                END DO
             END IF
 
-            ! Populate Data-Structures needed for DESID
+
+            ! Populate Data Structures needed for DESID
             DESID_EMVAR( IMETSRM )%LEN   = NMETSPC
             DESID_EMVAR( IMETSRM )%ARRY  = MTNAME( 1:NMETSPC )
             DESID_EMVAR( IMETSRM )%UNITS = MTUNIT( 1:NMETSPC )
@@ -189,16 +189,14 @@
             MV_TSTEP_F = TSTEP
             LDATE = STDATE; LTIME = STTIME
 
-
             ! Open Diagnostic File if Requested
-            IF ( .NOT.MET_EMIS_DIAG ) THEN
+            IF ( .NOT. MET_EMIS_DIAG ) THEN
                 CONTINUE
 
-            ELSE !IF( IO_PE_INCLUSIVE ) THEN
+            ELSE ! IF( IO_PE_INCLUSIVE ) THEN
 #ifdef mpas
                 call mio_fcreate( CTM_METEMIS_DIAG, mio_new_file )
 #else
-                
                 NVARS3D = NMETSPC
                 NLAYS3D = 1
 
@@ -273,11 +271,17 @@
             IF ( FIRSTIME ) THEN
                TOT_TSTEP = 0
                FIRSTIME = .FALSE.
-                
-               ! Create Output Diagnostic File
-               call mio_setfile( MET_CRO_2D )
-               call mio_fcreate( CTM_METEMIS_DIAG, mio_new_file )
 
+               ! Create Output Diagnostic File if requested
+               if ( MET_EMIS_DIAG ) then
+                  call mio_setfile( INIT_CONC_1 )
+                  mio_nlays = 1
+                  call mio_fcreate( CTM_METEMIS_DIAG, mio_new_file )
+                  if (mype .eq. 0) then
+                     call mio_set_global_attr ( CTM_METEMIS_DIAG, 'NLAYS', 1 )
+                     call mio_set_global_attr ( CTM_METEMIS_DIAG, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                  end if
+               end if
             END IF
 
             WRITE( MESG, '(A,I8)' ),
@@ -405,7 +409,7 @@ C ..........  Output diagnostic emissions
                     VDEMIS_MVDIAG = 0.0   ! array assignment
                  END IF ! LASTTIC
 
-              END IF      !!  if metemdiag
+              END IF      
             END IF
 
             RETURN

@@ -60,6 +60,7 @@ C   28 Jul 11 David Wong: set REVERT to .false. for twoway model case since
 C                         buffered file has only two time steps data
 C   01 Feb 19 David Wong: Implemented centralized I/O approach, removed all MY_N
 C                         clauses
+C   10 Jan 24 David Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -71,6 +72,9 @@ C-----------------------------------------------------------------------
 #endif
       use CENTRALIZED_IO_MODULE, only : interpolate_var, window
       use mio_module
+#ifdef twoway
+      use coupler_module
+#endif
 
       IMPLICIT NONE
 
@@ -160,6 +164,14 @@ C-----------------------------------------------------------------------
 
          WRITE( COMMSTR,'(4I2)' )  1, 1-NTHIK, 2, 1-NTHIK  ! ' 1 0 2 0'
 
+#ifdef twoway
+         VNAME = 'UWINDC'
+         IF ( INDEX1( VNAME, n_metdot3d_var, metdot3d_vlist ) .LE. 0 ) THEN
+            XMSG = 'Could not find ' // VNAME // ' in metdot3d_vlist' 
+            CALL LOG_WARNING( PNAME, LOGDEV, XMSG)
+            CSTAGUV = .FALSE.
+         END IF
+#else
          floc = mio_search ( MET_DOT_3D )
          if ( floc .le. 0 ) then
             xmsg = 'Error: file ' // trim(MET_DOT_3D) // ' unknown.'
@@ -169,9 +181,10 @@ C-----------------------------------------------------------------------
          VNAME = 'UWINDC'
          IF ( INDEX1( VNAME, mio_file_data(floc)%nvars, mio_file_data(floc)%var_name ) .LE. 0 ) THEN
             XMSG = 'Could not find ' // VNAME // ' in ' // MET_DOT_3D
-            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
+            CALL LOG_WARNING( PNAME, LOGDEV, XMSG)
             CSTAGUV = .FALSE.
-         END IF
+         END IF            
+#endif
 
          IF ( .NOT. CSTAGUV ) THEN
 

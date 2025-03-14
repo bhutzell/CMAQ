@@ -23,9 +23,14 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 C returns the last data date & time on file FNAME
 C specifically used only for input files
 
+C   10 Jan 24 D. Wong: Incorporated unified coupler implementation
+
       USE UTILIO_DEFN
       use mio_module
       USE LOGDEV_MOD, ONLY: M3EXIT
+#ifdef twoway
+      USE coupler_module
+#endif
 
       IMPLICIT NONE
       
@@ -50,9 +55,13 @@ C local variables:
       integer      floc, nsteps, tstep
 C-----------------------------------------------------------------------
 
-C open existing file for readonly access
-
 #ifndef mpas
+
+#ifdef twoway
+      LSTEP = coupled_model_tstep
+      LDATE = coupled_model_stdate
+      LTIME = coupled_model_sttime
+#else
       floc = mio_search( fname )
       if (floc .le. 0 ) then
          xmsg = 'ERROR: file ' // trim(fname) // ' unknown'
@@ -62,6 +71,8 @@ C open existing file for readonly access
       nsteps = mio_file_data(floc)%nsteps
       LSTEP = SEC2TIME( ( nsteps - 1 ) * TIME2SEC( tstep ) )
       call mio_get_global_attr( fname, 'SDATE', LDATE )
+#endif
+
       CALL NEXTIME( LDATE, LTIME, LSTEP )
 #endif
  

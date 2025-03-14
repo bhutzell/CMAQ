@@ -66,7 +66,8 @@
     INTEGER :: tw_sc, tw_ec, tw_sr, tw_er
     INTEGER :: tw_sc_d, tw_ec_d, tw_sr_d, tw_er_d
 
-    real :: WRF_LC_REF_LAT
+    real    :: WRF_LC_REF_LAT
+    real    :: wrfv
 
     logical :: wrf_convective_scheme,     &
                cmaq_wrf_feedback,         &    ! flag to indicate CMAQ provides aerosol information back to WRF

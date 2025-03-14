@@ -506,6 +506,7 @@ C   08 Aug 14 B.Gantt: added code for (1) increased accumulation mode
 C                      emissions, (2) sea surface temperature dependence
 C                      of emissions, and (3) reduction of surf zone
 C                      emisions
+C   10 Jan 24 David Wong: Incorporated unified coupler implmentation
  
 C References:
 C    Binkowski F.S., S.J. Roselle. Models-3 Community Multiscale Air Quality 
@@ -544,7 +545,9 @@ C-----------------------------------------------------------------------
             USE CONST, ONLY: PI, F6PI, STDTEMP, MWWAT, MWAIR, VP0
             USE ASX_DATA_MOD, ONLY: MET_DATA, GRID_DATA, svp2, svp3
 #ifdef mpas
-            use coupler_module, only : cell_vol, cell_thickness
+            use util_module, only : time2sec
+            use coupler_module, only : cell_vol, cell_ht
+            use mio_module
 #endif
 
             IMPLICIT NONE
@@ -682,7 +685,7 @@ C Initialize sea-salt output buffer
                      U10     = Met_Data%WSPD10     ( C,R )
                      SST     = max(Met_Data%TSEASFC( C,R ) - 273.15, 0.0 )
 #ifdef mpas
-                     RLAY1HT = Met_Data%RJACM ( C,R,1 ) / cell_thickness(C,1,1)
+                     RLAY1HT = Met_Data%RJACM ( C,R,1 ) / cell_ht(C,1,1)
 #else
                      RLAY1HT = Met_Data%RJACM ( C,R,1 ) / CELLHGT(c,r)
 #endif
@@ -933,8 +936,13 @@ C Then reset the sea-salt emissions array and local write counter.
 
                if ( firstwrite ) then
                   firstwrite = .false.
-                  call mio_setfile( MET_CRO_2D )
+                  call mio_setfile( INIT_CONC_1 )
+                  mio_nlays = 1
                   call mio_fcreate( CTM_SSEMIS_1, mio_new_file )
+                  if (mype .eq. 0) then
+                     call mio_set_global_attr ( CTM_SSEMIS_1, 'NLAYS', 1 )
+                     call mio_set_global_attr ( CTM_SSEMIS_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                  end if
                end if
 
                WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )
@@ -946,7 +954,6 @@ C Then reset the sea-salt emissions array and local write counter.
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                   END IF
                   CALL NEXTIME( MDATE, MTIME, TSTEP( 1 ) )
-                  call mio_setfile( CTM_CONC_1)
                   call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
                   
                   DO V = 1, NSSDIAG

@@ -643,10 +643,14 @@
                   VDEMIS_LTDIAG = VDEMIS_LTDIAG * DIVFAC   ! array assignment
                   COLUMN_DIAG = COLUMN_DIAG*DIVFAC
                   if ( firstwrite ) then
-                     call mio_setfile( MET_CRO_3D )
+                     call mio_setfile( INIT_CONC_1 )
                      call mio_fcreate( CTM_LTNGDIAG_1, mio_new_file )
-                     call mio_setfile( MET_CRO_2D )
+                     mio_nlays = 1
                      call mio_fcreate( CTM_LTNGDIAG_2, mio_new_file )
+                     if (mype .eq. 0) then
+                        call mio_set_global_attr ( CTM_LTNGDIAG_2, 'NLAYS', 1 )
+                        call mio_set_global_attr ( CTM_LTNGDIAG_2, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                     end if
                      firstwrite = .false.
                   end if
 

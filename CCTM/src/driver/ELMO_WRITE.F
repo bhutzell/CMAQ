@@ -63,7 +63,7 @@
       DO IFL = 1,N_ELMO_FILES
         
         if ( firstwrite( IFL ) ) then
-           call mio_setfile( MET_CRO_3D )
+           call mio_setfile( INIT_CONC_1 )
            subset_lay = ( ELMO_FILE( IFL )%NLAYS .NE. mio_nlays )
            if ( subset_lay ) mio_nlays = ELMO_FILE( IFL )%NLAYS
            call mio_fcreate( ELMO_FILE( IFL )%FLOGICAL, mio_new_file )
@@ -72,7 +72,7 @@
                  call mio_set_global_attr( ELMO_FILE( IFL )%FLOGICAL, 'NLAYS', 
      &                                     ELMO_FILE( IFL )%NLAYS )
                  call mio_set_global_attr( ELMO_FILE( IFL )%FLOGICAL, 
-     &                                     'VGLVLS', MET_CRO_3D,
+     &                                     'VGLVLS', INIT_CONC_1,
      &                                     ELMO_FILE( IFL )%LAY_BOT, 
      &                                     ELMO_FILE( IFL )%LAY_TOP+1 )
               end if

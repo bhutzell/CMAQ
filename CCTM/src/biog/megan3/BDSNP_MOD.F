@@ -133,12 +133,14 @@ C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
   
       USE RUNTIME_VARS
+      USE centralized_io_module
+      USE ASX_DATA_MOD
       USE HGRD_DEFN             ! horizontal domain specifications
       USE BEIS_DEFN, ONLY: NSEF ! beis
-      USE ASX_DATA_MOD
-      USE UTILIO_DEFN
       USE MIO_ASCII
       USE MIO_MODULE
+      USE PHOT_MOD, ONLY: CFRAC_2D_AVE
+      USE UTILIO_DEFN
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -146,7 +148,6 @@ C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
 #endif
 #endif
-      USE centralized_io_module
 
       IMPLICIT NONE
 C Includes:
@@ -627,8 +628,13 @@ C Final timestamp
      &                           NDEPRATE(:,1),time_stamp)
 #else
 
-      call mio_setfile( MET_CRO_2D )
+      call mio_setfile( INIT_CONC_1 )
+      mio_nlays = 1
       call mio_fcreate( SOILOUT, mio_new_file )
+      if (mype .eq. 0) then
+         call mio_set_global_attr ( SOILOUT, 'NLAYS', 1 )
+         call mio_set_global_attr ( SOILOUT, 'VGLVLS', INIT_CONC_1, 1, 2 )
+      end if
       call mio_time_format_conversion (ndate, ntime, time_stamp)
 
       call mio_fwrite( SOILOUT,'PFACTOR',PNAME,PFACTOR,TIME_STAMP)

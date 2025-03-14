@@ -1177,8 +1177,13 @@ C Then reset the emissions array and local write counter.
                sdiagv = 0.0   ! array assignment
 #endif
                if ( firstwrite ) then
-                  call mio_setfile( MET_CRO_2D )
+                  call mio_setfile( INIT_CONC_1 )
+                  mio_nlays = 1
                   call mio_fcreate( CTM_DUST_EMIS_1, mio_new_file )
+                  if (mype .eq. 0) then
+                     call mio_set_global_attr ( CTM_DUST_EMIS_1, 'NLAYS', 1 )
+                     call mio_set_global_attr ( CTM_DUST_EMIS_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                  end if
                   firstwrite = .false.
                end if
 

@@ -90,8 +90,8 @@ C-----------------------------------------------------------------------
 
       ! Local Variables:
       REAL, ALLOCATABLE :: CONC( :,:,:,: )
-      CHARACTER( 90 ) :: CMAQ_HEADER( 200 )
-      INTEGER         :: NCMAQ_HEAD
+      CHARACTER( 90 ) :: CMAQ_HEADER( 200 ), CMAQ_TOC( 200 )
+      INTEGER         :: NCMAQ_HEAD, NCMAQ_TOC
       CHARACTER( 400 ):: XMSG, BDG_FILE
       CHARACTER( 50 ) :: FM
       INTEGER         :: ASTAT
@@ -168,7 +168,7 @@ C-----------------------------------------------------------------------
               OPEN( UNIT = BDG_UNIT, FILE = BDG_FILE, STATUS = "REPLACE" )
           
               ! Write CMAQ Header
-              CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD )
+              CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD, CMAQ_TOC, NCMAQ_TOC  )
               WRITE( BDG_UNIT, '(A)' ), CMAQ_HEADER( 1:NCMAQ_HEAD )
               WRITE( BDG_UNIT, '(A1)' ),'#'
           
