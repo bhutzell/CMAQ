@@ -72,25 +72,7 @@
       IF ( RULE_STREAM_NML .EQ. 'ALL' .OR. RULE_STREAM_NML .EQ. 'TOTAL' ) THEN
          ! Special Case Where the Stream Identifier in the rule equals
          ! equals all 'ALL'. Expand the Rule to Apply to All Streams
-         ISRM = 0
-         IF ( N_FILE_GR .GT. 0 ) THEN
-           RULE_STREAM( ISRM+1:N_FILE_GR ) = .TRUE.
-           ISRM = ISRM + N_FILE_GR
-         END IF
-
-         IF ( NPTGRPS .GT. 0 ) THEN
-           RULE_STREAM( ISRM+1:ISRM+NPTGRPS ) = .TRUE.
-           ISRM = ISRM + NPTGRPS
-         END IF
-         IF ( N_FILE_TR .GT. 0 ) RULE_STREAM( ISRM+1:ISRM+N_FILE_TR ) = .TRUE.
-         IF ( IBIOSRM .GT.0 ) RULE_STREAM( IBIOSRM  ) = .TRUE.
-         IF ( IMGSRM  .GT.0 ) RULE_STREAM( IMGSRM   ) = .TRUE.
-         IF ( IMETSRM .GT.0 ) RULE_STREAM( IMETSRM  ) = .TRUE.
-         IF ( ILTSRM  .GT.0 ) RULE_STREAM( ILTSRM   ) = .TRUE.
-         IF ( ISEASRM .GT.0 ) RULE_STREAM( ISEASRM  ) = .TRUE.
-         IF ( IDUSTSRM.GT.0 ) RULE_STREAM( IDUSTSRM ) = .TRUE.
-         IF ( IMIOGSRM.GT.0 ) RULE_STREAM( IMIOGSRM ) = .TRUE.
-
+         RULE_STREAM( : ) = .TRUE.
 
       ELSE
          ! Determine if the Stream Label Refers to A Family and if So, 

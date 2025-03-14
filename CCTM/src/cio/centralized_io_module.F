@@ -5431,6 +5431,11 @@ C Read the various categories of normalized emissions
                 Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
              endif
 
+             If ( INDEX( MECHNAME, 'CRACMM3M' ) .GT. 0 ) then
+                XMSG = 'CTM_OCEAN_CHEM must be set to TRUE when using CRACMM3M mechanism' 
+                Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+             endif
+	     
           ELSEIF ( OCEAN_CHEM .AND. .NOT. USE_MARINE_GAS_EMISSION ) THEN
 
              call mio_fopen( OCEAN_1, mio_read_only )

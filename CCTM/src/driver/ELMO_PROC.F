@@ -39,6 +39,8 @@
 
       IMPLICIT NONE
 
+      REAL, PRIVATE, SAVE :: TSTEP_SYNC_R
+
       CONTAINS
 
 !-------------------------------------------------------------------------
@@ -140,6 +142,7 @@
       INIT_TIME = INIT_TIME_IN
       WRITE_STEP = .FALSE.
       INIT_STEP  = .FALSE.
+      TSTEP_SYNC_R = 1.0 / REAL( TIME2SEC( TSTEP( 2 ) ), 4 )
       IF ( ELMO_NSTEP .LT. 1 ) THEN
          WSTEP = 0
          INIT_STEP = .TRUE.
@@ -322,8 +325,35 @@
              !     Array if this is a write step
              IF ( INIT_TIME .OR. WRITE_STEP ) THEN
                OL = L1 - ELMO_FILE( IFL )%LAY_BOT + 1
+               
                DO IVAR = 1,ELMO_FILE( IFL )%N_VARS
-                   ELMO_OUT( IFL )%DATA( C1,R1,OL,IVAR ) = ELMO_USED( ELMO_FILE(IFL)%USEDID( IVAR ) )
+                   U   = ELMO_FILE( IFL )%USEDID( IVAR )
+                   IV  = ELMO_TABLE( J )%VAR_TYPE
+                   IF ( IV .EQ. ET_DDEP .OR.
+     &                  IV .EQ. ET_ISAM_DDEP .OR.
+     &                  IV .EQ. ET_DDM_DDEP .OR.
+     &                  IV .EQ. ET_WDEP .OR. 
+     &                  IV .EQ. ET_ISAM_WDEP .OR. 
+     &                  IV .EQ. ET_DDM_WDEP .OR.
+     &                  IV .EQ. ET_CMPST_DEP .OR.
+     &                  IV .EQ. ET_ISAM_CMPST_DEP .OR.
+     &                  IV .EQ. ET_DDM_CMPST_DEP .OR.
+     &                  IV .EQ. ET_DRVD_DDEP .OR.
+     &                  IV .EQ. ET_ISAM_DRVD_DDEP .OR.
+     &                  IV .EQ. ET_DDM_DRVD_DDEP .OR.
+     &                  IV .EQ. ET_DRVD_WDEP .OR.
+     &                  IV .EQ. ET_ISAM_DRVD_WDEP .OR.
+     &                  IV .EQ. ET_DDM_DRVD_WDEP ) THEN
+                     ! This is a deposition species so we should be
+                     ! outputting a flux
+                     ELMO_OUT( IFL )%DATA( C1,R1,OL,IVAR ) = 
+     &                    ELMO_USED( U ) * TSTEP_SYNC_R
+     &             
+                   ELSE
+                     ELMO_OUT( IFL )%DATA( C1,R1,OL,IVAR ) = ELMO_USED( U )
+
+                   END IF
+                   
                END DO
              END IF
  

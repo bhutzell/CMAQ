@@ -6,9 +6,8 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /home/bhutzell/CCTM_git_repository/UTIL/chemmech/input/cb6r5_ae7_aq/mech_cb6r5_ae7_aq.def
+! Source file: /work/MOD3DEV/sgq/manage_git/research/PR_1212/TEST/UTIL/chemmech/input/cb6r5_ae7_aq/mech_cb6r5_ae7_aq.def
 ! for Mechanism Name: CB6R5_AE7_AQ                    
-
 ! This file is used to create mechanism data and functions
 
 ! The following are reserved symbols declared in this file:
@@ -3178,7 +3177,7 @@
       CHARACTER( 16 )    :: HETERO( NHETERO )
 
       DATA ( HETERO( IRXXN ), IRXXN = 1, NHETERO ) / & 
-     &   'HETERO_CLNO3_WAI', 'HETERO_CLNO3_WAJ', 'HETERO_NTR2     ', &
+     &   'HETERO_CLN3_WAI ', 'HETERO_CLN3_WAJ ', 'HETERO_NTR2     ', &
      &   'HETERO_N2O5IJ   ', 'HETERO_N2O5K    ', 'HETERO_H2NO3PAIJ', &
      &   'HETERO_H2NO3PAK ', 'HETERO_H2NO3PBIJ', 'HETERO_H2NO3PBK ', &
      &   'HETERO_NO2      ', 'HETERO_IEPOX    ', 'HETERO_IEPOXOS  ', &
@@ -3273,7 +3272,7 @@
      &    'CL22            ', 'CL23            ', 'CL24            ', & ! 2   
      &    'CL25            ', 'CL26            ', 'CL27            ', & ! 3   
      &    'CL28            ', 'CL30            ', 'CL31            ', & ! 4   
-     &    'HET_CLNO3_WAI   ', 'HET_CLNO3_WAJ   ', 'SA01            ', & ! 5   
+     &    'HET_CLN3_WAI    ', 'HET_CLN3_WAJ    ', 'SA01            ', & ! 5   
      &    'SA02            ', 'SA03            ', 'SA04            ', & ! 6   
      &    'SA06            ', 'SA07            ', 'SA08            ', & ! 7   
      &    'SA09            ', 'SA10            ', 'SA11            ', & ! 8   
@@ -3399,8 +3398,8 @@
        INTEGER, PARAMETER  :: IJ_CLONO2_2         =  30
        INTEGER, PARAMETER  :: IJ_IC3ONO2          =  31
        INTEGER, PARAMETER  :: IJ_ACRO_09          =  32
-       INTEGER, PARAMETER  :: IK_HETERO_CLNO3_WAI =   1
-       INTEGER, PARAMETER  :: IK_HETERO_CLNO3_WAJ =   2
+       INTEGER, PARAMETER  :: IK_HETERO_CLN3_WAI  =   1
+       INTEGER, PARAMETER  :: IK_HETERO_CLN3_WAJ  =   2
        INTEGER, PARAMETER  :: IK_HETERO_NTR2      =   3
        INTEGER, PARAMETER  :: IK_HETERO_N2O5IJ    =   4
        INTEGER, PARAMETER  :: IK_HETERO_N2O5K     =   5

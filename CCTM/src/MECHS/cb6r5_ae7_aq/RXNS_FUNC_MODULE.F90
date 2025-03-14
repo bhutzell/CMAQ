@@ -883,10 +883,10 @@
      &                                                 1.8000D-31,   0.0000D+00,  -3.4000D+00,  & 
      &                                                 1.5000D-11,   0.0000D+00,  -1.9000D+00,  & 
      &                                                 1.0000D+00,   6.0000D-01 )
-!  Reaction Label HET_CLNO3_WAI   
-             RKI( NCELL,  256) =  BLKHET(  NCELL, IK_HETERO_CLNO3_WAI )
-!  Reaction Label HET_CLNO3_WAJ   
-             RKI( NCELL,  257) =  BLKHET(  NCELL, IK_HETERO_CLNO3_WAJ )
+!  Reaction Label HET_CLN3_WAI    
+             RKI( NCELL,  256) =  BLKHET(  NCELL, IK_HETERO_CLN3_WAI )
+!  Reaction Label HET_CLN3_WAJ    
+             RKI( NCELL,  257) =  BLKHET(  NCELL, IK_HETERO_CLN3_WAJ )
 !  Reaction Label SA01            
              RKI( NCELL,  258) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.7000D-12,   3.6000D+02 )
 !  Reaction Label SA02            

@@ -146,7 +146,7 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
 
       CHARACTER( LOG_LINE_LENGTH ) :: CTEMP
       INTEGER :: MSG_SIZE
-      INTEGER :: NLINE1, NLINE2, NLINE, NTAB, LAST_SPACE
+      INTEGER :: NLINE1, NLINE2, NLINE, NTAB, LAST_SPACE, IT
 
       CMSG = CMSG_IN
 
@@ -160,7 +160,11 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       ! Determine Length of Total Message
       MSG_SIZE = LEN_TRIM( CMSG )
       
-      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH )
+      IT = 0
+
+      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH .AND. IT .LE. 1000 )
+         IT = IT + 1
+
          ! Isolate One Line of Text
          LAST_SPACE = INDEX( CMSG( 1:NLINE+1 ), " ", BACK=.TRUE. )
      
@@ -275,6 +279,7 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       CALL UPCASE( CHEAD )
 
       ! Write the heading to the log file
+      WRITE( FUNIT, * )
       WRITE( FUNIT, * )
       WRITE( FMT, '("(", I0, "x,A,A,A)")' ) LOG_MAJOR_TAB
       WRITE( FMT2,'("(", I0, "x,A,)")' ) LOG_MAJOR_TAB
