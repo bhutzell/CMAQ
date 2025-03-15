@@ -66,12 +66,12 @@
       INTEGER :: DDM_LOG   = 6      ! Unit number of output log
       INTEGER :: ERROR_LOG = 6
       LOGICAL :: CHECK_MECHANISM  = .FALSE. ! write out Jacobian and derivatives values
-      LOGICAL :: CHECK_SORTING    = .FALSE. ! write out result of mechanism species sorting
+      LOGICAL :: CHECK_SORTING    = .TRUE. ! write out result of mechanism species sorting
       
 #ifdef verbose_ddm3d
       LOGICAL :: REPORT_CHART     = .TRUE.  ! write out species derivations and mechanism jacobian
 #else       
-      LOGICAL :: REPORT_CHART     = .FALSE. ! do not write out species derivations and mechanism jacobian
+      LOGICAL :: REPORT_CHART     = .TRUE.  ! do not write out species derivations and mechanism jacobian
 #endif        
     
 !!!!!!REAL( 8 ), ALLOCATABLE ::  RKI(  : )          ! Rate constants
@@ -88,10 +88,16 @@
       INTEGER,   ALLOCATABLE ::  JNEW2OLD( :,: )    ! YC species map
       INTEGER,   ALLOCATABLE ::  ISPECIES_REACTION( :,: ) ! species index for each reaction
       
+      INTEGER :: LENGTH_JACOBIAN_VECTOR = 0
+      INTEGER,   ALLOCATABLE ::  JACOBIAN_VECTOR_ROW ( : )
+      INTEGER,   ALLOCATABLE ::  JACOBIAN_VECTOR_COL ( : )
+      INTEGER,   ALLOCATABLE ::  JACOBIAN_VECTOR_DIAG( : )
+
       INTEGER  :: CHANGING_SPECIES = 0 ! mechanism species affected by reactions
       INTEGER  :: STEADY_SPECIES   = 0 ! mechanism species not affected by reactions
 
-      LOGICAL,   ALLOCATABLE :: JACOBIAN_FILLED( :,:,: )    ! Is Jacobian position nonzero
+      LOGICAL,   ALLOCATABLE :: JACOBIAN_FILLED ( :,:,: )    ! Is Jacobian position nonzero
+      INTEGER,   ALLOCATABLE :: JACOBIAN_SQU2VEC  ( :,: )    ! Collapses nonzero Jacobian values to vector
       
       LOGICAL                :: LSUNLIGHT  = .TRUE.
 
@@ -265,17 +271,17 @@ C..Parameters:
             
 ! map species time derivative and jacobian array
             CALL CHART_IRR
-
+            
 !  Set the number of Partial derivative terms in the Jacobian and
 !  count the number of terms for each species
-             DO I = 1, NUMB_MECH_SPC 
+             DO I = 1, NUMB_MECH_SPC
                 DO  J = 1, NUMB_MECH_SPC
                    IF ( JACOBIAN_FILLED( J,I,1 ) ) THEN
                        JACOBIAN_COUNT( J ) = JACOBIAN_COUNT( J ) + 1
                    END IF
                 END DO
              END DO
-
+       
 !  Sort the species, putting all with zero partial derivative 
 !  terms at the bottom and those with fewest PD terms at top.
 !  Set arrays for species with zero PD terms
@@ -284,11 +290,11 @@ C..Parameters:
          IF ( JACOBIAN_COUNT( JOLD ) .GT. 0 ) THEN
             CHANGING_SPECIES = CHANGING_SPECIES + 1
             JNEW = CHANGING_SPECIES
-            JNEW2OLD( JNEW,1 ) = JOLD
-            JOLD2NEW( JOLD,1 ) = JNEW
+!           JNEW2OLD( JNEW,1 ) = JOLD
+!           JOLD2NEW( JOLD,1 ) = JNEW
          ELSE
-            JNEW2OLD( CHANGING_SPECIES,1 ) = JOLD
-            JOLD2NEW( JOLD,1 ) = STEADY_SPECIES
+!           JNEW2OLD( CHANGING_SPECIES,1 ) = JOLD
+!           JOLD2NEW( JOLD,1 ) = STEADY_SPECIES
             STEADY_SPECIES = STEADY_SPECIES - 1
          END IF
       END DO
@@ -328,12 +334,13 @@ c  not recommended since computational efficiency reduced
            END IF
          END DO
 
-         JNEW2OLD( IMINNEW,1 ) = JOLD
-         JNEW2OLD( JNEW,1 )    = IMINOLD
-         JOLD2NEW( JOLD,1 )    = IMINNEW
-         JOLD2NEW( IMINOLD,1 ) = JNEW
+!        JNEW2OLD( IMINNEW,1 ) = JOLD
+!        JNEW2OLD( JNEW,1 )    = IMINOLD
+!        JOLD2NEW( JOLD,1 )    = IMINNEW
+!        JOLD2NEW( IMINOLD,1 ) = JNEW
 
       END DO
+      write(6,*)'set JOLD2NEW,JOLD2NEW'
       DO J = 1,NUMB_MECH_SPC
          JNEW = JOLD2NEW( J,1 )
          SORTED_COUNT(JNEW) = JACOBIAN_COUNT( J )
@@ -385,6 +392,7 @@ c  not recommended since computational efficiency reduced
       END IF
       
       RESET_JACOBIAN = .TRUE.
+      RESET_JACOBIAN = .FALSE.
 
 !  Reset the ISPECIES_REACTION array using the new species order developed above.
       
@@ -483,6 +491,12 @@ C=======================================================
         DO I = 1, NUMB_MECH_SPC  ! set diagonal to to true
            JACOBIAN_FILLED(I,I,1:2) = .TRUE.
         END DO
+        ALLOCATE( JACOBIAN_SQU2VEC( NUMB_MECH_SPC,NUMB_MECH_SPC ), STAT = IOS )
+        IF ( IOS .NE. 0 ) THEN
+           MSG = 'Error allocating JACOBIAN_SQU2VEC array'
+           CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
+        END IF
+        JACOBIAN_SQU2VEC = -1
             
 ! find each reaction affect each reactant and product
         ALLOCATE( REACTION_CHART( NRXNS ), STAT = IOS )
@@ -535,6 +549,7 @@ C=======================================================
                  END DO   
               END IF
            END DO
+
            IF( JACOB_OCCURANCES .GT. 0 ) THEN
                REACTION_CHART( R )%JACOB_OCCURANCES = JACOB_OCCURANCES
                JACOBIAN_TERMS = JACOBIAN_TERMS + JACOB_OCCURANCES
@@ -544,10 +559,13 @@ C=======================================================
      &                   REACTION_CHART( R )%JACOB_PARTIAL_COEFF ( JACOB_OCCURANCES ),
      &                   REACTION_CHART( R )%JACOB_PARTIAL_COL   ( JACOB_OCCURANCES ),  STAT = IOS )                      
                DO S = 1,  JACOB_OCCURANCES
-                  REACTION_CHART( R )%JACOB_PARTIAL_ROW( S )   = JACOB_PARTIAL_ROW( S )
-                  REACTION_CHART( R )%JACOB_PARTIAL_COL( S )   = JACOB_PARTIAL_COL( S )
+                  I = JACOB_PARTIAL_ROW( S )
+                  J = JACOB_PARTIAL_COL( S )
+                  REACTION_CHART( R )%JACOB_PARTIAL_ROW( S )   = I ! JACOB_PARTIAL_ROW( S )
+                  REACTION_CHART( R )%JACOB_PARTIAL_COL( S )   = J ! JACOB_PARTIAL_COL( S )
                   REACTION_CHART( R )%JACOB_PARTIAL_INDEX ( S ) = JACOB_PARTIAL_INDEX( S )
                   REACTION_CHART( R )%JACOB_PARTIAL_VECTOR( S ) = 0
+!!!!!!            REACTION_CHART( R )%JACOB_PARTIAL_VECTOR( S ) = JACOBIAN_SQU2VEC( I,J )
                   REACTION_CHART( R )%JACOB_PARTIAL_COEFF ( S ) = JACOB_PARTIAL_COEFF( S )
                END DO 
            END IF 
@@ -588,6 +606,59 @@ C=======================================================
            END IF 
         END DO
 
+! map Jacobian Matrix to Jacobian Vector
+         LENGTH_JACOBIAN_VECTOR = COUNT(  JACOBIAN_FILLED( :,:,1 ) )
+         ALLOCATE( JACOBIAN_VECTOR_ROW ( NUMB_MECH_SPC ),
+     &             JACOBIAN_VECTOR_DIAG( NUMB_MECH_SPC ),         
+     &             JACOBIAN_VECTOR_COL ( LENGTH_JACOBIAN_VECTOR ),         
+     &             STAT = IOS )
+         IF ( IOS .NE. 0 ) THEN
+             MSG = 'Error allocating  JACOBIAN_VECTOR_ROW, JACOBIAN_VECTOR_COL or JACOBIAN_VECTOR_DIAG '
+             WRITE(ERROR_LOG,*)TRIM(MSG)
+             CALL M3EXIT ( PNAME, 0, 0, MSG, XSTAT2 )
+         END IF
+!  Map vector representation of Jacobian Matrix for daylight
+         L = 0
+         R = 0
+         DO I = 1, NUMB_MECH_SPC 
+             DO  J = 1, NUMB_MECH_SPC
+                 IF ( JACOBIAN_FILLED( I,J,1 ) ) THEN
+                     L = L + 1
+                     JACOBIAN_SQU2VEC( I,J )  = L
+                     JACOBIAN_VECTOR_COL( L ) = J
+                     IF ( R .NE. I ) THEN
+                         R = I 
+                         JACOBIAN_VECTOR_ROW( R ) = L
+                     END IF
+                     IF( I .EQ. J )THEN
+                         JACOBIAN_VECTOR_DIAG( I ) = L
+!                         print*,'R, C, JACOBIAN_SQU2VEC( I,J ) = ',I,J,L
+                     END IF
+!                     print*,'R, C, JACOBIAN_SQU2VEC( I,J ) = ',I,J,L
+!                 else
+!                     print*,'r, c, jacobian_squ2vec( I,J ) = ',I,J,0
+                 END IF
+             END DO
+         END DO
+         
+!         PRINT*,'COUNT(  ( JACOBIAN_SQU2VEC > 0 ) ) = ', COUNT(  ( JACOBIAN_SQU2VEC > 0 ) ) 
+!         DO I = 1, NUMB_MECH_SPC 
+!            write(6,*)'R, C, JACOBIAN_SQU2VEC( I,I ) = ',I,I,JACOBIAN_SQU2VEC( I,I )
+!         END DO
+ 
+         DO I = 1, NRXNS
+!           write(6,'(A,5(I6,1X))')'IRXN,REACTION_CHART( IRXNS )%JACOB_OCCURANCES = ',
+!     &     I,REACTION_CHART( I )%JACOB_OCCURANCES
+           DO S = 1, REACTION_CHART( I )%JACOB_OCCURANCES
+                R = REACTION_CHART( I )%JACOB_PARTIAL_ROW( S )
+                C = REACTION_CHART( I )%JACOB_PARTIAL_COL( S )
+                REACTION_CHART( I )%JACOB_PARTIAL_VECTOR( S ) = JACOBIAN_SQU2VEC( R,C )
+!                IF( R .EQ. C )THEN
+!                    write(6,'(A,6(I6,1X))')'IRXN,R, C, JACOBIAN_SQU2VEC,JACOB_PARTIAL_VECTOR = ',I,R,C,
+!     &              JACOBIAN_SQU2VEC( R,C ),REACTION_CHART( I )%JACOB_PARTIAL_VECTOR( S )
+!                END IF
+           END DO
+        END DO
 
         DEALLOCATE( ISPECIES_LOSS,
      &              ISPECIES_PROD,
@@ -608,11 +679,11 @@ C=======================================================
 
          IMPLICIT NONE
 
-
 !..Arguments:
          INTEGER,   INTENT( IN ) ::  OUT_UNIT  ! output unit #
          
         INTEGER SPC, ISPC, JSPC, KSPC, LSPC
+        INTEGER MCOUNT,VCOUNT
         INTEGER IL, IR, IRXN, NR
         REAL(8) FACTOR
          
@@ -720,8 +791,9 @@ C=======================================================
            KSPC = ISPC ! JNEW2OLD( ISPC,1 )
            DO JSPC = 1, NUMB_MECH_SPC
               LSPC = JSPC ! JNEW2OLD( JSPC,1 )
-              WRITE(OUT_UNIT,'(A)')'JACOBIAN( ' // TRIM( CHEMISTRY_SPC( KSPC ) )
+              WRITE(OUT_UNIT,'(A)')'JACOBIAN MATRIX ( ' // TRIM( CHEMISTRY_SPC( KSPC ) )
      &        // ',' // TRIM( CHEMISTRY_SPC( LSPC ) ) // ' ) = 0.0 '
+              MCOUNT = 0
               DO IRXN = 1, NRXNS
                  DO IL = 1, REACTION_CHART( IRXN )%JACOB_OCCURANCES
                     IF( REACTION_CHART( IRXN )%JACOB_PARTIAL_ROW( IL ) .EQ. KSPC 
@@ -736,12 +808,75 @@ C=======================================================
                            WRITE(OUT_UNIT,97002)'&  - ',abs(REACTION_CHART( IRXN )%JACOB_PARTIAL_COEFF( IL )),
      &                     '*dReaction(',TRIM( RXLABEL( IRXN ) ),')/d' // TRIM( CHEMISTRY_SPC( IRR(IRXN,SPC) ) )                      
                         END IF
+                        MCOUNT = MCOUNT + 1
                     END IF
                 END DO
               END DO                  
+              IL = JACOBIAN_SQU2VEC( KSPC,LSPC )
+              VCOUNT = 0
+              IF ( IL .GT. 0  ) THEN
+                   WRITE(OUT_UNIT,'(A)')'JACOBIAN VECTOR  ( ' 
+     &             // TRIM( CHEMISTRY_SPC( KSPC ) ) // ',' // TRIM( CHEMISTRY_SPC( LSPC ) ) 
+     &             // ' ) = 0.0'
+                   DO IRXN = 1, NRXNS
+                      DO IL = 1, REACTION_CHART( IRXN )%JACOB_OCCURANCES
+                         IF( REACTION_CHART( IRXN )%JACOB_PARTIAL_ROW( IL ) .EQ. KSPC 
+     &                          .AND. REACTION_CHART( IRXN )%JACOB_PARTIAL_COL( IL ) .EQ. LSPC )THEN
+                             SPC = REACTION_CHART( IRXN )%JACOB_PARTIAL_INDEX( IL )
+                             !SPC = JNEW2OLD( SPC,1 )
+                             IF( REACTION_CHART( IRXN )%JACOB_PARTIAL_COEFF( IL ) .GT. 0.0 )THEN
+                                WRITE(OUT_UNIT,97002)'&  + ',
+     &                           abs( REACTION_CHART( IRXN )%JACOB_PARTIAL_COEFF( IL ) ),
+     &                          '*dReaction(' ,TRIM( RXLABEL( IRXN ) ),')/d'  // TRIM( CHEMISTRY_SPC( IRR(IRXN,SPC) ) )                      
+                             ELSE
+                                WRITE(OUT_UNIT,97002)'&  - ',abs(REACTION_CHART( IRXN )%JACOB_PARTIAL_COEFF( IL )),
+     &                          '*dReaction(',TRIM( RXLABEL( IRXN ) ),')/d' // TRIM( CHEMISTRY_SPC( IRR(IRXN,SPC) ) )                      
+                             END IF
+                             VCOUNT = VCOUNT + 1
+                         END IF
+                     END DO
+                   END DO 
+              END IF
+              IF ( MCOUNT .NE. VCOUNT ) THEN
+                  WRITE( OUT_UNIT,'(A,2(I4,1X),2(A,I6))')
+     &           'Problem Jacobian Vector inconsistent to Matrix at ROW,COL ',
+     &            KSPC,LSPC,' Matrix Terms ',MCOUNT,' Vector Terms ',VCOUNT
+              END IF 
            END DO
         END DO   
-        
+       
+       ! write out Jacobian(s) vector values
+!!        DO ISPC = 1, NUMB_MECH_SPC
+!!           KSPC = ISPC ! JNEW2OLD( ISPC,1 )
+!!           DO JSPC = 1, NUMB_MECH_SPC
+!!              LSPC = JSPC ! JNEW2OLD( JSPC,1 )
+!!              IL = JACOBIAN_SQU2VEC( KSPC,LSPC )
+!!              VCOUNT = 0 
+!!              IF ( IL .GT. 0  ) THEN
+!!                   WRITE(OUT_UNIT,'(A)')'JACOBIAN VECTOR  ( ' 
+!!     &             // TRIM( CHEMISTRY_SPC( KSPC ) ) // ',' // TRIM( CHEMISTRY_SPC( LSPC ) ) 
+!!     &             // ' ) = 0.0'
+!!                   DO IRXN = 1, NRXNS
+!!                      DO IL = 1, REACTION_CHART( IRXN )%JACOB_OCCURANCES
+!!                         IF( REACTION_CHART( IRXN )%JACOB_PARTIAL_ROW( IL ) .EQ. KSPC 
+!!     &                          .AND. REACTION_CHART( IRXN )%JACOB_PARTIAL_COL( IL ) .EQ. LSPC )THEN
+!!                             SPC = REACTION_CHART( IRXN )%JACOB_PARTIAL_INDEX( IL )
+!!                             !SPC = JNEW2OLD( SPC,1 )
+!!                             IF( REACTION_CHART( IRXN )%JACOB_PARTIAL_COEFF( IL ) .GT. 0.0 )THEN
+!!                                WRITE(OUT_UNIT,97002)'&  + ',
+!!     &                           abs( REACTION_CHART( IRXN )%JACOB_PARTIAL_COEFF( IL ) ),
+!!     &                          '*dReaction(' ,TRIM( RXLABEL( IRXN ) ),')/d'  // TRIM( CHEMISTRY_SPC( IRR(IRXN,SPC) ) )                      
+!!                             ELSE
+!!                                WRITE(OUT_UNIT,97002)'&  - ',abs(REACTION_CHART( IRXN )%JACOB_PARTIAL_COEFF( IL )),
+!!     &                          '*dReaction(',TRIM( RXLABEL( IRXN ) ),')/d' // TRIM( CHEMISTRY_SPC( IRR(IRXN,SPC) ) )                      
+!!                             END IF
+!!                         END IF
+!!                     END DO
+!!                   END DO
+!!              END IF                  
+!!           END DO
+!!        END DO   
+ 
 97001   FORMAT(7X,F7.4,'*',A)
 97002   FORMAT(5X,A,F8.5,A,A,A)
 
@@ -759,6 +894,8 @@ C
 C***********************************************************************
 
       USE RXNS_DATA
+      USE RUNTIME_VARS
+      USE UTILIO_DEFN
 
       IMPLICIT NONE
 
@@ -787,43 +924,36 @@ C..Local Variables:
       REAL( 8 ) :: EXPLIC( 3 )   ! Reaction partial derivatives
       
       LOGICAL, SAVE :: INITIALIZE = .TRUE.
+      LOGICAL, SAVE :: FIRSTCALL  = .TRUE.
+
+      INTEGER, SAVE :: NCALLS = 0
 
       INTEGER, ALLOCATABLE       :: JACOBIAN_COL( : )
       INTEGER, ALLOCATABLE       :: JACOBIAN_ROW( : )
+      LOGICAL, ALLOCATABLE       :: MATRIX_FILLED( :,: )
+      INTEGER, ALLOCATABLE       :: SQUARE_TO_VECTOR( :,: )
       CHARACTER(16), ALLOCATABLE :: JACOBIAN_COL_SPECIES( : )
       CHARACTER(16), ALLOCATABLE :: JACOBIAN_ROW_SPECIES( : )
-      
+
 C***********************************************************************
 
-      IF( RESET_JACOBIAN )THEN ! reroder row and columns of Jacobian
-                               ! using sorted species maps
-      
-          DO NRK = 1, NRXNS
-             DO NP = 1, REACTION_CHART( NRK )%JACOB_OCCURANCES             
-                JROW  = REACTION_CHART( NRK )%JACOB_PARTIAL_ROW( NP ) 
-                JCOL  = REACTION_CHART( NRK )%JACOB_PARTIAL_COL( NP ) 
-                JROW = JOLD2NEW( JROW,1 )
-                JCOL = JOLD2NEW( JCOL,1 )
-                REACTION_CHART( NRK )%JACOB_PARTIAL_ROW( NP ) = JROW
-                REACTION_CHART( NRK )%JACOB_PARTIAL_COL( NP ) = JCOL
-             END DO
-          END DO
-
-          DO NRK = 1, NRXNS
-             DO NP = 1,REACTION_CHART( NRK )%NREACTANTS
-                JR1 = JOLD2NEW( REACTION_CHART( NRK )%REACTANT( NP ),1 )
-                REACTION_CHART( NRK )%REACTANT( NP ) = JR1
-             END DO
-          END DO
-        
+      NCALLS = NCALLS + 1
+      IF( RESET_JACOBIAN )THEN 
+! reorder row and columns of Jacobian Filled
+! using sorted species maps
+          CALL REORDER_JACOBIANS()        
           RESET_JACOBIAN = .FALSE.
-
       END IF
       IF( INITIALIZE )THEN
+          CHECK_MECHANISM = .TRUE.
           INITIALIZE = .FALSE.
       END IF
 c...initialize Jacobian
-      JAC( :,: )  = 0.0
+      JAC( 1:NUMB_MECH_SPC,1:NUMB_MECH_SPC )  = 0.0
+      JROW = 1
+      JCOL = 1
+      write(6,'(A,2(i6,1x),3(es16.6,1X))')'JROW, JCOL, JAC = ',JROW,JCOL,JAC( JROW, JCOL )
+
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Loop over reaction rates adding partial derivatives; EXPLIC
 c  holds the values according to number of reactants
@@ -863,24 +993,351 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
              FRACN = REACTION_CHART( NRK )%JACOB_PARTIAL_COEFF( NP )
              IPART = REACTION_CHART( NRK )%JACOB_PARTIAL_INDEX( NP )
              JAC( JROW, JCOL ) = JAC( JROW, JCOL ) + REAL(FRACN * EXPLIC( IPART ) )
+             IF( JCOL .EQ. 1 .AND. JROW .EQ. 1 .AND. NCALLS .LT. 3 )THEN  
+!                write(6,'(A,i6,1x,es16.6)')'NRK,JACOB_PARTIAL_COEFF = ',NRK,FRACN
+!                write(6,'(A,i6,1x,i6)')'NRK,JACOB_PARTIAL_INDEX = ',NRK,IPART
+                 write(6,'(A,i6,1x,3(es16.6,1X))')'NRK, FRACN * EXPLIC( IPART )= ',NRK,FRACN,EXPLIC(IPART),JAC( JROW, JCOL )
+             END IF
           END DO
       END DO LOOP_REACTIONS
             
-      IF( .NOT. CHECK_MECHANISM )RETURN
+      IF( .NOT. FIRSTCALL .OR. MYPE .NE. 0 )RETURN
+      FIRSTCALL = .FALSE.
       
       DO JROW = 1, NUMB_MECH_SPC
-         JR1 = JROW ! JOLD2NEW( JROW,1 )
+         JR1 = JNEW2OLD( JROW,1 )
          DO JCOL = 1, NUMB_MECH_SPC
-              JR2 = JCOL ! JOLD2NEW( JCOL,1 )
-              WRITE(6,'(2(I4,1X),A32,ES16.6)')JR1,JR2,
-     &         'JACOBIAN( ' // TRIM( CHEMISTRY_SPC( JROW ) )
-     &        // ',' // TRIM( CHEMISTRY_SPC( JCOL ) ) // ' ) = ', JAC( JR1, JR2 )
+              JR2 = JNEW2OLD( JCOL,1 )
+              WRITE(6,'(2(I4,1X),A57,ES16.6)')JR1,JR2,
+     &         'JACOBIAN_MATRIX( ' // TRIM( CHEMISTRY_SPC( JR1 ) )
+     &        // ',' // TRIM( CHEMISTRY_SPC( JR2 ) ) // ' ) = ', JAC( JROW, JCOL )
           END DO
       END DO   
       
 
       RETURN 
       END SUBROUTINE EVALUATE_F_JAC_MECH
+      SUBROUTINE REORDER_JACOBIANS( )
+
+C***********************************************************************
+C
+C  Function: Compute the Jacobian Vector, [J(s)] where d[dCi/dt]/dCj != 0
+C  based on mechanism reactions  and that rate constants or species
+C  concentrations are nonzero
+C
+C  Preconditions: None
+C
+C  Key Subroutines/Functions Called: None
+C
+C***********************************************************************
+
+      USE RXNS_DATA
+      USE RUNTIME_VARS
+      USE UTILIO_DEFN
+
+      IMPLICIT NONE
+
+C..Includes:
+
+C..Arguments: None
+
+
+C..Parameters: None
+
+C..External Functions: None
+
+C..Local Variables:
+      INTEGER JR1, JR2, JR3  ! Pointer to reactant species conc.
+      INTEGER I, J, L, R     ! Pointer to reactant species conc.
+      INTEGER JROW           ! Jacobian Row
+      INTEGER JCOL           ! Jacobian Column
+      INTEGER NP             ! Loop index over partial derivation terms
+      INTEGER IPART          ! index for partial derivation of reaction
+      INTEGER NRK            ! Reaction number
+      INTEGER IOS
+            
+      LOGICAL, SAVE :: INITIALIZE = .TRUE.
+      LOGICAL, SAVE :: FIRSTCALL  = .TRUE.
+
+      INTEGER, ALLOCATABLE       :: JACOBIAN_COL( : )
+      INTEGER, ALLOCATABLE       :: JACOBIAN_ROW( : )
+      LOGICAL, ALLOCATABLE       :: MATRIX_FILLED( :,: )
+      INTEGER, ALLOCATABLE       :: SQUARE_TO_VECTOR( :,: )
+      CHARACTER(16), ALLOCATABLE :: JACOBIAN_COL_SPECIES( : )
+      CHARACTER(16), ALLOCATABLE :: JACOBIAN_ROW_SPECIES( : )
+      
+C***********************************************************************
+
+          IF( .NOT. RESET_JACOBIAN ) RETURN ! using sorted species maps
+      
+          ALLOCATE( MATRIX_FILLED( NUMB_MECH_SPC,NUMB_MECH_SPC ), STAT = IOS )
+          IF ( IOS .NE. 0 ) THEN
+            CALL M3EXIT ( 'EVALUATE_F_JAC_VECTOR', 0, 0, 
+     &      'Error allocating SQUARE_TO_VECTOR array', XSTAT2 )
+          END IF
+          DO JR1 = 1, NUMB_MECH_SPC
+             JROW = JOLD2NEW( JR1,1 )
+             DO JR2 = 1, NUMB_MECH_SPC
+                JCOL = JOLD2NEW( JR2,1 )
+                MATRIX_FILLED( JROW,JCOL ) =  JACOBIAN_FILLED( JR1,JR2,1 )
+             END DO
+          END DO
+          JACOBIAN_FILLED( :,:,1 ) = MATRIX_FILLED( :,: )
+
+!          JR3  = 0
+!          JROW = 0
+!          DO JR1 = 1, NUMB_MECH_SPC 
+!             DO JR2 = 1, NUMB_MECH_SPC
+!               IF ( JACOBIAN_FILLED( JR1,JR2,1 ) ) THEN
+!                  JR3 = JR3 + 1
+!                  JACOBIAN_SQU2VEC( JR1,JR2 )  = JR3
+!                  JACOBIAN_VECTOR_COL( JR3 ) = JR2
+!                  IF ( JROW .NE. JR1 ) THEN
+!                      JROW = JR1
+!                      JACOBIAN_VECTOR_ROW( JROW ) = JR3
+!                  END IF
+!                  IF( JR1 .EQ. JR2 )THEN
+!                      JACOBIAN_VECTOR_DIAG( JR1 ) = JR3
+!                  END IF
+!               END IF
+!            END DO
+!          END DO
+
+!  Map vector representation of Jacobian Matrix for daylight
+          L = 0
+          R = 0
+          DO I = 1, NUMB_MECH_SPC 
+              DO  J = 1, NUMB_MECH_SPC
+                  IF ( JACOBIAN_FILLED( I,J,1 ) ) THEN
+                      L = L + 1
+                      JACOBIAN_SQU2VEC( I,J )  = L
+                      JACOBIAN_VECTOR_COL( L ) = J
+                      IF ( R .NE. I ) THEN
+                          R = I 
+                          JACOBIAN_VECTOR_ROW( R ) = L
+                      END IF
+                      IF( I .EQ. J )THEN
+                          JACOBIAN_VECTOR_DIAG( I ) = L
+!                          print*,'R, C, JACOBIAN_SQU2VEC( I,J ) = ',I,J,L
+                      END IF
+!                     print*,'R, C, JACOBIAN_SQU2VEC( I,J ) = ',I,J,L
+!                 else
+!                     print*,'r, c, jacobian_squ2vec( I,J ) = ',I,J,0
+                  END IF
+              END DO
+          END DO
+
+          DO NRK = 1, NRXNS
+             DO NP = 1, REACTION_CHART( NRK )%JACOB_OCCURANCES             
+                JROW  = REACTION_CHART( NRK )%JACOB_PARTIAL_ROW( NP ) 
+                JCOL  = REACTION_CHART( NRK )%JACOB_PARTIAL_COL( NP ) 
+                JROW = JOLD2NEW( JROW,1 )
+                JCOL = JOLD2NEW( JCOL,1 )
+                REACTION_CHART( NRK )%JACOB_PARTIAL_ROW( NP ) = JROW
+                REACTION_CHART( NRK )%JACOB_PARTIAL_COL( NP ) = JCOL
+                REACTION_CHART( NRK )%JACOB_PARTIAL_VECTOR( NP ) = JACOBIAN_SQU2VEC( JROW,JCOL )
+             END DO
+          END DO
+          
+          DO NRK = 1, NRXNS
+             DO NP = 1,REACTION_CHART( NRK )%NREACTANTS
+                JR1 = JOLD2NEW( REACTION_CHART( NRK )%REACTANT( NP ),1 )
+                REACTION_CHART( NRK )%REACTANT( NP ) = JR1
+             END DO
+          END DO
+        
+          RESET_JACOBIAN = .FALSE.
+
+      END SUBROUTINE REORDER_JACOBIANS
+  
+      SUBROUTINE EVALUATE_F_JAC_VECTOR( YIN, RKI, JAC )
+
+C***********************************************************************
+C
+C  Function: Compute the Jacobian Vector, [J(s)] where d[dCi/dt]/dCj != 0
+C  based on mechanism reactions  and that rate constants or species
+C  concentrations are nonzero
+C
+C  Preconditions: None
+C
+C  Key Subroutines/Functions Called: None
+C
+C***********************************************************************
+
+      USE RXNS_DATA
+      USE RUNTIME_VARS
+      USE UTILIO_DEFN
+
+      IMPLICIT NONE
+
+C..Includes:
+
+C..Arguments:
+      REAL( 8 ), INTENT( IN ) :: YIN( : )    ! species concs, ppm
+      REAL( 8 ), INTENT( IN ) :: RKI(  : )   ! Rate constants so reaction rates are ppm//min
+      REAL( 4 ), INTENT(OUT)  :: JAC(  : )   ! jacobian values 
+
+C..Parameters: None
+
+C..External Functions: None
+
+C..Local Variables:
+      INTEGER JR1, JR2, JR3  ! Pointer to reactant species conc.
+      INTEGER JROW           ! Jacobian Row
+      INTEGER JCOL           ! Jacobian Column
+      INTEGER NP             ! Loop index over partial derivation terms
+      INTEGER IPART          ! index for partial derivation of reaction
+      INTEGER NRK            ! Reaction number
+      INTEGER IOS
+      
+      REAL( 8 ) :: CR2           ! Temporary product for 3 reactant reaction
+      REAL( 8 ) :: FRACN         ! Stoichiometric coefficient
+      REAL( 8 ) :: EXPLIC( 3 )   ! Reaction partial derivatives
+      
+      LOGICAL, SAVE :: INITIALIZE = .TRUE.
+      LOGICAL, SAVE :: FIRSTCALL  = .TRUE.
+
+      INTEGER, ALLOCATABLE       :: JACOBIAN_COL( : )
+      INTEGER, ALLOCATABLE       :: JACOBIAN_ROW( : )
+      LOGICAL, ALLOCATABLE       :: MATRIX_FILLED( :,: )
+      INTEGER, ALLOCATABLE       :: SQUARE_TO_VECTOR( :,: )
+      CHARACTER(16), ALLOCATABLE :: JACOBIAN_COL_SPECIES( : )
+      CHARACTER(16), ALLOCATABLE :: JACOBIAN_ROW_SPECIES( : )
+      
+C***********************************************************************
+
+      IF( RESET_JACOBIAN )THEN 
+! reorder row and columns of Jacobian Filled
+! using sorted species maps
+          CALL REORDER_JACOBIANS()        
+          RESET_JACOBIAN = .FALSE.
+      END IF
+      IF( INITIALIZE )THEN
+          CHECK_MECHANISM = .TRUE.
+          INITIALIZE = .FALSE.
+      END IF
+c...initialize Jacobian
+      JAC( 1:LENGTH_JACOBIAN_VECTOR )  = 0.0
+       JR1 = 1
+!     JAC( JR1 )  = 0.0
+       write(6,'(A,i6,1x,3(es16.6,1X))')' JR1, JAC( JR1 ) = ',JR1,JAC(JR1)
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  Loop over reaction rates adding partial derivatives; EXPLIC
+c  holds the values according to number of reactants
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+      LOOP_REACTIONS: DO NRK = 1, NRXNS
+         IF( REACTION_CHART( NRK )%LIGHT_DEPENDENT .AND. .NOT. LSUNLIGHT )CYCLE    
+c...partial derivatives for reactions with 1 reactant
+         SELECT CASE ( REACTION_CHART( NRK )%NREACTANTS )
+            CASE( 1 ) 
+               EXPLIC( 1 ) = RKI( NRK ) 
+c...partial derivatives for reactions with 2 reactants
+            CASE( 2 ) 
+               JR1 = REACTION_CHART( NRK )%REACTANT( 1 )
+               JR2 = REACTION_CHART( NRK )%REACTANT( 2 )
+               EXPLIC( 1 )  = RKI( NRK )
+     &                      * YIN( JR2 )
+               EXPLIC( 2 )  = RKI( NRK )
+     &                      * YIN( JR1 ) 
+c.....partial derivatives for reactions with 3 reactants
+            CASE( 3 ) 
+               JR1 = REACTION_CHART( NRK )%REACTANT( 1 )
+               JR2 = REACTION_CHART( NRK )%REACTANT( 2 )
+               JR3 = REACTION_CHART( NRK )%REACTANT( 3 )
+               CR2 = RKI( NRK ) * YIN( JR2 )
+               EXPLIC( 1 ) = CR2 * YIN( JR3 )
+               EXPLIC( 2 ) = RKI( NRK )
+     &                     * YIN( JR1 )
+     &                     * YIN( JR3 ) 
+               EXPLIC( 3 ) = CR2 * YIN( JR1 )
+         END SELECT
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c  Add Reaction's Partial Derivative to Jacobian 
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+          DO NP = 1, REACTION_CHART( NRK )%JACOB_OCCURANCES          
+             JR1   = REACTION_CHART( NRK )%JACOB_PARTIAL_VECTOR( NP ) 
+             FRACN = REACTION_CHART( NRK )%JACOB_PARTIAL_COEFF( NP )
+             IPART = REACTION_CHART( NRK )%JACOB_PARTIAL_INDEX( NP )
+             JAC( JR1 ) = JAC( JR1 ) + REAL(FRACN * EXPLIC( IPART ) )
+             IF( JR1 .EQ. 1 )THEN  
+!                write(6,'(A,i6,1x,es16.6)')'NRK,JACOB_PARTIAL_COEFF = ',NRK,FRACN
+!                write(6,'(A,i6,1x,i6)')'NRK,JACOB_PARTIAL_INDEX = ',NRK,IPART
+                 write(6,'(A,i6,1x,3(es16.6,1X))')'NRK, FRACN, EXPLIC( IPART )= ',NRK,FRACN,EXPLIC(IPART),JAC( JR1 )
+             END IF
+          END DO
+      END DO LOOP_REACTIONS
+            
+      IF( .NOT. FIRSTCALL  .OR. MYPE .NE. 0 )RETURN
+      FIRSTCALL = .FALSE.
+      
+      DO JROW = 1, NUMB_MECH_SPC
+         JR1 = JNEW2OLD( JROW,1 )
+         DO JCOL = 1, NUMB_MECH_SPC
+              JR2 = JNEW2OLD( JCOL,1 )
+              NP = JACOBIAN_SQU2VEC( JROW,JCOL )
+              IF ( NP .GT. 0 ) THEN
+                 WRITE(6,'(3(I4,1X),A57,ES16.6)')JR1,JR2,NP,
+     &           'JACOBIAN_VECTOR( ' // TRIM( CHEMISTRY_SPC( JR1 ) )
+     &           // ',' // TRIM( CHEMISTRY_SPC( JR2 ) ) // ' ) = ', JAC( NP )
+              ELSE
+                 WRITE(6,'(3(I4,1X),A66,ES16.6)')JR1,JR2,NP,
+     &           'JACOBIAN_VECTOR( ' // TRIM( CHEMISTRY_SPC( JR1 ) )
+     &           // ',' // TRIM( CHEMISTRY_SPC( JR2 ) ) // ' ) = 0.0E+0 '              
+              END IF
+              
+          END DO
+      END DO   
+      
+
+      RETURN 
+      END SUBROUTINE EVALUATE_F_JAC_VECTOR
+      SUBROUTINE CHECK_JAC_VECTOR( JAC_SQUARE,JAC_VECTOR )
+
+         USE RXNS_DATA
+
+! Compares Spare Vector representation of Jacobian against Matrix representation
+
+         IMPLICIT NONE
+
+         REAL  :: JAC_SQUARE( :,: )
+         REAL  :: JAC_VECTOR( : )
+
+         REAL  :: DIFF
+         REAL  :: SUM_DIFFS
+
+         INTEGER :: JROW, JCOL
+         INTEGER :: JR1, JR2
+         INTEGER :: NP
+
+         SUM_DIFFS = 0.0
+
+         DO JROW = 1, NUMB_MECH_SPC
+            JR1 = JNEW2OLD( JROW,1 )
+            WRITE(6,'(2(I4,1X),A)')JROW,JR1,'CHEMISTRY_SPC = ' // TRIM(CHEMISTRY_SPC( JR1 ))
+         END DO
+         DO JROW = 1, NUMB_MECH_SPC
+            JR1 = JNEW2OLD( JROW,1 )
+            DO JCOL = 1, NUMB_MECH_SPC
+                 JR2 = JNEW2OLD( JCOL,1 )
+                 NP = JACOBIAN_SQU2VEC( JROW,JCOL )
+                 IF ( NP .GT. 0 ) THEN
+                    DIFF =  JAC_VECTOR( NP ) - JAC_SQUARE( JROW,JCOL )
+                    WRITE(6,'(3(I4,1X),A57,3(ES16.6,1X))')JR1,JR2,NP,
+     &              'JACOBIAN_DIFF( ' // TRIM( CHEMISTRY_SPC( JR1 ) )
+     &              // ',' // TRIM( CHEMISTRY_SPC( JR2 ) ) // ' ) = ', DIFF,
+     &              JAC_VECTOR( NP ),JAC_SQUARE( JROW,JCOL )
+                 ELSE
+                    DIFF =  - JAC_SQUARE( JROW,JCOL )
+                    WRITE(6,'(3(I4,1X),A57,ES16.6)')JR1,JR2,NP,
+     &              'JACOBIAN_SQUARE( ' // TRIM( CHEMISTRY_SPC( JR1 ) )
+     &              // ',' // TRIM( CHEMISTRY_SPC( JR2 ) ) // ' ) = ', DIFF
+                 END IF
+                 SUM_DIFFS = SUM_DIFFS + DIFF
+             END DO
+         END DO
+
+         WRITE(6,'("SUM: VECTOR-SQUARE = ",ES16.6)')SUM_DIFFS
+      END SUBROUTINE CHECK_JAC_VECTOR
        SUBROUTINE EVALUATE_F_MECH( YIN, TAIR, DAIR, RKI, YDOT )
 
 C***********************************************************************

@@ -29,6 +29,7 @@ C-----------------------------------------------------------------------
                                               ! (See s_lu.F)
       Real, Allocatable, Save :: A1( :, : )
       Real, Allocatable, Save :: PDT( :, : )
+      Real, Allocatable, Save :: PDT_VECTOR( : )
       Real, Allocatable, Save :: PRD( : )
       Real, Allocatable, Save :: PRD_RATE( : )             ! Contribution to PRD from rxn rate sens
       Real, Allocatable, Save :: SOLD( : )
@@ -58,6 +59,7 @@ C-----------------------------------------------------------------------
 
       Use RXNS_DATA, Only: NUMB_MECH_SPC, NRXNS, CGRID_INDEX
       Use UTILIO_DEFN                   ! IOAPI parameters and functions declarations
+      Use MECHANISM_FUNCTIONS, Only: LENGTH_JACOBIAN_VECTOR
 
       Implicit None
 
@@ -109,6 +111,12 @@ C-----------------------------------------------------------------------
      &          PDT2( NUMB_MECH_SPC, NUMB_MECH_SPC ), STAT = ALLOCSTAT )
       IF ( ALLOCSTAT .NE. 0 ) THEN
          XMSG = 'Failure allocating A, A1, PDT, or PDT2'
+         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
+      END IF
+
+      ALLOCATE( PDT_VECTOR( LENGTH_JACOBIAN_VECTOR  ), STAT = ALLOCSTAT )
+      IF ( ALLOCSTAT .NE. 0 ) THEN
+         XMSG = 'Failure allocating PDT_VECTOR'
          CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
@@ -198,8 +206,10 @@ C-----------------------------------------------------------------------
       Integer HITMP2
 
       Logical, Save :: FIRSTIME = .TRUE.
+      Logical, Save :: CHECK_VECTOR = .TRUE.
       Logical, Save :: REORDER  = .TRUE. ! reorder YCDDM
       Integer, Save :: LOGDEV
+      Integer, Save :: NCALLS = 0
 
       Character( 96 ) :: XMSG = ' '
 
@@ -306,6 +316,12 @@ C-----------------------------------------------------------------------
       END IF
 
       CALL  EVALUATE_F_JAC_MECH( YCDDM, SRK, PDT ) ! Evaluate Jacobian based on YCDDM and SKR values
+      IF( CHECK_VECTOR )THEN
+         CALL  EVALUATE_F_JAC_VECTOR( YCDDM, SRK, PDT_VECTOR ) ! Evaluate Jacobian Vector based on YCDDM and SKR values
+         CALL CHECK_JAC_VECTOR( PDT,PDT_VECTOR )
+         NCALLS = NCALLS + 1
+         IF( NCALLS .GE. 2 )CHECK_VECTOR = .FALSE.
+      END IF 
 
       DO 433 J = 1, NUMB_MECH_SPC
          DO 434 I = 1, NUMB_MECH_SPC
@@ -509,6 +525,128 @@ C end of edits
       Return
 
       End Subroutine SOLVE_DDM3D_CHEM
+
+        ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        SUBROUTINE KppDecomp( JVS, NVAR, IER )
+        ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        !        Sparse LU factorization
+        ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+              USE MECHANISM_FUNCTIONS, LU_DIAG => JACOBIAN_VECTOR_DIAG, 
+     &                                 LU_CROW => JACOBIAN_VECTOR_ROW, 
+     &                                 LU_ICOL => JACOBIAN_VECTOR_COL,
+     &                                 LU_NONZERO => LENGTH_JACOBIAN_VECTOR
+              IMPLICIT NONE        
+              INTEGER,       INTENT( OUT) :: IER
+              INTEGER,       INTENT( IN ) :: NVAR
+              REAL(kind=4),  INTENT( INOUT ) :: JVS( : )
+! local              
+              INTEGER      :: k, kk, j, jj
+              REAL(kind=4) :: A              
+              REAL(kind=4), PARAMETER :: SMALL = TINY(0.0)
+              REAL(kind=4), ALLOCATABLE, SAVE :: W(:)
+
+              LOGICAL, SAVE :: INITIALIZE = .TRUE.
+              
+              IF ( INITIALIZE ) THEN
+                   INITIALIZE = .FALSE.
+                   ALLOCATE( W ( NVAR ), STAT = K )
+                   IF ( K .NE. 0 ) THEN
+                      IER = -1
+                      WRITE(6,*)"Failure allocating W in KppDecomp"
+                      RETURN
+                   END IF
+              END IF
+        
+              A   = 0.0 
+              IER = 0
+              DO k=1,NVAR
+                IF ( ABS(JVS(LU_DIAG(k))) < SMALL ) THEN
+                    IER = k
+                    RETURN
+                END IF
+                DO kk = LU_CROW(k), LU_CROW(k+1)-1
+                      W( LU_ICOL(kk) ) = JVS(kk)
+                END DO
+                DO kk = LU_CROW(k), LU_DIAG(k)-1
+                    j = LU_ICOL(kk)
+                    A = -W(j) / JVS( LU_DIAG(j) )
+                    W(j) = -A
+                    DO jj = LU_DIAG(j)+1, LU_CROW(j+1)-1
+                       W( LU_ICOL(jj) ) = W( LU_ICOL(jj) ) + a*JVS(jj)
+                    END DO
+                 END DO
+                 DO kk = LU_CROW(k), LU_CROW(k+1)-1
+                    JVS(kk) = W( LU_ICOL(kk) )
+                 END DO
+              END DO
+        
+        END SUBROUTINE KppDecomp
+        ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        SUBROUTINE KppSolveIndirect( JVS, NVAR, X )
+        ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        !        Sparse solve subroutine using indirect addressing
+        ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+              USE MECHANISM_FUNCTIONS, LU_DIAG => JACOBIAN_VECTOR_DIAG, 
+     &                                 LU_CROW => JACOBIAN_VECTOR_ROW, 
+     &                                 LU_ICOL => JACOBIAN_VECTOR_COL,
+     &                                 LU_NONZERO => LENGTH_JACOBIAN_VECTOR
+        
+              IMPLICIT NONE
+              
+              INTEGER,       INTENT( IN )    :: NVAR
+              REAL(kind=4),  INTENT( IN )    :: JVS( : )
+              REAL(kind=4),  INTENT( INOUT ) :: X( : )
+! local:
+              INTEGER      :: i, j
+              REAL(kind=4) :: TOTAL
+        
+              DO i=1,NVAR
+                 DO j = LU_CROW(i), LU_DIAG(i)-1
+                     X(i) = X(i) - JVS(j)*X(LU_ICOL(j))
+                 END DO
+              END DO
+        
+              DO i=NVAR,1,-1
+                TOTAL = X(i)
+                DO j = LU_DIAG(i)+1, LU_CROW(i+1)-1
+                  TOTAL = TOTAL- JVS(j)*X(LU_ICOL(j))
+                END DO
+                X(i) = TOTAL/JVS(LU_DIAG(i))
+              END DO
+        
+        END SUBROUTINE KppSolveIndirect
+
+        ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        FUNCTION SMatrixVectorProduct( JVS, X, NVAR ) RESULT( Y )
+        ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        !        Sparse Matrix time Dense Vector Product
+        ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+              USE MECHANISM_FUNCTIONS, LU_DIAG => JACOBIAN_VECTOR_DIAG,
+     &                                 LU_CROW => JACOBIAN_VECTOR_ROW,
+     &                                 LU_ICOL => JACOBIAN_VECTOR_COL,
+     &                                 LU_NONZERO => LENGTH_JACOBIAN_VECTOR
+
+              IMPLICIT NONE
+
+              INTEGER,       INTENT( IN )    :: NVAR
+              REAL(kind=4),  INTENT( IN )    :: JVS( : )
+              REAL(kind=4),  INTENT( IN )    :: X( NVAR )
+              REAL(kind=4)                   :: Y( NVAR )
+! local:
+              INTEGER      :: i, j
+              REAL(kind=4) :: SUM
+
+              Y = 0.0
+              DO i=1,NVAR
+                 DO j = LU_CROW(i),LU_CROW(i+1)-1
+                     Y(i) = Y(i) + JVS(j)*X(i)
+                 END DO
+              END DO
+
+        END FUNCTION SMatrixVectorProduct
 
 C-----------------------------------------------------------------------
 
