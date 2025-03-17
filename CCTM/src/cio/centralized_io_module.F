@@ -3315,21 +3315,22 @@
      &               strtcol2, endcol2, strtrow2, endrow2, gxoff1,
      &               gyoff1, gxoff2, gyoff2
 
-          lufile( 1 ) = grid_cro_2d
 
 #ifndef mpas
+#ifndef twoway
           if ( .not. lucro_avail  ) then ! TRUE if LUFRAC file isn't there 
+             lufile( 1 ) = grid_cro_2d
           
-            n_opened_file = n_opened_file + 1
+              n_opened_file = n_opened_file + 1
 
-            call mio_fopen (lufile( 1 ), mio_read_only)
+              call mio_fopen (lufile( 1 ), mio_read_only)
 
-            ! Retrieve domain decomposition offsets for first lufile 
-            call subhfile( lufile( 1 ), gxoff1, gyoff1, strtcol1, 
-     &                     endcol1, strtrow1, endrow1 )   
- 
-          
+              ! Retrieve domain decomposition offsets for first lufile 
+              call subhfile( lufile( 1 ), gxoff1, gyoff1, strtcol1, 
+     &                       endcol1, strtrow1, endrow1 )   
+           
           end if
+#endif
 #endif
 
     ! determine land_scheme from GRID_CRO_2D
