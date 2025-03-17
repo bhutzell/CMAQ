@@ -240,12 +240,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
                IF ( FIRSTIPR ) THEN
                   FIRSTIPR = .FALSE.
-                  call mio_setfile( MET_CRO_3D )
+                  call mio_setfile( INIT_CONC_1 )
                   IF ( PALEVS .NE. NLAYS ) mio_nlays = PALEVS
                   call mio_fcreate( CTM_IPR_1, mio_new_file )
                   IF ( MYPE .EQ. 0 .AND. PALEVS .NE. NLAYS ) THEN
                      CALL MIO_SET_GLOBAL_ATTR ( CTM_IPR_1, 'NLAYS', PALEVS )
-                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IPR_1, 'VGLVLS', MET_CRO_3D, 1, PALEVS+1 )
+                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IPR_1, 'VGLVLS', INIT_CONC_1, 1, PALEVS+1 )
                   END IF
                END IF
    
@@ -296,12 +296,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
                IF ( FIRSTIRR ) THEN
                   FIRSTIRR = .FALSE.
-                  call mio_setfile( MET_CRO_3D )
+                  call mio_setfile( INIT_CONC_1 )
                   IF ( PALEVS .NE. NLAYS ) mio_nlays = PALEVS
                   call mio_fcreate( CTM_IRR_1, mio_new_file )
                   IF ( MYPE .EQ. 0 .AND. PALEVS .NE. NLAYS ) THEN
                      CALL MIO_SET_GLOBAL_ATTR ( CTM_IRR_1, 'NLAYS', PALEVS )
-                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IRR_1, 'VGLVLS', MET_CRO_3D, 1, PALEVS+1 )
+                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IRR_1, 'VGLVLS', INIT_CONC_1, 1, PALEVS+1 )
                   END IF
                END IF
 

@@ -63,10 +63,11 @@ C                         related to ZSTATIC
 C     05 June 2019 F. Sidi: Bugfix related to Parallel I/O Implementation
 C     05 Aug  2019 D. Wong: Removed USE BMATVEC_MODULE statement and PTBILIIN
 C     19 Sep  2019 D. Wong: Fixed the way to advance to next day on an emission file, DESID_STREAM_DATE
+C     10 Jan  2024 D. Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE UDTYPES, ONLY: RARRY1
-      USE RUNTIME_VARS, ONLY : LOG_MESSAGE
+      USE LOGDEV_MOD, ONLY : LOG_MESSAGE
 
       IMPLICIT NONE
       INCLUDE SUBST_FILES_ID
@@ -135,7 +136,7 @@ C=======================================================================
          FUNCTION PT3D_INIT ( JDATE, JTIME, TSTEP )
      &                       RESULT ( SUCCESS )
 
-         USE GRID_CONF, ONLY: NLAYS, VGTYP_GD
+         USE GRID_CONF, ONLY: NLAYS, VGLVS_GD
          USE STK_PRMS, ONLY: SOURCE, STK_PRMS_INIT, MY_NSRC
          USE STK_EMIS, ONLY: DESID_STREAM_NAME, NSRC_EMIS, FIREFLAG,
      &                       MAP_PTtoISRM, STK_EMIS_INIT
@@ -185,6 +186,7 @@ C Local Variables:
          INTEGER :: STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC
 
          real, allocatable :: vglvsmd3( : )
+         CHARACTER( 16 ) :: LAYER_FILE = 'LAYER_FILE'
 
          INTERFACE
             SUBROUTINE DELTA_ZS( DESID_LAYS, MY_NSRC, SRC_MAP, STKHT, ZF, ZSTK, DDZF )
@@ -286,74 +288,30 @@ C get scenario timing
          PT_DATE = JDATE 
          PT_TIME = JTIME
 
-!C Get grid parameters from 3-d cross-point met file and store header information.
+!#ifndef twoway
+!         call mio_get_global_attr( MET_DOT_3D, 'NLAYS', METDLAYS )
+!         ALLOCATE( VGLVSXG( 0:MXLAYS3 ), 
+!     &             VGLVSMD3( 0:METDLAYS+1), STAT = IOS )
+!         CALL CHECKMEM( IOS, 'VGLVSXG', PNAME )
+!         call mio_get_global_attr( MET_DOT_3D, 'VGLVLS', VGLVSMD3 )
+! 
+!C Store local layer information
+!         J = LBOUND( VGLVSMD3, 1 ) + 1  ! 1st value contains num elements; skip it
+!         VGLVSXG( 0 ) = VGLVSMD3( J )
+!         DO L = 1, NLAYS
+!            J = J + 1
+!            VGLVSXG( L ) = VGLVSMD3( J )
+!         END DO
 !
-!         CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
-!     &                   STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC )
-
-C Initialize reference grid with met file
-!         XCELLCG = XCELL3D
-!         YCELLCG = YCELL3D
-!         METCCOLS = NCOLS3D
-!         METCROWS = NROWS3D
-!         METCXORIG = XORIG3D
-!         METCYORIG = YORIG3D
-!         call mio_get_global_attr( MET_CRO_3D, 'XCELL', XCELLCG )
-!         call mio_get_global_attr( MET_CRO_3D, 'YCELL', YCELLCG )
-!         call mio_get_global_attr( MET_CRO_3D, 'XORIG', METCXORIG )
-!         call mio_get_global_attr( MET_CRO_3D, 'YORIG', METCYORIG )  
-!         IF ( ( GXOFF .GT. 0 ) .AND. ( GYOFF .GT. 0 ) ) THEN
-!            METCXORIG = METCXORIG + REAL( GXOFF,8 ) * XCELLCG
-!            METCYORIG = METCYORIG + REAL( GYOFF,8 ) * YCELLCG
+!         floc = mio_search( MET_DOT_3D )
+!         METDNSTEPS = mio_file_data(floc)%nsteps
+!         IF ( PT_NSTEPS .GT. METDNSTEPS ) THEN
+!            WRITE( XMSG,94010 ) 'Requested output time steps > those on met file '
+!     &                          // CRLF() // BLANK10 // 'reset to ', 
+!     &                       METDNSTEPS
+!            PT_NSTEPS = METDNSTEPS
 !         END IF
-
-!!!!!!^^^^^^^!!!! THESE NEED TO BE CHECKED AGAINST GRIDDESC
-
-C Get grid parameters from 3-d dot-point met file and store header information.
-C (declared and stored in PTBILIN module)
-!         XCELLDG = XCELL3D
-!         YCELLDG = YCELL3D
-!         METDXORIG = XORIG3D
-!         METDYORIG = YORIG3D
-!         METDCOLS = NCOLS3D
-!         METDROWS = NROWS3D
-
-!         call mio_get_global_attr( MET_DOT_3D, 'XCELL', XCELLDG )
-!         call mio_get_global_attr( MET_DOT_3D, 'YCELL', YCELLDG )
-!         call mio_get_global_attr( MET_DOT_3D, 'XORIG', METDXORIG )
-!         call mio_get_global_attr( MET_DOT_3D, 'YORIG', METDYORIG )
-!         
-!         CALL SUBHFILE ( MET_DOT_3D, GXOFF, GYOFF,
-!     &                   STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC )
-!
-!         IF ( ( GXOFF .GT. 0 ) .AND. ( GYOFF .GT. 0 ) ) THEN
-!            METDXORIG = METDXORIG + REAL( GXOFF,8 ) * XCELLDG
-!            METDYORIG = METDYORIG + REAL( GYOFF,8 ) * YCELLDG
-!         END IF
-
-         call mio_get_global_attr( MET_DOT_3D, 'NLAYS', METDLAYS )
-         ALLOCATE( VGLVSXG( 0:MXLAYS3 ), 
-     &             VGLVSMD3( 0:METDLAYS+1), STAT = IOS )
-         CALL CHECKMEM( IOS, 'VGLVSXG', PNAME )
-         call mio_get_global_attr( MET_DOT_3D, 'VGLVLS', VGLVSMD3 )
- 
-C Store local layer information
-         J = LBOUND( VGLVSMD3, 1 ) + 1  ! 1st value contains num elements; skip it
-         VGLVSXG( 0 ) = VGLVSMD3( J )
-         DO L = 1, NLAYS
-            J = J + 1
-            VGLVSXG( L ) = VGLVSMD3( J )
-         END DO
-
-         floc = mio_search( MET_DOT_3D )
-         METDNSTEPS = mio_file_data(floc)%nsteps
-         IF ( PT_NSTEPS .GT. METDNSTEPS ) THEN
-            WRITE( XMSG,94010 ) 'Requested output time steps > those on met file '
-     &                          // CRLF() // BLANK10 // 'reset to ', 
-     &                       METDNSTEPS
-            PT_NSTEPS = METDNSTEPS
-         END IF
-
+!#endif
 #endif
 
 #ifdef srcid
@@ -403,7 +361,7 @@ C Open diagnostic layer fractions file?
             PLAYNAME = ' '   ! array
             NDATE = PT_DATE; NTIME = PT_TIME
             CALL NEXTIME( NDATE, NTIME, TSTEP ) ! advance one output tstep
-            CALL OPENLAYOUT( NDATE, NTIME, TSTEP, DESID_LAYS, VGLVSXG, NPTGRPS,
+            CALL OPENLAYOUT( NDATE, NTIME, TSTEP, DESID_LAYS, VGLVS_GD, NPTGRPS,
      &                       MY_NSRC, PLAYNAME )
          END IF
 
@@ -843,7 +801,7 @@ C=======================================================================
 
 C-----------------------------------------------------------------------
 
-      USE VGRD_DEFN, ONLY : VGTOP_GD
+      USE VGRD_DEFN, ONLY : VGTOP_GD, VGLVS_GD
       USE STK_EMIS, ONLY : FIREVAR, FIREFLAG
 #ifdef mpas
       USE STK_PRMS, ONLY : MY_STRT_SRC, MY_END_SRC, MY_NSRC, SOURCE, my_nsrc_pressure, my_nsrc_mesh_index
@@ -856,8 +814,10 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE CENTRALIZED_IO_MODULE, only : interpolate_var
       USE CONST, only: CPD
-#ifdef mpas
+#ifdef twoway
       USE coupler_module
+#endif
+#ifdef mpas
       USE util_module, only : crlf
 #endif
 
@@ -905,6 +865,7 @@ C-----------------------------------------------------------------------
       REAL    :: DELZ, DELFH
       REAL, ALLOCATABLE, SAVE :: TV( : )   ! Virtual temperature
       REAL, ALLOCATABLE, SAVE :: TF( : )   ! Full-layer height temperatures
+      REAL, ALLOCATABLE, SAVE :: temp_data( :,:,: )
       real, allocatable :: tdata(:)
       LOGICAL :: DETERMINED
       REAL    :: THV1
@@ -992,6 +953,7 @@ C-----------------------------------------------------------------------
        IF (.NOT. ALLOCATED(TV)) THEN
           ALLOCATE (TV(DESID_LAYS),
      &              TF(DESID_LAYS),
+     &              temp_data(ncols, 1, nlays),
      &              STAT=STAT)
        END IF
 #endif
@@ -1062,7 +1024,7 @@ C Get pressures: Use SIGMA values and surface pres. p=sigma*(psfc-ptop)+ptop
             END DO
          END IF
 
-         P_D( N )%WSPD = g3ddata(my_nsrc_mesh_index(s, n),1,:,wspd_ind)
+         P_D( N )%WSPD = coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,:,wspd_loc,1)
 
          P_D( N )%DDZF( 1,S ) = 1.0 / P_D( N )%ZF( 1,S )
          DO L = 2, DESID_LAYS
@@ -1070,28 +1032,33 @@ C Get pressures: Use SIGMA values and surface pres. p=sigma*(psfc-ptop)+ptop
          END DO
 
          IF ( FIREFLAG( N ) ) THEN
-            TSTK = g2ddata(my_nsrc_mesh_index(s, n),1,temp2_ind)
+            call coupler_data_retrieving ('TEMP2', temp_data(:,1,1))
+            TSTK = temp_data(my_nsrc_mesh_index(s, n),1,1)
             WSTK = P_D( N )%WSPD (1)
          ELSE
             m = MAX( 1, LSTK - DEG - 1 )
-            TSTK = g3ddata(my_nsrc_mesh_index(s, n),1,m,temp_ind)
+            TSTK = coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,m,temp_loc,1)
             WSTK = P_D( N )%WSPD (m)
          END IF
 
          DO L = 1, DESID_LAYS
             TV( L ) = P_D( N )%TA( L,S ) * ( 1.0 + 0.622 *
-     &                (   g3ddata(my_nsrc_mesh_index(s, n),1,L,qv_ind)
-     &                  / ( 1.0 + g3ddata(my_nsrc_mesh_index(s, n),1,L,qv_ind) ) ) )
+     &                (   coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,qv_loc,1)
+     &                  / ( 1.0 + coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,qv_loc,1) ) ) )
          END DO
 
          DO L = 1, DESID_LAYS - 1
-            DELZ  = g3ddata(my_nsrc_mesh_index(s, n),1,L+1,zh_ind) - g3ddata(my_nsrc_mesh_index(s, n),1,L,zh_ind)
-            DELFH = g3ddata(my_nsrc_mesh_index(s, n),1,L,zf_ind) - g3ddata(my_nsrc_mesh_index(s, n),1,L,zh_ind)
+            DELZ  =  coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L+1,zh_loc,1)
+     &             - coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zh_loc,1)
+            DELFH =  coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zf_loc,1)
+     &             - coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zh_loc,1)
             TF( L ) = TV( L ) + ( TV( L+1 ) - TV( L ) ) * DELFH / DELZ
          END DO
          L = DESID_LAYS
-         DELZ  = g3ddata(my_nsrc_mesh_index(s, n),1,L,zh_ind) - g3ddata(my_nsrc_mesh_index(s, n),1,L-1,zh_ind)
-         DELFH = g3ddata(my_nsrc_mesh_index(s, n),1,L,zf_ind) - g3ddata(my_nsrc_mesh_index(s, n),1,L,zh_ind)
+         DELZ  =  coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zh_loc,1)
+     &          - coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L-1,zh_loc,1)
+         DELFH =  coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zf_loc,1)
+     &          - coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,L,zh_loc,1)
          TF( L ) = TV( L ) + ( TV( L ) - TV( L-1 ) ) * DELFH / DELZ
 
          THV1  = TF( 1 ) * ( 1000.0 / P_D( N )%PRESF( 1 ) ) ** 0.286
@@ -1106,7 +1073,7 @@ C Get pressures: Use SIGMA values and surface pres. p=sigma*(psfc-ptop)+ptop
 
          PSFC = P_D( N )%PRSFC( S )
          DO L = 0, DESID_LAYS
-            P_D( N )%PRESF( L ) = ( VGLVSXG( L ) * ( PSFC - VGTOP_GD )
+            P_D( N )%PRESF( L ) = ( VGLVS_GD( L+1 ) * ( PSFC - VGTOP_GD )
      &                          +   VGTOP_GD ) * CONVPA
          END DO
 

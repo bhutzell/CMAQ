@@ -731,7 +731,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 !-------------------------------------------------------------------------
 
       USE util_Family_module
-      USE RXNS_DATA, ONLY : MECHNAME
+      USE RUNTIME_VARS, ONLY : MECH
 
       IMPLICIT NONE
 
@@ -745,7 +745,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER I1, I2, I3, IT, IVAR, J, IV
       
       
-      CHARACTER( 250 ) :: XMSG
+      CHARACTER( 400 ) :: XMSG
       CHARACTER(32), PARAMETER :: PNAME = 'MAP_ELMO_NML'
 
       
@@ -885,14 +885,34 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          ELSE IF ( VARS_NML(1) .EQ. 'DEFAULT' ) THEN
             ! Replace generic DEFAULT keyword with mechanism-specific
             ! keyword
-            VARS_NML( N_END+1 ) = 'DEFAULT_' // TRIM( MECHNAME )
-            N_END = N_END + 1
+            IF ( MECH .EQ. 'BLANK' ) THEN
+               XMSG = 'You have requested the DEFAULT keyword on an ELMO ' // 
+     &                'output file, and the variable MECH is needed in ' //
+     &                'order to know which DEFAULT keyword to map to. However, ' //
+     &                'MECH has not been defined as an environment variable. ' //
+     &                'For example, if your run script is in tcsh, make sure to ' //
+     &                'assign $MECH with setenv.'
+               CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+            ELSE    
+               VARS_NML( N_END+1 ) = 'DEFAULT_' // TRIM( MECH ) 
+               N_END = N_END + 1
+            END IF
          
          ELSE IF ( VARS_NML(1) .EQ. 'DEFAULT_DEP' ) THEN
             ! Replace generic DEFAULT keyword with mechanism-specific
             ! keyword
-            VARS_NML( N_END+1 ) = 'DEFAULT_DEP_' // TRIM( MECHNAME )
-            N_END = N_END + 1
+            IF ( MECH .EQ. 'BLANK' ) THEN
+               XMSG = 'You have requested the DEFAULT_DEP keyword on an ELMO ' // 
+     &                'output file, and the variable MECH is needed in ' //
+     &                'order to know which DEFAULT_DEP keyword to map to. However, ' //
+     &                'MECH has not been defined as an environment variable. ' //
+     &                'For example, if your run script is in tcsh, make sure to ' //
+     &                'assign $MECH with setenv.'
+               CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+            ELSE
+               VARS_NML( N_END+1 ) = 'DEFAULT_DEP_' // TRIM( MECH )
+               N_END = N_END + 1
+            END IF
          
          ELSEIF ( I1 .GT. 0 ) THEN
             ! Expand Matched Keyword

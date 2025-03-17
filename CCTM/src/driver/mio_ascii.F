@@ -154,8 +154,7 @@ C-----------------------------------------------------------------------
 
       FPATH = TRIM(OUTDIR) // '/' // TRIM(FNAME) // '_' //
      &        TRIM(APPL_NAME) // '.txt'
-      IOUT = JUNIT()
-      OPEN( IOUT,  FILE = FPATH, STATUS = 'UNKNOWN' )
+      OPEN( NEWUNIT = IOUT,  FILE = FPATH, STATUS = 'UNKNOWN' )
 
       WRITE ( IOUT, '(A3, I0, A5, I0)' ) 'in ' , N_MIO_IN, 
      &                                  ' out ', N_MIO_OUT

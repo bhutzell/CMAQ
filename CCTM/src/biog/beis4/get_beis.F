@@ -320,9 +320,13 @@ C Speciate emissions
          END DO
          IF ( LASTTIC ) THEN
             if ( firstwrite ) then 
-               call mio_setfile( MET_CRO_2D )
-
+               call mio_setfile( INIT_CONC_1 )
+               mio_nlays = 1
                call mio_fcreate( SNAME, mio_new_file )
+               if (mype .eq. 0) then
+                  call mio_set_global_attr ( SNAME, 'NLAYS', 1 )
+                  call mio_set_global_attr ( SNAME, 'VGLVLS', INIT_CONC_1, 1, 2 )
+               end if
                firstwrite = .false.
             end if
 

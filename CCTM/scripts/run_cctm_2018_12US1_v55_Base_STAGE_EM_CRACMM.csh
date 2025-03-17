@@ -37,7 +37,7 @@ cd CCTM/scripts
 #> Set General Parameters for Configuring the Simulation
  set VRSN      = v55               #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cracmm2           #> Mechanism ID
+ setenv MECH     cracmm2           #> Mechanism ID
  set EMIS      = WR705_2018gc2     #> Emission Inventory Details
  set APPL      = STAGE_EM_2018_12US1  #> Application Name (e.g. Gridname)
 
@@ -327,7 +327,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #set JVALfile  = JTABLE_${YYYYJJJ}
 
   #> Ozone column data
-  set OMIfile   = OMI_1979_to_2019.dat
+  set OMIfile   = omi_cmaq_2005through2024_27x27.dat
 
   #> Optics file
   set OPTfile = PHOT_OPTICS.dat

@@ -26,6 +26,8 @@ C                              26 Jul 06: comments in line with PARMS3.EXT
 C                   S. Roselle 29 Mar 11: Replaced I/O API include files
 C                                         with UTILIO_DEFN
 C                   D. Wong    11 May 11: incorporated twoway model implementation
+C                   D. Wong    10 Jan 24: used LAYER_FILE which is set in run 
+C                                         time, rather than MET_CRO_3D
 C.......................................................................
 
       USE RUNTIME_VARS
@@ -87,6 +89,9 @@ C-----------------------------------------------------------------------
 
             USE UTILIO_DEFN
             use mio_module
+#ifdef twoway
+            use twoway_data_module, only: wrfv
+#endif
 
             IMPLICIT NONE
 
@@ -98,10 +103,11 @@ C-----------------------------------------------------------------------
             CHARACTER( 96 ) :: XMSG = ' '
             character( 5000 ) :: filedesc
             CHARACTER(10)   :: WRF_VERSION = ' '
+            CHARACTER( 16 ) :: LAYER_FILE = 'LAYER_FILE'
 
             INTEGER L, ALLOCSTAT
             INTEGER  :: NV, LOC, STR_LEN
-            real, allocatable :: vglvs_mc3(:)
+            real, allocatable :: vglvs_ic(:)
 
 C This function is expected to be called only once - at startup
 
@@ -111,19 +117,17 @@ C This function is expected to be called only once - at startup
 
 #ifndef mpas
 
-               call mio_setfile ( MET_CRO_3D )
+               call mio_setfile ( INIT_CONC_1 )
                NLAYS = mio_nlays
       
-               call mio_get_global_attr( MET_CRO_3D, 'GDNAM', GDNAME_GD )
-               call mio_get_global_attr( MET_CRO_3D, 'VGTYP', VGTYP_GD )
-               call mio_get_global_attr( MET_CRO_3D, 'VGTOP', VGTOP_GD )
+               call mio_get_global_attr( INIT_CONC_1, 'GDNAM', GDNAME_GD )
+               call mio_get_global_attr( INIT_CONC_1, 'VGTYP', VGTYP_GD )
+               call mio_get_global_attr( INIT_CONC_1, 'VGTOP', VGTOP_GD )
                VGTPUN_GD = 'Pa'
                VGLVUN_GD = 'none'
 
-! For array-valued attributes, mio_get_global_attr returns the length of the array
-! in the first element. We know what this value should be already, so skip over it.
                ALLOCATE ( VGLVS_GD( NLAYS + 1 ), 
-     &                    vglvs_mc3( nlays + 2), 
+     &                    vglvs_ic( nlays + 2), 
      &                    X3FACE_GD( 0:NLAYS ), STAT = ALLOCSTAT )
                IF ( ALLOCSTAT .NE. 0 ) THEN
                   XMSG = 'Failure allocating VGLVS_GD, X3FACE_GD'
@@ -131,19 +135,24 @@ C This function is expected to be called only once - at startup
                   SUCCESS = .FALSE.; RETURN
                END IF
 
-               call mio_get_global_attr( MET_CRO_3D, 'VGLVLS', VGLVS_mc3 )
+               call mio_get_global_attr( INIT_CONC_1, 'VGLVLS', VGLVS_ic )
 
 C set layer thicknesses
-
+! For array-valued attributes, mio_get_global_attr returns the length of the array
+! in the first element. We know what this value should be already, so skip over it.
                DO L = 0, NLAYS
-                  VGLVS_GD( L+1 ) = VGLVS_MC3( L+2 )
+                  VGLVS_GD( L+1 ) = VGLVS_IC( L+2 )
                   X3FACE_GD( L ) = 1.0 - VGLVS_GD( L + 1 )
                END DO
 
                VGLVS3D(1:NLAYS+1) = VGLVS_GD(1:NLAYS+1)
-               deallocate( VGLVS_MC3 )
+               deallocate( VGLVS_IC )
 
 C Determine whether WRF version is 4.1 or greater
+#ifdef twoway
+               WRF_V4P = ( wrfv .ge. 4.1 )
+#else
+               call mio_fopen( MET_CRO_3D, mio_read_only )
                call mio_get_global_attr( MET_CRO_3D, 'FILEDESC', FILEDESC )
                LOC = INDEX (FILEDESC, 'WRF ARW V')
                IF (LOC > 0) THEN
@@ -166,6 +175,7 @@ C Determine whether WRF version is 4.1 or greater
                XMSG = 'Vertical layer structure already defined'
                CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
+#endif
 #endif
 
             END IF   ! FIRSTIME

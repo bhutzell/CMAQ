@@ -13,6 +13,7 @@
         CHARACTER( 3 ) :: CMYPE  = ""  ! Processor Number
         INTEGER :: OUTDEV = 6   ! File Unit for Standard Output
         INTEGER :: MYPE   = -1  ! Processor Number
+        INTEGER :: TOTPE  = 1   ! Total Number of Processors
         CHARACTER( 200 ) :: APPL_NAME = 'APPL' ! Logfile Names
 
         contains
@@ -44,8 +45,6 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       INTEGER, PARAMETER :: MAXLEN_CTM_LOG   = MAXLEN_CCTM_APPL_loc + 11
 
       CHARACTER( * ), INTENT( IN )    :: APP_NAME_IN
-
-      INTEGER :: TOTPE  = 1   ! Number of Total Processors
       CHARACTER(  8 ) :: PRESTR  = 'CTM_LOG_'
       CHARACTER( MAXLEN_CTM_LOG ) :: IOLOGEQ
 
@@ -66,7 +65,6 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       CALL MPI_COMM_SIZE ( MPI_COMM_WORLD, TOTPE, ERROR )
 #else
       MYPE = 0
-      TOTPE = 0
 #endif
       ! Fetch CMAQ Header
       CALL LOAD_HEADER( CMAQ_HEADER, NCMAQ_HEAD, CMAQ_TOC, NCMAQ_TOC )
@@ -148,7 +146,7 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
 
       CHARACTER( LOG_LINE_LENGTH ) :: CTEMP
       INTEGER :: MSG_SIZE
-      INTEGER :: NLINE1, NLINE2, NLINE, NTAB, LAST_SPACE
+      INTEGER :: NLINE1, NLINE2, NLINE, NTAB, LAST_SPACE, IT
 
       CMSG = CMSG_IN
 
@@ -162,7 +160,11 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       ! Determine Length of Total Message
       MSG_SIZE = LEN_TRIM( CMSG )
       
-      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH )
+      IT = 0
+
+      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH .AND. IT .LE. 1000 )
+         IT = IT + 1
+
          ! Isolate One Line of Text
          LAST_SPACE = INDEX( CMSG( 1:NLINE+1 ), " ", BACK=.TRUE. )
      
@@ -277,6 +279,7 @@ C   12 Aug 15 D.Wong:   Replaced SUBST_MPI with mpif.h
       CALL UPCASE( CHEAD )
 
       ! Write the heading to the log file
+      WRITE( FUNIT, * )
       WRITE( FUNIT, * )
       WRITE( FMT, '("(", I0, "x,A,A,A)")' ) LOG_MAJOR_TAB
       WRITE( FMT2,'("(", I0, "x,A,)")' ) LOG_MAJOR_TAB

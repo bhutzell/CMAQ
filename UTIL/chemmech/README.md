@@ -306,14 +306,16 @@ Rate constant parameters begin with either a # sign or the expression, "%s#", wh
 | 11  | #A?OPERATOR                    | A\*O |
 | 12  |  %H  #  A0@C0&A1@C1&A2            | min(A0\*EXP(-C0\*P)+A1\*EXP(-C1\*P), A2)  if  the  sun  is  above  the  horizon  and  open  water  plus  surf  zone covers the surface by more than 0.1\%.  0.0  if  otherwise |
 | 13  | %4 # _Text String_     | Simple Fortran formula for rate constant |
+| 14  | %5 # _Text String_     | Simple Fortran formula for rate constant that includes an operator defined in the SPECIAL block |
 
 **Notes:**
 1.  For rate constants with the form A\<Reference\> or A\*Reference, reference gives label for a photolysis rate (J), a heteorogeneous rate constant (H), rate constant for the given (K) reaction label or an operator (O). A equals one if not given.
 2.  Reaction Type 5 represents the rate constant for the reverse equilibrium reaction to the reaction label specified between the brackets.
 3.  Calculating the photolysis and heteorogeneous rates takes place outside the RXNS_FUNC_MODULE.F90 file produced by the CHEMMECH processor.
-4.  Operators are defined the SPECIAL block where <''REACTION''> is the rate constant for the given ''REACTION'' and [''species''] equals the concentration of a mechanism ''species'' at the beginning of the integration time-step for the chemistry's n
+4.  Operators are defined the SPECIAL block where <''REACTION''> is the rate constant for the given ''REACTION'' and [''species''] equals the concentration of a mechanism ''species'' at the beginning of the integration time-step for the chemistry's integration.
 5.  Type 12 is used to include ozone destruction by marine bromine and iodide compounds. It parameterizes effects from by a photochemical mechanism that includes such compounds.
-6.  Type 13 can use TEMP (K), PRES (atm), and the constant atmospheric species (molec/cm\*\*3). They also can use function and operator defined in the __FUNCTIONS__ and __SPECIAL__ blocks.
+6.  Type 13 can use TEMP (K), PRES (atm), and the constant atmospheric species (molec/cm\*\*3). They also can use functions defined in the __FUNCTIONS__ blocks.
+7.  Type 14 can use TEMP (K), PRES (atm), and the constant atmospheric species (molec/cm\*\*3). They also can use functions and operators defined in the __FUNCTIONS__ and __SPECIAL__ blocks.
 
 <a id=constants></a>
 #### CONSTANTS

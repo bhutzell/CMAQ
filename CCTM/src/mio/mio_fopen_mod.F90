@@ -84,7 +84,8 @@
                 write (mio_logdev, '(a, a9, a)') trim(fname), ' opened: ', trim(full_name)
              end if
           else
-             write (mio_logdev, '(a)') 'Abort in mio_fopen opening ' // trim(full_name)
+             write (mio_logdev, '(a)') 'Abort in mio_fopen opening ' // trim(fname)
+             write (mio_logdev, '(a)') 'Path: ' // trim(full_name)
              write (mio_logdev, *)  trim(nf90_strerror(stat))
              stop
           end if
@@ -649,22 +650,25 @@
           end if
 #endif
 
-#ifdef twoway
-          if ( ( fname .eq. grid_cro_2d ) .or.             &
-               ( fname .eq. grid_dot_2d ) ) then
-             loc_endcol  = loc_endcol - loc_strtcol + 1
-             loc_strtcol = 1
-             loc_endrow  = loc_endrow - loc_strtrow + 1
-             loc_strtrow = 1
-          else if ( ( fname .eq. met_cro_2d ) .or.         &
-                    ( fname .eq. met_cro_3d ) .or.         &
-                    ( fname .eq. met_dot_3d ) ) then
-             loc_endcol  = loc_endcol - loc_strtcol + 2
-             loc_strtcol = 2
-             loc_endrow  = loc_endrow - loc_strtrow + 2
-             loc_strtrow = 2
-          end if
-#endif
+! does this block make sense?
+! met files are not opened by MIO when running the twoway model
+! instead they are opened by WRF and the coupler is used
+!#ifdef twoway
+!          if ( ( fname .eq. grid_cro_2d ) .or.             &
+!               ( fname .eq. grid_dot_2d ) ) then
+!             loc_endcol  = loc_endcol - loc_strtcol + 1
+!             loc_strtcol = 1
+!             loc_endrow  = loc_endrow - loc_strtrow + 1
+!             loc_strtrow = 1
+!          else if ( ( fname .eq. met_cro_2d ) .or.         &
+!                    ( fname .eq. met_cro_3d ) .or.         &
+!                    ( fname .eq. met_dot_3d ) ) then
+!             loc_endcol  = loc_endcol - loc_strtcol + 2
+!             loc_strtcol = 2
+!             loc_endrow  = loc_endrow - loc_strtrow + 2
+!             loc_strtrow = 2
+!          end if
+!#endif
 
           mio_file_data(floc)%colde_pe(1, mio_mype_p1, pos) = loc_strtcol
           mio_file_data(floc)%colde_pe(2, mio_mype_p1, pos) = loc_endcol

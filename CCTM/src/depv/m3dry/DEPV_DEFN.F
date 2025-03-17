@@ -666,8 +666,13 @@ C-----------------------------------------------------------------------
             IF ( WRITE_TIME ) THEN
               IF ( FIRSTWRITE ) THEN
                  FIRSTWRITE = .FALSE.
-                 call mio_setfile( MET_CRO_2D )
+                 call mio_setfile( INIT_CONC_1 )
+                 mio_nlays = 1
                  call mio_fcreate( CTM_DEPV_DIAG, mio_new_file )
+                 if (mype .eq. 0) then
+                    call mio_set_global_attr ( CTM_DEPV_DIAG, 'NLAYS', 1 )
+                    call mio_set_global_attr ( CTM_DEPV_DIAG, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                 end if
               END IF            
 
               call mio_time_format_conversion (wdate, wtime, time_stamp)

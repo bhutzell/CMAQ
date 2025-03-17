@@ -392,13 +392,12 @@ REACTIONS[CM] =
 <CL27> CLNO2 = CL + NO2                               #1.0/<CLNO2_IUPAC13>;
 ! add new reactions for chlorine nitrate
 <CL28> CLO + NO2      = CLNO3                #1.8E-31^-3.4&1.5E-11^-1.9&0.6;
-!<CL29> CLNO3          = CLO + NO2   #4.48E-5^-1.0@12530&3.71E+15^3.5@12530&0.6;
-<CL30> CLNO3          = CLO + NO2                 # 1.0/<CLONO2_1>;
+<CL30> CLNO3          = CLO + NO2                # 1.0/<CLONO2_1>;
 <CL31> CLNO3          = CL + NO3                 # 1.0/<CLONO2_2>;
 
 ! heterogeneous reactions 
-<HET_CLNO3_WAI> CLNO3     = HOCL + HNO3               # 1.0~<HETERO_CLNO3_WAI>;
-<HET_CLNO3_WAJ> CLNO3     = HOCL + HNO3               # 1.0~<HETERO_CLNO3_WAJ>;
+<HET_CLN3_WAI>  CLNO3     = HOCL + HNO3          # 1.0~<HETERO_CLN3_WAI>;
+<HET_CLN3_WAJ>  CLNO3     = HOCL + HNO3          # 1.0~<HETERO_CLN3_WAJ>;
 
 ! SOA counter species and semivolatiles formed
 <SA01>  TOLRO2  + NO      = NO  + 0.016*SVAVB2 + 0.051*SVAVB3 +
@@ -607,17 +606,17 @@ REACTIONS[CM] =
 <BR38>  MBC2               = BR + 2*CL + HO2 + CO     # 1.0/<MBC2_BLIDE98>;
 
 ! Heterogeneous reactions
-<HET_BRNO3_WAI> BRNO3 = HOBR + HNO3                   # 1.0~<HETERO_BRNO3_WAI>;
-<HET_BRNO3_WAJ> BRNO3 = HOBR + HNO3                   # 1.0~<HETERO_BRNO3_WAJ>;
-<HET_HOBR_CLJ>  HOBR + ACLJ = BRCL                    # 1.0~<HETERO_HOBR_CLJ>;
-<HET_HOBR_BRJ>  HOBR + ABRJ = BR2                     # 1.0~<HETERO_HOBR_BRJ>;
-<HET_BRNO3_CLJ> BRNO3 + ACLJ = BRCL + HNO3            # 1.0~<HETERO_BRNO3_CLJ>;
-<HET_BRNO3_BRJ> BRNO3 + ABRJ = BR2 + HNO3             # 1.0~<HETERO_BRNO3_BRJ>;
-<HET_BRNO2_CLJ> BRNO2 + ACLJ = BRCL + HONO            # 1.0~<HETERO_BRNO2_CLJ>;
-<HET_BRNO2_BRJ> BRNO2 + ABRJ = BR2 + HONO             # 1.0~<HETERO_BRNO2_BRJ>;
+<HET_BRN3_WAI>  BRNO3 = HOBR + HNO3                   # 1.0~<HETERO_BRN3_WAI>;
+<HET_BRN3_WAJ>  BRNO3 = HOBR + HNO3                   # 1.0~<HETERO_BRN3_WAJ>;
+<HET_HOBR_ACLJ> HOBR + ACLJ = BRCL                    # 1.0~<HETERO_HOBR_ACLJ>;
+<HET_HOBR_ABRJ> HOBR + ABRJ = BR2                     # 1.0~<HETERO_HOBR_ABRJ>;
+<HET_BRN3_ACLJ> BRNO3 + ACLJ = BRCL + HNO3            # 1.0~<HETERO_BRN3_ACLJ>;
+<HET_BRN3_ABRJ> BRNO3 + ABRJ = BR2 + HNO3             # 1.0~<HETERO_BRN3_ABRJ>;
+<HET_BRN2_ACLJ> BRNO2 + ACLJ = BRCL + HONO            # 1.0~<HETERO_BRN2_ACLJ>;
+<HET_BRN2_ABRJ> BRNO2 + ABRJ = BR2 + HONO             # 1.0~<HETERO_BRN2_ABRJ>;
 
 ! Heterogeneous reaction of HBR
-<HET_HBR_BRJ>  HBR = ABRJ                             # 1.0~<HETERO_HBR_BRJ>;
+<HET_HBR_ABRJ>  HBR = ABRJ                            # 1.0~<HETERO_HBR_ABRJ>;
 
 ! Iodine chemistry
 
@@ -685,12 +684,12 @@ REACTIONS[CM] =
 <HET_I2O3_AJ>  I2O3 =                                 # 1.0~<HETERO_I2O3_AJ>;
 <HET_I2O4_AI>  I2O4 =                                 # 1.0~<HETERO_I2O4_AI>;
 <HET_I2O4_AJ>  I2O4 =                                 # 1.0~<HETERO_I2O4_AJ>;
-<HET_INO3_CLJ> INO3 + ACLJ = ICL + HNO3               # 1.0~<HETERO_INO3_CLJ>;
-<HET_INO3_BRJ> INO3 + ABRJ = IBR + HNO3               # 1.0~<HETERO_INO3_BRJ>;
-<HET_INO2_CLJ> INO2 + ACLJ = ICL + HONO               # 1.0~<HETERO_INO2_CLJ>;
-<HET_INO2_BRJ> INO2 + ABRJ = IBR + HONO               # 1.0~<HETERO_INO2_BRJ>;
-<HET_HOI_CLJ>  HOI + ACLJ = ICL                       # 1.0~<HETERO_HOI_CLJ>;
-<HET_HOI_BRJ>  HOI + ABRJ = IBR                       # 1.0~<HETERO_HOI_BRJ>;
+<HET_INO3_ACLJ> INO3 + ACLJ = ICL + HNO3              # 1.0~<HETERO_INO3_ACLJ>;
+<HET_INO3_ABRJ> INO3 + ABRJ = IBR + HNO3              # 1.0~<HETERO_INO3_ABRJ>;
+<HET_INO2_ACLJ> INO2 + ACLJ = ICL + HONO              # 1.0~<HETERO_INO2_ACLJ>;
+<HET_INO2_ABRJ> INO2 + ABRJ = IBR + HONO              # 1.0~<HETERO_INO2_ABRJ>;
+<HET_HOI_ACLJ>  HOI + ACLJ = ICL                      # 1.0~<HETERO_HOI_ACLJ>;
+<HET_HOI_ABRJ>  HOI + ABRJ = IBR                      # 1.0~<HETERO_HOI_ABRJ>;
 
 ! DMS chemistry (IUPAC except DMS4 which is from Somariva and Glasow, 2012 )
 <DMS1>  DMS + OH           = SO2     + MEO2
@@ -709,7 +708,6 @@ REACTIONS[CM] =
 <DMS5>  DMS + CLO          = 0.75*SO2 + 0.25*MSA
                                      + MEO2
                                      + CL             # 1.7E-15@-340;
-
 END MECH
 
 CONSTANTS

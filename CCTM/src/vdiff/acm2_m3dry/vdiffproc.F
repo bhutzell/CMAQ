@@ -77,6 +77,7 @@ C 16 Sep 16 J.Young: update for inline procan (IPR)
 C 02 Nov 2018: L.Zhou, S.Napelenok: isam implementation
 C  1 Feb 19 D.Wong: removed all MY_N clauses
 C 12 Dec 19 S.L.Napelenok: ddm-3d implementation for version 5.3.1
+C 10 Jan 24 D.Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE CGRID_SPCS          ! CGRID mechanism species
@@ -509,7 +510,7 @@ C read & interpolate emissions data => VDEMIS_DIFF from EMIS_DEFN module
       DO R = 1, NROWS
          DO C = 1, NCOLS
             DO L = 1, NLAYS
-               SEDDY( L,C,R ) = g3ddata(C,R,L,eddy_ind)
+               SEDDY( L,C,R ) = coupler_m2a_dr_3d_data(C,R,L,eddy_loc,1)
             END DO
          END DO
       END DO
@@ -735,8 +736,13 @@ C If last call this hour:  write accumulated depositions:
             END DO
 
             if ( write_firstime_mio ) then
-               call mio_setfile( MET_CRO_2D )
+               call mio_setfile( INIT_CONC_1 )
+               mio_nlays = 1
                call mio_fcreate( CTM_DRY_DEP_1, mio_new_file )
+               if (mype .eq. 0) then
+                  call mio_set_global_attr ( CTM_DRY_DEP_1, 'NLAYS', 1 )
+                  call mio_set_global_attr ( CTM_DRY_DEP_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+               end if
                write_firstime_mio = .false.
             end if
             call mio_fwrite( CTM_DRY_DEP_1, DDEP_SPC( V ), PNAME, WRDD, TIME_STAMP )
@@ -763,10 +769,15 @@ C Write vdiff diagnostics
          IF ( VDIFFDIAG ) THEN
 
             if ( first_write_diag ) then
-               call mio_setfile( MET_CRO_2D )
+               call mio_setfile( INIT_CONC_1 )
+               mio_nlays = 1
                call mio_fcreate( CTM_VDIFF_DIAG, mio_new_file )
+               if (mype .eq. 0) then
+                  call mio_set_global_attr ( CTM_VDIFF_DIAG, 'NLAYS', 1 )
+                  call mio_set_global_attr ( CTM_VDIFF_DIAG, 'VGLVLS', INIT_CONC_1, 1, 2 )
+               end if
                if ( GRAV_SETL ) then
-                  call mio_setfile( MET_CRO_3D )
+                  call mio_setfile( INIT_CONC_1 )
                   call mio_fcreate( CTM_VSED_DIAG, mio_new_file )
                end if
                first_write_diag = .false.
@@ -838,8 +849,13 @@ C Write other diagnostics
          WRDD = 0.0
          IF ( FIRST_WRITE_ISAM ) THEN
             FIRST_WRITE_ISAM = .FALSE.
-            call mio_setfile( MET_CRO_2D )
+            call mio_setfile( INIT_CONC_1 )
+            mio_nlays = 1
             call mio_fcreate( SA_DD_1, mio_new_file )
+            if (mype .eq. 0) then
+               call mio_set_global_attr ( SA_DD_1, 'NLAYS', 1 )
+               call mio_set_global_attr ( SA_DD_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+            end if
          END IF
          DO ITAG = 1, N_SPCTAG
             DO R = 1, NROWS
@@ -847,17 +863,7 @@ C Write other diagnostics
                   WRDD( C,R ) = SA_DDEP( C,R,ITAG )
                END DO
             END DO
-
-<<<<<<< HEAD
             call mio_fwrite( SA_DD_1, VNAM_SPCTAG( ITAG ), PNAME, WRDD, TIME_STAMP )
-=======
-            IF ( .NOT. WRITE3( SA_DD_1, VNAM_SPCTAG( ITAG ),
-     &                         MDATE, MTIME, WRDD ) ) THEN
-               XMSG = 'Could not write ' // SA_DD_1 // ' file'
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
-
->>>>>>> research
          END DO
          SA_DDEP = 0.0
 #endif
@@ -871,8 +877,13 @@ C WT - write out dry deposition sensitivities
 
          IF ( FIRST_WRITE_SENS ) THEN
             FIRST_WRITE_SENS = .FALSE.
-            call mio_setfile( MET_CRO_2D )
+            call mio_setfile( INIT_CONC_1 )
+            mio_nlays = 1
             call mio_fcreate( CTM_SDRYDEP_1, mio_new_file )
+            if (mype .eq. 0) then
+               call mio_set_global_attr ( CTM_SDRYDEP_1, 'NLAYS', 1 )
+               call mio_set_global_attr ( CTM_SDRYDEP_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+            end if
          END IF
 
          DO V = 1, N_SPC_DDEP
@@ -886,19 +897,11 @@ C WT - write out dry deposition sensitivities
                      WRDD( C,R ) = S_DDEP( S, C, R, NP )
                   ENDDO
                ENDDO
-<<<<<<< HEAD
+
                WRITE( LOGDEV,'(A)')'SDRYDEP: WRITE3D for ' // TRIM( SPCNAME )
 
                call mio_fwrite( CTM_SDRYDEP_1, SPCNAME, PNAME, WRDD, TIME_STAMP )
-=======
-!           WRITE( LOGDEV,'(A)')'WRITE3D for ' // TRIM( SPCNAME )
 
-               IF ( .NOT. WRITE3( CTM_SDRYDEP_1, SPCNAME,
-     &                 MDATE, MTIME, WRDD ) ) THEN
-                  XMSG = 'Could not write ' // CTM_SDRYDEP_1 // ' file'
-                  CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-               END IF
->>>>>>> research
             ENDDO
          ENDDO
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )

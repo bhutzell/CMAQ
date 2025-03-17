@@ -709,27 +709,32 @@ C...modules
       IF ( PHOTDIAG .AND. CREATE_MIO_OUTS ) THEN ! create MIO diagnostics
             CREATE_MIO_OUTS = .FALSE.
 ! Create PHOTDIAG1_MIO file
-            CALL MIO_SETFILE( MET_CRO_2D )
+            CALL MIO_SETFILE( INIT_CONC_1 )
+            mio_nlays = 1
             CALL MIO_FCREATE( FNAME=CTM_RJ_1, MODE=mio_new_file )
+            if (mype .eq. 0) then
+               call mio_set_global_attr ( CTM_RJ_1, 'NLAYS', 1 )
+               call mio_set_global_attr ( CTM_RJ_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+            end if
 ! Create PHOTDIAG2_MIO file
             IF (  NLAYS_DIAG .NE. 1 ) THEN
-                CALL MIO_SETFILE( MET_CRO_3D )
+                CALL MIO_SETFILE( INIT_CONC_1 )
                 MIO_NLAYS = NLAYS_DIAG
             END IF
             CALL MIO_FCREATE( FNAME=CTM_RJ_2, MODE=mio_new_file )
             IF ( MYPE .EQ. 0 .AND. NLAYS_DIAG .NE. 1 ) THEN
               CALL MIO_SET_GLOBAL_ATTR ( CTM_RJ_2, 'NLAYS', NLAYS_DIAG )
-              CALL MIO_SET_GLOBAL_ATTR ( CTM_RJ_2, 'VGLVLS', MET_CRO_3D, 1, NLAYS_DIAG )
+              CALL MIO_SET_GLOBAL_ATTR ( CTM_RJ_2, 'VGLVLS', INIT_CONC_1, 1, NLAYS_DIAG )
             END IF
 ! Create PHOTDIAG3_MIO file
             IF (  NLAYS_DIAG .NE. 1 ) THEN
-                CALL MIO_SETFILE( MET_CRO_3D )
+                CALL MIO_SETFILE( INIT_CONC_1 )
                 MIO_NLAYS = NLAYS_DIAG
             END IF
             CALL MIO_FCREATE( FNAME=CTM_RJ_3, MODE=mio_new_file )
             IF ( MYPE .EQ. 0 .AND. NLAYS_DIAG .NE. 1 ) THEN
               CALL MIO_SET_GLOBAL_ATTR ( CTM_RJ_3, 'NLAYS', NLAYS_DIAG )
-              CALL MIO_SET_GLOBAL_ATTR ( CTM_RJ_3, 'VGLVLS', MET_CRO_3D, 1, NLAYS_DIAG )
+              CALL MIO_SET_GLOBAL_ATTR ( CTM_RJ_3, 'VGLVLS', INIT_CONC_1, 1, NLAYS_DIAG )
             END IF
       END IF
 

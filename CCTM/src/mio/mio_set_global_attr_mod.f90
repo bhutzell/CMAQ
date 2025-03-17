@@ -50,17 +50,20 @@
                                          mio_file_data(fnum)%glo_att_name(m), &
                                          value)
                     if (stat .ne. 0) then
-                       write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name)
+                       write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name), &
+                                             ' for file ', trim(infile)
                        write (mio_logdev, *) ' due to ', trim(nf90_strerror(stat))
                        lerror = .true.
                     end if
                  else
-                    write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name)
+                    write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name), &
+                                             ' for file ', trim(infile)
                     write (mio_logdev, *) ' due to mismatch global attribute data type'
                     lerror = .true.
                  end if
               else
-                 write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name)
+                 write (mio_logdev, *) ' Failed to set global attribute ', trim(attr_name), &
+                                             ' for file ', trim(infile)
                  write (mio_logdev, *) ' due to non existence'
                  lerror = .true.
               end if

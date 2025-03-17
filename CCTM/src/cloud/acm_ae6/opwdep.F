@@ -32,6 +32,7 @@
 !    -------- ---             -----------------------------------------
 !     07/17/15 D. Wong        initial version
 !     12/30/19 S. Napelenok   ddm-3d implementation for v5.3.1
+!     01/10/24 D. Wong        Incorporated unified coupler implementation
 !-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -92,7 +93,6 @@
 #ifndef mpas
 
         IF ( IO_PE_INCLUSIVE ) THEN
-
               NVARS3D = N_SPC_WDEP + 1
 
 !...define wet deposition output descriptors for gaseous species

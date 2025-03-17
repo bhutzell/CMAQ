@@ -52,6 +52,7 @@ C                     MY_N clauses
 C   08 Mar 19 F. Sidi  Split up ICBC_FAC into IC_FAC and BC_FAC for 
 C                      tracer namelist only
 C   13 Mar 19 D. Wong: Implemented centralized I/O approach
+C   10 Jan 24 D. Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -158,10 +159,10 @@ C Local Variables
       CHARACTER( 34 ) :: ESTR2 = ' '
       CHARACTER( 34 ) :: ESTR3 = ' '
 
-      LOGICAL, SAVE :: FIRSTIME = .TRUE.
-      LOGICAL       :: L_WRITE_WARNING
-
-      integer :: floc
+      INTEGER         :: floc
+      LOGICAL, SAVE   :: FIRSTIME = .TRUE.
+      LOGICAL         :: L_WRITE_WARNING
+      LOGICAL         :: SKIP
 
 C-----------------------------------------------------------------------
 
@@ -192,25 +193,32 @@ C-----------------------------------------------------------------------
       WRITE( CONCMIN,'(1PE9.2)' ) CMIN
 
 #ifndef mpas
+      SKIP = .FALSE.
+#ifdef twoway
+      if (FNAME == MET_CRO_3D) then
+         SKIP = .TRUE.
+      end if
+#endif
 
-!     call mio_fopen (FNAME, mio_read_only)
-      floc = mio_search (FNAME)
+      IF (.NOT. SKIP) THEN
+         floc = mio_search (FNAME)
  
-      IF ( GL_NCOLS .NE. mio_file_data(floc)%gl_ncols ) THEN
-         WRITE( LOGDEV,* ) ' '
-         WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
-         WRITE( LOGDEV,* ) '>>  GL_NCOLS: ', GL_NCOLS, '  NCOLS3D: ', mio_file_data(floc)%gl_ncols
-      END IF
+         IF ( GL_NCOLS .NE. mio_file_data(floc)%gl_ncols ) THEN
+            WRITE( LOGDEV,* ) ' '
+            WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
+            WRITE( LOGDEV,* ) '>>  GL_NCOLS: ', GL_NCOLS, '  NCOLS3D: ', mio_file_data(floc)%gl_ncols
+         END IF
  
-      IF ( GL_NROWS .NE. mio_file_data(floc)%gl_nrows ) THEN
-         WRITE( LOGDEV,* ) ' '
-         WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
-         WRITE( LOGDEV,* ) '>>  GL_NROWS: ', GL_NROWS, '  NROWS3D: ', mio_file_data(floc)%gl_nrows
-      END IF
+         IF ( GL_NROWS .NE. mio_file_data(floc)%gl_nrows ) THEN
+            WRITE( LOGDEV,* ) ' '
+            WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
+            WRITE( LOGDEV,* ) '>>  GL_NROWS: ', GL_NROWS, '  NROWS3D: ', mio_file_data(floc)%gl_nrows
+         END IF
  
-      IF ( NLAYS .NE. mio_file_data(floc)%nlays ) THEN
-         XMSG = 'Wrong number of layers in ' // FNAME // ' file'
-         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         IF ( NLAYS .NE. mio_file_data(floc)%nlays ) THEN
+            XMSG = 'Wrong number of layers in ' // FNAME // ' file'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
       END IF
 #endif
 
