@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM2 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Nov 19, 2024
+C  REVISION HISTORY: Created by EBI solver program, Mar 14, 2025
 C
 C***********************************************************************
       USE HRDATA
@@ -87,13 +87,13 @@ C..NOTE: RXRAT commented out are not referenced by any routine
       RXRAT(     31 ) = RKI(    31 ) * YC(  OP1 )
       RXRAT(     32 ) = RKI(    32 ) * YC(  OP2 )
       RXRAT(     33 ) = RKI(    33 ) * YC(  OPB )
-      RXRAT(     34 ) = RKI(    34 ) * YC(  OP3 )
+      RXRAT(     34 ) = RKI(    34 ) * YC(  VOP3 )
       RXRAT(     35 ) = RKI(    35 ) * YC(  PAA )
       RXRAT(     36 ) = RKI(    36 ) * YC(  ONIT )
       RXRAT(     37 ) = RKI(    37 ) * YC(  PAN )
       RXRAT(     38 ) = RKI(    38 ) * YC(  PAN )
-      RXRAT(     39 ) = RKI(    39 ) * YC(  TRPN )
-      RXRAT(     40 ) = RKI(    40 ) * YC(  HONIT )
+      RXRAT(     39 ) = RKI(    39 ) * YC(  VTRPN )
+      RXRAT(     40 ) = RKI(    40 ) * YC(  VHONIT )
 !     RXRAT(     41 ) = RKI(    41 ) * YC(  O3 ) * YC(  HO )
 !     RXRAT(     42 ) = RKI(    42 ) * YC(  O3 ) * YC(  HO2 )
 !     RXRAT(     43 ) = RKI(    43 ) * YC(  O3 ) * YC(  NO )
@@ -186,7 +186,7 @@ C..NOTE: RXRAT commented out are not referenced by any routine
       RXRAT(    130 ) = RKI(   130 ) * YC(  OP1 ) * YC(  HO )
       RXRAT(    131 ) = RKI(   131 ) * YC(  OP2 ) * YC(  HO )
       RXRAT(    132 ) = RKI(   132 ) * YC(  OPB ) * YC(  HO )
-      RXRAT(    133 ) = RKI(   133 ) * YC(  OP3 ) * YC(  HO )
+      RXRAT(    133 ) = RKI(   133 ) * YC(  VOP3 ) * YC(  HO )
       RXRAT(    134 ) = RKI(   134 ) * YC(  MAHP ) * YC(  HO )
       RXRAT(    135 ) = RKI(   135 ) * YC(  ORA1 ) * YC(  HO )
       RXRAT(    136 ) = RKI(   136 ) * YC(  ORA2 ) * YC(  HO )
@@ -195,15 +195,15 @@ C..NOTE: RXRAT commented out are not referenced by any routine
       RXRAT(    139 ) = RKI(   139 ) * YC(  PPN ) * YC(  HO )
       RXRAT(    140 ) = RKI(   140 ) * YC(  MPAN ) * YC(  HO )
       RXRAT(    141 ) = RKI(   141 ) * YC(  ONIT ) * YC(  HO )
-      RXRAT(    142 ) = RKI(   142 ) * YC(  TRPN ) * YC(  HO )
-      RXRAT(    143 ) = RKI(   143 ) * YC(  HONIT ) * YC(  HO )
+      RXRAT(    142 ) = RKI(   142 ) * YC(  VTRPN ) * YC(  HO )
+      RXRAT(    143 ) = RKI(   143 ) * YC(  VHONIT ) * YC(  HO )
       RXRAT(    144 ) = RKI(   144 ) * YC(  ETE ) * YC(  O3 )
       RXRAT(    145 ) = RKI(   145 ) * YC(  OLT ) * YC(  O3 )
       RXRAT(    146 ) = RKI(   146 ) * YC(  OLI ) * YC(  O3 )
       RXRAT(    147 ) = RKI(   147 ) * YC(  API ) * YC(  O3 )
       RXRAT(    148 ) = RKI(   148 ) * YC(  LIM ) * YC(  O3 )
       RXRAT(    149 ) = RKI(   149 ) * YC(  LIMAL ) * YC(  O3 )
-      RXRAT(    150 ) = RKI(   150 ) * YC(  TRPN ) * YC(  O3 )
+      RXRAT(    150 ) = RKI(   150 ) * YC(  VTRPN ) * YC(  O3 )
       RXRAT(    151 ) = RKI(   151 ) * YC(  MACR ) * YC(  O3 )
       RXRAT(    152 ) = RKI(   152 ) * YC(  MVK ) * YC(  O3 )
       RXRAT(    153 ) = RKI(   153 ) * YC(  UALD ) * YC(  O3 )
@@ -216,7 +216,7 @@ C..NOTE: RXRAT commented out are not referenced by any routine
       RXRAT(    160 ) = RKI(   160 ) * YC(  OLI ) * YC(  NO3 )
       RXRAT(    161 ) = RKI(   161 ) * YC(  API ) * YC(  NO3 )
       RXRAT(    162 ) = RKI(   162 ) * YC(  LIM ) * YC(  NO3 )
-      RXRAT(    163 ) = RKI(   163 ) * YC(  TRPN ) * YC(  NO3 )
+      RXRAT(    163 ) = RKI(   163 ) * YC(  VTRPN ) * YC(  NO3 )
       RXRAT(    164 ) = RKI(   164 ) * YC(  HCHO ) * YC(  NO3 )
       RXRAT(    165 ) = RKI(   165 ) * YC(  ACD ) * YC(  NO3 )
       RXRAT(    166 ) = RKI(   166 ) * YC(  ALD ) * YC(  NO3 )
@@ -575,7 +575,7 @@ C..NOTE: RXRAT commented out are not referenced by any routine
       RXRAT(    519 ) = RKI(   519 ) * YC(  VROCP4OXY2 ) * YC(  HO )
       RXRAT(    520 ) = RKI(   520 ) * YC(  VROCP5OXY1 ) * YC(  HO )
       RXRAT(    521 ) = RKI(   521 ) * YC(  VROCP6OXY1 ) * YC(  HO )
-      RXRAT(    522 ) = RKI(   522 ) * YC(  OP3 ) * YC(  HO )
+      RXRAT(    522 ) = RKI(   522 ) * YC(  VOP3 ) * YC(  HO )
       RXRAT(    523 ) = RKI(   523 ) * YC(  ECH4 ) * YC(  HO )
       RXRAT(    524 ) = RKI(   524 ) * YC(  ATRPNJ )
       RXRAT(    525 ) = RKI(   525 ) * YC(  AHONITJ )

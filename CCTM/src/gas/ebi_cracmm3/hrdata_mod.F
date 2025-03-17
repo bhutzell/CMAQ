@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Mar 11, 2025
+C  REVISION HISTORY: Created by EBI solver program, Mar 14, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables for solution
 C*************************************************************************
@@ -150,13 +150,13 @@ c..Species indices
       INTEGER, PARAMETER :: OP1              =   38
       INTEGER, PARAMETER :: OP2              =   39
       INTEGER, PARAMETER :: OPB              =   40
-      INTEGER, PARAMETER :: OP3              =   41
+      INTEGER, PARAMETER :: VOP3             =   41
       INTEGER, PARAMETER :: PAA              =   42
-      INTEGER, PARAMETER :: CO2              =   43
-      INTEGER, PARAMETER :: ONIT             =   44
-      INTEGER, PARAMETER :: PAN              =   45
-      INTEGER, PARAMETER :: TRPN             =   46
-      INTEGER, PARAMETER :: HONIT            =   47
+      INTEGER, PARAMETER :: ONIT             =   43
+      INTEGER, PARAMETER :: PAN              =   44
+      INTEGER, PARAMETER :: CO2              =   45
+      INTEGER, PARAMETER :: VTRPN            =   46
+      INTEGER, PARAMETER :: VHONIT           =   47
       INTEGER, PARAMETER :: N2O5             =   48
       INTEGER, PARAMETER :: SO2              =   49
       INTEGER, PARAMETER :: SULF             =   50
@@ -230,7 +230,7 @@ c..Species indices
       INTEGER, PARAMETER :: LIMNP1           =  118
       INTEGER, PARAMETER :: LIMNP2           =  119
       INTEGER, PARAMETER :: ADCN             =  120
-      INTEGER, PARAMETER :: HOM              =  121
+      INTEGER, PARAMETER :: VHOM             =  121
       INTEGER, PARAMETER :: VROCP4OXY2       =  122
       INTEGER, PARAMETER :: VROCN1OXY6       =  123
       INTEGER, PARAMETER :: FURANONE         =  124
@@ -238,7 +238,7 @@ c..Species indices
       INTEGER, PARAMETER :: VROCP0OXY4       =  126
       INTEGER, PARAMETER :: BAL1             =  127
       INTEGER, PARAMETER :: BAL2             =  128
-      INTEGER, PARAMETER :: ELHOM            =  129
+      INTEGER, PARAMETER :: VELHOM           =  129
       INTEGER, PARAMETER :: VROCIOXY         =  130
       INTEGER, PARAMETER :: SLOWROC          =  131
       INTEGER, PARAMETER :: ACRO             =  132
@@ -253,7 +253,7 @@ c..Species indices
       INTEGER, PARAMETER :: SESQRO2          =  141
       INTEGER, PARAMETER :: VROCP0OXY2       =  142
       INTEGER, PARAMETER :: VROCP1OXY3       =  143
-      INTEGER, PARAMETER :: AGLYJ            =  144
+      INTEGER, PARAMETER :: AGLYOLIGJ        =  144
       INTEGER, PARAMETER :: IEPOXP           =  145
       INTEGER, PARAMETER :: AISO3NOSJ        =  146
       INTEGER, PARAMETER :: ASO4J            =  147

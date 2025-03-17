@@ -6,9 +6,11 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /home/bhutzell/CCTM_git_repository/UTIL/chemmech/scripts/../input/cracmm2/mech_cracmm2.def
+! Source file: /work/MOD3DEV/tskipper/cracmm3/20250314_avprepend_no_oxy_atoms/UTIL/chemmech/input/cracmm2/mech_cracmm2.def
 ! for Mechanism Name: CRACMM2                         
+
 ! This file is used to create mechanism data and functions
+
 ! The following are reserved symbols declared in this file:
 !    MECHNAME        = Mechanism name
 !    N_GAS_CHEM_SPC  = Total number of gas species in chemical mechanism
@@ -140,12 +142,12 @@
       DATA GAS_CHEM_SPC(  38 ) / 'OP1             ' /
       DATA GAS_CHEM_SPC(  39 ) / 'OP2             ' /
       DATA GAS_CHEM_SPC(  40 ) / 'OPB             ' /
-      DATA GAS_CHEM_SPC(  41 ) / 'OP3             ' /
+      DATA GAS_CHEM_SPC(  41 ) / 'VOP3            ' /
       DATA GAS_CHEM_SPC(  42 ) / 'PAA             ' /
       DATA GAS_CHEM_SPC(  43 ) / 'ONIT            ' /
       DATA GAS_CHEM_SPC(  44 ) / 'PAN             ' /
-      DATA GAS_CHEM_SPC(  45 ) / 'TRPN            ' /
-      DATA GAS_CHEM_SPC(  46 ) / 'HONIT           ' /
+      DATA GAS_CHEM_SPC(  45 ) / 'VTRPN           ' /
+      DATA GAS_CHEM_SPC(  46 ) / 'VHONIT          ' /
       DATA GAS_CHEM_SPC(  47 ) / 'N2O5            ' /
       DATA GAS_CHEM_SPC(  48 ) / 'SO2             ' /
       DATA GAS_CHEM_SPC(  49 ) / 'SULF            ' /
@@ -218,7 +220,7 @@
       DATA GAS_CHEM_SPC( 116 ) / 'LIMNP1          ' /
       DATA GAS_CHEM_SPC( 117 ) / 'LIMNP2          ' /
       DATA GAS_CHEM_SPC( 118 ) / 'ADCN            ' /
-      DATA GAS_CHEM_SPC( 119 ) / 'HOM             ' /
+      DATA GAS_CHEM_SPC( 119 ) / 'VHOM            ' /
       DATA GAS_CHEM_SPC( 120 ) / 'VROCP4OXY2      ' /
       DATA GAS_CHEM_SPC( 121 ) / 'VROCN1OXY6      ' /
       DATA GAS_CHEM_SPC( 122 ) / 'FURANONE        ' /
@@ -226,7 +228,7 @@
       DATA GAS_CHEM_SPC( 124 ) / 'VROCP0OXY4      ' /
       DATA GAS_CHEM_SPC( 125 ) / 'BAL1            ' /
       DATA GAS_CHEM_SPC( 126 ) / 'BAL2            ' /
-      DATA GAS_CHEM_SPC( 127 ) / 'ELHOM           ' /
+      DATA GAS_CHEM_SPC( 127 ) / 'VELHOM          ' /
       DATA GAS_CHEM_SPC( 128 ) / 'VROCIOXY        ' /
       DATA GAS_CHEM_SPC( 129 ) / 'SLOWROC         ' /
       DATA GAS_CHEM_SPC( 130 ) / 'ACRO            ' /
@@ -348,12 +350,12 @@
       & MEMBER("OP1             ",   35, "GC",   48.00D0, F), &
       & MEMBER("OP2             ",   36, "GC",   62.00D0, F), &
       & MEMBER("OPB             ",   37, "GC",  186.20D0, F), &
-      & MEMBER("OP3             ",   38, "GC",  176.20D0, F), &
+      & MEMBER("VOP3            ",   38, "GC",  176.20D0, F), &
       & MEMBER("PAA             ",   39, "GC",   76.00D0, F), &
       & MEMBER("ONIT            ",   40, "GC",  119.00D0, F), &
       & MEMBER("PAN             ",   41, "GC",  121.00D0, F), &
-      & MEMBER("TRPN            ",  120, "GC",  215.00D0, F), &
-      & MEMBER("HONIT           ",  121, "GC",  265.00D0, F), &
+      & MEMBER("VTRPN           ",  120, "GC",  215.00D0, F), &
+      & MEMBER("VHONIT          ",  121, "GC",  265.00D0, F), &
       & MEMBER("N2O5            ",   42, "GC",  108.00D0, F), &
       & MEMBER("SO2             ",   43, "GC",   64.00D0, F), &
       & MEMBER("SULF            ",   44, "GC",   98.00D0, F), &
@@ -427,7 +429,7 @@
       & MEMBER("LIMNP1          ",   86, "GC",  230.00D0, F), &
       & MEMBER("LIMNP2          ",   87, "GC",  230.00D0, F), &
       & MEMBER("ADCN            ",  125, "GC",  155.00D0, F), &
-      & MEMBER("HOM             ",   90, "GC",  250.00D0, F), &
+      & MEMBER("VHOM            ",   90, "GC",  250.00D0, F), &
       & MEMBER("VROCP4OXY2      ",  179, "GC",  158.20D0, F), &
       & MEMBER("VROCN1OXY6      ",  172, "GC",  190.20D0, F), &
       & MEMBER("FURANONE        ",  134, "GC",  100.10D0, F), &
@@ -435,7 +437,7 @@
       & MEMBER("VROCP0OXY4      ",  174, "GC",  202.30D0, F), &
       & MEMBER("BAL1            ",  126, "GC",  123.00D0, F), &
       & MEMBER("BAL2            ",  127, "GC",  109.00D0, F), &
-      & MEMBER("ELHOM           ",   91, "GC",  402.00D0, F), &
+      & MEMBER("VELHOM          ",   91, "GC",  402.00D0, F), &
       & MEMBER("VROCIOXY        ",  135, "GC",  247.00D0, F), &
       & MEMBER("SLOWROC         ",  136, "GC",   75.40D0, F), &
       & MEMBER("ACRO            ",  128, "GC",   56.10D0, F), &
@@ -538,12 +540,12 @@
       DATA CHEMISTRY_SPC(  38 ), SPECIES_MOLWT(  38 ) / 'OP1             ',   48.00D0 /
       DATA CHEMISTRY_SPC(  39 ), SPECIES_MOLWT(  39 ) / 'OP2             ',   62.00D0 /
       DATA CHEMISTRY_SPC(  40 ), SPECIES_MOLWT(  40 ) / 'OPB             ',  186.20D0 /
-      DATA CHEMISTRY_SPC(  41 ), SPECIES_MOLWT(  41 ) / 'OP3             ',  176.20D0 /
+      DATA CHEMISTRY_SPC(  41 ), SPECIES_MOLWT(  41 ) / 'VOP3            ',  176.20D0 /
       DATA CHEMISTRY_SPC(  42 ), SPECIES_MOLWT(  42 ) / 'PAA             ',   76.00D0 /
       DATA CHEMISTRY_SPC(  43 ), SPECIES_MOLWT(  43 ) / 'ONIT            ',  119.00D0 /
       DATA CHEMISTRY_SPC(  44 ), SPECIES_MOLWT(  44 ) / 'PAN             ',  121.00D0 /
-      DATA CHEMISTRY_SPC(  45 ), SPECIES_MOLWT(  45 ) / 'TRPN            ',  215.00D0 /
-      DATA CHEMISTRY_SPC(  46 ), SPECIES_MOLWT(  46 ) / 'HONIT           ',  265.00D0 /
+      DATA CHEMISTRY_SPC(  45 ), SPECIES_MOLWT(  45 ) / 'VTRPN           ',  215.00D0 /
+      DATA CHEMISTRY_SPC(  46 ), SPECIES_MOLWT(  46 ) / 'VHONIT          ',  265.00D0 /
       DATA CHEMISTRY_SPC(  47 ), SPECIES_MOLWT(  47 ) / 'N2O5            ',  108.00D0 /
       DATA CHEMISTRY_SPC(  48 ), SPECIES_MOLWT(  48 ) / 'SO2             ',   64.00D0 /
       DATA CHEMISTRY_SPC(  49 ), SPECIES_MOLWT(  49 ) / 'SULF            ',   98.00D0 /
@@ -617,7 +619,7 @@
       DATA CHEMISTRY_SPC( 117 ), SPECIES_MOLWT( 117 ) / 'LIMNP1          ',  230.00D0 /
       DATA CHEMISTRY_SPC( 118 ), SPECIES_MOLWT( 118 ) / 'LIMNP2          ',  230.00D0 /
       DATA CHEMISTRY_SPC( 119 ), SPECIES_MOLWT( 119 ) / 'ADCN            ',  155.00D0 /
-      DATA CHEMISTRY_SPC( 120 ), SPECIES_MOLWT( 120 ) / 'HOM             ',  250.00D0 /
+      DATA CHEMISTRY_SPC( 120 ), SPECIES_MOLWT( 120 ) / 'VHOM            ',  250.00D0 /
       DATA CHEMISTRY_SPC( 121 ), SPECIES_MOLWT( 121 ) / 'VROCP4OXY2      ',  158.20D0 /
       DATA CHEMISTRY_SPC( 122 ), SPECIES_MOLWT( 122 ) / 'VROCN1OXY6      ',  190.20D0 /
       DATA CHEMISTRY_SPC( 123 ), SPECIES_MOLWT( 123 ) / 'FURANONE        ',  100.10D0 /
@@ -625,7 +627,7 @@
       DATA CHEMISTRY_SPC( 125 ), SPECIES_MOLWT( 125 ) / 'VROCP0OXY4      ',  202.30D0 /
       DATA CHEMISTRY_SPC( 126 ), SPECIES_MOLWT( 126 ) / 'BAL1            ',  123.00D0 /
       DATA CHEMISTRY_SPC( 127 ), SPECIES_MOLWT( 127 ) / 'BAL2            ',  109.00D0 /
-      DATA CHEMISTRY_SPC( 128 ), SPECIES_MOLWT( 128 ) / 'ELHOM           ',  402.00D0 /
+      DATA CHEMISTRY_SPC( 128 ), SPECIES_MOLWT( 128 ) / 'VELHOM          ',  402.00D0 /
       DATA CHEMISTRY_SPC( 129 ), SPECIES_MOLWT( 129 ) / 'VROCIOXY        ',  247.00D0 /
       DATA CHEMISTRY_SPC( 130 ), SPECIES_MOLWT( 130 ) / 'SLOWROC         ',   75.40D0 /
       DATA CHEMISTRY_SPC( 131 ), SPECIES_MOLWT( 131 ) / 'ACRO            ',   56.10D0 /
@@ -729,12 +731,12 @@
       DATA CGRID_INDEX(  38 ), SPECIES_TYPE(  38 ), CONVERT_CONC(  38 ) /   35, 'GC', F /  ! OP1
       DATA CGRID_INDEX(  39 ), SPECIES_TYPE(  39 ), CONVERT_CONC(  39 ) /   36, 'GC', F /  ! OP2
       DATA CGRID_INDEX(  40 ), SPECIES_TYPE(  40 ), CONVERT_CONC(  40 ) /   37, 'GC', F /  ! OPB
-      DATA CGRID_INDEX(  41 ), SPECIES_TYPE(  41 ), CONVERT_CONC(  41 ) /   38, 'GC', F /  ! OP3
+      DATA CGRID_INDEX(  41 ), SPECIES_TYPE(  41 ), CONVERT_CONC(  41 ) /   38, 'GC', F /  ! VOP3
       DATA CGRID_INDEX(  42 ), SPECIES_TYPE(  42 ), CONVERT_CONC(  42 ) /   39, 'GC', F /  ! PAA
       DATA CGRID_INDEX(  43 ), SPECIES_TYPE(  43 ), CONVERT_CONC(  43 ) /   40, 'GC', F /  ! ONIT
       DATA CGRID_INDEX(  44 ), SPECIES_TYPE(  44 ), CONVERT_CONC(  44 ) /   41, 'GC', F /  ! PAN
-      DATA CGRID_INDEX(  45 ), SPECIES_TYPE(  45 ), CONVERT_CONC(  45 ) /  120, 'GC', F /  ! TRPN
-      DATA CGRID_INDEX(  46 ), SPECIES_TYPE(  46 ), CONVERT_CONC(  46 ) /  121, 'GC', F /  ! HONIT
+      DATA CGRID_INDEX(  45 ), SPECIES_TYPE(  45 ), CONVERT_CONC(  45 ) /  120, 'GC', F /  ! VTRPN
+      DATA CGRID_INDEX(  46 ), SPECIES_TYPE(  46 ), CONVERT_CONC(  46 ) /  121, 'GC', F /  ! VHONIT
       DATA CGRID_INDEX(  47 ), SPECIES_TYPE(  47 ), CONVERT_CONC(  47 ) /   42, 'GC', F /  ! N2O5
       DATA CGRID_INDEX(  48 ), SPECIES_TYPE(  48 ), CONVERT_CONC(  48 ) /   43, 'GC', F /  ! SO2
       DATA CGRID_INDEX(  49 ), SPECIES_TYPE(  49 ), CONVERT_CONC(  49 ) /   44, 'GC', F /  ! SULF
@@ -808,7 +810,7 @@
       DATA CGRID_INDEX( 117 ), SPECIES_TYPE( 117 ), CONVERT_CONC( 117 ) /   86, 'GC', F /  ! LIMNP1
       DATA CGRID_INDEX( 118 ), SPECIES_TYPE( 118 ), CONVERT_CONC( 118 ) /   87, 'GC', F /  ! LIMNP2
       DATA CGRID_INDEX( 119 ), SPECIES_TYPE( 119 ), CONVERT_CONC( 119 ) /  125, 'GC', F /  ! ADCN
-      DATA CGRID_INDEX( 120 ), SPECIES_TYPE( 120 ), CONVERT_CONC( 120 ) /   90, 'GC', F /  ! HOM
+      DATA CGRID_INDEX( 120 ), SPECIES_TYPE( 120 ), CONVERT_CONC( 120 ) /   90, 'GC', F /  ! VHOM
       DATA CGRID_INDEX( 121 ), SPECIES_TYPE( 121 ), CONVERT_CONC( 121 ) /  179, 'GC', F /  ! VROCP4OXY2
       DATA CGRID_INDEX( 122 ), SPECIES_TYPE( 122 ), CONVERT_CONC( 122 ) /  172, 'GC', F /  ! VROCN1OXY6
       DATA CGRID_INDEX( 123 ), SPECIES_TYPE( 123 ), CONVERT_CONC( 123 ) /  134, 'GC', F /  ! FURANONE
@@ -816,7 +818,7 @@
       DATA CGRID_INDEX( 125 ), SPECIES_TYPE( 125 ), CONVERT_CONC( 125 ) /  174, 'GC', F /  ! VROCP0OXY4
       DATA CGRID_INDEX( 126 ), SPECIES_TYPE( 126 ), CONVERT_CONC( 126 ) /  126, 'GC', F /  ! BAL1
       DATA CGRID_INDEX( 127 ), SPECIES_TYPE( 127 ), CONVERT_CONC( 127 ) /  127, 'GC', F /  ! BAL2
-      DATA CGRID_INDEX( 128 ), SPECIES_TYPE( 128 ), CONVERT_CONC( 128 ) /   91, 'GC', F /  ! ELHOM
+      DATA CGRID_INDEX( 128 ), SPECIES_TYPE( 128 ), CONVERT_CONC( 128 ) /   91, 'GC', F /  ! VELHOM
       DATA CGRID_INDEX( 129 ), SPECIES_TYPE( 129 ), CONVERT_CONC( 129 ) /  135, 'GC', F /  ! VROCIOXY
       DATA CGRID_INDEX( 130 ), SPECIES_TYPE( 130 ), CONVERT_CONC( 130 ) /  136, 'GC', F /  ! SLOWROC
       DATA CGRID_INDEX( 131 ), SPECIES_TYPE( 131 ), CONVERT_CONC( 131 ) /  128, 'GC', F /  ! ACRO
@@ -922,12 +924,12 @@
       INTEGER :: INDEX_OP1         =   38
       INTEGER :: INDEX_OP2         =   39
       INTEGER :: INDEX_OPB         =   40
-      INTEGER :: INDEX_OP3         =   41
+      INTEGER :: INDEX_VOP3        =   41
       INTEGER :: INDEX_PAA         =   42
       INTEGER :: INDEX_ONIT        =   43
       INTEGER :: INDEX_PAN         =   44
-      INTEGER :: INDEX_TRPN        =   45
-      INTEGER :: INDEX_HONIT       =   46
+      INTEGER :: INDEX_VTRPN       =   45
+      INTEGER :: INDEX_VHONIT      =   46
       INTEGER :: INDEX_N2O5        =   47
       INTEGER :: INDEX_SO2         =   48
       INTEGER :: INDEX_SULF        =   49
@@ -1001,7 +1003,7 @@
       INTEGER :: INDEX_LIMNP1      =  117
       INTEGER :: INDEX_LIMNP2      =  118
       INTEGER :: INDEX_ADCN        =  119
-      INTEGER :: INDEX_HOM         =  120
+      INTEGER :: INDEX_VHOM        =  120
       INTEGER :: INDEX_VROCP4OXY2  =  121
       INTEGER :: INDEX_VROCN1OXY6  =  122
       INTEGER :: INDEX_FURANONE    =  123
@@ -1009,7 +1011,7 @@
       INTEGER :: INDEX_VROCP0OXY4  =  125
       INTEGER :: INDEX_BAL1        =  126
       INTEGER :: INDEX_BAL2        =  127
-      INTEGER :: INDEX_ELHOM       =  128
+      INTEGER :: INDEX_VELHOM      =  128
       INTEGER :: INDEX_VROCIOXY    =  129
       INTEGER :: INDEX_SLOWROC     =  130
       INTEGER :: INDEX_ACRO        =  131
@@ -1448,959 +1450,959 @@
      &     50/
       REAL( 8 ),    PARAMETER :: ATM_H2 = 5.60000D-01
 
-      INTEGER, PARAMETER :: N_ATOMS =  15
+      INTEGER, PARAMETER :: N_ATOMS =  14
       CHARACTER( 16 )    :: ATOMS( N_ATOMS )
 
       DATA ( ATOMS( IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &   'CA', 'MN', 'CL', 'HG', 'BR', 'NA', & 
      &   'SI', 'S ', 'TI', 'FE', 'K ', 'I ', & 
-     &   'N ', 'C ', 'O '/
+     &   'N ', 'C '/
       REAL( 8 )            :: CHEM_SPC_ATOMS( NUMB_MECH_SPC,N_ATOMS )
 ! O3 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(   1,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! O3P found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(   2,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! O1D found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(   3,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! H2O2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(   4,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! HO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(   5,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! NO2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(   6,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00/
 ! NO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(   7,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00/
 ! NO3 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(   8,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00/
 ! HONO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(   9,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00/
 ! HNO3 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  10,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00/
 ! HNO4 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  11,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00/
 ! HO2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  12,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! HCHO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  13,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/
 ! CO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  14,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/
 ! ACD found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  15,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! MO2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  16,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/
 ! ALD found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  17,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! ETHP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  18,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! ACT found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  19,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! ACO3 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  20,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! UALD found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  21,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! KET found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  22,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! PINAL found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  23,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! HC10P found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  24,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! LIMAL found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  25,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! MEK found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  26,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! HKET found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  27,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! MACR found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  28,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! MACP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  29,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! XO2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  30,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! MVK found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  31,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! GLY found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  32,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! MGLY found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  33,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! DCB1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  34,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! DCB2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  35,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00/
 ! BALD found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  36,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! CHO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  37,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00/
 ! OP1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  38,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/
 ! OP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  39,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! OPB found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  40,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 3.0000D+00/
-! OP3 found in GC namelist 
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
+! VOP3 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  41,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00/
 ! PAA found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  42,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! ONIT found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  43,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 4.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 4.0000D+00/
 ! PAN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  44,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 2.0000D+00, 5.0000D+00/
-! TRPN found in GC namelist 
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 2.0000D+00/
+! VTRPN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  45,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01, 4.0000D+00/
-! HONIT found in GC namelist 
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01/
+! VHONIT found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  46,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01, 7.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01/
 ! N2O5 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  47,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 2.0000D+00, 0.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 2.0000D+00, 0.0000D+00/
 ! SO2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  48,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! SULF found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  49,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! SULRXN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  50,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! ETH found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  51,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! HC3 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  52,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! HC3P found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  53,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! ASOATJ found in AE namelist 
       DATA ( CHEM_SPC_ATOMS(  54,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 6.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! HC5 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  55,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! HC5P found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  56,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! ETE found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  57,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! ETEP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  58,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! OLT found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  59,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! OLTP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  60,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! OLI found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  61,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! OLIP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  62,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! ACE found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  63,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! ORA1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  64,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/
 ! BEN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  65,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00/
 ! BENP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  66,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00/
 ! PHEN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  67,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00/
 ! TOL found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  68,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! TOLP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  69,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! CSL found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  70,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 9.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 9.0000D+00/
 ! XYL found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  71,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00/
 ! XYLP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  72,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00/
 ! EBZ found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  73,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00/
 ! EBZP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  74,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00/
 ! ISO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  75,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! ISON found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  76,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 5.0000D+00, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 5.0000D+00/
 ! INO2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  77,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 5.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 5.0000D+00/
 ! ISOP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  78,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! ISHP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  79,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! IEPOX found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  80,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! IPX found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  81,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! INALD found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  82,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 5.0000D+00, 7.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 5.0000D+00/
 ! ROH found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  83,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! API found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  84,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! APIP1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  85,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! APIP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  86,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! LIM found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  87,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! LIMP1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  88,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! LIMP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  89,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! PINALP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  90,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! RCO3 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  91,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! LIMALP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  92,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! ACTP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  93,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! MEKP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  94,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! KETP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  95,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! MCP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  96,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! MVKP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  97,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! UALP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  98,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! DCB3 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS(  99,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! BALP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 100,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! ADDC found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 101,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! MCT found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 102,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! MCTO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 103,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! MOH found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 104,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/
 ! EOH found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 105,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! ETEG found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 106,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! MAHP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 107,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! ORA2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 108,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! ORAP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 109,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+00/
 ! PPN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 110,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 3.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 3.0000D+00/
 ! MPAN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 111,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 4.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 4.0000D+00/
 ! MCTP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 112,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! OLNN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 113,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 3.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 3.0000D+00/
 ! OLND found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 114,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 3.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 3.0000D+00/
 ! APINP1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 115,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01/
 ! APINP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 116,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01/
 ! LIMNP1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 117,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01/
 ! LIMNP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 118,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+01/
 ! ADCN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 119,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 6.0000D+00, 4.0000D+00/
-! HOM found in GC namelist 
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 6.0000D+00/
+! VHOM found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 120,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 7.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! VROCP4OXY2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 121,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 9.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 9.0000D+00/
 ! VROCN1OXY6 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 122,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00/
 ! FURANONE found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 123,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! VROCP3OXY2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 124,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.1000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.1000D+01/
 ! VROCP0OXY4 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 125,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! BAL1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 126,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! BAL2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 127,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00, 2.0000D+00/
-! ELHOM found in GC namelist 
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00/
+! VELHOM found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 128,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+01, 8.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+01/
 ! VROCIOXY found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 129,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 5.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! SLOWROC found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 130,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00/
 ! ACRO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 131,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! BDE13 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 132,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! BDE13P found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 133,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
 ! FURAN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 134,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! FURANO2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 135,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! PROG found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 136,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 3.0000D+00/
 ! SESQ found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 137,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.5000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.5000D+01/
 ! SESQNRO2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 138,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.5000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 1.0000D+00, 1.5000D+01/
 ! VROCN2OXY2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 139,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.7000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.7000D+01/
 ! SESQRO2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 140,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.5000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.5000D+01/
 ! VROCP0OXY2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 141,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01/
 ! VROCP1OXY3 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 142,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.1000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.1000D+01/
 ! AGLYJ found in AE namelist 
       DATA ( CHEM_SPC_ATOMS( 143,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00, 8.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00/
 ! IEPOXP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 144,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! AISO3NOSJ found in AE namelist 
       DATA ( CHEM_SPC_ATOMS( 145,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! ASO4J found in AE namelist 
       DATA ( CHEM_SPC_ATOMS( 146,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! AISO3OSJ found in AE namelist 
       DATA ( CHEM_SPC_ATOMS( 147,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 7.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! AISO4J found in AE namelist 
       DATA ( CHEM_SPC_ATOMS( 148,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 6.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! AISO5J found in AE namelist 
       DATA ( CHEM_SPC_ATOMS( 149,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 5.0000D+00/
 ! VROCP6ALK found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 150,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3000D+01/
 ! VROCP6ALKP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 151,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3000D+01/
 ! VROCP5ALK found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 152,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01/
 ! VROCP5ALKP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 153,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01/
 ! VROCP4ALK found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 154,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.8000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.8000D+01/
 ! VROCP4ALKP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 155,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.8000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.8000D+01/
 ! VROCP3ALK found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 156,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.1000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.1000D+01/
 ! VROCP3ALKP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 157,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.1000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.1000D+01/
 ! VROCP2ALK found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 158,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.4000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.4000D+01/
 ! VROCP2ALKP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 159,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.4000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.4000D+01/
 ! VROCP1ALK found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 160,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.7000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.7000D+01/
 ! VROCP1ALKP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 161,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.7000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.7000D+01/
 ! HC10 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 162,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! VROCP6ALKP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 163,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3000D+01/
 ! VROCP5ALKP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 164,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01/
 ! VROCP4ALKP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 165,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.8000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.8000D+01/
 ! VROCP2OXY2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 166,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.2000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.2000D+01/
 ! VROCP3ALKP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 167,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.1000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.1000D+01/
 ! VROCP1OXY1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 168,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.7000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.7000D+01/
 ! VROCP2ALKP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 169,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.4000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.4000D+01/
 ! VROCP1ALKP2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 170,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.7000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.7000D+01/
 ! VROCN1OXY1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 171,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+01, 2.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 2.0000D+01/
 ! HC10P2 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 172,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! VROCP6ARO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 173,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3000D+01/
 ! VROCP6AROP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 174,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.3000D+01/
 ! VROCN2OXY4 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 175,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.1000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.1000D+01/
 ! VROCN1OXY3 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 176,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.2000D+01, 4.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.2000D+01/
 ! VROCP5ARO found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 177,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01/
 ! VROCP5AROP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 178,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.4000D+01/
 ! NAPH found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 179,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! NAPHP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 180,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01, 5.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+01/
 ! VROCN2OXY8 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 181,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00, 6.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! VROCP5OXY1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 182,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.1000D+01, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.1000D+01/
 ! VROCP6OXY1 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 183,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 9.0000D+00, 1.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 9.0000D+00/
 ! ECH4 found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 184,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00/
 ! ATRPNJ found in AE namelist 
       DATA ( CHEM_SPC_ATOMS( 185,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! AHOMJ found in AE namelist 
       DATA ( CHEM_SPC_ATOMS( 186,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! AHONITJ found in AE namelist 
       DATA ( CHEM_SPC_ATOMS( 187,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00/
 ! STY found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 188,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00, 0.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00/
 ! STYP found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 189,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00, 3.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00/
 
       INTEGER, PARAMETER :: MXPRD =  28
       INTEGER            :: IRR( NRXNS,MXPRD+3 )
