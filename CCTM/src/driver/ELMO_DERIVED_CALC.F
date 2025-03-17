@@ -552,14 +552,6 @@
              OUTVAL = ELMO_BLANK
              END IF
 
-         ! Retrieve Ground Heat Flux 
-         CASE ( ID_GHFX )
-             IF ( L1 .EQ. 1 ) THEN
-             OUTVAL = MET_DATA%RGRND( C1,R1 ) - MET_DATA%HFX( C1,R1 ) - MET_DATA%LH( C1,R1 ) ! W m-1
-             ELSE
-             OUTVAL = ELMO_BLANK
-             END IF
-
          ! Retrieve Latent Heat Flux 
          CASE ( ID_SWC_1 )
              IF ( L1 .EQ. 1 ) THEN

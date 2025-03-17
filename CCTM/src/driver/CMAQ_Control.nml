@@ -150,7 +150,7 @@
   Keywd_name(9) = 'FLUXNET'           
   Keywd(9,:) = 'TA','PRES','RH','PBL','PRECIP','RGRND','WSPD10','WDIR10',
                'DENS','CFRAC','SFC_TMP','WVEL', 'USTAR', 'GA', 'ZOL', 'SHFX', 
-               'LHFX','GHFX','SWC_1','SWC_2','SOILT_1','SOILT_2' 
+               'LHFX','SWC_1','SWC_2','SOILT_1','SOILT_2' 
 
 
  !----------------------------------------------------!

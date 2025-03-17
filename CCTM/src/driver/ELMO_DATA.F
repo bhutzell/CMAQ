@@ -184,11 +184,10 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_ZOL    =     108
       INTEGER, PARAMETER :: ID_SHFX   =     109
       INTEGER, PARAMETER :: ID_LHFX   =     110
-      INTEGER, PARAMETER :: ID_GHFX   =     111
-      INTEGER, PARAMETER :: ID_SWC_1  =     112
-      INTEGER, PARAMETER :: ID_SWC_2  =     113
-      INTEGER, PARAMETER :: ID_SOILT_1 =    114
-      INTEGER, PARAMETER :: ID_SOILT_2 =    115
+      INTEGER, PARAMETER :: ID_SWC_1  =     111
+      INTEGER, PARAMETER :: ID_SWC_2  =     112
+      INTEGER, PARAMETER :: ID_SOILT_1 =    113
+      INTEGER, PARAMETER :: ID_SOILT_2 =    114
 
       TYPE ELDTP
         CHARACTER (LEN = 16) :: NAME      !Parameter Name
@@ -199,7 +198,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
 
-      INTEGER, PARAMETER :: N_ELMO_LIST = 115
+      INTEGER, PARAMETER :: N_ELMO_LIST = 114
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
 
@@ -330,7 +329,6 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'ZOL          ',ID_ZOL,        ET_MET,      F, '      ', 'Grid Cell Midpoint over Monin-Obukhov length' ),
      &ELDTP( 'SHFX         ',ID_SHFX,       ET_MET,      F, 'W m-2 ', 'Sensible Heat Flux' ),
      &ELDTP( 'LHFX         ',ID_LHFX,       ET_MET,      F, 'W m-2 ', 'Latent Heat FLux' ),
-     &ELDTP( 'GHFX         ',ID_GHFX,       ET_MET,      F, 'W m-2 ', 'Soil Heat Flux' ),
      &ELDTP( 'SWC_1        ',ID_SWC_1,      ET_MET,      F, '      ', 'Layer 1 soil moisture saturation ratio' ),
      &ELDTP( 'SWC_2        ',ID_SWC_2,      ET_MET,      F, '      ', 'Layer 2 soil moisture saturation ratio' ),
      &ELDTP( 'SOILT_1      ',ID_SOILT_1,    ET_MET,      F, 'K     ', 'Layer 1 soil temperature' ),
