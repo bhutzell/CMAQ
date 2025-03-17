@@ -216,10 +216,8 @@
   Keywd_name(18) = 'PM_FINE_VARS'
   Keywd(18,:) = 'PMF_H2O','PMF_HP','PMF_HPMOLAL','PMF_PH','FINE_ORG'
 
-
   Keywd_name(19) = 'COARSE_SPECIES'
   Keywd(19,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA','PMC_CL'
-
 
   Keywd_name(20) = 'AMS_SPECIES'
   Keywd(20,:) = 'PMAMS','PMAMS_SO4','PMAMS_NO3','PMAMS_NH4','PMAMS_CL','PMAMS_OA','PMAMS_OTOC'
