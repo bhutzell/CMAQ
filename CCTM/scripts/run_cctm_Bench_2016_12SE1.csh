@@ -299,7 +299,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv ncd_64bit_offset Y
   setenv mio_file_info $OUTDIR/mio_file_input_${CTM_APPL}.txt
 # for now, need at least one input
-  setenv CTM_MIO_INPUT "GRID_CRO_2D"
+  setenv CTM_MIO_INPUT "INIT_CONC_1"
 
   #> Initial conditions
   if ($NEW_START == true || $NEW_START == TRUE ) then
