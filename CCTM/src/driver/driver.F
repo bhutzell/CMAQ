@@ -101,6 +101,10 @@ C   02 Aug 19 F. Sidi: Restored serial processing option
 C   03 AUG 19 D.Wong:  Modified code to work with two-way model
 C   09 Sep 19 F. Sidi: Replaced L_CONC_WVEL & L_ACONC_WVEL (depreciated) with W_VEL
 C   21 Nov 19 S.L.Napelenok: Include DDM3D for versions 5.3.1
+C   10 Jan 24 D. Wong: Incorporated unified coupler implementation
+C   04 Mar 25 D. Wong: Eliminated two optional arguments: model_xcent and model_ycent,
+C                      where the same information can be obtained from WRF structure
+C                      config_flags that is passed to subroutine twoway_aqprep
 C-----------------------------------------------------------------------
 
       USE RXNS_DATA             ! chemical mechanism data
@@ -129,6 +133,9 @@ C-----------------------------------------------------------------------
       use lus_defn
       use mio_module
 #else
+#ifdef twoway
+      use coupler_module, only : coupled_model_stdate, coupled_model_sttime
+#endif
       USE PCGRID_DEFN           ! inherits GRID_CONF
       USE AVG_CONC              ! integral average CONC
       USE PA_DEFN, Only: LIPR, LIRR  ! Process Anaylsis control and data variables
@@ -346,8 +353,12 @@ C-----------------------------------------------------------------------
 #endif
 
 #ifdef twoway
+         coupled_model_stdate = MODEL_STDATE
+         coupled_model_sttime = MODEL_STTIME
+
          TSTEP( 1 ) = LOCAL_TSTEP
          TSTEP( 3 ) = SEC2TIME(MODEL_TSTEP)
+
 #else
          TSTEP( 1 ) = MODEL_TSTEP
 #endif
@@ -682,8 +693,8 @@ C Main processing loop:
 
       DO L = 1, NLAYS
          DO C = 1, NCOLS
-            CGRID( C,1,L,1:N_GC_SPC ) = cmaq_species( c,1,l,1:N_GC_SPC )
-            CGRID( C,1,L,N_GC_SPC+2:v ) = cmaq_species( c,1,l,N_GC_SPC+1:v-1 )
+            CGRID( C,1,L,1:N_GC_SPC )   = coupler_m2a_dr_3d_data( c,1,l,1:N_GC_SPC,1 )
+            CGRID( C,1,L,N_GC_SPC+2:v ) = coupler_m2a_dr_3d_data( c,1,l,N_GC_SPC+1:v-1,1 )
          END DO
       END DO
 
