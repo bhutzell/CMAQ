@@ -130,7 +130,7 @@
                'PM25_SPECIES_B','SIZE','AMS_SPECIES','PM25TO10_SPECIES',
                'CUTOFF_FRACTIONS','PM_FINE_VARS','PM25_VARS','COMMON_GASES','ACRO','ACT',
                'BDE13','MEK','EBZ','STY','HC3','HC5','HC10','OLI','OLT','API',
-               'ALD','NOZ','SULF','LSIROCG','TOTROCG','PMC_CL'
+               'ALD','NOZ','SULF','LSIROCG','TOTROCG'
 
   Keywd_name(7) = 'DEFAULT_CRACMM3'
   Keywd(7,:) = 'DEFAULT_CRACMM2'
@@ -218,7 +218,7 @@
 
 
   Keywd_name(19) = 'COARSE_SPECIES'
-  Keywd(19,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA'
+  Keywd(19,:) = 'PMC','PMC_SO4','PMC_NO3','PMC_NH4','PMC_NA','PMC_MG','PMC_K','PMC_CA','PMC_CL'
 
 
   Keywd_name(20) = 'AMS_SPECIES'
