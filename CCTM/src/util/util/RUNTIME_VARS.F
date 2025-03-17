@@ -847,11 +847,7 @@
       CALL GET_ENV ( SSEMDIAG, 'CTM_SSEMDIAG', SSEMDIAG, VARDEV )
  
       ! Set CTM_MET_EMIS to Y or T ro turn on met-modulated emissions
-<<<<<<< HEAD
       CALL GET_ENV ( MET_EMIS, 'CTM_MET_EMIS', MET_EMIS, VARDEV )
-=======
-       CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
->>>>>>> 7d6727211e29ad06ce6c1db18d3bdfff17d71344
  
       ! Get met-modulated emission diagnostic output file flag.
       CALL GET_ENV ( MET_EMIS_DIAG, 'MET_EMIS_DIAG', MET_EMIS_DIAG, VARDEV )
