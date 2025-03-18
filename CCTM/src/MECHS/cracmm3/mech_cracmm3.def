@@ -159,6 +159,8 @@ END ELIMINATE
 
 
 
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -438,7 +440,7 @@ REACTIONS[CM] =
                  # 1.06E-12;                 
 <R158> MCT + NO3 = MCTO + HNO3  - 1.0000*DELTA_C # 2.01E-10;
 <R159> MPAN + NO3 = MACP + NO2 + HNO3 # 2.2E-14 @ 500.;
-<RBAL2> BALP + NO2 = PAN  + 5.0000*DELTA_C # 9.7E-29 ^ -5.6 
+<RBAL2> BALP + NO2 = PAN  + 5.0000*DELTA_C  # 9.7E-29 ^ -5.6 
                    & 9.3E-12 ^ -1.5 & 1.42 & 0.3;                   
 <TRP11> PINALP = VHOM # 0.029;
 <TRP12> LIMALP = VHOM # 0.024;

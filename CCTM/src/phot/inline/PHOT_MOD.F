@@ -113,7 +113,7 @@ C-----------------------------------------------------------------------
       REAL, ALLOCATABLE  :: BLKSO2 ( : )           ! SO2 concentration [ molecules/cm**3 ]
       REAL, ALLOCATABLE  :: BLKDZ  ( : )           ! layer thicknesses [ m ]
       REAL, ALLOCATABLE  :: GAS_EXTINCTION( :,: )  ! extinction from gases per layer [1/m]
-      REAL, ALLOCATABLE  :: EXTINCTION    ( :,: )  ! total extinction per layer [1/m]
+      REAL, ALLOCATABLE  :: CLD_EXTINCTION( :,: )  ! cloud extinction per layer [1/m]
       REAL, ALLOCATABLE  :: ACTINIC_FLUX  ( :,: )  ! actinic fluxes, initially [Photons/(cm^2s)] then  [Watts/m^2] 
       REAL, ALLOCATABLE  :: IRRADIANCE    ( :,: )  ! total downward irradiance [Watts/m^2]
       REAL               :: REFLECTION             ! broad band reflection coefficient (diffuse) at model top 
@@ -390,7 +390,7 @@ C-----------------------------------------------------------------------
          ALLOCATE( QYZ( NLAYS,NWL,NPHOTAB ) )
          
          ALLOCATE( GAS_EXTINCTION( NLAYS,NWL ) )
-         ALLOCATE( EXTINCTION    ( NLAYS,NWL ) )
+         ALLOCATE( CLD_EXTINCTION( NLAYS,NWL ) )
          ALLOCATE( ACTINIC_FLUX  ( NLAYS,NWL ) )
          ALLOCATE( IRRADIANCE    ( NLAYS,NWL ) )
          
@@ -435,7 +435,7 @@ C-----------------------------------------------------------------------
 
       BLKRJ          = 0.0
       GAS_EXTINCTION = 0.0
-      EXTINCTION     = 0.0
+      CLD_EXTINCTION = 0.0
       ACTINIC_FLUX   = 0.0
       IRRADIANCE     = 0.0
       REFLECTION     = 0.0
@@ -653,7 +653,6 @@ C*** find ozone column density for atmosphere, stratosphere, and troposphere
             DTABS_A  = MAX( DTABS_A, SMALL )
 
             GAS_EXTINCTION( II,IWL ) = BETA_M + AO3 + ANO2        ! gas extinction
-            EXTINCTION( II,IWL )     = BETA_M + BEXT + AO3 + ANO2 ! gas and aerosol extinction
             
             IF ( CLOUDS( II ) ) THEN 
      
@@ -678,10 +677,9 @@ C*** find ozone column density for atmosphere, stratosphere, and troposphere
                DT_CLOUD( L ) = DT_CLOUD( L ) * LAYERING_FACTOR
                DTSCAT_CLOUD  = DTSCAT_CLOUD  * LAYERING_FACTOR
  
-               EXTINCTION( II,IWL ) = EXTINCTION( II,IWL )
-     &                              + ( CLOUD_LIQUID_EXT( II,IWL ) 
-     &                              +   CLOUD_ICE_EXT( II,IWL )
-     &                              +   CLOUD_AGGREG_EXT( II,IWL ) ) * LAYERING_FACTOR
+               CLD_EXTINCTION( II,IWL ) = ( CLOUD_LIQUID_EXT( II,IWL ) 
+     &                                  +   CLOUD_ICE_EXT( II,IWL )
+     &                                  +   CLOUD_AGGREG_EXT( II,IWL ) ) * LAYERING_FACTOR
     
                TAU_SCAT_CLD = TAU_SCAT_CLD + DTSCAT_CLOUD
 
