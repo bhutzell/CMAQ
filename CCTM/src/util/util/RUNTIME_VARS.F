@@ -625,12 +625,7 @@
       END IF
 
       ! Get Filename for Chemical Mechanism
-      CALL GET_ENV ( MECH, 'MECH', MECH, VARDEV )
-      IF ( LEN_TRIM( MECH ) .LE. 0 ) THEN
-         XMSG = 'Run script does not set environment MECH.'  
-         WRITE( OUTDEV, '(A)' )TRIM( XMSG )
-         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
+      CALL GET_ENV ( MECH, 'MECH', 'BLANK', VARDEV )
 
       ! Get photolysis rate diagnostic file flag
       CALL GET_ENV ( PHOTDIAG, 'CTM_PHOTDIAG', PHOTDIAG, VARDEV )
@@ -1147,10 +1142,10 @@
       CHARACTER( 20 )       :: FMT
 
       CHARACTER( LOG_LINE_LENGTH ) :: CTEMP
-      INTEGER :: MSG_SIZE
+      INTEGER :: MSG_SIZE, IT
       INTEGER :: NLINE1, NLINE2, NLINE, NTAB, LAST_SPACE
 
-      CMSG = CMSG_IN
+      CMSG = CMSG_IN 
 
       ! Write the message to the log file, while trimming to 80
       ! characters (while accounting for tab-length)
@@ -1161,8 +1156,11 @@
       
       ! Determine Length of Total Message
       MSG_SIZE = LEN_TRIM( CMSG )
-      
-      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH )
+      IT = 0
+
+      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH .AND. IT .LE. 1000 )
+         IT = IT + 1
+
          ! Isolate One Line of Text
          LAST_SPACE = INDEX( CMSG( 1:NLINE+1 ), " ", BACK=.TRUE. )
      
