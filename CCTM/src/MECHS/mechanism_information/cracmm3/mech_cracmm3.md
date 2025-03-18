@@ -44,7 +44,7 @@ Information is based on the mech.def file.
 | R024   | MGLY ----> HO2 + ACO3 + CO  | MGLY_RACM2 | Not Available<sup>1</sup> | 
 | R025   | DCB1 ---->   1.5000\*HO2 +    0.2500\*ACO3 +    0.2000\*XO2 + CO +    0.5000\*GLY +    0.5000\*MGLY  | MGLY_RACM2 | Not Available<sup>1</sup> | 
 | R026   | DCB2 ---->   1.5000\*HO2 +    0.2500\*ACO3 +    0.2000\*XO2 + CO +    0.5000\*GLY +    0.5000\*MGLY  | MGLY_RACM2 | Not Available<sup>1</sup> | 
-| R027   | BALD ----> CHO + HO2 + CO  | BALD_RACM2 | Not Available<sup>1</sup> | 
+| R027   | BALD ----> BAL1 + HO2 + CO  | BALD_RACM2 | Not Available<sup>1</sup> | 
 | R028   | OP1 ----> HO + HO2 + HCHO  | OP1_RACM2 | Not Available<sup>1</sup> | 
 | R029   | OP2 ----> HO + HO2 + ALD  | OP1_RACM2 | Not Available<sup>1</sup> | 
 | TRP03   | OPB ----> HO + HO2 + ALD  | OP1_RACM2 | Not Available<sup>1</sup> | 
@@ -186,10 +186,12 @@ Information is based on the mech.def file.
 | R152   | UALD + NO3 ----> HO2 + XO2 +    0.6680\*CO +    0.3320\*HCHO +    0.3320\*ALD + ONIT  |   5.02E-13e<sup> -1076.00/T</sup> |   1.3595E-14 |
 | R153   | GLY + NO3 ----> HO2 +    2.0000\*CO + HNO3  |   2.90E-12e<sup> -1900.00/T</sup> |   4.9522E-15 |
 | R154   | MGLY + NO3 ----> ACO3 + CO + HNO3  |   3.76E-12e<sup> -1900.00/T</sup> |   6.4208E-15 |
+| RBAL1   | BALD + NO3 ----> BALP + HNO3  |   2.4000E-15 |   2.4000E-15 |
 | R155   | PHEN + NO3 ---->   0.1520\*ASOATJ +    0.3390\*CHO +    0.8500\*ADDC +    0.4240\*ADCN +    0.4240\*HNO3  |   3.7800E-12 |   3.7800E-12 |
 | R156   | CSL + NO3 ---->   0.2000\*ASOATJ +    0.3200\*CHO +    0.0800\*ADDC +    0.4000\*ADCN +    0.4000\*HNO3  |   1.0600E-12 |   1.0600E-12 |
 | R158   | MCT + NO3 ----> MCTO + HNO3  |   2.0100E-10 |   2.0100E-10 |
 | R159   | MPAN + NO3 ----> MACP + NO2 + HNO3  |   2.20E-14e<sup>  -500.00/T</sup> |   4.1125E-15 |
+| RBAL2   | BALP + NO2 ----> PAN  | k<sub>o</sub>=  9.70E-29e<sup>     0.0/T</sup>(T/300)<sup> -5.60</sup><br>k<sub>i</sub> =   9.30E-12e<sup>     0.0/T</sup>(T/300)<sup> -1.50</sup><br>n=     0.30;F=     1.42 |   9.4009E-12 |
 | TRP11   | PINALP ----> VHOM  |   2.9000E-02 |   2.9000E-02 |
 | TRP12   | LIMALP ----> VHOM  |   2.4000E-02 |   2.4000E-02 |
 | R166   | ACO3 + NO2 ----> PAN  | k<sub>o</sub>=  9.70E-29e<sup>     0.0/T</sup>(T/300)<sup> -5.60</sup><br>k<sub>i</sub> =   9.30E-12e<sup>     0.0/T</sup>(T/300)<sup> -1.50</sup><br>n=     1.00;F=     0.60 |   8.6800E-12 |
@@ -228,7 +230,7 @@ Information is based on the mech.def file.
 | R197   | MCP + NO ----> NO2 +    0.5000\*HO2 +    0.5000\*HCHO + HKET  |   2.54E-12e<sup>   360.00/T</sup> |   8.4961E-12 |
 | R198   | MVKP + NO ---->   0.3000\*HO2 +    0.7000\*ACO3 +    0.7000\*XO2 + NO2 +    0.3000\*HCHO +    0.7000\*ALD +    0.3000\*MGLY  |   2.54E-12e<sup>   360.00/T</sup> |   8.4961E-12 |
 | R199   | UALP + NO ----> HO2 + NO2 +    0.6100\*CO +    0.0300\*HCHO +    0.2700\*ALD +    0.1800\*GLY +    0.7000\*KET +    0.2100\*MGLY  |   2.54E-12e<sup>   360.00/T</sup> |   8.4961E-12 |
-| R200   | BALP + NO ----> BAL1 + NO2  |   2.70E-12e<sup>   360.00/T</sup> |   9.0313E-12 |
+| R200   | BALP + NO ----> BAL1 + NO2 + CO2  |   2.70E-12e<sup>   360.00/T</sup> |   9.0313E-12 |
 | R201   | BAL1 + NO ----> BAL2 + NO2  |   2.70E-12e<sup>   360.00/T</sup> |   9.0313E-12 |
 | R202   | ADDC + NO ----> HO2 + NO2 +    0.3200\*HKET +    0.6800\*GLY +    0.6800\*OP2  |   2.70E-12e<sup>   360.00/T</sup> |   9.0313E-12 |
 | R203   | MCTP + NO ----> MCTO + NO2  |   2.70E-12e<sup>   360.00/T</sup> |   9.0313E-12 |
@@ -270,6 +272,9 @@ Information is based on the mech.def file.
 | R237   | MCP + HO2 ----> MAHP  |   1.82E-13e<sup>  1300.00/T</sup> |   1.4246E-11 |
 | R238   | MVKP + HO2 ----> OP2  |   2.91E-13e<sup>  1300.00/T</sup> |   2.2778E-11 |
 | R239   | UALP + HO2 ----> OP2  |   2.91E-13e<sup>  1300.00/T</sup> |   2.2778E-11 |
+| RBAL3   | BALP + HO2 ---->   0.4100\*VOP3 +    0.1500\*ORA2 +    0.1500\*O3 +    0.4400\*BAL1 +    0.4400\*HO +    0.4400\*CO2  |   2.38E-13e<sup>  1300.00/T</sup> |   1.8629E-11 |
+| RBAL4   | BAL1 + HO2 ----> ORA2  |   2.11E-13e<sup>  1300.00/T</sup> |   1.6516E-11 |
+| RBAL5   | BAL2 + O3 ----> BAL1  |   2.8600E-13 |   2.8600E-13 |
 | R240   | ADDC + HO2 ----> OP2  |   3.75E-13e<sup>   980.00/T</sup> |   1.0035E-11 |
 | R241   | CHO + HO2 ----> CSL  |   1.0000E-11 |   1.0000E-11 |
 | R242   | MCTP + HO2 ----> OP2  |   3.75E-13e<sup>   980.00/T</sup> |   1.0035E-11 |
@@ -307,7 +312,7 @@ Information is based on the mech.def file.
 | R273   | MCP + MO2 ----> HO2 +    1.5000\*HCHO +    0.5000\*HKET +    0.2500\*MOH +    0.2500\*ROH  |   3.40E-14e<sup>   221.00/T</sup> |   7.1350E-14 |
 | R274   | MVKP + MO2 ----> HO2 +    1.1600\*ACO3 +    1.1600\*XO2 +    1.5000\*HCHO +    1.7500\*ALD +    0.5000\*MGLY +    0.2500\*MOH +    0.2500\*ROH +    0.2920\*ORA2  |   8.3700E-14 |   8.3700E-14 |
 | R275   | UALP + MO2 ----> HO2 +    0.3050\*CO +    0.7730\*HCHO +    0.2030\*ALD +    0.5250\*KET +    0.1350\*GLY +    0.1050\*MGLY +    0.2500\*MOH +    0.2500\*ROH  |   3.40E-14e<sup>   221.00/T</sup> |   7.1350E-14 |
-| R276   | BALP + MO2 ----> HO2 + BAL1 + HCHO  |   3.56E-14e<sup>   708.00/T</sup> |   3.8260E-13 |
+| R276   | BALP + MO2 ----> HO2 + BAL1 + HCHO + CO2  |   3.56E-14e<sup>   708.00/T</sup> |   3.8260E-13 |
 | R277   | BAL1 + MO2 ----> HO2 + BAL2 + HCHO  |   3.56E-14e<sup>   708.00/T</sup> |   3.8260E-13 |
 | R278   | ADDC + MO2 ---->   2.0000\*HO2 + HCHO +    0.3200\*HKET +    0.6800\*GLY +    0.6800\*OP2  |   3.56E-14e<sup>   708.00/T</sup> |   3.8260E-13 |
 | R279   | MCTP + MO2 ----> HO2 + MCTO + HCHO  |   3.56E-14e<sup>   708.00/T</sup> |   3.8260E-13 |
@@ -344,7 +349,7 @@ Information is based on the mech.def file.
 | R309   | MCP + ACO3 ---->   0.5000\*HO2 + HCHO +    0.5000\*HKET +    0.5000\*MO2 +    0.5000\*ORA2 +    0.5000\*CO2  |   8.40E-14e<sup>   221.00/T</sup> |   1.7628E-13 |
 | R310   | MVKP + ACO3 ---->   0.5000\*HO2 +    0.5000\*MO2 +    1.1600\*ACO3 +    1.1600\*XO2 + HCHO +    2.3000\*ALD +    0.5000\*MGLY +    1.0830\*ORA2 +    0.5000\*CO2  |   1.68E-12e<sup>   500.00/T</sup> |   8.9872E-12 |
 | R311   | UALP + ACO3 ---->   0.5000\*HO2 +    0.5000\*MO2 +    0.5000\*CO +    0.0300\*HCHO +    0.2700\*ALD +    0.7000\*KET +    0.1800\*GLY +    0.1050\*MGLY +    0.5000\*ORA2 +    0.5000\*CO2  |   1.68E-12e<sup>   500.00/T</sup> |   8.9872E-12 |
-| R312   | BALP + ACO3 ----> MO2 + BAL1 + CO2  |   7.40E-13e<sup>   765.00/T</sup> |   9.6284E-12 |
+| R312   | BALP + ACO3 ----> MO2 + BAL1 +    2.0000\*CO2  |   7.40E-13e<sup>   765.00/T</sup> |   9.6284E-12 |
 | R313   | BAL1 + ACO3 ----> MO2 + BAL2 + CO2  |   7.40E-13e<sup>   765.00/T</sup> |   9.6284E-12 |
 | R314   | ADDC + ACO3 ---->   2.0000\*HO2 + MO2 +    0.3200\*HKET +    0.6800\*GLY +    0.6800\*OP2 + CO2  |   7.40E-13e<sup>   708.00/T</sup> |   7.9529E-12 |
 | R315   | MCTP + ACO3 ----> HO2 + MO2 + MCTO + CO2  |   7.40E-13e<sup>   708.00/T</sup> |   7.9529E-12 |
@@ -379,7 +384,7 @@ Information is based on the mech.def file.
 | R347   | MCP + NO3 ----> NO2 + HO2 + HCHO + HKET  |   1.2000E-12 |   1.2000E-12 |
 | R348   | MVKP + NO3 ---->   0.3000\*HO2 +    0.7000\*ACO3 +    0.7000\*XO2 + NO2 +    0.3000\*HCHO +    0.7000\*ALD +    0.3000\*MGLY  |   2.5000E-12 |   2.5000E-12 |
 | R349   | UALP + NO3 ----> HO2 + NO2 +    0.6100\*CO +    0.0300\*HCHO +    0.2700\*ALD +    0.7000\*KET +    0.1800\*GLY +    0.2100\*MGLY  |   2.5000E-12 |   2.5000E-12 |
-| R350   | BALP + NO3 ----> BAL1 + NO2  |   2.5000E-12 |   2.5000E-12 |
+| R350   | BALP + NO3 ----> BAL1 + NO2 + CO2  |   2.5000E-12 |   2.5000E-12 |
 | R351   | BAL1 + NO3 ----> BAL2 + NO2  |   2.5000E-12 |   2.5000E-12 |
 | R352   | ADDC + NO3 ----> HO2 + NO2 +    0.3200\*HKET +    0.6800\*GLY +    0.6800\*OP2  |   1.2000E-12 |   1.2000E-12 |
 | R353   | MCTP + NO3 ----> NO2 + MCTO  |   1.2000E-12 |   1.2000E-12 |
