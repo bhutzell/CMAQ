@@ -29,6 +29,7 @@
 !
 ! Revision History:
 ! Ben Murphy 2020 Feb: Created
+! Golam Sarwar 2024 Nov: Added enhancement factor for photolysis of HNO3
 !-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
@@ -42,7 +43,6 @@
 
       CONTAINS
 
-!-------------------------------------------------------------------------
       SUBROUTINE ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN )
 !     This subroutine maps the PM diagnostic variables that the user has
 !       requested to the entries in the ELMO_DATA table.

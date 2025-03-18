@@ -2166,6 +2166,10 @@
              RKI( NCELL,  900) =  BLKHET(  NCELL, IK_HETERO_I2O4_AI )
 !  Reaction Label HET_I2O4_AJ     
              RKI( NCELL,  901) =  BLKHET(  NCELL, IK_HETERO_I2O4_AJ )
+!  Reaction Label HET_ANO3I       
+             RKI( NCELL,  902) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
+!  Reaction Label HET_ANO3J       
+             RKI( NCELL,  903) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
 
         END DO  
 !  Multiply rate constants by [M], [O2], [N2], [H2O], [H2], or [CH4]

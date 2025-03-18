@@ -144,13 +144,14 @@
 !    Condensed halogen chemistry (HAL_OZONE) is removed and detailed halogen chemistry is added
 ! 09-26-24 G. Sarwar
 ! Aerosol nitrate photolysis
-!
-! 07-29-24 G. Sarwar
+!------------------------------------------------------------------------------
+! 01-29-25 G. Sarwar
 !    added chlorine (includes ClNO2 chemistry), bromine and iodine chemistry
 !    For implementing ClNO2 chemistry, two additional intermediate products are introduced: NO2PIJ and NO2PK
 !     NO2PIJ is formed on fine-mode aerosol and NO2PK is formed on coarse-mode aerosol
 !     They are identified as dioxidonitrogen (SMILES: [N+](=O)=O) for nitrogen balance
 !------------------------------------------------------------------------------
+
 CRACMM3M
 
 ELIMINATE = 
@@ -159,6 +160,10 @@ DELTA_I;
 DELTA_N;
 DELTA_C;
 END ELIMINATE
+
+
+
+
 
 
 
@@ -1782,7 +1787,7 @@ REACTIONS[CM] =
                      # 3.25E-12 @ 114;				                     
 <CLOR19> CLO + LIMNP1 = CLOO + 0.570*TRPN + 0.070*ONIT + 0.360*NO2 
                       + 0.430*LIMAL + 0.500*HO2  - 0.2800*DELTA_C 
-                      # 3.25E-12 @ 114;    		                      
+                      # 3.25E-12 @ 114;                      
 <CLOR20> CLO + LIMNP2 = 0.770*CLOO + 0.770*HO + 0.230*HCL + HOM  
                       + 1.0000*DELTA_N # 3.25E-12 @ 114;                      
 <CLOR21> CLO + PINALP = CLOO + 0.640*HOM  + 3.6000*DELTA_C 
@@ -1814,11 +1819,11 @@ REACTIONS[CM] =
 <CLOR35> CLO + MCTP = MCTO + CLOO # 3.25E-12 @ 114;
 <CLOR36> CLO + ORAP = CLOO + GLY + HO2 # 3.25E-12 @ 114;
 <CLOR37> CLO + OLNN = CLOO + HO2 + ONIT  - 1.0000*DELTA_C 
-                    # 3.25E-12 @ 114;                    
+                    # 3.25E-12 @ 114;                    		    			                    
 <CLOR38> CLO + OLND = CLOO + NO2 + 0.287*HCHO + 1.240*ALD + 0.464*KET  
                     - 3.3270*DELTA_C # 3.25E-12 @ 114;				                    
 <CLOR39> CLO + ADCN = CLOO + NO2 + GLY + OP2  + 2.0000*DELTA_C 
-                    # 3.25E-12 @ 114;		                    
+                    # 3.25E-12 @ 114;                    
 <CLOR40> CLO + XO2 = CLOO # 3.25E-12 @ 114;
 <CLOR41> CLO + BDE13P = 0.968*HO2 + CLOO + 0.895*ACRO + 0.895*HCHO 
                       + 0.072*FURAN  + 0.0600*DELTA_C # 3.25E-12 @ 114;                      
@@ -2129,6 +2134,10 @@ REACTIONS[CM] =
 <HET_I2O3_AJ> I2O3 =  + 2.0000*DELTA_I # 1.0~<HETERO_I2O3_AJ>;
 <HET_I2O4_AI> I2O4 =  + 2.0000*DELTA_I # 1.0~<HETERO_I2O4_AI>;
 <HET_I2O4_AJ> I2O4 =  + 2.0000*DELTA_I # 1.0~<HETERO_I2O4_AJ>;
+
+! Aerosol nitrate photolysis (implemented as heterogeneous reactions)
+<HET_ANO3I> ANO3I = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
+<HET_ANO3J> ANO3J = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
 
 END MECH
 
