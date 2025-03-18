@@ -63,6 +63,7 @@ C-----------------------------------------------------------------------
 #ifdef mpas
       USE coupler_module
 #endif
+      USE mio_module
       USE CONST, ONLY: MWAIR
 
       IMPLICIT NONE
@@ -121,10 +122,10 @@ C Local Variables
       INTEGER      LSULF                             ! Gas chem CGRID index
       INTEGER      ISO4AJ, ISO4AI, INUMATKN, INUMACC ! CGRID aerosol indices
 
-      INTEGER      GXOFF, GYOFF               ! global origin offset from file
-
-C for XTRACT3
-      INTEGER       :: STRTCOLINI, ENDCOLINI, STRTROWINI, ENDROWINI
+!      INTEGER      GXOFF, GYOFF               ! global origin offset from file
+!
+!C for XTRACT3
+!      INTEGER       :: STRTCOLINI, ENDCOLINI, STRTROWINI, ENDROWINI
       REAL      :: DBUFF( NCOLS,NROWS,NLAYS )
       REAL      :: DBUFF_TMP( NCOLS,NROWS,NLAYS )
 
@@ -158,10 +159,10 @@ C for XTRACT3
       CHARACTER( 34 ) :: ESTR2 = ' '
       CHARACTER( 34 ) :: ESTR3 = ' '
 
-      LOGICAL, SAVE :: FIRSTIME = .TRUE.
-      LOGICAL       :: L_WRITE_WARNING
-
-      LOGICAL       :: SKIP
+      INTEGER         :: floc
+      LOGICAL, SAVE   :: FIRSTIME = .TRUE.
+      LOGICAL         :: L_WRITE_WARNING
+      LOGICAL         :: SKIP
 
 C-----------------------------------------------------------------------
 
@@ -194,35 +195,27 @@ C-----------------------------------------------------------------------
 #ifndef mpas
       SKIP = .FALSE.
 #ifdef twoway
-      IF (FNAME == 'MET_CRO_3D') THEN
+      if (FNAME == MET_CRO_3D) then
          SKIP = .TRUE.
-      END IF
+      end if
 #endif
 
       IF (.NOT. SKIP) THEN
-         IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
-            XMSG = 'Could not open ' // FNAME // ' file'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+         floc = mio_search (FNAME)
  
-         IF ( .NOT. DESC3( FNAME ) ) THEN
-            XMSG = 'Could not get ' // FNAME // ' file description'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
- 
-         IF ( GL_NCOLS .NE. NCOLS3D ) THEN
+         IF ( GL_NCOLS .NE. mio_file_data(floc)%gl_ncols ) THEN
             WRITE( LOGDEV,* ) ' '
             WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
-            WRITE( LOGDEV,* ) '>>  GL_NCOLS: ', GL_NCOLS, '  NCOLS3D: ', NCOLS3D
+            WRITE( LOGDEV,* ) '>>  GL_NCOLS: ', GL_NCOLS, '  NCOLS3D: ', mio_file_data(floc)%gl_ncols
          END IF
  
-         IF ( GL_NROWS .NE. NROWS3D ) THEN
+         IF ( GL_NROWS .NE. mio_file_data(floc)%gl_nrows ) THEN
             WRITE( LOGDEV,* ) ' '
             WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
-            WRITE( LOGDEV,* ) '>>  GL_NROWS: ', GL_NROWS, '  NROWS3D: ', NROWS3D
+            WRITE( LOGDEV,* ) '>>  GL_NROWS: ', GL_NROWS, '  NROWS3D: ', mio_file_data(floc)%gl_nrows
          END IF
  
-         IF ( NLAYS .NE. NLAYS3D ) THEN
+         IF ( NLAYS .NE. mio_file_data(floc)%nlays ) THEN
             XMSG = 'Wrong number of layers in ' // FNAME // ' file'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
@@ -267,7 +260,7 @@ C is it on the IC file?
 #ifdef mpas
                NDX = INDEX1( GC_IC( ISUR ), n_all_spc, all_spc )
 #else
-               NDX = INDEX1( GC_IC( ISUR ), NVARS3D, VNAME3D )
+               NDX = INDEX1( GC_IC( ISUR ), mio_file_data(floc)%nvars, mio_file_data(floc)%var_name )
 #endif
                IF ( NDX .NE. 0 ) THEN
 C if there`s a surrogate name, CGRID_SPCS handles setting GC_ICBC_FAC
@@ -276,7 +269,7 @@ C if there`s a surrogate name, CGRID_SPCS handles setting GC_ICBC_FAC
                ELSE
                   XMSG = ESTR1 // TRIM( GC_IC( ISUR ) ) // ESTR2 // 
      &                   TRIM(GC_SPC( SPC ))
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 C If there is no surrogate or it cannot be found, look for the (main) species name on the IC file
@@ -284,14 +277,14 @@ C If there is no surrogate or it cannot be found, look for the (main) species na
 #ifdef mpas
                NDX = INDEX1( GC_SPC( SPC ), n_all_spc, all_spc )
 #else
-               NDX = INDEX1( GC_SPC( SPC ), NVARS3D, VNAME3D )
+               NDX = INDEX1( GC_SPC( SPC ), mio_file_data(floc)%nvars, mio_file_data(floc)%var_name )
 #endif
                IF ( NDX .NE. 0 ) THEN
                   INDX( SPC ) = NDX   ! index in the IC file
                   ICBC_FAC( SPC ) = 1.0
                ELSE
                   XMSG = ESTR1 // TRIM( GC_SPC( SPC ) ) // ESTR3
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 
@@ -315,7 +308,7 @@ C is it on the IC file?
 #ifdef mpas
                NDX = INDEX1( AE_IC( ISUR ), n_all_spc, all_spc )
 #else
-               NDX = INDEX1( AE_IC( ISUR ), NVARS3D, VNAME3D )
+               NDX = INDEX1( AE_IC( ISUR ), mio_file_data(floc)%nvars, mio_file_data(floc)%var_name )
 #endif
                IF ( NDX .NE. 0 ) THEN
                   INDX( SPC ) = NDX   ! index in the IC file
@@ -323,7 +316,7 @@ C is it on the IC file?
                ELSE
                   XMSG = ESTR1 // TRIM( AE_IC( ISUR ) ) // ESTR2 // 
      &                   TRIM(AE_SPC( SPC ))
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 C If there is no surrogate or it cant be found, look for the (main) species name on the IC file
@@ -331,14 +324,14 @@ C If there is no surrogate or it cant be found, look for the (main) species name
 #ifdef mpas
                NDX = INDEX1( AE_SPC( SPC ), n_all_spc, all_spc )
 #else
-               NDX = INDEX1( AE_SPC( SPC ), NVARS3D, VNAME3D )
+               NDX = INDEX1( AE_SPC( SPC ), mio_file_data(floc)%nvars, mio_file_data(floc)%var_name )
 #endif
                IF ( NDX .NE. 0 ) THEN
                   INDX( SPC ) = NDX
                   ICBC_FAC( SPC ) = 1.0
                ELSE
                   XMSG = ESTR1 // TRIM( AE_SPC( SPC ) ) // ESTR3
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 
@@ -362,7 +355,7 @@ C is it on the IC file?
 #ifdef mpas
                NDX = INDEX1( NR_IC( ISUR ), n_all_spc, all_spc )
 #else
-               NDX = INDEX1( NR_IC( ISUR ), NVARS3D, VNAME3D )
+               NDX = INDEX1( NR_IC( ISUR ), mio_file_data(floc)%nvars, mio_file_data(floc)%var_name )
 #endif
                IF ( NDX .NE. 0 ) THEN
                   INDX( SPC ) = NDX   ! index in the IC file
@@ -370,7 +363,7 @@ C is it on the IC file?
                ELSE
                   XMSG = ESTR1 // TRIM( NR_IC( ISUR ) ) // ESTR2 // 
      &                   TRIM(NR_SPC( SPC ))
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 C If there is no surrogate or it cant be found, look for the (main) species name on the IC file
@@ -378,14 +371,14 @@ C If there is no surrogate or it cant be found, look for the (main) species name
 #ifdef mpas
                NDX = INDEX1( NR_SPC( SPC ), n_all_spc, all_spc )
 #else
-               NDX = INDEX1( NR_SPC( SPC ), NVARS3D, VNAME3D )
+               NDX = INDEX1( NR_SPC( SPC ), mio_file_data(floc)%nvars, mio_file_data(floc)%var_name )
 #endif
                IF ( NDX .NE. 0 ) THEN
                   INDX( SPC ) = NDX
                   ICBC_FAC( SPC ) = 1.0
                ELSE
                   XMSG = ESTR1 // TRIM( NR_SPC( SPC ) ) // ESTR3
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 
@@ -409,7 +402,7 @@ C is it on the IC file?
 #ifdef mpas
                NDX = INDEX1( TR_IC( ISUR ), n_all_spc, all_spc )
 #else
-               NDX = INDEX1( TR_IC( ISUR ), NVARS3D, VNAME3D )
+               NDX = INDEX1( TR_IC( ISUR ), mio_file_data(floc)%nvars, mio_file_data(floc)%var_name )
 #endif
                IF ( NDX .NE. 0 ) THEN
                   INDX( SPC ) = NDX   ! index in the IC file
@@ -417,7 +410,7 @@ C is it on the IC file?
                ELSE
                   XMSG = ESTR1 // TRIM( TR_IC( ISUR ) ) // ESTR2 // 
      &                   TRIM(TR_SPC( SPC ))
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 C If there is no surrogate or it cant be found, look for the (main) species name on the IC file
@@ -425,14 +418,14 @@ C If there is no surrogate or it cant be found, look for the (main) species name
 #ifdef mpas
                NDX = INDEX1( TR_SPC( SPC ), n_all_spc, all_spc )
 #else
-               NDX = INDEX1( TR_SPC( SPC ), NVARS3D, VNAME3D )
+               NDX = INDEX1( TR_SPC( SPC ), mio_file_data(floc)%nvars, mio_file_data(floc)%var_name )
 #endif
                IF ( NDX .NE. 0 ) THEN
                   INDX( SPC ) = NDX
                   ICBC_FAC( SPC ) = 1.0
                ELSE
                   XMSG = ESTR1 // TRIM( TR_SPC( SPC ) ) // ESTR3
-                  CALL M3MESG( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
             END IF
 
@@ -460,7 +453,7 @@ C IOFDESC common now loaded with FNAME header
 
          IF ( NDX .GT. 0 ) THEN
 #ifndef mpas
-            call interpolate_var (VNAME3D ( NDX ), jdate, jtime, DBUFF)
+            call interpolate_var (mio_file_data(floc)%var_name ( NDX ), jdate, jtime, DBUFF)
 
             ! Add Non-Carbon Mass to Carbon Mass if any tracer is
             ! pointing to POC as a surrogate. It is very likely that
@@ -469,9 +462,9 @@ C IOFDESC common now loaded with FNAME header
             POC_CHK = 'NOTPOC'
             IF ( SPC_CAT .EQ. 'AE' ) POC_CHK = AE_SPC( SPC )
 
-            IF ( VNAME3D( NDX )( 1:4 ) .EQ. 'APOC' .AND.
+            IF ( mio_file_data(floc)%var_name( NDX )( 1:4 ) .EQ. 'APOC' .AND.
      &           POC_CHK(1:4) .NE. 'APOC' ) THEN 
-               ICNAME_TMP = 'APNCOM' // VNAME3D( NDX )( 5:5 )
+               ICNAME_TMP = 'APNCOM' // mio_file_data(floc)%var_name( NDX )( 5:5 )
                call interpolate_var (ICNAME_TMP, jdate, jtime, DBUFF_TMP)
                DBUFF = DBUFF + DBUFF_TMP
             END IF
@@ -533,7 +526,7 @@ C are ASO4J ICs available on the file?
 #ifdef mpas
          NDX = INDEX1( VNAME, n_ae_spc, ae_spc )
 #else
-         NDX = INDEX1( VNAME, NVARS3D, VNAME3D )
+         NDX = INDEX1( VNAME, mio_file_data(floc)%nvars, mio_file_data(floc)%var_name )
 #endif
      
          IF ( NDX .EQ. 0 ) THEN  ! ASO4J not on file
@@ -630,7 +623,7 @@ C correct sulfate vapor concentration for part removed:
 
             XMSG = 'No IC''s found for aerosol sulfate. ' //
      &             'Gas Chem sulfate used for partitioning.'
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
          END IF  ! NDX .EQ. 0
 

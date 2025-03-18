@@ -39,6 +39,7 @@ C-----------------------------------------------------------------------
       USE PA_DEFN, Only: N_IPR_SPC
       USE PA_IPRVARS
       USE PA_PARSE
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
       
@@ -60,11 +61,11 @@ c..Increment the counter and check for too many
       N_IPR_OPS( N_IPR_SPC ) = 0
       IF ( N_IPR_SPC .GT. MAXIPRSPC ) THEN
          WRITE( MSG, 94000 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94020 ) MAXIPRSPC
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT2 )
       END IF
 
@@ -83,11 +84,11 @@ c..the next character must be an equal sign
          CALL GETCHR         
       ELSE
          WRITE( MSG, 94040 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT2 )
       END IF
 
@@ -100,11 +101,11 @@ c..increment the counters and check for too many
 
       IF ( N_IPR_OPS( N_IPR_SPC ) .GT. MAXTERMS ) THEN
          WRITE( MSG, 94060 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94080 ) MAXTERMS
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT2 )
       END IF
 
@@ -120,11 +121,11 @@ c..if more operators, go back or return or err off
          RETURN
       ELSE
          WRITE( MSG, 94100 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT2 )
       END IF
 

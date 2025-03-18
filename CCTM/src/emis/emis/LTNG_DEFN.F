@@ -156,7 +156,6 @@
          INTEGER               :: CJDATE
          CHARACTER( 7 )        :: SJDATE
 
-         LOGICAL OK
          INTEGER               :: SPC
 
 !-----------------------------------------------------------------------
@@ -196,7 +195,7 @@
          CALL UPCASE(LTNG_FNAME)
          IF ( LTNG_FNAME .EQ. "INLINE" ) THEN  ! inline lightning NO production
             XMSG = 'Using in-line lightning NO production'
-            CALL M3MSG2( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 #ifdef twoway
            IF (wrf_lightning_assim) THEN
@@ -210,7 +209,7 @@
            END IF
            IF ( NLDNSTRIKE ) THEN
                   XMSG = 'Using hourly NLDN Strike data'
-                  CALL M3MSG2( XMSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
                LT_TSTEP = TIME2SEC ( FILE_TSTEP(F_LTNG)  )
                LT_TSTEP_F = FILE_TSTEP(F_LTNG) 
@@ -219,7 +218,7 @@
                  LT_TSTEP = TIME2SEC ( TSTEP )
                  LT_TSTEP_F = TSTEP 
                  XMSG = 'Using derived parameters for KF scheme '
-                 CALL M3MSG2( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
             END IF  !END if NLDNSTRIKE
 
 !            LT_TSTEP_F = SEC2TIME (LT_TSTEP)
@@ -236,7 +235,7 @@
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'ICCG, OCEAN_MASK, LTNG_Parameters'
      &                 // '  memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
                IF ( CJDATE .GT. 90 .AND. CJDATE .LT. 274 ) THEN
@@ -256,35 +255,34 @@
             IF ( LTNGDIAG ) THEN
 !C Build description for, and open lightning diagnostic file
 !C (all but variables-table and horizontal domain in description is borrowed from MNAME)
-               FDATE = STDATE
-               FTIME = STTIME
-               CALL NEXTIME( FDATE, FTIME, TSTEP )
-               SDATE3D = FDATE
-               STIME3D = FTIME
-               TSTEP3D = TSTEP
-
-               FTYPE3D = GRDDED3
-               NCOLS3D = GL_NCOLS
-               NROWS3D = GL_NROWS
-               NTHIK3D = 1
-               GDTYP3D = GDTYP_GD
-               P_ALP3D = P_ALP_GD
-               P_BET3D = P_BET_GD
-               P_GAM3D = P_GAM_GD
-               XORIG3D = XORIG_GD
-               YORIG3D = YORIG_GD
-               XCENT3D = XCENT_GD
-               YCENT3D = YCENT_GD
-               XCELL3D = XCELL_GD
-               YCELL3D = YCELL_GD
-               VGTYP3D = VGTYP_GD
-               VGTOP3D = VGTOP_GD
-               GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-               NLAYS3D = DESID_LAYS
-               DO L = 1, NLAYS3D + 1
-                  VGLVS3D( L ) = VGLVS_GD( L )
-               END DO
+!               FDATE = STDATE
+!               FTIME = STTIME
+!               CALL NEXTIME( FDATE, FTIME, TSTEP )
+!               SDATE3D = FDATE
+!               STIME3D = FTIME
+!               TSTEP3D = TSTEP
+!
+!               FTYPE3D = GRDDED3
+!               NCOLS3D = GL_NCOLS
+!               NROWS3D = GL_NROWS
+!               NTHIK3D = 1
+!               GDTYP3D = GDTYP_GD
+!               P_ALP3D = P_ALP_GD
+!               P_BET3D = P_BET_GD
+!               P_GAM3D = P_GAM_GD
+!               XORIG3D = XORIG_GD
+!               YORIG3D = YORIG_GD
+!               XCENT3D = XCENT_GD
+!               YCENT3D = YCENT_GD
+!               XCELL3D = XCELL_GD
+!               YCELL3D = YCELL_GD
+!               VGTYP3D = VGTYP_GD
+!               VGTOP3D = VGTOP_GD
+!
+!               NLAYS3D = DESID_LAYS
+!               DO L = 1, NLAYS3D + 1
+!                  VGLVS3D( L ) = VGLVS_GD( L )
+!               END DO
 
                NVARS3D = 1
                VNAME3D( 1 ) = LTSPC
@@ -292,10 +290,10 @@
                VTYPE3D( 1 ) = M3REAL
                UNITS3D( 1 ) = 'mol s-1'
 
-               FDESC3D = ' '   ! array assignment
-               FDESC3D( 1 ) = 'Gridded lightning NO production from CMAQ'
-               FDESC3D( 2 ) = '/from/ ' // PNAME
-               FDESC3D( 3 ) = '/Version/ CMAQ'
+!               FDESC3D = ' '   ! array assignment
+!               FDESC3D( 1 ) = 'Gridded lightning NO production from CMAQ'
+!               FDESC3D( 2 ) = '/from/ ' // PNAME
+!               FDESC3D( 3 ) = '/Version/ CMAQ'
 
                ! Store MIO Metadata
                NDIMS3D( 1:NVARS3D ) = 4
@@ -305,52 +303,38 @@
                L_ROW  ( 1:NVARS3D ) = .True.
                L_VEXT ( 1:NVARS3D ) = .False.
           
-               CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_1', NLAYS3D, 1, NLAYS3D,
+               CALL LOAD_MIO_FILE ( CTM_LTNGDIAG_1, NLAYS3D, 1, NLAYS3D,
      &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &              L_VEXT(1:NVARS3D) )
                
                ! Store MIO Metadata
-               NDIMS3D( 1:NVARS3D ) = 3
+               NDIMS3D( 1:NVARS3D ) = 4
                L_TSTEP( 1:NVARS3D ) = .True.
-               L_LAY  ( 1:NVARS3D ) = .False.
+               L_LAY  ( 1:NVARS3D ) = .True.
                L_COL  ( 1:NVARS3D ) = .True.
                L_ROW  ( 1:NVARS3D ) = .True.
                L_VEXT ( 1:NVARS3D ) = .False.
                
-               CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_2', 0, 0, 0,
+               CALL LOAD_MIO_FILE ( CTM_LTNGDIAG_2, 0, 0, 0,
      &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &              L_VEXT(1:NVARS3D) )
                
 !C Open output file (mol s-1)
-               IF ( IO_PE_INCLUSIVE ) THEN
-                  IF ( .NOT. OPEN3( CTM_LTNGDIAG_1, FSUNKN3, PNAME ) ) THEN
-                     XMSG = 'Could not open ' // TRIM( CTM_LTNGDIAG_1 )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
-                  NLAYS3D = 1
-                  VDESC3D( 1 ) = 'Column NO produced from lightning'
-                  IF ( .NOT. OPEN3( CTM_LTNGDIAG_2, FSUNKN3, PNAME ) ) THEN
-                     XMSG = 'Could not open ' // TRIM( CTM_LTNGDIAG_2 )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
-
-               END IF
-
                ALLOCATE( VDEMIS_LTDIAG( NCOLS,NROWS,DESID_LAYS ), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'VDEMIS_LTDIAG memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
                VDEMIS_LTDIAG = 0.0   ! array assignment
                ALLOCATE( COLUMN_DIAG( NCOLS,NROWS), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = 'COLUMN_DIAG memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
                COLUMN_DIAG = 0.0   ! array assignment
@@ -358,11 +342,7 @@
          ELSE   ! lightning emissions off line
 
 !C Lightning NO production from an input file
-            CALL M3MSG2( 'Using lightning NO production from a file' )
-
-!C Check grid definition (intialize, if first call)
-            OK = CHKGRID( LTNG_FNAME )
-
+            CALL LOG_MESSAGE( LOGDEV ,  'Using lightning NO production from a file' )
 
          END IF   ! IF ( LTNG_FNAME .EQ. "INLINE" ) inline or offline lightning NO production
 #endif
@@ -373,7 +353,7 @@
          ALLOCATE( VDEMIS_LT( NCOLS,NROWS,LTLYRS ), STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'VDEMIS_LT memory allocation failed'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
  
@@ -397,6 +377,7 @@
      &                                     ICCG_SUM,
      &                                     ICCG_WIN,
      &                                     LT_NAME
+         use mio_module
 #ifdef mpas
          use util_module, only : time2sec, nextime, upcase
 #else
@@ -444,6 +425,8 @@
          CHARACTER( 16 )   :: MNAME
          CHARACTER( 16 )   :: PNAME = 'GET_LTNG'
          CHARACTER( 120 )  :: XMSG = ' '
+         CHARACTER( 20 )   :: TIME_STAMP
+
          REAL, ALLOCATABLE :: COLUMN_LTNG_NO ( :,: ) ! column total NO
          
          INTEGER           :: cjdate
@@ -454,6 +437,7 @@
          LOGICAL,     SAVE :: wrf_assim = .FALSE.
          INTEGER,     SAVE :: TOT_TSTEP
          LOGICAL,     SAVE :: FIRSTIME = .TRUE.
+         LOGICAL,     SAVE :: FIRSTWRITE = .TRUE.
 
          REAL :: LOC_VGTOP_GD
 
@@ -658,22 +642,22 @@
                   DIVFAC = 1.0 / REAL( MTICS, 4 )
                   VDEMIS_LTDIAG = VDEMIS_LTDIAG * DIVFAC   ! array assignment
                   COLUMN_DIAG = COLUMN_DIAG*DIVFAC
-                  IF ( .NOT. WRITE3( CTM_LTNGDIAG_1, LTSPC, LDATE, LTIME, VDEMIS_LTDIAG ) )  THEN
-                     XMSG = 'Could not write to ' // TRIM( CTM_LTNGDIAG_1 )
-                     CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
-                  ELSE
-                     WRITE( LOGDEV,94040 )
-     &                    'Timestep written to', TRIM( CTM_LTNGDIAG_1 ),
-     &                    'for date and time', LDATE, LTIME
-                  END IF
-                  IF ( .NOT. WRITE3( CTM_LTNGDIAG_2, LTSPC, LDATE, LTIME, COLUMN_DIAG ) )  THEN
-                     XMSG = 'Could not write to ' // TRIM( CTM_LTNGDIAG_2 )
-                     CALL M3EXIT( PNAME, LDATE, LTIME, XMSG, XSTAT2 )
-                  ELSE
-                     WRITE( LOGDEV,94040 )
-     &                    'Timestep written to', TRIM( CTM_LTNGDIAG_2 ),
-     &                    'for date and time', LDATE, LTIME
-                  END IF
+                  if ( firstwrite ) then
+                     call mio_setfile( INIT_CONC_1 )
+                     call mio_fcreate( CTM_LTNGDIAG_1, mio_new_file )
+                     mio_nlays = 1
+                     call mio_fcreate( CTM_LTNGDIAG_2, mio_new_file )
+                     if (mype .eq. 0) then
+                        call mio_set_global_attr ( CTM_LTNGDIAG_2, 'NLAYS', 1 )
+                        call mio_set_global_attr ( CTM_LTNGDIAG_2, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                     end if
+                     firstwrite = .false.
+                  end if
+
+                  call mio_time_format_conversion( LDATE, LTIME, TIME_STAMP )
+                  call mio_fwrite( CTM_LTNGDIAG_1, LTSPC, PNAME, VDEMIS_LTDIAG, TIME_STAMP )
+
+                  call mio_fwrite( CTM_LTNGDIAG_2, LTSPC, PNAME, COLUMN_DIAG, TIME_STAMP )
 
                   VDEMIS_LTDIAG = 0.0   ! array assignment
                   COLUMN_DIAG = 0.0

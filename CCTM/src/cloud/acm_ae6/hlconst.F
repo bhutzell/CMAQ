@@ -431,7 +431,7 @@ C...  Atmospheric Chemistry and Physics, 1997
          END SUBROUTINE HLINDEX
 
          SUBROUTINE HLCONST_INIT
-            USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+            USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
             USE UTILIO_DEFN
             IMPLICIT NONE
 
@@ -563,6 +563,7 @@ C  H.Pye       09/2021 added CRACMM emission weighted surrogates
 C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
+      USE LOGDEV_MOD, ONLY: M3EXIT
 
       IMPLICIT NONE
 

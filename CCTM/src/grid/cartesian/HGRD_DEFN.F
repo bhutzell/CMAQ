@@ -21,21 +21,6 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE HGRD_DEFN
 
 C Define the horizontal domain, globally and for each processor, if parallel
-C Revision History: David Wong 18 Feb 01: created
-C                   Jeff Young 23 Feb 01: generalize
-C                              31 Mar 01: add BLKPRM.EXT
-C                              10 Nov 01: change to use GRIDDESC, env vars
-C                   J Gipson   01 Sep 04: change block size to 50
-C                   J Young    07 Dec 04: remove layer dependency (for MXCELLS,
-C                                         MXBLKS) to implement vertical layer
-C                                         dyn alloc appropriately
-C                   J Young    22 Dec 05: move proc. anayl. stuff to PAGRD_DEFN
-C                   S. Roselle 29 Mar 11: Replaced I/O API include files
-C                                         with UTILIO_DEFN
-C                   D. Wong    11 May 11: incorporated twoway model implementation
-C                   D. Wong    Aug 15:    Added a new logical variable, IO_PE_INCLUSIVE
-C                                           to facilitate parallel I/O implementation
-C                   D. Wong    01 Feb 19: removed all MY_N clauses
 C.......................................................................
       USE RUNTIME_VARS
 
@@ -48,19 +33,19 @@ C map projection type (should be named PRTYP_GD!)
       INTEGER, SAVE :: GDTYP_GD = 2 ! LAMGRD3
 
 C first map projection parameter (degrees)
-      REAL( 8 ), SAVE :: P_ALP_GD = 30.0
+      REAL( 8 ), SAVE :: P_ALP_GD = 30.D0
 
 C second map projection parameter (degrees)
-      REAL( 8 ), SAVE :: P_BET_GD = 60.0
+      REAL( 8 ), SAVE :: P_BET_GD = 60.D0
 
 C third map projection parameter (degrees)
-      REAL( 8 ), SAVE :: P_GAM_GD = -90.0
+      REAL( 8 ), SAVE :: P_GAM_GD = -90.D0
 
 C longitude for coord-system center (degrees)
-      REAL( 8 ), SAVE :: XCENT_GD = -90.0
+      REAL( 8 ), SAVE :: XCENT_GD = -90.D0
 
 C latitude for coord-system center (degrees)
-      REAL( 8 ), SAVE :: YCENT_GD = 40.0
+      REAL( 8 ), SAVE :: YCENT_GD = 40.D0
 
       REAL( 8 ), SAVE :: XORIG_GD ! X-coordinate origin of computational grid
       REAL( 8 ), SAVE :: YORIG_GD ! Y-coordinate origin of computational grid
@@ -70,17 +55,12 @@ C latitude for coord-system center (degrees)
 
       INTEGER, SAVE :: GL_NCOLS   ! no. of columns in global grid
       INTEGER, SAVE :: GL_NROWS   ! no. of rows in global grid
-      INTEGER, SAVE :: GL_NBNDY   ! no. of cells in one layer of global boundary
  
       INTEGER, SAVE :: NCOLS      ! grid columns array dimension
       INTEGER, SAVE :: NROWS      ! grid rows array dimension
       INTEGER, SAVE :: NBNDY      ! no. of cells in one layer of local boundary
- 
-!     INTEGER, PARAMETER :: NTHIK = 1     ! boundary thickness (cells)
       INTEGER, SAVE :: NTHIK      ! boundary thickness (cells)
  
-      INTEGER, SAVE :: MY_NCOLS_DOT ! local no. of dot file grid columns
-      INTEGER, SAVE :: MY_NROWS_DOT ! local no. of dot file grid rows
 C column range for each processor
       INTEGER, ALLOCATABLE, SAVE :: COLSX_PE( :,: )
       INTEGER, ALLOCATABLE, SAVE :: COLSD_PE( :,: )  ! dot file
@@ -96,22 +76,15 @@ C maximum stencil displacement in the north, east, south, and west direction
 
       LOGICAL :: IO_PE_INCLUSIVE
 
-C BLKPRM
-
-!     INTEGER, PARAMETER :: BLKSIZE = 500
-!     INTEGER, PARAMETER :: BLKSIZE = 50
-!     INTEGER, SAVE :: MXCELLS
-!     INTEGER, SAVE :: MXBLKS
-
-C Integral average conc
-
       CONTAINS
 
          FUNCTION HGRD_INIT ( NPROCS, MYID ) RESULT ( SUCCESS )
 
          USE UTILIO_DEFN
+         use replacement_util_module
+         use mio_module
 
-!        INCLUDE SUBST_VGRD_ID     ! vertical dimensioning parameters
+         INCLUDE SUBST_FILES_ID
 
          INTEGER, INTENT( IN ) :: NPROCS  ! total worker processors
          INTEGER, INTENT( IN ) :: MYID
@@ -120,9 +93,9 @@ C Integral average conc
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
          CHARACTER( 96 ) :: XMSG = ' '
 
-C environment variable grid name to select from GRIDDESC
          INTEGER :: STATUS, ALST
 
+! These arrays are duplicative of those in mio...
          INTEGER, ALLOCATABLE :: NCOLS_PE( : )  ! Column range for each PE
          INTEGER, ALLOCATABLE :: NROWS_PE( : )  ! Row range for each PE
 
@@ -141,14 +114,14 @@ C This function is expected to be called only once - at startup
 #ifndef mpas
 C With GRID_NAME (only input) retrieve all horizontal grid parameters from
 C the grid description file pointed to by the GRIDDESC env var:
-            IF ( .NOT. DSCGRID ( GRID_NAME,
+            IF ( .NOT. RDSCGRID( GRID_NAME,
      &                           COORD_SYS_NAME, GDTYP_GD, 
      &                           P_ALP_GD, P_BET_GD, P_GAM_GD,
      &                           XCENT_GD, YCENT_GD,
      &                           XORIG_GD, YORIG_GD, XCELL_GD, YCELL_GD,
      &                           GL_NCOLS, GL_NROWS, NTHIK ) ) THEN
                XMSG = 'Failure retrieving horizontal grid parameters'
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 #endif
@@ -160,7 +133,7 @@ C Check NPROCS against NPCOL*NPROW
                WRITE( LOGDEV,* ) ' --- Nprocs, NProw, NPcol ',
      &                                 NPROCS, NPROW, NPCOL
                XMSG = 'NPROCS is not equal to NPCOL*NPROW'
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -177,7 +150,7 @@ C Check NPROCS against NPCOL*NPROW
                IF ( MYPE .EQ. 0 ) THEN
                   WRITE(OUTDEV,'(A)')TRIM( XMSG )
                END IF 
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
 
                XMSG = 'Change NPROCS, NPCOL, NPROW in runscript to fit TOTAL_NCOLS and TOTAL_NROWS'
                IF ( MYPE .EQ. 0 ) THEN
@@ -193,7 +166,7 @@ C Check NPROCS against NPCOL*NPROW
      &                 ROWSX_PE( 2,NPROCS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** COLSX_PE or ROWSX_PE Memory allocation failed'
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -201,56 +174,26 @@ C Check NPROCS against NPCOL*NPROW
      &                 ROWSD_PE( 2,NPROCS ), STAT = ALST )
             IF ( ALST .NE. 0 ) THEN
                XMSG = '*** COLSD_PE or ROWSD_PE  Memory allocation failed'
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
-            ALLOCATE ( NCOLS_PE( NPROCS ),
-     &                 NROWS_PE( NPROCS ), STAT = ALST )
-            IF ( ALST .NE. 0 ) THEN
-               XMSG = '*** NCOLS_PE or NROWS_PE Memory allocation failed'
-               CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
-               SUCCESS = .FALSE.; RETURN
-            END IF
+           call mio_fopen( INIT_CONC_1, mio_read_only )
+           call mio_setfile( INIT_CONC_1 )
+           ncols = mio_ncols
+           nrows = mio_nrows
+           nbndy = 2*mio_domain_nthik * ( ncols + nrows + 2*mio_domain_nthik )
 
-C Construct the processor-to-subdomain map for main domain
-            CALL SUBHDOMAIN( NPROCS, NPCOL, NPROW, GL_NCOLS, GL_NROWS,
-     &                       NCOLS_PE, NROWS_PE, COLSX_PE, ROWSX_PE )
-
-C Get corresponding dot file map
-
-            DO I = 1, NPROCS
-               COLSD_PE( 1,I ) = COLSX_PE( 1,I )
-               COLSD_PE( 2,I ) = COLSX_PE( 2,I )
-               ROWSD_PE( 1,I ) = ROWSX_PE( 1,I )
-               ROWSD_PE( 2,I ) = ROWSX_PE( 2,I )
-            END DO
-
-            DO I = NPCOL, NPROCS, NPCOL
-               COLSD_PE( 2,I ) = COLSD_PE( 2,I ) + 1
-            END DO
-
-            DO I = NPROCS, NPROCS - NPCOL + 1, -1
-               ROWSD_PE( 2,I ) = ROWSD_PE( 2,I ) + 1
-            END DO
-
-            NCOLS = NCOLS_PE( MYPE+1 )
-            NROWS = NROWS_PE( MYPE+1 )
-            NBNDY = 2*NTHIK * ( NCOLS + NROWS + 2*NTHIK )
-            GL_NBNDY = 2*NTHIK * ( GL_NCOLS + GL_NROWS + 2*NTHIK )
-
-            MY_NCOLS_DOT = COLSD_PE( 2,MYPE+1 ) - COLSD_PE( 1,MYPE+1 ) + 1
-            MY_NROWS_DOT = ROWSD_PE( 2,MYPE+1 ) - ROWSD_PE( 1,MYPE+1 ) + 1
-
-!           MXCELLS = NCOLS * NROWS * NLAYS
-!           MXBLKS  = 1 + ( MXCELLS - 1 ) / BLKSIZE
-
-            DEALLOCATE ( NCOLS_PE )
-            DEALLOCATE ( NROWS_PE )
+            do i = 1, nprocs 
+               colsx_pe(:,i) = mio_domain_colde_pe(:,i,1)   ! starting and ending column for cross points
+               rowsx_pe(:,i) = mio_domain_rowde_pe(:,i,1)   ! starting and ending row for cross points
+               colsd_pe(:,i) = mio_domain_colde_pe(:,i,2)   ! starting and ending column for dot points
+               rowsd_pe(:,i) = mio_domain_rowde_pe(:,i,2)   ! starting and ending row for dot points
+            end do
 
          ELSE
             XMSG = 'Horizontal domain decomposition already defined'
-            CALL M3WARN ( 'HGRD_INIT', 0, 0, XMSG )
+            CALL LOG_WARNING( 'HGRD_INIT', LOGDEV, XMSG )
             SUCCESS = .FALSE.; RETURN
 
          END IF   ! FIRSTIME

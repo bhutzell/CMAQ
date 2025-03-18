@@ -34,7 +34,7 @@ C-----------------------------------------------------------------------
 
       USE RUNTIME_VARS
 #ifndef mpas
-      USE M3UTILIO
+!     USE M3UTILIO
 #endif
 
       IMPLICIT NONE
@@ -58,11 +58,11 @@ C-----------------------------------------------------------------------
          FIRSTIME = .FALSE.
       END If
 
-      IF ( .NOT. WRITE3( FNAME, VNAME, JDATE, JTIME, DATA ) ) THEN
-         XMSG = 'Error writing ' // 'to file "' // TRIM( FNAME ) // '."'
-         WRITE( LOGDEV,* ) XMSG
-         SUCCESS = .FALSE.
-      END IF
+!      IF ( .NOT. WRITE3( FNAME, VNAME, JDATE, JTIME, DATA ) ) THEN
+!         XMSG = 'Error writing ' // 'to file "' // TRIM( FNAME ) // '."'
+!         WRITE( LOGDEV,* ) XMSG
+!         SUCCESS = .FALSE.
+!      END IF
 #endif
 
       RETURN

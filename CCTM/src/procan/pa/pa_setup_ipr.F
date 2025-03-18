@@ -49,6 +49,7 @@ C-----------------------------------------------------------------------
       USE PA_DEFN
       USE PA_PARSE, Only: IZERO
       USE CGRID_SPCS, Only: N_CGRID_SPC, CGRID_NAME
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
       
@@ -91,9 +92,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF ( LEN_TRIM( IPR_SPNAM( NIPR ) ) .GT. 11 ) THEN
             WRITE( *,* ) ' '
             WRITE( MSG, 94030 ) TRIM( IPR_SPNAM( NIPR ) )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94031 )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
          END IF
 
          DO N = 1, N_IPR_OPS( NIPR )
@@ -102,9 +103,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
             IF ( NIPRVAR .GT. MAXIPROUT ) THEN
                WRITE( MSG, 94000 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94020 ) MAXIPROUT
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                CALL M3EXIT( 'GETEXTDAT', IZERO, IZERO, ' ', XSTAT2 )
             END IF
 

@@ -238,6 +238,7 @@ C-----------------------------------------------------------------------
 
       Use grid_conf, Only: ncols, nrows, nlays
       Use utilio_defn
+      Use logdev_mod, Only: m3exit
       Use aero_data, Only : aso4_idx, aso4aqh2o2_idx, aso4aqo3_idx,
      &                      aso4aqfemn_idx, aso4aqmhp_idx, aso4aqpaa_idx,
      &                      aso4gas_idx, aso4emis_idx, aso4icbc_idx,
@@ -463,7 +464,7 @@ C     6/25/19 streamlined version of update_aero borrowed from AERO_DATA
 C-----------------------------------------------------------------------
 
       Use aero_data, Only : n_aerospc, aerospc_map, n_mode
-
+      Use logdev_mod, Only: m3exit
       Use utilio_defn
 
       Implicit None

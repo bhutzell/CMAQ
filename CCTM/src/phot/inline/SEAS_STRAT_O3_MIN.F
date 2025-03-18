@@ -2447,9 +2447,6 @@
 
            INTEGER         :: YEAR
            INTEGER         :: DAY       ! julian day
-#ifndef mpas
-           LOGICAL         :: LEAP_YEAR ! is a leap year
-#endif
            LOGICAL         :: FIRST_CALL  = .TRUE.
 
            CHARACTER( 32 )     :: PNAME = 'SEASONAL_STRAT_O3' 
@@ -2484,24 +2481,11 @@
             DAY  = MOD( JDATE, 1000 )
             YEAR = INT( 0.001 * REAL(JDATE) )
             
-#ifndef mpas
-            LEAP_YEAR = ( ( MOD(YEAR,4) .EQ. 0 )
-     &                      .AND. ( MOD(YEAR,100) .NE. 0 )
-     &                           .OR. ( MOD(YEAR,400) .EQ. 0  ))
-
-            IF( LEAP_YEAR )THEN
-               TIME = REAL( DAY ) / 366.0
-            ELSE
-               TIME = REAL( DAY ) / 365.0
-            ENDIF
-#else
             IF( LEAP_YEAR(YEAR) )THEN
                TIME = REAL( DAY ) / 366.0
             ELSE
                TIME = REAL( DAY ) / 365.0
             ENDIF
-#endif
-
            
 ! find where time is located in profile data
 ! interpolation over time considers the profile data to be cyclic

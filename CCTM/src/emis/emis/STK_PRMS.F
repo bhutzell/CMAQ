@@ -136,18 +136,6 @@ C-----------------------------------------------------------------------
 
          DO N = 1, NGRPS
 
-!           IF ( .NOT. OPEN3( STKPRMS( N ), FSREAD3, PNAME ) ) THEN
-!              XMSG = 'Could not open '// TRIM( STKPRMS( N ) ) // ' file'
-!              CALL M3MESG( XMSG )
-!              SUCCESS = .FALSE.; RETURN
-!           END IF
-
-!           IF ( .NOT. DESC3( STKPRMS( N ) ) ) THEN
-!              XMSG = 'Could not get ' // TRIM( STKPRMS( N ) ) // ' file description'
-!              CALL M3MESG( XMSG )
-!              SUCCESS = .FALSE.; RETURN
-!           END IF
-
             ALLOCATE ( LOC_MAP( NSRC( N ) ), STAT = ASTAT )
             CALL CHECKMEM( ASTAT, 'LOC_MAP', PNAME )
 

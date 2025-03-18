@@ -82,6 +82,7 @@ C-----------------------------------------------------------------------
       USE centralized_io_module, only : AVGEMIS, interpolate_var
       Use ASX_DATA_MOD, only: MET_DATA
       USE MIO_ASCII
+      use mio_module
 
 #ifdef mpas
       USE util_module, only : hhmmss, time2sec
@@ -94,7 +95,8 @@ C-----------------------------------------------------------------------
 #endif
 
       IMPLICIT NONE
-
+      INCLUDE SUBST_FILES_ID
+      
 C Includes:
         
 C Arguments:
@@ -143,11 +145,13 @@ C Other variables:
       LOGICAL          OK        ! check flag
       LOGICAL, SAVE :: LASTTIC                ! true: last sync step this output tstep
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
 
       CHARACTER( 256 ) :: MESG       ! message buffer
       CHARACTER( 256 ) :: EQNAME     ! equivalent filename
       CHARACTER(  16 ) :: VAR        ! variable name
       CHARACTER(  16 ) :: PNAME = 'GET_BEIS'   ! prodedure name
+      CHARACTER(  20 ) :: TIME_STAMP
 
 #ifdef verbose_getbeis
       REAL,    ALLOCATABLE, SAVE :: EMISX( : )
@@ -219,14 +223,6 @@ C Allocate memory for arrays
 #ifndef mpas
          IF ( BEMIS_DIAG ) THEN
             EMISS = 0.0   ! array
-#ifdef parallel_io
-            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( SNAME, FSREAD3, PNAME ) ) THEN
-                  MESG = 'Could not open ' // TRIM(SNAME)
-                  CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-               END IF
-            END IF
-#endif
          END IF
 #endif
 
@@ -261,16 +257,7 @@ C calculate fseas based on deep soil temperature following WRF 3.8.1 PX
       END IF   ! if new day
 
       WRITE( MESG,94030 ) HHMMSS( JTIME )
-      CALL M3MSG2( MESG )
-
-!#ifndef mpas
-!C repopulate the met_cro_2d variable attributes
-!      IF ( .NOT. DESC3( MNAME ) ) THEN
-!         MESG = 'Could not get description of file "'
-!     &           // TRIM( MNAME ) // '"'
-!         CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-!      END IF
-!#endif
+      CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
 C Calculate temporal non-speciated beis emissions
       CALL BEIS( JDATE, JTIME, NCOLS, NROWS, MSPCS, SEMIS, BIPOL )
@@ -332,12 +319,22 @@ C Speciate emissions
             END DO
          END DO
          IF ( LASTTIC ) THEN
+            if ( firstwrite ) then 
+               call mio_setfile( INIT_CONC_1 )
+               mio_nlays = 1
+               call mio_fcreate( SNAME, mio_new_file )
+               if (mype .eq. 0) then
+                  call mio_set_global_attr ( SNAME, 'NLAYS', 1 )
+                  call mio_set_global_attr ( SNAME, 'VGLVLS', INIT_CONC_1, 1, 2 )
+               end if
+               firstwrite = .false.
+            end if
+
             EMISS = EMISS * HR2SEC   ! convert from gm/h to gm/s
             DO S = 1,MSPCS
-               IF ( .NOT. WRITE3( SNAME, EMSPC( S ), MDATE, MTIME, EMISS(:,:,S) ) ) THEN
-                  MESG = 'Could not write to output file "' // TRIM( SNAME ) // '"'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-               END IF
+               call mio_setfile( sname )
+               call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+               call mio_fwrite( sname, EMSPC( S ), pname, EMISS(:,:,S), TIME_STAMP )
             END DO
             WRITE( LOGDEV,94040 )
      &            'Timestep written to', SNAME,

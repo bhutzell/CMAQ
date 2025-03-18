@@ -369,7 +369,6 @@
 
          use utilio_defn
 
-
          IMPLICIT NONE
 
          REAL, INTENT( OUT )              :: CONV
@@ -475,13 +474,12 @@
             CONV = 1.0e-9
             BASIS = 'MASS'
          ELSE
-            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A)' ),
-     &              'ERROR: Species ',TRIM(SPEC),' on emission stream ',
-     &              ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
-     &              'as an emission rate. If you wish to use this variable for ',
-     &              'emissions, please correct the units (e.g. g/s or moles/s).'
-            CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
-            ! No Conversion and and Unknown Basis
+
+            WRITE( XMSG, 9000) TRIM(SPEC), ISRM, 
+     &                         TRIM(DESID_STREAM_LAB(ISRM)), TRIM(UNITS)
+            CALL LOG_WARNING( 'CHECK_EMIS_UNITS', LOGDEV, XMSG )
+            ! No Conversion and an Unknown Basis
+            CONV = 1.0e0
             BASIS = 'UNKNOWN'
          END IF
          
@@ -489,13 +487,9 @@
          ! denominator is empty.
          DENOM = UNITS(X+2:)
          IF ( DENOM .EQ. '' ) THEN
-            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' ),
-     &              'ERROR: Species ',TRIM(SPEC),' on emission stream ',
-     &              ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
-     &              'as an emission rate. If you wish to use this variable for ',
-     &              'emissions, please correct the units (e.g. g/s, moles/s, ',
-     &              'g/m2/s, or g/s/m2, etc.).'
-            CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
+            WRITE( XMSG, 9000) TRIM(SPEC), ISRM, 
+     &                         TRIM(DESID_STREAM_LAB(ISRM)), TRIM(UNITS)
+            CALL LOG_WARNING( 'CHECK_EMIS_UNITS', LOGDEV, XMSG )
             ! No Conversion and and Unknown Basis
             BASIS = 'UNKNOWN' 
             RETURN
@@ -520,13 +514,9 @@
          CALL CHECK_UNIT_DENOMINATOR( DENOM1, LAREA_UNIT, LTIME_UNIT, 
      &                                BASIS, CONV )
          IF ( BASIS .EQ. 'UNKNOWN' ) THEN
-            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' ),
-     &              'ERROR: Species ',TRIM(SPEC),' on emission stream ',
-     &              ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
-     &              'as an emission rate. If you wish to use this variable for ',
-     &              'emissions, please correct the units (e.g. g/s, moles/s, ',
-     &              'g/m2/s, or g/s/m2, etc.).'
-            CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
+            WRITE( XMSG, 9000) TRIM(SPEC), ISRM, 
+     &                         TRIM(DESID_STREAM_LAB(ISRM)), TRIM(UNITS)
+            CALL LOG_WARNING( 'CHECK_EMIS_UNITS', LOGDEV, XMSG )
             RETURN
          END IF
 
@@ -535,29 +525,28 @@
             CALL CHECK_UNIT_DENOMINATOR( DENOM2, LAREA_UNIT, LTIME_UNIT, 
      &                                   BASIS, CONV )
             IF ( BASIS .EQ. 'UNKNOWN' ) THEN
-               WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' ),
-     &                'ERROR: Species ',TRIM(SPEC),' on emission stream ',
-     &                ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
-     &                'as an emission rate. If you wish to use this variable for ',
-     &                'emissions, please correct the units (e.g. g/s, moles/s, ',
-     &                'g/m2/s, or g/s/m2, etc.).'
-               CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
+            WRITE( XMSG, 9000) TRIM(SPEC), ISRM, 
+     &                         TRIM(DESID_STREAM_LAB(ISRM)), TRIM(UNITS)
+               CALL LOG_WARNING( 'CHECK_EMIS_UNITS', LOGDEV, XMSG )
                RETURN
             END IF
          END IF
 
          ! Check to make sure the time component has been defined 
          IF ( .NOT. LTIME_UNIT ) THEN
-            WRITE( XMSG,'(A,A16,A,I3,A11,A16,A,A,A,A)' ),
-     &             'ERROR: Species ',TRIM(SPEC),' on emission stream ',
-     &             ISRM, ' has units ',TRIM(UNITS),' which are not recognized ',
-     &             'as an emission rate. If you wish to use this variable for ',
-     &             'emissions, please correct the units (e.g. g/s, moles/s, ',
-     &             'g/m2/s, or g/s/m2, etc.).'
-            CALL M3WARN( 'CHECK_EMIS_UNITS', 0, 0, XMSG )
+            WRITE( XMSG, 9000) TRIM(SPEC), ISRM, 
+     &                         TRIM(DESID_STREAM_LAB(ISRM)), TRIM(UNITS)
+            CALL LOG_WARNING( 'CHECK_EMIS_UNITS', LOGDEV, XMSG )
             BASIS = 'UNKNOWN'
             RETURN
          END IF 
+
+ 9000    format('ERROR: Species ', A, ' on emission stream ', I3, 
+     &          ' (', A, ') has units ', A, ' which are not recognized',
+     &          ' as an emission rate. If you wish to use this ',
+     &          'variable for emissions, please correct the units',
+     &          ' (e.g. g/s, moles/s, g/m2/s, or g/s/m2, etc.')
+     
 
          END SUBROUTINE CHECK_EMIS_UNITS
  

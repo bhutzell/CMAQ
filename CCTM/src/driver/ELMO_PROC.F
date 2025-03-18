@@ -35,6 +35,7 @@
       USE UTILIO_DEFN
       USE ELMO_DATA
       USE GRID_CONF, ONLY: NCOLS, NROWS, NLAYS, IO_PE_INCLUSIVE
+      USE LOGDEV_MOD
       USE RUNTIME_VARS
 
       IMPLICIT NONE
@@ -621,13 +622,6 @@
             CALL M3EXIT( 'CALC_ELMO', 0, 0, '', XSTAT1 )
       END SELECT
       
-      ! Save the fact that this variable has been calculated
-      !IF ( ILOC .GT. 0 ) THEN
-        !L_CALCULATED( ILOC ) = .TRUE.
-        !ELMO_USED_UNIT( ILOC ) = OUT_UNIT
-        !ELMO_USED( ILOC ) = OUTVAL
-      !END IF
-
       END SUBROUTINE CALC_ELMO
  
       END MODULE ELMO_PROC

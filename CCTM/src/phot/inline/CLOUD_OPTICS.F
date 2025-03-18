@@ -405,7 +405,7 @@
                       write(xmsg,*)Trim(pname)
      &                // ': ICE PARTICLE GENERALIZED EFFECTIVE SIZE OUT OF BOUNDS'
      &                // ' dge(', layer, ') = ', dge(layer),' um '
-                      call m3mesg(xmsg)
+                      CALL LOG_MESSAGE( LOGDEV , xmsg)
                       error_flag = .true.
                   end if
 #endif                   
@@ -426,7 +426,7 @@
                      if (cloud_ice_del(layer, iwl) .gt. 1.0 .or. cloud_ice_del(layer, iwl) .lt. 0.0)then
                          write(xmsg, 99950)'ice particle delta function outside bounds and equals ', 
      &                   cloud_ice_del(layer, iwl),' at layer ', layer
-                         call m3mesg(xmsg)
+                         CALL LOG_MESSAGE( LOGDEV , xmsg)
                          error_flag = .true.
                      end if 
 #endif
@@ -485,19 +485,19 @@
                   if (cloud_ice_ssa(layer, iwl) .gt. high .or. cloud_ice_ssa(layer, iwl) .lt. low)then
                      write(xmsg, 99950)'ice particle SSA outside bounds and equals ', 
      &               cloud_ice_ssa(layer, iwl),' at layer ', layer
-                     call m3mesg(xmsg)
+                     CALL LOG_MESSAGE( LOGDEV , xmsg)
 !                    error_flag = .true.
                   end if 
                   if (cloud_ice_asy(layer, iwl) .gt. 1.0 .or. cloud_ice_asy(layer, iwl) .lt. -1.0)then
                      write(xmsg, 99950)'ice particle asymmetery factor outside bounds and equals ', 
      &               cloud_ice_asy(layer, iwl),' at layer ', layer
-                     call m3mesg(xmsg)
+                     CALL LOG_MESSAGE( LOGDEV , xmsg)
                      error_flag = .true.
                   end if 
                   if (cloud_ice_scat(layer, iwl) .gt. cloud_ice_ext(layer, iwl))then
                      write(xmsg, 99950)'ice particle scattering greater than extinction, SSA ', 
      &               cloud_ice_ssa(layer, iwl),' at layer ', layer
-                     call m3mesg(xmsg)
+                     CALL LOG_MESSAGE( LOGDEV , xmsg)
                      error_flag = .true.
                   end if                   
 #endif
@@ -631,7 +631,7 @@
                   if (radliq .lt. mini_radius_liquid .or. radliq .gt. maxi_radius_liquid)then
                      write(xmsg, 99950)'liquid effective radius outside bounds and equals ', radliq,
      &               ' um at layer ', layer
-                     call m3mesg(xmsg)
+                     CALL LOG_MESSAGE( LOGDEV , xmsg)
                      error_flag = .true.
                   end if
 #endif                    
@@ -671,19 +671,19 @@
                   if (cloud_liquid_ssa(layer, iwl) .gt. high .or. cloud_liquid_ssa(layer, iwl) .lt. low)then
                      write(xmsg, 99950)'liquid cloud droplet SSA outside bounds and equals ', 
      &               cloud_liquid_ssa(layer, iwl),' at layer ', layer
-                     call m3mesg(xmsg)
+                     CALL LOG_MESSAGE( LOGDEV , xmsg)
 !                    error_flag = .true.
                   end if 
                   if (cloud_liquid_scat(layer, iwl) .gt. cloud_liquid_ext(layer, iwl))then
                      write(xmsg, 99950)'cloud droplet scattering greater than extinction, SSA = ', 
      &               cloud_liquid_ssa(layer, iwl),' at layer ', layer
-                     call m3mesg(xmsg)
+                     CALL LOG_MESSAGE( LOGDEV , xmsg)
                      error_flag = .true.
                   end if 
                   if (cloud_liquid_asy(layer, iwl) .gt. 1.0 .or. cloud_liquid_asy(layer, iwl) .lt. -1.0)then
                      write(xmsg, 99950)'liquid cloud droplet asymmetery factor outside bounds and equals ', 
      &               cloud_liquid_asy(layer, iwl),' at layer ', layer
-                     call m3mesg(xmsg)
+                     CALL LOG_MESSAGE( LOGDEV , xmsg)
                      error_flag = .true.
                   end if 
 #endif                    
@@ -955,7 +955,7 @@
                      if (snow_del .gt. 1.0 .or. snow_del .lt. 0.0)then
                          write(xmsg, 99960)'snowflake delta function outside bounds and equals ', 
      &                   snow_del,' at layer ', layer
-                         call m3mesg(xmsg)
+                         CALL LOG_MESSAGE( LOGDEV , xmsg)
                          error_flag = .true.
                      end if 
 !                    if( iwl .eq. 1 .and. row_cloud .eq. 1 .and. col_cloud .eq. 1 )then
@@ -993,19 +993,19 @@
                      if (snow_ssa .gt. high .or. snow_ssa .lt. low .or. snow_ssa .ne. snow_ssa )then
                         write(xmsg, 99960)'snowflake SSA outside bounds and equals ', 
      &                  snow_ssa,' at layer ', layer
-                        call m3mesg(xmsg)
+                        CALL LOG_MESSAGE( LOGDEV , xmsg)
 !                       error_flag = .true.
                      end if 
                      if (snow_asy .ge. 1.0 .or. snow_asy .le. -1.0 .or. snow_asy .ne. snow_asy )then
                          write(xmsg, 99960)'snowflake asymmetery factor outside bounds and equals ', 
      &                   snow_asy,' at layer ', layer
-                         call m3mesg(xmsg)
+                         CALL LOG_MESSAGE( LOGDEV , xmsg)
                          error_flag = .true.
                      end if 
                      if (snow_scat .gt. snow_ext)then
                          write(xmsg, 99960)'snowflake scattering greater than extinction, SSA ', 
      &                   snow_ssa,' at layer ', layer
-                         call m3mesg(xmsg)
+                         CALL LOG_MESSAGE( LOGDEV , xmsg)
                          error_flag = .true.
                      end if                      
 !                    if( iwl .eq. 1 .and. row_cloud .eq. 1 .and. col_cloud .eq. 1 )then
@@ -1064,7 +1064,7 @@
                      if (graupel_del .gt. 1.0 .or. graupel_del .lt. 0.0)then
                          write(xmsg, 99960)'graupel delta function outside bounds and equals ', 
      &                   graupel_del,' at layer ', layer
-                         call m3mesg(xmsg)
+                         CALL LOG_MESSAGE( LOGDEV , xmsg)
                          error_flag = .true.
                      end if 
 !                    if( iwl .eq. 1 .and. row_cloud .eq. 1 .and. col_cloud .eq. 1 )then
@@ -1104,13 +1104,13 @@
                      if (graupel_ssa .gt. high .or. graupel_ssa .lt. low .or. graupel_ssa .ne. graupel_ssa )then
                         write(xmsg, 99960)'graupel SSA outside bounds and equals ', 
      &                  graupel_ssa,' at layer ', layer
-                        call m3mesg(xmsg)
+                        CALL LOG_MESSAGE( LOGDEV , xmsg)
 !                       error_flag = .true.
                       end if 
                       if (graupel_asy .gt. 1.0 .or. graupel_asy .lt. -1.0 .or. graupel_asy .ne. graupel_asy )then
                          write(xmsg, 99960)'graupel asymmetery factor outside bounds and equals ', 
      &                   graupel_asy,' at layer ', layer
-                         call m3mesg(xmsg)
+                         CALL LOG_MESSAGE( LOGDEV , xmsg)
                          error_flag = .true.
                      end if 
 !                    if( iwl .eq. 1 .and. row_cloud .eq. 1 .and. col_cloud .eq. 1 )then

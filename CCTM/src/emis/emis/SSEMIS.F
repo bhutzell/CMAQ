@@ -37,6 +37,7 @@ C-----------------------------------------------------------------------
       USE HGRD_DEFN
       USE AERO_DATA, ONLY: N_MODE
       USE DESID_VARS
+      use mio_module
 
       IMPLICIT NONE
 
@@ -346,7 +347,7 @@ C Allocate SS arrays using NSSSPC value
      &                 GSFAC( NCOLS,NROWS ), STAT = STATUS )
             IF ( STATUS .NE. 0 ) THEN
                XMSG = '*** SSOUTM, SSOUTN or SSOUTS memory allocation failed'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -367,7 +368,7 @@ C Allocate diagnostic arrays
      &                    WRSS_SPC( NSSDIAG ), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = '*** SSOUTD or WRSS_SPC memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
 
@@ -404,21 +405,9 @@ C Open the sea-salt emission dignostic file
      &                    WRSS( NCOLS,NROWS ), STAT = STATUS )
                IF ( STATUS .NE. 0 ) THEN
                   XMSG = '*** SSBF or WRSS memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
-
-#ifndef mpas
-#ifdef parallel_io
-               CALL SE_BARRIER
-               IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-                  IF ( .NOT. OPEN3( CTM_SSEMIS_1, FSREAD3, PNAME ) ) THEN
-                     XMSG = 'Could not open ' // TRIM(CTM_SSEMIS_1)
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-                  END IF
-               END IF
-#endif
-#endif
 
             END IF
 
@@ -455,42 +444,8 @@ C Local variables:
 C-----------------------------------------------------------------------
 
 #ifndef mpas
-C Try to open existing file for update
-         IF ( .NOT. OPEN3( CTM_SSEMIS_1, FSRDWR3, PNAME ) ) THEN
-            XMSG = 'Could not open CTM_SSEMIS_1 for update - '
-     &           // 'try to open new'
-            CALL M3MESG( XMSG )
-
-C Set output file characteristics based on COORD.EXT and open diagnostic file
-            FTYPE3D = GRDDED3
-            SDATE3D = JDATE
-            STIME3D = JTIME
-            TSTEP3D = TSTEP
-            CALL NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
 
             NVARS3D = NSSDIAG
-            NCOLS3D = GL_NCOLS
-            NROWS3D = GL_NROWS
-            NLAYS3D = 1
-            NTHIK3D = 1
-            GDTYP3D = GDTYP_GD
-            P_ALP3D = P_ALP_GD
-            P_BET3D = P_BET_GD
-            P_GAM3D = P_GAM_GD
-            XORIG3D = XORIG_GD
-            YORIG3D = YORIG_GD
-            XCENT3D = XCENT_GD
-            YCENT3D = YCENT_GD
-            XCELL3D = XCELL_GD
-            YCELL3D = YCELL_GD
-            VGTYP3D = VGTYP_GD
-            VGTOP3D = VGTOP_GD
-!           VGTPUN3D = VGTPUN_GD ! currently, not defined
-            DO L = 1, NLAYS3D + 1
-               VGLVS3D( L ) = VGLVS_GD( L )
-            END DO
-!           GDNAM3D = GDNAME_GD
-            GDNAM3D = GRID_NAME  ! from HGRD_DEFN
 
             DO V = 1, NSSDIAG
                VTYPE3D( V ) = M3REAL
@@ -506,33 +461,21 @@ C Set output file characteristics based on COORD.EXT and open diagnostic file
      &                     // ' sea-salt emission rate'
             END DO
 
-            FDESC3D( 1 ) = 'hourly layer-1 sea-salt emission rates'
-            DO L = 2, MXDESC3
-               FDESC3D( L ) = ' '
-            END DO
-
             ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 3
+            NDIMS3D( 1:NVARS3D ) = 4
             L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .False.
+            L_LAY  ( 1:NVARS3D ) = .True.
             L_COL  ( 1:NVARS3D ) = .True.
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
           
-            CALL LOAD_MIO_FILE ( 'CTM_SSEMIS_1', 0, 0, 0,
+            CALL LOAD_MIO_FILE ( CTM_SSEMIS_1, 0, 0, 0,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
 
 
-C Open sea-salt emissions diagnostic file
-            IF ( .NOT. OPEN3( CTM_SSEMIS_1, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not create the CTM_SSEMIS_1 file'
-               CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-            END IF
-
-         END IF
 #endif
 
          RETURN
@@ -631,6 +574,7 @@ C Local Variables:
 
             CHARACTER( 16 ), SAVE :: PNAME = 'GET_SSEMIS'
             CHARACTER( 96 ) :: XMSG = ' '
+            character( 20 ) :: TIME_STAMP
             INTEGER C, R, L, N, V, S         ! loop indices
 
 C Variables for calculating ambient RH
@@ -714,6 +658,7 @@ C Variables for calculating dry surface-area emission rate for accum mode
             INTEGER           :: MDATE, MTIME  ! SSEMIS write date&time
 
             LOGICAL, SAVE :: FIRSTIME      = .TRUE.
+            LOGICAL, SAVE :: FIRSTWRITE    = .TRUE.
 
 C Mathematical constants
             REAL, PARAMETER      :: TWO3 = 2.0 / 3.0
@@ -989,17 +934,16 @@ C Then reset the sea-salt emissions array and local write counter.
 #ifndef mpas
             IF ( SSEMDIAG .AND. .NOT. L_DESID_DIAG ) THEN
 
-#ifdef parallel_io
-               IF ( FIRSTIME ) THEN
-                  FIRSTIME = .FALSE.
-                  IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-                     IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSREAD3, PNAME ) ) THEN
-                        XMSG = 'Could not open ' // TRIM( CTM_DRY_DEP_1 )
-                        CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                     END IF
-                  END IF
-               END IF
-#endif
+               if ( firstwrite ) then
+                  firstwrite = .false.
+                  call mio_setfile( INIT_CONC_1 )
+                  mio_nlays = 1
+                  call mio_fcreate( CTM_SSEMIS_1, mio_new_file )
+                  if (mype .eq. 0) then
+                     call mio_set_global_attr ( CTM_SSEMIS_1, 'NLAYS', 1 )
+                     call mio_set_global_attr ( CTM_SSEMIS_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                  end if
+               end if
 
                WSTEP = WSTEP + TIME2SEC( TSTEP( 2 ) )
 
@@ -1010,17 +954,16 @@ C Then reset the sea-salt emissions array and local write counter.
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                   END IF
                   CALL NEXTIME( MDATE, MTIME, TSTEP( 1 ) )
+                  call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+                  
                   DO V = 1, NSSDIAG
                      DO R = 1, NROWS
                         DO C = 1, NCOLS
                            WRSS( C,R ) = SSBF( V,C,R ) / FLOAT( WSTEP )
                         END DO
                      END DO
-                     IF ( .NOT. WRITE3( CTM_SSEMIS_1, WRSS_SPC( V ),
-     &                          MDATE, MTIME, WRSS ) ) THEN
-                        XMSG = 'Could not write ' // CTM_SSEMIS_1 // ' file'
-                        CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-                     END IF
+                     call mio_fwrite( CTM_SSEMIS_1, WRSS_SPC( V ),
+     &                                PNAME, WRSS, TIME_STAMP )
                   END DO
                   WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &                  'Timestep written to', CTM_SSEMIS_1,

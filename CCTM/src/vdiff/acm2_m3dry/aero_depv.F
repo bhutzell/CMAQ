@@ -81,7 +81,8 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN      
       USE AERO_DATA           ! aero variable data
       USE AEROMET_DATA
-      USE CONST        
+      USE CONST
+      USE LOGDEV_MOD, ONLY: M3EXIT        
 !      USE Mosaic_Mod, Only: ADEPVJ  ! Shared mosaic variables
 !      Use LSM_Mod, Only: N_LUFRAC
       USE ASX_DATA_MOD, Only: Met_Data
@@ -205,7 +206,7 @@ C Set the dep vel surrogate pointers
             ELSE
                XMSG = 'Could not find ' // AE_DEPV( V ) // ' in aerosol' //
      &                ' surrogate table. >>> Dep vel set to zero <<< '
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                DEPV_SUR( V ) = 0
             END IF
          END DO
@@ -324,7 +325,7 @@ C-----------------------------------------------------------------------
       USE AERO_DATA, Only: N_MODE
       Use LSM_Mod, Only: N_LUFRAC
       USE UTILIO_DEFN
-      USE RUNTIME_VARS, ONLY: LOGDEV
+      USE LOGDEV_MOD, ONLY: LOGDEV, M3EXIT
       IMPLICIT NONE
       CHARACTER( 96 ) :: XMSG = ' '
 

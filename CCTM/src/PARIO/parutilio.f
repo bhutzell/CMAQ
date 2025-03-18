@@ -167,8 +167,8 @@ C Note: more than one optional argument requires that the caller calls by name
                CHARACTER(*) :: ERRTXT
             END SUBROUTINE PM3WARN
 
-            LOGICAL FUNCTION PSHUT3 ()
-            END FUNCTION PSHUT3
+!            LOGICAL FUNCTION PSHUT3 ()
+!            END FUNCTION PSHUT3
 
             LOGICAL FUNCTION PTRWRITE3( FNAME, VNAME, JDATE, JTIME, BUFFER )
                CHARACTER(*)  :: FNAME

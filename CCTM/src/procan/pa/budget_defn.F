@@ -77,6 +77,7 @@ C Key Subroutines/Functions Called: None
  
 C-----------------------------------------------------------------------
       USE UTIL_FAMILY_MODULE
+      USE LOGDEV_MOD, ONLY : APPL_NAME
 #ifdef mpas
       use util_module, only : junit, index1, nextime
 #endif

@@ -34,6 +34,7 @@ C-----------------------------------------------------------------------
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
       USE DDM3D_DEFN, ONLY: NP, NPMAX, SENNUM, SPCNAME, SEN_PAR, SENGRID
+      use mio_module
 
       IMPLICIT NONE
 
@@ -103,33 +104,25 @@ c     INTEGER      ISUR                       ! surrogate index
 c     REAL,    ALLOCATABLE, SAVE :: ICBC_FAC( : ) ! Factor to be applied to ICs
       INTEGER      C, R, L, SPC, V            ! loop counters
       INTEGER      ASPC                       ! CGRID RHOJ pointer
-c     INTEGER      NCOLSDENS, NROWSDENS       ! local for DENS
+      integer      floc
 
       CHARACTER( 16 ) :: PNAME = 'LOAD_SENGRID'
       CHARACTER( 16 ) :: VNAME
 c     CHARACTER( 16 ) :: CONCMIN
       CHARACTER( 96 ) :: XMSG = ' '
-      CHARACTER( 40 ) :: CHWARN = 'Domain extents dfrnt from model for '
-c     CHARACTER( 24 ) :: ESTR1 = 'No IC found for species '
-c     CHARACTER( 34 ) :: ESTR2 = ' '
+      character( 19 ) :: timestamp
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
 
-c     INTEGER, SAVE :: LOGDEV
-
-c     INTEGER SENNUM
-c     CHARACTER( 8 ) :: SPCNAME
-c     CHARACTER( 16) :: SENNAME
 
 
 C-----------------------------------------------------------------------
 
       IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
-         LOGDEV = INIT3 ()
+         call mio_fopen( INIT_SENS_1, mio_read_only )
          CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
      &                   STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )
-C IOFDESC common now loaded with MET_CRO_3D header
 
          MXSPC = N_GC_SPC + N_AE_SPC + N_NR_SPC + N_TR_SPC + 1
          ALLOCATE ( INDX( MXSPC*NPMAX ),  STAT = ASTAT )
@@ -141,46 +134,12 @@ C IOFDESC common now loaded with MET_CRO_3D header
 
 c     WRITE( CONCMIN,'(1PE8.2)' ) CMIN
 
-       write(logdev,*) "BEFORE OPEN load_sengrid"
-
-
-      IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
-         XMSG = 'Could not open ' // FNAME // ' file'
-         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
- 
-      IF ( .NOT. DESC3( FNAME ) ) THEN
-         XMSG = 'Could not get ' // FNAME // ' file description'
-         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
- 
-      IF ( GL_NCOLS .NE. NCOLS3D ) THEN
-         WRITE( LOGDEV,* ) ' '
-         WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
-         WRITE( LOGDEV,* ) '>>  GL_NCOLS: ', GL_NCOLS, '  NCOLS3D: ', NCOLS3D
-      END IF
- 
-      IF ( GL_NROWS .NE. NROWS3D ) THEN
-         WRITE( LOGDEV,* ) ' '
-         WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
-         WRITE( LOGDEV,* ) '>>  GL_NROWS: ', GL_NROWS, '  NROWS3D: ', NROWS3D
-      END IF
- 
-      IF ( NLAYS .NE. NLAYS3D ) THEN
-         XMSG = 'Wrong number of layers in ' // FNAME // ' file'
-         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
-
-c     ESTR2 = ' in ' // TRIM( FNAME ) // '; set to ' // TRIM( CONCMIN )
-
-C Get INDX
-!     INDX = 0   ! array assignment
       DO SPC = 1, MXSPC*NPMAX
          INDX( SPC ) = 0
       END DO
 
-
-       write(logdev,*) "load_sengrid", SPC_CAT
+      write(logdev,*) "load_sengrid", SPC_CAT
+      call mio_time_format_conversion (JDATE, JTIME, timestamp)
 
       IF ( SPC_CAT .EQ. 'GC' ) THEN
 
@@ -199,7 +158,7 @@ c           SPCNAME = GC_SPC( SPC )( 1:12 )
                  XMSG = 'No IC found for sensitivity '
      &                // SPCNAME  // ' in ' // TRIM(FNAME)
      &                // ' Set to zero.'
-                 CALL M3MESG ( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
                IF ( INDX( SENNUM ) .GT. 0 )
      &            WRITE( LOGDEV,1013 ) INDX( SPC ), GC_SPC( SPC )
@@ -223,7 +182,7 @@ c           SPCNAME = AE_SPC( SPC )( 1:12 )
                  XMSG = 'No IC found for sensitivity ' 
      &                // SPCNAME  // ' in ' // TRIM(FNAME) 
      &                // ' Set to zero.'
-                 CALL M3MESG ( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
                IF ( INDX( SENNUM ) .GT. 0 )
      &            WRITE( LOGDEV,1013 ) INDX( SPC ), AE_SPC( SPC )
@@ -247,7 +206,7 @@ c           SPCNAME = NR_SPC( SPC )( 1:12 )
                  XMSG = 'No IC found for sensitivity '
      &                // SPCNAME  // ' in ' // TRIM(FNAME)
      &                // ' Set to zero.'
-                 CALL M3MESG ( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
                IF ( INDX( SENNUM ) .GT. 0 )
      &            WRITE( LOGDEV,1013 ) INDX( SPC ), NR_SPC( SPC )
@@ -271,7 +230,7 @@ c           SPCNAME = TR_SPC( SPC )( 1:12 )
                  XMSG = 'No IC found for sensitivity '
      &                // SPCNAME  // ' in ' // TRIM(FNAME)
      &                // ' Set to zero.'
-                 CALL M3MESG ( XMSG )
+                 CALL LOG_MESSAGE( LOGDEV ,  XMSG )
                END IF
                IF ( INDX( SENNUM ) .GT. 0 )
      &            WRITE( LOGDEV,1013 ) INDX( SPC ), NR_SPC( SPC )
@@ -294,7 +253,6 @@ C Read into SENGRID
 
       CALL SUBHFILE ( FNAME, GXOFF, GYOFF,
      &                STRTCOLINI, ENDCOLINI, STRTROWINI, ENDROWINI )
-C IOFDESC common now loaded with FNAME header
 
       DO SPC = 1, N_SPCS
          V = SPC_STRT - 1 + SPC
@@ -303,13 +261,17 @@ C IOFDESC common now loaded with FNAME header
             NDX = INDX( SENNUM )
 
             IF ( NDX .GT. 0 ) THEN
-               IF ( .NOT. XTRACT3( FNAME, VNAME3D ( NDX ),
-     &              1,NLAYS, STRTROWINI,ENDROWINI, STRTCOLINI,ENDCOLINI,
-     &              JDATE, JTIME, DBUFF ) ) THEN
-                  XMSG = 'Could not read ' // TRIM( VNAME3D( NDX ) )
-     &                 // ' from ' // FNAME
-                  CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
+!               IF ( .NOT. XTRACT3( FNAME, VNAME3D ( NDX ),
+!     &              1,NLAYS, STRTROWINI,ENDROWINI, STRTCOLINI,ENDCOLINI,
+!     &              JDATE, JTIME, DBUFF ) ) THEN
+!                  XMSG = 'Could not read ' // TRIM( VNAME3D( NDX ) )
+!     &                 // ' from ' // FNAME
+!                  CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+!               END IF
+               call mio_fread( fname, vname3d( ndx ), pname,
+     &               STRTCOLINI, ENDCOLINI, STRTROWINI, ENDROWINI, 1, mio_file_data(floc)%nlays,
+     &               DBUFF, timestamp)
+
                DO L = 1, NLAYS
                   DO R = 1, NROWS
                      DO C = 1, NCOLS
@@ -337,13 +299,16 @@ C IOFDESC common now loaded with FNAME header
 C Load RHOJ for transport and mixing ratio advection adjustment
 
          VNAME = 'DENSA_J'
-         IF ( .NOT. XTRACT3( MET_CRO_3D, VNAME,
-     &              1,NLAYS, STRTROWMC3,ENDROWMC3, STRTCOLMC3,ENDCOLMC3,
-     &              JDATE, JTIME, RHOJ ) ) THEN
-             XMSG = 'Could not read DENSA_J from ' // MET_CRO_3D
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-
+!         IF ( .NOT. XTRACT3( MET_CRO_3D, VNAME,
+!     &              1,NLAYS, STRTROWMC3,ENDROWMC3, STRTCOLMC3,ENDCOLMC3,
+!     &              JDATE, JTIME, RHOJ ) ) THEN
+!             XMSG = 'Could not read DENSA_J from ' // MET_CRO_3D
+!            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+!         END IF
+         call mio_fread( fname, vname, pname, STRTCOLINI, ENDCOLINI, 
+     &       STRTROWINI, ENDROWINI, 1, mio_file_data(floc)%nlays,
+     &       RHOJ, timestamp)
+          
          ASPC = GC_STRT - 1 + N_GC_SPCD
          DO NP = 1, NPMAX
             DO L = 1, NLAYS
@@ -359,13 +324,6 @@ C Load RHOJ for transport and mixing ratio advection adjustment
 
 
       END IF
-
-C Close the file
-
-!     IF ( .NOT. CLOSE3( FNAME ) ) THEN
-!        XMSG = 'Could not close ' // FNAME // ' file'
-!        CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-!     END IF
 
       RETURN
 

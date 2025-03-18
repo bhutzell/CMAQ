@@ -165,7 +165,7 @@ C Retrieve Number of Emission Streams of Various Types (sectors)
          CALL DESID_INIT_STREAMS( JDATE, JTIME )
          IF ( DESID_N_SRM .EQ. 0 ) THEN 
             XMSG = 'No Emissions Streams Have Been Selected.'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .TRUE.; RETURN
          END IF
 
@@ -235,7 +235,7 @@ C Initialize Online Lightning NOx Emissions
          END IF
 
 C Initialize Online Meteorology-Dependent Emissions
-         IF ( USE_MET_EMIS ) THEN 
+         IF ( MET_EMIS ) THEN 
            CALL LOG_SUBHEADING( LOGDEV, 'Initialize Met-Modulated Emissions' )
            IF ( .NOT. METEMIS_INIT( JDATE, JTIME, TSTEP(1) ) ) THEN
               XMSG = 'Failure initializing met-modulated emissions module'
@@ -266,7 +266,7 @@ C Allocate Space for Master Emissions Computation
          ALLOCATE ( VDEMIS_DIFF( N_SPC_DIFF,DESID_LAYS,NCOLS,NROWS ),STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'VDEMIS_DIFF memory allocation failed'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -277,7 +277,7 @@ C Allocate Space for Master Emissions Computation
      &                                                  STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'SA_VDEMIS_DIFF memory allocation failed'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 #endif
@@ -286,7 +286,7 @@ C Allocate Space for Master Emissions Computation
          ALLOCATE ( SVDEMIS_DIFF( N_SPC_DIFF,DESID_LAYS,NCOLS,NROWS,NPMAX ),STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'SVDEMIS_DIFF memory allocation failed'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 #endif
@@ -543,7 +543,7 @@ C Find emissions stream in the list of available streams
                    XMSG = " User specified ISAM tag - " //
      &                    TRIM( TAGSTREAMS(ITAG,ISRM) )// 
      &                    " - not found in available emissions streams "
-                   CALL M3MESG(XMSG)
+                   CALL LOG_MESSAGE( LOGDEV , XMSG)
                    EFLAG = .TRUE.
                  ELSE
                    TAGS_PER_STREAM( IDX ) = TAGS_PER_STREAM( IDX ) + 1
@@ -949,7 +949,6 @@ C Retrieve Emissions from All Stream Types
                    END DO
                  END IF
                END DO
-             
              END IF
 #endif       
              
@@ -1405,13 +1404,17 @@ C-----------------------------------------------------------------------
      &                      DIFF_MASK_NUM, DIFF_MASK_SRF, DIFF_MW, DIFF_SPC,
      &                      DIFF_MASK_NR, DIFF_MASK_TRAC
       USE AERO_DATA, ONLY : GPKG
+      USE MIO_MODULE
       USE CONST, ONLY: AVO, MWAIR
+
 #ifdef mpas
       USE coupler_module, ONLY: inv_cell_vol
 #endif
 
       IMPLICIT NONE
          
+      INCLUDE SUBST_FILES_ID
+
       INTEGER, INTENT( IN ) :: JDATE, JTIME, ISRM
       REAL, INTENT( In )    :: VDEMIS0( :,:,:,: )
       REAL, ALLOCATABLE, SAVE :: VDEMIS ( :,:,:,: )
@@ -1423,9 +1426,13 @@ C-----------------------------------------------------------------------
  
       INTEGER       :: LAYS, L, C, R, IVAR, NL, I
       INTEGER       :: ISPEC, IDIAG, IP, JSPEC, JDIAG, KSPEC
+      INTEGER       :: ALLOCSTAT
 
       LOGICAL :: FIRST_TIME = .TRUE.
+      LOGICAL :: subset_layer
       CHARACTER( 586 ) :: XMSG
+      CHARACTER( 20 ) :: TIME_STAMP
+      CHARACTER( 16 ) :: PNAME = 'DESID_CALC_DIAG'
 
       ! Get pressure info from ASX_DATA_MOD
       IF ( FIRST_TIME ) THEN
@@ -1433,9 +1440,16 @@ C-----------------------------------------------------------------------
 
          ALLOCATE( CNVTC( DESID_LAYS,NCOLS,NROWS ), 
      &             VDEMIS( N_SPC_DIFF,DESID_LAYS,NCOLS,NROWS ),
-     &             VDEMIS_OUT( NCOLS,NROWS,DESID_LAYS ) )
+     &             VDEMIS_OUT( NCOLS,NROWS,DESID_LAYS ),
+     &             DESID_DIAG_CREATE( DESID_N_DIAG), STAT=ALLOCSTAT )
+
+          if ( ALLOCSTAT .NE. 0 ) then
+             XMSG = 'Memory allocation error in ' // PNAME
+             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+          end if
+          DESID_DIAG_CREATE = .TRUE.
       END IF    !FirstTime
-      
+     
       VDEMIS     = 0.0
       VDEMIS_OUT = 0.0
 
@@ -1473,6 +1487,8 @@ C-----------------------------------------------------------------------
       FORALL ( I = 1:N_SPC_DIFF, DIFF_MASK_NUM( I ) )
      &    VDEMIS( I,1:NL,:,: ) = CNVTC( 1:NL,:,: ) * VDEMIS0( I,1:NL,:,:)
 
+      call mio_time_format_conversion (jdate, jtime, time_stamp)
+
       ! Write out this stream to its diagnostic file or sum emissions
       ! for an aggregate diagnostic
       DO IDIAG = 1,DESID_N_DIAG
@@ -1501,14 +1517,32 @@ C-----------------------------------------------------------------------
      &             VDEMIS_OUT(:,:,1) = SUM( VDEMIS_OUT( :,:,1:NL ),3 )
 
               IF ( DESID_DIAG_N_STREAM( IDIAG ) .EQ. 1 ) THEN
-                ! Only this stream contributes. Write emisison
+                ! Only this stream contributes. Write emission
                 ! rates out directly
 #ifndef mpas
-                IF ( .NOT. WRITE3( DESID_DIAG_LOGICAL(IDIAG), DESID_DIAG_SPEC(IDIAG)%SPEC(ISPEC),
-     &               JDATE, JTIME, VDEMIS_OUT( :,:,1:LAYS ) ) ) THEN
-                   XMSG = 'Could not write ' // TRIM( DESID_DIAG_FILENAME(IDIAG) ) // ' file'
-                   CALL M3EXIT( 'WRITE_EMISS_DIAG', JDATE, JTIME, XMSG, XSTAT1 )
+
+                if ( DESID_DIAG_CREATE( IDIAG ) ) then
+                   DESID_DIAG_CREATE( IDIAG ) = .FALSE.
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
+                   call mio_setfile( INIT_CONC_1 )
+                   subset_layer = ( mio_nlays .ne. LAYS )
+                   if ( subset_layer ) mio_nlays = LAYS
+
+                   call mio_fcreate( DESID_DIAG_LOGICAL(IDIAG), mio_new_file )
+
+                   if (subset_layer) then
+                      if (mype == 0) then
+                         call mio_set_global_attr ( DESID_DIAG_LOGICAL(IDIAG), 'NLAYS', LAYS )
+                         ! not sure what to do here regarding vglvls
+                         call mio_set_global_attr ( DESID_DIAG_LOGICAL(IDIAG), 'VGLVLS', INIT_CONC_1, 1, LAYS+1 )
+                      end if
+                   end if
                 END IF
+
+                call mio_fwrite( DESID_DIAG_LOGICAL(IDIAG), DESID_DIAG_SPEC( IDIAG )%SPEC(ISPEC),
+     &                             pname, VDEMIS_OUT( :,:,1:LAYS ), time_stamp )
+
 #endif
               ELSE
                 ! Other streams contribute as well. Sum these emission
@@ -1528,21 +1562,23 @@ C-----------------------------------------------------------------------
 
 !     Write out emissions diagnostic file
 !-----------------------------------------------------------------------
-          
+          use mio_module
+
           IMPLICIT NONE
+          INCLUDE SUBST_FILES_ID
 
-          INTEGER IDIAG, ISPEC, JSPEC
-          INTEGER LAYS
-          INTEGER JDATE, JTIME
+          INTEGER :: IDIAG, ISPEC, JSPEC
+          INTEGER :: LAYS
+          INTEGER :: JDATE, JTIME
           CHARACTER(200) :: XMSG
+          LOGICAL        :: subset_layer
 
-#ifdef mpas
-          CHARACTER (20) :: TIME_STAMP
+          CHARACTER (20 ) :: time_stamp
+          character( 16 ), save :: pname = 'DESID_WRITE_DIAG'
+
           call mio_time_format_conversion (jdate, jtime, time_stamp)
-#endif
-
+          
           DO IDIAG = 1,DESID_N_DIAG
-
             IF ( DESID_DIAG_N_STREAM( IDIAG ) .GT. 1 ) THEN
                LAYS = DESID_DIAG_LAYS( IDIAG )
 
@@ -1552,11 +1588,28 @@ C-----------------------------------------------------------------------
                   ! diagnostic
                   JSPEC = MAP_DIAGtoVDEMIS( ISPEC,IDIAG )
 #ifndef mpas
-                  IF ( .NOT. WRITE3( DESID_DIAG_LOGICAL(IDIAG), DESID_DIAG_SPEC( IDIAG )%SPEC( ISPEC ),
-     &                     JDATE, JTIME, VDEMIS_DIAG( JSPEC,:,:,1:LAYS ) ) ) THEN
-                    XMSG = 'Could not write ' // TRIM( DESID_DIAG_FILENAME(IDIAG) ) // ' file'
-                    CALL M3EXIT( 'WRITE_EMISS_DIAG', JDATE, JTIME, XMSG, XSTAT1 )
+                  IF ( DESID_DIAG_CREATE( IDIAG ) ) THEN
+                     DESID_DIAG_CREATE( IDIAG ) = .FALSE.
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
+                     call mio_setfile( INIT_CONC_1 )
+                     subset_layer = ( mio_nlays .ne. LAYS )
+                     if ( subset_layer ) mio_nlays = LAYS
+
+                     call mio_fcreate( DESID_DIAG_LOGICAL(IDIAG), mio_new_file )
+
+                     if (subset_layer) then
+                        if (mype == 0) then
+                           call mio_set_global_attr ( DESID_DIAG_LOGICAL(IDIAG), 'NLAYS', LAYS )
+                           ! not sure what to do here regarding vglvls
+                           call mio_set_global_attr ( DESID_DIAG_LOGICAL(IDIAG), 'VGLVLS', INIT_CONC_1, 1, LAYS+1 )
+                        end if
+                     end if
                   END IF
+
+                  call mio_fwrite( DESID_DIAG_LOGICAL(IDIAG), DESID_DIAG_SPEC( IDIAG )%SPEC(ISPEC),
+     &                             pname, VDEMIS_DIAG( JSPEC,:,:,1:LAYS ), time_stamp )
+     
 #else
              call mio_fwrite('EMIS_DIAG',DESID_DIAG_SPEC( IDIAG )%SPEC(ISPEC ), "write_emis",
      &                             VDEMIS_DIAG( JSPEC,:,1,1 ) ,time_stamp)
@@ -1694,7 +1747,7 @@ C-----------------------------------------------------------------------
             DESID_EMVAR( ISRM )%LAREAADJ= .FALSE.
 
             DO IEMVAR = 1,DESID_EMVAR( ISRM )%LEN
-               ! Assign Default Molecular Weight to Each Emision Variable
+               ! Assign Default Molecular Weight to Each Emission Variable
                B = DESID_EMVAR( ISRM )%ARRY( IEMVAR )
                IA  = INDEX1( B, DESID_N_EMVAR_TABLE, DESID_EMVAR_TABLE( : )%NAME )
                IF ( IA .GT. 0 ) THEN
@@ -2498,11 +2551,8 @@ C-----------------------------------------------------------------------
                      ! Check if IRGN and JRGN have a common Sub-Region 
                      ! and that that sub-region is not an active region
                      IF ( DESID_REG_SUB(I,K) .AND. DESID_REG_SUB(J,K) .AND.
-#ifndef mpas
-     &                    INDEXINT1( K, NREG, REG_UNQ(1:NREG) ) .EQ. 0 ) THEN
-#else
      &                    INDEX1( K, NREG, REG_UNQ(1:NREG) ) .EQ. 0 ) THEN
-#endif
+
                        ! Add Sub-Region K to Active Region List
                        NREG = NREG + 1
                        REG_UNQ( NREG ) = K
@@ -2721,7 +2771,7 @@ C-----------------------------------------------------------------------
          ! Warn the User if there are no emissions instructions provided        
          IF ( DESID_N_ISTR .LE. 0 ) THEN
             XMSG = 'There are no emissions instructions: VDEMIS is set to zero' ! below
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
          END IF
 
          ! Print a message for each emissions stream variable that is not used.
@@ -2947,7 +2997,7 @@ C-----------------------------------------------------------------------
          IF ( USE_MARINE_GAS_EMISSION ) DESID_N_SRM = DESID_N_SRM + 1
   
          ! Met-Modulated Emissions; use if met-emis is activated
-         IF ( USE_MET_EMIS ) DESID_N_SRM = DESID_N_SRM + 1
+         IF ( MET_EMIS ) DESID_N_SRM = DESID_N_SRM + 1
   
          ! Lightning NO Emissions
          IF ( LTNG_NO ) DESID_N_SRM = DESID_N_SRM + 1
@@ -3171,7 +3221,7 @@ C stkemis_init.
          END IF
          
          ! Met-Modulated Emissions
-         IF ( USE_MET_EMIS ) THEN
+         IF ( MET_EMIS ) THEN
            ISRM = ISRM + 1
              DESID_STREAM_TYPE( ISRM ) = 'METEMIS'
              DESID_STREAM_ITYPE( ISRM ) = 10
@@ -3196,7 +3246,7 @@ C stkemis_init.
 #ifdef mpas
          use util_module, only : index1, upcase
 #endif
-  
+        USE MIO_MODULE
         IMPLICIT NONE
   
         CHARACTER( 200 ) :: PREFIX = 'CCTM_DESID'
@@ -3212,7 +3262,8 @@ C stkemis_init.
      &                      SPEC_VECTOR( N_SPC_DIFF )
         CHARACTER( 3)    :: CDIAG
         LOGICAL          :: LERROR
-   
+        CHARACTER( 16 )  :: PNAME = 'DESID_INIT_DIAG'
+
         N_Diag_Nml = SIZE( Desid_Diag_Fmt_Nml )
         N_Buff = N_Diag_Nml * 20
 
@@ -3416,7 +3467,11 @@ C stkemis_init.
            END IF
            WRITE( DESID_DIAG_LOGICAL( IDIAG ),'( "DESID_",I3.3 )' ) IDIAG
 #ifndef mpas
-           VALUE = SETENVVAR( DESID_DIAG_LOGICAL( IDIAG ), DESID_DIAG_FILENAME( IDIAG ) )
+           VALUE = MIO_SETENV( DESID_DIAG_LOGICAL( IDIAG ), DESID_DIAG_FILENAME( IDIAG ) )
+           IF ( VALUE .NE. 0 ) THEN 
+             XMSG = 'Cannot setenv DESID DIAG FNAME: ' // DESID_DIAG_FILENAME( IDIAG ) 
+             CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+           END IF 
 #endif
         END DO
    
@@ -3454,9 +3509,9 @@ C                        removed deprecated TRIMLEN
       USE UTILIO_DEFN
       USE AERO_DATA, only : AEROMODE, N_MODE, MGPG, GPKG
       USE VDIFF_MAP, only : N_SPC_DIFF, DIFF_SPC, DIFF_MASK_AERO
+      use mio_module
 #ifdef mpas
       use util_module, only : index1, upcase
-      use mio_module
 #endif
   
       IMPLICIT NONE
@@ -3507,24 +3562,15 @@ C Open All Tracer Emission Files
               file_exist = .false.
            end if
 #else  
-           IF ( .NOT. OPEN3( DESID_STREAM_NAME( ISRM ), FSREAD3, PNAME ) ) THEN
-              XMSG = 'Could not open tracer file'
-              CALL M3MESG( XMSG )
-              file_exist = .false.
-           ELSE
-              file_exist = .true.
-             ! Assign Tracer Emissions Species
-             IF ( .NOT. DESC3( DESID_STREAM_NAME( ISRM ) ) ) THEN
-                XMSG = 'Could not get '// DESID_STREAM_NAME( ISRM ) // ' file description'
-                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-             END IF
-  
-             loc_nvars = nvars3d
-             loc_nlays = nlays3d
-             allocate (loc_vnames(loc_nvars), loc_units(loc_nvars), stat=status)
-             loc_vnames = VNAME3d(1:loc_nvars)
-             loc_units  = UNITS3D(1:loc_nvars)
-           END IF
+!          loc_nvars = nvars3d
+!          loc_nlays = nlays3d
+           loc_nvars = mio_file_data(floc)%nvars
+           loc_nlays = mio_file_data(floc)%nlays
+           allocate (loc_vnames(loc_nvars), loc_units(loc_nvars), stat=status)
+!          loc_vnames = VNAME3d(1:loc_nvars)
+!          loc_units  = UNITS3D(1:loc_nvars)
+           loc_vnames = mio_file_data(floc)%var_name
+           loc_units  = mio_file_data(floc)%units
 #endif  
 
            IF (FILE_EXIST) THEN
@@ -3563,7 +3609,6 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
         IF ( DESID_STREAM_TYPE( ISRM ) .EQ. 'GRID' ) THEN
           IGR = IGSRM( ISRM )
 
-#ifdef mpas 
           floc = mio_search (DESID_STREAM_NAME( ISRM ))
           call mio_timestamp_to_julian (mio_file_data(floc)%timestamp(1), loc_date, loc_time)
           loc_nvars = mio_file_data(floc)%nvars
@@ -3571,24 +3616,6 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
           allocate (loc_vnames(loc_nvars), loc_units(loc_nvars), stat=status)
           loc_vnames = mio_file_data(floc)%var_name
           loc_units  = mio_file_data(floc)%units
-#else
-          IF ( .NOT. OPEN3( DESID_STREAM_NAME( ISRM ), FSREAD3, PNAME ) ) THEN
-              XMSG = 'Could not open file ' // DESID_STREAM_NAME( ISRM )
-              CALL M3MESG( XMSG )
-          ELSE
-  
-            IF ( .NOT. DESC3( DESID_STREAM_NAME( ISRM ) ) ) THEN
-              XMSG = 'Could not get '// DESID_STREAM_NAME( ISRM ) // ' file description'
-              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-          END IF
-          loc_nvars = NVARS3D
-          loc_nlays = nlays3d
-          allocate (loc_vnames(loc_nvars), loc_units(loc_nvars), stat=status)
-          loc_vnames = VNAME3d(1:loc_nvars)
-          loc_units  = UNITS3D(1:loc_nvars)
-          loc_date   = sdate3d
-#endif
             
           ! Let the date for this emission stream come from the model
           ! by default or the file if the user wishes to override the
@@ -3642,7 +3669,7 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
   
       INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP
   
-      CHARACTER( 16 ) :: PNAME = 'OPEN_EMISS_DIAG'
+      CHARACTER( 16 ) :: PNAME = 'DESID_OPEN_DIAG'
       CHARACTER( 200 ) :: XMSG
   
       INTEGER :: IDIAG, IVAR, NLAYERS, V, ISPEC
@@ -3657,32 +3684,8 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
           NLAYERS = 1
           IF ( DESID_DIAG_FORMAT( IDIAG ) .EQ. '3D' ) NLAYERS = DESID_LAYS
   
-          ! Set output file characteristics based on COORD.EXT and 
-          ! open diagnostic file
-          FTYPE3D = GRDDED3
-          SDATE3D = STDATE
-          STIME3D = STTIME
-          TSTEP3D = TSTEP
-  
           NVARS3D = DESID_DIAG_SPEC( IDIAG )%NSPEC
-          NCOLS3D = GL_NCOLS
-          NROWS3D = GL_NROWS
           NLAYS3D = NLAYERS
-          NTHIK3D = 1
-          GDTYP3D = GDTYP_GD
-          P_ALP3D = P_ALP_GD
-          P_BET3D = P_BET_GD
-          P_GAM3D = P_GAM_GD
-          XORIG3D = XORIG_GD
-          YORIG3D = YORIG_GD
-          XCENT3D = XCENT_GD
-          YCENT3D = YCENT_GD
-          XCELL3D = XCELL_GD
-          YCELL3D = YCELL_GD
-          VGTYP3D = VGTYP_GD
-          VGTOP3D = VGTOP_GD
-          VGLVS3D( 1:NLAYS3D+1 ) = VGLVS_GD( 1:NLAYS3D+1 )
-          GDNAM3D = GRID_NAME  ! from HGRD_DEFN
   
           V = 0
           DO IVAR = 1,DESID_DIAG_SPEC( IDIAG )%NSPEC
@@ -3695,10 +3698,6 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
      &                       // ' from ' // TRIM(DESID_DIAG_LAB( IDIAG )) // ' emissions'
           END DO
           
-          FDESC3D( 1 ) = 'Instantaneous pollutant emissions from stream: ' // 
-     &                   TRIM(DESID_DIAG_LAB( IDIAG ) ) 
-          FDESC3D( 2:MXDESC3 ) = ''
-  
           ! Store MIO Metadata
           NDIMS3D( 1:NVARS3D ) = 4
           L_TSTEP( 1:NVARS3D ) = .True.
@@ -3713,16 +3712,10 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
      &         L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &         L_VEXT(1:NVARS3D) )
 
-          ! Open emissions stream diagnostic file
-          IF ( .NOT. OPEN3( DESID_DIAG_LOGICAL( IDIAG ), FSNEW3, PNAME ) ) THEN
-             XMSG = 'Could not create the ' // TRIM( DESID_DIAG_FILENAME( IDIAG ) ) // ' file'
-             CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-          END IF
-  
         END IF   ! DESID_STREAM_LDIAG?
       END DO     ! IDIAG
 #else
-         call mio_fcreate ('EMIS_DIAG',512 )
+         call mio_fcreate ('EMIS_DIAG', mio_new_file )
 #endif
   
   
@@ -3731,48 +3724,3 @@ C Open Gridded Emission Files (for gas chem, aerosols and non-reactive species)
   
 C-----------------------------------------------------------------------
        END MODULE DESID_MODULE
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   

@@ -66,52 +66,7 @@ C-----------------------------------------------------------------------
 #ifndef mpas
 C Try to open existing file for update
 
-      IF ( IO_PE_INCLUSIVE ) THEN   ! open new
-
-         IF ( .NOT. OPEN3( CTM_DEPV_DIAG, FSRDWR3, PNAME ) ) THEN
-
-            XMSG = 'Could not open ' // CTM_DEPV_DIAG // ' file for update - '
-     &           // 'try to open new'
-            CALL M3MESG( XMSG )
-
-C Set output file characteristics based on GRIDDESC and open the dep velocity diagnostic file
-
-            SDATE3D = JDATE
-            STIME3D = JTIME
-            TSTEP3D = TSTEP
-            CALL NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
-
-            FTYPE3D = GRDDED3
-!           NVARS3D = N_GDEPV_NAMES + N_ADEPV_NAMES + N_SDEPV_NAMES
             NVARS3D = N_GDEPV_NAMES + N_ADEPV_NAMES
-            NCOLS3D = GL_NCOLS
-            NROWS3D = GL_NROWS
-            NLAYS3D =     1
-            NTHIK3D =     1
-            GDTYP3D = GDTYP_GD
-            P_ALP3D = P_ALP_GD
-            P_BET3D = P_BET_GD 
-            P_GAM3D = P_GAM_GD
-            XORIG3D = XORIG_GD
-            YORIG3D = YORIG_GD
-            XCENT3D = XCENT_GD
-            YCENT3D = YCENT_GD
-            XCELL3D = XCELL_GD
-            YCELL3D = YCELL_GD
-            VGTYP3D = VGTYP_GD
-            VGTOP3D = VGTOP_GD
-            DO L = 1, NLAYS3D + 1
-               VGLVS3D( L ) = VGLVS_GD( L )
-            END DO
-            GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-            FDESC3D = ' '   ! array
-
-            L = LEN_TRIM( DEPV_METHOD )
-            FDESC3D( 1 ) = 'Instantaneous values of dry deposition velocities:'
-     &                  // ' the gas phase velocities are' 
-            FDESC3D( 2 ) = 'estimated by the '
-     &                  //  DEPV_METHOD( 1:L ) // ' algorithm.'
 
             N = 0
 
@@ -134,27 +89,19 @@ C Set output file characteristics based on GRIDDESC and open the dep velocity di
             END DO
 
             ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 3
+            NDIMS3D( 1:NVARS3D ) = 4
             L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .False.
+            L_LAY  ( 1:NVARS3D ) = .True. ! even if 2D
             L_COL  ( 1:NVARS3D ) = .True.
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
 
-            CALL LOAD_MIO_FILE ( 'CTM_DEPV_DIAG', 0, 0, 0,
+            CALL LOAD_MIO_FILE ( CTM_DEPV_DIAG, 0, 0, 0,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
 
-
-            IF ( .NOT. OPEN3( CTM_DEPV_DIAG, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not create '// TRIM( CTM_DEPV_DIAG ) // ' file'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-
-         END IF
-      END IF   ! IO_PE_INCLUSIVE
 #endif
 
       RETURN

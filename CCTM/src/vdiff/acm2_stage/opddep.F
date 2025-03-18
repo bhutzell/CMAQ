@@ -17,13 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/vdiff/acm2/opddep.F,v 1.6 2012/01/19 14:40:52 yoj Exp $
- 
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
- 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPDDEP ( JDATE, JTIME, TSTEP )
 
@@ -57,7 +50,7 @@ C Local variables:
       CHARACTER( 16 ) :: PNAME = 'OPDDEP'
       CHARACTER( 96 ) :: XMSG = ' '
 
-! component flux varialbes      
+! component flux variables      
       INTEGER,         SAVE :: N_BD_EMIS 
       CHARACTER( 16 ), SAVE :: BD_EMIS_SPC( 3 )
       INTEGER,         SAVE :: N_BD_FLUX 
@@ -67,10 +60,6 @@ C Local variables:
       INTEGER      STRT, FINI  ! loop induction variables
 
 C-----------------------------------------------------------------------
-
-C Try to open existing file for update
-
-      IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSRDWR3, PNAME ) ) THEN
 
          N_BD_EMIS = 0
          N_BD_FLUX = 0
@@ -89,38 +78,8 @@ C Try to open existing file for update
             BD_EMIS_SPC( N_BD_EMIS ) = 'HONO_Het '
          End If      
 
-         XMSG = 'Could not open ' // CTM_DRY_DEP_1 // ' file for update - '
-     &        // 'try to open new'
-         CALL M3MESG( XMSG )
-
-C Set output file characteristics based on COORD.EXT and open the dry dep file
-
-         FTYPE3D = GRDDED3
-         SDATE3D = JDATE
-         STIME3D = JTIME
-         TSTEP3D = TSTEP
-         CALL NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
          NVARS3D = N_SPC_DDEP + N_BD_EMIS + N_BD_FLUX 
-         NCOLS3D = GL_NCOLS
-         NROWS3D = GL_NROWS
-         NLAYS3D =     1
-         NTHIK3D =     1
-         GDTYP3D = GDTYP_GD
-         P_ALP3D = P_ALP_GD
-         P_BET3D = P_BET_GD 
-         P_GAM3D = P_GAM_GD
-         XORIG3D = XORIG_GD
-         YORIG3D = YORIG_GD
-         XCENT3D = XCENT_GD
-         YCENT3D = YCENT_GD
-         XCELL3D = XCELL_GD
-         YCELL3D = YCELL_GD
-         VGTYP3D = VGTYP_GD
-         VGTOP3D = VGTOP_GD
-         DO L = 1, NLAYS3D + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
-         END DO
-         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
+         NLAYS3D = 1
 
          N = 0
          STRT = 1
@@ -215,33 +174,20 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             END DO
          END IF
 
-         FDESC3D( 1 ) = 'hourly 1-layer cross-point STAGE dry deposition data'
-         DO L = 2, MXDESC3
-            FDESC3D( L ) = ' '
-         END DO
-
          ! Store MIO Metadata
-         NDIMS3D( 1:NVARS3D ) = 3
+         NDIMS3D( 1:NVARS3D ) = 4
          L_TSTEP( 1:NVARS3D ) = .True.
-         L_LAY  ( 1:NVARS3D ) = .False.
+         L_LAY  ( 1:NVARS3D ) = .True.  ! even if 2D
          L_COL  ( 1:NVARS3D ) = .True.
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
 
-         CALL LOAD_MIO_FILE ( 'CTM_DRY_DEP_1', 0, 0, 0,
+         CALL LOAD_MIO_FILE ( CTM_DRY_DEP_1, 0, 0, 0,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &        L_VEXT(1:NVARS3D) )
          
-C    Open dry deposition file
-
-         IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not create '// CTM_DRY_DEP_1 // ' file'
-            CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         END IF
-
-      END IF
 
       RETURN
       END

@@ -59,8 +59,6 @@ C-----------------------------------------------------------------------
 
          USE UTILIO_DEFN
 
-!        INCLUDE SUBST_VGRD_ID     ! vertical dimensioning parameters
-
          LOGICAL :: SUCCESS
          INTEGER :: ALLOCSTAT
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
@@ -94,16 +92,15 @@ C PCGRID extents
 
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating PCGRID'
-               CALL M3WARN ( 'PCGRID_INIT', 0, 0, XMSG )
+               CALL LOG_WARNING( 'PCGRID_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
                END IF
 
             PCGRID = 0.0
-!           PCGRID = -999.999
 
             ELSE
             XMSG = 'PCGRID already ALLOCATED'
-            CALL M3WARN ( 'PCGRID_INIT', 0, 0, XMSG )
+            CALL LOG_WARNING( 'PCGRID_INIT', LOGDEV, XMSG )
                SUCCESS = .FALSE.; RETURN
             END IF
 

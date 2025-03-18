@@ -40,6 +40,7 @@ C-----------------------------------------------------------------------
       USE PA_DEFN
       USE PA_VARS
       USE PA_PARSE
+      USE LOGDEV_MOD, ONLY: M3EXIT
 
       IMPLICIT NONE
       

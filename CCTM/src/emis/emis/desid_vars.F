@@ -157,6 +157,8 @@
       Integer, Parameter :: Desid_N_Emvar_Table = 208
       Type( desid_legend ), save :: Desid_Emvar_Table( Desid_N_Emvar_Table)
 
+      LOGICAL, ALLOCATABLE :: DESID_DIAG_CREATE(:)
+
       CONTAINS
 
         SUBROUTINE INIT_DESID_EMVAR_MW()

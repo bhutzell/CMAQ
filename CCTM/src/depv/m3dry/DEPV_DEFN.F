@@ -111,17 +111,10 @@ C flag for diagnostic DEPV file
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: UNIQUE_ADEPV( : )
       INTEGER, ALLOCATABLE, SAVE         :: AER_DEPV_SUR( : )
 
-      INTEGER, SAVE :: NR_OFFSET            ! Offset to NR start in CGRID
-
       REAL,    ALLOCATABLE, SAVE :: ADEPV( :,:,: )    ! Aerosol dep vel from
                                                                ! subroutine AERO_DEPV
       REAL,    ALLOCATABLE, SAVE :: DBUFF( :,: )      ! diagnostic output buffer
-      REAL,    ALLOCATABLE, SAVE :: DBUFF3( :,:,: )   ! diagnostic output buffer with 3 dimensions
 
-      REAL,    ALLOCATABLE, SAVE :: UCROSS( :,:,:)
-      REAL,    ALLOCATABLE, SAVE :: VCROSS( :,:,:)
-      REAL,    ALLOCATABLE, SAVE :: DLUSE( :,: )
-      
       CONTAINS
 
 C-----------------------------------------------------------------------
@@ -132,7 +125,6 @@ C-----------------------------------------------------------------------
          USE CGRID_SPCS          ! CGRID mechanism species
          USE DEPVVARS
          USE UTILIO_DEFN
-!         USE MOSAIC_MOD, Only: Init_Mosaic
          USE LSM_MOD, Only: Init_LSM !, n_lufrac
          USE BIDI_MOD, Only: Init_Bidi, HgBidi
          USE CONST
@@ -203,7 +195,7 @@ C-----------------------------------------------------------------------
      &              PLDV( N_SPC_DEPV,NCOLS,NROWS ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating DEPV or PLDV arrays'
-            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -211,7 +203,7 @@ C-----------------------------------------------------------------------
          ALLOCATE ( S_PLDV( NPMAX,N_SPC_DEPV,NCOLS,NROWS ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating S_PLDV array'
-            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
          S_PLDV = 0.0   ! array assignment
@@ -220,7 +212,7 @@ C-----------------------------------------------------------------------
          ALLOCATE ( DEPVEL_GAS( N_GAS_DEPV,NCOLS,NROWS ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating DEPVEL_GAS array'
-            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -233,7 +225,7 @@ C as a subset of the vert. diffused species list
          ALLOCATE ( DD_CONV( N_SPC_DEPV+1 ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'Failure allocating DD_CONV'
-            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -270,7 +262,7 @@ C Initialize
             ALLOCATE ( ADEPV( N_AE_DEPV,NCOLS,NROWS ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating ADEPV'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
          END IF
@@ -281,7 +273,7 @@ C Initialize
             ALLOCATE ( ALL_GAS_DEPV( N_GAS_DEPV ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating ALL_GAS_DEPV'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -302,7 +294,7 @@ C Identify and remove multiple occurrences of gas deposition velocities
      &                GAS_DEPV_SUR  ( N_GAS_DEPV ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating GAS_DEPV_FOUND or GAS_DEPV_SUR'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -325,7 +317,7 @@ C Identify and remove multiple occurrences of gas deposition velocities
             ALLOCATE( UNIQUE_GDEPV( N_UNIQUE_GDEPV ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating UNIQUE_GDEPV'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -358,7 +350,7 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
             ALLOCATE( AE_DEPV_FOUND( N_AE_DEPV ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating AE_DEPV_FOUND'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
             AE_DEPV_FOUND = .FALSE.
@@ -408,7 +400,7 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
      &                 NH3_DDEP(NCOLS,NROWS), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating CGRIDL1, CMP or PVD arrays'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
             CGRIDL1 = 0.0   ! array assignment (PVD initalized in m3dry)
@@ -420,7 +412,7 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
      &                    S_PVD    ( NPMAX,N_GAS_DEPV,NCOLS,NROWS ), STAT = ALLOCSTAT )
                IF ( ALLOCSTAT .NE. 0 ) THEN
                   XMSG = 'Failure allocating S_CGRIDL1 or S_PVD arrays'
-                  CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+                  CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                   SUCCESS = .FALSE.; RETURN
                END IF
                S_CGRIDL1 = 0.0
@@ -435,7 +427,7 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
             ALLOCATE ( DBUFF( NCOLS,NROWS ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating DBUFF'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -460,9 +452,9 @@ C-----------------------------------------------------------------------
          USE UTILIO_DEFN
          USE CONST
          USE ASX_DATA_MOD, Only: GRID_DATA !, MOSAIC_DATA
+         use mio_module
 #ifdef mpas
          Use util_module, only : time2sec, nextime, currstep
-         use mio_module
 #endif
 
          IMPLICIT NONE
@@ -500,6 +492,7 @@ C Local variables:
          INTEGER C, R, N, V, NDX, J
 
          LOGICAL, SAVE :: FIRSTIME = .TRUE.
+         LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
 
          CHARACTER (20) :: TIME_STAMP
          integer :: year, month, day, hour, minute
@@ -671,25 +664,18 @@ C-----------------------------------------------------------------------
             END IF
 
             IF ( WRITE_TIME ) THEN
+              IF ( FIRSTWRITE ) THEN
+                 FIRSTWRITE = .FALSE.
+                 call mio_setfile( INIT_CONC_1 )
+                 mio_nlays = 1
+                 call mio_fcreate( CTM_DEPV_DIAG, mio_new_file )
+                 if (mype .eq. 0) then
+                    call mio_set_global_attr ( CTM_DEPV_DIAG, 'NLAYS', 1 )
+                    call mio_set_global_attr ( CTM_DEPV_DIAG, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                 end if
+              END IF            
 
-#ifdef mpas
-               call mio_time_format_conversion (wdate, wtime, time_stamp)
-#else
-#ifdef parallel_io
-               IF ( FIRSTIME ) THEN
-                  FIRSTIME = .FALSE.
-                  IF ( DEPV_DIAG ) THEN
-                     IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-                        IF ( .NOT. OPEN3( CTM_DEPV_DIAG, FSREAD3, PNAME ) ) THEN
-                           XMSG = 'Could not open ' // TRIM( CTM_DEPV_DIAG )
-                           CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                        END IF
-                     END IF
-                  END IF
-
-               END IF
-#endif
-#endif
+              call mio_time_format_conversion (wdate, wtime, time_stamp)
 
                N = 0
                DO V = 1, N_GC_DEPV
@@ -708,12 +694,9 @@ C-----------------------------------------------------------------------
                      call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
      &                                real(DBUFF(:,1), 4), TIME_STAMP)
 #else
+                     call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
+     &                                DBUFF, TIME_STAMP)
 
-                     IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX ),
-     &                                  WDATE, WTIME, DBUFF ) ) THEN
-                         XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
-                         CALL M3EXIT ( PNAME, WDATE, WTIME, XMSG, XSTAT1 )
-                     END IF
 #endif
                   END IF
 
@@ -734,11 +717,8 @@ C-----------------------------------------------------------------------
                      call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
      &                                real(DBUFF(:,1), 4), TIME_STAMP)
 #else
-                     IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX ),
-     &                                  WDATE, WTIME, DBUFF ) ) THEN
-                         XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
-                         CALL M3EXIT ( PNAME, WDATE, WTIME, XMSG, XSTAT1 )
-                     END IF
+                     call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_GDEPV( NDX), pname,
+     &                                DBUFF, TIME_STAMP)
 #endif
 
                   END IF
@@ -758,11 +738,8 @@ C-----------------------------------------------------------------------
                   call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_ADEPV( N ), pname,
      &                             real(DBUFF(:,1), 4), TIME_STAMP)
 #else
-                  IF ( .NOT. WRITE3( CTM_DEPV_DIAG, UNIQUE_ADEPV( N ),
-     &                               WDATE, WTIME, DBUFF ) ) THEN
-                      XMSG = 'Could not write ' // CTM_DEPV_DIAG // ' file'
-                      CALL M3EXIT ( PNAME, WDATE, WTIME, XMSG, XSTAT1 )
-                  END IF
+                  call mio_fwrite (CTM_DEPV_DIAG, UNIQUE_ADEPV( N ), pname,
+     &                             DBUFF, TIME_STAMP)
 #endif
 
                END DO

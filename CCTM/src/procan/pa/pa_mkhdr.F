@@ -64,48 +64,9 @@ C Local Variables:
 C-----------------------------------------------------------------------
 
 #ifndef mpas
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-C  Get file header description from GRID_CONF and reconfigure output domain
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-      P_ALP3D = P_ALP_GD
-      P_BET3D = P_BET_GD
-      P_GAM3D = P_GAM_GD
-
-      XCENT3D = XCENT_GD
-      YCENT3D = YCENT_GD
-      XORIG3D = XORIG_GD
-      YORIG3D = YORIG_GD
-      XCELL3D = XCELL_GD
-      YCELL3D = YCELL_GD
-
-      VGTYP3D = VGTYP_GD
-      VGTOP3D = VGTOP_GD
-
-      FTYPE3D = GRDDED3
-      GDNAM3D = GDNAME_GD
-      UPNAM3D = PNAME
-
-      SDATE3D = SDATE
-      STIME3D = STIME
-      CALL NEXTIME( SDATE3D, STIME3D, TSTEP( 1 ) )
-      TSTEP3D = TSTEP( 1 )
-
-      NCOLS3D = PACOLS
-      NROWS3D = PAROWS
-      NLAYS3D = PALEVS
-
-      XORIG3D = XORIG3D + DBLE( PA_BEGCOL - 1 ) * XCELL3D
-      YORIG3D = YORIG3D + DBLE( PA_BEGROW - 1 ) * YCELL3D
-
-      DO L = PA_BEGLEV, PA_ENDLEV + 1
-         PL = L - PA_BEGLEV + 1
-         VGLVS3D ( PL ) = VGLVS_GD( L )
-      END DO
 
       IF ( TYPE .EQ. 'IPR' ) THEN
 
-         FDESC3D( 1 ) = 'Integrated Process Rates Output File ' // OUTFNAME
          NVARS3D = MIN( MXVARS3 , ( NIPRVAR - ( NFL - 1 ) * MXVARS3 ) )
 
          DO NOUT = 1, NVARS3D
@@ -132,7 +93,6 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       ELSE IF ( TYPE .EQ. 'IRR' ) THEN
 
-         FDESC3D( 1 ) = 'Integrated Reaction Rate Output File ' // OUTFNAME
          NVARS3D = MIN( MXVARS3 , ( NIRRVAR - ( ( NFL - 1 ) * MXVARS3 ) ) )
 
          DO NOUT = 1, NVARS3D

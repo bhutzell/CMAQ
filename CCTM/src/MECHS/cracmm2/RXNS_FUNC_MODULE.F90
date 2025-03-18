@@ -1641,7 +1641,7 @@
             WRITE(LOGDEV,99901)TRIM( MECHNAME )
             XMSG = 'The FATAL errors found in namelist used. Check ' &
       &          //  'the log of exiting processor if more details are needed.'
-            CALL M3WARN('MAP_CHEMISTRY_SPECIES',0,0,XMSG)
+            CALL LOG_WARNING('MAP_CHEMISTRY_SPECIES',LOGDEV,XMSG)
 
 
 99901       FORMAT( / 'FATAL error(s) found in the namelists used. Check that ' &

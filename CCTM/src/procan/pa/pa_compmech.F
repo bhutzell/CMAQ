@@ -43,6 +43,7 @@ C-----------------------------------------------------------------------
       USE PA_GLOBAL     ! Mech data used 
       USE PA_VARS
       USE PA_PARSE
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
       
@@ -173,7 +174,7 @@ c..List products
                LINNUM = LINNUM + 1
                IF ( LINNUM .GT. MXMECHLINE ) THEN
                   WRITE( MSG, 94000 )
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   CALL M3EXIT( 'MECHCOMP', IZERO, IZERO, ' ', XSTAT2 )
                END IF
                LINOUT = ''
@@ -228,7 +229,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                LINNUM = LINNUM + 1
                IF ( LINNUM .GT. MXFAMLINE ) THEN
                    WRITE( MSG, 94020 )
-                   CALL M3MESG( MSG )
+                   CALL LOG_MESSAGE( LOGDEV ,  MSG )
                    CALL M3EXIT( 'MECHCOMP', IZERO, IZERO, ' ', XSTAT2 )
                END IF
                LINOUT = ''

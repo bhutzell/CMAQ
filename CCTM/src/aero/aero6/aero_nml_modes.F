@@ -30,9 +30,9 @@ C-----------------------------------------------------------------------
           Use aero_data, only : n_aerolist, aerolist, modesuff,
      &                          iait, iacc, icor, reqd_modes
           Use runtime_vars, only : log_message, log_subheading, logdev,
-     &                             outdev, cmype
+     &                             log_warning, outdev, cmype, m3exit
           Use cgrid_spcs_types
-          Use utilio_defn, only : index1, xstat2, m3exit, m3warn, m3mesg
+          Use utilio_defn, only : index1, xstat2
 
           Implicit None
 
@@ -105,7 +105,7 @@ C-----------------------------------------------------------------------
                       xmsg = 'Aitken Flag for '//
      &                       TRIM(aedat(isp)%species_name)//' set incorrectly in the AE namelist.'
                       xmsg = Trim( pname ) // ': ' // xmsg
-                      call m3mesg( xmsg )
+                      CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                       eflag = .True.
                    end if
 
@@ -113,7 +113,7 @@ C-----------------------------------------------------------------------
                       xmsg = 'Accumulation Flag for '//
      &                       TRIM(aedat(isp)%species_name)//' set incorrectly in the AE namelist.'
                       xmsg = Trim( pname ) // ': ' // xmsg
-                      call m3mesg( xmsg )
+                      CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                       eflag = .True.
                    end if
 
@@ -121,7 +121,7 @@ C-----------------------------------------------------------------------
                       xmsg = 'Coarse Flag for '//
      &                       TRIM(aedat(isp)%species_name)//' set incorrectly in the AE namelist.'
                       xmsg = Trim( pname ) // ': ' // xmsg
-                      call m3mesg( xmsg )
+                      CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                       eflag = .True.
                    end if
               end if
@@ -131,7 +131,7 @@ C-----------------------------------------------------------------------
      &                 // Trim( cmype )
                   Call log_message( outdev, 'Error: '//xmsg )
                   xmsg = Trim( pname ) // ': ' // xmsg
-                  call m3mesg( xmsg )
+                  CALL LOG_MESSAGE( LOGDEV ,  xmsg )
                   call m3exit( pname, 0, 0, 'FATAL ERROR', xstat2 )
               end if
 
@@ -141,7 +141,7 @@ C-----------------------------------------------------------------------
      &             .not.aedat(isp)%lcor ) then
                     xmsg = 'No aerosol modes have been requested for '//
      &                     TRIM(aedat(isp)%species_name)//' on the AE namelist.' 
-                    call m3warn( pname, 0, 0, xmsg ) 
+                    CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
               end if
 
               ! For Aitken-Mode Particles

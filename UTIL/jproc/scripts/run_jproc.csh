@@ -31,7 +31,6 @@
     endif
  echo " "; echo " Input data path, CMAQ_REPO set to $CMAQ_REPO"; echo " "
 
-
  set VRSN     = v55 
  set MECH     = cb6r5_ae7_aq 
 #set MECH     = saprc07tic_ae7i_aq 

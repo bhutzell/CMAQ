@@ -18,6 +18,7 @@
 !------------------------------------------------------------------------!
 
       MODULE MIO_ASCII
+      USE UTILIO_DEFN
 
       IMPLICIT NONE
 
@@ -43,20 +44,19 @@
 
       TYPE( MIO_FILE_DATA_TYPE ) :: MIO_TXT_FILE_DATA( 200 )
 
-      INTEGER, PARAMETER :: N_MIO_VARS = 5000
-      INTEGER :: NDIMS3D( N_MIO_VARS )
-      LOGICAL :: L_TSTEP( N_MIO_VARS )
-      LOGICAL :: L_LAY( N_MIO_VARS )
-      LOGICAL :: L_COL( N_MIO_VARS )
-      LOGICAL :: L_ROW( N_MIO_VARS )
-      LOGICAL :: L_VEXT( N_MIO_VARS )
-
+      INTEGER :: NDIMS3D(MXVARS3)
+      LOGICAL :: L_TSTEP(MXVARS3)
+      LOGICAL :: L_LAY(MXVARS3)
+      LOGICAL :: L_COL(MXVARS3)
+      LOGICAL :: L_ROW(MXVARS3)
+      LOGICAL :: L_VEXT(MXVARS3)
       CONTAINS
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE INIT_MIO_FILE_DATA
 
-          N_MIO_IN  = 0
+          USE RUNTIME_VARS, ONLY: N_MIO_INPUTS
+          N_MIO_IN  = N_MIO_INPUTS
           N_MIO_OUT = 0
 
       END SUBROUTINE INIT_MIO_FILE_DATA
@@ -139,7 +139,7 @@ C   used in default operations of CMAQ.
 C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN 
-      USE RUNTIME_VARS, ONLY : OUTDIR, APPL_NAME
+      USE RUNTIME_VARS, ONLY : OUTDIR, APPL_NAME, MIO_INPUTS
 
       IMPLICIT NONE
 
@@ -154,20 +154,24 @@ C-----------------------------------------------------------------------
 
       FPATH = TRIM(OUTDIR) // '/' // TRIM(FNAME) // '_' //
      &        TRIM(APPL_NAME) // '.txt'
-      IOUT = JUNIT()
-      OPEN( IOUT,  FILE = FPATH, STATUS = 'UNKNOWN' )
+      OPEN( NEWUNIT = IOUT,  FILE = FPATH, STATUS = 'UNKNOWN' )
 
       WRITE ( IOUT, '(A3, I0, A5, I0)' ) 'in ' , N_MIO_IN, 
      &                                  ' out ', N_MIO_OUT
 
+      ! Write Input Filenames
+      Do IFILE = 1,N_MIO_IN
+         WRITE ( IOUT, '(A)' ) MIO_INPUTS( IFILE )
+      END DO
+
       ! Write Output File Metadata
       DO IFILE = 1,N_MIO_OUT
-         WRITE ( IOUT,* ) 
+         WRITE ( IOUT, 90210 ) MIO_TXT_FILE_DATA( IFILE )%FILE_LOGICAL
          WRITE ( IOUT, '(A)' ) MIO_TXT_FILE_DATA( IFILE )%FILE_LOGICAL
          WRITE ( IOUT, '(I0)' ) MIO_TXT_FILE_DATA( IFILE )%NVARS
 
          DO IVAR = 1,MIO_TXT_FILE_DATA( IFILE )%NVARS 
-           ! Find string for vairbale type
+           ! Find string for variable type
 #ifndef mpas
              IF ( MIO_TXT_FILE_DATA( IFILE )%VARTYPES( IVAR ) .EQ. M3REAL ) VT = 'real'
 #else 
@@ -190,7 +194,7 @@ C-----------------------------------------------------------------------
      &             '"',TRIM(MIO_TXT_FILE_DATA( IFILE )%VARDESC ( IVAR )),'"'
          END DO
       END DO
-
+90210 FORMAT ('# ',60('='),1x,A)
       CLOSE( IOUT )
 
       END SUBROUTINE WRITE_MIO_ASCII

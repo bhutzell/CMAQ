@@ -78,6 +78,7 @@ C-----------------------------------------------------------------------
       USE DDM3D_DEFN, ONLY : NP, NPMAX
       Use aero_ddm3d, ONLY : init_aero_ddm3d, ae_ddm3d_ready, og_sens, rog_dsens
 #endif 
+      USE LOGDEV_MOD
       Implicit None
 
       ! Define Logical values as T and F for the OA table
@@ -297,8 +298,8 @@ C-----------------------------------------------------------------------
       Use cgrid_spcs, only: n_gc_spc, gc_spc, n_gc_g2ae, gc_g2ae, gc_strt, gc_molwt, gc_g2ae_map, 
      &                      n_nr_spc, nr_spc, n_nr_n2ae, nr_n2ae, nr_strt, nr_molwt, nr_n2ae_map,
      &                      n_ae_spc, ae_spc
-      Use runtime_vars, only: logdev, log_subheading, log_heading
-      Use utilio_defn, only: index1, xstat3, m3exit
+      Use logdev_mod, only: logdev, log_subheading, log_heading, m3exit
+      Use utilio_defn, only: index1, xstat3
 
       Implicit None
 
@@ -589,7 +590,8 @@ C-----------------------------------------------------------------------
       Use aero_data, only : cond_budget, npf_budget
       Use aeromet_data, only: airdens, min_gasconc
       Use const, only: inv_mwair
-      Use utilio_defn, only: xstat3, m3exit
+      Use utilio_defn, only: xstat3
+      Use logdev_mod, only: m3exit
 
       Implicit None
 
@@ -684,8 +686,10 @@ C-----------------------------------------------------------------------
       ! that are mapped to CGRID.
       xmsg = 'FATAL:' // Trim( vname )
      &  // ' is not found in the G2AE or N2AE values of GC or NR namelists.'
-      Call m3warn( pname, 0, 0, xmsg )
- 
+
+! if this is a FATAL error, then we should crash rather than warn
+!     CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
+      CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1)
 
       Return
       End Function findVapor
@@ -1129,7 +1133,7 @@ C-----------------------------------------------------------------------
          If ( nsvol_NotTracers .Le. 0 ) Then
             xmsg = 'All semivolatile SOA species are tracers. Not realistic model setup.'
             solve_orgmoles = .False.
-            Call m3warn( pname, 0, 0, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
          End If
          
          Allocate( svname( nsvol ), svmw( nsvol ), svmw_inv( nsvol ),
@@ -2350,11 +2354,11 @@ C     abstol (absolute) amount
 !    &      'Warning: possible false convergence in soa bisection:', fnguess, nroot, pfc
             Write( xmsg,'(a,2(1pe15.5))' )
      &      'Warning: possible false convergence in soa bisection:', fnguess, nroot
-            Call m3warn( pname, 0, 0, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 #else
             xmsg = 'Warning: possible false convergence in soa bisection'
 #endif
-!           Call m3warn( pname, 0, 0, xmsg )
+!           CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
           End If
 
           Return

@@ -605,18 +605,18 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &        IARRAY2 .GT. MXARRAY .OR. ICCOUNT .GT. MXCOUNT2 .OR.
      &        JCCOUNT .GT. MXARRAY ) THEN
             WRITE( MSG, 94000 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94020 ) MXCOUNT2, ICNT 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94040 ) MXCOUNT1, JCNT 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94060 ) MXARRAY, IARRAY2 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94080 ) MXCOUNT2, ICCOUNT 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94100 ) MXARRAY, JCCOUNT, MAXGL3
             WRITE( LOGDEV,94110 )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT1 )
          END IF           
 
@@ -659,11 +659,11 @@ c  Check dimensions of PD arrays
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF ( NDPMAX .GT. MXRP .OR. NDLMAX .GT. MXRR ) THEN
             WRITE( MSG, 94000 ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94200 ) MXRP, NDPMAX 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             WRITE( MSG, 94220 ) MXRR, NDLMAX 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             CALL M3EXIT( PNAME, IZERO, IZERO, ' ', XSTAT1 ) 
          END IF
 700   END DO LOOP_SUN

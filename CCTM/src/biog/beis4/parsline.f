@@ -17,9 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/biog/beis3/parsline.f,v 1.3 2011/10/21 16:10:18 yoj Exp $
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         SUBROUTINE PARSLINE( LINE, N, SEGMENT )
@@ -62,6 +59,7 @@ C Last updated: $Date: 2011/10/21 16:10:18 $
 C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
 
@@ -267,11 +265,11 @@ C Store the segment from the input string
 
             MESG = 'ERROR: Overflow prevented while ' //
      &             'parsing line ' // PNAME
-            CALL M3MSG2( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
             MESG = 'First 200 characters of line contents are:'
-            CALL M3MSG2( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
             MESG = STRNG( 1:200 )
-            CALL M3MSG2( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
             MESG = 'Formatting problem'
             CALL M3EXIT( PNAME, 0, 0, MESG, 2 )

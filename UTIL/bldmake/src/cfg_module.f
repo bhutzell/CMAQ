@@ -111,8 +111,7 @@
       Character( FLN_LEN ) :: lib_1
       Character( FLN_LEN ) :: lib_2
       Character( FLN_LEN ) :: lib_3
-      Logical              :: l_lib_3
-      Logical              :: l_lib_5
+      Logical              :: l_lib_1
       Character( FLN_LEN ) :: lib_4
       Character( FLN_LEN ) :: lib_5
 
@@ -201,8 +200,6 @@
       n_includes = 0
       n_modules = 0
       miscMod = 0
-      l_lib_3 = .FALSE.
-      l_lib_5 = .FALSE.
       
       make_options = ' '
 
@@ -321,33 +318,32 @@
           Cycle
         End If
 
-        If ( key .Eq. 'LIB_1' ) Then
+        If ( key .Eq. 'LIB_1' ) Then  ! MPI
+          l_lib_1 = .TRUE.
           lib_1 = fields(2)
           If ( verbose ) Write( *, '("LIB_1 set to ",a)' ) Trim( lib_1 )
           Cycle
         End If
 
-        If ( key .Eq. 'LIB_2' ) Then
+        If ( key .Eq. 'LIB_2' ) Then  ! netCDF
           lib_2 = fields(2)
           If ( verbose ) Write( *, '("LIB_2 set to ",a)' ) Trim( lib_2 )
           Cycle
         End If
 
-        If ( key .Eq. 'LIB_3' ) Then
-          l_lib_3 = .TRUE.
+        If ( key .Eq. 'LIB_3' ) Then  ! currently unused
           lib_3 = fields(2)
           If ( verbose ) Write( *, '("LIB_3 set to ",a)' ) Trim( lib_3 )
           Cycle
         End If
  
-        If ( key .Eq. 'LIB_4' ) Then
+        If ( key .Eq. 'LIB_4' ) Then  ! currently unused
           lib_4 = fields(2)
           If ( verbose ) Write( *, '("LIB_4 set to ",a)' ) Trim( lib_4 )
           Cycle
         End If
 
-        If ( key .Eq. 'LIB_5' ) Then
-          l_lib_5 = .TRUE.
+        If ( key .Eq. 'LIB_5' ) Then  ! currently unused
           lib_5 = fields(2)
           If ( verbose ) Write( *, '("LIB_5 set to ",a)' ) Trim( lib_5 )
           Cycle

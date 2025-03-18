@@ -18,9 +18,6 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/depv/m3dry/LSM_MOD.F,v 1.5 2012/01/19 14:23:58 yoj Exp $
-
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       Module LSM_Mod
        

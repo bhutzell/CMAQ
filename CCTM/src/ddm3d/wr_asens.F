@@ -51,6 +51,7 @@ C-----------------------------------------------------------------------
 #endif
 
       USE DDM3D_DEFN, ONLY: NP, NPMAX, SPCNAME, SEN_PAR, SAGRID
+      USE MIO_MODULE
 
       IMPLICIT NONE
 
@@ -71,11 +72,11 @@ C Local variables:
       CHARACTER( 16 ) :: AVG_FILE_ENDTIME = 'AVG_FILE_ENDTIME'
       CHARACTER( 80 ) :: VARDESC = ' '
       CHARACTER( 96 ) :: XMSG = ' '
+      CHARACTER( 20 ) :: TIME_STAMP
 
-c     INTEGER, SAVE :: LOGDEV       ! FORTRAN unit number for log file
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
       LOGICAL OK
-c     LOGICAL, SAVE :: END_TIME = .FALSE.
 
       INTEGER      L, K, VAR, SPC ! loop counters
       INTEGER      STATUS
@@ -93,7 +94,6 @@ C represents data computed from time 1995196:090000 to 1995196:100000
 
       IF ( FIRSTIME ) THEN
          FIRSTIME = .FALSE.
-         LOGDEV = INIT3 ()
 
 C Override default beginning time timestamp for ACONC?
          VARDESC = 'Flag to Override default beginning time timestamp for ACONC'
@@ -105,13 +105,6 @@ C Override default beginning time timestamp for ACONC?
             WRITE( LOGDEV, '(5X, A)' ) VARDESC
             XMSG = '... Using default:'
             WRITE( LOGDEV, '(5X, A, I9)' ) XMSG, JTIME
-         END IF
-
-         IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-            IF ( .NOT. OPEN3( A_SENS_1, FSREAD3, PNAME ) ) THEN
-               XMSG = 'Could not open ' // A_SENS_1 // ' file for update'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
          END IF
 
 c Create a species name list of ASENS file
@@ -152,6 +145,20 @@ c Create a species name list of ASENS file
 
          END DO
 
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
+         call mio_setfile( MET_CRO_3D )
+         if (aconc_subset_layer) mio_nlays = A_NLAYS
+
+         call mio_fcreate( A_SENS_1, mio_new_file )
+
+         if (aconc_subset_layer) then
+            if (mype == 0) then
+               call mio_set_global_attr ( A_SENS_1, 'NLAYS', A_NLAYS )
+               call mio_set_global_attr ( A_SENS_1, 'VGLVLS', MET_CRO_3D, ACONC_BLEV, ACONC_ELEV+1 )
+            end if
+         end if
+
       END IF ! FIRSTIME
 
 
@@ -162,14 +169,12 @@ c Create a species name list of ASENS file
          CALL NEXTIME ( MDATE, MTIME, -TSTEP )
       END IF
 
+      call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+
       DO SPC = 1, N_ASENS_SPC
         DO NP = 1, NPMAX
-          IF ( .NOT. WRITE3( A_SENS_1, VARNAME_ASENS( NP, SPC ),
-     &         MDATE, MTIME, SAGRID( :,:,:,NP,SPC ) ) ) THEN
-               XMSG = 'Could not write '// VARNAME_ASENS( NP, SPC ) 
-     &              // ' to ' // A_SENS_1
-               CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
+          call mio_fwrite( A_SENS_1, VARNAME_ASENS( NP, SPC ),
+     &                     PNAME, SAGRID( :,:,:,NP,SPC ), TIME_STAMP )
          END DO
       END DO
 
@@ -179,6 +184,5 @@ c Create a species name list of ASENS file
 
       RETURN 
       END
-
 
 #endif

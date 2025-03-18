@@ -17,20 +17,12 @@ C   the MCNC Environmental Modeling Center are used with their         *
 C   permissions subject to the above restrictions.                     *
 C***********************************************************************
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/CCTM/src/driver/yamo_ddm3d/wr_sengrid.F,v 1.1 2009/09/29 13:53:40 sjr Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       SUBROUTINE WR_SENGRID ( JDATE, JTIME, TSTEP )
 
-C-----------------------------------------------------------------------
-C Function:
-C Save the instantaneous state of SENGRID in an I/O-API "circular buffer"
-C file to use for restart/continuation for subsequent simulation. 
+C Save the instantaneous state of SENGRID to use for restart/continuation 
+C for subsequent simulation. 
 
 C Revision History:
 C      Aug 08 S.L.Napelenok: initial (based on WR_CGRID)
@@ -51,6 +43,7 @@ C-----------------------------------------------------------------------
 
       USE DDM3D_DEFN
       USE MIO_ASCII
+      USE MIO_MODULE
 
       IMPLICIT NONE
 
@@ -58,34 +51,24 @@ C Include Files:
 
       INCLUDE SUBST_FILES_ID    ! file name parameters
 
-      INTEGER      JDATE                       ! current model date, coded YYYYDDD
-      INTEGER      JTIME                       ! current model time, coded HHMMSS
-      INTEGER      TSTEP                       ! output timestep (HHMMSS)
+      INTEGER      JDATE        ! current model date, coded YYYYDDD
+      INTEGER      JTIME        ! current model time, coded HHMMSS
+      INTEGER      TSTEP        ! output timestep (HHMMSS)
 
 C Local variables:
 
       CHARACTER( 16 ) :: PNAME = 'WR_SENGRID'
       CHARACTER( 96 ) :: XMSG = ' '
+      CHARACTER( 20 ) :: TIME_STAMP
 
-      INTEGER K, MXK, SPC, VAR
+      INTEGER K, SPC, VAR
       INTEGER ALLOCSTAT
 
-      INTEGER TSTEP_RF, NTHIK_RF, NCOLS_RF, NROWS_RF, GDTYP_RF
-      REAL( 8 ) :: P_ALP_RF, P_BET_RF, P_GAM_RF
-      REAL( 8 ) :: XCENT_RF, YCENT_RF
-      REAL( 8 ) :: XORIG_RF, YORIG_RF
-      REAL( 8 ) :: XCELL_RF, YCELL_RF
-      INTEGER VGTYP_RF
       INTEGER, SAVE :: EDATE, ETIME
-      REAL VGTOP_RF
-
-c     INTEGER, SAVE :: LOGDEV       ! FORTRAN unit number for log file
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
-      LOGICAL OK
-
-c     CHARACTER( 8 )  :: SPCNAME
 
       REAL, SAVE, ALLOCATABLE :: WRBUFF(:,:,:,:)
+      CHARACTER(16), SAVE, ALLOCATABLE :: SENNAME( : ) ! for storing sensitivity species names
       INTEGER :: c, r, s, d, i
 
       LOGICAL, EXTERNAL :: FLUSH3
@@ -95,246 +78,122 @@ C-----------------------------------------------------------------------
       IF ( FIRSTIME ) THEN
 
          FIRSTIME = .FALSE.
-         LOGDEV = INIT3 ()
 
-         ALLOCATE ( WRBUFF( NCOLS,NROWS,NLAYS,NSPCSD*NPMAX ), STAT = ALLOCSTAT  )
+         ALLOCATE ( WRBUFF( NCOLS,NROWS,NLAYS,NSPCSD*NPMAX ), 
+     &              SENNAME( NSPCSD*NPMAX ), STAT = ALLOCSTAT  )
          IF ( ALLOCSTAT .NE. 0 ) THEN
-            XMSG = 'WRBUFF memory allocation failed'
+            XMSG = 'WRBUFF or SENNAME memory allocation failed'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
-C Try to open existing file for update
+         EDATE = JDATE
+         ETIME = JTIME
+         CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
 
-         CALL SUBST_BARRIER
-         OK = OPEN3( CTM_SENS_1, FSRDWR3, PNAME )
-         CALL SUBST_GLOBAL_LOGICAL( OK, 'AND' )
-         IF ( .NOT. OK ) THEN
-
-            XMSG = 'Could not open ' // TRIM( CTM_SENS_1 )
-     &           // ' file for update - try to open new'
-            CALL M3MESG( XMSG )
-
-c           IF ( MYPE .EQ. 0 ) THEN
-            IF ( IO_PE_INCLUSIVE ) THEN
-
-C Get default file header attibutes from CONC file (assumes file already open)
-
-               IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
-                  XMSG = 'Could not get '
-     &                 // TRIM( CTM_CONC_1 )
-     &                 // ' file description'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-
-               EDATE = JDATE
-               ETIME = JTIME
-               CALL NEXTIME( EDATE, ETIME, RUNLEN )   ! end date & time
-
-               SDATE3D = EDATE
-               STIME3D = ETIME
+         SDATE3D = EDATE
+         STIME3D = ETIME
+         TSTEP3D = TSTEP
 
 C Get SENGRID nvars
 
-               NVARS3D = NSPCSD * NPMAX
-               NLAYS3D = NLAYS
-
-C Set file header attributes that differ from ASENS and open the file
-
-               FDESC3D = ' '
-               FDESC3D( 1 ) = 'Computational grid instantaneous sensitivities'
-               FDESC3D( 2 ) = '- for scenario continuation.'
-
-               WRITE( LOGDEV,* ) ' '
-               WRITE( LOGDEV,* ) '       State SENGRID File Header Description:'
-               DO K = 1, 2
-                  WRITE( LOGDEV,* ) '    => ',
-     &            TRIM( FDESC3D( K ) )
-               END DO
+         NVARS3D = NSPCSD * NPMAX
+         NLAYS3D = NLAYS
 
 C Create the names of the sensitivity outputs
 
 C Gas species
 
-               VAR = 0
+         VAR = 0
 
-               DO SPC = 1, N_GC_SPC
-                  SPCNAME = GC_SPC( SPC )( 1:12 )
-                  DO NP = 1, NPMAX
-                     VAR = VAR + 1
-                     VTYPE3D( VAR ) = M3REAL
-                     VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
-                     UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
-                  END DO
-               END DO
+         DO SPC = 1, N_GC_SPC
+            SPCNAME = GC_SPC( SPC )( 1:12 )
+            DO NP = 1, NPMAX
+               VAR = VAR + 1
+               VTYPE3D( VAR ) = M3REAL
+               VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
+               UNITS3D( VAR ) = 'ppmV'
+               VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
+            END DO
+         END DO
 
 C RHOJ - should be zero
 
-               SPCNAME = 'RHOJ'
-               DO NP = 1, NPMAX
-                  VAR = VAR + 1
-                  VTYPE3D( VAR ) = M3REAL
-                  VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
-                  UNITS3D( VAR ) = 'm*Kg/m**3'
-                  VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
-               END DO
+         SPCNAME = 'RHOJ'
+         DO NP = 1, NPMAX
+            VAR = VAR + 1
+            VTYPE3D( VAR ) = M3REAL
+            VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
+            UNITS3D( VAR ) = 'm*Kg/m**3'
+            VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
+         END DO
 
 C Aerosol species
 
-               DO SPC = 1, N_AE_SPC
-                  SPCNAME = AE_SPC( SPC )( 1:12 )
-                  DO NP = 1, NPMAX
-                     VAR = VAR + 1
-                     VTYPE3D( VAR ) = M3REAL
-                     VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
-                     IF ( VNAME3D( VAR )(1:3) .EQ. 'NUM' ) THEN
-                        UNITS3D( VAR ) = 'number/m**3'
-                     ELSE IF ( VNAME3D( VAR )(1:3) .EQ. 'SRF' ) THEN
-                        UNITS3D( VAR ) = 'm**2/m**3'
-                     ELSE
-                        UNITS3D( VAR ) = 'micrograms/m**3'
-                     END IF
-                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
-                  END DO
-               END DO
+         DO SPC = 1, N_AE_SPC
+            SPCNAME = AE_SPC( SPC )( 1:12 )
+            DO NP = 1, NPMAX
+               VAR = VAR + 1
+               VTYPE3D( VAR ) = M3REAL
+               VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
+               IF ( VNAME3D( VAR )(1:3) .EQ. 'NUM' ) THEN
+                  UNITS3D( VAR ) = 'number/m**3'
+               ELSE IF ( VNAME3D( VAR )(1:3) .EQ. 'SRF' ) THEN
+                  UNITS3D( VAR ) = 'm**2/m**3'
+               ELSE
+                  UNITS3D( VAR ) = 'micrograms/m**3'
+               END IF
+               VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
+            END DO
+         END DO
 
 C NR species
 
-               DO SPC = 1, N_NR_SPC
-                  SPCNAME = NR_SPC( SPC )( 1:12 )
-                  DO NP = 1, NPMAX
-                     VAR = VAR + 1
-                     VTYPE3D( VAR ) = M3REAL
-                     VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
-                     UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
-                  END DO
-               END DO
+         DO SPC = 1, N_NR_SPC
+            SPCNAME = NR_SPC( SPC )( 1:12 )
+            DO NP = 1, NPMAX
+               VAR = VAR + 1
+               VTYPE3D( VAR ) = M3REAL
+               VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
+               UNITS3D( VAR ) = 'ppmV'
+               VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
+            END DO
+         END DO
 
 c TR species
 
-               DO SPC = 1, N_TR_SPC
-                  SPCNAME = TR_SPC( SPC )( 1:12 )
-                  DO NP = 1, NPMAX
-                     VAR = VAR + 1
-                     VTYPE3D( VAR ) = M3REAL
-                     VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
-                     UNITS3D( VAR ) = 'ppmV'
-                     VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
-                  END DO
-               END DO
+         DO SPC = 1, N_TR_SPC
+            SPCNAME = TR_SPC( SPC )( 1:12 )
+            DO NP = 1, NPMAX
+               VAR = VAR + 1
+               VTYPE3D( VAR ) = M3REAL
+               VNAME3D( VAR ) = TRIM(SPCNAME) // '_' // SEN_PAR( NP )
+               UNITS3D( VAR ) = 'ppmV'
+               VDESC3D( VAR ) = 'Sens of ' // TRIM(SPCNAME) // ' to ' // SEN_PAR( NP )
+            END DO
+         END DO
 
-               ! Store MIO Metadata
-               NDIMS3D( 1:NVARS3D ) = 4
-               L_TSTEP( 1:NVARS3D ) = .True.
-               L_LAY  ( 1:NVARS3D ) = .True.
-               L_COL  ( 1:NVARS3D ) = .True.
-               L_ROW  ( 1:NVARS3D ) = .True.
-               L_VEXT ( 1:NVARS3D ) = .False.
+         SENNAME = VNAME3D
+           
+         IF ( IO_PE_INCLUSIVE ) THEN
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
 
-               CALL LOAD_MIO_FILE ( 'CTM_SENS_1', NLAYS3D, 1, NLAYS3D,
-     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &              L_VEXT(1:NVARS3D) )
+            CALL LOAD_MIO_FILE ( 'CTM_SENS_1', NLAYS3D, 1, NLAYS3D,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
 
 c open the file
 
-               IF ( .NOT. OPEN3( CTM_SENS_1, FSNEW3, PNAME ) ) THEN
-                  XMSG = 'Could not open '
-     &                 // TRIM( CTM_SENS_1 )  // ' file'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-
-            END IF   ! MYPE = 0
-
-         ELSE
-
-C File exists. Check header data with CONC file as reference. Currently only
-C proc 0 has CTM_CONC_1 open
-
-c           IF ( MYPE .EQ. 0 ) THEN
-            IF ( IO_PE_INCLUSIVE ) THEN
-
-               IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
-                  XMSG = 'Could not get '
-     &                 // TRIM( CTM_CONC_1 )
-     &                 // ' file description'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-
-               TSTEP_RF = TSTEP3D
-               NTHIK_RF = NTHIK3D
-               NCOLS_RF = NCOLS3D
-               NROWS_RF = NROWS3D
-               GDTYP_RF = GDTYP3D
-               P_ALP_RF = P_ALP3D
-               P_BET_RF = P_BET3D
-               P_GAM_RF = P_GAM3D
-               XCENT_RF = XCENT3D
-               YCENT_RF = YCENT3D
-               XORIG_RF = XORIG3D
-               YORIG_RF = YORIG3D
-               XCELL_RF = XCELL3D
-               YCELL_RF = YCELL3D
-               VGTYP_RF = VGTYP3D
-               VGTOP_RF = VGTOP3D
-
-               IF ( .NOT. DESC3( CTM_SENS_1 ) ) THEN
-                  XMSG = 'Could not get '
-     &                 // TRIM( CTM_SENS_1 )
-     &                 // ' file description'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-
-               IF ( TSTEP_RF .NE. ABS( TSTEP3D ) .OR.
-     &              NTHIK_RF .NE. NTHIK3D .OR.
-     &              NCOLS_RF .NE. NCOLS3D .OR.
-     &              NROWS_RF .NE. NROWS3D .OR.
-     &              GDTYP_RF .NE. GDTYP3D ) THEN
-                    XMSG = 'Header inconsistent on existing CTM_SENS_1'
-                    CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-               END IF
-               IF ( P_ALP_RF .NE. P_ALP3D .OR.
-     &              P_BET_RF .NE. P_BET3D .OR.
-     &              P_GAM_RF .NE. P_GAM3D ) THEN
-                    XMSG = 'Header inconsistent on existing CTM_SENS_1'
-                    CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-               END IF
-               IF ( XCENT_RF .NE. XCENT3D .OR.
-     &              YCENT_RF .NE. YCENT3D ) THEN
-                    XMSG = 'Header inconsistent on existing CTM_SENS_1'
-                    CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-               END IF
-               IF ( XORIG_RF .NE. XORIG3D .OR.
-     &              YORIG_RF .NE. YORIG3D ) THEN
-                    XMSG = 'Header inconsistent on existing CTM_SENS_1'
-                    CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-               END IF
-               IF ( XCELL_RF .NE. XCELL3D .OR.
-     &              YCELL_RF .NE. YCELL3D ) THEN
-                    XMSG = 'Header inconsistent on existing CTM_SENS_1'
-                    CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-               END IF
-               IF ( VGTYP_RF .NE. VGTYP3D ) THEN
-                    XMSG = 'Header inconsistent on existing CTM_SENS_1'
-                    CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-               END IF
-               IF ( VGTOP_RF .NE. VGTOP3D ) THEN
-                    XMSG = 'Header inconsistent on existing CTM_SENS_1'
-                    CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-               END IF
-
-            END IF   ! MYPE = 0
-
-         END IF   ! .NOT. OPEN CTM_SENS_1
-
-c         CALL SUBST_BARRIER
-
+         END IF   
          RETURN   ! MIO Initialization
-
       END IF   ! FIRSTIME
-
 
       i = 0
       do s = 1, NSPCSD
@@ -350,40 +209,17 @@ c         CALL SUBST_BARRIER
          end do
       end do
 
-#ifdef parallel_io
-      IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. FLUSH3 ( CTM_SENS_1 ) ) THEN
-            XMSG = 'Could not flush ' // TRIM(CTM_SENS_1)
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-      END IF
-      CALL SE_BARRIER
-      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( CTM_SENS_1, FSNONIO, PNAME ) ) THEN
-            XMSG = 'Could not open ' // TRIM(CTM_SENS_1)
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-      END IF
-
-      IF ( .NOT. WRITE3( CTM_SENS_1, ALLVAR3, JDATE, JTIME, WRBUFF ) ) THEN
-         XMSG = 'Could not write CTM_SENS_1'
-         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
-#else
-
-      IF ( .NOT. WRITE3( CTM_SENS_1, ALLVAR3, JDATE, JTIME, WRBUFF ) ) THEN
-         XMSG = 'Could not write SENGRID'
-         CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
-
-#endif
-
+      call mio_setfile( MET_CRO_3D )
+      call mio_fcreate( CTM_SENS_1, mio_new_file )
+      call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+      do I = 1, NSPCSD * NPMAX 
+         write(logdev,*) 'SENGRID: i, name: ', i, senname(i)
+         call mio_fwrite( CTM_SENS_1, SENNAME( I ),
+     &                    PNAME, WRBUFF( :,:,:,I ), TIME_STAMP )
+      end do
       WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &      'Timestep written to', CTM_SENS_1,
      &      'for date and time', JDATE, JTIME
-
-
-
 
       RETURN
       END

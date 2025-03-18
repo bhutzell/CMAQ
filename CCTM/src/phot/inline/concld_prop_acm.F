@@ -394,20 +394,6 @@ C...check the grid resolution from the MET_CRO_2D and set an appropriate
 C...  flag as to whether convective clouds should be run for the given
 C...  resolution
 
-C...open MET_CRO_3D
-
-!       IF ( .NOT. OPEN3( MET_CRO_3D, FSREAD3, PNAME ) ) THEN
-!         XMSG = 'Could not open '// MET_CRO_3D // ' file'
-!         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-!       END IF
-
-C...get description from the met file
-
-!       IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
-!         XMSG = 'Could not get ' // MET_CRO_2D //' file description'
-!         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-!       END IF
-
 C cccccccccccccccccccc enable backward compatiblity ccccccccccccccccccccc
 
         IF ( RCA_AVAIL ) THEN
@@ -437,9 +423,9 @@ C...  field if a convective parameterization was not used in the WRF simulation
           CONVCLD = .FALSE.
           XMSG = 'MCIP files indicate no convective parameterization was '
      &        // 'used in the WRF simulation'
-          CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
           XMSG = 'Processing will continue without subgrid clouds'
-          CALL M3MESG ( XMSG )
+          CALL LOG_MESSAGE( LOGDEV ,  XMSG )
           RETURN
         END IF
 

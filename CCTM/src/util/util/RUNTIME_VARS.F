@@ -65,7 +65,9 @@
 
       MODULE RUNTIME_VARS
 
+      use logdev_mod
       use get_env_module
+      use netcdf, only: nf90_noclobber, nf90_64bit_offset
 #ifdef mpas
       use universal_data_module, only : logdev
       use mydata_module
@@ -77,14 +79,12 @@
 
       PUBLIC
 
-      INTEGER :: OUTDEV = 6   ! File Unit for Standard Output
-#ifndef mpas
-      INTEGER :: LOGDEV = -1  ! File Unit for Ascii Log File
-#endif
-      INTEGER :: TOTPE  = 1   ! Number of Total Processors
+
+
+
       INTEGER :: NPROCS = 1   ! Number of Total Processors
-      INTEGER :: MYPE   = -1  ! Processor Number
-      CHARACTER( 3 ) :: CMYPE  = ""  ! Processor Number
+
+
 
       !-----------------------------------------------------------------------------------
       !>> Parameters for formatting output log files
@@ -92,17 +92,14 @@
 
       INTEGER, PARAMETER :: CTM_DIAG_LVL = 0
       
-      INTEGER :: LOG_LINE_LENGTH = 80  ! Cut the log offs at this character if possible
-      INTEGER :: LOG_MAJOR_TAB   = 5   ! Left tab for all text including headings
-      INTEGER :: LOG_MINOR_TAB   = 2   ! Tab for indenting subsequent lines of text in
-                                       ! a paragraph for instance.
+
 
       CHARACTER( 10 ) :: WEEKDAY( 7 ) = (/'Monday   ','Tuesday  ','Wednesday',
      &                        'Thursday ','Friday   ','Saturday ','Sunday   ' /)
 
 
-! this is for MPAS
-      LOGICAL :: ncd_64bit_offset = .FALSE.
+! this should no longer be needed for MPAS, mio handles internally
+!     LOGICAL :: ncd_64bit_offset = .FALSE.
 
       !-----------------------------------------------------------------------------------
       !>> Define Environment Variables for Controlling CMAQ Processes
@@ -126,17 +123,16 @@
       INTEGER :: STDATE          = 1995192  ! Start Date
       INTEGER :: STTIME          = 000000   ! Start Time
       INTEGER :: LOCAL_TSTEP     = 010000   ! set to TSTEP( 1 ) in initscen.F
-      INTEGER :: MET_TSTEP                  ! set meterology input temporal frequency
+      INTEGER :: MET_TSTEP       = 010000   ! set meterology input temporal frequency
       INTEGER :: NPCOL           = 1        ! no. of processors across grid columns
       INTEGER :: NPROW           = 1        ! no. of processors across grid rows
       INTEGER :: MAXSYNC         = 720      ! force max TSTEP(2) (sec)
       INTEGER :: MINSYNC         = 60       ! force min TSTEP(2) (sec)
 
       INTEGER, PARAMETER :: MAXLEN_CCTM_APPL     = 200    ! Length of Logfile Names
-      CHARACTER( MAXLEN_CCTM_APPL ) :: APPL_NAME = 'APPL' ! Logfile Names
       CHARACTER( MAXLEN_CCTM_APPL ) :: BLDFOLD   = ''     ! Build Directory
       CHARACTER( MAXLEN_CCTM_APPL ) :: OUTDIR    = ''     ! Output Directory
-
+  
       ! General; Multiprocess control, output and error checking
       LOGICAL :: PRINT_PROC_TIME = .FALSE. ! Flag to print elapsed time for all 
                                            ! science submodules
@@ -144,6 +140,8 @@
       LOGICAL :: CKSUM     = .TRUE.        ! flag for cksum on, default = [T]
       LOGICAL :: END_TIME  = .FALSE.       ! Override default beginning ACONC timestamp
       LOGICAL :: CTM_MIO_FILE = .FALSE.    ! Flag to write out ascii file that informs MIO 
+      CHARACTER( 16 ) :: MIO_INPUTS( 20 )  ! environment variable fnames
+      INTEGER :: N_MIO_INPUTS = 0
                                            !   about output file metadata
       
       INTEGER :: N_ACONC_VARS = 0    ! Number of species saved to avg conc file
@@ -261,9 +259,8 @@
       CHARACTER(  16 ), SAVE, ALLOCATABLE :: PLAY_BASE( : ) ! Use for Plume Rise Calculation
 
       LOGICAL :: USE_MARINE_GAS_EMISSION = .FALSE.
-
-      LOGICAL :: USE_MET_EMIS            = .FALSE. ! flag for met-modulated emissions
-      LOGICAL :: METEMDIAG               = .FALSE. ! flag for MET_EM diagnostic file
+      LOGICAL :: MET_EMIS                = .FALSE. ! flag for met-modulated emissions
+      LOGICAL :: MET_EMIS_DIAG           = .FALSE. ! flag for MET_EM diagnostic file
       LOGICAL :: HUM_NOX_YN              = .FALSE. ! flag for MET_EM NOx correction
 
       ! Process Analysis
@@ -315,12 +312,9 @@
 !  CMAQ. 
 !.........................................................................
 
+      USE LOGDEV_MOD
       USE RXNS_DATA, ONLY : MECHNAME
-#ifdef mpas
       use utilio_defn
-#else
-      USE M3UTILIO
-#endif
 
       IMPLICIT NONE                         
 
@@ -341,34 +335,20 @@
       CHARACTER( 400 ) :: STRTEMP
       CHARACTER( 80 )  :: PBASE     
       INTEGER, PARAMETER :: EXIT_STATUS = 1
-      INTEGER          :: ERROR
+
       INTEGER          :: VARDEV = -1
 
-      LOGICAL          :: FOUND
       LOGICAL          :: EFLAG = .FALSE.
       INTEGER          :: LOC, STR_LEN
-      CHARACTER(10)    :: WRF_VERSION
 
       CHARACTER( 16 ) :: PNAME = 'RUNTIME_VARS'
 
       !-------------------------------------------------------------------------------------------------------
       !>> Grid and High-Level Model Parameters
       !-------------------------------------------------------------------------------------------------------
-#ifdef parallel
-      CALL MPI_COMM_RANK ( MPI_COMM_WORLD, MYPE, ERROR )
-      CALL MPI_COMM_SIZE ( MPI_COMM_WORLD, TOTPE, ERROR )
-#else
-      MYPE = 0
-      TOTPE = 0
-#endif
- 
+  
       IF ( MYPE .EQ. 0 ) VARDEV = OUTDEV
 
-      ! Get Simulation Scenario Name to Label Log Files, etc
-      CALL GET_ENV( APPL_NAME, 'CTM_APPL', APPL_NAME, VARDEV )
-      
-      ! Start I/O-API and set up log file(s)
-      CALL SETUP_LOGDEV()
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_HEADING( OUTDEV, "Environment Variable Report" )
          CALL LOG_SUBHEADING( OUTDEV, "Grid and High-Level Model Parameters" )
@@ -376,7 +356,10 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
-       ! Get Logfile Directory
+      ! Get Simulation Scenario Name to Label Log Files, etc
+      CALL GET_ENV( APPL_NAME, 'CTM_APPL', APPL_NAME, VARDEV )
+
+      ! Get Logfile Directory
       CALL GET_ENV ( BLDFOLD, 'BLD', BLDFOLD, VARDEV ) 
  
       ! Get Logfile Directory
@@ -419,7 +402,7 @@
          IF ( NV .NE. 2 ) THEN
             XMSG = 'Environment variable problem for NPCOL_NPROW'
      &           // ' using default 1X1'
-            CALL M3WARN ( 'INIT_ENV_VARS', 0, 0, XMSG )
+            CALL LOG_WARNING( 'INIT_ENV_VARS',LOGDEV , XMSG )
             NV = 2
             V_LIST2( 1 ) = '1'
             V_LIST2( 2 ) = '1'
@@ -455,6 +438,9 @@
 
       ! PRINT MIO INPUT FILE
       CALL GET_ENV ( CTM_MIO_FILE, 'CTM_MIO_FILE', CTM_MIO_FILE, VARDEV )  
+
+      ! MIO input variable list
+      CALL GET_ENVLIST ( 'CTM_MIO_INPUT', N_MIO_INPUTS, MIO_INPUTS, VARDEV )
 
       ! CKSUM
       CALL GET_ENV ( CKSUM, 'CTM_CKSUM', CKSUM, VARDEV )
@@ -512,9 +498,9 @@
 #else
       IF( LVEXT ) THEN
           LVEXT = .FALSE.
-          WRITE( OUTDEV,'(A)')'Option to extract a Vertical Column of Ouptut Data set to YES'
+          WRITE( OUTDEV,'(A)')'Option to extract a Vertical Column of Output Data set to YES'
           WRITE( OUTDEV,'(A)')'However, the serial version cannot execute the option'
-          WRITE( LOGDEV,'(A)')'Option to extract a Vertical Column of Ouptut Data set to YES'
+          WRITE( LOGDEV,'(A)')'Option to extract a Vertical Column of Output Data set to YES'
           WRITE( LOGDEV,'(A)')'However, the serial version cannot execute the option'
       END IF
 #endif
@@ -863,12 +849,12 @@
       CALL GET_ENV ( SSEMDIAG, 'CTM_SSEMDIAG', SSEMDIAG, VARDEV )
  
       ! Set CTM_MET_EMIS to Y or T ro turn on met-modulated emissions
-       CALL GET_ENV ( USE_MET_EMIS, 'CTM_MET_EMIS', USE_MET_EMIS, VARDEV )
+      CALL GET_ENV ( MET_EMIS, 'CTM_MET_EMIS', MET_EMIS, VARDEV )
  
       ! Get met-modulated emission diagnostic output file flag.
-      CALL GET_ENV ( METEMDIAG, 'CTM_MET_EMIS_DIAG', METEMDIAG, VARDEV )
+      CALL GET_ENV ( MET_EMIS_DIAG, 'MET_EMIS_DIAG', MET_EMIS_DIAG, VARDEV )
 
-      ! Get met-modulated emission diagnostic output file flag.
+      ! Apply humidity adjustment for met-modulated mobile emissions
       CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
   
       ! Set LTNG_NO to Y or T to turn on lightning NO production
@@ -990,9 +976,7 @@
        ENDIF
       ENDIF
 
-! for MPAS
 #ifdef mpas
-      call get_env (ncd_64bit_offset, 'ncd_64bit_offset', .false., vardev)
       call get_env( cell_num, 'cell_num', 1, vardev)
 #else
 
@@ -1003,337 +987,25 @@
       ! to obtain WRF version information
       CALL LOG_HEADING( LOGDEV, 'Determine WRF Input Version' )
 
-      IF ( .NOT. OPEN3( MET_CRO_3D, FSREAD3, PNAME ) ) THEN
-         XMSG = 'Could not open '// MET_CRO_3D // ' file'
-         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
-
-      IF ( .NOT. DESC3( MET_CRO_3D ) ) THEN
-         XMSG = 'Could not get ' // MET_CRO_3D //' file description'
-         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
-
       ! Get environ. variable met_tstep to control meteorology frequency
-      CALL GET_ENV ( MET_TSTEP, 'MET_TSTEP', TSTEP3D, VARDEV)
+      CALL GET_ENV ( MET_TSTEP, 'MET_TSTEP', MET_TSTEP, VARDEV)
 
-      ! Ensure users cannot pick a met_tstep that is not smaller than the
-      ! file time step and something that is not a multiple of that tstep
+! commented out for now, but we will want to revisit whether and where
+! to put this check later
+      ! Ensure users cannot pick a met_tstep that is smaller than the
+      ! MC3 file time step or something that is not a multiple of that tstep
           
-      IF (MOD(TIME2SEC(MET_TSTEP), TIME2SEC(TSTEP3D)) .NE. 0) then
-          XMSG = 'MET_TSTEP environmental variable not equal to or a 
-     & multiple greater than time step of met file ' // MET_CRO_3D
-          CALL M3EXIT(PNAME, 0, 0, XMSG, XSTAT1)
-      end if 
+!      IF (MOD(TIME2SEC(MET_TSTEP), TIME2SEC(TSTEP3D)) .NE. 0) then
+!          XMSG = 'MET_TSTEP environmental variable not equal to or a 
+!     & multiple greater than time step of met file ' // MET_CRO_3D
+!          CALL M3EXIT(PNAME, 0, 0, XMSG, XSTAT1)
+!      end if 
 
-      FOUND = .FALSE.
-      NV = 0
-      Do WHILE ((.NOT. FOUND) .AND. (NV .LT. MXDESC3))
-         NV = NV + 1
-         LOC = INDEX (FDESC3D(NV), 'WRF ARW V')
-         IF (LOC > 0) THEN
-            FOUND = .TRUE.
-            STR_LEN = LEN_TRIM(FDESC3D(NV))
-            READ (FDESC3D(NV)(LOC+9:STR_LEN), *) WRF_VERSION
-            IF (WRF_VERSION .GE. '4.1') THEN
-               WRF_V4P = .TRUE.
-            END IF
-         END IF
-      END DO
 
-      XMSG = 'MET data determined based on WRF ARW version '
-      IF( MYPE .EQ. 0 ) THEN
-          WRITE(OUTDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-          WRITE(LOGDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-      ELSE
-          WRITE(LOGDEV,'(/,5X,2(A,1X),/)')TRIM( XMSG ), TRIM( FDESC3D(NV)(LOC+9:STR_LEN) )
-      END IF
-
-      IF ( .NOT. CLOSE3( MET_CRO_3D ) ) THEN
-        XMSG = 'Could not close ' // MET_CRO_3D
-        CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
 #endif
 
 #endif
 
       END SUBROUTINE INIT_ENV_VARS
 
-!.........................................................................
-      SUBROUTINE LOG_HEADING( FUNIT, CHEAD_IN )
-
-!  Formats and writes a user-supplied heading to a specific log file.
-!  This approach is intended to standardize the log files that are
-!  created by CMAQ. The length of the input array is set at 80 because
-!  we would like to try limiting lines to 80 characters and a heading
-!  should probably just be one line.
-!.........................................................................
-
-#ifdef mpas
-      use util_module
-#endif
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT( IN )           :: FUNIT
-      CHARACTER( * ), INTENT( IN )    :: CHEAD_IN
-      CHARACTER( len=: ), ALLOCATABLE :: CHEAD
-      CHARACTER( 20 )                 :: FMT
-      CHARACTER( 20 )                 :: FMT2
-      INTEGER                         :: LDASH
-
-      ! Capitalize the heading
-      CHEAD = CHEAD_IN
-      CALL UPCASE( CHEAD )
-
-      ! Write the heading to the log file
-      WRITE( FUNIT, * )
-      WRITE( FUNIT, * )
-      WRITE( FMT, '("(", I0, "x,A,A,A)")' ) LOG_MAJOR_TAB
-      WRITE( FMT2,'("(", I0, "x,A,)")' ) LOG_MAJOR_TAB
-
-      LDASH = 2*8 + LEN_TRIM( CHEAD )
-      WRITE( FUNIT, FMT2 ), REPEAT( '=', LDASH )
-      WRITE( FUNIT, FMT ),
-     &       '|>---   ',TRIM( CHEAD ),'   ---<|'
-      WRITE( FUNIT, FMT2 ), REPEAT( '=', LDASH )
-
-      END SUBROUTINE LOG_HEADING
-      
-!.........................................................................
-      SUBROUTINE LOG_SUBHEADING( FUNIT, CHEAD )
-
-!  Formats and writes a user-supplied sub-heading to a specific log file.
-!  This approach is intended to standardize the log files that are
-!  created by CMAQ. The length of the input array is set at 80 because
-!  we would like to try limiting lines to 80 characters and a sub-heading
-!  should probably just be one line.
-!.........................................................................
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT( IN ) :: FUNIT
-      CHARACTER( * ), INTENT( IN ) :: CHEAD
-      CHARACTER( 20 )       :: FMT
-      INTEGER                         :: LDASH
-
-      ! Write the sub-heading to the log file
-      WRITE( FMT, '("(/,", I0, "x,A,A,A)")' ) LOG_MAJOR_TAB
-      WRITE( FUNIT, FMT ),'|> ',TRIM( CHEAD ),':'
-      LDASH = 2*3 - 1 + LEN_TRIM( CHEAD )
-
-      WRITE( FMT, '("(", I0, "x,A,A)")' ) LOG_MAJOR_TAB
-      WRITE( FUNIT, FMT ) '+',REPEAT( '=', LDASH )
-
-      END SUBROUTINE LOG_SUBHEADING
-      
-!.........................................................................
-      SUBROUTINE LOG_MESSAGE( FUNIT, CMSG_IN )
-
-!  Formats and writes a user-supplied message to a specific log file.
-!  This approach is intended to standardize the log files that are
-!  created by CMAQ.
-!.........................................................................
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT( IN ) :: FUNIT
-      CHARACTER( * ), INTENT( IN ) :: CMSG_IN
-      CHARACTER( len=: ), ALLOCATABLE :: CMSG
-      CHARACTER( 20 )       :: FMT
-
-      CHARACTER( LOG_LINE_LENGTH ) :: CTEMP
-      INTEGER :: MSG_SIZE, IT
-      INTEGER :: NLINE1, NLINE2, NLINE, NTAB, LAST_SPACE
-
-      CMSG = CMSG_IN 
-
-      ! Write the message to the log file, while trimming to 80
-      ! characters (while accounting for tab-length)
-      NLINE1 = LOG_LINE_LENGTH - LOG_MAJOR_TAB
-      NLINE2 = LOG_LINE_LENGTH - LOG_MAJOR_TAB - LOG_MINOR_TAB
-      NLINE  = NLINE1
-      NTAB   = LOG_MAJOR_TAB
-      
-      ! Determine Length of Total Message
-      MSG_SIZE = LEN_TRIM( CMSG )
-      IT = 0
-
-      DO WHILE ( MSG_SIZE .GT. LOG_LINE_LENGTH .AND. IT .LE. 1000 )
-         IT = IT + 1
-
-         ! Isolate One Line of Text
-         LAST_SPACE = INDEX( CMSG( 1:NLINE+1 ), " ", BACK=.TRUE. )
-     
-         CTEMP = CMSG( 1:LAST_SPACE-1 )
-
-         WRITE( FMT, '("(", I0, "x,A)")' ) NTAB
-         WRITE( FUNIT, FMT ), CTEMP
-
-         CMSG = CMSG( LAST_SPACE+1:LEN( CMSG ) )
-         MSG_SIZE = LEN_TRIM( CMSG )
-
-         IF ( NTAB .EQ. LOG_MAJOR_TAB ) NTAB = NTAB + LOG_MINOR_TAB
-         IF ( NLINE.EQ. NLINE1 ) NLINE = NLINE2
-      END DO
-
-      ! Write Last Line
-      WRITE( FMT, '("(", I0, "x,A)")' ) NTAB
-      WRITE( FUNIT, FMT ), TRIM( CMSG )
-
-
-      END SUBROUTINE LOG_MESSAGE
-!.........................................................................
-      REAL( 8 ) FUNCTION SET_CPU_TIMING()
-
-! Function set cpu time
-      
-       IMPLICIT NONE
-
-#ifdef parallel
-      INCLUDE 'mpif.h'
-#endif
-      
- ! local:      
-      REAL( 8 )  :: CPU_TIME_FINISH
-#ifndef parallel
-      REAL       :: REAL_TIME
-#endif
-       
-#ifdef parallel
-      SET_CPU_TIMING = MPI_WTIME()
-#else
-      CALL CPU_TIME( REAL_TIME )
-      SET_CPU_TIMING = REAL( REAL_TIME,8 )
-#endif
-          
-      END FUNCTION SET_CPU_TIMING
-!.........................................................................
-      SUBROUTINE TIMING_DELTA( CPU_TIME_START, CPU_TIME_DELTA )
-      
-         IMPLICIT NONE
-
-#ifdef parallel
-      INCLUDE 'mpif.h'
-#endif
-        REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_START
-        REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_DELTA
-      
- ! local:      
-      REAL( 8 )  :: CPU_TIME_FINISH
-#ifndef parallel
-      REAL       :: REAL_TIME
-#endif
-
-!  This subroutine calculates and returns elapsed time from CPU_TIME_START
-!  as an update to CPU_TIME_DELTA so total time expense can be determine
-!  for code block in a cyclng loop.
-!  It also resets CPU_TIME_START to current CPU time.
-
-#ifdef parallel
-      CPU_TIME_FINISH = MPI_WTIME()
-#else
-      CALL CPU_TIME( REAL_TIME )
-      CPU_TIME_FINISH = REAL( REAL_TIME,8 )
-#endif
-      CPU_TIME_DELTA = CPU_TIME_DELTA + (CPU_TIME_FINISH-CPU_TIME_START)
-
-#ifdef parallel      
-      CPU_TIME_START = MPI_WTIME()
-#else
-      CALL CPU_TIME( REAL_TIME )
-      CPU_TIME_START = REAL( REAL_TIME,8 )
-#endif
-      
-      END SUBROUTINE TIMING_DELTA
-
-!.........................................................................
-      SUBROUTINE TIMING_SPLIT( CPU_TIME_START, IMSG, CPROCIN )
-
-!  This subroutine provides a split for the MPI timing functions and
-!  then prints out a message for how much time has passed using a
-!  character string input for customizing that message. 
-!.........................................................................
- 
-      IMPLICIT NONE
-
-#ifdef parallel
-      INCLUDE 'mpif.h'
-#endif
-      REAL( 8 ), INTENT( INOUT ) :: CPU_TIME_START
-      INTEGER,   INTENT( IN   )  :: IMSG   ! What kind of checkpoint this is
-      CHARACTER( * ), INTENT(IN), OPTIONAL :: CPROCIN
-      
-! local:      
-      REAL( 8 )        :: CPU_TIME_FINISH
-                                 !  1 = 'PROCESS'
-                                 !  2 = 'MASTER TIME STEP'
-                                 !  3 = 'OUTPUT'
-      CHARACTER( len=: ), ALLOCATABLE :: CPROC
-      CHARACTER( 250 ) :: XMSG
-
-#ifndef parallel
-      REAL :: REAL_TIME
-#endif
-
-
-      IF ( PRESENT( CPROCIN ) ) THEN
-         CPROC = CPROCIN
-      ELSE
-         CPROC = ' '
-      END IF
- 
-      ! Record Time at this Checkpoint
-#ifdef parallel
-      CPU_TIME_FINISH = MPI_WTIME()
-#else
-      CALL CPU_TIME( REAL_TIME )
-      CPU_TIME_FINISH = REAL( REAL_TIME,8 )
-#endif
-
-
-      ! Assemble the statement requested by the calling program
-      SELECT CASE ( IMSG )
-      CASE ( 1 )
-          ! Write Out The Time to Complete Each Sub-Process
-          WRITE( XMSG, 1002 ),TRIM( CPROC ), CPU_TIME_FINISH-CPU_TIME_START
-1002      FORMAT ( 2x, A15, ' completed... ', F12.4, ' seconds' )
-
-      CASE ( 2 ) 
-          ! Write out the time to complete the entire master time step
-          WRITE( XMSG, '(7x,A16)' ),'Master Time Step'
-          CALL LOG_MESSAGE( LOGDEV, XMSG )
-#ifndef twoway
-          IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
-#endif
-          WRITE( XMSG, '(7x,A24,F12.4,A8)' ),'Processing completed... ',
-     &                     (CPU_TIME_FINISH-CPU_TIME_START),' seconds'
-          CALL LOG_MESSAGE( LOGDEV, XMSG )
-          WRITE( LOGDEV, * )
-
-      CASE ( 3 ) 
-          ! Write out the time to complete the output procedure
-          WRITE( XMSG, '(1x,A32,F10.4,A)' ), '=--> Data Output completed...   ',
-     &                     (CPU_TIME_FINISH-CPU_TIME_START),' seconds'
-          CALL LOG_MESSAGE( LOGDEV, XMSG )
-          WRITE( LOGDEV, * )
-#ifndef twoway
-          IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
-          
-#endif
-      CASE( 4 )
- 
-      END SELECT 
-
-      ! Write out the timing statement
-#ifndef twoway
-      IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
-#endif
-#ifdef parallel      
-      CPU_TIME_START = MPI_WTIME()
-#else
-      CALL CPU_TIME( REAL_TIME )
-      CPU_TIME_START = REAL( REAL_TIME,8 )
-#endif
-      END SUBROUTINE TIMING_SPLIT    
- 
       END MODULE RUNTIME_VARS

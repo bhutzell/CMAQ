@@ -45,6 +45,7 @@ C        INTEGER    ROWSX_PE( 2,NPROCS )   ! Row index range for each PE
 C----------------------------------------------------------------------
 
       USE UTILIO_DEFN
+      USE LOGDEV_MOD, ONLY: M3EXIT
 
       IMPLICIT  NONE
 

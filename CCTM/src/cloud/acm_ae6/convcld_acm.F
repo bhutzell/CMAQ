@@ -705,7 +705,7 @@ C...  for the accumulation mode, add aqueous tracked species
           DO VAR = STRT, FINI
             SPC = SPC + 1
             WRITE( XMSG, '(i6,1x,A16,1x,i6,1x,a16)') VAR, AE_SPC( SPC ), SURCLDMX( VAR ), AE_SPC( SURCLDMX( VAR )-AE_STRT+1 )
-             CALL M3MESG ( XMSG )
+             CALL LOG_MESSAGE( LOGDEV ,  XMSG )
           END DO
 
         END IF ! stm
@@ -1759,7 +1759,7 @@ C...POLC in mol sp/m2
      &                    + PCLD( SPC,LAY ) * RHOM2( LAY )
 #ifdef isam
               CSPC = 0
-              CSPC = INDEXINT1(SPC,NSPC_SA,MAP_SAtoCGR(:))
+              CSPC = INDEX1(SPC,NSPC_SA,MAP_SAtoCGR(:))
 
               IF ( CSPC .NE. 0) THEN
                 DO ITAG = 1, NTAG_SA
@@ -1859,7 +1859,7 @@ C...  below cloud concentrations in mol sp/mol air
 
 #ifdef isam
                 CSPC = 0
-                CSPC = INDEXINT1(SPC,NSPC_SA,MAP_SAtoCGR(:))
+                CSPC = INDEX1(SPC,NSPC_SA,MAP_SAtoCGR(:))
                 IF ( CSPC .NE. 0) THEN
                   DO ITAG = 1, NTAG_SA
 
@@ -2122,9 +2122,7 @@ c    &                                   / MAX( 1.0E-25, POLC( CSPC ) ))
           END DO
 
 C...weight the removed amount by the cloud fraction and convert
-C...  from mol/m2 to kg/m2 and kg/m2 to kg/hectare
-
-C...convert removal change from moles/m**2 to kg/m**2 and kg/m**2 to kg/hectare
+C...  removal change from moles/m**2 to kg/m**2 and kg/m**2 to kg/hectare
 
                 DO I = 1,N_CGRID_SPC
                   IF ( CGRID_MASK_NUM( I ) .OR.
@@ -2150,7 +2148,7 @@ C...convert removal change from moles/m**2 to kg/m**2 and kg/m**2 to kg/hectare
 #endif
 #ifdef isam
                      CSPC = 0
-                     CSPC = INDEXINT1(I,NSPC_SA,MAP_SAtoCGR(:))
+                     CSPC = INDEX1(I,NSPC_SA,MAP_SAtoCGR(:))
                      IF ( CSPC .GT. 0 ) THEN
                        DO ITAG = 1, NTAG_SA
                          SA_REMOV( CSPC,ITAG ) = SA_REMOV( CSPC,ITAG ) * CGRID_MW( I )

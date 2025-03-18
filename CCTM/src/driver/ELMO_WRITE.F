@@ -32,6 +32,7 @@
      &                      ET_DRVD_DDEP, ET_ISAM_DRVD_DDEP, ET_DDM_DRVD_DDEP,
      &                      ET_DRVD_WDEP, ET_ISAM_DRVD_WDEP, ET_DDM_DRVD_WDEP 
       USE UTILIO_DEFN
+      use mio_module
 
       IMPLICIT NONE 
 
@@ -39,14 +40,46 @@
 
       INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP(3)
       LOGICAL, INTENT( IN ) :: INIT_TIME
+      logical, save         :: firstime = .true.
+      logical, allocatable, save :: firstwrite(:)
+      logical               :: subset_lay
       INTEGER MDATE, MTIME
-      INTEGER IVAR, IV, IFL, J
+      INTEGER IVAR, IV, IFL, J, ISTAT
       CHARACTER( 300 ) XMSG
-
+      character( 20 ) :: timestamp
       CHARACTER( 16 ), SAVE :: PNAME = 'WRITE_ELMO'
+      CHARACTER( 16 )       :: VNAME
+
+      if (firstime) then
+         firstime = .false.
+         allocate( firstwrite(N_ELMO_FILES), stat=istat )
+         if (istat .ne. 0) then
+           xmsg = 'failure allocating firstwrite'
+           call m3exit(pname, jdate, jtime, xmsg, 1)
+         end if
+         firstwrite = .TRUE.
+      end if
 
       DO IFL = 1,N_ELMO_FILES
         
+        if ( firstwrite( IFL ) ) then
+           call mio_setfile( INIT_CONC_1 )
+           subset_lay = ( ELMO_FILE( IFL )%NLAYS .NE. mio_nlays )
+           if ( subset_lay ) mio_nlays = ELMO_FILE( IFL )%NLAYS
+           call mio_fcreate( ELMO_FILE( IFL )%FLOGICAL, mio_new_file )
+           if ( subset_lay ) then
+              if ( mype .eq. 0 ) then
+                 call mio_set_global_attr( ELMO_FILE( IFL )%FLOGICAL, 'NLAYS', 
+     &                                     ELMO_FILE( IFL )%NLAYS )
+                 call mio_set_global_attr( ELMO_FILE( IFL )%FLOGICAL, 
+     &                                     'VGLVLS', INIT_CONC_1,
+     &                                     ELMO_FILE( IFL )%LAY_BOT, 
+     &                                     ELMO_FILE( IFL )%LAY_TOP+1 )
+              end if
+           end if
+           firstwrite( IFL ) = .FALSE.
+        end if
+
         SELECT CASE ( ELMO_FILE( IFL )%TMODE )
 
         CASE ( 0 )
@@ -54,15 +87,14 @@
 #ifndef mpas
           MDATE = JDATE
           MTIME = JTIME
+          call mio_time_format_conversion( MDATE, MTIME, TIMESTAMP )
 
-          IF ( .NOT. WRITE3( ELMO_FILE( IFL )%FLOGICAL, 
-     &       ALLVAR3, MDATE, MTIME,
-     &       ELMO_OUT(IFL)%DATA(:,:,:,:) ) ) THEN
-             XMSG = 'Could not write ' // 
-     &              ELMO_FILE(IFL)%FLOGICAL // ' file'
-             CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-          END IF
-
+          DO IVAR = 1, ELMO_FILE( IFL )%N_VARS
+            VNAME = ELMO_TABLE( ELMO_FILE( IFL )%TABID( IVAR ) )%OUT_NAME 
+            call mio_fwrite( ELMO_FILE( IFL )%FLOGICAL, 
+     &          VNAME, PNAME,
+     &          ELMO_OUT(IFL)%DATA(:,:,:,IVAR), TIMESTAMP ) 
+          END DO
           WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &                   'Timestep written to', ELMO_FILE(IFL)%FLOGICAL,
      &                   'for date and time', MDATE, MTIME
@@ -77,7 +109,8 @@
             IF ( .NOT. END_TIME ) THEN   ! ending time timestamp
                CALL NEXTIME ( MDATE, MTIME, -TSTEP(1) )
             END IF
-           
+            call mio_time_format_conversion( MDATE, MTIME, TIMESTAMP )
+
             ! Finalize Values for Averaged Variables
 !            DO IVAR = 1,ELMO_FILE( IFL )%N_VARS 
 !                J = ELMO_FILE( IFL )%TABID( IVAR )
@@ -96,16 +129,15 @@
 !            END DO
            
             ! Write Data
-            IF ( .NOT. WRITE3( ELMO_FILE( IFL )%FLOGICAL, 
-     &           ALLVAR3, MDATE, MTIME, 
-     &           ELMO_OUT(IFL)%DATA(:,:,:,:) ) ) THEN
-               XMSG = 'Could not write ' // 
-     &                ELMO_FILE( IFL )%FLOGICAL // ' file'
-               CALL M3EXIT ( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF
+            DO IVAR = 1, ELMO_FILE(IFL)%N_VARS
+               VNAME = ELMO_TABLE( ELMO_FILE(IFL)%TABID(IVAR) )%OUT_NAME
+               call mio_fwrite( ELMO_FILE( IFL )%FLOGICAL, 
+     &                          VNAME, PNAME,
+     &                          ELMO_OUT(IFL)%DATA(:,:,:,IVAR), TIMESTAMP ) 
+            END DO
            
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
-     &                       'Timestep written to', CTM_AELMO_1,
+     &                       'Timestep written to', ELMO_FILE(IFL)%FLOGICAL,
      &                       'for date and time', MDATE, MTIME
            
            

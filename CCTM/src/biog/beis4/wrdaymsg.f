@@ -53,6 +53,7 @@ C Last updated: $Date: 2011/10/21 16:10:18 $
 C-----------------------------------------------------------------------
 
       USE UTILIO_DEFN
+      USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
 
       IMPLICIT NONE
 
@@ -81,7 +82,7 @@ C-----------------------------------------------------------------------
 
       L = LEN_TRIM( WKDAYS( DAY ) )
       MESG = '>>> Processing ' // WKDAYS( DAY )( 1:L ) // ' ' // MMDDYY( JDATE )
-      CALL M3MSG2( MESG )
+      CALL LOG_MESSAGE( LOGDEV ,  MESG )
 
       RETURN
 

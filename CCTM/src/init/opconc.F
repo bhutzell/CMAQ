@@ -104,59 +104,6 @@ C  environment variable description
 C-----------------------------------------------------------------------
 
 #ifndef mpas
-C Set output file characteristics based on COORD.EXT and open it
-
-      FTYPE3D = GRDDED3
-      SDATE3D = JDATE
-      STIME3D = JTIME
-      TSTEP3D = TSTEP
-      NVARS3D = N_CONC_VARS
-      NCOLS3D = GL_NCOLS
-      NROWS3D = GL_NROWS
-      NLAYS3D = C_NLAYS
-      NTHIK3D = 1
-      GDTYP3D = GDTYP_GD
-      P_ALP3D = P_ALP_GD
-      P_BET3D = P_BET_GD 
-      P_GAM3D = P_GAM_GD
-      XORIG3D = XORIG_GD
-      YORIG3D = YORIG_GD
-      XCENT3D = XCENT_GD
-      YCENT3D = YCENT_GD
-      XCELL3D = XCELL_GD
-      YCELL3D = YCELL_GD
-      VGTYP3D = VGTYP_GD
-      VGTOP3D = VGTOP_GD
-!     VGTPUN3D = VGTPUN_GD ! currently, not defined
-      DO L = 1, NLAYS3D + 1
-         VGLVS3D( L ) = VGLVS_GD( L )
-      END DO
-      GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-      FDESC3D( 1 ) = 'Concentration file output'
-      FDESC3D( 2 ) = 'From CMAQ model dyn alloc version CTM'
-      FDESC3D( 3 ) = 'Set of variables (possibly) reduced from CGRID'
-      FDESC3D( 4 ) = 'For next scenario continuation runs,'
-      FDESC3D( 5 ) = 'use the "one-step" CGRID file'
-      KD = 5
-      V = CONC_BLEV
-      L = 0
-      DO K = KD + 1, MIN ( C_NLAYS + KD, MXDESC3 )
-         L = L + 1
-         WRITE( FDESC3D( K ),'( "Layer", I3, " to", I3, " " )' )
-     &   V + L - 1, L
-      END DO
-      IF ( ( KD + 1 + L ) .LT. MXDESC3 ) THEN
-         DO K = KD + 1 + L, MXDESC3
-            FDESC3D( K ) = ' '
-         END DO
-      END IF
-
-      WRITE( LOGDEV,* ) ' '
-      WRITE( LOGDEV,* ) '    Conc File Header Description:'
-      DO K = 1, KD + L
-         WRITE( LOGDEV,* ) '       ', TRIM( FDESC3D( K ) )
-      END DO
 
       V = 0
       STRT = 1
@@ -241,6 +188,8 @@ C Set output file characteristics based on COORD.EXT and open it
          VDESC3D( VAR ) = 'Air Pressure'
       END IF
 
+      NVARS3D = VAR
+
       ! Store MIO Metadata
       NDIMS3D( 1:NVARS3D ) = 4
       L_TSTEP( 1:NVARS3D ) = .True.
@@ -249,27 +198,12 @@ C Set output file characteristics based on COORD.EXT and open it
       L_ROW  ( 1:NVARS3D ) = .True.
       L_VEXT ( 1:NVARS3D ) = .False.
 
-      CALL LOAD_MIO_FILE ( 'CTM_CONC_1', NLAYS3D, CONC_BLEV, CONC_ELEV,
+      CALL LOAD_MIO_FILE ( CTM_CONC_1, NLAYS3D, CONC_BLEV, CONC_ELEV,
      &     VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D), 
      &     VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D), 
      &     L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &     L_VEXT(1:NVARS3D) )
 
-C create header
-
-      IF ( IO_PE_INCLUSIVE ) THEN   ! open new
-
-         IF ( .NOT. OPEN3( CTM_CONC_1, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not open ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-
-         IF ( .NOT. FLUSH3 ( CTM_CONC_1 ) ) THEN
-            XMSG = 'Could not sync to disk ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-
-      END IF
 #endif
 
       END SUBROUTINE OPCONC

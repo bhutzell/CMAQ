@@ -45,7 +45,7 @@ C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE DESID_VARS
       USE biog_emis_param_module
-
+      
       IMPLICIT NONE
 
       INTEGER, SAVE                      :: MSPCS         ! no. of emitted species
@@ -72,7 +72,7 @@ C-----------------------------------------------------------------------
          USE UTILIO_DEFN
          USE CGRID_SPCS, ONLY : N_CGRID_SPC, CGRID_NAME, CGRID_MW
 #ifdef mpas
-         USE util_module, only : PROMPTFFILE, index1, str2real, sortic
+         USE util_module, only : index1, str2real, sortic
 #else
 #ifdef parallel
          USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -84,9 +84,7 @@ C-----------------------------------------------------------------------
          USE MIO_ASCII
 
          IMPLICIT NONE
-
-C External Functions
-         LOGICAL,         EXTERNAL :: CHKGRID
+         INCLUDE SUBST_FILES_ID
 
 C Arguments:
          LOGICAL :: SUCCESS
@@ -187,10 +185,7 @@ C-----------------------------------------------------------------------
          SUCCESS = .TRUE.
 
 C Open speciation profiles file
-         RDEV = PROMPTFFILE(
-     &            'Enter logical name for Speciation Profiles file',
-     &            .TRUE., .TRUE., 'GSPRO', PNAME )
-
+         RDEV = GETEFILE( 'GSPRO', .TRUE., .TRUE., PNAME )
          IF ( SPPRO .EQ. 'DEFAULT' ) THEN 
             INDX = INDEX1( MECHNAME, NMECHS, BIOG_MECH_MAP%CHEMMECH )
             SPPRO = BIOG_MECH_MAP( INDX )%BIOGMECH
@@ -227,7 +222,7 @@ C species names, and to store the units for mass-based and mole-based conversion
                WRITE( MESG, 94010 )
      &               'I/O error', IOS, 'reading speciation profile ' //
      &               'file at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -246,7 +241,7 @@ C Check for header start
             ELSE IF ( NDX .GT. 0 ) THEN
                WRITE( MESG,94010 ) 'Header end found before header ' //
      &                             'started at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -275,7 +270,7 @@ C Check width of character fields of fixed length
             IF ( N .GT. 16 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Speciation profile code ' //
      &                'exceeds max width of 16 characters at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -283,7 +278,7 @@ C Check width of character fields of fixed length
             IF ( N .GT. 16 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Pollutant name ' //
      &                'exceeds max characters of 16 at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -291,14 +286,14 @@ C Check width of character fields of fixed length
             IF ( N .GT. 16 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Species name ' //
      &                 'exceeds max characters of 16 at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
 C Make sure divisor factor is not zero
             IF ( SDIV .EQ. 0.0 ) THEN
                WRITE( MESG,94010 ) 'ERROR: Zero divisor found at line ', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -314,9 +309,9 @@ C none found (skip entry).  Record number and position of all matches.
                   ELSE      ! Max of 10 profile pollutant names per biotype
                      MESG = 'ERROR: Exceeded max pollutant names' //
      &                      'per biotype in ' // PNAME
-                     CALL M3MSG2( MESG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MESG )
                      MESG = 'Quitting'
-                     CALL M3MESG( MESG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MESG )
                      SUCCESS = .FALSE.; RETURN
                   END IF
                END IF
@@ -350,18 +345,14 @@ C Check if species is already stored for current pollutant, and if not, incremen
 C species-per-pollutant counter and add species to list.
             DO M = 1, NIPOS
                K   = NSPECA( IPOS( M ) )
-#ifdef mpas
                NDX = INDEX1( SPECNM, K, TMPNAMES( :,IPOS( M ) ) )
-#else
-               NDX = INDEX1( SPECNM, K, TMPNAMES( 1,IPOS( M ) ) )
-#endif
                IF ( NDX .LE. 0 ) THEN
                   K = K + 1
                   IF ( K .LE. MXSPPOL ) THEN
                      TMPNAMES( K,IPOS( M ) ) = SPECNM
                   ELSE
                      MESG = 'ERROR: Exceeded TMPNAMES dimension'
-                     CALL M3MESG( MESG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MESG )
                      SUCCESS = .FALSE.; RETURN
                   END IF
                   NSPECA( IPOS( M ) ) = K
@@ -375,13 +366,13 @@ C species-per-pollutant counter and add species to list.
          IF ( POL .EQ. 0 ) THEN
             MESG = 'ERROR: No pollutants found in speciation ' //
      &             'profiles that match the inventory!'
-            CALL M3MESG( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
             SUCCESS = .FALSE.; RETURN
          END IF
 
          IF ( ISP .EQ. 0 ) THEN
             MESG = 'ERROR: No species found in speciation profile!'
-            CALL M3MESG( MESG )
+            CALL LOG_MESSAGE( LOGDEV ,  MESG )
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -410,11 +401,7 @@ C and if so, store in the output species name list.
 C Process species in sorted order
                K = INDX1A( J )
 C Find species in list of valid species per pollutant
-#ifdef mpas
                NDX = INDEX1( SPECNMA( K ), NSPECA( I ), TMPNAMES( :,I ) )
-#else
-               NDX = INDEX1( SPECNMA( K ), NSPECA( I ), TMPNAMES( 1,I ) )
-#endif
                IF ( NDX .GT. 0 ) THEN
                   ICOUNT = ICOUNT + 1
                   SPCNAMES( ICOUNT, I ) = SPECNMA( K )
@@ -453,7 +440,7 @@ C Find emitted CMAQ species names
                   EMSPC( MSPCS ) = SPCNAMES( ISP,POL )
 
                   WRITE (MESG, '(A,I0,A,A)'),'BEIS: Species ',MSPCS,' is ',TRIM(EMSPC( MSPCS ))
-                  CALL M3MESG( MESG )
+                  CALL LOG_MESSAGE( LOGDEV, MESG )
 #ifdef Verbose
                   write( logdev,'( 5X, I3, 1X, A5, 5X, I3, 1X, A16, I4, 3X, A16 )' )
      &                   pol, biotypes( pol ), isp, spcnames( isp,pol ), mspcs,
@@ -467,7 +454,7 @@ C Find emitted CMAQ species names
          END DO
 
          WRITE (MESG, '(A,I0)'),'BEIS: Number species found in speciation profile = ',MSPCS
-         CALL M3MESG( MESG )
+         CALL LOG_MESSAGE( LOGDEV, MESG )
 
 C Save Species names in global array for mapping emissions
          DESID_EMVAR( IBIOSRM )%LEN = MSPCS
@@ -497,7 +484,7 @@ C Save Species names in global array for mapping emissions
                  DESID_EMVAR( IBIOSRM )%MW( ISP ) = CGRID_MW( INDX )
              ELSE
                  WRITE( MESG, '(A,A,A,A)' ) 'WARNING: BEIS emission species ',
-     &               EMSPC( ISP ),' is not found in the Gas-Phase Mechanism. ',
+     &               TRIM(EMSPC( ISP )),' is not found in the Gas-Phase Mechanism. ',
      &               'The emission variable molecular weight will be set to 1.0'
                  CALL LOG_MESSAGE( LOGDEV, MESG )
                  DESID_EMVAR( IBIOSRM )%MW( ISP ) = 1.0
@@ -525,7 +512,7 @@ C conversions
                WRITE( MESG, 94010 )
      &              'I/O error', IOS, 'reading speciation profile ' //
      &              'file at line', IREC
-               CALL M3MESG( MESG )
+               CALL LOG_MESSAGE( LOGDEV ,  MESG )
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -567,97 +554,40 @@ C not found (skip entry)
 2999     CONTINUE ! end reading speciation profile input lines
 
 #ifndef mpas
-C Ensure met data time and grid for this run match beis emissions data files
-!         MNAME = PROMPTMFILE(
-!     &           'Enter name for gridded met input file',
-!     &           FSREAD3, 'MET_CRO_2D', PNAME )
-
-C Get description of met file
-!         IF ( .NOT. DESC3( MNAME ) ) THEN
-!            MESG = 'Could not get description of file "'
-!     &           // TRIM( MNAME ) // '"'
-!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-!         END IF
-
-C Check that grid description matches BGRD file
-!         IF ( .NOT. CHKGRID( MNAME ) ) THEN
-!            MESG = 'Grid in file "' // TRIM( MNAME )
-!     &           // '" does not match previously set grid.'
-!            CALL M3WARN( PNAME, 0, 0, MESG )
-!         END IF
 
          IF ( BEMIS_DIAG ) THEN
 C Build description for, and open beis diagnostic file
             MDATE = STDATE; MTIME = STTIME
             CALL NEXTIME( MDATE, MTIME, TSTEP(1) )
 
-            GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-            SDATE3D = MDATE
-            STIME3D = MTIME
-            TSTEP3D = TSTEP(1)
-            NCOLS3D = GL_NCOLS
-            NROWS3D = GL_NROWS
-            NLAYS3D =     1
-            NTHIK3D =     1
-            GDTYP3D = GDTYP_GD
-            P_ALP3D = P_ALP_GD
-            P_BET3D = P_BET_GD
-            P_GAM3D = P_GAM_GD
-            XORIG3D = XORIG_GD
-            YORIG3D = YORIG_GD
-            XCENT3D = XCENT_GD
-            YCENT3D = YCENT_GD
-            XCELL3D = XCELL_GD
-            YCELL3D = YCELL_GD
-            VGTYP3D = VGTYP_GD
-            VGTOP3D = VGTOP_GD
-
-            DO I = 1, NLAYS3D + 1
-               VGLVS3D( I ) = VGLVS_GD( I )
-            END DO
-
             VNAME3D = ''
             VDESC3D = ''
             UNITS3D = ''
+
             DO J = 1, MSPCS
                VNAME3D( J ) = EMSPC( J )
-               VDESC3D( J ) = 'biogenic emissions of the indicated species'
+               VDESC3D( J ) = 'BEIS3 emissions of the indicated species'
                VTYPE3D( J ) = M3REAL
                UNITS3D( J ) = 'gm s-1'
             END DO
 
             NVARS3D = MSPCS
-            FDESC3D = ' '   ! array
-
-            FDESC3D( 1 ) = 'Gridded biogenic emissions from CMAQ-BEIS3'
-            FDESC3D( 2 ) = '/from/ ' // PNAME
-            FDESC3D( 3 ) = '/Version/ CMAQ'
 
             ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 3
+            NDIMS3D( 1:NVARS3D ) = 4
             L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .False.
+            L_LAY  ( 1:NVARS3D ) = .True. ! even if 2-d
             L_COL  ( 1:NVARS3D ) = .True.
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
 
-            CALL LOAD_MIO_FILE ( 'B3GTS_S', 0, 0, 0,
+            SNAME = 'B3GTS_S'
+            CALL LOAD_MIO_FILE ( SNAME, 0, 0, 0,
      &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &           L_VEXT(1:NVARS3D) )
 
-
-C Open mass output file (tons/hour)
-
-            SNAME = 'B3GTS_S'
-            CALL SUBST_BARRIER
-            IF ( IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( SNAME, FSNEW3, PNAME ) ) THEN
-                  MESG = 'Could not open "' // TRIM( SNAME ) // '" file'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT1 )
-               END IF
-            END IF
 
          END IF
 #endif
@@ -666,7 +596,7 @@ C Initialize Biogenic Emission Array Variable
          ALLOCATE( VDEMIS_BI( MSPCS,NCOLS,NROWS ), STAT = STATUS )
          IF ( STATUS .NE. 0 ) THEN
            XMSG = 'VDEMIS_BI memory allocation failed'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING ( PNAME, LOGDEV, XMSG )
             SUCCESS = .FALSE.; RETURN
          END IF
           

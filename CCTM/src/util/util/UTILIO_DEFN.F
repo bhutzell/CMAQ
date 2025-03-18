@@ -48,42 +48,36 @@ C....................................................................
        use mio_module
        
        use prog_interrupt_module, M3WARN => prog_interrupt_warning,
-     &                             M3EXIT => prog_interrupt_exit,
-     &                             M3MESG => prog_interrupt_msg,
-     &                             M3MSG2 => prog_interrupt_msg,
-     &                             m3parag => prog_interrupt_nmsgs
-
-
-       INTEGER, PARAMETER :: XSTAT1 = 1
-       INTEGER, PARAMETER :: XSTAT2 = 1
-       INTEGER, PARAMETER :: XSTAT3 = 1
+     &                            M3EXIT => prog_interrupt_exit
 
 #else
-
-#ifdef parallel
-
-         USE M3UTILIO, EXCLUDE_INTERPB => INTERP3,
-     &                 EXCLUDE_M3EXIT  => M3EXIT,
-     &                 EXCLUDE_M3WARN  => M3WARN,
-     &                 EXCLUDE_SHUT3   => SHUT3,
-     &                 EXCLUDE_WRITE3  => WRITE3
-
-         USE PARUTILIO, 
-     &                  M3ERR   => PM3ERR,
-     &                  M3EXIT  => PM3EXIT,
-     &                  M3WARN  => PM3WARN,
-#ifdef parallel_io
-     &                  SHUT3   => PSHUT3
-
-         LOGICAL, EXTERNAL :: WRITE3
-#else
-     &                  SHUT3   => PSHUT3,
-     &                  WRITE3  => PWRITE3
-#endif
-#else
-         USE M3UTILIO, INTERPB => INTERP3
-#endif
+       use replacement_util_module
 
 #endif
+
+         INTEGER, PARAMETER :: XSTAT1 = 1
+         INTEGER, PARAMETER :: XSTAT2 = 1
+         INTEGER, PARAMETER :: XSTAT3 = 1
+         INTEGER, PARAMETER :: M3INT  = 4
+         INTEGER, PARAMETER :: M3REAL = 5
+         INTEGER, PARAMETER :: LATGRD3 = 1
+         integer, parameter :: mxvars3 = 5000
+         integer, parameter :: mxlays3 = 100
+         integer, parameter :: mxfile3 = 256
+         integer            :: nvars3d
+         integer            :: nlays3d
+         integer            :: sdate3d
+         integer            :: stime3d
+         integer            :: vtype3d(mxvars3)
+
+         real, parameter    :: AMISS3  = -9.0E36
+         real, parameter    :: BADVAL3 = -9.999E36
+         real               :: xcell3d
+         real               :: ycell3d
+         real               :: vglvs3d(mxlays3+1)
+
+         character(16)      :: vname3d(mxvars3)
+         character(16)      :: units3d(mxvars3)
+         character(80)      :: vdesc3d(mxvars3)
 
       END MODULE UTILIO_DEFN

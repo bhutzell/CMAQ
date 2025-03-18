@@ -67,7 +67,7 @@ C Set up horizontal domain and calculate processor-to-subdomain maps
             CALL LOG_SUBHEADING( LOGDEV, "Retrieve Horizontal Grid" )
             IF ( .NOT. HGRD_INIT ( NPROCS, MYID ) ) THEN
                MSG = '*** Failure defining horizontal domain'
-               CALL M3WARN ( 'GRID_INIT', 0, 0, MSG )
+               CALL LOG_WARNING( 'GRID_INIT', LOGDEV, MSG )
                SUCCESS = .FALSE.
                RETURN
                END IF
@@ -76,7 +76,7 @@ C define vertical layer structure
             CALL LOG_SUBHEADING( LOGDEV, "Retrieve Vertical Grid" )
             IF ( .NOT. VGRD_INIT() ) THEN
                MSG = '*** Failure defining vertical structure'
-               CALL M3WARN ( 'GRID_INIT', 0, 0, MSG )
+               CALL LOG_WARNING( 'GRID_INIT', LOGDEV, MSG )
                SUCCESS = .FALSE.
                RETURN
                END IF
@@ -86,7 +86,7 @@ C define vertical layer structure
 
             ELSE
             MSG = 'Domain configuration already defined'
-            CALL M3WARN ( 'GRID_INIT', 0, 0, MSG )
+            CALL LOG_WARNING( 'GRID_INIT', LOGDEV, MSG )
             SUCCESS = .FALSE.; RETURN
 #endif
             END IF   ! FIRSTIME

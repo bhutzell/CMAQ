@@ -58,9 +58,7 @@ C-----------------------------------------------------------------------
 
          USE UTILIO_DEFN
          USE AERO_DATA, ONLY : MGPG, GPKG
-#ifdef mpas
          USE mio_module
-#endif
 
          IMPLICIT NONE
 
@@ -70,7 +68,7 @@ C-----------------------------------------------------------------------
 
          INTEGER I, J, N, NGRPS, LEN1, LEN2, ISRM, X, loc_sdate,
      &           loc_nsrcs, loc_nvars, loc
-         integer :: loc_tflag(2), floc
+         integer :: loc_tflag(2), floc, lsdate
          character (16), allocatable :: loc_vname(:), loc_units(:)
 
          INTEGER ASTAT
@@ -119,29 +117,20 @@ C-----------------------------------------------------------------------
             loc_units = mio_file_data(floc)%units
 #else
 
-            IF ( .NOT. OPEN3( STKENAME( N ), FSREAD3, PNAME ) ) THEN
-               XMSG = 'Could not open '// TRIM( STKENAME( N ) ) // ' file'
-               CALL M3MESG( XMSG )
-               SUCCESS = .FALSE.; RETURN
-            END IF
+            floc = mio_search (STKENAME( N ))
 
-            IF ( .NOT. DESC3( STKENAME( N ) ) ) THEN
-               XMSG = 'Could not get ' // TRIM( STKENAME( N ) ) // ' file description'
-               CALL M3MESG( XMSG )
-               SUCCESS = .FALSE.; RETURN
-            END IF
+            call mio_get_global_attr (STKENAME( N ), 'SDATE', lsdate)
 
             ! Each file will use the default jdate, unless specified by the user 
             ! that the file is a representative day file
             loc_sdate = JDATE
-            IF ( DESID_STREAM_SYM_DATE( ISRM ) ) loc_sdate = SDATE3D
+            IF ( DESID_STREAM_SYM_DATE( ISRM ) ) loc_sdate = lsdate
 
-            loc_nsrcs = NROWS3D
-            loc_nvars = NVARS3D
-
+            call mio_get_global_attr (STKENAME( N ), 'NROWS', loc_nsrcs)
+            loc_nvars = mio_file_data(floc)%nvars
             allocate (loc_vname(loc_nvars), loc_units(loc_nvars), stat=astat)
-            loc_vname = vname3d(1:loc_nvars)
-            loc_units = units3d(1:loc_nvars)
+            loc_vname = mio_file_data(floc)%var_name
+            loc_units = mio_file_data(floc)%units
 #endif
 
             DESID_STREAM_DATE( ISRM ) = loc_sdate
@@ -195,8 +184,8 @@ C-----------------------------------------------------------------------
             deallocate (loc_vname, loc_units)
          END DO
 
-          ALLOCATE( STKBUFF( MAXVAL( NSRC_EMIS(:) ) ) )
-             CALL CHECKMEM( ASTAT, 'NSRC_EMIS', PNAME )
+          ALLOCATE( STKBUFF( MAXVAL( NSRC_EMIS(:) ) ), STAT = ASTAT )
+             CALL CHECKMEM( ASTAT, 'STKBUFF', PNAME )
 
          RETURN
 

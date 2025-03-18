@@ -37,6 +37,8 @@ C-----------------------------------------------------------------------
       USE WVEL_DEFN             ! derived vertical velocity component
       USE STD_CONC              ! standard CONC
       USE UTILIO_DEFN
+      use mio_module
+
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -66,12 +68,7 @@ C Local Variables:
       CHARACTER( 16 ) :: PNAME = 'OPCONC'
       CHARACTER( 96 ) :: XMSG = ' '
       CHARACTER( 28 ) :: SSTR = ' species saved to CONC file:'
-
-C environment variable for no. of layers from bottom to save on CONC file
-      CHARACTER( 16 ) :: NLAYS_CONC = 'NLAYS_CONC'
-
-C  environment variable description
-      CHARACTER( 80 ) :: VARDESC
+      character( 20 ) :: time_stamp
 
       INTEGER      K, KD, L, SPC, V   ! loop counters
       INTEGER      STRT, FINI         ! loop counters
@@ -82,18 +79,9 @@ C  environment variable description
 C-----------------------------------------------------------------------
 
 #ifndef mpas
-#ifdef parallel_io
-      CALL SUBST_BARRIER
-      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
-            XMSG = 'Could not open ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-      END IF
-#endif
 
 C write the initial concentrations as step 0 on the conc file
-C (inital data assumed to be in correct output units)
+C (initial data assumed to be in correct output units)
 
       ALLOCATE ( DBUFF( NCOLS,NROWS,C_NLAYS ), DBUFFP( NCOLS, NROWS,
      &           C_NLAYS), DBUFFTA( NCOLS, NROWS, C_NLAYS), 
@@ -103,25 +91,30 @@ C (inital data assumed to be in correct output units)
          CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
       END IF
 
-      WRITE( LOGDEV,* ) ' '
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
+      call mio_setfile( INIT_CONC_1 )
+      if (conc_subset_layer) mio_nlays = C_NLAYS
 
+      call mio_fcreate( CTM_CONC_1, mio_new_file )
+
+      if (conc_subset_layer) then
+         if (mype == 0) then
+            call mio_set_global_attr ( CTM_CONC_1, 'NLAYS', C_NLAYS )
+            call mio_set_global_attr ( CTM_CONC_1, 'VGLVLS', INIT_CONC_1, CONC_BLEV, CONC_ELEV+1 )
+         end if
+      end if
+      call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+
+      WRITE( LOGDEV,* ) ' '
       V = 0
 
       IF ( N_C_GC_SPC .NE. 0 ) WRITE( LOGDEV,'( /5X, "Gas Chem", A )' ) SSTR
-
       DO SPC = 1, N_C_GC_SPC
          V = V + 1
          INDX = CONC_MAP( V )
-
          DBUFF = CGRID( 1:NCOLS,1:NROWS,CONC_BLEV:CONC_ELEV,INDX )
-
-         IF ( .NOT. WRITE3( CTM_CONC_1, C_GC_SPC( SPC ),
-     &                      JDATE, JTIME, DBUFF ) ) THEN
-            XMSG = 'Could not write ' //
-     &             TRIM( C_GC_SPC( SPC ) ) //
-     &             ' to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+         call mio_fwrite( CTM_CONC_1, C_GC_SPC( SPC ), PNAME, DBUFF, TIME_STAMP )
 
          WRITE( LOGDEV,'( 5X, I4, " (", I3, ") ", A )' )
      &                SPC, V, TRIM( C_GC_SPC( SPC ) )
@@ -129,20 +122,11 @@ C (inital data assumed to be in correct output units)
       END DO
 
       IF ( N_C_AE_SPC .NE. 0 ) WRITE( LOGDEV,'( /5X, "Aerosol", A )' ) SSTR
-
       DO SPC = 1, N_C_AE_SPC
          V = V + 1
          INDX = CONC_MAP( V )
-
          DBUFF = CGRID( 1:NCOLS,1:NROWS,CONC_BLEV:CONC_ELEV,INDX )
-
-         IF ( .NOT. WRITE3( CTM_CONC_1, C_AE_SPC( SPC ),
-     &                      JDATE, JTIME, DBUFF ) ) THEN
-            XMSG = 'Could not write ' //
-     &             TRIM( C_AE_SPC( SPC ) ) //
-     &             ' to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+         call mio_fwrite( CTM_CONC_1, C_AE_SPC( SPC ), PNAME, DBUFF, TIME_STAMP )
 
          WRITE( LOGDEV,'( 5X, I4, " (", I3, ") ", A )' )
      &                SPC, V, TRIM( C_AE_SPC( SPC ) )
@@ -150,40 +134,22 @@ C (inital data assumed to be in correct output units)
       END DO
 
       IF ( N_C_NR_SPC .NE. 0 ) WRITE( LOGDEV,'( /5X, "Non-reactive", A )' ) SSTR
-
       DO SPC = 1, N_C_NR_SPC
          V = V + 1
          INDX = CONC_MAP( V )
-
          DBUFF = CGRID( 1:NCOLS,1:NROWS,CONC_BLEV:CONC_ELEV,INDX )
-
-         IF ( .NOT. WRITE3( CTM_CONC_1, C_NR_SPC( SPC ),
-     &                      JDATE, JTIME, DBUFF ) ) THEN
-            XMSG = 'Could not write ' //
-     &             TRIM( C_NR_SPC( SPC ) ) //
-     &             ' to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+         call mio_fwrite( CTM_CONC_1, C_NR_SPC( SPC ), PNAME, DBUFF, TIME_STAMP )
 
          WRITE( LOGDEV,'( 5X, I4, " (", I3, ") ", A )' )
      &                SPC, V, TRIM( C_NR_SPC( SPC ) )
       END DO
 
       IF ( N_C_TR_SPC .NE. 0 ) WRITE( LOGDEV,'( /5X, "Inert tracer", A )' ) SSTR
-
       DO SPC = 1, N_C_TR_SPC
          V = V + 1
          INDX = CONC_MAP( V )
-
          DBUFF = CGRID( 1:NCOLS,1:NROWS,CONC_BLEV:CONC_ELEV,INDX )
-
-         IF ( .NOT. WRITE3( CTM_CONC_1, C_TR_SPC( SPC ),
-     &                      JDATE, JTIME, DBUFF ) ) THEN
-            XMSG = 'Could not write ' //
-     &             TRIM( C_TR_SPC( SPC ) ) //
-     &             ' to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+         call mio_fwrite( CTM_CONC_1, C_TR_SPC( SPC ), PNAME, DBUFF, TIME_STAMP )
 
          WRITE( LOGDEV,'( 5X, I4, " (", I3, ") ", A )' )
      &                SPC, V, TRIM( C_TR_SPC( SPC ) )
@@ -191,56 +157,29 @@ C (inital data assumed to be in correct output units)
       END DO
  
       IF ( W_VEL ) THEN   ! Vertical Velocity Calculated from Advection
-
          DBUFF = BADVAL3
-
-         IF ( .NOT. WRITE3( CTM_CONC_1, 'W_VEL',
-     &                      JDATE, JTIME, DBUFF ) ) THEN
-            XMSG = 'Could not write Vertical Velocity (W_VEL) to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+         call mio_fwrite( CTM_CONC_1, 'W_VEL', PNAME, DBUFF, TIME_STAMP )
       END IF
  
-       IF ( L_CONC_TA ) THEN   ! for Temperature
-      
-      CALL interpolate_var ('TA', JDATE, JTIME, DBUFFTA)
-         
-         IF ( .NOT. WRITE3( CTM_CONC_1, 'TA',
-     &                      JDATE, JTIME, DBUFFTA ) ) THEN
-            XMSG = 'Could not write Temperature to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+      IF ( L_CONC_TA ) THEN   ! for Temperature      
+         CALL interpolate_var ('TA', JDATE, JTIME, DBUFFTA)         
+         call mio_fwrite( CTM_CONC_1, 'TA', PNAME, DBUFFTA, TIME_STAMP )
       END IF
 
-      IF ( L_CONC_PRES ) THEN   ! for Pressure
-      
-      CALL interpolate_var ('PRES', JDATE, JTIME, DBUFFP)
-      
-         IF ( .NOT. WRITE3( CTM_CONC_1, 'PRES',
-     &                      JDATE, JTIME, DBUFFP ) ) THEN
-            XMSG = 'Could not write Pressure to ' // CTM_CONC_1
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+      IF ( L_CONC_PRES ) THEN   ! for Pressure      
+         CALL interpolate_var ('PRES', JDATE, JTIME, DBUFFP)
+         call mio_fwrite( CTM_CONC_1, 'PRES', PNAME, DBUFFP, TIME_STAMP )
       END IF
-
 
       IF ( L_CONC_RH ) THEN   ! for Relative Humidity
-
-      CALL interpolate_var ('QV', JDATE, JTIME, DBUFFQV)
-
+         CALL interpolate_var ('QV', JDATE, JTIME, DBUFFQV)
          DBUFF = DBUFFQV * DBUFFP / ( DBUFFQV + 0.622015 ) /
      &                 ( 610.94 * EXP( 17.625 * ( DBUFFTA - 273.15 ) / 
      &                                 ( DBUFFTA - 273.15 + 243.04 ) ) )
          DBUFF = MIN( 0.9999, MAX( 0.001, DBUFF) )
 
-         IF ( .NOT. WRITE3( CTM_CONC_1, 'RH',
-     &                      JDATE, JTIME, DBUFF ) ) THEN
-            XMSG = 'Could not write Relative Humidity to ' // CTM_CONC_1
-
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+         call mio_fwrite( CTM_CONC_1, 'RH', PNAME, DBUFF, TIME_STAMP )
       END IF
-
 
       DEALLOCATE ( DBUFF, DBUFFP, DBUFFTA, DBUFFQV)
 

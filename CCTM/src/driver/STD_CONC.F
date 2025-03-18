@@ -65,6 +65,8 @@ C Logical to test whether met variables are included
       LOGICAL, SAVE :: L_CONC_TA = .FALSE.
       LOGICAL, SAVE :: L_CONC_PRES = .FALSE.
 
+      LOGICAL :: CONC_SUBSET_LAYER = .FALSE.
+
       CONTAINS
 
          SUBROUTINE CONC_DEFN ()
@@ -124,6 +126,7 @@ C  Retrieve CTM_WVEL environmental variable to see if user wants diagnosed verti
 
 C Retrieve the layer range used in the concentration file
         IF ( CONC_ELEV .EQ. -1 ) CONC_ELEV = NLAYS
+        IF ( ( CONC_BLEV .NE. 1 ) .OR. ( CONC_ELEV .NE. NLAYS ) ) CONC_SUBSET_LAYER = .TRUE.
 
         IF ( CONC_BLEV .LE. 0 .OR. CONC_ELEV .GT. NLAYS ) THEN
                WRITE( XMSG,'( "Layer range", 2I4, " invalid for this model" )' )
@@ -133,7 +136,7 @@ C Retrieve the layer range used in the concentration file
          IF ( CONC_BLEV .NE. 1 ) THEN
                WRITE( XMSG,'( "Layer", I3, " Not 1st layer in CGRID" )' )
      &         CONC_BLEV
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
          END IF
 
          C_NLAYS = CONC_ELEV - CONC_BLEV + 1

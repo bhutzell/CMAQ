@@ -43,6 +43,7 @@ C-----------------------------------------------------------------------
       USE PA_IPRVARS
       USE PA_DEFN, Only: LFULLIRR, LPARTIRR, N_IPR_SPC, IRRNAME
       USE PA_PARSE
+      USE LOGDEV_MOD, ONLY: M3EXIT
       use get_env_module 
 
       IMPLICIT NONE
@@ -139,7 +140,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Get the time and date to be used as the time stamp for all outputs;
 c  Convert from GMT to EDT or EST
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      CALL GETDTTIME( IDATE, ITIME )
+      CALL GETCDTTIME( IDATE, ITIME )
 
       IF ( ISDSTIME( IDATE ) ) THEN
          CALL NEXTIME( IDATE, ITIME, -40000 )

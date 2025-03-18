@@ -258,7 +258,7 @@ C...Count the number of mass emissions species
      &              dustouts( 2,ncols,nrows ), stat = status )
          if ( status .ne. 0 ) then
             xmsg = '*** Failure allocating DUSTOUTM, DUSTOUTN, or DUSTOUTS'
-            call m3warn ( pname, jdate, jtime, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             success = .false.; return
          end if
 
@@ -266,7 +266,7 @@ C Allocate emissions array
          allocate( dust_em( ncols,nrows ), stat = status )
          if ( status .ne. 0 ) then
             xmsg = '*** Failure allocating DUST_EM'
-            call m3warn( pname, jdate, jtime, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             success = .false.; return
          end if
 
@@ -275,7 +275,7 @@ C Allocate private arrays
      &             sd_ep ( ncols,nrows ), stat = status)
          if ( status .ne. 0 ) then
             xmsg = '*** Failure allocating WMAX, or SD_EP'
-            call m3warn( pname, jdate, jtime, xmsg )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             success = .false.; return
          end if
          wmax   = 0.0   ! array assignment
@@ -299,7 +299,7 @@ C Set up variable diagnostic names (from LUS_DEFN)
      &                vdiagnm_ustar( n_dlcat ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure allocating VDIAGNM_*'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
             vdiagnm_emis  = diag_type( ' ', ' ', ' ' )  ! array assignment
@@ -338,7 +338,7 @@ C Allocate diagnostic emissions arrays
      &                dustbf( ndust_diag,ncols,nrows ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure allocating DIAGNM, DIAGV or DUSTBF'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
 
@@ -346,7 +346,7 @@ C Allocate diagnostic emissions arrays
             allocate( sdiagv( ndust_diag ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure allocating SDIAGV'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
 #endif
@@ -426,7 +426,7 @@ C...append diagnostic variables with mass emissions species
             allocate( diagnm_swap( ndust_diag ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure allocating DIAGNM_SWAP'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
             diagnm_swap = diagnm 
@@ -437,7 +437,7 @@ C...append diagnostic variables with mass emissions species
             allocate( diagnm( ndust_diag ), stat = status )
             if ( status .ne. 0 ) then
                xmsg = '*** Failure reallocating DIAGNM'
-               call m3warn( pname, jdate, jtime, xmsg )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                success = .false.; return
             end if
             diagnm( 1:ndust_diag ) = diagnm_swap( 1:ndust_diag )
@@ -501,76 +501,29 @@ C Local variables:
 C-----------------------------------------------------------------------
 
 #ifndef mpas
-C Try to open existing file for update
-         if ( .not. open3( ctm_dust_emis_1, fsrdwr3, pname ) ) then
-            xmsg = 'Could not open CTM_DUST_EMIS_1 for update - '
-     &           // 'try to open new'
-            call m3mesg( xmsg )
+         do v = 1, ndust_var
+            vtype3d( v ) = m3real
+            vname3d( v ) = dust_var( v )%var
+            units3d( v ) = dust_var( v )%units
+            vdesc3d( v ) = dust_var( v )%desc
+         end do
 
-C Set output file characteristics based on COORD.EXT and open diagnostic file
-            ftype3d = grdded3
-            sdate3d = jdate
-            stime3d = jtime
-            tstep3d = tstep
-            call nextime( sdate3d, stime3d, tstep3d ) !  start the next hour
+         NVARS3D = ndust_var
 
-            nvars3d = ndust_var
-            ncols3d = gl_ncols
-            nrows3d = gl_nrows
-            nlays3d = 1
-            nthik3d = 1
-            gdtyp3d = gdtyp_gd
-            p_alp3d = p_alp_gd
-            p_bet3d = p_bet_gd
-            p_gam3d = p_gam_gd
-            xorig3d = xorig_gd
-            yorig3d = yorig_gd
-            xcent3d = xcent_gd
-            ycent3d = ycent_gd
-            xcell3d = xcell_gd
-            ycell3d = ycell_gd
-            vgtyp3d = vgtyp_gd
-            vgtop3d = vgtop_gd
-!           vgtpun3d = vgtpun_gd ! currently, not defined
-            do l = 1, nlays3d + 1
-               vglvs3d( l ) = vglvs_gd( l )
-            end do
-            gdnam3d = grid_name  ! from HGRD_DEFN
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 4
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .True. ! even if 2-D
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
 
-            do v = 1, nvars3d
-               vtype3d( v ) = m3real
-               vname3d( v ) = dust_var( v )%var
-               units3d( v ) = dust_var( v )%units
-               vdesc3d( v ) = dust_var( v )%desc
-            end do
-
-            fdesc3d( 1 ) = 'windblown dust parameters, variables, and'
-            fdesc3d( 2 ) = 'hourly layer-1 windblown dust emission rates'
-            do l = 3, mxdesc3
-               fdesc3d( l ) = ' '
-            end do
-
-            ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 3
-            L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .False.
-            L_COL  ( 1:NVARS3D ) = .True.
-            L_ROW  ( 1:NVARS3D ) = .True.
-            L_VEXT ( 1:NVARS3D ) = .False.
-
-            CALL LOAD_MIO_FILE ( 'CTM_DUST_EMIS_1', 0, 0, 0,
-     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &           L_VEXT(1:NVARS3D) )
+         CALL LOAD_MIO_FILE ( CTM_DUST_EMIS_1, 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
             
-C Open windblown dust emissions diagnostic file
-            if ( .not. open3( ctm_dust_emis_1, fsnew3, pname ) ) then
-               xmsg = 'Could not create the CTM_DUST_EMIS_1 file'
-               call m3exit( pname, sdate3d, stime3d, xmsg, xstat1 )
-            end if
-
-         end if
 #endif
 
          return
@@ -589,6 +542,7 @@ C=======================================================================
          use lus_data_module
          use centralized_io_module
          use RUNTIME_VARS, only: WRF_V4P
+         use mio_module
 #ifdef mpas
          use util_module, only : index1, time2sec
 #endif
@@ -633,11 +587,13 @@ C Parameters:
          character( 16 ) :: pname = 'GET_DUST_EMIS'
          character( 16 ) :: vname
          character( 96 ) :: xmsg
+         character( 20 ) :: TIME_STAMP
          integer status
          integer c, r, j, m, n, v, isd
 
          integer, save   :: wstep = 0      ! local write counter
          integer         :: mdate, mtime   ! diagnostic file write date&time
+         logical, save   :: firstwrite = .true.
 
                        ! automatic arrays
          real       :: fmoit  ( ncols,nrows )      ! factor of soil moisture on u*t
@@ -1220,6 +1176,20 @@ C Then reset the emissions array and local write counter.
                end do
                sdiagv = 0.0   ! array assignment
 #endif
+               if ( firstwrite ) then
+                  call mio_setfile( INIT_CONC_1 )
+                  mio_nlays = 1
+                  call mio_fcreate( CTM_DUST_EMIS_1, mio_new_file )
+                  if (mype .eq. 0) then
+                     call mio_set_global_attr ( CTM_DUST_EMIS_1, 'NLAYS', 1 )
+                     call mio_set_global_attr ( CTM_DUST_EMIS_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                  end if
+                  firstwrite = .false.
+               end if
+
+               call mio_setfile( CTM_DUST_EMIS_1 )
+               call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
+
                do v = 1, ndust_diag
                   do r = 1, nrows
                      do c = 1, ncols
@@ -1227,12 +1197,8 @@ C Then reset the emissions array and local write counter.
                      end do
                   end do
 
-                  if ( .not. WRITE3( ctm_dust_emis_1, diagnm( v )%var,
-     &                       mdate, mtime, wrbuf ) ) then
-                     xmsg = 'Could not write ' // trim( diagnm( v )%var )
-     &                    // ' to CTM_DUST_EMIS_1'
-                     call m3exit( pname, mdate, mtime, xmsg, xstat1 )
-                  end if
+                  call mio_fwrite( CTM_DUST_EMIS_1, diagnm( v )%var,
+     &                             pname, wrbuf, time_stamp )
                end do
                write( logdev,'( /5x, 2( a, 1x ), i8, ":", i6.6 )' )
      &               'Timestep written to CTM_DUST_EMIS_1',

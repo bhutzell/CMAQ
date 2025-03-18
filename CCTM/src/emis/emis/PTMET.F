@@ -86,13 +86,6 @@ c     END TYPE PTMET_TYPE
 
       TYPE( PTMET_TYPE ), ALLOCATABLE, SAVE :: PTMET_DATA( : )
 
-C cross-point surface met file name
-      CHARACTER(  16 ),              SAVE :: MC2NAME
-C cross-point layered met file name
-      CHARACTER(  16 ),              SAVE :: MC3NAME
-C dot-point layered met file name
-      CHARACTER(  16 ),              SAVE :: MD3NAME
-
 C-----------------------------------------------------------------------
       CONTAINS
 
@@ -287,62 +280,60 @@ C-----------------------------------------------------------------------
          CALL INTERPOLATE_VAR ('UWINDC', JDATE, JTIME, LOC_UWIND)
          CALL INTERPOLATE_VAR ('VWINDC', JDATE, JTIME, LOC_VWIND)
 #endif
-         !DO N = 1, NPTGRPS
 
-            MSRC = MY_NSRC( N )
+         MSRC = MY_NSRC( N )
 
-            DO S = 1, MY_NSRC (N )
+         DO S = 1, MY_NSRC (N )
 
-               MYC = MY_STKCOL( N )%ARRY( S )
-               MYR = MY_STKROW( N )%ARRY( S )
+            MYC = MY_STKCOL( N )%ARRY( S )
+            MYR = MY_STKROW( N )%ARRY( S )
 
-               PTMET_DATA( N )%HFX(S) = LOC_HFX(MYC, MYR)
+            PTMET_DATA( N )%HFX(S) = LOC_HFX(MYC, MYR)
 
-               PTMET_DATA( N )%HMIX(S) = LOC_PBL(MYC, MYR)
+            PTMET_DATA( N )%HMIX(S) = LOC_PBL(MYC, MYR)
 
-               PTMET_DATA( N )%TSFC(S) = LOC_TEMP2(MYC, MYR)
+            PTMET_DATA( N )%TSFC(S) = LOC_TEMP2(MYC, MYR)
 
-               PTMET_DATA( N )%USTAR(S) = LOC_USTAR(MYC, MYR)
+            PTMET_DATA( N )%USTAR(S) = LOC_USTAR(MYC, MYR)
 
-               PTMET_DATA( N )%PRSFC(S) = LOC_PRSFC(MYC, MYR)
+            PTMET_DATA( N )%PRSFC(S) = LOC_PRSFC(MYC, MYR)
 
-               DO L = 1, NLAYS
+            DO L = 1, NLAYS
                
-                  PTMET_DATA( N )%ZH(L,S)    = LOC_ZH(MYC, MYR, L)
+               PTMET_DATA( N )%ZH(L,S)    = LOC_ZH(MYC, MYR, L)
                   
-                  PTMET_DATA( N )%ZF(L,S)    = LOC_ZF(MYC, MYR, L)
+               PTMET_DATA( N )%ZF(L,S)    = LOC_ZF(MYC, MYR, L)
                   
-                  PTMET_DATA( N )%TA(L,S)    = LOC_TA(MYC, MYR, L)
+               PTMET_DATA( N )%TA(L,S)    = LOC_TA(MYC, MYR, L)
                   
-                  PTMET_DATA( N )%QV(L,S)    = LOC_QV(MYC, MYR, L)
+               PTMET_DATA( N )%QV(L,S)    = LOC_QV(MYC, MYR, L)
                   
-                  PTMET_DATA( N )%PRES(L,S)  = LOC_PRES(MYC, MYR, L)
+               PTMET_DATA( N )%PRES(L,S)  = LOC_PRES(MYC, MYR, L)
                   
-                  PTMET_DATA( N )%DENS(L,S)  = LOC_DENS(MYC, MYR, L)
+               PTMET_DATA( N )%DENS(L,S)  = LOC_DENS(MYC, MYR, L)
 #ifdef twoway
-                  PTMET_DATA( N )%UWIND(:,S) = LOC_UWIND(MYC, MYR, L)
+               PTMET_DATA( N )%UWIND(:,S) = LOC_UWIND(MYC, MYR, L)
 
-                  PTMET_DATA( N )%VWIND(:,S) = LOC_VWIND(MYC, MYR, L)
+               PTMET_DATA( N )%VWIND(:,S) = LOC_VWIND(MYC, MYR, L)
 #else
-                  PTMET_DATA( N )%UWIND(L,S) = 0.5*( LOC_UWIND(MYC, MYR, L)
-     &                                       +       LOC_UWIND(MYC+1, MYR, L) )
+               PTMET_DATA( N )%UWIND(L,S) = 0.5*( LOC_UWIND(MYC, MYR, L)
+     &                                    +       LOC_UWIND(MYC+1, MYR, L) )
                
-                  PTMET_DATA( N )%VWIND(L,S) = 0.5*( LOC_VWIND(MYC, MYR, L)
-     &                                       +       LOC_VWIND(MYC, MYR+1, L) )
+               PTMET_DATA( N )%VWIND(L,S) = 0.5*( LOC_VWIND(MYC, MYR, L)
+     &                                    +       LOC_VWIND(MYC, MYR+1, L) )
 #endif                
-               END DO
-
             END DO
 
-            IF ( MY_NSRC( N ) .GT. 0 ) THEN ! Compute ZSTK, DDZF
-               CALL DELTA_ZS( DESID_LAYS, MSRC,
-     &                        SOURCE( N )%ARRY, STKHT( N )%ARRY,
-     &                        PTMET_DATA( N )%ZF,
-     &                        PTMET_DATA( N )%ZSTK,
-     &                        PTMET_DATA( N )%DDZF )
-            END IF ! MY_NSRC( N ) > 0
+         END DO
 
-         !END DO   ! NPTGRPS
+         IF ( MY_NSRC( N ) .GT. 0 ) THEN ! Compute ZSTK, DDZF
+            CALL DELTA_ZS( DESID_LAYS, MSRC,
+     &                     SOURCE( N )%ARRY, STKHT( N )%ARRY,
+     &                     PTMET_DATA( N )%ZF,
+     &                     PTMET_DATA( N )%ZSTK,
+     &                     PTMET_DATA( N )%DDZF )
+         END IF ! MY_NSRC( N ) > 0
+
 
          END SUBROUTINE PTMET_CONVT
 #endif

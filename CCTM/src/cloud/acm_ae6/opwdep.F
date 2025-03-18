@@ -31,8 +31,8 @@
 !      Date   Who             What
 !    -------- ---             -----------------------------------------
 !     07/17/15 D. Wong        initial version
-!     12/30/19 S. Napelenok   ddm-3d implemenation for v5.3.1
-!     01/10/24 D. Wong        Incorporated unified coupler implmentation
+!     12/30/19 S. Napelenok   ddm-3d implementation for v5.3.1
+!     01/10/24 D. Wong        Incorporated unified coupler implementation
 !-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -56,9 +56,9 @@
 
 !...........ARGUMENTS
 
-      INTEGER, INTENT (IN) :: JDATE            ! current model date, coded YYYYDDD
-      INTEGER, INTENT (IN) :: JTIME            ! current model time, coded HHMMSS
-      INTEGER, INTENT (IN) :: TSTEP            ! model time step, coded HHMMSS
+      INTEGER, INTENT (IN) :: JDATE  ! current model date, coded YYYYDDD
+      INTEGER, INTENT (IN) :: JTIME  ! current model time, coded HHMMSS
+      INTEGER, INTENT (IN) :: TSTEP  ! model time step, coded HHMMSS
 
 !...........Local Variables
 
@@ -82,60 +82,17 @@
 
           XMSG = 'No species were specified for wet deposition ' //
      &           'tracking'
-          CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 
           XMSG = 'ONLY CLOUD DIAGNOSTICS WILL BE WRITTEN TO THE ' //
      &           'WETDEP OUTPUT FILE!'
-          CALL M3MESG ( XMSG )
+          CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
         END IF
 
 #ifndef mpas
-C Try to open existing wet deposition file for update
 
         IF ( IO_PE_INCLUSIVE ) THEN
-           WRITE( LOGDEV, * )
-           IF ( .NOT. OPEN3( CTM_WET_DEP_1, FSRDWR3, PNAME ) ) THEN
-
-              XMSG = 'Could not open ' // CTM_WET_DEP_1 // ' file for update - '
-     &               // 'try to open new'
-              CALL M3MESG( XMSG )
-
-!...Create wet deposition file:
-!...   copy most of header description from
-!...   MET_CRO_2D and initialize depositions to zero.
-
-#ifdef twoway
-              NLAYS3D = 1
-#else
-!...open MET_CRO_2D
-
-              IF ( .NOT. OPEN3( MET_CRO_2D, FSREAD3, PNAME ) ) THEN
-                XMSG = 'Could not open '// MET_CRO_2D // ' file'
-                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-              END IF
-
-!...get description from the met file
-
-              IF ( .NOT. DESC3( MET_CRO_2D ) ) THEN
-                XMSG = 'Could not get ' // MET_CRO_2D //' file description'
-                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-              END IF
-#endif
-
-              NCOLS3D = GL_NCOLS
-              NROWS3D = GL_NROWS
-
-              XORIG3D = XORIG_GD
-              YORIG3D = YORIG_GD
-
-!...advance to time variable for the output file to the next hour
-
-              SDATE3D = JDATE
-              STIME3D = 10000 * ( JTIME / 10000 )     !  clear MMSS fields
-              TSTEP3D = TSTEP     
-              CALL NEXTIME ( SDATE3D, STIME3D, TSTEP3D ) !  on the next hour
-
               NVARS3D = N_SPC_WDEP + 1
 
 !...define wet deposition output descriptors for gaseous species
@@ -204,46 +161,21 @@ C Try to open existing wet deposition file for update
               UNITS3D( VAR ) = 'kg ha-1'
               VDESC3D( VAR ) = 'hourly wet deposition values'
 
-!...initialize the file descriptors
-
-              FDESC3D( 1 ) = 'hourly 1-layer cross-point wet deposition'
-     &                       // ' from all cloud types'
-              DO L = 2 , MXDESC3
-                 FDESC3D( L ) = ' '
-              END DO
-
-              GDNAM3D = GRID_NAME  ! from HGRD_DEFN
- 
 !...Store MIO Metadata
-              NDIMS3D( 1:NVARS3D ) = 3
+              NDIMS3D( 1:NVARS3D ) = 4
               L_TSTEP( 1:NVARS3D ) = .True.
-              L_LAY  ( 1:NVARS3D ) = .False.
+              L_LAY  ( 1:NVARS3D ) = .True.
               L_COL  ( 1:NVARS3D ) = .True.
               L_ROW  ( 1:NVARS3D ) = .True.
               L_VEXT ( 1:NVARS3D ) = .False.
               
-              CALL LOAD_MIO_FILE ( 'CTM_WET_DEP_1', 0, 0, 0,
+              CALL LOAD_MIO_FILE ( CTM_WET_DEP_1, 0, 0, 0,
      &             VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &             VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &             L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &             L_VEXT(1:NVARS3D) )
  
-!...try to open the output file new
-
-              IF ( .NOT. OPEN3( CTM_WET_DEP_1, FSNEW3, PNAME ) ) THEN
-                 XMSG = 'Could not create '// CTM_WET_DEP_1 // ' file'
-                 CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-              END IF
-
-           END IF   ! open CTM_WET_DEP_1 read/write
-
 #ifdef sens
-           IF ( .NOT. OPEN3( CTM_SWETDEP_1, FSRDWR3, PNAME ) ) THEN
-               XMSG = 'Could not open ' // CTM_SWETDEP_1 //
-     &                ' file for update - try to open new'
-               CALL M3MESG( XMSG )
-
-C...Create sensitivity wet deposition file:
                NVARS3D = ( N_SPC_WDEP + 1 ) * NPMAX
 
                ALLOCATE ( S_WETDEPSPC( NVARS3D ) )
@@ -323,16 +255,10 @@ C...define output descriptor for hydrogen concentration
                   S_WETDEPSPC ( SENNUM ) = VNAME3D ( SENNUM )
                END DO
 
-C...initialize the file descriptors
-               FDESC3D = ' '
-               FDESC3D( 1 ) = 'Sensitivity of hourly 1-layer '
-     &                        // 'cross-point wet deposition '
-     &                        // 'from all cloud types'
-
                ! Store MIO Metadata
-               NDIMS3D( 1:NVARS3D ) = 3
+               NDIMS3D( 1:NVARS3D ) = 4
                L_TSTEP( 1:NVARS3D ) = .True.
-               L_LAY  ( 1:NVARS3D ) = .False.
+               L_LAY  ( 1:NVARS3D ) = .True.
                L_COL  ( 1:NVARS3D ) = .True.
                L_ROW  ( 1:NVARS3D ) = .True.
                L_VEXT ( 1:NVARS3D ) = .False.
@@ -343,13 +269,6 @@ C...initialize the file descriptors
      &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &              L_VEXT(1:NVARS3D) )
 
-C...try to open the output file new
-               IF ( .NOT. OPEN3( CTM_SWETDEP_1, FSNEW3, PNAME ) ) THEN
-                  XMSG = 'Could not create '// CTM_SWETDEP_1 // ' file'
-                  CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-               END IF
-
-           END IF   ! open CTM_SWETDEP_1 read/write
 #endif
 
 !...open the diagnostic file if user asked for it
@@ -358,28 +277,6 @@ C...try to open the output file new
 
 !...Try to open existing file for update
               WRITE( LOGDEV, * )
-              IF ( .NOT. OPEN3( CTM_WET_DEP_2, FSRDWR3, PNAME ) ) THEN
-
-                 XMSG = 'Could not open ' // CTM_WET_DEP_2 // ' file for update - '
-     &                  // 'try to open new'
-                 CALL M3MESG( XMSG )
-
-!...copy most of header description from
-!...CTM_WET_DEP_1 and initialize depositions to zero.
-
-!...get description from the other wet dep file
-
-                 IF ( .NOT. DESC3( CTM_WET_DEP_1 ) ) THEN
-                    XMSG = 'Could not get ' // CTM_WET_DEP_1 //' file description'
-                    CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                 END IF
-
-!...advance to time variable for the output file to the next hour
-
-                 SDATE3D = JDATE
-                 STIME3D = 10000 * ( JTIME / 10000 )     !  clear MMSS fields
-                 TSTEP3D = TSTEP     
-                 CALL NEXTIME ( SDATE3D, STIME3D, TSTEP3D ) !  on the next hour
 
                  NVARS3D = N_SPC_WDEP + 8 + 4
 
@@ -425,7 +322,7 @@ C...try to open the output file new
                  UNITS3D( VAR ) = ''
                  VDESC3D( VAR ) = 'Rain-event flag (values: 1,0)'
  
-!...define output descriptor for precitating cloud fraction
+!...define output descriptor for precipitating cloud fraction
 
                  VAR = VAR + 1
                  VTYPE3D( VAR ) = M3REAL
@@ -473,36 +370,19 @@ C...try to open the output file new
                  UNITS3D( VAR ) = '1'
                  VDESC3D( VAR ) = 'Total cloud transmissivity'
 
-!...initialize the file descriptors
-
-                 FDESC3D( 1 ) = 'hourly 1-layer cross-point wet deposition '
-     &                           // 'from sub-grid clouds and cloud data'
-                 DO L = 2 , MXDESC3
-                    FDESC3D( L ) = ' '
-                 END DO
-
 !...Store MIO Metadata
-                 NDIMS3D( 1:NVARS3D ) = 3
+                 NDIMS3D( 1:NVARS3D ) = 4
                  L_TSTEP( 1:NVARS3D ) = .True.
-                 L_LAY  ( 1:NVARS3D ) = .False.
+                 L_LAY  ( 1:NVARS3D ) = .True.
                  L_COL  ( 1:NVARS3D ) = .True.
                  L_ROW  ( 1:NVARS3D ) = .True.
                  L_VEXT ( 1:NVARS3D ) = .False.
                  
-                 CALL LOAD_MIO_FILE ( 'CTM_WET_DEP_2', 0, 0, 0,
+                 CALL LOAD_MIO_FILE ( CTM_WET_DEP_2, 0, 0, 0,
      &                VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &                VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &                L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
      &                L_VEXT(1:NVARS3D) )
-
-!...try to open the diagnostic output file
-
-                 IF ( .NOT. OPEN3( CTM_WET_DEP_2, FSNEW3, PNAME ) ) THEN
-                    XMSG = 'Could not create '// CTM_WET_DEP_2 // ' file'
-                    CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-                 END IF
-
-              END IF   ! open CTM_WET_DEP_2 read/write
 
            END IF   ! CLD_DIAG
 

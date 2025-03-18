@@ -21,6 +21,7 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE INIT_CCTM_MODULES ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
 
       USE RUNTIME_VARS, ONLY : COLUMN_MODEL
+      USE ELMO_INIT_DEFN, ONLY : ELMO_INIT
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP
       USE ELMO_PROC, ONLY : ELMO_DRIVER  
       USE ELMO_INIT_DEFN, ONLY : ELMO_INIT, OPEN_ELMO
@@ -103,38 +104,29 @@ C Arguments:
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
          END SUBROUTINE AERO
-
+         SUBROUTINE WR_CGRID( CGRID, JDATE, JTIME, OUTSTEP )
+            REAL, POINTER             :: CGRID( :,:,:,: )
+            INTEGER, INTENT( IN )     :: JDATE, JTIME
+            INTEGER, INTENT( IN )     :: OUTSTEP
+         END SUBROUTINE WR_CGRID
       END INTERFACE
 
-      ! Calculate Vertical Diffusion, Dry Deposition, and Emissions
       CALL VDIFF ( CGRID, JDATE, JTIME, TSTEP )
 
-      IF ( .NOT. COLUMN_MODEL ) THEN
-
-          !CALL HADV ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
-          !CALL ZADV ( CGRID, JDATE, JTIME, TSTEP )
-          !CALL HDIFF ( CGRID, JDATE, JTIME, TSTEP )
-
-      END IF
-          
       CALL PHOT ( CGRID, JDATE, JTIME, TSTEP )    
       CALL CLDPROC ( CGRID, JDATE, JTIME, TSTEP )
       !CALL CHEM ( CGRID, JDATE, JTIME, TSTEP )
       !CALL AERO ( CGRID, JDATE, JTIME, TSTEP )
 
-      ! Write CGRID state file for subsequent runs
       CALL WR_CGRID ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
+
 #ifdef isam
+      CALL WR_AVG_SA ( JDATE, JTIME, TSTEP( 1 ) )
       CALL WR_SA_CGRID ( JDATE, JTIME, TSTEP( 1 ) )
 #endif
+
 #ifdef sens
       CALL WR_SENGRID ( JDATE, JTIME, TSTEP( 1 )  )
-#endif
-
-      ! Open ISAM and DDM Concentration Files
-#ifdef isam
-      ! Write out ISAM source-resolved concentrations
-      CALL WR_AVG_SA ( JDATE, JTIME, TSTEP( 1 ) )
 #endif
 
       ! Initialize ELMO Arrays and Maps
@@ -153,13 +145,12 @@ C Arguments:
         ! Average parameters
         CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN=.TRUE.)
         
-        ! Print Instantaneous Values at first time step
-        CALL WRITE_ELMO( JDATE, JTIME, TSTEP, .TRUE. )
-
       END IF
 
       ! Initialize Budget Output File and Concentration Array
       IF ( BUDGET_DIAG ) CALL BUDGET_INIT( CGRID, JDATE, JTIME, TSTEP )
- 
+
       END SUBROUTINE INIT_CCTM_MODULES
 
+
+ 

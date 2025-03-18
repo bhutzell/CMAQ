@@ -174,6 +174,7 @@ C-----------------------------------------------------------------------
          USE UTILIO_DEFN
          USE VDIFF_MAP, ONLY : N_SPC_DIFF, DIFF_SPC
          USE CONST
+         USE LOGDEV_MOD, ONLY: M3EXIT
 
          INCLUDE SUBST_FILES_ID  ! file name parameters
 
@@ -314,7 +315,8 @@ C-----------------------------------------------------------------------
        USE AERO_DATA, ONLY: DESID_AERO_REF, DESID_N_AERO_REF
        USE DESID_VARS, ONLY: DESID_SD_NML
        USE DESID_UTIL, ONLY: DESID_GET_RULE_STREAMS
-       USE UTILIO_DEFN, ONLY: INDEX1, XSTAT1, M3EXIT, UPCASE
+       USE UTILIO_DEFN, ONLY: INDEX1, XSTAT1, UPCASE
+       USE LOGDEV_MOD, ONLY: M3EXIT
          
        IMPLICIT NONE
 

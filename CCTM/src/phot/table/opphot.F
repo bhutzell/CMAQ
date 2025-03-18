@@ -77,7 +77,7 @@ C...Try to open existing file for update
 
          XMSG = 'Could not open ' // CTM_RJ_2 // ' file for update - '
      &        // 'try to open new'
-         CALL M3MESG ( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
 C...Set output file characteristics based on COORD.EXT and open
 C...  the photolysis diagnostic file
@@ -133,7 +133,7 @@ C...load data from photolysis reaction list
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
       
-         CALL LOAD_MIO_FILE ( 'CTM_RJ_2', NLAYS3D, 1, NLAYS3D,
+         CALL LOAD_MIO_FILE ( 'CTM_RJ_2_MIO', NLAYS3D, 1, NLAYS3D,
      &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
      &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
      &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),

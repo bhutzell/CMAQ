@@ -88,16 +88,26 @@ C-----------------------------------------------------------------------
          FUNCTION VGRD_INIT ( ) RESULT ( SUCCESS )
 
             USE UTILIO_DEFN
+            use mio_module
+#ifdef twoway
+            use twoway_data_module, only: wrfv
+#endif
 
             IMPLICIT NONE
 
+            INCLUDE SUBST_FILES_ID
+ 
             LOGICAL :: SUCCESS
 
             LOGICAL, SAVE :: FIRSTIME = .TRUE.
             CHARACTER( 96 ) :: XMSG = ' '
+            character( 5000 ) :: filedesc
+            CHARACTER(10)   :: WRF_VERSION = ' '
             CHARACTER( 16 ) :: LAYER_FILE = 'LAYER_FILE'
 
             INTEGER L, ALLOCSTAT
+            INTEGER  :: NV, LOC, STR_LEN
+            real, allocatable :: vglvs_ic(:)
 
 C This function is expected to be called only once - at startup
 
@@ -107,51 +117,65 @@ C This function is expected to be called only once - at startup
 
 #ifndef mpas
 
-C get vert layer definition from LAYER_FILE
-               IF ( .NOT. OPEN3( LAYER_FILE, FSREAD3, 'VGRD_INIT' ) ) THEN
-                  XMSG = 'Could not open '// LAYER_FILE
-                  CALL M3WARN ( 'VGRD_INIT', 0, 0, XMSG )
-                  SUCCESS = .FALSE.; RETURN
-                  END IF
-
-               IF ( .NOT. DESC3( LAYER_FILE ) ) THEN
-                  XMSG = 'Could not get ' // LAYER_FILE // ' file description'
-                  CALL M3WARN ( 'VGRD_INIT', 0, 0, XMSG )
-                  SUCCESS = .FALSE.; RETURN
-                  END IF
-
-               GDNAME_GD = GDNAM3D
-
-               NLAYS = NLAYS3D
-
-               VGTYP_GD  = VGTYP3D
-               VGTOP_GD  = VGTOP3D
+               call mio_setfile ( INIT_CONC_1 )
+               NLAYS = mio_nlays
+      
+               call mio_get_global_attr( INIT_CONC_1, 'GDNAM', GDNAME_GD )
+               call mio_get_global_attr( INIT_CONC_1, 'VGTYP', VGTYP_GD )
+               call mio_get_global_attr( INIT_CONC_1, 'VGTOP', VGTOP_GD )
                VGTPUN_GD = 'Pa'
                VGLVUN_GD = 'none'
 
-               ALLOCATE ( VGLVS_GD( NLAYS + 1 ), STAT = ALLOCSTAT )
-               ALLOCATE ( X3FACE_GD( 0:NLAYS ), STAT = ALLOCSTAT )
+               ALLOCATE ( VGLVS_GD( NLAYS + 1 ), 
+     &                    vglvs_ic( nlays + 2), 
+     &                    X3FACE_GD( 0:NLAYS ), STAT = ALLOCSTAT )
                IF ( ALLOCSTAT .NE. 0 ) THEN
                   XMSG = 'Failure allocating VGLVS_GD, X3FACE_GD'
-                  CALL M3WARN ( 'VGRD_INIT', 0, 0, XMSG )
+                  CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
                   SUCCESS = .FALSE.; RETURN
-                  END IF
+               END IF
 
-               DO L = 1, NLAYS + 1
-                  VGLVS_GD( L ) = VGLVS3D( L )
-                  END DO
+               call mio_get_global_attr( INIT_CONC_1, 'VGLVLS', VGLVS_ic )
 
-C set layer layer thickenesses
-
+C set layer thicknesses
+! For array-valued attributes, mio_get_global_attr returns the length of the array
+! in the first element. We know what this value should be already, so skip over it.
                DO L = 0, NLAYS
+                  VGLVS_GD( L+1 ) = VGLVS_IC( L+2 )
                   X3FACE_GD( L ) = 1.0 - VGLVS_GD( L + 1 )
-                  END DO
+               END DO
+
+               VGLVS3D(1:NLAYS+1) = VGLVS_GD(1:NLAYS+1)
+               deallocate( VGLVS_IC )
+
+C Determine whether WRF version is 4.1 or greater
+#ifdef twoway
+               WRF_V4P = ( wrfv .ge. 4.1 )
+#else
+               call mio_fopen( MET_CRO_3D, mio_read_only )
+               call mio_get_global_attr( MET_CRO_3D, 'FILEDESC', FILEDESC )
+               LOC = INDEX (FILEDESC, 'WRF ARW V')
+               IF (LOC > 0) THEN
+                  STR_LEN = LEN_TRIM(FILEDESC)
+                  READ (FILEDESC(LOC+9:STR_LEN), *) WRF_VERSION
+                  IF (WRF_VERSION .GE. '4.1') THEN
+                     WRF_V4P = .TRUE.
+                  END IF
+               END IF
+
+               XMSG = 'MET data determined based on WRF ARW version'
+               IF ( MYPE .EQ. 0 ) THEN
+                  WRITE(OUTDEV,'(/,5X,2(A,1X),/)') TRIM( XMSG ), TRIM( WRF_VERSION )
+                  WRITE(LOGDEV,'(/,5X,2(A,1X),/)') TRIM( XMSG ), TRIM( WRF_VERSION )
+               ELSE
+                  WRITE(LOGDEV,'(/,5X,2(A,1X),/)') TRIM( XMSG ), TRIM( WRF_VERSION )
+               END IF
 
             ELSE
-            XMSG = 'Vertical layer structure already defined'
-            CALL M3WARN ( 'VGRD_INIT', 0, 0, XMSG )
-            SUCCESS = .FALSE.; RETURN
-
+               XMSG = 'Vertical layer structure already defined'
+               CALL LOG_WARNING( 'VGRD_INIT', LOGDEV, XMSG )
+               SUCCESS = .FALSE.; RETURN
+#endif
 #endif
 
             END IF   ! FIRSTIME

@@ -24,6 +24,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &                      IM_ACC, IM_NUC
       USE SOA_DEFN, ONLY  : IOA_PRI, IOA_SEC, IOA_ANTSEC, IOA_BIOSEC
       USE UTILIO_DEFN
+      use logdev_mod
 
       IMPLICIT NONE
 
@@ -1118,7 +1119,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &        TRIM(CETYPE(VARTYPE)) // ' that is unknown to ELMO. ' //
      &        'Confirm that this is correct for variable ' // trim(VARNAME) //
      &        '.  ' // TRIM( UNITTYPE)
-         CALL M3WARN( 'MAP_ELMO_UNITS', 0, 0, XMSG )
+         CALL LOG_WARNING( 'MAP_ELMO_UNITS', logdev, XMSG )
       END IF
  
       END SUBROUTINE MAP_ELMO_UNITS
@@ -1156,7 +1157,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         XMSG = 'ELMO is attempting to convert variable ' // 
      &       TRIM( ELMO_TABLE( J )%NAME ) // ' from '//
      &       'units but the MW is equal to 0.0'
-        CALL M3WARN( PNAME, 0, 0, XMSG )
+        CALL LOG_WARNING( PNAME, logdev, XMSG )
       END IF
 
       ! Calculate Unit Conversions

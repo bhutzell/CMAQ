@@ -39,6 +39,7 @@ C***********************************************************************
       USE HRDATA
       USE RXNS_DATA
       USE RXNS_FUNCTION
+      USE LOGDEV_MOD, ONLY: M3EXIT
       USE CONST, ONLY : MWAIR
 
       IMPLICIT NONE

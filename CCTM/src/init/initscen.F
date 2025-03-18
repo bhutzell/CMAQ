@@ -107,24 +107,13 @@ C Arguments:
                                 ! TSTEP(2) = sciproc sync. step (chem)
                                 ! TSTEP(3) = twoway model time step w.r.t. wrf time
                                 !            step and wrf/cmaq call frequency
-!     INTEGER      NSTEPS       ! run duration, as number of output time steps
 
 C Parameters:
 
       REAL, PARAMETER :: CMIN = 1.0E-30
 
 C Local Variables
-      CHARACTER( 16 ) :: PNAME = 'INITSCEN'
       CHARACTER( 16 ) :: FNAME
-      CHARACTER( 96 ) :: MSG = ' '
-
-      INTEGER      STEPSECS          ! seconds per time step
-      INTEGER      TOTSECS           ! run duration seconds
-
-#ifdef Verbose3
-      real sumcg
-      integer c, r, l, s, v
-#endif
 
 #ifdef sens
       integer COL,ROW,LAY,SPC
@@ -137,15 +126,10 @@ C Local Variables
             REAL,    INTENT( IN )         :: CMIN
             REAL, POINTER                 :: CGRID( :,:,:,: )
          END SUBROUTINE LOAD_CGRID
-         SUBROUTINE WR_INIT ( CGRID, JDATE, JTIME, TSTEP )
-            REAL, POINTER                 :: CGRID(:,:,:,:)
-            INTEGER, INTENT( IN )         :: JDATE
-            INTEGER, INTENT( IN )         :: JTIME
-            INTEGER, INTENT( IN )         :: TSTEP
-         END SUBROUTINE WR_INIT
 #ifdef isam
-         SUBROUTINE SA_ARRAY_INIT ( CGRID )
+         SUBROUTINE SA_ARRAY_INIT ( jdate, jtime, CGRID )
             IMPLICIT NONE
+            integer, intent( in )         :: JDATE, JTIME
             REAL, POINTER                 :: CGRID( :,:,:,: )
          END SUBROUTINE SA_ARRAY_INIT
          SUBROUTINE OP_SA ( JDATE, JTIME, TSTEP, NSTEPS, FNAME )
@@ -175,13 +159,6 @@ C-----------------------------------------------------------------------
 
       TSTEP( 1 ) = LOCAL_TSTEP 
 
-#ifdef isam
-      IF ( MYPE .EQ. 0 ) THEN
-         WRITE( LOGDEV,* ) 'Entered INITSCEN...'
-         WRITE( LOGDEV,* ) 'NSPC_SA, NTAG_SA:', NSPC_SA, NTAG_SA
-      END IF
-#endif
-
 C Initialize the CGRID array
       CGRID = CMIN
 
@@ -189,20 +166,6 @@ C Load CGRID
       IF ( N_GC_SPC .GT. 0 ) THEN
          FNAME = INIT_CONC_1
          CALL LOAD_CGRID ( FNAME, 'GC', CMIN, CGRID )
-#ifdef Verbose3
-         write( logdev,'(/"@@@c ", i8, i7.6)') stdate, sttime
-         l = 1
-         do v = gc_strt, gc_fini
-            s = v + 1 - gc_strt
-            sumcg = 0.0
-            do r = 1, nrows
-               do c = 1, ncols
-                  sumcg = sumcg + cgrid( c,r,l,v )
-               end do
-            end do
-            write( logdev,'("@@@c ", a, i5, g16.6)') gc_spc( s ), s, sumcg
-         end do
-#endif
       END IF  ! N_GC_SPC > 0
 
 C load rhoj
@@ -227,49 +190,49 @@ C Get tracer IC's
          CALL LOAD_CGRID ( FNAME, 'TR', CMIN, CGRID )
       END IF  ! N_TR_SPC > 0
 
-C Test opening existing conc file for update
-      CALL LOG_HEADING( LOGDEV, "Open/Create Concentration File" )
-
-C *** Open the aerosol parameters file (diameters and standard deviations).
-      !IF ( L_ELMO .AND. IO_PE_INCLUSIVE ) THEN
-      !     CALL OPEN_ELMO ( STDATE, STTIME, TSTEP( 1 ) )
-      !     ELMO_NSTEP = 0.0
-      !END IF
-
 #ifndef mpas
-      IF ( .NOT. OPEN3( CTM_CONC_1, FSRDWR3, PNAME ) ) THEN
 
 #ifndef twoway
-         BACKSPACE( LOGDEV )
+! why is this here, is it necessary?
+      BACKSPACE( LOGDEV )
 #endif
-         MSG = 'Could not open ' // TRIM( CTM_CONC_1 ) // ' for update - '
-     &        // 'try to open new'
-         CALL M3MESG( MSG )
-         ! Open the file new
-         CALL SUBST_BARRIER
-         CALL OPCONC ( STDATE, STTIME, TSTEP( 1 ) )
-#ifdef parallel
-         CALL OPVEXT ( STDATE, STTIME, TSTEP( 1 ) )
-#endif
-      END IF
 
-      CALL WR_INIT ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
-      
+      CALL LOG_HEADING( LOGDEV, "Open/Create Concentration File" )
+
+! the OPCONC routine should get renamed and moved inside CONC_DEFN
+      CALL OPCONC ( STDATE, STTIME, TSTEP( 1 ) )
+#ifdef parallel
+      CALL OPVEXT ( STDATE, STTIME, TSTEP( 1 ) )
+#endif
+
       CALL LOG_HEADING( LOGDEV, "Open/Create Average Concentration File" )
+! likewise OPACONC should get renamed and moved inside AVG_CONC
       CALL OPACONC ( STDATE, STTIME, TSTEP( 1 ) )
       
       CALL LOG_HEADING( LOGDEV, "Open/Create Wet Deposition File" )
+      CALL LOG_HEADING( LOGDEV, "Define Wet Deposition File" )
+! likewise OPWDED should get renamed and perhaps moved elsewhere
+      
       CALL OPWDEP  ( STDATE, STTIME, TSTEP( 1 ) )
 
 #ifdef sens
+! should there be a LOG_HEADING call saying we are initializing DDM or
+! is that done elsewhere? Maybe below in the LOAD_SENGRID block?
+! OPASENS should perhaps be renamed also
       CALL OPASENS( STDATE, STTIME, TSTEP( 1 ) )
 #endif
 
 #ifdef isam
-C Initialize ISAM array
-      CALL SA_ARRAY_INIT ( CGRID )
+      CALL LOG_HEADING( LOGDEV, "Initializing Integrated Source Apportionment Model (ISAM)" )
+      IF ( MYPE .EQ. 0 ) THEN
+         WRITE( LOGDEV,* ) 'NSPC_SA, NTAG_SA:', NSPC_SA, NTAG_SA
+      END IF
 
-C Open SA_CONC_1 and SA_CGRID_1
+C Initialize ISAM array
+      CALL SA_ARRAY_INIT ( STDATE, STTIME, CGRID )
+
+C Define ISAM output files SA_CONC_1 and SA_WD_1
+! why is op_sa called for all procs but sa_opwddep only for pe0?
       CALL OP_SA ( STDATE, STTIME, TSTEP, 1, SA_CONC_1 )
       IF ( MYPE .EQ. 0 ) CALL SA_OPWDDEP ( SA_WD_1, STDATE, STTIME, TSTEP( 1 ) )
 #endif

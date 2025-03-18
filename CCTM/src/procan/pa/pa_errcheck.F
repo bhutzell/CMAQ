@@ -48,6 +48,7 @@ C-----------------------------------------------------------------------
       USE PA_VARS
       USE PA_PARSE
       USE PA_DEFN
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
       
@@ -109,7 +110,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Write log header message
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       WRITE( MSG, 93000 )
-      CALL M3MESG( MSG )
+      CALL LOG_MESSAGE( LOGDEV ,  MSG )
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Check that all family names are valid
@@ -122,14 +123,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          INDX = INDEX1( FAMNAME( NFAM ), N_CGRID_SPC, CGRID_NAME )
          IF ( INDX .NE. 0 ) THEN
             WRITE( MSG, 94000 ) NFAM, FAMNAME( NFAM )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             LERROR = .TRUE.
          END IF
 
          INDX = INDEX1( FAMNAME( NFAM ), NVALID, VALNAME )
          IF ( INDX .NE. 0 ) THEN
             WRITE( MSG, 94020 ) NFAM, FAMNAME( NFAM )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             LERROR = .TRUE.
          END IF
 
@@ -143,7 +144,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             ELSE
                WRITE( MSG, 94040 ) NFAM, FAMNAME( NFAM ),
      &                             FAMMEMNAM( NFAM,NMEM )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                LERROR = .TRUE.
             END IF
          END DO
@@ -165,14 +166,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          INDX = INDEX1( RXSUMNAME( NRXS ), N_CGRID_SPC, CGRID_NAME )
          IF ( INDX .NE. 0 ) THEN 
             WRITE( MSG, 94060 ) NRXS, RXSUMNAME( NRXS )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             LERROR = .TRUE.
          END IF
 
          INDX = INDEX1( RXSUMNAME( NRXS ), NVALID, VALNAME )
          IF ( INDX .NE. 0 ) THEN
             WRITE( MSG, 94080 ) NRXS, RXSUMNAME( NRXS )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             LERROR = .TRUE.
          END IF
 
@@ -182,11 +183,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                RXSUMRN( NRXS, NTERM ) = INDX
             ELSE
                WRITE( MSG, 94100 )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94105 ) NRXS, RXSUMNAME( NRXS )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94110 ) RXSUMLBL( NRXS,NTERM )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                LERROR = .TRUE.
             END IF
          END DO
@@ -209,14 +210,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          INDX = INDEX1( CYCLNAME( NCYC ), N_CGRID_SPC, CGRID_NAME )
          IF ( INDX .NE. 0 ) THEN
             WRITE( MSG, 94120 ) NCYC, CYCLNAME( NCYC )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             LERROR = .TRUE.
          END IF
 
          INDX = INDEX1( CYCLNAME( NCYC ), NVALID, VALNAME )
          IF ( INDX .NE. 0 ) THEN
             WRITE( MSG, 94140 ) NCYC, CYCLNAME( NCYC )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             LERROR = .TRUE.
          END IF
 
@@ -237,7 +238,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          IF ( .NOT. LFOUND ) THEN
             WRITE( MSG, 94160 ) NCYC, CYCLNAME( NCYC ), CYCLSPEC( NCYC )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             LERROR = .TRUE.
          END IF
 100   CONTINUE
@@ -253,14 +254,14 @@ c..check that the output name itself is unique
          INDX = INDEX1( IRRNAME( NOUT ), N_CGRID_SPC, CGRID_NAME )
          IF ( INDX .NE. 0 ) THEN 
             WRITE( MSG, 94180 ) NOUT, IRRNAME( NOUT )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             LERROR = .TRUE.
          END IF
          
          INDX = INDEX1( IRRNAME( NOUT ), NVALID, VALNAME )
          IF ( INDX .NE. 0 ) THEN
             WRITE( MSG, 94200 ) NOUT, IRRNAME( NOUT )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             LERROR = .TRUE.
          END IF
 
@@ -297,18 +298,18 @@ c...check names used in production/loss/net operators
                   LERROR = .TRUE.
                   IF ( INDX .NE. 0 .AND. .NOT. LCHEMFAM( INDX ) ) THEN
                      WRITE( MSG, 94220 )
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      WRITE( MSG, 94260 ) NOUT, IRRNAME( NOUT ) 
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      WRITE( MSG, 94230 ) OUTSPEC1( NOUT, NTERM )
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   ELSE
                      WRITE( MSG, 94240 )
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      WRITE( MSG,94260 ) NOUT, IRRNAME( NOUT ) 
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      WRITE( MSG, 94280 ) OUTSPEC1( NOUT, NTERM )
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   END IF
                END IF
 
@@ -339,18 +340,18 @@ c...check names used in production/loss/net operators
                      LERROR = .TRUE.
                      IF ( INDX .NE. 0 .AND. .NOT. LCHEMFAM( INDX ) ) THEN
                         WRITE( MSG, 94220 )
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         WRITE( MSG, 94260 ) NOUT, IRRNAME( NOUT ) 
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         WRITE( MSG, 94230 ) OUTSPEC2( NOUT,NTERM )
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      ELSE
                         WRITE( MSG, 94240 )
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         WRITE( MSG, 94260 ) NOUT, IRRNAME( NOUT )
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         WRITE( MSG, 94280 ) OUTSPEC2( NOUT,NTERM )
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      END IF
                   END IF
                END IF
@@ -382,18 +383,18 @@ c...check names used in production/loss/net operators
                      LERROR = .TRUE.
                      IF ( INDX .NE. 0 .AND. .NOT. LCHEMFAM( INDX ) ) THEN
                         WRITE( MSG, 94220 )
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         WRITE( MSG, 94260 ) NOUT, IRRNAME( NOUT ) 
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         WRITE( MSG,94230 ) OUTSPEC2( NOUT,NTERM )
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      ELSE
                         WRITE( MSG, 94240 )
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         WRITE( MSG, 94260 ) NOUT, IRRNAME( NOUT )
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         WRITE( MSG, 94280 ) OUTSPEC3( NOUT,NTERM ) 
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      END IF
                   END IF
                END IF
@@ -418,11 +419,11 @@ c..check cycle names or reaction sum names
 
                IF ( .NOT. LFOUND ) THEN
                   WRITE( MSG, 94300 )
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94320 ) NOUT, IRRNAME( NOUT ) 
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94340 ) OUTSPEC1( NOUT,NTERM )
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   LERROR = .TRUE.
                END IF
 
@@ -437,20 +438,20 @@ c..check for reaction label name
 
                IF ( .NOT. LFOUND ) THEN
                   WRITE( MSG, 94360 )
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94380 ) NOUT, IRRNAME( NOUT ) 
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94400 ) OUTRXLBL( NOUT,NTERM )
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   LERROR = .TRUE.
                END IF
             ELSE
                WRITE( MSG, 94420 )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94440 ) NOUT, IRRNAME( NOUT )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94460 ) TYPE
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                LERROR = .TRUE.
             END IF
 120      CONTINUE
@@ -491,12 +492,12 @@ c..If all species requested, insert all species into position
                NEWNPASP = PAINDX - 1 + N_CGRID_SPC + ( N_IPR_SPC - NOUT )
                IF ( NEWNPASP .GT. MAXIPRSPC ) THEN
                   WRITE( MSG, 94800 )
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94820 ) MAXIPRSPC
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94840 )
-                  CALL M3MESG( MSG )
-                  CALL M3EXIT( 'ERRCHECK', IZERO, IZERO, ' ', XSTAT1 )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
+                  CALL M3EXIT( 'PA_ERRCHECK', IZERO, IZERO, ' ', XSTAT1 )
                END IF
 
                OFFSET = PAINDX - 1 + N_CGRID_SPC - NOUT
@@ -530,9 +531,9 @@ c..If all species requested, insert all species into position
                          
             IF ( .NOT. LFOUND ) THEN
                WRITE( MSG, 94480 )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                WRITE( MSG, 94500 ) IPR_SPNAM( PAINDX )
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                LERROR = .TRUE.
             END IF
 160      CONTINUE
@@ -597,9 +598,9 @@ c..Flag reactions included in Cycles for elimination in operators
                   NUMRXNS = NIRRRXNS( NOUT ) + NR
                   IF ( NUMRXNS .GT. MAXTERMS ) THEN
                      WRITE( MSG, 94560 )
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      WRITE( MSG, 94580 ) NOUT, IRRNAME( NOUT )
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      LERROR = .TRUE.
                      GO TO 300
                   END IF
@@ -615,9 +616,9 @@ c..Flag reactions included in Cycles for elimination in operators
                NUMRXNS = NIRRRXNS( NOUT ) + 1
                IF ( NUMRXNS .GT. MAXTERMS ) THEN
                   WRITE( MSG, 94560 )
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   WRITE( MSG, 94580 ) NOUT, IRRNAME( NOUT )
-                  CALL M3MESG( MSG )
+                  CALL LOG_MESSAGE( LOGDEV ,  MSG )
                   LERROR = .TRUE.
                   GO TO 300 
                END IF
@@ -666,13 +667,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF ( NUMOUTPOS .GT. MAXTERMS .OR. NUMOUTNEG .GT. MAXTERMS .OR.
      &     NUMOUTIND .GT. MAXTERMS ) THEN
          WRITE( MSG, 94600 )  MAXTERMS
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          LERREND = .TRUE.
       END IF
 
       IF ( LFULLIRR .AND. NRXNS .GT. MAXIRROUT ) THEN
          WRITE( MSG, 94610 )  MAXIRROUT
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          LERREND = .TRUE.
       END IF
 
@@ -689,12 +690,12 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                FAMMEMNAM( NFAM,N ) ) THEN
                      IF ( LFIRST ) THEN
                         WRITE( MSG, 94620 ) 
-                        CALL M3MESG( MSG )
+                        CALL LOG_MESSAGE( LOGDEV ,  MSG )
                         LFIRST = .FALSE.
                      END IF
                      WRITE( MSG, 94640 ) NFAM, FAMNAME( NFAM ), 
      &                                   FAMMEMNAM( N,NMEM )
-                     CALL M3MESG( MSG )
+                     CALL LOG_MESSAGE( LOGDEV ,  MSG )
                      LERROR = .TRUE.
                   END IF
                END IF
@@ -722,10 +723,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF ( LDIFF ) THEN
             LERROR = .TRUE.
             WRITE( MSG, 94650 ) NFAM, FAMNAME( NFAM ) 
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
             DO NMEM = 1, NUMFAMMEM( NFAM )
                WRITE( MSG,94652 ) NMEM, FAMMEMNAM( NFAM,NMEM ), SP_UNITS( NMEM ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
             END DO
          END IF
       END DO                   
@@ -739,11 +740,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF ( .NOT. LCYUSED( NCYC ) ) THEN
             IF ( LFIRST ) THEN 
                WRITE( MSG, 94660 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                LFIRST = .FALSE.
             END IF
             WRITE( MSG, 94680 ) NCYC, CYCLNAME( NCYC )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
          END IF
       END DO
 
@@ -752,11 +753,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          IF ( .NOT. LRXUSED( NRXS ) ) THEN
             IF ( LFIRST ) THEN 
                WRITE( MSG, 95700 ) 
-               CALL M3MESG( MSG )
+               CALL LOG_MESSAGE( LOGDEV ,  MSG )
                LFIRST = .FALSE.
             END IF
             WRITE( MSG, 95720 ) NRXS, RXSUMNAME( NRXS )
-            CALL M3MESG( MSG )
+            CALL LOG_MESSAGE( LOGDEV ,  MSG )
          END IF
       END DO
 
@@ -766,11 +767,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 999   CONTINUE
       IF ( LERREND ) THEN
          WRITE( MSG, 95740 )
-         CALL M3MESG( MSG )
-         CALL M3EXIT( 'ERRCHECK', IZERO, IZERO, ' ', XSTAT1 )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
+         CALL M3EXIT( 'PA_ERRCHECK', IZERO, IZERO, ' ', XSTAT1 )
       ELSE
          WRITE( MSG, 95760 )
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          RETURN
       END IF
  

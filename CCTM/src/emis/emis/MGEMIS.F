@@ -40,6 +40,7 @@ C   09 Jul 24 G. Sarwar - updated for halogen chemistry in CRACMM3M
       USE RUNTIME_VARS
       USE HGRD_DEFN
       USE DESID_VARS
+      use mio_module
 #ifdef mpas
       use util_module
 #endif
@@ -177,7 +178,7 @@ C Allocate MG arrays using NMGSPC value
 	    
             IF ( STATUS .NE. 0 ) THEN
                XMSG = '*** VDEMIS_MG, memory allocation failed'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
 
@@ -186,7 +187,7 @@ C Allocate MG arrays using NMGSPC value
      &                 SEAICE( NCOLS,NROWS ), STAT = STATUS )
             IF ( STATUS .NE. 0 ) THEN
               XMSG = '*** DMSL, TSEASFC, U10, or SEAICE memory'
-              CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+              CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
               SUCCESS = .FALSE.; RETURN
             END IF   
             U10     = 0.0
@@ -210,7 +211,7 @@ C Allocate diagnostic arrays
      &                     WRMG_SPC( NMGDIAG ), STAT = STATUS )
                 IF ( STATUS .NE. 0 ) THEN
                     XMSG = '*** MGOUTD or WRMG_SPC memory alloc failed'
-                    CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                    CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                     SUCCESS = .FALSE.; RETURN
                 END IF
 
@@ -232,7 +233,7 @@ C Open the marine gas emission dignostic file
      &                     WRMG( NCOLS,NROWS ), STAT = STATUS )
                 IF ( STATUS .NE. 0 ) THEN
                    XMSG = '*** MGBF or WRMG memory allocation failed'
-                   CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+                   CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                    SUCCESS = .FALSE.; RETURN
                 END IF
                 MGBF = 0.0
@@ -267,59 +268,15 @@ C Local variables:
 
          INTEGER      V, L       ! loop induction variables
          
-#ifdef mpas
-         integer :: io_mode
-#endif
-
 C-----------------------------------------------------------------------
 
 #ifdef mpas
-         if (ncd_64bit_offset) then
-            io_mode = ior (nf90_noclobber, nf90_64bit_offset)
-         else
-            io_mode = nf90_noclobber
-         end if
-
-         call mio_fcreate (CTM_MGEM_1, io_mode)
+         call mio_fcreate (CTM_MGEM_1, mio_new_file)
 
 #else
 
-C Try to open existing file for update
-         IF ( .NOT. OPEN3( CTM_MGEM_1, FSRDWR3, PNAME ) ) THEN
-            XMSG = 'Could not open CTM_MGEM_1 for update - '
-     &           // 'try to open new'
-            CALL M3MESG( XMSG )
-
-C Set output file characteristics based on COORD.EXT and open diagnostic file
-            FTYPE3D = GRDDED3
-            SDATE3D = JDATE
-            STIME3D = JTIME
-            TSTEP3D = TSTEP
-            CALL NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
-
             NVARS3D = NMGDIAG
-            NCOLS3D = GL_NCOLS
-            NROWS3D = GL_NROWS
             NLAYS3D = 1
-            NTHIK3D = 1
-            GDTYP3D = GDTYP_GD
-            P_ALP3D = P_ALP_GD
-            P_BET3D = P_BET_GD
-            P_GAM3D = P_GAM_GD
-            XORIG3D = XORIG_GD
-            YORIG3D = YORIG_GD
-            XCENT3D = XCENT_GD
-            YCENT3D = YCENT_GD
-            XCELL3D = XCELL_GD
-            YCELL3D = YCELL_GD
-            VGTYP3D = VGTYP_GD
-            VGTOP3D = VGTOP_GD
-!           VGTPUN3D = VGTPUN_GD ! currently, not defined
-            DO L = 1, NLAYS3D + 1
-               VGLVS3D( L ) = VGLVS_GD( L )
-            END DO
-!           GDNAM3D = GDNAME_GD
-            GDNAM3D = GRID_NAME  ! from HGRD_DEFN
 
             DO V = 1, NMGDIAG
                VTYPE3D( V ) = M3REAL
@@ -329,15 +286,10 @@ C Set output file characteristics based on COORD.EXT and open diagnostic file
      &                     // ' marine gas emission rate'
             END DO
 
-            FDESC3D( 1 ) = 'hourly layer-1 marine gas emission rates'
-            DO L = 2, MXDESC3
-               FDESC3D( L ) = ' '
-            END DO
-
             ! Store MIO Metadata
-            NDIMS3D( 1:NVARS3D ) = 3
+            NDIMS3D( 1:NVARS3D ) = 4
             L_TSTEP( 1:NVARS3D ) = .True.
-            L_LAY  ( 1:NVARS3D ) = .False.
+            L_LAY  ( 1:NVARS3D ) = .True. ! even if 2D
             L_COL  ( 1:NVARS3D ) = .True.
             L_ROW  ( 1:NVARS3D ) = .True.
             L_VEXT ( 1:NVARS3D ) = .False.
@@ -349,13 +301,6 @@ C Set output file characteristics based on COORD.EXT and open diagnostic file
      &           L_VEXT(1:NVARS3D) )
             
 
-C Open marine gas emissions diagnostic file
-            IF ( .NOT. OPEN3( CTM_MGEM_1, FSNEW3, PNAME ) ) THEN
-               XMSG = 'Could not create the CTM_MGEM_1 file'
-               CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-            END IF
-
-         END IF
 #endif
 
          RETURN
@@ -473,9 +418,9 @@ C Local Variables:
             REAL, PARAMETER :: ONESIXHUNDREDS = 1.0 / 600.0    ! 1.0 / 600.0
 
             LOGICAL, SAVE   :: FIRST_TIME = .TRUE.
-#ifdef mpas
+            LOGICAL, SAVE   :: FIRSTWRITE = .TRUE.
+
             CHARACTER( 20 ) :: time_stamp
-#endif
 
 C----------------------------- Begin calc ------------------------------
 
@@ -654,9 +599,6 @@ C Then reset the MG emissions array and local write counter.
 
              IF ( WSTEP .GE. TIME2SEC( TSTEP( 1 ) ) ) THEN
                 IWSTEP = 1.0 / REAL( WSTEP )
-#ifdef mpas
-                call mio_time_format_conversion (jdate, jtime, time_stamp)
-#else
 
                 IF ( .NOT. CURRSTEP( JDATE, JTIME, STDATE, STTIME, TSTEP( 1 ),
      &                                MDATE, MTIME ) ) THEN
@@ -664,15 +606,8 @@ C Then reset the MG emissions array and local write counter.
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT3 )
                 END IF
                 CALL NEXTIME( MDATE, MTIME, TSTEP( 1 ) )
-#ifdef parallel_io
-                IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-                  IF ( .NOT. OPEN3( CTM_MGEM_1, FSREAD3, PNAME ) ) THEN
-                       XMSG = 'Could not open ' // TRIM(CTM_MGEM_1)
-                       CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-                  END IF
-                END IF
-#endif
-#endif
+                call mio_time_format_conversion (mdate, mtime, time_stamp)
+
                 DO V = 1, NMGDIAG
                    DO R = 1, NROWS
                       DO C = 1, NCOLS
@@ -682,11 +617,20 @@ C Then reset the MG emissions array and local write counter.
 #ifdef mpas
                    call mio_fwrite (CTM_MGEM_1, WRMG_SPC(V), pname, WRMG(:,1), time_stamp)
 #else
-                   IF ( .NOT. WRITE3( CTM_MGEM_1, WRMG_SPC( V ),
-     &                        MDATE, MTIME, WRMG ) ) THEN
-                     XMSG = 'Couldnt write ' // CTM_MGEM_1 // 'file'
-                     CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-                   END IF
+
+                   if ( firstwrite ) then
+                      firstwrite = .false.
+                      call mio_setfile( INIT_CONC_1 )
+                      mio_nlays = 1
+                      call mio_fcreate( CTM_MGEM_1, mio_new_file )
+                      if (mype .eq. 0) then
+                         call mio_set_global_attr ( CTM_MGEM_1, 'NLAYS', 1 )
+                         call mio_set_global_attr ( CTM_MGEM_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+                      end if
+                   end if
+
+                   call mio_fwrite( CTM_MGEM_1, WRMG_SPC( V ),
+     &                              pname, WRMG, time_stamp )
 #endif
                END DO
 #ifdef mpas

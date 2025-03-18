@@ -23,15 +23,17 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 C returns the last data date & time on file FNAME
 C specifically used only for input files
 
-C   10 Jan 24 D. Wong: Incorporated unified coupler implmentation
+C   10 Jan 24 D. Wong: Incorporated unified coupler implementation
 
       USE UTILIO_DEFN
+      use mio_module
+      USE LOGDEV_MOD, ONLY: M3EXIT
 #ifdef twoway
       USE coupler_module
 #endif
 
       IMPLICIT NONE
- 
+      
 C Includes:
  
       INCLUDE SUBST_FILES_ID    ! file name parameters
@@ -50,31 +52,27 @@ C local variables:
       CHARACTER( 96 ) :: XMSG = ' '
 
       INTEGER      LSTEP
-
+      integer      floc, nsteps, tstep
 C-----------------------------------------------------------------------
 
-C open existing file for readonly access
-
 #ifndef mpas
+
 #ifdef twoway
       LSTEP = coupled_model_tstep
       LDATE = coupled_model_stdate
       LTIME = coupled_model_sttime
 #else
-      IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
-         XMSG = 'Could not open '// FNAME
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
-         END IF
-
-      IF ( .NOT. DESC3( FNAME ) ) THEN
-         XMSG = 'Could not get ' // FNAME // ' file description'
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
-         END IF
- 
-      LSTEP = SEC2TIME( ( MXREC3D - 1 ) * TIME2SEC( TSTEP3D ) )
-      LDATE = SDATE3D
-      LTIME = STIME3D
+      floc = mio_search( fname )
+      if (floc .le. 0 ) then
+         xmsg = 'ERROR: file ' // trim(fname) // ' unknown'
+         call m3exit(pname, 0, 0, xmsg, 1)
+      end if
+      tstep = mio_file_data(floc)%tstep
+      nsteps = mio_file_data(floc)%nsteps
+      LSTEP = SEC2TIME( ( nsteps - 1 ) * TIME2SEC( tstep ) )
+      call mio_get_global_attr( fname, 'SDATE', LDATE )
 #endif
+
       CALL NEXTIME( LDATE, LTIME, LSTEP )
 #endif
  

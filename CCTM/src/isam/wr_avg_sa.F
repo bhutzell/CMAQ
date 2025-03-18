@@ -34,6 +34,7 @@ C-----------------------------------------------------------------------
       USE SA_DEFN
       USE RUNTIME_VARS
       USE MIO_ASCII
+      USE MIO_MODULE
 
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -62,14 +63,16 @@ C Local variables:
       CHARACTER( 16 ) :: ACONC_END_TIME = 'ACONC_END_TIME'
       CHARACTER( 80 ) :: VARDESC = ' '
       CHARACTER( 96 ) :: XMSG = ' '
+      CHARACTER( 20 ) :: TIME_STAMP
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
       LOGICAL OK
 
       INTEGER      L, K, KD, VAR, SPC ! loop counters
       INTEGER      STATUS
 
-      INTEGER, SAVE :: A_NLYS
+      INTEGER, SAVE :: A_NLAYS
 
       INTEGER TSTEP_RF, NTHIK_RF, NCOLS_RF, NROWS_RF, GDTYP_RF
       REAL( 8 ) :: P_ALP_RF, P_BET_RF, P_GAM_RF
@@ -83,198 +86,34 @@ C-----------------------------------------------------------------------
       IF ( FIRSTIME ) THEN
 
          FIRSTIME = .FALSE.
-         MDATE = JDATE; MTIME = JTIME
-         IF ( END_TIME ) THEN 
-            CALL NEXTIME ( MDATE, MTIME, TSTEP )
-         END IF
-
-C Try to open existing file for update
 
          IF ( AISAM_ELEV .EQ. -1 ) AISAM_ELEV = NLAYS
+         A_NLAYS = AISAM_ELEV - AISAM_BLEV + 1
 
-         A_NLYS = AISAM_ELEV - AISAM_BLEV + 1
+         IF ( MYPE .EQ. 0 ) THEN
 
-         OK = OPEN3( SA_ACONC_1, FSRDWR3, PNAME )
-         CALL SUBST_GLOBAL_LOGICAL( OK, 'AND' )
-         IF ( .NOT. OK ) THEN
+            NVARS3D = N_SPCTAG
+            NLAYS3D = A_NLAYS
+            VNAME3D( 1:NVARS3D ) = VNAM_SPCTAG
+            UNITS3D( 1:NVARS3D ) = VUN_SPCTAG
+            VTYPE3D = M3REAL
+            VDESC3D = 'tracer conc.'
 
-            XMSG = 'Could not open ' // TRIM( SA_ACONC_1 )
-     &           // ' file for update - try to open new'
-            CALL M3MESG( XMSG )
-
-            IF ( MYPE .EQ. 0 ) THEN
-
-C Get default file header attibutes from CONC file (assumes file already open)
-
-               IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
-                  XMSG = 'Could not get '
-     &                 // TRIM( SA_CONC_1 )
-     &                 // ' file description'
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-
-C Set file header attributes that differ from CONC and open the file
-
-               SDATE3D = MDATE
-               STIME3D = MTIME
-               TSTEP3D = TSTEP
-               NLAYS3D = A_NLYS
-
-               L = 0
-               DO K = AISAM_BLEV, AISAM_ELEV
-                  L = L + 1
-                  VGLVS3D( L ) = VGLVS_GD( K )
-               END DO
-               GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-               FDESC3D( 1 ) = 'Src Apportionment file output '
-               FDESC3D( 2 ) = 
-     &                'Averaged over the synchronization time steps '
-               FDESC3D( 3 ) = 
-     &              'Timestamp represents beginning computed date/time '
-               FDESC3D( 4 ) = 'Layer mapping (ISAM to AISAM):'
-               KD = 4
-               VAR = AISAM_BLEV
-               L = 0
-               DO K = KD + 1, MIN ( A_NLYS + KD, MXDESC3 )
-                  L = L + 1
-                  WRITE( FDESC3D( K ),'( "Layer", I3, " to", I3, " " )' )
-     &            VAR + L - 1, L
-               END DO
-               IF ( ( KD + 1 + L ) .LT. MXDESC3 ) THEN
-                  DO K = KD + 1 + L, MXDESC3
-                     FDESC3D( K ) = ' '
-                  END DO
-               END IF
-
-               WRITE( LOGDEV,* ) ' '
-               WRITE( LOGDEV,* ) 
-     &                  '      Avg ISAM File Header Description:'
-               DO K = 1, KD + L
-                  WRITE( LOGDEV,* ) '    => ',
-     &            TRIM( FDESC3D( K ) )
-               END DO
-
-               ! Store MIO Metadata
-               NDIMS3D( 1:NVARS3D ) = 4
-               L_TSTEP( 1:NVARS3D ) = .True.
-               L_LAY  ( 1:NVARS3D ) = .True.
-               L_COL  ( 1:NVARS3D ) = .True.
-               L_ROW  ( 1:NVARS3D ) = .True.
-               L_VEXT ( 1:NVARS3D ) = .False.
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
               
-               CALL LOAD_MIO_FILE ( 'SA_ACONC_1', A_NLYS, AISAM_BLEV, AISAM_ELEV,
-     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &              L_VEXT(1:NVARS3D) )
+            CALL LOAD_MIO_FILE ( SA_ACONC_1, A_NLAYS, AISAM_BLEV, AISAM_ELEV,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
 
- 
-               IF ( .NOT. OPEN3( SA_ACONC_1, FSNEW3, PNAME ) ) THEN
-                  XMSG = 'Could not open '
-     &                 // TRIM( SA_ACONC_1 ) // ' file'
-                  CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-               END IF
-
-            END IF   ! MYPE = 0
-
-         ELSE
-
-C File exists. Make sure it matches requested output.
-
-            IF ( .NOT. DESC3( SA_CONC_1 ) ) THEN
-               XMSG = 'Could not get '
-     &              // TRIM( SA_CONC_1 )
-     &              // ' file description'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-
-            TSTEP_RF = TSTEP3D
-            NTHIK_RF = NTHIK3D
-            NCOLS_RF = NCOLS3D
-            NROWS_RF = NROWS3D
-            GDTYP_RF = GDTYP3D
-            P_ALP_RF = P_ALP3D
-            P_BET_RF = P_BET3D
-            P_GAM_RF = P_GAM3D
-            XCENT_RF = XCENT3D
-            YCENT_RF = YCENT3D
-            XORIG_RF = XORIG3D
-            YORIG_RF = YORIG3D
-            XCELL_RF = XCELL3D
-            YCELL_RF = YCELL3D
-            VGTYP_RF = VGTYP3D
-            VGTOP_RF = VGTOP3D
-
-            IF ( .NOT. DESC3( SA_ACONC_1 ) ) THEN
-               XMSG = 'Could not get '
-     &              // TRIM( SA_ACONC_1 )
-     &              // ' file description'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-
-            IF ( N_SPCTAG .NE. NVARS3D ) THEN
-               WRITE( XMSG, '( A, 2I6 )' )
-     &         'Number of variables don''t match file: ', N_SPCTAG, NVARS3D
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-
-            DO SPC = 1, N_SPCTAG
-               DO VAR = 1, NVARS3D
-                  IF ( VNAM_SPCTAG( SPC ) .EQ. VNAME3D( VAR ) ) GO TO 101
-               END DO
-               XMSG = 'Could not find ' // VNAM_SPCTAG( SPC )
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-101            CONTINUE
-            END DO
-
-            IF ( A_NLYS .NE. NLAYS3D ) THEN
-               WRITE( XMSG, '( A, 2I6 )' )
-     &         'Number of layers don''t match file: ', A_NLYS, NLAYS3D
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-
-C Check other header data with CONC file as reference
-
-            IF ( TSTEP_RF .NE. TSTEP3D .OR.
-     &           NTHIK_RF .NE. NTHIK3D .OR.
-     &           NCOLS_RF .NE. NCOLS3D .OR.
-     &           NROWS_RF .NE. NROWS3D .OR.
-     &           GDTYP_RF .NE. GDTYP3D ) THEN
-                 XMSG = 'Header inconsistent on existing SA_ACONC_1'
-                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( P_ALP_RF .NE. P_ALP3D .OR.
-     &           P_BET_RF .NE. P_BET3D .OR.
-     &           P_GAM_RF .NE. P_GAM3D ) THEN
-                 XMSG = 'Header inconsistent on existing SA_ACONC_1'
-                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( XCENT_RF .NE. XCENT3D .OR.
-     &           YCENT_RF .NE. YCENT3D ) THEN
-                 XMSG = 'Header inconsistent on existing SA_ACONC_1'
-                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( XORIG_RF .NE. XORIG3D .OR.
-     &           YORIG_RF .NE. YORIG3D ) THEN
-               XMSG = 'Header inconsistent on existing SA_ACONC_1'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( XCELL_RF .NE. XCELL3D .OR.
-     &           YCELL_RF .NE. YCELL3D ) THEN
-               XMSG = 'Header inconsistent on existing SA_ACONC_1'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( VGTYP_RF .NE. VGTYP3D ) THEN
-               XMSG = 'Header inconsistent on existing SA_ACONC_1'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( VGTOP_RF .NE. VGTOP3D ) THEN
-               XMSG = 'Header inconsistent on existing SA_ACONC_1'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-
-         END IF   ! .NOT. OPEN SA_ACONC_1
+         END IF   ! MYPE = 0
 
          RETURN    ! Initialization of MIO File
 
@@ -284,8 +123,22 @@ C Check other header data with CONC file as reference
       IF ( .NOT. END_TIME ) THEN
          CALL NEXTIME( MDATE, MTIME, -TSTEP)
       END IF
-      IF ( .NOT. ALLOCATED( BUF4 ) ) ALLOCATE( BUF4( NCOLS, NROWS, A_NLYS, N_SPCTAG ) )
+      call mio_time_format_conversion( MDATE, MTIME, TIME_STAMP )
 
+      IF ( FIRSTWRITE ) THEN
+         FIRSTWRITE = .FALSE.
+! If not writing all layers, change dimension mio_nlays before file creation, 
+! then change global attribute NLAYS to match
+         call mio_setfile( INIT_CONC_1 )
+         if ( A_NLAYS .lt. NLAYS ) mio_nlays = A_NLAYS
+         call mio_fcreate( SA_ACONC_1, mio_new_file )
+         if ( mype == 0 ) then
+            call mio_set_global_attr( SA_ACONC_1, 'NLAYS', A_NLAYS )
+            call mio_set_global_attr( SA_ACONC_1, 'VGLVLS', INIT_CONC_1, AISAM_BLEV, AISAM_ELEV+1 )
+         end if
+      END IF
+
+      IF ( .NOT. ALLOCATED( BUF4 ) ) ALLOCATE( BUF4( NCOLS, NROWS, A_NLAYS, N_SPCTAG ) )
     
       DO SPC = 1, N_SPCTAG
          L = 0
@@ -293,14 +146,9 @@ C Check other header data with CONC file as reference
           L = L + 1
           BUF4( :,:,L,SPC ) = AISAM( :,:,L, S_SPCTAG(SPC), T_SPCTAG(SPC) )
          ENDDO !
-         IF ( .NOT. WRITE3( SA_ACONC_1, VNAM_SPCTAG( SPC ),
-     &      MDATE, MTIME, BUF4( :,:,:,SPC ) ) ) THEN
-            XMSG = 'Could not write '
-     &           // VNAM_SPCTAG( SPC )
-     &           // ' to ' // SA_ACONC_1
-            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-         END IF
 !     write( logdev,* ) ' <>var, A_GC_SPC: ', VAR, A_GC_SPC( SPC )
+         call mio_fwrite( SA_ACONC_1, VNAM_SPCTAG( SPC ),
+     &                    PNAME, BUF4( :,:,:,SPC ), TIME_STAMP )
       END DO
  
       WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )

@@ -107,47 +107,47 @@ C                      where the same information can be obtained from WRF struc
 C                      config_flags that is passed to subroutine twoway_aqprep
 C-----------------------------------------------------------------------
 
-      USE RXNS_DATA             ! chemical mechanism data
-      USE CENTRALIZED_IO_MODULE
-      USE ASX_DATA_MOD, Only : MET_DATA, INIT_MET, GET_MET
-      USE LSM_MOD
-      USE WVEL_DEFN             ! derived vertical velocity component
-      USE BUDGET_DEFN
       USE AERO_DATA
-      USE SOA_DEFN, ONLY : MAP_OA
+      USE ASX_DATA_MOD, Only : MET_DATA, INIT_MET, GET_MET
+      USE AVG_CONC              ! integral average CONC
+      USE BIDI_MOD, Only : INIT_BIDI
+      USE BUDGET_DEFN
+      USE CENTRALIZED_IO_MODULE
+      USE CGRID_SPCS            ! CGRID mechanism species
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP, ELMO_INIT_SHARED
       USE ELMO_PROC, ONLY : ELMO_DRIVER
+      USE HLCONST_MOD
+      USE LSM_MOD
+      USE lus_data_module
+      use mio_module
+      USE MIO_ASCII
+      USE PA_DEFN, Only: LIPR, LIRR  ! Process Analysis control and data variables
+      USE PAGRD_DEFN            ! Process Analysis horiz domain specs
+      USE PCGRID_DEFN           ! inherits GRID_CONF
+      USE RUNTIME_VARS
+      USE RXNS_DATA             ! chemical mechanism data
+      USE SOA_DEFN, ONLY : MAP_OA
+      USE STD_CONC              ! standard CONC
       USE UTILIO_DEFN
       USE util_Family_module
-      USE RUNTIME_VARS
-      USE STD_CONC              ! standard CONC
-      USE CGRID_SPCS            ! CGRID mechanism species
+      USE WVEL_DEFN             ! derived vertical velocity component
 #ifdef mpas
-      USE HGRD_DEFN, ONLY: MYPE
       use coupler_module
-      use VGRD_DEFN, ONLY : NLAYS
-      use HGRD_DEFN, ONLY : NCOLS, NROWS
-
-      use mydata_module
       use get_env_module
+      USE HGRD_DEFN, ONLY: MYPE, NCOLS, NROWS
       use lus_defn
-      use mio_module
+      use mydata_module
+      use VGRD_DEFN, ONLY : NLAYS
 #else
 #ifdef twoway
       use coupler_module, only : coupled_model_stdate, coupled_model_sttime
+      use twoway_data_module
+      use sd_time_series_module
 #endif
-      USE PCGRID_DEFN           ! inherits GRID_CONF
-      USE AVG_CONC              ! integral average CONC
-      USE PA_DEFN, Only: LIPR, LIRR  ! Process Anaylsis control and data variables
-      USE PAGRD_DEFN            ! Process Anaylsis horiz domain specs
-
-      USE BIDI_MOD, Only : INIT_BIDI
 
 #ifdef isam
-c     USE SA_LAYERS
       USE SA_DEFN
-      USE PISAM_DEFN            ! SA array definition (borrowed )
-c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
+      USE PISAM_DEFN
 #endif
 
 #ifdef sens
@@ -157,23 +157,11 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
 
 #ifdef parallel
       USE VERTEXT_MODULE
-#endif
-      USE lus_data_module
-
-#ifdef twoway
-      use twoway_data_module
-      use sd_time_series_module
-#endif
-
-#ifdef parallel
       USE SE_MODULES            ! stenex (using SE_INIT_MODULE)
 #else
       USE NOOP_MODULES          ! stenex (using NOOP_INIT_MODULE)
 #endif
-#endif   ! end mpas
-
-      USE MIO_ASCII
-      USE HLCONST_MOD
+#endif   
 
       IMPLICIT NONE
 
@@ -185,7 +173,6 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
 
 #ifdef mpas
       real, parameter :: cmin = 1.0E-30
-
       integer :: ncols_gl
 #endif
 
@@ -220,7 +207,6 @@ C Local variables:
       REAL( 8 )         :: CPU_TIME_START, CPU_TIME_FINISH
       REAL              :: REAL_TIME
 
-
       CHARACTER(  2 ) :: COLROW = 'CR'  ! col/row arg list order
       CHARACTER( 16 ) :: PNAME = 'DRIVER'
       CHARACTER( 96 ) :: XMSG = ' '
@@ -238,8 +224,6 @@ C Local variables:
 
 #ifdef mpas
 
-      integer :: io_mode
-
       INTEGER      SPC_STRT, SPC_FINI, J
       LOGICAL      LSTAT
       INTEGER      STAT                       ! Status reported by Aerosol Dist Checker
@@ -252,11 +236,9 @@ C Local variables:
                                            !      Before
                                            !      (N, M2, M3) -
                                            !      After
-      REAL,ALLOCATABLE :: AECON( : )
-
+      REAL, ALLOCATABLE :: AECON( : )
       REAL( 8 ) :: BEGTIME     ! Wall-clock time (sec) at MPI initialization
       LOGICAL       :: L_WRITE_WARNING
-
 
 #endif
 
@@ -265,6 +247,16 @@ C Local variables:
             REAL, POINTER            :: CGRID( :,:,:,: )
             INTEGER, INTENT( OUT )   :: TSTEP( 3 )
          END SUBROUTINE INITSCEN
+         SUBROUTINE SCIPROC ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+            REAL, POINTER            :: CGRID( :,:,:,: )
+            INTEGER, INTENT( INOUT ) :: JDATE, JTIME
+            INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
+         END SUBROUTINE SCIPROC
+         SUBROUTINE INIT_CCTM_MODULES ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+            REAL, POINTER            :: CGRID( :,:,:,: )
+            INTEGER, INTENT( INOUT ) :: JDATE, JTIME
+            INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
+         END SUBROUTINE INIT_CCTM_MODULES
 #ifndef mpas
          SUBROUTINE ADVSTEP ( JDATE, JTIME, TSTEP, ASTEP, NREPS )
             INTEGER, INTENT( IN )    :: JDATE, JTIME
@@ -293,6 +285,10 @@ C Local variables:
             REAL, POINTER            :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )    :: JDATE, JTIME
          END SUBROUTINE PA_OUTPUT
+         subroutine wr_init ( cgrid, jdate, jtime, tstep )
+            real, pointer            :: cgrid( :,:,:,: )
+            integer, intent( in )    :: jdate, jtime, tstep
+         end subroutine wr_init
 #ifdef isam
          SUBROUTINE WR_SA ( JDATE, JTIME, TSTEP, NSTEPS )
             IMPLICIT NONE
@@ -320,16 +316,6 @@ C Local variables:
 #endif
 #endif
 
-         SUBROUTINE SCIPROC ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
-            REAL, POINTER            :: CGRID( :,:,:,: )
-            INTEGER, INTENT( INOUT ) :: JDATE, JTIME
-            INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
-         END SUBROUTINE SCIPROC
-         SUBROUTINE INIT_CCTM_MODULES ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
-            REAL, POINTER            :: CGRID( :,:,:,: )
-            INTEGER, INTENT( INOUT ) :: JDATE, JTIME
-            INTEGER, INTENT( IN )    :: TSTEP( 3 ), ASTEP( : )
-         END SUBROUTINE INIT_CCTM_MODULES
 #ifdef mpas
          SUBROUTINE UNLOAD_CGRID ( CGRID )
             REAL, INTENT(IN)  :: CGRID( :,:,:,: )
@@ -340,9 +326,6 @@ C Local variables:
 C-----------------------------------------------------------------------
 
       IF ( FIRST_RUN ) THEN
-
-         ! Initialize variables for passing file data to MIO
-         CALL INIT_MIO_FILE_DATA()
 
          TSTEP = 0
 #ifdef mpas
@@ -381,7 +364,6 @@ C-----------------------------------------------------------------------
          IO_PE_INCLUSIVE = .TRUE.
 
          call mpi_allreduce (ncols, ncols_gl, 1, mpi_int, mpi_sum, mpi_comm_world, status)
-
          call mio_init (NPROCS, 1, ncols_gl, nrows, logdev=logdev)
 
 C Set CGRID mechanism
@@ -399,6 +381,7 @@ C Set CGRID mechanism
             call M3EXIT (PNAME, JDATE, JTIME, XMSG, 1)
          END IF
 
+
 C Set up horizontal domain, calculate processor-to-subdomain maps
 C and define vertical layer structure (in module GRID_CONF)
          IF ( .NOT. GRID_INIT ( NPROCS, MYPE ) ) THEN
@@ -411,8 +394,20 @@ C and define vertical layer structure (in module GRID_CONF)
 C Initialize Environment Variables
          JDATE = 0
          JTIME = 0
+#ifdef parallel
+         CALL MPI_COMM_RANK ( MPI_COMM_WORLD, MYPE, ERROR )
+         CALL MPI_COMM_SIZE ( MPI_COMM_WORLD, TOTPE, ERROR )
+#else
+         MYPE = 0
+         TOTPE = 1
+#endif
          CALL INIT_ENV_VARS( JDATE, JTIME )
 #endif
+
+         ! Initialize variables for passing file data to MIO
+         CALL INIT_MIO_FILE_DATA()
+
+         call mio_init( npcol, nprow, gl_ncols, gl_nrows, logdev )
 
 C Set up horizontal domain, calculate processor-to-subdomain maps
 C and define vertical layer structure (in module GRID_CONF)
@@ -421,16 +416,9 @@ C and define vertical layer structure (in module GRID_CONF)
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
-#ifdef verbose_driver
-         write( logdev,* ) ' MYPE -> NPROCS:   ', mype, nprocs
-         write( logdev,* ) ' MYPE -> NPCOL:    ', mype, npcol
-         write( logdev,* ) ' MYPE -> NPROW:    ', mype, nprow
-         write( logdev,* ) ' MYPE -> MY_NCOLS: ', mype, ncols
-         write( logdev,* ) ' MYPE -> MY_NROWS: ', mype, nrows
-         write( logdev,* ) ' MYPE -> GL_NCOLS: ', mype, gl_ncols
-         write( logdev,* ) ' MYPE -> GL_NROWS: ', mype, gl_nrows
-         write( logdev,* ) ' MYPE -> NLAYS:    ', mype, nlays
-         write( logdev,* ) ' MYPE -> NBNDY:    ', mype, nbndy
+#ifdef parallel
+         CALL WRSUBDMAP ( NPROCS, mio_domain_ncols_pe(:,1), mio_domain_nrows_pe(:,1), 
+     &                    mio_domain_colde_pe(:,:,1), mio_domain_rowde_pe(:,:,1), logdev )
 #endif
 
 C Set CGRID mechanism
@@ -452,10 +440,6 @@ C Initialize Global Arrays for Storing Chemical, Regional, Process,
 C and Emission Stream Families
          call read_families
 
-#ifdef verbose_driver
-         write( logdev,* ) ' MYPE -> NSPCS:    ', mype, nspcsd
-#endif
-
 #ifdef parallel_io
          IF ( MOD( MYPE, NPCOL ) .EQ. 0 ) THEN
 #else
@@ -466,43 +450,12 @@ C and Emission Stream Families
             IO_PE_INCLUSIVE = .FALSE.
          END IF
 
-#ifdef parallel
-C Initialize PARIO
-         IF ( .NOT. PIO_INIT( COLROW, GL_NCOLS, GL_NROWS, NLAYS, NTHIK,
-     &                        NCOLS, NROWS, NPCOL, NPROW, NPROCS, MYPE,
-     &                        wflg = WFLG, io_pe_inclusive = IO_PE_INCLUSIVE ) ) THEN
-            XMSG = 'Failed to initialize parallel I/O library.'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-
-#endif
 C Initialize stencil exchange
          CALL SUBST_SE_INIT( NPROCS, NPCOL, NPROW, GL_NCOLS, GL_NROWS, NLAYS,
      &                       NSPCSD, MYPE, MNDIS, MEDIS, MSDIS, MWDIS )
 
-
-#ifdef verbose_driver
-         write( logdev,* ) ' MYPE -> MNDIS:    ', mype, mndis
-         write( logdev,* ) ' MYPE -> MEDIS:    ', mype, medis
-         write( logdev,* ) ' MYPE -> MSDIS:    ', mype, msdis
-         write( logdev,* ) ' MYPE -> MWDIS:    ', mype, mwdis
-#endif
-
 C Generate the process analysis data: load PA_DEFN module
          CALL PA_DATAGEN( )
-
-C Abort if the number of output variables exceeds the maximum allowed
-C by I/O-API
-         IF ( NSPCSD .GT. MXVARS3 ) THEN
-            WRITE( XMSG,'(5X, A, I5, A)' ) 'The number of variables,', NSPCSD,
-     &      ' to be written to the State CGRID File'
-            CALL LOG_MESSAGE( LOGDEV, XMSG )
-            WRITE( XMSG,'(5X, A, I5)' ) 'exceeds the I/O-API limit:', MXVARS3
-            CALL LOG_MESSAGE( LOGDEV, XMSG )
-            XMSG = 'Recompile with an I/O-API lib having a larger MXVARS3'
-            CALL LOG_MESSAGE( LOGDEV, XMSG )
-            CALL M3EXIT( PNAME, JDATE, JTIME, ' ', XSTAT1 )
-         END IF
 
 C Initialize PCGRID
          IF ( .NOT. PCGRID_INIT () ) THEN
@@ -512,14 +465,13 @@ C Initialize PCGRID
       
          CGRID => PCGRID( 1:NCOLS,1:NROWS,:,: )   ! required for PinG
 
-C Initalize CONC definitions (in STD_CONC F90 module)
+C Initialize CONC definitions (in STD_CONC F90 module)
          CALL CONC_DEFN ()
 
 C Get avg CONC definitions, species and layer pointers (in AVG_CONC F90 module)
          CALL A_CONC_DEFN ()
 
 #ifdef isam
-c        CALL GET_SA_LAYS ()
          CALL SA_DIM()
 
 C Initialize PISAM
@@ -547,7 +499,7 @@ C Initialize ddm3d calculations
          SENGRID => S_PCGRID(1:NCOLS,1:NROWS,:,:,:)
          SENGRID_TEMP => S_PCGRID_TEMP(1:NCOLS,1:NROWS,:,:)
 
-         ALLOCATE ( SAGRID( NCOLS,NROWS,A_NLYS,NPMAX,N_ASPCS ), STAT = STATUS)
+         ALLOCATE ( SAGRID( NCOLS,NROWS,A_NLAYS,NPMAX,N_ASPCS ), STAT = STATUS)
          IF ( STATUS .NE. 0 ) THEN
             XMSG = 'SAGRID memory allocation failed'
             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
@@ -556,11 +508,10 @@ C Initialize ddm3d calculations
          SAGRID = 0.0
 #endif
 
+#endif  
 
-#endif  ! end of mpas
 
-
-C Initiliaze IO Arrays and Open Files
+C Initialize IO Arrays and Open Files
 #ifdef mpas
          call centralized_io_init (NCOLS_IN)
 #else
@@ -583,7 +534,7 @@ C Convention: the input file concentration units are always ppmV.
 
          IF ( LIPR .OR. LIRR ) CALL PA_INIT ( CGRID, JDATE, JTIME, TSTEP )
 
-         ALLOCATE ( AGRID( NCOLS,NROWS,A_NLYS,N_ASPCS ), STAT = ALLOCSTAT )
+         ALLOCATE ( AGRID( NCOLS,NROWS,A_NLAYS,N_ASPCS ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
             XMSG = 'AGRID memory allocation failed'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -604,8 +555,6 @@ C Convention: the input file concentration units are always ppmV.
          AISAM = 0.
 #endif
 
-
-
 #ifdef twoway
          IF ( SD_TIME_SERIES ) THEN
             CALL SD_TIME_SERIES_INIT ( LOGDEV, TSTEP( 3 ) )
@@ -617,43 +566,33 @@ C Convention: the input file concentration units are always ppmV.
          END IF
 #endif
 #else
-!       if (.not. lus_init (mminlu_mpas, lufrac_data(:,:,1)) ) then
-!          CALL M3EXIT( 'DRIVER',JDATE,JTIME,'ERROR: Cannot initialize Land Use Category', 2)
-!       end if
 
-        if (ncd_64bit_offset) then
-            io_mode = ior (nf90_noclobber, nf90_64bit_offset)
-         else
-            io_mode = nf90_noclobber
+         call mio_setfile ('GR_EMIS_001')
+
+         if (L_ELMO) then
+            call mio_fcreate (CTM_ELMO_1, mio_new_file)
          end if
-
-        call mio_setfile ('GR_EMIS_001')
-
-        if (L_ELMO) then
-           call mio_fcreate (CTM_ELMO_1, io_mode)
-        end if
 
          call get_env (mpas_diag, 'mpas_diag', .false.)
 
          if (mpas_diag) then
-            call mio_fcreate ('CTM_OUT', io_mode)
+            call mio_fcreate ('CTM_OUT', mio_new_file)
          end if
 
-
-!       call mio_fcreate (CTM_DRY_DEP_1, io_mode)
-!       call mio_fcreate (CTM_WET_DEP_1, io_mode)
+!       call mio_fcreate (CTM_DRY_DEP_1, mio_new_file)
+!       call mio_fcreate (CTM_WET_DEP_1, mio_new_file)
 
         if ( depv_diag ) then
-            call mio_fcreate (CTM_DEPV_DIAG, io_mode)
+            call mio_fcreate (CTM_DEPV_DIAG, mio_new_file)
         end if
 
         if ( cld_diag ) then
-            call mio_fcreate (CTM_WET_DEP_2, io_mode)
+            call mio_fcreate (CTM_WET_DEP_2, mio_new_file)
         end if
 
 !       if (photdiag) then
-!          call mio_fcreate (CTM_RJ_1, io_mode)
-!          call mio_fcreate (CTM_RJ_2, io_mode)
+!          call mio_fcreate (CTM_RJ_1, mio_new_file)
+!          call mio_fcreate (CTM_RJ_2, mio_new_file)
 !       end if
 
 #endif
@@ -663,6 +602,7 @@ C ELMO (e.g. AOD, extinction, Kz, etc.)
          CALL ELMO_INIT_SHARED()
 
 C Initialize Meteorology Structures
+
          CALL INIT_LSM( JDATE, JTIME )
 #ifndef mpas
          CALL INIT_BIDI( )
@@ -671,7 +611,8 @@ C Initialize Meteorology Structures
 
          CALL GET_MET ( JDATE, JTIME, 0 )
 
-         IF ( W_VEL ) CALL GET_WVEL( JDATE, JTIME ) ! If the user wants vertical velocity written to file, retrieve it.
+! If the user wants vertical velocity written to file, retrieve it.
+         IF ( W_VEL ) CALL GET_WVEL( JDATE, JTIME ) 
 
          call hlconst_init
 
@@ -737,7 +678,7 @@ C Main processing loop:
       CALL ADVSTEP ( JDATE, JTIME, TSTEP, ASTEP, NREPS )
 
       ! Initialize arrays for storing output data averaged across the
-      ! synchornization time step
+      ! synchronization time step
       IF ( MOD( TIME2SEC( JTIME ), TIME2SEC( TSTEP( 1 ) ) ) .EQ. 0 ) THEN
          DO V = 1, N_ASPCS
             S = AVG_CONC_MAP( V )
@@ -749,21 +690,21 @@ C Main processing loop:
 #endif if
          END DO
 #ifdef isam
-            IF ( AISAM_ELEV .EQ. -1 ) AISAM_ELEV = NLAYS
+         IF ( AISAM_ELEV .EQ. -1 ) AISAM_ELEV = NLAYS
 
-            DO ITAG = 1, NTAG_SA ! average isam
-               DO V = 1, NSPC_SA
-                  L = 0
-                  DO K = AISAM_BLEV, AISAM_ELEV
-                     L = L + 1
-                     DO R = 1, NROWS
-                        DO C = 1, NCOLS
-                           AISAM( C,R,L,V,ITAG ) = ISAM( C,R,K,V,ITAG )
-                        END DO
+         DO ITAG = 1, NTAG_SA ! average isam
+            DO V = 1, NSPC_SA
+               L = 0
+               DO K = AISAM_BLEV, AISAM_ELEV
+                  L = L + 1
+                  DO R = 1, NROWS
+                     DO C = 1, NCOLS
+                        AISAM( C,R,L,V,ITAG ) = ISAM( C,R,K,V,ITAG )
                      END DO
                   END DO
                END DO
             END DO
+         END DO
 #endif
 
          IF ( W_VEL )
@@ -779,16 +720,30 @@ C Main processing loop:
 
 C Initialize Modules
       IF ( L_INIT ) THEN
-          L_INIT = .FALSE.
-          call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
-          if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
+         L_INIT = .FALSE.
+         call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+         if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
 
-          CALL LOG_HEADING( LOGDEV, 'Time Integration' )
-
+         CALL SUBST_BARRIER ! ensure mio_ascii file written
+         CALL LOG_HEADING( LOGDEV, 'Time Integration' )
+C Initialize MIO 
+         call mio_init2
+      
       ELSE IF ( L_ELMO .AND. ELMO_NSTEP .LT. 1.0 ) THEN
           ! Calculate all ELMO Variables for averaging but do not output them
           CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN=.FALSE. )
 
+      END IF
+
+! Output Instantaneous Values at first time step
+      IF ( JDATE .EQ. STDATE .AND. JTIME .EQ. STTIME ) THEN
+         CALL WR_INIT ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
+#ifdef isam
+         CALL WR_SA     ( JDATE, JTIME, TSTEP, 1 )
+#endif
+         IF ( L_ELMO ) THEN
+            CALL WRITE_ELMO( JDATE, JTIME, TSTEP, .TRUE. )
+        END IF
       END IF
 
       ! science process sequence:
@@ -947,9 +902,6 @@ C Write Data to Output Files
 #endif
 
       IF ( LAST_STEP ) THEN
-#ifdef mpas
-         call mio_shutdown()
-#else
 C write CGRID state file for subsequent runs
          CALL WR_CGRID ( CGRID, JDATE, JTIME, TSTEP( 1 ) )
 #ifdef isam
@@ -959,21 +911,18 @@ C write CGRID state file for subsequent runs
          CALL WR_SENGRID ( JDATE, JTIME, TSTEP( 1 )  )
 #endif
 
-C Shut down IOAPI
-         IF ( SHUT3() ) THEN
-            WRITE( LOGDEV, * )
-            CALL LOG_HEADING( LOGDEV, 'Program Completed Successfully' )
-            WRITE( XMSG, '(A,A,A,I7,A,I6.6,A)' ) 'Date and time ',
-     &             DT2STR( JDATE, JTIME ), ' (',JDATE,':',JTIME,')' 
-            CALL LOG_MESSAGE( LOGDEV, XMSG ) 
+         WRITE( LOGDEV, * )
+         CALL LOG_HEADING( LOGDEV, 'Program Completed Successfully' )
+         WRITE( XMSG, '(A,A,A,I7,A,I6.6,A)' ) 'Date and time ',
+     &          DT2STR( JDATE, JTIME ), ' (',JDATE,':',JTIME,')' 
+         CALL LOG_MESSAGE( LOGDEV, XMSG ) 
 
-            IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
-            IF ( MYPE .EQ. 0 ) CALL LOG_HEADING( OUTDEV, 'Program Completed Successfully' )
-            IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
-         ELSE
-            CALL LOG_MESSAGE( LOGDEV, ' *** FATAL ERROR shutting down Models-3 I/O *** ' )
-         END IF
-#endif
+         IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
+         IF ( MYPE .EQ. 0 ) CALL LOG_HEADING( OUTDEV, 'Program Completed Successfully' )
+         IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
+
+         call mio_shutdown
+
       END IF
 
       ! Output Verification of MIO Input File

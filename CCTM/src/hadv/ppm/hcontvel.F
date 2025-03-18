@@ -71,6 +71,7 @@ C-----------------------------------------------------------------------
       USE NOOP_MODULES          ! stenex (using NOOP_COMM_MODULE)
 #endif
       use CENTRALIZED_IO_MODULE, only : interpolate_var, window
+      use mio_module
 #ifdef twoway
       use coupler_module
 #endif
@@ -123,6 +124,7 @@ C local variables:
       INTEGER   STEP              ! advection time step in seconds
       REAL      DJ                ! temporary Jacobian * air density
       INTEGER   ESTAT
+      integer   floc
  
       CHARACTER( 16 ) :: VNAME
       CHARACTER( 16 ) :: PNAME = 'HCONTVEL'
@@ -165,24 +167,23 @@ C-----------------------------------------------------------------------
 #ifdef twoway
          VNAME = 'UWINDC'
          IF ( INDEX1( VNAME, n_metdot3d_var, metdot3d_vlist ) .LE. 0 ) THEN
-            XMSG = 'Could not find ' // VNAME // ' in MET_DOT_3D'
-            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            XMSG = 'Could not find ' // VNAME // ' in metdot3d_vlist' 
+            CALL LOG_WARNING( PNAME, LOGDEV, XMSG)
             CSTAGUV = .FALSE.
          END IF
 #else
-         VNAME3D = ' '   ! array assignment
-         IF ( .NOT. DESC3( MET_DOT_3D ) ) THEN
-            XMSG = 'Could not get '
-     &           // TRIM( MET_DOT_3D ) // ' file description'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
+         floc = mio_search ( MET_DOT_3D )
+         if ( floc .le. 0 ) then
+            xmsg = 'Error: file ' // trim(MET_DOT_3D) // ' unknown.'
+            call m3exit( pname, jdate, jtime, xmsg, xstat1 )
+         end if
 
          VNAME = 'UWINDC'
-         IF ( INDEX1( VNAME, NVARS3D, VNAME3D ) .LE. 0 ) THEN
+         IF ( INDEX1( VNAME, mio_file_data(floc)%nvars, mio_file_data(floc)%var_name ) .LE. 0 ) THEN
             XMSG = 'Could not find ' // VNAME // ' in ' // MET_DOT_3D
-            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV, XMSG)
             CSTAGUV = .FALSE.
-         END IF
+         END IF            
 #endif
 
          IF ( .NOT. CSTAGUV ) THEN
@@ -237,10 +238,10 @@ C-----------------------------------------------------------------------
      &        // TRIM( MET_CRO_3D ) // ', '
      &        // TRIM( MET_BDY_3D ) // ' and '
      &        // TRIM( MET_DOT_3D )
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          WRITE( AMSG,'( 2I8 )' ) LDATE( 1 ), LTIME( 1 )
          XMSG = 'Using data for last file step: ' // AMSG
-         CALL M3MESG( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          MDATE = LDATE( 1 )
          MTIME = LTIME( 1 )
       END IF

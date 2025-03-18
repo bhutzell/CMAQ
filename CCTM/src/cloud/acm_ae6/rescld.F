@@ -784,7 +784,7 @@ C...convert removal change from moles/m**2 to kg/m**2 and kg/m**2 to kg/hectare
 #endif
 #ifdef isam
                      CSPC = 0
-                     CSPC = INDEXINT1(I,NSPC_SA,MAP_SAtoCGR(:))
+                     CSPC = INDEX1(I,NSPC_SA,MAP_SAtoCGR(:))
                      IF ( CSPC .GT. 0 ) THEN
                        DO ITAG = 1, NTAG_SA
                          SA_REMOV( CSPC,ITAG ) = SA_REMOV( CSPC,ITAG ) * CGRID_MW( I )
@@ -793,7 +793,6 @@ C...convert removal change from moles/m**2 to kg/m**2 and kg/m**2 to kg/hectare
                      END IF
 #endif
                   END IF
-
 
                 END DO
 

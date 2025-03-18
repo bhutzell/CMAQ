@@ -23,25 +23,25 @@
     USE twoway_header_data_module
 
     use utilio_defn
-!   INCLUDE 'PARMS3.EXT'
-!   INCLUDE 'FDESC3.EXT'
 
     IMPLICIT NONE
 
     CHARACTER (LEN = 1), INTENT(IN) :: file_type
     INTEGER,             INTENT(IN) :: ncols, nrows
 
+!placeholder declarations to allow compilation
+    integer :: ncols3d, nrows3d, xorig3d, yorig3d, xcent3d, ycent3d, & 
+               gdtyp3d, ftype3d, p_alp3d, p_bet3d, p_gam3d, vgtyp3d, nthik3d
+    character(16) :: gdnam3d
+    real    :: vgtop3d
+
     ncols3d = ncols
     nrows3d = nrows
 
     if (file_type .eq. 'C') then
-!      ncols3d = ioapi_header%ncols
-!      nrows3d = ioapi_header%nrows
        xorig3d = ioapi_header%xorig
        yorig3d = ioapi_header%yorig
     else if (file_type .eq. 'D') then
-!      ncols3d = ioapi_header%ncols + 1
-!      nrows3d = ioapi_header%nrows + 1
        xorig3d = ioapi_header%xorig - ioapi_header%xcell / 2.0
        yorig3d = ioapi_header%yorig - ioapi_header%ycell / 2.0
     end if
@@ -61,13 +61,10 @@
     ycell3d = ioapi_header%ycell
 
     vgtyp3d = ioapi_header%vgtyp
-
     vgtop3d = ioapi_header%vgtop
-
     vglvs3d = ioapi_header%vglvs
 
     gdnam3d = ioapi_header%gdnam
-
     gdnam3d = ioapi_header%grid_name
 
     nthik3d = 1

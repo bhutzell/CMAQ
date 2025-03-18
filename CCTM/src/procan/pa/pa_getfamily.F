@@ -38,6 +38,7 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE PA_VARS
       USE PA_PARSE
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, M3EXIT
 
       IMPLICIT NONE
       
@@ -61,9 +62,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       MEMNUM = 0
       IF ( NFAMLYS .GT. MAXFAMLYS ) THEN
          WRITE( MSG, 94000 )
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94020 ) MAXFAMLYS
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETFAMILY', IZERO, IZERO, ' ', XSTAT2 )
       END IF
 
@@ -72,11 +73,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF ( CHR .NE. '=' ) THEN
          WRITE( MSG, 94040 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETFAMILY', IZERO, IZERO,' ', XSTAT2 )
       ELSE
          CALL GETCHR
@@ -90,11 +91,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF ( MEMNUM .GT. MAXFAMMEM ) THEN
          WRITE( MSG, 94060 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94080 ) MAXFAMMEM
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETFAMILY', IZERO, IZERO, ' ', XSTAT2 )
       END IF
 
@@ -114,11 +115,11 @@ c..Go back and get the next family member, return, or err off
          RETURN
       ELSE
          WRITE( MSG, 94100 ) 
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94500 ) LINNUM, INBUF
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          WRITE( MSG, 94520 ) CHR
-         CALL M3MESG( MSG )
+         CALL LOG_MESSAGE( LOGDEV ,  MSG )
          CALL M3EXIT( 'GETFAMILY', IZERO, IZERO, ' ', XSTAT2 ) 
       END IF
 

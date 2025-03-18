@@ -67,9 +67,10 @@ C     10 Jan  2024 D. Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE UDTYPES, ONLY: RARRY1
+      USE LOGDEV_MOD, ONLY : LOG_MESSAGE
 
       IMPLICIT NONE
-
+      INCLUDE SUBST_FILES_ID
 
       PUBLIC PT3D_INIT, GET_PT3D_EMIS
       PRIVATE
@@ -135,21 +136,22 @@ C=======================================================================
          FUNCTION PT3D_INIT ( JDATE, JTIME, TSTEP )
      &                       RESULT ( SUCCESS )
 
-         USE GRID_CONF, ONLY: NLAYS, VGTYP_GD
+         USE GRID_CONF, ONLY: NLAYS, VGLVS_GD
          USE STK_PRMS, ONLY: SOURCE, STK_PRMS_INIT, MY_NSRC
          USE STK_EMIS, ONLY: DESID_STREAM_NAME, NSRC_EMIS, FIREFLAG,
      &                       MAP_PTtoISRM, STK_EMIS_INIT
-         USE PTMET, ONLY: PTMET_DATA, MC2NAME, MC3NAME, MD3NAME, PTMET_INIT
-         USE PTBILIN, ONLY: NPTGRPS, 
-     &                      METCXORIG, METCYORIG, XCELLCG, YCELLCG, 
-     &                      METDXORIG, METDYORIG, XCELLDG, YCELLDG
+         USE PTMET, ONLY: PTMET_DATA, PTMET_INIT
+         USE PTBILIN, ONLY: NPTGRPS 
+!     &                      METCXORIG, METCYORIG, XCELLCG, YCELLCG, 
+!     &                      METDXORIG, METDYORIG, XCELLDG, YCELLDG
 
          USE UTILIO_DEFN
-         USE RUNTIME_VARS, ONLY: LOGDEV, MYPE, PT3DFRAC, PT_DATE, STDATE, STTIME,
+         USE RUNTIME_VARS, ONLY: LOGDEV,LOG_WARNING, MYPE, PT3DFRAC, PT_DATE, STDATE, STTIME,
      &                           PT_TIME, PT_NSTEPS, REP_LAYR
          USE DESID_VARS, ONLY: DESID_LAYS, DESID_MAXLAYS
          USE stack_group_data_module
          USE centralized_io_module, only : window
+         use mio_module
 
          IMPLICIT NONE
 
@@ -167,21 +169,23 @@ C Parameters:
 C Local Variables:
          CHARACTER( 16 )       :: PNAME = 'PT3D_INIT       ' ! procedure name
          CHARACTER( 16 )       :: VNAME    ! variable name buffer
-!        CHARACTER( 16 ), SAVE, ALLOCATABLE :: STKGNAME( : ) ! stack groups file name
 
          INTEGER          METCCOLS       ! cross point grid number of columns
          INTEGER          METCROWS       ! cross point grid number of rows
          INTEGER          METDCOLS       ! dot point grid number of columns
          INTEGER          METDROWS       ! dot point grid number of rows
+         INTEGER          METDLAYS       ! number of layers in MET_DOT_3D file
+         INTEGER          METDNSTEPS     ! number of time steps in MET_DOT_3D file
          INTEGER          IOS            ! i/o and allocate memory status
          INTEGER          NDATE          ! next timestep file Julian date (YYYYDDD)
          INTEGER          NTIME          ! next timestep file time (HHMMSS)
 
          INTEGER I, J, K, L, M, N, P, S, SRC, V, ISRM  ! counters and indices
-
+         INTEGER :: floc
          INTEGER :: GXOFF, GYOFF
          INTEGER :: STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC
 
+         real, allocatable :: vglvsmd3( : )
          CHARACTER( 16 ) :: LAYER_FILE = 'LAYER_FILE'
 
          INTERFACE
@@ -213,7 +217,7 @@ C-----------------------------------------------------------------------
 C In-line 3D point source emissions?
          IF ( NPTGRPS .GT. 0 ) THEN
             XMSG = 'Using in-line 3d point source emissions option'
-            CALL M3MSG2( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
          ELSE
             RETURN
          END IF
@@ -225,7 +229,7 @@ C rise algorithm
             XMSG = 'Environment variable CTM_DESID_LAYS must be set to ' //
      &             'a number from 4 to the ' // CRLF() // BLANK10 //
      &             'number of layers in the meteorology inputs.'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 C get diagnostic files options
@@ -245,22 +249,21 @@ C get diagnostic files options
 
          END IF
 
-         CALL M3MSG2( XMSG )
+         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 #ifndef mpas
 #ifdef srcid
          IF ( PT3DFRAC ) THEN   ! save local source id's
             ALLOCATE ( LDEV( NPTGRPS ), STAT = IOS )
             CALL CHECKMEM( IOS, 'LDEV', PNAME )
             LDEV = 0   ! array
-            WRITE( XMSG,94010 ) "Enter logical name for file containing " //
-     &                          "source id's of play files"
+!            WRITE( XMSG,94010 ) "Enter logical name for file containing " //
+!     &                          "source id's of play files"
             ALLOCATE ( PLAY_SRCID_NAME( NPTGRPS ), STAT = IOS )
             CALL CHECKMEM( IOS, 'PLAY_SRCID_NAME', PNAME )
             DO N = 1, NPTGRPS
                WRITE( REPSTR,'( "SRCIDLAY", I2.2, "_" )' ) N
                WRITE( PLAY_SRCID_NAME( N ),'( A, I2.2 )' ) REPSTR, MYPE   ! limited to 99 PE's
-               LDEV( N ) = PROMPTFFILE( XMSG, .FALSE., .TRUE.,
-     &                                  PLAY_SRCID_NAME( N ), PNAME )
+               LDEV( N ) = GETEFILE( PLAY_SRCID_NAME( N ), .FALSE., .TRUE., PNAME )
             END DO
          END IF
 #endif
@@ -269,14 +272,14 @@ C get diagnostic files options
          CALL CHECKMEM( IOS, 'RDEV', PNAME )
          RDEV = 0   ! array
          IF ( REP_LAYR .GT. 0 ) THEN
-            WRITE( XMSG,94010 ) 'Enter logical name for report of ' //
-     &                          'plumes exceeding layer', REP_LAYR
+!            WRITE( XMSG,94010 ) 'Enter logical name for report of ' //
+!     &                          'plumes exceeding layer', REP_LAYR
             ALLOCATE ( REPTNAME( NPTGRPS ), STAT = IOS )
             CALL CHECKMEM( IOS, 'REPTNAME', PNAME )
             DO N = 1, NPTGRPS
                WRITE( REPSTR,'( "REPRTLAY", I2.2, "_" )' ) N
                WRITE( REPTNAME( N ),'( A, I2.2 )' ) REPSTR, MYPE   ! limited to 99 PE's
-               RDEV( N ) = PROMPTFFILE( XMSG, .FALSE., .TRUE., REPTNAME( N ), PNAME )
+               RDEV( N ) = GETEFILE( REPTNAME( N ), .FALSE., .TRUE., PNAME )
             END DO
          END IF
 
@@ -285,122 +288,30 @@ C get scenario timing
          PT_DATE = JDATE 
          PT_TIME = JTIME
 
-C open met files
-
-#ifdef twoway
-         IF ( .NOT. OPEN3( LAYER_FILE, FSREAD3, PNAME ) ) THEN
-            XMSG = 'Could not open '// LAYER_FILE
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
-
-         IF ( .NOT. DESC3( LAYER_FILE ) ) THEN
-            XMSG = 'Could not get description of file LAYER_FILE'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
-#else
-         MC2NAME = PROMPTMFILE( 'Enter name for CROSS-POINT SURFACE MET file',
-     &                          FSREAD3, 'MET_CRO_2D', PNAME )
-
-         MC3NAME = PROMPTMFILE( 'Enter name for CROSS-POINT LAYERED MET file',
-     &                          FSREAD3, 'MET_CRO_3D', PNAME )
-
-         MD3NAME = PROMPTMFILE( 'Enter name for DOT-POINT LAYERED MET file',
-     &                          FSREAD3, 'MET_DOT_3D', PNAME )
-
-C Get grid parameters from 3-d cross-point met file and store header information.
-C Use time parameters for time defaults.
-         CALL RETRIEVE_IOAPI_HEADER( MC3NAME, JDATE, JTIME )
-
-         CALL SUBHFILE ( MC3NAME, GXOFF, GYOFF,
-     &                   STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC )
-
-C Initialize reference grid with met file
-         XCELLCG = XCELL3D
-         YCELLCG = YCELL3D
-         METCCOLS = NCOLS3D
-         METCROWS = NROWS3D
-         METCXORIG = XORIG3D
-         METCYORIG = YORIG3D
-
-         IF ( ( GXOFF .GT. 0 ) .AND. ( GYOFF .GT. 0 ) ) THEN
-            METCXORIG = XORIG3D + REAL( GXOFF,8 ) * XCELL3D
-            METCYORIG = YORIG3D + REAL( GYOFF,8 ) * YCELL3D
-         ELSE
-            METCXORIG = XORIG3D
-            METCYORIG = YORIG3D
-         END IF
-
-!!!!!!^^^^^^^!!!! THESE NEED TO BE CHECKED AGAINST GRIDDESC
-
-C Get grid parameters from 3-d dot-point met file and store header information.
-C (declared and stored in PTBILIN module)
-         CALL RETRIEVE_IOAPI_HEADER( MD3NAME, JDATE, JTIME )
-         XCELLDG = XCELL3D
-         YCELLDG = YCELL3D
-         METDXORIG = XORIG3D
-         METDYORIG = YORIG3D
-         METDCOLS = NCOLS3D
-         METDROWS = NROWS3D
-
-         CALL SUBHFILE ( MD3NAME, GXOFF, GYOFF,
-     &                   STRTCOLMC, ENDCOLMC, STRTROWMC, ENDROWMC )
-
-         IF ( ( GXOFF .GT. 0 ) .AND. ( GYOFF .GT. 0 ) ) THEN
-            METDXORIG = XORIG3D + REAL( GXOFF,8 ) * XCELL3D
-            METDYORIG = YORIG3D + REAL( GYOFF,8 ) * YCELL3D
-         ELSE
-            METDXORIG = XORIG3D
-            METDYORIG = YORIG3D
-         END IF
-#endif
-
-C Compare number of meteorology layers to number of emissions layers
-!         IF ( DESID_LAYS .LE. NLAYS ) THEN
-!            WRITE( XMSG,94010 ) 'NOTE: The number of emission layers ' //
-!     &                          'is', DESID_LAYS, ', and the maximum ' // CRLF()
-!     &                          // BLANK10 // 'possible layers is', NLAYS
-!            CALL M3MSG2( XMSG )
-!         ELSE
-!            WRITE( XMSG,94010 ) 'Resetting number of emission layers ' //
-!     &                          'from', DESID_LAYS, 'to number of ' // CRLF() //
-!     &                          BLANK10 // 'layers in the meteorology file,', NLAYS
-!            CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
-!            DESID_LAYS = NLAYS
+!#ifndef twoway
+!         call mio_get_global_attr( MET_DOT_3D, 'NLAYS', METDLAYS )
+!         ALLOCATE( VGLVSXG( 0:MXLAYS3 ), 
+!     &             VGLVSMD3( 0:METDLAYS+1), STAT = IOS )
+!         CALL CHECKMEM( IOS, 'VGLVSXG', PNAME )
+!         call mio_get_global_attr( MET_DOT_3D, 'VGLVLS', VGLVSMD3 )
+! 
+!C Store local layer information
+!         J = LBOUND( VGLVSMD3, 1 ) + 1  ! 1st value contains num elements; skip it
+!         VGLVSXG( 0 ) = VGLVSMD3( J )
+!         DO L = 1, NLAYS
+!            J = J + 1
+!            VGLVSXG( L ) = VGLVSMD3( J )
+!         END DO
+!
+!         floc = mio_search( MET_DOT_3D )
+!         METDNSTEPS = mio_file_data(floc)%nsteps
+!         IF ( PT_NSTEPS .GT. METDNSTEPS ) THEN
+!            WRITE( XMSG,94010 ) 'Requested output time steps > those on met file '
+!     &                          // CRLF() // BLANK10 // 'reset to ', 
+!     &                       METDNSTEPS
+!            PT_NSTEPS = METDNSTEPS
 !         END IF
-
-         ALLOCATE( VGLVSXG( 0:MXLAYS3 ), STAT = IOS )
-         CALL CHECKMEM( IOS, 'VGLVSXG', PNAME )
-
-C Store local layer information
-         J = LBOUND( VGLVS3D, 1 )   ! F90 array intrinsic
-         VGLVSXG( 0 ) = VGLVS3D( J )
-         DO L = 1, NLAYS
-            J = J + 1
-            VGLVSXG( L ) = VGLVS3D( J )
-         END DO
-
-         IF ( PT_NSTEPS .GT. MXREC3D ) THEN
-            WRITE( XMSG,94010 ) 'Requested output time steps > those on met file '
-     &                          // CRLF() // BLANK10 // 'reset to ', MXREC3D
-            PT_NSTEPS = MXREC3D
-         END IF
-
-C Get stack data
-!        ALLOCATE ( STKGNAME( NPTGRPS ), STAT = IOS )   ! stk parms files array
-!        CALL CHECKMEM( IOS, 'STKGNAME', PNAME )
-!        STKGNAME = ' '   ! array
-
-!        DO N = 1, NPTGRPS
-!           WRITE( VNAME,'( "STK_GRPS_",I3.3 )' ) N
-!           STKGNAME( N ) = PROMPTMFILE( 'Enter name for stack groups file',
-!    &                                   FSREAD3, VNAME, PNAME )
-!        END DO
-
-!        IF ( .NOT. STK_PRMS_INIT( STKGNAME ) ) THEN
-!           XMSG = 'Could not initialize stack parameters'
-!           CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
-!           SUCCESS = .FALSE.; RETURN
-!        END IF
+!#endif
 #endif
 
 #ifdef srcid
@@ -428,7 +339,7 @@ C Initialize stack emissions data
          ! Initialize Point Source Emissions
          IF ( .NOT. STK_EMIS_INIT( STKENAME, JDATE, JTIME ) ) THEN
             XMSG = 'Could not initialize stack parameters'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -438,7 +349,7 @@ C Initialize stack emissions data
             IF ( NSRC( N ) .NE. NSRC_EMIS( N ) ) THEN
                WRITE( LOGDEV,* ) 'NSRC vs. NSRC_EMIS:', N, NSRC( N ), NSRC_EMIS( N )
                XMSG = 'No. of sources for stack files don''t match'
-               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                SUCCESS = .FALSE.; RETURN
             END IF
          END DO
@@ -450,13 +361,13 @@ C Open diagnostic layer fractions file?
             PLAYNAME = ' '   ! array
             NDATE = PT_DATE; NTIME = PT_TIME
             CALL NEXTIME( NDATE, NTIME, TSTEP ) ! advance one output tstep
-            CALL OPENLAYOUT( NDATE, NTIME, TSTEP, DESID_LAYS, VGLVSXG, NPTGRPS,
+            CALL OPENLAYOUT( NDATE, NTIME, TSTEP, DESID_LAYS, VGLVS_GD, NPTGRPS,
      &                       MY_NSRC, PLAYNAME )
          END IF
 
          IF ( .NOT. PTMET_INIT ( ) ) THEN
             XMSG = 'Could not initialize stack met data'
-            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
             SUCCESS = .FALSE.; RETURN
          END IF
 
@@ -600,7 +511,7 @@ C=======================================================================
 
 ! Parameters:
 
-         LOGICAL,         EXTERNAL :: WRITE3_DISTR   ! calls WRITE3 directly
+!        LOGICAL,         EXTERNAL :: WRITE3_DISTR   ! calls WRITE3 directly
 
 ! Local variables:
          INTEGER          CDATE      ! previous step start date
@@ -679,7 +590,7 @@ C Based on the current time step, find whether or not a report should be written
 !         WRITE( XMSG,'(A, I7.6)' )
 !     &   'Calculating emissions point source layer fractions for', JTIME
 !         WRITE( LOGDEV,* ) ' '
-!         CALL M3MSG2( XMSG )
+!         CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 !
 !         IF ( LDATE .NE. JDATE ) THEN  ! write day and date to stdout & XMSG
 !            CALL WRDAYMSG( JDATE, XMSG )
@@ -818,21 +729,21 @@ C Read Emissions for all sources on File N
  
 C Write Out Diagnostic Info            
          IF ( PT3DFRAC .AND. WRTIME ) THEN     ! Write out layer fractions
-            IF ( .NOT. WRITE3_DISTR( PLAYNAME( N ), 'LFRAC', WDATE, WTIME,
-     &                               MY_NSRC( N ), DESID_LAYS, LFRAC ) ) THEN
-               XMSG = 'Error writing "LFRAC" to file "' //
-     &                 PLAYNAME( N )( 1:LEN_TRIM( PLAYNAME( N ) ) ) // '."'
-               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            IF ( .NOT. WRITE3_DISTR( PLAYNAME( N ), 'ZPLUME', WDATE, WTIME,
-     &                               MY_NSRC( N ), DESID_LAYS, ZPLUM ) ) THEN
-               XMSG = 'Error writing "ZPLUM" to file "' //
-     &                 PLAYNAME( N )( 1:LEN_TRIM( PLAYNAME( N ) ) ) // '."'
-               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-            WRITE( LOGDEV,94030 )
-     &         'Timestep written to', TRIM( PLAYNAME( N ) ),
-     &         'for date and time', WDATE, WTIME
+!            IF ( .NOT. WRITE3_DISTR( PLAYNAME( N ), 'LFRAC', WDATE, WTIME,
+!     &                               MY_NSRC( N ), DESID_LAYS, LFRAC ) ) THEN
+!               XMSG = 'Error writing "LFRAC" to file "' //
+!     &                 PLAYNAME( N )( 1:LEN_TRIM( PLAYNAME( N ) ) ) // '."'
+!               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!            END IF
+!            IF ( .NOT. WRITE3_DISTR( PLAYNAME( N ), 'ZPLUME', WDATE, WTIME,
+!     &                               MY_NSRC( N ), DESID_LAYS, ZPLUM ) ) THEN
+!               XMSG = 'Error writing "ZPLUM" to file "' //
+!     &                 PLAYNAME( N )( 1:LEN_TRIM( PLAYNAME( N ) ) ) // '."'
+!               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!            END IF
+!            WRITE( LOGDEV,94030 )
+!     &         'Timestep written to', TRIM( PLAYNAME( N ) ),
+!     &         'for date and time', WDATE, WTIME
          END IF
 
          IF ( PT3DFRAC ) THEN
@@ -890,7 +801,7 @@ C=======================================================================
 
 C-----------------------------------------------------------------------
 
-      USE VGRD_DEFN, ONLY : VGTOP_GD
+      USE VGRD_DEFN, ONLY : VGTOP_GD, VGLVS_GD
       USE STK_EMIS, ONLY : FIREVAR, FIREFLAG
 #ifdef mpas
       USE STK_PRMS, ONLY : MY_STRT_SRC, MY_END_SRC, MY_NSRC, SOURCE, my_nsrc_pressure, my_nsrc_mesh_index
@@ -898,7 +809,8 @@ C-----------------------------------------------------------------------
       USE STK_PRMS, ONLY : MY_STRT_SRC, MY_END_SRC, MY_NSRC, SOURCE
 #endif
       USE PTMET, ONLY : DESID_LAYS, P_D => PTMET_DATA
-      USE RUNTIME_VARS, ONLY : LOGDEV, IPVERT, PT3DFRAC, REP_LAYR, LOG_MESSAGE
+      USE RUNTIME_VARS, ONLY : IPVERT, PT3DFRAC, REP_LAYR
+      USE LOGDEV_MOD, ONLY : LOGDEV, LOG_MESSAGE, LOG_WARNING, M3EXIT
       USE UTILIO_DEFN
       USE CENTRALIZED_IO_MODULE, only : interpolate_var
       USE CONST, only: CPD
@@ -1161,7 +1073,7 @@ C Get pressures: Use SIGMA values and surface pres. p=sigma*(psfc-ptop)+ptop
 
          PSFC = P_D( N )%PRSFC( S )
          DO L = 0, DESID_LAYS
-            P_D( N )%PRESF( L ) = ( VGLVSXG( L ) * ( PSFC - VGTOP_GD )
+            P_D( N )%PRESF( L ) = ( VGLVS_GD( L+1 ) * ( PSFC - VGTOP_GD )
      &                          +   VGTOP_GD ) * CONVPA
          END DO
 
@@ -1233,7 +1145,7 @@ C (~mass concentration -- minor hydrostatic assumption) from bottom to top.
             WRITE( CINT,'( I8 )' ) S
             WRITE( XMSG,94010 ) 'ERROR: Top of plume is less than '
      &                          // 'top of stack for source:' // CINT
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
             WRITE( LOGDEV,* ) '    Zbot: ', ZBOT, ' Ztop: ', ZTOP
             WRITE( LOGDEV,* ) '    Stack Top: ', STK_HT( N )%ARRY( S ),
      &                        ' Plume Top: ', ZPLM
@@ -1304,7 +1216,7 @@ C  ZZF( LTOP-1 ) <= ZTOP < ZZF( LTOP )
      &            'Infinitely small plume created for source:,'
      &            // CINT // CRLF() // BLANK10
      &            // 'All emissions put in first layer.'
-               CALL M3WARN( PNAME, JDATE, JTIME, XMSG )
+               CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                LBOT = 1; LTOP = 1
                TFRAC( LBOT,S ) = 1.0
 
@@ -1329,7 +1241,7 @@ C If layer fractions are negative, put in the first layer
      &               // 'fractions found for source:' // CINT
      &               // CRLF() // BLANK10 // 'Plume reset to '
      &               // 'put all emissions in surface layer.'
-            CALL M3MESG( XMSG )
+            CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
             TFRAC( 1,S ) = 1.0
             TFRAC( 2:DESID_LAYS,S ) = 0.0
@@ -1401,33 +1313,6 @@ C Possible report to REPRTLAY
 
 
       END SUBROUTINE CALC_PLUME_HEIGHT
-
-C-----------------------------------------------------------------------
-
-#ifndef mpas
-         SUBROUTINE RETRIEVE_IOAPI_HEADER( FNAME, JDATE, JTIME )
-
-
-            USE UTILIO_DEFN, ONLY : DESC3, XSTAT2
-
-            IMPLICIT NONE
-
-            CHARACTER( * ) :: FNAME
-            INTEGER        :: JDATE, JTIME
-
-            CHARACTER( 16 )  :: PNAME = 'RETRVE_IOAPI_HDR'   ! procedure name
-            CHARACTER( 120 ) :: XMSG = ' '
-
-            IF ( .NOT. DESC3( FNAME ) ) THEN
-               XMSG = 'Could not get description of file "' //
-     &                FNAME( 1:LEN_TRIM( FNAME ) ) // '"'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            END IF
-
-            RETURN
-
-         END SUBROUTINE RETRIEVE_IOAPI_HEADER
-#endif
 
 C-----------------------------------------------------------------------
 

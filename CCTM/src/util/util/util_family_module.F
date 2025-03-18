@@ -68,8 +68,8 @@
 !     
 ! ----------------------------------------------------------------------
 
-      use RUNTIME_VARS, only : CMAQ_CTRL, CMAQ_CHEM_CTRL, logdev, log_message, 
-     &                         log_subheading
+      use logdev_mod, only : logdev, log_message, log_subheading, m3exit
+      use RUNTIME_VARS, only : CMAQ_CTRL, CMAQ_CHEM_CTRL
       use UTILIO_DEFN
       use desid_param_module, only : Desid_Max_Reg
       use aero_data, only : n_aerospc, aerospc, n_mode, aero_missing

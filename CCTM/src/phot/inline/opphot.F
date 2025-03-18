@@ -17,7 +17,6 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPPHOT ( JDATE, JTIME, TSTEP )
 
@@ -61,182 +60,190 @@ C...Local variables
       CHARACTER( 16 ), SAVE :: PNAME = 'OPPHOT'
       CHARACTER( 16 )       :: LAMBDA
       CHARACTER( 96 )       :: XMSG = ' '
+      
+      CHARACTER( 16 ), ALLOCATABLE :: VNAME( : )
+      CHARACTER( 16 ), ALLOCATABLE :: UNITS( : )
+      CHARACTER( 256), ALLOCATABLE :: VDESC( : )
+      INTEGER,         ALLOCATABLE :: VTYPE( : )
+      INTEGER,         ALLOCATABLE :: NDIMS( : )
+      
+      INTEGER :: NVARS_RJ_1 ! = 23 + 7 * NWL
+      INTEGER :: NVARS_RJ_2 ! = NPHOTAB
+      INTEGER :: NVARS_RJ_3 ! = 2 + 6 * N_DIAG_WVL
+      INTEGER :: NVARS_RJ_MAX
+      
+      LOGICAL, SAVE ::  INITIALIZED = .FALSE.
 
       INTEGER N, L, JWL, INCR     ! loop variables
 C-----------------------------------------------------------------------
 
-#ifndef mpas
+      IF ( INITIALIZED ) THEN
+         RETURN
+      END IF
+      INITIALIZED = .TRUE.
+#ifdef mpas
+      RETURN 
+#endif
+      
 C...Try to open existing file for update
 
-      IF ( .NOT. OPEN3( CTM_RJ_1, FSRDWR3, PNAME ) ) THEN
+#ifndef phot_debug
+      NVARS_RJ_1 = 21 + 7 * NWL
+#else
+      NVARS_RJ_1 = 21 + 9 * NWL
+#endif
+      IF ( USE_ACM_CLOUD ) NVARS_RJ_1 = NVARS_RJ_1 + 2      
+      NVARS_RJ_2 = NPHOTAB
+      NVARS_RJ_3 = 2 + 6 * N_DIAG_WVL
+      NVARS_RJ_MAX = MAX( NVARS_RJ_1,NVARS_RJ_2,NVARS_RJ_3)
 
-         XMSG = 'Could not open ' // CTM_RJ_1 // ' file for update - '
-     &        // 'try to open new'
-         CALL M3MESG( XMSG )
 
-C...Set output file characteristics based on COORD.EXT and open
-C...  the photolysis diagnostic file
+         
+         
+         ALLOCATE( NDIMS( NVARS_RJ_MAX))
+         NDIMS = 0
 
-         FTYPE3D = GRDDED3
-         SDATE3D = JDATE
-         STIME3D = JTIME
-         TSTEP3D = TSTEP
+         ALLOCATE( VNAME( NVARS_RJ_MAX),
+     &             UNITS( NVARS_RJ_MAX),         
+     &             VDESC( NVARS_RJ_MAX),         
+     &             VTYPE( NVARS_RJ_MAX))
 
-         NCOLS3D = GL_NCOLS
-         NROWS3D = GL_NROWS
-         NLAYS3D =     1
-         NTHIK3D =     1
-         GDTYP3D = GDTYP_GD
-         P_ALP3D = P_ALP_GD
-         P_BET3D = P_BET_GD
-         P_GAM3D = P_GAM_GD
-         XORIG3D = XORIG_GD
-         YORIG3D = YORIG_GD
-         XCENT3D = XCENT_GD
-         YCENT3D = YCENT_GD
-         XCELL3D = XCELL_GD
-         YCELL3D = YCELL_GD
-         VGTYP3D = VGTYP_GD
-         VGTOP3D = VGTOP_GD
-
-         DO L = 1, NLAYS3D + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
-         END DO
-
-         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
+         VNAME = " "
+         UNITS = " "
+         VDESC = " "
+         VTYPE = M3REAL
+          
 C...CSA Variables, Units and Descriptions for RJ_FILE
 
          N = 1
-         VNAME3D( N ) = 'COSZENS'
-         UNITS3D( N ) = ''
-         VDESC3D( N ) = 'Cosine of Solar Zenith Angle'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'COSZENS'
+         UNITS( N ) = ''
+         VDESC( N ) = 'Cosine of Solar Zenith Angle'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'OZONE_COLUMN'
-         UNITS3D( N ) = 'DU'
-         VDESC3D( N ) = 'Observed Total Ozone Column Density'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'OZONE_COLUMN'
+         UNITS( N ) = 'DU'
+         VDESC( N ) = 'Observed Total Ozone Column Density'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'NO2_COLUMN'
-         UNITS3D( N ) = 'petamolec cm-2'
-         VDESC3D( N ) = 'Predicted nitrogen dioxide column density'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'NO2_COLUMN'
+         UNITS( N ) = 'petamolec cm-2'
+         VDESC( N ) = 'Predicted nitrogen dioxide column density'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'CO_COLUMN'
-         UNITS3D( N ) = 'petamolec cm-2'
-         VDESC3D( N ) = 'Predicted carbon monoxide column density'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'CO_COLUMN'
+         UNITS( N ) = 'petamolec cm-2'
+         VDESC( N ) = 'Predicted carbon monoxide column density'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'SO2_COLUMN'
-         UNITS3D( N ) = 'petamolec cm-2'
-         VDESC3D( N ) = 'Predicted sulfur dioxide column density'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'SO2_COLUMN'
+         UNITS( N ) = 'petamolec cm-2'
+         VDESC( N ) = 'Predicted sulfur dioxide column density'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'HCHO_COLUMN'
-         UNITS3D( N ) = 'petamolec cm-2'
-         VDESC3D( N ) = 'Predicted formaldehyde column density'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'HCHO_COLUMN'
+         UNITS( N ) = 'petamolec cm-2'
+         VDESC( N ) = 'Predicted formaldehyde column density'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'TROPO_O3_COLUMN'
-         UNITS3D( N ) = 'DU'
-         VDESC3D( N ) = 'Predicted Tropospheric Ozone Column density'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'TROPO_O3_COLUMN'
+         UNITS( N ) = 'DU'
+         VDESC( N ) = 'Predicted Tropospheric Ozone Column density'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'JNO2'
-         UNITS3D( N ) = 'min-1'
-         VDESC3D( N ) = 'Photodissociation rate of NO2'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'JNO2'
+         UNITS( N ) = 'min-1'
+         VDESC( N ) = 'Photodissociation rate of NO2'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'JO3O1D'
-         UNITS3D( N ) = 'min-1'
-         VDESC3D( N ) = 'Photodissociation rate of ozone producing O(1D)'
-         VTYPE3D( N ) = M3REAL
-
-
-         N = N + 1
-         VNAME3D( N ) = 'RESOLVED_CFRAC'
-         UNITS3D( N ) = '1'
-         VDESC3D( N ) = 'Resolved Cloud Fraction averaged over cloudy layers'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'JO3O1D'
+         UNITS( N ) = 'min-1'
+         VDESC( N ) = 'Photodissociation rate of ozone producing O(1D)'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'RESOLVED_WBAR'
-         UNITS3D( N ) = 'g m-3'
-         VDESC3D( N ) = 'Resolved Cloud Hydrometeor Content averaged over cloudy layers'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'RESOLVED_CFRAC'
+         UNITS( N ) = '1'
+         VDESC( N ) = 'Resolved Cloud Fraction averaged over cloudy layers'
+         VTYPE( N ) = M3REAL
+
+         N = N + 1
+         VNAME( N ) = 'RESOLVED_WBAR'
+         UNITS( N ) = 'g m-3'
+         VDESC( N ) = 'Resolved Cloud Hydrometeor Content averaged over cloudy layers'
+         VTYPE( N ) = M3REAL
          
          IF( USE_ACM_CLOUD )THEN
              N = N + 1
-             VNAME3D( N ) = 'SUBGRID_CFRAC'
-             UNITS3D( N ) = '1'
-             VDESC3D( N ) = 'Subgrid Cloud Fraction averaged over cloudy layers'
-             VTYPE3D( N ) = M3REAL
+             VNAME( N ) = 'SUBGRID_CFRAC'
+             UNITS( N ) = '1'
+             VDESC( N ) = 'Subgrid Cloud Fraction averaged over cloudy layers'
+             VTYPE( N ) = M3REAL
 
              N = N + 1
-             VNAME3D( N ) = 'SUBGRID_WBAR'
-             UNITS3D( N ) = 'g m-3'
-             VDESC3D( N ) = 'Subgrid Cloud Hydrometeor Content averaged over cloudy layers'
-             VTYPE3D( N ) = M3REAL
+             VNAME( N ) = 'SUBGRID_WBAR'
+             UNITS( N ) = 'g m-3'
+             VDESC( N ) = 'Subgrid Cloud Hydrometeor Content averaged over cloudy layers'
+             VTYPE( N ) = M3REAL
          END IF             
 
          N = N + 1
-         VNAME3D( N ) = 'TRANS_DIFFUSE'
-         UNITS3D( N ) = '1'
-         VDESC3D( N ) = 'broad band transmission coefficient for diffuse radiation at surface'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'TRANS_DIFFUSE'
+         UNITS( N ) = '1'
+         VDESC( N ) = 'broad band transmission coefficient for diffuse radiation at surface'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'TRANS_DIRECT'
-         UNITS3D( N ) = '1'
-         VDESC3D( N ) = 'broad band transmission coefficient for direct radiation at surface'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'TRANS_DIRECT'
+         UNITS( N ) = '1'
+         VDESC( N ) = 'broad band transmission coefficient for direct radiation at surface'
+         VTYPE( N ) = M3REAL
  
          N = N + 1
-         VNAME3D( N ) = 'REFLECTION'
-         UNITS3D( N ) = '1'
-         VDESC3D( N ) = 'broad band reflection coefficient at top of atmosphere'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'REFLECTION'
+         UNITS( N ) = '1'
+         VDESC( N ) = 'broad band reflection coefficient at top of atmosphere'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'CLR_TRANS_DIF'
-         UNITS3D( N ) = '1'
-         VDESC3D( N ) = 'broad band diffuse transmission for clear sky at surface'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'CLR_TRANS_DIF'
+         UNITS( N ) = '1'
+         VDESC( N ) = 'broad band diffuse transmission for clear sky at surface'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'CLR_TRANS_DIR'
-         UNITS3D( N ) = '1'
-         VDESC3D( N ) = 'broad band direct transmission for clear sky at surface'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'CLR_TRANS_DIR'
+         UNITS( N ) = '1'
+         VDESC( N ) = 'broad band direct transmission for clear sky at surface'
+         VTYPE( N ) = M3REAL
               
          N = N + 1
-         VNAME3D( N ) = 'CLR_REFLECTION'
-         UNITS3D( N ) = '1'
-         VDESC3D( N ) = 'broad band reflection for clear sky at top of atmosphere'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'CLR_REFLECTION'
+         UNITS( N ) = '1'
+         VDESC( N ) = 'broad band reflection for clear sky at top of atmosphere'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'TROPO_O3_EXCEED'
-         UNITS3D( N ) = '1'
-         VDESC3D( N ) = 'Average Exceedance of modeled ozone column from max fraction of Total Column, '
+         VNAME( N ) = 'TROPO_O3_EXCEED'
+         UNITS( N ) = '1'
+         VDESC( N ) = 'Average Exceedance of modeled ozone column from max fraction of Total Column, '
      &               // ' a relative fraction from total column.'         
-         VTYPE3D( N ) = M3REAL
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'N_EXCEED_TROPO3'
-         UNITS3D( N ) = ''
-         VDESC3D( N ) = '# of times predicted tropospheric ozone column exceeds observed total column '
+         VNAME( N ) = 'N_EXCEED_TROPO3'
+         UNITS( N ) = ''
+         VDESC( N ) = 'num occurrences predicted ozone column exceeds obs total column '
      &               // 'per file time step'          
-         VTYPE3D( N ) = M3REAL
+         VTYPE( N ) = M3REAL
 
 
          DO JWL = 1, NWL
@@ -246,92 +253,89 @@ C...assumes that lamba in nanometers is on order of 100 or less
             WRITE( LAMBDA,'(I3.3)' ) INT( WAVELENGTH( JWL ) )
 
             N = N + 1
-            VNAME3D( N ) = 'ETOT_SFC_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = 'W m-2'
-            VDESC3D( N ) = 'Total Downward Irradiance at surface at '
+            VNAME( N ) = 'ETOT_SFC_W' // TRIM( LAMBDA )
+            UNITS( N ) = 'W m-2'
+            VDESC( N ) = 'Total Downward Irradiance at surface at '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
             N = N + 1
-            VNAME3D( N ) = 'AOD_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = ''
-            VDESC3D( N ) = 'Total Aerosol Optical Depth at '
+            VNAME( N ) = 'AOD_W' // TRIM( LAMBDA )
+            UNITS( N ) = ''
+            VDESC( N ) = 'Total Aerosol Optical Depth at '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
             N = N + 1
-            VNAME3D( N ) = 'AOD_ABS_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = ''
-            VDESC3D( N ) = 'Absorption Aerosol Optical Depth at '
+            VNAME( N ) = 'AOD_ABS_W' // TRIM( LAMBDA )
+            UNITS( N ) = ''
+            VDESC( N ) = 'Absorption Aerosol Optical Depth at '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
             N = N + 1
-            VNAME3D( N ) = 'TAU_CLOUD_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = ''
-            VDESC3D( N ) = 'Cloud Optical Depth at '
+            VNAME( N ) = 'TAU_CLOUD_W' // TRIM( LAMBDA )
+            UNITS( N ) = ''
+            VDESC( N ) = 'Cloud Optical Depth at '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 #ifdef phot_debug
             N = N + 1
-            VNAME3D( N ) = 'SSA_CLOUD_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = '1'
-            VDESC3D( N ) = 'Column Averaged Cloud Single Scattering Albedo at '
+            VNAME( N ) = 'SSA_CLOUD_W' // TRIM( LAMBDA )
+            UNITS( N ) = '1'
+            VDESC( N ) = 'Column Averaged Cloud Single Scattering Albedo at '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
             N = N + 1
-            VNAME3D( N ) = 'ASY_CLOUD_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = ''
-            VDESC3D( N ) = 'Column Averaged Cloud Asymmetry Factor at '
+            VNAME( N ) = 'ASY_CLOUD_W' // TRIM( LAMBDA )
+            UNITS( N ) = ''
+            VDESC( N ) = 'Column Averaged Cloud Asymmetry Factor at '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 #endif
             N = N + 1
-            VNAME3D( N ) = 'TAU_TOT_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = ''
-            VDESC3D( N ) = 'Total Optical Depth at'
+            VNAME( N ) = 'TAU_TOT_W' // TRIM( LAMBDA )
+            UNITS( N ) = ''
+            VDESC( N ) = 'Total Optical Depth at'
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
             N = N + 1
-            VNAME3D( N ) = 'TAUO3_TOP_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = ''
-            VDESC3D( N ) = 'Optical Depth of O3 above model domain at '
+            VNAME( N ) = 'TAUO3_TOP_W' // TRIM( LAMBDA )
+            UNITS( N ) = ''
+            VDESC( N ) = 'Optical Depth of O3 above model domain at '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
             N = N + 1
-            VNAME3D( N ) = 'ALBEDO_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = '1'
-            VDESC3D( N ) = 'Surface Albedo at the wavelength at '
+            VNAME( N ) = 'ALBEDO_W' // TRIM( LAMBDA )
+            UNITS( N ) = '1'
+            VDESC( N ) = 'Surface Albedo at the wavelength at '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
          ENDDO
 
          N = N + 1
-         VNAME3D( N ) = 'AOD_W550_ANGST' 
-         UNITS3D( N ) = ''
-         VDESC3D( N ) = 'Aerosol Optical Depth at'
+         VNAME( N ) = 'AOD_W550_ANGST' 
+         UNITS( N ) = ''
+         VDESC( N ) = 'Aerosol Optical Depth at'
      &                // ' 550 nm based on an Angstrom Interpolation'
-         VTYPE3D( N ) = M3REAL
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'AAOD_W550_ANGST' 
-         UNITS3D( N ) = ''
-         VDESC3D( N ) = 'Aerosol Absorption Optical Depth at'
+         VNAME( N ) = 'AAOD_W550_ANGST' 
+         UNITS( N ) = ''
+         VDESC( N ) = 'Aerosol Absorption Optical Depth at'
      &                // ' 550 nm based on an Angstrom Interpolation'
-         VTYPE3D( N ) = M3REAL
+         VTYPE( N ) = M3REAL
 
-         NVARS3D = N
-
-         FDESC3D( 1 ) = 'Surface Values of Optical Inputs and Radiative Results '
-         FDESC3D( 2 ) = 'from the In-line calculation of Photolysis Rates '
-         FDESC3D( 3 ) = 'for the ' // TRIM( MECHNAME ) // ' photochemical mechanism '
-         DO L = 4, MXDESC3
-            FDESC3D( L ) = ' '
-         END DO
+         IF ( N .NE. NVARS_RJ_1 ) THEN
+            WRITE(XMSG,'("NVARS_RJ1_1 equal ",I3," but needs to equal ",I3)')
+     &      NVARS_RJ_1,N
+            CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
+         END IF
 
 !C...Write ascii table describing variables
 !         WRITE(LOGDEV,'(A)')'*PHOTDIAG1 File Contents'
@@ -340,170 +344,58 @@ C...assumes that lamba in nanometers is on order of 100 or less
 !         WRITE(LOGDEV,99950)
 !         WRITE(LOGDEV,99951)
 !         DO L = 1, NVARS3D
-!            WRITE(LOGDEV,99952)TRIM(VNAME3D( L )),TRIM(UNITS3D( L )),TRIM(VDESC3D( L ))
+!            WRITE(LOGDEV,99952)TRIM(VNAME( L )),TRIM(UNITS( L )),TRIM(VDESC( L ))
 !         END DO
 
          ! Store MIO Metadata
-         NDIMS3D( 1:NVARS3D ) = 4
-         L_TSTEP( 1:NVARS3D ) = .True.
-         L_LAY  ( 1:NVARS3D ) = .True.
-         L_COL  ( 1:NVARS3D ) = .True.
-         L_ROW  ( 1:NVARS3D ) = .True.
-         L_VEXT ( 1:NVARS3D ) = .False.
+         NDIMS( 1:NVARS_RJ_1 ) = 4
+         L_TSTEP( 1:NVARS_RJ_1 ) = .True.
+         L_LAY  ( 1:NVARS_RJ_1 ) = .True.
+         L_COL  ( 1:NVARS_RJ_1 ) = .True.
+         L_ROW  ( 1:NVARS_RJ_1 ) = .True.
+         L_VEXT ( 1:NVARS_RJ_1 ) = .False.
        
-         CALL LOAD_MIO_FILE ( 'CTM_RJ_1', NLAYS3D, 1, NLAYS3D,
-     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &        L_VEXT(1:NVARS3D) )
+         CALL LOAD_MIO_FILE ( CTM_RJ_1, 1, 1, 1,
+     &        VNAME(1:NVARS_RJ_1), VTYPE(1:NVARS_RJ_1), UNITS(1:NVARS_RJ_1),
+     &        VDESC(1:NVARS_RJ_1), NDIMS(1:NVARS_RJ_1), L_TSTEP(1:NVARS_RJ_1),
+     &        L_LAY(1:NVARS_RJ_1),   L_COL(1:NVARS_RJ_1),   L_ROW(1:NVARS_RJ_1),
+     &        L_VEXT(1:NVARS_RJ_1) )
  
-
-C...Open the 1st photolysis diagnostic file
-
-         IF ( .NOT. OPEN3( CTM_RJ_1, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not create '// CTM_RJ_1 // ' file'
-            CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         END IF
-
-      END IF
-    
-C...Try to open existing file for update
-
-      IF ( .NOT. OPEN3( CTM_RJ_2, FSRDWR3, PNAME ) ) THEN
-
-         XMSG = 'Could not open ' // CTM_RJ_2 // ' file for update - '
-     &        // 'try to open new'
-         CALL M3MESG ( XMSG )
-
-C...Set output file characteristics based on COORD.EXT and open
-C...  the photolysis diagnostic file
-
-         FTYPE3D = GRDDED3
-         SDATE3D = JDATE
-         STIME3D = JTIME
-         TSTEP3D = TSTEP
-
-         NCOLS3D = GL_NCOLS
-         NROWS3D = GL_NROWS
-         NLAYS3D = NLAYS_DIAG
-         NTHIK3D =     1
-         GDTYP3D = GDTYP_GD
-         P_ALP3D = P_ALP_GD
-         P_BET3D = P_BET_GD
-         P_GAM3D = P_GAM_GD
-         XORIG3D = XORIG_GD
-         YORIG3D = YORIG_GD
-         XCENT3D = XCENT_GD
-         YCENT3D = YCENT_GD
-         XCELL3D = XCELL_GD
-         YCELL3D = YCELL_GD
-         VGTYP3D = VGTYP_GD
-         VGTOP3D = VGTOP_GD
-         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-         DO L = 1, NLAYS3D + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
-         END DO
-
-         FDESC3D( 1 ) = 'Three dimensional values of Photolysis rates '
-         FDESC3D( 2 ) = 'used to make predictions for the ' // TRIM( MECHNAME )
-         FDESC3D( 3 ) = 'photochemical mechanism from the In-line calculation.'
-         FDESC3D( 4 ) = 'Data files can be found in CMAQ repository under subdirectory,'
-         FDESC3D( 5 ) = 'UTIL/inline_phot_preproc/photolysis_CSQY_data'
-         DO N = 6, MXDESC3
-            FDESC3D( N ) = ' '
-         END DO
-
 C...load data from photolysis reaction list
 
-         DO N = 1, NPHOTAB
-            VNAME3D( N ) = PHOTAB( N )
-            VTYPE3D( N ) = M3REAL
-            UNITS3D( N ) = 'min-1'
-            VDESC3D( N ) = 'Photolysis rates calculated based on data file; ' // VNAME3D(N)
+         DO N = 1, NVARS_RJ_2
+            VNAME( N ) = PHOTAB( N )
+            VTYPE( N ) = M3REAL
+            UNITS( N ) = 'min-1'
+            VDESC( N ) = 'Photolysis rates calculated based on data file; ' // VNAME(N)
          END DO
 
-         NVARS3D = NPHOTAB
-         
 !C...Write ascii table describing variables
 !         WRITE(LOGDEV,'(A)')'*PHOTDIAG2 File Contents'
-!         WRITE(LOGDEV,'(A)')'**Three dimensionals values of Photolysis rates '
+!         WRITE(LOGDEV,'(A)')'**Three dimensional values of Photolysis rates '
 !     &                   // 'used to make predictions from the In-line calculation '
 !     &                   // ' of Photolysis Rates '
 !         WRITE(LOGDEV,99950)
 !         WRITE(LOGDEV,99951)
 !         DO L = 1, NVARS3D
-!            WRITE(LOGDEV,99952)TRIM(VNAME3D( L )),TRIM(UNITS3D( L )),TRIM(VDESC3D( L ))
+!            WRITE(LOGDEV,99952)TRIM(VNAME( L )),TRIM(UNITS( L )),TRIM(VDESC( L ))
 !         END DO
  
          ! Store MIO Metadata
-         NDIMS3D( 1:NVARS3D ) = 4
-         L_TSTEP( 1:NVARS3D ) = .True.
-         L_LAY  ( 1:NVARS3D ) = .True.
-         L_COL  ( 1:NVARS3D ) = .True.
-         L_ROW  ( 1:NVARS3D ) = .True.
-         L_VEXT ( 1:NVARS3D ) = .False.
+         NDIMS( 1:NVARS_RJ_2 ) = 4
+         L_TSTEP( 1:NVARS_RJ_2 ) = .True.
+         L_LAY  ( 1:NVARS_RJ_2 ) = .True.
+         L_COL  ( 1:NVARS_RJ_2 ) = .True.
+         L_ROW  ( 1:NVARS_RJ_2 ) = .True.
+         L_VEXT ( 1:NVARS_RJ_2 ) = .False.
        
-         CALL LOAD_MIO_FILE ( 'CTM_RJ_2', NLAYS3D, 1, NLAYS3D,
-     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &        L_VEXT(1:NVARS3D) )
+         CALL LOAD_MIO_FILE ( CTM_RJ_2, NLAYS3D, 1, NLAYS3D,
+     &        VNAME(1:NVARS_RJ_2), VTYPE(1:NVARS_RJ_2), UNITS(1:NVARS_RJ_2),
+     &        VDESC(1:NVARS_RJ_2), NDIMS(1:NVARS_RJ_2), L_TSTEP(1:NVARS_RJ_2),
+     &        L_LAY(1:NVARS_RJ_2),   L_COL(1:NVARS_RJ_2),   L_ROW(1:NVARS_RJ_2),
+     &        L_VEXT(1:NVARS_RJ_2) )
  
 
-         IF ( .NOT. OPEN3( CTM_RJ_2, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not create '// CTM_RJ_2 // ' file'
-            CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         END IF
-
-      END IF
-
-C...Try to open existing file for update
-
-      IF ( .NOT. OPEN3( CTM_RJ_3, FSRDWR3, PNAME ) ) THEN
-
-         XMSG = 'Could not open ' // CTM_RJ_3 // ' file for update - '
-     &        // 'try to open new'
-         CALL M3MESG ( XMSG )
-
-C...Set output file characteristics based on COORD.EXT and open
-C...  the photolysis diagnostic file
-
-         FTYPE3D = GRDDED3
-         SDATE3D = JDATE
-         STIME3D = JTIME
-         TSTEP3D = TSTEP
-
-         NCOLS3D = GL_NCOLS
-         NROWS3D = GL_NROWS
-         NLAYS3D = NLAYS_DIAG
-         NTHIK3D =     1
-         GDTYP3D = GDTYP_GD
-         P_ALP3D = P_ALP_GD
-         P_BET3D = P_BET_GD
-         P_GAM3D = P_GAM_GD
-         XORIG3D = XORIG_GD
-         YORIG3D = YORIG_GD
-         XCENT3D = XCENT_GD
-         YCENT3D = YCENT_GD
-         XCELL3D = XCELL_GD
-         YCELL3D = YCELL_GD
-         VGTYP3D = VGTYP_GD
-         VGTOP3D = VGTOP_GD
-         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
-
-         DO L = 1, NLAYS3D + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
-         END DO
-
-         FDESC3D( 1 ) = 'Three dimensional values of Optical Inputs and Radiative'
-         FDESC3D( 2 ) = 'Results from the In-line photolysis calculation using the'
-         FDESC3D( 3 ) =  TRIM( MECHNAME ) // ' photochemical mechanism.'
-
-         DO N = 4, MXDESC3
-            FDESC3D( N ) = ' '
-         END DO
-         
          N = 0
          
          DO L = 1, N_DIAG_WVL
@@ -515,98 +407,91 @@ C...assumes that lambda in nanometers is on order of 100 or less
             WRITE( LAMBDA,'(I3.3)' ) INT( WAVELENGTH( JWL ) )
 
             N = N + 1
-            VNAME3D( N ) = 'AERO_SCAT_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = 'Km-1'
-            VDESC3D( N ) = 'Aerosol Scattering of layer at '
+            VNAME( N ) = 'AERO_SCAT_W' // TRIM( LAMBDA )
+            UNITS( N ) = 'Km-1'
+            VDESC( N ) = 'Aerosol Scattering of layer at '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
             N = N + 1
-            VNAME3D( N ) = 'AERO_ASYM_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = ''
-            VDESC3D( N ) = 'Aerosol Asymmetry Factor at '
+            VNAME( N ) = 'AERO_ASYM_W' // TRIM( LAMBDA )
+            UNITS( N ) = ''
+            VDESC( N ) = 'Aerosol Asymmetry Factor at '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
             N = N + 1
-            VNAME3D( N ) = 'CLD_EXT_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = 'Km-1'
-            VDESC3D( N ) = 'Cloud Extinction of layer for '
+            VNAME( N ) = 'CLD_EXT_W' // TRIM( LAMBDA )
+            UNITS( N ) = 'Km-1'
+            VDESC( N ) = 'Cloud Extinction of layer for '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
             N = N + 1
-            VNAME3D( N ) = 'GAS_EXT_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = 'Km-1' 
-            VDESC3D( N ) = 'Total Extinction from Rayleigh scattering NO2 and O3 in layer for '
+            VNAME( N ) = 'GAS_EXT_W' // TRIM( LAMBDA )
+            UNITS( N ) = 'Km-1' 
+            VDESC( N ) = 'Total Extinction from Rayleigh scattering NO2 and O3 in layer for '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
  
             N = N + 1
-            VNAME3D( N ) = 'AERO_EXT_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = 'Km-1'
-            VDESC3D( N ) = 'Aerosol Extinction in layer for '
+            VNAME( N ) = 'AERO_EXT_W' // TRIM( LAMBDA )
+            UNITS( N ) = 'Km-1'
+            VDESC( N ) = 'Aerosol Extinction in layer for '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
             
             N = N + 1
-            VNAME3D( N ) = 'ACTINIC_FX_W' // TRIM( LAMBDA )
-            UNITS3D( N ) = 'W m-2'
-            VDESC3D( N ) = 'Net Actinic Flux, '
+            VNAME( N ) = 'ACTINIC_FX_W' // TRIM( LAMBDA )
+            UNITS( N ) = 'W m-2'
+            VDESC( N ) = 'Net Actinic Flux, '
      &                   // TRIM( LAMBDA ) // ' nm'
-            VTYPE3D( N ) = M3REAL
+            VTYPE( N ) = M3REAL
 
         END DO
         
          N = N + 1
-         VNAME3D( N ) = 'CFRAC_3D'
-         UNITS3D( N ) = '1'
-         VDESC3D( N ) = 'Resolved Cloud Fraction in grid cell'
-         VTYPE3D( N ) = M3REAL
+         VNAME( N ) = 'CFRAC_3D'
+         UNITS( N ) = '1'
+         VDESC( N ) = 'Resolved Cloud Fraction in grid cell'
+         VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'AERO_EXT_W550'
-         UNITS3D( N ) = 'Km-1'
-         VDESC3D( N ) = ' Aerosol Extinction of layer for '
+         VNAME( N ) = 'AERO_EXT_W550'
+         UNITS( N ) = 'Km-1'
+         VDESC( N ) = ' Aerosol Extinction of layer for '
      &                // '550 nm based on an Angstrom Interpolation'
-         VTYPE3D( N ) = M3REAL
+         VTYPE( N ) = M3REAL
         
-
-         NVARS3D = N
-
+         IF ( N .NE. NVARS_RJ_3 ) THEN
+            WRITE(XMSG,'("NVARS_RJ_3 equal ",I3," but needs to equal ",I3)')
+     &      NVARS_RJ_3,N
+            CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
+         END IF
 !C...Write ascii table describing variables
 !         WRITE(LOGDEV,'(A)')'*PHOTDIAG3 File Contents'
-!         WRITE(LOGDEV,'(A)')'**Three dimensionals values of Optical Inputs and Radiative '
+!         WRITE(LOGDEV,'(A)')'**Three dimensional values of Optical Inputs and Radiative '
 !     &                    // 'Results from the In-line photolysis calculation.'
 !         WRITE(LOGDEV,99950)
 !         WRITE(LOGDEV,99951)
 !         DO L = 1, NVARS3D
-!            WRITE(LOGDEV,99952)TRIM(VNAME3D( L )),TRIM(UNITS3D( L )),TRIM(VDESC3D( L ))
+!            WRITE(LOGDEV,99952)TRIM(VNAME( L )),TRIM(UNITS( L )),TRIM(VDESC( L ))
 !         END DO
 
          ! Store MIO Metadata
-         NDIMS3D( 1:NVARS3D ) = 4
-         L_TSTEP( 1:NVARS3D ) = .True.
-         L_LAY  ( 1:NVARS3D ) = .True.
-         L_COL  ( 1:NVARS3D ) = .True.
-         L_ROW  ( 1:NVARS3D ) = .True.
-         L_VEXT ( 1:NVARS3D ) = .False.
+         NDIMS( 1:NVARS_RJ_3 ) = 4
+         L_TSTEP( 1:NVARS_RJ_3 ) = .True.
+         L_LAY  ( 1:NVARS_RJ_3 ) = .True.
+         L_COL  ( 1:NVARS_RJ_3 ) = .True.
+         L_ROW  ( 1:NVARS_RJ_3 ) = .True.
+         L_VEXT ( 1:NVARS_RJ_3 ) = .False.
        
-         CALL LOAD_MIO_FILE ( 'CTM_RJ_3', NLAYS3D, 1, NLAYS3D,
-     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &        L_VEXT(1:NVARS3D) )
+         CALL LOAD_MIO_FILE ( CTM_RJ_3, NLAYS_DIAG, 1, NLAYS_DIAG,
+     &        VNAME(1:NVARS_RJ_3), VTYPE(1:NVARS_RJ_3), UNITS(1:NVARS_RJ_3),
+     &        VDESC(1:NVARS_RJ_3), NDIMS(1:NVARS_RJ_3), L_TSTEP(1:NVARS_RJ_3),
+     &        L_LAY(1:NVARS_RJ_3),   L_COL(1:NVARS_RJ_3),   L_ROW(1:NVARS_RJ_3),
+     &        L_VEXT(1:NVARS_RJ_3) )
 
-C...Open the 3rd photolysis diagnostic file
-
-         IF ( .NOT. OPEN3( CTM_RJ_3, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not create '// CTM_RJ_3 // ' file'
-            CALL M3EXIT ( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         END IF
-
-      END IF
-#endif
 
 99950    FORMAT('|Variable Name|Units|Description                                   |')         
 99951    FORMAT('|:----|:----:|:---------------------------------------------|')

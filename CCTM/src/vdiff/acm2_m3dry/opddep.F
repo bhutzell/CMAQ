@@ -18,12 +18,6 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/vdiff/acm2/opddep.F,v 1.6 2012/01/19 14:40:52 yoj Exp $
- 
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
- 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPDDEP ( JDATE, JTIME, TSTEP )
 
@@ -69,48 +63,12 @@ C Local variables:
 C-----------------------------------------------------------------------
 
 #ifndef mpas
-C Try to open existing file for update
 
-      IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSRDWR3, PNAME ) ) THEN
-      
-         XMSG = 'Could not open ' // CTM_DRY_DEP_1 // ' file for update - '
-     &        // 'try to open new'
-         CALL M3MESG( XMSG )
-
-C Set output file characteristics based on COORD.EXT and open the dry dep file
-
-         FTYPE3D = GRDDED3
-         SDATE3D = JDATE
-         STIME3D = JTIME
-         TSTEP3D = TSTEP
-         CALL NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
          IF ( ABFLUX ) THEN
             NVARS3D = N_SPC_DDEP + 2
          ELSE 
             NVARS3D = N_SPC_DDEP 
          END IF
-         NCOLS3D = GL_NCOLS
-         NROWS3D = GL_NROWS
-         NLAYS3D =     1
-         NTHIK3D =     1
-         GDTYP3D = GDTYP_GD
-         P_ALP3D = P_ALP_GD
-         P_BET3D = P_BET_GD 
-         P_GAM3D = P_GAM_GD
-         XORIG3D = XORIG_GD
-         YORIG3D = YORIG_GD
-         XCENT3D = XCENT_GD
-         YCENT3D = YCENT_GD
-         XCELL3D = XCELL_GD
-         YCELL3D = YCELL_GD
-         VGTYP3D = VGTYP_GD
-         VGTOP3D = VGTOP_GD
-!        VGTPUN3D = VGTPUN_GD ! currently, not defined
-         DO L = 1, NLAYS3D + 1
-            VGLVS3D( L ) = VGLVS_GD( L )
-         END DO
-!        GDNAM3D = GDNAME_GD
-         GDNAM3D = GRID_NAME  ! from HGRD_DEFN
 
          N = 0
          STRT = 1
@@ -174,15 +132,10 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
             VDESC3D( V+1 ) = 'hourly NH3_Emis values'
          END IF
 
-         FDESC3D( 1 ) = 'hourly 1-layer cross-point M3Dry dry deposition data'
-         DO L = 2, MXDESC3
-            FDESC3D( L ) = ' '
-         END DO
-
          ! Store MIO Metadata
-         NDIMS3D( 1:NVARS3D ) = 3
+         NDIMS3D( 1:NVARS3D ) = 4
          L_TSTEP( 1:NVARS3D ) = .True.
-         L_LAY  ( 1:NVARS3D ) = .False.
+         L_LAY  ( 1:NVARS3D ) = .True.
          L_COL  ( 1:NVARS3D ) = .True.
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
@@ -194,28 +147,13 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
      &        L_VEXT(1:NVARS3D) )
 
 
-C    Open dry deposition file
-
-         IF ( .NOT. OPEN3( CTM_DRY_DEP_1, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not create '// CTM_DRY_DEP_1 // ' file'
-            CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         END IF
-
-      END IF
 #endif
 
 #ifdef sens
-CC..Create sensitivity dry deposition file
-
-C...check for existing file
-      IF ( .NOT. OPEN3( CTM_SDRYDEP_1, FSRDWR3, PNAME ) ) THEN
-         XMSG = 'Could not open ' // CTM_SDRYDEP_1 // ' file for update - '
-     &        // 'try to open new'
-         CALL M3MESG( XMSG )
+C..Create sensitivity dry deposition file
 
 C...set output file variables 
          NVARS3D = N_SPC_DDEP * NPMAX
-         FDESC3D( 1 ) = 'sensitivity of hourly dry deposition'
 
 C...define sens dry deposition output descriptors for gaseous species
          N = 0
@@ -288,9 +226,9 @@ C...define dry deposition output descriptors for tracer species
          END DO
 
          ! Store MIO Metadata
-         NDIMS3D( 1:NVARS3D ) = 3
+         NDIMS3D( 1:NVARS3D ) = 4
          L_TSTEP( 1:NVARS3D ) = .True.
-         L_LAY  ( 1:NVARS3D ) = .False.
+         L_LAY  ( 1:NVARS3D ) = .True.
          L_COL  ( 1:NVARS3D ) = .True.
          L_ROW  ( 1:NVARS3D ) = .True.
          L_VEXT ( 1:NVARS3D ) = .False.
@@ -302,13 +240,6 @@ C...define dry deposition output descriptors for tracer species
      &        L_VEXT(1:NVARS3D) )
 
 
-C...create a new file
-         IF ( .NOT. OPEN3( CTM_SDRYDEP_1, FSNEW3, PNAME ) ) THEN
-            XMSG = 'Could not create '// CTM_DRY_DEP_1 // ' file'
-            CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
-         END IF
-
-      END IF
 #endif
 
       RETURN

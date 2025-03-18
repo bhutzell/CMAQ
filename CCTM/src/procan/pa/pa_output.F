@@ -76,6 +76,8 @@ C-----------------------------------------------------------------------
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE PAGRD_DEFN            ! PA horiz domain specs
       USE UTILIO_DEFN           ! inherits PARUTILIO
+      use mio_module
+      use replacement_util_module
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE, SE_DATA_COPY_MODULE)
@@ -106,8 +108,11 @@ C Local Variables:
       INTEGER, SAVE :: NIPRFLS          ! Number of IPR output files
       INTEGER, SAVE :: NIRRFLS          ! Number of IRR output files
       LOGICAL, SAVE :: LFIRST = .TRUE.  ! Flag for first call
+      LOGICAL, SAVE :: FIRSTIPR = .TRUE.
+      LOGICAL, SAVE :: FIRSTIRR = .TRUE.
 
       CHARACTER( 80 ) ::  XMSG = ' '    ! Error message buffer
+      CHARACTER( 20 ) :: TIME_STAMP
 
       INTEGER C         ! Loop index for columns
       INTEGER ICG       ! Index for species in cgrid array
@@ -139,32 +144,32 @@ C-----------------------------------------------------------------------
      $             stat=allocstat)
       end if
 
-#ifdef parallel
-      IF ( .NOT. LFIRST ) THEN
-C Reset decomposition map
-         IF ( .NOT. PIO_INIT( COLROW, PACOLS, PAROWS, PALEVS, NTHIK,
-     &                        MY_PACOLS, MY_PAROWS, NPCOL, NPROW, NPCOL*NPROW,
-     &                        MYPE ) ) THEN
-            XMSG = 'Failed to re-initialize parallel I/O library.'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            RETURN
-         END IF
-      END IF
-#endif
+!#ifdef parallel
+!      IF ( .NOT. LFIRST ) THEN
+!C Reset decomposition map
+!         IF ( .NOT. PIO_INIT( COLROW, PACOLS, PAROWS, PALEVS, NTHIK,
+!     &                        MY_PACOLS, MY_PAROWS, NPCOL, NPROW, NPCOL*NPROW,
+!     &                        MYPE ) ) THEN
+!            XMSG = 'Failed to re-initialize parallel I/O library.'
+!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!            RETURN
+!         END IF
+!      END IF
+!#endif
 
 C On first call, get and save the output file names 
       IF ( LFIRST ) THEN
 
-#ifdef parallel
-C Reset decomposition map
-         IF ( .NOT. PIO_INIT( COLROW, PACOLS, PAROWS, PALEVS, NTHIK,
-     &                        MY_PACOLS, MY_PAROWS, NPCOL, NPROW, NPCOL*NPROW,
-     &                        MYPE, WFLG = .TRUE. ) ) THEN
-            XMSG = 'Failed to re-initialize parallel I/O library.'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            RETURN
-         END IF
-#endif
+!#ifdef parallel
+!C Reset decomposition map
+!         IF ( .NOT. PIO_INIT( COLROW, PACOLS, PAROWS, PALEVS, NTHIK,
+!     &                        MY_PACOLS, MY_PAROWS, NPCOL, NPROW, NPCOL*NPROW,
+!     &                        MYPE, WFLG = .TRUE. ) ) THEN
+!            XMSG = 'Failed to re-initialize parallel I/O library.'
+!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!            RETURN
+!         END IF
+!#endif
 
          IF ( LIPR .AND. NIPRVAR. GT. 0 ) THEN
 
@@ -185,14 +190,6 @@ C Reset decomposition map
                ELSE IF ( NFL .GT. 3 ) THEN
                   XMSG = 'Maximum number of IPR output files exceeded'
                   CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-               END IF
-
-               IF ( MYPE .EQ. 0 ) THEN
-                  IF ( .NOT. OPEN3( IPRFNAM( NFL ), FSRDWR3, PNAME ) ) THEN
-                     XMSG = 'Could not open Integrated Process Rate Output File: '
-     &                    // IPRFNAM( NFL )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
                END IF
 
             END DO
@@ -220,14 +217,6 @@ C Reset decomposition map
                   CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
                END IF
 
-               IF ( MYPE .EQ. 0 ) THEN
-                  IF ( .NOT. OPEN3( IRRFNAM( NFL ), FSRDWR3, PNAME ) ) THEN
-                     XMSG = 'Could not open Integrated Reaction Rate Output File: '
-     &                    // IRRFNAM( NFL )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
-               END IF
-
             END DO
 
          END IF
@@ -237,6 +226,9 @@ C Reset decomposition map
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 C  Output Process analysis data and re-initialize arrays
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      call mio_time_format_conversion( JDATE, JTIME, TIME_STAMP )
+
       IF ( LIPR ) THEN
 
          DO NFL = 1, NIPRFLS
@@ -246,12 +238,19 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             DO NOUT = 1, NVARINDX
                VARINDX = ( NFL - 1 ) * MXVARS3 + NOUT
 
-               IF ( .NOT. WRITE3( IPRFNAM( NFL ), IPRNAME( VARINDX ),
-     &                 JDATE, JTIME, DELC( :,:,:,VARINDX ) ) ) THEN 
-                  XMSG = 'Could not write ' // IPRFNAM( NFL )
-                  CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+               IF ( FIRSTIPR ) THEN
+                  FIRSTIPR = .FALSE.
+                  call mio_setfile( INIT_CONC_1 )
+                  IF ( PALEVS .NE. NLAYS ) mio_nlays = PALEVS
+                  call mio_fcreate( CTM_IPR_1, mio_new_file )
+                  IF ( MYPE .EQ. 0 .AND. PALEVS .NE. NLAYS ) THEN
+                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IPR_1, 'NLAYS', PALEVS )
+                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IPR_1, 'VGLVLS', INIT_CONC_1, 1, PALEVS+1 )
+                  END IF
                END IF
-
+   
+               call mio_fwrite( CTM_IPR_1, IPRNAME( VARINDX ),
+     &                          PNAME, DELC( :,:,:,VARINDX ), TIME_STAMP )
             END DO
 
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
@@ -294,12 +293,20 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 #else
                DBUFF = IRROUT( 1:MY_PACOLS,1:MY_PAROWS,1:PALEVS,VARINDX )
 #endif
-               IF ( .NOT. WRITE3( IRRFNAM( NFL ), IRRNAME( VARINDX ),
-     &              JDATE, JTIME, DBUFF ) ) THEN 
-                  XMSG = 'Could not write ' // IRRFNAM( NFL )
-                  CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+
+               IF ( FIRSTIRR ) THEN
+                  FIRSTIRR = .FALSE.
+                  call mio_setfile( INIT_CONC_1 )
+                  IF ( PALEVS .NE. NLAYS ) mio_nlays = PALEVS
+                  call mio_fcreate( CTM_IRR_1, mio_new_file )
+                  IF ( MYPE .EQ. 0 .AND. PALEVS .NE. NLAYS ) THEN
+                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IRR_1, 'NLAYS', PALEVS )
+                     CALL MIO_SET_GLOBAL_ATTR ( CTM_IRR_1, 'VGLVLS', INIT_CONC_1, 1, PALEVS+1 )
+                  END IF
                END IF
 
+               call mio_fwrite( CTM_IRR_1, IRRNAME( VARINDX ),
+     &                          PNAME, DBUFF, TIME_STAMP )
             END DO
 
             WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
@@ -325,26 +332,26 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       END IF   ! IRR
 
-#ifdef parallel
-      IF ( .NOT. LFIRST ) THEN
-C Reset decomposition map
-         IF ( .NOT. PIO_INIT( COLROW, GL_NCOLS, GL_NROWS, NLAYS, NTHIK,
-     &                        NCOLS, NROWS, NPCOL, NPROW, NPCOL*NPROW,
-     &                        MYPE ) ) THEN
-            XMSG = 'Failed to re-initialize parallel I/O library.'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            RETURN
-         END IF
-      ELSE
-         IF ( .NOT. PIO_INIT( COLROW, GL_NCOLS, GL_NROWS, NLAYS, NTHIK,
-     &                        NCOLS, NROWS, NPCOL, NPROW, NPCOL*NPROW,
-     &                        MYPE, WFLG = .TRUE. ) ) THEN
-            XMSG = 'Failed to re-initialize parallel I/O library.'
-            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-            RETURN
-         END IF
-      END IF
-#endif
+!#ifdef parallel
+!      IF ( .NOT. LFIRST ) THEN
+!C Reset decomposition map
+!         IF ( .NOT. PIO_INIT( COLROW, GL_NCOLS, GL_NROWS, NLAYS, NTHIK,
+!     &                        NCOLS, NROWS, NPCOL, NPROW, NPCOL*NPROW,
+!     &                        MYPE ) ) THEN
+!            XMSG = 'Failed to re-initialize parallel I/O library.'
+!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!            RETURN
+!         END IF
+!      ELSE
+!         IF ( .NOT. PIO_INIT( COLROW, GL_NCOLS, GL_NROWS, NLAYS, NTHIK,
+!     &                        NCOLS, NROWS, NPCOL, NPROW, NPCOL*NPROW,
+!     &                        MYPE, WFLG = .TRUE. ) ) THEN
+!            XMSG = 'Failed to re-initialize parallel I/O library.'
+!            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+!            RETURN
+!         END IF
+!      END IF
+!#endif
 #endif
 
       IF ( LFIRST ) THEN

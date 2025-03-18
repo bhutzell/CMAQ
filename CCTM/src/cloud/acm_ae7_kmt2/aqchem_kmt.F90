@@ -953,7 +953,7 @@ kron: DO WHILE (T < TEND)
               write(logdev,*) 'I, START, END'
               write(logdev,*) I, STARTM(I), ENDM(I)
               XMSG = 'Mass balance problem in KMT?'
-              CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+              CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
            END IF  
                       
         END DO

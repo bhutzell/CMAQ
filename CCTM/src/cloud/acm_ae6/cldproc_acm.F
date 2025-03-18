@@ -65,6 +65,7 @@ C-----------------------------------------------------------------------
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
       use CENTRALIZED_IO_MODULE, only : interpolate_var
+      use mio_module
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_WDEP
       USE CONST
 
@@ -84,7 +85,6 @@ C-----------------------------------------------------------------------
 
 #ifdef mpas
       use util_module, only : nextime, index1, time2sec
-      use mio_module
       use coupler_module
 #endif
       USE CONST
@@ -119,7 +119,14 @@ C...........ARGUMENTS
 C...........Local Variables
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE. ! flag for first pass thru
-
+      LOGICAL, SAVE :: FIRSTWRITE = .TRUE.
+      LOGICAL, SAVE :: FIRSTDIAG = .TRUE.
+#ifdef sens
+      LOGICAL, SAVE :: FIRST_WRITE_SENS = .TRUE.
+#endif
+#ifdef isam
+      LOGICAL, SAVE :: FIRST_WRITE_ISAM = .TRUE.
+#endif
       CHARACTER( 16 ), SAVE :: PNAME = 'CLDPROC' ! driver program name
       CHARACTER( 16 ) :: VNAME            ! input variable name list
 
@@ -151,8 +158,8 @@ C...........Local Variables
       REAL, ALLOCATABLE, SAVE :: SUBTRANS( :,:,: ) ! subgrid cloud transmissivity
 
       REAL CCMIN
+      CHARACTER (20) :: TIME_STAMP               ! this is for mio
 #ifdef mpas
-      CHARACTER (20) :: TIME_STAMP               ! this is for mpas
       integer :: year, month, day, hour, minute  ! this is for mpas
 
 ! this is for creating the output name list
@@ -163,7 +170,6 @@ C...........Local Variables
       integer, save :: loc_n
       integer :: loc_nvars, stat, n, k, fnum
       logical :: found
-      character (16) :: wdep_spc(300)
 #endif
 
 #ifdef isam
@@ -209,14 +215,14 @@ C...and return
 
           XMSG = 'No species were specified for wet deposition ' //
      &           'tracking'
-          CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+          CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
 
           XMSG = 'ONLY CLOUD DIAGNOSTICS WILL BE WRITTEN TO THE ' //
      &           'WETDEP OUTPUT FILE!'
-          CALL M3MESG ( XMSG )
+          CALL LOG_MESSAGE( LOGDEV ,  XMSG )
 
         END IF
-
+ 
 C...initialize the deposition array before processing clouds
 
         ALLOCATE ( TOT_DEP ( NCOLS,NROWS,N_SPC_WDEP+1 ),
@@ -365,56 +371,6 @@ Ckrt deposition arrays for tagged species.....
                end if
             end do
          end if
-
-
-         wdep_spc = ' '
-         SPC = 0
-         STRT = 1
-         FINI = N_GC_WDEP
-         DO VAR = STRT, FINI
-            SPC = SPC + 1
-            wdep_spc( VAR ) = GC_WDEP( SPC )
-         END DO
-
-         SPC = 0
-         STRT = N_GC_WDEP + 1
-         FINI = N_GC_WDEP + N_AE_WDEP
-         DO VAR = STRT, FINI
-            SPC = SPC + 1
-            wdep_spc ( VAR ) = AE_WDEP( SPC )
-         END DO
-
-         SPC = 0
-         STRT = N_GC_WDEP + N_AE_WDEP + 1
-         FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP
-         DO VAR = STRT, FINI
-            SPC = SPC + 1
-            wdep_spc ( VAR ) = NR_WDEP( SPC )
-         END DO
-
-         SPC = 0
-         STRT = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + 1
-         FINI = N_GC_WDEP + N_AE_WDEP + N_NR_WDEP + N_TR_WDEP
-         DO VAR = STRT, FINI
-            SPC = SPC + 1
-            wdep_spc ( VAR ) = TR_WDEP( SPC )
-         END DO
-#else
-         IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-            IF ( .NOT. OPEN3( CTM_WET_DEP_1, FSREAD3, PNAME ) ) THEN
-               XMSG = 'Could not open ' // TRIM( CTM_WET_DEP_1 )
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-         END IF
-         IF ( CLD_DIAG ) THEN
-            IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-               IF ( .NOT. OPEN3( CTM_WET_DEP_2, FSREAD3, PNAME ) ) THEN
-                  XMSG = 'Could not open ' // TRIM( CTM_WET_DEP_2 )
-                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
-            END IF
-         END IF
-
 #endif
          RETURN ! Added for MIO Implementation
       END IF   ! FIRSTIME
@@ -659,11 +615,29 @@ Ckrt  for the tagged species as well....
 
 C...write data to the normal wet deposition file
 
-        IF ( .NOT. WRITE3( CTM_WET_DEP_1, ALLVAR3, NDATE,
-     &                     NTIME, TOT_DEP ) ) THEN
-          XMSG = 'Could not write ' // CTM_WET_DEP_1 // ' file'
-          CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
-        END IF
+        if ( FIRSTWRITE ) then
+           FIRSTWRITE = .FALSE.
+           call mio_setfile( INIT_CONC_1 )
+           mio_nlays = 1
+           call mio_fcreate( CTM_WET_DEP_1, mio_new_file )
+           if (mype .eq. 0) then
+              call mio_set_global_attr ( CTM_WET_DEP_1, 'NLAYS', 1 )
+              call mio_set_global_attr ( CTM_WET_DEP_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+           end if
+        end if
+
+        call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
+
+        DO VAR = 1, N_SPC_WDEP 
+           call mio_fwrite( CTM_WET_DEP_1, WDEP_SPC( VAR ),
+     &                      PNAME, TOT_DEP(:,:,VAR), TIME_STAMP )
+        END DO
+
+        VAR = N_SPC_WDEP + 1
+        VNAME = 'HPLUS'
+        call mio_fwrite( CTM_WET_DEP_1, VNAME,
+     &                   PNAME, TOT_DEP(:,:,VAR), TIME_STAMP )
+
 #endif
 
         WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
@@ -674,6 +648,18 @@ C...write data to the normal wet deposition file
 #ifdef sens
 C...write data to the sensitivity wet deposition file
 c gas species
+        IF ( FIRST_WRITE_SENS ) THEN
+           FIRST_WRITE_SENS = .FALSE.
+           call mio_setfile( INIT_CONC_1 )
+           mio_nlays = 1
+           call mio_fcreate( CTM_SWETDEP_1, mio_new_file )
+           if (mype .eq. 0) then
+              call mio_set_global_attr ( CTM_SWETDEP_1, 'NLAYS', 1 )
+              call mio_set_global_attr ( CTM_SWETDEP_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+           end if
+        END IF
+        call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
+
         DO NP = 1, NPMAX
           DO SPC = 1, ( N_SPC_WDEP + 1 ) 
             SENNUM = ( SPC - 1 ) * NPMAX + NP
@@ -682,11 +668,11 @@ c gas species
 
         END DO
 
-        IF ( .NOT. WRITE3( CTM_SWETDEP_1, ALLVAR3, NDATE,
-     &                     NTIME, S_DEPWRT ) ) THEN
-          XMSG = 'Could not write ' // CTM_SWETDEP_1 // ' file'
-          CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
-        END IF
+        DO SPC = 1, NPMAX * ( N_SPC_WDEP + 1 )
+!          write(logdev,*) 'SWETDEP: spc, name', spc, swdep_spc(spc)
+           call mio_fwrite( CTM_SWETDEP_1, swdep_spc( SPC ),
+     &                      PNAME, S_DEPWRT( :,:,SPC ), TIME_STAMP )
+        END DO
 
         WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6)' )
      &         'Timestep written to', CTM_SWETDEP_1,
@@ -700,7 +686,6 @@ C...write data to the diagnostic file if requested by the user
         IF ( CLD_DIAG ) THEN
 #ifdef mpas
            if ((loc_n > 0) .and. mpas_diag) then
-              call mio_setfile (CTM_WET_DEP_2)
 
               do spc = 1, mio_file_data(mio_cfile)%nvars
                  VNAME = mio_file_data(mio_cfile)%var_name(spc)
@@ -708,12 +693,82 @@ C...write data to the diagnostic file if requested by the user
               end do
            end if
 #else
-
-          IF ( .NOT. WRITE3( CTM_WET_DEP_2, ALLVAR3, NDATE,
-     &                       NTIME, CONV_DEP ) ) THEN
-          XMSG = 'Could not write ' // CTM_WET_DEP_2 // ' file'
-            CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
+          IF ( FIRSTDIAG ) THEN
+             FIRSTDIAG = .FALSE.
+             call mio_setfile( INIT_CONC_1 )
+             mio_nlays = 1
+             call mio_fcreate( CTM_WET_DEP_2, mio_new_file )
+             if (mype .eq. 0) then
+                call mio_set_global_attr ( CTM_WET_DEP_2, 'NLAYS', 1 )
+                call mio_set_global_attr ( CTM_WET_DEP_2, 'VGLVLS', INIT_CONC_1, 1, 2 )
+             end if
           END IF
+       
+          DO VAR = 1, N_SPC_WDEP 
+             call mio_fwrite( CTM_WET_DEP_2, WDEP_SPC( VAR ),
+     &                      PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+          END DO
+
+          VAR = N_SPC_WDEP + 1
+          VNAME = 'HPLUS'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'PLCL'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'CLOUD_BOTTOM'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'PR_CLOUDTOP'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'NP_CLOUDTOP'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'RAIN_FLAG'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'PR_CLDFRAC'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'NP_CLDFRAC'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'PR_TRANS'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'NP_TRANS'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'RES_TRANS'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
+          VAR = VAR + 1
+          VNAME = 'CLD_TRANS'
+          call mio_fwrite( CTM_WET_DEP_2, VNAME, 
+     &                     PNAME, CONV_DEP(:,:,VAR), TIME_STAMP )
+
 #endif
 
           WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
@@ -733,6 +788,18 @@ C...reinitialize deposition array
 #endif
 
 #ifdef isam
+        IF ( FIRST_WRITE_ISAM ) THEN
+           FIRST_WRITE_ISAM = .FALSE.
+           call mio_setfile( INIT_CONC_1 )
+           mio_nlays = 1
+           call mio_fcreate( SA_WD_1, mio_new_file )   
+           if (mype .eq. 0) then
+              call mio_set_global_attr ( SA_WD_1, 'NLAYS', 1 )
+              call mio_set_global_attr ( SA_WD_1, 'VGLVLS', INIT_CONC_1, 1, 2 )
+           end if
+        END IF
+        call mio_time_format_conversion( NDATE, NTIME, TIME_STAMP )
+
         BUFF2 = 0.0
         DO SPC = 1, N_SPCTAG
           DO ROW = 1, NROWS
@@ -741,12 +808,8 @@ C...reinitialize deposition array
             END DO ! col
           END DO ! row
 
-          IF ( .NOT. WRITE3( SA_WD_1, VNAM_SPCTAG( SPC ),
-     &                       NDATE, NTIME, BUFF2 ) ) THEN
-            XMSG = 'Could not write ' // SA_WD_1 // ' file'
-            CALL M3EXIT ( PNAME, NDATE, NTIME, XMSG, XSTAT1 )
-          END IF
-          
+          call mio_fwrite( SA_WD_1, VNAM_SPCTAG( SPC ),
+     &                     PNAME, BUFF2, TIME_STAMP )
        END DO ! n_spctag
 
        TOT_SADEP  = 0.0

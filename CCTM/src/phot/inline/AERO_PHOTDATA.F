@@ -276,22 +276,20 @@ C ***    Create map for refactive index for each species
          write( logdev, 5001)(lambda_list( v ), v = 1, nwl)
 #endif 
 
-         WRITE(LOGDEV,*)
-         CALL M3MESG('METHOD FOR AEROSOL OPTICAL PROPERTIES')
-         xmsg = 'METHOD FOR AEROSOL OPTICAL PROPERTIES'
+         XMSG = 'METHOD FOR AEROSOL OPTICAL PROPERTIES'
+         CALL LOG_MESSAGE( LOGDEV, XMSG )
          IF ( .NOT. CORE_SHELL ) THEN
-            XMSG = 'CORE-SHELL mixing model option is set to off so'
-            WRITE(LOGDEV,'(A)')TRIM( XMSG )
-         ELSE
-            XMSG = 'CORE-SHELL mixing model used when aerosol mode has significant black carbon'
-            WRITE(LOGDEV,'(A)')TRIM( XMSG )
-            XMSG = 'When aerosol mode does not have significant black carbon,'
-            WRITE(LOGDEV,'(A)')TRIM( XMSG )
+            CALL LOG_MESSAGE( LOGDEV , 'Core-shell mixing model option is set to off')
+            CALL LOG_MESSAGE( LOGDEV , 'For optics of internally mixed aerosol, Mie calculation used')
+         ELSE 
+            CALL LOG_MESSAGE( LOGDEV , 'For AERO mixing models, core-shell model is possible')
+            CALL LOG_MESSAGE( LOGDEV , 'For optics of aerosols with no core, Mie calculation used')
          END IF
+
          SELECT CASE ( AEROSOL_OPTICS )
            CASE( 1 )
              XMSG = 'VOLUME MIXING model and Tabular Mie Method used'
-             WRITE(LOGDEV,'(A)')TRIM( XMSG )
+             CALL LOG_MESSAGE( LOGDEV, XMSG )
              CALL FAST_MIEAER_MODAL( MIE_PARAMETER,REFINDX,EXTAER,SCATAER,GAER,BSCOEF )
              IF ( EFLAG_WRF_FAST_MIE ) THEN
                 XMSG = 'Above Failure Initializing Tabular Mie Method for aerosol optics'
@@ -299,12 +297,12 @@ C ***    Create map for refactive index for each species
              END IF
            CASE( 2 )
              XMSG = 'VOLUME MIXING model and Mie calculation used'
-             WRITE(LOGDEV,'(A)')TRIM( XMSG )
+             CALL LOG_MESSAGE( LOGDEV, XMSG )
            CASE( 3 )
              XMSG = 'VOLUME MIXING model and FAST_OPTICS used'
-             WRITE(LOGDEV,'(A)')TRIM( XMSG )
-             XMSG = '-Approximations to Mie Theory based on Mie paramter and refractive index '
-             WRITE(LOGDEV,'(A)')TRIM( XMSG )
+             CALL LOG_MESSAGE( LOGDEV, XMSG ) 
+             XMSG = '-Approximations to Mie Theory based on Mie parameter and refractive index '
+             CALL LOG_MESSAGE( LOGDEV, XMSG )
          END SELECT
          WRITE(LOGDEV,*)
 
@@ -845,7 +843,7 @@ C***  and contribution to the overall asymmetry factor
      &               BLK_AE_LSG( MODE,L )
      
                      XMSG =  'FAILURE IN AERO_OPTICAL2: shell only case '
-                     CALL M3WARN( PNAME, 0, 0, XMSG )
+                     CALL LOG_WARNING( PNAME, LOGDEV , XMSG)
                      
                   END IF
 

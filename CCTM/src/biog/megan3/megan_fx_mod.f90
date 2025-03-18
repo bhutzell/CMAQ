@@ -2556,7 +2556,7 @@ CONTAINS    !!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
        REAL, INTENT(IN)      :: WIND( NCOLS, NROWS )
        REAL, INTENT(IN)      :: PRES( NCOLS, NROWS )
        REAL, INTENT(IN)      :: QV  ( NCOLS, NROWS )
-       REAL, INTENT(IN)      :: CTF(NrTyp, NCOLS, NROWS ) ! Canopy type factor array
+       REAL, INTENT(IN)      :: CTF(NrTyp, NCOLS, NROWS, 1 ) ! Canopy type factor array
 
 !   OUTPUT VARIABLES 
 
@@ -2618,7 +2618,7 @@ CONTAINS    !!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
             SunFrac(I,J,:)     = 1.0
             TotalCT           = 0.0
             DO I_CT = 1,NRTYP   !canopy types
-              TotalCT = TotalCT + CTF(I_CT,I,J) * 0.01
+              TotalCT = TotalCT + CTF(I_CT,I,J,1) * 0.01
             ENDDO   ! ENDDO I_CT
 
             IF (TotalCT .GT. 0.0 .AND. LAIc(I,J) .GT. 0.0) THEN
@@ -2631,7 +2631,7 @@ CONTAINS    !!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
               sun_frac_total     = 0.0
 
               DO I_CT = 1,NRTYP   !canopy types
-                IF (CTF(I_CT,I,J) .NE. 0.0) THEN
+                IF (CTF(I_CT,I,J,1) .NE. 0.0) THEN
                 sun_ppfd           = 0.0
                 shade_ppfd         = 0.0
                 sun_tk             = 0.0
@@ -2674,15 +2674,15 @@ CONTAINS    !!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
                               shade_tk,ShadeleafSH,ShadeleafLH,ShadeleafIR,&
                               NrCha, NrTyp, Ws0, TairK0, HumidairPa0)
                      sun_ppfd_total(:)   = sun_ppfd_total(:) + &
-                                     0.01*CTF(I_CT,I,J)*sun_ppfd(:)
+                                     0.01*CTF(I_CT,I,J,1)*sun_ppfd(:)
                      shade_ppfd_total(:) = shade_ppfd_total(:) +&
-                                     0.01*CTF(I_CT,I,J)*shade_ppfd(:)
+                                     0.01*CTF(I_CT,I,J,1)*shade_ppfd(:)
                      sun_tk_total(:)     = sun_tk_total(:) +&
-                                     0.01*CTF(I_CT,I,J)*sun_tk(:)
+                                     0.01*CTF(I_CT,I,J,1)*sun_tk(:)
                      shade_tk_total(:)   = shade_tk_total(:) +& 
-                                     0.01*CTF(I_CT,I,J)*shade_tk(:)
+                                     0.01*CTF(I_CT,I,J,1)*shade_tk(:)
                      sun_frac_total(:)   = sun_frac_total(:) + &
-                                     0.01*CTF(I_CT,I,J)*sun_frac(:)
+                                     0.01*CTF(I_CT,I,J,1)*sun_frac(:)
                 ENDIF
               ENDDO  ! ENDDO I_CT
               SunleafTK(I,J,:)   = sun_tk_total(:)/TotalCT
@@ -3144,7 +3144,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
      
       INTEGER, INTENT(IN) :: SLTYP  (NCOLS, NROWS)  ! soil type
       REAL, INTENT(IN)    :: JYEAR, JDAY
-      REAL, INTENT(IN)    :: CTF( NrTyp, NCOLS, NROWS ) ! Canopy type factor arra
+      REAL, INTENT(IN)    :: CTF( NrTyp, NCOLS, NROWS, 1 ) ! Canopy type factor arra
       REAL, INTENT(IN)    :: LAIc( NCOLS, NROWS )    ! Current time step LAI
       REAL, INTENT(IN)    :: LAT (NCOLS, NROWS )    ! Latitude
       REAL, INTENT(IN)    :: TEMP (NCOLS, NROWS)   ! Temperautre (K)
@@ -3212,12 +3212,12 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
              TMO1 = 0.
              TMO2 = 0.
              DO I_CT = 1,5
-               TMO1 = TMO1 + CTF(I_CT,I,J)
-               TMO2 = TMO2 + CTF(I_CT,I,J) * CFNOG(I,J)
+               TMO1 = TMO1 + CTF(I_CT,I,J,1)
+               TMO2 = TMO2 + CTF(I_CT,I,J,1) * CFNOG(I,J)
              ENDDO
              ! CFNO for crops
-             TMO1 = TMO1 + CTF(6,I,J)
-             TMO2 = TMO2 + CTF(6,I,J) * CFNO(I,J)
+             TMO1 = TMO1 + CTF(6,I,J,1)
+             TMO2 = TMO2 + CTF(6,I,J,1) * CFNO(I,J)
              IF (TMO1 .EQ. 0.0) THEN
                 GAMNO(I,J) = 0.0
              ELSE
