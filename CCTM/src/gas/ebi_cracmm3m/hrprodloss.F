@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Feb 10, 2025
+C  REVISION HISTORY: Created by EBI solver program, Feb 11, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 
@@ -4331,12 +4331,12 @@ C***********************************************************************
      &                     +                 RXRAT(   895 )      ! ABRJ+INO3=IBR+HNO3
 
       PROD(  ANO3I       ) =                 RXRAT(   873 )      ! CLNO2=ANO3I+ACLI
-      LOSS(  ANO3I       ) =   0.0D0
+      LOSS(  ANO3I       ) =                 RXRAT(   902 )      ! ANO3I=0.6700D+00*HONO+...
 
       PROD(  ANO3J       ) =                 RXRAT(   874 )      ! CLNO2=ANO3J+ACLJ
      &                     +                 RXRAT(   879 )      ! CLNO3+ACLJ=ANO3J+CL2
      &                     +                 RXRAT(   880 )      ! CLNO3+ABRJ=ANO3J+BRCL
-      LOSS(  ANO3J       ) =   0.0D0
+      LOSS(  ANO3J       ) =                 RXRAT(   903 )      ! ANO3J=0.6700D+00*HONO+...
 
       RETURN
 

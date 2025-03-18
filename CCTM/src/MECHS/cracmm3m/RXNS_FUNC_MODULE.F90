@@ -159,7 +159,7 @@
          RETURN
        END FUNCTION HALOGEN_FALLOFF
 
-       SUBROUTINE SPECIAL_RATES( NUMCELLS, Y, TEMP, DENS, RKI )
+       SUBROUTINE SPECIAL_RATES( NUMCELLS, Y, TAIR, DENS, RKI )
 ! Purpose: calculate special rate operators and update
 !         appropriate rate constants
 
@@ -169,26 +169,26 @@
 ! Arguments:
        INTEGER,      INTENT( IN  )   :: NUMCELLS        ! Number of cells in block 
        REAL( 8 ),    INTENT( IN )    :: Y( :, : )       ! species concs
-       REAL( 8 ),    INTENT( IN )    :: TEMP( : )       ! air temperature, K 
+       REAL( 8 ),    INTENT( IN )    :: TAIR( : )       ! air temperature, K 
        REAL( 8 ),    INTENT( IN )    :: DENS( : )       ! air density, Kg/m3
        REAL( 8 ),    INTENT( INOUT ) :: RKI( :, : )     ! reaction rate constant, ppm/min 
 ! Local:
        REAL( 8 ), PARAMETER :: DENSITY_TO_NUMBER = 2.07930D+19 ! Kg/m3 to molecules/cm3
 
        INTEGER   :: NCELL
+       REAL( 8 ) :: TEMP
        REAL( 8 ) :: INV_TEMP
        REAL( 8 ) :: CAIR
-       REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule) to 1/(ppm)
-       REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molec^2) to 1/(ppm^2)
+       REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule*sec) to 1/(ppm*min)
+       REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molecule^2*sec) to 1/(ppm^2*min)
 ! special rate operators listed below
 
-
-
        DO NCELL = 1, NUMCELLS
-          INV_TEMP  = 1.0D0 / TEMP( NCELL )
+          TEMP      = TAIR( NCELL )
+          INV_TEMP  = 1.0D0 / TEMP 
           CAIR      = DENSITY_TO_NUMBER * DENS( NCELL )
-          CFACT     = 1.0D-06 * CAIR
-          CFACT_SQU = 1.0D-12 * CAIR * CAIR
+          CFACT     = 6.0D-05 * CAIR
+          CFACT_SQU = 6.0D-11 * CAIR * CAIR
 
 
 ! define special rate operators
@@ -2166,6 +2166,10 @@
              RKI( NCELL,  900) =  BLKHET(  NCELL, IK_HETERO_I2O4_AI )
 !  Reaction Label HET_I2O4_AJ     
              RKI( NCELL,  901) =  BLKHET(  NCELL, IK_HETERO_I2O4_AJ )
+!  Reaction Label HET_ANO3I       
+             RKI( NCELL,  902) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
+!  Reaction Label HET_ANO3J       
+             RKI( NCELL,  903) =  BLKHET(  NCELL, IK_HETERO_ANO3 )
 
         END DO  
 !  Multiply rate constants by [M], [O2], [N2], [H2O], [H2], or [CH4]
