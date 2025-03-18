@@ -179,8 +179,8 @@
        REAL( 8 ) :: TEMP
        REAL( 8 ) :: INV_TEMP
        REAL( 8 ) :: CAIR
-       REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule*min) to 1/(ppm*min)
-       REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molec^2*min) to 1/(ppm^2*min)
+       REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule*sec) to 1/(ppm*min)
+       REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molecule^2*sec) to 1/(ppm^2*min)
 ! special rate operators listed below
 
        DO NCELL = 1, NUMCELLS
@@ -1717,12 +1717,12 @@
              INDEX_OP1         = IOLD2NEW( INDEX_OP1        , 1 )
              INDEX_OP2         = IOLD2NEW( INDEX_OP2        , 1 )
              INDEX_OPB         = IOLD2NEW( INDEX_OPB        , 1 )
-             INDEX_OP3         = IOLD2NEW( INDEX_OP3        , 1 )
+             INDEX_VOP3        = IOLD2NEW( INDEX_VOP3       , 1 )
              INDEX_PAA         = IOLD2NEW( INDEX_PAA        , 1 )
              INDEX_ONIT        = IOLD2NEW( INDEX_ONIT       , 1 )
              INDEX_PAN         = IOLD2NEW( INDEX_PAN        , 1 )
-             INDEX_TRPN        = IOLD2NEW( INDEX_TRPN       , 1 )
-             INDEX_HONIT       = IOLD2NEW( INDEX_HONIT      , 1 )
+             INDEX_VTRPN       = IOLD2NEW( INDEX_VTRPN      , 1 )
+             INDEX_VHONIT      = IOLD2NEW( INDEX_VHONIT     , 1 )
              INDEX_N2O5        = IOLD2NEW( INDEX_N2O5       , 1 )
              INDEX_SO2         = IOLD2NEW( INDEX_SO2        , 1 )
              INDEX_SULF        = IOLD2NEW( INDEX_SULF       , 1 )
@@ -1796,7 +1796,7 @@
              INDEX_LIMNP1      = IOLD2NEW( INDEX_LIMNP1     , 1 )
              INDEX_LIMNP2      = IOLD2NEW( INDEX_LIMNP2     , 1 )
              INDEX_ADCN        = IOLD2NEW( INDEX_ADCN       , 1 )
-             INDEX_HOM         = IOLD2NEW( INDEX_HOM        , 1 )
+             INDEX_VHOM        = IOLD2NEW( INDEX_VHOM       , 1 )
              INDEX_VROCP4OXY2  = IOLD2NEW( INDEX_VROCP4OXY2 , 1 )
              INDEX_VROCN1OXY6  = IOLD2NEW( INDEX_VROCN1OXY6 , 1 )
              INDEX_FURANONE    = IOLD2NEW( INDEX_FURANONE   , 1 )
@@ -1804,7 +1804,7 @@
              INDEX_VROCP0OXY4  = IOLD2NEW( INDEX_VROCP0OXY4 , 1 )
              INDEX_BAL1        = IOLD2NEW( INDEX_BAL1       , 1 )
              INDEX_BAL2        = IOLD2NEW( INDEX_BAL2       , 1 )
-             INDEX_ELHOM       = IOLD2NEW( INDEX_ELHOM      , 1 )
+             INDEX_VELHOM      = IOLD2NEW( INDEX_VELHOM     , 1 )
              INDEX_VROCIOXY    = IOLD2NEW( INDEX_VROCIOXY   , 1 )
              INDEX_SLOWROC     = IOLD2NEW( INDEX_SLOWROC    , 1 )
              INDEX_ACRO        = IOLD2NEW( INDEX_ACRO       , 1 )

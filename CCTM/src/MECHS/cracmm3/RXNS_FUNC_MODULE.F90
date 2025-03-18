@@ -694,15 +694,15 @@
              RKI( NCELL,  175) =   2.0100D-10 * CFACT 
 !  Reaction Label R159            
              RKI( NCELL,  176) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.2000D-14,  -5.0000D+02 )
-!  Reaction Label TRP11           
-             RKI( NCELL,  177) =   2.9000D-02 * SFACT 
-!  Reaction Label TRP12           
-             RKI( NCELL,  178) =   2.4000D-02 * SFACT 
 !  Reaction Label RBAL2           
-             RKI( NCELL,  179) =  CFACT * FALLOFF_T10( INV_TEMP,  TEMPOT300,  CAIR, & 
+             RKI( NCELL,  177) =  CFACT * FALLOFF_T10( INV_TEMP,  TEMPOT300,  CAIR, & 
      &                                                 9.7000D-29,   0.0000D+00,  -5.6000D+00,  & 
      &                                                 9.3000D-12,   0.0000D+00,  -1.5000D+00,  & 
      &                                                 3.0000D-01,   1.4200D+00 )
+!  Reaction Label TRP11           
+             RKI( NCELL,  178) =   2.9000D-02 * SFACT 
+!  Reaction Label TRP12           
+             RKI( NCELL,  179) =   2.4000D-02 * SFACT 
 !  Reaction Label R166            
              RKI( NCELL,  180) =  CFACT * FALLOFF_T10( INV_TEMP,  TEMPOT300,  CAIR, & 
      &                                                 9.7000D-29,   0.0000D+00,  -5.6000D+00,  & 
@@ -1740,13 +1740,13 @@
              INDEX_OP1         = IOLD2NEW( INDEX_OP1        , 1 )
              INDEX_OP2         = IOLD2NEW( INDEX_OP2        , 1 )
              INDEX_OPB         = IOLD2NEW( INDEX_OPB        , 1 )
-             INDEX_OP3         = IOLD2NEW( INDEX_OP3        , 1 )
+             INDEX_VOP3        = IOLD2NEW( INDEX_VOP3       , 1 )
              INDEX_PAA         = IOLD2NEW( INDEX_PAA        , 1 )
-             INDEX_CO2         = IOLD2NEW( INDEX_CO2        , 1 )
              INDEX_ONIT        = IOLD2NEW( INDEX_ONIT       , 1 )
              INDEX_PAN         = IOLD2NEW( INDEX_PAN        , 1 )
-             INDEX_TRPN        = IOLD2NEW( INDEX_TRPN       , 1 )
-             INDEX_HONIT       = IOLD2NEW( INDEX_HONIT      , 1 )
+             INDEX_CO2         = IOLD2NEW( INDEX_CO2        , 1 )
+             INDEX_VTRPN       = IOLD2NEW( INDEX_VTRPN      , 1 )
+             INDEX_VHONIT      = IOLD2NEW( INDEX_VHONIT     , 1 )
              INDEX_N2O5        = IOLD2NEW( INDEX_N2O5       , 1 )
              INDEX_SO2         = IOLD2NEW( INDEX_SO2        , 1 )
              INDEX_SULF        = IOLD2NEW( INDEX_SULF       , 1 )
@@ -1821,14 +1821,14 @@
              INDEX_LIMNP1      = IOLD2NEW( INDEX_LIMNP1     , 1 )
              INDEX_LIMNP2      = IOLD2NEW( INDEX_LIMNP2     , 1 )
              INDEX_ADCN        = IOLD2NEW( INDEX_ADCN       , 1 )
-             INDEX_HOM         = IOLD2NEW( INDEX_HOM        , 1 )
+             INDEX_VHOM        = IOLD2NEW( INDEX_VHOM       , 1 )
              INDEX_VROCP4OXY2  = IOLD2NEW( INDEX_VROCP4OXY2 , 1 )
              INDEX_VROCN1OXY6  = IOLD2NEW( INDEX_VROCN1OXY6 , 1 )
              INDEX_FURANONE    = IOLD2NEW( INDEX_FURANONE   , 1 )
              INDEX_VROCP3OXY2  = IOLD2NEW( INDEX_VROCP3OXY2 , 1 )
              INDEX_VROCP0OXY4  = IOLD2NEW( INDEX_VROCP0OXY4 , 1 )
              INDEX_BAL2        = IOLD2NEW( INDEX_BAL2       , 1 )
-             INDEX_ELHOM       = IOLD2NEW( INDEX_ELHOM      , 1 )
+             INDEX_VELHOM      = IOLD2NEW( INDEX_VELHOM     , 1 )
              INDEX_VROCIOXY    = IOLD2NEW( INDEX_VROCIOXY   , 1 )
              INDEX_SLOWROC     = IOLD2NEW( INDEX_SLOWROC    , 1 )
              INDEX_ACRO        = IOLD2NEW( INDEX_ACRO       , 1 )
@@ -1843,7 +1843,7 @@
              INDEX_SESQRO2     = IOLD2NEW( INDEX_SESQRO2    , 1 )
              INDEX_VROCP0OXY2  = IOLD2NEW( INDEX_VROCP0OXY2 , 1 )
              INDEX_VROCP1OXY3  = IOLD2NEW( INDEX_VROCP1OXY3 , 1 )
-             INDEX_AGLYJ       = IOLD2NEW( INDEX_AGLYJ      , 1 )
+             INDEX_AGLYOLIGJ   = IOLD2NEW( INDEX_AGLYOLIGJ  , 1 )
              INDEX_IEPOXP      = IOLD2NEW( INDEX_IEPOXP     , 1 )
              INDEX_AISO3NOSJ   = IOLD2NEW( INDEX_AISO3NOSJ  , 1 )
              INDEX_ASO4J       = IOLD2NEW( INDEX_ASO4J      , 1 )

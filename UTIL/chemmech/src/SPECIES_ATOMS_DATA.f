@@ -791,7 +791,7 @@
      &              /12X,'END IF')
 2161   FORMAT(/ 12X, 'MODEL_SPECIES( ' I5, ' ) = MODEL_SPECIES_INFO(',5("'", A, "', & ",/34X),"'",A2,"',  &",
      &        /34X, F8.3, ')')
-2163   FORMAT( 12X, 'SPECIES_ATOMS_COUNTS( :,',I5,') = & ',/12X,'(/ ',14(f6.1,',',1X), f6.1,'/)',' ! ',A,
+2163   FORMAT( 12X, 'SPECIES_ATOMS_COUNTS( :,',I5,') = & ',/12X,'(/ ',13(f6.1,',',1X), f6.1,'/)',' ! ',A,
      &         1X,A,' namelist')
 2164   FORMAT( "12X, 'SPECIES_ATOMS_COUNTS( ,I5,') = (/ ", I3, 
      &         "(I4,',',1X), I4,'/)',' ! ', A,1X,A,' namelist'")
@@ -815,10 +815,10 @@
 
               IMPLICIT NONE
 
-              N_ATOMS = 15
+              N_ATOMS = 14
               ALLOCATE( ATOMS(N_ATOMS) )
               ATOMS(1:N_ATOMS) = ( / 'CA', 'MN', 'CL', 'HG', 'BR', 'NA', 'SI', 'S ', 
-     &                               'TI', 'FE', 'K ', 'I ', 'N ', 'C ', 'O ' / )
+     &                               'TI', 'FE', 'K ', 'I ', 'N ', 'C ' / )
 
               ALLOCATE( SPECIES_ATOMS ( N_ATOM_SPECIES,N_ATOMS),
      &                  ATOMS_SPECIES_REPRESENTATIVE( N_ATOM_SPECIES ),

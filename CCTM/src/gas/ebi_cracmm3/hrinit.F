@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Mar 12, 2025
+C  REVISION HISTORY: Created by EBI solver program, Mar 18, 2025
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -174,12 +174,12 @@ c..Allocate and define ebi species
       EBISP(  27 ) = OP1
       EBISP(  28 ) = OP2
       EBISP(  29 ) = OPB
-      EBISP(  30 ) = OP3
+      EBISP(  30 ) = VOP3
       EBISP(  31 ) = PAA
-      EBISP(  32 ) = CO2
-      EBISP(  33 ) = ONIT
-      EBISP(  34 ) = TRPN
-      EBISP(  35 ) = HONIT
+      EBISP(  32 ) = ONIT
+      EBISP(  33 ) = CO2
+      EBISP(  34 ) = VTRPN
+      EBISP(  35 ) = VHONIT
       EBISP(  36 ) = SO2
       EBISP(  37 ) = SULF
       EBISP(  38 ) = SULRXN
@@ -253,14 +253,14 @@ c..Allocate and define ebi species
       EBISP( 106 ) = LIMNP1
       EBISP( 107 ) = LIMNP2
       EBISP( 108 ) = ADCN
-      EBISP( 109 ) = HOM
+      EBISP( 109 ) = VHOM
       EBISP( 110 ) = VROCP4OXY2
       EBISP( 111 ) = VROCN1OXY6
       EBISP( 112 ) = FURANONE
       EBISP( 113 ) = VROCP3OXY2
       EBISP( 114 ) = VROCP0OXY4
       EBISP( 115 ) = BAL2
-      EBISP( 116 ) = ELHOM
+      EBISP( 116 ) = VELHOM
       EBISP( 117 ) = VROCIOXY
       EBISP( 118 ) = SLOWROC
       EBISP( 119 ) = ACRO
@@ -275,7 +275,7 @@ c..Allocate and define ebi species
       EBISP( 128 ) = SESQRO2
       EBISP( 129 ) = VROCP0OXY2
       EBISP( 130 ) = VROCP1OXY3
-      EBISP( 131 ) = AGLYJ
+      EBISP( 131 ) = AGLYOLIGJ
       EBISP( 132 ) = IEPOXP
       EBISP( 133 ) = AISO3NOSJ
       EBISP( 134 ) = ASO4J
@@ -369,13 +369,13 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( OP1         ) = 5.0D-04
       RTOL( OP2         ) = 5.0D-04
       RTOL( OPB         ) = 5.0D-04
-      RTOL( OP3         ) = 5.0D-04
+      RTOL( VOP3        ) = 5.0D-04
       RTOL( PAA         ) = 5.0D-04
-      RTOL( CO2         ) = 5.0D-04
       RTOL( ONIT        ) = 5.0D-04
       RTOL( PAN         ) = 5.0D-04
-      RTOL( TRPN        ) = 5.0D-04
-      RTOL( HONIT       ) = 5.0D-04
+      RTOL( CO2         ) = 5.0D-04
+      RTOL( VTRPN       ) = 5.0D-04
+      RTOL( VHONIT      ) = 5.0D-04
       RTOL( N2O5        ) = 5.0D-04
       RTOL( SO2         ) = 5.0D-04
       RTOL( SULF        ) = 1.0D+00
@@ -450,14 +450,14 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( LIMNP1      ) = 5.0D-04
       RTOL( LIMNP2      ) = 5.0D-04
       RTOL( ADCN        ) = 5.0D-04
-      RTOL( HOM         ) = 5.0D-04
+      RTOL( VHOM        ) = 5.0D-04
       RTOL( VROCP4OXY2  ) = 5.0D-04
       RTOL( VROCN1OXY6  ) = 5.0D-04
       RTOL( FURANONE    ) = 5.0D-04
       RTOL( VROCP3OXY2  ) = 5.0D-04
       RTOL( VROCP0OXY4  ) = 5.0D-04
       RTOL( BAL2        ) = 5.0D-04
-      RTOL( ELHOM       ) = 5.0D-04
+      RTOL( VELHOM      ) = 5.0D-04
       RTOL( VROCIOXY    ) = 5.0D-04
       RTOL( SLOWROC     ) = 5.0D-04
       RTOL( ACRO        ) = 5.0D-04
@@ -472,7 +472,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( SESQRO2     ) = 5.0D-04
       RTOL( VROCP0OXY2  ) = 5.0D-04
       RTOL( VROCP1OXY3  ) = 5.0D-04
-      RTOL( AGLYJ       ) = 5.0D-04
+      RTOL( AGLYOLIGJ   ) = 5.0D-04
       RTOL( IEPOXP      ) = 5.0D-04
       RTOL( AISO3NOSJ   ) = 5.0D-04
       RTOL( ASO4J       ) = 5.0D-04

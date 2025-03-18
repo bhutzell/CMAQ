@@ -18,7 +18,7 @@ ADCN|Aromatic-NO3 adduct from PHEN|G|155.0|L|4-oxocyclohex-2-en-1-yl nitrate|OC1
 ADDC|Aromatic-HO adduct from CSL|G|125.0|L|3-methyl-5-oxocyclohex-3-en-1-yloxidanyl|CC1=CC\(O\)=CC\(\[O\]\)C1
 AEC|Elemental carbon|P|12.0|L|Carbon|\[C\]
 AFE|Iron ion|P|55.8|E|Iron ion|[\[Fe++\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID4042672)
-AGLY|SOA from reactive uptake of glyoxal on particles|P|66.4|L|2-(4,5-dihydroxy-1,3-dioxolan-2-yl)-1,3-dioxolane-4,5-diol|OC2OC\(C1OC\(O\)C\(O\)O1\)OC2O
+AGLYOLIG|SOA from reactive uptake of glyoxal on particles|P|66.4|L|2-(4,5-dihydroxy-1,3-dioxolan-2-yl)-1,3-dioxolane-4,5-diol|OC2OC\(C1OC\(O\)C\(O\)O1\)OC2O
 AH2O|Water associated with particulate inorganic compounds|P|18.0|E|Water|[O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID6026296)
 AH3OP|Hydronium ion tracer|P|19.0|E|Hydronium ion|[\[OH3+\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID20893597)
 AISO3NOS|Non-sulfated SOA from IEPOX uptake|P|136.2|L|2-methylbutane-1,2,3,4-tetrol|C\(O\)C\(O\)\(C\)C\(O\)CO
