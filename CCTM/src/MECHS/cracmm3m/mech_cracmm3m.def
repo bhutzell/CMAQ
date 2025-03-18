@@ -179,6 +179,12 @@ END ELIMINATE
 
 
 
+
+
+
+
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -1381,10 +1387,8 @@ REACTIONS[CM] =
 <R364> ECH4 + HO = MO2 # 2.45E-12 @ 1775.;
 
 ! monoterpene nitrate hydrolysis
-<TRP58> ATRPNJ = AHOMJ + HNO3  - 1.0000*DELTA_N - 1.0000*DELTA_C 
-               # 9.26E-05;               
-<TRP59> AHONITJ = AHOMJ + HNO3  - 1.0000*DELTA_N - 1.0000*DELTA_C 
-                # 9.26E-05;                
+<TRP58> ATRPNJ = AHOMJ + HNO3  - 1.0000*DELTA_N # 9.26E-05;
+<TRP59> AHONITJ = AHOMJ + HNO3  - 1.0000*DELTA_N # 9.26E-05;
 
 ! MCM-based styrene chemistry
 <ROCARO71> STY + HO = STYP # 1.02E-11 @ -532;
@@ -1783,7 +1787,7 @@ REACTIONS[CM] =
                      # 3.25E-12 @ 114;				                     
 <CLOR19> CLO + LIMNP1 = CLOO + 0.570*TRPN + 0.070*ONIT + 0.360*NO2 
                       + 0.430*LIMAL + 0.500*HO2  - 0.2800*DELTA_C 
-                      # 3.25E-12 @ 114;
+                      # 3.25E-12 @ 114;                      
 <CLOR20> CLO + LIMNP2 = 0.770*CLOO + 0.770*HO + 0.230*HCL + HOM  
                       + 1.0000*DELTA_N # 3.25E-12 @ 114;                      
 <CLOR21> CLO + PINALP = CLOO + 0.640*HOM  + 3.6000*DELTA_C 
@@ -1819,7 +1823,7 @@ REACTIONS[CM] =
 <CLOR38> CLO + OLND = CLOO + NO2 + 0.287*HCHO + 1.240*ALD + 0.464*KET  
                     - 3.3270*DELTA_C # 3.25E-12 @ 114;				                    
 <CLOR39> CLO + ADCN = CLOO + NO2 + GLY + OP2  + 2.0000*DELTA_C 
-                    # 3.25E-12 @ 114;
+                    # 3.25E-12 @ 114;                    
 <CLOR40> CLO + XO2 = CLOO # 3.25E-12 @ 114;
 <CLOR41> CLO + BDE13P = 0.968*HO2 + CLOO + 0.895*ACRO + 0.895*HCHO 
                       + 0.072*FURAN  + 0.0600*DELTA_C # 3.25E-12 @ 114;                      
