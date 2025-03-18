@@ -380,7 +380,6 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(281), A(281), E(281) / 'NITROSYL_BROMID ', 4.96E-02, 0.0E+00 /   ! Using NITROSYL_CHLROD data
       DATA SUBNAME(282), A(282), E(282) / 'HYDROGEN_CYANIDE', 1.72E+02, 4.4E+03 /   ! Sander, R. ACP (2015)
 
-      
       DATA B( MSO2   ), D( MSO2   ) / 1.30E-02,  1.96E+03 /  ! SO2*H2O<=>HSO3+H     : Smith and Martell (1976)
       DATA B( MHSO3  ), D( MHSO3  ) / 6.60E-08,  1.50E+03 /  ! HSO3<=>SO3+H         : Smith and Martell (1976)
       DATA B( MHNO2  ), D( MHNO2  ) / 5.10E-04, -1.26E+03 /  ! HNO2(aq)<=>NO2+H     : Schwartz and White (1981)
@@ -400,7 +399,7 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA B( MHBR   ), D( MHBR   ) / 1.00E+09,  0.00E+00 /  ! HBR <=> H + BR       : Schweitzer et al. (2000)
       DATA B( MHI    ), D( MHI    ) / 3.20E+09,  0.00E+00 /  ! HI <=> H + I         : Schweitzer et al. (2000)
       DATA B( MACRYACID ), D( MACRYACID ) / 5.62E-05,  0.00E+00 /  ! CH3C(O)OH <=> H + CH3C(O)O  : Riddick et al. (1985)
-      
+
 !-------------------------------------------------------------------------------
 ! Note for dissociation constant for equation LCL2: CL2*H2O <=> HOCL + H + CL
 ! Need aqueous [CL-] concentration to calculate effective henry's law coefficient
