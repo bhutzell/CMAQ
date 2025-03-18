@@ -902,6 +902,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
          ELSE IF ( VARS_NML(1) .EQ. 'DEFAULT' ) THEN
             ! Replace generic DEFAULT keyword with mechanism-specific
             ! keyword
+
             IF ( MECH .EQ. 'BLANK' ) THEN
                XMSG = 'You have requested the DEFAULT keyword on an ELMO ' // 
      &                'output file, and the variable MECH is needed in ' //
@@ -914,10 +915,12 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                VARS_NML( N_END+1 ) = 'DEFAULT_' // TRIM( MECH ) 
                N_END = N_END + 1
             END IF
+
          
          ELSE IF ( VARS_NML(1) .EQ. 'DEFAULT_DEP' ) THEN
             ! Replace generic DEFAULT keyword with mechanism-specific
             ! keyword
+
             IF ( MECH .EQ. 'BLANK' ) THEN
                XMSG = 'You have requested the DEFAULT_DEP keyword on an ELMO ' // 
      &                'output file, and the variable MECH is needed in ' //
@@ -930,6 +933,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                VARS_NML( N_END+1 ) = 'DEFAULT_DEP_' // TRIM( MECH )
                N_END = N_END + 1
             END IF
+
          
          ELSEIF ( I1 .GT. 0 ) THEN
             ! Expand Matched Keyword

@@ -623,7 +623,9 @@
       END IF
 
       ! Get Filename for Chemical Mechanism
+
       CALL GET_ENV ( MECH, 'MECH', 'BLANK', VARDEV )
+
 
       ! Get photolysis rate diagnostic file flag
       CALL GET_ENV ( PHOTDIAG, 'CTM_PHOTDIAG', PHOTDIAG, VARDEV )
