@@ -180,6 +180,15 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       INTEGER, PARAMETER :: ID_WD_SOA =     103
       INTEGER, PARAMETER :: ID_DD_SOC =     104
       INTEGER, PARAMETER :: ID_WD_SOC =     105
+      INTEGER, PARAMETER :: ID_USTAR  =     106
+      INTEGER, PARAMETER :: ID_GA     =     107
+      INTEGER, PARAMETER :: ID_ZOL    =     108
+      INTEGER, PARAMETER :: ID_SHFX   =     109
+      INTEGER, PARAMETER :: ID_LHFX   =     110
+      INTEGER, PARAMETER :: ID_SWC_1  =     111
+      INTEGER, PARAMETER :: ID_SWC_2  =     112
+      INTEGER, PARAMETER :: ID_SOILT_1 =    113
+      INTEGER, PARAMETER :: ID_SOILT_2 =    114
 
       TYPE ELDTP
         CHARACTER (LEN = 16) :: NAME      !Parameter Name
@@ -190,7 +199,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         CHARACTER (LEN = 80) :: DESC      !Description
       END TYPE ELDTP
 
-      INTEGER, PARAMETER :: N_ELMO_LIST = 105
+      INTEGER, PARAMETER :: N_ELMO_LIST = 114
 
       TYPE (ELDTP), PARAMETER :: ELMO_LIST( N_ELMO_LIST ) = (/
 
@@ -307,15 +316,24 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
      &ELDTP( 'K_IEPOX      ',ID_KIEPOX,     ET_CHEM,     F, 's-1   ', 'IEPOX 1st order particle phase reaction rate const' ),
      &ELDTP( 'GAMMA_IMAE   ',ID_GIMAE,      ET_CHEM,     F, '1     ', 'IMAE+HMML heterogeneous uptake coefficient' ),
      &ELDTP( 'VOC_NOX      ',ID_VOC_NOX,    ET_CHEM,     F, '      ', 'VOC-limiting (>0.35) or NOx-limiting (<0.35) O3 formation' ),
-     &ELDTP( 'EF_HNO3      ',ID_EF_HNO3,    ET_CHEM,     F, '1     ', 'Enhancement factor for HNO3 photolysis' ),
      &ELDTP( 'DZ           ',ID_DZ,         ET_MET,      F, 'm     ', 'Height of each grid cell computed from top layer height' ),
+     &ELDTP( 'EF_HNO3      ',ID_EF_HNO3,    ET_CHEM,     F, '1     ', 'Enhancement factor for HNO3 photolysis' ),
      &ELDTP( 'ZH           ',ID_ZH,         ET_MET,      F, 'm     ', 'Height of grid cell midpoints (mass-weighted)' ),
      &ELDTP( 'CFRAC        ',ID_CFRAC,      ET_MET,      F, '      ', 'Cloud Fraction' ),
      &ELDTP( 'PV           ',ID_PV,         ET_MET,      F, '      ', 'Potential Vorticity' ),
      &ELDTP( 'DENS         ',ID_DENS,       ET_MET,      F, 'kg m-3', 'Advected Density' ),
      &ELDTP( 'KZ           ',ID_KZ,         ET_MET,      F, 'm2 s-1', 'Vertical diffusivity coefficients' ),
      &ELDTP( 'KZMIN        ',ID_KZMIN,      ET_MET,      F, 'm2 s-1', 'Vertical diffusivity coefficients' ),
-     &ELDTP( 'RHOJ         ',ID_RHOJ,       ET_MET,      F, 'kg m-3', 'Advected Density x Jacobian/MSFX^2' ) /)
+     &ELDTP( 'RHOJ         ',ID_RHOJ,       ET_MET,      F, 'kg m-3', 'Advected Density x Jacobian/MSFX^2' ),
+     &ELDTP( 'USTAR        ',ID_USTAR,      ET_MET,      F, 'm s-1 ', 'Surface Friction Velocity' ),
+     &ELDTP( 'GA           ',ID_GA,         ET_MET,      F, 'm s-1 ', 'Surface Aerodynamic Conductance' ),
+     &ELDTP( 'ZOL          ',ID_ZOL,        ET_MET,      F, '      ', 'Grid Cell Midpoint over Monin-Obukhov length' ),
+     &ELDTP( 'SHFX         ',ID_SHFX,       ET_MET,      F, 'W m-2 ', 'Sensible Heat Flux' ),
+     &ELDTP( 'LHFX         ',ID_LHFX,       ET_MET,      F, 'W m-2 ', 'Latent Heat FLux' ),
+     &ELDTP( 'SWC_1        ',ID_SWC_1,      ET_MET,      F, '      ', 'Layer 1 soil moisture saturation ratio' ),
+     &ELDTP( 'SWC_2        ',ID_SWC_2,      ET_MET,      F, '      ', 'Layer 2 soil moisture saturation ratio' ),
+     &ELDTP( 'SOILT_1      ',ID_SOILT_1,    ET_MET,      F, 'K     ', 'Layer 1 soil temperature' ),
+     &ELDTP( 'SOILT_2      ',ID_SOILT_2,    ET_MET,      F, 'K     ', 'Layer 2 soil temperature' ) /)
      
 
       TYPE ELMO_KEY_TYPE
@@ -335,7 +353,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
           INTEGER                     :: STRUCT       ! 0 = gridded, 1 = unstructured
           CHARACTER( 16)              :: FLOGICAL     ! I/O Logical Name for each output file
           INTEGER                     :: TSTEP        ! Output Time Step (HHMMSS)
-          INTEGER                     :: TMODE        ! 0 = Instantaneous, 
+          INTEGER                     :: TMODE        ! 0 = Instantaneous,
                                                       ! 1 = Aggregate (Average/Cumulative)
           INTEGER                     :: LAY_BOT      ! Bottom Layer
           INTEGER                     :: LAY_TOP      ! Top Layer

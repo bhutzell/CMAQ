@@ -421,9 +421,9 @@ C...assumes that lambda in nanometers is on order of 100 or less
             VTYPE( N ) = M3REAL
 
             N = N + 1
-            VNAME( N ) = 'EXT_W' // TRIM( LAMBDA )
+            VNAME( N ) = 'CLD_EXT_W' // TRIM( LAMBDA )
             UNITS( N ) = 'Km-1'
-            VDESC( N ) = 'Total Extinction of layer for '
+            VDESC( N ) = 'Cloud Extinction of layer for '
      &                   // TRIM( LAMBDA ) // ' nm'
             VTYPE( N ) = M3REAL
 
@@ -435,7 +435,7 @@ C...assumes that lambda in nanometers is on order of 100 or less
             VTYPE( N ) = M3REAL
  
             N = N + 1
-            VNAME( N ) = 'EXT_AERO_W' // TRIM( LAMBDA )
+            VNAME( N ) = 'AERO_EXT_W' // TRIM( LAMBDA )
             UNITS( N ) = 'Km-1'
             VDESC( N ) = 'Aerosol Extinction in layer for '
      &                   // TRIM( LAMBDA ) // ' nm'
@@ -457,7 +457,7 @@ C...assumes that lambda in nanometers is on order of 100 or less
          VTYPE( N ) = M3REAL
 
          N = N + 1
-         VNAME( N ) = 'EXT_AERO_W550'
+         VNAME( N ) = 'AERO_EXT_W550'
          UNITS( N ) = 'Km-1'
          VDESC( N ) = ' Aerosol Extinction of layer for '
      &                // '550 nm based on an Angstrom Interpolation'
