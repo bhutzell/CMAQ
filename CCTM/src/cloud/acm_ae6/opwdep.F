@@ -32,6 +32,7 @@
 !    -------- ---             -----------------------------------------
 !     07/17/15 D. Wong        initial version
 !     12/30/19 S. Napelenok   ddm-3d implemenation for v5.3.1
+!     01/10/24 D. Wong        Incorporated unified coupler implmentation
 !-----------------------------------------------------------------------
 
       USE GRID_CONF           ! horizontal & vertical domain specifications
@@ -104,6 +105,9 @@ C Try to open existing wet deposition file for update
 !...   copy most of header description from
 !...   MET_CRO_2D and initialize depositions to zero.
 
+#ifdef twoway
+              NLAYS3D = 1
+#else
 !...open MET_CRO_2D
 
               IF ( .NOT. OPEN3( MET_CRO_2D, FSREAD3, PNAME ) ) THEN
@@ -117,6 +121,7 @@ C Try to open existing wet deposition file for update
                 XMSG = 'Could not get ' // MET_CRO_2D //' file description'
                 CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
               END IF
+#endif
 
               NCOLS3D = GL_NCOLS
               NROWS3D = GL_NROWS

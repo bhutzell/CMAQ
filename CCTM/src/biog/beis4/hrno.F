@@ -272,34 +272,35 @@ C Determine last timestamp
 #else
 
 C Open met file
-         MNAME = PROMPTMFILE(
-     &           'Enter name for gridded met input file',
-     &           FSREAD3, 'MET_CRO_2D', PNAME )
+!         MNAME = PROMPTMFILE(
+!     &           'Enter name for gridded met input file',
+!     &           FSREAD3, 'MET_CRO_2D', PNAME )
 
 C Get description of met file
-         IF ( .NOT. DESC3( MNAME ) ) THEN
-            MESG = 'Could not get description of file "'
-     &           // TRIM( MNAME ) // '"'
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-         END IF
+!         IF ( .NOT. DESC3( MNAME ) ) THEN
+!            MESG = 'Could not get description of file "'
+!     &           // TRIM( MNAME ) // '"'
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!         END IF
 
-         METSTEP = TSTEP3D
+!         METSTEP = TSTEP3D
+          METSTEP = 10000   ! temporary hack
 
 C Check that grid description matches MET_CRO_2D file
-         IF ( .NOT. CHKGRID( MNAME ) ) THEN
-            MESG = 'Grid in file "' // TRIM( MNAME )
-     &           // '" does not match grid in file ' // TRIM( MNAME ) // '"'
-#ifdef twoway
-            CALL M3WARN( PNAME, 0, 0, MESG )
-#else
-            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
-#endif
-         END IF
+!         IF ( .NOT. CHKGRID( MNAME ) ) THEN
+!            MESG = 'Grid in file "' // TRIM( MNAME )
+!     &           // '" does not match grid in file ' // TRIM( MNAME ) // '"'
+!#ifdef twoway
+!            CALL M3WARN( PNAME, 0, 0, MESG )
+!#else
+!            CALL M3EXIT( PNAME, JDATE, JTIME, MESG, XSTAT2 )
+!#endif
+!         END IF
 #endif
 
-         WRITE( MESG, '(A,I0,A,I0)' ),
-     &     'NCOLS = ',NCOLS,': NROWS = ',NROWS
-         CALL M3MESG( MESG )
+!         WRITE( MESG, '(A,I0,A,I0)' ),
+!     &     'NCOLS = ',NCOLS,': NROWS = ',NROWS
+!         CALL M3MESG( MESG )
 
          ALLOCATE( RNTOT( NCOLS,NROWS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'RNTOT', PNAME )

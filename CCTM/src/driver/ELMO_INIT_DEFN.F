@@ -388,6 +388,10 @@
            ELMO_FILE( IFL )%TMODE = 0
         ELSE IF ( TMODE( IFL )(1:3) .EQ. 'AGG' ) THEN
            ELMO_FILE( IFL )%TMODE = 1
+        ELSE IF ( TMODE( IFL )(1:3) .EQ. 'AVG' ) THEN
+           ELMO_FILE( IFL )%TMODE = 1
+        ELSE IF ( TMODE( IFL )(1:3) .EQ. 'AVE' ) THEN
+           ELMO_FILE( IFL )%TMODE = 1
         ELSE
             WRITE( XMSG, "(A,I3.3,A)")
      &             'An ELMO file may only be aggregate or instantaneous.  '//
@@ -1083,7 +1087,7 @@
 
         INTEGER :: L          ! loop induction variables
         INTEGER :: MDATE, MTIME, IFL, IVAR, J, ICOMP
-        INTEGER :: LAY_BOT, LAY_TOP
+        INTEGER :: LAY_BOT, LAY_TOP, IV
 
       CALL LOG_MESSAGE( LOGDEV,'' )
       CALL LOG_SUBHEADING( LOGDEV, 'Open ELMO Output Files' )
@@ -1147,6 +1151,32 @@
                  VTYPE3D( IVAR ) = ELMO_TABLE( J )%OUT_TYPE
                  VNAME3D( IVAR ) = ELMO_TABLE( J )%OUT_NAME
                  UNITS3D( IVAR ) = ELMO_TABLE( J )%CUNIT
+
+                 ! If this is an instantaneous file and a deposition
+                 ! species, then indicate the units are a flux rather
+                 ! than an aggregate per output time step
+                 IF ( ELMO_FILE( IFL )%TMODE .EQ. 0 ) THEN
+                   IV = ELMO_TABLE( J )%VAR_TYPE
+                   IF ( IV .EQ. ET_DDEP .OR.
+     &                  IV .EQ. ET_ISAM_DDEP .OR.
+     &                  IV .EQ. ET_DDM_DDEP .OR.
+     &                  IV .EQ. ET_WDEP .OR.
+     &                  IV .EQ. ET_ISAM_WDEP .OR.
+     &                  IV .EQ. ET_DDM_WDEP .OR.
+     &                  IV .EQ. ET_CMPST_DEP .OR.
+     &                  IV .EQ. ET_ISAM_CMPST_DEP .OR.
+     &                  IV .EQ. ET_DDM_CMPST_DEP .OR.
+     &                  IV .EQ. ET_DRVD_DDEP .OR.
+     &                  IV .EQ. ET_ISAM_DRVD_DDEP .OR.
+     &                  IV .EQ. ET_DDM_DRVD_DDEP .OR.
+     &                  IV .EQ. ET_DRVD_WDEP .OR.
+     &                  IV .EQ. ET_ISAM_DRVD_WDEP .OR.
+     &                  IV .EQ. ET_DDM_DRVD_WDEP ) THEN
+                     ! This is a deposition species so we should be
+                     ! outputting a flux
+                     UNITS3D( IVAR ) = TRIM( UNITS3D( IVAR ) ) // ' s-1'
+                   END IF
+                 END IF
                  VDESC3D( IVAR ) = ELMO_TABLE( J )%DESC
                END DO
                
