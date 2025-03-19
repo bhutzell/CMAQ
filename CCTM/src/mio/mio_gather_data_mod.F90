@@ -295,7 +295,6 @@
              lerror = .true.
           end if
 
-          call mpi_barrier(mpi_comm_world, stat)
           if (.not. lerror) then
              third_dim = size(in_data, 3)
 
