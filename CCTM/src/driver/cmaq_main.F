@@ -94,7 +94,7 @@ C processes (NPROCS)
         ! Initialize all runscript environmental variables
         CALL INIT_ENV_VARS
 
-        MODEL_TSTEP = LOCAL_TSTEP
+        MODEL_TSTEP = OUT_TSTEP
 
         TOTSECS  = TIME2SEC( RUNLEN )
 

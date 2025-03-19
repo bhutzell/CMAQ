@@ -122,7 +122,7 @@
       INTEGER :: RUNLEN          = 480000   ! Run Length
       INTEGER :: STDATE          = 1995192  ! Start Date
       INTEGER :: STTIME          = 000000   ! Start Time
-      INTEGER :: LOCAL_TSTEP     = 010000   ! set to TSTEP( 1 ) in initscen.F
+      INTEGER :: OUT_TSTEP       = 010000   ! set to TSTEP( 1 ) in initscen.F
       INTEGER :: MET_TSTEP       = 010000   ! set meterology input temporal frequency
       INTEGER :: NPCOL           = 1        ! no. of processors across grid columns
       INTEGER :: NPROW           = 1        ! no. of processors across grid rows
@@ -378,7 +378,7 @@
       GRID_NAME = STRTEMP(1:16)
 
       ! Output Time Step
-      CALL GET_ENV ( LOCAL_TSTEP, 'CTM_TSTEP', LOCAL_TSTEP, VARDEV )
+      CALL GET_ENV ( OUT_TSTEP, 'CTM_TSTEP', OUT_TSTEP, VARDEV )
 
       ! Run Duration
       CALL GET_ENV ( RUNLEN,  'CTM_RUNLEN', RUNLEN, VARDEV )
