@@ -306,7 +306,7 @@
       CONTAINS
           
 !.........................................................................
-      SUBROUTINE INIT_ENV_VARS( JDATE, JTIME )
+      SUBROUTINE INIT_ENV_VARS
 
 !  Defines and retrieves values for all environment variable input to 
 !  CMAQ. 
@@ -324,8 +324,6 @@
       include 'mpif.h'
 #endif
  
-      INTEGER, INTENT( In )  :: JDATE       
-      INTEGER, INTENT( In )  :: JTIME  
       CHARACTER(  16 )       :: V_LIST2( 20 )
       CHARACTER( 240 )       :: XMSG   = ''  
       INTEGER                :: NV
@@ -341,7 +339,7 @@
       LOGICAL          :: EFLAG = .FALSE.
       INTEGER          :: LOC, STR_LEN
 
-      CHARACTER( 16 ) :: PNAME = 'RUNTIME_VARS'
+      CHARACTER( 16 ) :: PNAME = 'INIT_ENV_VARS'
 
       !-------------------------------------------------------------------------------------------------------
       !>> Grid and High-Level Model Parameters
@@ -402,7 +400,7 @@
          IF ( NV .NE. 2 ) THEN
             XMSG = 'Environment variable problem for NPCOL_NPROW'
      &           // ' using default 1X1'
-            CALL LOG_WARNING( 'INIT_ENV_VARS',LOGDEV , XMSG )
+            CALL LOG_WARNING( PNAME, LOGDEV, XMSG )
             NV = 2
             V_LIST2( 1 ) = '1'
             V_LIST2( 2 ) = '1'
@@ -467,7 +465,7 @@
          READ( V_LIST2( 2 ), '( I4 )' ) ACONC_ELEV
       ELSE 
          XMSG = 'Environment variable error for ACONC_BLEV_ELEV'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         CALL M3EXIT( PNAME, 0, 0, XMSG, EXIT_STATUS )
       END IF
   
       ! CONC File Vertical Layer Range and Speciation
@@ -483,7 +481,7 @@
          READ( V_LIST2( 2 ), '( I4 )' ) CONC_ELEV
       ELSE 
          XMSG = 'Environment variable error for CONC_BLEV_ELEV'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         CALL M3EXIT( PNAME, 0, 0, XMSG, EXIT_STATUS )
       END IF
 
       ! PWRTFLAG
@@ -544,7 +542,7 @@
          READ( V_LIST2( 2 ), '( I4 )' ) AISAM_ELEV
       ELSE
          XMSG = 'Environment variable error for AISAM_BLEV_ELEV'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         CALL M3EXIT( PNAME, 0, 0, XMSG, EXIT_STATUS )
       END IF
 
       ! SA_CONC File Vertical Layer Range and Speciation
@@ -560,7 +558,7 @@
          READ( V_LIST2( 2 ), '( I4 )' ) ISAM_ELEV
       ELSE
          XMSG = 'Environment variable error for ISAM_BLEV_ELEV'
-         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+         CALL M3EXIT( PNAME, 0, 0, XMSG, EXIT_STATUS )
       END IF
 
       ! Get species bias case
@@ -934,7 +932,7 @@
             READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDCOL
          ELSE 
             XMSG = 'Environment variable error for PA_BCOL_ECOL'
-            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+            CALL M3EXIT( PNAME, 0, 0, XMSG, EXIT_STATUS )
          END IF
      
          ! Get the Beginning and Ending Rows for Process Analysis
@@ -946,7 +944,7 @@
             READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDROW
          ELSE 
             XMSG = 'Environment variable error for PA_BROW_EROW'
-            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+            CALL M3EXIT( PNAME, 0, 0, XMSG, EXIT_STATUS )
          END IF
      
          ! Get the Beginning and Ending Layers for Process Analysis
@@ -958,7 +956,7 @@
             READ( V_LIST2( 2 ), '( I4 )' ) PA_ENDLEV
          ELSE 
             XMSG = 'Environment variable error for PA_BLEV_ELEV'
-            CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+            CALL M3EXIT( PNAME, 0, 0, XMSG, EXIT_STATUS )
          END IF
       END IF
 

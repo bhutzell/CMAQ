@@ -329,7 +329,7 @@ C-----------------------------------------------------------------------
 
          TSTEP = 0
 #ifdef mpas
-         CALL INIT_ENV_VARS( 0, 0 )
+         CALL INIT_ENV_VARS
 #else
          STDATE     = MODEL_STDATE
          STTIME     = MODEL_STTIME
@@ -401,7 +401,7 @@ C Initialize Environment Variables
          MYPE = 0
          TOTPE = 1
 #endif
-         CALL INIT_ENV_VARS( JDATE, JTIME )
+         CALL INIT_ENV_VARS
 #endif
 
          ! Initialize variables for passing file data to MIO

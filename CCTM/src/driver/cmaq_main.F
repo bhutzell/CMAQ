@@ -92,7 +92,7 @@ C processes (NPROCS)
         CALL SETUP_LOGDEV(APP_NAME_IN)
 
         ! Initialize all runscript environmental variables
-        CALL INIT_ENV_VARS( 0, 0 )
+        CALL INIT_ENV_VARS
 
         MODEL_TSTEP = LOCAL_TSTEP
 
