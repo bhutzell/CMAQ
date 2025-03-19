@@ -157,7 +157,7 @@ C Local Variables
 
 C-----------------------------------------------------------------------
 
-      TSTEP( 1 ) = LOCAL_TSTEP 
+      TSTEP( 1 ) = OUT_TSTEP 
 
 C Initialize the CGRID array
       CGRID = CMIN

@@ -217,7 +217,6 @@ C Local variables:
 
       LOGICAL, SAVE :: FIRST_RUN = .TRUE.  ! used for twoway model
       LOGICAL, SAVE :: L_INIT    = .TRUE.  ! used for MIO File Input Initialization
-      LOGICAL       :: WFLG = .TRUE.       ! turn on write subdmap in pio_init
 
       INTEGER, SAVE :: myNREPS = 0
       INTEGER       :: STATUS
@@ -329,7 +328,7 @@ C-----------------------------------------------------------------------
 
          TSTEP = 0
 #ifdef mpas
-         CALL INIT_ENV_VARS( 0, 0 )
+         CALL INIT_ENV_VARS
 #else
          STDATE     = MODEL_STDATE
          STTIME     = MODEL_STTIME
@@ -339,7 +338,7 @@ C-----------------------------------------------------------------------
          coupled_model_stdate = MODEL_STDATE
          coupled_model_sttime = MODEL_STTIME
 
-         TSTEP( 1 ) = LOCAL_TSTEP
+         TSTEP( 1 ) = OUT_TSTEP
          TSTEP( 3 ) = SEC2TIME(MODEL_TSTEP)
 
 #else
@@ -401,7 +400,7 @@ C Initialize Environment Variables
          MYPE = 0
          TOTPE = 1
 #endif
-         CALL INIT_ENV_VARS( JDATE, JTIME )
+         CALL INIT_ENV_VARS
 #endif
 
          ! Initialize variables for passing file data to MIO

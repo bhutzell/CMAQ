@@ -623,7 +623,7 @@
           use mio_module
           USE RUNTIME_VARS, only : N_FILE_GR,
      &                             STDATE, WB_DUST, ISAM_NEW_START,
-     &                             local_tstep, met_tstep, NLDNSTRIKE,
+     &                             met_tstep, NLDNSTRIKE,
      &                             LPVO3, MET_EMIS
           USE UTILIO_DEFN
 #ifdef mpas
