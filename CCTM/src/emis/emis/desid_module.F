@@ -1362,19 +1362,21 @@ C-----------------------------------------------------------------------
      &        ( (.NOT.DIFF_MASK_NUM( ISPC ) .AND. .NOT. DIFF_MASK_SRF( ISPC )) 
      &          .AND. EMIS_MIN .LT. -1.0e-7 ) ) THEN
 
+#ifndef mpas
            ! Find Where the Most Negative Value Is and Exit
            ALOC = MINLOC( VDEMIS( ISPC,1:NL,:,: ) )
            ILAY = ALOC( 1 )
            ICOL = ALOC( 2 )
            IROW = ALOC( 3 )
+#ifdef parallel
            CALL GET_GLOBAL_COORDS( ICOL, IROW, JCOL, JROW )
-
+#endif
            WRITE( LOGDEV, '(/,5x,A,/,5x,A,A,A,A/,5x,A,ES10.3,A,A,/,5x,A1,I3,A1,I3,A1,I2,A2)' ),
      &       'ERROR: At least one invalid negative emission rate has been ',
      &       'detected for CMAQ species ',TRIM(DIFF_SPC( ISPC )),'. The ', 
      &       'most negative emission','rate is ',EMIS_MIN,' at domain-wide gridcell',
      &       ' (COL,ROW,LAY): ','(',JCOL,',',JROW,',',ILAY,').'
-
+#endif
            STAT = 1
         ELSE IF ( EMIS_MIN .LT. 0.0 ) THEN
            ! Threshold was not exceeded, but there are negatives that
