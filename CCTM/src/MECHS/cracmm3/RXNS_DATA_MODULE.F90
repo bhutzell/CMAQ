@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /work/MOD3DEV/tskipper/cracmm3/20250318_cracmm_dev_merge/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
+! Source file: /work/MOD3DEV/tskipper/cracmm3/20250320_rep_structures/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
 ! for Mechanism Name: CRACMM3                         
 
 ! This file is used to create mechanism data and functions
@@ -397,10 +397,10 @@
       & MEMBER("ROH             ",  106, "GC",   60.00D0, F), &
       & MEMBER("API             ",   76, "GC",  136.40D0, F), &
       & MEMBER("APIP1           ",   77, "GC",  185.00D0, F), &
-      & MEMBER("APIP2           ",   78, "GC",  185.00D0, F), &
+      & MEMBER("APIP2           ",   78, "GC",  249.00D0, F), &
       & MEMBER("LIM             ",   83, "GC",  136.30D0, F), &
       & MEMBER("LIMP1           ",   84, "GC",  185.00D0, F), &
-      & MEMBER("LIMP2           ",   85, "GC",  185.00D0, F), &
+      & MEMBER("LIMP2           ",   85, "GC",  249.00D0, F), &
       & MEMBER("PINALP          ",   82, "GC",  199.00D0, F), &
       & MEMBER("RCO3            ",   92, "GC",   89.00D0, F), &
       & MEMBER("LIMALP          ",   89, "GC",  217.00D0, F), &
@@ -413,9 +413,9 @@
       & MEMBER("DCB3            ",   99, "GC",   84.00D0, F), &
       & MEMBER("BALP            ",  100, "GC",  137.00D0, F), &
       & MEMBER("ADDC            ",  101, "GC",  125.00D0, F), &
-      & MEMBER("CHO             ",   34, "GC",  139.00D0, F), &
+      & MEMBER("CHO             ",   34, "GC",  107.00D0, F), &
       & MEMBER("MCT             ",  102, "GC",  110.11D0, F), &
-      & MEMBER("MCTO            ",  103, "GC",  123.00D0, F), &
+      & MEMBER("MCTO            ",  103, "GC",  109.00D0, F), &
       & MEMBER("MOH             ",  104, "GC",   32.00D0, F), &
       & MEMBER("EOH             ",  105, "GC",   46.10D0, F), &
       & MEMBER("ETEG            ",  107, "GC",   62.10D0, F), &
@@ -424,13 +424,13 @@
       & MEMBER("ORAP            ",  113, "GC",   91.00D0, F), &
       & MEMBER("PPN             ",  114, "GC",  135.00D0, F), &
       & MEMBER("MPAN            ",  115, "GC",  147.10D0, F), &
-      & MEMBER("MCTP            ",  122, "GC",  172.00D0, F), &
+      & MEMBER("MCTP            ",  122, "GC",  125.00D0, F), &
       & MEMBER("OLNN            ",  123, "GC",  136.00D0, F), &
       & MEMBER("OLND            ",  124, "GC",  136.00D0, F), &
       & MEMBER("APINP1          ",   79, "GC",  230.00D0, F), &
-      & MEMBER("APINP2          ",   80, "GC",  230.00D0, F), &
+      & MEMBER("APINP2          ",   80, "GC",  294.00D0, F), &
       & MEMBER("LIMNP1          ",   86, "GC",  230.00D0, F), &
-      & MEMBER("LIMNP2          ",   87, "GC",  230.00D0, F), &
+      & MEMBER("LIMNP2          ",   87, "GC",  294.00D0, F), &
       & MEMBER("ADCN            ",  125, "GC",  155.00D0, F), &
       & MEMBER("VHOM            ",   90, "GC",  250.00D0, F), &
       & MEMBER("VROCP4OXY2      ",  179, "GC",  158.20D0, F), &
@@ -590,10 +590,10 @@
       DATA CHEMISTRY_SPC(  84 ), SPECIES_MOLWT(  84 ) / 'ROH             ',   60.00D0 /
       DATA CHEMISTRY_SPC(  85 ), SPECIES_MOLWT(  85 ) / 'API             ',  136.40D0 /
       DATA CHEMISTRY_SPC(  86 ), SPECIES_MOLWT(  86 ) / 'APIP1           ',  185.00D0 /
-      DATA CHEMISTRY_SPC(  87 ), SPECIES_MOLWT(  87 ) / 'APIP2           ',  185.00D0 /
+      DATA CHEMISTRY_SPC(  87 ), SPECIES_MOLWT(  87 ) / 'APIP2           ',  249.00D0 /
       DATA CHEMISTRY_SPC(  88 ), SPECIES_MOLWT(  88 ) / 'LIM             ',  136.30D0 /
       DATA CHEMISTRY_SPC(  89 ), SPECIES_MOLWT(  89 ) / 'LIMP1           ',  185.00D0 /
-      DATA CHEMISTRY_SPC(  90 ), SPECIES_MOLWT(  90 ) / 'LIMP2           ',  185.00D0 /
+      DATA CHEMISTRY_SPC(  90 ), SPECIES_MOLWT(  90 ) / 'LIMP2           ',  249.00D0 /
       DATA CHEMISTRY_SPC(  91 ), SPECIES_MOLWT(  91 ) / 'PINALP          ',  199.00D0 /
       DATA CHEMISTRY_SPC(  92 ), SPECIES_MOLWT(  92 ) / 'RCO3            ',   89.00D0 /
       DATA CHEMISTRY_SPC(  93 ), SPECIES_MOLWT(  93 ) / 'LIMALP          ',  217.00D0 /
@@ -606,9 +606,9 @@
       DATA CHEMISTRY_SPC( 100 ), SPECIES_MOLWT( 100 ) / 'DCB3            ',   84.00D0 /
       DATA CHEMISTRY_SPC( 101 ), SPECIES_MOLWT( 101 ) / 'BALP            ',  137.00D0 /
       DATA CHEMISTRY_SPC( 102 ), SPECIES_MOLWT( 102 ) / 'ADDC            ',  125.00D0 /
-      DATA CHEMISTRY_SPC( 103 ), SPECIES_MOLWT( 103 ) / 'CHO             ',  139.00D0 /
+      DATA CHEMISTRY_SPC( 103 ), SPECIES_MOLWT( 103 ) / 'CHO             ',  107.00D0 /
       DATA CHEMISTRY_SPC( 104 ), SPECIES_MOLWT( 104 ) / 'MCT             ',  110.11D0 /
-      DATA CHEMISTRY_SPC( 105 ), SPECIES_MOLWT( 105 ) / 'MCTO            ',  123.00D0 /
+      DATA CHEMISTRY_SPC( 105 ), SPECIES_MOLWT( 105 ) / 'MCTO            ',  109.00D0 /
       DATA CHEMISTRY_SPC( 106 ), SPECIES_MOLWT( 106 ) / 'MOH             ',   32.00D0 /
       DATA CHEMISTRY_SPC( 107 ), SPECIES_MOLWT( 107 ) / 'EOH             ',   46.10D0 /
       DATA CHEMISTRY_SPC( 108 ), SPECIES_MOLWT( 108 ) / 'ETEG            ',   62.10D0 /
@@ -617,13 +617,13 @@
       DATA CHEMISTRY_SPC( 111 ), SPECIES_MOLWT( 111 ) / 'ORAP            ',   91.00D0 /
       DATA CHEMISTRY_SPC( 112 ), SPECIES_MOLWT( 112 ) / 'PPN             ',  135.00D0 /
       DATA CHEMISTRY_SPC( 113 ), SPECIES_MOLWT( 113 ) / 'MPAN            ',  147.10D0 /
-      DATA CHEMISTRY_SPC( 114 ), SPECIES_MOLWT( 114 ) / 'MCTP            ',  172.00D0 /
+      DATA CHEMISTRY_SPC( 114 ), SPECIES_MOLWT( 114 ) / 'MCTP            ',  125.00D0 /
       DATA CHEMISTRY_SPC( 115 ), SPECIES_MOLWT( 115 ) / 'OLNN            ',  136.00D0 /
       DATA CHEMISTRY_SPC( 116 ), SPECIES_MOLWT( 116 ) / 'OLND            ',  136.00D0 /
       DATA CHEMISTRY_SPC( 117 ), SPECIES_MOLWT( 117 ) / 'APINP1          ',  230.00D0 /
-      DATA CHEMISTRY_SPC( 118 ), SPECIES_MOLWT( 118 ) / 'APINP2          ',  230.00D0 /
+      DATA CHEMISTRY_SPC( 118 ), SPECIES_MOLWT( 118 ) / 'APINP2          ',  294.00D0 /
       DATA CHEMISTRY_SPC( 119 ), SPECIES_MOLWT( 119 ) / 'LIMNP1          ',  230.00D0 /
-      DATA CHEMISTRY_SPC( 120 ), SPECIES_MOLWT( 120 ) / 'LIMNP2          ',  230.00D0 /
+      DATA CHEMISTRY_SPC( 120 ), SPECIES_MOLWT( 120 ) / 'LIMNP2          ',  294.00D0 /
       DATA CHEMISTRY_SPC( 121 ), SPECIES_MOLWT( 121 ) / 'ADCN            ',  155.00D0 /
       DATA CHEMISTRY_SPC( 122 ), SPECIES_MOLWT( 122 ) / 'VHOM            ',  250.00D0 /
       DATA CHEMISTRY_SPC( 123 ), SPECIES_MOLWT( 123 ) / 'VROCP4OXY2      ',  158.20D0 /
@@ -1989,7 +1989,7 @@
       DATA ( CHEM_SPC_ATOMS( 103,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 8.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
 ! MCT found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 104,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
@@ -1999,7 +1999,7 @@
       DATA ( CHEM_SPC_ATOMS( 105,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00/
 ! MOH found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 106,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
@@ -2044,7 +2044,7 @@
       DATA ( CHEM_SPC_ATOMS( 114,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 7.0000D+00/
+     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 6.0000D+00/
 ! OLNN found in GC namelist 
       DATA ( CHEM_SPC_ATOMS( 115,IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & 

@@ -161,6 +161,8 @@ END ELIMINATE
 
 
 
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -334,10 +336,10 @@ REACTIONS[CM] =
                  + 0.010*MGLY + 0.790*OP2  + 0.9000*DELTA_C # 1.00E-11;                 
 <R104> BALD + HO = BALP # 5.32E-12 @ -243.;
 <R105> PHEN + HO = 0.152*ASOATJ + 0.619*HO2 + 0.170*ADDC + 0.059*CHO 
-                 + 0.619*MCT  - 0.4400*DELTA_C # 6.75E-12 @ -405.;                 
+                 + 0.619*MCT  - 0.3810*DELTA_C # 6.75E-12 @ -405.;                 
 <R106> CSL + HO = 0.200*ASOATJ + 0.584*HO2 + 0.160*ADDC + 0.056*CHO 
-                + 0.584*MCT  + 0.5280*DELTA_C # 4.65E-11 @ 0.0;                
-<R108> MCT + HO = MCTO  - 1.0000*DELTA_C # 2.05E-10 @ 0.0;
+                + 0.584*MCT  + 0.5840*DELTA_C # 4.65E-11 @ 0.0;                
+<R108> MCT + HO = MCTO # 2.05E-10 @ 0.0;
 <R109> MOH + HO = HO2 + HCHO # 2.85E-12 @ 345.;
 <R110> EOH + HO = HO2 + ACD # 3.0E-12 @ -20.;
 <R111> ROH + HO = HO2 + 0.719*ALD + 0.184*ACD  + 0.4750*DELTA_C 
@@ -433,12 +435,12 @@ REACTIONS[CM] =
 <R154> MGLY + NO3 = ACO3 + CO + HNO3 # 3.76E-12 @ 1900.;
 <RBAL1> BALD + NO3 = BALP + HNO3 # 2.40E-15;
 <R155> PHEN + NO3 = 0.152*ASOATJ + 0.339*CHO + 0.850*ADDC + 0.424*ADCN 
-                  + 0.424*HNO3  + 0.1520*DELTA_N - 6.2700*DELTA_C 
+                  + 0.424*HNO3  + 0.1520*DELTA_N - 5.9310*DELTA_C 
                   # 3.78E-12;                  
 <R156> CSL + NO3 = 0.200*ASOATJ + 0.320*CHO + 0.080*ADDC + 0.400*ADCN 
-                 + 0.400*HNO3  + 0.2000*DELTA_N + 0.0800*DELTA_C 
+                 + 0.400*HNO3  + 0.2000*DELTA_N + 0.4000*DELTA_C 
                  # 1.06E-12;                 
-<R158> MCT + NO3 = MCTO + HNO3  - 1.0000*DELTA_C # 2.01E-10;
+<R158> MCT + NO3 = MCTO + HNO3 # 2.01E-10;
 <R159> MPAN + NO3 = MACP + NO2 + HNO3 # 2.2E-14 @ 500.;
 <RBAL2> BALP + NO2 = PAN  + 5.0000*DELTA_C  # 9.7E-29 ^ -5.6 
                    & 9.3E-12 ^ -1.5 & 1.42 & 0.3;                   
@@ -542,8 +544,8 @@ REACTIONS[CM] =
                  # 2.7E-12 @ -360.;                 
 <R208> XO2 + NO = NO2 # 2.7E-12 @ -360.;
 <R209> BAL2 + NO2 = ONIT  + 2.0000*DELTA_C # 2.0E-11;
-<R210> CHO + NO2 = ONIT  + 4.0000*DELTA_C # 2.0E-11;
-<R211> MCTO + NO2 = ONIT  + 3.0000*DELTA_C # 2.08E-12;
+<R210> CHO + NO2 = ONIT  + 3.0000*DELTA_C # 2.0E-11;
+<R211> MCTO + NO2 = ONIT  + 2.0000*DELTA_C # 2.08E-12;
 <R212> MO2 + HO2 = OP1 # 4.1E-13 @ -750.;
 <R213> ETHP + HO2 = OP2 # 7.5E-13 @ -700.;
 <R214> HC3P + HO2 = OP2  + 1.0000*DELTA_C # 1.66E-13 @ -1300.;
@@ -596,8 +598,8 @@ REACTIONS[CM] =
 <RBAL4> BAL1 + HO2 = ORA2  + 4.0000*DELTA_C # 2.11E-13@ -1300;
 <RBAL5> BAL2 + O3 = BAL1 # 2.86E-13;
 <R240> ADDC + HO2 = OP2  + 5.0000*DELTA_C # 3.75E-13 @ -980.;
-<R241> CHO + HO2 = CSL  + 1.0000*DELTA_C # 1.00E-11;
-<R242> MCTP + HO2 = OP2  + 5.0000*DELTA_C # 3.75E-13 @ -980.;
+<R241> CHO + HO2 = CSL # 1.00E-11;
+<R242> MCTP + HO2 = OP2  + 4.0000*DELTA_C # 3.75E-13 @ -980.;
 <R243> ORAP + HO2 = OP2 # 1.15E-13 @ -1300.;
 <R244> OLNN + HO2 = ONIT  - 1.0000*DELTA_C # 1.66E-13 @ -1300.;
 <R245> OLND + HO2 = ONIT  - 1.0000*DELTA_C # 1.66E-13 @ -1300.;
