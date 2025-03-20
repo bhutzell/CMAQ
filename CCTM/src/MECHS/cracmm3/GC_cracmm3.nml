@@ -36,7 +36,7 @@ GC_SPECIES_DATA =
 'DCB1'          , 98.0   ,''     ,-1     ,''     ,-1     ,'VD_DCB1'          , 1   ,'METHACROLEIN'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!2-methylbut-2-enedial,L,NA,O=CC=C(C)C=O
 'DCB2'          ,112.1   ,''     ,-1     ,''     ,-1     ,'VD_DCB2'          , 1   ,'METHACROLEIN'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!2-methyl-4-oxopent-2-enal,L,NA,O=CC(=CC(=O)C)C
 'BALD'          ,106.0   ,''     ,-1     ,''     ,-1     ,'VD_BALD'          , 1   ,'BENZALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Benzaldehyde,L,DTXSID8039241,O=CC1=CC=CC=C1
-'CHO'           ,107.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!,(2-methylphenyl)oxidanylL,NA,CC1=CC=CC=C1[O]
+'CHO'           ,107.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!(2-methylphenyl)oxidanyl,L,NA,CC1=CC=CC=C1[O]
 'OP1'           , 48.0   ,''     ,-1     ,''     ,-1     ,'VD_OP1'           , 1   ,'METHYLHYDROPEROX', 1  ,''             ,'MHP'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Methyl hydroperoxide,E,DTXSID10184401,COO
 'OP2'           , 62.0   ,''     ,-1     ,''     ,-1     ,'VD_OP2'           , 1   ,'METHYLHYDROPEROX', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Ethyl hydroperoxide,L,DTXSID70184402,CCOO
 'OPB'           ,186.2   ,''     ,-1     ,''     ,-1     ,'VD_OPB'           , 1   ,'METHYLHYDROPEROX', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!2-hydroperoxy-2;6;6-trimethylbicyclo[3.1.1]heptan-3-ol,L,NA,OOC1(C)C(O)CC2CC1C2(C)C
