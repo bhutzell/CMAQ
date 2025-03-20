@@ -1200,8 +1200,8 @@ C *** set up variables needed for calculating K_BRONO2
                CLNO3_CL_RXN_TIME    = 4.0D0 * INV_GAMMA_CLNO3_ACL / CBAR_CLNO3
                CLNO3_BR_RXN_TIME    = 4.0D0 * INV_GAMMA_CLNO3_ABR / CBAR_CLNO3
                INO3_WA_RXN_TIME     = 4.0D0 * INV_GAMMA_INO3_WA / CBAR_INO3
-               
-              
+
+
                IF( MET_DATA%COSZEN( C, R ) .LE. 0.0 )THEN
                    DARK = .TRUE.
                ELSE
