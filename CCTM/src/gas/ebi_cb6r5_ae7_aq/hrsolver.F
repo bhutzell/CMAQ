@@ -45,7 +45,6 @@ C**********************************************************************
       USE PA_IRR_MODULE
 #ifdef isam
       USE SA_IRR_DEFN
-      USE ELMO_DATA, ONLY : ELMO_VOC_NOX
 #endif
 #ifdef sens
       USE DDM3D_CHEM, ONLY: YCDDM
@@ -368,7 +367,6 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
                  IF( NEBI .EQ. N_EBI_STEPS )UPDATE_SOLD = .TRUE.
                  CALL SA_IRR_UNBLOCKED ( .FALSE., RKI, YC, DTC )
                  UPDATE_PROBABILITIES = .FALSE.
-                 ELMO_VOC_NOX( C,R,L )  = VOC_TO_NOX
 #endif
 
 #ifdef sens
