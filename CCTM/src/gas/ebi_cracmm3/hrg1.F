@@ -29,11 +29,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-<<<<<<< HEAD
-C  REVISION HISTORY: Created by EBI solver program, Mar  7, 2025
-=======
 C  REVISION HISTORY: Created by EBI solver program, Mar 24, 2025
->>>>>>> CRACMM3_CHLORINE
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C   01 Jun 18 B.Hutzell: replaced steady solution for O1D with backward Euler

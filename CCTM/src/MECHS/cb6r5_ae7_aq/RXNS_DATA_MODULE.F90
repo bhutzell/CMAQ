@@ -6,11 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-<<<<<<< HEAD
-! Source file: /work/MOD3DEV/sgq/manage_git/research/PR_1212/TEST/UTIL/chemmech/input/cb6r5_ae7_aq/mech_cb6r5_ae7_aq.def
-=======
 ! Source file: /work/MOD3DEV/tskipper/cmaq_testing/20250314_chemmech_no_oxygen_atoms/UTIL/chemmech/input/cb6r5_ae7_aq/mech_cb6r5_ae7_aq
->>>>>>> CRACMM3_CHLORINE
 ! for Mechanism Name: CB6R5_AE7_AQ                    
 
 ! This file is used to create mechanism data and functions

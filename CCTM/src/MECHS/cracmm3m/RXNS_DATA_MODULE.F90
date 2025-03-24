@@ -6,13 +6,8 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-<<<<<<< HEAD
 ! Source file: /work/MOD3DEV/sgq/manage_git/research/cracmm3_chlorine_phot/UTIL/chemmech/input/cracmm3m/mech_cracmm3m.def
-=======
-! Source file: /work/MOD3DEV/tskipper/cmaq_testing/20250318_chemmech_merge/UTIL/chemmech/input/cracmm3m/mech_cracmm3m.def
->>>>>>> CRACMM3_CHLORINE
 ! for Mechanism Name: CRACMM3M                        
-
 ! This file is used to create mechanism data and functions
 
 ! The following are reserved symbols declared in this file:
