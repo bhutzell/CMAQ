@@ -16,7 +16,7 @@
 #> the repository. The user may also set their own preferred 
 #> directory.
 
- set CMAQ_HOME = /work/MOD3DEV/sgq/manage_git/research/cracmm3_chlorine
+ set CMAQ_HOME = /home/username/path
 
 #> This section allows users to choose explicitly which tools
 #> to make available from the repo. For each selected tool,
