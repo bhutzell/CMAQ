@@ -109,11 +109,12 @@
       CHARACTER( 100 ),ALLOCATABLE :: DESID_STREAM_DESC( : )  ! Description of each emissions stream
       LOGICAL,         ALLOCATABLE :: DESID_STREAM_LAPPLY( : )! Flag to use each emissions stream
       LOGICAL         ,ALLOCATABLE :: DESID_STREAM_DIFF( :,: )! Test for whether or not a stream contributes to 
-                                                         !   a particular transported variable
+                                                              !   a particular transported variable
       LOGICAL         ,ALLOCATABLE :: DESID_STREAM_SYM_DATE( : ) ! Toggle for whether or not to let the 
-                                                             ! emission stream date override the model
-      INTEGER         ,ALLOCATABLE :: DESID_STREAM_DATE( : )! Date to be read in from each emissions stream
-      LOGICAL         ,ALLOCATABLE :: DESID_STREAM_FIRE( : )! Is this Emission Stream Representing Fires (1=Yes)
+                                                              ! emission stream date override the model
+      INTEGER         ,ALLOCATABLE :: DESID_STREAM_DATE( : )  ! Date to be read in from each emissions stream
+      LOGICAL         ,ALLOCATABLE :: DESID_STREAM_FIRE( : )  ! Is this Emission Stream Representing Fires 
+      LOGICAL         ,ALLOCATABLE :: DESID_STREAM_ONLINE( : )! Is this an online Emission Stream 
 
       INTEGER         ,ALLOCATABLE :: DESID_DIAG_N_STREAM( : )    ! Number of Streams for each diagnostic file
       LOGICAL         ,ALLOCATABLE :: DESID_DIAG_STREAM_MASK(:,:) ! True if a stream contributes to a diagnostic

@@ -1,5 +1,9 @@
 CLNO3_R_JPL19
+<<<<<<< HEAD
 ! CLNO3 + hv  =  CL + NO3
+=======
+! CLNO3 + hν  =  CL + NO3
+>>>>>>> research
 ! JPL Publication 19-5;  Evaluation Number 19; May 2020
 ! Page: 4-236 to 4-238; Table 4F-18
 ! Quantum yield is calculated following the Table 4F18 note
@@ -129,5 +133,9 @@ FAC=1.0
 426	2.22E-22	1.00
 428	2.07E-22	1.00
 430	1.89E-22	1.00
+<<<<<<< HEAD
 432	1.88E-22	1.00
 
+=======
+432	1.88E-22	1.00
+>>>>>>> research

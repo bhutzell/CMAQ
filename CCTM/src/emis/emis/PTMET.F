@@ -47,6 +47,7 @@ C     06 Aug 2019 D.Wong: - For two-way model, use UWIND/VWIND (wind U/V compone
 C                           mass point and in offline CMAQ model, use average value of
 C                           UWINDC/VWINDC to approximate UWIND/VWIND. Hence no longer
 C                           need UWINDC_AVAIL/VWINDC_AVAIL
+C     10 Jan 2024 D.Wong: - Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE UDTYPES, ONLY: PTMET_TYPE
@@ -184,14 +185,14 @@ C-----------------------------------------------------------------------
 
          IF ( MY_NSRC( N ) .GT. 0 ) THEN
             DO S = 1, MY_NSRC( N )
-               PTMET_DATA( N )%USTAR( S )  = g2ddata(my_nsrc_mesh_index(s, n),1,ustar_ind)
-               PTMET_DATA( N )%HFX( S )    = g2ddata(my_nsrc_mesh_index(s, n),1,hfx_ind)
-               PTMET_DATA( N )%HMIX( S )   = g2ddata(my_nsrc_mesh_index(s, n),1,pbl_ind)
+               PTMET_DATA( N )%USTAR( S )  = coupler_m2a_dr_2d_data(my_nsrc_mesh_index(s, n),1,ustar_loc,1)
+               PTMET_DATA( N )%HFX( S )    = coupler_m2a_dr_2d_data(my_nsrc_mesh_index(s, n),1,hfx_loc,1)
+               PTMET_DATA( N )%HMIX( S )   = coupler_m2a_dr_2d_data(my_nsrc_mesh_index(s, n),1,pbl_loc,1)
 
-               PTMET_DATA( N )%TA( :,S )   = g3ddata(my_nsrc_mesh_index(s, n),1,:,temp_ind)
-               PTMET_DATA( N )%ZH( :,S )   = g3ddata(my_nsrc_mesh_index(s, n),1,:,zh_ind)
-               PTMET_DATA( N )%ZF( :,S )   = g3ddata(my_nsrc_mesh_index(s, n),1,:,zf_ind)
-               PTMET_DATA( N )%DENS( :,S ) = g3ddata(my_nsrc_mesh_index(s, n),1,:,dens_ind)
+               PTMET_DATA( N )%TA( :,S )   = coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,:,temp_loc,1)
+               PTMET_DATA( N )%ZH( :,S )   = coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,:,zh_loc,1)
+               PTMET_DATA( N )%ZF( :,S )   = coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,:,zf_loc,1)
+               PTMET_DATA( N )%DENS( :,S ) = coupler_m2a_dr_3d_data(my_nsrc_mesh_index(s, n),1,:,dens_loc,1)
             END DO
          END IF
 
