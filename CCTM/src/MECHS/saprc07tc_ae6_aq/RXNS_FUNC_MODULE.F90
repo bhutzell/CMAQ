@@ -179,8 +179,8 @@
        REAL( 8 ) :: TEMP
        REAL( 8 ) :: INV_TEMP
        REAL( 8 ) :: CAIR
-       REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule*min) to 1/(ppm*min)
-       REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molec^2*min) to 1/(ppm^2*min)
+       REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule*sec) to 1/(ppm*min)
+       REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molecule^2*sec) to 1/(ppm^2*min)
 ! special rate operators listed below
 
        DO NCELL = 1, NUMCELLS

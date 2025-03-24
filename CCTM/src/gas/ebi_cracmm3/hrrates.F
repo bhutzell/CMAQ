@@ -27,7 +27,11 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
+<<<<<<< HEAD
 C  REVISION HISTORY: Created by EBI solver program, Mar  7, 2025
+=======
+C  REVISION HISTORY: Created by EBI solver program, Mar 24, 2025
+>>>>>>> CRACMM3_CHLORINE
 C
 C***********************************************************************
       USE HRDATA
