@@ -140,7 +140,7 @@
 !      to make the number carbons in the products match the number of carbons in
 !      the reactants).
 ! 09-25-24 G. Sarwar
-!    INO2 is renamed to ISONP 
+!    INO2 is renamed to ISONP
 !    Condensed halogen chemistry (HAL_OZONE) is updated using hemispheric CMAQ results with CRACMM2
 ! 09-26-24 G. Sarwar
 ! Aerosol nitrate photolysis
@@ -157,6 +157,8 @@ DELTA_SI;
 DELTA_N;
 DELTA_C;
 END ELIMINATE
+
+
 
 
 
@@ -288,8 +290,8 @@ REACTIONS[CM] =
 <ROCARO51> XYL + HO = 0.830*XYLP + 0.170*CSL + 0.170*HO2  
                     - 0.1700*DELTA_C # 2.33E-11;                    
 <ROCARO61> EBZ + HO = 0.820*EBZP + 0.180*CSL + 0.180*HO2  
-                    - 0.1800*DELTA_C # 7.00E-12;      
-<ROCARO61a> EBZ + NO3 = EBZP + HNO3 # 5.70E-16;		                  
+                    - 0.1800*DELTA_C # 7.00E-12;                    
+<ROCARO61a> EBZ + NO3 = EBZP + HNO3 # 5.70E-16;		
 !Isoprene AMORE mechanism
 <RAM01> ISO + O3 = 0.250*HO + 0.250*HO2 + 0.400*MO2 + 0.018*ACO3 
                  + 0.100*MACP + 0.090*H2O2 + 0.220*CO + HCHO 
@@ -309,9 +311,9 @@ REACTIONS[CM] =
                   + 0.110*ACO3 + 0.030*MACR + 2.000*HO + 0.340*HO2 
                   + 0.140*IPX + CO  + 0.0800*DELTA_C # 2.97E-11 @ -390;                  
 <RAM08> ISONP + HO2 = 0.450*HO + 0.950*INALD + 0.020*IPX  
-                   + 0.0500*DELTA_N + 0.1500*DELTA_C # 3.14E-11 @ -580;                   
+                    + 0.0500*DELTA_N + 0.1500*DELTA_C # 3.14E-11 @ -580;                    
 <RAM09> ISONP + NO = 0.150*MVK + 0.650*INALD + 0.050*ISON + 0.200*HCHO 
-                  + 1.300*NO2  + 0.7000*DELTA_C # 9.42E-12 @ -580;                  
+                   + 1.300*NO2  + 0.7000*DELTA_C # 9.42E-12 @ -580;                   
 <RAM10> ISON + HO = HO + 0.350*INALD + 0.170*IEPOX + 0.650*NO2  
                   + 2.4000*DELTA_C # 2.4E-11 @ -390;                  
 <RAM11> HO + INALD = CO + NO2 + 0.300*HO2 + HCHO  + 3.0000*DELTA_C 
@@ -1379,10 +1381,8 @@ REACTIONS[CM] =
 <R364> ECH4 + HO = MO2 # 2.45E-12 @ 1775.;
 
 ! monoterpene nitrate hydrolysis
-<TRP58> ATRPNJ = AHOMJ + HNO3  - 1.0000*DELTA_N - 1.0000*DELTA_C 
-               # 9.26E-05;               
-<TRP59> AHONITJ = AHOMJ + HNO3  - 1.0000*DELTA_N - 1.0000*DELTA_C 
-                # 9.26E-05;                
+<TRP58> ATRPNJ = AHOMJ + HNO3  - 1.0000*DELTA_N # 9.26E-05;
+<TRP59> AHONITJ = AHOMJ + HNO3  - 1.0000*DELTA_N # 9.26E-05;
 
 ! MCM-based styrene chemistry
 <ROCARO71> STY + HO = STYP # 1.02E-11 @ -532;
@@ -1396,11 +1396,11 @@ REACTIONS[CM] =
 <ROCARO75> STYP + MO2 = 1.370*HO2 + 1.680*HCHO + BALD + 0.320*MOH  
                       + 0.0000*DELTA_C # 2.5E-13;                      
 <ROCARO76> STYP + ACO3 = HO2 + HCHO + BALD + 0.700*MO2 + 0.300*ORA2  
-                       + 0.7000*DELTA_C # 2.5E-13;
+                       + 0.7000*DELTA_C # 2.5E-13;                       
 
 ! Aerosol nitrate photolysis (implemented as heterogeneous reactions)
-<HET_ANO3I> ANO3I = 0.67*HONO + 0.33*NO2 # 1.0~<HETERO_ANO3>;
-<HET_ANO3J> ANO3J = 0.67*HONO + 0.33*NO2 # 1.0~<HETERO_ANO3>;      
+<HET_ANO3I> ANO3I = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
+<HET_ANO3J> ANO3J = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
 
 !! Chlorine chemistry
 
@@ -1471,21 +1471,20 @@ REACTIONS[CM] =
 <CLOR04> CLO + HC5P = 0.200*HO2 + 0.051*MO2 + 0.231*ETHP + 0.235*XO2 
                     + CLOO + 0.018*HCHO + 0.045*ACD + 0.203*ALD 
                     + 0.033*MEK + 0.217*ACT + 0.033*KET + 0.272*HKET  
-                    + 2.0060*DELTA_C # 3.25E-12 @ 114;   
+                    + 2.0060*DELTA_C # 3.25E-12 @ 114;                    
 <CLOR51> CLO + HC10P = 0.740*HC10P2 + CLOO  + 2.6000*DELTA_C 
-                     # 3.25E-12 @ 114;     
-		     
+                     # 3.25E-12 @ 114;                     
 <HET_N2O5IJ> N2O5 = HNO3 + NO2PIJ # 1.0~<HETERO_N2O5IJ>;
-<HET_N2O5K>  N2O5 = HNO3 + NO2PK  # 1.0~<HETERO_N2O5K>;
+<HET_N2O5K> N2O5 = HNO3 + NO2PK # 1.0~<HETERO_N2O5K>;
 <HET_H2NO3PIJA> NO2PIJ = HNO3 # 1.0~<HETERO_H2NO3PAIJ>;
-<HET_H2NO3PKA>  NO2PK = HNO3 # 1.0~<HETERO_H2NO3PAK>;
-<HET_H2NO3PIB>  NO2PIJ + ACLI = CLNO2 # 1.0~<HETERO_H2NO3PBIJ>;
-<HET_H2NO3PJB>  NO2PIJ + ACLJ = CLNO2 # 1.0~<HETERO_H2NO3PBIJ>;
-<HET_H2NO3PKB>  NO2PK + ACLK = CLNO2 # 1.0~<HETERO_H2NO3PBK>;
+<HET_H2NO3PKA> NO2PK = HNO3 # 1.0~<HETERO_H2NO3PAK>;
+<HET_H2NO3PIB> NO2PIJ + ACLI = CLNO2 # 1.0~<HETERO_H2NO3PBIJ>;
+<HET_H2NO3PJB> NO2PIJ + ACLJ = CLNO2 # 1.0~<HETERO_H2NO3PBIJ>;
+<HET_H2NO3PKB> NO2PK + ACLK = CLNO2 # 1.0~<HETERO_H2NO3PBK>;
 
-<HET_CLN3_WAI> CLNO3 = HOCL + HNO3               # 1.0~<HETERO_CLN3_WAI>;
-<HET_CLN3_WAJ> CLNO3 = HOCL + HNO3               # 1.0~<HETERO_CLN3_WAJ>;
-<HET_CLN3_ACLJ> CLNO3 + ACLJ = CL2 + ANO3J       # 1.0~<HETERO_CLN3_ACLJ>;
+<HET_CLN3_WAI> CLNO3 = HOCL + HNO3 # 1.0~<HETERO_CLN3_WAI>;
+<HET_CLN3_WAJ> CLNO3 = HOCL + HNO3 # 1.0~<HETERO_CLN3_WAJ>;
+<HET_CLN3_ACLJ> CLNO3 + ACLJ = CL2 + ANO3J # 1.0~<HETERO_CLN3_ACLJ>;
 
 END MECH
 
