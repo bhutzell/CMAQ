@@ -71,12 +71,20 @@
 #> command line, then commands for sourcing files on the EPA high
 #> performance computing system will be invoked, otherwise they will
 #> be ignored.
- set IS_EPA = 0
+set echo
+ setenv IS_EPA 0
  if ( $#argv == 1 ) then
    if ( $1 == "EPA" | $1 == "epa" ) then
-     set IS_EPA = 1
+     setenv IS_EPA  1
    endif
  endif
+
+set nodename = `uname -n | cut -c 1-6`
+if (nodename == "atmos4" || nodename == "atmos5" ) then 
+ setenv IS_ZEN  0
+else 
+ setenv IS_ZEN  1
+endif
 
 #===============================================================================
 #> Copy config_cmaq.csh to Project directory and insert correct location
@@ -86,6 +94,9 @@
  sed -i '/setenv CMAQ_REPO \$CMAQ_HOME/c\ setenv CMAQ_REPO '"$REPO_HOME" $CMAQ_HOME/config_cmaq.csh
  if ( $IS_EPA  ) then
   sed -i 's/\# source \/work\/MOD3DEV\/cmaq_common\/cmaq_env.csh/source \/work\/MOD3DEV\/cmaq_common\/cmaq_env.csh/' $CMAQ_HOME/config_cmaq.csh
+ endif
+ if ( $IS_ZEN  ) then
+  sed -i 's/\-xHost//g' $CMAQ_HOME/config_cmaq.csh
  endif
 
 #===============================================================================
@@ -264,7 +275,8 @@
 #===============================================================================
  # Insert Job Scheduler Preface into Run Scripts for those working inside EPA
  if ( $IS_EPA ) then
-   source /work/MOD3DEV/cmaq_common/epa_scheduler.csh  #>>> Comment Out if not at EPA
+   #source /work/MOD3DEV/cmaq_common/epa_scheduler.csh  #>>> Comment Out if not at EPA
+   source /work/MOD3DEV/jwilliso/prs/zen/repo/epa_scheduler.csh  #>>> Comment Out if not at EPA
  endif
 
 #===============================================================================
