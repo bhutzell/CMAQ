@@ -75,12 +75,6 @@
  if ( $#argv == 1 ) then
    if ( $1 == "EPA" | $1 == "epa" ) then
      set IS_EPA = 1
-     set nodename = `uname -n | cut -c 1-6`
-     if ($nodename == "atmos4" || $nodename == "atmos5" ) then 
-      set IS_ZEN =  0
-     else 
-      set IS_ZEN = 1
-     endif
    endif
  endif
 
@@ -92,9 +86,6 @@
  sed -i '/setenv CMAQ_REPO \$CMAQ_HOME/c\ setenv CMAQ_REPO '"$REPO_HOME" $CMAQ_HOME/config_cmaq.csh
  if ( $IS_EPA  ) then
   sed -i 's/\# source \/work\/MOD3DEV\/cmaq_common\/cmaq_env.csh/source \/work\/MOD3DEV\/cmaq_common\/cmaq_env.csh/' $CMAQ_HOME/config_cmaq.csh
-  if ( $IS_ZEN  ) then
-   sed -i 's/\-xHost//g' $CMAQ_HOME/config_cmaq.csh
-  endif
  endif
 
 
