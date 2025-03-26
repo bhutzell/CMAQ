@@ -13,7 +13,6 @@ C
 C**********************************************************************
       USE ENV_VARS
       USE GLOBAL_DATA
-      !!USE M3UTILIO ! IOAPI parameters and declarations
       USE RXNS_DATA
 
       IMPLICIT NONE
@@ -47,7 +46,6 @@ C..SCRATCH LOCAL VARIABLES:
       INTEGER  :: E1, E2       ! end pos of string
       INTEGER  :: IND          ! array index
       INTEGER  :: IIN          ! Unit no. of input file
-      INTEGER  :: IOUT         ! Unit no. of output file
       INTEGER  :: N, S         ! Loop indices
       INTEGER  :: NPOS         ! Reaction index
       INTEGER  :: RPOS1        !
@@ -75,9 +73,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       FNAME = OUTPATH( 1 : E1 ) // '/hrprodloss.F' 
 
-      IOUT = JUNIT()
+      GLOBAL_IOUT = JUNIT()
 
-      OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
+      OPEN( UNIT = GLOBAL_IOUT, FILE = FNAME, ERR = 9000 )
 
 
       IIN = JUNIT()
@@ -89,9 +87,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       OPEN( UNIT = IIN, FILE = FNAME, ERR = 9000 )
 
 
-      IF( LWR_COPY ) CALL WR_COPYRT( IOUT )
+      IF( LWR_COPY ) CALL WR_COPYRT( GLOBAL_IOUT )
 
-      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( IOUT )
+      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( GLOBAL_IOUT )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Read, modify, and write first part of code from template
@@ -103,13 +101,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LINEIN( 1 : 2 ) .EQ. 'R1' ) THEN
 
-         WRITE( IOUT, 93000 ) TRIM( MECHNAME )
+         WRITE( GLOBAL_IOUT, 93000 ) TRIM( MECHNAME )
 
          GO TO 100
 
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'R2' ) THEN
 
-         WRITE( IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
+         WRITE( GLOBAL_IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
 
          GO TO 100
 
@@ -121,7 +119,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
         E1 = LEN_TRIM( LINEIN )
 
-        WRITE( IOUT, 92000 ) LINEIN( 1 : E1 )
+        WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : E1 )
 
         GO TO 100
 
@@ -143,7 +141,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             IF( NAME_INDEX( SPECIES( S ), N_SS_SPC, SS_SPC ) .NE. 0 ) CYCLE
          END IF
 
-         WRITE( IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 )
 
          SPEC = ADJUSTL( SPECIES( S ) )
 
@@ -171,7 +169,7 @@ c..production terms
      &           NPOS, LINOUT, LRXN1, RPOS1, RPOS2, PPOS1, PPOS2 )
 
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             LRXN1 = .FALSE.
          
@@ -182,7 +180,7 @@ c..production terms
             E2 = LEN_TRIM( VNAME )
             LINOUT = '      ' // VNAME( 1 : E2 ) // ' =   0.0D0'
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
          END IF
 
@@ -213,7 +211,7 @@ c..loss terms
      &           NPOS, LINOUT, LRXN1, RPOS1, RPOS2, PPOS1, PPOS2 )
 
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             LRXN1 = .FALSE.
          
@@ -224,7 +222,7 @@ c..loss terms
             E2 = LEN_TRIM( VNAME )
             LINOUT = '      ' // VNAME( 1 : E2 ) // ' =   0.0D0'
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
          END IF
 
@@ -237,14 +235,14 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          LINOUT = '      IF( L_AE_VRSN ) THEN' 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
          
          DO S = 1, N_AE_SPC
 
             IND = NAME_INDEX( AE_SPC( S ) , N_SPECIES, SPECIES )
 
-            WRITE( IOUT, 92000 )
+            WRITE( GLOBAL_IOUT, 92000 )
 
             SPEC = ADJUSTL( AE_SPC( S ) )
 
@@ -272,7 +270,7 @@ c..production terms
      &           NPOS, LINOUT, LRXN1, RPOS1, RPOS2, PPOS1, PPOS2 )
 
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             LRXN1 = .FALSE.
          
@@ -283,7 +281,7 @@ c..production terms
                E2 = LEN_TRIM( VNAME )
                LINOUT = '      ' // VNAME( 1 : E2 ) // ' =  0.0D0'
                E1 = LEN_TRIM( LINOUT )
-               WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+               WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             END IF
 
@@ -314,7 +312,7 @@ c..loss terms
      &              NPOS, LINOUT, LRXN1, RPOS1, RPOS2, PPOS1, PPOS2 )
 
                E1 = LEN_TRIM( LINOUT )
-               WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+               WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
                LRXN1 = .FALSE.
          
@@ -325,7 +323,7 @@ c..loss terms
                E2 = LEN_TRIM( VNAME )
                LINOUT = '      ' // VNAME( 1 : E2 ) // ' =  0.0D0'
                E1 = LEN_TRIM( LINOUT )
-               WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+               WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             END IF
 
@@ -333,8 +331,8 @@ c..loss terms
 
          LINOUT = '      END IF' 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END IF
 
@@ -346,14 +344,14 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
          LINOUT = '      IF( L_AQ_VRSN ) THEN' 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
          
          DO S = 1, N_AQ_SPC
 
             IND = NAME_INDEX( AQ_SPC( S ) , N_SPECIES, SPECIES )
 
-            WRITE( IOUT, 92000 )
+            WRITE( GLOBAL_IOUT, 92000 )
 
             SPEC = ADJUSTL( AQ_SPC( S ) )
 
@@ -381,7 +379,7 @@ c..production terms
      &           NPOS, LINOUT, LRXN1, RPOS1, RPOS2, PPOS1, PPOS2 )
 
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             LRXN1 = .FALSE.
          
@@ -392,7 +390,7 @@ c..production terms
                E2 = LEN_TRIM( VNAME )
                LINOUT = '      ' // VNAME( 1 : E2 ) // ' =  0.0D0'
                E1 = LEN_TRIM( LINOUT )
-               WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+               WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             END IF
 
@@ -423,7 +421,7 @@ c..loss terms
      &              NPOS, LINOUT, LRXN1, RPOS1, RPOS2, PPOS1, PPOS2 )
 
                E1 = LEN_TRIM( LINOUT )
-               WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+               WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
                LRXN1 = .FALSE.
          
@@ -434,7 +432,7 @@ c..loss terms
                E2 = LEN_TRIM( VNAME )
                LINOUT = '      ' // VNAME( 1 : E2 ) // ' =  0.0D0'
                E1 = LEN_TRIM( LINOUT )
-               WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+               WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             END IF
 
@@ -442,8 +440,8 @@ c..loss terms
 
          LINOUT = '      END IF' 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END IF
 
@@ -453,7 +451,7 @@ c  Production terms for negative stoichiometry
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF( LPAR_NEG ) THEN
 
-         WRITE( IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 )
 
          S = NAME_INDEX( 'PAR', N_SPECIES, SPECIES )
 
@@ -482,7 +480,7 @@ c..production terms
      &           NPOS, LINOUT, LRXN1, RPOS1, RPOS2, PPOS1, PPOS2 )
 
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             LRXN1 = .FALSE.
          
@@ -493,17 +491,17 @@ c..production terms
             E2 = LEN_TRIM( VNAME )
             LINOUT = '      ' // VNAME( 1 : E2 ) // ' =  0.0D0'
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
          END IF
 
       END IF
 
-      WRITE( IOUT, 97000 )
+      WRITE( GLOBAL_IOUT, 97000 )
 
       CLOSE( IIN )
 
-      CLOSE( IOUT )
+      CLOSE( GLOBAL_IOUT )
 
       NOUTFLS = NOUTFLS + 1
       OUTFLNAM( NOUTFLS ) = 'hrprodloss.F'

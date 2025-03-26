@@ -434,7 +434,6 @@ C
 C**********************************************************************
       USE ENV_VARS
       USE GLOBAL_DATA
-      !!USE M3UTILIO ! IOAPI parameters and declarations
       USE RXNS_DATA   ! mechanism data and specifications
 
 
@@ -497,6 +496,7 @@ C..SAVED LOCAL VARIABLES
       INTEGER, SAVE         ::  KNO2_NO2EX = 0  
 
 C..SAVED LOGICAL VARIABLES
+      INTEGER, SAVE   ::    LINE_COUNT = 0
       LOGICAL, SAVE   ::    LFIRST     = .TRUE.     ! First call flag
       LOGICAL, SAVE   ::    FLAG_OH_S  = .TRUE.     ! controls OH_S write
       LOGICAL, SAVE   ::    FLAG_HO2_S = .TRUE.     ! controls HO2_S write
@@ -527,6 +527,7 @@ c..NO2-->NO2EX
 
       END IF
 
+      IF( LRXN1 ) LINE_COUNT = 0
       USE_YCP = .FALSE.
       
       WRITE( GROUP, '(I1)' ) GRPNO
@@ -746,7 +747,16 @@ c..Special case for HONO being formed from NO2EX -- relate it to NO2
 
          LINOUT = LINOUT( 1 : EPOS ) // '! ' // RXOUT( 1 : ERX )
 
-
+C...check new fortran statement is needed for VNAME
+         IF( LEN_TRIM( LINOUT ) .GT. 0 )THEN
+            IF ( LINE_COUNT .GE. MAX_LINE_CONTINUE )THEN
+               WRITE(GLOBAL_IOUT,'(6X,A," = ",A,1X," + ")')TRIM( VNAME ),TRIM( VNAME )
+               LINE_COUNT = 0
+            ELSE
+               LINE_COUNT = LINE_COUNT + 1
+            END IF
+         END IF
+               
          RETURN
 
       END IF

@@ -47,7 +47,6 @@ C..SCRATCH LOCAL VARIABLES:
       INTEGER  :: EPOS         ! end pos of string
       INTEGER  :: IND          ! array index
       INTEGER  :: IIN          ! Unit no. of input file
-      INTEGER  :: IOUT         ! Unit no. of output file
       INTEGER  :: N, S         ! Loop indices
       INTEGER  :: NSPEC        ! 
 
@@ -74,9 +73,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       FNAME = OUTPATH( 1 : EPOS ) // '/hrinit.F' 
 
-      IOUT = JUNIT()
+      GLOBAL_IOUT = JUNIT()
 
-      OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
+      OPEN( UNIT = GLOBAL_IOUT, FILE = FNAME, ERR = 9000 )
 
 
       IIN = JUNIT()
@@ -88,9 +87,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       OPEN( UNIT = IIN, FILE = FNAME, ERR = 9000 )
 
 
-      IF( LWR_COPY ) CALL WR_COPYRT( IOUT )
+      IF( LWR_COPY ) CALL WR_COPYRT( GLOBAL_IOUT )
 
-      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( IOUT )
+      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( GLOBAL_IOUT )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Read, modify, and write code from template
@@ -102,38 +101,38 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LINEIN( 1 : 1 ) .NE. 'R' ) THEN
 
-         WRITE( IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
+         WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
 
       ELSE
 
          IF( LINEIN( 2 : 2 ) .EQ. '1' .AND. .NOT. LOUT1 ) THEN
 
-            WRITE( IOUT, 93000 ) TRIM( MECHNAME )
+            WRITE( GLOBAL_IOUT, 93000 ) TRIM( MECHNAME )
 
             LOUT1 = .TRUE. 
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '2' .AND. .NOT. LOUT2 ) THEN
 
-            WRITE( IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
+            WRITE( GLOBAL_IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
 
             LOUT2 = .TRUE. 
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '3' .AND. .NOT. LOUT3 ) THEN
 
-            WRITE( IOUT, 93025 ) NSPECIAL
+            WRITE( GLOBAL_IOUT, 93025 ) NSPECIAL
 
             LOUT3 = .TRUE. 
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '4' .AND. .NOT. LOUT4 ) THEN
 
-            IF( LPAR_NEG ) WRITE( IOUT, 93040 ) 
-            IF( N_SS_SPC .GT. 0 ) WRITE( IOUT, 93045 )
+            IF( LPAR_NEG ) WRITE( GLOBAL_IOUT, 93040 ) 
+            IF( N_SS_SPC .GT. 0 ) WRITE( GLOBAL_IOUT, 93045 )
 
             LOUT4 = .TRUE.
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '5' .AND. .NOT. LOUT5 ) THEN
 
-            IF( LDEGRADE_SUBS ) WRITE( IOUT, 93046 ) LINEIN( 3 : LEN_TRIM( LINEIN ) )
+            IF( LDEGRADE_SUBS ) WRITE( GLOBAL_IOUT, 93046 ) LINEIN( 3 : LEN_TRIM( LINEIN ) )
 
             LOUT5 = .FALSE.
 
@@ -150,29 +149,29 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C  Write first section for one mech
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-!         WRITE( IOUT, 92000 ) CLINE
-!         WRITE( IOUT, 93100 )
-!         WRITE( IOUT, 92000 ) CLINE
+!         WRITE( GLOBAL_IOUT, 92000 ) CLINE
+!         WRITE( GLOBAL_IOUT, 93100 )
+!         WRITE( GLOBAL_IOUT, 92000 ) CLINE
 
 c..create indices for all mechanism species
 !         DO N = 1, N_SPECIES
 !            SPOUT = '                '         
 !            EPOS = LEN_TRIM( SPECIES( N ) )
 !            SPOUT( 1 : EPOS ) = SPECIES( N )( 1 : EPOS ) 
-!            WRITE( IOUT, 93120 ) SPOUT( 1 : CL ), N
+!            WRITE( GLOBAL_IOUT, 93120 ) SPOUT( 1 : CL ), N
 !         END DO
 
 
          IF( N_SS_SPC .EQ. 0 ) THEN    !  no ss species in mech
 
 c..form ebi species array (all species except those in groups 1-4) 
-            WRITE( IOUT, 93140 ) N_GC_EBI
+            WRITE( GLOBAL_IOUT, 93140 ) N_GC_EBI
 
             IND = 0
             DO N = 1, N_SPECIES
                IF( L_GC_EBI( N ) ) THEN
                   IND = IND + 1
-                  WRITE( IOUT, 93160 ) IND, SPECIES( N )
+                  WRITE( GLOBAL_IOUT, 93160 ) IND, SPECIES( N )
      &                 ( 1 : LEN_TRIM( SPECIES( N ) ) )
                END IF
             END DO
@@ -180,33 +179,33 @@ c..form ebi species array (all species except those in groups 1-4)
          ELSE                          ! some species in mech are in ss
 
 c..form ebi species array ( no SS species, no group species )
-            WRITE( IOUT, 93140 ) ( N_GC_EBI - N_SS_SPC )
+            WRITE( GLOBAL_IOUT, 93140 ) ( N_GC_EBI - N_SS_SPC )
             IND = 0
             DO N = 1, N_SPECIES
                IF( NAME_INDEX( SPECIES( N ), N_SS_SPC, SS_SPC) .EQ. 0 .AND.
      &             L_GC_EBI( N ) ) THEN  
                    IND = IND + 1
-                   WRITE( IOUT, 93160 ) IND, SPECIES( N )
+                   WRITE( GLOBAL_IOUT, 93160 ) IND, SPECIES( N )
      &                  ( 1 : LEN_TRIM( SPECIES( N ) ) )
                END IF
             END DO  
 
 c..form ss species array  
-            WRITE( IOUT, 93180 )        
+            WRITE( GLOBAL_IOUT, 93180 )        
             IND = 0
             DO N = 1, N_SS_SPC
                IND = IND + 1 
-               WRITE( IOUT, 93200 ) IND, 
+               WRITE( GLOBAL_IOUT, 93200 ) IND, 
      &                SS_SPC( N )( 1 : LEN_TRIM( SS_SPC( N ) ) )
             END DO   
 
 c..form active species array ( all species except SS species )            
-            WRITE( IOUT, 93220 ) N_SPECIES - N_SS_SPC
+            WRITE( GLOBAL_IOUT, 93220 ) N_SPECIES - N_SS_SPC
             IND = 0
             DO N = 1, N_SPECIES
                IF( NAME_INDEX( SPECIES( N ), N_SS_SPC, SS_SPC ) .EQ. 0 ) THEN  
                    IND = IND + 1
-                   WRITE( IOUT, 93240 ) IND, 
+                   WRITE( GLOBAL_IOUT, 93240 ) IND, 
      &                    SPECIES( N )( 1 : LEN_TRIM( SPECIES( N ) ) )
                END IF
             END DO 
@@ -218,31 +217,31 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C  Write tolerance section
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-      WRITE( IOUT, 92020 )
-      WRITE( IOUT, 92000 ) CLINE
-      WRITE( IOUT, 95000 )
-      WRITE( IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 95000 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
 
 
 
          DO N = 1, N_SPECIES
 
             IF( L_LOW_TOL_SPC( N ) ) THEN
-               WRITE( IOUT, 95020 ) SPECIES( N )( 1 : CL ), LOW_TOL
+               WRITE( GLOBAL_IOUT, 95020 ) SPECIES( N )( 1 : CL ), LOW_TOL
             ELSEIF( L_HII_TOL_SPC( N ) ) THEN
-               WRITE( IOUT, 95020 ) SPECIES( N )( 1 : CL ), HII_TOL
+               WRITE( GLOBAL_IOUT, 95020 ) SPECIES( N )( 1 : CL ), HII_TOL
             ELSE
-               WRITE( IOUT, 95020 ) SPECIES( N )( 1 : CL ), STD_TOL
+               WRITE( GLOBAL_IOUT, 95020 ) SPECIES( N )( 1 : CL ), STD_TOL
             END IF
 
          END DO
 
 
-      WRITE( IOUT, 96000 )
+      WRITE( GLOBAL_IOUT, 96000 )
 
       CLOSE( IIN )
 
-      CLOSE( IOUT )
+      CLOSE( GLOBAL_IOUT )
 
       NOUTFLS = NOUTFLS + 1
       OUTFLNAM( NOUTFLS ) = 'hrinit.F'
