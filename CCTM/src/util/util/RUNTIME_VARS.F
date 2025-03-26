@@ -241,11 +241,12 @@
       LOGICAL :: SSEMDIAG      = .FALSE. ! flag for SSEMIS diagnostic file
       LOGICAL :: LTNG_NO       = .FALSE. ! flag for online calculation of NO from lightning
       INTEGER :: LT_ASM_DT     = 0       ! Lightning Input Time Interval
-      LOGICAL :: NLDNSTRIKE    = .FALSE. ! flag to use NLDN STRIKE directly 
+      LOGICAL :: LTNGON_DATA   = .FALSE. ! flag to use LTNG data directly 
       LOGICAL :: LTNGDIAG      = .FALSE. ! flag to turn on lightning NO diagnostics
       REAL    :: MOLSNCG       = 350.0   ! Lightning NO Production Rate
       REAL    :: MOLSNIC       = 350.0   ! Lightning NO Production Rate
-      CHARACTER(250) :: LTNG_FNAME = 'InLine' ! Lightning NO Input Name
+      INTEGER :: LNO_OPTION    = 1       ! Lightning NO options, 1 is default
+      !CHARACTER(250) :: LTNG_FNAME = 'InLine' ! Lightning NO Input Name
 
       INTEGER :: NPTGRPS       = 0       ! no. pt src input file groups
       LOGICAL :: PT3DDIAG      = .FALSE. ! Write point source 3d emis diagnostic file
@@ -872,16 +873,16 @@
       CALL GET_ENV ( HUM_NOX_YN, 'CTM_MET_EMIS_HUM', HUM_NOX_YN, VARDEV )
   
       ! Set LTNG_NO to Y or T to turn on lightning NO production
-      CALL GET_ENV ( LTNG_NO, 'CTM_LTNG_NO', LTNG_NO, VARDEV ) 
+      CALL GET_ENV ( LTNG_NO, 'CTM_LNO_ONLINE', LTNG_NO, VARDEV ) 
 
       ! Get Lightning Input Time Interval
       CALL GET_ENV ( LT_ASM_DT, 'LTNG_ASSIM_DT', LT_ASM_DT, VARDEV ) 
 
       ! Get Lightning NO File Name
-      CALL GET_ENV ( LTNG_FNAME, 'LTNGNO', LTNG_FNAME, VARDEV )
+      !CALL GET_ENV ( LTNG_FNAME, 'LTNGNO', LTNG_FNAME, VARDEV )
  
       ! Flag for using NLDN data for Lightning Strikes
-      CALL GET_ENV ( NLDNSTRIKE, 'USE_NLDN', NLDNSTRIKE, VARDEV )
+      CALL GET_ENV ( LTNGON_DATA, 'USE_LTNG_DATA', LTNGON_DATA, VARDEV )
  
       ! Flag for Outputing Lightning Diagnostic File
       CALL GET_ENV ( LTNGDIAG, 'LTNGDIAG', LTNGDIAG, VARDEV )
@@ -891,6 +892,12 @@
       
       ! Get Lightning NO Production Rate
       CALL GET_ENV ( MOLSNIC, 'MOLSNIC', 350.0, VARDEV )
+
+      ! Get Lightning NO Opitons: 1, 2, 3, 4
+      ! 1: default using groundbased lightnin flash
+      ! 2: using GLM (satellite) flash, 3: using GLM energy
+      ! 4: using synergized GLM/WWLLN energy 
+      CALL GET_ENV ( LNO_OPTION, 'LNO_OPTION', 1, VARDEV )
  
       ! get number of different file groups (sectors)
       CALL GET_ENV ( NPTGRPS, 'N_EMIS_PT', NPTGRPS, VARDEV )
