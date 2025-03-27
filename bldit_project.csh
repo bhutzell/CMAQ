@@ -88,6 +88,7 @@
   sed -i 's/\# source \/work\/MOD3DEV\/cmaq_common\/cmaq_env.csh/source \/work\/MOD3DEV\/cmaq_common\/cmaq_env.csh/' $CMAQ_HOME/config_cmaq.csh
  endif
 
+
 #===============================================================================
 #> Copy CCTM scripts
 #===============================================================================
