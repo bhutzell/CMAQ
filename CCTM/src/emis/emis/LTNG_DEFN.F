@@ -99,14 +99,10 @@
       REAL,    ALLOCATABLE, SAVE :: ICCG           ( :,: ) ! intercloud strikes per cloud to ground strike
 !C Vertical coord values
       REAL,    ALLOCATABLE, SAVE :: VGLVSLT        ( : )
-      REAL, PARAMETER :: Ynox = 1.0e17
-      REAL, PARAMETER :: Na = 6.022e23
-      REAL, PARAMETER :: beta = 1.10e-22 !1.10e-22 corresponding to 350 moles/flash,!1.53359e-22 #1.10825 for 3 Years GLM
-      REAL, PARAMETER :: j2fj = 1.0e+15 !1.53359e-22 #1.10825 for 3 Years GLM
       REAL, SAVE      :: YNaBeta
       REAL, SAVE      :: BetaF2E  ! GLM mean daily energy/flash
       REAL, SAVE      :: GamaF2E  ! WWLLN mean daily energy/stroke
-      REAL, SAVE      :: sGamaF2E  ! WWLLN mean daily energy/stroke
+      REAL, SAVE      :: sGamaF2E  ! WWLLNs mean daily energy/stroke
 
 
 !C    scenario time/date needed for diagnostic output
@@ -167,11 +163,21 @@
          INTEGER               :: I, J, K, L, V, STATUS
          INTEGER               :: CJDATE
          CHARACTER( 7 )        :: SJDATE
-         REAL                       :: mEngPfl,smEngPfl, WLNsd, zScore, sWLNsd, szScore
-         REAL,    Allocatable       :: gZWLNeng(:),gZWLNseng(:), gZWLNfl(:), gZWLNsfl(:), EngPfl(:), sEngPfl(:)
-
+         REAL                       :: mEngPfl   ! mean engergy per flash
+         REAL                       :: smEngPfl  ! mean energy per flash for the WWLLNs data: s indicats WWLLNs 
+         REAL                       :: WLNsd     ! tThe standard deviation (sd) for the WWLLN data 
+         REAL                       :: sWLNsd    ! the standard deviation (sd) for the WWLLNs data
+         REAL                       :: zScore    ! the ratio of CC/CG lightning strikes for WWLLN data
+         REAL                       :: szScore   ! the ratio of CC/CG lightning strikes for WWLLNs data 
+         REAL,    Allocatable       :: gZWLNeng(:) ! greater than zero (gZ) WWLLN energy record (grid-cell-hourly)
+         REAL,    Allocatable       :: gZWLNseng(:) ! gZ WWLLNs engergy records
+         REAL,    Allocatable       :: gZWLNfl(:)   ! gZ WWLLN strike records
+         REAL,    Allocatable       :: gZWLNsfl(:)  ! gZ WWLLNs strike records
+         REAL,    Allocatable       :: EngPfl(:)    ! the buffer holding the WWLLN energy per flash with gZ records
+         REAL,    Allocatable       :: sEngPfl(:)   !the buffer holding the WWLLNs energy per flash with gZ records
+                                       
          LOGICAL OK
-         INTEGER               :: SPC, WLNgZlen
+         INTEGER                    :: WLNgZlen     ! the length of nonzero records for the WWLLN/WWLLNs data
 
 !-----------------------------------------------------------------------
 
