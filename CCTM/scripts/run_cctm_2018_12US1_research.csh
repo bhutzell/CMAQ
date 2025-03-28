@@ -80,7 +80,7 @@ echo 'Start Model Run At ' `date`
 
 #> Set Working, Input, and Output Directories
  setenv WORKDIR ${CMAQ_HOME}/CCTM/scripts         #> Working Directory. Where the runscript is.
- setenv OUTDIR  ${CMAQ_DATA}/output_CCTM_${RUNID}_LNOx #> Output Directory
+ setenv OUTDIR  ${CMAQ_DATA}/output_CCTM_${RUNID}_Research #> Output Directory
  setenv INPDIR  /work/MOD3DATA/2018_12US1           #> Input Directory
  setenv LOGDIR  ${OUTDIR}/LOGS                    #> Log Directory Location
  setenv NMLpath ${BLD}                            #> Location of Namelists. Common places are: 
