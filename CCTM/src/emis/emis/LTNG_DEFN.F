@@ -67,6 +67,8 @@
 !C                      US (Lambert projection), when run over the hemisphere and turning lightning NOx on,
 !C                       the run would crash due to uncompatible projection (polar)
 !C 6 Jan 2020 D. Kang: Correct the time steps in the lightning NOx !diagnostic files from 1:00 - 0:00 to 0:00 to 23:00
+!C  2024 D. Kang:  Clean up of variable names and implement
+!                       GLM/WWLLN energy based LNOx producion
 !C----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE DESID_VARS
@@ -91,7 +93,6 @@
 
       CHARACTER( 16 ),      SAVE :: RC_NAME       ! RC name: old is RC and CCnew is RCA
 
-!C allocate these if LTNG_FNAME = 'INLINE'
       REAL,    ALLOCATABLE, SAVE :: LTNG_PRSFC     ( :,: ) ! surface pressure
       REAL,    ALLOCATABLE, SAVE :: LTNG_RC        ( :,: ) ! convective rainfall
 !C allocate these if LPARAM
@@ -212,9 +213,6 @@
          READ( SJDATE, '(4X, I3)' ) CJDATE
 
 #ifndef mpas
-!C Is lightning NO production inline, or from a file?
-!         CALL UPCASE(LTNG_FNAME)
-         IF ( LTNG_NO ) THEN  ! inline lightning NO production
             XMSG = 'Using in-line lightning NO production'
             CALL M3MSG2( XMSG )
 
@@ -447,16 +445,7 @@
                END IF
                COLUMN_DIAG = 0.0   ! array assignment
             END IF   ! LTNGDIAG
-!         ELSE   ! lightning emissions off line
 
-!C Lightning NO production from an input file
-!            CALL M3MSG2( 'Using lightning NO production from a file' )
-
-!C Check grid definition (intialize, if first call)
-!            OK = CHKGRID( LTNG_FNAME )
-
-
-         END IF   ! IF ( LTNG_NO ) inline or offline lightning NO production
 #endif
 
          LTLYRS = DESID_LAYS
