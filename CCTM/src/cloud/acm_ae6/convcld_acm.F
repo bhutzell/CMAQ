@@ -1968,27 +1968,21 @@ C...Finally, get in cloud pollutant concentrations in mol sp per mol air
 
 #ifdef isam
           DO SPC = 1, NSPC_SA
-             CSPC = MAP_SAtoCGR(SPC)
-             SA_SUM = SUM ( SA_POLC( SPC,: ) )
-c            IF ( POLC( CSPC ) .GT. 1.0E-30 .AND. CEND( CSPC ) .GT. 1.0E-09 ) THEN
-c            IF ( POLC( CSPC ) .GT. 1.0E-30 ) THEN 
-             IF ( SA_SUM .GT. 1.0E-25 ) THEN
-                DO ITAG = 1, NTAG_SA
-                   SA_CEND( SPC, ITAG ) = SA_POLC( SPC, ITAG )
-     &                                  * ( CEND( CSPC )
-c    &                                    / POLC( CSPC ) )
-     &                                    / SA_SUM )
-                   SA_REMOV( SPC, ITAG ) = SA_POLC( SPC, ITAG )
-     &                                   * ( REMOV( CSPC )
-c    &                                     / POLC( CSPC ) )
-     &                                     / SA_SUM )
-                END DO
-             ELSE 
-                DO ITAG = 1, NTAG_SA
-                   SA_CEND( SPC, ITAG )  = 0.0
-                   SA_REMOV( SPC, ITAG ) = 0.0
-                END DO
-             END IF
+            CSPC = MAP_SAtoCGR(SPC)
+            SA_SUM = SUM ( SA_POLC( SPC,: ) )
+            DO ITAG = 1, NTAG_SA
+              IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( SPC, ITAG ) .GT. 1.0E-25 ) THEN
+                SA_CEND( SPC, ITAG ) = SA_POLC( SPC, ITAG )
+     &                               * ( CEND( CSPC )
+     &                               / SA_SUM )
+                SA_REMOV( SPC, ITAG ) = SA_POLC( SPC, ITAG )
+     &                                * ( REMOV( CSPC )
+     &                                / SA_SUM )
+              ELSE ! no update
+                SA_CEND( SPC, ITAG )  = 0.0
+                SA_REMOV( SPC, ITAG ) = 0.0
+              END IF
+            END DO
           END DO
 #endif
 
@@ -2027,31 +2021,30 @@ C...  mimic this for the ASO4GASJ tracking species
 
 
 #ifdef isam
-            DO SPC = 1, NSPC_SA ! general case
+            DO SPC = 1, NSPC_SA
               CSPC = MAP_SAtoCGR(SPC)
               SA_SUM = SUM ( SA_POLC( SPC,: ) )
               DO ITAG = 1, NTAG_SA
-c               IF ( POLC( CSPC ) .GT. 1.0E-30 ) THEN
-                IF ( SA_SUM .GT. 1.0E-25 ) THEN
-                  SA_CEND( SPC,ITAG ) = SA_POLC( SPC,ITAG )
-     &                                * ( CEND( CSPC )
-c    &                                  / MAX( 1.0E-26,POLC( CSPC ) ) )
+                IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( SPC, ITAG ) .GT. 1.0E-25 ) THEN
+                  SA_CEND( SPC, ITAG ) = SA_POLC( SPC, ITAG )
+     &                                 * ( CEND( CSPC )
+     &                                 / SA_SUM )
+                  SA_REMOV( SPC, ITAG ) = SA_POLC( SPC, ITAG )
+     &                                  * ( REMOV( CSPC )
      &                                  / SA_SUM )
-                  SA_REMOV( SPC,ITAG ) = SA_POLC( SPC, ITAG )
-     &                                 * ( REMOV( CSPC )
-c    &                                   / MAX( 1.0E-25, POLC( CSPC ) ))
-     &                                   / SA_SUM )
-                ELSE
-                  SA_CEND( SPC,ITAG )  = 0.0
-                  SA_REMOV( SPC,ITAG ) = 0.0
+                ELSE ! no update
+                  SA_CEND( SPC, ITAG )  = 0.0
+                  SA_REMOV( SPC, ITAG ) = 0.0
                 END IF
               END DO
             END DO
+
             IF ( S_N2O5 .NE. 0 ) THEN
               DO ITAG = 1, NTAG_SA
                 SA_CEND( S_N2O5,ITAG )  = 0.0
               END DO
             END IF
+
             IF (S_SO4J .NE. 0 ) THEN ! sulfate case
 
               DO ITAG = 1, NTAG_SA  ! sulfate from H2SO4

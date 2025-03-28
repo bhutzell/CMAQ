@@ -196,7 +196,7 @@ C Latitude and longitude for zenith angle calculation: Golam Sarwar * July 1, 20
       REAL          JHNO3                           ! HNO3 photolysis rate, 1/min 
 
 #ifdef isam
-      INTEGER, SAVE           :: S_SO2, S_SO4J, S_SULF
+      INTEGER, SAVE           :: S_SO2, S_SO4J, S_SULF, S_N2O5
       INTEGER, SAVE           :: C_SO2, C_SO4J, C_SULF
       REAL, ALLOCATABLE, SAVE :: SA_POLC   ( :,: )
       REAL, ALLOCATABLE, SAVE :: SA_CEND   ( :,: )
@@ -307,6 +307,7 @@ C...  the met timestep in hours
         S_SO2  = INDEX1( 'SO2', NSPC_SA, ISAM_SPEC(:,OTHRTAG) )
         S_SO4J = INDEX1( 'ASO4J', NSPC_SA, ISAM_SPEC(:,OTHRTAG) )
         S_SULF = INDEX1( 'SULF', NSPC_SA, ISAM_SPEC(:,OTHRTAG) )
+        S_N2O5 = INDEX1( 'N2O5', NSPC_SA, ISAM_SPEC(:,OTHRTAG) )
 
         C_SO2  = INDEX1( 'SO2',   N_GC_SPC, GC_SPC )
         C_SO4J = INDEX1( 'ASO4J', N_AE_SPC, AE_SPC ) + 1 + N_GC_SPC
@@ -618,25 +619,19 @@ C...  that were scavenged or that participated in cloud chemistry
                 DO SPC = 1, NSPC_SA
                   CSPC = MAP_SAtoCGR(SPC)
                   SA_SUM = SUM ( SA_POLC( SPC,: ) )
-c                 IF ( POLC( CSPC ) .GT. 1.0E-30 .AND. CEND( CSPC ) .GT. 1.0E-09 ) THEN
-c                 IF ( POLC( CSPC ) .GT. 1.0E-30 ) THEN
-                  IF ( SA_SUM .GT. 1.0E-25 ) THEN
-                    DO ITAG = 1, NTAG_SA
+                  DO ITAG = 1, NTAG_SA
+                    IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( SPC, ITAG ) .GT. 1.0E-25 ) THEN
                       SA_CEND( SPC, ITAG ) = SA_POLC( SPC, ITAG )
      &                                     * ( CEND( CSPC )
-c    &                                       / POLC( CSPC ) )
      &                                       / SA_SUM )
                       SA_REMOV( SPC, ITAG ) = SA_POLC( SPC, ITAG )
      &                                      * ( REMOV( CSPC )
-c    &                                        / POLC( CSPC ) )
      &                                        / SA_SUM )
-                    END DO
-                  ELSE ! no update
-                    DO ITAG = 1, NTAG_SA
+                    ELSE ! no update
                       SA_CEND( SPC, ITAG )  = 0.0
                       SA_REMOV( SPC, ITAG ) = 0.0
-                    END DO
-                  END IF
+                    END IF
+                  END DO
                 END DO
 #endif
 
@@ -674,26 +669,29 @@ C...  mimic this for the ASO4GASJ tracking species
      &                          ALFA2, ALFA3, COSZ )
 
 #ifdef isam
-                  DO SPC = 1, NSPC_SA ! general case
+                  DO SPC = 1, NSPC_SA
                     CSPC = MAP_SAtoCGR(SPC)
                     SA_SUM = SUM ( SA_POLC( SPC,: ) )
                     DO ITAG = 1, NTAG_SA
-c                     IF ( POLC( CSPC ) .GT. 1.0E-30 ) THEN
-                      IF ( SA_SUM .GT. 1.0E-25 ) THEN
-                        SA_CEND( SPC, ITAG ) = SA_POLC( SPC,ITAG )
+                      IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( SPC, ITAG ) .GT. 1.0E-25 ) THEN
+                        SA_CEND( SPC, ITAG ) = SA_POLC( SPC, ITAG )
      &                                       * ( CEND( CSPC )
-c    &                                         / MAX( 1.0E-25, POLC( CSPC ) ) )
-     &                                         / SA_SUM )
+     &                                       / SA_SUM )
                         SA_REMOV( SPC, ITAG ) = SA_POLC( SPC, ITAG )
      &                                        * ( REMOV( CSPC )
-c    &                                          / MAX( 1.0E-25, POLC( CSPC ) ) )
-     &                                          / SA_SUM )
-                      ELSE !
+     &                                        / SA_SUM )
+                      ELSE ! no update
                         SA_CEND( SPC, ITAG )  = 0.0
                         SA_REMOV( SPC, ITAG ) = 0.0
                       END IF
                     END DO
                   END DO
+
+                  IF ( S_N2O5 .NE. 0 ) THEN
+                    DO ITAG = 1, NTAG_SA
+                      SA_CEND( S_N2O5,ITAG )  = 0.0
+                    END DO
+                  END IF
 
                   IF (S_SO4J .NE. 0 ) THEN ! sulfate case
 
