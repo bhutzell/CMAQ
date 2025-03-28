@@ -18,8 +18,8 @@ In this section, details on the routine CCTM output files are provided. All CMAQ
 |**File Name<sup>1</sup>**|**File Type**|**Time-Dependence<sup>2</sup>**|**Spatial Dimensions<sup>3</sup>** |
 |----------------------------|------|----|-----------------------------------|
 |**Flexible Standard<sup>4</sup>**| | | |
-|[CCTM_ELMO1_${fname}](#ELMO)<a id=ELMO_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
-|[CCTM_ELMO2_${fname}](#ELMO) <a id=ELMO_t></a>|GRDDED3|Hourly Averaged and Cumulative|XYZ'
+|[CCTM_ELMO1_fname](#ELMO)<a id=ELMO_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
+|[CCTM_ELMO2_fname](#ELMO) <a id=ELMO_t></a>|GRDDED3|Hourly Averaged and Cumulative|XYZ'
 |**Fixed Standard**| | | |
 |[Output Log](#cmaq_output_log) <a id=cmaq_output_log_t></a>|ASCII|n/a|n/a
 |[CCTM_CONC](#conc)<a id=conc_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
@@ -52,7 +52,7 @@ In this section, details on the routine CCTM output files are provided. All CMAQ
 <sup>1</sup>By default, output files are named CCTM_XXX_${CTM_APPL}.nc where XXX is the file identifier and ${CTM_APPL} is a user defined string that identifies the model run.   
 <sup>2</sup>While "Hourly" is indicated, users may define a different time step (e.g., 30 minutes) for model output by changing the TSTEP variable in the runscript. Hourly Instantaneous represents the model value at the exact model output time step.  Hourly Averaged values represent the average model values for the 60 minutes beginning with the model output time step.  Hourly Cumulative represent the cumulative (summed) model values for the 60 minutes ending at the model output time step.  
 <sup>3</sup>X is the dimension along the x-axis, Y is the dimension along the y-axis, Z is the vertical dimension, Z' is the user pre-defined size of the vertical dimension controlled by the environment variables CONC_BLEV_ELEV, ACONC_BLEV_ELEV, AELMO_BLEV_ELEV, and NLAYS_PHOTDIAG (range from 1 to all layers) and W is a non-layer dimension, e.g. number of LU fractions, number of sites for vertical extraction.    
-<sup>4</sup>The number and qualities of ELMO output files are entirely customizable by the user. Two examples are provided here to demonstrate that ELMO files currently must be either fully instantaneous or fully aggregated (i.e. average concentrations and cumulative deposition). The variable fname is user-specified for each file.
+<sup>4</sup>The number and qualities of ELMO output files are entirely customizable by the user. Two examples are provided here to demonstrate that ELMO files currently must be either fully instantaneous or fully aggregated (i.e. average concentrations and cumulative deposition). The variable fname is user-specified for each file.  
 <sup>5</sup>A special ASCII output file, FLOOR_xxx with xxx being the processor number, contains information when a simulation results in negative concentrations. 
 
 ## 7.2 CCTM Output Files
