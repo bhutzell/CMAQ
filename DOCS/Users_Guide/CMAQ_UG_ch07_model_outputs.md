@@ -17,12 +17,13 @@ In this section, details on the routine CCTM output files are provided. All CMAQ
 
 |**File Name<sup>1</sup>**|**File Type**|**Time-Dependence<sup>2</sup>**|**Spatial Dimensions<sup>3</sup>** |
 |----------------------------|------|----|-----------------------------------|
-|**Standard**| | | |
+|**Flexible Standard<sup>4</sup>**| | | |
+|[CCTM_ELMO1_${fname}](#ELMO)<a id=ELMO_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
+|[CCTM_ELMO2_${fname}](#ELMO) <a id=ELMO_t></a>|GRDDED3|Hourly Averaged and Cumulative|XYZ'
+|**Fixed Standard**| | | |
 |[Output Log](#cmaq_output_log) <a id=cmaq_output_log_t></a>|ASCII|n/a|n/a
 |[CCTM_CONC](#conc)<a id=conc_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
 |[CCTM_ACONC](#aconc) <a id=aconc_t></a>|GRDDED3|Hourly Averaged|XYZ'
-|[CCTM_ELMO](#ELMO) <a id=ELMO_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
-|[CCTM_AELMO](#aELMO) <a id=aELMO_t></a>|GRDDED3|Hourly Averaged|XYZ'
 |[CCTM_DRYDEP](#drydep) <a id=drydep_t></a>|GRDDED3|Hourly Cumulative|XY
 |[CCTM_WETDEP1](#wetdep) <a id=wetdep_t></a>|GRDDED3|Hourly Cumulative|XY
 |**Restart**| | | |
@@ -51,7 +52,8 @@ In this section, details on the routine CCTM output files are provided. All CMAQ
 <sup>1</sup>By default, output files are named CCTM_XXX_${CTM_APPL}.nc where XXX is the file identifier and ${CTM_APPL} is a user defined string that identifies the model run.   
 <sup>2</sup>While "Hourly" is indicated, users may define a different time step (e.g., 30 minutes) for model output by changing the TSTEP variable in the runscript. Hourly Instantaneous represents the model value at the exact model output time step.  Hourly Averaged values represent the average model values for the 60 minutes beginning with the model output time step.  Hourly Cumulative represent the cumulative (summed) model values for the 60 minutes ending at the model output time step.  
 <sup>3</sup>X is the dimension along the x-axis, Y is the dimension along the y-axis, Z is the vertical dimension, Z' is the user pre-defined size of the vertical dimension controlled by the environment variables CONC_BLEV_ELEV, ACONC_BLEV_ELEV, AELMO_BLEV_ELEV, and NLAYS_PHOTDIAG (range from 1 to all layers) and W is a non-layer dimension, e.g. number of LU fractions, number of sites for vertical extraction.    
-<sup>4</sup>A special ASCII output file, FLOOR_xxx with xxx being the processor number, contains information when a simulation results in negative concentrations. 
+<sup>4</sup>The number and qualities of ELMO output files are entirely customizable by the user. Two examples are provided here to demonstrate that ELMO files currently must be either fully instantaneous or fully aggregated (i.e. average concentrations and cumulative deposition). The variable fname is user-specified for each file.
+<sup>5</sup>A special ASCII output file, FLOOR_xxx with xxx being the processor number, contains information when a simulation results in negative concentrations. 
 
 ## 7.2 CCTM Output Files
 
@@ -107,13 +109,6 @@ Units for all variables are specified in the output file.
 The namelist input file CMAQ_Control_Misc.nml allows users to omit this file (set instant = .FALSE. under &elmo_activate), to set the top and bottom layers to be output (Inst_Layer_Top and Inst_Layer_Bot under &elmo_inst) and which variables to output (Inst_Vars_Nml under &elmo_inst).
 See [Appendix F (ELMO Output):](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more details.
 
-<a id=aELMO></a>
-
-**CCTM_AELMO: average hourly ELMO output file**
-<!-- BEGIN COMMENT -->
-[Return to Table 7-1](#aELMO_t)
-<!-- END COMMENT -->
-
 This optional 2-D or 3-D CCTM output file contains average information integrated from the previous output time step for user-specified variables including concentrations that would appear on CONC and ACONC files as well as aggregate variables like total mass of PM<sub>2.5</sub> and PM<sub>10</sub>. 
 Diagnostic parameters that were found on the PMDIAG file in previous CMAQ versions are also available for output on the ELMO file. 
 Thease include particle geometric mean diameters, geometric standard deviations, bulk densities, 2nd moments and 3rd moments for the lognormal modes. 
@@ -121,9 +116,6 @@ It also includes the fraction of each mode that contributes to PM<sub>1</sub>, P
 Many diagnostics relating to heterogenous chemistry are provided including the N<sub>2</sub>O<sub>5</sub> reaction probability, the ClNO<sub>2</sub> reaction yield, and the IEPOX uptake coefficient. 
 Units for all variables are specified in the output file. 
 
-The namelist input file CMAQ_Control_Misc.nml allows users to omit this file (set instant = .FALSE. under &elmo_activate), to set the top and bottom layers to be output (Inst_Layer_Top and Inst_Layer_Bot under &elmo_inst) and which variables to output (Inst_Vars_Nml under &elmo_inst).
-See [Appendix F (ELMO Output):](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more details. 
- 
 <a id=drydep></a>
 
 **CCTM_DRYDEP: hourly cumulative dry deposition file**
