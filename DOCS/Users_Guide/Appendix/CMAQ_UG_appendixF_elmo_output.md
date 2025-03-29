@@ -6,19 +6,20 @@
 
 * * *
 
-# Appendix F: Explicit and Lumped cmaq Model Output version 2 (ELMOv2)
+# Appendix F: Explicit and Lumped CMAQ Model Output version 2 (ELMOv2)
 The ELMO module makes both raw and highly aggregated predictive data directly available in CMAQ output files rather than requiring follow-up post-processing steps. For example, users may now output NOx, VOC, and PM2.5 mass directly from CMAQ!  
-Users specify output file configurations via the CMAQ control namelist (CMAQ_Control.nml). This namelist also contains definitions of ELMO keywords that can be used to simplify output file specification. 
-Finally, the chemical control file (CMAQ_Chem_Control_${mech}.nml) contains the definitions of ELMO composite variables that are defined as linear combinations of existing variables. 
+
+Users specify output file configurations via the CMAQ Control namelist (CMAQ_Control.nml). This namelist also contains definitions of ELMO keywords that can be used to simplify output file specification. 
+Finally, the Chemical Control namelist (CMAQ_Chem_Control_${mech}.nml) contains the definitions of ELMO composite variables that are defined as linear combinations of existing variables. 
 These components are described in detail below.
 
-**Why use ELMOv2?**
+**Why use ELMOv2?**  
 There are several distinct advantages to using ELMO instead of post-processing CONC and ACONC output with COMBINE:
 
-- Definitions of products like PM25 mass, PMF (Fine PM mass), and PM10 mass automatically adjust as PM species are activated or deactivated by CMAQ users or chemical mechanisms are switched. There is no need to modify a SpecDef file to account for a new or eliminated species.  
+- Definitions of products like PM25 (PM2.5 mass), PMF (Fine PM mass), and PM10 (PM10.0 mass) automatically adjust as PM species are activated or deactivated by CMAQ users or chemical mechanisms are switched. There is no need to modify a SpecDef file to account for a new or eliminated species.  
    - Note that some of the diagnostic species defined in FINE_ORG, specifically those meant to provide an approximate distinction between primary and secondary or anthropogenic and biogenic organic aerosols, should generally only be used in a qualitative manner. 
 A number of emitted compounds forming organic aerosols in the atmosphere can have both anthropogenic and biogenic sources so a quantitative attribution of organic aerosols to specific sources cannot be based on an analysis of concentrations alone and should use ISAM instead. 
-Moreover, their interpretation may not be consistent across mechanisms (e.g. cb6r5_aero7 vs. cracmm1) depending on the assumptions made during emissions processing and the mapping of emitted species to CMAQ mechanism species in DESID.
+Moreover, their interpretation may not be consistent across mechanisms (e.g. cb6r5_aero7 vs. cracmm3) depending on the assumptions made during emissions processing and the mapping of emitted species to CMAQ mechanism species in DESID.
 
 - Complex properties like O:C, OM:OC, particle acidity, etc. can be calculated using species properties available within CMAQ. 
 This resolves a potential vulnerability where, for example, the OM:OC of organic species may become out of sync between the SpecDef and the SOA_DEFN table within the model. This could have potentially led to errors in the calculation of OC (organic carbon). With ELMO, there is no such risk.  
@@ -27,7 +28,7 @@ This resolves a potential vulnerability where, for example, the OM:OC of organic
 
 - New parameters are available that were not before like N10, N20, N40 and N100, the number of particles above 10, 20, 40 and 100 nm in diameter. AOD and extinction at 550 nm have also been supported as options; these were previously only available on the photolysis diagnostic file.  
 
-- Keywords are available (see section F.4) to select groups of variables of interest. 
+- Keywords are available to select groups of variables of interest. 
 
 - Variables may be added to the ELMO_LIST table in ELMO_DATA.F and then prescribed in ELMO_PROC.F with greater ease.
  
@@ -37,7 +38,7 @@ For example, total PM2.5 have some small deviations when it is calculated as the
 
 ### F.1 Output File Specification
 The interface for prescribing ELMO file properties is located in the [CMAQ Control File](../CMAQ_UG_ch04_model_inputs.md#miscctrl). 
-Several variables prescribe how the ELMO output file parameters will be processed. 
+The ELMO_INIT namelist section prescribes how the ELMO output file parameters will be processed. 
 ```
 &ELMO_INIT
   N_Files = 2
@@ -46,7 +47,7 @@ Several variables prescribe how the ELMO output file parameters will be processe
   N_Max_Keywords_variables = 150
 /
 ```
-The variable N_Files must equal exactly the numbe rof ELMO files you wish. N_Max_Output Variables provides a limit on the total number of variables on any one file. 
+The variable N_Files must equal exactly the number of ELMO files you wish. N_Max_Output Variables provides a limit on the total number of variables on any one file. 
 N_Keywords must match exactly the number of Keyword variables below. Finally, N_Max_Keywords_Variables should be greater than the ;argest number of components for any one keyword below.
 
 ```
@@ -109,7 +110,7 @@ Another example specifies how to calculate fine-mode sulfate particle mass:
 ```
 In this example, the CMAQ species ASO4 points to the CMAQ sulfate chemical species. The 4th field indicates this composite should be summed for FINE particle mass, which CMAQ translates 
 internally to the sum of the Aitken and Accumulation modes. The name PMF_SO4 denotes fine-mode PM sulfate. Table F-1 shows the possible values for the 4th field denoting particle size.  
-
+                                        
 **Table F-1. Definition of values that may be used for phase/size (Field 4) in the ELMO Composite Interface**
 
 |**Phase/Size**  |**Meaning**|
@@ -325,7 +326,10 @@ Variables that are useful for comparing to satelites or other remote sensing tec
 #### F.2.8 Source-Resolved Variables
 In ELMOv2, the instrumented CMAQ source apportionment (ISAM) and sensitivity (DDM) models can now output composite and derived variables directly instead of outputting all CMAQ species 
 for every user-defined source and requiring users to post-process them into aggregates offline. For example, if a user defines EGU as a source in ISAM to represent electric generating 
-units, then the variable PM25_EGU can be added to File_Vars to request PM2.5 mass just for the EGU source.
+units, then the variable PM25_EGU can be added to File_Vars to request PM2.5 mass just for the EGU source.  
+
+If, on the other hand, the subscripts _ISAM or _DDM are used after any CMAQ species or ELMO Composite, then the source-oriented variables corresponding to that variable are all added 
+to the output files. Additionally, a variable with the suffix _TAGS. This quantifies the sum of all tagged variables and may be compaerd to the bulk CMAQ output. 
 
 
 #### F.2.9 ELMO Keywords
@@ -367,11 +371,97 @@ Keywords if you define your chemical mechanism. Be sure to add them to the Keywo
 
 
 ### F.3 ELMO Logs
+ELMOv2 now includes an extensive output to each CTM_LOG ascii logfile. This log reports 
+the COMPOSITES that were introduced to ELMO, and more importantly, reports the properties 
+and contents of each output file it creates. Each variable record in the log provides the 
+variable name, the ELMO variable type, units, and a brief description. If the variable is a 
+Composite, the record  will also include the equation used within ELMO to calculate the 
+value of the Composite. 
 
+Search for the string 'ELMO Output Variable Report' inside one of the CTM_LOG files.  
+```
+     >--------------------------------------------------------------------------------
+     Output File Num: " 1" | Temporality: Aggregate
+     Output Filename: ELMO1_DEFAULT
+         Bottom Layer:  1 Top Layer:  1
+         Number of Variables:   192
 
+        Variable            Type            Unit        Description
+        -----------------   --------------  --------    --------------
+        PMF                 DERIVED CONC    ug m-3      Fine Particle Mass
+          = +ASO4I +ASO4J +ANO3I +ANO3J +ACLI +ACLJ +ANH4I +ANH4J +ANAI +ANAJ
+            +AMGJ +AKJ +ACAJ +APOCI +APOCJ +APNCOMI +APNCOMJ +AECI +AECJ +AFEJ
+            +AOTHRI +AOTHRJ +AALJ +ASIJ +ATIJ +AMNJ +AISO1J +AISO2J +AISO3J
+            +ASQTJ +AOLGAJ +AOLGBJ +AORGCJ +AMTNO3J +AMTHYDJ +AMT1J +AMT2J
+            +AMT3J +AMT4J +AMT5J +AMT6J +AGLYJ +ALVPO1I +ALVPO1J +ASVPO1I
+            +ASVPO1J +ASVPO2I +ASVPO2J +ASVPO3J +AIVPO1J +ALVOO1I +ALVOO1J
+            +ALVOO2I +ALVOO2J +ASVOO1I +ASVOO1J +ASVOO2I +ASVOO2J +ASVOO3J
+            +APCSOJ +AAVB1J +AAVB2J +AAVB3J +AAVB4J
 
+        NH3                 CONC            ppmV        Molar Mixing Ratio of NH3
 
- 
+        FORMALD             COMPOSITE CONC  ppmV        Formaldehyde Concentration
+          = +1.00E+00*FORM
+
+        ISOPRENE            COMPOSITE CONC  ppmV        Isoprene Concentration
+          = +1.00E+00*ISOP
+
+        ACETALD             COMPOSITE CONC  ppmV        Acetaldehyde Concentration
+          = +1.00E+00*ALD2
+
+        ACETYLENE           COMPOSITE CONC  ppmV        Acetylene Concentration
+          = +1.00E+00*ETHY
+
+        ETHANE              COMPOSITE CONC  ppmV        Ethane Concentration
+          = +1.00E+00*ETHA
+
+        TOLUENE             COMPOSITE CONC  ppmV        Toluene Concentration
+          = +1.00E+00*TOL
+
+        XYLENES             COMPOSITE CONC  ppmV        Xylenes Concentration
+          = +1.00E+00*XYLMN
+
+        NAPHTHAL            COMPOSITE CONC  ppmV        Naphthalene Concentration
+          = +1.00E+00*NAPH
+
+        TERPENES            COMPOSITE CONC  ppmV        Monoterpene Concentration
+          = +1.00E+00*TERP
+
+        HOX                 COMPOSITE CONC  ppmV        HOx Concentration
+          = +1.00E+00*OH +1.00E+00*HO2
+
+        NOX                 COMPOSITE CONC  ppmV        NOx Concentration
+          = +1.00E+00*NO +1.00E+00*NO2
+
+        NTR                 COMPOSITE CONC  ppmV        Organic Nitrates
+          = +1.00E+00*NTR1 +1.00E+00*NTR2 +1.00E+00*INTR
+
+        PM25_SO4            COMPOSITE CONC  ug m-3      PM2.5 Sulfate
+          = +1.00E+00*ASO4I*FPM25_AIT +1.00E+00*ASO4J*FPM25_ACC
+            +1.00E+00*ASO4K*FPM25_COR
+
+        PM25_NO3            COMPOSITE CONC  ug m-3      PM2.5 Nitrate
+          = +1.00E+00*ANO3I*FPM25_AIT +1.00E+00*ANO3J*FPM25_ACC
+            +1.00E+00*ANO3K*FPM25_COR
+
+        PM25_NH4            COMPOSITE CONC  ug m-3      PM2.5 Ammonium
+          = +1.00E+00*ANH4I*FPM25_AIT +1.00E+00*ANH4J*FPM25_ACC
+            +1.00E+00*ANH4K*FPM25_COR
+
+        PM25_CL             COMPOSITE CONC  ug m-3      PM2.5 Chloride
+          = +1.00E+00*ACLI*FPM25_AIT +1.00E+00*ACLJ*FPM25_ACC
+            +1.00E+00*ACLK*FPM25_COR
+
+        PM25_NA             COMPOSITE CONC  ug m-3      PM2.5 Sodium
+          = +1.00E+00*ANAI*FPM25_AIT +1.00E+00*ANAJ*FPM25_ACC
+            +8.37E-01*ASEACAT*FPM25_COR +6.26E-02*ASOIL*FPM25_COR
+            +2.30E-03*ACORS*FPM25_COR
+
+        PM25_EC             COMPOSITE CONC  ug m-3      PM2.5 Elemental Carbon
+          = +1.00E+00*AECI*FPM25_AIT +1.00E+00*AECJ*FPM25_ACC
+```
+Notice that the definition of PMF is complicated. These Composites are described in the log in terms of their constituent species for transparency.
+
 
 <!-- BEGIN COMMENT -->
 
