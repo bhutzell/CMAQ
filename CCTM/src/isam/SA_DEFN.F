@@ -667,19 +667,20 @@ c----------------------------------------------------------
      &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP '/ )
        
         !CRACMM3
-        ALLOCATE( ISAM_SPEC_NO3( 6 )%LIST( 27 ) )
+        ALLOCATE( ISAM_SPEC_NO3( 6 )%LIST( 29 ) )
         ISAM_SPEC_NO3( 6 )%LIST = (/   'HNO3 ','NO   ','NO2  ','NO3  ','HONO ',
      &         'N2O5 ','PAN  ','HNO4 ','ONIT ','MPAN ','PPN  ','ISON ','TRPN ',
      &         'INALD','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
-     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP '/ )
+     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP ','ANO3I','ANO3J'/ )
  
         !CRACMM3M
-        ALLOCATE( ISAM_SPEC_NO3( 7 )%LIST( 36 ) )
+        ALLOCATE( ISAM_SPEC_NO3( 7 )%LIST( 38 ) )
         ISAM_SPEC_NO3( 7 )%LIST = (/   'HNO3 ','NO   ','NO2  ','NO3  ','HONO ',
      &         'N2O5 ','PAN  ','HNO4 ','ONIT ','MPAN ','PPN  ','ISON ','TRPN ',
      &         'INALD','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
      &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP ','CLNO ','CLNO2',
-     &         'CLNO3','BRNO ','BRNO2','BRNO3','INO  ','INO2 ','INO3 '/ )
+     &         'CLNO3','BRNO ','BRNO2','BRNO3','INO  ','INO2 ','INO3 ','ANO3I',
+     &         'ANO3J'/ )
  
         !PRESCRIBE SPECIES RELEVANT FOR ASSIGNING BIAS TO VOCs
         !CB6R5_AE7_AQ
