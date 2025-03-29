@@ -56,8 +56,32 @@ In this section, details on the routine CCTM output files are provided. All CMAQ
 <sup>5</sup>A special ASCII output file, FLOOR_xxx with xxx being the processor number, contains information when a simulation results in negative concentrations. 
 
 ## 7.2 CCTM Output Files
+  
+<a id=ELMO></a>
 
-Some output files created by the CCTM are considered standard output as these contain hourly concentration and deposition values and information to document the run. Options for these files are controlled by their corresponding environment variable in the CCTM RunScript (e.g. run_cctm.csh).
+**CCTM_ELMO: hourly ELMO output files**
+<!-- BEGIN COMMENT -->
+[Return to Table 7-1](#ELMO_t)
+<!-- END COMMENT -->
+
+These optional 2-D or 3-D CCTM output files contains instantaneous or aggregated data for user-specified variables including 
+concentrations that would appear on CONC and ACONC files, deposition fluxes that would appear on WETDEP or DRYDEP, and aggregated 
+variables like total particulate mass (PM<sub>2.5</sub> and PM<sub>10</sub>). 
+Diagnostic parameters that were found on the PMDIAG file in previous CMAQ versions are also available for output on ELMO files. 
+Thease include particle geometric mean diameters, geometric standard deviations, bulk densities, 2nd moments and 3rd moments for 
+the lognormal modes. 
+One can also output the fraction of each mode that contributes to PM<sub>1</sub>, PM<sub>2.5</sub>, and PM<sub>10</sub> or the 
+AMS (aerosol mass spectrometer) transmission factor for each mode. 
+Many diagnostics relating to meteorology, heterogenous chemistry, and optical metrics (e.g. AOD, NO2_COLUMN) are provided. ELMOv2 
+further includes support for ISAM and DDM variables. 
+
+Units for all variables are specified in the output file. Verbose definitions of variables and their attributes are written to each 
+CTM_LOG ascii logfile.
+
+The namelist input file CMAQ_Control.nml allows users to declare how many CCTM_ELMO files to create. 
+See [Appendix F (ELMO Output):](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more details.
+ 
+Some output files created by the CCTM have been considered standard output in the past as these contain hourly concentration and deposition values and information to document the run. Options for these files are controlled by their corresponding environment variable in the CCTM RunScript (e.g. run_cctm.csh).
 <a id=cmaq_output_log></a>
 
 **CMAQ output log**
@@ -91,30 +115,6 @@ The 2-D or 3-D CCTM hourly concentration file (CONC) contains instantaneous gas-
 <!-- END COMMENT -->
 
 The 2-D or 3-D CCTM integral average concentration file contains average model species concentrations for each model hour, as opposed to instantaneous concentrations at the end of each output time step. The species written to the ACONC file are set by the user in the CCTM RunScript using the environment variable AVG_CONC_SPCS. The model layers for which hourly average concentrations are calculated are also set in the CCTM RunScript using the environment variable ACONC_BLEV_ELEV, where BLEV corresponds to the bottom layer number and ELEV corresponds to the top layer number. An example setting for the ACONC_BLEV_ELEV variable is “1 6”, which defines layers 1 through 6 as the vertical extent for which hourly average concentrations are calculated and written to the ACONC file.
- 
-<a id=ELMO></a>
-
-**CCTM_ELMO: instantaneous hourly ELMO output file**
-<!-- BEGIN COMMENT -->
-[Return to Table 7-1](#ELMO_t)
-<!-- END COMMENT -->
-
-This optional 2-D or 3-D CCTM output file contains instantaneous information at the end of the output time step for user-specified variables including concentrations that would appear on CONC and ACONC files as well as aggregate variables like total mass of PM<sub>2.5</sub> and PM<sub>10</sub>. 
-Diagnostic parameters that were found on the PMDIAG file in previous CMAQ versions are also available for output on the ELMO file. 
-Thease include particle geometric mean diameters, geometric standard deviations, bulk densities, 2nd moments and 3rd moments for the lognormal modes. 
-It also includes the fraction of each mode that contributes to PM<sub>1</sub>, PM<sub>2.5</sub>, and PM<sub>10</sub> and the AMS transmission factor for each mode. 
-Many diagnostics relating to heterogenous chemistry are provided including the N<sub>2</sub>O<sub>5</sub> reaction probability, the ClNO<sub>2</sub> reaction yield, and the IEPOX uptake coefficient. 
-Units for all variables are specified in the output file. 
-
-The namelist input file CMAQ_Control_Misc.nml allows users to omit this file (set instant = .FALSE. under &elmo_activate), to set the top and bottom layers to be output (Inst_Layer_Top and Inst_Layer_Bot under &elmo_inst) and which variables to output (Inst_Vars_Nml under &elmo_inst).
-See [Appendix F (ELMO Output):](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more details.
-
-This optional 2-D or 3-D CCTM output file contains average information integrated from the previous output time step for user-specified variables including concentrations that would appear on CONC and ACONC files as well as aggregate variables like total mass of PM<sub>2.5</sub> and PM<sub>10</sub>. 
-Diagnostic parameters that were found on the PMDIAG file in previous CMAQ versions are also available for output on the ELMO file. 
-Thease include particle geometric mean diameters, geometric standard deviations, bulk densities, 2nd moments and 3rd moments for the lognormal modes. 
-It also includes the fraction of each mode that contributes to PM<sub>1</sub>, PM<sub>2.5</sub>, and PM<sub>10</sub> and the AMS transmission factor for each mode. 
-Many diagnostics relating to heterogenous chemistry are provided including the N<sub>2</sub>O<sub>5</sub> reaction probability, the ClNO<sub>2</sub> reaction yield, and the IEPOX uptake coefficient. 
-Units for all variables are specified in the output file. 
 
 <a id=drydep></a>
 
