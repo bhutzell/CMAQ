@@ -9,13 +9,13 @@ CMAQ combines current knowledge in atmospheric science and air quality modeling 
 
 
 ## CMAQ version 6.0 Beta Overview:
-The CMAQ6.0 beta release includes two research versions of the CMAQ system that allow community members:
+The CMAQ6.0 beta release includes two research versions of the CMAQ system (beta 1 and beta 2) that allow community members:
 
 * a preview of science and feature updates planned for the final CMAQv6.0 release.
 * a role in helping to test, troubleshoot, and debug the development code before the final release.
 * the ability to take advantage of improvements for preliminary studies of their own interest.
 
-The only difference between the beta 1 (v6.0b1) and beta 2 (v6.0b2) versions involve the format of input and output files. These updates and other new features in the beta versions are documeted in the **[CMAQv6.0beta Release Notes](DOCS/Release_Notes/README.md).**
+The beta 2 (v6.0b2) version removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library.  The beta 1 (v6.0b1) version still relies on functions in this library. These updates and other new features in the beta versions are documeted in the **[CMAQv6.0beta Release Notes](DOCS/Release_Notes/README.md).**
 
 While initially planned for fall 2026, the status and timing of any final release of CMAQv6.0 is unknown at this point.
 
