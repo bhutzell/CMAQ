@@ -29,7 +29,7 @@ a working directory on your server:
 ```
 git clone -b 6.0b1 https://github.com/USEPA/CMAQ.git CMAQ_REPO
 ```
-** 2 Version**
+**Beta 2 Version**
 ```
 git clone -b 6.0b2 https://github.com/USEPA/CMAQ.git CMAQ_REPO
 ```
@@ -37,10 +37,10 @@ git clone -b 6.0b2 https://github.com/USEPA/CMAQ.git CMAQ_REPO
 ## CMAQ Repository Guide
 Source code and scripts are organized as follows:
 * **CCTM (CMAQ Chemical Transport Model):** code and scripts for running the 3D-CTM at the heart of CMAQ.
-* **DOCS:** CMAQ User's Guide, developers guidance, and short tutorials.
+* **DOCS:** Release Notes, Release FAQ, Getting Started reference page, User's Guide, and short tutorials.
 * **PREP:** Data preprocessing tools for important input files like initial and boundary conditions, meteorology, etc.
 * **POST:** Data postprocessing tools for aggregating and evaluating CMAQ output products (e.g. Combine, Site-Compare, etc)
-* **PYTOOLS:** Python pre- and postprocessing tools (currently this includes the DMSCHLO preprocessor)
+* **PYTOOLS:** Python pre- and postprocessing tools
 * **UTIL:** Utilities for generating code and using CMAQ (e.g. chemical mechanism generation)
 
 ## CMAQv6.0 Beta Documentation
