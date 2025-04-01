@@ -2392,7 +2392,6 @@ C...Now do changes in cloudy layers:
 #ifdef isam
             DO SPC = 1, NSPC_SA ! general case
               CSPC = MAP_SAtoCGR(SPC)
-c             IF (CEND( MAP_SAtoCGR(SPC) ) .GT. 1.0E-09) THEN
               DO ITAG = 1, NTAG_SA
                 INCLOUD = SA_PCLD( SPC,LAY,ITAG ) * ( SA_CEND( SPC,ITAG )
      &                  / MAX( SA_POLC( SPC,ITAG ), CONCMINL( CSPC,LAY ) ) )
@@ -2404,50 +2403,49 @@ c             IF (CEND( MAP_SAtoCGR(SPC) ) .GT. 1.0E-09) THEN
                 ISAM( COL,ROW,LAY,SPC,ITAG ) = FRAC * INCLOUD
      &                                       + ( 1.0 - FRAC ) * OUTCLOUD
               END DO
-c             END IF
             END DO
 
-            IF (S_SO4J .NE. 0 ) THEN ! sulfate case
-              DO ITAG = 1, NTAG_SA
+c           IF (S_SO4J .NE. 0 ) THEN ! sulfate case
+c             DO ITAG = 1, NTAG_SA
 
-                INCLOUD = PCLD( C_SO4J,LAY ) * SA_CEND( S_SO4J,ITAG ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) )
-     &                  - ( PCLD( C_SO4J,LAY ) * CEND( C_SO4J ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) ) )
-     &                  * SA_POLC( S_SO4J,ITAG ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) ) 
-     &                  + SA_PCLD( S_SO4J,LAY,ITAG ) * CEND( C_SO4J ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) )
-                INCLOUD = MAX( INCLOUD, CONCMINL( C_SO4J,LAY ) )
+c               INCLOUD = PCLD( C_SO4J,LAY ) * SA_CEND( S_SO4J,ITAG ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) )
+c    &                  - ( PCLD( C_SO4J,LAY ) * CEND( C_SO4J ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) ) )
+c    &                  * SA_POLC( S_SO4J,ITAG ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) ) 
+c    &                  + SA_PCLD( S_SO4J,LAY,ITAG ) * CEND( C_SO4J ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) )
+c               INCLOUD = MAX( INCLOUD, CONCMINL( C_SO4J,LAY ) )
 
-                OUTCLOUD = ( SA_CCR( S_SO4J,LAY,ITAG ) - FRAC * SA_PCLD( S_SO4J,LAY,ITAG ) )
-     &                   / ( 1.0 - FRAC )
+c               OUTCLOUD = ( SA_CCR( S_SO4J,LAY,ITAG ) - FRAC * SA_PCLD( S_SO4J,LAY,ITAG ) )
+c    &                   / ( 1.0 - FRAC )
 c               OUTCLOUD = MAX( OUTCLOUD, CONCMINL( CSPC,LAY ) )
-                OUTCLOUD = MAX( OUTCLOUD, CONCMINL( C_SO4J,LAY ) )
+c               OUTCLOUD = MAX( OUTCLOUD, CONCMINL( C_SO4J,LAY ) )
 
-                ISAM( COL,ROW,LAY,S_SO4J,ITAG ) = FRAC * INCLOUD
-     &                                       + ( 1.0 - FRAC ) * OUTCLOUD
-              END DO
-            END IF
+c               ISAM( COL,ROW,LAY,S_SO4J,ITAG ) = FRAC * INCLOUD
+c    &                                       + ( 1.0 - FRAC ) * OUTCLOUD
+c             END DO
+c           END IF
 
 
-            IF (S_AORGCJ .NE. 0 ) THEN ! AORGCJ case
-              DO ITAG = 1, NTAG_SA
-                INCLOUD = PCLD( C_AORGCJ,LAY ) * SA_CEND( S_AORGCJ,ITAG ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) )
-     &                  - ( PCLD( C_AORGCJ,LAY ) * CEND( C_AORGCJ ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) ) )
-     &                  * SA_POLC( S_AORGCJ,ITAG ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) ) 
-     &                  + SA_PCLD( S_AORGCJ,LAY,ITAG ) * CEND( C_AORGCJ ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) )
+c           IF (S_AORGCJ .NE. 0 ) THEN ! AORGCJ case
+c             DO ITAG = 1, NTAG_SA
+c               INCLOUD = PCLD( C_AORGCJ,LAY ) * SA_CEND( S_AORGCJ,ITAG ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) )
+c    &                  - ( PCLD( C_AORGCJ,LAY ) * CEND( C_AORGCJ ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) ) )
+c    &                  * SA_POLC( S_AORGCJ,ITAG ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) ) 
+c    &                  + SA_PCLD( S_AORGCJ,LAY,ITAG ) * CEND( C_AORGCJ ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) )
 
-                INCLOUD = SA_PCLD( S_AORGCJ,LAY,ITAG ) * SA_CEND( S_AORGCJ,ITAG )
-     &                  / MAX( SA_POLC( S_AORGCJ,ITAG ), CONCMINL( SPC,LAY ) )
+c               INCLOUD = SA_PCLD( S_AORGCJ,LAY,ITAG ) * SA_CEND( S_AORGCJ,ITAG )
+c    &                  / MAX( SA_POLC( S_AORGCJ,ITAG ), CONCMINL( SPC,LAY ) )
 c               INCLOUD = MAX( INCLOUD, CONCMINL( C_AORGCJ,LAY ) )
 
-                OUTCLOUD = ( SA_CCR( S_AORGCJ,LAY,ITAG ) - FRAC * SA_PCLD( S_AORGCJ,LAY,ITAG ) )
-     &                   / ( 1.0 - FRAC )
+c               OUTCLOUD = ( SA_CCR( S_AORGCJ,LAY,ITAG ) - FRAC * SA_PCLD( S_AORGCJ,LAY,ITAG ) )
+c    &                   / ( 1.0 - FRAC )
 c               OUTCLOUD = MAX( OUTCLOUD, CONCMINL( CSPC,LAY ) )
-                OUTCLOUD = MAX( OUTCLOUD, CONCMINL( C_AORGCJ,LAY ) )
+c               OUTCLOUD = MAX( OUTCLOUD, CONCMINL( C_AORGCJ,LAY ) )
 
-                ISAM( COL,ROW,LAY,S_AORGCJ,ITAG ) = FRAC * INCLOUD
-     &                                       + ( 1.0 - FRAC ) * OUTCLOUD
+c               ISAM( COL,ROW,LAY,S_AORGCJ,ITAG ) = FRAC * INCLOUD
+c    &                                       + ( 1.0 - FRAC ) * OUTCLOUD
 
-              END DO
-            END IF
+c             END DO
+c           END IF
 #endif
           END DO
 
