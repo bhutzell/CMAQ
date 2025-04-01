@@ -2310,7 +2310,8 @@ C...   include raining region below cld base
 
                 DO ITAG = 1, NTAG_SA
                   INCLOUD = SA_PCLD( S_AORGCJ,LAY,ITAG ) * SA_CEND( S_AORGCJ,ITAG )
-     &                  / MAX( SA_POLC( S_AORGCJ,ITAG ), CONCMINL( SPC,LAY ) )
+c    &                  / MAX( SA_POLC( S_AORGCJ,ITAG ), CONCMINL( SPC,LAY ) )
+     &                  / MAX( SA_POLC( S_AORGCJ,ITAG ), CONCMINL( C_AORGCJ,LAY ) )
 c                 INCLOUD = MAX( INCLOUD, CONCMINL( C_AORGCJ,LAY ) )
                   OUTCLOUD = SA_PCLD( S_AORGCJ,LAY,ITAG )
                   ISAM( COL,ROW,LAY,S_AORGCJ,ITAG ) = FRAC * SA_INCLOUD( ITAG )
@@ -2417,7 +2418,8 @@ c             END IF
 
                 OUTCLOUD = ( SA_CCR( S_SO4J,LAY,ITAG ) - FRAC * SA_PCLD( S_SO4J,LAY,ITAG ) )
      &                   / ( 1.0 - FRAC )
-                OUTCLOUD = MAX( OUTCLOUD, CONCMINL( CSPC,LAY ) )
+c               OUTCLOUD = MAX( OUTCLOUD, CONCMINL( CSPC,LAY ) )
+                OUTCLOUD = MAX( OUTCLOUD, CONCMINL( C_SO4J,LAY ) )
 
                 ISAM( COL,ROW,LAY,S_SO4J,ITAG ) = FRAC * INCLOUD
      &                                       + ( 1.0 - FRAC ) * OUTCLOUD
@@ -2438,7 +2440,8 @@ c               INCLOUD = MAX( INCLOUD, CONCMINL( C_AORGCJ,LAY ) )
 
                 OUTCLOUD = ( SA_CCR( S_AORGCJ,LAY,ITAG ) - FRAC * SA_PCLD( S_AORGCJ,LAY,ITAG ) )
      &                   / ( 1.0 - FRAC )
-                OUTCLOUD = MAX( OUTCLOUD, CONCMINL( CSPC,LAY ) )
+c               OUTCLOUD = MAX( OUTCLOUD, CONCMINL( CSPC,LAY ) )
+                OUTCLOUD = MAX( OUTCLOUD, CONCMINL( C_AORGCJ,LAY ) )
 
                 ISAM( COL,ROW,LAY,S_AORGCJ,ITAG ) = FRAC * INCLOUD
      &                                       + ( 1.0 - FRAC ) * OUTCLOUD
