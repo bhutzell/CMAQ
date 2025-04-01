@@ -50,8 +50,38 @@ This name can also be used in the contents of any Keyword to activate it with a 
     refined in source-oriented applications like ISAM and DDM.  
     - ET_DRVD_WDEP - a derived ELMO variable for wet deposition fluxes. These can presumably be 
     refined in source-oriented applications like ISAM and DDM.  
+    - ET_AEROPROP - an aerosol property. These variables describe the aerosol size distribution (e.g. number concentration, 
+    diameter, density, etc.) or some chemical property (e.g. O:C, pH).  
+    - ET_PHOT - an optical property. This could be AOD, NO2 column, etc.
+    - ET_MET - a meteorological variable (e.g. temperature, rain data, etc.)
+    - ET_CHEM - a chemical reaction property for heterogeneous reactions like gamma uptake coefficient.
 
+#### STEP 3: Declare Array for New Variable
 
+Declare an allocatable array in the ELMO_DATA module that will store the values for your new variable so they may be accessed by ELMO. 
+Use ELMO_AOD_550 as an example. This particular variable is defined with two dimensions. Use three dimensions if your variable is 
+dependent on height.  
+
+#### STEP 4: Allocate and Initialize New Variable
+
+Add your variable to the subroutine elmo_init_shared. Again, you may use ELMO_AOD_550 as an example.  
+
+#### STEP 5: Populate New Variable in CMAQ
+
+Use the new array defined and allocated in Steps 3/4 in a CMAQ module to store the data you wish to output. The ELMO_DATA module should 
+be used in the subroutine you modify if it is not already. We recommend using the 'Use ELMO_DATA, Only:' approach to protect the rest 
+of the ELMO_DATA module and only update your own variable.  
+
+#### STEP 6: Propagate Data to ELMO Output Arrays
+
+In ELMO_DERIVED_CALC.F, add a case to the select case statement for the variable IDG. Your case should reference the new ID_ index of 
+your variable. Within the case, set outval equal to the value of your new variable in the current local grid cell (C1,R1,L1), and 
+make any appropriate modifications. Again, use the approach for ELMO_AOD_550 as a guide.  
+
+#### STEP 7: Add Variable Name to CMAQ Control File
+
+ELMO is now equipped to output your variable. You may add it to File_Vars in CMAQ_Control.nml for any custom output file you like, or 
+you may add it to the contents of any ELMO Keyword.  
 
 <!-- START_OF_COMMENT -->
 
