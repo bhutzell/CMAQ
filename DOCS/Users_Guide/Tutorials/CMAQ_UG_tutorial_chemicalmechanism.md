@@ -84,9 +84,11 @@ The examples used in this tutorial do not include species that need to be added 
 
 
 
-<a id=DESID_Ctrl></a>
-### 1.6 Edit DESID Chemical Mapping Control file.
-The DESID Chemical Mapping Control file describes how to input emissions and is located at /$CMAQ_REPO/CCTM/src/MECHS/${mechanism}/CMAQ_Control_DESID_${mechanism}.nml. Any new species included in the mech_*.def or GC, AE, and NR namelists that is directly emitted should be included in this file. Examples of adding new species are given in the [DESID tutorial](CMAQ_UG_tutorial_emissions.md).
+<a id=CMAQ_Chem_Control_${MECH}.nml></a>
+### 1.6 Edit Chemical Control Namelist.
+The CMAQ Chemical Control namelist describes how to input emissions and is located at /$CMAQ_REPO/CCTM/src/MECHS/${mechanism}/CMAQ_Chem_Control_${MECH}.nml. 
+Any new species included in the mech_*.def or GC, AE, and NR namelists that is directly emitted should be included in this file. Examples of adding new species are given 
+in the [DESID tutorial](CMAQ_UG_tutorial_emissions.md).
 
 
 

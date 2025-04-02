@@ -139,7 +139,7 @@ This section describes each of the input files required by the various CMAQ prog
 |[E2C_SOIL](#e2c_soil) <a id=e2c_soil_t></a>| GRDDED3 | Time-invariant | XY|EPIC|required for running CMAQ with bidirectional NH3|
 |[E2C_CHEM](#e2c_chem) <a id=e2c_chem_t></a>| GRDDED3 | Daily |XY|EPIC|required for running CMAQ with bidirectional NH3|
 |**STAGE Deposition Option**||||||
-|[STAGECTRL_NML](#stagectrl_nml) <a id=desidctrl_t></a>|ASCII|n/a|n/a|CMAQ repo|required|
+|[STAGECTRL_NML](#stagectrl_nml) <a id=stagectrl_t></a>|ASCII|n/a|n/a|CMAQ repo|required|
 |**Photolysis** | | | |||
 |[OMI](#omi) <a id=omi_t></a>| ASCII | Daily | n/a |CMAQ repo or create_omi|required|
 |[OPTICS_DATA](#omi) <a id=omi_t></a>| ASCII | n/a | n/a |CMAQ repo|required|
@@ -786,7 +786,7 @@ This is a 3-D daily file created by the EPIC to CMAQ tool via the FEST-C interfa
 **STAGECTRL_NML: STAGE Control Namelist**
 
 <!-- BEGIN COMMENT -->
-[Return to Table 4-1](#stagectrl_nml)
+[Return to Table 4-1](#stagectrl_t)
 <!-- END COMMENT -->
 
 **Table 4-6** Variables in the STAGE_DATA section of STAGECTRL_NML.

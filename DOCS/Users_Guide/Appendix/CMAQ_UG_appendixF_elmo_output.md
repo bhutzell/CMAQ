@@ -37,7 +37,7 @@ There can be some slight numerical differences when one compares quantities aver
 For example, total PM2.5 have some small deviations when it is calculated as the hourly average of the sum of species (online) versus the sum of hourly averaged species (offline).  
 
 ### F.1 Output File Specification
-The interface for prescribing ELMO file properties is located in the [CMAQ Control File](../CMAQ_UG_ch04_model_inputs.md#miscctrl). 
+The interface for prescribing ELMO file properties is located in the [CMAQ Control File](../CMAQ_UG_ch04_model_inputs.md#cmaqctrl). 
 The ELMO_INIT namelist section prescribes how the ELMO output file parameters will be processed. 
 ```
 &ELMO_INIT
