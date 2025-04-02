@@ -669,90 +669,99 @@ C...  mimic this for the ASO4GASJ tracking species
      &                          ALFA2, ALFA3, COSZ )
 
 #ifdef isam
-                  DO SPC = 1, NSPC_SA
-                    CSPC = MAP_SAtoCGR(SPC)
-                    SA_SUM = SUM ( SA_POLC( SPC,: ) )
-                    DO ITAG = 1, NTAG_SA
-                      IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( SPC, ITAG ) .GT. 1.0E-25 ) THEN
-                        SA_CEND( SPC, ITAG ) = SA_POLC( SPC, ITAG )
-     &                                       * ( CEND( CSPC )
-     &                                       / SA_SUM )
-                        SA_REMOV( SPC, ITAG ) = SA_POLC( SPC, ITAG )
-     &                                        * ( REMOV( CSPC )
-     &                                        / SA_SUM )
-                      ELSE ! no update
-                        SA_CEND( SPC, ITAG )  = 0.0
-                        SA_REMOV( SPC, ITAG ) = 0.0
-                      END IF
-                    END DO
-                  END DO
+           DO SPC = 1, NSPC_SA ! general case
+              CSPC = MAP_SAtoCGR(SPC)
+              SA_SUM = SUM ( SA_POLC( SPC,: ) )
+              DO ITAG = 1, NTAG_SA
+                IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( SPC, ITAG ) .GT. 1.0E-25 ) THEN
+                  SA_CEND( SPC, ITAG ) = SA_POLC( SPC, ITAG )
+     &                                 * ( CEND( CSPC ) / SA_SUM )
+                  SA_REMOV( SPC, ITAG ) = SA_POLC( SPC, ITAG )
+     &                                  * ( REMOV( CSPC ) / SA_SUM )
+                ELSE ! no update for small numbers to prevent noise
+                  SA_CEND( SPC, ITAG )  = 0.0
+                  SA_REMOV( SPC, ITAG ) = 0.0
+                END IF
+              END DO
+            END DO
 
-                  IF ( S_N2O5 .NE. 0 ) THEN
-                    DO ITAG = 1, NTAG_SA
-                      SA_CEND( S_N2O5,ITAG )  = 0.0
-                    END DO
-                  END IF
+            IF ( S_N2O5 .NE. 0 ) THEN ! remove N2O5
+              DO ITAG = 1, NTAG_SA
+                SA_CEND( S_N2O5,ITAG )  = 0.0
+              END DO
+            END IF
 
-                  IF (S_SO4J .NE. 0 ) THEN ! sulfate case
+            IF (S_SO4J .NE. 0 ) THEN ! sulfate case
+              DO ITAG = 1, NTAG_SA  ! sulfate from H2SO4
+                SA_DS4( ITAG ) = SA_POLC( S_SULF,ITAG )
+                SA_CEND( S_SULF,ITAG )  = 1.0E-30
+              END DO
+              SA_SUM = SUM ( SA_POLC( S_SO2,: ) ) ! total available SO2 for oxidation in water
+              DO ITAG = 1, NTAG_SA
+                IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( S_SO2,ITAG ) .GT. 1.0E-25 ) THEN
+                  SA_DS4( ITAG ) = SA_DS4( ITAG ) + DS4_SAVE ! total sulfate produced
+     &                           * ( SA_POLC( S_SO2,ITAG ) / SA_SUM )
+                  SA_CEND( S_SO4J,ITAG ) = SA_POLC( S_SO4J,ITAG )  ! sulfate before removal
+     &                                   + SA_DS4( ITAG )
+                END IF
+              END DO
+              SA_SUM = SUM ( SA_CEND( S_SO4J,: ) ) ! total apportioned sulfate before removal
+              DO ITAG = 1, NTAG_SA ! final sulfate removal and concentration
+                IF ( SA_SUM .GT. 1.0E-25 .AND. SA_CEND( S_SO4J,ITAG ) .GT. 1.0E-25 ) THEN
+                  SA_REMOV( S_SO4J,ITAG ) = REMOV_SAVE
+     &                                    * ( SA_CEND( S_SO4J,ITAG ) / SA_SUM )
+                  SA_CEND( S_SO4J,ITAG ) = SA_CEND( S_SO4J,ITAG )
+     &                                   - DEPSUM_SAVE
+     &                                   * ( SA_CEND( S_SO4J,ITAG ) / SA_SUM )
+                  SA_CEND( S_SO4J,ITAG ) = MAX ( SA_CEND( S_SO4J,ITAG ), 1.0E-30 )
+                ELSE
+                  SA_REMOV( S_SO4J,ITAG ) = 0.0
+                  SA_CEND( S_SO4J,ITAG )  = 0.0
+                END IF
+              END DO
+            END IF
 
-                    DO ITAG = 1, NTAG_SA  ! sulfate from H2SO4
-                      SA_DS4( ITAG ) = SA_POLC( S_SULF,ITAG )
-                      SA_CEND( S_SULF,ITAG )  = 1.0E-30
-                    END DO
-
-                    DO ITAG = 1, NTAG_SA
-                      SA_DS4( ITAG ) = SA_DS4( ITAG ) + DS4_SAVE ! total sulfate produced
-     &                               * SA_POLC( S_SO2,ITAG )
-     &                               / SUM ( SA_POLC( S_SO2,: ) )
-                      SA_CEND( S_SO4J,ITAG ) = SA_POLC( S_SO4J,ITAG )  ! sulfate before removal
-     &                                       + SA_DS4( ITAG )
-                    END DO
- 
-                    SA_SUM = SUM ( SA_CEND( S_SO4J,: ) ) ! total apportioned sulfate before removal
-
-                    DO ITAG = 1, NTAG_SA ! final sulfate removal and concentration
-                      SA_REMOV( S_SO4J,ITAG ) = REMOV_SAVE
-     &                                        * SA_CEND( S_SO4J,ITAG )
-     &                                        / SA_SUM
-                      SA_CEND( S_SO4J,ITAG ) = SA_CEND( S_SO4J,ITAG )
-     &                                       - DEPSUM_SAVE
-     &                                       * SA_CEND( S_SO4J,ITAG )
-     &                                       / SA_SUM
-                      SA_CEND( S_SO4J,ITAG ) = MAX ( SA_CEND( S_SO4J,ITAG ), 1.0E-30 )
-                    END DO
-          
-                  END IF
-
-                  IF (S_AORGCJ .NE. 0 ) THEN ! AORGCJ case
-                    SA_DCSOA_GLY = 0.0
-                    SA_DCSOA_MGLY = 0.0
-                    DO ITAG = 1, NTAG_SA
-                      IF ( S_GLY .NE. 0 ) THEN
-                        SA_DCSOA_GLY( ITAG ) = DGLY1_SAVE
-     &                               * SA_POLC( S_GLY,ITAG )
-     &                               / MAX( 1.0E-25, SUM ( SA_POLC( S_GLY,: ) ) )
-                      END IF
-                      IF ( S_MGLY .NE. 0 ) THEN
-                        SA_DCSOA_MGLY( ITAG ) = DMGLY1_SAVE
-     &                               * SA_POLC( S_MGLY,ITAG )
-     &                               / MAX( 1.0E-25, SUM ( SA_POLC( S_MGLY,: ) ) )
-                      END IF
-                      SA_CEND( S_AORGCJ,ITAG ) = SA_POLC( S_AORGCJ,ITAG ) ! AORGCJ before removal
-     &                                         + SA_DCSOA_GLY( ITAG )
-     &                                         + SA_DCSOA_MGLY( ITAG )
-                    END DO
-                    SA_SUM = MAX( 1.0E-25, SUM ( SA_CEND( S_AORGCJ,: ) ) ) ! total apportioned AORGCJ before removal
-                    DO ITAG = 1, NTAG_SA ! final AORGCJ removal and concentration
-                      SA_REMOV( S_AORGCJ,ITAG ) = REMOV_AORGC_SAVE
-     &                                        * SA_CEND( S_AORGCJ,ITAG )
-     &                                        / SA_SUM
-                      SA_CEND( S_AORGCJ,ITAG ) = SA_CEND( S_AORGCJ,ITAG )
-     &                                       - DEPSUM_AORGC_SAVE
-     &                                       * SA_CEND( S_AORGCJ,ITAG )
-     &                                       / SA_SUM
-                      SA_CEND( S_AORGCJ,ITAG ) = MAX ( SA_CEND( S_AORGCJ,ITAG ), 1.0E-30 )
-                    END DO
-                  END IF
+            IF (S_AORGCJ .NE. 0 ) THEN ! AORGCJ case
+               SA_DCSOA_GLY = 0.0
+               SA_DCSOA_MGLY = 0.0
+               IF ( S_GLY .NE. 0 ) THEN ! GLY oxidation
+                 SA_SUM = SUM ( SA_POLC( S_GLY,: ) )
+                 DO ITAG = 1, NTAG_SA
+                   IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( S_GLY,ITAG ) .GT. 1.0E-25 ) THEN
+                     SA_DCSOA_GLY( ITAG ) = DGLY1_SAVE
+     &                                    * SA_POLC( S_GLY,ITAG ) / SA_SUM
+                   END IF
+                 END DO
+               END IF
+               IF ( S_MGLY .NE. 0 ) THEN ! MGLY oxidation
+                 SA_SUM = SUM ( SA_POLC( S_MGLY,: ) )
+                 DO ITAG = 1, NTAG_SA
+                   IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( S_MGLY,ITAG ) .GT. 1.0E-25 ) THEN
+                     SA_DCSOA_MGLY( ITAG ) = DMGLY1_SAVE
+     &                               * SA_POLC( S_MGLY,ITAG ) / SA_SUM
+                   END IF
+                 END DO
+               END IF
+               DO ITAG = 1, NTAG_SA
+                 SA_CEND( S_AORGCJ,ITAG ) = SA_POLC( S_AORGCJ,ITAG ) ! AORGCJ before removal
+     &                                    + SA_DCSOA_GLY( ITAG )
+     &                                    + SA_DCSOA_MGLY( ITAG )
+               END DO
+               SA_SUM = SUM ( SA_CEND( S_AORGCJ,: ) )  ! total apportioned AORGCJ before removal
+               DO ITAG = 1, NTAG_SA ! final AORGCJ removal and concentration
+                 IF ( SA_SUM .GT. 1.0E-25 .AND. SA_CEND( S_AORGCJ,ITAG ) .GT. 1.0E-25 ) THEN
+                   SA_REMOV( S_AORGCJ,ITAG ) = REMOV_AORGC_SAVE
+     &                                       * SA_CEND( S_AORGCJ,ITAG ) / SA_SUM
+                   SA_CEND( S_AORGCJ,ITAG ) = SA_CEND( S_AORGCJ,ITAG )
+     &                                      - DEPSUM_AORGC_SAVE
+     &                                      * SA_CEND( S_AORGCJ,ITAG ) / SA_SUM
+                   SA_CEND( S_AORGCJ,ITAG ) = MAX ( SA_CEND( S_AORGCJ,ITAG ), 1.0E-30 )
+                 ELSE
+                   SA_REMOV( S_AORGCJ,ITAG ) = 0.0
+                   SA_CEND( S_AORGCJ,ITAG )  = 0.0
+                 END IF
+               END DO
+            END IF
 #endif
                 END IF
 

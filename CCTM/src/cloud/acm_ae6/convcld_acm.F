@@ -2021,88 +2021,97 @@ C...  mimic this for the ASO4GASJ tracking species
 
 
 #ifdef isam
-            DO SPC = 1, NSPC_SA
+            DO SPC = 1, NSPC_SA ! general case
               CSPC = MAP_SAtoCGR(SPC)
               SA_SUM = SUM ( SA_POLC( SPC,: ) )
               DO ITAG = 1, NTAG_SA
                 IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( SPC, ITAG ) .GT. 1.0E-25 ) THEN
                   SA_CEND( SPC, ITAG ) = SA_POLC( SPC, ITAG )
-     &                                 * ( CEND( CSPC )
-     &                                 / SA_SUM )
+     &                                 * ( CEND( CSPC ) / SA_SUM )
                   SA_REMOV( SPC, ITAG ) = SA_POLC( SPC, ITAG )
-     &                                  * ( REMOV( CSPC )
-     &                                  / SA_SUM )
-                ELSE ! no update
+     &                                  * ( REMOV( CSPC ) / SA_SUM )
+                ELSE ! no update for small numbers to prevent noise
                   SA_CEND( SPC, ITAG )  = 0.0
                   SA_REMOV( SPC, ITAG ) = 0.0
                 END IF
               END DO
             END DO
 
-            IF ( S_N2O5 .NE. 0 ) THEN
+            IF ( S_N2O5 .NE. 0 ) THEN ! remove N2O5
               DO ITAG = 1, NTAG_SA
                 SA_CEND( S_N2O5,ITAG )  = 0.0
               END DO
             END IF
 
             IF (S_SO4J .NE. 0 ) THEN ! sulfate case
-
               DO ITAG = 1, NTAG_SA  ! sulfate from H2SO4
                 SA_DS4( ITAG ) = SA_POLC( S_SULF,ITAG )
                 SA_CEND( S_SULF,ITAG )  = 1.0E-30
               END DO
-
+              SA_SUM = SUM ( SA_POLC( S_SO2,: ) ) ! total available SO2 for oxidation in water
               DO ITAG = 1, NTAG_SA
-                SA_DS4( ITAG ) = SA_DS4( ITAG ) + DS4_SAVE ! total sulfate produced
-     &                         * ( SA_POLC( S_SO2,ITAG )
-     &                           / SUM ( SA_POLC( S_SO2,: ) ) )
-                SA_CEND( S_SO4J,ITAG ) = SA_POLC( S_SO4J,ITAG )  ! sulfate before removal
-     &                                       + SA_DS4( ITAG )
+                IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( S_SO2,ITAG ) .GT. 1.0E-25 ) THEN
+                  SA_DS4( ITAG ) = SA_DS4( ITAG ) + DS4_SAVE ! total sulfate produced
+     &                           * ( SA_POLC( S_SO2,ITAG ) / SA_SUM )
+                  SA_CEND( S_SO4J,ITAG ) = SA_POLC( S_SO4J,ITAG )  ! sulfate before removal
+     &                                   + SA_DS4( ITAG )
+                END IF
               END DO
-
               SA_SUM = SUM ( SA_CEND( S_SO4J,: ) ) ! total apportioned sulfate before removal
- 
               DO ITAG = 1, NTAG_SA ! final sulfate removal and concentration
-                SA_REMOV( S_SO4J,ITAG ) = REMOV_SAVE
-     &                                  * ( SA_CEND( S_SO4J,ITAG )
-     &                                    / SA_SUM )
-                SA_CEND( S_SO4J,ITAG ) = SA_CEND( S_SO4J,ITAG )
-     &                                 - DEPSUM_SAVE
-     &                                 * ( SA_CEND( S_SO4J,ITAG )
-     &                                   / SA_SUM )
-                SA_CEND( S_SO4J,ITAG ) = MAX ( SA_CEND( S_SO4J,ITAG ), 1.0E-30 )
+                IF ( SA_SUM .GT. 1.0E-25 .AND. SA_CEND( S_SO4J,ITAG ) .GT. 1.0E-25 ) THEN
+                  SA_REMOV( S_SO4J,ITAG ) = REMOV_SAVE
+     &                                    * ( SA_CEND( S_SO4J,ITAG ) / SA_SUM )
+                  SA_CEND( S_SO4J,ITAG ) = SA_CEND( S_SO4J,ITAG )
+     &                                   - DEPSUM_SAVE
+     &                                   * ( SA_CEND( S_SO4J,ITAG ) / SA_SUM )
+                  SA_CEND( S_SO4J,ITAG ) = MAX ( SA_CEND( S_SO4J,ITAG ), 1.0E-30 )
+                ELSE
+                  SA_REMOV( S_SO4J,ITAG ) = 0.0
+                  SA_CEND( S_SO4J,ITAG )  = 0.0
+                END IF
               END DO
-
             END IF
 
             IF (S_AORGCJ .NE. 0 ) THEN ! AORGCJ case
                SA_DCSOA_GLY = 0.0
                SA_DCSOA_MGLY = 0.0
-               DO ITAG = 1, NTAG_SA
-                  IF ( S_GLY .NE. 0 ) THEN
-                    SA_DCSOA_GLY( ITAG ) = DGLY1_SAVE
-     &                               * SA_POLC( S_GLY,ITAG )
-     &                               / MAX( 1.0E-25, SUM ( SA_POLC( S_GLY,: ) ) )
-                  END IF
-                  IF ( S_MGLY .NE. 0 ) THEN
+               IF ( S_GLY .NE. 0 ) THEN ! GLY oxidation
+                 SA_SUM = SUM ( SA_POLC( S_GLY,: ) )
+                 DO ITAG = 1, NTAG_SA
+                   IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( S_GLY,ITAG ) .GT. 1.0E-25 ) THEN
+                     SA_DCSOA_GLY( ITAG ) = DGLY1_SAVE
+     &                                    * SA_POLC( S_GLY,ITAG ) / SA_SUM
+                   END IF
+                 END DO
+               END IF
+               IF ( S_MGLY .NE. 0 ) THEN ! MGLY oxidation
+                 SA_SUM = SUM ( SA_POLC( S_MGLY,: ) )
+                 DO ITAG = 1, NTAG_SA
+                   IF ( SA_SUM .GT. 1.0E-25 .AND. SA_POLC( S_MGLY,ITAG ) .GT. 1.0E-25 ) THEN
                      SA_DCSOA_MGLY( ITAG ) = DMGLY1_SAVE
-     &                               * SA_POLC( S_MGLY,ITAG )
-     &                               / MAX( 1.0E-25, SUM ( SA_POLC( S_MGLY,: ) ) )
-                  END IF
-                  SA_CEND( S_AORGCJ,ITAG ) = SA_POLC( S_AORGCJ,ITAG ) ! AORGCJ before removal
-     &                                         + SA_DCSOA_GLY( ITAG )
-     &                                         + SA_DCSOA_MGLY( ITAG )
+     &                               * SA_POLC( S_MGLY,ITAG ) / SA_SUM
+                   END IF
+                 END DO
+               END IF
+               DO ITAG = 1, NTAG_SA
+                 SA_CEND( S_AORGCJ,ITAG ) = SA_POLC( S_AORGCJ,ITAG ) ! AORGCJ before removal
+     &                                    + SA_DCSOA_GLY( ITAG )
+     &                                    + SA_DCSOA_MGLY( ITAG )
                END DO
-               SA_SUM = MAX( 1.0E-25, SUM ( SA_CEND( S_AORGCJ,: ) ) ) ! total apportioned AORGCJ before removal
+               SA_SUM = SUM ( SA_CEND( S_AORGCJ,: ) )  ! total apportioned AORGCJ before removal
                DO ITAG = 1, NTAG_SA ! final AORGCJ removal and concentration
-                  SA_REMOV( S_AORGCJ,ITAG ) = REMOV_AORGC_SAVE
-     &                                        * SA_CEND( S_AORGCJ,ITAG )
-     &                                        / SA_SUM
-                  SA_CEND( S_AORGCJ,ITAG ) = SA_CEND( S_AORGCJ,ITAG )
-     &                                       - DEPSUM_AORGC_SAVE
-     &                                       * SA_CEND( S_AORGCJ,ITAG )
-     &                                       / SA_SUM
-                  SA_CEND( S_AORGCJ,ITAG ) = MAX ( SA_CEND( S_AORGCJ,ITAG ), 1.0E-30 )
+                 IF ( SA_SUM .GT. 1.0E-25 .AND. SA_CEND( S_AORGCJ,ITAG ) .GT. 1.0E-25 ) THEN
+                   SA_REMOV( S_AORGCJ,ITAG ) = REMOV_AORGC_SAVE
+     &                                       * SA_CEND( S_AORGCJ,ITAG ) / SA_SUM
+                   SA_CEND( S_AORGCJ,ITAG ) = SA_CEND( S_AORGCJ,ITAG )
+     &                                      - DEPSUM_AORGC_SAVE
+     &                                      * SA_CEND( S_AORGCJ,ITAG ) / SA_SUM
+                   SA_CEND( S_AORGCJ,ITAG ) = MAX ( SA_CEND( S_AORGCJ,ITAG ), 1.0E-30 )
+                 ELSE
+                   SA_REMOV( S_AORGCJ,ITAG ) = 0.0
+                   SA_CEND( S_AORGCJ,ITAG )  = 0.0
+                 END IF
                END DO
             END IF
 #endif
@@ -2236,10 +2245,8 @@ C...   include raining region below cld base
                 END IF
               END DO
 #ifdef isam
-              DO SPC = 1, NSPC_SA ! general case
+              DO SPC = 1, NSPC_SA
                 CSPC = MAP_SAtoCGR(SPC)
- 
-                IF ( CEND( CSPC ) .GT. 1.0E-09) THEN
                 DO ITAG = 1, NTAG_SA
                   INCLOUD = SA_PCLD( SPC, LAY, ITAG )
      &                    * ( SA_CEND( SPC, ITAG )
@@ -2248,79 +2255,7 @@ C...   include raining region below cld base
                   ISAM( COL,ROW,LAY,SPC,ITAG ) = FRAC * INCLOUD
      &                                         + ( 1.0 - FRAC ) * OUTCLOUD
                 END DO
-                END IF
               END DO
-
-              IF (S_SO4J .NE. 0 ) THEN ! sulfate case
-
-                CONDIS = 0.0
-                DO ITAG = 1, NTAG_SA
-                  SA_INCLOUD( ITAG ) = PCLD( C_SO4J,LAY ) * ( SA_CEND( S_SO4J,ITAG ) 
-     &                    / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) ) )
-     &                    - ( PCLD( C_SO4J,LAY ) * CEND( C_SO4J ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) ) )
-     &                    * SA_POLC( S_SO4J,ITAG ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) )
-     &                    + SA_PCLD( S_SO4J,LAY,ITAG ) * CEND( C_SO4J ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) )
-                  IF ( SA_INCLOUD( ITAG ) .LT. 0.0 ) THEN
-                    CONDIS = CONDIS + SA_INCLOUD( ITAG )
-                    SA_INCLOUD( ITAG )  = 0.0
-                  END IF
-                END DO
-
-                IF ( CONDIS .NE. 0.0 ) THEN
-                 BLNC = ( CONDIS + SUM( SA_INCLOUD( : ) ) ) / MAX( SUM( SA_INCLOUD( : ) ), CONCMINL( C_SO4J,LAY ) )
-                  DO ITAG = 1, NTAG_SA
-                    IF ( SA_INCLOUD( ITAG ) .GT. 0.0 ) THEN
-                      SA_INCLOUD( ITAG ) = BLNC * SA_INCLOUD( ITAG )
-                    END IF
-                  END DO
-                END IF
-
-                DO ITAG = 1, NTAG_SA
-                  OUTCLOUD = SA_PCLD( S_SO4J,LAY,ITAG )
-                  ISAM( COL,ROW,LAY,S_SO4J,ITAG ) = FRAC * SA_INCLOUD( ITAG )
-     &                                       + ( 1.0 - FRAC ) * OUTCLOUD
-                  ISAM( COL,ROW,LAY,S_SO4J,ITAG ) = MAX( ISAM( COL,ROW,LAY,S_SO4J,ITAG ), 1.0E-30 )
-                END DO
-
-              END IF
-
-              IF (S_AORGCJ .NE. 0 ) THEN ! AORGCJ case
-
-                CONDIS = 0.0
-                DO ITAG = 1, NTAG_SA
-                  SA_INCLOUD( ITAG ) = PCLD( C_AORGCJ,LAY ) * ( SA_CEND( S_AORGCJ,ITAG ) 
-     &                    / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) ) )
-     &                    - ( PCLD( C_AORGCJ,LAY ) * CEND( C_AORGCJ ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) ) )
-     &                    * SA_POLC( S_AORGCJ,ITAG ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) )
-     &                    + SA_PCLD( S_AORGCJ,LAY,ITAG ) * CEND( C_AORGCJ ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) )
-                  IF ( SA_INCLOUD( ITAG ) .LT. 0.0 ) THEN
-                    CONDIS = CONDIS + SA_INCLOUD( ITAG )
-                    SA_INCLOUD( ITAG )  = 0.0
-                  END IF
-                END DO
-
-                IF ( CONDIS .NE. 0.0 ) THEN
-                 BLNC = ( CONDIS + SUM( SA_INCLOUD( : ) ) ) / MAX( SUM( SA_INCLOUD( : ) ), CONCMINL( C_AORGCJ,LAY ) )
-                  DO ITAG = 1, NTAG_SA
-                    IF ( SA_INCLOUD( ITAG ) .GT. 0.0 ) THEN
-                      SA_INCLOUD( ITAG ) = BLNC * SA_INCLOUD( ITAG )
-                    END IF
-                  END DO
-                END IF
-
-                DO ITAG = 1, NTAG_SA
-                  INCLOUD = SA_PCLD( S_AORGCJ,LAY,ITAG ) * SA_CEND( S_AORGCJ,ITAG )
-c    &                  / MAX( SA_POLC( S_AORGCJ,ITAG ), CONCMINL( SPC,LAY ) )
-     &                  / MAX( SA_POLC( S_AORGCJ,ITAG ), CONCMINL( C_AORGCJ,LAY ) )
-c                 INCLOUD = MAX( INCLOUD, CONCMINL( C_AORGCJ,LAY ) )
-                  OUTCLOUD = SA_PCLD( S_AORGCJ,LAY,ITAG )
-                  ISAM( COL,ROW,LAY,S_AORGCJ,ITAG ) = FRAC * SA_INCLOUD( ITAG )
-     &                                       + ( 1.0 - FRAC ) * OUTCLOUD
-                  ISAM( COL,ROW,LAY,S_AORGCJ,ITAG ) = MAX( ISAM( COL,ROW,LAY,S_AORGCJ,ITAG ), 1.0E-30 )
-                END DO
-
-              END IF
-
 #endif
             END DO
           ELSE
@@ -2335,11 +2270,9 @@ c                 INCLOUD = MAX( INCLOUD, CONCMINL( C_AORGCJ,LAY ) )
               END DO
 #ifdef isam
               DO SPC = 1, NSPC_SA
-c               IF (PCLD( MAP_SAtoCGR(SPC),LAY ) .GT. 1.0E-09) THEN
                 DO ITAG = 1, NTAG_SA
                   ISAM( COL,ROW,LAY,SPC,ITAG ) = SA_PCLD( SPC, LAY, ITAG )
                 END DO
-c               END IF
               END DO
 #endif
             END DO
@@ -2390,7 +2323,7 @@ C...Now do changes in cloudy layers:
               END IF
             END DO
 #ifdef isam
-            DO SPC = 1, NSPC_SA ! general case
+            DO SPC = 1, NSPC_SA
               CSPC = MAP_SAtoCGR(SPC)
               DO ITAG = 1, NTAG_SA
                 INCLOUD = SA_PCLD( SPC,LAY,ITAG ) * ( SA_CEND( SPC,ITAG )
@@ -2404,48 +2337,6 @@ C...Now do changes in cloudy layers:
      &                                       + ( 1.0 - FRAC ) * OUTCLOUD
               END DO
             END DO
-
-c           IF (S_SO4J .NE. 0 ) THEN ! sulfate case
-c             DO ITAG = 1, NTAG_SA
-
-c               INCLOUD = PCLD( C_SO4J,LAY ) * SA_CEND( S_SO4J,ITAG ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) )
-c    &                  - ( PCLD( C_SO4J,LAY ) * CEND( C_SO4J ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) ) )
-c    &                  * SA_POLC( S_SO4J,ITAG ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) ) 
-c    &                  + SA_PCLD( S_SO4J,LAY,ITAG ) * CEND( C_SO4J ) / MAX( POLC( C_SO4J ), CONCMINL( C_SO4J,LAY ) )
-c               INCLOUD = MAX( INCLOUD, CONCMINL( C_SO4J,LAY ) )
-
-c               OUTCLOUD = ( SA_CCR( S_SO4J,LAY,ITAG ) - FRAC * SA_PCLD( S_SO4J,LAY,ITAG ) )
-c    &                   / ( 1.0 - FRAC )
-c               OUTCLOUD = MAX( OUTCLOUD, CONCMINL( CSPC,LAY ) )
-c               OUTCLOUD = MAX( OUTCLOUD, CONCMINL( C_SO4J,LAY ) )
-
-c               ISAM( COL,ROW,LAY,S_SO4J,ITAG ) = FRAC * INCLOUD
-c    &                                       + ( 1.0 - FRAC ) * OUTCLOUD
-c             END DO
-c           END IF
-
-
-c           IF (S_AORGCJ .NE. 0 ) THEN ! AORGCJ case
-c             DO ITAG = 1, NTAG_SA
-c               INCLOUD = PCLD( C_AORGCJ,LAY ) * SA_CEND( S_AORGCJ,ITAG ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) )
-c    &                  - ( PCLD( C_AORGCJ,LAY ) * CEND( C_AORGCJ ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) ) )
-c    &                  * SA_POLC( S_AORGCJ,ITAG ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) ) 
-c    &                  + SA_PCLD( S_AORGCJ,LAY,ITAG ) * CEND( C_AORGCJ ) / MAX( POLC( C_AORGCJ ), CONCMINL( C_AORGCJ,LAY ) )
-
-c               INCLOUD = SA_PCLD( S_AORGCJ,LAY,ITAG ) * SA_CEND( S_AORGCJ,ITAG )
-c    &                  / MAX( SA_POLC( S_AORGCJ,ITAG ), CONCMINL( SPC,LAY ) )
-c               INCLOUD = MAX( INCLOUD, CONCMINL( C_AORGCJ,LAY ) )
-
-c               OUTCLOUD = ( SA_CCR( S_AORGCJ,LAY,ITAG ) - FRAC * SA_PCLD( S_AORGCJ,LAY,ITAG ) )
-c    &                   / ( 1.0 - FRAC )
-c               OUTCLOUD = MAX( OUTCLOUD, CONCMINL( CSPC,LAY ) )
-c               OUTCLOUD = MAX( OUTCLOUD, CONCMINL( C_AORGCJ,LAY ) )
-
-c               ISAM( COL,ROW,LAY,S_AORGCJ,ITAG ) = FRAC * INCLOUD
-c    &                                       + ( 1.0 - FRAC ) * OUTCLOUD
-
-c             END DO
-c           END IF
 #endif
           END DO
 

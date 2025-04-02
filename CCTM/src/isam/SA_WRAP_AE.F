@@ -156,10 +156,8 @@ Ckrt Identify species index in ISAM array
              ! explicitly, if it exists.
              IF ( JAER(3) .GT. 0 ) THEN
                 DO K = 1,NTAG_SA
-c                  TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JGAS,K ) / BULK0( :,:,:,JGAS )
                    TAG_FRAC( :,:,: ) = ISAM0( :,:,:,JGAS,K ) / ( BULK0( :,:,:,JGAS ) + MIN_VAL )
      &                                * DBLE( AERO_COND( :,:,:,CAER(3) ) )
-c                  TAG_FRAC2( :,:,: ) = ISAM0( :,:,:,JAER(3),K ) / BULK0( :,:,:,JAER(3) )
                    TAG_FRAC2( :,:,: ) = ISAM0( :,:,:,JAER(3),K ) / ( BULK0( :,:,:,JAER(3) ) + MIN_VAL )
      &                                * DBLE( AERO_COND( :,:,:,CAER(3) ) * -1.0 )
                    DO C = 1,NCOLS
@@ -167,9 +165,6 @@ c                  TAG_FRAC2( :,:,: ) = ISAM0( :,:,:,JAER(3),K ) / BULK0( :,:,:,
                    DO L = 1,NLAYS
                      IF ( AERO_COND( C,R,L,CAER(3) ) .GE. 0.0 ) THEN 
                         ! Condensation - Gas-phase drives attribution
-c                        TAG_FRAC( C,R,L ) = MIN( TAG_FRAC( C,R,L ), 
-c    &                                           ISAM1( C,R,L,JGAS,K )-MIN_VAL )
-c     &                                           ISAM1( C,R,L,JGAS,K ) )
                         ISAM1( C,R,L,JAER(3),K ) = 
      &                         ISAM1( C,R,L,JAER(3),K ) + TAG_FRAC( C,R,L ) 
                         ISAM1( C,R,L,JGAS,K ) = 
@@ -177,9 +172,6 @@ c     &                                           ISAM1( C,R,L,JGAS,K ) )
      &                            / ( ppm2mole(C,R,L) * AEROSPC_MW( IAER ) ) 
                      ELSE   
                         ! Evaporation - Aerosol drives attribution
-c                        TAG_FRAC2( C,R,L ) = MIN( TAG_FRAC2( C,R,L ), 
-c    &                                           ISAM1( C,R,L,JAER(3),K )-MIN_VAL )
-c     &                                           ISAM1( C,R,L,JAER(3),K ) )
                         ISAM1( C,R,L,JAER(3),K ) = 
      &                         ISAM1( C,R,L,JAER(3),K ) - TAG_FRAC2( C,R,L )
                         ISAM1( C,R,L,JGAS,K ) = 
@@ -387,10 +379,6 @@ c  !>>>>> COAGULATION <<<<<!
           DO K = 1,NTAG_SA
              ! Calculate Apportioned mass leaving the source mode using the
              ! COAG and GROWTH process analysis arrays
-c             TAG_FRAC( :,:,: ) = MIN( ISAM1(:,:,:,ISA1,K) / BULK1(:,:,:) 
-c     &                                * BULK_TRANS_SRC( :,:,: ), 
-c     &                               ISAM1( :,:,:,ISA1,K ) - MIN_VAL )
-
              TAG_FRAC( :,:,: ) = ISAM1(:,:,:,ISA1,K) / ( BULK1(:,:,:) + MIN_VAL )
      &                                * BULK_TRANS_SRC( :,:,: ) 
              ISAM1( :,:,:,ISA1,K ) = ISAM1( :,:,:,ISA1,K ) - TAG_FRAC( :,:,: )
