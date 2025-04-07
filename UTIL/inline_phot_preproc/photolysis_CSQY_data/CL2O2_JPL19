@@ -1,0 +1,48 @@
+CL2O2_JPL19
+! CL2O2 + hν  =  CL + CLOO
+! JPL Publication 19-5;  Evaluation Number 19; May 2020
+! Page: 4-224; Table 4F-8 for absorption cross-section
+! Quantum yield is taken as 1.0
+! Müller, H. S. P.; Willner, H. Gas phase studies on chloryl chloride, ClClO2. Ber. Bunsenges. Phys. Chem. 1992, 96, 427-431
+! Chemical Kinetics and Photochemical Data for Use in Atmospheric Studies
+! https://jpldataeval.jpl.nasa.gov/pdf/NASA-JPL%20Evaluation%2019-5.pdf
+! Data for ClClO2 (chloryl chloride) is used
+! Assume these are point values (not specified in data source)
+POINT
+! With FAC, units are (cm^2/molecule)
+FAC=1.0
+220	9.20E-18	1.0
+225	1.16E-17	1.0
+230	1.27E-17	1.0
+235	1.21E-17	1.0
+240	1.06E-17	1.0
+245	8.80E-18	1.0
+250	7.20E-18	1.0
+255	5.90E-18	1.0
+260	5.30E-18	1.0
+265	5.50E-18	1.0
+270	6.60E-18	1.0
+275	8.30E-18	1.0
+280	1.05E-17	1.0
+285	1.26E-17	1.0
+290	1.43E-17	1.0
+295	1.50E-17	1.0
+300	1.47E-17	1.0
+305	1.33E-17	1.0
+310	1.12E-17	1.0
+315	8.70E-18	1.0
+320	6.30E-18	1.0
+325	4.30E-18	1.0
+330	2.80E-18	1.0
+335	1.90E-18	1.0
+340	1.20E-18	1.0
+345	8.00E-19	1.0
+350	6.00E-19	1.0
+355	5.00E-19	1.0
+360	4.00E-19	1.0
+365	4.00E-19	1.0
+370	3.00E-19	1.0
+375	3.00E-19	1.0
+380	2.00E-19	1.0
+385	2.00E-19	1.0
+390	2.00E-19	1.0

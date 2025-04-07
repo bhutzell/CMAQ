@@ -179,8 +179,8 @@
        REAL( 8 ) :: TEMP
        REAL( 8 ) :: INV_TEMP
        REAL( 8 ) :: CAIR
-       REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule*min) to 1/(ppm*min)
-       REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molec^2*min) to 1/(ppm^2*min)
+       REAL( 8 ) :: CFACT         ! scales operator if not multiplied by RKI, cm^3/(molecule*sec) to 1/(ppm*min)
+       REAL( 8 ) :: CFACT_SQU     ! scales operator if not multiplied by RKI, cm^6/(molecule^2*sec) to 1/(ppm^2*min)
 ! special rate operators listed below
 
        DO NCELL = 1, NUMCELLS
@@ -883,10 +883,10 @@
      &                                                 1.8000D-31,   0.0000D+00,  -3.4000D+00,  & 
      &                                                 1.5000D-11,   0.0000D+00,  -1.9000D+00,  & 
      &                                                 1.0000D+00,   6.0000D-01 )
-!  Reaction Label HET_CLNO3_WAI   
-             RKI( NCELL,  256) =  BLKHET(  NCELL, IK_HETERO_CLNO3_WAI )
-!  Reaction Label HET_CLNO3_WAJ   
-             RKI( NCELL,  257) =  BLKHET(  NCELL, IK_HETERO_CLNO3_WAJ )
+!  Reaction Label HET_CLN3_WAI    
+             RKI( NCELL,  256) =  BLKHET(  NCELL, IK_HETERO_CLN3_WAI )
+!  Reaction Label HET_CLN3_WAJ    
+             RKI( NCELL,  257) =  BLKHET(  NCELL, IK_HETERO_CLN3_WAJ )
 !  Reaction Label SA01            
              RKI( NCELL,  258) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.7000D-12,   3.6000D+02 )
 !  Reaction Label SA02            

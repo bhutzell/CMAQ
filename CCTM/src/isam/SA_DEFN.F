@@ -561,8 +561,8 @@ c----------------------------------------------------------
      &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      ','CO        '/ )
 
         !CRACMM3
-        ALLOCATE( ISAM_SPEC_VOC( 10 )%LIST( 98 ) )
-        ISAM_SPEC_VOC( 10 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
+        ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 98 ) )
+        ISAM_SPEC_VOC( 6 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
      &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
      &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
      &    'EBZ       ','ELHOM     ','EOH       ','ETE       ','ETEG      ',
