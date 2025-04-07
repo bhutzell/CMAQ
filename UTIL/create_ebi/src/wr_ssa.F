@@ -15,7 +15,6 @@ C**********************************************************************
 
       USE ENV_VARS
       USE GLOBAL_DATA
-      !!USE M3UTILIO ! IOAPI parameters and declarations
       USE RXNS_DATA
 
       IMPLICIT NONE
@@ -54,7 +53,6 @@ C..SCRATCH LOCAL VARIABLES:
 
       INTEGER  :: EPOS          ! end pos of string
       INTEGER  :: IIN           ! Unit no. of input file
-      INTEGER  :: IOUT          ! Unit no. of output file
 
       INTEGER  :: E1            ! End pos. of string
       INTEGER  :: E2            ! End pos. of string
@@ -105,9 +103,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       FNAME = OUTPATH( 1 : E1 ) // '/hrcalc_ss.F' 
 
-      IOUT = JUNIT()
+      GLOBAL_IOUT = JUNIT()
 
-      OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
+      OPEN( UNIT = GLOBAL_IOUT, FILE = FNAME, ERR = 9000 )
 
 
       IIN = JUNIT()
@@ -119,9 +117,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       OPEN( UNIT = IIN, FILE = FNAME, ERR = 9000 )
 
 
-      IF( LWR_COPY ) CALL WR_COPYRT( IOUT )
+      IF( LWR_COPY ) CALL WR_COPYRT( GLOBAL_IOUT )
 
-      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( IOUT )
+      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( GLOBAL_IOUT )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Read, modify, and write first part of code from template
@@ -133,13 +131,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LINEIN( 1 : 2 ) .EQ. 'R1' ) THEN
 
-         WRITE( IOUT, 93000 ) TRIM( MECHNAME )
+         WRITE( GLOBAL_IOUT, 93000 ) TRIM( MECHNAME )
 
          GO TO 100
 
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'R2' ) THEN
 
-         WRITE( IOUT, 93020 ) TRIM( CR_DATE )
+         WRITE( GLOBAL_IOUT, 93020 ) TRIM( CR_DATE )
 
          GO TO 100
 
@@ -151,7 +149,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
         E1 = LEN_TRIM( LINEIN )
 
-        WRITE( IOUT, 92000 ) LINEIN( 1 : E1 )
+        WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : E1 )
 
         GO TO 100
 
@@ -180,11 +178,11 @@ c  in which this SS species is a reactant
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       DO S = 1, N_SS_SPC
 
-         WRITE( IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 )
 
          SPOUT = ADJUSTL( SS_SPC( S ) )
 
-         WRITE( IOUT, 92100 ) CLINE, SPOUT, CLINE
+         WRITE( GLOBAL_IOUT, 92100 ) CLINE, SPOUT, CLINE
 
          SPNUM = NAME_INDEX( SPOUT, N_SPECIES, SPECIES )
 
@@ -193,7 +191,7 @@ c  Loop over all reactions to get all SS production terms
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          VNAME = 'SS_PROD'
          LRXN1 = .TRUE.
-         WRITE( IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 )
 
          DO N = 1, MAX_SS_PROD
 
@@ -213,7 +211,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &           NPOS, LINOUT, LRXN1, RPOS1, RPOS2, PPOS1, PPOS2 )
 
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             LRXN1 = .FALSE.
          
@@ -231,7 +229,7 @@ c  If the reaction uses a special rate constant, use RKI; if not
 c  use RKI_SAV 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          LRXN1 = .TRUE.
-         WRITE( IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 )
 
          DO N = 1, MAX_SS_LOSS
 
@@ -266,7 +264,7 @@ c..Don't need to calculate rxrat in hrrates if this reaction has a SS reactant
                E1 = LEN_TRIM( LINOUT )
             END DO
 
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
             LRXN1 = .FALSE.
          
          END DO    ! End loop over MAX_SS_LOSS
@@ -281,24 +279,24 @@ c..Error generated if the SS species has no loss terms
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Generate code that computes the SS species concentration
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-         WRITE( IOUT, 92120 ) 
+         WRITE( GLOBAL_IOUT, 92120 ) 
 
          SPOUT = ADJUSTL( SS_SPC( S ) )
          E1 = LEN_TRIM( SPOUT )
 
          LINOUT = '      IF( SS_LFRQ .LE. 0.0 ) SS_LFRQ = MINLOSS'
          EPOS = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : EPOS )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : EPOS )
 
          LINOUT = '      YC( NCELL, ' // SPOUT( 1 : E1 ) // 
      &            ' ) = SS_PROD / SS_LFRQ'
          EPOS = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : EPOS )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : EPOS )
 
          LINOUT = '      YC( NCELL, ' // SPOUT( 1 : E1 ) // ' ) = MAX( YC( NCELL, ' //
      &            SPOUT( 1 : E1 ) // ' ), MINCONC )'
          EPOS = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : EPOS )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : EPOS )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Generate code that updates reaction rates and rate constants for all 
@@ -306,7 +304,7 @@ c  reactions that have this SS species as a reactant; The SS conc is rolled
 c  into the rate constant using RKI for special rate constants and 
 c  RKI_SAV for non-special rate constants
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-         WRITE( IOUT, 92140 ) 
+         WRITE( GLOBAL_IOUT, 92140 ) 
 
 c..This section updates reaction rates (rxrat)
          DO N = 1, MAX_SS_LOSS
@@ -345,7 +343,7 @@ c..Add the SS reactant
             EPOS = LEN_TRIM( LINOUT )
 
 
-            WRITE( IOUT, 92000 ) LINOUT( 1 : EPOS )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : EPOS )
 
         END DO       ! Loop over reactions
 
@@ -373,14 +371,14 @@ c..This section writes code to update rate constants
 
             END IF
 
-            WRITE( IOUT, 92000 ) LINOUT( 1 : EPOS )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : EPOS )
 
          END DO      ! Loop over reactions
 
 
       END DO         ! Loop over SS species
 
-      WRITE( IOUT, 95100 ) 
+      WRITE( GLOBAL_IOUT, 95100 ) 
 
       IF( LERROR ) THEN
          MSG = 'STOPPING because of errors in processing steady-state species'
@@ -389,7 +387,7 @@ c..This section writes code to update rate constants
       END IF
 
       CLOSE( IIN )
-      CLOSE( IOUT )
+      CLOSE( GLOBAL_IOUT )
 
       NOUTFLS = NOUTFLS + 1
       OUTFLNAM( NOUTFLS ) = 'hrcalc_ss.F'
