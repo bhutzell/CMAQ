@@ -12,13 +12,7 @@ This chapter provides basic information on the format and content of CMAQ input 
 
 All CMAQ input and output files are conformed to I/O API netCDF file format. Please refer to the [I/O API User's Manual](https://www.cmascenter.org/ioapi/documentation/all_versions/html) for details.
 
-Full input datasets for 2016 over two domains are publically available to download from the CMAS Data Warehouse.  The input files are stored on Google Drive with metadata organized through Dataverse.  
-
-|**Domain**|**Simulation Dates**|**Dataverse DOI**| 
-|:--------------:|:----:|:--------:|
-| Southeast US | July 1 - 14, 2016| https://doi.org/10.15139/S3/IQVABD |
-| Conterminous U.S. (CONUS) | Jan 1 - Dec 31, 2016 | https://doi.org/10.15139/S3/MHNUNE |
-
+See the [CMAQ Data](../CMAQ_Data.md) page for a CMAQ-ready input files for mutliple domains and simulation years.
 
 ## 4.2 CMAQ Pre-processors 
 [Figure 2-1][link_4.2_fig2] shows the relationship between CMAQ pre-processors and the main CMAQ program, the CMAQ Chemistry Transport Model (CCTM).  MCIP, ICON and BCON are included in the CMAQ repository and are used to create meteorological, initial conditions and boundary conditions inputs.  SMOKE, FEST-C and Spatial Allocator Tools are external software packages used for creating emissions inputs for CMAQ.  The following subsections provide more information on these tools and point the user to additional sources of documentation. 
@@ -259,9 +253,9 @@ The namelist files for the other pollutant classes have similar configurations a
 Used by: ELMOv2, Budget Tool, DESID
  
 This control namelist provides an interface to activate/deactivate and set parameters for the operation of the Explicit and Lumped CMAQ Model Output module 
-(ELMO; [Appendix F](Appendix/CMAQ_UG_appendixF_elmo_output.md)), the Budget Tool (Chapter 9), and the DESID emission interface.   
+(ELMO; [Appendix F](Appendix/CMAQ_UG_appendixF_elmo_output.md)), the Budget Tool (Chapter 9), and the Detailed Emissions Scaling, Isolation and Diagnostics (DESID; [Appendix B](Appendix/CMAQ_UG_appendixB_emissions_control.md) emission interface.   
 
-The first section of this namelist allows Users to customize their output files to maximize utility and minimize cost of I/O time and storage requirements. 
+The first section of this namelist allows users to customize their output files to maximize utility and minimize cost of I/O time and storage requirements. 
 The sections that follow include setting Keywords for use in ELMOv2 specifications, populating Regions for DESID scaling operations and source-apportionment 
 applications, configuring chemically independent emission specifications like particle size distirbutions and area normalization, and specifying the 
 contents of DESID diagnostic output files. The final section contains inputs to activate or deactive the Budget Tool and set the species that should have 
@@ -276,20 +270,20 @@ their budget calculated.
 
 <!-- END COMMENT -->
 
-The new CMAQ Chemical Control Namelist is stored in each chemical mechanism folder within MECHS. It allows Users to input sophisticated scaling rules for 
+Beginning with CMAQv6.0beta, a new CMAQ Chemical Control Namelist is stored in each chemical mechanism folder within MECHS. It allows users to input sophisticated scaling rules for 
 configuring emissions with DESID. If the user modifies the name or location of this namelist, then the following command in the RunScript should be updated as well:
 ```
 setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml
 ```
 
 The Detailed Emissions Scaling, Isolation and Diagnostics (DESID) module included with CMAQv5.3 and beyond provides comprehensive customization and transparency of 
-emissions manipulation to the user. These features are accomplished primarily through an explicit list of scaling rules that are articulated in the Chemical Control 
-Namelist. This chemical mapping table, which links chemical variables on the emissions streams (external files or online processes) to CMAQ species, offers 
+emissions manipulation to the user. These features are accomplished primarily through an explicit list of scaling rules that are articulated in the first input section of the Chemical Control 
+Namelist (&Desid_ScalingVars, &Desid_Scaling). This chemical mapping table, which links chemical variables on the emissions streams (external files or online processes) to CMAQ species, offers 
 scaling capabilities, geographic specicficity with the regions functionalities, size distribution customization, and the use of chemical families. See the DESID 
 emission overview and tutorial for explicit examples.
 
 * [Jump to DESID Tutorial](Tutorials/CMAQ_UG_tutorial_emissions.md) for step by step instructions on performing some basic manipulation of emission streams.
-* [Jump to Emissions overview](CMAQ_UG_ch06_model_configuration_options.md) in Chapter 6 of this User's Guide.
+* [Jump to Emissions overview](CMAQ_UG_ch06_model_configuration_options.md#6.9_Emissions) in Chapter 6 of this User's Guide.
 
 The next namelist input sections (&Chemical_FamVars and &ChemicalFamilies) allow users to define chemical families for output that can be referred to by DESID or 
 The Budget Tool. For example, 'NOX' may be defined as a chemical family containing 'NO' and 'NO2'. The &Chemical_FamVars section should be used to define the total 
