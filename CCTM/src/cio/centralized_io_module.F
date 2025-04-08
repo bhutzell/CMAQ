@@ -6155,16 +6155,16 @@ C Read the various categories of normalized emissions
           End If
 
 
-          DO v = 1, nvars
-            DO n = 1, nstep
+          DO n = 1, nsteps 
+            DO v = 1, nvars
                IF ( .NOT. XTRACT3( LTNGFILE, LT_NAME(v), 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        jdate, jtime, LTNG_DATA4D(:,:,:,n,v) ) ) Then
                   XMSG = 'Could not interpolate OPEN from ' // LTNGFILE
                   Call M3EXIT( PNAME, jdate, jtime, XMSG, XSTAT1 )
                End If
-               CALL nextime (jdate, jtime, tstep)
             ENDDO
+            CALL nextime (jdate, jtime, tstep)
           ENDDO
              
 
