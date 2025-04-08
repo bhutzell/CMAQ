@@ -16,7 +16,6 @@ C
 C**********************************************************************
       USE ENV_VARS
       USE GLOBAL_DATA
-      !!USE M3UTILIO ! IOAPI parameters and declarations
       USE RXNS_DATA
 
       IMPLICIT NONE
@@ -52,7 +51,6 @@ C..SCRATCH LOCAL VARIABLES:
       INTEGER  :: IND2         ! array index
       INTEGER  :: IND3         ! array index
       INTEGER  :: IIN          ! Unit no. of input file
-      INTEGER  :: IOUT         ! Unit no. of output file
       INTEGER  :: N, S         ! Loop indices
       INTEGER  :: NPOS         ! Reaction index
       INTEGER  :: RPOS1        !
@@ -80,9 +78,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       FNAME = OUTPATH( 1 : E1 ) // '/hrrates.F' 
 
-      IOUT = JUNIT()
+      GLOBAL_IOUT = JUNIT()
 
-      OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
+      OPEN( UNIT = GLOBAL_IOUT, FILE = FNAME, ERR = 9000 )
 
 
       IIN = JUNIT()
@@ -94,9 +92,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       OPEN( UNIT = IIN, FILE = FNAME, ERR = 9000 )
 
 
-      IF( LWR_COPY ) CALL WR_COPYRT( IOUT )
+      IF( LWR_COPY ) CALL WR_COPYRT( GLOBAL_IOUT )
 
-      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( IOUT )
+      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( GLOBAL_IOUT )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Read, modify, and write first part of code from template
@@ -108,13 +106,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LINEIN( 1 : 2 ) .EQ. 'R1' ) THEN
 
-         WRITE( IOUT, 93000 ) TRIM( MECHNAME )
+         WRITE( GLOBAL_IOUT, 93000 ) TRIM( MECHNAME )
 
          GO TO 100
 
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'R2' ) THEN
 
-         WRITE( IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
+         WRITE( GLOBAL_IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
 
          GO TO 100
 
@@ -126,7 +124,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
         E1 = LEN_TRIM( LINEIN )
 
-        WRITE( IOUT, 92000 ) LINEIN( 1 : E1 )
+        WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : E1 )
 
         GO TO 100
 
@@ -137,7 +135,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Write reactions for gas-phase only portion of mechanism
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      WRITE( IOUT, 94000 ) 
+      WRITE( GLOBAL_IOUT, 94000 ) 
 
       DO N = 1, NRXNS
 
@@ -184,7 +182,7 @@ c..skip rxn if any reactant is a AE or AQ species
          IF( L_SS_RXN_FLAG( N ) ) LINOUT( 1 : 1 ) = '!'
 
   
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
@@ -217,7 +215,7 @@ c..do rxn if any reactant is a AE or AQ species
 
             IF( LRXN1 ) THEN
 
-               WRITE( IOUT, 95000 )
+               WRITE( GLOBAL_IOUT, 95000 )
 
                LRXN1 = .FALSE.
 
@@ -242,13 +240,13 @@ c..do rxn if any reactant is a AE or AQ species
   
             IF( .NOT. L_RXFLAG( N ) ) LINOUT( 1 : 1 ) = '!'
             IF( L_SS_RXN_FLAG( N ) ) LINOUT( 1 : 1 ) = '!'
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
          END IF
 
       END DO
 
-      IF( .NOT. LRXN1 ) WRITE( IOUT, 95020 )
+      IF( .NOT. LRXN1 ) WRITE( GLOBAL_IOUT, 95020 )
 
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -280,7 +278,7 @@ c..do rxn if any reactant is a AE or AQ species
 
             IF( LRXN1 ) THEN
 
-               WRITE( IOUT, 95040 )
+               WRITE( GLOBAL_IOUT, 95040 )
 
                LRXN1 = .FALSE.
 
@@ -305,21 +303,21 @@ c..do rxn if any reactant is a AE or AQ species
   
             IF( .NOT. L_RXFLAG( N ) ) LINOUT( 1 : 1 ) = '!'
             IF( L_SS_RXN_FLAG( N ) ) LINOUT( 1 : 1 ) = '!'
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
          END IF
 
 
       END DO
 
-      IF( .NOT. LRXN1 ) WRITE( IOUT, 95020 )
+      IF( .NOT. LRXN1 ) WRITE( GLOBAL_IOUT, 95020 )
 
 
-      WRITE( IOUT, 96000 )
+      WRITE( GLOBAL_IOUT, 96000 )
 
       CLOSE( IIN )
 
-      CLOSE( IOUT )
+      CLOSE( GLOBAL_IOUT )
 
       NOUTFLS = NOUTFLS + 1
       OUTFLNAM( NOUTFLS ) = 'hrrates.F'
