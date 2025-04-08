@@ -33,7 +33,7 @@ In this section, details on the routine CCTM output files are provided. All CMAQ
 |[CCTM_MSOILOUT](#soilout) <a id=soilout_t></a>|GRDDED3|n/a (see detailed file description below)|XY
 |[CCTM_BDSNPOUT](#bdsnpout) <a id=bdsnpout_t></a>|GRDDED3|n/a (see detailed file description below)|XY
 |**Diagnostic and Advanced**| | | |
-|[FLOOR](#floor)<sup>5</sup> <a id=floor_t></a>|ASCII|Hourly|n/a
+|[FLOOR](#floor)<sup>5</sup> <a id=floor_t></a>|ASCII|Hourly|XYZ
 |[CCTM_B3GTS_S](#b3gts) <a id=b3gts_t></a>|GRDDED3|Hourly Instantaneous| XY
 |[CCTM_BUDGET](#budget) <a id=budget_t></a>|ASCII|Hourly Instantaneous| Domain-Wide
 |[CCTM_DEPV](#depv) <a id=depv_t></a>|GRDDED3|Hourly Instantaneous|XY
