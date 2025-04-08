@@ -6155,7 +6155,7 @@ C Read the various categories of normalized emissions
           End If
 
 
-          DO n = 1, nsteps 
+          DO n = 1, nstep 
             DO v = 1, nvars
                IF ( .NOT. XTRACT3( LTNGFILE, LT_NAME(v), 1, 1,
      &                        startrow, endrow, startcol, endcol,
