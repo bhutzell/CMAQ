@@ -3,8 +3,8 @@
 ## Remove pgi compile failure for ebi solver for cracmm3m mechanism
 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Bug Fix, Chemistry
-**Release Version/Date**: CMAQ Version 6.0  
+**Type of update**: Bug Fix, Chemistry  
+**Release Version/Date**: CMAQv6.0beta 
 
 **Description**: the update modifies the create_ebi utility to remove the pgi compile error for the cracmm3m's ebi solver. The error occurs because a subroutine has a statement exceeding number of line continuations allowed by pgf90 in nvhpc version 24.7. Changes to create_ebi remove the specific error for cracmm3's ebi solver but attempt to prevent this type of error in other ebi subroutines. The goal supports developing later versions of chemical mechanism that have more complex or numerous interactions between chemical species.
 
@@ -12,7 +12,7 @@
       
 |Merge Commit | Internal record|
 |:------:|:-------:|
-| Merge for PR#1069 | [PR#1307](https://github.com/USEPA/CMAQ_Dev/pull/1307)  | 
+| Merge for PR#1307 | [PR#1307](https://github.com/USEPA/CMAQ_Dev/pull/1307)  | 
 
 
 ## Update Chemistry Utilities for More Recent Versions of pgi Compilers
