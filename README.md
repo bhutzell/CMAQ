@@ -27,7 +27,9 @@ While initially planned for fall 2026, the status and timing of any final releas
 ## Differences in CMAQv6.0 beta 1 and beta 2
 The beta 1 version (v6.0b1; **this branch**) includes the science and feature updates described above.   
 
-The beta 2 version (v6.0b2) is identical to version 1 but removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library.  This update makes the code for the offline CMAQ model consistent with the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for easier developement and maintenance across all three versions.
+The beta 2 version (v6.0b2) is identical to version 1 but removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library.  This update makes the code for the offline CMAQ model consistent with the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for substantially easier developement and maintenance across all three versions.   To implement this update input/output functions and other utilities such as calendar functions that previously relied on the I/O API library (developed and maintained by [Carlie Coats](https://github.com/cjcoats)) have been added to the CMAQ source code under CCTM/src/mio. The beta 2 version also moves functions related to log warnings and messages from the RUNTIMEVARS module into the logdev_mod module (both under CCTM/src/util/util/).  
+
+**Next Steps** The I/O updates in v6.0b2 were designed to facilitate creating CMAQ output files with variables of mixed dimensions.  When implemented in a future version of CMAQ, this new feature will allow users to produce many fewer output files per simulations, e.g., 2D and 3D gridded variables can be saved in a single file.
 
 
 ## Getting the CMAQ Repository
