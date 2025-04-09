@@ -78,6 +78,40 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 |[Merge for PR#1214](https://github.com/USEPA/CMAQ_Dev/commit/f807233e2354b0d270aba2b2207393ddacb4a1af) | [PR#1214](https://github.com/USEPA/CMAQ_Dev/pull/1214)  |
 
 
+### Correct conservation of nitrogen for 4 reactions in CRACMM3
+**Primary Contact**: [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
+**Secondary Contact**:  [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency (could make Havala primary instead)    
+**Type of update**: Maintenance   
+**Release Version/Date**:  CMAQv6.0beta  
+
+**Description**:  
+Greg Yarwood noted 4 RACM2 reactions that do not properly conserve nitrogen. The reactions are also in CRACMM. He proposed an update and Bill Stockwell agreed. The following proposed fixes from Greg Yarwood have been implemented in CRACMM3:  
+R159 MPAN + NO3→MACP + NO2 + HNO3  
+R246 ADCN + HO2→ ONIT  
+R273 MCP + MO2→ HO2 + 1.500 HCHO + 0.500 HKET + 0.250 MOH + 0.250 ROH  
+R309 MCP + ACO3→ 0.500 HO2 + HCHO + 0.500 HKET + 0.500 MO2 + 0.500 ORA2  
+
+**Significance and Impact**: Errors in conservation of nitrogen for select reactions ported from RACM2 into CRACMM should be corrected to be more accurate. One of the long-term goals of CRACMM is to balance nitrogen within the mechanism, and this is a step towards that goal. Impacts on simulated concentrations are minimal.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1205](https://github.com/USEPA/CMAQ_Dev/commit/a0f806bd2666d217ff25c4a2b3b04d2347c1d607) | [PR#1205](https://github.com/USEPA/CMAQ_Dev/pull/1205)  |
+
+
+
+### CRACMM Reaction Metadata File  
+[[Havala Pye](mailto:pye.havala@epa.gov)], U.S. Environmental Protection Agency    
+**Type of update**: Documentation   
+**Release Version/Date**:  CMAQv6.0beta  
+
+**Description**:  Metadata file to document updates to CRACMM chemistry at the reaction level.  
+
+**Significance and Impact**: This file provides information on CRACMM updates at the reaction level. This file will be posted on github.com/USEPA/CRACMM upon public release of CRACMM in CMAQ. This file will feed efforts to link chemical reactions across EPA and specifically the Chemical Transformations Database (CheT, https://ccte-cced-chet.epa.gov/).
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1258](https://github.com/USEPA/CMAQ_Dev/commit/e9aeb46561f7c4e7f497ed65617e4ea53ce2f25b) | [PR#1258](https://github.com/USEPA/CMAQ_Dev/pull/1258)  |
+
 ### Updated mechanism CRACMM2
 [Nash Skipper](mailto:skipper.nash@epa.gov) and [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
