@@ -8,7 +8,7 @@ CMAQ is an active open-source development project of the U.S. EPA's Office of Re
 CMAQ combines current knowledge in atmospheric science and air quality modeling with multi-processor computing techniques in an open-source framework to deliver fast, technically sound estimates of ozone, particulates, toxics, and acid deposition.
 
 
-## CMAQ version 6.0 Beta Overview:
+## CMAQ version 6.0 Beta Overview
 The CMAQ6.0 beta release includes two research versions of the CMAQ system (beta 1 and beta 2) that allow community members:
 
 * a preview of science and feature updates planned for the final CMAQv6.0 release.
@@ -24,8 +24,10 @@ These updates and other new features in the beta versions are documeted in the *
 
 While initially planned for fall 2026, the status and timing of any final release of CMAQv6.0 is unknown at this point.
 
-### Differences in CMAQv6.0 beta 1 and beta 2:
-The beta 2 version (v6.0b2)  removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library.   The beta 1 version (v6.0b1; **this branch**) still relies on functions in this library.   
+## Differences in CMAQv6.0 beta 1 and beta 2
+The beta 1 version (v6.0b1; **this branch**) includes the science and feature updates described above.   
+
+The beta 2 version (v6.0b2) removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library.  This update makes the code for the offline CMAQ model consistent with the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for easier developement and maintenance across all three versions.
 
 
 ## Getting the CMAQ Repository
