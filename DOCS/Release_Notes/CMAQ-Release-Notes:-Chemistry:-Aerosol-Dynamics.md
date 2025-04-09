@@ -1,26 +1,5 @@
 # Aerosol Dynamics
 
-### Replace CONST.EXT include file with module and update constant values  
-**Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Restructure   
-**Release Version/Date**:  CMAQ v6.0  
-
-**Description**:   
-In this PR, the code is restructured to define and use a CONST module in lieu of the CONST.EXT include file. 
-The module includes fundamental physical, chemical, and mathematical constants used in CMAQ as well as certain commonly used statement functions, particularly `ESATL` for calculating the saturation vapor pressure of water as a function of temperature.  The values of Avogadro's number, the Boltzmann constant, and the universal gas constant are updated to be consistent with the latest (2019) NIST and SI standards. The single and double precision versions of these constants are also made consistent with each other.
-Additionally, the Meng and Seinfeld (1994) approximation to the error function ERF has been removed. ERF and its complement ERFC are intrinsic Fortran functions since the 2008 standard. 
-
-**Significance and Impact**:   
-Very minor change in model results. Easier code maintenance and better consistency.  
-
-**References**:   
-NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds. NIST Special Publication 330, 2019.   doi: 10.6028/nist.sp.330-2019  
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1137](https://github.com/USEPA/CMAQ_Dev/commit/e7ed66e185b1b93af8515428053465564ae6857c) | [PR#1137](https://github.com/USEPA/CMAQ_Dev/pull/1137)  | 
-|[Merge for PR#1138](https://github.com/USEPA/CMAQ_Dev/commit/96449cd6f20eccf61699cee038317b6ffaed467a) | [PR#1138](https://github.com/USEPA/CMAQ_Dev/pull/1138)  |   
-
 ### SOA Mapping: Revise Logfile Output
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Logfile Messaging  
