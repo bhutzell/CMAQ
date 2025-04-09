@@ -5,9 +5,9 @@
 **Type of update**: New Feature  
 **Release Version/Date**: CMAQv6.0beta   
 
-**Description**:
+**Description**: Previously, WRF-CMAQ has utilized IOAPI3 BUFFERED file to facilitata data transfer between WRF and CMAQ. Currently, CMAQ is able to couple with two different meteorological models, WRF and MPAS to form a twoway coupled model. With software Interoperability and reusability in mind, an unified coupler was developed that can be used for coupling either WRF-CMAQ or MPAS-CMAQ coupled model. Clearly, the objective is to provide a simple methodology/technique to transfer information/data between two models (the IOAPI3 BUFFERED file is no longer needed). In general, a user does not need to know the actual implementation of the unified coupler unless the user wants to modify the current WRF-CMAQ coupled model paradigm by transferring additional new information from WRF to CMAQ or/and new information from CMAQ to WRF. Complete details of the unified coupler are provided in the [WRF-CMAQ Tutorial](Tutorials/CMAQ_UG_tutorial_WRF-CMAQ_Benchmark.md).
 
-**Significance and Impact:**  
+**Significance and Impact:**  The design of the unified coupler follows the software Interoperability and reusability principle. It has been applied to construct the WRF-CMAQ coupled model and the MPAS-CMAQ coupled model. 
 
 
 |Merge Commit | Internal record|
