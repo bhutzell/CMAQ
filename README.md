@@ -1,4 +1,4 @@
-CMAQv6.0 BETA
+CMAQv6.0 BETA 1
 ==========
 
 US EPA Community Multiscale Air Quality Model (CMAQ) Website: https://www.epa.gov/cmaq
