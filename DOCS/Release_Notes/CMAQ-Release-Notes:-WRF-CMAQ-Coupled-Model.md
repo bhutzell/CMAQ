@@ -1,9 +1,25 @@
 # WRF-CMAQ Coupled Model
 
+## Unified Coupler Implementation 
+[David Wong](mailto:wong.david-C@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: New Feature  
+**Release Version/Date**: CMAQv6.0beta   
+
+**Description**:
+
+**Significance and Impact:**  
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1086](https://github.com/USEPA/CMAQ_Dev/commit/0cd768e2ef80931c49c7781e0426dfd6c556cc28) | [PR#1086](https://github.com/USEPA/CMAQ_Dev/pull/1086)  | 
+    
+
 ## Compatibility issues with WRF versions 4.5.2 and later
 [David Wong](mailto:wong.david-C@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
+
 **Description**: An update in WRFv4.5.2 (issued in [PR 1953](https://github.com/wrf-model/WRF/pull/1953) to the wrf-model GitHub repository) causes a run time error when using the WRF-CMAQ coupled model with WRF versions 4.5.2 and later.
 
 A workaround for this incompatibility issue is to revert this WRF update when using the WRF-CMAQ system.  To do this first download or clone the code for WRFv4.5.1. Next copy the following two files from the WRFv4.5.1 code base to your folder containing the more recent version WRF (e.g., 4.6.1). For example, if your WRF code for the two versions are saved in folders 'WRFv451' and 'WRFv4.*', execute the following commands:   
@@ -24,6 +40,7 @@ EPA's testing of WRFv4.5.1-CMAQv5.5 has included chemical mechanisms CB6r5 and C
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
+
 **Description**: When the runtime option CORE_SHELL_OPTICS is set to True and CCTM is compiled with the gcc 6.1 compiler, the model crashes. The cause is a write to the mystr character variable in the BHCOAT subroutine because the value has an insufficient length.  
 
 **Significance and Impact:**  The change allows running CCTM with gcc 6.1 compiler where CORE_SHELL_OPTICS is set to True. Using the intel 18.0, tests showed the change does not alter model predictions over the 2018 12NE3 and 2015 HEMI domains.  
@@ -37,6 +54,7 @@ EPA's testing of WRFv4.5.1-CMAQv5.5 has included chemical mechanisms CB6r5 and C
 [David Wong](mailto:wong.david-c@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: New Feature  
 **Release Version/Date**: CMAQv5.4  
+
 **Description**: The new WRF-CMAQ model is based on WRFv4.4 and CMAQv5.4. It supports only RRTMG radiation scheme for short wave aerosol direct effect. It uses core-shell model to perform aerosol optics calculations rather than volume mixing technique as in the previous version of the WRF-CMAQ model.
 
 The code used to couple the WRFv4.4-CMAQv5.4 models is now released as part of the CMAQ Github Repository.
@@ -65,6 +83,7 @@ A complete step by step build process and run instructions are provided in the [
 [David Wong](mailto:wong.david-c@epa.gov@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.4  
+
 **Description**: A bug was identified within the CMAQ to WRF coupling routine (twoway_feedback.F90) where aerosol feedback information is transferred from CMAQ to WRF. In doing so, it was found that WRF was not receiving the correct aerosol feedback information due to a looping error relating to the number of layers set to 1 in some cases. 
 
 Specifically, The 3-way nested loop in the subroutine feedback_read (twoway_feedback.F90) assigns aerosol feedback information to the WRF grid structure. The outer loop runs from 1 to NLAYS3D which it is an IOAPI internal variable, and the value of NLAYS3D is establish at the end of calling IOAPI subroutine DESC3. Hence its value might differ from the value obtained in the FIRTIME block and subsequent time step. 
