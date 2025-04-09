@@ -1,10 +1,86 @@
+# STAGE
+
+### Update to Minimum Kz and Kz0ut in the STAGE deposition option
+[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**:  Science Update, Documentation  
+**Release Version/Date**:  V6.0beta  
+
+**Description**:   
+This pull request updates minimum Kz value to only be applied in the PBL and sets the minimum Kz0ut value from 1 m2/s to 0.01 m2/s in accordance to WRF 4 PX and YSU PBL schemes. 
+
+**Significance and Impact**:  
+The update to the minimum Kz, default option, results in slightly more O3 titration and higher NOx and primary PM in urban areas. This generally results in a slight model improvements when evaluated against AQS observations. 
+
+The revised Kz0ut results in substantially more O3 titration and higher NOx and primary PM in urban areas. This generally improves ozone and NOx model performance and results in more of a mixed model performance in PM.
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1278](https://github.com/USEPA/CMAQ_Dev/commit/23654ff0e2f4371354ec357bff96845b7e4eff9a) | [PR#1278](https://github.com/USEPA/CMAQ_Dev/pull/1278)  |
+
+### Restored the impact of dry deposition factor on diagnostic deposition velocity outputs
+**Primary Contact**: [Jesse Bash(mailto:bash.jesse@epa.gov)], U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix   
+**Release Version/Date**:  v6.0beta  
+
+**Description**:  
+This update is needed for the dry deposition velocity diagnostic file to represent model sensitivities in which the user selects a dry deposition factor that is not unity.  
+
+**Significance and Impact**:   
+These updates reflect the impact of the dry deposition factor on the diagnostic deposition velocity output and does not impact model concentration or deposition estimates.
+
+If the user selects a dry deposition factor for a surrogate deposition velocity that differs from the dry deposition factor of the original species, the user is now prompted to make the dry deposition factors consistent for the species or add the the species as a unique species in the CMAQ_Control_STAGE namelist. 
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1282](https://github.com/USEPA/CMAQ_Dev/commit/1c99863e38eee05a8e901a1204c402a98bdbf09d) | [PR#1282](https://github.com/USEPA/CMAQ_Dev/pull/1282)  |
+
+### Model stop if STAGECTRL_NML environmental variable is missing
+ [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix   
+**Release Version/Date**:  v6.0beta  
+
+**Description**:   
+This pull request modifies CMAQ to alert the user if the STAGECTRL_NML is not set in the runscript when the STAGE deposition option is used. 
+
+**Significance and Impact**:  
+Model results are unchanged. 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1242](https://github.com/USEPA/CMAQ_Dev/commit/dd8fa43dbac447332e54d56a8cc100733ae1ce96) | [PR#1242](https://github.com/USEPA/CMAQ_Dev/pull/1242)  |
+ 
+
+
+### STAGE gcc debug flag bug fix  
+[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix   
+**Release Version/Date**:  v6.0beta  
+
+**Description**:  
+STAGE with bidirectional NH3 exchange will currently crash when using a gcc build compiled with debug flags due to uninitialized F1_NH4 and F2_NH4 arrays in centralized_io_module.F. This occurs only when with the environment variable NEW_START = TRUE and these arrays are not populated but checked for NaNs in NH3_BIDI_MOD.F.  This pull request initialized  these arrays allowing the model to run when compiled with gcc debug flags.
+
+**Significance and Impact**:  
+This bugfix allows the user to run the model compiled with gcc debug flags using the STAGE deposition option with bidirectional NH3 exchange. 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1227](https://github.com/USEPA/CMAQ_Dev/commit/9d9d871b6921443c270f7eebea2e1893d6f25822) | [PR#1227](https://github.com/USEPA/CMAQ_Dev/pull/1227)  |
+
+
+
+
 ### Correction in an Underflow STAGE Emerson Aerosol Dry Deposition Option
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQ 5.5  
-**Description**:  This pull request resolves an underflow issue in calculating the bounce correction term (R1) in the [Emerson et al. 2020](https://www.pnas.org/doi/10.1073/pnas.2014761117) (equation 2) aerosol dry deposition option in STAGE.   
 
-**Significance and Impact**: This allows for CMAQ simulations using the STAGE Emersion aerosol dry deposition option when compiled with debug flags. This correction makes relatively small changes in the aerosol dry deposition velocity when the gravitation settling velocity is large. This can result in small changes in the aerosol deposition velocity but has no impact on model evaluations to the precision that is reported in the AMET tool.  
+**Description**:   
+This pull request resolves an underflow issue in calculating the bounce correction term (R1) in the [Emerson et al. 2020](https://www.pnas.org/doi/10.1073/pnas.2014761117) (equation 2) aerosol dry deposition option in STAGE.   
+
+**Significance and Impact**:  
+This allows for CMAQ simulations using the STAGE Emersion aerosol dry deposition option when compiled with debug flags. This correction makes relatively small changes in the aerosol dry deposition velocity when the gravitation settling velocity is large. This can result in small changes in the aerosol deposition velocity but has no impact on model evaluations to the precision that is reported in the AMET tool.  
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
@@ -15,13 +91,15 @@
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQ 5.5  
+
 **Description**:  
  This pull request address three issues in the STAGE deposition option.   
 1. The units for Molar Vol in CMAQ_Control_STAGE.nml are incorrect and should be cm**3 mol-1
 2. The diffusive volume in STAGE_MOD.F should be 20.1 cm**3 mol-1 rather than 22.4 following Fuller et al. 1966 and the [EPA Onsite toolbox](https://www3.epa.gov/ceampubl/learn2model/part-two/onsite/ed-background.html).
 3. Added the attenuation of u<sub>*</sub> due to canopy elements to the deposition of aerosols to vegetated covered smooth surfaces.  
 
-**Significance and Impact**: This pull request corrects a units typo in the  CMAQ_Control_STAGE.nml and the FSG diffusive volume for air in the diffusivity calculation. This results in a minor reduction in model estimated O<sub>3</sub> concentrations with the largest reductions (less than 1 ppb) occurring during the summer over forested land cover where the model typically overestimates AQS observed O<sub>3</sub>. The model differences are not likely to impact the general model evaluation.   
+**Significance and Impact**:   
+This pull request corrects a units typo in the  CMAQ_Control_STAGE.nml and the FSG diffusive volume for air in the diffusivity calculation. This results in a minor reduction in model estimated O<sub>3</sub> concentrations with the largest reductions (less than 1 ppb) occurring during the summer over forested land cover where the model typically overestimates AQS observed O<sub>3</sub>. The model differences are not likely to impact the general model evaluation.   
 
 **References**:  [EPA Onsite toolbox](https://www3.epa.gov/ceampubl/learn2model/part-two/onsite/ed-background.html)  
 
@@ -30,29 +108,31 @@
 |[Merge for PR#1070](https://github.com/USEPA/CMAQ/commit/372037a5e32bca159c57fab7703de99c4530f7e3) | [PR#1070](https://github.com/USEPA/CMAQ_Dev/pull/1070)  | 
 
 
-### Land Use and Deposition Species Mapping
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Bug Fix, New Feature  
-**Release Version/Date**: CMAQ 5.4  
-**Description**:  
+### Land Use and Deposition Species Mapping 
+[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency   
+**Type of update**: Bug Fix, New Feature   
+**Release Version/Date**: CMAQ 5.4   
+
+**Description**:   
 This update to STAGE has three primary parts: 
 1. introduces the mapping of land use data from the meteorological model to an internal land use category similar as with the AQMEII 4 project. This mapping is defined in the CMAQ_Control_STAGE.nml and is fully customizable allowing the user to set the number and parameters for the land use types and define the meteorological models land use data. These parameters now include the NH3 and Hg compensation points for bidirectional options. This also provides the logic when mapping from land use specific deposition to high resolution land use data, e.g. MODIS.
 2. Land use specific conductances are now normalized to the meteorological model’s grid average value. This results in little change when using WRF 3.8.1 with the PX land surface scheme but does change results with other versions of WRF and land surface schemes. When using WRF 4.1.2 using the PX land surface scheme in the EQUATES project, this resulted in a reduction in Maximum 8 hour O3 concentrations over the Eastern US by 1-3 ppb in July and little change in January. This resulted in an improvement in model performance. 
 3. The mapping of dry deposition species to vertical diffusion species has been completely revised. This mapping is now done in the initialization DEPV_DEFN.F rather than at each sync step. This mapping is now editable without the need to recompile using the CMAQ_Control_STAGE namelist allowing users to add deposition processes to any modeled species. The mapping between vdiff and dep is stored in a derived data type and is also used to control the output of the optional grid and tiled deposition velocity files. 
 4. This pull request corrected an error in the bidirectional NH3 exchange parameterization of the soil ammonium in solution for MODIS category 14 that was present when soil moisture in the first soil fell below the specified wilting point that resulted in excessively high NH3 emissions. This was only present when running using MODIS land use over the contiguous U.S. with bidirectional NH3 exchange turned on. 
 
-**Significance and Impact**: Overall, these result in a reduction in model run time, particularly when the MOSAIC option is set, and improved model O3 performance and reduced NH3 error when compared against AMoN observations when using meteorology with MODIS land use. There is little impact on other model species. Land use and species-specific deposition parameters have been aggregated allowing for easier maintenance, improved transparency, and gives the user much more control over the governing deposition processes.
+**Significance and Impact**:  
+Overall, these result in a reduction in model run time, particularly when the MOSAIC option is set, and improved model O3 performance and reduced NH3 error when compared against AMoN observations when using meteorology with MODIS land use. There is little impact on other model species. Land use and species-specific deposition parameters have been aggregated allowing for easier maintenance, improved transparency, and gives the user much more control over the governing deposition processes.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#847](https://github.com/USEPA/CMAQ/commit/16f959108268dd2a55e2271a26d5d89a9ec54914) | [PR#847](https://github.com/USEPA/CMAQ_Dev/pull/847)  | 
 
 ### Updates to Gaseous and Aerosol Dry Deposition
-[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Bug fix, New feature  
-**Release Version/Date**: CMAQ 5.4  
-**Description**:  
+[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency   
+**Type of update**: Bug fix, New feature   
+**Release Version/Date**: CMAQ 5.4   
 
+**Description**:   
 The STAGE option in CMAQ v5.5 now allows the user to specify key land use parameters for gaseous and aerosol dry deposition process using the CMAQ_Control_STAGE.nml name list. Default values have been populated using median observations from the TRY Plant Trait Database. These updates reduce the bias in summertime NH3 concentrations by approximately half.
 
 Two aerosol deposition options have been added that better capture the observed relationship between the observed aerosol dry deposition velocity and particle diameter. The Emerson et al. 2020 option has been made the default in STAGE and results in PM2.5 concentrations similar to the STAGE CMAQ v5.3 scheme while the Pleim et al. 2022 option results in a higher rates of aerosol deposition in the Accumulation mode and results in lower ambient PM2.5 concentrations.  
@@ -79,7 +159,7 @@ Deposition velocity as a function of particle diameter for the CSU model, M3Dry 
 ![image](https://user-images.githubusercontent.com/12100276/165372939-ccfa2c55-8a45-4604-9a62-31e0887baa5e.png)
 Deposition pathways of the STAGE-CSU implementation.
 
-**Significance and Impact**:
+**Significance and Impact**:  
 1.	This pull request revises the formula for Rb_leaf which results in lower resistances to vegetation with LAI > 4.6 and higher resistance to deposition otherwise. This primarily impacts HNO3 and other species with low/no canopy resistance. Model differences are small and typically less than 1 ppb.
 2.	Changes 2 and 3 result in about a 15% increase in summertime NH3 concentrations over the CONUS domain with decreases in heavily agricultural areas. This results in a reduction in the model bias and error.
 
@@ -103,7 +183,7 @@ Time series of PM2.5 from STAGE using the CSU aerosol deposition velocity, black
 ![image](https://user-images.githubusercontent.com/12100276/165374388-27999a12-981f-4b15-b7f0-557a6471b691.png)
 July 2016 stacked barplots. From left to right, AQS daily observations, STAGE with CSU aerosol deposition option, STAGE with M3Dry aerosol deposition option, STAGE with v5.3 aerosol deposition option
 
-**References**: 
+**References**:   
 Campbell and Norman, An introduction to Environmental Biophysics, Springer New York, NY, https://doi.org/10.1007/978-1-4612-1626-1: 1998  
 
 Emerson, E.W., Hodshire, A.L., DeBolt, H.M., Farmer, D.K., Revisiting particle dry deposition and its role in radiative effect estimates. Proceedings of the National Academy of Sciences, 117(42), 26076-26082, https://doi.org/10.1073/pnas.2014761117: 2020 
