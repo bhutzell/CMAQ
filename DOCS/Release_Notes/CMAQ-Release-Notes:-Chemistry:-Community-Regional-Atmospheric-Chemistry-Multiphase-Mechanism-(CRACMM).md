@@ -1,3 +1,83 @@
+# Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM)
+
+### Updated mechanism CRACMM3
+[Havala Pye](mailto:pye.havala@epa.gov),  U.S. Environmental Protection Agency    
+**Type of update**: Science Update  
+**Release Version/Date**: CMAQv6.0beta   
+
+**Description**: 
+ 
+
+**Significance and Impact**:  
+ 
+
+**References**:  
+
+
+### Halogen chemistry in CRACCM3M
+[Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Science Update  
+**Release Version/Date**: CMAQv6.0beta  
+
+**Description**:  
+This update contains four different items: (1) NOY definition in the current SpecDef files for CRACMM2 and CRACMM3 contain an error which is now fixed (2) It adds halogen (Cl, Br, I) chemistry to CRACMM3 and creates a new marine mechanism (CRACMM3M). Current model (MGEMIS.F) contains an error for grid-cell area calculation for halogen emissions which is fixed in the pull request. A new Euler Backward Iterative (EBI) solver is developed. (3) CMAQ with cb6r5m_ae7_aq did not compile due to changes made in CRACMM3M. Several heterogeneous reactions in cb6r5m_ae7_aq are relabeled (without making any chemistry changes). Update made in MGEMIS.F for grid-cell area calculation also affects halogen emissions in cb6r5m_ae7_aq. (4) CMAQ with cb6r5_ae7_aq was also tested due to the update in MGEMIS.F. 
+
+**Significance and Impact**:  
+Item #1: Correcting NOY definition:  
+It does not directly affect CMAQ results and no test involving CMAQ was performed.
+
+Item #2: Halogen chemistry with CRACMM3 (CRACMM3M):  
+Halogen chemistry reduces O3 over seawater and land by up to 8.0 ppb. Larger reductions occur over the seawater than over the land. Halogen chemistry reduces surface O3 by 13% over the seawater (annually). However, halogen chemistry has marginal effects on model PM2.5 concentrations. 
+
+Item #3: Updates in cb6r5m_ae7_aq:  
+Update in MGEMIS.F increases ozone and reduces sulfate over low latitude areas due to the changes in gid-cell area estimates. Incorporation of the map-scale factor (msfx2) into the calculation lowers the grid-cell area estimates near the equator and subsequently reduces halogen and DMS emissions. 
+
+Item #4: Updates in cb6r5_ae7_aq:  
+Update in MGEMIS.F has minimum impacts on ozone and sulfate over the contiguous US.
+
+**References**:   None
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1212](https://github.com/USEPA/CMAQ_Dev/commit/8d512cc361675212430b579adc766c010309bdd1) | [PR#1212](https://github.com/USEPA/CMAQ_Dev/pull/1212)  |
+
+### Photolysis of aerosol nitrate in CRACCM3M
+[Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Science Update  
+**Release Version/Date**:  CMAQv6.0beta  
+
+**Description**:  
+This updates adds photolysis of aerosol nitrate (ANO3) to the CRACMM3 marine mechanism (CRACMM3M) following the procedure described in Sarwar et al., 2024. A new Euler Backward Iterative (EBI) solver is developed.
+
+**Significance and Impact**: 
+Model ozone (O3) concentrations without the photolysis of aerosol nitrate are shown in Figure 1a. Higher values are predicted over the land than over seawater. Model O3 enhancements with the photolysis of aerosol nitrate are shown Figure 1b. Consistent with the results shown in Sarwar et al. (2024) for CB6, aerosol nitrate photolysis enhances O3 over seawater and land by large margins. Larger enhancement occur over the western U.S. than over the eastern U.S.
+
+![image](https://github.com/user-attachments/assets/1b276ad3-11eb-4e5b-a9f1-d8d9a2b5a2a3)
+Figure 1: (a) CMAQ predicted O3 with CRACMM2M (without the aerosol nitrate photolysis) in May (b) Impact of the aerosol nitrate photolysis on O3 compared to those without the aerosol nitrate photolysis in May
+
+Monthly Mean Bias was calculated by using model predicted daily maximum 8 hour average (MDA8) O3 and observed data from the AQS monitoring network over the western and eastern U.S (Figure 2(a-b)). Over the western U.S., model without the aerosol nitrate photolysis underpredicts observed data in most months while model with the aerosol nitrate photolysis eliminates the negative bias. Over the eastern U.S., model without the aerosol nitrate photolysis has mixed impacts on model performance producing negative bias in January-May and positive bias in June-December. Model with the aerosol nitrate photolysis eliminates the negative bias in January-May, but slightly deteriorates bias in June-December.
+
+![image](https://github.com/user-attachments/assets/efeef818-6491-45d1-9983-c717e841d97b)
+Figure 2: (a) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the western U.S. (b) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. 
+
+Model PM2.5 concentrations without the photolysis of aerosol nitrate are shown in Figure 3a. Higher values are predicted over land than over seawater. Changes in model PM2.5 concentrations with the photolysis of aerosol nitrate are shown Figure 3b. It only affects model PM2.5 concentrations by small margins. Reductions occur due to the loss aerosol nitrate by photolysis while the enhancements occur from the changes in secondary aerosols due to the changes in oxidant levels. 
+
+![image](https://github.com/user-attachments/assets/a229bc46-7396-482d-808c-e16e14a614cf)
+Figure 3: (a) CMAQ predicted mean PM2.5 wth CRACMM2M (without the aerosol nitrate photolysis) in May (b) Impact of the aerosol nitrate photolysis on PM2.5 compared to those without the aerosol nitrate photolysis in May
+
+Monthly Mean Bias was calculated by using predicted daily mean PM2.5 and observed data from the AQS monitoring network over the western and eastern U.S (Figure 4(a-b)). Bias without and with the aerosol nitrate photolysis in each month is similar over western and eastern U.S. Thus, the aerosol nitrate photolysis has low impacts on model performance for PM2.5.
+
+![image](https://github.com/user-attachments/assets/3ad7743e-e8c3-40b4-963f-eb45d0b84435)
+Figure 4: (a) Monthly Mean Bias of daily mean PM2.5  without and with aerosol nitrate photolysis at AQS sites over the western U.S. (b) Monthly Mean Bias of daily mean PM2.5  without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. 
+
+**References**:   
+Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A., B., Lee, J., Carpenter, L. J.: Examining the Impact of the photolysis of aerosol nitrate over Northern Hemisphere, Science of the Total Environment, 917, 170406, 2024. 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1214](https://github.com/USEPA/CMAQ_Dev/commit/f807233e2354b0d270aba2b2207393ddacb4a1af) | [PR#1214](https://github.com/USEPA/CMAQ_Dev/pull/1214)  |
+
+
 ### Updated mechanism CRACMM2
 [Nash Skipper](mailto:skipper.nash@epa.gov) and [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
