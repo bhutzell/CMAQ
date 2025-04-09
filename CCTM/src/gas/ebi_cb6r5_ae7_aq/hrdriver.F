@@ -83,8 +83,10 @@ C**********************************************************************
       USE CENTRALIZED_IO_MODULE, ONLY : INTERPOLATE_VAR, OCEAN, SZONE
 #ifdef sens
       USE DDM3D_CHEM
-      Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, NP, NPMAX, CKTIME
+      Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH,
+     &                      SENGRID, NP, NPMAX, CKTIME
 #endif
+      
       USE CONST, ONLY: MWAIR, MWWAT, STDATMPA
 
       IMPLICIT NONE
