@@ -27,7 +27,7 @@ While initially planned for fall 2026, the status and timing of any final releas
 ## Differences in CMAQv6.0 beta 1 and beta 2
 The beta 1 version (v6.0b1; **this branch**) includes the science and feature updates described above.   
 
-The beta 2 version (v6.0b2) removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library.  This update makes the code for the offline CMAQ model consistent with the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for easier developement and maintenance across all three versions.
+The beta 2 version (v6.0b2) is identical to version 1 but removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library.  This update makes the code for the offline CMAQ model consistent with the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for easier developement and maintenance across all three versions.
 
 
 ## Getting the CMAQ Repository
