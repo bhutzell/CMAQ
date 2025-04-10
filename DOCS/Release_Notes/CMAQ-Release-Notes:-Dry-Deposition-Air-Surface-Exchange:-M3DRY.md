@@ -3,7 +3,7 @@
 ### Updates of minimum Kz for M3Dry
 [Jon Pleim](mailto:pleim.jon@pa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
-**Release Version/Date**:  V6.0beta  
+**Release Version/Date**:  V6.0 beta1 and beta 2  
 
 **Description**:   
 Changes the minimum Kz from 1.0 m2/s to 0.01 m2/s when the Kzmin flag is set to False.  This minimum Kz is the same as used in WRF.  Also, when Kzmin flag is set to True, changes the height above ground where Kzmin is set according to fraction of urban LU from 500 m to the PBLHT.
