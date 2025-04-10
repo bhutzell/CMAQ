@@ -621,7 +621,7 @@
      &                       /3600.0 ! get time units right: emissions are in the unit of moles/s
                        ELSE IF (LNO_OPTION == 3) THEN
                           COLUMN_LTNG_NO( COL,ROW ) =
-     &                     ( LTNG_DATA( COL,ROW,GegIdx )*GamaF2E)
+     &                     ( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E)
      &                       / 3600.0 ! get time units right: emissions are in the unit of moles/s
 ! LNO using maximum of GLMeng and WLNeng with daily Beta/Gama values
                        ELSE IF (LNO_OPTION == 4) THEN 
