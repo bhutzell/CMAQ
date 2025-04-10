@@ -3,7 +3,7 @@
 ### MIO: New functions for input/output commands and other utilities
 [Chris Nolte](mailto:nolte.chris@epa.gov) and [David Wong](mailto:wong.david-c@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Restructure   
-**Release Version/Date**:  CMAQv6.0 **beta 2 only**
+**Release Version/Date**:  CMAQv6.0 *beta 2 only*
 
 **Description**:  
 The MIO update removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library. This update makes the code for the offline CMAQ model consistent with the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for substantially easier developement and maintenance across all three versions. To implement this update input/output functions and other utilities such as calendar functions that previously relied on the I/O API library (developed and maintained by [Carlie Coats](https://github.com/cjcoats)) have been added to the CMAQ source code under CCTM/src/mio. In addition, this update moves functions related to log warnings and messages from the RUNTIMEVARS module into the logdev_mod module (both under CCTM/src/util/util/).  
