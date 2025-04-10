@@ -31,7 +31,7 @@ There are several options in the CMAQ system that have not yet been implemented 
 3. [Windowing capability](../Users_Guide/CMAQ_UG_ch04_model_inputs.md#431-windowing-capability) (i.e, subsetting inputs when the domain of the input files is larger than the simulation domain)
 
 **References**:   
-Portions Copyright ©1992-2002 MCNC and Carlie J. Coats, Jr., 2003-2013 by Baron Advanced Meteorological Systems, © 2005-2013, 2017- Carlie J. Coats, Jr., and , and © 2014- UNC Institute for the Environment. Please see the disclaimers contained in the (I/O API Copyright Notice file)[https://cjcoats.github.io/ioapi/NOTICES.html].
+Portions Copyright ©1992-2002 MCNC and Carlie J. Coats, Jr., 2003-2013 by Baron Advanced Meteorological Systems, © 2005-2013, 2017- Carlie J. Coats, Jr., and , and © 2014- UNC Institute for the Environment. Please see the disclaimers contained in the [I/O API Copyright Notice file](https://cjcoats.github.io/ioapi/NOTICES.html).
 
 
 |Merge Commit | Internal record|
