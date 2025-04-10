@@ -240,6 +240,13 @@
                     GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
                ELSE IF (LNO_OPTION == 3) THEN
                     GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
+                    GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
+                    IF(sum(LTNG_DATA4D(:,:,1,:,GflIdx)) > 0) then
+                    BetaF2E = sum(LTNG_DATA4D(:,:,1,:,GegIdx))/(sum(LTNG_DATA4D(:,:,1,:,GflIdx))*SQUAREKM)
+                    BetaF2E = MOLSNCG/BetaF2E                 !moles N per flash energy of GLM
+                 ELSE
+                    BetaF2E = 0
+                 ENDIF
                ELSE IF (LNO_OPTION >= 4) THEN
                     GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
                     GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
