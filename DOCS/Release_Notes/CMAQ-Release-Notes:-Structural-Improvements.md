@@ -1,9 +1,47 @@
 # Structural Improvements
 
-### Replace CONST.EXT include file with module and update constant values  
-**Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+### MIO: New functions for input/output commands and other utilities
+[Chris Nolte](mailto:nolte.chris@epa.gov) and [David Wong](mailto:wong.david-c@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Restructure   
-**Release Version/Date**:  CMAQ v6.0beta  
+**Release Version/Date**:  CMAQv6.0 **beta 2 only**
+
+**Description**:  
+The MIO update removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library. This update makes the code for the offline CMAQ model consistent with the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for substantially easier developement and maintenance across all three versions. To implement this update input/output functions and other utilities such as calendar functions that previously relied on the I/O API library (developed and maintained by [Carlie Coats](https://github.com/cjcoats)) have been added to the CMAQ source code under CCTM/src/mio. In addition, this update moves functions related to log warnings and messages from the RUNTIMEVARS module into the logdev_mod module (both under CCTM/src/util/util/).  
+
+(*talk about how current implantation relies on input file to specify the output files and variables to be written to each output file (this interacts with ELMO). this file is generated in the code from user settings.*)  
+(*talk about replacement_util module?*)
+
+The following environment variables are required in the CCTM run script to utilize the new MIO module. Note these updates are included in the sample runscripts of v60b2 under CCTM/scripts.
+1. remove the option -v from output file environment variables, e.g., ```setenv CTM_CONC_1      $OUTDIR/CCTM_CONC_${CTM_APPL}.nc ```
+2. ```setenv CTM_MIO_FILE Y``` *(turn on generation of MIO_ASCII file; code will crash if this is not set to Y)*  
+3. ```setenv MISC_FILE_INFO ${path}$``` *(directory where MIO file will be written)*  
+4.  ```
+    setenv mio_file_info $OUTDIR/mio_file_input_${CTM_APPL}.txt  
+    setenv CTM_MIO_INPUT "INIT_CONC_1"
+    ```
+    *(for now, need at least one input file)*  <- I think this will require further explanation
+5. ```setenv ncd_64bit_offset Y``` *(needed when using netcdf4)*    
+
+**Significance and Impact**:   
+[other positive things about mio's purpose ...] CMAQ output files are unchanged by this update.  Although CCTM no longer requires installation of the I/O API library several PREP and POST tools within the CMAQ repository retain this dependency (e.g., ICON, BCON, COMBINE).  \
+
+There are several options in the CMAQ system that have not yet been implemented with MIO and so will not work with this version of CMAQv6.0 beta.  These include:
+1. VERTEXT option (<- this option is not actually listed in Appendix A!)
+2. Generating MCIP-like outputs when running the WRF-CMAQ coupled model
+3. [Windowing capability](../Users_Guide/CMAQ_UG_ch04_model_inputs.md#431-windowing-capability) (i.e, subsetting inputs when the domain of the input files is larger than the simulation domain)
+
+**References**:   
+Portions Copyright ©1992-2002 MCNC and Carlie J. Coats, Jr., 2003-2013 by Baron Advanced Meteorological Systems, © 2005-2013, 2017- Carlie J. Coats, Jr., and , and © 2014- UNC Institute for the Environment. Please see the disclaimers contained in the (I/O API Copyright Notice file)[https://cjcoats.github.io/ioapi/NOTICES.html].
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+
+
+### Replace CONST.EXT include file with module and update constant values  
+[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Restructure   
+**Release Version/Date**: CMAQv6.0 beta 1 and beta 2
 
 **Description**:   
 In this PR, the code is restructured to define and use a CONST module in lieu of the CONST.EXT include file. 
