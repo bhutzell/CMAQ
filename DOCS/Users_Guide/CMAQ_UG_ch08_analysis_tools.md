@@ -18,7 +18,7 @@ Many software programs are freely available for pre- and post-processing, evalua
 |**Software**|**Description**|     **Source**    |
 |------------|-------------------------------|---------------------------------------------|
 |***Post-processing***|||
-|CMAQ POST Tools|Programs released with CMAQ source code to prepare output data for model evaluation|[https://github.com/USEPA/CMAQ](../../POST/README.md)|
+|CMAQ POST Tools|Programs released with CMAQ source code to prepare output data for model evaluation|[https://github.com/USEPA/CMAQ/blob/main/POST/README.md](https://github.com/USEPA/CMAQ/blob/main/POST/README.md)|
 |I/O API Tools|Postprocessing tools for manipulating data in the I/O API/netCDF format|[https://www.cmascenter.org/ioapi](https://www.cmascenter.org/ioapi)|
 |NCO|netCDF Operators: Postprocessing tools for manipulating data in the netCDF format|[http://nco.sourceforge.net](http://nco.sourceforge.net)
 |***Evaluation/Visualization***| | |
@@ -33,24 +33,57 @@ This chapter briefly describes how to use some of the software tools supported b
 
 ## 8.2 Aggregating and Transforming Model Species Concentrations
 
-The *combine* Fortran program, released as part of the CMAQ POST tools, can combine variables from CMAQ output, emissions, or meteorology files into a new I/O API file. Model species can be aggregated or transformed into variables of interest, e.g., to change units from ppmV to ppbV or match observed quantities from a specific monitoring network. Model output files can be concatenated to create files for longer time periods, e.g., files with hourly data for individual days can be combined into a single file for an entire month.  More information on the *combine* utility and its use can be found in this [README file.]( ../../POST/combine/README.md) 
+### 8.2.1 Using ELMOv2
+With version 2 of the Explicit and Lumped CMAQ Model Output (ELMO) module, users can precisely specify the variables 
+present on simulation output files, along with several file attributes (e.g. file name, temporality, number of layers). 
+Potential variables include concentration and deposition flux fields for CMAQ model species; aggregated quantities like 
+NOX, PM25 mass, or PM10 mass; diagnostic variables like particle size, number, and AOD; and environmental parameters temperature, 
+relative humidity, and PBL height.  
 
-The *combine* utility relies on a chemical mechanism-specific "Species Definition" files that prescribe how CMAQ output variables should be mapped and/or combined to become comparable to different measured gas, particle, and deposition species. When you download the CMAQ code, the Species Definition files corresponding to default model output variables are automatically included under the subdirectory "CCTM/src/MECHS".  Within each of the listed mechanism folders, you will find files "SpecDef_MECH_NAME.txt" (for gas and aerosol species) and "SpecDef_dep_MECH_NAME.txt" (for deposition species) that contain a long list of species definitions and corresponding documentation. For example, the calculation of NO<sub>X</sub> in ppbV is given as
+User have full control over how to mix variables across any number of customized output files 
+([CCTM_ELMO](CMAQ_UG_ch07_model_outputs.md#ELMO)), and may use Keywords provided in the CMAQ Control Namelist to quickly 
+and robustly activate predefined lists of variables commonly used together (e.g. all fine PM species, or NO2 column and 
+Pressure). See [Appendix F](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more information about the calculation of ELMO output variables 
+and how this relates to use of the *combine* tool.  
+
+Although ELMOv2 offers incredible capabilities for online processing of CMAQ metrics, most simulations are executed for 
+24-hr periods (due to typical constraints of model inputs). Post-processing steps are still often attractive for 
+concatenating 24-hr output files to monthly or yearly files.  
+
+### 8.2.2 Post-procesing with COMBINE
+The *combine* Fortran program, released as part of the CMAQ POST tools, can combine variables from CMAQ output, emissions, 
+or meteorology files into a new I/O API-style file. Model species can be aggregated or transformed into variables of interest, e.g., 
+to change units from ppmV to ppbV, or to match observed quantities from a specific monitoring network. Model output files can be 
+concatenated to create files for longer time periods, e.g., files with hourly data for individual days can be combined into a 
+single file for an entire month.  More information on the *combine* utility and its use can be found in this [README file.][Link_8.2]
+
+The *combine* utility relies on a chemical mechanism-specific "Species Definition" file that prescribes how variables 
+should be mapped and/or combined. When you download the CMAQ code, the Species Definition files corresponding to 
+default model output variables are automatically included under the subdirectory "CCTM/src/MECHS".  Within each of the 
+listed mechanism folders, you will find files "SpecDef_Conc_MECH_NAME.txt" (for gas and aerosol species) and 
+"SpecDef_Dep_MECH_NAME.txt" (for deposition species) that contain a long list of species definitions and corresponding 
+documentation. For example, the calculation of NO<sub>X</sub> in ppbV is given 
+as:  
 ```
 NOX             ,ppbV      ,1000.0*(NO[1] + NO2[1])
 ```
-where NO and NO2 are pulled from an hourly instantaneous [CCTM_CONC](CMAQ_UG_ch07_model_outputs.md#conc) or hourly average [CCTM_ACONC](CMAQ_UG_ch07_model_outputs.md#aconc) model output file in units of ppmV. 
+where NO and NO2 are pulled from an hourly instantaneous [CCTM_CONC](CMAQ_UG_ch07_model_outputs.md#conc) or hourly 
+average [CCTM_ACONC](CMAQ_UG_ch07_model_outputs.md#aconc) model output file in units of ppmV. 
 
-Note that some species aggregation is already happening within the CMAQ model. The CMAQ aerosol module explicitly represents a number of individual aerosol species that need to be combined for comparisons to measured total PM<sub>2.5</sub> mass.  The Explicit and Lumped Model Output (ELMO) capability introduced in CMAQv5.4 prescribes the calculation of aggregated aerosol species (e.g., PM<sub>1</sub>, PM<sub>2.5</sub>, and PM<sub>10</sub>),  as well as diagnostic values (e.g., aerosol surface area and number) and CMAQ calculates them online.  The species are then written to the [CCTM_ELMO](CMAQ_UG_ch07_model_outputs.md#ELMO) or [CCTM_AELMO](CMAQ_UG_ch07_model_outputs.md#AELMO) output files. 
+The "SpecDef_Conc_MECH_NAME.txt" file relies on concentration output from the CCTM_CONC (or CCTM_ACONC) files, 
+aerosol property output from the ELMO module, and meteorological variables for completing all of its calculations. 
+These "SpecDef_Conc_MECH_NAME.txt" files are provided for all Carbon Bond 6-based mechanisms and all CRACMM-based 
+mechanisms. The SpecDef_Dep_MECH_NAME.txt files are also provided to processes output from the standard deposition 
+files WETDEP1 and DRYDEP.  
 
-The "SpecDef_MECH_NAME.txt" file relies on output from the CCTM_CONC (or CCTM_ACONC) and the CCTM_ELMO (or CCTM_AELMO) files in addition to meteorological variables for completing all of its calculations. Generally, gas-phase species coming from the direct CCTM_CONC output and aerosol species from CCTM_ELMO. For reference and transparency, each mechanism folder also includes a file named "SpecDef_Conc_MECH_NAME.txt", which processes both gas- and aerosol species from the CCTM_CONC file (CCTM_ELMO variables is still needed for applying hard bounds on particle size, like 2.5 um). These "SpecDef_Conc_MECH_NAME.txt" files are provided for all Carbon Bond 6-based mechanisms and all CRACMM-based mechanisms. Either of these two approaches should yield highly similar or exactly equal results.  
-
-Finally, the SpecDef_Dep_MECH_NAME.txt files are provided to processes deposition variable output from CMAQ.  
-
-See [Apendix F](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more information about the calculation of ELMO output variables and how this relates to use of the *combine* tool.
+If Users leverage ELMOv2 for fully customized output files, the COMBINE utility is still incredibly useful for 
+concatenating 24-hr files to longer time periods (there are other tools for accomplishing this task though). If COMBINE 
+is used, it may be run in GENSPEC mode to generate a SpecDef file given all of the variables on an input file. This 
+alleviates Users from the tedious task of writing their own SpecDef file to process large output CMAQ files with 
+numerous variables. 
 
 ## 8.3 Model-Observation Pairing for Model Evaluation 
- Once model output has been processed using *combine*, the *sitecmp* and *sitecmp_dailyo3* utilities can be used to match air pollutant measurements with the appropriate model predicted variables.  This pairing of model and observed variables is specified in the run scripts for *sitecmp* and *sitecmp_dailyo3*.  In *sitecmp_dailyo3* this step is controlled by the definition of environment variables OBS_SPECIES and OZONE.  See the [README.md](../../POST/sitecmp_dailyo3/README.md) and the sample run script in the [*sitecmp_dailyo3* scripts](https://github.com/USEPA/CMAQ/tree/main/POST/sitecmp_dailyo3/scripts) folder for more information on setting these environment variables.  The run script for the *sitecmp* utility can be customized for many different types of chemical and meteorological quantities as described in the [README.md](../../POST/sitecmp/README.md) for sitecmp.  Sample run scripts for the AQS, CSN, IMPROVE, NADP and SEARCH networks based on the 2016 CMAQ test case are provided in the [*sitecmp* scripts](https://github.com/USEPA/CMAQ/tree/main/POST/sitecmp_dailyo3/scripts) folder.  In addition, the [README.md](../../POST/sitecmp/scripts/README.md) file within the *sitecmp* scripts folder provides the configuration options for monitoring networks.  Note that there are multiple formats for CSN and SEARCH observed data files depending on the year.  The README.txt file is broken into different sections to reflect the change in species names in the observation files for these two networks.  (For example, elemental carbon measurements from the CSN network are labeled as “ec_niosh” in 2009 and earlier, “ec_tor” in 2010, and “88380_val” starting in 2011.)
+ Once model output has been processed using *combine*, the *sitecmp* and *sitecmp_dailyo3* utilities can be used to match air pollutant measurements with the appropriate model predicted variables.  This pairing of model and observed variables is specified in the run scripts for *sitecmp* and *sitecmp_dailyo3*.  In *sitecmp_dailyo3* this step is controlled by the definition of environment variables OBS_SPECIES and OZONE.  See the [README.md][link_8.3] and the sample run script in the [*sitecmp_dailyo3* scripts][link_8.3_II] folder for more information on setting these environment variables.  The run script for the *sitecmp* utility can be customized for many different types of chemical and meteorological quantities as described in the [README.md][link_8.3_III] for sitecmp.  Sample run scripts for the AQS, CSN, IMPROVE, NADP and SEARCH networks based on the 2016 CMAQ test case are provided in the [*sitecmp* scripts][link_8.3_IV] folder.  In addition, the [README.md][link_8.3_IV] file within the *sitecmp* scripts folder provides the configuration options for monitoring networks.  Note that there are multiple formats for CSN and SEARCH observed data files depending on the year.  The README.txt file is broken into different sections to reflect the change in species names in the observation files for these two networks.  (For example, elemental carbon measurements from the CSN network are labeled as “ec_niosh” in 2009 and earlier, “ec_tor” in 2010, and “88380_val” starting in 2011.)
 
 ### 8.3.1 Spatial matching in sitecmp and sitecmp_dailyo3
 In *sitecmp*, model values are extracted for the grid cell containing the monitor location. In *sitecmp_dailyo3* the model value of the grid cell containing the observation is provided, as well as the maximum model value of the 9 grid cells centered on the monitor location. These variables in the output file contain the character string "9cell" in the variable name.
@@ -79,7 +112,7 @@ The network data available include: AERONET, AMON, AQS, CASTNET, CSN, FLUXNET, I
 
 ## 8.5 Visualization Environment for Rich Data Interpretation (VERDI)
 
-The Visualization Environment for Rich Data Interpretation (VERDI) is a visual analysis tool for evaluating and plotting multivariate gridded results from meteorological and air quality models.  VERDI is written in Java, so it can be run on a variety of computer operating systems; VERDI packages are currently released for Linux, Windows, and Mac.  In addition to supporting the CMAQ modeling system, VERDI also currently supports analysis and visualization of model results from the regional [Weather Research and Forecasting (WRF) model](https://ncar.ucar.edu/what-we-offer/models/weather-research-and-forecasting-model-wrf), the global [Model for Prediction Across Scales (MPAS)](https://ncar.ucar.edu/what-we-offer/models/model-prediction-across-scales-mpas), the [Meteorology-Chemistry Interface Processor (MCIP)](../../PREP/mcip/README.md), and the [Comprehensive Air Quality Model with Extensions (CAMx)](http://www.camx.com).  In addition, VERDI can read and overlay observational data at monitoring site locations to visually compare model results to observations, both spatially and temporally.
+The Visualization Environment for Rich Data Interpretation (VERDI) is a visual analysis tool for evaluating and plotting multivariate gridded results from meteorological and air quality models.  VERDI is written in Java, so it can be run on a variety of computer operating systems; VERDI packages are currently released for Linux, Windows, and Mac.  In addition to supporting the CMAQ modeling system, VERDI also currently supports analysis and visualization of model results from the regional [Weather Research and Forecasting (WRF) model](https://ncar.ucar.edu/what-we-offer/models/weather-research-and-forecasting-model-wrf), the global [Model for Prediction Across Scales (MPAS)](https://ncar.ucar.edu/what-we-offer/models/model-prediction-across-scales-mpas), the [Meteorology-Chemistry Interface Processor (MCIP)][link_8.5], and the [Comprehensive Air Quality Model with Extensions (CAMx)](http://www.camx.com).  In addition, VERDI can read and overlay observational data at monitoring site locations to visually compare model results to observations, both spatially and temporally.
 
 VERDI’s interactive graphical user interface (GUI) allows for quick examination of model results, while the command line scripting capability in VERDI can be used for more routine analysis and plot production.  Supported input data formats include I/O API, netCDF (both WRF-style and MPAS-style), and UAM-IV from models and ASCII text, and netCDF for observational data sets.  Supported map projections include Lambert conformal conic, Mercator, Universal Transverse Mercator, and polar stereographic.  
 
@@ -96,3 +129,21 @@ The CMAS Center currently hosts VERDI at https://www.cmascenter.org/verdi, provi
 CMAQv5.5 User's Guide <br>
 
 <!-- END COMMENT -->
+
+<!-- START_OF_COMMENT --> 
+
+[link_8.2]: ../../POST/combine/
+[link_8.3]: ../../POST/sitecmp_dailyo3/
+[link_8.3_II]: ../../POST/sitecmp_dailyo3/scripts/
+[link_8.3_III]: ../../POST/sitecmp/
+[link_8.3_IV]: ../../POST/sitecmp/scripts/
+[link_8.5]: ../../PREP/mcip/
+
+<!-- END_OF_COMMENT -->
+
+[link_8.2]: https://github.com/USEPA/CMAQ/blob/main/POST/combine/
+[link_8.3]: https://github.com/USEPA/CMAQ/blob/main/POST/sitecmp_dailyo3/
+[link_8.3_II]: https://github.com/USEPA/CMAQ/blob/main/POST/sitecmp_dailyo3/scripts/
+[link_8.3_III]: https://github.com/USEPA/CMAQ/blob/main/POST/sitecmp/
+[link_8.3_IV]: https://github.com/USEPA/CMAQ/blob/main/POST/sitecmp/scripts/
+[link_8.5]: https://github.com/USEPA/CMAQ/blob/main/PREP/mcip/

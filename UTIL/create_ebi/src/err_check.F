@@ -14,7 +14,6 @@ C
 C**********************************************************************
       USE ENV_VARS
       USE GLOBAL_DATA
-!      USE M3UTILIO    ! IOAPI parameters and declarations
       USE RXNS_DATA   ! mechanism data and specifications
 
 

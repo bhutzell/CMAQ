@@ -6,6 +6,10 @@
 
       INTEGER, PARAMETER      ::  MAXOUTFLS = 20 ! Max No. of output files generated
 
+      INTEGER, PARAMETER      ::  MAX_LINE_CONTINUE = 225 ! Max No. of fortran line continuations
+
+c...Global iout unit
+      INTEGER    :: GLOBAL_IOUT
 
 c..Group species indices
       INTEGER    ::  NO   = 0
