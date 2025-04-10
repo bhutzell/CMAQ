@@ -13,7 +13,6 @@ C
 C**********************************************************************
       USE ENV_VARS
       USE GLOBAL_DATA
-      !!USE M3UTILIO ! IOAPI parameters and declarations
       USE RXNS_DATA
 
       IMPLICIT NONE
@@ -50,7 +49,6 @@ C..SCRATCH LOCAL VARIABLES:
       INTEGER  :: E1, E2       ! end pos of string
       INTEGER  :: IND          ! array index
       INTEGER  :: IIN          ! Unit no. of input file
-      INTEGER  :: IOUT         ! Unit no. of output file
       INTEGER  :: N, S, P, R   ! Loop indices
       INTEGER  :: NR           ! No. of reactants
       INTEGER  :: NPOS         ! Reaction index
@@ -88,9 +86,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       FNAME = OUTPATH( 1 : E1 ) // '/hrg3.F' 
 
-      IOUT = JUNIT()
+      GLOBAL_IOUT = JUNIT()
 
-      OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
+      OPEN( UNIT = GLOBAL_IOUT, FILE = FNAME, ERR = 9000 )
 
 
       IIN = JUNIT()
@@ -102,9 +100,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       OPEN( UNIT = IIN, FILE = FNAME, ERR = 9000 )
 
 
-      IF( LWR_COPY ) CALL WR_COPYRT( IOUT )
+      IF( LWR_COPY ) CALL WR_COPYRT( GLOBAL_IOUT )
 
-      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( IOUT )
+      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( GLOBAL_IOUT )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Read, modify, and write 1st section of code from template
@@ -116,13 +114,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LINEIN( 1 : 2 ) .EQ. 'R1' ) THEN
 
-         WRITE( IOUT, 93000 ) TRIM( MECHNAME )
+         WRITE( GLOBAL_IOUT, 93000 ) TRIM( MECHNAME )
 
          GO TO 100
 
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'R2' ) THEN
 
-         WRITE( IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
+         WRITE( GLOBAL_IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
 
          GO TO 100
 
@@ -136,7 +134,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             LINOUT = '      REAL( 8 ) ::   K8_8         ! K' //
      &         SPOUT( 1 : E1 ) // '+' //  SPOUT( 1 : E1 ) // ' * delta t'
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
           
             SPOUT = SPECIES( PAN )
@@ -151,7 +149,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             LINOUT = LINOUT( 1 : E1 ) // SPOUT( 1 : E2 ) //
      &          ' * delta t'
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
              
 
             SPOUT = SPECIES( C2O3 )
@@ -171,7 +169,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             LINOUT = LINOUT( 1 : E1 ) // SPOUT( 1 : E2 ) // 
      &         ' * [NO2] * delta t'
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             LFIRST_R3 = .FALSE.
 
@@ -188,7 +186,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       ELSE
 
-         WRITE( IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
+         WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
 
          GO TO 100
 
@@ -205,8 +203,8 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       E1 = LEN_TRIM( SPECIES( C2O3 ) )
       E2 = LEN_TRIM( SPECIES( PAN ) )
-      WRITE( IOUT, 92000 )
-      WRITE( IOUT, 94000 ) SPECIES( C2O3 )( 1 : E1 ), SPECIES( PAN )( 1 : E2 )
+      WRITE( GLOBAL_IOUT, 92000 )
+      WRITE( GLOBAL_IOUT, 94000 ) SPECIES( C2O3 )( 1 : E1 ), SPECIES( PAN )( 1 : E2 )
 
 c..Determine the reactions to include & get coefficients for the prod terms
       LRXN1 = .TRUE.
@@ -238,7 +236,7 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
@@ -252,8 +250,8 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       SPOUT = SPECIES( C2O3 )
       E1 = LEN_TRIM( SPOUT )
-      WRITE( IOUT, 92000 )
-      WRITE( IOUT, 94020 ) SPOUT( 1 : E1 ), SPOUT( 1 : E1 ), SPOUT( 1 : E1 )
+      WRITE( GLOBAL_IOUT, 92000 )
+      WRITE( GLOBAL_IOUT, 94020 ) SPOUT( 1 : E1 ), SPOUT( 1 : E1 ), SPOUT( 1 : E1 )
       LRXN1 = .TRUE.
       DO N = 1, NRXNS         
 
@@ -282,7 +280,7 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
        
@@ -295,8 +293,8 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       SPOUT = SPECIES( PAN )
       E1 = LEN_TRIM( SPOUT )
-      WRITE( IOUT, 92000 )
-      WRITE( IOUT, 94040 ) SPOUT( 1 : E1 )
+      WRITE( GLOBAL_IOUT, 92000 )
+      WRITE( GLOBAL_IOUT, 94040 ) SPOUT( 1 : E1 )
       LRXN1 = .TRUE.
       DO N = 1, NRXNS         
 
@@ -321,7 +319,7 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
@@ -329,8 +327,8 @@ c..call routine to create output line & write it
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  R8_8, R8_9, and R9_8 terms
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      WRITE( IOUT, 92000 )      
-      WRITE( IOUT, 94060 )
+      WRITE( GLOBAL_IOUT, 92000 )      
+      WRITE( GLOBAL_IOUT, 94060 )
 
 c..K8,8 term ( C2O3+C2O3=)
 !      DO N = 1, NRXNS
@@ -338,17 +336,17 @@ c..K8,8 term ( C2O3+C2O3=)
 !            WRITE( RNUM, '( I5 )' ) N
 !            LINOUT = '      K8_8  = RKI( ' // RNUM // ' ) * DTC'
 !            E1 = LEN_TRIM( LINOUT )
-!            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+!            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 !         END IF
 !      END DO
       IF( RXN_C2O3_SELF .GT. 0 )THEN
          WRITE( RNUM, '( I5 )' ) RXN_C2O3_SELF
          LINOUT = '      K8_8  = RKI( ' // RNUM // ' ) * DTC'
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
       ELSE
          LINOUT = '      K8_8  = 0.0D0'
-         WRITE( IOUT, 92000 ) TRIM( LINOUT )      
+         WRITE( GLOBAL_IOUT, 92000 ) TRIM( LINOUT )      
       END IF
 
 c..R8,9 term ( production of C2O3 fro PAN )
@@ -365,10 +363,10 @@ c            LINOUT = '      R8_9  = RKI( ' // RNUM // ' ) * DTC'
                  LINOUT = '     &      +   RKI( ' // RNUM // ' ) '
             END IF
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92040, ADVANCE= 'NO' ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92040, ADVANCE= 'NO' ) LINOUT( 1 : E1 )
          END IF
       END DO
-      WRITE( IOUT, 92060)
+      WRITE( GLOBAL_IOUT, 92060)
 
 
 c..R9,8 term ( production of PAN from C2O3 )
@@ -390,10 +388,10 @@ c..R9,8 term ( production of PAN from C2O3 )
      &          SPOUT( 1 : E2 ) // ' ) '
             END IF
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92040, ADVANCE= 'NO' ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92040, ADVANCE= 'NO' ) LINOUT( 1 : E1 )
          END IF
       END DO
-      WRITE( IOUT, 92060)
+      WRITE( GLOBAL_IOUT, 92060)
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -419,28 +417,28 @@ c..finish reading skipped section of template (i.e., code between S1 markers)
 
       IF( LINEIN( 1 : 2 ) .EQ. 'R4' ) THEN
 
-         WRITE( IOUT, 95000) SPECIES( C2O3 )( 1 : LEN_TRIM( SPECIES( C2O3 ) ) ),
+         WRITE( GLOBAL_IOUT, 95000) SPECIES( C2O3 )( 1 : LEN_TRIM( SPECIES( C2O3 ) ) ),
      &                       SPECIES( PAN  )( 1 : LEN_TRIM( SPECIES( PAN  ) ) )
 
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'R5' ) THEN
 
-         WRITE( IOUT, 95020) SPECIES( C2O3 )( 1 : LEN_TRIM( SPECIES( C2O3 ) ) ),
+         WRITE( GLOBAL_IOUT, 95020) SPECIES( C2O3 )( 1 : LEN_TRIM( SPECIES( C2O3 ) ) ),
      &                       SPECIES( PAN  )( 1 : LEN_TRIM( SPECIES( PAN  ) ) )
 
 
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'R6' ) THEN
  
-         WRITE( IOUT, 95040) SPECIES( C2O3 )( 1 : LEN_TRIM( SPECIES( C2O3 ) ) )
+         WRITE( GLOBAL_IOUT, 95040) SPECIES( C2O3 )( 1 : LEN_TRIM( SPECIES( C2O3 ) ) )
 
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'R7' ) THEN
  
-         WRITE( IOUT, 95060) SPECIES( PAN  )( 1 : LEN_TRIM( SPECIES( PAN  ) ) ),
+         WRITE( GLOBAL_IOUT, 95060) SPECIES( PAN  )( 1 : LEN_TRIM( SPECIES( PAN  ) ) ),
      &                       SPECIES( PAN  )( 1 : LEN_TRIM( SPECIES( PAN  ) ) ),
      &                       SPECIES( C2O3 )( 1 : LEN_TRIM( SPECIES( C2O3 ) ) )
 
       ELSE
 
-         WRITE( IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
+         WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
 
       END IF
 
@@ -452,7 +450,7 @@ c..finish reading skipped section of template (i.e., code between S1 markers)
         
       CLOSE( IIN )
 
-      CLOSE( IOUT )
+      CLOSE( GLOBAL_IOUT )
 
       NOUTFLS = NOUTFLS + 1
       OUTFLNAM( NOUTFLS ) = 'hrg3.F'

@@ -23,18 +23,18 @@ Goal: Modify the gas- and aerosol-phase chemical mechanisms in CMAQ, create new 
 12. ELMO_PROC.F
 
 ### Key Utilities  
-1. chemmech (see [documentation](../../../UTIL/chemmech/README.md))
-2. create_ebi (see [documentation](../../../UTIL/create_ebi/README.md))
+1. chemmech (see [documentation][link_1])
+2. create_ebi (see [documentation][link_2])
 *Note that these utilities are automatically run by the Autochem feature of the bldit_cctm.csh script, if it is activated.
 
 <a id=modifychem></a>
 ## 1. Modifying the chemical mechanism inputs ##
-### 1.1 See the git instructions below (Section 3) if you would like to propagate the chemical mechanism changes in your Github repository. If you are assigning a new name to your mechanism, create a new folder under /$CMAQ_REPO/CCTM/src/MECHS and copy and update the names of all chemical namelist files, the mech_*.def file, the CMAQ_Control_DESID_*.nml namelist, and the SpecDef_*.txt file, if desired.  
+### 1.1 See the [git instructions](#github) below if you would like to propagate the chemical mechanism changes in your Github repository. If you are assigning a new name to your mechanism, create a new folder under /$CMAQ_REPO/CCTM/src/MECHS and copy and update the names of all chemical namelist files, the mech_*.def file, the CMAQ_Control_DESID_*.nml namelist, and the SpecDef_*.txt file, if desired.  
 
 
 <a id=mech_def></a>
 ### 1.2 Edit mech_*.def.
-The mech_*.def file lists all of CMAQ chemical reactions and is located at /$CMAQ_REPO/CCTM/src/MECHS/${mechanism}/mech_/${mechanism}.def. The [chemmech documentation](../../../UTIL/chemmech/README.md) describes formats for reaction rate constants dependent on temperature, atmospheric number density, water vapor, sunlight, model species and constants such as oxygen and methane mixing ratios. The documentation also gives a more detailed explanation of the mech.def (mechanism definitions) sections and formatting rules.
+The mech_*.def file lists all of CMAQ chemical reactions and is located at /$CMAQ_REPO/CCTM/src/MECHS/${mechanism}/mech_/${mechanism}.def. The [chemmech documentation][link_1] describes formats for reaction rate constants dependent on temperature, atmospheric number density, water vapor, sunlight, model species and constants such as oxygen and methane mixing ratios. The documentation also gives a more detailed explanation of the mech.def (mechanism definitions) sections and formatting rules.
 - All reactions must begin with a name in < > brackets.
 - All reactions must end with # followed by a reaction rate constant with units of cm<sup>3</sup>/(molecules s)
 - In this tutorial, all reactions regenerate the oxidant.
@@ -84,9 +84,11 @@ The examples used in this tutorial do not include species that need to be added 
 
 
 
-<a id=DESID_Ctrl></a>
-### 1.6 Edit DESID Chemical Mapping Control file.
-The DESID Chemical Mapping Control file describes how to input emissions and is located at /$CMAQ_REPO/CCTM/src/MECHS/${mechanism}/CMAQ_Control_DESID_${mechanism}.nml. Any new species included in the mech_*.def or GC, AE, and NR namelists that is directly emitted should be included in this file. Examples of adding new species are given in the [DESID tutorial](CMAQ_UG_tutorial_emissions.md).
+<a id=CMAQ_Chem_Control_${MECH}.nml></a>
+### 1.6 Edit Chemical Control Namelist.
+The CMAQ Chemical Control namelist describes how to input emissions and is located at /$CMAQ_REPO/CCTM/src/MECHS/${mechanism}/CMAQ_Chem_Control_${MECH}.nml. 
+Any new species included in the mech_*.def or GC, AE, and NR namelists that is directly emitted should be included in this file. Examples of adding new species are given 
+in the [DESID tutorial](CMAQ_UG_tutorial_emissions.md).
 
 
 
@@ -396,4 +398,12 @@ git push dev_push_repo newchem
 You should now be able to see these changes in Github online.
 
 
+<!-- START_OF_COMMENT -->  
 
+[link_1]: ../../../UTIL/chemmech/
+[link_2]: ../../../UTIL/create_ebi/
+
+<!-- END_OF_COMMENT -->
+
+[link_1]: https://github.com/USEPA/CMAQ/blob/main/UTIL/chemmech/
+[link_2]: https://github.com/USEPA/CMAQ/blob/main/UTIL/create_ebi/ 
