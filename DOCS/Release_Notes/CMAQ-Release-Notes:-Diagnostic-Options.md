@@ -4,7 +4,7 @@
 **Primary Contact**: [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Secondary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Module Major Revision  
-**Release Version/Date**:  CMAQ v6.0 beta  
+**Release Version/Date**:  CMAQ v6.0 beta 1 and beta 2   
 
 **Description**:  
 ELMOv2.1 expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining variables and assigning them to output files.
