@@ -1,4 +1,27 @@
 # Photolysis
+
+### Fix photolysis loss process in reactive tracer module
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix, Science Update      
+**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2  
+
+**Description**:   
+The reactive tracers module allows its species to have loss processes from photolysis reactions. The photolysis frequencies used must be available in the gas phase chemistry. Currently, CMAQ chemical mechanisms do use the capacity but testing it found two errors. 
+
+-   One error incorrectly converted the units of photolysis frequencies from 1/min. to 1/sec. 
+-   The second error used the array holding the photolysis frequencies before the gas chemistry driver sets the array values. This error only occurs in the hrdriver.F file of the EBI gas chemistry solvers.
+
+Updates remove the above errors. They also modify a ppmV to molecules/cm<sup>3</sup> conversion factor used by the reactive tracer module so the factor is more consistent the values used in the RXNS_FUNC_MOD.F90 for the gas phase chemistry. The factor depends on the air number density.
+
+**Significance and Impact**:   
+The changes corrects a loss process in the reactive tracer module. The correction supports developing a version of the CRACMM3 mechanism supporting air toxics assessment such as EPA's AirToxScreen.
+
+Updates regarding the photolysis processes do not alter model predictions. The corrected conversion factor does change predictions of model species that are treated by the reactive tracers module such as in the NR species namelist of the cb6r5hap_ae7_aq mechanism. Tests showed that concentrations of these species have a mean change around +/\- 0.5% over the 12NE3 2018 benchmark and 12US1 2020 domains. The mean change seems consistent with mean relative change of the conversion factor around +/-1%.
+
+|Merge Commit | Internal record| 
+|:------:|:-------:|
+|[Merge for PR#1178](https://github.com/USEPA/CMAQ/commit/1752ce0d71f76485798cad916a5505c8c65eac2c) | [PR#1178](https://github.com/USEPA/CMAQ_Dev/pull/1178)  | 
+
 ### Remove uninitialized variable and correct a diagnostic in CCTM's inline module for photolysis frequencies
 [William B. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Bug Fix   
