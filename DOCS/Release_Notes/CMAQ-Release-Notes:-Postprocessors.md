@@ -5,6 +5,22 @@
 
 
 ## [combine](../../POST/combine/README.md)
+### Allow compilation of combine with gcc10+
+[Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Improve code robustness   
+**Release Version/Date**: CMAQv6.0 beta 1 and beta 2
+
+**Description**:   
+Allows the compilation of combine with gcc compiler versions 10 and higher without having to resort to using the "-fallow-argument-mismatch" compiler flag
+
+**Significance and Impact**:    
+The code update removes lines that prevented the code from compiling with gcc compiler versions 10 and higher. The removed lines were only invoked when using a wrfout file as one of the input files to combine, and the vertical grid information of the wrfout file obtained by the removed function calls in these lines was not actually used by combine in any way. Therefore, removing these lines does not impact any output files but does allow the code to compile.  
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1159](https://github.com/USEPA/CMAQ/commit/5e9753318a3708546298879b68b2ca0ef2dc4be3) | [PR#1159](https://github.com/USEPA/CMAQ_Dev/pull/1159)  |  
+
 ### Correct cadmium in SpecDef_Conc_cb6r5hap_ae7_aq.txt   
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
