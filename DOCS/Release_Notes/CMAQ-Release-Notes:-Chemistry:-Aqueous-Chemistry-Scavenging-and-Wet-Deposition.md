@@ -1,3 +1,14 @@
+
+
+### Removal of acm_ae6_mp Cloud Module
+**Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Maintenance
+**Release Version/Date**:  CMAQv6.0 beta 1 and 2
+**Description**:  The acm_ae6_mp cloud mechanism was previously used with multipollutant configurations of the CMAQ model. However, it no longer works with any existing chemical mechanism and is scientifically obsolete. This unused option is removed in this PR.  
+**Significance and Impact**: Since it has not been possible to use this option for several model releases, its removal is not expected to have any significant impacts on the user community.  
+**Internal PRs**: [PR#1236](https://github.com/USEPA/CMAQ_Dev/pull/1236)  
+
+
 ###  Cleanup of unit conversions and wetdep output mapping  
 [Ben Murphy](mailto:murphy.benjamin@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Science Update    
