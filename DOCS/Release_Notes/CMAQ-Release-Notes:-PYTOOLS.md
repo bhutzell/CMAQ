@@ -12,7 +12,7 @@ Now impact on model results - strictly ease of use.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1209](https://github.com/USEPA/CMAQ_Dev/commit/daea281e470fc1de06ed5fb2306bae06f3a47fa2) | [PR#1209](https://github.com/USEPA/CMAQ_Dev/pull/1209)  | 
+|[Merge for PR#1209](https://github.com/USEPA/CMAQ/commit/daea281e470fc1de06ed5fb2306bae06f3a47fa2) | [PR#1209](https://github.com/USEPA/CMAQ_Dev/pull/1209)  | 
 
 
 
