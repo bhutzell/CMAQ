@@ -5,6 +5,23 @@
 
 
 ## [combine](../../POST/combine/README.md)
+### Correct cadmium in SpecDef_Conc_cb6r5hap_ae7_aq.txt   
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix  
+**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2  
+
+**Description**:   
+The COMBINE concentration definitions file for cb6r5hap uses ACD for aerosol cadmium but the aerosol species' bulk name has changed ACADMIUM. This update corrects the model species name in the   SpecDef_Conc_cb6r5hap_ae7_aq.txt.   
+
+**Significance and Impact**:   
+The update allows using the  SpecDef_Conc_cb6r5hap_ae7_aq.txt file for COMBINE processing of CCTM output files.
+
+**Internal PRs**: 
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1213](https://github.com/USEPA/CMAQ/commit/bad219d39b65205052d2768c1e9c0c5f9eccbdb4) | [PR#1213](https://github.com/USEPA/CMAQ_Dev/pull/1213)  |  
+
+
 
 ### Improve Checks on Formulas Used by COMBINE
 [William T. Hutzell](mailto:Hutzell.Bill@epa.gov), U.S. Environmental Protection Agency  
