@@ -6,14 +6,14 @@
 **Release Version/Date**: CMAQv6.0 beta 1 and beta 2   
 
 **Description**:  
-Previously, WRF-CMAQ has utilized IOAPI3 BUFFERED file to facilitate data transfer between WRF and CMAQ. Currently, CMAQ is able to couple with two different meteorological models, WRF and MPAS to form a twoway coupled model. With software interoperability and reusability in mind, a unified coupler was developed that can be used for coupling either WRF-CMAQ or MPAS-CMAQ. The objective is to provide a simple approach to transfer information between two models. The IOAPI3 BUFFERED file is no longer needed in the new approach. In general, a user does not need to know the actual implementation of the unified coupler unless the user wants to modify the current WRF-CMAQ coupled model paradigm by transferring additional new information from WRF to CMAQ or/and new information from CMAQ to WRF. Additional details of the unified coupler are provided in the [WRF-CMAQ Tutorial](../Users_Guide/Tutorials/CMAQ_UG_tutorial_WRF-CMAQ_Benchmark.md).
+Previously, WRF-CMAQ has utilized IOAPI3 BUFFERED file to facilitate data transfer between WRF and CMAQ. Currently, CMAQ is able to couple with two different meteorological models, WRF and MPAS to form a twoway coupled model. With software interoperability and reusability in mind, a unified coupler was developed that can be used for coupling either WRF-CMAQ or MPAS-CMAQ. The objective is to provide a simple approach to transfer information between two models. The IOAPI3 BUFFERED file is no longer needed in the new approach. In general, a user does not need to know the actual implementation of the unified coupler unless the user wants to modify the current WRF-CMAQ coupled model paradigm by transferring additional new information from WRF to CMAQ or/and new information from CMAQ to WRF. 
 
 **Significance and Impact:**   
 The design of the unified coupler follows the software interoperability and reusability principle. It has been applied to construct the WRF-CMAQ coupled model and the MPAS-CMAQ coupled model. 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1086](https://github.com/USEPA/CMAQ_Dev/commit/0cd768e2ef80931c49c7781e0426dfd6c556cc28) | [PR#1086](https://github.com/USEPA/CMAQ_Dev/pull/1086)  | 
+|[Merge for PR#1086](https://github.com/USEPA/CMAQ/commit/0cd768e2ef80931c49c7781e0426dfd6c556cc28) | [PR#1086](https://github.com/USEPA/CMAQ_Dev/pull/1086)  | 
     
 
 ## Compatibility issues with WRF versions 4.5.2 and later
