@@ -42,6 +42,16 @@ The other error is a a model crash when the cb6r5hap_ae7_aq mechanism is used fo
 |:------:|:-------:|
 |[Merge for PR#1158](https://github.com/USEPA/CMAQ/commit/211b328a5d41012426d1d034d11008d946d21bf8) | [PR#1158](https://github.com/USEPA/CMAQ_Dev/pull/1158)  | 
 
+
+### Updates to diagnostics for Inline Photolysis
+**Primary Contact**: [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix, New Feature   
+**Release Version/Date**:  Version 6.0 beta 1 and 2  
+**Description**:  This update replaces total extinction coefficients in the PHOTDIAG3 diagnostic file with cloud extinction coefficients. The replacement seeks to give a informative diagnostic on what sources are attenuating light in a grid cell. The update also adds calculating aerosol extinction coefficients and asymmetry parameters when the sun is below horizon if PHOTDIAG is _**yes**_. The motive seeks to expand model time steps for evaluating the aerosol optical properties.  
+**Significance and Impact**: Changes remove a unit conversion error, give a informative diagnostic on what sources are attenuating light, and provide more diagnostic data to evaluate how aerosol properties are calculated.  
+**Internal PRs**: [PR#1231](https://github.com/USEPA/CMAQ_Dev/pull/1231)  
+
+
 ### Remove compiler error using table option of phot module 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
