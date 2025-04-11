@@ -22,7 +22,8 @@ CMAQv6.0beta includes many scientific enhancements and new features that will be
 
 
 #### Chemistry
-
+* CMAQv6.0beta introduces CRACMM version 3. CRACMM2 includes several updates to CRACMM2. Many updates are intended to improve the representation of gas-phase and aerosol chemistry in marine environments.
+  
 #### Dry Deposition/Air Surface Exchange
 
 #### Stratosphere-Troposphere Exchange
