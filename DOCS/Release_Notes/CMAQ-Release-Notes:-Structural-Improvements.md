@@ -6,30 +6,30 @@
 **Release Version/Date**:  CMAQv6.0 *beta 2 only*
 
 **Description**:  
-The MIO update removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library. This update makes the code for the offline CMAQ model consistent with the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for substantially easier developement and maintenance across all three versions. To implement this update input/output functions and other utilities such as calendar functions that previously relied on the I/O API library (developed and maintained by [Carlie Coats](https://github.com/cjcoats)) have been added to the CMAQ source code under CCTM/src/mio. In addition, this update moves functions related to log warnings and messages from the RUNTIMEVARS module into the logdev_mod module (both under CCTM/src/util/util/).  
+From its earliest beginnings, the CMAQ modeling system has relied on the Models-3 [I/O API library](https://cjcoats.github.io/ioapi/index.html) to handle reading input and writing output data as well as a wide range of utility functions, including time and date operations, logging and error reporting, and coordinate transformations. The I/O API and its thorough documentation have contributed significantly to the stability and usability of the overall modeling system for the past three decades.
 
-(*talk about how current implantation relies on input file to specify the output files and variables to be written to each output file (this interacts with ELMO). this file is generated in the code from user settings.*)  
-(*talk about replacement_util module?*)
+When the effort to couple CMAQ to the Model for Prediction Across Scales (MPAS) was begun, I/O API did not support the unstructured global grids used by MPAS. This led ORD to develop an alternative set of routines, known as MIO (Model I/O). These routines are designed to work for the offline configuration of CMAQ as well as the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for substantially easier development and maintenance across all three model versions.
+
+The MIO update **(available only in CMAQv6.0 beta 2)** removes the dependency of the CMAQ Chemical Transport Model (CCTM) on I/O API. The MIO code has been added to the CMAQ source code under CCTM/src/mio, while several utility functions present in I/O API have been re-implemented in a separate module under CCTM/src/misc. In addition, this update moves functions related to log warnings and messages from the RUNTIME_VARS module into the LOGDEV_MOD module (both under CCTM/src/util/util/).  
+
+In its current implementation, MIO relies on an input file (accessed via the environment variable `mio_file_info`) that specifies which variables are written to which output files, as well as their coordinate dimensions. This input file does not need to be created by hand, but instead is generated during model initialization based on settings in the run script and the `CMAQ_Control.nml` namelist file (see documentation for the Explicit and Lumped Model Output (ELMO) module). 
 
 The following environment variables are required in the CCTM run script to utilize the new MIO module. Note these updates are included in the sample runscripts of v60b2 under CCTM/scripts.
-1. remove the option -v from output file environment variables, e.g., ```setenv CTM_CONC_1      $OUTDIR/CCTM_CONC_${CTM_APPL}.nc ```
-2. ```setenv CTM_MIO_FILE Y``` *(turn on generation of MIO_ASCII file; code will crash if this is not set to Y)*  
-3. ```setenv MISC_FILE_INFO ${path}$``` *(directory where MIO file will be written)*  
-4.  ```
-    setenv mio_file_info $OUTDIR/mio_file_input_${CTM_APPL}.txt  
-    setenv CTM_MIO_INPUT "INIT_CONC_1"
-    ```
-    *(for now, need at least one input file)*  <- I think this will require further explanation
-5. ```setenv ncd_64bit_offset Y``` *(needed when using netcdf4)*    
+1. remove the "-v" from output file environment variables, e.g., ```setenv CTM_CONC_1      $OUTDIR/CCTM_CONC_${CTM_APPL}.nc ```
+2. ```setenv mio_file_info ${OUTDIR}/mio_file_input_${CTM_APPL}.txt``` *(MIO will read the file pointed to by mio_file_info; the file generated automatically is written to `${OUTDIR}/mio_file_input_${CTM_APPL}.txt`; under normal operation these are the same)*  
+3.  ```setenv CTM_MIO_INPUT "INIT_CONC_1"    ```   *(It is not necessary to specify all input files to MIO, but in the current implementation there must be at least one, which we hardcode as the ICON file)*  
+4. ```setenv ncd_64bit_offset Y``` *(needed when using 64-bit file offsets, introduced in netCDF 3.6.0 and standard in netCDF4; these are necessary for writing files greater than 2 GB in size)*    
 
 **Significance and Impact**:   
-[other positive things about mio's purpose ...] CMAQ output files are unchanged by this update.  Although CCTM no longer requires installation of the I/O API library several PREP and POST tools within the CMAQ repository retain this dependency (e.g., ICON, BCON, COMBINE).  \
+Eventually, this update will facilitate greater flexibility in specifying variables to be written to output files, including writing gridded files that include variables with differing dimensions. In the current implementation, CMAQ output files are conformant with the I/O API interface.  Although the CCTM no longer requires installation of the I/O API library several PREP and POST tools within the CMAQ repository retain this dependency (e.g., ICON, BCON, COMBINE).  These utilities, as well as other programs that use the I/O API library, can read outputs written by MIO. 
 
+**Known Limitations**:
 There are several options in the CMAQ system that have not yet been implemented with MIO and so will not work with this version of CMAQv6.0 beta.  These include:
 1. VERTEXT option (<- this option is not actually listed in Appendix A!)
 2. Generating MCIP-like outputs when running the WRF-CMAQ coupled model
 3. [Windowing capability](../Users_Guide/CMAQ_UG_ch04_model_inputs.md#431-windowing-capability) (i.e, subsetting inputs when the domain of the input files is larger than the simulation domain)
-
+4. Single-column model
+   
 **References**:   
 Portions Copyright ©1992-2002 MCNC and Carlie J. Coats, Jr., 2003-2013 by Baron Advanced Meteorological Systems, © 2005-2013, 2017- Carlie J. Coats, Jr., and , and © 2014- UNC Institute for the Environment. Please see the disclaimers contained in the [I/O API Copyright Notice file](https://cjcoats.github.io/ioapi/NOTICES.html).
 
