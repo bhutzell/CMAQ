@@ -180,6 +180,17 @@ This file provides information on CRACMM updates at the reaction level. This fil
 |:------:|:-------:|
 |[Merge for PR#1258](https://github.com/USEPA/CMAQ_Dev/commit/e9aeb46561f7c4e7f497ed65617e4ea53ce2f25b) | [PR#1258](https://github.com/USEPA/CMAQ_Dev/pull/1258)  |
 
+
+### Delete obsolete chemical mechanisms
+[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Maintenance   
+**Release Version/Date**: CMAQv6.0 beta 1 and beta 2  
+**Description**:  This PR deletes obsolete chemical mechanisms, including cracmm1_aq, cracmm1amore_aq, cb6r3_ae7_aq, racm2_ae6_aq, and saprc07tic_ae7i_aqkmt2. The CHEMMECH, CREATE_EBI, and INLINE_PHOT_PREPROC utilities have been rerun for each of the remaining chemical mechanisms to ensure internal consistency.  
+**Significance and Impact**: When a new version of a chemical mechanism is developed, the CMAQ team generally retains an older version of that mechanism for at least one release cycle. This is done both to ease maintenance and testing and to reduce confusion on the part of users.  
+**Internal PRs**: [PR#1196](https://github.com/USEPA/CMAQ_Dev/pull/1196)  
+
+
+
 ### Updated mechanism CRACMM2  
 [Nash Skipper](mailto:skipper.nash@epa.gov) and [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency      
 **Type of update**: Science Update   
