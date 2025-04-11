@@ -1,4 +1,21 @@
 # Utilities
+### Add species composition data to RXNS modules and add new reactive rate constant type
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Bug Fix and Documentation, New Feature  
+**Release Version/Date**: version 6.0 beta 1 and beta 2  
+
+**Description**:  The pull request accomplishes two items by changes to the CHEMMECH utility.     
+One item adds composition information for chemistry species to the RXNS_DATA_MODULE.F90 output file. The information is counts of elements read determined by the SMILE strings read from species namelist files. The information is not currently used in CMAQ CTM but can support computing how well model processes conserve elements among chemistry species. The changes to CHEMMECH also add an output file that is not part of the CMAQ source code. The file is called **MECH_ATOM_COUNTS.f90** and gives composition data of all mechanism species based on its species namelists.  The file has been compiled within the CMAQ CTM but the function contained has not been executed. Note that only cracmm-based mechanisms have nonzero values of element counts for species composition because they have the needed information in their species namelist files. Also, the pull request does not update all mechanisms and their ebi solvers because the pull request #1196 removes the omitted mechanism. However, the omission does brake these mechanism's functionality.
+
+The other item corrects rate constant type thirteen that was developed for the Master Chemical Mechanism ([MCM](https://mcm.york.ac.uk/MCM/)) and Common Representative Intermediate [(CRI)](https://mcm.york.ac.uk/CRI/) Mechanism. Type thirteen uses a text string read from the mechanism definition file for computing the reaction's rate constant in the RXNS_FUNC_MODULE.F90 file. The problem is that type thirteen does not consider if the text string includes an operator defined in the **SPECIAL** block in the mechanism definition file (See the CHEMMECH README.md file). The result sets the reaction's rate constant to zero in RXNS_FUNC_MODULE.F90. The solution adds rate constant type 14 to consider this circumstance. 
+
+**Significance and Impact**: 
+1.  Adds information to RXNS_DATA_MODULE.F90 file that can be used to determine for cracmm based mechanisms how model processes conserve a subset of chemical elements such as carbon, nitrogen, sulfur, mercury and chlorine. 
+2.  Removes a shortcoming of reaction rate constant type thirteen. 
+3.  No effect on CMAQ predictions were found.
+   
+**Internal PRs**: [PR#1211](https://github.com/USEPA/CMAQ_Dev/pull/1211)  
+
 
 ## Remove pgi compile failure for ebi solver for cracmm3m mechanism
 
