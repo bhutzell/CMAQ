@@ -1,7 +1,31 @@
 # Post-processors
 
 ## [calc_tmetric](../../POST/calc_tmetric/README.md) 
- No changes were made to this tool in CMAQv5.5.
+### Expand functionality of calc_tmetric
+[William T. Hutzell](mailto:hutzell.bill@epa.gov)], U.S. Environmental Protection Agency    
+**Type of update**: New Feature 
+**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2
+
+**Description**:   
+
+The updates attempts to expand functions of the **calc_tmetric** post-processing tool by the below changes.
+
+- Produce output files with statistical metrics over a period equal to N time steps based on the input file(s). The metrics are sequential over time with a frequency one over N. The value of N is defined at run time.
+- Increase possible metrics to include maximum, minimum, and range over the selected period.  
+- Improve efficiency in processing large grid files covering days to weeks by calculating metrics for input file(s) variables in parallel rather than in serial.  
+- Replace I/O API functions for getting environment variables.
+- Update Fortran syntax closer to the current standard.  
+
+The goal seeks to ease visualizing (e.g., via VERDI) or analyzing (e.g., via R) large data file(s) such as combine extracts or CMAQ output files coverings days to weeks.
+
+**Significance and Impact**:  
+Make **calc_tmetric** a more useful tool for examining CMAQ inputs or output files from long simulations.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1226](https://github.com/USEPA/CMAQ/commit/6847b80ad4ffa39f2cd13b748a704b7f064312c1) | [PR#1226](https://github.com/USEPA/CMAQ_Dev/pull/1226)  |  
+
+No changes were made to this tool in CMAQv5.5.
 
 
 ## [combine](../../POST/combine/README.md)
