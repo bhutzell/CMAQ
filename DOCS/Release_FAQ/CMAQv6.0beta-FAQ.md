@@ -22,11 +22,10 @@ CMAQv6.0beta includes many scientific enhancements and new features that will be
 
 
 #### Chemistry
-* CMAQv6.0beta introduces CRACMM version 3. CRACMM2 includes several updates to CRACMM2. Many updates are intended to improve the representation of gas-phase and aerosol chemistry in marine environments.
+* CMAQv6.0beta introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates are intended to improve the representation of gas-phase and aerosol chemistry in marine environments. If you are interested in learning more, please see the [CRACMM3 release note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3).
   
-#### Dry Deposition/Air Surface Exchange
-
-#### Stratosphere-Troposphere Exchange
+#### Vertical Diffusion & Air Surface Exchange
+* CMAQv6.0beta changes the behaviour of minimum eddy diffusivity (Kz) option, which has an important impact on nighttime concentrations. If the runtime environmental variable KZMIN is set to 'True/Yes', the minium eddy diffusivity will now be applied through the planetary boundary layer (PBL), where as previous it was limited to 500 meters above ground. However, if KZMIN is set to 'False/No', the minimum eddy diffusivity....
 
 #### Emissions
 
