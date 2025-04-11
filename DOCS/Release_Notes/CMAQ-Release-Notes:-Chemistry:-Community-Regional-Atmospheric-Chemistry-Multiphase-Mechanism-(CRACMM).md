@@ -144,8 +144,8 @@ Styrene concentrations are reduced, primarily due to additional losses through r
 |[Merge for PR#1153](https://github.com/USEPA/CMAQ_Dev/commit/c89b9afe89e86875b8cfcdc4af3f0a83b8db0762) | [PR#1153](https://github.com/USEPA/CMAQ_Dev/pull/1153)  |
 
 ### Correct conservation of nitrogen for 4 reactions in CRACMM3  
-**Primary Contact**: [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
-**Secondary Contact**:  [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency (could make Havala primary instead)    
+**Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency  
+**Secondary Contact**: [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Maintenance   
 **Release Version/Date**:  CMAQv6.0 beta 1 and beta 2   
 
