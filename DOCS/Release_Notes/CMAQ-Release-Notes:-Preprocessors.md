@@ -82,7 +82,7 @@ Additionally, the mapping of carbon bond species SVSQT was updated for both CRAC
 
 ## [Create OMI](https://github.com/USEPA/CMAQ/tree/main/PREP/create_omi) 
 
-### Remove IOAPI dependence of create_omi PREP tool 
+### Feature updates to create_omi PREP tool 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: New Feature  
 **Release Version/Date**:  CMAQv6.0 beta 1 and beta 2
