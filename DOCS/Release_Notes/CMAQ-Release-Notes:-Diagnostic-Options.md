@@ -77,7 +77,16 @@ These composites may be specified in the ELMO output file list in CMAQ_Control.n
 |[Merge for PR#1184](https://github.com/USEPA/CMAQ_Dev/commit/d0d1a121ffe55e22a8712a8d1b13b6567ae3b199) | [PR#1184](https://github.com/USEPA/CMAQ_Dev/pull/1184)  |   
 
 
-## Remove Uninitialized Variable in Column Model
+
+### Changes in Henry's law computation and Budget Tool
+**Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Computational Efficiency Improvements   
+**Release Version/Date**:  Version 6.0 beta 1 and 2  
+**Description**:  The code that computes Henry's Law constants has been modified to use integer indices rather than character string lookups. The budget tool has been turned off by default. Users interested in tracking the contributions of various processes to the budgets of CMAQ species can generate this output by setting BUDGET_DIAG=.TRUE. in CMAQ_Control_Misc.nml.  
+**Significance and Impact**: Collectively, these two updates reduce runtime by approximately 18% on our 12US1 test case using 256 processors, without any change in model output.  
+**Internal PRs**: [PR#1182](https://github.com/USEPA/CMAQ_Dev/pull/1182)  
+
+### Remove Uninitialized Variable in Column Model
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
@@ -99,7 +108,7 @@ Allows running CCTM for a column domain without unpredictable crashes. Using a c
 |:------:|:-------:|
 |[Merge for PR#1072](https://github.com/USEPA/CMAQ/commit/277c01c4b82b86a021949a72b3e387449cf68eda) | [PR#1072](https://github.com/USEPA/CMAQ_Dev/pull/1072)  |   
 
-## Fix bug in ELMO calculation of PMF_OC, PMF_NCOM  
+### Fix bug in ELMO calculation of PMF_OC, PMF_NCOM  
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
@@ -114,7 +123,7 @@ This change affects only PMF_OC and PMF_NCOM in the ELMO/AELMO outputs. There is
 |:------:|:-------:|
 |[Merge for PR#1104](https://github.com/USEPA/CMAQ/commit/3857d63aa00c2fbdd8278ccedc2c4986acc24f0e) | [PR#1104](https://github.com/USEPA/CMAQ_Dev/pull/1104)  | 
 
-## Correct calculation of PM1, PM2.5, and PM25to10 as well as speciated NA, K, CA, and MG in ELMO
+### Correct calculation of PM1, PM2.5, and PM25to10 as well as speciated NA, K, CA, and MG in ELMO
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
@@ -148,7 +157,7 @@ The mode parameter fix for the calculation of mass with a hard diameter cut-off 
 |:------:|:-------:|
 |[Merge for PR#1078](https://github.com/USEPA/CMAQ/commit/52a12a0ac08237a871998996873dd57486833891) | [PR#1078](https://github.com/USEPA/CMAQ_Dev/pull/1078)  | 
 
-## Accurate output of gas-phase species in mass units
+### Accurate output of gas-phase species in mass units
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
@@ -164,7 +173,7 @@ Gas-phase Benzo-a-pyrene was yielding garbage output from ELMO.
 |[Merge for PR#1008](https://github.com/USEPA/CMAQ/commit/f1d6b57dc10c2a02dffc60bd3ace522c40e677b6) | [PR#1008](https://github.com/USEPA/CMAQ_Dev/pull/1008)  | 
 
 
-## Restore accurate timestepping when running with temporally finer MET inputs 
+### Restore accurate timestepping when running with temporally finer MET inputs 
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
