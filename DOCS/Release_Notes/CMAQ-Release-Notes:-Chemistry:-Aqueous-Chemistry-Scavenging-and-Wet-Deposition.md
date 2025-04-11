@@ -1,9 +1,38 @@
 
+### Streamline Mapping to Default Cloud Chemistry Solver
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Infrastructure Improvement  
+**Release Version/Date**:  v6.0 beta 1 and 2  
+**Description**:  
+This current PR is aimed at some minor updates to simplify the mapping of cldproc vectors to the aqueous chemistry routine via **AQ_DATA**.  
+- High-level variables have been renamed for less confusion. For example, ngas is replaced with n_aq_gas to indicate it is relevant to the aqueous chemistry solver. Likewise naddaer and naer are replaced with one variable, n_aq_aer.
+- akn, acc, and cor are replaced with global variables defined in the AERO_DATA module: iait, iacc, and icor.
+- The series of 'req_XXX' variables for gases and aerosols are eliminated. If these species are required, then they can be given explicit, local indices which is now done.
+- nmodes is replaced by the global variable n_mode from AERO_DATA. 
+- The aerosol surrogate table is revamped. Currently, some rows contain all modes of a species, while others, like PHG and TRACER contain only one mode and leave the rest blank. Many additional aerosols are added in code below. This PR updates the table to be explicit in defining the 31 aerosol species that will be treated by the aqueous chemistry solver. Each species is further assigned a local index that will not change.
+- Map vectors like MAP_CGRIDtoAQGAS are defined to make mapping easier to follow from cloudproc to aqchem.
+- Code that previously built the aerosol surrogate table is now deleted since the aerosol table is defined explicitly.
+
+The following updates were made to **aq_map**:
+- Code for passing concentrations and calculating contributions to surrogates is streamlined.
+- The approach for accounting for the Aitken mode contribution to surrogates is streamlined and generalized so that it extends automatically to any surrogate defined in the future, not just the 4 that were available currently, PRI, POA, SOA, and TRACER.
+- Mode indices are generalized
+
+The following limited updates were made to **aqchem**:
+- Variable names like nliqs were updated to N_AQ_LIQS
+- AKN, ACC, and COR were updated to IAIT, IACC, and ICOR.
+- Commented code was removed.
+
+**Significance and Impact**:  These updates are needed to support transparency in model development and maintenance. Specifically, the streamlined mapping approach will support addition of aerosol modes and support of aerosol size section options in the future.
+
+**Internal PRs**: [PR#1130](https://github.com/USEPA/CMAQ_Dev/pull/1130)  
+
+
 
 ### Removal of acm_ae6_mp Cloud Module
 **Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Maintenance
-**Release Version/Date**:  CMAQv6.0 beta 1 and 2
+**Release Version/Date**:  CMAQv6.0 beta 1 and 2  
 **Description**:  The acm_ae6_mp cloud mechanism was previously used with multipollutant configurations of the CMAQ model. However, it no longer works with any existing chemical mechanism and is scientifically obsolete. This unused option is removed in this PR.  
 **Significance and Impact**: Since it has not been possible to use this option for several model releases, its removal is not expected to have any significant impacts on the user community.  
 **Internal PRs**: [PR#1236](https://github.com/USEPA/CMAQ_Dev/pull/1236)  
