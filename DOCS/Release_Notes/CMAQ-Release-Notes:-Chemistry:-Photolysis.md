@@ -1,3 +1,24 @@
+# Photolysis
+### Remove uninitialized variable and correct a diagnostic in CCTM's inline module for photolysis frequencies
+[William B. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Bug Fix   
+**Release Version/Date**: CMAQv6.0 beta 1 and beta 2  
+
+**Description**:   
+Two errors in CCTM's inline module for photolysis frequencies are corrected. 
+
+First, the PHOTDIAG3 files's total extinction had two conversions from m<sup>-1</sup> to Km<sup>-1</sup>. This update removes the first conversion in CCTM/src/phot/inline/PHOT_MOD.F so total extinction's conversion occurs in CCTM/src/phot/inline/phot.F and is consistent to where gas and aerosol extinctions are converted to  Km<sup>-1</sup>. 
+
+The other error is a a model crash when the cb6r5hap_ae7_aq mechanism is used for the 12NE3 domain on 07/01/2018 and the model is compiled with the gfortran compiler with debug flags.  The cause is that the GWC array (Graupel Water Content) is not initialized during the following condition: A vertical column does not have resolved clouds but has sub-grid (convective) clouds that do not occupy the entire column. The error allows the GWC array to have NaNs or very small negative numbers. NaNs produce floating point errors in a subroutine of the CLOUD_OPTICS.F file that crash the model. The solution inserts a command to zero out GWC in phot.F when this condition occurs. The change removes NaNs and other erroneous values in GWC. 
+
+**Significance and Impact**:   
+1. Total extinction's correction allows more accurate comparisons to gas and aerosol extinction values in PHOTDIAG3.
+2. Uninitialized variables can have unpredictable effects on model simulations or results, e.g., crashes, inconsistent predictions between different process configurations, etc. Removing the GWC's uninitialized or bad values prevents a potential source of such problems.
+
+|Merge Commit | Internal record| 
+|:------:|:-------:|
+|[Merge for PR#1158](https://github.com/USEPA/CMAQ/commit/211b328a5d41012426d1d034d11008d946d21bf8) | [PR#1158](https://github.com/USEPA/CMAQ_Dev/pull/1158)  | 
+
 ### Remove compiler error using table option of phot module 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
