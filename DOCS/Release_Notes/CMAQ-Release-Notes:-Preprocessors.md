@@ -50,15 +50,17 @@ The original algorithm was removed from _combine_, and it was replaced with logi
 
 ## [ICON](https://github.com/USEPA/CMAQ/tree/main/PREP/icon)
 
+ No changes were made to the source code of ICON in CMAQv5.5 or v6.0 beta.
+ 
 See the CMAQv6.0 beta Release Note on **[Remove option for Aerosol Initial Condition surface area](./CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#remove-option-for-aerosol-initial-condition-surface-area-and-update-settings-for-boundary-condition-surface-area)**.
 
- No changes were made to ICON in CMAQv5.5 or v6.0 beta.
+
 
 ## [BCON](https://github.com/USEPA/CMAQ/tree/main/PREP/bcon)
+No changes were made to the source code of BCON in v6.0 beta.   
 
 See the CMAQv6.0 beta Release Note on **[Update settings for Boundary Condition Surface Area](./CMAQ-Release-Notes:-Chemistry:-Aerosol-Dynamics.md#remove-option-for-aerosol-initial-condition-surface-area-and-update-settings-for-boundary-condition-surface-area)**.
 
-No changes were made to BCON in CMAQv5.5 or v6.0 beta. 
 
 ### Improved IC/BC species mappings for CRACMM  
 [Havala Pye](mailto:pye.havala@epa.gov) and [Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency   
