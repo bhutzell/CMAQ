@@ -18,6 +18,41 @@ No impact on results.
 |[Merge for PR#1186](https://github.com/USEPA/CMAQ_Dev/commit/99d4354f5f4f16956f45c9a276f357e942b555cc) | [PR#1186](https://github.com/USEPA/CMAQ_Dev/pull/1186)  | 
   
 
+### Remove option for Aerosol Initial Condition surface area and update settings for Boundary Condition Surface Area
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Run script updates  
+**Release Version/Date**:  v6.0 beta 1 and beta 2
+
+**Description**:   
+The run script options for whether or not to use aerosol surface area from initial and boundary conditions have been updated. 
+
+*IC_AERO_M2USE:* this option instructs CMAQ to use surface area (i.e. the second moment, M2) of each aerosol mode from the initial condition file. If set to False, then CMAQ applies a default modal standard deviation prescribed in AERO_DATA. After the first simulation day, this option is set to True, regardless of the run script setting. Therefore, the impact of this option should be negligible after model spin-up, so it has been decided that this option should be removed.
+
+*IC_AERO_M2WET:* this option prescribes whether to treat the initial condition surface area as applicable for the wet or dry aerosol size distribution. Because IC_AERO_M2USE is removed, this option is removed as well.
+
+*BC_AERO_M2USE:* this option instructs CMAQ to use aerosol surface area from the boundary condition files. Because the definition of the second moment changed with PR #890, when SOA is now considered part of the dry aerosol components, all boundary conditions created before May 3, 2022 have incompatible aerosol surface area with current CMAQ. Therefore, run scripts that point to boundary conditions created before May 3, 2022 should have BC_AERO_M2USE set to False, and run scripts with boundary conditions created after this date should be set to True.
+
+*BC_AERO_M2WET:* generally, aerosol surface area is assumed to be dry and this option should be set to False by default. If a user knows their aerosol surface area applies to the wet size distribution, this option may be used to enforce compatibility.
+
+These variables are now explained in the User Guide Appendix A.
+
+**Significance and Impact**:  
+These changes improve transparency and compatibility across CMAQ scenarios.
+
+Simulations were performed on 2018 CONUS domain for a summertime period. The map below shows the difference between concentrations for total aerosol with the BC_AERO_M2USE option set to F vs. T. 
+![image](https://github.com/user-attachments/assets/9f048187-ab68-4f64-9ba9-925cb6c6d218)
+Deviation in total fine particle mass concentration in $\mu g \ m^{-3}$.
+
+![image](https://github.com/user-attachments/assets/80068a34-2643-49ac-bb0a-cce3e5859d41)
+Deviation in total coarse particle mass concentration in $\mu g \ m^{-3}$.
+The majority of the difference between these simulations comes from coarse mode particles. The impact on the fine mode particle mass is negligible.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1174](https://github.com/USEPA/CMAQ/commit/e6c581cd140c4248d7220ed7f2a1ec77a391da7e) | [PR#1174](https://github.com/USEPA/CMAQ_Dev/pull/1174)  | 
+
+
+
 ### Improve Aerosol Boundary Condition Processing
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
