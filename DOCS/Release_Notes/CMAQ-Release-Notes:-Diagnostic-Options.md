@@ -215,20 +215,13 @@ Collectively, these two updates reduce runtime by approximately 18% on our 12US1
 |:------:|:-------:|
 |[Merge for PR#1182](https://github.com/USEPA/CMAQ/commit/7f82804551f82e714dc91c85430beaef9b1bb282) | [PR#1182](https://github.com/USEPA/CMAQ_Dev/pull/1182)  |   
 
-### Update to the Budget Tool
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Bug Fixes
-**Release Version/Date**:  v6.0 beta 1 and beta 2
+### Bugfix to the Budget Tool output file
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Bug Fixes  
+**Release Version/Date**:  v6.0 beta 1 and beta 2  
 
 **Description**:   
-Several independent features and code upgrades for ELMO, DESID, and the Budget Tool are implemented.  
-(1) When deposition is output through ELMO in instantaneous mode, it is now output in terms of flux (kg ha-1 s-1). Values are divided by the current sync time step, and units metadata are updated for the variables on the instantaneous output file.
-
-(2) DESID variables for online emission streams indices (e.g. IBIOSRM, IMGSRM, etc.) are largely unnecessary and can be removed in almost all cases. This simplification makes it easier to introduce new online emission modules to DESID. There are fewer places in the code to modify.
-
-(3) The Budget Tool prints the log header at the top of its ascii output file. The log header subroutine was updated recently to include a secondary header that directs users to helpful parts of the logfile. This second portion should not be printed in the Budget output file. This PR corrects the log header subroutine call without printing that second section to the Budget output file. Without the fix, CMAQ crashes when the Budget tool is turned on.
-
-(4) When excessively long character strings are sent to log_message, it has the potential to reach an infinite loop. This PR establishes a cap on the log_message at 1000 lines.
+The Budget Tool prints the log header at the top of its ascii output file. The log header subroutine was updated recently to include a secondary header that directs users to helpful parts of the logfile. This second portion should not be printed in the Budget output file. This PR corrects the log header subroutine call without printing that second section to the Budget output file. Without the fix, CMAQ crashes when the Budget Tool is turned on.
 
 **Significance and Impact**:   
 No impact on results.
