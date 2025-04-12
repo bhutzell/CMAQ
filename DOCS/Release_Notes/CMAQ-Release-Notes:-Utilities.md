@@ -31,22 +31,6 @@ The other item corrects rate constant type thirteen that was developed for the M
 |:------:|:-------:|
 | Merge for PR#1307 | [PR#1307](https://github.com/USEPA/CMAQ_Dev/pull/1307)  | 
 
-### Update to log file in RUNTIME_VARS
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
-**Type of update**: Bug Fixe  
-**Release Version/Date**:  v6.0 beta 1 and beta 2  
-
-**Description**:   
-When excessively long character strings are sent to log_message, it has the potential to reach an infinite loop. This update establishes a cap on the log_message at 1000 lines.
-
-**Significance and Impact**:   
-No impact on results.
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1267](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e) | [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  |   
-
-
 ## Update Chemistry Utilities for More Recent Versions of pgi Compilers
 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
