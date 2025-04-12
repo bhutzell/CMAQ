@@ -1,5 +1,5 @@
 # Diagnostic Options
-
+## ELMO
 ### ELMO version 2.1  
 **Primary Contact**: [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Secondary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency     
@@ -74,41 +74,19 @@ These composites may be specified in the ELMO output file list in CMAQ_Control.n
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1184](https://github.com/USEPA/CMAQ_Dev/commit/d0d1a121ffe55e22a8712a8d1b13b6567ae3b199) | [PR#1184](https://github.com/USEPA/CMAQ_Dev/pull/1184)  |   
+|| [PR#1290](https://github.com/USEPA/CMAQ_Dev/pull/1290)  |   
+|| [PR#1277](https://github.com/USEPA/CMAQ_Dev/pull/1277)  |   
+|| [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  |   
+|| [PR#1262](https://github.com/USEPA/CMAQ_Dev/pull/1262)  |   
+|| [PR#1247](https://github.com/USEPA/CMAQ_Dev/pull/1247)  |   
+|| [PR#1245](https://github.com/USEPA/CMAQ_Dev/pull/1245)  |   
+|| [PR#1244](https://github.com/USEPA/CMAQ_Dev/pull/1244)  |   
+|| [PR#1238](https://github.com/USEPA/CMAQ_Dev/pull/1238)  |   
+|[Merge for PR#1184](https://github.com/USEPA/CMAQ/commit/d0d1a121ffe55e22a8712a8d1b13b6567ae3b199) | [PR#1184](https://github.com/USEPA/CMAQ_Dev/pull/1184)  |  
+|| [PR#1176](https://github.com/USEPA/CMAQ_Dev/pull/1176)  |   
+|| [PR#1166](https://github.com/USEPA/CMAQ_Dev/pull/1166)  |   
 
-
-
-### Changes in Henry's law computation and Budget Tool
-**Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Computational Efficiency Improvements   
-**Release Version/Date**:  Version 6.0 beta 1 and 2  
-**Description**:  The code that computes Henry's Law constants has been modified to use integer indices rather than character string lookups. The budget tool has been turned off by default. Users interested in tracking the contributions of various processes to the budgets of CMAQ species can generate this output by setting BUDGET_DIAG=.TRUE. in CMAQ_Control_Misc.nml.  
-**Significance and Impact**: Collectively, these two updates reduce runtime by approximately 18% on our 12US1 test case using 256 processors, without any change in model output.  
-**Internal PRs**: [PR#1182](https://github.com/USEPA/CMAQ_Dev/pull/1182)  
-
-### Remove Uninitialized Variable in Column Model
-[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Bug Fix  
-**Release Version/Date**: CMAQv5.5  
-
-**Description**:  
-When the GRID_NAME sets the model domain to a column model, _i.e., NCOLS and NROWS equal one_. The model unpredictably crashes with the below error message.
-
-     NCVGT: : NetCDF: Index exceeds dimension bound
-        *** ERROR ABORT in subroutine retrieve_time_de on PE 000
-        Could not extract MET_CRO_3D       file
-     Abort(0) on node 0 (rank 0 in comm 0): application called MPI_Abort(MPI_COMM_WORLD, 0) - process 0
-
-The error occurs because SDATE and STIME are uninitialized in sciproc.F and later used to interpolate the model grid's Jacobian. Uninitialized SDATE and STIME may have values outside the period covered by the METCRO3D file so the time interpolation fails. The code fix moves setting SDATE and STIME above the IF ( .NOT. COLUMN_MODEL ) block in sciproc.F.  
-
-**Significance and Impact**:  
-Allows running CCTM for a column domain without unpredictable crashes. Using a column model can speed up developing code or debugging species name-lists and emissions control files.  
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1072](https://github.com/USEPA/CMAQ/commit/277c01c4b82b86a021949a72b3e387449cf68eda) | [PR#1072](https://github.com/USEPA/CMAQ_Dev/pull/1072)  |   
-
-### Fix bug in ELMO calculation of PMF_OC, PMF_NCOM  
+### Fix bug in ELMO calculation of PMF_OC, PMF_NCOM   
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
@@ -123,7 +101,7 @@ This change affects only PMF_OC and PMF_NCOM in the ELMO/AELMO outputs. There is
 |:------:|:-------:|
 |[Merge for PR#1104](https://github.com/USEPA/CMAQ/commit/3857d63aa00c2fbdd8278ccedc2c4986acc24f0e) | [PR#1104](https://github.com/USEPA/CMAQ_Dev/pull/1104)  | 
 
-### Correct calculation of PM1, PM2.5, and PM25to10 as well as speciated NA, K, CA, and MG in ELMO
+### Correct calculation of PM1, PM2.5, and PM25to10 as well as speciated NA, K, CA, and MG in ELMO  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
 **Release Version/Date**: CMAQv5.5  
@@ -188,7 +166,7 @@ This model bug fix should be adopted as soon as possible for any user running WR
 |:------:|:-------:|
 |[Merge for PR#962](https://github.com/USEPA/CMAQ/commit/a6e2bf20b774467fed85fc82eacd93ff57ef3434) | [PR#962](https://github.com/USEPA/CMAQ_Dev/pull/962)  | 
 
-## Introduction of the Explicit and Lumped air quality Model Output module (ELMO)
+### Introduction of the Explicit and Lumped air quality Model Output module (ELMO)
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: New Feature  
 **Release Version/Date**: CMAQv5.4  
@@ -220,3 +198,64 @@ There is no quantitative impact on results, but there will be a noticeable posit
 |[Merge for PR#639](https://github.com/USEPA/CMAQ/commit/3dc2bb6e3d3041bbbf0729643cc38bb2c52b2e11) | [PR#639](https://github.com/USEPA/CMAQ_Dev/pull/639)  | 
 |[Merge for PR#637](https://github.com/USEPA/CMAQ/commit/6bf6a3c367cb5fae088396c879e1c9609766a5dd) | [PR#637](https://github.com/USEPA/CMAQ_Dev/pull/637)  | 
 |[Merge for PR#769](https://github.com/USEPA/CMAQ/commit/c5bce3ef77dc54b29bf66046d07f766afc2d9f61) | [PR#769](https://github.com/USEPA/CMAQ_Dev/pull/769)  | 
+
+## Budget Tool
+### Changes in Henry's law computation and Budget Tool  
+[Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Computational Efficiency Improvements    
+**Release Version/Date**:  Version 6.0 beta 1 and 2   
+
+**Description**:    
+The code that computes Henry's Law constants has been modified to use integer indices rather than character string lookups. The budget tool has been turned off by default. Users interested in tracking the contributions of various processes to the budgets of CMAQ species can generate this output by setting BUDGET_DIAG=.TRUE. in CMAQ_Control_Misc.nml.  
+
+**Significance and Impact**:   
+Collectively, these two updates reduce runtime by approximately 18% on our 12US1 test case using 256 processors, without any change in model output. 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1182](https://github.com/USEPA/CMAQ/commit/7f82804551f82e714dc91c85430beaef9b1bb282) | [PR#1182](https://github.com/USEPA/CMAQ_Dev/pull/1182)  |   
+
+### Update to the Budget Tool
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fixes
+**Release Version/Date**:  v6.0 beta 1 and beta 2
+
+**Description**:   
+Several independent features and code upgrades for ELMO, DESID, and the Budget Tool are implemented.  
+(1) When deposition is output through ELMO in instantaneous mode, it is now output in terms of flux (kg ha-1 s-1). Values are divided by the current sync time step, and units metadata are updated for the variables on the instantaneous output file.
+
+(2) DESID variables for online emission streams indices (e.g. IBIOSRM, IMGSRM, etc.) are largely unnecessary and can be removed in almost all cases. This simplification makes it easier to introduce new online emission modules to DESID. There are fewer places in the code to modify.
+
+(3) The Budget Tool prints the log header at the top of its ascii output file. The log header subroutine was updated recently to include a secondary header that directs users to helpful parts of the logfile. This second portion should not be printed in the Budget output file. This PR corrects the log header subroutine call without printing that second section to the Budget output file. Without the fix, CMAQ crashes when the Budget tool is turned on.
+
+(4) When excessively long character strings are sent to log_message, it has the potential to reach an infinite loop. This PR establishes a cap on the log_message at 1000 lines.
+
+**Significance and Impact**:   
+No impact on results.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1267](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e) | [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  |   
+
+## Column Model  
+### Remove Uninitialized Variable in Column Model  
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Bug Fix  
+**Release Version/Date**: CMAQv5.5  
+
+**Description**:  
+When the GRID_NAME sets the model domain to a column model, _i.e., NCOLS and NROWS equal one_. The model unpredictably crashes with the below error message.
+
+     NCVGT: : NetCDF: Index exceeds dimension bound
+        *** ERROR ABORT in subroutine retrieve_time_de on PE 000
+        Could not extract MET_CRO_3D       file
+     Abort(0) on node 0 (rank 0 in comm 0): application called MPI_Abort(MPI_COMM_WORLD, 0) - process 0
+
+The error occurs because SDATE and STIME are uninitialized in sciproc.F and later used to interpolate the model grid's Jacobian. Uninitialized SDATE and STIME may have values outside the period covered by the METCRO3D file so the time interpolation fails. The code fix moves setting SDATE and STIME above the IF ( .NOT. COLUMN_MODEL ) block in sciproc.F.  
+
+**Significance and Impact**:  
+Allows running CCTM for a column domain without unpredictable crashes. Using a column model can speed up developing code or debugging species name-lists and emissions control files.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1072](https://github.com/USEPA/CMAQ/commit/277c01c4b82b86a021949a72b3e387449cf68eda) | [PR#1072](https://github.com/USEPA/CMAQ_Dev/pull/1072)  |   
