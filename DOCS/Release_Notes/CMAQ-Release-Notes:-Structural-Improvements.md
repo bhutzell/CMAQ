@@ -34,14 +34,29 @@ There are several options in the CMAQ system that have not yet been implemented 
 Portions Copyright ©1992-2002 MCNC and Carlie J. Coats, Jr., 2003-2013 by Baron Advanced Meteorological Systems, © 2005-2013, 2017- Carlie J. Coats, Jr., and , and © 2014- UNC Institute for the Environment. Please see the disclaimers contained in the [I/O API Copyright Notice file](https://cjcoats.github.io/ioapi/NOTICES.html).
 
 
+### Reorganize CCTM Initialization to Populate MIO Output Data  
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Infrastructure Update   
+**Release Version/Date**:  v6.0 beta 1 and beta 2   
+
+**Description**:   
+Each output file is opened and its metadata specified exactly how it has been in the past with IOAPI. A subroutine call has been added to populate a new global structure variable MIO_FILE_DATA so that it contains information for all files and can be used by MIO to initialize all outputs.
+
+This update adds initialization calls to all modules with output and diagnostics so they occur before the MIO Ascii file is written. Most modules only required addition of RETURN statements at the end of their 'FIRSTIME' block. 
+
+The BEIS module was an exception. Initialization and file open tasks were spread across several source code files. Thus, the BEIS module is restructured so that it uses fewer nested subroutines and functions. Some initialization tasks are moved from tmpbeis (now named get_beis) to the BEIS_INIT function. The initialization of HRNO likewise required adding a new call to only perform initialization tasks and return.  
+
+**Significance and Impact**:  
+No changes to concentration or deposition predictions. Instead, this update provides the internal connections necessary to support MIO in CMAQv6.0 beta 2.
+  
 |Merge Commit | Internal record|
 |:------:|:-------:|
-
+|[Merge for PR#1128](https://github.com/USEPA/CMAQ/commit/c7687fae48802145ed5a778f6371440211521409) | [PR#1128](https://github.com/USEPA/CMAQ_Dev/pull/1128)  | 
 
 ### Replace CONST.EXT include file with module and update constant values  
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Restructure   
-**Release Version/Date**: CMAQv6.0 beta 1 and beta 2
+**Release Version/Date**: CMAQv6.0 beta 1 and beta 2  
 
 **Description**:   
 In this PR, the code is restructured to define and use a CONST module in lieu of the CONST.EXT include file. 
@@ -56,13 +71,13 @@ NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1137](https://github.com/USEPA/CMAQ_Dev/commit/e7ed66e185b1b93af8515428053465564ae6857c) | [PR#1137](https://github.com/USEPA/CMAQ_Dev/pull/1137)  | 
-|[Merge for PR#1138](https://github.com/USEPA/CMAQ_Dev/commit/96449cd6f20eccf61699cee038317b6ffaed467a) | [PR#1138](https://github.com/USEPA/CMAQ_Dev/pull/1138)  |   
+|[Merge for PR#1137](https://github.com/USEPA/CMAQ/commit/e7ed66e185b1b93af8515428053465564ae6857c) | [PR#1137](https://github.com/USEPA/CMAQ_Dev/pull/1137)  | 
+|[Merge for PR#1138](https://github.com/USEPA/CMAQ/commit/96449cd6f20eccf61699cee038317b6ffaed467a) | [PR#1138](https://github.com/USEPA/CMAQ_Dev/pull/1138)  |   
 
 ### GNU build flag update to enable compilation with GNU versions 10+
 [Fahim Sidi](mailto:sidi.fahim@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**:  v5.5  
+**Release Version/Date**:  v5.5   
 
 **Description**:  Starting GNU version 10+, GNU no longer allows rank mismatches between the callee and the calling function. The exact verbiage from the GNU change logs:"Mismatches between actual and dummy argument lists in a single file are now rejected with an error. Use the new option -fallow-argument-mismatch to turn these errors into warnings; this option is implied with -std=legacy. -Wargument-mismatch has been removed.” (https://gcc.gnu.org/gcc-10/changes.html)
 
@@ -75,14 +90,14 @@ The non-FORTRAN explanation boils down to the ability to pass 1-D arrays, 2-D ar
 **References**:  n/a
 |Merge Commit | Internal record|
 |:------:|:-------:|
-| [Merge for PR#1154](https://github.com/USEPA/CMAQ_Dev/commit/c31983b72a3049d708138da3f57227875333eb39) |  [PR#1154](https://github.com/USEPA/CMAQ_Dev/pull/1154) |
+| [Merge for PR#1154](https://github.com/USEPA/CMAQ/commit/c31983b72a3049d708138da3f57227875333eb39) |  [PR#1154](https://github.com/USEPA/CMAQ_Dev/pull/1154) |
 
 ### Emissions Diagnostics and Log Output
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Diagnostic and Log Updates  
 **Release Version**:  v5.5 
  
-**Description**:  
+**Description**:   
 Several issues with emissions diagnostics were identified by internal developers and external users. These have been resolved. Issues include:
 
 - Process analysis errors when PA_BLEV > 1 and emissions are restricted to layer 1 only.  This issue was first identified on the CMAS User Forum: https://forum.cmascenter.org/t/really-large-ipr-emis-results-for-upper-layers/
@@ -92,20 +107,23 @@ Several issues with emissions diagnostics were identified by internal developers
 - The EMVAR molecular weight table defined in desid_vars.F is now assigned with individual operational lines instead of one continuous parameter statement in the module specification section. This update will avoid Fortran continuation line limit issues in the future if the number of emission species continues to expand.
 - Adding space for environment variables like the symbolic date labels to be printed completely in the log files
 
-**Significance and Impact**: These updates improve consistency among diagnostic output files and improve readability of the log files. 
+**Significance and Impact**:  
+These updates improve consistency among diagnostic output files and improve readability of the log files. 
  
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1077](https://github.com/USEPA/CMAQ/commit/1eef012a93faf0f7f9b523fede916fb5cd890fef) | [PR#1077](https://github.com/USEPA/CMAQ_Dev/pull/1077)  |  
 
-## Add precision to timing metrics in logfiles
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Improvement (Minor log formatting change)  
-**Release Version/Date**: v5.5  
+## Add precision to timing metrics in logfiles 
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency   
+**Type of update**: Improvement (Minor log formatting change)   
+**Release Version/Date**: v5.5    
 
-**Description**: This PR adds three decimal places of precision to the process-level timing metrics in the ascii logfile.
+**Description**:   
+This PR adds three decimal places of precision to the process-level timing metrics in the ascii logfile.
 
-**Significance and Impact**: At high computational efficiency, the default precision provided for the timing metrics in the logfile was yielding 0.0 for some processes. When aggregated, this underestimates the time taken by these processes.  
+**Significance and Impact**:   
+At high computational efficiency, the default precision provided for the timing metrics in the logfile was yielding 0.0 for some processes. When aggregated, this underestimates the time taken by these processes.  
  
 |Merge Commit | Internal record|
 |:------:|:-------:|
@@ -113,15 +131,16 @@ Several issues with emissions diagnostics were identified by internal developers
 
 ## Improvement of Logfile output and error reporting
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
-**Type of update**: Bug Fix and Log File Improvements  
-**Release Version**: CMAQv5.4  
+**Type of update**: Bug Fix and Log File Improvements   
+**Release Version**: CMAQv5.4   
 
-**Description**: 
+**Description**:   
 - Propagated SHA ID from git repository to configuration file and execution ID to support versioning and matching code state to results.
 - Propagated (mostly documentation) improvements to v5.4 branch from existing v5.3 release branch. 
 - Added M3EXIT output to Main logfile to improve discoverability.
   
-**Significance and Impact**: No impact on results for the cases tested.  
+**Significance and Impact**:   
+No impact on results for the cases tested.  
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
