@@ -22,6 +22,21 @@ Updates regarding the photolysis processes do not alter model predictions. The c
 |:------:|:-------:|
 |[Merge for PR#1178](https://github.com/USEPA/CMAQ/commit/1752ce0d71f76485798cad916a5505c8c65eac2c) | [PR#1178](https://github.com/USEPA/CMAQ_Dev/pull/1178)  | 
 
+### Updated OMI.dat file that contains data from 2005 through 2024
+[Kirk Baker](mailto:baker.kirk@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: New ancillary input file   
+**Release Version/Date**:  CMAQv6.0 beta1 and beta 2
+
+**Description**:  
+New O3 column input file for the photolysis routine in CMAQ. This file provides finer resolution than the previous file and includes more recent data which extends from 2005 through 2024. This new OMI.dat file has a resolution of 27x27 cells covering the globe compared to the previous file resolution of 17x17. The 27x27 resolution was chosen to produce a file that was below the recommended file size for a GitHub repository. Additional files are available upon request that use finer resolution to cover the globe. 
+
+**Significance and Impact**:  
+Minor changes to O3 and related species due to changing O3 column input data resolution. Also extends file to include data through 2024.
+
+|Merge Commit | Internal record| 
+|:------:|:-------:|
+|[Merge for PR#1256](https://github.com/USEPA/CMAQ/commit/8322e8f53705dcc07a81ef40b09099c52fb23a63) | [PR#1256](https://github.com/USEPA/CMAQ_Dev/pull/1256)  | 
+
 ### Remove uninitialized variable and correct a diagnostic in CCTM's inline module for photolysis frequencies
 [William B. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Bug Fix   
@@ -49,8 +64,11 @@ The other error is a a model crash when the cb6r5hap_ae7_aq mechanism is used fo
 **Release Version/Date**:  Version 6.0 beta 1 and 2  
 **Description**:  This update replaces total extinction coefficients in the PHOTDIAG3 diagnostic file with cloud extinction coefficients. The replacement seeks to give a informative diagnostic on what sources are attenuating light in a grid cell. The update also adds calculating aerosol extinction coefficients and asymmetry parameters when the sun is below horizon if PHOTDIAG is _**yes**_. The motive seeks to expand model time steps for evaluating the aerosol optical properties.  
 **Significance and Impact**: Changes remove a unit conversion error, give a informative diagnostic on what sources are attenuating light, and provide more diagnostic data to evaluate how aerosol properties are calculated.  
-**Internal PRs**: [PR#1231](https://github.com/USEPA/CMAQ_Dev/pull/1231)  
 
+
+|Merge Commit | Internal record| 
+|:------:|:-------:|
+|[Merge for PR#1231](https://github.com/USEPA/CMAQ/commit/dd7760aba8719a9bfec0be1a48db652d56958a85) | [PR#1231](https://github.com/USEPA/CMAQ_Dev/pull/1231)  | 
 
 ### Remove compiler error using table option of phot module 
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
