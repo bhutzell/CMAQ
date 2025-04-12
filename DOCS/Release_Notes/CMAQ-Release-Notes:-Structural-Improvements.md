@@ -74,6 +74,22 @@ NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds
 |[Merge for PR#1137](https://github.com/USEPA/CMAQ/commit/e7ed66e185b1b93af8515428053465564ae6857c) | [PR#1137](https://github.com/USEPA/CMAQ_Dev/pull/1137)  | 
 |[Merge for PR#1138](https://github.com/USEPA/CMAQ/commit/96449cd6f20eccf61699cee038317b6ffaed467a) | [PR#1138](https://github.com/USEPA/CMAQ_Dev/pull/1138)  |   
 
+
+### Cap log_message at 1000 lines  
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Bug Fixe  
+**Release Version/Date**:  v6.0 beta 1 and beta 2  
+
+**Description**:   
+When excessively long character strings are sent to log_message, it has the potential to reach an infinite loop. This update establishes a cap on the log_message at 1000 lines.
+
+**Significance and Impact**:   
+No impact on results.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1267](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e) | [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  |   
+
 ### GNU build flag update to enable compilation with GNU versions 10+
 [Fahim Sidi](mailto:sidi.fahim@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
