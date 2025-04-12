@@ -1,3 +1,58 @@
+# Detailed Emissions Scaling Isolation and Diagnostics Module (DESID)
+
+### Improve DESID Error Checking for Negative Emissions  
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix   
+**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2
+
+**Description**:  
+CMAQ users including Bonyoung Koo (Bay Area Air Quality Management District) and Calvin Howes (South Coast Air Quality Management District) have reported issues where an aerosol mass emission rate goes below zero but is within the tolerance set in DESID (-1.0e-7). When extrapolated to particle surface area or number emission though, this value can exceed the static threshold. Their suggestion to relax tolerances for particle number and surface area emissions is appropriate and useful.
+
+See for example:   
+https://forum.cmascenter.org/t/tolerance-for-negative-emissions-in-the-desid-module/5241  
+https://forum.cmascenter.org/t/cmaqv5-5-emission-error-with-negative-emissions/5389/7  
+
+DESID has been updated to allow number emissions down to -1 x 10<sup>-11</sup> s<sup>-1</sup> and surface area emissions down to -0.1 m<sup>2</sup> s<sup>-1</sup>.
+
+This update also improves error reporting by giving the user the gridcell location of the negative value detected in reference to the global grid, not the local sub-domain. If only one processor is used, the local and global units are assumed to be the same.  
+
+**Significance and Impact**:   
+There should be no impact on results, but users are now given more information to diagnose the cause of negative emission rates calculated in DESID.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1222](https://github.com/USEPA/CMAQ_Dev/commit/d17cbcb6a715aa63a32ade77ebcbd2784b040c1a) | [PR#1222](https://github.com/USEPA/CMAQ_Dev/pull/1222)  | 
+
+### DESID Area-Normalized Conversion Factor  
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix    
+**Release Version/Date**:  v6.0 beta 1 and beta 2   
+
+**Description**:    
+The DESID conversion factor assigned to translate area-based emissions is erroneously inverted. This update takes the reciprocal of that value.
+
+**Significance and Impact**:    
+This will dramatically affect predictions for any species that includes emissions normalized to a specific area that is not in units of meters. 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1160](https://github.com/USEPA/CMAQ_Dev/commit/8767b9671cef369aad28d9a484f4b86f961958fa) | [PR#1160](https://github.com/USEPA/CMAQ_Dev/pull/1160)  | 
+
+### Streamlining DESID code  
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Code Maintenance   
+**Release Version/Date**:  v6.0 beta 1 and beta 2  
+
+**Description**:    
+DESID variables for online emission streams indices (e.g. IBIOSRM, IMGSRM, etc.) are largely unnecessary and can be removed in almost all cases. This simplification makes it easier to introduce new online emission modules to DESID. There are fewer places in the code to modify.
+
+**Significance and Impact**:    
+No impact on results.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1267](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e) | [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  | 
+
 ### Updates needed for MPAS-CMAQ implementation  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
