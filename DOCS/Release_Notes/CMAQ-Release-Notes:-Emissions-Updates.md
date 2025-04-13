@@ -12,6 +12,7 @@ This page contains links to Wiki pages describing current and past changes to th
    * [Sea-Spray Aerosol Emissions](./CMAQ-Release-Notes:-Emissions-Updates:-Sea-Spray-Aerosol-Emissions.md)
    * [Gridded Emissions](./CMAQ-Release-Notes:-Emissions-Updates:-Gridded-Emissions.md)
    * [Point Source Emissions](./CMAQ-Release-Notes:-Emissions-Updates:-Point-Source-Emissions.md)
+   * [Online Met-Dependent Emission (MetEmis) Module](./CMAQ-Release-Notes:-Emissions-Updates:-Online-Met-Dependent-Emission-(MetEmis)-Module.md)
 
  
 
