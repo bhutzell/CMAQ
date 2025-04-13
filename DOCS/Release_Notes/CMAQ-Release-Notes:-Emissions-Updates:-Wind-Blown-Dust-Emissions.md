@@ -13,7 +13,7 @@ Without this fix, users enabling the inline WBD module and using WRF simulations
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1181](https://github.com/USEPA/CMAQ_Dev/commit/b506277bdf8aaedc567348b8604e2bb854f3a707) | [PR#1181](https://github.com/USEPA/CMAQ_Dev/pull/1181)  |
+|[Merge for PR#1181](https://github.com/USEPA/CMAQ/commit/b506277bdf8aaedc567348b8604e2bb854f3a707) | [PR#1181](https://github.com/USEPA/CMAQ_Dev/pull/1181)  |
 
 
 ### Updates to Windblown Dust Emissions 
