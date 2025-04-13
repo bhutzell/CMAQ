@@ -38,6 +38,25 @@ This will dramatically affect predictions for any species that includes emission
 |:------:|:-------:|
 |[Merge for PR#1160](https://github.com/USEPA/CMAQ_Dev/commit/8767b9671cef369aad28d9a484f4b86f961958fa) | [PR#1160](https://github.com/USEPA/CMAQ_Dev/pull/1160)  | 
 
+### Streamline Emissions Unit Conversions in DESID
+[Ben Murphy](mailto:murphy.ben@epa.gov)], U.S. Environmental Protection Agency    
+**Type of update**: Code Improvement   
+**Release Version/Date**:  v6.0 beta 1 and beta 2   
+
+**Description**:   
+This update streamlines and centralizes the unit conversions in DESID so that all aerosol and gas units are the same when passing from online emission modules to DESID and the unit conversion subroutine uses one approach for converting all scalars from total emission rate to volume-normalized emission rate. Erroneous comments in the dust module that inaccurately describe units for key variables are also resolved.
+
+There has been a long-standing criticism of the overly complex unit conversions in the CMAQ emissions workflow going back at least to v4.7.1 where variables in different phases are converted at different points in the algorithm and with individually defined conversion formulae.
+
+Now, units for aerosols from all sources, including dust and sea spray, are in g/s when entering DESID. The DESID workflow converts these units to ppmv/s for aerosol mass using the same conversion as it does for gases. Centralization of these steps is critical for maintenance of the offline, WRF-CMAQ, and MPAS-CMAQ systems, where different conversions are needed on different platforms.
+
+**Significance and Impact**:    
+No impact on results.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1177](https://github.com/USEPA/CMAQ/commit/44fa7764e3632063d2459e383d650ccaea491d95) | [PR#1177](https://github.com/USEPA/CMAQ_Dev/pull/1177)  | 
+
 ### Streamlining DESID code  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Code Maintenance   
