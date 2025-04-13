@@ -1,4 +1,22 @@
-### Windblown Dust Emissions 
+# Wind Blown Dust Emissions
+
+### Correction for NLCD40 Land Use Mapping in Windblown Dust Module
+[Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Bug Fix    
+**Release Version/Date**:  CMAQv6.0 beta 1 and beta 1 (first released on [5.5+ branch](../CMAQ-Bugfix-Branch.md#record-of-changes-to-cmaqv55) on 2024-12-06)  
+
+**Description**:   
+Resolves excessive inline windblown dust (WBD) emissions when using WRF simulations with NLCD40 land use (LU). The excessive emissions were caused by mapping two NLCD40 categories (“shrub/scrub” and “dwarf scrub” to the wrong internal BELD3 LU class (“barren or sparsely vegetated” instead of “shrubland”) that is being used in the WBD module.
+
+**Significance and Impact**:   
+Without this fix, users enabling the inline WBD module and using WRF simulations with NLCD40 LU as input to their CCTM simulations will likely experience excessive contributions from WBD emissions to PM2.5 mass concentrations. Over a 12km contiguous modeling domain, the effect was found to be most pronounced during springtime over the Southwestern U.S. Testing of the bug fix for 2018 with two different configurations of WRF using NLCD40 LU showed that annual total WBD emissions over the modeling domain were reduced by a factor of 3-4.  
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1181](https://github.com/USEPA/CMAQ_Dev/commit/b506277bdf8aaedc567348b8604e2bb854f3a707) | [PR#1181](https://github.com/USEPA/CMAQ_Dev/pull/1181)  |
+
+
+### Updates to Windblown Dust Emissions 
 [Jeff Willison](mailto:willison.jeffrey@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update and Bug Fix  
 **Release Version/Date**: CMAQv5.4  
