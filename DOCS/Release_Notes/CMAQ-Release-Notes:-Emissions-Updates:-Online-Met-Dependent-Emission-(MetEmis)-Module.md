@@ -42,4 +42,4 @@ development in the Community Multiscale Air Quality (CMAQ): CMAQ-MetEmis, Geosci
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1094](https://github.com/USEPA/CMAQ_Dev/commit/27a2791509106ef4729637c30a56574ea2e4426b) | [PR#1094](https://github.com/USEPA/CMAQ_Dev/pull/1094)  |
+|[Merge for PR#1094](https://github.com/USEPA/CMAQ/commit/27a2791509106ef4729637c30a56574ea2e4426b) | [PR#1094](https://github.com/USEPA/CMAQ_Dev/pull/1094)  |
