@@ -67,6 +67,8 @@
 !C                      US (Lambert projection), when run over the hemisphere and turning lightning NOx on,
 !C                       the run would crash due to uncompatible projection (polar)
 !C 6 Jan 2020 D. Kang: Correct the time steps in the lightning NOx !diagnostic files from 1:00 - 0:00 to 0:00 to 23:00
+!C  2024 D. Kang:  Clean up of variable names and implement
+!                       GLM/WWLLN energy based LNOx producion
 !C----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE DESID_VARS
@@ -91,7 +93,6 @@
 
       CHARACTER( 16 ),      SAVE :: RC_NAME       ! RC name: old is RC and CCnew is RCA
 
-!C allocate these if LTNG_FNAME = 'INLINE'
       REAL,    ALLOCATABLE, SAVE :: LTNG_PRSFC     ( :,: ) ! surface pressure
       REAL,    ALLOCATABLE, SAVE :: LTNG_RC        ( :,: ) ! convective rainfall
 !C allocate these if LPARAM
@@ -99,14 +100,10 @@
       REAL,    ALLOCATABLE, SAVE :: ICCG           ( :,: ) ! intercloud strikes per cloud to ground strike
 !C Vertical coord values
       REAL,    ALLOCATABLE, SAVE :: VGLVSLT        ( : )
-      REAL, PARAMETER :: Ynox = 1.0e17
-      REAL, PARAMETER :: Na = 6.022e23
-      REAL, PARAMETER :: beta = 1.10e-22 !1.10e-22 corresponding to 350 moles/flash,!1.53359e-22 #1.10825 for 3 Years GLM
-      REAL, PARAMETER :: j2fj = 1.0e+15 !1.53359e-22 #1.10825 for 3 Years GLM
       REAL, SAVE      :: YNaBeta
       REAL, SAVE      :: BetaF2E  ! GLM mean daily energy/flash
       REAL, SAVE      :: GamaF2E  ! WWLLN mean daily energy/stroke
-      REAL, SAVE      :: sGamaF2E  ! WWLLN mean daily energy/stroke
+      REAL, SAVE      :: sGamaF2E  ! WWLLNs mean daily energy/stroke
 
 
 !C    scenario time/date needed for diagnostic output
@@ -167,11 +164,21 @@
          INTEGER               :: I, J, K, L, V, STATUS
          INTEGER               :: CJDATE
          CHARACTER( 7 )        :: SJDATE
-         REAL                       :: mEngPfl,smEngPfl, WLNsd, zScore, sWLNsd, szScore
-         REAL,    Allocatable       :: gZWLNeng(:),gZWLNseng(:), gZWLNfl(:), gZWLNsfl(:), EngPfl(:), sEngPfl(:)
-
+         REAL                       :: mEngPfl   ! mean engergy per flash
+         REAL                       :: smEngPfl  ! mean energy per flash for the WWLLNs data: s indicats WWLLNs 
+         REAL                       :: WLNsd     ! tThe standard deviation (sd) for the WWLLN data 
+         REAL                       :: sWLNsd    ! the standard deviation (sd) for the WWLLNs data
+         REAL                       :: zScore    ! the ratio of CC/CG lightning strikes for WWLLN data
+         REAL                       :: szScore   ! the ratio of CC/CG lightning strikes for WWLLNs data 
+         REAL,    Allocatable       :: gZWLNeng(:) ! greater than zero (gZ) WWLLN energy record (grid-cell-hourly)
+         REAL,    Allocatable       :: gZWLNseng(:) ! gZ WWLLNs engergy records
+         REAL,    Allocatable       :: gZWLNfl(:)   ! gZ WWLLN strike records
+         REAL,    Allocatable       :: gZWLNsfl(:)  ! gZ WWLLNs strike records
+         REAL,    Allocatable       :: EngPfl(:)    ! the buffer holding the WWLLN energy per flash with gZ records
+         REAL,    Allocatable       :: sEngPfl(:)   !the buffer holding the WWLLNs energy per flash with gZ records
+                                       
          LOGICAL OK
-         INTEGER               :: SPC, WLNgZlen
+         INTEGER                    :: WLNgZlen     ! the length of nonzero records for the WWLLN/WWLLNs data
 
 !-----------------------------------------------------------------------
 
@@ -206,9 +213,6 @@
          READ( SJDATE, '(4X, I3)' ) CJDATE
 
 #ifndef mpas
-!C Is lightning NO production inline, or from a file?
-!         CALL UPCASE(LTNG_FNAME)
-         IF ( LTNG_NO ) THEN  ! inline lightning NO production
             XMSG = 'Using in-line lightning NO production'
             CALL M3MSG2( XMSG )
 
@@ -236,6 +240,13 @@
                     GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
                ELSE IF (LNO_OPTION == 3) THEN
                     GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
+                    GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
+                    IF(sum(LTNG_DATA4D(:,:,1,:,GflIdx)) > 0) then
+                    BetaF2E = sum(LTNG_DATA4D(:,:,1,:,GegIdx))/(sum(LTNG_DATA4D(:,:,1,:,GflIdx))*SQUAREKM)
+                    BetaF2E = MOLSNCG/BetaF2E                 !moles N per flash energy of GLM
+                 ELSE
+                    BetaF2E = 0
+                 ENDIF
                ELSE IF (LNO_OPTION >= 4) THEN
                     GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
                     GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
@@ -441,16 +452,7 @@
                END IF
                COLUMN_DIAG = 0.0   ! array assignment
             END IF   ! LTNGDIAG
-!         ELSE   ! lightning emissions off line
 
-!C Lightning NO production from an input file
-!            CALL M3MSG2( 'Using lightning NO production from a file' )
-
-!C Check grid definition (intialize, if first call)
-!            OK = CHKGRID( LTNG_FNAME )
-
-
-         END IF   ! IF ( LTNG_NO ) inline or offline lightning NO production
 #endif
 
          LTLYRS = DESID_LAYS
@@ -626,7 +628,7 @@
      &                       /3600.0 ! get time units right: emissions are in the unit of moles/s
                        ELSE IF (LNO_OPTION == 3) THEN
                           COLUMN_LTNG_NO( COL,ROW ) =
-     &                     ( LTNG_DATA( COL,ROW,GegIdx )*GamaF2E)
+     &                     ( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E)
      &                       / 3600.0 ! get time units right: emissions are in the unit of moles/s
 ! LNO using maximum of GLMeng and WLNeng with daily Beta/Gama values
                        ELSE IF (LNO_OPTION == 4) THEN 
