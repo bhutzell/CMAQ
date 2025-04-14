@@ -18,19 +18,22 @@ CMAQv6.0beta includes many scientific enhancements and new features that will be
 
 #### Instrumented Models
 
-#### On-line coupling of CMAQ with meteorological models   
+#### On-line coupling of CMAQ with meteorological models
+* 
 
 
 #### Chemistry
-* CMAQv6.0beta introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates are intended to improve the representation of gas-phase and aerosol chemistry in marine environments. If you are interested in learning more, please see the [CRACMM3 release note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3).
+* CMAQv6.0beta introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates are primarily intended to improve the representation of gas-phase and aerosol chemistry in marine environments. If you are interested in learning more, please see the [CRACMM3 release note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3).
   
 #### Vertical Diffusion & Air Surface Exchange
-* CMAQv6.0beta changes the behaviour of the runtime minimum eddy diffusivity (Kz) option called KZMIN. This option, first introduced in CMAQv4.5, is a parametrization to allow the mixing in the planetary boundary layer (PBL) to respond to the land-use characteristics. If the runtime environmental variable KZMIN is set to 'True/Yes', the land-use based paramterizated minium eddy diffusivity will now be applied through the PBL, where as previously it was limited to 500 meters above ground. If KZMIN is set to 'False/No', a constant value of 0.01 m<sup>2</sup>/s is applied everywhere at all times. This change primarily impacts nighttime concentrations, specifically in grid cells where the PBL is lower than 500 meter. In those grid cells, primary emitted species concentrations will increase, where as ozone mixing ratios will drop due to increased NOx titration. 
+* CMAQv6.0beta changes the behaviour of the runtime minimum eddy diffusivity (Kz) option called KZMIN. This option, first introduced in CMAQv4.5, is a parametrization to allow the mixing in the planetary boundary layer (PBL) to respond to the land-use characteristics. If the runtime environmental variable KZMIN is set to 'True/Yes', the land-use based paramterizated minium eddy diffusivity will now be applied through the PBL, where as previously it was limited to 500 meters above ground. If KZMIN is set to 'False/No', a constant value of 0.01 m<sup>2</sup>/s is applied everywhere at all times. This change primarily impacts nighttime concentrations, specifically in grid cells where the PBL is lower than 500 meter. In those grid cells, primary emitted species concentrations will increase, where as ozone mixing ratios will decrease due to increased NOx titration. 
 
 #### Emissions
-* CMAQv6.0beta fixes a bug related to the estimation of marine-gas halogen emissions within CMAQ. To estimate the emissions of gaseous halogens in marine environments, the grid cell area covering the spatial extent within the domain is needed. Because CMAQ horizontal domains are defined by projecting a map onto a 2-D plane a map-scale factor must be applied with converting physical areas to projected space, which was not taken into account when estimating halogen emissions within this module. The impact of this bug fix decreases halogen emissions over low latitude areas if using a northern polar stereographic map projection, which subsequently increase ozone (less ozone is destroyed by halogens) and decreases sulfate (less is produced via dimethyl sulfide).
+* CMAQv6.0beta fixes a bug related to the estimation of marine-gas halogen emissions within CMAQ. To estimate the emissions of gaseous halogens in marine environments, the grid cell area covering the spatial extent within the domain is needed. Because CMAQ horizontal domains are defined by projecting a map onto a 2-D plane a map-scale factor must be applied when converting physical areas to projected space, which was not taken into account when estimating halogen emissions within this module. This bug fix impacts halogen emission estimates in grid cells in which map scale factors are not unity. For example, if using a northern polar stereographic map projection, this will lead to an increase ozone (less ozone is destroyed by halogens) and decreases sulfate (less is produced via dimethyl sulfide) mostly over lower latitude areas.
 
-* CMAQv6.0beta incorporates 
+* CMAQv6.0beta fixes a bug related to the estimation of windblown dust emissions within CMAQ when using the NLCD40 land-use. To estimate the emissions of windblown dust, grid cell land-use information along with meteorological conditions are needed. In this case, when using WRF with NLCD40 land-use, two cateogries of NLCD40 (“shrub/scrub” and “dwarf scrub”) were being mapped to the wrong internal categories (“barren or sparsely vegetated” instead of “shrubland”). These internal categories are used in teh windblown dust module to assign parameter values controlling erodibility, which in this case was overestimated. Depending on the domain, year and approach to specify vegetation fraction in WRF, this bug fix will likely correct excessinve "soil" PM2.5 and total PM2.5 mass concentrations when using the NLCD40 land-use.
+
+* CMAQv6.0beta introduces the MetEmis module to dynamically calculate meteorology-induced hourly gridded on-road mobile emissions within CMAQ, using simulated meteorology without any computational burden to the CMAQ modeling system. The impact is to better spatiotemporal represent mobile emissions based on the simulated meteorology inputs when compared to the static scenario. For detailed information see Baek et al., 2023. 
 
 #### Process Analysis & Sulfur Tracking Model (STM) 
 
@@ -98,3 +101,7 @@ A more general list of Frequent CMAQ Questions can be found on our website: http
 Technical support for CMAQ, including questions about model inputs, downloading, compiling, and running the model, 
 and pre- and post-processing utilities, should be directed to the [CMAS Center User Forum](https://forum.cmascenter.org/). 
  [**Please read and follow these steps**](https://forum.cmascenter.org/t/please-read-before-posting/1321) prior to submitting new questions to the User Forum.
+
+<a id=mainbody_references></a>
+## References
+Baek, B. H., Coats, C., Ma, S., Wang, C.-T., Li, Y., Xing, J., Tong, D., Kim, S., and Woo, J.-H.: Dynamic Meteorology-induced Emissions Coupler (MetEmis) development in the Community Multiscale Air Quality (CMAQ): CMAQ-MetEmis, Geosci. Model Dev., 16, 4659–4676, https://doi.org/10.5194/gmd-16-4659-2023, 2023.
