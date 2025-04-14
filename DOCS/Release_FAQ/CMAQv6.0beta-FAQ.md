@@ -25,9 +25,12 @@ CMAQv6.0beta includes many scientific enhancements and new features that will be
 * CMAQv6.0beta introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates are intended to improve the representation of gas-phase and aerosol chemistry in marine environments. If you are interested in learning more, please see the [CRACMM3 release note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3).
   
 #### Vertical Diffusion & Air Surface Exchange
-* CMAQv6.0beta changes the behaviour of minimum eddy diffusivity (Kz) option, which has an important impact on nighttime concentrations. If the runtime environmental variable KZMIN is set to 'True/Yes', the minium eddy diffusivity will now be applied through the planetary boundary layer (PBL), where as previous it was limited to 500 meters above ground. However, if KZMIN is set to 'False/No', the minimum eddy diffusivity....
+* CMAQv6.0beta changes the behaviour of the runtime minimum eddy diffusivity (Kz) option called KZMIN. This option, first introduced in CMAQv4.5, is a parametrization to allow the mixing in the planetary boundary layer (PBL) to respond to the land-use characteristics. If the runtime environmental variable KZMIN is set to 'True/Yes', the land-use based paramterizated minium eddy diffusivity will now be applied through the PBL, where as previously it was limited to 500 meters above ground. If KZMIN is set to 'False/No', a constant value of 0.01 m<sup>2</sup>/s is applied everywhere at all times. This change primarily impacts nighttime concentrations, specifically in grid cells where the PBL is lower than 500 meter. In those grid cells, primary emitted species concentrations will increase, where as ozone mixing ratios will drop due to increased NOx titration. 
 
 #### Emissions
+* CMAQv6.0beta fixes a bug related to the estimation of marine-gas halogen emissions within CMAQ. To estimate the emissions of gaseous halogens in marine environments, the grid cell area covering the spatial extent within the domain is needed. Because CMAQ horizontal domains are defined by projecting a map onto a 2-D plane a map-scale factor must be applied with converting physical areas to projected space, which was not taken into account when estimating halogen emissions within this module. The impact of this bug fix decreases halogen emissions over low latitude areas if using a northern polar stereographic map projection, which subsequently increase ozone (less ozone is destroyed by halogens) and decreases sulfate (less is produced via dimethyl sulfide).
+
+* CMAQv6.0beta incorporates 
 
 #### Process Analysis & Sulfur Tracking Model (STM) 
 
