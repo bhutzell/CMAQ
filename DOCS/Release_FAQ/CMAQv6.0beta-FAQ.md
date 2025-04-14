@@ -45,7 +45,9 @@ CMAQv6.0beta includes many scientific enhancements and new features that will be
 
 <a id=diff_v55_v60b_input_files></a>
 ### What differences should I expect in the required model input files?
-* If you have already successfully migrated to v5.5, you will not need to any additional input to run with the analogous options in v6.0beta. However, if you trying to run with the newest released version of CRACMM in v6.0beta, users will have to generate or map existing emissions to CRACMMv2.0. For additional information on emissions for CRACMMv2.0 please see the [CRACMM GitHub Page](https://github.com/USEPA/CRACMM/tree/main/emissions).  
+* If you have already successfully migrated to v5.5, you will not need any additional input files to run with the analogous options in v6.0 beta.  CRACMM2 emissions inputs can be used to run CMAQv6.0 beta with the new CRACMM3 mechanism without any modifications. 
+* For CRACMM3M (new marine version), an additional emission, CH3I, is needed. This will occur automatically for in-line biogenic emissions, but offline emissions will need to have CH3I explicit.
+* CRACMM1 emissions inputs can be mapped to CRACMM2 species with minor adjustments following this guidance: https://usepa.github.io/CRACMM/emissions/README.html
 
 <a id=diff_v55_v60b_ouput_files></a>
 ### What differences should I expect in my model output files?
