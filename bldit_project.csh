@@ -16,7 +16,8 @@
 #> the repository. The user may also set their own preferred 
 #> directory.
 
- set CMAQ_HOME = /home/username/path
+ set CMAQ_HOME = /work/MAQSEA/cnolte/cmaq/2025-04-14-pr1169
+
 #> This section allows users to choose explicitly which tools
 #> to make available from the repo. For each selected tool,
 #> extract_scripts.csh will copy any build and run scripts

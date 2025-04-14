@@ -101,8 +101,8 @@
 !C Vertical coord values
       REAL,    ALLOCATABLE, SAVE :: VGLVSLT        ( : )
       REAL, SAVE      :: YNaBeta
-      REAL, SAVE      :: BetaF2E  ! GLM mean daily energy/flash
-      REAL, SAVE      :: GamaF2E  ! WWLLN mean daily energy/stroke
+      REAL, SAVE      :: BetaF2E   ! GLM mean daily energy/flash
+      REAL, SAVE      :: GamaF2E   ! WWLLN mean daily energy/stroke
       REAL, SAVE      :: sGamaF2E  ! WWLLNs mean daily energy/stroke
 
 
@@ -131,8 +131,8 @@
          USE UTILIO_DEFN
          USE CENTRALIZED_IO_MODULE, only : RCA_AVAIL, ICCG_SUM, ICCG_WIN,
      &                                     FILE_TSTEP, F_MET, F_LTNG, LT_NAME, 
-     &                                     LT_VARS,FILE_XCELL,
-     &                                     FILE_YCELL,LTNG_DATA4D
+     &                                     LT_VARS, FILE_XCELL,
+     &                                     FILE_YCELL, LTNG_DATA4D
          USE MIO_ASCII
 
 #ifdef twoway
@@ -149,36 +149,29 @@
 
          LOGICAL SUCCESS
 
-!C External Functions:
-         LOGICAL,     EXTERNAL :: CHKGRID
-
 !C value to start log linear regression  
          CHARACTER( 16 )       :: PNAME = 'LTNG_INIT'
          CHARACTER( 80 )       :: VARDESC   ! env variable description
          CHARACTER( 120 )      :: XMSG = ' '
          REAL                  :: X, Y, VAL
          INTEGER               :: C, R
-
-         LOGICAL LTNGPARAM           ! env var to use lightning NO parameters file
-         INTEGER LSPCS               ! no. of lightning species
          INTEGER               :: I, J, K, L, V, STATUS
          INTEGER               :: CJDATE
          CHARACTER( 7 )        :: SJDATE
-         REAL                       :: mEngPfl   ! mean engergy per flash
-         REAL                       :: smEngPfl  ! mean energy per flash for the WWLLNs data: s indicats WWLLNs 
-         REAL                       :: WLNsd     ! tThe standard deviation (sd) for the WWLLN data 
-         REAL                       :: sWLNsd    ! the standard deviation (sd) for the WWLLNs data
-         REAL                       :: zScore    ! the ratio of CC/CG lightning strikes for WWLLN data
-         REAL                       :: szScore   ! the ratio of CC/CG lightning strikes for WWLLNs data 
-         REAL,    Allocatable       :: gZWLNeng(:) ! greater than zero (gZ) WWLLN energy record (grid-cell-hourly)
-         REAL,    Allocatable       :: gZWLNseng(:) ! gZ WWLLNs engergy records
-         REAL,    Allocatable       :: gZWLNfl(:)   ! gZ WWLLN strike records
-         REAL,    Allocatable       :: gZWLNsfl(:)  ! gZ WWLLNs strike records
-         REAL,    Allocatable       :: EngPfl(:)    ! the buffer holding the WWLLN energy per flash with gZ records
-         REAL,    Allocatable       :: sEngPfl(:)   !the buffer holding the WWLLNs energy per flash with gZ records
+         REAL                  :: mEngPfl      ! mean energy per flash
+         REAL                  :: smEngPfl     ! mean energy per flash for the WWLLNs data: s indicates WWLLNs 
+         REAL                  :: WLNsd        ! standard deviation for the WWLLN data 
+         REAL                  :: sWLNsd       ! standard deviation for the WWLLNs data
+         REAL                  :: zScore       ! ratio of CC/CG lightning strikes for WWLLN data
+         REAL                  :: szScore      ! ratio of CC/CG lightning strikes for WWLLNs data 
+         REAL,    Allocatable  :: gZWLNeng(:)  ! greater than zero (gZ) WWLLN energy record (grid-cell-hourly)
+         REAL,    Allocatable  :: gZWLNseng(:) ! gZ WWLLNs energy records
+         REAL,    Allocatable  :: gZWLNfl(:)   ! gZ WWLLN strike records
+         REAL,    Allocatable  :: gZWLNsfl(:)  ! gZ WWLLNs strike records
+         REAL,    Allocatable  :: EngPfl(:)    ! buffer holding the WWLLN energy per flash with gZ records
+         REAL,    Allocatable  :: sEngPfl(:)   ! buffer holding the WWLLNs energy per flash with gZ records
                                        
-         LOGICAL OK
-         INTEGER                    :: WLNgZlen     ! the length of nonzero records for the WWLLN/WWLLNs data
+         INTEGER               :: WLNgZlen     ! number of nonzero records for the WWLLN/WWLLNs data
 
 !-----------------------------------------------------------------------
 
@@ -213,245 +206,243 @@
          READ( SJDATE, '(4X, I3)' ) CJDATE
 
 #ifndef mpas
-            XMSG = 'Using in-line lightning NO production'
-            CALL M3MSG2( XMSG )
+         XMSG = 'Using in-line lightning NO production'
+         CALL M3MSG2( XMSG )
 
 #ifdef twoway
-           IF (wrf_lightning_assim) THEN
-              LTNGON_DATA = .FALSE.
-           END IF
+         IF (wrf_lightning_assim) THEN
+            LTNGON_DATA = .FALSE.
+         END IF
 #endif
-           SQUAREKM = REAL( ( XCELL_GD * YCELL_GD * 1.0D-6 ), 4 )
-           IF ( RCA_AVAIL ) THEN
-               RC_NAME = 'RCA'
-           ELSE
-               RC_NAME = 'RC'
-           END IF
-           IF ( LTNGON_DATA ) THEN
-                  XMSG = 'Using hourly LTNG data'
-                  CALL M3MSG2( XMSG )
-               IF(LNO_OPTION == 1) THEN
-                 IF(LT_VARS == 1) THEN
-                     WsflIdx = 1
-                 ELSE
-                     WsflIdx = INDEX1("WLNsfl", LT_VARS, LT_NAME)
-                 ENDIF
-               ELSE IF (LNO_OPTION == 2) THEN
-                    GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
-               ELSE IF (LNO_OPTION == 3) THEN
-                    GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
-                    GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
-                    IF(sum(LTNG_DATA4D(:,:,1,:,GflIdx)) > 0) then
-                    BetaF2E = sum(LTNG_DATA4D(:,:,1,:,GegIdx))/(sum(LTNG_DATA4D(:,:,1,:,GflIdx))*SQUAREKM)
-                    BetaF2E = MOLSNCG/BetaF2E                 !moles N per flash energy of GLM
-                 ELSE
-                    BetaF2E = 0
-                 ENDIF
-               ELSE IF (LNO_OPTION >= 4) THEN
-                    GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
-                    GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
-                    WflIdx = INDEX1("WLNfl", LT_VARS, LT_NAME)
-                    WegIdx = INDEX1("WLNeng", LT_VARS, LT_NAME)
+         SQUAREKM = REAL( ( XCELL_GD * YCELL_GD * 1.0D-6 ), 4 )
+         IF ( RCA_AVAIL ) THEN
+             RC_NAME = 'RCA'
+         ELSE
+             RC_NAME = 'RC'
+         END IF
+         IF ( LTNGON_DATA ) THEN
+             XMSG = 'Using hourly LTNG data'
+             CALL M3MSG2( XMSG )
+             IF (LNO_OPTION == 1) THEN
+                IF (LT_VARS == 1) THEN
+                    WsflIdx = 1
+                ELSE
                     WsflIdx = INDEX1("WLNsfl", LT_VARS, LT_NAME)
-                    WsegIdx = INDEX1("WLNseng", LT_VARS, LT_NAME)
-                    WLNgZlen = COUNT(LTNG_DATA4D(:,:,1,:,WflIdx) > 0)  ! gZ: greater than zero
-                    ALLOCATE(gZWLNeng(WLNgZlen),gZWLNseng(WLNgZlen), gZWLNfl(WLNgZlen))
-                    ALLOCATE(gZWLNsfl(WLNgZlen), EngPfl(WLNgZlen), sEngPfl(WLNgZlen))
-                    gZWLNfl = PACK(LTNG_DATA4D(:,:,1,:,WflIdx), LTNG_DATA4D(:,:,1,:,WflIdx) > 0)
-                    gZWLNsfl = PACK(LTNG_DATA4D(:,:,1,:,WsflIdx), LTNG_DATA4D(:,:,1,:,WsflIdx) > 0)
-                    gZWLNeng = PACK(LTNG_DATA4D(:,:,1,:,WegIdx), LTNG_DATA4D(:,:,1,:,WegIdx) > 0)
-                    gZWLNseng = PACK(LTNG_DATA4D(:,:,1,:,WsegIdx), LTNG_DATA4D(:,:,1,:,WsegIdx) > 0)
-                    EngPfl = gZWLNeng/(gZWLNfl*SQUAREKM)
-                    sEngPfl = gZWLNseng/(gZWLNsfl*SQUAREKM)
-                    mEngPfl = sum(EngPfl)/WLNgZlen
-                    smEngPfl = sum(sEngPfl)/WLNgZlen
-                    WLNsd   = SQRT(sum(EngPfl**2)/size(EngPfl) - mEngPfl**2)
-                    sWLNsd   = SQRT(sum(sEngPfl**2)/size(sEngPfl) - smEngPfl**2)
-                    zScore = mEngPfl + 3*WLNsd
-                    szScore = smEngPfl + 3*sWLNsd
+                ENDIF
+             ELSE IF (LNO_OPTION == 2) THEN
+                GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
+             ELSE IF (LNO_OPTION == 3) THEN
+                GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
+                GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
+                IF (sum(LTNG_DATA4D(:,:,1,:,GflIdx)) > 0) then
+                  BetaF2E = sum(LTNG_DATA4D(:,:,1,:,GegIdx))/(sum(LTNG_DATA4D(:,:,1,:,GflIdx))*SQUAREKM)
+                  BetaF2E = MOLSNCG/BetaF2E                 !moles N per flash energy of GLM
+                ELSE
+                  BetaF2E = 0
+                ENDIF
+             ELSE IF (LNO_OPTION >= 4) THEN
+                GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
+                GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
+                WflIdx = INDEX1("WLNfl", LT_VARS, LT_NAME)
+                WegIdx = INDEX1("WLNeng", LT_VARS, LT_NAME)
+                WsflIdx = INDEX1("WLNsfl", LT_VARS, LT_NAME)
+                WsegIdx = INDEX1("WLNseng", LT_VARS, LT_NAME)
+                WLNgZlen = COUNT(LTNG_DATA4D(:,:,1,:,WflIdx) > 0)  ! gZ: greater than zero
+                ALLOCATE(gZWLNeng(WLNgZlen), gZWLNseng(WLNgZlen), gZWLNfl(WLNgZlen))
+                ALLOCATE(gZWLNsfl(WLNgZlen), EngPfl(WLNgZlen), sEngPfl(WLNgZlen))
+                gZWLNfl = PACK(LTNG_DATA4D(:,:,1,:,WflIdx), LTNG_DATA4D(:,:,1,:,WflIdx) > 0)
+                gZWLNsfl = PACK(LTNG_DATA4D(:,:,1,:,WsflIdx), LTNG_DATA4D(:,:,1,:,WsflIdx) > 0)
+                gZWLNeng = PACK(LTNG_DATA4D(:,:,1,:,WegIdx), LTNG_DATA4D(:,:,1,:,WegIdx) > 0)
+                gZWLNseng = PACK(LTNG_DATA4D(:,:,1,:,WsegIdx), LTNG_DATA4D(:,:,1,:,WsegIdx) > 0)
+                EngPfl = gZWLNeng/(gZWLNfl*SQUAREKM)
+                sEngPfl = gZWLNseng/(gZWLNsfl*SQUAREKM)
+                mEngPfl = sum(EngPfl)/WLNgZlen
+                smEngPfl = sum(sEngPfl)/WLNgZlen
+                WLNsd   = SQRT(sum(EngPfl**2)/size(EngPfl) - mEngPfl**2)
+                sWLNsd   = SQRT(sum(sEngPfl**2)/size(sEngPfl) - smEngPfl**2)
+                zScore = mEngPfl + 3*WLNsd
+                szScore = smEngPfl + 3*sWLNsd
 ! filter out possible spurious WWLLN energy records that are outliers
 ! and recompute using the strokes and the mean energy per stroke
-                  DO i = 1, size(LTNG_DATA4D,4) 
-                    DO r = 1, NROWS
+                DO i = 1, size(LTNG_DATA4D,4) 
+                   DO r = 1, NROWS
                       DO c = 1, NCOLS
-                        IF((LTNG_DATA4D(c,r,1,i,WflIdx) > 0) .and.  
-     &                     (LTNG_DATA4D(c,r,1,i,WegIdx)/(LTNG_DATA4D(c,r,1,i,WflIdx)*SQUAREKM) 
-     &                    > zScore)) THEN
-                          LTNG_DATA4D(c,r,1,i,WegIdx) = LTNG_DATA4D(c,r,1,i,WflIdx) * mEngPfl
-                        ENDIF
-                        IF((LTNG_DATA4D(c,r,1,i,WsflIdx) > 0) .and. 
-     &                    (LTNG_DATA4D(c,r,1,i,WsegIdx)/(LTNG_DATA4D(c,r,1,i,WsflIdx)*SQUAREKM) >
-     &                   szScore)) THEN
-                          LTNG_DATA4D(c,r,1,i,WsegIdx) = LTNG_DATA4D(c,r,1,i,WsflIdx) * smEngPfl
-                        ENDIF
+                         IF ((LTNG_DATA4D(c,r,1,i,WflIdx) > 0) .and.  
+     &                      (LTNG_DATA4D(c,r,1,i,WegIdx)/(LTNG_DATA4D(c,r,1,i,WflIdx)*SQUAREKM) 
+     &                      > zScore)) THEN
+                            LTNG_DATA4D(c,r,1,i,WegIdx) = LTNG_DATA4D(c,r,1,i,WflIdx) * mEngPfl
+                         ENDIF
+                         IF ((LTNG_DATA4D(c,r,1,i,WsflIdx) > 0) .and. 
+     &                      (LTNG_DATA4D(c,r,1,i,WsegIdx)/(LTNG_DATA4D(c,r,1,i,WsflIdx)*SQUAREKM) >
+     &                      szScore)) THEN
+                            LTNG_DATA4D(c,r,1,i,WsegIdx) = LTNG_DATA4D(c,r,1,i,WsflIdx) * smEngPfl
+                         ENDIF
                       ENDDO
-                    ENDDO
-                 ENDDO
-                 IF(sum(LTNG_DATA4D(:,:,1,:,GflIdx)) > 0) then
-                    BetaF2E = sum(LTNG_DATA4D(:,:,1,:,GegIdx))/(sum(LTNG_DATA4D(:,:,1,:,GflIdx))*SQUAREKM)
-                    BetaF2E = MOLSNCG/BetaF2E                 !moles N per flash energy of GLM
-                 ELSE 
-                    BetaF2E = 0
-                 ENDIF 
-                 IF(sum(LTNG_DATA4D(:,:,1,:,WflIdx)) > 0) then
-                   GamaF2E = sum(LTNG_DATA4D(:,:,1,:,WegIdx))/(sum(LTNG_DATA4D(:,:,1,:,WflIdx))*SQUAREKM)
-                   GamaF2E = MOLSNCG/GamaF2E                 !moles N per flash energy of WWLLN
-                 ELSE 
-                   GamaF2E = 0
-                 ENDIF 
-                 IF(sum(LTNG_DATA4D(:,:,1,:,WsflIdx)) > 0) then
-                  sGamaF2E = sum(LTNG_DATA4D(:,:,1,:,WsegIdx))/(sum(LTNG_DATA4D(:,:,1,:,WsflIdx))*SQUAREKM)
-                  sGamaF2E = MOLSNCG/sGamaF2E                 !moles N per flash energy of WWLLN
-                 ELSE 
-                  sGamaF2E = 0
-                 ENDIF 
+                   ENDDO
+                ENDDO
+                IF (sum(LTNG_DATA4D(:,:,1,:,GflIdx)) > 0) then
+                   BetaF2E = sum(LTNG_DATA4D(:,:,1,:,GegIdx))/(sum(LTNG_DATA4D(:,:,1,:,GflIdx))*SQUAREKM)
+                   BetaF2E = MOLSNCG/BetaF2E                 !moles N per flash energy of GLM
+                ELSE 
+                   BetaF2E = 0
+                ENDIF 
+                IF (sum(LTNG_DATA4D(:,:,1,:,WflIdx)) > 0) then
+                  GamaF2E = sum(LTNG_DATA4D(:,:,1,:,WegIdx))/(sum(LTNG_DATA4D(:,:,1,:,WflIdx))*SQUAREKM)
+                  GamaF2E = MOLSNCG/GamaF2E                 !moles N per flash energy of WWLLN
+                ELSE 
+                  GamaF2E = 0
+                ENDIF 
+                IF (sum(LTNG_DATA4D(:,:,1,:,WsflIdx)) > 0) then
+                 sGamaF2E = sum(LTNG_DATA4D(:,:,1,:,WsegIdx))/(sum(LTNG_DATA4D(:,:,1,:,WsflIdx))*SQUAREKM)
+                 sGamaF2E = MOLSNCG/sGamaF2E                 !moles N per flash energy of WWLLN
+                ELSE 
+                 sGamaF2E = 0
+                ENDIF 
 
-               ELSE
-                   XMSG = 'LNO_OPTION has to be in the range from 1 to 4'
-                   CALL M3MSG2( XMSG )
-               END IF
-
-               LT_TSTEP = TIME2SEC ( FILE_TSTEP(F_LTNG)  )
-               LT_TSTEP_F = FILE_TSTEP(F_LTNG) 
-            ELSE
-                 LT_TSTEP = TIME2SEC ( TSTEP )
-                 LT_TSTEP_F = TSTEP 
-                 XMSG = 'Using derived parameters for KF scheme '
+             ELSE
+                 XMSG = 'LNO_OPTION must be in the range from 1 to 4'
                  CALL M3MSG2( XMSG )
-            END IF  !END if LTNGON_DATA 
+             END IF
 
-!            LT_TSTEP_F = SEC2TIME (LT_TSTEP)
+             LT_TSTEP = TIME2SEC ( FILE_TSTEP(F_LTNG)  )
+             LT_TSTEP_F = FILE_TSTEP(F_LTNG) 
+         ELSE
+             LT_TSTEP = TIME2SEC ( TSTEP )
+             LT_TSTEP_F = TSTEP 
+             XMSG = 'Using derived parameters for KF scheme '
+             CALL M3MSG2( XMSG )
+         END IF  !END if LTNGON_DATA 
 
 !C Set up vertical layers
-            ALLOCATE( VGLVSLT( 0:DESID_LAYS ), STAT = STATUS )
-            CALL CHECKMEM( STATUS, 'VGLVSLT', PNAME )
+         ALLOCATE( VGLVSLT( 0:DESID_LAYS ), STAT = STATUS )
+         CALL CHECKMEM( STATUS, 'VGLVSLT', PNAME )
 
-            ALLOCATE( ICCG        ( NCOLS,NROWS ),
-     &                   LTNG_PRSFC  ( NCOLS,NROWS ),
-     &                   LTNG_DATA ( NCOLS,NROWS,LT_VARS ),
-     &                   LTNG_RC     ( NCOLS,NROWS ),STAT = STATUS )
-               IF ( STATUS .NE. 0 ) THEN
-                  XMSG = 'ICCG, OCEAN_MASK, LTNG_Parameters'
-     &                 // '  memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
-                  SUCCESS = .FALSE.; RETURN
-               END IF
-               IF ( CJDATE .GT. 90 .AND. CJDATE .LT. 274 ) THEN
-                  ICCG = ICCG_SUM
-               ELSE
-                  ICCG = ICCG_WIN
-               END IF
-!            END IF  !LPARAM
+         ALLOCATE( ICCG        ( NCOLS,NROWS ),
+     &             LTNG_PRSFC  ( NCOLS,NROWS ),
+     &             LTNG_DATA   ( NCOLS,NROWS,LT_VARS ),
+     &             LTNG_RC     ( NCOLS,NROWS ),STAT = STATUS )
+         IF ( STATUS .NE. 0 ) THEN
+            XMSG = 'ICCG, OCEAN_MASK, LTNG_Parameters'
+     &          // '  memory allocation failed'
+            CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+            SUCCESS = .FALSE.; RETURN
+         END IF
+         IF ( CJDATE .GT. 90 .AND. CJDATE .LT. 274 ) THEN
+            ICCG = ICCG_SUM
+         ELSE
+            ICCG = ICCG_WIN
+         END IF
+
 !C Store local layer information
-            DO L = DESID_LAYS, 0, -1
-                  VGLVSLT( L ) = VGLVS_GD( L+1 )
-!                  WRITE( LOGDEV,'(5X, A, I3, A, F11.7)' ) 'VGLVSLT(', L, ' ):', VGLVSLT( L )
-            END DO
+         DO L = DESID_LAYS, 0, -1
+            VGLVSLT( L ) = VGLVS_GD( L+1 )
+!           WRITE( LOGDEV,'(5X, A, I3, A, F11.7)' ) 'VGLVSLT(', L, ' ):', VGLVSLT( L )
+         END DO
 
 
-            LDATE = STDATE; LTIME = STTIME
-            IF ( LTNGDIAG ) THEN
+         LDATE = STDATE; LTIME = STTIME
+         IF ( LTNGDIAG ) THEN
 !C Build description for, and open lightning diagnostic file
 !C (all but variables-table and horizontal domain in description is borrowed from MNAME)
-               FDATE = STDATE
-               FTIME = STTIME
-               CALL NEXTIME( FDATE, FTIME, TSTEP )
-               SDATE3D = FDATE
-               STIME3D = FTIME
-               TSTEP3D = TSTEP
+            FDATE = STDATE
+            FTIME = STTIME
+            CALL NEXTIME( FDATE, FTIME, TSTEP )
+            SDATE3D = FDATE
+            STIME3D = FTIME
+            TSTEP3D = TSTEP
 
-               FTYPE3D = GRDDED3
-               NCOLS3D = GL_NCOLS
-               NROWS3D = GL_NROWS
-               NTHIK3D = 1
-               GDTYP3D = GDTYP_GD
-               P_ALP3D = P_ALP_GD
-               P_BET3D = P_BET_GD
-               P_GAM3D = P_GAM_GD
-               XORIG3D = XORIG_GD
-               YORIG3D = YORIG_GD
-               XCENT3D = XCENT_GD
-               YCENT3D = YCENT_GD
-               XCELL3D = XCELL_GD
-               YCELL3D = YCELL_GD
-               VGTYP3D = VGTYP_GD
-               VGTOP3D = VGTOP_GD
-               GDNAM3D = GRID_NAME  ! from HGRD_DEFN
+            FTYPE3D = GRDDED3
+            NCOLS3D = GL_NCOLS
+            NROWS3D = GL_NROWS
+            NTHIK3D = 1
+            GDTYP3D = GDTYP_GD
+            P_ALP3D = P_ALP_GD
+            P_BET3D = P_BET_GD
+            P_GAM3D = P_GAM_GD
+            XORIG3D = XORIG_GD
+            YORIG3D = YORIG_GD
+            XCENT3D = XCENT_GD
+            YCENT3D = YCENT_GD
+            XCELL3D = XCELL_GD
+            YCELL3D = YCELL_GD
+            VGTYP3D = VGTYP_GD
+            VGTOP3D = VGTOP_GD
+            GDNAM3D = GRID_NAME  ! from HGRD_DEFN
 
-               NLAYS3D = DESID_LAYS
-               DO L = 1, NLAYS3D + 1
-                  VGLVS3D( L ) = VGLVS_GD( L )
-               END DO
+            NLAYS3D = DESID_LAYS
+            DO L = 1, NLAYS3D + 1
+               VGLVS3D( L ) = VGLVS_GD( L )
+            END DO
 
-               NVARS3D = 1
-               VNAME3D( 1 ) = LTSPC
-               VDESC3D( 1 ) = 'hourly average NO produced from lightning'
-               VTYPE3D( 1 ) = M3REAL
-               UNITS3D( 1 ) = 'mol s-1'
+            NVARS3D = 1
+            VNAME3D( 1 ) = LTSPC
+            VDESC3D( 1 ) = 'hourly average NO produced from lightning'
+            VTYPE3D( 1 ) = M3REAL
+            UNITS3D( 1 ) = 'mol s-1'
 
-               FDESC3D = ' '   ! array assignment
-               FDESC3D( 1 ) = 'Gridded lightning NO production from CMAQ'
-               FDESC3D( 2 ) = '/from/ ' // PNAME
-               FDESC3D( 3 ) = '/Version/ CMAQ'
+            FDESC3D = ' '   ! array assignment
+            FDESC3D( 1 ) = 'Gridded lightning NO production from CMAQ'
+            FDESC3D( 2 ) = '/from/ ' // PNAME
+            FDESC3D( 3 ) = '/Version/ CMAQ'
 
-               ! Store MIO Metadata
-               NDIMS3D( 1:NVARS3D ) = 4
-               L_TSTEP( 1:NVARS3D ) = .True.
-               L_LAY  ( 1:NVARS3D ) = .True.
-               L_COL  ( 1:NVARS3D ) = .True.
-               L_ROW  ( 1:NVARS3D ) = .True.
-               L_VEXT ( 1:NVARS3D ) = .False.
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 4
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .True.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
           
-               CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_1', NLAYS3D, 1, NLAYS3D,
-     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &              L_VEXT(1:NVARS3D) )
-               
-               ! Store MIO Metadata
-               NDIMS3D( 1:NVARS3D ) = 3
-               L_TSTEP( 1:NVARS3D ) = .True.
-               L_LAY  ( 1:NVARS3D ) = .False.
-               L_COL  ( 1:NVARS3D ) = .True.
-               L_ROW  ( 1:NVARS3D ) = .True.
-               L_VEXT ( 1:NVARS3D ) = .False.
-               
-               CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_2', 0, 0, 0,
-     &              VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
-     &              VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
-     &              L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
-     &              L_VEXT(1:NVARS3D) )
+            CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_1', NLAYS3D, 1, NLAYS3D,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
+            
+            ! Store MIO Metadata
+            NDIMS3D( 1:NVARS3D ) = 3
+            L_TSTEP( 1:NVARS3D ) = .True.
+            L_LAY  ( 1:NVARS3D ) = .False.
+            L_COL  ( 1:NVARS3D ) = .True.
+            L_ROW  ( 1:NVARS3D ) = .True.
+            L_VEXT ( 1:NVARS3D ) = .False.
+            
+            CALL LOAD_MIO_FILE ( 'CTM_LTNGDIAG_2', 0, 0, 0,
+     &           VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &           VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &           L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &           L_VEXT(1:NVARS3D) )
                
 !C Open output file (mol s-1)
-               IF ( IO_PE_INCLUSIVE ) THEN
-                  IF ( .NOT. OPEN3( CTM_LTNGDIAG_1, FSUNKN3, PNAME ) ) THEN
-                     XMSG = 'Could not open ' // TRIM( CTM_LTNGDIAG_1 )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
-                  NLAYS3D = 1
-                  VDESC3D( 1 ) = 'Column NO produced from lightning'
-                  IF ( .NOT. OPEN3( CTM_LTNGDIAG_2, FSUNKN3, PNAME ) ) THEN
-                     XMSG = 'Could not open ' // TRIM( CTM_LTNGDIAG_2 )
-                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-                  END IF
-
+            IF ( IO_PE_INCLUSIVE ) THEN
+               IF ( .NOT. OPEN3( CTM_LTNGDIAG_1, FSUNKN3, PNAME ) ) THEN
+                  XMSG = 'Could not open ' // TRIM( CTM_LTNGDIAG_1 )
+                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+               END IF
+               NLAYS3D = 1
+               VDESC3D( 1 ) = 'Column NO produced from lightning'
+               IF ( .NOT. OPEN3( CTM_LTNGDIAG_2, FSUNKN3, PNAME ) ) THEN
+                  XMSG = 'Could not open ' // TRIM( CTM_LTNGDIAG_2 )
+                  CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
 
-               ALLOCATE( VDEMIS_LTDIAG( NCOLS,NROWS,DESID_LAYS ), STAT = STATUS )
-               IF ( STATUS .NE. 0 ) THEN
-                  XMSG = 'VDEMIS_LTDIAG memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
-                  SUCCESS = .FALSE.; RETURN
-               END IF
-               VDEMIS_LTDIAG = 0.0   ! array assignment
-               ALLOCATE( COLUMN_DIAG( NCOLS,NROWS,1), STAT = STATUS )
-               IF ( STATUS .NE. 0 ) THEN
-                  XMSG = 'COLUMN_DIAG memory allocation failed'
-                  CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
-                  SUCCESS = .FALSE.; RETURN
-               END IF
-               COLUMN_DIAG = 0.0   ! array assignment
-            END IF   ! LTNGDIAG
+            END IF
+
+            ALLOCATE( VDEMIS_LTDIAG( NCOLS,NROWS,DESID_LAYS ), STAT = STATUS )
+            IF ( STATUS .NE. 0 ) THEN
+               XMSG = 'VDEMIS_LTDIAG memory allocation failed'
+               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               SUCCESS = .FALSE.; RETURN
+            END IF
+            VDEMIS_LTDIAG = 0.0   ! array assignment
+            ALLOCATE( COLUMN_DIAG( NCOLS,NROWS,1), STAT = STATUS )
+            IF ( STATUS .NE. 0 ) THEN
+               XMSG = 'COLUMN_DIAG memory allocation failed'
+               CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
+               SUCCESS = .FALSE.; RETURN
+            END IF
+            COLUMN_DIAG = 0.0   ! array assignment
+         END IF   ! LTNGDIAG
 
 #endif
 
@@ -465,8 +456,6 @@
             SUCCESS = .FALSE.; RETURN
          END IF
  
-!         RETURN
-
          END FUNCTION LTNG_INIT
 
 !C======================================================================
@@ -502,8 +491,6 @@
          LOGICAL, INTENT( IN ) :: L_DESID_DIAG ! flag determining whether or not DESID
                                                !   is in diagnostic mode              
          REAL,   PARAMETER :: CONVPA = 1.0E-2  ! convert Pa to hPa
-!        REAL,   PARAMETER :: WK = 8.0         ! shape parameter for weibull distribution
-!        REAL,   PARAMETER :: WLAMBDA = 700.0  ! scale parameter for weibull distribution
          REAL,   PARAMETER :: WMU = 350.0      ! mean
          REAL,   PARAMETER :: WSIGMA = 200.0   ! standard deviation
          REAL,   PARAMETER :: W2MU = 600.0     ! mean
@@ -528,7 +515,7 @@
          REAL    XCELLR, YCELLR   ! cell spacing ratio to 36Km
          REAL    FLASH_FAC        ! lightning flashes factor
 
-         LOGICAL,     SAVE :: LASTTIC   ! true: last sync step this output tstep
+         LOGICAL,     SAVE :: LASTTIC  ! true: last sync step this output tstep
          REAL              :: DIVFAC   ! averaging factor for diagnostic file
 
          CHARACTER( 16 )   :: MNAME
@@ -545,7 +532,7 @@
          INTEGER,     SAVE :: TOT_TSTEP
          LOGICAL,     SAVE :: FIRSTIME = .TRUE.
 
-         REAL :: LOC_VGTOP_GD
+         REAL              :: LOC_VGTOP_GD
 
 !-----------------------------------------------------------------------
          
@@ -566,12 +553,12 @@
 
 !C read in the hourly lightning strike file
 #ifdef twoway
-            IF(wrf_lightning_assim) THEN
+            IF (wrf_lightning_assim) THEN
               call interpolate_var ('LNT', jdate, jtime, LTNG_DATA(:,:,1))
 !C Interpret the timestep LTNG_DATA value into hourly value
               LTNG_DATA(:,:,1) = LTNG_DATA(:,:,1)*60/LT_ASM_DT
-               wrf_assim = .TRUE.
-!               WRITE(*,*) "Max LTNG_DATA = ", MAXVAL(LTNG_DATA)
+              wrf_assim = .TRUE.
+!             WRITE(*,*) "Max LTNG_DATA = ", MAXVAL(LTNG_DATA)
             ELSE
               IF ( .NOT. LTNGON_DATA ) THEN
                 call interpolate_var (RC_NAME, jdate, jtime, LTNG_RC)
@@ -592,16 +579,15 @@
                END IF
             END IF
 #endif
-           ! call desc3 (file_name)
             
-            IF( R_READY ) THEN
+            IF ( R_READY ) THEN
                IF ( LTNGON_DATA ) THEN
                  DO v = 1, LT_VARS 
                    call interpolate_var (LT_NAME(v), ldate, ltime, LTNG_DATA(:,:,v))
                    R_READY = .FALSE.
                  ENDDO
-              END IF  ! LTNGON_DATA
-            END IF     !R_READY
+               END IF  
+            END IF  
             ALLOCATE( COLUMN_LTNG_NO( NCOLS,NROWS ), STAT = STATUS )
             IF ( STATUS .NE. 0 ) THEN
                XMSG = 'COLUMN_LTNG_NO memory allocation failed'
@@ -609,74 +595,74 @@
             END IF
             COLUMN_LTNG_NO( :,: ) = 0.0
 !C Iterate over each grid cell and distribute lightning NO vertically
-               DO ROW = 1, NROWS
-                  DO COL = 1, NCOLS
-                     IF ( LTNGON_DATA .or. wrf_assim ) THEN 
-                       IF(LNO_OPTION == 1) THEN
-                          COLUMN_LTNG_NO( COL,ROW ) =
-     &                     ( LTNG_DATA( COL,ROW,WsflIdx )
-     &                       * SQUAREKM     ! LTNG_DATA in km-2
-     &                       * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
-     &                       * ( MOLSNCG + MOLSNIC * ICCG( COL,ROW ) ) )
-     &                       / 3600.0 ! get time units right: emissions are in the unit of moles/s
-                       ELSE IF (LNO_OPTION == 2) THEN
-                          COLUMN_LTNG_NO( COL,ROW ) =
-     &                     ( LTNG_DATA( COL,ROW,GflIdx )
-     &                       * SQUAREKM     ! LTNG_DATA in km-2
-     &                       * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
-     &                       * ( MOLSNCG + MOLSNIC * ICCG( COL,ROW ) ) )
-     &                       /3600.0 ! get time units right: emissions are in the unit of moles/s
-                       ELSE IF (LNO_OPTION == 3) THEN
-                          COLUMN_LTNG_NO( COL,ROW ) =
-     &                     ( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E)
-     &                       / 3600.0 ! get time units right: emissions are in the unit of moles/s
+            DO ROW = 1, NROWS
+               DO COL = 1, NCOLS
+                  IF ( LTNGON_DATA .or. wrf_assim ) THEN 
+                    IF (LNO_OPTION == 1) THEN
+                       COLUMN_LTNG_NO( COL,ROW ) =
+     &                  ( LTNG_DATA( COL,ROW,WsflIdx )
+     &                    * SQUAREKM     ! LTNG_DATA in km-2
+     &                    * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
+     &                    * ( MOLSNCG + MOLSNIC * ICCG( COL,ROW ) ) )
+     &                    / 3600.0 ! get time units right: emissions are in the unit of moles/s
+                    ELSE IF (LNO_OPTION == 2) THEN
+                       COLUMN_LTNG_NO( COL,ROW ) =
+     &                  ( LTNG_DATA( COL,ROW,GflIdx )
+     &                    * SQUAREKM     ! LTNG_DATA in km-2
+     &                    * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
+     &                    * ( MOLSNCG + MOLSNIC * ICCG( COL,ROW ) ) )
+     &                    /3600.0 ! get time units right: emissions are in the unit of moles/s
+                    ELSE IF (LNO_OPTION == 3) THEN
+                       COLUMN_LTNG_NO( COL,ROW ) =
+     &                  ( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E)
+     &                    / 3600.0 ! get time units right: emissions are in the unit of moles/s
 ! LNO using maximum of GLMeng and WLNeng with daily Beta/Gama values
-                       ELSE IF (LNO_OPTION == 4) THEN 
-                          COLUMN_LTNG_NO( COL,ROW ) =
-     &                     max( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E,
-     &                       LTNG_DATA( COL,ROW,WegIdx )*GamaF2E)   
-     &                       / 3600.0 ! get time units right: emissions are in the unit of moles/s
+                    ELSE IF (LNO_OPTION == 4) THEN 
+                       COLUMN_LTNG_NO( COL,ROW ) =
+     &                  max( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E,
+     &                    LTNG_DATA( COL,ROW,WegIdx )*GamaF2E)   
+     &                    / 3600.0 ! get time units right: emissions are in the unit of moles/s
 ! LNO using maximum of GLMeng and WLNseng with daily Beta/sGama values
-! and ICCG adjustmenet (setting the upper bound)
-                       ELSE IF (LNO_OPTION == 5) THEN  !
-                          COLUMN_LTNG_NO( COL,ROW ) =
-     &                     max( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E,
-     &                       LTNG_DATA( COL,ROW,WsegIdx )
-     &                       * ( 1 + ICCG( COL,ROW ) )*sGamaF2E )
-     &                       / 3600.0 ! get time units right: emissions are in the unit of moles/s
-                       ELSE
-                         XMSG = 'LNO_OPTION is not correctly set; correct range is from 1 to 5'
-                         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-                       ENDIF
-                     ELSE
-                        IF ( LTNG_RC( COL,ROW ) .GT. 0 ) THEN
-                           SCL_FACTOR = EXP(INTERCEPT_lg(COL, ROW))
-                           IF ( LTNG_RC( COL,ROW ) .GT. SCL_FACTOR .AND. OCEAN_MASK( COL,ROW ) .GT. 0.2 )THEN
-                              COLUMN_LTNG_NO( COL,ROW ) =
-     &                         ( EXP( SLOPE_LG( COL,ROW ) * LOG( LTNG_RC( COL,ROW ) )
-     &                           + INTERCEPT_LG( COL,ROW) )
-     &                           * SQUAREKM   ! the relation is built on the unit of flash/km2*hr
-     &                           * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
-     &                           * ( MOLSNCG  ! moles N per flash intercloud strikes per cloud-to-ground strike
-     &                             + ( MOLSNIC * ICCG( COL,ROW ) ) ) )
-     &                         /3600.0          ! get time units right
-                              IF ( COLUMN_LTNG_NO( COL,ROW ) .LT. 0 ) COLUMN_LTNG_NO( COL,ROW ) = 0.0
-                           ELSE
-                              COLUMN_LTNG_NO( COL,ROW ) =
-     &                         ( ( SLOPE( COL,ROW ) * LTNG_RC( COL,ROW ) + INTERCEPT( COL,ROW ) )
-     &                           * SQUAREKM   ! the relation is built on flash/km2*hr
-     &                           * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
-     &                           * ( MOLSNCG  ! moles N per flash intercloud strikes per cloud-to-ground strike
-     &                             + ( MOLSNIC * ICCG( COL,ROW ) ) ) )
-     &                         / 3600.0        ! get time units right 
-                              IF ( COLUMN_LTNG_NO( COL,ROW ) .LT. 0 ) COLUMN_LTNG_NO( COL,ROW ) = 0.0
-                           END IF
-                        ELSE
-                           COLUMN_LTNG_NO( COL,ROW ) = 0.0
-                        END IF
-                     END IF   ! LTNGON_DATA
-                  END DO   ! COL
-               END DO   ! ROW
+! and ICCG adjustment (setting the upper bound)
+                    ELSE IF (LNO_OPTION == 5) THEN  !
+                       COLUMN_LTNG_NO( COL,ROW ) =
+     &                  max( LTNG_DATA( COL,ROW,GegIdx )*BetaF2E,
+     &                    LTNG_DATA( COL,ROW,WsegIdx )
+     &                    * ( 1 + ICCG( COL,ROW ) )*sGamaF2E )
+     &                    / 3600.0 ! get time units right: emissions are in the unit of moles/s
+                    ELSE
+                      XMSG = 'LNO_OPTION is not correctly set; correct range is from 1 to 5'
+                      CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
+                    ENDIF
+                  ELSE
+                    IF ( LTNG_RC( COL,ROW ) .GT. 0 ) THEN
+                      SCL_FACTOR = EXP(INTERCEPT_lg(COL, ROW))
+                      IF ( LTNG_RC( COL,ROW ) .GT. SCL_FACTOR .AND. OCEAN_MASK( COL,ROW ) .GT. 0.2 )THEN
+                         COLUMN_LTNG_NO( COL,ROW ) =
+     &                    ( EXP( SLOPE_LG( COL,ROW ) * LOG( LTNG_RC( COL,ROW ) )
+     &                      + INTERCEPT_LG( COL,ROW) )
+     &                      * SQUAREKM   ! the relation is built on the unit of flash/km2*hr
+     &                      * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
+     &                      * ( MOLSNCG  ! moles N per flash intercloud strikes per cloud-to-ground strike
+     &                        + ( MOLSNIC * ICCG( COL,ROW ) ) ) )
+     &                    /3600.0          ! get time units right
+                         IF ( COLUMN_LTNG_NO( COL,ROW ) .LT. 0 ) COLUMN_LTNG_NO( COL,ROW ) = 0.0
+                      ELSE
+                         COLUMN_LTNG_NO( COL,ROW ) =
+     &                    ( ( SLOPE( COL,ROW ) * LTNG_RC( COL,ROW ) + INTERCEPT( COL,ROW ) )
+     &                      * SQUAREKM   ! the relation is built on flash/km2*hr
+     &                      * OCEAN_MASK( COL,ROW ) ! reduce offshore strikes
+     &                      * ( MOLSNCG  ! moles N per flash intercloud strikes per cloud-to-ground strike
+     &                        + ( MOLSNIC * ICCG( COL,ROW ) ) ) )
+     &                    / 3600.0        ! get time units right 
+                         IF ( COLUMN_LTNG_NO( COL,ROW ) .LT. 0 ) COLUMN_LTNG_NO( COL,ROW ) = 0.0
+                      END IF
+                    ELSE
+                      COLUMN_LTNG_NO( COL,ROW ) = 0.0
+                    END IF
+                  END IF   ! LTNGON_DATA
+               END DO   ! COL
+            END DO   ! ROW
 
             VDEMIS_LT = 0.0   ! array assignment
 
@@ -822,7 +808,6 @@
 C------------------  Format  Statements   ------------------------------
 
 94040 FORMAT( /5X, 3( A, :, 1X ), I8, ":", I6.6 )
-94042 FORMAT( /5X, A, 1X, I8, ":", I6.6, 1X, 1PE13.5 )
 
          END SUBROUTINE GET_LTNG
 

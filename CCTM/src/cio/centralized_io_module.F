@@ -146,11 +146,11 @@
         real*8  :: file_ycell(max_nfiles) = 0.0d0
         logical :: file_sym_date(max_nfiles)  
 
-        CHARACTER( 40 ), parameter :: LTNGFILE = 'LTNG_DATA'
+        CHARACTER( 40 ), parameter :: LTNGFILE     = 'LTNG_DATA'
         CHARACTER( 40 ), parameter :: ICFILE       = 'INIT_CONC_1'
         CHARACTER( 40 ), parameter :: BCFILE       = 'BNDY_CONC_1'
         CHARACTER( 40 ), parameter :: ISAM_PREVDAY = 'ISAM_PREVDAY'
-        integer  :: LT_VARS                      ! Number of variabls in LTNGFILE
+        integer  :: LT_VARS                      ! Number of variables in LTNGFILE
 
 ! time independent data
         real, allocatable :: MSFX2(:,:),         ! from GRID_CRO_2D data
@@ -6108,49 +6108,49 @@ C Read the various categories of normalized emissions
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "OCNMASK", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, OCEAN_MASK ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract OPEN from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "SLOPE", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, SLOPE ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract SLOPE from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "INTERCEPT", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, INTERCEPT ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract INTERCEPT from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "SLOPE_lg", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, SLOPE_lg ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract SLOPE_lg from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "INTERCEPT_lg", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, INTERCEPT_lg ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract INTERCEPT_lg from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "ICCG_SUM", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, ICCG_SUM ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract ICCG_SUM from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
           IF ( .NOT. XTRACT3( LTNGPARMS_FILE, "ICCG_WIN", 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        0, 0, ICCG_WIN ) ) Then
-             XMSG = 'Could not interpolate OPEN from ' // LTNGPARMS_FILE
+             XMSG = 'Could not extract ICCG_WIN from ' // LTNGPARMS_FILE
              Call M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
           End If
 
@@ -6160,7 +6160,7 @@ C Read the various categories of normalized emissions
                IF ( .NOT. XTRACT3( LTNGFILE, LT_NAME(v), 1, 1,
      &                        startrow, endrow, startcol, endcol,
      &                        jdate, jtime, LTNG_DATA4D(:,:,:,n,v) ) ) Then
-                  XMSG = 'Could not interpolate OPEN from ' // LTNGFILE
+                  XMSG = 'Could not extract ' // LT_NAME(v) // ' from ' // LTNGFILE
                   Call M3EXIT( PNAME, jdate, jtime, XMSG, XSTAT1 )
                End If
             ENDDO

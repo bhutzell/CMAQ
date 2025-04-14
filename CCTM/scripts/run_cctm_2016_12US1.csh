@@ -620,8 +620,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_DEPV_MOS    "$OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc -v"    #> Dry Dep Velocity
   setenv CTM_VDIFF_DIAG  "$OUTDIR/CCTM_VDIFF_DIAG_${CTM_APPL}.nc -v" #> Vertical Dispersion Diagnostic
   setenv CTM_VSED_DIAG   "$OUTDIR/CCTM_VSED_DIAG_${CTM_APPL}.nc -v"  #> Particle Grav. Settling Velocity
-  setenv CTM_LTNGDIAG_1  "$OUTDIR/CCTM_LNO3D_${CTM_APPL}.nc -v"   #> Hourly Avg Lightning NO
-  setenv CTM_LTNGDIAG_2  "$OUTDIR/CCTM_LNO2DCOL_${CTM_APPL}.nc -v"    #> Column Total Lightning NO
+  setenv CTM_LTNGDIAG_1  "$OUTDIR/CCTM_LNO3D_${CTM_APPL}.nc -v"      #> Hourly Avg Lightning NO
+  setenv CTM_LTNGDIAG_2  "$OUTDIR/CCTM_LNO2DCOL_${CTM_APPL}.nc -v"   #> Column Total Lightning NO
   setenv CTM_VEXT_1      "$OUTDIR/CCTM_VEXT_${CTM_APPL}.nc -v"       #> On-Hour 3D Concs at select sites
 
   setenv LAYER_FILE  $ICpath/$ICFILE
