@@ -19,8 +19,8 @@ To determine its configuration, DESID makes use of input primarily from four fil
 A separate version of the chemical mapping control file exists for every mechanism because these namelists are preloaded with likely rules linking emissions of important CMAQ primary species to their typical emission species names as output by SMOKE. 
 By default, this namelist is stored in each chemical mechanism folder (e.g. MECHS/cb6r5_ae7_aq) and is copied into the user's build directory when bldit_cctm.csh is executed and a chemical mechanism is chosen. If the user modifies the name or location of the DESID control file or chemical mapping file, then the following commands in the RunScript should be updated as well:
 ```
-setenv DESID_CTRL_NML ${BLD}/CMAQ_Control_DESID.nml
-setenv DESID_CHEM_CTRL_NML ${BLD}/CMAQ_Control_DESID_${MECH}.nml
+setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
+setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml
 ```
 
 If the user does not provide a DESID Control Files or the path to the files in the RunScript are incorrect, then the model will abort and indicate the error. If the user would like all emissions set to 0, it is recommended that they use the syntax outlined here and in the DESID tutorial to do so.   
@@ -360,7 +360,7 @@ The variable Desid_Max_Stream_Fam_Members should be set higher than the maximum 
 
 ### B.3.6 Chemical Families
 Chemical families are defined analogously to stream and region families but in the CMAQ Miscellaneous Control file. This is because they are useful to modules beyond DESID, including [ELMO](CMAQ_UG_appendixF_elmo_output.md) and the [Budget Tool](../CMAQ_UG_ch09_process_analysis.md). 
-See the [Miscellaneous Control File Description](../CMAQ_UG_ch04_model_inputs.md#miscctrl) in Chapter 4 for details. 
+See the [CMAQ Control Namelist Description](../CMAQ_UG_ch04_model_inputs.md#cmaqctrl) in Chapter 4 for details. 
 
 One additional note: if a chemical familiy is defined for use in an emission scaling rule, the user should be careful about confirming that the members of that family are present on the emission input file or the CMAQ model species list, depending on which the user is trying to modify. Since the names on the input files are often different than those on the CMAQ model species list, care is advised. DESID will print warnings to the CMAQ log file when it cannot find species that it is looking for from a chemical family on an input file or in the list of CMAQ model species. Please confirm that the model is operating as you expect.  
  

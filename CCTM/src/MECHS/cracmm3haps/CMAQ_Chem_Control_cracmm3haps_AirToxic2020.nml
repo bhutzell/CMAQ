@@ -1857,9 +1857,13 @@ CMPST =
                 'ug m-3', 'GAS',
                 'BENAPY',
 
-'P_HCN'        ,'hydrogen cyanide ',
+'P_HCN'        ,'hydrogen cyanide',
                 'ug m-3', 'GAS',
                 'HCN',
+
+'P_ETEG'        ,'Ethylene glycol',
+                'ug m-3', 'GAS',
+                'ETEG',
 
 !------------------------!
 !**** Gas Deposition ****!

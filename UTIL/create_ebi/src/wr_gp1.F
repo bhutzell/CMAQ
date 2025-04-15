@@ -53,7 +53,6 @@ C..SCRATCH LOCAL VARIABLES:
       INTEGER  :: E1, E2       ! end pos of string
       INTEGER  :: IND          ! array index
       INTEGER  :: IIN          ! Unit no. of input file
-      INTEGER  :: IOUT         ! Unit no. of output file
       INTEGER  :: N, S, P, R   ! Loop indices
       INTEGER  :: NR           ! No. of reactants
       INTEGER  :: NPOS         ! Reaction index
@@ -108,9 +107,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       FNAME = OUTPATH( 1 : E1 ) // '/hrg1.F' 
 
-      IOUT = JUNIT()
+      GLOBAL_IOUT = JUNIT()
 
-      OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
+      OPEN( UNIT = GLOBAL_IOUT, FILE = FNAME, ERR = 9000 )
 
 
       IIN = JUNIT()
@@ -122,9 +121,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       OPEN( UNIT = IIN, FILE = FNAME, ERR = 9000 )
 
 
-      IF( LWR_COPY ) CALL WR_COPYRT( IOUT )
+      IF( LWR_COPY ) CALL WR_COPYRT( GLOBAL_IOUT )
 
-      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( IOUT )
+      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( GLOBAL_IOUT )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Read, modify, and write 1st section of code from template
@@ -136,19 +135,19 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LINEIN( 1 : 2 ) .EQ. 'R1' ) THEN
 
-         WRITE( IOUT, 93000 ) TRIM( MECHNAME )
+         WRITE( GLOBAL_IOUT, 93000 ) TRIM( MECHNAME )
 
          GO TO 100
 
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'R2' ) THEN
 
-         WRITE( IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
+         WRITE( GLOBAL_IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
 
          GO TO 100
          
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'RE' ) THEN
 
-         IF( LNO2EX_CYCLE ) WRITE( IOUT, 92000 ) LINEIN( 3 : LEN_TRIM( LINEIN ) )
+         IF( LNO2EX_CYCLE ) WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 3 : LEN_TRIM( LINEIN ) )
 
          GO TO 100            
 
@@ -158,7 +157,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       ELSE
 
-         WRITE( IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
+         WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
 
          GO TO 100
 
@@ -169,10 +168,10 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Do O1D section
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      WRITE( IOUT, 92020 )
-      WRITE( IOUT, 92000 ) CLINE
-      WRITE( IOUT, 93100 )
-      WRITE( IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 93100 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
 
 c..get all reactions in which O1D is reacting
       LRXN1 = .TRUE.
@@ -193,11 +192,11 @@ c..get all reactions in which O1D is reacting
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
-      WRITE( IOUT, 92000 )
+      WRITE( GLOBAL_IOUT, 92000 )
 
 c..get reaction(s) producing O3P from O1D
       LRXN1 = .TRUE.
@@ -218,25 +217,25 @@ c..get reaction(s) producing O3P from O1D
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
 c..write the the final line 
-      WRITE( IOUT, 92000 )
+      WRITE( GLOBAL_IOUT, 92000 )
       LINOUT = '      O3P_S  = O3P_S / O1D_S'
       E1 = LEN_TRIM( LINOUT )
-      WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+      WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Do NO2EX section if included in Group 1
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       IF( LNO2EX_CYCLE ) THEN
         
-         WRITE( IOUT, 92020 )
-         WRITE( IOUT, 92000 ) CLINE
-         WRITE( IOUT, 93200 )
-         WRITE( IOUT, 92000 ) CLINE
+         WRITE( GLOBAL_IOUT, 92020 )
+         WRITE( GLOBAL_IOUT, 92000 ) CLINE
+         WRITE( GLOBAL_IOUT, 93200 )
+         WRITE( GLOBAL_IOUT, 92000 ) CLINE
 
 c..get all reactions in which NO2EX is reacting
          LRXN1 = .TRUE.
@@ -257,11 +256,11 @@ c..get all reactions in which NO2EX is reacting
             LRXN1 = .FALSE.
 
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
          END DO  
 
-         WRITE( IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 )
 
 c..get reaction(s) producing NO2 from NO2EX
          LRXN1 = .TRUE.
@@ -282,15 +281,15 @@ c..get reaction(s) producing NO2 from NO2EX
             LRXN1 = .FALSE.
 
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
          END DO
 
 c..write the the final line 
-         WRITE( IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 )
          LINOUT = '      NO2_S  = NO2_S / EXN_S'
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
        END IF  ! LNO2EX_CYCLE = .TRUE.
 
@@ -316,10 +315,10 @@ c            if b-d < c-a ==> Lno2 < Pno, so R1_2 coeff = b-d
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c..Write the section header
-      WRITE( IOUT, 92020 )
-      WRITE( IOUT, 92000 ) CLINE
-      WRITE( IOUT, 94000 )
-      WRITE( IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 94000 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
 
 
       LRXN1 = .TRUE.
@@ -356,11 +355,11 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO  
 
-      WRITE( IOUT, '( A )' ) '      R1_2  = R1_2 * DTC'
+      WRITE( GLOBAL_IOUT, '( A )' ) '      R1_2  = R1_2 * DTC'
 
    
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -383,7 +382,7 @@ c            if b-d = c-a ==> Lno2 = Pno, so P1 coeff = 0
 c            if b-d < c-a ==> Lno2 < Pno, so P1 coeff = (c-a) - (b-d)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      WRITE( IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92020 )
       LRXN1 = .TRUE.
  
       DO N = 1, NRXNS
@@ -419,13 +418,13 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
       SPOUT = ADJUSTL( SPECIES( NO ) )
       E1 = LEN_TRIM( SPOUT )
-      WRITE( IOUT, '( 3A )' ) '      P1    = YC0( ', SPOUT( 1 : E1 ),
+      WRITE( GLOBAL_IOUT, '( 3A )' ) '      P1    = YC0( ', SPOUT( 1 : E1 ),
      &       ' ) + P1 * DTC'
 
 
@@ -450,7 +449,7 @@ c            if a-c gt d-b  ==> Lno > Pno2, so L1 coeff = (a-c)-(d-b)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      WRITE( IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92020 )
       LRXN1 = .TRUE.
       DO N = 1, NRXNS         
 
@@ -483,13 +482,13 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
            
       LINOUT = '      L1    = 1.0D0 + L1 * DTC'
       E1 = LEN_TRIM( LINOUT )
-      WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+      WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -513,10 +512,10 @@ c            if d-b < a-c ==> Pno2 < Lno, so R2_1 coeff = d-b
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c..Write the section header
-      WRITE( IOUT, 92020 )
-      WRITE( IOUT, 92000 ) CLINE
-      WRITE( IOUT, 94020 )
-      WRITE( IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 94020 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
 
       LRXN1 = .TRUE.
       DO N = 1, NRXNS         
@@ -558,13 +557,13 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
            
       LINOUT = '      R2_1  = R2_1 * DTC'
       E1 = LEN_TRIM( LINOUT )
-      WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+      WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  P2 computation ( Production of NO2 )
@@ -589,7 +588,7 @@ c
 c    Added special treatment of NO2EX to group 1 - 
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-      WRITE( IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92020 )
       LRXN1 = .TRUE.
       LNO2EX_DONE = .FALSE.
 
@@ -635,7 +634,7 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
          IF( LNO2EX_CYCLE .AND. 
      &     IRR( N, 1 ) .EQ. NO2EX .AND. IRR( N, 4 ) .EQ. NO2 ) 
@@ -645,7 +644,7 @@ c..call routine to create output line & write it
 
       SPOUT = ADJUSTL( SPECIES( NO2 ) )
       E1 = LEN_TRIM( SPOUT )
-      WRITE( IOUT, '( 3A )' ) '      P2 = YC0( ', SPOUT( 1 : E1 ),
+      WRITE( GLOBAL_IOUT, '( 3A )' ) '      P2 = YC0( ', SPOUT( 1 : E1 ),
      &       ' ) + P2 * DTC'
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -668,7 +667,7 @@ c            if b-d gt c-a  ==> Lno2 > Pno, so L2 coeff = (b-d)-(c-a)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      WRITE( IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92020 )
       LRXN1 = .TRUE.
       DO N = 1, NRXNS         
 
@@ -706,13 +705,13 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
            
       LINOUT = '      L2     = 1.0D0 + L2 * DTC'
       E1 = LEN_TRIM( LINOUT )
-      WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+      WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  P3 computation ( Production of O3 )
@@ -722,10 +721,10 @@ c      a) those in which O3 is produced EXCEPT O3P=O3
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c..Write the section header
-      WRITE( IOUT, 92020 )
-      WRITE( IOUT, 92000 ) CLINE
-      WRITE( IOUT, 94040 )
-      WRITE( IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 94040 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
 
       LRXN1 = .TRUE.
       DO N = 1, NRXNS
@@ -754,7 +753,7 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
@@ -763,10 +762,10 @@ c..call routine to create output line & write it
       E1 = LEN_TRIM( SPOUT )
 
       IF( LRXN1 ) THEN
-          WRITE( IOUT, '( 3A )' ) '      P3 = YC0( ', SPOUT( 1 : E1 ),
+          WRITE( GLOBAL_IOUT, '( 3A )' ) '      P3 = YC0( ', SPOUT( 1 : E1 ),
      &       ' ) '         
       ELSE
-         WRITE( IOUT, '( 3A )' )  '      P3 = YC0( ', SPOUT( 1 : E1 ),
+         WRITE( GLOBAL_IOUT, '( 3A )' )  '      P3 = YC0( ', SPOUT( 1 : E1 ),
      &       ' ) + P3 * DTC'
       END IF
 
@@ -777,7 +776,7 @@ c    L3 includes O3 loss terms from the following reactions:
 c       a) those in which O3 is lost EXCEPT NO+O3=NO2
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      WRITE( IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92020 )
       LRXN1 = .TRUE.
       DO N = 1, NRXNS         
 
@@ -807,13 +806,13 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
            
       LINOUT = '      L3    = 1.0D0 + L3 * DTC'
       E1 = LEN_TRIM( LINOUT )
-      WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+      WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  P12 computation ( Production of O3P )
@@ -826,10 +825,10 @@ c         ( done in BLD_OUTLINE)
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c..Write the section header
-      WRITE( IOUT, 92020 )
-      WRITE( IOUT, 92000 ) CLINE
-      WRITE( IOUT, 94060 )
-      WRITE( IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
+      WRITE( GLOBAL_IOUT, 94060 )
+      WRITE( GLOBAL_IOUT, 92000 ) CLINE
 
       LRXN1 = .TRUE.
       DO N = 1, NRXNS
@@ -874,7 +873,7 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
@@ -882,7 +881,7 @@ c..call routine to create output line & write it
       SPOUT = ADJUSTL( SPECIES( O3P ) )
       E1 = LEN_TRIM( SPOUT )
 
-      WRITE( IOUT, '( 3A )' ) '      P12 = YC0( ', SPOUT( 1 : E1 ),
+      WRITE( GLOBAL_IOUT, '( 3A )' ) '      P12 = YC0( ', SPOUT( 1 : E1 ),
      &       ' ) + P12 * DTC'
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -892,7 +891,7 @@ c    L12 includes O3P loss terms from the following reactions:
 c       a) those in which O3P reacts 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c..Write the section header
-      WRITE( IOUT, 92020 )
+      WRITE( GLOBAL_IOUT, 92020 )
 
       LRXN1 = .TRUE.
       DO N = 1, NRXNS
@@ -919,11 +918,11 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
-      WRITE( IOUT, '( 3A )' ) '      L12   = 1.0D0 + L12 * DTC'
+      WRITE( GLOBAL_IOUT, '( 3A )' ) '      L12   = 1.0D0 + L12 * DTC'
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -966,7 +965,7 @@ c..Find rection numbers for NO2->NO+O3P, O3P->O3, & NO+O3->NO2
 
       IF( LINEIN( 1 : 2 ) .EQ. 'R3' ) THEN
 
-         IF( LFIRST ) WRITE( IOUT, 95000 ) J1, J2, K1_3
+         IF( LFIRST ) WRITE( GLOBAL_IOUT, 95000 ) J1, J2, K1_3
          LFIRST = .FALSE.
          GO TO 400
 
@@ -976,7 +975,7 @@ c..Find rection numbers for NO2->NO+O3P, O3P->O3, & NO+O3->NO2
 
       ELSE
 
-         WRITE( IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
+         WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
 
          GO TO 400
 
@@ -1007,20 +1006,20 @@ c..Find NO2->NO2EX Rxn no. if NO2EX included in group
          END DO
       END IF
 
-      WRITE( IOUT, 96000 ) SPECIES( NO  )( 1 : LEN_TRIM( SPECIES( NO  ) ) )
-      WRITE( IOUT, 96020 ) SPECIES( NO2 )( 1 : LEN_TRIM( SPECIES( NO2 ) ) )
-      WRITE( IOUT, 96040 ) SPECIES( NO2 )( 1 : LEN_TRIM( SPECIES( NO2 ) ) )
-      WRITE( IOUT, 96060 )
-      WRITE( IOUT, 96080 ) SPECIES( O3  )( 1 : LEN_TRIM( SPECIES( O3 ) ) ),
+      WRITE( GLOBAL_IOUT, 96000 ) SPECIES( NO  )( 1 : LEN_TRIM( SPECIES( NO  ) ) )
+      WRITE( GLOBAL_IOUT, 96020 ) SPECIES( NO2 )( 1 : LEN_TRIM( SPECIES( NO2 ) ) )
+      WRITE( GLOBAL_IOUT, 96040 ) SPECIES( NO2 )( 1 : LEN_TRIM( SPECIES( NO2 ) ) )
+      WRITE( GLOBAL_IOUT, 96060 )
+      WRITE( GLOBAL_IOUT, 96080 ) SPECIES( O3  )( 1 : LEN_TRIM( SPECIES( O3 ) ) ),
      &                     SPECIES( NO  )( 1 : LEN_TRIM( SPECIES( NO ) ) )
-      WRITE( IOUT, 96100 ) SPECIES( O3P )( 1 : LEN_TRIM( SPECIES( O3P ) ) )
+      WRITE( GLOBAL_IOUT, 96100 ) SPECIES( O3P )( 1 : LEN_TRIM( SPECIES( O3P ) ) )
 
       WRITE( RNUM, '(I5)' ) KO3_O1D
       RNUM = ADJUSTL( RNUM )
-!      WRITE( IOUT, 96120 ) SPECIES( O1D )( 1 : LEN_TRIM( SPECIES( O1D ) ) ),
+!      WRITE( GLOBAL_IOUT, 96120 ) SPECIES( O1D )( 1 : LEN_TRIM( SPECIES( O1D ) ) ),
 !     &                     RNUM( 1 : LEN_TRIM( RNUM ) ),
 !     &                     SPECIES( O3  )( 1 : LEN_TRIM( SPECIES( O3 ) ) )
-      WRITE( IOUT, 96121 ) SPECIES( O1D )( 1 : LEN_TRIM( SPECIES( O1D ) ) ),
+      WRITE( GLOBAL_IOUT, 96121 ) SPECIES( O1D )( 1 : LEN_TRIM( SPECIES( O1D ) ) ),
      &                     SPECIES( O1D )( 1 : LEN_TRIM( SPECIES( O1D ) ) ),      
      &                     RNUM( 1 : LEN_TRIM( RNUM ) ),
      &                     SPECIES( O3  )( 1 : LEN_TRIM( SPECIES( O3 ) ) )
@@ -1028,21 +1027,21 @@ c..Find NO2->NO2EX Rxn no. if NO2EX included in group
       IF( LNO2EX_CYCLE ) THEN
          WRITE( RNUM, '(I5)' ) KNO2_NO2EX 
          RNUM = ADJUSTL( RNUM )
-         WRITE( IOUT, 96130 ) SPECIES( NO2EX )( 1 : LEN_TRIM( SPECIES( NO2EX ) ) ),
+         WRITE( GLOBAL_IOUT, 96130 ) SPECIES( NO2EX )( 1 : LEN_TRIM( SPECIES( NO2EX ) ) ),
      &                        RNUM( 1 : LEN_TRIM( RNUM ) ),
      &                        SPECIES( NO2  )( 1 : LEN_TRIM( SPECIES( NO2 ) ) )
-         WRITE( IOUT, 96135 ) SPECIES( NO2EX )( 1 : LEN_TRIM( SPECIES( NO2EX ) ) ),
+         WRITE( GLOBAL_IOUT, 96135 ) SPECIES( NO2EX )( 1 : LEN_TRIM( SPECIES( NO2EX ) ) ),
      &                        RNUM( 1 : LEN_TRIM( RNUM ) ),
      &                        SPECIES( NO2  )( 1 : LEN_TRIM( SPECIES( NO2 ) ) ),
      &                        SPECIES( NO2  )( 1 : LEN_TRIM( SPECIES( NO2 ) ) ),
      &                        SPECIES( NO2EX )( 1 : LEN_TRIM( SPECIES( NO2EX ) ) )
       END IF
 
-      WRITE( IOUT, 96140 )
+      WRITE( GLOBAL_IOUT, 96140 )
 
       CLOSE( IIN )
 
-      CLOSE( IOUT )
+      CLOSE( GLOBAL_IOUT )
 
       NOUTFLS = NOUTFLS + 1
       OUTFLNAM( NOUTFLS ) = 'hrg1.F'

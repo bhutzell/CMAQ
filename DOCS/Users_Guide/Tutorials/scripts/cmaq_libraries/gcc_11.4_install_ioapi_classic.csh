@@ -1,5 +1,5 @@
 #!/bin/csh -f
-# Build I/O API version that supports NCF4 
+# Build I/O API version that supports classic netCDF 
 # Note - this script works for gcc 11.4.1 
 # using gcc 10 and above, use the  -fallow-argument-mismatch argument
 #  As of Aug. 28, 2020, there are now new BIN=Linux*gfort10* types and corresponding Makeinclude.Linux*gfort10* that incorporate this flag for the I/O API and M3Tools. 

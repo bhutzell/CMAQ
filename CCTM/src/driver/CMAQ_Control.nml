@@ -141,8 +141,7 @@
 
   Keywd_name(72) = 'DEFAULT_CRACMM3HAPS'
   Keywd(72,:) = 'DEFAULT_CRACMM2','PM_TOXICS','GAS_TOXICS','P_HCN','EOH','HCL','MOH',
-                'EBZ','STY','XYLENE','TOLUENE','NAPHTHAL','BENZENE'
-!              ,'CL2'
+                'P_ETEG','EBZ','STY','XYLENE','TOLUENE','NAPHTHAL','BENZENE','CL2'
 
  !------------------------------------!
  !----- Meteorological Variables -----!

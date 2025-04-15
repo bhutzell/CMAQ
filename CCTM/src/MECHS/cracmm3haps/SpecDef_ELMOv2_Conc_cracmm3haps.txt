@@ -144,6 +144,7 @@ CARBSULFIDE     ,ug/m3     ,P_CRBSULF[1]
 CHLOROPRENE     ,ug/m3     ,P_CHLRPRN[1]
 ETHYLBENZENE    ,ug/m3     ,P_ETHYLBENZ[1]
 HYDROGEN_CYANIDE,ug/m3     ,P_HCN[1]
+ETEG_UGM3       ,ug/m3     ,P_ETEG[1]
 
 
 !! Inert PAH tracer
