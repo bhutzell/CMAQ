@@ -1,6 +1,7 @@
 # Frequently Asked Questions for Using the CMAQv6.0 BETA Version
 
 ## Table of Contents:
+* [What is a beta version?](#what_beta)
 * [Do I need to update from v5.5 to v6.0beta?](#why_update_v55_v60b)
 * [What do I need to do to update from v5.5 to v6.0beta?](#update_v55_v60b)
   * [What differences should I expect in the required model input files?](#diff_v55_v60b_input_files)
@@ -12,9 +13,13 @@
 * [Additional FAQ](#additional_faq)
 * [Technical support for CMAQ](#tech_support)
 
+<a id=what_beta></a>
+## What is a beta version?
+We are making this early version of the code available for testing, evaluation, and demonstration purposes before the official, general release. It is also intended to facilitate community contributions. This beta version may be unstable, contain bugs, and may not function as intended in the final release. We plan to conduct extensive evaluation of this beta version over the coming months, which may lead to additional changes before the final release.
+
 <a id=why_update_v55_v60b></a>
 ## Do I need to update from v5.5 to v6.0beta?
-CMAQv6.0beta includes many scientific enhancements and new features that will benefit certain applications. See the v6.0beta Release Notes for a complete description of each change.   
+No, CMAQv6.0beta is not intended as a replacement for CMAQv5.5. CMAQv6.0beta includes many scientific enhancements and new features that we are making available for testing, evaluation, and demonstration purposes. See the v6.0beta Release Notes for a complete description of each change.   
 
 #### Instrumented Models (CMAQ-ISAM, CMAQ-DDM3D)
 * CMAQv6.0beta introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as well several improvements that target CMAQ-ISAM robustness for all chemical mechanisms.
