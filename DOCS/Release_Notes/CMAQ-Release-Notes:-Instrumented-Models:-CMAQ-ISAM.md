@@ -23,6 +23,19 @@ Corrects erroneous mass attributed to sources geographically far away very soon 
 **Description**:  
 ISAM encounters several floating-point exceptions when run in debug mode across all mechanisms. These are resolved by adding a minimum value to the denominator in each case.
 
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#91225](https://github.com/USEPA/CMAQ_Dev/commit/63afe25a706aed7ad3273d4718b2eedd2f242cea) | [PR#1225](https://github.com/USEPA/CMAQ_Dev/pull/1225)  |
+
+
+## Adds pcVOC and NOy species to ISAM species lists
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix  
+**Release Version/Date**:  v5.5+
+
+**Description**:  
+The species pcVOC, CRON, and OPAN were missing from the VOC, NOY and NOY species lists in ISAM. This can cause discrepancies when propagating source apportionment through the VOC and NOY systems. For example, with pcVOC missing, an unexplainable magnitude of mass is reclassified into the 'OTHER' category. It is also impossible for ELMO to calculate ISAM_NOY from CB6 mechanisms because ELMO's definition of NOY (in the chemical control file) does not match the list of species available.
+
 **Significance and Impact**:  
 This change supports the comprehensive accounting of SOA precursors and NOy species in the source apportionment of PM, ozone, and other air pollution endpoints.
 
@@ -47,24 +60,9 @@ The SOA predictions for the non-contiguous regions show dramatically large maxim
 ![Fig1_speclist_PMF_Gridded_NonCont](https://github.com/user-attachments/assets/618a0fa1-c4a1-4c4b-912b-b0f1185ea55a)
 ![Fig1_speclist_SOA_Gridded_NonCont](https://github.com/user-attachments/assets/8604a822-bf90-400a-9494-b682ba676f87)
 
-
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#XXXX](https://github.com/USEPA/CMAQ_Dev/commit/) | [PR#1317](https://github.com/USEPA/CMAQ_Dev/pull/1317)  |
-
-## Adds pcVOC and NOy species to ISAM species lists
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Bug Fix  
-**Release Version/Date**:  v5.5+
-
-**Description**:  
-The species pcVOC, CRON, and OPAN were missing from the VOC, NOY and NOY species lists in ISAM. This can cause discrepancies when propagating source apportionment through the VOC and NOY systems. For example, with pcVOC missing, an unexplainable magnitude of mass is reclassified into the 'OTHER' category. It is also impossible for ELMO to calculate ISAM_NOY from CB6 mechanisms because ELMO's definition of NOY (in the chemical control file) does not match the list of species available.
-
-**Significance and Impact**:  
-
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#91225](https://github.com/USEPA/CMAQ_Dev/commit/63afe25a706aed7ad3273d4718b2eedd2f242cea) | [PR#1225](https://github.com/USEPA/CMAQ_Dev/pull/1225)  |
 
 
 ##  Source Apportionment of SOA
