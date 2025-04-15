@@ -25,7 +25,7 @@ ISAM encounters several floating-point exceptions when run in debug mode across 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#91225](https://github.com/USEPA/CMAQ_Dev/commit/63afe25a706aed7ad3273d4718b2eedd2f242cea) | [PR#1225](https://github.com/USEPA/CMAQ_Dev/pull/1225)  |
+|[Merge for PR#1225](https://github.com/USEPA/CMAQ_Dev/commit/63afe25a706aed7ad3273d4718b2eedd2f242cea) | [PR#1225](https://github.com/USEPA/CMAQ_Dev/pull/1225)  |
 
 
 ## Adds pcVOC and NOy species to ISAM species lists
