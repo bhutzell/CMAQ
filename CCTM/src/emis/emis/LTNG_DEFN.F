@@ -307,7 +307,7 @@
                  ENDIF 
 
                ELSE
-                   XMSG = 'LNO_OPTION has to be in the range from 1 to 4'
+                   XMSG = 'LNO_OPTION has to be in the range from 1 to 5'
                    CALL M3MSG2( XMSG )
                END IF
 
