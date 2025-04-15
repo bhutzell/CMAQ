@@ -530,7 +530,6 @@
          LOGICAL,     SAVE :: R_READY = .TRUE.
          LOGICAL,     SAVE :: wrf_assim = .FALSE.
          INTEGER,     SAVE :: TOT_TSTEP = 0
-         LOGICAL,     SAVE :: FIRSTIME = .TRUE.
 
          REAL              :: LOC_VGTOP_GD
 
