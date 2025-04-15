@@ -24,6 +24,43 @@ Corrects erroneous mass attributed to sources geographically far away very soon 
 ISAM encounters several floating-point exceptions when run in debug mode across all mechanisms. These are resolved by adding a minimum value to the denominator in each case.
 
 **Significance and Impact**:  
+This change supports the comprehensive accounting of SOA precursors and NOy species in the source apportionment of PM, ozone, and other air pollution endpoints.
+
+Tested two cases on the 12K CONUS domain for one week in July:
+(1) EQUATES representative case
+(2) SpecList - added pcvoc and NOY compounds (CRON and OPAN) to ISAM species list.
+
+**CO Concentrations from EGUs**  
+![Fig1_speclist_CO_EGU](https://github.com/user-attachments/assets/f502f7c4-f0a3-4370-a40b-b745a94c4901)
+
+**NOx species from the same EGUs** changes by about a factor of 4 lower than the absolute EGU contribution.  
+![Fig1_speclist_NOx_EGU](https://github.com/user-attachments/assets/1988acc0-e31d-405d-a33b-6464ab4926c2)
+
+**Fine PM and SOA from EGUs** show increases of about 1 ug m-3 due to the pcVOC addition, and this is the principal driver of change in total fine PM.  
+![Fig1_speclist_PMF_EGU](https://github.com/user-attachments/assets/01be9917-21ba-410b-ab87-27a78dc3d5d6)
+![Fig1_speclist_SOA_EGU](https://github.com/user-attachments/assets/dc686b40-1219-49a6-8173-7b6987762426)
+
+For gridded area sources in non-contiguous states, NOy is increased marginally due to addition of CRON and OPAN to the species list. The effect on ozone is quite small.   
+![Fig1_speclist_NOY_Gridded_NonCont](https://github.com/user-attachments/assets/35677205-17df-4a29-a3cd-7815a3be645e)
+
+The SOA predictions for the non-contiguous regions show dramatically large maximum differences compared to absolute time-averaged concentrations. This reflects the dominant role of pcSOA to the total. The  differences for fine PM are mostly, if not equal to, the changes in total SOA.  
+![Fig1_speclist_PMF_Gridded_NonCont](https://github.com/user-attachments/assets/618a0fa1-c4a1-4c4b-912b-b0f1185ea55a)
+![Fig1_speclist_SOA_Gridded_NonCont](https://github.com/user-attachments/assets/8604a822-bf90-400a-9494-b682ba676f87)
+
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#XXXX](https://github.com/USEPA/CMAQ_Dev/commit/) | [PR#1317](https://github.com/USEPA/CMAQ_Dev/pull/1317)  |
+
+## Adds pcVOC and NOy species to ISAM species lists
+[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Bug Fix  
+**Release Version/Date**:  v5.5+
+
+**Description**:  
+The species pcVOC, CRON, and OPAN were missing from the VOC, NOY and NOY species lists in ISAM. This can cause discrepancies when propagating source apportionment through the VOC and NOY systems. For example, with pcVOC missing, an unexplainable magnitude of mass is reclassified into the 'OTHER' category. It is also impossible for ELMO to calculate ISAM_NOY from CB6 mechanisms because ELMO's definition of NOY (in the chemical control file) does not match the list of species available.
+
+**Significance and Impact**:  
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
