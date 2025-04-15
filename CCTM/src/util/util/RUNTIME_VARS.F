@@ -246,7 +246,6 @@
       REAL    :: MOLSNCG       = 350.0   ! Lightning NO Production Rate
       REAL    :: MOLSNIC       = 350.0   ! Lightning NO Production Rate
       INTEGER :: LNO_OPTION    = 1       ! Lightning NO options, 1 is default
-      !CHARACTER(250) :: LTNG_FNAME = 'InLine' ! Lightning NO Input Name
 
       INTEGER :: NPTGRPS       = 0       ! no. pt src input file groups
       LOGICAL :: PT3DDIAG      = .FALSE. ! Write point source 3d emis diagnostic file
@@ -878,9 +877,6 @@
       ! Get Lightning Input Time Interval
       CALL GET_ENV ( LT_ASM_DT, 'LTNG_ASSIM_DT', LT_ASM_DT, VARDEV ) 
 
-      ! Get Lightning NO File Name
-      !CALL GET_ENV ( LTNG_FNAME, 'LTNGNO', LTNG_FNAME, VARDEV )
- 
       ! Flag for using NLDN data for Lightning Strikes
       CALL GET_ENV ( LTNGON_DATA, 'USE_LTNG_DATA', LTNGON_DATA, VARDEV )
  
@@ -893,8 +889,8 @@
       ! Get Lightning NO Production Rate
       CALL GET_ENV ( MOLSNIC, 'MOLSNIC', 350.0, VARDEV )
 
-      ! Get Lightning NO Opitons: 1, 2, 3, 4
-      ! 1: default using groundbased lightnin flash
+      ! Get Lightning NO Options: 1, 2, 3, 4
+      ! 1: default using ground-based lightning flash
       ! 2: using GLM (satellite) flash, 3: using GLM energy
       ! 4: using synergized GLM/WWLLN energy 
       CALL GET_ENV ( LNO_OPTION, 'LNO_OPTION', 1, VARDEV )
