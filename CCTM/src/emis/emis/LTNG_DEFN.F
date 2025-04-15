@@ -529,7 +529,7 @@
 
          LOGICAL,     SAVE :: R_READY = .TRUE.
          LOGICAL,     SAVE :: wrf_assim = .FALSE.
-         INTEGER,     SAVE :: TOT_TSTEP
+         INTEGER,     SAVE :: TOT_TSTEP = 0
          LOGICAL,     SAVE :: FIRSTIME = .TRUE.
 
          REAL              :: LOC_VGTOP_GD
@@ -542,12 +542,6 @@
             VDEMIS_LT = 0.0
 
             DTSTEP = TIME2SEC( TSTEP( 1 ) ) / TIME2SEC( TSTEP( 2 ) ) 
-            !C Open me filet
-!C Get domain window info for met_cro_2d file
-            IF (FIRSTIME) THEN
-                TOT_TSTEP = 0
-                FIRSTIME = .FALSE.
-            END IF
             WRITE( SJDATE, '(I7)') JDATE
             READ( SJDATE, '(4X, I3)') CJDATE
 
