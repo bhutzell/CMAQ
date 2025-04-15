@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/2209b80d-3ab3-4326-b1c1-a3bad4393517)# Frequently Asked Questions for Using the CMAQv6.0 BETA Version
+# Frequently Asked Questions for Using the CMAQv6.0 BETA Version
 
 ## Table of Contents:
 * [Do I need to update from v5.5 to v6.0beta?](#why_update_v55_v60b)
