@@ -16,8 +16,8 @@ WDEP_NO2           ,kg ha-1     ,WD_NO2[1]
 DDEP_NO            ,kg ha-1     ,DD_NO[1]
 WDEP_NO            ,kg ha-1     ,WD_NO[1]
 DDEP_FORM          ,kg ha-1     ,DD_FORMALD[1]
-WDEP_FORM	       ,kg ha-1     ,WD_FORMALD[1]
-DDEP_H2O2	       ,kg ha-1     ,DD_H2O2[1]
+WDEP_FORM	   ,kg ha-1     ,WD_FORMALD[1]
+DDEP_H2O2	   ,kg ha-1     ,DD_H2O2[1]
 WDEP_H2O2          ,kg ha-1     ,WD_H2O2[1]
 DDEP_N2O5          ,kg ha-1     ,DD_N2O5[1]
 WDEP_N2O5          ,kg ha-1     ,WD_N2O5[1]
@@ -27,10 +27,6 @@ DDEP_HNO3          ,kg ha-1     ,DD_HNO3[1]
 WDEP_HNO3          ,kg ha-1     ,WD_HNO3[1]
 DDEP_NO3           ,kg ha-1     ,DD_NO3[1]
 WDEP_NO3           ,kg ha-1     ,WD_NO3[1]
-DDEP_CLNO2         ,kg ha-1     ,DD_CLNO2[1]
-WDEP_CLNO2         ,kg ha-1     ,WD_CLNO2[1]
-DDEP_CLNO3         ,kg ha-1     ,DD_CLNO3[1]
-WDEP_CLNO3         ,kg ha-1     ,WD_CLNO3[1]
 DDEP_NTR           ,kg ha-1     ,DD_NTR[1]
 WDEP_NTR           ,kg ha-1     ,WD_NTR[1]
 DDEP_PANT          ,kg ha-1     ,DD_PANT[1]
@@ -41,7 +37,7 @@ DDEP_SO2           ,kg ha-1     ,DD_SO2[1]
 DDEP_O3            ,kg ha-1     ,DD_O3[1]
 WDEP_O3            ,kg ha-1     ,WD_O3[1]
 DDEP_PNA           ,kg ha-1     ,DD_HNO4[1]   
-WDEP_PNA           ,kg ha-1     ,WD_HNO4[1]
+WDEP_PNA           ,kg ha-1     ,WD_HNO4[1]   
 DDEP_BENZENE       ,kg ha-1     ,DD_BENZ[1]
 WDEP_BENZENE       ,kg ha-1     ,WD_BENZ[1]
 DDEP_TOLUENE       ,kg ha-1     ,DD_TOLU[1]
@@ -54,7 +50,6 @@ DDEP_STYRENE       ,kg ha-1     ,DD_STYR[1]
 WDEP_STYRENE       ,kg ha-1     ,WD_STYR[1]
 DDEP_XYLENE        ,kg ha-1     ,DD_HAP_XYL[1]
 WDEP_XYLENE        ,kg ha-1     ,WD_HAP_XYL[1]
-   
 
 !---------------------------------------------------!
 !------------- Aerosol Deposition ------------------!
@@ -93,7 +88,7 @@ DDEP_ANAK          ,kg ha-1     ,DD_PMC_NA[1]
 DDEP_ANAIJK        ,kg ha-1     ,DD_TSP_NA[1]
 WDEP_ANAK          ,kg ha-1     ,WD_PMC_NA[1]
 WDEP_ANAIJK        ,kg ha-1     ,WD_TSP_NA[1]
-TDEP_ANAIJK        ,kg ha-1     ,TD_TSP_NA[1]  
+TDEP_ANAIJK        ,kg ha-1     ,TD_TSP_NA[1]
 
 !! Chloride
 DDEP_ACLIJ         ,kg ha-1     ,DD_PMF_CL[1]
@@ -106,18 +101,18 @@ TDEP_CL            ,kg ha-1     ,TD_TCL[1]
 
 !! Calcium
 DDEP_CAJ           ,kg ha-1     ,DD_PMF_CA[1]
-WDEP_CAJ	       ,kg ha-1     ,WD_PMF_CA[1]
+WDEP_CAJ	   ,kg ha-1     ,WD_PMF_CA[1]
 DDEP_CAK           ,kg ha-1     ,DD_PMC_CA[1]
 WDEP_CAK           ,kg ha-1     ,WD_PMC_CA[1]
-DDEP_CAJK	       ,kg ha-1     ,DD_TSP_CA[1]
-WDEP_CAJK	       ,kg ha-1     ,WD_TSP_CA[1]
+DDEP_CAJK	   ,kg ha-1     ,DD_TSP_CA[1]
+WDEP_CAJK	   ,kg ha-1     ,WD_TSP_CA[1]
 
 !! Iron
-DDEP_FEJ	       ,kg ha-1     ,DD_PMF_FE[1]
-WDEP_FEJ	       ,kg ha-1     ,WD_PMF_FE[1]
+DDEP_FEJ	    ,kg ha-1    ,DD_PMF_FE[1]
+WDEP_FEJ	    ,kg ha-1    ,WD_PMF_FE[1]
 
 !! Aluminum
-DDEP_ALJ	       ,kg ha-1     ,DD_PMF_AL[1]
+DDEP_ALJ	   ,kg ha-1     ,DD_PMF_AL[1]
 WDEP_ALJ           ,kg ha-1     ,WD_PMF_AL[1]
 
 !! Silicon
@@ -148,9 +143,9 @@ WDEP_KJK           ,kg ha-1     ,WD_TSP_K[1]
 DDEP_MNJ           ,kg ha-1     ,DD_PMF_MN[1]
 WDEP_MNJ           ,kg ha-1     ,WD_PMF_MN[1]
 
-! lead
-DDEP_LEAD          ,kg ha-1   ,DD_PB_HAPS[1]
-WDEP_LEAD          ,kg ha-1   ,WD_PB_HAPS[1]
+!! Lead
+DDEP_LEAD          ,kg ha-1     ,DD_PB_HAPS[1]
+WDEP_LEAD          ,kg ha-1     ,WD_PB_HAPS[1]
 
 ! Manganese for Air Toxics Inventory
 DDEP_MN_HAPS       ,kg ha-1   ,DD_MN_HAPS[1]

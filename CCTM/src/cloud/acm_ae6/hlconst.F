@@ -43,7 +43,7 @@ C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
 
 C...........PARAMETERS and their descriptions:
 
-         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 281     ! Number of substances
+         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 282     ! Number of substances
 
          PRIVATE 
 
@@ -371,11 +371,7 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(279), A(279), E(279) / 'CL2O2           ', 1.01E+00, 3.5E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(280), A(280), E(280) / 'OBRO            ', 1.01E+00, 3.5E+03 /   ! Using CLOO data
       DATA SUBNAME(281), A(281), E(281) / 'NITROSYL_BROMID ', 4.96E-02, 0.0E+00 /   ! Using NITROSYL_CHLROD data
-
-      DATA SUBNAME(278), A(278), E(278) / 'CLOO            ', 1.01E+00, 3.5E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
-      DATA SUBNAME(279), A(279), E(279) / 'CL2O2           ', 1.01E+00, 3.5E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
-      DATA SUBNAME(280), A(280), E(280) / 'OBRO            ', 1.01E+00, 3.5E+03 /   ! Using CLOO data
-      DATA SUBNAME(281), A(281), E(281) / 'NITROSYL_BROMID ', 4.96E-02, 0.0E+00 /   ! Using NITROSYL_CHLROD data
+      DATA SUBNAME(282), A(282), E(282) / 'HYDROGEN_CYANIDE', 1.72E+02, 4.4E+03 /   ! Sander, R. ACP (2015)
 
       DATA B( MSO2   ), D( MSO2   ) / 1.30E-02,  1.96E+03 /  ! SO2*H2O<=>HSO3+H     : Smith and Martell (1976)
       DATA B( MHSO3  ), D( MHSO3  ) / 6.60E-08,  1.50E+03 /  ! HSO3<=>SO3+H         : Smith and Martell (1976)
