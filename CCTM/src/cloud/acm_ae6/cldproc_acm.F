@@ -536,6 +536,7 @@ c                 ENDIF
       DO VAR = 1,N_SPC_WDEP + 1
         TOT_DEP0( :,:,VAR ) = TOT_DEP( :,:,VAR ) + CONV_DEP( :,:,VAR )
       END DO
+
 #ifdef isam
       TOT_SADEP0 = TOT_SADEP + CONV_SADEP
 #endif

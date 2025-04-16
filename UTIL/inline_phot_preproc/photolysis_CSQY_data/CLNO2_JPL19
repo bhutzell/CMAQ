@@ -1,5 +1,9 @@
 CLNO2_JPL19
+<<<<<<< HEAD
 ! CLNO2 + hν  =  CL + NO2
+=======
+! CLNO2 + hv  =  CL + NO2
+>>>>>>> CRACMM3_CHLORINE
 ! JPL Publication 19-5;  Evaluation Number 19; May 2020
 ! Page: 4-234-to 4-235; Table 4F-16 for absorption cross-section
 ! Quantum yield is taken as 1.0
@@ -65,4 +69,8 @@ FAC=1.0
 460	5.47E-23	1.0
 465	3.69E-23	1.0
 470	3.21E-23	1.0
+<<<<<<< HEAD
 475	2.05E-23	1.0
+=======
+475	2.05E-23	1.0
+>>>>>>> CRACMM3_CHLORINE
