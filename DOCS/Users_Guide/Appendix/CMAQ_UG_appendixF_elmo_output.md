@@ -48,7 +48,7 @@ The ELMO_INIT namelist section prescribes how the ELMO output file parameters wi
 /
 ```
 The variable N_Files must equal exactly the number of ELMO files you wish. N_Max_Output Variables provides a limit on the total number of variables on any one file. 
-N_Keywords must match exactly the number of Keyword variables below. Finally, N_Max_Keywords_Variables should be greater than the ;argest number of components for any one keyword below.
+N_Keywords must match exactly the number of Keyword variables below. Finally, N_Max_Keywords_Variables should be greater than the largest number of components for any one keyword below.
 
 ```
 &ELMO_Files
@@ -82,7 +82,7 @@ There are thousands of variables that can be requested in the File_Vars field.
 ### F.2 Output Variable Types
 
 #### F.2.1 CMAQ Species
-ELMO has full capability of outputting all 'raw' CMAQ species for concentration, dry deposition, and wet deposition. If the name of any CMAQ species is provided, it's concentration 
+ELMO has full capability of outputting all 'raw' CMAQ species for concentration, dry deposition, and wet deposition. If the name of any CMAQ species is provided, its concentration 
 will be output in ppm for gases and ug m-3 for aerosols. If DD_ is prepended, then dry deposition in kg ha-1 is output. If WD_ is prepended, wet deposition in kg ha-1 is output.  
 
 Additionally, ELMOv2 allows several shortcut wildcards that will activate all CMAQ species so that Users do not have to list them all (Table F-1). 
@@ -121,7 +121,7 @@ Here is an example for NOx:
                 'NO + NO2',
 ```
 Each definition includes 5 comma-separated fields. The first field is the short-name name of the composite; we recommend keeping these to 10 characters or less. The second field is 
-a long description of the composite, and the third field specify the units. Some unit conversions are supported (e.g. ppmV to ug m-3) and are discussed below, but it is recommended that complex unit 
+a long description of the composite, and the third field specifies the units. Some unit conversions are supported (e.g. ppmV to ug m-3) and are discussed below, but it is recommended that complex unit 
 conversions be done by the user offline. The fourth field provides information about the particle sizes corresponding to the composite. If no particle species are included in the 
 composite, then the 4th field may read 'GAS'. The 5th field specifies the calculation of the composite, which can include CMAQ species concentrations or deposition, as well as any
 ELMO composites that have already been defined.  
@@ -161,7 +161,7 @@ For convenience, ELMO automatically assumes that the variables ASO4, ANO3, ANH4,
 These species names may be used in File_Vars to request the total concentration across all modes, or they may be combined with DD_ or WD_ to request the deposition across all modes 
 (e.g. WD_ANH4 = WD_NH4I + WD_NH4J + WD_NH4K). 
 
-It is also possible to use a * to reuqest ELMO to expand an aerosol chemical species to all modes. For example, adding the variable 
+It is also possible to use a * to request ELMO to expand an aerosol chemical species to all modes. For example, adding the variable 
 '*ASO4', will instruct ELMO to add ASO4I, ASO4J, and ASO4K to the output file.  
 
 ##### Unit Conversions
@@ -399,7 +399,7 @@ other ELMO variables and CMAQ species. They are defined below the ELMO File spec
   Keywd_name(1) = 'SIMPLE'
   Keywd(1,:) = 'PM25','PM10','O3','SO2','CO','NOX','NH3','ISOPRENE','FORMALD'
 ```
-Now the Keyword 'SIMPLE' may be used in File_Vard and ELMO will substitute in all 9 variables in its contents list.
+Now the Keyword 'SIMPLE' may be used in File_Vars and ELMO will substitute in all 9 variables in its contents list.
 ```
   Flabel(1)= 'SMALL_OUT'
   Tmode(1) = 'aggregate'

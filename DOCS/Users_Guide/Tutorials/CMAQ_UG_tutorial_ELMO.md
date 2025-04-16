@@ -83,10 +83,3 @@ make any appropriate modifications. Again, use the approach for ELMO_AOD_550 as 
 ELMO is now equipped to output your variable. You may add it to File_Vars in CMAQ_Control.nml for any custom output file you like, or 
 you may add it to the contents of any ELMO Keyword.  
 
-<!-- START_OF_COMMENT -->
-
-[link_1]: ../../../POST/combine/
-
-<!-- END_OF_COMMENT -->
-
-[link_1]: https://github.com/USEPA/CMAQ/blob/main/POST/combine/ 

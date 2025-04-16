@@ -15,7 +15,7 @@
 
 The Detailed Emissions Scaling, Isolation and Diagnostics (DESID) module included with CMAQv5.3+ provides comprehensive customization and transparency of emissions manipulation to the user. The customization of emissions is accomplished via a series of Control Namelists, which contain variables that modify the behavior of the emissions module. These include ***Emission Scaling Rules***, ***Size Distributions***, ***Regions Registry***, ***Chemical Families***, ***Region Families***, and ***Area Adjustments***.
 
-To determine its configuration, DESID makes use of input primarily from four files: the CMAQ runscript, the CMAQ Miscellaneous Control File ([CMAQ_Control_Misc.nml][link_B.1_misc]), the DESID Control file ([CMAQ_Control_DESID.nml][link_B.1_desis]), and the DESID Chemical Mapping File (e.g. [CMAQ_Control_DESID_cb6r5_ae7_aq.nml][link_B.1_desid]). 
+To determine its configuration, DESID makes use of input primarily from four files: the CMAQ runscript, the CMAQ Control File ([CMAQ_Control.nml][link_B.1_misc]), the Chemical Control file ([CMAQ_Chemical_Control_{$MECH}.nml][link_B.1_desis]), and the DESID Chemical Mapping File (e.g. [CMAQ_Control_DESID_cb6r5_ae7_aq.nml][link_B.1_desid]). 
 A separate version of the chemical mapping control file exists for every mechanism because these namelists are preloaded with likely rules linking emissions of important CMAQ primary species to their typical emission species names as output by SMOKE. 
 By default, this namelist is stored in each chemical mechanism folder (e.g. MECHS/cb6r5_ae7_aq) and is copied into the user's build directory when bldit_cctm.csh is executed and a chemical mechanism is chosen. If the user modifies the name or location of the DESID control file or chemical mapping file, then the following commands in the RunScript should be updated as well:
 ```
@@ -359,8 +359,8 @@ Example 2 (set Desid_N_Steam_Fams=3 in Desid_StreamFamVars):
 The variable Desid_Max_Stream_Fam_Members should be set higher than the maximum number of stream members for any stream family.
 
 ### B.3.6 Chemical Families
-Chemical families are defined analogously to stream and region families but in the CMAQ Miscellaneous Control file. This is because they are useful to modules beyond DESID, including [ELMO](CMAQ_UG_appendixF_elmo_output.md) and the [Budget Tool](../CMAQ_UG_ch09_process_analysis.md). 
-See the [CMAQ Control Namelist Description](../CMAQ_UG_ch04_model_inputs.md#cmaqctrl) in Chapter 4 for details. 
+Chemical families are defined analogously to stream and region families but in the CMAQ Chemical Control file. This is because they are useful to modules beyond DESID, including [ELMO](CMAQ_UG_appendixF_elmo_output.md) and the [Budget Tool](../CMAQ_UG_ch09_process_analysis.md). 
+See the [CMAQ Chemical Control Namelist Description](../CMAQ_UG_ch04_model_inputs.md#chemctrl) in Chapter 4 for details. 
 
 One additional note: if a chemical familiy is defined for use in an emission scaling rule, the user should be careful about confirming that the members of that family are present on the emission input file or the CMAQ model species list, depending on which the user is trying to modify. Since the names on the input files are often different than those on the CMAQ model species list, care is advised. DESID will print warnings to the CMAQ log file when it cannot find species that it is looking for from a chemical family on an input file or in the list of CMAQ model species. Please confirm that the model is operating as you expect.  
  

@@ -331,21 +331,17 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Control Files
   #>
-  #> IMPORTANT NOTE
-  #>
-  #> The DESID control files defined below are an integral part of controlling the behavior of the model simulation.
-  #> Among other things, they control the mapping of species in the emission files to chemical species in the model and
-  #> several aspects related to the simulation of organic aerosols.
-  #> Please carefully review the DESID control files to ensure that they are configured to be consistent with the assumptions
-  #> made when creating the emission files defined below and the desired representation of organic aerosols.
+  #> The CMAQ control files defined below are an integral part of controlling the behavior of the model simulation.
+  #> Among other things, they control the variables output to ELMO files, the mapping of species in the emission 
+  #> files to chemical species in the model, and other parameters configuring model input and output.
+  #> Please carefully review the CMAQ chemical control file to ensure it is configured to be consistent with the 
+  #> assumptions made when creating the emission files defined below and the desired chemical mechanism.
   #> For further information, please see:
-  #> + AERO7 Release Notes section on 'Required emission updates':
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Release_Notes/aero7_overview.md
-  #> + CMAQ User's Guide section 6.9.3 on 'Emission Compatability':
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/CMAQ_UG_ch06_model_configuration_options.md#6.9.3_Emission_Compatability
-  #> + Emission Control (DESID) Documentation in the CMAQ User's Guide:
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
-  #>
+  #> + CMAQ User's Guide Appendix F on 'ELMOv2':
+  #>   https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixF_elmo_output.md
+  #> + CMAQ User's Guide Appendix B on Emission Control using DESID:
+  #>   https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
+  #> 
   setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
   setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}_2022v1.nml
 
