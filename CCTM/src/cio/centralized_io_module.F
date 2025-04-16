@@ -1989,7 +1989,8 @@
 
           USE UTILIO_DEFN
           USE HGRD_DEFN
-          USE LSM_Mod, ONLY: n_lufrac, init_lsm
+          USE LSM_Mod,      ONLY: n_lufrac, init_lsm
+          USE STAGE_LU_Mod, ONLY: init_STAGE_LU
 #if defined twoway || defined mpas
           USE coupler_module
 #endif
@@ -2004,6 +2005,7 @@
           INTEGER          :: STAT, n, c
 
           CALL INIT_LSM( 0, 0 )
+!          IF( USE_STAGE) CALL INIT_STAGE_LU( 0, 0 )
 
           allocate (LUFRAC(ncols, nrows, n_lufrac), STAT=STAT)
           IF ( STAT .NE. 0 ) THEN
@@ -5322,6 +5324,9 @@ C Read the various categories of normalized emissions
           USE UTILIO_DEFN
           use HGRD_DEFN, only : ncols, nrows
           use depv_data_module
+          Use STAGE_DATA, Only:  Nit1, Nit2, L1_ON, L2_ON, GMN, BDc1, BDc2, F1_NH4, F2_NH4, L1_ON_Yest, L2_ON_Yest, F1_ON, F2_ON, 
+     &                           gamma1, gamma2
+          use RUNTIME_VARS, only : USE_STAGE
 !         use util_module, only : index1
 
           INCLUDE SUBST_FILES_ID  ! file name parameters
@@ -5386,7 +5391,8 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
 
-#ifdef m3dry_opt
+!#ifdef m3dry_opt
+          If(.NOT. USE_STAGE) Then
           Allocate ( por1 ( ncols, nrows, e2c_cats ),
      &               por2 ( ncols, nrows, e2c_cats ),
      &               wp1  ( ncols, nrows, e2c_cats ),
@@ -5442,7 +5448,8 @@ C Read the various categories of normalized emissions
      &              '" from file "' // TRIM( E2C_SOIL ) // '"'
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
-#endif
+          End If
+!#endif
  
 ! for E2C_CHEM file
           If ( .Not. Open3( E2C_CHEM, fsread3, pname ) ) Then
@@ -5481,8 +5488,8 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
 
-#ifdef m3dry_opt
-
+!#ifdef m3dry_opt
+          If( .NOT.USE_STAGE ) Then
           Allocate ( wep1 ( ncols, nrows, e2c_cats ),
      &               wep2 ( ncols, nrows, e2c_cats ),
      &               dep2 ( ncols, nrows, e2c_cats ),
@@ -5511,8 +5518,10 @@ C Read the various categories of normalized emissions
      &              '" from file "' // TRIM( E2C_CHEM ) // '"'
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
-#else
-#ifdef stage_opt
+          End If
+!#else
+!#ifdef stage_opt
+          If( USE_STAGE ) Then
           Allocate( Nit1       ( ncols,nrows,e2c_cats ),
      &              Nit2       ( ncols,nrows,e2c_cats ),
      &              L1_ON      ( ncols,nrows,e2c_cats ),
@@ -5694,9 +5703,9 @@ C Read the various categories of normalized emissions
           end if   ! MEDC_AVAIL
 
 9001      Format( 'Failure reading ', a, 1x, 'from ', a )
-
-#endif   ! end if stage option
-#endif   ! end if m3dry option
+          endif ! USE_STAGE
+!#endif   ! end if stage option
+!#endif   ! end if m3dry option
 
         end subroutine depv_data_setup
 
@@ -5705,6 +5714,8 @@ C Read the various categories of normalized emissions
 
           USE UTILIO_DEFN
           use bidi_mod
+          use STAGE_bidi_mod, only : INIT_STAGE_BIDI
+          use RUNTIME_VARS, only : USE_STAGE
 
           INCLUDE SUBST_FILES_ID             ! file name parameters
 
@@ -5713,8 +5724,11 @@ C Read the various categories of normalized emissions
           CHARACTER( 256 ) :: xmsg
           integer :: v
           integer :: startcol, endcol, startrow, endrow, gxoff, gyoff
-
-          CALL INIT_BIDI( )
+          If( USE_STAGE ) Then
+             CALL INIT_STAGE_BIDI( )
+          Else 
+             CALL INIT_BIDI( )
+          End If
 
           IF ( .NOT. OPEN3( INIT_MEDC_1, FSREAD3, PNAME ) ) THEN
              XMSG = 'Open failure for ' // INIT_MEDC_1
