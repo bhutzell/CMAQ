@@ -17,7 +17,7 @@
 !------------------------------------------------------------------------!
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE VDIFFACMX ( DTSEC, SEDDY, DDEP, TOT_BD_EMIS, DDEPJ, CNGRD )
+      SUBROUTINE STAGE_VDIFFACMX ( DTSEC, SEDDY, DDEP, TOT_BD_EMIS, DDEPJ, CNGRD )
 
 C-----------------------------------------------------------------------
 C Asymmetric Convective Model v2 (ACM2/ACM1) -- Pleim(2006/2014)
@@ -48,11 +48,13 @@ C-----------------------------------------------------------------------
       USE GRID_CONF
       USE DESID_VARS, ONLY : VDEMIS_DIFF, DESID_LAYS
       USE DESID_PARAM_MODULE, ONLY : DESID_N_SRM
-      USE DEPV_DEFN
+      USE STAGE_DEFN
       USE ASX_DATA_MOD
+      USE STAGE_EMIS_MAP
       USE VDIFF_MAP
       USE UTILIO_DEFN
-      USE BIDI_MOD
+!      USE BIDI_MOD
+      USE STAGE_BIDI_MOD
       USE MOSAIC_MOD, ONLY: Tile_Data
       USE VDIFF_DIAG, NLPCR => NLPCR_MEAN
       USE HGRD_DEFN,only : COLSX_PE, ROWSX_PE
@@ -93,7 +95,7 @@ C External Functions: None
 
 C Local Variables:
 
-      CHARACTER( 16 ), SAVE :: PNAME = 'VDIFFACMX'
+      CHARACTER( 16 ), SAVE :: PNAME = 'STAGE_VDIFFACMX'
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL, SAVE :: SPECLOG = .TRUE.             ! For BDSNP

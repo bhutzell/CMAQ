@@ -25,7 +25,7 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
  
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE OPDDEP ( JDATE, JTIME, TSTEP )
+      SUBROUTINE STAGE_OPDDEP ( JDATE, JTIME, TSTEP )
 
 C   30 Mar 01 J.Young: dyn alloc - Use HGRD_DEFN
 C   03 Sep 01 David Wong: for new pario
@@ -54,7 +54,7 @@ C Arguments:
 
 C Local variables:
 
-      CHARACTER( 16 ) :: PNAME = 'OPDDEP'
+      CHARACTER( 16 ) :: PNAME = 'STAGE_OPDDEP'
       CHARACTER( 96 ) :: XMSG = ' '
 
 ! component flux varialbes      

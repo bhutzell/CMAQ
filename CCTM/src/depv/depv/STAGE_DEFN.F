@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      MODULE DEPV_DEFN
+      MODULE STAGE_DEFN
 
 C-----------------------------------------------------------------------
 C Function: deposition velocity interface to the chemistry-transport model
@@ -95,9 +95,9 @@ C-----------------------------------------------------------------------
          USE CGRID_SPCS          ! CGRID mechanism species
          USE STAGE_DATA
          USE UTILIO_DEFN
-         USE LSM_MOD, Only: Init_LSM
+         USE STAGE_LU_Mod, Only: Init_STAGE_LU
          USE MOSAIC_MOD, Only: Tile_Data
-         USE BIDI_MOD, Only: Init_Bidi
+!         USE STAGE_BIDI_MOD, Only: Init_STAGE_Bidi
          USE STAGE_MOD, Only: INIT_STAGE
          USE STAGE_OUTPUT
          USE CONST, ONLY: RGASUNIV, MWAIR
@@ -434,7 +434,7 @@ C-----------------------------------------------------------------------
          USE CGRID_SPCS          ! CGRID mechanism species
          USE UTILIO_DEFN
          USE Mosaic_Mod
-         USE ASX_DATA_MOD, Only: GRID_DATA, MOSAIC_DATA
+         USE ASX_DATA_MOD, Only: GRID_DATA
          Use STAGE_OUTPUT
          Use STAGE_MOD,    Only: GAS_X, AERO_X
 
@@ -542,4 +542,4 @@ C-----------------------------------------------------------------------
 
          END SUBROUTINE GET_DEPV
 
-      END MODULE DEPV_DEFN
+      END MODULE STAGE_DEFN

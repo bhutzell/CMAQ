@@ -59,7 +59,7 @@ C-----------------------------------------------------------------------
       USE RUNTIME_VARS, ONLY: LOGDEV, OUTDEV, MYPE, CKSUM, 
      &                        PRINT_PROC_TIME, WEEKDAY, 
      &                        LOG_MESSAGE, TIMING_SPLIT, STM,
-     &                        COLUMN_MODEL, LPVO3
+     &                        COLUMN_MODEL, LPVO3, USE_STAGE
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -155,6 +155,11 @@ C Local Variables:
             INTEGER, INTENT( IN )     :: JDATE, JTIME
             INTEGER, INTENT( IN )     :: TSTEP( 3 )
          END SUBROUTINE VDIFF
+         SUBROUTINE STAGE_VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+            REAL, POINTER             :: CGRID( :,:,:,: )
+            INTEGER, INTENT( IN )     :: JDATE, JTIME
+            INTEGER, INTENT( IN )     :: TSTEP( 3 )
+         END SUBROUTINE STAGE_VDIFF
          SUBROUTINE PHOT ( CGRID, JDATE, JTIME, TSTEP )
             REAL, POINTER             :: CGRID( :,:,:,: )
             INTEGER, INTENT( IN )     :: JDATE, JTIME
@@ -228,7 +233,11 @@ C-----------------------------------------------------------------------
       CALL LOG_MESSAGE( LOGDEV, XMSG )
 
       ! Calculate Vertical Diffusion, Dry Deposition, and Emissions
-      CALL VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+      IF( USE_STAGE ) THEN 
+         CALL STAGE_VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+      ELSE
+         CALL VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+      END IF
       IF ( CKSUM ) CALL CKSUMMER ( 'VDIFF', CGRID, JDATE, JTIME )
 #ifndef mpas
       IF ( BUDGET_DIAG .OR. LIPR ) CALL PA_UPDATE_PROC ( IPR_VDIF, CGRID, JDATE, JTIME, TSTEP, .FALSE. )

@@ -17,7 +17,7 @@
 !------------------------------------------------------------------------!
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE VDIFF ( CGRID, JDATE, JTIME, TSTEP )
+      SUBROUTINE STAGE_VDIFF ( CGRID, JDATE, JTIME, TSTEP )
 
 C-----------------------------------------------------------------------
 C Asymmetric Convective Model v2 (ACM2) -- Pleim(2006)
@@ -82,13 +82,14 @@ C-----------------------------------------------------------------------
       USE DESID_VARS, ONLY : VDEMIS_DIFF, DESID_LAYS
       USE DESID_MODULE, ONLY : DESID_INIT, DESID_DRIVER
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_DDEP
-      USE DEPV_DEFN
+      USE STAGE_DEFN
       USE ASX_DATA_MOD
+      USE STAGE_EMIS_MAP
       USE VDIFF_MAP
       USE UTILIO_DEFN
-      USE BIDI_MOD
-      USE HGSIM
-      Use MOSAIC_MOD, Only: Tile_Data
+      USE STAGE_BIDI_MOD
+      USE HG_BIDI
+      Use MOSAIC_MOD, Only: Init_Mosaic, Tile_Data, GET_STAGE_MET
       USE SEDIMENTATION
       USE VDIFF_DIAG
       USE PA_UPDATE
@@ -122,7 +123,7 @@ C Parameters:
 C External Functions: None
 
 C Local Variables: 
-      CHARACTER( 16 ), SAVE :: PNAME = 'VDIFFPROC'
+      CHARACTER( 16 ), SAVE :: PNAME = 'STAGE_VDIFFPROC'
 
       CHARACTER( 80 ) :: VARDESC                ! env variable description
 
@@ -174,14 +175,14 @@ C Local Variables
          SUBROUTINE EDDYX ( EDDYV )
             REAL,           INTENT( OUT ) :: EDDYV( :,:,: )
          END SUBROUTINE EDDYX
-         SUBROUTINE VDIFFACMX( dtsec, seddy, ddep, TOT_BD_EMIS, ddepj, cngrd )
+         SUBROUTINE STAGE_VDIFFACMX( dtsec, seddy, ddep, TOT_BD_EMIS, ddepj, cngrd )
             REAL, INTENT( IN )    :: dtsec
             REAL, INTENT( INOUT ) :: seddy( :,:,: )
             REAL, INTENT( INOUT ) :: ddep ( :,:,: )
             REAL, INTENT( INOUT ) :: TOT_BD_EMIS ( :,:,: )
             REAL, INTENT( INOUT ), OPTIONAL :: ddepj    ( :,:,:,: )
             REAL, INTENT( INOUT ) :: cngrd( :,:,:,: )
-         END SUBROUTINE VDIFFACMX
+         END SUBROUTINE STAGE_VDIFFACMX
 #ifdef isam
          SUBROUTINE SA_OPWDDEP ( SADEPFILE, JDATE, JTIME, TSTEP )
             IMPLICIT NONE
@@ -201,6 +202,7 @@ C-----------------------------------------------------------------------
 
          CALL LOG_HEADING( LOGDEV, "Initialize Surface Exchange Module" )
 
+         CALL INIT_MOSAIC( JDATE, JTIME, Grid_Data%LUFRAC )
          IF ( .NOT. DEPV_INIT ( JDATE, JTIME, TSTEP, CGRID ) ) THEN
             XMSG = 'Failure initializing deposition velocities module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -212,16 +214,22 @@ C create global maps
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
+C create global maps for bidi emissions and between STAGE and vdiff
+         IF ( .NOT. STAGE_EMIS_MAP_INIT( ) ) THEN
+            XMSG = 'Failure initializing index mapping module'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
+
 C Initialize the met data
          CALL INIT_MET( JDATE, JTIME )
 
-         IF ( HGBIDI ) THEN ! Initialize HGSIM module
-            CALL INIT_HGSIM(JDATE, JTIME)
+         IF ( HGBIDI ) THEN ! Initialize HG_BIDI module
+            CALL INIT_HG_BIDI(JDATE, JTIME)
          END IF
 
 C Set output file characteristics based on COORD.EXT and open the dry dep file
          IF ( IO_PE_INCLUSIVE ) THEN
-            CALL OPDDEP ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP )
+            CALL STAGE_OPDDEP ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP )
 #ifdef isam
             CALL SA_OPWDDEP ( SA_DD_1, JDATE, JTIME,TSTEP( 1 ) )
 #endif
@@ -326,7 +334,7 @@ C Set up for grav. settling
             END IF
             DDEPJ = 0.0   ! array assignment
             IF ( IO_PE_INCLUSIVE )
-     &         CALL OPDDEP_MOS ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP )
+     &         CALL STAGE_OPDDEP_MOS ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP )
          END IF   ! if Mosaic
 !--------------------------------------------------------------------------------------------------
          DO V = 1, N_SPC_DEPV
@@ -348,7 +356,8 @@ C Convert non-molar mixing ratio species and re-order CGRID
       CALL CONV_CGRID ( CGRID, MDATE, MTIME, CNGRD )
 
 C read & interpolate met data
-      CALL GET_MET ( MDATE, MTIME, MSTEP )
+      CALL GET_MET       ( MDATE, MTIME, MSTEP )
+      CALL GET_STAGE_MET ( MDATE, MTIME, MSTEP )
 
 C read & interpolate deposition velocities
       CALL GET_DEPV ( MDATE, MTIME, TSTEP, CGRID )      
@@ -400,10 +409,10 @@ C Store Deposition Change in Budget and Process Analysis Arrays
 C Calculate the change in concentration and dry dep from vertical diffusion and vsed
 C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual argument
       IF ( .NOT. MOSAIC ) THEN
-         CALL VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
+         CALL STAGE_VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
      &                   cngrd = CNGRD )
       ELSE
-         CALL VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
+         CALL STAGE_VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
      &                   ddepj = DDEPJ, cngrd = CNGRD )
       END IF 
 

@@ -44,13 +44,15 @@ C Revised:  1 Dec 2017  Original version.  (J. Bash)
 C-------------------------------------------------------------------------------
 
       Use GRID_CONF           ! horizontal & vertical domain specifications
-      Use LSM_MOD             ! Land surface data
-      Use ASX_DATA_MOD
+      Use STAGE_LU_MOD             ! Land surface data
+      Use ASX_DATA_MOD, only: grid_data, met_data, dwat, hplus_ap, hplus_def, hplus_h2o, kvis
+      Use CONST
       USE UTILIO_DEFN      
       USE CGRID_SPCS          ! CGRID mechanism species
       USE STAGE_DATA
       USE AERO_DATA, Only: N_MODE
       USE CENTRALIZED_IO_MODULE, Only: WR_AVAIL
+      USE RUNTIME_VARS, Only: MOSAIC
 
       IMPLICIT NONE
 
@@ -58,8 +60,6 @@ C shared variables
       INTEGER, ALLOCATABLE, SAVE :: DEPV_SUR( : )   ! pointer to surrogate
       REAL,    ALLOCATABLE, SAVE :: VDEP( : )    ! deposition  velocity [ m/s ]
       REAL,    ALLOCATABLE, SAVE :: VDEPJ( :,: ) ! deposition  velocity [ m/s ]
-      REAL,    SAVE              :: xcent
-      REAL,    SAVE              :: ycent
       INTEGER, PARAMETER         :: N_AE_DEP_SPC = 9 
 C land use indexes
       Logical, Allocatable, Save :: Water( : )
@@ -95,7 +95,7 @@ C  This subroutine sets up the mapping and options for the STAGE gaseous
 C  and aerosol exchange subroutines. 
 C-----------------------------------------------------------------------
          USE NH3_BIDI_MOD
-         USE MOSAIC_MOD, Only: Tile_Data
+         USE MOSAIC_MOD, Only: Tile_Data, init_mosaic
          USE CONST
 
          Implicit None        
@@ -123,8 +123,6 @@ C                                       1234567890123456
          DATA         VDAE_NAME( 8 ) / 'VSRFACC         ' /
          DATA         VDAE_NAME( 9 ) / 'VSRFCOR         ' /
 
-         xcent = real( file_xcell(f_met), 4 )
-         ycent = real( file_ycell(f_met), 4 )
 C Check aerosol deposition options 
          If( ( STAGE_E20 .And. STAGE_P22 ) ) Then
             XMSG = 'Both CTM_STAGE_E20 and CTM_STAGE_P22 aerosol dry ' //
@@ -139,10 +137,13 @@ C Check aerosol deposition options
      &             ' deposition options were set to Y. Please select one. '
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          End If
+
 C if abflux this specifies soil, vegetation and water compensation points for NH3
          IF ( abflux ) THEN
             CALL Init_NH3_Bidi( jdate, jtime )
          END IF
+
+!         CALL INIT_MOSAIC( JDATE, JTIME, Grid_Data%LUFRAC )
 C  Allocate arrays
          Allocate ( Water  ( Tile_Data%n_lufrac ),
      &              Ag     ( Tile_Data%n_lufrac ),
@@ -281,8 +282,8 @@ C-----------------------------------------------------------------
          SUBROUTINE GAS_X( JDate, JTime, TStep, c, r, cgridl1 )        
         
          Use NH3_BIDI_MOD
-         Use MOSAIC_MOD, Only: Tile_Data 
-         Use HGSIM
+         Use MOSAIC_MOD, Only: Tile_Data, is_ag, is_agmos, is_water, zsoil1, zsoil2 
+         Use HG_BIDI
          Use Resist_Funcs
          Use HLCONST_MOD
 
@@ -291,13 +292,6 @@ C-----------------------------------------------------------------
          Integer, Intent( IN )  :: JDate, JTime, c, r      ! internal simulation date&time
          REAL,    Intent( IN )  :: cgridl1( : )    ! layer 1 concentrations
          REAL,    Intent( IN )  :: TStep           ! Time step in seconds
-C Parameters specific to gas_x. Currently based on m3dry but subject to change
-         Real, Parameter :: d3         = 1.38564e-2 ! [dim'less]
-         Real, Parameter :: hplus_ap   = 1.0e-6     ! pH=6.0 leaf apoplast solution Ph (Massad et al 2008)      
-         Real, Parameter :: hplus_def  = 1.0e-5     ! pH=5.0
-         Real, Parameter :: hplus_east = 1.0e-5     ! pH=5.0
-         Real, Parameter :: hplus_h2o  = 7.94328e-9 ! 10.0**(-8.1)
-         Real, Parameter :: hplus_west = 3.16228e-6 ! 10.0**(-5.5)
 C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffusion Volume for air 
          Real, Parameter :: Diff_Vol   = 20.1       ! cm3/mol
 
@@ -311,17 +305,18 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
          Real            :: scc_pr_23               ! (SCC/PR)**2/3, fn of DIF0
          Real            :: dif_T, k_vis, dwat_T    ! Trace gas diffusivity, kinematic viscosity of air, and diffusivity of water vapor in air (m2/s)
 ! Soil properties
-         Real            :: sm_v5cm, sm_v1cm        ! Soil moisture at 5 and 1 cm (m3/m3)
-         Real            :: sm_vsat                 ! volumetric soil saturation (m3/m3)
-         Real            :: sm_vfc                  ! volumetric field capacity (m3/m3)
-         Real            :: sm_vwlt                 ! volumetric wilting point (m3/m3)
-         Real            :: sm_vres                 ! volumetric residual water (m3/m3)
-         Real            :: sm_bslp                 ! slope of the saturation water retention curve (ratio)
+         Real            :: sm_v1m, sm_v5cm, sm_v1cm ! Soil moisture at 1 m, 5 cm, and 1 cm (m3/m3)
+         Real            :: sm_vsat                  ! volumetric soil saturation (m3/m3)
+         Real            :: sm_vfc                   ! volumetric field capacity (m3/m3)
+         Real            :: sm_vwlt                  ! volumetric wilting point (m3/m3)
+         Real            :: sm_vres                  ! volumetric residual water (m3/m3)
+         Real            :: sm_bslp                  ! slope of the saturation water retention curve (ratio)
 ! meteorological variables
          Real            :: temp_g, temp_2m  ! Soil and 2m temperature (K)
          Real            :: q_2m             ! water vapor mixing ratio at 2m ()
          Real            :: rh               ! relative humidity (%) and surface friction velocity (m/s) 
          Real            :: ustar            ! surface friction velocity (m/s)
+         Real            :: z0               ! zero plane displacement (m)
 ! Canopy variables
          Real            :: l_leaf          ! leaf aerodynamic width (m)
          Real            :: lai             ! leaf area index (m2/m2)
@@ -334,6 +329,7 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
          Real            :: Ra      ! aerodynamic resistance (s/m)
          Real            :: Rb      ! quasi-laminar soil/water resistance (s/m)
          Real            :: Rb_leaf ! quasi-laminary leaf resistance (s/m)
+         Real            :: Rstw    ! Stomatal resistance for water vapor (s/m)
          Real            :: Rst     ! Stomatal resistance (s/m)
          Real            :: Rcut    ! cuticlular resistance (s/m)
          Real            :: Rgc     ! under canopy soil resistance (s/m)
@@ -375,11 +371,11 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
          q_2m    = MET_DATA%Q2( c,r )
          temp_g  = MET_DATA%TEMPG( c,r )
          rh      = MET_DATA%RH2( c,r )
-         sm_vsat = GRID_DATA%WSAT( c,r )
-         sm_vfc  = GRID_DATA%WFC( c,r )
-         sm_vwlt = GRID_DATA%WWLT( c,r )
-         sm_vres = GRID_DATA%WRES( c,r )
-         sm_bslp = max(GRID_DATA%BSLP( c,r ),1.0)
+         sm_vsat = TILE_DATA%WSAT( c,r )
+         sm_vfc  = TILE_DATA%WFC( c,r )
+         sm_vwlt = TILE_DATA%WWLT( c,r )
+         sm_vres = TILE_DATA%WRES( c,r )
+         sm_bslp = max(TILE_DATA%BSLP( c,r ),1.0)
          sm_v1cm = min(MET_DATA%SOIM1( c,r ),sm_vsat)
          sm_v1cm = max(sm_v1cm,sm_vres)
          If( ABFLUX ) Then
@@ -392,10 +388,16 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
             sm_v5cm = sm_v1cm * exp( (0.05-zsoil1) * GRAV )**(1.0/sm_bslp)
             sm_v5cm = Min( sm_v5cm, sm_vsat )
             sm_v5cm = Max( sm_v5cm, sm_vres )
+            sm_v1m  = min(Tile_Data%SOIM2( c,r ),sm_vsat)
+            sm_v1m  = max(sm_v1m,sm_vres)
          Else If( CLM_LSM .OR. NOAH_LSM ) Then
-            sm_v5cm = MET_DATA%SOIM2( c,r )
+            sm_v5cm = Tile_Data%SOIM2( c,r )
             sm_v5cm = Min( sm_v5cm, sm_vsat )
             sm_v5cm = Max( sm_v5cm, sm_vres )
+! simplified from Darcy's law assuming stationarity and only gravitational draining with the Campbell hydrological functions applied
+            sm_v1m = sm_v5cm * exp( (1.0-zsoil2) * GRAV )**(1.0/sm_bslp)
+            sm_v1m  = min(sm_v1m,sm_vsat)
+            sm_v1m  = max(sm_v1m,sm_vres)
          End If
 
          snow    = max( 0.0, MET_DATA%SNOCOV( c,r ) )
@@ -406,17 +408,7 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
          IF (((GRID_DATA%OCEAN(c,r) + GRID_DATA%SZONE(c,r)) .GT. 0.0) .AND. (MET_DATA%SEAICE(c,r) .LE. 0.0)) THEN
             sea_ice = .FALSE.
          End If
-!
-         IF ( ( ycent .GE.   30.0 ) .AND. ( ycent .LE.  45.0 ) .AND.
-     &        ( xcent .GE. -120.0 ) .AND. ( xcent .LE. -70.0 ) ) THEN
-            IF ( GRID_DATA%LON( c,r ) .GT. -100.0 ) THEN
-               hplus = hplus_east
-            ELSE
-               hplus = hplus_west
-            END IF
-         ELSE
-            hplus = hplus_def
-         END IF
+
 ! moved water temperature here to reduce redundancy and facilitate moving the hlconst 
 ! subroutine out of the land use loop for better vectorization.
          ctemp2 = temp_2m - stdtemp
@@ -427,6 +419,7 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
          dwat_T = dwat*1.0e-4 * ( temp_2m/STDTEMP )**1.81 ! Following Massman 1999
          n = 0
          n_diag = 0
+         flux_hgII = 0.0
          spc_loop: Do s = 1, dep_gas_all
             IF ( asx_run_map( s ) ) Then
             n = n + 1
@@ -451,7 +444,7 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
             soil_flux = 0.0
             heff_wat  = hlconst( hlind( s ), tw, effective, hplus_h2o )* 0.08205 * tw
             heff_ap   = hlconst( hlind( s ), temp_2m, effective, hplus_ap )
-            heff      = hlconst( hlind( s ), temp_2m, effective, hplus )* 0.08205 * temp_2m
+            heff      = hlconst( hlind( s ), temp_2m, effective, hplus_def )* 0.08205 * temp_2m
             If ( HGBIDI .And. Hg_Hit ) Then
                Call  Get_Hg_Comp( Hg_st, Hg_cut, Hg_grnd, Hg_wat, c_atm, heff_wat, heff, r, c )
             End If
@@ -478,21 +471,16 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
                Rcut   = 0.0
                Rg     = 0.0
                Rgc    = 0.0                  
+               Rstw   = 1.0e6
 C land use specific area fraction 
                frac_lu = Tile_Data%LUFRAC( c,r,l )  
                If( frac_lu .Gt. 0.0 ) Then
 C land use specific met data
-               ustar   = MOSAIC_DATA%USTAR( c,r,l )
-               lai     = MOSAIC_DATA%LAI( c,r,l )
-C land use specific land cover data
-               wet     = Mosaic_Data%DELTA( c,r,l )
-               dry     = 1.0 - wet
-               veg     = MOSAIC_DATA%VEG( c,r,l ) 
-               no_veg  = 1.0 - veg
-               l_leaf  = Tile_Data%l_width( l )
+               z0      = Calc_z0( is_ag(l), is_agmos(l), is_water(l), frac_lu, Tile_Data%Z00( l ), Met_Data%Z0( c,r ), 
+     &                            Tile_Data%LAIMN0( l ), Tile_Data%LAI0( l ), Tile_Data%SOIT2( c,r ) )
+               ustar   = Calc_USTAR( MET_DATA%USTAR( c,r ), Met_Data%ZH( c,r,1 ), Met_Data%Z0( c,r ), z0, frac_lu )
 C Get Ra
-               Ra = MOSAIC_DATA%RA( c,r,l )
-
+               Ra = Calc_Ra( Met_Data%RA( c,r ), Met_Data%ZH( c,r,1 ), Met_Data%Z0( c,r ), z0, frac_lu )
 !-------------------------------------------------------------------------------------------------
 ! Quasi-laminar boundary layer resistance
 !-------------------------------------------------------------------------------------------------
@@ -513,22 +501,41 @@ C Get Ra
 
                   Vd     = 1.0 / ( Ra + Rb + Rwat )  
                   f_wat  = f_wat  + frac_lu * ( c_wat - c_atm ) / ( Ra + Rb + Rwat )   
+                  if( s .EQ. s_HGII ) Then
+                     flux_hgII = flux_hgII + f_wat * frac_lu
+                  End If
                Else 
 !-------------------------------------------------------------------------------------------------
 ! Air-land exchange
 !-------------------------------------------------------------------------------------------------
 ! Resistance to air-canopy exchange
 !-------------------------------------------------------------------------------------------------
+                  lai     = Calc_LAI( l, Tile_Data%n_lufrac, is_ag, is_agmos, is_water, MET_DATA%LAI( c,r ), 
+     &                             Tile_Data%LUFRAC( c,r,: ), Tile_Data%LAIMN0, Tile_Data%LAI0, Tile_Data%SOIT2( c,r ) )
+                  veg     = Calc_Veg( l, Tile_Data%n_lufrac, is_ag, is_agmos, is_water, MET_DATA%VEG( c,r ), 
+     &                             Tile_Data%LUFRAC( c,r,: ), Tile_Data%VEGMN0, Tile_Data%VEG0, Tile_Data%SOIT2( c,r ) )
+C land use specific land cover data
+                  wet     = Calc_CanWat( veg, lai, Met_Data%WR( c,r ), WR_AVAIL, q_2m, Met_Data%QSS_GRND( c,r ),
+     &                                Met_Data%RN( c,r ), Met_Data%RC( c,r ) )
+                  dry     = 1.0 - wet
+                  no_veg  = 1.0 - veg
+                  l_leaf  = Tile_Data%l_width( l )
 C Calculate Rst
                   If( lai .Gt. 0.0 ) Then
 !-------------------------------------------------------------------------------------------------
 ! Quasi Laminar Resistance to leaf 
 !-------------------------------------------------------------------------------------------------
                      Rb_leaf = Calc_Rb_leaf( k_vis, dif_T, ustar, l_leaf, lai )
+C Get Rstw
+                     Rstw = Calc_Rstw( l, Tile_Data%n_lufrac, Met_Data%RS( c,r ), Tile_Data%LUFRAC( c,r,: ),
+     &                           Tile_Data%rsmin, lai, ustar, Ra, Met_Data%RGRND( c,r ), sm_v1m, sm_vwlt, 
+     &                           sm_vfc, temp_2m, Met_Data%QSS_GRND( c,r ), q_2m, Grid_Data%LWMASK( c,r ),
+     &                           k_vis, dwat_T, l_leaf )
+
 !-------------------------------------------------------------------------------------------------
 ! Resistance to air-stomatal exchange
 !-------------------------------------------------------------------------------------------------
-                     Rst = Calc_Rst( Mosaic_Data%RSTW( c,r,l ), dwat_T, dif_T, heff_ap, f0( s ), lai )
+                     Rst = Calc_Rst( Rstw, dwat_T, dif_T, heff_ap, f0( s ), lai )
 
 !-------------------------------------------------------------------------------------------------
 ! Resistance to air-cuticle exchange
@@ -540,6 +547,7 @@ C Calculate Rst
 ! Resistance to air-canopy covered soil exchange
 !-------------------------------------------------------------------------------------------------
                   Else ! LAI = 0.0
+                     Rstw    = 1.0e6
                      Rst     = 1.0e6
                      Rcut    = 1.0e6
                      Rb_leaf = 1.0e6
@@ -604,12 +612,21 @@ C Calculate Rst
                      f_stom = f_stom + frac_lu * veg * ( c_stom - c_leaf ) / Rst        ! air-stomatal exchange
                   End If ! compensation points greater than 0
                End If ! Water    
-               Tile_Data%Lu_Vd( c,r,n,l ) =  vd * Tile_Data%Vd_Fac( n )
+               vd =  vd * Tile_Data%Vd_Fac( n )
+               If( MOSAIC ) Then
+                  Tile_Data%Lu_Vd( c,r,n,l ) =  vd
+                  Tile_Data%RA( c,r,l )      =  Ra
+                  Tile_Data%RSTW( c,r,l )    =  Rstw
+                  Tile_Data%LAI( c,r,l )     =  lai
+                  Tile_Data%USTAR( c,r,l )   =  ustar
+                  Tile_Data%Z0( c,r,l )      =  z0
+                  Tile_Data%VEG( c,r,l )     =  Veg
+               End If
 ! Generalization of the production and deposition velocity terms
                Tile_Data%Bidi_Emis( C, R, n ) = Tile_Data%Bidi_Emis( c, r, n )  + 
      &                                          frac_lu * LU_Emis
                Tile_Data%Grd_Vd( C, R, n ) = Tile_Data%Grd_Vd( c, r, n ) + 
-     &                                       frac_lu * Tile_Data%Lu_Vd( c,r,n,l )
+     &                                       frac_lu * vd
             End If ! frac_lu > 0
 
             End Do lu_loop
@@ -619,12 +636,10 @@ C Calculate Rst
                End If
             End If
             If(HGBIDI .And. Hg_Hit ) Then
-               flux_hgII = 0.0 
 ! negative values are deposition fluxes
-               flux_hgII = -Sum( Tile_Data%Lu_Vd( c,r,n_HgII,: ) * Tile_Data%LUFRAC( c,r,: ), mask = WATER)
-
                Call Hg_Surf_Update ( f_stom, f_cut, f_soil, f_wat, flux_hgII, 
      &                               Heff_wat, Heff, TStep, c, r, Jdate, Jtime )
+               flux_hgII = 0.0 
             End If
 C--------------------------------------------------------------------------
             IF ( sfc_hono ) THEN
@@ -714,8 +729,8 @@ C-----------------------------------------------------------------------
          USE AEROMET_DATA        ! Includes CONST module
          USE GRID_CONF           ! horizontal & vertical domain specifications
          USE RXNS_DATA           ! chemical mechanism data
-         Use MOSAIC_MOD, Only: Tile_Data 
-         Use Resist_Funcs, Only: Aero_Depv, Aero_Depv_E20, Aero_Depv_P22
+         Use MOSAIC_MOD, Only: Tile_Data, is_ag, is_agmos, is_water 
+         Use Resist_Funcs !, Only: Aero_Depv, Aero_Depv_E20, Aero_Depv_P22
 
          IMPLICIT NONE
 
@@ -777,7 +792,7 @@ C modal sedimentation velocities for number, 2nd, and 3rd moment, or mass:
          REAL SC3                      ! Schmidt numbers for 3rd moment
          REAL NU                       ! kinematic viscosity [ m**2 s**-1 ]
          REAL TWOXLM                   ! 2 X atmospheric mean free path
-         REAL Ra, Ustar, lai           ! Land use specific environmental variables
+         REAL Ra, Ustar, lai, z0       ! Land use specific environmental variables
          REAL Ubar, SeaIce, SST        ! Grid scale meteorological variables
          REAL Lu_frac, Veg, wet        ! Land use and vegetation coverage fraction
          REAL l_width, Alpha           ! Emerson et al. 2020 land use variables
@@ -900,11 +915,6 @@ C Integrated Emerson et al 2020 Interception term.
 
             lu_loop: DO L = 1, Tile_Data%n_lufrac
 C ***    Land use parameters
-               Veg     = Mosaic_Data%VEG( C,R,L )
-               wet     = Mosaic_Data%DELTA( c,r,l )
-               Ustar   = Mosaic_Data%USTAR( C,R,L )
-               lai     = Mosaic_Data%LAI( C,R,L )
-               Ra      = Mosaic_Data%RA( C,R,L )
                lu_frac = Tile_Data%LUFRAC( C,R,L )
                l_width = Tile_Data%l_width( L )
                Alpha   = Tile_Data%Alpha( L )
@@ -912,8 +922,32 @@ C ***    Land use parameters
                Ahair   = Tile_Data%Ahair( L )
                Fhair   = Tile_Data%Fhair( L )
                Aleaf   = Tile_Data%Aleaf( L )
-               IF( water( L ) ) wet = 1.0
                IF ( lu_frac .Eq. 0.0 ) Cycle lu_loop
+                  z0      = Calc_z0( is_ag(L), is_agmos(L), is_water(L), lu_frac, Tile_Data%Z00( L ), Met_Data%Z0( c,r ), 
+     &                               Tile_Data%LAIMN0( L ), Tile_Data%LAI0( L ), Tile_Data%SOIT2( c,r ) )
+                  ustar   = Calc_USTAR( MET_DATA%USTAR( c,r ), Met_Data%ZH( c,r,1 ), Met_Data%Z0( c,r ), z0, lu_frac )
+                  Ra      = Calc_Ra( Met_Data%RA( c,r ), Met_Data%ZH( c,r,1 ), Met_Data%Z0( c,r ), z0, lu_frac )
+                  IF( water( L ) ) Then
+                     wet = 1.0
+                     lai = 0.0
+                     veg = 0.0
+                  Else 
+                     lai     = Calc_LAI( L, Tile_Data%n_lufrac, is_ag, is_agmos, is_water, MET_DATA%LAI( c,r ), 
+     &                                Tile_Data%LUFRAC( c,r,: ), Tile_Data%LAIMN0, Tile_Data%LAI0, Tile_Data%SOIT2( c,r ) )
+
+                     veg     = Calc_Veg( L, Tile_Data%n_lufrac, is_ag, is_agmos, is_water, MET_DATA%VEG( c,r ), 
+     &                             Tile_Data%LUFRAC( c,r,: ), Tile_Data%VEGMN0, Tile_Data%VEG0, Tile_Data%SOIT2( c,r ) )
+                     wet     = Calc_CanWat( veg, lai, Met_Data%WR( c,r ), WR_AVAIL, Met_Data%Q2( c,r ), 
+     &                                   Met_Data%QSS_GRND( c,r ), Met_Data%RN( c,r ), Met_Data%RC( c,r ) )
+                  End If            
+                  if( veg .gt. 0.0 .and. lai .gt. 0.0 .and. l_width .eq. 0.0 ) Then
+                     Write(logdev,*) 'LU Name  : ',Tile_Data%name_lu(l)
+                     Write(logdev,*) 'l_width  : ',l_width
+                     Write(logdev,*) 'is_water : ',is_water(L)
+                     Write(logdev,*) 'water    : ',water(L)
+                     Write(logdev,*) 'lai      : ',lai
+                     Write(logdev,*) 'veg      : ',veg
+                  End If
 
 C now calculate the deposition velocities
 
@@ -956,10 +990,10 @@ C Return dry deposition velocities for aerosols (first layer only).
             NDX = N_GC_DEPV + N_NR_DEPV + N_TR_DEPV + V
             IF ( DEPV_SUR( V ) .GT. 0 ) THEN
                Tile_Data%Grd_Vd( C,R,NDX )   = VDEP( DEPV_SUR( V ) )    * Tile_Data%Vd_Fac( NDX )
-               Tile_Data%Lu_Vd( C,R,NDX,: )  = VDEPJ( :,DEPV_SUR( V ) ) * Tile_Data%Vd_Fac( NDX )
+               if(MOSAIC) Tile_Data%Lu_Vd( C,R,NDX,: )  = VDEPJ( :,DEPV_SUR( V ) ) * Tile_Data%Vd_Fac( NDX )
             ELSE
                Tile_Data%Grd_Vd( C,R,NDX )   = 0.0
-               Tile_Data%Lu_Vd( C,R,NDX,: )  = 0.0  
+               if(MOSAIC) Tile_Data%Lu_Vd( C,R,NDX,: )  = 0.0  
             END IF 
          END DO
                     

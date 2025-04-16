@@ -110,7 +110,9 @@ C-----------------------------------------------------------------------
       USE RXNS_DATA             ! chemical mechanism data
       USE CENTRALIZED_IO_MODULE
       USE ASX_DATA_MOD, Only : MET_DATA, INIT_MET, GET_MET
+      Use MOSAIC_MOD, Only: Init_Mosaic, Tile_Data, GET_STAGE_MET
       USE LSM_MOD
+      USE STAGE_LU_MOD, Only : INIT_STAGE_LU
       USE WVEL_DEFN             ! derived vertical velocity component
       USE BUDGET_DEFN
       USE AERO_DATA
@@ -140,8 +142,8 @@ C-----------------------------------------------------------------------
       USE AVG_CONC              ! integral average CONC
       USE PA_DEFN, Only: LIPR, LIRR  ! Process Anaylsis control and data variables
       USE PAGRD_DEFN            ! Process Anaylsis horiz domain specs
-
       USE BIDI_MOD, Only : INIT_BIDI
+      USE STAGE_BIDI_MOD, Only : INIT_STAGE_BIDI
 
 #ifdef isam
 c     USE SA_LAYERS
@@ -664,8 +666,15 @@ C ELMO (e.g. AOD, extinction, Kz, etc.)
 
 C Initialize Meteorology Structures
          CALL INIT_LSM( JDATE, JTIME )
+         IF( USE_STAGE) Then
+            CALL INIT_STAGE_LU( JDATE, JTIME )
+         End If
 #ifndef mpas
-         CALL INIT_BIDI( )
+         IF( USE_STAGE) Then
+            CALL INIT_STAGE_BIDI( )
+         Else
+            CALL INIT_BIDI( )
+         End IF
 #endif
          CALL INIT_MET( JDATE, JTIME )
 
