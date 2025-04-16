@@ -14,7 +14,6 @@ C
 C**********************************************************************
       USE ENV_VARS
       USE GLOBAL_DATA
-      !!USE M3UTILIO ! IOAPI parameters and declarations
       USE RXNS_DATA
 
       IMPLICIT NONE
@@ -42,7 +41,6 @@ C..SCRATCH LOCAL VARIABLES:
       INTEGER  :: EPOS         ! end pos of string
       INTEGER  :: IND          ! array index
       INTEGER  :: IIN          ! Unit no. of input file
-      INTEGER  :: IOUT         ! Unit no. of output file
       INTEGER  :: N            ! Loop index
 
       LOGICAL  :: LOUT1 = .FALSE.  ! Flag for line 1 output processed
@@ -63,9 +61,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       FNAME = OUTPATH( 1 : EPOS ) // '/hrdata_mod.F' 
 
-      IOUT = JUNIT()
+      GLOBAL_IOUT = JUNIT()
 
-      OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
+      OPEN( UNIT = GLOBAL_IOUT, FILE = FNAME, ERR = 9000 )
 
 
       IIN = JUNIT()
@@ -77,9 +75,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       OPEN( UNIT = IIN, FILE = FNAME, ERR = 9000 )
 
 
-      IF( LWR_COPY ) CALL WR_COPYRT( IOUT )
+      IF( LWR_COPY ) CALL WR_COPYRT( GLOBAL_IOUT )
 
-      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( IOUT )
+      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( GLOBAL_IOUT )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Read, modify, and write code from template
@@ -91,37 +89,37 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LINEIN( 1 : 1 ) .NE. 'R' ) THEN
 
-         WRITE( IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
+         WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
 
       ELSE
 
          IF( LINEIN( 2 : 2 ) .EQ. '1' .AND. .NOT. LOUT1 ) THEN
 
-            WRITE( IOUT, 93000 ) TRIM( MECHNAME )
+            WRITE( GLOBAL_IOUT, 93000 ) TRIM( MECHNAME )
 
             LOUT1 = .TRUE. 
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '2' .AND. .NOT. LOUT2 ) THEN
 
-            WRITE( IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
+            WRITE( GLOBAL_IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
 
             LOUT2 = .TRUE. 
             
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '3' .AND. .NOT. LOUT3 ) THEN
 
-            IF( LPAR_NEG ) WRITE( IOUT, 93040 ) 
+            IF( LPAR_NEG ) WRITE( GLOBAL_IOUT, 93040 ) 
 
             LOUT3 = .TRUE.
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '5' .AND. .NOT. LOUT5 ) THEN
 
-            IF( LDEGRADE_SUBS ) WRITE( IOUT, 93045 ) LINEIN( 3 : LEN_TRIM( LINEIN ) )
+            IF( LDEGRADE_SUBS ) WRITE( GLOBAL_IOUT, 93045 ) LINEIN( 3 : LEN_TRIM( LINEIN ) )
 
             LOUT5 = .FALSE.
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '6' .AND. .NOT. LOUT6 ) THEN
 
-            WRITE( IOUT, 93082 ) REAL( TIME_STEP,8 )
+            WRITE( GLOBAL_IOUT, 93082 ) REAL( TIME_STEP,8 )
 
             LOUT6 = .TRUE. 
             
@@ -138,21 +136,21 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Generate the species indices
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      WRITE( IOUT, 93050 )
+      WRITE( GLOBAL_IOUT, 93050 )
 
       DO N = 1, N_SPECIES
 
          EPOS = 16 ! LEN_TRIM( SPECIES( N ) )
            
-         WRITE( IOUT, 93081 ) SPECIES( N ) ( 1 : EPOS ), N
+         WRITE( GLOBAL_IOUT, 93081 ) SPECIES( N ) ( 1 : EPOS ), N
 
       END DO
 
-      WRITE( IOUT, 93140 )
+      WRITE( GLOBAL_IOUT, 93140 )
 
       CLOSE( IIN )
 
-      CLOSE( IOUT )
+      CLOSE( GLOBAL_IOUT )
 
       NOUTFLS = NOUTFLS + 1
       OUTFLNAM( NOUTFLS ) = 'hrdata_mod.F'

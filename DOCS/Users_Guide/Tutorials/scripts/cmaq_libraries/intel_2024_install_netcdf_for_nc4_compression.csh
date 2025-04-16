@@ -62,9 +62,9 @@ tar -xzvf libzip-1.11.3.tar.gz
 cd libzip-1.11.3
 mkdir build
 cd build
-cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel -DCMAKE_C_COMPILER=icx ..
+cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$cwd/LIBRARIES_intel -DCMAKE_C_COMPILER=icx ..
 setenv ZIP_STATIC TRUE 
-cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/proj/ie/proj/CMAS/CMAQ/CMAQv5.5/build_sycamore/LIBRARIES_intel -DCMAKE_C_COMPILER=icx ..
+cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$cwd/LIBRARIES_intel -DCMAKE_C_COMPILER=icx ..
 make
 make install
 ## copy the libraries from lib64 to lib
@@ -232,8 +232,6 @@ cd  ${INSTDIR}
 
 # install test
    cd $INSTDIR/bin
-   ls h5diff
-   whereis h5diff
-   nc-config --version
-   nf-config --version
+   ./nc-config --version
+   ./nf-config --version
    #ncxx4-config --version

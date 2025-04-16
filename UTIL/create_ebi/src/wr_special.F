@@ -14,7 +14,6 @@ C**********************************************************************
 
       USE ENV_VARS
       USE GLOBAL_DATA
-      !!USE M3UTILIO ! IOAPI parameters and declarations
       USE RXNS_DATA
 
       IMPLICIT NONE
@@ -46,8 +45,7 @@ C..SCRATCH LOCAL VARIABLES:
       INTEGER  :: EPOS          ! end pos of string
       INTEGER  :: E1            ! end pos of string
       INTEGER  :: IIN           ! Unit no. of input file
-      INTEGER  :: IOUT          ! Unit no. of output file
-
+ 
       INTEGER  :: N             ! Loop index
       INTEGER  :: T1            ! Loop index
       INTEGER  :: POS           ! Loop index
@@ -116,9 +114,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       FNAME = OUTPATH( 1 : E1 ) // '/hrcalc_special.F' 
 
-      IOUT = JUNIT()
+      GLOBAL_IOUT = JUNIT()
 
-      OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
+      OPEN( UNIT = GLOBAL_IOUT, FILE = FNAME, ERR = 9000 )
 
       IIN = JUNIT()
 
@@ -128,9 +126,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       OPEN( UNIT = IIN, FILE = FNAME, ERR = 9000 )
 
-      IF( LWR_COPY ) CALL WR_COPYRT( IOUT )
+      IF( LWR_COPY ) CALL WR_COPYRT( GLOBAL_IOUT )
 
-      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( IOUT )
+      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( GLOBAL_IOUT )
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Read, modify, and write first part of code from template
@@ -142,13 +140,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LINEIN( 1 : 2 ) .EQ. 'R1' ) THEN
 
-         WRITE( IOUT, 93000 ) TRIM( MECHNAME )
+         WRITE( GLOBAL_IOUT, 93000 ) TRIM( MECHNAME )
 
          GO TO 100
 
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'R2' ) THEN
 
-         WRITE( IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
+         WRITE( GLOBAL_IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
 
          GO TO 100
 
@@ -156,9 +154,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 c..Declare special rate constant names
          DO N = 1, NSPECIAL
-            WRITE( IOUT, 95000 ) SPECIAL( N )
+            WRITE( GLOBAL_IOUT, 95000 ) SPECIAL( N )
          END DO
-         WRITE( IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 )
 
          GO TO 100
 
@@ -170,7 +168,7 @@ c..Declare special rate constant names
 
         E1 = LEN_TRIM( LINEIN )
 
-        WRITE( IOUT, 92000 ) LINEIN( 1 : E1 )
+        WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : E1 )
 
         GO TO 100
 
@@ -183,11 +181,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Section to compute values of special rate constants
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      WRITE( IOUT, 92000 )'c..Compute values of special rate constants'
+      WRITE( GLOBAL_IOUT, 92000 )'c..Compute values of special rate constants'
       
       DO N = 1, NSPECIAL
 
-         WRITE( IOUT , 92000 )
+         WRITE( GLOBAL_IOUT , 92000 )
 
          LDONE1 = .FALSE.
 
@@ -231,7 +229,7 @@ c..Loop for rate constant/concentration terms
 
             EPOS = LEN_TRIM( LINOUT )
 
-            WRITE( IOUT, 92000 ) LINOUT( 1 : EPOS )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : EPOS )
 
             LDONE1 = .TRUE.
 
@@ -264,7 +262,7 @@ c..Loop for other special operator terms
 
             EPOS = LEN_TRIM( LINOUT )
 
-            WRITE( IOUT, 92000 ) LINOUT( 1 : EPOS )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : EPOS )
 
             LDONE1 = .TRUE.
 
@@ -301,9 +299,9 @@ c..stop if any errors encountered
 
 c..Set rate constants of individual reactions
 
-      WRITE( IOUT, 92000 )
-      WRITE( IOUT, 92000 ) 'c..set individual mechanism rate constants'
-      WRITE( IOUT, 92000 )
+      WRITE( GLOBAL_IOUT, 92000 )
+      WRITE( GLOBAL_IOUT, 92000 ) 'c..set individual mechanism rate constants'
+      WRITE( GLOBAL_IOUT, 92000 )
 
       DO N = 1, NSPECIAL_RXN
 
@@ -322,14 +320,14 @@ c..Set rate constants of individual reactions
 
          EPOS = LEN_TRIM( LINOUT )
 
-         WRITE( IOUT, 92000 ) LINOUT( 1 : EPOS )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : EPOS )
 
       END DO
 
-      WRITE( IOUT, 95100 ) 
+      WRITE( GLOBAL_IOUT, 95100 ) 
 
       CLOSE( IIN )
-      CLOSE( IOUT )
+      CLOSE( GLOBAL_IOUT )
 
       NOUTFLS = NOUTFLS + 1
       OUTFLNAM( NOUTFLS ) = 'hrcalc_special.F'
