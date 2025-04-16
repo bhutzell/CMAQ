@@ -3,14 +3,14 @@
 ### MIO: New functions for input/output commands and other utilities
 [Chris Nolte](mailto:nolte.chris@epa.gov) and [David Wong](mailto:wong.david-c@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Restructure   
-**Release Version/Date**:  CMAQv6.0 *beta 2 only*
+**Release Version/Date**:  CMAQv6.0
 
 **Description**:  
 From its earliest beginnings, the CMAQ modeling system has relied on the Models-3 [I/O API library](https://cjcoats.github.io/ioapi/index.html) to handle reading input and writing output data as well as a wide range of utility functions, including time and date operations, logging and error reporting, and coordinate transformations. The I/O API and its thorough documentation have contributed significantly to the stability and usability of the overall modeling system for the past three decades.
 
 When the effort to couple CMAQ to the Model for Prediction Across Scales (MPAS) was begun, I/O API did not support the unstructured global grids used by MPAS. This led ORD to develop an alternative set of routines, known as MIO (Model I/O). These routines are designed to work for the offline configuration of CMAQ as well as the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for substantially easier development and maintenance across all three model versions.
 
-The MIO update **(available only in CMAQv6.0 beta 2)** removes the dependency of the CMAQ Chemical Transport Model (CCTM) on I/O API. The MIO code has been added to the CMAQ source code under CCTM/src/mio, while several utility functions present in I/O API have been re-implemented in a separate module under CCTM/src/misc. In addition, this update moves functions related to log warnings and messages from the RUNTIME_VARS module into the LOGDEV_MOD module (both under CCTM/src/util/util/).  
+The MIO update **(available in CMAQv6.0 beta 2)** removes the dependency of the CMAQ Chemical Transport Model (CCTM) on I/O API. The MIO code has been added to the CMAQ source code under CCTM/src/mio, while several utility functions present in I/O API have been re-implemented in a separate module under CCTM/src/misc. In addition, this update moves functions related to log warnings and messages from the RUNTIME_VARS module into the LOGDEV_MOD module (both under CCTM/src/util/util/).  
 
 In its current implementation, MIO relies on an input file (accessed via the environment variable `mio_file_info`) that specifies which variables are written to which output files, as well as their coordinate dimensions. This input file does not need to be created by hand, but instead is generated during model initialization based on settings in the run script and the `CMAQ_Control.nml` namelist file (see documentation for the Explicit and Lumped Model Output (ELMO) module). 
 
@@ -37,7 +37,7 @@ Portions Copyright ©1992-2002 MCNC and Carlie J. Coats, Jr., 2003-2013 by Baron
 ### Reorganize CCTM Initialization to Populate MIO Output Data  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Infrastructure Update   
-**Release Version/Date**:  v6.0 beta 1 and beta 2   
+**Release Version/Date**:  v6.0
 
 **Description**:   
 Each output file is opened and its metadata specified exactly how it has been in the past with IOAPI. A subroutine call has been added to populate a new global structure variable MIO_FILE_DATA so that it contains information for all files and can be used by MIO to initialize all outputs.
@@ -56,7 +56,7 @@ No changes to concentration or deposition predictions. Instead, this update prov
 ### Replace CONST.EXT include file with module and update constant values  
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Restructure   
-**Release Version/Date**: CMAQv6.0 beta 1 and beta 2  
+**Release Version/Date**: CMAQv6.0
 
 **Description**:   
 In this PR, the code is restructured to define and use a CONST module in lieu of the CONST.EXT include file. 
@@ -78,7 +78,7 @@ NIST, The International System of Units (SI). Newell, D.B. and Tiesinga, E., eds
 ### Cap log_message at 1000 lines  
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Bug Fixe  
-**Release Version/Date**:  v6.0 beta 1 and beta 2  
+**Release Version/Date**:  v6.0 
 
 **Description**:   
 When excessively long character strings are sent to log_message, it has the potential to reach an infinite loop. This update establishes a cap on the log_message at 1000 lines.

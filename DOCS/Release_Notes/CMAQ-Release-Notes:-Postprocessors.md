@@ -4,7 +4,7 @@
 ### Expand functionality of calc_tmetric
 [William T. Hutzell](mailto:hutzell.bill@epa.gov)], U.S. Environmental Protection Agency    
 **Type of update**: New Feature 
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2
+**Release Version/Date**:  CMAQv6.0 
 
 **Description**:   
 
@@ -32,7 +32,7 @@ No changes were made to this tool in CMAQv5.5.
 ### Allow compilation of combine with gcc10+
 [Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Improve code robustness   
-**Release Version/Date**: CMAQv6.0 beta 1 and beta 2
+**Release Version/Date**: CMAQv6.0
 
 **Description**:   
 Allows the compilation of combine with gcc compiler versions 10 and higher without having to resort to using the "-fallow-argument-mismatch" compiler flag
@@ -48,7 +48,7 @@ The code update removes lines that prevented the code from compiling with gcc co
 ### Correct cadmium in SpecDef_Conc_cb6r5hap_ae7_aq.txt   
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2  
+**Release Version/Date**:  CMAQv6.0
 
 **Description**:   
 The COMBINE concentration definitions file for cb6r5hap uses ACD for aerosol cadmium but the aerosol species' bulk name has changed ACADMIUM. This update corrects the model species name in the   SpecDef_Conc_cb6r5hap_ae7_aq.txt.   

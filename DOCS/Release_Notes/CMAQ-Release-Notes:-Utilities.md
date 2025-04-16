@@ -2,7 +2,7 @@
 ### Add species composition data to RXNS modules and add new reactive rate constant type
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix and Documentation, New Feature  
-**Release Version/Date**: version 6.0 beta 1 and beta 2  
+**Release Version/Date**: version 6.0 
 
 **Description**:  The pull request accomplishes two items by changes to the CHEMMECH utility.     
 One item adds composition information for chemistry species to the RXNS_DATA_MODULE.F90 output file. The information is counts of elements read determined by the SMILE strings read from species namelist files. The information is not currently used in CMAQ CTM but can support computing how well model processes conserve elements among chemistry species. The changes to CHEMMECH also add an output file that is not part of the CMAQ source code. The file is called **MECH_ATOM_COUNTS.f90** and gives composition data of all mechanism species based on its species namelists.  The file has been compiled within the CMAQ CTM but the function contained has not been executed. Note that only cracmm-based mechanisms have nonzero values of element counts for species composition because they have the needed information in their species namelist files. Also, the pull request does not update all mechanisms and their ebi solvers because the pull request #1196 removes the omitted mechanism. However, the omission does brake these mechanism's functionality.

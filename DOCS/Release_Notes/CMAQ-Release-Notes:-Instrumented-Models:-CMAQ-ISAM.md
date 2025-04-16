@@ -1,7 +1,7 @@
 ### Erroneous mass attribution  
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**:  Bug Fix   
-**Release Version/Date**:  CMAQv6.0 beta1 and beta2  
+**Release Version/Date**:  CMAQv6.0
 
 **Description**:   
 This bug fix resolves the erroneous growth of tagged mass far away from the location of emission sources. As pictured below, NO2 emitted from various states across the U.S. leads to NO2 from each source present in southern and central California. The reason for the error involves how tagged aerosol mass concentrations were floored in CMAQ v5.4. As implemented, the approach added artificial mass to condensing or evaporating species. This mass propagated through the system and led to enhancements in both particle- and gas-phase species.
@@ -12,13 +12,13 @@ Corrects erroneous mass attributed to sources geographically far away very soon 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1134](https://github.com/USEPA/CMAQ_Dev/commit/63afe25a706aed7ad3273d4718b2eedd2f242cea) | [PR#1134](https://github.com/USEPA/CMAQ_Dev/pull/1134)  |
+|[Merge for PR#1134](https://github.com/USEPA/CMAQ/commit/63afe25a706aed7ad3273d4718b2eedd2f242cea) | [PR#1134](https://github.com/USEPA/CMAQ_Dev/pull/1134)  |
 
 
 ## Avoid floating point exceptions in aerosol source apportionment algorithm
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix  
-**Release Version/Date**:  v6.0 beta1 and beta2  
+**Release Version/Date**:  v6.0 
 
 **Description**:  
 ISAM encounters several floating-point exceptions when run in debug mode across all mechanisms. These are resolved by adding a minimum value to the denominator in each case.
@@ -27,7 +27,7 @@ ISAM encounters several floating-point exceptions when run in debug mode across 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#91225](https://github.com/USEPA/CMAQ_Dev/commit/63afe25a706aed7ad3273d4718b2eedd2f242cea) | [PR#1225](https://github.com/USEPA/CMAQ_Dev/pull/1225)  |
+|[Merge for PR#91225](https://github.com/USEPA/CMAQ/commit/63afe25a706aed7ad3273d4718b2eedd2f242cea) | [PR#1225](https://github.com/USEPA/CMAQ_Dev/pull/1225)  |
 
 
 ##  Source Apportionment of SOA

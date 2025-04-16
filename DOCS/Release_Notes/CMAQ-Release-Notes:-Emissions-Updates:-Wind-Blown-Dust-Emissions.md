@@ -3,7 +3,7 @@
 ### Correction for NLCD40 Land Use Mapping in Windblown Dust Module
 [Christian Hogrefe](mailto:hogrefe.christian@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Bug Fix    
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 1 (first released on [5.5+ branch](../CMAQ-Bugfix-Branch.md#record-of-changes-to-cmaqv55) on 2024-12-06)  
+**Release Version/Date**:  CMAQv6.0 (first released with [5.5.0.1](https://github.com/USEPA/CMAQ/releases/tag/CMAQv5.5.01_19Mar2025))  
 
 **Description**:   
 Resolves excessive inline windblown dust (WBD) emissions when using WRF simulations with NLCD40 land use (LU). The excessive emissions were caused by mapping two NLCD40 categories (“shrub/scrub” and “dwarf scrub” to the wrong internal BELD3 LU class (“barren or sparsely vegetated” instead of “shrubland”) that is being used in the WBD module.

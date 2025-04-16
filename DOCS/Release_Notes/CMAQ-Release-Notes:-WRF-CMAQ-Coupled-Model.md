@@ -3,7 +3,7 @@
 ## Unified Coupler Implementation 
 [David Wong](mailto:wong.david-C@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: New Feature   
-**Release Version/Date**: CMAQv6.0 beta 1 and beta 2   
+**Release Version/Date**: CMAQv6.0 
 
 **Description**:  
 Previously, WRF-CMAQ has utilized IOAPI3 BUFFERED file to facilitate data transfer between WRF and CMAQ. Currently, CMAQ is able to couple with two different meteorological models, WRF and MPAS to form a twoway coupled model. With software interoperability and reusability in mind, a unified coupler was developed that can be used for coupling either WRF-CMAQ or MPAS-CMAQ. The objective is to provide a simple approach to transfer information between two models. The IOAPI3 BUFFERED file is no longer needed in the new approach. In general, a user does not need to know the actual implementation of the unified coupler unless the user wants to modify the current WRF-CMAQ coupled model paradigm by transferring additional new information from WRF to CMAQ or/and new information from CMAQ to WRF. 
@@ -97,4 +97,4 @@ Similarly the last block of code in the feedback_read subroutine suffers a simil
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#951](https://github.com/USEPA/CMAQ_Dev/commit/50cf578877c377fb00c74619e60ae511ab14dd3e) | [PR#951](https://github.com/USEPA/CMAQ_Dev/pull/951)  |   
+|[Merge for PR#951](https://github.com/USEPA/CMAQ/commit/50cf578877c377fb00c74619e60ae511ab14dd3e) | [PR#951](https://github.com/USEPA/CMAQ_Dev/pull/951)  |   

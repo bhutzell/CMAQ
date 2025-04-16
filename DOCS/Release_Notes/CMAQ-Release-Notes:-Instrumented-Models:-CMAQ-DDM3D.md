@@ -3,14 +3,14 @@
 ### DDM-3D control file character limit increase
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Functionality expansion  
-**Release Version/Date**: CMAQv6.0 beta1 and beta2  
+**Release Version/Date**: CMAQv6.0 
   
 **Description**:  
 As applications of DDM-3D become more complex in scope, users have come up against the hard-coded limit of how long the SPECIES, EMIS streams, and REGIONS specification strings can be in the DDM-3D control file.  This PR increase the size to 1024 characters.  
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1140](https://github.com/USEPA/CMAQ_Dev/commit/6a74de4e3849cfee94213476f9007a221601eac4) | [PR#1140](https://github.com/USEPA/CMAQ_Dev/pull/1140)  |
+|[Merge for PR#1140](https://github.com/USEPA/CMAQ/commit/6a74de4e3849cfee94213476f9007a221601eac4) | [PR#1140](https://github.com/USEPA/CMAQ_Dev/pull/1140)  |
 
 
 

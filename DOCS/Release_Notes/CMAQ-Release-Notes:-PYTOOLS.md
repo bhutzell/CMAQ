@@ -2,7 +2,7 @@
 ## shp2cmaq script fix
 [Barron Henderson](mailto:henderson.barron@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug fix  
-**Release Version/Date**: CMAQv6.0 beta 1 and beta 2  
+**Release Version/Date**: CMAQv6.0
  
 **Description**:  
 The shp2cmaq.py script was designed to work either as a module or as a script, but the script part was not operational.
