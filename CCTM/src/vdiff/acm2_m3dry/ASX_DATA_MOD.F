@@ -521,7 +521,6 @@ C Land use information:
       DATA depname(273), dif0(273), ar(273), meso(273), lebas(273) / 'CHBR2CL         ',0.0720,    2.0,      0.0, 101.5/ ! Use MB2C data
       DATA depname(274), dif0(274), ar(274), meso(274), lebas(274) / 'CHBRCL2         ',0.0739,    2.0,      0.0,  94.5/ ! Use MBC2 data
       DATA depname(275), dif0(275), ar(275), meso(275), lebas(275) / 'CH2BRCL         ',0.0834,    2.0,      0.0,  77.0/ ! Use MBC data
-      DATA depname(276), dif0(276), ar(276), meso(276), lebas(276) / 'IEPOXOPERA      ',0.0760,    8.0,      0.0, 110.8/ ! IEPOX new wet scav surrogate in CRACMM3
 
       CONTAINS
 

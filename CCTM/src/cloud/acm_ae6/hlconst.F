@@ -43,7 +43,7 @@ C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
 
 C...........PARAMETERS and their descriptions:
 
-         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 297     ! Number of substances
+         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 296     ! Number of substances
 
          PRIVATE 
 
@@ -391,11 +391,10 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(290), A(290), E(290) / 'LIMALOPERA      ', 2.75E+01, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
       DATA SUBNAME(291), A(291), E(291) / 'DCB3OPERA       ', 1.74E+04, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
       DATA SUBNAME(292), A(292), E(292) / 'ISHPOPERA       ', 6.61E+05, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
-      DATA SUBNAME(293), A(293), E(293) / 'IEPOXOPERA      ', 2.63E+05, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
-      DATA SUBNAME(294), A(294), E(294) / 'MAHPOPERA       ', 3.55E+05, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
-      DATA SUBNAME(295), A(295), E(295) / 'ISONOPERA       ', 7.08E+03, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
-      DATA SUBNAME(296), A(296), E(296) / 'TRPNOPERA       ', 2.09E+02, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
-      DATA SUBNAME(297), A(297), E(297) / 'HONITOPERA      ', 7.94E+07, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(293), A(293), E(293) / 'MAHPOPERA       ', 3.55E+05, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(294), A(294), E(294) / 'ISONOPERA       ', 7.08E+03, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(295), A(295), E(295) / 'TRPNOPERA       ', 2.09E+02, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(296), A(296), E(296) / 'HONITOPERA      ', 7.94E+07, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
 
       DATA B( MSO2   ), D( MSO2   ) / 1.30E-02,  1.96E+03 /  ! SO2*H2O<=>HSO3+H     : Smith and Martell (1976)
       DATA B( MHSO3  ), D( MHSO3  ) / 6.60E-08,  1.50E+03 /  ! HSO3<=>SO3+H         : Smith and Martell (1976)
