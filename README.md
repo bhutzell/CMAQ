@@ -10,33 +10,24 @@ CMAQ combines current knowledge in atmospheric science and air quality modeling 
 
 ## CMAQ version 6.0 Beta Overview:
 
-The science updates and new features in the beta versions are documented in the **[CMAQv6.0beta Release Notes](DOCS/Release_Notes/README.md).**
+The science updates and new features in the beta version (v6.0b1) are documented in the [CMAQv6.0beta Release Notes](DOCS/Release_Notes/README.md) and summarized in the **[Release FAQ](DOCS/Release_FAQ/CMAQv6.0-FAQ.md)**.
 
-While initially planned for fall 2026, the status and timing of any final release of CMAQv6.0 is to be determined. This CMAQv6.0 beta release includes two research versions of the CMAQ system (beta 1 and beta 2) that allow community members:
+While initially planned for fall 2026, the status and timing of any final release of CMAQv6.0 is to be determined. This CMAQv6.0 beta release allows community members:
 
 * a preview of science and feature updates planned for the CMAQv6.0 release.
 * the ability to take advantage of improvements for preliminary studies of their own interest.
 * help other interested community members by testing, troubleshooting, and debugging the research version before any potential future final release.
 
 
-## Differences in CMAQv6.0 beta 1 and beta 2:
-The beta 1 version (v6.0b1; **this branch**) includes the science and feature updates described in the Release Notes.   
-
-The beta 2 version (v6.0b2) is identical to version 1 but removes the dependency of the CMAQ Chemical Transport Model (CCTM) on the I/O API library.  This update makes the code for the offline CMAQ model more consistent with the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for substantially easier developement and maintenance across all three versions.   To implement this update input/output functions and other utilities such as calendar functions that previously relied on the [I/O API library](https://github.com/cjcoats)) have been added to the CMAQ source code under CCTM/src/mio and CCTM/src/misc. The beta 2 version also moves functions related to log warnings and messages from the RUNTIME_VARS module into the LOGDEV_MOD module (both under CCTM/src/util/util/).  
-
-**Next Steps** The I/O updates in v6.0b2 were designed to facilitate creating CMAQ output files with variables of mixed dimensions.  When implemented in a future version of CMAQ, this new feature will allow users to produce many fewer output files per simulation, e.g., 2D and 3D gridded variables can be written to a single file.
-
 ## Getting the CMAQ Repository
-This CMAQ Git archive is organized with each version stored as a branch on the main USEPA/CMAQ repository. The most recently released official version of the model will always be on the branch called 'main'. To clone code from the CMAQv6.0 beta versions issue the following command from within a working directory on your server:
+This CMAQ Git archive is organized with each version stored as a branch on the main USEPA/CMAQ repository. The most recently released official version of the model will always be on the branch called 'main'. 
+To clone code from the CMAQv6.0 beta 1 version issue the following command from within a working directory on your server:
 
 **Beta 1 Version**
 ```
 git clone -b 6.0b1 https://github.com/USEPA/CMAQ.git CMAQ_REPO
 ```
-**Beta 2 Version**
-```
-git clone -b 6.0b2 https://github.com/USEPA/CMAQ.git CMAQ_REPO
-```
+
 
 ## CMAQ Repository Guide
 Source code and scripts are organized as follows:

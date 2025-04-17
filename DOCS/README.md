@@ -8,6 +8,8 @@ The following documents are available for each CMAQ release:
 
 - **[Getting Started](Getting_Started.md)**: A brief introduction for new and returning users.
 
+- **[Release FAQ](Release_FAQ/README.md)**: Frequently asked questions for upgrading to the latest CMAQ versions.
+
 - **[Release Notes](Release_Notes/README.md)**: Technical notes on the new features and science in this release of CMAQ.
 
 - **[CMAQ Bugfix Branch](CMAQ-Bugfix-Branch.md)**: Updates to the continually evolving "+" branch offering the most recent bugfixes or minor updates that improve model stability, efficiency, etc. 
