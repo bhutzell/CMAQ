@@ -378,8 +378,13 @@
          ! Retrieve Indicator for VOC-limited (>0.35) or NOx_limited
          ! (<0.35) ozone formation
          CASE ( ID_VOC_NOX )
+#ifdef isam
             IF ( AERO_CHEM_SET ) OUTVAL = ELMO_VOC_NOX( C1,R1,L1 )
-
+#else
+            XMSG = 'CMAQ_Control.nml requests ELMO output, VOC_NOX, '//
+     &             'but CCTM has to be built with isam build option.'
+            CALL M3EXIT( 'ELMO_DERIVED_CALC',0,0,XMSG,1)
+#endif
          ! Retrieve Nitric Acid Enhancement Factor from photolysis
          ! of aerosols
          CASE ( ID_EF_HNO3 )
