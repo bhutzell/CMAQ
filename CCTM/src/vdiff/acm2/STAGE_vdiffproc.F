@@ -532,6 +532,11 @@ C If last call this hour:  write accumulated depositions:
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF     
          ENDIF
+         IF ( .NOT. WRITE3( CTM_DRY_DEP_1, BD_EMIS_SPC( HCHO_E ),
+     &        MDATE, MTIME, TOT_BD_EMIS( HCHO_E,:,: ) ) ) THEN
+            XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
+            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+         END IF     
 ! End of STAGE Diagnostic output
          WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &         'Timestep written to', CTM_DRY_DEP_1,

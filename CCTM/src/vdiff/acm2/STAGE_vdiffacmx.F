@@ -142,7 +142,7 @@ C ACM Local Variables
       REAL        FNL                              ! ACM2 Variable
       INTEGER     NLP, NL, LCBL
       INTEGER, SAVE :: NO2_HIT, HONO_HIT, HNO3_HIT, NO2_MAP, HNO3_MAP
-      INTEGER, SAVE :: NH3_HIT, HG_HIT
+      INTEGER, SAVE :: NH3_HIT, HG_HIT, HCHO_HIT
       REAL        DTLIM, DTS, DTACM, RZ
 
       INTEGER     ASTAT
@@ -266,8 +266,13 @@ C set auxiliary depv arrays
          END IF
          DD = 0.0; UU = 0.0   ! array assignment
 
-         HONO_HIT = 0; HNO3_HIT = 0; NO2_HIT  = 0; NH3_HIT = 0
-                       HNO3_MAP = 0; NO2_MAP  = 0
+         HONO_HIT = 0 
+         HNO3_HIT = 0 
+         NO2_HIT  = 0 
+         NH3_HIT  = 0
+         HCHO_HIT = 0
+         HNO3_MAP = 0 
+         NO2_MAP  = 0 
          DO V = 1, N_SPC_DEPV
             IF ( DV2DF_SPC( V ) .EQ. 'NO2' ) THEN
                NO2_HIT = V
@@ -281,6 +286,9 @@ C set auxiliary depv arrays
                NH3_HIT = V
             ELSE IF ( DV2DF_SPC( V ) .EQ. 'HG' ) THEN
                HG_HIT = V
+            ELSE IF ( DV2DF_SPC( V ) .EQ. 'FORM' .OR. 
+     &                DV2DF_SPC( V ) .EQ. 'HCHO' ) THEN
+               HCHO_HIT = V
             END IF
          END DO
 
@@ -596,7 +604,8 @@ C-----------------------------------------------------------------------
             END IF   
             IF ( SFC_HONO ) THEN         
                TMP_BD_EMIS( HONO_E ) = TOT_BD_EMIS( HONO_E,C,R )
-            END IF                     
+            END IF                 
+            TMP_BD_EMIS( HCHO_E ) = TOT_BD_EMIS( HCHO_E,C,R )    
          END DO
          PLDV_HONO = Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( HONO_HIT ) )
 
@@ -743,6 +752,10 @@ C Pass selected N species to the BDSNP Soil NO emissions scheme
                   END IF
                   IF ( SFC_HONO .AND. V .EQ. HONO_HIT ) THEN
                      TMP_BD_EMIS( HONO_E ) = TMP_BD_EMIS( HONO_E ) +                    
+     &                  THETA * Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( V ) ) * DD_CONV( V ) * DTDENS1                 
+                  END IF
+                  IF ( V .EQ. HCHO_HIT ) THEN
+                     TMP_BD_EMIS( HCHO_E ) = TMP_BD_EMIS( HCHO_E ) +                    
      &                  THETA * Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( V ) ) * DD_CONV( V ) * DTDENS1                 
                   END IF
                END IF
@@ -965,7 +978,10 @@ C --------- END of HET HONO RX ----------
                      TMP_BD_EMIS( HONO_E ) = TMP_BD_EMIS( HONO_E ) + 
      &                  THBAR * Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( V ) ) * DD_CONV( V ) * DTDENS1                                 
                   END IF
-
+                  IF ( V .EQ. HCHO_HIT ) THEN
+                     TMP_BD_EMIS( HCHO_E ) = TMP_BD_EMIS( HCHO_E ) +                    
+     &                  THETA * Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( V ) ) * DD_CONV( V ) * DTDENS1                 
+                  END IF
                END IF
 
             END DO
@@ -1033,7 +1049,8 @@ C Update ISAM Dry Deposition
          END IF   
          IF ( SFC_HONO ) THEN         
             TOT_BD_EMIS( HONO_E,C,R ) = TMP_BD_EMIS( HONO_E )
-         END IF                     
+         END IF          
+         TOT_BD_EMIS( HCHO_E,C,R ) = TMP_BD_EMIS( HCHO_E )           
  
          IF ( XMOSAIC ) THEN
             DDEPJ( :,:,C,R ) = DDBFJ( :,: )

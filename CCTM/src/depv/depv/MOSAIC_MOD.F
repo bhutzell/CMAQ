@@ -274,32 +274,38 @@ C File variables:
                   Tile_Data%RHOB( C,R ) = RHOB_PX( 3 )
                End If
             End Do 
-            End DO
+            End Do
 
          Else If( Noah_LSM ) Then
             Write(Logdev,*) 'MCIP/WRF used the Noah LSM'
             zsoil1 = 0.01 ! Adjusted based on Darmenova et al. 2009 doi:10.1029/2008JD011236
             zsoil2 = 0.05 ! For abflux estimated from 1cm and 1 meter 
-            Forall( C = 1:NCOLS, R = 1:NROWS )
+            Do C = 1, NCOLS
+            Do R = 1, NROWS 
                Tile_Data%WSAT( C,R ) = WSAT_NOAH( Grid_Data%SLTYP( C,R ) )
                Tile_Data%WWLT( C,R ) = WWLT_NOAH( Grid_Data%SLTYP( C,R ) )
                Tile_Data%WFC ( C,R ) = WFC_NOAH ( Grid_Data%SLTYP( C,R ) )
                Tile_Data%WRES( C,R ) = WRES_NOAH( Grid_Data%SLTYP( C,R ) )
                Tile_Data%BSLP( C,R ) = BSLP_NOAH( Grid_Data%SLTYP( C,R ) )
                Tile_Data%RHOB( C,R ) = RHOB_NOAH( Grid_Data%SLTYP( C,R ) )
-            End Forall
+            End Do 
+            End Do
+
          Else If( CLM_LSM ) Then
             Write(Logdev,*) 'MCIP/WRF used the CLM LSM'
             zsoil1 = 0.0175
             zsoil2 = 0.0451
-            Forall( C = 1:NCOLS, R = 1:NROWS )
+            Do C = 1, NCOLS
+            Do R = 1, NROWS 
                Tile_Data%WSAT( C,R ) = WSAT_CLM( Grid_Data%SLTYP( C,R ) )
                Tile_Data%WWLT( C,R ) = WWLT_CLM( Grid_Data%SLTYP( C,R ) )
                Tile_Data%WFC ( C,R ) = WFC_CLM ( Grid_Data%SLTYP( C,R ) )
                Tile_Data%WRES( C,R ) = WRES_CLM( Grid_Data%SLTYP( C,R ) )
                Tile_Data%BSLP( C,R ) = BSLP_CLM( Grid_Data%SLTYP( C,R ) )
                Tile_Data%RHOB( C,R ) = RHOB_CLM( Grid_Data%SLTYP( C,R ) )
-            End Forall                            
+            End Do 
+            End Do
+
          End If
         
          If( MOSAIC ) Then

@@ -196,8 +196,8 @@ setenv BC_AERO_M2USE F       #> Specify whether or not to use aerosol surface ar
                              #>    conditions provided by a CMAQ simulation on a parent domain, (2) M2 
                              #>    is available, and (3) the domain is smaller than CONUS. 
                              
-#> Surface Tiled Aerosol and Gaseous Exchange Options
-#> Only active if DepMod=stage at compile time
+#> Surface Tiled Aerosol and Gaseous Exchange Option
+setenv CTM_USE_STAGE N       #> Use the STAGE depostion option [ default: N ]
 setenv CTM_MOSAIC N          #> Output landuse specific deposition velocities [ default: N ]
 setenv CTM_STAGE_P22 N       #> Pleim et al. 2022 Aerosol deposition model [default: N]
 setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [default: Y]

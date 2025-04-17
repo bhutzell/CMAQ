@@ -559,7 +559,7 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 !--------------------------------------------------------------------------------------------------
 ! Calculate resistance to snow-covered surfaces
 !--------------------------------------------------------------------------------------------------
-         Pure Function Calc_Rsnow( temp_g, snow, molwt, M_ac, heff, dif_T, rel_rx ) Result( Rsnow )
+         Pure Function Calc_Rsnow( temp_g, snow, molwt, M_ac, heff, dif_T, Rx ) Result( Rsnow )
          Use const, only: stdtemp
 
          Implicit None
@@ -570,15 +570,15 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
          Real, Intent( IN ) :: M_ac   ! Mass accommodation coefficient (ratio)
          Real, Intent( IN ) :: heff   ! Effective henry's constant (unitless)
          Real, Intent( IN ) :: dif_T  ! Mass diffusivity of the trace gas (m2/s) 
-         Real, Intent( IN ) :: rel_rx ! Relative reactivivity (unitless)
+         Real, Intent( IN ) :: Rx ! Relative reactivivity (unitless)
          Real               :: Rwet   ! Resistance of deposition to water surfaces (s/m)
          Real               :: Rice   ! Resistance of deposition to ice surfaces (s/m)
          Real               :: Rsnow  ! Resistance of deposition to snow surfaces (s/m)
          Real               :: melt_snow, ice_snow ! Ration of snow with semi-solid melted and ice surfaces (ratio)
          Real, Parameter    :: rsndiff    = 10.0   ! snow diffusivity fac (s/m)
 
-         Rwet = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T )
-         Rice = Calc_Rice( rel_rx )
+         Rwet = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T, Rx )
+         Rice = Calc_Rice( Rx )
 ! Liquid snow fraction modeled as a system dominated by van der Waals forces following Dash et al. 1999 S. Rep. Prog. Phys. 
 ! with a maximum fraction of the disordered interface acting as an aqueous solution as 20% following Conklin et al 1993 with
 ! the negligible impact of the disordered interface depth of 2 nm following Roth et al 2004. The 2 nm depth was approximated 
@@ -604,8 +604,8 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 !-------------------------------------------------------------------------------------------------
 ! Resistance to air-wet surface exchange
 !-------------------------------------------------------------------------------------------------
-         Pure Function Calc_Rwet( temp_g, MW, ac, H, dif_T ) Result( Rwet )
-         Use Const, only: RGASUNIV
+         Pure Function Calc_Rwet( temp_g, MW, ac, H, dif_T, Rx ) Result( Rwet )
+         Use Const, only: RGASUNIV, stdtemp
 
          Implicit None
 
@@ -614,6 +614,7 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
          Real,    Intent( IN ) :: dif_T
          Real,    Intent( IN ) :: MW
          Real,    Intent( IN ) :: ac
+         Real,    Intent( IN ) :: Rx ! Relative reactivivity (unitless)
          Real, Parameter :: rad_wat     = 1.9e-4    ! water droplet radius (m)
          Real            :: Rwet
          Real            :: rmsv
@@ -621,7 +622,11 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 
          rmsv    = sqrt( 3.0 * RGASUNIV * 1.0e3 * temp_g / MW) 
          rawmt   = rad_wat / dif_T  + 4.0 / ( rmsv  * ac )
-         Rwet   = rawmt + rawmt/( H * rad_wat )
+         If(temp_g .gt. stdtemp) Then
+            Rwet   = rawmt + rawmt/( H * rad_wat )
+         Else 
+            Rwet = Calc_Rice( Rx )
+         End If
 
          End Function Calc_Rwet
 
@@ -668,14 +673,13 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
 !-------------------------------------------------------------------------------------------------
 ! Resistance to air-cuticular exchange
 !-------------------------------------------------------------------------------------------------
-         Pure Function Calc_Rcut( temp_g, Rx, molwt, M_ac, heff, dif_T, a_cut,  
+         Pure Function Calc_Rcut( temp_g, Rx, molwt, M_ac, heff, dif_T,  
      &                            snow, no_snow, dry, wet, rh, lai, O3_hit, NH3_hit, ABFLUX ) Result( Rcut )
 
          Use const, only: stdtemp
          Implicit None
 
          Real, Intent( IN ) :: temp_g
-         Real, Intent( IN ) :: a_cut
          Real, Intent( IN ) :: snow
          Real, Intent( IN ) :: no_snow
          Real, Intent( IN ) :: dry
@@ -687,13 +691,12 @@ c        Iodide in sea-water based on SST  (mol /dm-3)
          Real, Intent( IN ) :: M_ac 
          Real, Intent( IN ) :: heff 
          Real, Intent( IN ) :: dif_T
-!         Real, Intent( IN ) :: Rice
-!         Real, Intent( IN ) :: Rsnow
          Logical, Intent( IN ) :: O3_hit
          Logical, Intent( IN ) :: NH3_hit
          Logical, Intent( IN ) :: ABFLUX
 
          Real            :: Rcut
+         Real            :: Gcns
          Real            :: Rsnow
          Real            :: rcdry
          Real            :: rwet
@@ -706,32 +709,18 @@ C Calculate Rcut
          ! If the surface is cold and wet, use dry snow.                   
          rcdry = rcut0 * a0 / Rx
          Rsnow = Calc_Rsnow( temp_g, snow, molwt, M_ac, heff, dif_T, Rx )
-         IF ( temp_g .GE. stdtemp ) THEN 
-!            Rwet= Rwet0         
-            Rwet = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T ) 
-         ELSE ! temp_g .Lt. stdtemp
-!            rwet = Rice
-            rwet = Calc_Rice( Rx )
-         END IF ! temp 
-         IF ( O3_hit ) THEN 
+         Rwet = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T, Rx )
+         If( O3_hit .AND. temp_g .GT. stdtemp ) Then
          ! Canopy level wet resistence Rwet to ozone was found to be about 200 s/m on basis of Keysburg exp
          ! Using LAI(1-sided) of about 6.25 measured at Keysburg gives leaf level rwet about 1250 s/m
-            rwet = 1250.0    ! s/m
-         ! Leaf level rwet estimated from Altimir et al 2006 gives about 1350 s/m  
-         ! Dry cuticle
-            rh_func = max( 0.0,( rh - 70.0 )/30.0 )
-            rcdry   = 1.0 / ( ( 1.0 -rh_func) / ( rcut0 * a0 / Rx )  + rh_func / rwet )               
+               rwet = 1250.0    ! s/m
          End If
-         If ( NH3_hit .And. ABFLUX ) Then
-         ! Massad et al. 2010 Cuticular resistance
-            rcdry = rwm * EXP( a_cut * ( 100.0 - rh ) )    
-         End If ! O3
 
-         Rcut = no_snow / ( lai * ( dry / rcdry     +  ! Dry Cuticle 
-     &                               wet / rwet ) ) +  ! Wet Cuticle 
-     &          snow * Rsnow                           ! Snow
+         Gcns = lai * ( dry / rcdry  + wet / rwet )    ! No Snow Cuticular Conductance
+         Rcut = 1.0 / ( no_snow * Gcns + snow / Rsnow) ! Cuticular resistance with snow
 
          End Function Calc_Rcut
+
 !-------------------------------------------------------------------------------------------------
 ! In-Canopy Aerodynamics Resistance
 !-------------------------------------------------------------------------------------------------
@@ -815,49 +804,49 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
          Real               :: sm_v1cm_ir, sm_v5cm_ir, sm_v10cm
          Real               :: sm_func
          Real               :: ldry
-         Real               :: dp, rgdry
-         Real               :: p_wet ! wet soil surface
-         Real               :: p_dry ! dry soil surface
+         Real               :: dp, rgdry, rgdiff
+         Real               :: s_wet ! wet soil surface
+         Real               :: s_dry ! dry soil surface
          Real, Parameter    :: ldry_max = 0.02
          Real, Parameter    :: rg0      = 1000.0     ! [s/m]
 
-         Rwet  = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T )
+         Rwet  = Calc_Rwet( temp_g, molwt, M_ac, heff, dif_T, Rx )
          Rsnow = Calc_Rsnow( temp_g, snow, molwt, M_ac, heff, dif_T, Rx )
-
-         If(ABFLUX .And. NH3_Hit) Then
+!         If(ABFLUX .And. NH3_Hit) Then
 ! Updated based on EPIC 5cm soil moisture estimates where the 25% percentile of the irrigated crop fractional soil moisture was 
 ! approximately equal to 60% of the field capacity.  
-            If ( frac_ir .Gt. 0.0 .And. sm_v5cm .LE.  0.60 * sm_vfc ) Then            
-               sm_v1cm_ir = ( 1.0 - frac_ir ) * sm_v1cm + frac_ir * 0.60 * sm_vfc
-               sm_v5cm_ir = ( 1.0 - frac_ir ) * sm_v5cm + frac_ir * 0.60 * sm_vfc
-            Else
-               sm_v1cm_ir = sm_v1cm
-               sm_v5cm_ir = sm_v5cm
-            End If
+         If ( frac_ir .Gt. 0.0 .And. sm_v5cm .LE.  0.60 * sm_vfc ) Then            
+            sm_v1cm_ir = ( 1.0 - frac_ir ) * sm_v1cm + frac_ir * 0.60 * sm_vfc
+            sm_v5cm_ir = ( 1.0 - frac_ir ) * sm_v5cm + frac_ir * 0.60 * sm_vfc
+         Else
+            sm_v1cm_ir = sm_v1cm
+            sm_v5cm_ir = sm_v5cm
+         End If
             
 ! The following resistance parameterization is derived from measurements with soil samples of 2 cm thick (Kondo et al 1990)
 ! https://doi.org/10.1175/1520-0450(1990)029<0385:APOEFB>2.0.CO;2 as discussed in Sakaguchi and Zeng 2009 JGR 
 ! https://doi.org/10.1029/2008JD010834 According to Swenson and Lawrence 2014 (https://doi.org/10.1002/2014JD022314) and the 
 ! references therein the dry layer thickness varies from 1 to 3 cm. 
 ! From Sakaguchi and Zeng 2009 JGR Equation 10
-            ldry = Calc_ldry( sm_v1cm_ir, sm_v5cm_ir, sm_vsat, zsoil )         
-            dp  = dif_T * sm_vsat**2 * ( 1.0 - sm_vres / sm_vsat ) ** ( 2.0 + 3.0 / sm_bslp )         
-            rgdry = max(ldry / dp,1.0e-6)
+         ldry = Calc_ldry( sm_v1cm_ir, sm_v5cm_ir, sm_vsat, zsoil )         
+         dp  = dif_T * sm_vsat**2 * ( 1.0 - sm_vres / sm_vsat ) ** ( 2.0 + 3.0 / sm_bslp )         
+         rgdiff = max(ldry / dp,1.0e-6)
 ! Assumes that the soil water is an emission source. Air-soil water gradient replaces the empirical resistance to water
-            Rg = no_snow * rgdry + snow * Rsnow 
+!         Rg = 1.0 / ( no_snow / rgdry + snow / Rsnow ) 
 
-         Else If ( O3_Hit ) Then
+!         Else If ( O3_Hit ) Then
+         If ( O3_Hit ) Then
 ! Following based on measurements Fares et al 2014 https://doi.org/10.1016/j.agrformet.2014.08.014 for sandy soil 
 ! forests at 10cm measured soil moisture and Fumagalli et al. 20016 https://doi.org/10.1016/j.agrformet.2016.07.011 for sandy loam soils
 ! Here an asymptotic function was applied to set lower and upper bounds in the resistance as reported by Fumagalli et al. 2016
             sm_v10cm = min(sm_v1cm * exp( 0.09 * GRAV )**(1.0/sm_bslp), sm_vsat )
             sm_func = max( tiny(0.0)**(1.0/sm_bslp) * PI , ( sm_v10cm-sm_vwlt ) / sm_vfc )
             rgdry   = 250.0 + 2000.0 * atan( sm_func**sm_bslp ) /PI  
-
-            Rg = no_snow * ( 1.0/ ( dry / rgdry + wet / rwet ) ) + snow * Rsnow   
+            Rg = 1.0 / ( no_snow / ( 1.0/ ( dry / rgdry + wet / rwet ) ) + snow / Rsnow )   
          Else 
             rgdry  = rg0 * a0 / Rx
-            Rg = no_snow * ( 1.0/ ( dry / rgdry + wet / rwet ) ) + snow * Rsnow  
+            rgdry  = 1.0 / ( 1.0 / rgdry + 1.0 / ( rgdiff + rwet ) )
+            Rg     = 1.0 / ( no_snow / ( 1.0/ ( dry / rgdry + wet / rwet ) ) + snow / Rsnow )
          End If
          Rinc =  Calc_Rinc( Ra, lai )
          Rbgc = Calc_Rbg( k_vis, dif_T, lai, ustar )
@@ -1091,7 +1080,7 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
 !-------------------------------------------------------------------------------------------------
 ! Aerosol Deposition Velocity
 !-------------------------------------------------------------------------------------------------
-         Pure Function aero_depv_E20(veg, lai, Ustar, Ra, wet, l_aero, Alpha, DG, SC, NU, VGHAT, EINHAT)
+         Pure Function aero_depv_E20(veg, lai, Ustar, Ra, lwet, swet, l_aero, Alpha, DG, SC, NU, VGHAT, EINHAT)
      &                               Result( depv )
                   
          Implicit None
@@ -1100,7 +1089,8 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
          Real, Intent( IN ) :: lai
          Real, Intent( IN ) :: Ustar
          Real, Intent( IN ) :: Ra
-         Real, Intent( IN ) :: wet
+         Real, Intent( IN ) :: lwet
+         Real, Intent( IN ) :: swet
          Real, Intent( IN ) :: l_aero
          Real, Intent( IN ) :: Alpha
          Real, Intent( IN ) :: DG
@@ -1115,11 +1105,11 @@ C Calculate Canopy Covered Soil Resistance Nemitz et al 2000 https://doi.org/10.
          Real               :: Rc     ! Two layer canopy resitance
          Real               :: Rinc   ! In canopy resistance for two layer model 
 
-         RD_GW = RD_Smooth_E20(VGHAT, Ustar, 0.0, SC, NU, wet )
+         RD_GW = RD_Smooth_E20(VGHAT, Ustar, 0.0, SC, NU, swet )
          If( lai .gt. 0.0 .and. veg .gt. 0.0 ) Then
             Rinc      = Calc_Rinc( Ra, lai )
-            RD_VegL   = RD_Veg_E20( Vghat, Ustar, SC,l_aero, lai, DG, wet, Alpha, EINHAT )
-            RD_VegG   = RD_Smooth_E20(VGHAT, Ustar, lai, SC, NU, wet )
+            RD_VegL   = RD_Veg_E20( Vghat, Ustar, SC,l_aero, lai, DG, lwet, Alpha, EINHAT )
+            RD_VegG   = RD_Smooth_E20(VGHAT, Ustar, lai, SC, NU, swet )
 ! Resistance to:                  Soil              Canopy
             Rc   = 1.0 /( 1.0/(Rinc + RD_VegG) + 1.0/RD_VegL )  
             depv =       veg   * Vghat / ( 1.0 - EXP( -Vghat * ( Ra + Rc ) ) ) +  

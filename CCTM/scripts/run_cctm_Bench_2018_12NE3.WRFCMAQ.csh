@@ -214,8 +214,8 @@ setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affec
 
 setenv CTM_TURN_ON_PV        N   # WRF-CMAQ ONLY turn on/off PV [ N -- make sure compiled with pv on ]
 
-#> Surface Tiled Aerosol and Gaseous Exchange Options
-#> Only active if DepMod=stage at compile time
+#> Surface Tiled Aerosol and Gaseous Exchange Option
+setenv CTM_USE_STAGE N       #> Use the STAGE depostion option [ default: N ]
 setenv CTM_MOSAIC N          #> Output landuse specific deposition velocities [ default: N ]
 setenv CTM_STAGE_P22 N       #> Pleim et al. 2022 Aerosol deposition model [default: N]
 setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [default: Y]

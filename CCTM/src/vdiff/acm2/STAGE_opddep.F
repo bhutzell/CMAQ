@@ -88,6 +88,8 @@ C Try to open existing file for update
             N_BD_EMIS = N_BD_EMIS + 1      
             BD_EMIS_SPC( N_BD_EMIS ) = 'HONO_Het '
          End If      
+         N_BD_EMIS = N_BD_EMIS + 1      
+         BD_EMIS_SPC( N_BD_EMIS ) = 'HCHO_Emis '
 
          XMSG = 'Could not open ' // CTM_DRY_DEP_1 // ' file for update - '
      &        // 'try to open new'
@@ -214,6 +216,14 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
                VDESC3D( V ) = 'hourly surface heterogenous production values'
             END DO
          END IF
+         STRT = FINI + 1
+         FINI = FINI + 1
+         DO V = STRT, FINI
+            VTYPE3D( V ) = M3REAL
+            VNAME3D( V ) = 'HCHO_Emis '
+            UNITS3D( V ) = 'kg/hectare'
+            VDESC3D( V ) = 'hourly stomatal HCHO emissions'
+         END DO
 
          FDESC3D( 1 ) = 'hourly 1-layer cross-point STAGE dry deposition data'
          DO L = 2, MXDESC3

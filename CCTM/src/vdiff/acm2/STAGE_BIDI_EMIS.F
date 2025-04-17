@@ -37,7 +37,7 @@ C-----------------------------------------------------------------------
       USE VDIFF_DATA
 
 C component flux output variables 
-      INTEGER,         SAVE :: N_BD_EMIS, NH3_E, HG_E, HONO_E
+      INTEGER,         SAVE :: N_BD_EMIS, NH3_E, HG_E, HONO_E, HCHO_E
       CHARACTER( 16 ), SAVE :: BD_EMIS_SPC( 4 ) = ' '
 
       CONTAINS
@@ -74,8 +74,9 @@ C Local variables:
          SUCCESS = .TRUE.
 
          NH3_E  = 0
-         HG_E  = 0
+         HG_E   = 0
          HONO_E = 0
+         HCHO_E = 0
          IF ( ABFLUX ) THEN          
             NH3_E = 1
             N_BD_EMIS = NH3_E
@@ -91,6 +92,9 @@ C Local variables:
             N_BD_EMIS = HONO_E
             BD_EMIS_SPC( HONO_E ) = 'HONO_Het '                      
          END IF    
+         HCHO_E = max(NH3_E,HG_E,HONO_E) + 1   
+         N_BD_EMIS = HCHO_E
+         BD_EMIS_SPC( HCHO_E ) = 'HCHO_Emis '  
 
          RETURN
 
