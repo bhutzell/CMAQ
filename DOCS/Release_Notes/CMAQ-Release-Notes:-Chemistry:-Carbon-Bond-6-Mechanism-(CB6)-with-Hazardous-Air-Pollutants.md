@@ -2,8 +2,8 @@
 ### Correct loss of reactive tracer styrene from ozone reaction
 [William T. Hutzell](mailto:hutzell.billl@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix
-**Release Version/Date**:  Version 5.5+ and Version 6.0 beta 1 and beta 2  
-**Description**:  The CCTM [reactive_tracers](https://github.com/USEPA/CMAQ_Dev/tree/research/CCTM/src/reactive_tracers) module includes a tracer for styrene. The reviewing DEGRADE_PARAMETERS.F file determined that the loss process for a ozone reaction is wrong. Its rate constant is approximately four orders of magnitude too high and is actually the rate constant for a reaction between styrene and nitrate. The error causes predicted concentrations of styrene to be low over four orders of magnitude. 
+**Release Version/Date**:  CMAQv6.0 
+**Description**:  The CCTM reactive tracers module (CCTM/src/reactive_tracers) includes a tracer for styrene. The reviewing DEGRADE_PARAMETERS.F file determined that the loss process for a ozone reaction is wrong. Its rate constant is approximately four orders of magnitude too high and is actually the rate constant for a reaction between styrene and nitrate. The error causes predicted concentrations of styrene to be low over four orders of magnitude. 
 
 The fix replaces bad rate constant with the Le Person et al. (2007) value obtain from the [NIST Chemical Kinetics Database](https://kinetics.nist.gov/kinetics/index.jsp).  For OH, NO<sub>3</sub> and Cl reactions between styrene, the rate constants were obtain from the same database and are Joeson et al. (2014), Atkinson (1991), and Shi (1997), respectively. 
 

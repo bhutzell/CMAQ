@@ -3,7 +3,7 @@
 ### Fix photolysis loss process in reactive tracer module
 [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix, Science Update      
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2  
+**Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
 The reactive tracers module allows its species to have loss processes from photolysis reactions. The photolysis frequencies used must be available in the gas phase chemistry. Currently, CMAQ chemical mechanisms do use the capacity but testing it found two errors. 
@@ -40,7 +40,7 @@ Minor changes to O3 and related species due to changing O3 column input data res
 ### Remove uninitialized variable and correct a diagnostic in CCTM's inline module for photolysis frequencies
 [William B. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Bug Fix   
-**Release Version/Date**: CMAQv6.0 beta 1 and beta 2  
+**Release Version/Date**: CMAQv6.0   
 
 **Description**:   
 Two errors in CCTM's inline module for photolysis frequencies are corrected. 
@@ -61,7 +61,7 @@ The other error is a a model crash when the cb6r5hap_ae7_aq mechanism is used fo
 ### Updates to diagnostics for Inline Photolysis
 **Primary Contact**: [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix, New Feature   
-**Release Version/Date**:  Version 6.0 beta 1 and 2  
+**Release Version/Date**:  CMAQv6.0    
 **Description**:  This update replaces total extinction coefficients in the PHOTDIAG3 diagnostic file with cloud extinction coefficients. The replacement seeks to give a informative diagnostic on what sources are attenuating light in a grid cell. The update also adds calculating aerosol extinction coefficients and asymmetry parameters when the sun is below horizon if PHOTDIAG is _**yes**_. The motive seeks to expand model time steps for evaluating the aerosol optical properties.  
 **Significance and Impact**: Changes remove a unit conversion error, give a informative diagnostic on what sources are attenuating light, and provide more diagnostic data to evaluate how aerosol properties are calculated.  
 

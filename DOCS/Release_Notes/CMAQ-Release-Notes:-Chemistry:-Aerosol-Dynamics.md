@@ -3,7 +3,7 @@
 ### SOA Mapping: Revise Logfile Output
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Logfile Messaging  
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2   
+**Release Version/Date**:  CMAQv6.0 
 
 **Description**:  
 Logfile message currently warn about aerosol and gas species not being able to be found when they are actually not needed by some mechanisms at all. This PR revises the logfile messaging approach to only alert when a species is required and not found (i.e. the model crashes). 
@@ -21,7 +21,7 @@ No impact on results.
 ### Remove option for Aerosol Initial Condition surface area and update settings for Boundary Condition Surface Area
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Run script updates  
-**Release Version/Date**:  v6.0 beta 1 and beta 2
+**Release Version/Date**:  CMAQv6.0 
 
 **Description**:   
 The run script options for whether or not to use aerosol surface area from initial and boundary conditions have been updated. 

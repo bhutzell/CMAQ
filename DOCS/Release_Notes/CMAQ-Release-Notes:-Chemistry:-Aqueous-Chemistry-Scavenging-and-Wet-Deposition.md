@@ -2,7 +2,7 @@
 ### Streamline Mapping to Default Cloud Chemistry Solver
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Infrastructure Improvement  
-**Release Version/Date**:  v6.0 beta 1 and 2  
+**Release Version/Date**: CMAQv6.0 
 **Description**:  
 This current PR is aimed at some minor updates to simplify the mapping of cldproc vectors to the aqueous chemistry routine via **AQ_DATA**.  
 - High-level variables have been renamed for less confusion. For example, ngas is replaced with n_aq_gas to indicate it is relevant to the aqueous chemistry solver. Likewise naddaer and naer are replaced with one variable, n_aq_aer.
@@ -32,7 +32,7 @@ The following limited updates were made to **aqchem**:
 ### Removal of acm_ae6_mp Cloud Module
 **Primary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Maintenance  
-**Release Version/Date**:  CMAQv6.0 beta 1 and 2  
+**Release Version/Date**:  CMAQv6.0  
 **Description**:  The acm_ae6_mp cloud mechanism was previously used with multipollutant configurations of the CMAQ model. However, it no longer works with any existing chemical mechanism and is scientifically obsolete. This unused option is removed in this PR.  
 **Significance and Impact**: Since it has not been possible to use this option for several model releases, its removal is not expected to have any significant impacts on the user community.  
 **Internal PRs**: [PR#1236](https://github.com/USEPA/CMAQ_Dev/pull/1236)  

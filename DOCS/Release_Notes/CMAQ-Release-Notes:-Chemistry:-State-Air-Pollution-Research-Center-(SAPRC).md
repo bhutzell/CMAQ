@@ -3,7 +3,7 @@
 ### Fix bug preventing CMAQ from running using SAPRC mechanisms
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix   
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2  
+**Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
 The GC namelist for the SAPRC mechanisms specify that CLNO2 should be written to the DRYDEP outputs. However, this species has no deposition velocity surrogate, meaning that it does not undergo dry deposition. This inconsistency is fixed in CMAQv6.0 so that CLNO2 does undergo dry deposition.  

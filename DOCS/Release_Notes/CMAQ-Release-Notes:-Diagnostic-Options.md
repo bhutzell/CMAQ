@@ -4,7 +4,7 @@
 **Primary Contact**: [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Secondary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Module Major Revision  
-**Release Version/Date**:  CMAQ v6.0 beta 1 and beta 2   
+**Release Version/Date**:  CMAQ v6.0  
 
 **Description**:  
 ELMOv2.1 expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining variables and assigning them to output files.
@@ -203,7 +203,7 @@ There is no quantitative impact on results, but there will be a noticeable posit
 ### Changes in Henry's law computation and Budget Tool  
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Computational Efficiency Improvements    
-**Release Version/Date**:  Version 6.0 beta 1 and 2   
+**Release Version/Date**:  Version 6.0    
 
 **Description**:    
 The code that computes Henry's Law constants has been modified to use integer indices rather than character string lookups. The budget tool has been turned off by default. Users interested in tracking the contributions of various processes to the budgets of CMAQ species can generate this output by setting BUDGET_DIAG=.TRUE. in CMAQ_Control_Misc.nml.  
@@ -218,7 +218,7 @@ Collectively, these two updates reduce runtime by approximately 18% on our 12US1
 ### Bugfix to the Budget Tool output file
 [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Bug Fixes  
-**Release Version/Date**:  v6.0 beta 1 and beta 2  
+**Release Version/Date**:  v6.0   
 
 **Description**:   
 The Budget Tool prints the log header at the top of its ascii output file. The log header subroutine was updated recently to include a secondary header that directs users to helpful parts of the logfile. This second portion should not be printed in the Budget output file. This PR corrects the log header subroutine call without printing that second section to the Budget output file. Without the fix, CMAQ crashes when the Budget Tool is turned on.

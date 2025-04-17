@@ -3,7 +3,7 @@
 ### Implement Online Met-Dependent Emission Module (MetEmis)  
 [Ben Murphy](murphy.ben@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update   
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2   
+**Release Version/Date**:  CMAQv6.0 
 
 **Description**:   
 The MetEmis module dynamically calculates meteorology-induced hourly gridded on-road mobile emissions within CMAQ, using simulated meteorology without any computational burden to the CMAQ modeling system.   

@@ -3,7 +3,7 @@
 ### Updated mechanism CRACMM3
 [Havala Pye](mailto:pye.havala@epa.gov),  U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
-**Release Version/Date**: CMAQv6.0 beta1 and beta 2     
+**Release Version/Date**: CMAQv6.0  
 
 **Description**: CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version builds on the previous CMAQv5.4 release of CRACMM2. With the release of CRACMM3, CRACMM1 versions have been deprecated and removed from CMAQv6.0. CRACMM2 remains functional in CMAQv6.0. CRACMM3 is available in 3 versions: a base CRACMM3, CRACMM3HAPs, and CRACMM3M. All three versions share the same core chemistry while two versions have expanded capabilities for specific applications. CRACMM3HAPs includes additional hazardous air pollutants and follows strategies similar to previous versions of CMAQ where several species are added external to the radical budget. Specifically, additional HAPs beyond the base HAPs included in CRACMM3 are included in the "nonreactive" (NR) namelist or included in the aerosol namelist as tracers. The additional HAPs undergo transport, removal, and chemical decay, if applicable. CRACMM3 for marine environments (CRACMM3M) includes additional halogen reactions for environments (not limited to marine) where that chemistry is important. In base CRACMM3, the halogen chemistry is represented by one parameterized reaction as in CRACMM1 but with updated parameters. See the individual release notes for more information.
  
@@ -16,7 +16,7 @@
 ### Halogen chemistry in CRACCM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update  
-**Release Version/Date**: CMAQv6.0 beta 1 and beta 2    
+**Release Version/Date**: CMAQv6.0   
 
 **Description**:  
 This update contains four different items: (1) NOY definition in the current SpecDef files for CRACMM2 and CRACMM3 contain an error which is now fixed (2) It adds halogen (Cl, Br, I) chemistry to CRACMM3 and creates a new marine mechanism (CRACMM3M). Current model (MGEMIS.F) contains an error for grid-cell area calculation for halogen emissions which is fixed in the pull request. A new Euler Backward Iterative (EBI) solver is developed. (3) CMAQ with cb6r5m_ae7_aq did not compile due to changes made in CRACMM3M. Several heterogeneous reactions in cb6r5m_ae7_aq are relabeled (without making any chemistry changes). Update made in MGEMIS.F for grid-cell area calculation also affects halogen emissions in cb6r5m_ae7_aq. (4) CMAQ with cb6r5_ae7_aq was also tested due to the update in MGEMIS.F. 
@@ -43,7 +43,7 @@ Update in MGEMIS.F has minimum impacts on ozone and sulfate over the contiguous 
 ### Photolysis of aerosol nitrate in CRACCM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update  
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2   
+**Release Version/Date**:  CMAQv6.0   
 
 **Description**:  
 This updates adds photolysis of aerosol nitrate (ANO3) to the CRACMM3 marine mechanism (CRACMM3M) following the procedure described in Sarwar et al., 2024. A new Euler Backward Iterative (EBI) solver is developed.
@@ -79,7 +79,7 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 ### Photolysis of aerosol nitrate in CRACMM3  
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2    
+**Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
 This pull request adds photolysis of aerosol nitrate (ANO3) to CRACMM3 following the procedure described in Sarwar et al., 2024. It adds a new aerosol species, ASEAST, which represents entire fine-mode sea-salt with a molecular weight of 31.3 grams per mole. Molecular weight of ASEAST is calculated using sea-salt composition data and molecular weight of individual chemical species represented in AERO_DATA.F. ASEAT and ANO3, and their molecular weights are used to calculate an enhancement factor which is then multiplied by the photolysis frequency of nitric acid to calculate the photolysis frequency of ANO3. A new Euler Backward Iterative (EBI) solver is developed.
@@ -106,7 +106,7 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 ### Updating the condensed halogen chemistry and renaming of "INO2" to "ISONP"  
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update      
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2  
+**Release Version/Date**:  CMAQv6.0   
 
 **Description**:    
 This pull request contains two updates: (1) CRACMM3 contains a chemical species “INO2” (isoprene nitrate peroxy radical). Detailed halogen chemistry for CRACMM3 also contains INO2 (iodine nitrite). To avoid conflict, INO2 in CRACMM3 is changed to ISONP. (2) Condensed halogen chemistry used in CRACMM3 was previously developed using hemispheric results of detailed halogen chemistry in the Carbon Bond chemical mechanism. The condensed halogen chemistry is re-derived using hemispheric results of detailed halogen chemistry in CRACMM3 following the procedure described in Sarwar et al., 2015 and is included in this pull request. A new Euler Backward Iterative (EBI) solver is developed since the name of a chemical species is changed.
@@ -149,7 +149,7 @@ Styrene concentrations are reduced, primarily due to additional losses through r
 **Primary Contact**: [Havala Pye](mailto:pye.havala@epa.gov), U.S. Environmental Protection Agency  
 **Secondary Contact**: [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Maintenance   
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2   
+**Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
 Greg Yarwood noted 4 RACM2 reactions that do not properly conserve nitrogen. The reactions are also in CRACMM. He proposed an update and Bill Stockwell agreed. The following proposed fixes from Greg Yarwood have been implemented in CRACMM3:  
@@ -170,7 +170,7 @@ Errors in conservation of nitrogen for select reactions ported from RACM2 into C
 ### CRACMM Reaction Metadata File  
 [[Havala Pye](mailto:pye.havala@epa.gov)], U.S. Environmental Protection Agency    
 **Type of update**: Documentation   
-**Release Version/Date**:  CMAQv6.0 beta 1 and beta 2   
+**Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
 Metadata file to document updates to CRACMM chemistry at the reaction level.  
@@ -186,7 +186,7 @@ This file provides information on CRACMM updates at the reaction level. This fil
 ### Delete obsolete chemical mechanisms
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Maintenance   
-**Release Version/Date**: CMAQv6.0 beta 1 and beta 2  
+**Release Version/Date**: CMAQv6.0    
 **Description**:  This PR deletes obsolete chemical mechanisms, including cracmm1_aq, cracmm1amore_aq, cb6r3_ae7_aq, racm2_ae6_aq, and saprc07tic_ae7i_aqkmt2. The CHEMMECH, CREATE_EBI, and INLINE_PHOT_PREPROC utilities have been rerun for each of the remaining chemical mechanisms to ensure internal consistency.  
 **Significance and Impact**: When a new version of a chemical mechanism is developed, the CMAQ team generally retains an older version of that mechanism for at least one release cycle. This is done both to ease maintenance and testing and to reduce confusion on the part of users.  
 **Internal PRs**: [PR#1196](https://github.com/USEPA/CMAQ_Dev/pull/1196)  

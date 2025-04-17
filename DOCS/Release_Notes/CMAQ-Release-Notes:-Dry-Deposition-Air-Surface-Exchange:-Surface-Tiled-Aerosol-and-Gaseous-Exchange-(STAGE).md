@@ -3,7 +3,7 @@
 ### Update to Minimum Kz and Kz0ut in the STAGE deposition option
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**:  Science Update, Documentation  
-**Release Version/Date**:  V6.0 beta 1 and beta 2  
+**Release Version/Date**:  V6.0
 
 **Description**:   
 This pull request updates minimum Kz value to only be applied in the PBL and sets the minimum Kz0ut value from 1 m2/s to 0.01 m2/s in accordance to WRF 4 PX and YSU PBL schemes. 
@@ -16,12 +16,12 @@ The revised Kz0ut results in substantially more O3 titration and higher NOx and 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1278](https://github.com/USEPA/CMAQ_Dev/commit/23654ff0e2f4371354ec357bff96845b7e4eff9a) | [PR#1278](https://github.com/USEPA/CMAQ_Dev/pull/1278)  |
+|[Merge for PR#1278](https://github.com/USEPA/CMAQ/commit/23654ff0e2f4371354ec357bff96845b7e4eff9a) | [PR#1278](https://github.com/USEPA/CMAQ_Dev/pull/1278)  |
 
 ### Restored the impact of dry deposition factor on diagnostic deposition velocity outputs
 **Primary Contact**: [Jesse Bash(mailto:bash.jesse@epa.gov)], U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix   
-**Release Version/Date**:  v6.0 beta 1 and beta 2  
+**Release Version/Date**:  v6.0
 
 **Description**:  
 This update is needed for the dry deposition velocity diagnostic file to represent model sensitivities in which the user selects a dry deposition factor that is not unity.  
@@ -34,12 +34,12 @@ If the user selects a dry deposition factor for a surrogate deposition velocity 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1282](https://github.com/USEPA/CMAQ_Dev/commit/1c99863e38eee05a8e901a1204c402a98bdbf09d) | [PR#1282](https://github.com/USEPA/CMAQ_Dev/pull/1282)  |
+|[Merge for PR#1282](https://github.com/USEPA/CMAQ/commit/1c99863e38eee05a8e901a1204c402a98bdbf09d) | [PR#1282](https://github.com/USEPA/CMAQ_Dev/pull/1282)  |
 
 ### Model stop if STAGECTRL_NML environmental variable is missing
  [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix   
-**Release Version/Date**:  v6.0 beta 1 and beta 2 
+**Release Version/Date**:  v6.0
 
 **Description**:   
 This pull request modifies CMAQ to alert the user if the STAGECTRL_NML is not set in the runscript when the STAGE deposition option is used. 
@@ -49,14 +49,14 @@ Model results are unchanged.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1242](https://github.com/USEPA/CMAQ_Dev/commit/dd8fa43dbac447332e54d56a8cc100733ae1ce96) | [PR#1242](https://github.com/USEPA/CMAQ_Dev/pull/1242)  |
+|[Merge for PR#1242](https://github.com/USEPA/CMAQ/commit/dd8fa43dbac447332e54d56a8cc100733ae1ce96) | [PR#1242](https://github.com/USEPA/CMAQ_Dev/pull/1242)  |
  
 
 
 ### STAGE gcc debug flag bug fix  
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Bug Fix   
-**Release Version/Date**:  v6.0 beta 1 and beta 2
+**Release Version/Date**:  v6.0
 
 **Description**:  
 STAGE with bidirectional NH3 exchange will currently crash when using a gcc build compiled with debug flags due to uninitialized F1_NH4 and F2_NH4 arrays in centralized_io_module.F. This occurs only when with the environment variable NEW_START = TRUE and these arrays are not populated but checked for NaNs in NH3_BIDI_MOD.F.  This pull request initialized  these arrays allowing the model to run when compiled with gcc debug flags.
@@ -66,7 +66,7 @@ This bugfix allows the user to run the model compiled with gcc debug flags using
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1227](https://github.com/USEPA/CMAQ_Dev/commit/9d9d871b6921443c270f7eebea2e1893d6f25822) | [PR#1227](https://github.com/USEPA/CMAQ_Dev/pull/1227)  |
+|[Merge for PR#1227](https://github.com/USEPA/CMAQ/commit/9d9d871b6921443c270f7eebea2e1893d6f25822) | [PR#1227](https://github.com/USEPA/CMAQ_Dev/pull/1227)  |
 
 
 
