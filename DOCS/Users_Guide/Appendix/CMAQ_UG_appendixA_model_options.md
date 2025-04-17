@@ -399,8 +399,9 @@ Sets if the CCTM will run in multi-processor or serial mode.
     Input parameters for configuring ELMOv2, DESID, the Budget Tool and other CMAQ capabilities
 -   `CMAQ_CH_CTRL_NML [default: ${BLD}/CMAQ_Chem_Control.nml]`<a id=CMAQ_CH_CTRL_NML></a>  
     Mechanism-specific input parameters for configuring DESID and ELMOv2
--   `STAGE_CTRL_NML [default: ${BLD}/CMAQ_Control_STAGE.nml]`<a id=CMAQ_CTRL_STAGE_NML></a>  
-    Specify chemical properties relevant for calculating deposition in STAGE.
+-   `STAGECTRL_NML [default: ${BLD}/CMAQ_Control_STAGE.nml]`<a id=STAGECTRL_NML></a>  
+    Specify chemical properties relevant for calculating deposition in STAGE, and land-use dependent physical 
+    properties as well as land-use mapping instructions.
 
 
 
