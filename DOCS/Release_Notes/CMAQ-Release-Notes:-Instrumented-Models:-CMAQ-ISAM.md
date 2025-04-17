@@ -6,7 +6,7 @@
 **Description**:   
 This bug fix resolves the erroneous growth of tagged mass far away from the location of emission sources. As pictured below, NO2 emitted from various states across the U.S. leads to NO2 from each source present in southern and central California. The reason for the error involves how tagged aerosol mass concentrations were floored in CMAQ v5.4. As implemented, the approach added artificial mass to condensing or evaporating species. This mass propagated through the system and led to enhancements in both particle- and gas-phase species.
 
-![combined_01052016](https://github.com/USEPA/CMAQ_Dev/assets/17143709/a5728e62-01b4-4db0-8faf-bc4bd49d7fa6)
+![combined_01052016](https://github.com/user-attachments/assets/3b6b9c5a-766e-4981-b087-1f00759b9d15)
 
 **Significance and Impact**:   
 Corrects erroneous mass attributed to sources geographically far away very soon after emissions that can not be explained by transport. This issues was brought to attention on the CMAS user forum. As depicted above, the concentration of these artificial enhancements can approach the true values of the tagged concentrations near and downwind real sources. It is difficult to completely know where these errors would have congregated in various domains, but they are likely more problematic in places with enhanced photoactivity, like SOUTHERN California.
@@ -45,21 +45,21 @@ Tested two cases on the 12K CONUS domain for one week in July:
 (2) SpecList - added pcvoc and NOY compounds (CRON and OPAN) to ISAM species list.
 
 **CO Concentrations from EGUs**  
-![Fig1_speclist_CO_EGU](https://github.com/user-attachments/assets/f502f7c4-f0a3-4370-a40b-b745a94c4901)
+![Murphy_ISAM_I](https://github.com/user-attachments/assets/567b99b0-8174-4130-90f3-2db459308c3a)
 
 **NOx species from the same EGUs** changes by about a factor of 4 lower than the absolute EGU contribution.  
-![Fig1_speclist_NOx_EGU](https://github.com/user-attachments/assets/1988acc0-e31d-405d-a33b-6464ab4926c2)
+![Fig1_speclist_NOx_EGU](https://github.com/user-attachments/assets/213051d9-b8bb-42b1-900c-aeeb5efa9fe2)
 
 **Fine PM and SOA from EGUs** show increases of about 1 ug m-3 due to the pcVOC addition, and this is the principal driver of change in total fine PM.  
-![Fig1_speclist_PMF_EGU](https://github.com/user-attachments/assets/01be9917-21ba-410b-ab87-27a78dc3d5d6)
-![Fig1_speclist_SOA_EGU](https://github.com/user-attachments/assets/dc686b40-1219-49a6-8173-7b6987762426)
+![Fig1_speclist_PMF_EGU](https://github.com/user-attachments/assets/1fad9296-c28b-4fcb-90af-eca2ad9b9b00)
+![Fig1_speclist_SOA_EGU](https://github.com/user-attachments/assets/b7981275-4be4-47df-b8ab-4cf44365a4a8)
 
 For gridded area sources in non-contiguous states, NOy is increased marginally due to addition of CRON and OPAN to the species list. The effect on ozone is quite small.   
-![Fig1_speclist_NOY_Gridded_NonCont](https://github.com/user-attachments/assets/35677205-17df-4a29-a3cd-7815a3be645e)
+![Fig1_speclist_NOY_Gridded_NonCont](https://github.com/user-attachments/assets/79e6655c-9dec-4c74-a97f-646206634489)
 
 The SOA predictions for the non-contiguous regions show dramatically large maximum differences compared to absolute time-averaged concentrations. This reflects the dominant role of pcSOA to the total. The  differences for fine PM are mostly, if not equal to, the changes in total SOA.  
-![Fig1_speclist_PMF_Gridded_NonCont](https://github.com/user-attachments/assets/618a0fa1-c4a1-4c4b-912b-b0f1185ea55a)
-![Fig1_speclist_SOA_Gridded_NonCont](https://github.com/user-attachments/assets/8604a822-bf90-400a-9494-b682ba676f87)
+![Fig1_speclist_PMF_Gridded_NonCont](https://github.com/user-attachments/assets/d0816e82-f10a-4952-9a7d-712fe4474cd7)
+![Fig1_speclist_SOA_Gridded_NonCont](https://github.com/user-attachments/assets/d6b9881a-d0bd-4cdf-9e08-260473a16edf)
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
