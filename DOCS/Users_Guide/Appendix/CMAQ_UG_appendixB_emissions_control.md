@@ -15,7 +15,7 @@
 
 The Detailed Emissions Scaling, Isolation and Diagnostics (DESID) module included with CMAQv5.3+ provides comprehensive customization and transparency of emissions manipulation to the user. The customization of emissions is accomplished via a series of Control Namelists, which contain variables that modify the behavior of the emissions module. These include ***Emission Scaling Rules***, ***Size Distributions***, ***Regions Registry***, ***Chemical Families***, ***Region Families***, and ***Area Adjustments***.
 
-To determine its configuration, DESID makes use of input primarily from four files: the CMAQ runscript, the CMAQ Control File ([CMAQ_Control.nml][link_B.1_misc]), the Chemical Control file ([CMAQ_Chemical_Control_{$MECH}.nml][link_B.1_desis]), and the DESID Chemical Mapping File (e.g. [CMAQ_Control_DESID_cb6r5_ae7_aq.nml][link_B.1_desid]). 
+To determine its configuration, DESID makes use of input primarily from four files: the CMAQ runscript, the CMAQ Control File ([CMAQ_Control.nml][link_B.1_control]) and the Chemical Control file ([CMAQ_Chemical_Control_{$MECH}.nml][link_B.1_chem_control]). 
 A separate version of the chemical mapping control file exists for every mechanism because these namelists are preloaded with likely rules linking emissions of important CMAQ primary species to their typical emission species names as output by SMOKE. 
 By default, this namelist is stored in each chemical mechanism folder (e.g. MECHS/cb6r5_ae7_aq) and is copied into the user's build directory when bldit_cctm.csh is executed and a chemical mechanism is chosen. If the user modifies the name or location of the DESID control file or chemical mapping file, then the following commands in the RunScript should be updated as well:
 ```
@@ -428,15 +428,13 @@ CMAQv5.5 User's Guide <br>
 <!-- START_OF_COMMENT -->  
 
 [link_B.3]: ../../../PYTOOLS/shp2cmaq/
-[link_B.1_misc]: ../../../CCTM/src/util/util/CMAQ_Control_Misc.nml
-[link_B.1_desis]: ../../../CCTM/src/emis/emis/CMAQ_Control_DESID.nml
-[link_B.1_desid]: ../../../CCTM/src/MECHS/cb6r5_ae7_aq/CMAQ_Control_DESID_cb6r5_ae7_aq.nml
+[link_B.1_control]: ../../../CCTM/src/driver/CMAQ_Control.nml
+[link_B.1_chem_control]: ../../../CCTM/src/MECHS/cb6r5_ae7_aq/CMAQ_Chem_Control_cb6r5_ae7_aq.nml
 [link_B.3_aero]:  ../../../CCTM/src/aero/aero6/AERO_DATA.F
 
 <!-- END_OF_COMMENT -->
 
 [link_B.3]: https://github.com/USEPA/CMAQ/blob/main/PYTOOLS/shp2cmaq/ 
-[link_B.1_misc]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/util/util/CMAQ_Control_Misc.nml
-[link_B.1_desis]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/emis/emis/CMAQ_Control_DESID.nml
-[link_B.1_desid]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/MECHS/cb6r5_ae7_aq/CMAQ_Control_DESID_cb6r5_ae7_aq.nml
+[link_B.1_control]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/driver/CMAQ_Control.nml
+[link_B.1_chem_control]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/MECHS/cb6r5_ae7_aq/CMAQ_Chem_Control_cb6r5_ae7_aq.nml
 [link_B.3_aero]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/aero/aero6/AERO_DATA.F
