@@ -13,8 +13,7 @@
 
 <a id=what_beta></a>
 ## What is a beta version?
-We are making this early version of the code available for testing, evaluation, and demonstration purposes before the official, general release. It is also intended to facilitate community contributions. This beta version may be unstable, contain bugs, and may not function as intended in the final release. We plan to conduct extensive evaluation of this beta version over the coming months, which may lead to additional changes before the final release.
-
+We are making this early version of the code available for testing, evaluation, and demonstration purposes before the official, general release. It is also intended to facilitate community contributions. This beta version may be unstable, contain bugs, and may not function as intended in the final release. 
 <a id=update_v55_v60b></a>
 ## Do I need to update from v5.5 to v6.0beta?
 No, CMAQv6.0beta is not intended as a replacement for CMAQv5.5.
