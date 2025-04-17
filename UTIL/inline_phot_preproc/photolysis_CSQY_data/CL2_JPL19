@@ -1,9 +1,5 @@
 CL2_JPL19
-<<<<<<< HEAD
 ! CL2 + hν = 2.0*CL
-=======
-! CL2 + hv = 2.0*CL
->>>>>>> CRACMM3_CHLORINE
 ! NASA JPL Publication 19-5; Evaluation Number 19; May 2020
 ! Page: 4-205-to 4-207; Table 4F-1 for absorption cross-section
 ! Quantum yield is assumed to be 1.0
@@ -43,8 +39,4 @@ FAC=1.0
 520	6.81E-23	1.0
 530	3.13E-23	1.0
 540	1.37E-23	1.0
-<<<<<<< HEAD
 550	5.80E-24	1.0
-=======
-550	5.80E-24	1.0
->>>>>>> CRACMM3_CHLORINE
