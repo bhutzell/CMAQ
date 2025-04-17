@@ -217,3 +217,15 @@ AISO5,Multifunctional product from heterogeneous uptake of INALD
 NUM,Number of particles
 SRF,Surface area of particles
 ASEAST, J-mode seasalt concentration (tracer)
+CL2, Molecular chlorine 
+CL, Atomic chlorine
+CLO, Chlorine monoxide
+OCLO, Chlorine dioxide 
+CL2O2, Chloryl chloride
+HOCL, Hypochlorous acid
+CLNO, Nitrosyl chloride
+CLNO2, Nitryl chloride
+CLNO3, Chlorine nitrate
+CLOO, Chlorine superoxide
+NO2PIJ, Dioxidonitrogen
+NO2PK, Dioxidonitrogen

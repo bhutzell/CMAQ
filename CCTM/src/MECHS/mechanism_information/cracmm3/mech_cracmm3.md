@@ -37,24 +37,27 @@ Information is based on the mech.def file.
 | R017   | KET ---->   1.5000\*ETHP +    0.5000\*ACO3 +    0.5000\*CO  | KET_JGR19 | Not Available<sup>1</sup> | 
 | R018   | HKET ----> HO2 + ACO3 + HCHO  | HKET_RACM2 | Not Available<sup>1</sup> | 
 | R019   | MACR ---->   0.3400\*HO +    0.6600\*HO2 +    0.6700\*ACO3 +    0.3300\*MACP +    0.3400\*XO2 +    0.6700\*CO +    0.6700\*HCHO  | MACR_RACM2 | Not Available<sup>1</sup> | 
-| R020   | MVK ---->   0.3000\*MO2 +    0.3000\*MACP +    0.7000\*CO +    0.7000\*UALD  | MVK_RACM2 | Not Available<sup>1</sup> | 
-| R021   | GLY ---->   2.0000\*CO  | GLYH2_RACM2 | Not Available<sup>1</sup> | 
-| R022   | GLY ----> HCHO + CO  | GLYF_RACM2 | Not Available<sup>1</sup> | 
-| R023   | GLY ---->   2.0000\*HO2 +    2.0000\*CO  | GLYHX_RACM2 | Not Available<sup>1</sup> | 
+| R020   | MVK ---->   0.3000\*MO2 +    0.3000\*MACP +    0.7000\*CO +    0.7000\*UALD  | MVK_JPL19 | Not Available<sup>1</sup> | 
+| R021   | GLY ---->   2.0000\*CO  | GLYH2_JPL19 | Not Available<sup>1</sup> | 
+| R022   | GLY ----> HCHO + CO  | GLYF_JPL19 | Not Available<sup>1</sup> | 
+| R023   | GLY ---->   2.0000\*HO2 +    2.0000\*CO  | GLYHX_JPL19 | Not Available<sup>1</sup> | 
 | R024   | MGLY ----> HO2 + ACO3 + CO  | MGLY_RACM2 | Not Available<sup>1</sup> | 
 | R025   | DCB1 ---->   1.5000\*HO2 +    0.2500\*ACO3 +    0.2000\*XO2 + CO +    0.5000\*GLY +    0.5000\*MGLY  | MGLY_RACM2 | Not Available<sup>1</sup> | 
 | R026   | DCB2 ---->   1.5000\*HO2 +    0.2500\*ACO3 +    0.2000\*XO2 + CO +    0.5000\*GLY +    0.5000\*MGLY  | MGLY_RACM2 | Not Available<sup>1</sup> | 
-| R027   | BALD ----> BAL1 + HO2 + CO  | BALD_RACM2 | Not Available<sup>1</sup> | 
+| R027a   | BALD ----> BEN + CO  | BALD1_CALVERT11 | Not Available<sup>1</sup> | 
+| R027b   | BALD ----> BAL1 + CO + HO2  | BALD2_CALVERT11 | Not Available<sup>1</sup> | 
 | R028   | OP1 ----> HO + HO2 + HCHO  | OP1_RACM2 | Not Available<sup>1</sup> | 
 | R029   | OP2 ----> HO + HO2 + ALD  | OP1_RACM2 | Not Available<sup>1</sup> | 
 | TRP03   | OPB ----> HO + HO2 + ALD  | OP1_RACM2 | Not Available<sup>1</sup> | 
 | R029a   | VOP3 ----> HO + HO2 + ALD  | OP1_RACM2 | Not Available<sup>1</sup> | 
 | R030   | PAA ----> HO + MO2  | PAA_RACM2 | Not Available<sup>1</sup> | 
-| R031   | ONIT ----> HO2 + NO2 +    0.2000\*ALD +    0.8000\*KET  | ONIT_RACM2 | Not Available<sup>1</sup> | 
-| R032   | PAN ----> ACO3 + NO2  | PAN1_RACM2 | Not Available<sup>1</sup> | 
-| R033   | PAN ----> MO2 + NO3 + CO2  | PAN2_RACM2 | Not Available<sup>1</sup> | 
-| TRP55   | VTRPN ----> NO2 +    0.6700\*KET +    0.3300\*UALD  | ONIT_RACM2 | Not Available<sup>1</sup> | 
-| TRP56   | VHONIT ----> HKET + NO2  | ONIT_RACM2 | Not Available<sup>1</sup> | 
+| R031   | ONIT ----> HO2 + NO2 +    0.2000\*ALD +    0.8000\*KET  | ONIT_CALVERT08 | Not Available<sup>1</sup> | 
+| R032   | PAN ----> ACO3 + NO2  | PAN1_JPL19 | Not Available<sup>1</sup> | 
+| R033   | PAN ----> MO2 + NO3 + CO2  | PAN2_JPL19 | Not Available<sup>1</sup> | 
+| R033a   | PPN ----> RCO3 + NO2  | PPN1_JPL19 | Not Available<sup>1</sup> | 
+| R033b   | PPN ----> HC3P + NO3  | PPN2_JPL19 | Not Available<sup>1</sup> | 
+| TRP55   | VTRPN ----> NO2 +    0.6700\*KET +    0.3300\*UALD  | TRPN_WANG2023 | Not Available<sup>1</sup> | 
+| TRP56   | VHONIT ----> HKET + NO2  | TRPN_WANG2023 | Not Available<sup>1</sup> | 
 | R034   | O3 + HO ----> HO2  |   1.70E-12e<sup>  -940.00/T</sup> |   7.2647E-14 |
 | R035   | O3 + HO2 ----> HO  |   1.00E-14e<sup>  -490.00/T</sup> |   1.9331E-15 |
 | R036   | O3 + NO ----> NO2  |   3.00E-12e<sup> -1500.00/T</sup> |   1.9596E-14 |
@@ -443,7 +446,6 @@ Information is based on the mech.def file.
 | R020c   | SESQRO2 + NO ---->   0.2470\*VROCP1OXY3 +    0.7530\*VROCP3OXY2 +    0.7530\*NO2  |   2.70E-12e<sup>   360.00/T</sup> |   9.0313E-12 |
 | HET_GLY   | GLY ----> AGLYOLIGJ  | HETERO_GLY | Not Available<sup>2</sup> | 
 | HET_MGLY   | MGLY ----> AGLYOLIGJ  | HETERO_MGLY | Not Available<sup>2</sup> | 
-| HET_N2O5   | N2O5 ---->   2.0000\*HNO3  | HETERO_N2O5IJ | Not Available<sup>2</sup> | 
 | HET_NO2   | NO2 ---->   0.5000\*HONO +    0.5000\*HNO3  | HETERO_NO2 | Not Available<sup>2</sup> | 
 | HET_HO2   | HO2 ----> | HETERO_HO2 | Not Available<sup>2</sup> | 
 | HET_NO3   | NO3 ----> HNO3  | HETERO_NO3 | Not Available<sup>2</sup> | 
@@ -554,8 +556,69 @@ Information is based on the mech.def file.
 | ROCARO74   | STYP + NO3 ----> NO2 + HO2 + HCHO + BALD  |   2.3000E-12 |   2.3000E-12 |
 | ROCARO75   | STYP + MO2 ---->   1.3700\*HO2 +    1.6800\*HCHO + BALD +    0.3200\*MOH  |   2.5000E-13 |   2.5000E-13 |
 | ROCARO76   | STYP + ACO3 ----> HO2 + HCHO + BALD +    0.7000\*MO2 +    0.3000\*ORA2 +    0.7000\*CO2  |   2.5000E-13 |   2.5000E-13 |
-| HET_ANO3I   | ANO3I ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_IEPOX | Not Available<sup>2</sup> | 
-| HET_ANO3J   | ANO3J ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_IEPOX | Not Available<sup>2</sup> | 
+| HET_ANO3I   | ANO3I ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_ANO3 | Not Available<sup>2</sup> | 
+| HET_ANO3J   | ANO3J ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_ANO3 | Not Available<sup>2</sup> | 
+| CLP01   | CL2 ---->   2.0000\*CL  | CL2_JPL19 | Not Available<sup>1</sup> | 
+| CLP02   | CLO ----> CL + O3P  | CLO_JPL19 | Not Available<sup>1</sup> | 
+| CLP03   | OCLO ----> CLO + O3P  | OCLO_JPL19 | Not Available<sup>1</sup> | 
+| CLP07   | CL2O2 ----> CL + CLOO  | CL2O2_JPL19 | Not Available<sup>1</sup> | 
+| CLP10   | HOCL ----> HO + CL  | HOCL_JPL19 | Not Available<sup>1</sup> | 
+| CLP12   | CLNO ----> CL + NO  | CLNO_JPL19 | Not Available<sup>1</sup> | 
+| CLP14   | CLNO2 ----> CL + NO2  | CLNO2_JPL19 | Not Available<sup>1</sup> | 
+| CLP17   | CLNO3 ----> CL + NO3  | CLNO3_R_JPL19 | Not Available<sup>1</sup> | 
+| CLP18   | CLNO3 ----> CLO + NO2  | CLNO3_M_JPL19 | Not Available<sup>1</sup> | 
+| CLT01   | CL + O3 ----> CLO  |   2.30E-11e<sup>  -200.00/T</sup> |   1.1760E-11 |
+| CLT02   | CL + H2 ----> HCL + HO2  |   3.05E-11e<sup> -2270.00/T</sup> |   1.5057E-14 |
+| CLT03   | CL + HO2 ----> CLO + HO  |   3.60E-11e<sup>  -375.00/T</sup> |   1.0234E-11 |
+| CLT04   | CL + HO2 ----> HCL  |   1.40E-11e<sup>   270.00/T</sup> |   3.4627E-11 |
+| CLT05   | CL + H2O2 ----> HCL + HO2  |   1.10E-11e<sup>  -980.00/T</sup> |   4.1105E-13 |
+| CLT06   | CL + CLOO ---->   2.0000\*CLO  |   1.20E-11e<sup>     0.00/T</sup> |   1.2000E-11 |
+| CLT07   | CL + CLOO ----> CL2  |   2.30E-10e<sup>     0.00/T</sup> |   2.3000E-10 |
+| CLT08   | CL + OCLO ---->   2.0000\*CLO  |   3.40E-11e<sup>   160.00/T</sup> |   5.8149E-11 |
+| CLT09   | CL + CL2O2 ----> CL2 + CLOO  |   7.60E-11e<sup>    65.00/T</sup> |   9.4514E-11 |
+| CLT10   | CL + HOCL ----> CL2 + HO  |   3.40E-12e<sup>  -130.00/T</sup> |   2.1985E-12 |
+| CLT11   | CL + NO + M ----> CLNO  |   7.70E-32(T/300)<sup> -1.80</sup> |   7.7862E-32 |
+| CLT12   | CL + NO2 ----> CLNO2  | k<sub>o</sub>=  1.80E-31e<sup>     0.0/T</sup>(T/300)<sup> -2.00</sup><br>k<sub>i</sub> =   1.00E-10e<sup>     0.0/T</sup>(T/300)<sup> -1.00</sup><br>n=     1.00;F=     0.60 |   3.5840E-12 |
+| CLT14   | CL + NO3 ----> CLO + NO2  |   2.4000E-11 |   2.4000E-11 |
+| CLT15   | CL + CLNO ----> CL2 + NO  |   5.80E-11e<sup>   100.00/T</sup> |   8.1113E-11 |
+| CLT17   | CL + CLNO3 ----> CL2 + NO3  |   6.20E-12e<sup>   145.00/T</sup> |   1.0083E-11 |
+| CLT22   | CLO + HO2 ----> HOCL  |   2.60E-12e<sup>   290.00/T</sup> |   6.8770E-12 |
+| CLT23   | CLO + NO ----> CL + NO2  |   6.40E-12e<sup>   290.00/T</sup> |   1.6928E-11 |
+| CLT25   | CLO + NO2 ----> CLNO3  | k<sub>o</sub>=  1.80E-31e<sup>     0.0/T</sup>(T/300)<sup> -3.40</sup><br>k<sub>i</sub> =   1.50E-11e<sup>     0.0/T</sup>(T/300)<sup> -1.90</sup><br>n=     1.00;F=     0.60 |   2.3359E-12 |
+| CLT27   | CLO + CLO ----> CL2  |   1.00E-12e<sup> -1590.00/T</sup> |   4.8301E-15 |
+| CLT28   | CLO + CLO ----> OCLO + CL  |   3.50E-13e<sup> -1370.00/T</sup> |   3.5358E-15 |
+| CLT31   | CLO + CLO ----> CL2O2  | k<sub>o</sub>=  1.90E-32e<sup>     0.0/T</sup>(T/300)<sup> -3.60</sup><br>k<sub>i</sub> =   3.70E-12e<sup>     0.0/T</sup>(T/300)<sup> -1.60</sup><br>n=     1.00;F=     0.60 |   3.1907E-13 |
+| CLT32   | CL2O2 ---->   2.0000\*CLO  |   4.63E+26e<sup> -8537.00/T</sup> \*CLT31 |   5.4222E+01<sup>8</sup>| 
+| CLT35   | OCLO + NO ----> CLO + NO2  |   1.10E-13e<sup>   350.00/T</sup> |   3.5581E-13 |
+| CLT36   | HO + CL2 ----> CL + HOCL  |   2.60E-12e<sup> -1100.00/T</sup> |   6.4965E-14 |
+| CLT37   | HO + CLO ----> HCL  |   6.00E-13e<sup>   230.00/T</sup> |   1.2977E-12 |
+| CLT38   | HO + CLO ----> CL + HO2  |   7.40E-12e<sup>   270.00/T</sup> |   1.8303E-11 |
+| CLT39   | HO + HCL ----> CL  |   1.80E-12e<sup>  -250.00/T</sup> |   7.7824E-13 |
+| CLT40   | HO + HOCL ----> CLO  |   3.00E-12e<sup>  -500.00/T</sup> |   5.6080E-13 |
+| CLT41   | HO + CLNO2 ----> HOCL + NO2  |   2.40E-12e<sup> -1250.00/T</sup> |   3.6260E-14 |
+| CLT43   | HO + CLNO3 ----> HOCL + NO3  |   1.20E-12e<sup>  -330.00/T</sup> |   3.9673E-13 |
+| CLT44   | HO + OCLO ----> HOCL  |   1.40E-12e<sup>   600.00/T</sup> |   1.0474E-11 |
+| CLT45   | HO + CL2O2 ----> HOCL + CLOO  |   6.00E-13e<sup>   670.00/T</sup> |   5.6767E-12 |
+| CLTO01   | CL + CH4 ----> HCL + MO2  |   7.10E-12e<sup> -1270.00/T</sup> |   1.0031E-13 |
+| CLTO02   | CL + ETH ----> HCL + ETHP  |   7.20E-11e<sup>   -70.00/T</sup> |   5.6934E-11 |
+| CLTO03   | CL + HC3 ----> HCL + HC3P +    0.0000\*ASOATJ  |   1.40E-10e<sup>     0.00/T</sup> |   1.4000E-10 |
+| CLTO04   | CL + HC5 ----> HCL + HC5P +    0.0013\*ASOATJ  |   2.70E-10e<sup>     0.00/T</sup> |   2.7000E-10 |
+| CLTO05   | CL + HC10 ----> HCL + HC10P  |   5.2700E-10 |   5.2700E-10 |
+| CLOR01   | CLO + MO2 ----> CLOO + HCHO + HO2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
+| CLOR02   | CLO + ETHP ----> CLOO + ACD + HO2  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
+| CLOR03   | CLO + HC3P ---->   0.6600\*HO2 +    0.1310\*MO2 +    0.0480\*ETHP +    0.0890\*XO2 + CLOO +    0.5040\*ACD +    0.1320\*ALD +    0.1650\*ACT +    0.0420\*MEK  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
+| CLOR04   | CLO + HC5P ---->   0.2000\*HO2 +    0.0510\*MO2 +    0.2310\*ETHP +    0.2350\*XO2 + CLOO +    0.0180\*HCHO +    0.0450\*ACD +    0.2030\*ALD +    0.0330\*MEK +    0.2170\*ACT +    0.0330\*KET +    0.2720\*HKET  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
+| CLOR51   | CLO + HC10P ---->   0.7400\*HC10P2 + CLOO  |   3.25E-12e<sup>  -114.00/T</sup> |   2.2173E-12 |
+| HET_N2O5IJ   | N2O5 ----> HNO3 + NO2PIJ  | HETERO_N2O5IJ | Not Available<sup>2</sup> | 
+| HET_N2O5K   | N2O5 ----> HNO3 + NO2PK  | HETERO_N2O5K | Not Available<sup>2</sup> | 
+| HET_H2NO3PIJA   | NO2PIJ ----> HNO3  | HETERO_H2NO3PAIJ | Not Available<sup>2</sup> | 
+| HET_H2NO3PKA   | NO2PK ----> HNO3  | HETERO_H2NO3PAK | Not Available<sup>2</sup> | 
+| HET_H2NO3PIB   | NO2PIJ + ACLI ----> CLNO2  | HETERO_H2NO3PBIJ | Not Available<sup>2</sup> | 
+| HET_H2NO3PJB   | NO2PIJ + ACLJ ----> CLNO2  | HETERO_H2NO3PBIJ | Not Available<sup>2</sup> | 
+| HET_H2NO3PKB   | NO2PK + ACLK ----> CLNO2  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
+| HET_CLN3_WAI   | CLNO3 ----> HOCL + HNO3  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
+| HET_CLN3_WAJ   | CLNO3 ----> HOCL + HNO3  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
+| HET_CLN3_ACLJ   | CLNO3 + ACLJ ----> CL2 + ANO3J  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
 
 <sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     
 <sup>1</sup>Photolysis Reaction;depends on radiation and predicted concentrations     
