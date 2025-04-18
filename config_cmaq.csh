@@ -98,7 +98,7 @@
         #> set the compiler flag -qopt-report=5 to get a model optimization report in the build directory with the optrpt extension
         setenv myFC mpiifort
         setenv myCC icc       
-        setenv myFSTD "-O3 -fno-alias -mp1 -fp-model source -ftz -simd -align all -xHost -vec-guard-write -unroll-aggressive"
+        setenv myFSTD "-O3 -fno-alias -mp1 -fp-model source -ftz -simd -align all -vec-guard-write -unroll-aggressive"
         setenv myDBG  "-O0 -g -check bounds -check uninit -fpe0 -fno-alias -ftrapuv -traceback"
         setenv myLINK_FLAG #"-qopenmp-simd" openMP not supported w/ CMAQ
         setenv myFFLAGS "-fixed -132"

@@ -468,7 +468,7 @@ C.. BENZO[A]PYRENE, accumulation mode
 !           LH_EQU(32)  =  2.00D-15    ! average between 0% and 70%  Rel. Hum. Points in Owususa et al. (2004)
            LHRATE(1,32)  = 3.10D-02   ! average between 50% and 70% Rel. Hum. Points in Zhou et al. (2013) for organic shell around NH4SO4 core
            LH_EQU(1,32)  = 10.1D-15   ! average between 50% and 70% Rel. Hum. Points in Zhou et al. (2013) for organic shell around NH4SO4 core
-           LH_TAMIN(1,32)  =  275.15  ! based on New-Shield BaP heteorogeneous oxidation treatment in Shrivastava et al. (2017)
+           LH_TAMIN(1,32)  =  275.15 ! based on New-Shield BaP heteorogeneous oxidation treatment in Shrivastava et al. (2017)
            LH_RHMIN(1,32)  =  0.50    ! based on New-Shield BaP heteorogeneous oxidation treatment in Shrivastava et al. (2017)
 
 C.. BENZO[A]PYRENE, Aitken mode
@@ -555,7 +555,6 @@ C.. Tracer for acrolein emissions
             ELSE IF( INDEX(MECHNAME,'SAPRC07T') .GT. 0 )THEN
                BICAUSE(1:5,37)  = (/   'OH ',    'O3 ',    'NO3',     'CL ',     'O3P'/)
                BIRATE(1:5,37)   = (/ 2.0D-11, 2.37D-15, 1.18D-15, 2.94D-10, 2.37D-12/)
-               BI_ACT(1:5,37)   = (/  0.00D0,  2.528D3,    0.0D0,    0.0D0,    0.0D0/)
                BI_ACT(1:5,37)   = (/  0.00D0,  2.528D3,    0.0D0,    0.0D0,    0.0D0/)
             ELSE  ! cracmm1 by default
                BICAUSE(1:4,37)  = (/    'HO ',     'O3 ',    'NO3',     'CL '/)
