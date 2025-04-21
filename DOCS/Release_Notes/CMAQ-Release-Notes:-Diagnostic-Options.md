@@ -74,17 +74,32 @@ These composites may be specified in the ELMO output file list in CMAQ_Control.n
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|| [PR#1290](https://github.com/USEPA/CMAQ_Dev/pull/1290)  |   
-|| [PR#1277](https://github.com/USEPA/CMAQ_Dev/pull/1277)  |   
-|| [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  |   
-|| [PR#1262](https://github.com/USEPA/CMAQ_Dev/pull/1262)  |   
-|| [PR#1247](https://github.com/USEPA/CMAQ_Dev/pull/1247)  |   
-|| [PR#1245](https://github.com/USEPA/CMAQ_Dev/pull/1245)  |   
-|| [PR#1244](https://github.com/USEPA/CMAQ_Dev/pull/1244)  |   
-|| [PR#1238](https://github.com/USEPA/CMAQ_Dev/pull/1238)  |   
+|[Merge for PR#1290](https://github.com/USEPA/CMAQ/commit/8aae97cf667fea22a73b7bb8d19cb9258aa81fa0)| [PR#1290](https://github.com/USEPA/CMAQ_Dev/pull/1290)  |   
+|[Merge for PR#1277](https://github.com/USEPA/CMAQ/commit/79c7418a26c0567d9628d5fd0a74bc262c82a395)| [PR#1277](https://github.com/USEPA/CMAQ_Dev/pull/1277)  |   
+|[Merge for PR#1267](https://github.com/USEPA/CMAQ/commit/684b45ca253c04a854278ca929bb25968583fe3e)| [PR#1267](https://github.com/USEPA/CMAQ_Dev/pull/1267)  |   
+|[Merge for PR#1262](https://github.com/USEPA/CMAQ/commit/9bcd43ea91e8f036ad876120aa3dd00007c0f340)| [PR#1262](https://github.com/USEPA/CMAQ_Dev/pull/1262)  |   
+|[Merge for PR#1247](https://github.com/USEPA/CMAQ/commit/ea75fac22998dee22bb020800439e81891eaba15)| [PR#1247](https://github.com/USEPA/CMAQ_Dev/pull/1247)  |   
+|[Merge for PR#1245](https://github.com/USEPA/CMAQ/commit/8a473d67e2de77aaf6aa6ca149a2513d5aeef295)| [PR#1245](https://github.com/USEPA/CMAQ_Dev/pull/1245)  |   
+|[Merge for PR#1244](https://github.com/USEPA/CMAQ/commit/e4664ce84958819739b1bab5167bdd2eff4d2dfb)| [PR#1244](https://github.com/USEPA/CMAQ_Dev/pull/1244)  |   
+|[Merge for PR#1238](https://github.com/USEPA/CMAQ/commit/5c1180ebd2fe633dca8a79a053386a6161ebc592)| [PR#1238](https://github.com/USEPA/CMAQ_Dev/pull/1238)  |   
 |[Merge for PR#1184](https://github.com/USEPA/CMAQ/commit/d0d1a121ffe55e22a8712a8d1b13b6567ae3b199) | [PR#1184](https://github.com/USEPA/CMAQ_Dev/pull/1184)  |  
-|| [PR#1176](https://github.com/USEPA/CMAQ_Dev/pull/1176)  |   
-|| [PR#1166](https://github.com/USEPA/CMAQ_Dev/pull/1166)  |   
+|[Merge for PR#1176](https://github.com/USEPA/CMAQ/commit/5f0a76d2abceaf1e0e6e5b0ef98cf2cef85c5b20)| [PR#1176](https://github.com/USEPA/CMAQ_Dev/pull/1176)  |   
+|[Merge for PR#1166](https://github.com/USEPA/CMAQ/commit/7797e7939ab221b9e345af14c360ee3f6a25ed34) | [PR#1166](https://github.com/USEPA/CMAQ_Dev/pull/1166)  |   
+
+
+
+### Redirect ELMO for indicator of ozone production regime  
+**Primary Contact**: [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Enhancement  
+**Release Version/Date**:  CMAQ version 6.0  
+
+**Description**:   
+The update modifies how the ELMO obtains an indicator whether the ozone production regime is VOC or NOx limiting if CCTM is compiled with isam. Changes move setting of the output variable from EBI solver subroutines of the chemical mechanisms to the ISAM routine calculating the regime indicator. Computational and coding reasons motivate the changes. Computationally, the extraction is within a loop integrating over the synchronization time step via chemistry sub-time step so the output variable is set an unneeded number of times. From a coding prospective, the extraction method has to modify each mechanism's EBI solver and the create_ebi chemistry utility. This update removes these problems and simplifies how ELMO sets a output variable.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1302](https://github.com/USEPA/CMAQ/commit/32211aeb9ea27845118aa10d362f80aa8e1f4f15) | [PR#1302](https://github.com/USEPA/CMAQ_Dev/pull/1302)  | 
+
 
 ### Fix bug in ELMO calculation of PMF_OC, PMF_NCOM   
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency  
