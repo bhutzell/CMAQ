@@ -12,7 +12,7 @@
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1305](https://github.com/USEPA/CMAQ_Dev/commit/32cd44f4046eb704504a012cdae32de04f04e1d8) | [PR#1305](https://github.com/USEPA/CMAQ_Dev/pull/1305)  |
+|[Merge for PR#1305](https://github.com/USEPA/CMAQ/commit/32cd44f4046eb704504a012cdae32de04f04e1d8) | [PR#1305](https://github.com/USEPA/CMAQ_Dev/pull/1305)  |
 
 ### Erroneous mass attribution  
 [Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
