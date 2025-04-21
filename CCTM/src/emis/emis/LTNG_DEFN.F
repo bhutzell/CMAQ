@@ -229,12 +229,27 @@
                    WsflIdx = 1
                ELSE
                    WsflIdx = INDEX1("WLNsfl", LT_VARS, LT_NAME)
+                   IF ( WsflIdx .EQ. 0 ) THEN
+                      XMSG = "The variable name WLNsfl doesn't
+     &                             exist in the input lightning data" 
+                      CALL M3EXIT( 'Online Lightning NO', 1, 1, XMSG, XSTAT1 )
+                   ENDIF
                ENDIF
              ELSE IF (LNO_OPTION == 2) THEN
                   GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
+                  IF ( GflIdx .EQ. 0 ) THEN
+                      XMSG = "The variable name GLMfl doesn't
+     &                             exist in the input lightning data" 
+                      CALL M3EXIT( 'Online Lightning NO', 1, 1, XMSG, XSTAT1 )
+                  ENDIF
              ELSE IF (LNO_OPTION == 3) THEN
                   GegIdx = INDEX1("GLMeng", LT_VARS, LT_NAME)
                   GflIdx = INDEX1("GLMfl", LT_VARS, LT_NAME)
+                  IF ( (GflIdx .EQ. 0) .or. (GegIdx .EQ. 0)) THEN
+                     XMSG = "The variable nameis GLMfl and/or GLMeng don't
+     &                       exist in the input lightning data file" 
+                     CALL M3EXIT( 'Online Lightning NO', 1, 1, XMSG, XSTAT1 )
+                  ENDIF
                   IF (sum(LTNG_DATA4D(:,:,1,:,GflIdx)) > 0) then
                      BetaF2E = sum(LTNG_DATA4D(:,:,1,:,GegIdx))/(sum(LTNG_DATA4D(:,:,1,:,GflIdx))*SQUAREKM)
                      BetaF2E = MOLSNCG/BetaF2E                 !moles N per flash energy of GLM
@@ -248,6 +263,14 @@
                   WegIdx = INDEX1("WLNeng", LT_VARS, LT_NAME)
                   WsflIdx = INDEX1("WLNsfl", LT_VARS, LT_NAME)
                   WsegIdx = INDEX1("WLNseng", LT_VARS, LT_NAME)
+                  IF ( (GflIdx .EQ. 0) .or. (GegIdx .EQ. 0) .or. (wflIdx .EQ.  0)
+     &               .or. (WegIdx .EQ. 0) .or. (WsflIdx .EQ. 0) .or.  (WsflIdx .EQ. 0)
+     &               .or. (WsegIdx .EQ. 0)) THEN
+                     XMSG = "One or more of the variable names: GLMfl,
+     &                      GLMeng, WLNfl, WLNeng, WLNsfl, and WLNseng are missing from the 
+     &                      the input lightning data file" 
+                     CALL M3EXIT( 'Online Lightning NO', 1, 1, XMSG, XSTAT1 )
+                  ENDIF
                   WLNgZlen = COUNT(LTNG_DATA4D(:,:,1,:,WflIdx) > 0)  ! gZ: greater than zero
                   ALLOCATE(gZWLNeng(WLNgZlen),gZWLNseng(WLNgZlen), gZWLNfl(WLNgZlen))
                   ALLOCATE(gZWLNsfl(WLNgZlen), EngPfl(WLNgZlen), sEngPfl(WLNgZlen))
