@@ -5,13 +5,12 @@
 **Type of update**: Science Update  
 **Release Version/Date**: CMAQv6.0  
 
-**Description**: CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version builds on the previous CMAQv5.4 release of CRACMM2. With the release of CRACMM3, CRACMM1 versions have been deprecated and removed from CMAQv6.0. CRACMM2 remains functional in CMAQv6.0. CRACMM3 is available in 3 versions: a base CRACMM3, CRACMM3HAPs, and CRACMM3M. All three versions share the same core chemistry while two versions have expanded capabilities for specific applications. CRACMM3HAPs includes additional hazardous air pollutants and follows strategies similar to previous versions of CMAQ where several species are added external to the radical budget. Specifically, additional HAPs beyond the base HAPs included in CRACMM3 are included in the "nonreactive" (NR) namelist or included in the aerosol namelist as tracers. The additional HAPs undergo transport, removal, and chemical decay, if applicable. CRACMM3 for marine environments (CRACMM3M) includes additional halogen reactions for environments (not limited to marine) where that chemistry is important. In base CRACMM3, the halogen chemistry is represented by one parameterized reaction as in CRACMM1 but with updated parameters. See the individual release notes for more information.
+**Description**:  
+CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version builds on the previous CMAQv5.4 release of CRACMM2. With the release of CRACMM3, CRACMM1 versions have been deprecated and removed from CMAQv6.0. CRACMM2 remains functional in CMAQv6.0. CRACMM3 is available in 3 versions: a base CRACMM3, CRACMM3HAPs, and CRACMM3M. All three versions share the same core chemistry while two versions have expanded capabilities for specific applications. CRACMM3HAPs includes additional hazardous air pollutants and follows strategies similar to previous versions of CMAQ where several species are added external to the radical budget. Specifically, additional HAPs beyond the base HAPs included in CRACMM3 are included in the "nonreactive" (NR) namelist or included in the aerosol namelist as tracers. The additional HAPs undergo transport, removal, and chemical decay, if applicable. CRACMM3 for marine environments (CRACMM3M) includes additional halogen reactions for environments (not limited to marine) where that chemistry is important. In base CRACMM3, the halogen chemistry is represented by one parameterized reaction as in CRACMM1 but with updated parameters. See the individual release notes for more information.
  
 
-**Significance and Impact**:  CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enable a wider range of applications of CRACMM.
- 
-**References**:  N/A
-
+**Significance and Impact**:   
+CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enable a wider range of applications of CRACMM.
 
 ### Halogen chemistry in CRACCM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
@@ -34,11 +33,9 @@ Update in MGEMIS.F increases ozone and reduces sulfate over low latitude areas d
 Item #4: Updates in cb6r5_ae7_aq:  
 Update in MGEMIS.F has minimum impacts on ozone and sulfate over the contiguous US.
 
-**References**:   None
-
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1212](https://github.com/USEPA/CMAQ_Dev/commit/8d512cc361675212430b579adc766c010309bdd1) | [PR#1212](https://github.com/USEPA/CMAQ_Dev/pull/1212)  |
+|[Merge for PR#1212](https://github.com/USEPA/CMAQ/commit/8d512cc361675212430b579adc766c010309bdd1) | [PR#1212](https://github.com/USEPA/CMAQ_Dev/pull/1212)  |
 
 ### Photolysis of aerosol nitrate in CRACCM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
@@ -74,7 +71,22 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1214](https://github.com/USEPA/CMAQ_Dev/commit/f807233e2354b0d270aba2b2207393ddacb4a1af) | [PR#1214](https://github.com/USEPA/CMAQ_Dev/pull/1214)  |
+|[Merge for PR#1214](https://github.com/USEPA/CMAQ/commit/f807233e2354b0d270aba2b2207393ddacb4a1af) | [PR#1214](https://github.com/USEPA/CMAQ_Dev/pull/1214)  |
+
+### Adding chlorine chemistry in CRACMM3 
+[Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
+**Type of update**: Science Update    
+**Release Version/Date**:  CMAQv6.0  
+
+**Description**:    
+This pull request adds chlorine chemistry to CRACMM3 as it does not contain any gas-phase chlorine chemistry. Chlorine chemistry in CRACMM3 is added from CRACMM3M which contains detailed chlorine chemistry. However, CRACMM3M contains more than 200 reactions with additional chemical species which substantially increases CMAQ computational time. To minimize the computational demand, organic chlorine chemistry was reduced by using VOC reactivity. VOC reactivity for each organic reaction was calculated by multiplying individual VOC concentration in January (12-km CONUS domain) with corresponding rate constant of the VOC and chlorine reaction. Five organic reactions contributed 78.5% of the total VOC reactivity; thus, these five organic reactions (reactions of CH4, ETH, HC3, HC5 and HC10 with Cl radical) and their corresponding peroxy radical reactions (reactions of ClO with MO2, ETHP, HC3P, HC5P, and HC10P) are retained in the reduced chlorine chemistry while all other organic reactions are removed. All inorganic and selective heterogeneous chlorine reactions from CARCMM3M are retained in CRACMM3. Chlorine chemistry in CRACMM3 includes the heterogeneous ClNO2 production and contains 61 reactions. A new Euler Backward Iterative (EBI) solver is developed for CRACMM3 containing chlorine chemistry. It increases computational time by ~6%.
+
+**Significance and Impact**:   
+Chlorine chemistry increases nitryl chloride (ClNO2) in winter which subsequently moderately increases ozone (O3) and secondary organic mass (SOM). It decreases aerosol nitrate concentration; consequently, its impacts on total fine particles (ATOTIJ) are mixed – it increases ATOTIJ in some areas while decreasing in other areas. Its impacts on ClNO2 are smaller in warmer months than those in winter due to lower N2O5 concentration. Subsequently, the impacts of chlorine chemistry on O3, SOM, and ATOTIJ in warmer months are also smaller than those in winter.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1252](https://github.com/USEPA/CMAQ/commit/686bde3e7b2a335d8769b8ff14368d068ba95583) | [PR#1252](https://github.com/USEPA/CMAQ_Dev/pull/1252)  |
 
 ### Photolysis of aerosol nitrate in CRACMM3  
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency    
@@ -101,7 +113,52 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1185](https://github.com/USEPA/CMAQ_Dev/commit/189dc7f9b7e60b87efe76f5ff9af53088c2b469a) | [PR#1185](https://github.com/USEPA/CMAQ_Dev/pull/1185)  |
+|[Merge for PR#1185](https://github.com/USEPA/CMAQ/commit/189dc7f9b7e60b87efe76f5ff9af53088c2b469a) | [PR#1185](https://github.com/USEPA/CMAQ_Dev/pull/1185)  |
+
+### Photolysis update in CRACMM3 and CRACMM3M
+
+**Primary Contact**: [Golam Sarwar](mailto:sarwar.golam@epa.gov) Atmospheric & Environmental Systems Modeling Division, U.S. EPA  
+**Secondary Contact**: [Bill Hutzell](mailto:Hutzell.Bill@epa.gov), Atmospheric & Environmental Systems Modeling Division, U.S. EPA  
+**Type of update**: Science Update  
+**Release Version/Date**:  CMAQv6.0  
+
+**Description**:   
+CRACMM3 include multiple photolytic reactions. Many of these photolytic reactions were retained from RACM2 which was developed more than 10 years ago. Photolysis frequencies are calculated using absorption cross-sections and quantum yields. Some of the absorption cross-sections and quantum yields data in CRACMM3 are out of date. Here, absorption cross-sections and quantum yields are updated for several chemical species. In addition, two new photolytic reactions of PPN are added. 
+
+Photolytic reactions of MVK (methyl vinyl ketone), GLY (glyoxal), PAN1 (peroxyacetyl nitrate), ONIT (organic nitrate) are not updated but their photolysis frequencies are updated. For MVK and GLY, absorption cross-section and quantum yield data are taken from the NASA JPL-19 (Burkholder et al., 2019). Photolysis frequencies of PAN1 are updated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al. (2008). For ONIT, NASA JPL-19 provides more recent data than Calvert et al. (2008) who gives data for more organic nitrate compounds. The used cross-section is an average between these organic nitrate compounds. Quantum yields from the NASA JPL-19 are used. CRACMM3 includes two terpene nitrate species (TRPN and HONIT) which currently use photolysis data for ONIT. A recent study by Wang et al. (2023) provides absorption cross-section and average quantum yield data for three terpene nitrates. Data for α-pinene nitrate from the article are now used for TRPN and HONIT.
+
+In CRACMM3, photolysis of BALD (benzaldehyde), only proceeds with one pathway:
+<R027> BALD  = BEN  + CO                        # 1.0/<BALD_RACM2>;
+
+The process is updated to include 2 different pathways as follows:
+<R027a> BALD  = BEN  + CO                        # 1.0/<BALD1_CALVERT11>;
+<R027b> BALD  = BENP + CO + HO2          # 1.0/<BALD2_CALVERT11>;
+
+The photolysis frequencies of BALD are also updated to use absorption cross-section and quantum yield data from Calvert et al. (2011).
+
+CRACMM3 does not include any photolytic reaction for PPN (peroxypropionyl nitrate). Two photolytic reactions of PPN are added. Photolysis frequencies are calculated using absorption cross-section from the NASA JPL-19 and quantum yield data from the Calvert et al.(2008).
+<R033a> PPN = RCO3      + NO2          # 1.0/<PPN1_JPL19>;
+<R033b> PPN = HC3P      + NO3          # 1.0/<PPN2_JPL19>;
+
+In addition, the update includes temperature effects on the cross-section for PAN and PPN following the NASA JPL-19, density effects on quantum yield for MVK following the NASA JPL-19, and temperature and density effects on quantum yield for GLY following Salter et al. (2013a and 2013b).
+
+Since additional reactions are included in CRACMM3, a new EBI solver is also generated and tested for the updated mechanism. Similar updates are also completed in CRACMM3M, and a new EBI solver is also generated and tested for the updated mechanism.
+
+**Significance and Impact**:    
+Several photolytic reactions are updated to support CRACMM3 development and implementation. Cross-sections and quantum yields data, and temperature and density effects on quantum yield are added. The updates have small impacts on mean ozone (<±0.1 ppbv) and ATOTIJ (<0.1 microgram/m3).
+
+**References**:    
+1.	Calvert, J.G., R.G Derwent, J.J. Orlando, G.S. Tyndall and T.J Wallington, Mechanisms of Atmospheric Oxidation of the Alkanes, Oxford, 2008.
+2.	Calvert, J.G., A. Mellouki, J.J, Orlando, M.J. Pilling and T.J. Wallington, Mechanisms of Atmospheric Oxidation of the Oxygenates, Oxford, 2011.
+3.	J.B. Burkholder, S.P. Sander, J. Abbatt, J.R. Barker, C. Cappa, J.D. Crounse, T.S. Dibble, R.E. Huie, C.E. Kolb, M.J. Kurylo, V.L. Orkin, C.J. Percival, D.M. Wilmouth and P.H. Wine, Chemical Kinetics and Photochemical Data for Use in Atmospheric Studies, Evaluation No. 19, JPL Publication 19-5, Jet Propulsion Laboratory, Pasadena, 2019. http://jpldataeval.jpl.nasa.gov/.
+4.	Salter, R. J., Blitz, M. A., Heard, D. E., Kovacs, T., Pilling, M. J., Rickard, A. R. and Seakins, P. W., Phys. Chem. Chem. Phys., 15, 4984, 2013a.
+5.	Salter, R. J., Blitz, M. A., Heard, D. E., Pilling, M. J., Rickard, A. R. and Seakins, P. W., Phys. Chem. Chem. Phys., 15, 6516, 2013b.
+6.	Wang, Y., Takeuchi, M., Wang, S., Nizkorodov, S.A., France, S., Eris, G., and Ng, N.L.,  2023. Photolysis of Gas-Phase Atmospherically Relevant Monoterpene-Derived Organic Nitrates, J. Phys. Chem. A 2023, 127, 987−999.  
+
+  
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1275](https://github.com/USEPA/CMAQ/commit/56d21d2efa4f3a8221c470b345e4be97af4dc7b5) | [PR#1275](https://github.com/USEPA/CMAQ_Dev/pull/1275)  |
 
 ### Updating the condensed halogen chemistry and renaming of "INO2" to "ISONP"  
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency    
@@ -119,12 +176,12 @@ Sarwar, G., Gantt, B., Schwede, D., Foley, K., Mathur, R., Saiz-Lopez, A: Impact
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1183](https://github.com/USEPA/CMAQ_Dev/commit/0353213dc5b72c961735cba164aca67e859d8231) | [PR#1183](https://github.com/USEPA/CMAQ_Dev/pull/1183)  |
+|[Merge for PR#1183](https://github.com/USEPA/CMAQ/commit/0353213dc5b72c961735cba164aca67e859d8231) | [PR#1183](https://github.com/USEPA/CMAQ_Dev/pull/1183)  |
 
 ### Consistent treatment of styrene and ethylbenzene across CMAQ   
 [Nash Skipper](mailto:skipper.nash@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update   
-**Release Version/Date**:   
+**Release Version/Date**:  CMAQv6.0 
 
 **Description**:   
 The representation of the chemistry of styrene and ethylbenzene in CRACMM3 has been updated to be consistent with the treatment of styrene and ethylbenzene in the CMAQ reactive tracer module. This allows for CRACMM styrene and ethylbenzene species to be used directly in modeling of air toxics without the need for styrene and ethylbenzene reactive tracers. Reactions of styrene with ozone and the nitrate radical have been added in CRACMM3 with chemistry based on the Master Chemical Mechanism. These are minor channels compared to reaction with OH (which was previously added in CRACMM2), but they are being added to ensure consistent treatment of styrene in CRACMM and the CMAQ reactive tracer module. The reaction rate constant of styrene+OH has also been updated to use a value from an experimental study. For ethylbenzene, a reaction with NO3 has been added, and there has been a small change in the rate constant for reaction with OH.
@@ -141,7 +198,7 @@ Styrene concentrations are reduced, primarily due to additional losses through r
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1153](https://github.com/USEPA/CMAQ_Dev/commit/c89b9afe89e86875b8cfcdc4af3f0a83b8db0762) | [PR#1153](https://github.com/USEPA/CMAQ_Dev/pull/1153)  |
+|[Merge for PR#1153](https://github.com/USEPA/CMAQ/commit/c89b9afe89e86875b8cfcdc4af3f0a83b8db0762) | [PR#1153](https://github.com/USEPA/CMAQ_Dev/pull/1153)  |
 
 
 
@@ -163,7 +220,7 @@ Errors in conservation of nitrogen for select reactions ported from RACM2 into C
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1205](https://github.com/USEPA/CMAQ_Dev/commit/a0f806bd2666d217ff25c4a2b3b04d2347c1d607) | [PR#1205](https://github.com/USEPA/CMAQ_Dev/pull/1205)  |
+|[Merge for PR#1205](https://github.com/USEPA/CMAQ/commit/a0f806bd2666d217ff25c4a2b3b04d2347c1d607) | [PR#1205](https://github.com/USEPA/CMAQ_Dev/pull/1205)  |
 
 
 
@@ -180,16 +237,23 @@ This file provides information on CRACMM updates at the reaction level. This fil
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-|[Merge for PR#1258](https://github.com/USEPA/CMAQ_Dev/commit/e9aeb46561f7c4e7f497ed65617e4ea53ce2f25b) | [PR#1258](https://github.com/USEPA/CMAQ_Dev/pull/1258)  |
+|[Merge for PR#1258](https://github.com/USEPA/CMAQ/commit/e9aeb46561f7c4e7f497ed65617e4ea53ce2f25b) | [PR#1258](https://github.com/USEPA/CMAQ_Dev/pull/1258)  |
 
 
 ### Delete obsolete chemical mechanisms
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Maintenance   
-**Release Version/Date**: CMAQv6.0    
-**Description**:  This PR deletes obsolete chemical mechanisms, including cracmm1_aq, cracmm1amore_aq, cb6r3_ae7_aq, racm2_ae6_aq, and saprc07tic_ae7i_aqkmt2. The CHEMMECH, CREATE_EBI, and INLINE_PHOT_PREPROC utilities have been rerun for each of the remaining chemical mechanisms to ensure internal consistency.  
-**Significance and Impact**: When a new version of a chemical mechanism is developed, the CMAQ team generally retains an older version of that mechanism for at least one release cycle. This is done both to ease maintenance and testing and to reduce confusion on the part of users.  
-**Internal PRs**: [PR#1196](https://github.com/USEPA/CMAQ_Dev/pull/1196)  
+**Release Version/Date**: CMAQv6.0  
+
+**Description**:  
+This PR deletes obsolete chemical mechanisms, including cracmm1_aq, cracmm1amore_aq, cb6r3_ae7_aq, racm2_ae6_aq, and saprc07tic_ae7i_aqkmt2. The CHEMMECH, CREATE_EBI, and INLINE_PHOT_PREPROC utilities have been rerun for each of the remaining chemical mechanisms to ensure internal consistency.  
+**Significance and Impact**:   
+When a new version of a chemical mechanism is developed, the CMAQ team generally retains an older version of that mechanism for at least one release cycle. This is done both to ease maintenance and testing and to reduce confusion on the part of users.  
+
+**Internal PRs**: 
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1196](https://github.com/USEPA/CMAQ/commit/efb14057514a4ffc9d97f1d2a0e75369ed8ff0a2) | [PR#1196](https://github.com/USEPA/CMAQ_Dev/pull/1196)  |
 
 
 
