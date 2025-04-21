@@ -21,15 +21,17 @@ No, CMAQv6.0beta is not intended as a replacement for CMAQv5.5.
 CMAQv6.0beta includes many scientific enhancements and new features that we are making available for testing, evaluation, and demonstration purposes. See the CMAQ Release Notes for a complete description of each change.   
 
 #### Instrumented Models (CMAQ-ISAM, CMAQ-DDM3D)
-* CMAQv6.0beta introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as well several improvements that target CMAQ-ISAM robustness for all chemical mechanisms.
+* CMAQv6.0beta introduces CMAQ-ISAM compatibility with CRACMM2, CRACMM3, & CRACMM3M as well several improvements that target CMAQ-ISAM robustness for all chemical mechanisms. Please see the [ISAM release notes](../Release_Notes/CMAQ-Release-Notes%3A-Instrumented-Models%3A-CMAQ-ISAM.md).
   
-* CMAQv6.0beta fixes DDM3D instability in sensitivity fields after hetereogenous chemistry due to inconsistent unit conversions. 
+* CMAQv6.0beta fixes DDM3D instability in sensitivity fields after hetereogenous chemistry due to inconsistent unit conversions. Please see the [DDM3D release note](../Release_Notes/CMAQ-Release-Notes:-Instrumented-Models:-CMAQ-DDM3D.md).
 
 #### On-line coupling of CMAQ with meteorological models
-* CMAQv6.0beta introduces the unified coupler to couple WRF-CMAQ and MPAS-CMAQ in a consistent "one-code" framework. Previously, the WRF-CMAQ implementation was built using [I/O API buffered](https://www.cmascenter.org/ioapi/documentation/all_versions/html/BUFFERED.html#buf) files to transfer data from the two models during runtime. Users should note to implement such a system, a number of infrastructure changes were made. 
+* CMAQv6.0beta introduces the unified coupler to couple WRF-CMAQ and MPAS-CMAQ in a consistent "one-code" framework. Previously, the WRF-CMAQ implementation was built using [I/O API buffered](https://www.cmascenter.org/ioapi/documentation/all_versions/html/BUFFERED.html#buf) files to transfer data from the two models during runtime. Users should note to implement such a system, a number of infrastructure changes were made. See the [WRF-CMAQ release note](../Release_Notes/CMAQ-Release-Notes:-WRF-CMAQ-Coupled-Model.md#wrf-cmaq-coupled-model).
 
 #### Chemistry
-* CMAQv6.0beta introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates are primarily intended to improve the representation of gas-phase and aerosol chemistry in marine environments. If you are interested in learning more, please see the [CRACMM3 release note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3).
+* CMAQv6.0beta introduces CRACMM version 3. CRACMM3 includes several updates to CRACMM2. These updates are primarily intended to improve the representation of gas-phase and aerosol chemistry in marine environments. In addition to the base CRACMM3 mechanism,  CMAQv6.0beta includes CRACMM3M, with extended marine chemistry, and CRACMM3HAPS which includes additional gas chemistry for additional Hazardous Air Pollutants.  If you are interested in learning more, please see the [CRACMM3 release notes](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Community-Regional-Atmospheric-Chemistry-Multiphase-Mechanism-(CRACMM).md#updated-mechanism-cracmm3).
+
+* A bug fix to the cb6r5hap_ae7_aq mechanism corrects a severe underestimation of the model species styrene, a hazardous air pollutant. No other model species are impacted. See the [release note](../Release_Notes/CMAQ-Release-Notes:-Chemistry:-Carbon-Bond-6-Mechanism-(CB6)-with-Hazardous-Air-Pollutants.md#correct-loss-of-reactive-tracer-styrene-from-ozone-reaction) for additional information.
   
 * CMAQv6.0beta no longer supports the following mechanisms: CB6R3_AE7_AQ, CRACMM1_AQ, CRACMM1AMORE_AQ, RACM2_AE6_AQ, and SAPRC07TIC_AE7i_AQKMT2. Users that are interested in using these mechanisms will need to downgrade their CMAQ version. 
   
