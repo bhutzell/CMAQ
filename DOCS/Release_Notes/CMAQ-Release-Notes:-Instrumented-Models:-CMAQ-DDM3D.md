@@ -1,14 +1,14 @@
 # Decoupled Direct Method in Three Dimensions (CMAQ-DDM-3D)
 
 ### DDM-3D control file character limit increase
-[Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Functionality expansion  
-**Release Version/Date**: CMAQv6.0 
+[Sergey L. Napelenok](mailto:napelenok.sergey@epa.gov), U.S. Environmental Protection Agency      
+**Type of update**: Functionality expansion    
+**Release Version/Date**: CMAQv6.0   
   
-**Description**:  
-As applications of DDM-3D become more complex in scope, users have come up against the hard-coded limit of how long the SPECIES, EMIS streams, and REGIONS specification strings can be in the DDM-3D control file.  This PR increase the size to 1024 characters.  
+**Description**:    
+As applications of DDM-3D become more complex in scope, users have come up against the hard-coded limit of how long the SPECIES, EMIS streams, and REGIONS specification strings can be in the DDM-3D control file.  This update increases the size to 1024 characters.  
 
-|Merge Commit | Internal record|
+|Merge Commit | Internal record|  
 |:------:|:-------:|
 |[Merge for PR#1140](https://github.com/USEPA/CMAQ/commit/6a74de4e3849cfee94213476f9007a221601eac4) | [PR#1140](https://github.com/USEPA/CMAQ_Dev/pull/1140)  |
 
@@ -17,9 +17,13 @@ As applications of DDM-3D become more complex in scope, users have come up again
 ### CMAQ-HDDM-3D Second Order Sensitivity Fix  
 [Sergey L. Napelenok](mailto:contact.email@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug Fix  
-**Release Version/Date**: CMAQv5.5    
-**Description**: A bug made its way into the chemistry routines that calculated 2nd order sensitivities (HDDM-3D) resulting in erroneous output for these parameters. Additionally, there are some runtime errors in the log files associated with writing out deposition sensitivity output. Finally, dry deposition sensitivities were not written out correctly.  
-**Significance and Impact**: Second order sensitivities will now provide correct output and the log files will no longer display error messages about deposition sensitivities. Sensitivity of dry depositions will now output correctly past the 1st parameter.  
+**Release Version/Date**: CMAQv5.5   
+
+**Description**:   
+A bug made its way into the chemistry routines that calculated 2nd order sensitivities (HDDM-3D) resulting in erroneous output for these parameters. Additionally, there are some runtime errors in the log files associated with writing out deposition sensitivity output. Finally, dry deposition sensitivities were not written out correctly.  
+
+**Significance and Impact**:   
+Second order sensitivities will now provide correct output and the log files will no longer display error messages about deposition sensitivities. Sensitivity of dry depositions will now output correctly past the 1st parameter.  
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
