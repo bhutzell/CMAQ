@@ -73,6 +73,24 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 |:------:|:-------:|
 |[Merge for PR#1214](https://github.com/USEPA/CMAQ/commit/f807233e2354b0d270aba2b2207393ddacb4a1af) | [PR#1214](https://github.com/USEPA/CMAQ_Dev/pull/1214)  |
 
+
+### Add CRACMM3HAPS Chemical mechanism
+[William T. Hutzll](mailto:hutzell.bill@epa.gov)], U.S. Environmental Protection Agency    
+**Type of update**: Science Update, Documentation, New Feature  
+**Release Version/Date**: CMAQ version 6.0   
+
+**Description**:   
+The update adds a new mechanism (cracmm3haps) that extends the cracmm3 mechanism for gas chemistry. The extension allows CCTM simulations using cracmm3 species and reactions that includes Hazardous Air Pollutants (HAPs) as in the cb6r5hap_ae7_aq mechanism for gas chemistry. The new mechanism has one more HAP than cb6r5hap_ae7_aq. The model species simulates the transport and fate of hydrogen cyanide (HCN) emissions. The chemical destruction of HCN is simulated using the reactive tracer module in CCTM so has no impact on the results from cracmm3. Like cb6r5hap_ae7_aq, cracmm3haps should give the same predictions of criteria air pollutant as cracmm3. Also, cracmm3haps has species that track emissions of formaldehyde, acetaldehyde, and acrolein. Unlike cb6r5hap_ae7_aq, cracmm3haps only tracks emission of elemental gaseous mercury, oxidized gaseous mercury and particulate mercury as nonreactive tracer of emissions. As a result, the mechanism does not have secondary production of oxidized and particulate mercury. The main goal of cracmm3 supports risk assessments to human health from air emissions and secondary production of HAPs such as EPA's AirToxScreen studies.
+
+**Significance and Impact**:   
+The update supports risk assessments to human health from air emissions and secondary production of HAPs such as EPA's AirToxScreen studies. It provides an option to using the cb6r5hap_ae7_aq mechanism whose core chemistry is less in sync than the current state of science for atmospheric chemistry.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1279](https://github.com/USEPA/CMAQ/commit/d8707a4fa10a8f23ad6b99453fbcf1bdb9df51dd) | [PR#1279](https://github.com/USEPA/CMAQ_Dev/pull/1279)  |
+
+
+
 ### Adding chlorine chemistry in CRACMM3 
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update    
@@ -118,7 +136,7 @@ Sarwar, G., Henderson, B.H., Hogrefe, C., Mathur, R., Gilliam, R., Callaghan, A.
 ### Photolysis update in CRACMM3 and CRACMM3M
 
 **Primary Contact**: [Golam Sarwar](mailto:sarwar.golam@epa.gov) Atmospheric & Environmental Systems Modeling Division, U.S. EPA  
-**Secondary Contact**: [Bill Hutzell](mailto:Hutzell.Bill@epa.gov), Atmospheric & Environmental Systems Modeling Division, U.S. EPA  
+**Secondary Contact**: [William T. Hutzell](mailto:Hutzell.Bill@epa.gov), Atmospheric & Environmental Systems Modeling Division, U.S. EPA  
 **Type of update**: Science Update  
 **Release Version/Date**:  CMAQv6.0  
 
