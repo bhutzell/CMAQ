@@ -470,7 +470,7 @@ C Local Variables:
 
 #ifdef isam
          INTEGER                    :: IDX, SPC, LAYER, RGN, IRGN
-         CHARACTER(96)              :: TXTSTRING
+         CHARACTER(1024)            :: TXTSTRING
          REAL                       :: MINCHECK, TOTAL
 #endif
 C-----------------------------------------------------------------------
