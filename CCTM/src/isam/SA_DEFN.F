@@ -81,12 +81,12 @@ c...Define Allocatable Apportionment Arrays
 
 c...Variables regarding the tag list
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: TAGNAME( : )
-      CHARACTER( 96 )                    :: TAGCLASSES = ' '
-      CHARACTER( 96 ), ALLOCATABLE, SAVE :: TAGSTREAMS_TEMP( : )
+      CHARACTER( 256 )                    :: TAGCLASSES = ' '
+      CHARACTER( 1024 ), ALLOCATABLE, SAVE :: TAGSTREAMS_TEMP( : )
       CHARACTER( 96 ), ALLOCATABLE, SAVE :: TAGSTREAMS( :, : )
       INTEGER, ALLOCATABLE, SAVE         :: TAGSTREAMS_NUM( : )
 
-      CHARACTER( 96 ), ALLOCATABLE, SAVE :: ISAMRGN_TEMP( : )
+      CHARACTER( 1024 ), ALLOCATABLE, SAVE :: ISAMRGN_TEMP( : )
       CHARACTER( 96 ), ALLOCATABLE, SAVE :: ISAMRGN( :, : )
       INTEGER, ALLOCATABLE, SAVE         :: ISAMRGN_NUM( : )
       INTEGER, ALLOCATABLE, SAVE         :: ISAMRGN_MAP( :, : )
@@ -201,7 +201,7 @@ C external functions
 
         INTEGER, INTENT( OUT ) :: NTAGS
         INTEGER ILINE
-        CHARACTER( 180 ) :: TXTLINE
+        CHARACTER( 1024 ) :: TXTLINE
         
 C-----------------------------------------------------------
         CALL NAMEVAL( 'SA_IOLIST', EQNAME )
@@ -270,7 +270,7 @@ C external functions
 
         INTEGER ILINE
         INTEGER ITAG, TAGLOOP
-        CHARACTER( 128 ) :: TXTLINE
+        CHARACTER( 1024 ) :: TXTLINE
 
 C...multi-sectors-for-a-single-tag 20130702
         INTEGER ISGSTK
