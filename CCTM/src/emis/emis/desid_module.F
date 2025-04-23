@@ -1368,7 +1368,12 @@ C-----------------------------------------------------------------------
            ILAY = ALOC( 1 )
            ICOL = ALOC( 2 )
            IROW = ALOC( 3 )
+#ifdef parallel
            CALL GET_GLOBAL_COORDS( ICOL, IROW, JCOL, JROW )
+#else
+           JCOL = ICOL
+           JROW = IROW
+#endif
 
            WRITE( LOGDEV, '(/,5x,A,/,5x,A,A,A,A/,5x,A,ES10.3,A,A,/,5x,A1,I3,A1,I3,A1,I2,A2)' ),
      &       'ERROR: At least one invalid negative emission rate has been ',
