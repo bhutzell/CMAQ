@@ -667,11 +667,12 @@ c----------------------------------------------------------
      &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP '/ )
        
         !CRACMM3
-        ALLOCATE( ISAM_SPEC_NO3( 6 )%LIST( 29 ) )
+        ALLOCATE( ISAM_SPEC_NO3( 6 )%LIST( 32 ) )
         ISAM_SPEC_NO3( 6 )%LIST = (/   'HNO3 ','NO   ','NO2  ','NO3  ','HONO ',
      &         'N2O5 ','PAN  ','HNO4 ','ONIT ','MPAN ','PPN  ','ISON ','TRPN ',
      &         'INALD','ACO3 ','MO2  ','HC3P ','HC5P ','HC10P','KETP ','ISOP ',
-     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP ','ANO3I','ANO3J'/ )
+     &         'ETHP ','RCO3 ','XYLP ','TR2  ','BENP ','ETEP ','ANO3I','ANO3J'
+     &         'CLNO ','CLNO2', 'CLNO3'/ )
  
         !CRACMM3M
         ALLOCATE( ISAM_SPEC_NO3( 7 )%LIST( 38 ) )
@@ -839,14 +840,15 @@ c----------------------------------------------------------
      &                             'PAH_176E3','PAH_192E3','PAH_101E2','PAH_176E2',
      &                             'PAH_114E1'/)   
 
-       ALLOCATE( ISAM_SPEC_TOXICS%LIST( 30 ) )
-       ISAM_SPEC_TOXICS%LIST( 1:30 ) = (/'ACRY_NITRILE','CARBONTET   ','PROPYL_DICL ',
+       ALLOCATE( ISAM_SPEC_TOXICS%LIST( 34 ) )
+       ISAM_SPEC_TOXICS%LIST( 1:34 ) = (/'ACRY_NITRILE','CARBONTET   ','PROPYL_DICL ',
      &     'DICL_PROPENE','CL4_ETHANE  ','CHCL3       ','BR2_C2_12   ','CL2_C2_12   ',
      &     'ETOX        ','ACET_NITRILE','XYLENE      ','STYRENE     ','ACRYACID    ',
      &     'HEXANE      ','METHCHLORIDE','CARBSULFIDE ','CHLOROPRENE ','ETHYLBENZENE',
      &     'HEXMETH_DIS ','HYDRAZINE   ','MAL_ANHYDRID','CL_ETHE     ','NAPHTHALENE ',
      &     'QUINOLINE   ','TOL_DIIS    ','TRIETHYLAMIN','DICL_BENZENE','CL2_ME      ',
-     &     'CL4_ETHE    ','CL3_ETHE    '/)
+     &     'CL4_ETHE    ','CL3_ETHE    ','HCHO_PRIM   ','ACD_PRIM    ','ACRO_PRIM   ',
+     &     'HCN         '/)
 
 
         ALLOCATE( ISAM_SPEC_MERCURY%LIST( 4 ) )

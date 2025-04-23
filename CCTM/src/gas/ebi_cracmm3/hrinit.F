@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Mar 14, 2025
+C  REVISION HISTORY: Created by EBI solver program, Mar 24, 2025
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -138,7 +138,7 @@ C***********************************************************************
 
 c..Allocate and define ebi species
 
-      N_EBISP  = 179
+      N_EBISP  = 195
       ALLOCATE( EBISP( N_EBISP ), STAT = IOS ) 
       IF ( IOS .NE. 0 ) THEN
          MSG = 'Error allocating EBISP' 
@@ -170,94 +170,94 @@ c..Allocate and define ebi species
       EBISP(  23 ) = DCB1
       EBISP(  24 ) = DCB2
       EBISP(  25 ) = BALD
-      EBISP(  26 ) = CHO
-      EBISP(  27 ) = OP1
-      EBISP(  28 ) = OP2
-      EBISP(  29 ) = OPB
-      EBISP(  30 ) = OP3
-      EBISP(  31 ) = PAA
-      EBISP(  32 ) = ONIT
-      EBISP(  33 ) = TRPN
-      EBISP(  34 ) = HONIT
-      EBISP(  35 ) = SO2
-      EBISP(  36 ) = SULF
-      EBISP(  37 ) = SULRXN
-      EBISP(  38 ) = ETH
-      EBISP(  39 ) = HC3
-      EBISP(  40 ) = HC3P
-      EBISP(  41 ) = ASOATJ
-      EBISP(  42 ) = HC5
-      EBISP(  43 ) = HC5P
-      EBISP(  44 ) = ETE
-      EBISP(  45 ) = ETEP
-      EBISP(  46 ) = OLT
-      EBISP(  47 ) = OLTP
-      EBISP(  48 ) = OLI
-      EBISP(  49 ) = OLIP
-      EBISP(  50 ) = ACE
-      EBISP(  51 ) = ORA1
-      EBISP(  52 ) = BEN
-      EBISP(  53 ) = BENP
-      EBISP(  54 ) = PHEN
-      EBISP(  55 ) = TOL
-      EBISP(  56 ) = TOLP
-      EBISP(  57 ) = CSL
-      EBISP(  58 ) = XYL
-      EBISP(  59 ) = XYLP
-      EBISP(  60 ) = EBZ
-      EBISP(  61 ) = EBZP
-      EBISP(  62 ) = ISO
-      EBISP(  63 ) = ISON
-      EBISP(  64 ) = ISONP
-      EBISP(  65 ) = ISOP
-      EBISP(  66 ) = ISHP
-      EBISP(  67 ) = IEPOX
-      EBISP(  68 ) = IPX
-      EBISP(  69 ) = INALD
-      EBISP(  70 ) = ROH
-      EBISP(  71 ) = API
-      EBISP(  72 ) = APIP1
-      EBISP(  73 ) = APIP2
-      EBISP(  74 ) = LIM
-      EBISP(  75 ) = LIMP1
-      EBISP(  76 ) = LIMP2
-      EBISP(  77 ) = PINALP
-      EBISP(  78 ) = RCO3
-      EBISP(  79 ) = LIMALP
-      EBISP(  80 ) = ACTP
-      EBISP(  81 ) = MEKP
-      EBISP(  82 ) = KETP
-      EBISP(  83 ) = MCP
-      EBISP(  84 ) = MVKP
-      EBISP(  85 ) = UALP
-      EBISP(  86 ) = DCB3
-      EBISP(  87 ) = BALP
-      EBISP(  88 ) = ADDC
-      EBISP(  89 ) = MCT
-      EBISP(  90 ) = MCTO
-      EBISP(  91 ) = MOH
-      EBISP(  92 ) = EOH
-      EBISP(  93 ) = ETEG
-      EBISP(  94 ) = MAHP
-      EBISP(  95 ) = ORA2
-      EBISP(  96 ) = ORAP
-      EBISP(  97 ) = PPN
-      EBISP(  98 ) = MPAN
-      EBISP(  99 ) = MCTP
-      EBISP( 100 ) = OLNN
-      EBISP( 101 ) = OLND
-      EBISP( 102 ) = APINP1
-      EBISP( 103 ) = APINP2
-      EBISP( 104 ) = LIMNP1
-      EBISP( 105 ) = LIMNP2
-      EBISP( 106 ) = ADCN
-      EBISP( 107 ) = HOM
-      EBISP( 108 ) = VROCP4OXY2
-      EBISP( 109 ) = VROCN1OXY6
-      EBISP( 110 ) = FURANONE
-      EBISP( 111 ) = VROCP3OXY2
-      EBISP( 112 ) = VROCP0OXY4
-      EBISP( 113 ) = BAL1
+      EBISP(  26 ) = BEN
+      EBISP(  27 ) = BAL1
+      EBISP(  28 ) = OP1
+      EBISP(  29 ) = OP2
+      EBISP(  30 ) = OPB
+      EBISP(  31 ) = OP3
+      EBISP(  32 ) = PAA
+      EBISP(  33 ) = ONIT
+      EBISP(  34 ) = PPN
+      EBISP(  35 ) = RCO3
+      EBISP(  36 ) = HC3P
+      EBISP(  37 ) = TRPN
+      EBISP(  38 ) = HONIT
+      EBISP(  39 ) = SO2
+      EBISP(  40 ) = SULF
+      EBISP(  41 ) = SULRXN
+      EBISP(  42 ) = ETH
+      EBISP(  43 ) = HC3
+      EBISP(  44 ) = ASOATJ
+      EBISP(  45 ) = HC5
+      EBISP(  46 ) = HC5P
+      EBISP(  47 ) = ETE
+      EBISP(  48 ) = ETEP
+      EBISP(  49 ) = OLT
+      EBISP(  50 ) = OLTP
+      EBISP(  51 ) = OLI
+      EBISP(  52 ) = OLIP
+      EBISP(  53 ) = ACE
+      EBISP(  54 ) = ORA1
+      EBISP(  55 ) = BENP
+      EBISP(  56 ) = PHEN
+      EBISP(  57 ) = TOL
+      EBISP(  58 ) = TOLP
+      EBISP(  59 ) = CSL
+      EBISP(  60 ) = XYL
+      EBISP(  61 ) = XYLP
+      EBISP(  62 ) = EBZ
+      EBISP(  63 ) = EBZP
+      EBISP(  64 ) = ISO
+      EBISP(  65 ) = ISON
+      EBISP(  66 ) = ISONP
+      EBISP(  67 ) = ISOP
+      EBISP(  68 ) = ISHP
+      EBISP(  69 ) = IEPOX
+      EBISP(  70 ) = IPX
+      EBISP(  71 ) = INALD
+      EBISP(  72 ) = ROH
+      EBISP(  73 ) = API
+      EBISP(  74 ) = APIP1
+      EBISP(  75 ) = APIP2
+      EBISP(  76 ) = LIM
+      EBISP(  77 ) = LIMP1
+      EBISP(  78 ) = LIMP2
+      EBISP(  79 ) = PINALP
+      EBISP(  80 ) = LIMALP
+      EBISP(  81 ) = ACTP
+      EBISP(  82 ) = MEKP
+      EBISP(  83 ) = KETP
+      EBISP(  84 ) = MCP
+      EBISP(  85 ) = MVKP
+      EBISP(  86 ) = UALP
+      EBISP(  87 ) = DCB3
+      EBISP(  88 ) = BALP
+      EBISP(  89 ) = ADDC
+      EBISP(  90 ) = CHO
+      EBISP(  91 ) = MCT
+      EBISP(  92 ) = MCTO
+      EBISP(  93 ) = MOH
+      EBISP(  94 ) = EOH
+      EBISP(  95 ) = ETEG
+      EBISP(  96 ) = MAHP
+      EBISP(  97 ) = ORA2
+      EBISP(  98 ) = ORAP
+      EBISP(  99 ) = MPAN
+      EBISP( 100 ) = MCTP
+      EBISP( 101 ) = OLNN
+      EBISP( 102 ) = OLND
+      EBISP( 103 ) = APINP1
+      EBISP( 104 ) = APINP2
+      EBISP( 105 ) = LIMNP1
+      EBISP( 106 ) = LIMNP2
+      EBISP( 107 ) = ADCN
+      EBISP( 108 ) = HOM
+      EBISP( 109 ) = VROCP4OXY2
+      EBISP( 110 ) = VROCN1OXY6
+      EBISP( 111 ) = FURANONE
+      EBISP( 112 ) = VROCP3OXY2
+      EBISP( 113 ) = VROCP0OXY4
       EBISP( 114 ) = BAL2
       EBISP( 115 ) = ELHOM
       EBISP( 116 ) = VROCIOXY
@@ -324,6 +324,22 @@ c..Allocate and define ebi species
       EBISP( 177 ) = CO2
       EBISP( 178 ) = ANO3I
       EBISP( 179 ) = ANO3J
+      EBISP( 180 ) = CL2
+      EBISP( 181 ) = CL
+      EBISP( 182 ) = CLO
+      EBISP( 183 ) = OCLO
+      EBISP( 184 ) = CL2O2
+      EBISP( 185 ) = CLOO
+      EBISP( 186 ) = HOCL
+      EBISP( 187 ) = CLNO
+      EBISP( 188 ) = CLNO2
+      EBISP( 189 ) = CLNO3
+      EBISP( 190 ) = HCL
+      EBISP( 191 ) = NO2PIJ
+      EBISP( 192 ) = NO2PK
+      EBISP( 193 ) = ACLI
+      EBISP( 194 ) = ACLJ
+      EBISP( 195 ) = ACLK
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -365,7 +381,8 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( DCB1        ) = 5.0D-04
       RTOL( DCB2        ) = 5.0D-04
       RTOL( BALD        ) = 5.0D-04
-      RTOL( CHO         ) = 5.0D-04
+      RTOL( BEN         ) = 5.0D-04
+      RTOL( BAL1        ) = 5.0D-04
       RTOL( OP1         ) = 5.0D-04
       RTOL( OP2         ) = 5.0D-04
       RTOL( OPB         ) = 5.0D-04
@@ -373,6 +390,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( PAA         ) = 5.0D-04
       RTOL( ONIT        ) = 5.0D-04
       RTOL( PAN         ) = 5.0D-04
+      RTOL( PPN         ) = 5.0D-04
+      RTOL( RCO3        ) = 5.0D-04
+      RTOL( HC3P        ) = 5.0D-04
       RTOL( TRPN        ) = 5.0D-04
       RTOL( HONIT       ) = 5.0D-04
       RTOL( N2O5        ) = 5.0D-04
@@ -381,7 +401,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( SULRXN      ) = 1.0D+00
       RTOL( ETH         ) = 5.0D-04
       RTOL( HC3         ) = 5.0D-04
-      RTOL( HC3P        ) = 5.0D-04
       RTOL( ASOATJ      ) = 5.0D-04
       RTOL( HC5         ) = 5.0D-04
       RTOL( HC5P        ) = 5.0D-04
@@ -393,7 +412,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( OLIP        ) = 5.0D-04
       RTOL( ACE         ) = 5.0D-04
       RTOL( ORA1        ) = 5.0D-04
-      RTOL( BEN         ) = 5.0D-04
       RTOL( BENP        ) = 5.0D-04
       RTOL( PHEN        ) = 5.0D-04
       RTOL( TOL         ) = 5.0D-04
@@ -419,7 +437,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( LIMP1       ) = 5.0D-04
       RTOL( LIMP2       ) = 5.0D-04
       RTOL( PINALP      ) = 5.0D-04
-      RTOL( RCO3        ) = 5.0D-04
       RTOL( LIMALP      ) = 5.0D-04
       RTOL( ACTP        ) = 5.0D-04
       RTOL( MEKP        ) = 5.0D-04
@@ -430,6 +447,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( DCB3        ) = 5.0D-04
       RTOL( BALP        ) = 5.0D-04
       RTOL( ADDC        ) = 5.0D-04
+      RTOL( CHO         ) = 5.0D-04
       RTOL( MCT         ) = 5.0D-04
       RTOL( MCTO        ) = 5.0D-04
       RTOL( MOH         ) = 5.0D-04
@@ -438,7 +456,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( MAHP        ) = 5.0D-04
       RTOL( ORA2        ) = 5.0D-04
       RTOL( ORAP        ) = 5.0D-04
-      RTOL( PPN         ) = 5.0D-04
       RTOL( MPAN        ) = 5.0D-04
       RTOL( MCTP        ) = 5.0D-04
       RTOL( OLNN        ) = 5.0D-04
@@ -454,7 +471,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( FURANONE    ) = 5.0D-04
       RTOL( VROCP3OXY2  ) = 5.0D-04
       RTOL( VROCP0OXY4  ) = 5.0D-04
-      RTOL( BAL1        ) = 5.0D-04
       RTOL( BAL2        ) = 5.0D-04
       RTOL( ELHOM       ) = 5.0D-04
       RTOL( VROCIOXY    ) = 5.0D-04
@@ -521,6 +537,22 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       RTOL( CO2         ) = 5.0D-04
       RTOL( ANO3I       ) = 5.0D-04
       RTOL( ANO3J       ) = 5.0D-04
+      RTOL( CL2         ) = 5.0D-04
+      RTOL( CL          ) = 5.0D-04
+      RTOL( CLO         ) = 5.0D-04
+      RTOL( OCLO        ) = 5.0D-04
+      RTOL( CL2O2       ) = 5.0D-04
+      RTOL( CLOO        ) = 5.0D-04
+      RTOL( HOCL        ) = 5.0D-04
+      RTOL( CLNO        ) = 5.0D-04
+      RTOL( CLNO2       ) = 5.0D-04
+      RTOL( CLNO3       ) = 5.0D-04
+      RTOL( HCL         ) = 5.0D-04
+      RTOL( NO2PIJ      ) = 5.0D-04
+      RTOL( NO2PK       ) = 5.0D-04
+      RTOL( ACLI        ) = 5.0D-04
+      RTOL( ACLJ        ) = 5.0D-04
+      RTOL( ACLK        ) = 5.0D-04
 
 
       RETURN
