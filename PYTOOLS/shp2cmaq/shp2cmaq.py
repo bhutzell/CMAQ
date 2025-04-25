@@ -12,6 +12,7 @@ shp2cmaq : function
     Converts a shapefile to a CMAQ-ready mask file using area overlap
 
 Updates:
+- v1.1 : Updated to fix time-independence and update unit attribute to units
 - v1.0 : Barron H. Henderson converted code to a script.
 
 
@@ -47,7 +48,7 @@ import os
 import string
 
 
-__version__ = '1.0'
+__version__ = '1.1.0'
 
 
 def shp2cmaq(
