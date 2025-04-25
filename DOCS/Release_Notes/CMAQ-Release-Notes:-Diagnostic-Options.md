@@ -11,7 +11,7 @@ The update modifies how the ELMO obtains an indicator whether the ozone producti
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1302](https://github.com/USEPA/CMAQ/commit/32211aeb9ea27845118aa10d362f80aa8e1f4f15) | [PR#1302](https://github.com/USEPA/CMAQ_Dev/pull/1302)  | 
-|[Merge for PR#1302](https://github.com/USEPA/CMAQ/commit/32211aeb9ea27845118aa10d362f80aa8e1f4f15) | [PR#1302](https://github.com/USEPA/CMAQ_Dev/pull/1302)  | 
+| Merge for PR#1329 | [PR#1329](https://github.com/USEPA/CMAQ_Dev/pull/1329)  | 
 
 
 ## Remove Uninitialized Variable in Column Model
