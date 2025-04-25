@@ -1,18 +1,24 @@
 # PYTOOLS
+
 ## shp2cmaq script fix
 [Barron Henderson](mailto:henderson.barron@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Bug fix  
 **Release Version/Date**: CMAQv6.0
  
-**Description**:  
-The shp2cmaq.py script was designed to work either as a module or as a script, but the script part was not operational.
+**Description**:
+
+There are two updates here:
+1. The shp2cmaq.py script was designed to work either as a module or as a script, but the script part was not operational.
+2. @gongkangjia noted that the TFLAG should be 0. This update modifies the output TFLAG and SDATE to use 0 instead of 1970001. This provides better compatibility as a time-independent file. For more details, see Set the year and date in shp2cmaq to 0 CMAQ#244.
 
 **Significance and Impact**:   
-Now impact on model results - strictly ease of use.
+The first update has no impact on model results - strictly ease of use.
+The second update will change the usability of an input from the pre-processor, but does not change the output of CMAQ.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1209](https://github.com/USEPA/CMAQ/commit/daea281e470fc1de06ed5fb2306bae06f3a47fa2) | [PR#1209](https://github.com/USEPA/CMAQ_Dev/pull/1209)  | 
+|[Merge for PR#1330]() | [PR#1330](https://github.com/USEPA/CMAQ_Dev/pull/1330)  | 
 
 
 
