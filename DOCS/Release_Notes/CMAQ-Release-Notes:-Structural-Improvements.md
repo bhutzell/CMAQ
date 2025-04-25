@@ -12,7 +12,7 @@ The update removes a CCTM compile error from the desid_module.F file when the bu
 
 |Merge Commit | Pull Request |
 |:------:|:-------:|
-| Merge for PR#1331 |  [PR#1154](https://github.com/USEPA/CMAQ_Dev/pull/1331) |
+| Merge for PR#1331 |  [PR#1331](https://github.com/USEPA/CMAQ_Dev/pull/1331) |
 
 ### GNU build flag update to enable compilation with GNU versions 10+
 [Fahim Sidi](mailto:sidi.fahim@epa.gov), U.S. Environmental Protection Agency    
