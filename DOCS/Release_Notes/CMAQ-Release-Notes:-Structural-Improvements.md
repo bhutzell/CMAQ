@@ -6,13 +6,13 @@
 **Release Version**:  v6.0
 
 **Description**:
-The update removes a CCTM compil error from the desid_module.F when the build script compiles a serial version. The error are lines getting a gridcell's column and row number in the simulation domain. The method only works for parallel version because it uses a PARIO routine. The fix inserts a ifdef-else block to consider parallel and non-parallel cases.
+The update removes a CCTM compile error from the desid_module.F file when the build script compiles a serial version. The error comes from lines getting a grid cell's column and row number in the simulation domain. The method only works for parallel version because it uses a PARIO routine. The fix inserts a ifdef-else block to consider parallel and non-parallel cases.
 
-**Significance and Impact**: Th update allows compiling a serial version of CCTM.
+**Significance and Impact**: The update allows compiling a serial version of CCTM which can be useful in diagnosing CCTM bugs or errors.
 
 |Merge Commit | Pull Request |
 |:------:|:-------:|
-| [Merge for PR#1154](https://github.com/USEPA/CMAQ_Dev/commit/c31983b72a3049d708138da3f57227875333eb39) |  [PR#1154](https://github.com/USEPA/CMAQ_Dev/pull/1154) |
+| Merge for PR#1331 |  [PR#1154](https://github.com/USEPA/CMAQ_Dev/pull/1331) |
 
 ### GNU build flag update to enable compilation with GNU versions 10+
 [Fahim Sidi](mailto:sidi.fahim@epa.gov), U.S. Environmental Protection Agency    
