@@ -45,6 +45,7 @@ C**********************************************************************
       USE PA_IRR_MODULE
 #ifdef isam
       USE SA_IRR_DEFN
+#endif
 #ifdef sens
       USE DDM3D_CHEM, ONLY: YCDDM
       USE CGRID_SPCS, ONLY: GC_SPC
