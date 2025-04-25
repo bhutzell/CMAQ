@@ -12,7 +12,7 @@ These changes address an issue in the aerosol/gas partitioning calculations for 
 
 **Significance and Impact**:   
 
-The changes to the source apportionment routines in the aerosol and cloud module address the erroneous contribution issue for the scenarios identified by the users. No impact on base model concentration and deposition fields are expected and observed. The apportionment fields are mode more stable and with less erroneous attributions cropping put in the domain geographically distant from tracked sources.
+The changes to the source apportionment routines in the aerosol and cloud module address the erroneous contribution issue for the scenarios identified by the users. No impact on base model concentration and deposition fields are expected and observed. The apportionment fields are more stable and show less erroneous attributions cropping up in the domain geographically distant from tracked sources.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
