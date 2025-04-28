@@ -1490,7 +1490,7 @@ REACTIONS[CM] =
 <HET_CLN3_WAJ> CLNO3 = HOCL + HNO3 # 1.0~<HETERO_CLN3_WAJ>;
 <HET_CLN3_ACLJ> CLNO3 + ACLJ = CL2 + ANO3J # 1.0~<HETERO_CLN3_ACLJ>;
 
-! heterogeneous oxidation of SO2 in ALW
+! heterogeneous reaction of SO2 in ALW
 <HET_SO2_H2O2> SO2 + H2O2 = ASO4J           # 1.0~<HETERO_SO2H>;
 <HET_SO2_O3>   SO2 + O3 = ASO4J             # 1.0~<HETERO_SO2O>;
 <HET_SO2_MEPX> SO2 + OP1 = ASO4J           # 1.0~<HETERO_SO2M>;

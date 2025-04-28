@@ -2142,6 +2142,19 @@ REACTIONS[CM] =
 <HET_ANO3I> ANO3I = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
 <HET_ANO3J> ANO3J = 0.670*HONO + 0.330*NO2 # 1.0~<HETERO_ANO3>;
 
+! heterogeneous reaction of SO2 in ALW
+<HET_SO2_H2O2> SO2 + H2O2 = ASO4J           # 1.0~<HETERO_SO2H>;
+<HET_SO2_O3>   SO2 + O3 = ASO4J             # 1.0~<HETERO_SO2O>;
+<HET_SO2_MEPX> SO2 + OP1 = ASO4J           # 1.0~<HETERO_SO2M>;
+<HET_SO2_PACD> SO2 + PAA = ASO4J           # 1.0~<HETERO_SO2P>;
+<HET_SO2_NO2>  SO2 + NO2 = ASO4J + HONO     # 1.0~<HETERO_SO2N>;
+
+<HET_SO2_TMI>  SO2 + AFEJ + AMNJ = ASO4J + AFEJ + AMNJ   # 1.0~<HETERO_SO2T>;
+<HET_SO2_HCHO>  SO2 + HCHO = AHMSJ                       # 1.0~<HETERO_HMSP>;
+<HET_SO2_HNO4>  SO2 + HNO4 = ASO4J + ANO3J                # 1.0~<HETERO_HNO4>;
+<HET_HMS_L1>  AHMSJ + HO = HO2 + SO2 + ORA1              # 1.0~<HETERO_HMSL1>;
+<HET_HMS_L2>  AHMSJ = SO2 + HCHO                         # 1.0~<HETERO_HMSL2>; 
+
 END MECH
 
 CONSTANTS
