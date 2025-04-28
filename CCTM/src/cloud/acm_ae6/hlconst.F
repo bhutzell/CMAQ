@@ -43,7 +43,7 @@ C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
 
 C...........PARAMETERS and their descriptions:
 
-         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 281     ! Number of substances
+         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 282     ! Number of substances
 
          PRIVATE 
 
@@ -209,7 +209,6 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(120), A(120), E(120) / '124TRIMETH_BENZE', 1.50E-01, 4.3E+03 /  ! Hanson et al. (1995)
       DATA SUBNAME(121), A(121), E(121) / 'CHLOROACETALDEHY', 4.18E+01, 0.0E+00 /  ! Bond Estimate by EPA SUITE PROGRAM  (2007)
       DATA SUBNAME(122), A(122), E(122) / 'CHLOROACETONE   ', 3.82E-01, 0.0E+00 /  ! Staudinger and Roberts (2001)
-
       DATA SUBNAME(123), A(123), E(123) / 'NITROSYL_CHLORID', 4.96E-02, 0.0E+00 /  ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(124), A(124), E(124) / 'NITRYL_CHLORIDE ', 2.43E-02, 0.0E+00 /  ! Behnke et al. (1997), JGR, D102, 3795-3804
       DATA SUBNAME(125), A(125), E(125) / 'HEXYL_HYDROPEROX', 1.23E+01, 0.0E+00 /  ! Bond Estimated by EPA SUITE PROGRAM  (2007)
@@ -261,7 +260,6 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(168), A(168), E(168) / 'I2O4            ', 1.00E+04, 0.0E+00 /   ! Saiz-Lopez et al., ACPD, 2014
       DATA SUBNAME(169), A(169), E(169) / 'HI              ', 2.50E+01, 9.8E+03 /   ! Ordóñez et al. (2012) (https://www.henrys-law.org/henry)  
       DATA SUBNAME(170), A(170), E(170) / 'HOI             ', 4.10E+02, 4.0E+03 /   ! 2002 CB7r1 report (CAMx); Sander, ACP, 2015 (page 4415) 
-
       DATA SUBNAME(171), A(171), E(171) / 'INO             ', 5.00E-02, 0.0E+00 /   ! Same as ClNO which is from ROLF SANDERS COMPILATION (1999)/Scheer et al. (1997)
       DATA SUBNAME(172), A(172), E(172) / 'INO2            ', 3.34E-01, 0.0E+00 /   ! Badia et al. (2019) (https://www.henrys-law.org/henry)     
       DATA SUBNAME(173), A(173), E(173) / 'INO3            ', 1.00E+06, 0.0E+00 /   ! Same as BRNO3; BRNO3 from Sander (2015)  
@@ -269,13 +267,11 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(175), A(175), E(175) / 'MIC             ', 9.22E-01, 4.1E+03 /   ! Moore et al. (1995) (https://www.henrys-law.org/henry)
       DATA SUBNAME(176), A(176), E(176) / 'MIB             ', 2.02E+00, 0.0E+00 /   ! Karagodin-Doyennel et al. (2021) (https://www.henrys-law.org/henry)
       DATA SUBNAME(177), A(177), E(177) / 'MI2             ', 2.33E+00, 5.3E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
-
       DATA SUBNAME(178), A(178), E(178) / 'BRO             ', 7.10E-01, 0.0E+00 /   ! Parrella et al. (2012)
       DATA SUBNAME(179), A(179), E(179) / 'HOBR            ', 1.82E+00, 4.0E+03 /   ! Mozurkewich (1995) (https://www.henrys-law.org/henry)
       DATA SUBNAME(180), A(180), E(180) / 'HBR             ', 6.89E+00, 0.0E+00 /   ! Hayer et al. (2022) (https://www.henrys-law.org/henry)
       DATA SUBNAME(181), A(181), E(181) / 'BR2             ', 7.29E-01, 4.4E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(182), A(182), E(182) / 'BRNO3           ', 1.00E+06, 0.0E+00 /   ! Sander (2015)
-
       DATA SUBNAME(183), A(183), E(183) / 'MB3             ', 1.72E+00, 5.2E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(184), A(184), E(184) / 'CH3BR           ', 1.50E-01, 0.0E+00 /   ! ROLF SANDERS COMPILATION (1999)/Yaws and Yang et al. (1992)
       DATA SUBNAME(185), A(185), E(185) / 'MB2             ', 9.12E-01, 4.3E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
@@ -285,7 +281,6 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(189), A(189), E(189) / 'BRNO2           ', 3.04E-01, 0.0E+00 /   ! Frenzel et al. (1998) (https://www.henrys-law.org/henry) 
       DATA SUBNAME(190), A(190), E(190) / 'BRCL            ', 9.80E-01, 5.6E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(191), A(191), E(191) / 'ICL             ', 1.10E+02, 2.1E+03 /   ! Sherwen et al., 2016
-
       DATA SUBNAME(192), A(192), E(192) / 'DMS             ', 4.80E-01, 3.1E+03 /   ! ROLF SANDERS COMPILATION (1999)/De Bryuyn et al. (1995)
       DATA SUBNAME(193), A(193), E(193) / 'MSA             ', 7.70E+04, 0.0E+00 /   ! Meylan and Howard (1991), inverse of the value is used due to unit conversion
       DATA SUBNAME(194), A(194), E(194) / 'XYLENE          ', 1.90E-01, 4.2E+03  / ! .35/.3/.35 m/o/p, Sander ACP 2015, Staudinger and Roberts (2001) for m; Fogg and Sangster (2003) for o and p
@@ -308,12 +303,10 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(211), A(211), E(211) / 'SVAVB3          ', 1.2E+07,  6.0E+03 /   ! est based on Hodzic 2014 GRL
       DATA SUBNAME(212), A(212), E(212) / 'SVAVB4          ', 1.8E+06,  6.0E+03 /   ! est based on Hodzic 2014 GRL
       DATA SUBNAME(213), A(213), E(213) / 'CLNO3           ', 1.00E+06, 0.0E+00 /   ! Sander (2015)
-
       DATA SUBNAME(214), A(214), E(214) / 'IBR             ', 2.43E+01, 4.9E+03 /   ! Sherwen et al., 2016
       DATA SUBNAME(215), A(215), E(215) / 'FMBR            ', 4.56E+01, 0.0E+00 /   ! Wang et al. (2017) (https://www.henrys-law.org/henry)
       DATA SUBNAME(216), A(216), E(216) / 'CLO             ', 7.40E-01, 0.0E+00 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(217), A(217), E(217) / 'BENAPY          ', 2.00E+03, 4.7E+03 /   ! benzo[a]pyrene Ma et al. (2010) and ten Hulscher et al. (1992) in  Sander et al., ACP, 2015
-
       DATA SUBNAME(218), A(218), E(218) / 'XYEOPERA        ', 1.27E-01, 4.0E+03 /   ! O-xylene T dep from Staudinger and Roberts 1996, CRACMM RepCmp (OPERA SAR)
       DATA SUBNAME(219), A(219), E(219) / 'ROCIOXYOPERA    ', 8.12E+00, 0.0E+00 /   ! emission wt. CRACMM value (OPERA SAR)
       DATA SUBNAME(220), A(220), E(220) / 'UALDOPERA       ', 44.0E+00, 0.0E+00 /   ! CRACMM RepCmp value (OPERA SAR)
@@ -374,11 +367,11 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(275), A(275), E(275) / 'XYLOPERA        ', 0.14E+00, 0.0E+00 /   ! CRACMM RepCmp value (OPERA SAR)
       DATA SUBNAME(276), A(276), E(276) / 'INALDOPERA      ', 1.00E+05, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
       DATA SUBNAME(277), A(277), E(277) / 'IPXOPERA        ', 1.55E+07, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
-
       DATA SUBNAME(278), A(278), E(278) / 'CLOO            ', 1.01E+00, 3.5E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(279), A(279), E(279) / 'CL2O2           ', 1.01E+00, 3.5E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(280), A(280), E(280) / 'OBRO            ', 1.01E+00, 3.5E+03 /   ! Using CLOO data
       DATA SUBNAME(281), A(281), E(281) / 'NITROSYL_BROMID ', 4.96E-02, 0.0E+00 /   ! Using NITROSYL_CHLROD data
+      DATA SUBNAME(282), A(282), E(282) / 'HYDROGEN_CYANIDE', 1.72E+02, 4.4E+03 /   ! Sander, R. ACP (2015)
 
       DATA B( MSO2   ), D( MSO2   ) / 1.30E-02,  1.96E+03 /  ! SO2*H2O<=>HSO3+H     : Smith and Martell (1976)
       DATA B( MHSO3  ), D( MHSO3  ) / 6.60E-08,  1.50E+03 /  ! HSO3<=>SO3+H         : Smith and Martell (1976)

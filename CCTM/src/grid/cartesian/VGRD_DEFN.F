@@ -91,11 +91,13 @@ C-----------------------------------------------------------------------
 
             IMPLICIT NONE
 
+            INCLUDE SUBST_FILES_ID
+
             LOGICAL :: SUCCESS
 
             LOGICAL, SAVE :: FIRSTIME = .TRUE.
             CHARACTER( 96 ) :: XMSG = ' '
-            CHARACTER( 16 ) :: LAYER_FILE = 'LAYER_FILE'
+            CHARACTER( 16 ) :: LAYER_FILE 
 
             INTEGER L, ALLOCSTAT
 
@@ -106,6 +108,8 @@ C This function is expected to be called only once - at startup
                SUCCESS = .TRUE.
 
 #ifndef mpas
+
+               LAYER_FILE = INIT_CONC_1
 
 C get vert layer definition from LAYER_FILE
                IF ( .NOT. OPEN3( LAYER_FILE, FSREAD3, 'VGRD_INIT' ) ) THEN
