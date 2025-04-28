@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Mar 14, 2025
+C  REVISION HISTORY: Created by EBI solver program, Apr  9, 2025
 C
 C***********************************************************************
       USE HRDATA
@@ -590,6 +590,16 @@ C..NOTE: RXRAT commented out are not referenced by any routine
       RXRAT(    534 ) = RKI(   534 ) * YC(  STYP ) * YC(  ACO3 )
       RXRAT(    535 ) = RKI(   535 ) * YC(  ANO3I )
       RXRAT(    536 ) = RKI(   536 ) * YC(  ANO3J )
+      RXRAT(    537 ) = RKI(   537 ) * YC(  SO2 ) * YC(  H2O2 )
+      RXRAT(    538 ) = RKI(   538 ) * YC(  SO2 ) * YC(  O3 )
+      RXRAT(    539 ) = RKI(   539 ) * YC(  SO2 ) * YC(  OP1 )
+      RXRAT(    540 ) = RKI(   540 ) * YC(  SO2 ) * YC(  PAA )
+      RXRAT(    541 ) = RKI(   541 ) * YC(  SO2 ) * YC(  NO2 )
+      RXRAT(    542 ) = RKI(   542 ) * YC(  SO2 ) * YC(  AFEJ ) * YC(  AMNJ )
+      RXRAT(    543 ) = RKI(   543 ) * YC(  SO2 ) * YC(  HCHO )
+      RXRAT(    544 ) = RKI(   544 ) * YC(  SO2 ) * YC(  HNO4 )
+      RXRAT(    545 ) = RKI(   545 ) * YC(  AHMSJ ) * YC(  HO )
+      RXRAT(    546 ) = RKI(   546 ) * YC(  AHMSJ )
 
 
       RETURN

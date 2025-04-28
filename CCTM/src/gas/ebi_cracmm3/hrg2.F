@@ -28,7 +28,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Mar 14, 2025
+C  REVISION HISTORY: Created by EBI solver program, Apr  9, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -189,6 +189,7 @@ c..Production of HO2 from OH ( r5,4 terms )
      &     +    1.6000D-01 * RKI(   490 ) * YC ( VROCP6ARO   )   ! HO+VROCP6ARO=...
      &     +    1.6000D-01 * RKI(   496 ) * YC ( VROCP5ARO   )   ! HO+VROCP5ARO=...
      &     +    1.6000D-01 * RKI(   502 ) * YC ( NAPH        )   ! HO+NAPH=0.1600D+...
+     &     +                 RKI(   545 ) * YC ( AHMSJ       )   ! HO+AHMSJ=HO2+SO2+...
 
       R5_4  = R5_4 * DTC
 
@@ -414,6 +415,7 @@ c..Remaining HONO production terms
       P19 =    5.0000D-01 * RXRAT(   425 )      ! NO2=0.5000D+00*HONO+...
      &    +    6.7000D-01 * RXRAT(   535 )      ! ANO3I=0.6700D+00*HONO+...
      &    +    6.7000D-01 * RXRAT(   536 )      ! ANO3J=0.6700D+00*HONO+...
+     &    +                 RXRAT(   541 )      ! SO2+NO2=HONO+ASO4J
 
       P19 = YC0( HONO ) + P19 * DTC
 
@@ -578,6 +580,7 @@ c..HONO loss terms not included in R4_19
 c..HNO4 loss terms not included in R5_21
       L21 =    2.0000D-01 * RKI(     9 )                        ! HNO4=0.8000D+...
      &    +                 RKI(    75 ) * YC ( HO          )   ! HNO4+HO=NO2
+     &    +                 RKI(   544 ) * YC ( SO2         )   ! HNO4+SO2=ASO4J+ANO3J
 
       L21   = 1.0D0 + L21 * DTC + R5_21
 

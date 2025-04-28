@@ -549,8 +549,18 @@ Information is based on the mech.def file.
 | ROCARO74   | STYP + NO3 ----> NO2 + HO2 + HCHO + BALD  |   2.3000E-12 |   2.3000E-12 |
 | ROCARO75   | STYP + MO2 ---->   1.3700\*HO2 +    1.6800\*HCHO + BALD +    0.3200\*MOH  |   2.5000E-13 |   2.5000E-13 |
 | ROCARO76   | STYP + ACO3 ----> HO2 + HCHO + BALD +    0.7000\*MO2 +    0.3000\*ORA2  |   2.5000E-13 |   2.5000E-13 |
-| HET_ANO3I   | ANO3I ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_IEPOX | Not Available<sup>2</sup> | 
-| HET_ANO3J   | ANO3J ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_IEPOX | Not Available<sup>2</sup> | 
+| HET_ANO3I   | ANO3I ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_ANO3 | Not Available<sup>2</sup> | 
+| HET_ANO3J   | ANO3J ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_ANO3 | Not Available<sup>2</sup> | 
+| HET_SO2_H2O2   | SO2 + H2O2 ----> ASO4J  | HETERO_SO2H | Not Available<sup>2</sup> | 
+| HET_SO2_O3   | SO2 + O3 ----> ASO4J  | HETERO_SO2O | Not Available<sup>2</sup> | 
+| HET_SO2_MEPX   | SO2 + OP1 ----> ASO4J  | HETERO_SO2M | Not Available<sup>2</sup> | 
+| HET_SO2_PACD   | SO2 + PAA ----> ASO4J  | HETERO_SO2P | Not Available<sup>2</sup> | 
+| HET_SO2_NO2   | SO2 + NO2 ----> ASO4J + HONO  | HETERO_SO2N | Not Available<sup>2</sup> | 
+| HET_SO2_TMI   | SO2 + AFEJ + AMNJ ----> ASO4J + AFEJ + AMNJ  | HETERO_SO2T | Not Available<sup>2</sup> | 
+| HET_SO2_HCHO   | SO2 + HCHO ----> AHMSJ  | HETERO_HMSP | Not Available<sup>2</sup> | 
+| HET_SO2_HNO4   | SO2 + HNO4 ----> ASO4J + ANO3J  | HETERO_HNO4 | Not Available<sup>2</sup> | 
+| HET_HMS_L1   | AHMSJ + HO ----> HO2 + SO2 + ORA1  | HETERO_HNO4 | Not Available<sup>2</sup> | 
+| HET_HMS_L2   | AHMSJ ----> SO2 + HCHO  | HETERO_HNO4 | Not Available<sup>2</sup> | 
 
 <sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     
 <sup>1</sup>Photolysis Reaction;depends on radiation and predicted concentrations     

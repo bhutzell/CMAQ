@@ -54,7 +54,7 @@ C-----------------------------------------------------------------------
 
       Implicit None
 
-      Integer, Parameter :: n_precursor = 24   ! # of precursors
+      Integer, Parameter :: n_precursor = 31   ! # of precursors
 
       Type precursor_type
          Character( 16 ) :: name               ! species name
@@ -69,6 +69,7 @@ C                       Name    RxnCounter  Update  Required
 C                    ---------   ---------- ------  ------
      & precursor_type( 'NO2    ', .False. , .True., .True.  ),
      & precursor_type( 'N2O5   ', .False. , .True., .True.  ),
+     & precursor_type( 'O3     ', .False. , .True., .False. ),
      & precursor_type( 'HNO3   ', .False. , .True., .True.  ),
      & precursor_type( 'HONO   ', .False. , .True., .True.  ),
      & precursor_type( 'ISOPRXN', .True.  , .True., .False. ),
@@ -90,8 +91,14 @@ C                    ---------   ---------- ------  ------
      & precursor_type( 'PAHNRXN', .True.  , .True., .False. ),
      & precursor_type( 'PAHHRXN', .True.  , .True., .False. ),
      & precursor_type( 'PCSOARXN',.True.  , .True., .False. ),
-     & precursor_type( 'PHGRXN ', .True.  , .True., .False. )/)
-
+     & precursor_type( 'PHGRXN ', .True.  , .True., .False. ),    
+     & precursor_type( 'H2O2   ', .False. , .True., .False. ),
+     & precursor_type( 'HCHO   ', .False. , .True., .False. ),
+     & precursor_type( 'HNO4   ', .False. , .True., .False. ),
+     & precursor_type( 'OP1    ', .False. , .True., .False. ),
+     & precursor_type( 'PAA    ', .False. , .True., .False. ),
+     & precursor_type( 'SO2    ', .False. , .True., .False. )/)
+     
 C Required species
       Character( 16 ), Private, Parameter :: req_NO2    = 'NO2'
       Character( 16 ), Private, Parameter :: req_N2O5   = 'N2O5'
@@ -103,6 +110,13 @@ C Required species
       Character( 16 ), Private, Parameter :: req_NH3    = 'NH3'
       Character( 16 ), Private, Parameter :: req_OH     = 'OH'
       Character( 16 ), Private, Parameter :: req_PHGRXN = 'PHGRXN'
+      Character( 16 ), Private, Parameter :: req_SO2    = 'SO2'
+      Character( 16 ), Private, Parameter :: req_H2O2   = 'H2O2'
+      Character( 16 ), Private, Parameter :: req_HCHO   = 'HCHO'
+      Character( 16 ), Private, Parameter :: req_HNO4   = 'HNO4'
+      Character( 16 ), Private, Parameter :: req_O3     = 'O3'
+      Character( 16 ), Private, Parameter :: req_OP1    = 'OP1'
+      Character( 16 ), Private, Parameter :: req_PAA    = 'PAA'
 
 C Indices of required species
       Integer :: NO2_idx
@@ -115,6 +129,13 @@ C Indices of required species
       Integer :: NH3_idx
       Integer :: OH_idx
       Integer :: PHGRXN_idx
+      Integer :: SO2_idx
+      Integer :: H2O2_idx
+      Integer :: HCHO_idx
+      Integer :: HNO4_idx
+      Integer :: O3_idx
+      Integer :: OP1_idx
+      Integer :: PAA_idx
 
       Real( 8 ) :: precursor_mw( n_precursor )   ! mol wt from cgrid_spcs [g/mol]
 
@@ -146,7 +167,7 @@ C SR  03/25/11 Replaced I/O API include files with UTILIO_DEFN
 C----------------------------------------------------------------------
 
       Use rxns_data, only:  mechname
-      Use aero_data, only: ae6hg, aphgj_idx
+      Use aero_data, only: ae6hg, aphgj_idx, hethms
       Use cgrid_spcs, only: n_gc_g2ae, gc_g2ae, gc_g2ae_map, gc_molwt, gc_strt,
      &                      n_nr_n2ae, nr_n2ae, nr_n2ae_map, nr_molwt, nr_strt
       Use utilio_defn, only: index1, xstat3, m3warn, m3exit
@@ -215,6 +236,71 @@ C Find indices of required species
          PHGRXN_idx = 0
 #endif
       end if
+      
+      If ( hethms ) Then 
+        SO2_idx    = findPrecursor( req_SO2,    .false.)
+        H2O2_idx   = findPrecursor( req_H2O2,   .false.)
+        HCHO_idx   = findPrecursor( req_HCHO,   .false.)
+        HNO4_idx   = findPrecursor( req_HNO4,   .false.)
+        O3_idx     = findPrecursor( req_O3,     .false.)
+        OP1_idx    = findPrecursor( req_OP1,    .false.)
+        PAA_idx    = findPrecursor( req_PAA,    .false.)
+	 	  
+         If(   precursor_map( SO2_idx ) .Lt. 1  )Then
+           xmsg = ' Gas Phase Precursor ' // Trim( req_SO2 )
+     &         // ' SO2 is not found -> is missing'
+           Call m3warn( 'map_precursor', 0, 0, xmsg )
+         End If 	 
+	 
+         If(   precursor_map( H2O2_idx ) .Lt. 1  )Then
+           xmsg = ' Gas Phase Precursor ' // Trim( req_H2O2 )
+     &         // ' H2O2 is not found -> is missing'
+           Call m3warn( 'map_precursor', 0, 0, xmsg )
+         End If 	 
+	 
+         If(   precursor_map( O3_idx ) .Lt. 1  )Then
+           xmsg = ' Gas Phase Precursor ' // Trim( req_O3 )
+     &         // ' O3 is not found -> is missing'
+           Call m3warn( 'map_precursor', 0, 0, xmsg )
+         End If 
+
+         If(   precursor_map( HCHO_idx ) .Lt. 1  )Then
+           xmsg = ' Gas Phase Precursor ' // Trim( req_HCHO )
+     &         // ' HCHO is not found -> is missing'
+           Call m3warn( 'map_precursor', 0, 0, xmsg )
+         End If 
+	   
+         If(   precursor_map( HNO4_idx ) .Lt. 1  )Then
+           xmsg = ' Gas Phase Precursor ' // Trim( req_HNO4 )
+     &         // ' HNO4 is not found -> is missing'
+           Call m3warn( 'map_precursor', 0, 0, xmsg )
+         End If 	   
+
+         If(   precursor_map( OP1_idx ) .Lt. 1  )Then
+           xmsg = ' Gas Phase Precursor ' // Trim( req_OP1 )
+     &         // ' OP1 is not found -> is missing'
+           Call m3warn( 'map_precursor', 0, 0, xmsg )
+          End If
+	  
+	  If(   precursor_map( PAA_idx ) .Lt. 1  )Then
+           xmsg = ' Gas Phase Precursor ' // Trim( req_PAA )
+     &         // ' PAA is not found -> is missing'
+           Call m3warn( 'map_precursor', 0, 0, xmsg )
+          End If
+
+#ifdef verbose_aero
+        Else 
+         xmsg = ' No heterogeneous sulfur chemistry in aerosol water.'
+         Call m3warn( 'map_precursor', 0, 0, xmsg )
+               SO2_idx = 0
+	       H2O2_idx = 0
+	       O3_idx = 0
+	       HCHO_idx = 0
+	       HNO4_idx = 0
+	       OP1_idx = 0
+	       PAA_idx = 0
+#endif
+      end if      
 
 #ifdef verbose_aero
       Write( logdev,'( /5x, a )' ) 'map_precursor required species'
@@ -227,6 +313,14 @@ C Find indices of required species
       Write( logdev,'( 5x, a, i4 )' ) 'HCL_idx:    ', HCL_idx
       Write( logdev,'( 5x, a, i4 )' ) 'NH3_idx:    ', NH3_idx
       Write( logdev,'( 5x, a, i4 )' ) 'OH_idx:     ', OH_idx
+      Write( logdev,'( 5x, a, i4 )' ) 'SO2_idx:    ', SO2_idx
+      Write( logdev,'( 5x, a, i4 )' ) 'H2O2_idx:   ', H2O2_idx
+      Write( logdev,'( 5x, a, i4 )' ) 'HCHO_idx:   ', HCHO_idx
+      Write( logdev,'( 5x, a, i4 )' ) 'HNO4_idx:   ', HNO4_idx
+      Write( logdev,'( 5x, a, i4 )' ) 'O3_idx:     ', O3_idx
+      Write( logdev,'( 5x, a, i4 )' ) 'OP1_idx:    ', OP1_idx
+      Write( logdev,'( 5x, a, i4 )' ) 'PAA_idx:    ', PAA_idx
+      
       if( aphgj_idx .gt. 0 )then
           Write( logdev,'( 5x, a, i4 )' ) 'PHGRXN_idx:     ', PHGRXN_idx
       end if

@@ -875,6 +875,10 @@ CMPST =
 'PMF_TC'      , 'Total Carbon (OC + EC)',
                 'ug m-3', 'FINE', 
                 'PMF_OC + PMF_EC',
+		
+'PMF_HMS'     , 'Fine-Mode Hydroxymethanesulfonate',
+                'ug m-3', 'FINE', 
+                'AHMS',	
 
 !-- Particle Composites Projected to Aerosol Mass Spectrometer --!
 'PMAMS_SO4'   , 'Sulfate Collected by the AMS',
@@ -897,6 +901,10 @@ CMPST =
 'PM1_SO4'     , 'PM1 Sulfate',
                 'ug m-3', 'PM1', 
                 'ASO4',
+		
+'PM1_HMS'     , 'PM1 Hydroxymethanesulfonate',
+                'ug m-3', 'PM1', 
+                'AHMS',		
 
 'PM1_NO3'     , 'PM1 Nitrate',
                 'ug m-3', 'PM1', 
@@ -960,7 +968,7 @@ CMPST =
 
 'PM1_OTHWNC'  , 'PM1 Unspeciated Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM1', 
-                'PM1 - ASO4 - ANO3 - ANH4 - ACL - ANA - AEC - PM1_OC - PM1_RCSOIL',
+                'PM1 - ASO4 - AHMS - ANO3 - ANH4 - ACL - ANA - AEC - PM1_OC - PM1_RCSOIL',
 
 'PM1_UNSPCRS' , 'PM1 Unspeciated Coarse-Mode Mass',
                 'ug m-3', 'PM1', 
@@ -974,6 +982,10 @@ CMPST =
 'PM25_SO4'    , 'PM2.5 Sulfate',
                 'ug m-3', 'PM25', 
                 'ASO4',
+		
+'PM25_HMS'    , 'PM2.5 Hydroxymehanesulfonate',
+                'ug m-3', 'PM25', 
+                'AHMS',		
 
 'PM25_NO3'    , 'PM2.5 Nitrate',
                 'ug m-3', 'PM25', 
@@ -1037,7 +1049,7 @@ CMPST =
 
 'PM25_OTHWNC'  ,'PM2.5 Unspeciated Coarse Mass for the IMPROVE Method',
                 'ug m-3', 'PM25', 
-                'PM25 - PM25_SO4 - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_OC - PM25_RCSOIL',
+                'PM25 - PM25_SO4 - PM25_HMS - PM25_NO3 - PM25_NH4 - PM25_CL - PM25_NA - PM25_EC - PM25_OC - PM25_RCSOIL',
 
 'PM25_UNSPCRS', 'PM2.5 Unspeciated Coarse Mass',
                 'ug m-3', 'PM25', 
@@ -1329,6 +1341,15 @@ CMPST =
 'WD_PMF_FE'   , 'Wet Dep of Fine-Mode Iron', 
                 'kg ha-1', 'DEP_FINE', 
                 'WD_AFE',
+		
+!-- HMS --!
+'DD_PMF_HMS'   , 'Dry Dep of Fine-Mode Hydroxymethanesulfonate', 
+                'kg ha-1', 'DEP_FINE', 
+                'DD_AHMS',
+
+'WD_PMF_HMS'   , 'Wet Dep of Fine-Mode Hydroxymethanesulfonate', 
+                'kg ha-1', 'DEP_FINE', 
+                'WD_AHMS',		
 
 !-- Aluminum --!
 'DD_PMF_AL'   , 'Dry Dep of Fine-Mode Aluminum', 
@@ -1455,7 +1476,7 @@ CMPST =
 !-- Total Sulfate --!
 'WD_SOX'      , 'Wet Dep of Total Sulfate', 
                 'kg ha-1', 'DEP', 
-                'WD_ASO4 + 1.5*WD_SO2',
+                'WD_ASO4 + 1.5*WD_SO2 + 0.864*WD_AHMS',
 
 !-- Total Chloride --!
 'WD_TCL'      , 'Wet Dep of Total Chloride',
@@ -1557,7 +1578,7 @@ CMPST =
 !-- Total Sulfur --!
 'DD_S_TOT'      , 'Dry Dep of Total Sulfur', 
                   'kgS ha-1', 'DEP', 
-                  '0.5*DD_SO2 + 0.33333*DD_ASO4',
+                  '0.5*DD_SO2 + 0.33333*DD_ASO4 + 0.288*DD_AHMS',
 
 'WD_S_TOT'      , 'Wet Dep of Total Sulfur', 
                   'kgS ha-1', 'DEP', 
