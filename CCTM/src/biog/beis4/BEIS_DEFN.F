@@ -71,6 +71,7 @@ C-----------------------------------------------------------------------
          USE RXNS_DATA, ONLY : MECHNAME
          USE UTILIO_DEFN
          USE CGRID_SPCS, ONLY : N_CGRID_SPC, CGRID_NAME, CGRID_MW
+         USE RUNTIME_VARS, only: USE_SAGE_N
 #ifdef mpas
          USE util_module, only : PROMPTFFILE, index1, str2real, sortic
 #else
@@ -669,13 +670,13 @@ C Initialize Biogenic Emission Array Variable
             CALL M3WARN ( PNAME, JDATE, JTIME, XMSG )
             SUCCESS = .FALSE.; RETURN
          END IF
-          
+         if( .NOT. USE_SAGE_N ) Then 
 C Initialize temporal non-speciated soil NO emissions
-         ALLOCATE( NOPOL( NCOLS,NROWS ), STAT=IOS )
-         CALL CHECKMEM( IOS, 'NOPOL', PNAME )
-         NOPOL(:,:) = 0.0
-         CALL HRNO( JDATE, JTIME, TSTEP, NOPOL, .FALSE. )
-
+            ALLOCATE( NOPOL( NCOLS,NROWS ), STAT=IOS )
+            CALL CHECKMEM( IOS, 'NOPOL', PNAME )
+            NOPOL(:,:) = 0.0
+            CALL HRNO( JDATE, JTIME, TSTEP, NOPOL, .FALSE. )
+         end if
          SUCCESS = .TRUE.
 
          RETURN

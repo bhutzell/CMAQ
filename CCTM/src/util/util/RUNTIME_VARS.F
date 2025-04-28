@@ -244,6 +244,8 @@
       INTEGER :: LT_ASM_DT     = 0       ! Lightning Input Time Interval
       LOGICAL :: NLDNSTRIKE    = .FALSE. ! flag to use NLDN STRIKE directly 
       LOGICAL :: LTNGDIAG      = .FALSE. ! flag to turn on lightning NO diagnostics
+      LOGICAL :: USE_SAGE_N    = .FALSE. ! flag to turn on SAGE biogenic soil NO and HONO emissions
+      LOGICAL :: USE_SAGE_N_EF = .FALSE. ! flag to use SAGE emission factor file
       REAL    :: MOLSNCG       = 350.0   ! Lightning NO Production Rate
       REAL    :: MOLSNIC       = 350.0   ! Lightning NO Production Rate
       CHARACTER(250) :: LTNG_FNAME = 'InLine' ! Lightning NO Input Name
@@ -844,6 +846,10 @@
       CALL GET_ENV(USE_MEGAN_LAI, 'USE_MEGAN_LAI',USE_MEGAN_LAI,VARDEV )
       CALL GET_ENV(MGN_ONLN_DEP, 'MGN_ONLN_DEP',MGN_ONLN_DEP,VARDEV )
       CALL GET_ENV(BDSNP_MEGAN, 'BDSNP_MEGAN',BDSNP_MEGAN,VARDEV )
+
+      ! SAGE biogenic soil N and HONO emissions        
+      CALL GET_ENV( USE_SAGE_N,    'USE_SAGE_N',    USE_SAGE_N,    VARDEV ) 
+      CALL GET_ENV( USE_SAGE_N_EF, 'USE_SAGE_N_EF', USE_SAGE_N_EF, VARDEV )
 
       ! Get the speciation profile to use
       CALL GET_ENV ( SPPRO, 'BIOG_SPRO', SPPRO, VARDEV )

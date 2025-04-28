@@ -128,9 +128,10 @@ C...include files
        
          Integer, Intent( In )  :: jdate
          Integer, Intent( In )  :: jtime
-         Real, Intent( In )  :: lufrac( :,:,: )    
+         Real, Intent( In )     :: lufrac( :,:,: )    
          Character( 240 )       :: xmsg = ' '
          Character(  16 ), save :: pname = 'Init_Mosaic'
+         Logical,          save :: INITIALIZED = .FALSE.
          Integer c,r,n,l,s
          Integer N_GAS_DEPV
          Integer gxoff, gyoff            ! global origin offset from file
@@ -139,8 +140,12 @@ C...include files
 C File variables:
          Real, Pointer    :: SOILCAT ( :,: )
 
-         Write(logdev,*) 'n_stage_lu : ', n_stage_lu
-         Write(logdev,*) 'Allocated Tile_data? : ', Allocated(Tile_Data%cat_lu)
+C--------------------------------------------------------------------------
+C Prevent initializing the code twice 
+         If ( INITIALIZED ) Return 
+         INITIALIZED = .TRUE.
+
+         CALL INIT_STAGE_LU( JDATE, JTIME )
 ! Allocate Tile Data
          ALLOCATE ( Tile_Data%cat_lu       ( n_stage_lu ),
      &              Tile_Data%name_lu      ( n_stage_lu ), 
@@ -180,9 +185,7 @@ C File variables:
                XMSG = 'Failure allocating layer 2 soil moisture'
                Call M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             End If
-         End If
-! 
-         CALL INIT_STAGE_LU( JDATE, JTIME )
+         End IF
 
 ! STAGE land use 
          Tile_Data%n_lufrac = n_stage_lu

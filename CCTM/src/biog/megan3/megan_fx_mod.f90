@@ -3131,7 +3131,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
 !*********************************************************************
 
       USE BDSNP_MOD
-      USE RUNTIME_VARS, ONLY: BDSNP_MEGAN
+      USE RUNTIME_VARS, ONLY: BDSNP_MEGAN,USE_SAGE_N
 
       IMPLICIT NONE
  
@@ -3182,7 +3182,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
                  CFNO = 0.0 ! INITIALIZE
                  CFNOG = 0.0 ! INITIALIZE
 
-         if (BDSNP_MEGAN) then
+         if (BDSNP_MEGAN .and. .Not. USE_SAGE_N) then
 
           call get_date(JYEAR, JDAY, MM, DD)
 
@@ -3190,7 +3190,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
                     L_DESID_DIAG,SOILM1,SOILT,SLTYP,LAIc,    &
                                             bdsnp_no)
 
-        else
+        else if(.Not. USE_SAGE_N) then
 
 
           CALL SOILNOX(IDATE,ITIME,NCOLS,NROWS,            &

@@ -82,6 +82,7 @@ C-----------------------------------------------------------------------
       USE centralized_io_module, only : AVGEMIS, interpolate_var
       Use ASX_DATA_MOD, only: MET_DATA
       USE MIO_ASCII
+      USE RUNTIME_VARS, only: USE_SAGE_N
 
 #ifdef mpas
       USE util_module, only : hhmmss, time2sec
@@ -149,10 +150,10 @@ C Other variables:
       CHARACTER(  16 ) :: VAR        ! variable name
       CHARACTER(  16 ) :: PNAME = 'GET_BEIS'   ! prodedure name
 
-#ifdef verbose_getbeis
+!#ifdef verbose_getbeis
       REAL,    ALLOCATABLE, SAVE :: EMISX( : )
       INTEGER, ALLOCATABLE, SAVE :: CX( : ), RX( : )
-#endif
+!#endif
 
       INTERFACE
          SUBROUTINE BEIS( JDATE, JTIME, NX, NY, MSPCS, SEMIS, BIPOL )
@@ -207,14 +208,14 @@ C Allocate memory for arrays
 
          LDATE = 0
 
-#ifdef verbose_getbeis
+!#ifdef verbose_getbeis
          ALLOCATE( EMISX( MSPCS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'EMISX', PNAME )
          ALLOCATE( CX( MSPCS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'CX', PNAME )
          ALLOCATE( RX( MSPCS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'RX', PNAME )
-#endif
+!#endif
 
 #ifndef mpas
          IF ( BEMIS_DIAG ) THEN
@@ -236,9 +237,9 @@ C Loop thru the number of time steps (hourly)
 
       VDEMIS_BI = 0.0   ! array
       EMPOL = 0.0   ! array
-#ifdef verbose_getbeis
+!#ifdef verbose_getbeis
       EMISX = 0.0   ! array
-#endif
+!#endif
 
       IF ( JDATE .NE. LDATE ) THEN
 
@@ -274,12 +275,13 @@ C calculate fseas based on deep soil temperature following WRF 3.8.1 PX
 
 C Calculate temporal non-speciated beis emissions
       CALL BEIS( JDATE, JTIME, NCOLS, NROWS, MSPCS, SEMIS, BIPOL )
+      EMPOL( :,:,1:NSEF-1 ) = BIPOL
 
 C Calculate temporal non-speciated soil NO emissions
-      CALL HRNO( JDATE, JTIME, TSTEP, NOPOL, L_DESID_DIAG )
-
-      EMPOL( :,:,1:NSEF-1 ) = BIPOL
-      EMPOL( :,:,NSEF )     = NOPOL
+      IF ( .Not. USE_SAGE_N ) THEN
+         CALL HRNO( JDATE, JTIME, TSTEP, NOPOL, L_DESID_DIAG )
+         EMPOL( :,:,NSEF )     = NOPOL
+      End If
 
 C Speciate emissions
       DO K = 1, NSEF
