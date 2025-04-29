@@ -43,7 +43,7 @@ C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
 
 C...........PARAMETERS and their descriptions:
 
-         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 297     ! Number of substances
+         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 298     ! Number of substances
 
          PRIVATE 
 
@@ -388,6 +388,7 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(295), A(295), E(295) / 'ISONOPERA       ', 7.08E+03, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
       DATA SUBNAME(296), A(296), E(296) / 'TRPNOPERA       ', 2.09E+02, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
       DATA SUBNAME(297), A(297), E(297) / 'HONITOPERA      ', 7.94E+07, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(298), A(298), E(298) / 'VMTN1OPERA      ', 3.31E+09, 0.0E+00 /   ! CRACMM RepCmp value (OPERA SAR)
 
       DATA B( MSO2   ), D( MSO2   ) / 1.30E-02,  1.96E+03 /  ! SO2*H2O<=>HSO3+H     : Smith and Martell (1976)
       DATA B( MHSO3  ), D( MHSO3  ) / 6.60E-08,  1.50E+03 /  ! HSO3<=>SO3+H         : Smith and Martell (1976)

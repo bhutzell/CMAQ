@@ -618,6 +618,7 @@ Information is based on the mech.def file.
 | HET_CLN3_WAI   | CLNO3 ----> HOCL + HNO3  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
 | HET_CLN3_WAJ   | CLNO3 ----> HOCL + HNO3  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
 | HET_CLN3_ACLJ   | CLNO3 + ACLJ ----> CL2 + ANO3J  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
+| SOAphot01   | AHOMJ ---->   0.8000\*AMTN1J +    0.2000\*ORA1  |   1.0000E-02\*NO2_RACM2 | Not Available<sup>1</sup> | 
 
 <sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     
 <sup>1</sup>Photolysis Reaction;depends on radiation and predicted concentrations     

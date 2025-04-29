@@ -377,6 +377,8 @@
                 RKI( NCELL,  550) =  RJBLK( NCELL, IJ_CLNO3_R_JPL19 )
 !  Reaction Label CLP18           
                 RKI( NCELL,  551) =  RJBLK( NCELL, IJ_CLNO3_M_JPL19 )
+!  Reaction Label SOAphot01       
+                RKI( NCELL,  604) =   1.0000D-02 * RJBLK( NCELL, IJ_NO2_RACM2 )
 
                 IF ( SEAWATER (NCELL) .GT. 0.001D0 ) THEN
 !  Reaction Label HAL_Ozone       
@@ -2042,5 +2044,6 @@
              INDEX_ACLI        = IOLD2NEW( INDEX_ACLI       , 1 )
              INDEX_ACLJ        = IOLD2NEW( INDEX_ACLJ       , 1 )
              INDEX_ACLK        = IOLD2NEW( INDEX_ACLK       , 1 )
+             INDEX_AMTN1J      = IOLD2NEW( INDEX_AMTN1J     , 1 )
           END SUBROUTINE RESET_SPECIES_POINTERS
        END MODULE RXNS_FUNCTION

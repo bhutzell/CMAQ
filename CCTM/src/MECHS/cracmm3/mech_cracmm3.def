@@ -176,6 +176,10 @@ END ELIMINATE
 
 
 
+
+
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -1514,6 +1518,10 @@ REACTIONS[CM] =
 <HET_CLN3_WAI> CLNO3 = HOCL + HNO3 # 1.0~<HETERO_CLN3_WAI>;
 <HET_CLN3_WAJ> CLNO3 = HOCL + HNO3 # 1.0~<HETERO_CLN3_WAJ>;
 <HET_CLN3_ACLJ> CLNO3 + ACLJ = CL2 + ANO3J # 1.0~<HETERO_CLN3_ACLJ>;
+
+! monoterpene SOA photolysis at 1% of jNO2
+<SOAphot01> AHOMJ = 0.800*AMTN1J + 0.200*ORA1  - 0.2000*DELTA_C 
+                  # 0.01/<NO2_RACM2>;                  
 
 END MECH
 

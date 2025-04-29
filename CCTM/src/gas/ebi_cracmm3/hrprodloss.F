@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Apr 18, 2025
+C  REVISION HISTORY: Created by EBI solver program, Apr 29, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 
@@ -1527,6 +1527,7 @@ C***********************************************************************
      &                     +    7.0000D-02 * RXRAT(   155 )      ! MVK+O3=0.7000D-01*ORA1+...
      &                     +    4.4000D-02 * RXRAT(   156 )      ! UALD+O3=0.4400D-01*ORA1+...
      &                     +    2.5000D-01 * RXRAT(   159 )      ! DCB3+O3=0.2500D+00*ORA1+...
+     &                     +    2.0000D-01 * RXRAT(   604 )      ! AHOMJ=0.2000D+00*ORA1+...
       LOSS(  ORA1        ) =                 RXRAT(   138 )      ! ORA1+HO=HO2+CO2
 
       PROD(  BENP        ) =    4.7000D-01 * RXRAT(    89 )      ! BEN+HO=0.4700D+00*BENP+...
@@ -2589,7 +2590,7 @@ C***********************************************************************
 
       PROD(  AHOMJ       ) =                 RXRAT(   531 )      ! ATRPNJ=AHOMJ+HNO3
      &                     +                 RXRAT(   532 )      ! AHONITJ=AHOMJ+HNO3
-      LOSS(  AHOMJ       ) =   0.0D0
+      LOSS(  AHOMJ       ) =                 RXRAT(   604 )      ! AHOMJ=0.8000D+00*AMTN1J+...
 
       PROD(  AHONITJ     ) =   0.0D0
       LOSS(  AHONITJ     ) =                 RXRAT(   532 )      ! AHONITJ=AHOMJ+HNO3
@@ -2765,6 +2766,9 @@ C***********************************************************************
 
       PROD(  ACLK        ) =   0.0D0
       LOSS(  ACLK        ) =                 RXRAT(   600 )      ! ACLK+NO2PK=CLNO2
+
+      PROD(  AMTN1J      ) =    8.0000D-01 * RXRAT(   604 )      ! AHOMJ=0.8000D+00*AMTN1J+...
+      LOSS(  AMTN1J      ) =   0.0D0
 
       RETURN
 

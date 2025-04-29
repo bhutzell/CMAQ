@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3 mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Apr 18, 2025
+C  REVISION HISTORY: Created by EBI solver program, Apr 29, 2025
 C
 C***********************************************************************
       USE HRDATA
@@ -657,6 +657,7 @@ C..NOTE: RXRAT commented out are not referenced by any routine
       RXRAT(    601 ) = RKI(   601 ) * YC(  CLNO3 )
       RXRAT(    602 ) = RKI(   602 ) * YC(  CLNO3 )
       RXRAT(    603 ) = RKI(   603 ) * YC(  CLNO3 ) * YC(  ACLJ )
+      RXRAT(    604 ) = RKI(   604 ) * YC(  AHOMJ )
 
 
       RETURN
