@@ -1426,7 +1426,7 @@
 !  Reaction Label ROCOXY15c       
              RKI( NCELL,  528) =   2.0500D-11 * CFACT 
 !  Reaction Label ROCOXY16c       
-             RKI( NCELL,  529) =   4.6900D-11 * CFACT 
+             RKI( NCELL,  529) =   4.7400D-11 * CFACT 
 !  Reaction Label R364            
              RKI( NCELL,  530) =  CFACT * ARRHENUIS_T03( INV_TEMP,  2.4500D-12,  -1.7750D+03 )
 !  Reaction Label TRP58           
