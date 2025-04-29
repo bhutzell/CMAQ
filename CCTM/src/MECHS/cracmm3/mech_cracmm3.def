@@ -176,6 +176,8 @@ END ELIMINATE
 
 
 
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -1238,180 +1240,148 @@ REACTIONS[CM] =
 
 ! Multigenerational oxidation of LVOCs and SVOCs
 ! Aging of ROCOXY with explicit low MW species
-<ROCOXY1c> VROCN2OXY8 + HO = 
-        0.0854 * VROCN2OXY8 + 0.2581 * MEK
-      + 0.2581 * KET + 0.2581 * HCHO
-      + 0.1291 * ACD + 0.2581 * ALD
-      + 0.2581 * MO2 + 0.2581 * ETHP
-      + 0.2581 * HC3P + 0.2581 * MEKP # 5.90e-11;
-<ROCOXY2c> VROCN2OXY4 + HO = 
-        0.8083 * VROCN2OXY8 + 0.3130 * VROCN2OXY4
-      + 0.0016 * VROCN1OXY6 + 0.0794 * MEK
-      + 0.0794 * KET + 0.0794 * HCHO
-      + 0.0397 * ACD + 0.0794 * ALD
-      + 0.0794 * MO2 + 0.0794 * ETHP
-      + 0.0794 * HC3P + 0.0794 * MEKP
-      + 0.0794 * KETP                   # 6.07e-11;
-<ROCOXY3c> VROCN2OXY2 + HO = 
-        0.1156 * VROCN2OXY8 + 0.6895 * VROCN2OXY4
-      + 0.2642 * VROCN2OXY2 + 0.0663 * VROCN1OXY6
-      + 0.0635 * VROCN1OXY3 + 0.0950 * VROCP0OXY4
-      + 0.0332 * VOP3 + 0.0390 * MEK
-      + 0.0390 * KET + 0.0390 * HCHO
-      + 0.0195 * ACD + 0.0390 * ALD
-      + 0.0390 * MO2 + 0.0390 * ETHP
-      + 0.0390 * HC3P + 0.0390 * MEKP
-      + 0.0390 * KETP                   # 5.54e-11;
-<ROCOXY4c> VROCN1OXY6 + HO = 
-        0.2036 * VROCN2OXY8 + 0.0071 * VROCN2OXY4
-      + 0.1446 * VOP3 + 0.1840 * MEK
-      + 0.1840 * KET + 0.1840 * HCHO
-      + 0.0920 * ACD + 0.1840 * ALD
-      + 0.1840 * MO2 + 0.1840 * ETHP
-      + 0.1840 * HC3P + 0.1840 * MEKP
-      + 0.1840 * KETP                   # 5.63e-11;
-<ROCOXY5c> VROCN1OXY3 + HO = 
-        0.3609 * VROCN2OXY8 + 0.5200 * VROCN2OXY4
-      + 0.0088 * VROCN2OXY2 + 0.1452 * VROCN1OXY6
-      + 0.0420 * VROCN1OXY3 + 0.0524 * VROCP0OXY4
-      + 0.0646 * MEK + 0.0646 * KET
-      + 0.0646 * HCHO + 0.0323 * ACD
-      + 0.0646 * ALD + 0.0646 * MO2
-      + 0.0646 * ETHP + 0.0646 * HC3P
-      + 0.0646 * MEKP + 0.0646 * KETP # 5.46e-11;
-<ROCOXY6c> VROCN1OXY1 + HO = 
-        0.0074 * VROCN2OXY8 + 0.1190 * VROCN2OXY4
-      + 0.7673 * VROCN2OXY2 + 0.0132 * VROCN1OXY6
-      + 0.0614 * VROCN1OXY3 + 0.0305 * VROCN1OXY1
-      + 0.0367 * VROCP0OXY4 + 0.0605 * VROCP0OXY2
-      + 0.0488 * VROCP1OXY3 + 0.0202 * VROCP1OXY1
-      + 0.0584 * VROCP2OXY2 + 0.0375 * VROCP3OXY2
-      + 0.0074 * VROCP4OXY2 + 0.0179 * VOP3
-      + 0.0258 * OP2 + 0.0244 * MEK
-      + 0.0244 * KET + 0.0244 * HCHO
-      + 0.0122 * ACD + 0.0244 * ALD
-      + 0.0244 * MO2 + 0.0244 * ETHP
-      + 0.0244 * HC3P + 0.0244 * MEKP
-      + 0.0244 * KETP                   # 4.50e-11;
-<ROCOXY7c> VROCP0OXY4 + HO = 
-        0.3695 * VROCN2OXY8 + 0.1291 * VROCN2OXY4
-      + 0.1547 * VROCN1OXY6 + 0.0822 * VROCN1OXY3
-      + 0.0400 * VROCP0OXY4 + 0.1068 * MEK
-      + 0.1068 * KET + 0.1068 * HCHO
-      + 0.0534 * ACD + 0.1068 * ALD
-      + 0.1068 * MO2 + 0.1068 * ETHP
-      + 0.1068 * HC3P + 0.1068 * MEKP
-      + 0.1068 * KETP                   # 5.17e-11;
-<ROCOXY8c> VROCP0OXY2 + HO = 
-        0.0738 * VROCN2OXY8 + 0.4667 * VROCN2OXY4
-      + 0.1222 * VROCN2OXY2 + 0.0453 * VROCN1OXY6
-      + 0.1516 * VROCN1OXY3 + 0.0050 * VROCN1OXY1
-      + 0.1332 * VROCP0OXY4 + 0.0104 * VROCP0OXY2
-      + 0.0321 * VROCP1OXY3 + 0.0140 * VROCP1OXY1
-      + 0.0240 * VROCP2OXY2 + 0.0595 * VOP3
-      + 0.0445 * MEK + 0.0445 * KET
-      + 0.0445 * HCHO + 0.0222 * ACD
-      + 0.0445 * ALD + 0.0445 * MO2
-      + 0.0445 * ETHP + 0.0445 * HC3P
-      + 0.0445 * MEKP + 0.0445 * KETP # 4.73e-11;
-<ROCOXY9c> VROCP1OXY3 + HO = 
-        0.1962 * VROCN2OXY8 + 0.1947 * VROCN2OXY4
-      + 0.0004 * VROCN2OXY2 + 0.1076 * VROCN1OXY6
-      + 0.0568 * VROCN1OXY3 + 0.2122 * VROCP0OXY4
-      + 0.0007 * VROCP0OXY2 + 0.1369 * VOP3
-      + 0.0818 * MEK + 0.0818 * KET
-      + 0.0818 * HCHO + 0.0409 * ACD
-      + 0.0818 * ALD + 0.0818 * MO2
-      + 0.0818 * ETHP + 0.0818 * HC3P
-      + 0.0818 * MEKP + 0.0818 * KETP # 4.60e-11;
-<ROCOXY10c> VROCP1OXY1 + HO = 
-        0.0023 * VROCN2OXY8 + 0.1340 * VROCN2OXY4
-      + 0.3349 * VROCN2OXY2 + 0.0082 * VROCN1OXY6
-      + 0.1202 * VROCN1OXY3 + 0.0761 * VROCN1OXY1
-      + 0.0325 * VROCP0OXY4 + 0.1267 * VROCP0OXY2
-      + 0.0647 * VROCP1OXY3 + 0.0364 * VROCP1OXY1
-      + 0.0890 * VROCP2OXY2 + 0.0646 * VROCP3OXY2
-      + 0.0448 * VROCP4OXY2 + 0.0087 * VOP3
-      + 0.0103 * OP2 + 0.0297 * MEK
-      + 0.0297 * KET + 0.0297 * HCHO
-      + 0.0149 * ACD + 0.0297 * ALD
-      + 0.0297 * MO2 + 0.0297 * ETHP
-      + 0.0297 * HC3P + 0.0297 * MEKP
-      + 0.0297 * KETP                   # 3.80e-11;
-<ROCOXY11c> VROCP2OXY2 + HO = 
-        0.0479 * VROCN2OXY8 + 0.1746 * VROCN2OXY4
-      + 0.0104 * VROCN2OXY2 + 0.0550 * VROCN1OXY6
-      + 0.1118 * VROCN1OXY3 + 0.0013 * VROCN1OXY1
-      + 0.1480 * VROCP0OXY4 + 0.0417 * VROCP0OXY2
-      + 0.1181 * VROCP1OXY3 + 0.0218 * VROCP1OXY1
-      + 0.1195 * VROCP2OXY2 + 0.0207 * VROCP3OXY2
-      + 0.0294 * VOP3 + 0.0453 * OP2
-      + 0.0628 * MEK + 0.0628 * KET
-      + 0.0628 * HCHO + 0.0314 * ACD
-      + 0.0628 * ALD + 0.0628 * MO2
-      + 0.0628 * ETHP + 0.0628 * HC3P
-      + 0.0628 * MEKP + 0.0628 * KETP # 3.93e-11;
-<ROCOXY12c> VROCP3OXY2 + HO = 
-        0.0324 * VROCN2OXY8 + 0.0769 * VROCN2OXY4
-      + 0.0009 * VROCN2OXY2 + 0.0621 * VROCN1OXY6
-      + 0.0489 * VROCN1OXY3 + 0.1550 * VROCP0OXY4
-      + 0.0155 * VROCP0OXY2 + 0.1117 * VROCP1OXY3
-      + 0.0113 * VROCP1OXY1 + 0.1465 * VROCP2OXY2
-      + 0.0871 * VROCP3OXY2 + 0.0040 * VROCP4OXY2
-      + 0.0569 * VOP3 + 0.0472 * OP2
-      + 0.0698 * MEK + 0.0698 * KET
-      + 0.0698 * HCHO + 0.0349 * ACD
-      + 0.0698 * ALD + 0.0698 * MO2
-      + 0.0698 * ETHP + 0.0698 * HC3P
-      + 0.0698 * MEKP + 0.0698 * KETP # 3.52e-11;
-<ROCOXY13c> VROCP4OXY2 + HO = 
-        0.0117 * VROCN2OXY8 + 0.0167 * VROCN2OXY4
-      + 0.0504 * VROCN1OXY6 + 0.0276 * VROCN1OXY3
-      + 0.0920 * VROCP0OXY4 + 0.0788 * VROCP1OXY3
-      + 0.0108 * VROCP1OXY1 + 0.1227 * VROCP2OXY2
-      + 0.1501 * VROCP3OXY2 + 0.0466 * VROCP4OXY2
-      + 0.0785 * VOP3 + 0.0399 * OP2
-      + 0.0786 * MEK + 0.0786 * KET
-      + 0.0786 * HCHO + 0.0393 * ACD
-      + 0.0786 * ALD + 0.0786 * MO2
-      + 0.0786 * ETHP + 0.0786 * HC3P
-      + 0.0786 * MEKP + 0.0786 * KETP # 3.12e-11;
-<ROCOXY14c> VROCP5OXY1 + HO = 
-        0.0103 * VROCN2OXY4 + 0.0006 * VROCN2OXY2
-      + 0.0090 * VROCN1OXY6 + 0.0146 * VROCN1OXY3
-      + 0.0702 * VROCP0OXY4 + 0.0153 * VROCP0OXY2
-      + 0.1017 * VROCP1OXY3 + 0.0047 * VROCP1OXY1
-      + 0.1658 * VROCP2OXY2 + 0.1757 * VROCP3OXY2
-      + 0.1587 * VROCP4OXY2 + 0.0573 * VROCP5OXY1
-      + 0.0097 * VROCP6OXY1 + 0.0253 * VOP3
-      + 0.0368 * OP2 + 0.0526 * MEK
-      + 0.0526 * KET + 0.0526 * HCHO
-      + 0.0263 * ACD + 0.0526 * ALD
-      + 0.0526 * MO2 + 0.0526 * ETHP
-      + 0.0526 * HC3P + 0.0526 * MEKP
-      + 0.0531 * HC5P + 0.0526 * KETP # 2.40e-11;
-<ROCOXY15c> VROCP6OXY1 + HO = 
-        0.0061 * VROCN1OXY6 + 0.0049 * VROCN1OXY3
-      + 0.0224 * VROCP0OXY4 + 0.0420 * VROCP1OXY3
-      + 0.0033 * VROCP1OXY1 + 0.0906 * VROCP2OXY2
-      + 0.1489 * VROCP3OXY2 + 0.1742 * VROCP4OXY2
-      + 0.1157 * VROCP5OXY1 + 0.0294 * VROCP6OXY1
-      + 0.0415 * VOP3 + 0.0560 * OP2
-      + 0.0571 * MEK + 0.0571 * KET
-      + 0.0571 * HCHO + 0.0285 * ACD
-      + 0.0571 * ALD + 0.0571 * MO2
-      + 0.0571 * ETHP + 0.0571 * HC3P
-      + 0.0571 * MEKP + 0.0497 * HC5P
-      + 0.0571 * KETP                   # 2.05e-11;
-<ROCOXY16c> VOP3 + HO = 
-        0.1628 * VROCN2OXY8 + 0.0103 * VROCN2OXY4
-      + 0.0585 * VROCN1OXY6 + 0.0171 * VROCP0OXY4
-      + 0.1299 * VOP3 + 0.1652 * MEK
-      + 0.1652 * KET + 0.1652 * HCHO
-      + 0.0826 * ACD + 0.1652 * ALD
-      + 0.1652 * MO2 + 0.1652 * ETHP
-      + 0.1652 * HC3P + 0.1652 * MEKP
-      + 0.1652 * KETP                   # 4.74e-11;
+<ROCOXY1c> VROCN2OXY8 + HO = 0.0854*VROCN2OXY8 + 0.2581*MEK 
+                           + 0.2581*KET + 0.2581*HCHO + 0.1291*ACD 
+                           + 0.2581*ALD + 0.2581*MO2 + 0.2581*ETHP 
+                           + 0.2581*HC3P + 0.2581*MEKP  
+                           + 0.2077*DELTA_C # 5.90e-11;                           
+<ROCOXY2c> VROCN2OXY4 + HO = 0.8083*VROCN2OXY8 + 0.313*VROCN2OXY4 
+                           + 0.0016*VROCN1OXY6 + 0.0794*MEK 
+                           + 0.0794*KET + 0.0794*HCHO + 0.0397*ACD 
+                           + 0.0794*ALD + 0.0794*MO2 + 0.0794*ETHP 
+                           + 0.0794*HC3P + 0.0794*MEKP + 0.0794*KETP  
+                           - 0.4165*DELTA_C # 6.07e-11;                           
+<ROCOXY3c> VROCN2OXY2 + HO = 0.1156*VROCN2OXY8 + 0.6895*VROCN2OXY4 
+                           + 0.2642*VROCN2OXY2 + 0.0663*VROCN1OXY6 
+                           + 0.0635*VROCN1OXY3 + 0.095*VROCP0OXY4 
+                           + 0.0332*VOP3 + 0.039*MEK + 0.039*KET 
+                           + 0.039*HCHO + 0.0195*ACD + 0.039*ALD 
+                           + 0.039*MO2 + 0.039*ETHP + 0.039*HC3P 
+                           + 0.039*MEKP + 0.039*KETP  + 0.4758*DELTA_C 
+                           # 5.54e-11;                           
+<ROCOXY4c> VROCN1OXY6 + HO = 0.2036*VROCN2OXY8 + 0.0071*VROCN2OXY4 
+                           + 0.1446*VOP3 + 0.184*MEK + 0.184*KET 
+                           + 0.184*HCHO + 0.092*ACD + 0.184*ALD 
+                           + 0.184*MO2 + 0.184*ETHP + 0.184*HC3P 
+                           + 0.184*MEKP + 0.184*KETP  + 0.0039*DELTA_C 
+                           # 5.63e-11;                           
+<ROCOXY5c> VROCN1OXY3 + HO = 0.3609*VROCN2OXY8 + 0.520*VROCN2OXY4 
+                           + 0.0088*VROCN2OXY2 + 0.1452*VROCN1OXY6 
+                           + 0.042*VROCN1OXY3 + 0.0524*VROCP0OXY4 
+                           + 0.0646*MEK + 0.0646*KET + 0.0646*HCHO 
+                           + 0.0323*ACD + 0.0646*ALD + 0.0646*MO2 
+                           + 0.0646*ETHP + 0.0646*HC3P + 0.0646*MEKP 
+                           + 0.0646*KETP  - 0.4589*DELTA_C # 5.46e-11;                           
+<ROCOXY6c> VROCN1OXY1 + HO = 0.0074*VROCN2OXY8 + 0.119*VROCN2OXY4 
+                           + 0.7673*VROCN2OXY2 + 0.0132*VROCN1OXY6 
+                           + 0.0614*VROCN1OXY3 + 0.0305*VROCN1OXY1 
+                           + 0.0367*VROCP0OXY4 + 0.0605*VROCP0OXY2 
+                           + 0.0488*VROCP1OXY3 + 0.0202*VROCP1OXY1 
+                           + 0.0584*VROCP2OXY2 + 0.0375*VROCP3OXY2 
+                           + 0.0074*VROCP4OXY2 + 0.0179*VOP3 
+                           + 0.0258*OP2 + 0.0244*MEK + 0.0244*KET 
+                           + 0.0244*HCHO + 0.0122*ACD + 0.0244*ALD 
+                           + 0.0244*MO2 + 0.0244*ETHP + 0.0244*HC3P 
+                           + 0.0244*MEKP + 0.0244*KETP  
+                           - 0.0338*DELTA_C # 4.50e-11;                           
+<ROCOXY7c> VROCP0OXY4 + HO = 0.3695*VROCN2OXY8 + 0.1291*VROCN2OXY4 
+                           + 0.1547*VROCN1OXY6 + 0.0822*VROCN1OXY3 
+                           + 0.040*VROCP0OXY4 + 0.1068*MEK + 0.1068*KET 
+                           + 0.1068*HCHO + 0.0534*ACD + 0.1068*ALD 
+                           + 0.1068*MO2 + 0.1068*ETHP + 0.1068*HC3P 
+                           + 0.1068*MEKP + 0.1068*KETP  
+                           + 0.2722*DELTA_C # 5.17e-11;                           
+<ROCOXY8c> VROCP0OXY2 + HO = 0.0738*VROCN2OXY8 + 0.4667*VROCN2OXY4 
+                           + 0.1222*VROCN2OXY2 + 0.0453*VROCN1OXY6 
+                           + 0.1516*VROCN1OXY3 + 0.005*VROCN1OXY1 
+                           + 0.1332*VROCP0OXY4 + 0.0104*VROCP0OXY2 
+                           + 0.0321*VROCP1OXY3 + 0.014*VROCP1OXY1 
+                           + 0.024*VROCP2OXY2 + 0.0595*VOP3 
+                           + 0.0445*MEK + 0.0445*KET + 0.0445*HCHO 
+                           + 0.0222*ACD + 0.0445*ALD + 0.0445*MO2 
+                           + 0.0445*ETHP + 0.0445*HC3P + 0.0445*MEKP 
+                           + 0.0445*KETP  - 0.1324*DELTA_C # 4.73e-11;                           
+<ROCOXY9c> VROCP1OXY3 + HO = 0.1962*VROCN2OXY8 + 0.1947*VROCN2OXY4 
+                           + 0.0004*VROCN2OXY2 + 0.1076*VROCN1OXY6 
+                           + 0.0568*VROCN1OXY3 + 0.2122*VROCP0OXY4 
+                           + 0.0007*VROCP0OXY2 + 0.1369*VOP3 
+                           + 0.0818*MEK + 0.0818*KET + 0.0818*HCHO 
+                           + 0.0409*ACD + 0.0818*ALD + 0.0818*MO2 
+                           + 0.0818*ETHP + 0.0818*HC3P + 0.0818*MEKP 
+                           + 0.0818*KETP  + 0.3365*DELTA_C # 4.60e-11;                           
+<ROCOXY10c> VROCP1OXY1 + HO = 0.0023*VROCN2OXY8 + 0.134*VROCN2OXY4 
+                            + 0.3349*VROCN2OXY2 + 0.0082*VROCN1OXY6 
+                            + 0.1202*VROCN1OXY3 + 0.0761*VROCN1OXY1 
+                            + 0.0325*VROCP0OXY4 + 0.1267*VROCP0OXY2 
+                            + 0.0647*VROCP1OXY3 + 0.0364*VROCP1OXY1 
+                            + 0.089*VROCP2OXY2 + 0.0646*VROCP3OXY2 
+                            + 0.0448*VROCP4OXY2 + 0.0087*VOP3 
+                            + 0.0103*OP2 + 0.0297*MEK + 0.0297*KET 
+                            + 0.0297*HCHO + 0.0149*ACD + 0.0297*ALD 
+                            + 0.0297*MO2 + 0.0297*ETHP + 0.0297*HC3P 
+                            + 0.0297*MEKP + 0.0297*KETP  
+                            + 0.2239*DELTA_C # 3.80e-11;                            
+<ROCOXY11c> VROCP2OXY2 + HO = 0.0479*VROCN2OXY8 + 0.1746*VROCN2OXY4 
+                            + 0.0104*VROCN2OXY2 + 0.055*VROCN1OXY6 
+                            + 0.1118*VROCN1OXY3 + 0.0013*VROCN1OXY1 
+                            + 0.148*VROCP0OXY4 + 0.0417*VROCP0OXY2 
+                            + 0.1181*VROCP1OXY3 + 0.0218*VROCP1OXY1 
+                            + 0.1195*VROCP2OXY2 + 0.0207*VROCP3OXY2 
+                            + 0.0294*VOP3 + 0.0453*OP2 + 0.0628*MEK 
+                            + 0.0628*KET + 0.0628*HCHO + 0.0314*ACD 
+                            + 0.0628*ALD + 0.0628*MO2 + 0.0628*ETHP 
+                            + 0.0628*HC3P + 0.0628*MEKP + 0.0628*KETP  
+                            + 0.2175*DELTA_C # 3.93e-11;                            
+<ROCOXY12c> VROCP3OXY2 + HO = 0.0324*VROCN2OXY8 + 0.0769*VROCN2OXY4 
+                            + 0.0009*VROCN2OXY2 + 0.0621*VROCN1OXY6 
+                            + 0.0489*VROCN1OXY3 + 0.155*VROCP0OXY4 
+                            + 0.0155*VROCP0OXY2 + 0.1117*VROCP1OXY3 
+                            + 0.0113*VROCP1OXY1 + 0.1465*VROCP2OXY2 
+                            + 0.0871*VROCP3OXY2 + 0.004*VROCP4OXY2 
+                            + 0.0569*VOP3 + 0.0472*OP2 + 0.0698*MEK 
+                            + 0.0698*KET + 0.0698*HCHO + 0.0349*ACD 
+                            + 0.0698*ALD + 0.0698*MO2 + 0.0698*ETHP 
+                            + 0.0698*HC3P + 0.0698*MEKP + 0.0698*KETP  
+                            + 0.3147*DELTA_C # 3.52e-11;                            
+<ROCOXY13c> VROCP4OXY2 + HO = 0.0117*VROCN2OXY8 + 0.0167*VROCN2OXY4 
+                            + 0.0504*VROCN1OXY6 + 0.0276*VROCN1OXY3 
+                            + 0.092*VROCP0OXY4 + 0.0788*VROCP1OXY3 
+                            + 0.0108*VROCP1OXY1 + 0.1227*VROCP2OXY2 
+                            + 0.1501*VROCP3OXY2 + 0.0466*VROCP4OXY2 
+                            + 0.0785*VOP3 + 0.0399*OP2 + 0.0786*MEK 
+                            + 0.0786*KET + 0.0786*HCHO + 0.0393*ACD 
+                            + 0.0786*ALD + 0.0786*MO2 + 0.0786*ETHP 
+                            + 0.0786*HC3P + 0.0786*MEKP + 0.0786*KETP  
+                            - 0.5004*DELTA_C # 3.12e-11;                            
+<ROCOXY14c> VROCP5OXY1 + HO = 0.0103*VROCN2OXY4 + 0.0006*VROCN2OXY2 
+                            + 0.009*VROCN1OXY6 + 0.0146*VROCN1OXY3 
+                            + 0.0702*VROCP0OXY4 + 0.0153*VROCP0OXY2 
+                            + 0.1017*VROCP1OXY3 + 0.0047*VROCP1OXY1 
+                            + 0.1658*VROCP2OXY2 + 0.1757*VROCP3OXY2 
+                            + 0.1587*VROCP4OXY2 + 0.0573*VROCP5OXY1 
+                            + 0.0097*VROCP6OXY1 + 0.0253*VOP3 
+                            + 0.0368*OP2 + 0.0526*MEK + 0.0526*KET 
+                            + 0.0526*HCHO + 0.0263*ACD + 0.0526*ALD 
+                            + 0.0526*MO2 + 0.0526*ETHP + 0.0526*HC3P 
+                            + 0.0526*MEKP + 0.0531*HC5P + 0.0526*KETP  
+                            + 0.3794*DELTA_C # 2.40e-11;                            
+<ROCOXY15c> VROCP6OXY1 + HO = 0.0061*VROCN1OXY6 + 0.0049*VROCN1OXY3 
+                            + 0.0224*VROCP0OXY4 + 0.042*VROCP1OXY3 
+                            + 0.0033*VROCP1OXY1 + 0.0906*VROCP2OXY2 
+                            + 0.1489*VROCP3OXY2 + 0.1742*VROCP4OXY2 
+                            + 0.1157*VROCP5OXY1 + 0.0294*VROCP6OXY1 
+                            + 0.0415*VOP3 + 0.056*OP2 + 0.0571*MEK 
+                            + 0.0571*KET + 0.0571*HCHO + 0.0285*ACD 
+                            + 0.0571*ALD + 0.0571*MO2 + 0.0571*ETHP 
+                            + 0.0571*HC3P + 0.0571*MEKP + 0.0497*HC5P 
+                            + 0.0571*KETP  - 0.0282*DELTA_C # 2.05e-11;                            
+<ROCOXY16c> VOP3 + HO = 0.1628*VROCN2OXY8 + 0.0103*VROCN2OXY4 
+                      + 0.0585*VROCN1OXY6 + 0.0171*VROCP0OXY4 
+                      + 0.1299*VOP3 + 0.1652*MEK + 0.1652*KET 
+                      + 0.1652*HCHO + 0.0826*ACD + 0.1652*ALD 
+                      + 0.1652*MO2 + 0.1652*ETHP + 0.1652*HC3P 
+                      + 0.1652*MEKP + 0.1652*KETP  + 0.2781*DELTA_C 
+                      # 4.74e-11;                      
 
 ! ECH4 (emitted methane)
 <R364> ECH4 + HO = MO2 # 2.45E-12 @ 1775.;
