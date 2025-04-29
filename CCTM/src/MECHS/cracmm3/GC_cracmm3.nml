@@ -199,4 +199,5 @@ GC_SPECIES_DATA =
 'CLOO'          , 67.5  ,''      ,-1     ,''     ,-1     ,''                  ,-1   ,''               ,-1  ,''             ,''       ,''    ,''    ,''    ,'Yes',!Chlorine dioxide,E,DTXSID5023958,O=Cl[O]
 'NO2PIJ'        , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''   ,''    ,'Yes',!Dioxidonitrogen, E, NA,[N+](=O)=O
 'NO2PK'         , 46.0  ,''      ,-1     ,''     ,-1     ,''                  ,-1    ,''              ,-1  ,''             ,''        ,''    ,''    ,''   ,'Yes',!Dioxidonitrogen, E, NA, [N+](=O)=O
+'VMTN1'         ,262.0   ,''     ,-1     ,''     ,-1     ,'VD_VMTN1'          , 1   ,'VMTN1OPERA'     , 1  ,''            ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!3-[carboxy(hydroxy)methyl]cyclobutane-1;2;2-tricarboxylic acid,L,NA,OC(C1CC(C(O)=O)C1(C(O)=O)C(O)=O)C(O)=O
 /

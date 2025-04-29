@@ -31,8 +31,8 @@ Information is based on the mech.def file.
 | R014   | ACT ----> MO2 + ACO3  | CH3COCH3A_JPL19 | Not Available<sup>1</sup> | 
 | R014a   | ACT ---->   2.0000\*MO2 + CO  | CH3COCH3B_JPL19 | Not Available<sup>1</sup> | 
 | R015   | UALD ---->   1.2200\*HO2 +    0.7840\*ACO3 +    1.2200\*CO +    0.3500\*HCHO +    0.4340\*ALD +    0.2160\*KET  | UALD_RACM2 | Not Available<sup>1</sup> | 
-| TRP01   | PINAL ----> HO2 + HC10P + CO  | ALD_JPL19 | Not Available<sup>1</sup> | 
-| TRP02   | LIMAL ----> HO2 + HC10P + CO  | ALD_JPL19 | Not Available<sup>1</sup> | 
+| TRP01   | PINAL ----> HO2 + PINALP + CO  | ALD_JPL19 | Not Available<sup>1</sup> | 
+| TRP02   | LIMAL ----> HO2 + LIMALP + CO  | ALD_JPL19 | Not Available<sup>1</sup> | 
 | R016   | MEK ---->   0.1000\*MO2 + ETHP +    0.9000\*ACO3 +    0.1000\*CO  | MEK_JGR19 | Not Available<sup>1</sup> | 
 | R017   | KET ---->   1.5000\*ETHP +    0.5000\*ACO3 +    0.5000\*CO  | KET_JGR19 | Not Available<sup>1</sup> | 
 | R018   | HKET ----> HO2 + ACO3 + HCHO  | HKET_RACM2 | Not Available<sup>1</sup> | 
@@ -164,8 +164,8 @@ Information is based on the mech.def file.
 | R126   | ETE + O3 ---->   0.0800\*HO +    0.1500\*HO2 +    0.6300\*CO + HCHO +    0.3700\*ORA1  |   9.14E-15e<sup> -2580.00/T</sup> |   1.5953E-18 |
 | R127   | OLT + O3 ---->   0.2200\*HO +    0.3200\*HO2 +    0.0800\*MO2 +    0.0600\*ETHP +    0.0400\*HC3P +    0.0200\*HC5P +    0.0680\*H2O2 +    0.4300\*CO +    0.0200\*ETH +    0.0150\*HC3 +    0.0060\*HC5 +    0.0320\*BEN +    0.5600\*HCHO +    0.0100\*ACD +    0.4400\*ALD +    0.0300\*ACT +    0.0200\*BALD +    0.0600\*MEK +    0.0100\*HKET +    0.0300\*ORA1 +    0.0600\*ORA2  |   4.33E-15e<sup> -1800.00/T</sup> |   1.0341E-17 |
 | R128   | OLI + O3 ---->   0.4600\*HO +    0.0700\*HO2 +    0.3200\*MO2 +    0.0700\*ETHP +    0.0400\*HC3P +    0.0900\*ACO3 +    0.3700\*CO +    0.0260\*H2O2 +    0.0100\*ETH +    0.0100\*HC3 +    0.0900\*HCHO +    0.4570\*ACD +    0.7300\*ALD +    0.1100\*ACT +    0.0170\*KET +    0.0440\*HKET +    0.0170\*ORA2  |   4.40E-15e<sup>  -845.00/T</sup> |   2.5858E-16 |
-| R131   | API + O3 ---->   0.6055\*HO +    0.2145\*PINALP +    0.2550\*H2O2 +    0.2535\*PINAL +    0.0065\*ORA2 +    0.1105\*HO2 +    0.1105\*CO +    0.4590\*HCHO +    0.2805\*RCO3 +    0.1785\*KET +    0.0665\*HC3 +    0.0385\*OP1 +    0.0280\*ORA1  |   8.05E-16e<sup>  -640.00/T</sup> |   9.4092E-17 |
-| R132   | LIM + O3 ---->   0.6600\*HO +    0.6600\*LIMAL +    0.3300\*ACO3 +    0.3300\*HCHO +    0.3300\*RCO3 +    0.3300\*H2O2 +    0.0100\*ORA2  |   2.80E-15e<sup>  -770.00/T</sup> |   2.1162E-16 |
+| R131   | API + O3 ---->   0.6055\*HO +    0.2145\*PINALP +    0.2550\*H2O2 +    0.2535\*PINAL +    0.0065\*ORA2 +    0.1105\*HO2 +    0.1105\*CO +    0.4590\*HCHO +    0.2305\*APIP1 +    0.0500\*APIP2 +    0.1785\*KET +    0.0665\*HC3 +    0.0385\*OP1 +    0.0280\*ORA1  |   8.05E-16e<sup>  -640.00/T</sup> |   9.4092E-17 |
+| R132   | LIM + O3 ---->   0.6600\*HO +    0.6600\*LIMAL +    0.3300\*ACO3 +    0.3300\*HCHO +    0.2200\*LIMP1 +    0.1100\*LIMP2 +    0.3300\*H2O2 +    0.0100\*ORA2  |   2.80E-15e<sup>  -770.00/T</sup> |   2.1162E-16 |
 | TRP08   | LIMAL + O3 ---->   0.0900\*HO + ALD +    0.6200\*HCHO +    0.2300\*OP1 +    0.0200\*H2O2 +    0.1500\*ORA1  |   8.3000E-18 |   8.3000E-18 |
 | TRP09   | VTRPN + O3 ---->   0.3300\*VHONIT +    0.6700\*NO2 +    0.2700\*PINAL +    0.3800\*KET +    0.2100\*HCHO +    0.0200\*ALD  |   1.6700E-16 |   1.6700E-16 |
 | R133   | MACR + O3 ---->   0.1900\*HO +    0.1400\*HO2 +    0.1000\*ACO3 +    0.2200\*CO +    0.5000\*MGLY +    0.4500\*ORA1  |   1.36E-15e<sup> -2112.00/T</sup> |   1.1406E-18 |
@@ -618,6 +618,7 @@ Information is based on the mech.def file.
 | HET_CLN3_WAI   | CLNO3 ----> HOCL + HNO3  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
 | HET_CLN3_WAJ   | CLNO3 ----> HOCL + HNO3  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
 | HET_CLN3_ACLJ   | CLNO3 + ACLJ ----> CL2 + ANO3J  | HETERO_H2NO3PBK | Not Available<sup>2</sup> | 
+| SOAphot01   | AHOMJ ---->   0.8000\*AMTN1J +    0.2000\*ORA1  |   1.0000E-02\*NO2_RACM2 | Not Available<sup>1</sup> | 
 
 <sup>0</sup>Units molecules/(sec*cm<sup>3</sup>); Value at 298.15 K;   2.4615E+19 molecules/cm<sup>3</sup>;   1.00 Atm.     
 <sup>1</sup>Photolysis Reaction;depends on radiation and predicted concentrations     

@@ -208,8 +208,8 @@ c..Remaining HO2 production terms
      &   +                 RXRAT(    12 )      ! ACD=HO2+MO2+CO
      &   +                 RXRAT(    13 )      ! ALD=HO2+ETHP+CO
      &   +    1.2200D+00 * RXRAT(    16 )      ! UALD=0.1220D+01*HO2+...
-     &   +                 RXRAT(    17 )      ! PINAL=HO2+HC10P+CO
-     &   +                 RXRAT(    18 )      ! LIMAL=HO2+HC10P+CO
+     &   +                 RXRAT(    17 )      ! PINAL=HO2+PINALP+CO
+     &   +                 RXRAT(    18 )      ! LIMAL=HO2+LIMALP+CO
      &   +                 RXRAT(    21 )      ! HKET=HO2+ACO3+HCHO
      &   +    6.6000D-01 * RXRAT(    22 )      ! MACR=0.6600D+00*HO2+...
      &   +    2.0000D+00 * RXRAT(    26 )      ! GLY=0.2000D+01*HO2+0.2000D+...

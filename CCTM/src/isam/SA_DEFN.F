@@ -561,7 +561,7 @@ c----------------------------------------------------------
      &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      ','CO        '/ )
 
         !CRACMM3
-        ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 98 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 6 )%LIST( 99 ) )
         ISAM_SPEC_VOC( 6 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
      &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
      &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
@@ -581,7 +581,8 @@ c----------------------------------------------------------
      &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
      &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
      &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
-     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      ','CO        '/ )
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','VMTN1     ','ECH4      ',
+     &    'CO        '/ )
 
         !PRESCRIBE NITRATE SPECIES
         !CB6R5_AE7_AQ
