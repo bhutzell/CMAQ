@@ -180,6 +180,8 @@ END ELIMINATE
 
 
 
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -201,8 +203,8 @@ REACTIONS[CM] =
 <R015> UALD = 1.220*HO2 + 0.784*ACO3 + 1.220*CO + 0.350*HCHO 
             + 0.434*ALD + 0.216*KET  - 0.5200*DELTA_C 
             # 1.0/<UALD_RACM2>;            
-<TRP01> PINAL = HO2 + HC10P + CO  - 1.0000*DELTA_C # 1.0/<ALD_JPL19>;
-<TRP02> LIMAL = HO2 + HC10P + CO  - 1.0000*DELTA_C # 1.0/<ALD_JPL19>;
+<TRP01> PINAL = HO2 + PINALP + CO  - 1.0000*DELTA_C # 1.0/<ALD_JPL19>;
+<TRP02> LIMAL = HO2 + LIMALP + CO  - 1.0000*DELTA_C # 1.0/<ALD_JPL19>;
 <R016> MEK = 0.100*MO2 + ETHP + 0.900*ACO3 + 0.100*CO # 1.0/<MEK_JGR19>;
 <R017> KET = 1.500*ETHP + 0.500*ACO3 + 0.500*CO  + 0.5000*DELTA_C 
            # 1.0/<KET_JGR19>;           
@@ -400,11 +402,12 @@ REACTIONS[CM] =
                 + 0.017*ORA2  + 0.0450*DELTA_C # 4.40E-15 @ 845.0;                
 <R131> API + O3 = 0.6055*HO + 0.2145*PINALP + 0.255*H2O2 + 0.2535*PINAL 
                 + 0.0065*ORA2 + 0.1105*HO2 + 0.1105*CO + 0.459*HCHO 
-                + 0.2805*RCO3 + 0.1785*KET + 0.0665*HC3 + 0.0385*OP1 
-                + 0.028*ORA1  + 2.7375*DELTA_C # 8.05e-16 @ 640.;                
+                + 0.2305*APIP1 + 0.050*APIP2 + 0.1785*KET + 0.0665*HC3 
+                + 0.0385*OP1 + 0.028*ORA1  + 0.7740*DELTA_C 
+                # 8.05e-16 @ 640.;                
 <R132> LIM + O3 = 0.660*HO + 0.660*LIMAL + 0.330*ACO3 + 0.330*HCHO 
-                + 0.330*RCO3 + 0.330*H2O2 + 0.010*ORA2  
-                + 1.4000*DELTA_C # 2.8E-15 @ 770.;                
+                + 0.220*LIMP1 + 0.110*LIMP2 + 0.330*H2O2 + 0.010*ORA2  
+                - 0.9100*DELTA_C # 2.8E-15 @ 770.;                
 <TRP08> LIMAL + O3 = 0.090*HO + ALD + 0.620*HCHO + 0.230*OP1 
                    + 0.020*H2O2 + 0.150*ORA1  + 6.0000*DELTA_C 
                    # 8.30E-18;                   
