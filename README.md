@@ -18,7 +18,7 @@ While initially planned for fall 2026, the status and timing of any final releas
 * the ability to take advantage of improvements for preliminary studies of their own interest.
 * help other interested community members by testing, troubleshooting, and debugging the research version before any potential future final release.
 
-## New features in CMAQ version 5.5 include:
+## New features in CMAQ version 6.0 include:
 * Gas, Aqueous, & Aerosol Chemistry 
   * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 including paritical nitrate (pNO3) as a heterogenous reaction 
   * CRACMM3M, with incluesion of halogen chemistry to improve the representation of gas-phase and aerosol chemistry in marine environments.
