@@ -543,15 +543,15 @@ C *** Parameters
 
 C *** Species dependent parameters  (from KMT2)     
 
-      REAL( 8 ), PARAMETER :: ALPHA_H2O2   = 1.532D-01                            
-      REAL( 8 ), PARAMETER :: ALPHA_O3     = 1.00D-01           
-      REAL( 8 ), PARAMETER :: ALPHA_MEPX   = 6.758D-03        
-      REAL( 8 ), PARAMETER :: ALPHA_PACD   = 1.90D-02                     
-      REAL( 8 ), PARAMETER :: ALPHA_NO2    = 1.50D-03           
-      REAL( 8 ), PARAMETER :: ALPHA_SO2    = 1.10D-01               
-      REAL( 8 ), PARAMETER :: ALPHA_HCHO   = 2.00D-02      
-      REAL( 8 ), PARAMETER :: ALPHA_HNO4   = 1.00D-01 
-      REAL( 8 ), PARAMETER :: ALPHA_OH     = 5.00D-02        
+!      REAL( 8 ), PARAMETER :: ALPHA_H2O2   = 1.532D-01                            
+!      REAL( 8 ), PARAMETER :: ALPHA_O3     = 1.00D-01           
+!      REAL( 8 ), PARAMETER :: ALPHA_MEPX   = 6.758D-03        
+!      REAL( 8 ), PARAMETER :: ALPHA_PACD   = 1.90D-02                     
+!      REAL( 8 ), PARAMETER :: ALPHA_NO2    = 1.50D-03           
+!      REAL( 8 ), PARAMETER :: ALPHA_SO2    = 1.10D-01               
+!      REAL( 8 ), PARAMETER :: ALPHA_HCHO   = 2.00D-02      
+!      REAL( 8 ), PARAMETER :: ALPHA_HNO4   = 1.00D-01 
+!      REAL( 8 ), PARAMETER :: ALPHA_OH     = 5.00D-02        
 
 !     REAL,      PARAMETER :: GPKG        = 1.0E+03                      ! g/kg unit conversion
       REAL,      PARAMETER :: CFACTOR     = 8.0 * GPKG  * RGASUNIV / PI  ! factor in cbar_coeff
@@ -658,8 +658,7 @@ C *** Local Variables
       REAL( 8 )       :: CBAR_OH           ! molecular velocity of OH (m/s)
       REAL( 8 )       :: CBAR_HOCL         ! molecular velocity of HOCL (m/s)        
       REAL( 8 )       :: CBAR_HCL          ! molecular velocity of HCL (m/s)
-      REAL( 8 )       :: CBAR_CLNO2        ! molecular velocity of CLNO2 (m/s)  
-      
+      REAL( 8 )       :: CBAR_CLNO2        ! molecular velocity of CLNO2 (m/s)      
       REAL( 8 )       :: CBAR_NO2          ! molecular velocity of NO2 (m/s)  
       REAL( 8 )       :: CBAR_H2O2         ! molecular velocity of H2O2 (m/s)
       REAL( 8 )       :: CBAR_O3           ! molecular velocity of O3 (m/s)
@@ -714,8 +713,7 @@ C *** Local Variables
       REAL( 8 )       :: INV_DIFF_OH          ! reciprocal molecular diffusivity [m2/sec]
       REAL( 8 )       :: INV_DIFF_HOCL        ! reciprocal molecular diffusivity [m2/sec]
       REAL( 8 )       :: INV_DIFF_HCL         ! reciprocal molecular diffusivity [m2/sec]
-      REAL( 8 )       :: INV_DIFF_CLNO2       ! reciprocal molecular diffusivity [m2/sec]
-      
+      REAL( 8 )       :: INV_DIFF_CLNO2       ! reciprocal molecular diffusivity [m2/sec]      
       REAL( 8 )       :: INV_DIFF_H2O2        ! reciprocal molecular diffusivity [m2/sec]
       REAL( 8 )       :: INV_DIFF_NO2         ! reciprocal molecular diffusivity [m2/sec]
       REAL( 8 )       :: INV_DIFF_O3          ! reciprocal molecular diffusivity [m2/sec]
@@ -725,7 +723,7 @@ C *** Local Variables
       REAL( 8 )       :: INV_DIFF_HCHO        ! reciprocal molecular diffusivity [m2/sec]
       REAL( 8 )       :: INV_DIFF_HNO4        ! reciprocal molecular diffusivity [m2/sec]
       
-      REAL( 8 )       :: OHMIN      
+      REAL( 8 )       :: OHMIN                ! [OH-]       
       
       REAL            :: MARINE_AREA                     ! variable to identify grid-cells over ocean
 
@@ -778,8 +776,7 @@ C *** variables for calculating GAMMA of SO2 on aerosol
       REAL      :: HNO4_CONC        ! concentration of HNO4 (ppm)
       
       REAL( 8 ) J_SO2, J_H2O2, J_O3, J_NO2, J_MEPX, J_PACD, J_HCHO, J_HNO4 ! Mass Transfer Rates 
-                                                                           ! (or Mass Transfer Rates / 
-									   ! Heff (before call to CALCSO2GAMMAS)) 
+                                                                           ! (after call to CALCSO2GAMMAS)
       
 C Latitude and longitude for zenith angle calculation: Golam Sarwar * July 1, 2024
       REAL          COSZ                            ! local cosine of zenith angle
@@ -1088,6 +1085,7 @@ C *** Calculate rate constants at each grid cell location
                   DUMP_CELL = .FALSE.
                END IF
 #endif 
+
        
 C *** Extract aerosol concentrations and update aerosol volume, surface
 C     area and diameter values.
@@ -1139,8 +1137,7 @@ C *** calculate molecular speeds (m/s) using Eq 4 of Pleim et al (1995)
                CBAR_OH    = CBAR_COEFF * INV_SQRT_MWOH 
                CBAR_HOCL  = CBAR_COEFF * INV_SQRT_MWHOCL
                CBAR_HCL   = CBAR_COEFF * INV_SQRT_MWHCL
-               CBAR_CLNO2 = CBAR_COEFF * INV_SQRT_MWCLNO2  
-	       
+               CBAR_CLNO2 = CBAR_COEFF * INV_SQRT_MWCLNO2  	       
 	       CBAR_NO2   = CBAR_COEFF * INV_SQRT_MWNO2
                CBAR_H2O2  = CBAR_COEFF * INV_SQRT_MWH2O2
                CBAR_O3    = CBAR_COEFF * INV_SQRT_MWO3
@@ -1149,7 +1146,6 @@ C *** calculate molecular speeds (m/s) using Eq 4 of Pleim et al (1995)
                CBAR_PACD  = CBAR_COEFF * INV_SQRT_MWPACD               
 	       CBAR_HCHO = CBAR_COEFF * INV_SQRT_MWHCHO
 	       CBAR_HNO4 = CBAR_COEFF * INV_SQRT_MWHNO4
-!	       CBAR_OH   = CBAR_COEFF * INV_SQRT_MWOH 
 	       
 C *** correct N2O5 molecular diffusivity for ambient conditions
 
@@ -1171,8 +1167,7 @@ C *** correct molecular diffusivity for ambient conditions - assumed similar to 
                INV_DIFF_OH     = 1.0D0 / ( STD_DIFF_OH * ADJUST_DIFF )
                INV_DIFF_HOCL   = 1.0D0 / ( STD_DIFF_HOCL * ADJUST_DIFF )
                INV_DIFF_HCL    = 1.0D0 / ( STD_DIFF_HCL * ADJUST_DIFF )
-               INV_DIFF_CLNO2  = 1.0D0 / ( STD_DIFF_CLNO2 * ADJUST_DIFF )
-	       
+               INV_DIFF_CLNO2  = 1.0D0 / ( STD_DIFF_CLNO2 * ADJUST_DIFF )	       
 	       INV_DIFF_NO2    = 1.0D0 / ( STD_DIFF_NO2 * ADJUST_DIFF )
                INV_DIFF_H2O2   = 1.0D0 / ( STD_DIFF_H2O2 * ADJUST_DIFF )
                INV_DIFF_O3     = 1.0D0 / ( STD_DIFF_O3 * ADJUST_DIFF )
@@ -1181,7 +1176,6 @@ C *** correct molecular diffusivity for ambient conditions - assumed similar to 
                INV_DIFF_PACD   = 1.0D0 / ( STD_DIFF_PACD * ADJUST_DIFF )
 	       INV_DIFF_HCHO   = 1.0D0 / ( STD_DIFF_HCHO * ADJUST_DIFF )
 	       INV_DIFF_HNO4   = 1.0D0 / ( STD_DIFF_HNO4 * ADJUST_DIFF )
-!	       INV_DIFF_OH     = 1.0D0 / ( STD_DIFF_OH * ADJUST_DIFF )
 	       
 
 C *** get KN2O5 rate constants YIELD_CLNO2 for each mode
@@ -1383,7 +1377,7 @@ C *** set up variables needed for calculating K_BRONO2
 	       ALW = aerospc_conc(ah2o_idx,2)
 		
 !C *** assign SMALL gamma for SO2 oxidation in low aerosol liquid water 
-               IF ( SO2_CONC .LE. 0.0 .OR. AIRRH .LT. 0.5D0 .OR. ALW .LT. 0.01D0) THEN      
+               IF ( SO2_CONC .LE. 0.0 .OR. ALW .LT. 0.1D0) THEN      
   		         	GAMMAH2O2SO2 = SMALL 
   	        		GAMMAO3SO2   = SMALL 
   	        		GAMMAMEPXSO2 = SMALL 
@@ -1401,72 +1395,43 @@ C *** calculate gamma for SO2 reactions in aerosol liquid water
 C *** Transfer necessary info to CALCSO2GAMMAS to calculate 
 C *** kinetic mass transfer rates. Will use this info to determine 
 C *** which reactant is limiting for mass transfer when there are 2 gas phase reactants
-
-      J_H2O2 = ( 1.0D0 / ( RADIUS * RADIUS * INV_DIFF_H2O2 / 3.0D0 + 
-     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_H2O2 * CBAR_H2O2 ) ) ) * 
-     &  REAL( H2O2_CONC, 8 ) * AIRPRES * REAL( PA2ATM, 8 ) / 1.0D6 
-                    
-      J_O3 = ( 1.0D0 / ( RADIUS * RADIUS * INV_DIFF_O3 / 3.0D0 + 
-     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_O3 * CBAR_O3 ) ) ) * 
-     &  REAL( O3_CONC, 8 ) * AIRPRES * REAL( PA2ATM, 8 ) / 1.0D6 
-      
-      J_NO2 = ( 1.0D0 / ( RADIUS * RADIUS * INV_DIFF_NO2 / 3.0D0 + 
-     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_NO2 * CBAR_NO2 ) ) ) * 
-     &  REAL( NO2_CONC,8 ) * AIRPRES * REAL( PA2ATM, 8 ) / 1.0D6                           
-      
-      J_MEPX = ( 1.0D0 / ( RADIUS * RADIUS * INV_DIFF_MEPX / 3.0D0 + 
-     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_MEPX * CBAR_MEPX ) ) ) * 
-     &  REAL( MEPX_CONC,8 ) * AIRPRES * REAL( PA2ATM, 8 ) / 1.0D6                       
-      
-      J_PACD = ( 1.0D0 / ( RADIUS * RADIUS * INV_DIFF_PACD /3.0D0 + 
-     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_PACD * CBAR_PACD ) ) ) * 
-     &  REAL( PACD_CONC,8 ) * AIRPRES * REAL( PA2ATM, 8 ) / 1.0D6                      
-      
-      J_SO2  = ( 1.0D0 / ( RADIUS * RADIUS * INV_DIFF_SO2 / 3.0D0 + 
-     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_SO2 * CBAR_SO2 ) ) ) * 
-     &  REAL( SO2_CONC,8 ) * AIRPRES * REAL( PA2ATM, 8 ) / 1.0D6                    
-      
-      J_HCHO  = ( 1.0D0 / ( RADIUS * RADIUS * INV_DIFF_HCHO / 3.0D0 + 
-     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_HCHO * CBAR_HCHO ) ) ) * 
-     &  REAL( FORM_CONC,8 ) * AIRPRES * REAL( PA2ATM, 8 ) / 1.0D6                   
-      
-      J_HNO4 = ( 1.0D0 / ( RADIUS * RADIUS * INV_DIFF_HNO4 / 3.0D0 + 
-     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_HNO4 * CBAR_HNO4 ) ) ) * 
-     &  REAL( HNO4_CONC,8 ) * AIRPRES * REAL( PA2ATM, 8 ) / 1.0D6                      
+ 
+     
+               J_H2O2 = RADIUS * RADIUS * INV_DIFF_H2O2 / 3.0D0                     
+               J_O3   = RADIUS * RADIUS * INV_DIFF_O3 / 3.0D0       
+               J_NO2  = RADIUS * RADIUS * INV_DIFF_NO2 / 3.0D0                                
+               J_MEPX = RADIUS * RADIUS * INV_DIFF_MEPX / 3.0D0                          
+               J_PACD = RADIUS * RADIUS * INV_DIFF_PACD /3.0D0                          
+               J_SO2  = RADIUS * RADIUS * INV_DIFF_SO2 / 3.0D0                       
+               J_HCHO = RADIUS * RADIUS * INV_DIFF_HCHO / 3.0D0                          
+               J_HNO4 = RADIUS * RADIUS * INV_DIFF_HNO4 / 3.0D0                     
       
 
               CALL CALCSO2GAMMAS( RADIUS, AIRTEMP, AIRPRES, REAL (SO2_CONC, 8),
-     &                          DARK, REAL(NO2_CONC, 8), 
-     &                          REAL(H2O2_CONC, 8), REAL(O3_CONC, 8), 
+     &                          REAL(NO2_CONC, 8), REAL(H2O2_CONC, 8), REAL(O3_CONC, 8), 
      &                          REAL(MEPX_CONC, 8), REAL(PACD_CONC, 8), 
      &                          REAL(FORM_CONC, 8), REAL(HNO4_CONC, 8), REAL(OH_CONC, 8), 
-     &                          GAMMAH2O2SO2, GAMMAO3SO2,  
-     &                          GAMMAMEPXSO2, GAMMAPACDSO2, GAMMANO2SO2, GAMMATMISO2, 
-     &                          GAMMAHMSP,
-     &                          GAMMAHNO4SO2, GAMMAHMSOH,  
-     &                          OHMIN, J_SO2, J_H2O2, J_O3,
-     &                          J_NO2, J_MEPX, J_PACD, J_HCHO, J_HNO4 )
+     &                          CBAR_H2O2, CBAR_O3, CBAR_SO2, CBAR_MEPX,
+     &                          CBAR_PACD, CBAR_NO2, CBAR_HCHO, CBAR_HNO4,
+     &                          CBAR_OH, J_SO2, J_H2O2, J_O3,
+     &                          J_NO2, J_MEPX, J_PACD, J_HCHO, J_HNO4, OHMIN,
+     &                          GAMMAH2O2SO2, GAMMAO3SO2, GAMMAMEPXSO2,  
+     &                          GAMMAPACDSO2, GAMMANO2SO2, GAMMATMISO2, 
+     &                          GAMMAHMSP, GAMMAHNO4SO2, GAMMAHMSOH, DARK )
      
         END IF 
-
+	
 
                 O3_SO2_RXN_TIME     = 4.0D0 / ( CBAR_O3 * GAMMAO3SO2 )             
                 H2O2_SO2_RXN_TIME   = 4.0D0 / ( CBAR_H2O2 * GAMMAH2O2SO2 )                                      
-                NO2_SO2_RXN_TIME    = 4.0D0 / ( CBAR_NO2 * GAMMANO2SO2 )                                                                               
+                NO2_SO2_RXN_TIME    = 4.0D0 / ( CBAR_NO2 * GAMMANO2SO2 )                                                                       
                 MEPX_SO2_RXN_TIME   = 4.0D0 / ( CBAR_MEPX * GAMMAMEPXSO2 )                                        
                 PACD_SO2_RXN_TIME   = 4.0D0 / ( CBAR_PACD * GAMMAPACDSO2 )  
 		TMI_SO2_RXN_TIME    = 4.0D0 / ( CBAR_SO2 * GAMMATMISO2 )                                           
                 HCHO_SO2_RXN_TIME   = 4.0D0 / ( CBAR_HCHO * GAMMAHMSP )
 		HNO4_SO2_RXN_TIME   = 4.0D0 / ( CBAR_HNO4 * GAMMAHNO4SO2 )
+		HMS_OH_RXN_TIME     = 4.0D0 / ( CBAR_OH * GAMMAHMSOH )
 		
-
-		IF ( GAMMAHMSOH .GT. 0.0D0 ) THEN
-		   HMS_OH_RXN_TIME = 4.0D0 / ( CBAR_OH * GAMMAHMSOH )
-		ELSE
-		   HMS_OH_RXN_TIME = 0.0D0
-		END IF	       
-		
-
                CBARIEPOX = CFACTOR_IEPOX * DSQRT( AIRTEMP )
                CBARIMAE  = CFACTOR_IMAE  * DSQRT( AIRTEMP )
 
@@ -1930,7 +1895,7 @@ C hydrolysis
 	        CASE( IA_SO2N )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_NO2 + NO2_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(NO2_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.01D0 .AND. AIRRH .GE. 0.5D0  ) THEN
+     &  		  ALW .GE. 0.1D0 ) THEN
 		    IF(J_SO2 .LT. J_NO2) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + NO2_SO2_RXN_TIME*CBAR_NO2/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (NO2_CONC, 8)                                     ! 1/(min*ppm)
@@ -1944,7 +1909,7 @@ C hydrolysis
                 CASE( IA_SO2H )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_H2O2 + H2O2_SO2_RXN_TIME )  
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(H2O2_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.01D0 .AND. AIRRH .GE. 0.5D0  ) THEN 
+     &  		  ALW .GE. 0.1D0 ) THEN 
 		    IF(J_SO2 .LT. J_H2O2) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + H2O2_SO2_RXN_TIME*CBAR_H2O2/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (H2O2_CONC, 8)                                     ! 1/(min*ppm)
@@ -1958,7 +1923,7 @@ C hydrolysis
                 CASE( IA_SO2O )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_O3 + O3_SO2_RXN_TIME )  
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(O3_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.01D0 .AND. AIRRH .GE. 0.5D0  ) THEN		   
+     &  		  ALW .GE. 0.1D0  ) THEN		   
 		    IF(J_SO2 .LT. J_O3) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + O3_SO2_RXN_TIME*CBAR_O3/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (O3_CONC, 8)                                      ! 1/(min*ppm)
@@ -1972,7 +1937,7 @@ C hydrolysis
                 CASE( IA_SO2M )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_MEPX + MEPX_SO2_RXN_TIME )       
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(MEPX_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.01D0 .AND. AIRRH .GE. 0.5D0  ) THEN		   
+     &  		  ALW .GE. 0.1D0  ) THEN		   
 		    IF(J_SO2 .LT. J_MEPX) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + MEPX_SO2_RXN_TIME*CBAR_MEPX/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (MEPX_CONC, 8)                                    ! 1/(min*ppm)
@@ -1986,7 +1951,7 @@ C hydrolysis
                 CASE( IA_SO2P )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_PACD + PACD_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0  .AND. REAL(PACD_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.01D0 .AND. AIRRH .GE. 0.5D0  ) THEN
+     &  		  ALW .GE. 0.1D0  ) THEN
 		    IF(J_SO2 .LT. J_PACD) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + PACD_SO2_RXN_TIME*CBAR_PACD/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (PACD_CONC, 8)                                   ! 1/(min*ppm)
@@ -2001,7 +1966,7 @@ C hydrolysis
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + TMI_SO2_RXN_TIME )  
 !                   IF ( FE_PPM(2) .GT. MIN_VALUE .AND. MN_PPM(2) .GT. MIN_VALUE) THEN
                    IF ( FE_PPM(2) .GT. 0.0D0 .AND. MN_PPM(2) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.01D0 .AND. AIRRH .GE. 0.5D0  ) THEN
+     &  		  ALW .GE. 0.1D0 ) THEN
                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / FE_PPM(2) / MN_PPM(2)                                  ! 1/(min*ppm*ppm)
                    ELSE
                     KHETERO( IRATE, C,R,L ) = 0.0D0  
@@ -2010,7 +1975,7 @@ C hydrolysis
 		CASE( IA_HMSP )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_HCHO + HCHO_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0  .AND. REAL(FORM_CONC, 8) .GT. 0.0D0 .AND.
-     &  		  ALW .GE. 0.01D0 .AND. AIRRH .GE. 0.5D0  ) THEN
+     &  		  ALW .GE. 0.1D0  ) THEN
 		    IF(J_SO2 .LT. J_HCHO) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + HCHO_SO2_RXN_TIME*CBAR_HCHO/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (FORM_CONC, 8)                                   ! 1/(min*ppm)
@@ -2024,7 +1989,7 @@ C hydrolysis
 		CASE( IA_HNO4 )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_HNO4 + HNO4_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0  .AND. REAL(HNO4_CONC, 8) .GT. 0.0D0 .AND.
-     &  		  ALW .GE. 0.01D0 .AND. AIRRH .GE. 0.5D0  ) THEN
+     &  		  ALW .GE. 0.1D0 ) THEN
 		    IF(J_SO2 .LT. J_HNO4) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + HNO4_SO2_RXN_TIME*CBAR_HNO4/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (HNO4_CONC, 8)                                   ! 1/(min*ppm)
@@ -2037,7 +2002,7 @@ C hydrolysis
 		   
 		CASE( IA_HMSL1 )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_OH + HMS_OH_RXN_TIME )  
-                   IF ( HMS_PPM(2) .GT. 0.0D0 .AND. ALW .GE. 0.01D0 .AND. AIRRH .GE. 0.5D0 ) THEN
+                   IF ( HMS_PPM(2) .GT. 0.0D0 .AND. ALW .GE. 0.1D0  ) THEN
                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / HMS_PPM(2)                                            ! 1/(min*ppm)
                    ELSE
                     KHETERO( IRATE, C,R,L ) = 0.0D0  
@@ -2046,7 +2011,7 @@ C hydrolysis
 		CASE( IA_HMSL2 )   
 !                   K1 = OHMIN * 4800.0D0*DEXP(-4700.0D0*(1.d0/AIRTEMP-1.0D0/298.0D0)) +  
 !     &                  6.2D-8*DEXP(-11400*(1.0D0/AIRTEMP-1.0D0/298.0D0))  
-!                    IF ( ALW .GE. 0.01D0 .AND. AIRRH .GE. 0.5D0 ) THEN                   
+!                    IF ( ALW .GE. 0.1D0  ) THEN                   
 !                   KHETERO( IRATE, C,R,L ) = 60.0D0 * K1                                                          ! 1/(min)
 !                    ELSE
 		    KHETERO( IRATE, C,R,L ) = 0.0D0                                                                ! 1/(min)
@@ -3168,13 +3133,15 @@ C *** Calculate final values to return
       
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE CALCSO2GAMMAS( RADIUS, TEMPERATURE, PRESSURE, SO2_CONC,
-     &                          DARK, NO2_CONC, H2O2_CONC, O3_CONC, 
-     &                          MEPX_CONC, PACD_CONC, 
-     &                          HCHO_CONC, HNO4_CONC, OH_CONC, 
-     &                          GAMMAH2O2, GAMMAO3, GAMMAMEPX, GAMMAPACD, GAMMANO2,
-     &                          GAMMASO2, GAMMAHMSP,
-     &                          GAMMAHNO4, GAMMAOH, OHMINUS, J_SO2, J_H2O2, J_O3,
-     &                          J_NO2, J_MEPX, J_PACD, J_HCHO, J_HNO4 )
+     &                          NO2_CONC, H2O2_CONC, O3_CONC, MEPX_CONC, 
+     &                          PACD_CONC, HCHO_CONC, HNO4_CONC, OH_CONC, 
+     &                          CBAR_H2O2, CBAR_O3, CBAR_SO2, CBAR_MEPX,
+     &                          CBAR_PACD, CBAR_NO2, CBAR_HCHO, CBAR_HNO4,
+     &                          CBAR_OH, J_SO2, J_H2O2, J_O3, J_NO2, J_MEPX,
+     &                          J_PACD, J_HCHO, J_HNO4, OHMINUS, GAMMAH2O2, 
+     &                          GAMMAO3, GAMMAMEPX, GAMMAPACD, GAMMANO2,
+     &                          GAMMASO2, GAMMAHMSP, GAMMAHNO4, GAMMAOH, DARK )
+     
 
 C  Calculates the uptake coefficients (gammas) for SO2 oxidation by 
 C  H2O2, O3, MHP, PAA, NO2, O2 (catalyzed by TMI), HNO4
@@ -3212,7 +3179,7 @@ C  3. Farrell et al. "Predicted impacts of heterogeneous chemical pathways on
 C                     particulate sulfur over Fairbanks (Alaska), the Northern 
 C                     Hemisphere, and the Contiguous United States", 
 C                     Atmos. Chem. Phys., 25, 3287-3312, 2025.
-C                     https://doi.org/10.5194/acp-25-3287-2025, 
+C                     https://doi.org/10.5194/acp-25-3287-2025 
 C
 C-----------------------------------------------------------------------
 
@@ -3238,10 +3205,20 @@ C *** Arguments
       REAL( 8 ),    INTENT( IN ) :: HCHO_CONC         ! HCHO concentration [ppm]
       REAL( 8 ),    INTENT( IN ) :: HNO4_CONC         ! HNO4 concentration [ppm]
       REAL( 8 ),    INTENT( IN ) :: OH_CONC           ! OH concentration [ppm]
+        
+      REAL( 8 ),    INTENT( IN ) :: CBAR_H2O2              ! molecular velocity of H2O2 (m/s)  
+      REAL( 8 ),    INTENT( IN ) :: CBAR_O3                ! molecular velocity of O3 (m/s)  
+      REAL( 8 ),    INTENT( IN ) :: CBAR_SO2               ! molecular velocity of SO2 (m/s)  
+      REAL( 8 ),    INTENT( IN ) :: CBAR_MEPX              ! molecular velocity of MEPX (m/s)  
+      REAL( 8 ),    INTENT( IN ) :: CBAR_PACD              ! molecular velocity of PACD (m/s)  
+      REAL( 8 ),    INTENT( IN ) :: CBAR_NO2               ! molecular velocity of NO2 (m/s) 
+      REAL( 8 ),    INTENT( IN ) :: CBAR_HCHO              ! molecular velocity of HCHO (m/s)
+      REAL( 8 ),    INTENT( IN ) :: CBAR_HNO4              ! molecular velocity of HNO4 (m/s)
+      REAL( 8 ),    INTENT( IN ) :: CBAR_OH                ! molecular velocity of OH (m/s) 
 
       LOGICAL  ,    INTENT( IN ) :: DARK              ! Day or Night       
 
-! mass transfer rate (output from calcso2gammas) or rate / effective Henry's Law (input to calcso2gammas)    
+! mass transfer rate (output from calcso2gammas)  
   
       REAL( 8 ),    INTENT( INOUT ) :: J_SO2           ! mass transfer rate for SO2
       REAL( 8 ),    INTENT( INOUT ) :: J_H2O2          ! mass transfer rate for H2O2
@@ -3261,7 +3238,8 @@ C *** Arguments
       REAL( 8 ),    INTENT( OUT ) :: GAMMAHMSP         ! Uptake coeff for HCHO []
       REAL( 8 ),    INTENT( OUT ) :: GAMMAHNO4         ! Uptake coeff for HNO4 []
       REAL( 8 ),    INTENT( OUT ) :: GAMMAOH           ! Uptake coeff for OH   []  
-      REAL( 8 ),    INTENT( OUT ) :: OHMINUS           ! [OH-] [M]   
+      
+      REAL( 8 ),    INTENT( OUT ) :: OHMINUS           ! [OH-] [M]     
 
 C *** Local Variables
       REAL( 8)        :: AH3OP                           ! total fine-mode hydronium [ug/m3]
@@ -3317,7 +3295,6 @@ C *** Common Parameters
       REAL( 8 ), PARAMETER :: RGAS        = 0.08206D0                    ! Universal gas constant [L atm/mol K]         
       REAL( 8 ), PARAMETER :: DENSITY     = 1.0D+03                      ! density of water (gm/liter)  
       REAL( 8 ), PARAMETER :: DA          = 1.0D-09                      ! Unit - M2 / s         
-!      REAL( 8),  PARAMETER :: AMIN_WATER  = 1.0D+00                      ! mimimum fine-mode water for activation of chemistry [ug/m3]
      
 C *** Accommodation coefficients  (from KMT2; unitless)     
 
@@ -3354,63 +3331,38 @@ C *** Parameters for SO2
       REAL( 8 )  :: KLOW_NO2    
       REAL( 8 )  :: KHIGH_NO2 
       REAL( 8 )  :: K_CHEM_SO2_1, K_CHEM_SO2_2, K_ION_NO2    
-      REAL( 8 )  :: IONIC                                         ! Ionic strength in aerosol water [M or mol/kg H2O] 
-      REAL( 8 )  :: IONICFE, IONIC_1, IONIC_2, IONIC_3, IONIC_4   ! Max limit for ionic strength in different lab studies           
-      REAL( 8 )  :: H2OW                                          ! Kw   
-      REAL( 8 )  :: HPLUS, HPLUSmolal                             ! H+  concentration in ALW   [M]
-      REAL( 8 )  :: pH                                            ! -log10[H+]
-      REAL( 8 )  :: TOTWATER, INORGWAT               ! water concentration in micrograms per m3, inorganic or inorganic+organic water
+      REAL( 8 )  :: IONIC                                        ! Ionic strength in aerosol water [M or mol/kg H2O] 
+      REAL( 8 )  :: IONICFE, IONIC_1, IONIC_2, IONIC_3, IONIC_4  ! Max limit for ionic strength           
+      REAL( 8 )  :: H2OW                                         ! Kw   
+      REAL( 8 )  :: HPLUS, HPLUSmolal                            ! H+  concentration  [M] or m
+      REAL( 8 )  :: pH                                           ! -log10[H+]
+      REAL( 8 )  :: TOTWATER, INORGWAT                           ! water concentration in micrograms per m3, 
+                                                                 ! inorganic or inorganic+organic water
 
-      REAL( 8 ) :: FE_OX                                        ! Fe(III) available for sulfate oxidation
-      REAL( 8 ) :: MN_OX                                        ! Mn(II) available for sulfate oxidation
-      REAL( 8 ) :: FE_III                                       ! Fractional Fe(III) partitioning
-      REAL( 8 ) :: MN_II                                        ! Fractional Mn(II) partitioning
-      REAL( 8 ) :: FE_SOL                                       ! Fractional Fe solubility
-      REAL( 8 ) :: MN_SOL                                       ! Fractional Mn solubility
+      REAL( 8 )  :: FE_OX                                        ! Fe(III) available for sulfate oxidation
+      REAL( 8 )  :: MN_OX                                        ! Mn(II) available for sulfate oxidation
+      REAL( 8 )  :: FE_III                                       ! Fractional Fe(III) partitioning
+      REAL( 8 )  :: MN_II                                        ! Fractional Mn(II) partitioning
+      REAL( 8 )  :: FE_SOL                                       ! Fractional Fe solubility
+      REAL( 8 )  :: MN_SOL                                       ! Fractional Mn solubility
 
-      REAL( 8 ) :: AHMS
-      REAL( 8 ) :: KHYDHCHO
+      REAL( 8 )  :: AHMS                                         ! Hydroxymethanesulfonate [M]
+      REAL( 8 )  :: KHYDHCHO                                     ! Hydration coefficient for HCHO
 
-      REAL( 8 )  :: AMN                                         ! Mn in aerosol liquid water
-      REAL( 8 )  :: AFE                                         ! Fe in aerosol liquid water
-      REAL( 8 )  :: TS6                                         ! total SO4 conc in aerosol liquid water (mol/lite
-      REAL( 8 )  :: SO42M                                       ! SO42- [M]
-      REAL( 8 )  :: HSO4M                                       ! HSO4- [M]
-
-      REAL( 8 )  :: A                                           ! assumed complementary anions of Fe in aerosol liquid water
-      REAL( 8 )  :: B                                           ! assumed complementary anions of Mn in aerosol liquid water   
+      REAL( 8 )  :: AMN                                          ! Total Mn in J mode [M]
+      REAL( 8 )  :: AFE                                          ! Total Fe in J mode [M]
+      REAL( 8 )  :: TS6                                          ! Total SO4 conc in aerosol liquid water [M]
+      REAL( 8 )  :: SO42M                                        ! SO42- [M]
+      REAL( 8 )  :: HSO4M                                        ! HSO4- [M]
       
-      REAL( 8 ) :: WCONC					! Water concentration [M] 
+      REAL( 8 ) :: WCONC					 ! Water concentration [M] 
     
       REAL( 8 ) :: AFEm, AMNm, FE_OXm, MN_OXm
-      REAL( 8 ) :: FSIV(3)                                      ! H2SO3, HSO3, and SO3 Fraction of SIV
+      REAL( 8 ) :: FSIV(3)                                       ! H2SO3, HSO3, and SO3 Fraction of SIV
       
-      REAL( 8 ) :: H2O2, O3, NO2, MEPX, PACD, HCHO, OH, HNO4
+      REAL( 8 ) :: H2O2, O3, NO2, MEPX, PACD, HCHO, OH, HNO4     ! oxidant/reactant concentrations [M]
       
-C *** INV_SQRT_MW*   
-      REAL( 8 ), PARAMETER :: INV_SQRT_MWH2O2 = 1.71498585D-01 
-      REAL( 8 ), PARAMETER :: INV_SQRT_MWO3   = 1.44337567D-1 
-      REAL( 8 ), PARAMETER :: INV_SQRT_MWSO2  = 1.2500000D-1     
-      REAL( 8 ), PARAMETER :: INV_SQRT_MWMEPX = 1.44337567D-1 
-      REAL( 8 ), PARAMETER :: INV_SQRT_MWPACD = 1.14707866D-1 
-      REAL( 8 ), PARAMETER :: INV_SQRT_MWNO2  = 1.47425932467825D-1    
-      REAL( 8 ), PARAMETER :: INV_SQRT_MWHCHO = 1.82495D-1
-      REAL( 8 ), PARAMETER :: INV_SQRT_MWHNO4 = 1.125D-1
-      REAL( 8 ), PARAMETER :: INV_SQRT_MWOH   = 2.4248D-1  
-      REAL( 8 ), PARAMETER :: SMALL           = 1.0D-30
-
-C *** molecular velocities           
-      REAL( 8 )       :: CBAR_H2O2              ! molecular velocity of H2O2 (m/s)  
-      REAL( 8 )       :: CBAR_O3                ! molecular velocity of O3 (m/s)  
-      REAL( 8 )       :: CBAR_SO2               ! molecular velocity of SO2 (m/s)  
-      REAL( 8 )       :: CBAR_MEPX              ! molecular velocity of MEPX (m/s)  
-      REAL( 8 )       :: CBAR_PACD              ! molecular velocity of PACD (m/s)  
-      REAL( 8 )       :: CBAR_NO2               ! molecular velocity of NO2 (m/s) 
-      REAL( 8 )       :: CBAR_HCHO              ! molecular velocity of HCHO (m/s)
-      REAL( 8 )       :: CBAR_HNO4              ! molecular velocity of HNO4 (m/s)
-      REAL( 8 )       :: CBAR_OH                ! molecular velocity of OH (m/s) 
-
-      REAL( 8 )       :: CBAR_COEFF             ! cell coefficient for mean molecular speed              
+      REAL( 8 ), PARAMETER :: SMALL           = 1.0D-30            
 
       INTEGER I        
 
@@ -3468,7 +3420,7 @@ C *** J-mode particle volume [L/m**3 air]
        
        END IF       
        
-       WCONC = TOTWATER * inv_volume / ( REAL( aerospc_mw( ah2o_idx ),8 ) * 1.d6)  ! water concentration (M)
+       WCONC = TOTWATER * inv_volume / ( REAL( aerospc_mw( ah2o_idx ),8 ) * 1.d6)  ! water concentration [M]
   
 ! *** Calculate HPLUS and OHMINUS concentration   
 
@@ -3476,7 +3428,7 @@ C *** J-mode particle volume [L/m**3 air]
        H2OW  = 1.8D-16 * DEXP( -6.8D+03 * TFAC ) ! (does not include [H2O] = 55.5M)
       
        HPLUSmolal = REAL( aerospc_conc( ah3op_idx, 2 ),8 ) * DENSITY / 
-     &            ( TOTWATER * REAL( aerospc_mw( ah3op_idx ),8 ) )            ! mol/kg
+     &            ( TOTWATER * REAL( aerospc_mw( ah3op_idx ),8 ) )       ! mol/kg H2O
 
        HPLUS = REAL(aerospc_conc( ah3op_idx, 2 ),8) * inv_volume /
      &        (REAL(aerospc_mw( ah3op_idx),8) * 1.d6)                    ! M
@@ -3485,9 +3437,7 @@ C *** J-mode particle volume [L/m**3 air]
       
        pH = -DLOG10(HPLUSmolal)
 
-C *** Determine AFE and AMN concentration in aerosol liquid water !M
-!      AFE = aerospc_conc( afe_idx, 2 ) * DENSITY / ( aerospc_conc( ah2o_idx, 2 ) * aerospc_mw( afe_idx ) )    ! M
-!      AMN = aerospc_conc( amn_idx, 2 ) * DENSITY / ( aerospc_conc( ah2o_idx, 2 ) * aerospc_mw( amn_idx ) )    ! M
+C *** Determine AFE and AMN concentration in aerosol liquid water [M]
 
        AFE = REAL(aerospc_conc( afe_idx, 2 ),8) * inv_volume /
      &       (REAL(aerospc_mw( afe_idx),8) * 1.d6) !M
@@ -3504,15 +3454,14 @@ C...Assign fraction partitioning of FE(III) and MN(II)
       MN_II = 1.0D0 
 
 C...Assign solubility of Fe and Mn (more representative of natural emissions)
-      FE_SOL = 0.1D0 !0.1D0
-      MN_SOL = 0.5D0 !0.5D0 
+      FE_SOL = 0.1D0
+      MN_SOL = 0.5D0
 
 C *** Calculate [Fe3+], [Mn2+] concentration [M or m] 
  
       FE_OX = FE_III * FE_SOL * AFE  
       MN_OX = MN_II  * MN_SOL * AMN 
-      
-          
+               
 C *** Limit available Fe3+, Mn2+ at high pH
       
       IF(FEMNprec .GT. 0) THEN
@@ -3521,8 +3470,7 @@ C *** Limit available Fe3+, Mn2+ at high pH
       END IF
 
 C *** Calculate total sulfate concentration in ALW and calculate SO42- and HSO4-
-
-!      TS6 = aerospc_conc( aso4_idx, 2 ) * DENSITY / ( aerospc_conc( ah2o_idx, 2 ) * aerospc_mw( aso4_idx ) )   
+ 
        TS6 = REAL(aerospc_conc( aso4_idx, 2 ), 8 ) * inv_volume /
      &      ( REAL(aerospc_mw( aso4_idx), 8 ) * 1.d6 ) !M    
        K2 = 1.02D-2 * EXP( 2.720D3 * TFAC ) 
@@ -3531,20 +3479,7 @@ C *** Calculate total sulfate concentration in ALW and calculate SO42- and HSO4-
        HSO4M = TS6 - SO42M                         ! bisulfate M
 
 ! *** Determine ionic strength [M of m]
-!          IONICm = 0.50 * HPLUS
-!     &          + 0.50 * aerospc_conc( ana_idx, 2 )   * 1.0D0 * DENSITY / ( aerospc_mw( ana_idx  ) * aerospc_conc( ah2o_idx, 2))  
-!     &          + 0.50 * aerospc_conc( ak_idx, 2 )    * 1.0D0 * DENSITY / ( aerospc_mw( ak_idx  )  * aerospc_conc( ah2o_idx, 2))  
-!     &          + 0.50 * aerospc_conc( amg_idx, 2 )   * 4.0D0 * DENSITY / ( aerospc_mw( amg_idx )  * aerospc_conc( ah2o_idx, 2))                     
-!     &          + 0.50 * aerospc_conc( anh4_idx, 2 )  * 1.0D0 * DENSITY / ( aerospc_mw( anh4_idx)  * aerospc_conc( ah2o_idx, 2))   
-!     &          + 0.50 * aerospc_conc( ano3_idx, 2 )  * 1.0D0 * DENSITY / ( aerospc_mw( ano3_idx)  * aerospc_conc( ah2o_idx, 2))   
-!     &          + 0.50 * aerospc_conc( acl_idx, 2 )   * 1.0D0 * DENSITY / ( aerospc_mw( acl_idx )  * aerospc_conc( ah2o_idx, 2))   
-!     &          + 0.50 * aerospc_conc( aca_idx, 2 )   * 4.0D0 * DENSITY / ( aerospc_mw( aca_idx )  * aerospc_conc( ah2o_idx, 2))
-!     &          + 0.50 * OHMINUS * 1.0D0 
-!     &          + 0.50 * FE_OX   * 9.0D0 
-!     &          + 0.50 * MN_OX   * 4.0D0 
-!     &          + 0.50 * SO42M   * 4.0D0 
-!     &          + 0.50 * HSO4M   * 1.0D0      ! 
-!     
+    
           IONIC = 0.50 * HPLUS *1.0D0
      &          + 0.50 * REAL(aerospc_conc( ana_idx, 2 )/aerospc_mw( ana_idx),8) * inv_volume / 1.d6 *1.0D0  
      &          + 0.50 * REAL(aerospc_conc( ak_idx, 2 )/aerospc_mw( ak_idx),8) * inv_volume / 1.d6 *1.0D0
@@ -3568,7 +3503,6 @@ C *** Calculate total sulfate concentration in ALW and calculate SO42- and HSO4-
 	  IONIC_3 = MIN( IONIC, 1.2 )
 	  IONIC_4 = MIN( IONIC, 1.14D0 ) 
 
-
 C *** Henry's Law coefficients (M/atm)
       H_SO2  = REAL( HLCONST( HLC_SO2       , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
       H_H2O2 = REAL( HLCONST( HLC_H2O2      , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
@@ -3581,21 +3515,6 @@ C *** Henry's Law coefficients (M/atm)
       H_HCHO = H_HCHO / ( 1.d0 + KHYDHCHO )
       H_HNO4 = REAL( HLCONST( HLC_HNO4       , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
       H_OH   = REAL( HLCONST( HLC_OH         , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
-                  
-      
-C *** Calculate Mean molecular speeds - m/s
-      CBAR_COEFF  = DSQRT( REAL(CFACTOR, 8) * TEMPERATURE ) 
-      
-      CBAR_H2O2   = CBAR_COEFF * INV_SQRT_MWH2O2
-      CBAR_O3     = CBAR_COEFF * INV_SQRT_MWO3
-      CBAR_SO2    = CBAR_COEFF * INV_SQRT_MWSO2      
-      CBAR_MEPX   = CBAR_COEFF * INV_SQRT_MWMEPX
-      CBAR_PACD   = CBAR_COEFF * INV_SQRT_MWPACD      
-      CBAR_NO2    = CBAR_COEFF * INV_SQRT_MWNO2
-      CBAR_HCHO   = CBAR_COEFF * INV_SQRT_MWHCHO
-      CBAR_HNO4   = CBAR_COEFF * INV_SQRT_MWHNO4
-      CBAR_OH     = CBAR_COEFF * INV_SQRT_MWOH
-             		   
   
 C *** Calculate H2SO3, HSO3, SO3, S(IV)          
       AKEQ1 = 1.3D-02  * EXP ( 1.96D+03 * TFAC ) / 55.5 * WCONC  
@@ -3632,17 +3551,38 @@ C *** Calculate oxidant concentrations [M]
       HCHO = H_HCHO * HCHO_CONC * PRESSURE * REAL (PA2ATM, 8) / 1.0D6 
       HNO4 = H_HNO4 * HNO4_CONC * PRESSURE * REAL (PA2ATM, 8) / 1.0D6 
       OH   = H_OH * OH_CONC * PRESSURE * REAL (PA2ATM, 8) / 1.0D6
-
-C *** Multiply input J's by effective Henry's law coefficients to get mass transfer rates
-      J_H2O2 = J_H2O2 * H_H2O2                  
-      J_O3 = J_O3 * H_O3                                         
-      J_NO2 = J_NO2 * H_NO2                                     
-      J_MEPX = J_MEPX * H_MEPX                                      
-      J_PACD = J_PACD * H_PACD                                      
-      J_SO2  = J_SO2 * H_SO2_EFF                                   
-      J_HCHO = J_HCHO * H_HCHO                                   
-      J_HNO4 = J_HNO4 * H_HNO4  
       
+      J_H2O2 = ( 1.0D0 / ( J_H2O2 + 
+     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_H2O2 * CBAR_H2O2 ) ) ) * 
+     &  H2O2 
+                    
+      J_O3 = ( 1.0D0 / ( J_O3 + 
+     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_O3 * CBAR_O3 ) ) ) * 
+     &  O3
+      
+      J_NO2 = ( 1.0D0 / ( J_NO2 + 
+     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_NO2 * CBAR_NO2 ) ) ) * 
+     &  NO2                          
+      
+      J_MEPX = ( 1.0D0 / ( J_MEPX + 
+     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_MEPX * CBAR_MEPX ) ) ) * 
+     &  MEPX                    
+      
+      J_PACD = ( 1.0D0 / ( J_PACD + 
+     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_PACD * CBAR_PACD ) ) ) * 
+     &  PACD                      
+      
+      J_SO2  = ( 1.0D0 / ( J_SO2 + 
+     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_SO2 * CBAR_SO2 ) ) ) * 
+     &  SIV                   
+      
+      J_HCHO  = ( 1.0D0 / ( J_HCHO + 
+     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_HCHO * CBAR_HCHO ) ) ) * 
+     &  HCHO                  
+      
+      J_HNO4 = ( 1.0D0 / ( J_HNO4 + 
+     &  4.0D0 * RADIUS / ( 3.0D0 * ALPHA_HNO4 * CBAR_HNO4 ) ) ) * 
+     &  HNO4            
       
 C *** CALCULATE PSEUDO 1ST ORDER RATE COEFFICIENTS                    
       
@@ -3757,7 +3697,7 @@ C *** Calculate K_CHEM_HCHO
       
       IF (HMSlo .GT. 1) then
       
-        K1 = 0.5D0*(3.20D+2 * EXP( -2.70D3 * TFAC ) +  7.90D+2 * EXP( -2.90D3 * TFAC ))                                                    
+        K1 = 0.5D0*(3.20D+2 * EXP( -2.70D3 * TFAC ) + 7.90D+2 * EXP( -2.90D3 * TFAC ))                                                    
         K2 = 0.5D0*(3.80D+6 * EXP( -2.50D3 * TFAC ) + 2.50D+7 * EXP( -2.45D3 * TFAC ))
       
       ELSE IF (HMSlo .GT. 0 .and. HMSlo .LT. 2) then
@@ -3793,7 +3733,7 @@ C *** Calculate GAMMAH2O2
       IF( K_CHEM_H2O2 .GT. 0.0D0 )THEN
           L_H2O2 = DSQRT (DA / K_CHEM_H2O2)  
           IF( J_SO2 .LT. J_H2O2 ) THEN
-              GAMMAH2O2 = SO2_GAMMA ( RADIUS, L_H2O2, ALPHA_SO2, CBAR_SO2, H_SO2_EFF, TEMPERATURE, K_CHEM_H2O2 )
+             GAMMAH2O2 = SO2_GAMMA ( RADIUS, L_H2O2, ALPHA_SO2, CBAR_SO2, H_SO2_EFF, TEMPERATURE, K_CHEM_H2O2 )
           ELSE    
              GAMMAH2O2 = SO2_GAMMA ( RADIUS, L_H2O2, ALPHA_H2O2, CBAR_H2O2, H_H2O2, TEMPERATURE, K_CHEM_H2O2 )
           END IF
@@ -3813,7 +3753,6 @@ C *** Calculate GAMMAO3
       ELSE
           GAMMAO3 = SMALL
       END IF
-
 
 C *** Calculate GAMMAMEPX
        
@@ -3841,7 +3780,6 @@ C *** Calculate GAMMAPACD
         GAMMAPACD = SMALL
       END IF
 
-
 C *** Calculate GAMMANO2
    
       IF( K_CHEM_NO2 .GT. 0.0D0 )THEN
@@ -3854,7 +3792,6 @@ C *** Calculate GAMMANO2
       ELSE
         GAMMANO2 = SMALL
       END IF
-
       
 C *** Calculate GAMMASO2
              
@@ -3864,7 +3801,6 @@ C *** Calculate GAMMASO2
       ELSE
         GAMMASO2 = SMALL
       END IF
-
        
 C *** Calculate GAMMAHMSP 
        
@@ -3879,7 +3815,6 @@ C *** Calculate GAMMAHMSP
       ELSE
         GAMMAHMSP = SMALL
       END IF
-
       
 C *** Calculate GAMMAHNO4 
             
@@ -3893,7 +3828,6 @@ C *** Calculate GAMMAHNO4
       ELSE
         GAMMAHNO4 = SMALL
       END IF
-
       
 C *** Calculate GAMMAOH     
 
@@ -3901,11 +3835,10 @@ C *** Calculate GAMMAOH
         L_OH = DSQRT (DA / K_CHEM_OH)
         GAMMAOH = SO2_GAMMA ( RADIUS, L_OH, ALPHA_OH, CBAR_OH, H_OH, TEMPERATURE, K_CHEM_OH )  
       ELSE
-        L_OH = 0.0D0
-	GAMMAOH = 0.0D0
-      ENDIF      
-   
+	GAMMAOH = SMALL !0.0D0
+      ENDIF   
 
+		
       RETURN
 
       END SUBROUTINE CALCSO2GAMMAS    
