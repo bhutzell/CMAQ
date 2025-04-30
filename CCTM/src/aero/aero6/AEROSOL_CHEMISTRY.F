@@ -1377,7 +1377,7 @@ C *** set up variables needed for calculating K_BRONO2
 	       ALW = aerospc_conc(ah2o_idx,2)
 		
 !C *** assign SMALL gamma for SO2 oxidation in low aerosol liquid water 
-               IF ( SO2_CONC .LE. 0.0 .OR. ALW .LT. 0.1D0) THEN      
+               IF ( SO2_CONC .LE. 0.0 .OR. ALW .LT. 0.1D0 .OR. AIRRH .LT. 0.5D0) THEN      
   		         	GAMMAH2O2SO2 = SMALL 
   	        		GAMMAO3SO2   = SMALL 
   	        		GAMMAMEPXSO2 = SMALL 
@@ -1895,7 +1895,7 @@ C hydrolysis
 	        CASE( IA_SO2N )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_NO2 + NO2_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(NO2_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0 ) THEN
+     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0 ) THEN
 		    IF(J_SO2 .LT. J_NO2) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + NO2_SO2_RXN_TIME*CBAR_NO2/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (NO2_CONC, 8)                                     ! 1/(min*ppm)
@@ -1909,7 +1909,7 @@ C hydrolysis
                 CASE( IA_SO2H )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_H2O2 + H2O2_SO2_RXN_TIME )  
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(H2O2_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0 ) THEN 
+     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0  ) THEN 
 		    IF(J_SO2 .LT. J_H2O2) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + H2O2_SO2_RXN_TIME*CBAR_H2O2/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (H2O2_CONC, 8)                                     ! 1/(min*ppm)
@@ -1923,7 +1923,7 @@ C hydrolysis
                 CASE( IA_SO2O )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_O3 + O3_SO2_RXN_TIME )  
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(O3_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0  ) THEN		   
+     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN		   
 		    IF(J_SO2 .LT. J_O3) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + O3_SO2_RXN_TIME*CBAR_O3/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (O3_CONC, 8)                                      ! 1/(min*ppm)
@@ -1937,7 +1937,7 @@ C hydrolysis
                 CASE( IA_SO2M )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_MEPX + MEPX_SO2_RXN_TIME )       
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(MEPX_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0  ) THEN		   
+     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN		   
 		    IF(J_SO2 .LT. J_MEPX) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + MEPX_SO2_RXN_TIME*CBAR_MEPX/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (MEPX_CONC, 8)                                    ! 1/(min*ppm)
@@ -1951,7 +1951,7 @@ C hydrolysis
                 CASE( IA_SO2P )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_PACD + PACD_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0  .AND. REAL(PACD_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0  ) THEN
+     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN
 		    IF(J_SO2 .LT. J_PACD) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + PACD_SO2_RXN_TIME*CBAR_PACD/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (PACD_CONC, 8)                                   ! 1/(min*ppm)
@@ -1966,7 +1966,7 @@ C hydrolysis
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + TMI_SO2_RXN_TIME )  
 !                   IF ( FE_PPM(2) .GT. MIN_VALUE .AND. MN_PPM(2) .GT. MIN_VALUE) THEN
                    IF ( FE_PPM(2) .GT. 0.0D0 .AND. MN_PPM(2) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0 ) THEN
+     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0  ) THEN
                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / FE_PPM(2) / MN_PPM(2)                                  ! 1/(min*ppm*ppm)
                    ELSE
                     KHETERO( IRATE, C,R,L ) = 0.0D0  
@@ -1975,7 +1975,7 @@ C hydrolysis
 		CASE( IA_HMSP )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_HCHO + HCHO_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0  .AND. REAL(FORM_CONC, 8) .GT. 0.0D0 .AND.
-     &  		  ALW .GE. 0.1D0  ) THEN
+     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN
 		    IF(J_SO2 .LT. J_HCHO) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + HCHO_SO2_RXN_TIME*CBAR_HCHO/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (FORM_CONC, 8)                                   ! 1/(min*ppm)
@@ -1989,7 +1989,7 @@ C hydrolysis
 		CASE( IA_HNO4 )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_HNO4 + HNO4_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0  .AND. REAL(HNO4_CONC, 8) .GT. 0.0D0 .AND.
-     &  		  ALW .GE. 0.1D0 ) THEN
+     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0  ) THEN
 		    IF(J_SO2 .LT. J_HNO4) THEN
 		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + HNO4_SO2_RXN_TIME*CBAR_HNO4/CBAR_SO2 )
 		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (HNO4_CONC, 8)                                   ! 1/(min*ppm)
@@ -2002,7 +2002,7 @@ C hydrolysis
 		   
 		CASE( IA_HMSL1 )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_OH + HMS_OH_RXN_TIME )  
-                   IF ( HMS_PPM(2) .GT. 0.0D0 .AND. ALW .GE. 0.1D0  ) THEN
+                   IF ( HMS_PPM(2) .GT. 0.0D0 .AND. ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN
                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / HMS_PPM(2)                                            ! 1/(min*ppm)
                    ELSE
                     KHETERO( IRATE, C,R,L ) = 0.0D0  
@@ -2011,7 +2011,7 @@ C hydrolysis
 		CASE( IA_HMSL2 )   
 !                   K1 = OHMIN * 4800.0D0*DEXP(-4700.0D0*(1.d0/AIRTEMP-1.0D0/298.0D0)) +  
 !     &                  6.2D-8*DEXP(-11400*(1.0D0/AIRTEMP-1.0D0/298.0D0))  
-!                    IF ( ALW .GE. 0.1D0  ) THEN                   
+!                    IF ( ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN                   
 !                   KHETERO( IRATE, C,R,L ) = 60.0D0 * K1                                                          ! 1/(min)
 !                    ELSE
 		    KHETERO( IRATE, C,R,L ) = 0.0D0                                                                ! 1/(min)
