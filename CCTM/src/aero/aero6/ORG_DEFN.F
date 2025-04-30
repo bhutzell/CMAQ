@@ -980,6 +980,7 @@ C Key Subroutines/Functions called:  newt, soabisection
       Use aeromet_data
       Use const
       Use utilio_defn
+      Use mass_transfer, only : hcond3
 
       Implicit None
 

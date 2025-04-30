@@ -210,6 +210,7 @@ C-----------------------------------------------------------------------
       USE CONST
       USE UTILIO_DEFN
       USE AERO_BUDGET
+      USE MASS_TRANSFER, ONLY : VOLINORG
 
 #ifdef sens
       USE DDM3D_DEFN, ONLY : NP, NPMAX
