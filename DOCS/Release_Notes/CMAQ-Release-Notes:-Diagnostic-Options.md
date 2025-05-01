@@ -97,6 +97,19 @@ Additional minor changes were made to support ELMOv2 implementation:
 |[Merge for PR#1166](https://github.com/USEPA/CMAQ/commit/7797e7939ab221b9e345af14c360ee3f6a25ed34) | [PR#1166](https://github.com/USEPA/CMAQ_Dev/pull/1166)  |   
 
 
+### Redirect ELMO for indicator of ozone production regime  
+**Primary Contact**: [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
+**Type of update**: Enhancement  
+**Release Version/Date**:  CMAQ version 6.0  
+
+**Description**:   
+The update modifies how the ELMO obtains an indicator whether the ozone production regime is VOC or NOx limiting if CCTM is compiled with isam. Changes move setting of the output variable from EBI solver subroutines of the chemical mechanisms to the ISAM routine calculating the regime indicator. Computational and coding reasons motivate the changes. Computationally, the extraction is within a loop integrating over the synchronization time step via chemistry sub-time step so the output variable is set an unneeded number of times. From a coding prospective, the extraction method has to modify each mechanism's EBI solver and the create_ebi chemistry utility. This update removes these problems and simplifies how ELMO sets a output variable.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1302](https://github.com/USEPA/CMAQ/commit/32211aeb9ea27845118aa10d362f80aa8e1f4f15) | [PR#1302](https://github.com/USEPA/CMAQ_Dev/pull/1302)  | 
+| Merge for PR#1329 | [PR#1329](https://github.com/USEPA/CMAQ_Dev/pull/1329)  | 
+
 
 ### Redirect ELMO for indicator of ozone production regime  
 **Primary Contact**: [William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency     
@@ -277,3 +290,4 @@ Allows running CCTM for a column domain without unpredictable crashes. Using a c
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1072](https://github.com/USEPA/CMAQ/commit/277c01c4b82b86a021949a72b3e387449cf68eda) | [PR#1072](https://github.com/USEPA/CMAQ_Dev/pull/1072)  |   
+
