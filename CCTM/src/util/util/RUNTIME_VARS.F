@@ -184,10 +184,16 @@
       LOGICAL :: LPVO3     = .FALSE.       ! Activate Potential Vorticity Module (default=False)
 
       ! Aerosols
-      LOGICAL :: BC_AERO_M2WET=.FALSE.! flag for specifying wet aerosol size parameters 
-                                      !   for boundary conditions. FALSE = dry
-      LOGICAL :: BC_AERO_M2USE=.TRUE. ! flag for using the second moment from the input file
-                                          !   for boundary conditions.TRUE = use input 2nd moment
+      CHARACTER(3) :: 
+     &   AERO_MASS_TRANSFER='HYB'          ! Mode-dependent mass transfer approach (Default = 'HYB')
+                                           !   DYN - Dynamic approach for all modes
+                                           !   EQB - Equilibrium Approach for all modes
+                                           !   HYB - Equilibrium for Aitken and Accumulation modes, 
+                                           !         and Dynamic for the coarse mode.
+      LOGICAL :: BC_AERO_M2WET=.FALSE.     ! flag for specifying wet aerosol size parameters 
+                                           !   for boundary conditions. FALSE = dry
+      LOGICAL :: BC_AERO_M2USE=.TRUE.      ! flag for using the second moment from the input file
+                                           !   for boundary conditions.TRUE = use input 2nd moment
 
       ! Cloud Parameters
       LOGICAL :: CLD_DIAG  = .FALSE. ! flag to output cloud diagnostic files
@@ -683,10 +689,13 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
-      ! Get flag for interpreting initial condition aerosol size distributions as dry
+      ! Get flag for setting aerosol mass transfer approach
+      CALL GET_ENV ( AERO_MASS_TRANSFER, 'AERO_MT', AERO_MASS_TRANSFER, VARDEV )
+
+      ! Get flag for interpreting boundary condition aerosol size distributions as dry
       CALL GET_ENV ( BC_AERO_M2WET, 'BC_AERO_M2WET', BC_AERO_M2WET, VARDEV )
 
-      ! Get flag for using initial condition aerosol second moment
+      ! Get flag for using boundary condition aerosol second moment
       CALL GET_ENV ( BC_AERO_M2USE, 'BC_AERO_M2USE', BC_AERO_M2USE, VARDEV )
 
       !-------------------------------------------------------------------------------------------------------
