@@ -1,58 +1,5 @@
 # Structural Improvements
 
-### MIO: New functions for input/output commands and other utilities
-[Chris Nolte](mailto:nolte.chris@epa.gov) and [David Wong](mailto:wong.david-c@epa.gov), U.S. Environmental Protection Agency    
-**Type of update**: Restructure   
-**Release Version/Date**:  CMAQv6.0
-
-**Description**:  
-From its earliest beginnings, the CMAQ modeling system has relied on the Models-3 [I/O API library](https://cjcoats.github.io/ioapi/index.html) to handle reading input and writing output data as well as a wide range of utility functions, including time and date operations, logging and error reporting, and coordinate transformations. The I/O API and its thorough documentation have contributed significantly to the stability and usability of the overall modeling system for the past three decades.
-
-When the effort to couple CMAQ to the Model for Prediction Across Scales (MPAS) was begun, I/O API did not support the unstructured global grids used by MPAS. This led ORD to develop an alternative set of routines, known as MIO (Model I/O). These routines are designed to work for the offline configuration of CMAQ as well as the two coupled versions, WRF-CMAQ and MPAS-CMAQ, allowing for substantially easier development and maintenance across all three model versions.
-
-The MIO update **(available in CMAQv6.0 beta 2)** removes the dependency of the CMAQ Chemical Transport Model (CCTM) on I/O API. The MIO code has been added to the CMAQ source code under CCTM/src/mio, while several utility functions present in I/O API have been re-implemented in a separate module under CCTM/src/misc. In addition, this update moves functions related to log warnings and messages from the RUNTIME_VARS module into the LOGDEV_MOD module (both under CCTM/src/util/util/).  
-
-In its current implementation, MIO relies on an input file (accessed via the environment variable `mio_file_info`) that specifies which variables are written to which output files, as well as their coordinate dimensions. This input file does not need to be created by hand, but instead is generated during model initialization based on settings in the run script and the `CMAQ_Control.nml` namelist file (see documentation for the Explicit and Lumped Model Output (ELMO) module). 
-
-The following environment variables are required in the CCTM run script to utilize the new MIO module. Note these updates are included in the sample runscripts of v60b2 under CCTM/scripts.
-1. remove the "-v" from output file environment variables, e.g., ```setenv CTM_CONC_1      $OUTDIR/CCTM_CONC_${CTM_APPL}.nc ```
-2. ```setenv mio_file_info ${OUTDIR}/mio_file_input_${CTM_APPL}.txt``` *(MIO will read the file pointed to by mio_file_info; the file generated automatically is written to `${OUTDIR}/mio_file_input_${CTM_APPL}.txt`; under normal operation these are the same)*  
-3.  ```setenv CTM_MIO_INPUT "INIT_CONC_1"    ```   *(It is not necessary to specify all input files to MIO, but in the current implementation there must be at least one, which we hardcode as the ICON file)*  
-4. ```setenv ncd_64bit_offset Y``` *(needed when using 64-bit file offsets, introduced in netCDF 3.6.0 and standard in netCDF4; these are necessary for writing files greater than 2 GB in size)*    
-
-**Significance and Impact**:   
-Eventually, this update will facilitate greater flexibility in specifying variables to be written to output files, including writing gridded files that include variables with differing dimensions. In the current implementation, CMAQ output files are conformant with the I/O API interface.  Although the CCTM no longer requires installation of the I/O API library several PREP and POST tools within the CMAQ repository retain this dependency (e.g., ICON, BCON, COMBINE).  These utilities, as well as other programs that use the I/O API library, can read outputs written by MIO. 
-
-**Known Limitations**:
-There are several options in the CMAQ system that have not yet been implemented with MIO and so will not work with this version of CMAQv6.0 beta.  These include:
-1. VERTEXT option (<- this option is not actually listed in Appendix A!)
-2. Generating MCIP-like outputs when running the WRF-CMAQ coupled model
-3. [Windowing capability](../Users_Guide/CMAQ_UG_ch04_model_inputs.md#431-windowing-capability) (i.e, subsetting inputs when the domain of the input files is larger than the simulation domain)
-4. Single-column model
-   
-**References**:   
-Portions Copyright ©1992-2002 MCNC and Carlie J. Coats, Jr., 2003-2013 by Baron Advanced Meteorological Systems, © 2005-2013, 2017- Carlie J. Coats, Jr., and , and © 2014- UNC Institute for the Environment. Please see the disclaimers contained in the [I/O API Copyright Notice file](https://cjcoats.github.io/ioapi/NOTICES.html).
-
-
-### Reorganize CCTM Initialization to Populate MIO Output Data  
-[Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency     
-**Type of update**: Infrastructure Update   
-**Release Version/Date**:  v6.0
-
-**Description**:   
-Each output file is opened and its metadata specified exactly how it has been in the past with IOAPI. A subroutine call has been added to populate a new global structure variable MIO_FILE_DATA so that it contains information for all files and can be used by MIO to initialize all outputs.
-
-This update adds initialization calls to all modules with output and diagnostics so they occur before the MIO Ascii file is written. Most modules only required addition of RETURN statements at the end of their 'FIRSTIME' block. 
-
-The BEIS module was an exception. Initialization and file open tasks were spread across several source code files. Thus, the BEIS module is restructured so that it uses fewer nested subroutines and functions. Some initialization tasks are moved from tmpbeis (now named get_beis) to the BEIS_INIT function. The initialization of HRNO likewise required adding a new call to only perform initialization tasks and return.  
-
-**Significance and Impact**:  
-No changes to concentration or deposition predictions. Instead, this update provides the internal connections necessary to support MIO in CMAQv6.0 beta 2.
-  
-|Merge Commit | Internal record|
-|:------:|:-------:|
-|[Merge for PR#1128](https://github.com/USEPA/CMAQ/commit/c7687fae48802145ed5a778f6371440211521409) | [PR#1128](https://github.com/USEPA/CMAQ_Dev/pull/1128)  | 
-
 ### Replace CONST.EXT include file with module and update constant values  
 [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Restructure   
