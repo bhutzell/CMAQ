@@ -1,17 +1,17 @@
 # Diagnostic Options
 ## ELMO
-### ELMO version 2.1  
+### ELMO version 2  
 **Primary Contact**: [Ben Murphy](mailto:murphy.ben@epa.gov), U.S. Environmental Protection Agency  
 **Secondary Contact**: [Chris Nolte](mailto:nolte.chris@epa.gov), U.S. Environmental Protection Agency     
 **Type of update**: Module Major Revision  
 **Release Version/Date**:  CMAQ v6.0  
 
 **Description**:  
-ELMOv2.1 expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining variables and assigning them to output files.
+ELMOv2 expands the features of ELMO to include gas concentrations, deposition variables, ISAM output, and DDM output. It improves transparency and offers greater flexibility for defining variables and assigning them to output files.
 
 With this major revision to ELMO, users can now request and create complex variable output without incurring large storage costs. This is particularly critical for application tools like ISAM and DDM, as well as processing platforms like Amazon Web Service where storage fees can become substantial.
 
-ELMO v2.1 features are further described in the CMAQ User's Guide [Appendix F](../Users_Guide/Appendix/CMAQ_UG_appendixF_elmo_output.md).
+ELMO v2 features are further described in the CMAQ User's Guide [Appendix F](../Users_Guide/Appendix/CMAQ_UG_appendixF_elmo_output.md).
 
 **Significance and Impact**:  
 The following features are supported in ELMOv2.1:
@@ -71,6 +71,16 @@ can be introduced to fit several objectives including:
                 'ASO4',
 ```
 These composites may be specified in the ELMO output file list in CMAQ_Control.nml, or they may be used in subsequent formulas to create even more complex output variables.  
+
+Additional minor changes were made to support ELMOv2 implementation:
+- The run-script variable MECH was converted to an environment variable so that it could be used to identify which chemical mechanism to apply for 
+"DEFAULT" and "DEFAULT_DEP" keywords.
+- Support output from STAGE of surface flux and soil variables measured at FluxNet sites.
+- Output instantaneous dry and wet deposition values as fluxes (kg ha-1 s-1).
+- Reviewed all runscripts for errors. Updated 2019 CRACMM runscript with new control file names.
+- Updated chlorine deposition variables for consistency across all mechanisms.
+- Reintroduced SpecDef files across all mechanisms. Made molecular weight consistent across all SpecDef files. 
+- Reviewed and updated names of all HAPs. Updated aerosol cadmium name.  
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
