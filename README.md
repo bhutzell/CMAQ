@@ -37,7 +37,7 @@ While initially planned for fall 2026, the status and timing of any final releas
   * Additional development to improve robustness for all chemical mechanisms 
   * Fixes to DDM3D instabilities relating to propagating sensitivity fields through heterogenous chemistry due to inconsistent unit conversions 
 * Diagnostic Model Output
-  * Upgrade from ELMOv1.0 to ELMOv2.1 – added new capabilities for model output 
+  * Upgrade from ELMOv1.0 to ELMOv2.0 – added new capabilities for model output 
   * Updates to photolysis diagnostic outputs (CCTM_PHOTDIAG1 & CCTM_PHOTDIAG3 ) 
 * Coupled model system
   * First public release of unified coupler to couple WRF-CMAQ and MPAS-CMAQ in a consistent “one-code” framework 
