@@ -302,7 +302,7 @@ C     mass partitioning between the modes
       INTEGER, SAVE :: IAER_SO4, IGAS_SULF
 
       REAL( 8 ) :: TMP
-      INTEGER I, N, IB, ISRP, IGAS, K, P, ! loop and array indices
+      INTEGER I, N, IB, ISRP, K, P,       ! loop and array indices
      &        IAER, KAER
       INTEGER IMODE, IM                   ! mode loop index  
       INTEGER ISTEP                       ! loop index, mass transfer time step loop
@@ -649,8 +649,8 @@ C     (The _RENORM and cation_FAC constants are set in the AERO_DATA module)
             DRYM20 = WETM2 * ( DRYM3 / WETM3 ) ** D_TWOTHIRDS
 
 C *** Initial vapor-phase concentrations [ug/m3]
-            DO IGAS = 1,NGAS
-              CGAS( IGAS ) = PRECURSOR_CONC( MAP_IGAStoPREC( IGAS ) )
+            DO I = 1,NGAS
+              CGAS( I ) = PRECURSOR_CONC( MAP_IGAStoPREC( I ) )
             END DO
 
 C *** Compute sulfate production rate [ug/m3 s] for coarse mode
@@ -845,9 +845,10 @@ C     equilibrium. These are often fine modes.
          END IF
       END DO
 
+      ! Add Condensable Gas to ISORROPIA input vector, WI
       DO K = 1,NGAS
          IF ( K .NE. KH2SO4 ) THEN
-            ! ADD CONDENSABLE GAS
+            I = GTTR( K )%ISRP
             WI(I) = WI(I) + PRECURSOR_CONC( MAP_IGAStoPREC( K ) )  * CFAC_GAS( K )
          END IF
       END DO
@@ -857,7 +858,8 @@ C     equilibrium. These are often fine modes.
 
       ! Set flags to account for mass conservation violations in ISRP3F
       TRUSTCL  = .TRUE.
-      IF ( (WI( KNA ) + WI( KCL )) .LT. 1.0D-20 .or. WI( KCL ) .LT. 1.0D-10 ) THEN
+      IF ( (WI( ATTR(KNA)%ISRP ) + WI( ATTR(KCL)%ISRP )) .LT. 1.0D-20 .or.
+     &      WI( ATTR(KCL)%ISRP ) .LT. 1.0D-10 ) THEN
          TRUSTCL = .FALSE.
       END IF
          
@@ -875,7 +877,7 @@ C     equilibrium. These are often fine modes.
       DO K = 1,NGAS
         IF ( K .NE. KH2SO4 ) THEN
           I = GTTR( K )%ISRP
-          isrp_gas( I ) = real( precursor_conc( MAP_IGAStoPREC( K ) ),  8 ) * CFAC_GAS( K )
+          ISRP_GAS( I ) = real( PRECURSOR_CONC( MAP_IGAStoPREC( K ) ),  8 ) * CFAC_GAS( K )
         END IF
       END DO
       EQLBHIJ =  HPLUS( 1 ) + HPLUS( 2 )  ! use charge balance if lacking isoropia info 
