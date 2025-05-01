@@ -21,6 +21,26 @@ Description of why this change is needed.
 **Tests conducted:**  
 Describe tests that were conducted including domain and time period (e.g. BLDCHECK; June 1-2 2016 SEBENCH; Jan 2017 12US1) and results of the tests.  Include plots of relevant results.  
 
-**Link to Release Noteelease Note must be filled out before PR is merged:**  
-Link to the new Release Note for your PR under [DOCS/Release_Notes](../DOCS/Release_Notes/README.md). 
-A Release Note must be filled out before PR is merged. 
+**Release Note must be part of your PR before it is merged.**  
+Your PR should include a description of the code update in the DOCS folder.  On your branch, browse to DOCS/Release_Notes and select the markdown (.md) file for the appropriate category, e.g., Transport Processes. At the top of the markdown file insert and the fill out the following template.  If it is unclear which markdown file you should use for your Release Note, plase say that in your PR request and tag @kmfoley.
+
+
+### [Fill in Title]
+ [Fill in contact name](mailto:contact.email@epa.gov), U.S. Environmental Protection Agency    
+
+ **Primary Contact**: [Fill in contact name and email address](mailto:contact.email@epa.gov), U.S. Environmental Protection Agency    
+ 
+**Secondary Contact**: [optional] (If the primary contact is in a temporary position, e.g., students/postdocs, please include a secondary contact to ensure the contact remains valid after the appointment ends.)  
+ 
+**Type of update**: [examples: Bug Fix, Science Update, Documentation, New Feature]   
+
+**Release Version/Date**:  
+
+**Description**:  
+
+**Significance and Impact**: (This can be very similar to the sections above but geared toward our user community rather than the development team, e.g., could be a shortned or less technical version.)  
+
+ **References**:   [optional]  
+
+ **Internal PRs**: (Replace xxx with your PR number.)
+[PR#xxx](https://github.com/USEPA/CMAQ_Dev/pull/xxx)  
