@@ -40,7 +40,7 @@ Potential variables include concentration and deposition flux fields for CMAQ mo
 NOX, PM25 mass, or PM10 mass; diagnostic variables like particle size, number, and AOD; and environmental parameters temperature, 
 relative humidity, and PBL height.  
 
-User have full control over how to mix variables across any number of customized output files 
+Users have full control over how to mix variables across any number of customized output files 
 ([CCTM_ELMO](CMAQ_UG_ch07_model_outputs.md#ELMO)), and may use Keywords provided in the CMAQ Control Namelist to quickly 
 and robustly activate predefined lists of variables commonly used together (e.g. all fine PM species, or NO2 column and 
 Pressure). See [Appendix F](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more information about the calculation of ELMO output variables 
@@ -48,7 +48,7 @@ and how this relates to use of the *combine* tool.
 
 Although ELMOv2 offers incredible capabilities for online processing of CMAQ metrics, most simulations are executed for 
 24-hr periods (due to typical constraints of model inputs). Post-processing steps are still often attractive for 
-concatenating 24-hr output files to monthly or yearly files.  
+concatenating 24-hr output files to monthly or yearly files and/or for performing unit conversions.  
 
 ### 8.2.2 Post-procesing with COMBINE
 The *combine* Fortran program, released as part of the CMAQ POST tools, can combine variables from CMAQ output, emissions, 
@@ -80,7 +80,9 @@ If Users leverage ELMOv2 for fully customized output files, the COMBINE utility 
 concatenating 24-hr files to longer time periods (there are other tools for accomplishing this task though). If COMBINE 
 is used, it may be run in GENSPEC mode to generate a SpecDef file given all of the variables on an input file. This 
 alleviates Users from the tedious task of writing their own SpecDef file to process large output CMAQ files with 
-numerous variables. 
+numerous variables. The CMAQ repository contains default SpecDef files for use with ELMOv2 output labeled 
+"SpecDef_ELMOv2_Conc_MECH_NAME.txt" and "SpecDef_ELMOv2_Dep_MECH_NAME.txt." These configuration files will process 
+output created using the "DEFAULT" and "DEFAULT_DEP" keywords in the CMAQ_Control.nml file, respectively.  
 
 ## 8.3 Model-Observation Pairing for Model Evaluation 
  Once model output has been processed using *combine*, the *sitecmp* and *sitecmp_dailyo3* utilities can be used to match air pollutant measurements with the appropriate model predicted variables.  This pairing of model and observed variables is specified in the run scripts for *sitecmp* and *sitecmp_dailyo3*.  In *sitecmp_dailyo3* this step is controlled by the definition of environment variables OBS_SPECIES and OZONE.  See the [README.md][link_8.3] and the sample run script in the [*sitecmp_dailyo3* scripts][link_8.3_II] folder for more information on setting these environment variables.  The run script for the *sitecmp* utility can be customized for many different types of chemical and meteorological quantities as described in the [README.md][link_8.3_III] for sitecmp.  Sample run scripts for the AQS, CSN, IMPROVE, NADP and SEARCH networks based on the 2016 CMAQ test case are provided in the [*sitecmp* scripts][link_8.3_IV] folder.  In addition, the [README.md][link_8.3_IV] file within the *sitecmp* scripts folder provides the configuration options for monitoring networks.  Note that there are multiple formats for CSN and SEARCH observed data files depending on the year.  The README.txt file is broken into different sections to reflect the change in species names in the observation files for these two networks.  (For example, elemental carbon measurements from the CSN network are labeled as “ec_niosh” in 2009 and earlier, “ec_tor” in 2010, and “88380_val” starting in 2011.)
