@@ -22,7 +22,7 @@ Description of why this change is needed.
 Describe tests that were conducted including domain and time period (e.g. BLDCHECK; June 1-2 2016 SEBENCH; Jan 2017 12US1) and results of the tests.  Include plots of relevant results.  
 
 **Release Note must be part of your PR before it is merged.**  
-Your PR should include a description of the code update in the DOCS folder.  On your branch, browse to DOCS/Release_Notes and select the markdown (.md) file for the appropriate category, e.g., Transport Processes. At the top of the markdown file insert and the fill out the following template.  If it is unclear which markdown file you should use for your Release Note, plase say that in your PR request and tag @kmfoley.
+Your PR should include a description of the code update in the DOCS folder.  On your branch, browse to DOCS/Release_Notes and select the markdown (.md) file for the appropriate category, e.g., Transport Processes. At the top of the markdown file insert and then fill out the following template.  If it is unclear which markdown file you should use for your Release Note, please say that in your PR request and tag @kmfoley.
 
 
 ### [Fill in Title]
