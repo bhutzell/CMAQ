@@ -5,7 +5,7 @@
 * [Do I need to update from v5.5 to v6.0beta?](#update_v55_v60b)
 * [What do I need to do to update from v5.5 to v6.0beta?](#update_v55_v60b)
   * [What differences should I expect in the required model input files?](#diff_v55_v60b_input_files)
-  * [What differences should I expect in my model output files?](#diff_v55_v60b_ouput_files)
+  * [What differences should I expect in my model output files?](#diff_v55_v60b_output_files)
 * [Are there new benchmark data and documentation updates?](#data_and_docs)
 * [How to cite CMAQ](#how_to_cite)
 * [Additional FAQ](#additional_faq)
@@ -61,7 +61,7 @@ CMAQv6.0beta includes many scientific enhancements and new features that we are 
 
 <a id=update_v55_v60b></a>
 ## What do I need to do to update from v5.5 to v6.0beta?
-* If you have already successfully migrated to v5.5, you will not need any additional input to run with the analogous options in v6.0. However, users should note that the CCTM runscripts have changed, so older user-created runscripts may need to be adapted to be comparable with the released runscripts. Additionally, if you trying to run with the newest released version of CRACMM in v6.0, users will have to generate or map existing emissions to CRACMMv3.0. For additional information on emissions for CRACMMv3.0 please see the CRACMM GitHub page.
+* If you have already successfully migrated to v5.5, you will not need any additional input to run with the analogous options in v6.0. However, users should note that the CCTM runscripts have changed, so older user-created runscripts may need to be adapted to be compatible with v6.0. Additionally, if you are trying to run with the newest released version of CRACMM in v6.0, users will have to generate or map existing emissions to CRACMMv3.0. For additional information on emissions for CRACMMv3.0 please see the CRACMM GitHub page.
   
 <a id=diff_v55_v60b_input_files></a>
 ### What differences should I expect in the required model input files?
@@ -69,7 +69,7 @@ CMAQv6.0beta includes many scientific enhancements and new features that we are 
 
 * CRACMM1 emissions inputs can be mapped to CRACMM2 species with minor adjustments following this guidance: https://usepa.github.io/CRACMM/emissions/README.html
 
-<a id=diff_v55_v60b_ouput_files></a>
+<a id=diff_v55_v60b_output_files></a>
 ### What differences should I expect in my model output files?
 * CMAQv6.0beta updates two of the three photolysis diagnostic files (CCTM_PHOTDIAG1 and CCTM_PHOTDIAG3). The CCTM_PHOTDIAG1 file remains largely unchanged, with the only changes being in the diagnostic variables: AOD_W550_ANST (Aerosol Optical Depth at 550 nm based on an Angstrom Interpolation) and AAOD_W550_ANGST (Aerosol Absorption Optical Depth at 550 nm based on an Angstrom Interpolation). The updates now enable calculation of AOD_550 values when the sun is below the horizon. The CCTM_PHOTDIAG3 file changed in three different ways. (1) The variable representing total extinction, the sum of absorption and scattering at various wavelengths from gas, aerosols and clouds, is no longer reported; this variable is now replaced by the cloud extinction; the total extinction can be computed manually as the sum of gas, aerosol and cloud extinction. (2) The photolysis diagnostic variable names "EXT_AERO_W" are changed to "AERO_EXT_W", making the naming convention consistent with how the gas is reported. (3)  The photolysis diagnostics for AOD_550 and aerosol asymmetry and extinction are now available at all simulation hours, independent of the position of the sun.
 
