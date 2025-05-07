@@ -6,9 +6,9 @@
 **Release Version/Date**:  CMAQv6.0 
 
 **Description**:  
-Logfile message currently warn about aerosol and gas species not being able to be found when they are actually not needed by some mechanisms at all. This PR revises the logfile messaging approach to only alert when a species is required and not found (i.e. the model crashes). 
+In CMAQv5.5 and previous, warnings are written to the logfile about aerosol and gas species not being able to be found when they are actually not needed by some mechanisms at all. This PR revises the logfile messaging approach to only alert when a species is required and not found (i.e. the model crashes). 
 
-Logfile messages were added to state when aerosol and gas species were successfully mapped instead.
+Instead, logfile messages are now added to state when aerosol and gas species are successfully mapped.
 
 **Significance and Impact**:   
 No impact on results.
@@ -26,7 +26,7 @@ No impact on results.
 **Description**:   
 The run script options for whether or not to use aerosol surface area from initial and boundary conditions have been updated. 
 
-*IC_AERO_M2USE:* this option instructs CMAQ to use surface area (i.e. the second moment, M2) of each aerosol mode from the initial condition file. If set to False, then CMAQ applies a default modal standard deviation prescribed in AERO_DATA. After the first simulation day, this option is set to True, regardless of the run script setting. Therefore, the impact of this option should be negligible after model spin-up, so it has been decided that this option should be removed.
+*IC_AERO_M2USE:* In CMAQv5.5, this option instructs CMAQ to use surface area (i.e. the second moment, M2) of each aerosol mode from the initial condition file. If the run is a new start (NEW_START = TRUE) and this flag is set to False, then CMAQ applies a default modal standard deviation prescribed in AERO_DATA. This flag is ignored for runs that are restarts. Therefore, the impact of this option should be negligible after model spin-up, so it has been decided that this option should be removed.
 
 *IC_AERO_M2WET:* this option prescribes whether to treat the initial condition surface area as applicable for the wet or dry aerosol size distribution. Because IC_AERO_M2USE is removed, this option is removed as well.
 
