@@ -5,14 +5,14 @@
 **Release Version/Date**:  CMAQv6.0   
 
 **Description**:   
-The CCTM reactive tracers module (CCTM/src/reactive_tracers) includes a tracer for styrene. The reviewing DEGRADE_PARAMETERS.F file determined that the loss process for a ozone reaction is wrong. Its rate constant is approximately four orders of magnitude too high and is actually the rate constant for a reaction between styrene and nitrate. The error causes predicted concentrations of styrene to be low over four orders of magnitude. 
+The CCTM reactive tracers module (CCTM/src/reactive_tracers) includes a tracer for styrene. Reviewing the DEGRADE_PARAMETERS.F file determined that the rate constant for the reaction with ozone is approximately four orders of magnitude too high and is actually the rate constant for a reaction between styrene and nitrate. The error causes predicted concentrations of styrene to be low by over four orders of magnitude. 
 
-The fix replaces bad rate constant with the Le Person et al. (2007) value obtain from the [NIST Chemical Kinetics Database](https://kinetics.nist.gov/kinetics/index.jsp).  For OH, NO<sub>3</sub> and Cl reactions between styrene, the rate constants were obtain from the same database and are Joeson et al. (2014), Atkinson (1991), and Shi (1997), respectively. 
+The fix replaces the bad rate constant with the Le Person et al. (2007) value obtained from the [NIST Chemical Kinetics Database](https://kinetics.nist.gov/kinetics/index.jsp).  For reactions between styrene and OH, NO<sub>3</sub> and Cl, the rate constants were obtained from the same database and are Cho et al. (2014), Atkinson (1991), and Shi et al. (1997), respectively. 
 
 **Significance and Impact**:  
 The error causes a severe underestimate of exposure and human health risks from styrene emissions when using CMAQ for its air toxics assessments such as in [EPA AirToxScreen](https://www.epa.gov/AirToxScreen).
 
-For the STYRENE model species as in the cb6r5hap_ae7_aq mechanism, predicted concentrations are low by several orders of magnitude. The below plot illustrate the error by show the mean styrene concentration after one 24 hour simulation over the 12NE3 2018 Benchmark Domain.
+For the STYRENE model species as in the cb6r5hap_ae7_aq mechanism, predicted concentrations are low by several orders of magnitude. The plot below illustrates the error by showing the mean styrene concentration after one 24 hour simulation over the 12NE3 2018 Benchmark Domain.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
