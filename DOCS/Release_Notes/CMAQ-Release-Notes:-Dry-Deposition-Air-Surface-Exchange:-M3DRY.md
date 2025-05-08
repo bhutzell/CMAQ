@@ -62,7 +62,7 @@ The inspiration for this new model comes from comparisons of currently used aero
 The most significant effect of the new model is to increase the mass dry deposition of the accumulation mode aerosols in CMAQ.  Accumulation mode mass dry deposition velocities increase by almost an order of magnitude in forested areas with lesser increases for shorter vegetation.  Peak PM2.5 concentrations are reduced in some forested areas by up to 40% in CMAQ simulations.   
 
 **References**:   
-Pleim, J. E., Ran, L., Saylor, R. D., Willison, J., & Binkowski, F. S. (2022). A new aerosol dry deposition model for air quality and climate modeling. Journal of Advances in Modeling Earth Systems, 14, e2022MS003050. [https://doi. org/10.1029/2022MS003050](https://doi.%20org/10.1029/2022MS003050)
+Pleim, J. E., Ran, L., Saylor, R. D., Willison, J., & Binkowski, F. S. (2022). A new aerosol dry deposition model for air quality and climate modeling. Journal of Advances in Modeling Earth Systems, 14, e2022MS003050. [https://doi.org/10.1029/2022MS003050](https://doi.org/10.1029/2022MS003050)
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
