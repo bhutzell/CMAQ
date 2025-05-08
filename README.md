@@ -5,7 +5,7 @@ US EPA Community Multiscale Air Quality Model (CMAQ) Website: https://www.epa.go
 
 CMAQ is an open-source development project of the U.S. EPA that consists of a suite of programs for conducting air quality model simulations. CMAQ is supported by the CMAS Center: http://www.cmascenter.org
 
-CMAQ combines current knowledge in atmospheric science and air quality modeling with multi-processor computing techniques in an open-source framework to deliver fast, technically sound estimates of ozone, particulates and toxics in the air we breathe, as well as deposition of pollutants such as acids and nutrients to our land and water.
+CMAQ combines current knowledge in atmospheric science and air quality modeling with multi-processor computing techniques in an open-source framework to deliver scientifically sound estimates of ozone, particulates and toxics in the air we breathe, as well as deposition of pollutants such as acids and nutrients to our land and water.
 
 
 ## CMAQ version 6.0 Beta Overview:
@@ -20,8 +20,8 @@ While initially planned for fall 2026, the status and timing of any final releas
 
 ## New features in CMAQ version 6.0 include:
 * Gas, Aqueous, & Aerosol Chemistry 
-  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 including paritical nitrate (pNO3) as a heterogenous reaction 
-  * CRACMM3M, with incluesion of halogen chemistry to improve the representation of gas-phase and aerosol chemistry in marine environments.
+  * Community Regional Atmospheric Chemistry Multiphase Mechanism (CRACMM) version 3 including particle nitrate (pNO3) as a heterogenous reaction 
+  * CRACMM3M, with inclusion of halogen chemistry to improve the representation of gas-phase and aerosol chemistry in marine environments.
   * CRACMM3HAPS which includes additional gas chemistry for Hazardous Air Pollutants.
   * Henry’s law rate constant updates 
   * Photolysis rate constant updates 
@@ -37,7 +37,7 @@ While initially planned for fall 2026, the status and timing of any final releas
   * Additional development to improve robustness for all chemical mechanisms 
   * Fixes to DDM3D instabilities relating to propagating sensitivity fields through heterogenous chemistry due to inconsistent unit conversions 
 * Diagnostic Model Output
-  * Upgrade from ELMOv1.0 to ELMOv2.0 – added new capabilities for model output 
+  * Upgrade from ELMOv1.0 to ELMOv2.1 – added new capabilities for model output 
   * Updates to photolysis diagnostic outputs (CCTM_PHOTDIAG1 & CCTM_PHOTDIAG3 ) 
 * Coupled model system
   * First public release of unified coupler to couple WRF-CMAQ and MPAS-CMAQ in a consistent “one-code” framework 
@@ -65,7 +65,7 @@ Source code and scripts are organized as follows:
 * **UTIL:** Utilities for generating code and using CMAQ (e.g. chemical mechanism generation)
 
 ## CMAQv6.0 Beta Documentation
-The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DESID have been updated for CMAQv6.0 beta.  All other User's Guide content in this repository was last updated for the CMAQv5.5 release. Additional documentaiton updates will be included in the CMAQv6.0 release. Information on the updates in CMAQv6.0 beta is included in the **[CMAQ Release Notes](DOCS/Release_Notes/README.md).**
+The User's Guide chapters, tutorials, and appendices related to ELMOv2.1 and DESID have been updated for CMAQv6.0 beta.  All other User's Guide content in this repository was last updated for the CMAQv5.5 release. Additional documentation updates will be included in the CMAQv6.0 release. Information on the updates in CMAQv6.0 beta is included in the **[CMAQ Release Notes](DOCS/Release_Notes/README.md).**
 
 
 ## CMAQ Test Cases 
