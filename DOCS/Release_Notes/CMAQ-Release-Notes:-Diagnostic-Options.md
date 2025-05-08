@@ -18,7 +18,7 @@ The following features are supported in ELMOv2.1:
 - Gas concentrations and composite variable definitions
 - Dry and wet deposition variables with composite variable definitions
 - ISAM and DDM concentrations and deposition output
-- Arbitrary number output files with user-defined properties (e.g. layers, avg vs. inst) and arbitrary variable assignments to each file.
+- Arbitrary number output files with user-defined properties (e.g. layers, average vs. instantaneous) and arbitrary variable assignments to each file.
 - Compatibility with emerging I/O infrastructure
 - VOC, NOx, total nitrogen deposition, total sulfur deposition, etc. 
 - New output variable naming scheme that achieves consistency across chemical mechanisms
@@ -51,7 +51,7 @@ Variable Name    , 'Description',
                  'Formula',
 ```
 
-can be introduced to fit several objectives including:  
+These composites can be used for several objectives including:  
 - converting units (e.g. from ppmV to ppbV or ug m-3) or updating names for a particular species.
 ```
 'FORMALD'     , 'Formaldehyde Concentration',
