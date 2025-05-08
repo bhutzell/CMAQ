@@ -12,7 +12,7 @@ CMAQv6.0 includes an updated version of CRACMM called CRACMM3. This version buil
 **Significance and Impact**:   
 CRACMM3 includes updated chemistry beyond CRACMM2. CRACMM3HAPs and CRACMM3M enable a wider range of applications of CRACMM.
 
-### Halogen chemistry in CRACCM3M
+### Halogen chemistry in CRACMM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update  
 **Release Version/Date**: CMAQv6.0   
@@ -25,19 +25,19 @@ Item #1: Correcting NOY definition:
 It does not directly affect CMAQ results and no test involving CMAQ was performed.
 
 Item #2: Halogen chemistry with CRACMM3 (CRACMM3M):  
-Halogen chemistry reduces O3 over seawater and land by up to 8.0 ppb. Larger reductions occur over the seawater than over the land. Halogen chemistry reduces surface O3 by 13% over the seawater (annually). However, halogen chemistry has marginal effects on model PM2.5 concentrations. 
+Halogen chemistry reduces O3 over seawater and land by up to 8.0 ppb. Larger reductions occur over seawater than over land. Halogen chemistry reduces surface O3 by 13% over seawater (annually). However, halogen chemistry has marginal effects on model PM2.5 concentrations. 
 
 Item #3: Updates in cb6r5m_ae7_aq:  
-Update in MGEMIS.F increases ozone and reduces sulfate over low latitude areas due to the changes in gid-cell area estimates. Incorporation of the map-scale factor (msfx2) into the calculation lowers the grid-cell area estimates near the equator and subsequently reduces halogen and DMS emissions. 
+Update in MGEMIS.F increases ozone and reduces sulfate over low latitude areas due to the changes in grid-cell area estimates. Incorporation of the map-scale factor (msfx2) into the calculation lowers the grid-cell area estimates near the equator and subsequently reduces halogen and DMS emissions. 
 
 Item #4: Updates in cb6r5_ae7_aq:  
-Update in MGEMIS.F has minimum impacts on ozone and sulfate over the contiguous US.
+Update in MGEMIS.F has minimal impacts on ozone and sulfate over the contiguous US.
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
 |[Merge for PR#1212](https://github.com/USEPA/CMAQ/commit/8d512cc361675212430b579adc766c010309bdd1) | [PR#1212](https://github.com/USEPA/CMAQ_Dev/pull/1212)  |
 
-### Photolysis of aerosol nitrate in CRACCM3M
+### Photolysis of aerosol nitrate in CRACMM3M
 [Golam Sarwar](mailto:sarwar.golam@epa.gov), U.S. Environmental Protection Agency  
 **Type of update**: Science Update  
 **Release Version/Date**:  CMAQv6.0   
@@ -46,17 +46,17 @@ Update in MGEMIS.F has minimum impacts on ozone and sulfate over the contiguous 
 This updates adds photolysis of aerosol nitrate (ANO3) to the CRACMM3 marine mechanism (CRACMM3M) following the procedure described in Sarwar et al., 2024. A new Euler Backward Iterative (EBI) solver is developed.
 
 **Significance and Impact**:   
-Model ozone (O3) concentrations without the photolysis of aerosol nitrate are shown in Figure 1a. Higher values are predicted over the land than over seawater. Model O3 enhancements with the photolysis of aerosol nitrate are shown Figure 1b. Consistent with the results shown in Sarwar et al. (2024) for CB6, aerosol nitrate photolysis enhances O3 over seawater and land by large margins. Larger enhancement occur over the western U.S. than over the eastern U.S.
+Model ozone (O3) concentrations without the photolysis of aerosol nitrate are shown in Figure 1a. Higher values are predicted over land than over seawater. Model O3 enhancements with the photolysis of aerosol nitrate are shown in Figure 1b. Consistent with the results shown in Sarwar et al. (2024) for CB6, aerosol nitrate photolysis enhances O3 over seawater and land by large margins. Larger enhancements occur over the western U.S. than over the eastern U.S.
 
 ![Sarwar_CRACMM_I](https://github.com/user-attachments/assets/fa1aac70-5816-41d7-a6eb-0b6d0431577c)
-Figure 1: (a) CMAQ predicted O3 with CRACMM2M (without the aerosol nitrate photolysis) in May (b) Impact of the aerosol nitrate photolysis on O3 compared to those without the aerosol nitrate photolysis in May
+Figure 1: (a) CMAQ predicted O3 with CRACMM2M (without aerosol nitrate photolysis) in May (b) Impact of aerosol nitrate photolysis on O3 compared to without aerosol nitrate photolysis
 
-Monthly Mean Bias was calculated by using model predicted daily maximum 8 hour average (MDA8) O3 and observed data from the AQS monitoring network over the western and eastern U.S (Figure 2(a-b)). Over the western U.S., model without the aerosol nitrate photolysis underpredicts observed data in most months while model with the aerosol nitrate photolysis eliminates the negative bias. Over the eastern U.S., model without the aerosol nitrate photolysis has mixed impacts on model performance producing negative bias in January-May and positive bias in June-December. Model with the aerosol nitrate photolysis eliminates the negative bias in January-May, but slightly deteriorates bias in June-December.
+Monthly Mean Bias was calculated by using model predicted daily maximum 8 hour average (MDA8) O3 and observed data from the AQS monitoring network over the western and eastern U.S (Figure 2(a-b)). Over the western U.S., the model without aerosol nitrate photolysis underpredicts observed data in most months while model with aerosol nitrate photolysis eliminates the negative bias. Over the eastern U.S., the model without aerosol nitrate photolysis has mixed model performance with negative bias in January-May and positive bias in June-December. The model with aerosol nitrate photolysis eliminates the negative bias in January-May, but slightly deteriorates bias in June-December.
 
 ![Sarwar_CRACMM3M_II](https://github.com/user-attachments/assets/85f7f03b-d05a-4812-9d7f-f876e44d1990)
 Figure 2: (a) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the western U.S. (b) Monthly Mean Bias of DMA8 O3 without and with aerosol nitrate photolysis at AQS sites over the eastern U.S. 
 
-Model PM2.5 concentrations without the photolysis of aerosol nitrate are shown in Figure 3a. Higher values are predicted over land than over seawater. Changes in model PM2.5 concentrations with the photolysis of aerosol nitrate are shown Figure 3b. It only affects model PM2.5 concentrations by small margins. Reductions occur due to the loss aerosol nitrate by photolysis while the enhancements occur from the changes in secondary aerosols due to the changes in oxidant levels. 
+Model PM2.5 concentrations without the photolysis of aerosol nitrate are shown in Figure 3a. Higher values are predicted over land than over seawater. Changes in model PM2.5 concentrations with the photolysis of aerosol nitrate are shown in Figure 3b. It only affects model PM2.5 concentrations by small margins. Reductions occur due to the loss of aerosol nitrate by photolysis while enhancements occur from the changes in secondary aerosols due to the changes in oxidant levels. 
 
 ![Sarwar_CRACMM3M_III](https://github.com/user-attachments/assets/c33e60ea-ece7-4754-b8d6-d65243d271f3)
 Figure 3: (a) CMAQ predicted mean PM2.5 wth CRACMM2M (without the aerosol nitrate photolysis) in May (b) Impact of the aerosol nitrate photolysis on PM2.5 compared to those without the aerosol nitrate photolysis in May
