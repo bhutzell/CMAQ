@@ -35,7 +35,7 @@ echo 'Start Model Run At ' `date`
 #> Set General Parameters for Configuring the Simulation
  set VRSN      = v55              #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cracmm2      #> Mechanism ID
+ setenv MECH     cracmm2      #> Mechanism ID
  set APPL      = 2022_12US1_CRACMM2  #> Application Name (e.g. Gridname)
                                                        
 #> Define RUNID as any combination of parameters above or others. By default,
