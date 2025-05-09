@@ -53,7 +53,6 @@ C-----------------------------------------------------------------------
       USE STAGE_EMIS_MAP
       USE VDIFF_MAP
       USE UTILIO_DEFN
-!      USE BIDI_MOD
       USE STAGE_BIDI_MOD
       USE MOSAIC_MOD, ONLY: Tile_Data
       USE VDIFF_DIAG, NLPCR => NLPCR_MEAN
@@ -66,6 +65,12 @@ C-----------------------------------------------------------------------
      &                   SA_VDEMIS_DIFF, ITAG, NTAG_SA, NSPC_SA,
      &                   S_SPCTAG, T_SPCTAG, SA_DDEP, OTHRTAG, ISAM_SPEC,
      &                   L_NO3, SA_BIDI, BIDITAG, L_NH4
+#endif
+
+#ifdef sens
+      USE DDM3D_DEFN, ONLY : NP, NPMAX, SNGRD, S_DDEP, S_PLDV, SVDEMIS_DIFF,
+     &                       SENS, S_EMIS, S_DD, S_UU, S_DDBF, S_POL,
+     &                       S_DELC, S_PLDV_HONO
 #endif
 
       IMPLICIT NONE
@@ -141,7 +146,7 @@ C ACM Local Variables
       REAL        DEPV_HNO3                        ! dep vel of HNO3
       REAL        FNL                              ! ACM2 Variable
       INTEGER     NLP, NL, LCBL
-      INTEGER, SAVE :: NO2_HIT, HONO_HIT, HNO3_HIT, NO2_MAP, HNO3_MAP
+      INTEGER, SAVE :: NO2_HIT, HONO_HIT, HNO3_HIT, NO2_MAP, HONO_MAP, HNO3_MAP
       INTEGER, SAVE :: NH3_HIT, HG_HIT, HCHO_HIT
       REAL        DTLIM, DTS, DTACM, RZ
 
@@ -271,7 +276,8 @@ C set auxiliary depv arrays
          NO2_HIT  = 0 
          NH3_HIT  = 0
          HCHO_HIT = 0
-         HNO3_MAP = 0 
+         HNO3_MAP = 0
+         HONO_MAP = 0  
          NO2_MAP  = 0 
          DO V = 1, N_SPC_DEPV
             IF ( DV2DF_SPC( V ) .EQ. 'NO2' ) THEN
@@ -279,6 +285,7 @@ C set auxiliary depv arrays
                NO2_MAP = DV2DF( V )
             ELSE IF ( DV2DF_SPC( V ) .EQ. 'HONO' ) THEN
                HONO_HIT = V
+               HONO_MAP = DV2DF( V )
             ELSE IF ( DV2DF_SPC( V ) .EQ. 'HNO3' ) THEN
                HNO3_HIT = V
                HNO3_MAP = DV2DF( V )
@@ -393,10 +400,6 @@ C set auxiliary depv arrays
               WRITE(LOGDEV,'(I2,3X,I4,8X,A16)')ITAG,JSPCTAG,'MISSING'
            END IF   
         END DO
-c       WRITE(LOGDEV,* )'TAG_species, Default Partitioning Coeff.'
-c       DO JSPCTAG = 1, N_SPCTAG
-c         WRITE(LOGDEV,*)VNAM_SPCTAG( JSPCTAG ),' ,',SAFRAC( JSPCTAG )
-c       END DO          
 
         IF ( ABFLUX .AND. L_NH4 ) THEN
           ITAG = 0
@@ -408,11 +411,47 @@ c       END DO
             END IF
           END DO
 
-c         DO ITAG = 1, NTAG_SA
-c           JSPCTAG = INDEX_SA_NH3( ITAG )
-c           SAFRAC( JSPCTAG ) = 0.0 ! to not double count the bi-di emmissions
-c         END DO
         END IF
+#endif
+
+#ifdef sens
+         ALLOCATE ( S_POL   ( NPMAX, N_SPC_DEPV ), STAT = ASTAT )
+         IF ( ASTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating S_POL'
+            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+         END IF
+         S_POL = 0.0
+
+         ALLOCATE ( S_DDBF( N_SPC_DEPV, NPMAX ), STAT = ASTAT )
+         IF ( ASTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating S_DBF'
+            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+            END IF
+         S_DDBF = 0.0
+
+         ALLOCATE ( SENS( N_SPC_DIFF,NLAYS,NPMAX ),
+     &              S_EMIS( N_SPC_DIFF,NLAYS,NPMAX ), STAT = ASTAT )
+         IF ( ASTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating SENS or S_EMIS'
+            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+         END IF
+         SENS = 0.0; S_EMIS = 0.0   ! array assignment
+
+         ALLOCATE ( S_DD( N_SPC_DIFF,NLAYS,NPMAX ),
+     &              S_UU( N_SPC_DIFF,NLAYS,NPMAX ), STAT = ASTAT )
+         IF ( ASTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating S_DD or S_UU'
+            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+         END IF
+         S_DD = 0.0; S_UU = 0.0   ! array assignment
+
+         ALLOCATE ( S_PLDV_HONO( NPMAX ), STAT = ASTAT )
+         IF ( ASTAT .NE. 0 ) THEN
+            XMSG = 'Failure allocating S_PLDV_HONO'
+            CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+         END IF
+         S_PLDV_HONO = 0.0  ! array assignment
+
 #endif
  
       END IF   !  if Firstime
@@ -548,6 +587,16 @@ C-----------------------------------------------------------------------
 #endif
          END DO
 
+#ifdef sens
+         DO NP = 1, NPMAX
+            DO L = 1, NLAYS
+               DO V = 1, N_SPC_DIFF
+                  SENS( V,L,NP ) = SNGRD( DIFF_MAP( V ),L,C,R,NP )
+               END DO
+            END DO
+         END DO
+#endif
+
          EMIS = 0.0      ! array assignment
          IF ( DESID_N_SRM .GE. 1 ) 
      &        EMIS( :,1:DESID_LAYS ) = DTS * VDEMIS_DIFF( :,:,C,R )
@@ -568,6 +617,13 @@ C-----------------------------------------------------------------------
                TOP = NSPC_SA*ITAG
                SAEMIS( BOT:TOP,L ) = DTS * SA_VDEMIS_DIFF( :,L,C,R,ITAG )
             END DO
+         END DO
+#endif
+
+#ifdef sens
+         S_EMIS = 0.0
+         DO NP = 1, NPMAX
+            S_EMIS( :,1:DESID_LAYS,NP ) = DTS * SVDEMIS_DIFF( :,:,C,R,NP )
          END DO
 #endif
 
@@ -596,6 +652,12 @@ C-----------------------------------------------------------------------
                End If
                EMIS_OVER_VD( V ) = Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( V ) ) / DEPVCR( V )                        
             End If
+#ifdef sens
+            DO NP = 1, NPMAX
+               S_POL   ( NP,V ) = S_PLDV( NP,V,C,R ) / DEPVCR( V )
+               S_DDBF( V, NP ) = S_DDEP( V, C, R, NP )
+            END DO
+#endif
             IF ( ABFLUX ) THEN
                TMP_BD_EMIS( NH3_E ) = TOT_BD_EMIS( NH3_E,C,R )
             END IF
@@ -608,6 +670,11 @@ C-----------------------------------------------------------------------
             TMP_BD_EMIS( HCHO_E ) = TOT_BD_EMIS( HCHO_E,C,R )    
          END DO
          PLDV_HONO = Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( HONO_HIT ) )
+#ifdef sens
+         DO NP = 1, NPMAX
+            S_PLDV_HONO( NP ) = S_PLDV( NP,HONO_HIT,C,R )
+         END DO
+#endif
 
 #ifdef isam
          DO JSPCTAG = 1, N_SPCTAG
@@ -677,6 +744,13 @@ C is accounted as depositional loss; calculate increased deposition loss
                   DEPV_HNO3   = DEPVCR( V ) + PLDV_HONO / CONC( NO2_MAP,1 )
                   DD_FAC( V ) = DTDENS1 * DD_CONV( V ) * DEPV_HNO3
                   DDBF( V )   = DDBF( V ) + THETA * DD_FAC( V ) * CONC( S,1 )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     SENS( S,1,NP ) = S_POL( NP,V ) + ( SENS( S,1,NP ) - S_POL( NP,V ) ) * EFAC1( V )
+                     S_DDBF( V, NP ) = S_DDBF( V, NP ) + THETA * DD_FAC( V ) * SENS ( S,1,NP )
+                  END DO
+#endif
+
 
 C Use special treatment for NO2
 C Loss of NO2 via the heterogeneous reaction is accounted for as an additional
@@ -691,11 +765,16 @@ C reduce the NO2 conc. in the atmosphere without affecting the depositional loss
                   EMIS_OVER_VD( V ) = Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( V ) ) / DEPV_NO2
                   CONC( S,1 )    = EMIS_OVER_VD( V ) + ( CONC( S,1 ) - EMIS_OVER_VD( V ) ) * EFAC1( V )
                   DDBF( V )      = DDBF( V ) + THETA * DD_FAC( V ) * CONC( S,1 )
-  
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     S_POL( NP, V ) = S_PLDV( NP,V,C,R ) / DEPV_NO2
+                     SENS( S,1,NP ) = S_POL( NP,V ) + ( SENS( S,1,NP ) - S_POL( NP,V ) ) * EFAC1( V )
+                     S_DDBF( V, NP ) = S_DDBF( V, NP ) + THETA * DD_FAC( V ) * SENS ( S,1,NP )
+                  END DO
+#endif
 C --------- END of HET HONO RX ----------
 
                ELSE
-
 
 C Pass selected N species to the BDSNP Soil NO emissions scheme
 
@@ -741,6 +820,13 @@ C Pass selected N species to the BDSNP Soil NO emissions scheme
                   S = DV2DF( V )
                   CONC( S,1 ) = EMIS_OVER_VD( V ) + ( CONC( S,1 ) - EMIS_OVER_VD( V ) ) * EFAC1( V )
                   DDBF( V ) = DDBF( V ) + THETA * DD_FAC( V ) * CONC( S,1 )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     SENS( S,1,NP ) = S_POL( NP,V ) + ( SENS( S,1,NP ) - S_POL( NP,V ) ) * EFAC1( V )
+                     S_DDBF( V, NP ) = S_DDBF( V, NP ) + THETA * DD_FAC( V ) * SENS( S, 1,NP )
+!     &                      - DTDENS1 * DD_CONV( V ) * S_PLDV( NP,V,C,R ) )
+                  END DO
+#endif
 
                   IF ( ABFLUX .AND. V .EQ. NH3_HIT ) THEN
                      TMP_BD_EMIS( NH3_E ) = TMP_BD_EMIS( NH3_E ) + 
@@ -753,6 +839,13 @@ C Pass selected N species to the BDSNP Soil NO emissions scheme
                   IF ( SFC_HONO .AND. V .EQ. HONO_HIT ) THEN
                      TMP_BD_EMIS( HONO_E ) = TMP_BD_EMIS( HONO_E ) +                    
      &                  THETA * Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( V ) ) * DD_CONV( V ) * DTDENS1                 
+#ifdef sens
+                     S = HONO_MAP
+                     DO NP = 1, NPMAX
+                        SENS( S,1,NP ) = S_POL( NP,V ) + ( SENS( S,1,NP ) - S_POL( NP,V ) ) * EFAC1( V )
+                        S_DDBF( V, NP ) = S_DDBF( V, NP ) + THETA * DD_FAC( V ) * SENS ( S,1,NP )
+                     END DO
+#endif
                   END IF
                   IF ( V .EQ. HCHO_HIT ) THEN
                      TMP_BD_EMIS( HCHO_E ) = TMP_BD_EMIS( HCHO_E ) +                    
@@ -792,6 +885,12 @@ C --------------- END of HET HONO RX ----------
                   DD( V,L ) = 0.0
                   UU( V,L ) = 0.0
                END DO
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     S_DD( V,L,NP) = 0.0
+                     S_UU( V,L,NP) = 0.0
+                  END DO
+#endif
             END DO
 
 #ifdef isam
@@ -823,6 +922,13 @@ C Set MATRIX1 elements A (col 1), B (diag.), E (superdiag.) and D (RHS)
                   DD( V,L ) = CONC( V,L )
      &                      - LFAC1( L ) * CONC( V,L )
      &                      + LFAC2( L ) * CONC( V,L+1 ) 
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     S_DD( V,L,NP ) = SENS( V,L,NP )
+     &                         - LFAC1( L ) * SENS( V,L,NP )
+     &                         + LFAC2( L ) * SENS( V,L+1,NP )
+                  END DO
+#endif
                END DO
 
 #ifdef isam
@@ -839,6 +945,14 @@ C Set MATRIX1 elements A (col 1), B (diag.), E (superdiag.) and D (RHS)
      &                    -   MDWN( L ) * CONC( V,L )
      &                    +   MFAC( L ) * CONC( V,L+1 )
                      DD( V,L ) = CONC( V,L ) + DFACQ * DELC
+#ifdef sens    
+                     DO NP = 1, NPMAX
+                        S_DELC = MBARKS( L ) * SENS( V,1,NP )
+     &                       -   MDWN( L ) * SENS( V,L,NP )
+     &                       +   MFAC( L ) * SENS( V,L+1,NP )
+                        S_DD( V,L,NP ) = SENS( V,L,NP ) + DFACQ * S_DELC
+                     END DO
+#endif         
                   END DO
 
 #ifdef isam
@@ -857,10 +971,21 @@ C Set MATRIX1 elements A (col 1), B (diag.), E (superdiag.) and D (RHS)
                CALL SA_MATRIX1( LCBL, AA, BB1,EE1, SA_DD, SA_UU)
 #endif
 
+#ifdef sens
+               DO NP = 1, NPMAX
+                  CALL MATRIX1 ( LCBL, AA, BB1, EE1, S_DD(:,:,NP), S_UU(:,:,NP) )
+               END DO
+#endif
+
 C update conc
                DO L = 1, LCBL
                   DO V = 1, N_SPC_DIFF
                      CONC( V,L ) = UU( V,L )
+#ifdef sens
+                     DO NP = 1, NPMAX
+                        SENS( V,L,NP ) = S_UU( V,L,NP )
+                     END DO
+#endif
                   END DO
 #ifdef isam
                   DO JSPCTAG = 1, N_SPCTAG
@@ -874,6 +999,12 @@ C reinitialize for TRI solver
                   DO V = 1, N_SPC_DIFF
                      DD( V,L ) = 0.0
                      UU( V,L ) = 0.0
+#ifdef sens
+                     DO NP = 1, NPMAX
+                        S_DD( V,L,NP ) = 0.0
+                        S_UU( V,L,NP ) = 0.0
+                     END DO
+#endif
                   END DO
 #ifdef isam
                   DO JSPCTAG = 1, N_SPCTAG
@@ -890,6 +1021,13 @@ C reinitialize for TRI solver
                DD( V,L ) = CONC( V,L )
      &                   + LFAC3( L ) * ( CONC( V,L+1 ) - CONC( V,L ) )
      &                   + EMIS( V,L )
+#ifdef sens
+               DO NP = 1, NPMAX
+                  S_DD( V,L,NP ) = SENS( V,L,NP )
+     &                           + LFAC3( L ) * ( SENS( V,L+1,NP ) - SENS( V,L,NP ) )
+     &                           + S_EMIS( V,L,NP )
+               END DO
+#endif
             END DO
 
 #ifdef isam
@@ -906,6 +1044,14 @@ C reinitialize for TRI solver
      &                      + LFAC3( L ) * ( CONC( V,L+1 ) - CONC( V,L ) )
      &                      - LFAC4( L ) * ( CONC( V,L ) - CONC( V,L-1 ) )
      &                      + EMIS( V,L )
+#ifdef sens 
+                  DO NP = 1, NPMAX
+                     S_DD( V,L,NP ) = SENS( V,L,NP )
+     &                              + LFAC3( L ) * ( SENS( V,L+1,NP ) - SENS( V,L,NP ) )
+     &                              - LFAC4( L ) * ( SENS( V,L,NP ) - SENS( V,L-1,NP ) )
+     &                              + S_EMIS( V,L,NP )
+                  END DO
+#endif
                END DO
 #ifdef isam
                DO JSPCTAG = 1, N_SPCTAG
@@ -921,6 +1067,12 @@ C reinitialize for TRI solver
             DO V = 1, N_SPC_DIFF
                DD( V,L ) = CONC( V,L )
      &                   - LFAC4( L ) * ( CONC( V,L ) - CONC( V,L-1 ) )
+#ifdef sens
+               DO NP = 1, NPMAX
+                  S_DD( V,L,NP ) = SENS( V,L,NP )
+     &                           - LFAC4( L ) * ( SENS( V,L,NP ) - SENS( V,L-1,NP ) )
+               END DO
+#endif
             END DO
 #ifdef isam
             DO JSPCTAG = 1, N_SPCTAG
@@ -934,10 +1086,22 @@ C reinitialize for TRI solver
             CALL SA_TRI ( CC, BB2, EE2, SA_DD, SA_UU )
 #endif
 
+#ifdef sens
+            DO NP = 1, NPMAX
+               CALL TRI ( CC, BB2, EE2, S_DD(:,:,NP), S_UU(:,:,NP) )
+            END DO
+#endif
+
+
 C Load into CGRID
             DO L = 1, NLAYS
                DO V = 1, N_SPC_DIFF
                   CONC( V,L ) = UU( V,L )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     SENS( V,L,NP ) = S_UU( V,L,NP )
+                  END DO
+#endif
                END DO
 #ifdef isam
                DO JSPCTAG = 1, N_SPCTAG
@@ -954,11 +1118,24 @@ C --------- HET HONO RX -----------------
                   S = HNO3_MAP
                   CONC( S,1 ) = EMIS_OVER_VD( V ) + ( CONC( S,1 ) - EMIS_OVER_VD( V ) ) * EFAC2( V )
                   DDBF( V )   = DDBF( V ) + THBAR * DD_FAC( V ) * CONC( S,1 )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     SENS( S,1,NP ) = S_POL( NP,V ) + ( SENS( S,1,NP ) - S_POL( NP,V ) ) * EFAC2( V )
+                     S_DDBF( V,NP ) = S_DDBF( V,NP ) + THBAR * DD_FAC( V ) * SENS( S,1,NP )
+                  END DO
+#endif
 
                ELSE IF ( V .EQ. NO2_HIT ) THEN
                   S = NO2_MAP
                   CONC( S,1 ) = EMIS_OVER_VD( V ) + ( CONC( S,1 ) - EMIS_OVER_VD( V ) ) * EFAC2( V )
                   DDBF( V )   = DDBF( V ) + THBAR * DD_FAC( V ) * CONC( S,1 )
+
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     SENS( S,1,NP ) = S_POL( NP,V ) + ( SENS( S,1,NP ) - S_POL( NP,V ) ) * EFAC2( V )
+                     S_DDBF( V,NP ) = S_DDBF( V,NP ) + THBAR * DD_FAC( V ) * SENS( S,1,NP )
+                  END DO
+#endif
 
 C --------- END of HET HONO RX ----------
 
@@ -966,6 +1143,13 @@ C --------- END of HET HONO RX ----------
                   S = DV2DF( V )
                   CONC( S,1 ) = EMIS_OVER_VD( V ) + ( CONC( S,1 ) - EMIS_OVER_VD( V ) ) * EFAC2( V )
                   DDBF( V ) = DDBF( V ) + THBAR * DD_FAC( V ) * CONC( S,1 )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     SENS( S,1,NP ) = S_POL( NP,V ) + ( SENS( S,1,NP ) - S_POL( NP,V ) ) * EFAC1( V )
+                     S_DDBF( V, NP ) = S_DDBF( V, NP ) + THETA * DD_FAC( V ) * SENS( S, 1,NP )
+!     &                      - DTDENS1 * DD_CONV( V ) * S_PLDV( NP,V,C,R ) )
+                  END DO
+#endif
                   IF ( ABFLUX .AND. V .EQ. NH3_HIT ) THEN
                      TMP_BD_EMIS( NH3_E ) = TMP_BD_EMIS( NH3_E ) + 
      &                  THBAR * Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( V ) ) * DD_CONV( V ) * DTDENS1                                 
@@ -980,7 +1164,14 @@ C --------- END of HET HONO RX ----------
                   END IF
                   IF ( V .EQ. HCHO_HIT ) THEN
                      TMP_BD_EMIS( HCHO_E ) = TMP_BD_EMIS( HCHO_E ) +                    
-     &                  THETA * Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( V ) ) * DD_CONV( V ) * DTDENS1                 
+     &                  THETA * Tile_Data%Bidi_Emis( C, R, Tile_Data%dep2vdiff( V ) ) * DD_CONV( V ) * DTDENS1    
+#ifdef sens
+                        S = HONO_MAP
+                        DO NP = 1, NPMAX
+                           SENS( S,1,NP ) = S_POL( NP,V ) + ( SENS( S,1,NP ) - S_POL( NP,V ) ) * EFAC1( V )
+                           S_DDBF( V, NP ) = S_DDBF( V, NP ) + THETA * DD_FAC( V ) * SENS ( S,1,NP )
+                        END DO
+#endif             
                   END IF
                END IF
 
@@ -1059,6 +1250,22 @@ C Update ISAM Dry Deposition
 #ifdef isam
          DO JSPCTAG = 1, N_SPCTAG
             SA_DDEP( C,R,JSPCTAG ) = SA_DDBF( JSPCTAG )
+         END DO
+#endif
+
+#ifdef sens
+         DO NP = 1, NPMAX
+
+            DO L = 1, NLAYS
+               DO V = 1, N_SPC_DIFF
+                  SNGRD( DIFF_MAP( V ),L,C,R,NP ) = SENS( V,L,NP )
+               END DO
+            END DO
+
+            DO V = 1, N_SPC_DEPV
+               S_DDEP( V,C,R,NP ) = S_DDBF( V,NP )
+            END DO
+
          END DO
 #endif
 

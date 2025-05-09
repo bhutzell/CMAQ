@@ -276,6 +276,10 @@ C-----------------------------------------------------------------
          Use HG_BIDI
          Use Resist_Funcs
          Use HLCONST_MOD
+#ifdef sens
+         USE DDM3D_DEFN, ONLY : NP, NPMAX, S_PVD, S_CGRIDL1
+#endif
+
 
          Implicit None
 
@@ -288,6 +292,10 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
 ! Heterogeneous HONO
          Real            :: surf_bldg, surf_leaf    ! HONO building and leaf surface area/voluem (1/
          Real            :: kno2, conc_no2          ! pseudo-first order reaction NO2 + H2O -> HONO  (1/s), NO2 (ppm)
+#ifdef sens
+      REAL               :: s_conc_no2( NPMAX )
+#endif
+
 ! Physical Chemistry variables
          Real            :: heff_ap, heff_wat, heff ! Henry's constant for leaf apoplast, surface water, and wet surfaces
          Real            :: hplus                   ! H+ in aqueous media
@@ -355,6 +363,9 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
    
          effective = .TRUE.
 
+#ifdef sens
+         s_pvd     ( :,:,:,: ) = 0.0
+#endif
 ! grid cell met variables 
          temp_2m  = Met_Data%TEMP2(c,r)
          q_2m     = MET_DATA%Q2( c,r )
@@ -692,11 +703,20 @@ C Determine NO2 concentration needed for HONO production term.
 
                IF ( s .EQ. s_NO2 ) THEN
                   conc_no2 = cgridl1( n )
-
+#ifdef sens
+                     DO NP = 1, NPMAX
+                        s_conc_no2( NP ) = s_cgridl1( NP, n,c,r )
+                     END DO
+#endif
                END IF
 C Calculate production (bidi_emis) for HONO; unit = ppm * m/s
                IF ( s .EQ. s_HONO ) Then
                   Tile_Data%Bidi_Emis( C, R, n ) = kno2 * conc_no2 * MET_DATA%ZF( c,r,1 )
+#ifdef sens
+                  DO NP = 1, NPMAX
+                     s_pvd( NP,n,c,r ) = kno2 * s_conc_no2( NP ) * MET_DATA%ZF( c,r,1 )
+                  END DO
+#endif
                END IF 
             END IF
 
@@ -858,7 +878,11 @@ C ***    extract grid cell concentrations of aero species from CGRID
 C        into aerospc_conc in aero_data module
 C        Also determines second moment from surface area and adds wet
 C        species
+#ifdef sens
+         CALL EXTRACT_AERO( CGRID( C,R,1,: ), .TRUE., CGRID( C,R,:,: ), .FALSE. ) 
+#else
          CALL EXTRACT_AERO( CGRID( C,R,1,: ), .TRUE. )
+#endif
 
 C ***    Calculate geometric mean diameters and standard deviations of the
 C        "wet" size distribution

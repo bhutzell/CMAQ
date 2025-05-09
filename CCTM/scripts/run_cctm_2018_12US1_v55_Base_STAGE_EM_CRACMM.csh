@@ -201,7 +201,7 @@ setenv BC_AERO_M2USE T       #> Specify whether or not to use aerosol surface ar
 
 
 #> Surface Tiled Aerosol and Gaseous Exchange Option
-setenv CTM_USE_STAGE N       #> Use the STAGE depostion option [ default: N ]
+setenv CTM_USE_STAGE N       #> Use the STAGE deposition option [ default: N; active only if CTM_USE_STAGE = Y ]
 setenv CTM_MOSAIC N          #> Output landuse specific deposition velocities [ default: N ]
 setenv CTM_STAGE_P22 N       #> Pleim et al. 2022 Aerosol deposition model [default: N]
 setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [default: Y]

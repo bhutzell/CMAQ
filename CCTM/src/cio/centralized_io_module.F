@@ -2005,7 +2005,6 @@
           INTEGER          :: STAT, n, c
 
           CALL INIT_LSM( 0, 0 )
-!          IF( USE_STAGE) CALL INIT_STAGE_LU( 0, 0 )
 
           allocate (LUFRAC(ncols, nrows, n_lufrac), STAT=STAT)
           IF ( STAT .NE. 0 ) THEN
@@ -5391,7 +5390,6 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
 
-!#ifdef m3dry_opt
           If(.NOT. USE_STAGE) Then
           Allocate ( por1 ( ncols, nrows, e2c_cats ),
      &               por2 ( ncols, nrows, e2c_cats ),
@@ -5449,7 +5447,6 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
           End If
-!#endif
  
 ! for E2C_CHEM file
           If ( .Not. Open3( E2C_CHEM, fsread3, pname ) ) Then
@@ -5488,7 +5485,6 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
 
-!#ifdef m3dry_opt
           If( .NOT.USE_STAGE ) Then
           Allocate ( wep1 ( ncols, nrows, e2c_cats ),
      &               wep2 ( ncols, nrows, e2c_cats ),
@@ -5519,8 +5515,7 @@ C Read the various categories of normalized emissions
              CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT2 )
           End If
           End If
-!#else
-!#ifdef stage_opt
+
           If( USE_STAGE ) Then
           Allocate( Nit1       ( ncols,nrows,e2c_cats ),
      &              Nit2       ( ncols,nrows,e2c_cats ),
@@ -5704,8 +5699,6 @@ C Read the various categories of normalized emissions
 
 9001      Format( 'Failure reading ', a, 1x, 'from ', a )
           endif ! USE_STAGE
-!#endif   ! end if stage option
-!#endif   ! end if m3dry option
 
         end subroutine depv_data_setup
 
