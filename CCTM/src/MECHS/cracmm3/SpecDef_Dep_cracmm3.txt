@@ -80,8 +80,10 @@ DDEP_ACLIJ         ,kg ha-1     ,ACLJ[1] + ACLI[1]
 DDEP_ACLK          ,kg ha-1     ,ACLK[1]
 DDEP_ACLIJK        ,kg ha-1     ,ACLI[1] + ACLJ[1] + ACLK[1]
 WDEP_ACLIJK        ,kg ha-1     ,ACLI[2] + ACLJ[2] + ACLK[2]
-DDEP_TCL           ,kg ha-1     ,DDEP_ACLIJK[0] + CL2[1] + 0.972*HCL[1] + 0.6578*HOCL[1] 
-WDEP_TCL           ,kg ha-1     ,WDEP_ACLIJK[0] + 0.972*HCL[2] + CL2[2] + 0.6758*HOCL[2] 
+DDEP_TCL           ,kg ha-1     ,DDEP_ACLIJK[0] + CL2[1] + 0.972*HCL[1] + 0.6578*HOCL[1] \
+                                 + 0.4352*CLNO2[1] + 0.36377*CLNO3[1]
+WDEP_TCL           ,kg ha-1     ,WDEP_ACLIJK[0] + 0.972*HCL[2] + CL2[2] + 0.6758*HOCL[2] \
+                                 + 0.4352*CLNO2[2] + 0.36377*CLNO3[2]
 TDEP_CL            ,kg ha-1     ,DDEP_TCL[0] + WDEP_TCL[0]
 
 !! Calcium
