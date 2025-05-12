@@ -1510,19 +1510,19 @@ CMPST =
 
 'DD_OXN_PANT' , 'Dry Dep of Oxidized Nitrogen from PAN',
                 'kgN ha-1', 'DEP',
-                '0.11570*DD_PAN + 0.11570*DD_PPN + 0.11570*DD_MPAN',
+                '0.11570*DD_PAN + 0.10370*DD_PPN + 0.09517*DD_MPAN',
 
 'WD_OXN_PANT' , 'Wet Dep of Oxidized Nitrogen from PAN',
                 'kgN ha-1', 'DEP',
-                '0.11570*WD_PAN + 0.11570*WD_PPN + 0.11570*WD_MPAN',
+                '0.11570*WD_PAN + 0.10370*WD_PPN + 0.09517*WD_MPAN',
 
 'DD_OXN_ORGN' , 'Dry Dep of Oxidized Nitrogen from Organic Nitrate',
                 'kgN ha-1', 'DEP',
-                '0.10770*DD_ONIT + 0.10770*DD_ISON + 0.10770*DD_VTRPN + 0.10770*DD_INALD + 0.10770*DD_VHONIT',
+                '0.11765*DD_ONIT + 0.09524*DD_ISON + 0.06512*DD_VTRPN + 0.07176*DD_INALD + 0.05283*DD_VHONIT',
 
 'WD_OXN_ORGN' , 'Wet Dep of Oxidized Nitrogen from Organic Nitrate',
                 'kgN ha-1', 'DEP',
-                '0.10770*WD_ONIT + 0.10770*WD_ISON + 0.10770*WD_VTRPN + 0.10770*WD_INALD + 0.10770*WD_VHONIT',
+                '0.11765*WD_ONIT + 0.09524*WD_ISON + 0.06512*WD_VTRPN + 0.07176*WD_INALD + 0.05283*WD_VHONIT',
 
 'DD_OXN_OTHR' , 'Dry Dep of Oxidized Nitrogen from Other Components',
                 'kgN ha-1', 'DEP',
