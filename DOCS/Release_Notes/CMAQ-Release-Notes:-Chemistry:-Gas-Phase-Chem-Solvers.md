@@ -10,7 +10,7 @@
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-| Merge for PR#1345 | [PR#1345](https://github.com/USEPA/CMAQ_Dev/pull/1345)  |
+| Merge for PR#1346 | [PR#1345](https://github.com/USEPA/CMAQ_Dev/pull/1346)  |
 
 ### Tuning up the Gear Solver
 
