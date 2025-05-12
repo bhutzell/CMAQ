@@ -125,7 +125,7 @@ C...modules
       USE CLOUD_OPTICS         ! data and routines for optics of cloud hydrometeors
       USE SEAS_STRAT_O3_MIN    ! monthly minimum fraction of ozone column density above Pressure TOP
       USE CENTRALIZED_IO_MODULE, ONLY : LAT, LON, HT
-      USE ELMO_DATA, ONLY : ELMO_AOD_550, ELMO_EXT_550
+      USE ELMO_DATA, ONLY : ELMO_AOD_550, ELMO_EXT_550, ELMO_NO2COL,ELMO_SO2COL, ELMO_HCHOCOL, ELMO_COCOL
 
 #ifdef mpas
       use mio_module
@@ -316,7 +316,7 @@ C...modules
 
       REAL, ALLOCATABLE, SAVE :: AERO_SCAT ( :,:,:,: ) ! aerosol scattering for layer [1/Km]
       REAL, ALLOCATABLE, SAVE :: AERO_ASYM ( :,:,:,: ) ! aerosol asymmetry factor
-      REAL, ALLOCATABLE, SAVE :: TOT_EXT   ( :,:,:,: ) ! total extinction for layer [1/Km]
+      REAL, ALLOCATABLE, SAVE :: CLD_EXT   ( :,:,:,: ) ! cloud extinction for layer [1/Km]
       REAL, ALLOCATABLE, SAVE :: GAS_EXT   ( :,:,:,: ) ! clear sky extinction for layer [1/Km]
       REAL, ALLOCATABLE, SAVE :: AERO_EXT  ( :,:,:,: ) ! aerosol extinction for layer [1/Km]
       REAL, ALLOCATABLE, SAVE :: ACTINIC_FX( :,:,:,: ) ! net actinic flux [watts/m**2]
@@ -567,9 +567,9 @@ C...modules
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
 
-            ALLOCATE ( TOT_EXT( NCOLS,NROWS,NLAYS_DIAG,N_DIAG_WVL ), STAT = ALLOCSTAT )
+            ALLOCATE ( CLD_EXT( NCOLS,NROWS,NLAYS_DIAG,N_DIAG_WVL ), STAT = ALLOCSTAT )
             IF ( ALLOCSTAT .NE. 0 ) THEN
-               XMSG = 'Failure allocating 3D TOT_EXT'
+               XMSG = 'Failure allocating 3D CLD_EXT'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
 
@@ -801,7 +801,7 @@ C...modules
             ASY_CLOUD_WL = 0.0
 #endif
             TAU_TOT_WL   = 0.0
-            TOT_EXT      = 0.0
+            CLD_EXT      = 0.0
             GAS_EXT      = 0.0
             AERO_EXT     = 0.0
             AERO_SCAT    = 0.0
@@ -832,6 +832,22 @@ C...modules
                   CALL COLUMN_GAS( IGAS=LGC_O3, UNIT_FACTOR=MSCALE, COLUMN_DENSITY=TROPO_OC )                     
 !...get total ozone column based on OMI observations
                   CALL O3TOTCOL ( LAT( COL,ROW ), LON( COL,ROW ), MIDDATE, MIDTIME, TOTAL_OC( COL,ROW ) )
+                  CALL GET_AERO_DATA ( COL,ROW, NLAYS, DENS, CGRID )
+                  DO LEV = 1, NLAYS
+                     AERO_EXT_550( COL,ROW,LEV ) = 1000.0 * AERO_EXTI_550( LEV )
+                     TAU_AERO_550 ( COL,ROW ) = TAU_AERO_550 ( COL,ROW )
+     &                                        + AERO_EXTI_550( LEV ) * BLKDZ( LEV )
+                     TAU_ABS_AERO_550 ( COL,ROW ) = TAU_ABS_AERO_550 ( COL,ROW )
+     &                                            + AERO_ABSO_550( LEV ) * BLKDZ( LEV )
+                  END DO
+                  DO L = 1, N_DIAG_WVL
+                     IWL = DIAG_WVL( L )
+                     DO LEV = 1,NLAYS_DIAG 
+                        AERO_SCAT( COL,ROW,LEV,L )  = 1000.0 * AERO_SCAT_COEF( LEV,IWL )
+                        AERO_EXT( COL,ROW,LEV,L )   = 1000.0 * AERO_EXTI_COEF( LEV,IWL )
+                        AERO_ASYM( COL,ROW,LEV,L )  = AERO_ASYM_FAC( LEV,IWL )
+                     END DO
+                  END DO
                END DO
             END DO   
          ELSE
@@ -874,7 +890,7 @@ C...modules
                      ASY_CLOUD_WL( COL,ROW, : ) = 0.0
 #endif
                      TAU_TOT_WL  ( COL,ROW, : )   = 0.0
-                     TOT_EXT     ( COL,ROW, :,: ) = 0.0
+                     CLD_EXT     ( COL,ROW, :,: ) = 0.0
                      GAS_EXT     ( COL,ROW, :,: ) = 0.0
                      AERO_EXT    ( COL,ROW, :,: ) = 0.0
                      AERO_SCAT   ( COL,ROW, :,: ) = 0.0
@@ -904,6 +920,22 @@ C...modules
                      CALL COLUMN_GAS( IGAS=LGC_O3, UNIT_FACTOR=MSCALE, COLUMN_DENSITY=TROPO_OC )                     
 !...get total ozone column based on OMI observations
                      CALL O3TOTCOL ( LAT( COL,ROW ), LON( COL,ROW ), MIDDATE, MIDTIME, TOTAL_OC( COL,ROW ) )
+                     CALL GET_AERO_DATA ( COL,ROW, NLAYS, DENS, CGRID )
+                     DO LEV = 1, NLAYS
+                        AERO_EXT_550( COL,ROW,LEV ) = 1000.0 * AERO_EXTI_550( LEV )
+                        TAU_AERO_550 ( COL,ROW ) = TAU_AERO_550 ( COL,ROW )
+     &                                           + AERO_EXTI_550( LEV ) * BLKDZ( LEV )
+                        TAU_ABS_AERO_550 ( COL,ROW ) = TAU_ABS_AERO_550 ( COL,ROW )
+     &                                               + AERO_ABSO_550( LEV ) * BLKDZ( LEV )
+                     END DO
+                     DO L = 1, N_DIAG_WVL
+                        IWL = DIAG_WVL( L )
+                        DO LEV = 1,NLAYS_DIAG
+                           AERO_EXT( COL,ROW,LEV,L )    = 1000.0 * AERO_EXTI_COEF( LEV,IWL )
+                           AERO_ASYM( COL,ROW,LEV,L )   = AERO_ASYM_FAC( LEV,IWL )
+                           AERO_SCAT( COL,ROW,LEV,L )   = 1000.0 * AERO_SCAT_COEF( LEV,IWL )
+                        END DO
+                     END DO
                   END IF   
 
                   CYCLE LOOP_COLS
@@ -994,6 +1026,7 @@ C...modules
 !  hydrometeor concentrations
                   LWC = 0.0
                   IWC = 0.0
+                  GWC = 0.0
                   RWC = 0.0
                   SWC = 0.0
                   RWC = 0.0
@@ -1079,7 +1112,7 @@ C...modules
                      IWL = DIAG_WVL( L )
                      FORALL ( LEV = 1:NLAYS_DIAG )
                         ACTINIC_FX( COL,ROW,LEV,L )  = ACTINIC_FLUX( LEV,IWL )
-                        TOT_EXT ( COL,ROW,LEV,L )    = 1000.0 * EXTINCTION( LEV,IWL )
+                        CLD_EXT ( COL,ROW,LEV,L )    = 1000.0 * CLD_EXTINCTION( LEV,IWL )
                         GAS_EXT ( COL,ROW,LEV,L )    = 1000.0 * GAS_EXTINCTION( LEV,IWL )
                         AERO_EXT( COL,ROW,LEV,L )    = 1000.0 * AERO_EXTI_COEF( LEV,IWL )
                         AERO_SCAT ( COL,ROW,LEV,L )  = 1000.0 * AERO_SCAT_COEF( LEV,IWL )
@@ -1198,8 +1231,8 @@ C...modules
                         DO LEV = 1, NLAYS_DIAG
                            DO L = 1, N_DIAG_WVL
                               IWL = DIAG_WVL( L )
-                              TOT_EXT( COL,ROW,LEV,L )    = MSCALE * TOT_EXT( COL,ROW,LEV,L )
-     &                                                    + ACM_CLOUDS( COL,ROW ) * EXTINCTION( LEV,IWL )
+                              CLD_EXT( COL,ROW,LEV,L )    = MSCALE * CLD_EXT( COL,ROW,LEV,L )
+     &                                                    + 1000.0 * ACM_CLOUDS( COL,ROW ) * CLD_EXTINCTION( LEV,IWL )
                               ACTINIC_FX( COL,ROW,LEV,L ) = MSCALE * ACTINIC_FX( COL,ROW,LEV,L )
      &                                                    + ACM_CLOUDS( COL,ROW ) * ACTINIC_FLUX( LEV,IWL )
                            END DO
@@ -1250,6 +1283,13 @@ C...modules
       ! Store PM Diagnostic AOD and extinction
       ELMO_AOD_550 = TAU_AERO_550
       ELMO_EXT_550 = AERO_EXT_550
+
+      IF ( PHOTDIAG ) THEN
+          ELMO_NO2COL  = NO2_COLUMN
+          ELMO_SO2COL  = SO2_COLUMN
+          ELMO_HCHOCOL = HCHO_COLUMN
+          ELMO_COCOL   = CO_COLUMN
+      END IF
 
 !...report on whether stratospheric ozone column satisfies climatological minimums
       IF( N_TROPO_O3_TOGGLE .GT. 0 )THEN
@@ -1542,14 +1582,14 @@ C...modules
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
 
-            VARNM = 'EXT_AERO_W' // WLTXT( IWL )
+            VARNM = 'AERO_EXT_W' // WLTXT( IWL )
             IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, AERO_EXT( :,:,:,L ) ) ) THEN
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
 
-            VARNM = 'EXT_W' // WLTXT( IWL )
-            IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, TOT_EXT( :,:,:,L ) ) ) THEN
+            VARNM = 'CLD_EXT_W' // WLTXT( IWL )
+            IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, CLD_EXT( :,:,:,L ) ) ) THEN
                XMSG = 'Error writing variable ' // VARNM
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
@@ -1561,7 +1601,7 @@ C...modules
             END IF
          END DO
 
-         VARNM = 'EXT_AERO_W550'
+         VARNM = 'AERO_EXT_W550'
          IF ( .NOT. WRITE3( CTM_RJ_3, VARNM, ODATE, OTIME, AERO_EXT_550( :,:,: ) ) ) THEN
              XMSG = 'Error writing variable ' // VARNM
              CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )

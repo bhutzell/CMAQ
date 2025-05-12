@@ -1,0 +1,49 @@
+CH2ICL_JPL19
+! CH2ICL + HV = I + CL + HO2 
+! JPL Publication 19-5;  Evaluation Number 19; May 2020
+! Page: 4-412; Table 4H-27
+! Quantum yield is taken as 1.0
+! Note: Absorption cross sections (σ); 205–230 nm: Roehl et al.; 235–355 nm: mean of data from Roehl et al.4 and Rattigan et al.; 360–390 nm: Rattigan et al.
+! https://jpldataeval.jpl.nasa.gov/pdf/NASA-JPL%20Evaluation%2019-5.pdf
+! Assume these are point values (not specified in data source)
+POINT
+! With FAC, units are (cm^2/molecule)
+FAC=1.0
+205	1.32E-18	1.00
+210	4.21E-19	1.00
+215	1.11E-19	1.00
+220	7.50E-20	1.00
+225	9.76E-20	1.00
+230	1.49E-19	1.00
+235	2.12E-19	1.00
+240	3.21E-19	1.00
+245	4.59E-19	1.00
+250	6.33E-19	1.00
+255	8.45E-19	1.00
+260	1.06E-18	1.00
+265	1.22E-18	1.00
+270	1.28E-18	1.00
+275	1.21E-18	1.00
+280	1.04E-18	1.00
+285	8.11E-19	1.00
+290	5.85E-19	1.00
+295	3.99E-19	1.00
+300	2.59E-19	1.00
+305	1.67E-19	1.00
+310	1.09E-19	1.00
+315	7.16E-20	1.00
+320	4.79E-20	1.00
+325	3.23E-20	1.00
+330	2.14E-20	1.00
+335	1.40E-20	1.00
+340	9.06E-21	1.00
+345	5.69E-21	1.00
+350	3.50E-21	1.00
+355	2.25E-21	1.00
+360	1.33E-21	1.00
+365	8.10E-22	1.00
+370	4.80E-22	1.00
+375	2.70E-22	1.00
+380	1.70E-22	1.00
+385	8.00E-23	1.00
+390	6.00E-23	1.00

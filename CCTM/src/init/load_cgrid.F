@@ -52,6 +52,7 @@ C                     MY_N clauses
 C   08 Mar 19 F. Sidi  Split up ICBC_FAC into IC_FAC and BC_FAC for 
 C                      tracer namelist only
 C   13 Mar 19 D. Wong: Implemented centralized I/O approach
+C   10 Jan 24 D. Wong: Incorporated unified coupler implmentation
 C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -59,7 +60,6 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE AERO_DATA, ONLY : CHECK_AERO_ICBC, N_MODE
       Use CENTRALIZED_IO_MODULE, only : interpolate_var
-      USE RUNTIME_VARS, ONLY : IC_AERO_M2WET, IC_AERO_M2USE
 #ifdef mpas
       USE coupler_module
 #endif
@@ -161,6 +161,8 @@ C for XTRACT3
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL       :: L_WRITE_WARNING
 
+      LOGICAL       :: SKIP
+
 C-----------------------------------------------------------------------
 
       JDATE = STDATE
@@ -190,31 +192,40 @@ C-----------------------------------------------------------------------
       WRITE( CONCMIN,'(1PE9.2)' ) CMIN
 
 #ifndef mpas
-      IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
-         XMSG = 'Could not open ' // FNAME // ' file'
-         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+      SKIP = .FALSE.
+#ifdef twoway
+      IF (FNAME == 'MET_CRO_3D') THEN
+         SKIP = .TRUE.
       END IF
+#endif
+
+      IF (.NOT. SKIP) THEN
+         IF ( .NOT. OPEN3( FNAME, FSREAD3, PNAME ) ) THEN
+            XMSG = 'Could not open ' // FNAME // ' file'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
  
-      IF ( .NOT. DESC3( FNAME ) ) THEN
-         XMSG = 'Could not get ' // FNAME // ' file description'
-         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-      END IF
+         IF ( .NOT. DESC3( FNAME ) ) THEN
+            XMSG = 'Could not get ' // FNAME // ' file description'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
  
-      IF ( GL_NCOLS .NE. NCOLS3D ) THEN
-         WRITE( LOGDEV,* ) ' '
-         WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
-         WRITE( LOGDEV,* ) '>>  GL_NCOLS: ', GL_NCOLS, '  NCOLS3D: ', NCOLS3D
-      END IF
+         IF ( GL_NCOLS .NE. NCOLS3D ) THEN
+            WRITE( LOGDEV,* ) ' '
+            WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
+            WRITE( LOGDEV,* ) '>>  GL_NCOLS: ', GL_NCOLS, '  NCOLS3D: ', NCOLS3D
+         END IF
  
-      IF ( GL_NROWS .NE. NROWS3D ) THEN
-         WRITE( LOGDEV,* ) ' '
-         WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
-         WRITE( LOGDEV,* ) '>>  GL_NROWS: ', GL_NROWS, '  NROWS3D: ', NROWS3D
-      END IF
+         IF ( GL_NROWS .NE. NROWS3D ) THEN
+            WRITE( LOGDEV,* ) ' '
+            WRITE( LOGDEV,* ) '    WARNING: ' // CHWARN // FNAME
+            WRITE( LOGDEV,* ) '>>  GL_NROWS: ', GL_NROWS, '  NROWS3D: ', NROWS3D
+         END IF
  
-      IF ( NLAYS .NE. NLAYS3D ) THEN
-         XMSG = 'Wrong number of layers in ' // FNAME // ' file'
-         CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         IF ( NLAYS .NE. NLAYS3D ) THEN
+            XMSG = 'Wrong number of layers in ' // FNAME // ' file'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+         END IF
       END IF
 #endif
 
@@ -500,8 +511,6 @@ C Load RHOJ for transport and mixing ratio advection adjustment
          CALL LOG_SUBHEADING( LOGDEV, 'Check Aerosol IC Size Distributions' )
 
          ! Check Aerosol Size Distributions and Warn the User if They Are Not Robust.
-         ! Surface area is output from this routine consistent with the
-         ! specification in IC_AERO_M2WET.
          IF ( NEW_START ) THEN
            SPC_STRT = AE_STRT
            SPC_FINI = AE_STRT + N_AE_SPC - 1
@@ -510,7 +519,7 @@ C Load RHOJ for transport and mixing ratio advection adjustment
            DO R = 1, NROWS
            DO C = 1, NCOLS
               AECON( 1:N_AE_SPC ) = CGRID( C,R,L,SPC_STRT:SPC_FINI )
-              CALL CHECK_AERO_ICBC( AECON, IC_AERO_M2WET, IC_AERO_M2USE, 
+              CALL CHECK_AERO_ICBC( AECON, .FALSE., .TRUE., 
      &                              .FALSE., L_WRITE_WARNING, C,R,L )
               CGRID( C,R,L,SPC_STRT:SPC_FINI ) = AECON( 1:N_AE_SPC )
            END DO

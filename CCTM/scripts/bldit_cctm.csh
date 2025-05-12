@@ -1,13 +1,13 @@
 #!/bin/csh -f
 
-# ======================= CCTMv5.4.X Build Script ========================= 
-# Usage: bldit.cctm.csh <compiler> >&! bldit.cctm.log                          
+# ======================= CCTMv5.5.X Build Script ========================= 
+# Usage: bldit_cctm.csh <compiler> >&! bldit.cctm.log                          
 # Requirements: I/O API & netCDF libraries, a Fortran compiler,               
 #               and MPI for multiprocessor computing                     
 #
 # To report problems or request help with this script/program:           
 #             http://www.cmascenter.org
-# ========================================================================= 
+# =========================================================================  
 
 #> Set Compiler Identity by User Input: Options -> intel | pgi | gcc
  if ( $#argv == 1 ) then
@@ -78,26 +78,35 @@ set make_options = "-j"                #> additional options for make command if
 #set ISAM_CCTM                         #> uncomment to compile CCTM with ISAM activated
                                        #>   comment out to use standard process
 
-#set DDM3D_CCTM                        #> uncomment to compile CCTM with DD3D activated
+#set DDM3D_CCTM                        #> uncomment to compile CCTM with DDM-3D activated
                                        #>   comment out to use standard process
-#> Two-way WRF-CMAQ 
-#set build_twoway                      #> uncomment to build WRF-CMAQ twoway; 
+#> WRF-CMAQ coupled model 
+#set build_wrf_cmaq                    #> uncomment to build WRF-CMAQ coupled model; 
                                        #>   comment out for off-line chemistry 
+
+#> MPAS-CMAQ coupled model
+#set build_mpas_cmaq                   #> uncomment to build MPAS-CMAQ coupled model; 
+
 
 #> Working directory and Version IDs
  if ( $?ISAM_CCTM ) then
-     set VRSN  = v54_ISAM             #> model configuration ID for CMAQ_ISAM
+     set VRSN  = v55_ISAM             #> model configuration ID for CMAQ_ISAM
  else if ( $?DDM3D_CCTM ) then
-     set VRSN = v54_DDM3D             #> model configuration ID for CMAQ_DDM
+     set VRSN = v55_DDM3D             #> model configuration ID for CMAQ_DDM
  else
-     set VRSN = v54                   #> model configuration ID for CMAQ
+     set VRSN = v55                   #> model configuration ID for CMAQ
  endif
  
  set EXEC  = CCTM_${VRSN}.exe          #> executable name
  set CFG   = CCTM_${VRSN}.cfg          #> configuration file name
 
- if ( $?build_twoway ) then            # WRF Version used for WRF-CMAQ Model (must be v4.4+)
-    set WRF_VRSN = v4.4
+ if ( $?build_wrf_cmaq && $?build_mpas_cmaq ) then
+    echo " options build_wrf_cmaq and build_mpas_cmaq cannot be used at the same time"
+    exit 1
+ endif
+
+ if ( $?build_wrf_cmaq ) then          # WRF Version used for WRF-CMAQ Model (must be v4.4+)
+    set WRF_VRSN = v4.4.1
  endif   
 
 #========================================================================
@@ -145,16 +154,15 @@ set make_options = "-j"                #> additional options for make command if
  # Special cloud modules for kmt versions
  if( ${Mechanism} == cb6r5_ae7_aqkmt2 ) then
      set ModCloud = cloud/acm_ae7_kmt2
- else if( ${Mechanism} == saprc07tic_ae7i_aqkmt2 ) then
-     set ModCloud = cloud/acm_ae7_kmt2
  endif
 
  # Gas chem solver
- if ( ${Mechanism} == cb6r5m_ae7_aq ) then  #> Gas-phase chemistry solver options ($CMAQ_MODEL/CCTM/src/gas)
-     setenv ChemSolver ros3                  #> ros3 (or smvgear) are system independent
- else                                      
-     setenv ChemSolver ebi                   #> [ default for most mechanisms: ebi ]
- endif
+ 
+ setenv ChemSolver ebi                   #> [ default for most mechanisms: ebi ]
+   
+ if ( ${Mechanism} == cb6r5m_ae7_aq || ${Mechanism} == cracmm3m ) then #> Gas-phase chemistry solver options ($CMAQ_MODEL/CCTM/src/gas)
+   setenv ChemSolver ros3                                              #> ros3 (or smvgear) are system independent
+ endif  
                                          
  if ( $ChemSolver == ebi ) then             
     set ModGas    = gas/${ChemSolver}_${Mechanism}
@@ -229,11 +237,22 @@ set make_options = "-j"                #> additional options for make command if
     exit 1
  endif
 
-#> If the two-way, coupled WRF-CMAQ model is being built,
+#> If the WRF-CMAQ coupled model is being built,
 #> then just generate the Makefile. Don't compile.
- if ( $?build_twoway ) then
+ if ( $?build_wrf_cmaq ) then
     set MakeFileOnly   
-    set ModTwoway = twoway
+#   set Modwrfcmaq = wrf_cmaq
+    set Modwrfcmaq = twoway
+    set Modcoupler = unified_coupler
+ endif
+
+#> If the MPAS-CMAQ coupled model is being built,
+#> then just generate the Makefile. Don't compile.
+ if ( $?build_mpas_cmaq ) then
+    set MakeFileOnly   
+    set Modmpascmaq = mpas_cmaq
+#    set Modcoupler  = coupler
+    set ModMio      = mio
  endif
 
 #> If parallel-io is selected, then make sure the multiprocessor
@@ -346,9 +365,9 @@ set make_options = "-j"                #> additional options for make command if
 #> Set and create the "BLD" directory for checking out and compiling 
 #> source code. Move current directory to that build directory.
  if ( $?Debug_CCTM ) then
-    set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_debug
+     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_debug
  else
-    set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
+     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
  endif
 
 
@@ -474,7 +493,11 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo                                                              >> $Cfile
  echo "lib_4       ioapi/lib;"                                     >> $Cfile
  echo                                                              >> $Cfile
- set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $cpp_depmod $STX1 $STX2$quote;"
+ if ( $?build_mpas_cmaq ) then
+    set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $cpp_depmod $quote;"
+ else
+    set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $cpp_depmod $STX1 $STX2$quote;"
+ endif
  echo "cpp_flags   $text"                                          >> $Cfile
  echo                                                              >> $Cfile
  echo "f_compiler  $FC;"                                           >> $Cfile
@@ -504,7 +527,6 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     echo                                                           >> $Cfile
  endif
  echo "include SUBST_PE_COMM    $ICL_PAR/PE_COMM.EXT;"             >> $Cfile
- echo "include SUBST_CONST      $ICL_CONST/CONST.EXT;"             >> $Cfile
  echo "include SUBST_FILES_ID   $ICL_FILES/FILES_CTM.EXT;"         >> $Cfile
  echo "include SUBST_EMISPRM    $ICL_EMCTL/EMISPRM.EXT;"           >> $Cfile
  echo                                                              >> $Cfile
@@ -535,9 +557,16 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  endif
  echo                                                              >> $Cfile
 
- if ( $?build_twoway ) then
-    echo "// option set for WRF-CMAQ twoway"                       >> $Cfile
-    echo "Module ${ModTwoway};"                                    >> $Cfile
+ if ( $?build_wrf_cmaq ) then
+    echo "// option set for WRF-CMAQ coupled model"                >> $Cfile
+    echo "Module ${Modwrfcmaq};"                                   >> $Cfile
+    echo "Module ${Modcoupler};"                                   >> $Cfile
+    echo                                                           >> $Cfile
+ endif
+
+ if ( $?build_mpas_cmaq ) then
+    echo "// option set for MPAS-CMAQ coupled model"               >> $Cfile
+    echo "Module ${Modmpascmaq};"                                  >> $Cfile
     echo                                                           >> $Cfile
  endif
 
@@ -601,6 +630,13 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "Module ${ModMegBiog};"                                      >> $Cfile
  echo  
 
+ if ( $?build_mpas_cmaq ) then
+    set text = "mio"
+    echo "// options are" $text                                       >> $Cfile
+    echo "Module ${ModMio};"                                      >> $Cfile
+    echo  
+ endif
+
  set text = "smoke"
  echo "// options are" $text                                       >> $Cfile
  echo "Module ${ModPlmrs};"                                        >> $Cfile
@@ -628,7 +664,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "Module ${ModGas};"                                          >> $Cfile
  echo                                                              >> $Cfile
 
- set MechList = "cb6r5hap_ae7_aq, cb6r3_ae7_aq, cb6r5_ae7_aq, cb6r5_ae7_aqkmt2, cb6r5m_ae7_aq, racm2_ae6_aq, saprc07tc_ae6_aq, saprc07tic_ae7i_aq, saprc07tic_ae7i_aqkmt2"
+ set MechList = "cb6r5_ae7_aq, cb6r5_ae7_aqkmt2, cb6r5hap_ae7_aq, cb6r5m_ae7_aq, cracmm2, cracmm3, saprc07tc_ae6_aq, saprc07tic_ae7i_aq"
 
  set text = "gas chemistry mechanisms"
  echo "// " $text                                                  >> $Cfile
@@ -653,7 +689,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "Module ${ModAero};"                                         >> $Cfile
  echo                                                              >> $Cfile
 
- set text = "acm_ae6, acm_ae6_kmt, acm_ae7_kmt2, acm_ae6_mp, acm_ae7"
+ set text = "acm_ae6, acm_ae7_kmt2"
  echo "// options are" $text                                       >> $Cfile
  echo "Module ${ModCloud};"                                        >> $Cfile
  echo                                                              >> $Cfile
@@ -745,15 +781,23 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     set bld_flags = "${bld_flags} -isam_cctm"
  endif
 
- if ( $?build_twoway ) then
+ if ( $?build_wrf_cmaq ) then
    set bld_flags = "${bld_flags} -twoway"
+ endif
+
+ if ( $?build_mpas_cmaq ) then
+
+   #set bld_flags = "${bld_flags} -mpas"
+   set bld_flags = "${bld_flags} -mpascmaq"
  endif
 
 #> Run BLDMAKE with source code in build directory
  $Blder $bld_flags $Cfile   
 
 #> Rename Makefile to specify compiler option and link back to Makefile
- if ( ! $?build_twoway ) then
+ if ( $?build_mpas_cmaq ) then
+    ln -s Makefile.mpas_cmaq Makefile
+ else if ( ! $?build_wrf_cmaq ) then
     mv Makefile Makefile.$compilerString
     if ( -e Makefile.$compilerString && -e Makefile ) rm Makefile
     ln -s Makefile.$compilerString Makefile
@@ -773,18 +817,17 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  endif
  mv ${CFG}.bld $Bld/${CFG}
 
-#> If a CRACMM mechanism is used and the compiler is gcc, remove trailing
-#>   comments in species namelist files (or else model will not run)
- if ( ${Mechanism} =~ *cracmm* && ${compiler} == gcc ) then
-    echo "   >>> removing trailing comments from species namelists <<<"
-    sed -i 's/,\!.*/,/' $Bld/GC_${Mechanism}.nml
-    sed -i 's/,\!.*/,/' $Bld/AE_${Mechanism}.nml
-    sed -i 's/,\!.*/,/' $Bld/NR_${Mechanism}.nml
+#> gcc compiler chokes on trailing comments in namelists
+ if ( ${compiler} == gcc ) then
+    echo "   >>> removing trailing comments from namelists <<<"
+    foreach fnml ( $Bld/*.nml )
+      sed -i 's/,\!.*/,/' $fnml
+    end
  endif
 
 #> If Building WRF-CMAQ, download WRF, download auxillary files and build
 #> model
- if ( $?build_twoway ) then
+ if ( $?build_wrf_cmaq ) then
 
 #> Check if the user has git installed on their system
   git --version >& /dev/null
@@ -797,7 +840,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
 
     cd $CMAQ_HOME/CCTM/scripts
   
-    # Downlad WRF repository from GitHub and put CMAQv5.4 into it
+    # Downlad WRF repository from GitHub and put CMAQv5.5 into it
     set WRF_BLD = BLD_WRF${WRF_VRSN}_CCTM_${VRSN}_${compilerString}
     setenv wrf_path ${CMAQ_HOME}/CCTM/scripts/${WRF_BLD}
     setenv WRF_CMAQ 1
@@ -812,11 +855,6 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
         ${WRF_ARCH}
         1
 EOF
-
-    else
-      # Clean-up 
-      rm -r $Bld
-      cd $wrf_path
     endif
 
      # Compile WRF-CMAQ

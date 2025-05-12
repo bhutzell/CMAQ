@@ -81,11 +81,6 @@ C flag for diagnostic DEPV file
 
       INTEGER, SAVE :: NR_OFFSET            ! Offset to NR start in CGRID
 
-      INTEGER :: GXOFF, GYOFF              ! global origin offset from file
-C for INTERPX
-      INTEGER, SAVE :: STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2
-      INTEGER, SAVE :: STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3
-
       REAL,    ALLOCATABLE, SAVE :: UCROSS( :,:,:)
       REAL,    ALLOCATABLE, SAVE :: VCROSS( :,:,:)
       REAL,    ALLOCATABLE, SAVE :: DLUSE( :,: )
@@ -179,11 +174,6 @@ C set dry dep conversion factor (done here so that vdiff doesn`t need the includ
             S = S + 1
             DD_CONV( S ) = CNVTD * TR_MOLWT( TR_DEPV_MAP( V ) )
          END DO
-
-         CALL SUBHFILE ( MET_CRO_2D, GXOFF, GYOFF,
-     &                   STRTCOLMC2, ENDCOLMC2, STRTROWMC2, ENDROWMC2 )
-         CALL SUBHFILE ( MET_CRO_3D, GXOFF, GYOFF,
-     &                   STRTCOLMC3, ENDCOLMC3, STRTROWMC3, ENDROWMC3 )                       
 
          INIT_GAS_DV:
      &   IF ( N_GAS_DEPV .GT. 0 ) THEN
@@ -331,7 +321,17 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
          FINI = N_GC_DEPV
          DO V = STRT, FINI
             N = N + 1
-            NDX = GAS_DEPV_SUR( N )      
+            NDX = GAS_DEPV_SUR( N )
+            IF(Tile_Data%Vd_name( NDX ) .NE. 'Empty' .AND. 
+     &         Tile_Data%Vd_Fac ( NDX ) .NE. GC_DEPV_FAC( N ) ) THEN     
+               xmsg = 'The dry deposition factor for surrogate species ' // 
+     &                 trim(GC_DEPV( N )) // ' in the GC namelist does not ' // 
+     &                'match the factor for the deposition species. Edit ' //
+     &                'GC Namelist to correct the dry deposition factor, or ' //
+     &                'add this species as a uniquely deposited species in ' //
+     &                'the CMAQ_Control_STAGE namelist.' 
+               CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+            End If
             Tile_Data%Vd_Name ( NDX ) = GC_DEPV( N )
             Tile_Data%Vd_Fac  ( NDX ) = GC_DEPV_FAC( N )
             Tile_Data%dep2vdiff ( V ) = NDX 
@@ -343,6 +343,16 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
          DO V = STRT, FINI
             N = N + 1
             NDX = GAS_DEPV_SUR( N+N_GC_DEPV )
+            IF(Tile_Data%Vd_name( NDX ) .NE. 'Empty' .AND. 
+     &         Tile_Data%Vd_Fac ( NDX ) .NE. NR_DEPV_FAC( N ) ) THEN     
+               xmsg = 'The dry deposition factor for surrogate species ' // 
+     &                 trim(NR_DEPV( N )) // ' in the NR namelist does not ' // 
+     &                'match the factor for the deposition species. Edit ' //
+     &                'NR Namelist to correct the dry deposition factor, or ' //
+     &                'add this species as a uniquely deposited species in ' //
+     &                'the CMAQ_Control_STAGE namelist.' 
+               CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+            End If
             Tile_Data%Vd_Name ( NDX ) = NR_DEPV( N )
             Tile_Data%Vd_Fac  ( NDX ) = NR_DEPV_FAC( N )
             Tile_Data%dep2vdiff ( V ) = NDX 
@@ -354,6 +364,16 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
          DO V = STRT, FINI
             N = N + 1
             NDX = GAS_DEPV_SUR( N + N_GC_DEPV + N_NR_DEPV )
+            IF(Tile_Data%Vd_name( NDX ) .NE. 'Empty' .AND. 
+     &         Tile_Data%Vd_Fac ( NDX ) .NE. TR_DEPV_FAC( N ) ) THEN     
+               xmsg = 'The dry deposition factor for surrogate species ' // 
+     &                 trim(TR_DEPV( N )) // ' in the TR namelist does not ' // 
+     &                'match the factor for the deposition species. Edit ' //
+     &                'TR Namelist to correct the dry deposition factor, or ' //
+     &                'add this species as a uniquely deposited species in ' //
+     &                'the CMAQ_Control_STAGE namelist.' 
+               CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+            End If
             Tile_Data%Vd_Name ( NDX ) = TR_DEPV( N )
             Tile_Data%Vd_Fac  ( NDX ) = TR_DEPV_FAC( N )
             Tile_Data%dep2vdiff ( V ) = NDX 
@@ -366,6 +386,16 @@ C Identify and remove multiple occurrences of aerosol deposition velocities
             DO V = STRT, FINI
                N = N + 1
                NDX = N_GC_DEPV + N_NR_DEPV + N_TR_DEPV + N
+               IF(Tile_Data%Vd_name( NDX ) .NE. 'Empty' .AND. 
+     &            Tile_Data%Vd_Fac ( NDX ) .NE. AE_DEPV_FAC( N ) ) THEN     
+                  xmsg = 'The dry deposition factor for surrogate species ' // 
+     &                    trim(AE_DEPV( N )) // ' in the AE namelist does not ' // 
+     &                   'match the factor for the deposition species. Edit ' //
+     &                   'AE Namelist to correct the dry deposition factor, or ' //
+     &                   'add this species as a uniquely deposited species in ' //
+     &                   'the CMAQ_Control_STAGE namelist.' 
+                  CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+               End If
                Tile_Data%Vd_Name ( NDX ) = AE_DEPV( N )
                Tile_Data%Vd_Fac  ( NDX ) = AE_DEPV_FAC( N )
                Tile_Data%dep2vdiff ( V ) = NDX 

@@ -17,9 +17,6 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/yoj/arc/CCTM/src/depv/m3dry/DEPVVARS.F,v 1.7 2012/01/19 14:21:45 yoj Exp $
-
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       MODULE DEPVVARS
 
@@ -47,10 +44,11 @@ C           06 Aug 2018: M.Qin: added new lumped anthropogenic semivolatiles
 C           16 Aug 2018: G. Sarwar: added ClNO3 and FMBR, and updated INO3 and BRNO3 name changes
 C           21 Nov 2018: G. Sarwar: added several halogen species
 C           09 Jan 2021: G. Sarwar: removed CH3BR
+C           10 Mar 2025: G. SarwarL added CRACMM3M species
 C-----------------------------------------------------------------------
 
       INTEGER, PARAMETER :: LDDEP = 4
-      INTEGER, PARAMETER :: LTOTG = 265
+      INTEGER, PARAMETER :: LTOTG = 275
       INTEGER, PARAMETER :: LCMP  = 8
       CHARACTER( 16 )    :: DEPV_METHOD
 
@@ -350,6 +348,16 @@ C-------------------------------------------------------------------------------
          DEPSPC( 263) = 'IPX             '
          DEPSPC( 264) = 'INALD           '
          DEPSPC( 265) = 'HONIT           '
+         DEPSPC( 266) = 'HCOCL           '
+         DEPSPC( 267) = 'CH2BR2          '
+         DEPSPC( 268) = 'CHBR3           '
+         DEPSPC( 269) = 'HCOBR           '
+         DEPSPC( 270) = 'CH2I2           '
+         DEPSPC( 271) = 'CH2IBR          '
+         DEPSPC( 272) = 'CH2ICL          '	 
+         DEPSPC( 273) = 'CHBR2CL         '
+         DEPSPC( 274) = 'CHBRCL2         '
+         DEPSPC( 275) = 'CH2BRCL         '
 
          N_USE_DEPSPC = 0
          USE_DEPSPC = .FALSE.   ! array

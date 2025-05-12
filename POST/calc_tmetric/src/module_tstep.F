@@ -59,8 +59,8 @@ C..PARAMETERS: None
 C..SAVED LOCAL VARIABLES: None
 
 C..SCRATCH LOCAL VARIABLES:
-         CHARACTER*80  MSG         ! Log message
-         CHARACTER*16  PNAME       ! Program Name
+         CHARACTER(80)  MSG         ! Log message
+         CHARACTER(16)  PNAME       ! Program Name
 
          INTEGER D0, D1            ! Differences betwwen two times, seconds
          INTEGER INDX              ! Array location to insert new index

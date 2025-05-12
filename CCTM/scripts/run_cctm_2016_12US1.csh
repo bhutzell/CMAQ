@@ -33,9 +33,9 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v54              #> Code Version
+ set VRSN      = v55              #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cb6r5_ae7_aq      #> Mechanism ID
+ setenv MECH     cb6r5_ae7_aq      #> Mechanism ID
  set EMIS      = 2016fh            #> Emission Inventory Details
  set APPL      = 2016_CONUS        #> Application Name (e.g. Gridname)
 
@@ -151,7 +151,9 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
 setenv CTM_WB_DUST N         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
-setenv CTM_LTNG_NO Y         #> turn on lightning NOx [ default: N ]
+setenv CTM_LNO_ONLINE Y      #> turn on lightning NOx [ default: N ]
+                             #> alternatively LNOx emissions can also be read in as external emissions inputs,
+                             #> in this case, please setenv this variable to N to avoid double counting
 setenv KZMIN Y               #> use Min Kz option in edyintb [ default: Y ], 
                              #>    otherwise revert to Kz0UT
 setenv PX_VERSION Y          #> WRF PX LSM
@@ -184,14 +186,17 @@ setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affec
                              #>      model where optics determined by
                              #>      (4-Tabular Mie; 5-Mie Calculation; 6-Case Approx to Mie Theory)
 
-setenv IC_AERO_M2WET F       #> Specify whether or not initial condition aerosol size distribution 
-                             #>    is wet or dry [ default: F = dry ]
 setenv BC_AERO_M2WET F       #> Specify whether or not boundary condition aerosol size distribution 
-                             #>    is wet or dry [ default: F = dry ]
-setenv IC_AERO_M2USE F       #> Specify whether or not to use aerosol surface area from initial 
-                             #>    conditions [ default: T = use aerosol surface area  ]
+                             #>    is wet or dry [ default: F = dry ]. This option should be set
+                             #>    to True if boundary condition size distirbution parameters are
+                             #>    provided in terms of wet diameter (e.g. by an offline calculation,
+                             #>    or a different 3D chemical transport model system).
 setenv BC_AERO_M2USE F       #> Specify whether or not to use aerosol surface area from boundary 
                              #>    conditions [ default: T = use aerosol surface area  ]
+                             #>    This setting can be significant for PM when using small domains.
+                             #>    It is recommended to set this option to True if (1) using boundary
+                             #>    conditions provided by a CMAQ simulation on a parent domain, (2) M2 
+                             #>    is available, and (3) the domain is smaller than CONUS. 
                              
 #> Surface Tiled Aerosol and Gaseous Exchange Options
 #> Only active if DepMod=stage at compile time
@@ -313,7 +318,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #set JVALfile  = JTABLE_${YYYYJJJ}
 
   #> Ozone column data
-  set OMIfile   = OMI_1979_to_2019.dat
+  set OMIfile   = omi_cmaq_2005through2024_27x27.dat
 
   #> Optics file
   set OPTfile = PHOT_OPTICS.dat
@@ -329,31 +334,22 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv MET_BDY_3D  $METpath/METBDY3D_$YYMMDD.nc
   setenv LUFRAC_CRO  $METpath/LUFRAC_CRO_$YYMMDD.nc
 # setenv LUFRAC_CRO  $METpath/LUFRAC_CRO.$GRID_NAME.${NZ}L.$YYMMDD
-
+  
   #> Control Files
   #>
-  #> IMPORTANT NOTE
-  #>
-  #> The DESID control files defined below are an integral part of controlling the behavior of the model simulation.
-  #> Among other things, they control the mapping of species in the emission files to chemical species in the model and
-  #> several aspects related to the simulation of organic aerosols.
-  #> Please carefully review the DESID control files to ensure that they are configured to be consistent with the assumptions
-  #> made when creating the emission files defined below and the desired representation of organic aerosols.
+  #> The CMAQ control files defined below are an integral part of controlling the behavior of the model simulation.
+  #> Among other things, they control the variables output to ELMO files, the mapping of species in the emission 
+  #> files to chemical species in the model, and other parameters configuring model input and output.
+  #> Please carefully review the CMAQ chemical control file to ensure it is configured to be consistent with the 
+  #> assumptions made when creating the emission files defined below and the desired chemical mechanism.
   #> For further information, please see:
-  #> + AERO7 Release Notes section on 'Required emission updates':
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Release_Notes/aero7_overview.md
-  #> + CMAQ User's Guide section 6.9.3 on 'Emission Compatability':
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/CMAQ_UG_ch06_model_configuration_options.md#6.9.3_Emission_Compatability
-  #> + Emission Control (DESID) Documentation in the CMAQ User's Guide:
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
-  #>
-  setenv DESID_CTRL_NML ${BLD}/CMAQ_Control_DESID.nml
-  setenv DESID_CHEM_CTRL_NML ${BLD}/CMAQ_Control_DESID_${MECH}.nml
-
-  #> The following namelist configures aggregated output (via the Explicit and Lumped
-  #> Air Quality Model Output (ELMO) Module), domain-wide budget output, and chemical
-  #> family output.
-  setenv MISC_CTRL_NML ${BLD}/CMAQ_Control_Misc.nml
+  #> + CMAQ User's Guide Appendix F on 'ELMOv2':
+  #>   https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixF_elmo_output.md
+  #> + CMAQ User's Guide Appendix B on Emission Control using DESID:
+  #>   https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
+  #> 
+  setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
+  setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}.nml
 
   #> The following namelist controls the mapping of meteorological land use types and the NH3 and Hg emission
   #> potentials
@@ -436,16 +432,20 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv STK_EM_SYM_DATE_008 T
   setenv STK_EM_SYM_DATE_009 T
 
-  #> Lightning NOx configuration
-  if ( $CTM_LTNG_NO == 'Y' ) then
-     setenv LTNGNO "InLine"    #> set LTNGNO to "Inline" to activate in-line calculation
-
+  #> Inline lightning NOx configuration
+  if ( $CTM_LNO_ONLINE == 'Y' ) then
   #> In-line lightning NOx options
-     setenv USE_NLDN  Y        #> use hourly NLDN strike file [ default: Y ]
-     if ( $USE_NLDN == Y ) then
-        setenv NLDN_STRIKES ${IN_LTpath}/NLDN.12US1.${YYYYMMDD}.ioapi
+     setenv USE_LTNG_DATA  Y        #> use hourly lightning data input file [ default: Y ]
+     if ( $USE_LTNG_DATA == Y ) then
+        setenv LTNG_DATA ${IN_LTpath}/NLDN.12US1.${YYYYMMDD}.ioapi
+	setenv LNO_OPTION 1 # default, use lightning strikes such as NLDN, WWLLNs
+        # LNO_OPTION 2:  use GLM flashes
+        # LNO_OPTION 3:  use GLM Energy
+        # LNO_OPTION 4:  use synergized GLM/WWLLN Energy
+	# LNO_OPTION 5:  use synergized GLM/WWLLNs Energy with ICCG adjustment to set upper bound
+
      endif
-     setenv LTNGPARMS_FILE ${IN_LTpath}/LTNG_AllParms_12US1.ncf #> lightning parameter file; ignore if LTNGPARAM = N
+     setenv LTNGPARMS_FILE ${IN_LTpath}/LTNG_AllParms_12US1.ncf #> lightning parameter file
   endif
 
 
@@ -616,8 +616,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_DEPV_MOS    "$OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc -v"    #> Dry Dep Velocity
   setenv CTM_VDIFF_DIAG  "$OUTDIR/CCTM_VDIFF_DIAG_${CTM_APPL}.nc -v" #> Vertical Dispersion Diagnostic
   setenv CTM_VSED_DIAG   "$OUTDIR/CCTM_VSED_DIAG_${CTM_APPL}.nc -v"  #> Particle Grav. Settling Velocity
-  setenv CTM_LTNGDIAG_1  "$OUTDIR/CCTM_LTNGHRLY_${CTM_APPL}.nc -v"   #> Hourly Avg Lightning NO
-  setenv CTM_LTNGDIAG_2  "$OUTDIR/CCTM_LTNGCOL_${CTM_APPL}.nc -v"    #> Column Total Lightning NO
+  setenv CTM_LTNGDIAG_1  "$OUTDIR/CCTM_LNO3D_${CTM_APPL}.nc -v"      #> Hourly Avg Lightning NO
+  setenv CTM_LTNGDIAG_2  "$OUTDIR/CCTM_LNO2DCOL_${CTM_APPL}.nc -v"   #> Column Total Lightning NO
   setenv CTM_VEXT_1      "$OUTDIR/CCTM_VEXT_${CTM_APPL}.nc -v"       #> On-Hour 3D Concs at select sites
 
   #> set floor file (neg concs)

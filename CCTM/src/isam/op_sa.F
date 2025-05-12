@@ -20,7 +20,6 @@
       SUBROUTINE OP_SA ( JDATE, JTIME, TSTEP, NSTEPS, FILE_NAME )
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c20140428  Opens ISAM's SA_CONC_1 file
 c       op_sa.F called by initscen.F
 c
 C     01 Nov 2018: S.Napelenok Updates for cmaq5.3 release 
@@ -35,7 +34,6 @@ c     USE SA_LAYERS
       USE SA_DEFN               ! Mc06
       USE UTILIO_DEFN           ! replaces ioparms, iofdesc, iodecl
 c     USE SUBST_MODULES         ! stenex
-      USE RXNS_DATA, ONLY : MECHNAME !Get Chemical Mechanism Name
       USE RUNTIME_VARS
       USE MIO_ASCII
 

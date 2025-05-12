@@ -37,6 +37,9 @@ NOTE2: For better understanding of how this file is read, or to modify/add featu
 
 After the final sensitivity definition block, the keyword 'END' is required.
 
+*** WARNING: Only the first 1024 characters of the EMIS streams, SPECIES, and REGION lists are read by the input file parsers; edit sinput.F if this is insufficient.
+
+
 
 Examples:
 

@@ -77,6 +77,7 @@ C-------------------------------------------------------------------------------
       Use LSM_MOD             ! Land surface data
       use centralized_io_module
       USE CONST
+      Use WVEL_DEFN
 
       Implicit None
 
@@ -125,6 +126,7 @@ C-------------------------------------------------------------------------------
          Real,    Allocatable :: UWIND    ( :,:,: )  ! [m/s]
          Real,    Allocatable :: VWIND    ( :,:,: )  ! [m/s]                    
 !> 3-D meteorological fields:
+         Real,    Allocatable :: KZ       ( :,:,: )  ! Kz [m**2/s]
          Real,    Allocatable :: KZMIN    ( :,:,: )  ! minimum Kz [m**2/s]
          Real,    Allocatable :: PRES     ( :,:,: )  ! pressure [Pa]
          Real,    Allocatable :: QV       ( :,:,: )  ! water vapor mixing ratio
@@ -139,6 +141,7 @@ C-------------------------------------------------------------------------------
          Real,    Allocatable :: RJACM    ( :,:,: )  ! reciprocal mid-layer Jacobian
          Real,    Allocatable :: RJACF    ( :,:,: )  ! reciprocal full-layer Jacobian
          Real,    Allocatable :: RRHOJ    ( :,:,: )  ! reciprocal density X Jacobian
+         Real,    Allocatable :: WVEL     ( :,:,: )  ! vertical velocity
       End Type MET_Type
       
       Type :: GRID_Type
@@ -331,6 +334,7 @@ C-----------------------------------------------------------------------
      &             Met_Data%CFRAC    ( NCOLS,NROWS ),
      &             Met_Data%UWIND    ( NCOLS+1,NROWS+1,NLAYS ),
      &             Met_Data%VWIND    ( NCOLS+1,NROWS+1,NLAYS ),
+     &             Met_Data%KZ       ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%KZMIN    ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%PRES     ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%QV       ( NCOLS,NROWS,NLAYS ),
@@ -345,12 +349,14 @@ C-----------------------------------------------------------------------
      &             Met_Data%RJACM    ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%RJACF    ( NCOLS,NROWS,NLAYS ),
      &             Met_Data%RRHOJ    ( NCOLS,NROWS,NLAYS ),
+     &             Met_Data%WVEL     ( NCOLS,NROWS,NLAYS ),
      &             STAT = ALLOCSTAT )
          If ( ALLOCSTAT .Ne. 0 ) Then
             XMSG = 'Failure allocating met vars'
             Call M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          End If
 
+         Met_Data%KZ = 0.0
 
          ALLOCATE( Grid_Data%DX3F      ( NLAYS ),
      &             Grid_Data%RDX3F     ( NLAYS ),
@@ -589,8 +595,6 @@ C Arguments:
 
 C Parameters:
          Real, Parameter :: cond_min = 1.0 / resist_max ! minimum conductance [m/s]
-         Real, Parameter :: KZMAXL = 500.0    ! upper limit for min Kz [m]
-         Real, Parameter :: KZ0UT  = 1.0      ! minimum eddy diffusivity [m**2/sec] KZ0
          Real, Parameter :: KZL    = 0.01     ! lowest KZ
          Real, Parameter :: KZU    = 1.0      ! 2.0  ! highest KZ
          Real, Parameter :: EPS    = 1.0E-08  ! small number for temperature difference
@@ -639,11 +643,35 @@ C-------------------------------- MET_CRO_3D --------------------------------
 
          call interpolate_var ('JACOBM', jdate, jtime, Met_Data%RJACM)
      
-         Met_Data%RJACM = 1.0 / Met_Data%RJACM
-
          call interpolate_var ('JACOBF', jdate, jtime, Met_Data%RJACF)
 
-         Met_Data%RJACF = 1.0 / Met_Data%RJACF
+         ! Calculate Vertical Velocity
+         ! RJACM and RJACF are not yet reciprocals. They are the actual
+         ! Jacobians.
+         IF ( W_VEL ) THEN
+            DO L = 1,NLAYS
+               IF ( JACOBF_AVAIL ) THEN
+                  Met_Data%WVEL( :,:,L ) = MSFX2( :,: ) * WY( L,:,: ) * Met_Data%RJACF( :,:,L )
+               ELSE
+                  If ( L .LT. NLAYS ) THEN
+                     Met_Data%WVEL( :,:,L ) = MSFX2( :,: ) * WY( L,:,: ) * 0.5 *
+     &                                         ( Met_Data%RJACM(:,:,L) +
+     &                                           Met_Data%RJACM(:,:,L+1) )
+                  ELSE
+                     Met_Data%WVEL( :,:,L ) = MSFX2( :,: ) * WY( L,:,: ) * 0.4 *
+     &                                         ( Met_Data%RJACF(:,:,L-1)+
+     &                                           Met_Data%RJACM(:,:,L)   )
+                  END IF
+               END IF
+            END DO
+         ELSE
+            Met_Data%WVEL = 0.0
+         END IF
+         
+         ! Now convert RJACM and RJACF to reciprocals 
+         Met_Data%RJACM = 1.0 / Met_Data%RJACM
+         Met_Data%RJACF = 1.0 / Met_Data%RJACF 
+
 
          call interpolate_var ('DENSA_J', jdate, jtime, Met_Data%RRHOJ)
 
@@ -795,7 +823,6 @@ C Met_cro_2D variables that have recently changed due to MCIP or WRF/CMAQ
          MET_DATA%RH = MIN( 0.9999, MAX( 0.001, MET_DATA%RH ) )
  
 
-
 C-------------------------------- MET_DOT_3D --------------------------------
          call interpolate_var (vname_uc, jdate, jtime, Met_Data%UWIND)
 
@@ -813,12 +840,12 @@ C-------------------------------- Calculated Variables -------------------------
          IF ( MINKZ ) THEN
             Met_Data%KZMIN = KZL
             DO L = 1, NLAYS
-               Where( Met_Data%ZF( :,:,L ) .LE. KZMAXL )
+               Where( Met_Data%ZF( :,:,L ) .LE. Met_Data%PBL )
                   Met_Data%KZMIN( :,:,L ) = KZL + ( KZU - KZL ) * 0.01 * Grid_data%PURB
                End Where
             End Do
          ELSE
-            Met_Data%KZMIN = KZ0UT
+            Met_Data%KZMIN = KZL
          END IF
 
          BUFF3D = Met_Data%TA * ( 1.0 + 0.608 * Met_Data%QV )

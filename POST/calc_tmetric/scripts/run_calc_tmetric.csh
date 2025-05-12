@@ -1,7 +1,7 @@
 #! /bin/csh -f
 
-# ===================== CALC_TMETRIC_v5.4.X Run Script =============
-# Usage: run.calc_tmetric.csh >&! calc_tmetric.log &
+# ===================== CALC_TMETRIC_v5.5.X Run Script =============
+# Usage: run_calc_tmetric.csh >&! calc_tmetric.log &
 #
 # To report problems or request help with this script/program:
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -20,9 +20,9 @@
  source ./config_cmaq.csh
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v54               #> Code Version
+ set VRSN      = v55               #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cb6r3_ae7_aq      #> Mechanism ID
+ set MECH      = cb6r5_ae7_aq      #> Mechanism ID
  set APPL      = Bench_2016_12SE1        #> Application Name (e.g. Gridname)
                                                       
 #> Define RUNID as any combination of parameters above or others. By default,
@@ -52,16 +52,22 @@
 #> CALC_TMETRIC Configuration Options
 # =====================================================================
 
-#> operation to perform - SUM (default) or AVG
+#> operation to perform - SUM (default), AVG, MAX, MIN, or RNG (range)
  setenv OPERATION AVG
 # setenv OPERATION SUM
+# setenv OPERATION MAX
+# setenv OPERATION MIN
+# setenv OPERATION RNG
+
+#>Number of timesteps used in operation performed 
+#>set to zero or negative value for process all timesteps
+setenv SAMPLE_PERIOD 4
+
 
 #> list of species to output - set to "ALL" to process all species from INFILE, or list species to process
 #> the output variable names will have the ${OPERATION} value (SUM or AVG) appended to the input variable names
-# setenv SPECIES_1 ALL
- setenv SPECIES_1 O3
- setenv SPECIES_2 CO
- setenv SPECIES_3 PM25_TOT
+ setenv SPECIES "ALL"
+#setenv SPECIES "O3 CO PM25_TOT"
 
 #############################################################
 #  Input files

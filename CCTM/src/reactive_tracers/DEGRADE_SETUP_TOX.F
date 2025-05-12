@@ -304,7 +304,7 @@ C..Set up indices that point to concentrations in CGRID.
                         N = INDEX1( WNAME, N_NR_SPC, NR_SPC )
                         MARKER = NR_STRT
                         IF ( N == 0 ) THEN
-#ifdef verbose_gas
+#ifdef verbose_deg
                            WRITE( LOGDEV,'(a)' ) TRIM( WNAME ), ' is not '
      &                          // 'in gas or nonreactive species table.'
      &                          // 'its loss processes not calculated '
@@ -361,7 +361,7 @@ C..check UNIMOLECULAR decay rates
 
                WRITE( LOGDEV,1100 ) VNAME( 1 ), RXTANT_MAP( I ),
      &              ' Unimolecular ',
-     &              UNIRATE( J, I ) * TEMP_298K**UNI_TEXP( J, I )
+     &              UNIRATE( J, I ) * (TEMP_298K*INV_T298K)**UNI_TEXP( J, I )
      &              * EXP( -UNI_ACT( J, I ) * INV_T298K ),
      &              VNAME( J+1 ), PROD_MAP( J, I )
 
@@ -431,13 +431,13 @@ C..checking degradation rates
                IF ( RAD_MAP( J, I ) > 0 ) THEN
                   WRITE( LOGDEV,1200 ) VNAME( 1 ), RXTANT_MAP( I ),
      &                 ' Bimolecular ', WNAME, RAD_MAP( J, I ),
-     &                 BIRATE( J, I ) * TEMP_298K**BI_TEXP( J, I )
+     &                 BIRATE( J, I ) * (TEMP_298K*INV_T298K)**BI_TEXP( J, I )
      &                 * EXP( -BI_ACT( J, I ) * INV_T298K ),
      &                 VNAME( J+K+1 ), PROD_MAP( J+K, I )
                ELSE
                    WRITE( LOGDEV,1200 ) VNAME( 1 ), RXTANT_MAP( I ),
      &                 'NOT INCLUDED', WNAME, RAD_MAP( J, I ),
-     &                  BIRATE( J,I ) * TEMP_298K**BI_TEXP( J, I )
+     &                  BIRATE( J,I ) * (TEMP_298K*INV_T298K)**BI_TEXP( J, I )
      &                  * EXP( -BI_ACT( J, I ) * INV_T298K ),
      &                  VNAME( J+K+1 ), PROD_MAP( J+K, I )
                END IF
@@ -515,14 +515,14 @@ C..checking degradation rates
                   WRITE( LOGDEV,1300 ) VNAME( 1 ), RXTANT_MAP( I ),
      &                 ' Trimolecular ', TRICAUSE( 1, J, I ), RAD2_MAP( 1, J, I ),
      &                 TRICAUSE( 2, J, I ), RAD2_MAP( 2, J, I ),
-     &                 TRIRATE( J, I ) * TEMP_298K**TRI_TEXP( J, I )
+     &                 TRIRATE( J, I ) * (TEMP_298K*INV_T298K)**TRI_TEXP( J, I )
      &                 * EXP( -TRI_ACT( J, I ) * INV_T298K ),
      &                 VNAME( J+K+1 ), PROD_MAP( J+K, I )
                ELSE IF ( ICOUNT .GT. 0 ) THEN
                   WRITE( LOGDEV,1300 ) VNAME( 1 ), RXTANT_MAP( I ),
      &                 ' NOT INCLUDED ', TRICAUSE( 1, J, I ), RAD2_MAP( 1, J, I ),
      &                 TRICAUSE( 2, J, I ), RAD2_MAP( 2, J, I ),
-     &                 TRIRATE( J, I ) * TEMP_298K**TRI_TEXP( J, I )
+     &                 TRIRATE( J, I ) * (TEMP_298K*INV_T298K)**TRI_TEXP( J, I )
      &                 * EXP( -TRI_ACT( J, I ) * INV_T298K ),
      &                 VNAME( J+K+1 ), PROD_MAP( J+K, I )
                ENDIF
@@ -544,18 +544,19 @@ C..checking degradation rates
                IF ( LEN_TRIM( WNAME ) < 2 ) CYCLE
 
                IF ( N < 1 ) THEN
-                  WRITE( LOGDEV,* ) 'Photolysis rate, ', WNAME, ' for ',
-     &                 REACT( I )( 1:LEN_NAME ),
-     &                 'is not JTABLE and is not included. '
+                  WRITE( LOGDEV,1350 ) 'Photolysis rate, ', TRIM( WNAME ), ' for ',
+     &            TRIM( REACT( I ) ), ' is not JTABLE and is not included. '
                   CYCLE
                ENDIF
 
                PHOTO_MAP( J, I ) = N
 
                WRITE( LOGDEV,1400 ) VNAME( 1 ), RXTANT_MAP( I ),
-     &              ' Photolysis ', PHOTAB( N ), ' ', 'times', ' ',
+     &              ' Photolysis ', PHOTAB( N ), PHOTO_MAP( J, I ), 'times', ' ',
      &              A_PHOTO( J, I ),
      &              VNAME( J+K+1 ), PROD_MAP( J+K, I )
+!  adjust A_PHOT to account for units of calculated photolysis frequencies (min-1)
+                    A_PHOTO( J, I ) = A_PHOTO( J, I )/60.0D0
 
 70          CONTINUE
 
@@ -652,7 +653,8 @@ C..checking degradation rates
 1100     FORMAT(A20,1X,I5,1X,A20,1X,2(21X,6X),ES12.4,1X,A20,1X,I5)
 1200     FORMAT(A20,1X,I5,1X,A20,1X,A20,1X,I5,1X,21X,6X,ES12.4,1X,A20,1X,I5)
 1300     FORMAT(A20,1X,I5,1X,A20,1X,2(A20,1X,I5,1X),ES12.4,1X,A20,1X,I5)
-1400     FORMAT(A20,1X,I5,1X,A20,1X,2(A20,1X,A5,1X),ES12.4,1X,A20,1X,I5)
+1350     FORMAT(A,A,A,A16,A)
+1400     FORMAT(A20,1X,I5,1X,A20,1X,(A20,1X,I5,1X),(A20,1X,A5,1X),ES12.4,1X,A20,1X,I5)
 1600     FORMAT('       DEGRADED      ',' Index',
      &              '       Process      ','        Cause A      ',
      &              ' Index', '       Cause B      ',' Index',

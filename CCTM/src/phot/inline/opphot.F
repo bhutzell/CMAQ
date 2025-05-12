@@ -18,12 +18,6 @@
 !------------------------------------------------------------------------!
 
 
-C RCS file, release, date & time of last delta, author, state, [and locker]
-C $Header: /project/work/rep/arc/CCTM/src/phot/phot_inline/opphot.F,v 1.3 2011/10/21 16:11:28 yoj Exp $
-
-C what(1) key, module and SID; SCCS file; date and time of last delta:
-C %W% %P% %G% %U%
-
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       SUBROUTINE OPPHOT ( JDATE, JTIME, TSTEP )
 
@@ -502,7 +496,7 @@ C...  the photolysis diagnostic file
             VGLVS3D( L ) = VGLVS_GD( L )
          END DO
 
-         FDESC3D( 1 ) = 'Three dimensionals values of Optical Inputs and Radiative'
+         FDESC3D( 1 ) = 'Three dimensional values of Optical Inputs and Radiative'
          FDESC3D( 2 ) = 'Results from the In-line photolysis calculation using the'
          FDESC3D( 3 ) =  TRIM( MECHNAME ) // ' photochemical mechanism.'
 
@@ -514,7 +508,7 @@ C...  the photolysis diagnostic file
          
          DO L = 1, N_DIAG_WVL
 
-C...assumes that lamba in nanometers is on order of 100 or less
+C...assumes that lambda in nanometers is on order of 100 or less
 
             JWL = DIAG_WVL( L )
             
@@ -535,9 +529,9 @@ C...assumes that lamba in nanometers is on order of 100 or less
             VTYPE3D( N ) = M3REAL
 
             N = N + 1
-            VNAME3D( N ) = 'EXT_W' // TRIM( LAMBDA )
+            VNAME3D( N ) = 'CLD_EXT_W' // TRIM( LAMBDA )
             UNITS3D( N ) = 'Km-1'
-            VDESC3D( N ) = 'Total Extinction of layer for '
+            VDESC3D( N ) = 'Cloud Extinction of layer for '
      &                   // TRIM( LAMBDA ) // ' nm'
             VTYPE3D( N ) = M3REAL
 
@@ -549,7 +543,7 @@ C...assumes that lamba in nanometers is on order of 100 or less
             VTYPE3D( N ) = M3REAL
  
             N = N + 1
-            VNAME3D( N ) = 'EXT_AERO_W' // TRIM( LAMBDA )
+            VNAME3D( N ) = 'AERO_EXT_W' // TRIM( LAMBDA )
             UNITS3D( N ) = 'Km-1'
             VDESC3D( N ) = 'Aerosol Extinction in layer for '
      &                   // TRIM( LAMBDA ) // ' nm'
@@ -571,7 +565,7 @@ C...assumes that lamba in nanometers is on order of 100 or less
          VTYPE3D( N ) = M3REAL
 
          N = N + 1
-         VNAME3D( N ) = 'EXT_AERO_W550'
+         VNAME3D( N ) = 'AERO_EXT_W550'
          UNITS3D( N ) = 'Km-1'
          VDESC3D( N ) = ' Aerosol Extinction of layer for '
      &                // '550 nm based on an Angstrom Interpolation'

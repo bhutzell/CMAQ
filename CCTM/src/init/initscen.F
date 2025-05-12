@@ -73,7 +73,7 @@ C-----------------------------------------------------------------------
       USE CGRID_SPCS            ! CGRID mechanism species
       USE UTILIO_DEFN
       USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP 
-      USE ELMO_PROC, ONLY : OPEN_ELMO
+      USE ELMO_INIT_DEFN, ONLY : OPEN_ELMO
 #ifndef mpas
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
@@ -228,13 +228,13 @@ C Get tracer IC's
       END IF  ! N_TR_SPC > 0
 
 C Test opening existing conc file for update
-      CALL LOG_HEADING( LOGDEV, "Open or Create Concentration File" )
+      CALL LOG_HEADING( LOGDEV, "Open/Create Concentration File" )
 
 C *** Open the aerosol parameters file (diameters and standard deviations).
-      IF ( L_ELMO .AND. IO_PE_INCLUSIVE ) THEN
-           CALL OPEN_ELMO ( STDATE, STTIME, TSTEP( 1 ) )
-           ELMO_NSTEP = 0.0
-      END IF
+      !IF ( L_ELMO .AND. IO_PE_INCLUSIVE ) THEN
+      !     CALL OPEN_ELMO ( STDATE, STTIME, TSTEP( 1 ) )
+      !     ELMO_NSTEP = 0.0
+      !END IF
 
 #ifndef mpas
       IF ( .NOT. OPEN3( CTM_CONC_1, FSRDWR3, PNAME ) ) THEN
@@ -255,10 +255,10 @@ C *** Open the aerosol parameters file (diameters and standard deviations).
 
       CALL WR_INIT ( CGRID, STDATE, STTIME, TSTEP( 1 ) )
       
-      CALL LOG_HEADING( LOGDEV, "Open or Create Average Concentration File" )
+      CALL LOG_HEADING( LOGDEV, "Open/Create Average Concentration File" )
       CALL OPACONC ( STDATE, STTIME, TSTEP( 1 ) )
       
-      CALL LOG_HEADING( LOGDEV, "Open or Create Wet Deposition File" )
+      CALL LOG_HEADING( LOGDEV, "Open/Create Wet Deposition File" )
       CALL OPWDEP  ( STDATE, STTIME, TSTEP( 1 ) )
 
 #ifdef sens
@@ -334,7 +334,6 @@ C Open SA_CONC_1 and SA_CGRID_1
 
       CALL SUBST_BARRIER
 
-      CALL LOG_HEADING( LOGDEV, "Check Initial Concentrations" )
 #endif
 
       RETURN

@@ -17,20 +17,21 @@ In this section, details on the routine CCTM output files are provided. All CMAQ
 
 |**File Name<sup>1</sup>**|**File Type**|**Time-Dependence<sup>2</sup>**|**Spatial Dimensions<sup>3</sup>** |
 |----------------------------|------|----|-----------------------------------|
-|**Standard**| | | |
+|**Flexible Standard<sup>4</sup>**| | | |
+|[CCTM_ELMO1_[fname1]](#ELMO)<a id=ELMO_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
+|[CCTM_ELMO2_[fname2]](#ELMO) <a id=ELMO_t></a>|GRDDED3|Hourly Averaged and Cumulative|XYZ'
+|**Fixed Standard**| | | |
 |[Output Log](#cmaq_output_log) <a id=cmaq_output_log_t></a>|ASCII|n/a|n/a
 |[CCTM_CONC](#conc)<a id=conc_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
 |[CCTM_ACONC](#aconc) <a id=aconc_t></a>|GRDDED3|Hourly Averaged|XYZ'
-|[CCTM_ELMO](#ELMO) <a id=ELMO_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
-|[CCTM_AELMO](#aELMO) <a id=aELMO_t></a>|GRDDED3|Hourly Averaged|XYZ'
 |[CCTM_DRYDEP](#drydep) <a id=drydep_t></a>|GRDDED3|Hourly Cumulative|XY
 |[CCTM_WETDEP1](#wetdep) <a id=wetdep_t></a>|GRDDED3|Hourly Cumulative|XY
 |**Restart**| | | |
 |[CCTM_CGRID](#cgrid) <a id=cgrid_t></a>|GRDDED3|Hourly Instantaneous|XYZ
-|[CCTM_MEDIA](#media)<a id=media_t></a>|GRDDED3|Hourly Instantaneous|XY
+|[CCTM_MEDIA_CONC](#media)<a id=media_conc_t></a>|GRDDED3|Hourly Instantaneous|XY
 |[CCTM_BSOILOUT](#soilout) <a id=soilout_t></a>|GRDDED3|n/a (see detailed file description below)|XY
 |[CCTM_MSOILOUT](#soilout) <a id=soilout_t></a>|GRDDED3|n/a (see detailed file description below)|XY
-|[CCTM_BDSNPOUT](#bdsnpout) <a id=soilout_t></a>|GRDDED3|n/a (see detailed file description below)|XY
+|[CCTM_BDSNPOUT](#bdsnpout) <a id=bdsnpout_t></a>|GRDDED3|n/a (see detailed file description below)|XY
 |**Diagnostic and Advanced**| | | |
 |[CCTM_B3GTS_S](#b3gts) <a id=b3gts_t></a>|GRDDED3|Hourly Instantaneous| XY
 |[CCTM_BUDGET](#budget) <a id=budget_t></a>|ASCII|Hourly Instantaneous| Domain-Wide
@@ -38,26 +39,49 @@ In this section, details on the routine CCTM output files are provided. All CMAQ
 |[CCTM_DUSTEMIS](#dust) <a id=dust_t></a>|GRDDED3|Hourly Instantaneous|XY
 |[CCTM_DESIDX](#desid) <a id=desid_t></a>|GRDDED3|Hourly Instantaneous|XYZ
 |[CCTM_DEPVMOS](#depv_mos) <a id=depv_mos_t></a>|GRDDED3|Hourly Instantaneous|XYW
-|[CCTM_DEPVFST](#depv_fst) <a id=depv_fst_t></a>|GRDDED3|Hourly Instantaneous|XYW
 |[CCTM_DDEP_MOS](#dry_dep_mos) <a id=dry_dep_mos_t></a>|GRDDED3|Hourly Cumulative|XYW
-|[CCTM_DDEP_FST](#dry_dep_fst) <a id=dry_dep_fst_t></a>|GRDDED3|Hourly Cumulative|XYW
 |[CCTM_LTNGHRLY](#ltngdiag1) <a id=ltngdiag1_t></a>|GRDDED3|Hourly Instantaneous|XYZ
 |[CCTM_LTNGCOL](#ltngdiag2) <a id=ltngdiag2_t></a>|GRDDED3|Hourly Instantaneous|XY
-|[CCTM_PHOTDIAG1](#ctm_rj_1) <a id=ctm_rj1_t></a>|GRDDED3|Hourly Instantaneous|XY
-|[CCTM_PHOTDIAG2](#ctm_rj_2) <a id=ctm_rj2_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
-|[CCTM_PHOTDIAG3](#ctm_rj_3) <a id=ctm_rj3_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
+|[CCTM_PHOTDIAG1](#ctm_rj1) <a id=ctm_rj1_t></a>|GRDDED3|Hourly Instantaneous|XY
+|[CCTM_PHOTDIAG2](#ctm_rj2) <a id=ctm_rj2_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
+|[CCTM_PHOTDIAG3](#ctm_rj3) <a id=ctm_rj3_t></a>|GRDDED3|Hourly Instantaneous|XYZ'
 |[CCTM_SSEMIS](#ssemis) <a id=ssemis_t></a>|GRDDED3|Hourly Instantaneous|XY
 |[CCTM_WETDEP2](#wetdep2) <a id=wetdep2_t></a>|GRDDED3|Hourly Cumulative|XY
 |[CCTM_VEXT](#vext) <a id=vext_t></a>|GRDDED3|Hourly Instantaneous|WZ
 
-<sup>1</sup>By default, output files are named CCTM_XXX_${CTM_APPL}.nc where XXX is the file identifier and ${CTM_APPL} is a user defined string that identifies the model run.   
-<sup>2</sup>While "Hourly" is indicated, users may define a different time step (e.g., 30 minutes) for model output by changing the TSTEP variable in the runscript. Hourly Instantaneous represents the model value at the exact model output time step.  Hourly Averaged values represent the average model values for the 60 minutes beginning with the model output time step.  Hourly Cumulative represent the cumulative (summed) model values for the 60 minutes ending at the model output time step.  
-<sup>3</sup>X is the dimension along the x-axis, Y is the dimension along the y-axis, Z is the vertical dimension, Z' is the user pre-defined size of the vertical dimension controlled by the environment variables CONC_BLEV_ELEV, ACONC_BLEV_ELEV, AELMO_BLEV_ELEV, and NLAYS_PHOTDIAG (range from 1 to all layers) and W is a non-layer dimension, e.g. number of LU fractions, number of sites for vertical extraction.    
-<sup>4</sup>A special ASCII output file, FLOOR_xxx with xxx being the processor number, contains information when a simulation results in negative concentrations. 
+<sup>**1**</sup>By default, output files are named CCTM_XXX_${CTM_APPL}.nc where XXX is the file identifier and ${CTM_APPL} is a user defined string that identifies the model run.   
+<sup>**2**</sup>While "Hourly" is indicated, users may define a different time step (e.g., 30 minutes) for model output by changing the TSTEP variable in the runscript. Hourly Instantaneous represents the model value at the exact model output time step.  Hourly Averaged values represent the average model values for the 60 minutes beginning with the model output time step.  Hourly Cumulative represents the cumulative (summed) model values time-stamped to the previous output time step.  
+<sup>**3**</sup>X is the dimension along the x-axis, Y is the dimension along the y-axis, Z is the vertical dimension, Z' is the user pre-defined size of the vertical dimension controlled by the environment variables CONC_BLEV_ELEV, ACONC_BLEV_ELEV, AELMO_BLEV_ELEV, and NLAYS_PHOTDIAG (range from 1 to all layers) and W is a non-layer dimension, e.g. number of LU fractions, number of sites for vertical extraction.    
+<sup>**4**</sup>The number and qualities of ELMO output files are entirely customizable by the user. Two examples are provided here to demonstrate that ELMO files currently must be either fully instantaneous or fully aggregated (i.e. average concentrations and cumulative deposition). The variable fname is user-specified for each file.  
+<sup>**5**</sup>A special ASCII output file, FLOOR_xxx with xxx being the processor number, contains information when a simulation results in negative concentrations. 
 
 ## 7.2 CCTM Output Files
+  
+<a id=ELMO></a>
 
-Some output files created by the CCTM are considered standard output as these contain hourly concentration and deposition values and information to document the run. Options for these files are controlled by their corresponding environment variable in the CCTM RunScript (e.g. run_cctm.csh).
+**CCTM_ELMO: hourly ELMO output files**
+<!-- BEGIN COMMENT -->
+[Return to Table 7-1](#ELMO_t)
+<!-- END COMMENT -->
+
+These optional 2-D or 3-D CCTM output files contains instantaneous or aggregated data for user-specified variables including 
+concentrations that would appear on CONC and ACONC files, deposition fluxes that would appear on WETDEP or DRYDEP, and aggregated 
+variables like total particulate mass (PM<sub>2.5</sub> and PM<sub>10</sub>). 
+Diagnostic parameters that were found on the PMDIAG file in previous CMAQ versions are also available for output on ELMO files. 
+Thease include particle geometric mean diameters, geometric standard deviations, bulk densities, 2nd moments and 3rd moments for 
+the lognormal modes. 
+One can also output the fraction of each mode that contributes to PM<sub>1</sub>, PM<sub>2.5</sub>, and PM<sub>10</sub> or the 
+AMS (aerosol mass spectrometer) transmission factor for each mode. 
+Many diagnostics relating to meteorology, heterogenous chemistry, and optical metrics (e.g. AOD, NO2_COLUMN) are provided. ELMOv2 
+further includes support for ISAM and DDM variables. 
+
+Units for all variables are specified in the output file. Verbose definitions of variables and their attributes are written to each 
+CTM_LOG ascii logfile.
+
+The namelist input file CMAQ_Control.nml allows users to declare how many CCTM_ELMO files to create. 
+See [Appendix F (ELMO Output):](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more details.
+ 
+Some output files created by the CCTM have been considered standard output in the past as these contain hourly concentration and deposition values and information to document the run. Options for these files are controlled by their corresponding environment variable in the CCTM RunScript (e.g. run_cctm.csh).
 <a id=cmaq_output_log></a>
 
 **CMAQ output log**
@@ -80,7 +104,7 @@ The LOGFILE environment variable allows users to specify the name of a log file 
 [Return to Table 7-1](#conc_t)
 <!-- END COMMENT -->
 
-The 2-D or 3-D CCTM hourly concentration file (CONC) contains instantaneous gas-phase species mixing ratios (ppmV) and aerosol species concentrations (µg m<sup>-3</sup>) at the end of each model output time step. The number and type of species contained in the CONC files depends on the chemical mechanism and aerosol model configurations that are selected when the CCTM is compiled. The [Species NameLists files](CMAQ_UG_ch04_model_inputs.md#matrix_nml) within the mechanism directories list the modeled species, and contain a column that specifies which species are written to the CONC files (e.g. [AE_cb6r3_ae7_aq.nml](../../CCTM/src/MECHS/cb6r3_ae7_aq/AE_cb6r3_ae7_aq.nml)). The GC_*mechname*.nml file lists the gas-phase species, the AE_*mechname*.nml file lists the aerosol species, and the NR_*mechname*.nml lists the nonreactive (inert) species. Species can be removed from the CONC file by editing the CONC column in the NameList file(s) to reduce the number of species that are written to, and thus the size of the CONC file. Users can also specify the output species list (including temperature, pressure & relative humidity) by modifying the environment variable CONC_SPCS in the RunScript which overrides the setting of the CONC column in the NameList file(s). By default, concentrations for all model layers are output to the CONC file.  Users may specify the layers to output using the CONC_BLEV_ELEV environment variable in the RunScript where BLEV corresponds to the bottom layer number and ELEV corresponds to the top layer number.
+The 2-D or 3-D CCTM hourly concentration file (CONC) contains instantaneous gas-phase species mixing ratios (ppmV) and aerosol species concentrations (µg m<sup>-3</sup>) at the end of each model output time step. The number and type of species contained in the CONC files depends on the chemical mechanism and aerosol model configurations that are selected when the CCTM is compiled. The [Species NameLists files](CMAQ_UG_ch04_model_inputs.md#matrix_nml) within the mechanism directories list the modeled species, and contain a column that specifies which species are written to the CONC files (e.g. [AE_cb6r3_ae7_aq.nml][link_7_nml]). The GC_*mechname*.nml file lists the gas-phase species, the AE_*mechname*.nml file lists the aerosol species, and the NR_*mechname*.nml lists the nonreactive (inert) species. Species can be removed from the CONC file by editing the CONC column in the NameList file(s) to reduce the number of species that are written to, and thus the size of the CONC file. Users can also specify the output species list (including temperature, pressure & relative humidity) by modifying the environment variable CONC_SPCS in the RunScript which overrides the setting of the CONC column in the NameList file(s). By default, concentrations for all model layers are output to the CONC file.  Users may specify the layers to output using the CONC_BLEV_ELEV environment variable in the RunScript where BLEV corresponds to the bottom layer number and ELEV corresponds to the top layer number.
 
 
 <a id=aconc></a>
@@ -91,41 +115,7 @@ The 2-D or 3-D CCTM hourly concentration file (CONC) contains instantaneous gas-
 <!-- END COMMENT -->
 
 The 2-D or 3-D CCTM integral average concentration file contains average model species concentrations for each model hour, as opposed to instantaneous concentrations at the end of each output time step. The species written to the ACONC file are set by the user in the CCTM RunScript using the environment variable AVG_CONC_SPCS. The model layers for which hourly average concentrations are calculated are also set in the CCTM RunScript using the environment variable ACONC_BLEV_ELEV, where BLEV corresponds to the bottom layer number and ELEV corresponds to the top layer number. An example setting for the ACONC_BLEV_ELEV variable is “1 6”, which defines layers 1 through 6 as the vertical extent for which hourly average concentrations are calculated and written to the ACONC file.
- 
-<a id=ELMO></a>
 
-**CCTM_ELMO: instantaneous hourly ELMO output file**
-<!-- BEGIN COMMENT -->
-[Return to Table 7-1](#ELMO_t)
-<!-- END COMMENT -->
-
-This optional 2-D or 3-D CCTM output file contains instantaneous information at the end of the output time step for user-specified variables including concentrations that would appear on CONC and ACONC files as well as aggregate variables like total mass of PM<sub>2.5</sub> and PM<sub>10<\sub>. 
-Diagnostic parameters that were found on the PMDIAG file in previous CMAQ versions are also available for output on the ELMO file. 
-Thease include particle geometric mean diameters, geometric standard deviations, bulk densities, 2nd moments and 3rd moments for the lognormal modes. 
-It also includes the fraction of each mode that contributes to PM1, PM2.5, and PM10 and the AMS transmission factor for each mode. 
-Many diagnostics relating to heterogenous chemistry are provided including the N<sub>2</sub>O<sub>5</sub> reaction probability, the ClNO<sub>2</sub> reaction yield, and the IEPOX uptake coefficient. 
-Units for all variables are specified in the output file. 
-
-The namelist input file CMAQ_Control_Misc.nml allows users to omit this file (set instant = .FALSE. under &elmo_activate), to set the top and bottom layers to be output (Inst_Layer_Top and Inst_Layer_Bot under &elmo_inst) and which variables to output (Inst_Vars_Nml under &elmo_inst).
-See [Appendix F (ELMO Output):](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more details.
-
-<a id=aELMO></a>
-
-**CCTM_AELMO: average hourly ELMO output file**
-<!-- BEGIN COMMENT -->
-[Return to Table 7-1](#aELMO_t)
-<!-- END COMMENT -->
-
-This optional 2-D or 3-D CCTM output file contains average information integrated from the previous output time step for user-specified variables including concentrations that would appear on CONC and ACONC files as well as aggregate variables like total mass of PM<sub>2.5</sub> and PM<sub>10<\sub>. 
-Diagnostic parameters that were found on the PMDIAG file in previous CMAQ versions are also available for output on the ELMO file. 
-Thease include particle geometric mean diameters, geometric standard deviations, bulk densities, 2nd moments and 3rd moments for the lognormal modes. 
-It also includes the fraction of each mode that contributes to PM1, PM2.5, and PM10 and the AMS transmission factor for each mode. 
-Many diagnostics relating to heterogenous chemistry are provided including the N<sub>2</sub>O<sub>5</sub> reaction probability, the ClNO<sub>2</sub> reaction yield, and the IEPOX uptake coefficient. 
-Units for all variables are specified in the output file. 
-
-The namelist input file CMAQ_Control_Misc.nml allows users to omit this file (set instant = .FALSE. under &elmo_activate), to set the top and bottom layers to be output (Inst_Layer_Top and Inst_Layer_Bot under &elmo_inst) and which variables to output (Inst_Vars_Nml under &elmo_inst).
-See [Appendix F (ELMO Output):](Appendix/CMAQ_UG_appendixF_elmo_output.md) for more details. 
- 
 <a id=drydep></a>
 
 **CCTM_DRYDEP: hourly cumulative dry deposition file**
@@ -141,21 +131,14 @@ CMAQ v5.3 and later contains two build-time options for calculating dry depositi
 When the model is run with CTM_ABFLUX set to Y, the CCTM_DRYDEP file will contain additional NH3 flux components.  The variable names and definitions are defined in Table 7-2.  Note that these variables definitions may not agree with the definitions used in CMAQ versions prior to version 5.3.2.    
 
 <a id=Table7-2></a>
-**Table 7-2. NH3 Flux components in CCTM_DRYDEP Output files when ammonia bidirectional surface flus is enabled**
+**Table 7-2. NH3 Flux components in CCTM_DRYDEP Output files when ammonia bidirectional surface flux is enabled**
 
 |**Variable Name**|**Variable Description**|
 |:----:|:----------------------------:|
 |NH3|Downward Deposition Flux (always positive)  |	
 |NH3_Emis|Upward Emissions Flux (always positive)	   |  
 |NH3_Flux|Net Flux (positive if downward and negative if upward)  | 
-|NH3_Stom*|NH3 flux from leaf stomatal pathways (positive values are emissions and negative values are deposition) |
-|NH3_Cut*|NH3 flux from leaf cuticular pathways (positive values are emissions and negative values are deposition) |
-|NH3_Soil*|NH3 flux from soil pathways (positive values are emissions and negative values are deposition) |
-|NH3_Ag*|NH3 flux over agriculture land use (positive values are emissions and negative values are deposition)|
-|NH3_Nat*|NH3 flux over non-agriculture land use (positive values are emissions and negative values are deposition) |
-|NH3_Wat*|NH3 flux over water bodies (positive values are emissions and negative values are deposition) |
 
-\*Additional diagnostic deposition values available when using the STAGE dry deposition option with bi-directional ammonia flux enabled.
 
 <a id=wetdep></a>
 
@@ -181,12 +164,12 @@ The 3-D CCTM ending concentration file contains gas-phase species mixing ratios 
 
 <a id=media></a>
 
-**CCTM_MEDIA: Bidirectional modeling media concentration file**
+**CCTM_MEDIA_CONC: Bidirectional modeling media concentration file**
 <!-- BEGIN COMMENT -->
-[Return to Table 7-1](#media_t)
+[Return to Table 7-1](#media_conc_t)
 <!-- END COMMENT -->
 
-This 2-D CCTM file contains the soil NH<sub>4</sub><sup>+</sup> and pH concentrations and/or the soil, vegetation and water Hg concentrations. This file is only created when the CTM_ABFLUX environment variable or the CTM_HGBIDI variable in the RunScript is set to Y (Default is N) and is used to initialize the next day of the model simulation.
+This 2-D CCTM file contains the soil NH<sub>4</sub><sup>+</sup> and pH concentrations and/or the soil, vegetation and water Hg concentrations. This file is only created when the CTM_ABFLUX environment variable or the CTM_HGBIDI variable in the RunScript is set to Y (Default is N) for either the M3Dry or STAGE dry deposition option. For STAGE, it is used to initialize the next day of the model simulation for either the CTM_ABFLUX == Y or CTM_HGBIDI == Y case. For M3Dry, it is only used to initialize the next day of the model simulation for the CTM_HGBDIDI == Y case while the the soil NH<sub>4</sub><sup>+</sup> and pH concentrations written to this file for the CTM_ABFLUX == Y case are purely diagnostic. As described in [Chapter 6](CMAQ_UG_ch06_model_configuration_options.md#6.8.1_Dry_Depm3dry), M3Dry relies exclusively on input files generated by EPIC to derive the soil compensation concentration for the bidirectional NH<sub>3</sub><sup>+</sup> flux calculation.  
 
 <a id=soilout></a>
 
@@ -205,7 +188,7 @@ As with BEIS, the file set by the environmental variable MEGAN_SOILOUT contains 
  
 **CCTM_BDSNPOUT**
 <!-- BEGIN COMMENT -->
-[Return to Table 7-1](#bdsnpout)
+[Return to Table 7-1](#bdsnpout_t)
 <!-- END COMMENT -->
  
 This file is required when setting both CTM_BIOGEMIS_MG to Y and BDSNP_MEGAN to Y, since the BDSNP soil NO model requires information about the previous day's meteorology and nitrogen deposition reservoir. The output file is created at the end of the simulation day and its name is defined by setting the environmental variable BDSNPOUT. The input file for the previous day is defined by setting the environmental variable BDSNPINP. 
@@ -238,7 +221,7 @@ This optional ASCII file contains specific gridcells/timesteps in which species 
 
 This optional ascii file outputs domain-wide changes for user-specified species every output time step in units of kg for gases and aerosols, number for particle number, and m<sup>2</sup> for particle surface area. See [Chapter 9 (Process Analysis and Budget):](CMAQ_UG_ch09_process_analysis.md) for a description of the Budget Tool methods, interface, and potential applications.
 
-In CMAQv5.4, the destination folder of this output file must be specified with the $OUTDIR environment variable in the RunScript. If this variable is not specified, the destination will be the root directory.    
+The destination folder of this output file must be specified with the $OUTDIR environment variable in the RunScript. If this variable is not specified, the destination will be the root directory.    
 
 <a id=b3gts></a>
 
@@ -247,7 +230,7 @@ In CMAQv5.4, the destination folder of this output file must be specified with t
 [Return to Table 7-1](#b3gts_t)
 <!-- END COMMENT -->
 
-This optional 2-D CCTM hourly output file contains total hourly biogenic emissions in mass units calculated in-line by the CCTM when the CTM_BIOGEMIS environment variable is set to Y. This file is only created if the B3GTS_DIAG environment variable in the RunScript is set to Y (Default is Y).
+This optional 2-D CCTM hourly output file contains total hourly biogenic emissions in mass units calculated in-line by the CCTM when the CTM_BIOGEMIS environment variable is set to Y. This file is only created if the B3GTS_DIAG environment variable in the RunScript is set to Y (Default is Y) and only if BEIS is the selected biogenic emisisons model. 
 
 <a id=depv></a>
 
@@ -298,25 +281,6 @@ This optional 3-D CCTM file contains the deposition velocity (m s<sup>-1</sup>) 
 <!-- END COMMENT -->
 
 This optional 3-D CCTM file contains the total deposition (kg hectare<sup>-1</sup>) for the hour for each land use type within each grid cell. This output file is structured with the land use category being the 3rd dimension (i.e. equivalent to the layers in a concentration file). So, for model runs using the NLCD land use category system, the files will have 40 "layers". This file is only created if the ModDepv environment variable in the BuildScript is set to stage (rather than m3dry) and if the CTM_MOSAIC environment variable in the RunScript is set to Y (Default is N).
-
-
-<a id=depv_fst></a>
-
-**CCTM_DEPVFST: stomatal deposition velocity file**
-<!-- BEGIN COMMENT -->
-[Return to Table 7-1](#depv_fst_t)
-<!-- END COMMENT -->
-
-This optional 3-D CCTM file contains the deposition velocity (m s<sup>-1</sup>) through the stomatal pathway for the final time step of the hour for each land use type within a grid cell. This output file is structured with the land use category being the 3rd dimension (i.e. equivalent to the layers in a concentration file). So, for model runs using the NLCD land use category system, the files will have 40 "layers". This file is only created if the ModDepv environment variable in the BuildScript is set to stage (rather than m3dry) and if the CTM_FST environment variable in the RunScript is set to Y (Default is N).
-
-<a id=dry_dep_fst></a>
-
-**CCTM_DDFST: stomatal flux file**
-<!-- BEGIN COMMENT -->
-[Return to Table 7-1](#dry_dep_fst_t)
-<!-- END COMMENT -->
-
-This optional 3-D CCTM file contains the total deposition (kg hectare<sup>-1</sup>) through the stomatal pathway for the hour for each land use type within each grid cell. This output file is structured with the land use category being the 3rd dimension (i.e. equivalent to the layers in a concentration file). So, for model runs using the NLCD land use category system, the files will have 40 "layers". This file is only created if the ModDepv environment variable in the BuildScript is set to stage (rather than m3dry) and if the CTM_FST environment variable in the RunScript is set to Y (Default is N).
 
 <a id=ltngdiag1></a>
 
@@ -394,6 +358,14 @@ This optional 3-D CCTM file contains vertical profiles of the concentration of m
 <!-- BEGIN COMMENT -->
 
 [<< Previous Chapter](CMAQ_UG_ch06_model_configuration_options.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch08_analysis_tools.md)<br>
-CMAQ User's Guide (c) 2022<br>
+CMAQv5.5 User's Guide <br>
 
 <!-- END COMMENT -->
+
+<!-- START_OF_COMMENT -->
+
+[link_7_nml]: ../../CCTM/src/MECHS/cb6r3_ae7_aq/AE_cb6r3_ae7_aq.nml  
+
+<!-- END_OF_COMMENT -->
+
+[link_7_nml]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/MECHS/cb6r3_ae7_aq/AE_cb6r3_ae7_aq.nml  

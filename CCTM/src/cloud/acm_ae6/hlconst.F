@@ -17,146 +17,61 @@
 !  subject to their copyright restrictions.                              !
 !------------------------------------------------------------------------!
 
-      REAL FUNCTION HLCONST ( CNAME, TEMP, EFFECTIVE, HPLUS )
+      MODULE HLCONST_MOD
+         IMPLICIT NONE
 
-C-----------------------------------------------------------------------
-C
-C  FUNCTION: return the Henry's law constant for the specified substance
-C            at the given temperature
-C
-C  References:
-C
-C  1. Nguyen, T. B., Coggon, M. M., Bates, K. H., Zhang, X., Schwantes,
-C     R. H., Schilling, K. A., Loza, C. L., Flagan, R. C., Wennberg, P. O.,
-C     and Seinfeld, J. H.: Organic aerosol formation from the reactive
-C     uptake of isoprene epoxydiols (IEPOX) onto non-acidified inorganic
-C     seeds, Atmos. Chem. Phys., 14, 3497-3510,
-C     doi:10.5194/acp-14-3497-2014, 2014.
-C 
-C  revision history:
-C    who        when           what
-C  ---------  --------  -------------------------------------
-C  S.Roselle  08/15/97  code written for Models-3
-C  J.Gipson   06/18/01  added Henry's Law constants 50-55 for saprc99
-C  W.Hutzell  07/03/01  added Henry's Law constants 56-57 for Atrazine
-C                       and the daughter products from Atrazine and OH
-C                       reactions.
-C  J.Gipson.  09/06/02  added Henry's Law constants 59-73   for toxics
-C  S.Roselle  11/07/02  added capability for calculating the effective
-C                       Henry's law constant and updated coefficients
-C                       in Henry's law constant table
-C  J.Gipson   08/06/03  added Henry's Law constants 77-79
-C  G.Sarwar   11/21/04  added constants for chlorine chemistry (Henry's
-C                       law constants 80-85 and dissociation constants
-C                       14-16
-C  R.Bullock  07/05/05  added Henry's Law constants 86-87 for mercury 
-C                       with enthalpy calculated from cited laboratory 
-C                       data fit to an Arrhenius equation
-C  W.Hutzell  02/14/06  added HLC 88 to 116, dissociation constant for
-C                       17 (hydrazine)
-C  A.Carlton  09/20/06  updated Henry's Law constants for 1,7,19,20,21,30 
-C                       O3, NO3, hexane, octane, nonane, methanol and
-C                       isoprene reference
-C  S.Roselle  10/10/07  changed pointers to parameters; reformatted
-C                       variable declarations
-C  W.Hutzell  03/07/08  added Henry's Law constants for 117 to 120
-C  W.Hutzell  01/01/09  added Henry's Law constants for 121 to 125 for
-C                       for SAPRC07T mechanism                 
-C  Y.Xie      6/11/10  added Henry's Law constants for 126 to 130 for 
-C                       isoprene chemistry in SAPRC07               
-C  S.Roselle  03/01/11  replaced I/O API include files with UTILIO_DEFN;
-C                       removed deprecated TRIMLEN
-C  W.Hutzell  08/16/12  updated IOAPI and Henry Constant names to V5.01
-C                       standards
-C  W.Hutzell  01/30/13  updated PHENOL, and add values for CATECHOL and
-C                       XYLENOL
-C  H.Pye      02/05/13  added Henry's Law 133-134 for IEPOX and IMAE
-C  G.Sarwar   12/18/13  added Henry's Law constants for 135 to 140
-C  W.Hutzell  07/11/14  correct error in DATA from last revision
-C  D.Luecken  07/11/14  added 141 through 144 for nitrates
-C  H.Pye      05/05/15  added monoterpene and isoprene nitrates
-C  H.Pye      01/26/2016 added SOA SVOCs
-C  G.Sarwar   03/24/15  added iodine and bromine species
-C  H.Pye      05/31/16  updated IEPOX H-law from 2.7e6 to 3.0e7 M/atm
-C                       to reflect Nguyen et al. 2014.
-C  W.Hutzell  09/16/16  1) removed HCHO dissociation because its henry's
-C                        constant already accounts for the effect.
-C                       2) added henry's constant for compounds 194 thru
-C                        199 representing several toxic air pollutants
-C  
-C  D. Luecken 09/21/2016 
-C       1. added HAPs in 194-200; 
-C       2. modified existing HEXANE (19),N-HEXANE (117), and STYRENE (119); 
-C       3. removed dissociation  calculation for formaldedhyde because the listed value 
-C          is already an effective rate (Sander ACP, 2015, note 187)
-C       4. added dissociation constant for acrylic acid (LACRYACID) (via B. Hutzell)
-C  H.Pye       06/2017  added semivolatile monoterpene products
-C  G.Sarwar    08/2018  added Henry's Law constant for ClNO3, FMBR, IBR, and updated iodine and bromine species
-C  G. Sarwar   11/2018  added Henry's Law constant for CLO
-C  H.Pye       09/2021 added CRACMM emission weighted surrogates
-C-----------------------------------------------------------------------
+C...pointers for dissociating species needed to compute effective 
+c   Henry's law constants
+         INTEGER, PUBLIC  :: HLC_SO2, HLC_HNO2, HLC_HNO3, HLC_CO2, 
+     &                       HLC_H2O2, HLC_HCOOH, HLC_HO2, HLC_NH3,
+     &                       HLC_HYDRAZINE, HLC_ATRA, HLC_DATRA, HLC_CL2, 
+     &                       HLC_HCL, HLC_HOCL, HLC_HBR, HLC_HI, 
+     &                       HLC_ACRYACID
 
-      USE UTILIO_DEFN
+C...pointers for additional Henry's law species needed in AQCHEM
+         INTEGER, PUBLIC  :: HLC_O3, HLC_MHYDPOX, HLC_PEROXYACET, 
+     &                       HLC_GLY, HLC_MGLY, HLC_OH
 
-      IMPLICIT NONE
+C...pointers for additional Henry's law species needed in KMT version of AQCHEM
+         INTEGER, PUBLIC  :: HLC_CH3COOH, HLC_NO2, HLC_HNO4, HLC_NO3, 
+     &                       HLC_PYRUVACID
 
-C...........ARGUMENTS and their descriptions
+C...pointers for Henry's law species needed in AEROSOL_CHEMISTRY
+         INTEGER, PUBLIC  :: HLC_IEPOX, HLC_IMAE
 
-      CHARACTER*(*), INTENT ( IN ) :: CNAME      ! name of substance
-      REAL,          INTENT ( IN ) :: TEMP       ! temperature (K)
-      LOGICAL,       INTENT ( IN ) :: EFFECTIVE  ! true=compute the effective henry's law constant
-      REAL,          INTENT ( IN ) :: HPLUS      ! hydrogen ion concentration (mol/l)
-
-C...........INCLUDES and their descriptions
-
+         PUBLIC :: SUBNAME, HLCONST, HLCONST_INIT
 
 C...........PARAMETERS and their descriptions:
 
-      INTEGER, PARAMETER :: MXSPCS = 277     ! Number of substances
-      INTEGER, PARAMETER :: MXDSPCS = 19     ! Number of dissociating species
+         INTEGER, PUBLIC, PARAMETER :: MXSPCS = 282     ! Number of substances
 
-C...pointers for the dissociation constants (array B and D)
+         PRIVATE 
 
-      INTEGER, PARAMETER :: LSO2       =  1  ! SO2
-      INTEGER, PARAMETER :: LHSO3      =  2  ! HSO3
-      INTEGER, PARAMETER :: LHNO2      =  3  ! HNO3
-      INTEGER, PARAMETER :: LHNO3      =  4  ! HNO3
-      INTEGER, PARAMETER :: LCO2       =  5  ! CO2
-      INTEGER, PARAMETER :: LHCO3      =  6  ! HCO3
-      INTEGER, PARAMETER :: LH2O2      =  7  ! H2O2
-      INTEGER, PARAMETER :: LHCOOH     =  8  ! HCOOH
-      INTEGER, PARAMETER :: LHO2       =  9  ! HO2
-      INTEGER, PARAMETER :: LNH4OH     = 10  ! NH4OH
-      INTEGER, PARAMETER :: LH2O       = 11  ! H2O
-      INTEGER, PARAMETER :: LATRA      = 12  ! Atrazine
-      INTEGER, PARAMETER :: LCL2       = 13  ! CL2
-      INTEGER, PARAMETER :: LHOCL      = 14  ! HOCL
-      INTEGER, PARAMETER :: LHCL       = 15  ! HCL
-      INTEGER, PARAMETER :: LHYDRAZINE = 16  ! Hydrazine
-      INTEGER, PARAMETER :: LHBR       = 17  ! HBR
-      INTEGER, PARAMETER :: LHI        = 18  ! HI
-      INTEGER, PARAMETER :: LACRYACID  = 19  ! CCH3COOH
+         INTEGER, PARAMETER :: MXDSPCS = 19     ! Number of dissociating species
 
+C...pointers for the dissociation constants (arrays B and D)
 
-C...........SCRATCH LOCAL VARIABLES and their descriptions:
-
-      CHARACTER( 16 ), SAVE :: PNAME = 'HLCONST'  ! program name
-      CHARACTER( 16 ), SAVE :: SUBNAME( MXSPCS )  ! list of substance names
-
-      CHARACTER( 120 ) :: XMSG = ' '    ! exit status message string
-
-      INTEGER       S                   ! loop index
-      INTEGER       SPC                 ! species index
-
-      REAL          HPLUSI              ! 1 / HPLUS
-      REAL          HPLUS2I             ! 1 / HPLUS**2
-      REAL          CLMINUS             ! chlorine ion conc [CL-]
-      REAL          CLMINUSI            ! 1 / CLMINUS
-      REAL          TFAC                ! (298-T)/(T*298)
-      REAL          AKEQ1               ! temp var for dissociation constant
-      REAL          AKEQ2               ! temp var for dissociation constant
-      REAL          OHION               ! OH ion concentration
-      REAL          KH                  ! temp var for henry's law constant
+         INTEGER, PARAMETER :: MSO2       =  1  ! SO2
+         INTEGER, PARAMETER :: MHSO3      =  2  ! HSO3
+         INTEGER, PARAMETER :: MHNO2      =  3  ! HNO3
+         INTEGER, PARAMETER :: MHNO3      =  4  ! HNO3
+         INTEGER, PARAMETER :: MCO2       =  5  ! CO2
+         INTEGER, PARAMETER :: MHCO3      =  6  ! HCO3
+         INTEGER, PARAMETER :: MH2O2      =  7  ! H2O2
+         INTEGER, PARAMETER :: MHCOOH     =  8  ! HCOOH
+         INTEGER, PARAMETER :: MHO2       =  9  ! HO2
+         INTEGER, PARAMETER :: MNH4OH     = 10  ! NH4OH
+         INTEGER, PARAMETER :: MH2O       = 11  ! H2O
+         INTEGER, PARAMETER :: MATRA      = 12  ! Atrazine
+         INTEGER, PARAMETER :: MCL2       = 13  ! CL2
+         INTEGER, PARAMETER :: MHOCL      = 14  ! HOCL
+         INTEGER, PARAMETER :: MHCL       = 15  ! HCL
+         INTEGER, PARAMETER :: MHYDRAZINE = 16  ! Hydrazine
+         INTEGER, PARAMETER :: MHBR       = 17  ! HBR
+         INTEGER, PARAMETER :: MHI        = 18  ! HI
+         INTEGER, PARAMETER :: MACRYACID  = 19  ! CCH3COOH
+	 
+         CHARACTER( 16 )    :: SUBNAME( MXSPCS )  ! list of substance names	 
 
 C...Henry's law constant data taken mostly from Rolf Sanders' Compilation of
 C...  Henry's Law Constants for Inorganic and Organic Species of Potential
@@ -250,10 +165,10 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME( 77), A( 77), E( 77) / 'MEK             ', 2.0E+01, 5.0E+03 /  ! Zhou and Mopper 1990
       DATA SUBNAME( 78), A( 78), E( 78) / 'MVK             ', 4.1E+01, 0.0E+00 /  ! Iraci et al. 1998
       DATA SUBNAME( 79), A( 79), E( 79) / 'METHACROLEIN    ', 6.5E+00, 0.0E+00 /  ! Iraci et al. 1998
-      DATA SUBNAME( 80), A( 80), E( 80) / 'CL2             ', 8.6E-02, 2.0E+03 /  ! ROLF SANDERS COMPILATION (1999)/KAVANAUGH AND TRUSSELL (1980)
-      DATA SUBNAME( 81), A( 81), E( 81) / 'HOCL            ', 6.6E+02, 5.9E+03 /  ! ROLF SANDERS COMPILATION (1999)/HUTHWELKER ET AL (1995)
-      DATA SUBNAME( 82), A( 82), E( 82) / 'HCL             ', 1.9E+01, 6.0E+02 /  ! ROLF SANDERS COMPILATION (1999)/DEAN (1992)
-      DATA SUBNAME( 83), A( 83), E( 83) / 'FMCL            ', 1.1E+00, 0.0E+00 /  ! EPA SUITE PROGRAM/UNIT CONVERTED TO MATCH THE DEFINITION BY ROLF SANDERS.
+      DATA SUBNAME( 80), A( 80), E( 80) / 'CL2             ', 6.1E-02, 3.2E+03 /  ! Aieta and Roberts (1986) (https://www.henrys-law.org/henry)  
+      DATA SUBNAME( 81), A( 81), E( 81) / 'HOCL            ', 6.6E+02, 5.9E+03 /  ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)  
+      DATA SUBNAME( 82), A( 82), E( 82) / 'HCL             ', 1.1E+00, 2.3E+03 /  ! Marsh and McElroy (1985) (https://www.henrys-law.org/henry)  
+      DATA SUBNAME( 83), A( 83), E( 83) / 'FMCL            ', 1.7E+02, 0.0E+00 /  ! OPERA SAR
       DATA SUBNAME( 84), A( 84), E( 84) / 'ICL1            ', 6.9E+01, 0.0E+00 /  ! EPA SUITE PROGRAM/UNIT CONVERTED TO MATCH THE DEFINITION BY ROLF SANDERS.
       DATA SUBNAME( 85), A( 85), E( 85) / 'ICL2            ', 6.9E+01, 0.0E+00 /  ! EPA SUITE PROGRAM/ASSUMED EQUAL TO THAT OF ICL1
       DATA SUBNAME( 86), A( 86), E( 86) / 'HG              ', 1.11E-01, 4.97E+03 /! Elemental Mercury from Clever et al. (1985)
@@ -294,8 +209,7 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(120), A(120), E(120) / '124TRIMETH_BENZE', 1.50E-01, 4.3E+03 /  ! Hanson et al. (1995)
       DATA SUBNAME(121), A(121), E(121) / 'CHLOROACETALDEHY', 4.18E+01, 0.0E+00 /  ! Bond Estimate by EPA SUITE PROGRAM  (2007)
       DATA SUBNAME(122), A(122), E(122) / 'CHLOROACETONE   ', 3.82E-01, 0.0E+00 /  ! Staudinger and Roberts (2001)
-
-      DATA SUBNAME(123), A(123), E(123) / 'NITROSYL_CHLORID', 5.10E-01, 0.0E+00 /  ! Bond Estimate by EPA SUITE PROGRAM  (2007)
+      DATA SUBNAME(123), A(123), E(123) / 'NITROSYL_CHLORID', 4.96E-02, 0.0E+00 /  ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(124), A(124), E(124) / 'NITRYL_CHLORIDE ', 2.43E-02, 0.0E+00 /  ! Behnke et al. (1997), JGR, D102, 3795-3804
       DATA SUBNAME(125), A(125), E(125) / 'HEXYL_HYDROPEROX', 1.23E+01, 0.0E+00 /  ! Bond Estimated by EPA SUITE PROGRAM  (2007)
 
@@ -337,40 +251,36 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(160), A(160), E(160) / 'SVXYL1          ', 6.2E+07,  6.0E+03 /   ! Pye 2016 est based on Hodzic 2014 GRL
       DATA SUBNAME(161), A(161), E(161) / 'SVXYL2          ', 4.0E+06,  6.0E+03 /   ! Pye 2016 est based on Hodzic 2014 GRL
 
-      DATA SUBNAME(162), A(162), E(162) / 'I2              ', 3.10E+00, 4.6E+03 /   ! ROLF SANDERS COMPILATION (1999)/Berdnikov and Bazhin (1970)
+      DATA SUBNAME(162), A(162), E(162) / 'I2              ', 3.14E+00, 4.6E+03 /   ! Berdnikov and Bazhin (1970) (https://www.henrys-law.org/henry)
       DATA SUBNAME(163), A(163), E(163) / 'I               ', 6.30E-03, 2.3E+03 /   ! ROLF SANDERS COMPILATION (1999)/Berdnikov and Bazhin (1970)
-      DATA SUBNAME(164), A(164), E(164) / 'IO              ', 4.50E+02, 0.0E+00 /   ! Saiz-Lopez et al., ACPD, 2014
+      DATA SUBNAME(164), A(164), E(164) / 'IO              ', 4.46E+02, 0.0E+00 /   ! Saiz-Lopez et al., ACPD, 2014
       DATA SUBNAME(165), A(165), E(165) / 'OIO             ', 1.00E+04, 0.0E+00 /   ! Saiz-Lopez et al., ACPD, 2014
-      DATA SUBNAME(166), A(166), E(166) / 'I2O2            ', 1.00E+30, 0.0E+00 /   ! Sherwen et al., 2016
-      DATA SUBNAME(167), A(167), E(167) / 'I2O3            ', 1.00E+30, 0.0E+00 /   ! Sherwen et al., 2016
-      DATA SUBNAME(168), A(168), E(168) / 'I2O4            ', 1.00E+30, 0.0E+00 /   ! Sherwen et al., 2016
-      DATA SUBNAME(169), A(169), E(169) / 'HI              ', 2.50E+00, 5.3E+03 /   ! Schweitzer et al. (2000)
-      DATA SUBNAME(170), A(170), E(170) / 'HOI             ', 1.53E+04, 8.3E+03 /   ! Sherwen et al., 2016      
-
+      DATA SUBNAME(166), A(166), E(166) / 'I2O2            ', 1.00E+04, 0.0E+00 /   ! Saiz-Lopez et al., ACPD, 2014
+      DATA SUBNAME(167), A(167), E(167) / 'I2O3            ', 1.00E+04, 0.0E+00 /   ! Saiz-Lopez et al., ACPD, 2014
+      DATA SUBNAME(168), A(168), E(168) / 'I2O4            ', 1.00E+04, 0.0E+00 /   ! Saiz-Lopez et al., ACPD, 2014
+      DATA SUBNAME(169), A(169), E(169) / 'HI              ', 2.50E+01, 9.8E+03 /   ! Ordóñez et al. (2012) (https://www.henrys-law.org/henry)  
+      DATA SUBNAME(170), A(170), E(170) / 'HOI             ', 4.10E+02, 4.0E+03 /   ! 2002 CB7r1 report (CAMx); Sander, ACP, 2015 (page 4415) 
       DATA SUBNAME(171), A(171), E(171) / 'INO             ', 5.00E-02, 0.0E+00 /   ! Same as ClNO which is from ROLF SANDERS COMPILATION (1999)/Scheer et al. (1997)
-      DATA SUBNAME(172), A(172), E(172) / 'INO2            ', 3.00E-01, 0.0E+00 /   ! Same as BRNO2 which is from ROLF SANDERS COMPILATION (1999)/Frenzel et al. (1998)
-      DATA SUBNAME(173), A(173), E(173) / 'INO3            ', 1.00E+30, 0.0E+00 /   ! Same as BRNO3; BRNO3 from Sander (2015)      
-      DATA SUBNAME(174), A(174), E(174) / 'CH3I            ', 1.40E-01, 4.3E+03 /   ! ROLF SANDERS COMPILATION (1999)/Moore et al. (1995)
-      DATA SUBNAME(175), A(175), E(175) / 'MIC             ', 8.90E-01, 4.3E+03 /   ! ROLF SANDERS COMPILATION (1999)/Moore et al. (1995)
-      DATA SUBNAME(176), A(176), E(176) / 'MIB             ', 8.90E-01, 4.3E+03 /   ! Same as MIC, Final Report to TCEQ, Environ International, 2012
-      DATA SUBNAME(177), A(177), E(177) / 'MI2             ', 2.30E+00, 5.0E+03 /   ! ROLF SANDERS COMPILATION (1999)/Moore et al. (1995)
-
+      DATA SUBNAME(172), A(172), E(172) / 'INO2            ', 3.34E-01, 0.0E+00 /   ! Badia et al. (2019) (https://www.henrys-law.org/henry)     
+      DATA SUBNAME(173), A(173), E(173) / 'INO3            ', 1.00E+06, 0.0E+00 /   ! Same as BRNO3; BRNO3 from Sander (2015)  
+      DATA SUBNAME(174), A(174), E(174) / 'CH3I            ', 1.40E-01, 4.1E+03 /   ! Moore et al. (1995) (https://www.henrys-law.org/henry)
+      DATA SUBNAME(175), A(175), E(175) / 'MIC             ', 9.22E-01, 4.1E+03 /   ! Moore et al. (1995) (https://www.henrys-law.org/henry)
+      DATA SUBNAME(176), A(176), E(176) / 'MIB             ', 2.02E+00, 0.0E+00 /   ! Karagodin-Doyennel et al. (2021) (https://www.henrys-law.org/henry)
+      DATA SUBNAME(177), A(177), E(177) / 'MI2             ', 2.33E+00, 5.3E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(178), A(178), E(178) / 'BRO             ', 7.10E-01, 0.0E+00 /   ! Parrella et al. (2012)
-      DATA SUBNAME(179), A(179), E(179) / 'HOBR            ', 6.10E+03, 6.0E+03 /   ! Sherwen et al., 2016
-      DATA SUBNAME(180), A(180), E(180) / 'HBR             ', 7.50E-01, 6.1E+03 /   ! A from Schweitzer et al. (2000) and E from Chmeides and Stelson (1992) - ROLF SANDERS COMPILATION (1999)
-      DATA SUBNAME(181), A(181), E(181) / 'BR2             ', 7.60E-01, 4.1E+03 /   ! Dean et al. (1992)
-      DATA SUBNAME(182), A(182), E(182) / 'BRNO3           ', 1.00E+30, 0.0E+00 /   ! Sander (2015)
-
-      DATA SUBNAME(183), A(183), E(183) / 'MB3             ', 1.40E+00, 5.0E+03 /   ! ROLF SANDERS COMPILATION (1999)/Moore et al. (1995)
+      DATA SUBNAME(179), A(179), E(179) / 'HOBR            ', 1.82E+00, 4.0E+03 /   ! Mozurkewich (1995) (https://www.henrys-law.org/henry)
+      DATA SUBNAME(180), A(180), E(180) / 'HBR             ', 6.89E+00, 0.0E+00 /   ! Hayer et al. (2022) (https://www.henrys-law.org/henry)
+      DATA SUBNAME(181), A(181), E(181) / 'BR2             ', 7.29E-01, 4.4E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
+      DATA SUBNAME(182), A(182), E(182) / 'BRNO3           ', 1.00E+06, 0.0E+00 /   ! Sander (2015)
+      DATA SUBNAME(183), A(183), E(183) / 'MB3             ', 1.72E+00, 5.2E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(184), A(184), E(184) / 'CH3BR           ', 1.50E-01, 0.0E+00 /   ! ROLF SANDERS COMPILATION (1999)/Yaws and Yang et al. (1992)
-      DATA SUBNAME(185), A(185), E(185) / 'MB2             ', 9.30E-01, 4.4E+03 /   ! ROLF SANDERS COMPILATION (1999)/Moore et al. (1995)
-      DATA SUBNAME(186), A(186), E(186) / 'MB2C            ', 7.30E-01, 4.9E+03 /   ! ROLF SANDERS COMPILATION (1999)/Moore et al. (1995)
+      DATA SUBNAME(185), A(185), E(185) / 'MB2             ', 9.12E-01, 4.3E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
+      DATA SUBNAME(186), A(186), E(186) / 'MB2C            ', 7.49E-01, 4.6E+03 /   ! Moore et al. (1995) (https://www.henrys-law.org/henry)
       DATA SUBNAME(187), A(187), E(187) / 'MBC2            ', 4.00E-01, 4.7E+03 /   ! ROLF SANDERS COMPILATION (1999)/Moore et al. (1995)
-      DATA SUBNAME(188), A(188), E(188) / 'MBC             ', 8.90E-01, 4.3E+03 /   ! Same as MIC
-      DATA SUBNAME(189), A(189), E(189) / 'BRNO2           ', 3.00E-01, 0.0E+00 /   ! Frenzel et al. (1998)
-      DATA SUBNAME(190), A(190), E(190) / 'BRCL            ', 9.70E-01, 0.0E+00 /   ! Sherwen et al., 2016
+      DATA SUBNAME(188), A(188), E(188) / 'MBC             ', 6.68E-01, 4.7E+03 /   ! Hiatt (2013) (https://www.henrys-law.org/henry) 
+      DATA SUBNAME(189), A(189), E(189) / 'BRNO2           ', 3.04E-01, 0.0E+00 /   ! Frenzel et al. (1998) (https://www.henrys-law.org/henry) 
+      DATA SUBNAME(190), A(190), E(190) / 'BRCL            ', 9.80E-01, 5.6E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(191), A(191), E(191) / 'ICL             ', 1.10E+02, 2.1E+03 /   ! Sherwen et al., 2016
-
       DATA SUBNAME(192), A(192), E(192) / 'DMS             ', 4.80E-01, 3.1E+03 /   ! ROLF SANDERS COMPILATION (1999)/De Bryuyn et al. (1995)
       DATA SUBNAME(193), A(193), E(193) / 'MSA             ', 7.70E+04, 0.0E+00 /   ! Meylan and Howard (1991), inverse of the value is used due to unit conversion
       DATA SUBNAME(194), A(194), E(194) / 'XYLENE          ', 1.90E-01, 4.2E+03  / ! .35/.3/.35 m/o/p, Sander ACP 2015, Staudinger and Roberts (2001) for m; Fogg and Sangster (2003) for o and p
@@ -392,10 +302,10 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(210), A(210), E(210) / 'SVAVB2          ', 7.9E+07,  6.0E+03 /   ! est based on Hodzic 2014 GRL
       DATA SUBNAME(211), A(211), E(211) / 'SVAVB3          ', 1.2E+07,  6.0E+03 /   ! est based on Hodzic 2014 GRL
       DATA SUBNAME(212), A(212), E(212) / 'SVAVB4          ', 1.8E+06,  6.0E+03 /   ! est based on Hodzic 2014 GRL
-      DATA SUBNAME(213), A(213), E(213) / 'CLNO3           ', 1.00E+30, 0.0E+00 /   ! Sander (2015)
+      DATA SUBNAME(213), A(213), E(213) / 'CLNO3           ', 1.00E+06, 0.0E+00 /   ! Sander (2015)
       DATA SUBNAME(214), A(214), E(214) / 'IBR             ', 2.43E+01, 4.9E+03 /   ! Sherwen et al., 2016
-      DATA SUBNAME(215), A(215), E(215) / 'FMBR            ', 7.40E+01, 0.0E+00 /   ! Sander, R. ACP (2015), krysztofiak et al. (2012)
-      DATA SUBNAME(216), A(216), E(216) / 'CLO             ', 7.00E-03, 0.0E+00 /   ! Sander et al., ACP, 2015
+      DATA SUBNAME(215), A(215), E(215) / 'FMBR            ', 4.56E+01, 0.0E+00 /   ! Wang et al. (2017) (https://www.henrys-law.org/henry)
+      DATA SUBNAME(216), A(216), E(216) / 'CLO             ', 7.40E-01, 0.0E+00 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
       DATA SUBNAME(217), A(217), E(217) / 'BENAPY          ', 2.00E+03, 4.7E+03 /   ! benzo[a]pyrene Ma et al. (2010) and ten Hulscher et al. (1992) in  Sander et al., ACP, 2015
       DATA SUBNAME(218), A(218), E(218) / 'XYEOPERA        ', 1.27E-01, 4.0E+03 /   ! O-xylene T dep from Staudinger and Roberts 1996, CRACMM RepCmp (OPERA SAR)
       DATA SUBNAME(219), A(219), E(219) / 'ROCIOXYOPERA    ', 8.12E+00, 0.0E+00 /   ! emission wt. CRACMM value (OPERA SAR)
@@ -457,57 +367,234 @@ C...  Atmospheric Chemistry and Physics, 1997
       DATA SUBNAME(275), A(275), E(275) / 'XYLOPERA        ', 0.14E+00, 0.0E+00 /   ! CRACMM RepCmp value (OPERA SAR)
       DATA SUBNAME(276), A(276), E(276) / 'INALDOPERA      ', 1.00E+05, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
       DATA SUBNAME(277), A(277), E(277) / 'IPXOPERA        ', 1.55E+07, 0.0E+00 /   ! CRACMM RepCMP value (OPERA SAR)
+      DATA SUBNAME(278), A(278), E(278) / 'CLOO            ', 1.01E+00, 3.5E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
+      DATA SUBNAME(279), A(279), E(279) / 'CL2O2           ', 1.01E+00, 3.5E+03 /   ! Burkholder et al. (2019) (https://www.henrys-law.org/henry)
+      DATA SUBNAME(280), A(280), E(280) / 'OBRO            ', 1.01E+00, 3.5E+03 /   ! Using CLOO data
+      DATA SUBNAME(281), A(281), E(281) / 'NITROSYL_BROMID ', 4.96E-02, 0.0E+00 /   ! Using NITROSYL_CHLROD data
+      DATA SUBNAME(282), A(282), E(282) / 'HYDROGEN_CYANIDE', 1.72E+02, 4.4E+03 /   ! Sander, R. ACP (2015)
 
-      DATA B( LSO2   ), D( LSO2   ) / 1.30E-02,  1.96E+03 /  ! SO2*H2O<=>HSO3+H     : Smith and Martell (1976)
-      DATA B( LHSO3  ), D( LHSO3  ) / 6.60E-08,  1.50E+03 /  ! HSO3<=>SO3+H         : Smith and Martell (1976)
-      DATA B( LHNO2  ), D( LHNO2  ) / 5.10E-04, -1.26E+03 /  ! HNO2(aq)<=>NO2+H     : Schwartz and White (1981)
-      DATA B( LHNO3  ), D( LHNO3  ) / 1.54E+01,  8.70E+03 /  ! HNO3(aq)<=>NO3+H     : Schwartz (1984)
-      DATA B( LCO2   ), D( LCO2   ) / 4.30E-07, -1.00E+03 /  ! CO2*H2O<=>HCO3+H     : Smith and Martell (1976)
-      DATA B( LHCO3  ), D( LHCO3  ) / 4.68E-11, -1.76E+03 /  ! HCO3<=>CO3+H         : Smith and Martell (1976)
-      DATA B( LH2O2  ), D( LH2O2  ) / 2.20E-12, -3.73E+03 /  ! H2O2(aq)<=>HO2+H     : Smith and Martell (1976)
-      DATA B( LHCOOH ), D( LHCOOH ) / 1.80E-04, -2.00E+01 /  ! HCOOH(aq)<=>HCOO+H   : Martell and Smith (1977)
-      DATA B( LHO2   ), D( LHO2   ) / 3.50E-05,  0.00E+00 /  ! HO2(aq)<=>H+O2       : Perrin (1982)
-      DATA B( LNH4OH ), D( LNH4OH ) / 1.70E-05, -4.50E+02 /  ! NH4*OH<=>NH4+OH      : Smith and Martell (1976)
-      DATA B( LH2O   ), D( LH2O   ) / 1.00E-14, -6.71E+03 /  ! H2O<=>H+OH           : Smith and Martell (1976)
-      DATA B( LATRA  ), D( LATRA  ) / 2.09E-02,  0.00E+00 /  ! C8H14ClN5<=>C8H13ClN5+H  : Weber (1970)
-      DATA B( LCL2   ), D( LCL2   ) / 5.01E-04,  0.00E+00 /  ! CL2*H2O <=> HOCL + H + CL : LIN AND PEHKONEN, JGR, 103, D21, 28093-28102, NOVEMBER 20, 1998. ALSO SEE NOTE BELOW
-      DATA B( LHOCL  ), D( LHOCL  ) / 3.16E-08,  0.00E+00 /  ! HOCL <=>H + OCL      : LIN AND PEHKONEN, JGR, 103, D21, 28093-28102, NOVEMBER 20, 1998
-      DATA B( LHCL   ), D( LHCL   ) / 1.74E+06,  6.90E+03 /  ! HCL <=> H + CL       : Marsh and McElroy (1985)
-      DATA B( LHYDRAZINE), D( LHYDRAZINE) / 1.11E-08,  0.00E+00 /  ! HYDRAZINE <=> HYDRAZINE+ + OH-  : Moliner and Street (1989)
-      DATA B( LHBR   ), D( LHBR   ) / 1.00E+09,  0.00E+00 /  ! HBR <=> H + BR       : Schweitzer et al. (2000)
-      DATA B( LHI    ), D( LHI    ) / 3.20E+09,  0.00E+00 /  ! HI <=> H + I         : Schweitzer et al. (2000)
-      DATA B( LACRYACID ), D( LACRYACID ) / 5.62E-05,  0.00E+00 /  ! CH3C(O)OH <=> H + CH3C(O)O  : Riddick et al. (1985)
+      DATA B( MSO2   ), D( MSO2   ) / 1.30E-02,  1.96E+03 /  ! SO2*H2O<=>HSO3+H     : Smith and Martell (1976)
+      DATA B( MHSO3  ), D( MHSO3  ) / 6.60E-08,  1.50E+03 /  ! HSO3<=>SO3+H         : Smith and Martell (1976)
+      DATA B( MHNO2  ), D( MHNO2  ) / 5.10E-04, -1.26E+03 /  ! HNO2(aq)<=>NO2+H     : Schwartz and White (1981)
+      DATA B( MHNO3  ), D( MHNO3  ) / 1.54E+01,  8.70E+03 /  ! HNO3(aq)<=>NO3+H     : Schwartz (1984)
+      DATA B( MCO2   ), D( MCO2   ) / 4.30E-07, -1.00E+03 /  ! CO2*H2O<=>HCO3+H     : Smith and Martell (1976)
+      DATA B( MHCO3  ), D( MHCO3  ) / 4.68E-11, -1.76E+03 /  ! HCO3<=>CO3+H         : Smith and Martell (1976)
+      DATA B( MH2O2  ), D( MH2O2  ) / 2.20E-12, -3.73E+03 /  ! H2O2(aq)<=>HO2+H     : Smith and Martell (1976)
+      DATA B( MHCOOH ), D( MHCOOH ) / 1.80E-04, -2.00E+01 /  ! HCOOH(aq)<=>HCOO+H   : Martell and Smith (1977)
+      DATA B( MHO2   ), D( MHO2   ) / 3.50E-05,  0.00E+00 /  ! HO2(aq)<=>H+O2       : Perrin (1982)
+      DATA B( MNH4OH ), D( MNH4OH ) / 1.70E-05, -4.50E+02 /  ! NH4*OH<=>NH4+OH      : Smith and Martell (1976)
+      DATA B( MH2O   ), D( MH2O   ) / 1.00E-14, -6.71E+03 /  ! H2O<=>H+OH           : Smith and Martell (1976)
+      DATA B( MATRA  ), D( MATRA  ) / 2.09E-02,  0.00E+00 /  ! C8H14ClN5<=>C8H13ClN5+H  : Weber (1970)
+      DATA B( MCL2   ), D( MCL2   ) / 5.01E-04,  0.00E+00 /  ! CL2*H2O <=> HOCL + H + CL : LIN AND PEHKONEN (1998, see note below)
+      DATA B( MHOCL  ), D( MHOCL  ) / 3.16E-08,  0.00E+00 /  ! HOCL <=>H + OCL      : LIN AND PEHKONEN (1998) 
+      DATA B( MHCL   ), D( MHCL   ) / 1.74E+06,  6.90E+03 /  ! HCL <=> H + CL       : Marsh and McElroy (1985)
+      DATA B( MHYDRAZINE), D( MHYDRAZINE) / 1.11E-08,  0.00E+00 /  ! HYDRAZINE <=> HYDRAZINE+ + OH-  : Moliner and Street (1989)
+      DATA B( MHBR   ), D( MHBR   ) / 1.00E+09,  0.00E+00 /  ! HBR <=> H + BR       : Schweitzer et al. (2000)
+      DATA B( MHI    ), D( MHI    ) / 3.20E+09,  0.00E+00 /  ! HI <=> H + I         : Schweitzer et al. (2000)
+      DATA B( MACRYACID ), D( MACRYACID ) / 5.62E-05,  0.00E+00 /  ! CH3C(O)OH <=> H + CH3C(O)O  : Riddick et al. (1985)
 
 !-------------------------------------------------------------------------------
-! Note for dissociation constant for equation 14: CL2*H2O <=> HOCL + H + CL
+! Note for dissociation constant for equation LCL2: CL2*H2O <=> HOCL + H + CL
 ! Need aqueous [CL-] concentration to calculate effective henry's law coefficient
 ! Used a value of 2.0 mM following Lin and Pehkonen, JGR, 103, D21, 28093-28102, November 20, 1998
 !-------------------------------------------------------------------------------
 
-C...........EXTERNAL FUNCTIONS:
+      CONTAINS
+
+! Look for species CSPEC in Henry's Law table of substances SUBNAME
+         SUBROUTINE HLINDEX( CSPEC, IND, LERROR )
+            USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+            USE UTILIO_DEFN
+            IMPLICIT NONE
+
+            CHARACTER(16), INTENT(IN   ) :: CSPEC
+            INTEGER,       INTENT(  OUT) :: IND
+            LOGICAL,       INTENT(INOUT) :: LERROR
+
+            CHARACTER(120)               :: XMSG
+
+            IND = INDEX1( CSPEC, MXSPCS, SUBNAME )
+            IF ( IND .EQ. 0 ) THEN
+               LERROR = .TRUE.
+               XMSG = ' Could not find ' // TRIM( CSPEC ) // 
+     &                ' in Henry''s Law table SUBNAME'
+               CALL LOG_MESSAGE( LOGDEV, XMSG )
+            END IF
+
+         END SUBROUTINE HLINDEX
+
+         SUBROUTINE HLCONST_INIT
+            USE RUNTIME_VARS, ONLY : LOGDEV, LOG_MESSAGE
+            USE UTILIO_DEFN
+            IMPLICIT NONE
+
+            CHARACTER( 80 ) :: XMSG
+            CHARACTER( 16 ) :: PNAME = 'HLCONST_INIT'
+            LOGICAL         :: LERROR = .FALSE.
+! species that dissociate, needed for calculating effective Henry's Law coeffs
+            CALL HLINDEX( 'SO2             ', HLC_SO2      , LERROR )
+            CALL HLINDEX( 'HNO2            ', HLC_HNO2     , LERROR ) 
+            CALL HLINDEX( 'HNO3            ', HLC_HNO3     , LERROR ) 
+            CALL HLINDEX( 'CO2             ', HLC_CO2      , LERROR ) 
+            CALL HLINDEX( 'H2O2            ', HLC_H2O2     , LERROR ) 
+            CALL HLINDEX( 'FORMIC_ACID     ', HLC_HCOOH    , LERROR ) 
+            CALL HLINDEX( 'HO2             ', HLC_HO2      , LERROR ) 
+            CALL HLINDEX( 'NH3             ', HLC_NH3      , LERROR ) 
+            CALL HLINDEX( 'HYDRAZINE       ', HLC_HYDRAZINE, LERROR ) 
+            CALL HLINDEX( 'ATRA            ', HLC_ATRA     , LERROR ) 
+            CALL HLINDEX( 'DATRA           ', HLC_DATRA    , LERROR ) 
+            CALL HLINDEX( 'CL2             ', HLC_CL2      , LERROR ) 
+            CALL HLINDEX( 'HCL             ', HLC_HCL      , LERROR ) 
+            CALL HLINDEX( 'HOCL            ', HLC_HOCL     , LERROR ) 
+            CALL HLINDEX( 'HBR             ', HLC_HBR      , LERROR ) 
+            CALL HLINDEX( 'HI              ', HLC_HI       , LERROR ) 
+            CALL HLINDEX( 'ACRYACID        ', HLC_ACRYACID , LERROR ) 
+
+! additional species needed in AQCHEM
+            CALL HLINDEX( 'O3              ', HLC_O3        , LERROR ) 
+            CALL HLINDEX( 'METHYLHYDROPEROX', HLC_MHYDPOX   , LERROR ) 
+            CALL HLINDEX( 'PEROXYACETIC_ACI', HLC_PEROXYACET, LERROR ) 
+            CALL HLINDEX( 'GLYOXAL         ', HLC_GLY       , LERROR ) 
+            CALL HLINDEX( 'METHYL_GLYOXAL  ', HLC_MGLY      , LERROR ) 
+            CALL HLINDEX( 'OH              ', HLC_OH        , LERROR ) 
+
+! add'l species needed in KMT version of AQCHEM
+            CALL HLINDEX( 'ACETIC_ACID     ', HLC_CH3COOH   , LERROR ) 
+            CALL HLINDEX( 'NO2             ', HLC_NO2       , LERROR ) 
+            CALL HLINDEX( 'HNO4            ', HLC_HNO4      , LERROR ) 
+            CALL HLINDEX( 'NO3             ', HLC_NO3       , LERROR ) 
+            CALL HLINDEX( 'PYRUVIC_ACID    ', HLC_PYRUVACID , LERROR ) 
+
+! additional species needed in AEROSOL_CHEMISTRY
+            CALL HLINDEX( 'IEPOX           ', HLC_IEPOX     , LERROR )
+            CALL HLINDEX( 'IMAE            ', HLC_IMAE      , LERROR )
+
+            IF ( LERROR ) THEN
+               XMSG = ' Missing species required for computing Henry''s law constants'
+               CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
+            END IF
+
+         END SUBROUTINE HLCONST_INIT
+	 
+         REAL FUNCTION HLCONST ( ISUB, TEMP, EFFECTIVE, HPLUS )
+
+C-----------------------------------------------------------------------
+C
+C  FUNCTION: return the Henry's law constant for the specified substance
+C            at the given temperature
+C
+C  References:
+C
+C  1. Nguyen, T. B., Coggon, M. M., Bates, K. H., Zhang, X., Schwantes,
+C     R. H., Schilling, K. A., Loza, C. L., Flagan, R. C., Wennberg, P. O.,
+C     and Seinfeld, J. H.: Organic aerosol formation from the reactive
+C     uptake of isoprene epoxydiols (IEPOX) onto non-acidified inorganic
+C     seeds, Atmos. Chem. Phys., 14, 3497-3510,
+C     doi:10.5194/acp-14-3497-2014, 2014.
+C 
+C  revision history:
+C    who        when           what
+C  ---------  --------  -------------------------------------
+C  S.Roselle  08/15/97  code written for Models-3
+C  J.Gipson   06/18/01  added Henry's Law constants 50-55 for saprc99
+C  W.Hutzell  07/03/01  added Henry's Law constants 56-57 for Atrazine
+C                       and the daughter products from Atrazine and OH
+C                       reactions.
+C  J.Gipson.  09/06/02  added Henry's Law constants 59-73   for toxics
+C  S.Roselle  11/07/02  added capability for calculating the effective
+C                       Henry's law constant and updated coefficients
+C                       in Henry's law constant table
+C  J.Gipson   08/06/03  added Henry's Law constants 77-79
+C  G.Sarwar   11/21/04  added constants for chlorine chemistry (Henry's
+C                       law constants 80-85 and dissociation constants
+C                       14-16
+C  R.Bullock  07/05/05  added Henry's Law constants 86-87 for mercury 
+C                       with enthalpy calculated from cited laboratory 
+C                       data fit to an Arrhenius equation
+C  W.Hutzell  02/14/06  added HLC 88 to 116, dissociation constant for
+C                       17 (hydrazine)
+C  A.Carlton  09/20/06  updated Henry's Law constants for 1,7,19,20,21,30 
+C                       O3, NO3, hexane, octane, nonane, methanol and
+C                       isoprene reference
+C  S.Roselle  10/10/07  changed pointers to parameters; reformatted
+C                       variable declarations
+C  W.Hutzell  03/07/08  added Henry's Law constants for 117 to 120
+C  W.Hutzell  01/01/09  added Henry's Law constants for 121 to 125 for
+C                       for SAPRC07T mechanism                 
+C  Y.Xie      6/11/10  added Henry's Law constants for 126 to 130 for 
+C                       isoprene chemistry in SAPRC07               
+C  S.Roselle  03/01/11  replaced I/O API include files with UTILIO_DEFN;
+C                       removed deprecated TRIMLEN
+C  W.Hutzell  08/16/12  updated IOAPI and Henry Constant names to V5.01
+C                       standards
+C  W.Hutzell  01/30/13  updated PHENOL, and add values for CATECHOL and
+C                       XYLENOL
+C  H.Pye      02/05/13  added Henry's Law 133-134 for IEPOX and IMAE
+C  G.Sarwar   12/18/13  added Henry's Law constants for 135 to 140
+C  W.Hutzell  07/11/14  correct error in DATA from last revision
+C  D.Luecken  07/11/14  added 141 through 144 for nitrates
+C  H.Pye      05/05/15  added monoterpene and isoprene nitrates
+C  H.Pye      01/26/2016 added SOA SVOCs
+C  G.Sarwar   03/24/15  added iodine and bromine species
+C  H.Pye      05/31/16  updated IEPOX H-law from 2.7e6 to 3.0e7 M/atm
+C                       to reflect Nguyen et al. 2014.
+C  W.Hutzell  09/16/16  1) removed HCHO dissociation because its henry's
+C                        constant already accounts for the effect.
+C                       2) added henry's constant for compounds 194 thru
+C                        199 representing several toxic air pollutants
+C  
+C  D. Luecken 09/21/2016 
+C       1. added HAPs in 194-200; 
+C       2. modified existing HEXANE (19),N-HEXANE (117), and STYRENE (119); 
+C       3. removed dissociation  calculation for formaldedhyde because the listed value 
+C          is already an effective rate (Sander ACP, 2015, note 187)
+C       4. added dissociation constant for acrylic acid (LACRYACID) (via B. Hutzell)
+C  H.Pye       06/2017  added semivolatile monoterpene products
+C  G.Sarwar    08/2018  added Henry's Law constant for ClNO3, FMBR, IBR, and updated iodine and bromine species
+C  G. Sarwar   11/2018  added Henry's Law constant for CLO
+C  H.Pye       09/2021 added CRACMM emission weighted surrogates
+C-----------------------------------------------------------------------
+
+      USE UTILIO_DEFN
+
+      IMPLICIT NONE
+
+C...........ARGUMENTS and their descriptions
+
+      INTEGER, INTENT ( IN ) :: ISUB       ! index in SUBNAME array
+      REAL,    INTENT ( IN ) :: TEMP       ! temperature (K)
+      LOGICAL, INTENT ( IN ) :: EFFECTIVE  ! true=compute the effective henry's law constant
+      REAL,    INTENT ( IN ) :: HPLUS      ! hydrogen ion concentration (mol/l)
+
+C...........SCRATCH LOCAL VARIABLES and their descriptions:
+
+      CHARACTER( 16 ), SAVE :: PNAME = 'HLCONST'  ! program name
+      CHARACTER( 120 ) :: XMSG = ' '    ! exit status message string
+
+      REAL          HPLUSI              ! 1 / HPLUS
+      REAL          HPLUS2I             ! 1 / HPLUS**2
+      REAL          CLMINUS             ! chlorine ion conc [CL-]
+      REAL          CLMINUSI            ! 1 / CLMINUS
+      REAL          TFAC                ! (298-T)/(T*298)
+      REAL          AKEQ1               ! temp var for dissociation constant
+      REAL          AKEQ2               ! temp var for dissociation constant
+      REAL          OHION               ! OH ion concentration
+      REAL          KH                  ! temp var for henry's law constant
 
 C-----------------------------------------------------------------------
 
-      SPC = 0
-      DO S = 1, MXSPCS
-        IF( CNAME .EQ. SUBNAME( S ) )THEN
-            SPC = S
-            EXIT
-        END IF
-      END DO
+C...error if index out of range in table
 
-C...error if species not found in table
-
-      IF ( SPC .LE. 0 ) THEN
-        XMSG = TRIM( CNAME ) // ' not found in Henry''s '//
-     &         ' Law Constant table in routine HLCONST.'
+      IF ( ISUB .LE. 0 .OR. ISUB .GT. MXSPCS ) THEN
+        WRITE( XMSG, '(A,I4,A)' ) ' index ', ISUB, ' out of range in Henry''s'//
+     &         ' Law Constant table in routine HLCONST'
         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
-      END IF
+      END IF	 
 
 C...compute the Henry's Law Constant
 
       TFAC = ( 298.0 - TEMP) / ( 298.0 * TEMP )
-      KH = A( SPC ) * EXP( E( SPC ) * TFAC )
+      KH = A( ISUB ) * EXP( E( ISUB ) * TFAC )
       HLCONST = KH
 
 C...compute the effective Henry's law constants
@@ -523,109 +610,111 @@ C...compute the effective Henry's law constants
         HPLUSI = 1.0 / HPLUS
         HPLUS2I = HPLUSI * HPLUSI
 
-C...assign a value for clminus.  use 2.0 mM based on Lin and Pehkonene, 1998, JGR
+C...assign a value for clminus.  use 2.0 mM based on Lin and Pehkonen, 1998, JGR
 
-        CLMINUS   = 2.0E-03                ! chlorine ion conc [CL-]
+	CLMINUS   = 2.0E-03                ! chloride ion conc [CL-]
         CLMINUSI  = 1.0 / CLMINUS          ! 1 / CLMINUS
 
-        CHECK_NAME: SELECT CASE ( CNAME )
+        IF ( ISUB .EQ. HLC_SO2 ) THEN      !   SO2H2O <=> HSO3- + H+
+                                           ! & HSO3- <=> SO3= + H+
 
-        CASE ('SO2')            !   SO2H2O <=> HSO3- + H+
-                                ! & HSO3- <=> SO3= + H+
-
-          AKEQ1 = B( LSO2 )  * EXP( D( LSO2 )  * TFAC )
-          AKEQ2 = B( LHSO3 ) * EXP( D( LHSO3 ) * TFAC )
+ 
+         AKEQ1 = B( MSO2 )  * EXP( D( MSO2 )  * TFAC )
+          AKEQ2 = B( MHSO3 ) * EXP( D( MHSO3 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI + AKEQ1 * AKEQ2 * HPLUS2I )
 
-        CASE ('HNO2')           ! HNO2(aq) <=> NO2- + H+
+        ELSE IF ( ISUB .EQ. HLC_HNO2 ) THEN   ! HNO2(aq) <=> NO2- + H+
 
-          AKEQ1 = B( LHNO2 ) * EXP( D( LHNO2 ) * TFAC )
+          AKEQ1 = B( MHNO2 ) * EXP( D( MHNO2 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        CASE ('HNO3')           ! HNO3(aq) <=> NO3- + H+
+        ELSE IF ( ISUB .EQ. HLC_HNO3 ) THEN   ! HNO3(aq) <=> NO3- + H+
 
-          AKEQ1 = B( LHNO3 ) * EXP( D( LHNO3 ) * TFAC )
+          AKEQ1 = B( MHNO3 ) * EXP( D( MHNO3 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        CASE ('CO2')            !   CO2H2O <=> HCO3- + H+
-                                ! & HCO3- <=> CO3= + H+
+        ELSE IF ( ISUB .EQ. HLC_CO2 ) THEN    !   CO2H2O <=> HCO3- + H+
+                                              ! & HCO3- <=> CO3= + H+
 
-          AKEQ1 = B( LCO2 )  * EXP( D( LCO2 )  * TFAC )
-          AKEQ2 = B( LHCO3 ) * EXP( D( LHCO3 ) * TFAC )
+          AKEQ1 = B( MCO2 )  * EXP( D( MCO2 )  * TFAC )
+          AKEQ2 = B( MHCO3 ) * EXP( D( MHCO3 ) * TFAC )
           HLCONST = KH
      &            * ( 1.0 + AKEQ1 * HPLUSI + AKEQ1 * AKEQ2 * HPLUS2I )
 
-        CASE ('H2O2')           ! H2O2(aq) <=> HO2- + H+
+        ELSE IF ( ISUB .EQ. HLC_H2O2 ) THEN   ! H2O2(aq) <=> HO2- + H+
 
-          AKEQ1 = B( LH2O2 ) * EXP( D( LH2O2 ) * TFAC )
+          AKEQ1 = B( MH2O2 ) * EXP( D( MH2O2 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        CASE ('FORMIC_ACID')    ! HCOOH(aq) <=> HCOO- + H+
+        ELSE IF ( ISUB .EQ. HLC_HCOOH ) THEN  ! HCOOH(aq) <=> HCOO- + H+
 
-          AKEQ1 = B( LHCOOH ) * EXP( D( LHCOOH ) * TFAC )
+          AKEQ1 = B( MHCOOH ) * EXP( D( MHCOOH ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        CASE ('HO2')            ! HO2(aq) <=> H+ + O2-
+        ELSE IF ( ISUB .EQ. HLC_HO2 ) THEN    ! HO2(aq) <=> H+ + O2-
 
-          AKEQ1 = B( LHO2 ) * EXP( D( LHO2 ) * TFAC )
+          AKEQ1 = B( MHO2 ) * EXP( D( MHO2 ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        CASE ('NH3')            ! NH4OH <=> NH4+ + OH-
+        ELSE IF ( ISUB .EQ. HLC_NH3 ) THEN    ! NH4OH <=> NH4+ + OH-
 
-          AKEQ1 = B( LNH4OH ) * EXP( D( LNH4OH ) * TFAC )
-          AKEQ2 = B( LH2O ) * EXP( D( LH2O ) * TFAC )
+          AKEQ1 = B( MNH4OH ) * EXP( D( MNH4OH ) * TFAC )
+          AKEQ2 = B( MH2O ) * EXP( D( MH2O ) * TFAC )
           OHION = AKEQ2 * HPLUSI
           HLCONST = KH * ( 1.0 + AKEQ1 / OHION )
 
-        CASE ('HYDRAZINE')      ! HYDRAZINE <=> HYDRAZINE+ + OH-
+        ELSE IF ( ISUB. EQ. HLC_HYDRAZINE ) THEN ! HYDRAZINE <=> HYDRAZINE+ + OH-
 
-          AKEQ1 = B( LHYDRAZINE ) * EXP( D( LHYDRAZINE ) * TFAC )
-          AKEQ2 = B( LH2O ) * EXP( D( LH2O ) * TFAC )
+          AKEQ1 = B( MHYDRAZINE ) * EXP( D( MHYDRAZINE ) * TFAC )
+          AKEQ2 = B( MH2O ) * EXP( D( MH2O ) * TFAC )
           OHION = AKEQ2 * HPLUSI
           HLCONST = KH * ( 1.0 + AKEQ1 / OHION )
 
-        CASE ('ATRA', 'DATRA')  !     ATRA(aq)  <=>  ATRA- + H
-                                !  or DATRA(aq) <=> DATRA- + H
+        ELSE IF ( ISUB. EQ. HLC_ATRA .OR. 
+     &            ISUB .EQ. HLC_DATRA ) THEN  !     ATRA(aq)  <=>  ATRA- + H
+                                              !  or DATRA(aq) <=> DATRA- + H
 
-          AKEQ1   = B( LATRA ) * EXP( D( LATRA ) * TFAC )
+          AKEQ1   = B( MATRA ) * EXP( D( MATRA ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        CASE ( 'CL2' )          ! CL2*H2O <=> HOCL + H + CL
-                                ! HOCL <=>H + OCL
+        ELSE IF ( ISUB .EQ. HLC_CL2 ) THEN    ! CL2*H2O <=> HOCL + H + CL
+                                              ! HOCL <=>H + OCL
 
-          AKEQ1   = B( LCL2 )  * EXP( D( LCL2 ) * TFAC )
-          AKEQ2   = B( LHOCL ) * EXP( D( LHOCL ) * TFAC )
+          AKEQ1   = B( MCL2 )  * EXP( D( MCL2 ) * TFAC )
+          AKEQ2   = B( MHOCL ) * EXP( D( MHOCL ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI * CLMINUSI
      &            + AKEQ1 * AKEQ2 * HPLUS2I * CLMINUSI )
 
-        CASE ( 'HCL' )          ! HCL <=> H+ + CL-
+        ELSE IF ( ISUB .EQ. HLC_HCL ) THEN    ! HCL <=> H+ + CL-
 
-          AKEQ1   = B( LHCL ) * EXP( D( LHCL ) * TFAC )
+          AKEQ1   = B( MHCL ) * EXP( D( MHCL ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        CASE ( 'HOCL' )         ! HOCL <=> H+ + OCL-
+        ELSE IF ( ISUB .EQ. HLC_HOCL ) THEN   ! HOCL <=> H+ + OCL-
 
-          AKEQ1   = B( LHOCL ) * EXP( D( LHOCL ) * TFAC )
+          AKEQ1   = B( MHOCL ) * EXP( D( MHOCL ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        CASE ( 'HBR' )          ! HBR <=> H+ + BR-
+        ELSE IF ( ISUB .EQ. HLC_HBR ) THEN    ! HBR <=> H+ + BR-
 
-          AKEQ1   = B( LHBR ) * EXP( D( LHBR ) * TFAC )
+          AKEQ1   = B( MHBR ) * EXP( D( MHBR ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        CASE ( 'HI' )          ! HI <=> H+ + I-
+        ELSE IF ( ISUB .EQ. HLC_HI ) THEN     ! HI <=> H+ + I-
 
-          AKEQ1   = B( LHI ) * EXP( D( LHI ) * TFAC )
+          AKEQ1   = B( MHI ) * EXP( D( MHI ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        CASE ( 'ACRYACID' )    ! CH3C(O)OH <=> H + CH3C(O)O 
+        ELSE IF ( ISUB .EQ. HLC_ACRYACID ) THEN ! CH3C(O)OH <=> H + CH3C(O)O 
 
-          AKEQ1   = B( LACRYACID ) * EXP( D( LACRYACID ) * TFAC )
+          AKEQ1   = B( MACRYACID ) * EXP( D( MACRYACID ) * TFAC )
           HLCONST = KH * ( 1.0 + AKEQ1 * HPLUSI )
 
-        END SELECT CHECK_NAME
+        END IF 
 
-      END IF
+      END IF  ! EFFECTIVE
 
       RETURN
       END
+      
+      END MODULE HLCONST_MOD

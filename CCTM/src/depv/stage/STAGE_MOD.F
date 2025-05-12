@@ -264,9 +264,9 @@ C-----------------------------------------------------------------
 !------------------------------------------------------------------------------
 ! ******** Calculate deposition velocity for trace gas species ********
 ! 
-! Applies Ohms law and the first Kirshhoff current law to estimate trace gase 
+! Applies Ohms law and the first Kirchhoff current law to estimate trace gas 
 ! dry deposition velocities and canopy/vegetation/soil concentrations following
-! the frame work of Nemitz et al., 2000 and Massad et al 2010
+! the framework of Nemitz et al., 2000 and Massad et al 2010
 ! 
 ! References: 
 !  
@@ -284,6 +284,7 @@ C-----------------------------------------------------------------
          Use MOSAIC_MOD, Only: Tile_Data 
          Use HGSIM
          Use Resist_Funcs
+         Use HLCONST_MOD
 
          Implicit None
 
@@ -308,7 +309,7 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
          Real            :: hplus                   ! H+ in aqueous media
          LOGICAL         :: effective               ! true=compute effective Henry's Law const
          Real            :: scc_pr_23               ! (SCC/PR)**2/3, fn of DIF0
-         Real            :: dif_T, k_vis, dwat_T    ! Trace gase diffusivity, kinematic viscosity of air, and diffusivity of water vapor in air (m2/s)
+         Real            :: dif_T, k_vis, dwat_T    ! Trace gas diffusivity, kinematic viscosity of air, and diffusivity of water vapor in air (m2/s)
 ! Soil properties
          Real            :: sm_v5cm, sm_v1cm        ! Soil moisture at 5 and 1 cm (m3/m3)
          Real            :: sm_vsat                 ! volumetric soil saturation (m3/m3)
@@ -316,7 +317,7 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
          Real            :: sm_vwlt                 ! volumetric wilting point (m3/m3)
          Real            :: sm_vres                 ! volumetric residual water (m3/m3)
          Real            :: sm_bslp                 ! slope of the saturation water retention curve (ratio)
-! meteorologial variables
+! meteorological variables
          Real            :: temp_g, temp_2m  ! Soil and 2m temperature (K)
          Real            :: q_2m             ! water vapor mixing ratio at 2m ()
          Real            :: rh               ! relative humidity (%) and surface friction velocity (m/s) 
@@ -361,7 +362,6 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
          integer         :: i, l, n, s, n_diag
          Logical         :: NH3_hit, O3_hit, Hg_hit ! logical vars for special cases
 
-         Real, External  :: hlconst
 ! Hg bidi variables 
          Real            :: Hg_st, Hg_cut, Hg_grnd, Hg_wat, flux_hgII
    
@@ -449,9 +449,9 @@ C Fuller-Schettler-Giddings (https://doi.org/10.1021/ie50677a007; Table I) Diffu
             flux_ag   = 0.0
             f_wat     = 0.0
             soil_flux = 0.0
-            heff_wat  = hlconst( H_name_all( s ), tw, effective, hplus_h2o )* 0.08205 * tw
-            heff_ap   = hlconst( H_name_all( s ), temp_2m, effective, hplus_ap )
-            heff      = hlconst( H_name_all( s ), temp_2m, effective, hplus )* 0.08205 * temp_2m
+            heff_wat  = hlconst( hlind( s ), tw, effective, hplus_h2o )* 0.08205 * tw
+            heff_ap   = hlconst( hlind( s ), temp_2m, effective, hplus_ap )
+            heff      = hlconst( hlind( s ), temp_2m, effective, hplus )* 0.08205 * temp_2m
             If ( HGBIDI .And. Hg_Hit ) Then
                Call  Get_Hg_Comp( Hg_st, Hg_cut, Hg_grnd, Hg_wat, c_atm, heff_wat, heff, r, c )
             End If
@@ -511,7 +511,7 @@ C Get Ra
                      LU_Emis = c_wat / ( Ra + Rb + Rwat )
                   End If
 
-                  Tile_Data%Lu_Vd( c,r,n,l ) = 1.0 / ( Ra + Rb + Rwat )  
+                  Vd     = 1.0 / ( Ra + Rb + Rwat )  
                   f_wat  = f_wat  + frac_lu * ( c_wat - c_atm ) / ( Ra + Rb + Rwat )   
                Else 
 !-------------------------------------------------------------------------------------------------
@@ -598,24 +598,18 @@ C Calculate Rst
 !-------------------------------------------------------------------------------------------------
 ! Bidirectional exchange
 !-------------------------------------------------------------------------------------------------                                                               
-                     LU_Emis = max( vd * c_atm - LU_Flux, 0.0 )                         ! should always be greater than 0
-                     Tile_Data%Lu_Vd( c,r,n,l ) = vd                                    ! Deposition velocity
+                     LU_Emis = max( vd * c_atm - LU_Flux, 0.0 )                         ! should always be greater than 0                     
                      f_soil = f_soil + frac_lu * ( veg * ( ( c_ll - c_z0 ) / Rgc ) +    ! LU_Flux = f_soil + f_stom + f_cut
      &                                         no_veg * (c_grnd - c_atm)/( Ra + Rg ) )  ! air-soil exchange
                      f_stom = f_stom + frac_lu * veg * ( c_stom - c_leaf ) / Rst        ! air-stomatal exchange
-                     f_cut  = f_cut  + frac_lu * veg * ( c_cut  - c_leaf ) / Rcut       ! air-cuticular exchange
-                  Else
-!-------------------------------------------------------------------------------------------------
-! Non bidirectional exchange
-!-------------------------------------------------------------------------------------------------   
-                     Tile_Data%Lu_Vd( c,r,n,l ) =  vd
                   End If ! compensation points greater than 0
                End If ! Water    
+               Tile_Data%Lu_Vd( c,r,n,l ) =  vd * Tile_Data%Vd_Fac( n )
 ! Generalization of the production and deposition velocity terms
-               Tile_Data%Bidi_Emis( C, R, n ) = Tile_Data%Bidi_Emis( C, R, n )  + 
+               Tile_Data%Bidi_Emis( C, R, n ) = Tile_Data%Bidi_Emis( c, r, n )  + 
      &                                          frac_lu * LU_Emis
-               Tile_Data%Grd_Vd( C, R, n ) = Tile_Data%Grd_Vd( C, R, n ) + 
-     &                           frac_lu * Tile_Data%Lu_Vd( c,r,n,l )
+               Tile_Data%Grd_Vd( C, R, n ) = Tile_Data%Grd_Vd( c, r, n ) + 
+     &                                       frac_lu * Tile_Data%Lu_Vd( c,r,n,l )
             End If ! frac_lu > 0
 
             End Do lu_loop
@@ -961,10 +955,10 @@ C Return dry deposition velocities for aerosols (first layer only).
          DO V = 1, N_AE_DEPV
             NDX = N_GC_DEPV + N_NR_DEPV + N_TR_DEPV + V
             IF ( DEPV_SUR( V ) .GT. 0 ) THEN
-               Tile_Data%Grd_Vd( C,R,NDX )   = VDEP( DEPV_SUR( V ) ) 
-               Tile_Data%Lu_Vd( C,R,NDX,: )  = VDEPJ( :,DEPV_SUR( V ) )
+               Tile_Data%Grd_Vd( C,R,NDX )   = VDEP( DEPV_SUR( V ) )    * Tile_Data%Vd_Fac( NDX )
+               Tile_Data%Lu_Vd( C,R,NDX,: )  = VDEPJ( :,DEPV_SUR( V ) ) * Tile_Data%Vd_Fac( NDX )
             ELSE
-               Tile_Data%Grd_Vd( C,R,NDX ) = 0.0
+               Tile_Data%Grd_Vd( C,R,NDX )   = 0.0
                Tile_Data%Lu_Vd( C,R,NDX,: )  = 0.0  
             END IF 
          END DO

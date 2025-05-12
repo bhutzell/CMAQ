@@ -1,0 +1,5 @@
+cmaqsatproc ~=0.2, >=0.4.1
+geopandas
+xarray
+netcdf4
+pycno

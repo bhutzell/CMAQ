@@ -1,7 +1,7 @@
 #! /bin/csh -f
 
-# ====================== COMBINE_v5.4.X Run Script =================== 
-# Usage: run.combine.uncoupled.csh >&! combine.log &                                
+# ====================== COMBINE_v5.5.X Run Script =================== 
+# Usage: run_combine.csh >&! combine.log &                                
 #
 # To report problems or request help with this script/program:     
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -21,9 +21,9 @@
  source ./config_cmaq.csh
        
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v54              #> Code Version
+ set VRSN      = v55               #> Code Version
  set PROC      = mpi               #> serial or mpi
- set MECH      = cb6r3_ae7_aq      #> Mechanism ID
+ set MECH      = cb6r5_ae7_aq      #> Mechanism ID
  set APPL      = Bench_2016_12SE1        #> Application Name (e.g. Gridname)
                                                       
 #> Define RUNID as any combination of parameters above or others. By default,
@@ -56,6 +56,11 @@
 
 # =====================================================================
 #> COMBINE Configuration Options
+#> The purpose of this example run script is to create two output files
+#> (COMBINE_ACONC and COMBINE_DEP) often used for model evaluation 
+#> purposes. This is accomplished by setting up two loops, each with
+#> its own definitions of SPECIES_DEF and day-specific input files before 
+#> calling the COMBINE executable. 
 # =====================================================================
 
 #> Set Start and End Days for looping
@@ -63,7 +68,7 @@
  set END_DATE   = "2016-07-14"     #> ending date    (July 14, 2016)
  
 #> Set location of species definition files for concentration and deposition species.
- setenv SPEC_CONC $CMAQ_HOME/POST/combine/scripts/spec_def_files/SpecDef_${MECH}.txt
+ setenv SPEC_CONC $CMAQ_HOME/POST/combine/scripts/spec_def_files/SpecDef_Conc_${MECH}.txt
  setenv SPEC_DEP  $CMAQ_HOME/POST/combine/scripts/spec_def_files/SpecDef_Dep_${MECH}.txt
 
 #> Use GENSPEC switch to generate a new specdef file (does not generate output file).
@@ -71,7 +76,9 @@
 
 
 # =====================================================================
-#> Begin Loop Through Simulation Days to Create ACONC File
+#> Begin First Loop Through Simulation Days to Create COMBINE_ACONC File
+#> Set up the SPECIES_DEF, INFILEx, and OUTFILE environment variables
+#> for COMBINE_ACONC processing
 # =====================================================================
 
 #> Set the species definition file for concentration species.
@@ -94,7 +101,7 @@
 
   #> Define name of combine output file to save hourly average concentration.
   #> A new file will be created for each month/year.
-   setenv OUTFILE ${POSTDIR}/COMBINE_ACONC_${RUNID}_$YYYY$MM.nc
+   setenv OUTFILE ${POSTDIR}/COMBINE_AELMO_${RUNID}_$YYYY$MM.nc
 
   #> Define name of input files needed for combine program.
   #> File [1]: CMAQ conc/aconc file
@@ -117,7 +124,9 @@
 
 
 # =====================================================================
-#> Begin Loop Through Simulation Days to Create DEP File
+#> Begin Second Loop Through Simulation Days to Create COMBINE_DEP File
+#> Set up the SPECIES_DEF, INFILEx, and OUTFILE environment variables
+#> for COMBINE_DEP processing
 # =====================================================================
 
 #> Set the species definition file for concentration species.

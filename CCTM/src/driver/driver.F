@@ -101,6 +101,10 @@ C   02 Aug 19 F. Sidi: Restored serial processing option
 C   03 AUG 19 D.Wong:  Modified code to work with two-way model
 C   09 Sep 19 F. Sidi: Replaced L_CONC_WVEL & L_ACONC_WVEL (depreciated) with W_VEL
 C   21 Nov 19 S.L.Napelenok: Include DDM3D for versions 5.3.1
+C   10 Jan 24 D. Wong: Incorporated unified coupler implementation
+C   04 Mar 25 D. Wong: Eliminated two optional arguments: model_xcent and model_ycent,
+C                      where the same information can be obtained from WRF structure
+C                      config_flags that is passed to subroutine twoway_aqprep
 C-----------------------------------------------------------------------
 
       USE RXNS_DATA             ! chemical mechanism data
@@ -110,8 +114,9 @@ C-----------------------------------------------------------------------
       USE WVEL_DEFN             ! derived vertical velocity component
       USE BUDGET_DEFN
       USE AERO_DATA
-      USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP
-      USE ELMO_PROC, ONLY : ELMO_DRIVER, WRITE_ELMO, MAP_ELMO
+      USE SOA_DEFN, ONLY : MAP_OA
+      USE ELMO_DATA, ONLY : L_ELMO, ELMO_NSTEP, ELMO_INIT_SHARED
+      USE ELMO_PROC, ONLY : ELMO_DRIVER
       USE UTILIO_DEFN
       USE util_Family_module
       USE RUNTIME_VARS
@@ -128,6 +133,9 @@ C-----------------------------------------------------------------------
       use lus_defn
       use mio_module
 #else
+#ifdef twoway
+      use coupler_module, only : coupled_model_stdate, coupled_model_sttime
+#endif
       USE PCGRID_DEFN           ! inherits GRID_CONF
       USE AVG_CONC              ! integral average CONC
       USE PA_DEFN, Only: LIPR, LIRR  ! Process Anaylsis control and data variables
@@ -165,6 +173,7 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
 #endif   ! end mpas
 
       USE MIO_ASCII
+      USE HLCONST_MOD
 
       IMPLICIT NONE
 
@@ -344,8 +353,12 @@ C-----------------------------------------------------------------------
 #endif
 
 #ifdef twoway
+         coupled_model_stdate = MODEL_STDATE
+         coupled_model_sttime = MODEL_STTIME
+
          TSTEP( 1 ) = LOCAL_TSTEP
          TSTEP( 3 ) = SEC2TIME(MODEL_TSTEP)
+
 #else
          TSTEP( 1 ) = MODEL_TSTEP
 #endif
@@ -432,6 +445,12 @@ C Initialize ddm3d calculations
 #endif
 
         CALL MAP_AERO()
+        CALL MAP_OA()
+
+
+C Initialize Global Arrays for Storing Chemical, Regional, Process,
+C and Emission Stream Families
+         call read_families
 
 #ifdef verbose_driver
          write( logdev,* ) ' MYPE -> NSPCS:    ', mype, nspcsd
@@ -499,10 +518,6 @@ C Initalize CONC definitions (in STD_CONC F90 module)
 C Get avg CONC definitions, species and layer pointers (in AVG_CONC F90 module)
          CALL A_CONC_DEFN ()
 
-C Miscellaneous Configuration Operations
-         WRITE( LOGDEV, * )
-         CALL LOG_HEADING( LOGDEV, "Configure Scenario" )
-
 #ifdef isam
 c        CALL GET_SA_LAYS ()
          CALL SA_DIM()
@@ -545,19 +560,12 @@ C Initialize ddm3d calculations
 #endif  ! end of mpas
 
 
-C Initialize Global Arrays for Storing Chemical, Regional, Process,
-C and Emission Stream Families
-         call read_families
-
 C Initiliaze IO Arrays and Open Files
 #ifdef mpas
          call centralized_io_init (NCOLS_IN)
 #else
          call centralized_io_init
 #endif
-
-C Initialize ELMO Arrays and Maps
-         call map_elmo
 
 C Initialize conc field: Copy IC's to CONC file as step 0
 C Convention: the input file concentration units are always ppmV.
@@ -570,6 +578,7 @@ C Convention: the input file concentration units are always ppmV.
 #endif
 
 #ifndef mpas
+         CALL LOG_HEADING( LOGDEV, "Check Initial Concentrations" )
          CALL CKSUMMER ( 'INITSCEN', CGRID, JDATE, JTIME )
 
          IF ( LIPR .OR. LIRR ) CALL PA_INIT ( CGRID, JDATE, JTIME, TSTEP )
@@ -649,6 +658,10 @@ C Convention: the input file concentration units are always ppmV.
 
 #endif
 
+C Initialize Shared Global Output Variables used for 
+C ELMO (e.g. AOD, extinction, Kz, etc.)
+         CALL ELMO_INIT_SHARED()
+
 C Initialize Meteorology Structures
          CALL INIT_LSM( JDATE, JTIME )
 #ifndef mpas
@@ -660,10 +673,11 @@ C Initialize Meteorology Structures
 
          IF ( W_VEL ) CALL GET_WVEL( JDATE, JTIME ) ! If the user wants vertical velocity written to file, retrieve it.
 
+         call hlconst_init
+
          FIRST_RUN = .FALSE.
 
 C Main processing loop:
-         IF ( MYPE .EQ. 0 ) WRITE( OUTDEV, * )
          IF ( MYPE. EQ. 0 ) CALL LOG_HEADING( OUTDEV, "Time Integration" )
 
       END IF ! first_run
@@ -679,8 +693,8 @@ C Main processing loop:
 
       DO L = 1, NLAYS
          DO C = 1, NCOLS
-            CGRID( C,1,L,1:N_GC_SPC ) = cmaq_species( c,1,l,1:N_GC_SPC )
-            CGRID( C,1,L,N_GC_SPC+2:v ) = cmaq_species( c,1,l,N_GC_SPC+1:v-1 )
+            CGRID( C,1,L,1:N_GC_SPC )   = coupler_m2a_dr_3d_data( c,1,l,1:N_GC_SPC,1 )
+            CGRID( C,1,L,N_GC_SPC+2:v ) = coupler_m2a_dr_3d_data( c,1,l,N_GC_SPC+1:v-1,1 )
          END DO
       END DO
 
@@ -763,34 +777,18 @@ C Main processing loop:
       END IF
 #endif
 
-      ! Compute ELMO Values at Beginning of Main Time Step
-      IF ( L_ELMO ) THEN
-        IF ( JDATE .EQ. STDATE .AND. JTIME .EQ. STTIME ) THEN
-
-             ! Calculate all ELMO variables for both Instantaneous and
-             ! Average parameters
-             CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.TRUE.)
-             ! Print Instantaneous Values at first time step
-             CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.TRUE. )
-
-        ELSE IF ( ELMO_NSTEP .LT. 1.0 ) THEN
-             ! Calculate all ELMO Variables for averaging but do not output them
-             CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
-        END IF
-      END IF
-
-      ! Initialize Budget Output File and Concentration Array
-      IF ( BUDGET_DIAG ) CALL BUDGET_INIT( CGRID, JDATE, JTIME, TSTEP )
-
-
 C Initialize Modules
       IF ( L_INIT ) THEN
           L_INIT = .FALSE.
           call init_cctm_modules( CGRID, JDATE, JTIME, TSTEP, ASTEP )
           if ( MYPE .EQ. 0 .AND. CTM_MIO_FILE ) call write_mio_ascii( 'mio_file_input' )
 
-C Initialize MIO - placeholder
-!         call mio_init
+          CALL LOG_HEADING( LOGDEV, 'Time Integration' )
+
+      ELSE IF ( L_ELMO .AND. ELMO_NSTEP .LT. 1.0 ) THEN
+          ! Calculate all ELMO Variables for averaging but do not output them
+          CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN=.FALSE. )
+
       END IF
 
       ! science process sequence:
@@ -845,7 +843,7 @@ C Initialize MIO - placeholder
 
 #endif
          ! Output ELMO Diagnostic Information
-         IF ( L_ELMO ) CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
+         IF ( L_ELMO ) CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, INIT_TIME_IN=.FALSE. )
 
       END DO
 
@@ -927,7 +925,7 @@ C Write Data to Output Files
          CALL WR_ASENS ( JDATE, JTIME, TSTEP( 1 ) )
 #endif
          ! Write output generated from ELMO module
-         IF ( L_ELMO ) CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
+         IF ( L_ELMO ) CALL WRITE_ELMO( JDATE, JTIME, TSTEP, .FALSE. )
 
          ! Write out process analysis and budget diagnostics
          IF ( LIPR .OR. LIRR ) CALL PA_OUTPUT ( CGRID, JDATE, JTIME )

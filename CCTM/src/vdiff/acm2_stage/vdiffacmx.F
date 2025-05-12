@@ -57,6 +57,7 @@ C-----------------------------------------------------------------------
       USE VDIFF_DIAG, NLPCR => NLPCR_MEAN
       USE HGRD_DEFN,only : COLSX_PE, ROWSX_PE
       USE BDSNP_MOD, ONLY: GET_N_DEP
+      USE ELMO_DATA, ONLY : L_ELMO
 
 #ifdef isam
       USE SA_DEFN, ONLY: N_SPCTAG, ISAM, VNAM_SPCTAG, TRANSPORT_SPC,
@@ -571,8 +572,7 @@ C-----------------------------------------------------------------------
          EMIS_OVER_VD = 0.0
          DO V = 1, N_SPC_DEPV
             DDBF( V )   = DDEP( V,C,R )
-            DEPVCR( V ) = Tile_Data%Vd_Fac( Tile_Data%dep2vdiff( V ) ) * 
-     &                    Tile_Data%Grd_Vd( C,R,Tile_Data%dep2vdiff( V ) )
+            DEPVCR( V ) = Tile_Data%Grd_Vd( C,R,Tile_Data%dep2vdiff( V ) )
             DD_FAC( V ) = DTDENS1 * DD_CONV( V ) * DEPVCR( V )
             EFAC1 ( V ) = EXP( -DEPVCR( V ) * RP )
             EFAC2 ( V ) = EXP( -DEPVCR( V ) * RQ )
@@ -643,8 +643,7 @@ C ----------------------------------------------------------------------
          IF ( XMOSAIC ) THEN
             DDBFJ( :,: )   = DDEPJ( :,:,C,R )           
             DO L = 1, Tile_Data%n_lufrac
-               DEPVJCR( L,: ) = Tile_Data%Vd_Fac( Tile_Data%dep2vdiff ) * 
-     &                          Tile_Data%Lu_Vd( C,R,Tile_Data%dep2vdiff,L )
+               DEPVJCR( L,: ) = Tile_Data%Lu_Vd( C,R,Tile_Data%dep2vdiff,L )
                DD_FACJ( L,: ) = DTDENS1 * DD_CONV( : ) * DEPVJCR( L,: )
             END DO
          END IF
