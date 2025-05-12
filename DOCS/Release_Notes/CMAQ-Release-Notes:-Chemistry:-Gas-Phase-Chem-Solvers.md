@@ -4,7 +4,7 @@
 
 **Release Version/Date**: CMAQ version 6.0
 
-**Description** The update removes losses emission tracers of formaldehyde, acetaldehyde, and acrolein emissions tracers via a monatomic chlroine reaction in default versions of cracmm based mechanism, i.e., cracmm3 or lower. Why? The cracmm3 does include monoatomic chlorine but does not include reactions between formaldehyde, acetaldehyde, and acrolein. The update has an exception the marine version of cracmm3, cracmm3m, because the mehaniism does include reactions between formaldehyde, acetaldehyde, and acrolein.
+**Description** The update removes losses emission tracers of formaldehyde, acetaldehyde, and acrolein emissions tracers via a monatomic chlorine reaction in default versions of cracmm based mechanism, i.e., cracmm3 or lower. Why? The cracmm3 does include monoatomic chlorine but does not include reactions between formaldehyde, acetaldehyde, and acrolein. The update has an exception the marine version of cracmm3, cracmm3m, because the mehaniism does include reactions between formaldehyde, acetaldehyde, and acrolein.
 
 **Significance and Impact**: The update increases predictions emission tracers of formaldehyde, acetaldehyde, and acrolein emissions in the cracmm3haps mechanism so predictions from the cracmm3haps mechanism will incorrectly represent the amount secondary production in concentrations in total concentrations of formaldehyde, acetaldehyde, and acrolein.
 
