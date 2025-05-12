@@ -476,7 +476,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &                STAT = ASTAT )
            CALL CHECKMEM( ASTAT, 'CNGRD', PNAME )
          END IF
-         
+
          ! Set layer thickenesses
          CONVDD = 1.0 / ABS ( VGLVS_GD( 2 ) - VGLVS_GD( 1 ) ) 
 

@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /home/bhutzell/CCTM_git_repository/UTIL/chemmech/input/saprc07tic_ae7i_aq/mech_saprc07tic_ae7i_aq.def
+! Source file: /work/MOD3DEV/tskipper/cmaq_testing/20250314_chemmech_no_oxygen_atoms/UTIL/chemmech/input/saprc07tic_ae7i_aq/mech_saprc0
 ! for Mechanism Name: SAPRC07TIC_AE7I_AQ              
 
 ! This file is used to create mechanism data and functions
@@ -1797,13 +1797,13 @@
      &     45,  608/
       REAL( 8 ),    PARAMETER :: ATM_H2 = 5.60000D-01
 
-      INTEGER, PARAMETER :: N_ATOMS =  15
+      INTEGER, PARAMETER :: N_ATOMS =  14
       CHARACTER( 16 )    :: ATOMS( N_ATOMS )
 
       DATA ( ATOMS( IRXXN ), IRXXN = 1, N_ATOMS ) / & 
      &   'CA', 'MN', 'CL', 'HG', 'BR', 'NA', & 
      &   'SI', 'S ', 'TI', 'FE', 'K ', 'I ', & 
-     &   'N ', 'C ', 'O '/
+     &   'N ', 'C '/
       REAL( 8 )            :: CHEM_SPC_ATOMS( NUMB_MECH_SPC,N_ATOMS ) = 0.0D0 
 
       INTEGER, PARAMETER :: MXPRD =  26
