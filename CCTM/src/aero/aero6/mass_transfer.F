@@ -578,21 +578,29 @@ C     N.B: these are for a "wet" size distribution
       CINORG = 0.0
       CFINAL = 0.0
 
-C *** For Hybrid approach, calculate dynamic mass trasfer for
-C     semi-volatile components of coarse mode (NO3, CL, NH4)  
+C *** DYNAMIC AEROSOL MODES:
+C     Begin mass transfer calculations for aerosol modes using
+C     a dynamic approach that solves for vapor pressures and
+C     integrates fluxes across time.
+      
+      DO IMODE = 1,N_MODE
+        IF ( .NOT. L_MODE_EQB( IMODE ) ) THEN
+  
+          ! For Hybrid approach, calculate dynamic mass trasfer for
+          ! semi-volatile components of coarse mode (NO3, CL, NH4)  
+          IF ( AEROMODE(IMODE)%COARSE_MASK .AND. .NOT. DO_COARSE_MT ) CYCLE
 
-      IF ( DO_COARSE_MT ) THEN 
+          CNTRL( 1 ) = 1.0D0 ! reverse problem (WI contains only aerosol)
+          CNTRL( 2 ) = 1.0D0 ! aerosol in metastable state
 
-         CNTRL( 1 ) = 1.0D0 ! reverse problem (WI contains only aerosol)
-         CNTRL( 2 ) = 1.0D0 ! aerosol in metastable state
-
-         INT_TIME = 0.0D0
-         TSTEP    = 90.0D0
-         ISTEP    = 1
-         IMODE    = 3
-         TrustIso = .TRUE.
+          INT_TIME = 0.0D0
+          TSTEP    = AERO_DYN_TSTEP
+          ISTEP    = 1
+          TrustIso = .TRUE.
  
-         DO WHILE ( INT_TIME .LT. DELT ) 
+          ! Begin sub-time step iteration for dynamic mass transfer
+          ! calculations
+          DO WHILE ( INT_TIME .LT. DELT ) 
 
             IF ( INT_TIME + TSTEP .GT. DELT ) TSTEP = DELT - INT_TIME 
             INT_TIME = INT_TIME + TSTEP 
