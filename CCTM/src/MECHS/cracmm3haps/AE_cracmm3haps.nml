@@ -7,7 +7,7 @@ AE_SPECIES_DATA =
 'ANH4'      , 18.00 ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'NH4'        , 1  ,'NH4'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Ammonium ion,E,DTXSID5043974,[NH4+]
 'ANO3'      , 62.00 ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'NO3'        , 1  ,'NO3'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Nitrate ion,E,DTXSID5024217,[N+](=O)([O-])[O-]
 'ASOAT'     ,200.00 ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!3;4;5;6;7-Pentahydroxyheptan-2-one,L,DTXSID80956455,CC(=O)C(C(C(C(CO)O)O)O)O
-'AGLY'      , 66.40 ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!2-(4;5-dihydroxy-1;3-dioxolan-2-yl)-1;3-dioxolane-4;5-diol,L,NA,OC2OC(C1OC(O)C(O)O1)OC2O
+'AGLYOLIG'  , 66.40 ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!2-(4;5-dihydroxy-1;3-dioxolan-2-yl)-1;3-dioxolane-4;5-diol,L,NA,OC2OC(C1OC(O)C(O)O1)OC2O
 'AHOM'      ,250.00 ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'AELHOM'    ,402.00 ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'AORGC'     ,177.00 ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'AORGC'    ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!2-(4;5-dihydroxy-1;3-dioxolan-2-yl)-1;3-dioxolane-4;5-diol,L,NA,OC2OC(C1OC(O)C(O)O1)OC2O
@@ -59,6 +59,7 @@ AE_SPECIES_DATA =
 'ATRPN'     ,215.0  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'AHONIT'    ,265.0  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'ASEAST'    ,31.30  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'PRI'        , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Sea salt tracer,L,NA,NA
+'AMTN1'     ,262.0  ,F      ,T     ,F      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'ORG'        , 1  ,'SOA'      ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!NA,NA,NA,NA
 'ANI'     , 58.70   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Nickel,E,DTXSID2020925,[Ni]
 'ACR_VI'  , 52.00   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Chromium Hexavalent,E,DTXSID7023982,[Cr+6]
 'ACR_III' , 52.00   ,T      ,T     ,T      ,''     ,'' ,-1     ,'' ,-1     ,'VMASS'     , 1  ,'TRACER'     , 1  ,'TRACER'   ,'Yes'   ,'Yes'   ,'Yes'   ,'Yes',!Chromium Trivalent,E,DTXSID2023981,[Cr+3]
