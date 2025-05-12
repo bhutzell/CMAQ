@@ -728,7 +728,7 @@ CMPST =
 
 'NTR'         , 'Organic Nitrates',
                 'ppmV', 'GAS',
-                'ONIT+ISON+INALD+VTRPN+VHONIT+VMTN1',
+                'ONIT+ISON+INALD+VTRPN+VHONIT',
 
 'PANS'        , 'Peroxy-Acetyl Nitrates',
                 'ppmV', 'GAS',
@@ -895,7 +895,7 @@ CMPST =
 
 'PMF_MTSOA'   , 'Fine-Mode Monoterpene SOA excl Nitrates',
                 'ug m-3', 'FINE',
-                'AHOM + AELHOM',
+                'AHOM + AELHOM + AMTN1',
 
 'PMF_TC'      , 'Total Carbon (OC + EC)',
                 'ug m-3', 'FINE', 
@@ -1146,7 +1146,7 @@ CMPST =
 !-- Nitrate --!
 'NOY'         , 'NOy Concentration',
                 'ppmV', 'TSP',
-                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + HNO4 + PAN + PPN + MPAN + ISON + INALD + IPX + VTRPN + ONIT + VHONIT + VMTN1 + CLNO + CLNO2 + CLNO3',
+                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + HNO4 + PAN + PPN + MPAN + ISON + INALD + IPX + VTRPN + ONIT + VHONIT + CLNO + CLNO2 + CLNO3',
 
 'NOZ'         , 'NOz Concentration',
                 'ppmV', 'TSP',
@@ -1198,11 +1198,11 @@ CMPST =
 !-- Organic Nitrates --!
 'DD_NTR'      , 'Dry Dep of Organic Nitrates',
                 'kg ha-1', 'DEP',
-                'DD_ONIT + DD_ISON + DD_VTRPN + DD_INALD + DD_VHONIT + DD_VMTN1',
+                'DD_ONIT + DD_ISON + DD_VTRPN + DD_INALD + DD_VHONIT',
 
 'WD_NTR'      , 'Wet Dep of Organic Nitrates',
                 'kg ha-1', 'DEP',
-                'WD_ONIT + WD_ISON + WD_VTRPN + WD_INALD + WD_VHONIT + WD_VMTN1',
+                'WD_ONIT + WD_ISON + WD_VTRPN + WD_INALD + WD_VHONIT',
 
 !-- PAN --!
 'DD_PANT'     , 'Dry Dep of Total PAN',
@@ -1519,11 +1519,11 @@ CMPST =
 
 'DD_OXN_ORGN' , 'Dry Dep of Oxidized Nitrogen from Organic Nitrate',
                 'kgN ha-1', 'DEP',
-                '0.11765*DD_ONIT + 0.09524*DD_ISON + 0.06512*DD_VTRPN + 0.07176*DD_INALD + 0.05283*DD_VHONIT + 0.05344*DD_VMTN1',
+                '0.11765*DD_ONIT + 0.09524*DD_ISON + 0.06512*DD_VTRPN + 0.07176*DD_INALD + 0.05283*DD_VHONIT',
 
 'WD_OXN_ORGN' , 'Wet Dep of Oxidized Nitrogen from Organic Nitrate',
                 'kgN ha-1', 'DEP',
-                '0.11765*WD_ONIT + 0.09524*WD_ISON + 0.06512*WD_VTRPN + 0.07176*WD_INALD + 0.05283*WD_VHONIT + 0.05344*WD_VMTN1',
+                '0.11765*WD_ONIT + 0.09524*WD_ISON + 0.06512*WD_VTRPN + 0.07176*WD_INALD + 0.05283*WD_VHONIT',
 
 'DD_OXN_OTHR' , 'Dry Dep of Oxidized Nitrogen from Other Components',
                 'kgN ha-1', 'DEP',
