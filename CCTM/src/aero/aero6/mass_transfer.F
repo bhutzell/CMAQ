@@ -905,8 +905,11 @@ C     equilibrium. These are often fine modes.
             IF ( DVOLINORG( K ) .LT. 0.0D0 ) THEN
               KAER = GTTR( K )%KAER
               IAER = MAP_INORGtoAERO( KAER )
-              DVOLMAX = -SUM(REAL( AEROSPC_CONC( IAER,: ), 8 ), MASK=L_MODE_EQB(:) ) * 
-     &                   CFAC_AER(KAER) + EVAPMIND
+              DVOLMAX = EVAPMIND
+              DO IMODE = 1,N_MODE
+                 IF ( L_MODE_EQB( IMODE ) ) 
+     &              DVOLMAX = DVOLMAX - REAL( AEROSPC_CONC( IAER,IMODE ), 8 ) * CFAC_AER(KAER)
+              END DO
               DVOLINORG( K ) = MAX( DVOLINORG( K ), DVOLMAX )
             END IF
          END IF
@@ -948,7 +951,9 @@ C     equilibrium. These are often fine modes.
       ENDDO
 
       ! Initialize Final Concentrations
-      CFINAL = 0.0
+      DO IMODE = 1,N_MODE
+        IF ( L_MODE_EQB( IMODE ) ) CFINAL( :,IMODE ) = 0.0
+      END DO
 
       ! Calculate Final Concentrations
       DO ISP = 1, NGAS

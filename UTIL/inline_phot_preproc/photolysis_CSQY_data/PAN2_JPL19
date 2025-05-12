@@ -1,0 +1,50 @@
+PAN2_JPL19
+! PAN + HV = MO2 + NO3  
+! Absorption x-section from JPL19 pages 4-124 (Table 4D-21) - data at 298K used
+! Source: Chemical Kinetics and Photochemical Data for Use in Atmospheric Studies, Evaluation No.
+!         19," JPL Publication 19-5, Jet Propulsion Laboratory, Pasadena,
+!         2019 http://jpldataeval.jpl.nasa.gov (May 2020)
+! Quantum yield data are from Calvert et al., 2008 Recommendations; pages 820
+!   Calvert, J.G., R.G Derwent, J.J. Orlando, G.S. Tyndall and T.J Wallington,
+!     Mechanisms of Atmospheric Oxidation of the Alkanes, Oxford, 2008.
+! Supplied by Dr. William Stockwell, reformatted by Dr. Golam Sarwar to make it compatible with CMAQ
+Points 
+! With FAC, units are (cm^2/molecule)
+FAC=1.0
+278	1.74E-20	0.290
+280	1.46E-20	0.299
+282	1.21E-20	0.305
+284	1.01E-20	0.314
+286	8.10E-21	0.322
+288	6.48E-21	0.330
+290	5.37E-21	0.338
+292	4.47E-21	0.345
+294	3.69E-21	0.354
+296	2.97E-21	0.362
+298	2.45E-21	0.369
+300	1.89E-21	0.378
+302	1.52E-21	0.385
+304	1.25E-21	0.393
+306	9.98E-22	0.402
+308	8.16E-22	0.410
+310	6.66E-22	0.418
+312	5.38E-22	0.425
+314	4.62E-22	0.434
+316	3.63E-22	0.442
+318	3.00E-22	0.450
+320	2.52E-22	0.458
+322	1.99E-22	0.465
+324	1.66E-22	0.474
+326	1.40E-22	0.482
+328	1.17E-22	0.490
+330	1.06E-22	0.498
+332	8.57E-23	0.505
+334	7.20E-23	0.514
+336	6.10E-23	0.522
+338	5.00E-23	0.530
+340	4.20E-23	0.537
+342	3.50E-23	0.545
+344	2.90E-23	0.554
+346	2.40E-23	0.563
+348	2.00E-23	0.568
+350	1.60E-23	0.575
