@@ -510,7 +510,15 @@ C.. Tracer for formaldehyde emissions
                BI_ACT(1:3,35)  = (/ -1.25D2, 2.431D3,  3.0D1 /)  
                PHOTO_NAME(1:2,35 ) = (/"HCHO_MOL_JPL19","HCHO_RAD_JPL19" /)
                A_PHOTO(1:2,35)     = 1.0D0
-            ELSE ! cracmm1 by default
+            ELSE IF( INDEX(MECHNAME,'CRACMM3M') .GT. 0 )THEN
+               BICAUSE(1:3,35) = (/'HO ', 'NO3', 'CL1'/)
+               BIRATE(1:3,35)  = (/  5.5D-12, 2.0D-12, 8.10D-11 /) 
+               BI_ACT(1:3,35)  = (/  -1.25D2,  2.44D3, 3.0D1 /)   
+               PHOTO_NAME(1:2,35 ) = (/"HCHO_MOL_JPL19","HCHO_RAD_JPL19" /)
+               A_PHOTO(1:2,35)     = 1.0D0
+            ELSE ! cracmm by default
+C..Note that cracmm3 chemistry includes CL as species but it not does react with formaldehyde
+C..so use CL1 to prevent loss process but keep information if needed in future development
                BICAUSE(1:3,35) = (/'HO ', 'NO3', 'CL '/)
                BIRATE(1:3,35)  = (/  5.5D-12, 2.0D-12, 8.10D-11 /) 
                BI_ACT(1:3,35)  = (/  -1.25D2,  2.44D3, 3.0D1 /)   
@@ -538,9 +546,17 @@ C.. Tracer for acetaldehyde emissions
               BI_ACT(1:3,36)   = (/   -3.45D2,   1.9D3,    0.0D0 /)
               PHOTO_NAME(1:1,36 ) = (/"CH3CHO_RACM2"/)
               A_PHOTO(1:1,36)     = 1.0D0
-            ELSE ! cracmm1 by default
+            ELSE IF( INDEX(MECHNAME,'CRACMM3M') .GT. 0 )THEN 
               BICAUSE(1:3,36)  = (/     'HO ',   'NO3',     'CL ' /)
-              BIRATE(1:3,36)   = (/   4.7D-12, 1.4D-12, 7.90D-11 /)
+              BIRATE(1:3,36)   = (/   4.7D-12, 1.4D-12, 8.00D-11 /)
+              BI_ACT(1:3,36)   = (/   -3.45D2,   1.9D3,    0.0D0 /)
+              PHOTO_NAME(1:1,36 ) = (/"CH3CHO_RACM2"/)
+              A_PHOTO(1:1,36)     = 1.0D0
+            ELSE ! cracmm by default
+C..Note that cracmm3 chemistry includes CL as species but it not does react with acetaldehyde
+C..so use CL1 to prevent loss process but keep information if needed in future development
+              BICAUSE(1:3,36)  = (/     'HO ',   'NO3',     'CL1' /)
+              BIRATE(1:3,36)   = (/   4.7D-12, 1.4D-12, 8.00D-11 /)
               BI_ACT(1:3,36)   = (/   -3.45D2,   1.9D3,    0.0D0 /)
               PHOTO_NAME(1:1,36 ) = (/"CH3CHO_RACM2"/)
               A_PHOTO(1:1,36)     = 1.0D0
@@ -556,8 +572,14 @@ C.. Tracer for acrolein emissions
                BICAUSE(1:5,37)  = (/   'OH ',    'O3 ',    'NO3',     'CL ',     'O3P'/)
                BIRATE(1:5,37)   = (/ 2.0D-11, 2.37D-15, 1.18D-15, 2.94D-10, 2.37D-12/)
                BI_ACT(1:5,37)   = (/  0.00D0,  2.528D3,    0.0D0,    0.0D0,    0.0D0/)
-            ELSE  ! cracmm1 by default
+            ELSE IF( INDEX(MECHNAME,'CRACMM3M') .GT. 0 )THEN
                BICAUSE(1:4,37)  = (/    'HO ',     'O3 ',    'NO3',     'CL '/)
+               BIRATE(1:4,37)   = (/ 8.0D-12, 2.90D-19, 3.40D-15, 2.23D-10/)
+               BI_ACT(1:4,37)   = (/  -3.8D2,    0.0D0,    0.0D0,    0.0D0/)
+            ELSE  ! cracmm by default
+C..Note that cracmm3 chemistry includes CL as species but it not does react with acrolein
+C..so use CL1 to prevent loss process but keep information if needed in future development
+               BICAUSE(1:4,37)  = (/    'HO ',     'O3 ',    'NO3',     'CL1'/)
                BIRATE(1:4,37)   = (/ 8.0D-12, 2.90D-19, 3.40D-15, 2.23D-10/)
                BI_ACT(1:4,37)   = (/  -3.8D2,    0.0D0,    0.0D0,    0.0D0/)
             END IF
