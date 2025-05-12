@@ -425,7 +425,7 @@ C Return From Initialization
      &                       MAP_DIFFtoSA, ISAM_SPEC, NSPC_SA,
      &                       ISAMRGN_TEMP, ISAMRGN, ISAMRGN_NUM,
      &                       ISAMRGN_MAP, TAGS_PER_STREAM,
-     &                       ISAM_PVO3_MAP, L_OZONE
+     &                       ISAM_PVO3_MAP, L_OZONE, TAGNAME
          USE VDIFF_MAP, ONLY : DIFF_MAP, DIFF_SPC
 #endif
 
@@ -470,7 +470,7 @@ C Local Variables:
 
 #ifdef isam
          INTEGER                    :: IDX, SPC, LAYER, RGN, IRGN
-         CHARACTER(96)              :: TXTSTRING
+         CHARACTER(1024)            :: TXTSTRING
          REAL                       :: MINCHECK, TOTAL
 #endif
 C-----------------------------------------------------------------------
@@ -603,6 +603,17 @@ C Map the user specified ISAM regions to available CMAQ regions
                 END IF
               END DO
 
+            END DO
+
+            WRITE(LOGDEV,*) "ISAM tag Definitions in the control file:"
+            WRITE(LOGDEV,*) "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+            DO ITAG = 1, NTAG_SA-3
+              WRITE(LOGDEV,'(a,1x,i4,1x,a)')"Tag", ITAG, TAGNAME(ITAG)
+              WRITE(LOGDEV,'(a,*(1x,a,:,","))')"Streams:",(TRIM(TAGSTREAMS(ITAG,ISRM)),ISRM=1,TAGSTREAMS_NUM(ITAG))
+              WRITE(LOGDEV,'(a,*(1x,a,:,","))')"Regions:",(TRIM(ISAMRGN(ITAG,ISRM)),ISRM=1,ISAMRGN_NUM(ITAG))
+            END DO
+            DO ITAG = NTAG_SA-2, NTAG_SA
+              WRITE(LOGDEV,'(a,1x,i4,1x,a)')"Tag", ITAG, TAGNAME(ITAG)
             END DO
 
 #endif
