@@ -1,5 +1,32 @@
 # STAGE
 
+### Runtime Deposition Options
+[Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
+**Type of update**:  Science Update, Documentation  
+**Release Version/Date**:  V6.0
+
+**Description and/or issue being addressed**:  
+Allows the user to specify M3Dry (default) or STAGE dry deposition options from the run script. 
+
+**Significance and Impact**:  
+
+The STAGE implementation includes a change to the tiling parameterizations for aerodynamic and stomatal resistances.
+Corrections to the tiled LAI that better represents parameterizations in costal areas.
+
+Tiled deposition to partially snow covered land was incorrectly modeled as resistances in series and are now modeled as resistances in parallel. This results to higher deposition to partially snow covered land.
+
+Bidirectional HCHO exchange and leaf micro wetness is updated as parameterized in [Skipper et al. 2024](https://doi.org/10.5194/acp-24-12903-2024). Earlier versions of STAGE modeled leaf wetness as a function of relative humidity for O<sub>3</sub> and NH<sub>3</sub>. Here we apply the leaf surface micro wetness as a function of relative humidity following [Burkhardt et al. 2009](https://doi.org/10.5194/bg-6-67-2009) and is applied for all deposited species. This required an update in the NH<sub>3</sub> cuticular resistance from [Massad et al. 2010](https://doi.org/10.5194/acp-10-10359-2010) to [Ramsay et al. 2021](https://doi.org/10.5194/bg-18-2809-2021) to accommodate a universal representation of leaf micro wetness.  This results in similar results for NH<sub>3</sub> bidirectional exchange simulations and lower estimated NH<sub>3</sub> concentrations when NH<sub>3</sub> bidirectional exchange is not selected and a consistent representation for both options.
+
+Tiled R<sub>st</sub> is scaled by land use type based on the minimum stomatal resistance and better represents the driving meteorological model. 
+
+Tiled R<sub>a</sub> is now parameterized as R<sub>a</sub> = Pr<sub>o</sub>U/u<sub>*</sub><sup>2</sup> and stability corrections are implicitly included by applying  [Byun et al. 1999](https://www.cmascenter.org/cmaq/science_documentation/) Equations 12-30, 12-40, 12-42, and 12-46. 
+
+STAGE was modified to support DDM-3D. 
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321/commits/d387fd332650055d71fb4de373dc25d92ab86730) | [PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321)  |
+
 ### Update to Minimum Kz and Kz0ut in the STAGE deposition option
 [Jesse Bash](mailto:bash.jesse@epa.gov), U.S. Environmental Protection Agency    
 **Type of update**:  Science Update, Documentation  
