@@ -1,5 +1,21 @@
 # M3DRY
 
+### Runtime Deposition Options
+[Jon Pleim](mailto:pleim.jon@pa.gov), U.S. Environmental Protection Agency    
+**Type of update**: Science Update  
+**Release Version/Date**:  V6.0 
+
+**Description**:  
+Allows the user to specify M3Dry (default) or STAGE dry deposition options from the run script. 
+
+**Significance and Impact**:   
+
+Updated relative reactivity for carbon species following Raoult’s law changing the minimum value from 1 to 0.01 as well as recalculating this value for CO and HCHO for M3Dry. This update aligns the relative reactivity with the methodology used for new CRACMM and PFAS species. Revised relative reactivities in M3Dry generally result in a higher VOC concentrations and improves the evaluation against AQS observations. In all cases, the change in VOC concentrations are relatively small and generally less than 5% of the existing biases.
+
+|Merge Commit | Internal record|
+|:------:|:-------:|
+|[Merge for PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321/commits/d387fd332650055d71fb4de373dc25d92ab86730)| [PR#1321](https://github.com/USEPA/CMAQ_Dev/pull/1321)  |
+
 ### Updates of minimum Kz for M3Dry
 [Jon Pleim](mailto:pleim.jon@pa.gov), U.S. Environmental Protection Agency    
 **Type of update**: Science Update  
