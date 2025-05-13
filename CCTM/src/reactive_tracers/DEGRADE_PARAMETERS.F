@@ -511,7 +511,7 @@ C.. Tracer for formaldehyde emissions
                PHOTO_NAME(1:2,35 ) = (/"HCHO_MOL_JPL19","HCHO_RAD_JPL19" /)
                A_PHOTO(1:2,35)     = 1.0D0
             ELSE IF( INDEX(MECHNAME,'CRACMM3M') .GT. 0 )THEN
-               BICAUSE(1:3,35) = (/'HO ', 'NO3', 'CL1'/)
+               BICAUSE(1:3,35) = (/'HO ', 'NO3', 'CL '/)
                BIRATE(1:3,35)  = (/  5.5D-12, 2.0D-12, 8.10D-11 /) 
                BI_ACT(1:3,35)  = (/  -1.25D2,  2.44D3, 3.0D1 /)   
                PHOTO_NAME(1:2,35 ) = (/"HCHO_MOL_JPL19","HCHO_RAD_JPL19" /)
@@ -519,7 +519,7 @@ C.. Tracer for formaldehyde emissions
             ELSE ! cracmm by default
 C..Note that cracmm3 chemistry includes CL as species but it not does react with formaldehyde
 C..so use CL1 to prevent loss process but keep information if needed in future development
-               BICAUSE(1:3,35) = (/'HO ', 'NO3', 'CL '/)
+               BICAUSE(1:3,35) = (/'HO ', 'NO3', 'CL1'/)
                BIRATE(1:3,35)  = (/  5.5D-12, 2.0D-12, 8.10D-11 /) 
                BI_ACT(1:3,35)  = (/  -1.25D2,  2.44D3, 3.0D1 /)   
                PHOTO_NAME(1:2,35 ) = (/"HCHO_MOL_JPL19","HCHO_RAD_JPL19" /)
