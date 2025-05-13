@@ -150,7 +150,7 @@ setenv CTM_ADV_CFL 0.95      #> max CFL [ default: 0.75]
 setenv CTM_OCEAN_CHEM Y      #> Flag for ocean halogen chemistry, sea spray aerosol emissions,
                              #> and enhanced ozone deposition over ocean waters  [ default: Y ]
 setenv CTM_WB_DUST N         #> use inline windblown dust emissions (only for use with PX) [ default: N ]
-setenv CTM_LTNG_NO Y         #> turn on lightning NOx [ default: N ]
+setenv CTM_LNO_ONLINE Y         #> turn on lightning NOx [ default: N ]
 setenv KZMIN Y               #> use Min Kz option in edyintb [ default: Y ], 
                              #>    otherwise revert to Kz0UT
 setenv PX_VERSION Y          #> WRF PX LSM
@@ -230,7 +230,7 @@ setenv CTM_DUSTEM_DIAG N     #> windblown dust emissions diagnostic file [ defau
                              #>     Ignore if CTM_WB_DUST = N
 setenv CTM_DEPV_FILE N       #> deposition velocities diagnostic file [ default: N ]
 setenv VDIFF_DIAG_FILE N     #> vdiff & possibly aero grav. sedimentation diagnostic file [ default: N ]
-setenv LTNGDIAG N            #> lightning diagnostic file [ default: N ]
+setenv LTNGDIAG Y            #> lightning diagnostic file [ default: N ]
 setenv B3GTS_DIAG N          #> BEIS mass emissions diagnostic file [ default: N ]
 setenv CTM_WVEL Y            #> save derived vertical velocity component to conc 
                              #>    file [ default: Y ]
@@ -331,21 +331,17 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   #> Control Files
   #>
-  #> IMPORTANT NOTE
-  #>
-  #> The DESID control files defined below are an integral part of controlling the behavior of the model simulation.
-  #> Among other things, they control the mapping of species in the emission files to chemical species in the model and
-  #> several aspects related to the simulation of organic aerosols.
-  #> Please carefully review the DESID control files to ensure that they are configured to be consistent with the assumptions
-  #> made when creating the emission files defined below and the desired representation of organic aerosols.
+  #> The CMAQ control files defined below are an integral part of controlling the behavior of the model simulation.
+  #> Among other things, they control the variables output to ELMO files, the mapping of species in the emission 
+  #> files to chemical species in the model, and other parameters configuring model input and output.
+  #> Please carefully review the CMAQ chemical control file to ensure it is configured to be consistent with the 
+  #> assumptions made when creating the emission files defined below and the desired chemical mechanism.
   #> For further information, please see:
-  #> + AERO7 Release Notes section on 'Required emission updates':
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Release_Notes/aero7_overview.md
-  #> + CMAQ User's Guide section 6.9.3 on 'Emission Compatability':
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/CMAQ_UG_ch06_model_configuration_options.md#6.9.3_Emission_Compatability
-  #> + Emission Control (DESID) Documentation in the CMAQ User's Guide:
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
-  #>
+  #> + CMAQ User's Guide Appendix F on 'ELMOv2':
+  #>   https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixF_elmo_output.md
+  #> + CMAQ User's Guide Appendix B on Emission Control using DESID:
+  #>   https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md
+  #> 
   setenv CMAQ_CTRL_NML ${BLD}/CMAQ_Control.nml
   setenv CMAQ_CH_CTRL_NML ${BLD}/CMAQ_Chem_Control_${MECH}_2022v1.nml
 
@@ -435,17 +431,17 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv STK_EM_SYM_DATE_010 T
 
   #> Lightning NOx configuration
-  if ( $CTM_LTNG_NO == 'Y' ) then
-     setenv LTNGNO "InLine"    #> set LTNGNO to "Inline" to activate in-line calculation
-
-  #> Lightning NOx configuration
-  if ( $CTM_LTNG_NO == 'Y' ) then
-     setenv LTNGNO "InLine"    #> set LTNGNO to "Inline" to activate in-line calculation
-
+  if ( $CTM_LNO_ONLINE == 'Y' ) then
   #> In-line lightning NOx options
-     setenv USE_NLDN  Y        #> use hourly NLDN strike file [ default: Y ]
-     if ( $USE_NLDN == Y ) then
-        setenv NLDN_STRIKES ${IN_LTpath}/WWLLNs_12km_60min_${YYYYMMDD}.ioapi
+     setenv USE_LTNG_DATA  Y        #> use hourly NLDN strike file [ default: Y ]
+     if ( $USE_LTNG_DATA == Y ) then
+        setenv LTNG_DATA ${IN_LTpath}/WWLLNs_12km_60min_${YYYYMMDD}.ioapi
+         setenv LNO_OPTION 1 # default, use lightning strikes such as NLDN, WWLLNs
+        # LNO_OPTION 2:  use GLM flashes
+        # LNO_OPTION 3:  use GLM Energy
+        # LNO_OPTION 4:  use synergized GLM/WWLLN Energy
+        # LNO_OPTION 5:  use synergized GLM/WWLLNs Energy with ICCG adjustment to set upper bound
+
      endif
      setenv LTNGPARMS_FILE ${IN_LTpath}/LTNG_AllParms_12US1.ncf #> lightning parameter file; ignore if LTNGPARAM = N
   endif
@@ -617,8 +613,8 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv CTM_DEPV_MOS    "$OUTDIR/CCTM_DEPVMOS_${CTM_APPL}.nc -v"    #> Dry Dep Velocity
   setenv CTM_VDIFF_DIAG  "$OUTDIR/CCTM_VDIFF_DIAG_${CTM_APPL}.nc -v" #> Vertical Dispersion Diagnostic
   setenv CTM_VSED_DIAG   "$OUTDIR/CCTM_VSED_DIAG_${CTM_APPL}.nc -v"  #> Particle Grav. Settling Velocity
-  setenv CTM_LTNGDIAG_1  "$OUTDIR/CCTM_LTNGHRLY_${CTM_APPL}.nc -v"   #> Hourly Avg Lightning NO
-  setenv CTM_LTNGDIAG_2  "$OUTDIR/CCTM_LTNGCOL_${CTM_APPL}.nc -v"    #> Column Total Lightning NO
+  setenv CTM_LTNGDIAG_1  "$OUTDIR/CCTM_LNO3D_${CTM_APPL}.nc -v"      #> Hourly Avg Lightning NO
+  setenv CTM_LTNGDIAG_2  "$OUTDIR/CCTM_LNO2DCOL_${CTM_APPL}.nc -v"   #> Column Total Lightning NO
   setenv CTM_VEXT_1      "$OUTDIR/CCTM_VEXT_${CTM_APPL}.nc -v"       #> On-Hour 3D Concs at select sites
 
   #> set floor file (neg concs)
