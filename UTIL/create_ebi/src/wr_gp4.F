@@ -13,7 +13,6 @@ C
 C**********************************************************************
       USE ENV_VARS
       USE GLOBAL_DATA
-      !!USE M3UTILIO ! IOAPI parameters and declarations
       USE RXNS_DATA
 
       IMPLICIT NONE
@@ -51,7 +50,6 @@ C..SCRATCH LOCAL VARIABLES:
       INTEGER  :: E1, E2       ! end pos of string
       INTEGER  :: IND          ! array index
       INTEGER  :: IIN          ! Unit no. of input file
-      INTEGER  :: IOUT         ! Unit no. of output file
       INTEGER  :: N, S, P, R   ! Loop indices
       INTEGER  :: NR           ! No. of reactants
       INTEGER  :: NPOS         ! Reaction index
@@ -91,9 +89,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       FNAME = OUTPATH( 1 : E1 ) // '/hrg4.F' 
 
-      IOUT = JUNIT()
+      GLOBAL_IOUT = JUNIT()
 
-      OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
+      OPEN( UNIT = GLOBAL_IOUT, FILE = FNAME, ERR = 9000 )
 
 
       IIN = JUNIT()
@@ -105,9 +103,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       OPEN( UNIT = IIN, FILE = FNAME, ERR = 9000 )
 
 
-      IF( LWR_COPY ) CALL WR_COPYRT( IOUT )
+      IF( LWR_COPY ) CALL WR_COPYRT( GLOBAL_IOUT )
 
-      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( IOUT )
+      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( GLOBAL_IOUT )
 
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -129,13 +127,13 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LINEIN( 1 : 2 ) .EQ. 'R1' ) THEN
 
-         WRITE( IOUT, 93000 ) TRIM( MECHNAME )
+         WRITE( GLOBAL_IOUT, 93000 ) TRIM( MECHNAME )
 
          GO TO 100
 
       ELSEIF( LINEIN( 1 : 2 ) .EQ. 'R2' ) THEN
 
-         WRITE( IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
+         WRITE( GLOBAL_IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
 
          GO TO 100
 
@@ -147,7 +145,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
             IF( LQUAD ) THEN
 
-               WRITE( IOUT, 93500 ) SPECIES( NO3  )( 1 : E1 ),
+               WRITE( GLOBAL_IOUT, 93500 ) SPECIES( NO3  )( 1 : E1 ),
      &                              SPECIES( N2O5 )( 1 : E2 ),
      &                              SPECIES( NO3  )( 1 : E1 )
 
@@ -157,11 +155,11 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                LINOUT = '      REAL( 8 ) ::   K15_15       ! K' //
      &            SPOUT( 1 : E1 ) // '+' //  SPOUT( 1 : E1 ) // ' * delta t'
                E1 = LEN_TRIM( LINOUT )
-               WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+               WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             ELSE
 
-               WRITE( IOUT, 93520 ) SPECIES( NO3  )( 1 : E1 ),
+               WRITE( GLOBAL_IOUT, 93520 ) SPECIES( NO3  )( 1 : E1 ),
      &                              SPECIES( N2O5 )( 1 : E2 ),
      &                              SPECIES( NO3  )( 1 : E1 )
 
@@ -179,7 +177,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             LINOUT = LINOUT( 1 : E1 ) // SPOUT( 1 : E2 ) //
      &          ' * delta t'
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
              
 
             SPOUT = SPECIES( NO3 )
@@ -199,7 +197,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             LINOUT = LINOUT( 1 : E1 ) // SPOUT( 1 : E2 ) // 
      &         '[NO2] * delta t'
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
             LFIRST_R3 = .FALSE.
 
@@ -214,7 +212,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       ELSE
 
-         WRITE( IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
+         WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
 
          GO TO 100
 
@@ -231,8 +229,8 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       E1 = LEN_TRIM( SPECIES( NO3 ) )
       E2 = LEN_TRIM( SPECIES( N2O5 ) )
-      WRITE( IOUT, 92000 )
-      WRITE( IOUT, 94000 ) SPECIES( NO3 )( 1 : E1 ), SPECIES( N2O5 )( 1 : E2 )
+      WRITE( GLOBAL_IOUT, 92000 )
+      WRITE( GLOBAL_IOUT, 94000 ) SPECIES( NO3 )( 1 : E1 ), SPECIES( N2O5 )( 1 : E2 )
 
 c..Determine the reactions to include & get coefficients for the prod terms
       LRXN1 = .TRUE.
@@ -263,7 +261,7 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
@@ -277,8 +275,8 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       SPOUT = SPECIES( NO3 )
       E1 = LEN_TRIM( SPOUT )
-      WRITE( IOUT, 92000 )
-      WRITE( IOUT, 94020 ) SPOUT( 1 : E1 ), SPOUT( 1 : E1 ), SPOUT( 1 : E1 )
+      WRITE( GLOBAL_IOUT, 92000 )
+      WRITE( GLOBAL_IOUT, 94020 ) SPOUT( 1 : E1 ), SPOUT( 1 : E1 ), SPOUT( 1 : E1 )
       LRXN1 = .TRUE.
       DO N = 1, NRXNS         
 
@@ -307,7 +305,7 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
        
@@ -320,8 +318,8 @@ c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       SPOUT = SPECIES( N2O5 )
       E1 = LEN_TRIM( SPOUT )
-      WRITE( IOUT, 92000 )
-      WRITE( IOUT, 94040 ) SPOUT( 1 : E1 )
+      WRITE( GLOBAL_IOUT, 92000 )
+      WRITE( GLOBAL_IOUT, 94040 ) SPOUT( 1 : E1 )
       LRXN1 = .TRUE.
       DO N = 1, NRXNS         
 
@@ -346,7 +344,7 @@ c..call routine to create output line & write it
          LRXN1 = .FALSE.
 
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
       END DO
 
@@ -357,22 +355,22 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c..Header & K15_15 term if present ( NO3+NO3=)
       IF( LQUAD ) THEN
 
-         WRITE( IOUT, 92000 )      
-         WRITE( IOUT, 94060 )
+         WRITE( GLOBAL_IOUT, 92000 )      
+         WRITE( GLOBAL_IOUT, 94060 )
 
          DO N = 1, NRXNS
             IF( IRR( N, 1 ) .EQ. NO3 .AND.  IRR( N, 2 ) .EQ. NO3 ) THEN
                WRITE( RNUM, '( I5 )' ) N
                LINOUT = '      K15_15  = RKI( ' // RNUM // ' ) * DTC'
                E1 = LEN_TRIM( LINOUT )
-               WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+               WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
             END IF
          END DO
 
       ELSE
 
-        WRITE( IOUT, 92000 )      
-        WRITE( IOUT, 94080 )
+        WRITE( GLOBAL_IOUT, 92000 )      
+        WRITE( GLOBAL_IOUT, 94080 )
 
 
       END IF
@@ -390,11 +388,11 @@ c..R15_16 term ( production of NO3 from N2O5 )
                 LINOUT = '     &        +   RKI( ' // RNUM // ' ) ' 
             END IF
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92040, ADVANCE = 'NO' ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92040, ADVANCE = 'NO' ) LINOUT( 1 : E1 )
          END IF
       END DO
-      WRITE( IOUT, 92060)
-      WRITE( IOUT, 92020)
+      WRITE( GLOBAL_IOUT, 92060)
+      WRITE( GLOBAL_IOUT, 92020)
 
 c..R16_15 term ( production of N2O5 from NO3 )
       DO N = 1, NRXNS
@@ -405,7 +403,7 @@ c..R16_15 term ( production of N2O5 from NO3 )
             LINOUT = '      R16_15  = RKI( ' // RNUM // 
      &       ' ) * YCP( NO2 ) * DTC'
             E1 = LEN_TRIM( LINOUT )
-            WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+            WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
          END IF
       END DO
 
@@ -418,41 +416,41 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
      &      SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) ) // ' & ' //
      &      SPECIES( N2O5 )( 1 : LEN_TRIM( SPECIES( N2O5 ) ) )
          E1 = LEN_TRIM( LINOUT )
-         WRITE( IOUT, 92000 )
-         WRITE( IOUT, 92000 ) LINOUT( 1 : E1 )
+         WRITE( GLOBAL_IOUT, 92000 )
+         WRITE( GLOBAL_IOUT, 92000 ) LINOUT( 1 : E1 )
 
-         WRITE( IOUT, 95000) SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) ),
+         WRITE( GLOBAL_IOUT, 95000) SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) ),
      &                       SPECIES( N2O5 )( 1 : LEN_TRIM( SPECIES( N2O5 ) ) )
 
-         WRITE( IOUT, 95020) 
+         WRITE( GLOBAL_IOUT, 95020) 
 
-         WRITE( IOUT, 95040) SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) )
+         WRITE( GLOBAL_IOUT, 95040) SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) )
 
-         WRITE( IOUT, 95060) SPECIES( N2O5 )( 1 : LEN_TRIM( SPECIES( N2O5 ) ) ),
+         WRITE( GLOBAL_IOUT, 95060) SPECIES( N2O5 )( 1 : LEN_TRIM( SPECIES( N2O5 ) ) ),
      &                       SPECIES( N2O5 )( 1 : LEN_TRIM( SPECIES( N2O5 ) ) ),
      &                       SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) )
 
 
       ELSE
 
-         WRITE( IOUT, 96000) 
+         WRITE( GLOBAL_IOUT, 96000) 
 
-         WRITE( IOUT, 96020) SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) )
+         WRITE( GLOBAL_IOUT, 96020) SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) )
 
-         WRITE( IOUT, 96040) SPECIES( N2O5 )( 1 : LEN_TRIM( SPECIES( N2O5 ) ) ),
+         WRITE( GLOBAL_IOUT, 96040) SPECIES( N2O5 )( 1 : LEN_TRIM( SPECIES( N2O5 ) ) ),
      &                       SPECIES( N2O5 )( 1 : LEN_TRIM( SPECIES( N2O5 ) ) )
 
-         WRITE( IOUT, 96060) SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) ),
+         WRITE( GLOBAL_IOUT, 96060) SPECIES( NO3  )( 1 : LEN_TRIM( SPECIES( NO3  ) ) ),
      &                       SPECIES( N2O5 )( 1 : LEN_TRIM( SPECIES( N2O5 ) ) )
 
 
       END IF
       
-      WRITE( IOUT, 97000)
+      WRITE( GLOBAL_IOUT, 97000)
         
       CLOSE( IIN )
 
-      CLOSE( IOUT )
+      CLOSE( GLOBAL_IOUT )
 
       NOUTFLS = NOUTFLS + 1
       OUTFLNAM( NOUTFLS ) = 'hrg4.F'

@@ -87,7 +87,7 @@ C***********************************************************************
       INTEGER, ALLOCATABLE :: H2O2_HNO3_PROD_RXNS( : ) ! indices of H2O2 or HNO3 producing reactions
 
       REAL( 8 ), ALLOCATABLE :: H2O2_HNO3_YIELD( : )   ! H2O2 or HNO3 yield for a reaction subset
-      REAL( 8 ) :: VOC_TO_NOX 
+      REAL( 8 ) :: VOC_TO_NOX = -1.0D0
        
       INTEGER :: ISAM_LOG        ! Unit number of output log
       INTEGER :: ISAM_JDATE = 0
@@ -1019,6 +1019,7 @@ c..Add the number of species molecules produced in this reaction
           USE VGRD_DEFN
           USE RXNS_DATA
           USE UTILIO_DEFN
+          USE ELMO_DATA, ONLY : ELMO_VOC_NOX
           USE SA_DEFN    ! 20130517
 
          IMPLICIT NONE
@@ -1062,6 +1063,7 @@ c..Add the number of species molecules produced in this reaction
                END IF    
             END DO LOAD_ISAM ! ktag loop     
          END DO   ! jspc
+         ELMO_VOC_NOX( COL,ROW,LAY )  = VOC_TO_NOX
  
 #ifdef verbose_isam             
           IF( WRITE_CELL )THEN

@@ -13,7 +13,6 @@ C
 C**********************************************************************
       USE ENV_VARS
       USE GLOBAL_DATA
-      !!USE M3UTILIO ! IOAPI parameters and declarations
       USE RXNS_DATA
 
       IMPLICIT NONE
@@ -37,7 +36,6 @@ C..SCRATCH LOCAL VARIABLES:
 
       INTEGER  :: EPOS         ! end pos of string
       INTEGER  :: IIN          ! Unit no. of input file
-      INTEGER  :: IOUT         ! Unit no. of output file
 
       LOGICAL  :: LOUT0 = .FALSE.  ! Flag for line 1 output processed
       LOGICAL  :: LOUT1 = .FALSE.  ! Flag for line 1 output processed
@@ -56,9 +54,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       
       FNAME = OUTPATH( 1 : EPOS ) // '/hrsolver.F'     
 
-      IOUT = JUNIT()
+      GLOBAL_IOUT = JUNIT()
 
-      OPEN( UNIT = IOUT, FILE = FNAME, ERR = 9000 )
+      OPEN( UNIT = GLOBAL_IOUT, FILE = FNAME, ERR = 9000 )
 
 
       IIN = JUNIT()
@@ -77,9 +75,9 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c Start processing
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      IF( LWR_COPY ) CALL WR_COPYRT( IOUT )
+      IF( LWR_COPY ) CALL WR_COPYRT( GLOBAL_IOUT )
 
-      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( IOUT )
+      IF( LWR_CVS_HDR ) CALL WR_CVSHDR( GLOBAL_IOUT )
 
 
   100 CONTINUE
@@ -88,47 +86,47 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       IF( LINEIN( 1 : 1 ) .NE. 'R' ) THEN
 
-         WRITE( IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
+         WRITE( GLOBAL_IOUT, 92000 ) LINEIN( 1 : LEN_TRIM( LINEIN ) )
 
       ELSE
 
          IF( LINEIN( 2 : 2 ) .EQ. '0' .AND. .NOT. LOUT0 ) THEN
 
-            IF( NSPECIAL .NE. 0 ) WRITE( IOUT, 93029 ) 
+            IF( NSPECIAL .NE. 0 ) WRITE( GLOBAL_IOUT, 93029 ) 
 
             LOUT0 = .TRUE.             
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '1' .AND. .NOT. LOUT1 ) THEN
 
-            WRITE( IOUT, 93000 ) TRIM( MECHNAME )
+            WRITE( GLOBAL_IOUT, 93000 ) TRIM( MECHNAME )
 
             LOUT1 = .TRUE. 
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '2' .AND. .NOT. LOUT2 ) THEN
 
-            WRITE( IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
+            WRITE( GLOBAL_IOUT, 93020 ) CR_DATE( 1 : LEN_TRIM( CR_DATE ) )
 
             LOUT2 = .TRUE. 
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '3' .AND. .NOT. LOUT3 ) THEN
 
-            IF( NSPECIAL .NE. 0 ) WRITE( IOUT, 93030 ) 
+            IF( NSPECIAL .NE. 0 ) WRITE( GLOBAL_IOUT, 93030 ) 
 
             LOUT3 = .TRUE. 
             
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '4' .AND. .NOT. LOUT4 ) THEN
 
             IF( LPAR_NEG ) THEN 
-               WRITE( IOUT, 93040 ) 
+               WRITE( GLOBAL_IOUT, 93040 ) 
             ELSE
-               WRITE( IOUT, 93060 )
+               WRITE( GLOBAL_IOUT, 93060 )
             END IF
 
             LOUT3 = .TRUE.
 
          ELSEIF( LINEIN( 2 : 2 ) .EQ. '5' .AND. .NOT. LOUT5 ) THEN
 
-            IF( LDEGRADE_SUBS ) WRITE( IOUT, 93046 ) LINEIN( 3 : LEN_TRIM( LINEIN ) )
+            IF( LDEGRADE_SUBS ) WRITE( GLOBAL_IOUT, 93046 ) LINEIN( 3 : LEN_TRIM( LINEIN ) )
 
             LOUT5 = .FALSE.
 
@@ -142,7 +140,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       CLOSE( IIN )
 
-      CLOSE( IOUT )
+      CLOSE( GLOBAL_IOUT )
 
       NOUTFLS = NOUTFLS + 1
       OUTFLNAM( NOUTFLS ) = 'hrsolver.F'

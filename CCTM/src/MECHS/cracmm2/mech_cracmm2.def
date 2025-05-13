@@ -154,6 +154,8 @@ END ELIMINATE
 
 
 
+
+
 REACTIONS[CM] =                                                                                                                                                                      
 
 <R001> O3 = O3P # 1.0/<O3O3P_NASA06>;
@@ -1363,10 +1365,8 @@ REACTIONS[CM] =
 <R364> ECH4 + HO = MO2 # 2.45E-12 @ 1775.;
 
 ! monoterpene nitrate hydrolysis
-<TRP58> ATRPNJ = AHOMJ + HNO3  - 1.0000*DELTA_N - 1.0000*DELTA_C 
-               # 9.26E-05;               
-<TRP59> AHONITJ = AHOMJ + HNO3  - 1.0000*DELTA_N - 1.0000*DELTA_C 
-                # 9.26E-05;                
+<TRP58> ATRPNJ = AHOMJ + HNO3  - 1.0000*DELTA_N # 9.26E-05;
+<TRP59> AHONITJ = AHOMJ + HNO3  - 1.0000*DELTA_N # 9.26E-05;
 
 ! MCM-based styrene chemistry
 <ROCARO71> STY + HO = STYP # 5.8E-11;
