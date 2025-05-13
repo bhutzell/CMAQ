@@ -190,6 +190,7 @@
                                            !   EQB - Equilibrium Approach for all modes
                                            !   HYB - Equilibrium for Aitken and Accumulation modes, 
                                            !         and Dynamic for the coarse mode.
+      INTEGER :: AERO_DYN_TSTEP = 90       ! Maximum sub-time-step for dynamic aerosol mass transfer
       LOGICAL :: BC_AERO_M2WET=.FALSE.     ! flag for specifying wet aerosol size parameters 
                                            !   for boundary conditions. FALSE = dry
       LOGICAL :: BC_AERO_M2USE=.TRUE.      ! flag for using the second moment from the input file
@@ -693,6 +694,9 @@
 
       ! Get flag for setting aerosol mass transfer approach
       CALL GET_ENV ( AERO_MASS_TRANSFER, 'AERO_MT', AERO_MASS_TRANSFER, VARDEV )
+
+      ! Get maximum sub-time-step for dynamic aerosol mass transfer
+      CALL GET_ENV ( AERO_DYN_TSTEP, 'AERO_DYN_TSTEP', AERO_DYN_TSTEP, VARDEV )
 
       ! Get flag for interpreting boundary condition aerosol size distributions as dry
       CALL GET_ENV ( BC_AERO_M2WET, 'BC_AERO_M2WET', BC_AERO_M2WET, VARDEV )
