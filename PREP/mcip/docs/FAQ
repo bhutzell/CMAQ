@@ -1,5 +1,40 @@
 Frequently Asked Questions for MCIP
 
+MCIP Version 6.0 Alpha (14 May 2025)
+
+What are the changes in this release?
+
+  The changes in MCIPv6.0 Alpha are highlighted at the end of 
+  docs/ReleaseNotes, and they are explained in docs/CHANGES.
+
+
+Do I need to update to MCIPv6.0 Alpha?
+
+  You should strongly consider updating to MCIPv6.0 Alpha if:
+
+    1. You have data supplied by WRFv4.3 or later.
+
+    2. You are using polar stereographic projection and want latitude and
+       longitude other than at cell centers (such as for post-processing).
+
+    3. You want to not write GRID* I/O API files for every MCIP run.
+
+
+Why is this an "Alpha" release?
+
+  This pre-release of MCIPv6.0 accompanies the pre-release of CMAQv6.0. 
+  This release of MCIP allows the code updates to get to the community more
+  quickly. Accordingly, this release of MCIP has not undergone as comprehensive
+  of testing as a final release.
+
+
+I think I found a bug. What should I do?
+
+  Bugs should be reported to the CMAS Forum in the MCIP tab:
+  https://forum.cmascenter/org/c/mcip
+
+
+
 MCIP Version 5.5 (19 September 2024)
 
 What are the changes in this release?

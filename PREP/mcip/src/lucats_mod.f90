@@ -37,6 +37,9 @@ MODULE lucats
 !                        confusion.  (T. Spero)
 !           08 Aug 2018  Corrected bug in setting land use category names in
 !                        MCIP for USGS24 + lakes.  (T. Spero)
+!           12 May 2025  Added urban local climate zones (LCZs) that append to
+!                        some land use classifications beginning in WRFv4.3.
+!                        (T. Spero)
 !-------------------------------------------------------------------------------
 
   IMPLICIT NONE
@@ -140,7 +143,7 @@ MODULE lucats
        "Wooded Tundra                                   ", &  ! 18
        "Mixed Tundra                                    ", &  ! 19
        "Barren Tundra                                   ", &  ! 20
-       "Lake (if from WRFv3.8 or later)                 ", &  ! 21
+       "Lakes                                           ", &  ! 21
        "~~~unassigned~~~                                ", &  ! 22
        "~~~unassigned~~~                                ", &  ! 23
        "~~~unassigned~~~                                ", &  ! 24
@@ -247,5 +250,18 @@ MODULE lucats
        "Cultivated Crops                                ", &  ! 38
        "Woody Wetland                                   ", &  ! 39
        "Emergent Herbaceous Wetland                     "  /) ! 40
+
+  CHARACTER(LEN=48), PARAMETER :: lulcz ( 11 ) =           &  ! LCZs
+    (/ "LCZ_1                                           ", &  !  1
+       "LCZ_2                                           ", &  !  2
+       "LCZ_3                                           ", &  !  3
+       "LCZ_4                                           ", &  !  4
+       "LCZ_5                                           ", &  !  5
+       "LCZ_6                                           ", &  !  6
+       "LCZ_7                                           ", &  !  7
+       "LCZ_8                                           ", &  !  8
+       "LCZ_9                                           ", &  !  9
+       "LCZ_10                                          ", &  ! 10
+       "LCZ_11                                          "  /) ! 11
 
 END MODULE lucats

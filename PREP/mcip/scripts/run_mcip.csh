@@ -105,6 +105,8 @@
 #                        staggering is the default.  (T. Spero)
 #           17 Nov 2019  Corrected variable setting for file_geo in
 #                        namelist generation code.  (T. Spero)
+#           14 May 2025  Restored option to not write time-independent
+#                        I/O API files (GRIDCRO). (T. Spero)
 #=======================================================================
 
 #-----------------------------------------------------------------------
@@ -159,7 +161,9 @@ set InMetFiles = ( $InMetDir/subset_wrfout_d01_2016-07-01_00:00:00 \
                    $InMetDir/subset_wrfout_d01_2016-07-03_00:00:00 )
 
 set IfGeo      = "F"
-set InGeoFile  = $InGeoDir/geo_em_d01.nc
+if ( $IfGeo == "T" ) then
+  set InGeoFile  = $InGeoDir/geo_em_d01.nc
+endif
 
 #-----------------------------------------------------------------------
 # Set user control options.
@@ -198,6 +202,14 @@ set INTVL      = 60 # [min]
 #-----------------------------------------------------------------------
 
 set IOFORM = 1
+
+#-----------------------------------------------------------------------
+# Choose whether time-independent output will be written (GRIDCRO).
+#   0 = Do not write time-independent I/O API files (GRIDCRO)
+#   1 = Write time-independent I/O API files (GRIDCRO)
+#-----------------------------------------------------------------------
+
+set MKGRID = 1
 
 #-----------------------------------------------------------------------
 # Set number of meteorology "boundary" points to remove on each of four
@@ -397,6 +409,7 @@ cat >> $WorkDir/namelist.${PROG} << !
   lprt_col   =  $LPRT_COL
   lprt_row   =  $LPRT_ROW
   wrf_lc_ref_lat = $WRF_LC_REF_LAT
+  makegrid   =  $MKGRID
  $Marker
 
  &WINDOWDEFS

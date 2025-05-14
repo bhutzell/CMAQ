@@ -23,9 +23,11 @@ SUBROUTINE gridout (sdate, stime)
 ! Purpose:  Output time-independent fields.
 ! Revised:  18 Dec 2018  Original version in MCIPv5.0.  Subsumes part of
 !                        gridout.f90 from MCIPv4.5.  (T. Spero)
+!           12 May 2025  Added option to not write time-independent I/O API
+!                        files (GRIDOUT). (T. Spero)
 !-------------------------------------------------------------------------------
 
-  USE mcipparm, ONLY: ioform
+  USE mcipparm, ONLY: ioform, makegrid
 
   IMPLICIT NONE
 
@@ -39,7 +41,9 @@ SUBROUTINE gridout (sdate, stime)
   SELECT CASE ( ioform )
 
     CASE ( 1 )  ! Models-3 I/O API
-      CALL outgm3io (sdate, stime)
+      IF ( makegrid == 1 ) THEN
+        CALL outgm3io (sdate, stime)
+      ENDIF
 
   END SELECT
 

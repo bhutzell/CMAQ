@@ -190,6 +190,10 @@ SUBROUTINE rdwrfem (mcip_now)
 !                        for select compilers. (T. Spero)
 !           13 Dec 2023  Removed redundant NF90_OPEN/NF90_CLOSE couplet to
 !                        improve efficiency and memory management. (T. Spero)
+!           14 May 2025  Corrected the latitude and longitude calculations for
+!                        polar stereographic projection. Added constraints on
+!                        northing and easting for all projections to limit to
+!                        0.0 for very small numbers. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE date_pack
@@ -206,6 +210,7 @@ SUBROUTINE rdwrfem (mcip_now)
   INTEGER                           :: cdfidg
   REAL                              :: deg2rad
   INTEGER                           :: dimids     ( nf90_max_var_dims )
+  REAL,               PARAMETER     :: distmin    = 1.0e-7
   REAL,    SAVE,      ALLOCATABLE   :: dum2d      ( : , : )
   INTEGER, SAVE,      ALLOCATABLE   :: dum2d_i    ( : , : )
   REAL,    SAVE,      ALLOCATABLE   :: dum2d_u    ( : , : )
@@ -2052,9 +2057,15 @@ SUBROUTINE rdwrfem (mcip_now)
 
             xxin = met_xxctr -  &
                    ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
+            IF ( ABS(xxin) < distmin ) THEN
+              xxin = 0.0
+            ENDIF
 
             yyin = met_yyctr -  &
                    ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
+            IF ( ABS(yyin) < distmin ) THEN
+              yyin = 0.0
+            ENDIF
 
             CALL xy2ll_lam (xxin, yyin, met_tru1, met_tru2, met_proj_clon,  &
                             met_ref_lat, latdot(i,j), londot(i,j))
@@ -2074,9 +2085,15 @@ SUBROUTINE rdwrfem (mcip_now)
 
               xxin = met_xxctr -  &
                      ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
+              IF ( ABS(xxin) < distmin ) THEN
+                xxin = 0.0
+              ENDIF
 
               yyin = met_yyctr -  &
                      ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
+              IF ( ABS(yyin) < distmin ) THEN
+                yyin = 0.0
+              ENDIF
 
               CALL xy2ll_lam (xxin, yyin, met_tru1, met_tru2, met_proj_clon,  &
                               met_ref_lat, latu(i,j), lonu(i,j))
@@ -2094,9 +2111,15 @@ SUBROUTINE rdwrfem (mcip_now)
 
               xxin = met_xxctr -  &
                      ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
+              IF ( ABS(xxin) < distmin ) THEN
+                xxin = 0.0
+              ENDIF
 
               yyin = met_yyctr -  &
                      ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
+              IF ( ABS(yyin) < distmin ) THEN
+                yyin = 0.0
+              ENDIF
 
               CALL xy2ll_lam (xxin, yyin, met_tru1, met_tru2, met_proj_clon,  &
                               met_ref_lat, latv(i,j), lonv(i,j))
@@ -2111,25 +2134,26 @@ SUBROUTINE rdwrfem (mcip_now)
 
       CASE (2)  ! polar stereographic
 
+        xoff = 0.0  ! dot-point grid: no offset from dot-point center value
+        yoff = 0.0  ! dot-point grid: no offset from dot-point center value
+
         DO j = 1, met_ny
           DO i = 1, met_nx
 
-            ! Use four-point interpolation here for latitude and longitude.
-            ! Because CMAQ will never use outermost row and column from WRF
-            ! due to location of CMAQ boundaries, inexact values in the
-            ! outermost row and column will not matter.
+            xxin = met_xxctr -  &
+                   ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
+            IF ( ABS(xxin) < distmin ) THEN
+              xxin = 0.0
+            ENDIF
 
-            ii = MIN(i,nxm)
-            jj = MIN(j,nym)
+            yyin = met_yyctr -  &
+                   ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
+            IF ( ABS(yyin) < distmin ) THEN
+              yyin = 0.0
+            ENDIF
 
-            im1 = MIN(i-1,1)
-            jm1 = MIN(j-1,1)
-
-            latdot(i,j) = ( latcrs(im1,jj)  + latcrs(ii,jj) +   &
-                            latcrs(im1,jm1) + latcrs(ii,jm1) ) * 0.25
-
-            londot(i,j) = ( loncrs(im1,jj)  + loncrs(ii,jj) +   &
-                            loncrs(im1,jm1) + loncrs(ii,jm1) ) * 0.25
+            CALL xy2ll_ps (xxin, yyin, met_tru1, met_proj_clon,  &
+                           latdot(i,j), londot(i,j))
 
             mapdot(i,j) = mapfac_ps (latdot(i,j), met_tru1)
 
@@ -2138,26 +2162,53 @@ SUBROUTINE rdwrfem (mcip_now)
 
         IF ( .NOT. gotfaces ) THEN  ! get lat, lon, map-scale factor on faces
 
-          DO j = 1, met_ny
+          xoff = 0.0  ! U-face: no offset in X from dot-point center value
+          yoff = 0.5  ! U-face: 0.5-cell offset in Y from dot-point center value
+
+          DO j = 1, met_ny  ! use all Y to fill array; last row outside domain
             DO i = 1, met_nx
 
-              ! Use linear interpolation here for latitude and longitude.
-              ! Because CMAQ will never use outermost row and column from WRF
-              ! due to location of CMAQ boundaries, inexact values in the
-              ! outermost row and column will not matter.
+              xxin = met_xxctr -  &
+                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
+              IF ( ABS(xxin) < distmin ) THEN
+                xxin = 0.0
+              ENDIF
 
-              ii = MIN(i,nxm)
-              jj = MIN(j,nym)
+              yyin = met_yyctr -  &
+                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
+              IF ( ABS(yyin) < distmin ) THEN
+                yyin = 0.0
+              ENDIF
 
-              im1 = MIN(i-1,1)
-              jm1 = MIN(j-1,1)
+              CALL xy2ll_ps (xxin, yyin, met_tru1, met_proj_clon,  &
+                             latu(i,j), lonu(i,j))
 
-              latu(i,j) = ( latcrs(im1,jj) + latcrs(ii,jj) ) * 0.5
-              lonu(i,j) = ( loncrs(im1,jj) + loncrs(ii,jj) ) * 0.5
               mapu(i,j) = mapfac_ps (latu(i,j), met_tru1)
 
-              latv(i,j) = ( latcrs(ii,jm1) + latcrs(ii,jj) ) * 0.5
-              lonv(i,j) = ( loncrs(ii,jm1) + loncrs(ii,jj) ) * 0.5
+            ENDDO
+          ENDDO
+
+          xoff = 0.5  ! V-face: 0.5-cell offset in X from dot-point center value
+          yoff = 0.0  ! V-face: no offset in Y from dot-point center value
+
+          DO j = 1, met_ny
+            DO i = 1, met_nx  ! use all X to fill array; last col outside domain
+
+              xxin = met_xxctr -  &
+                     ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
+              IF ( ABS(xxin) < distmin ) THEN
+                xxin = 0.0
+              ENDIF
+
+              yyin = met_yyctr -  &
+                     ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
+              IF ( ABS(yyin) < distmin ) THEN
+                yyin = 0.0
+              ENDIF
+
+              CALL xy2ll_ps (xxin, yyin, met_tru1, met_proj_clon,  &
+                             latv(i,j), lonv(i,j))
+
               mapv(i,j) = mapfac_ps (latv(i,j), met_tru1)
 
             ENDDO
@@ -2176,9 +2227,15 @@ SUBROUTINE rdwrfem (mcip_now)
 
             xxin = met_xxctr -  &
                    ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
+            IF ( ABS(xxin) < distmin ) THEN
+              xxin = 0.0
+            ENDIF
 
             yyin = met_yyctr -  &
                    ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
+            IF ( ABS(yyin) < distmin ) THEN
+              yyin = 0.0
+            ENDIF
 
             CALL xy2ll_merc (xxin, yyin, met_proj_clon,  &
                              latdot(i,j), londot(i,j))
@@ -2198,9 +2255,15 @@ SUBROUTINE rdwrfem (mcip_now)
 
               xxin = met_xxctr -  &
                      ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
+              IF ( ABS(xxin) < distmin ) THEN
+                xxin = 0.0
+              ENDIF
 
               yyin = met_yyctr -  &
                      ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
+              IF ( ABS(yyin) < distmin ) THEN
+                yyin = 0.0
+              ENDIF
 
               CALL xy2ll_merc (xxin, yyin, met_proj_clon,  &
                                latu(i,j), lonu(i,j))
@@ -2218,9 +2281,15 @@ SUBROUTINE rdwrfem (mcip_now)
 
               xxin = met_xxctr -  &
                      ( met_rictr_dot - (FLOAT(i) + xoff) ) * met_resoln
+              IF ( ABS(xxin) < distmin ) THEN
+                xxin = 0.0
+              ENDIF
 
               yyin = met_yyctr -  &
                      ( met_rjctr_dot - (FLOAT(j) + yoff) ) * met_resoln
+              IF ( ABS(yyin) < distmin ) THEN
+                yyin = 0.0
+              ENDIF
 
               CALL xy2ll_merc (xxin, yyin, met_proj_clon,  &
                                latv(i,j), lonv(i,j))

@@ -19,13 +19,12 @@
 SUBROUTINE xy2ll_merc (xx, yy, lambda0, phi, lambda)
 
 !-------------------------------------------------------------------------------
-! Name:     (X,Y) to Latitude-Longitude for Polar Stereographic Projection
+! Name:     (X,Y) to Latitude-Longitude for Mercator Projection
 ! Purpose:  Calcluates latitude-longitude for a given (X,Y) pair from origin
-!           and polar stereographic projection information.
-! Notes:    Equations taken from "Map Projections: Theory and Applications"
-!           by Frederick Pearson, II (1990), pp. 190-192.
+!           and Mercator projection information.
 ! Revised:  18 Sep 2009  Original version.  (T. Otte)
 !           07 Sep 2011  Updated disclaimer.  (T. Otte)
+!           14 May 2025  Corrected Name and Purpose of this routine. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE const, ONLY: rearth
