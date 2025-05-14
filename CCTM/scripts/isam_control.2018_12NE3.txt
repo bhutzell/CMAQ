@@ -9,7 +9,7 @@
 !!! each user-defined source.
 !!!   Choose any/all from the list:
 !!!   SULFATE   - ASO4, SO2, SULF, SULRXN
-!!!   NITRATE   - ANO3, HNO3, NO, NO2, NO3, HONO, N2O5, PNA, PAN, PANX, NTR1, NTR2, INTR, CLNO2, CLNO3
+!!!   NITRATE   - ANO3, HNO3, NO, NO2, NO3, HONO, N2O5, PNA, PAN, PANX, NTR1, NTR2, INTR, CLNO2, CLNO3, CRON, OPAN
 !!!   AMMONIUM  - ANH4, NH3
 !!!   EC        - AEC
 !!!   OA_TOT    - Total Primary and Seocndary Organic Aerosol Species
