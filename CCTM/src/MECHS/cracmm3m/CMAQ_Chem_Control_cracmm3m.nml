@@ -1471,11 +1471,11 @@ CMPST =
 !-- Total Nitrate --!
 'DD_TNO3'     , 'Dry Dep of Total Nitrate',
                 'kg ha-1', 'DEP',
-                'DD_ANO3 + 0.984*DD_HNO3 + DD_NO3',
+                'DD_ANO3 + 0.984*DD_HNO3 + DD_NO3 + 0.6362*DD_CLNO3',
 
 'WD_TNO3'     , 'Wet Dep of Total Nitrate',
                 'kg ha-1', 'DEP',
-                'WD_ANO3 + 0.984*WD_HNO3 + WD_NO3',
+                'WD_ANO3 + 0.984*WD_HNO3 + WD_NO3 + 0.6362*WD_CLNO3',
 
 !-- Total Ammonia --!
 'DD_NHX'      , 'Dry Dep of Total Ammonia', 
