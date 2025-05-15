@@ -21,7 +21,7 @@ NR_SPECIES_DATA =
 'CL3_ETHE'       ,131.40  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'TRICHLOROETHENE' , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Trichloroethylene,E,DTXSID0021383,ClC=C(Cl)Cl
 'CL_ETHE'        , 62.50  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'VINYL_CHLORIDE'  , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Vinyl Chloride,E,DTXSID8021434,ClC=C
 'QUINOLINE'      ,129.20  ,''     ,-1      ,''     ,-1     ,''                ,-1   ,'QUINOLINE'       , 1  ,''             ,''        ,'Yes' ,''    ,'Yes' ,'Yes',!Quinoline,E,DTXSID1021798,C1=CC2=C(C=C1)N=CC=C2
-'HEXMETH_DIS'    ,168.20  ,''     ,-1      ,''     ,-1     ,'VD_HEXMETH_DIIS' , 1   ,'HEXAMETHYLE_DIIS', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!n-Hexane,E,DTXSID0021917,CCCCCC
+'HEXMETH_DIS'    ,168.20  ,''     ,-1      ,''     ,-1     ,'VD_HEXMETH_DIIS' , 1   ,'HEXAMETHYLE_DIIS', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hexamethylene 16-Diisocyanate,E,DTXSID4024143,O=C=NCCCCCCN=C=O
 'HYDRAZINE'      , 32.00  ,''     ,-1      ,''     ,-1     ,'VD_HYDRAZINE'    , 1   ,'HYDRAZINE'       , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrazine,E,DTXSID3020702,NN
 'MAL_ANHYDRID'   , 98.00  ,''     ,-1      ,''     ,-1     ,'VD_MAL_ANHYDRIDE', 1   ,'MALEIC_ANHYDRIDE', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Maleic Anhydride,E,DTXSID7024166,O=C1OC(=O)C=C1
 'TOL_DIIS'       ,174.20  ,''     ,-1      ,''     ,-1     ,'VD_TOLUENE_DIIS' , 1   ,'24-TOLUENE_DIIS' , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!24-Toluene Diisocyanate,DTXSID7026156,CC1=CC=C(C=C1N=C=O)N=C=O
