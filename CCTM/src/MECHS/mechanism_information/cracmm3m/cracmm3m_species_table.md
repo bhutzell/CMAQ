@@ -1,4 +1,4 @@
-CRACMM3 Species Table
+CRACMM3M Species Table
 Gas (G) and particle (P) species from the namelists. SMILES link to representative structures in the EPA Chemicals Dashboard (if available).
 
 Note that for each particulate species in CMAQ, a letter will be appended to the name to designate the size, or mode, of the aerosol being represented: I = Aitken mode, J = Accumulation mode, K = Coarse mode. Prepending of a species with a V or A in CMAQ or the chemical mechanism files indicates the species resides in the gas or particulate phase. 
@@ -6,6 +6,7 @@ Note that for each particulate species in CMAQ, a letter will be appended to the
  <sub>Species</sub> | <sub>Description</sub> | <sub>Phase</sub> | <sub>Molecular Weight (g/mol)</sub> | <sub>Explicit/ Lumped</sub> | <sub>Representative Structure</sub> | <sub>SMILES</sub> 
  ----- | ----- | ----- | ----- | ----- | ----- | ----- 
 AAL|Aluminum ion|P|27.0|E|Aluminum ion|[\[Al+3\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID70912343)
+ABR||P|79.9|E|Bromide ion|[\[Br-\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID6043967)
 ACA|Calcium ion|P|40.1|E|Calcium ion|[\[Ca++\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID7037638)
 ACD|Acetaldehyde |G|44.0|E|Acetaldehyde|[CC=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID5039224)
 ACE|Acetylene |G|26.0|E|Acetylene|[C#C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID6026379)
@@ -58,6 +59,22 @@ BDE13|1,3-butadiene|G|54.1|E|1,3-Butadiene|[C=CC=C](https://comptox.epa.gov/dash
 BDE13P|Peroxy radicals from BDE13|G|103.0|L|(1-hydroxybut-3-en-2-yl)peroxy|C=CC\(O\[O\]\)CO
 BEN|Benzene|G|78.11|E|Benzene|[C1=CC=CC=C1](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3039242)
 BENP|Peroxy radicals formed from benzene|G|159.12|L|{8-hydroxy-6,7-dioxabicyclo[3.2.1]oct-3-en-2-yl}peroxy|\[O\]OC1C=CC2OOC1C2O
+BR| Bromine atom|G|79.9|E|Bromine atom|[\[Br\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID201014232)
+BR2| Bromine|G|159.8|E|Bromine|[BrBr](https://comptox.epa.gov/dashboard/chemical/details/DTXSID1035238)
+BRCL| Bromine chloride|G|115.4|E|Bromine chloride|[BrCl](https://comptox.epa.gov/dashboard/chemical/details/DTXSID4035259)
+BRNO| Nitrosyl bromide|G|109.9|E|Nitrosyl bromide|[BrN=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID90158701)
+BRNO2| Nitryl bromide|G|125.9|E|Nitryl bromide|BrN\(=O\)=O
+BRNO3| Bromine nitrate|G|141.9|E|Bromine nitrate|[BrON\(=O\)=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID90960821)
+BRO| Bromine monoxide|G|95.9|E|Bromine monoxide|[\[O\]Br](https://comptox.epa.gov/dashboard/chemical/details/DTXSID201315575)
+CH2BR2|	Dibromomethane|G|173.8|E|Dibromomethane|[BrCBr](https://comptox.epa.gov/dashboard/chemical/details/DTXSID4021557)
+CH2BRCL| Bromochloromethane|G|129.4|E|Bromochloromethane|[ClCBr](https://comptox.epa.gov/dashboard/chemical/details/DTXSID4021503)
+CH2I2| Methylene iodide|G|267.8|E|Methylene iodide|[ICI](https://comptox.epa.gov/dashboard/chemical/details/DTXSID4058784)
+CH2IBR|	Bromoiodomethane|G|220.8|E|Bromoiodomethane|[ICBr](https://comptox.epa.gov/dashboard/chemical/details/DTXSID50204233)
+CH2ICL|	Chloroiodomethane|G|176.4|E|Chloroiodomethane|[ClCI](https://comptox.epa.gov/dashboard/chemical/details/DTXSID50208034)
+CH3I| Iodomethane|G|141.9|E|Iodomethane|[CI](https://comptox.epa.gov/dashboard/chemical/details/DTXSID0024187)
+CHBR2CL| Dibromochloromethane|G|208.3|E|Dibromochloromethane|[ClC\(Br\)Br](https://comptox.epa.gov/dashboard/chemical/details/DTXSID1020300)
+CHBR3| Bromoform|G|252.7|E|Bromoform|[BrC\(Br\)Br](https://comptox.epa.gov/dashboard/chemical/details/DTXSID1021374)
+CHBRCL2| Bromodichloromethane|G|163.9|E|Bromodichloromethane|[ClC\(Cl\)Br](https://comptox.epa.gov/dashboard/chemical/details/DTXSID1020198)
 CHO|Phenoxy radical formed from CSL|G|107.0|L|(2-methylphenyl)oxidanyl|CC1=CC=CC=C1\[O\]
 CL| Atomic chlorine|G|35.5|E|Chlorine atom|[\[Cl\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID801014230)
 CL2| Molecular chlorine |G|71.0|E|Chlorine|[ClCl](https://comptox.epa.gov/dashboard/chemical/details/DTXSID1020273)
@@ -88,6 +105,7 @@ FURANO2|Peroxy radicals from FURAN oxidation|G|145.1|L|(2-formyl-5-hydroxy-5H-fu
 FURANONE|Ring-retaining ketone product from FURAN oxidation|G|100.1|L|2-hydroxy-2H-furan-5-one|[C1=CC\(=O\)OC1O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID10930763)
 GLY|Glyoxal and glycoaldehydes |G|58.0|L|Glyoxal|[O=CC=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID5025364)
 H2O2|Hydrogen peroxide|G|34.0|E|Hydrogen peroxide|[OO](https://comptox.epa.gov/dashboard/chemical/details/DTXSID2020715)
+HBR| Hydobromic acid|G|80.9|E|Hydobromic acid|[Br](https://comptox.epa.gov/dashboard/chemical/details/DTXSID0029713)
 HC10|Alkanes and other species with HO rate constant greater than 6.8x10<sup>-12</sup> cm<sup>3</sup> s<sup>-1</sup>|G|142.28|L|Decane|[CCCCCCCCCC](https://comptox.epa.gov/dashboard/chemical/details/DTXSID6024913)
 HC10P|Peroxy radicals formed from HC10 |G|173.27|L|Decan-3-ylperoxy|CCCCCCCC\(CC\)O\[O\]
 HC10P2|Hydroxy peroxy radicals from HC10P alkoxy product|G|189.27|L|(8-hydroxydecan-5-yl)peroxy|CCCCC\(O\[O\]\)CCC\(O\)CC
@@ -97,18 +115,34 @@ HC5|Alkanes and other species with HO rate constant between 3.4x10<sup>-12</sup>
 HC5P|Peroxy radicals formed from HC5|G|103.0|L|Pentan-3-ylperoxy|CCC\(O\[O\]\)CC
 HCHO|Formaldehyde |G|30.0|E|Formaldehyde|[C=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID7020637)
 HCL|Hydrochloric acid|G|36.0|E|Hydrochloric acid|[Cl](https://comptox.epa.gov/dashboard/chemical/details/DTXSID2020711)
+HCOBR| Formyl bromide|G|108.9|E|Formyl bromide|[BrC=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID20227994)
+HCOCL| Formyl chloride|G|64.5|E|Formyl chloride|[ClC=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID30180344)
+HI| Hydrogen iodide|G|127.9|E|Hydrogen iodide|[I](https://comptox.epa.gov/dashboard/chemical/details/DTXSID2044349)
 HKET|Hydroxy ketone |G|74.0|L|Hydroxy acetone|[CC\(=O\)CO](https://comptox.epa.gov/dashboard/chemical/details/DTXSID8051590)
 HNO3|Nitric acid|G|63.0|E|Nitric acid|[\[N+\]\(=O\)\(O\)\[O-\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID5029685)
 HNO4|Pernitric acid |G|79.0|E|Hydroxy nitrate|[\[N+\]\(=O\)\(\[O-\]\)OO](https://comptox.epa.gov/dashboard/chemical/details/DTXSID201030501)
 HO|Hydroxy radical|G|17.0|E|Hydroxyl radical|\[OH\]
 HO2|Hydroperoxy radical|G|33.0|E|Hydroperoxy|[O\[O-\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID30894777)
+HOBR| Hypobromous acid|G|96.9|E|Hypobromous acid|[OBr](https://comptox.epa.gov/dashboard/chemical/details/DTXSID701024864)
 HOCL| Hypochlorous acid|G|52.5|E|Hypochlorous acid|[OCl](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3036737)
+HOI| Hypoiodous acid|G|143.9|E|Hypoiodous acid|[OI](https://comptox.epa.gov/dashboard/chemical/details/DTXSID8042050)
 HOM|Highly oxygenated molecules from terpenes|GP|250.0|L|6,7-dihydroperoxy-3,3,6-trimethyl-tetrahydro-3aH-1,2-benzodioxol-5-ol|OC1CC2C\(OOC2\(C\)C\)C\(OO\)C1\(C\)OO
 HONIT|Second generation monoterpene nitrates|GP|265.0|L|2-(3-hydroperoxy-4,5-dihydroxy-4-methylcyclohexyl)propan-2-yl nitrate|CC\(C\)\(O\[N+\]\(\[O-\]\)=O\)C1CC\(O\)C\(C\)\(O\)C\(C1\)OO
 HONO|Nitrous acid |G|47.0|E|Nitrous acid|[N\(=O\)O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID7064813)
+I| Atmomic iodine|G|126.9|E|Atmomic iodine|[\[I\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID501014231)
+I2| Iodine|G|253.8|E|Iodine|[II](https://comptox.epa.gov/dashboard/chemical/details/DTXSID7034672)
+I2O2| Diiodine dioxide|G|285.8|E|Diiodine dioxide|O=I\(=O\)I
+I2O3| Diiodine trioxide|G|301.8|E|Diiodine trioxide|O=IOI\(=O\)
+I2O4| Diiodine tetroxide|G|317.8|E|Diiodine Tetroxide|O=IOI\(=O\)=O
+IBR| Iodine bromide|G|206.8|E|Iodine bromide|[IBr](https://comptox.epa.gov/dashboard/chemical/details/DTXSID2064862)
+ICL| Iodine chloride|G|162.4|E|Iodine chloride|[ICl](https://comptox.epa.gov/dashboard/chemical/details/DTXSID1064879)
 IEPOX|isoprene epoxydiols |G|118.1|E|Isoprene epoxydiol|OCC1OC1\(C\)CO
 IEPOXP|IEPOX intermediate (tracking species)|G|118.1||NA|
 INALD|Isoprene nitrates|G|195.1|L|2-hydroperoxy-4-hydroxy-3-methyl-3-(nitrooxy)butanal|CC\(CO\)\(O\[N+\]\(=O\)O\)C\(C=O\)OO
+INO| Nitrosyl iodide|G|156.9|E|Nitrosyl iodide|[IN=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID80207297)
+INO2| Iodine nitrite|G|172.9| E|Iodine nitrite|IN\(=O\)=O
+INO3| Iodine nitrate|G|188.9|E|Iodine nitrate|[ION\(=O\)=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID001336624)
+IO| Iodine monoxide|G|142.9|E|Iodine monoxide|[\[O\]I](https://comptox.epa.gov/dashboard/chemical/details/DTXSID101316449)
 IPX|Isoprene tetrafunctional compounds|G|150.1|L|3-(1-hydroperoxy-2-hydroxypropan-2-yl)oxiran-2-ol|CC\(O\)\(COO\)C1OC1O
 ISHP|Beta-hydroxy hydroperoxides from ISOP+HO2|G|118.0|L|2-hydroperoxy-2-methylbut-3-en-1-ol|C=CC\(OO\)\(CO\)C
 ISO|Isoprene |G|68.1|E|Isoprene|[CC\(=C\)C=C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID2020761)
@@ -153,7 +187,9 @@ NUM|Number of particles|P|1.0|L|Number of particles|
 O1D|Excited state oxygen atom, O(1D) |G|16.0|E|Excited oxygen|[\[O\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID00170378)
 O3|Ozone|G|48.0|E|Ozone|[\[O-\]\[O+\]=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID0021098)
 O3P|Ground state oxygen atom, O(3P)|G|16.0|E|Ground state oxygen|[\[O\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID00170378)
+OBRO| Bromine dioxide|G|111.9|E|Bromine dioxide|[O=\[Br\]=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID401028281)
 OCLO| Chlorine dioxide |G|67.5|E|Chlorine dioxide isomar|O=Cl\[O\]
+OIO| Iodine dioxide|G|158.9|E|Iodine dioxide|O=I\(=O\)
 OLI|Internal alkenes |G|70.1|L|2-Methyl-2-butene|[CC=C\(C\)C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID8027165)
 OLIP|Peroxy radicals formed from OLI|G|119.0|L|(3-hydroxy-2-methylbutan-2-yl)peroxy|\[O\]OC\(C\)\(C\)C\(C\)O
 OLND|NO3-alkene adduct reacting via decomposition |G|136.0|L|[1-(nitrooxy)propan-2-yl]peroxy|CC\(O\[O\]\)CO\[N+\]\(\[O-\]\)=O

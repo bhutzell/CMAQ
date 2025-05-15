@@ -62,7 +62,7 @@ HONO,Nitrous acid
 IEPOX,isoprene epoxydiols 
 IEPOXP,IEPOX intermediate (tracking species)
 INALD,Isoprene nitrates
-INO2,Isoprene nitrate-derived peroxy radicals
+ISONP,Isoprene nitrate-derived peroxy radicals
 IPX,Isoprene tetrafunctional compounds
 ISHP,Beta-hydroxy hydroperoxides from ISOP+HO2
 ISO,Isoprene 
@@ -209,9 +209,11 @@ HEXANE,n-Hexane
 HG,elemental mercury
 HGIIGAS,Divalent Mercury Compounds
 HYDRAZINE,Hydrazine
-HEXMETHY_DIS,Hexamethylene 16-Diisocyanate
+HEXMETH_DIS,Hexamethylene 16-Diisocyanate
 MAL_ANHYDRID,Maleic Anhydride
 METHCHLORIDE,methyl chloride
+TOL_DIIS,24-Toluene Diisocyanate
+HCN,Hydrogen Cyanide
 PAH_000E0,Lumped POM or PAHs Inert Tracer with a 0.0 Unit Risk Exposure<sup>1</sup>
 PAH_176E5,Lumped POM or PAHs Inert Tracer with a 0.0000096 Unit Risk Exposure
 PAH_880E5,Lumped POM or PAHs Inert Tracer with a 0.000048 Risk Exposure
@@ -229,7 +231,7 @@ ASO4,Total sulfur IV as sulfate
 ANH4,Ammonium ion
 ANO3,Nitrate ion
 ASOAT,An empirical SOA
-AGLY,SOA from reactive uptake of glyoxal on particles
+AGLYOLIG,SOA from reactive uptake of glyoxal on particles
 AORGC,SOA from cloud processing of GLY and MGLY
 AEC,Elemental carbon
 AOTHR,Primary unspeciated fine PM
@@ -257,8 +259,20 @@ AISO4,Multifunctional product from heterogeneous uptake of IPX
 AISO5,Multifunctional product from heterogeneous uptake of INALD
 NUM,Number of particles
 SRF,Surface area of particles
-ATRPN,SOA from TRPN
-AHONIT,SOA from HONIT
+ASEAST, J-mode seasalt concentration (tracer)
+CL2, Molecular chlorine
+CL, Atomic chlorine
+CLO, Chlorine monoxide
+OCLO, Chlorine dioxide
+CL2O2, Chloryl chloride
+HOCL, Hypochlorous acid
+CLNO, Nitrosyl chloride
+CLNO2, Nitryl chloride
+CLNO3, Chlorine nitrate
+CLOO, Chlorine superoxide
+NO2PIJ, Dioxidonitrogen
+NO2PK, Dioxidonitrogen
+MTN1,Monoterpene derived species with C* 1e-1 ug/m3
 ABE,Beryllium
 ABENAPY,Aerosol Phase Benzo-a-Pyrene
 ACADMIUM,Cadmium
@@ -274,3 +288,5 @@ ADE_SO4,Diesel Sulfate
 AMN_HAPS,Manganese based on the Hazardous Air Pollutant Emissions
 APB,Lead
 APHG,Mercury
+ANI,Nickel
+AAS,Arsenic
