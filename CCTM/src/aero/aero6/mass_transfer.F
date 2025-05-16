@@ -88,15 +88,18 @@
      & INORG_GAS_TYPE( 'HNO3   ' ,KNO3       ,  2            ,  3 ),
      & INORG_GAS_TYPE( 'HCL    ' ,KCL        ,  3            ,  4 ) /)
 
-      REAL( 8 ), SAVE :: CFAC_AER(NAER) ! 1.0e-6/MW [ug/m3 --> mol/m3]
-      REAL( 8 ), SAVE :: CFAC_GAS(NGAS) ! 1.0e-6/MW [ug/m3 --> mol/m3]
+      REAL( 8 ), SAVE :: CFAC_AER(NAER)      ! 1.0e-6/MW [ug/m3 --> mol/m3]
+      REAL( 8 ), SAVE :: CFAC_AER_INV(NAER)  ! 1.0e6*MW  [mol/m3 --> ug/m3]
+      REAL( 8 ), SAVE :: CFAC_ASEACAT        ! 1.0e-6/MW [ug/m3 --> mol/m3]
+      REAL( 8 ), SAVE :: CFAC_GAS(NGAS)      ! 1.0e-6/MW [ug/m3 --> mol/m3]
       REAL( 8 ), SAVE :: MASStoVOL_AER(NAER) ! 1.0e-9*6pi/rho [ug/m3 --> m3/m3]
       REAL( 8 ), SAVE :: MASStoVOL_SOIL      ! 1.0e-9*6pi/rho [ug/m3 --> m3/m3]
       REAL( 8 ), SAVE :: MASStoVOL_CORS      ! 1.0e-9*6pi/rho [ug/m3 --> m3/m3]
 
-      REAL( 8 ), SAVE :: MW_AER(NAER)  ! g mol-1
-      REAL( 8 ), SAVE :: MW_GAS(NGAS)  ! g mol-1
-      REAL( 8 ), SAVE :: MW_RATIO(NGAS)! [g mol-1]_gas / [g mol-1]_aer
+      REAL( 8 ), SAVE :: MW_AER(NAER)      ! g mol-1
+      REAL( 8 ), SAVE :: MW_GAS(NGAS)      ! g mol-1
+      REAL( 8 ), SAVE :: MW_RATIO(NGAS)    ! [g mol-1]_gas / [g mol-1]_aer
+      REAL( 8 ), SAVE :: MW_RATIO_INV(NGAS)! [g mol-1]_aer / [g mol-1]_gas
       REAL( 8 ), SAVE :: AER_CHARGE(NAER)  ! ion charge in aerosol species
 
       ! ISORROPIA MAPS
@@ -339,13 +342,15 @@ C-----------------------------------------------------------------------
          MAP_INORGtoAERO = 0
          MAP_IGAStoCGRID = 0
          
-         CFAC_AER(:) = 0.0
-         CFAC_GAS(:) = 0.0                                       
-         MASStoVOL_AER(:) = 0.0
+         CFAC_AER(:) = 0.0D0
+         CFAC_AER_INV(:) = 0.0D0
+         CFAC_GAS(:) = 0.0D0
+         MASStoVOL_AER(:) = 0.0D0
 
-         MW_AER = 0.0
-         MW_GAS = 0.0
-         MW_RATIO = 0.0
+         MW_AER = 0.0D0
+         MW_GAS = 0.0D0
+         MW_RATIO = 0.0D0
+         MW_RATIO_INV = 0.0D0
 
          ! Map Aerosol Species
          DO K = 1,NAER
@@ -353,14 +358,19 @@ C-----------------------------------------------------------------------
             IF ( I .GT. 0 ) THEN
                MAP_INORGtoAERO( K ) = I
                MW_AER( K ) = REAL( AEROSPC_MW( I ), 8 ) 
-               CFAC_AER( K ) = 1.0E-6 / MW_AER( K ) ! Conversion ug m-3 to mol m-3
-               MASStoVOL_AER( K ) = 1.0E-9 * F6DPI / REAL( AEROSPC(I)%DENSITY, 8 )      ! Conversion ug m-3 to m3 m-3
+               CFAC_AER( K ) = 1.0D-6 / MW_AER( K ) ! Conversion ug m-3 to mol m-3
+               CFAC_AER_INV( K ) = 1.0D0 / CFAC_AER( K )
+               MASStoVOL_AER( K ) = 1.0D-9 * F6DPI / REAL( AEROSPC(I)%DENSITY, 8 )      ! Conversion ug m-3 to m3 m-3
                AER_CHARGE( K ) = REAL( AEROSPC( I )%CHARGE, 8 )
             END IF
          END DO
+         CFAC_AER( KH2O ) = 1.0D-6 / 18.0153D0    ! MW( AH2O ) is 18.0, and this disagrees with the 
+         CFAC_AER_INV( KH2O ) = 1.0D6 * 18.0153D0 ! global parameter MWWAT, which equals 18.0153.
+                                                  ! Set this parameter manually.
+         CFAC_ASEACAT = 1.0D-6 / 23.75D0
 
-         MASStoVOL_SOIL = 1.0E-9 * F6DPI / REAL( AEROSPC( ASOIL_IDX )%DENSITY, 8 )
-         MASStoVOL_CORS = 1.0E-9 * F6DPI / REAL( AEROSPC( ACORS_IDX )%DENSITY, 8 )
+         MASStoVOL_SOIL = 1.0D-9 * F6DPI / REAL( AEROSPC( ASOIL_IDX )%DENSITY, 8 )
+         MASStoVOL_CORS = 1.0D-9 * F6DPI / REAL( AEROSPC( ACORS_IDX )%DENSITY, 8 )
 
          ! Map Gas Species
          DO K = 1,NGAS
@@ -376,10 +386,11 @@ C-----------------------------------------------------------------------
                P = I
             END IF
             IF ( P .GT. 0 ) THEN
-               MW_GAS( K ) = REAL( CGRID_MW( P ), 8 )
-               CFAC_GAS( K ) = 1.0E-6 / MW_GAS( K )  ! Conversion ug m-3 to mol m-3
+               MW_GAS( K ) = REAL( CGRID_MW( MAP_IGAStoCGRID(K) ), 8 )
+               CFAC_GAS( K ) = 1.0D-6 / MW_GAS( K )  ! Conversion ug m-3 to mol m-3
 
-               MW_RATIO( K ) = MW_GAS( K ) / MW_AER( GTTR(K)%KAER ) 
+               MW_RATIO( K ) = MW_GAS( K ) / MW_AER( GTTR(K)%KAER )
+               MW_RATIO_INV( K ) = MW_AER( GTTR(K)%KAER ) / MW_GAS( K )
             END IF
          END DO
 
@@ -450,7 +461,12 @@ C     N.B: these are for a "wet" size distribution
      &                   DV_SO4, ALPHSULF, CBAR_SO4, FCONC_OUT )
             FCONC_SO4( I, : ) = FCONC_OUT( : )
 
-            IF ( AERO_MISSING( IAER_SO4,I ) ) FCONC_SO4( I,: ) = 0.0D0
+            IF ( .NOT. DO_COARSE_MT ) THEN
+               FCONC_SO4( N_MODE,1 ) = 0.0D0
+               FCONC_SO4( N_MODE,2 ) = 0.0D0
+            END IF
+
+            !IF ( AERO_MISSING( IAER_SO4,I ) ) FCONC_SO4( I,: ) = 0.0D0
 
             GRFAC1( I ) = FCONC_SO4( I,1 )
             GRFAC2( I ) = FCONC_SO4( I,2 )
@@ -542,7 +558,7 @@ C     N.B: these are for a "wet" size distribution
          ! Diagnose Condensaiton Sink to Each Mode
          CONDSO4( 1 ) = OMEGA_AT_SO4 * SCONDRATE      
       
-      IF ( DO_COARSE_MT ) THEN 
+         IF ( DO_COARSE_MT ) THEN 
             CONDSO4( 2 ) = OMEGA_AC_SO4 * SCONDRATE      
             CONDSO4( 3 ) = SCONDRATE - ( CONDSO4( 1 ) + CONDSO4( 2 ) ) 
          ELSE                                  ! fine equilibrium
@@ -692,7 +708,7 @@ C     integrates fluxes across time.
 
             ! Compute sulfate production rate [ug/m3 s] for coarse mode
             RATE = CONDSO4( IMODE )
-            CFINAL( KSO4,IMODE )  = CINORG( KSO4,IMODE ) + RATE * TSTEP / MW_RATIO(KH2SO4)
+            CFINAL( KSO4,IMODE )  = CINORG( KSO4,IMODE ) + RATE * TSTEP * MW_RATIO_INV(KH2SO4)
 
             ! Double Precision vars for ISORROPIA [mole/m3]
             ! Compute equilibrium vapor pressures [mol/m3] of NH3, HNO3, and HCL
@@ -706,7 +722,7 @@ C     integrates fluxes across time.
                  IF ( I .GT. 0 .AND. I .LE. NISRP )
      &              WI( I ) = CINORG( K,IMODE ) * CFAC_AER( K )
                END DO
-               WI( ATTR( KSO4 )%ISRP ) = CFINAL( KSO4,IMODE )
+               WI( ATTR( KSO4 )%ISRP ) = CFINAL( KSO4,IMODE ) * CFAC_AER( KSO4 )
                
                ! Call ISORROPIA Module
                CALL ISOROPIA( WI, RHI, TEMPI, CNTRL, WT, ISRP_GAS, ISRP_AERLIQ,  
@@ -741,20 +757,22 @@ C     integrates fluxes across time.
                   K = GTTR(I)%KAER
 
                   ! Protect time integration against overshoot
-                  IF ( J( I ) * TSTEP / CFAC_AER(K) * MW_RATIO(I) .GT. CGAS(I) ) THEN
+                  IF ( J( I ) * TSTEP * CFAC_AER_INV(K) * MW_RATIO(I) .GT. CGAS(I) ) THEN
                      WRITE( LOGDEV,* ) 'Condensed amt. exceeds ' // 
      &                                 TRIM(GTTR(I)%NAME) //' conc: aero_subs.f'
-                     J( I ) = CGAS(I) / ( TSTEP / CFAC_AER(K) * MW_RATIO(I) )
+                     J( I ) = CGAS(I) / ( TSTEP * CFAC_AER_INV(K) * MW_RATIO(I) )
                   END IF
 
                   ! Integrate mass transfer equation, convert flux from molar to mass
                   CFINAL( K,IMODE ) = MAX( 0.0D0, CINORG( K,IMODE )
-     &                                  + J(I) * TSTEP / CFAC_AER(K) )
+     &                                  + J(I) * TSTEP * CFAC_AER_INV(K) )
                END IF
             END DO
+            
+            ! For H+, just pass initial value to final
+            CFINAL( KH3OP,IMODE ) = CINORG( KH3OP,IMODE )
 
             ! Pass nonvolatile species to final concentration vector
-            CFINAL( KSO4,IMODE )= CINORG( KNA,IMODE )
             CFINAL( KNA,IMODE ) = CINORG( KNA,IMODE )
             CFINAL( KMG,IMODE ) = CINORG( KMG,IMODE )
             CFINAL( KK,IMODE )  = CINORG( KK, IMODE )
@@ -763,7 +781,10 @@ C     integrates fluxes across time.
             ! Calculate updated H+ concentration 
             HPLUS( IMODE ) = 0.0
             DO I = 1,NAER
-               IF ( I .NE. KH2O .AND. I .NE. KH3OP ) THEN
+               IF ( I .EQ. KNA ) THEN
+                  HPLUS( IMODE ) = HPLUS( IMODE ) 
+     &               - AEROSPC( ASEACAT_IDX )%CHARGE * CFINAL( KNA,IMODE ) / AEROSPC_MW( ASEACAT_IDX )
+               ELSE IF ( I .NE. KH2O .AND. I .NE. KH3OP ) THEN
                   HPLUS( IMODE ) = HPLUS( IMODE ) - 
      &                             AER_CHARGE( I ) * CFINAL( I, IMODE ) / MW_AER( I )
                END IF
@@ -773,13 +794,16 @@ C     integrates fluxes across time.
             WI = 0.0
             DO I = 1,NAER
               ISRP = ATTR(I)%ISRP
-              IF ( ISRP .GT. 0 .AND. ISRP .LE. NISRP ) 
-     &             WI( ISRP ) = WI( ISRP ) + CFINAL( I,IMODE ) * CFAC_AER( I )
+              IF ( I .EQ. KNA ) THEN
+                 WI( ISRP ) = WI( ISRP ) + CFINAL( I,IMODE ) * CFAC_ASEACAT
+              ELSE IF ( ISRP .GT. 0 .AND. ISRP .LE. NISRP ) THEN
+                 WI( ISRP ) = WI( ISRP ) + CFINAL( I,IMODE ) * CFAC_AER( I )
+              END IF
             END DO
 
             CALL CALC_H2O( WI, RHI, TEMPI, H2O_NEW ) 
 
-            CFINAL( KH2O,IMODE ) = H2O_NEW / CFAC_AER( KH2O )
+            CFINAL( KH2O,IMODE ) = H2O_NEW * CFAC_AER_INV( KH2O )
 
             ! Update all Local Vapor Concentrations 
             DO I = 1,NGAS
@@ -856,25 +880,29 @@ C     equilibrium. These are often fine modes.
       ! Sum all total gas+particle concentrations to passed to
       ! ISORROPIA. Convert everything to [mol m-3].
       WI(:) = 0.0
-      DO K = 1,NAER
-         I = ATTR( K )%ISRP
-         IF ( I .GT. 0 .AND. I .LE. NISRP ) THEN
+      DO IAER = 1,NAER
+         I = ATTR( IAER )%ISRP
+         K = MAP_INORGtoAERO( IAER )
+
+         IF ( IAER .EQ. KSO4 ) THEN
+            ! ADD NEW PARTICLE FORMATION MASS
+            WI(I) = ( SUM( AEROSPC_CONC(K,:),MASK=L_MODE_EQB(:) ) 
+     &                + ( DMDT_SO4 + SUM( CONDSO4(:), MASK=L_MODE_EQB(:) ) ) 
+     &                    * DELT * MW_RATIO_INV(KH2SO4) ) * CFAC_AER(IAER)
+         ELSE IF ( I .GT. 0 .AND. I .LE. NISRP ) THEN
             ! ADD PARTICLE PHASE MASS FROM BOTH MODES
-            WI(I) = SUM( AEROSPC_CONC( K,: ), MASK=L_MODE_EQB(:) ) * CFAC_AER( K )
-         END IF
-         IF ( K .EQ. KSO4 ) THEN
-            ! ADD CONDENSED SULFATE
-            WI(I) = WI(I) + 
-     &           +( DMDT_SO4 + SUM( CONDSO4(:), MASK=L_MODE_EQB(:) ) ) * 
-     &                         DELT / MW_RATIO(KH2SO4) * CFAC_AER(K)
+            WI(I) = SUM( AEROSPC_CONC(K,:),MASK=L_MODE_EQB(:) ) * CFAC_AER( IAER )
          END IF
       END DO
 
       ! Add Condensable Gas to ISORROPIA input vector, WI
       DO K = 1,NGAS
          IF ( K .NE. KH2SO4 ) THEN
-            I = GTTR( K )%ISRP
-            WI(I) = WI(I) + PRECURSOR_CONC( MAP_IGAStoPREC( K ) )  * CFAC_GAS( K )
+            I = ATTR( GTTR( K )%KAER )%ISRP
+            IF ( I .GT. 0 .AND. I .LE. NISRP ) THEN
+               ! ADD CONDENSABLE GAS
+               WI(I) = WI(I) + CGAS( K )  * CFAC_GAS( K )
+            END IF
          END IF
       END DO
 
@@ -898,6 +926,8 @@ C     equilibrium. These are often fine modes.
 
       ! Save H+ concentration information in microgram/m3 for consistency
       EQLBHIJ = ISRP_AERLIQ(1) * 1.0D6 * MW_AER( KH3OP )
+
+#else
 
       DO K = 1,NGAS
         IF ( K .NE. KH2SO4 ) THEN
@@ -979,7 +1009,8 @@ C     equilibrium. These are often fine modes.
             DO IMODE = 1,N_MODE
               IF ( L_MODE_EQB( IMODE ) ) THEN
                 CFINAL( ISP,IMODE ) = CFINAL( ISP,IMODE ) + CINORG( ISP,IMODE )
-     &                        + PHI( GTTR(ISP)%KAER,IMODE ) * DVOLINORG( ISP ) / CFAC_AER(ISP)
+     &                        + PHI( GTTR(ISP)%KAER,IMODE ) 
+     &                          * DVOLINORG( ISP ) * CFAC_AER_INV(ISP)
               END IF
             END DO
          ELSE
@@ -987,7 +1018,8 @@ C     equilibrium. These are often fine modes.
             DO IMODE = 1,N_MODE
               IF ( L_MODE_EQB( IMODE ) ) THEN
                 CFINAL( ISP,IMODE ) = CFINAL( ISP,IMODE ) + CINORG( ISP,IMODE )
-     &                          + OMEGA( IMODE ) * DVOLINORG( ISP ) / CFAC_AER(ISP)
+     &                          + OMEGA( IMODE ) 
+     &                            * DVOLINORG( ISP ) * CFAC_AER_INV(ISP)
               END IF
             END DO
          END IF
@@ -1016,10 +1048,10 @@ C *** Apply Final Concentrations to Moment Variables in Aerosol Scheme
             MOMENT0_CONC( IMODE ) = REAL( AM0(IMODE) + DNDT * DELT, 4 )
             ! Add NPF to total condensation rate
             RATE = DMDT_SO4 + CONDSO4( IMODE )
-            CFINAL( KSO4,IMODE ) = CINORG( KSO4,IMODE ) + RATE * DELT / MW_RATIO(KH2SO4) 
+            CFINAL( KSO4,IMODE ) = CINORG( KSO4,IMODE ) + RATE * DELT * MW_RATIO_INV(KH2SO4) 
          ELSE
             ! Ignore NPF. The small particles are not in these modes
-            CFINAL( KSO4,IMODE ) = CINORG( KSO4,IMODE ) + CONDSO4( IMODE ) * DELT / MW_RATIO(KH2SO4)
+            CFINAL( KSO4,IMODE ) = CINORG( KSO4,IMODE ) + CONDSO4( IMODE ) * DELT * MW_RATIO_INV(KH2SO4)
          END IF
 
          CFINAL( KNA,IMODE ) = CINORG( KNA,IMODE )
@@ -1035,7 +1067,7 @@ C *** Apply Final Concentrations to Moment Variables in Aerosol Scheme
          END DO
          
          CALL CALC_H2O( WI, RHI, TEMPI, H2O_NEW ) 
-         CFINAL( KH2O,IMODE ) = H2O_NEW / CFAC_AER( KH2O )
+         CFINAL( KH2O,IMODE ) = H2O_NEW * CFAC_AER_INV( KH2O )
          
          ! Update All Aerosol Concentrations
          DO I = 1,NAER
@@ -1052,8 +1084,9 @@ C *** Apply Final Concentrations to Moment Variables in Aerosol Scheme
          DDRYM3DT = 0.0
          DO I = 1,NGAS
             K = GTTR(I)%KAER
-            DDRYM3DT = DDRYM3DT + MASStoVOL_AER( K ) *
+            DDRYM3DT = DDRYM3DT + 
      &                 ( CFINAL( K,IMODE ) - CINORG( K,IMODE ) )
+     &                 * MASStoVOL_AER( K )
          END DO
          DDRYM3DT = DDRYM3DT / DELT
 
@@ -1149,8 +1182,14 @@ C     aerospc_conc variables. This should be for the wet distribution.
 
 C *** Update gas-phase concentrations from Aitken and Accumulation Mode Partitioning
       DO I = 1,NGAS
-         PRECURSOR_CONC( MAP_IGAStoPREC( I ) ) = CGAS(I) 
-     &        + SUM( -DAER( GTTR(I)%KAER,:) * MW_RATIO( I ) )
+         IF ( I .EQ. KH2SO4 ) THEN
+            PRECURSOR_CONC( MAP_IGAStoPREC( I ) ) = PRECURSOR_CONC( MAP_IGAStoPREC( I ) )
+     &          + SUM( -DAER( GTTR(I)%KAER,:) * MW_RATIO( I ) )
+         ELSE
+            K = GTTR(I)%KAER
+            PRECURSOR_CONC( MAP_IGAStoPREC( I ) ) = CGAS(I) 
+     &          + SUM( CINORG( K,: ) - CFINAL( K,: ),MASK=L_MODE_EQB(:) ) * MW_RATIO( I )
+         END IF
       END DO
 
 2023  FORMAT( 1X, 'VOLINORG returning negative gas concentrations from ISOROPIA:'
