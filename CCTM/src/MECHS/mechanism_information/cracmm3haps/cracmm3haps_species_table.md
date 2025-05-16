@@ -9,7 +9,6 @@ AAL|Aluminum ion|P|27.0|E|Aluminum ion|[\[Al+3\]](https://comptox.epa.gov/dashbo
 AAS|Arsenic|P|74.92|E|Arsenic|[\[As\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID4023886)
 ABE|Beryllium|P|9.0|E|Beryllium|[\[Be\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID4023913)
 ABENAPY|Aerosol Phase Benzo-a-Pyrene|P|252.3|E|Benzo[a]pyrene|[C1=CC=C2C\(=C1\)C=C1C=CC3=CC=CC4=CC=C2C1=C34](https://comptox.epa.gov/dashboard/chemical/details/DTXSID2020139)
-ACA|Calcium|P|40.1|E|Calcium ion|[\[Ca++\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID7037638)
 ACA|Calcium ion|P|40.1|E|Calcium ion|[\[Ca++\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID7037638)
 ACADMIUM|Cadmium|P|112.4|E|Cadmium|[\[Cd++\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID60177060)
 ACD|Acetaldehyde |G|44.0|E|Acetaldehyde|[CC=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID5039224)
