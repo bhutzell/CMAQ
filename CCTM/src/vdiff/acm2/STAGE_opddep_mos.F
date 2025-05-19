@@ -94,12 +94,9 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          YCELL3D = YCELL_GD
          VGTYP3D = VGTYP_GD
          VGTOP3D = VGTOP_GD
-!        VGTPUN3D = VGTPUN_GD ! currently, not defined
          DO L = 1, NLAYS3D + 1
-!           VGLVS3D( L ) = VGLVS_GD( L )
-            VGLVS3D( L ) = 1.0  ! just a dummy variable b/c they aren't really levels
+           VGLVS3D( L ) = VGLVS_GD( L )
          END DO
-!        GDNAM3D = GDNAME_GD
          GDNAM3D = GRID_NAME  ! from HGRD_DEFN
 
          N = 0

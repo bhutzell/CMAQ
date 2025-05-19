@@ -425,15 +425,15 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      set IN_BEISpath = ${INPDIR}/land
      setenv GSPRO          $BLD/gspro_biogenics.txt
      setenv BEIS_NORM_EMIS $IN_BEISpath/b3grd_bench.nc
-     if ($USE_SAGE_N == 'Y') then
-        setenv SAGE_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
-     else 
+     if ($USE_SAGE_N == 'N') then
         setenv BEIS_SOILINP    $OUTDIR/CCTM_BSOILOUT_${RUNID}_${YESTERDAY}.nc
      endif
                              #> Biogenic NO soil input file; ignore if NEW_START = TRUE
   endif
   if ( $CTM_BIOGEMIS_MG == 'Y' ) then
-    setenv MEGAN_SOILINP    $OUTDIR/CCTM_MSOILOUT_${RUNID}_${YESTERDAY}.nc
+     if ($USE_SAGE_N == 'N') then
+        setenv MEGAN_SOILINP    $OUTDIR/CCTM_MSOILOUT_${RUNID}_${YESTERDAY}.nc
+     endif
                              #> Biogenic NO soil input file; ignore if INITIAL_RUN = Y
                              #>                            ; ignore if IGNORE_SOILINP = Y
          setenv MEGAN_CTS /work/MOD3DATA/2014_HEMI/surface/megan3.2/CT3_HEMI.ncf
