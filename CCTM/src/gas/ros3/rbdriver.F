@@ -86,7 +86,8 @@ C**********************************************************************
       USE CONST
 #ifdef sens
       USE DDM3D_CHEM
-      Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, NP, NPMAX, CKTIME
+      Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH,
+     &                      SENGRID, NP, NPMAX, CKTIME
 #endif
       
       IMPLICIT NONE 
@@ -637,17 +638,35 @@ C  Update CGRID based on the degradation routines
               END DO
 
               DO ISP = 1,NUMB_MECH_SPC
-!                  ISPOLD = INEW2OLD( ISP,NCS )
-!                  YCDDM( ISPOLD ) = YAVE(NCELL,ISP)
                   YCDDM( ISP ) = YAVE(NCELL,ISP)
                END DO
                CELLNUM = NORDCELL( OFFSET + NCELL )
                COL = CCOL( CELLNUM )
                ROW = CROW( CELLNUM )
                LEV = CLEV( CELLNUM )
+c..unit conversion to ppmV for current gridcell if sensitivity is in ugm-3
+               DO ISP = 1, ISCHANG( NCS )
+                  S = CGRID_INDEX( ISP )                  
+                  IF( CONVERT_CONC( ISP ) )THEN
+                     DO NP = 1, NPMAX
+                        SENGRID( COL,ROW,LEV,NP,S ) = BLKSVOL( NCELL )*FORWARD_CONV( ISP )
+     &                                              * SENGRID( COL,ROW,LEV,NP,S )
+                     END DO
+                  END IF
+               END DO
 
-!                CALL SOLVE_DDM3D_CHEM( COL,ROW,LEV,CHEMSTEP )
                CALL SOLVE_DDM3D_CHEM( COL,ROW,LEV,CHEMSTEP,IOLD2NEW,INEW2OLD )
+
+c..revert back to original units if ug/m3
+               DO ISP = 1, ISCHANG( NCS )
+                  S = CGRID_INDEX( ISP )
+                  IF( CONVERT_CONC( ISP ) )THEN
+                      DO NP = 1, NPMAX
+                        SENGRID( COL,ROW,LEV,NP,S ) = REAL( REVERSE_CONV( ISP ) * BLKDENS( NCELL ) )
+     &                                              * SENGRID( COL,ROW,LEV,NP,S )
+                      END DO
+                  ENDIF
+               END DO               
             END DO
             NUMCELLS = NUMB_CELLS
 #endif
