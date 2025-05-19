@@ -27,7 +27,7 @@ C  PRECONDITIONS: For the CRACMM3M mechanism
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Apr  2, 2025
+C  REVISION HISTORY: Created by EBI solver program, May 19, 2025
 C
 C   18 Jul 14 B.Hutzell: revised to use real(8) variables
 C**********************************************************************
@@ -68,24 +68,24 @@ C**********************************************************************
 
 
 c..Production of NO3 (except from N2O5 )
-      P15 =    2.0000D-01 * RKI(     9 ) * YC ( HNO4        )                           ! HNO4=0.2000D+00*NO3+...
-     &    +                 RKI(    39 ) * YC ( PAN         )                           ! PAN=NO3+MO2
-     &    +                 RKI(    41 ) * YC ( PPN         )                           ! PPN=NO3+HC3P
-     &    +                 RKI(    47 ) * YCP( O3          ) * YCP( NO2         )      ! O3+NO2=NO3
-     &    +                 RKI(    65 ) * YCP( NO2         ) * YCP( O3P         )      ! NO2+O3P=NO3
-     &    +                 RKI(    67 ) * YC ( HNO3        ) * YCP( HO          )      ! HNO3+HO=NO3
-     &    +                 RKI(   142 ) * YC ( PAN         ) * YCP( HO          )      ! PAN+HO=NO3+XO2+HCHO
-     &    +                 RKI(   143 ) * YC ( PPN         ) * YCP( HO          )      ! PPN+HO=NO3+XO2+HCHO
-     &    +                 RKI(   147 ) * YC ( HONIT       ) * YCP( HO          )      ! HONIT+HO=NO3+HKET
-     &    +                 RKI(   543 ) * YC ( CLNO3       )                           ! CLNO3=NO3+CL
-     &    +                 RKI(   560 ) * YC ( CL          ) * YC ( CLNO3       )      ! CL+CLNO3=NO3+CL2
-     &    +                 RKI(   575 ) * YCP( HO          ) * YC ( CLNO3       )      ! HO+CLNO3=NO3+HOCL
-     &    +                 RKI(   610 ) * YC ( CL          ) * YC ( PAN         )      ! CL+PAN=NO3+XO2+HCL+HCHO
-     &    +                 RKI(   611 ) * YC ( CL          ) * YC ( PPN         )      ! CL+PPN=NO3+XO2+HCL+HCHO
-     &    +                 RKI(   739 ) * YC ( BRNO3       )                           ! BRNO3=NO3+BR
-     &    +                 RKI(   749 ) * YC ( BR          ) * YC ( BRNO3       )      ! BR+BRNO3=NO3+BR2
-     &    +                 RKI(   812 ) * YC ( INO3        )                           ! INO3=NO3+I
-     &    +                 RKI(   823 ) * YC ( I           ) * YC ( INO3        )      ! I+INO3=NO3+I2
+      P15 =    2.0000D-01 * RKI(     9 ) * YC ( HNO4        )                                                ! HNO4=0.2000D+00*NO3+...
+     &    +                 RKI(    39 ) * YC ( PAN         )                                                ! PAN=NO3+MO2
+     &    +                 RKI(    41 ) * YC ( PPN         )                                                ! PPN=NO3+HC3P
+     &    +                 RKI(    47 ) * YCP( O3          ) * YCP( NO2         )                           ! O3+NO2=NO3
+     &    +                 RKI(    65 ) * YCP( NO2         ) * YCP( O3P         )                           ! NO2+O3P=NO3
+     &    +                 RKI(    67 ) * YC ( HNO3        ) * YCP( HO          )                           ! HNO3+HO=NO3
+     &    +                 RKI(   142 ) * YC ( PAN         ) * YCP( HO          )                           ! PAN+HO=NO3+XO2+HCHO
+     &    +                 RKI(   143 ) * YC ( PPN         ) * YCP( HO          )                           ! PPN+HO=NO3+XO2+HCHO
+     &    +                 RKI(   147 ) * YC ( HONIT       ) * YCP( HO          )                           ! HONIT+HO=NO3+HKET
+     &    +                 RKI(   543 ) * YC ( CLNO3       )                                                ! CLNO3=NO3+CL
+     &    +                 RKI(   560 ) * YC ( CL          ) * YC ( CLNO3       )                           ! CL+CLNO3=NO3+CL2
+     &    +                 RKI(   575 ) * YCP( HO          ) * YC ( CLNO3       )                           ! HO+CLNO3=NO3+HOCL
+     &    +                 RKI(   610 ) * YC ( CL          ) * YC ( PAN         )                           ! CL+PAN=NO3+XO2+HCL+HCHO
+     &    +                 RKI(   611 ) * YC ( CL          ) * YC ( PPN         )                           ! CL+PPN=NO3+XO2+HCL+HCHO
+     &    +                 RKI(   739 ) * YC ( BRNO3       )                                                ! BRNO3=NO3+BR
+     &    +                 RKI(   749 ) * YC ( BR          ) * YC ( BRNO3       )                           ! BR+BRNO3=NO3+BR2
+     &    +                 RKI(   812 ) * YC ( INO3        )                                                ! INO3=NO3+I
+     &    +                 RKI(   823 ) * YC ( I           ) * YC ( INO3        )                           ! I+INO3=NO3+I2
 
 c..Loss frequency of NO3 ( except NO3 + NO3 if present )
       L15 =                 RKI(     5 )                        ! NO3=NO
