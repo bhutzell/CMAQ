@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /work/MOD3DEV/kfa/CMAQ_Integration/CRACMM_SO4/cracmm_042825/UTIL/chemmech/input/cracmm3m/mech_cracmm3m.def
+! Source file: /work/MOD3DEV/kfa/CMAQ_Integration/CRACMM_SO4/cracmm_043025/UTIL/chemmech/input/cracmm3m/mech_cracmm3m.def
 ! for Mechanism Name: CRACMM3M                        
 
 ! This file is used to create mechanism data and functions
@@ -3599,7 +3599,7 @@
      &      0,    0,    0,    0,    0,  243,  244,    9,    9,   10, & ! 7   
      &     10,  244,  244,    0,    0,    9,    9,   10,   10,   10, & ! 8   
      &     10,    0,    0,    0,    9,    9,   10,   10,    0,    0, & ! 9   
-     &      0,    0,    0,    0,    6,    6,    0,    0,    0,    0, & ! O   
+     &      0,    0,    0,    0,    6,    6,    0,    0,  105,  109, & ! O   
      &      9,  245,    0,  244,   52,   13/     !  1   
 
       DATA ( IRR( IRXXN,  6 ), IRXXN = 1, NRXNS ) / & 
@@ -7015,7 +7015,7 @@
      &     1.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, & ! 9   
      &     1.0000D+00, 1.0000D+00, 1.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
      &     0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 3.3000D-01, & ! O   
-     &     3.3000D-01, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! +   
+     &     3.3000D-01, 0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00, & ! +   
      &     1.0000D+00, 1.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00, & ! 1   
      &     1.0000D+00/           !        +   
 
@@ -12043,7 +12043,7 @@
      &      1,    1,    1,    1,    1,    2,    2,    2,    2,    2, & ! 7   
      &      2,    2,    2,    1,    1,    2,    2,    2,    2,    2, & ! 8   
      &      2,    1,    1,    1,    2,    2,    2,    2,    0,    0, & ! 9   
-     &      0,    0,    0,    0,    2,    2,    1,    1,    1,    1, & ! O   
+     &      0,    0,    0,    0,    2,    2,    1,    1,    2,    2, & ! O   
      &      2,    3,    1,    2,    3,    2/     !  1   
 
       INTEGER, PARAMETER :: MHETERO =  60

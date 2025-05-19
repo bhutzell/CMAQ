@@ -6,7 +6,7 @@
 
 
 ! --------- Photochemical Mechanism Reactions, Rates, etc. DAT ---------
-! Source file: /work/MOD3DEV/kfa/CMAQ_Integration/CRACMM_SO4/cracmm_042825/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
+! Source file: /work/MOD3DEV/kfa/CMAQ_Integration/CRACMM_SO4/cracmm_043025/UTIL/chemmech/input/cracmm3/mech_cracmm3.def
 ! for Mechanism Name: CRACMM3                         
 
 ! This file is used to create mechanism data and functions
@@ -2960,7 +2960,7 @@
      &    199,    0,   12,    0,    0,    6,    8,    0,  198,   16, & ! 7   
      &     18,   48,   59,   24,   13,   15,   16,   16,  198,  204, & ! 8   
      &    205,    0,    0,    0,    0,    0,   10,   10,  192,    0, & ! 9   
-     &      0,    0,    0,    9,  209,    0,  192,   52,   13/     !O   
+     &      0,  106,  110,    9,  209,    0,  192,   52,   13/     !O   
 
       DATA ( IRR( IRXXN,  6 ), IRXXN = 1, NRXNS ) / & 
      &      0,    0,    0,    0,    0,    0,    0,    0,    6,    0, & ! O   
@@ -5260,7 +5260,7 @@
      &     1.0000D+00, 1.3100D-01, 5.1000D-02, 1.0000D+00, 1.0000D+00, & ! +   
      &     1.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, 0.0000D+00, & ! 9   
      &     0.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 0.0000D+00, & ! +   
-     &     0.0000D+00, 0.0000D+00, 0.0000D+00, 1.0000D+00, 1.0000D+00, & ! O   
+     &     0.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00, & ! O   
      &     0.0000D+00, 1.0000D+00, 1.0000D+00, 1.0000D+00/           !+   
 
       DATA ( SC( IRXXN,  3 ), IRXXN = 1, NRXNS ) / & 
@@ -8614,7 +8614,7 @@
      &      2,    1,    2,    1,    1,    2,    2,    1,    2,    2, & ! 7   
      &      2,    3,    3,    2,    3,    3,    9,   12,    2,    2, & ! 8   
      &      2,    1,    1,    1,    1,    1,    2,    2,    2,    1, & ! 9   
-     &      1,    1,    1,    2,    3,    1,    2,    3,    2/     !O   
+     &      1,    2,    2,    2,    3,    1,    2,    3,    2/     !O   
 
       INTEGER, PARAMETER :: MHETERO =  32
       INTEGER            :: IHETERO( MHETERO,2 )

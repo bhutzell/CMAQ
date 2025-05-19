@@ -923,8 +923,8 @@ Information is based on the mech.def file.
 | HET_ANO3J   | ANO3J ---->   0.6700\*HONO +    0.3300\*NO2  | HETERO_ANO3 | Not Available<sup>2</sup> | 
 | HET_SO2_H2O2   | SO2 + H2O2 ----> ASO4J  | HETERO_SO2H | Not Available<sup>2</sup> | 
 | HET_SO2_O3   | SO2 + O3 ----> ASO4J  | HETERO_SO2O | Not Available<sup>2</sup> | 
-| HET_SO2_MEPX   | SO2 + OP1 ----> ASO4J  | HETERO_SO2M | Not Available<sup>2</sup> | 
-| HET_SO2_PACD   | SO2 + PAA ----> ASO4J  | HETERO_SO2P | Not Available<sup>2</sup> | 
+| HET_SO2_MEPX   | SO2 + OP1 ----> ASO4J + MOH  | HETERO_SO2M | Not Available<sup>2</sup> | 
+| HET_SO2_PACD   | SO2 + PAA ----> ASO4J + ORA2  | HETERO_SO2P | Not Available<sup>2</sup> | 
 | HET_SO2_NO2   | SO2 + NO2 ----> ASO4J + HONO  | HETERO_SO2N | Not Available<sup>2</sup> | 
 | HET_SO2_TMI   | SO2 + AFEJ + AMNJ ----> ASO4J + AFEJ + AMNJ  | HETERO_SO2T | Not Available<sup>2</sup> | 
 | HET_SO2_HCHO   | SO2 + HCHO ----> AHMSJ  | HETERO_HMSP | Not Available<sup>2</sup> | 
