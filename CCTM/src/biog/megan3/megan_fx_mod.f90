@@ -3190,14 +3190,16 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
                     L_DESID_DIAG,SOILM1,SOILT,SLTYP,LAIc,    &
                                             bdsnp_no)
 
-        else if(.Not. USE_SAGE_N) then
+        else
 
 
           CALL SOILNOX(IDATE,ITIME,NCOLS,NROWS,            &
                      TEMP,LSOIL,SLTYP, SOILM1, SOILT,     &
                      LAIc, LAT, PRECADJ,                 &
                      CFNO, CFNOG )
-
+        IF( USE_SAGE_N) THEN
+           GAMNO = 0.0           
+        ELSE
         DO I = 1,NCOLS
           DO J = 1,NROWS
             CALL GROWSEASON(IDATE,LAT(I,J),GDAY,GLEN)
@@ -3227,7 +3229,7 @@ SUBROUTINE MEGVEA(  LAYERS, JDATE, ZTIME,                &
  
            ENDDO  !NCOLS
         ENDDO  !NROWS
-
+        END IF
         END IF ! YL or BDSNP
 
 

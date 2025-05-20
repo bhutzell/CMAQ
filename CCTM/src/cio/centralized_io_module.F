@@ -2950,6 +2950,10 @@
           integer :: stat, i, j, k, fnumb, fnumm
           real, allocatable :: t24sum(:,:), sw24sum(:,:)
 
+          if( USE_SAGE_N .and. BDSNP_MEGAN) Then
+                MESG = 'ERROR: Correct the run script USE_SAGE_N and BDSNP_MEGAN cannot both be set to Y.'
+                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT3 )
+          end if
 
           if (BIOGEMIS_BEIS .and. .not. USE_SAGE_N) then
              ALLOCATE( PTYPE( NCOLS,NROWS ),
@@ -2967,38 +2971,7 @@
              DDTTM    = ' '   ! array
           end if
 
-          if (BIOGEMIS_MEGAN .and. .not. USE_SAGE_N) then
-             ALLOCATE (PTYPE( NCOLS,NROWS ),
-     &                 PULSEDATE( NCOLS,NROWS ),
-     &                 PULSETIME( NCOLS,NROWS ),
-     &                 RAINFALL( NCOLS,NROWS, mxhrs ),
-     &                 t24y     ( ncols,nrows        ),
-     &                 sw24y    ( ncols,nrows        ),
-     &                 lai_y    ( ncols,nrows        ),
-     &                 HRNO_SW  ( NCOLS,NROWS, mxhrs ),
-     &                 HRNO_T2M ( NCOLS,NROWS, mxhrs ),
-     &                 t24sum   ( ncols,nrows        ),
-     &                 sw24sum  ( ncols,nrows        ),
-     &                 DDTTM    ( mxhrs ),
-     &                 stat=stat)
-     
-             IF ( STAT .NE. 0 ) THEN
-                MESG = 'Failure BIOGEMIS_MEGAN arrays'
-                CALL M3EXIT( PNAME, 0, 0, MESG, XSTAT3 )
-             END IF
-
-             t24y     = 0.0
-             sw24y    = 0.0
-             lai_y    = 0.0
-             HRNO_SW  = 0.0
-             HRNO_T2M = 0.0
-             sw24sum  = 0.0
-             t24sum   = 0.0
-             RAINFALL = 0.0
-             DDTTM    = ' '   ! array
-          end if
-
-          if (BIOGEMIS_MEGAN .and. USE_SAGE_N) then
+          if (BIOGEMIS_MEGAN) then
              ALLOCATE (PTYPE( NCOLS,NROWS ),
      &                 PULSEDATE( NCOLS,NROWS ),
      &                 PULSETIME( NCOLS,NROWS ),
@@ -3049,7 +3022,6 @@
           end if
 
           if (USE_SAGE_N) then
-             write(logdev,*) 'CIO Allocating SAGE variables'
              ALLOCATE( PFACTOR      ( ncols,nrows ),
      &                 DRYPERIOD    ( ncols,nrows ), 
      &                 FREEZEPERIOD ( ncols,nrows ), 
@@ -3159,7 +3131,7 @@
 
           end if ! end beis section
 
-          if (BIOGEMIS_MEGAN .and. .not. NEW_START .and. .not. IGNORE_SOILINP .and. .not. USE_SAGE_N) then
+          if (BIOGEMIS_MEGAN .and. .not. NEW_START .and. .not. IGNORE_SOILINP ) then
 #ifdef mpas
              ! file will be opened automatically when it is indicated in FILE_INFO
              fnumm = mio_search (MSOILINP)
