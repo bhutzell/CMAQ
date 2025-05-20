@@ -280,6 +280,7 @@ C     mass partitioning between the modes
       REAL( 8 ) :: J( NGAS )              ! condensation/evaporation flux [mol/m**3-s]
       REAL( 8 ) :: CFINAL( NAER,N_MODE )  ! conc after mass xfer step [ug/m**3]
       REAL( 8 ) :: H2O_NEW                ! Update of LWC after condensation 
+      REAL( 8 ) :: H2O_NEW_INV            ! Reciprocal of update of LWC after condensation 
       REAL( 8 ) :: SO4                    ! modal SO4 after condensation or cond + nucl
       REAL( 8 ) :: DDRYM3DT               ! rate of 3rd moment transfer - dry inorg spcs
       REAL( 8 ) :: DDRYM2DT               ! rate of 2nd moment transfer -  "     "    "
@@ -1046,6 +1047,8 @@ C *** Apply Final Concentrations to Moment Variables in Aerosol Scheme
       M2DRY_INIT( : ) = MOMENT2_CONC( : )
 
       DO IMODE = 1, N_MODE  ! modal partitioning of equilibrium aerosol mass
+         IF ( L_MODE_EQB( IMODE ) ) THEN 
+
          IF ( IMODE .EQ. NPF_MODE ) THEN
             ! Update Number Concentration with NPF
             MOMENT0_CONC( IMODE ) = REAL( AM0(IMODE) + DNDT * DELT, 4 )
@@ -1106,6 +1109,8 @@ C *** Apply Final Concentrations to Moment Variables in Aerosol Scheme
             Y = M2DRY_INIT( IMODE ) + DDRYM2DT * DELT
          END IF
          moment2_conc( IMODE ) = REAL( MAX( REAL( AEROMODE_MINM2( IMODE ), 8 ), Y ),4 )
+
+         END IF  ! Is this an equilibrium mode?
       END DO
 
       ! Add water and SOA to 2nd moment while preserving standard deviation
@@ -1129,13 +1134,13 @@ C *** Apply Final Concentrations to Moment Variables in Aerosol Scheme
       END DO
       H2O_NEW = REAL( SUM( AEROSPC_CONC( MAP_INORGtoAERO( KH2O ),: ), 
      &                     MASK=L_MODE_EQB(:) ), 8 )
+      IF (  H2O_NEW .GT. CONMIN ) H2O_NEW_INV = 1.0 / H2O_NEW
 
       ! Assign H3O+ concentrations for equilibrium and dynamic modes
       DO IMODE = 1,N_MODE
          IF ( L_MODE_EQB(IMODE) ) THEN
             IF (  H2O_NEW .GT. CONMIN )THEN
-               H2O_NEW = 1.0 / H2O_NEW
-               AEROSPC_CONC( MAP_INORGtoAERO( KH3OP ),IMODE ) = REAL( EQLBHIJ * H2O_NEW, 4 ) * 
+               AEROSPC_CONC( MAP_INORGtoAERO( KH3OP ),IMODE ) = REAL( EQLBHIJ * H2O_NEW_INV, 4 ) * 
      &                     AEROSPC_CONC( MAP_INORGtoAERO( KH2O ),IMODE ) 
             ELSE
                AEROSPC_CONC( MAP_INORGtoAERO( KH3OP ),IMODE ) = CONMIN
