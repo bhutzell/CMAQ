@@ -41,6 +41,9 @@ C   08 Jun 12 J.Young: remove full character blank padding for GNU Fortran (GCC)
       USE CGRID_SPCS          ! CGRID mechanism species
       USE UTILIO_DEFN
       USE MIO_ASCII
+#ifdef sens
+      USE DDM3D_DEFN, ONLY: NP, NPMAX, SENNUM, SPCNAME, SEN_PAR
+#endif
 
       IMPLICIT NONE
  
@@ -252,6 +255,113 @@ C    Open dry deposition file
          END IF
 
       END IF
+
+#ifdef sens
+CC..Create sensitivity dry deposition file
+
+C...check for existing file
+      IF ( .NOT. OPEN3( CTM_SDRYDEP_1, FSRDWR3, PNAME ) ) THEN
+         XMSG = 'Could not open ' // CTM_SDRYDEP_1 // ' file for update - '
+     &        // 'try to open new'
+         CALL M3MESG( XMSG )
+
+C...set output file variables 
+         NVARS3D = N_SPC_DDEP * NPMAX
+         FDESC3D( 1 ) = 'sensitivity of hourly dry deposition'
+
+C...define sens dry deposition output descriptors for gaseous species
+         N = 0
+         STRT = 1
+         FINI = N_GC_DDEP
+         DO V = STRT, FINI
+            N = N + 1
+            SPCNAME = GC_DDEP( N )( 1:12 )
+            DO NP = 1, NPMAX
+               SENNUM = ( V - 1 ) * NPMAX + NP
+               VNAME3D ( SENNUM ) = TRIM( SPCNAME ) //'_' // SEN_PAR( NP )
+               VTYPE3D( SENNUM ) = M3REAL
+               UNITS3D( SENNUM ) = 'kg/hectare'
+               VDESC3D( SENNUM ) = 'sensitivity of hourly dry deposition values'
+            END DO
+         ENDDO
+
+C...define dry deposition output descriptors for aerosol species
+         N = 0
+         STRT = N_GC_DDEP + 1
+         FINI = N_GC_DDEP + N_AE_DDEP
+         DO V = STRT, FINI
+            N = N + 1
+            SPCNAME = AE_DDEP( N )( 1:12 )
+            DO NP = 1, NPMAX
+               SENNUM = ( V - 1 ) * NPMAX + NP
+               VNAME3D ( SENNUM ) = TRIM( SPCNAME ) //'_' // SEN_PAR( NP )
+               VTYPE3D( SENNUM ) = M3REAL
+               IF ( AE_DDEP( N )( 1:3 ) .EQ. 'NUM' ) THEN
+                  UNITS3D( SENNUM ) = 'number/hectare'
+               ELSE IF ( AE_DDEP( N )( 1:3 ) .EQ. 'SRF' ) THEN
+                  UNITS3D( SENNUM ) = 'm**2/hectare'
+               ELSE
+                  UNITS3D( SENNUM ) = 'kg/hectare'
+               END IF
+               VDESC3D( SENNUM ) = 'sensitivity of hourly dry deposition values'
+            END DO
+         ENDDO
+
+C...define dry deposition output descriptors for non-reactive species
+         N = 0
+         STRT = N_GC_DDEP + N_AE_DDEP + 1
+         FINI = N_GC_DDEP + N_AE_DDEP + N_NR_DDEP
+         DO V = STRT, FINI
+            N = N + 1
+            SPCNAME = NR_DDEP( N )( 1:12 )
+            DO NP = 1, NPMAX
+               SENNUM = ( V - 1 ) * NPMAX + NP
+               VNAME3D ( SENNUM ) = TRIM( SPCNAME ) //'_' // SEN_PAR( NP )
+               VTYPE3D( SENNUM ) = M3REAL
+               UNITS3D( SENNUM ) = 'kg/hectare'
+               VDESC3D( SENNUM ) = 'sensitivity of hourly dry deposition values'
+            END DO
+         END DO
+
+C...define dry deposition output descriptors for tracer species
+         N = 0
+         STRT = N_GC_DDEP + N_AE_DDEP + N_NR_DDEP + 1
+         FINI = N_GC_DDEP + N_AE_DDEP + N_NR_DDEP + N_TR_DDEP
+         DO V = STRT, FINI
+            N = N + 1
+            SPCNAME = TR_DDEP( N )( 1:12 )
+            DO NP = 1, NPMAX
+               SENNUM = ( V - 1 ) * NPMAX + NP
+               VNAME3D ( SENNUM ) = TRIM( SPCNAME ) //'_' // SEN_PAR( NP )
+               VTYPE3D( SENNUM ) = M3REAL
+               UNITS3D( SENNUM ) = '----'
+               VDESC3D( SENNUM ) = 'sensitivity of hourly dry deposition values'
+            END DO
+         END DO
+
+         ! Store MIO Metadata
+         NDIMS3D( 1:NVARS3D ) = 3
+         L_TSTEP( 1:NVARS3D ) = .True.
+         L_LAY  ( 1:NVARS3D ) = .False.
+         L_COL  ( 1:NVARS3D ) = .True.
+         L_ROW  ( 1:NVARS3D ) = .True.
+         L_VEXT ( 1:NVARS3D ) = .False.
+
+         CALL LOAD_MIO_FILE ( 'CTM_SDRYDEP_1', 0, 0, 0,
+     &        VNAME3D(1:NVARS3D), VTYPE3D(1:NVARS3D), UNITS3D(1:NVARS3D),
+     &        VDESC3D(1:NVARS3D), NDIMS3D(1:NVARS3D), L_TSTEP(1:NVARS3D),
+     &        L_LAY(1:NVARS3D),   L_COL(1:NVARS3D),   L_ROW(1:NVARS3D),
+     &        L_VEXT(1:NVARS3D) )
+
+
+C...create a new file
+         IF ( .NOT. OPEN3( CTM_SDRYDEP_1, FSNEW3, PNAME ) ) THEN
+            XMSG = 'Could not create '// CTM_DRY_DEP_1 // ' file'
+            CALL M3EXIT( PNAME, SDATE3D, STIME3D, XMSG, XSTAT1 )
+         END IF
+
+      END IF
+#endif
 
       RETURN
       END

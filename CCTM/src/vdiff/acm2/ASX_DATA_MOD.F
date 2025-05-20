@@ -198,9 +198,7 @@ C Land use information:
       Real, Parameter :: dwat       = 0.2178     ! [cm^2/s] at 273.15K
       Real, Parameter :: hplus_ap   = 1.0e-6     ! pH=6.0 leaf apoplast solution Ph (Massad et al 2008)      
       Real, Parameter :: hplus_def  = 1.0e-5     ! pH=5.0
-      Real, Parameter :: hplus_east = 1.0e-5     ! pH=5.0
       Real, Parameter :: hplus_h2o  = 7.94328e-9 ! 10.0**(-8.1)
-      Real, Parameter :: hplus_west = 3.16228e-6 ! 10.0**(-5.5)
       Real, Parameter :: kvis       = 0.132      ! [cm^2 / s] at 273.15K
       Real, Parameter :: pr         = 0.709      ! [dim'less]
       Real, Parameter :: rcut0      = 3000.0     ! [s/m]

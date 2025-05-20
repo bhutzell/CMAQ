@@ -197,12 +197,11 @@ setenv BC_AERO_M2USE F       #> Specify whether or not to use aerosol surface ar
                              #>    is available, and (3) the domain is smaller than CONUS. 
                              
 #> Surface Tiled Aerosol and Gaseous Exchange Option
-setenv CTM_USE_STAGE N       #> Use the STAGE deposition option [ default: N; active only if CTM_USE_STAGE = Y ]
+setenv CTM_USE_STAGE N       #> Use the STAGE deposition option [ default: N ]
 setenv CTM_MOSAIC N          #> Output landuse specific deposition velocities [ default: N ]
 setenv CTM_STAGE_P22 N       #> Pleim et al. 2022 Aerosol deposition model [default: N]
-setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [default: Y]
+setenv CTM_STAGE_E20 Y       #> Emerson et al. 2020 Aerosol deposition model [default: Y; active only if CTM_USE_STAGE = Y]
 setenv CTM_STAGE_S22 N       #> Shu et al. 2022 (CMAQ v5.3) Aerosol deposition model [default: N]
-
 
 #> Vertical Extraction Options
 setenv VERTEXT N

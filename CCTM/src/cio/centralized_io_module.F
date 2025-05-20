@@ -1990,7 +1990,6 @@
           USE UTILIO_DEFN
           USE HGRD_DEFN
           USE LSM_Mod,      ONLY: n_lufrac, init_lsm
-          USE STAGE_LU_Mod, ONLY: init_STAGE_LU
 #if defined twoway || defined mpas
           USE coupler_module
 #endif

@@ -750,9 +750,7 @@ C re-set dry deposition array to zero
 
          DDEP = 0.0
          TOT_BD_EMIS = 0.0
-#ifdef sens
-         S_DDEP = 0.0
-#endif
+
          IF ( MOSAIC ) THEN
             DDEPJ = 0.0   ! array assignment
          END IF
