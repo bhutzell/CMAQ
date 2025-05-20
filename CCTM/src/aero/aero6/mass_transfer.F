@@ -224,8 +224,8 @@ C *** Modal partition factors [ dimensionless ]
 C     defined in Equations A17-A18 of [Binkowski & Shankar,1995]
       REAL( 8 ) :: OMEGA_AT_SO4  ! Aitken mode 2nd and 3rd moments
       REAL( 8 ) :: OMEGA_AC_SO4  ! Accumulation mode 2nd and 3rd moments
-      REAL( 8 ) :: OMEGA( 2 )    ! partitioning coefficient for equilibrium PM mass
-      REAL( 8 ) :: PHI( NAER,2 ) ! Mass Fraction of each component in each aerosol mode
+      REAL( 8 ) :: OMEGA( N_MODE )    ! partitioning coefficient for equilibrium PM mass
+      REAL( 8 ) :: PHI( NAER,N_MODE ) ! Mass Fraction of each component in each aerosol mode
       REAL( 8 ) :: TOTAER( NAER )! Total aerosol component across multiple modes 
 
 C *** Variables for new particle formation:
@@ -596,7 +596,7 @@ C     N.B: these are for a "wet" size distribution
       ! Load initial concentrations for all modes
       DO IMODE = 1,N_MODE
         DO I = 1,NAER
-          IF ( MAP_INORGtoAERO(I) ) THEN
+          IF ( MAP_INORGtoAERO(I) .GT. 0 ) THEN
              IF ( .NOT. AERO_MISSING( MAP_INORGtoAERO(I),IMODE ) ) THEN
                 ! Explicit Aerosol Species - load CINORG
                 CINORG( I,IMODE ) = REAL( AEROSPC_CONC( MAP_INORGtoAERO(I),IMODE ),8 )
