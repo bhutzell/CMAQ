@@ -1,16 +1,19 @@
-###  Remove a Loss Process for Formaldehyde, Acetaldehyde, and Acrolein Emission Tracers in Reactive Tracers Module
+###  Remove a Loss Process for Formaldehyde, Acetaldehyde, and Acrolein Emission Tracers in Reactive Tracers Module and other updates to the cracmmhaps mechanism.
 
-**Type of update**: Bug Fix
+[William T. Hutzell](mailto:hutzell.bill@epa.gov), U.S. Environmental Protection Agency  
 
-**Release Version/Date**: CMAQ version 6.0
+**Type of update**: Bug Fix    
+**Release Version/Date**: CMAQ version 6.0    
 
-**Description** The update removes losses emission tracers of formaldehyde, acetaldehyde, and acrolein emissions tracers via a monatomic chlorine reaction in default versions of cracmm based mechanism, i.e., cracmm3 or lower. Why? The cracmm3 does include monoatomic chlorine but does not include reactions between formaldehyde, acetaldehyde, and acrolein. The update has an exception the marine version of cracmm3, cracmm3m, because the mehaniism does include reactions between formaldehyde, acetaldehyde, and acrolein.
+**Description** Updates revises the cracmm3haps mechanism to give predictions matching the cracmm3 mechanism for model species such as ozone, formaldehyde, acrolein, acetaldehyde and aerosol sulfate. 
 
-**Significance and Impact**: The update increases predictions emission tracers of formaldehyde, acetaldehyde, and acrolein emissions in the cracmm3haps mechanism so predictions from the cracmm3haps mechanism will incorrectly represent the amount secondary production in concentrations in total concentrations of formaldehyde, acetaldehyde, and acrolein.
+They remove chemical losses in reactive tracers of formaldehyde, acetaldehyde, and acrolein emissions via a monatomic chlorine reaction in default versions of cracmm based mechanism, i.e., cracmm3 or lower. Why? The cracmm3 mechanism includes monoatomic chlorine but does not include reactions between formaldehyde, acetaldehyde, and acrolein. The update has an exception for the marine version of cracmm3 because the mehanism does include reactions between formaldehyde, acetaldehyde, and acrolein. Other revisions corrected the cracmm3haps Chemistry Control and aerosol species name lists. Molecular chlorine emissions were added to the control file. In the cracmm3haps aerosol namelist, wet scavenging factors were changed from minus one to plus one for inorganic and organic water aerosols.
+
+**Significance and Impact**: The updates allow the cracmm3haps mechanism predict large set of hazardous air pollutants and predict criteria air pollutants matching the cracmm3 mechanism. 
 
 |Merge Commit | Internal record|
 |:------:|:-------:|
-| Merge for PR#1346 | [PR#1345](https://github.com/USEPA/CMAQ_Dev/pull/1346)  |
+| Merge for PR#1346 | [PR#1346](https://github.com/USEPA/CMAQ_Dev/pull/1346)  |
 
 ### Tuning up the Gear Solver
 
