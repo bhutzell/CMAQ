@@ -134,10 +134,10 @@
                'ALD','NOZ','SULF','LSIROCG','TOTROCG'
 
   Keywd_name(7) = 'DEFAULT_CRACMM3'
-  Keywd(7,:) = 'DEFAULT_CRACMM2'
+  Keywd(7,:) = 'DEFAULT_CRACMM2', 'PMF_HMS', 'PM25_HMS'
 
   Keywd_name(70) = 'DEFAULT_CRACMM3M'
-  Keywd(70,:) = 'DEFAULT_CRACMM2'
+  Keywd(70,:) = 'DEFAULT_CRACMM2', 'PMF_HMS', 'PM25_HMS'
 
   Keywd_name(72) = 'DEFAULT_CRACMM3HAPS'
   Keywd(72,:) = 'DEFAULT_CRACMM2','PM_TOXICS','GAS_TOXICS','P_HCN','EOH','HCL','MOH',
@@ -177,7 +177,7 @@
                'PMF_NH4','PMF_FE','PMF_AL','PMF_SI','PMF_TI','PMF_CA',
                'PMF_MG','PMF_K','PMF_MN','PMF_RCSOIL','PMF_OTHWNC','PMF_NC',
                'PMF_OTH','PM25_OC','PM25_EC','PM25_SO4','PM25_NO3','PM25_NH4',
-               'TSP_NO3_PPM','AOD_550', 'PMF_HMS', 'PM25_HMS'
+               'TSP_NO3_PPM','AOD_550'
   
 
  !------------------------------!
@@ -207,16 +207,16 @@
 
   Keywd_name(15) = 'FINE_SPECIES_A'
   Keywd(15,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
-                'PMF_OA','PMF_OTH','PMF_RCSOIL','PMF_HMS'
+                'PMF_OA','PMF_OTH','PMF_RCSOIL' 
 
   Keywd_name(16) = 'FINE_SPECIES_B'
   Keywd(16,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
-                'PMF_OC','PMF_OTHWNC','PMF_RCSOIL', 'PMF_HMS'
+                'PMF_OC','PMF_OTHWNC','PMF_RCSOIL' 
 
   Keywd_name(17) = 'FINE_SPECIES_C'
   Keywd(17,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
                 'PMF_OA','AOTHR','PMF_FE','PMF_SI','PMF_CA','PMF_MG',
-                'PMF_MN','PMF_AL','PMF_K','PMF_HMS'
+                'PMF_MN','PMF_AL','PMF_K' 
 
   Keywd_name(18) = 'PM_FINE_VARS'
   Keywd(18,:) = 'PMF_H2O','PMF_HP','PMF_HPMOLAL','PMF_PH','FINE_ORG'
@@ -230,16 +230,16 @@
   Keywd_name(21) = 'PM1_SPECIES'
   Keywd(21,:) = 'PM1','PM1_SO4','PM1_NO3','PM1_NH4','PM1_CL','PM1_NA','PM1_EC','PM1_OC',
                'PM1_OA','PM1_MG','PM1_K','PM1_CA','PM1_OTHER','PM1_FE','PM1_SI','PM1_TI',
-               'PM1_MN','PM1_AL','PM1_RCSOIL','PM1_OTHWNC','PM1_UNSPCRS', 'PM1_HMS'
+               'PM1_MN','PM1_AL','PM1_RCSOIL','PM1_OTHWNC','PM1_UNSPCRS'
 
   Keywd_name(22) = 'PM25_SPECIES_A'
   Keywd(22,:) = 'PM25_SO4','PM25_NO3','PM25_NH4','PM25_CL','PM25_NA','PM25_EC',
-                'PM25_OC','PM25_OTHWNC','PM25_RCSOIL', 'PM25_HMS' 
+                'PM25_OC','PM25_OTHWNC','PM25_RCSOIL'
 
   Keywd_name(23) = 'PM25_SPECIES_B'
   Keywd(23,:) = 'PM25_SO4','PM25_NO3','PM25_NH4','PM25_CL','PM25_NA','PM25_EC',
                 'PM25_OA','PM25_OTHER','PM25_MG','PM25_K','PM25_CA','PM25_FE','PM25_SI',
-                'PM25_TI','PM25_MN','PM25_AL', 'PM25_HMS'
+                'PM25_TI','PM25_MN','PM25_AL'
 
   Keywd_name(24) = 'PM25TO10_SPECIES'
   Keywd(24,:) = 'PM25TO10','PM25TO10_SO4','PM25TO10_NO3','PM25TO10_NH4','PM25TO10_CL',
@@ -363,10 +363,10 @@
                 'SEASPRAY_SULFUR_DEP',
   
   Keywd_name(43) = 'DEFAULT_DEP_CRACMM3'
-  Keywd(43,:) = 'DEFAULT_DEP_CRACMM2'
+  Keywd(43,:) = 'DEFAULT_DEP_CRACMM2', 'DD_PMF_HMS','WD_PMF_HMS'
   
   Keywd_name(71) = 'DEFAULT_DEP_CRACMM3M'
-  Keywd(71,:) = 'DEFAULT_DEP_CRACMM2'
+  Keywd(71,:) = 'DEFAULT_DEP_CRACMM2', 'DD_PMF_HMS','WD_PMF_HMS'
  
   Keywd_name(73) = 'DEFAULT_DEP_CRACMM3HAPS'
   Keywd(73,:) = 'DEFAULT_DEP_CRACMM2','DD_PMF_CL','DD_PMC_CL','DD_TSP_CL','WD_TSP_CL','DD_HCL','WD_HCL',
@@ -394,7 +394,7 @@
                 'DD_PMF_TI','DD_PMF_MN','DD_PMF_MG','DD_PMF_K',
                 'DD_PMF_OC','WD_PMF_OC','DD_PMF_POC','WD_PMF_POC','DD_PMF_SOC','WD_PMF_SOC',
                 'DD_PMF_OA','WD_PMF_OA','DD_PMF_POA','WD_PMF_POA','DD_PMF_SOA','WD_PMF_SOA'!,
-                'DD_ANAJ', 'DD_PMF_HMS'
+                'DD_ANAJ'
 
   Keywd_name(47) = 'COARSE_DDEP'
   Keywd(47,:) = 'DD_PMC_NO3','DD_PMC_NH4','DD_PMC_SO4','DD_PMC_NA','DD_PMC_CL',
@@ -407,7 +407,7 @@
   Keywd(49,:) = 'WD_TSP_NO3','WD_TSP_NH4','WD_TSP_SO4','WD_TSP_MTNO3','WD_TSP_NA',
                 'WD_PMC_NA','WD_PMF_CA','WD_PMC_CA','WD_TSP_CA','WD_PMF_FE',
                 'WD_PMF_AL','WD_PMF_SI','WD_PMF_TI','WD_PMF_MN','WD_PMF_MG','WD_PMC_MG',
-                'WD_TSP_MG','WD_PMF_K','WD_PMC_K','WD_TSP_K','WD_ANAJ','WD_PMF_HMS'
+                'WD_TSP_MG','WD_PMF_K','WD_PMC_K','WD_TSP_K','WD_ANAJ'
 
  
  !----------------------------!
