@@ -27,8 +27,8 @@
       INTEGER, PARAMETER :: NAER = 10      ! number of particle species
       INTEGER, PARAMETER :: NGAS = 4       ! number of gaseous species
  
-      REAL( 8 ), SAVE :: CAER( NAER,N_MODE )
       REAL( 8 ), SAVE :: CGAS( NGAS )
+      REAL( 8 ), SAVE :: CGAS0( NGAS )
 
       ! Indices for inorganic particle species
       INTEGER, PARAMETER :: KSO4 = 1 
@@ -271,6 +271,7 @@ C     mass partitioning between the modes
       REAL( 8 ) :: DVOLINORG( NGAS )      ! vol inorg spcs mass to be xferred [mol/m3]
       REAL( 8 ) :: DVOLMAX                ! max value for DVOLINORG 
       REAL( 8 ) :: CINORG( NAER,N_MODE )  ! scratch array for inorg spcs [ug/m**3]
+      REAL( 8 ) :: CINORG0( NAER,N_MODE ) ! scratch array for inorg spcs [ug/m**3]
       REAL( 8 ) :: ASEACAT                ! coarse sea-salt cations [ug/m**3]
       REAL( 8 ) :: INT_TIME               ! internal mass transfer time (s)
       REAL( 8 ) :: TSTEP                  ! mass transfer time step [s]
@@ -587,8 +588,9 @@ C     N.B: these are for a "wet" size distribution
 
 
       ! Begin Condensation and Evaporation Calculations
-      CINORG = 0.0
-      CFINAL = 0.0
+      CINORG  = 0.0
+      CINORG0 = 0.0
+      CFINAL  = 0.0
 
       ! Load initial concentrations for all modes
       DO IMODE = 1,N_MODE
@@ -641,12 +643,13 @@ C     N.B: these are for a "wet" size distribution
         CINORG( KH3OP,IMODE ) = REAL( HPLUS( IMODE ),8 )
 
       END DO
+      CINORG0 = CINORG
 
       ! Initial vapor-phase concentrations [ug/m3]
       DO I = 1,NGAS
          CGAS( I ) = PRECURSOR_CONC( MAP_IGAStoPREC( I ) )
       END DO
-
+      CGAS0 = CGAS
 
 C *** DYNAMIC AEROSOL MODES:
 C     Begin mass transfer calculations for aerosol modes using
@@ -1187,8 +1190,8 @@ C *** Update gas-phase concentrations from Aitken and Accumulation Mode Partitio
      &          + SUM( -DAER( GTTR(I)%KAER,:) * MW_RATIO( I ) )
          ELSE
             K = GTTR(I)%KAER
-            PRECURSOR_CONC( MAP_IGAStoPREC( I ) ) = CGAS(I) 
-     &          + SUM( CINORG( K,: ) - CFINAL( K,: ),MASK=L_MODE_EQB(:) ) * MW_RATIO( I )
+            PRECURSOR_CONC( MAP_IGAStoPREC( I ) ) = CGAS0(I) 
+     &          + SUM( CINORG0( K,: ) - CFINAL( K,: ),MASK=L_MODE_EQB(:) ) * MW_RATIO( I )
          END IF
       END DO
 
