@@ -430,6 +430,9 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
   if( $USE_SAGE_N == 'Y' ) then
      setenv SAGE_SOILINIT   $OUTDIR/CCTM_SSOILOUT_${RUNID}_${YESTERDAY}.nc
+     if( $USE_SAGE_N_EF == 'Y') then
+        setenv SAGE_EF /work/MOD3APP/ezv/2020_NEI/BEIS4/12US1/BEIS4_SAGE_beld6_norm_emis_4CALIF1.ncf
+     endif
   endif
 
   #> In-line biogenic emissions configuration

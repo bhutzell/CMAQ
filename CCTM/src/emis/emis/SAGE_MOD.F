@@ -281,11 +281,11 @@ C https://doi.org/10.1126/science.1242266 figure 4.
                            if ( BIOGEMIS_BEIS .and. USE_SAGE_N_EF ) Then
                               F_BIOG    = NONAGNO( c,r )
                               F_AG      = GROWAGNO( c,r ) * FERT_ADJ( JDATE, LATI, TSOI2 ) +  NGROWAGNO( c,r )
-                              UNIT_CONV = 1.0 / SG_MW(NSPC) / 3600.0
+                              UNIT_CONV = 1.0 / (SG_MW(NSPC) * 3600.0)
                            else
                               F_BIOG = EF_BIOG( i_ag, N_LU, Tile_Data%LUFRAC( c,r,: ), EF_LU )
                               F_AG   = EF_AG(   i_ag, Tile_Data%LUFRAC( c,r,: ), EF_LU, JDATE, LATI, TSOI2 )
-                              UNIT_CONV =  GRID_AREA/3600.0/msfx2(c,r)/SG_MW(NSPC)
+                              UNIT_CONV =  GRID_AREA / (SG_MW(NSPC) * 3600.0 * msfx2(c,r))
                            end if
                            EM_BIOG  = EM_ADJ(NSPC) * F_BIOG
                            EM_AG    = EM_ADJ(NSPC) * F_AG
