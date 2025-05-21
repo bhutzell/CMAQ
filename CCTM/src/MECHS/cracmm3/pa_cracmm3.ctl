@@ -178,7 +178,7 @@ IRR_OUTPUT NewHOxfromHNOX = HNO4cyc[NEGONLY];
 ! from photolysis not including HCHO, HNO3 and HNO4
 IRR_OUTPUT NewHOxfromhv = <R012> + <R013> + 1.22*<R015> + <R018>
 + <R019> + 2.0*<R023> + <TRP01> + <TRP02> + <R024> + 1.5*<R025> 
-+ 1.5*<R026> + <R027> + 2.0*<R028> + 2.0*<R029> + 2.0*<TRP03>
++ 1.5*<R026> + <R027b> + 2.0*<R028> + 2.0*<R029> + 2.0*<TRP03>
 + 2.0*<R029> + <R030> + <R031>;
 ! from O3+alkene reactions
 IRR_OUTPUT NewHOxfromO3 =0.230*<R126> + 0.550*<R127> + 0.530*<R128> 
@@ -241,5 +241,9 @@ IRR_OUTPUT TERPNO2fromTERP = PROD[SESQNRO2] FROM [SESQ]
  + PROD[LIMP1] FROM [LIM] + PROD[LIMP2] FROM [LIM];
 !SOA from isoprene
 IRR_OUTPUT SOAviaISOPRENE = PROD[ISOPRENE_SOA];
+
+! NOx and NOz from ANO3 heterogeneous reactions
+IRR_OUTPUT NOxFromANO3 = 0.33*<HET_ANO3I> + 0.33*<HET_ANO3J>;
+IRR_OUTPUT NOzFromANO3 = 0.67*<HET_ANO3I> + 0.67*<HET_ANO3J>;
 
 ENDPA;

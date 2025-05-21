@@ -1,3 +1,4 @@
+CRACMM3 Species Table
 Gas (G) and particle (P) species from the namelists. SMILES link to representative structures in the EPA Chemicals Dashboard (if available).
 
 Note that for each particulate species in CMAQ, a letter will be appended to the name to designate the size, or mode, of the aerosol being represented: I = Aitken mode, J = Accumulation mode, K = Coarse mode. Prepending of a species with a V or A in CMAQ or the chemical mechanism files indicates the species resides in the gas or particulate phase. 
@@ -37,29 +38,38 @@ AORGH2O|Water associated with particulate organic compounds|P|18.0|E|Water|[O](h
 AOTHR|Primary unspeciated fine PM|P|200.0|L|Unspeciated PM|
 API|Alpha-pinenes and other cyclic terpenes with one double bond|G|136.4|L|alpha-pinene|[CC1=CCC2CC1C2\(C\)C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID4026501)
 APINP1|Peroxy radicals from API+NO3 that do not undergo autoxidation|G|230.0|L|[2,6,6-trimethyl-3-(nitrooxy)bicyclo[3.1.1]heptan-2-yl]peroxy|\[O\]OC1\(C\)C\(ON\(=O\)=O\)CC2CC1C2\(C\)C
-APINP2|Peroxy radicals from API+NO3 that undergo autoxidation|G|230.0|L|[2,6,6-trimethyl-3-(nitrooxy)bicyclo[3.1.1]heptan-2-yl]peroxy|\[O\]OC1\(C\)C\(ON\(=O\)=O\)CC2CC1C2\(C\)C
+APINP2|Peroxy radicals from API+NO3 that undergo autoxidation|G|294.0|L|[4-hydroperoxy-6-(2-hydroperoxypropan-2-yl)-3-methyl-2-(nitrooxy)cyclohex-3-en-1-yl]peroxy|CC1=C\(CC\(C\(O\[O\]\)C1\(ON\(=O\)=O\)\)C\(C\)\(C\)OO\)OO
 APIP1|Peroxy radicals from API+OH that do not undergo autoxidation|G|185.0|L|{3-hydroxy-2,6,6-trimethylbicyclo[3.1.1]heptan-2-yl}peroxy|\[O\]OC1\(C\)C\(O\)CC2CC1C2\(C\)C
-APIP2|Peroxy radicals from API+OH that undergo autoxidation|G|185.0|L|{3-hydroxy-2,6,6-trimethylbicyclo[3.1.1]heptan-2-yl}peroxy|\[O\]OC1\(C\)C\(O\)CC2CC1C2\(C\)C
+APIP2|Peroxy radicals from API+OH that undergo autoxidation|G|249.0|L|[4-hydroperoxy-6-(2-hydroperoxypropan-2-yl)-2-hydroxy-3-methylcyclohex-3-en-1-yl]peroxy|CC1=C\(CC\(C\(O\[O\]\)C1O\)C\(C\)\(C\)OO\)OO
 APNCOM|Primary non-carbon organic matter (legacy)|P|220.0|L|Non-carbon organic matter|
 APOC|Primary organic carbon (legacy)|P|220.0|L|Organic carbon|
 ASEACAT|Sea spray cations|P|23.75|L|Coarse sea spray cations|
+ASEAST| J-mode seasalt concentration (tracer)|P|31.3|L|Sea salt tracer|
 ASI|Silicon|P|28.1|E|Total Silicon|[\[Si\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID0051441)
 ASO4|Total sulfur IV as sulfate|P|96.0|L|Sulfate ion|[\[O-\]S\(=O\)\(=O\)\[O-\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3042425)
 ASOAT|An empirical SOA|P|200.0|L|3,4,5,6,7-Pentahydroxyheptan-2-one|[CC\(=O\)C\(C\(C\(C\(CO\)O\)O\)O\)O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID80956455)
 ASOIL|Lumped crustal species|P|100.0|L|Crustal species|
 ATI|Titanium|P|47.9|E|Total Titanium|[\[Ti\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3047764)
-BAL1|Peroxy radicals formed from BALD |G|123.0|L|(4-methylphenyl)peroxy|\[O\]OC1=CC=C\(C\)C=C1
-BAL2|Peroxy radicals formed from BALD |G|109.0|L|phenylperoxy|\[O\]OC1=CC=CC=C1
+BAL1|Peroxy radicals formed from BALD |G|109.1|L|Phenylperoxy radical|\[O\]OC1=CC=CC=C1
+BAL2|Peroxy radicals formed from BALD |G|93.1|L|phenoxy radical|\[O\]C1=CC=CC=C1
 BALD|Benzaldehyde and other aromatic aldehydes|G|106.0|L|Benzaldehyde|[O=CC1=CC=CC=C1](https://comptox.epa.gov/dashboard/chemical/details/DTXSID8039241)
 BALP|Peroxy radicals formed from BALD |G|137.0|L|benzoylperoxy|O=C\(O\[O\]\)C1=CC=CC=C1
 BDE13|1,3-butadiene|G|54.1|E|1,3-Butadiene|[C=CC=C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3020203)
 BDE13P|Peroxy radicals from BDE13|G|103.0|L|(1-hydroxybut-3-en-2-yl)peroxy|C=CC\(O\[O\]\)CO
 BEN|Benzene|G|78.11|E|Benzene|[C1=CC=CC=C1](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3039242)
 BENP|Peroxy radicals formed from benzene|G|159.12|L|{8-hydroxy-6,7-dioxabicyclo[3.2.1]oct-3-en-2-yl}peroxy|\[O\]OC1C=CC2OOC1C2O
-CHO|Phenoxy radical formed from CSL|G|139.0|L|4-hydroxy-3,5-dimethylcyclohexa-2,5-dien-1-yloxidanyl|\[O\]C1C=C\(C\)C\(O\)C\(=C1\)C
+CHO|Phenoxy radical formed from CSL|G|107.0|L|(2-methylphenyl)oxidanyl|CC1=CC=CC=C1\[O\]
+CL| Atomic chlorine|G|35.5|E|Chlorine atom|[\[Cl\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID801014230)
+CL2| Molecular chlorine |G|71.0|E|Chlorine|[ClCl](https://comptox.epa.gov/dashboard/chemical/details/DTXSID1020273)
+CL2O2| Chloryl chloride|G|103.0|E|Dichlorine dioxide|[ClOOCl](https://comptox.epa.gov/dashboard/chemical/details/DTXSID001310193)
+CLNO| Nitrosyl chloride|G|65.5|E|Nitrosyl chloride|[ClN=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID5051945)
+CLNO2| Nitryl chloride|G|81.5|E|Nitryl chloride|[ClN\(=O\)=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID601317066)
+CLNO3| Chlorine nitrate|G|97.5|E|Chlorine nitrate|[\[O-\]\[N+\]\(=O\)OCl](https://comptox.epa.gov/dashboard/chemical/details/DTXSID00163043)
+CLO| Chlorine monoxide|G|51.5|E|Chlorine monoxide|[\[O-\]Cl](https://comptox.epa.gov/dashboard/chemical/details/DTXSID8073136)
+CLOO| Chlorine superoxide|G|67.5|E|Chlorine dioxide|[O=Cl\[O\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID5023958)
 CO|Carbon monoxide|G|28.0|E|Carbon monoxide|[\[C-\]#\[O+\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID5027273)
 CO2|Carbon dioxide|G|44.0|E|Carbon dioxide|[O=C=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID4027028)
-CSL|Cresol and other hydroxy substituted aromatics |G|136.2|L|2-Phenylpropan-2-ol|[CC\(C\)\(O\)C1=CC=CC=C1](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3027247)
+CSL|Cresol and other hydroxy substituted aromatics |G|108.14|L|o-cresol|[CC1=C\(O\)C=CC=C1](https://comptox.epa.gov/dashboard/chemical/details/DTXSID8021808)
 DCB1|Unsaturated dicarbonyls|G|98.0|L|2-methylbut-2-enedial|O=CC=C\(C\)C=O
 DCB2|Unsaturated dicarbonyls|G|112.1|L|2-methyl-4-oxopent-2-enal|O=CC\(=CC\(=O\)C\)C
 DCB3|Unsaturated dicarbonyls|G|84.0|L|but-2-enedial|O=CC=CC=O
@@ -92,17 +102,18 @@ HNO3|Nitric acid|G|63.0|E|Nitric acid|[\[N+\]\(=O\)\(O\)\[O-\]](https://comptox.
 HNO4|Pernitric acid |G|79.0|E|Hydroxy nitrate|[\[N+\]\(=O\)\(\[O-\]\)OO](https://comptox.epa.gov/dashboard/chemical/details/DTXSID201030501)
 HO|Hydroxy radical|G|17.0|E|Hydroxyl radical|\[OH\]
 HO2|Hydroperoxy radical|G|33.0|E|Hydroperoxy|[O\[O-\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID30894777)
+HOCL| Hypochlorous acid|G|52.5|E|Hypochlorous acid|[OCl](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3036737)
 HOM|Highly oxygenated molecules from terpenes|GP|250.0|L|6,7-dihydroperoxy-3,3,6-trimethyl-tetrahydro-3aH-1,2-benzodioxol-5-ol|OC1CC2C\(OOC2\(C\)C\)C\(OO\)C1\(C\)OO
 HONIT|Second generation monoterpene nitrates|GP|265.0|L|2-(3-hydroperoxy-4,5-dihydroxy-4-methylcyclohexyl)propan-2-yl nitrate|CC\(C\)\(O\[N+\]\(\[O-\]\)=O\)C1CC\(O\)C\(C\)\(O\)C\(C1\)OO
 HONO|Nitrous acid |G|47.0|E|Nitrous acid|[N\(=O\)O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID7064813)
 IEPOX|isoprene epoxydiols |G|118.1|E|Isoprene epoxydiol|OCC1OC1\(C\)CO
 IEPOXP|IEPOX intermediate (tracking species)|G|118.1||NA|
 INALD|Isoprene nitrates|G|195.1|L|2-hydroperoxy-4-hydroxy-3-methyl-3-(nitrooxy)butanal|CC\(CO\)\(O\[N+\]\(=O\)O\)C\(C=O\)OO
-ISONP|Isoprene nitrate-derived peroxy radicals|G|162.1|L|[(2E)-3-methyl-4-(nitrooxy)but-2-en-1-yl]peroxy|C/C\(=C\CO\[O\]\)CON\(=O\)=O
 IPX|Isoprene tetrafunctional compounds|G|150.1|L|3-(1-hydroperoxy-2-hydroxypropan-2-yl)oxiran-2-ol|CC\(O\)\(COO\)C1OC1O
 ISHP|Beta-hydroxy hydroperoxides from ISOP+HO2|G|118.0|L|2-hydroperoxy-2-methylbut-3-en-1-ol|C=CC\(OO\)\(CO\)C
 ISO|Isoprene |G|68.1|E|Isoprene|[CC\(=C\)C=C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID2020761)
 ISON|Beta-hydroxyalkylnitrates from ISOP+NO alkylnitrates from ISO+NO3|G|147.0|L|2-methyl-2-(nitrooxy)but-3-en-1-ol|OCC\(C\)\(C=C\)ON\(=O\)=O
+ISONP|Isoprene nitrate-derived peroxy radicals|G|162.1|L|[(2E)-3-methyl-4-(nitrooxy)but-2-en-1-yl]peroxy|C/C\(=C\CO\[O\]\)CON\(=O\)=O
 ISOP|Peroxy radicals formed from ISO+HO |G|117.0|L|(1-hydroxy-3-methylbut-3-en-2-yl)peroxy|OCC\(O\[O\]\)C\(C\)=C
 KET|ketones|G|86.0|L|Diethylketone|[CCC\(=O\)CC](https://comptox.epa.gov/dashboard/chemical/details/DTXSID6021820)
 KETP|Peroxy radicals formed from KET|G|117.0|L|(3-oxopentan-2-yl)peroxy|CCC\(C\(C\)O\[O\]\)=O
@@ -110,22 +121,23 @@ LIM|d-limonene and other cyclic diene-terpenes |G|136.3|L|D-Limonene|[CC\(=C\)\[
 LIMAL|Limonene aldehyde and similar LIM-derived aldehydes|G|168.0|L|Limonaldehyde|O=CCC\(CCC\(=O\)C\)C\(=C\)C
 LIMALP|Peroxy radicals from LIMAL|G|217.0|L|[1-hydroxy-2-methyl-5-oxo-3-(3-oxobutyl)pentan-2-yl]peroxy|O=CCC\(CCC\(=O\)C\)C\(C\)\(CO\)O\[O\]
 LIMNP1|Peroxy radicals from LIM+NO3 that do not undergo autoxidation|G|230.0|L|[1-methyl-2-(nitrooxy)-4-(prop-1-en-2-yl)cyclohexyl]peroxy|\[O-\]\[N+\]\(=O\)OC1CC\(CCC1\(C\)O\[O\]\)C\(=C\)C
-LIMNP2|Peroxy radicals from LIM+NO3 that undergo autoxidation|G|230.0|L|[1-methyl-2-(nitrooxy)-4-(prop-1-en-2-yl)cyclohexyl]peroxy|\[O-\]\[N+\]\(=O\)OC1CC\(CCC1\(C\)O\[O\]\)C\(=C\)C
+LIMNP2|Peroxy radicals from LIM+NO3 that undergo autoxidation|G|294.0|L|{6-hydroperoxy-4-[2-hydroperoxy-1-(nitrooxy)propan-2-yl]-1-methylcyclohex-2-en-1-yl}peroxy|C\(OO\)1C\(O\[O\]\)\(C\)C=CC\(C\(OO\)\(C\)C\(ON\(=O\)=O\)\)C1
 LIMP1|Peroxy radicals from LIM+OH that do not undergo autoxidation|G|185.0|L|[2-hydroxy-1-methyl-4-(prop-1-en-2-yl)cyclohexyl]peroxy|\[O\]OC1\(C\)CCC\(CC1O\)C\(=C\)C
-LIMP2|Peroxy radicals from LIM+OH that undergo autoxidation|G|185.0|L|[2-hydroxy-1-methyl-4-(prop-1-en-2-yl)cyclohexyl]peroxy|\[O\]OC1\(C\)CCC\(CC1O\)C\(=C\)C
+LIMP2|Peroxy radicals from LIM+OH that undergo autoxidation|G|249.0|L|[6-hydroperoxy-4-(2-hydroperoxy-1-hydroxypropan-2-yl)-1-methylcyclohex-2-en-1-yl]peroxy|C\(OO\)1C\(O\[O\]\)\(C\)C=CC\(C\(OO\)\(C\)CO\)C1
 MACP|Peroxy radicals formed from MACR+HO|G|101.0|L|(2-methylprop-2-enoyl)peroxy|CC\(=C\)C\(=O\)O\[O\]
 MACR|methacrolein and other C4 aldehydes |G|70.0|L|Methacrolein|[CC\(=C\)C=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID0052540)
 MAHP|Hydroperoxides from MACP+HO2 |G|102.0|L|2-methylprop-2-eneperoxoic acid|C=C\(C\)C\(OO\)=O
 MCP|Peroxy radical formed from MACR + HO which does not form MPAN|G|119.0|L|(1-hydroxy-2-methyl-3-oxopropan-2-yl)peroxy|OCC\(C\)\(O\[O\]\)C=O
-MCT|Methyl catechol|G|124.1|L|4-Methylcatechol|[CC1=CC\(O\)=C\(O\)C=C1](https://comptox.epa.gov/dashboard/chemical/details/DTXSID5020861)
-MCTO|Alkoxy radical formed from MCT+HO and MCT+NO3|G|123.0|L|3-hydroxy-5-methylphenyloxidanyl|CC1=CC\(O\)=CC\(\[O\]\)=C1
-MCTP|Radical formed fro MCT+O3 reaction |G|172.0|L|C7H8O5 Biradical|CC\(/C=C\\[C\]\(O\[O\]\)O\)=C/C\(O\)=O
+MCT|Methyl catechol|G|110.11|L|Catechol|[OC1=C\(O\)C=CC=C1](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3020257)
+MCTO|Alkoxy radical formed from MCT+HO and MCT+NO3|G|109.0|L|(2-hydroxyphenyl)oxidanyl|\[O\]C1=CC=CC=C1O
+MCTP|Radical formed fro MCT+O3 reaction |G|125.0|L|(2-hydroxyphenyl)peroxy|\[O\]OC1=CC=CC=C1O
 MEK|Methyl ethyl ketone|G|72.1|E|Methyl ethyl ketone|[CCC\(C\)=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3021516)
 MEKP|Peroxy radicals formed from MEK|G|103.0|L|(3-oxobutyl)peroxy|\[O\]OCCC\(=O\)C
 MGLY|Methylglyoxal and other alpha-carbonyl aldehydes |G|72.0|L|Methyl glyoxal|[CC\(=O\)C=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID0021628)
 MO2|Methyl peroxy radical|G|47.0|E|Methylperoxy|[CO\[O\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID10944007)
 MOH|Methanol |G|32.0|E|Methanol|[CO](https://comptox.epa.gov/dashboard/chemical/details/DTXSID2021731)
 MPAN|Peroxymethacryloylnitrate and other higher peroxyacylnitrates from isoprene oxidation|G|147.1|L|Peroxymethacryloyl nitrate|[O=N\(=O\)OOC\(=O\)C\(=C\)C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID10236878)
+MTN1|Monoterpene derived species with C* 1e-1 &#956;g m<sup>-3</sup>|GP|262.0|L|3-[carboxy(hydroxy)methyl]cyclobutane-1,2,2-tricarboxylic acid|OC\(C1CC\(C\(O\)=O\)C1\(C\(O\)=O\)C\(O\)=O\)C\(O\)=O
 MVK|Methyl vinyl ketone|G|70.1|E|Methyl vinyl ketone|[CC\(=O\)C=C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID3025671)
 MVKP|Peroxy radicals formed from MVK|G|119.0|L|(2-hydroxy-3-oxobutyl)peroxy|CC\(=O\)C\(O\)CO\[O\]
 N2O5|Dinitrogen pentoxide |G|108.0|E|Dinitrogen pentoxide|[\[N+\]\(=O\)\(\[O-\]\)O\[N+\]\(=O\)\[O-\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID90143672)
@@ -134,11 +146,14 @@ NAPHP|Peroxy radicals from NAPH oxidation|G|209.17|L|{8-hydroxy-10,11-dioxatricy
 NH3|Ammonia|G|17.0|E|Ammonia|[N](https://comptox.epa.gov/dashboard/chemical/details/DTXSID0023872)
 NO|Nitric oxide |G|30.0|E|Nitric oxide|[\[N\]=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID1020938)
 NO2|Nitrogen dioxide |G|46.0|E|Nitrogen dioxide|[N\(=O\)\[O\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID7020974)
+NO2PIJ| Dioxidonitrogen|G|46.0| E|Dioxidonitrogen|\[N+\]\(=O\)=O
+NO2PK| Dioxidonitrogen|G|46.0| E|Dioxidonitrogen|\[N+\]\(=O\)=O
 NO3|Nitrogen trioxide|G|62.0|E|Nitrate radical|\[O\]N\(=O\)=O
 NUM|Number of particles|P|1.0|L|Number of particles|
 O1D|Excited state oxygen atom, O(1D) |G|16.0|E|Excited oxygen|[\[O\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID00170378)
 O3|Ozone|G|48.0|E|Ozone|[\[O-\]\[O+\]=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID0021098)
 O3P|Ground state oxygen atom, O(3P)|G|16.0|E|Ground state oxygen|[\[O\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID00170378)
+OCLO| Chlorine dioxide |G|67.5|E|Chlorine dioxide isomar|O=Cl\[O\]
 OLI|Internal alkenes |G|70.1|L|2-Methyl-2-butene|[CC=C\(C\)C](https://comptox.epa.gov/dashboard/chemical/details/DTXSID8027165)
 OLIP|Peroxy radicals formed from OLI|G|119.0|L|(3-hydroxy-2-methylbutan-2-yl)peroxy|\[O\]OC\(C\)\(C\)C\(C\)O
 OLND|NO3-alkene adduct reacting via decomposition |G|136.0|L|[1-(nitrooxy)propan-2-yl]peroxy|CC\(O\[O\]\)CO\[N+\]\(\[O-\]\)=O
@@ -155,7 +170,7 @@ ORA2|Acetic acid and higher acids |G|60.2|L|Acetic acid|[CC\(O\)=O](https://comp
 ORAP|Peroxy radical formed from ORA2 + HO reaction|G|91.0|L|(carboxymethyl)peroxy|\[O\]OCC\(=O\)O
 PAA|Peroxyacetic acids and higher analogs|G|76.0|L|Peroxyacetic acid|[CC\(=O\)OO](https://comptox.epa.gov/dashboard/chemical/details/DTXSID1025853)
 PAN|Peroxyacetyl nitrate and higher saturated PANs |G|121.0|L|Peroxyacetyl nitrate|[CC\(=O\)OON\(=O\)=O](https://comptox.epa.gov/dashboard/chemical/details/DTXSID4062301)
-PHEN|phenol and benzene diols|G|110.1|L|Resorcinol|[OC1=CC\(O\)=CC=C1](https://comptox.epa.gov/dashboard/chemical/details/DTXSID2021238)
+PHEN|phenol and benzene diols|G|94.11|E|Phenol|[OC1=CC=CC=C1](https://comptox.epa.gov/dashboard/chemical/details/DTXSID5021124)
 PINAL|Pinonaldehyde and similar APIN-derived aldehydes|G|168.0|L|Pinonaldehyde|O=CCC1CC\(C\(=O\)C\)C1\(C\)C
 PINALP|Peroxy radicals from PINAL oxidation|G|199.0|L|[3-acetyl-2,2-dimethyl-1-(2-oxoethyl)cyclobutyl]peroxy|O=CCC1\(O\[O\]\)CC\(C\(=O\)C\)C1\(C\)C
 PPN|Peroxypropionyl nitrate|G|135.0|E|Peroxypopionyl nitrate|[CCC\(=O\)OO\[N+\]\(=O\)\[O-\]](https://comptox.epa.gov/dashboard/chemical/details/DTXSID90206675)

@@ -407,7 +407,7 @@ C                     ---------- - - - ------- ------- ---------- --------- ----
      & spcs_list_type('AISO5   ',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.18), ! from heterogeneous uptake of INALD
      & spcs_list_type('ATRPN   ',F,T,F, cm_set, 1400.0, 'VTRPN  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.10), ! SOA from first generation monoterpene nitrate
      & spcs_list_type('AHONIT  ',F,T,F, cm_set, 1400.0, 'VHONIT ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.14), ! SOA from second generation monoterpene nitrate
-     & spcs_list_type('AGLYOLIG',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! glyoxal SOA (CRACMM3)
+     & spcs_list_type('AGLYOLIG',F,T,F, cm_set, 1400.0, '       ','       ',0.0  ,'NVL',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.13), ! glyoxal SOA CRACMM3
      & spcs_list_type('AMTN1   ',F,T,F, cm_set, 1400.0, 'VMTN1  ','       ',0.0  ,'REV',F,F,  0,  2.8, 6.1,T, 'DUST  ', 0.17)  ! monoterpene SOA C* 0.1 ug/m3
      & /)                                                 
  
