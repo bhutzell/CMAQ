@@ -416,7 +416,7 @@ C
      &                         CGRID_MASK_NR 
 
         USE AERO_DATA
-        USE SOA_DEFN
+        USE ORG_DEFN
         USE UTILIO_DEFN
 
         IMPLICIT NONE
