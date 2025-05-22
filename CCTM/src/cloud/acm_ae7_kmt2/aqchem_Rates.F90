@@ -430,8 +430,7 @@ SUBROUTINE Update_RCONST ( )
             + VAR( ind_L_PYRACMIN ) + VAR( ind_L_GCOLACMIN ) &
             + VAR( ind_L_CCOOHMIN ) &
             + VAR( ind_L_HSO3MIN ) + VAR( ind_L_HCOOMIN ) &
-            + VAR( ind_L_NO3MIN ) &
-            + VAR( ind_L_HSO4MIN ) + VAR( IND_L_HMSMIN)  &
+            + VAR( ind_L_NO3MIN ) + VAR( ind_L_HSO4MIN ) &
             + VAR( ind_L_NAPLUS ) + VAR( ind_L_KPLUS ) + VAR( ind_L_CLMIN ) &
             + VAR( ind_L_SO4MIN ) + VAR( ind_L_SO3MIN ) + &
             + VAR( ind_L_HMSMIN ) + VAR( ind_L_SO5MIN ) + &
@@ -536,8 +535,8 @@ SUBROUTINE Update_RCONST ( )
   RCONST(196) = ((KRXN(6.0D+8,0.D0,0,0,0)))
   RCONST(197) = ((KRXN(8.6D+8,0.D0,0,0,0)))
   RCONST(198) = ((KRXN(1.1D+9,-1516.D0,0,0,0)))
-  RCONST(199) = ((KRXN(1.5D+8,0.D0,0,0,0)))
-  RCONST(200) = ((KRXN(1.2D+9,0.D0,0,0,0)))
+  RCONST(199) = ((KRXN(3.62D+8,0.D0,0,0,0)))
+  RCONST(200) = ((KRXN(2.9D+9,0.D0,0,0,0)))
   RCONST(201) = ((KRXN(1.4D+6,0.D0,0,0,0)))
   RCONST(202) = ((KRXN(4.7D+7,0.D0,0,0,0)))
   RCONST(203) = ((KRXN(7.7D+6,0.D0,0,0,0)))
@@ -569,12 +568,12 @@ SUBROUTINE Update_RCONST ( )
   RCONST(250) = ((KRXN(3.4D+9,-1200.D0,0,0,0)))
   RCONST(251) = ((KRXN(7.9D+2,-2900.D0,0,0,0)))
   RCONST(252) = ((KRXN(2.5D+7,-2450.D0,0,0,0)))
-  RCONST(253) = ((KRXN(7.7D-3,-9200.D0,4,0,0)))
+  RCONST(253) = ((KRXN(1.2D-7,0.D0,4,0,0)))
   RCONST(254) = ((KRXN(3.7D3,0.D0,0,0,0)))
   RCONST(255) = ((KRXN(3.0D8,0.D0,0,0,0)))
   RCONST(256) = ((KRXN(7.9D+2,-2900.D0,0,0,0)))
   RCONST(257) = ((KRXN(2.5D+7,-2450.D0,0,0,0)))
-  RCONST(258) = ((KRXN(7.7D-3,-9200.D0,4,0,0)))
+  RCONST(258) = ((KRXN(1.2D-7,0.D0,4,0,0)))
   RCONST(259) = ((KRXN(3.7D3,0.D0,0,0,0)))
   RCONST(260) = ((KRXN(3.0D8,0.D0,0,0,0)))
       
