@@ -590,8 +590,6 @@ C     N.B: these are for a "wet" size distribution
 
       ! Begin Condensation and Evaporation Calculations
       CINORG  = 0.0
-      CINORG0 = 0.0
-      CFINAL  = 0.0
 
       ! Load initial concentrations for all modes
       DO IMODE = 1,N_MODE
@@ -619,25 +617,25 @@ C     N.B: these are for a "wet" size distribution
         ! Load Soil Concentrations
         IF ( .NOT. AERO_MISSING( ASOIL_IDX,IMODE ) ) THEN
            CINORG( KNA,IMODE ) = CINORG( KNA,IMODE ) + 
-     &       REAL( AEROSPC_CONC( ASOIL_IDX,IMODE ),8 ) * ASOIL_NA_FAC/ASOIL_RENORM
+     &       REAL( AEROSPC_CONC( ASOIL_IDX,IMODE ),8 )/ASOIL_RENORM * ASOIL_NA_FAC
            CINORG( KMG,IMODE ) = CINORG( KMG,IMODE ) + 
-     &       REAL( AEROSPC_CONC( ASOIL_IDX,IMODE ),8 ) * ASOIL_MG_FAC/ASOIL_RENORM
+     &       REAL( AEROSPC_CONC( ASOIL_IDX,IMODE ),8 )/ASOIL_RENORM * ASOIL_MG_FAC
            CINORG( KK,IMODE )  = CINORG( KK,IMODE ) + 
-     &       REAL( AEROSPC_CONC( ASOIL_IDX,IMODE ),8 ) * ASOIL_K_FAC /ASOIL_RENORM
+     &       REAL( AEROSPC_CONC( ASOIL_IDX,IMODE ),8 )/ASOIL_RENORM * ASOIL_K_FAC 
            CINORG( KCA,IMODE ) = CINORG( KCA,IMODE ) + 
-     &       REAL( AEROSPC_CONC( ASOIL_IDX,IMODE ),8 ) * ASOIL_CA_FAC/ASOIL_RENORM
+     &       REAL( AEROSPC_CONC( ASOIL_IDX,IMODE ),8 )/ASOIL_RENORM * ASOIL_CA_FAC
         END IF
 
         ! Load Anthropogenic Coarse Concentrations
         IF ( .NOT. AERO_MISSING( ACORS_IDX,IMODE ) ) THEN
            CINORG( KNA,IMODE ) = CINORG( KNA,IMODE ) + 
-     &       REAL( AEROSPC_CONC( ACORS_IDX,IMODE ),8 ) * ACORS_NA_FAC/ACORSEM_RENORM
+     &       REAL( AEROSPC_CONC( ACORS_IDX,IMODE ),8 )/ACORSEM_RENORM * ACORS_NA_FAC
            CINORG( KMG,IMODE ) = CINORG( KMG,IMODE ) + 
-     &       REAL( AEROSPC_CONC( ACORS_IDX,IMODE ),8 ) * ACORS_MG_FAC/ACORSEM_RENORM
+     &       REAL( AEROSPC_CONC( ACORS_IDX,IMODE ),8 )/ACORSEM_RENORM * ACORS_MG_FAC
            CINORG( KK,IMODE )  = CINORG( KK,IMODE ) + 
-     &       REAL( AEROSPC_CONC( ACORS_IDX,IMODE ),8 ) * ACORS_K_FAC /ACORSEM_RENORM
+     &       REAL( AEROSPC_CONC( ACORS_IDX,IMODE ),8 )/ACORSEM_RENORM * ACORS_K_FAC 
            CINORG( KCA,IMODE ) = CINORG( KCA,IMODE ) + 
-     &       REAL( AEROSPC_CONC( ACORS_IDX,IMODE ),8 ) * ACORS_CA_FAC/ACORSEM_RENORM
+     &       REAL( AEROSPC_CONC( ACORS_IDX,IMODE ),8 )/ACORSEM_RENORM * ACORS_CA_FAC
         END IF
 
         ! Load H+ Concentration
@@ -645,6 +643,7 @@ C     N.B: these are for a "wet" size distribution
 
       END DO
       CINORG0 = CINORG
+      CFINAL  = CINORG
 
       ! Initial vapor-phase concentrations [ug/m3]
       DO I = 1,NGAS
@@ -700,6 +699,12 @@ C     integrates fluxes across time.
 
             GRFAC1( IMODE ) = FCONC_SO4( IMODE,1 ) 
             GRFAC2( IMODE ) = FCONC_SO4( IMODE,2 ) 
+
+            ! Update Semivolatile Components
+            CINORG( KNH4,IMODE ) = REAL( AEROSPC_CONC( ANH4_IDX,IMODE ), 8 )  ! KNH4 = 2, ANH4_IDX = 4
+            CINORG( KNO3,IMODE ) = REAL( AEROSPC_CONC( ANO3_IDX,IMODE ), 8 )  ! KNO3 = 3, ANO3_IDX = 2
+            CINORG( KCL, IMODE ) = REAL( AEROSPC_CONC( ACL_IDX,IMODE ),  8 )  ! KCL = 4, ACL_IDX = 3
+            CINORG( KSO4,IMODE ) = REAL( AEROSPC_CONC( ASO4_IDX,IMODE ), 8 )  ! KSO4 = 1, ASO4_IDX = 1
 
             ! Calculate moments prior to mass transfer
             M3OTHR = MASStoVOL_AER( KNA ) * AEROSPC_CONC( ASEACAT_IDX,IMODE )
@@ -857,6 +862,14 @@ C     integrates fluxes across time.
 
             MOMENT2_CONC( IMODE ) = REAL( WETM2,4 )
 
+            ! Pass Final Aerosol Concentrations to Next Time Step
+            DO I = 1,NAER
+              IF ( ATTR(I)%SEMIVOL ) THEN
+                AEROSPC_CONC( MAP_INORGtoAERO(I),IMODE ) =
+     &                        REAL( CFINAL( I,IMODE ),4 )
+              END IF
+            END DO
+
             ! Update the third moments, geometric mean diameters, geometric 
             ! standard deviations, modal mass totals, and modal particle 
             ! densities. It is a waste of time updating the aitken and
@@ -865,16 +878,17 @@ C     integrates fluxes across time.
             
             CALL GETPAR( .TRUE. )
 
-            ! Pass Final Aerosol Concentrations to Next Time Step
-            CINORG( :,IMODE ) = CFINAL( :,IMODE )
-
           END DO   ! end mass transfer time step loop
          
-        END IF   ! for 'Hybrid' method
+        END IF   ! is this mode dynamic?
       END DO   ! Loop over modes
 C *** End of Coarse Mode dynamic mass transfer calculations
-
-
+                     
+      DO I = 1,NGAS
+        IF ( GTTR(I)%ISRP .GT. 0 ) THEN
+          PRECURSOR_CONC( MAP_IGAStoPREC(I) ) = CGAS( I )
+        END IF
+      END DO
 
 C *** EQUILIBRIUM AEROSOL MODES: 
 C     Call ISORROPIA in forward mode to calculate gas-particle 
@@ -936,7 +950,7 @@ C     equilibrium. These are often fine modes.
       DO K = 1,NGAS
         IF ( K .NE. KH2SO4 ) THEN
           I = GTTR( K )%ISRP
-          ISRP_GAS( I ) = real( PRECURSOR_CONC( MAP_IGAStoPREC( K ) ),  8 ) * CFAC_GAS( K )
+          ISRP_GAS( I ) = CGAS( K ) * CFAC_GAS( K )
         END IF
       END DO
       EQLBHIJ =  HPLUS( 1 ) + HPLUS( 2 )  ! use charge balance if lacking isoropia info 
@@ -1195,8 +1209,8 @@ C *** Update gas-phase concentrations from Aitken and Accumulation Mode Partitio
      &          + SUM( -DAER( GTTR(I)%KAER,:) * MW_RATIO( I ) )
          ELSE
             K = GTTR(I)%KAER
-            PRECURSOR_CONC( MAP_IGAStoPREC( I ) ) = CGAS0(I) 
-     &          + SUM( CINORG0( K,: ) - CFINAL( K,: ),MASK=L_MODE_EQB(:) ) * MW_RATIO( I )
+            PRECURSOR_CONC( MAP_IGAStoPREC( I ) ) = CGAS(I) 
+     &          + SUM( CINORG( K,: ) - CFINAL( K,: ), MASK=L_MODE_EQB(:) ) * MW_RATIO( I )
          END IF
       END DO
 
