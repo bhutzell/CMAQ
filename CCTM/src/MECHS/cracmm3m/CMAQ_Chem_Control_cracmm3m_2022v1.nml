@@ -60,6 +60,7 @@
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'SULF'        ,'GAS'  ,0.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'NH3'    ,'NH3'         ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'HCL'    ,'HCL'         ,'GAS'  ,1.  ,'UNIT','a', 
+   'EVERYWHERE', 'ALL'         ,'CL2'    ,'CL2'         ,'GAS'  ,1.  ,'UNIT','a', 
 
    ! Organic gases
    'EVERYWHERE', 'ALL'         ,'ACD'    ,'ACD'         ,'GAS'  ,1.  ,'UNIT','a', 
@@ -112,8 +113,7 @@
    'EVERYWHERE', 'ALL'         ,'UALD'   ,'UALD'        ,'GAS'  ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'XYL'    ,'XYL'         ,'GAS'  ,1.  ,'UNIT','a',  
 
-
-   ! VROC emitted species added for 2022 CRACMM2 emission files
+    ! VROC emitted species added for 2022 CRACMM2 emission files
 
    'EVERYWHERE', 'ALL'         ,'VROCN1ALK' ,'VROCN1ALK'  ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'VROCN1OXY1','VROCN1OXY1' ,'GAS'  ,1   ,'UNIT','a',
@@ -138,7 +138,7 @@
    'EVERYWHERE', 'ALL'         ,'VROCP6ALK' ,'VROCP6ALK'  ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'VROCP6ARO' ,'VROCP6ARO'  ,'GAS'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'         ,'VROCP6OXY1','VROCP6OXY1' ,'GAS'  ,1   ,'UNIT','a',
-
+    
 
    ! Default Aerosols
    'EVERYWHERE', 'ALL'         ,'SULF'   ,'ASO4'        ,'FINE' ,1.  ,'MASS','a', 
@@ -158,7 +158,7 @@
    'EVERYWHERE', 'ALL'         ,'PK'     ,'AK'          ,'FINE' ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'PMN'    ,'AMN'         ,'FINE' ,1.  ,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'PH2O'   ,'AH2O'        ,'FINE' ,1.  ,'UNIT','a', 
-
+ 
    ! AROC emitted species for 2022 CRACMM2 emissions files
 
    'EVERYWHERE', 'ALL'         ,'AROCN1ALK'    ,'AROCN1ALK'    ,'FINE' ,1.  ,'MASS','a',
@@ -194,8 +194,27 @@
    'EVERYWHERE', 'GR_RWC'      ,'AROCP2OXY2', 'AROCP2OXY2'  ,'FINE',0.6  ,'UNIT','m',
    'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP3ALK'   ,'GAS' ,0.667,'MASS','a',
    'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP4ALK'   ,'GAS' ,2.0  ,'MASS','a',
+ 
+ 
 
-                                                        
+   ! Marine Halogen Chemistry
+   'EVERYWHERE', 'MGEM'         ,'HYPOIODUSACID',   'HOI'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'MOLECULARIODINE', 'I2'      ,'GAS'  ,1.  ,'UNIT','a',
+!  'EVERYWHERE', 'MGEM'         ,'DIMETHYLSULFIDE', 'DMS'     ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'METHYLIODIDE',    'CH3I'    ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'DIIODOMETHANE',   'CH2I2'   ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'BROMOIODOMETHANE','CH2IBR'  ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'CHLOROIODOMETHAN','CH2ICL'  ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'TRIBROMOMETHANE', 'CHBR3'   ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'DIBROMOMETHANE',  'CH2BR2'  ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'DIBROMOCHLORMETA','CHBR2CL' ,'GAS'  ,1.  ,'UNIT','a',
+   'EVERYWHERE', 'MGEM'         ,'BROMODICHLOROMET','CHBRCL2' ,'GAS'  ,1.  ,'UNIT','a'
+   'EVERYWHERE', 'MGEM'         ,'BROMOCHLOROMETHA','CH2BRCL' ,'GAS'  ,1.  ,'UNIT','a',   
+
+   ! Used for MEGAN only
+   'EVERYWHERE', 'ALL'        ,'CH3I'      ,'CH3I'       ,'GAS'  ,0   ,'UNIT','a',
+ 
+                                                       
    ! Coarse-Mode Inorganic Ions Scaling                 
    'EVERYWHERE', 'ALL'         ,'PMC'    ,'ACORS'   ,'COARSE',0.99675,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'PMC'    ,'ASO4'    ,'COARSE',0.001  ,'UNIT','a', 
@@ -203,11 +222,14 @@
    'EVERYWHERE', 'ALL'         ,'PMC'    ,'ACL'     ,'COARSE',0.00145,'UNIT','a', 
    'EVERYWHERE', 'ALL'         ,'PMC'    ,'AH2O'    ,'COARSE',0.00032,'UNIT','a', 
 
+   ! pcSOA is a CMAQ species introduced to account for missing pathways for SOA
+   ! formation from combustion sources. It includes IVOC oxidation as well as other
+   ! phenomena (Murphy et al., ACP, 2017). It was parameterized primarily in LA,
+   ! where vehicle exhaust continues to dominate.
+   ! pcSOA is deprecated in CRACMM
 
    ! Wind-Blown Dust and Sea Spray Scaling
    ! Fine Components
-   'EVERYWHERE', 'ALL'    ,'PMFINE_LVPO1','AROCN2OXY2'  ,'FINE',1.   ,'UNIT','a',
-   'EVERYWHERE', 'ALL'    ,'PMFINE_LVOO1','AROCN2OXY8'  ,'FINE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMFINE_SO4'  ,'ASO4'        ,'FINE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMFINE_NO3'  ,'ANO3'        ,'FINE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMFINE_CL'   ,'ACL'         ,'FINE',1.   ,'UNIT','a',
@@ -223,7 +245,8 @@
    'EVERYWHERE', 'ALL'    ,'PMFINE_MN'   ,'AMN'         ,'FINE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMFINE_H2O'  ,'AH2O'        ,'FINE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'    ,'PMFINE_OTHR' ,'AOTHR'       ,'FINE',1.   ,'UNIT','a',
-
+   'EVERYWHERE', 'ALL'    ,'PMFINE_BR'   ,'ABR'         ,'FINE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMFINE_SEAST','ASEAST'      ,'FINE',1.   ,'UNIT','a',
 
    ! Wind-Blown Dust and Sea Spray Scaling
    ! Coarse Components
@@ -233,6 +256,7 @@
    'EVERYWHERE', 'ALL'    ,'PMCOARSE_H2O','AH2O'      ,'COARSE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL'   ,'PMCOARSE_SOIL','ASOIL'     ,'COARSE',1.   ,'UNIT','a',
    'EVERYWHERE', 'ALL' ,'PMCOARSE_SEACAT','ASEACAT'   ,'COARSE',1.   ,'UNIT','a',
+   'EVERYWHERE', 'ALL'    ,'PMCOARSE_BR' ,'ABR'       ,'COARSE',1.   ,'UNIT','a',
 
 /
 
@@ -818,7 +842,7 @@ CMPST =
 !-- Nitrate --!
 'NOY'         , 'NOy Concentration',
                 'ppmV', 'TSP',
-                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + HNO4 + PAN + PPN + MPAN + ISON + INALD + IPX + TRPN + ONIT + HONIT',
+                'NO + NO2 + NO3 + 2.0*N2O5 + HONO + HNO3 + ANO3 + HNO4 + PAN + PPN + MPAN + ISON + INALD + IPX + TRPN + ONIT + HONIT + CLNO + CLNO2 + CLNO3 + BRNO + BRNO2 + BRNO3 + INO + INO2 + INO3',
 
 'NOZ'         , 'NOz Concentration',
                 'ppmV', 'TSP',
@@ -969,20 +993,20 @@ CMPST =
                 'DD_TSP_NA + WD_TSP_NA',
 
 !-- Chloride --!
-'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride', 
-                'kg ha-1', 'DEP_FINE', 
+'DD_PMF_CL'   , 'Dry Dep of Fine-Mode Chloride',
+                'kg ha-1', 'DEP_FINE',
+                'DD_ACL - DD_ACLI',
+
+'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride',
+                'kg ha-1', 'DEP_COARSE',
                 'DD_ACL',
 
-'DD_PMC_CL'   , 'Dry Dep of Coarse-Mode Chloride', 
-                'kg ha-1', 'DEP_COARSE', 
-                'DD_ACL',
-
-'DD_TSP_CL'   , 'Dry Dep of Particulate Chloride', 
-                'kg ha-1', 'DEP', 
+'DD_TSP_CL'   , 'Dry Dep of Particulate Chloride',
+                'kg ha-1', 'DEP',
                 'DD_PMF_CL + DD_PMC_CL',
 
-'WD_TSP_CL'   , 'Wet Dep of Particulate Chloride', 
-                'kg ha-1', 'DEP', 
+'WD_TSP_CL'   , 'Wet Dep of Particulate Chloride',
+                'kg ha-1', 'DEP',
                 'WD_ACL',
 
 !-- Calcium --!
@@ -1145,22 +1169,20 @@ CMPST =
 'WD_SOX'      , 'Wet Dep of Total Sulfate', 
                 'kg ha-1', 'DEP', 
                 'WD_ASO4 + 1.5*WD_SO2',
-
+		
 !-- Total Chloride --!
-'DD_TCL'      , 'Dry Dep of Total Chloride', 
-                'kg ha-1', 'DEP', 
-                'DD_TSP_CL + 0.972*DD_HCL ',
-!                'DD_TSP_CL + DD_CL2 + 0.972*DD_HCL + 0.6758*DD_HOCL',
+
+'DD_TCL'      , 'Dry Dep of Total Chloride',
+                'kg ha-1', 'DEP',
+                'DD_CL2 + 0.972*DD_HCL + 0.6758*DD_HOCL + 0.4352*DD_CLNO2 + 0.36377*DD_CLNO3',
 
 'WD_TCL'      , 'Wet Dep of Total Chloride', 
-                'kg ha-1', 'DEP', 
-                '0.972*WD_HCL + WD_TSP_CL',
-!                '0.972*WD_HCL + WD_CL2 + WD_TSP_CL + 0.6758*WD_HOCL',
+                'kg ha-1', 'DEP',
+		'0.972*WD_HCL + WD_CL2 + WD_ACL - WD_ACLI + 0.6758*WD_HOCL + 0.4352*WD_CLNO2 + 0.36377*WD_CLNO3',
 
 'TD_TCL'      , 'Total Dep of Total Chloride', 
                 'kg ha-1', 'DEP', 
-                'DD_TCL + WD_TCL',
-
+                'WD_TCL + DD_TCL',		
 
 !-----------------------------!
 !**** Nitrogen Deposition ****!
@@ -1201,11 +1223,11 @@ CMPST =
 
 'DD_OXN_OTHR' , 'Dry Dep of Oxidized Nitrogen from Other Components',
                 'kgN ha-1', 'DEP',
-                '0.25926*DD_N2O5 + 0.29787*DD_HONO',
-
+                '0.25926*DD_N2O5 + 0.29787*DD_HONO + 0.1717*DD_CLNO2 + 0.1436*DD_CLNO3',
+				
 'WD_OXN_OTHR' , 'Wet Dep of Oxidized Nitrogen from Other Components',
                 'kgN ha-1', 'DEP',
-                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.177720*WD_PNA',
+                '0.25926*WD_N2O5 + 0.29787*WD_HONO + 0.177720*WD_PNA + 0.1717*WD_CLNO2 + 0.1436*WD_CLNO3',				
 
 'DD_OXN_TOT'  , 'Dry Dep of Total Oxidized Nitrogen',
                 'kgN ha-1', 'DEP',
