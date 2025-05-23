@@ -74,7 +74,7 @@ C             aerosol extinction efficiency
 C HOTP 7/17/2018 Added kappaorg hygroscopicity parameter (Petters and
 C             Kreidenweis 2007 ACP) for organic aerosols. kappa should be zero for
 C             species that are not organic. Water uptake onto inorganics calculated using ISORROPIA.
-C             POC+NCOM kappa is set to zero and calculated in SOA_DEFN if those species are in use.
+C             POC+NCOM kappa is set to zero and calculated in ORG_DEFN if those species are in use.
 C             Current kappaorg values are based on species specific
 C             OM/OC ratios (Pye et al. 2017 ACP).
 C GS  08/17/81 Added bromide in seasalt

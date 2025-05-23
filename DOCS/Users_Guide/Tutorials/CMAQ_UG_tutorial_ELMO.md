@@ -9,7 +9,7 @@ adding new derived variables to the ELMO source code.
 
 #### STEP 1: Add a Keyword Name  
 
-Go to the CMAQ Control Namelist (CMAQ_Control.nml) under the section "DEFINE ELMO KEYWORDS FOR USE IN FILE_VARS". 
+Go to the CMAQ Control Namelist ([CMAQ_Control.nml][link_cmaq_ctrl]) under the section "DEFINE ELMO KEYWORDS FOR USE IN FILE_VARS". 
 Create a new line and set the value of Keywd_name(x) equal to the name of your new Keyword. The x is an arbitrary 
 index indicating the position of your Keyword in the full Keyword list. There is nothing consequential about the order 
 of ELMO Keywords, but indices cannot repeat. If you choose a number in the middle of the existing list, you must increment 
@@ -31,7 +31,7 @@ Your Keyword is ready for use in File_Vars to activate variables for your simula
 
 #### STEP 1: Add an Index for the New Variable
 
-Go to ELMO_DATA.F. Beginning around line 70, you will find a list of 100+ integers, prefixed with ID_, which map to 
+Go to [ELMO_DATA.F][link_elmo_data]. Beginning around line 70, you will find a list of 100+ integers, prefixed with ID_, which map to 
 derived ELMO variables and other diagnostics. Add an index for your new variable to the end of the list. We recommend 
 prefixing it with ID_.
 
@@ -80,13 +80,18 @@ make any appropriate modifications. Again, use the approach for ELMO_AOD_550 as 
 
 #### STEP 7: Add Variable Name to CMAQ Control File
 
-ELMO is now equipped to output your variable. You may add it to File_Vars in CMAQ_Control.nml for any custom output file you like, or 
+ELMO is now equipped to output your variable. You may add it to File_Vars in [CMAQ_Control.nml][link_cmaq_ctrl] for any custom output file you like, or 
 you may add it to the contents of any ELMO Keyword.  
+
 
 <!-- START_OF_COMMENT -->
 
-[link_1]: ../../../POST/combine/
+[link_elmo_data]: ../../../CCTM/src/driver/ELMO_DATA.F
+[link_cmaq_ctrl]: ../../../CCTM/src/driver/CMAQ_Control.F
 
 <!-- END_OF_COMMENT -->
 
-[link_1]: https://github.com/USEPA/CMAQ/blob/main/POST/combine/ 
+[link_elmo_data]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/driver/ELMO_DATA.F
+[link_cmaq_ctrl]: https://github.com/USEPA/CMAQ/blob/main/CCTM/src/driver/CMAQ_Control.F
+
+
