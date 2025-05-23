@@ -1137,16 +1137,16 @@ C *** calculate molecular speeds (m/s) using Eq 4 of Pleim et al (1995)
                CBAR_OH    = CBAR_COEFF * INV_SQRT_MWOH 
                CBAR_HOCL  = CBAR_COEFF * INV_SQRT_MWHOCL
                CBAR_HCL   = CBAR_COEFF * INV_SQRT_MWHCL
-               CBAR_CLNO2 = CBAR_COEFF * INV_SQRT_MWCLNO2  	       
-	       CBAR_NO2   = CBAR_COEFF * INV_SQRT_MWNO2
+               CBAR_CLNO2 = CBAR_COEFF * INV_SQRT_MWCLNO2         
+               CBAR_NO2   = CBAR_COEFF * INV_SQRT_MWNO2
                CBAR_H2O2  = CBAR_COEFF * INV_SQRT_MWH2O2
                CBAR_O3    = CBAR_COEFF * INV_SQRT_MWO3
                CBAR_SO2   = CBAR_COEFF * INV_SQRT_MWSO2
                CBAR_MEPX  = CBAR_COEFF * INV_SQRT_MWMEPX
                CBAR_PACD  = CBAR_COEFF * INV_SQRT_MWPACD               
-	       CBAR_HCHO = CBAR_COEFF * INV_SQRT_MWHCHO
-	       CBAR_HNO4 = CBAR_COEFF * INV_SQRT_MWHNO4
-	       
+               CBAR_HCHO = CBAR_COEFF * INV_SQRT_MWHCHO
+               CBAR_HNO4 = CBAR_COEFF * INV_SQRT_MWHNO4
+       
 C *** correct N2O5 molecular diffusivity for ambient conditions
 
                INV_DIFFUSIVITY = 1.0D0 / ( STD_DIFF_N2O5 * ADJUST_DIFF )
@@ -1167,16 +1167,16 @@ C *** correct molecular diffusivity for ambient conditions - assumed similar to 
                INV_DIFF_OH     = 1.0D0 / ( STD_DIFF_OH * ADJUST_DIFF )
                INV_DIFF_HOCL   = 1.0D0 / ( STD_DIFF_HOCL * ADJUST_DIFF )
                INV_DIFF_HCL    = 1.0D0 / ( STD_DIFF_HCL * ADJUST_DIFF )
-               INV_DIFF_CLNO2  = 1.0D0 / ( STD_DIFF_CLNO2 * ADJUST_DIFF )	       
-	       INV_DIFF_NO2    = 1.0D0 / ( STD_DIFF_NO2 * ADJUST_DIFF )
+               INV_DIFF_CLNO2  = 1.0D0 / ( STD_DIFF_CLNO2 * ADJUST_DIFF )       
+               INV_DIFF_NO2    = 1.0D0 / ( STD_DIFF_NO2 * ADJUST_DIFF )
                INV_DIFF_H2O2   = 1.0D0 / ( STD_DIFF_H2O2 * ADJUST_DIFF )
                INV_DIFF_O3     = 1.0D0 / ( STD_DIFF_O3 * ADJUST_DIFF )
                INV_DIFF_SO2    = 1.0D0 / ( STD_DIFF_SO2 * ADJUST_DIFF )
                INV_DIFF_MEPX   = 1.0D0 / ( STD_DIFF_MEPX * ADJUST_DIFF )
                INV_DIFF_PACD   = 1.0D0 / ( STD_DIFF_PACD * ADJUST_DIFF )
-	       INV_DIFF_HCHO   = 1.0D0 / ( STD_DIFF_HCHO * ADJUST_DIFF )
-	       INV_DIFF_HNO4   = 1.0D0 / ( STD_DIFF_HNO4 * ADJUST_DIFF )
-	       
+               INV_DIFF_HCHO   = 1.0D0 / ( STD_DIFF_HCHO * ADJUST_DIFF )
+               INV_DIFF_HNO4   = 1.0D0 / ( STD_DIFF_HNO4 * ADJUST_DIFF )
+       
 
 C *** get KN2O5 rate constants YIELD_CLNO2 for each mode
                YIELD_CLNO2 = 0.0D0
@@ -1231,18 +1231,18 @@ C *** get KN2O5 rate constants YIELD_CLNO2 for each mode
 
 
 c *** get aerosol FE, MN, and HMS concentrations
-		  AFE  = aerospc_conc( AFE_IDX, N )
+                  AFE  = aerospc_conc( AFE_IDX, N )
                   AMN  = aerospc_conc( AMN_IDX, N ) 
-		  
-		  FE_PPM( N ) = PPM_FACTOR * ( AFE * INV_MWFE )
+  
+                  FE_PPM( N ) = PPM_FACTOR * ( AFE * INV_MWFE )
                   MN_PPM( N ) = PPM_FACTOR * ( AMN * INV_MWMN )
-		  
-		  IF ( AHMS_IDX .GT. 0 ) THEN
+  
+                  IF ( AHMS_IDX .GT. 0 ) THEN
                      AHMS  = aerospc_conc( AHMS_IDX, N ) 
-		     HMS_PPM( N ) = PPM_FACTOR * ( AHMS * INV_MWHMS )
-		  ELSE
-		     AHMS  = 0.0 
-		     HMS_PPM( N ) = 0.d0
+                     HMS_PPM( N ) = PPM_FACTOR * ( AHMS * INV_MWHMS )
+                  ELSE
+                     AHMS  = 0.0 
+                     HMS_PPM( N ) = 0.d0
                   END IF  
 
 c *** get fine aerosol H2O and chlorine concentrations in
@@ -1305,7 +1305,7 @@ C *** calculate aerosol surface area
 C *** Calculate IEPOX and MAE uptake information for accumulation mode
                RADIUS_I  = 0.5D0 * DE_WET( 1 ) ! particle size - i-mode
                RADIUS    = 0.5D0 * DE_WET( 2 ) ! particle size - j-mode
-	       	 
+ 
 C *** Calculate approximate seasalt surface area, m2/m3
                MARINE_AREA = ( OCEAN( C,R ) + SZONE( C,R ) )
                IF ( MARINE_AREA .GT. 0.0 .AND. MARINE_MECH ) THEN 
@@ -1362,56 +1362,55 @@ C *** set up variables needed for calculating K_BRONO2
                ELSE
                    DARK = .FALSE.
                END IF
-	       
-	       ALW = aerospc_conc(ah2o_idx,2)
-	       
+       
+               ALW = aerospc_conc(ah2o_idx,2)
+       
 C *** Heterogeneous Sulfur Chemistry      
-		
-	IF ( hethms ) THEN
-	       	   
-C *** Extract SO2, NO2, OH, FORM, H2O2, O3, MEPX, PACD, and HNO4 concentrations
-        SO2_CONC  = CGRID(C, R, L, precursor_map( SO2_idx ))       ! SO2 in ppm
-        NO2_CONC  = CGRID(C, R, L, precursor_map( NO2_idx ))       ! NO2 in ppm	 
-	OH_CONC   = CGRID(C, R, L, precursor_map( OH_idx ))        ! OH in ppm	
-	H2O2_CONC  = CGRID(C, R, L, precursor_map( H2O2_idx ))     ! H2O2 in ppm
-	FORM_CONC  = CGRID(C, R, L, precursor_map( HCHO_idx ))     ! HCHO in ppm
-	HNO4_CONC  = CGRID(C, R, L, precursor_map( HNO4_idx ))     ! HNO4 in ppm  
-	O3_CONC    = CGRID(C, R, L, precursor_map( O3_idx ))       ! O3 in ppm    	    
-        MEPX_CONC  = CGRID(C, R, L, precursor_map( OP1_idx ))      ! MHP in ppm    	    
-        PACD_CONC  = CGRID(C, R, L, precursor_map( PAA_idx ))      ! PAA in ppm 
-	      	
-!C *** assign SMALL gamma for SO2 oxidation in low aerosol liquid water 
-               IF ( SO2_CONC .LE. 0.0 .OR. ALW .LT. 0.1D0 .OR. AIRRH .LT. 0.5D0) THEN      
-  		         	GAMMAH2O2SO2 = SMALL 
-  	        		GAMMAO3SO2   = SMALL 
-  	        		GAMMAMEPXSO2 = SMALL 
-  		        	GAMMAPACDSO2 = SMALL 
-  		        	GAMMANO2SO2  = SMALL
-				GAMMATMISO2  = SMALL 
-                                GAMMAHMSP    = SMALL
-                                GAMMAHNO4SO2 = SMALL
-				GAMMAHMSOH   = SMALL
-				OHMIN = 0.d0		        	  
 
-               ELSE                                                      
+               IF ( hethms ) THEN
+          
+C *** Extract SO2, NO2, OH, FORM, H2O2, O3, MEPX, PACD, and HNO4 concentrations
+                  SO2_CONC  = CGRID(C, R, L, precursor_map( SO2_idx ))       ! SO2 in ppm
+                  NO2_CONC  = CGRID(C, R, L, precursor_map( NO2_idx ))       ! NO2 in ppm 
+                  OH_CONC   = CGRID(C, R, L, precursor_map( OH_idx ))        ! OH in ppm
+                  H2O2_CONC  = CGRID(C, R, L, precursor_map( H2O2_idx ))     ! H2O2 in ppm
+                  FORM_CONC  = CGRID(C, R, L, precursor_map( HCHO_idx ))     ! HCHO in ppm
+                  HNO4_CONC  = CGRID(C, R, L, precursor_map( HNO4_idx ))     ! HNO4 in ppm  
+                  O3_CONC    = CGRID(C, R, L, precursor_map( O3_idx ))       ! O3 in ppm        
+                  MEPX_CONC  = CGRID(C, R, L, precursor_map( OP1_idx ))      ! MHP in ppm        
+                  PACD_CONC  = CGRID(C, R, L, precursor_map( PAA_idx ))      ! PAA in ppm 
+      
+!C *** assign SMALL gamma for SO2 oxidation in low aerosol liquid water 
+                  IF ( SO2_CONC .LE. 0.0 .OR. ALW .LT. 0.1D0 .OR. AIRRH .LT. 0.5D0) THEN      
+                     GAMMAH2O2SO2 = SMALL 
+                     GAMMAO3SO2   = SMALL 
+                     GAMMAMEPXSO2 = SMALL 
+                     GAMMAPACDSO2 = SMALL 
+                     GAMMANO2SO2  = SMALL
+                     GAMMATMISO2  = SMALL 
+                     GAMMAHMSP    = SMALL
+                     GAMMAHNO4SO2 = SMALL
+                     GAMMAHMSOH   = SMALL
+                     OHMIN = 0.d0          
+
+                  ELSE                                                      
 C *** calculate gamma for SO2 reactions in aerosol liquid water 
 
 C *** Transfer necessary info to CALCSO2GAMMAS to calculate 
 C *** kinetic mass transfer rates. Will use this info to determine 
 C *** which reactant is limiting for mass transfer when there are 2 gas phase reactants
  
-     
-               J_H2O2 = RADIUS * RADIUS * INV_DIFF_H2O2 / 3.0D0                     
-               J_O3   = RADIUS * RADIUS * INV_DIFF_O3 / 3.0D0       
-               J_NO2  = RADIUS * RADIUS * INV_DIFF_NO2 / 3.0D0                                
-               J_MEPX = RADIUS * RADIUS * INV_DIFF_MEPX / 3.0D0                          
-               J_PACD = RADIUS * RADIUS * INV_DIFF_PACD /3.0D0                          
-               J_SO2  = RADIUS * RADIUS * INV_DIFF_SO2 / 3.0D0                       
-               J_HCHO = RADIUS * RADIUS * INV_DIFF_HCHO / 3.0D0                          
-               J_HNO4 = RADIUS * RADIUS * INV_DIFF_HNO4 / 3.0D0                     
+                     J_H2O2 = RADIUS * RADIUS * INV_DIFF_H2O2 / 3.0D0                     
+                     J_O3   = RADIUS * RADIUS * INV_DIFF_O3 / 3.0D0       
+                     J_NO2  = RADIUS * RADIUS * INV_DIFF_NO2 / 3.0D0                                
+                     J_MEPX = RADIUS * RADIUS * INV_DIFF_MEPX / 3.0D0                          
+                     J_PACD = RADIUS * RADIUS * INV_DIFF_PACD /3.0D0                          
+                     J_SO2  = RADIUS * RADIUS * INV_DIFF_SO2 / 3.0D0                       
+                     J_HCHO = RADIUS * RADIUS * INV_DIFF_HCHO / 3.0D0                          
+                     J_HNO4 = RADIUS * RADIUS * INV_DIFF_HNO4 / 3.0D0                     
       
 
-              CALL CALCSO2GAMMAS( RADIUS, AIRTEMP, AIRPRES, REAL (SO2_CONC, 8),
+                     CALL CALCSO2GAMMAS( RADIUS, AIRTEMP, AIRPRES, REAL (SO2_CONC, 8),
      &                          REAL(NO2_CONC, 8), REAL(H2O2_CONC, 8), REAL(O3_CONC, 8), 
      &                          REAL(MEPX_CONC, 8), REAL(PACD_CONC, 8), 
      &                          REAL(FORM_CONC, 8), REAL(HNO4_CONC, 8), REAL(OH_CONC, 8), 
@@ -1423,21 +1422,21 @@ C *** which reactant is limiting for mass transfer when there are 2 gas phase re
      &                          GAMMAPACDSO2, GAMMANO2SO2, GAMMATMISO2, 
      &                          GAMMAHMSP, GAMMAHNO4SO2, GAMMAHMSOH, DARK )
      
-        END IF 
-	
+                  END IF 
 
-                O3_SO2_RXN_TIME     = 4.0D0 / ( CBAR_O3 * GAMMAO3SO2 )             
-                H2O2_SO2_RXN_TIME   = 4.0D0 / ( CBAR_H2O2 * GAMMAH2O2SO2 )                                      
-                NO2_SO2_RXN_TIME    = 4.0D0 / ( CBAR_NO2 * GAMMANO2SO2 )                                                                       
-                MEPX_SO2_RXN_TIME   = 4.0D0 / ( CBAR_MEPX * GAMMAMEPXSO2 )                                        
-                PACD_SO2_RXN_TIME   = 4.0D0 / ( CBAR_PACD * GAMMAPACDSO2 )  
-		TMI_SO2_RXN_TIME    = 4.0D0 / ( CBAR_SO2 * GAMMATMISO2 )                                           
-                HCHO_SO2_RXN_TIME   = 4.0D0 / ( CBAR_HCHO * GAMMAHMSP )
-		HNO4_SO2_RXN_TIME   = 4.0D0 / ( CBAR_HNO4 * GAMMAHNO4SO2 )
-		HMS_OH_RXN_TIME     = 4.0D0 / ( CBAR_OH * GAMMAHMSOH )
-		
-        END IF
-		
+
+                  O3_SO2_RXN_TIME     = 4.0D0 / ( CBAR_O3 * GAMMAO3SO2 )             
+                  H2O2_SO2_RXN_TIME   = 4.0D0 / ( CBAR_H2O2 * GAMMAH2O2SO2 )                                      
+                  NO2_SO2_RXN_TIME    = 4.0D0 / ( CBAR_NO2 * GAMMANO2SO2 )                                                                       
+                  MEPX_SO2_RXN_TIME   = 4.0D0 / ( CBAR_MEPX * GAMMAMEPXSO2 )                                        
+                  PACD_SO2_RXN_TIME   = 4.0D0 / ( CBAR_PACD * GAMMAPACDSO2 )  
+                  TMI_SO2_RXN_TIME    = 4.0D0 / ( CBAR_SO2 * GAMMATMISO2 )                                           
+                  HCHO_SO2_RXN_TIME   = 4.0D0 / ( CBAR_HCHO * GAMMAHMSP )
+                  HNO4_SO2_RXN_TIME   = 4.0D0 / ( CBAR_HNO4 * GAMMAHNO4SO2 )
+                  HMS_OH_RXN_TIME     = 4.0D0 / ( CBAR_OH * GAMMAHMSOH )
+
+               END IF
+
                CBARIEPOX = CFACTOR_IEPOX * DSQRT( AIRTEMP )
                CBARIMAE  = CFACTOR_IMAE  * DSQRT( AIRTEMP )
 
@@ -1873,7 +1872,7 @@ C hydrolysis
                  CASE( IA_INO3_WAI )
                      IF ( AIRRH .LE. 0.2D0 ) THEN
                       KHETERO( IRATE, C,R,L ) = 0.0
-                     ELSEIF (AIRRH .GT. 0.2D0 ) THEN  		                       
+                     ELSEIF (AIRRH .GT. 0.2D0 ) THEN                         
                       KHETERO( IRATE, C,R,L ) = 60.0D0 * WET_M2( 1 ) * DPI / ( RADIUS_I * INV_DIFF_INO3 + INO3_WA_RXN_TIME )
                      ENDIF
 
@@ -1883,7 +1882,7 @@ C hydrolysis
                      ELSEIF (AIRRH .GT. 0.2D0) THEN   
                       KHETERO( IRATE, C,R,L ) = 60.0D0 * WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_INO3 + INO3_WA_RXN_TIME )
                      ENDIF  
-		     
+     
                 CASE( IA_ANO3 )
 
                     IF ( .NOT. DARK ) THEN
@@ -1897,131 +1896,131 @@ C hydrolysis
                       IF ( L_ELMO ) EF_HNO3( C,R,L ) = FAC_HNO3
                       KHETERO( IRATE, C,R,L ) = REAL( JHNO3 * FAC_HNO3,8 ) ! 1/min ,
                     END IF
-		    
-	        CASE( IA_SO2N )   
+    
+                CASE( IA_SO2N )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_NO2 + NO2_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(NO2_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0 ) THEN
-		    IF(J_SO2 .LT. J_NO2) THEN
-		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + NO2_SO2_RXN_TIME*CBAR_NO2/CBAR_SO2 )
-		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (NO2_CONC, 8)                                     ! 1/(min*ppm)
-		    ELSE 
-                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                     ! 1/(min*ppm)
-		    END IF
+     &                ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0 ) THEN
+                      IF(J_SO2 .LT. J_NO2) THEN
+                         K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + NO2_SO2_RXN_TIME*CBAR_NO2/CBAR_SO2 )
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (NO2_CONC, 8)                                 ! 1/(min*ppm)
+                      ELSE 
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                 ! 1/(min*ppm)
+                      END IF
                    ELSE
-                   KHETERO( IRATE, C,R,L ) = 0.0D0  
+                      KHETERO( IRATE, C,R,L ) = 0.0D0  
                    END IF                                      
 
                 CASE( IA_SO2H )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_H2O2 + H2O2_SO2_RXN_TIME )  
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(H2O2_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0  ) THEN 
-		    IF(J_SO2 .LT. J_H2O2) THEN
-		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + H2O2_SO2_RXN_TIME*CBAR_H2O2/CBAR_SO2 )
-		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (H2O2_CONC, 8)                                     ! 1/(min*ppm)
-		    ELSE                 
-                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                      ! 1/(min*ppm)
-		     END IF
+     &                ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0  ) THEN 
+                      IF(J_SO2 .LT. J_H2O2) THEN
+                         K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + H2O2_SO2_RXN_TIME*CBAR_H2O2/CBAR_SO2 )
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (H2O2_CONC, 8)                                 ! 1/(min*ppm)
+                      ELSE                 
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                  ! 1/(min*ppm)
+                      END IF
                    ELSE
-                    KHETERO( IRATE, C,R,L ) = 0.0D0  
+                      KHETERO( IRATE, C,R,L ) = 0.0D0  
                    END IF  
 
                 CASE( IA_SO2O )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_O3 + O3_SO2_RXN_TIME )  
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(O3_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN		   
-		    IF(J_SO2 .LT. J_O3) THEN
-		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + O3_SO2_RXN_TIME*CBAR_O3/CBAR_SO2 )
-		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (O3_CONC, 8)                                      ! 1/(min*ppm)
-		    ELSE 
-                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                     ! 1/(min*ppm)
-		    END IF
+     &                ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN   
+                      IF(J_SO2 .LT. J_O3) THEN
+                         K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + O3_SO2_RXN_TIME*CBAR_O3/CBAR_SO2 )
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (O3_CONC, 8)                                      ! 1/(min*ppm)
+                      ELSE 
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                     ! 1/(min*ppm)
+                      END IF
                    ELSE
-                    KHETERO( IRATE, C,R,L ) = 0.0D0  
+                      KHETERO( IRATE, C,R,L ) = 0.0D0  
                    END IF                    
                  
                 CASE( IA_SO2M )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_MEPX + MEPX_SO2_RXN_TIME )       
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0 .AND. REAL(MEPX_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN		   
-		    IF(J_SO2 .LT. J_MEPX) THEN
-		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + MEPX_SO2_RXN_TIME*CBAR_MEPX/CBAR_SO2 )
-		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (MEPX_CONC, 8)                                    ! 1/(min*ppm)
-		    ELSE                                  
-                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8) 
-		    END IF                                   ! 1/(min*ppm)
+     &                ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN   
+                      IF(J_SO2 .LT. J_MEPX) THEN
+                         K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + MEPX_SO2_RXN_TIME*CBAR_MEPX/CBAR_SO2 )
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (MEPX_CONC, 8)                                    ! 1/(min*ppm)
+                      ELSE                                  
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                     ! 1/(min*ppm)
+                      END IF                                                 
                    ELSE
-                    KHETERO( IRATE, C,R,L ) = 0.0D0  
+                      KHETERO( IRATE, C,R,L ) = 0.0D0  
                    END IF  
 
                 CASE( IA_SO2P )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_PACD + PACD_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0  .AND. REAL(PACD_CONC, 8) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN
-		    IF(J_SO2 .LT. J_PACD) THEN
-		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + PACD_SO2_RXN_TIME*CBAR_PACD/CBAR_SO2 )
-		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (PACD_CONC, 8)                                   ! 1/(min*ppm)
-		    ELSE
-                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                    ! 1/(min*ppm)
-		    END IF
+     &                ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN
+                      IF(J_SO2 .LT. J_PACD) THEN
+                         K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + PACD_SO2_RXN_TIME*CBAR_PACD/CBAR_SO2 )
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (PACD_CONC, 8)                                   ! 1/(min*ppm)
+                      ELSE
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                    ! 1/(min*ppm)
+                      END IF
                    ELSE
-                    KHETERO( IRATE, C,R,L ) = 0.0D0  
+                      KHETERO( IRATE, C,R,L ) = 0.0D0  
                    END IF 
-		   
-		CASE( IA_SO2T )   
+   
+                CASE( IA_SO2T )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + TMI_SO2_RXN_TIME )  
 !                   IF ( FE_PPM(2) .GT. MIN_VALUE .AND. MN_PPM(2) .GT. MIN_VALUE) THEN
                    IF ( FE_PPM(2) .GT. 0.0D0 .AND. MN_PPM(2) .GT. 0.0D0 .AND. 
-     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0  ) THEN
-                    KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / FE_PPM(2) / MN_PPM(2)                                  ! 1/(min*ppm*ppm)
+     &                ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0  ) THEN
+                      KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / FE_PPM(2) / MN_PPM(2)                                  ! 1/(min*ppm*ppm)
                    ELSE
-                    KHETERO( IRATE, C,R,L ) = 0.0D0  
-                   END IF 	   
+                      KHETERO( IRATE, C,R,L ) = 0.0D0  
+                   END IF    
 
-		CASE( IA_HMSP )   
+                CASE( IA_HMSP )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_HCHO + HCHO_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0  .AND. REAL(FORM_CONC, 8) .GT. 0.0D0 .AND.
-     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN
-		    IF(J_SO2 .LT. J_HCHO) THEN
-		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + HCHO_SO2_RXN_TIME*CBAR_HCHO/CBAR_SO2 )
-		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (FORM_CONC, 8)                                   ! 1/(min*ppm)
-		    ELSE
-                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                    ! 1/(min*ppm)
-		    END IF
+     &                ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN
+                      IF(J_SO2 .LT. J_HCHO) THEN
+                         K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + HCHO_SO2_RXN_TIME*CBAR_HCHO/CBAR_SO2 )
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (FORM_CONC, 8)                                   ! 1/(min*ppm)
+                      ELSE
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                    ! 1/(min*ppm)
+                      END IF
                    ELSE
-                    KHETERO( IRATE, C,R,L ) = 0.0D0  
+                      KHETERO( IRATE, C,R,L ) = 0.0D0  
                    END IF 
-		   
-		CASE( IA_HNO4 )   
+   
+                CASE( IA_HNO4 )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_HNO4 + HNO4_SO2_RXN_TIME )                     
                    IF ( REAL(SO2_CONC, 8) .GT. 0.0D0  .AND. REAL(HNO4_CONC, 8) .GT. 0.0D0 .AND.
-     &  		  ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0  ) THEN
-		    IF(J_SO2 .LT. J_HNO4) THEN
-		     K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + HNO4_SO2_RXN_TIME*CBAR_HNO4/CBAR_SO2 )
-		     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (HNO4_CONC, 8)                                   ! 1/(min*ppm)
-		    ELSE
-                     KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                    ! 1/(min*ppm)
-		    END IF
+     &                ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0  ) THEN
+                      IF(J_SO2 .LT. J_HNO4) THEN
+                         K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_SO2 + HNO4_SO2_RXN_TIME*CBAR_HNO4/CBAR_SO2 )
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (HNO4_CONC, 8)                                   ! 1/(min*ppm)
+                      ELSE
+                         KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / REAL (SO2_CONC, 8)                                    ! 1/(min*ppm)
+                      END IF
                    ELSE
-                    KHETERO( IRATE, C,R,L ) = 0.0D0  
+                      KHETERO( IRATE, C,R,L ) = 0.0D0  
                    END IF 
-		   
-		CASE( IA_HMSL1 )   
+   
+                CASE( IA_HMSL1 )   
                    K1 = WET_M2( 2 ) * DPI / ( RADIUS * INV_DIFF_OH + HMS_OH_RXN_TIME )  
                    IF ( HMS_PPM(2) .GT. 0.0D0 .AND. ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN
-                    KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / HMS_PPM(2)                                            ! 1/(min*ppm)
+                      KHETERO( IRATE, C,R,L ) = 60.0D0 * K1 / HMS_PPM(2)                                            ! 1/(min*ppm)
                    ELSE
-                    KHETERO( IRATE, C,R,L ) = 0.0D0  
-                  END IF	      
-		   
-		CASE( IA_HMSL2 )   
+                      KHETERO( IRATE, C,R,L ) = 0.0D0  
+                   END IF      
+   
+                CASE( IA_HMSL2 )   
 !                   K1 = OHMIN * 4800.0D0*DEXP(-4700.0D0*(1.d0/AIRTEMP-1.0D0/298.0D0)) +  
 !     &                  6.2D-8*DEXP(-11400*(1.0D0/AIRTEMP-1.0D0/298.0D0))  
-!                    IF ( ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN                   
-!                   KHETERO( IRATE, C,R,L ) = 60.0D0 * K1                                                          ! 1/(min)
-!                    ELSE
-		    KHETERO( IRATE, C,R,L ) = 0.0D0                                                                ! 1/(min)
-!		    END IF		                     
+!                   IF ( ALW .GE. 0.1D0 .AND. AIRRH .GE. 0.5D0   ) THEN                   
+!                      KHETERO( IRATE, C,R,L ) = 60.0D0 * K1                                                          ! 1/(min)
+!                   ELSE
+                       KHETERO( IRATE, C,R,L ) = 0.0D0                                                                ! 1/(min)
+!                   END IF                     
 
                END SELECT
 
@@ -3320,7 +3319,7 @@ C TVOL = set volume basis for concentration calculations
 C IONEFF = use ionic strength enhancement factors 
 C HMSlo = use low or high HMS production rates        
 C FEMNprec = limit soluble Fe and Mn by solid precipitation (less Fe available to catalyze aq reactions as pH goes up)
-					   
+   
       INTEGER, PARAMETER :: IONEFF = 1     ! 1 = Use ionic strength enhancement factors for Henry's Law coefs for SO2 and H2O2, 
                                            ! SO2 dissoc coefs, and kO3 and kh2o2 rate coefficients; 0 = no addnl ionic EFs
       INTEGER, PARAMETER :: HMSlo = 0      ! 0 for high HMS prod rate, 1 for low HMS prod rate, 2 for avg
@@ -3361,7 +3360,7 @@ C *** Parameters for SO2
       REAL( 8 )  :: SO42M                                        ! SO42- [M]
       REAL( 8 )  :: HSO4M                                        ! HSO4- [M]
       
-      REAL( 8 ) :: WCONC					 ! Water concentration [M] 
+      REAL( 8 ) :: WCONC                                         ! Water concentration [M] 
     
       REAL( 8 ) :: AFEm, AMNm, FE_OXm, MN_OXm
       REAL( 8 ) :: FSIV(3)                                       ! H2SO3, HSO3, and SO3 Fraction of SIV
@@ -3391,10 +3390,10 @@ C *** J-mode particle volume [L/m**3 air]
          volume = 0.0d0
          Do i = 1, n_aerospc 
             If ( aerospc( i )%tracer ) Cycle
-!	    If ( aerospc( i )%om ) Cycle
+!            If ( aerospc( i )%om ) Cycle
             If ( aero_missing( i,2 ) ) Cycle
                volume = volume + (Real( aerospc_conc( i, 2 ) / 
-     &	                aerospc(i)%density, 8 ) * 1.0d-6)
+     &                aerospc(i)%density, 8 ) * 1.0d-6)
          End Do
          inv_volume = 1.d0 / volume  
 
@@ -3486,7 +3485,7 @@ C *** Calculate total sulfate concentration in ALW and calculate SO42- and HSO4-
 
 ! *** Determine ionic strength [M of m]
     
-          IONIC = 0.50 * HPLUS *1.0D0
+       IONIC = 0.50 * HPLUS *1.0D0
      &          + 0.50 * REAL(aerospc_conc( ana_idx, 2 )/aerospc_mw( ana_idx),8) * inv_volume / 1.d6 *1.0D0  
      &          + 0.50 * REAL(aerospc_conc( ak_idx, 2 )/aerospc_mw( ak_idx),8) * inv_volume / 1.d6 *1.0D0
      &          + 0.50 * REAL(aerospc_conc( amg_idx, 2 )/aerospc_mw( amg_idx),8) * inv_volume / 1.d6 *4.0D0                   
@@ -3502,25 +3501,25 @@ C *** Calculate total sulfate concentration in ALW and calculate SO42- and HSO4-
                     
           
 ! *** Keep the calculated ionic strength within experimental range [M or m]
-	  
-	  IONICFE = MIN( IONIC, 2.d0 )
-	  IONIC_1 = MIN( IONIC, 5.d0 )
-	  IONIC_2 = MIN( IONIC, 6.d0 )
-	  IONIC_3 = MIN( IONIC, 1.2 )
-	  IONIC_4 = MIN( IONIC, 1.14D0 ) 
+  
+       IONICFE = MIN( IONIC, 2.d0 )
+       IONIC_1 = MIN( IONIC, 5.d0 )
+       IONIC_2 = MIN( IONIC, 6.d0 )
+       IONIC_3 = MIN( IONIC, 1.2 )
+       IONIC_4 = MIN( IONIC, 1.14D0 ) 
 
 C *** Henry's Law coefficients (M/atm)
-      H_SO2  = REAL( HLCONST( HLC_SO2       , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
-      H_H2O2 = REAL( HLCONST( HLC_H2O2      , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
-      H_O3   = REAL( HLCONST( HLC_O3        , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)     
-      H_NO2  = REAL( HLCONST( HLC_NO2       , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
-      H_MEPX = REAL( HLCONST( HLC_MHYDPOX   , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
-      H_PACD = REAL( HLCONST( HLC_PEROXYACET , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
-      H_HCHO = REAL( HLCONST( HLC_HCHO       , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
-      KHYDHCHO = 1.8D-1 * EXP( 4.03D+3 * TFAC ) / 5.1D-3 * WCONC ! Under dilute conditions, WCONC ~ 55.5 M
-      H_HCHO = H_HCHO / ( 1.d0 + KHYDHCHO )
-      H_HNO4 = REAL( HLCONST( HLC_HNO4       , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
-      H_OH   = REAL( HLCONST( HLC_OH         , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
+       H_SO2  = REAL( HLCONST( HLC_SO2       , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
+       H_H2O2 = REAL( HLCONST( HLC_H2O2      , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
+       H_O3   = REAL( HLCONST( HLC_O3        , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)     
+       H_NO2  = REAL( HLCONST( HLC_NO2       , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
+       H_MEPX = REAL( HLCONST( HLC_MHYDPOX   , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
+       H_PACD = REAL( HLCONST( HLC_PEROXYACET , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
+       H_HCHO = REAL( HLCONST( HLC_HCHO       , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
+       KHYDHCHO = 1.8D-1 * EXP( 4.03D+3 * TFAC ) / 5.1D-3 * WCONC ! Under dilute conditions, WCONC ~ 55.5 M
+       H_HCHO = H_HCHO / ( 1.d0 + KHYDHCHO )
+       H_HNO4 = REAL( HLCONST( HLC_HNO4       , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
+       H_OH   = REAL( HLCONST( HLC_OH         , REAL(TEMPERATURE,4), .FALSE., 0.0 ), 8)
   
 C *** Calculate H2SO3, HSO3, SO3, S(IV)          
       AKEQ1 = 1.3D-02  * EXP ( 1.96D+03 * TFAC ) / 55.5 * WCONC  
@@ -3544,8 +3543,8 @@ C *** Calculate H2SO3, HSO3, SO3, S(IV)
       FSIV = 0
       IF(SIV .gt. 0) THEN
          FSIV(1) = H2SO3 / SIV    
-	 FSIV(2) = HSO3 / SIV  
-	 FSIV(3) = SO3 / SIV  
+         FSIV(2) = HSO3 / SIV  
+         FSIV(3) = SO3 / SIV  
       END IF  
 
 C *** Calculate oxidant concentrations [M]      
@@ -3649,12 +3648,12 @@ C *** Calculate K_CHEM_SO2 (average of 2 rate expressions)
      &                 ( 1.0D0 + 75.0D0 *( TS6**0.67D0 ))) *                             
      &                 10.D0**(-4.07*(IONICFE**0.5)/(1.d0+(IONICFE**0.5)))               ! added ionic strength inhibition (using Mn value -- see Seinfeld and Pandis) 
         IF( pH .LE. 4.2 ) then 
-	   K6 = (3.72D+07*EXP(-8431.6*TFAC297)*HPLUS**(-0.74)) *
+           K6 = (3.72D+07*EXP(-8431.6*TFAC297)*HPLUS**(-0.74)) *
      &          10.d0**(-4.07*(IONICFE**0.5)/(1.d0+(IONICFE**0.5)))      
-	ELSE
-	   K6 = (2.51D+13*EXP(-8431.6*TFAC297)*HPLUS**(0.67)) *
+        ELSE
+           K6 = (2.51D+13*EXP(-8431.6*TFAC297)*HPLUS**(0.67)) *
      &          10.d0**(-4.07*(IONICFE**0.5)/(1.d0+(IONICFE**0.5)))    
-	END IF
+        END IF
         K_CHEM_SO2_2 = (K6 * MN_OX * FE_OX)                        ! 1/s
                  
         K_CHEM_SO2 = (K_CHEM_SO2_1 + K_CHEM_SO2_2) / 2.d0      
@@ -3662,41 +3661,41 @@ C *** Calculate K_CHEM_SO2 (average of 2 rate expressions)
 C *** Calculate K_CHEM_NO2 (average of 3 rates)
 
         IF( pH .LT. 5.0 ) then 
-	   KLOW_NO2 = 1.4D+05    
-	ELSE IF(pH .GT. 5.8) then
-	   KLOW_NO2 = 2.0D+06
-	ELSE
-	   KLOW_NO2 = 1.4D+05 + ((2.0D+06-1.4D+05) * (pH - 5.0))/(5.8-5.0)   
-	END IF
-	
-	IF( pH .LT. 5.3 ) then 
-	   KHIGH_NO2 = 1.24D+07    
-	ELSE IF(pH .GT. 8.7) then
-	   KHIGH_NO2 = 1.67D+07
-	ELSE
-	   KHIGH_NO2 = 1.24D+07 + ((1.67D+07-1.24D+07) * (pH - 5.3))/(8.7-5.3)   
-	END IF
+           KLOW_NO2 = 1.4D+05    
+        ELSE IF(pH .GT. 5.8) then
+           KLOW_NO2 = 2.0D+06
+        ELSE
+           KLOW_NO2 = 1.4D+05 + ((2.0D+06-1.4D+05) * (pH - 5.0))/(5.8-5.0)   
+        END IF
+
+        IF( pH .LT. 5.3 ) then 
+           KHIGH_NO2 = 1.24D+07    
+        ELSE IF(pH .GT. 8.7) then
+           KHIGH_NO2 = 1.67D+07
+        ELSE
+           KHIGH_NO2 = 1.24D+07 + ((1.67D+07-1.24D+07) * (pH - 5.3))/(8.7-5.3)   
+        END IF
 
         K_ION_NO2 = 10 ** (( 3.1 * IONIC_4 / ( IONIC_4  + 0.2 )) + 6.1 ) ! Chen et al., 2019 
 
         K1 = (KLOW_NO2 + KHIGH_NO2 + K_ION_NO2) / 3.d0
-	
-	IF ( J_SO2 .LT. J_NO2 ) THEN
-	   K_CHEM_NO2 = K1 * NO2       
-	ELSE
-	   K_CHEM_NO2 = K1 * SIV
-	END IF              
+
+        IF ( J_SO2 .LT. J_NO2 ) THEN
+           K_CHEM_NO2 = K1 * NO2       
+        ELSE
+           K_CHEM_NO2 = K1 * SIV
+        END IF              
      
 C *** Calculate K_CHEM_OH
 
       IF ( ahms_idx .GT. 0 ) THEN
-        AHMS = REAL(aerospc_conc( ahms_idx, 2 ),8) * inv_volume /
+         AHMS = REAL(aerospc_conc( ahms_idx, 2 ),8) * inv_volume /
      &       (REAL(aerospc_mw( ahms_idx),8) * 1.d6) !M 
-        K1 = 3.D+08                                                        
-        K_CHEM_OH = K1 * AHMS                     ! 1/s
+         K1 = 3.D+08                                                        
+         K_CHEM_OH = K1 * AHMS                     ! 1/s
       ELSE
-	AHMS = 0.0                                                      
-        K_CHEM_OH = 0.d0 
+         AHMS = 0.0                                                      
+         K_CHEM_OH = 0.d0 
       END IF
 
 C *** Calculate K_CHEM_HCHO
@@ -3811,40 +3810,39 @@ C *** Calculate GAMMASO2
 C *** Calculate GAMMAHMSP 
        
       IF( K_CHEM_HCHO .GT. 0.0D0 )THEN
-
-          L_HCHO = DSQRT (DA / K_CHEM_HCHO)
-          IF( J_SO2 .LT. J_HCHO ) THEN
-             GAMMAHMSP = SO2_GAMMA ( RADIUS, L_HCHO, ALPHA_SO2, CBAR_SO2, H_SO2_EFF, TEMPERATURE, K_CHEM_HCHO )
-          ELSE 
-             GAMMAHMSP = SO2_GAMMA ( RADIUS, L_HCHO, ALPHA_HCHO, CBAR_HCHO, H_HCHO, TEMPERATURE, K_CHEM_HCHO )
-          END IF
+         L_HCHO = DSQRT (DA / K_CHEM_HCHO)
+         IF( J_SO2 .LT. J_HCHO ) THEN
+            GAMMAHMSP = SO2_GAMMA ( RADIUS, L_HCHO, ALPHA_SO2, CBAR_SO2, H_SO2_EFF, TEMPERATURE, K_CHEM_HCHO )
+         ELSE 
+            GAMMAHMSP = SO2_GAMMA ( RADIUS, L_HCHO, ALPHA_HCHO, CBAR_HCHO, H_HCHO, TEMPERATURE, K_CHEM_HCHO )
+         END IF
       ELSE
-        GAMMAHMSP = SMALL
+         GAMMAHMSP = SMALL
       END IF
       
 C *** Calculate GAMMAHNO4 
             
       IF( K_CHEM_HNO4 .GT. 0.0D0 )THEN
-          L_HNO4 = DSQRT (DA / K_CHEM_HNO4)
-          IF( J_SO2 .LT. J_HNO4 ) THEN
-             GAMMAHNO4 = SO2_GAMMA ( RADIUS, L_HNO4, ALPHA_SO2, CBAR_SO2, H_SO2_EFF, TEMPERATURE, K_CHEM_HNO4 )
-          ELSE 
-             GAMMAHNO4 = SO2_GAMMA ( RADIUS, L_HNO4, ALPHA_HNO4, CBAR_HNO4, H_HNO4, TEMPERATURE, K_CHEM_HNO4 )
-          END IF
+         L_HNO4 = DSQRT (DA / K_CHEM_HNO4)
+         IF( J_SO2 .LT. J_HNO4 ) THEN
+            GAMMAHNO4 = SO2_GAMMA ( RADIUS, L_HNO4, ALPHA_SO2, CBAR_SO2, H_SO2_EFF, TEMPERATURE, K_CHEM_HNO4 )
+         ELSE 
+            GAMMAHNO4 = SO2_GAMMA ( RADIUS, L_HNO4, ALPHA_HNO4, CBAR_HNO4, H_HNO4, TEMPERATURE, K_CHEM_HNO4 )
+         END IF
       ELSE
-        GAMMAHNO4 = SMALL
+         GAMMAHNO4 = SMALL
       END IF
       
 C *** Calculate GAMMAOH     
 
       IF ( K_CHEM_OH .GT. 0 ) THEN 
-        L_OH = DSQRT (DA / K_CHEM_OH)
-        GAMMAOH = SO2_GAMMA ( RADIUS, L_OH, ALPHA_OH, CBAR_OH, H_OH, TEMPERATURE, K_CHEM_OH )  
+         L_OH = DSQRT (DA / K_CHEM_OH)
+         GAMMAOH = SO2_GAMMA ( RADIUS, L_OH, ALPHA_OH, CBAR_OH, H_OH, TEMPERATURE, K_CHEM_OH )  
       ELSE
-	GAMMAOH = SMALL !0.0D0
+         GAMMAOH = SMALL !0.0D0
       ENDIF   
 
-		
+
       RETURN
 
       END SUBROUTINE CALCSO2GAMMAS    
