@@ -656,31 +656,28 @@ C     Begin mass transfer calculations for aerosol modes using
 C     a dynamic approach that solves for vapor pressures and
 C     integrates fluxes across time.
       
-      DO IMODE = 1,N_MODE
-        IF ( .NOT. L_MODE_EQB( IMODE ) ) THEN
-  
-          ! For Hybrid approach, calculate dynamic mass trasfer for
-          ! semi-volatile components of coarse mode (NO3, CL, NH4)  
-          IF ( AEROMODE(IMODE)%COARSE_MASK .AND. .NOT. DO_COARSE_MT ) CYCLE
+      CNTRL( 1 ) = 1.0D0 ! reverse problem (WI contains only aerosol)
+      CNTRL( 2 ) = 1.0D0 ! aerosol in metastable state
 
-          CNTRL( 1 ) = 1.0D0 ! reverse problem (WI contains only aerosol)
-          CNTRL( 2 ) = 1.0D0 ! aerosol in metastable state
-
-          INT_TIME = 0.0D0
-          TSTEP    = AERO_DYN_TSTEP
-          ISTEP    = 1
-          TrustIso = .TRUE.
+      INT_TIME = 0.0D0
+      TSTEP    = AERO_DYN_TSTEP
+      ISTEP    = 1
+      TrustIso = .TRUE.
  
-          ! Store Contribution of Non-Volaitle Species to 3rd Moment
+      ! Begin sub-time step iteration for dynamic mass transfer
+      ! calculations
+      DO WHILE ( INT_TIME .LT. DELT ) 
 
+        IF ( INT_TIME + TSTEP .GT. DELT ) TSTEP = DELT - INT_TIME 
+        INT_TIME = INT_TIME + TSTEP 
+        ISTEP = ISTEP + 1   
 
-          ! Begin sub-time step iteration for dynamic mass transfer
-          ! calculations
-          DO WHILE ( INT_TIME .LT. DELT ) 
-
-            IF ( INT_TIME + TSTEP .GT. DELT ) TSTEP = DELT - INT_TIME 
-            INT_TIME = INT_TIME + TSTEP 
-            ISTEP = ISTEP + 1   
+        DO IMODE = N_MODE,1,-1
+          IF ( .NOT. L_MODE_EQB( IMODE ) ) THEN
+  
+            ! For Hybrid approach, calculate dynamic mass trasfer for
+            ! semi-volatile components of coarse mode (NO3, CL, NH4)  
+            IF ( AEROMODE(IMODE)%COARSE_MASK .AND. .NOT. DO_COARSE_MT ) CYCLE
 
             ! Calculate first moments using Equation 4 of Binkowski & Shankar
             ! (1995) or Equation 3 of Binkowski and Roselle (2003).
@@ -878,10 +875,10 @@ C     integrates fluxes across time.
             
             CALL GETPAR( .TRUE. )
 
-          END DO   ! end mass transfer time step loop
          
-        END IF   ! is this mode dynamic?
-      END DO   ! Loop over modes
+          END IF   ! is this mode dynamic?
+        END DO   ! Loop over modes
+      END DO   ! end mass transfer time step loop
 C *** End of Coarse Mode dynamic mass transfer calculations
                      
       DO I = 1,NGAS
