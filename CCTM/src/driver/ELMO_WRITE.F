@@ -21,6 +21,7 @@
       SUBROUTINE WRITE_ELMO ( JDATE, JTIME, TSTEP, INIT_TIME )
 ! Revision history
 !   20 Feb - B. Murphy: Created
+!   15 May 2025 - D. Wong: Enabled parallel_io feature
 !-------------------------------------------------------------------------
 
       USE RUNTIME_VARS
@@ -44,6 +45,21 @@
       CHARACTER( 300 ) XMSG
 
       CHARACTER( 16 ), SAVE :: PNAME = 'WRITE_ELMO'
+      LOGICAL, SAVE :: FIRSTIME_ELMO = .TRUE.
+
+      IF (FIRSTIME_ELMO) THEN
+#ifdef parallel_io
+        IF ( .NOT. IO_PE_INCLUSIVE ) THEN
+           DO IFL = 1,N_ELMO_FILES
+              IF ( .NOT. OPEN3( ELMO_FILE( IFL )%FLOGICAL, FSREAD3, PNAME ) ) THEN
+                 XMSG = 'Could not open ' // ELMO_FILE( IFL )%FLOGICAL
+                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+              END IF
+           END DO
+        END IF
+#endif
+        FIRSTIME_ELMO = .FALSE.
+      END IF
 
       DO IFL = 1,N_ELMO_FILES
         
