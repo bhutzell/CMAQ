@@ -1305,17 +1305,6 @@ C *** calculate aerosol surface area
 C *** Calculate IEPOX and MAE uptake information for accumulation mode
                RADIUS_I  = 0.5D0 * DE_WET( 1 ) ! particle size - i-mode
                RADIUS    = 0.5D0 * DE_WET( 2 ) ! particle size - j-mode
-	       
-C *** Extract SO2, NO2, OH, FORM, H2O2, O3, MEPX, PACD, and HNO4 concentrations
-        SO2_CONC  = CGRID(C, R, L, precursor_map( SO2_idx ))       ! SO2 in ppm
-        NO2_CONC  = CGRID(C, R, L, precursor_map( NO2_idx ))       ! NO2 in ppm	 
-	OH_CONC   = CGRID(C, R, L, precursor_map( OH_idx ))        ! OH in ppm	
-	H2O2_CONC  = CGRID(C, R, L, precursor_map( H2O2_idx ))     ! H2O2 in ppm
-	FORM_CONC  = CGRID(C, R, L, precursor_map( HCHO_idx ))     ! HCHO in ppm
-	HNO4_CONC  = CGRID(C, R, L, precursor_map( HNO4_idx ))     ! HNO4 in ppm  
-	O3_CONC    = CGRID(C, R, L, precursor_map( O3_idx ))       ! O3 in ppm    	    
-        MEPX_CONC  = CGRID(C, R, L, precursor_map( OP1_idx ))      ! MHP in ppm    	    
-        PACD_CONC  = CGRID(C, R, L, precursor_map( PAA_idx ))      ! PAA in ppm           
 	       	 
 C *** Calculate approximate seasalt surface area, m2/m3
                MARINE_AREA = ( OCEAN( C,R ) + SZONE( C,R ) )
@@ -1375,7 +1364,22 @@ C *** set up variables needed for calculating K_BRONO2
                END IF
 	       
 	       ALW = aerospc_conc(ah2o_idx,2)
+	       
+C *** Heterogeneous Sulfur Chemistry      
 		
+	IF ( hethms ) THEN
+	       	   
+C *** Extract SO2, NO2, OH, FORM, H2O2, O3, MEPX, PACD, and HNO4 concentrations
+        SO2_CONC  = CGRID(C, R, L, precursor_map( SO2_idx ))       ! SO2 in ppm
+        NO2_CONC  = CGRID(C, R, L, precursor_map( NO2_idx ))       ! NO2 in ppm	 
+	OH_CONC   = CGRID(C, R, L, precursor_map( OH_idx ))        ! OH in ppm	
+	H2O2_CONC  = CGRID(C, R, L, precursor_map( H2O2_idx ))     ! H2O2 in ppm
+	FORM_CONC  = CGRID(C, R, L, precursor_map( HCHO_idx ))     ! HCHO in ppm
+	HNO4_CONC  = CGRID(C, R, L, precursor_map( HNO4_idx ))     ! HNO4 in ppm  
+	O3_CONC    = CGRID(C, R, L, precursor_map( O3_idx ))       ! O3 in ppm    	    
+        MEPX_CONC  = CGRID(C, R, L, precursor_map( OP1_idx ))      ! MHP in ppm    	    
+        PACD_CONC  = CGRID(C, R, L, precursor_map( PAA_idx ))      ! PAA in ppm 
+	      	
 !C *** assign SMALL gamma for SO2 oxidation in low aerosol liquid water 
                IF ( SO2_CONC .LE. 0.0 .OR. ALW .LT. 0.1D0 .OR. AIRRH .LT. 0.5D0) THEN      
   		         	GAMMAH2O2SO2 = SMALL 
@@ -1431,6 +1435,8 @@ C *** which reactant is limiting for mass transfer when there are 2 gas phase re
                 HCHO_SO2_RXN_TIME   = 4.0D0 / ( CBAR_HCHO * GAMMAHMSP )
 		HNO4_SO2_RXN_TIME   = 4.0D0 / ( CBAR_HNO4 * GAMMAHNO4SO2 )
 		HMS_OH_RXN_TIME     = 4.0D0 / ( CBAR_OH * GAMMAHMSOH )
+		
+        END IF
 		
                CBARIEPOX = CFACTOR_IEPOX * DSQRT( AIRTEMP )
                CBARIMAE  = CFACTOR_IMAE  * DSQRT( AIRTEMP )
