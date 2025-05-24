@@ -597,7 +597,8 @@ C     N.B: these are for a "wet" size distribution
           IF ( MAP_INORGtoAERO(I) .GT. 0 ) THEN
              IF ( .NOT. AERO_MISSING( MAP_INORGtoAERO(I),IMODE ) ) THEN
                 ! Explicit Aerosol Species - load CINORG
-                CINORG( I,IMODE ) = REAL( AEROSPC_CONC( MAP_INORGtoAERO(I),IMODE ),8 )
+                CINORG( I,IMODE ) = 
+     &             REAL( AEROSPC_CONC( MAP_INORGtoAERO(I),IMODE ),8 )
              END IF
           END IF
         END DO
@@ -642,6 +643,24 @@ C     N.B: these are for a "wet" size distribution
         CINORG( KH3OP,IMODE ) = REAL( HPLUS( IMODE ),8 )
 
       END DO
+
+      ! Load Aitken Mode Cations from 10% of Accumulation Mode if they are not
+      ! represented explicitly and dynamic partitioning is selected
+      IF ( .NOT. L_MODE_EQB( IAIT ) ) THEN
+          IF ( AERO_MISSING( MAP_INORGtoAERO( KMG ),IAIT ) ) THEN
+              CINORG( KMG,IAIT ) = 0.1 * CINORG( KMG,IACC )
+              CINORG( KMG,IACC ) = 0.9 * CINORG( KMG,IACC )
+          END IF
+          IF ( AERO_MISSING( MAP_INORGtoAERO( KK ),IAIT ) ) THEN
+              CINORG( KK, IAIT ) = 0.1 * CINORG( KK,IACC )
+              CINORG( KK, IACC ) = 0.9 * CINORG( KK,IACC )
+          END IF
+          IF ( AERO_MISSING( MAP_INORGtoAERO( KCA ),IAIT ) ) THEN
+              CINORG( KCA,IAIT ) = 0.1 * CINORG( KCA,IACC )
+              CINORG( KCA,IACC ) = 0.9 * CINORG( KCA,IACC )
+          END IF
+      END IF
+
       CINORG0 = CINORG
       CFINAL  = CINORG
 
@@ -698,10 +717,10 @@ C     integrates fluxes across time.
             GRFAC2( IMODE ) = FCONC_SO4( IMODE,2 ) 
 
             ! Update Semivolatile Components
-            CINORG( KNH4,IMODE ) = REAL( AEROSPC_CONC( ANH4_IDX,IMODE ), 8 )  ! KNH4 = 2, ANH4_IDX = 4
-            CINORG( KNO3,IMODE ) = REAL( AEROSPC_CONC( ANO3_IDX,IMODE ), 8 )  ! KNO3 = 3, ANO3_IDX = 2
-            CINORG( KCL, IMODE ) = REAL( AEROSPC_CONC( ACL_IDX,IMODE ),  8 )  ! KCL = 4, ACL_IDX = 3
-            CINORG( KSO4,IMODE ) = REAL( AEROSPC_CONC( ASO4_IDX,IMODE ), 8 )  ! KSO4 = 1, ASO4_IDX = 1
+            CINORG( KNH4,IMODE ) = REAL( AEROSPC_CONC( MAP_INORGtoAERO(KNH4),IMODE ), 8 )  ! KNH4 = 2, ANH4_IDX = 4
+            CINORG( KNO3,IMODE ) = REAL( AEROSPC_CONC( MAP_INORGtoAERO(KNO3),IMODE ), 8 )  ! KNO3 = 3, ANO3_IDX = 2
+            CINORG( KCL, IMODE ) = REAL( AEROSPC_CONC( MAP_INORGtoAERO(KCL),IMODE ),  8 )  ! KCL = 4, ACL_IDX = 3
+            CINORG( KSO4,IMODE ) = REAL( AEROSPC_CONC( MAP_INORGtoAERO(KSO4),IMODE ), 8 )  ! KSO4 = 1, ASO4_IDX = 1
 
             ! Calculate moments prior to mass transfer
             M3OTHR = MASStoVOL_AER( KNA ) * AEROSPC_CONC( ASEACAT_IDX,IMODE )
