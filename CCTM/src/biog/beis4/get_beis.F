@@ -208,14 +208,14 @@ C Allocate memory for arrays
 
          LDATE = 0
 
-!#ifdef verbose_getbeis
+#ifdef verbose_getbeis
          ALLOCATE( EMISX( MSPCS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'EMISX', PNAME )
          ALLOCATE( CX( MSPCS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'CX', PNAME )
          ALLOCATE( RX( MSPCS ), STAT=IOS )
          CALL CHECKMEM( IOS, 'RX', PNAME )
-!#endif
+#endif
 
 #ifndef mpas
          IF ( BEMIS_DIAG ) THEN
