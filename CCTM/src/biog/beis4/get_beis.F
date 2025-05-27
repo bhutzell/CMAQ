@@ -150,10 +150,10 @@ C Other variables:
       CHARACTER(  16 ) :: VAR        ! variable name
       CHARACTER(  16 ) :: PNAME = 'GET_BEIS'   ! prodedure name
 
-!#ifdef verbose_getbeis
+#ifdef verbose_getbeis
       REAL,    ALLOCATABLE, SAVE :: EMISX( : )
       INTEGER, ALLOCATABLE, SAVE :: CX( : ), RX( : )
-!#endif
+#endif
 
       INTERFACE
          SUBROUTINE BEIS( JDATE, JTIME, NX, NY, MSPCS, SEMIS, BIPOL )
@@ -237,9 +237,9 @@ C Loop thru the number of time steps (hourly)
 
       VDEMIS_BI = 0.0   ! array
       EMPOL = 0.0   ! array
-!#ifdef verbose_getbeis
+#ifdef verbose_getbeis
       EMISX = 0.0   ! array
-!#endif
+#endif
 
       IF ( JDATE .NE. LDATE ) THEN
 
