@@ -250,42 +250,49 @@ C Find indices of required species
            xmsg = ' Gas Phase Precursor ' // Trim( req_SO2 )
      &         // ' SO2 is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
+	   Precursor_eflag = .true.
          End If 	 
 	 
          If(   precursor_map( H2O2_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_H2O2 )
      &         // ' H2O2 is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
+	   Precursor_eflag = .true.
          End If 	 
 	 
          If(   precursor_map( O3_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_O3 )
      &         // ' O3 is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
+	   Precursor_eflag = .true.
          End If 
 
          If(   precursor_map( HCHO_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_HCHO )
      &         // ' HCHO is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
+	   Precursor_eflag = .true.
          End If 
 	   
          If(   precursor_map( HNO4_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_HNO4 )
      &         // ' HNO4 is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
+	   Precursor_eflag = .true.
          End If 	   
 
          If(   precursor_map( OP1_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_OP1 )
      &         // ' OP1 is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
+	   Precursor_eflag = .true.
           End If
 	  
 	  If(   precursor_map( PAA_idx ) .Lt. 1  )Then
            xmsg = ' Gas Phase Precursor ' // Trim( req_PAA )
      &         // ' PAA is not found -> is missing'
            Call m3warn( 'map_precursor', 0, 0, xmsg )
+	   Precursor_eflag = .true.
           End If
 
 #ifdef verbose_aero
@@ -300,7 +307,7 @@ C Find indices of required species
 	       OP1_idx = 0
 	       PAA_idx = 0
 #endif
-      end if      
+      End If      
 
 #ifdef verbose_aero
       Write( logdev,'( /5x, a )' ) 'map_precursor required species'
