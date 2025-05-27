@@ -247,6 +247,7 @@ ANH4IJ          ,ug m-3    ,ANH4I[1]+ANH4J[1]
 ANH4K           ,ug m-3    ,ANH4K[1]
 ASO4IJ          ,ug m-3    ,ASO4I[1]+ASO4J[1]
 ASO4K           ,ug m-3    ,ASO4K[1]
+AHMSJ           ,ug m-3    ,AHMSJ[1]
 AFEK            ,ug m-3    ,0.02695*ASOIL[1]+0.0467*ACORS[1]
 AMNK            ,ug m-3    ,0.00075*ASOIL[1]+0.0011*ACORS[1]
 
@@ -336,7 +337,8 @@ ATOTI           ,ug m-3    ,ASO4I[1] + ANH4I[1] + ANO3I[1] + ANAI[1]   \
 ATOTJ           ,ug m-3    ,ASO4J[1] + ANH4J[1] + ANO3J[1] + ANAJ[1]   \
                            +ACLJ[1] + AECJ[1] + AOMJ[0] + AOTHRJ[1]    \
                            +AFEJ[1] + AALJ[1] + ASIJ[1] + ATIJ[1]      \
-                           +ACAJ[1] + AMGJ[1] + AKJ[1] + AMNJ[1]
+                           +ACAJ[1] + AMGJ[1] + AKJ[1] + AMNJ[1]       \
+			   +AHMSJ[1]        
 
 ATOTK           ,ug m-3    ,ASO4K[1] + ANH4K[1] + ANO3K[1] + ACLK[1]   \
                            +ACORS[1] + ASOIL[1] + ASEACAT[1]
@@ -347,7 +349,8 @@ ATOTIJK         ,ug m-3    ,ATOTI[0] + ATOTJ[0] + ATOTK[0]
 AUNSPEC1IJ      ,ug m-3    ,ATOTIJ[0] - (ASO4IJ[0] + ANO3IJ[0]         \
                                          +ANH4IJ[0] + ACLIJ[0]         \
                                          +ANAIJ[0] + AECIJ[0]          \
-                                         +AOCIJ[0] + ASOILJ[0])
+                                         +AOCIJ[0] + ASOILJ[0]         \
+					 +AHMSJ[0])       
 !! Non-Carbon Organic Mass
 ANCOMIJ         ,ug m-3    ,AOMIJ[0] - AOCIJ[0]
 
@@ -369,6 +372,7 @@ PM1_TOT         ,ug m-3    ,ATOTI[0]*FPM1_AIT[3]+ATOTJ[0]*FPM1_ACC[3]+ATOTK[0]*F
 !PM1_OC         ,ugC m-3   ,AOCI[0] *FPM1_AIT[3] +AOCJ[0] *FPM1_ACC[3]
 !PM1_OM         ,ug m-3    ,AOMI[0] *FPM1_AIT[3] +AOMJ[0] *FPM1_ACC[3]
 !PM1_SO4        ,ug m-3    ,ASO4I[1]*FPM1_AIT[3] +ASO4J[1]*FPM1_ACC[3] +ASO4K[1]*FPM1_COR[3]
+!PM1_HMS        ,ug m-3    ,AHMSJ[1]*FPM1_ACC[3]
 !PM1_CL         ,ug m-3    ,ACLI[1] *FPM1_AIT[3] +ACLJ[1] *FPM1_ACC[3] +ACLK[1] *FPM1_COR[3]
 !PM1_NA         ,ug m-3    ,ANAI[1] *FPM1_AIT[3] +ANAJ[1] *FPM1_ACC[3] +ANAK[0] *FPM1_COR[3]
 !PM1_MG         ,ug m-3    ,                     AMGJ[1] *FPM1_ACC[3] +AMGK[0] *FPM1_COR[3]
@@ -378,7 +382,8 @@ PM1_TOT         ,ug m-3    ,ATOTI[0]*FPM1_AIT[3]+ATOTJ[0]*FPM1_ACC[3]+ATOTK[0]*F
 !PM1_NO3        ,ug m-3    ,ANO3I[1] *FPM1_AIT[3]+ANO3J[1]*FPM1_ACC[3] +ANO3K[1]*FPM1_COR[3]
 !PM1_SOIL       ,ug m-3    ,ASOILJ[0]*FPM1_ACC[3]+(ASOIL[1]+ACORS[1])*FPM1_COR[3]
 !PM1_UNSPEC1    ,ug m-3    ,PM1_TOT[0] - (PM1_CL[0] + PM1_EC[0]+ PM1_NA[0]  + PM1_NH4[0] +  \
-!                                         PM1_NO3[0]+ PM1_OC[0]+ PM1_SOIL[0]+ PM1_SO4[0] )
+!                                         PM1_NO3[0]+ PM1_OC[0]+ PM1_SOIL[0]+ PM1_SO4[0] + \
+!                                         PM1_HMS[0]  )
 !PM1_UNSPCRS    ,ug m-3    ,ATOTK[0] *FPM1_COR[3] - (ASO4K[1]*FPM1_COR[3] \
 !                                                  +ACLK[1]*FPM1_COR[3]  \
 !                                                  +ANAK[0]*FPM1_COR[3]  \
@@ -404,9 +409,10 @@ PM25_OC         ,ugC m-3   ,AOCI[0] *FPM25_AIT[3]+AOCJ[0]*FPM25_ACC[3]
 PM25_OM         ,ug m-3    ,AOMI[0] *FPM25_AIT[3]+AOMJ[0]*FPM25_ACC[3]
 PM25_SOIL       ,ug m-3    ,ASOILJ[0]*FPM25_ACC[3]+ASOIL[1]*FPM25_COR[3]
 PM25_SO4        ,ug m-3    ,ASO4I[1]*FPM25_AIT[3]+ASO4J[1]*FPM25_ACC[3]+ASO4K[1]*FPM25_COR[3]
+PM25_HMS        ,ug m-3    ,AHMSJ[1]*FPM25_ACC[3]
 PM25_TOT        ,ug m-3    ,ATOTI[0]*FPM25_AIT[3]+ATOTJ[0]*FPM25_ACC[3]+ATOTK[0]*FPM25_COR[3]
 PM25_UNSPEC1    ,ug m-3    ,PM25_TOT[0]-(PM25_CL[0]+PM25_EC[0]+PM25_NA[0]+PM25_NH4[0] \
-                           +PM25_NO3[0]+PM25_OC[0]+PM25_SOIL[0]+PM25_SO4[0])
+                           +PM25_NO3[0]+PM25_OC[0]+PM25_SOIL[0]+PM25_SO4[0]+PM25_HMS[0])
 PM25_UNSPCRS    ,ug m-3    ,ATOTK[0]*FPM25_COR[3] - (ASO4K[1]*FPM25_COR[3] \
                                                   +ACLK[1]*FPM25_COR[3]  \
                                                   +ANAK[0]*FPM25_COR[3]  \

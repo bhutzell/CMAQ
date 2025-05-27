@@ -1037,6 +1037,15 @@ c----------------------------------------------------------
             CALL ADD_ISAM_SPEC( ISAM_SPEC_SO4(IMECH)%LIST(ISPEC), 
      &                          FOUND_SPECIES, IMECH )
           END DO
+	  
+	  IF( INDEX( MECHNAME,'CRACMM3' ) .GT. 0 )THEN
+             CALL ADD_ISAM_SPEC( 'AHMS', FOUND_SPECIES, IMECH )
+             CALL CHECK_MECH( 'SULFATE', IMECH, MECHNAME, EFLAG )
+             DO ISPEC = 1,SIZE( ISAM_SPEC_SO4( IMECH )%LIST )
+                CALL ADD_ISAM_SPEC( ISAM_SPEC_SO4(IMECH)%LIST(ISPEC),
+     &                              FOUND_SPECIES, IMECH )
+             END DO
+          END IF
           
           ! Warn if all species are missing
           CALL ISAM_SPECIES_WARN( 'SULFATE', FOUND_SPECIES, EFLAG )

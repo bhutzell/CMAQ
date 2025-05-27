@@ -3,19 +3,19 @@
 GC_SPECIES_DATA = 
 
 !SPECIES        ,MOLWT   ,IC     ,IC_FAC ,BC     ,BC_FAC ,DRYDEP SURR       ,FAC  ,WET-SCAV SURR     ,FAC ,GC2AE SURR     ,GC2AQ SURR,TRNS  ,DDEP  ,WDEP  ,CONC ,!RepCmp,ExplicitorLumped,DTXSID,SMILES
-'O3'            , 48.0   ,''     ,-1     ,''     ,-1     ,'VD_O3'           , 1   ,'O3'              , 1  ,''             ,'O3'      ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Ozone,E,DTXSID0021098,[O-][O+]=O
+'O3'            , 48.0   ,''     ,-1     ,''     ,-1     ,'VD_O3'           , 1   ,'O3'              , 1  ,'O3'           ,'O3'      ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Ozone,E,DTXSID0021098,[O-][O+]=O
 'O3P'           , 16.0   ,''     ,-1     ,''     ,-1     ,''                ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!Ground state oxygen,E,DTXSID00170378,[O]
 'O1D'           , 16.0   ,''     ,-1     ,''     ,-1     ,''                ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!Excited oxygen,E,DTXSID00170378,[O]
-'H2O2'          , 34.0   ,''     ,-1     ,''     ,-1     ,'VD_H2O2'         , 1   ,'H2O2'            , 1  ,''             ,'H2O2'    ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrogen peroxide,E,DTXSID2020715,OO
+'H2O2'          , 34.0   ,''     ,-1     ,''     ,-1     ,'VD_H2O2'         , 1   ,'H2O2'            , 1  ,'H2O2'         ,'H2O2'    ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydrogen peroxide,E,DTXSID2020715,OO
 'HO'            , 17.0   ,''     ,-1     ,''     ,-1     ,''                ,-1   ,''                ,-1  ,'OH'           ,'HO'      ,''    ,''    ,''    ,'Yes',!Hydroxyl radical,E,NA,[OH]
 'NO2'           , 46.0   ,''     ,-1     ,''     ,-1     ,'VD_NO2'          , 1   ,'NO2'             , 1  ,'NO2'          ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nitrogen dioxide,E,DTXSID7020974,N(=O)[O]
 'NO'            , 30.0   ,''     ,-1     ,''     ,-1     ,'VD_NO'           , 1   ,'NO'              , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nitric oxide,E,DTXSID1020938,[N]=O
 'NO3'           , 62.0   ,''     ,-1     ,''     ,-1     ,'VD_NO3'          , 1   ,'NO3'             , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nitrate radical,E,NA,[O]N(=O)=O
 'HONO'          , 47.0   ,''     ,-1     ,''     ,-1     ,'VD_HONO'         , 1   ,'HNO2'            , 1  ,'HONO'         ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nitrous acid,E,DTXSID7064813,N(=O)O
 'HNO3'          , 63.0   ,''     ,-1     ,''     ,-1     ,'VD_HNO3'         , 1   ,'HNO3'            , 1  ,'HNO3'         ,'HNO3'    ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Nitric acid,E,DTXSID5029685,[N+](=O)(O)[O-]
-'HNO4'          , 79.0   ,''     ,-1     ,''     ,-1     ,'VD_PNA'          , 1   ,'HNO4'            , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydroxy nitrate,E,DTXSID201030501,[N+](=O)([O-])OO
+'HNO4'          , 79.0   ,''     ,-1     ,''     ,-1     ,'VD_PNA'          , 1   ,'HNO4'            , 1  ,'HNO4'         ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Hydroxy nitrate,E,DTXSID201030501,[N+](=O)([O-])OO
 'HO2'           , 33.0   ,''     ,-1     ,''     ,-1     ,''                ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!Hydroperoxy,E,DTXSID30894777,O[O-]
-'HCHO'          , 30.0   ,''     ,-1     ,''     ,-1     ,'VD_HCHO'         , 1   ,'FORMALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Formaldehyde,E,DTXSID7020637,C=O
+'HCHO'          , 30.0   ,''     ,-1     ,''     ,-1     ,'VD_HCHO'         , 1   ,'FORMALDEHYDE'    , 1  ,'HCHO'         ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Formaldehyde,E,DTXSID7020637,C=O
 'CO'            , 28.0   ,''     ,-1     ,''     ,-1     ,'VD_CO'           , 1   ,'CO'              , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Carbon monoxide,E,DTXSID5027273,[C-]#[O+]
 'ACD'           , 44.0   ,''     ,-1     ,''     ,-1     ,'VD_ACD'          , 1   ,'ACETALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Acetaldehyde,E,DTXSID5039224,CC=O
 'MO2'           , 47.0   ,''     ,-1     ,''     ,-1     ,''                ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!Methylperoxy,E,DTXSID10944007,CO[O]
@@ -37,15 +37,15 @@ GC_SPECIES_DATA =
 'DCB2'          ,112.1   ,''     ,-1     ,''     ,-1     ,'VD_DCB2'          , 1   ,'METHACROLEIN'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!2-methyl-4-oxopent-2-enal,L,NA,O=CC(=CC(=O)C)C
 'BALD'          ,106.0   ,''     ,-1     ,''     ,-1     ,'VD_BALD'          , 1   ,'BENZALDEHYDE'    , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Benzaldehyde,L,DTXSID8039241,O=CC1=CC=CC=C1
 'CHO'           ,139.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,''             ,''        ,''    ,''    ,''    ,'Yes',!4-hydroxy-3;5-dimethylcyclohexa-2;5-dien-1-yloxidanyl,L,NA,[O]C1C=C(C)C(O)C(=C1)C
-'OP1'           , 48.0   ,''     ,-1     ,''     ,-1     ,'VD_OP1'           , 1   ,'METHYLHYDROPEROX', 1  ,''             ,'MHP'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Methyl hydroperoxide,E,DTXSID10184401,COO
+'OP1'           , 48.0   ,''     ,-1     ,''     ,-1     ,'VD_OP1'           , 1   ,'METHYLHYDROPEROX', 1  ,'OP1'          ,'MHP'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Methyl hydroperoxide,E,DTXSID10184401,COO
 'OP2'           , 62.0   ,''     ,-1     ,''     ,-1     ,'VD_OP2'           , 1   ,'METHYLHYDROPEROX', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Ethyl hydroperoxide,L,DTXSID70184402,CCOO
 'OPB'           ,186.2   ,''     ,-1     ,''     ,-1     ,'VD_OPB'           , 1   ,'METHYLHYDROPEROX', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!2-hydroperoxy-2;6;6-trimethylbicyclo[3.1.1]heptan-3-ol,L,NA,OOC1(C)C(O)CC2CC1C2(C)C
 'OP3'           ,176.2   ,''     ,-1     ,''     ,-1     ,'VD_OP3'           , 1   ,'METHYLHYDROPEROX', 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!5-hydroperoxy-6-hydroxyoctan-3-one,L,NA,CCC(=O)CC(OO)C(O)CC
-'PAA'           , 76.0   ,''     ,-1     ,''     ,-1     ,'VD_PAA'           , 1   ,'PEROXYACETIC_ACI', 1  ,''             ,'PAA'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Peroxyacetic acid,L,DTXSID1025853,CC(=O)OO
+'PAA'           , 76.0   ,''     ,-1     ,''     ,-1     ,'VD_PAA'           , 1   ,'PEROXYACETIC_ACI', 1  ,'PAA'          ,'PAA'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Peroxyacetic acid,L,DTXSID1025853,CC(=O)OO
 'ONIT'          ,119.0   ,''     ,-1     ,''     ,-1     ,'VD_ONIT'          , 1   ,'MPAN'            , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Butan-2-yl nitrate,L,DTXSID00871813,CCC(C)O[N+](=O)[O-]
 'PAN'           ,121.0   ,''     ,-1     ,''     ,-1     ,'VD_PAN'           , 1   ,'PAN'             , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Peroxyacetyl nitrate,L,DTXSID4062301,CC(=O)OON(=O)=O
 'N2O5'          ,108.0   ,''     ,-1     ,''     ,-1     ,'VD_N2O5'          , 1   ,'N2O5'            , 1  ,'N2O5'         ,'N2O5'    ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Dinitrogen pentoxide,E,DTXSID90143672,[N+](=O)([O-])O[N+](=O)[O-]
-'SO2'           , 64.0   ,''     ,-1     ,''     ,-1     ,'VD_SO2'           , 1   ,'SO2'             , 1  ,''             ,'SO2'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Sulfur dioxide,E,DTXSID6029672,O=S=O
+'SO2'           , 64.0   ,''     ,-1     ,''     ,-1     ,'VD_SO2'           , 1   ,'SO2'             , 1  ,'SO2'          ,'SO2'     ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Sulfur dioxide,E,DTXSID6029672,O=S=O
 'SULF'          , 98.0   ,''     ,-1     ,''     ,-1     ,'VD_SULF'          , 1   ,'H2SO4'           , 1  ,'SULF'         ,'H2SO4'   ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Sulfuric acid,E,DTXSID5029683,OS(=O)(=O)O
 'SULRXN'        , 98.0   ,''     ,-1     ,''     ,-1     ,''                 ,-1   ,''                ,-1  ,'SULPRD'       ,''        ,''    ,''    ,''    ,''   ,!NA,NA,NA,NA
 'ETH'           , 30.1   ,''     ,-1     ,''     ,-1     ,'VD_ETH'           , 1   ,'ETHANE'          , 1  ,''             ,''        ,'Yes' ,'Yes' ,'Yes' ,'Yes',!Ethane,E,DTXSID6026377,CC
