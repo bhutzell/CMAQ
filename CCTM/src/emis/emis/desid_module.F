@@ -81,6 +81,7 @@ C-----------------------------------------------------------------------
          USE MEGAN_DEFN          ! biogenic emissions from MEGAN
          USE MGEMIS              ! marine gas emissions
          USE LTNG_DEFN           ! NO emissions from lightning strikes
+         USE SAGE_MOD            ! NO and HONO emissions from soil
          USE PT3D_DEFN           ! plume rise emissions
          USE METEMIS             ! met-modulated (mobile) emissions
          USE UTILIO_DEFN         ! I/O API
@@ -115,9 +116,7 @@ C Local Variables:
          CHARACTER( 80 ) :: VARDESC   ! env variable description
          CHARACTER( 120 ) :: XMSG = ' '
          INTEGER V, L, STATUS, ISRM
-
-C-----------------------------------------------------------------------
-
+C--------------------------------------------------------------------------
          SUCCESS = .TRUE.
 
          ! Initialize Emission Variable Molecular Weights
@@ -216,6 +215,15 @@ C Initialize Online Biogenic Emissions, BEIS
           CALL LOG_SUBHEADING( LOGDEV, 'Initialize BEIS Biogenic Emissions' )
           IF ( .NOT. BEIS_INIT( JDATE, JTIME, TSTEP ) ) THEN
             XMSG = 'Failure initializing biogenics emissions module'
+            CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+          END IF
+         END IF
+
+         IF ( USE_SAGE_N ) THEN
+C Initialize Online Soil Gas Emissions
+          CALL LOG_SUBHEADING( LOGDEV, 'Initialize SAGE NO and HONO emissions' )
+          IF ( .NOT. SAGE_INIT( JDATE, JTIME, TSTEP(1) ) ) THEN
+            XMSG = 'Failure initializing SAGE emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
           END IF
          END IF
@@ -409,6 +417,7 @@ C Return From Initialization
          USE SSEMIS
          USE DUST_EMIS
          USE MGEMIS              ! marine gas emissions
+         USE SAGE_MOD            ! soil NO and HONO     
          USE PT3D_DEFN           ! plume rise emissions
          USE LTNG_DEFN           ! lightning NO emissions
          USE METEMIS             ! met-modulated emissions
@@ -802,6 +811,16 @@ C Retrieve Emissions from All Stream Types
                  END FORALL
                  CALL DESID_SCALING( VDEMIS_READ, ISRM, NL, VDEMIS_SCALED )
                  CALL DESID_SIZE_DIST( ISRM, VDEMIS_SCALED, NL )
+
+               ! Retrieve Soil Biogenic Emissions
+               CASE ( 11 )
+                 NL = 1
+                 CALL GET_SAGE_EMIS ( JDATE, JTIME, TSTEP, L_DESID_DIAG) ! mol/s
+                 FORALL( ISTR = 1:DESID_N_ISTR, MAP_ISTRtoEMVAR( ISTR,ISRM ) .GT. 0 )
+                    VDEMIS_READ( ISTR,1,:,: ) = VDEMIS_SG( MAP_ISTRtoEMVAR( ISTR,ISRM ),:,: ) 
+                 END FORALL
+                 ! Apply Rules from DESID_${mech} namelist
+                 CALL DESID_SCALING( VDEMIS_READ, ISRM, NL, VDEMIS_SCALED )
   
              END SELECT
              
@@ -2961,6 +2980,9 @@ C-----------------------------------------------------------------------
   
          ! Marine gas emissions; use online marine gas option only if CB6R5M or CRACMM3M is used
          IF ( USE_MARINE_GAS_EMISSION ) DESID_N_SRM = DESID_N_SRM + 1
+
+         ! Soil gas Emissions
+         IF ( USE_SAGE_N ) DESID_N_SRM = DESID_N_SRM + 1
   
          ! Met-Modulated Emissions; use if met-emis is activated
          IF ( USE_MET_EMIS ) DESID_N_SRM = DESID_N_SRM + 1
@@ -3196,6 +3218,17 @@ C stkemis_init.
              DESID_STREAM_ONLINE( ISRM ) = .TRUE.
 
              IMETSRM = ISRM
+         END IF
+
+         ! Online soil-air gas emissions of NO and HONO
+         IF ( USE_SAGE_N ) THEN
+             ISRM = ISRM + 1
+             DESID_STREAM_TYPE( ISRM ) = 'SAGE'
+             DESID_STREAM_ITYPE( ISRM ) = 11
+             DESID_STREAM_LAB ( ISRM ) = 'SAGE'
+             DESID_STREAM_DESC( ISRM ) = 'SAGE Emissions'
+ 
+             ISGSRM = ISRM
          END IF
 
         END SUBROUTINE DESID_INIT_STREAMS 
