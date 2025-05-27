@@ -22,7 +22,7 @@ C RCS file, release, date & time of last delta, author, state, [and locker]
 C $Header: /project/work/rep/arc/CCTM/src/depv/m3dry/LSM_MOD.F,v 1.5 2012/01/19 14:23:58 yoj Exp $
 
 C::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      Module LSM_Mod
+      Module STAGE_LU_Mod
        
 C------------------------------------------------------------------------------
 C Revision History: 
@@ -58,9 +58,10 @@ C         data set, Boundary-Layer Meteorology, 52, 93-234, https://doi.org/10.1
 C Campbell, G.S., Norman, J.M., An Introduction to Environmental Biophysics, Springer, New York, NY, 286 pages, 
 C         ISBN: 978-1-4612-1626-1 
 C------------------------------------------------------------------------------
-       
+      USE LSM_MOD, only: LAND_SCHEME                               
+
       Implicit None
-      
+
       INTEGER, PARAMETER :: N_SOIL_TYPE_WRFV4P = 16
       INTEGER, PARAMETER :: N_SOIL_TYPE_WRFV3  = 11
       INTEGER :: N_SOIL_TYPE
@@ -85,7 +86,7 @@ C------------------------------------------------------------------------------
       REAL,   SAVE               :: wfc_noah  (19) ! Soil volumetric field capacity (m3/m3) 
       REAL,   SAVE               :: rhob_noah (19) ! Soil bulk density (kg/L)
       INTEGER, SAVE              :: n_lufrac
-      CHARACTER( 80 ), SAVE      :: LAND_SCHEME
+!      CHARACTER( 80 ), SAVE      :: LAND_SCHEME
 
       INTEGER, SAVE               :: n_xref_lu
       INTEGER, SAVE               :: n_stage_lu
@@ -313,7 +314,7 @@ C-------------------------------------------------------------------------------
      &                  1.44e6, 1.72e6, 1.69e6 /
 
       CONTAINS                                 
-         SUBROUTINE INIT_LSM( JDate, JTime )   
+         SUBROUTINE INIT_STAGE_LU( JDate, JTime )   
                                                
          USE HGRD_DEFN                         
          USE UTILIO_DEFN                       
@@ -329,7 +330,7 @@ C-------------------------------------------------------------------------------
          INTEGER, INTENT( In )  :: jdate       
          INTEGER, INTENT( In )  :: jtime  
          CHARACTER( 240 )       :: XMSG = ' '  
-         CHARACTER(  16 ), SAVE :: PNAME = 'Init_LSM'
+         CHARACTER(  16 ), SAVE :: PNAME = 'Init_STAGE_LU'
          INTEGER l                             
          INTEGER :: STAT
 
@@ -364,6 +365,7 @@ C-------------------------------------------------------------------------------
             BSLP_PX = BSLP_PX_WRFV3
             RHOB_PX = RHOB_PX_WRFV3
          END IF
+         write(logdev,*) 'WRF_V4P',WRF_V4P
 
 #ifdef twoway                                  
          IF ( NUM_LAND_CAT .EQ. 24 ) THEN      
@@ -378,7 +380,7 @@ C-------------------------------------------------------------------------------
 #endif                                         
          Call STAGE_LU_MAPPER                           
                                                
-         END SUBROUTINE Init_LSM               
+         END SUBROUTINE Init_STAGE_LU               
          
          SUBROUTINE STAGE_LU_MAPPER
             
@@ -573,4 +575,4 @@ C-------------------------------------------------------------------------------
             n_lufrac = maxval(MET_TO_STAGE_LU%Met_Index)
          END SUBROUTINE STAGE_LU_MAPPER
                                                
-      END MODULE LSM_Mod                       
+      END MODULE STAGE_LU_Mod                       

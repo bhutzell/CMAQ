@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------!
 
 c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      Module Bidi_Mod
+      Module STAGE_Bidi_Mod
 
 C Contains the shared variables and subroutines needed for the bidirectional 
 C flux models in CMAQ
@@ -59,7 +59,7 @@ C                   D. Wong Feb 01 19: removed all MY_N clauses
 
 
       Contains 
-         Subroutine INIT_BIDI()
+         Subroutine INIT_STAGE_BIDI()
          Use GRID_CONF
          Use CGRID_SPCS          ! CGRID mechanism species
          Use UTILIO_DEFN
@@ -69,7 +69,7 @@ C                   D. Wong Feb 01 19: removed all MY_N clauses
          
 C... Local:
  
-         Character( 16 ) :: PNAME = 'INIT_BIDI       '
+         Character( 16 ) :: PNAME = 'INIT_STAGE_BIDI       '
          Integer         :: STATUS
          Logical, SAVE   :: INITIALIZED = .FALSE.
          
@@ -167,7 +167,7 @@ C Prevent initializing the code twice
          
          Return
          
-         End Subroutine INIT_BIDI
+         End Subroutine INIT_STAGE_BIDI
 !*****************************************************************************
 !************** Iput / output section of the module **************************
 !*****************************************************************************
@@ -539,4 +539,4 @@ C--------------------------------------------------------------------------
 
          End Subroutine WRASX_MEDIA
 
-      End Module Bidi_Mod   
+      End Module STAGE_Bidi_Mod   

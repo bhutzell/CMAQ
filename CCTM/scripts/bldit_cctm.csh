@@ -119,12 +119,10 @@ set make_options = "-j"                #> additional options for make command if
 
  set ModGrid   = grid/cartesian             #> grid configuration module 
  
- set DepMod    = m3dry                      #> m3dry or stage
-#set DepMod    = stage
  set ModAdv    = wrf_cons                   #> 3-D Advection Scheme [Options: wrf_cons (default), local_cons]
  set ModHdiff  = hdiff/multiscale           #> horizontal diffusion module
- set ModVdiff  = vdiff/acm2_${DepMod}       #> vertical diffusion module (see $CMAQ_MODEL/CCTM/src/vdiff)
- set ModDepv   = depv/${DepMod}             #> deposition velocity calculation module 
+ set ModVdiff  = vdiff/acm2                 #> vertical diffusion module (see $CMAQ_MODEL/CCTM/src/vdiff)
+ set ModDepv   = depv/depv                  #> deposition velocity calculation module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/depv)
  set ModEmis   = emis/emis                  #> in-line emissions module
  set ModBiog   = biog/beis4                 #> BEIS4 in-line emissions module 
@@ -264,16 +262,6 @@ set make_options = "-j"                #> additional options for make command if
     set PIO = ( -Dparallel_io )
  else
     set PIO = ""
- endif
-
- if ($DepMod == m3dry) then
-    set cpp_depmod = '-Dm3dry_opt'
- else if ($DepMod == stage) then
-    set cpp_depmod = '-Dstage_opt'
-    if ( $?DDM3D_CCTM ) then
-       echo "*** DDM3D is not compatible with the STAGE deposition model"
-       exit 1
-    endif
  endif
 
 #> Set variables needed for multiprocessor and serial builds
@@ -493,9 +481,9 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "lib_4       ioapi/lib;"                                     >> $Cfile
  echo                                                              >> $Cfile
  if ( $?build_mpas_cmaq ) then
-    set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $cpp_depmod $quote;"
+    set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $quote;"
  else
-    set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $cpp_depmod $STX1 $STX2$quote;"
+    set text = "$quote$CPP_FLAGS $PAR $SENS $PIO $STX1 $STX2$quote;"
  endif
  echo "cpp_flags   $text"                                          >> $Cfile
  echo                                                              >> $Cfile

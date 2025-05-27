@@ -202,7 +202,8 @@
       LOGICAL :: DEPV_DIAG  = .FALSE. ! flag for grid cell deposition velocity diagnostic file
       Logical :: HGBIDI     = .FALSE. ! flag for Hg bidirectional exchange
       Logical :: BIDI_FERT_NH3 = .TRUE. ! flag to remove fertilizer ammonia from Bidirectional emissions
-      Logical :: STAGE_E20 = .TRUE.   ! flag for the Emerson et al. 2020 Aerosol deposition model PNAS https://www.pnas.org/cgi/doi/10.1073/pnas.2014761117
+      Logical :: USE_STAGE = .FALSE.   ! flag for the STAGE deposition option
+      Logical :: STAGE_E20 = .TRUE.   ! flag for the Emerson et al. 2020 Aerosol deposition model 
       Logical :: STAGE_P22 = .FALSE.  ! flag for the Pleim et al. 2022 Aerosol deposition model
       Logical :: STAGE_S22 = .FALSE.  ! flag for the Shu et al. 2022 Aerosol deposition model
       CHARACTER(16) :: DUST_LAND_SCHEME = "UNKNOWN" ! NLCD, USGS, etc
@@ -754,6 +755,9 @@
       ! CTM_IGNORE_FERT_NH3
       CALL GET_ENV ( BIDI_FERT_NH3, 'CTM_BIDI_FERT_NH3', BIDI_FERT_NH3, VARDEV )
  
+      ! Flag for Surface Tiled Aerosol and Gaseous Exchange (STAGE) model Emerson et al. 2020 Aerosol Deposition Option
+      CALL GET_ENV ( USE_STAGE, 'CTM_USE_STAGE', USE_STAGE, VARDEV )
+
       ! Flag for using BELD Land Use for WindBlown Dust 
       CALL GET_ENV ( STRTEMP, 'CTM_WBDUST_BELD', DUST_LAND_SCHEME, VARDEV )
       DUST_LAND_SCHEME = STRTEMP( 1:16)
