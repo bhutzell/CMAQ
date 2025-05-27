@@ -222,7 +222,6 @@
       CHARACTER( MAXLEN_CCTM_APPL ) :: STAGECTRL  = 'STAGECTRL_NML' ! STAGE Deposition Control Filename
       CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CTRL  = 'CMAQ_CTRL_NML' ! Emission Control Filename
       CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CHEM_CTRL  = 'CMAQ_CH_CTRL_NML' ! Emission Control Filename
-      INTEGER :: EMLAYS_MX     = 0       ! Emission Layers
       INTEGER :: N_FILE_GR     = 0       ! Number of Gridded Emission Files
       INTEGER :: N_FILE_TR     = 0       ! NUmber of Tracer Emission Files
       LOGICAL :: EMISCHK       = .TRUE.  ! flag for checking that surrogate emissions 
@@ -814,9 +813,6 @@
          WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
-
-      ! Number of Layers for Emissions
-      CALL GET_ENV ( EMLAYS_MX, 'CTM_EMLAYS', EMLAYS_MX, VARDEV )
 
       ! Get Name of Emission Control File
       CALL GET_ENV ( CMAQ_CTRL, 'CMAQ_CTRL_NML', CMAQ_CTRL, VARDEV )
