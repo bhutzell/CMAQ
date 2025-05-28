@@ -605,27 +605,28 @@ c----------------------------------------------------------
      &    'CO        '/ )
 
         !CRACMM3M
-        ALLOCATE( ISAM_SPEC_VOC( 7 )%LIST( 98 ) )
+        ALLOCATE( ISAM_SPEC_VOC( 7 )%LIST( 99 ) )
         ISAM_SPEC_VOC( 7 )%LIST = (/'ACD       ','ACE       ','ACRO      ',
      &    'ACT       ','ALD       ','API       ','BALD      ','BDE13     ',
      &    'BEN       ','CSL       ','DCB1      ','DCB2      ','DCB3      ',
-     &    'EBZ       ','ELHOM     ','EOH       ','ETE       ','ETEG      ',
-     &    'ETH       ','FURAN     ','FURANONE  ','GLY       ','HOM       ',
+     &    'EBZ       ','VELHOM    ','EOH       ','ETE       ','ETEG      ',
+     &    'ETH       ','FURAN     ','FURANONE  ','GLY       ','VHOM      ',
      &    'HC3       ','HC5       ','HC10      ','HCHO      ','HKET      ',
-     &    'HONIT     ','IEPOX     ','ISHP      ','IPX       ','ISO       ',
+     &    'VHONIT    ','IEPOX     ','ISHP      ','IPX       ','ISO       ',
      &    'KET       ','LIM       ','LIMAL     ','MACR      ','MAHP      ',
      &    'MCT       ','MEK       ','MGLY      ','MOH       ','MVK       ',
      &    'NAPH      ','OLI       ','OLT       ','OP1       ','OP2       ',
-     &    'OP3       ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
+     &    'VOP3      ','OPB       ','ORA1      ','ORA2      ','PINAL     ',
      &    'PHEN      ','PROG      ','ROH       ','SESQ      ','SLOWROC   ',
      &    'STY       ','TOL       ','UALD      ','XYL       ','PAA       ',
      &    'PAN       ','PPN       ','MPAN      ','ONIT      ','ISON      ',
-     &    'TRPN      ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
+     &    'VTRPN     ','VROCIOXY  ','VROCP5ARO ','VROCP6ARO ','VROCN2ALK ',
      &    'VROCN1ALK ','VROCP0ALK ','VROCP1ALK ','VROCP2ALK ','VROCP3ALK ',
      &    'VROCP4ALK ','VROCP5ALK ','VROCP6ALK ','VROCN2OXY2','VROCN2OXY4',
      &    'VROCN2OXY8','VROCN1OXY1','VROCN1OXY3','VROCN1OXY6','VROCP0OXY2',
      &    'VROCP0OXY4','VROCP1OXY1','VROCP1OXY3','VROCP2OXY2','VROCP3OXY2',
-     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','ECH4      ','CO        '/ )
+     &    'VROCP4OXY2','VROCP5OXY1','VROCP6OXY1','VMTN1     ','ECH4      ',
+     &    'CO        '/ )
 
         !PRESCRIBE NITRATE SPECIES
         !CB6R5_AE7_AQ
