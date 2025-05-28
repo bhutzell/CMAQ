@@ -194,7 +194,7 @@ C Open speciation profiles file
          IF ( SPPRO .EQ. 'DEFAULT' ) THEN 
             INDX = INDEX1( MECHNAME, NMECHS, BIOG_MECH_MAP%CHEMMECH )
             SPPRO = BIOG_MECH_MAP( INDX )%BIOGMECH
-            WRITE( LOGDEV, '(5X,A,A,A)' ), 'Accessing compatible biogenic ',
+            WRITE( LOGDEV, '(5X,A,A,A)' ) 'Accessing compatible biogenic ',
      &             'emissions mechanism: ',TRIM( SPPRO )
          END IF
 
@@ -452,7 +452,7 @@ C Find emitted CMAQ species names
                   MSPCS = MSPCS + 1
                   EMSPC( MSPCS ) = SPCNAMES( ISP,POL )
 
-                  WRITE (MESG, '(A,I0,A,A)'),'BEIS: Species ',MSPCS,' is ',TRIM(EMSPC( MSPCS ))
+                  WRITE (MESG, '(A,I0,A,A)') 'BEIS: Species ',MSPCS,' is ',TRIM(EMSPC( MSPCS ))
                   CALL M3MESG( MESG )
 #ifdef Verbose
                   write( logdev,'( 5X, I3, 1X, A5, 5X, I3, 1X, A16, I4, 3X, A16 )' )
@@ -466,7 +466,7 @@ C Find emitted CMAQ species names
             END DO
          END DO
 
-         WRITE (MESG, '(A,I0)'),'BEIS: Number species found in speciation profile = ',MSPCS
+         WRITE (MESG, '(A,I0)') 'BEIS: Number species found in speciation profile = ',MSPCS
          CALL M3MESG( MESG )
 
 C Save Species names in global array for mapping emissions

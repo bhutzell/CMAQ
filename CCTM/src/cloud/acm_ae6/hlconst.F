@@ -70,7 +70,7 @@ C...pointers for the dissociation constants (arrays B and D)
          INTEGER, PARAMETER :: MHBR       = 17  ! HBR
          INTEGER, PARAMETER :: MHI        = 18  ! HI
          INTEGER, PARAMETER :: MACRYACID  = 19  ! CCH3COOH
-	 
+ 
          CHARACTER( 16 )    :: SUBNAME( MXSPCS )  ! list of substance names	 
 
 C...Henry's law constant data taken mostly from Rolf Sanders' Compilation of
@@ -475,7 +475,7 @@ C...  Atmospheric Chemistry and Physics, 1997
             END IF
 
          END SUBROUTINE HLCONST_INIT
-	 
+ 
          REAL FUNCTION HLCONST ( ISUB, TEMP, EFFECTIVE, HPLUS )
 
 C-----------------------------------------------------------------------
@@ -589,7 +589,7 @@ C...error if index out of range in table
         WRITE( XMSG, '(A,I4,A)' ) ' index ', ISUB, ' out of range in Henry''s'//
      &         ' Law Constant table in routine HLCONST'
         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2 )
-      END IF	 
+      END IF 
 
 C...compute the Henry's Law Constant
 
@@ -612,7 +612,7 @@ C...compute the effective Henry's law constants
 
 C...assign a value for clminus.  use 2.0 mM based on Lin and Pehkonen, 1998, JGR
 
-	CLMINUS   = 2.0E-03                ! chloride ion conc [CL-]
+        CLMINUS   = 2.0E-03                ! chloride ion conc [CL-]
         CLMINUSI  = 1.0 / CLMINUS          ! 1 / CLMINUS
 
         IF ( ISUB .EQ. HLC_SO2 ) THEN      !   SO2H2O <=> HSO3- + H+

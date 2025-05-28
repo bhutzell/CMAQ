@@ -91,7 +91,7 @@
 
       ! Check for Error in File Open Process
       IF ( IOST .NE. 0 ) THEN
-          WRITE( XMSG, '(A,A,A)' ),'ERROR: Could not read ',
+          WRITE( XMSG, '(A,A,A)' ) 'ERROR: Could not read ',
      &           'CMAQ CHemical Control namelist file: ',TRIM( CMAQ_CHEM_CTRL )
           CALL M3EXIT( PNAME,0,0,XMSG,1 )
       END IF
@@ -793,7 +793,7 @@
            ! sign
            READ( NUMSTRING, '(E20.6)' ) COEF
            IF ( LNEG ) THEN
-               COEF = COEF * -1.0
+               COEF = COEF * (-1.0)
                LNEG = .FALSE.
            END IF
 

@@ -772,7 +772,7 @@ c:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
       N_NML = ELMO_FILE( IFL )%N_VARS_IN
       N_END = INDEX1( '', N_NML, ELMO_FILE( IFL )%VARS_IN(:) ) - 1
       IF ( N_END .LE. 0 ) THEN
-          WRITE( XMSG, '(A)' ),'ERROR: Unreadable variables requested for ELMO output'
+          WRITE( XMSG, '(A)' ) 'ERROR: Unreadable variables requested for ELMO output'
           CALL M3EXIT( PNAME, 0, 0, XMSG, 1 )
       END IF
       

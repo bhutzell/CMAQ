@@ -211,19 +211,19 @@ C-----------------------------------------------------------------------
       CPU_TIME_START = REAL( REAL_TIME,8 )
 #endif
       CPU_TIME_START_MASTER = CPU_TIME_START
-      WRITE( XMSG, '(A,I7.7,A,I6.6)' ), 'Processing Day/Time [YYYYDDD:HHMMSS]: ',JDATE, 
+      WRITE( XMSG, '(A,I7.7,A,I6.6)' ) 'Processing Day/Time [YYYYDDD:HHMMSS]: ',JDATE, 
      &       ':',JTIME
       IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
       CALL LOG_MESSAGE( LOGDEV, XMSG )
 
       CDATE_TIME = DT2STR( JDATE, JTIME )
-      WRITE( XMSG, '(2x,6A)' ), 'Which is Equivalent to (UTC): ',
+      WRITE( XMSG, '(2x,6A)' ) 'Which is Equivalent to (UTC): ',
      &       CDATE_TIME(1:8),' ',TRIM( WEEKDAY( WKDAY( JDATE ) ) ),
      &       ',', CDATE_TIME(9:)
       IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
       CALL LOG_MESSAGE( LOGDEV, XMSG )
 
-      WRITE( XMSG, '(2x,A,I6.6)' ), 'Time-Step Length (HHMMSS): ',TSTEP(2) 
+      WRITE( XMSG, '(2x,A,I6.6)' ) 'Time-Step Length (HHMMSS): ',TSTEP(2) 
       IF ( MYPE .EQ. 0 ) CALL LOG_MESSAGE( OUTDEV, XMSG )
       CALL LOG_MESSAGE( LOGDEV, XMSG )
 

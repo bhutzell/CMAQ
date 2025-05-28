@@ -354,7 +354,7 @@ C-------------------------------------------------------------------------------
          DEPSPC( 269) = 'HCOBR           '
          DEPSPC( 270) = 'CH2I2           '
          DEPSPC( 271) = 'CH2IBR          '
-         DEPSPC( 272) = 'CH2ICL          '	 
+         DEPSPC( 272) = 'CH2ICL          ' 
          DEPSPC( 273) = 'CHBR2CL         '
          DEPSPC( 274) = 'CHBRCL2         '
          DEPSPC( 275) = 'CH2BRCL         '

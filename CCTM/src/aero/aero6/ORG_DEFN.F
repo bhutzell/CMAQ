@@ -2478,10 +2478,10 @@ C     (percent) or abstol (absolute) amount
         nguess  = ( lower + upper ) / 2.0e0 ! new guess is halfway b/w old lower and upper
         fnguess = soaequation( nonvolmol, n, cstaratt, totsemivol, mlwt, nguess ) ! function evaluated at new guess
 
-        Write( logdev,* ), 'iter   ', iter
-        Write( logdev,* ), 'Lower= ', lower, flower
-        Write( logdev,* ), 'Upper= ', upper, fupper
-        Write( logdev,* ), 'Guess= ', nguess, fnguess
+        Write( logdev,* ) 'iter   ', iter
+        Write( logdev,* ) 'Lower= ', lower, flower
+        Write( logdev,* ) 'Upper= ', upper, fupper
+        Write( logdev,* ) 'Guess= ', nguess, fnguess
 
         If ( nguess .Ne. 0.0 ) Then           ! safe division
           ea = ABS( nguess - oldn )/nguess   ! fractional diff b/w 2guesses
