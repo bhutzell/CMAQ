@@ -820,16 +820,27 @@ c----------------------------------------------------------
      &                  'CL2         '/)
 
         !CRACMM2
-        ALLOCATE( ISAM_SPEC_HAPGAS( 5 )%LIST( 1 ) )
-        ISAM_SPEC_HAPGAS( 5 )%LIST = (/'HCHO        '/)
+        ALLOCATE( ISAM_SPEC_HAPGAS( 5 )%LIST( 10 ) )
+        ISAM_SPEC_HAPGAS( 5 )%LIST = (/'HCHO        ','ACD         ',
+     &                  'ACRO        ','BDE13       ','BEN         ',
+     &                  'EBZ         ','ETEG        ','MOH         ',
+     &                  'STY         ','TOL         '/)
+
 
         !CRACMM3
-        ALLOCATE( ISAM_SPEC_HAPGAS( 6 )%LIST( 1 ) )
-        ISAM_SPEC_HAPGAS( 6 )%LIST = (/'HCHO        '/)
+        ALLOCATE( ISAM_SPEC_HAPGAS( 6 )%LIST( 11 ) )
+        ISAM_SPEC_HAPGAS( 6 )%LIST = (/'HCHO        ','ACD         ',
+     &                  'ACRO        ','BDE13       ','BEN         ',
+     &                  'EBZ         ','ETEG        ','MOH         ',
+     &                  'STY         ','TOL         ','CL2         '/)
+
 
         !CRACMM3M
-        ALLOCATE( ISAM_SPEC_HAPGAS( 7 )%LIST( 2 ) )
-        ISAM_SPEC_HAPGAS( 7 )%LIST = (/'HCHO        ','CL2         '/)
+        ALLOCATE( ISAM_SPEC_HAPGAS( 7 )%LIST( 11 ) )
+        ISAM_SPEC_HAPGAS( 7 )%LIST = (/'HCHO        ','ACD         ',
+     &                  'ACRO        ','BDE13       ','BEN         ',
+     &                  'EBZ         ','ETEG        ','MOH         ',
+     &                  'STY         ','TOL         ','CL2         '/)
 
         !AEROSOL HAPS
         ALLOCATE( ISAM_SPEC_HAPAERO%LIST( 14 ) )
