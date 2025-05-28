@@ -162,7 +162,7 @@
    'EVERYWHERE', 'ALL'        ,'AROCP1OXY3','AROCP1OXY3','FINE'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'AROCP2OXY2','AROCP2OXY2','FINE'  ,1   ,'UNIT','a',
    'EVERYWHERE', 'ALL'        ,'AROCP3OXY2','AROCP3OXY2','FINE'  ,1   ,'UNIT','a',
-
+ 
    ! Scale Fire ROC Emissions to account for organic compound volatility 
    !
    ! Residential Wood Combustion emissions were processed for the 2022 platform with
@@ -173,12 +173,16 @@
    ! atmosphere. Thus, the emissions for LVOCs and SVOCs (AROCN2-AROCP2) need to be
    ! scaled down to 60% of the total PM emission factor, consistent with May et al. 
    ! (2013). Of the remaining 40% of the PM factor, 10% is categorized as an IVOC with
-   ! C* ~ 1,000 ug m-3 (VROCP3) and 30% is an IVOC with C* ~ 10,000 ug m-3 (VROCP4).
+   ! C* ~ 1,000 ug m-3 (VROCP3) and 30% is an IVOC with C* ~ 10,000 ug m-3 (VROCP4). 
+   ! The O:C of VROCP3 and VROCP4 is assumed to be 0.091 and 0.035, following Ciarelli
+   ! et al. (2019). This is accomplished by distributing each between the alkane species
+   ! with O:C = 0.0 and OXY2 with O:C = 0.2.
    !
    ! AROCP0OXY4 is scaled to 15% of the PM emission factor upstream in the EPA emissions
-   ! workflow through the S2S Tool. The scaling for VROCP3ALK (0.1) and VROCP4ALK (0.3) 
-   ! is normalized to AROCP0OXY4. This should only be applied operationally for Residential 
-   ! Wood Combustion, and not for wild, prescribed, or agricultural fires.
+   ! workflow through the S2S Tool. The scaling for VROCP3ALK (0.0545), VROCP3OXY2 (0.0455),
+   ! VROCP4ALK (0.2475), and VROCP4OXY2 (0.0525) are normalized to AROCP0OXY4 (0.15). This should 
+   ! only be applied operationally for Residential Wood Combustion, and not for wild, 
+   ! prescribed, or agricultural fires.
    !
    ! When applying this scaling, check that 'GR_RWC' is updated to correspond to the 
    ! stream label the Run Script has assigned to the residential wood combustion 
@@ -187,7 +191,11 @@
    ! May et al., Gas-particle partitioning of primary organic aerosol emissions: 
    !    3. Biomass burning. Journal of Geophysical Research: Atmospheres. Vol. 118,
    !    11, 327-11,338, 2013.
- 
+   ! Ciarelli et al., Constraining a hybrid volatility basis-set model for aging of
+   !    wood-burning emissions using smog chamber experiments: a box-model study
+   !    based on the VBS scheme of the CAMx model (v5.4). Geoscientific Model 
+   !    Development, 10, 2303-2320, 2017.
+
    'EVERYWHERE', 'GR_RWC'      ,'AROCN2OXY4', 'AROCN2OXY4'  ,'FINE',0.6  ,'UNIT','m',
    'EVERYWHERE', 'GR_RWC'      ,'AROCN2OXY8', 'AROCN2OXY8'  ,'FINE',0.6  ,'UNIT','m',
    'EVERYWHERE', 'GR_RWC'      ,'AROCN1OXY3', 'AROCN1OXY3'  ,'FINE',0.6  ,'UNIT','m',
@@ -198,8 +206,10 @@
    'EVERYWHERE', 'GR_RWC'      ,'AROCP1OXY3', 'AROCP1OXY3'  ,'FINE',0.6  ,'UNIT','m',
    'EVERYWHERE', 'GR_RWC'      ,'AROCP2ALK',  'AROCP2ALK'   ,'FINE',0.6  ,'UNIT','m',
    'EVERYWHERE', 'GR_RWC'      ,'AROCP2OXY2', 'AROCP2OXY2'  ,'FINE',0.6  ,'UNIT','m',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP3ALK'   ,'GAS' ,0.667,'MASS','a',
-   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP4ALK'   ,'GAS' ,2.0  ,'MASS','a',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP3ALK'   ,'GAS' ,0.363,'MASS','a',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP3OXY2'  ,'GAS' ,0.303,'MASS','a',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP4ALK'   ,'GAS' ,1.650,'MASS','a',
+   'EVERYWHERE', 'GR_RWC'      ,'AROCP0OXY4', 'VROCP4OXY2'  ,'GAS' ,0.350,'MASS','a',
  
    ! For biogenics:
    ! Used for MEGAN only

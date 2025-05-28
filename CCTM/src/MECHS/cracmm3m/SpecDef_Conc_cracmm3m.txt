@@ -286,7 +286,7 @@ ATOTJ           ,ug m-3    ,ASO4J[1] + ANH4J[1] + ANO3J[1] + ANAJ[1]   \
                            +ACLJ[1] + AECJ[1] + AOMJ[0] + AOTHRJ[1]    \
                            +AFEJ[1] + AALJ[1] + ASIJ[1] + ATIJ[1]      \
                            +ACAJ[1] + AMGJ[1] + AKJ[1] + AMNJ[1]       \
-			   +AHMSJ[1]  
+			               +AHMSJ[1]  
                             
 ATOTK           ,ug m-3    ,ASO4K[1] + ANH4K[1] + ANO3K[1] + ACLK[1]   \
                            +ACORS[1] + ASOIL[1] + ASEACAT[1]   
@@ -298,7 +298,7 @@ AUNSPEC1IJ      ,ug m-3    ,ATOTIJ[0] - (ASO4IJ[0] + ANO3IJ[0]         \
                                          +ANH4IJ[0] + ACLIJ[0]         \
                                          +ANAIJ[0] + AECIJ[0]          \
                                          +AOCIJ[0] + ASOILJ[0]         \
-					 +AHMSJ[0])       
+					                     +AHMSJ[0])       
 !! Non-Carbon Organic Mass
 ANCOMIJ         ,ug m-3    ,AOMIJ[0] - AOCIJ[0]
 
