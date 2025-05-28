@@ -134,10 +134,10 @@
                'ALD','NOZ','SULF','LSIROCG','TOTROCG'
 
   Keywd_name(7) = 'DEFAULT_CRACMM3'
-  Keywd(7,:) = 'DEFAULT_CRACMM2'
+  Keywd(7,:) = 'DEFAULT_CRACMM2', 'PMF_HMS', 'PM25_HMS'
 
   Keywd_name(70) = 'DEFAULT_CRACMM3M'
-  Keywd(70,:) = 'DEFAULT_CRACMM2'
+  Keywd(70,:) = 'DEFAULT_CRACMM2', 'PMF_HMS', 'PM25_HMS'
 
   Keywd_name(72) = 'DEFAULT_CRACMM3HAPS'
   Keywd(72,:) = 'DEFAULT_CRACMM2','PM_TOXICS','GAS_TOXICS','P_HCN','EOH','HCL','MOH',
@@ -207,16 +207,16 @@
 
   Keywd_name(15) = 'FINE_SPECIES_A'
   Keywd(15,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
-                'PMF_OA','PMF_OTH','PMF_RCSOIL'
+                'PMF_OA','PMF_OTH','PMF_RCSOIL' 
 
   Keywd_name(16) = 'FINE_SPECIES_B'
   Keywd(16,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
-                'PMF_OC','PMF_OTHWNC','PMF_RCSOIL'
+                'PMF_OC','PMF_OTHWNC','PMF_RCSOIL' 
 
   Keywd_name(17) = 'FINE_SPECIES_C'
   Keywd(17,:) = 'PMF_SO4','PMF_NO3','PMF_NH4','PMF_CL','PMF_NA','PMF_EC',
                 'PMF_OA','AOTHR','PMF_FE','PMF_SI','PMF_CA','PMF_MG',
-                'PMF_MN','PMF_AL','PMF_K'
+                'PMF_MN','PMF_AL','PMF_K' 
 
   Keywd_name(18) = 'PM_FINE_VARS'
   Keywd(18,:) = 'PMF_H2O','PMF_HP','PMF_HPMOLAL','PMF_PH','FINE_ORG'
@@ -363,10 +363,10 @@
                 'SEASPRAY_SULFUR_DEP','WD_TSP_CL','DD_TCL',
   
   Keywd_name(43) = 'DEFAULT_DEP_CRACMM3'
-  Keywd(43,:) = 'DEFAULT_DEP_CRACMM2'
+  Keywd(43,:) = 'DEFAULT_DEP_CRACMM2', 'DD_PMF_HMS','WD_PMF_HMS'
   
   Keywd_name(71) = 'DEFAULT_DEP_CRACMM3M'
-  Keywd(71,:) = 'DEFAULT_DEP_CRACMM2'
+  Keywd(71,:) = 'DEFAULT_DEP_CRACMM2', 'DD_PMF_HMS','WD_PMF_HMS'
  
   Keywd_name(73) = 'DEFAULT_DEP_CRACMM3HAPS'
   Keywd(73,:) = 'DEFAULT_DEP_CRACMM2','DD_PMF_CL','DD_PMC_CL','DD_TSP_CL','WD_TSP_CL','DD_HCL','WD_HCL',

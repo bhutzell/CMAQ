@@ -25,7 +25,7 @@ C what(1) key, module and SID; SCCS file; date and time of last delta:
 C %W% %P% %G% %U%
  
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE OPDDEP_MOS ( JDATE, JTIME, TSTEP )
+      SUBROUTINE STAGE_OPDDEP_MOS ( JDATE, JTIME, TSTEP )
 
 C   30 Mar 01 J.Young: dyn alloc - Use HGRD_DEFN
 C   03 Sep 01 David Wong: for new pario
@@ -53,7 +53,7 @@ C Arguments:
 
 C Local variables:
 
-      CHARACTER( 16 ) :: PNAME = 'OPDDEP_MOS'
+      CHARACTER( 16 ) :: PNAME = 'STAGE_OPDDEP_MOS'
       CHARACTER( 96 ) :: XMSG = ' '
 
       INTEGER      V, N, L     ! loop induction variables
@@ -94,12 +94,9 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          YCELL3D = YCELL_GD
          VGTYP3D = VGTYP_GD
          VGTOP3D = VGTOP_GD
-!        VGTPUN3D = VGTPUN_GD ! currently, not defined
          DO L = 1, NLAYS3D + 1
-!           VGLVS3D( L ) = VGLVS_GD( L )
-            VGLVS3D( L ) = 1.0  ! just a dummy variable b/c they aren't really levels
+           VGLVS3D( L ) = VGLVS_GD( L )
          END DO
-!        GDNAM3D = GDNAME_GD
          GDNAM3D = GRID_NAME  ! from HGRD_DEFN
 
          N = 0

@@ -202,7 +202,8 @@
       LOGICAL :: DEPV_DIAG  = .FALSE. ! flag for grid cell deposition velocity diagnostic file
       Logical :: HGBIDI     = .FALSE. ! flag for Hg bidirectional exchange
       Logical :: BIDI_FERT_NH3 = .TRUE. ! flag to remove fertilizer ammonia from Bidirectional emissions
-      Logical :: STAGE_E20 = .TRUE.   ! flag for the Emerson et al. 2020 Aerosol deposition model PNAS https://www.pnas.org/cgi/doi/10.1073/pnas.2014761117
+      Logical :: USE_STAGE = .FALSE.   ! flag for the STAGE deposition option
+      Logical :: STAGE_E20 = .TRUE.   ! flag for the Emerson et al. 2020 Aerosol deposition model 
       Logical :: STAGE_P22 = .FALSE.  ! flag for the Pleim et al. 2022 Aerosol deposition model
       Logical :: STAGE_S22 = .FALSE.  ! flag for the Shu et al. 2022 Aerosol deposition model
       CHARACTER(16) :: DUST_LAND_SCHEME = "UNKNOWN" ! NLCD, USGS, etc
@@ -222,7 +223,6 @@
       CHARACTER( MAXLEN_CCTM_APPL ) :: STAGECTRL  = 'STAGECTRL_NML' ! STAGE Deposition Control Filename
       CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CTRL  = 'CMAQ_CTRL_NML' ! Emission Control Filename
       CHARACTER( MAXLEN_CCTM_APPL ) :: CMAQ_CHEM_CTRL  = 'CMAQ_CH_CTRL_NML' ! Emission Control Filename
-      INTEGER :: EMLAYS_MX     = 0       ! Emission Layers
       INTEGER :: N_FILE_GR     = 0       ! Number of Gridded Emission Files
       INTEGER :: N_FILE_TR     = 0       ! NUmber of Tracer Emission Files
       LOGICAL :: EMISCHK       = .TRUE.  ! flag for checking that surrogate emissions 
@@ -754,6 +754,9 @@
       ! CTM_IGNORE_FERT_NH3
       CALL GET_ENV ( BIDI_FERT_NH3, 'CTM_BIDI_FERT_NH3', BIDI_FERT_NH3, VARDEV )
  
+      ! Flag for Surface Tiled Aerosol and Gaseous Exchange (STAGE) model Emerson et al. 2020 Aerosol Deposition Option
+      CALL GET_ENV ( USE_STAGE, 'CTM_USE_STAGE', USE_STAGE, VARDEV )
+
       ! Flag for using BELD Land Use for WindBlown Dust 
       CALL GET_ENV ( STRTEMP, 'CTM_WBDUST_BELD', DUST_LAND_SCHEME, VARDEV )
       DUST_LAND_SCHEME = STRTEMP( 1:16)
@@ -814,9 +817,6 @@
          WRITE( OUTDEV, '(6x,A)' ),'  ---Env Variable---  |  ---Value---'
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
-
-      ! Number of Layers for Emissions
-      CALL GET_ENV ( EMLAYS_MX, 'CTM_EMLAYS', EMLAYS_MX, VARDEV )
 
       ! Get Name of Emission Control File
       CALL GET_ENV ( CMAQ_CTRL, 'CMAQ_CTRL_NML', CMAQ_CTRL, VARDEV )

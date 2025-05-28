@@ -61,6 +61,8 @@ WDEP_ANH4IJK       ,kg ha-1     ,ANH4I[2] + ANH4J[2] + ANH4K[2]
 DDEP_ASO4IJ        ,kg ha-1     ,ASO4I[1] + ASO4J[1]
 DDEP_ASO4K         ,kg ha-1     ,ASO4K[1]
 WDEP_ASO4IJK       ,kg ha-1     ,ASO4I[2] + ASO4J[2] + ASO4K[2]
+DDEP_AHMSJ         ,kg ha-1     ,AHMSJ[1]
+WDEP_AHMSJ         ,kg ha-1     ,AHMSJ[2]
 DDEP_AECIJ	   ,kg ha-1     ,AECI[1] +AECJ[1]
 
 !DDEP_SSSO4J        ,kg ha-1     ,0.2514*ANAJ[1]
@@ -73,7 +75,7 @@ DDEP_AECIJ	   ,kg ha-1     ,AECI[1] +AECJ[1]
 !-----------------------------------------------------!
 DDEP_NHX           ,kg ha-1     ,ANH4I[1] + ANH4J[1] + ANH4K[1] + 1.059*NH3[1]
 WDEP_NHX           ,kg ha-1     ,ANH4I[2] + ANH4J[2] + ANH4K[2] + 1.059*NH3[2]
-WDEP_TSO4          ,kg ha-1     ,ASO4I[2] + ASO4J[2] + ASO4K[2] + 1.5*SO2[2]
+WDEP_TSO4          ,kg ha-1     ,ASO4I[2] + ASO4J[2] + ASO4K[2] + 1.5*SO2[2] + 0.864*AHMSJ[2]
 
 !! Sodium
 DDEP_ANAIJ         ,kg ha-1     ,ANAI[1] + ANAJ[1]
@@ -221,7 +223,7 @@ TD_N_TOT           ,kgN ha-1    ,DD_N_TOT[0]   + WD_N_TOT[0]
 !-------------------------------------------------!
 !------------- Sulfur Deposition -----------------!
 !-------------------------------------------------!
-DD_S_TOT           ,kgS ha-1    ,0.5*SO2[1] + 0.33333*ASO4I[1] + 0.33333*ASO4J[1] + 0.33333*ASO4K[1]
+DD_S_TOT           ,kgS ha-1    ,0.5*SO2[1] + 0.33333*ASO4I[1] + 0.33333*ASO4J[1] + 0.33333*ASO4K[1] + 0.288*AHMSJ[1]
 WD_S_TOT           ,kgS ha-1    ,0.33333*WDEP_TSO4[0]
 TD_S_TOT           ,kgS ha-1    ,DD_S_TOT[0] + WD_S_TOT[0]
 !DD_S_SeaS          ,kgS ha-1    ,0.33333*DDEP_SSSO4J[0] + 0.33333*DDEP_SSSO4K[0]
